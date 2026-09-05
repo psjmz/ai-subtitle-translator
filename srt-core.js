@@ -707,6 +707,23 @@
     return repairThinSegs(splitByDuration(s, times, { locale: locale }), locale);
   }
 
+  // 单语导出分片（v0.9.13）：优先按时长占比切分（文本随语音出现），
+  // 但校验每片折行 ≤ maxLines；句组内时长严重不均时（如 4.4s vs 1.3s），
+  // 按时长分片会让长 cue 分到超 2 行的量，观感不可接受——此时退回按宽度均分
+  // （splitTextNatural 等宽分段，天然最小化"最大行数"）。译文总宽超出
+  // k×maxW×maxLines 容量时均分也无法全 ≤2 行，等宽分段仍是最优解，照常返回。
+  function splitCues(text, times, opts) {
+    opts = opts || {};
+    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
+    const maxLines = (opts.maxLines > 0) ? opts.maxLines : 2;
+    const locale = opts.locale;
+    const pieces = splitByDuration(text, times, { locale: locale });
+    if (times.length <= 1) return pieces;
+    const fits = (ps) => ps.every((p) => wrapToWidth(p, maxW, { normalize: true, locale: locale }).length <= maxLines);
+    if (fits(pieces)) return pieces;
+    return splitTextNatural(String(text == null ? '' : text), times.length, locale);
+  }
+
   // 退化段修复：有效字符（去标点/空白/符号）<= 2 的段，从相邻最肥的段按词借字，
   // 避免「源文一整句，译文只有标点/语气词」的观感。借字以词为单位整借（含其附着标点），不劈词。
   function repairThinSegs(segs, locale) {
@@ -907,7 +924,7 @@
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
-    splitTextNatural, splitAligned, buildBilingual, buildBilingualParts,
+    splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts,
     validateItems, anchorOk,
     MAX_W_DEFAULT: 20
   };

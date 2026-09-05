@@ -679,5 +679,35 @@ t('anchorOk：空文本与未知语言放行', () => {
   assert.strictEqual(C.anchorOk('   ', 'ko'), true);
 });
 
+console.log('— 单 cue 行数上限 splitCues（v0.9.13）—');
+t('splitCues：时长均衡时不介入，结果与 splitByDuration 一致', () => {
+  const times=[{start:0,end:2000},{start:2000,end:4000}];
+  const text='这是一条测试字幕内容长度适中的句子';
+  assert.deepStrictEqual(C.splitCues(text,times,{maxW:20,locale:'zh-CN'}), C.splitByDuration(text,times,{locale:'zh-CN'}));
+});
+t('splitCues：时长严重不均时退回宽度均分，每片折行 ≤2 行且零丢失', () => {
+  const times=[{start:0,end:9500},{start:9500,end:10000}];   // 95/5 时长占比
+  const text='这是一条非常长的测试字幕句子当句组内时长严重不均时长分片会让长的那条字幕分到超过两行的量需要兜底机制退回按宽度均分';
+  assert.strictEqual(C.textWidth(text) > 40, true, '前提：总宽超过单 cue 2 行容量');
+  const raw=C.splitByDuration(text,times,{locale:'zh-CN'});
+  assert.ok(C.wrapToWidth(raw[0],20,{normalize:true,locale:'zh-CN'}).length>2, '前提：复现时长分片 3 行 bug');
+  const ps=C.splitCues(text,times,{maxW:20,locale:'zh-CN'});
+  ps.forEach(p=>assert.ok(C.wrapToWidth(p,20,{normalize:true,locale:'zh-CN'}).length<=2,'每片折行 ≤2 行'));
+  assert.strictEqual(ps.join(''), text, '零丢失');
+});
+t('splitCues：译文总宽超出容量时等宽分片仍最优（≤3 行兜底）', () => {
+  const times=[{start:0,end:3000},{start:3000,end:6000}];
+  const text='容量不足的极端情况译文总宽度远超两条字幕四行的显示容量此时按宽度均分仍然是最小化最大行数的最优解每条三行兜底并且在数字与单位整体出现的场景下比如百分之三十和一千也不允许被拆散';
+  const ps=C.splitCues(text,times,{maxW:20,locale:'zh-CN'});
+  assert.strictEqual(C.textWidth(text) > 80, true, '前提：总宽超 2 cue × 2 行容量');
+  ps.forEach(p=>assert.ok(C.wrapToWidth(p,20,{normalize:true,locale:'zh-CN'}).length<=3,'每片 ≤3 行兜底'));
+  assert.strictEqual(ps.join(''), text, '零丢失');
+});
+t('splitCues：单 cue 句组直接透传不切分', () => {
+  const times=[{start:0,end:2000}];
+  const text='单条字幕的句子不参与切分';
+  assert.deepStrictEqual(C.splitCues(text,times,{maxW:20,locale:'zh-CN'}), [text]);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
