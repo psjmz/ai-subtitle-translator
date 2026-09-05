@@ -691,6 +691,69 @@
     return splitByDuration(text, times, { locale: locale });
   }
 
+  // 对齐切分（译文专用）：以参考各段（源文段）的宽度占比为切分目标，在自然断点择优。
+  // 双语切时间轴时，源/译若各自独立找断点，"第 i 段对第 i 段"的假设会被语序差、
+  // 语言密度差打破，出现源文一长串译文只剩"…/呃，"的错位段。按比例对齐后，
+  // 译文每段都能分到与源文段份量相当的内容；再经 repairThinSegs 兜底。
+  function splitAligned(text, refSegs, k, locale) {
+    k = Math.max(1, k | 0);
+    const s = String(text == null ? '' : text);
+    if (k <= 1) return [squashLines(s)];
+    if (!s.trim()) return new Array(k).fill('');
+    const ws = (refSegs || []).map((x) => Math.max(0.5, textWidth(x || '')));
+    while (ws.length < k) ws.push(0.5);
+    let cum = 0;
+    const times = ws.slice(0, k).map((w) => { const t = { start: cum * 100, end: (cum + w) * 100 }; cum += w; return t; });
+    return repairThinSegs(splitByDuration(s, times, { locale: locale }), locale);
+  }
+
+  // 退化段修复：有效字符（去标点/空白/符号）<= 2 的段，从相邻最肥的段按词借字，
+  // 避免「源文一整句，译文只有标点/语气词」的观感。借字以词为单位整借（含其附着标点），不劈词。
+  function repairThinSegs(segs, locale) {
+    const eff = (s) => Array.from(String(s || '').replace(/[\s\p{P}\p{S}]/gu, '')).length;
+    const chunksOf = (s) => {
+      try {
+        const seg = new Intl.Segmenter(locale || 'zh', { granularity: 'word' });
+        return Array.from(seg.segment(String(s))).map((x) => x.segment);
+      } catch (e) { return [String(s)]; }
+    };
+    for (let i = 0; i < segs.length; i++) {
+      if (eff(segs[i]) > 2) continue;
+      const cands = [i - 1, i + 1].filter((j) => j >= 0 && j < segs.length && eff(segs[j]) >= 6)
+        .sort((a, b) => eff(segs[b]) - eff(segs[a]));
+      if (!cands.length) continue;
+      const j = cands[0];
+      const chunks = chunksOf(segs[j]);
+      const moved = [];
+      // 从邻段靠界一侧借字：左邻借尾、右邻借头；一次借一词连同其附着标点
+      while (eff(moved.join('')) < 3 && chunks.length && eff(chunks.join('')) > 3) {
+        if (j < i) { // 借尾：尾部标点连同前面的词一起移动
+          let unit = '';
+          while (chunks.length) {
+            const c = chunks.pop();
+            unit = c + unit;
+            if (/[\p{L}\p{N}]/u.test(c)) break;   // 吃到含字母/数字的块为止
+          }
+          if (!unit) break;
+          moved.unshift(unit);
+        } else {     // 借头：头部的词连同其后标点一起移动
+          let unit = '';
+          while (chunks.length) {
+            const c = chunks.shift();
+            unit += c;
+            if (/[\p{L}\p{N}]/u.test(c) && (!chunks.length || /[\p{L}\p{N}]/u.test(chunks[0]))) break;
+          }
+          if (!unit) break;
+          moved.push(unit);
+        }
+      }
+      if (!moved.length) continue;
+      if (j < i) { segs[j] = chunks.join('').trim(); segs[i] = (moved.join('') + segs[i]).trim(); }
+      else { segs[j] = chunks.join('').trim(); segs[i] = (segs[i] + moved.join('')).trim(); }
+    }
+    return segs;
+  }
+
   // 由工作行生成双语字幕条目（结构化版：源文/译文分行保留，供 ASS 分层导出使用）。
   // rows：[{no,start,end,en,zh,flag}]（与前端 S.rows 同构；en=源文，zh=译文）
   // opts：
@@ -698,9 +761,10 @@
   //   srcLocale  源语言 BCP47（分词保护；英文等空格语言影响很小）
   //   dstLocale  目标语言 BCP47
   //   order      'src-first'（源文为主，默认）| 'dst-first'（译文为主）——结构化版仅透传，由调用方决定摆放
-  // 规则（严格 1+1）：
-  //   - 每条导出字幕 = 源文 1 行 + 译文 1 行；任一方折行超 1 行即把该 cue 切成 k 条子字幕
-  //     （k = max(源文折行数, 译文折行数)），源/译各自在自然断点切 k 段按序配对；
+  // 规则（可读性优先，详见函数内 R1/R2/R3）：
+  //   - 目标形态仍是 源文 1 行 + 译文 1 行；但微超宽（≤maxW+4）直接单行放下，
+  //     切分会产生饥饿段（≤2 有效字）时回退为整 cue（源/译各最多 2 行），
+  //     只有超 2+2 容量的长 cue 才真正切时间轴（源文自然断点切、译文按源文段宽占比对齐切）；
   //   - 子时间轴按源文各段显示宽度占比瓜分原 cue 时长（时间跟着说话内容走）；
   //   - flag='merged' 的行（句组合并被跳过的行）：其源文拼回承载行，避免源文丢失；
   //   - flag='drop'、无译文的行：跳过（与单语导出同口径）。
@@ -736,19 +800,38 @@
       const pushItem = (st, en, sLines, dLines) => {
         out.push({ no: out.length + 1, start: st, end: en, srcLines: sLines, dstLines: dLines });
       };
+      // 规则（可读性优先，三层兜底）：
+      //  R1 微超宽容忍：两边宽度都 ≤ maxW+4 时不折不切，直接单行放下（字幕适当长点观感更好）；
+      //  R2 饥饿段回退：切分后任一段只剩 <=2 个有效字（如 "…"/"呃，"）时放弃切分，
+      //     整 cue 显示，源/译各自最多折 2 行（2+2 封顶）——废字幕比满屏更糟；
+      //  R3 强制切分：超出 2+2 容量的长 cue 才切时间轴（源文自然断点切、译文按比例对齐切 + 段内修复）。
+      const effOf = (s) => Array.from(String(s || '').replace(/[\s\p{P}\p{S}]/gu, '')).length;
+      const srcW = srcText ? textWidth(srcText) : 0;
+      const dstW = textWidth(dstText);
+      if (srcW <= maxW + 4 && dstW <= maxW + 4) {
+        pushItem(e.start, e.end, srcText ? [srcText] : [], [dstText]);
+        continue;
+      }
       const srcLines = srcText ? wrapToWidth(srcText, maxW, { normalize: true, locale: opts.srcLocale }) : [];
       const dstLines = wrapToWidth(dstText, maxW, { normalize: true, locale: opts.dstLocale });
       let k = Math.max(srcLines.length, dstLines.length);
       if (k <= 1) { pushItem(e.start, e.end, srcLines, dstLines); continue; }
-      // 严格 1+1：切 k 条子字幕。自然断点切出的段仍可能超宽（断点偏离均分位），
-      // 此时递增 k 重切，直到每段都能单行放下（k 上限兜底：极端长词/原子实在切不动才接受段内折行）。
+      // 切 k 条子字幕。源文按自然断点切；译文按源文各段宽度占比对齐切（splitAligned 内含段内退化修复），
+      // 保证段对段份量对应。任一段仍超宽则递增 k 重切（上限兜底：极端长词/原子切不动才接受段内折行）。
       const fits = (segs) => segs.every((s) => !s || textWidth(s) <= maxW + 1e-9);
       let srcSegs = [], dstSegs = [];
       const kCap = k + 10;
       for (;; k++) {
         srcSegs = srcText ? splitTextNatural(srcText, k, opts.srcLocale) : new Array(k).fill('');
-        dstSegs = splitTextNatural(dstText, k, opts.dstLocale);
+        dstSegs = splitAligned(dstText, srcText ? srcSegs : null, k, opts.dstLocale);
         if ((fits(srcSegs) && fits(dstSegs)) || k >= kCap) break;
+      }
+      // R2：切分产生了饥饿段（空段不算——无源文行的译段独自成条属正常），
+      // 且整 cue 放得下 2+2 → 放弃切分，整 cue 折行显示
+      const starved = (segs) => segs.some((s) => s && effOf(s) <= 2);
+      if ((starved(srcSegs) || starved(dstSegs)) && srcW <= 2 * maxW && dstW <= 2 * maxW) {
+        pushItem(e.start, e.end, srcLines, dstLines);
+        continue;
       }
       // 子时间轴：按源文各段宽度占比分配（无源文时按译文段宽）
       const basis = (srcText ? srcSegs : dstSegs).map((s) => Math.max(0.5, textWidth(s)));
@@ -802,7 +885,7 @@
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
-    splitTextNatural, buildBilingual, buildBilingualParts,
+    splitTextNatural, splitAligned, buildBilingual, buildBilingualParts,
     validateItems,
     MAX_W_DEFAULT: 20
   };

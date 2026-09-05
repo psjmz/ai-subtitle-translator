@@ -581,5 +581,68 @@ t('MAX_W_DEFAULT = 20', () => {
   assert.strictEqual(C.MAX_W_DEFAULT, 20);
 });
 
+console.log('— 译文对齐切分（splitAligned / 退化段修复）—');
+const effLen = (s) => Array.from(String(s || '').replace(/[\s\p{P}\p{S}]/gu, '')).length;
+t('splitAligned：按源文段宽占比切译文，各段份量对应且无退化段', () => {
+  // 真实案例（Sam Altman 访谈 #63-64）：独立断点切分曾把译文切成 ["…我认为很重要，这样某个版本…"]["…"][…]
+  const srcSegs = ["the specifics of how Astra's being", 'released. I think it\'s', 'important so that a version', 'of it with specific guardrails. Um,'];
+  const zh = '关于Astra如何发布的具体细节，我认为很重要，这样某个版本…在早期版本中，我们为其设定了具体的防护措施。嗯，';
+  const segs = C.splitAligned(zh, srcSegs, 4, 'zh-CN');
+  assert.strictEqual(segs.length, 4);
+  segs.forEach((s, i) => assert.ok(effLen(s) > 2, '第 ' + i + ' 段退化: ' + JSON.stringify(s)));
+  // 零丢失：拼回（去空白）等于原文（去空白）
+  assert.strictEqual(segs.join('').replace(/\s+/g, ''), zh.replace(/\s+/g, ''));
+});
+t('splitAligned：k=1 原样返回，空文本返回 k 个空段', () => {
+  assert.deepStrictEqual(C.splitAligned('你好世界', ['a'], 1, 'zh-CN'), ['你好世界']);
+  assert.deepStrictEqual(C.splitAligned('', ['a', 'b'], 2, 'zh-CN'), ['', '']);
+});
+t('splitAligned：参考段缺失时按均分兜底', () => {
+  const segs = C.splitAligned('这是一段没有源文参考的译文内容需要切分', null, 3, 'zh-CN');
+  assert.strictEqual(segs.length, 3);
+  assert.ok(segs.every((s) => s.length > 0));
+});
+t('buildBilingualParts：长句组双语切分后无退化段、译文零丢失', () => {
+  const rows = [{
+    no: 1, start: 120000, end: 128000, flag: '',
+    en: "the specifics of how Astra's being released. I think it's important so that a version of it with specific guardrails. Um,",
+    zh: '关于Astra如何发布的具体细节，我认为很重要，这样某个版本…在早期版本中，我们为其设定了具体的防护措施。嗯，'
+  }];
+  const parts = C.buildBilingualParts(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.ok(parts.length >= 2, '应切分为多条');
+  parts.forEach((p, i) => {
+    const d = p.dstLines.join('');
+    assert.ok(effLen(d) > 2, '第 ' + i + ' 条译文退化: ' + JSON.stringify(d));
+  });
+  const joined = parts.map((p) => p.dstLines.join('')).join('').replace(/\s+/g, '');
+  assert.strictEqual(joined, rows[0].zh.replace(/\s+/g, ''), '译文拼接应零丢失');
+});
+t('R1 微超宽容忍：宽度 ≤ maxW+4 时不折不切、单行放下', () => {
+  // 英文约 44 字母 ≈ 22 宽（>20 但 ≤24）；中文 22 字 = 22 宽
+  const rows = [{
+    no: 1, start: 0, end: 4000, flag: '',
+    en: 'It is really important so that a version of it ships soon',
+    zh: '我认为这确实非常重要，这样某个版本才能发布，嗯'
+  }];
+  assert.ok(C.textWidth(rows[0].en) > 20 && C.textWidth(rows[0].en) <= 24, '前提：源文微超宽');
+  assert.ok(C.textWidth(rows[0].zh) > 20 && C.textWidth(rows[0].zh) <= 24, '前提：译文微超宽');
+  const parts = C.buildBilingualParts(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(parts.length, 1, '微超宽不应切分');
+  assert.deepStrictEqual(parts[0].srcLines, [rows[0].en]);
+  assert.deepStrictEqual(parts[0].dstLines, [rows[0].zh]);
+});
+t('R2 饥饿段回退：切分只剩几个字的段时放弃切分，整 cue 最多 2+2 行', () => {
+  // 源文自然断点在 "Right." 后 → 第 1 段极短；译文按比例切第 1 段只剩 "嗯，" → 饥饿 → 回退整 cue
+  const rows = [{
+    no: 1, start: 0, end: 6000, flag: '',
+    en: 'Right. It is important so that a version of it ships safely',
+    zh: '嗯，对。我认为这样某个版本能安全发布非常重要。'
+  }];
+  const parts = C.buildBilingualParts(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(parts.length, 1, '饥饿段应触发整 cue 回退: ' + JSON.stringify(parts.map((p) => p.dstLines)));
+  assert.ok(parts[0].srcLines.length <= 2 && parts[0].dstLines.length <= 2, '回退后每方最多 2 行');
+  assert.strictEqual(parts[0].dstLines.join('').replace(/\s+/g, ''), rows[0].zh.replace(/\s+/g, ''), '译文零丢失');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
