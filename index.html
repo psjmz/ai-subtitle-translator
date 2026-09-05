@@ -149,7 +149,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 SRT 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.11</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.12</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -1520,10 +1520,19 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
   });
   // 校验齐全：每个输入句组必须有结果
   groups.forEach(g=>{ if(!byGno[g.gno]) throw new Error('缺少句组 '+g.gno+' 的结果'); });
+  // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
+  const dstV = $('dstLang').value;
+  const badAnchor = [];
+  for(const g of groups){
+    const m = byGno[g.gno];
+    if(!m || m.type==='drop') continue;
+    const txt = String(m.text||'').trim();
+    if(txt && !C.anchorOk(txt, dstV)) badAnchor.push(g.gno);
+  }
   // fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）
   const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
   const fillers=new Set((Array.isArray(obj.fillers)?obj.fillers:[]).map(Number).filter(no=>known.has(no)));
-  return { byGno, fillers };
+  return { byGno, fillers, badAnchor };
 }
 
 /* ---------------- 主流程 ---------------- */
@@ -1615,6 +1624,15 @@ async function runTranslate(){
         try{
           lastCall=Date.now();
           const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sys);
+          // 锚定失败且还有重试机会：丢弃本次结果重试；最后一次仍失败则接受结果（内容仍可用，仅语言跑偏）
+          if(out.badAnchor && out.badAnchor.length && attempt<maxTry-1){
+            log(t('batchFail',bi+1,attempt+1,'锚定校验未过（句组 '+out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':'')+' 译文非'+LBY(cfg.dst).zh+'）'),'err');
+            await new Promise(r=>setTimeout(r,1500));
+            continue;
+          }
+          if(out.badAnchor && out.badAnchor.length){
+            log('⚠️ 句组 '+out.badAnchor.slice(0,5).join(',')+(out.badAnchor.length>5?'…':'')+' 译文可能不是'+LBY(cfg.dst).zh+'，已按原样保留','err');
+          }
           Object.keys(out.byGno).forEach(k=>res.set(Number(k), out.byGno[k]));
           out.fillers.forEach(no=>fillerSet.add(no));
           ok=true;

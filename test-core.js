@@ -644,5 +644,40 @@ t('R2 饥饿段回退：切分只剩几个字的段时放弃切分，整 cue 最
   assert.strictEqual(parts[0].dstLines.join('').replace(/\s+/g, ''), rows[0].zh.replace(/\s+/g, ''), '译文零丢失');
 });
 
+console.log('— 语言锚定校验 anchorOk —');
+t('anchorOk：中文目标拒绝假名/谚文', () => {
+  assert.strictEqual(C.anchorOk('这是一个中文字幕。', 'zh-CN'), true);
+  assert.strictEqual(C.anchorOk('OpenAI 发布了新产品', 'zh-CN'), true);   // 专名保留原文合法
+  assert.strictEqual(C.anchorOk('これは日本語です', 'zh-CN'), false);     // 日文混入
+  assert.strictEqual(C.anchorOk('한국어 번역', 'zh-TW'), false);          // 韩文混入
+});
+t('anchorOk：日文目标拒绝中文/谚文，放行正常日文与纯专名', () => {
+  assert.strictEqual(C.anchorOk('これは日本語の字幕です。', 'ja'), true);
+  assert.strictEqual(C.anchorOk('アストラ', 'ja'), true);                  // 全片假名外来语合法
+  assert.strictEqual(C.anchorOk('OpenAI', 'ja'), true);                    // 纯拉丁专名合法
+  assert.strictEqual(C.anchorOk('日本語の漢字とかな', 'ja'), true);        // 汉字+假名 = 正常日文
+  assert.strictEqual(C.anchorOk('这是中文字幕', 'ja'), false);             // 有汉字无假名 = 中文
+  assert.strictEqual(C.anchorOk('我打算花大量时间提醒那些人', 'ja'), false);
+  assert.strictEqual(C.anchorOk('한국어', 'ja'), false);                   // 谚文混入
+});
+t('anchorOk：韩文目标拒绝汉字/假名', () => {
+  assert.strictEqual(C.anchorOk('이것은 한국어 자막입니다.', 'ko'), true);
+  assert.strictEqual(C.anchorOk('OpenAI', 'ko'), true);
+  assert.strictEqual(C.anchorOk('这是中文', 'ko'), false);
+  assert.strictEqual(C.anchorOk('これは日本語です', 'ko'), false);
+});
+t('anchorOk：拉丁/西里尔等目标拒绝 CJK', () => {
+  assert.strictEqual(C.anchorOk('Esto es un subtítulo en español.', 'es'), true);
+  assert.strictEqual(C.anchorOk("C'est un sous-titre français.", 'fr'), true);
+  assert.strictEqual(C.anchorOk('Это русский перевод.', 'ru'), true);
+  assert.strictEqual(C.anchorOk('这是一个中文字幕', 'es'), false);
+  assert.strictEqual(C.anchorOk('これは日本語です', 'fr'), false);
+  assert.strictEqual(C.anchorOk('한국어', 'de'), false);
+});
+t('anchorOk：空文本与未知语言放行', () => {
+  assert.strictEqual(C.anchorOk('', 'ja'), true);
+  assert.strictEqual(C.anchorOk('   ', 'ko'), true);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

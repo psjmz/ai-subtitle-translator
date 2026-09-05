@@ -877,6 +877,28 @@
     return issues;
   }
 
+  // 语言锚定校验：判断译文文本是否符合目标语言的文种（纯函数，供批后校验调用）。
+  // 背景：实测 DeepSeek 会间歇性地把整批日文译成中文（同 prompt 重发即恢复），
+  // 批后用本函数校验、失败整批重试即可挡住这类事故。
+  // 规则（保守，宁漏不误伤——专名/数字/外来语保留原文是合法译文）：
+  //   zh-CN / zh-TW : 不得含日文假名或韩文谚文；
+  //   ja            : 不得含谚文；含汉字时必须同时含假名（有汉字无假名 = 中文）；
+  //   ko            : 不得含汉字或假名；
+  //   其余目标语言   : 不得含 CJK（汉字/假名/谚文）。
+  // 空文本视为通过（交给完整性校验处理）。
+  const RE_HAN = /[\u3400-\u4dbf\u4e00-\u9fff]/;
+  const RE_KANA = /[\u3040-\u30ff\u31f0-\u31ff]/;
+  const RE_HANGUL = /[\u1100-\u11ff\uac00-\ud7af]/;
+  function anchorOk(text, dst) {
+    const s = String(text == null ? '' : text);
+    if (!s.trim()) return true;
+    const han = RE_HAN.test(s), kana = RE_KANA.test(s), hangul = RE_HANGUL.test(s);
+    if (dst === 'zh-CN' || dst === 'zh-TW') return !kana && !hangul;
+    if (dst === 'ja') return !hangul && !(han && !kana);
+    if (dst === 'ko') return !han && !kana;
+    return !han && !kana && !hangul;
+  }
+
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
@@ -886,7 +908,7 @@
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, buildBilingual, buildBilingualParts,
-    validateItems,
+    validateItems, anchorOk,
     MAX_W_DEFAULT: 20
   };
 });
