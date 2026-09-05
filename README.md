@@ -1,6 +1,6 @@
 # AI SRT Subtitle Translator
 
-[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL_3.0-blue.svg)](LICENSE)
+![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL_3.0-blue.svg)
 
 A free, self-hosted web workbench that translates `.srt` subtitle files with any OpenAI-compatible LLM (DeepSeek, OpenAI, GLM, Kimi, ...). Zero npm dependencies — one Node.js file serves everything.
 
@@ -11,7 +11,7 @@ A free, self-hosted web workbench that translates `.srt` subtitle files with any
 ## Quick start
 
 ```bash
-git clone https://github.com/YOUR_NAME/srt-translator.git
+git clone https://github.com/psjmz/srt-translator.git
 cd srt-translator
 node server.js          # Node >= 18, no npm install needed
 # open http://localhost:8972
@@ -26,6 +26,7 @@ No build step, no database, no Docker required. `data/` (one JSON file) holds al
 ## Highlights
 
 ### Translation quality
+
 - **Sentence-group aware**: cues are merged into complete sentences before translation, then split back onto the original timeline (duration-aware, so no over-long blocks)
 - **Word-boundary protection** via `Intl.Segmenter` — CJK words like 产品/価格 are never torn across lines
 - **Number-atom protection**: `30%`, `$50`, `1,000`, `12.5`, `100万美元` are treated as unbreakable atoms
@@ -35,11 +36,13 @@ No build step, no database, no Docker required. `data/` (one JSON file) holds al
 - **Filler removal**: uh / um / you know can be dropped
 
 ### Ready-to-burn output
+
 - Timeline validation (no overlaps, no gaps, sequential numbering)
 - Width-aware line wrapping (CJK = full-width, Latin auto-doubled threshold)
 - Output is a standards-compliant `.srt` ready for hard-subbing
 
 ### i18n + SEO (built-in, not an afterthought)
+
 - UI in **14 languages** (zh-CN / zh-TW / en / ja / es / pt / ko / de / fr / id / hi / th / vi / ru)
 - Per-language SEO routes (`/en/`, `/ja/`, ...): server-rendered `<title>` / description / OG tags / JSON-LD / copy blocks, so crawlers get the right language **without executing JS**
 - `sitemap.xml` with hreflang alternates, `robots.txt`, `?lang=` 301 redirects
@@ -47,6 +50,7 @@ No build step, no database, no Docker required. `data/` (one JSON file) holds al
 - Optional GA4: set your measurement ID in admin — nothing is injected if left empty
 
 ### Privacy
+
 By default everything runs **in your browser**; subtitle text is only sent to the model endpoint you configured. The server keeps no copies.
 
 ## Deployment
@@ -54,7 +58,7 @@ By default everything runs **in your browser**; subtitle text is only sent to th
 ### Any VPS (Ubuntu, one script)
 
 ```bash
-git clone https://github.com/YOUR_NAME/srt-translator.git
+git clone https://github.com/psjmz/srt-translator.git
 cd srt-translator
 bash deploy.sh                  # HTTP on :80
 bash deploy.sh --https your.domain.com   # Caddy + free Let's Encrypt cert
@@ -74,12 +78,12 @@ Any Nginx/Caddy pointing at the port works. Set `PUBLIC_URL=https://your.domain.
 
 All runtime config lives in `data/config.json`, editable at `/admin.html`:
 
-| Field | Meaning |
-|---|---|
-| Base URL / Model / API key | Any OpenAI-compatible chat-completions endpoint |
-| Per-IP / global daily limits | Free-quota abuse protection (0 = unlimited) |
-| Public URL | SEO canonical / sitemap prefix (empty = infer from request) |
-| GA4 ID | Inject gtag.js only when set (format `G-XXXXXXX`) |
+| Field                        | Meaning                                                     |
+| ---------------------------- | ----------------------------------------------------------- |
+| Base URL / Model / API key   | Any OpenAI-compatible chat-completions endpoint             |
+| Per-IP / global daily limits | Free-quota abuse protection (0 = unlimited)                 |
+| Public URL                   | SEO canonical / sitemap prefix (empty = infer from request) |
+| GA4 ID                       | Inject gtag.js only when set (format `G-XXXXXXX`)           |
 
 ## Tests
 

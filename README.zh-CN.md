@@ -11,7 +11,7 @@
 ## 快速开始
 
 ```bash
-git clone https://github.com/YOUR_NAME/srt-translator.git
+git clone https://github.com/psjmz/srt-translator.git
 cd srt-translator
 node server.js          # Node >= 18，无需 npm install
 # 打开 http://localhost:8972
@@ -54,7 +54,7 @@ node server.js          # Node >= 18，无需 npm install
 ### 任意 VPS（Ubuntu 一键脚本）
 
 ```bash
-git clone https://github.com/YOUR_NAME/srt-translator.git
+git clone https://github.com/psjmz/srt-translator.git
 cd srt-translator
 bash deploy.sh                        # HTTP 模式，占用 80
 bash deploy.sh --https your.domain.com  # Caddy + 免费 Let's Encrypt 证书
