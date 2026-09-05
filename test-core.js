@@ -463,5 +463,123 @@ t('编号连续 + formatSrt 整体往返', () => {
   assert.strictEqual(rt.items.length, 2);
 });
 
+console.log('— 多格式：WebVTT —');
+t('parseVtt：文件头 + cue 标识行 + 行内标签剥离', () => {
+  const vtt = 'WEBVTT - 测试\n\ncue-1\n00:00:01.000 --> 00:00:03.500\n<v Roger>Hello</v> <b>world</b>\n\nNOTE 这是注释\n\n00:01:00.250 --> 00:01:02.000\n第二段 &amp; 内容\n';
+  const { items, issues } = C.parseVtt(vtt);
+  assert.strictEqual(issues.length, 0, JSON.stringify(issues));
+  assert.strictEqual(items.length, 2);
+  assert.strictEqual(items[0].start, 1000);
+  assert.strictEqual(items[0].end, 3500);
+  assert.strictEqual(items[0].text, 'Hello world');
+  assert.strictEqual(items[1].text, '第二段 & 内容');
+});
+t('parseVtt：MM:SS.mmm 短格式时间', () => {
+  const { items } = C.parseVtt('WEBVTT\n\n01:23.456 --> 01:25.000\n短格式\n');
+  assert.strictEqual(items[0].start, 83456);
+  assert.strictEqual(items[0].end, 85000);
+});
+t('formatVtt → parseVtt 往返一致', () => {
+  const items = [
+    { no: 1, start: 200, end: 2600, text: '第一行' },
+    { no: 2, start: 3000, end: 5000, text: 'second line\nwith two rows' },
+  ];
+  const out = C.formatVtt(items);
+  assert.ok(out.startsWith('WEBVTT\n\n'));
+  const rt = C.parseVtt(out);
+  assert.strictEqual(rt.issues.length, 0, JSON.stringify(rt.issues));
+  assert.deepStrictEqual(rt.items, items);
+});
+t('fmtTimeVtt 毫秒小数点', () => {
+  assert.strictEqual(C.fmtTimeVtt(3723456), '01:02:03.456');
+});
+
+console.log('— 多格式：ASS/SSA —');
+t('parseAss：特效标签剥离 + \\N 换行 + Text 列含逗号', () => {
+  const ass = '[Script Info]\nTitle: x\n\n[V4+ Styles]\nFormat: Name, Fontname\nStyle: Default,Arial\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:01.00,0:00:03.50,Default,,0,0,0,,{\\an8}Hello, {\\i1}world{\\i0}\\N第二行\\h空格\nComment: 0,0:00:05.00,0:00:06.00,Default,,0,0,0,,注释不进字幕\nDialogue: 0,0:01:00.25,0:01:02.00,Default,,0,0,0,,第三段，含逗号\n';
+  const { items, issues } = C.parseAss(ass);
+  assert.strictEqual(issues.length, 0, JSON.stringify(issues));
+  assert.strictEqual(items.length, 2);
+  assert.strictEqual(items[0].start, 1000);
+  assert.strictEqual(items[0].end, 3500);
+  assert.strictEqual(items[0].text, 'Hello, world\n第二行 空格');
+  assert.strictEqual(items[1].text, '第三段，含逗号');
+});
+t('fmtTimeAss 厘秒格式', () => {
+  assert.strictEqual(C.fmtTimeAss(3723456), '1:02:03.45');
+  assert.strictEqual(C.fmtTimeAss(83456), '0:01:23.45');
+});
+t('formatAss：头部齐全 + 双语分层（Top/Bottom 各一条 Dialogue）', () => {
+  const out = C.formatAss([
+    { start: 1000, end: 3000, lines: [
+      { style: 'Top', text: 'English source line' },
+      { style: 'Bottom', text: '中文译文行' },
+    ] },
+  ], { title: '测试' });
+  assert.ok(out.includes('[Script Info]') && out.includes('[V4+ Styles]') && out.includes('[Events]'));
+  assert.ok(out.includes('Style: Bottom') && out.includes('Style: Top'));
+  assert.ok(out.includes('&H00FFFFFF'), '主语言白色');
+  assert.ok(out.includes('&H0000D7FF'), '副语言金黄');
+  const dlg = out.split('\n').filter(l => l.startsWith('Dialogue:'));
+  assert.strictEqual(dlg.length, 2, '源/译各一条');
+  assert.ok(dlg[0].includes(',Top,') && dlg[0].includes('English source line'));
+  assert.ok(dlg[1].includes(',Bottom,') && dlg[1].includes('中文译文行'));
+  // 自产 ASS 可被 parseAss 读回（重叠属双语分层正常现象，只比对内容）
+  const rt = C.parseAss(out);
+  assert.strictEqual(rt.items.length, 2);
+  assert.ok(rt.items.some(i => i.text === 'English source line'));
+  assert.ok(rt.items.some(i => i.text === '中文译文行'));
+});
+t('formatAss：多行文本转 \\N', () => {
+  const out = C.formatAss([{ start: 0, end: 1000, lines: [{ style: 'Bottom', text: '甲\n乙' }] }]);
+  assert.ok(out.includes('甲\\N乙'));
+  const rt = C.parseAss(out);
+  assert.strictEqual(rt.items[0].text, '甲\n乙');
+});
+
+console.log('— 多格式：TXT / 识别 / 双语结构化 —');
+t('formatTxt：段落式纯文本', () => {
+  const out = C.formatTxt([
+    { no: 1, start: 0, end: 1000, text: '第一段' },
+    { no: 2, start: 1000, end: 2000, text: '第二段\n两行' },
+  ]);
+  assert.strictEqual(out, '第一段\n\n第二段\n两行\n');
+});
+t('detectFormat：vtt / ass / srt', () => {
+  assert.strictEqual(C.detectFormat('WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nx\n'), 'vtt');
+  assert.strictEqual(C.detectFormat('\uFEFFWEBVTT\n'), 'vtt');
+  assert.strictEqual(C.detectFormat('[Script Info]\nTitle: x\n[Events]\n'), 'ass');
+  assert.strictEqual(C.detectFormat('1\n00:00:01,000 --> 00:00:02,000\nx\n'), 'srt');
+});
+t('buildBilingualParts：源/译分行保留，与 buildBilingual 文本一致', () => {
+  const rows = [{ no: 1, start: 0, end: 2000, en: 'Hello there.', zh: '你好。', flag: '' }];
+  const parts = C.buildBilingualParts(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(parts.length, 1);
+  assert.deepStrictEqual(parts[0].srcLines, ['Hello there.']);
+  assert.deepStrictEqual(parts[0].dstLines, ['你好。']);
+  const bi = C.buildBilingual(rows, { maxW: 20 });
+  assert.strictEqual(bi[0].text, parts[0].srcLines.concat(parts[0].dstLines).join('\n'));
+  const biRev = C.buildBilingual(rows, { maxW: 20, order: 'dst-first' });
+  assert.strictEqual(biRev[0].text, parts[0].dstLines.concat(parts[0].srcLines).join('\n'));
+});
+t('长 cue 下 buildBilingualParts 段数与 buildBilingual 条数一致', () => {
+  const en = 'This is a fairly long English subtitle line that definitely exceeds the maximum allowed display width for one single row of subtitle text on screen';
+  const zh = '这是一条相当长的中文字幕译文内容，它的显示宽度明显超过了单行所能容纳的最大限制，需要切分处理';
+  const rows = [{ no: 1, start: 0, end: 12000, en: en, zh: zh, flag: '' }];
+  const parts = C.buildBilingualParts(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  const bi = C.buildBilingual(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(parts.length, bi.length);
+  assert.ok(parts.length >= 2);
+  parts.forEach((p, i) => {
+    assert.ok(p.srcLines.length <= 2 && p.dstLines.length <= 2, '段内最多 2 行兜底: #' + i);
+    assert.strictEqual(bi[i].text, p.srcLines.concat(p.dstLines).join('\n'));
+  });
+});
+
+console.log('— 默认阈值 —');
+t('MAX_W_DEFAULT = 20', () => {
+  assert.strictEqual(C.MAX_W_DEFAULT, 20);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

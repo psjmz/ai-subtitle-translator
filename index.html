@@ -8,7 +8,7 @@
 <!-- 以下 SEO head 区块由 server.js 按语言路由（/ /en/ /zh-TW/ /ja/）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
 <!--SEO-HEAD-START-->
 <title>AI 免费字幕翻译 - SRT 字幕在线翻译工具｜多语言支持</title>
-<meta name="description" content="用 AI 大模型免费翻译 SRT 字幕：上传 .srt 文件，自动翻译成中文、英文、日文等多语言字幕。内置句级智能合并、时间轴对齐、自动折行、去水词、专有名词处理，译文可直接压制视频。">
+<meta name="description" content="用 AI 大模型免费翻译 SRT 字幕：上传 SRT / VTT / ASS 字幕文件，自动翻译成中文、英文、日文等多语言字幕。内置句级智能合并、时间轴对齐、自动折行、去水词、专有名词处理，译文可直接压制视频。">
 <meta name="keywords" content="SRT翻译,字幕翻译,AI字幕,免费字幕翻译,大模型翻译,SRT字幕在线翻译,字幕机翻,video subtitle translation,translate SRT">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#0E9488">
@@ -16,13 +16,13 @@
 <!-- Open Graph / 社交分享卡片 -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="AI 免费字幕翻译 - SRT 字幕在线翻译工具">
-<meta property="og:description" content="上传 .srt 字幕，AI 大模型免费翻译成多语言。句级智能合并、时间轴对齐、自动折行，译文可直接压制视频。">
+<meta property="og:description" content="上传 SRT / VTT / ASS 字幕，AI 大模型免费翻译成多语言。句级智能合并、时间轴对齐、自动折行，译文可直接压制视频。">
 <meta property="og:image" content="/og-image.png">
 <meta property="og:site_name" content="SRT 字幕翻译工作台">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AI 免费字幕翻译 - SRT 字幕在线翻译工具">
-<meta name="twitter:description" content="上传 .srt 字幕，AI 大模型免费翻译成多语言。句级智能合并、时间轴对齐、自动折行。">
+<meta name="twitter:description" content="上传 SRT / VTT / ASS 字幕，AI 大模型免费翻译成多语言。句级智能合并、时间轴对齐、自动折行。">
 <meta name="twitter:image" content="/og-image.png">
 <!-- 结构化数据（搜索引擎富摘要） -->
 <script type="application/ld+json">
@@ -149,7 +149,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 SRT 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.9</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.10</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -158,7 +158,7 @@
     <span class="rule" data-page-node-id="sBzJMcqp0R6H7q8b5BDS3S" data-i18n="rule3">③ 听写纠错</span>
     <span class="rule" data-page-node-id="I2PIQPQVCpDbld771UT8E6" data-i18n="rule4">④ 专名可保留或翻译</span>
     <span class="rule" data-page-node-id="kfK7mFbAjWr24TBMe9ekkT" data-i18n="rule5">⑤ 去水词</span>
-    <span class="rule" data-page-node-id="743RM9R8wsdpXzi3jBDvZI" data-i18n-html="rule6">⑥ 超过 <b data-page-node-id="nzmwOZ37Ws7iDNZnMHDxTp">24 字</b> 自动折行</span>
+    <span class="rule" data-page-node-id="743RM9R8wsdpXzi3jBDvZI" data-i18n-html="rule6">⑥ 超过 <b data-page-node-id="nzmwOZ37Ws7iDNZnMHDxTp">20 字</b> 自动折行</span>
   </div>
 
   <div class="layout" data-page-node-id="1eu46tPXvENLxK0QNykwAH">
@@ -167,11 +167,11 @@
       <div class="card" data-page-node-id="7W9RbnDomapvz8dsVor9lg">
         <h2 data-page-node-id="llsfwRR8kSa409vRxDQy7o"><span class="step" data-page-node-id="GMOitxpvDv3t9O1JjDWW0e">1</span><span data-i18n="step1">导入字幕（支持多语言）</span></h2>
         <div class="btns" style="margin-top:0" data-page-node-id="62GQUck6yo5dkD4LyH5Xmz">
-          <button class="btn sm" id="btnFile" data-page-node-id="MZJboQjK2wypb5w0AHYh8v" data-i18n="btnFile">📂 选择 .srt 文件</button>
+          <button class="btn sm" id="btnFile" data-page-node-id="MZJboQjK2wypb5w0AHYh8v" data-i18n="btnFile">📂 选择字幕文件</button>
           <button class="btn sm ghost" id="btnDemo" data-page-node-id="PWgC8niRDVCT0UwhlLR0jg" data-i18n="btnDemo">载入示例</button>
         </div>
-        <input type="file" id="file" accept=".srt,.txt" hidden data-page-node-id="CxYWWcJPMOIGSAlVkv7JlH">
-        <textarea id="paste" rows="5" placeholder="或直接把 SRT 文本粘贴到这里…" data-i18n-ph="pastePh" data-page-node-id="L8fM1xQqTvR6YkNhS5tDgA"></textarea>
+        <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.txt" hidden data-page-node-id="CxYWWcJPMOIGSAlVkv7JlH">
+        <textarea id="paste" rows="5" placeholder="或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）" data-i18n-ph="pastePh" data-page-node-id="L8fM1xQqTvR6YkNhS5tDgA"></textarea>
         <div class="btns" data-page-node-id="Foq04Y66td5cBxPwOzD76k"><button class="btn sm" id="btnParse" data-page-node-id="SLN93w9EivB6aZIMpiF0e3" data-i18n="btnParse">解析字幕</button></div>
         <div class="hint" id="parseInfo" data-page-node-id="DnrRionnfOHMgvQODWWoNV"></div>
       </div>
@@ -222,8 +222,8 @@
           <input type="password" id="apikey" autocomplete="off" data-page-node-id="fjeR234CAWYss4JFEQ28Tm">
         </div>
 
-        <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，默认 24）</label>
-        <input type="number" id="maxW" value="24" min="8" max="48" data-page-node-id="nHDvqEd0WVMgZv4TiIxEIq">
+        <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，默认 20）</label>
+        <input type="number" id="maxW" value="20" min="8" max="48" data-page-node-id="nHDvqEd0WVMgZv4TiIxEIq">
         <div class="btns" data-page-node-id="HF8Fbj8UJE2HRRfdXMXBs4">
           <button class="btn primary" id="btnGo" data-page-node-id="nOlcKaSvIp5ohDOevsDj1x" data-i18n="btnGo">▶ 开始翻译</button>
           <button class="btn ok" id="btnPost" data-page-node-id="GQLVkZGyvxEh6Aajh4eMoI" data-i18n="btnPost">↻ 仅后处理（折行/清提示词）</button>
@@ -232,17 +232,24 @@
       </div>
 
       <div class="card" data-page-node-id="dkaIcimKzf2ApZEmATh98M">
-        <h2 data-page-node-id="67ERYGxN0FXNn6yTtMSyKn"><span class="step" data-page-node-id="Gde0qf20aEQLq4tDJQau4W">4</span><span data-i18n="stepExport">导出译文 SRT</span></h2>
+        <h2 data-page-node-id="67ERYGxN0FXNn6yTtMSyKn"><span class="step" data-page-node-id="Gde0qf20aEQLq4tDJQau4W">4</span><span data-i18n="stepExport">导出译文</span></h2>
         <label data-i18n="lblExpFmt">导出格式</label>
         <select id="expFmt">
           <option value="mono" data-i18n="fmtMono">仅译文（单语）</option>
           <option value="bi-src" data-i18n="fmtBiSrc">双语 · 原文在上</option>
           <option value="bi-dst" data-i18n="fmtBiDst">双语 · 译文在上</option>
         </select>
+        <label data-i18n="lblFileFmt">文件格式</label>
+        <select id="expFileFmt">
+          <option value="srt">SRT (.srt)</option>
+          <option value="vtt">WebVTT (.vtt)</option>
+          <option value="ass">ASS · 双语分屏样式 (.ass)</option>
+          <option value="txt">TXT · 纯文本 (.txt)</option>
+        </select>
         <label data-page-node-id="5O0vOyIxZAhQjFYbpzrSJj" data-i18n="lblOutName">导出文件名（默认按源文件 + 目标语言自动命名）</label>
         <input type="text" id="outName" placeholder="xxx_中文字幕.srt" data-i18n-ph="outPh" data-page-node-id="2mSNaTe9I6ePIvGWD9W6oa">
         <div class="btns" data-page-node-id="PxiNGo6w0oUnfL67UwAP0R">
-          <button class="btn primary" id="btnDownload" data-page-node-id="MaeGj45VMIU9gtHes1fy1P" data-i18n="btnDownload">⬇ 下载 .srt</button>
+          <button class="btn primary" id="btnDownload" data-page-node-id="MaeGj45VMIU9gtHes1fy1P" data-i18n="btnDownload">⬇ 下载字幕</button>
           <button class="btn" id="btnCopy" data-page-node-id="90h1vqeDuRlNGzQiK2GsNr" data-i18n="btnCopy">复制全文</button>
         </div>
         <div class="hint" data-page-node-id="7ASARGp1Z8YcTvQHp1i3ti" data-i18n="hintOutName">切换目标语言后，文件名里的语言后缀会自动跟随。</div>
@@ -292,11 +299,11 @@
   <section class="seo" aria-label="关于本工具" style="max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;">
     <h2 style="font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;">关于 SRT 字幕翻译工作台</h2>
     <p>本工具是一款<strong>基于 AI 大模型的免费在线 SRT 字幕翻译服务</strong>，支持中文、英文、日文等多语言互译。无需注册、无需下载客户端，浏览器打开即可使用，字幕数据全程不上传服务器（除非你勾选了云端翻译）。</p>
-    <p style="margin-top:8px;"><strong>主要功能：</strong>SRT 字幕文件解析与翻译、句级智能合并（一个完整句子分布在多条字幕时合并翻译后按时长回填）、时间轴对齐、自动折行（支持 CJK 与西文混合宽度）、去水词、专有名词保留或翻译、可选翻译风格（信达雅 / 大白话 / 自定义）。译文可直接导出为标准 .srt 文件压制视频。</p>
+    <p style="margin-top:8px;"><strong>主要功能：</strong>SRT / VTT / ASS 字幕文件解析与翻译、句级智能合并（一个完整句子分布在多条字幕时合并翻译后按时长回填）、时间轴对齐、自动折行（支持 CJK 与西文混合宽度）、去水词、专有名词保留或翻译、可选翻译风格（信达雅 / 大白话 / 自定义）。译文可导出为 SRT / WebVTT / ASS（双语上下分屏样式）/ TXT 纯文本，直接压制视频。</p>
     <p style="margin-top:8px;"><strong>适用人群：</strong>视频翻译从业者、自媒体创作者、外语学习者、字幕组、需要快速本地化视频内容的团队。</p>
   </section>
   <noscript>
-    <p style="max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;">本工具需要启用 JavaScript 才能使用。请在浏览器中启用 JavaScript，然后上传 .srt 字幕文件即可使用 AI 免费字幕翻译。</p>
+    <p style="max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;">本工具需要启用 JavaScript 才能使用。请在浏览器中启用 JavaScript，然后上传 SRT / VTT / ASS 字幕文件即可使用 AI 免费字幕翻译。</p>
   </noscript>
   <!--SEO-COPY-END-->
 
@@ -368,9 +375,9 @@ const I18N = {
   docTitle:'AI 免费字幕翻译 - SRT 字幕翻译工作台', appTitle:'🎬 SRT 字幕翻译工作台',
   tagLocal:'本地运行 · 字幕不上传服务器', uiLangTag:'界面语言',
   rule1:'① 翻译风格可选（信达雅/大白话/自定义）', rule2:'② 时间轴对齐', rule3:'③ 听写纠错',
-  rule4:'④ 专名可保留或翻译', rule5:'⑤ 去水词', rule6:'⑥ 超过 <b>24 字</b> 自动折行',
-  step1:'导入字幕（支持多语言）', btnFile:'📂 选择 .srt 文件', btnDemo:'载入示例',
-  pastePh:'或直接把 SRT 文本粘贴到这里…', btnParse:'解析字幕',
+  rule4:'④ 专名可保留或翻译', rule5:'⑤ 去水词', rule6:'⑥ 超过 <b>20 字</b> 自动折行',
+  step1:'导入字幕（支持多语言）', btnFile:'📂 选择字幕文件', btnDemo:'载入示例',
+  pastePh:'或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）', btnParse:'解析字幕',
   stepReq:'翻译要求', stepEngine:'翻译引擎', lblMode:'工作模式',
   optBuiltin:'默认模型（站点提供，无需 Key）', optApi:'自定义 API（OpenAI 兼容）',
   optDemo:'规则演练（无翻译，仅演示折行/水词/重排）',
@@ -388,11 +395,11 @@ const I18N = {
   termsHintOn:'勾选 = 术语表内的专名强制保留原文（下方术语表已启用）。',
   termsHintOff:'已关闭：人名/机构/产品/术语将全部翻译为目标语言，术语表不生效。',
   lblTerms:'需强制保留原文的专名（可留空，逗号分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行阈值（字，默认 24）', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止',
+  lblMaxW:'折行阈值（字，默认 20）', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止',
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
-  stepExport:'导出译文 SRT', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
-  btnDownload:'⬇ 下载 .srt', btnCopy:'复制全文', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', fmtBiSrc:'双语 · 原文在上', fmtBiDst:'双语 · 译文在上', hintOutName:'切换目标语言后，文件名里的语言后缀会自动跟随。',
+  stepExport:'导出译文', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
+  btnDownload:'⬇ 下载字幕', btnCopy:'复制全文', lblFileFmt:'文件格式', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', fmtBiSrc:'双语 · 原文在上', fmtBiDst:'双语 · 译文在上', hintOutName:'切换目标语言后，文件名里的语言后缀会自动跟随。',
   logTitle:'运行日志', logReady:'就绪。导入字幕或载入示例开始。',
   stTotal:'条数', stDone:'已译', stDrop:'水词清空', stMerge:'跨条句组', stWrap:'折行', stIssues:'待处理',
   fAll:'全部', fTodo:'仅待译', fDone:'仅已译', fFlag:'仅特殊处理',
@@ -430,9 +437,9 @@ const I18N = {
   docTitle:'AI 免費字幕翻譯 - SRT 字幕翻譯工作台', appTitle:'🎬 SRT 字幕翻譯工作台',
   tagLocal:'本機執行 · 字幕不上傳伺服器', uiLangTag:'介面語言',
   rule1:'① 翻譯風格可選（信達雅/大白話/自訂）', rule2:'② 時間軸對齊', rule3:'③ 聽寫糾錯',
-  rule4:'④ 專名可保留或翻譯', rule5:'⑤ 去水詞', rule6:'⑥ 超過 <b>24 字</b> 自動折行',
-  step1:'匯入字幕（支援多語言）', btnFile:'📂 選擇 .srt 檔案', btnDemo:'載入範例',
-  pastePh:'或直接把 SRT 文字貼上這裡…', btnParse:'解析字幕',
+  rule4:'④ 專名可保留或翻譯', rule5:'⑤ 去水詞', rule6:'⑥ 超過 <b>20 字</b> 自動折行',
+  step1:'匯入字幕（支援多語言）', btnFile:'📂 選擇字幕檔案', btnDemo:'載入範例',
+  pastePh:'或直接把字幕文字貼上這裡…（支援 SRT / VTT / ASS）', btnParse:'解析字幕',
   stepReq:'翻譯要求', stepEngine:'翻譯引擎', lblMode:'工作模式',
   optBuiltin:'預設模型（站點提供，無需 Key）', optApi:'自訂 API（OpenAI 相容）',
   optDemo:'規則演練（無翻譯，僅示範折行/水詞/重排）',
@@ -450,11 +457,11 @@ const I18N = {
   termsHintOn:'勾選 = 術語表內的專名強制保留原文（下方術語表已啟用）。',
   termsHintOff:'已關閉：人名/機構/產品/術語將全部翻譯為目標語言，術語表不生效。',
   lblTerms:'需強制保留原文的專名（可留空，逗號分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行閾值（字，預設 24）', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止',
+  lblMaxW:'折行閾值（字，預設 20）', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止',
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
-  stepExport:'匯出譯文 SRT', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
-  btnDownload:'⬇ 下載 .srt', btnCopy:'複製全文', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', fmtBiSrc:'雙語 · 原文在上', fmtBiDst:'雙語 · 譯文在上', hintOutName:'切換目標語言後，檔名裡的語言後綴會自動跟隨。',
+  stepExport:'匯出譯文', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
+  btnDownload:'⬇ 下載字幕', btnCopy:'複製全文', lblFileFmt:'檔案格式', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', fmtBiSrc:'雙語 · 原文在上', fmtBiDst:'雙語 · 譯文在上', hintOutName:'切換目標語言後，檔名裡的語言後綴會自動跟隨。',
   logTitle:'執行日誌', logReady:'就緒。匯入字幕或載入範例開始。',
   stTotal:'條數', stDone:'已譯', stDrop:'水詞清空', stMerge:'跨條句組', stWrap:'折行', stIssues:'待處理',
   fAll:'全部', fTodo:'僅待譯', fDone:'僅已譯', fFlag:'僅特殊處理',
@@ -492,9 +499,9 @@ const I18N = {
   docTitle:'AI Free Subtitle Translation - SRT Translator', appTitle:'🎬 SRT Subtitle Translator',
   tagLocal:'Runs locally · subtitles never leave your browser', uiLangTag:'UI',
   rule1:'① Choose translation style (Faithful/Plain/Custom)', rule2:'② Timeline aligned', rule3:'③ Auto-fix transcription errors',
-  rule4:'④ Keep or translate proper nouns', rule5:'⑤ Remove filler cues', rule6:'⑥ Auto-wrap lines longer than <b>24 units</b>',
-  step1:'Import subtitles (any language)', btnFile:'📂 Choose .srt file', btnDemo:'Load sample',
-  pastePh:'…or paste SRT text here…', btnParse:'Parse subtitles',
+  rule4:'④ Keep or translate proper nouns', rule5:'⑤ Remove filler cues', rule6:'⑥ Auto-wrap lines longer than <b>20 units</b>',
+  step1:'Import subtitles (any language)', btnFile:'📂 Choose subtitle file', btnDemo:'Load sample',
+  pastePh:'…or paste subtitle text here… (SRT / VTT / ASS)', btnParse:'Parse subtitles',
   stepReq:'Translation requirements', stepEngine:'Translation engine', lblMode:'Mode',
   optBuiltin:'Default model (site-provided, no key needed)', optApi:'Custom API (OpenAI-compatible)',
   optDemo:'Dry run (no translation; shows wrapping/filler/renumber)',
@@ -512,11 +519,11 @@ const I18N = {
   termsHintOn:'Checked = terms in the list stay in original form (list enabled).',
   termsHintOff:'Off: all names/brands/products/terms are translated; the term list is ignored.',
   lblTerms:'Proper nouns to keep in original form (optional, comma-separated)', termsPh:'e.g. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Wrap threshold (units, default 24)', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop',
+  lblMaxW:'Wrap threshold (units, default 20)', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop',
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
-  stepExport:'Export translated SRT', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
-  btnDownload:'⬇ Download .srt', btnCopy:'Copy all', lblExpFmt:'Export format', fmtMono:'Translated only', fmtBiSrc:'Bilingual · source on top', fmtBiDst:'Bilingual · translation on top', hintOutName:'The language suffix in the file name follows the target language.',
+  stepExport:'Export translation', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
+  btnDownload:'⬇ Download subtitles', btnCopy:'Copy all', lblFileFmt:'File format', lblExpFmt:'Export format', fmtMono:'Translated only', fmtBiSrc:'Bilingual · source on top', fmtBiDst:'Bilingual · translation on top', hintOutName:'The language suffix in the file name follows the target language.',
   logTitle:'Log', logReady:'Ready. Import subtitles or load the sample.',
   stTotal:'Cues', stDone:'Done', stDrop:'Fillers cleared', stMerge:'Multi-cue groups', stWrap:'Wrapped', stIssues:'Pending',
   fAll:'All', fTodo:'Pending only', fDone:'Done only', fFlag:'Flagged only',
@@ -554,9 +561,9 @@ const I18N = {
   docTitle:'AI無料字幕翻訳 - SRT字幕翻訳ワークベンチ', appTitle:'🎬 SRT字幕翻訳ワークベンチ',
   tagLocal:'ローカル動作 · 字幕はサーバーに送信されません', uiLangTag:'表示言語',
   rule1:'① 翻訳スタイル選択（信達雅/平易/カスタム）', rule2:'② タイムライン一致', rule3:'③ 音声起こし誤りを自動修正',
-  rule4:'④ 固有名詞は保持/翻訳を選択', rule5:'⑤ フィラー除去', rule6:'⑥ <b>24字</b>超は自動改行',
-  step1:'字幕を読み込む（多言語対応）', btnFile:'📂 .srtファイルを選択', btnDemo:'サンプルを読込',
-  pastePh:'または SRT テキストをここに貼り付け…', btnParse:'字幕を解析',
+  rule4:'④ 固有名詞は保持/翻訳を選択', rule5:'⑤ フィラー除去', rule6:'⑥ <b>20字</b>超は自動改行',
+  step1:'字幕を読み込む（多言語対応）', btnFile:'📂 字幕ファイルを選択', btnDemo:'サンプルを読込',
+  pastePh:'または字幕テキストをここに貼り付け…（SRT / VTT / ASS 対応）', btnParse:'字幕を解析',
   stepReq:'翻訳要件', stepEngine:'翻訳エンジン', lblMode:'動作モード',
   optBuiltin:'デフォルトモデル（サイト提供、Key不要）', optApi:'カスタム API（OpenAI互換）',
   optDemo:'ドライラン（翻訳なし、改行/フィラー/振り直しのデモ）',
@@ -574,11 +581,11 @@ const I18N = {
   termsHintOn:'チェック＝用語リストの固有名詞を原文のまま保持（リスト有効）。',
   termsHintOff:'オフ：人名/組織/製品/用語はすべて翻訳先言語に訳され、用語リストは無効。',
   lblTerms:'原文のまま保持する固有名詞（任意、カンマ区切り）', termsPh:'例：SpaceX, Prism, EnduroSat',
-  lblMaxW:'改行しきい値（字、既定24）', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止',
+  lblMaxW:'改行しきい値（字、既定20）', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止',
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
-  stepExport:'翻訳SRTを書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
-  btnDownload:'⬇ .srtをダウンロード', btnCopy:'全文コピー', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', fmtBiSrc:'二か国語 · 原文が上', fmtBiDst:'二か国語 · 翻訳が上', hintOutName:'翻訳先言語を切り替えるとファイル名の言語suffixも自動で変わります。',
+  stepExport:'翻訳を書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
+  btnDownload:'⬇ 字幕をダウンロード', btnCopy:'全文コピー', lblFileFmt:'ファイル形式', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', fmtBiSrc:'二か国語 · 原文が上', fmtBiDst:'二か国語 · 翻訳が上', hintOutName:'翻訳先言語を切り替えるとファイル名の言語suffixも自動で変わります。',
   logTitle:'ログ', logReady:'準備完了。字幕を読み込むかサンプルを開始してください。',
   stTotal:'件数', stDone:'翻訳済', stDrop:'フィラー消去', stMerge:'複数跨ぎ文', stWrap:'改行', stIssues:'未処理',
   fAll:'すべて', fTodo:'未翻訳のみ', fDone:'翻訳済のみ', fFlag:'フラグ付きのみ',
@@ -616,9 +623,9 @@ const I18N = {
   docTitle:'Traducción Gratis de Subtítulos con IA - SRT Translator', appTitle:'🎬 Traductor de Subtítulos SRT',
   tagLocal:'Se ejecuta localmente · los subtítulos no salen de tu navegador', uiLangTag:'Idioma',
   rule1:'① Elige estilo de traducción (Fiel/Llano/Personalizado)', rule2:'② Línea de tiempo alineada', rule3:'③ Corrige errores de transcripción',
-  rule4:'④ Mantener o traducir nombres propios', rule5:'⑤ Eliminar frases de relleno', rule6:'⑥ Ajuste automático de líneas de más de <b>24 unidades</b>',
-  step1:'Importar subtítulos (cualquier idioma)', btnFile:'📂 Elegir archivo .srt', btnDemo:'Cargar ejemplo',
-  pastePh:'…o pega aquí el texto SRT…', btnParse:'Analizar subtítulos',
+  rule4:'④ Mantener o traducir nombres propios', rule5:'⑤ Eliminar frases de relleno', rule6:'⑥ Ajuste automático de líneas de más de <b>20 unidades</b>',
+  step1:'Importar subtítulos (cualquier idioma)', btnFile:'📂 Elegir archivo de subtítulos', btnDemo:'Cargar ejemplo',
+  pastePh:'…o pega aquí el texto de subtítulos… (SRT / VTT / ASS)', btnParse:'Analizar subtítulos',
   stepReq:'Requisitos de traducción', stepEngine:'Motor de traducción', lblMode:'Modo',
   optBuiltin:'Modelo por defecto (del sitio, sin API key)', optApi:'API personalizada (compatible con OpenAI)',
   optDemo:'Simulación (sin traducción; muestra ajuste/relleno/renumeración)',
@@ -636,11 +643,11 @@ const I18N = {
   termsHintOn:'Marcado = los términos de la lista se mantienen en su forma original (lista activada).',
   termsHintOff:'Desactivado: todos los nombres/marcas/productos/términos se traducen; la lista se ignora.',
   lblTerms:'Nombres propios a mantener en su forma original (opcional, separados por comas)', termsPh:'p. ej. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbral de ajuste de línea (unidades, por defecto 24)', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener',
+  lblMaxW:'Umbral de ajuste de línea (unidades, por defecto 20)', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener',
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
-  stepExport:'Exportar SRT traducido', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
-  btnDownload:'⬇ Descargar .srt', btnCopy:'Copiar todo', lblExpFmt:'Formato de exportación', fmtMono:'Solo traducción', fmtBiSrc:'Bilingüe · original arriba', fmtBiDst:'Bilingüe · traducción arriba', hintOutName:'El sufijo de idioma del nombre de archivo sigue al idioma destino.',
+  stepExport:'Exportar traducción', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
+  btnDownload:'⬇ Descargar subtítulos', btnCopy:'Copiar todo', lblFileFmt:'Formato de archivo', lblExpFmt:'Formato de exportación', fmtMono:'Solo traducción', fmtBiSrc:'Bilingüe · original arriba', fmtBiDst:'Bilingüe · traducción arriba', hintOutName:'El sufijo de idioma del nombre de archivo sigue al idioma destino.',
   logTitle:'Registro', logReady:'Listo. Importa subtítulos o carga el ejemplo.',
   stTotal:'Subtítulos', stDone:'Hechos', stDrop:'Relleno quitado', stMerge:'Grupos multi-línea', stWrap:'Ajustados', stIssues:'Pendientes',
   fAll:'Todos', fTodo:'Solo pendientes', fDone:'Solo hechos', fFlag:'Solo marcados',
@@ -678,9 +685,9 @@ const I18N = {
   docTitle:'Tradução Grátis de Legendas com IA - SRT Translator', appTitle:'🎬 Tradutor de Legendas SRT',
   tagLocal:'Roda localmente · as legendas não saem do seu navegador', uiLangTag:'Idioma',
   rule1:'① Escolha o estilo de tradução (Fiel/Coloquial/Personalizado)', rule2:'② Linha do tempo alinhada', rule3:'③ Corrige erros de transcrição',
-  rule4:'④ Manter ou traduzir nomes próprios', rule5:'⑤ Remover frases de preenchimento', rule6:'⑥ Quebra automática de linhas acima de <b>24 unidades</b>',
-  step1:'Importar legendas (qualquer idioma)', btnFile:'📂 Escolher arquivo .srt', btnDemo:'Carregar exemplo',
-  pastePh:'…ou cole o texto SRT aqui…', btnParse:'Analisar legendas',
+  rule4:'④ Manter ou traduzir nomes próprios', rule5:'⑤ Remover frases de preenchimento', rule6:'⑥ Quebra automática de linhas acima de <b>20 unidades</b>',
+  step1:'Importar legendas (qualquer idioma)', btnFile:'📂 Escolher arquivo de legendas', btnDemo:'Carregar exemplo',
+  pastePh:'…ou cole o texto de legendas aqui… (SRT / VTT / ASS)', btnParse:'Analisar legendas',
   stepReq:'Requisitos de tradução', stepEngine:'Motor de tradução', lblMode:'Modo',
   optBuiltin:'Modelo padrão (do site, sem API key)', optApi:'API personalizada (compatível com OpenAI)',
   optDemo:'Simulação (sem tradução; mostra quebra/preenchimento/renumeração)',
@@ -698,11 +705,11 @@ const I18N = {
   termsHintOn:'Marcado = os termos da lista ficam na forma original (lista ativada).',
   termsHintOff:'Desativado: todos os nomes/marcas/produtos/termos são traduzidos; a lista é ignorada.',
   lblTerms:'Nomes próprios a manter na forma original (opcional, separados por vírgula)', termsPh:'ex.: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Limite de quebra de linha (unidades, padrão 24)', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar',
+  lblMaxW:'Limite de quebra de linha (unidades, padrão 20)', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar',
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
-  stepExport:'Exportar SRT traduzido', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
-  btnDownload:'⬇ Baixar .srt', btnCopy:'Copiar tudo', lblExpFmt:'Formato de exportação', fmtMono:'Somente tradução', fmtBiSrc:'Bilíngue · original acima', fmtBiDst:'Bilíngue · tradução acima', hintOutName:'O sufixo de idioma no nome do arquivo segue o idioma destino.',
+  stepExport:'Exportar tradução', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
+  btnDownload:'⬇ Baixar legendas', btnCopy:'Copiar tudo', lblFileFmt:'Formato do arquivo', lblExpFmt:'Formato de exportação', fmtMono:'Somente tradução', fmtBiSrc:'Bilíngue · original acima', fmtBiDst:'Bilíngue · tradução acima', hintOutName:'O sufixo de idioma no nome do arquivo segue o idioma destino.',
   logTitle:'Registro', logReady:'Pronto. Importe legendas ou carregue o exemplo.',
   stTotal:'Legendas', stDone:'Feitas', stDrop:'Preenchido removido', stMerge:'Grupos multilinha', stWrap:'Quebradas', stIssues:'Pendentes',
   fAll:'Todas', fTodo:'Só pendentes', fDone:'Só feitas', fFlag:'Só marcadas',
@@ -740,9 +747,9 @@ const I18N = {
   docTitle:'AI 무료 자막 번역 - SRT 자막 번역기', appTitle:'🎬 SRT 자막 번역기',
   tagLocal:'로컬 실행 · 자막은 브라우저를 벗어나지 않습니다', uiLangTag:'언어',
   rule1:'① 번역 스타일 선택(충실/구어체/사용자 정의)', rule2:'② 타임라인 정렬', rule3:'③ 전사 오류 자동 수정',
-  rule4:'④ 고유명사 유지 또는 번역 선택', rule5:'⑤ 필러 자막 제거', rule6:'⑥ <b>24단위</b> 초과 시 자동 줄바꿈',
-  step1:'자막 불러오기(모든 언어)', btnFile:'📂 .srt 파일 선택', btnDemo:'샘플 불러오기',
-  pastePh:'…또는 SRT 텍스트를 여기에 붙여넣기…', btnParse:'자막 분석',
+  rule4:'④ 고유명사 유지 또는 번역 선택', rule5:'⑤ 필러 자막 제거', rule6:'⑥ <b>20단위</b> 초과 시 자동 줄바꿈',
+  step1:'자막 불러오기(모든 언어)', btnFile:'📂 자막 파일 선택', btnDemo:'샘플 불러오기',
+  pastePh:'…또는 자막 텍스트를 여기에 붙여넣기… (SRT / VTT / ASS 지원)', btnParse:'자막 분석',
   stepReq:'번역 요구사항', stepEngine:'번역 엔진', lblMode:'모드',
   optBuiltin:'기본 모델(사이트 제공, Key 불필요)', optApi:'사용자 API(OpenAI 호환)',
   optDemo:'드라이런(번역 없음, 줄바꿈/필러/재번호화 데모)',
@@ -760,11 +767,11 @@ const I18N = {
   termsHintOn:'체크 = 목록의 용어를 원문 그대로 유지(목록 활성화).',
   termsHintOff:'끔: 모든 인물/브랜드/제품/용어를 번역하며 용어 목록은 무시됩니다.',
   lblTerms:'원문으로 유지할 고유명사(선택, 쉼표로 구분)', termsPh:'예: SpaceX, Prism, EnduroSat',
-  lblMaxW:'줄바꿈 기준(단위, 기본 24)', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지',
+  lblMaxW:'줄바꿈 기준(단위, 기본 20)', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지',
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
-  stepExport:'번역된 SRT 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
-  btnDownload:'⬇ .srt 다운로드', btnCopy:'전체 복사', lblExpFmt:'내보내기 형식', fmtMono:'번역문만', fmtBiSrc:'이중 언어 · 원문이 위', fmtBiDst:'이중 언어 · 번역문이 위', hintOutName:'대상 언어를 바꾸면 파일명의 언어 접미사도 자동으로 따라갑니다.',
+  stepExport:'번역 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
+  btnDownload:'⬇ 자막 다운로드', btnCopy:'전체 복사', lblFileFmt:'파일 형식', lblExpFmt:'내보내기 형식', fmtMono:'번역문만', fmtBiSrc:'이중 언어 · 원문이 위', fmtBiDst:'이중 언어 · 번역문이 위', hintOutName:'대상 언어를 바꾸면 파일명의 언어 접미사도 자동으로 따라갑니다.',
   logTitle:'로그', logReady:'준비 완료. 자막을 불러오거나 샘플을 시작하세요.',
   stTotal:'자막 수', stDone:'완료', stDrop:'필러 정리', stMerge:'다중 자막 그룹', stWrap:'줄바꿈', stIssues:'대기',
   fAll:'전체', fTodo:'미번역만', fDone:'완료만', fFlag:'표시된 것만',
@@ -802,9 +809,9 @@ const I18N = {
   docTitle:'Kostenlose KI-Untertitel-Übersetzung - SRT Übersetzer', appTitle:'🎬 SRT Untertitel-Übersetzer',
   tagLocal:'Läuft lokal · Untertitel verlassen Ihren Browser nicht', uiLangTag:'Sprache',
   rule1:'① Übersetzungsstil wählbar (Treuhert/Wortwörtlich/Eigene)', rule2:'② Zeitleisten-Ausrichtung', rule3:'③ Transkriptionsfehler auto-korrigieren',
-  rule4:'④ Eigennamen behalten oder übersetzen', rule5:'⑤ Füllzeilen entfernen', rule6:'⑥ Automatischer Umbruch ab <b>24 Einheiten</b>',
-  step1:'Untertitel importieren (jede Sprache)', btnFile:'📂 .srt-Datei wählen', btnDemo:'Beispiel laden',
-  pastePh:'…oder SRT-Text hier einfügen…', btnParse:'Untertitel analysieren',
+  rule4:'④ Eigennamen behalten oder übersetzen', rule5:'⑤ Füllzeilen entfernen', rule6:'⑥ Automatischer Umbruch ab <b>20 Einheiten</b>',
+  step1:'Untertitel importieren (jede Sprache)', btnFile:'📂 Untertiteldatei wählen', btnDemo:'Beispiel laden',
+  pastePh:'…oder Untertiteltext hier einfügen… (SRT / VTT / ASS)', btnParse:'Untertitel analysieren',
   stepReq:'Übersetzungsanforderungen', stepEngine:'Übersetzungs-Engine', lblMode:'Modus',
   optBuiltin:'Standardmodell (vom Site-Betreiber, kein Key nötig)', optApi:'Eigene API (OpenAI-kompatibel)',
   optDemo:'Probelauf (keine Übersetzung; zeigt Umbruch/Füllwörter/Neunummerierung)',
@@ -822,11 +829,11 @@ const I18N = {
   termsHintOn:'Aktiviert = Begriffe aus der Liste bleiben in Originalform (Liste aktiv).',
   termsHintOff:'Aus: alle Namen/Firmen/Produkte/Begriffe werden übersetzt; die Liste wird ignoriert.',
   lblTerms:'Eigennamen, die in Originalform bleiben sollen (optional, kommagetrennt)', termsPh:'z. B. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbruch-Schwellwert (Einheiten, Standard 24)', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen',
+  lblMaxW:'Umbruch-Schwellwert (Einheiten, Standard 20)', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen',
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
-  stepExport:'Übersetzte SRT exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
-  btnDownload:'⬇ .srt herunterladen', btnCopy:'Alles kopieren', lblExpFmt:'Exportformat', fmtMono:'Nur Übersetzung', fmtBiSrc:'Zweisprachig · Original oben', fmtBiDst:'Zweisprachig · Übersetzung oben', hintOutName:'Das Sprach-Suffix im Dateinamen folgt der Zielsprache.',
+  stepExport:'Übersetzung exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
+  btnDownload:'⬇ Untertitel herunterladen', btnCopy:'Alles kopieren', lblFileFmt:'Dateiformat', lblExpFmt:'Exportformat', fmtMono:'Nur Übersetzung', fmtBiSrc:'Zweisprachig · Original oben', fmtBiDst:'Zweisprachig · Übersetzung oben', hintOutName:'Das Sprach-Suffix im Dateinamen folgt der Zielsprache.',
   logTitle:'Protokoll', logReady:'Bereit. Untertitel importieren oder Beispiel laden.',
   stTotal:'Untertitel', stDone:'Fertig', stDrop:'Füllwörter entfernt', stMerge:'Mehrzeilige Gruppen', stWrap:'Umgebrochen', stIssues:'Offen',
   fAll:'Alle', fTodo:'Nur offene', fDone:'Nur fertige', fFlag:'Nur markierte',
@@ -864,9 +871,9 @@ const I18N = {
   docTitle:'Traduction de Sous-titres Gratuite par IA - SRT Translator', appTitle:'🎬 Traducteur de Sous-titres SRT',
   tagLocal:'Fonctionne en local · les sous-titres ne quittent jamais votre navigateur', uiLangTag:'Langue',
   rule1:'① Choisissez le style de traduction (Fidèle/Courant/Personnalisé)', rule2:'② Timeline alignée', rule3:'③ Corrige les erreurs de transcription',
-  rule4:'④ Conserver ou traduire les noms propres', rule5:'⑤ Supprimer les lignes de remplissage', rule6:'⑥ Retour à la ligne automatique au-delà de <b>24 unités</b>',
-  step1:'Importer des sous-titres (toute langue)', btnFile:'📂 Choisir un fichier .srt', btnDemo:'Charger l\u2019exemple',
-  pastePh:'…ou collez le texte SRT ici…', btnParse:'Analyser les sous-titres',
+  rule4:'④ Conserver ou traduire les noms propres', rule5:'⑤ Supprimer les lignes de remplissage', rule6:'⑥ Retour à la ligne automatique au-delà de <b>20 unités</b>',
+  step1:'Importer des sous-titres (toute langue)', btnFile:'📂 Choisir un fichier de sous-titres', btnDemo:'Charger l\u2019exemple',
+  pastePh:'…ou collez le texte des sous-titres ici… (SRT / VTT / ASS)', btnParse:'Analyser les sous-titres',
   stepReq:'Exigences de traduction', stepEngine:'Moteur de traduction', lblMode:'Mode',
   optBuiltin:'Modèle par défaut (fourni par le site, sans clé)', optApi:'API personnalisée (compatible OpenAI)',
   optDemo:'Simulation (sans traduction ; montre retour ligne/remplissage/renumérotation)',
@@ -884,11 +891,11 @@ const I18N = {
   termsHintOn:'Coché = les termes de la liste restent en forme originale (liste activée).',
   termsHintOff:'Désactivé : tous les noms/marques/produits/termes sont traduits ; la liste est ignorée.',
   lblTerms:'Noms propres à conserver en forme originale (facultatif, séparés par des virgules)', termsPh:'ex. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Seuil de retour ligne (unités, défaut 24)', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter',
+  lblMaxW:'Seuil de retour ligne (unités, défaut 20)', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter',
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
-  stepExport:'Exporter le SRT traduit', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
-  btnDownload:'⬇ Télécharger .srt', btnCopy:'Tout copier', lblExpFmt:"Format d'export", fmtMono:'Traduction seule', fmtBiSrc:'Bilingue · original en haut', fmtBiDst:'Bilingue · traduction en haut', hintOutName:'Le suffixe de langue du nom de fichier suit la langue cible.',
+  stepExport:'Exporter la traduction', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
+  btnDownload:'⬇ Télécharger les sous-titres', btnCopy:'Tout copier', lblFileFmt:'Format de fichier', lblExpFmt:"Format d'export", fmtMono:'Traduction seule', fmtBiSrc:'Bilingue · original en haut', fmtBiDst:'Bilingue · traduction en haut', hintOutName:'Le suffixe de langue du nom de fichier suit la langue cible.',
   logTitle:'Journal', logReady:'Prêt. Importez des sous-titres ou chargez l\u2019exemple.',
   stTotal:'Sous-titres', stDone:'Terminés', stDrop:'Remplissage retiré', stMerge:'Groupes multi-lignes', stWrap:'Répartis', stIssues:'En attente',
   fAll:'Tous', fTodo:'En attente', fDone:'Terminés', fFlag:'Marqués',
@@ -926,9 +933,9 @@ const I18N = {
   docTitle:'Terjemahan Subtitle Gratis dengan AI - SRT Translator', appTitle:'🎬 Penerjemah Subtitle SRT',
   tagLocal:'Berjalan lokal · subtitle tidak keluar dari browser Anda', uiLangTag:'Bahasa',
   rule1:'① Pilih gaya terjemahan (Setia/Keseharian/Kustom)', rule2:'② Penyelarasan timeline', rule3:'③ Perbaiki kesalahan transkripsi otomatis',
-  rule4:'④ Pertahankan atau terjemahkan nama diri', rule5:'⑤ Hapus baris pengisi', rule6:'⑥ Bungkus baris otomatis lebih dari <b>24 unit</b>',
-  step1:'Impor subtitle (bahasa apa pun)', btnFile:'📂 Pilih file .srt', btnDemo:'Muat contoh',
-  pastePh:'…atau tempel teks SRT di sini…', btnParse:'Analisis subtitle',
+  rule4:'④ Pertahankan atau terjemahkan nama diri', rule5:'⑤ Hapus baris pengisi', rule6:'⑥ Bungkus baris otomatis lebih dari <b>20 unit</b>',
+  step1:'Impor subtitle (bahasa apa pun)', btnFile:'📂 Pilih file subtitle', btnDemo:'Muat contoh',
+  pastePh:'…atau tempel teks subtitle di sini… (SRT / VTT / ASS)', btnParse:'Analisis subtitle',
   stepReq:'Persyaratan terjemahan', stepEngine:'Mesin terjemahan', lblMode:'Mode',
   optBuiltin:'Model bawaan (disediakan situs, tanpa key)', optApi:'API kustom (kompatibel OpenAI)',
   optDemo:'Uji coba (tanpa terjemahan; menampilkan pembungkusan/pengisi/penomoran ulang)',
@@ -946,11 +953,11 @@ const I18N = {
   termsHintOn:'Dicentang = istilah dalam daftar tetap dalam bentuk asli (daftar aktif).',
   termsHintOff:'Mati: semua nama/merek/produk/istilah diterjemahkan; daftar diabaikan.',
   lblTerms:'Nama diri yang dipertahankan dalam bentuk asli (opsional, pisahkan koma)', termsPh:'mis. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ambang pembungkusan baris (unit, bawaan 24)', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti',
+  lblMaxW:'Ambang pembungkusan baris (unit, bawaan 20)', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti',
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
-  stepExport:'Ekspor SRT terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
-  btnDownload:'⬇ Unduh .srt', btnCopy:'Salin semua', lblExpFmt:'Format ekspor', fmtMono:'Terjemahan saja', fmtBiSrc:'Dwibahasa · teks asli di atas', fmtBiDst:'Dwibahasa · terjemahan di atas', hintOutName:'Akhiran bahasa pada nama file mengikuti bahasa target.',
+  stepExport:'Ekspor terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
+  btnDownload:'⬇ Unduh subtitle', btnCopy:'Salin semua', lblFileFmt:'Format file', lblExpFmt:'Format ekspor', fmtMono:'Terjemahan saja', fmtBiSrc:'Dwibahasa · teks asli di atas', fmtBiDst:'Dwibahasa · terjemahan di atas', hintOutName:'Akhiran bahasa pada nama file mengikuti bahasa target.',
   logTitle:'Log', logReady:'Siap. Impor subtitle atau muat contoh.',
   stTotal:'Subtitle', stDone:'Selesai', stDrop:'Pengisi dihapus', stMerge:'Grup multi-baris', stWrap:'Dibungkus', stIssues:'Tertunda',
   fAll:'Semua', fTodo:'Tertunda saja', fDone:'Selesai saja', fFlag:'Ditandai saja',
@@ -988,9 +995,9 @@ const I18N = {
   docTitle:'मुफ़्त AI सबटाइटल अनुवाद - SRT अनुवादक', appTitle:'🎬 SRT सबटाइटल अनुवादक',
   tagLocal:'स्थानीय रूप से चलता है · सबटाइटल आपका ब्राउज़र नहीं छोड़ते', uiLangTag:'भाषा',
   rule1:'① अनुवाद शैली चुनें (सटीक/सरल/अपनी)', rule2:'② टाइमलाइन संरेखण', rule3:'③ ट्रांसक्रिप्शन त्रुटियाँ स्वतः सुधारें',
-  rule4:'④ संज्ञाएँ रखें या अनुवाद करें', rule5:'⑤ फिलर पंक्तियाँ हटाएँ', rule6:'⑥ <b>24 इकाई</b> से अधिक पर स्वतः लाइन-रैप',
-  step1:'सबटाइटल आयात करें (कोई भी भाषा)', btnFile:'📂 .srt फ़ाइल चुनें', btnDemo:'नमूना लोड करें',
-  pastePh:'…या SRT टेक्स्ट यहाँ पेस्ट करें…', btnParse:'सबटाइटल पार्स करें',
+  rule4:'④ संज्ञाएँ रखें या अनुवाद करें', rule5:'⑤ फिलर पंक्तियाँ हटाएँ', rule6:'⑥ <b>20 इकाई</b> से अधिक पर स्वतः लाइन-रैप',
+  step1:'सबटाइटल आयात करें (कोई भी भाषा)', btnFile:'📂 सबटाइटल फ़ाइल चुनें', btnDemo:'नमूना लोड करें',
+  pastePh:'…या सबटाइटल टेक्स्ट यहाँ पेस्ट करें… (SRT / VTT / ASS)', btnParse:'सबटाइटल पार्स करें',
   stepReq:'अनुवाद आवश्यकताएँ', stepEngine:'अनुवाद इंजन', lblMode:'मोड',
   optBuiltin:'डिफ़ॉल्ट मॉडल (साइट-प्रदत्त, Key नहीं चाहिए)', optApi:'अपनी API (OpenAI-संगत)',
   optDemo:'ड्राई-रन (अनुवाद नहीं; रैप/फिलर/पुनर्क्रमांकन दिखाता है)',
@@ -1008,11 +1015,11 @@ const I18N = {
   termsHintOn:'चयनित = सूची के शब्द मूल रूप में रहेंगे (सूची सक्रिय)।',
   termsHintOff:'बंद: सभी नाम/ब्रांड/उत्पाद/शब्दावली अनुवाद होंगे; सूची नज़रअंदाज़।',
   lblTerms:'मूल रूप में रखने योग्य संज्ञाएँ (वैकल्पिक, कॉमा से अलग)', termsPh:'जैसे SpaceX, Prism, EnduroSat',
-  lblMaxW:'रैप सीमा (इकाई, डिफ़ॉल्ट 24)', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें',
+  lblMaxW:'रैप सीमा (इकाई, डिफ़ॉल्ट 20)', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें',
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
-  stepExport:'अनूदित SRT निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
-  btnDownload:'⬇ .srt डाउनलोड', btnCopy:'सब कॉपी करें', lblExpFmt:'निर्यात प्रारूप', fmtMono:'केवल अनुवाद', fmtBiSrc:'द्विभाषी · मूल ऊपर', fmtBiDst:'द्विभाषी · अनुवाद ऊपर', hintOutName:'फ़ाइल नाम का भाषा-प्रत्यय लक्ष्य भाषा के साथ बदलता है।',
+  stepExport:'अनुवाद निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
+  btnDownload:'⬇ सबटाइटल डाउनलोड', btnCopy:'सब कॉपी करें', lblFileFmt:'फ़ाइल प्रारूप', lblExpFmt:'निर्यात प्रारूप', fmtMono:'केवल अनुवाद', fmtBiSrc:'द्विभाषी · मूल ऊपर', fmtBiDst:'द्विभाषी · अनुवाद ऊपर', hintOutName:'फ़ाइल नाम का भाषा-प्रत्यय लक्ष्य भाषा के साथ बदलता है।',
   logTitle:'लॉग', logReady:'तैयार। सबटाइटल आयात करें या नमूना लोड करें।',
   stTotal:'सबटाइटल', stDone:'पूर्ण', stDrop:'फिलर हटाए', stMerge:'बहु-पंक्ति समूह', stWrap:'रैप्ड', stIssues:'शेष',
   fAll:'सभी', fTodo:'केवल शेष', fDone:'केवल पूर्ण', fFlag:'केवल चिह्नित',
@@ -1050,9 +1057,9 @@ const I18N = {
   docTitle:'แปลซับไตเติลฟรีด้วย AI - SRT Translator', appTitle:'🎬 ตัวแปลซับไตเติล SRT',
   tagLocal:'ทำงานแบบโลคัล · ซับไตเติลไม่ออกจากเบราว์เซอร์ของคุณ', uiLangTag:'ภาษา',
   rule1:'① เลือกสไตล์การแปล (ตรงความ/พูดง่าย/กำหนดเอง)', rule2:'② จัดแนวไทม์ไลน์', rule3:'③ แก้ข้อผิดพลาดจากการถอดเสียง',
-  rule4:'④ คงหรือแปลชื่อเฉพาะ', rule5:'⑤ ลบบรรทัดเสียบเติม', rule6:'⑥ ตัดบรรทัดอัตโนมัติเมื่อเกิน <b>24 หน่วย</b>',
-  step1:'นำเข้าซับไตเติล (ทุกภาษา)', btnFile:'📂 เลือกไฟล์ .srt', btnDemo:'โหลดตัวอย่าง',
-  pastePh:'…หรือวางข้อความ SRT ที่นี่…', btnParse:'วิเคราะห์ซับไตเติล',
+  rule4:'④ คงหรือแปลชื่อเฉพาะ', rule5:'⑤ ลบบรรทัดเสียบเติม', rule6:'⑥ ตัดบรรทัดอัตโนมัติเมื่อเกิน <b>20 หน่วย</b>',
+  step1:'นำเข้าซับไตเติล (ทุกภาษา)', btnFile:'📂 เลือกไฟล์ซับไตเติล', btnDemo:'โหลดตัวอย่าง',
+  pastePh:'…หรือวางข้อความซับไตเติลที่นี่… (SRT / VTT / ASS)', btnParse:'วิเคราะห์ซับไตเติล',
   stepReq:'ข้อกำหนดการแปล', stepEngine:'เอนจินแปลภาษา', lblMode:'โหมด',
   optBuiltin:'โมเดลมาตรฐาน (จัดให้โดยเว็บ ไม่ต้องใช้ Key)', optApi:'API ของคุณเอง (รองรับ OpenAI)',
   optDemo:'ทดลองรัน (ไม่แปล; แสดงการตัดบรรทัด/คำเสียบ/เรียงเลขใหม่)',
@@ -1070,11 +1077,11 @@ const I18N = {
   termsHintOn:'เลือก = คำในรายการคงรูปเดิม (รายการเปิดใช้งาน)',
   termsHintOff:'ปิด: ชื่อ/แบรนด์/ผลิตภัณฑ์/คำศัพท์ทั้งหมดจะถูกแปล; รายการถูกละเว้น',
   lblTerms:'ชื่อเฉพาะที่จะคงรูปเดิม (ไม่บังคับ คั่นด้วยจุลภาค)', termsPh:'เช่น SpaceX, Prism, EnduroSat',
-  lblMaxW:'เกณฑ์ตัดบรรทัด (หน่วย, ค่าเริ่มต้น 24)', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด',
+  lblMaxW:'เกณฑ์ตัดบรรทัด (หน่วย, ค่าเริ่มต้น 20)', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด',
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
-  stepExport:'ส่งออก SRT ที่แปลแล้ว', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
-  btnDownload:'⬇ ดาวน์โหลด .srt', btnCopy:'คัดลอกทั้งหมด', lblExpFmt:'รูปแบบการส่งออก', fmtMono:'เฉพาะคำแปล', fmtBiSrc:'สองภาษา · ต้นฉบับอยู่บน', fmtBiDst:'สองภาษา · คำแปลอยู่บน', hintOutName:'คำลงท้ายภาษาในชื่อไฟล์จะเปลี่ยนตามภาษาเป้าหมาย',
+  stepExport:'ส่งออกคำแปล', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
+  btnDownload:'⬇ ดาวน์โหลดซับไตเติล', btnCopy:'คัดลอกทั้งหมด', lblFileFmt:'รูปแบบไฟล์', lblExpFmt:'รูปแบบการส่งออก', fmtMono:'เฉพาะคำแปล', fmtBiSrc:'สองภาษา · ต้นฉบับอยู่บน', fmtBiDst:'สองภาษา · คำแปลอยู่บน', hintOutName:'คำลงท้ายภาษาในชื่อไฟล์จะเปลี่ยนตามภาษาเป้าหมาย',
   logTitle:'บันทึก', logReady:'พร้อมแล้ว นำเข้าซับไตเติลหรือโหลดตัวอย่างเพื่อเริ่ม',
   stTotal:'ซับไตเติล', stDone:'แปลแล้ว', stDrop:'ลบคำเสียบแล้ว', stMerge:'กลุ่มข้ามบรรทัด', stWrap:'ตัดบรรทัดแล้ว', stIssues:'ค้างอยู่',
   fAll:'ทั้งหมด', fTodo:'ยังไม่แปล', fDone:'แปลแล้ว', fFlag:'มีสถานะพิเศษ',
@@ -1112,9 +1119,9 @@ const I18N = {
   docTitle:'Dịch Phụ đề Miễn phí bằng AI - SRT Translator', appTitle:'🎬 Trình Dịch Phụ đề SRT',
   tagLocal:'Chạy cục bộ · phụ đề không rời khỏi trình duyệt của bạn', uiLangTag:'Ngôn ngữ',
   rule1:'① Chọn phong cách dịch (Chuẩn/Thoại thường/Tùy chỉnh)', rule2:'② Căn chỉnh timeline', rule3:'③ Tự sửa lỗi chép lời',
-  rule4:'④ Giữ hoặc dịch tên riêng', rule5:'⑤ Loại dòng đệm', rule6:'⑥ Tự động ngắt dòng khi vượt <b>24 đơn vị</b>',
-  step1:'Nhập phụ đề (mọi ngôn ngữ)', btnFile:'📂 Chọn file .srt', btnDemo:'Tải ví dụ mẫu',
-  pastePh:'…hoặc dán văn bản SRT vào đây…', btnParse:'Phân tích phụ đề',
+  rule4:'④ Giữ hoặc dịch tên riêng', rule5:'⑤ Loại dòng đệm', rule6:'⑥ Tự động ngắt dòng khi vượt <b>20 đơn vị</b>',
+  step1:'Nhập phụ đề (mọi ngôn ngữ)', btnFile:'📂 Chọn file phụ đề', btnDemo:'Tải ví dụ mẫu',
+  pastePh:'…hoặc dán văn bản phụ đề vào đây… (SRT / VTT / ASS)', btnParse:'Phân tích phụ đề',
   stepReq:'Yêu cầu dịch', stepEngine:'Cỗ máy dịch', lblMode:'Chế độ',
   optBuiltin:'Mô hình mặc định (site cung cấp, không cần Key)', optApi:'API riêng (tương thích OpenAI)',
   optDemo:'Chạy thử (không dịch; hiện ngắt dòng/từ đệm/đánh số lại)',
@@ -1132,11 +1139,11 @@ const I18N = {
   termsHintOn:'Đã chọn = các thuật ngữ trong danh sách giữ nguyên dạng (danh sách bật).',
   termsHintOff:'Tắt: mọi tên/thương hiệu/sản phẩm/thuật ngữ đều được dịch; danh sách bị bỏ qua.',
   lblTerms:'Tên riêng cần giữ nguyên (không bắt buộc, phân tách bằng dấu phẩy)', termsPh:'vd: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ngưỡng ngắt dòng (đơn vị, mặc định 24)', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng',
+  lblMaxW:'Ngưỡng ngắt dòng (đơn vị, mặc định 20)', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng',
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
-  stepExport:'Xuất SRT đã dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
-  btnDownload:'⬇ Tải .srt', btnCopy:'Chép tất cả', lblExpFmt:'Định dạng xuất', fmtMono:'Chỉ bản dịch', fmtBiSrc:'Song ngữ · gốc ở trên', fmtBiDst:'Song ngữ · dịch ở trên', hintOutName:'Hậu tố ngôn ngữ trong tên file theo ngôn ngữ đích.',
+  stepExport:'Xuất bản dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
+  btnDownload:'⬇ Tải phụ đề', btnCopy:'Chép tất cả', lblFileFmt:'Định dạng tệp', lblExpFmt:'Định dạng xuất', fmtMono:'Chỉ bản dịch', fmtBiSrc:'Song ngữ · gốc ở trên', fmtBiDst:'Song ngữ · dịch ở trên', hintOutName:'Hậu tố ngôn ngữ trong tên file theo ngôn ngữ đích.',
   logTitle:'Nhật ký', logReady:'Sẵn sàng. Nhập phụ đề hoặc tải ví dụ mẫu.',
   stTotal:'Phụ đề', stDone:'Xong', stDrop:'Đã dọn đệm', stMerge:'Nhóm nhiều dòng', stWrap:'Đã ngắt dòng', stIssues:'Chờ xử lý',
   fAll:'Tất cả', fTodo:'Chờ dịch', fDone:'Đã dịch', fFlag:'Có đánh dấu',
@@ -1174,9 +1181,9 @@ const I18N = {
   docTitle:'Бесплатный ИИ-перевод Субтитров - SRT Translator', appTitle:'🎬 Переводчик Субтитров SRT',
   tagLocal:'Работает локально · субтитры не покидают ваш браузер', uiLangTag:'Язык',
   rule1:'① Выбор стиля перевода (Точный/Разговорный/Свой)', rule2:'② Выравнивание таймлайна', rule3:'③ Авто-исправление ошибок транскрибации',
-  rule4:'④ Сохранить или перевести имена собственные', rule5:'⑤ Удаление строк-заполнителей', rule6:'⑥ Автоперенос строк длиннее <b>24 единиц</b>',
-  step1:'Импорт субтитров (любой язык)', btnFile:'📂 Выбрать .srt файл', btnDemo:'Загрузить пример',
-  pastePh:'…или вставьте текст SRT сюда…', btnParse:'Разобрать субтитры',
+  rule4:'④ Сохранить или перевести имена собственные', rule5:'⑤ Удаление строк-заполнителей', rule6:'⑥ Автоперенос строк длиннее <b>20 единиц</b>',
+  step1:'Импорт субтитров (любой язык)', btnFile:'📂 Выбрать файл субтитров', btnDemo:'Загрузить пример',
+  pastePh:'…или вставьте текст субтитров сюда… (SRT / VTT / ASS)', btnParse:'Разобрать субтитры',
   stepReq:'Требования к переводу', stepEngine:'Переводчик (движок)', lblMode:'Режим',
   optBuiltin:'Модель по умолчанию (от сайта, без ключа)', optApi:'Своя API (OpenAI-совместимая)',
   optDemo:'Пробный запуск (без перевода; показывает перенос/заполнители/перенумерацию)',
@@ -1194,11 +1201,11 @@ const I18N = {
   termsHintOn:'Включено = термины из списка остаются в оригинальном виде (список активен).',
   termsHintOff:'Выключено: все имена/бренды/продукты/термины переводятся; список игнорируется.',
   lblTerms:'Имена собственные для сохранения оригинала (необязательно, через запятую)', termsPh:'напр. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Порог переноса строк (единиц, по умолчанию 24)', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки',
+  lblMaxW:'Порог переноса строк (единиц, по умолчанию 20)', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки',
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
-  stepExport:'Экспорт переведённого SRT', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
-  btnDownload:'⬇ Скачать .srt', btnCopy:'Копировать всё', lblExpFmt:'Формат экспорта', fmtMono:'Только перевод', fmtBiSrc:'Двуязычный · оригинал сверху', fmtBiDst:'Двуязычный · перевод сверху', hintOutName:'Суффикс языка в имени файла следует за языком перевода.',
+  stepExport:'Экспорт перевода', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
+  btnDownload:'⬇ Скачать субтитры', btnCopy:'Копировать всё', lblFileFmt:'Формат файла', lblExpFmt:'Формат экспорта', fmtMono:'Только перевод', fmtBiSrc:'Двуязычный · оригинал сверху', fmtBiDst:'Двуязычный · перевод сверху', hintOutName:'Суффикс языка в имени файла следует за языком перевода.',
   logTitle:'Журнал', logReady:'Готово. Импортируйте субтитры или загрузите пример.',
   stTotal:'Субтитров', stDone:'Готово', stDrop:'Заполнители убраны', stMerge:'Многострочные группы', stWrap:'Перенесено', stIssues:'Осталось',
   fAll:'Все', fTodo:'Только не переведённые', fDone:'Только готовые', fFlag:'Только отмеченные',
@@ -1307,7 +1314,7 @@ function getCfg(){
   return {
     src: $('srcLang').value,
     dst: $('dstLang').value,
-    maxW: +$('maxW').value || 24,
+    maxW: +$('maxW').value || 20,
     styleMode,
     styleCustom: $('styleCustom').value.trim(),
     keepTerms: $('keepTerms').checked,
@@ -1347,7 +1354,7 @@ function zhBadge(r){
   let b='';
   if (r.flag==='drop') b+='<span class="badge b-drop">'+t('bDrop')+'</span>';
   else if (r.flag==='merge') b+='<span class="badge b-merge">'+t('bMerge')+'</span>';
-  if (r.flag!=='drop' && C.textWidth((r.zh||'').replace(/\n/g,''))> (S.maxW||24)) b+='<span class="badge b-long">'+t('bLong')+'</span>';
+  if (r.flag!=='drop' && C.textWidth((r.zh||'').replace(/\n/g,''))> (S.maxW||20)) b+='<span class="badge b-long">'+t('bLong')+'</span>';
   return b;
 }
 
@@ -1719,13 +1726,14 @@ $('filter').addEventListener('change', renderRows);
 
 /* ---------------- 导入 ---------------- */
 function setSrc(text, fileName){
-  const {items, issues}=C.parseSrt(text);
+  const inFmt=C.detectFormat(text);   // 按内容识别：srt / vtt / ass
+  const {items, issues}= inFmt==='vtt' ? C.parseVtt(text) : inFmt==='ass' ? C.parseAss(text) : C.parseSrt(text);
   S.srcItems=items;
   // 导入后立即构建工作行，右侧对照区才能显示内容（runTranslate 时会重建为深拷贝）
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0;
   if(fileName){
-    S.fileBase=fileName.replace(/\.srt$/i,'');
+    S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
     autoOutName();
   }
   const w=issues.length;
@@ -1836,27 +1844,62 @@ function buildExportItems(){
   }
   const srcV=$('srcLang').value;
   return C.buildBilingual(S.rows, {
-    maxW: +$('maxW').value || 24,
+    maxW: +$('maxW').value || 20,
     srcLocale: srcV==='auto' ? '' : srcV,   // auto 时分词器回退 zh（空格语言靠空格断点，不受影响）
     dstLocale: $('dstLang').value,
     order: fmt==='bi-dst' ? 'dst-first' : 'src-first'
   });
 }
+function expFileFmt(){ return ($('expFileFmt')||{}).value||'srt'; }
 function buildExport(){
+  const ff=expFileFmt();
+  if(ff==='vtt') return C.formatVtt(buildExportItems());
+  if(ff==='txt') return C.formatTxt(buildExportItems());
+  if(ff==='ass') return C.formatAss(buildAssEvents(), {title:S.fileBase||'translated'});
   return C.formatSrt(buildExportItems());
 }
+// ASS 事件：单语 → 全部 Bottom 样式；双语 → 源/译分层（Top=金黄小字在上，Bottom=白色主阅读位在下），
+// 「在上」一方放 Top 样式：bi-src 原文在上，bi-dst 译文在上。
+function buildAssEvents(){
+  const fmt=($('expFmt')||{}).value||'mono';
+  if(fmt==='mono'){
+    return buildExportItems().map(it=>({start:it.start,end:it.end,lines:[{style:'Bottom',text:it.text}]}));
+  }
+  const srcV=$('srcLang').value;
+  const dstFirst = fmt==='bi-dst';
+  const parts=C.buildBilingualParts(S.rows,{
+    maxW: +$('maxW').value || 20,
+    srcLocale: srcV==='auto' ? '' : srcV,
+    dstLocale: $('dstLang').value
+  });
+  return parts.map(p=>{
+    const topText=(dstFirst?p.dstLines:p.srcLines).join('\n');
+    const botText=(dstFirst?p.srcLines:p.dstLines).join('\n');
+    const lines=[];
+    if(topText) lines.push({style:'Top',text:topText});
+    if(botText) lines.push({style:'Bottom',text:botText});
+    return {start:p.start,end:p.end,lines};
+  });
+}
 function runReport(){
-  const txt=buildExport();
-  const {items, issues}=C.parseSrt(txt);
+  const ff=expFileFmt();
+  let issues, count;
+  if(ff==='srt'){
+    const {items, issues:iss}=C.parseSrt(buildExport());
+    issues=iss; count=items.length;
+  }else{
+    const its=buildExportItems();
+    issues=C.validateItems(its); count=its.length;
+  }
   const box=$('reportBox'); box.style.display=issues.length?'block':'none';
   $('report').innerHTML = issues.length
     ? '<div class="issue">'+issues.slice(0,20).map(i=>'#'+i.at+' '+i.msg).join('<br>')+'</div>'
-    : t('verifyOk',items.length);
+    : t('verifyOk',count);
 }
 $('btnDownload').addEventListener('click', ()=>{
   if(!S.rows.length){ log(t('noExport'),'err'); return; }
   runReport();
-  const name=($('outName').value.trim()||'translated.srt');
+  const name=($('outName').value.trim()||('translated.'+expFileFmt()));
   const blob=new Blob([buildExport()],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -1889,7 +1932,8 @@ function save(){
     terms:$('terms').value.trim(), mode:$('mode').value, maxW:$('maxW').value,
     srcLang:$('srcLang').value, style:style,
     styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0',
-    expFmt:($('expFmt')||{}).value||'mono'
+    expFmt:($('expFmt')||{}).value||'mono',
+    expFileFmt:expFileFmt()
   };
   /* 语言只在用户手动切换过时才记忆——避免页面加载时的 save() 把默认值/检测值写死，
      否则第二次访问起浏览器语言自动检测会被 localStorage 里的旧值永久覆盖 */
@@ -1905,9 +1949,10 @@ if(sv.model) $('model').value=sv.model;
 if(sv.key) $('apikey').value=sv.key;
 if(sv.terms) $('terms').value=sv.terms;
 if(sv.mode) $('mode').value=sv.mode;
-// 折行阈值：旧默认 18 升级为新默认 24（用户自定义过其他值则保留）
-if(sv.maxW && +sv.maxW !== 18) $('maxW').value=sv.maxW;
+// 折行阈值：历史默认 18/24 升级为 v0.9.10 默认 20（用户自定义过其他值则保留）
+if(sv.maxW && +sv.maxW !== 18 && +sv.maxW !== 24) $('maxW').value=sv.maxW;
 if(sv.expFmt && ['mono','bi-src','bi-dst'].includes(sv.expFmt)) $('expFmt').value=sv.expFmt;
+if(sv.expFileFmt && ['srt','vtt','ass','txt'].includes(sv.expFileFmt)) $('expFileFmt').value=sv.expFileFmt;
 
 /* 语言选择填充 */
 (function(){
@@ -1957,13 +2002,14 @@ $('keepTerms').addEventListener('change',()=>{ termsUI(); save(); });
 function autoOutName(){
   if(!S.fileBase) return;
   const fmt=($('expFmt')||{}).value||'mono';
-  $('outName').value=S.fileBase+'_'+LBY($('dstLang').value).file+(fmt==='mono'?'字幕.srt':'双语字幕.srt');
+  $('outName').value=S.fileBase+'_'+LBY($('dstLang').value).file+(fmt==='mono'?'字幕':'双语字幕')+'.'+expFileFmt();
 }
 function refreshOutName(){
   const v=$('outName').value; if(!v) return;
-  if(/_[^_/]*(?:双语)?字幕\.srt$/i.test(v)) autoOutName(); // 仅当仍是自动命名时跟随，用户改过的名不覆盖
+  if(/_[^_/]*(?:双语)?字幕\.(srt|vtt|ass|txt)$/i.test(v)) autoOutName(); // 仅当仍是自动命名时跟随，用户改过的名不覆盖
 }
 $('expFmt').addEventListener('change',()=>{ refreshOutName(); save(); });
+$('expFileFmt').addEventListener('change',()=>{ refreshOutName(); save(); });
 $('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
 $('dstLang').addEventListener('change',()=>{ UI.dstManual=true; refreshOutName(); setColLabels(); save(); });
 

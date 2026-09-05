@@ -3,7 +3,7 @@
  *
  * 编码的翻译规范（用户定稿）：
  *  - 字数口径：显示宽度折算。汉字/全角标点 = 1 字；半角非空白字符每 2 个 = 1 字。
- *  - 折行规则：整条文本等效宽度 > 24 时，在同一时间轴内折成多行，每行等效宽度 <= 24。
+ *  - 折行规则：整条文本等效宽度 > 20 时（默认阈值，可调），在同一时间轴内折成多行，每行等效宽度 <= 20。
  *    断点优先级：句末(。！？…) > 逗点类(，、；：) > 连接词前 > 介词/助词前 > 词边界硬切。
  *  - 水词识别：um/yeah/well 等纯填充独立条目、[音乐] 类纯提示词条目，供上层删除或合并。
  */
@@ -233,7 +233,7 @@
   // 超了才折，且折后每行 <= maxW。
   // opts.locale：目标语言（BCP47），启用词典分词保护（中文/日文等无空格语言不劈词）。
   function wrapToWidth(s, maxW, opts) {
-    maxW = (maxW > 0) ? maxW : 24;
+    maxW = (maxW > 0) ? maxW : 20;
     opts = opts || {};
     const src = String(s == null ? '' : s).replace(/\r/g, '');
     if (opts.normalize) {
@@ -323,6 +323,157 @@
     return items.map(fmtItem).join('\n\n') + '\n';
   }
   function renumber(items) { items.forEach((it, i) => { it.no = i + 1; }); return items; }
+
+  // ---------------- WebVTT 解析 / 格式化 ----------------
+  // VTT 时间：MM:SS.mmm 或 HH:MM:SS.mmm（毫秒用小数点）；支持 cue 标识行、NOTE/STYLE/REGION 块跳过。
+  const VTT_TIME_RE = /^(?:(\d{1,3}):)?(\d{1,2}):(\d{2})\.(\d{3})\s*-->\s*(?:(\d{1,3}):)?(\d{1,2}):(\d{2})\.(\d{3})/;
+  function fmtTimeVtt(ms) {
+    const t = Math.max(0, Math.round(ms));
+    const p = (x, l) => String(x).padStart(l, '0');
+    return p(Math.floor(t / 3600000), 2) + ':' + p(Math.floor(t / 60000) % 60, 2) + ':' +
+           p(Math.floor(t / 1000) % 60, 2) + '.' + p(t % 1000, 3);
+  }
+  function parseVtt(src) {
+    const items = [], issues = [];
+    const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    const blocks = text.split(/\n\s*\n/);
+    let prevEnd = -1;
+    blocks.forEach((b, bi) => {
+      let lines = b.split('\n').map((x) => x.trimEnd());
+      if (bi === 0 && /^WEBVTT/i.test(lines[0] || '')) lines = lines.slice(1); // 文件头
+      if (!lines.join('').trim()) return;
+      if (/^(NOTE|STYLE|REGION)/.test(lines[0] || '')) return;                 // 注释/样式/区域块
+      const ti = lines.findIndex((l) => l.indexOf('-->') >= 0);                 // 允许 cue 标识行
+      if (ti < 0) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺时间轴）' }); return; }
+      const m = VTT_TIME_RE.exec(lines[ti].trim());
+      if (!m) { issues.push({ type: 'fmt', at: bi + 1, msg: '时间轴格式不正确' }); return; }
+      const st = toMs(m[1] || 0, m[2], m[3], m[4]);
+      const en = toMs(m[5] || 0, m[6], m[7], m[8]);
+      const body = lines.slice(ti + 1).join('\n')
+        .replace(/<[^>]+>/g, '')                       // <c>/<v>/<b> 等行内标签
+        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        .replace(/&nbsp;/g, ' ').trim();
+      if (!body) return;
+      if (en <= st) issues.push({ type: 'time', at: items.length + 1, msg: '结束时间早于开始时间' });
+      if (st < prevEnd - 1) issues.push({ type: 'overlap', at: items.length + 1, msg: '与上一条时间轴重叠' });
+      prevEnd = en;
+      items.push({ no: items.length + 1, start: st, end: en, text: body });
+    });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块' });
+    return { items, issues };
+  }
+  function formatVtt(items) {
+    return 'WEBVTT\n\n' + items.map((it) =>
+      it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + '\n' + it.text
+    ).join('\n\n') + '\n';
+  }
+
+  // ---------------- ASS/SSA 解析 / 格式化 ----------------
+  // ASS 时间：H:MM:SS.cc（厘秒）。解析 [Events] 的 Dialogue 行，按 Format 行定位列；
+  // 文本剥离 {\...} 特效标签，\N→换行，\h→空格。Comment 行跳过。
+  const ASS_TIME_RE = /^(\d+):(\d{1,2}):(\d{1,2})[.:](\d{1,2})/;
+  function parseAssTime(str) {
+    const m = ASS_TIME_RE.exec(String(str || '').trim());
+    if (!m) return null;
+    return (+m[1] * 3600 + +m[2] * 60 + +m[3]) * 1000 + (+m[4].padEnd(2, '0')) * 10;
+  }
+  function fmtTimeAss(ms) {
+    const t = Math.max(0, Math.round(ms));
+    const p = (x) => String(x).padStart(2, '0');
+    return Math.floor(t / 3600000) + ':' + p(Math.floor(t / 60000) % 60) + ':' +
+           p(Math.floor(t / 1000) % 60) + '.' + p(Math.floor(t / 10) % 100);
+  }
+  function parseAss(src) {
+    const items = [], issues = [];
+    const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    const DEF_FMT = ['layer', 'start', 'end', 'style', 'name', 'marginl', 'marginr', 'marginv', 'effect', 'text'];
+    let inEvents = false, fmt = null, prevEnd = -1;
+    text.split('\n').forEach((ln, li) => {
+      const s = ln.trim();
+      if (/^\[/.test(s)) { inEvents = /^\[events\]/i.test(s); return; }
+      if (!inEvents || !s) return;
+      if (/^format\s*:/i.test(s)) {
+        fmt = s.slice(s.indexOf(':') + 1).split(',').map((x) => x.trim().toLowerCase());
+        return;
+      }
+      if (!/^dialogue\s*:/i.test(s)) return;              // Comment 行等跳过
+      const cols = fmt || DEF_FMT;
+      const raw = s.slice(s.indexOf(':') + 1).trim().split(',');
+      const head = raw.slice(0, cols.length - 1);
+      const textField = raw.slice(cols.length - 1).join(','); // Text 列可含逗号
+      const col = (name) => {
+        const idx = cols.indexOf(name);
+        return (idx >= 0 && idx < head.length) ? head[idx].trim() : '';
+      };
+      const st = parseAssTime(col('start'));
+      const en = parseAssTime(col('end'));
+      if (st == null || en == null) { issues.push({ type: 'fmt', at: li + 1, msg: '时间轴格式不正确' }); return; }
+      const body = textField
+        .replace(/\{[^}]*\}/g, '')                        // {\an8}{\pos(...)} 等特效标签
+        .replace(/\\N/gi, '\n').replace(/\\h/gi, ' ')
+        .replace(/[ \t]+\n/g, '\n').trim();
+      if (!body) return;
+      if (en <= st) issues.push({ type: 'time', at: li + 1, msg: '结束时间早于开始时间' });
+      if (st < prevEnd - 1) issues.push({ type: 'overlap', at: li + 1, msg: '与上一条时间轴重叠' });
+      if (en > prevEnd) prevEnd = en;
+      items.push({ no: items.length + 1, start: st, end: en, text: body });
+    });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块' });
+    return { items, issues };
+  }
+
+  // 生成带样式分层的 ASS 文件（1080p 基准，可直压视频 / 进 Aegisub 二次编辑）。
+  // events：[{start,end,lines:[{style:'Top'|'Bottom',text}]}]
+  //   Bottom 主语言：白色 100% 大小，底部居中（an2）——主要阅读位置；
+  //   Top    副语言：金黄约 75% 大小，顶部居中（an8）——行业双语分层惯例；
+  // 双语时源/译各占一条 Dialogue（时间相同、位置分离），不挤在两行里。
+  function formatAss(events, opts) {
+    opts = opts || {};
+    const STYLE_FMT = 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding';
+    const header = [
+      '[Script Info]',
+      'Title: ' + (opts.title || 'Translated Subtitles'),
+      'ScriptType: v4.00+',
+      'PlayResX: 1920',
+      'PlayResY: 1080',
+      'ScaledBorderAndShadow: yes',
+      'WrapStyle: 0',
+      'YCbCr Matrix: TV.709',
+      '',
+      '[V4+ Styles]',
+      STYLE_FMT,
+      'Style: Bottom,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
+      'Style: Top,PingFang SC,42,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,8,60,60,42,1',
+      '',
+      '[Events]',
+      'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
+    ];
+    const evLines = [];
+    for (const ev of (events || [])) {
+      if (!ev) continue;
+      (ev.lines || []).forEach((ln, i) => {
+        if (!ln || !ln.text || !String(ln.text).trim()) return;
+        const tx = String(ln.text).replace(/\r/g, '').replace(/\n/g, '\\N');
+        evLines.push('Dialogue: ' + i + ',' + fmtTimeAss(ev.start) + ',' + fmtTimeAss(ev.end) + ',' +
+          (ln.style === 'Top' ? 'Top' : 'Bottom') + ',,0,0,0,,' + tx);
+      });
+    }
+    return header.join('\n') + '\n' + evLines.join('\n') + '\n';
+  }
+
+  // ---------------- 纯文本导出 ----------------
+  // 每条字幕的文本作为一个段落（保留条内换行），段落间空行分隔；无时间轴。
+  function formatTxt(items) {
+    return items.map((it) => it.text).join('\n\n') + '\n';
+  }
+
+  // 按内容识别字幕格式：'vtt' | 'ass' | 'srt'
+  function detectFormat(src) {
+    const text = String(src == null ? '' : src).replace(/^\uFEFF/, '');
+    if (/^\s*WEBVTT/i.test(text)) return 'vtt';
+    if (/\[Script Info\]/i.test(text)) return 'ass';
+    return 'srt';
+  }
 
   // ---------------- 水词 / 提示词识别 ----------------
   const FILLERS = new Set(['um', 'uh', 'er', 'ah', 'oh', 'mm', 'mmm', 'mhmm', 'hmm', 'hm',
@@ -521,7 +672,7 @@
     const txt = String(text == null ? '' : text).trim();
     if (!txt) return false;
     const maxDur = opts.maxDur || 7000;
-    const maxW = (opts.maxW > 0) ? opts.maxW : 24;
+    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
     const maxLines = opts.maxLines || 2;
     const dur = (cues[cues.length - 1].end || 0) - (cues[0].start || 0);
     if (dur > maxDur) return false;
@@ -540,24 +691,23 @@
     return splitByDuration(text, times, { locale: locale });
   }
 
-  // 由工作行生成双语字幕条目（纯函数，供导出层调用）。
+  // 由工作行生成双语字幕条目（结构化版：源文/译文分行保留，供 ASS 分层导出使用）。
   // rows：[{no,start,end,en,zh,flag}]（与前端 S.rows 同构；en=源文，zh=译文）
   // opts：
-  //   maxW       每行等效宽度上限（默认 24，与折行同口径）
+  //   maxW       每行等效宽度上限（默认 20，与折行同口径）
   //   srcLocale  源语言 BCP47（分词保护；英文等空格语言影响很小）
   //   dstLocale  目标语言 BCP47
-  //   order      'src-first'（源文在上，默认）| 'dst-first'（译文在上）
+  //   order      'src-first'（源文为主，默认）| 'dst-first'（译文为主）——结构化版仅透传，由调用方决定摆放
   // 规则（严格 1+1）：
   //   - 每条导出字幕 = 源文 1 行 + 译文 1 行；任一方折行超 1 行即把该 cue 切成 k 条子字幕
   //     （k = max(源文折行数, 译文折行数)），源/译各自在自然断点切 k 段按序配对；
   //   - 子时间轴按源文各段显示宽度占比瓜分原 cue 时长（时间跟着说话内容走）；
   //   - flag='merged' 的行（句组合并被跳过的行）：其源文拼回承载行，避免源文丢失；
   //   - flag='drop'、无译文的行：跳过（与单语导出同口径）。
-  // 返回 [{no,start,end,text}]，可直接交给 formatSrt。
-  function buildBilingual(rows, opts) {
+  // 返回 [{no,start,end,srcLines:[],dstLines:[]}]。
+  function buildBilingualParts(rows, opts) {
     opts = opts || {};
-    const maxW = (opts.maxW > 0) ? opts.maxW : 24;
-    const srcFirst = opts.order !== 'dst-first';
+    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
     // 1) 汇集成对条目：活跃行 + 其后 merged 行的源文
     const entries = [];
     let last = null;
@@ -583,17 +733,23 @@
       for (const p of e.srcParts) srcText = srcText ? joinSrc(srcText, p) : p;
       const dstText = e.dst;
       if (!dstText) continue;
-      const stack = (sLines, dLines) => (srcFirst ? sLines.concat(dLines) : dLines.concat(sLines));
       const pushItem = (st, en, sLines, dLines) => {
-        out.push({ no: out.length + 1, start: st, end: en, text: stack(sLines, dLines).join('\n') });
+        out.push({ no: out.length + 1, start: st, end: en, srcLines: sLines, dstLines: dLines });
       };
       const srcLines = srcText ? wrapToWidth(srcText, maxW, { normalize: true, locale: opts.srcLocale }) : [];
       const dstLines = wrapToWidth(dstText, maxW, { normalize: true, locale: opts.dstLocale });
-      const k = Math.max(srcLines.length, dstLines.length);
+      let k = Math.max(srcLines.length, dstLines.length);
       if (k <= 1) { pushItem(e.start, e.end, srcLines, dstLines); continue; }
-      // 严格 1+1：切 k 条子字幕
-      const srcSegs = srcText ? splitTextNatural(srcText, k, opts.srcLocale) : new Array(k).fill('');
-      const dstSegs = splitTextNatural(dstText, k, opts.dstLocale);
+      // 严格 1+1：切 k 条子字幕。自然断点切出的段仍可能超宽（断点偏离均分位），
+      // 此时递增 k 重切，直到每段都能单行放下（k 上限兜底：极端长词/原子实在切不动才接受段内折行）。
+      const fits = (segs) => segs.every((s) => !s || textWidth(s) <= maxW + 1e-9);
+      let srcSegs = [], dstSegs = [];
+      const kCap = k + 10;
+      for (;; k++) {
+        srcSegs = srcText ? splitTextNatural(srcText, k, opts.srcLocale) : new Array(k).fill('');
+        dstSegs = splitTextNatural(dstText, k, opts.dstLocale);
+        if ((fits(srcSegs) && fits(dstSegs)) || k >= kCap) break;
+      }
       // 子时间轴：按源文各段宽度占比分配（无源文时按译文段宽）
       const basis = (srcText ? srcSegs : dstSegs).map((s) => Math.max(0.5, textWidth(s)));
       const W = basis.reduce((a, b) => a + b, 0);
@@ -610,6 +766,16 @@
       }
     }
     return out;
+  }
+
+  // 双语字幕条目（纯文本版：源/译行叠放为单个 text，可直接交给 formatSrt / formatVtt / formatTxt）。
+  // 规则与 buildBilingualParts 相同；opts.order：'src-first'（源文在上，默认）| 'dst-first'（译文在上）。
+  function buildBilingual(rows, opts) {
+    const srcFirst = !opts || opts.order !== 'dst-first';
+    return buildBilingualParts(rows, opts).map((p) => ({
+      no: p.no, start: p.start, end: p.end,
+      text: (srcFirst ? p.srcLines.concat(p.dstLines) : p.dstLines.concat(p.srcLines)).join('\n')
+    }));
   }
 
   // ---------------- 校验 ----------------
@@ -631,10 +797,13 @@
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
+    parseVtt, formatVtt, fmtTimeVtt,
+    parseAss, formatAss, fmtTimeAss, parseAssTime,
+    formatTxt, detectFormat,
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
-    splitTextNatural, buildBilingual,
+    splitTextNatural, buildBilingual, buildBilingualParts,
     validateItems,
-    MAX_W_DEFAULT: 24
+    MAX_W_DEFAULT: 20
   };
 });

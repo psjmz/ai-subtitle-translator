@@ -38,7 +38,9 @@ No build step, no database, no Docker required. `data/` (one JSON file) holds al
 ### Ready-to-burn output
 
 - Timeline validation (no overlaps, no gaps, sequential numbering)
-- Width-aware line wrapping (CJK = full-width, Latin auto-doubled threshold)
+- Width-aware line wrapping (CJK = full-width, Latin auto-doubled threshold; default 20)
+- **Bilingual export**: translation-only / source-above / translation-above, strict 1+1 lines per cue (long cues auto-split on the timeline by content ratio)
+- **Multi-format I/O**: import SRT / WebVTT / ASS (auto-detected); export SRT / WebVTT / ASS / TXT — bilingual ASS uses split-screen styling (white translation bottom-center, gold source on top) instead of cramming two lines together
 - Output is a standards-compliant `.srt` ready for hard-subbing
 
 ### i18n + SEO (built-in, not an afterthought)
