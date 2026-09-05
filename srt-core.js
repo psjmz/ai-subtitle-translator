@@ -529,6 +529,89 @@
     return wrapToWidth(txt, maxW, { normalize: true, locale: opts.locale }).length <= maxLines;
   }
 
+  // ---------------- 双语字幕导出 ----------------
+  // 把文本在自然断点处切成 k 段（宽度尽量均衡）。
+  // 复用 splitByDuration：喂入 k 段等长的合成时间轴，等价于"按宽度均分 + 自然断点择优"，
+  // 同时继承其全部保护：数字+单位原子不劈、词边界加分、空段借字保底（保证 k 段均非空）。
+  function splitTextNatural(text, k, locale) {
+    k = Math.max(1, k | 0);
+    const times = [];
+    for (let i = 0; i < k; i++) times.push({ start: i * 1000, end: (i + 1) * 1000 });
+    return splitByDuration(text, times, { locale: locale });
+  }
+
+  // 由工作行生成双语字幕条目（纯函数，供导出层调用）。
+  // rows：[{no,start,end,en,zh,flag}]（与前端 S.rows 同构；en=源文，zh=译文）
+  // opts：
+  //   maxW       每行等效宽度上限（默认 24，与折行同口径）
+  //   srcLocale  源语言 BCP47（分词保护；英文等空格语言影响很小）
+  //   dstLocale  目标语言 BCP47
+  //   order      'src-first'（源文在上，默认）| 'dst-first'（译文在上）
+  // 规则（严格 1+1）：
+  //   - 每条导出字幕 = 源文 1 行 + 译文 1 行；任一方折行超 1 行即把该 cue 切成 k 条子字幕
+  //     （k = max(源文折行数, 译文折行数)），源/译各自在自然断点切 k 段按序配对；
+  //   - 子时间轴按源文各段显示宽度占比瓜分原 cue 时长（时间跟着说话内容走）；
+  //   - flag='merged' 的行（句组合并被跳过的行）：其源文拼回承载行，避免源文丢失；
+  //   - flag='drop'、无译文的行：跳过（与单语导出同口径）。
+  // 返回 [{no,start,end,text}]，可直接交给 formatSrt。
+  function buildBilingual(rows, opts) {
+    opts = opts || {};
+    const maxW = (opts.maxW > 0) ? opts.maxW : 24;
+    const srcFirst = opts.order !== 'dst-first';
+    // 1) 汇集成对条目：活跃行 + 其后 merged 行的源文
+    const entries = [];
+    let last = null;
+    for (const r of (rows || [])) {
+      if (!r) continue;
+      if (r.flag === 'drop') { last = null; continue; }
+      const srcOne = squashLines(String(r.en == null ? '' : r.en));
+      if (r.flag === 'merged') {
+        if (last && srcOne) last.srcParts.push(srcOne);
+        if (last && (r.end || 0) > last.end) last.end = r.end; // 防御：merged 行的时间覆盖并入承载行
+        continue;
+      }
+      if (!r.zh || !String(r.zh).trim()) { last = null; continue; }
+      last = { start: r.start || 0, end: r.end || 0,
+               srcParts: srcOne ? [srcOne] : [],
+               dst: squashLines(String(r.zh)) };
+      entries.push(last);
+    }
+    // 2) 逐条目叠放 / 切分
+    const out = [];
+    for (const e of entries) {
+      let srcText = '';
+      for (const p of e.srcParts) srcText = srcText ? joinSrc(srcText, p) : p;
+      const dstText = e.dst;
+      if (!dstText) continue;
+      const stack = (sLines, dLines) => (srcFirst ? sLines.concat(dLines) : dLines.concat(sLines));
+      const pushItem = (st, en, sLines, dLines) => {
+        out.push({ no: out.length + 1, start: st, end: en, text: stack(sLines, dLines).join('\n') });
+      };
+      const srcLines = srcText ? wrapToWidth(srcText, maxW, { normalize: true, locale: opts.srcLocale }) : [];
+      const dstLines = wrapToWidth(dstText, maxW, { normalize: true, locale: opts.dstLocale });
+      const k = Math.max(srcLines.length, dstLines.length);
+      if (k <= 1) { pushItem(e.start, e.end, srcLines, dstLines); continue; }
+      // 严格 1+1：切 k 条子字幕
+      const srcSegs = srcText ? splitTextNatural(srcText, k, opts.srcLocale) : new Array(k).fill('');
+      const dstSegs = splitTextNatural(dstText, k, opts.dstLocale);
+      // 子时间轴：按源文各段宽度占比分配（无源文时按译文段宽）
+      const basis = (srcText ? srcSegs : dstSegs).map((s) => Math.max(0.5, textWidth(s)));
+      const W = basis.reduce((a, b) => a + b, 0);
+      const total = Math.max(0, e.end - e.start);
+      let cum = 0;
+      for (let i = 0; i < k; i++) {
+        cum += basis[i];
+        const subStart = i === 0 ? e.start : Math.round(e.start + total * (cum - basis[i]) / W);
+        const subEnd = i === k - 1 ? e.end : Math.round(e.start + total * cum / W);
+        // 段内仍超宽（罕见：长不可断 stretch）则折行兜底，接受该段 2 行
+        const sL = srcSegs[i] ? wrapToWidth(srcSegs[i], maxW, { normalize: true, locale: opts.srcLocale }) : [];
+        const dL = wrapToWidth(dstSegs[i], maxW, { normalize: true, locale: opts.dstLocale });
+        pushItem(subStart, subEnd, sL, dL);
+      }
+    }
+    return out;
+  }
+
   // ---------------- 校验 ----------------
   function validateItems(items) {
     const issues = [];
@@ -550,6 +633,7 @@
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
+    splitTextNatural, buildBilingual,
     validateItems,
     MAX_W_DEFAULT: 24
   };

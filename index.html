@@ -149,7 +149,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 SRT 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.8</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.9</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -233,6 +233,12 @@
 
       <div class="card" data-page-node-id="dkaIcimKzf2ApZEmATh98M">
         <h2 data-page-node-id="67ERYGxN0FXNn6yTtMSyKn"><span class="step" data-page-node-id="Gde0qf20aEQLq4tDJQau4W">4</span><span data-i18n="stepExport">导出译文 SRT</span></h2>
+        <label data-i18n="lblExpFmt">导出格式</label>
+        <select id="expFmt">
+          <option value="mono" data-i18n="fmtMono">仅译文（单语）</option>
+          <option value="bi-src" data-i18n="fmtBiSrc">双语 · 原文在上</option>
+          <option value="bi-dst" data-i18n="fmtBiDst">双语 · 译文在上</option>
+        </select>
         <label data-page-node-id="5O0vOyIxZAhQjFYbpzrSJj" data-i18n="lblOutName">导出文件名（默认按源文件 + 目标语言自动命名）</label>
         <input type="text" id="outName" placeholder="xxx_中文字幕.srt" data-i18n-ph="outPh" data-page-node-id="2mSNaTe9I6ePIvGWD9W6oa">
         <div class="btns" data-page-node-id="PxiNGo6w0oUnfL67UwAP0R">
@@ -386,7 +392,7 @@ const I18N = {
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
   stepExport:'导出译文 SRT', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
-  btnDownload:'⬇ 下载 .srt', btnCopy:'复制全文', hintOutName:'切换目标语言后，文件名里的语言后缀会自动跟随。',
+  btnDownload:'⬇ 下载 .srt', btnCopy:'复制全文', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', fmtBiSrc:'双语 · 原文在上', fmtBiDst:'双语 · 译文在上', hintOutName:'切换目标语言后，文件名里的语言后缀会自动跟随。',
   logTitle:'运行日志', logReady:'就绪。导入字幕或载入示例开始。',
   stTotal:'条数', stDone:'已译', stDrop:'水词清空', stMerge:'跨条句组', stWrap:'折行', stIssues:'待处理',
   fAll:'全部', fTodo:'仅待译', fDone:'仅已译', fFlag:'仅特殊处理',
@@ -448,7 +454,7 @@ const I18N = {
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
   stepExport:'匯出譯文 SRT', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
-  btnDownload:'⬇ 下載 .srt', btnCopy:'複製全文', hintOutName:'切換目標語言後，檔名裡的語言後綴會自動跟隨。',
+  btnDownload:'⬇ 下載 .srt', btnCopy:'複製全文', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', fmtBiSrc:'雙語 · 原文在上', fmtBiDst:'雙語 · 譯文在上', hintOutName:'切換目標語言後，檔名裡的語言後綴會自動跟隨。',
   logTitle:'執行日誌', logReady:'就緒。匯入字幕或載入範例開始。',
   stTotal:'條數', stDone:'已譯', stDrop:'水詞清空', stMerge:'跨條句組', stWrap:'折行', stIssues:'待處理',
   fAll:'全部', fTodo:'僅待譯', fDone:'僅已譯', fFlag:'僅特殊處理',
@@ -510,7 +516,7 @@ const I18N = {
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
   stepExport:'Export translated SRT', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
-  btnDownload:'⬇ Download .srt', btnCopy:'Copy all', hintOutName:'The language suffix in the file name follows the target language.',
+  btnDownload:'⬇ Download .srt', btnCopy:'Copy all', lblExpFmt:'Export format', fmtMono:'Translated only', fmtBiSrc:'Bilingual · source on top', fmtBiDst:'Bilingual · translation on top', hintOutName:'The language suffix in the file name follows the target language.',
   logTitle:'Log', logReady:'Ready. Import subtitles or load the sample.',
   stTotal:'Cues', stDone:'Done', stDrop:'Fillers cleared', stMerge:'Multi-cue groups', stWrap:'Wrapped', stIssues:'Pending',
   fAll:'All', fTodo:'Pending only', fDone:'Done only', fFlag:'Flagged only',
@@ -572,7 +578,7 @@ const I18N = {
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
   stepExport:'翻訳SRTを書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
-  btnDownload:'⬇ .srtをダウンロード', btnCopy:'全文コピー', hintOutName:'翻訳先言語を切り替えるとファイル名の言語suffixも自動で変わります。',
+  btnDownload:'⬇ .srtをダウンロード', btnCopy:'全文コピー', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', fmtBiSrc:'二か国語 · 原文が上', fmtBiDst:'二か国語 · 翻訳が上', hintOutName:'翻訳先言語を切り替えるとファイル名の言語suffixも自動で変わります。',
   logTitle:'ログ', logReady:'準備完了。字幕を読み込むかサンプルを開始してください。',
   stTotal:'件数', stDone:'翻訳済', stDrop:'フィラー消去', stMerge:'複数跨ぎ文', stWrap:'改行', stIssues:'未処理',
   fAll:'すべて', fTodo:'未翻訳のみ', fDone:'翻訳済のみ', fFlag:'フラグ付きのみ',
@@ -634,7 +640,7 @@ const I18N = {
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
   stepExport:'Exportar SRT traducido', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
-  btnDownload:'⬇ Descargar .srt', btnCopy:'Copiar todo', hintOutName:'El sufijo de idioma del nombre de archivo sigue al idioma destino.',
+  btnDownload:'⬇ Descargar .srt', btnCopy:'Copiar todo', lblExpFmt:'Formato de exportación', fmtMono:'Solo traducción', fmtBiSrc:'Bilingüe · original arriba', fmtBiDst:'Bilingüe · traducción arriba', hintOutName:'El sufijo de idioma del nombre de archivo sigue al idioma destino.',
   logTitle:'Registro', logReady:'Listo. Importa subtítulos o carga el ejemplo.',
   stTotal:'Subtítulos', stDone:'Hechos', stDrop:'Relleno quitado', stMerge:'Grupos multi-línea', stWrap:'Ajustados', stIssues:'Pendientes',
   fAll:'Todos', fTodo:'Solo pendientes', fDone:'Solo hechos', fFlag:'Solo marcados',
@@ -696,7 +702,7 @@ const I18N = {
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
   stepExport:'Exportar SRT traduzido', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
-  btnDownload:'⬇ Baixar .srt', btnCopy:'Copiar tudo', hintOutName:'O sufixo de idioma no nome do arquivo segue o idioma destino.',
+  btnDownload:'⬇ Baixar .srt', btnCopy:'Copiar tudo', lblExpFmt:'Formato de exportação', fmtMono:'Somente tradução', fmtBiSrc:'Bilíngue · original acima', fmtBiDst:'Bilíngue · tradução acima', hintOutName:'O sufixo de idioma no nome do arquivo segue o idioma destino.',
   logTitle:'Registro', logReady:'Pronto. Importe legendas ou carregue o exemplo.',
   stTotal:'Legendas', stDone:'Feitas', stDrop:'Preenchido removido', stMerge:'Grupos multilinha', stWrap:'Quebradas', stIssues:'Pendentes',
   fAll:'Todas', fTodo:'Só pendentes', fDone:'Só feitas', fFlag:'Só marcadas',
@@ -758,7 +764,7 @@ const I18N = {
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
   stepExport:'번역된 SRT 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
-  btnDownload:'⬇ .srt 다운로드', btnCopy:'전체 복사', hintOutName:'대상 언어를 바꾸면 파일명의 언어 접미사도 자동으로 따라갑니다.',
+  btnDownload:'⬇ .srt 다운로드', btnCopy:'전체 복사', lblExpFmt:'내보내기 형식', fmtMono:'번역문만', fmtBiSrc:'이중 언어 · 원문이 위', fmtBiDst:'이중 언어 · 번역문이 위', hintOutName:'대상 언어를 바꾸면 파일명의 언어 접미사도 자동으로 따라갑니다.',
   logTitle:'로그', logReady:'준비 완료. 자막을 불러오거나 샘플을 시작하세요.',
   stTotal:'자막 수', stDone:'완료', stDrop:'필러 정리', stMerge:'다중 자막 그룹', stWrap:'줄바꿈', stIssues:'대기',
   fAll:'전체', fTodo:'미번역만', fDone:'완료만', fFlag:'표시된 것만',
@@ -820,7 +826,7 @@ const I18N = {
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
   stepExport:'Übersetzte SRT exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
-  btnDownload:'⬇ .srt herunterladen', btnCopy:'Alles kopieren', hintOutName:'Das Sprach-Suffix im Dateinamen folgt der Zielsprache.',
+  btnDownload:'⬇ .srt herunterladen', btnCopy:'Alles kopieren', lblExpFmt:'Exportformat', fmtMono:'Nur Übersetzung', fmtBiSrc:'Zweisprachig · Original oben', fmtBiDst:'Zweisprachig · Übersetzung oben', hintOutName:'Das Sprach-Suffix im Dateinamen folgt der Zielsprache.',
   logTitle:'Protokoll', logReady:'Bereit. Untertitel importieren oder Beispiel laden.',
   stTotal:'Untertitel', stDone:'Fertig', stDrop:'Füllwörter entfernt', stMerge:'Mehrzeilige Gruppen', stWrap:'Umgebrochen', stIssues:'Offen',
   fAll:'Alle', fTodo:'Nur offene', fDone:'Nur fertige', fFlag:'Nur markierte',
@@ -882,7 +888,7 @@ const I18N = {
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
   stepExport:'Exporter le SRT traduit', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
-  btnDownload:'⬇ Télécharger .srt', btnCopy:'Tout copier', hintOutName:'Le suffixe de langue du nom de fichier suit la langue cible.',
+  btnDownload:'⬇ Télécharger .srt', btnCopy:'Tout copier', lblExpFmt:"Format d'export", fmtMono:'Traduction seule', fmtBiSrc:'Bilingue · original en haut', fmtBiDst:'Bilingue · traduction en haut', hintOutName:'Le suffixe de langue du nom de fichier suit la langue cible.',
   logTitle:'Journal', logReady:'Prêt. Importez des sous-titres ou chargez l\u2019exemple.',
   stTotal:'Sous-titres', stDone:'Terminés', stDrop:'Remplissage retiré', stMerge:'Groupes multi-lignes', stWrap:'Répartis', stIssues:'En attente',
   fAll:'Tous', fTodo:'En attente', fDone:'Terminés', fFlag:'Marqués',
@@ -944,7 +950,7 @@ const I18N = {
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
   stepExport:'Ekspor SRT terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
-  btnDownload:'⬇ Unduh .srt', btnCopy:'Salin semua', hintOutName:'Akhiran bahasa pada nama file mengikuti bahasa target.',
+  btnDownload:'⬇ Unduh .srt', btnCopy:'Salin semua', lblExpFmt:'Format ekspor', fmtMono:'Terjemahan saja', fmtBiSrc:'Dwibahasa · teks asli di atas', fmtBiDst:'Dwibahasa · terjemahan di atas', hintOutName:'Akhiran bahasa pada nama file mengikuti bahasa target.',
   logTitle:'Log', logReady:'Siap. Impor subtitle atau muat contoh.',
   stTotal:'Subtitle', stDone:'Selesai', stDrop:'Pengisi dihapus', stMerge:'Grup multi-baris', stWrap:'Dibungkus', stIssues:'Tertunda',
   fAll:'Semua', fTodo:'Tertunda saja', fDone:'Selesai saja', fFlag:'Ditandai saja',
@@ -1006,7 +1012,7 @@ const I18N = {
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
   stepExport:'अनूदित SRT निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
-  btnDownload:'⬇ .srt डाउनलोड', btnCopy:'सब कॉपी करें', hintOutName:'फ़ाइल नाम का भाषा-प्रत्यय लक्ष्य भाषा के साथ बदलता है।',
+  btnDownload:'⬇ .srt डाउनलोड', btnCopy:'सब कॉपी करें', lblExpFmt:'निर्यात प्रारूप', fmtMono:'केवल अनुवाद', fmtBiSrc:'द्विभाषी · मूल ऊपर', fmtBiDst:'द्विभाषी · अनुवाद ऊपर', hintOutName:'फ़ाइल नाम का भाषा-प्रत्यय लक्ष्य भाषा के साथ बदलता है।',
   logTitle:'लॉग', logReady:'तैयार। सबटाइटल आयात करें या नमूना लोड करें।',
   stTotal:'सबटाइटल', stDone:'पूर्ण', stDrop:'फिलर हटाए', stMerge:'बहु-पंक्ति समूह', stWrap:'रैप्ड', stIssues:'शेष',
   fAll:'सभी', fTodo:'केवल शेष', fDone:'केवल पूर्ण', fFlag:'केवल चिह्नित',
@@ -1068,7 +1074,7 @@ const I18N = {
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
   stepExport:'ส่งออก SRT ที่แปลแล้ว', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
-  btnDownload:'⬇ ดาวน์โหลด .srt', btnCopy:'คัดลอกทั้งหมด', hintOutName:'คำลงท้ายภาษาในชื่อไฟล์จะเปลี่ยนตามภาษาเป้าหมาย',
+  btnDownload:'⬇ ดาวน์โหลด .srt', btnCopy:'คัดลอกทั้งหมด', lblExpFmt:'รูปแบบการส่งออก', fmtMono:'เฉพาะคำแปล', fmtBiSrc:'สองภาษา · ต้นฉบับอยู่บน', fmtBiDst:'สองภาษา · คำแปลอยู่บน', hintOutName:'คำลงท้ายภาษาในชื่อไฟล์จะเปลี่ยนตามภาษาเป้าหมาย',
   logTitle:'บันทึก', logReady:'พร้อมแล้ว นำเข้าซับไตเติลหรือโหลดตัวอย่างเพื่อเริ่ม',
   stTotal:'ซับไตเติล', stDone:'แปลแล้ว', stDrop:'ลบคำเสียบแล้ว', stMerge:'กลุ่มข้ามบรรทัด', stWrap:'ตัดบรรทัดแล้ว', stIssues:'ค้างอยู่',
   fAll:'ทั้งหมด', fTodo:'ยังไม่แปล', fDone:'แปลแล้ว', fFlag:'มีสถานะพิเศษ',
@@ -1130,7 +1136,7 @@ const I18N = {
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
   stepExport:'Xuất SRT đã dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
-  btnDownload:'⬇ Tải .srt', btnCopy:'Chép tất cả', hintOutName:'Hậu tố ngôn ngữ trong tên file theo ngôn ngữ đích.',
+  btnDownload:'⬇ Tải .srt', btnCopy:'Chép tất cả', lblExpFmt:'Định dạng xuất', fmtMono:'Chỉ bản dịch', fmtBiSrc:'Song ngữ · gốc ở trên', fmtBiDst:'Song ngữ · dịch ở trên', hintOutName:'Hậu tố ngôn ngữ trong tên file theo ngôn ngữ đích.',
   logTitle:'Nhật ký', logReady:'Sẵn sàng. Nhập phụ đề hoặc tải ví dụ mẫu.',
   stTotal:'Phụ đề', stDone:'Xong', stDrop:'Đã dọn đệm', stMerge:'Nhóm nhiều dòng', stWrap:'Đã ngắt dòng', stIssues:'Chờ xử lý',
   fAll:'Tất cả', fTodo:'Chờ dịch', fDone:'Đã dịch', fFlag:'Có đánh dấu',
@@ -1192,7 +1198,7 @@ const I18N = {
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
   stepExport:'Экспорт переведённого SRT', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
-  btnDownload:'⬇ Скачать .srt', btnCopy:'Копировать всё', hintOutName:'Суффикс языка в имени файла следует за языком перевода.',
+  btnDownload:'⬇ Скачать .srt', btnCopy:'Копировать всё', lblExpFmt:'Формат экспорта', fmtMono:'Только перевод', fmtBiSrc:'Двуязычный · оригинал сверху', fmtBiDst:'Двуязычный · перевод сверху', hintOutName:'Суффикс языка в имени файла следует за языком перевода.',
   logTitle:'Журнал', logReady:'Готово. Импортируйте субтитры или загрузите пример.',
   stTotal:'Субтитров', stDone:'Готово', stDrop:'Заполнители убраны', stMerge:'Многострочные группы', stWrap:'Перенесено', stIssues:'Осталось',
   fAll:'Все', fTodo:'Только не переведённые', fDone:'Только готовые', fFlag:'Только отмеченные',
@@ -1720,7 +1726,7 @@ function setSrc(text, fileName){
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0;
   if(fileName){
     S.fileBase=fileName.replace(/\.srt$/i,'');
-    $('outName').value=S.fileBase+'_'+LBY($('dstLang').value).file+'字幕.srt';
+    autoOutName();
   }
   const w=issues.length;
   $('parseInfo').innerHTML= w
@@ -1820,11 +1826,24 @@ you recently had a hundred million dollar announcement back in January February
 `;
 
 /* ---------------- 导出 ---------------- */
-function buildExport(){
+// 按导出格式生成条目：mono=仅译文（原逻辑）；bi-*=双语（源文/译文叠放，严格 1+1，长 cue 自动切时间轴）
+function buildExportItems(){
   collectZh();
-  const items=S.rows.filter(r=>r.flag!=='drop' && r.flag!=='merged' && r.zh && r.zh.trim())
-    .map((r,i)=>({no:i+1,start:r.start,end:r.end,text:r.zh}));
-  return C.formatSrt(items);
+  const fmt=($('expFmt')||{}).value||'mono';
+  if(fmt==='mono'){
+    return S.rows.filter(r=>r.flag!=='drop' && r.flag!=='merged' && r.zh && r.zh.trim())
+      .map((r,i)=>({no:i+1,start:r.start,end:r.end,text:r.zh}));
+  }
+  const srcV=$('srcLang').value;
+  return C.buildBilingual(S.rows, {
+    maxW: +$('maxW').value || 24,
+    srcLocale: srcV==='auto' ? '' : srcV,   // auto 时分词器回退 zh（空格语言靠空格断点，不受影响）
+    dstLocale: $('dstLang').value,
+    order: fmt==='bi-dst' ? 'dst-first' : 'src-first'
+  });
+}
+function buildExport(){
+  return C.formatSrt(buildExportItems());
 }
 function runReport(){
   const txt=buildExport();
@@ -1844,7 +1863,7 @@ $('btnDownload').addEventListener('click', ()=>{
   a.download=name;
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
-  log(t('exported',name,S.rows.filter(r=>r.flag!=='drop'&&r.flag!=='merged'&&r.zh&&r.zh.trim()).length),'okc');
+  log(t('exported',name,buildExportItems().length),'okc');
 });
 $('btnCopy').addEventListener('click', async ()=>{
   if(!S.rows.length){ log(t('noCopy'),'err'); return; }
@@ -1869,7 +1888,8 @@ function save(){
     base:$('base').value.trim(), model:$('model').value.trim(), key:$('apikey').value.trim(),
     terms:$('terms').value.trim(), mode:$('mode').value, maxW:$('maxW').value,
     srcLang:$('srcLang').value, style:style,
-    styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0'
+    styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0',
+    expFmt:($('expFmt')||{}).value||'mono'
   };
   /* 语言只在用户手动切换过时才记忆——避免页面加载时的 save() 把默认值/检测值写死，
      否则第二次访问起浏览器语言自动检测会被 localStorage 里的旧值永久覆盖 */
@@ -1887,6 +1907,7 @@ if(sv.terms) $('terms').value=sv.terms;
 if(sv.mode) $('mode').value=sv.mode;
 // 折行阈值：旧默认 18 升级为新默认 24（用户自定义过其他值则保留）
 if(sv.maxW && +sv.maxW !== 18) $('maxW').value=sv.maxW;
+if(sv.expFmt && ['mono','bi-src','bi-dst'].includes(sv.expFmt)) $('expFmt').value=sv.expFmt;
 
 /* 语言选择填充 */
 (function(){
@@ -1932,12 +1953,17 @@ $('keepTerms').checked = sv.keepTerms!=='0';
 termsUI();
 $('keepTerms').addEventListener('change',()=>{ termsUI(); save(); });
 
-/* 语言切换联动：列头 + 导出文件名 */
+/* 语言/格式切换联动：列头 + 导出文件名 */
+function autoOutName(){
+  if(!S.fileBase) return;
+  const fmt=($('expFmt')||{}).value||'mono';
+  $('outName').value=S.fileBase+'_'+LBY($('dstLang').value).file+(fmt==='mono'?'字幕.srt':'双语字幕.srt');
+}
 function refreshOutName(){
   const v=$('outName').value; if(!v) return;
-  const nv=v.replace(/_[^_/]*字幕\.srt$/i,'_'+LBY($('dstLang').value).file+'字幕.srt');
-  if(nv!==v) $('outName').value=nv;
+  if(/_[^_/]*(?:双语)?字幕\.srt$/i.test(v)) autoOutName(); // 仅当仍是自动命名时跟随，用户改过的名不覆盖
 }
+$('expFmt').addEventListener('change',()=>{ refreshOutName(); save(); });
 $('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
 $('dstLang').addEventListener('change',()=>{ UI.dstManual=true; refreshOutName(); setColLabels(); save(); });
 

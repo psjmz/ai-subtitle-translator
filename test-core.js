@@ -372,5 +372,96 @@ t('validateItems 空内容检出', () => {
   assert.ok(iss.some(i => i.type === 'empty'));
 });
 
+console.log('— 双语字幕导出（buildBilingual / splitTextNatural）—');
+t('splitTextNatural：k 段均非空、拼回等于原文、切点自然', () => {
+  const text = '今天我们请到了一位非常特别的嘉宾，他将和我们聊聊太空产业的未来和发展方向';
+  const parts = C.splitTextNatural(text, 3, 'zh-CN');
+  console.log('      → ' + parts.join(' / '));
+  assert.strictEqual(parts.length, 3);
+  parts.forEach(p => assert.ok(p.length > 0, '每段必须有内容'));
+  assert.strictEqual(parts.join(''), text);
+});
+t('短字幕 1+1：单条叠放、默认源上译下', () => {
+  const rows = [{ no: 1, start: 0, end: 2000, en: 'Hello there.', zh: '你好。', flag: '' }];
+  const items = C.buildBilingual(rows, { maxW: 24, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(items.length, 1);
+  assert.deepStrictEqual(items[0].text.split('\n'), ['Hello there.', '你好。']);
+  assert.strictEqual(items[0].start, 0);
+  assert.strictEqual(items[0].end, 2000);
+});
+t('译上源下：order=dst-first', () => {
+  const rows = [{ no: 1, start: 0, end: 2000, en: 'Hello there.', zh: '你好。', flag: '' }];
+  const items = C.buildBilingual(rows, { maxW: 24, order: 'dst-first' });
+  assert.deepStrictEqual(items[0].text.split('\n'), ['你好。', 'Hello there.']);
+});
+t('长 cue 严格 1+1：切成多条子字幕，每行 <=maxW', () => {
+  const en = 'This is a fairly long English subtitle line that definitely exceeds the maximum allowed display width for one single row of subtitle text on screen';
+  const zh = '这是一条相当长的中文字幕译文内容，它的显示宽度明显超过了单行所能容纳的最大限制，需要切分处理';
+  const rows = [{ no: 1, start: 0, end: 12000, en: en, zh: zh, flag: '' }];
+  const items = C.buildBilingual(rows, { maxW: 24, srcLocale: 'en', dstLocale: 'zh-CN' });
+  console.log('      → 切成 ' + items.length + ' 条');
+  assert.ok(items.length >= 2, '长 cue 应被切分');
+  items.forEach(it => {
+    const lines = it.text.split('\n');
+    assert.strictEqual(lines.length, 2, '每条子字幕必须恰好 2 行（源1+译1）: ' + it.text);
+    lines.forEach(l => assert.ok(C.textWidth(l) <= 24.01, '行宽超限: ' + l));
+  });
+  // 内容完整性：源文、译文拼回应与原文一致（空白差异忽略）
+  const srcJoined = items.map(it => it.text.split('\n')[0]).join(' ').replace(/\s+/g, '');
+  assert.strictEqual(srcJoined, en.replace(/\s+/g, ''), '源文内容应完整');
+  const dstJoined = items.map(it => it.text.split('\n')[1]).join('').replace(/\s+/g, '');
+  assert.strictEqual(dstJoined, zh.replace(/\s+/g, ''), '译文内容应完整');
+});
+t('子时间轴：单调递增、不重叠、覆盖原 cue 全程', () => {
+  const en = 'Space systems were the major focus for a long time and ground segment was kind of the afterthought for most companies in the industry';
+  const zh = '太空系统长期以来一直是主要焦点，而地面段对行业内大多数公司来说算是事后才想到的部分';
+  const rows = [{ no: 1, start: 5000, end: 15000, en: en, zh: zh, flag: '' }];
+  const items = C.buildBilingual(rows, { maxW: 24, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.ok(items.length >= 2);
+  assert.strictEqual(items[0].start, 5000, '首条起点 = 原 cue 起点');
+  assert.strictEqual(items[items.length - 1].end, 15000, '末条终点 = 原 cue 终点');
+  for (let i = 0; i < items.length; i++) {
+    assert.ok(items[i].start < items[i].end, '子字幕时长必须为正: #' + i);
+    if (i > 0) assert.ok(items[i].start >= items[i - 1].end, '时间轴不得重叠/倒流: #' + i);
+  }
+  // formatSrt → parseSrt 往返零 issue
+  const rt = C.parseSrt(C.formatSrt(items));
+  assert.strictEqual(rt.issues.length, 0, '导出再解析应无问题: ' + JSON.stringify(rt.issues));
+});
+t('merged 行的源文拼回承载行（不丢源文）', () => {
+  const rows = [
+    { no: 1, start: 0, end: 3000, en: 'But this wouldn\'t be the last time', zh: '但这并不是最后一次世界领导人被关税的后果震惊。', flag: '' },
+    { no: 2, start: 3000, end: 5000, en: 'a world leader was shocked by a tariff.', zh: null, flag: 'merged' },
+  ];
+  const items = C.buildBilingual(rows, { maxW: 24, srcLocale: 'en', dstLocale: 'zh-CN' });
+  const allSrc = items.map(it => it.text.split('\n').filter((l, i, arr) => true)[0]).join(' ');
+  assert.ok(allSrc.includes('last time'), '应含首条源文');
+  assert.ok(allSrc.includes('shocked by a tariff'), 'merged 行的源文必须拼回: ' + allSrc);
+  assert.strictEqual(items[0].start, 0);
+  assert.strictEqual(items[items.length - 1].end, 5000, '时间轴覆盖整组');
+});
+t('drop / 无译文行：跳过（与单语同口径）', () => {
+  const rows = [
+    { no: 1, start: 0, end: 1000, en: 'yeah', zh: null, flag: 'drop' },
+    { no: 2, start: 1000, end: 2000, en: 'Hello.', zh: '你好。', flag: '' },
+    { no: 3, start: 2000, end: 3000, en: 'Untranslated.', zh: null, flag: 'missing' },
+  ];
+  const items = C.buildBilingual(rows, { maxW: 24 });
+  assert.strictEqual(items.length, 1);
+  assert.strictEqual(items[0].no, 1, '重新编号');
+  assert.ok(items[0].text.includes('你好。'));
+});
+t('编号连续 + formatSrt 整体往返', () => {
+  const rows = [
+    { no: 1, start: 0, end: 2000, en: 'First line.', zh: '第一行。', flag: '' },
+    { no: 2, start: 2000, end: 4000, en: 'Second line here.', zh: '第二行在这。', flag: '' },
+  ];
+  const items = C.buildBilingual(rows, { maxW: 24 });
+  items.forEach((it, i) => assert.strictEqual(it.no, i + 1));
+  const rt = C.parseSrt(C.formatSrt(items));
+  assert.strictEqual(rt.issues.length, 0);
+  assert.strictEqual(rt.items.length, 2);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
