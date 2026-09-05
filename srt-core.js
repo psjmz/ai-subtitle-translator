@@ -1,0 +1,556 @@
+/* srt-core.js — SRT 字幕规则引擎
+ * 浏览器 <script src> 与 Node (require) 通用。
+ *
+ * 编码的翻译规范（用户定稿）：
+ *  - 字数口径：显示宽度折算。汉字/全角标点 = 1 字；半角非空白字符每 2 个 = 1 字。
+ *  - 折行规则：整条文本等效宽度 > 24 时，在同一时间轴内折成多行，每行等效宽度 <= 24。
+ *    断点优先级：句末(。！？…) > 逗点类(，、；：) > 连接词前 > 介词/助词前 > 词边界硬切。
+ *  - 水词识别：um/yeah/well 等纯填充独立条目、[音乐] 类纯提示词条目，供上层删除或合并。
+ */
+(function (root, factory) {
+  if (typeof module !== 'undefined' && module.exports) module.exports = factory();
+  else root.SrtCore = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  // ---------------- 显示宽度 ----------------
+  function isFull(ch) {
+    const c = ch.codePointAt(0);
+    return (c >= 0x2e80 && c <= 0x9fff) ||   // CJK 汉字 / 部首 / 假名 / 谚文
+           (c >= 0x3000 && c <= 0x303f) ||   // CJK 标点（含全角空格）
+           (c >= 0xff00 && c <= 0xffef) ||   // 全角字符
+           c === 0x2018 || c === 0x2019 || c === 0x201c || c === 0x201d ||
+           c === 0x2026 || c === 0x2014 || c === 0x00b7;
+  }
+  function charW(ch) { return isFull(ch) ? 1 : 0.5; }
+  function textWidth(s) {
+    if (!s) return 0;
+    let w = 0;
+    for (const ch of s) {
+      if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') continue;
+      w += charW(ch);
+    }
+    return w;
+  }
+
+  // ---------------- 折行 ----------------
+  const SENT_END = '。！？…!?';         // 5
+  const CLAUSE   = '，、；;：:';         // 4
+  const CONJ_WORDS = ['换句话说', '也就是说', '然后', '但是', '不过', '所以', '因为', '而且',
+    '还有', '其实', '如果', '并且', '以及', '因此', '另外', '此外', '甚至', '虽然', '尽管',
+    '由于', '于是', '接着', '毕竟', '总之'];
+  const CONJ_SINGLE = ['但', '而', '并', '却', '就', '才', '也', '又', '更', '再', '还', '只', '都', '则'];
+  const PREP_WORDS = ['关于', '对于', '随着', '作为', '为了'];
+  const PREP_SINGLE = ['在', '从', '把', '被', '让', '对', '跟', '与', '向', '为', '由', '将', '当'];
+  const CLOSE_SET = '”’』】）》"\'';
+  const CLOSE_FIRST = '”’』】）》\'，。！？、；：…'; // 行首禁用的收尾符号
+
+  function isAlnum(c) { return !!c && /[A-Za-z0-9]/.test(c); }
+
+  // ---------------- 数字+单位原子保护 ----------------
+  // 「30%」「$50」「1,000」「12.5」「100万」等数字与其单位/符号是不可拆散的整体，
+  // 折行（findCut）与按时长切分（splitByDuration）都不允许把切点落在其内部。
+  const CURR_PREFIX = '$¥€£';
+  const UNIT_CJK = '万个亿千百美元元年月日时分秒人次倍钟';
+
+  // 返回 pos（字符数组）中所有原子区间 [start, end)（end 不含；区间内部禁止切分）
+  function atomicRanges(pos) {
+    const n = pos.length, ranges = [];
+    const isD = (c) => c >= '0' && c <= '9';
+    const isLat = (c) => /[A-Za-z]/.test(c);
+    let i = 0;
+    while (i < n) {
+      let j = i;
+      if (CURR_PREFIX.indexOf(pos[j]) >= 0) j++;           // 可选货币前缀
+      if (j < n && isD(pos[j])) {
+        const numStart = j;
+        while (j < n && isD(pos[j])) j++;                  // 整数部分
+        // 小数 / 千分位（可重复，如 1,234.56）
+        while (j + 1 < n && (pos[j] === '.' || pos[j] === ',') && isD(pos[j + 1])) {
+          j += 2;
+          while (j < n && isD(pos[j])) j++;
+        }
+        if (j < n && (pos[j] === '%' || pos[j] === '°')) j++;   // 百分比 / 度数
+        else if (j < n && UNIT_CJK.indexOf(pos[j]) >= 0) {     // 中文量词单位（连续吞并：万/美元/元年…）
+          while (j < n && UNIT_CJK.indexOf(pos[j]) >= 0) j++;
+        } else {
+          // 拉丁单位 1~3 字母（kg / mm / mph / rd…）；若后面还有字母则视为普通单词，不吞
+          let k = j, cnt = 0;
+          while (k < n && cnt < 4 && isLat(pos[k])) { k++; cnt++; }
+          if (cnt >= 1 && cnt <= 3 && (k >= n || !isLat(pos[k]))) j = k;
+        }
+        if (j > numStart) ranges.push([i, j]);
+        i = j;
+      } else i++;
+    }
+    return ranges;
+  }
+
+  // ---------------- 词边界保护（Intl.Segmenter 分词） ----------------
+  // 中文/日文等无空格语言：折行硬切可能把一个词劈到两行（如「产|品」「价|格」「应|对」）。
+  // Intl.Segmenter 是浏览器与现代 Node 内置的词典级分词器（零依赖），
+  // 用它标记词边界；不可用时自动降级为旧行为（仅按标点/宽度切）。
+  const SEG_CACHE = {};
+  function getSegmenter(locale) {
+    if (typeof Intl === 'undefined' || typeof Intl.Segmenter !== 'function') return null;
+    const key = String(locale || 'zh');
+    if (!(key in SEG_CACHE)) {
+      try { SEG_CACHE[key] = new Intl.Segmenter(key, { granularity: 'word' }); }
+      catch (e) {
+        try { SEG_CACHE[key] = new Intl.Segmenter('zh', { granularity: 'word' }); }
+        catch (e2) { SEG_CACHE[key] = null; }
+      }
+    }
+    return SEG_CACHE[key];
+  }
+  // 返回 pos（字符数组）中所有「词边界下标」的集合：在边界下标处切分不会劈词。
+  // 分词器不可用或出错时返回 null（调用方降级为旧行为）。
+  function wordBounds(pos, locale) {
+    const seg = getSegmenter(locale);
+    if (!seg || !pos.length) return null;
+    try {
+      const bounds = new Set();
+      let idx = 0;
+      for (const s of seg.segment(pos.join(''))) {
+        bounds.add(idx);
+        idx += Array.from(s.segment).length;
+      }
+      bounds.add(idx);
+      return bounds;
+    } catch (e) { return null; }
+  }
+
+  // 判断在 pos[cut-1] 之后断行的自然度（>=2 视为自然断点）
+  function breakPrio(pos, cut) {
+    const n = pos.length;
+    if (cut <= 0 || cut >= n) return 0;
+    const ch = pos[cut - 1];
+    // 行尾是闭引号/闭括号：继承其前一字符的等级
+    if (CLOSE_SET.includes(ch)) {
+      const prev = cut - 2 >= 0 ? pos[cut - 2] : '';
+      if (SENT_END.includes(prev)) return 5;
+      if (CLAUSE.includes(prev)) return 4;
+      return 3;
+    }
+    if (SENT_END.includes(ch)) return 5;
+    if (ch === ' ' || ch === '\u3000') return 4;  // 空格/全角空格处断行（多语言词边界）
+    if (CLAUSE.includes(ch)) return 4;
+    // 下一字符以连接词开头 → 在连接词前断开
+    const rest = pos.slice(cut).join('');
+    for (const w of CONJ_WORDS) if (rest.startsWith(w)) return 3;
+    if (rest && CONJ_SINGLE.includes(rest[0])) return 3;
+    // 下一字符为介词/助词 → 低优先
+    if (rest) {
+      if (PREP_SINGLE.includes(rest[0])) return 2;
+      for (const w of PREP_WORDS) if (rest.startsWith(w)) return 2;
+      // 数字/货币/单位开头（原子前断点，如 "高达|30%的关税"）→ 低优先自然断点
+      if (/[0-9$¥€£%°]/.test(rest[0])) return 2;
+    }
+    return 0;
+  }
+
+  // 找 segment（单行文本）的第一个切点（返回切点下标，slice(0,cut) 为第一行）
+  // locale：目标语言（BCP47，如 zh-CN / ja），用于词典分词保护词边界；缺省按 zh。
+  function findCut(s, maxW, locale) {
+    const pos = Array.from(s);
+    const n = pos.length;
+    // 原子保护：切点不得落在数字+单位内部（如 30%、$50、1,000）
+    const atom = atomicRanges(pos);
+    const inAtom = (i) => { for (let k = 0; k < atom.length; k++) if (i > atom[k][0] && i < atom[k][1]) return true; return false; };
+    // 词边界（无空格语言的劈词保护）；分词器不可用时为 null → 降级
+    const bounds = wordBounds(pos, locale);
+    // 1) 硬切候选：最长前缀（宽度不超过 maxW）
+    let acc = 0, c = n;
+    for (let i = 0; i < n; i++) {
+      const w = charW(pos[i]);
+      if (acc + w > maxW + 1e-9) { c = i; break; }
+      acc += w;
+    }
+    if (c >= n) return n;
+    // 2) 避免劈开英文/数字词
+    if (c > 0 && c < n && isAlnum(pos[c - 1]) && isAlnum(pos[c])) {
+      let j = c - 1;
+      while (j > 0 && isAlnum(pos[j - 1])) j--;
+      c = Math.max(1, j);
+    }
+    // 3) 在硬切位置向前最多 10 字范围内，找最近的自然断点（保证第一行尽量满行）。
+    //    伪断点（介词/连接词前断开）必须落在词边界上才有效 —— 否则「应对」的「对」
+    //    会被误判为介词，把动词劈成两半。
+    const effPrio = (cut) => {
+      const p = breakPrio(pos, cut);
+      if (p >= 4) return p;                        // 标点/空格：天然边界，不受影响
+      if (bounds && !bounds.has(cut)) return 0;    // 伪断点落在词内部 → 无效
+      return p;
+    };
+    const lo = Math.max(1, c - 10);
+    for (let cut = c; cut > lo; cut--) {
+      if (!inAtom(cut) && effPrio(cut) >= 2) return cut;
+    }
+    // 4) 兜底：若附近没有，在 [1, c]（不超硬切宽度）范围内找最高优先级断点（同级取更靠后的，行尽量满）
+    let best = -1, bestP = 0;
+    for (let cut = c; cut >= 1; cut--) {
+      if (inAtom(cut)) continue;
+      const p = effPrio(cut);
+      if (p > bestP) { bestP = p; best = cut; if (p >= 4) break; }
+    }
+    if (best >= 1 && bestP >= 2) return best;
+    // 5) 最后手段：纯硬切（不劈原子；行首不得是闭符号）
+    if (inAtom(c)) {
+      const r = atom.filter((x) => c > x[0] && c < x[1])[0];
+      if (r) c = (r[0] >= 1) ? r[0] : Math.min(r[1], n - 1); // 回退到原子开头；原子在行首则推到原子末尾
+    }
+    if (c < n && CLOSE_FIRST.includes(pos[c])) {
+      // 切点落在闭符号前：把切点前移，让闭符号连同其前一字符一起去下一行
+      // （既不超宽、下一行行首也不是闭符号；连续闭符号一并处理）
+      let k = c;
+      while (k > 1 && CLOSE_FIRST.includes(pos[k])) k--;
+      c = Math.max(1, k);
+    }
+    // 5b) 词保护：切点若落在词内部（含上面闭符号回退造成的情况）→ 整词下移到下一行。
+    // 该词一行内放得下才移动；词本身超过一行宽则保持硬切（无解）。
+    if (bounds && c > 1 && !bounds.has(c) && !inAtom(c)) {
+      let ws = c - 1;
+      while (ws > 1 && !bounds.has(ws)) ws--;
+      let we = c;
+      while (we < n && !bounds.has(we)) we++;
+      const wordW = pos.slice(ws, we).reduce((a, ch) => a + charW(ch), 0);
+      if (ws >= 1 && bounds.has(ws) && !inAtom(ws) && wordW <= maxW) c = ws;
+    }
+    // 5c) 行首助词回避：下一行以助词（的了着过…）开头时，切点再往前挪一个词，
+    //     让助词跟它的中心词待在一起（如「…应对 / 的冲击」→「…应对 / 关税的冲击」的兜底路径）。
+    const ASP_FIRST = '的了着过地得吗呢吧啊呀嘛么';
+    if (bounds && c > 1 && ASP_FIRST.includes(pos[c]) && bounds.has(c) && !inAtom(c)) {
+      let ws2 = c - 1;
+      while (ws2 > 1 && !bounds.has(ws2)) ws2--;
+      if (ws2 >= 1 && bounds.has(ws2) && !inAtom(ws2)) c = ws2;
+    }
+    return c;
+  }
+
+  // 将文本按 maxW 折行，返回行数组。
+  // opts.normalize=true 时（规则⑥标准口径）：先把文本内已有换行合并为单行，
+  // 再判定“整条等效宽”是否超 maxW —— 未超则保持单行（修复短句被错误断行），
+  // 超了才折，且折后每行 <= maxW。
+  // opts.locale：目标语言（BCP47），启用词典分词保护（中文/日文等无空格语言不劈词）。
+  function wrapToWidth(s, maxW, opts) {
+    maxW = (maxW > 0) ? maxW : 24;
+    opts = opts || {};
+    const src = String(s == null ? '' : s).replace(/\r/g, '');
+    if (opts.normalize) {
+      const one = squashLines(src);
+      return (one && textWidth(one) > maxW) ? foldSeg(one, maxW, opts.locale) : [one];
+    }
+    const out = [];
+    for (const ln of src.split('\n')) {
+      if (textWidth(ln) <= maxW) { out.push(ln); continue; }
+      out.push.apply(out, foldSeg(ln, maxW, opts.locale));
+    }
+    return out;
+  }
+
+  // 把多行文本合并为单行：行首尾空白去掉再拼接；
+  // 若拼缝两侧都是字母数字（英文被换行拆断的场景），补一个空格。
+  function squashLines(src) {
+    const lines = src.split('\n').map((x) => x.trim()).filter((x) => x !== '');
+    let out = '';
+    for (const ln of lines) {
+      if (!out) { out = ln; continue; }
+      const needSpace = isAlnum(out[out.length - 1]) && isAlnum(ln[0]);
+      out += (needSpace ? ' ' : '') + ln;
+    }
+    return out;
+  }
+
+  // 将已确认超宽的连续文本折为多行，每行 <= maxW
+  function foldSeg(seg, maxW, locale) {
+    const out = [];
+    while (seg && textWidth(seg) > maxW) {
+      const cut = findCut(seg, maxW, locale);
+      const f = seg.slice(0, cut).trimEnd(); // 行尾空白不进输出行（避免拼接残留空格）
+      if (!f || cut <= 0) break; // 防御：切不动就放弃本行，避免死循环
+      out.push(f);
+      seg = seg.slice(cut);
+    }
+    if (seg) { const tail = seg.trimEnd(); if (tail) out.push(tail); }
+    return out;
+  }
+
+  // ---------------- SRT 解析 / 格式化 ----------------
+  const TIME_RE = /^(\d{1,2}):(\d{2}):(\d{2})[,.](\d{1,3})\s*-->\s*(\d{1,2}):(\d{2}):(\d{2})[,.](\d{1,3})/;
+  function toMs(h, m, s, ms) { return (+h * 3600 + +m * 60 + +s) * 1000 + +ms; }
+  function parseTime(str) {
+    const m = TIME_RE.exec(String(str || '').trim());
+    if (!m) return null;
+    return [toMs(m[1], m[2], m[3], m[4].padEnd(3, '0')), toMs(m[5], m[6], m[7], m[8].padEnd(3, '0'))];
+  }
+  function fmtTime(ms) {
+    const t = Math.max(0, Math.round(ms));
+    const p = (x, l) => String(x).padStart(l, '0');
+    return p(Math.floor(t / 3600000), 2) + ':' + p(Math.floor(t / 60000) % 60, 2) + ':' +
+           p(Math.floor(t / 1000) % 60, 2) + ',' + p(t % 1000, 3);
+  }
+
+  // 解析 SRT 文本 → { items:[{no,start,end,text}], issues:[] }
+  function parseSrt(src) {
+    const items = [], issues = [];
+    const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    const blocks = text.split(/\n\s*\n/);
+    let prevEnd = -1, prevNo = 0;
+    blocks.forEach((b, bi) => {
+      const lines = b.split('\n').map((x) => x.trimEnd());
+      if (!lines.join('').trim()) return;
+      const noM = /^\s*(\d+)\s*$/.exec(lines[0] || '');
+      const ti = lines.findIndex((l) => l.indexOf('-->') >= 0);
+      if (!noM || ti < 1) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺编号或时间轴）' }); return; }
+      const t = parseTime(lines[ti]);
+      if (!t) { issues.push({ type: 'fmt', at: +noM[1], msg: '时间轴格式不正确' }); return; }
+      const no = +noM[1];
+      const body = lines.slice(ti + 1).join('\n').trim();
+      if (no <= prevNo) issues.push({ type: 'num', at: no, msg: '编号未递增' });
+      if (t[1] <= t[0]) issues.push({ type: 'time', at: no, msg: '结束时间早于开始时间' });
+      if (t[0] < prevEnd - 1) issues.push({ type: 'overlap', at: no, msg: '与上一条时间轴重叠' });
+      prevEnd = t[1]; prevNo = no;
+      items.push({ no, start: t[0], end: t[1], text: body });
+    });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块' });
+    return { items, issues };
+  }
+
+  function fmtItem(it) {
+    return it.no + '\n' + fmtTime(it.start) + ' --> ' + fmtTime(it.end) + '\n' + it.text;
+  }
+  function formatSrt(items) {
+    return items.map(fmtItem).join('\n\n') + '\n';
+  }
+  function renumber(items) { items.forEach((it, i) => { it.no = i + 1; }); return items; }
+
+  // ---------------- 水词 / 提示词识别 ----------------
+  const FILLERS = new Set(['um', 'uh', 'er', 'ah', 'oh', 'mm', 'mmm', 'mhmm', 'hmm', 'hm',
+    'yeah', 'yep', 'yup', 'nope', 'nah', 'ok', 'okay', 'alright', 'right', 'well', 'so', 'like',
+    'uhh', 'uhuh', 'uh-uh', 'ha', 'heh', 'huh', 'ahh', 'ahem', 'yeahyeah', 'yeahyeahyeah', 'uhhuh']);
+  const FILLER_PHRASES = new Set(['you know', 'i mean', 'you know what', 'i guess', 'oh yeah',
+    'oh ok', 'oh okay', 'all right', 'no no', 'yeah yeah', 'right right']);
+  const SOUND_HINTS = ['音乐', '背景音乐', '掌声', '笑声', '欢呼', '音效', '噪音', '旁白', '画外音',
+    '解说', '说话声', '鸟叫', '咳嗽', '车声', '电话铃', '提示音',
+    'music', 'applause', 'laugh', 'cheer', 'sound effect', 'coughing', 'phone ringing',
+    'narration', 'voiceover', 'background noise', 'sigh', 'groan'];
+
+  function soundOnlyRe() {
+    return new RegExp('^\\s*[\\[【\\(（][^\\]】\\)）]*(?:' + SOUND_HINTS.join('|') + ')[^\\[【\\(（]*[\\]】\\)）]\\s*$');
+  }
+  function normFill(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/[\u2018\u2019\u201c\u201d"'`]/g, '')
+      .replace(/[^a-z0-9\s]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // 整条是否属于「纯水词 / 纯提示词」（上层据此 drop 或 merge）
+  function isFillerCue(text) {
+    if (!text || !text.trim()) return false;
+    const t = text.trim();
+    if (soundOnlyRe().test(t)) return true;
+    const n = normFill(t);
+    if (!n) return false;
+    if (n.length > 12) return false;
+    if (FILLER_PHRASES.has(n)) return true;
+    const compact = n.replace(/[^a-z0-9]/g, '');
+    if (FILLERS.has(compact)) return true;              // "Yeah, yeah." → yeahyeah 之类
+    const words = n.split(' ');
+    if (words.every((w) => FILLERS.has(w))) return true;
+    return false;
+  }
+
+  // 去掉文本内嵌的 [音乐] 等提示词
+  function stripSoundTags(text) {
+    const re = new RegExp('\\s*[\\[【\\(（][^\\]】\\)）]*(?:' + SOUND_HINTS.join('|') + ')[^\\[【\\(（]*[\\]】\\)）]\\s*', 'g');
+    return String(text == null ? '' : text)
+      .replace(re, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  // ---------------- 句子级分组与时长分配 ----------------
+  // 场景：源 SRT 常把一个完整句子拆在相邻多条字幕里（如 "…was shocked" / "by a tariff's consequences."）。
+  // 翻译以句组为单位进行，译回时按各条字幕的时长比例切分回填（时间轴不动）。
+  const SENT_FINAL = '.!?…。！？…';
+  const CLOSE_BRKS = '”’』】》）)]"\'';
+
+  function endsSentence(text) {
+    const t = stripSoundTags(text).trim();
+    if (!t) return false;
+    for (let i = t.length - 1; i >= 0; i--) {
+      const ch = t[i];
+      if (CLOSE_BRKS.includes(ch)) continue;
+      if (ch === ' ' || ch === '\t' || ch === '\n') continue;
+      return SENT_FINAL.includes(ch);
+    }
+    return false;
+  }
+
+  function joinSrc(a, b) {
+    const needSpace = isAlnum(a[a.length - 1]) && isAlnum(b[0]);
+    return a + (needSpace ? ' ' : '') + b;
+  }
+
+  // 把相邻 cue 合并为「句组」：文本未以句末标点结尾的 cue 与下一条同组；
+  // 纯水词/纯提示词 cue 单独成组并标记 filler:true（上层直接清空该条）。
+  // opts.maxCues / opts.maxWidth 为保险丝：防听写文本全程无标点导致超长合并。
+  function groupSentences(items, opts) {
+    opts = opts || {};
+    const maxCues = opts.maxCues || 6;
+    const maxWidth = opts.maxWidth || 200;
+    const groups = [];
+    let cur = null;
+    const flush = () => {
+      if (cur && cur.cues.length) groups.push({ gno: groups.length + 1, cues: cur.cues, text: cur.text });
+      cur = null;
+    };
+    for (const it of items) {
+      if (isFillerCue(it.text)) {
+        flush();
+        groups.push({ gno: groups.length + 1, cues: [it], text: it.text, filler: true });
+        continue;
+      }
+      const txt = String(it.text || '').trim();
+      if (!txt) continue;
+      if (cur && (cur.cues.length >= maxCues || textWidth(joinSrc(cur.text, txt)) > maxWidth)) flush();
+      if (!cur) cur = { cues: [], text: '' };
+      cur.text = cur.text ? joinSrc(cur.text, txt) : txt;
+      cur.cues.push(it);
+      if (endsSentence(txt)) flush();
+    }
+    flush();
+    return groups;
+  }
+
+  // 前缀宽度数组中，第一个 >= w 的下标（找不到返回末下标）
+  function idxAtWidth(pref, w) {
+    let lo = 0, hi = pref.length - 1, ans = pref.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (pref[mid] >= w) { ans = mid; hi = mid - 1; } else lo = mid + 1;
+    }
+    return ans;
+  }
+
+  // 把整句译文按各 cue 的时长比例切分，返回与 times 等长的字符串数组，每项非空。
+  // 切分点优先取语义停顿（复用 breakPrio 优先级），并在时长占比的目标位置附近（±6 宽度）择优；
+  // 切点禁止落在数字+单位原子内部（如 30%、$50、1,000）；词边界加分（不劈词，如 价|格）。
+  // opts.locale：目标语言（BCP47），启用词典分词。
+  function splitByDuration(text, times, opts) {
+    opts = opts || {};
+    const pos = Array.from(String(text == null ? '' : text).replace(/\r/g, '').replace(/\n/g, ' ').trim());
+    const n = times.length;
+    if (n <= 1) return [pos.join('')];
+    if (!pos.length) return times.map(() => '');
+    const atom = atomicRanges(pos);
+    const inAtom = (i) => { for (let k = 0; k < atom.length; k++) if (i > atom[k][0] && i < atom[k][1]) return true; return false; };
+    const wb = wordBounds(pos, opts.locale);
+    const dur = times.map((x) => Math.max(1, (x.end || 0) - (x.start || 0)));
+    const total = dur.reduce((a, b) => a + b, 0);
+    // 前缀显示宽度（与 textWidth 同口径：跳过空白）
+    const pref = new Array(pos.length + 1).fill(0);
+    for (let i = 0; i < pos.length; i++) pref[i + 1] = pref[i] + (/\s/.test(pos[i]) ? 0 : charW(pos[i]));
+    const W = pref[pos.length] || 1;
+    const cuts = [0];
+    for (let k = 1; k < n; k++) {
+      const target = (dur.slice(0, k).reduce((a, b) => a + b, 0) / total) * W;
+      const prevCut = cuts[cuts.length - 1];
+      const lo = Math.max(prevCut + 1, idxAtWidth(pref, target - 6));
+      const hi = Math.min(pos.length - 1, idxAtWidth(pref, target + 6));
+      let best = -1, bestScore = -Infinity;
+      for (let i = lo; i <= hi; i++) {
+        if (inAtom(i)) continue;
+        const p = breakPrio(pos, i);
+        const eff = (p >= 4 || !wb || wb.has(i)) ? p : 0;  // 伪断点（介词/连接词）落词内部 → 无效
+        const score = eff * 100
+          + (wb && wb.has(i) ? 150 : 0)   // 词边界加分：语义同级时优先不劈词
+          - Math.abs(pref[i] - target);
+        if (score > bestScore) { bestScore = score; best = i; }
+      }
+      if (best < 0 || best <= prevCut) {
+        // 窗口内无合法点（全被原子挡住等）：从目标位置起向两侧找最近的非原子点
+        let c0 = Math.min(Math.max(prevCut + 1, idxAtWidth(pref, target)), pos.length - 1);
+        if (inAtom(c0)) {
+          let f = c0;
+          while (f > prevCut + 1 && inAtom(f)) f--;
+          if (inAtom(f)) { f = c0; while (f < pos.length - 1 && inAtom(f)) f++; }
+          c0 = f;
+        }
+        best = c0;
+      }
+      cuts.push(best);
+    }
+    cuts.push(pos.length);
+    const out = [];
+    for (let k = 0; k < n; k++) out.push(pos.slice(cuts[k], cuts[k + 1]).join('').trim());
+    // 保底：某段为空时，从最长的相邻段借字符，保证每条字幕都有内容（借出边界不劈数字原子）
+    for (let k = 0; k < n; k++) {
+      if (out[k]) continue;
+      const nb = out.map((x, i) => ({ i, len: x.length })).filter((x) => x.i !== k && x.len > 2)
+        .sort((a, b) => b.len - a.len)[0];
+      if (!nb) continue;
+      const arr = Array.from(out[nb.i]);
+      const aa = atomicRanges(arr);
+      const bad = (p) => { for (let r = 0; r < aa.length; r++) if (p > aa[r][0] && p < aa[r][1]) return true; return false; };
+      if (nb.i < k) {
+        let cut = arr.length - 2;
+        while (cut > 1 && bad(cut)) cut--;
+        out[k] = arr.slice(cut).join('');
+        out[nb.i] = arr.slice(0, cut).join('');
+      } else {
+        let cut = 2;
+        while (cut < arr.length - 1 && bad(cut)) cut++;
+        out[k] = arr.slice(0, cut).join('');
+        out[nb.i] = arr.slice(cut).join('');
+      }
+    }
+    return out;
+  }
+
+  // 判定跨条句组是否适合直接合并为一条字幕：
+  // ① 合并后总时长 <= maxDur（默认 7000ms，单条字幕行业安全上限）
+  // ② 译文折行后 <= maxLines 行（默认 2 行；分词保护上线后折行质量稳定，改用真实行数判定）
+  // opts.locale：目标语言（BCP47），传给折行分词。
+  // 满足则合并（时间轴取首条 start ~ 末条 end，译文整条回填），否则回退按时长切分。
+  function mergeableGroup(cues, text, opts) {
+    opts = opts || {};
+    if (!cues || cues.length < 2) return false;
+    const txt = String(text == null ? '' : text).trim();
+    if (!txt) return false;
+    const maxDur = opts.maxDur || 7000;
+    const maxW = (opts.maxW > 0) ? opts.maxW : 24;
+    const maxLines = opts.maxLines || 2;
+    const dur = (cues[cues.length - 1].end || 0) - (cues[0].start || 0);
+    if (dur > maxDur) return false;
+    if (textWidth(txt) > maxW * maxLines) return false;   // 宽度预判：超容量直接否
+    return wrapToWidth(txt, maxW, { normalize: true, locale: opts.locale }).length <= maxLines;
+  }
+
+  // ---------------- 校验 ----------------
+  function validateItems(items) {
+    const issues = [];
+    let prevEnd = -1, prevNo = 0;
+    items.forEach((it) => {
+      if (it.start > it.end) issues.push({ type: 'time', at: it.no, msg: '结束时间早于开始时间' });
+      else if (it.start === it.end) issues.push({ type: 'time', at: it.no, msg: '零时长' });
+      if (it.start < prevEnd - 1) issues.push({ type: 'overlap', at: it.no, msg: '与上一条时间轴重叠' });
+      if (it.no <= prevNo) issues.push({ type: 'num', at: it.no, msg: '编号未递增' });
+      if (!it.text || !it.text.trim()) issues.push({ type: 'empty', at: it.no, msg: '空内容' });
+      prevEnd = it.end; prevNo = it.no;
+    });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有可用的字幕块' });
+    return issues;
+  }
+
+  return {
+    isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
+    parseSrt, formatSrt, fmtTime, parseTime, renumber,
+    isFillerCue, stripSoundTags,
+    groupSentences, splitByDuration, mergeableGroup,
+    validateItems,
+    MAX_W_DEFAULT: 24
+  };
+});

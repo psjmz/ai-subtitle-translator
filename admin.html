@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>SRT 工具 · 管理后台</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --line:#e4e7ec; --txt:#1f2328; --mut:#6a737d;
+    --pri:#2f6fed; --ok:#1a7f4b; --err:#c62828; --warn:#9a6700;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:640px;margin:32px auto;padding:0 16px}
+  h1{font-size:20px;margin:0 0 4px}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+  h2{font-size:15px;margin:0 0 14px}
+  label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+  input,select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--txt)}
+  input:focus,select:focus{outline:2px solid #bcd3fb;border-color:var(--pri)}
+  .row{display:flex;gap:12px}
+  .row>div{flex:1}
+  .btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button{padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer}
+  button.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .msg{margin-top:12px;font-size:13px;display:none;padding:8px 12px;border-radius:8px}
+  .msg.ok{display:block;background:#eaf5ee;color:var(--ok)}
+  .msg.err{display:block;background:#fdecea;color:var(--err)}
+  .usage{font-size:13px;color:var(--mut);background:#f4f6f9;border-radius:8px;padding:10px 12px;margin-top:14px}
+  .usage b{color:var(--txt)}
+  .note{font-size:12px;color:var(--mut);margin-top:6px}
+  .mask{color:var(--mut);font-family:monospace;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔧 SRT 工具 · 管理后台</h1>
+  <div class="sub">配置给所有用户免费使用的默认翻译模型。Key 只保存在服务器上，不会下发给浏览器。</div>
+
+  <div class="card" id="loginCard" style="display:none">
+    <h2>管理员登录</h2>
+    <label>管理密码</label>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="输入管理密码">
+    <div class="btns"><button class="primary" id="btnLogin">登录</button></div>
+    <div class="note" id="firstRunNote" style="display:none">🚀 首次部署：现在输入的密码将直接成为管理密码，请立即登录一次完成初始化。</div>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="main" style="display:none">
+    <div class="card">
+      <h2>默认模型配置</h2>
+      <label>服务商（选预设自动填充，或选手动自定义）</label>
+      <select id="provider"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base" spellcheck="false" placeholder="https://api.deepseek.com">
+        </div>
+        <div>
+          <label>模型名</label>
+          <input type="text" id="model" spellcheck="false" placeholder="deepseek-chat">
+        </div>
+      </div>
+      <label>API Key（<span class="mask" id="keyMask">未设置</span>）</label>
+      <input type="password" id="key" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+      <div class="row">
+        <div>
+          <label>单 IP 每日请求数上限（0 = 不限）</label>
+          <input type="number" id="perIpDaily" min="0" max="10000">
+        </div>
+        <div>
+          <label>全站每日请求总量上限（0 = 不限）</label>
+          <input type="number" id="globalDaily" min="0" max="1000000">
+        </div>
+      </div>
+      <div class="row">
+        <label>站点公开 URL（SEO 用：canonical / sitemap / og:image 的前缀；留空按当前域名）</label>
+        <input type="text" id="publicUrl" spellcheck="false" placeholder="https://srt.your-domain.com">
+      </div>
+      <div class="row">
+        <label>GA4 统计 ID（如 G-XXXXXXXXXX；留空 = 不注入统计代码）</label>
+        <input type="text" id="analyticsId" spellcheck="false" placeholder="G-XXXXXXXXXX">
+      </div>
+      <div class="btns">
+        <button class="primary" id="btnSave">保存配置</button>
+        <button id="btnTest">测试连通</button>
+        <button id="btnLogout" style="margin-left:auto">退出登录</button>
+      </div>
+      <div class="usage" id="usage"></div>
+      <div class="msg" id="cfgMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>修改管理密码</h2>
+      <div class="row">
+        <div>
+          <label>新密码（至少 6 位）</label>
+          <input type="password" id="npw" autocomplete="new-password">
+        </div>
+        <div>
+          <label>确认新密码</label>
+          <input type="password" id="npw2" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="btns"><button class="primary" id="btnPw">更新密码</button></div>
+      <div class="msg" id="pwMsg"></div>
+      <div class="note">修改后下次登录用新密码，本页面仍保持登录状态。</div>
+    </div>
+
+    <div class="note">提示：配置保存后立即生效（前端刷新即可看到新模型）；用户侧的「默认模型」开箱即用，高级用户仍可自带 Key。</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const TOKEN_KEY = 'srtAdminToken';
+let token = localStorage.getItem(TOKEN_KEY) || '';
+
+const PRESETS = [
+  { name: 'DeepSeek', base: 'https://api.deepseek.com', model: 'deepseek-chat' },
+  { name: 'OpenAI', base: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
+  { name: 'Kimi (Moonshot)', base: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' },
+  { name: '智谱 GLM', base: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
+  { name: '通义千问', base: 'https://dashscope.aliyuncs.com/compatible-mode/v1', model: 'qwen-plus' },
+  { name: '硅基流动', base: 'https://api.siliconflow.cn/v1', model: 'Qwen/Qwen2.5-7B-Instruct' },
+  { name: '手动自定义', base: '', model: '' }
+];
+
+function show(el, on){ $(el).style.display = on ? '' : 'none'; }
+function msg(el, text, cls){ const m = $(el); m.textContent = text; m.className = 'msg ' + (cls || 'ok'); }
+
+async function api(path, method, body){
+  const r = await fetch(path, {
+    method: method || 'GET',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': token },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error && j.error.message ? j.error.message : ('HTTP ' + r.status));
+  return j;
+}
+
+async function loadConfig(){
+  try {
+    const c = await api('/api/admin/config');
+    const preset = PRESETS.find(p => p.name === c.provider);
+    fillProviderSelect(c.provider || '');
+    $('base').value = c.base || '';
+    $('model').value = c.model || '';
+    $('keyMask').textContent = c.keySet ? ('已保存：' + c.keyMask) : '未设置';
+    $('perIpDaily').value = c.perIpDaily;
+    $('globalDaily').value = c.globalDaily;
+    $('publicUrl').value = c.publicUrl || '';
+    $('analyticsId').value = c.analyticsId || '';
+    $('usage').innerHTML = '今日用量：全站 <b>' + c.usedToday + '</b> / ' + (c.globalDaily || '∞') +
+      ' 次请求 · 独立访问 IP <b>' + c.usedIps + '</b> 个' +
+      (c.keySet ? '' : ' · <span style="color:var(--err)">尚未配置模型，用户端不可用</span>');
+    return true;
+  } catch (e) {
+    if (/未登录|会话/.test(e.message)) return false;
+    throw e;
+  }
+}
+
+function fillProviderSelect(current){
+  const sel = $('provider');
+  sel.innerHTML = '';
+  PRESETS.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.name; o.textContent = p.name;
+    sel.appendChild(o);
+  });
+  if (current) sel.value = current;
+}
+
+async function enterAdmin(){
+  show('loginCard', false); show('main', true);
+  try { await loadConfig(); }
+  catch (e) { msg('cfgMsg', '读取配置失败：' + e.message, 'err'); }
+}
+
+/* 初始化：有 token 直接进，否则显示登录 */
+(async function init(){
+  if (token) {
+    try { if (await loadConfig()) return enterAdmin(); }
+    catch (e) { msg('loginMsg', '读取配置失败：' + e.message, 'err'); }
+  }
+  show('loginCard', true);
+  // 首次部署（服务端尚无管理密码）：提示本次输入将成为管理密码
+  try {
+    const r = await fetch('/api/model-info');
+    const j = await r.json();
+    if (j && j.adminInit === false) document.getElementById('firstRunNote').style.display = '';
+  } catch (e) {}
+})();
+
+$('btnLogin').addEventListener('click', async () => {
+  const pw = $('pw').value;
+  if (!pw) return msg('loginMsg', '请输入密码', 'err');
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error && j.error.message || '登录失败');
+    token = j.token; localStorage.setItem(TOKEN_KEY, token);
+    msg('loginMsg', j.firstRun ? '管理密码已初始化并登录成功' : '登录成功', 'ok');
+    enterAdmin();
+  } catch (e) { msg('loginMsg', e.message, 'err'); }
+});
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnLogin').click(); });
+
+$('provider').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.name === $('provider').value);
+  if (p && p.name !== '手动自定义') { $('base').value = p.base; $('model').value = p.model; }
+});
+
+$('btnSave').addEventListener('click', async () => {
+  const base = $('base').value.trim(), model = $('model').value.trim(), key = $('key').value.trim();
+  if (!base || !model) return msg('cfgMsg', 'Base URL 和模型名不能为空', 'err');
+  try {
+    await api('/api/admin/config', 'POST', {
+      provider: $('provider').value, base, model, key,
+      perIpDaily: +$('perIpDaily').value || 0, globalDaily: +$('globalDaily').value || 0,
+      publicUrl: $('publicUrl').value.trim(), analyticsId: $('analyticsId').value.trim()
+    });
+    $('key').value = '';
+    msg('cfgMsg', '已保存并即时生效 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfgMsg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnTest').addEventListener('click', async () => {
+  msg('cfgMsg', '测试中…', 'ok');
+  try {
+    const r = await api('/api/admin/test', 'POST');
+    msg('cfgMsg', '连通成功，模型返回：' + r.sample, 'ok');
+  } catch (e) { msg('cfgMsg', e.message, 'err'); }
+});
+
+$('btnPw').addEventListener('click', async () => {
+  const a = $('npw').value, b = $('npw2').value;
+  if (a.length < 6) return msg('pwMsg', '新密码至少 6 位', 'err');
+  if (a !== b) return msg('pwMsg', '两次输入不一致', 'err');
+  try {
+    await api('/api/admin/config', 'POST', { newPassword: a });
+    $('npw').value = $('npw2').value = '';
+    msg('pwMsg', '管理密码已更新 ✓', 'ok');
+  } catch (e) { msg('pwMsg', e.message, 'err'); }
+});
+
+$('btnLogout').addEventListener('click', () => {
+  localStorage.removeItem(TOKEN_KEY); token = '';
+  location.reload();
+});
+</script>
+</body>
+</html>

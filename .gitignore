@@ -1,0 +1,12 @@
+# Runtime data (admin password hash, model API key, usage counters) - NEVER commit
+data/
+*.bak*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# Node
+node_modules/
+npm-debug.log*
