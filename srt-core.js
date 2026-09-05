@@ -184,13 +184,15 @@
     };
     const lo = Math.max(1, c - 10);
     for (let cut = c; cut > lo; cut--) {
-      if (!inAtom(cut) && effPrio(cut) >= 2) return cut;
+      if (!inAtom(cut) && effPrio(cut) >= 2 && textWidth(s.slice(cut)) <= maxW + 1e-9) return cut;
     }
-    // 4) 兜底：若附近没有，在 [1, c]（不超硬切宽度）范围内找最高优先级断点（同级取更靠后的，行尽量满）
+    // 4) 兜底：若附近没有，在 [1, c]（不超硬切宽度）范围内找最高优先级断点（同级取更靠后的，行尽量满）。
+    //    约束：剩余文本 ≤ maxW，否则会折出孤儿行+第 3 行（24 宽文本断在「，」处只剩 2 字第一行+ 22 字剩余）。
     let best = -1, bestP = 0;
     for (let cut = c; cut >= 1; cut--) {
       if (inAtom(cut)) continue;
       const p = effPrio(cut);
+      if (textWidth(s.slice(cut)) > maxW + 1e-9) continue; // 跳过会产生额外行的切点
       if (p > bestP) { bestP = p; best = cut; if (p >= 4) break; }
     }
     if (best >= 1 && bestP >= 2) return best;

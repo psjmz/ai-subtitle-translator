@@ -708,6 +708,21 @@ t('splitCues：单 cue 句组直接透传不切分', () => {
   const text='单条字幕的句子不参与切分';
   assert.deepStrictEqual(C.splitCues(text,times,{maxW:20,locale:'zh-CN'}), [text]);
 });
+t('wrapToWidth：24 宽中文文本不断在标点出孤儿行（v0.9.14）', () => {
+  // 线上 Nvidia #48：24 宽文本断在「，」（优先级 4）会导致首行只剩 2 字+剩余 22 宽强制再折一次
+  const text='嗯，我们会为这款模型提供不同级别的网络访问权限，';
+  const lines=C.wrapToWidth(text,20,{normalize:true,locale:'zh-CN'});
+  assert.strictEqual(lines.length, 2, '24 宽文本 maxW=20 必须折成 2 行而非 3 行');
+  lines.forEach(l=>assert.ok(C.textWidth(l)<=20,'每行宽度 ≤ maxW'));
+  assert.strictEqual(lines.join(''), text, '零字符丢失');
+});
+t('wrapToWidth：回归 - 双标点断点优先级仍生效', () => {
+  // 反向用例：剩余 ≤ maxW 时标点优先级仍优先
+  const text='你好，世界，明天要下雨了。';
+  const lines=C.wrapToWidth(text,10,{normalize:true,locale:'zh-CN'});
+  assert.strictEqual(lines.length, 2);
+  assert.strictEqual(lines[0], '你好，世界，'); // 标点断点仍胜出
+});
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
