@@ -149,7 +149,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.21</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.22</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -414,7 +414,7 @@ const I18N = {
   mergedNote:'已并入上一条字幕（时间轴合并）',
   startT:'开始整片翻译：{0} → {1}，共 {2} 条，每批 {3} 条。',
   batchProg:'第 {0}/{1} 批（句组 {2}–{3}）…',
-  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重试{0}次后成功）',
+  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重试{0}次后成功）', anchorKeep:'⚠️ 句组 {0} 译文可能不是{1}，已按原样保留', anchorRefix:'{0} 个句组译文语言跑偏，已通过单组重译全部恢复',
   overCapStart:'检测到 {0} 个句组译文过长（超出该时长内可显示的 2 行容量），压缩重译中…', overCapDone:'超容压缩完成：{0}/{1} 个句组已收进容量。', overCapFail:'超容压缩重译失败，过长句组按原样保留。', overCapCallFail:'压缩重译第 {0} 次失败：{1}',
   batchFail:'批 {0} 第 {1} 次失败：{2}', batchSkip:'该批跳过，可在完成后整篇重试。',
   ratePace:'免费模型限流中，{0} 秒后继续…', rateWait:'遇到限流（429），等待 20 秒后重试…',
@@ -477,7 +477,7 @@ const I18N = {
   mergedNote:'已併入上一條字幕（時間軸合併）',
   startT:'開始整片翻譯：{0} → {1}，共 {2} 條，每批 {3} 條。',
   batchProg:'第 {0}/{1} 批（句組 {2}–{3}）…',
-  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重試{0}次後成功）',
+  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重試{0}次後成功）', anchorKeep:'⚠️ 句組 {0} 譯文可能不是{1}，已按原樣保留', anchorRefix:'{0} 個句組譯文語言跑偏，已透過單組重譯全部恢復',
   overCapStart:'偵測到 {0} 個句組譯文過長（超出該時長內可顯示的 2 行容量），壓縮重譯中…', overCapDone:'超容壓縮完成：{0}/{1} 個句組已收進容量。', overCapFail:'超容壓縮重譯失敗，過長句組按原樣保留。', overCapCallFail:'壓縮重譯第 {0} 次失敗：{1}',
   batchFail:'批 {0} 第 {1} 次失敗：{2}', batchSkip:'該批跳過，可在完成後整篇重試。',
   ratePace:'免費模型限流中，{0} 秒後繼續…', rateWait:'遇到限流（429），等待 20 秒後重試…',
@@ -540,7 +540,7 @@ const I18N = {
   mergedNote:'Merged into the previous cue (timeline merged)',
   startT:'Translating: {0} → {1}, {2} cues, {3} per batch.',
   batchProg:'Batch {0}/{1} (sentences {2}–{3})…',
-  batchDone:'Batch {0}/{1} done{2}.', retried:' (after {0} retries)',
+  batchDone:'Batch {0}/{1} done{2}.', retried:' (after {0} retries)', anchorKeep:'⚠️ Groups {0}: translation may not be in {1}; kept as is', anchorRefix:'{0} drifted group(s) fully recovered via isolated re-translation',
   overCapStart:'Detected {0} group(s) with translations too long for the screen (over 2 lines), re-translating more concisely…', overCapDone:'Length compression done: {0}/{1} group(s) now fit.', overCapFail:'Length compression failed; over-long groups kept as-is.', overCapCallFail:'Compression attempt {0} failed: {1}',
   batchFail:'Batch {0} attempt {1} failed: {2}', batchSkip:'Batch skipped; you can re-run the whole file later.',
   ratePace:'Free-model rate limit, continuing in {0}s…', rateWait:'Rate limited (429), waiting 20s before retry…',
@@ -603,7 +603,7 @@ const I18N = {
   mergedNote:'前の字幕に統合済み（タイムライン統合）',
   startT:'翻訳開始：{0} → {1}、全 {2} 件、1バッチ {3} 件。',
   batchProg:'バッチ {0}/{1}（文グループ {2}–{3}）…',
-  batchDone:'バッチ {0}/{1} 完了{2}。', retried:'（{0}回再試行後に成功）',
+  batchDone:'バッチ {0}/{1} 完了{2}。', retried:'（{0}回再試行後に成功）', anchorKeep:'⚠️ グループ {0} の訳文は{1}ではない可能性があるため、そのまま保持しました', anchorRefix:'言語が逸脱した {0} グループを個別再翻訳で全件復元しました',
   overCapStart:'画面の2行容量を超える長い訳文の句組が {0} 件検出されました。圧縮して再翻訳中…', overCapDone:'圧縮再翻訳完了：{0}/{1} 件が容量内に収まりました。', overCapFail:'圧縮再翻訳に失敗したため、長すぎる句組はそのまま保持します。', overCapCallFail:'圧縮再翻訳の第 {0} 回目が失敗：{1}',
   batchFail:'バッチ {0} の第 {1} 回失敗：{2}', batchSkip:'このバッチはスキップ。後で全体を再実行できます。',
   ratePace:'無料モデルのレート制限中、{0} 秒後に続行…', rateWait:'レート制限（429）、20秒待って再試行…',
@@ -666,7 +666,7 @@ const I18N = {
   mergedNote:'Fusionado en el subtítulo anterior (línea de tiempo fusionada)',
   startT:'Traduciendo: {0} → {1}, {2} subtítulos, {3} por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
-  batchDone:'Lote {0}/{1} terminado{2}.', retried:' (tras {0} reintentos)',
+  batchDone:'Lote {0}/{1} terminado{2}.', retried:' (tras {0} reintentos)', anchorKeep:'⚠️ Grupos {0}: la traducción podría no estar en {1}; se mantienen tal cual', anchorRefix:'{0} grupo(s) desviados se recuperaron por completo mediante retraducción individual',
   overCapStart:'Detectadas {0} traducciones demasiado largas para la pantalla (más de 2 líneas); se retraducen de forma más concisa…', overCapDone:'Compresión completada: {0}/{1} grupos ahora caben.', overCapFail:'La compresión falló; los grupos demasiado largos se mantienen tal cual.', overCapCallFail:'Intento de compresión {0} fallido: {1}',
   batchFail:'Lote {0} intento {1} falló: {2}', batchSkip:'Lote omitido; puedes reejecutar todo el archivo más tarde.',
   ratePace:'Límite de velocidad del modelo gratuito, continuando en {0}s…', rateWait:'Limitado (429), esperando 20s antes de reintentar…',
@@ -729,7 +729,7 @@ const I18N = {
   mergedNote:'Fundida na legenda anterior (linha do tempo fundida)',
   startT:'Traduzindo: {0} → {1}, {2} legendas, {3} por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
-  batchDone:'Lote {0}/{1} concluído{2}.', retried:' (após {0} tentativas)',
+  batchDone:'Lote {0}/{1} concluído{2}.', retried:' (após {0} tentativas)', anchorKeep:'⚠️ Grupos {0}: a tradução pode não estar em {1}; mantidos como estão', anchorRefix:'{0} grupo(s) desviados recuperados por completo por retradução individual',
   overCapStart:'Detectadas {0} traduções longas demais para a tela (mais de 2 linhas); retraduzindo de forma mais concisa…', overCapDone:'Compressão concluída: {0}/{1} grupos agora cabem.', overCapFail:'A compressão falhou; os grupos longos demais foram mantidos como estão.', overCapCallFail:'Tentativa de compressão {0} falhou: {1}',
   batchFail:'Lote {0} tentativa {1} falhou: {2}', batchSkip:'Lote ignorado; você pode reexecutar o arquivo inteiro depois.',
   ratePace:'Limite de taxa do modelo gratuito, continuando em {0}s…', rateWait:'Limitado (429), aguardando 20s antes de tentar de novo…',
@@ -792,7 +792,7 @@ const I18N = {
   mergedNote:'이전 자막에 병합됨(타임라인 병합)',
   startT:'번역 시작: {0} → {1}, 총 {2}개, 배치당 {3}개.',
   batchProg:'배치 {0}/{1}(문장 그룹 {2}–{3})…',
-  batchDone:'배치 {0}/{1} 완료{2}.', retried:'({0}회 재시도 후 성공)',
+  batchDone:'배치 {0}/{1} 완료{2}.', retried:'({0}회 재시도 후 성공)', anchorKeep:'⚠️ 그룹 {0}의 번역이 {1}가 아닐 수 있어 그대로 유지했어요', anchorRefix:'언어가 이탈한 그룹 {0}개를 개별 재번역으로 모두 복구했어요',
   overCapStart:'화면 2줄 용량을 초과하는 번역 그룹 {0}개를 발견했습니다. 압축 재번역 중…', overCapDone:'압축 재번역 완료: {0}/{1}개 그룹이 용량 안에 들어맞습니다.', overCapFail:'압축 재번역에 실패하여 과도하게 긴 그룹은 그대로 유지합니다.', overCapCallFail:'압축 재번역 {0}번째 시도 실패: {1}',
   batchFail:'배치 {0} {1}번째 시도 실패: {2}', batchSkip:'이 배치는 건너뛰었습니다; 나중에 전체를 다시 실행할 수 있습니다.',
   ratePace:'무료 모델 속도 제한, {0}초 후 계속…', rateWait:'속도 제한(429), 20초 대기 후 재시도…',
@@ -855,7 +855,7 @@ const I18N = {
   mergedNote:'In den vorherigen Untertitel zusammengeführt (Zeitleiste vereint)',
   startT:'Übersetze: {0} → {1}, {2} Untertitel, {3} pro Batch.',
   batchProg:'Batch {0}/{1} (Sätze {2}–{3})…',
-  batchDone:'Batch {0}/{1} fertig{2}.', retried:' (nach {0} Wiederholungen)',
+  batchDone:'Batch {0}/{1} fertig{2}.', retried:' (nach {0} Wiederholungen)', anchorKeep:'⚠️ Gruppen {0}: Die Übersetzung ist möglicherweise nicht {1}; unverändert übernommen', anchorRefix:'{0} abgewichene Gruppe(n) durch Einzel-Re-Übersetzung vollständig wiederhergestellt',
   overCapStart:'{0} Gruppe(n) mit zu langen Übersetzungen für den Bildschirm (mehr als 2 Zeilen) erkannt – werde kürzer neu übersetzen…', overCapDone:'Kürzung abgeschlossen: {0}/{1} Gruppen passen jetzt.', overCapFail:'Kürzung fehlgeschlagen; zu lange Gruppen bleiben unverändert.', overCapCallFail:'Kürzungsversuch {0} fehlgeschlagen: {1}',
   batchFail:'Batch {0} Versuch {1} fehlgeschlagen: {2}', batchSkip:'Batch übersprungen; Sie können die ganze Datei später erneut ausführen.',
   ratePace:'Geschwindigkeitslimit des Gratis-Modells, weiter in {0}s…', rateWait:'Rate-Limit (429), warte 20s vor dem erneuten Versuch…',
@@ -918,7 +918,7 @@ const I18N = {
   mergedNote:'Fusionné dans le sous-titre précédent (timeline fusionnée)',
   startT:'Traduction : {0} → {1}, {2} sous-titres, {3} par lot.',
   batchProg:'Lot {0}/{1} (phrases {2}–{3})…',
-  batchDone:'Lot {0}/{1} terminé{2}.', retried:' (après {0} tentatives)',
+  batchDone:'Lot {0}/{1} terminé{2}.', retried:' (après {0} tentatives)', anchorKeep:'⚠️ Groupes {0} : la traduction pourrait ne pas être en {1} ; conservée telle quelle', anchorRefix:'{0} groupe(s) déviés entièrement récupérés par retraduction individuelle',
   overCapStart:'{0} groupe(s) avec des traductions trop longues pour l’écran (plus de 2 lignes) détecté(s), retraduction plus concise en cours…', overCapDone:'Compression terminée : {0}/{1} groupe(s) tiennent maintenant.', overCapFail:'La compression a échoué ; les groupes trop longs sont conservés tels quels.', overCapCallFail:'Tentative de compression {0} échouée : {1}',
   batchFail:'Lot {0} tentative {1} échouée : {2}', batchSkip:'Lot ignoré ; vous pourrez relancer tout le fichier plus tard.',
   ratePace:'Limite de débit du modèle gratuit, reprise dans {0}s…', rateWait:'Limité (429), attente de 20s avant nouvel essai…',
@@ -981,7 +981,7 @@ const I18N = {
   mergedNote:'Digabung ke subtitle sebelumnya (timeline digabung)',
   startT:'Menerjemahkan: {0} → {1}, {2} subtitle, {3} per batch.',
   batchProg:'Batch {0}/{1} (kalimat {2}–{3})…',
-  batchDone:'Batch {0}/{1} selesai{2}.', retried:' (setelah {0} percobaan)',
+  batchDone:'Batch {0}/{1} selesai{2}.', retried:' (setelah {0} percobaan)', anchorKeep:'⚠️ Grup {0}: terjemahan mungkin bukan dalam {1}; tetap dipertahankan', anchorRefix:'{0} grup yang melenceng sepenuhnya dipulihkan lewat penerjemahan ulang terpisah',
   overCapStart:'Terdeteksi {0} grup dengan terjemahan terlalu panjang untuk layar (lebih dari 2 baris), menerjemahkan ulang secara lebih ringkas…', overCapDone:'Pemadatan selesai: {0}/{1} grup kini muat.', overCapFail:'Pemadatan gagal; grup yang terlalu panjang tetap dipertahankan.', overCapCallFail:'Percobaan pemadatan {0} gagal: {1}',
   batchFail:'Batch {0} percobaan {1} gagal: {2}', batchSkip:'Batch dilewati; Anda bisa menjalankan ulang seluruh file nanti.',
   ratePace:'Batas laju model gratis, lanjut dalam {0} dtk…', rateWait:'Dibatasi (429), menunggu 20 dtk sebelum mencoba lagi…',
@@ -1044,7 +1044,7 @@ const I18N = {
   mergedNote:'पिछले सबटाइटल में विलय (टाइमलाइन विलय)',
   startT:'अनुवाद शुरू: {0} → {1}, {2} सबटाइटल, प्रति बैच {3}।',
   batchProg:'बैच {0}/{1} (वाक्य {2}–{3})…',
-  batchDone:'बैच {0}/{1} पूर्ण{2}।', retried:' ({0} पुनः प्रयास बाद)',
+  batchDone:'बैच {0}/{1} पूर्ण{2}।', retried:' ({0} पुनः प्रयास बाद)', anchorKeep:'⚠️ समूह {0}: अनुवाद {1} में नहीं हो सकता; जैसा है वैसा रखा गया', anchorRefix:'विचलित {0} समूह अलग पुनर्अनुवाद से पूरी तरह बहाल किए गए',
   overCapStart:'स्क्रीन की 2-पंक्ति क्षमता से अधिक लंबे अनुवाद वाले {0} समूह मिले, अधिक संक्षिप्त रूप से पुनः अनुवाद हो रहे हैं…', overCapDone:'संपीडन पूर्ण: {0}/{1} समूह अब क्षमता में आ गए।', overCapFail:'संपीडन विफल; बहुत लंबे समूह जस के तस रखे गए।', overCapCallFail:'संपीडन प्रयास {0} विफल: {1}',
   batchFail:'बैच {0} प्रयास {1} असफल: {2}', batchSkip:'बैच छोड़ा गया; बाद में पूरी फ़ाइल दोबारा चला सकते हैं।',
   ratePace:'मुफ़्त मॉडल दर-सीमा, {0} सेकंड में जारी…', rateWait:'सीमित (429), 20 सेकंड प्रतीक्षा बाद पुनः प्रयास…',
@@ -1107,7 +1107,7 @@ const I18N = {
   mergedNote:'รวมเข้าซับไตเติลก่อนหน้า (รวมไทม์ไลน์)',
   startT:'เริ่มแปลทั้งไฟล์: {0} → {1} รวม {2} ซับ ละ {3} ต่อแบตช์',
   batchProg:'แบตช์ {0}/{1} (กลุ่มประโยค {2}–{3})…',
-  batchDone:'แบตช์ {0}/{1} เสร็จ{2}', retried:' (สำเร็จหลังลองใหม่ {0} ครั้ง)',
+  batchDone:'แบตช์ {0}/{1} เสร็จ{2}', retried:' (สำเร็จหลังลองใหม่ {0} ครั้ง)', anchorKeep:'⚠️ กลุ่ม {0} คำแปลอาจไม่ใช่{1} จึงเก็บไว้ตามเดิม', anchorRefix:'กลุ่มที่ภาษาเพี้ยน {0} กลุ่ม กู้คืนครบด้วยการแปลใหม่รายกลุ่มแล้ว',
   overCapStart:'พบคำแปลที่ยาวเกินความจุ 2 บรรทัดบนจอ {0} กลุ่ม กำลังแปลใหม่แบบกระชับ…', overCapDone:'บีบอัดเสร็จสมบูรณ์: {0}/{1} กลุ่มเข้าได้ในความจุแล้ว', overCapFail:'บีบอัดไม่สำเร็จ กลุ่มที่ยาวเกินคงไว้ตามเดิม', overCapCallFail:'ความพยายามบีบอัดครั้งที่ {0} ล้มเหลว: {1}',
   batchFail:'แบตช์ {0} ครั้งที่ {1} ล้มเหลว: {2}', batchSkip:'ข้ามแบตช์นี้ สามารถรันทั้งไฟล์ใหม่ภายหลังได้',
   ratePace:'โมเดลฟรีถูกจำกัดอัตรา จะไปต่อใน {0} วินาที…', rateWait:'โดนจำกัดอัตรา (429) รอ 20 วินาทีแล้วลองใหม่…',
@@ -1170,7 +1170,7 @@ const I18N = {
   mergedNote:'Đã gộp vào phụ đề trước (timeline đã gộp)',
   startT:'Đang dịch: {0} → {1}, {2} phụ đề, {3} mỗi lô.',
   batchProg:'Lô {0}/{1} (câu {2}–{3})…',
-  batchDone:'Lô {0}/{1} xong{2}.', retried:' (thành công sau {0} lần thử lại)',
+  batchDone:'Lô {0}/{1} xong{2}.', retried:' (thành công sau {0} lần thử lại)', anchorKeep:'⚠️ Nhóm {0}: bản dịch có thể không phải {1}; giữ nguyên', anchorRefix:'Đã khôi phục hoàn toàn {0} nhóm lệch ngôn ngữ bằng cách dịch lại từng nhóm riêng lẻ',
   overCapStart:'Phát hiện {0} nhóm bản dịch quá dài so với màn hình (trên 2 dòng), đang dịch lại ngắn gọn hơn…', overCapDone:'Nén hoàn tất: {0}/{1} nhóm đã vừa màn hình.', overCapFail:'Nén thất bại; các nhóm quá dài được giữ nguyên.', overCapCallFail:'Lần nén thứ {0} thất bại: {1}',
   batchFail:'Lô {0} lần thử {1} thất bại: {2}', batchSkip:'Lô bị bỏ qua; bạn có thể chạy lại cả file sau.',
   ratePace:'Mô hình miễn phí bị giới hạn tốc độ, tiếp tục sau {0}s…', rateWait:'Bị giới hạn (429), chờ 20s rồi thử lại…',
@@ -1233,7 +1233,7 @@ const I18N = {
   mergedNote:'Объединено с предыдущим субтитром (таймлайн объединён)',
   startT:'Перевод: {0} → {1}, {2} субтитров, {3} на батч.',
   batchProg:'Батч {0}/{1} (предложения {2}–{3})…',
-  batchDone:'Батч {0}/{1} готов{2}.', retried:' (после {0} повторов)',
+  batchDone:'Батч {0}/{1} готов{2}.', retried:' (после {0} повторов)', anchorKeep:'⚠️ Группы {0}: перевод может быть не на {1}; оставлен как есть', anchorRefix:'{0} групп с отклонением языка полностью восстановлены изолированным повторным переводом',
   overCapStart:'Обнаружены группы с переводами длиннее ёмкости экрана (более 2 строк): {0}. Идёт более сжатый повторный перевод…', overCapDone:'Сжатие завершено: {0}/{1} групп помещаются.', overCapFail:'Сжатие не удалось; слишком длинные группы сохранены как есть.', overCapCallFail:'Попытка сжатия {0} не удалась: {1}',
   batchFail:'Батч {0} попытка {1} не удалась: {2}', batchSkip:'Батч пропущен; можно перезапустить весь файл позже.',
   ratePace:'Ограничение скорости бесплатной модели, продолжаю через {0}с…', rateWait:'Лимит (429), жду 20с перед повтором…',
@@ -1296,7 +1296,7 @@ const I18N = {
   mergedNote:'Unito nel sottotitolo precedente (timeline unificata)',
   startT:'Traduzione: {0} → {1}, {2} sottotitoli, {3} per batch.',
   batchProg:'Batch {0}/{1} (frasi {2}–{3})…',
-  batchDone:'Batch {0}/{1} completato{2}.', retried:' (dopo {0} tentativi)',
+  batchDone:'Batch {0}/{1} completato{2}.', retried:' (dopo {0} tentativi)', anchorKeep:'⚠️ Gruppi {0}: la traduzione potrebbe non essere in {1}; mantenuta così com\'è', anchorRefix:'{0} gruppi deviati recuperati integralmente con ritraduzione isolata',
   overCapStart:'Rilevati {0} gruppi con traduzioni troppo lunghe per lo schermo (oltre 2 righe), ritraduco in modo più conciso…', overCapDone:'Compressione completata: {0}/{1} gruppi ora entrano.', overCapFail:'Compressione fallita; i gruppi troppo lunghi restano invariati.', overCapCallFail:'Tentativo di compressione {0} fallito: {1}',
   batchFail:'Tentativo {1} del batch {0} non riuscito: {2}', batchSkip:'Batch saltato; puoi rieseguire l\'intero file più tardi.',
   ratePace:'Limite di frequenza del modello gratuito, ripresa tra {0}s…', rateWait:'Limite raggiunto (429), attesa di 20s prima di riprovare…',
@@ -1359,7 +1359,7 @@ const I18N = {
   mergedNote:'دُمجت في الترجمة السابقة (الخط الزمني مدمج)',
   startT:'الترجمة: {0} ← {1}، {2} ترجمة، {3} لكل دفعة.',
   batchProg:'دفعة {0}/{1} (جمل {2}–{3})…',
-  batchDone:'اكتملت الدفعة {0}/{1}{2}.', retried:' (بعد {0} محاولات)',
+  batchDone:'اكتملت الدفعة {0}/{1}{2}.', retried:' (بعد {0} محاولات)', anchorKeep:'⚠️ المجموعات {0}: قد لا تكون الترجمة باللغة {1}؛ أُبقيت كما هي', anchorRefix:'تمت استعادة {0} مجموعة منحرفة بالكامل عبر إعادة ترجمة منفردة',
   overCapStart:'تم اكتشاف {0} مجموعة بترجمات أطول من سعة الشاشة (أكثر من سطرين)، تجري إعادة ترجمة أكثر إيجازًا…', overCapDone:'اكتمل الضغط: {0}/{1} مجموعة أصبحت ضمن السعة.', overCapFail:'فشل الضغط؛ تم الإبقاء على المجموعات الطويلة جدًا كما هي.', overCapCallFail:'فشلت محاولة الضغط {0}: {1}',
   batchFail:'فشلت محاولة {1} للدفعة {0}: {2}', batchSkip:'تخطّيت الدفعة؛ يمكنك إعادة تشغيل الملف كاملًا لاحقًا.',
   ratePace:'حد معدل النموذج المجاني، سنكمل خلال {0} ث…', rateWait:'بلغنا حد المعدل (429)، انتظار 20 ث قبل إعادة المحاولة…',
@@ -1422,7 +1422,7 @@ const I18N = {
   mergedNote:'Önceki altyazıyla birleştirildi (zaman çizgisi birleşik)',
   startT:'Çevriliyor: {0} → {1}, {2} altyazı, grup başına {3}.',
   batchProg:'Grup {0}/{1} (cümleler {2}–{3})…',
-  batchDone:'Grup {0}/{1} tamamlandı{2}.', retried:' ({0} denemeden sonra)',
+  batchDone:'Grup {0}/{1} tamamlandı{2}.', retried:' ({0} denemeden sonra)', anchorKeep:'⚠️ Gruplar {0}: çeviri {1} olmayabilir; olduğu gibi korundu', anchorRefix:'{0} sapmış grup izole yeniden çeviriyle tamamen kurtarıldı',
   overCapStart:'Ekrana sığmayan (2 satırdan uzun) çevirileri olan {0} grup algılandı, daha kısa yeniden çevriliyor…', overCapDone:'Kısaltma tamamlandı: {0}/{1} grup artık sığıyor.', overCapFail:'Kısaltma başarısız; çok uzun gruplar olduğu gibi korundu.', overCapCallFail:'Kısaltma denemesi {0} başarısız: {1}',
   batchFail:'Grup {0} deneme {1} başarısız: {2}', batchSkip:'Grup atlandı; tüm dosyayı daha sonra yeniden çalıştırabilirsin.',
   ratePace:'Ücretsiz model hız limiti, {0} sn içinde devam ediliyor…', rateWait:'Hız limiti (429), yeniden denemeden önce 20 sn bekleniyor…',
@@ -1631,7 +1631,54 @@ function mergeGroupRows(cues, text){
   return n;
 }
 
+/* v0.9.22：非中文目标语言改用英文指令——指令语言与输出语言脱钩。
+   背景：中文指令在日/韩等与汉字有亲缘的目标语言上偶发泄漏成译文（v0.9.17、v0.9.22 两次线上评测实证），
+   英文指令经 v0.9.17 评测验证可清零该问题。中文目标（zh-CN/zh-TW）指令语言=输出语言，天然安全，沿用中文指令。 */
+const STYLE_DESC_EN = {
+  elegant: 'Faithful, fluent, tasteful: convey the original meaning accurately, read naturally, use appropriate wording, and follow the target language\'s idiomatic conventions. Do not translate word-for-word.',
+  plain:   'Colloquial and plain: translate in everyday spoken style, like casual conversation; prefer short sentences and common words, avoid stiff bookish wording, and keep the speaker\'s tone.'
+};
+function systemPromptEn(cfg){
+  const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);
+  const srcFor = cfg.src === 'auto' ? '(identify it automatically)' : srcN.prompt;
+  const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
+  const styleEn = (cfg.styleMode === 'custom' && cfg.styleCustom) ? ('Custom style: ' + cfg.styleCustom) : (STYLE_DESC_EN[cfg.styleMode] || STYLE_DESC_EN.elegant);
+  let s = 'You are a professional subtitle translator.\n'
+    + '[MOST IMPORTANT RULE] The target output language = ' + dstN.prompt + ' (' + dstNative + '). Every translated text field must be written in ' + dstNative
+    + '. This prompt is written in English, which is only the instruction language and has nothing to do with the output language — unless the target language itself is Chinese, NEVER output Chinese.\n'
+    + 'Source subtitle language: ' + srcFor + '.\n'
+    + 'The input contains several "sentence groups": a complete sentence may be split across multiple subtitle cues (already merged into one merged text), or may be a single cue.\n'
+    + 'Task: translate each group\'s merged text into one complete, fluent sentence in ' + dstNative + '.\n'
+    + 'Rules you must follow:\n'
+    + '1. [Translation style] ' + styleEn + '\n'
+    + '2. [One-to-one correspondence] The output groups array must correspond one-to-one with the input groups (same gno). Never merge, split, or omit groups.\n'
+    + '3. [Transcription fixes] The source text may come from speech transcription and contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (using proper ' + srcFor + ' spelling), then translate. Proper names must also be spelling-corrected (e.g. Mennerbrigitte should first be corrected to Brigitte) before handling them per rule 4.'
+    + (cfg.src === 'en' ? ' Examples: Mennerbrigitte→Brigitte, 1:00 37 Ventures→137 Ventures.\n' : '\n');
+  if (cfg.keepTerms){
+    const tt = cfg.terms ? cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') : '(none)';
+    s += '4. [Keep proper nouns] Personal names, organizations, products, brands, and technical terms must keep their original spelling — never render them in ' + dstNative
+       + ': even widely known ' + dstNative + ' renderings must not be used (e.g. Elon Musk stays Elon Musk, SpaceX stays SpaceX, Taylor Swift stays Taylor Swift).'
+       + ' Generic place names (e.g. the White House) should be translated following ' + dstNative + ' conventions. User-specified terms that must stay in the original: ' + tt + '.\n';
+  } else {
+    s += '4. [Translate proper nouns] Personal names, organizations, products, brands, and technical terms must be translated into their established ' + dstNative
+       + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists.'
+       + (cfg.terms ? ' User-provided terms should also be translated: ' + cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') + '.' : '') + '\n';
+  }
+  s += '5. [Filler handling — the default behavior is to translate]\n'
+   + '   - Normal sentences (any group with substantive content) must be output as type:"text" with a complete translation; this is the default and the vast majority of cases.\n'
+   + '   - Only when a cue consists entirely of filler words or sound tags (e.g. "Um.", "[music]") should its cue number be listed in the fillers array; the program will clear that cue.\n'
+   + '   - Only when a group\'s entire merged text is pure filler/sound tags with no substantive content may that group be output as type:"drop" with an empty text; this is a rare exception.\n'
+   + '   - Note: type "drop" does not make the translation disappear — it only tells the program to clear that cue. Do not set everything to drop to be "safe".\n'
+   + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
+   + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
+   + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
+   + '{"groups":[{"gno":1,"type":"text","text":"…"},{"gno":2,"type":"drop"}],"fillers":[17,23]}\n'
+   + 'Once more: every text field must be written in ' + dstNative + '.';
+  return s;
+}
 function systemPrompt(cfg){
+  // v0.9.22 分发：非中文目标 → 英文指令；中文目标 → 中文指令
+  if(cfg.dst !== 'zh-CN' && cfg.dst !== 'zh-TW') return systemPromptEn(cfg);
   const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);
   const srcFor = cfg.src === 'auto' ? '（由你自动识别）' : srcN.prompt;
   const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
@@ -1708,8 +1755,13 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
     cues: g.cues.map(c=>({no:c.no, t:fmtTC(c.start,c.end), src:c.text}))
   }));
   const dstN = LBY($('dstLang').value);
-  const userMsg = '句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:garr})
-    + '\n请把每个句组的 merged 翻译成'+dstN.prompt+'（'+dstN.zh+'），text 字段必须用'+dstN.zh+'书写。只输出 JSON。';
+  // v0.9.22：用户消息与系统提示词同语言（非中文目标用英文，防指令语言泄漏）
+  const zhDst = $('dstLang').value==='zh-CN' || $('dstLang').value==='zh-TW';
+  const userMsg = zhDst
+    ? '句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:garr})
+      + '\n请把每个句组的 merged 翻译成'+dstN.prompt+'（'+dstN.zh+'），text 字段必须用'+dstN.zh+'书写。只输出 JSON。'
+    : 'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:garr})
+      + '\nTranslate each group\'s merged text into '+dstN.prompt+' ('+dstN.zh+'). The text field must be written in '+dstN.zh+'. Output JSON only.';
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
     {role:'user',content:userMsg}
@@ -1762,19 +1814,27 @@ function fitsCapacity(text, active, cfg){
 }
 
 // 超容压缩重译：句组译文过长放不下画面时，请模型在保留核心语义的前提下压缩改写（v0.9.21）
+// v0.9.22：非中文目标用英文指令（与主翻译提示词语言一致，防中文泄漏）
 async function compressBatch(base,key,model,items,dstLang){
   const dstN = LBY(dstLang);
+  const zhDst = dstLang==='zh-CN' || dstLang==='zh-TW';
   const groups=items.map(x=>{
     const over=C.textWidth(C.stripSoundTags(x.current));
     const target=Math.floor(x.cap*0.95);
     const pct=over>0 ? Math.max(10, Math.round((1-target/over)*100)) : 20;
-    return { gno:x.gno, 容量上限:target, 当前宽度:Math.round(over*10)/10, 原文:x.src, 当前译文:x.current, 要求:'改写后约缩短'+pct+'%，显示宽度（半角字符每个0.5、中日韩全角每个1）不超过容量上限' };
+    return zhDst
+      ? { gno:x.gno, 容量上限:target, 当前宽度:Math.round(over*10)/10, 原文:x.src, 当前译文:x.current, 要求:'改写后约缩短'+pct+'%，显示宽度（半角字符每个0.5、中日韩全角每个1）不超过容量上限' }
+      : { gno:x.gno, capacityLimit:target, currentWidth:Math.round(over*10)/10, source:x.src, currentTranslation:x.current, requirement:'Shorten by about '+pct+'%; display width (half-width chars count 0.5 each, CJK full-width chars count 1 each) must not exceed capacityLimit' };
   });
-  const userMsg='以下字幕句组的译文过长，超出画面可显示的容量，请逐组把译文改写得更简洁：压缩冗余表述、去掉可有可无的修饰词、合并同义成分，但必须保留核心语义与通顺度，不得丢句。\n'
-    +JSON.stringify({groups})
-    +'\n所有 text 字段必须用'+dstN.zh+'书写。只输出 JSON：{"groups":[{"gno":…,"text":"…"}]}。';
+  const userMsg = zhDst
+    ? '以下字幕句组的译文过长，超出画面可显示的容量，请逐组把译文改写得更简洁：压缩冗余表述、去掉可有可无的修饰词、合并同义成分，但必须保留核心语义与通顺度，不得丢句。\n'
+      +JSON.stringify({groups})
+      +'\n所有 text 字段必须用'+dstN.zh+'书写。只输出 JSON：{"groups":[{"gno":…,"text":"…"}]}。'
+    : 'The following subtitle translations are too long to fit the on-screen capacity. Rewrite each one more concisely: compress redundant phrasing, drop dispensable modifiers, merge synonymous parts — but keep the core meaning and fluency, and never drop a sentence.\n'
+      +JSON.stringify({groups})
+      +'\nEvery text field must be written in '+dstN.zh+'. Output JSON only: {"groups":[{"gno":…,"text":"…"}]}.';
   const raw=await chatOnce(base,key,model,[
-    {role:'system',content:'你是专业字幕译后编辑，擅长在不损失可读性的前提下压缩译文长度。只输出 JSON。'},
+    {role:'system',content: zhDst ? '你是专业字幕译后编辑，擅长在不损失可读性的前提下压缩译文长度。只输出 JSON。' : 'You are a professional post-translation subtitle editor skilled at shortening translations without losing readability. Output JSON only.'},
     {role:'user',content:userMsg}
   ]);
   const obj=parseLlmJson(raw);
@@ -1880,7 +1940,31 @@ async function runTranslate(){
             continue;
           }
           if(out.badAnchor && out.badAnchor.length){
-            log('⚠️ 句组 '+out.badAnchor.slice(0,5).join(',')+(out.badAnchor.length>5?'…':'')+' 译文可能不是'+LBY(cfg.dst).zh+'，已按原样保留','err');
+            // v0.9.22：终检失败拆单组重译——整批上下文偶发触发模型跑偏，隔离单组重发通常即恢复（评测实证 5/5）
+            const remain=[];
+            for(const gno of out.badAnchor){
+              if(S.stop){ remain.push(gno); continue; }
+              const g1=gBatch.find(x=>x.gno===gno);
+              let fixed=false;
+              if(g1){
+                for(let a=0;a<2 && !fixed;a++){
+                  try{
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalBatch,sys);
+                    if(!o2.badAnchor || !o2.badAnchor.length){
+                      out.byGno[gno]=o2.byGno[gno];
+                      o2.fillers.forEach(no=>fillerSet.add(no));
+                      fixed=true;
+                    }
+                  }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+                }
+              }
+              if(!fixed) remain.push(gno);
+            }
+            if(remain.length){
+              log(t('anchorKeep', remain.slice(0,5).join(',')+(remain.length>5?'…':''), LBY(cfg.dst).zh),'err');
+            } else {
+              log(t('anchorRefix', out.badAnchor.length),'okc');
+            }
           }
           Object.keys(out.byGno).forEach(k=>res.set(Number(k), out.byGno[k]));
           out.fillers.forEach(no=>fillerSet.add(no));
