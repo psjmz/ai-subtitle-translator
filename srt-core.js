@@ -557,6 +557,29 @@
       .trim();
   }
 
+  // ---------------- 双 speaker 对话（v0.9.25）----------------
+  // 电影字幕常见格式：同一条 cue 内两个说话人各占一行、以 - 开头（Netflix/BBC 惯例）。
+  // 窄门检测（宁窄勿宽，单行 dash 的普通字幕不进此轨道）：
+  //   ≥2 个非空行，且【全部】行以 -/–/— 开头（行首 dash 后可有可无空格）。
+  const SP_DASH_RE = /^[-–—]\s?/;
+  function isSpeakerText(text) {
+    const lines = String(text == null ? '' : text).replace(/\r/g, '').split('\n')
+      .map((s) => s.trim()).filter(Boolean);
+    return lines.length >= 2 && lines.every((l) => SP_DASH_RE.test(l));
+  }
+
+  // speaker 行独立折行：每行 ≤ maxW+4 直放（与 R1 微超宽同口径），
+  // 超宽才在该行内部折行；speaker 边界神圣——绝不跨行重分配、绝不切分时间轴。
+  function foldSpeakerLines(text, maxW, locale) {
+    const out = [];
+    for (const ln of String(text == null ? '' : text).replace(/\r/g, '').split('\n')
+      .map((s) => s.trim()).filter(Boolean)) {
+      if (textWidth(stripSoundTags(ln)) <= maxW + 4) { out.push(ln); continue; }
+      out.push.apply(out, wrapToWidth(ln, maxW, { normalize: true, locale: locale }));
+    }
+    return out;
+  }
+
   // ---------------- 句子级分组与时长分配 ----------------
   // 场景：源 SRT 常把一个完整句子拆在相邻多条字幕里（如 "…was shocked" / "by a tariff's consequences."）。
   // 翻译以句组为单位进行，译回时按各条字幕的时长比例切分回填（时间轴不动）。
@@ -597,6 +620,13 @@
       if (isFillerCue(it.text)) {
         flush();
         groups.push({ gno: groups.length + 1, cues: [it], text: it.text, filler: true });
+        continue;
+      }
+      // 双 speaker 对话 cue（v0.9.25）：独立成组、不与相邻 cue 合并——
+      // 两个说话人的对白是自洽单元，跨 cue 合并/切分都会把 A 的话混进 B 的行
+      if (isSpeakerText(it.text)) {
+        flush();
+        groups.push({ gno: groups.length + 1, cues: [it], text: String(it.text), speaker: true });
         continue;
       }
       const txt = String(it.text || '').trim();
@@ -752,6 +782,11 @@
     const maxW = (opts.maxW > 0) ? opts.maxW : 20;
     const maxLines = (opts.maxLines > 0) ? opts.maxLines : 2;
     const locale = opts.locale;
+    // 双 speaker 对话（v0.9.25）：单 cue 透传保留行结构（splitByDuration 会把 \n 压成空格）；
+    // 多 cue 防御性走旧路径（句组隔离保证 speaker 组必为单 cue，此处仅兜底）
+    if (isSpeakerText(text) && times.length <= 1) {
+      return [String(text == null ? '' : text).replace(/\r/g, '').trim()];
+    }
     const pieces = splitByDuration(text, times, { locale: locale });
     if (times.length <= 1) return pieces;
     const fits = (ps) => ps.every((p) => wrapToWidth(p, maxW, { normalize: true, locale: locale }).length <= maxLines);
@@ -910,6 +945,15 @@
         continue;
       }
       if (!r.zh || !String(r.zh).trim()) { last = null; continue; }
+      // 双 speaker 对话（v0.9.25）：src/dst 都保留原始多行（不 squash），
+      // 后续走 SP 分支每行独立折行；模型降级返回单行时 isSpeakerText 为 false，自然落回旧路径
+      if (isSpeakerText(String(r.zh))) {
+        last = { start: r.start || 0, end: r.end || 0, speaker: true,
+                 srcParts: srcOne ? [String(r.en == null ? '' : r.en).replace(/\r/g, '').trim()] : [],
+                 dst: String(r.zh).replace(/\r/g, '').trim() };
+        entries.push(last);
+        continue;
+      }
       last = { start: r.start || 0, end: r.end || 0,
                srcParts: srcOne ? [srcOne] : [],
                dst: squashLines(String(r.zh)) };
@@ -925,6 +969,15 @@
       const pushItem = (st, en, sLines, dLines) => {
         out.push({ no: out.length + 1, start: st, end: en, srcLines: sLines, dstLines: dLines });
       };
+      // SP 双 speaker（v0.9.25）：src 块 + dst 块各自按 dash 行独立折行，
+      // 不跨 speaker 切分、不折 2+2 容量框架（4 行上限天然满足）
+      if (e.speaker) {
+        const sLines = (e.srcParts.length && isSpeakerText(e.srcParts[0]))
+          ? foldSpeakerLines(e.srcParts[0], maxW, opts.srcLocale)
+          : (e.srcParts.length ? wrapToWidth(e.srcParts[0], maxW, { normalize: true, locale: opts.srcLocale }) : []);
+        pushItem(e.start, e.end, sLines, foldSpeakerLines(e.dst, maxW, opts.dstLocale));
+        continue;
+      }
       // 规则（可读性优先，三层兜底）：
       //  R1 微超宽容忍：两边宽度都 ≤ maxW+4 时不折不切，直接单行放下（字幕适当长点观感更好）；
       //  R2 饥饿段回退：切分后任一段只剩 <=2 个有效字（如 "…"/"呃，"）时放弃切分，
@@ -1020,6 +1073,11 @@
     const out = [];
     const emit = (st, en, text) => { out.push({ no: out.length + 1, start: st, end: en, text: text }); };
     for (const e of entries) {
+      // SP 双 speaker（v0.9.25）：每行独立折行、绝不跨 speaker 切分/重分配时间轴
+      if (isSpeakerText(e.rawZh)) {
+        emit(e.start, e.end, foldSpeakerLines(e.rawZh, maxW, locale).join('\n'));
+        continue;
+      }
       // R0：已有折行合规 → 原样尊重（含用户在表格里手工调过的折行）
       const rawLines = e.rawZh.split('\n').map((s) => s.trim()).filter(Boolean);
       if (rawLines.length >= 1 && rawLines.length <= maxLines
@@ -1121,7 +1179,7 @@
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
-    splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts,
+    splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars,
     validateItems, anchorOk, fixMixedChars,
     MAX_W_DEFAULT: 20

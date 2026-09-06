@@ -149,7 +149,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.24</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.25</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -1557,7 +1557,13 @@ function zhBadge(r){
   let b='';
   if (r.flag==='drop') b+='<span class="badge b-drop">'+t('bDrop')+'</span>';
   else if (r.flag==='merge') b+='<span class="badge b-merge">'+t('bMerge')+'</span>';
-  if (r.flag!=='drop' && C.textWidth((r.zh||'').replace(/\n/g,''))> (S.maxW||20)) b+='<span class="badge b-long">'+t('bLong')+'</span>';
+  if (r.flag!=='drop' && r.zh){
+    // v0.9.25 双 speaker 对话按行独立算宽（合并算必误报）；超长 = 任一行超过行级容忍（会折行）
+    const over = C.isSpeakerText(r.zh)
+      ? r.zh.split('\n').some(l => l.trim() && C.textWidth(l.trim()) > (S.maxW||20)+4)
+      : C.textWidth(r.zh.replace(/\n/g,'')) > (S.maxW||20);
+    if (over) b+='<span class="badge b-long">'+t('bLong')+'</span>';
+  }
   return b;
 }
 
@@ -1670,6 +1676,7 @@ function systemPromptEn(cfg){
    + '   - Only when a group\'s entire merged text is pure filler/sound tags with no substantive content may that group be output as type:"drop" with an empty text; this is a rare exception.\n'
    + '   - Note: type "drop" does not make the translation disappear — it only tells the program to clear that cue. Do not set everything to drop to be "safe".\n'
    + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
+   + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
    + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
    + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
    + '{"groups":[{"gno":1,"type":"text","text":"…"},{"gno":2,"type":"drop"}],"fillers":[17,23]}\n'
@@ -1709,6 +1716,7 @@ s += '5.【水词处理——默认行为是翻译】\n'
    + '   - 仅当整个句组的 merged 全部是水词/提示词（无任何实义内容）时，该组才输出 type:"drop" 且 text 留空；这是极少数例外。\n'
    + '   - 注意：类型 "drop" 不会让译文消失，只是程序据此清空字幕；不要为了"安全"而把所有句组都设 drop。\n'
   + '6.【禁止自行折行】text 一律输出单行文本，严禁包含换行符 \\n；折行由程序按显示宽度自动处理，你不要也不能手动分行。\n'
+  + '   唯一例外：若该句组的原文是多行且每行以 - 开头（同一条字幕里两个说话人对话），译文必须保持相同结构——每个说话人一行、每行以「- 」开头、行与行之间用一个换行符 \\n 连接。\n'
   + '7.【数字单位一体】译文中的数字与其单位/符号必须作为整体紧邻出现（如 30%、$50、1,000、12.5、100万），严禁拆散或在数字与单位之间插入其他字符。\n'
   + '只输出 JSON（不要 markdown 代码块、不要多余解释）：\n'
   + '{"groups":[{"gno":1,"type":"text","text":"…"},{"gno":2,"type":"drop"}],"fillers":[17,23]}\n'
@@ -1916,7 +1924,9 @@ async function runTranslate(){
         const pieces=col.pieces;
         g.cues.forEach((c,i)=>{
           const row=S.rows.find(x=>x.no===c.no);
-          if(row){ row.zh=C.wrapToWidth(pieces[i]||'',cfg.maxW,{normalize:true, locale:cfg.dst}).join('\n'); }
+          // v0.9.25 双 speaker 对话：保留行结构（wrapToWidth normalize 会 squash \n），
+          // 折行延后到导出时按行独立处理（buildMonoParts SP 分支）
+          if(row){ row.zh=C.isSpeakerText(pieces[i]||'') ? String(pieces[i]).trim() : C.wrapToWidth(pieces[i]||'',cfg.maxW,{normalize:true, locale:cfg.dst}).join('\n'); }
         });
         if(col.collapsed) applyTailCollapse(g.cues);
       });
@@ -2054,10 +2064,11 @@ async function runTranslate(){
       const col=C.collapseThinTail(C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst}), active, {maxW:cfg.maxW, locale:cfg.dst});
       const pieces=col.pieces;
       // 超容检测：分片折行 >2 行 = 译文总宽超过 cue数×2×maxW 物理容量，任何切分都放不下（v0.9.21 压缩重译）
+      // v0.9.25：双 speaker 对话豁免——压缩改写会破坏 dash 行结构，超宽由导出时的行级折行兜底
       let over=false;
       pieces.forEach(p=>{
         const ps=String(p!=null?p:'').trim();
-        if(ps && C.wrapToWidth(C.stripSoundTags(ps),cfg.maxW,{normalize:true,locale:cfg.dst}).length>2) over=true;
+        if(ps && !C.isSpeakerText(ps) && C.wrapToWidth(C.stripSoundTags(ps),cfg.maxW,{normalize:true,locale:cfg.dst}).length>2) over=true;
       });
       if(over) overCapGroups.push({g, active, text});
       active.forEach((c,i)=>{

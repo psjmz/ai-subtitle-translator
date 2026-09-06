@@ -824,6 +824,74 @@ t('句末软偏好：无句末标点文本行为不变', () => {
   assert.strictEqual(w[0], '这是一段没有任何句末标点的长');
 });
 
+// ---------- v0.9.25 双 speaker 对话 ----------
+t('isSpeakerText 检测门：双行 dash 命中，单行/混合/空不命中', () => {
+  assert.strictEqual(C.isSpeakerText('- aa的对话\n- bb的对话'), true, '双行 dash');
+  assert.strictEqual(C.isSpeakerText('- 你要去哪里？\n- 不关你的事。'), true, '带标点双行');
+  assert.strictEqual(C.isSpeakerText('– en dash\n— em dash'), true, 'en/em 破折号');
+  assert.strictEqual(C.isSpeakerText('- yeah right'), false, '单行 dash 不进新轨道');
+  assert.strictEqual(C.isSpeakerText('- aa的对话\nbb的续行'), false, 'dash+普通行不进');
+  assert.strictEqual(C.isSpeakerText('普通文本\n第二行'), false, '无 dash 不进');
+  assert.strictEqual(C.isSpeakerText(''), false, '空文本');
+  assert.strictEqual(C.isSpeakerText(null), false, 'null 安全');
+});
+t('groupSentences：双 speaker cue 独立成组、不与相邻 cue 合并', () => {
+  const items = [
+    { no: 1, start: 0, end: 2000, text: 'And then he said' },
+    { no: 2, start: 2000, end: 5000, text: '- Go away\n- Make me' },
+    { no: 3, start: 5000, end: 8000, text: 'and walked off' },
+  ];
+  const groups = C.groupSentences(items, {});
+  const sp = groups.filter(g => g.speaker);
+  assert.strictEqual(sp.length, 1, '恰好一个 speaker 组');
+  assert.strictEqual(sp[0].cues.length, 1, '单 cue 组');
+  assert.strictEqual(sp[0].cues[0].no, 2);
+  assert.ok(!groups.some(g => g.cues.length > 1 && g.cues.some(c => c.no === 2)), 'dash cue 未混入任何多 cue 组');
+});
+t('splitCues：双 speaker 单 cue 透传保留行结构（不被 squash）', () => {
+  const pieces = C.splitCues('- 走开\n- 你试试', [{ start: 2000, end: 5000 }], { maxW: 20, locale: 'zh-CN' });
+  assert.strictEqual(pieces.length, 1);
+  assert.strictEqual(pieces[0], '- 走开\n- 你试试');
+});
+t('buildMonoParts SP：每行独立、行级容忍、绝不跨 speaker 折行', () => {
+  // 两行各 5 宽 ≤ 20+4 → 原样双行
+  const m1 = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: 'x', zh: '- 走开\n- 你试试啊', flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
+  assert.strictEqual(m1[0].text, '- 走开\n- 你试试啊', '合规双行原样');
+  // 行宽 18.5/17.5，maxW=14：一行超容忍(>18)行内折叠、一行容忍内单行；speaker 边界不跨
+  const zh = '- 我们现在到底要去哪里买东西呢朋友你说\n- 你不要总是管这么多行不行啊真的服了';
+  const m2 = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: 'x', zh, flag: '' }], { maxW: 14, dstLocale: 'zh-CN' });
+  const lines = m2[0].text.split('\n');
+  assert.ok(lines.length >= 2, '至少双行');
+  lines.forEach(l => assert.ok(C.textWidth(l) <= 18, '每行 ≤ maxW+4 或折行后 ≤ maxW: [' + l + '] 宽' + C.textWidth(l)));
+  assert.ok(lines.some(l => l.trim().startsWith('-')), '保留 dash 前缀');
+  // speaker 边界：每行文本守恒（去空白拼接与原文一致）
+  const norm = s => String(s).replace(/\s+/g, '');
+  assert.strictEqual(norm(m2[0].text), norm(zh), '文本守恒');
+});
+t('buildBilingualParts SP：src 块 + dst 块各按 dash 行独立，不被 squash 内联', () => {
+  const rows = [{ no: 1, start: 0, end: 5000, en: '- Where are you going?\n- None of your business.', zh: '- 你要去哪里？\n- 不关你的事。', flag: '' }];
+  const parts = C.buildBilingualParts(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(parts.length, 1, '单条目（不切时间轴）');
+  assert.strictEqual(parts[0].srcLines.join('\n'), '- Where are you going?\n- None of your business.', 'src 保留双行');
+  assert.strictEqual(parts[0].dstLines.join('\n'), '- 你要去哪里？\n- 不关你的事。', 'dst 保留双行');
+});
+t('降级：模型无视豁免返回单行 → isSpeakerText 不命中 → 走旧路径不崩', () => {
+  const zhDegraded = '- 走开。- 你试试啊。';   // 单行内联（模型把两行并一行）
+  const m = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: '- Go away\n- Make me', zh: zhDegraded, flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
+  assert.ok(m[0].text.includes('- 走开。'), '单行原样导出（不比现状差）');
+  const bi = C.buildBilingualParts([{ no: 1, start: 0, end: 5000, en: '- Go away\n- Make me', zh: zhDegraded, flag: '' }], { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.ok(bi.length >= 1 && bi[0].dstLines.length >= 1, '双语降级路径正常出条目');
+});
+t('兼容性：非 dash 多行文本仍走旧路径（squash + R0-R3）', () => {
+  // 手工折行的普通译文（非 dash）→ R0 尊重
+  const m = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: 'x', zh: '这是一行\n这是第二行', flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
+  assert.strictEqual(m[0].text, '这是一行\n这是第二行', 'R0 原样（旧路径未受影响）');
+  // 普通超宽单行 → R2 折行（旧路径）；宽度 > maxW+4 才触发
+  let longZh = '这是一段'; while (C.textWidth(longZh) < 28) longZh += '超宽译文内容';
+  const m2 = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: 'x', zh: longZh, flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
+  assert.ok(m2[0].text.includes('\n'), 'R2 正常折行');
+});
+
 // ---------- v0.9.21 混字词表 ----------
 t('fixMixedChars：泰文混入的汉字术语被替换为正确泰文', () => {
   assert.strictEqual(C.fixMixedChars('มันลงทุนในโมเดล前沿ด้วย', 'th'), 'มันลงทุนในโมเดลล้ำหน้าด้วย');
