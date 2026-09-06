@@ -745,10 +745,83 @@
     return splitTextNatural(String(text == null ? '' : text), times.length, locale);
   }
 
+  // 有效字符数（去空白/标点/符号）：判定「饥饿段 / 孤儿尾巴」的统一口径（v0.9.23 从 repairThinSegs 提升复用）
+  function effChars(s) {
+    return Array.from(String(s == null ? '' : s).replace(/[\s\p{P}\p{S}]/gu, '')).length;
+  }
+
+  // 语言感知拼接（v0.9.23 孤儿收并用）：汉字/假名与泰、老、高棉、缅文等无空格文字直接拼接；
+  // 韩文谚文书写上词间用空格（切分必发生在空格处，助词从不跨空格附着）→ 补空格还原；
+  // 拉丁等其余语言补一个空格。与 joinSrc（源文用）不同，本函数面向任意目标语言的收并拼缝。
+  const RE_NO_SPACE_EDGE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
+  function joinSeg(a, b) {
+    const A = String(a == null ? '' : a).trim();
+    const B = String(b == null ? '' : b).trim();
+    if (!A) return B;
+    if (!B) return A;
+    if (RE_NO_SPACE_EDGE.test(A[A.length - 1]) || RE_NO_SPACE_EDGE.test(B[0])) return A + B;
+    return A + ' ' + B;
+  }
+
+  // 句末判定（宽口径，供跨句守卫）：比 groupSentences 的 SENT_FINAL 多含阿语 ؟ 与天城文 ।，
+  // 并跳过句尾闭合引号/空白。跨句守卫宁严勿松——多拦一次合并只是少修一处，误并一次就是语义错误。
+  const TAIL_SENT_FINAL = '.!?…。！？…؟।';
+  function endsSentenceLoose(text) {
+    const t = stripSoundTags(text).trim();
+    if (!t) return false;
+    for (let i = t.length - 1; i >= 0; i--) {
+      const ch = t[i];
+      if (CLOSE_BRKS.includes(ch)) continue;
+      if (ch === ' ' || ch === '\t' || ch === '\n') continue;
+      return TAIL_SENT_FINAL.includes(ch);
+    }
+    return false;
+  }
+
+  // B1 孤儿尾巴收并（v0.9.23，纯函数）：splitCues 按时长比例切分后，末条 cue 极短
+  // （< 700ms，低于行业 ~0.8s 最短可读时长）且译文只剩尾巴（≤2 有效字或整片 ≤1 词）时，
+  // 把尾巴并回前一片。这是"撤销一次坏切分"（尾巴本出自同一句组译文被机械切薄），
+  // 不是合并两个独立句子——后者由守卫③拦截。
+  // 四重守卫（全部命中才动）：
+  //   ① 末条 cue 时长 < minDur（默认 700ms）
+  //   ② 尾巴有效字 ≤ thinChars（默认 2，去标点空白）或整片 ≤1 词（拉丁 "world." 类）
+  //   ③ 前片非句末结尾（。！？.!?…؟।）——前句已完结则尾巴是「嗯。」类独立应答，不并
+  //   ④ 收并后前片折行 ≤ maxLines（默认 2；放不下保持原切分）
+  // 返回 {pieces, collapsed}：命中时 pieces 为新数组（倒数第二片 = joinSeg(前,尾)，末片 = ''），
+  // 未命中时原样返回（pieces 为入参的字符串化副本）。pieces 与 cues 等长对齐。
+  function collapseThinTail(pieces, cues, opts) {
+    opts = opts || {};
+    const minDur = opts.minDur > 0 ? opts.minDur : 700;
+    const thinChars = opts.thinChars > 0 ? opts.thinChars : 2;
+    const maxW = opts.maxW > 0 ? opts.maxW : 20;
+    const maxLines = opts.maxLines > 0 ? opts.maxLines : 2;
+    const locale = opts.locale;
+    const ps = (pieces || []).map((p) => String(p == null ? '' : p));
+    const cs = cues || [];
+    const no = { pieces: ps, collapsed: false };
+    if (ps.length < 2 || cs.length < 2 || ps.length !== cs.length) return no;
+    const dur = (cs[cs.length - 1].end || 0) - (cs[cs.length - 1].start || 0);
+    if (dur >= minDur) return no;
+    const tail = ps[ps.length - 1].trim();
+    const prev = ps[ps.length - 2].trim();
+    if (!tail || !prev) return no;
+    const tailPlain = stripSoundTags(tail);
+    const effTail = effChars(tailPlain);
+    const wordsTail = tailPlain.split(/\s+/).filter(Boolean).length;
+    if (effTail > thinChars && wordsTail > 1) return no;
+    if (endsSentenceLoose(prev)) return no;
+    const joined = joinSeg(prev, tail);
+    if (wrapToWidth(stripSoundTags(joined), maxW, { normalize: true, locale: locale }).length > maxLines) return no;
+    const np = ps.slice();
+    np[np.length - 2] = joined;
+    np[np.length - 1] = '';
+    return { pieces: np, collapsed: true };
+  }
+
   // 退化段修复：有效字符（去标点/空白/符号）<= 2 的段，从相邻最肥的段按词借字，
   // 避免「源文一整句，译文只有标点/语气词」的观感。借字以词为单位整借（含其附着标点），不劈词。
   function repairThinSegs(segs, locale) {
-    const eff = (s) => Array.from(String(s || '').replace(/[\s\p{P}\p{S}]/gu, '')).length;
+    const eff = effChars;   // v0.9.23：提升为模块级 effChars，行为不变
     const chunksOf = (s) => {
       try {
         const seg = new Intl.Segmenter(locale || 'zh', { granularity: 'word' });
@@ -899,6 +972,79 @@
     }));
   }
 
+  // 单语字幕条目（v0.9.23）：替代此前 filter+map 直透 S.rows 的零处理路径——
+  // 旧路径把回填存的原始文本原样导出（未折行超宽单行、>2 行、merged 尾行时间丢失全放行）。
+  // 四层规则（与 buildBilingualParts 同框架，无源文参照）：
+  //   R0 尊重已有折行：已含换行、≤maxLines 行且每行宽 ≤maxW+4 → 原样输出（保留用户手工折行）
+  //   R1 微超宽单行：整段宽 ≤maxW+4 → 单行放下（避免折出 1-3 字寡行，与双语 R1 同口径）
+  //   R2 常态折行：折后 ≤maxLines 行 → 直接输出
+  //   R3 超容量切分：超出 maxW×maxLines 容量 → 按自然断点切 k 片 + repairThinSegs 修复饥饿段，
+  //      子时间轴按各片宽度占比瓜分（时间跟着内容走）；段内仍超宽递增 k 重切（上限 k+10）
+  // rows 口径与 buildBilingualParts 相同：'merged' 行并入承载行（end 延展），'drop'/空译文跳过。
+  // 返回 [{no,start,end,text}]（text 可含 \n，与旧 mono 输出同构）。
+  function buildMonoParts(rows, opts) {
+    opts = opts || {};
+    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
+    const maxLines = (opts.maxLines > 0) ? opts.maxLines : 2;
+    const locale = opts.dstLocale || opts.locale;
+    // 1) 汇集条目（与 buildBilingualParts 第 1 步同构）
+    const entries = [];
+    let last = null;
+    for (const r of (rows || [])) {
+      if (!r) continue;
+      if (r.flag === 'drop') { last = null; continue; }
+      if (r.flag === 'merged') {
+        if (last && (r.end || 0) > last.end) last.end = r.end;   // 尾行时间并入承载行
+        continue;
+      }
+      const rawZh = String(r.zh == null ? '' : r.zh);
+      if (!rawZh.trim()) { last = null; continue; }
+      last = { start: r.start || 0, end: r.end || 0, rawZh: rawZh, dst: squashLines(rawZh) };
+      entries.push(last);
+    }
+    // 2) 逐条目 R0-R3
+    const out = [];
+    const emit = (st, en, text) => { out.push({ no: out.length + 1, start: st, end: en, text: text }); };
+    for (const e of entries) {
+      // R0：已有折行合规 → 原样尊重（含用户在表格里手工调过的折行）
+      const rawLines = e.rawZh.split('\n').map((s) => s.trim()).filter(Boolean);
+      if (rawLines.length >= 1 && rawLines.length <= maxLines
+          && rawLines.every((l) => textWidth(stripSoundTags(l)) <= maxW + 4)) {
+        emit(e.start, e.end, rawLines.join('\n'));
+        continue;
+      }
+      const dst = e.dst;
+      const w = textWidth(stripSoundTags(dst));
+      // R1：微超宽单行
+      if (w <= maxW + 4) { emit(e.start, e.end, dst); continue; }
+      // R2：常态折行
+      const lines = wrapToWidth(dst, maxW, { normalize: true, locale: locale });
+      if (lines.length <= maxLines) { emit(e.start, e.end, lines.join('\n')); continue; }
+      // R3：超容量切分（k 片，饥饿段借字修复，段内超宽递增 k）
+      const k0 = Math.max(2, Math.ceil(w / (maxW * maxLines)));
+      const fitsAll = (ss) => ss.every((s) => !s || wrapToWidth(s, maxW, { normalize: true, locale: locale }).length <= maxLines);
+      let segs = [];
+      const kCap = k0 + 10;
+      for (let k = k0; k <= kCap; k++) {
+        segs = repairThinSegs(splitTextNatural(dst, k, locale), locale);
+        if (fitsAll(segs)) break;
+      }
+      // 子时间轴按各片宽度占比瓜分（时间跟着内容走）
+      const basis = segs.map((s) => Math.max(0.5, textWidth(stripSoundTags(String(s || '')))));
+      const Wsum = basis.reduce((a, b) => a + b, 0) || 1;
+      const total = Math.max(0, e.end - e.start);
+      let cum = 0;
+      for (let i = 0; i < segs.length; i++) {
+        cum += basis[i];
+        const subStart = i === 0 ? e.start : Math.round(e.start + total * (cum - basis[i]) / Wsum);
+        const subEnd = i === segs.length - 1 ? e.end : Math.round(e.start + total * cum / Wsum);
+        const dL = wrapToWidth(segs[i], maxW, { normalize: true, locale: locale });
+        emit(subStart, subEnd, dL.join('\n'));
+      }
+    }
+    return out;
+  }
+
   // ---------------- 校验 ----------------
   function validateItems(items) {
     const issues = [];
@@ -962,6 +1108,7 @@
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts,
+    buildMonoParts, collapseThinTail, joinSeg, effChars,
     validateItems, anchorOk, fixMixedChars,
     MAX_W_DEFAULT: 20
   };

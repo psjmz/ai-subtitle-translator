@@ -795,5 +795,116 @@ t('fixMixedChars：非泰文目标语言零影响（词表按语言隔离）', (
   assert.strictEqual(C.fixMixedChars(undefined, 'th'), '');
 });
 
+// ---------- v0.9.23 B1 孤儿尾巴收并 ----------
+const THIN_CUES = [{ start: 5920, end: 11120 }, { start: 11120, end: 11680 }];   // 5.2s + 0.56s（截图场景）
+t('collapseThinTail：截图场景（0.56s 尾 cue + 2 字尾巴）→ 收并', () => {
+  const r = C.collapseThinTail(
+    ['并巩固了其作为全球最具主导地位的科技公司之一的', '地位。'],
+    THIN_CUES, { maxW: 20, locale: 'zh-CN' });
+  assert.ok(r.collapsed, '应触发收并');
+  assert.strictEqual(r.pieces[0], '并巩固了其作为全球最具主导地位的科技公司之一的地位。', '尾巴无空格拼回前片');
+  assert.strictEqual(r.pieces[1], '', '末片清空（调用方转 merged）');
+});
+t('collapseThinTail：守卫① 尾 cue ≥700ms 不收', () => {
+  const cues = [{ start: 0, end: 5000 }, { start: 5000, end: 7000 }];   // 尾 2s
+  const r = C.collapseThinTail(['前面一段正常内容', '尾巴'], cues, { maxW: 20, locale: 'zh-CN' });
+  assert.ok(!r.collapsed, '长尾 cue 不应收并');
+});
+t('collapseThinTail：守卫② 多词多字尾巴不收', () => {
+  const r = C.collapseThinTail(['some content here', 'the end.'], THIN_CUES, { maxW: 20, locale: 'en' });
+  assert.ok(!r.collapsed, '2 词 6 有效字的尾巴有实质内容');
+});
+t('collapseThinTail：守卫② 拉丁 1 词尾巴（world.）→ 收并补空格', () => {
+  const r = C.collapseThinTail(['in the most dominant tech', 'world.'], THIN_CUES, { maxW: 20, locale: 'en' });
+  assert.ok(r.collapsed, '1 词尾巴应收并');
+  assert.strictEqual(r.pieces[0], 'in the most dominant tech world.', '拉丁拼缝补空格');
+});
+t('collapseThinTail：守卫③ 前片句末标点（跨句）不收——独立短应答保留', () => {
+  for (const prev of ['你觉得呢？', '好的。', 'Done.', '完了！', 'هل أنت بخير؟', 'आप कैसे हैं?']) {
+    const r = C.collapseThinTail([prev, '嗯。'], THIN_CUES, { maxW: 20, locale: 'zh-CN' });
+    assert.ok(!r.collapsed, '前片已句末（' + prev + '）→ 尾巴是独立新句');
+  }
+});
+t('collapseThinTail：守卫④ 收并后超 2 行容量不收', () => {
+  let prev = '';
+  while (C.textWidth(prev) < 40) prev += '前';   // 恰 40 宽
+  const r = C.collapseThinTail([prev, '好'], THIN_CUES, { maxW: 20, locale: 'zh-CN' });
+  assert.ok(!r.collapsed, '40+1 超容量应保持原切分');
+  const r2 = C.collapseThinTail([prev.slice(1), '好'], THIN_CUES, { maxW: 20, locale: 'zh-CN' });
+  assert.ok(r2.collapsed, '39+1 恰好 2 行应放行');
+});
+t('collapseThinTail：韩文拼缝补空格（谚文词间空格还原）', () => {
+  const r = C.collapseThinTail(['합니다', '다음은'], THIN_CUES, { maxW: 20, locale: 'ko' });
+  assert.ok(r.collapsed);
+  assert.strictEqual(r.pieces[0], '합니다 다음은', '韩文收并补空格（切分发生在空格处）');
+});
+t('collapseThinTail：单 cue / 长度不齐 / 空片 防御性不收', () => {
+  assert.ok(!C.collapseThinTail(['只有一片'], [{ start: 0, end: 600 }], {}).collapsed, '单 cue 无收并对象');
+  assert.ok(!C.collapseThinTail(['前片', '尾巴', '多余'], THIN_CUES, {}).collapsed, 'pieces 与 cues 长度不齐');
+  assert.ok(!C.collapseThinTail(['前片', ''], THIN_CUES, {}).collapsed, '空尾巴不触发');
+  assert.ok(!C.collapseThinTail(['', '尾巴'], THIN_CUES, {}).collapsed, '空前片不触发');
+});
+
+// ---------- v0.9.23 A 单语导出四层规则 ----------
+t('buildMonoParts：R0 合规已有折行原样尊重（保留手工折行）', () => {
+  const rows = [{ no: 1, start: 0, end: 3000, en: 'x', zh: '并巩固了其\n作为全球主导科技公司之一的', flag: '' }];
+  const m = C.buildMonoParts(rows, { maxW: 20, dstLocale: 'zh-CN' });
+  assert.strictEqual(m.length, 1);
+  assert.strictEqual(m[0].text, '并巩固了其\n作为全球主导科技公司之一的', '折行原样保留');
+});
+t('buildMonoParts：R1 微超宽（≤maxW+4）单行放下，不折寡行', () => {
+  let zh = '';
+  while (C.textWidth(zh) < 23) zh += '字';   // 恰 23 宽（>20 且 ≤24）
+  assert.ok(C.textWidth(zh) > 20 && C.textWidth(zh) <= 24, '前提：微超宽');
+  const m = C.buildMonoParts([{ no: 1, start: 0, end: 3000, en: 'x', zh, flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
+  assert.ok(!m[0].text.includes('\n'), '微超宽单行直放');
+});
+t('buildMonoParts：R2 超宽单行（回填存的原始未折行文本）重折为 2 行', () => {
+  const zh = '并巩固了其作为全球最具主导地位的科技公司之一的地位。';   // 26 宽
+  const m = C.buildMonoParts([{ no: 1, start: 5920, end: 11120, en: 'x', zh, flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
+  const lines = m[0].text.split('\n');
+  assert.strictEqual(lines.length, 2, '折为 2 行');
+  lines.forEach(l => assert.ok(C.textWidth(l) <= 20, '每行 ≤20: ' + l));
+});
+t('buildMonoParts：R3 超容量（>2 行）切分，子时间轴按宽度占比、每片 ≤2 行', () => {
+  let zh = '';
+  while (C.textWidth(zh) < 60) zh += '超长内容';   // ~60 宽
+  const m = C.buildMonoParts([{ no: 1, start: 0, end: 8000, en: 'x', zh, flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
+  assert.ok(m.length >= 2, '切为多条子 cue');
+  let prevEnd = -1;
+  m.forEach(it => {
+    assert.ok(it.start >= prevEnd, '时间轴单调不重叠');
+    prevEnd = it.end;
+    it.text.split('\n').forEach(l => assert.ok(C.textWidth(l) <= 20, '每行 ≤20: ' + l));
+    assert.ok(it.text.split('\n').length <= 2, '每片 ≤2 行');
+  });
+  assert.strictEqual(m[0].start, 0);
+  assert.strictEqual(m[m.length - 1].end, 8000, '子 cue 瓜分完整时长');
+});
+t('buildMonoParts：merged 行并入承载行（end 延展）、drop/空译文跳过', () => {
+  const rows = [
+    { no: 1, start: 5920, end: 11120, en: 'long', zh: '并巩固了其地位', flag: '' },
+    { no: 2, start: 11120, end: 11680, en: 'world.', zh: null, flag: 'merged' },
+    { no: 3, start: 12000, end: 13000, en: 'drop me', zh: null, flag: 'drop' },
+    { no: 4, start: 13000, end: 14000, en: 'empty', zh: '', flag: '' },
+    { no: 5, start: 14000, end: 15000, en: 'ok', zh: '正常一条', flag: '' }
+  ];
+  const m = C.buildMonoParts(rows, { maxW: 20, dstLocale: 'zh-CN' });
+  assert.strictEqual(m.length, 2, 'merged/drop/空行均不出条目');
+  assert.strictEqual(m[0].end, 11680, 'merged 尾行时间并入承载行');
+  assert.strictEqual(m[1].text, '正常一条');
+});
+t('buildMonoParts：文本守恒（所有译文零丢失）', () => {
+  const rows = [
+    { no: 1, start: 0, end: 2000, en: 'a', zh: '第一句完整译文', flag: '' },
+    { no: 2, start: 2000, end: 2600, en: 'b', zh: '尾巴', flag: '' },
+    { no: 3, start: 3000, end: 6000, en: 'c', zh: '这是较长的一段译文需要折行处理一下才可以', flag: '' }
+  ];
+  const m = C.buildMonoParts(rows, { maxW: 20, dstLocale: 'zh-CN' });
+  const joined = m.map(it => it.text.replace(/\n/g, '')).join('');
+  assert.ok(joined.includes('第一句完整译文尾巴'), '前两条文本齐备');
+  assert.ok(joined.includes('这是较长的一段译文需要折行处理一下才可以'), '第三条文本齐备');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

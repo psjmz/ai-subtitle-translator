@@ -149,7 +149,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.22</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.23</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -1790,16 +1790,31 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
   return { byGno, fillers, badAnchor };
 }
 
+// B1 孤儿尾巴收并落地（v0.9.23）：collapseThinTail 命中后，末行转 merged（复用既有机制：
+// 单语导出过滤、双语源文并入承载行、表格显示"已并入"）、承载行 end 延展到末行 end
+//（行业允许 out-cue 延至语音结束，无重叠、无新 gap）。
+function applyTailCollapse(active){
+  if(!active || active.length<2) return;
+  const tailC=active[active.length-1], prevC=active[active.length-2];
+  const tailR=S.rows.find(x=>x.no===tailC.no), prevR=S.rows.find(x=>x.no===prevC.no);
+  if(!tailR || !prevR) return;
+  tailR.zh=null; tailR.flag='merged';
+  if((tailC.end||0)>(prevR.end||0)) prevR.end=tailC.end;
+}
+
 // 句组回填：优先合并为单条（时长/行数达标），否则按时长切分回填；返回回填方式（v0.9.21 抽出复用）
+// v0.9.23：切分后加 B1 孤儿尾巴收并（末条 cue <700ms 且译文只剩 ≤2 字/1 词尾巴 → 并回前条）
 function backfillGroup(active, text, cfg){
   if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); return 'merged'; }
   const times=active.map(c=>({start:c.start, end:c.end}));
-  const pieces=C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst});
+  const col=C.collapseThinTail(C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst}), active, {maxW:cfg.maxW, locale:cfg.dst});
+  const pieces=col.pieces;
   active.forEach((c,i)=>{
     const r=S.rows.find(x=>x.no===c.no);
     if(r){ r.zh=String(pieces[i]!=null?pieces[i]:'').trim(); if(r.flag!=='drop') r.flag=''; }
   });
-  return 'split';
+  if(col.collapsed) applyTailCollapse(active);
+  return col.collapsed ? 'collapsed' : 'split';
 }
 
 // 容量校验：译文按该句组时间轴切分回填后，每条 cue 折行均 ≤2 行（物理放得下）
@@ -1896,11 +1911,14 @@ async function runTranslate(){
           if(C.mergeableGroup(g.cues, g.text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(g.cues, g.text); mG++; return; }
         }
         const times=g.cues.map(c=>({start:c.start, end:c.end}));
-        const pieces=C.splitCues(g.text, times, {maxW:cfg.maxW, locale:cfg.dst});
+        // B1 孤儿尾巴收并（v0.9.23，规则演练路径同样生效）
+        const col=C.collapseThinTail(C.splitCues(g.text, times, {maxW:cfg.maxW, locale:cfg.dst}), g.cues, {maxW:cfg.maxW, locale:cfg.dst});
+        const pieces=col.pieces;
         g.cues.forEach((c,i)=>{
           const row=S.rows.find(x=>x.no===c.no);
           if(row){ row.zh=C.wrapToWidth(pieces[i]||'',cfg.maxW,{normalize:true, locale:cfg.dst}).join('\n'); }
         });
+        if(col.collapsed) applyTailCollapse(g.cues);
       });
       S.dropN=drop; S.mergeN=gMulti; S.mergedN=mG;
       log(t('mergeInfo', gMulti, mG, gMulti-mG));
@@ -2032,7 +2050,9 @@ async function runTranslate(){
         if(C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); mG++; continue; }
       }
       const times=active.map(c=>({start:c.start, end:c.end}));
-      const pieces=C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst});
+      // B1 孤儿尾巴收并（v0.9.23）：末条 cue <700ms 且译文只剩尾巴 → 并回前条，消灭 0.5s 级闪现孤儿
+      const col=C.collapseThinTail(C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst}), active, {maxW:cfg.maxW, locale:cfg.dst});
+      const pieces=col.pieces;
       // 超容检测：分片折行 >2 行 = 译文总宽超过 cue数×2×maxW 物理容量，任何切分都放不下（v0.9.21 压缩重译）
       let over=false;
       pieces.forEach(p=>{
@@ -2044,6 +2064,7 @@ async function runTranslate(){
         const r=S.rows.find(x=>x.no===c.no);
         if(r){ r.zh=String(pieces[i]!=null?pieces[i]:'').trim(); if(r.flag!=='drop') r.flag=''; }
       });
+      if(col.collapsed) applyTailCollapse(active);
     }
     // 异常 drop / missing 告警：超过 30% 时提示用户检查模型配置或重试（避免静默全军覆没）
     const grpTotal = groups.length || 1;
@@ -2229,8 +2250,12 @@ function buildExportItems(){
   collectZh();
   const fmt=expFmtOf();
   if(fmt==='mono'){
-    return S.rows.filter(r=>r.flag!=='drop' && r.flag!=='merged' && r.zh && r.zh.trim())
-      .map((r,i)=>({no:i+1,start:r.start,end:r.end,text:r.zh}));
+    // v0.9.23：单语导出走 buildMonoParts 四层规则（R0 尊重已有折行 / R1 微超宽单行 / R2 常态折行 /
+    // R3 超容量切分），替代此前 filter+map 直透 S.rows 的零处理路径（超宽单行、>2 行、merged 尾行时间丢失）
+    return C.buildMonoParts(S.rows, {
+      maxW: +$('maxW').value || 20,
+      dstLocale: $('dstLang').value
+    });
   }
   const srcV=$('srcLang').value;
   return C.buildBilingual(S.rows, {
