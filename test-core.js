@@ -724,5 +724,40 @@ t('wrapToWidth：回归 - 双标点断点优先级仍生效', () => {
   assert.strictEqual(lines[0], '你好，世界，'); // 标点断点仍胜出
 });
 
+console.log('— ASS 底部双行（v0.9.17）—');
+t('formatAss：Sub 样式进头部（金黄 42pt 底部对齐）', () => {
+  const out = C.formatAss([{ start: 0, end: 1000, lines: [{ style: 'Bottom', text: 'x' }] }]);
+  const sub = out.split('\n').find(l => l.startsWith('Style: Sub,'));
+  assert.ok(sub, '头部含 Sub 样式');
+  assert.ok(sub.includes('&H0000D7FF'), 'Sub 副语言金黄');
+  const cols = sub.split(',');
+  assert.strictEqual(cols[18], '2', 'Sub 底部居中对齐（Alignment=2）');
+  assert.strictEqual(cols[2], '42', 'Sub 42pt');
+});
+t('formatAss：per-line MarginV 写入 Dialogue（Sub 动态抬升）', () => {
+  const out = C.formatAss([{ start: 0, end: 2000, lines: [
+    { style: 'Sub', text: 'English above', mv: 116 },
+    { style: 'Bottom', text: '中文译文\n两行' },
+  ] }]);
+  const dlg = out.split('\n').filter(l => l.startsWith('Dialogue:'));
+  assert.strictEqual(dlg.length, 2);
+  // Dialogue 字段：Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text
+  const subDlg = dlg.find(l => l.includes(',Sub,'));
+  const botDlg = dlg.find(l => l.includes(',Bottom,'));
+  assert.ok(subDlg, 'Sub 行存在');
+  assert.ok(subDlg.includes(',,0,0,116,,'), 'Sub MarginV=116 写入');
+  assert.ok(botDlg.includes(',,0,0,0,,'), '无 mv 时 MarginV=0（用样式默认）');
+  assert.ok(botDlg.includes('中文译文\\N两行'));
+  // 读回校验
+  const rt = C.parseAss(out);
+  assert.ok(rt.items.some(i => i.text === 'English above'));
+});
+t('formatAss：mv 为 0/负值时回退样式默认（防御）', () => {
+  const out = C.formatAss([{ start: 0, end: 1000, lines: [
+    { style: 'Sub', text: 'zero', mv: 0 },
+  ] }]);
+  assert.ok(out.includes(',,0,0,0,,'), 'mv=0 不写入覆盖值');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

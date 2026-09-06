@@ -446,6 +446,9 @@
       STYLE_FMT,
       'Style: Bottom,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
       'Style: Top,PingFang SC,42,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,8,60,60,42,1',
+      // Sub：底部双行样式（v0.9.17）——外观与 Top 一致（42pt 金黄）但对齐方式为底部居中，
+      // 实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定，实现“紧贴译文上方、整体锚在底部”。
+      'Style: Sub,PingFang SC,42,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
       '',
       '[Events]',
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
@@ -456,8 +459,9 @@
       (ev.lines || []).forEach((ln, i) => {
         if (!ln || !ln.text || !String(ln.text).trim()) return;
         const tx = String(ln.text).replace(/\r/g, '').replace(/\n/g, '\\N');
+        const st = ln.style === 'Top' ? 'Top' : (ln.style === 'Sub' ? 'Sub' : 'Bottom');
         evLines.push('Dialogue: ' + i + ',' + fmtTimeAss(ev.start) + ',' + fmtTimeAss(ev.end) + ',' +
-          (ln.style === 'Top' ? 'Top' : 'Bottom') + ',,0,0,0,,' + tx);
+          st + ',,0,0,' + (ln.mv > 0 ? Math.round(ln.mv) : 0) + ',,' + tx);
       });
     }
     return header.join('\n') + '\n' + evLines.join('\n') + '\n';
