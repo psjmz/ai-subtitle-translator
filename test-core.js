@@ -779,5 +779,21 @@ t('findCut 后移补偿：中文（无空格）行为不变', () => {
   assert.ok(!/^[”’』】）》。，！？、；：…]/.test(w[1] || ''), '行首无禁则符号');
 });
 
+// ---------- v0.9.21 混字词表 ----------
+t('fixMixedChars：泰文混入的汉字术语被替换为正确泰文', () => {
+  assert.strictEqual(C.fixMixedChars('มันลงทุนในโมเดล前沿ด้วย', 'th'), 'มันลงทุนในโมเดลล้ำหน้าด้วย');
+  assert.strictEqual(C.fixMixedChars('ไม่ว่าจะเป็นกับห้องปฏิบัติการ前沿', 'th'), 'ไม่ว่าจะเป็นกับห้องปฏิบัติการล้ำหน้า');
+});
+t('fixMixedChars：非泰文目标语言零影响（词表按语言隔离）', () => {
+  // 中文/日文译文里「前沿」是合法词汇，绝不替换
+  assert.strictEqual(C.fixMixedChars('我们站在技术的前沿', 'zh-CN'), '我们站在技术的前沿');
+  assert.strictEqual(C.fixMixedChars('最前線の技術', 'ja'), '最前線の技術');
+  // 无词表的语言原样返回
+  assert.strictEqual(C.fixMixedChars('edge of frontier', 'fr'), 'edge of frontier');
+  // 空值安全（null/undefined 归一为空串）
+  assert.strictEqual(C.fixMixedChars(null, 'th'), '');
+  assert.strictEqual(C.fixMixedChars(undefined, 'th'), '');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

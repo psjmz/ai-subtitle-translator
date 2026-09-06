@@ -937,6 +937,22 @@
     return !han && !kana && !hangul;
   }
 
+  // 已知混字词表（按目标语言隔离）：实测 DeepSeek 偶发在个别术语上写出汉字字面
+  // （如泰文"ล้ำหน้า/前沿"被写成汉字"前沿"混在泰文里），锚定重试后仍不改的顽固组，
+  // 在回填阶段做机械替换。只按 dst 命中本语言的表，其他语言零影响（中日韩译文里的
+  // 合法汉字永远不会被碰）。发现新的混字案例往对应语言数组里追加即可。
+  const MIXED_FIX = {
+    th: [ ['前沿', 'ล้ำหน้า'] ]
+  };
+  function fixMixedChars(text, dst) {
+    const s = String(text == null ? '' : text);
+    const rules = MIXED_FIX[dst];
+    if (!rules || !s) return s;
+    let out = s;
+    for (let i = 0; i < rules.length; i++) out = out.split(rules[i][0]).join(rules[i][1]);
+    return out;
+  }
+
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
@@ -946,7 +962,7 @@
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts,
-    validateItems, anchorOk,
+    validateItems, anchorOk, fixMixedChars,
     MAX_W_DEFAULT: 20
   };
 });

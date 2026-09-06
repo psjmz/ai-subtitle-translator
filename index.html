@@ -149,7 +149,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.20</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.21</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -415,6 +415,7 @@ const I18N = {
   startT:'开始整片翻译：{0} → {1}，共 {2} 条，每批 {3} 条。',
   batchProg:'第 {0}/{1} 批（句组 {2}–{3}）…',
   batchDone:'批 {0}/{1} 完成{2}。', retried:'（重试{0}次后成功）',
+  overCapStart:'检测到 {0} 个句组译文过长（超出该时长内可显示的 2 行容量），压缩重译中…', overCapDone:'超容压缩完成：{0}/{1} 个句组已收进容量。', overCapFail:'超容压缩重译失败，过长句组按原样保留。', overCapCallFail:'压缩重译第 {0} 次失败：{1}',
   batchFail:'批 {0} 第 {1} 次失败：{2}', batchSkip:'该批跳过，可在完成后整篇重试。',
   ratePace:'免费模型限流中，{0} 秒后继续…', rateWait:'遇到限流（429），等待 20 秒后重试…',
   userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折行 …',
@@ -477,6 +478,7 @@ const I18N = {
   startT:'開始整片翻譯：{0} → {1}，共 {2} 條，每批 {3} 條。',
   batchProg:'第 {0}/{1} 批（句組 {2}–{3}）…',
   batchDone:'批 {0}/{1} 完成{2}。', retried:'（重試{0}次後成功）',
+  overCapStart:'偵測到 {0} 個句組譯文過長（超出該時長內可顯示的 2 行容量），壓縮重譯中…', overCapDone:'超容壓縮完成：{0}/{1} 個句組已收進容量。', overCapFail:'超容壓縮重譯失敗，過長句組按原樣保留。', overCapCallFail:'壓縮重譯第 {0} 次失敗：{1}',
   batchFail:'批 {0} 第 {1} 次失敗：{2}', batchSkip:'該批跳過，可在完成後整篇重試。',
   ratePace:'免費模型限流中，{0} 秒後繼續…', rateWait:'遇到限流（429），等待 20 秒後重試…',
   userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 折行 …',
@@ -539,6 +541,7 @@ const I18N = {
   startT:'Translating: {0} → {1}, {2} cues, {3} per batch.',
   batchProg:'Batch {0}/{1} (sentences {2}–{3})…',
   batchDone:'Batch {0}/{1} done{2}.', retried:' (after {0} retries)',
+  overCapStart:'Detected {0} group(s) with translations too long for the screen (over 2 lines), re-translating more concisely…', overCapDone:'Length compression done: {0}/{1} group(s) now fit.', overCapFail:'Length compression failed; over-long groups kept as-is.', overCapCallFail:'Compression attempt {0} failed: {1}',
   batchFail:'Batch {0} attempt {1} failed: {2}', batchSkip:'Batch skipped; you can re-run the whole file later.',
   ratePace:'Free-model rate limit, continuing in {0}s…', rateWait:'Rate limited (429), waiting 20s before retry…',
   userStop:'Stopped by user.', postEnd:'Translation finished, applying filler removal / wrapping…',
@@ -601,6 +604,7 @@ const I18N = {
   startT:'翻訳開始：{0} → {1}、全 {2} 件、1バッチ {3} 件。',
   batchProg:'バッチ {0}/{1}（文グループ {2}–{3}）…',
   batchDone:'バッチ {0}/{1} 完了{2}。', retried:'（{0}回再試行後に成功）',
+  overCapStart:'画面の2行容量を超える長い訳文の句組が {0} 件検出されました。圧縮して再翻訳中…', overCapDone:'圧縮再翻訳完了：{0}/{1} 件が容量内に収まりました。', overCapFail:'圧縮再翻訳に失敗したため、長すぎる句組はそのまま保持します。', overCapCallFail:'圧縮再翻訳の第 {0} 回目が失敗：{1}',
   batchFail:'バッチ {0} の第 {1} 回失敗：{2}', batchSkip:'このバッチはスキップ。後で全体を再実行できます。',
   ratePace:'無料モデルのレート制限中、{0} 秒後に続行…', rateWait:'レート制限（429）、20秒待って再試行…',
   userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了、フィラー除去 / 改行を適用中…',
@@ -663,6 +667,7 @@ const I18N = {
   startT:'Traduciendo: {0} → {1}, {2} subtítulos, {3} por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
   batchDone:'Lote {0}/{1} terminado{2}.', retried:' (tras {0} reintentos)',
+  overCapStart:'Detectadas {0} traducciones demasiado largas para la pantalla (más de 2 líneas); se retraducen de forma más concisa…', overCapDone:'Compresión completada: {0}/{1} grupos ahora caben.', overCapFail:'La compresión falló; los grupos demasiado largos se mantienen tal cual.', overCapCallFail:'Intento de compresión {0} fallido: {1}',
   batchFail:'Lote {0} intento {1} falló: {2}', batchSkip:'Lote omitido; puedes reejecutar todo el archivo más tarde.',
   ratePace:'Límite de velocidad del modelo gratuito, continuando en {0}s…', rateWait:'Limitado (429), esperando 20s antes de reintentar…',
   userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando limpieza de relleno / ajuste…',
@@ -725,6 +730,7 @@ const I18N = {
   startT:'Traduzindo: {0} → {1}, {2} legendas, {3} por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
   batchDone:'Lote {0}/{1} concluído{2}.', retried:' (após {0} tentativas)',
+  overCapStart:'Detectadas {0} traduções longas demais para a tela (mais de 2 linhas); retraduzindo de forma mais concisa…', overCapDone:'Compressão concluída: {0}/{1} grupos agora cabem.', overCapFail:'A compressão falhou; os grupos longos demais foram mantidos como estão.', overCapCallFail:'Tentativa de compressão {0} falhou: {1}',
   batchFail:'Lote {0} tentativa {1} falhou: {2}', batchSkip:'Lote ignorado; você pode reexecutar o arquivo inteiro depois.',
   ratePace:'Limite de taxa do modelo gratuito, continuando em {0}s…', rateWait:'Limitado (429), aguardando 20s antes de tentar de novo…',
   userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicando remoção de preenchimento / quebra…',
@@ -787,6 +793,7 @@ const I18N = {
   startT:'번역 시작: {0} → {1}, 총 {2}개, 배치당 {3}개.',
   batchProg:'배치 {0}/{1}(문장 그룹 {2}–{3})…',
   batchDone:'배치 {0}/{1} 완료{2}.', retried:'({0}회 재시도 후 성공)',
+  overCapStart:'화면 2줄 용량을 초과하는 번역 그룹 {0}개를 발견했습니다. 압축 재번역 중…', overCapDone:'압축 재번역 완료: {0}/{1}개 그룹이 용량 안에 들어맞습니다.', overCapFail:'압축 재번역에 실패하여 과도하게 긴 그룹은 그대로 유지합니다.', overCapCallFail:'압축 재번역 {0}번째 시도 실패: {1}',
   batchFail:'배치 {0} {1}번째 시도 실패: {2}', batchSkip:'이 배치는 건너뛰었습니다; 나중에 전체를 다시 실행할 수 있습니다.',
   ratePace:'무료 모델 속도 제한, {0}초 후 계속…', rateWait:'속도 제한(429), 20초 대기 후 재시도…',
   userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제거 / 줄바꿈 적용 중…',
@@ -849,6 +856,7 @@ const I18N = {
   startT:'Übersetze: {0} → {1}, {2} Untertitel, {3} pro Batch.',
   batchProg:'Batch {0}/{1} (Sätze {2}–{3})…',
   batchDone:'Batch {0}/{1} fertig{2}.', retried:' (nach {0} Wiederholungen)',
+  overCapStart:'{0} Gruppe(n) mit zu langen Übersetzungen für den Bildschirm (mehr als 2 Zeilen) erkannt – werde kürzer neu übersetzen…', overCapDone:'Kürzung abgeschlossen: {0}/{1} Gruppen passen jetzt.', overCapFail:'Kürzung fehlgeschlagen; zu lange Gruppen bleiben unverändert.', overCapCallFail:'Kürzungsversuch {0} fehlgeschlagen: {1}',
   batchFail:'Batch {0} Versuch {1} fehlgeschlagen: {2}', batchSkip:'Batch übersprungen; Sie können die ganze Datei später erneut ausführen.',
   ratePace:'Geschwindigkeitslimit des Gratis-Modells, weiter in {0}s…', rateWait:'Rate-Limit (429), warte 20s vor dem erneuten Versuch…',
   userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende Füllwort-Entfernung / Umbruch an…',
@@ -911,6 +919,7 @@ const I18N = {
   startT:'Traduction : {0} → {1}, {2} sous-titres, {3} par lot.',
   batchProg:'Lot {0}/{1} (phrases {2}–{3})…',
   batchDone:'Lot {0}/{1} terminé{2}.', retried:' (après {0} tentatives)',
+  overCapStart:'{0} groupe(s) avec des traductions trop longues pour l’écran (plus de 2 lignes) détecté(s), retraduction plus concise en cours…', overCapDone:'Compression terminée : {0}/{1} groupe(s) tiennent maintenant.', overCapFail:'La compression a échoué ; les groupes trop longs sont conservés tels quels.', overCapCallFail:'Tentative de compression {0} échouée : {1}',
   batchFail:'Lot {0} tentative {1} échouée : {2}', batchSkip:'Lot ignoré ; vous pourrez relancer tout le fichier plus tard.',
   ratePace:'Limite de débit du modèle gratuit, reprise dans {0}s…', rateWait:'Limité (429), attente de 20s avant nouvel essai…',
   userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, application suppression remplissage / retour ligne…',
@@ -973,6 +982,7 @@ const I18N = {
   startT:'Menerjemahkan: {0} → {1}, {2} subtitle, {3} per batch.',
   batchProg:'Batch {0}/{1} (kalimat {2}–{3})…',
   batchDone:'Batch {0}/{1} selesai{2}.', retried:' (setelah {0} percobaan)',
+  overCapStart:'Terdeteksi {0} grup dengan terjemahan terlalu panjang untuk layar (lebih dari 2 baris), menerjemahkan ulang secara lebih ringkas…', overCapDone:'Pemadatan selesai: {0}/{1} grup kini muat.', overCapFail:'Pemadatan gagal; grup yang terlalu panjang tetap dipertahankan.', overCapCallFail:'Percobaan pemadatan {0} gagal: {1}',
   batchFail:'Batch {0} percobaan {1} gagal: {2}', batchSkip:'Batch dilewati; Anda bisa menjalankan ulang seluruh file nanti.',
   ratePace:'Batas laju model gratis, lanjut dalam {0} dtk…', rateWait:'Dibatasi (429), menunggu 20 dtk sebelum mencoba lagi…',
   userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghapusan pengisi / pembungkusan…',
@@ -1035,6 +1045,7 @@ const I18N = {
   startT:'अनुवाद शुरू: {0} → {1}, {2} सबटाइटल, प्रति बैच {3}।',
   batchProg:'बैच {0}/{1} (वाक्य {2}–{3})…',
   batchDone:'बैच {0}/{1} पूर्ण{2}।', retried:' ({0} पुनः प्रयास बाद)',
+  overCapStart:'स्क्रीन की 2-पंक्ति क्षमता से अधिक लंबे अनुवाद वाले {0} समूह मिले, अधिक संक्षिप्त रूप से पुनः अनुवाद हो रहे हैं…', overCapDone:'संपीडन पूर्ण: {0}/{1} समूह अब क्षमता में आ गए।', overCapFail:'संपीडन विफल; बहुत लंबे समूह जस के तस रखे गए।', overCapCallFail:'संपीडन प्रयास {0} विफल: {1}',
   batchFail:'बैच {0} प्रयास {1} असफल: {2}', batchSkip:'बैच छोड़ा गया; बाद में पूरी फ़ाइल दोबारा चला सकते हैं।',
   ratePace:'मुफ़्त मॉडल दर-सीमा, {0} सेकंड में जारी…', rateWait:'सीमित (429), 20 सेकंड प्रतीक्षा बाद पुनः प्रयास…',
   userStop:'उपयोगकर्ता ने रोका।', postEnd:'अनुवाद समाप्त, फिलर हटाना / रैप लागू हो रहा है…',
@@ -1097,6 +1108,7 @@ const I18N = {
   startT:'เริ่มแปลทั้งไฟล์: {0} → {1} รวม {2} ซับ ละ {3} ต่อแบตช์',
   batchProg:'แบตช์ {0}/{1} (กลุ่มประโยค {2}–{3})…',
   batchDone:'แบตช์ {0}/{1} เสร็จ{2}', retried:' (สำเร็จหลังลองใหม่ {0} ครั้ง)',
+  overCapStart:'พบคำแปลที่ยาวเกินความจุ 2 บรรทัดบนจอ {0} กลุ่ม กำลังแปลใหม่แบบกระชับ…', overCapDone:'บีบอัดเสร็จสมบูรณ์: {0}/{1} กลุ่มเข้าได้ในความจุแล้ว', overCapFail:'บีบอัดไม่สำเร็จ กลุ่มที่ยาวเกินคงไว้ตามเดิม', overCapCallFail:'ความพยายามบีบอัดครั้งที่ {0} ล้มเหลว: {1}',
   batchFail:'แบตช์ {0} ครั้งที่ {1} ล้มเหลว: {2}', batchSkip:'ข้ามแบตช์นี้ สามารถรันทั้งไฟล์ใหม่ภายหลังได้',
   ratePace:'โมเดลฟรีถูกจำกัดอัตรา จะไปต่อใน {0} วินาที…', rateWait:'โดนจำกัดอัตรา (429) รอ 20 วินาทีแล้วลองใหม่…',
   userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร็จ กำลังลบคำเสียบ / ตัดบรรทัด…',
@@ -1159,6 +1171,7 @@ const I18N = {
   startT:'Đang dịch: {0} → {1}, {2} phụ đề, {3} mỗi lô.',
   batchProg:'Lô {0}/{1} (câu {2}–{3})…',
   batchDone:'Lô {0}/{1} xong{2}.', retried:' (thành công sau {0} lần thử lại)',
+  overCapStart:'Phát hiện {0} nhóm bản dịch quá dài so với màn hình (trên 2 dòng), đang dịch lại ngắn gọn hơn…', overCapDone:'Nén hoàn tất: {0}/{1} nhóm đã vừa màn hình.', overCapFail:'Nén thất bại; các nhóm quá dài được giữ nguyên.', overCapCallFail:'Lần nén thứ {0} thất bại: {1}',
   batchFail:'Lô {0} lần thử {1} thất bại: {2}', batchSkip:'Lô bị bỏ qua; bạn có thể chạy lại cả file sau.',
   ratePace:'Mô hình miễn phí bị giới hạn tốc độ, tiếp tục sau {0}s…', rateWait:'Bị giới hạn (429), chờ 20s rồi thử lại…',
   userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn từ đệm / ngắt dòng…',
@@ -1221,6 +1234,7 @@ const I18N = {
   startT:'Перевод: {0} → {1}, {2} субтитров, {3} на батч.',
   batchProg:'Батч {0}/{1} (предложения {2}–{3})…',
   batchDone:'Батч {0}/{1} готов{2}.', retried:' (после {0} повторов)',
+  overCapStart:'Обнаружены группы с переводами длиннее ёмкости экрана (более 2 строк): {0}. Идёт более сжатый повторный перевод…', overCapDone:'Сжатие завершено: {0}/{1} групп помещаются.', overCapFail:'Сжатие не удалось; слишком длинные группы сохранены как есть.', overCapCallFail:'Попытка сжатия {0} не удалась: {1}',
   batchFail:'Батч {0} попытка {1} не удалась: {2}', batchSkip:'Батч пропущен; можно перезапустить весь файл позже.',
   ratePace:'Ограничение скорости бесплатной модели, продолжаю через {0}с…', rateWait:'Лимит (429), жду 20с перед повтором…',
   userStop:'Остановлено пользователем.', postEnd:'Перевод завершён, применяю удаление заполнителей / перенос строк…',
@@ -1283,6 +1297,7 @@ const I18N = {
   startT:'Traduzione: {0} → {1}, {2} sottotitoli, {3} per batch.',
   batchProg:'Batch {0}/{1} (frasi {2}–{3})…',
   batchDone:'Batch {0}/{1} completato{2}.', retried:' (dopo {0} tentativi)',
+  overCapStart:'Rilevati {0} gruppi con traduzioni troppo lunghe per lo schermo (oltre 2 righe), ritraduco in modo più conciso…', overCapDone:'Compressione completata: {0}/{1} gruppi ora entrano.', overCapFail:'Compressione fallita; i gruppi troppo lunghi restano invariati.', overCapCallFail:'Tentativo di compressione {0} fallito: {1}',
   batchFail:'Tentativo {1} del batch {0} non riuscito: {2}', batchSkip:'Batch saltato; puoi rieseguire l\'intero file più tardi.',
   ratePace:'Limite di frequenza del modello gratuito, ripresa tra {0}s…', rateWait:'Limite raggiunto (429), attesa di 20s prima di riprovare…',
   userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozione riempitivi / a capo…',
@@ -1345,6 +1360,7 @@ const I18N = {
   startT:'الترجمة: {0} ← {1}، {2} ترجمة، {3} لكل دفعة.',
   batchProg:'دفعة {0}/{1} (جمل {2}–{3})…',
   batchDone:'اكتملت الدفعة {0}/{1}{2}.', retried:' (بعد {0} محاولات)',
+  overCapStart:'تم اكتشاف {0} مجموعة بترجمات أطول من سعة الشاشة (أكثر من سطرين)، تجري إعادة ترجمة أكثر إيجازًا…', overCapDone:'اكتمل الضغط: {0}/{1} مجموعة أصبحت ضمن السعة.', overCapFail:'فشل الضغط؛ تم الإبقاء على المجموعات الطويلة جدًا كما هي.', overCapCallFail:'فشلت محاولة الضغط {0}: {1}',
   batchFail:'فشلت محاولة {1} للدفعة {0}: {2}', batchSkip:'تخطّيت الدفعة؛ يمكنك إعادة تشغيل الملف كاملًا لاحقًا.',
   ratePace:'حد معدل النموذج المجاني، سنكمل خلال {0} ث…', rateWait:'بلغنا حد المعدل (429)، انتظار 20 ث قبل إعادة المحاولة…',
   userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، تُطبَّق إزالة الحشو / الالتفاف…',
@@ -1407,6 +1423,7 @@ const I18N = {
   startT:'Çevriliyor: {0} → {1}, {2} altyazı, grup başına {3}.',
   batchProg:'Grup {0}/{1} (cümleler {2}–{3})…',
   batchDone:'Grup {0}/{1} tamamlandı{2}.', retried:' ({0} denemeden sonra)',
+  overCapStart:'Ekrana sığmayan (2 satırdan uzun) çevirileri olan {0} grup algılandı, daha kısa yeniden çevriliyor…', overCapDone:'Kısaltma tamamlandı: {0}/{1} grup artık sığıyor.', overCapFail:'Kısaltma başarısız; çok uzun gruplar olduğu gibi korundu.', overCapCallFail:'Kısaltma denemesi {0} başarısız: {1}',
   batchFail:'Grup {0} deneme {1} başarısız: {2}', batchSkip:'Grup atlandı; tüm dosyayı daha sonra yeniden çalıştırabilirsin.',
   ratePace:'Ücretsiz model hız limiti, {0} sn içinde devam ediliyor…', rateWait:'Hız limiti (429), yeniden denemeden önce 20 sn bekleniyor…',
   userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu temizleme / satır sarma uygulanıyor…',
@@ -1721,6 +1738,52 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
   return { byGno, fillers, badAnchor };
 }
 
+// 句组回填：优先合并为单条（时长/行数达标），否则按时长切分回填；返回回填方式（v0.9.21 抽出复用）
+function backfillGroup(active, text, cfg){
+  if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); return 'merged'; }
+  const times=active.map(c=>({start:c.start, end:c.end}));
+  const pieces=C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst});
+  active.forEach((c,i)=>{
+    const r=S.rows.find(x=>x.no===c.no);
+    if(r){ r.zh=String(pieces[i]!=null?pieces[i]:'').trim(); if(r.flag!=='drop') r.flag=''; }
+  });
+  return 'split';
+}
+
+// 容量校验：译文按该句组时间轴切分回填后，每条 cue 折行均 ≤2 行（物理放得下）
+function fitsCapacity(text, active, cfg){
+  if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})) return true;
+  const times=active.map(c=>({start:c.start, end:c.end}));
+  const pieces=C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst});
+  return pieces.every(p=>{
+    const ps=String(p!=null?p:'').trim();
+    return !ps || C.wrapToWidth(C.stripSoundTags(ps),cfg.maxW,{normalize:true,locale:cfg.dst}).length<=2;
+  });
+}
+
+// 超容压缩重译：句组译文过长放不下画面时，请模型在保留核心语义的前提下压缩改写（v0.9.21）
+async function compressBatch(base,key,model,items,dstLang){
+  const dstN = LBY(dstLang);
+  const groups=items.map(x=>{
+    const over=C.textWidth(C.stripSoundTags(x.current));
+    const target=Math.floor(x.cap*0.95);
+    const pct=over>0 ? Math.max(10, Math.round((1-target/over)*100)) : 20;
+    return { gno:x.gno, 容量上限:target, 当前宽度:Math.round(over*10)/10, 原文:x.src, 当前译文:x.current, 要求:'改写后约缩短'+pct+'%，显示宽度（半角字符每个0.5、中日韩全角每个1）不超过容量上限' };
+  });
+  const userMsg='以下字幕句组的译文过长，超出画面可显示的容量，请逐组把译文改写得更简洁：压缩冗余表述、去掉可有可无的修饰词、合并同义成分，但必须保留核心语义与通顺度，不得丢句。\n'
+    +JSON.stringify({groups})
+    +'\n所有 text 字段必须用'+dstN.zh+'书写。只输出 JSON：{"groups":[{"gno":…,"text":"…"}]}。';
+  const raw=await chatOnce(base,key,model,[
+    {role:'system',content:'你是专业字幕译后编辑，擅长在不损失可读性的前提下压缩译文长度。只输出 JSON。'},
+    {role:'user',content:userMsg}
+  ]);
+  const obj=parseLlmJson(raw);
+  if(!obj||!Array.isArray(obj.groups)) throw new Error('JSON 缺少 groups');
+  const byGno={};
+  obj.groups.forEach(x=>{ if(x&&x.gno!=null) byGno[x.gno]={ text:(x.text!=null?x.text:x.zh) }; });
+  return byGno;
+}
+
 /* ---------------- 主流程 ---------------- */
 async function runTranslate(){
   if(S.translating) return;
@@ -1853,6 +1916,7 @@ async function runTranslate(){
 
     // 回填：整条纯水词的 cue 直接清空；句组优先合并为单条（时长/行数达标），否则按时长切分回填（时间轴不动）
     S.rows.forEach(r=>{ if(fillerSet.has(r.no)){ r.zh=null; r.flag='drop'; } });
+    const overCapGroups=[];   // 超容句组（v0.9.21：压缩重译候选）
     let gMulti=0, mG=0, suspiciousDrop=0, missingCount=0;
     for(const g of groups){
       const active=g.cues.filter(c=>!fillerSet.has(c.no));
@@ -1872,7 +1936,7 @@ async function runTranslate(){
         suspiciousDrop++;
         continue;
       }
-      const text = textRaw;
+      const text = C.fixMixedChars(textRaw, cfg.dst);
       if(!text){
         active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
         missingCount++;
@@ -1885,6 +1949,13 @@ async function runTranslate(){
       }
       const times=active.map(c=>({start:c.start, end:c.end}));
       const pieces=C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst});
+      // 超容检测：分片折行 >2 行 = 译文总宽超过 cue数×2×maxW 物理容量，任何切分都放不下（v0.9.21 压缩重译）
+      let over=false;
+      pieces.forEach(p=>{
+        const ps=String(p!=null?p:'').trim();
+        if(ps && C.wrapToWidth(C.stripSoundTags(ps),cfg.maxW,{normalize:true,locale:cfg.dst}).length>2) over=true;
+      });
+      if(over) overCapGroups.push({g, active, text});
       active.forEach((c,i)=>{
         const r=S.rows.find(x=>x.no===c.no);
         if(r){ r.zh=String(pieces[i]!=null?pieces[i]:'').trim(); if(r.flag!=='drop') r.flag=''; }
@@ -1899,6 +1970,37 @@ async function runTranslate(){
     if(missingCount > 0 && missingCount >= grpTotal * 0.3){
       const pct = Math.round(missingCount / grpTotal * 100) + '%';
       log(t('warnManyMissing', missingCount, grpTotal, pct), 'err');
+    }
+
+    // 超容压缩重译（v0.9.21）：极少数句组译文总宽超过物理容量（cue数×2行×maxW），
+    // 任何切分都会产生 >2 行的 cue。交给模型压缩改写一轮；压缩后仍放不下或校验不过
+    // 则按原样保留（实测出现率 <0.2%，只影响该句组本身，不触碰其他任何译文行）。
+    if(overCapGroups.length && useApi && !S.stop){
+      log(t('overCapStart', overCapGroups.length));
+      const items = overCapGroups.map(oc=>({ gno:oc.g.gno, src:oc.g.text, current:oc.text, cap:oc.active.length*2*cfg.maxW }));
+      let got=null;
+      for(let a=0; a<2 && !got && !S.stop; a++){
+        try{ got = await compressBatch(effBase,effKey,effModel,items,cfg.dst); }
+        catch(e){
+          log(t('overCapCallFail', a+1, e.message), 'err');
+          if(a===0) await new Promise(r=>setTimeout(r,2000));
+        }
+      }
+      if(got){
+        let fixed=0;
+        overCapGroups.forEach(oc=>{
+          const nt=got[oc.g.gno];
+          const txt=nt ? String(nt.text||'').trim() : '';
+          const cap=oc.active.length*2*cfg.maxW;
+          if(txt && C.anchorOk(txt,cfg.dst) && C.textWidth(C.stripSoundTags(txt))<=cap && fitsCapacity(txt,oc.active,cfg)){
+            backfillGroup(oc.active, txt, cfg);
+            fixed++;
+          }
+        });
+        log(t('overCapDone', fixed, overCapGroups.length), fixed ? 'okc' : 'err');
+      }else{
+        log(t('overCapFail'), 'err');
+      }
     }
     S.dropN = S.rows.filter(r=>r.flag==='drop').length;
     S.mergeN = gMulti;
