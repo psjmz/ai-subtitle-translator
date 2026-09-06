@@ -226,6 +226,21 @@
       while (ws2 > 1 && !bounds.has(ws2)) ws2--;
       if (ws2 >= 1 && bounds.has(ws2) && !inAtom(ws2)) c = ws2;
     }
+    // 5d) 后移补偿（v0.9.20）：若切点导致剩余超宽（词保护把长词/长合成词整体下移后常见，
+    //     如 "de waardering op een koers-|winstverhouding van 170 …" 剩 22.5 > 20 折出第 3 行，
+    //     而在合成词后的空格处切可 2 行装下），尝试把切点后移到下一个空格词边界之后，
+    //     让第一行更长、剩余能装进下一行。仅当第一行仍 ≤ maxW 时采用；第一行超宽即停。
+    //     中日等无空格语言无空格边界，循环自然终止，行为不变。
+    if (c > 0 && c < n && textWidth(s.slice(c)) > maxW + 1e-9) {
+      let nc = c;
+      while (nc < n) {
+        while (nc < n && pos[nc] !== ' ' && pos[nc] !== '\u3000') nc++;
+        if (nc >= n) break;
+        nc++; // 跳过空格
+        if (textWidth(pos.slice(0, nc).join('')) > maxW + 1e-9) break; // 第一行已超宽，继续后移只会更宽
+        if (textWidth(pos.slice(nc).join('')) <= maxW + 1e-9) { c = nc; break; }
+      }
+    }
     return c;
   }
 

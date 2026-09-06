@@ -759,5 +759,25 @@ t('formatAss：mv 为 0/负值时回退样式默认（防御）', () => {
   assert.ok(out.includes(',,0,0,0,,'), 'mv=0 不写入覆盖值');
 });
 
+// ---------- v0.9.20 findCut 后移补偿 ----------
+t('findCut 后移补偿：连字复合词断在词首导致剩余超宽时，后移到词后空格 2 行装下（nl 实例）', () => {
+  const t1 = 'de waardering op een koers-winstverhouding van 170 is zeker geen waardeaandeel.';
+  const w = C.wrapToWidth(t1, 20, { normalize: true, locale: 'nl' });
+  assert.strictEqual(w.length, 2, '34.5 宽 ≤ 40，应 2 行');
+  assert.ok(C.textWidth(w[0]) <= 20 && C.textWidth(w[1]) <= 20, '每行 ≤ 20');
+  assert.ok(w[0].endsWith('koers-winstverhouding'), '合成词完整保留在第一行');
+});
+t('findCut 后移补偿：物理超容（总宽 > 2×maxW）时保持多行不死循环', () => {
+  const t2 = 'Saya tidak semestinya mahu mengambil kedudukan S1 dan kedudukan hiper-menurun, tetapi kebimbangan';
+  const w = C.wrapToWidth(t2, 20, { normalize: true, locale: 'ms' });
+  assert.ok(w.length >= 3, '超容文本正常多行');
+  w.forEach(l => assert.ok(C.textWidth(l) <= 20, '每行仍 ≤ 20: ' + l));
+});
+t('findCut 后移补偿：中文（无空格）行为不变', () => {
+  const w = C.wrapToWidth('这是一个比较长的中文句子用来验证修复不会影响中文折行行为逻辑', 20, { normalize: true, locale: 'zh-CN' });
+  assert.ok(w.length >= 2 && w.every(l => C.textWidth(l) <= 20));
+  assert.ok(!/^[”’』】）》。，！？、；：…]/.test(w[1] || ''), '行首无禁则符号');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
