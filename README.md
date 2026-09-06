@@ -11,8 +11,8 @@ A free, self-hosted web workbench that translates `.srt` subtitle files with any
 ## Quick start
 
 ```bash
-git clone https://github.com/psjmz/srt-translator.git
-cd srt-translator
+git clone https://github.com/psjmz/ai-subtitle-translator.git
+cd ai-subtitle-translator
 node server.js          # Node >= 18, no npm install needed
 # open http://localhost:8972
 ```
@@ -60,8 +60,8 @@ By default everything runs **in your browser**; subtitle text is only sent to th
 ### Any VPS (Ubuntu, one script)
 
 ```bash
-git clone https://github.com/psjmz/srt-translator.git
-cd srt-translator
+git clone https://github.com/psjmz/ai-subtitle-translator.git
+cd ai-subtitle-translator
 bash deploy.sh                  # HTTP on :80
 bash deploy.sh --https your.domain.com   # Caddy + free Let's Encrypt cert
 ```
