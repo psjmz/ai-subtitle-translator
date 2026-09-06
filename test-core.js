@@ -779,6 +779,51 @@ t('findCut 后移补偿：中文（无空格）行为不变', () => {
   assert.ok(!/^[”’』】）》。，！？、；：…]/.test(w[1] || ''), '行首无禁则符号');
 });
 
+// ---------- v0.9.24 findCut 句末软偏好 ----------
+t('句末软偏好：三短句聚首行，让步从句整段下行（用户截图场景）', () => {
+  // 旧行为：切在「不过|如果」（prio 3 连接词切点更近）→「…但我不是。不过 / 如果我要排队」
+  // 新行为：窗口内句末切点（prio 5）优先 →「等一下。给你。但我不是。 / 不过如果我要排队」
+  const t1 = '等一下。给你。但我不是。不过如果我要排队';
+  for (const maxW of [13, 14, 16, 19]) {
+    const w = C.wrapToWidth(t1, maxW, { normalize: true, locale: 'zh-CN' });
+    assert.strictEqual(w.length, 2, 'maxW=' + maxW + ' 总宽 20 应 2 行');
+    assert.strictEqual(w[0], '等一下。给你。但我不是。', 'maxW=' + maxW + ' 首行折在句末');
+    assert.strictEqual(w[1], '不过如果我要排队', 'maxW=' + maxW + ' 让步从句整段下行');
+  }
+});
+t('句末软偏好：句末切点恰在窗口边界（c-10）也生效', () => {
+  // 「…举起手来！」距硬切位置恰好 10 字，闭区间纳入
+  const w = C.wrapToWidth('不要动放下武器举起手来！警察马上就到了别做傻事', 22, { normalize: true, locale: 'zh-CN' });
+  assert.strictEqual(w[0], '不要动放下武器举起手来！');
+  assert.strictEqual(w[1], '警察马上就到了别做傻事');
+});
+t('句末软偏好守卫：句末过早（首行 < maxW/2）不升级，维持最近合法切点', () => {
+  // 「好的。」在 maxW=10 时首行仅 3 宽 < 5，不采纳句末切点
+  const w = C.wrapToWidth('好的。我们走吧大家快点跟上啊', 10, { normalize: true, locale: 'zh-CN' });
+  assert.strictEqual(w.length, 2);
+  assert.ok(C.textWidth(w[0]) >= 5, '首行不因句末偏好而过短: ' + w[0]);
+});
+t('句末软偏好守卫：句末切点导致剩余超宽（折第 3 行）时跳过', () => {
+  // 「真的吗。」后剩 17 宽 > 14，句末切点无效，退回正常折行
+  const t1 = '真的吗。好的没问题我这就过去帮你处理一下下';
+  const w = C.wrapToWidth(t1, 14, { normalize: true, locale: 'zh-CN' });
+  assert.strictEqual(w.length, 2, '2 行装下不折第 3 行');
+  w.forEach(l => assert.ok(C.textWidth(l) <= 14, '每行 ≤ 14'));
+});
+t('句末软偏好守卫：拉丁 "!" 后跟空格不切在 ! 与空格之间', () => {
+  // ASCII "!" 属 SENT_END，但切在 "!|" 会把空格留到行首 —— 空格守卫交还给空格切点
+  const t1 = 'Stop! Do not move or I will shoot you right now immediately';
+  const w = C.wrapToWidth(t1, 20, { normalize: true, locale: 'en' });
+  assert.ok(w.length >= 2);
+  w.forEach(l => assert.ok(!l.startsWith(' '), '行首不得为空格: [' + l + ']'));
+});
+t('句末软偏好：无句末标点文本行为不变', () => {
+  const t1 = '这是一段没有任何句末标点的长文本需要折行处理一下';
+  const w = C.wrapToWidth(t1, 14, { normalize: true, locale: 'zh-CN' });
+  assert.ok(w.length >= 2 && w.every(l => C.textWidth(l) <= 14));
+  assert.strictEqual(w[0], '这是一段没有任何句末标点的长');
+});
+
 // ---------- v0.9.21 混字词表 ----------
 t('fixMixedChars：泰文混入的汉字术语被替换为正确泰文', () => {
   assert.strictEqual(C.fixMixedChars('มันลงทุนในโมเดล前沿ด้วย', 'th'), 'มันลงทุนในโมเดลล้ำหน้าด้วย');

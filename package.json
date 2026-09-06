@@ -1,6 +1,6 @@
 {
   "name": "srt-translator",
-  "version": "0.9.23",
+  "version": "0.9.24",
   "private": true,
   "description": "AI-powered free SRT subtitle translator with multi-language SEO",
   "scripts": {

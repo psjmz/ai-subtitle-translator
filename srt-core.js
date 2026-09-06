@@ -182,10 +182,24 @@
       if (bounds && !bounds.has(cut)) return 0;    // 伪断点落在词内部 → 无效
       return p;
     };
+    // v0.9.24 句末软偏好：窗口内若存在句末标点切点（prio 5，含阿语 ؟/天城文 । 经 breakPrio 的
+    // SENT_END 口径），优先折在句末——短句聚首行（各自闭合、结束感强）、让步从句整段下行，
+    // 避免行尾挂连接词残段（「…但我不是。不过|如果我要排队」→「…但我不是。|不过如果我要排队」）。
+    // 守卫：句末切点离硬切位置 ≤10 字（原窗口）且首行宽 ≥ maxW/2（不为贴句末牺牲可读性），
+    // 剩余 ≤ maxW（不折出第 3 行）；无句末切点或守卫不过 → 维持原「最近合法切点」行为。
     const lo = Math.max(1, c - 10);
-    for (let cut = c; cut > lo; cut--) {
-      if (!inAtom(cut) && effPrio(cut) >= 2 && textWidth(s.slice(cut)) <= maxW + 1e-9) return cut;
+    let near = -1, sentCut = -1;
+    for (let cut = c; cut >= lo; cut--) {
+      if (inAtom(cut)) continue;
+      const p = effPrio(cut);
+      if (textWidth(s.slice(cut)) > maxW + 1e-9) continue; // 跳过会产生额外行的切点
+      if (p >= 2 && near < 0) near = cut;     // 最近合法切点（原行为）
+      // 句末切点后跟空格（拉丁 "Stop!| Don't"）→ 不取，交给空格切点（near 已覆盖）
+      if (p === 5 && sentCut < 0 && pos[cut] !== ' ' && pos[cut] !== '\u3000') sentCut = cut;
+      if (near >= 0 && sentCut >= 0) break;
     }
+    if (sentCut >= 0 && textWidth(pos.slice(0, sentCut).join('')) >= maxW / 2) return sentCut;
+    if (near >= 0) return near;
     // 4) 兜底：若附近没有，在 [1, c]（不超硬切宽度）范围内找最高优先级断点（同级取更靠后的，行尽量满）。
     //    约束：剩余文本 ≤ maxW，否则会折出孤儿行+第 3 行（24 宽文本断在「，」处只剩 2 字第一行+ 22 字剩余）。
     let best = -1, bestP = 0;
