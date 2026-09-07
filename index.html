@@ -142,6 +142,10 @@
   .issue{color:var(--warn);margin:2px 0}
   .drop-note{color:var(--del);font-size:12px;font-style:italic}
   .footer{margin-top:18px;font-size:11px;color:var(--mut);text-align:center;letter-spacing:.3px}
+  .footer-oss{margin-top:6px;font-size:11px;text-align:center;letter-spacing:.3px}
+  .footer-oss a{color:var(--mut);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color .15s}
+  .footer-oss a:hover{color:var(--acc)}
+  .footer-oss svg{width:13px;height:13px;fill:currentColor;flex:none}
   .seg{margin:8px 0;border-left:3px solid var(--acc);padding:0 10px;font-size:12px}
 </style>
 </head>
@@ -149,7 +153,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.25</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.26</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -297,6 +301,7 @@
   <!--SEO-COPY-END-->
 
   <div class="footer" data-page-node-id="V2DGSIREjxUEHMJB72TEQk" data-i18n="footer">规则引擎 srt-core.js · 支持多语言互译 · 折行口径：CJK/全角=1 字、半角每 2 字符=1 字，整条超阈值才折、每行 ≤ 阈值</div>
+  <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 </div>
 
 <script src="srt-core.js"></script>
