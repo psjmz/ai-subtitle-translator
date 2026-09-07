@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>SRT 工具 · 管理后台</title>
+<title>AI 字幕工具 · 管理后台</title>
 <style>
   :root{
     --bg:#f6f7f9; --card:#fff; --line:#e4e7ec; --txt:#1f2328; --mut:#6a737d;
@@ -33,6 +33,13 @@
   .usage b{color:var(--txt)}
   .note{font-size:12px;color:var(--mut);margin-top:6px}
   .mask{color:var(--mut);font-family:monospace;font-size:13px}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .chip{font-size:12px;background:#f4f6f9;border-radius:16px;padding:4px 12px;color:var(--mut)}
+  .chip b{color:var(--txt)}
+  .tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .tbl th,.tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+  .tbl th{color:var(--mut);font-weight:500;font-size:12px}
+  .tbl tr:hover td{background:#f8fafc}
 </style>
 </head>
 <body>
@@ -91,6 +98,19 @@
       </div>
       <div class="usage" id="usage"></div>
       <div class="msg" id="cfgMsg"></div>
+    </div>
+
+    <div class="card" id="eventsCard" style="display:none">
+      <h2>📊 使用记录（用户在翻译什么）</h2>
+      <div class="stats" id="evStats"></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th></tr></thead>
+          <tbody id="evRows"></tbody>
+        </table>
+      </div>
+      <div class="note">仅记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数；不记录字幕内容。自带 API Key 的翻译不经过服务器，无法统计。同 IP 同文件 30 分钟内算一次会话。</div>
+      <div class="btns"><button id="btnRefreshEvents">刷新</button></div>
     </div>
 
     <div class="card">
@@ -181,7 +201,36 @@ async function enterAdmin(){
   show('loginCard', false); show('main', true);
   try { await loadConfig(); }
   catch (e) { msg('cfgMsg', '读取配置失败：' + e.message, 'err'); }
+  loadEvents();
 }
+
+/* 使用行为记录 */
+function evTime(ts){
+  const d = new Date(ts);
+  const p = n => String(n).padStart(2, '0');
+  return (d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function esc(s){ const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+async function loadEvents(){
+  try {
+    const j = await api('/api/admin/events?limit=100');
+    show('eventsCard', true);
+    const chips = [];
+    chips.push('今日 <b>' + j.today.count + '</b> 个翻译会话');
+    if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
+    if (j.today.batches) chips.push('<b>' + j.today.batches + '</b> 次请求');
+    if (j.topFiles && j.topFiles[0]) chips.push('最常翻译：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
+    if (j.topLangs && j.topLangs[0]) chips.push('最热目标语：<b>' + esc(j.topLangs[0].name) + '</b> ×' + j.topLangs[0].n);
+    chips.push('累计 <b>' + j.total + '</b> 条');
+    $('evStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+    $('evRows').innerHTML = (j.events || []).map(e =>
+      '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) + '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
+      '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || 1) + '</td></tr>'
+    ).join('') || '<tr><td colspan="6" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
+  }
+  catch (e) { /* 记录区加载失败不影响主配置页 */ }
+}
+$('btnRefreshEvents').addEventListener('click', loadEvents);
 
 /* 初始化：有 token 直接进，否则显示登录 */
 (async function init(){

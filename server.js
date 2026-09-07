@@ -64,6 +64,45 @@ function readUsage(){
 }
 function writeUsage(u){ fs.writeFileSync(USAGE_PATH, JSON.stringify(u), 'utf8'); }
 
+/* ---------------- 使用行为记录（仅元数据：文件名/语言/条数，不含字幕内容） ---------------- */
+const EVENTS_PATH = path.join(DATA_DIR, 'events.json');
+const EVENTS_MAX = 3000;             // 最多保留条数（防无限增长，超出裁掉最旧的）
+const EVENT_DEDUP_MS = 30 * 60 * 1000; // 同 IP 同文件同语言 30 分钟内视为同一会话（批次累加）
+function readEvents(){
+  try {
+    const j = JSON.parse(fs.readFileSync(EVENTS_PATH, 'utf8'));
+    if (Array.isArray(j.events)) return j;
+  } catch (e) {}
+  return { events: [] };
+}
+function appendEvent(ip, meta){
+  if (!meta || typeof meta !== 'object') return;
+  const now = Date.now();
+  const file = String(meta.file || '').replace(/[\x00-\x1f]/g, '').slice(0, 120);
+  const lang = String(meta.lang || '').slice(0, 10);
+  const cues = Math.max(0, Math.floor(+meta.cues || 0));
+  if (!file && !lang) return; // 无有效元数据（老版前端/异常请求）不记
+  const db = readEvents();
+  // 会话去重：从尾部找同 ip+file+lang 且时间窗口内的记录 → 批次 +1
+  for (let i = db.events.length - 1; i >= 0; i--) {
+    const e = db.events[i];
+    if (e.ip === ip && e.file === file && e.lang === lang && now - e.t < EVENT_DEDUP_MS) {
+      e.batches = (e.batches || 1) + 1;
+      if (cues > (e.cues || 0)) e.cues = cues;
+      fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+      return;
+    }
+    if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
+  }
+  db.events.push({ t: now, ip, file, lang, cues, batches: 1 });
+  if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
+  fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+}
+function dateOfTs(ts){
+  const d = new Date(ts);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
 /* ---------------- 管理会话（内存 token） ---------------- */
 const TOKENS = new Set();
 function newToken(){ const tk = crypto.randomBytes(24).toString('hex'); TOKENS.add(tk); return tk; }
@@ -511,6 +550,7 @@ const server = http.createServer(async (req, res) => {
       usage.ips[ip] = ipUsed + 1;
       usage.global += 1;
       writeUsage(usage);
+      try { appendEvent(ip, body.meta); } catch (e) {} // 行为记录失败不影响翻译主流程
       try {
         const out = await callModel(cfg, body.messages, undefined);
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
@@ -555,6 +595,27 @@ const server = http.createServer(async (req, res) => {
           publicUrl: cfg.publicUrl || '',
           analyticsId: cfg.analyticsId || '',
           usedToday: usage.global, usedIps: Object.keys(usage.ips).length
+        });
+      }
+
+      /* 使用行为记录：最近事件 + 统计汇总（?limit=N 控制返回条数，默认 100，上限 500） */
+      if (req.method === 'GET' && u === '/api/admin/events') {
+        const qLimit = Math.min(500, Math.max(1, parseInt((req.url.split('?')[1]||'').split('=').pop(), 10) || 100));
+        const db = readEvents();
+        const all = db.events;
+        const today = todayStr();
+        const todays = all.filter(e => dateOfTs(e.t) === today);
+        const cnt = (arr, key) => {
+          const m = new Map();
+          for (const e of arr) { const k = e[key] || '(空)'; m.set(k, (m.get(k) || 0) + 1); }
+          return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n }));
+        };
+        return sendJson(res, 200, {
+          total: all.length,
+          today: { count: todays.length, ips: new Set(todays.map(e => e.ip)).size, batches: todays.reduce((s, e) => s + (e.batches || 1), 0) },
+          topFiles: cnt(all, 'file'),
+          topLangs: cnt(all, 'lang'),
+          events: all.slice(-qLimit).reverse() // 最新在前
         });
       }
 

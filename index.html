@@ -153,7 +153,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.26</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.27</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -1749,7 +1749,7 @@ async function chatOnce(base,key,model,msgs){
       method:'POST',
       headers,
       body:JSON.stringify(builtin
-        ? {messages:msgs,temperature:0.2,stream:false}
+        ? {messages:msgs,temperature:0.2,stream:false,meta:S.trMeta||undefined}
         : {model,messages:msgs,temperature:0.2,stream:false}),
       signal:ctl.signal
     });
@@ -1892,6 +1892,8 @@ async function runTranslate(){
   const effModel= cfg.mode==='builtin' ? '' : cfg.model;
   const maxTry  = 3;
   let lastCall = 0;
+  // 云端翻译（builtin）时随请求捎带会话元数据（仅 文件名/目标语言/条数，不含字幕内容），供站点运营统计
+  S.trMeta = cfg.mode==='builtin' ? { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length } : null;
 
   clearLog();
   S.translating=true; S.stop=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.locale=cfg.dst;
