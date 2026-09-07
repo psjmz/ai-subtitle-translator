@@ -107,9 +107,26 @@
   .stat.warn b{color:var(--warn)} .stat.ok b{color:var(--ok)} .stat.del b{color:var(--del)}
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
   .toolbar select{width:auto;font-size:12.5px}
-  .prog{flex:1;min-width:120px;height:6px;background:#E4EEEC;border-radius:99px;overflow:hidden;display:none;border:1px solid var(--line)}
-  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),#3FB9AE);transition:width .2s}
-  .prog.show{display:block}
+  /* v0.9.28 进度显示：sticky 仪表卡 + 斜纹动画 + 大号百分比 */
+  .progwrap{position:sticky;top:8px;z-index:30;display:none;align-items:center;gap:14px;background:var(--card);border:1px solid var(--acc-line);box-shadow:0 4px 14px rgba(14,148,136,.13);border-radius:12px;padding:10px 16px;margin-bottom:10px}
+  .progwrap.show{display:flex}
+  .pg-badge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--acc);background:var(--acc-weak);border-radius:99px;padding:5px 12px;white-space:nowrap;flex:none}
+  .pg-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:pgblink 1.1s ease-in-out infinite;flex:none}
+  @keyframes pgblink{50%{opacity:.22}}
+  .pg-main{flex:1;min-width:0}
+  .pg-row{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+  .pg-pct{font-size:21px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums;line-height:1;min-width:52px}
+  .pg-info{font-size:12px;color:var(--sub);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .pg-eta{font-size:12px;color:var(--acc);font-family:var(--mono);margin-left:auto;white-space:nowrap;flex:none}
+  .prog{height:14px;background:#E4EEEC;border-radius:99px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),#3FB9AE);transition:width .25s}
+  .prog.run i{background-image:repeating-linear-gradient(-55deg,rgba(255,255,255,.25) 0 9px,rgba(255,255,255,0) 9px 18px),linear-gradient(90deg,var(--acc),#3FB9AE);background-size:26px 100%,100% 100%;animation:pgflow .9s linear infinite}
+  @keyframes pgflow{to{background-position:26px 0,0 0}}
+  .progwrap.done{border-color:#8FD6A8}
+  .progwrap.done .pg-pct{color:#1E9E5A}
+  .progwrap.done .pg-badge{color:#1E9E5A;background:#E4F5EB}
+  .progwrap.done .pg-dot{background:#1E9E5A;animation:none}
+  .progwrap.done .prog i{background:linear-gradient(90deg,#1E9E5A,#3BC46F)}
   .prtxt{font-size:12px;color:var(--sub);font-family:var(--mono)}
   /* cue rows */
   .cuegrid{display:grid;grid-template-columns:52px 158px 1fr 1fr;gap:8px;align-items:center;
@@ -153,7 +170,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.27</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.28</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -201,6 +218,7 @@
         <div class="hint" id="termsHint" style="margin-top:2px" data-page-node-id="mFblWCcO4Q2sH2GMDCeLqo">勾选 = 保留原文；取消勾选 = 全部译为目标语言。此开关关闭时下方术语表不生效。</div>
         <label data-page-node-id="Mxih3slwTugDEl755okAwB" data-i18n="lblTerms">需强制保留原文的专名（可留空，逗号分隔）</label>
         <input type="text" id="terms" placeholder="如：SpaceX, Prism, EnduroSat" data-i18n-ph="termsPh" data-page-node-id="H7C8HKb5FClsDcSR5Tk9HM">
+        <label class="chk" style="margin-top:10px" data-page-node-id="G7wQxT9mL2vNaR4hKj1sXb"><input type="checkbox" id="autoTerms" checked data-page-node-id="H3kRwPq5VmL8dNc2JxT4yU"><span data-i18n="chkAutoTerms">自动术语表：翻译前自动提取专名与歧义词，统一全片译法</span></label>
       </div>
 
       <div class="card" data-page-node-id="HXMHfs18ST8n9Ch3hhBkhR">
@@ -271,8 +289,17 @@
           <option value="done" data-page-node-id="jEUNhJbyWruwMg3USu49vx" data-i18n="fDone">仅已译</option>
           <option value="flag" data-page-node-id="Pr1oU2ARrTkPEfGwRPJosa" data-i18n="fFlag">仅特殊处理</option>
         </select>
-        <span class="prtxt" id="prText" data-page-node-id="8pgW8DbHgweimzK8h85ayP"></span>
-        <span class="prog" id="prog" data-page-node-id="tiQ71YHWAXcWedXVPyv4fx"><i data-page-node-id="QthWmOVNSYRMPAlKsVh9OY"></i></span>
+      </div>
+      <div class="progwrap" id="progWrap" data-page-node-id="tiQ71YHWAXcWedXVPyv4fx">
+        <span class="pg-badge"><i class="pg-dot"></i><span id="pgState" data-page-node-id="QthWmOVNSYRMPAlKsVh9OY">…</span></span>
+        <div class="pg-main">
+          <div class="pg-row">
+            <span class="pg-pct" id="pgPct">0%</span>
+            <span class="pg-info" id="prText" data-page-node-id="8pgW8DbHgweimzK8h85ayP"></span>
+            <span class="pg-eta" id="pgEta"></span>
+          </div>
+          <div class="prog" id="prog"><i></i></div>
+        </div>
       </div>
       <div class="lst" data-page-node-id="kj7lZrKelW0vM3yK2B99vA">
         <div class="cuegrid head" data-page-node-id="xkWHihUx7ifFz23BLGy3As">
@@ -419,6 +446,9 @@ const I18N = {
   mergedNote:'已并入上一条字幕（时间轴合并）',
   startT:'开始整片翻译：{0} → {1}，共 {2} 条，每批 {3} 条。',
   batchProg:'第 {0}/{1} 批（句组 {2}–{3}）…',
+  pgRun:'翻译中', pgEta:'预计剩余 {0}', pgDone:'✓ 完成 · 用时 {0}',
+  chkAutoTerms:'自动术语表：翻译前自动提取专名与歧义词，统一全片译法',
+  autoTermsRun:'正在提取术语表（专名/歧义词）…', autoTermsDone:'自动术语表就绪：{0} 个术语已统一译法', autoTermsSkip:'术语提取失败，跳过后继续翻译：{0}',
   batchDone:'批 {0}/{1} 完成{2}。', retried:'（重试{0}次后成功）', anchorKeep:'⚠️ 句组 {0} 译文可能不是{1}，已按原样保留', anchorRefix:'{0} 个句组译文语言跑偏，已通过单组重译全部恢复',
   overCapStart:'检测到 {0} 个句组译文过长（超出该时长内可显示的 2 行容量），压缩重译中…', overCapDone:'超容压缩完成：{0}/{1} 个句组已收进容量。', overCapFail:'超容压缩重译失败，过长句组按原样保留。', overCapCallFail:'压缩重译第 {0} 次失败：{1}',
   batchFail:'批 {0} 第 {1} 次失败：{2}', batchSkip:'该批跳过，可在完成后整篇重试。',
@@ -482,6 +512,9 @@ const I18N = {
   mergedNote:'已併入上一條字幕（時間軸合併）',
   startT:'開始整片翻譯：{0} → {1}，共 {2} 條，每批 {3} 條。',
   batchProg:'第 {0}/{1} 批（句組 {2}–{3}）…',
+  pgRun:'翻譯中', pgEta:'預計剩餘 {0}', pgDone:'✓ 完成 · 用時 {0}',
+  chkAutoTerms:'自動術語表：翻譯前自動提取專名與歧義詞，統一全片譯法',
+  autoTermsRun:'正在提取術語表（專名/歧義詞）…', autoTermsDone:'自動術語表就緒：{0} 個術語已統一譯法', autoTermsSkip:'術語提取失敗，跳過後繼續翻譯：{0}',
   batchDone:'批 {0}/{1} 完成{2}。', retried:'（重試{0}次後成功）', anchorKeep:'⚠️ 句組 {0} 譯文可能不是{1}，已按原樣保留', anchorRefix:'{0} 個句組譯文語言跑偏，已透過單組重譯全部恢復',
   overCapStart:'偵測到 {0} 個句組譯文過長（超出該時長內可顯示的 2 行容量），壓縮重譯中…', overCapDone:'超容壓縮完成：{0}/{1} 個句組已收進容量。', overCapFail:'超容壓縮重譯失敗，過長句組按原樣保留。', overCapCallFail:'壓縮重譯第 {0} 次失敗：{1}',
   batchFail:'批 {0} 第 {1} 次失敗：{2}', batchSkip:'該批跳過，可在完成後整篇重試。',
@@ -545,6 +578,9 @@ const I18N = {
   mergedNote:'Merged into the previous cue (timeline merged)',
   startT:'Translating: {0} → {1}, {2} cues, {3} per batch.',
   batchProg:'Batch {0}/{1} (sentences {2}–{3})…',
+  pgRun:'Translating', pgEta:'ETA {0}', pgDone:'✓ Done · {0}',
+  chkAutoTerms:'Auto glossary: extract proper nouns & ambiguous terms before translating for file-wide consistency',
+  autoTermsRun:'Extracting glossary (proper nouns / ambiguous terms)…', autoTermsDone:'Auto glossary ready: {0} terms unified', autoTermsSkip:'Glossary extraction failed, continuing without it: {0}',
   batchDone:'Batch {0}/{1} done{2}.', retried:' (after {0} retries)', anchorKeep:'⚠️ Groups {0}: translation may not be in {1}; kept as is', anchorRefix:'{0} drifted group(s) fully recovered via isolated re-translation',
   overCapStart:'Detected {0} group(s) with translations too long for the screen (over 2 lines), re-translating more concisely…', overCapDone:'Length compression done: {0}/{1} group(s) now fit.', overCapFail:'Length compression failed; over-long groups kept as-is.', overCapCallFail:'Compression attempt {0} failed: {1}',
   batchFail:'Batch {0} attempt {1} failed: {2}', batchSkip:'Batch skipped; you can re-run the whole file later.',
@@ -608,6 +644,9 @@ const I18N = {
   mergedNote:'前の字幕に統合済み（タイムライン統合）',
   startT:'翻訳開始：{0} → {1}、全 {2} 件、1バッチ {3} 件。',
   batchProg:'バッチ {0}/{1}（文グループ {2}–{3}）…',
+  pgRun:'翻訳中', pgEta:'残り約 {0}', pgDone:'✓ 完了 · 所要 {0}',
+  chkAutoTerms:'自動用語集：翻訳前に固有名詞・曖昧語を抽出し、全編の訳を統一',
+  autoTermsRun:'用語集を抽出中（固有名詞・曖昧語）…', autoTermsDone:'自動用語集：{0} 語の訳を統一', autoTermsSkip:'用語集の抽出に失敗、スキップして翻訳を継続：{0}',
   batchDone:'バッチ {0}/{1} 完了{2}。', retried:'（{0}回再試行後に成功）', anchorKeep:'⚠️ グループ {0} の訳文は{1}ではない可能性があるため、そのまま保持しました', anchorRefix:'言語が逸脱した {0} グループを個別再翻訳で全件復元しました',
   overCapStart:'画面の2行容量を超える長い訳文の句組が {0} 件検出されました。圧縮して再翻訳中…', overCapDone:'圧縮再翻訳完了：{0}/{1} 件が容量内に収まりました。', overCapFail:'圧縮再翻訳に失敗したため、長すぎる句組はそのまま保持します。', overCapCallFail:'圧縮再翻訳の第 {0} 回目が失敗：{1}',
   batchFail:'バッチ {0} の第 {1} 回失敗：{2}', batchSkip:'このバッチはスキップ。後で全体を再実行できます。',
@@ -671,6 +710,9 @@ const I18N = {
   mergedNote:'Fusionado en el subtítulo anterior (línea de tiempo fusionada)',
   startT:'Traduciendo: {0} → {1}, {2} subtítulos, {3} por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
+  pgRun:'Traduciendo', pgEta:'Faltan {0}', pgDone:'✓ Listo · {0}',
+  chkAutoTerms:'Glosario automático: extrae nombres propios y términos ambiguos antes de traducir para uniformar todo el archivo',
+  autoTermsRun:'Extrayendo glosario (nombres propios / términos ambiguos)…', autoTermsDone:'Glosario automático listo: {0} términos unificados', autoTermsSkip:'Falló la extracción del glosario, se continúa sin él: {0}',
   batchDone:'Lote {0}/{1} terminado{2}.', retried:' (tras {0} reintentos)', anchorKeep:'⚠️ Grupos {0}: la traducción podría no estar en {1}; se mantienen tal cual', anchorRefix:'{0} grupo(s) desviados se recuperaron por completo mediante retraducción individual',
   overCapStart:'Detectadas {0} traducciones demasiado largas para la pantalla (más de 2 líneas); se retraducen de forma más concisa…', overCapDone:'Compresión completada: {0}/{1} grupos ahora caben.', overCapFail:'La compresión falló; los grupos demasiado largos se mantienen tal cual.', overCapCallFail:'Intento de compresión {0} fallido: {1}',
   batchFail:'Lote {0} intento {1} falló: {2}', batchSkip:'Lote omitido; puedes reejecutar todo el archivo más tarde.',
@@ -734,6 +776,9 @@ const I18N = {
   mergedNote:'Fundida na legenda anterior (linha do tempo fundida)',
   startT:'Traduzindo: {0} → {1}, {2} legendas, {3} por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
+  pgRun:'Traduzindo', pgEta:'Faltam {0}', pgDone:'✓ Concluído · {0}',
+  chkAutoTerms:'Glossário automático: extrai nomes próprios e termos ambíguos antes de traduzir para uniformar o arquivo todo',
+  autoTermsRun:'Extraindo glossário (nomes próprios / termos ambíguos)…', autoTermsDone:'Glossário automático pronto: {0} termos unificados', autoTermsSkip:'Falha na extração do glossário, continuando sem ele: {0}',
   batchDone:'Lote {0}/{1} concluído{2}.', retried:' (após {0} tentativas)', anchorKeep:'⚠️ Grupos {0}: a tradução pode não estar em {1}; mantidos como estão', anchorRefix:'{0} grupo(s) desviados recuperados por completo por retradução individual',
   overCapStart:'Detectadas {0} traduções longas demais para a tela (mais de 2 linhas); retraduzindo de forma mais concisa…', overCapDone:'Compressão concluída: {0}/{1} grupos agora cabem.', overCapFail:'A compressão falhou; os grupos longos demais foram mantidos como estão.', overCapCallFail:'Tentativa de compressão {0} falhou: {1}',
   batchFail:'Lote {0} tentativa {1} falhou: {2}', batchSkip:'Lote ignorado; você pode reexecutar o arquivo inteiro depois.',
@@ -797,6 +842,9 @@ const I18N = {
   mergedNote:'이전 자막에 병합됨(타임라인 병합)',
   startT:'번역 시작: {0} → {1}, 총 {2}개, 배치당 {3}개.',
   batchProg:'배치 {0}/{1}(문장 그룹 {2}–{3})…',
+  pgRun:'번역 중', pgEta:'남은 시간 약 {0}', pgDone:'✓ 완료 · 소요 {0}',
+  chkAutoTerms:'자동 용어집: 번역 전 고유명사와 애매한 단어를 추출하여 전체에서 번역을 통일',
+  autoTermsRun:'용어집 추출 중(고유명사·애매한 단어)…', autoTermsDone:'자동 용어집: {0}개 용어 번역 통일', autoTermsSkip:'용어집 추출 실패, 건너뛰고 계속 진행: {0}',
   batchDone:'배치 {0}/{1} 완료{2}.', retried:'({0}회 재시도 후 성공)', anchorKeep:'⚠️ 그룹 {0}의 번역이 {1}가 아닐 수 있어 그대로 유지했어요', anchorRefix:'언어가 이탈한 그룹 {0}개를 개별 재번역으로 모두 복구했어요',
   overCapStart:'화면 2줄 용량을 초과하는 번역 그룹 {0}개를 발견했습니다. 압축 재번역 중…', overCapDone:'압축 재번역 완료: {0}/{1}개 그룹이 용량 안에 들어맞습니다.', overCapFail:'압축 재번역에 실패하여 과도하게 긴 그룹은 그대로 유지합니다.', overCapCallFail:'압축 재번역 {0}번째 시도 실패: {1}',
   batchFail:'배치 {0} {1}번째 시도 실패: {2}', batchSkip:'이 배치는 건너뛰었습니다; 나중에 전체를 다시 실행할 수 있습니다.',
@@ -860,6 +908,9 @@ const I18N = {
   mergedNote:'In den vorherigen Untertitel zusammengeführt (Zeitleiste vereint)',
   startT:'Übersetze: {0} → {1}, {2} Untertitel, {3} pro Batch.',
   batchProg:'Batch {0}/{1} (Sätze {2}–{3})…',
+  pgRun:'Übersetzung läuft', pgEta:'Noch {0}', pgDone:'✓ Fertig · {0}',
+  chkAutoTerms:'Auto-Glossar: extrahiert vor der Übersetzung Eigennamen und mehrdeutige Begriffe, um dateiweite Einheitlichkeit zu sichern',
+  autoTermsRun:'Glossar wird extrahiert (Eigennamen / mehrdeutige Begriffe)…', autoTermsDone:'Auto-Glossar bereit: {0} Begriffe vereinheitlicht', autoTermsSkip:'Glossar-Extraktion fehlgeschlagen, wird ohne fortgesetzt: {0}',
   batchDone:'Batch {0}/{1} fertig{2}.', retried:' (nach {0} Wiederholungen)', anchorKeep:'⚠️ Gruppen {0}: Die Übersetzung ist möglicherweise nicht {1}; unverändert übernommen', anchorRefix:'{0} abgewichene Gruppe(n) durch Einzel-Re-Übersetzung vollständig wiederhergestellt',
   overCapStart:'{0} Gruppe(n) mit zu langen Übersetzungen für den Bildschirm (mehr als 2 Zeilen) erkannt – werde kürzer neu übersetzen…', overCapDone:'Kürzung abgeschlossen: {0}/{1} Gruppen passen jetzt.', overCapFail:'Kürzung fehlgeschlagen; zu lange Gruppen bleiben unverändert.', overCapCallFail:'Kürzungsversuch {0} fehlgeschlagen: {1}',
   batchFail:'Batch {0} Versuch {1} fehlgeschlagen: {2}', batchSkip:'Batch übersprungen; Sie können die ganze Datei später erneut ausführen.',
@@ -923,6 +974,9 @@ const I18N = {
   mergedNote:'Fusionné dans le sous-titre précédent (timeline fusionnée)',
   startT:'Traduction : {0} → {1}, {2} sous-titres, {3} par lot.',
   batchProg:'Lot {0}/{1} (phrases {2}–{3})…',
+  pgRun:'Traduction', pgEta:'Reste {0}', pgDone:'✓ Terminé · {0}',
+  chkAutoTerms:'Glossaire auto : extrait avant traduction les noms propres et termes ambigus pour uniformiser tout le fichier',
+  autoTermsRun:'Extraction du glossaire (noms propres / termes ambigus)…', autoTermsDone:'Glossaire auto prêt : {0} termes unifiés', autoTermsSkip:'Échec de l\'extraction du glossaire, poursuite sans : {0}',
   batchDone:'Lot {0}/{1} terminé{2}.', retried:' (après {0} tentatives)', anchorKeep:'⚠️ Groupes {0} : la traduction pourrait ne pas être en {1} ; conservée telle quelle', anchorRefix:'{0} groupe(s) déviés entièrement récupérés par retraduction individuelle',
   overCapStart:'{0} groupe(s) avec des traductions trop longues pour l’écran (plus de 2 lignes) détecté(s), retraduction plus concise en cours…', overCapDone:'Compression terminée : {0}/{1} groupe(s) tiennent maintenant.', overCapFail:'La compression a échoué ; les groupes trop longs sont conservés tels quels.', overCapCallFail:'Tentative de compression {0} échouée : {1}',
   batchFail:'Lot {0} tentative {1} échouée : {2}', batchSkip:'Lot ignoré ; vous pourrez relancer tout le fichier plus tard.',
@@ -986,6 +1040,9 @@ const I18N = {
   mergedNote:'Digabung ke subtitle sebelumnya (timeline digabung)',
   startT:'Menerjemahkan: {0} → {1}, {2} subtitle, {3} per batch.',
   batchProg:'Batch {0}/{1} (kalimat {2}–{3})…',
+  pgRun:'Menerjemahkan', pgEta:'Sisa {0}', pgDone:'✓ Selesai · {0}',
+  chkAutoTerms:'Glosarium otomatis: mengekstrak nama diri & istilah ambigu sebelum menerjemahkan agar seragam di seluruh file',
+  autoTermsRun:'Mengekstrak glosarium (nama diri / istilah ambigu)…', autoTermsDone:'Glosarium otomatis siap: {0} istilah diseragamkan', autoTermsSkip:'Ekstraksi glosarium gagal, dilanjutkan tanpa itu: {0}',
   batchDone:'Batch {0}/{1} selesai{2}.', retried:' (setelah {0} percobaan)', anchorKeep:'⚠️ Grup {0}: terjemahan mungkin bukan dalam {1}; tetap dipertahankan', anchorRefix:'{0} grup yang melenceng sepenuhnya dipulihkan lewat penerjemahan ulang terpisah',
   overCapStart:'Terdeteksi {0} grup dengan terjemahan terlalu panjang untuk layar (lebih dari 2 baris), menerjemahkan ulang secara lebih ringkas…', overCapDone:'Pemadatan selesai: {0}/{1} grup kini muat.', overCapFail:'Pemadatan gagal; grup yang terlalu panjang tetap dipertahankan.', overCapCallFail:'Percobaan pemadatan {0} gagal: {1}',
   batchFail:'Batch {0} percobaan {1} gagal: {2}', batchSkip:'Batch dilewati; Anda bisa menjalankan ulang seluruh file nanti.',
@@ -1049,6 +1106,9 @@ const I18N = {
   mergedNote:'पिछले सबटाइटल में विलय (टाइमलाइन विलय)',
   startT:'अनुवाद शुरू: {0} → {1}, {2} सबटाइटल, प्रति बैच {3}।',
   batchProg:'बैच {0}/{1} (वाक्य {2}–{3})…',
+  pgRun:'अनुवाद हो रहा है', pgEta:'शेष {0}', pgDone:'✓ पूर्ण · समय {0}',
+  chkAutoTerms:'स्वचालित शब्दावली: अनुवाद से पहले संज्ञाएँ व द्विअर्थी शब्द निकालकर पूरी फ़ाइल में एकरूपता लाता है',
+  autoTermsRun:'शब्दावली निकाली जा रही है (संज्ञाएँ / द्विअर्थी शब्द)…', autoTermsDone:'स्वचालित शब्दावली तैयार: {0} शब्द एकरूप', autoTermsSkip:'शब्दावली निकालने में विफल, इसके बिना जारी: {0}',
   batchDone:'बैच {0}/{1} पूर्ण{2}।', retried:' ({0} पुनः प्रयास बाद)', anchorKeep:'⚠️ समूह {0}: अनुवाद {1} में नहीं हो सकता; जैसा है वैसा रखा गया', anchorRefix:'विचलित {0} समूह अलग पुनर्अनुवाद से पूरी तरह बहाल किए गए',
   overCapStart:'स्क्रीन की 2-पंक्ति क्षमता से अधिक लंबे अनुवाद वाले {0} समूह मिले, अधिक संक्षिप्त रूप से पुनः अनुवाद हो रहे हैं…', overCapDone:'संपीडन पूर्ण: {0}/{1} समूह अब क्षमता में आ गए।', overCapFail:'संपीडन विफल; बहुत लंबे समूह जस के तस रखे गए।', overCapCallFail:'संपीडन प्रयास {0} विफल: {1}',
   batchFail:'बैच {0} प्रयास {1} असफल: {2}', batchSkip:'बैच छोड़ा गया; बाद में पूरी फ़ाइल दोबारा चला सकते हैं।',
@@ -1112,6 +1172,9 @@ const I18N = {
   mergedNote:'รวมเข้าซับไตเติลก่อนหน้า (รวมไทม์ไลน์)',
   startT:'เริ่มแปลทั้งไฟล์: {0} → {1} รวม {2} ซับ ละ {3} ต่อแบตช์',
   batchProg:'แบตช์ {0}/{1} (กลุ่มประโยค {2}–{3})…',
+  pgRun:'กำลังแปล', pgEta:'เหลืออีก {0}', pgDone:'✓ เสร็จ · ใช้เวลา {0}',
+  chkAutoTerms:'คลังศัพท์อัตโนมัติ: ดึงชื่อเฉพาะและคำคลุมเครือก่อนแปลเพื่อความสม่ำเสมอทั้งไฟล์',
+  autoTermsRun:'กำลังดึงคลังศัพท์ (ชื่อเฉพาะ / คำคลุมเครือ)…', autoTermsDone:'คลังศัพท์พร้อม: รวม {0} คำ', autoTermsSkip:'ดึงคลังศัพท์ไม่สำเร็จ ข้ามและทำต่อ: {0}',
   batchDone:'แบตช์ {0}/{1} เสร็จ{2}', retried:' (สำเร็จหลังลองใหม่ {0} ครั้ง)', anchorKeep:'⚠️ กลุ่ม {0} คำแปลอาจไม่ใช่{1} จึงเก็บไว้ตามเดิม', anchorRefix:'กลุ่มที่ภาษาเพี้ยน {0} กลุ่ม กู้คืนครบด้วยการแปลใหม่รายกลุ่มแล้ว',
   overCapStart:'พบคำแปลที่ยาวเกินความจุ 2 บรรทัดบนจอ {0} กลุ่ม กำลังแปลใหม่แบบกระชับ…', overCapDone:'บีบอัดเสร็จสมบูรณ์: {0}/{1} กลุ่มเข้าได้ในความจุแล้ว', overCapFail:'บีบอัดไม่สำเร็จ กลุ่มที่ยาวเกินคงไว้ตามเดิม', overCapCallFail:'ความพยายามบีบอัดครั้งที่ {0} ล้มเหลว: {1}',
   batchFail:'แบตช์ {0} ครั้งที่ {1} ล้มเหลว: {2}', batchSkip:'ข้ามแบตช์นี้ สามารถรันทั้งไฟล์ใหม่ภายหลังได้',
@@ -1175,6 +1238,9 @@ const I18N = {
   mergedNote:'Đã gộp vào phụ đề trước (timeline đã gộp)',
   startT:'Đang dịch: {0} → {1}, {2} phụ đề, {3} mỗi lô.',
   batchProg:'Lô {0}/{1} (câu {2}–{3})…',
+  pgRun:'Đang dịch', pgEta:'Còn lại {0}', pgDone:'✓ Xong · {0}',
+  chkAutoTerms:'Bảng thuật ngữ tự động: trích tên riêng & từ nhiễu nghĩa trước khi dịch để thống nhất cả file',
+  autoTermsRun:'Đang trích bảng thuật ngữ (tên riêng / từ nhiễu nghĩa)…', autoTermsDone:'Bảng thuật ngữ sẵn sàng: {0} thuật ngữ đã thống nhất', autoTermsSkip:'Trích thuật ngữ thất bại, tiếp tục không có nó: {0}',
   batchDone:'Lô {0}/{1} xong{2}.', retried:' (thành công sau {0} lần thử lại)', anchorKeep:'⚠️ Nhóm {0}: bản dịch có thể không phải {1}; giữ nguyên', anchorRefix:'Đã khôi phục hoàn toàn {0} nhóm lệch ngôn ngữ bằng cách dịch lại từng nhóm riêng lẻ',
   overCapStart:'Phát hiện {0} nhóm bản dịch quá dài so với màn hình (trên 2 dòng), đang dịch lại ngắn gọn hơn…', overCapDone:'Nén hoàn tất: {0}/{1} nhóm đã vừa màn hình.', overCapFail:'Nén thất bại; các nhóm quá dài được giữ nguyên.', overCapCallFail:'Lần nén thứ {0} thất bại: {1}',
   batchFail:'Lô {0} lần thử {1} thất bại: {2}', batchSkip:'Lô bị bỏ qua; bạn có thể chạy lại cả file sau.',
@@ -1238,6 +1304,9 @@ const I18N = {
   mergedNote:'Объединено с предыдущим субтитром (таймлайн объединён)',
   startT:'Перевод: {0} → {1}, {2} субтитров, {3} на батч.',
   batchProg:'Батч {0}/{1} (предложения {2}–{3})…',
+  pgRun:'Перевод', pgEta:'Осталось {0}', pgDone:'✓ Готово · за {0}',
+  chkAutoTerms:'Автоглоссарий: перед переводом извлекает имена собственные и неоднозначные термины для единообразия по всему файлу',
+  autoTermsRun:'Извлечение глоссария (имена собственные / неоднозначные термины)…', autoTermsDone:'Автоглоссарий готов: {0} терминов унифицировано', autoTermsSkip:'Не удалось извлечь глоссарий, продолжаем без него: {0}',
   batchDone:'Батч {0}/{1} готов{2}.', retried:' (после {0} повторов)', anchorKeep:'⚠️ Группы {0}: перевод может быть не на {1}; оставлен как есть', anchorRefix:'{0} групп с отклонением языка полностью восстановлены изолированным повторным переводом',
   overCapStart:'Обнаружены группы с переводами длиннее ёмкости экрана (более 2 строк): {0}. Идёт более сжатый повторный перевод…', overCapDone:'Сжатие завершено: {0}/{1} групп помещаются.', overCapFail:'Сжатие не удалось; слишком длинные группы сохранены как есть.', overCapCallFail:'Попытка сжатия {0} не удалась: {1}',
   batchFail:'Батч {0} попытка {1} не удалась: {2}', batchSkip:'Батч пропущен; можно перезапустить весь файл позже.',
@@ -1301,6 +1370,9 @@ const I18N = {
   mergedNote:'Unito nel sottotitolo precedente (timeline unificata)',
   startT:'Traduzione: {0} → {1}, {2} sottotitoli, {3} per batch.',
   batchProg:'Batch {0}/{1} (frasi {2}–{3})…',
+  pgRun:'Traduzione', pgEta:'Mancano {0}', pgDone:'✓ Completato · {0}',
+  chkAutoTerms:'Glossario automatico: estrae nomi propri e termini ambigui prima di tradurre per uniformare l\'intero file',
+  autoTermsRun:'Estrazione del glossario (nomi propri / termini ambigui)…', autoTermsDone:'Glossario automatico pronto: {0} termini unificati', autoTermsSkip:'Estrazione del glossario fallita, si continua senza: {0}',
   batchDone:'Batch {0}/{1} completato{2}.', retried:' (dopo {0} tentativi)', anchorKeep:'⚠️ Gruppi {0}: la traduzione potrebbe non essere in {1}; mantenuta così com\'è', anchorRefix:'{0} gruppi deviati recuperati integralmente con ritraduzione isolata',
   overCapStart:'Rilevati {0} gruppi con traduzioni troppo lunghe per lo schermo (oltre 2 righe), ritraduco in modo più conciso…', overCapDone:'Compressione completata: {0}/{1} gruppi ora entrano.', overCapFail:'Compressione fallita; i gruppi troppo lunghi restano invariati.', overCapCallFail:'Tentativo di compressione {0} fallito: {1}',
   batchFail:'Tentativo {1} del batch {0} non riuscito: {2}', batchSkip:'Batch saltato; puoi rieseguire l\'intero file più tardi.',
@@ -1364,6 +1436,9 @@ const I18N = {
   mergedNote:'دُمجت في الترجمة السابقة (الخط الزمني مدمج)',
   startT:'الترجمة: {0} ← {1}، {2} ترجمة، {3} لكل دفعة.',
   batchProg:'دفعة {0}/{1} (جمل {2}–{3})…',
+  pgRun:'جارٍ الترجمة', pgEta:'متبقي {0}', pgDone:'✓ اكتمل · {0}',
+  chkAutoTerms:'قاموس تلقائي: يستخرج الأسماء الخاصة والمصطلحات الملتبسة قبل الترجمة لتوحيد الترجمة في كامل الملف',
+  autoTermsRun:'جارٍ استخراج القاموس (أسماء خاصة / مصطلحات ملتبسة)…', autoTermsDone:'القاموس التلقائي جاهز: تم توحيد {0} مصطلحًا', autoTermsSkip:'فشل استخراج القاموس، ستتم المتابعة بدونه: {0}',
   batchDone:'اكتملت الدفعة {0}/{1}{2}.', retried:' (بعد {0} محاولات)', anchorKeep:'⚠️ المجموعات {0}: قد لا تكون الترجمة باللغة {1}؛ أُبقيت كما هي', anchorRefix:'تمت استعادة {0} مجموعة منحرفة بالكامل عبر إعادة ترجمة منفردة',
   overCapStart:'تم اكتشاف {0} مجموعة بترجمات أطول من سعة الشاشة (أكثر من سطرين)، تجري إعادة ترجمة أكثر إيجازًا…', overCapDone:'اكتمل الضغط: {0}/{1} مجموعة أصبحت ضمن السعة.', overCapFail:'فشل الضغط؛ تم الإبقاء على المجموعات الطويلة جدًا كما هي.', overCapCallFail:'فشلت محاولة الضغط {0}: {1}',
   batchFail:'فشلت محاولة {1} للدفعة {0}: {2}', batchSkip:'تخطّيت الدفعة؛ يمكنك إعادة تشغيل الملف كاملًا لاحقًا.',
@@ -1427,6 +1502,9 @@ const I18N = {
   mergedNote:'Önceki altyazıyla birleştirildi (zaman çizgisi birleşik)',
   startT:'Çevriliyor: {0} → {1}, {2} altyazı, grup başına {3}.',
   batchProg:'Grup {0}/{1} (cümleler {2}–{3})…',
+  pgRun:'Çevriliyor', pgEta:'Kalan {0}', pgDone:'✓ Tamamlandı · {0}',
+  chkAutoTerms:'Otomatik sözlük: çeviriden önce özel isimleri ve belirsiz terimleri çıkararak tüm dosyada tutarlılık sağlar',
+  autoTermsRun:'Sözlük çıkarılıyor (özel isimler / belirsiz terimler)…', autoTermsDone:'Otomatik sözlük hazır: {0} terim birleştirildi', autoTermsSkip:'Sözlük çıkarılamadı, onsuz devam ediliyor: {0}',
   batchDone:'Grup {0}/{1} tamamlandı{2}.', retried:' ({0} denemeden sonra)', anchorKeep:'⚠️ Gruplar {0}: çeviri {1} olmayabilir; olduğu gibi korundu', anchorRefix:'{0} sapmış grup izole yeniden çeviriyle tamamen kurtarıldı',
   overCapStart:'Ekrana sığmayan (2 satırdan uzun) çevirileri olan {0} grup algılandı, daha kısa yeniden çevriliyor…', overCapDone:'Kısaltma tamamlandı: {0}/{1} grup artık sığıyor.', overCapFail:'Kısaltma başarısız; çok uzun gruplar olduğu gibi korundu.', overCapCallFail:'Kısaltma denemesi {0} başarısız: {1}',
   batchFail:'Grup {0} deneme {1} başarısız: {2}', batchSkip:'Grup atlandı; tüm dosyayı daha sonra yeniden çalıştırabilirsin.',
@@ -1513,7 +1591,53 @@ function log(msg, cls){
 function clearLog(){ $('log').innerHTML = ''; }
 function fmtTC(s,e){ return C.fmtTime(s)+' --> '+C.fmtTime(e); }
 function tcHtml(it){ return '<span class="cue">'+esc(C.fmtTime(it.start))+'<br>'+esc(C.fmtTime(it.end))+'</span>'; }
-function setProg(p, show){ const el=$('prog'); el.style.display=show?'block':'none'; if(show) el.firstChild.style.width=p+'%'; }
+/* v0.9.28 进度仪表卡：sticky 可见 + 大号百分比 + ETA（EMA 平滑）+ 标签页标题进度 + 完成态 */
+const BASE_TITLE = document.title;
+const PG = { t0:0, tAll:0, durs:[], ok:false };
+function fmtDur(sec){
+  sec = Math.max(0, Math.round(sec));
+  const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;
+  return h>0 ? h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0') : m+':'+String(s).padStart(2,'0');
+}
+function setProg(p, show){
+  const w=$('progWrap'); if(!w) return;
+  if(!show){ w.classList.remove('show','done'); $('prog').classList.remove('run'); document.title=BASE_TITLE; return; }
+  w.classList.add('show');
+  $('pgPct').textContent=p+'%';
+  $('prog').firstChild.style.width=p+'%';
+  document.title = (p>0 && p<100) ? (p+'% · '+BASE_TITLE) : BASE_TITLE;
+}
+function pgStart(){
+  PG.t0=0; PG.tAll=Date.now(); PG.durs=[]; PG.ok=false;
+  const w=$('progWrap');
+  if(w){ w.classList.remove('done'); $('prog').classList.add('run'); }
+  const st=$('pgState'); if(st) st.textContent=t('pgRun');
+  $('pgEta').textContent='';
+}
+function pgBatch(bi, totalB){
+  const now=Date.now();
+  if(PG.t0) PG.durs.push((now-PG.t0)/1000);
+  PG.t0=now;
+  setProg(Math.round(bi/totalB*100), true);
+  const etaEl=$('pgEta');
+  if(PG.durs.length>=3 && bi<totalB){
+    const avg=PG.durs.slice(-5).reduce((a,b)=>a+b,0)/Math.min(PG.durs.length,5);
+    etaEl.textContent=t('pgEta', fmtDur((totalB-bi)*avg));
+  }
+}
+function pgFinish(){
+  PG.ok=true;
+  const w=$('progWrap');
+  if(!w || !w.classList.contains('show')) return;
+  $('pgState').textContent=t('pgDone', fmtDur((Date.now()-PG.tAll)/1000));
+  $('pgEta').textContent='';
+  $('prog').classList.remove('run');
+  w.classList.add('done');
+  $('pgPct').textContent='100%';
+  $('prog').firstChild.style.width='100%';
+  document.title=BASE_TITLE;
+  setTimeout(()=>{ if(!S.translating){ setProg(0,false); setPrText(''); } }, 2600);
+}
 function setPrText(t){ $('prText').textContent=t||''; }
 
 // 读取左侧全部设置 → 配置对象（含校验用的错误信息）
@@ -1527,6 +1651,7 @@ function getCfg(){
     styleCustom: $('styleCustom').value.trim(),
     keepTerms: $('keepTerms').checked,
     terms: $('terms').value.trim(),
+    autoTerms: $('autoTerms').checked,
     mode: $('mode').value,
     base: $('base').value.trim(),
     key: $('apikey').value.trim(),
@@ -1675,6 +1800,10 @@ function systemPromptEn(cfg){
        + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists.'
        + (cfg.terms ? ' User-provided terms should also be translated: ' + cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') + '.' : '') + '\n';
   }
+  if (cfg.glossary){
+    s += '4.5 [Glossary] The following terms MUST be rendered exactly as specified, consistently across the whole file (callsigns / proper nouns / jargon, disambiguated from story context; this table takes precedence over rule 4 for these terms):\n'
+       + cfg.glossary.split('\n').map(l=>'  - '+l).join('\n') + '\n';
+  }
   s += '5. [Filler handling — the default behavior is to translate]\n'
    + '   - Normal sentences (any group with substantive content) must be output as type:"text" with a complete translation; this is the default and the vast majority of cases.\n'
    + '   - Only when a cue consists entirely of filler words or sound tags (e.g. "Um.", "[music]") should its cue number be listed in the fillers array; the program will clear that cue.\n'
@@ -1715,6 +1844,10 @@ function systemPrompt(cfg){
        + '的通行译名，严禁保留原文写法：如 Elon Musk→埃隆·马斯克、SpaceX→太空探索技术公司、NASA→美国宇航局、Google→谷歌；即使是很知名的品牌或人名也必须译出；确实没有通行译名的才保留原文。'
        + (cfg.terms ? ' 用户提供的术语也应翻译：' + cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join('、') + '。' : '') + '\n';
   }
+  if (cfg.glossary){
+    s += '4.5【术语表】以下术语必须严格按给定译法、全片统一处理（呼号/专名/军语，译法已按剧情语境确定；这些术语优先于规则4）：\n'
+       + cfg.glossary.split('\n').map(l=>'- '+l).join('\n') + '\n';
+  }
 s += '5.【水词处理——默认行为是翻译】\n'
    + '   - 正常句子（含实义内容的任何句组）一律输出 type:"text" 并提供完整译文；这是默认与绝大多数情况。\n'
    + '   - 仅当某条 cue 整条都只是纯语气词或纯提示词（如 "Um."、"[music]"、"[音乐]"），把该 cue 编号列入 fillers 数组，程序会清空该条字幕。\n'
@@ -1732,6 +1865,14 @@ s += '5.【水词处理——默认行为是翻译】\n'
 function parseLlmJson(raw){
   let s=String(raw||'');
   s=s.replace(/```json|```/g,'').trim();
+  // v0.9.28：术语表等场景返回 JSON 数组——[ 在 { 之前时先按数组解析，失败回落对象路径（对既有调用零影响）
+  const a2=s.indexOf('['), a1=s.indexOf('{');
+  if (a2>=0 && (a1<0 || a2<a1)){
+    const b2=s.lastIndexOf(']');
+    if (b2>a2){
+      try { return JSON.parse(s.slice(a2,b2+1)); } catch(e){}
+    }
+  }
   const a=s.indexOf('{'), b=s.lastIndexOf('}');
   if (a<0||b<=a) throw new Error('返回内容不是 JSON');
   return JSON.parse(s.slice(a,b+1));
@@ -1872,6 +2013,45 @@ async function compressBatch(base,key,model,items,dstLang){
   return byGno;
 }
 
+/* ---------------- 自动术语表（v0.9.28） ----------------
+   翻译前一次调用：仅提取 专名（人名/呼号/地名/机构/品牌/作品）与 语境歧义词（军语/行话/多义词），
+   锁定全片统一译法注入规则 4.5；原文超长时均匀采样覆盖全片。 */
+function sampleSrcText(groups, budget){
+  const texts = groups.filter(g=>!g.filler && g.text).map(g=>g.text);
+  const all = texts.join('\n');
+  if(all.length<=budget) return all;
+  const stride = Math.ceil(all.length/budget);
+  const picked=[]; let len=0;
+  for(let i=0;i<texts.length && len<budget;i+=stride){ picked.push(texts[i]); len+=texts[i].length+1; }
+  return picked.join('\n');
+}
+async function extractGlossary(base,key,model,cfg,srcText){
+  const dstN=LBY(cfg.dst), zhDst=(cfg.dst==='zh-CN'||cfg.dst==='zh-TW');
+  const sys = zhDst
+    ? '你是字幕翻译的术语审定员，负责在翻译开始前锁定全片统一译法。只输出 JSON，不要解释。'
+    : 'You are a terminology curator for subtitle translation, locking file-wide renderings before translation starts. Output JSON only, no explanation.';
+  const usr = zhDst
+    ? '从下面的字幕原文中提取术语表。只收两类：\n'
+      + '① 专有名词：人物名、呼号/代号、地名、机构、品牌、作品名；\n'
+      + '② 语境歧义词：军语、行话、俚语、多义词——正确译法依赖剧情语境，不看上下文容易译错。\n'
+      + '严格排除：普通词汇、常见短语、数字、时间表达、通用军衔。只收「全片统一译法真正重要」的词。\n'
+      + '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、'+dstN.zh+'统一译法 r。最多 25 条；确实没有就返回 []。\n'
+      + '只输出 JSON 数组：[{"t":"Outlaw 1","note":"友军战机呼号","r":"亡命徒1"}]\n\n字幕原文：\n'+srcText
+    : 'Extract a glossary from the subtitle source text below. Include ONLY two kinds:\n'
+      + '(1) proper nouns: character names, callsigns/code names, place names, organizations, brands, work titles;\n'
+      + '(2) context-ambiguous terms: military jargon, technical slang, polysemous words whose correct rendering depends on the story context.\n'
+      + 'Strictly EXCLUDE common vocabulary, generic phrases, numbers, time expressions, generic ranks. Only terms whose file-wide consistent rendering truly matters.\n'
+      + 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r in '+dstN.zh+'. Max 25 items; return [] if none.\n'
+      + 'Output JSON array only: [{"t":"Outlaw 1","note":"friendly fighter callsign","r":"アウトロー1"}]\n\nSource subtitles:\n'+srcText;
+  const raw=await chatOnce(base,key,model,[
+    {role:'system',content:sys},
+    {role:'user',content:usr}
+  ]);
+  const arr=parseLlmJson(raw);
+  if(!Array.isArray(arr)) throw new Error('JSON 缺少数组');
+  return arr.filter(x=>x && typeof x.t==='string' && typeof x.r==='string' && x.t.trim() && x.r.trim()).slice(0,25);
+}
+
 /* ---------------- 主流程 ---------------- */
 async function runTranslate(){
   if(S.translating) return;
@@ -1885,7 +2065,8 @@ async function runTranslate(){
   const useApi = builtinReady || apiReady;
   if(cfg.mode==='api' && !apiReady){ log(t('degradeDemo'), 'err'); }
   if(cfg.mode==='builtin' && !builtinReady){ log(t('builtinOff'), 'err'); }
-  const sys = systemPrompt(cfg);
+  let sys = systemPrompt(cfg);
+  pgStart();
   const B = Math.max(1, Math.min(60, +$('batch').value || 12));
   const effBase = cfg.mode==='builtin' ? BUILTIN_API : cfg.base;
   const effKey  = cfg.mode==='builtin' ? '' : cfg.key;
@@ -1944,6 +2125,23 @@ async function runTranslate(){
     }
 
     log(t('startT',LBY(cfg.src).zh,LBY(cfg.dst).zh,S.srcItems.length,B));
+
+    // v0.9.28 自动术语表：翻译前锁定专名/呼号/军语的全片统一译法（仅提取元数据级术语，失败自动跳过不影响主流程）
+    if(cfg.autoTerms){
+      setPrText(t('autoTermsRun')); setProg(0,true);
+      try{
+        const gl = await extractGlossary(effBase,effKey,effModel,cfg,sampleSrcText(groups,20000));
+        const manual=(cfg.terms||'').split(/[,，]/).map(x=>x.trim().toLowerCase()).filter(Boolean);
+        const lines=gl.filter(x=>!manual.includes(x.t.trim().toLowerCase()))
+          .map(x=>x.t.trim()+' → '+x.r.trim()+(x.note?'（'+String(x.note).trim()+'）':''));
+        if(lines.length){
+          sys = systemPrompt(Object.assign({},cfg,{glossary:lines.join('\n')}));
+          log(t('autoTermsDone',lines.length),'okc');
+          log(lines.map(l=>'  · '+l).join('\n'));
+        }
+      }catch(e){ log(t('autoTermsSkip',e.message),'err'); }
+    }
+
     // 按句组分批：句组是原子单位不拆开；单批 cue 数不超过 B
     const batches=[];
     let curB=[], curCues=0;
@@ -1960,7 +2158,7 @@ async function runTranslate(){
     for(let bi=0; bi<totalB; bi++){
       if(S.stop){ log(t('userStop'),'err'); break; }
       const gBatch=batches[bi];
-      setProg(Math.round(bi/totalB*100),true);
+      pgBatch(bi, totalB);
       setPrText(t('batchProg', bi+1, totalB, gBatch[0].gno, gBatch[gBatch.length-1].gno));
       let ok=false;
       for(let attempt=0; attempt<maxTry && !ok; attempt++){
@@ -2030,7 +2228,7 @@ async function runTranslate(){
         }
       }
     }
-    setProg(100,true); setPrText(t('postEnd'));
+    setProg(100,true); $('prog').classList.remove('run'); setPrText(t('postEnd'));
     log(t('postEnd'));
 
     // 回填：整条纯水词的 cue 直接清空；句组优先合并为单条（时长/行数达标），否则按时长切分回填（时间轴不动）
@@ -2134,13 +2332,14 @@ async function runTranslate(){
     applyPost();         // 清提示词 + 折行（超阈值自动分行）
     finalRenumberAndStats();
     log(t('allDone',S.dropN,S.mergeN,S.wrapN),'okc');
+    pgFinish();
   }catch(e){
     log(t('errOccur',e.message),'err');
   }finally{
     S.translating=false;
     $('btnGo').disabled=false; $('btnPost').disabled=false;
     $('btnGo').textContent=btnText;
-    setProg(0,false); setPrText('');
+    if(!PG.ok){ setProg(0,false); setPrText(''); }
   }
 }
 
@@ -2404,6 +2603,7 @@ function save(){
     terms:$('terms').value.trim(), mode:$('mode').value, maxW:$('maxW').value,
     srcLang:$('srcLang').value, style:style,
     styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0',
+    autoTerms:$('autoTerms').checked?'1':'0',
     expStyle:expStyle()
   };
   /* 语言只在用户手动切换过时才记忆——避免页面加载时的 save() 把默认值/检测值写死，
@@ -2467,8 +2667,10 @@ function termsUI(){
   $('termsHint').textContent = on ? t('termsHintOn') : t('termsHintOff');
 }
 $('keepTerms').checked = sv.keepTerms!=='0';
+$('autoTerms').checked = sv.autoTerms!=='0';
 termsUI();
 $('keepTerms').addEventListener('change',()=>{ termsUI(); save(); });
+$('autoTerms').addEventListener('change',()=>{ save(); });
 
 /* 语言/格式切换联动：列头 + 导出文件名 */
 function autoOutName(){
