@@ -59,7 +59,7 @@
   <div id="main" style="display:none">
     <div class="card">
       <h2>默认模型配置</h2>
-      <label>服务商（选预设自动填充，或选手动自定义）</label>
+      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
       <select id="provider"></select>
       <div class="row">
         <div>
@@ -67,7 +67,7 @@
           <input type="text" id="base" spellcheck="false" placeholder="https://api.deepseek.com">
         </div>
         <div>
-          <label>模型名</label>
+          <label>模型名（如 deepseek-chat / gpt-4o / claude-sonnet-4.6 / 按服务商准确填写）</label>
           <input type="text" id="model" spellcheck="false" placeholder="deepseek-chat">
         </div>
       </div>
@@ -141,13 +141,18 @@ const TOKEN_KEY = 'srtAdminToken';
 let token = localStorage.getItem(TOKEN_KEY) || '';
 
 const PRESETS = [
-  { name: 'DeepSeek', base: 'https://api.deepseek.com', model: 'deepseek-chat' },
-  { name: 'OpenAI', base: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
-  { name: 'Kimi (Moonshot)', base: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' },
-  { name: '智谱 GLM', base: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
-  { name: '通义千问', base: 'https://dashscope.aliyuncs.com/compatible-mode/v1', model: 'qwen-plus' },
-  { name: '硅基流动', base: 'https://api.siliconflow.cn/v1', model: 'Qwen/Qwen2.5-7B-Instruct' },
-  { name: '手动自定义', base: '', model: '' }
+  { id: 'openai',      name: 'OpenAI',                  base: 'https://api.openai.com/v1' },
+  { id: 'anthropic',   name: 'Anthropic Claude',        base: 'https://api.anthropic.com/v1' },
+  { id: 'gemini',      name: 'Google Gemini',           base: 'https://generativelanguage.googleapis.com/v1beta/openai' },
+  { id: 'xai',         name: 'xAI Grok',                base: 'https://api.x.ai/v1' },
+  { id: 'openrouter',  name: 'OpenRouter（聚合百模）',  base: 'https://openrouter.ai/api/v1' },
+  { id: 'deepseek',    name: 'DeepSeek（推荐）',        base: 'https://api.deepseek.com' },
+  { id: 'qwen',        name: '阿里通义千问',            base: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+  { id: 'glm',         name: '智谱 GLM',                base: 'https://open.bigmodel.cn/api/paas/v4' },
+  { id: 'kimi',        name: '月之暗面 Kimi',           base: 'https://api.moonshot.cn/v1' },
+  { id: 'doubao',      name: '字节豆包（火山方舟）',    base: 'https://ark.cn-beijing.volces.com/api/v3' },
+  { id: 'siliconflow', name: '硅基流动 SiliconFlow',    base: 'https://api.siliconflow.cn/v1' },
+  { id: 'custom',      name: '手动自定义',              base: '' }
 ];
 
 function show(el, on){ $(el).style.display = on ? '' : 'none'; }
@@ -167,8 +172,19 @@ async function api(path, method, body){
 async function loadConfig(){
   try {
     const c = await api('/api/admin/config');
-    const preset = PRESETS.find(p => p.name === c.provider);
-    fillProviderSelect(c.provider || '');
+    /* 兼容老数据：按 id 找预设，找不到但 provider 是中文名也对一次（升级前保存的旧名） */
+    let pid = '';
+    if (c.provider) {
+      const hit = PRESETS.find(p => p.id === c.provider || p.name === c.provider);
+      pid = hit ? hit.id : '';
+    }
+    fillProviderSelect(pid);
+    /* 老数据如果有 base 与某预设的 base 一致，但 provider 字段没存（或存了别的东西），补上匹配预设的 id */
+    if (!pid && c.base) {
+      const m = PRESETS.find(p => p.base && p.base === (c.base || '').replace(/\/+$/, ''));
+      if (m) { $('provider').value = m.id; }
+      else { $('provider').value = 'custom'; }
+    }
     $('base').value = c.base || '';
     $('model').value = c.model || '';
     $('keyMask').textContent = c.keySet ? ('已保存：' + c.keyMask) : '未设置';
@@ -189,9 +205,10 @@ async function loadConfig(){
 function fillProviderSelect(current){
   const sel = $('provider');
   sel.innerHTML = '';
+  /* 全部服务商平铺（与 index.html 一致） */
   PRESETS.forEach(p => {
     const o = document.createElement('option');
-    o.value = p.name; o.textContent = p.name;
+    o.value = p.id; o.textContent = p.name;
     sel.appendChild(o);
   });
   if (current) sel.value = current;
@@ -265,8 +282,9 @@ $('btnLogin').addEventListener('click', async () => {
 $('pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnLogin').click(); });
 
 $('provider').addEventListener('change', () => {
-  const p = PRESETS.find(x => x.name === $('provider').value);
-  if (p && p.name !== '手动自定义') { $('base').value = p.base; $('model').value = p.model; }
+  const p = PRESETS.find(x => x.id === $('provider').value);
+  /* 选预设自动填 base；模型由用户手填（不预设），避免误覆盖用户指定的具体型号 */
+  if (p && p.id !== 'custom' && !$('base').value.trim()) $('base').value = p.base;
 });
 
 $('btnSave').addEventListener('click', async () => {

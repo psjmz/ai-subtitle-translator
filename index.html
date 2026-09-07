@@ -170,7 +170,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.29</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.30</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -234,14 +234,19 @@
         <div id="apiBox" data-page-node-id="ovHem8WvyQYTXOybaziYVV">
           <label data-page-node-id="SUnvDS3tufyBvHomRzqDvl" data-i18n="lblProvider">服务商</label>
           <select id="provider" data-page-node-id="Qp7M1u0pbbG0tgKFPXXIVA"></select>
+          <div class="hint" id="providerNote" style="display:none"></div>
           <label data-page-node-id="nfA1PT3BiLPZQ9PkUGbUq5" data-i18n="lblBase">Base URL（自动拼接 /chat/completions）</label>
           <input type="text" id="base" spellcheck="false" data-page-node-id="wCGA5fUI6L06JCvGtOUixF">
           <div class="row2" data-page-node-id="DS8a4j2djWyZURvABVoXTl">
             <div data-page-node-id="w70kaa2lesGhsnsxm7HGBP"><label data-page-node-id="bplWe2iDOdtFn8ZX04UFhe" data-i18n="lblModel">模型</label><input type="text" id="model" spellcheck="false" data-page-node-id="6iZBpwOK1D0hR3NVEkI8Zs"></div>
             <div data-page-node-id="8SHrXD8t2tsX3V5QsQssn6"><label data-page-node-id="0ehikMdLViTyPimjBDx1NQ" data-i18n="lblBatch">单批条数</label><input type="number" id="batch" value="12" min="1" max="60" data-page-node-id="Bp5JBRmOXfUa8WNVeEAWI3"></div>
           </div>
-          <label data-page-node-id="214kF9o0bVLmDB6BXAGLvE" data-i18n="lblKey">API Key（仅保存在本机浏览器）</label>
+          <label data-page-node-id="214kF9o0bVLmDB6BXAGLvE">API Key（仅保存在本机浏览器）<a id="keyLink" href="#" target="_blank" rel="noopener" style="float:right;font-weight:400;display:none"></a></label>
           <input type="password" id="apikey" autocomplete="off" data-page-node-id="fjeR234CAWYss4JFEQ28Tm">
+          <div class="btns" style="margin-top:8px">
+            <button class="btn" id="btnTest" type="button" data-i18n="btnTest">⚡ 测试连接</button>
+            <span class="hint" id="testOut" style="align-self:center"></span>
+          </div>
         </div>
 
         <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，默认 20）</label>
@@ -337,13 +342,20 @@
 const C = window.SrtCore;
 
 /* ---------------- 常量与状态 ---------------- */
+/* 服务商预设（v0.9.30）：海外/国内头部 + 其他，全部 OpenAI 兼容端点；模型由用户自填 */
 const PROVIDERS = [
-  { name: 'DeepSeek（推荐）', base: 'https://api.deepseek.com', model: 'deepseek-chat' },
-  { name: 'OpenAI', base: 'https://api.openai.com/v1', model: 'gpt-4o-mini' },
-  { name: 'Kimi (Moonshot)', base: 'https://api.moonshot.cn/v1', model: 'moonshot-v1-8k' },
-  { name: '智谱 GLM', base: 'https://open.bigmodel.cn/api/paas/v4', model: 'glm-4-flash' },
-  { name: '通义千问', base: 'https://dashscope.aliyuncs.com/compatible-mode/v1', model: 'qwen-plus' },
-  { name: '硅基流动', base: 'https://api.siliconflow.cn/v1', model: 'Qwen/Qwen2.5-7B-Instruct' }
+  { id:'openai',     name:'OpenAI',            base:'https://api.openai.com/v1',                                       keyUrl:'https://platform.openai.com/api-keys' },
+  { id:'anthropic',  name:'Anthropic Claude',  base:'https://api.anthropic.com/v1',                                    keyUrl:'https://console.anthropic.com/settings/keys' },
+  { id:'gemini',     name:'Google Gemini',     base:'https://generativelanguage.googleapis.com/v1beta/openai',         keyUrl:'https://aistudio.google.com/apikey' },
+  { id:'xai',        name:'xAI Grok',          base:'https://api.x.ai/v1',                                             keyUrl:'https://console.x.ai' },
+  { id:'openrouter', name:'OpenRouter（聚合百模）', base:'https://openrouter.ai/api/v1',                                 keyUrl:'https://openrouter.ai/settings/keys', note:'noteOpenRouter' },
+  { id:'deepseek',   name:'DeepSeek（推荐）',   base:'https://api.deepseek.com',                                        keyUrl:'https://platform.deepseek.com/api_keys' },
+  { id:'qwen',       name:'阿里通义千问',       base:'https://dashscope.aliyuncs.com/compatible-mode/v1',              keyUrl:'https://bailian.console.aliyun.com/?apiKey=1' },
+  { id:'glm',        name:'智谱 GLM',          base:'https://open.bigmodel.cn/api/paas/v4',                            keyUrl:'https://open.bigmodel.cn/usercenter/apikeys' },
+  { id:'kimi',       name:'月之暗面 Kimi',      base:'https://api.moonshot.cn/v1',                                      keyUrl:'https://platform.moonshot.cn/console/api-keys' },
+  { id:'doubao',     name:'字节豆包（火山方舟）', base:'https://ark.cn-beijing.volces.com/api/v3',                      keyUrl:'https://console.volcengine.com/ark', note:'noteDoubao' },
+  { id:'siliconflow',name:'硅基流动 SiliconFlow', base:'https://api.siliconflow.cn/v1',                                keyUrl:'https://cloud.siliconflow.cn/account/ak' },
+  { id:'custom',     name:'',                    base:'', keyUrl:'' }   /* 自定义：不覆盖已填值 */
 ];
 /* 站点内置免费模型（后台配置）：免 Key、OpenAI 兼容；匿名有速率限制 */
 /* 默认模型（站点后端 /api/translate 代理，管理员在 admin.html 配置） */
@@ -415,6 +427,7 @@ const I18N = {
   hintElegant:'信达雅：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯。',
   hintPlain:'大白话：口语化、直白易懂，像日常对话；多用短句与常用词，保留说话人语气。',
   hintCustom:'自定义：下面的描述将原样作为“翻译风格”要求发给模型。',
+  optCustom:"自定义…", btnTest:"⚡ 测试连接", testRun:"测试中…", testOk:"✓ 连接成功", testFail:"✗ 失败：{0}", getKey:"获取 API Key ↗", noteDoubao:"豆包需在火山方舟控制台开通模型服务；「模型」填 doubao-seed-… 或接入点 ID（ep- 开头）", noteOpenRouter:"模型名格式为 厂商/模型（如 anthropic/claude-sonnet-4.6）；一个 Key 可调用数百款模型",
   lblProvider:'服务商', lblBase:'Base URL（自动拼接 /chat/completions）', lblModel:'模型', lblBatch:'单批条数',
   lblKey:'API Key（仅保存在本机浏览器）',
   chkKeepTerms:'专有名词（人名/机构/产品/术语）保留原文，不翻译',
@@ -481,6 +494,7 @@ const I18N = {
   hintElegant:'信達雅：準確傳達原意、通順流暢、用詞得體，貼合目標語言表達習慣。',
   hintPlain:'大白話：口語化、直白易懂，像日常對話；多用短句與常用詞，保留說話人語氣。',
   hintCustom:'自訂：下面的描述將原樣作為「翻譯風格」要求發給模型。',
+  optCustom:"自訂…", btnTest:"⚡ 測試連線", testRun:"測試中…", testOk:"✓ 連線成功", testFail:"✗ 失敗：{0}", getKey:"取得 API Key ↗", noteDoubao:"豆包需在火山方舟控制台開通模型服務；「模型」填 doubao-seed-… 或接入點 ID（ep- 開頭）", noteOpenRouter:"模型名格式為 廠商/模型（如 anthropic/claude-sonnet-4.6）；一個 Key 可呼叫數百款模型",
   lblProvider:'服務商', lblBase:'Base URL（自動拼接 /chat/completions）', lblModel:'模型', lblBatch:'單批條數',
   lblKey:'API Key（僅儲存在本機瀏覽器）',
   chkKeepTerms:'專有名詞（人名/機構/產品/術語）保留原文，不翻譯',
@@ -547,6 +561,7 @@ const I18N = {
   hintElegant:'Faithful & elegant: accurate, fluent and graceful, following the target language\'s natural expression.',
   hintPlain:'Plain: colloquial and easy to understand, like everyday conversation; short sentences, common words, keep the speaker\'s tone.',
   hintCustom:'Custom: the description below is sent to the model verbatim as the style requirement.',
+  optCustom:"Custom…", btnTest:"⚡ Test connection", testRun:"Testing…", testOk:"✓ Connected", testFail:"✗ Failed: {0}", getKey:"Get API Key ↗", noteDoubao:"Doubao requires enabling model service in the Volcano Ark console; Model = doubao-seed-… or endpoint ID (ep-…)", noteOpenRouter:"Model names use vendor/model format (e.g. anthropic/claude-sonnet-4.6); one key unlocks hundreds of models",
   lblProvider:'Provider', lblBase:'Base URL (/chat/completions appended automatically)', lblModel:'Model', lblBatch:'Cues per batch',
   lblKey:'API Key (stored only in this browser)',
   chkKeepTerms:'Keep proper nouns (names/brands/products/terms) untranslated',
@@ -613,6 +628,7 @@ const I18N = {
   hintElegant:'信達雅：原文の意味を正確に、流暢で品のある表現、翻訳先の言語に自然な文体で。',
   hintPlain:'平易：口語的で分かりやすい、日常会話のような訳文。短い文と常用語を使い、話者のトーンを保持。',
   hintCustom:'カスタム：下の説明がそのまま「翻訳スタイル」としてモデルに送られます。',
+  optCustom:"カスタム…", btnTest:"⚡ 接続テスト", testRun:"テスト中…", testOk:"✓ 接続成功", testFail:"✗ 失敗：{0}", getKey:"APIキーを取得 ↗", noteDoubao:"doubao は火山方舟（Volcano Ark）コンソールでモデルサービスの有効化が必要。「モデル」は doubao-seed-… またはエンドポイント ID（ep- 始まり）", noteOpenRouter:"モデル名は ベンダー/モデル 形式（例: anthropic/claude-sonnet-4.6）。1 つのキーで数百のモデルを利用可能",
   lblProvider:'プロバイダー', lblBase:'Base URL（/chat/completions は自動付加）', lblModel:'モデル', lblBatch:'1回のバッチ件数',
   lblKey:'API Key（このブラウザにのみ保存）',
   chkKeepTerms:'固有名詞（人名/組織/製品/用語）は原文のまま翻訳しない',
@@ -679,6 +695,7 @@ const I18N = {
   hintElegant:'Fiel y elegante: preciso, fluido y cuidadoso, siguiendo la expresión natural del idioma destino.',
   hintPlain:'Llano: coloquial y fácil de entender, como una conversación cotidiana; frases cortas, palabras comunes, conserva el tono del hablante.',
   hintCustom:'Personalizado: la descripción de abajo se envía al modelo tal cual como requisito de estilo.',
+  optCustom:"Personalizado…", btnTest:"⚡ Probar conexión", testRun:"Probando…", testOk:"✓ Conectado", testFail:"✗ Error: {0}", getKey:"Obtener API Key ↗", noteDoubao:"Doubao requiere activar el servicio de modelos en la consola Volcano Ark; Modelo = doubao-seed-… o ID de endpoint (ep-…)", noteOpenRouter:"Los nombres de modelo usan formato proveedor/modelo (p. ej. anthropic/claude-sonnet-4.6); una clave da acceso a cientos de modelos",
   lblProvider:'Proveedor', lblBase:'Base URL (/chat/completions se añade automáticamente)', lblModel:'Modelo', lblBatch:'Subtítulos por lote',
   lblKey:'API Key (solo se guarda en este navegador)',
   chkKeepTerms:'Mantener nombres propios (personas/marcas/productos/términos) sin traducir',
@@ -745,6 +762,7 @@ const I18N = {
   hintElegant:'Fiel e elegante: preciso, fluido e cuidado, seguindo a expressão natural do idioma destino.',
   hintPlain:'Coloquial: informal e fácil de entender, como conversa do dia a dia; frases curtas, palavras comuns, mantém o tom de quem fala.',
   hintCustom:'Personalizado: a descrição abaixo é enviada ao modelo exatamente como requisito de estilo.',
+  optCustom:"Personalizado…", btnTest:"⚡ Testar conexão", testRun:"Testando…", testOk:"✓ Conectado", testFail:"✗ Falhou: {0}", getKey:"Obter API Key ↗", noteDoubao:"O Doubao exige ativar o serviço de modelos no console Volcano Ark; Modelo = doubao-seed-… ou ID do endpoint (ep-…)", noteOpenRouter:"Os nomes de modelo usam o formato fornecedor/modelo (ex.: anthropic/claude-sonnet-4.6); uma chave dá acesso a centenas de modelos",
   lblProvider:'Provedor', lblBase:'Base URL (/chat/completions adicionado automaticamente)', lblModel:'Modelo', lblBatch:'Legendas por lote',
   lblKey:'API Key (guardada apenas neste navegador)',
   chkKeepTerms:'Manter nomes próprios (pessoas/marcas/produtos/termos) sem traduzir',
@@ -811,6 +829,7 @@ const I18N = {
   hintElegant:'충실하고 우아하게: 정확하고 유창하며 품위 있게, 대상 언어의 자연스러운 표현을 따릅니다.',
   hintPlain:'구어체: 일상 대화처럼 쉽고 알기 쉽게; 짧은 문장과 흔한 단어를 쓰고 말하는 사람의 어조를 유지합니다.',
   hintCustom:'사용자 정의: 아래 설명이 그대로 "번역 스타일" 요구사항으로 모델에 전송됩니다.',
+  optCustom:"사용자 지정…", btnTest:"⚡ 연결 테스트", testRun:"테스트 중…", testOk:"✓ 연결 성공", testFail:"✗ 실패: {0}", getKey:"API 키 받기 ↗", noteDoubao:"doubao는 화산방주(Volcano Ark) 콘솔에서 모델 서비스 활성화 필요. 모델은 doubao-seed-… 또는 엔드포인트 ID(ep-로 시작)", noteOpenRouter:"모델명은 벤더/모델 형식(예: anthropic/claude-sonnet-4.6). 하나의 키로 수백 개 모델 사용 가능",
   lblProvider:'공급자', lblBase:'Base URL(/chat/completions 자동 추가)', lblModel:'모델', lblBatch:'배치당 자막 수',
   lblKey:'API Key(이 브라우저에만 저장)',
   chkKeepTerms:'고유명사(인물/브랜드/제품/용어)를 번역하지 않고 원문 유지',
@@ -877,6 +896,7 @@ const I18N = {
   hintElegant:'Treuhert & elegant: genau, flüssig und stilvoll, der Zielsprache entsprechend.',
   hintPlain:'Wortwörtlich: umgangssprachlich und leicht verständlich, wie Alltagsrede; kurze Sätze, gängige Wörter, Ton des Sprechers bleibt.',
   hintCustom:'Eigene: die Beschreibung unten wird unverändert als Stilvorgabe an das Modell gesendet.',
+  optCustom:"Benutzerdefiniert…", btnTest:"⚡ Verbindung testen", testRun:"Test läuft…", testOk:"✓ Verbunden", testFail:"✗ Fehlgeschlagen: {0}", getKey:"API-Key holen ↗", noteDoubao:"Doubao erfordert die Aktivierung des Modelldienstes in der Volcano-Ark-Konsole; Modell = doubao-seed-… oder Endpunkt-ID (ep-…)", noteOpenRouter:"Modellnamen im Format Anbieter/Modell (z. B. anthropic/claude-sonnet-4.6); ein Key schaltet Hunderte Modelle frei",
   lblProvider:'Anbieter', lblBase:'Base URL (/chat/completions wird automatisch angehängt)', lblModel:'Modell', lblBatch:'Untertitel pro Batch',
   lblKey:'API Key (nur in diesem Browser gespeichert)',
   chkKeepTerms:'Eigennamen (Personen/Firmen/Produkte/Begriffe) unübersetzt lassen',
@@ -943,6 +963,7 @@ const I18N = {
   hintElegant:'Fidèle et élégant : précis, fluide et soigné, selon l\u2019expression naturelle de la langue cible.',
   hintPlain:'Courant : familier et facile à comprendre, comme une conversation quotidienne ; phrases courtes, mots courants, ton du locuteur conservé.',
   hintCustom:'Personnalisé : la description ci-dessous est envoyée telle quelle au modèle comme exigence de style.',
+  optCustom:"Personnalisé…", btnTest:"⚡ Tester la connexion", testRun:"Test en cours…", testOk:"✓ Connecté", testFail:"✗ Échec : {0}", getKey:"Obtenir une clé API ↗", noteDoubao:"Doubao nécessite l'activation du service de modèles dans la console Volcano Ark ; Modèle = doubao-seed-… ou ID de point d'accès (ep-…)", noteOpenRouter:"Les noms de modèles suivent le format fournisseur/modèle (ex. anthropic/claude-sonnet-4.6) ; une clé donne accès à des centaines de modèles",
   lblProvider:'Fournisseur', lblBase:'Base URL (/chat/completions ajouté automatiquement)', lblModel:'Modèle', lblBatch:'Sous-titres par lot',
   lblKey:'Clé API (stockée uniquement dans ce navigateur)',
   chkKeepTerms:'Conserver les noms propres (personnes/marques/produits/termes) non traduits',
@@ -1009,6 +1030,7 @@ const I18N = {
   hintElegant:'Setia & elegan: akurat, lancar dan berkelas, mengikuti gaya alami bahasa target.',
   hintPlain:'Keseharian: kolokial dan mudah dipahami, seperti percakapan sehari-hari; kalimat pendek, kata umum, nada pembicara tetap terjaga.',
   hintCustom:'Kustom: deskripsi di bawah dikirim apa adanya ke model sebagai persyaratan gaya.',
+  optCustom:"Kustom…", btnTest:"⚡ Uji koneksi", testRun:"Menguji…", testOk:"✓ Terhubung", testFail:"✗ Gagal: {0}", getKey:"Ambil API Key ↗", noteDoubao:"Doubao memerlukan aktivasi layanan model di konsol Volcano Ark; Model = doubao-seed-… atau ID endpoint (ep-…)", noteOpenRouter:"Nama model memakai format vendor/model (mis. anthropic/claude-sonnet-4.6); satu key membuka ratusan model",
   lblProvider:'Penyedia', lblBase:'Base URL (/chat/completions ditambahkan otomatis)', lblModel:'Model', lblBatch:'Subtitle per batch',
   lblKey:'API Key (hanya tersimpan di browser ini)',
   chkKeepTerms:'Pertahankan nama diri (orang/merek/produk/istilah) tanpa diterjemahkan',
@@ -1075,6 +1097,7 @@ const I18N = {
   hintElegant:'सटीक और सुसंस्कृत: सही, सहज और उचित शब्दों में, लक्ष्य भाषा की प्राकृतिक अभिव्यक्ति के अनुसार।',
   hintPlain:'सरल: बोलचाल और आसान, रोज़मर्रा की बातचीत जैसा; छोटे वाक्य, आम शब्द, बोलने वाले का अंदाज़ बना रहे।',
   hintCustom:'अपनी: नीचे का विवरण शैली-आवश्यकता के रूप में मॉडल को वैसे ही भेजा जाता है।',
+  optCustom:"कस्टम…", btnTest:"⚡ कनेक्शन परीक्षण", testRun:"परीक्षण हो रहा है…", testOk:"✓ कनेक्ट हो गया", testFail:"✗ विफल: {0}", getKey:"API कुंजी पाएं ↗", noteDoubao:"Doubao के लिए Volcano Ark कंसोल में मॉडल सेवा सक्रिय करना आवश्यक है; मॉडल = doubao-seed-… या एंडपॉइंट ID (ep-…)", noteOpenRouter:"मॉडल नाम vendor/model प्रारूप में हैं (जैसे anthropic/claude-sonnet-4.6); एक कुंजी सैकड़ों मॉडल खोलती है",
   lblProvider:'प्रदाता', lblBase:'Base URL (/chat/completions स्वतः जुड़ता है)', lblModel:'मॉडल', lblBatch:'प्रति बैच सबटाइटल',
   lblKey:'API Key (केवल इस ब्राउज़र में सहेजा जाता है)',
   chkKeepTerms:'संज्ञाएँ (नाम/ब्रांड/उत्पाद/शब्दावली) अनूदित न रखें',
@@ -1141,6 +1164,7 @@ const I18N = {
   hintElegant:'ตรงความและสละสลวย: แม่นยำ ลื่นไหล ใช้คำเหมาะสม ตามสำนวนธรรมชาติของภาษาเป้าหมาย',
   hintPlain:'พูดง่าย: เป็นภาษาพูด เข้าใจง่าย เหมือนบทสนทนาประจำวัน; ประโยคสั้น คำทั่วไป คงโทนของผู้พูด',
   hintCustom:'กำหนดเอง: คำบรรยายด้านล่างจะถูกส่งไปยังโมเดลเป็นข้อกำหนดสไตล์ตรง ๆ',
+  optCustom:"กำหนดเอง…", btnTest:"⚡ ทดสอบการเชื่อมต่อ", testRun:"กำลังทดสอบ…", testOk:"✓ เชื่อมต่อสำเร็จ", testFail:"✗ ล้มเหลว: {0}", getKey:"รับ API Key ↗", noteDoubao:"Doubao ต้องเปิดใช้บริการโมเดลในคอนโซล Volcano Ark ก่อน; โมเดล = doubao-seed-… หรือ endpoint ID (ขึ้นต้นด้วย ep-)", noteOpenRouter:"ชื่อโมเดลใช้รูปแบบ ผู้ให้บริการ/โมเดล (เช่น anthropic/claude-sonnet-4.6) คีย์เดียวใช้ได้หลายร้อยโมเดล",
   lblProvider:'ผู้ให้บริการ', lblBase:'Base URL (/chat/completions จะถูกเติมอัตโนมัติ)', lblModel:'โมเดล', lblBatch:'ซับไตเติลต่อแบตช์',
   lblKey:'API Key (บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น)',
   chkKeepTerms:'คงชื่อเฉพาะ (บุคคล/แบรนด์/ผลิตภัณฑ์/คำศัพท์) ไว้ไม่แปล',
@@ -1207,6 +1231,7 @@ const I18N = {
   hintElegant:'Chuẩn mực & trang nhã: chính xác, trôi chảy, dùng từ đàng hoàng, theo cách diễn đạt tự nhiên của ngôn ngữ đích.',
   hintPlain:'Thoại thường: khẩu ngữ, dễ hiểu, như hội thoại hằng ngày; câu ngắn, từ phổ thông, giữ giọng người nói.',
   hintCustom:'Tùy chỉnh: phần mô tả bên dưới được gửi nguyên văn cho mô hình như yêu cầu phong cách.',
+  optCustom:"Tùy chỉnh…", btnTest:"⚡ Kiểm tra kết nối", testRun:"Đang kiểm tra…", testOk:"✓ Kết nối thành công", testFail:"✗ Thất bại: {0}", getKey:"Lấy API Key ↗", noteDoubao:"Doubao cần kích hoạt dịch vụ mô hình trong bảng điều khiển Volcano Ark; Mô hình = doubao-seed-… hoặc ID endpoint (ep-…)", noteOpenRouter:"Tên mô hình theo định dạng nhà_cung_cấp/mô_hình (vd: anthropic/claude-sonnet-4.6); một khóa mở hàng trăm mô hình",
   lblProvider:'Nhà cung cấp', lblBase:'Base URL (tự động thêm /chat/completions)', lblModel:'Mô hình', lblBatch:'Phụ đề mỗi lô',
   lblKey:'API Key (chỉ lưu trong trình duyệt này)',
   chkKeepTerms:'Giữ nguyên tên riêng (người/thương hiệu/sản phẩm/thuật ngữ), không dịch',
@@ -1273,6 +1298,7 @@ const I18N = {
   hintElegant:'Точный и литературный: точно, бегло и уместно, в духе естественной речи языка перевода.',
   hintPlain:'Разговорный: просто и понятно, как повседневная речь; короткие фразы, обычные слова, тон говорящего сохраняется.',
   hintCustom:'Свой: описание ниже отправляется модели дословно как требование к стилю.',
+  optCustom:"Свои…", btnTest:"⚡ Проверить", testRun:"Проверка…", testOk:"✓ Подключено", testFail:"✗ Ошибка: {0}", getKey:"Получить API-ключ ↗", noteDoubao:"Для Doubao нужно включить сервис моделей в консоли Volcano Ark; Модель = doubao-seed-… или ID эндпоинта (ep-…)", noteOpenRouter:"Имена моделей в формате вендор/модель (напр. anthropic/claude-sonnet-4.6); один ключ открывает сотни моделей",
   lblProvider:'Провайдер', lblBase:'Base URL (/chat/completions добавляется автоматически)', lblModel:'Модель', lblBatch:'Субтитров на батч',
   lblKey:'API Key (хранится только в этом браузере)',
   chkKeepTerms:'Оставлять имена собственные (лица/бренды/продукты/термины) без перевода',
@@ -1339,6 +1365,7 @@ const I18N = {
   hintElegant:'Fedele ed elegante: accurato, scorrevole e curato, seguendo l\'espressione naturale della lingua di destinazione.',
   hintPlain:'Semplice: colloquiale e facile da capire, come una conversazione quotidiana; frasi brevi, parole comuni, mantiene il tono del parlante.',
   hintCustom:'Personalizzato: la descrizione qui sotto viene inviata al modello così com\'è come requisito di stile.',
+  optCustom:"Personalizzato…", btnTest:"⚡ Prova connessione", testRun:"Verifica…", testOk:"✓ Connesso", testFail:"✗ Errore: {0}", getKey:"Ottieni API Key ↗", noteDoubao:"Doubao richiede l'attivazione del servizio modelli nella console Volcano Ark; Modello = doubao-seed-… o ID endpoint (ep-…)", noteOpenRouter:"I nomi dei modelli usano il formato fornitore/modello (es. anthropic/claude-sonnet-4.6); una chiave sblocca centinaia di modelli",
   lblProvider:'Fornitore', lblBase:'URL di base (/chat/completions aggiunto automaticamente)', lblModel:'Modello', lblBatch:'Sottotitoli per batch',
   lblKey:'Chiave API (salvata solo in questo browser)',
   chkKeepTerms:'Mantieni non tradotti i nomi propri (persone/marchi/prodotti/termini)',
@@ -1405,6 +1432,7 @@ const I18N = {
   hintElegant:'أمين وأنيق: دقيق وسلس ومنتقى، وفق التعبير الطبيعي للغة الهدف.',
   hintPlain:'بسيط: عامي وسهل الفهم، كحوار يومي؛ جُمل قصيرة وكلمات شائعة مع الحفاظ على نبرة المتحدث.',
   hintCustom:'مخصص: يُرسل الوصف أدناه إلى النموذج كما هو كمتطلب أسلوب.',
+  optCustom:"مخصص…", btnTest:"⚡ اختبار الاتصال", testRun:"جارٍ الاختبار…", testOk:"✓ تم الاتصال", testFail:"✗ فشل: {0}", getKey:"احصل على مفتاح API ↗", noteDoubao:"يتطلب Doubao تفعيل خدمة النماذج في وحدة تحكم Volcano Ark؛ الموديل = doubao-seed-… أو معرف النقطة (ep-…)", noteOpenRouter:"أسماء النماذج بصيغة المورد/النموذج (مثل anthropic/claude-sonnet-4.6)؛ مفتاح واحد يفتح مئات النماذج",
   lblProvider:'المزوّد', lblBase:'العنوان الأساسي (يُضاف /chat/completions تلقائيًا)', lblModel:'النموذج', lblBatch:'ترجمات لكل دفعة',
   lblKey:'مفتاح API (يُحفظ في هذا المتصفح فقط)',
   chkKeepTerms:'إبقاء الأسماء الخاصة (أشخاص/علامات/منتجات/مصطلحات) دون ترجمة',
@@ -1471,6 +1499,7 @@ const I18N = {
   hintElegant:'Sadık ve zarif: doğru, akıcı ve özenli; hedef dilin doğal ifadesine uygun.',
   hintPlain:'Sade: günlük ve anlaşılır, sıradan bir konuşma gibi; kısa cümleler, yaygın kelimeler, konuşanın tonunu korur.',
   hintCustom:'Özel: aşağıdaki açıklama, stil gereksinimi olarak modele olduğu gibi gönderilir.',
+  optCustom:"Özel…", btnTest:"⚡ Bağlantıyı test et", testRun:"Test ediliyor…", testOk:"✓ Bağlandı", testFail:"✗ Başarısız: {0}", getKey:"API Anahtarı al ↗", noteDoubao:"Doubao, Volcano Ark konsolunda model servisini etkinleştirmeyi gerektirir; Model = doubao-seed-… veya endpoint ID (ep-…)", noteOpenRouter:"Model adları sağlayıcı/model biçimindedir (örn. anthropic/claude-sonnet-4.6); tek anahtar yüzlerce modele erişim sağlar",
   lblProvider:'Sağlayıcı', lblBase:'Temel URL (/chat/completions otomatik eklenir)', lblModel:'Model', lblBatch:'Grup başına altyazı',
   lblKey:'API Anahtarı (yalnızca bu tarayıcıda saklanır)',
   chkKeepTerms:'Özel isimleri (kişi/marka/ürün/terim) çevirmeden koru',
@@ -1559,6 +1588,7 @@ function applyI18n(){
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPh); });
   if (typeof buildStyleOptions === 'function') buildStyleOptions(); // 导出样式选项的组标签跟随界面语言
+  if (typeof buildProviderOptions === 'function') buildProviderOptions(); // 服务商分组的组标签跟随界面语言
   if (typeof refreshOutPh === 'function') refreshOutPh(); // 导出文件名占位符动态化，覆盖字典静态值
   const ao = document.querySelector('#srcLang option[value=auto]');
   if (ao) ao.textContent = t('autoDetect');
@@ -1888,6 +1918,8 @@ async function chatOnce(base,key,model,msgs,timeoutMs){
     const url = builtin ? BUILTIN_API : base.replace(/\/+$/,'')+'/chat/completions';
     const headers={'Content-Type':'application/json'};
     if(!builtin && key) headers.Authorization='Bearer '+key;
+    /* Anthropic OpenAI 兼容层：浏览器直连必须带此 header（否则 CORS 拒绝） */
+    if(!builtin && /anthropic\.com/.test(url)) headers['anthropic-dangerous-direct-browser-access']='true';
     const r=await fetch(url,{
       method:'POST',
       headers,
@@ -2622,6 +2654,7 @@ function save(){
   const style=(document.querySelector('input[name=style]:checked')||{}).value||'elegant';
   const o = {
     base:$('base').value.trim(), model:$('model').value.trim(), key:$('apikey').value.trim(),
+    provider:(document.getElementById('provider')||{}).value||'',
     terms:$('terms').value.trim(), mode:$('mode').value, maxW:$('maxW').value,
     srcLang:$('srcLang').value, style:style,
     styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0',
@@ -2715,13 +2748,65 @@ $('dstLang').addEventListener('change',()=>{ UI.dstManual=true; refreshOutName()
 /* 其余字段自动保存 */
 ['base','model','apikey','terms','mode','maxW'].forEach(id=>$(id).addEventListener('change',save));
 
-/* ---------------- 服务商预设 ---------------- */
+/* ---------------- 服务商预设（v0.9.30 分组：海外/国内/其他，模型自填） ---------------- */
 const sel=$('provider');
-PROVIDERS.forEach((p,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=p.name; sel.appendChild(o); });
+function buildProviderOptions(){
+  const cur=sel.value;
+  sel.innerHTML='';
+  /* 全部服务商平铺（无分组） */
+  PROVIDERS.forEach(p=>{
+    const o=document.createElement('option'); o.value=p.id;
+    if(p.id==='custom'){ o.dataset.i18n='optCustom'; o.textContent=t('optCustom'); }
+    else o.textContent=p.name;
+    sel.appendChild(o);
+  });
+  sel.value = PROVIDERS.some(p=>p.id===cur) ? cur : 'deepseek';
+}
+/* 刷新 Key 链接与提示（不触碰 base/model 输入框） */
+function providerAuxUI(){
+  const p=PROVIDERS.find(x=>x.id===sel.value)||PROVIDERS[0];
+  const kl=$('keyLink'), pn=$('providerNote');
+  if(p.keyUrl){ kl.href=p.keyUrl; kl.textContent=t('getKey'); kl.style.display=''; }
+  else kl.style.display='none';
+  if(p.note){ pn.textContent=t(p.note); pn.style.display=''; }
+  else pn.style.display='none';
+}
 sel.addEventListener('change', ()=>{
-  const p=PROVIDERS[+sel.value]; if(p){ $('base').value=p.base; $('model').value=p.model; save(); }
+  const p=PROVIDERS.find(x=>x.id===sel.value); if(!p) return;
+  if(p.id!=='custom'){ $('base').value=p.base; $('model').value=''; }  /* 模型由用户自填 */
+  providerAuxUI(); save();
 });
-sel.dispatchEvent(new Event('change'));
+buildProviderOptions();
+/* 恢复上次选择：优先 provider id 记忆；老数据按 base 匹配；都对不上但有自定义 base → 自定义；
+   空配置 → 默认 DeepSeek。修复 v0.9.29 及之前「加载即被第一个预设覆盖」的 bug */
+(function(){
+  let pid=sv.provider;
+  if(!PROVIDERS.some(p=>p.id===pid)){
+    const saved=(sv.base||'').replace(/\/+$/,'');
+    const m=PROVIDERS.find(p=>p.base && p.base===saved);
+    pid = m ? m.id : (saved ? 'custom' : 'deepseek');
+  }
+  sel.value=pid;
+  if(!$('base').value.trim()){ const p=PROVIDERS.find(x=>x.id===pid); if(p&&p.base) $('base').value=p.base; }
+  providerAuxUI();
+})();
+
+/* 测试连接（v0.9.30）：用当前配置发一条最小请求，验证 Base URL / Key / 模型名三件套 */
+$('btnTest').addEventListener('click', async ()=>{
+  const out=$('testOut'), btn=$('btnTest');
+  const base=$('base').value.trim(), key=$('apikey').value.trim(), model=$('model').value.trim();
+  if(!base||!model){ out.style.color='#dc2626'; out.textContent=t('testFail','Base URL / Model'); return; }
+  btn.disabled=true; out.style.color=''; out.textContent=t('testRun');
+  try{
+    const r=await chatOnce(base,key,model,[{role:'user',content:'Reply with exactly: OK'}],20000);
+    out.style.color='#059669';
+    const echo=String(r||'').trim().replace(/\s+/g,' ').slice(0,24);
+    out.textContent=t('testOk')+(echo?' · '+echo:'');
+  }catch(e){
+    out.style.color='#dc2626';
+    out.textContent=t('testFail', String(e&&e.message||e).slice(0,140));
+  }finally{ btn.disabled=false; }
+});
 
 /* 模式切换显示 */
 function modeUI(){
