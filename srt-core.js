@@ -600,6 +600,24 @@
     return parts.map((p) => dash + ' ' + p.trim()).join('\n');
   }
 
+  // v0.9.39（仅 mono 导出镜像，cue 57 案例）：源 cue 为 K≥2 行 dash 结构、译文被模型压成单行时，
+  // 按行内 dash 边界切回 K 段，镜像源的多行结构。与回填侧 repairSpeakerLines 的差别：
+  //   ①dash 后允许无空格（模型偶发输出「-♪」，回填侧 \s+ 匹配不上而放行）；
+  //   ②只改导出副本——不动 S.rows 数据、不影响双语/ASS 路径。
+  // 段数不匹配则原样返回（宁错放不错改）。
+  function mirrorSpeakerLines(dst, src) {
+    const s = String(dst == null ? '' : dst).replace(/\r/g, '').trim();
+    if (!s || s.includes('\n')) return s;
+    const srcLines = String(src == null ? '' : src).replace(/\r/g, '').split('\n')
+      .map((x) => x.trim()).filter(Boolean);
+    if (srcLines.length < 2 || !srcLines.every((l) => SP_DASH_RE.test(l))) return s;
+    // dash 前仍须句读/空白/行首（lookbehind 防误伤 "20-30" 等无空格连字符），dash 后容忍零空格
+    const parts = s.split(/(?<=[\s。．，,！？!?…；;）)】」』"”]|^)\s*[-–—]\s*/).filter((x) => x.trim());
+    if (parts.length !== srcLines.length) return s;
+    const dash = (srcLines[0].match(/^[-–—]/) || ['-'])[0];
+    return parts.map((p) => dash + ' ' + p.trim()).join('\n');
+  }
+
   // ---------------- 句子级分组与时长分配 ----------------
   // 场景：源 SRT 常把一个完整句子拆在相邻多条字幕里（如 "…was shocked" / "by a tariff's consequences."）。
   // 翻译以句组为单位进行，译回时按各条字幕的时长比例切分回填（时间轴不动）。
@@ -1126,7 +1144,8 @@
         if (last && (r.end || 0) > last.end) last.end = r.end;   // 尾行时间并入承载行
         continue;
       }
-      const rawZh = String(r.zh == null ? '' : r.zh);
+      // v0.9.39：镜像源 speaker 多行结构（仅 mono 导出生效，不动 S.rows 数据/双语/ASS 路径）
+      const rawZh = mirrorSpeakerLines(String(r.zh == null ? '' : r.zh), r.en);
       if (!rawZh.trim()) { last = null; continue; }
       last = { start: r.start || 0, end: r.end || 0, rawZh: rawZh, dst: squashLines(rawZh) };
       entries.push(last);
@@ -1244,7 +1263,7 @@
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars,
     validateItems, anchorOk, fixMixedChars,
-    musicLost, normalizeMusic, repairSpeakerLines,
+    musicLost, normalizeMusic, repairSpeakerLines, mirrorSpeakerLines,
     MAX_W_DEFAULT: 20
   };
 });

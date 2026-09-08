@@ -1113,5 +1113,27 @@ t('repairSpeakerLines：已有换行/源非多行 dash → 不动', () => {
   assert.strictEqual(C.repairSpeakerLines('普通译文', '- 单行 dash 源。'), '普通译文');
 });
 
+t('mirrorSpeakerLines：cue57 案例——「-♪」无空格也能切回两行（mono 镜像）', () => {
+  const src = '- Oh. After you.\n- ♪ Of somebody\'s lack of love ♪';
+  const dst = '- 哦，你先请。-♪ 因某人缺乏爱 ♪';
+  assert.strictEqual(C.mirrorSpeakerLines(dst, src), '- 哦，你先请。\n- ♪ 因某人缺乏爱 ♪');
+});
+t('mirrorSpeakerLines：源非 dash 多行 / 段数不符 / 已多行 → 原样返回', () => {
+  assert.strictEqual(C.mirrorSpeakerLines('一行译文', '普通多行\n没有dash'), '一行译文');
+  assert.strictEqual(C.mirrorSpeakerLines('- 甲。- 乙。- 丙。', '- A.\n- B.'), '- 甲。- 乙。- 丙。');
+  assert.strictEqual(C.mirrorSpeakerLines('- 甲。\n- 乙。', '- A.\n- B.'), '- 甲。\n- 乙。');
+});
+t('mirrorSpeakerLines：「20-30」类连字符不受影响', () => {
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- 20-30 之间。-♪ 歌词 ♪', '- A.\n- ♪ B ♪'),
+    '- 20-30 之间。\n- ♪ 歌词 ♪');
+});
+t('buildMonoParts：单行译文镜像源 speaker 两行结构（mono 全格式生效）', () => {
+  const rows = [{ start: 0, end: 2000, en: '- Oh. After you.\n- ♪ Of somebody\'s lack of love ♪', zh: '- 哦，你先请。-♪ 因某人缺乏爱 ♪' }];
+  const out = C.buildMonoParts(rows, { maxW: 20, dstLocale: 'zh-CN' });
+  assert.strictEqual(out.length, 1);
+  assert.strictEqual(out[0].text, '- 哦，你先请。\n- ♪ 因某人缺乏爱 ♪');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
