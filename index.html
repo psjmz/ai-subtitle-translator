@@ -170,7 +170,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.32</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.33</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -308,7 +308,7 @@
       </div>
       <div class="lst" data-page-node-id="kj7lZrKelW0vM3yK2B99vA">
         <div class="cuegrid head" data-page-node-id="xkWHihUx7ifFz23BLGy3As">
-          <span data-page-node-id="S0NIe5bY8HCvRpU3F5br41">#</span><span data-page-node-id="uEW4tas4JeiYfNZQJf8LbN">时间轴</span><span id="hSrc" data-page-node-id="GEZ0kbOclMqX99QEyIB2UY">英文原文</span><span id="hDst" data-page-node-id="aIiu2HklvFib5vdvM7H7HC">中文译文（可点击编辑）</span>
+          <span data-page-node-id="S0NIe5bY8HCvRpU3F5br41">#</span><span data-i18n="colTc" data-page-node-id="uEW4tas4JeiYfNZQJf8LbN">时间轴</span><span id="hSrc" data-page-node-id="GEZ0kbOclMqX99QEyIB2UY">英文原文</span><span id="hDst" data-page-node-id="aIiu2HklvFib5vdvM7H7HC">中文译文（可点击编辑）</span>
         </div>
         <div class="inner" id="rows" data-page-node-id="LXlYK1sSejmhH6z5O5KEhw"></div>
       </div>
@@ -348,13 +348,13 @@ const PROVIDERS = [
   { id:'anthropic',  name:'Anthropic Claude',  base:'https://api.anthropic.com/v1',                                    keyUrl:'https://console.anthropic.com/settings/keys' },
   { id:'gemini',     name:'Google Gemini',     base:'https://generativelanguage.googleapis.com/v1beta/openai',         keyUrl:'https://aistudio.google.com/apikey' },
   { id:'xai',        name:'xAI Grok',          base:'https://api.x.ai/v1',                                             keyUrl:'https://console.x.ai' },
-  { id:'openrouter', name:'OpenRouter（聚合百模）', base:'https://openrouter.ai/api/v1',                                 keyUrl:'https://openrouter.ai/settings/keys', note:'noteOpenRouter' },
-  { id:'deepseek',   name:'DeepSeek（推荐）',   base:'https://api.deepseek.com',                                        keyUrl:'https://platform.deepseek.com/api_keys' },
-  { id:'qwen',       name:'阿里通义千问',       base:'https://dashscope.aliyuncs.com/compatible-mode/v1',              keyUrl:'https://bailian.console.aliyun.com/?apiKey=1' },
-  { id:'glm',        name:'智谱 GLM',          base:'https://open.bigmodel.cn/api/paas/v4',                            keyUrl:'https://open.bigmodel.cn/usercenter/apikeys' },
-  { id:'kimi',       name:'月之暗面 Kimi',      base:'https://api.moonshot.cn/v1',                                      keyUrl:'https://platform.moonshot.cn/console/api-keys' },
-  { id:'doubao',     name:'字节豆包（火山方舟）', base:'https://ark.cn-beijing.volces.com/api/v3',                      keyUrl:'https://console.volcengine.com/ark', note:'noteDoubao' },
-  { id:'siliconflow',name:'硅基流动 SiliconFlow', base:'https://api.siliconflow.cn/v1',                                keyUrl:'https://cloud.siliconflow.cn/account/ak' },
+  { id:'openrouter', name:'OpenRouter', zhName:'OpenRouter（聚合百模）', base:'https://openrouter.ai/api/v1',                                 keyUrl:'https://openrouter.ai/settings/keys', note:'noteOpenRouter' },
+  { id:'deepseek',   name:'DeepSeek', zhName:'DeepSeek（推荐）', note:'noteDeepSeek',   base:'https://api.deepseek.com',                                        keyUrl:'https://platform.deepseek.com/api_keys' },
+  { id:'qwen',       name:'Qwen (Alibaba)', zhName:'阿里通义千问',       base:'https://dashscope.aliyuncs.com/compatible-mode/v1',              keyUrl:'https://bailian.console.aliyun.com/?apiKey=1' },
+  { id:'glm',        name:'Zhipu GLM', zhName:'智谱 GLM',          base:'https://open.bigmodel.cn/api/paas/v4',                            keyUrl:'https://open.bigmodel.cn/usercenter/apikeys' },
+  { id:'kimi',       name:'Moonshot Kimi', zhName:'月之暗面 Kimi',      base:'https://api.moonshot.cn/v1',                                      keyUrl:'https://platform.moonshot.cn/console/api-keys' },
+  { id:'doubao',     name:'Doubao (Volcengine Ark)', zhName:'字节豆包（火山方舟）', base:'https://ark.cn-beijing.volces.com/api/v3',                      keyUrl:'https://console.volcengine.com/ark', note:'noteDoubao' },
+  { id:'siliconflow',name:'SiliconFlow', zhName:'硅基流动 SiliconFlow', base:'https://api.siliconflow.cn/v1',                                keyUrl:'https://cloud.siliconflow.cn/account/ak' },
   { id:'custom',     name:'',                    base:'', keyUrl:'' }   /* 自定义：不覆盖已填值 */
 ];
 /* 站点内置免费模型（后台配置）：免 Key、OpenAI 兼容；匿名有速率限制 */
@@ -377,28 +377,28 @@ async function refreshBuiltinHint(){
 }
 /* ---------------- 语言 / 风格配置 ---------------- */
 const LANGS = [
-  { v:'en',    zh:'English',          file:'英文',   prompt:'English' },
-  { v:'zh-CN', zh:'简体中文',          file:'中文',   prompt:'简体中文 (Simplified Chinese)' },
-  { v:'zh-TW', zh:'繁體中文',          file:'繁体中文',prompt:'繁體中文 (Traditional Chinese)' },
-  { v:'ja',    zh:'日本語',            file:'日文',   prompt:'Japanese' },
-  { v:'ko',    zh:'한국어',            file:'韩文',   prompt:'Korean' },
-  { v:'fr',    zh:'Français',         file:'法文',   prompt:'French' },
-  { v:'de',    zh:'Deutsch',          file:'德文',   prompt:'German' },
-  { v:'es',    zh:'Español',          file:'西文',   prompt:'Spanish' },
-  { v:'pt',    zh:'Português',        file:'葡文',   prompt:'Portuguese' },
-  { v:'it',    zh:'Italiano',         file:'意文',   prompt:'Italian' },
-  { v:'ru',    zh:'Русский',          file:'俄文',   prompt:'Russian' },
-  { v:'ar',    zh:'العربية',          file:'阿文',   prompt:'Arabic' },
-  { v:'th',    zh:'ไทย',              file:'泰文',   prompt:'Thai' },
-  { v:'vi',    zh:'Tiếng Việt',       file:'越文',   prompt:'Vietnamese' },
-  { v:'id',    zh:'Bahasa Indonesia', file:'印尼文', prompt:'Indonesian' },
-  { v:'hi',    zh:'हिन्दी',            file:'印地文', prompt:'Hindi' },
-  { v:'tr',    zh:'Türkçe',           file:'土文',   prompt:'Turkish' },
-  { v:'pl',    zh:'Polski',           file:'波兰文', prompt:'Polish' },
-  { v:'nl',    zh:'Nederlands',       file:'荷兰文', prompt:'Dutch' },
-  { v:'ms',    zh:'Bahasa Melayu',    file:'马来文', prompt:'Malay' },
-  { v:'fil',   zh:'Filipino',         file:'菲律宾文',prompt:'Filipino (Tagalog)' },
-  { v:'fa',    zh:'فارسی',            file:'波斯文', prompt:'Persian (Farsi)' }
+  { v:'en',    zh:'English', en:'English',          file:'英文',   prompt:'English' },
+  { v:'zh-CN', zh:'简体中文', en:'Chinese',          file:'中文',   prompt:'简体中文 (Simplified Chinese)' },
+  { v:'zh-TW', zh:'繁體中文', en:'Chinese (Trad.)',          file:'繁体中文',prompt:'繁體中文 (Traditional Chinese)' },
+  { v:'ja',    zh:'日本語', en:'Japanese',            file:'日文',   prompt:'Japanese' },
+  { v:'ko',    zh:'한국어', en:'Korean',            file:'韩文',   prompt:'Korean' },
+  { v:'fr',    zh:'Français', en:'French',         file:'法文',   prompt:'French' },
+  { v:'de',    zh:'Deutsch', en:'German',          file:'德文',   prompt:'German' },
+  { v:'es',    zh:'Español', en:'Spanish',          file:'西文',   prompt:'Spanish' },
+  { v:'pt',    zh:'Português', en:'Portuguese',        file:'葡文',   prompt:'Portuguese' },
+  { v:'it',    zh:'Italiano', en:'Italian',         file:'意文',   prompt:'Italian' },
+  { v:'ru',    zh:'Русский', en:'Russian',          file:'俄文',   prompt:'Russian' },
+  { v:'ar',    zh:'العربية', en:'Arabic',          file:'阿文',   prompt:'Arabic' },
+  { v:'th',    zh:'ไทย', en:'Thai',              file:'泰文',   prompt:'Thai' },
+  { v:'vi',    zh:'Tiếng Việt', en:'Vietnamese',       file:'越文',   prompt:'Vietnamese' },
+  { v:'id',    zh:'Bahasa Indonesia', en:'Indonesian', file:'印尼文', prompt:'Indonesian' },
+  { v:'hi',    zh:'हिन्दी', en:'Hindi',            file:'印地文', prompt:'Hindi' },
+  { v:'tr',    zh:'Türkçe', en:'Turkish',           file:'土文',   prompt:'Turkish' },
+  { v:'pl',    zh:'Polski', en:'Polish',           file:'波兰文', prompt:'Polish' },
+  { v:'nl',    zh:'Nederlands', en:'Dutch',       file:'荷兰文', prompt:'Dutch' },
+  { v:'ms',    zh:'Bahasa Melayu', en:'Malay',    file:'马来文', prompt:'Malay' },
+  { v:'fil',   zh:'Filipino', en:'Filipino',         file:'菲律宾文',prompt:'Filipino (Tagalog)' },
+  { v:'fa',    zh:'فارسی', en:'Persian',            file:'波斯文', prompt:'Persian (Farsi)' }
 ];
 const LBY = (v) => LANGS.find(l => l.v === v) || { zh:v, file:v, prompt:v };
 const STYLE_DESC = {
@@ -474,7 +474,8 @@ const I18N = {
   errOccur:'发生错误：{0}',
   noExport:'没有可导出的字幕。', exported:'已导出：{0}（{1} 条）',
   noCopy:'没有内容可复制。', copied:'已复制到剪贴板。', copiedCompat:'已复制（兼容模式）。',
-  verifyOk:'✅ 校验通过：{0} 条，编号连续、时间轴无重叠、无空行。', pasteEmpty:'粘贴区为空。'
+  verifyOk:'✅ 校验通过：{0} 条，编号连续、时间轴无重叠、无空行。', pasteEmpty:'粘贴区为空。',
+  colTc:'时间轴', fnSub:'字幕', fnBi:'双语字幕', demoFile:'9月3日_示例.srt', noteDeepSeek:'推荐：性价比高、速度快，适合字幕批量翻译', errNotCfg:'管理员尚未配置默认模型，请改用自定义 API。', errIpLimit:'今日该 IP 的免费翻译额度（{0} 次请求）已用完，可填写自己的 API Key 继续使用。', errGlobalLimit:'本站今日免费翻译总额度已用完，可填写自己的 API Key 继续使用。', errBadJson:'请求体不是合法 JSON', errNoMsgs:'缺少 messages', errUpstream:'默认模型调用失败：{0}', errNotJson:'返回内容不是 JSON', errEmpty:'返回为空', errNoGroups:'JSON 缺少 groups', errNoGno:'JSON 条目缺少 gno', errMissGroup:'缺少句组 {0} 的结果', errNoArray:'JSON 缺少数组', anchorFail:'锚定校验未过（句组 {0} 译文非{1}）', issBlkNoNumTs:'无法解析该块（缺编号或时间轴）', issBlkNoTs:'无法解析该块（缺时间轴）', issBadTs:'时间轴格式不正确', issNumInc:'编号未递增', issEndLtStart:'结束时间早于开始时间', issOverlap:'与上一条时间轴重叠', issNoBlocks:'没有解析到任何字幕块', issZeroDur:'零时长', issEmptyCue:'空内容', issNoUsable:'没有可用的字幕块'
 },
 'zh-TW': {
   docTitle:'AI字幕全自動翻譯-你要的語言字幕都有', appTitle:'🎬 AI 字幕翻譯工作台',
@@ -541,7 +542,8 @@ const I18N = {
   errOccur:'發生錯誤：{0}',
   noExport:'沒有可匯出的字幕。', exported:'已匯出：{0}（{1} 條）',
   noCopy:'沒有內容可複製。', copied:'已複製到剪貼簿。', copiedCompat:'已複製（相容模式）。',
-  verifyOk:'✅ 校驗通過：{0} 條，編號連續、時間軸無重疊、無空行。', pasteEmpty:'貼上區為空。'
+  verifyOk:'✅ 校驗通過：{0} 條，編號連續、時間軸無重疊、無空行。', pasteEmpty:'貼上區為空。',
+  colTc:'時間軸', fnSub:'字幕', fnBi:'雙語字幕', demoFile:'9月3日_範例.srt', noteDeepSeek:'推薦：性價比高、速度快，適合字幕批次翻譯', errNotCfg:'管理員尚未設定預設模型，請改用自訂 API。', errIpLimit:'今日該 IP 的免費翻譯額度（{0} 次請求）已用完，可填寫自己的 API Key 繼續使用。', errGlobalLimit:'本站今日免費翻譯總額度已用完，可填寫自己的 API Key 繼續使用。', errBadJson:'請求體不是合法 JSON', errNoMsgs:'缺少 messages', errUpstream:'預設模型調用失敗：{0}', errNotJson:'返回內容不是 JSON', errEmpty:'返回為空', errNoGroups:'JSON 缺少 groups', errNoGno:'JSON 條目缺少 gno', errMissGroup:'缺少句組 {0} 的結果', errNoArray:'JSON 缺少陣列', anchorFail:'錨定校驗未過（句組 {0} 譯文非{1}）', issBlkNoNumTs:'無法解析該塊（缺編號或時間軸）', issBlkNoTs:'無法解析該塊（缺時間軸）', issBadTs:'時間軸格式不正確', issNumInc:'編號未遞增', issEndLtStart:'結束時間早於開始時間', issOverlap:'與上一條時間軸重疊', issNoBlocks:'沒有解析到任何字幕塊', issZeroDur:'零時長', issEmptyCue:'空內容', issNoUsable:'沒有可用的字幕塊'
 },
 'en': {
   docTitle:'AI Auto Subtitle Translation - Subtitles in Any Language You Need', appTitle:'🎬 AI Subtitle Translator',
@@ -608,7 +610,8 @@ const I18N = {
   errOccur:'Error: {0}',
   noExport:'Nothing to export.', exported:'Exported: {0} ({1} cues)',
   noCopy:'Nothing to copy.', copied:'Copied to clipboard.', copiedCompat:'Copied (compat mode).',
-  verifyOk:'✅ Validation passed: {0} cues, sequential numbering, no overlaps, no empty cues.', pasteEmpty:'Paste area is empty.'
+  verifyOk:'✅ Validation passed: {0} cues, sequential numbering, no overlaps, no empty cues.', pasteEmpty:'Paste area is empty.',
+  colTc:'Timeline', fnSub:'subtitles', fnBi:'bilingual', demoFile:'demo.srt', noteDeepSeek:'Recommended: fast and cost-effective, ideal for batch subtitle translation', errNotCfg:'The site admin has not configured a default model. Please use your own API instead.', errIpLimit:'Today\'s free translation quota for this IP ({0} requests) is used up. Enter your own API key to continue.', errGlobalLimit:'Today\'s site-wide free translation quota is used up. Enter your own API key to continue.', errBadJson:'Request body is not valid JSON', errNoMsgs:'Missing messages', errUpstream:'Default model call failed: {0}', errNotJson:'Response is not JSON', errEmpty:'Response is empty', errNoGroups:'JSON is missing groups', errNoGno:'JSON item is missing gno', errMissGroup:'Missing result for group {0}', errNoArray:'JSON is missing the array', anchorFail:'Anchor check failed (group {0} translation is not {1})', issBlkNoNumTs:'Cannot parse block (missing index or timeline)', issBlkNoTs:'Cannot parse block (missing timeline)', issBadTs:'Invalid timeline format', issNumInc:'Index not increasing', issEndLtStart:'End time earlier than start time', issOverlap:'Overlaps previous timeline', issNoBlocks:'No subtitle blocks parsed', issZeroDur:'Zero duration', issEmptyCue:'Empty content', issNoUsable:'No usable subtitle blocks'
 },
 'ja': {
   docTitle:'AI全自動字幕翻訳 - 必要な言語の字幕をすべて', appTitle:'🎬 AI字幕翻訳ワークベンチ',
@@ -675,7 +678,8 @@ const I18N = {
   errOccur:'エラー：{0}',
   noExport:'書き出す字幕がありません。', exported:'書き出しました：{0}（{1} 件）',
   noCopy:'コピーする内容がありません。', copied:'クリップボードにコピーしました。', copiedCompat:'コピーしました（互換モード）。',
-  verifyOk:'✅ チェック通過：{0} 件、番号連続・タイムライン重複なし・空行なし。', pasteEmpty:'貼り付けエリアが空です。'
+  verifyOk:'✅ チェック通過：{0} 件、番号連続・タイムライン重複なし・空行なし。', pasteEmpty:'貼り付けエリアが空です。',
+  colTc:'タイムライン', fnSub:'字幕', fnBi:'二カ国語字幕', demoFile:'サンプル.srt', noteDeepSeek:'推奨：高速かつ費用対効果が高く、字幕の一括翻訳に最適', errNotCfg:'管理者がデフォルトモデルを未設定です。カスタム API をご利用ください。', errIpLimit:'本日のこの IP の無料翻訳枠（{0} リクエスト）を使い切りました。独自の API Key を入力して続行できます。', errGlobalLimit:'本日のサイト全体の無料翻訳総枠を使い切りました。独自の API Key を入力して続行できます。', errBadJson:'リクエスト本文が有効な JSON ではありません', errNoMsgs:'messages がありません', errUpstream:'デフォルトモデルの呼び出しに失敗：{0}', errNotJson:'返答が JSON ではありません', errEmpty:'返答が空です', errNoGroups:'JSON に groups がありません', errNoGno:'JSON 項目に gno がありません', errMissGroup:'グループ {0} の結果がありません', errNoArray:'JSON に配列がありません', anchorFail:'アンカー検証不合格（グループ {0} の訳文が{1}ではありません）', issBlkNoNumTs:'ブロックを解析できません（番号またはタイムライン欠落）', issBlkNoTs:'ブロックを解析できません（タイムライン欠落）', issBadTs:'タイムラインの形式が不正です', issNumInc:'番号が連続していません', issEndLtStart:'終了時刻が開始時刻より前です', issOverlap:'前のタイムラインと重複しています', issNoBlocks:'字幕ブロックが一つも解析されませんでした', issZeroDur:'長さがゼロです', issEmptyCue:'内容が空です', issNoUsable:'使用可能な字幕ブロックがありません'
 },
 'es': {
   docTitle:'Traducción Automática de Subtítulos con IA - Subtítulos en Cualquier Idioma', appTitle:'🎬 Traductor de Subtítulos IA',
@@ -742,7 +746,8 @@ const I18N = {
   errOccur:'Error: {0}',
   noExport:'Nada que exportar.', exported:'Exportado: {0} ({1} subtítulos)',
   noCopy:'Nada que copiar.', copied:'Copiado al portapapeles.', copiedCompat:'Copiado (modo compat).',
-  verifyOk:'✅ Validación OK: {0} subtítulos, numeración secuencial, sin solapamientos, sin vacíos.', pasteEmpty:'El área de pegado está vacía.'
+  verifyOk:'✅ Validación OK: {0} subtítulos, numeración secuencial, sin solapamientos, sin vacíos.', pasteEmpty:'El área de pegado está vacía.',
+  colTc:'Línea de tiempo', fnSub:'subtitulos', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recomendado: rápido y económico, ideal para traducir subtítulos por lotes', errNotCfg:'El administrador aún no ha configurado un modelo predeterminado. Use su propia API.', errIpLimit:'La cuota gratuita de hoy para esta IP ({0} solicitudes) se ha agotado. Introduzca su propia API key para continuar.', errGlobalLimit:'La cuota gratuita total del sitio de hoy se ha agotado. Introduzca su propia API key para continuar.', errBadJson:'El cuerpo de la solicitud no es JSON válido', errNoMsgs:'Faltan messages', errUpstream:'Falló la llamada al modelo predeterminado: {0}', errNotJson:'La respuesta no es JSON', errEmpty:'La respuesta está vacía', errNoGroups:'Falta groups en el JSON', errNoGno:'Falta gno en el elemento JSON', errMissGroup:'Falta el resultado del grupo {0}', errNoArray:'Falta el array en el JSON', anchorFail:'Verificación de anclaje fallida (la traducción del grupo {0} no es {1})', issBlkNoNumTs:'No se puede analizar el bloque (falta índice o línea de tiempo)', issBlkNoTs:'No se puede analizar el bloque (falta línea de tiempo)', issBadTs:'Formato de línea de tiempo no válido', issNumInc:'El índice no aumenta', issEndLtStart:'La hora de fin es anterior a la de inicio', issOverlap:'Se solapa con la línea de tiempo anterior', issNoBlocks:'No se analizó ningún bloque de subtítulos', issZeroDur:'Duración cero', issEmptyCue:'Contenido vacío', issNoUsable:'No hay bloques de subtítulos utilizables'
 },
 'pt': {
   docTitle:'Tradução Automática de Legendas com IA - Legendas em Qualquer Idioma', appTitle:'🎬 Tradutor de Legendas IA',
@@ -809,7 +814,8 @@ const I18N = {
   errOccur:'Erro: {0}',
   noExport:'Nada para exportar.', exported:'Exportado: {0} ({1} legendas)',
   noCopy:'Nada para copiar.', copied:'Copiado para a área de transferência.', copiedCompat:'Copiado (modo compat).',
-  verifyOk:'✅ Validação OK: {0} legendas, numeração sequencial, sem sobreposições, sem vazias.', pasteEmpty:'A área de colagem está vazia.'
+  verifyOk:'✅ Validação OK: {0} legendas, numeração sequencial, sem sobreposições, sem vazias.', pasteEmpty:'A área de colagem está vazia.',
+  colTc:'Linha do tempo', fnSub:'legendas', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recomendado: rápido e econômico, ideal para tradução em lote de legendas', errNotCfg:'O administrador ainda não configurou um modelo padrão. Use sua própria API.', errIpLimit:'A cota gratuita de hoje para este IP ({0} solicitações) acabou. Insira sua própria API key para continuar.', errGlobalLimit:'A cota gratuita total do site de hoje acabou. Insira sua própria API key para continuar.', errBadJson:'O corpo da requisição não é JSON válido', errNoMsgs:'Faltam messages', errUpstream:'Falha na chamada do modelo padrão: {0}', errNotJson:'A resposta não é JSON', errEmpty:'A resposta está vazia', errNoGroups:'JSON sem groups', errNoGno:'Item do JSON sem gno', errMissGroup:'Falta o resultado do grupo {0}', errNoArray:'JSON sem array', anchorFail:'Verificação de ancoragem falhou (a tradução do grupo {0} não é {1})', issBlkNoNumTs:'Não foi possível analisar o bloco (falta índice ou linha do tempo)', issBlkNoTs:'Não foi possível analisar o bloco (falta linha do tempo)', issBadTs:'Formato de linha do tempo inválido', issNumInc:'Índice não crescente', issEndLtStart:'Horário de fim anterior ao de início', issOverlap:'Sobrepõe a linha do tempo anterior', issNoBlocks:'Nenhum bloco de legendas analisado', issZeroDur:'Duração zero', issEmptyCue:'Conteúdo vazio', issNoUsable:'Nenhum bloco de legendas utilizável'
 },
 'ko': {
   docTitle:'AI 자동 자막 번역 - 원하는 언어 자막 모두 지원', appTitle:'🎬 AI 자막 번역기',
@@ -876,7 +882,8 @@ const I18N = {
   errOccur:'오류: {0}',
   noExport:'내보낼 자막이 없습니다.', exported:'내보냈습니다: {0}({1}개)',
   noCopy:'복사할 내용이 없습니다.', copied:'클립보드에 복사했습니다.', copiedCompat:'복사했습니다(호환 모드).',
-  verifyOk:'✅ 검증 통과: {0}개, 번호 연속·타임라인 중복 없음·빈 줄 없음.', pasteEmpty:'붙여넣기 영역이 비어 있습니다.'
+  verifyOk:'✅ 검증 통과: {0}개, 번호 연속·타임라인 중복 없음·빈 줄 없음.', pasteEmpty:'붙여넣기 영역이 비어 있습니다.',
+  colTc:'타임라인', fnSub:'자막', fnBi:'이중언어자막', demoFile:'예시.srt', noteDeepSeek:'추천: 빠르고 비용 효율이 좋아 자막 일괄 번역에 적합', errNotCfg:'관리자가 기본 모델을 설정하지 않았습니다. 직접 API를 사용해 주세요.', errIpLimit:'오늘 이 IP의 무료 번역 한도({0}회 요청)를 모두 사용했습니다. 직접 API Key를 입력해 계속할 수 있습니다.', errGlobalLimit:'오늘 사이트 전체 무료 번역 총 한도를 모두 사용했습니다. 직접 API Key를 입력해 계속할 수 있습니다.', errBadJson:'요청 본문이 유효한 JSON이 아닙니다', errNoMsgs:'messages가 없습니다', errUpstream:'기본 모델 호출 실패: {0}', errNotJson:'응답이 JSON이 아닙니다', errEmpty:'응답이 비어 있습니다', errNoGroups:'JSON에 groups가 없습니다', errNoGno:'JSON 항목에 gno가 없습니다', errMissGroup:'그룹 {0}의 결과가 없습니다', errNoArray:'JSON에 배열이 없습니다', anchorFail:'앵커 검증 실패(그룹 {0} 번역이 {1}이(가) 아님)', issBlkNoNumTs:'블록을 분석할 수 없습니다(번호 또는 타임라인 누락)', issBlkNoTs:'블록을 분석할 수 없습니다(타임라인 누락)', issBadTs:'타임라인 형식이 올바르지 않습니다', issNumInc:'번호가 증가하지 않습니다', issEndLtStart:'종료 시간이 시작 시간보다 빠릅니다', issOverlap:'이전 타임라인과 겹칩니다', issNoBlocks:'자막 블록이 하나도 분석되지 않았습니다', issZeroDur:'길이가 0입니다', issEmptyCue:'내용이 비어 있습니다', issNoUsable:'사용 가능한 자막 블록이 없습니다'
 },
 'de': {
   docTitle:'Kostenlose KI-Untertitel-Autoübersetzung - Untertitel in jeder Sprache', appTitle:'🎬 KI Untertitel-Übersetzer',
@@ -943,7 +950,8 @@ const I18N = {
   errOccur:'Fehler: {0}',
   noExport:'Nichts zu exportieren.', exported:'Exportiert: {0} ({1} Untertitel)',
   noCopy:'Nichts zu kopieren.', copied:'In die Zwischenablage kopiert.', copiedCompat:'Kopiert (Kompatibilitätsmodus).',
-  verifyOk:'✅ Validierung bestanden: {0} Untertitel, fortlaufende Nummern, keine Überlappungen, keine Leerzeilen.', pasteEmpty:'Einfügebereich ist leer.'
+  verifyOk:'✅ Validierung bestanden: {0} Untertitel, fortlaufende Nummern, keine Überlappungen, keine Leerzeilen.', pasteEmpty:'Einfügebereich ist leer.',
+  colTc:'Zeitachse', fnSub:'untertitel', fnBi:'zweisprachig', demoFile:'demo.srt', noteDeepSeek:'Empfohlen: schnell und kostengünstig, ideal für Stapelübersetzung von Untertiteln', errNotCfg:'Der Administrator hat noch kein Standardmodell konfiguriert. Bitte eigenen API-Key verwenden.', errIpLimit:'Das heutige Gratis-Kontingent für diese IP ({0} Anfragen) ist aufgebraucht. Eigenen API-Key eingeben, um weiterzumachen.', errGlobalLimit:'Das heutige Gratis-Gesamtkontingent der Seite ist aufgebraucht. Eigenen API-Key eingeben, um weiterzumachen.', errBadJson:'Anfragekörper ist kein gültiges JSON', errNoMsgs:'messages fehlt', errUpstream:'Standardmodell-Aufruf fehlgeschlagen: {0}', errNotJson:'Antwort ist kein JSON', errEmpty:'Antwort ist leer', errNoGroups:'JSON ohne groups', errNoGno:'JSON-Eintrag ohne gno', errMissGroup:'Ergebnis für Gruppe {0} fehlt', errNoArray:'JSON ohne Array', anchorFail:'Ankerprüfung fehlgeschlagen (Übersetzung der Gruppe {0} ist nicht {1})', issBlkNoNumTs:'Block kann nicht analysiert werden (Index oder Zeitachse fehlt)', issBlkNoTs:'Block kann nicht analysiert werden (Zeitachse fehlt)', issBadTs:'Ungültiges Zeitachsenformat', issNumInc:'Index nicht aufsteigend', issEndLtStart:'Endzeit liegt vor der Startzeit', issOverlap:'Überlappt mit der vorherigen Zeitachse', issNoBlocks:'Keine Untertitelblöcke analysiert', issZeroDur:'Null Dauer', issEmptyCue:'Leerer Inhalt', issNoUsable:'Keine verwendbaren Untertitelblöcke'
 },
 'fr': {
   docTitle:'Traduction Automatique de Sous-titres Gratuite par IA - Sous-titres dans Toutes les Langues', appTitle:'🎬 Traducteur de Sous-titres IA',
@@ -1010,7 +1018,8 @@ const I18N = {
   errOccur:'Erreur : {0}',
   noExport:'Rien à exporter.', exported:'Exporté : {0} ({1} sous-titres)',
   noCopy:'Rien à copier.', copied:'Copié dans le presse-papiers.', copiedCompat:'Copié (mode compatibilité).',
-  verifyOk:'✅ Validation réussie : {0} sous-titres, numérotation continue, aucun chevauchement, aucune ligne vide.', pasteEmpty:'La zone de collage est vide.'
+  verifyOk:'✅ Validation réussie : {0} sous-titres, numérotation continue, aucun chevauchement, aucune ligne vide.', pasteEmpty:'La zone de collage est vide.',
+  colTc:'Timeline', fnSub:'sous-titres', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recommandé : rapide et économique, idéal pour la traduction de sous-titres par lots', errNotCfg:'L\'administrateur n\'a pas encore configuré de modèle par défaut. Utilisez votre propre API.', errIpLimit:'Le quota gratuit du jour pour cette IP ({0} requêtes) est épuisé. Saisissez votre propre clé API pour continuer.', errGlobalLimit:'Le quota gratuit total du site pour aujourd\'hui est épuisé. Saisissez votre propre clé API pour continuer.', errBadJson:'Le corps de la requête n\'est pas un JSON valide', errNoMsgs:'messages manquant', errUpstream:'Échec de l\'appel au modèle par défaut : {0}', errNotJson:'La réponse n\'est pas du JSON', errEmpty:'La réponse est vide', errNoGroups:'Il manque groups dans le JSON', errNoGno:'Il manque gno dans l\'élément JSON', errMissGroup:'Résultat manquant pour le groupe {0}', errNoArray:'Il manque le tableau dans le JSON', anchorFail:'Échec de la vérification d\'ancrage (la traduction du groupe {0} n\'est pas en {1})', issBlkNoNumTs:'Impossible d\'analyser le bloc (index ou timeline manquant)', issBlkNoTs:'Impossible d\'analyser le bloc (timeline manquant)', issBadTs:'Format de timeline invalide', issNumInc:'Index non croissant', issEndLtStart:'Heure de fin antérieure à l\'heure de début', issOverlap:'Chevauche la timeline précédente', issNoBlocks:'Aucun bloc de sous-titres analysé', issZeroDur:'Durée nulle', issEmptyCue:'Contenu vide', issNoUsable:'Aucun bloc de sous-titres utilisable'
 },
 'id': {
   docTitle:'Terjemahan Subtitle Otomatis dengan AI - Subtitle dalam Bahasa Apa Pun', appTitle:'🎬 Penerjemah Subtitle AI',
@@ -1077,7 +1086,8 @@ const I18N = {
   errOccur:'Kesalahan: {0}',
   noExport:'Tidak ada yang bisa diekspor.', exported:'Diekspor: {0} ({1} subtitle)',
   noCopy:'Tidak ada yang bisa disalin.', copied:'Tersalin ke clipboard.', copiedCompat:'Tersalin (mode kompat).',
-  verifyOk:'✅ Validasi lolos: {0} subtitle, penomoran berurutan, tanpa tumpang tindih, tanpa baris kosong.', pasteEmpty:'Area tempelan kosong.'
+  verifyOk:'✅ Validasi lolos: {0} subtitle, penomoran berurutan, tanpa tumpang tindih, tanpa baris kosong.', pasteEmpty:'Area tempelan kosong.',
+  colTc:'Lini masa', fnSub:'subtitle', fnBi:'dua bahasa', demoFile:'demo.srt', noteDeepSeek:'Direkomendasikan: cepat dan hemat biaya, ideal untuk terjemahan subtitle massal', errNotCfg:'Admin belum mengonfigurasi model bawaan. Gunakan API Anda sendiri.', errIpLimit:'Kuota gratis hari ini untuk IP ini ({0} permintaan) sudah habis. Masukkan API key Anda sendiri untuk melanjutkan.', errGlobalLimit:'Kuota gratis total situs hari ini sudah habis. Masukkan API key Anda sendiri untuk melanjutkan.', errBadJson:'Body permintaan bukan JSON yang valid', errNoMsgs:'messages tidak ada', errUpstream:'Panggilan model bawaan gagal: {0}', errNotJson:'Respons bukan JSON', errEmpty:'Respons kosong', errNoGroups:'JSON tidak memiliki groups', errNoGno:'Item JSON tidak memiliki gno', errMissGroup:'Hasil untuk grup {0} tidak ada', errNoArray:'JSON tidak memiliki array', anchorFail:'Pemeriksaan jangkar gagal (terjemahan grup {0} bukan {1})', issBlkNoNumTs:'Tidak dapat mengurai blok (nomor atau lini masa hilang)', issBlkNoTs:'Tidak dapat mengurai blok (lini masa hilang)', issBadTs:'Format lini masa tidak valid', issNumInc:'Nomor tidak bertambah', issEndLtStart:'Waktu selesai lebih awal dari waktu mulai', issOverlap:'Tumpang tindih dengan lini masa sebelumnya', issNoBlocks:'Tidak ada blok subtitle yang diurai', issZeroDur:'Durasi nol', issEmptyCue:'Konten kosong', issNoUsable:'Tidak ada blok subtitle yang dapat digunakan'
 },
 'hi': {
   docTitle:'मुफ़्त AI स्वचालित सबटाइटल अनुवाद - आपको जिस भाषा में चाहिए', appTitle:'🎬 AI सबटाइटल अनुवादक',
@@ -1144,7 +1154,8 @@ const I18N = {
   errOccur:'त्रुटि: {0}',
   noExport:'निर्यात के लिए कुछ नहीं।', exported:'निर्यातित: {0} ({1} सबटाइटल)',
   noCopy:'कॉपी करने को कुछ नहीं।', copied:'क्लिपबोर्ड पर कॉपी हुआ।', copiedCompat:'कॉपी हुआ (कम्पैट मोड)।',
-  verifyOk:'✅ सत्यापन पास: {0} सबटाइटल, क्रमिक क्रमांक, कोई ओवरलैप नहीं, कोई खाली पंक्ति नहीं।', pasteEmpty:'पेस्ट क्षेत्र खाली है।'
+  verifyOk:'✅ सत्यापन पास: {0} सबटाइटल, क्रमिक क्रमांक, कोई ओवरलैप नहीं, कोई खाली पंक्ति नहीं।', pasteEmpty:'पेस्ट क्षेत्र खाली है।',
+  colTc:'टाइमलाइन', fnSub:'सबटाइटल', fnBi:'द्विभाषी', demoFile:'demo.srt', noteDeepSeek:'अनुशंसित: तेज़ और किफ़ायती, सबटाइटल बैच अनुवाद के लिए आदर्श', errNotCfg:'व्यवस्थापक ने डिफ़ॉल्ट मॉडल कॉन्फ़िगर नहीं किया है। कृपया अपनी API का उपयोग करें।', errIpLimit:'आज इस IP का मुफ़्त अनुवाद कोटा ({0} अनुरोध) समाप्त हो गया है। जारी रखने के लिए अपनी API key डालें।', errGlobalLimit:'आज साइट कुल मुफ़्त अनुवाद कोटा समाप्त हो गया है। जारी रखने के लिए अपनी API key डालें।', errBadJson:'अनुरोध बॉडी मान्य JSON नहीं है', errNoMsgs:'messages अनुपस्थित', errUpstream:'डिफ़ॉल्ट मॉडल कॉल विफल: {0}', errNotJson:'प्रतिक्रिया JSON नहीं है', errEmpty:'प्रतिक्रिया खाली है', errNoGroups:'JSON में groups नहीं है', errNoGno:'JSON आइटम में gno नहीं है', errMissGroup:'समूह {0} का परिणाम नहीं मिला', errNoArray:'JSON में सरणी नहीं है', anchorFail:'एंकर जाँच विफल (समूह {0} का अनुवाद {1} नहीं है)', issBlkNoNumTs:'ब्लॉक पार्स नहीं हो सका (इंडेक्स या टाइमलाइन अनुपस्थित)', issBlkNoTs:'ब्लॉक पार्स नहीं हो सका (टाइमलाइन अनुपस्थित)', issBadTs:'अमान्य टाइमलाइन प्रारूप', issNumInc:'इंडेक्स बढ़ता नहीं है', issEndLtStart:'समाप्ति समय प्रारंभ समय से पहले है', issOverlap:'पिछली टाइमलाइन से अध्यारोपित है', issNoBlocks:'कोई सबटाइटल ब्लॉक पार्स नहीं हुआ', issZeroDur:'शून्य अवधि', issEmptyCue:'खाली सामग्री', issNoUsable:'कोई उपयोगी सबटाइटल ब्लॉक नहीं'
 },
 'th': {
   docTitle:'แปลซับไตเติลอัตโนมัติฟรีด้วย AI - ซับไตเติลทุกภาษาที่คุณต้องการ', appTitle:'🎬 ตัวแปลซับไตเติล AI',
@@ -1211,7 +1222,8 @@ const I18N = {
   errOccur:'เกิดข้อผิดพลาด: {0}',
   noExport:'ไม่มีซับไตเติลให้ส่งออก', exported:'ส่งออกแล้ว: {0} ({1} ซับ)',
   noCopy:'ไม่มีเนื้อหาให้คัดลอก', copied:'คัดลอกไปยังคลิปบอร์ดแล้ว', copiedCompat:'คัดลอกแล้ว (โหมดเข้ากันได้)',
-  verifyOk:'✅ ตรวจสอบผ่าน: {0} ซับ เลขเรียงต่อเนื่อง ไทม์ไลน์ไม่ซ้อนกัน ไม่มีบรรทัดว่าง', pasteEmpty:'พื้นที่วางข้อความว่างอยู่'
+  verifyOk:'✅ ตรวจสอบผ่าน: {0} ซับ เลขเรียงต่อเนื่อง ไทม์ไลน์ไม่ซ้อนกัน ไม่มีบรรทัดว่าง', pasteEmpty:'พื้นที่วางข้อความว่างอยู่',
+  colTc:'ไทม์ไลน์', fnSub:'ซับไตเติล', fnBi:'สองภาษา', demoFile:'demo.srt', noteDeepSeek:'แนะนำ: เร็วและคุ้มค่า เหมาะกับการแปลซับไตเติลเป็นชุด', errNotCfg:'ผู้ดูแลยังไม่ได้ตั้งค่าโมเดลเริ่มต้น โปรดใช้ API ของคุณเอง', errIpLimit:'โควตาฟรีวันนี้ของ IP นี้ ({0} คำขอ) หมดแล้ว กรอก API Key ของคุณเองเพื่อใช้ต่อ', errGlobalLimit:'โควตาฟรีรวมของไซต์วันนี้หมดแล้ว กรอก API Key ของคุณเองเพื่อใช้ต่อ', errBadJson:'เนื้อหาคำขอไม่ใช่ JSON ที่ถูกต้อง', errNoMsgs:'ไม่มี messages', errUpstream:'เรียกโมเดลเริ่มต้นไม่สำเร็จ: {0}', errNotJson:'การตอบกลับไม่ใช่ JSON', errEmpty:'การตอบกลับว่างเปล่า', errNoGroups:'JSON ไม่มี groups', errNoGno:'รายการ JSON ไม่มี gno', errMissGroup:'ไม่มีผลลัพธ์ของกลุ่ม {0}', errNoArray:'JSON ไม่มีอาร์เรย์', anchorFail:'ตรวจสอบยึดหลักไม่ผ่าน (คำแปลของกลุ่ม {0} ไม่ใช่{1})', issBlkNoNumTs:'แยกวิเคราะห์บล็อกไม่ได้ (ขาดหมายเลขหรือไทม์ไลน์)', issBlkNoTs:'แยกวิเคราะห์บล็อกไม่ได้ (ขาดไทม์ไลน์)', issBadTs:'รูปแบบไทม์ไลน์ไม่ถูกต้อง', issNumInc:'หมายเลขไม่เรียงจากน้อยไปมาก', issEndLtStart:'เวลาจบก่อนเวลาเริ่ม', issOverlap:'ทับซ้อนกับไทม์ไลน์ก่อนหน้า', issNoBlocks:'ไม่พบบล็อกซับไตเติลเลย', issZeroDur:'ระยะเวลาเป็นศูนย์', issEmptyCue:'เนื้อหาว่างเปล่า', issNoUsable:'ไม่มีบล็อกซับไตเติลที่ใช้ได้'
 },
 'vi': {
   docTitle:'Dịch Phụ đề Tự động Miễn phí bằng AI - Phụ đề Mọi Ngôn ngữ', appTitle:'🎬 Trình Dịch Phụ đề AI',
@@ -1278,7 +1290,8 @@ const I18N = {
   errOccur:'Lỗi: {0}',
   noExport:'Không có gì để xuất.', exported:'Đã xuất: {0} ({1} phụ đề)',
   noCopy:'Không có gì để chép.', copied:'Đã chép vào clipboard.', copiedCompat:'Đã chép (chế độ tương thích).',
-  verifyOk:'✅ Kiểm tra đạt: {0} phụ đề, số thứ tự liên tục, không chồng lấn, không dòng trống.', pasteEmpty:'Vùng dán đang trống.'
+  verifyOk:'✅ Kiểm tra đạt: {0} phụ đề, số thứ tự liên tục, không chồng lấn, không dòng trống.', pasteEmpty:'Vùng dán đang trống.',
+  colTc:'Dòng thời gian', fnSub:'phu-de', fnBi:'song-ngu', demoFile:'demo.srt', noteDeepSeek:'Đề xuất: nhanh và tiết kiệm, lý tưởng cho dịch phụ đề theo loạt', errNotCfg:'Quản trị viên chưa cấu hình mô hình mặc định. Hãy dùng API của riêng bạn.', errIpLimit:'Hạn mức miễn phí hôm nay cho IP này ({0} yêu cầu) đã hết. Nhập API key của riêng bạn để tiếp tục.', errGlobalLimit:'Hạn mức miễn phí tổng của site hôm nay đã hết. Nhập API key của riêng bạn để tiếp tục.', errBadJson:'Thân yêu cầu không phải JSON hợp lệ', errNoMsgs:'Thiếu messages', errUpstream:'Gọi mô hình mặc định thất bại: {0}', errNotJson:'Phản hồi không phải JSON', errEmpty:'Phản hồi trống', errNoGroups:'JSON thiếu groups', errNoGno:'Mục JSON thiếu gno', errMissGroup:'Thiếu kết quả của nhóm {0}', errNoArray:'JSON thiếu mảng', anchorFail:'Kiểm tra neo không đạt (bản dịch của nhóm {0} không phải {1})', issBlkNoNumTs:'Không thể phân tích khối (thiếu số thứ tự hoặc dòng thời gian)', issBlkNoTs:'Không thể phân tích khối (thiếu dòng thời gian)', issBadTs:'Định dạng dòng thời gian không hợp lệ', issNumInc:'Số thứ tự không tăng', issEndLtStart:'Thời gian kết thúc sớm hơn thời gian bắt đầu', issOverlap:'Chồng lấn với dòng thời gian trước', issNoBlocks:'Không phân tích được khối phụ đề nào', issZeroDur:'Thời lượng bằng không', issEmptyCue:'Nội dung trống', issNoUsable:'Không có khối phụ đề khả dụng'
 },
 'ru': {
   docTitle:'Бесплатный ИИ-перевод Субтитров Автоматический - Субтитры на любом языке', appTitle:'🎬 ИИ-переводчик Субтитров',
@@ -1345,7 +1358,8 @@ const I18N = {
   errOccur:'Ошибка: {0}',
   noExport:'Нечего экспортировать.', exported:'Экспортировано: {0} ({1} субтитров)',
   noCopy:'Нечего копировать.', copied:'Скопировано в буфер обмена.', copiedCompat:'Скопировано (режим совместимости).',
-  verifyOk:'✅ Проверка пройдена: {0} субтитров, нумерация последовательна, наложений нет, пустых строк нет.', pasteEmpty:'Область вставки пуста.'
+  verifyOk:'✅ Проверка пройдена: {0} субтитров, нумерация последовательна, наложений нет, пустых строк нет.', pasteEmpty:'Область вставки пуста.',
+  colTc:'Таймлайн', fnSub:'субтитры', fnBi:'двуязычные', demoFile:'demo.srt', noteDeepSeek:'Рекомендуется: быстро и недорого, идеально для пакетного перевода субтитров', errNotCfg:'Администратор ещё не настроил модель по умолчанию. Используйте свой API.', errIpLimit:'Бесплатная квота на сегодня для этого IP ({0} запросов) исчерпана. Введите свой API-ключ, чтобы продолжить.', errGlobalLimit:'Общая бесплатная квота сайта на сегодня исчерпана. Введите свой API-ключ, чтобы продолжить.', errBadJson:'Тело запроса не является корректным JSON', errNoMsgs:'Отсутствует messages', errUpstream:'Не удалось вызвать модель по умолчанию: {0}', errNotJson:'Ответ не является JSON', errEmpty:'Пустой ответ', errNoGroups:'В JSON нет groups', errNoGno:'В элементе JSON нет gno', errMissGroup:'Нет результата для группы {0}', errNoArray:'В JSON нет массива', anchorFail:'Проверка привязки не пройдена (перевод группы {0} не на {1})', issBlkNoNumTs:'Не удалось разобрать блок (нет номера или таймлайна)', issBlkNoTs:'Не удалось разобрать блок (нет таймлайна)', issBadTs:'Неверный формат таймлайна', issNumInc:'Номер не возрастает', issEndLtStart:'Время окончания раньше времени начала', issOverlap:'Пересекается с предыдущим таймлайном', issNoBlocks:'Не разобран ни один блок субтитров', issZeroDur:'Нулевая длительность', issEmptyCue:'Пустое содержимое', issNoUsable:'Нет пригодных блоков субтитров'
 },
 'it': {
   docTitle:'Traduzione Automatica dei Sottotitoli con IA - Sottotitoli in Qualsiasi Lingua', appTitle:'🎬 Traduttore di Sottotitoli IA',
@@ -1412,7 +1426,8 @@ const I18N = {
   errOccur:'Errore: {0}',
   noExport:'Nulla da esportare.', exported:'Esportato: {0} ({1} sottotitoli)',
   noCopy:'Nulla da copiare.', copied:'Copiato negli appunti.', copiedCompat:'Copiato (modalità compatibile).',
-  verifyOk:'✅ Validazione superata: {0} sottotitoli, numerazione sequenziale, nessuna sovrapposizione, nessun vuoto.', pasteEmpty:'L\'area di incollaggio è vuota.'
+  verifyOk:'✅ Validazione superata: {0} sottotitoli, numerazione sequenziale, nessuna sovrapposizione, nessun vuoto.', pasteEmpty:'L\'area di incollaggio è vuota.',
+  colTc:'Timeline', fnSub:'sottotitoli', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Consigliato: veloce ed economico, ideale per la traduzione in blocco dei sottotitoli', errNotCfg:'L\'amministratore non ha ancora configurato un modello predefinito. Usa la tua API.', errIpLimit:'La quota gratuita di oggi per questo IP ({0} richieste) è esaurita. Inserisci la tua API key per continuare.', errGlobalLimit:'La quota gratuita totale del sito di oggi è esaurita. Inserisci la tua API key per continuare.', errBadJson:'Il corpo della richiesta non è JSON valido', errNoMsgs:'Manca messages', errUpstream:'Chiamata al modello predefinito non riuscita: {0}', errNotJson:'La risposta non è JSON', errEmpty:'La risposta è vuota', errNoGroups:'Manca groups nel JSON', errNoGno:'Manca gno nell\'elemento JSON', errMissGroup:'Manca il risultato del gruppo {0}', errNoArray:'Manca l\'array nel JSON', anchorFail:'Verifica àncora non superata (la traduzione del gruppo {0} non è in {1})', issBlkNoNumTs:'Impossibile analizzare il blocco (manca indice o timeline)', issBlkNoTs:'Impossibile analizzare il blocco (manca la timeline)', issBadTs:'Formato timeline non valido', issNumInc:'Indice non crescente', issEndLtStart:'Ora di fine precedente all\'ora di inizio', issOverlap:'Si sovrappone alla timeline precedente', issNoBlocks:'Nessun blocco di sottotitoli analizzato', issZeroDur:'Durata zero', issEmptyCue:'Contenuto vuoto', issNoUsable:'Nessun blocco di sottotitoli utilizzabile'
 },
 'ar': {
   docTitle:'ترجمة الترجمات تلقائيًا بالذكاء الاصطناعي - ترجمات بأي لغة تحتاجها', appTitle:'🎬 مترجم الترجمات بالذكاء الاصطناعي',
@@ -1479,7 +1494,8 @@ const I18N = {
   errOccur:'خطأ: {0}',
   noExport:'لا شيء للتصدير.', exported:'صُدّر: {0} ({1} ترجمة)',
   noCopy:'لا شيء للنسخ.', copied:'نُسخ إلى الحافظة.', copiedCompat:'نُسخ (وضع التوافق).',
-  verifyOk:'✅ اجتاز التحقق: {0} ترجمة، ترقيم متسلسل، بلا تداخل، بلا أسطر فارغة.', pasteEmpty:'منطقة اللصق فارغة.'
+  verifyOk:'✅ اجتاز التحقق: {0} ترجمة، ترقيم متسلسل، بلا تداخل، بلا أسطر فارغة.', pasteEmpty:'منطقة اللصق فارغة.',
+  colTc:'الخط الزمني', fnSub:'ترجمة', fnBi:'ثنائية اللغة', demoFile:'demo.srt', noteDeepSeek:'موصى به: سريع واقتصادي، مثالي للترجمة الدفعية للترجمات', errNotCfg:'لم يُهيئ المسؤول نموذجًا افتراضيًا بعد. استخدم واجهة API الخاصة بك.', errIpLimit:'انتهت حصة الترجمة المجانية اليوم لهذا IP ({0} طلب). أدخل مفتاح API الخاص بك للمتابعة.', errGlobalLimit:'انتهت حصة الترجمة المجانية الإجمالية للموقع اليوم. أدخل مفتاح API الخاص بك للمتابعة.', errBadJson:'نص الطلب ليس JSON صالحًا', errNoMsgs:'messages مفقود', errUpstream:'فشل استدعاء النموذج الافتراضي: {0}', errNotJson:'الاستجابة ليست بصيغة JSON', errEmpty:'الاستجابة فارغة', errNoGroups:'JSON يفتقد groups', errNoGno:'العنصر في JSON يفتقد gno', errMissGroup:'نتيجة المجموعة {0} مفقودة', errNoArray:'يفتقد JSON المصفوفة', anchorFail:'فشل التحقق من التثبيت (ترجمة المجموعة {0} ليست {1})', issBlkNoNumTs:'تعذر تحليل الكتلة (رقم أو خط زمني مفقود)', issBlkNoTs:'تعذر تحليل الكتلة (خط زمني مفقود)', issBadTs:'تنسيق الخط الزمني غير صالح', issNumInc:'الرقم غير متزايد', issEndLtStart:'وقت النهاية قبل وقت البداية', issOverlap:'يتداخل مع الخط الزمني السابق', issNoBlocks:'لم يتم تحليل أي كتلة ترجمة', issZeroDur:'مدة صفرية', issEmptyCue:'محتوى فارغ', issNoUsable:'لا توجد كتل ترجمة قابلة للاستخدام'
 },
 'tr': {
   docTitle:'AI ile Otomatik Altyazı Çevirisi - İhtiyacın Olan Her Dilde Altyazı', appTitle:'🎬 AI Altyazı Çevirmeni',
@@ -1546,7 +1562,8 @@ const I18N = {
   errOccur:'Hata: {0}',
   noExport:'Dışa aktarılacak bir şey yok.', exported:'Dışa aktarıldı: {0} ({1} altyazı)',
   noCopy:'Kopyalanacak bir şey yok.', copied:'Panoya kopyalandı.', copiedCompat:'Kopyalandı (uyumluluk modu).',
-  verifyOk:'✅ Doğrulama geçti: {0} altyazı, sıralı numaralandırma, çakışma yok, boş satır yok.', pasteEmpty:'Yapıştırma alanı boş.'
+  verifyOk:'✅ Doğrulama geçti: {0} altyazı, sıralı numaralandırma, çakışma yok, boş satır yok.', pasteEmpty:'Yapıştırma alanı boş.',
+  colTc:'Zaman çizelgesi', fnSub:'altyazi', fnBi:'iki-dilli', demoFile:'demo.srt', noteDeepSeek:'Önerilen: hızlı ve uygun maliyetli, toplu altyazı çevirisi için ideal', errNotCfg:'Yönetici henüz varsayılan modeli yapılandırmadı. Kendi API\'nizi kullanın.', errIpLimit:'Bu IP için bugünün ücretsiz çeviri kotası ({0} istek) doldu. Devam etmek için kendi API anahtarınızı girin.', errGlobalLimit:'Bugünün site geneli ücretsiz çeviri kotası doldu. Devam etmek için kendi API anahtarınızı girin.', errBadJson:'İstek gövdesi geçerli JSON değil', errNoMsgs:'messages eksik', errUpstream:'Varsayılan model çağrısı başarısız: {0}', errNotJson:'Yanıt JSON değil', errEmpty:'Yanıt boş', errNoGroups:'JSON\'da groups eksik', errNoGno:'JSON öğesinde gno eksik', errMissGroup:'Grup {0} için sonuç eksik', errNoArray:'JSON\'da dizi eksik', anchorFail:'Çapa denetimi başarısız (grup {0} çevirisi {1} değil)', issBlkNoNumTs:'Blok çözümlenemedi (numara veya zaman çizelgesi eksik)', issBlkNoTs:'Blok çözümlenemedi (zaman çizelgesi eksik)', issBadTs:'Geçersiz zaman çizelgesi biçimi', issNumInc:'Numara artmıyor', issEndLtStart:'Bitiş saati başlangıç saatinden önce', issOverlap:'Önceki zaman çizelgesiyle çakışıyor', issNoBlocks:'Hiç altyazı bloğu çözümlenmedi', issZeroDur:'Süre sıfır', issEmptyCue:'Boş içerik', issNoUsable:'Kullanılabilir altyazı bloğu yok'
 }
 };
 const UI = { lang:'zh-CN', langManual:false, dstManual:false };
@@ -1555,6 +1572,30 @@ function t(k){
   let s = (k in d) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
   for (let i=1; i<arguments.length; i++) s = s.split('{'+(i-1)+'}').join(String(arguments[i]));
   return s;
+}
+/* v0.9.33：解析问题/后端错误按界面语言显示 */
+function issTxt(i){
+  if(!i) return '';
+  if(!i.code) return i.msg;
+  const k='iss'+String(i.code)[0].toUpperCase()+String(i.code).slice(1); /* code:'badTs' → 键 issBadTs */
+  if((I18N[UI.lang] && Object.prototype.hasOwnProperty.call(I18N[UI.lang],k)) || Object.prototype.hasOwnProperty.call(I18N['zh-CN'],k)) return t(k);
+  return i.msg;
+}
+function srvErrTxt(msg){ /* 后端 /api/translate 错误：按 code 映射本地化（v0.9.33），未知则原样 */
+  const c=msg.match(/"code"\s*:\s*"([^"]+)"/);
+  const m=msg.match(/"message"\s*:\s*"([^"]+)"/);
+  const keyMap={not_configured:'errNotCfg',ip_limit:'errIpLimit',global_limit:'errGlobalLimit',bad_json:'errBadJson',missing_messages:'errNoMsgs',upstream_error:'errUpstream'};
+  const k=c && keyMap[c[1]];
+  if(k==='errIpLimit'){
+    const p=msg.match(/"params"\s*:\s*\[\s*(\d+)\s*\]/);
+    return t('errIpLimit', p ? p[1] : '');
+  }
+  if(k==='errUpstream'){
+    const raw=m ? m[1] : msg;
+    return t('errUpstream', raw.replace(/^Default model call failed: /,''));
+  }
+  if(k) return t(k);
+  return m ? m[1] : msg;
 }
 function detectUiLang(){
   const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'zh-CN'];
@@ -1904,7 +1945,7 @@ function parseLlmJson(raw){
     }
   }
   const a=s.indexOf('{'), b=s.lastIndexOf('}');
-  if (a<0||b<=a) throw new Error('返回内容不是 JSON');
+  if (a<0||b<=a) throw new Error(t('errNotJson'));
   return JSON.parse(s.slice(a,b+1));
 }
 
@@ -1931,7 +1972,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs){
     if(!r.ok){ const t=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+t.slice(0,200)); }
     const j=await r.json();
     const out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-    if(!out) throw new Error('返回为空');
+    if(!out) throw new Error(t('errEmpty'));
     return out;
   } finally { clearTimeout(timer); }
 }
@@ -1955,14 +1996,14 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
     {role:'user',content:userMsg}
   ]);
   const obj=parseLlmJson(raw);
-  if(!obj||!Array.isArray(obj.groups)) throw new Error('JSON 缺少 groups');
+  if(!obj||!Array.isArray(obj.groups)) throw new Error(t('errNoGroups'));
   const byGno={};
   obj.groups.forEach(x=>{
-    if(!x||x.gno==null) throw new Error('JSON 条目缺少 gno');
+    if(!x||x.gno==null) throw new Error(t('errNoGno'));
     byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh) };
   });
   // 校验齐全：每个输入句组必须有结果
-  groups.forEach(g=>{ if(!byGno[g.gno]) throw new Error('缺少句组 '+g.gno+' 的结果'); });
+  groups.forEach(g=>{ if(!byGno[g.gno]) throw new Error(t('errMissGroup',g.gno)); });
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
   const dstV = $('dstLang').value;
   const badAnchor = [];
@@ -2041,7 +2082,7 @@ async function compressBatch(base,key,model,items,dstLang){
     {role:'user',content:userMsg}
   ]);
   const obj=parseLlmJson(raw);
-  if(!obj||!Array.isArray(obj.groups)) throw new Error('JSON 缺少 groups');
+  if(!obj||!Array.isArray(obj.groups)) throw new Error(t('errNoGroups'));
   const byGno={};
   obj.groups.forEach(x=>{ if(x&&x.gno!=null) byGno[x.gno]={ text:(x.text!=null?x.text:x.zh) }; });
   return byGno;
@@ -2083,7 +2124,7 @@ async function extractGlossary(base,key,model,cfg,srcText){
     {role:'user',content:usr}
   ],240000);
   const arr=parseLlmJson(raw);
-  if(!Array.isArray(arr)) throw new Error('JSON 缺少数组');
+  if(!Array.isArray(arr)) throw new Error(t('errNoArray'));
   return arr.filter(x=>x && typeof x.t==='string' && typeof x.r==='string' && x.t.trim() && x.r.trim()).slice(0,25);
 }
 
@@ -2216,7 +2257,7 @@ async function runTranslate(){
           const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sys);
           // 锚定失败且还有重试机会：丢弃本次结果重试；最后一次仍失败则接受结果（内容仍可用，仅语言跑偏）
           if(out.badAnchor && out.badAnchor.length && attempt<maxTry-1){
-            log(t('batchFail',bi+1,attempt+1,'锚定校验未过（句组 '+out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':'')+' 译文非'+LBY(cfg.dst).zh+'）'),'err');
+            log(t('batchFail',bi+1,attempt+1,t('anchorFail',out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':''),LBY(cfg.dst).zh)),'err');
             await new Promise(r=>setTimeout(r,1500));
             continue;
           }
@@ -2255,15 +2296,13 @@ async function runTranslate(){
           log(t('batchFail',bi+1,attempt+1,e.message),'err');
           if(S.stop) break;
           if(cfg.mode==='builtin' && /HTTP (429|503)/.test(e.message)){
-            // 后端限流 / 未配置：提取服务端消息，停止整片翻译
-            const m=e.message.match(/"message"\s*:\s*"([^"]+)"/);
-            log(m ? m[1] : e.message, 'err');
+            // 后端限流 / 未配置：按 code 本地化服务端消息（v0.9.33），停止整片翻译
+            log(srvErrTxt(e.message), 'err');
             log(t('builtinOff'), 'err');
             S.stop=true; break;
-          } else if(cfg.mode==='builtin' && /HTTP 502/.test(e.message) && /上游 HTTP 40[13]/.test(e.message)){
+          } else if(cfg.mode==='builtin' && /HTTP 502/.test(e.message) && /Upstream HTTP 40[13]/.test(e.message)){
             // 上游认证失败/额度不足（管理员 Key 问题）：重试无意义，直接停止
-            const m=e.message.match(/"message"\s*:\s*"([^"]+)"/);
-            log(m ? m[1] : e.message, 'err');
+            log(srvErrTxt(e.message), 'err');
             S.stop=true; break;
           } else if(/429|rate/i.test(e.message) && attempt<maxTry-1){
             log(t('rateWait'),'err');
@@ -2434,7 +2473,7 @@ function setSrc(text, fileName){
   }
   const w=issues.length;
   $('parseInfo').innerHTML= w
-    ? '<span style="color:var(--warn)">'+t('parseWarn',items.length,w)+'</span><br>'+issues.slice(0,6).map(i=>'#'+i.at+' '+i.msg).join('<br>')+(issues.length>6?'<br>…':'')
+    ? '<span style="color:var(--warn)">'+t('parseWarn',items.length,w)+'</span><br>'+issues.slice(0,6).map(i=>'#'+i.at+' '+issTxt(i)).join('<br>')+(issues.length>6?'<br>…':'')
     : t('parseOk',items.length);
   renderRows();
   log(t('imported',fileName||t('paste'),items.length),'okc');
@@ -2454,7 +2493,7 @@ $('btnParse').addEventListener('click', ()=>{
   if(!txt){ log(t('pasteEmpty'),'err'); return; }
   setSrc(txt,'');
 });
-$('btnDemo').addEventListener('click', ()=>{ $('paste').value=DEMO; setSrc(DEMO,'9月3日_示例.srt'); });
+$('btnDemo').addEventListener('click', ()=>{ $('paste').value=DEMO; setSrc(DEMO,t('demoFile')); });
 
 const DEMO=`1
 00:00:00,200 --> 00:00:00,600
@@ -2632,7 +2671,7 @@ function runReport(){
   }
   const box=$('reportBox'); box.style.display=issues.length?'block':'none';
   $('report').innerHTML = issues.length
-    ? '<div class="issue">'+issues.slice(0,20).map(i=>'#'+i.at+' '+i.msg).join('<br>')+'</div>'
+    ? '<div class="issue">'+issues.slice(0,20).map(i=>'#'+i.at+' '+issTxt(i)).join('<br>')+'</div>'
     : t('verifyOk',count);
 }
 $('btnDownload').addEventListener('click', ()=>{
@@ -2745,16 +2784,31 @@ $('autoTerms').addEventListener('change',()=>{ save(); });
 /* 语言/格式切换联动：列头 + 导出文件名 */
 function autoOutName(){
   if(!S.fileBase) return;
+  $('outName').value=autoOutNameStr();
+}
+function outNameParts(){ /* v0.9.33：文件名按界面语言生成——zh 界面沿用中文语言名+字幕；其余界面用英文语言名+本地化后缀 */
   const fmt=expFmtOf();
-  $('outName').value=S.fileBase+'_'+LBY($('dstLang').value).file+(fmt==='mono'?'字幕':'双语字幕')+'.'+expFileFmt();
+  const zhUI=UI.lang==='zh-CN'||UI.lang==='zh-TW';
+  const langName=zhUI ? LBY($('dstLang').value).file : LBY($('dstLang').value).en;
+  const suf=zhUI ? (fmt==='mono'?'字幕':'双语字幕') : (fmt==='mono'?'_'+t('fnSub'):'_'+t('fnBi'));
+  return {langName, suf};
+}
+function autoOutNameStr(){
+  const p=outNameParts();
+  return S.fileBase+'_'+p.langName+p.suf+'.'+expFileFmt();
+}
+function autoNameRe(){ /* 自动命名检测：后缀集合 = 中/英固定词 + 当前界面语言的后缀（v0.9.33） */
+  const words=[...new Set(['字幕','双语字幕','subtitles','bilingual',t('fnSub'),t('fnBi')])];
+  const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return new RegExp('_[^_/]*(?:'+words.map(esc).join('|')+')\\.(srt|vtt|ass|txt)$','i');
 }
 function refreshOutName(){
   const v=$('outName').value; if(!v) return;
-  if(/_[^_/]*(?:双语)?字幕\.(srt|vtt|ass|txt)$/i.test(v)) autoOutName(); // 仅当仍是自动命名时跟随，用户改过的名不覆盖
+  if(autoNameRe().test(v)) autoOutName(); // 仅当仍是自动命名时跟随（v0.9.33 支持各语言后缀），用户改过的名不覆盖
 }
-function refreshOutPh(){ // 占位符跟随 目标语言/导出样式（v0.9.15）
-  const fmt=expFmtOf();
-  $('outName').placeholder='xxx_'+LBY($('dstLang').value).file+(fmt==='mono'?'字幕':'双语字幕')+'.'+expFileFmt();
+function refreshOutPh(){ // 占位符跟随 目标语言/导出样式（v0.9.15；v0.9.33 按界面语言命名）
+  const p=outNameParts();
+  $('outName').placeholder='xxx_'+p.langName+p.suf+'.'+expFileFmt();
 }
 $('expStyle').addEventListener('change',()=>{ refreshOutName(); refreshOutPh(); save(); });
 $('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
@@ -2772,7 +2826,7 @@ function buildProviderOptions(){
   PROVIDERS.forEach(p=>{
     const o=document.createElement('option'); o.value=p.id;
     if(p.id==='custom'){ o.dataset.i18n='optCustom'; o.textContent=t('optCustom'); }
-    else o.textContent=p.name;
+    else o.textContent=(UI.lang==='zh-CN'||UI.lang==='zh-TW')&&p.zhName ? p.zhName : p.name;
     sel.appendChild(o);
   });
   sel.value = PROVIDERS.some(p=>p.id===cur) ? cur : 'deepseek';

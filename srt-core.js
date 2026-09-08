@@ -332,18 +332,18 @@
       if (!lines.join('').trim()) return;
       const noM = /^\s*(\d+)\s*$/.exec(lines[0] || '');
       const ti = lines.findIndex((l) => l.indexOf('-->') >= 0);
-      if (!noM || ti < 1) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺编号或时间轴）' }); return; }
+      if (!noM || ti < 1) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺编号或时间轴）', code: 'blkNoNumTs' }); return; }
       const t = parseTime(lines[ti]);
-      if (!t) { issues.push({ type: 'fmt', at: +noM[1], msg: '时间轴格式不正确' }); return; }
+      if (!t) { issues.push({ type: 'fmt', at: +noM[1], msg: '时间轴格式不正确', code: 'badTs' }); return; }
       const no = +noM[1];
       const body = lines.slice(ti + 1).join('\n').trim();
-      if (no <= prevNo) issues.push({ type: 'num', at: no, msg: '编号未递增' });
-      if (t[1] <= t[0]) issues.push({ type: 'time', at: no, msg: '结束时间早于开始时间' });
-      if (t[0] < prevEnd - 1) issues.push({ type: 'overlap', at: no, msg: '与上一条时间轴重叠' });
+      if (no <= prevNo) issues.push({ type: 'num', at: no, msg: '编号未递增', code: 'numInc' });
+      if (t[1] <= t[0]) issues.push({ type: 'time', at: no, msg: '结束时间早于开始时间', code: 'endLtStart' });
+      if (t[0] < prevEnd - 1) issues.push({ type: 'overlap', at: no, msg: '与上一条时间轴重叠', code: 'overlap' });
       prevEnd = t[1]; prevNo = no;
       items.push({ no, start: t[0], end: t[1], text: body });
     });
-    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块' });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
     return { items, issues };
   }
 
@@ -375,9 +375,9 @@
       if (!lines.join('').trim()) return;
       if (/^(NOTE|STYLE|REGION)/.test(lines[0] || '')) return;                 // 注释/样式/区域块
       const ti = lines.findIndex((l) => l.indexOf('-->') >= 0);                 // 允许 cue 标识行
-      if (ti < 0) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺时间轴）' }); return; }
+      if (ti < 0) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺时间轴）', code: 'blkNoTs' }); return; }
       const m = VTT_TIME_RE.exec(lines[ti].trim());
-      if (!m) { issues.push({ type: 'fmt', at: bi + 1, msg: '时间轴格式不正确' }); return; }
+      if (!m) { issues.push({ type: 'fmt', at: bi + 1, msg: '时间轴格式不正确', code: 'badTs' }); return; }
       const st = toMs(m[1] || 0, m[2], m[3], m[4]);
       const en = toMs(m[5] || 0, m[6], m[7], m[8]);
       const body = lines.slice(ti + 1).join('\n')
@@ -385,12 +385,12 @@
         .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
         .replace(/&nbsp;/g, ' ').trim();
       if (!body) return;
-      if (en <= st) issues.push({ type: 'time', at: items.length + 1, msg: '结束时间早于开始时间' });
-      if (st < prevEnd - 1) issues.push({ type: 'overlap', at: items.length + 1, msg: '与上一条时间轴重叠' });
+      if (en <= st) issues.push({ type: 'time', at: items.length + 1, msg: '结束时间早于开始时间', code: 'endLtStart' });
+      if (st < prevEnd - 1) issues.push({ type: 'overlap', at: items.length + 1, msg: '与上一条时间轴重叠', code: 'overlap' });
       prevEnd = en;
       items.push({ no: items.length + 1, start: st, end: en, text: body });
     });
-    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块' });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
     return { items, issues };
   }
   function formatVtt(items) {
@@ -438,18 +438,18 @@
       };
       const st = parseAssTime(col('start'));
       const en = parseAssTime(col('end'));
-      if (st == null || en == null) { issues.push({ type: 'fmt', at: li + 1, msg: '时间轴格式不正确' }); return; }
+      if (st == null || en == null) { issues.push({ type: 'fmt', at: li + 1, msg: '时间轴格式不正确', code: 'badTs' }); return; }
       const body = textField
         .replace(/\{[^}]*\}/g, '')                        // {\an8}{\pos(...)} 等特效标签
         .replace(/\\N/gi, '\n').replace(/\\h/gi, ' ')
         .replace(/[ \t]+\n/g, '\n').trim();
       if (!body) return;
-      if (en <= st) issues.push({ type: 'time', at: li + 1, msg: '结束时间早于开始时间' });
-      if (st < prevEnd - 1) issues.push({ type: 'overlap', at: li + 1, msg: '与上一条时间轴重叠' });
+      if (en <= st) issues.push({ type: 'time', at: li + 1, msg: '结束时间早于开始时间', code: 'endLtStart' });
+      if (st < prevEnd - 1) issues.push({ type: 'overlap', at: li + 1, msg: '与上一条时间轴重叠', code: 'overlap' });
       if (en > prevEnd) prevEnd = en;
       items.push({ no: items.length + 1, start: st, end: en, text: body });
     });
-    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块' });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
     return { items, issues };
   }
 
@@ -1122,14 +1122,14 @@
     const issues = [];
     let prevEnd = -1, prevNo = 0;
     items.forEach((it) => {
-      if (it.start > it.end) issues.push({ type: 'time', at: it.no, msg: '结束时间早于开始时间' });
-      else if (it.start === it.end) issues.push({ type: 'time', at: it.no, msg: '零时长' });
-      if (it.start < prevEnd - 1) issues.push({ type: 'overlap', at: it.no, msg: '与上一条时间轴重叠' });
-      if (it.no <= prevNo) issues.push({ type: 'num', at: it.no, msg: '编号未递增' });
-      if (!it.text || !it.text.trim()) issues.push({ type: 'empty', at: it.no, msg: '空内容' });
+      if (it.start > it.end) issues.push({ type: 'time', at: it.no, msg: '结束时间早于开始时间', code: 'endLtStart' });
+      else if (it.start === it.end) issues.push({ type: 'time', at: it.no, msg: '零时长', code: 'zeroDur' });
+      if (it.start < prevEnd - 1) issues.push({ type: 'overlap', at: it.no, msg: '与上一条时间轴重叠', code: 'overlap' });
+      if (it.no <= prevNo) issues.push({ type: 'num', at: it.no, msg: '编号未递增', code: 'numInc' });
+      if (!it.text || !it.text.trim()) issues.push({ type: 'empty', at: it.no, msg: '空内容', code: 'emptyCue' });
       prevEnd = it.end; prevNo = it.no;
     });
-    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有可用的字幕块' });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有可用的字幕块', code: 'noUsable' });
     return issues;
   }
 

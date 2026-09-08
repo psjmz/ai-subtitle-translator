@@ -193,6 +193,10 @@ function serveStatic(req, res, urlPath){
   const lang = SEO_ROUTE[p];
   if (lang) { serveIndexLang(req, res, lang); return; }
   if (p === '/') { serveIndexLang(req, res, 'zh-CN'); return; }
+  /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
+     修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
+  const lm = p.match(/^\/([a-zA-Z][a-zA-Z-]*)\/(.+)$/);
+  if (lm && SEO_ROUTE['/' + lm[1]]) p = '/' + lm[2];
   const file = path.normalize(path.join(ROOT, p));
   if (!file.startsWith(ROOT)) { res.writeHead(403); res.end('Forbidden'); return; }
   fs.readFile(file, (err, buf) => {
@@ -542,7 +546,7 @@ async function callModel(cfg, messages, maxTokens){
     body: JSON.stringify({ model: cfg.model, messages, temperature: 0.2, stream: false, max_tokens: maxTokens })
   });
   const text = await r.text();
-  if (!r.ok) throw new Error('上游 HTTP ' + r.status + ' ' + text.slice(0, 200));
+  if (!r.ok) throw new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
   return JSON.parse(text);
 }
 
@@ -569,23 +573,23 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && u === '/api/translate') {
       const cfg = readConfig();
       if (!(cfg.base && cfg.model && cfg.key)) {
-        return sendJson(res, 503, { error: { code: 'not_configured', message: '管理员尚未配置默认模型，请改用自定义 API。' } });
+        return sendJson(res, 503, { error: { code: 'not_configured', message: 'Default model is not configured by the site admin. Use your own API instead.' } });
       }
       const usage = readUsage();
       const ip = clientIp(req);
       const ipUsed = usage.ips[ip] || 0;
       if (cfg.perIpDaily > 0 && ipUsed >= cfg.perIpDaily) {
-        return sendJson(res, 429, { error: { code: 'ip_limit', message: '今日该访问的免费翻译额度（' + cfg.perIpDaily + ' 次请求）已用完，可填写自己的 API Key 继续使用。' } });
+        return sendJson(res, 429, { error: { code: 'ip_limit', message: 'Daily free quota for this IP (' + cfg.perIpDaily + ' requests) is used up. Enter your own API key to continue.', params: [cfg.perIpDaily] } });
       }
       if (cfg.globalDaily > 0 && usage.global >= cfg.globalDaily) {
-        return sendJson(res, 429, { error: { code: 'global_limit', message: '本站今日免费翻译总额度已用完，可填写自己的 API Key 继续使用。' } });
+        return sendJson(res, 429, { error: { code: 'global_limit', message: 'Today\'s site-wide free quota is used up. Enter your own API key to continue.' } });
       }
       let body;
       try { body = JSON.parse(await readBody(req, 2 * 1024 * 1024)); } catch (e) {
-        return sendJson(res, 400, { error: { code: 'bad_request', message: '请求体不是合法 JSON' } });
+        return sendJson(res, 400, { error: { code: 'bad_json', message: 'Request body is not valid JSON' } });
       }
       if (!Array.isArray(body.messages) || !body.messages.length) {
-        return sendJson(res, 400, { error: { code: 'bad_request', message: '缺少 messages' } });
+        return sendJson(res, 400, { error: { code: 'missing_messages', message: 'Missing messages' } });
       }
       usage.ips[ip] = ipUsed + 1;
       usage.global += 1;
@@ -595,7 +599,7 @@ const server = http.createServer(async (req, res) => {
         const out = await callModel(cfg, body.messages, undefined);
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
-        return sendJson(res, 502, { error: { code: 'upstream_error', message: '默认模型调用失败：' + e.message } });
+        return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e.message } });
       }
     }
 
@@ -605,11 +609,11 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && u === '/api/event') {
       let body;
       try { body = JSON.parse(await readBody(req, 4 * 1024)); } catch (e) {
-        return sendJson(res, 400, { error: { message: '请求体不是合法 JSON' } });
+        return sendJson(res, 400, { error: { message: 'Request body is not valid JSON' } });
       }
       const ev = String(body.ev || '');
       if (ev !== 'finish' && ev !== 'download') {
-        return sendJson(res, 400, { error: { message: 'ev 必须是 finish 或 download' } });
+        return sendJson(res, 400, { error: { message: 'ev must be finish or download' } });
       }
       try { markEvent(clientIp(req), body, ev); } catch (e) {}
       return sendJson(res, 200, { ok: true });
