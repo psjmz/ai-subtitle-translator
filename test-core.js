@@ -725,14 +725,27 @@ t('wrapToWidth：回归 - 双标点断点优先级仍生效', () => {
 });
 
 console.log('— ASS 底部双行（v0.9.17）—');
-t('formatAss：Sub 样式进头部（金黄 42pt 底部对齐）', () => {
+t('formatAss：Sub 样式进头部（金黄 50pt 底部对齐）', () => {
   const out = C.formatAss([{ start: 0, end: 1000, lines: [{ style: 'Bottom', text: 'x' }] }]);
   const sub = out.split('\n').find(l => l.startsWith('Style: Sub,'));
   assert.ok(sub, '头部含 Sub 样式');
   assert.ok(sub.includes('&H0000D7FF'), 'Sub 副语言金黄');
   const cols = sub.split(',');
   assert.strictEqual(cols[18], '2', 'Sub 底部居中对齐（Alignment=2）');
-  assert.strictEqual(cols[2], '42', 'Sub 42pt');
+  assert.strictEqual(cols[2], '50', 'Sub 50pt（v0.9.35 副字号提号）');
+});
+t('formatAss：TopMain 样式进头部（白 56pt 顶部对齐，v0.9.35 译文在上主字号）', () => {
+  const out = C.formatAss([{ start: 0, end: 1000, lines: [{ style: 'TopMain', text: 'x' }] }]);
+  const tm = out.split('\n').find(l => l.startsWith('Style: TopMain,'));
+  assert.ok(tm, '头部含 TopMain 样式');
+  assert.ok(tm.includes('&H00FFFFFF'), 'TopMain 主语言白色');
+  const cols = tm.split(',');
+  assert.strictEqual(cols[18], '8', 'TopMain 顶部居中对齐（Alignment=8）');
+  assert.strictEqual(cols[2], '56', 'TopMain 56pt 主字号');
+  const top = out.split('\n').find(l => l.startsWith('Style: Top,'));
+  assert.strictEqual(top.split(',')[2], '50', 'Top 副字号同步提为 50pt');
+  // TopMain Dialogue 正常输出
+  assert.ok(out.split('\n').some(l => l.startsWith('Dialogue:') && l.includes(',TopMain,')), 'TopMain Dialogue 写入');
 });
 t('formatAss：per-line MarginV 写入 Dialogue（Sub 动态抬升）', () => {
   const out = C.formatAss([{ start: 0, end: 2000, lines: [

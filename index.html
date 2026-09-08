@@ -170,7 +170,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.34</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.35</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2711,10 +2711,16 @@ function buildExport(){
   if(ff==='ass') return C.formatAss(buildAssEvents(), {title:S.fileBase||'translated'});
   return C.formatSrt(buildExportItems());
 }
-// ASS 事件：单语 → 全部 Bottom 样式；双语分屏 → 源/译分层（Top=金黄小字在上，Bottom=白色主阅读位在下），
-// 「在上」一方放 Top 样式：bi-src 原文在上，bi-dst 译文在上。
-// 双语底部双行（v0.9.17）→ 两行独立 Dialogue、都底部对齐（Bottom 56pt 白在下，Sub 42pt 金黄紧贴其上方），
-// Sub 的 MarginV 按下方块实际行数动态抬高：42 + 行数×66 + 8，保证贴合不重叠（影院双语惯例）。
+// ASS 事件（v0.9.35：字号跟角色走，位置跟模式走）——译文恒为主阅读样式（白 56pt：Bottom/TopMain），
+// 原文恒为副样式（金黄 50pt：Top/Sub），不再因「译文在上」把主字号让给原文：
+//   单语 → 全部 Bottom（白 56pt 底部）；
+//   分屏 bi-src（原文在上）→ 原文 Top（金黄）+ 译文 Bottom（白）；
+//   分屏 bi-dst（译文在上）→ 译文 TopMain（白 56pt）+ 原文 Sub（金黄落底）；
+//   底部双行（ass-stack）→ 位置完全跟随 order（v0.9.36 定稿方案 B，所见即所得）：
+//     bi-src → 原文 Sub 在上、译文 Bottom 贴底（影院惯例摆法）；
+//     bi-dst → 译文 Bottom（白 56pt 整块经 MarginV 抬到上方）+ 原文 Sub 贴底。
+//     在上块 的 MarginV 按下方块实际行数动态抬高：42 + 行数×行高 + 8（56pt 行高 66 / 50pt 行高 59），
+//     保证贴合不重叠；字号始终译大原小，与位置无关。
 function buildAssEvents(){
   const fmt=expFmtOf();
   if(fmt==='mono'){
@@ -2729,18 +2735,27 @@ function buildAssEvents(){
   });
   const stacked=assStacked();
   return parts.map(p=>{
-    const topText=(dstFirst?p.dstLines:p.srcLines).join('\n');
-    const botText=(dstFirst?p.srcLines:p.dstLines).join('\n');
+    const dstText=p.dstLines.join('\n');
+    const srcText=p.srcLines.join('\n');
     if(stacked){
       const lines=[];
-      const nBot=botText?botText.split('\n').length:0;
-      if(topText) lines.push({style:'Sub',text:topText,mv: nBot? 42+nBot*66+8 : 42});
-      if(botText) lines.push({style:'Bottom',text:botText});
+      const nLines=(s)=>s?s.split('\n').length:0;
+      if(dstFirst){
+        // 译文在上：原文 Sub（金 50pt）贴底，译文 Bottom（白 56pt）抬到其上方（mv 覆盖样式默认）
+        const nSrc=nLines(srcText);
+        if(srcText) lines.push({style:'Sub',text:srcText});
+        if(dstText) lines.push({style:'Bottom',text:dstText,mv: nSrc? 42+nSrc*59+8 : 42});
+      }else{
+        // 原文在上：译文 Bottom（白 56pt）贴底，原文 Sub（金 50pt）紧贴其上方
+        const nDst=nLines(dstText);
+        if(srcText) lines.push({style:'Sub',text:srcText,mv: nDst? 42+nDst*66+8 : 42});
+        if(dstText) lines.push({style:'Bottom',text:dstText});
+      }
       return {start:p.start,end:p.end,lines};
     }
     const lines=[];
-    if(topText) lines.push({style:'Top',text:topText});
-    if(botText) lines.push({style:'Bottom',text:botText});
+    if(dstText) lines.push({style: dstFirst?'TopMain':'Bottom', text:dstText});
+    if(srcText) lines.push({style: dstFirst?'Sub':'Top', text:srcText});
     return {start:p.start,end:p.end,lines};
   });
 }

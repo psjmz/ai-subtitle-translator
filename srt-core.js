@@ -454,9 +454,10 @@
   }
 
   // 生成带样式分层的 ASS 文件（1080p 基准，可直压视频 / 进 Aegisub 二次编辑）。
-  // events：[{start,end,lines:[{style:'Top'|'Bottom',text}]}]
-  //   Bottom 主语言：白色 100% 大小，底部居中（an2）——主要阅读位置；
-  //   Top    副语言：金黄约 75% 大小，顶部居中（an8）——行业双语分层惯例；
+  // events：[{start,end,lines:[{style,text,mv?}]}]
+  // 样式按「角色 × 位置」正交（v0.9.35：字号跟角色走，位置跟模式走——译文恒为主阅读样式）：
+  //   主语言（译文）：白色 56pt —— Bottom（底部居中 an2，主阅读位）/ TopMain（顶部居中 an8，译文在上时用）
+  //   副语言（原文）：金黄 50pt —— Top（顶部居中 an8）/ Sub（底部居中 an2，MarginV 可逐条动态指定）
   // 双语时源/译各占一条 Dialogue（时间相同、位置分离），不挤在两行里。
   function formatAss(events, opts) {
     opts = opts || {};
@@ -474,10 +475,13 @@
       '[V4+ Styles]',
       STYLE_FMT,
       'Style: Bottom,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
-      'Style: Top,PingFang SC,42,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,8,60,60,42,1',
-      // Sub：底部双行样式（v0.9.17）——外观与 Top 一致（42pt 金黄）但对齐方式为底部居中，
-      // 实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定，实现“紧贴译文上方、整体锚在底部”。
-      'Style: Sub,PingFang SC,42,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
+      'Style: Top,PingFang SC,50,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,8,60,60,42,1',
+      // TopMain（v0.9.35）：主语言顶部样式——外观与 Bottom 一致（白 56pt），仅对齐方式为顶部居中（an8）。
+      // 「译文在上」分屏模式下译文用本样式，保证译文无论在哪都保持主阅读字号。
+      'Style: TopMain,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,8,60,60,42,1',
+      // Sub：底部双行 / 副语言落底样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（金黄）但对齐方式为底部居中，
+      // 实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定；mv=0 时回退样式默认 MarginV=42。
+      'Style: Sub,PingFang SC,50,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
       '',
       '[Events]',
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
@@ -488,7 +492,7 @@
       (ev.lines || []).forEach((ln, i) => {
         if (!ln || !ln.text || !String(ln.text).trim()) return;
         const tx = String(ln.text).replace(/\r/g, '').replace(/\n/g, '\\N');
-        const st = ln.style === 'Top' ? 'Top' : (ln.style === 'Sub' ? 'Sub' : 'Bottom');
+        const st = ['Top', 'TopMain', 'Sub'].includes(ln.style) ? ln.style : 'Bottom';
         evLines.push('Dialogue: ' + i + ',' + fmtTimeAss(ev.start) + ',' + fmtTimeAss(ev.end) + ',' +
           st + ',,0,0,' + (ln.mv > 0 ? Math.round(ln.mv) : 0) + ',,' + tx);
       });
