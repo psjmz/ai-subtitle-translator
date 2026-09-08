@@ -658,9 +658,12 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-      /* 使用行为记录：最近事件 + 统计汇总（?limit=N 控制返回条数，默认 100，上限 500） */
+      /* 使用行为记录：统计汇总 + 事件流
+         ?page=N&size=20 → 分页模式（v0.9.40：默认 20 条/页，最新在第 1 页；size 上限 100）
+         ?limit=N → 旧兼容（最近 N 条一次性返回，上限 500，默认 100） */
       if (req.method === 'GET' && u === '/api/admin/events') {
-        const qLimit = Math.min(500, Math.max(1, parseInt((req.url.split('?')[1]||'').split('=').pop(), 10) || 100));
+        let q = {};
+        try { q = Object.fromEntries(new URL('http://x' + req.url).searchParams); } catch (e) {}
         const db = readEvents();
         const all = db.events;
         const today = todayStr();
@@ -670,7 +673,7 @@ const server = http.createServer(async (req, res) => {
           for (const e of arr) { const k = e[key] || '(空)'; m.set(k, (m.get(k) || 0) + 1); }
           return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n }));
         };
-        return sendJson(res, 200, {
+        const base = {
           total: all.length,
           today: {
             count: todays.length,
@@ -681,9 +684,20 @@ const server = http.createServer(async (req, res) => {
           },
           topFiles: cnt(all, 'file'),
           topLangs: cnt(all, 'lang'),
-          topModels: cnt(all.filter(e => e.model), 'model'),
-          events: all.slice(-qLimit).reverse() // 最新在前
-        });
+          topModels: cnt(all.filter(e => e.model), 'model')
+        };
+        const newest = all.slice().reverse(); // 最新在前（倒序拷贝，不动存储的追加序数组）
+        if (q.page !== undefined) {
+          const size = Math.min(100, Math.max(1, parseInt(q.size, 10) || 20));
+          const pages = Math.max(1, Math.ceil(all.length / size));
+          const page = Math.min(pages, Math.max(1, parseInt(q.page, 10) || 1));
+          return sendJson(res, 200, Object.assign(base, {
+            page, size, pages,
+            events: newest.slice((page - 1) * size, page * size)
+          }));
+        }
+        const qLimit = Math.min(500, Math.max(1, parseInt(q.limit, 10) || 100));
+        return sendJson(res, 200, Object.assign(base, { events: newest.slice(0, qLimit) }));
       }
 
       if (req.method === 'POST' && u === '/api/admin/config') {

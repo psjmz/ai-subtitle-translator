@@ -30,6 +30,11 @@
   .msg.ok{display:block;background:#eaf5ee;color:var(--ok)}
   .msg.err{display:block;background:#fdecea;color:var(--err)}
   .usage{font-size:13px;color:var(--mut);background:#f4f6f9;border-radius:8px;padding:10px 12px;margin-top:14px}
+  /* v0.9.40：使用记录分页条 */
+  .pager{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .pager button{padding:4px 12px;font-size:13px;border-radius:6px}
+  .pager button.cur{background:var(--pri);border-color:var(--pri);color:#fff;cursor:default}
+  .pager .pinfo{color:var(--mut);font-size:13px;margin:0 6px}
   .usage b{color:var(--txt)}
   .note{font-size:12px;color:var(--mut);margin-top:6px}
   .mask{color:var(--mut);font-family:monospace;font-size:13px}
@@ -109,6 +114,7 @@
           <tbody id="evRows"></tbody>
         </table>
       </div>
+      <div class="pager" id="evPager"></div>
       <div class="note">记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数、所用模型、完成/下载状态；不记录字幕内容。自带 API Key 的翻译直连服务商，仅在完成/下载时上报轻量记录（模型/语言/下载状态可统计，批次与时长不适用）。同 IP 同文件同语言 30 分钟内算一次会话。</div>
       <div class="btns"><button id="btnRefreshEvents">刷新</button></div>
     </div>
@@ -221,7 +227,8 @@ async function enterAdmin(){
   loadEvents();
 }
 
-/* 使用行为记录 */
+/* 使用行为记录（v0.9.40 分页：20 条/页，最新在第 1 页） */
+let evPage = 1;
 function evTime(ts){
   const d = new Date(ts);
   const p = n => String(n).padStart(2, '0');
@@ -230,7 +237,7 @@ function evTime(ts){
 function esc(s){ const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
 async function loadEvents(){
   try {
-    const j = await api('/api/admin/events?limit=100');
+    const j = await api('/api/admin/events?page=' + evPage + '&size=20');
     show('eventsCard', true);
     const chips = [];
     chips.push('今日 <b>' + j.today.count + '</b> 个翻译会话');
@@ -259,9 +266,41 @@ async function loadEvents(){
         '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
         '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + dlTd + '</td></tr>';
     }).join('') || '<tr><td colspan="10" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
+    renderPager(j);
   }
   catch (e) { /* 记录区加载失败不影响主配置页 */ }
 }
+/* 分页条：上一页/下一页 + 窗口化页码（首末页 + 当前页前后各 1，超过间隔用 …） */
+function renderPager(j){
+  const el = $('evPager');
+  const pages = j.pages || 1;
+  if (pages <= 1) { el.innerHTML = j.total ? '<span class="pinfo">共 ' + j.total + ' 条</span>' : ''; return; }
+  const btn = (p, label, cur, dis) =>
+    '<button' + (cur ? ' class="cur"' : '') + (dis ? ' disabled' : '') + ' data-p="' + p + '">' + (label || p) + '</button>';
+  const win = [];
+  const add = p => { if (p >= 1 && p <= pages && !win.includes(p)) win.push(p); };
+  add(1); add(pages);
+  for (let p = evPage - 1; p <= evPage + 1; p++) add(p);
+  win.sort((a, b) => a - b);
+  let html = btn(evPage - 1, '‹ 上一页', false, evPage <= 1);
+  let prev = 0;
+  for (const p of win) {
+    if (p - prev > 1) html += '<span class="pinfo">…</span>';
+    html += btn(p, p, p === evPage, false);
+    prev = p;
+  }
+  html += btn(evPage + 1, '下一页 ›', false, evPage >= pages);
+  html += '<span class="pinfo">第 ' + evPage + ' / ' + pages + ' 页 · 共 ' + j.total + ' 条</span>';
+  el.innerHTML = html;
+}
+$('evPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === evPage) return;
+  evPage = p;
+  loadEvents();
+});
 $('btnRefreshEvents').addEventListener('click', loadEvents);
 
 /* 初始化：有 token 直接进，否则显示登录 */
