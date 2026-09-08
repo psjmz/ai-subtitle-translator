@@ -105,11 +105,11 @@
       <div class="stats" id="evStats"></div>
       <div style="overflow-x:auto">
         <table class="tbl">
-          <thead><tr><th>时间</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th></tr></thead>
+          <thead><tr><th>开始时间</th><th>结束时间</th><th>时长</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th><th>模型</th><th>下载</th></tr></thead>
           <tbody id="evRows"></tbody>
         </table>
       </div>
-      <div class="note">仅记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数；不记录字幕内容。自带 API Key 的翻译不经过服务器，无法统计。同 IP 同文件 30 分钟内算一次会话。</div>
+      <div class="note">记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数、所用模型、完成/下载状态；不记录字幕内容。自带 API Key 的翻译直连服务商，仅在完成/下载时上报轻量记录（模型/语言/下载状态可统计，批次与时长不适用）。同 IP 同文件同语言 30 分钟内算一次会话。</div>
       <div class="btns"><button id="btnRefreshEvents">刷新</button></div>
     </div>
 
@@ -236,14 +236,29 @@ async function loadEvents(){
     chips.push('今日 <b>' + j.today.count + '</b> 个翻译会话');
     if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
     if (j.today.batches) chips.push('<b>' + j.today.batches + '</b> 次请求');
+    if (j.today.finished !== undefined) chips.push('完成 <b>' + j.today.finished + '</b> 个');
+    if (j.today.downloaded !== undefined) chips.push('下载 <b>' + j.today.downloaded + '</b> 次');
     if (j.topFiles && j.topFiles[0]) chips.push('最常翻译：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
     if (j.topLangs && j.topLangs[0]) chips.push('最热目标语：<b>' + esc(j.topLangs[0].name) + '</b> ×' + j.topLangs[0].n);
+    if (j.topModels && j.topModels[0]) chips.push('最常用模型：<b>' + esc(j.topModels[0].name) + '</b> ×' + j.topModels[0].n);
     chips.push('累计 <b>' + j.total + '</b> 条');
     $('evStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
-    $('evRows').innerHTML = (j.events || []).map(e =>
-      '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) + '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
-      '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || 1) + '</td></tr>'
-    ).join('') || '<tr><td colspan="6" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
+    const fmtDur = ms => {
+      const s = Math.round(ms / 1000);
+      if (s < 60) return s + '秒';
+      if (s < 3600) return Math.floor(s / 60) + '分' + (s % 60 ? (s % 60) + '秒' : '');
+      return Math.floor(s / 3600) + '时' + Math.floor((s % 3600) / 60) + '分';
+    };
+    $('evRows').innerHTML = (j.events || []).map(e => {
+      const endTd = e.finishedAt ? evTime(e.finishedAt) : '<span style="color:var(--mut)">未完成</span>';
+      /* 自带 Key 会话的 t 是首次上报时间（非翻译开始），时长无意义不显示 */
+      const durTd = (e.finishedAt && !e.byok) ? fmtDur(e.finishedAt - e.t) : '-';
+      const mdlTd = e.model ? esc(e.model) + (e.byok ? ' <span style="color:var(--mut);font-size:11px">(自带Key)</span>' : '') : '<span style="color:var(--mut)">-</span>';
+      const dlTd = e.downloads ? '✓ ×' + e.downloads : '<span style="color:var(--mut)">-</span>';
+      return '<tr><td>' + evTime(e.t) + '</td><td>' + endTd + '</td><td>' + durTd + '</td><td>' + esc(e.ip) +
+        '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
+        '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + dlTd + '</td></tr>';
+    }).join('') || '<tr><td colspan="10" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
   }
   catch (e) { /* 记录区加载失败不影响主配置页 */ }
 }

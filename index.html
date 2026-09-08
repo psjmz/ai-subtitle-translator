@@ -170,7 +170,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.30</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.32</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2088,6 +2088,19 @@ async function extractGlossary(base,key,model,cfg,srcText){
 }
 
 /* ---------------- 主流程 ---------------- */
+/* 会话生命周期上报（fire-and-forget 不阻塞不报错；云端与自带 Key 模式都上报）
+   ev: 'finish' 翻译完成 | 'download' 下载字幕；model：自带 Key 模式带用户填的模型名 */
+function reportEvent(ev){
+  if(!S.trMeta) return;
+  try{
+    fetch('/api/event',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev})
+    }).catch(()=>{});
+  }catch(e){}
+}
+
 async function runTranslate(){
   if(S.translating) return;
   if(!S.srcItems.length){ log(t('noSrc'),'err'); return; }
@@ -2108,9 +2121,9 @@ async function runTranslate(){
   const effModel= cfg.mode==='builtin' ? '' : cfg.model;
   const maxTry  = 3;
   let lastCall = 0;
-  // 云端翻译（builtin）时随请求捎带会话元数据（仅 文件名/目标语言/条数，不含字幕内容），供站点运营统计
-  S.trMeta = cfg.mode==='builtin' ? { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length } : null;
-
+  // 会话元数据（仅 文件名/目标语言/条数/模型名，不含字幕内容），供站点运营统计。
+  // builtin：随翻译请求捎带（模型由服务器端记录）；自带 Key：随 finish/download 上报轻量记录
+  S.trMeta = { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length, model: cfg.mode==='api' ? cfg.model : '' };
   clearLog();
   S.translating=true; S.stop=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.locale=cfg.dst;
   $('btnGo').disabled=$('btnPost').disabled=true;
@@ -2386,6 +2399,7 @@ async function runTranslate(){
     applyPost();         // 清提示词 + 折行（超阈值自动分行）
     finalRenumberAndStats();
     log(t('allDone',S.dropN,S.mergeN,S.wrapN),'okc');
+    reportEvent('finish');   // 翻译成功完成上报（仅云端模式有效）
     pgFinish();
   }catch(e){
     log(t('errOccur',e.message),'err');
@@ -2631,6 +2645,7 @@ $('btnDownload').addEventListener('click', ()=>{
   a.download=name;
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
+  reportEvent('download');   // 下载成功上报（仅云端模式有效）
   log(t('exported',name,buildExportItems().length),'okc');
 });
 $('btnCopy').addEventListener('click', async ()=>{

@@ -75,13 +75,14 @@ function readEvents(){
   } catch (e) {}
   return { events: [] };
 }
-function appendEvent(ip, meta){
+function appendEvent(ip, meta, model){
   if (!meta || typeof meta !== 'object') return;
   const now = Date.now();
   const file = String(meta.file || '').replace(/[\x00-\x1f]/g, '').slice(0, 120);
   const lang = String(meta.lang || '').slice(0, 10);
   const cues = Math.max(0, Math.floor(+meta.cues || 0));
   if (!file && !lang) return; // 无有效元数据（老版前端/异常请求）不记
+  const mdl = String(model || '').replace(/[\x00-\x1f]/g, '').slice(0, 60);
   const db = readEvents();
   // 会话去重：从尾部找同 ip+file+lang 且时间窗口内的记录 → 批次 +1
   for (let i = db.events.length - 1; i >= 0; i--) {
@@ -89,14 +90,53 @@ function appendEvent(ip, meta){
     if (e.ip === ip && e.file === file && e.lang === lang && now - e.t < EVENT_DEDUP_MS) {
       e.batches = (e.batches || 1) + 1;
       if (cues > (e.cues || 0)) e.cues = cues;
+      if (mdl && !e.model) e.model = mdl;
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
     }
     if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
   }
-  db.events.push({ t: now, ip, file, lang, cues, batches: 1 });
+  db.events.push({ t: now, ip, file, lang, cues, batches: 1, model: mdl });
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
   fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+}
+/* 前端生命周期上报：翻译完成（finish）/ 下载字幕（download）。
+   匹配窗口放宽到 3 小时（大文件翻译+用户迟些下载都算同一次会话），取最新一条。
+   匹配不到但带了 model（自带 Key 用户，翻译不经服务器）→ 创建轻量记录，模型也能统计。 */
+const EVENT_LIFE_MS = 3 * 60 * 60 * 1000;
+function markEvent(ip, meta, ev){
+  if (!meta || typeof meta !== 'object') return false;
+  const now = Date.now();
+  const file = String(meta.file || '').replace(/[\x00-\x1f]/g, '').slice(0, 120);
+  const lang = String(meta.lang || '').slice(0, 10);
+  const mdl = String(meta.model || '').replace(/[\x00-\x1f]/g, '').slice(0, 60);
+  if (!file && !lang) return false;
+  const db = readEvents();
+  for (let i = db.events.length - 1; i >= 0; i--) {
+    const e = db.events[i];
+    if (now - e.t >= EVENT_LIFE_MS) break; // 更早的必不在窗口内
+    if (e.ip === ip && e.file === file && e.lang === lang) {
+      if (ev === 'finish') {
+        e.finishedAt = now;                    // 完成时间（重译后再完成取最新；开始时间即 e.t）
+      } else if (ev === 'download') {
+        e.downloads = (e.downloads || 0) + 1;
+        e.downloadedAt = now;
+      } else return false;
+      if (mdl && !e.model) e.model = mdl;
+      fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+      return true;
+    }
+  }
+  /* 自带 Key 用户（翻译未经服务器，无 builtin 会话）：首次上报时创建轻量记录 */
+  if (!mdl) return false;
+  const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
+  if (ev === 'finish') lite.finishedAt = now;
+  else if (ev === 'download') { lite.downloads = 1; lite.downloadedAt = now; }
+  else return false;
+  db.events.push(lite);
+  if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
+  fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+  return true;
 }
 function dateOfTs(ts){
   const d = new Date(ts);
@@ -550,13 +590,29 @@ const server = http.createServer(async (req, res) => {
       usage.ips[ip] = ipUsed + 1;
       usage.global += 1;
       writeUsage(usage);
-      try { appendEvent(ip, body.meta); } catch (e) {} // 行为记录失败不影响翻译主流程
+      try { appendEvent(ip, body.meta, cfg.model); } catch (e) {} // 行为记录失败不影响翻译主流程
       try {
         const out = await callModel(cfg, body.messages, undefined);
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
         return sendJson(res, 502, { error: { code: 'upstream_error', message: '默认模型调用失败：' + e.message } });
       }
+    }
+
+    /* 前端生命周期上报（公开轻接口）：翻译完成 / 下载字幕。
+       body: {file, lang, model?, ev:'finish'|'download'}。
+       云端会话：匹配更新；自带 Key 用户（带 model、无会话）：创建轻量记录（模型/语言/下载可统计，批次与时长不适用）。 */
+    if (req.method === 'POST' && u === '/api/event') {
+      let body;
+      try { body = JSON.parse(await readBody(req, 4 * 1024)); } catch (e) {
+        return sendJson(res, 400, { error: { message: '请求体不是合法 JSON' } });
+      }
+      const ev = String(body.ev || '');
+      if (ev !== 'finish' && ev !== 'download') {
+        return sendJson(res, 400, { error: { message: 'ev 必须是 finish 或 download' } });
+      }
+      try { markEvent(clientIp(req), body, ev); } catch (e) {}
+      return sendJson(res, 200, { ok: true });
     }
 
     /* 管理登录 */
@@ -612,9 +668,16 @@ const server = http.createServer(async (req, res) => {
         };
         return sendJson(res, 200, {
           total: all.length,
-          today: { count: todays.length, ips: new Set(todays.map(e => e.ip)).size, batches: todays.reduce((s, e) => s + (e.batches || 1), 0) },
+          today: {
+            count: todays.length,
+            ips: new Set(todays.map(e => e.ip)).size,
+            batches: todays.reduce((s, e) => s + (e.batches || 1), 0),
+            finished: todays.filter(e => e.finishedAt && dateOfTs(e.finishedAt) === today).length,
+            downloaded: todays.filter(e => e.downloadedAt && dateOfTs(e.downloadedAt) === today).length
+          },
           topFiles: cnt(all, 'file'),
           topLangs: cnt(all, 'lang'),
+          topModels: cnt(all.filter(e => e.model), 'model'),
           events: all.slice(-qLimit).reverse() // 最新在前
         });
       }
