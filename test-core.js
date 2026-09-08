@@ -1167,5 +1167,52 @@ t('mirrorSpeakerLines：半角句点防护——「3.5-8」范围连字符不切
   assert.strictEqual(C.mirrorSpeakerLines('- U.S.-style 设计。- 乙。', src), '- U.S.-style 设计。- 乙。');
 });
 
+/* ---------------- v0.9.41：阅读速度（CPS）检测 + ASS 歌词斜体 ---------------- */
+t('cpsOf：等效宽度/秒（全角=1、半角=0.5；空/零时长返回 0）', () => {
+  assert.strictEqual(C.cpsOf('一二三四', 2000), 2);   // 4 宽 / 2s
+  assert.strictEqual(C.cpsOf('abcdefgh', 2000), 2);   // 8 半角 = 4 宽 / 2s
+  assert.strictEqual(C.cpsOf('', 1000), 0);
+  assert.strictEqual(C.cpsOf('abc', 0), 0);
+});
+t('cpsLimitOf：语言分档 ja 4 / ko 12 / zh 9 / 默认 8（Netflix TTSG）', () => {
+  assert.strictEqual(C.cpsLimitOf('ja'), 4);
+  assert.strictEqual(C.cpsLimitOf('ko'), 12);
+  assert.strictEqual(C.cpsLimitOf('zh-CN'), 9);
+  assert.strictEqual(C.cpsLimitOf('zh-TW'), 9);
+  assert.strictEqual(C.cpsLimitOf('es'), 8);
+});
+t('readingSpeedIssues：超速 / 过短 / 纯符号豁免（zh-CN 档 9）', () => {
+  const items = [
+    { no: 1, start: 0, end: 1000, text: '一二三四五六七八九十' }, // 10 宽/1s = 10 > 9 → 超速
+    { no: 2, start: 2000, end: 2500, text: '短' },                // 0.5s < 0.83s → 过短（CPS 2/s 不超）
+    { no: 3, start: 3000, end: 5000, text: '♪ 音乐 ♪' },         // 实义词 → 参与但不超速
+    { no: 4, start: 4000, end: 6000, text: '♪' },                 // 纯符号 → CPS 豁免
+  ];
+  const iss = C.readingSpeedIssues(items, 'zh-CN');
+  const cps = iss.filter(i => i.type === 'cps'), dur = iss.filter(i => i.type === 'dur');
+  assert.strictEqual(cps.length, 1);
+  assert.strictEqual(cps[0].at, 1);
+  assert.strictEqual(cps[0].args[1], 9);   // i18n 占位：limit
+  assert.strictEqual(dur.length, 1);
+  assert.strictEqual(dur[0].at, 2);
+});
+t('readingSpeedIssues：ja 档 4（6 字/秒超速）', () => {
+  const iss = C.readingSpeedIssues([{ no: 1, start: 0, end: 1000, text: 'これはテスト' }], 'ja');
+  assert.strictEqual(iss.length, 1);
+  assert.strictEqual(iss[0].type, 'cps');
+  assert.strictEqual(iss[0].args[1], 4);
+});
+t('readingSpeedIssues：时长 ≤0 不产生 issue（交给 validateItems）', () => {
+  assert.strictEqual(C.readingSpeedIssues([{ no: 1, start: 1000, end: 1000, text: 'x' }], 'zh-CN').length, 0);
+});
+t('formatAss：含 ♪/♫ 的行加内联斜体，普通行不加（v0.9.41）', () => {
+  const out = C.formatAss([{ start: 0, end: 1000, lines: [
+    { style: 'Bottom', text: '♪ 爱在空中飘荡 ♪' },
+    { style: 'Top', text: '普通对白' }
+  ] }], { title: 'T' });
+  assert.ok(out.includes('{\\i1}♪ 爱在空中飘荡 ♪{\\i0}'), '歌词行应有斜体标记');
+  assert.ok(!out.includes('{\\i1}普通对白'), '普通行不应有斜体标记');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

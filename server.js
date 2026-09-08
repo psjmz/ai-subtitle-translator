@@ -659,7 +659,7 @@ const server = http.createServer(async (req, res) => {
       }
 
       /* 使用行为记录：统计汇总 + 事件流
-         ?page=N&size=20 → 分页模式（v0.9.40：默认 20 条/页，最新在第 1 页；size 上限 100）
+         ?page=N&size=20 → 分页模式（v0.9.41：默认 20 条/页，最新在第 1 页；size 上限 100）
          ?limit=N → 旧兼容（最近 N 条一次性返回，上限 500，默认 100） */
       if (req.method === 'GET' && u === '/api/admin/events') {
         let q = {};

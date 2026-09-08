@@ -493,8 +493,11 @@
         if (!ln || !ln.text || !String(ln.text).trim()) return;
         const tx = String(ln.text).replace(/\r/g, '').replace(/\n/g, '\\N');
         const st = ['Top', 'TopMain', 'Sub'].includes(ln.style) ? ln.style : 'Bottom';
+        // v0.9.41 歌词斜体：含 ♪/♫ 的行按行业惯例（Netflix TTSG：italicize lyrics）加内联斜体标记，
+        // 不新增样式（{\i1}/{\i0} 内联覆盖对所有现有样式生效；SRT/VTT/TXT 纯文本路径不受影响）。
+        const musicLine = /[♪♫]/.test(tx);
         evLines.push('Dialogue: ' + i + ',' + fmtTimeAss(ev.start) + ',' + fmtTimeAss(ev.end) + ',' +
-          st + ',,0,0,' + (ln.mv > 0 ? Math.round(ln.mv) : 0) + ',,' + tx);
+          st + ',,0,0,' + (ln.mv > 0 ? Math.round(ln.mv) : 0) + ',,' + (musicLine ? '{\\i1}' + tx + '{\\i0}' : tx));
       });
     }
     return header.join('\n') + '\n' + evLines.join('\n') + '\n';
@@ -1216,6 +1219,38 @@
     return issues;
   }
 
+  // ---------------- 阅读速度（CPS）检测（v0.9.41，只读 QC，不改动任何输出） ----------------
+  // 口径对齐 Netflix TTSG 的 CJK 计法：全角=1、半角=0.5（即 textWidth 等效宽度），除以显示秒数。
+  // 阈值（等效字/秒，成人档，来源 Netflix 各语言 TTSG）：
+  //   ja 4（日文汉字信息密度最高，Netflix 最严） / ko 12 / zh-CN·zh-TW 9（官方允许上浮至 11，取标称值）
+  //   其余语言 8：Netflix 拉丁语系按含空格字符计 17 CPS，等效宽度口径约 8。
+  // 纯水词/声音标签条目不参与 CPS；时长 <0.5s 的条目 CPS 无意义，跳过（过短另行报 shortDur）。
+  const CPS_LIMITS = { 'ja': 4, 'ko': 12, 'zh-CN': 9, 'zh-TW': 9 };
+  const MIN_DUR_MS = 833; // Netflix 最短显示时长 5/6 秒
+  function cpsLimitOf(dst) { return CPS_LIMITS[dst] || 8; }
+  function cpsOf(text, durMs) {
+    const d = +durMs;
+    if (!text || !(d > 0)) return 0;
+    return textWidth(String(text)) / (d / 1000);
+  }
+  // 阅读速度与最短时长检查：返回 issue 数组（type:'cps'/'dur'），供导出前报告（只读提示）。
+  // items 口径同 validateItems（[{no,start,end,text}]）；dst 为目标语言码（BCP47）。
+  // cps issue 带 args:[cps, limit] 供 i18n 占位符渲染。
+  function readingSpeedIssues(items, dst) {
+    const issues = [];
+    const lim = cpsLimitOf(dst);
+    (items || []).forEach((it) => {
+      if (!it || !it.text) return;
+      const dur = (it.end || 0) - (it.start || 0);
+      if (dur <= 0) return; // 时长问题交给 validateItems
+      if (dur < MIN_DUR_MS) issues.push({ type: 'dur', at: it.no, code: 'shortDur', msg: '显示时长不足 0.83 秒', args: [(dur / 1000).toFixed(2)] });
+      if (isFillerCue(String(it.text))) return; // 纯水词/声音标签不参与 CPS
+      const cps = cpsOf(stripSoundTags(String(it.text)), dur);
+      if (cps > lim + 1e-9) issues.push({ type: 'cps', at: it.no, code: 'cps', msg: '阅读速度过快', cps: Math.round(cps * 10) / 10, args: [Math.round(cps * 10) / 10, lim] });
+    });
+    return issues;
+  }
+
   // 语言锚定校验：判断译文文本是否符合目标语言的文种（纯函数，供批后校验调用）。
   // 背景：实测 DeepSeek 会间歇性地把整批日文译成中文（同 prompt 重发即恢复），
   // 批后用本函数校验、失败整批重试即可挡住这类事故。
@@ -1265,6 +1300,7 @@
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars,
     validateItems, anchorOk, fixMixedChars,
+    cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, normalizeMusic, repairSpeakerLines, mirrorSpeakerLines,
     MAX_W_DEFAULT: 20
   };
