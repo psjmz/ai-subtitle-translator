@@ -611,8 +611,10 @@
     const srcLines = String(src == null ? '' : src).replace(/\r/g, '').split('\n')
       .map((x) => x.trim()).filter(Boolean);
     if (srcLines.length < 2 || !srcLines.every((l) => SP_DASH_RE.test(l))) return s;
-    // dash 前仍须句读/空白/行首（lookbehind 防误伤 "20-30" 等无空格连字符），dash 后容忍零空格
-    const parts = s.split(/(?<=[\s。．，,！？!?…；;）)】」』"”]|^)\s*[-–—]\s*/).filter((x) => x.trim());
+    // dash 前须句读/空白/行首（lookbehind 防误伤 "20-30" 等无空格连字符），dash 后容忍零空格；
+    // ♪♫ 放行（「♪- 哦」音乐行+对白边界，cue 15 案例）；
+    // 半角句点 . 与印地 danda ।॥、阿语 ，؟؛ 放行——对白边界的 21 语言覆盖（cue 10 型，18 语言曾因缺 . 切不开）
+    const parts = s.split(/(?<=[\s.。．，,！？!?…；;）)】」』"”♪♫।॥،؟؛]|^)\s*[-–—]\s*/).filter((x) => x.trim());
     if (parts.length !== srcLines.length) return s;
     const dash = (srcLines[0].match(/^[-–—]/) || ['-'])[0];
     return parts.map((p) => dash + ' ' + p.trim()).join('\n');

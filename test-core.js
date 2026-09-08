@@ -1135,5 +1135,37 @@ t('buildMonoParts：单行译文镜像源 speaker 两行结构（mono 全格式�
   assert.strictEqual(out[0].text, '- 哦，你先请。\n- ♪ 因某人缺乏爱 ♪');
 });
 
+t('mirrorSpeakerLines：cue15 案例——「♪-」音符后紧跟 dash 也能切回两行', () => {
+  const src = '- ♪ Love is in the air... ♪\n- Oh, oh.';
+  const dst = '- ♪ 爱在空中飘荡…… ♪- 哦，哦。';
+  assert.strictEqual(C.mirrorSpeakerLines(dst, src), '- ♪ 爱在空中飘荡…… ♪\n- 哦，哦。');
+});
+t('mirrorSpeakerLines：对白边界 21 语言标点覆盖（半角./印地।/阿语，/韩语.）', () => {
+  const src = '- Allie M. Allie M.\n- Yeah, we got one right here.';
+  // 半角句点紧贴 dash（拉丁/西里尔/韩语等 18 语言曾切不开）
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- Allie M. Allie M.- Ouais, on en a un juste ici.', src),
+    '- Allie M. Allie M.\n- Ouais, on en a un juste ici.');
+  // 韩语：句点后无空格
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- 앨리 M. 앨리 M.- 그래, 여기 딱 한 명 있어.', src),
+    '- 앨리 M. 앨리 M.\n- 그래, 여기 딱 한 명 있어.');
+  // 印地语 danda ।
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- एली एम। एली एम।- हाँ, हमारे पास एक यहीं है।', src),
+    '- एली एम। एली एम।\n- हाँ, हमारे पास एक यहीं है।');
+  // 阿语逗号 ，（RTL 逻辑序纯字符串切分，无重排）
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- أوه،- أوه، لدينا واحد هنا.', '- Oh, oh.\n- Yeah, we got one.'),
+    '- أوه،\n- أوه، لدينا واحد هنا.');
+});
+t('mirrorSpeakerLines：半角句点防护——「3.5-8」范围连字符不切开，走真实边界成两行', () => {
+  const src = '- A.\n- B.';
+  // dash 前是数字（5）不在白名单 → 「3.5-8」整体保留在第一段内，切分走「。- 」真实边界
+  assert.strictEqual(C.mirrorSpeakerLines('- 3.5-8 之间。- 乙。', src), '- 3.5-8 之间。\n- 乙。');
+  // 连字词产生多余切点 → 段数 3≠2 → 整体不动（宁错放不错改）
+  assert.strictEqual(C.mirrorSpeakerLines('- U.S.-style 设计。- 乙。', src), '- U.S.-style 设计。- 乙。');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
