@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.36</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.37</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2034,6 +2034,7 @@ function systemPromptEn(cfg){
    + '   - Only when a cue consists entirely of filler words or sound tags (e.g. "Um.", "[music]") should its cue number be listed in the fillers array; the program will clear that cue.\n'
    + '   - Only when a group\'s entire merged text is pure filler/sound tags with no substantive content may that group be output as type:"drop" with an empty text; this is a rare exception.\n'
    + '   - Note: type "drop" does not make the translation disappear — it only tells the program to clear that cue. Do not set everything to drop to be "safe".\n'
+   + '5.5 [Music lines] Music note symbols (♪ ♫) only mark "singing" — they are not content: keep the leading/trailing note symbols in the translation (matching the source) and fully translate the lyric text between them into ' + dstNative + '. Never output the symbols only, and never drop the lyrics.\n'
    + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
    + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
    + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
@@ -2078,6 +2079,7 @@ s += '5.【水词处理——默认行为是翻译】\n'
    + '   - 仅当某条 cue 整条都只是纯语气词或纯提示词（如 "Um."、"[music]"、"[音乐]"），把该 cue 编号列入 fillers 数组，程序会清空该条字幕。\n'
    + '   - 仅当整个句组的 merged 全部是水词/提示词（无任何实义内容）时，该组才输出 type:"drop" 且 text 留空；这是极少数例外。\n'
    + '   - 注意：类型 "drop" 不会让译文消失，只是程序据此清空字幕；不要为了"安全"而把所有句组都设 drop。\n'
+  + '5.5【音乐行】♪ ♫ 等音乐符号只是「正在唱歌」的标记，不是内容：译文必须保留与原文对应的首尾音乐符号，并把符号之间的歌词完整翻译成' + dstNative + '；严禁只输出符号、严禁丢掉歌词。\n'
   + '6.【禁止自行折行】text 一律输出单行文本，严禁包含换行符 \\n；折行由程序按显示宽度自动处理，你不要也不能手动分行。\n'
   + '   唯一例外：若该句组的原文是多行且每行以 - 开头（同一条字幕里两个说话人对话），译文必须保持相同结构——每个说话人一行、每行以「- 」开头、行与行之间用一个换行符 \\n 连接。\n'
   + '7.【数字单位一体】译文中的数字与其单位/符号必须作为整体紧邻出现（如 30%、$50、1,000、12.5、100万），严禁拆散或在数字与单位之间插入其他字符。\n'
@@ -2166,6 +2168,8 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
     if(!m || m.type==='drop') continue;
     const txt = String(m.text||'').trim();
     if(txt && !C.anchorOk(txt, dstV)) badAnchor.push(g.gno);
+    // v0.9.37：音乐行丢词（源有歌词而译文只剩 ♪ 符号）——纯符号可通过 anchorOk，必须单查；并入锚定重试通道
+    else if(txt && C.musicLost(txt, g.text) && !badAnchor.includes(g.gno)) badAnchor.push(g.gno);
   }
   // fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）
   const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
@@ -2513,8 +2517,10 @@ async function runTranslate(){
         suspiciousDrop++;
         continue;
       }
-      const text = C.fixMixedChars(textRaw, cfg.dst);
-      if(!text){
+      // v0.9.37：译文先归一化音乐符号（折叠重复/补回丢失首尾），再判丢词——
+      // 重试后仍只剩 ♪ 符号的按 missing 标记（诚实显示待处理），绝不静默回填"看似已译"的空壳
+      const text = C.normalizeMusic(C.fixMixedChars(textRaw, cfg.dst), g.text);
+      if(!text || C.musicLost(text, g.text)){
         active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
         missingCount++;
         continue;
@@ -2571,7 +2577,8 @@ async function runTranslate(){
         let fixed=0;
         overCapGroups.forEach(oc=>{
           const nt=got[oc.g.gno];
-          const txt=nt ? String(nt.text||'').trim() : '';
+          // v0.9.37：压缩改写后的译文同样归一化音乐符号（压缩可能把首尾 ♪ 压掉）
+          const txt=nt ? C.normalizeMusic(String(nt.text||'').trim(), oc.g.text) : '';
           const cap=oc.active.length*2*cfg.maxW;
           if(txt && C.anchorOk(txt,cfg.dst) && C.textWidth(C.stripSoundTags(txt))<=cap && fitsCapacity(txt,oc.active,cfg)){
             backfillGroup(oc.active, txt, cfg);

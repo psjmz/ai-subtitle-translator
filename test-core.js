@@ -1032,5 +1032,34 @@ t('buildMonoParts：文本守恒（所有译文零丢失）', () => {
   assert.ok(joined.includes('这是较长的一段译文需要折行处理一下才可以'), '第三条文本齐备');
 });
 
+console.log('— 音乐符号行（v0.9.37）—');
+t('musicLost：译文只剩 ♪ 符号而源有歌词 → 判丢词', () => {
+  assert.strictEqual(C.musicLost('♪♪', '♪ Love is in the air ♪'), true);
+  assert.strictEqual(C.musicLost('♪ ♪', '♪ Love is in the air ♪'), true);
+  assert.strictEqual(C.musicLost('♪ 爱在空中飘荡 ♪', '♪ Love is in the air ♪'), false);
+  assert.strictEqual(C.musicLost('♪', '♪'), false);           // 纯音乐行（源本无歌词）不算丢词
+  assert.strictEqual(C.musicLost('♪', '♪♪'), false);          // 源纯符号，译文纯符号，正常
+  assert.strictEqual(C.musicLost('♪ 사랑이 공중에 ♪', '♪ Love is in the air ♪'), false); // 韩文歌词
+});
+t('normalizeMusic：折叠紧邻重复符号（♪♪ → ♪）', () => {
+  assert.strictEqual(C.normalizeMusic('♪♪ 爱在空中飘荡 ♪♪', '♪ Love is in the air ♪'), '♪ 爱在空中飘荡 ♪');
+  assert.strictEqual(C.normalizeMusic('♪ ♪ 爱在空中 ♪ ♪', '♪ Love is in the air ♪'), '♪ 爱在空中 ♪');
+});
+t('normalizeMusic：源首尾有符号而译文丢失 → 补回', () => {
+  assert.strictEqual(C.normalizeMusic('爱在空中飘荡', '♪ Love is in the air ♪'), '♪ 爱在空中飘荡 ♪');
+  assert.strictEqual(C.normalizeMusic('♪ 爱在空中飘荡', '♪ Love is in the air ♪'), '♪ 爱在空中飘荡 ♪'); // 尾符补回
+  assert.strictEqual(C.normalizeMusic('爱在空中飘荡 ♪', '♪ Love is in the air ♪'), '♪ 爱在空中飘荡 ♪');   // 首符补回
+});
+t('normalizeMusic：源无符号的普通行 → 零影响', () => {
+  assert.strictEqual(C.normalizeMusic('普通译文一句', 'An ordinary line.'), '普通译文一句');
+  assert.strictEqual(C.normalizeMusic('♪ 纯音乐行 ♪', '♪'), '♪ 纯音乐行 ♪'); // 源单符号，译文首尾已齐 → 不动
+});
+t('normalizeMusic：行中间单个符号不碰', () => {
+  assert.strictEqual(C.normalizeMusic('一句 ♪ 中间有符号的歌词', 'A line ♪ with mid symbol'), '一句 ♪ 中间有符号的歌词');
+});
+t('normalizeMusic：无歌词纯符号行（源 ♪♪ 译文 ♪♪）→ 折叠为 ♪', () => {
+  assert.strictEqual(C.normalizeMusic('♪♪', '♪♪'), '♪');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

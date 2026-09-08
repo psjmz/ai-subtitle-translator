@@ -803,6 +803,32 @@
     return Array.from(String(s == null ? '' : s).replace(/[\s\p{P}\p{S}]/gu, '')).length;
   }
 
+  // ---------------- 音乐符号行（v0.9.37）----------------
+  // 唱歌行首尾的 ♪/♫ 只是「正在唱歌」的标记，不是内容。评测发现模型两类偶发事故：
+  //  a) 只回 ♪♪ 丢掉整句歌词（纯符号能通过 anchorOk，静默漏网）；
+  //  b) 首尾符号丢失或叠成 ♪♪。以下两个纯函数在回填前统一纠正。
+  const RE_MUSIC = /[♪♫♬♩]/;
+  // 丢词判定：译文剥离音乐符号/标点/空白后无实词，而源仍有实词 → 判丢词（触发重试/missing）
+  function musicLost(dst, src) {
+    const d = String(dst == null ? '' : dst).replace(/[♪♫♬♩\s\p{P}\p{S}]/gu, '');
+    if (d) return false; // 译文还有实词，没丢
+    const s = String(src == null ? '' : src).replace(/[♪♫♬♩\s\p{P}\p{S}]/gu, '');
+    return s.length > 0;  // 源有实词、译文没有 → 丢词
+  }
+  // 归一化：①折叠紧邻重复符号（♪♪ / ♪ ♪ → ♪）②源首尾有符号而译文丢失 → 用源符号补回。
+  // 只动首尾锚定与紧邻重复，行中间的单个符号不碰；源本身无符号的行零影响。
+  function normalizeMusic(dst, src) {
+    let s = String(dst == null ? '' : dst).trim();
+    if (!s) return s;
+    s = s.replace(/([♪♫♬♩])(\s*\1)+/g, '$1');
+    const srcS = String(src == null ? '' : src).trim();
+    const head = (srcS.match(/^[♪♫♬♩]\s*/) || [''])[0].trim();
+    const tail = (srcS.match(/\s*[♪♫♬♩]$/) || [''])[0].trim();
+    if (head && !RE_MUSIC.test(s[0])) s = head + ' ' + s;
+    if (tail && !RE_MUSIC.test(s[s.length - 1])) s = s + ' ' + tail;
+    return s;
+  }
+
   // 语言感知拼接（v0.9.23 孤儿收并用）：汉字/假名与泰、老、高棉、缅文等无空格文字直接拼接；
   // 韩文谚文书写上词间用空格（切分必发生在空格处，助词从不跨空格附着）→ 补空格还原；
   // 拉丁等其余语言补一个空格。与 joinSrc（源文用）不同，本函数面向任意目标语言的收并拼缝。
@@ -1186,6 +1212,7 @@
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars,
     validateItems, anchorOk, fixMixedChars,
+    musicLost, normalizeMusic,
     MAX_W_DEFAULT: 20
   };
 });
