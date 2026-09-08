@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.37</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.38</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2192,6 +2192,8 @@ function applyTailCollapse(active){
 // 句组回填：优先合并为单条（时长/行数达标），否则按时长切分回填；返回回填方式（v0.9.21 抽出复用）
 // v0.9.23：切分后加 B1 孤儿尾巴收并（末条 cue <700ms 且译文只剩 ≤2 字/1 词尾巴 → 并回前条）
 function backfillGroup(active, text, cfg){
+  // v0.9.38：speaker 换行修复（与主回填循环同款，覆盖压缩重译路径）
+  if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
   if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); return 'merged'; }
   const times=active.map(c=>({start:c.start, end:c.end}));
   const col=C.collapseThinTail(C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst}), active, {maxW:cfg.maxW, locale:cfg.dst});
@@ -2519,7 +2521,9 @@ async function runTranslate(){
       }
       // v0.9.37：译文先归一化音乐符号（折叠重复/补回丢失首尾），再判丢词——
       // 重试后仍只剩 ♪ 符号的按 missing 标记（诚实显示待处理），绝不静默回填"看似已译"的空壳
-      const text = C.normalizeMusic(C.fixMixedChars(textRaw, cfg.dst), g.text);
+      // v0.9.38：speaker 换行修复——模型偶发把 "\n- " 压成行内 dash，源结构对得上时机械补回
+      let text = C.normalizeMusic(C.fixMixedChars(textRaw, cfg.dst), g.text);
+      if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
       if(!text || C.musicLost(text, g.text)){
         active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
         missingCount++;

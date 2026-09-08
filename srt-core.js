@@ -584,6 +584,22 @@
     return out;
   }
 
+  // v0.9.38：模型偶发丢掉 speaker 换行（把 "\n- " 压成行内 "- "，规则 6 例外失守），
+  // 折行会把第二个说话人的 dash 折进行尾。修复窄门：源是 K 行 dash 对话、译文无换行、
+  // 按行内 dash 切出的段数恰好 = K → 机械补回换行；段数对不上原样返回（宁错放不错改）。
+  function repairSpeakerLines(dst, src) {
+    const s = String(dst == null ? '' : dst).replace(/\r/g, '').trim();
+    if (!s || s.includes('\n')) return s;
+    const srcLines = String(src == null ? '' : src).replace(/\r/g, '').split('\n')
+      .map((x) => x.trim()).filter(Boolean);
+    if (srcLines.length < 2 || !srcLines.every((l) => SP_DASH_RE.test(l))) return s;
+    // 行内 dash 分隔：dash 前是句读/空白/行首（lookbehind 保留句读，防误伤 "20-30" 等无空格连字符）
+    const parts = s.split(/(?<=[\s。．，,！？!?…；;）)】」』"”]|^)\s*[-–—]\s+/).filter((x) => x.trim());
+    if (parts.length !== srcLines.length) return s;
+    const dash = (srcLines[0].match(/^[-–—]/) || ['-'])[0];
+    return parts.map((p) => dash + ' ' + p.trim()).join('\n');
+  }
+
   // ---------------- 句子级分组与时长分配 ----------------
   // 场景：源 SRT 常把一个完整句子拆在相邻多条字幕里（如 "…was shocked" / "by a tariff's consequences."）。
   // 翻译以句组为单位进行，译回时按各条字幕的时长比例切分回填（时间轴不动）。
@@ -633,10 +649,26 @@
         groups.push({ gno: groups.length + 1, cues: [it], text: String(it.text), speaker: true });
         continue;
       }
+      // v0.9.38：音乐符号行不与对白互并——歌词行结尾常无句末标点（"…believe in ♪"），
+      // endsSentence 判"句子未完"会把下一条对白吸进同一句组，译文错位到错误时间窗（实测：歌词行吸进对白 "Yo, yo."）
+      const mus = RE_MUSIC.test(String(it.text || ''));
+      if (mus) {
+        if (effChars(String(it.text || '')) > 0) {
+          // 歌词行：可与相邻歌词行同组（保留歌曲上下文），与对白互斥
+          if (cur && !cur.music) flush();
+        } else {
+          // 纯标记行（只有 ♪ 无歌词）：独立成组，不与任何相邻 cue 合并
+          flush();
+          groups.push({ gno: groups.length + 1, cues: [it], text: String(it.text), music: true });
+          continue;
+        }
+      } else if (cur && cur.music) {
+        flush();
+      }
       const txt = String(it.text || '').trim();
       if (!txt) continue;
       if (cur && (cur.cues.length >= maxCues || textWidth(joinSrc(cur.text, txt)) > maxWidth)) flush();
-      if (!cur) cur = { cues: [], text: '' };
+      if (!cur) cur = { cues: [], text: '', music: mus };
       cur.text = cur.text ? joinSrc(cur.text, txt) : txt;
       cur.cues.push(it);
       if (endsSentence(txt)) flush();
@@ -1212,7 +1244,7 @@
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars,
     validateItems, anchorOk, fixMixedChars,
-    musicLost, normalizeMusic,
+    musicLost, normalizeMusic, repairSpeakerLines,
     MAX_W_DEFAULT: 20
   };
 });

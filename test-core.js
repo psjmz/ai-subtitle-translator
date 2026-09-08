@@ -1061,5 +1061,57 @@ t('normalizeMusic：无歌词纯符号行（源 ♪♪ 译文 ♪♪）→ 折�
   assert.strictEqual(C.normalizeMusic('♪♪', '♪♪'), '♪');
 });
 
+console.log('— 音乐行句组边界 + speaker 换行修复（v0.9.38）—');
+t('groupSentences：歌词行不吸对白（♪ 结尾无句末标点）', () => {
+  const items = [
+    { no: 1, start: 0, end: 2600, text: "♪ But it's something\nthat I must believe in ♪" },
+    { no: 2, start: 2600, end: 4100, text: 'Yo, yo. What do we got?' },
+    { no: 3, start: 4100, end: 6100, text: "♪ And it's there\nwhen I look in your eyes ♪" }
+  ];
+  const gs = C.groupSentences(items);
+  const g1 = gs.find(g => g.cues.some(c => c.no === 1)), g2 = gs.find(g => g.cues.some(c => c.no === 2));
+  assert.notStrictEqual(g1, g2, '歌词行与对白行必须分属不同句组');
+});
+t('groupSentences：连续歌词行可同组（保留歌曲上下文）', () => {
+  const items = [
+    { no: 1, start: 0, end: 2000, text: '♪ first half of the verse ♪' },
+    { no: 2, start: 2000, end: 4000, text: '♪ second half of the verse ♪' }
+  ];
+  const gs = C.groupSentences(items);
+  const g1 = gs.find(g => g.cues.some(c => c.no === 1)), g2 = gs.find(g => g.cues.some(c => c.no === 2));
+  assert.strictEqual(g1, g2, '相邻歌词行应同组');
+});
+t('groupSentences：纯 ♪ 标记行独立成组', () => {
+  const items = [
+    { no: 1, start: 0, end: 1000, text: 'Hello there.' },
+    { no: 2, start: 1000, end: 2000, text: '♪' },
+    { no: 3, start: 2000, end: 3000, text: 'How are you?' }
+  ];
+  const gs = C.groupSentences(items);
+  assert.ok(gs.some(g => g.cues.length === 1 && g.cues[0].no === 2), '纯 ♪ 行应独立成组');
+});
+t('repairSpeakerLines：模型压掉换行 → 机械补回', () => {
+  const src = '- Allie M. Allie M.\n- Yeah, we got one right here.';
+  const dst = '- 艾莉·M。艾莉·M。- 对，我们这儿正好有一单。';
+  assert.strictEqual(C.repairSpeakerLines(dst, src), '- 艾莉·M。艾莉·M。\n- 对，我们这儿正好有一单。');
+});
+t('repairSpeakerLines：模型丢首 dash 但保留中间 dash → 段数对上仍可补', () => {
+  const src = '- A.\n- B.';
+  assert.strictEqual(C.repairSpeakerLines('甲的台词。- 乙的台词。', src), '- 甲的台词。\n- 乙的台词。');
+});
+t('repairSpeakerLines：译文无任何 dash → 无从切分，原样返回', () => {
+  const src = '- A.\n- B.';
+  assert.strictEqual(C.repairSpeakerLines('甲说乙说连成一片', src), '甲说乙说连成一片');
+});
+t('repairSpeakerLines：dash 段数对不上 → 原样返回', () => {
+  const src = '- A.\n- B.';
+  assert.strictEqual(C.repairSpeakerLines('一句话没有分隔', src), '一句话没有分隔');
+  assert.strictEqual(C.repairSpeakerLines('甲说。乙说。丙也说。', src), '甲说。乙说。丙也说。');
+});
+t('repairSpeakerLines：已有换行/源非多行 dash → 不动', () => {
+  assert.strictEqual(C.repairSpeakerLines('- 甲\n- 乙', '- A.\n- B.'), '- 甲\n- 乙');
+  assert.strictEqual(C.repairSpeakerLines('普通译文', '- 单行 dash 源。'), '普通译文');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
