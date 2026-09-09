@@ -1229,6 +1229,7 @@
       if (r.flag === 'merged') {
         if (last && srcOne) last.srcParts.push(srcOne);
         if (last && (r.end || 0) > last.end) last.end = r.end; // 防御：merged 行的时间覆盖并入承载行
+        if (last) last.times.push({ start: r.start || 0, end: r.end || 0 }); // v0.9.48：保留原 cue 边界
         continue;
       }
       if (!r.zh || !String(r.zh).trim()) { last = null; continue; }
@@ -1236,12 +1237,14 @@
       // 后续走 SP 分支每行独立折行；模型降级返回单行时 isSpeakerText 为 false，自然落回旧路径
       if (isSpeakerText(String(r.zh))) {
         last = { start: r.start || 0, end: r.end || 0, speaker: true,
+                 times: [{ start: r.start || 0, end: r.end || 0 }],
                  srcParts: srcOne ? [String(r.en == null ? '' : r.en).replace(/\r/g, '').trim()] : [],
                  dst: String(r.zh).replace(/\r/g, '').trim() };
         entries.push(last);
         continue;
       }
       last = { start: r.start || 0, end: r.end || 0,
+               times: [{ start: r.start || 0, end: r.end || 0 }],
                srcParts: srcOne ? [srcOne] : [],
                dst: squashLines(String(r.zh)) };
       entries.push(last);
@@ -1255,6 +1258,43 @@
       if (!dstText) continue;
       const pushItem = (st, en, sLines, dLines) => {
         out.push({ no: out.length + 1, start: st, end: en, srcLines: sLines, dstLines: dLines });
+      };
+      // v0.9.48 段级发射器：原 cue 边界切出的一个段（时间已定），只管"怎么放下"——
+      // R1 微超宽单行 → R2 折 2 行 → R3 段内细切（等宽自然断点 + 段时间按宽度占比瓜分，兜底折 2 行）
+      const emitPart = (st, en, sTxt, dTxt) => {
+        const sw = sTxt ? textWidth(sTxt) : 0;
+        const dw = textWidth(dTxt || '');
+        if (sw <= maxW + 4 && dw <= maxW + 4) { // R1
+          pushItem(st, en, sTxt ? [sTxt] : [], [dTxt || '']);
+          return;
+        }
+        if (sw <= 2 * maxW && dw <= 2 * maxW) { // R2：两边折行都 ≤2 行 → 整段折行放下
+          const sL = sTxt ? wrapToWidth(sTxt, maxW, { normalize: true, locale: opts.srcLocale }) : [];
+          const dL = wrapToWidth(dTxt || '', maxW, { normalize: true, locale: opts.dstLocale });
+          if (sL.length <= 2 && dL.length <= 2) { pushItem(st, en, sL, dL); return; }
+        }
+        // R3：段内仍超容量 → 细切（k 从宽度需求起步递增；时间按各片宽度占比瓜分段时长）
+        const fitsW = (segs) => segs.every((s) => !s || textWidth(s) <= maxW + 1e-9);
+        let kk = Math.max(1, Math.ceil(Math.max(sw, dw) / maxW));
+        let ss = [], dd = [];
+        const kCap2 = kk + 10;
+        for (;; kk++) {
+          ss = sTxt ? splitTextNatural(sTxt, kk, opts.srcLocale) : new Array(kk).fill('');
+          dd = splitAligned(dTxt || '', sTxt ? ss : null, kk, opts.dstLocale);
+          if ((fitsW(ss) && fitsW(dd)) || kk >= kCap2) break;
+        }
+        const basis = (sTxt ? ss : dd).map((s) => Math.max(0.5, textWidth(s || '')));
+        const Wt = basis.reduce((a, b) => a + b, 0) || 1;
+        const total = Math.max(0, en - st);
+        let cum = 0;
+        for (let i = 0; i < kk; i++) {
+          cum += basis[i];
+          const subStart = i === 0 ? st : Math.round(st + total * (cum - basis[i]) / Wt);
+          const subEnd = i === kk - 1 ? en : Math.round(st + total * cum / Wt);
+          const sL = ss[i] ? wrapToWidth(ss[i], maxW, { normalize: true, locale: opts.srcLocale }) : [];
+          const dL = wrapToWidth(dd[i] || '', maxW, { normalize: true, locale: opts.dstLocale });
+          pushItem(subStart, subEnd, sL, dL);
+        }
       };
       // SP 双 speaker（v0.9.25）：src 块 + dst 块各自按 dash 行独立折行，
       // 不跨 speaker 切分、不折 2+2 容量框架（4 行上限天然满足）
@@ -1281,6 +1321,19 @@
       const dstLines = wrapToWidth(dstText, maxW, { normalize: true, locale: opts.dstLocale });
       let k = Math.max(srcLines.length, dstLines.length);
       if (k <= 1) { pushItem(e.start, e.end, srcLines, dstLines); continue; }
+      // v0.9.48：合并句组（entry.times > 1）——译文/源文先按各原 cue 时长比例切回（时间跟着语音走，
+      // splitByDuration 内含词边界/语义停顿/原子保护），原 cue 边界即子时间轴；段内仍超容量才段内细切。
+      // 背景：旧路径把整组当一个超长 cue 等宽重切（时间按文本宽度瓜分），实测把 3 条原文切出
+      // 5 条全新边界，源文语音边界全丢、译文被英文宽度绑架产生劈词/悬空收尾，观感不可接受。
+      if (e.times && e.times.length > 1) {
+        const times = e.times;
+        const sSegs = srcText ? splitByDuration(srcText, times, { locale: opts.srcLocale }) : null;
+        const dSegs = splitByDuration(dstText, times, { locale: opts.dstLocale });
+        for (let i = 0; i < times.length; i++) {
+          emitPart(times[i].start, times[i].end, sSegs ? (sSegs[i] || '') : '', dSegs[i] || '');
+        }
+        continue;
+      }
       // 切 k 条子字幕。源文按自然断点切；译文按源文各段宽度占比对齐切（splitAligned 内含段内退化修复），
       // 保证段对段份量对应。任一段仍超宽则递增 k 重切（上限兜底：极端长词/原子切不动才接受段内折行）。
       const fits = (segs) => segs.every((s) => !s || textWidth(s) <= maxW + 1e-9);
@@ -1349,12 +1402,13 @@
       if (r.flag === 'drop') { last = null; continue; }
       if (r.flag === 'merged') {
         if (last && (r.end || 0) > last.end) last.end = r.end;   // 尾行时间并入承载行
+        if (last) last.times.push({ start: r.start || 0, end: r.end || 0 }); // v0.9.48：保留原 cue 边界
         continue;
       }
       // v0.9.39：镜像源 speaker 多行结构（仅 mono 导出生效，不动 S.rows 数据/双语/ASS 路径）
       const rawZh = mirrorSpeakerLines(String(r.zh == null ? '' : r.zh), r.en);
       if (!rawZh.trim()) { last = null; continue; }
-      last = { start: r.start || 0, end: r.end || 0, rawZh: rawZh, dst: squashLines(rawZh) };
+      last = { start: r.start || 0, end: r.end || 0, times: [{ start: r.start || 0, end: r.end || 0 }], rawZh: rawZh, dst: squashLines(rawZh) };
       entries.push(last);
     }
     // 2) 逐条目 R0-R3
@@ -1375,6 +1429,39 @@
       }
       const dst = e.dst;
       const w = textWidth(stripSoundTags(dst));
+      // v0.9.48：合并句组（entry.times > 1）——译文先按各原 cue 时长比例切回（原边界即子时间轴），
+      // 段内超容量才段内细切。旧路径整组等宽重切会造出全新边界，源文语音节奏全丢（与双语路径同源 bug）。
+      if (e.times && e.times.length > 1) {
+        const segs0 = splitByDuration(dst, e.times, { locale: locale });
+        for (let i = 0; i < e.times.length; i++) {
+          const t = e.times[i];
+          const seg = segs0[i] || '';
+          const sw = textWidth(stripSoundTags(seg));
+          if (sw <= maxW + 4) { emit(t.start, t.end, seg); continue; }            // R1 单行
+          const l0 = wrapToWidth(seg, maxW, { normalize: true, locale: locale });
+          if (l0.length <= maxLines) { emit(t.start, t.end, l0.join('\n')); continue; } // R2 折行
+          // R3 段内细切：k 片 + 饥饿段修复，段时间按宽度占比瓜分
+          const k0 = Math.max(2, Math.ceil(sw / (maxW * maxLines)));
+          const fitsAll0 = (ss) => ss.every((s) => !s || wrapToWidth(s, maxW, { normalize: true, locale: locale }).length <= maxLines);
+          let segs = [];
+          const cap = k0 + 10;
+          for (let k = k0; k <= cap; k++) {
+            segs = repairThinSegs(splitTextNatural(seg, k, locale), locale);
+            if (fitsAll0(segs)) break;
+          }
+          const basis0 = segs.map((s) => Math.max(0.5, textWidth(stripSoundTags(String(s || '')))));
+          const W0 = basis0.reduce((a, b) => a + b, 0) || 1;
+          const total0 = Math.max(0, t.end - t.start);
+          let cum0 = 0;
+          for (let j = 0; j < segs.length; j++) {
+            cum0 += basis0[j];
+            const a = j === 0 ? t.start : Math.round(t.start + total0 * (cum0 - basis0[j]) / W0);
+            const b = j === segs.length - 1 ? t.end : Math.round(t.start + total0 * cum0 / W0);
+            emit(a, b, wrapToWidth(segs[j], maxW, { normalize: true, locale: locale }).join('\n'));
+          }
+        }
+        continue;
+      }
       // R1：微超宽单行
       if (w <= maxW + 4) { emit(e.start, e.end, dst); continue; }
       // R2：常态折行

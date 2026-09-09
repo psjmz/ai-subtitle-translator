@@ -644,6 +644,55 @@ t('R2 饥饿段回退：切分只剩几个字的段时放弃切分，整 cue 最
   assert.strictEqual(parts[0].dstLines.join('').replace(/\s+/g, ''), rows[0].zh.replace(/\s+/g, ''), '译文零丢失');
 });
 
+console.log('— v0.9.48 合并句组原 cue 边界保留 —');
+const MG_ROWS = [
+  { no: 15, start: 38793, end: 39988, flag: '', en: 'So, something we were talking about',
+    zh: '我们今天早上喝咖啡时聊到了一点，就是尽可能多去鼓励大家的重要性。' },
+  { no: 16, start: 39988, end: 41478, flag: 'merged', en: 'when we were having\ncoffee this morning is the', zh: null },
+  { no: 17, start: 41478, end: 43987, flag: 'merged', en: 'importance of encouraging\nas many people as possible.', zh: null }
+];
+t('合并句组双语导出：按原 cue 边界切回，不再等宽重切造新边界', () => {
+  const parts = C.buildBilingualParts(MG_ROWS, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(parts.length, 3, '应输出原 cue 数 3 条: ' + JSON.stringify(parts.map((p) => p.dstLines)));
+  assert.strictEqual(parts[0].start, 38793); assert.strictEqual(parts[0].end, 39988);
+  assert.strictEqual(parts[1].start, 39988); assert.strictEqual(parts[1].end, 41478);
+  assert.strictEqual(parts[2].start, 41478); assert.strictEqual(parts[2].end, 43987);
+  // 源文按原边界时长比例切回：第 1 条含句首（So, something），第 3 条含句尾（possible）
+  assert.ok(parts[0].srcLines.join(' ').startsWith('So, something'), '第 1 条应以句首开头');
+  assert.ok(parts[parts.length - 1].srcLines.join(' ').includes('possible'), '第 3 条应含句尾');
+  // 译文零丢失
+  const joined = parts.map((p) => p.dstLines.join('')).join('').replace(/\s+/g, '');
+  assert.strictEqual(joined, MG_ROWS[0].zh, '译文拼接零丢失');
+  // 第 2 条在逗号处自然断（不含跨段劈词"聊|到了"）
+  assert.ok(parts[1].dstLines.join('').includes('聊到了一点'), '聊到了一点 应完整在同一条');
+});
+t('合并句组单语导出：按原 cue 边界切回', () => {
+  const mono = C.buildMonoParts(MG_ROWS, { maxW: 20, dstLocale: 'zh-CN' });
+  assert.strictEqual(mono.length, 3, '应输出原 cue 数 3 条');
+  assert.strictEqual(mono[1].start, 39988); assert.strictEqual(mono[1].end, 41478);
+  assert.ok(mono[1].text.includes('聊到了一点'), '聊到了一点 应完整在同一条');
+  const joined = mono.map((p) => p.text).join('').replace(/\s+/g, '');
+  assert.strictEqual(joined, MG_ROWS[0].zh, '译文拼接零丢失');
+});
+t('合并句组窄宽度（maxW=14）：首边界仍为原 cue 边界，段内细切零丢失', () => {
+  const parts = C.buildBilingualParts(MG_ROWS, { maxW: 14, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.ok(parts.length >= 3, '至少 3 条');
+  assert.strictEqual(parts[0].start, 38793); assert.strictEqual(parts[0].end, 39988);
+  assert.strictEqual(parts[1].start, 39988, '第 2 条起点应为原边界 39.988');
+  const joined = parts.map((p) => p.dstLines.join('')).join('').replace(/\s+/g, '');
+  assert.strictEqual(joined, MG_ROWS[0].zh, '译文拼接零丢失');
+  parts.forEach((p, i) => assert.ok(effLen(p.dstLines.join('')) > 0 || p.srcLines.length, '第 ' + i + ' 条不应完全为空'));
+});
+t('单 cue 超容量（无 merged）：维持等宽切分不变（回归保护）', () => {
+  const rows = [{ no: 1, start: 0, end: 6000, flag: '',
+    en: 'So, something we were talking about when we were having coffee this morning is the importance of encouraging as many people as possible.',
+    zh: '我们今天早上喝咖啡时聊到了一点，就是尽可能多去鼓励大家的重要性。' }];
+  const parts = C.buildBilingualParts(rows, { maxW: 14, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.ok(parts.length >= 2, '单 cue 超容量仍应切分');
+  const joined = parts.map((p) => p.dstLines.join('')).join('').replace(/\s+/g, '');
+  assert.strictEqual(joined, rows[0].zh, '译文拼接零丢失');
+});
+
 console.log('— 语言锚定校验 anchorOk —');
 t('anchorOk：中文目标拒绝假名/谚文', () => {
   assert.strictEqual(C.anchorOk('这是一个中文字幕。', 'zh-CN'), true);
