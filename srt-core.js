@@ -49,10 +49,41 @@
   // NS_HARD：任何情况下都不得作为段首——CJK 标点、日文小假名/长音符（正字法上不起词首）
   // NS_SOFT：独立成词（助词）时不得作为段首——「的」在「的确」中是词首不罚（Segmenter 整词判定），
   //          日文格助词は/が/を/に等同理（にほん 不罚、あなた|に 罚）
-  const NS_HARD = '，。、；！？：' + 'っゃゅょぁぃぅぇぉゎ' + 'ー';
+  const NS_HARD = '，。、；！？：…”’」』）)]}》»' + 'っゃゅょぁぃぅぇぉゎ' + 'ー';
   const NS_SOFT = '的了着么呢吗吧啊呀哦啦嘛呗地得' + 'はがをにでとへも';
 
   function isAlnum(c) { return !!c && /[A-Za-z0-9]/.test(c); }
+
+  // v0.9.51：跨行/跨 cue 拼接的空格判定（Unicode 感知）。
+  // 旧判定仅认 ASCII 字母：西里尔等非拉丁字母跨行拼回直接粘连（实测俄语源 "тысячи\nчасов"
+  // → "тысячичасов"，双语 ASS 原文行 15 处丢空格；groupSentences 的 joinSrc 同样中招，
+  // 拼接结果就是送进模型的 prompt 文本）；标点后接词的接缝（"естественно,\nпрочитал"）
+  // 连英语也中招（"interesting,\nright" → "interesting,right"）。规则（a 末字符 la、b 首字符 fb）：
+  //   · 任一侧属无空格书写系统（CJK/假名/泰文）→ 不加空格；
+  //   · la 是开括号/开引号/连字符/撇号/斜杠 → 粘附不加空格（"«Книга" "well-known" "don’t" "km/h"）；
+  //   · 字母|字母（空格书写系统）→ 加空格；字母|闭标点 → 粘附（"словами»."）；字母|开标点 → 加空格；
+  //   · 完成性标点（.,;:!?…— 等）|字母 → 加空格；标点|标点 → 不加。
+  const RE_UNSPACED_SCRIPT = /[\u3000-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\u0e00-\u0e7f]/;
+  const RE_LETNUM_U = /[\p{L}\p{N}]/u;
+  const RE_ATTACH_AFTER = /[([{«"'‘“„\u2019\/\-]/;
+  const RE_OPEN_PUNCT = /[([{«"'‘“]/;
+  function needJoinSpace(a, b) {
+    if (!a || !b) return false;
+    const la = a[a.length - 1], fb = b[0];
+    if (RE_UNSPACED_SCRIPT.test(la) || RE_UNSPACED_SCRIPT.test(fb)) return false;
+    if (RE_ATTACH_AFTER.test(la)) return false;
+    // v0.9.51：法语省音判定——直撇号打头的段，前段以单字母省音词（l' d' j' n' s' c' m' t'）或 qu' 结尾时
+    // 属缩合词被 cue 边界切开（l|'école），不加空格；英语 "get 'em" 不受影响（t 前是字母，非单字母省音）。
+    if (fb === "'" && RE_LETNUM_U.test(la)) {
+      const p2 = a[a.length - 2];
+      if ('ldjncsmtLDJNCSMT'.includes(la) && (!p2 || !RE_LETNUM_U.test(p2))) return false;
+      if (la === 'u' && p2 === 'q' && (!a[a.length - 3] || !RE_LETNUM_U.test(a[a.length - 3]))) return false;
+    }
+    if (RE_LETNUM_U.test(la)) return RE_LETNUM_U.test(fb) || RE_OPEN_PUNCT.test(fb);
+    return RE_LETNUM_U.test(fb) || RE_OPEN_PUNCT.test(fb);   // 完成性标点|字母/开标点（":«" → ": «"）
+  }
+  // 空格书写系统的字母/数字（硬切劈词保护用）：CJK/泰文等无空格文字不算——它们允许任意位置切
+  function isSpacedLetnum(c) { return !!c && RE_LETNUM_U.test(c) && !RE_UNSPACED_SCRIPT.test(c); }
 
   // ---------------- 数字+单位原子保护 ----------------
   // 「30%」「$50」「1,000」「12.5」「100万」等数字与其单位/符号是不可拆散的整体，
@@ -174,10 +205,11 @@
       acc += w;
     }
     if (c >= n) return n;
-    // 2) 避免劈开英文/数字词
-    if (c > 0 && c < n && isAlnum(pos[c - 1]) && isAlnum(pos[c])) {
+    // 2) 避免劈开英文/数字词（v0.9.51：扩到全部空格书写系统——西里尔/希腊/阿拉伯等字母词
+    //    同样不可劈；CJK/泰文仍允许任意切）
+    if (c > 0 && c < n && isSpacedLetnum(pos[c - 1]) && isSpacedLetnum(pos[c])) {
       let j = c - 1;
-      while (j > 0 && isAlnum(pos[j - 1])) j--;
+      while (j > 0 && isSpacedLetnum(pos[j - 1])) j--;
       c = Math.max(1, j);
     }
     // 3) 在硬切位置向前最多 10 字范围内，找最近的自然断点（保证第一行尽量满行）。
@@ -293,7 +325,7 @@
     let out = '';
     for (const ln of lines) {
       if (!out) { out = ln; continue; }
-      const needSpace = isAlnum(out[out.length - 1]) && isAlnum(ln[0]);
+      const needSpace = needJoinSpace(out, ln);   // v0.9.51：Unicode/书写系统感知（西里尔丢空格修复）
       out += (needSpace ? ' ' : '') + ln;
     }
     return out;
@@ -670,7 +702,7 @@
   }
 
   function joinSrc(a, b) {
-    const needSpace = isAlnum(a[a.length - 1]) && isAlnum(b[0]);
+    const needSpace = needJoinSpace(a, b);   // v0.9.51：Unicode/书写系统感知（拼接结果即 prompt 文本）
     return a + (needSpace ? ' ' : '') + b;
   }
 
@@ -783,6 +815,7 @@
         const eff = (p >= 4 || !wb || wb.has(i)) ? p : 0;  // 伪断点（介词/连接词）落词内部 → 无效
         const score = eff * 100
           + (wb && wb.has(i) ? 150 : 0)   // 词边界加分：语义同级时优先不劈词
+          + (i > 0 && CLOSE_SET.includes(pos[i - 1]) ? 40 : 0)  // v0.9.51：闭引号/闭括号归前段（破平局：...friend?|" she → ...friend?"|she）
           - Math.abs(pref[i] - target)
           - noStartPenalty(i);            // v0.9.50：行首禁则（的地得/助词/小假名不起行）
         if (score > bestScore) { bestScore = score; best = i; }
@@ -1225,18 +1258,9 @@
         }
       }
       if (!moved.length) continue;
-      // v0.9.50 修复：借词与原段的拼接处补空格。CJK/泰文等无空格文字不受影响（字符均属无空格书写系统），
-      // 空格语言（拉丁/西里尔/天城文等）两侧均为字母数字时补一个空格——实测事故：西语 "y"+"lanzártelos"
-      // 直接拼成 "ylanzártelos"。阿拉伯文属空格语言同样适用。
-      const glue = (a, b) => {
-        if (!a || !b) return a + b;
-        const la = a[a.length - 1], fb = b[0];
-        const unspaced = /[\u3000-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\u0e00-\u0e7f]/;
-        if (/[\p{L}\p{N}]/u.test(la) && /[\p{L}\p{N}]/u.test(fb) && !unspaced.test(la) && !unspaced.test(fb)) {
-          return a + ' ' + b;
-        }
-        return a + b;
-      };
+      // v0.9.51：借词与原段的拼接统一走 needJoinSpace（v0.9.50 的 glue 只补「字母|字母」接缝，
+      // 「借出词带尾逗号 + 饥饿段字母开头」类接缝仍会粘连；CJK/泰文不受影响）
+      const glue = (a, b) => needJoinSpace(a, b) ? a + ' ' + b : a + b;
       if (j < i) { segs[j] = chunks.join('').trim(); segs[i] = glue(moved.join(''), segs[i]).trim(); }
       else { segs[j] = chunks.join('').trim(); segs[i] = glue(segs[i], moved.join('')).trim(); }
     }
@@ -1630,7 +1654,7 @@
     parseVtt, formatVtt, fmtTimeVtt,
     parseAss, formatAss, fmtTimeAss, parseAssTime,
     formatTxt, detectFormat,
-    isFillerCue, stripSoundTags,
+    isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,

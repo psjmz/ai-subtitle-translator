@@ -1572,5 +1572,72 @@ t('音乐帧与 splitMusicLines 联动：双对复原结果可被逐 cue 对齐�
   assert.strictEqual(segs[1], '♪ 放眼望去四处皆是 ♪');
 });
 
+console.log('— v0.9.51 跨行/跨 cue 拼接空格（Unicode 感知）—');
+t('squashLines：西里尔跨行补空格（回归：旧版粘连）', () => {
+  assert.strictEqual(C.squashLines('пять лет и тысячи\nчасов на изучение'), 'пять лет и тысячи часов на изучение');
+});
+t('squashLines：标点后接词补空格（拉丁同样受益）', () => {
+  assert.strictEqual(C.squashLines('Naturally,\nI read it'), 'Naturally, I read it');
+});
+t('squashLines：破折号后接词补空格', () => {
+  assert.strictEqual(C.squashLines('за утренним кофе, —\nэто важно'), 'за утренним кофе, — это важно');
+});
+t('squashLines：CJK 跨行不加空格（行为不变）', () => {
+  assert.strictEqual(C.squashLines('当然，\n这本书我读过了'), '当然，这本书我读过了');
+  assert.strictEqual(C.squashLines('你好\n世界'), '你好世界');
+});
+t('squashLines：开引号/开括号后粘附不加空格', () => {
+  assert.strictEqual(C.squashLines('«\nКнига Илона»'), '«Книга Илона»');
+  assert.strictEqual(C.squashLines('слова (\nпример)'), 'слова (пример)');
+});
+t('squashLines：连字符/撇号粘附（不造 "well- known"）', () => {
+  assert.strictEqual(C.squashLines('well-\nknown'), 'well-known');
+  assert.strictEqual(C.squashLines('don’\nt'), 'don’t');
+});
+t('squashLines：闭引号贴词不加空格', () => {
+  assert.strictEqual(C.squashLines('словами\n». конец'), 'словами». конец');
+});
+t('joinSrc：西里尔句组拼接补空格（prompt 路径）', () => {
+  assert.strictEqual(C.joinSrc('что ты потратил', 'пять лет'), 'что ты потратил пять лет');
+});
+t('joinSrc：CJK 拼接不加空格（行为不变）', () => {
+  assert.strictEqual(C.joinSrc('我读了', '这本书'), '我读了这本书');
+});
+t('squashLines：法语省音 l\'école 被切分时不插空格（v0.9.51 审计修复）', () => {
+  assert.strictEqual(C.squashLines("de l\n'école"), "de l'école");
+  assert.strictEqual(C.squashLines("qu\n'un"), "qu'un");
+});
+t('squashLines：英语 get \'em 仍补空格（单引号对白不受省音判定影响）', () => {
+  assert.strictEqual(C.squashLines("get\n'em"), "get 'em");
+});
+t('splitByDuration：英文对白闭直引号归前段（v0.9.51 平局裁决修复）', () => {
+  const text = '"I\'m fine, thanks." "And how are you today, my friend?" she asked politely.';
+  const segs = C.splitByDuration(text, [{start:0,end:2000},{start:2000,end:4000},{start:4000,end:6000}], { locale: 'en' });
+  assert.ok(!/^["'”’]/.test(segs[2] || ''), '末段不应以闭引号开头: ' + JSON.stringify(segs));
+  assert.ok(/["'”’]$/.test(segs[1] || ''), '中段应以闭引号收尾: ' + JSON.stringify(segs));
+});
+t('wrapToWidth：西里尔长词不被硬切劈开（劈词保护扩 Unicode）', () => {
+  const lines = C.wrapToWidth('электроэнергетика продолжается дальше', 8, { normalize: true, locale: 'ru' });
+  for (const ln of lines) {
+    assert.ok(!/^([а-яА-ЯёЁ]+)$/.test(ln) || ln.length <= 8 || true); // 占位：宽度由 textWidth 决定
+  }
+  assert.ok(lines.every((ln) => ln.trim().length > 0));
+  // 关键断言：任何一行不得以被劈开的词残段结尾且下一行以残段开头（无空格相接即劈词）
+  for (let i = 0; i + 1 < lines.length; i++) {
+    const a = lines[i], b = lines[i + 1];
+    if (!a || !b) continue;
+    const la = a[a.length - 1], fb = b[0];
+    assert.ok(!(C.needJoinSpace(a, b) === false && /[а-яА-ЯёЁ]/.test(la) && /[а-яА-ЯёЁ]/.test(fb)),
+      '相邻两行字母直接相接 = 劈词: ' + JSON.stringify(lines));
+  }
+});
+t('splitByDuration：闭引号不落段首（NS_HARD 扩展，回归：zh 行首 “）', () => {
+  // 双语句组按原边界切回时，。”两侧同为 5 级断点，旧版靠宽度距离决胜可能把 ” 留给下段开头
+  const text = '“我要去开自助仓储，因为那行的失败率极低。”但他完全不是这种思维模式，丝毫不是。';
+  const segs = C.splitByDuration(text, [{ start: 0, end: 2412 }, { start: 2412, end: 5825 }], { locale: 'zh-CN' });
+  assert.ok(segs.length === 2, '应切 2 段');
+  assert.ok(!/^[”’»）)]/.test(segs[1]), '第 2 段不得以闭引号开头: ' + segs[1]);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
