@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.46</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.47</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -259,7 +259,7 @@
           <input type="text" id="base" spellcheck="false" data-page-node-id="wCGA5fUI6L06JCvGtOUixF">
           <div class="row2" data-page-node-id="DS8a4j2djWyZURvABVoXTl">
             <div data-page-node-id="w70kaa2lesGhsnsxm7HGBP"><label data-page-node-id="bplWe2iDOdtFn8ZX04UFhe" data-i18n="lblModel">模型</label><input type="text" id="model" spellcheck="false" data-page-node-id="6iZBpwOK1D0hR3NVEkI8Zs"></div>
-            <div data-page-node-id="8SHrXD8t2tsX3V5QsQssn6"><label data-page-node-id="0ehikMdLViTyPimjBDx1NQ" data-i18n="lblBatch">单批条数</label><input type="number" id="batch" value="12" min="1" max="60" data-page-node-id="Bp5JBRmOXfUa8WNVeEAWI3"></div>
+            <div data-page-node-id="8SHrXD8t2tsX3V5QsQssn6"><label data-page-node-id="0ehikMdLViTyPimjBDx1NQ" data-i18n="lblBatch">单批条数</label><input type="number" id="batch" value="24" min="1" max="60" data-page-node-id="Bp5JBRmOXfUa8WNVeEAWI3"></div>
           </div>
           <label data-page-node-id="214kF9o0bVLmDB6BXAGLvE">API Key（仅保存在本机浏览器）<a id="keyLink" href="#" target="_blank" rel="noopener" style="float:right;font-weight:400;display:none"></a></label>
           <input type="password" id="apikey" autocomplete="off" data-page-node-id="fjeR234CAWYss4JFEQ28Tm">
@@ -515,7 +515,7 @@ const I18N = {
   pgRun:'翻译中', pgEta:'预计剩余 {0}', pgDone:'✓ 完成 · 用时 {0}',
   chkAutoTerms:'自动术语表：翻译前自动提取专名与歧义词，统一全片译法',
   autoTermsRun:'正在提取术语表（专名/歧义词）…', autoTermsDone:'自动术语表就绪：{0} 个术语已统一译法', autoTermsSkip:'术语提取失败，跳过后继续翻译：{0}', batchRescue:'第 {0} 批多次失败，已拆单组补救：成功 {1}/{2} 组',
-  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重试{0}次后成功）', anchorKeep:'⚠️ 句组 {0} 译文可能不是{1}，已按原样保留', anchorRefix:'{0} 个句组译文语言跑偏，已通过单组重译全部恢复',
+  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重试{0}次后成功）', anchorKeep:'⚠️ 句组 {0} 译文可能不是{1}，已按原样保留', anchorRefix:'{0} 个句组译文语言跑偏，已通过单组重译全部恢复', musicDropSaved:'{0} 个音乐句组被模型判 drop，单组重译已救回', musicDropKept:'句组 {0} 判为纯哼唱，单组复核后按水词删除',
   overCapStart:'检测到 {0} 个句组译文过长（超出该时长内可显示的 2 行容量），压缩重译中…', overCapDone:'超容压缩完成：{0}/{1} 个句组已收进容量。', overCapFail:'超容压缩重译失败，过长句组按原样保留。', overCapCallFail:'压缩重译第 {0} 次失败：{1}',
   batchFail:'批 {0} 第 {1} 次失败：{2}', batchSkip:'该批跳过，可在完成后整篇重试。',
   ratePace:'免费模型限流中，{0} 秒后继续…', rateWait:'遇到限流（429），等待 20 秒后重试…',
@@ -589,7 +589,7 @@ const I18N = {
   pgRun:'翻譯中', pgEta:'預計剩餘 {0}', pgDone:'✓ 完成 · 用時 {0}',
   chkAutoTerms:'自動術語表：翻譯前自動提取專名與歧義詞，統一全片譯法',
   autoTermsRun:'正在提取術語表（專名/歧義詞）…', autoTermsDone:'自動術語表就緒：{0} 個術語已統一譯法', autoTermsSkip:'術語提取失敗，跳過後繼續翻譯：{0}', batchRescue:'第 {0} 批多次失敗，已拆單組補救：成功 {1}/{2} 組',
-  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重試{0}次後成功）', anchorKeep:'⚠️ 句組 {0} 譯文可能不是{1}，已按原樣保留', anchorRefix:'{0} 個句組譯文語言跑偏，已透過單組重譯全部恢復',
+  batchDone:'批 {0}/{1} 完成{2}。', retried:'（重試{0}次後成功）', anchorKeep:'⚠️ 句組 {0} 譯文可能不是{1}，已按原樣保留', anchorRefix:'{0} 個句組譯文語言跑偏，已透過單組重譯全部恢復', musicDropSaved:'{0} 個音樂句組被模型判 drop，單組重譯已救回', musicDropKept:'句組 {0} 判為純哼唱，單組複核後按水詞刪除',
   overCapStart:'偵測到 {0} 個句組譯文過長（超出該時長內可顯示的 2 行容量），壓縮重譯中…', overCapDone:'超容壓縮完成：{0}/{1} 個句組已收進容量。', overCapFail:'超容壓縮重譯失敗，過長句組按原樣保留。', overCapCallFail:'壓縮重譯第 {0} 次失敗：{1}',
   batchFail:'批 {0} 第 {1} 次失敗：{2}', batchSkip:'該批跳過，可在完成後整篇重試。',
   ratePace:'免費模型限流中，{0} 秒後繼續…', rateWait:'遇到限流（429），等待 20 秒後重試…',
@@ -663,7 +663,7 @@ const I18N = {
   pgRun:'Translating', pgEta:'ETA {0}', pgDone:'✓ Done · {0}',
   chkAutoTerms:'Auto glossary: extract proper nouns & ambiguous terms before translating for file-wide consistency',
   autoTermsRun:'Extracting glossary (proper nouns / ambiguous terms)…', autoTermsDone:'Auto glossary ready: {0} terms unified', autoTermsSkip:'Glossary extraction failed, continuing without it: {0}', batchRescue:'Batch {0} failed repeatedly; rescued {1}/{2} groups individually',
-  batchDone:'Batch {0}/{1} done{2}.', retried:' (after {0} retries)', anchorKeep:'⚠️ Groups {0}: translation may not be in {1}; kept as is', anchorRefix:'{0} drifted group(s) fully recovered via isolated re-translation',
+  batchDone:'Batch {0}/{1} done{2}.', retried:' (after {0} retries)', anchorKeep:'⚠️ Groups {0}: translation may not be in {1}; kept as is', anchorRefix:'{0} drifted group(s) fully recovered via isolated re-translation', musicDropSaved:'{0} music group(s) marked drop were rescued via isolated re-translation', musicDropKept:'Group(s) {0} judged pure humming; confirmed and removed as filler',
   overCapStart:'Detected {0} group(s) with translations too long for the screen (over 2 lines), re-translating more concisely…', overCapDone:'Length compression done: {0}/{1} group(s) now fit.', overCapFail:'Length compression failed; over-long groups kept as-is.', overCapCallFail:'Compression attempt {0} failed: {1}',
   batchFail:'Batch {0} attempt {1} failed: {2}', batchSkip:'Batch skipped; you can re-run the whole file later.',
   ratePace:'Free-model rate limit, continuing in {0}s…', rateWait:'Rate limited (429), waiting 20s before retry…',
@@ -737,7 +737,7 @@ const I18N = {
   pgRun:'翻訳中', pgEta:'残り約 {0}', pgDone:'✓ 完了 · 所要 {0}',
   chkAutoTerms:'自動用語集：翻訳前に固有名詞・曖昧語を抽出し、全編の訳を統一',
   autoTermsRun:'用語集を抽出中（固有名詞・曖昧語）…', autoTermsDone:'自動用語集：{0} 語の訳を統一', autoTermsSkip:'用語集の抽出に失敗、スキップして翻訳を継続：{0}', batchRescue:'バッチ {0} が複数回失敗、グループ単位で救済：{1}/{2} グループ成功',
-  batchDone:'バッチ {0}/{1} 完了{2}。', retried:'（{0}回再試行後に成功）', anchorKeep:'⚠️ グループ {0} の訳文は{1}ではない可能性があるため、そのまま保持しました', anchorRefix:'言語が逸脱した {0} グループを個別再翻訳で全件復元しました',
+  batchDone:'バッチ {0}/{1} 完了{2}。', retried:'（{0}回再試行後に成功）', anchorKeep:'⚠️ グループ {0} の訳文は{1}ではない可能性があるため、そのまま保持しました', anchorRefix:'言語が逸脱した {0} グループを個別再翻訳で全件復元しました', musicDropSaved:'drop と判定された音楽グループ {0} 個を個別再翻訳で復元しました', musicDropKept:'グループ {0} は純粋なハミングと判定され、確認のうえフィラーとして削除しました',
   overCapStart:'画面の2行容量を超える長い訳文の句組が {0} 件検出されました。圧縮して再翻訳中…', overCapDone:'圧縮再翻訳完了：{0}/{1} 件が容量内に収まりました。', overCapFail:'圧縮再翻訳に失敗したため、長すぎる句組はそのまま保持します。', overCapCallFail:'圧縮再翻訳の第 {0} 回目が失敗：{1}',
   batchFail:'バッチ {0} の第 {1} 回失敗：{2}', batchSkip:'このバッチはスキップ。後で全体を再実行できます。',
   ratePace:'無料モデルのレート制限中、{0} 秒後に続行…', rateWait:'レート制限（429）、20秒待って再試行…',
@@ -811,7 +811,7 @@ const I18N = {
   pgRun:'Traduciendo', pgEta:'Faltan {0}', pgDone:'✓ Listo · {0}',
   chkAutoTerms:'Glosario automático: extrae nombres propios y términos ambiguos antes de traducir para uniformar todo el archivo',
   autoTermsRun:'Extrayendo glosario (nombres propios / términos ambiguos)…', autoTermsDone:'Glosario automático listo: {0} términos unificados', autoTermsSkip:'Falló la extracción del glosario, se continúa sin él: {0}', batchRescue:'Lote {0} falló varias veces; rescate individual: {1}/{2} grupos',
-  batchDone:'Lote {0}/{1} terminado{2}.', retried:' (tras {0} reintentos)', anchorKeep:'⚠️ Grupos {0}: la traducción podría no estar en {1}; se mantienen tal cual', anchorRefix:'{0} grupo(s) desviados se recuperaron por completo mediante retraducción individual',
+  batchDone:'Lote {0}/{1} terminado{2}.', retried:' (tras {0} reintentos)', anchorKeep:'⚠️ Grupos {0}: la traducción podría no estar en {1}; se mantienen tal cual', anchorRefix:'{0} grupo(s) desviados se recuperaron por completo mediante retraducción individual', musicDropSaved:'{0} grupo(s) de música marcados como drop se recuperaron mediante retraducción individual', musicDropKept:'Grupo(s) {0} considerados canto sin palabras; confirmados y eliminados como relleno',
   overCapStart:'Detectadas {0} traducciones demasiado largas para la pantalla (más de 2 líneas); se retraducen de forma más concisa…', overCapDone:'Compresión completada: {0}/{1} grupos ahora caben.', overCapFail:'La compresión falló; los grupos demasiado largos se mantienen tal cual.', overCapCallFail:'Intento de compresión {0} fallido: {1}',
   batchFail:'Lote {0} intento {1} falló: {2}', batchSkip:'Lote omitido; puedes reejecutar todo el archivo más tarde.',
   ratePace:'Límite de velocidad del modelo gratuito, continuando en {0}s…', rateWait:'Limitado (429), esperando 20s antes de reintentar…',
@@ -885,7 +885,7 @@ const I18N = {
   pgRun:'Traduzindo', pgEta:'Faltam {0}', pgDone:'✓ Concluído · {0}',
   chkAutoTerms:'Glossário automático: extrai nomes próprios e termos ambíguos antes de traduzir para uniformar o arquivo todo',
   autoTermsRun:'Extraindo glossário (nomes próprios / termos ambíguos)…', autoTermsDone:'Glossário automático pronto: {0} termos unificados', autoTermsSkip:'Falha na extração do glossário, continuando sem ele: {0}', batchRescue:'Lote {0} falhou várias vezes; resgate individual: {1}/{2} grupos',
-  batchDone:'Lote {0}/{1} concluído{2}.', retried:' (após {0} tentativas)', anchorKeep:'⚠️ Grupos {0}: a tradução pode não estar em {1}; mantidos como estão', anchorRefix:'{0} grupo(s) desviados recuperados por completo por retradução individual',
+  batchDone:'Lote {0}/{1} concluído{2}.', retried:' (após {0} tentativas)', anchorKeep:'⚠️ Grupos {0}: a tradução pode não estar em {1}; mantidos como estão', anchorRefix:'{0} grupo(s) desviados recuperados por completo por retradução individual', musicDropSaved:'{0} grupo(s) de música marcados como drop foram recuperados por retradução individual', musicDropKept:'Grupo(s) {0} considerados canto sem palavras; confirmados e removidos como preenchimento',
   overCapStart:'Detectadas {0} traduções longas demais para a tela (mais de 2 linhas); retraduzindo de forma mais concisa…', overCapDone:'Compressão concluída: {0}/{1} grupos agora cabem.', overCapFail:'A compressão falhou; os grupos longos demais foram mantidos como estão.', overCapCallFail:'Tentativa de compressão {0} falhou: {1}',
   batchFail:'Lote {0} tentativa {1} falhou: {2}', batchSkip:'Lote ignorado; você pode reexecutar o arquivo inteiro depois.',
   ratePace:'Limite de taxa do modelo gratuito, continuando em {0}s…', rateWait:'Limitado (429), aguardando 20s antes de tentar de novo…',
@@ -959,7 +959,7 @@ const I18N = {
   pgRun:'번역 중', pgEta:'남은 시간 약 {0}', pgDone:'✓ 완료 · 소요 {0}',
   chkAutoTerms:'자동 용어집: 번역 전 고유명사와 애매한 단어를 추출하여 전체에서 번역을 통일',
   autoTermsRun:'용어집 추출 중(고유명사·애매한 단어)…', autoTermsDone:'자동 용어집: {0}개 용어 번역 통일', autoTermsSkip:'용어집 추출 실패, 건너뛰고 계속 진행: {0}', batchRescue:'배치 {0} 반복 실패, 그룹별 구조 시도: {1}/{2}개 성공',
-  batchDone:'배치 {0}/{1} 완료{2}.', retried:'({0}회 재시도 후 성공)', anchorKeep:'⚠️ 그룹 {0}의 번역이 {1}가 아닐 수 있어 그대로 유지했어요', anchorRefix:'언어가 이탈한 그룹 {0}개를 개별 재번역으로 모두 복구했어요',
+  batchDone:'배치 {0}/{1} 완료{2}.', retried:'({0}회 재시도 후 성공)', anchorKeep:'⚠️ 그룹 {0}의 번역이 {1}가 아닐 수 있어 그대로 유지했어요', anchorRefix:'언어가 이탈한 그룹 {0}개를 개별 재번역으로 모두 복구했어요', musicDropSaved:'drop로 판정된 음악 그룹 {0}개를 개별 재번역으로 구했어요', musicDropKept:'그룹 {0}은(는) 순수 허밍으로 판정되어 확인 후 필러로 삭제했어요',
   overCapStart:'화면 2줄 용량을 초과하는 번역 그룹 {0}개를 발견했습니다. 압축 재번역 중…', overCapDone:'압축 재번역 완료: {0}/{1}개 그룹이 용량 안에 들어맞습니다.', overCapFail:'압축 재번역에 실패하여 과도하게 긴 그룹은 그대로 유지합니다.', overCapCallFail:'압축 재번역 {0}번째 시도 실패: {1}',
   batchFail:'배치 {0} {1}번째 시도 실패: {2}', batchSkip:'이 배치는 건너뛰었습니다; 나중에 전체를 다시 실행할 수 있습니다.',
   ratePace:'무료 모델 속도 제한, {0}초 후 계속…', rateWait:'속도 제한(429), 20초 대기 후 재시도…',
@@ -1033,7 +1033,7 @@ const I18N = {
   pgRun:'Übersetzung läuft', pgEta:'Noch {0}', pgDone:'✓ Fertig · {0}',
   chkAutoTerms:'Auto-Glossar: extrahiert vor der Übersetzung Eigennamen und mehrdeutige Begriffe, um dateiweite Einheitlichkeit zu sichern',
   autoTermsRun:'Glossar wird extrahiert (Eigennamen / mehrdeutige Begriffe)…', autoTermsDone:'Auto-Glossar bereit: {0} Begriffe vereinheitlicht', autoTermsSkip:'Glossar-Extraktion fehlgeschlagen, wird ohne fortgesetzt: {0}', batchRescue:'Batch {0} mehrfach fehlgeschlagen; Einzelrettung: {1}/{2} Gruppen',
-  batchDone:'Batch {0}/{1} fertig{2}.', retried:' (nach {0} Wiederholungen)', anchorKeep:'⚠️ Gruppen {0}: Die Übersetzung ist möglicherweise nicht {1}; unverändert übernommen', anchorRefix:'{0} abgewichene Gruppe(n) durch Einzel-Re-Übersetzung vollständig wiederhergestellt',
+  batchDone:'Batch {0}/{1} fertig{2}.', retried:' (nach {0} Wiederholungen)', anchorKeep:'⚠️ Gruppen {0}: Die Übersetzung ist möglicherweise nicht {1}; unverändert übernommen', anchorRefix:'{0} abgewichene Gruppe(n) durch Einzel-Re-Übersetzung vollständig wiederhergestellt', musicDropSaved:'{0} als drop markierte Musikgruppe(n) durch Einzel-Re-Übersetzung gerettet', musicDropKept:'Gruppe(n) {0} als reines Summen eingestuft; bestätigt und als Füllwort entfernt',
   overCapStart:'{0} Gruppe(n) mit zu langen Übersetzungen für den Bildschirm (mehr als 2 Zeilen) erkannt – werde kürzer neu übersetzen…', overCapDone:'Kürzung abgeschlossen: {0}/{1} Gruppen passen jetzt.', overCapFail:'Kürzung fehlgeschlagen; zu lange Gruppen bleiben unverändert.', overCapCallFail:'Kürzungsversuch {0} fehlgeschlagen: {1}',
   batchFail:'Batch {0} Versuch {1} fehlgeschlagen: {2}', batchSkip:'Batch übersprungen; Sie können die ganze Datei später erneut ausführen.',
   ratePace:'Geschwindigkeitslimit des Gratis-Modells, weiter in {0}s…', rateWait:'Rate-Limit (429), warte 20s vor dem erneuten Versuch…',
@@ -1107,7 +1107,7 @@ const I18N = {
   pgRun:'Traduction', pgEta:'Reste {0}', pgDone:'✓ Terminé · {0}',
   chkAutoTerms:'Glossaire auto : extrait avant traduction les noms propres et termes ambigus pour uniformiser tout le fichier',
   autoTermsRun:'Extraction du glossaire (noms propres / termes ambigus)…', autoTermsDone:'Glossaire auto prêt : {0} termes unifiés', autoTermsSkip:'Échec de l\'extraction du glossaire, poursuite sans : {0}', batchRescue:'Lot {0} a échoué plusieurs fois ; sauvetage individuel : {1}/{2} groupes',
-  batchDone:'Lot {0}/{1} terminé{2}.', retried:' (après {0} tentatives)', anchorKeep:'⚠️ Groupes {0} : la traduction pourrait ne pas être en {1} ; conservée telle quelle', anchorRefix:'{0} groupe(s) déviés entièrement récupérés par retraduction individuelle',
+  batchDone:'Lot {0}/{1} terminé{2}.', retried:' (après {0} tentatives)', anchorKeep:'⚠️ Groupes {0} : la traduction pourrait ne pas être en {1} ; conservée telle quelle', anchorRefix:'{0} groupe(s) déviés entièrement récupérés par retraduction individuelle', musicDropSaved:'{0} groupe(s) de musique marqués drop récupérés par retraduction individuelle', musicDropKept:'Groupe(s) {0} jugés fredonnement pur ; confirmés et supprimés comme remplissage',
   overCapStart:'{0} groupe(s) avec des traductions trop longues pour l’écran (plus de 2 lignes) détecté(s), retraduction plus concise en cours…', overCapDone:'Compression terminée : {0}/{1} groupe(s) tiennent maintenant.', overCapFail:'La compression a échoué ; les groupes trop longs sont conservés tels quels.', overCapCallFail:'Tentative de compression {0} échouée : {1}',
   batchFail:'Lot {0} tentative {1} échouée : {2}', batchSkip:'Lot ignoré ; vous pourrez relancer tout le fichier plus tard.',
   ratePace:'Limite de débit du modèle gratuit, reprise dans {0}s…', rateWait:'Limité (429), attente de 20s avant nouvel essai…',
@@ -1181,7 +1181,7 @@ const I18N = {
   pgRun:'Menerjemahkan', pgEta:'Sisa {0}', pgDone:'✓ Selesai · {0}',
   chkAutoTerms:'Glosarium otomatis: mengekstrak nama diri & istilah ambigu sebelum menerjemahkan agar seragam di seluruh file',
   autoTermsRun:'Mengekstrak glosarium (nama diri / istilah ambigu)…', autoTermsDone:'Glosarium otomatis siap: {0} istilah diseragamkan', autoTermsSkip:'Ekstraksi glosarium gagal, dilanjutkan tanpa itu: {0}', batchRescue:'Batch {0} gagal berulang; penyelamatan per grup: {1}/{2} grup',
-  batchDone:'Batch {0}/{1} selesai{2}.', retried:' (setelah {0} percobaan)', anchorKeep:'⚠️ Grup {0}: terjemahan mungkin bukan dalam {1}; tetap dipertahankan', anchorRefix:'{0} grup yang melenceng sepenuhnya dipulihkan lewat penerjemahan ulang terpisah',
+  batchDone:'Batch {0}/{1} selesai{2}.', retried:' (setelah {0} percobaan)', anchorKeep:'⚠️ Grup {0}: terjemahan mungkin bukan dalam {1}; tetap dipertahankan', anchorRefix:'{0} grup yang melenceng sepenuhnya dipulihkan lewat penerjemahan ulang terpisah', musicDropSaved:'{0} grup musik yang di-drop berhasil diselamatkan lewat penerjemahan ulang terpisah', musicDropKept:'Grup {0} dinilai humming murni; dikonfirmasi dan dihapus sebagai pengisi',
   overCapStart:'Terdeteksi {0} grup dengan terjemahan terlalu panjang untuk layar (lebih dari 2 baris), menerjemahkan ulang secara lebih ringkas…', overCapDone:'Pemadatan selesai: {0}/{1} grup kini muat.', overCapFail:'Pemadatan gagal; grup yang terlalu panjang tetap dipertahankan.', overCapCallFail:'Percobaan pemadatan {0} gagal: {1}',
   batchFail:'Batch {0} percobaan {1} gagal: {2}', batchSkip:'Batch dilewati; Anda bisa menjalankan ulang seluruh file nanti.',
   ratePace:'Batas laju model gratis, lanjut dalam {0} dtk…', rateWait:'Dibatasi (429), menunggu 20 dtk sebelum mencoba lagi…',
@@ -1255,7 +1255,7 @@ const I18N = {
   pgRun:'अनुवाद हो रहा है', pgEta:'शेष {0}', pgDone:'✓ पूर्ण · समय {0}',
   chkAutoTerms:'स्वचालित शब्दावली: अनुवाद से पहले संज्ञाएँ व द्विअर्थी शब्द निकालकर पूरी फ़ाइल में एकरूपता लाता है',
   autoTermsRun:'शब्दावली निकाली जा रही है (संज्ञाएँ / द्विअर्थी शब्द)…', autoTermsDone:'स्वचालित शब्दावली तैयार: {0} शब्द एकरूप', autoTermsSkip:'शब्दावली निकालने में विफल, इसके बिना जारी: {0}', batchRescue:'बैच {0} बार-बार विफल; प्रति-समूह बचाव: {1}/{2} समूह सफल',
-  batchDone:'बैच {0}/{1} पूर्ण{2}।', retried:' ({0} पुनः प्रयास बाद)', anchorKeep:'⚠️ समूह {0}: अनुवाद {1} में नहीं हो सकता; जैसा है वैसा रखा गया', anchorRefix:'विचलित {0} समूह अलग पुनर्अनुवाद से पूरी तरह बहाल किए गए',
+  batchDone:'बैच {0}/{1} पूर्ण{2}।', retried:' ({0} पुनः प्रयास बाद)', anchorKeep:'⚠️ समूह {0}: अनुवाद {1} में नहीं हो सकता; जैसा है वैसा रखा गया', anchorRefix:'विचलित {0} समूह अलग पुनर्अनुवाद से पूरी तरह बहाल किए गए', musicDropSaved:'drop माने गए {0} संगीत समूह अलग पुनर्अनुवाद से बचाए गए', musicDropKept:'समूह {0} शुद्ध गुनगुनाहट माने गए; पुष्टि कर फिलर के रूप में हटाए गए',
   overCapStart:'स्क्रीन की 2-पंक्ति क्षमता से अधिक लंबे अनुवाद वाले {0} समूह मिले, अधिक संक्षिप्त रूप से पुनः अनुवाद हो रहे हैं…', overCapDone:'संपीडन पूर्ण: {0}/{1} समूह अब क्षमता में आ गए।', overCapFail:'संपीडन विफल; बहुत लंबे समूह जस के तस रखे गए।', overCapCallFail:'संपीडन प्रयास {0} विफल: {1}',
   batchFail:'बैच {0} प्रयास {1} असफल: {2}', batchSkip:'बैच छोड़ा गया; बाद में पूरी फ़ाइल दोबारा चला सकते हैं।',
   ratePace:'मुफ़्त मॉडल दर-सीमा, {0} सेकंड में जारी…', rateWait:'सीमित (429), 20 सेकंड प्रतीक्षा बाद पुनः प्रयास…',
@@ -1329,7 +1329,7 @@ const I18N = {
   pgRun:'กำลังแปล', pgEta:'เหลืออีก {0}', pgDone:'✓ เสร็จ · ใช้เวลา {0}',
   chkAutoTerms:'คลังศัพท์อัตโนมัติ: ดึงชื่อเฉพาะและคำคลุมเครือก่อนแปลเพื่อความสม่ำเสมอทั้งไฟล์',
   autoTermsRun:'กำลังดึงคลังศัพท์ (ชื่อเฉพาะ / คำคลุมเครือ)…', autoTermsDone:'คลังศัพท์พร้อม: รวม {0} คำ', autoTermsSkip:'ดึงคลังศัพท์ไม่สำเร็จ ข้ามและทำต่อ: {0}', batchRescue:'แบตช์ {0} ล้มเหลวซ้ำ ช่วยเหลือรายกลุ่ม: สำเร็จ {1}/{2} กลุ่ม',
-  batchDone:'แบตช์ {0}/{1} เสร็จ{2}', retried:' (สำเร็จหลังลองใหม่ {0} ครั้ง)', anchorKeep:'⚠️ กลุ่ม {0} คำแปลอาจไม่ใช่{1} จึงเก็บไว้ตามเดิม', anchorRefix:'กลุ่มที่ภาษาเพี้ยน {0} กลุ่ม กู้คืนครบด้วยการแปลใหม่รายกลุ่มแล้ว',
+  batchDone:'แบตช์ {0}/{1} เสร็จ{2}', retried:' (สำเร็จหลังลองใหม่ {0} ครั้ง)', anchorKeep:'⚠️ กลุ่ม {0} คำแปลอาจไม่ใช่{1} จึงเก็บไว้ตามเดิม', anchorRefix:'กลุ่มที่ภาษาเพี้ยน {0} กลุ่ม กู้คืนครบด้วยการแปลใหม่รายกลุ่มแล้ว', musicDropSaved:'กลุ่มเพลงที่ถูก drop {0} กลุ่ม กู้กลับมาด้วยการแปลใหม่รายกลุ่ม', musicDropKept:'กลุ่ม {0} เป็นเสียงฮัมล้วน ยืนยันแล้วจึงลบเป็นคำเติม',
   overCapStart:'พบคำแปลที่ยาวเกินความจุ 2 บรรทัดบนจอ {0} กลุ่ม กำลังแปลใหม่แบบกระชับ…', overCapDone:'บีบอัดเสร็จสมบูรณ์: {0}/{1} กลุ่มเข้าได้ในความจุแล้ว', overCapFail:'บีบอัดไม่สำเร็จ กลุ่มที่ยาวเกินคงไว้ตามเดิม', overCapCallFail:'ความพยายามบีบอัดครั้งที่ {0} ล้มเหลว: {1}',
   batchFail:'แบตช์ {0} ครั้งที่ {1} ล้มเหลว: {2}', batchSkip:'ข้ามแบตช์นี้ สามารถรันทั้งไฟล์ใหม่ภายหลังได้',
   ratePace:'โมเดลฟรีถูกจำกัดอัตรา จะไปต่อใน {0} วินาที…', rateWait:'โดนจำกัดอัตรา (429) รอ 20 วินาทีแล้วลองใหม่…',
@@ -1403,7 +1403,7 @@ const I18N = {
   pgRun:'Đang dịch', pgEta:'Còn lại {0}', pgDone:'✓ Xong · {0}',
   chkAutoTerms:'Bảng thuật ngữ tự động: trích tên riêng & từ nhiễu nghĩa trước khi dịch để thống nhất cả file',
   autoTermsRun:'Đang trích bảng thuật ngữ (tên riêng / từ nhiễu nghĩa)…', autoTermsDone:'Bảng thuật ngữ sẵn sàng: {0} thuật ngữ đã thống nhất', autoTermsSkip:'Trích thuật ngữ thất bại, tiếp tục không có nó: {0}', batchRescue:'Batch {0} thất bại nhiều lần; cứu từng nhóm: thành công {1}/{2} nhóm',
-  batchDone:'Lô {0}/{1} xong{2}.', retried:' (thành công sau {0} lần thử lại)', anchorKeep:'⚠️ Nhóm {0}: bản dịch có thể không phải {1}; giữ nguyên', anchorRefix:'Đã khôi phục hoàn toàn {0} nhóm lệch ngôn ngữ bằng cách dịch lại từng nhóm riêng lẻ',
+  batchDone:'Lô {0}/{1} xong{2}.', retried:' (thành công sau {0} lần thử lại)', anchorKeep:'⚠️ Nhóm {0}: bản dịch có thể không phải {1}; giữ nguyên', anchorRefix:'Đã khôi phục hoàn toàn {0} nhóm lệch ngôn ngữ bằng cách dịch lại từng nhóm riêng lẻ', musicDropSaved:'Đã cứu {0} nhóm nhạc bị drop bằng cách dịch lại từng nhóm riêng lẻ', musicDropKept:'Nhóm {0} được xác định là tiếng ngân thuần; đã xác nhận và xóa như từ đệm',
   overCapStart:'Phát hiện {0} nhóm bản dịch quá dài so với màn hình (trên 2 dòng), đang dịch lại ngắn gọn hơn…', overCapDone:'Nén hoàn tất: {0}/{1} nhóm đã vừa màn hình.', overCapFail:'Nén thất bại; các nhóm quá dài được giữ nguyên.', overCapCallFail:'Lần nén thứ {0} thất bại: {1}',
   batchFail:'Lô {0} lần thử {1} thất bại: {2}', batchSkip:'Lô bị bỏ qua; bạn có thể chạy lại cả file sau.',
   ratePace:'Mô hình miễn phí bị giới hạn tốc độ, tiếp tục sau {0}s…', rateWait:'Bị giới hạn (429), chờ 20s rồi thử lại…',
@@ -1477,7 +1477,7 @@ const I18N = {
   pgRun:'Перевод', pgEta:'Осталось {0}', pgDone:'✓ Готово · за {0}',
   chkAutoTerms:'Автоглоссарий: перед переводом извлекает имена собственные и неоднозначные термины для единообразия по всему файлу',
   autoTermsRun:'Извлечение глоссария (имена собственные / неоднозначные термины)…', autoTermsDone:'Автоглоссарий готов: {0} терминов унифицировано', autoTermsSkip:'Не удалось извлечь глоссарий, продолжаем без него: {0}', batchRescue:'Батч {0} не прошёл несколько раз; спасение по группам: {1}/{2}',
-  batchDone:'Батч {0}/{1} готов{2}.', retried:' (после {0} повторов)', anchorKeep:'⚠️ Группы {0}: перевод может быть не на {1}; оставлен как есть', anchorRefix:'{0} групп с отклонением языка полностью восстановлены изолированным повторным переводом',
+  batchDone:'Батч {0}/{1} готов{2}.', retried:' (после {0} повторов)', anchorKeep:'⚠️ Группы {0}: перевод может быть не на {1}; оставлен как есть', anchorRefix:'{0} групп с отклонением языка полностью восстановлены изолированным повторным переводом', musicDropSaved:'{0} музыкальных групп со статусом drop спасены изолированным повторным переводом', musicDropKept:'Группы {0} признаны чистым напевом; подтверждены и удалены как слова-связки',
   overCapStart:'Обнаружены группы с переводами длиннее ёмкости экрана (более 2 строк): {0}. Идёт более сжатый повторный перевод…', overCapDone:'Сжатие завершено: {0}/{1} групп помещаются.', overCapFail:'Сжатие не удалось; слишком длинные группы сохранены как есть.', overCapCallFail:'Попытка сжатия {0} не удалась: {1}',
   batchFail:'Батч {0} попытка {1} не удалась: {2}', batchSkip:'Батч пропущен; можно перезапустить весь файл позже.',
   ratePace:'Ограничение скорости бесплатной модели, продолжаю через {0}с…', rateWait:'Лимит (429), жду 20с перед повтором…',
@@ -1551,7 +1551,7 @@ const I18N = {
   pgRun:'Traduzione', pgEta:'Mancano {0}', pgDone:'✓ Completato · {0}',
   chkAutoTerms:'Glossario automatico: estrae nomi propri e termini ambigui prima di tradurre per uniformare l\'intero file',
   autoTermsRun:'Estrazione del glossario (nomi propri / termini ambigui)…', autoTermsDone:'Glossario automatico pronto: {0} termini unificati', autoTermsSkip:'Estrazione del glossario fallita, si continua senza: {0}', batchRescue:'Batch {0} non riuscito più volte; recupero individuale: {1}/{2} gruppi',
-  batchDone:'Batch {0}/{1} completato{2}.', retried:' (dopo {0} tentativi)', anchorKeep:'⚠️ Gruppi {0}: la traduzione potrebbe non essere in {1}; mantenuta così com\'è', anchorRefix:'{0} gruppi deviati recuperati integralmente con ritraduzione isolata',
+  batchDone:'Batch {0}/{1} completato{2}.', retried:' (dopo {0} tentativi)', anchorKeep:'⚠️ Gruppi {0}: la traduzione potrebbe non essere in {1}; mantenuta così com\'è', anchorRefix:'{0} gruppi deviati recuperati integralmente con ritraduzione isolata', musicDropSaved:'{0} gruppi musicali contrassegnati come drop recuperati con ritraduzione isolata', musicDropKept:'Gruppo/i {0} giudicati canto senza parole; confermati e rimossi come riempitivo',
   overCapStart:'Rilevati {0} gruppi con traduzioni troppo lunghe per lo schermo (oltre 2 righe), ritraduco in modo più conciso…', overCapDone:'Compressione completata: {0}/{1} gruppi ora entrano.', overCapFail:'Compressione fallita; i gruppi troppo lunghi restano invariati.', overCapCallFail:'Tentativo di compressione {0} fallito: {1}',
   batchFail:'Tentativo {1} del batch {0} non riuscito: {2}', batchSkip:'Batch saltato; puoi rieseguire l\'intero file più tardi.',
   ratePace:'Limite di frequenza del modello gratuito, ripresa tra {0}s…', rateWait:'Limite raggiunto (429), attesa di 20s prima di riprovare…',
@@ -1625,7 +1625,7 @@ const I18N = {
   pgRun:'جارٍ الترجمة', pgEta:'متبقي {0}', pgDone:'✓ اكتمل · {0}',
   chkAutoTerms:'قاموس تلقائي: يستخرج الأسماء الخاصة والمصطلحات الملتبسة قبل الترجمة لتوحيد الترجمة في كامل الملف',
   autoTermsRun:'جارٍ استخراج القاموس (أسماء خاصة / مصطلحات ملتبسة)…', autoTermsDone:'القاموس التلقائي جاهز: تم توحيد {0} مصطلحًا', autoTermsSkip:'فشل استخراج القاموس، ستتم المتابعة بدونه: {0}', batchRescue:'فشلت الدفعة {0} عدة مرات؛ إنقاذ فردي: {1}/{2} مجموعة',
-  batchDone:'اكتملت الدفعة {0}/{1}{2}.', retried:' (بعد {0} محاولات)', anchorKeep:'⚠️ المجموعات {0}: قد لا تكون الترجمة باللغة {1}؛ أُبقيت كما هي', anchorRefix:'تمت استعادة {0} مجموعة منحرفة بالكامل عبر إعادة ترجمة منفردة',
+  batchDone:'اكتملت الدفعة {0}/{1}{2}.', retried:' (بعد {0} محاولات)', anchorKeep:'⚠️ المجموعات {0}: قد لا تكون الترجمة باللغة {1}؛ أُبقيت كما هي', anchorRefix:'تمت استعادة {0} مجموعة منحرفة بالكامل عبر إعادة ترجمة منفردة', musicDropSaved:'تم إنقاذ {0} مجموعة موسيقية عُلّمت drop عبر إعادة ترجمة منفردة', musicDropKept:'المجموعات {0} اعتُبرت همهمة خالصة؛ تم تأكيدها وحذفها كحشو',
   overCapStart:'تم اكتشاف {0} مجموعة بترجمات أطول من سعة الشاشة (أكثر من سطرين)، تجري إعادة ترجمة أكثر إيجازًا…', overCapDone:'اكتمل الضغط: {0}/{1} مجموعة أصبحت ضمن السعة.', overCapFail:'فشل الضغط؛ تم الإبقاء على المجموعات الطويلة جدًا كما هي.', overCapCallFail:'فشلت محاولة الضغط {0}: {1}',
   batchFail:'فشلت محاولة {1} للدفعة {0}: {2}', batchSkip:'تخطّيت الدفعة؛ يمكنك إعادة تشغيل الملف كاملًا لاحقًا.',
   ratePace:'حد معدل النموذج المجاني، سنكمل خلال {0} ث…', rateWait:'بلغنا حد المعدل (429)، انتظار 20 ث قبل إعادة المحاولة…',
@@ -1699,7 +1699,7 @@ const I18N = {
   pgRun:'Çevriliyor', pgEta:'Kalan {0}', pgDone:'✓ Tamamlandı · {0}',
   chkAutoTerms:'Otomatik sözlük: çeviriden önce özel isimleri ve belirsiz terimleri çıkararak tüm dosyada tutarlılık sağlar',
   autoTermsRun:'Sözlük çıkarılıyor (özel isimler / belirsiz terimler)…', autoTermsDone:'Otomatik sözlük hazır: {0} terim birleştirildi', autoTermsSkip:'Sözlük çıkarılamadı, onsuz devam ediliyor: {0}', batchRescue:'Batch {0} birden çok kez başarısız; tek grup kurtarma: {1}/{2} grup',
-  batchDone:'Grup {0}/{1} tamamlandı{2}.', retried:' ({0} denemeden sonra)', anchorKeep:'⚠️ Gruplar {0}: çeviri {1} olmayabilir; olduğu gibi korundu', anchorRefix:'{0} sapmış grup izole yeniden çeviriyle tamamen kurtarıldı',
+  batchDone:'Grup {0}/{1} tamamlandı{2}.', retried:' ({0} denemeden sonra)', anchorKeep:'⚠️ Gruplar {0}: çeviri {1} olmayabilir; olduğu gibi korundu', anchorRefix:'{0} sapmış grup izole yeniden çeviriyle tamamen kurtarıldı', musicDropSaved:'drop olarak işaretlenen {0} müzik grubu izole yeniden çeviriyle kurtarıldı', musicDropKept:'Grup {0} saf mırıltı olarak değerlendirildi; onaylanıp dolgu olarak silindi',
   overCapStart:'Ekrana sığmayan (2 satırdan uzun) çevirileri olan {0} grup algılandı, daha kısa yeniden çevriliyor…', overCapDone:'Kısaltma tamamlandı: {0}/{1} grup artık sığıyor.', overCapFail:'Kısaltma başarısız; çok uzun gruplar olduğu gibi korundu.', overCapCallFail:'Kısaltma denemesi {0} başarısız: {1}',
   batchFail:'Grup {0} deneme {1} başarısız: {2}', batchSkip:'Grup atlandı; tüm dosyayı daha sonra yeniden çalıştırabilirsin.',
   ratePace:'Ücretsiz model hız limiti, {0} sn içinde devam ediliyor…', rateWait:'Hız limiti (429), yeniden denemeden önce 20 sn bekleniyor…',
@@ -2174,14 +2174,16 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
   const dstV = $('dstLang').value;
   const badAnchor = [];
+  const musicDropGnos = [];
   for(const g of send){
     const m = byGno[g.gno];
     if(!m) continue;
-    // v0.9.46：含歌词的音乐组不接受显式 drop——♪ 行丢歌词正是音乐标记不一致的根源（实测 zh-CN
-    // 把 ♪ Oh-oh, oh-oh ♪ 整行 drop），并入锚定重试通道强制重译；非音乐组保持原 drop 语义
+    // v0.9.47：含歌词音乐组的显式 drop 走独立通道 musicDropGnos，不再并入 badAnchor（整批重发通道）——
+    // 实测 Gemini 对纯哼唱（♪ Oh-oh, oh-oh ♪）8/8 语言整批重发 2 次后仍 drop：模型对「无实义」的
+    // 判断救不回，白付整批重发成本。改由外层单组隔离重译一次，再 drop 就接受模型判断
     if(m.type==='drop' && !String(m.text||'').trim()){
       const dropSrc = g.mFrames ? g.mFrames.plainText : g.text;
-      if(C.RE_MUSIC.test(String(g.text)) && C.effChars(dropSrc) > 0) badAnchor.push(g.gno);
+      if(C.RE_MUSIC.test(String(g.text)) && C.effChars(dropSrc) > 0) musicDropGnos.push(g.gno);
       continue;
     }
     const txt = String(m.text||'').trim();
@@ -2193,7 +2195,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
   // fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）
   const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
   const fillers=new Set((Array.isArray(obj.fillers)?obj.fillers:[]).map(Number).filter(no=>known.has(no)));
-  return { byGno, fillers, badAnchor };
+  return { byGno, fillers, badAnchor, musicDropGnos };
 }
 
 // B1 孤儿尾巴收并落地（v0.9.23）：collapseThinTail 命中后，末行转 merged（复用既有机制：
@@ -2486,6 +2488,31 @@ async function runTranslate(){
             await new Promise(r=>setTimeout(r,1500));
             continue;
           }
+          // v0.9.47：音乐组 drop → 单组隔离重译一次（绝不整批重发）；再 drop 就接受模型判断，按水词删除
+          if(out.musicDropGnos && out.musicDropGnos.length){
+            const stillDrop=[];
+            for(const gno of out.musicDropGnos){
+              if(S.stop){ stillDrop.push(gno); continue; }
+              const g1=gBatch.find(x=>x.gno===gno);
+              let fixed=false;
+              if(g1){
+                try{
+                  const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalBatch,sys);
+                  const m2=o2.byGno&&o2.byGno[gno];
+                  // 救回标准：拿到非空译文且该组未触发语言跑偏锚定
+                  if(m2 && String(m2.text||'').trim() && !(o2.badAnchor||[]).includes(gno)){
+                    out.byGno[gno]=m2;
+                    o2.fillers.forEach(no=>fillerSet.add(no));
+                    fixed=true;
+                  }
+                }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+              }
+              if(!fixed) stillDrop.push(gno);
+            }
+            const savedN=out.musicDropGnos.length-stillDrop.length;
+            if(savedN>0) log(t('musicDropSaved',savedN),'okc');
+            if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
+          }
           if(out.badAnchor && out.badAnchor.length){
             // v0.9.22：终检失败拆单组重译——整批上下文偶发触发模型跑偏，隔离单组重发通常即恢复（评测实证 5/5）
             const remain=[];
@@ -2497,10 +2524,15 @@ async function runTranslate(){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalBatch,sys);
+                    // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
+                    // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
                     if(!o2.badAnchor || !o2.badAnchor.length){
-                      out.byGno[gno]=o2.byGno[gno];
-                      o2.fillers.forEach(no=>fillerSet.add(no));
-                      fixed=true;
+                      const m2=o2.byGno&&o2.byGno[gno];
+                      if(m2 && String(m2.text||'').trim()){
+                        out.byGno[gno]=m2;
+                        o2.fillers.forEach(no=>fillerSet.add(no));
+                        fixed=true;
+                      }
                     }
                   }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
                 }
@@ -2583,12 +2615,11 @@ async function runTranslate(){
       }
       const textRaw = String(m.text||'').trim();
       // 防御性丢弃判定：仅当模型显式 type='drop' 且 text 为空时才丢弃；只要给了译文就用译文
-      // v0.9.46：含歌词的音乐组重试后仍 drop → 按 missing 标记（待处理），绝不静默当水词清空
+      // v0.9.47：音乐组 drop 已在批次层经单组隔离重译确认（再 drop 即信模型），与其他水词同路径按 drop 落标
       const explicitDrop = m.type==='drop' && !textRaw;
       if(explicitDrop){
-        const musicDrop = C.RE_MUSIC.test(String(g.text)) && C.effChars(g.mFrames ? g.mFrames.plainText : g.text) > 0;
-        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag=musicDrop?'missing':'drop'; } });
-        if(musicDrop) missingCount++; else suspiciousDrop++;
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='drop'; } });
+        suspiciousDrop++;
         continue;
       }
       // v0.9.45：音乐帧组——[N] 编号正文按源文段映射、符号按源文序列复原（模型从未见过 ♪）。
