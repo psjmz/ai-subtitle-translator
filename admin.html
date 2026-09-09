@@ -360,7 +360,9 @@ $('btnTest').addEventListener('click', async () => {
   msg('cfgMsg', '测试中…', 'ok');
   try {
     const r = await api('/api/admin/test', 'POST');
-    msg('cfgMsg', '连通成功，模型返回：' + r.sample, 'ok');
+    // v0.9.44：服务器 ok:false 表示连通但模型没返回正文（思考型模型 token 限额/模型名错/鉴权空 body），r.hint 给可读原因
+    if (r && r.ok) msg('cfgMsg', '连通成功，模型返回：' + (r.sample || '(空字符串)'), 'ok');
+    else msg('cfgMsg', (r && r.hint) ? '连通成功但模型未返回正文：' + r.hint : '连通成功但模型未返回正文', 'err');
   } catch (e) { msg('cfgMsg', e.message, 'err'); }
 });
 

@@ -728,9 +728,16 @@ const server = http.createServer(async (req, res) => {
           return sendJson(res, 400, { error: { message: '请先保存 Base URL / 模型 / API Key' } });
         }
         try {
-          const out = await callModel(cfg, [{ role: 'user', content: 'Reply with exactly: OK' }], 10);
-          const sample = out.choices && out.choices[0] && out.choices[0].message ? out.choices[0].message.content : '';
-          return sendJson(res, 200, { ok: true, sample: String(sample).slice(0, 40) });
+          // v0.9.44：max_tokens 从 10 提到 256——Gemini 等思考型模型在 10 token 限额下 0 completion，
+          //  message.content 字段直接缺失，前端拿到 undefined（误判"模型返回空"）。
+          const out = await callModel(cfg, [{ role: 'user', content: 'Reply with exactly: OK' }], 256);
+          const choice = out.choices && out.choices[0];
+          const sample = choice && choice.message ? choice.message.content : '';
+          const reason = choice ? choice.finish_reason : null;
+          const usage = out.usage || null;
+          if (sample) return sendJson(res, 200, { ok: true, sample: String(sample).slice(0, 40), reason, usage });
+          // v0.9.44：content 缺失时把 finish_reason + usage 暴露给前端，便于定位（思考模型限额、模型名拼错、鉴权失败返回空 body 等）
+          return sendJson(res, 200, { ok: false, sample: '', reason, usage, hint: '模型未返回正文（finish_reason=' + (reason||'?') + '，completion_tokens=' + ((usage&&usage.completion_tokens!=null)?usage.completion_tokens:'?') + '）。常见原因：思考型模型 token 全用于 thinking 上限不足、模型名拼错、鉴权失败返回空 body' });
         } catch (e) {
           return sendJson(res, 502, { error: { message: '连通失败：' + e.message } });
         }
