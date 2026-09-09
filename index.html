@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.44</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.45</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2040,7 +2040,7 @@ function systemPromptEn(cfg){
    + '   - Only when a group\'s entire merged text is pure filler/sound tags with no substantive content may that group be output as type:"drop" with an empty text; this is a rare exception.\n'
    + '   - Note: type "drop" does not make the translation disappear — it only tells the program to clear that cue. Do not set everything to drop to be "safe".\n'
    + '   - Repetitions: when the same speaker repeats a word or phrase in a row (e.g. "No, no, no"), translating it once is usually enough; keep the repetition only when it is plot/emotion-pertinent (stuttering, emphasis, comedic rhythm).\n'
-   + '5.5 [Music lines] Music note symbols (♪ ♫) only mark "singing" — they are not content: keep the leading/trailing note symbols in the translation (matching the source) and fully translate the lyric text between them into ' + dstNative + '. Never output the symbols only, and never drop the lyrics. In lyric lines, end only with ? or ! (never a comma or period; commas may appear within a line); when a song fades into the background and is no longer subtitled, close with an ellipsis (…) to give precedence to dialogue; in a duet where each singer has their own line, every line carries its own leading/trailing ♪.\n'
+   + '5.5 [Lyric segments] Lyric lines arrive with their music symbols (♪ ♫ etc.) already stripped by the program; the lyric text is marked with segment numbers like [1] [2]. When segment numbers appear in the input, keep every number exactly as-is — [1] stays [1]: never translate, renumber, add, or drop segments. Translate only the lyric text after each number; the program re-attaches the music symbols at their original positions. Conversely, when the input has NO segment numbers, you must NOT invent or add any numbers to your output. End lyric lines only with ? or ! (never a comma or period; commas may appear within a line); when a song fades into the background and is no longer subtitled, close with an ellipsis (…) to give precedence to dialogue.\n'
    + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
    + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
    + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
@@ -2087,7 +2087,7 @@ s += '5.【水词处理——默认行为是翻译】\n'
    + '   - 仅当整个句组的 merged 全部是水词/提示词（无任何实义内容）时，该组才输出 type:"drop" 且 text 留空；这是极少数例外。\n'
    + '   - 注意：类型 "drop" 不会让译文消失，只是程序据此清空字幕；不要为了"安全"而把所有句组都设 drop。\n'
   + '   - 重复词：同一说话人连续重复的词或短语（如 "No, no, no"）通常译一次即可；但若重复本身有情绪或剧情作用（结巴、强调、喜剧节奏），应按语境保留。\n'
-  + '5.5【音乐行】♪ ♫ 等音乐符号只是「正在唱歌」的标记，不是内容：译文必须保留与原文对应的首尾音乐符号，并把符号之间的歌词完整翻译成' + dstNative + '；严禁只输出符号、严禁丢掉歌词。歌词行末只用 ？和 ！，不用逗号或句号（行内可用逗号）；歌曲退到背景、不再翻译时用省略号（…）收尾给对白让位；二重唱各唱一行时，每行首尾都带 ♪。\n'
+  + '5.5【歌词分段】歌词行的音乐符号（♪ ♫ 等）已由程序剥离，正文以 [1] [2] 等分段编号给出。输入出现分段编号时，编号必须原样保留——[1] 还是 [1]，严禁翻译编号、改写数字、增删或重排分段；只翻译编号后面的歌词正文，程序会把音乐符号按原文位置自动加回。反之，输入没有分段编号时，严禁自行发明或添加任何编号。歌词行末只用 ？和 ！，不用逗号或句号（行内可用逗号）；歌曲退到背景、不再翻译时用省略号（…）收尾给对白让位。\n'
   + '6.【禁止自行折行】text 一律输出单行文本，严禁包含换行符 \\n；折行由程序按显示宽度自动处理，你不要也不能手动分行。\n'
   + '   唯一例外：若该句组的原文是多行且每行以 - 开头（同一条字幕里两个说话人对话），译文必须保持相同结构——每个说话人一行、每行以「- 」开头、行与行之间用一个换行符 \\n 连接。\n'
   + '7.【数字单位一体】译文中的数字与其单位/符号必须作为整体紧邻出现（如 30%、$50、1,000、12.5、100万），严禁拆散或在数字与单位之间插入其他字符。\n'
@@ -2142,9 +2142,12 @@ async function chatOnce(base,key,model,msgs,timeoutMs){
 }
 
 async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
-  const garr = groups.map(g=>({
+  // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
+  // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
+  const send = groups.filter(g=>!g.pureMusic);
+  const garr = send.map(g=>({
     gno: g.gno,
-    merged: g.text,
+    merged: g.mFrames ? g.mFrames.plainText : g.text,
     cues: g.cues.map(c=>({no:c.no, t:fmtTC(c.start,c.end), src:c.text}))
   }));
   const dstN = LBY($('dstLang').value);
@@ -2166,18 +2169,19 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
     if(!x||x.gno==null) throw new Error(t('errNoGno'));
     byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh) };
   });
-  // 校验齐全：每个输入句组必须有结果
-  groups.forEach(g=>{ if(!byGno[g.gno]) throw new Error(t('errMissGroup',g.gno)); });
+  // 校验齐全：每个输入句组必须有结果（v0.9.45：只校验真正发给模型的 send 集）
+  send.forEach(g=>{ if(!byGno[g.gno]) throw new Error(t('errMissGroup',g.gno)); });
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
   const dstV = $('dstLang').value;
   const badAnchor = [];
-  for(const g of groups){
+  for(const g of send){
     const m = byGno[g.gno];
     if(!m || m.type==='drop') continue;
     const txt = String(m.text||'').trim();
     if(txt && !C.anchorOk(txt, dstV)) badAnchor.push(g.gno);
     // v0.9.37：音乐行丢词（源有歌词而译文只剩 ♪ 符号）——纯符号可通过 anchorOk，必须单查；并入锚定重试通道
-    else if(txt && C.musicLost(txt, g.text) && !badAnchor.includes(g.gno)) badAnchor.push(g.gno);
+    // v0.9.45：音乐帧组输出为 [N] 编号正文，musicLost 对编号数字不敏感，需比对纯正文
+    else if(txt && C.musicLost(txt, g.mFrames ? g.mFrames.plainText : g.text) && !badAnchor.includes(g.gno)) badAnchor.push(g.gno);
   }
   // fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）
   const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
@@ -2380,6 +2384,17 @@ async function runTranslate(){
 
     // 句子级分组：跨多条字幕的句子合并为句组，译文将按各条时长比例切分回填
     const groups = C.groupSentences(S.srcItems);
+    // v0.9.45 音乐帧预处理：♪/♫ 等符号不进模型——有歌词段的音乐组改发 [1][2]… 编号的纯正文，
+    // 译文回来按编号映射、符号按源文序列复原；纯符号行（只有 ♪）不进模型直接原文回填。
+    // v0.9.45b：不再因组文本含 \n 跳过（歌词 cue 几乎都是多行，cue 内换行是常态，
+    // extractMusicFrames 已把 \n 当空白归一化）；speaker 组（dash 结构）仍走旧路径
+    for(const g of groups){
+      if(g.filler || g.speaker) continue;
+      const mf = C.extractMusicFrames(g.text);
+      if(!mf) continue;
+      if(!mf.segs.length) g.pureMusic = true;
+      else g.mFrames = mf;
+    }
     const gMultiN = groups.filter(g=>!g.filler && g.cues.length>1).length;
     log(t('groupInfo', groups.length, gMultiN));
 
@@ -2547,6 +2562,11 @@ async function runTranslate(){
     for(const g of groups){
       const active=g.cues.filter(c=>!fillerSet.has(c.no));
       if(!active.length) continue;
+      // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型——译文=源文原样，符号永远不丢
+      if(g.pureMusic){
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(g.text).trim(); if(r.flag!=='drop') r.flag=''; } });
+        continue;
+      }
       const m=res.get(g.gno);
       // 批次失败 / 无结果：标记为 missing（待处理）——绝不当 drop，否则用户会把失败误判为水词清空
       if(!m){
@@ -2562,10 +2582,17 @@ async function runTranslate(){
         suspiciousDrop++;
         continue;
       }
-      // v0.9.37：译文先归一化音乐符号（折叠重复/补回丢失首尾），再判丢词——
-      // 重试后仍只剩 ♪ 符号的按 missing 标记（诚实显示待处理），绝不静默回填"看似已译"的空壳
-      // v0.9.38：speaker 换行修复——模型偶发把 "\n- " 压成行内 dash，源结构对得上时机械补回
-      let text = C.normalizeMusic(C.fixMixedChars(textRaw, cfg.dst), g.text);
+      // v0.9.45：音乐帧组——[N] 编号正文按源文段映射、符号按源文序列复原（模型从未见过 ♪）。
+      // 复原结果不过 normalizeMusic（相邻帧「♪ ♪」是正确结构，折叠会破坏）；复原失败回落旧路径。
+      let text = null;
+      if(g.mFrames) text = C.reassembleMusic(C.fixMixedChars(textRaw, cfg.dst), g.mFrames);
+      if(text == null){
+        // v0.9.45b：旧路径清洗残留分段编号——模型偶发把规则 5.5 的 [N] 编号带进无编号输入的输出，
+        // 不清会被时长切分切成两半（实测：行尾 [ 行首 3]）；源文本身含 [N] 时不清（可能是正文引用）
+        let rawOld = C.fixMixedChars(textRaw, cfg.dst);
+        if(!C.hasSegMarkers(g.text)) rawOld = C.stripSegMarkers(rawOld).replace(/\s+/g, ' ').trim();
+        text = C.normalizeMusic(rawOld, g.text);
+      }
       if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
       if(!text || C.musicLost(text, g.text)){
         active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
@@ -2597,7 +2624,9 @@ async function runTranslate(){
         const ps=String(p!=null?p:'').trim();
         if(ps && !C.isSpeakerText(ps) && C.wrapToWidth(C.stripSoundTags(ps),cfg.maxW,{normalize:true,locale:cfg.dst}).length>2) over=true;
       });
-      if(over) overCapGroups.push({g, active, text});
+      // v0.9.45：音乐帧组不进压缩重译——改写会破坏 ♪ 复原结构；歌词天然短行，超容概率极低，
+      // 保不住容量也优先保符号正确（导出折行兜底）
+      if(over && !g.mFrames) overCapGroups.push({g, active, text});
       active.forEach((c,i)=>{
         const r=S.rows.find(x=>x.no===c.no);
         if(r){ r.zh=String(pieces[i]!=null?pieces[i]:'').trim(); if(r.flag!=='drop') r.flag=''; }

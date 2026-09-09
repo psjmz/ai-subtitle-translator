@@ -893,16 +893,32 @@
   }
   // 归一化：①折叠紧邻重复符号（♪♪ / ♪ ♪ → ♪）②源首尾有符号而译文丢失 → 用源符号补回。
   // 只动首尾锚定与紧邻重复，行中间的单个符号不碰；源本身无符号的行零影响。
-  function normalizeMusic(dst, src) {
-    let s = String(dst == null ? '' : dst).trim();
+  // v0.9.45b：单行修复——dash 行首（"- ♪ xxx"）的 ♪ 在整串逻辑里恢复不到（串首是 '-'），
+  // 行首符号感知可选 dash 前缀，行尾照旧；折叠重复符号每行独立做
+  function normalizeMusicLine(dl, sl) {
+    let s = String(dl == null ? '' : dl).trim();
     if (!s) return s;
     s = s.replace(/([♪♫♬♩])(\s*\1)+/g, '$1');
-    const srcS = String(src == null ? '' : src).trim();
-    const head = (srcS.match(/^[♪♫♬♩]\s*/) || [''])[0].trim();
-    const tail = (srcS.match(/\s*[♪♫♬♩]$/) || [''])[0].trim();
-    if (head && !RE_MUSIC.test(s[0])) s = head + ' ' + s;
-    if (tail && !RE_MUSIC.test(s[s.length - 1])) s = s + ' ' + tail;
+    const srcS = String(sl == null ? '' : sl).trim();
+    const mh = srcS.match(/^(-\s*)?([♪♫♬♩])\s*/);
+    const mt = srcS.match(/\s*([♪♫♬♩])\s*$/);
+    if (mh) {
+      const dm = s.match(/^(-\s*)/);
+      const afterDash = dm ? s.slice(dm[1].length) : s;
+      if (!RE_MUSIC.test(afterDash[0] || '')) s = (dm ? dm[1] : '') + mh[2] + ' ' + afterDash;
+    }
+    if (mt && !RE_MUSIC.test(s[s.length - 1] || '')) s = s + ' ' + mt[1];
     return s;
+  }
+
+  function normalizeMusic(dst, src) {
+    const d = String(dst == null ? '' : dst);
+    const srcS0 = String(src == null ? '' : src);
+    // 多行结构（speaker dash 行等）且行数对齐 → 逐行修复（整串只补首尾，行中行的行首行尾恢复不到）
+    if (/\n/.test(srcS0) && /\n/.test(d) && d.split('\n').length === srcS0.split('\n').length) {
+      return d.split('\n').map((x, i) => normalizeMusicLine(x, srcS0.split('\n')[i])).join('\n');
+    }
+    return normalizeMusicLine(d, srcS0);
   }
 
   // v0.9.42：音乐组歌词行对齐切分。音乐句组（多条歌词 cue 合并翻译）按时长比例回填会把
@@ -936,6 +952,131 @@
       return out;
     }
     return null;
+  }
+
+  // ---------------- 音乐帧：符号不进模型（v0.9.45）----------------
+  // 设计：♪/♫/♬/♩ 完全不发给模型。发送前把源文拆成「符号序列 + 正文段」，正文段用
+  // [1][2]… 编号发给模型；译文回来后按编号映射回填、符号按源文顺序原样复原。
+  // 模型从此见不到 ♪，从根上杜绝「丢符号/叠符号/符号错位」整类事故
+  // （v0.9.37 musicLost / v0.9.42 splitMusicLines 系列修补的共同根因：模型不可靠地搬运符号）。
+  // 含换行（dash 多行 speaker 结构）的文本不适用，返回 null 走旧路径。
+
+  // 拆帧：无音乐符号 → null；否则
+  // { items: [{mark:'♪'} | {text:' Love '}],           // 源文按符号/正文切开的完整序列
+  //   segs:  [{itemIdx, text}],                        // 有实词的正文段（发给模型的部分）
+  //   plainText: '[1] Love is in the air [2] ...' }    // 模型实际看到的 merged
+  // v0.9.45b：cue 内部换行不再拒收（歌词 cue 几乎都是多行，\n 当空白归一化）——
+  // 此前含 \n 的组整组跳回旧路径，♪ 照发模型，新机制对真实歌词组基本失效
+  function extractMusicFrames(src) {
+    const s = String(src == null ? '' : src).replace(/\r/g, '');
+    if (!RE_MUSIC.test(s)) return null;
+    const items = [];
+    const re = /([♪♫♬♩]+)|([^♪♫♬♩]+)/g;
+    let m;
+    while ((m = re.exec(s)) !== null) {
+      if (m[1]) { for (const ch of m[1]) items.push({ mark: ch }); }
+      else items.push({ text: m[2] });
+    }
+    const segs = [];
+    items.forEach((it, i) => {
+      if (it.text != null && it.text.trim()) segs.push({ itemIdx: i, text: it.text.trim() });
+    });
+    const plainText = segs.map((sg, n) => '[' + (n + 1) + '] ' + sg.text.replace(/\s+/g, ' ').trim()).join(' ');
+    return { items, segs, plainText };
+  }
+
+  // v0.9.45b：清洗译文中残留的分段编号 [N]（含全角变体）——模型偶发把规则 5.5 的编号
+  // 带进「无编号输入」的输出（实测：单 cue 歌词组凭空出现 [7]/[9]），旧路径切分会把标记切成两半
+  function stripSegMarkers(s) {
+    return String(s == null ? '' : s).replace(/[［【[]\s*[0-9０-９]+\s*[\]】］]/g, ' ');
+  }
+
+  // 源文是否含 [N] 分段编号（决定 stripSegMarkers 是否安全：源文本就有编号时不能清）
+  function hasSegMarkers(s) {
+    return /[［【[]\s*[0-9０-９]+\s*[\]】］]/.test(String(s == null ? '' : s));
+  }
+
+  // 解析模型输出的分段编号：容忍 [1] / 【１】 / ［1］ 等变体；返回 {1:'…',2:'…'}，无编号返回 null
+  function parseSegMarkers(out) {
+    const s = String(out == null ? '' : out);
+    const half = (d) => d.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+    const re = /[［【[]\s*([0-9０-９]+)\s*[\]】］]/g;
+    const marks = [];
+    let m;
+    while ((m = re.exec(s)) !== null) {
+      const n = parseInt(half(m[1]), 10);
+      if (n) marks.push({ n, start: m.index, end: m.index + m[0].length });
+    }
+    if (!marks.length) return null;
+    const res = {};
+    for (let i = 0; i < marks.length; i++) {
+      const from = marks[i].end;
+      const to = (i + 1 < marks.length) ? marks[i + 1].start : s.length;
+      const piece = s.slice(from, to).replace(/\s+/g, ' ').trim();
+      if (res[marks[i].n] == null) res[marks[i].n] = piece; // 首个优先（模型偶发重复编号）
+    }
+    return res;
+  }
+
+  // 按源文段权重把整段译文切成 n 段（[N] 解析失败时的兜底）：按显示宽度比例定位，
+  // 在 ±25% 范围内优先找标点/空格边界，找不到就地硬切（宁切口正不丢内容）
+  function splitByWeights(text, weights) {
+    const s = String(text == null ? '' : text).trim();
+    const n = weights.length;
+    if (n <= 1 || !s) return Array.from({ length: n }, (_, i) => (i === 0 ? s : ''));
+    const total = weights.reduce((a, b) => a + b, 0) || 1;
+    const BOUND = /[\s，。、！？；：…·,.!?;:]/;
+    const cuts = [];
+    let cum = 0;
+    for (let i = 0; i < n - 1; i++) {
+      cum += weights[i];
+      const t = Math.round(s.length * cum / total);
+      const lo = Math.max(1, Math.floor(t * 0.75)), hi = Math.min(s.length - 1, Math.ceil(t * 1.25));
+      let cut = Math.min(Math.max(t, lo), hi);
+      outer:
+      for (let d = 0; d <= Math.max(t - lo, hi - t); d++) {
+        if (t - d >= lo && BOUND.test(s[t - d])) { cut = t - d + 1; break outer; } // 标点归左段
+        if (t + d <= hi && BOUND.test(s[t + d])) { cut = t + d + 1; break outer; }
+      }
+      cuts.push(Math.min(Math.max(cut, 1), s.length - 1));
+    }
+    const out = [];
+    let prev = 0;
+    for (const c of cuts) { out.push(s.slice(prev, c).trim()); prev = c; }
+    out.push(s.slice(prev).trim());
+    return out;
+  }
+
+  // 复原：translated 为模型输出（[N] 分段或整段），frames 为 extractMusicFrames 的返回。
+  // 成功 → 符号按源文序列原样复原的完整译文；失败 → null（上层回落 normalizeMusic 旧路径）。
+  // 注意：复原结果不要再过 normalizeMusic——相邻帧的「♪ ♪」是正确结构，会被折叠破坏。
+  function reassembleMusic(translated, frames) {
+    if (!frames || !frames.segs || !frames.segs.length) return null;
+    const raw = String(translated == null ? '' : translated).trim();
+    if (!raw) return null;
+    const n = frames.segs.length;
+    const map = parseSegMarkers(raw);
+    let pieces = null;
+    if (map) {
+      const cand = frames.segs.map((sg, i) => {
+        const v = map[i + 1];
+        return (v != null && String(v).trim()) ? String(v).trim() : null;
+      });
+      if (cand.every((p) => p != null)) pieces = cand; // 编号齐全，精确映射
+    }
+    if (!pieces) {
+      // 兜底：剥掉所有编号标记，整段译文按源文段权重切分（模型漏编号/格式跑偏时不丢内容）
+      const stripped = raw.replace(/[［【[]\s*[0-9０-９]+\s*[\]】］]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!stripped) return null;
+      pieces = splitByWeights(stripped, frames.segs.map((sg) => textWidth(sg.text) || sg.text.length || 1));
+    }
+    let segNo = 0, out = '';
+    for (const it of frames.items) {
+      if (it.mark) out += it.mark;
+      else if (it.text != null && it.text.trim()) out += ' ' + pieces[segNo++] + ' ';
+      else out += ' ';
+    }
+    return out.replace(/\s+/g, ' ').trim();
   }
 
   // 语言感知拼接（v0.9.23 孤儿收并用）：汉字/假名与泰、老、高棉、缅文等无空格文字直接拼接；
@@ -1356,6 +1497,7 @@
     validateItems, anchorOk, fixMixedChars,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
+    extractMusicFrames, parseSegMarkers, splitByWeights, reassembleMusic, stripSegMarkers, hasSegMarkers,
     MAX_W_DEFAULT: 20
   };
 });

@@ -1300,5 +1300,151 @@ t('formatAss：含 ♪/♫ 的行加内联斜体，普通行不加（v0.9.41）'
   assert.ok(!out.includes('{\\i1}普通对白'), '普通行不应有斜体标记');
 });
 
+console.log('— 音乐帧：符号不进模型（v0.9.45）—');
+t('extractMusicFrames：无符号 → null', () => {
+  assert.strictEqual(C.extractMusicFrames('Hello world'), null);
+});
+t('extractMusicFrames：cue 内换行归一化，不再拒收（v0.9.45b）', () => {
+  // 歌词 cue 几乎都是多行；此前含 \n 整组跳回旧路径导致 ♪ 照发模型
+  const f = C.extractMusicFrames('♪ And I don\'t know\nif I\'m being foolish ♪');
+  assert.ok(f, '应返回帧而非 null');
+  assert.strictEqual(f.segs.length, 1);
+  assert.strictEqual(f.plainText, '[1] And I don\'t know if I\'m being foolish');
+});
+t('extractMusicFrames：多 cue 歌词组拼接后含 \n → 全组可拆帧（v0.9.45b 回归用例）', () => {
+  // 复现《一夜限定》开场合唱组：joinSrc 空格拼接、cue5 内部 \n 保留在组文本里
+  const src = '♪ Love is in the air ♪♪ Everywhere I look around ♪♪ And I don\'t know\nif I\'m being foolish ♪';
+  const f = C.extractMusicFrames(src);
+  assert.ok(f, '应返回帧而非 null');
+  assert.strictEqual(f.segs.length, 3);
+  assert.strictEqual(f.plainText, '[1] Love is in the air [2] Everywhere I look around [3] And I don\'t know if I\'m being foolish');
+  const out = C.reassembleMusic('[1]爱在空气中弥漫[2]我环顾四周[3]我不知道自己是否在犯傻', f);
+  assert.strictEqual(out, '♪ 爱在空气中弥漫 ♪♪ 我环顾四周 ♪♪ 我不知道自己是否在犯傻 ♪');
+  assert.strictEqual((out.match(/[♪♫♬♩]/g) || []).length, 6, '符号数与源文严格一致');
+});
+t('extractMusicFrames：单对 ♪ → 1 段 + plainText 带 [1]', () => {
+  const f = C.extractMusicFrames('♪ Love is in the air ♪');
+  assert.strictEqual(f.segs.length, 1);
+  assert.strictEqual(f.plainText, '[1] Love is in the air');
+  assert.strictEqual(f.items.filter(x => x.mark).length, 2);
+});
+t('extractMusicFrames：双对 ♪ → 2 段 + [1][2]', () => {
+  const f = C.extractMusicFrames('♪ Love is in the air ♪ ♪ Everywhere I look around ♪');
+  assert.strictEqual(f.segs.length, 2);
+  assert.strictEqual(f.plainText, '[1] Love is in the air [2] Everywhere I look around');
+  assert.strictEqual(f.items.filter(x => x.mark).length, 4);
+});
+t('extractMusicFrames：仅首符号（奇数）→ 1 段', () => {
+  const f = C.extractMusicFrames('♪ Love is in the air');
+  assert.strictEqual(f.segs.length, 1);
+  assert.strictEqual(f.items.filter(x => x.mark).length, 1);
+});
+t('extractMusicFrames：纯符号行 → 0 段（上层直接原文回填）', () => {
+  const f = C.extractMusicFrames('♪');
+  assert.strictEqual(f.segs.length, 0);
+  assert.strictEqual(f.plainText, '');
+});
+t('extractMusicFrames：♪♪ 相邻叠符号与 ♬ 变体', () => {
+  const f = C.extractMusicFrames('♪♪ We will rock you ♬');
+  assert.strictEqual(f.segs.length, 1);
+  assert.strictEqual(f.plainText, '[1] We will rock you');
+  assert.strictEqual(f.items.filter(x => x.mark).length, 3);
+});
+t('reassembleMusic：[N] 完整 → 符号按源文序列复原', () => {
+  const f = C.extractMusicFrames('♪ Love is in the air ♪ ♪ Everywhere I look around ♪');
+  const out = C.reassembleMusic('[1] 爱意在空中弥漫 [2] 放眼望去四处皆是', f);
+  assert.strictEqual(out, '♪ 爱意在空中弥漫 ♪ ♪ 放眼望去四处皆是 ♪');
+  // 符号数与源文一致（4 个）
+  assert.strictEqual((out.match(/[♪♫♬♩]/g) || []).length, 4);
+});
+t('reassembleMusic：单对 [1] → 首尾符号', () => {
+  const f = C.extractMusicFrames('♪ Love is in the air ♪');
+  const out = C.reassembleMusic('[1] 爱意在空中弥漫', f);
+  assert.strictEqual(out, '♪ 爱意在空中弥漫 ♪');
+});
+t('reassembleMusic：全角【１】与［２］变体容错', () => {
+  const f = C.extractMusicFrames('♪ A ♪ ♪ B ♪');
+  const out = C.reassembleMusic('【１】甲 【２】乙', f);
+  assert.strictEqual(out, '♪ 甲 ♪ ♪ 乙 ♪');
+});
+t('reassembleMusic：模型漏编号 → 权重兜底切分不丢内容', () => {
+  const f = C.extractMusicFrames('♪ Love is in the air ♪ ♪ Everywhere I look around ♪');
+  const out = C.reassembleMusic('爱意在空中弥漫 放眼望去四处皆是', f);
+  assert.ok(out != null, '兜底应成功');
+  assert.strictEqual((out.match(/[♪♫♬♩]/g) || []).length, 4, '符号数保持 4');
+  assert.ok(out.includes('爱意在空中弥漫') && out.includes('放眼望去四处皆是'), '内容不丢');
+  assert.ok(out.indexOf('爱意在空中弥漫') < out.indexOf('放眼望去四处皆是'), '顺序保持');
+});
+t('reassembleMusic：空输出 → null（回落旧路径）', () => {
+  const f = C.extractMusicFrames('♪ Love ♪');
+  assert.strictEqual(C.reassembleMusic('', f), null);
+  assert.strictEqual(C.reassembleMusic('[1]', f), null); // 只有编号没正文
+});
+t('stripSegMarkers：清洗残留 [N]（含全角变体），不动正文（v0.9.45b）', () => {
+  assert.strictEqual(C.stripSegMarkers('[1]爱在空气中弥漫[2]我环顾四周').replace(/\s+/g, ''), '爱在空气中弥漫我环顾四周');
+  assert.strictEqual(C.stripSegMarkers('【３】甲 ［４］乙').replace(/\s+/g, ''), '甲乙');
+  assert.strictEqual(C.stripSegMarkers('普通译文，无编号。'), '普通译文，无编号。');
+});
+t('hasSegMarkers：源文含 [N] 才为真（清洗守卫）', () => {
+  assert.strictEqual(C.hasSegMarkers('参见文献 [3] 的说法'), true);
+  assert.strictEqual(C.hasSegMarkers('♪ Love is in the air ♪'), false);
+  assert.strictEqual(C.hasSegMarkers('普通对白'), false);
+});
+t('normalizeMusic：speaker 多行结构逐行修复——第二行行首 ♪ 找回（v0.9.45b）', () => {
+  // 复现 ja 实测：模型把 "- ♪ Of somebody's lack of love ♪" 的行首 ♪ 弄丢
+  const src = "- Oh. After you.\n- ♪ Of somebody's lack of love ♪";
+  const dst = '- ああ。お先にどうぞ。\n- 誰かの愛の欠如の ♪';
+  const out = C.normalizeMusic(dst, src);
+  assert.strictEqual(out, '- ああ。お先にどうぞ。\n- ♪ 誰かの愛の欠如の ♪');
+});
+t('normalizeMusic：行数不齐（模型并行）回落整串逻辑', () => {
+  const src = "♪ A ♪\n♪ B ♪";
+  const out = C.normalizeMusic('甲と乙', src);
+  assert.ok(out.startsWith('♪') && out.endsWith('♪'), '整串首尾修复仍生效');
+});
+t('reassembleMusic：往返一致性——任意输入符号序列与源文严格一致', () => {
+  const srcs = [
+    '♪ Love is in the air ♪',
+    '♪ Love ♪ ♪ Everywhere ♪',
+    '♪ only leading',
+    'only trailing ♫',
+    '♪ mid ♪ word ♪ marks ♪',
+    '♬ We will rock you ♬'
+  ];
+  for (const src of srcs) {
+    const f = C.extractMusicFrames(src);
+    const marksOf = (s) => (String(s).match(/[♪♫♬♩]/g) || []).join('');
+    // 模拟模型完美输出
+    const perfect = f.segs.map((sg, i) => '[' + (i + 1) + '] 译' + (i + 1)).join(' ');
+    assert.strictEqual(marksOf(C.reassembleMusic(perfect, f)), marksOf(src), '符号序列不一致: ' + src);
+    // 模拟模型漏编号（兜底路径）
+    const nomark = f.segs.map((sg, i) => '译' + (i + 1) + ' 兜底内容' + (i + 1)).join(' ');
+    assert.strictEqual(marksOf(C.reassembleMusic(nomark, f)), marksOf(src), '兜底符号序列不一致: ' + src);
+  }
+});
+t('splitByWeights：两段按比例、优先边界', () => {
+  const p = C.splitByWeights('爱意在空中弥漫，放眼望去四处皆是', [15, 25]);
+  assert.strictEqual(p.length, 2);
+  assert.ok(p[0].includes('，') || p[0].endsWith('弥漫'), '应切在标点/边界附近: ' + p.join('|'));
+  assert.ok((p[0] + p[1]).replace(/[\s，]/g, '').length >= 12, '内容不丢');
+});
+t('splitByWeights：三段切分', () => {
+  const p = C.splitByWeights('甲甲甲乙乙乙丙丙丙', [3, 3, 3]);
+  assert.strictEqual(p.length, 3);
+  assert.strictEqual(p.join(''), '甲甲甲乙乙乙丙丙丙', '无损拼接还原');
+});
+t('splitByWeights：空串与单段', () => {
+  assert.deepStrictEqual(C.splitByWeights('', [1, 1]), ['', '']);
+  assert.deepStrictEqual(C.splitByWeights('整段', [1]), ['整段']);
+});
+t('音乐帧与 splitMusicLines 联动：双对复原结果可被逐 cue 对齐切分', () => {
+  const f = C.extractMusicFrames('♪ Love is in the air ♪ ♪ Everywhere I look around ♪');
+  const out = C.reassembleMusic('[1] 爱意在空中弥漫 [2] 放眼望去四处皆是', f);
+  const segs = C.splitMusicLines(out, 2);
+  assert.ok(segs, '应成功切 2 行');
+  assert.strictEqual(segs[0], '♪ 爱意在空中弥漫 ♪');
+  assert.strictEqual(segs[1], '♪ 放眼望去四处皆是 ♪');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
