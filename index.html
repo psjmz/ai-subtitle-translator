@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.42</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.43</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2017,7 +2017,7 @@ function systemPromptEn(cfg){
     + 'Rules you must follow:\n'
     + '1. [Translation style] ' + styleEn + '\n'
     + '2. [One-to-one correspondence] The output groups array must correspond one-to-one with the input groups (same gno). Never merge, split, or omit groups.\n'
-    + '3. [Transcription fixes] The source text may come from speech transcription and contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (using proper ' + srcFor + ' spelling), then translate. Proper names must also be spelling-corrected (e.g. Mennerbrigitte should first be corrected to Brigitte) before handling them per rule 4.'
+    + '3. [Transcription fixes] The source text may come from speech transcription and contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (using proper ' + srcFor + ' spelling), then translate. Proper names must also be spelling-corrected (e.g. Mennerbrigitte should first be corrected to Brigitte) before handling them per rule 4. This rule takes precedence over the glossary (rule 4.5): if a glossary entry itself carries a transcription error, correct the spelling first and apply that entry\'s rendering to the corrected form.'
     + (cfg.src === 'en' ? ' Examples: Mennerbrigitte→Brigitte, 1:00 37 Ventures→137 Ventures.\n' : '\n');
   if (cfg.keepTerms){
     const tt = cfg.terms ? cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') : '(none)';
@@ -2064,7 +2064,7 @@ function systemPrompt(cfg){
   + '必须遵守：\n'
   + '1.【翻译风格】' + styleDesc(cfg) + '\n'
   + '2.【逐组对应】输出的 groups 数组必须与输入句组一一对应（gno 相同），严禁合并、拆分或遗漏句组。\n'
-  + '3.【听写纠错】原文可能来自语音听写，含明显听写错误（人名、地名、机构、术语、数字、同音词等），识别后先纠正（按' + srcFor + '的正确写法）再翻译。专名同样先纠正拼写（如 Mennerbrigitte 应先纠正为 Brigitte），再按规则4处理（' + (cfg.keepTerms ? '保留原文' : '译成目标语言') + '）。'
+  + '3.【听写纠错】原文可能来自语音听写，含明显听写错误（人名、地名、机构、术语、数字、同音词等），识别后先纠正（按' + srcFor + '的正确写法）再翻译。专名同样先纠正拼写（如 Mennerbrigitte 应先纠正为 Brigitte），再按规则4处理（' + (cfg.keepTerms ? '保留原文' : '译成目标语言') + '）。本规则同样优先于规则4.5（术语表）：术语条目本身若含听写错误，先纠正拼写，再按该条目的统一译法处理纠正后的形式。'
   + (cfg.src === 'en' ? ' 示例：Mennerbrigitte→Brigitte、1:00 37 Ventures→137 Ventures。\n' : '\n');
   if (cfg.keepTerms){
     const t = cfg.terms ? cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join('、') : '（无）';
@@ -2305,6 +2305,7 @@ async function extractGlossary(base,key,model,cfg,srcText){
       + '① 专有名词：人物名、呼号/代号、地名、机构、品牌、作品名；\n'
       + '② 语境歧义词：军语、行话、俚语、多义词——正确译法依赖剧情语境，不看上下文容易译错。\n'
       + '严格排除：普通词汇、常见短语、数字、时间表达、通用军衔。只收「全片统一译法真正重要」的词。\n'
+      + '原文可能来自语音听写，同一专名在片中可能出现多种拼写变体（听写错误所致）：必须先归并为一个规范拼写再入表，t 用规范拼写，严禁把同一个人/事物拆成多条。\n'
       + (cfg.keepTerms
           ? '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、统一译法 r。r 的规则：①类专有名词（人物名/呼号/品牌/机构/作品名）的 r 必须与 t 完全一致——原文写法原样保留，严禁音译或转写（如 Bobbi Thompson 的 r 就是 Bobbi Thompson，严禁写成 博比·汤普森）；只有通用地名（国家/城市/地标）与②类歧义词的 r 用'+dstN.zh+'通行译法。最多 25 条；确实没有就返回 []。\n'
             + '只输出 JSON 数组：[{"t":"Bobbi Thompson","note":"受访者、房产经纪人","r":"Bobbi Thompson"}]\n\n字幕原文：\n'+srcText
@@ -2314,6 +2315,7 @@ async function extractGlossary(base,key,model,cfg,srcText){
       + '(1) proper nouns: character names, callsigns/code names, place names, organizations, brands, work titles;\n'
       + '(2) context-ambiguous terms: military jargon, technical slang, polysemous words whose correct rendering depends on the story context.\n'
       + 'Strictly EXCLUDE common vocabulary, generic phrases, numbers, time expressions, generic ranks. Only terms whose file-wide consistent rendering truly matters.\n'
+      + 'The source may come from speech transcription, so the same proper noun may appear under different misspelled variants: merge them into one canonical spelling first — use the canonical spelling as t, and never split one person/entity into multiple entries.\n'
       + (cfg.keepTerms
           ? 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r. Rules for r: for proper nouns (people / callsigns / brands / organizations / work titles), r MUST be exactly identical to t — keep the original spelling verbatim, never transliterate or transcribe it (e.g. the r for "Bobbi Thompson" is "Bobbi Thompson", not 博比·汤普森); only generic place names (countries / cities / landmarks) and category (2) ambiguous terms take the established '+dstN.zh+' rendering. Max 25 items; return [] if none.\n'
             + 'Output JSON array only: [{"t":"Bobbi Thompson","note":"interviewee, real-estate agent","r":"Bobbi Thompson"}]\n\nSource subtitles:\n'+srcText
