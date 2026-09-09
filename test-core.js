@@ -235,6 +235,28 @@ t('借字保底也不劈原子', () => {
   assert.ok(pieces.join('').includes('30%'));
   assert.ok(pieces.some(p => p.includes('30%')), '30% 应完整');
 });
+t('v0.9.49 纯标点段不独立成条（回归：How Elon Thinks 句末闭引号）', () => {
+  // 句组末条 cue 极短（0.42s）时，切点落在句号前会让闭引号 ” 单独成段（非空、逃过空段保底）
+  const zh = '他说：“没有人疯狂到愿意去尝试太空，所以那就是我必须去创办的公司，因为没人在做这件事，而我有能力做到。”';
+  const times = [
+    { start: 101337, end: 103745 }, { start: 103894, end: 105158 },
+    { start: 105246, end: 106432 }, { start: 106950, end: 107371 },
+  ];
+  const pieces = C.splitByDuration(zh, times, { locale: 'zh-CN' });
+  console.log('      → ' + pieces.join(' / '));
+  assert.strictEqual(pieces.length, 4, '段数与 cue 数一致');
+  assert.ok(pieces.every(p => C.effChars(p) > 0), '每段都应有实词: ' + JSON.stringify(pieces));
+  assert.ok(pieces[3].endsWith('”'), '闭引号应附着在末段尾部');
+  assert.strictEqual(pieces.join(''), zh, '译文零丢失');
+});
+t('v0.9.49 首段纯标点（开引号）不独立成条', () => {
+  const zh = '“太空是我们必须去的地方。”他随后补充道，SpaceX 由此诞生。';
+  const times = [{ start: 0, end: 500 }, { start: 600, end: 2000 }, { start: 2100, end: 4000 }];
+  const pieces = C.splitByDuration(zh, times, { locale: 'zh-CN' });
+  console.log('      → ' + pieces.join(' / '));
+  assert.ok(pieces.every(p => C.effChars(p) > 0), '每段都应有实词: ' + JSON.stringify(pieces));
+  assert.strictEqual(pieces.join(''), zh, '译文零丢失');
+});
 
 console.log('— 词边界保护（Intl.Segmenter 分词）—');
 // 通用校验：折行的每个切点都必须落在词边界上（不劈词）
