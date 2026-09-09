@@ -666,12 +666,20 @@ t('合并句组双语导出：按原 cue 边界切回，不再等宽重切造新
   // 第 2 条在逗号处自然断（不含跨段劈词"聊|到了"）
   assert.ok(parts[1].dstLines.join('').includes('聊到了一点'), '聊到了一点 应完整在同一条');
 });
-t('合并句组单语导出：按原 cue 边界切回', () => {
-  const mono = C.buildMonoParts(MG_ROWS, { maxW: 20, dstLocale: 'zh-CN' });
-  assert.strictEqual(mono.length, 3, '应输出原 cue 数 3 条');
-  assert.strictEqual(mono[1].start, 39988); assert.strictEqual(mono[1].end, 41478);
-  assert.ok(mono[1].text.includes('聊到了一点'), '聊到了一点 应完整在同一条');
-  const joined = mono.map((p) => p.text).join('').replace(/\s+/g, '');
+t('合并句组单语导出：装得下整句一条，装不下按原 cue 边界切回', () => {
+  // v0.9.48 用户决策：单语整句优先——译文折 maxLines 行装得下时保持整句一条常驻全组时间窗
+  const wide = C.buildMonoParts(MG_ROWS, { maxW: 20, dstLocale: 'zh-CN' });
+  assert.strictEqual(wide.length, 1, 'maxW=20 装得下应整句 1 条');
+  assert.strictEqual(wide[0].start, 38793); assert.strictEqual(wide[0].end, 43987);
+  assert.ok(wide[0].text.includes('聊到了一点'), '整句完整');
+  const joinedW = wide.map((p) => p.text).join('').replace(/\s+/g, '');
+  assert.strictEqual(joinedW, MG_ROWS[0].zh, '译文零丢失');
+  // 装不下（maxW=15 折 2 行超容）→ 按原 cue 边界切回 3 条，不再等宽重切造新边界
+  const narrow = C.buildMonoParts(MG_ROWS, { maxW: 15, dstLocale: 'zh-CN' });
+  assert.strictEqual(narrow.length, 3, '应输出原 cue 数 3 条');
+  assert.strictEqual(narrow[1].start, 39988); assert.strictEqual(narrow[1].end, 41478);
+  assert.ok(narrow[1].text.includes('聊到了一点'), '聊到了一点 应完整在同一条');
+  const joined = narrow.map((p) => p.text).join('').replace(/\s+/g, '');
   assert.strictEqual(joined, MG_ROWS[0].zh, '译文拼接零丢失');
 });
 t('合并句组窄宽度（maxW=14）：首边界仍为原 cue 边界，段内细切零丢失', () => {

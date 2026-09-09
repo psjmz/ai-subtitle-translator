@@ -1429,9 +1429,13 @@
       }
       const dst = e.dst;
       const w = textWidth(stripSoundTags(dst));
-      // v0.9.48：合并句组（entry.times > 1）——译文先按各原 cue 时长比例切回（原边界即子时间轴），
-      // 段内超容量才段内细切。旧路径整组等宽重切会造出全新边界，源文语音节奏全丢（与双语路径同源 bug）。
+      // v0.9.48：合并句组（entry.times > 1）整句优先——装得下（单行/折 maxLines 行）就整句一条常驻全组时间窗，
+      // 保持阅读连贯（用户决策：单语装得下不切碎）；超容量才按各原 cue 时长比例切回（原边界即子时间轴），
+      // 段内超容量再段内细切。旧路径整组等宽重切会造出全新边界，源文语音节奏全丢（与双语路径同源 bug）。
       if (e.times && e.times.length > 1) {
+        if (w <= maxW + 4) { emit(e.start, e.end, dst); continue; }                  // 整句单行
+        const lW = wrapToWidth(dst, maxW, { normalize: true, locale: locale });
+        if (lW.length <= maxLines) { emit(e.start, e.end, lW.join('\n')); continue; } // 整句折行
         const segs0 = splitByDuration(dst, e.times, { locale: locale });
         for (let i = 0; i < e.times.length; i++) {
           const t = e.times[i];
