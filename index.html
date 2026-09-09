@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.41</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.42</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -1967,7 +1967,11 @@ function applyPost(){
   S.rows.forEach(r=>{
     if (r.flag==='drop' || r.flag==='merged' || !r.zh) return;
     const t = C.stripSoundTags(r.zh);
-    const lines = C.wrapToWidth(t, S.maxW, {normalize:true, locale:S.locale || 'zh-CN'});
+    // v0.9.42：speaker 行保持 dash 行结构、按行独立折行——normalize 的 squashLines 会把
+    // 「\n- 」压成行内 dash（#17 曾靠折行巧合复原，属未定义行为）；非 speaker 行维持原 normalize 路径
+    const lines = C.isSpeakerText(t)
+      ? C.foldSpeakerLines(t, S.maxW, S.locale || 'zh-CN')
+      : C.wrapToWidth(t, S.maxW, {normalize:true, locale:S.locale || 'zh-CN'});
     if (lines.join('\n') !== t) wrapN++;
     r.zh = lines.join('\n');
   });
@@ -2019,6 +2023,7 @@ function systemPromptEn(cfg){
     const tt = cfg.terms ? cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') : '(none)';
     s += '4. [Keep proper nouns] Personal names, organizations, products, brands, and technical terms must keep their original spelling — never render them in ' + dstNative
        + ': even widely known ' + dstNative + ' renderings must not be used (e.g. Elon Musk stays Elon Musk, SpaceX stays SpaceX, Taylor Swift stays Taylor Swift).'
+       + ' Even if the target language normally transliterates names (katakana, hangul, Cyrillic transliteration, Devanagari, etc.), Latin-script names and brands must keep their exact Latin spelling, letter for letter (Bobbi Thompson stays Bobbi Thompson — never 博比·汤普森 / 보비 톰슨 / Бобби Томпсон).'
        + ' Generic place names (e.g. the White House) should be translated following ' + dstNative + ' conventions. User-specified terms that must stay in the original: ' + tt + '.\n';
   } else {
     s += '4. [Translate proper nouns] Personal names, organizations, products, brands, and technical terms must be translated into their established ' + dstNative
@@ -2065,6 +2070,7 @@ function systemPrompt(cfg){
     const t = cfg.terms ? cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join('、') : '（无）';
     s += '4.【专名保留】人名、机构、产品、品牌、技术术语一律保留原文写法、严禁译成' + dstNative
        + '：即使有广为人知的' + dstNative + '译名也保持原文，如 Elon Musk 保持 Elon Musk（严禁写成 埃隆·马斯克）、SpaceX 保持 SpaceX、Taylor Swift 保持 Taylor Swift（严禁写成 泰勒·斯威夫特）。'
+       + '即使目标语言习惯音译人名（片假名、谚文、西里尔字母转写、天城文等），拉丁字母的人名/品牌也必须保持拉丁字母原文写法、一个字母都不改（Bobbi Thompson 保持 Bobbi Thompson，严禁写成 博比·汤普森/보비 톰슨）。'
        + '国家城市等通用地名（如 the White House→白宫）按' + dstNative + '习惯译出。用户指定必须保留原文的术语：' + t + '。\n';
   } else {
     s += '4.【专名翻译】人名、机构、产品、品牌、技术术语一律译成' + dstNative
@@ -2193,9 +2199,30 @@ function applyTailCollapse(active){
 
 // 句组回填：优先合并为单条（时长/行数达标），否则按时长切分回填；返回回填方式（v0.9.21 抽出复用）
 // v0.9.23：切分后加 B1 孤儿尾巴收并（末条 cue <700ms 且译文只剩 ≤2 字/1 词尾巴 → 并回前条）
+// v0.9.42：音乐组歌词行对齐（backfillGroup 与 fitsCapacity 共用同一判定，保证容量预判与实际回填一致）。
+// 组内全部 cue 都是「含音乐符号且有实词」的歌词行时，按译文 ♪ 边界切 n 行逐 cue 回填；
+// 每行折行须 ≤2（容量守卫）。任一条件不满足返回 null → 回落既有合并/时长切分路径（零行为变化）。
+function musicAlignedSegs(active, text, cfg){
+  if(!(active.length>1)) return null;
+  if(!active.every(c=>C.RE_MUSIC.test(String(c.text)) && C.effChars(String(c.text))>0)) return null;
+  const segs=C.splitMusicLines(text, active.length);
+  if(!segs) return null;
+  return segs.every(p=>C.wrapToWidth(C.stripSoundTags(p),cfg.maxW,{normalize:true,locale:cfg.dst}).length<=2) ? segs : null;
+}
 function backfillGroup(active, text, cfg){
   // v0.9.38：speaker 换行修复（与主回填循环同款，覆盖压缩重译路径）
   if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
+  // v0.9.42：音乐组优先按歌词行对齐——歌词跟随各自 cue 时间轴，杜绝「♪ 孤行」/行中夹 ♪/词中硬切
+  if(active.length>1){
+    const mSegs=musicAlignedSegs(active, text, cfg);
+    if(mSegs){
+      active.forEach((c,i)=>{
+        const r=S.rows.find(x=>x.no===c.no);
+        if(r){ r.zh=mSegs[i]; if(r.flag!=='drop') r.flag=''; }
+      });
+      return 'music';
+    }
+  }
   if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); return 'merged'; }
   const times=active.map(c=>({start:c.start, end:c.end}));
   const col=C.collapseThinTail(C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst}), active, {maxW:cfg.maxW, locale:cfg.dst});
@@ -2210,6 +2237,8 @@ function backfillGroup(active, text, cfg){
 
 // 容量校验：译文按该句组时间轴切分回填后，每条 cue 折行均 ≤2 行（物理放得下）
 function fitsCapacity(text, active, cfg){
+  // v0.9.42：音乐组按对齐段判定（musicAlignedSegs 已含 ≤2 行守卫，与 backfillGroup 同一口径）
+  if(active.length>1 && musicAlignedSegs(active, text, cfg)) return true;
   if(active.length>1 && C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})) return true;
   const times=active.map(c=>({start:c.start, end:c.end}));
   const pieces=C.splitCues(text, times, {maxW:cfg.maxW, locale:cfg.dst});
@@ -2267,19 +2296,29 @@ async function extractGlossary(base,key,model,cfg,srcText){
   const sys = zhDst
     ? '你是字幕翻译的术语审定员，负责在翻译开始前锁定全片统一译法。只输出 JSON，不要解释。'
     : 'You are a terminology curator for subtitle translation, locking file-wide renderings before translation starts. Output JSON only, no explanation.';
+  // v0.9.42：提取提示词尊重 keepTerms——此前术语表一律给目标语言译法，而规则 4.5 又优先于
+  // 规则 4，导致勾选「专名保留原文」时 CJK 等非拉丁目标仍被音译（两个默认勾选的功能互相打架）。
+  // 现在：keepTerms 开 → ①类专名 r 必须与 t 完全一致（原文原样，不音译不转写），
+  // 仅通用地名与②类歧义词给目标语言译法，术语表与规则 4 方向一致。
   const usr = zhDst
     ? '从下面的字幕原文中提取术语表。只收两类：\n'
       + '① 专有名词：人物名、呼号/代号、地名、机构、品牌、作品名；\n'
       + '② 语境歧义词：军语、行话、俚语、多义词——正确译法依赖剧情语境，不看上下文容易译错。\n'
       + '严格排除：普通词汇、常见短语、数字、时间表达、通用军衔。只收「全片统一译法真正重要」的词。\n'
-      + '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、'+dstN.zh+'统一译法 r。最多 25 条；确实没有就返回 []。\n'
-      + '只输出 JSON 数组：[{"t":"Outlaw 1","note":"友军战机呼号","r":"亡命徒1"}]\n\n字幕原文：\n'+srcText
+      + (cfg.keepTerms
+          ? '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、统一译法 r。r 的规则：①类专有名词（人物名/呼号/品牌/机构/作品名）的 r 必须与 t 完全一致——原文写法原样保留，严禁音译或转写（如 Bobbi Thompson 的 r 就是 Bobbi Thompson，严禁写成 博比·汤普森）；只有通用地名（国家/城市/地标）与②类歧义词的 r 用'+dstN.zh+'通行译法。最多 25 条；确实没有就返回 []。\n'
+            + '只输出 JSON 数组：[{"t":"Bobbi Thompson","note":"受访者、房产经纪人","r":"Bobbi Thompson"}]\n\n字幕原文：\n'+srcText
+          : '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、'+dstN.zh+'统一译法 r。最多 25 条；确实没有就返回 []。\n'
+            + '只输出 JSON 数组：[{"t":"Outlaw 1","note":"友军战机呼号","r":"亡命徒1"}]\n\n字幕原文：\n'+srcText)
     : 'Extract a glossary from the subtitle source text below. Include ONLY two kinds:\n'
       + '(1) proper nouns: character names, callsigns/code names, place names, organizations, brands, work titles;\n'
       + '(2) context-ambiguous terms: military jargon, technical slang, polysemous words whose correct rendering depends on the story context.\n'
       + 'Strictly EXCLUDE common vocabulary, generic phrases, numbers, time expressions, generic ranks. Only terms whose file-wide consistent rendering truly matters.\n'
-      + 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r in '+dstN.zh+'. Max 25 items; return [] if none.\n'
-      + 'Output JSON array only: [{"t":"Outlaw 1","note":"friendly fighter callsign","r":"アウトロー1"}]\n\nSource subtitles:\n'+srcText;
+      + (cfg.keepTerms
+          ? 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r. Rules for r: for proper nouns (people / callsigns / brands / organizations / work titles), r MUST be exactly identical to t — keep the original spelling verbatim, never transliterate or transcribe it (e.g. the r for "Bobbi Thompson" is "Bobbi Thompson", not 博比·汤普森); only generic place names (countries / cities / landmarks) and category (2) ambiguous terms take the established '+dstN.zh+' rendering. Max 25 items; return [] if none.\n'
+            + 'Output JSON array only: [{"t":"Bobbi Thompson","note":"interviewee, real-estate agent","r":"Bobbi Thompson"}]\n\nSource subtitles:\n'+srcText
+          : 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r in '+dstN.zh+'. Max 25 items; return [] if none.\n'
+            + 'Output JSON array only: [{"t":"Outlaw 1","note":"friendly fighter callsign","r":"アウトロー1"}]\n\nSource subtitles:\n'+srcText);
   // v0.9.29：术语表单独放宽到 240s（一次性成本；DeepSeek 拥塞时 8.6K 实测 161.5s，90s 必然误杀）
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
@@ -2533,6 +2572,15 @@ async function runTranslate(){
       }
       if(active.length>1){
         gMulti++;
+        // v0.9.42：音乐组优先按歌词行对齐（♪ 边界逐 cue 回填，杜绝♪孤行/行中♪/词中硬切）
+        const mSegs = musicAlignedSegs(active, text, cfg);
+        if(mSegs){
+          active.forEach((c,i)=>{
+            const r=S.rows.find(x=>x.no===c.no);
+            if(r){ r.zh=mSegs[i]; if(r.flag!=='drop') r.flag=''; }
+          });
+          continue;
+        }
         // 短句组（总时长 <=7s 且译文 <=2 行）直接合并为一条，译文天然完整、永不切散
         if(C.mergeableGroup(active, text, {maxW:cfg.maxW, locale:cfg.dst})){ mergeGroupRows(active, text); mG++; continue; }
       }
@@ -2851,7 +2899,7 @@ function runReport(){
     items=buildExportItems();
     issues=C.validateItems(items); count=items.length;
   }
-  // v0.9.41 CPS 检测：只读 QC（时间轴来自源文件，超标多为源节奏快），结构问题排前面不被冲掉
+  // v0.9.42 CPS 检测：只读 QC（时间轴来自源文件，超标多为源节奏快），结构问题排前面不被冲掉
   const rs=C.readingSpeedIssues(items, $('dstLang').value);
   const cpsN=rs.filter(i=>i.type==='cps').length, durN=rs.length-cpsN;
   issues=issues.concat(rs);
@@ -2942,7 +2990,7 @@ else if(sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.exp
   dst.value = (sv.dstManual && okDst(sv.dstLang)) ? sv.dstLang : (okDst(uiDefault) ? uiDefault : 'zh-CN');
 })();
 
-/* v0.9.41 语言感知行宽推荐：切换目标语言时，若用户没手动改过行宽，联动到该语言推荐值
+/* v0.9.42 语言感知行宽推荐：切换目标语言时，若用户没手动改过行宽，联动到该语言推荐值
    （Netflix TTSG：中文 16 / 日文 13 / 韩文 16 全角字每行；拉丁语系保持 20 ≈ 40 半角字符）。
    用户手动改过（input 事件）或 localStorage 里存过自定义值 → 永远尊重用户，不再联动。 */
 (function(){

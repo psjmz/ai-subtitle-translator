@@ -1167,6 +1167,92 @@ t('mirrorSpeakerLines：半角句点防护——「3.5-8」范围连字符不切
   assert.strictEqual(C.mirrorSpeakerLines('- U.S.-style 设计。- 乙。', src), '- U.S.-style 设计。- 乙。');
 });
 
+/* ---------------- v0.9.42：speaker 拉丁字母边界放宽 + 音乐组歌词行对齐 ---------------- */
+t('mirrorSpeakerLines：cue10 案例——拉丁字母后紧跟「- 」也切回两行（v0.9.42 宽松阶段）', () => {
+  const src = '- Allie M. Allie M.\n- Yeah, we got one right here.';
+  // 字母 M 后紧跟 - 加空白：严格白名单切不开，宽松阶段放行
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- 艾莉·M- 对，我们这儿正好有一单。', src),
+    '- 艾莉·M\n- 对，我们这儿正好有一单。');
+  // 大小写都放行
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- bob- Ouais, on en a un.', '- Bob\n- Yeah.'),
+    '- bob\n- Ouais, on en a un.');
+});
+t('mirrorSpeakerLines：宽松阶段防护——数字前缀/无空格后缀/破折号不放宽', () => {
+  const src = '- A.\n- B.';
+  // dash 前是数字 → 不放宽，段数对不上 → 整体不动
+  assert.strictEqual(C.mirrorSpeakerLines('- 20-30 之间。- 乙。- 丙。', src), '- 20-30 之间。- 乙。- 丙。');
+  // dash 后无空白（U.S.-style）→ 不放宽；此处唯一 dash 切不开 → 段数 1≠2 → 原样返回
+  assert.strictEqual(C.mirrorSpeakerLines('- U.S.-style 设计。- 乙。', src), '- U.S.-style 设计。- 乙。');
+  // 破折号 — 不在放宽范围（防行文 "wait— what" 假阳性）：无其他边界 → 不动
+  assert.strictEqual(C.mirrorSpeakerLines('- wait— what happens.', src), '- wait— what happens.');
+  // 有真实句读边界时：切分走「。- 」真实边界，行内破折号不误切
+  assert.strictEqual(C.mirrorSpeakerLines('- wait— what happens.- 乙。', src), '- wait— what happens.\n- 乙。');
+});
+t('repairSpeakerLines：拉丁字母边界同样放宽（回填侧与导出侧一致）', () => {
+  const src = '- Allie M. Allie M.\n- Yeah, we got one right here.';
+  assert.strictEqual(
+    C.repairSpeakerLines('艾莉·M- 对，我们这儿正好有一单。', src),
+    '- 艾莉·M\n- 对，我们这儿正好有一单。');
+  // 数字前缀不放宽，且区间词在真实边界切分时保持完整
+  assert.strictEqual(C.repairSpeakerLines('20-30 之间而已', src), '20-30 之间而已');
+  assert.strictEqual(C.repairSpeakerLines('20-30 之间。- 乙。', src), '- 20-30 之间。\n- 乙。');
+});
+t('repair/mirror：模型手动折行的 \\n 不再短路修复（v0.9.42 守卫修正，cue 10 实测形态）', () => {
+  const src = '- Allie M. Allie M.\n- Yeah, we got one right here.';
+  // dash 边界压扁 + 折行 \n 混在第二说话人句中（此前「有 \n 就跳过」漏修）
+  assert.strictEqual(
+    C.mirrorSpeakerLines('- Allie M. Allie M.- 有，\n我們這裡有一份。', src),
+    '- Allie M. Allie M.\n- 有，我們這裡有一份。');
+  assert.strictEqual(
+    C.repairSpeakerLines('- 祝你好運，好嗎？- 你也是，\n兄弟。', '- Good luck, all right?\n- You, too, man.'),
+    '- 祝你好運，好嗎？\n- 你也是，兄弟。');
+  // 已是正确 dash 结构 → 不动
+  assert.strictEqual(C.mirrorSpeakerLines('- 甲\n- 乙', src), '- 甲\n- 乙');
+  assert.strictEqual(C.repairSpeakerLines('- 甲\n- 乙', src), '- 甲\n- 乙');
+  // 折行压平后仍切不出段数吻合的边界 → 按原样返回（含原始 \n，宁错放不错改）
+  assert.strictEqual(C.mirrorSpeakerLines('- 甲乙丙\n丁戊己', src), '- 甲乙丙\n丁戊己');
+});
+t('foldSpeakerLines：speaker 行按行独立折行（applyPost 结构保持用，v0.9.42 导出）', () => {
+  // ≤ maxW+4 的行直放，行结构不跨行重分配
+  assert.deepStrictEqual(C.foldSpeakerLines('- 甲\n- 乙', 4, 'zh-CN'), ['- 甲', '- 乙']);
+  assert.deepStrictEqual(C.foldSpeakerLines('- 一二三四五六\n- 乙', 4, 'zh-CN'), ['- 一二三四五六', '- 乙']);
+  // 超过 maxW+4 才在该行内部折行（wrapToWidth normalize 同款结果）
+  assert.deepStrictEqual(
+    C.foldSpeakerLines('- 一二三四五六七八九\n- 乙', 4, 'zh-CN'),
+    C.wrapToWidth('- 一二三四五六七八九', 4, { normalize: true, locale: 'zh-CN' }).concat(['- 乙']));
+});
+t('splitMusicLines：形态 A——配对符号逐行切分（v0.9.42）', () => {
+  assert.deepStrictEqual(
+    C.splitMusicLines('♪ 爱在空中飘荡 ♪ ♪ 我能感觉到 ♪', 2),
+    ['♪ 爱在空中飘荡 ♪', '♪ 我能感觉到 ♪']);
+  assert.deepStrictEqual(
+    C.splitMusicLines('♫ Love ♫ ♪ 爱 ♪', 2),
+    ['♫ Love ♫', '♪ 爱 ♪']);
+});
+t('splitMusicLines：形态 B——normalizeMusic 折叠后的 n+1 符号形态', () => {
+  // 「♪ ♪」被折叠后只剩首尾+行间符号
+  assert.deepStrictEqual(
+    C.splitMusicLines('♪ 爱在空中飘荡 ♪ 我能感觉到 ♪', 2),
+    ['♪ 爱在空中飘荡 ♪', '♪ 我能感觉到 ♪']);
+  assert.deepStrictEqual(
+    C.splitMusicLines('♪ A ♪ B ♪ C ♪', 3),
+    ['♪ A ♪', '♪ B ♪', '♪ C ♪']);
+  // 管线级：normalizeMusic 先折叠，splitMusicLines 仍能切回两行
+  const collapsed = C.normalizeMusic('♪ 爱在空中 ♪ ♪ 我能感觉到 ♪', '♪ 爱在空中 ♪ ♪ 我能感觉到 ♪');
+  assert.deepStrictEqual(
+    C.splitMusicLines(collapsed, 2),
+    ['♪ 爱在空中 ♪', '♪ 我能感觉到 ♪']);
+});
+t('splitMusicLines：守卫——段数不符/空段/混对白/单行 → null 回落', () => {
+  assert.strictEqual(C.splitMusicLines('♪ A ♪', 2), null);            // 1 对 ≠ 2
+  assert.strictEqual(C.splitMusicLines('♪ A ♪ ♪ ♪', 2), null);       // 第二行空段
+  assert.strictEqual(C.splitMusicLines('他说 ♪ A ♪ ♪ B ♪', 2), null); // 配对外夹对白
+  assert.strictEqual(C.splitMusicLines('♪ A ♪', 1), null);            // n<2 不适用
+  assert.strictEqual(C.splitMusicLines('♪ A ♪ B ♪ C ♪', 2), null);    // 4 符号既非 2 对也非 3
+});
+
 /* ---------------- v0.9.41：阅读速度（CPS）检测 + ASS 歌词斜体 ---------------- */
 t('cpsOf：等效宽度/秒（全角=1、半角=0.5；空/零时长返回 0）', () => {
   assert.strictEqual(C.cpsOf('一二三四', 2000), 2);   // 4 宽 / 2s

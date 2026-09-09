@@ -30,7 +30,7 @@
   .msg.ok{display:block;background:#eaf5ee;color:var(--ok)}
   .msg.err{display:block;background:#fdecea;color:var(--err)}
   .usage{font-size:13px;color:var(--mut);background:#f4f6f9;border-radius:8px;padding:10px 12px;margin-top:14px}
-  /* v0.9.41：使用记录分页条 */
+  /* v0.9.42：使用记录分页条 */
   .pager{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:14px}
   .pager button{padding:4px 12px;font-size:13px;border-radius:6px}
   .pager button.cur{background:var(--pri);border-color:var(--pri);color:#fff;cursor:default}
@@ -227,7 +227,7 @@ async function enterAdmin(){
   loadEvents();
 }
 
-/* 使用行为记录（v0.9.41 分页：20 条/页，最新在第 1 页） */
+/* 使用行为记录（v0.9.42 分页：20 条/页，最新在第 1 页） */
 let evPage = 1;
 function evTime(ts){
   const d = new Date(ts);

@@ -590,15 +590,33 @@
   // v0.9.38：模型偶发丢掉 speaker 换行（把 "\n- " 压成行内 "- "，规则 6 例外失守），
   // 折行会把第二个说话人的 dash 折进行尾。修复窄门：源是 K 行 dash 对话、译文无换行、
   // 按行内 dash 切出的段数恰好 = K → 机械补回换行；段数对不上原样返回（宁错放不错改）。
+  // v0.9.42：切分改两阶段。严格阶段 = 原句读/空白白名单；宽松阶段补拉丁字母边界
+  // （cue 10 型「艾莉·M- 对」，三语言复现）：字母/间隔号 · 后紧跟半角连字符 -、
+  // 且 dash 后跟空白才放行——数字区间 "20-30"（前是数字）、"U.S.-style"（后无空白）、
+  // 行文破折号 "wait— what"（— 不在放宽范围）均不受影响；仍受段数守卫约束。
+  function splitFlatSpeakerParts(s, expected, strictRe) {
+    let parts = s.split(strictRe).filter((x) => x.trim());
+    if (parts.length === expected) return parts;
+    // 宽松阶段 lookbehind 含 ^：消费行首 dash（与严格阶段一致），避免「- - 甲」双前缀
+    parts = s.split(/(?<=[A-Za-z·]|^)-(?=\s+)/).filter((x) => x.trim());
+    if (parts.length === expected) return parts;
+    return null;
+  }
   function repairSpeakerLines(dst, src) {
-    const s = String(dst == null ? '' : dst).replace(/\r/g, '').trim();
-    if (!s || s.includes('\n')) return s;
+    const raw = String(dst == null ? '' : dst).replace(/\r/g, '').trim();
+    if (!raw) return raw;
     const srcLines = String(src == null ? '' : src).replace(/\r/g, '').split('\n')
       .map((x) => x.trim()).filter(Boolean);
-    if (srcLines.length < 2 || !srcLines.every((l) => SP_DASH_RE.test(l))) return s;
+    if (srcLines.length < 2 || !srcLines.every((l) => SP_DASH_RE.test(l))) return raw;
+    // v0.9.42：模型手动折行（违反规则 6 的 \n）不再短路修复——此前「有 \n 就跳过」让折行混过
+    // （实测 zh-TW 13 条 speaker 有 11 条带折行 \n 全部漏修）。已是正确 dash 结构的才跳过；
+    // 否则压平 \n 后走两阶段切分；切不出段数吻合的边界按原样返回（宁错放不错改）。
+    if (isSpeakerText(raw)) return raw;
+    // 折行 \n 压平（squashLines 语言感知拼缝：字母数字间补空格、CJK 标点后不补）
+    const s = squashLines(raw);
     // 行内 dash 分隔：dash 前是句读/空白/行首（lookbehind 保留句读，防误伤 "20-30" 等无空格连字符）
-    const parts = s.split(/(?<=[\s。．，,！？!?…；;）)】」』"”]|^)\s*[-–—]\s+/).filter((x) => x.trim());
-    if (parts.length !== srcLines.length) return s;
+    const parts = splitFlatSpeakerParts(s, srcLines.length, /(?<=[\s。．，,！？!?…；;）)】」』"”]|^)\s*[-–—]\s+/);
+    if (!parts) return raw;
     const dash = (srcLines[0].match(/^[-–—]/) || ['-'])[0];
     return parts.map((p) => dash + ' ' + p.trim()).join('\n');
   }
@@ -607,18 +625,21 @@
   // 按行内 dash 边界切回 K 段，镜像源的多行结构。与回填侧 repairSpeakerLines 的差别：
   //   ①dash 后允许无空格（模型偶发输出「-♪」，回填侧 \s+ 匹配不上而放行）；
   //   ②只改导出副本——不动 S.rows 数据、不影响双语/ASS 路径。
-  // 段数不匹配则原样返回（宁错放不错改）。
+  // 段数不匹配则原样返回（宁错放不错改）。v0.9.42 起与回填侧共用两阶段切分（拉丁字母边界放宽）
+  // 与同款守卫修正：模型手动折行的 \n 不再短路镜像（cue 10「…- 有，\n我們…」实测曾漏修）。
   function mirrorSpeakerLines(dst, src) {
-    const s = String(dst == null ? '' : dst).replace(/\r/g, '').trim();
-    if (!s || s.includes('\n')) return s;
+    const raw = String(dst == null ? '' : dst).replace(/\r/g, '').trim();
+    if (!raw) return raw;
     const srcLines = String(src == null ? '' : src).replace(/\r/g, '').split('\n')
       .map((x) => x.trim()).filter(Boolean);
-    if (srcLines.length < 2 || !srcLines.every((l) => SP_DASH_RE.test(l))) return s;
+    if (srcLines.length < 2 || !srcLines.every((l) => SP_DASH_RE.test(l))) return raw;
+    if (isSpeakerText(raw)) return raw;   // 已是正确 dash 结构 → 不动
+    const s = squashLines(raw);           // 折行 \n 压平后重试（语言感知拼缝）
     // dash 前须句读/空白/行首（lookbehind 防误伤 "20-30" 等无空格连字符），dash 后容忍零空格；
     // ♪♫ 放行（「♪- 哦」音乐行+对白边界，cue 15 案例）；
     // 半角句点 . 与印地 danda ।॥、阿语 ，؟؛ 放行——对白边界的 21 语言覆盖（cue 10 型，18 语言曾因缺 . 切不开）
-    const parts = s.split(/(?<=[\s.。．，,！？!?…；;）)】」』"”♪♫।॥،؟؛]|^)\s*[-–—]\s*/).filter((x) => x.trim());
-    if (parts.length !== srcLines.length) return s;
+    const parts = splitFlatSpeakerParts(s, srcLines.length, /(?<=[\s.。．，,！？!?…；;）)】」』"”♪♫।॥،؟؛]|^)\s*[-–—]\s*/);
+    if (!parts) return raw;
     const dash = (srcLines[0].match(/^[-–—]/) || ['-'])[0];
     return parts.map((p) => dash + ' ' + p.trim()).join('\n');
   }
@@ -882,6 +903,39 @@
     if (head && !RE_MUSIC.test(s[0])) s = head + ' ' + s;
     if (tail && !RE_MUSIC.test(s[s.length - 1])) s = s + ' ' + tail;
     return s;
+  }
+
+  // v0.9.42：音乐组歌词行对齐切分。音乐句组（多条歌词 cue 合并翻译）按时长比例回填会把
+  // ♪ 边界切开——实测 zh-TW 出现只剩「♪」的孤行（歌词被挪到下一条）、18/21 语言行中夹 ♪、
+  // fr 歌词被切在词中间。译文里的 ♪…♪ 天然是歌词行边界，本函数把整组译文切回 n 条歌词行：
+  //   形态 A（配对）：模型按行输出「♪ A' ♪ ♪ B' ♪」——2n 个符号配 n 对，配对之外须无实词残余；
+  //   形态 B（折叠）：normalizeMusic 把相邻「♪ ♪」折叠后只剩 n+1 个符号（首尾各一），
+  //                  相邻符号间的文本即该行歌词，行首尾符号复用边界符号；
+  //   其余情形（段数不符 / 空段 / 混入对白）→ 返回 null，调用方回落时长切分（宁回落不冒险）。
+  function splitMusicLines(text, n) {
+    const s = String(text == null ? '' : text).replace(/\r/g, '').replace(/\n/g, ' ').trim();
+    if (!s || !(n >= 2)) return null;
+    const PAIR = /[♪♫♬♩][^♪♫♬♩]*[♪♫♬♩]/g;
+    // 形态 A：n 个完整配对段，且剥离配对后无实词残余（防歌词外夹对白被丢）
+    const pairs = s.match(PAIR) || [];
+    if (pairs.length === n) {
+      const rest = s.replace(PAIR, '');
+      if (!effChars(rest) && pairs.every((x) => effChars(x) > 0)) return pairs.map((x) => x.trim());
+    }
+    // 形态 B：恰好 n+1 个符号、首尾皆为符号 → 折叠形态
+    const arr = Array.from(s);
+    const idx = [];
+    for (let i = 0; i < arr.length; i++) if (RE_MUSIC.test(arr[i])) idx.push(i);
+    if (idx.length === n + 1 && idx[0] === 0 && idx[idx.length - 1] === arr.length - 1) {
+      const out = [];
+      for (let k = 0; k < n; k++) {
+        const mid = arr.slice(idx[k] + 1, idx[k + 1]).join('').trim();
+        if (!effChars(mid)) return null;
+        out.push(arr[idx[k]] + ' ' + mid + ' ' + arr[idx[k + 1]]);
+      }
+      return out;
+    }
+    return null;
   }
 
   // 语言感知拼接（v0.9.23 孤儿收并用）：汉字/假名与泰、老、高棉、缅文等无空格文字直接拼接；
@@ -1298,10 +1352,10 @@
     isFillerCue, stripSoundTags,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
-    buildMonoParts, collapseThinTail, joinSeg, effChars,
+    buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
     validateItems, anchorOk, fixMixedChars,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
-    musicLost, normalizeMusic, repairSpeakerLines, mirrorSpeakerLines,
+    musicLost, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
     MAX_W_DEFAULT: 20
   };
 });
