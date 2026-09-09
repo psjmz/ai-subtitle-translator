@@ -987,8 +987,15 @@
 
   // v0.9.45b：清洗译文中残留的分段编号 [N]（含全角变体）——模型偶发把规则 5.5 的编号
   // 带进「无编号输入」的输出（实测：单 cue 歌词组凭空出现 [7]/[9]），旧路径切分会把标记切成两半
+  // v0.9.46：空白归一化保留换行——此前调用方用 \s+ 压平会把多行 speaker 结构压成单行，
+  // normalizeMusic 的逐行修复（要求行数对齐）失效 → 第二行行首 ♪ 丢失（实测 fr 等 14 语言）
   function stripSegMarkers(s) {
-    return String(s == null ? '' : s).replace(/[［【[]\s*[0-9０-９]+\s*[\]】］]/g, ' ');
+    return String(s == null ? '' : s)
+      .replace(/[［【[]\s*[0-9０-９]+\s*[\]】］]/g, ' ')
+      .replace(/[^\S\n]+/g, ' ')
+      .replace(/ *\n */g, '\n')
+      .replace(/\n{2,}/g, '\n')
+      .trim();
   }
 
   // 源文是否含 [N] 分段编号（决定 stripSegMarkers 是否安全：源文本就有编号时不能清）

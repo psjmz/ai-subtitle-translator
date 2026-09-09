@@ -1385,6 +1385,21 @@ t('stripSegMarkers：清洗残留 [N]（含全角变体），不动正文（v0.9
   assert.strictEqual(C.stripSegMarkers('【３】甲 ［４］乙').replace(/\s+/g, ''), '甲乙');
   assert.strictEqual(C.stripSegMarkers('普通译文，无编号。'), '普通译文，无编号。');
 });
+t('stripSegMarkers：空白归一化保留换行——多行 speaker 结构不被压平（v0.9.46）', () => {
+  // 复现 fr 实测：模型输出带残留 [2] 的两行 → 清洗后必须仍是两行，行首 ♪ 才能被 normalizeMusic 逐行修复
+  const cleaned = C.stripSegMarkers("- Oh. Après toi.\n- [2] Du manque d'amour de quelqu'un");
+  assert.strictEqual(cleaned, "- Oh. Après toi.\n- Du manque d'amour de quelqu'un");
+  // 单行内多余空格仍要压平；连续空行折叠
+  assert.strictEqual(C.stripSegMarkers('甲   [1]  乙'), '甲 乙');
+  assert.strictEqual(C.stripSegMarkers('甲\n\n乙'), '甲\n乙');
+});
+t('旧路径全链：残留编号清洗 + normalizeMusic 逐行修复 → speaker 第二行行首 ♪ 找回（v0.9.46）', () => {
+  const src = "- Oh. After you.\n- ♪ Of somebody's lack of love ♪";
+  const modelOut = "- Oh. Après toi.\n- [2] Du manque d'amour de quelqu'un";
+  const rawOld = C.hasSegMarkers(src) ? modelOut : C.stripSegMarkers(modelOut);
+  const out = C.normalizeMusic(rawOld, src);
+  assert.strictEqual(out, "- Oh. Après toi.\n- ♪ Du manque d'amour de quelqu'un ♪");
+});
 t('hasSegMarkers：源文含 [N] 才为真（清洗守卫）', () => {
   assert.strictEqual(C.hasSegMarkers('参见文献 [3] 的说法'), true);
   assert.strictEqual(C.hasSegMarkers('♪ Love is in the air ♪'), false);

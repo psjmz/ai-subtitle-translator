@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.45</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.46</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2176,7 +2176,14 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
   const badAnchor = [];
   for(const g of send){
     const m = byGno[g.gno];
-    if(!m || m.type==='drop') continue;
+    if(!m) continue;
+    // v0.9.46：含歌词的音乐组不接受显式 drop——♪ 行丢歌词正是音乐标记不一致的根源（实测 zh-CN
+    // 把 ♪ Oh-oh, oh-oh ♪ 整行 drop），并入锚定重试通道强制重译；非音乐组保持原 drop 语义
+    if(m.type==='drop' && !String(m.text||'').trim()){
+      const dropSrc = g.mFrames ? g.mFrames.plainText : g.text;
+      if(C.RE_MUSIC.test(String(g.text)) && C.effChars(dropSrc) > 0) badAnchor.push(g.gno);
+      continue;
+    }
     const txt = String(m.text||'').trim();
     if(txt && !C.anchorOk(txt, dstV)) badAnchor.push(g.gno);
     // v0.9.37：音乐行丢词（源有歌词而译文只剩 ♪ 符号）——纯符号可通过 anchorOk，必须单查；并入锚定重试通道
@@ -2576,10 +2583,12 @@ async function runTranslate(){
       }
       const textRaw = String(m.text||'').trim();
       // 防御性丢弃判定：仅当模型显式 type='drop' 且 text 为空时才丢弃；只要给了译文就用译文
+      // v0.9.46：含歌词的音乐组重试后仍 drop → 按 missing 标记（待处理），绝不静默当水词清空
       const explicitDrop = m.type==='drop' && !textRaw;
       if(explicitDrop){
-        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='drop'; } });
-        suspiciousDrop++;
+        const musicDrop = C.RE_MUSIC.test(String(g.text)) && C.effChars(g.mFrames ? g.mFrames.plainText : g.text) > 0;
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag=musicDrop?'missing':'drop'; } });
+        if(musicDrop) missingCount++; else suspiciousDrop++;
         continue;
       }
       // v0.9.45：音乐帧组——[N] 编号正文按源文段映射、符号按源文序列复原（模型从未见过 ♪）。
@@ -2590,7 +2599,7 @@ async function runTranslate(){
         // v0.9.45b：旧路径清洗残留分段编号——模型偶发把规则 5.5 的 [N] 编号带进无编号输入的输出，
         // 不清会被时长切分切成两半（实测：行尾 [ 行首 3]）；源文本身含 [N] 时不清（可能是正文引用）
         let rawOld = C.fixMixedChars(textRaw, cfg.dst);
-        if(!C.hasSegMarkers(g.text)) rawOld = C.stripSegMarkers(rawOld).replace(/\s+/g, ' ').trim();
+        if(!C.hasSegMarkers(g.text)) rawOld = C.stripSegMarkers(rawOld);
         text = C.normalizeMusic(rawOld, g.text);
       }
       if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
