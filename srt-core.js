@@ -44,6 +44,13 @@
   const PREP_SINGLE = ['在', '从', '把', '被', '让', '对', '跟', '与', '向', '为', '由', '将', '当'];
   const CLOSE_SET = '”’』】）》"\'';
   const CLOSE_FIRST = '”’』】）》\'，。！？、；：…'; // 行首禁用的收尾符号
+  // v0.9.50 行首禁则（kinsoku）：切点使下一段以这些字符开头时软惩罚（-260，低于标点断点优先级差、
+  // 高于词边界加分），仅在同分择优时改变切点位置，不影响任何硬规则。
+  // NS_HARD：任何情况下都不得作为段首——CJK 标点、日文小假名/长音符（正字法上不起词首）
+  // NS_SOFT：独立成词（助词）时不得作为段首——「的」在「的确」中是词首不罚（Segmenter 整词判定），
+  //          日文格助词は/が/を/に等同理（にほん 不罚、あなた|に 罚）
+  const NS_HARD = '，。、；！？：' + 'っゃゅょぁぃぅぇぉゎ' + 'ー';
+  const NS_SOFT = '的了着么呢吗吧啊呀哦啦嘛呗地得' + 'はがをにでとへも';
 
   function isAlnum(c) { return !!c && /[A-Za-z0-9]/.test(c); }
 
@@ -751,6 +758,19 @@
     for (let i = 0; i < pos.length; i++) pref[i + 1] = pref[i] + (/\s/.test(pos[i]) ? 0 : charW(pos[i]));
     const W = pref[pos.length] || 1;
     const cuts = [0];
+    // v0.9.50 行首禁则惩罚：候选切点 i 使下一段以 NS_HARD/NS_SOFT（独立成词的助词）开头时减 260 分。
+    // NS_SOFT 的独立成词判定：i 是词边界且下一词边界就在 i+1（助词自成一个分词块）；「的确」「了解」
+    // 「得到」「にほん」等词首场景整词成块、不罚。wb 不可用时（无分词器）保守罚全部 NS_SOFT。
+    const noStartPenalty = (i) => {
+      const c = pos[i] || '';
+      if (NS_HARD.includes(c)) return 260;
+      if (!NS_SOFT.includes(c)) return 0;
+      if (!wb) return 260;
+      if (!wb.has(i)) return 0;               // 词内部：本就不会被选（eff=0 已挡）
+      let j = i + 1;
+      while (j < pos.length && !wb.has(j)) j++;
+      return j === i + 1 ? 260 : 0;            // 助词独立成块 → 罚
+    };
     for (let k = 1; k < n; k++) {
       const target = (dur.slice(0, k).reduce((a, b) => a + b, 0) / total) * W;
       const prevCut = cuts[cuts.length - 1];
@@ -763,7 +783,8 @@
         const eff = (p >= 4 || !wb || wb.has(i)) ? p : 0;  // 伪断点（介词/连接词）落词内部 → 无效
         const score = eff * 100
           + (wb && wb.has(i) ? 150 : 0)   // 词边界加分：语义同级时优先不劈词
-          - Math.abs(pref[i] - target);
+          - Math.abs(pref[i] - target)
+          - noStartPenalty(i);            // v0.9.50：行首禁则（的地得/助词/小假名不起行）
         if (score > bestScore) { bestScore = score; best = i; }
       }
       if (best < 0 || best <= prevCut) {
@@ -1186,20 +1207,38 @@
           }
           if (!unit) break;
           moved.unshift(unit);
-        } else {     // 借头：头部的词连同其后标点一起移动
-          let unit = '';
+        } else {     // 借头：头部的词连同其后紧邻标点一起移动
+          // v0.9.50 修复：旧断点条件「字母块后跟字母块」在空格语言永不成立（词间总有空格块），
+          // 导致整个邻段被一次性搬空（西语实测 38 字符挤进 1s 短 cue）。改为：吃到词后，
+          // 只继续吞紧邻标点，遇空格/下一词即止。CJK 无空格块，行为不变（词+紧邻标点）。
+          let unit = '', sawWord = false;
           while (chunks.length) {
-            const c = chunks.shift();
-            unit += c;
-            if (/[\p{L}\p{N}]/u.test(c) && (!chunks.length || /[\p{L}\p{N}]/u.test(chunks[0]))) break;
+            const c = chunks[0];
+            const isW = /[\p{L}\p{N}]/u.test(c);
+            if (isW && sawWord) break;                       // 下一词：停
+            if (!isW && sawWord && /^\s+$/.test(c)) break;   // 词后空格：词结束（空格语言的边界）
+            if (isW) sawWord = true;
+            unit += chunks.shift();
           }
           if (!unit) break;
           moved.push(unit);
         }
       }
       if (!moved.length) continue;
-      if (j < i) { segs[j] = chunks.join('').trim(); segs[i] = (moved.join('') + segs[i]).trim(); }
-      else { segs[j] = chunks.join('').trim(); segs[i] = (segs[i] + moved.join('')).trim(); }
+      // v0.9.50 修复：借词与原段的拼接处补空格。CJK/泰文等无空格文字不受影响（字符均属无空格书写系统），
+      // 空格语言（拉丁/西里尔/天城文等）两侧均为字母数字时补一个空格——实测事故：西语 "y"+"lanzártelos"
+      // 直接拼成 "ylanzártelos"。阿拉伯文属空格语言同样适用。
+      const glue = (a, b) => {
+        if (!a || !b) return a + b;
+        const la = a[a.length - 1], fb = b[0];
+        const unspaced = /[\u3000-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\u0e00-\u0e7f]/;
+        if (/[\p{L}\p{N}]/u.test(la) && /[\p{L}\p{N}]/u.test(fb) && !unspaced.test(la) && !unspaced.test(fb)) {
+          return a + ' ' + b;
+        }
+        return a + b;
+      };
+      if (j < i) { segs[j] = chunks.join('').trim(); segs[i] = glue(moved.join(''), segs[i]).trim(); }
+      else { segs[j] = chunks.join('').trim(); segs[i] = glue(segs[i], moved.join('')).trim(); }
     }
     return segs;
   }

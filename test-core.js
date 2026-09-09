@@ -258,6 +258,38 @@ t('v0.9.49 首段纯标点（开引号）不独立成条', () => {
   assert.strictEqual(pieces.join(''), zh, '译文零丢失');
 });
 
+console.log('— v0.9.50 行首禁则与借词拼接 —');
+const NS_TIMES = [
+  { start: 28630, end: 30220 }, { start: 30220, end: 32080 }, { start: 32240, end: 33320 },
+  { start: 33320, end: 34350 }, { start: 34350, end: 37300 },
+];
+t('v0.9.50 中文行首禁则：的 吸附上一段行尾', () => {
+  const zh = '我打算梳理出一些我觉得特别有意思的要点和想法抛给你，看看你觉得其中哪些有趣，';
+  const pieces = C.splitByDuration(zh, NS_TIMES, { locale: 'zh-CN' });
+  console.log('      → ' + pieces.join(' / '));
+  const softStart = '的了着么呢吗吧啊呀哦啦嘛呗地得';
+  assert.ok(pieces.every(p => !softStart.includes(p[0])), '段首不得为独立助词: ' + JSON.stringify(pieces));
+  assert.ok(pieces[1].endsWith('的'), '的 应留在上一段行尾');
+  assert.strictEqual(pieces.join(''), zh, '译文零丢失');
+});
+t('v0.9.50 借词拼接补空格（西语 y lanzártelos 回归）', () => {
+  const es = 'Voy a repasar algunos puntos e ideas que me parecieron muy interesantes y lanzártelos, a ver cuáles te llaman la atención.';
+  const pieces = C.splitByDuration(es, NS_TIMES, { locale: 'es' });
+  console.log('      → ' + pieces.join(' / '));
+  assert.ok(pieces.every(p => C.effChars(p) > 2), '每段应有实词（无孤立虚词段）: ' + JSON.stringify(pieces));
+  assert.ok(!pieces.some(p => /ylanz/.test(p)), '不得出现词粘连: ' + JSON.stringify(pieces));
+  const joined = pieces.join(' ').replace(/\s+/g, ' ').trim();
+  assert.strictEqual(joined, es.replace(/\s+/g, ' ').trim(), '拼接还原（空格归一后）零丢失');
+});
+t('v0.9.50 日文格助词不起行', () => {
+  const ja = '興味深いと思った要点とアイデアをいくつか拾って、あなたに投げかけます。どれが面白いか見てみてください。';
+  const pieces = C.splitByDuration(ja, NS_TIMES, { locale: 'ja' });
+  console.log('      → ' + pieces.join(' / '));
+  const part = 'はがをにでとへも';
+  assert.ok(pieces.every(p => !part.includes(p[0])), '段首不得为格助词: ' + JSON.stringify(pieces));
+  assert.strictEqual(pieces.join(''), ja, '译文零丢失');
+});
+
 console.log('— 词边界保护（Intl.Segmenter 分词）—');
 // 通用校验：折行的每个切点都必须落在词边界上（不劈词）
 function assertNoWordSplit(src, ls, locale) {
