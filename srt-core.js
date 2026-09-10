@@ -303,7 +303,7 @@
   // 超了才折，且折后每行 <= maxW。
   // opts.locale：目标语言（BCP47），启用词典分词保护（中文/日文等无空格语言不劈词）。
   function wrapToWidth(s, maxW, opts) {
-    maxW = (maxW > 0) ? maxW : 20;
+    maxW = (maxW > 0) ? maxW : 21;
     opts = opts || {};
     const src = String(s == null ? '' : s).replace(/\r/g, '');
     if (opts.normalize) {
@@ -888,7 +888,7 @@
     const txt = String(text == null ? '' : text).trim();
     if (!txt) return false;
     const maxDur = opts.maxDur || 7000;
-    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
+    const maxW = (opts.maxW > 0) ? opts.maxW : 21;
     const maxLines = opts.maxLines || 2;
     const dur = (cues[cues.length - 1].end || 0) - (cues[0].start || 0);
     if (dur > maxDur) return false;
@@ -930,7 +930,7 @@
   // k×maxW×maxLines 容量时均分也无法全 ≤2 行，等宽分段仍是最优解，照常返回。
   function splitCues(text, times, opts) {
     opts = opts || {};
-    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
+    const maxW = (opts.maxW > 0) ? opts.maxW : 21;
     const maxLines = (opts.maxLines > 0) ? opts.maxLines : 2;
     const locale = opts.locale;
     // 双 speaker 对话（v0.9.25）：单 cue 透传保留行结构（splitByDuration 会把 \n 压成空格）；
@@ -1200,7 +1200,7 @@
     opts = opts || {};
     const minDur = opts.minDur > 0 ? opts.minDur : 700;
     const thinChars = opts.thinChars > 0 ? opts.thinChars : 2;
-    const maxW = opts.maxW > 0 ? opts.maxW : 20;
+    const maxW = opts.maxW > 0 ? opts.maxW : 21;
     const maxLines = opts.maxLines > 0 ? opts.maxLines : 2;
     const locale = opts.locale;
     const ps = (pieces || []).map((p) => String(p == null ? '' : p));
@@ -1298,7 +1298,7 @@
   // 返回 [{no,start,end,srcLines:[],dstLines:[]}]。
   function buildBilingualParts(rows, opts) {
     opts = opts || {};
-    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
+    const maxW = (opts.maxW > 0) ? opts.maxW : 21;
     // 1) 汇集成对条目：活跃行 + 其后 merged 行的源文
     const entries = [];
     let last = null;
@@ -1471,7 +1471,7 @@
   // 返回 [{no,start,end,text}]（text 可含 \n，与旧 mono 输出同构）。
   function buildMonoParts(rows, opts) {
     opts = opts || {};
-    const maxW = (opts.maxW > 0) ? opts.maxW : 20;
+    const maxW = (opts.maxW > 0) ? opts.maxW : 21;
     const maxLines = (opts.maxLines > 0) ? opts.maxLines : 2;
     const locale = opts.dstLocale || opts.locale;
     // 1) 汇集条目（与 buildBilingualParts 第 1 步同构）

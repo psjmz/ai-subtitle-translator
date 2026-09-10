@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.52</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.53</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -199,7 +199,7 @@
     <span class="rule" data-page-node-id="sBzJMcqp0R6H7q8b5BDS3S" data-i18n="rule3">③ 听写纠错</span>
     <span class="rule" data-page-node-id="I2PIQPQVCpDbld771UT8E6" data-i18n="rule4">④ 专名可保留或翻译</span>
     <span class="rule" data-page-node-id="kfK7mFbAjWr24TBMe9ekkT" data-i18n="rule5">⑤ 去水词</span>
-    <span class="rule" data-page-node-id="743RM9R8wsdpXzi3jBDvZI" data-i18n-html="rule6">⑥ 超过 <b data-page-node-id="nzmwOZ37Ws7iDNZnMHDxTp">20 字</b> 自动折行</span>
+    <span class="rule" data-page-node-id="743RM9R8wsdpXzi3jBDvZI" data-i18n-html="rule6">⑥ 超过<b data-page-node-id="nzmwOZ37Ws7iDNZnMHDxTp">行宽阈值</b>自动折行</span>
   </div>
 
   <div class="layout" data-page-node-id="1eu46tPXvENLxK0QNykwAH">
@@ -269,8 +269,8 @@
           </div>
         </div>
 
-        <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，默认 20）</label>
-        <input type="number" id="maxW" value="20" min="8" max="48" data-page-node-id="nHDvqEd0WVMgZv4TiIxEIq">
+        <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，随目标语言按 Netflix 规范推荐）</label>
+        <input type="number" id="maxW" value="21" min="8" max="48" data-page-node-id="nHDvqEd0WVMgZv4TiIxEIq">
         <div class="btns" data-page-node-id="HF8Fbj8UJE2HRRfdXMXBs4">
           <button class="btn primary" id="btnGo" data-page-node-id="nOlcKaSvIp5ohDOevsDj1x" data-i18n="btnGo">▶ 开始翻译</button>
           <button class="btn ok" id="btnPost" data-page-node-id="GQLVkZGyvxEh6Aajh4eMoI" data-i18n="btnPost">↻ 仅后处理（折行/清提示词）</button>
@@ -465,7 +465,7 @@ const I18N = {
   docTitle:'AI字幕全自动翻译-你要的语言字幕都有', appTitle:'🎬 AI 字幕翻译工作台',
   tagLocal:'本地运行 · 字幕不上传服务器', uiLangTag:'界面语言',
   rule1:'① 翻译风格可选（信达雅/大白话/自定义）', rule2:'② 时间轴对齐', rule3:'③ 听写纠错',
-  rule4:'④ 专名可保留或翻译', rule5:'⑤ 去水词', rule6:'⑥ 超过 <b>20 字</b> 自动折行',
+  rule4:'④ 专名可保留或翻译', rule5:'⑤ 去水词', rule6:'⑥ 超过<b>行宽阈值</b>自动折行',
   step1:'导入字幕（支持多语言）', btnFile:'📂 选择字幕文件', btnDemo:'载入示例',
   pastePh:'或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）', btnParse:'解析字幕',
   stepReq:'翻译要求', stepEngine:'翻译引擎', lblMode:'工作模式',
@@ -486,7 +486,7 @@ const I18N = {
   termsHintOn:'勾选 = 术语表内的专名强制保留原文（下方术语表已启用）。',
   termsHintOff:'已关闭：人名/机构/产品/术语将全部翻译为目标语言，术语表不生效。',
   lblTerms:'需强制保留原文的专名（可留空，逗号分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行阈值（字，默认 20）', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止',
+  lblMaxW:'折行阈值（字，随目标语言按 Netflix 规范推荐）', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止',
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
   stepExport:'导出译文', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
@@ -539,7 +539,7 @@ const I18N = {
   docTitle:'AI字幕全自動翻譯-你要的語言字幕都有', appTitle:'🎬 AI 字幕翻譯工作台',
   tagLocal:'本機執行 · 字幕不上傳伺服器', uiLangTag:'介面語言',
   rule1:'① 翻譯風格可選（信達雅/大白話/自訂）', rule2:'② 時間軸對齊', rule3:'③ 聽寫糾錯',
-  rule4:'④ 專名可保留或翻譯', rule5:'⑤ 去水詞', rule6:'⑥ 超過 <b>20 字</b> 自動折行',
+  rule4:'④ 專名可保留或翻譯', rule5:'⑤ 去水詞', rule6:'⑥ 超過<b>行寬閾值</b>自動折行',
   step1:'匯入字幕（支援多語言）', btnFile:'📂 選擇字幕檔案', btnDemo:'載入範例',
   pastePh:'或直接把字幕文字貼上這裡…（支援 SRT / VTT / ASS）', btnParse:'解析字幕',
   stepReq:'翻譯要求', stepEngine:'翻譯引擎', lblMode:'工作模式',
@@ -560,7 +560,7 @@ const I18N = {
   termsHintOn:'勾選 = 術語表內的專名強制保留原文（下方術語表已啟用）。',
   termsHintOff:'已關閉：人名/機構/產品/術語將全部翻譯為目標語言，術語表不生效。',
   lblTerms:'需強制保留原文的專名（可留空，逗號分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行閾值（字，預設 20）', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止',
+  lblMaxW:'折行閾值（字，隨目標語言按 Netflix 規範推薦）', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止',
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
   stepExport:'匯出譯文', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
@@ -613,7 +613,7 @@ const I18N = {
   docTitle:'AI Auto Subtitle Translation - Subtitles in Any Language You Need', appTitle:'🎬 AI Subtitle Translator',
   tagLocal:'Runs locally · subtitles never leave your browser', uiLangTag:'UI',
   rule1:'① Choose translation style (Faithful/Plain/Custom)', rule2:'② Timeline aligned', rule3:'③ Auto-fix transcription errors',
-  rule4:'④ Keep or translate proper nouns', rule5:'⑤ Remove filler cues', rule6:'⑥ Auto-wrap lines longer than <b>20 units</b>',
+  rule4:'④ Keep or translate proper nouns', rule5:'⑤ Remove filler cues', rule6:'⑥ Auto-wrap lines over the <b>width threshold</b>',
   step1:'Import subtitles (any language)', btnFile:'📂 Choose subtitle file', btnDemo:'Load sample',
   pastePh:'…or paste subtitle text here… (SRT / VTT / ASS)', btnParse:'Parse subtitles',
   stepReq:'Translation requirements', stepEngine:'Translation engine', lblMode:'Mode',
@@ -634,7 +634,7 @@ const I18N = {
   termsHintOn:'Checked = terms in the list stay in original form (list enabled).',
   termsHintOff:'Off: all names/brands/products/terms are translated; the term list is ignored.',
   lblTerms:'Proper nouns to keep in original form (optional, comma-separated)', termsPh:'e.g. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Wrap threshold (units, default 20)', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop',
+  lblMaxW:'Wrap threshold (units, Netflix spec per language)', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop',
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
   stepExport:'Export translation', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
@@ -687,7 +687,7 @@ const I18N = {
   docTitle:'AI全自動字幕翻訳 - 必要な言語の字幕をすべて', appTitle:'🎬 AI字幕翻訳ワークベンチ',
   tagLocal:'ローカル動作 · 字幕はサーバーに送信されません', uiLangTag:'表示言語',
   rule1:'① 翻訳スタイル選択（信達雅/平易/カスタム）', rule2:'② タイムライン一致', rule3:'③ 音声起こし誤りを自動修正',
-  rule4:'④ 固有名詞は保持/翻訳を選択', rule5:'⑤ フィラー除去', rule6:'⑥ <b>20字</b>超は自動改行',
+  rule4:'④ 固有名詞は保持/翻訳を選択', rule5:'⑤ フィラー除去', rule6:'⑥ <b>しきい値</b>超は自動改行',
   step1:'字幕を読み込む（多言語対応）', btnFile:'📂 字幕ファイルを選択', btnDemo:'サンプルを読込',
   pastePh:'または字幕テキストをここに貼り付け…（SRT / VTT / ASS 対応）', btnParse:'字幕を解析',
   stepReq:'翻訳要件', stepEngine:'翻訳エンジン', lblMode:'動作モード',
@@ -708,7 +708,7 @@ const I18N = {
   termsHintOn:'チェック＝用語リストの固有名詞を原文のまま保持（リスト有効）。',
   termsHintOff:'オフ：人名/組織/製品/用語はすべて翻訳先言語に訳され、用語リストは無効。',
   lblTerms:'原文のまま保持する固有名詞（任意、カンマ区切り）', termsPh:'例：SpaceX, Prism, EnduroSat',
-  lblMaxW:'改行しきい値（字、既定20）', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止',
+  lblMaxW:'改行しきい値（字、Netflix規格の言語別推奨）', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止',
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
   stepExport:'翻訳を書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
@@ -761,7 +761,7 @@ const I18N = {
   docTitle:'Traducción Automática de Subtítulos con IA - Subtítulos en Cualquier Idioma', appTitle:'🎬 Traductor de Subtítulos IA',
   tagLocal:'Se ejecuta localmente · los subtítulos no salen de tu navegador', uiLangTag:'Idioma',
   rule1:'① Elige estilo de traducción (Fiel/Llano/Personalizado)', rule2:'② Línea de tiempo alineada', rule3:'③ Corrige errores de transcripción',
-  rule4:'④ Mantener o traducir nombres propios', rule5:'⑤ Eliminar frases de relleno', rule6:'⑥ Ajuste automático de líneas de más de <b>20 unidades</b>',
+  rule4:'④ Mantener o traducir nombres propios', rule5:'⑤ Eliminar frases de relleno', rule6:'⑥ Ajuste automático al superar el <b>umbral</b>',
   step1:'Importar subtítulos (cualquier idioma)', btnFile:'📂 Elegir archivo de subtítulos', btnDemo:'Cargar ejemplo',
   pastePh:'…o pega aquí el texto de subtítulos… (SRT / VTT / ASS)', btnParse:'Analizar subtítulos',
   stepReq:'Requisitos de traducción', stepEngine:'Motor de traducción', lblMode:'Modo',
@@ -782,7 +782,7 @@ const I18N = {
   termsHintOn:'Marcado = los términos de la lista se mantienen en su forma original (lista activada).',
   termsHintOff:'Desactivado: todos los nombres/marcas/productos/términos se traducen; la lista se ignora.',
   lblTerms:'Nombres propios a mantener en su forma original (opcional, separados por comas)', termsPh:'p. ej. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbral de ajuste de línea (unidades, por defecto 20)', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener',
+  lblMaxW:'Umbral de ajuste de línea (norma Netflix por idioma)', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener',
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
   stepExport:'Exportar traducción', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
@@ -835,7 +835,7 @@ const I18N = {
   docTitle:'Tradução Automática de Legendas com IA - Legendas em Qualquer Idioma', appTitle:'🎬 Tradutor de Legendas IA',
   tagLocal:'Roda localmente · as legendas não saem do seu navegador', uiLangTag:'Idioma',
   rule1:'① Escolha o estilo de tradução (Fiel/Coloquial/Personalizado)', rule2:'② Linha do tempo alinhada', rule3:'③ Corrige erros de transcrição',
-  rule4:'④ Manter ou traduzir nomes próprios', rule5:'⑤ Remover frases de preenchimento', rule6:'⑥ Quebra automática de linhas acima de <b>20 unidades</b>',
+  rule4:'④ Manter ou traduzir nomes próprios', rule5:'⑤ Remover frases de preenchimento', rule6:'⑥ Quebra automática ao exceder o <b>limite</b>',
   step1:'Importar legendas (qualquer idioma)', btnFile:'📂 Escolher arquivo de legendas', btnDemo:'Carregar exemplo',
   pastePh:'…ou cole o texto de legendas aqui… (SRT / VTT / ASS)', btnParse:'Analisar legendas',
   stepReq:'Requisitos de tradução', stepEngine:'Motor de tradução', lblMode:'Modo',
@@ -856,7 +856,7 @@ const I18N = {
   termsHintOn:'Marcado = os termos da lista ficam na forma original (lista ativada).',
   termsHintOff:'Desativado: todos os nomes/marcas/produtos/termos são traduzidos; a lista é ignorada.',
   lblTerms:'Nomes próprios a manter na forma original (opcional, separados por vírgula)', termsPh:'ex.: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Limite de quebra de linha (unidades, padrão 20)', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar',
+  lblMaxW:'Limite de quebra de linha (padrão Netflix por idioma)', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar',
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
   stepExport:'Exportar tradução', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
@@ -909,7 +909,7 @@ const I18N = {
   docTitle:'AI 자동 자막 번역 - 원하는 언어 자막 모두 지원', appTitle:'🎬 AI 자막 번역기',
   tagLocal:'로컬 실행 · 자막은 브라우저를 벗어나지 않습니다', uiLangTag:'언어',
   rule1:'① 번역 스타일 선택(충실/구어체/사용자 정의)', rule2:'② 타임라인 정렬', rule3:'③ 전사 오류 자동 수정',
-  rule4:'④ 고유명사 유지 또는 번역 선택', rule5:'⑤ 필러 자막 제거', rule6:'⑥ <b>20단위</b> 초과 시 자동 줄바꿈',
+  rule4:'④ 고유명사 유지 또는 번역 선택', rule5:'⑤ 필러 자막 제거', rule6:'⑥ <b>기준</b> 초과 시 자동 줄바꿈',
   step1:'자막 불러오기(모든 언어)', btnFile:'📂 자막 파일 선택', btnDemo:'샘플 불러오기',
   pastePh:'…또는 자막 텍스트를 여기에 붙여넣기… (SRT / VTT / ASS 지원)', btnParse:'자막 분석',
   stepReq:'번역 요구사항', stepEngine:'번역 엔진', lblMode:'모드',
@@ -930,7 +930,7 @@ const I18N = {
   termsHintOn:'체크 = 목록의 용어를 원문 그대로 유지(목록 활성화).',
   termsHintOff:'끔: 모든 인물/브랜드/제품/용어를 번역하며 용어 목록은 무시됩니다.',
   lblTerms:'원문으로 유지할 고유명사(선택, 쉼표로 구분)', termsPh:'예: SpaceX, Prism, EnduroSat',
-  lblMaxW:'줄바꿈 기준(단위, 기본 20)', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지',
+  lblMaxW:'줄바꿈 기준(단위, Netflix 규격 언어별 권장)', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지',
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
   stepExport:'번역 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
@@ -983,7 +983,7 @@ const I18N = {
   docTitle:'Kostenlose KI-Untertitel-Autoübersetzung - Untertitel in jeder Sprache', appTitle:'🎬 KI Untertitel-Übersetzer',
   tagLocal:'Läuft lokal · Untertitel verlassen Ihren Browser nicht', uiLangTag:'Sprache',
   rule1:'① Übersetzungsstil wählbar (Treuhert/Wortwörtlich/Eigene)', rule2:'② Zeitleisten-Ausrichtung', rule3:'③ Transkriptionsfehler auto-korrigieren',
-  rule4:'④ Eigennamen behalten oder übersetzen', rule5:'⑤ Füllzeilen entfernen', rule6:'⑥ Automatischer Umbruch ab <b>20 Einheiten</b>',
+  rule4:'④ Eigennamen behalten oder übersetzen', rule5:'⑤ Füllzeilen entfernen', rule6:'⑥ Automatischer Umbruch über <b>Schwellwert</b>',
   step1:'Untertitel importieren (jede Sprache)', btnFile:'📂 Untertiteldatei wählen', btnDemo:'Beispiel laden',
   pastePh:'…oder Untertiteltext hier einfügen… (SRT / VTT / ASS)', btnParse:'Untertitel analysieren',
   stepReq:'Übersetzungsanforderungen', stepEngine:'Übersetzungs-Engine', lblMode:'Modus',
@@ -1004,7 +1004,7 @@ const I18N = {
   termsHintOn:'Aktiviert = Begriffe aus der Liste bleiben in Originalform (Liste aktiv).',
   termsHintOff:'Aus: alle Namen/Firmen/Produkte/Begriffe werden übersetzt; die Liste wird ignoriert.',
   lblTerms:'Eigennamen, die in Originalform bleiben sollen (optional, kommagetrennt)', termsPh:'z. B. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbruch-Schwellwert (Einheiten, Standard 20)', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen',
+  lblMaxW:'Umbruch-Schwellwert (Netflix-Standard je Sprache)', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen',
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
   stepExport:'Übersetzung exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
@@ -1057,7 +1057,7 @@ const I18N = {
   docTitle:'Traduction Automatique de Sous-titres Gratuite par IA - Sous-titres dans Toutes les Langues', appTitle:'🎬 Traducteur de Sous-titres IA',
   tagLocal:'Fonctionne en local · les sous-titres ne quittent jamais votre navigateur', uiLangTag:'Langue',
   rule1:'① Choisissez le style de traduction (Fidèle/Courant/Personnalisé)', rule2:'② Timeline alignée', rule3:'③ Corrige les erreurs de transcription',
-  rule4:'④ Conserver ou traduire les noms propres', rule5:'⑤ Supprimer les lignes de remplissage', rule6:'⑥ Retour à la ligne automatique au-delà de <b>20 unités</b>',
+  rule4:'④ Conserver ou traduire les noms propres', rule5:'⑤ Supprimer les lignes de remplissage', rule6:'⑥ Retour à la ligne automatique au-delà du <b>seuil</b>',
   step1:'Importer des sous-titres (toute langue)', btnFile:'📂 Choisir un fichier de sous-titres', btnDemo:'Charger l\u2019exemple',
   pastePh:'…ou collez le texte des sous-titres ici… (SRT / VTT / ASS)', btnParse:'Analyser les sous-titres',
   stepReq:'Exigences de traduction', stepEngine:'Moteur de traduction', lblMode:'Mode',
@@ -1078,7 +1078,7 @@ const I18N = {
   termsHintOn:'Coché = les termes de la liste restent en forme originale (liste activée).',
   termsHintOff:'Désactivé : tous les noms/marques/produits/termes sont traduits ; la liste est ignorée.',
   lblTerms:'Noms propres à conserver en forme originale (facultatif, séparés par des virgules)', termsPh:'ex. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Seuil de retour ligne (unités, défaut 20)', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter',
+  lblMaxW:'Seuil de retour ligne (norme Netflix par langue)', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter',
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
   stepExport:'Exporter la traduction', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
@@ -1131,7 +1131,7 @@ const I18N = {
   docTitle:'Terjemahan Subtitle Otomatis dengan AI - Subtitle dalam Bahasa Apa Pun', appTitle:'🎬 Penerjemah Subtitle AI',
   tagLocal:'Berjalan lokal · subtitle tidak keluar dari browser Anda', uiLangTag:'Bahasa',
   rule1:'① Pilih gaya terjemahan (Setia/Keseharian/Kustom)', rule2:'② Penyelarasan timeline', rule3:'③ Perbaiki kesalahan transkripsi otomatis',
-  rule4:'④ Pertahankan atau terjemahkan nama diri', rule5:'⑤ Hapus baris pengisi', rule6:'⑥ Bungkus baris otomatis lebih dari <b>20 unit</b>',
+  rule4:'④ Pertahankan atau terjemahkan nama diri', rule5:'⑤ Hapus baris pengisi', rule6:'⑥ Bungkus baris otomatis melebihi <b>ambang</b>',
   step1:'Impor subtitle (bahasa apa pun)', btnFile:'📂 Pilih file subtitle', btnDemo:'Muat contoh',
   pastePh:'…atau tempel teks subtitle di sini… (SRT / VTT / ASS)', btnParse:'Analisis subtitle',
   stepReq:'Persyaratan terjemahan', stepEngine:'Mesin terjemahan', lblMode:'Mode',
@@ -1152,7 +1152,7 @@ const I18N = {
   termsHintOn:'Dicentang = istilah dalam daftar tetap dalam bentuk asli (daftar aktif).',
   termsHintOff:'Mati: semua nama/merek/produk/istilah diterjemahkan; daftar diabaikan.',
   lblTerms:'Nama diri yang dipertahankan dalam bentuk asli (opsional, pisahkan koma)', termsPh:'mis. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ambang pembungkusan baris (unit, bawaan 20)', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti',
+  lblMaxW:'Ambang pembungkusan baris (standar Netflix per bahasa)', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti',
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
   stepExport:'Ekspor terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
@@ -1205,7 +1205,7 @@ const I18N = {
   docTitle:'मुफ़्त AI स्वचालित सबटाइटल अनुवाद - आपको जिस भाषा में चाहिए', appTitle:'🎬 AI सबटाइटल अनुवादक',
   tagLocal:'स्थानीय रूप से चलता है · सबटाइटल आपका ब्राउज़र नहीं छोड़ते', uiLangTag:'भाषा',
   rule1:'① अनुवाद शैली चुनें (सटीक/सरल/अपनी)', rule2:'② टाइमलाइन संरेखण', rule3:'③ ट्रांसक्रिप्शन त्रुटियाँ स्वतः सुधारें',
-  rule4:'④ संज्ञाएँ रखें या अनुवाद करें', rule5:'⑤ फिलर पंक्तियाँ हटाएँ', rule6:'⑥ <b>20 इकाई</b> से अधिक पर स्वतः लाइन-रैप',
+  rule4:'④ संज्ञाएँ रखें या अनुवाद करें', rule5:'⑤ फिलर पंक्तियाँ हटाएँ', rule6:'⑥ <b>सीमा</b> से अधिक पर स्वतः लाइन-रैप',
   step1:'सबटाइटल आयात करें (कोई भी भाषा)', btnFile:'📂 सबटाइटल फ़ाइल चुनें', btnDemo:'नमूना लोड करें',
   pastePh:'…या सबटाइटल टेक्स्ट यहाँ पेस्ट करें… (SRT / VTT / ASS)', btnParse:'सबटाइटल पार्स करें',
   stepReq:'अनुवाद आवश्यकताएँ', stepEngine:'अनुवाद इंजन', lblMode:'मोड',
@@ -1226,7 +1226,7 @@ const I18N = {
   termsHintOn:'चयनित = सूची के शब्द मूल रूप में रहेंगे (सूची सक्रिय)।',
   termsHintOff:'बंद: सभी नाम/ब्रांड/उत्पाद/शब्दावली अनुवाद होंगे; सूची नज़रअंदाज़।',
   lblTerms:'मूल रूप में रखने योग्य संज्ञाएँ (वैकल्पिक, कॉमा से अलग)', termsPh:'जैसे SpaceX, Prism, EnduroSat',
-  lblMaxW:'रैप सीमा (इकाई, डिफ़ॉल्ट 20)', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें',
+  lblMaxW:'रैप सीमा (इकाई, Netflix मानक अनुसार भाषा-वार)', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें',
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
   stepExport:'अनुवाद निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
@@ -1279,7 +1279,7 @@ const I18N = {
   docTitle:'แปลซับไตเติลอัตโนมัติฟรีด้วย AI - ซับไตเติลทุกภาษาที่คุณต้องการ', appTitle:'🎬 ตัวแปลซับไตเติล AI',
   tagLocal:'ทำงานแบบโลคัล · ซับไตเติลไม่ออกจากเบราว์เซอร์ของคุณ', uiLangTag:'ภาษา',
   rule1:'① เลือกสไตล์การแปล (ตรงความ/พูดง่าย/กำหนดเอง)', rule2:'② จัดแนวไทม์ไลน์', rule3:'③ แก้ข้อผิดพลาดจากการถอดเสียง',
-  rule4:'④ คงหรือแปลชื่อเฉพาะ', rule5:'⑤ ลบบรรทัดเสียบเติม', rule6:'⑥ ตัดบรรทัดอัตโนมัติเมื่อเกิน <b>20 หน่วย</b>',
+  rule4:'④ คงหรือแปลชื่อเฉพาะ', rule5:'⑤ ลบบรรทัดเสียบเติม', rule6:'⑥ ตัดบรรทัดอัตโนมัติเมื่อเกิน<b>เกณฑ์</b>',
   step1:'นำเข้าซับไตเติล (ทุกภาษา)', btnFile:'📂 เลือกไฟล์ซับไตเติล', btnDemo:'โหลดตัวอย่าง',
   pastePh:'…หรือวางข้อความซับไตเติลที่นี่… (SRT / VTT / ASS)', btnParse:'วิเคราะห์ซับไตเติล',
   stepReq:'ข้อกำหนดการแปล', stepEngine:'เอนจินแปลภาษา', lblMode:'โหมด',
@@ -1300,7 +1300,7 @@ const I18N = {
   termsHintOn:'เลือก = คำในรายการคงรูปเดิม (รายการเปิดใช้งาน)',
   termsHintOff:'ปิด: ชื่อ/แบรนด์/ผลิตภัณฑ์/คำศัพท์ทั้งหมดจะถูกแปล; รายการถูกละเว้น',
   lblTerms:'ชื่อเฉพาะที่จะคงรูปเดิม (ไม่บังคับ คั่นด้วยจุลภาค)', termsPh:'เช่น SpaceX, Prism, EnduroSat',
-  lblMaxW:'เกณฑ์ตัดบรรทัด (หน่วย, ค่าเริ่มต้น 20)', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด',
+  lblMaxW:'เกณฑ์ตัดบรรทัด (มาตรฐาน Netflix ตามภาษา)', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด',
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
   stepExport:'ส่งออกคำแปล', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
@@ -1353,7 +1353,7 @@ const I18N = {
   docTitle:'Dịch Phụ đề Tự động Miễn phí bằng AI - Phụ đề Mọi Ngôn ngữ', appTitle:'🎬 Trình Dịch Phụ đề AI',
   tagLocal:'Chạy cục bộ · phụ đề không rời khỏi trình duyệt của bạn', uiLangTag:'Ngôn ngữ',
   rule1:'① Chọn phong cách dịch (Chuẩn/Thoại thường/Tùy chỉnh)', rule2:'② Căn chỉnh timeline', rule3:'③ Tự sửa lỗi chép lời',
-  rule4:'④ Giữ hoặc dịch tên riêng', rule5:'⑤ Loại dòng đệm', rule6:'⑥ Tự động ngắt dòng khi vượt <b>20 đơn vị</b>',
+  rule4:'④ Giữ hoặc dịch tên riêng', rule5:'⑤ Loại dòng đệm', rule6:'⑥ Tự động ngắt dòng khi vượt <b>ngưỡng</b>',
   step1:'Nhập phụ đề (mọi ngôn ngữ)', btnFile:'📂 Chọn file phụ đề', btnDemo:'Tải ví dụ mẫu',
   pastePh:'…hoặc dán văn bản phụ đề vào đây… (SRT / VTT / ASS)', btnParse:'Phân tích phụ đề',
   stepReq:'Yêu cầu dịch', stepEngine:'Cỗ máy dịch', lblMode:'Chế độ',
@@ -1374,7 +1374,7 @@ const I18N = {
   termsHintOn:'Đã chọn = các thuật ngữ trong danh sách giữ nguyên dạng (danh sách bật).',
   termsHintOff:'Tắt: mọi tên/thương hiệu/sản phẩm/thuật ngữ đều được dịch; danh sách bị bỏ qua.',
   lblTerms:'Tên riêng cần giữ nguyên (không bắt buộc, phân tách bằng dấu phẩy)', termsPh:'vd: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ngưỡng ngắt dòng (đơn vị, mặc định 20)', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng',
+  lblMaxW:'Ngưỡng ngắt dòng (chuẩn Netflix theo ngôn ngữ)', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng',
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
   stepExport:'Xuất bản dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
@@ -1427,7 +1427,7 @@ const I18N = {
   docTitle:'Бесплатный ИИ-перевод Субтитров Автоматический - Субтитры на любом языке', appTitle:'🎬 ИИ-переводчик Субтитров',
   tagLocal:'Работает локально · субтитры не покидают ваш браузер', uiLangTag:'Язык',
   rule1:'① Выбор стиля перевода (Точный/Разговорный/Свой)', rule2:'② Выравнивание таймлайна', rule3:'③ Авто-исправление ошибок транскрибации',
-  rule4:'④ Сохранить или перевести имена собственные', rule5:'⑤ Удаление строк-заполнителей', rule6:'⑥ Автоперенос строк длиннее <b>20 единиц</b>',
+  rule4:'④ Сохранить или перевести имена собственные', rule5:'⑤ Удаление строк-заполнителей', rule6:'⑥ Автоперенос при превышении <b>порога</b>',
   step1:'Импорт субтитров (любой язык)', btnFile:'📂 Выбрать файл субтитров', btnDemo:'Загрузить пример',
   pastePh:'…или вставьте текст субтитров сюда… (SRT / VTT / ASS)', btnParse:'Разобрать субтитры',
   stepReq:'Требования к переводу', stepEngine:'Переводчик (движок)', lblMode:'Режим',
@@ -1448,7 +1448,7 @@ const I18N = {
   termsHintOn:'Включено = термины из списка остаются в оригинальном виде (список активен).',
   termsHintOff:'Выключено: все имена/бренды/продукты/термины переводятся; список игнорируется.',
   lblTerms:'Имена собственные для сохранения оригинала (необязательно, через запятую)', termsPh:'напр. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Порог переноса строк (единиц, по умолчанию 20)', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки',
+  lblMaxW:'Порог переноса строк (стандарт Netflix по языку)', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки',
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
   stepExport:'Экспорт перевода', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
@@ -1501,7 +1501,7 @@ const I18N = {
   docTitle:'Traduzione Automatica dei Sottotitoli con IA - Sottotitoli in Qualsiasi Lingua', appTitle:'🎬 Traduttore di Sottotitoli IA',
   tagLocal:'Esecuzione locale · i sottotitoli non lasciano mai il tuo browser', uiLangTag:'Lingua interfaccia',
   rule1:'① Scegli lo stile di traduzione (Fedele/Colloquiale/Personalizzato)', rule2:'② Allineamento della timeline', rule3:'③ Correzione automatica degli errori di trascrizione',
-  rule4:'④ Nomi propri tradotti o mantenuti', rule5:'⑤ Rimozione delle espressioni riempitive', rule6:'⑥ Ritorno a capo automatico oltre <b>20 unità</b>',
+  rule4:'④ Nomi propri tradotti o mantenuti', rule5:'⑤ Rimozione delle espressioni riempitive', rule6:'⑥ Ritorno a capo automatico oltre la <b>soglia</b>',
   step1:'Importa sottotitoli (qualsiasi lingua)', btnFile:'📂 Scegli file sottotitoli', btnDemo:'Carica esempio',
   pastePh:'…oppure incolla qui il testo dei sottotitoli… (SRT / VTT / ASS)', btnParse:'Analizza sottotitoli',
   stepReq:'Requisiti di traduzione', stepEngine:'Motore di traduzione', lblMode:'Modalità',
@@ -1522,7 +1522,7 @@ const I18N = {
   termsHintOn:'Attivo: i termini dell\'elenco restano nella forma originale (elenco abilitato).',
   termsHintOff:'Disattivo: tutti i nomi/marchi/prodotti/termini vengono tradotti; l\'elenco viene ignorato.',
   lblTerms:'Nomi propri da mantenere in forma originale (facoltativo, separati da virgola)', termsPh:'es. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Soglia di ritorno a capo (unità, predefinito 20)', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare',
+  lblMaxW:'Soglia di ritorno a capo (standard Netflix per lingua)', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare',
   btnPost:'↻ Solo post-elaborazione (a capo/pulizia tag)',
   hintPrivacy:'Modello predefinito: i sottotitoli passano dal server di questo sito verso il fornitore configurato dall\'amministratore; API personalizzata: il fornitore scelto li elabora direttamente, senza passare da questo sito.',
   stepExport:'Esporta traduzione', lblOutName:'Nome file di esportazione (automatico: nome origine + lingua di destinazione)', outPh:'xxx_tradotto.srt',
@@ -1575,7 +1575,7 @@ const I18N = {
   docTitle:'ترجمة الترجمات تلقائيًا بالذكاء الاصطناعي - ترجمات بأي لغة تحتاجها', appTitle:'🎬 مترجم الترجمات بالذكاء الاصطناعي',
   tagLocal:'يعمل محليًا · الترجمات لا تغادر متصفحك أبدًا', uiLangTag:'لغة الواجهة',
   rule1:'① اختر أسلوب الترجمة (أمين/عامي/مخصص)', rule2:'② محاذاة الخط الزمني', rule3:'③ تصحيح تلقائي لأخطاء التفريغ',
-  rule4:'④ الأسماء الخاصة تُترجم أو تبقى كما هي', rule5:'⑤ إزالة الحشو اللفظي', rule6:'⑥ التفاف تلقائي للأسطر التي تتجاوز <b>20 وحدة</b>',
+  rule4:'④ الأسماء الخاصة تُترجم أو تبقى كما هي', rule5:'⑤ إزالة الحشو اللفظي', rule6:'⑥ التفاف تلقائي للأسطر التي تتجاوز <b>الحد</b>',
   step1:'استورد الترجمات (بأي لغة)', btnFile:'📂 اختر ملف الترجمات', btnDemo:'تحميل مثال',
   pastePh:'…أو الصق نص الترجمات هنا… (SRT / VTT / ASS)', btnParse:'تحليل الترجمات',
   stepReq:'متطلبات الترجمة', stepEngine:'محرك الترجمة', lblMode:'الوضع',
@@ -1596,7 +1596,7 @@ const I18N = {
   termsHintOn:'عند التفعيل: تبقى المصطلحات في القائمة بصيغتها الأصلية (القائمة مفعّلة).',
   termsHintOff:'عند الإيقاف: تُترجم جميع الأسماء/العلامات/المنتجات/المصطلحات؛ وتُتجاهل قائمة المصطلحات.',
   lblTerms:'أسماء خاصة تبقى بصيغتها الأصلية (اختياري، مفصولة بفواصل)', termsPh:'مثال: SpaceX, Prism, EnduroSat',
-  lblMaxW:'حد الالتفاف (وحدات، الافتراضي 20)', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف',
+  lblMaxW:'حد الالتفاف (معيار Netflix حسب اللغة)', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف',
   btnPost:'↻ معالجة لاحقة فقط (التفاف/تنظيف الوسوم)',
   hintPrivacy:'النموذج الافتراضي: تمر الترجمات عبر خادم هذا الموقع إلى المزوّد الذي أعدّه المشرف؛ API مخصص: يعالجها المزوّد الذي اخترته مباشرة دون المرور بهذا الموقع.',
   stepExport:'تصدير الترجمة', lblOutName:'اسم ملف التصدير (تلقائي: اسم المصدر + لغة الهدف)', outPh:'xxx_translated.srt',
@@ -1649,7 +1649,7 @@ const I18N = {
   docTitle:'AI ile Otomatik Altyazı Çevirisi - İhtiyacın Olan Her Dilde Altyazı', appTitle:'🎬 AI Altyazı Çevirmeni',
   tagLocal:'Yerel çalışır · altyazılar tarayıcından asla çıkmaz', uiLangTag:'Arayüz dili',
   rule1:'① Çeviri tarzını seç (Sadık/Günlük/Özel)', rule2:'② Zaman çizgisi hizalama', rule3:'③ Yazım hatası otomatik düzeltme',
-  rule4:'④ Özel isimler çevrilir veya korunur', rule5:'⑤ Dolgu ifadelerin temizlenmesi', rule6:'⑥ <b>20 birimi</b> aşan satırlar otomatik sarılır',
+  rule4:'④ Özel isimler çevrilir veya korunur', rule5:'⑤ Dolgu ifadelerin temizlenmesi', rule6:'⑥ <b>Eşiği</b> aşan satırlar otomatik sarılır',
   step1:'Altyazıları içe aktar (herhangi bir dil)', btnFile:'📂 Altyazı dosyası seç', btnDemo:'Örnek yükle',
   pastePh:'…veya altyazı metnini buraya yapıştır… (SRT / VTT / ASS)', btnParse:'Altyazıları çözümle',
   stepReq:'Çeviri gereksinimleri', stepEngine:'Çeviri motoru', lblMode:'Mod',
@@ -1670,7 +1670,7 @@ const I18N = {
   termsHintOn:'İşaretliyken listedeki terimler özgün biçimde kalır (liste etkin).',
   termsHintOff:'Kapalı: tüm isim/marka/ürün/terim çevrilir; terim listesi yok sayılır.',
   lblTerms:'Özgün biçimde korunacak özel isimler (isteğe bağlı, virgülle ayır)', termsPh:'örn. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Satır sarma eşiği (birim, varsayılan 20)', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla',
+  lblMaxW:'Satır sarma eşiği (Netflix standardı, dile göre)', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla',
   btnPost:'↻ Sadece son işlem (satır sarma/etiket temizleme)',
   hintPrivacy:'Varsayılan model: altyazılar bu sitenin sunucusu üzerinden yöneticinin yapılandırdığı sağlayıcıya iletilir; Özel API: seçtiğin sağlayıcı bunları doğrudan işler, bu siteye uğramaz.',
   stepExport:'Çeviriyi dışa aktar', lblOutName:'Dışa aktarma dosya adı (otomatik: kaynak adı + hedef dil)', outPh:'xxx_cevrildi.srt',
@@ -1871,7 +1871,7 @@ function getCfg(){
   return {
     src: $('srcLang').value,
     dst: $('dstLang').value,
-    maxW: +$('maxW').value || 20,
+    maxW: +$('maxW').value || 21,
     styleMode,
     styleCustom: $('styleCustom').value.trim(),
     keepTerms: $('keepTerms').checked,
@@ -2863,13 +2863,13 @@ function buildExportItems(){
     // v0.9.23：单语导出走 buildMonoParts 四层规则（R0 尊重已有折行 / R1 微超宽单行 / R2 常态折行 /
     // R3 超容量切分），替代此前 filter+map 直透 S.rows 的零处理路径（超宽单行、>2 行、merged 尾行时间丢失）
     return C.buildMonoParts(S.rows, {
-      maxW: +$('maxW').value || 20,
+      maxW: +$('maxW').value || 21,
       dstLocale: $('dstLang').value
     });
   }
   const srcV=$('srcLang').value;
   return C.buildBilingual(S.rows, {
-    maxW: +$('maxW').value || 20,
+    maxW: +$('maxW').value || 21,
     srcLocale: srcV==='auto' ? '' : srcV,   // auto 时分词器回退 zh（空格语言靠空格断点，不受影响）
     dstLocale: $('dstLang').value,
     order: fmt==='bi-dst' ? 'dst-first' : 'src-first'
@@ -2930,7 +2930,7 @@ function buildAssEvents(){
   const srcV=$('srcLang').value;
   const dstFirst = fmt==='bi-dst';
   const parts=C.buildBilingualParts(S.rows,{
-    maxW: +$('maxW').value || 20,
+    maxW: +$('maxW').value || 21,
     srcLocale: srcV==='auto' ? '' : srcV,
     dstLocale: $('dstLang').value
   });
@@ -3019,12 +3019,15 @@ function save(){
   const o = {
     base:$('base').value.trim(), model:$('model').value.trim(), key:$('apikey').value.trim(),
     provider:(document.getElementById('provider')||{}).value||'',
-    terms:$('terms').value.trim(), mode:$('mode').value, maxW:$('maxW').value,
+    terms:$('terms').value.trim(), mode:$('mode').value,
     srcLang:$('srcLang').value, style:style,
     styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0',
     autoTerms:$('autoTerms').checked?'1':'0',
     expStyle:expStyle()
   };
+  /* v0.9.53：折行阈值只在用户手动改过时才记忆——语言感知联动值（中文16/日文13）若被写入
+     localStorage，下次加载会被误判为「用户自定义」，从此锁死、切目标语言不再联动推荐 */
+  if (UI.maxWTouched) o.maxW = $('maxW').value;
   /* 语言只在用户手动切换过时才记忆——避免页面加载时的 save() 把默认值/检测值写死，
      否则第二次访问起浏览器语言自动检测会被 localStorage 里的旧值永久覆盖 */
   if (UI.langManual)      { o.uiLang = UI.lang;   o.langManual = 1; }
@@ -3039,8 +3042,9 @@ if(sv.model) $('model').value=sv.model;
 if(sv.key) $('apikey').value=sv.key;
 if(sv.terms) $('terms').value=sv.terms;
 if(sv.mode) $('mode').value=sv.mode;
-// 折行阈值：历史默认 18/24 升级为 v0.9.10 默认 20（用户自定义过其他值则保留）
-if(sv.maxW && +sv.maxW !== 18 && +sv.maxW !== 24) $('maxW').value=sv.maxW;
+// 折行阈值：历史默认 18/24/20（v0.9.53 起默认 21）与联动推荐值 16/13 均不恢复，
+// 否则 maxWTouched 误判锁死联动。真手动设过这些值的用户会被重新纳入联动（值不变，仅失去锁定）
+if(sv.maxW && ![18,24,20,16,13].includes(+sv.maxW)) $('maxW').value=sv.maxW;
 /* 导出样式记忆 + 旧版双选择器迁移：expFmt+expFileFmt → expStyle */
 if(sv.expStyle && /^[a-z-]+\|(srt|vtt|ass|ass-stack|txt)$/.test(sv.expStyle)) $('expStyle').value=sv.expStyle;
 else if(sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.expFmt) && ['srt','vtt','ass','txt'].includes(sv.expFileFmt)) $('expStyle').value=sv.expFmt+'|'+sv.expFileFmt;
@@ -3065,13 +3069,24 @@ else if(sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.exp
    （Netflix TTSG：中文 16 / 日文 13 / 韩文 16 全角字每行；拉丁语系保持 20 ≈ 40 半角字符）。
    用户手动改过（input 事件）或 localStorage 里存过自定义值 → 永远尊重用户，不再联动。 */
 (function(){
-  const MAXW_BY_LANG={ 'zh-CN':16, 'zh-TW':16, 'ja':13, 'ko':16 };
-  let maxWTouched = !!(sv.maxW && +sv.maxW !== 18 && +sv.maxW !== 24 && +sv.maxW !== 20);
+  /* Netflix TTSG（Timed Text Style Guide）每语言行宽，换算为本工具口径（全角=1 字、半角 2 字符=1 字）：
+     拉丁/西里尔/天城文/阿拉伯等半角书写系统 42 CPL → 21 字（官方各语言 guide：英/德/西/葡/意/荷/土/俄/印地 42、
+     阿拉伯 Netflix Originals 42）；中文 16 全角、日文 13 全角、韩文 16 全角。
+     未列语言按 21。用户手动改过（input 或 localStorage 自定义值）永远优先。 */
+  const MAXW_BY_LANG={
+    'zh-CN':16, 'zh-TW':16, 'ja':13, 'ko':16,
+    'en':21, 'fr':21, 'de':21, 'es':21, 'pt':21, 'it':21, 'ru':21,
+    'ar':21, 'th':21, 'vi':21, 'id':21, 'hi':21, 'tr':21, 'pl':21,
+    'nl':21, 'ms':21, 'fil':21, 'fa':21
+  };
+  // 用户自定义 = localStorage 里存有非默认/非推荐值（18/24/20/16/13 均为历史或现行默认，21 现默认）
+  let maxWTouched = !!(sv.maxW && ![18,24,20,16,13,21].includes(+sv.maxW));
+  UI.maxWTouched = maxWTouched;   // v0.9.53：save() 据此决定是否持久化（联动值不落盘）
   const mw=$('maxW');
-  mw.addEventListener('input', ()=>{ maxWTouched=true; });
+  mw.addEventListener('input', ()=>{ maxWTouched=true; UI.maxWTouched=true; });
   const syncMaxW=()=>{
     if(maxWTouched) return;
-    const rec=MAXW_BY_LANG[$('dstLang').value]||20;
+    const rec=MAXW_BY_LANG[$('dstLang').value]||21;
     if(+mw.value!==rec) mw.value=rec;
   };
   $('dstLang').addEventListener('change', syncMaxW);
