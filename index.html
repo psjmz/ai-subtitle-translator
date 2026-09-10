@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.55</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.56</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -525,6 +525,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} 个句组翻译失败（{2}）——多为模型 Key 失效/限流/网络问题，请检查「翻译引擎」配置后重试。',
   postDone:'后处理完成：清除提示词 + 折行（每条 ≤ {0} 字）。',
   errOccur:'发生错误：{0}',
+  errModalTitle:'大模型暂时不能工作',
+  errModalBody:'翻译已停止：模型服务没有响应，可能是网络不稳、服务繁忙或配置失效。可稍等几分钟再试，或在「翻译引擎」中切换自定义 API（可先用「测试连接」验证）。',
+  errModalGo:'自己设置翻译引擎设置',
+  errModalLater:'稍后再试',
+  errModalFatal:'翻译出错',
   noExport:'没有可导出的字幕。', exported:'已导出：{0}（{1} 条）',
   noCopy:'没有内容可复制。', copied:'已复制到剪贴板。', copiedCompat:'已复制（兼容模式）。',
   seoTitle:'关于 AI 字幕翻译工作台',
@@ -599,6 +604,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} 個句組翻譯失敗（{2}）——多為模型 Key 失效/限流/網路問題，請檢查「翻譯引擎」配置後重試。',
   postDone:'後處理完成：清除提示詞 + 折行（每條 ≤ {0} 字）。',
   errOccur:'發生錯誤：{0}',
+  errModalTitle:'大模型暫時無法工作',
+  errModalBody:'翻譯已停止：模型服務沒有回應，可能是網路不穩、服務繁忙或設定失效。可稍等幾分鐘再試，或在「翻譯引擎」中切換自訂 API（可先用「測試連線」驗證）。',
+  errModalGo:'開啟翻譯引擎設定',
+  errModalLater:'稍後再試',
+  errModalFatal:'翻譯出錯',
   noExport:'沒有可匯出的字幕。', exported:'已匯出：{0}（{1} 條）',
   noCopy:'沒有內容可複製。', copied:'已複製到剪貼簿。', copiedCompat:'已複製（相容模式）。',
   seoTitle:'關於 AI 字幕翻譯工作台',
@@ -673,6 +683,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} groups failed to translate ({2}) — usually a key/quota/network issue. Check "Translation Engine" and retry.',
   postDone:'Post-processing done: tags cleaned + wrapped (each line ≤ {0} units).',
   errOccur:'Error: {0}',
+  errModalTitle:'The AI model is temporarily unavailable',
+  errModalBody:'Translation stopped: the model service is not responding — the network may be unstable, the service busy, or the configuration invalid. Wait a few minutes and retry, or switch to a custom API under "Translation engine" (verify with "Test connection" first).',
+  errModalGo:'Open engine settings',
+  errModalLater:'Try later',
+  errModalFatal:'Translation error',
   noExport:'Nothing to export.', exported:'Exported: {0} ({1} cues)',
   noCopy:'Nothing to copy.', copied:'Copied to clipboard.', copiedCompat:'Copied (compat mode).',
   seoTitle:'Free AI Auto Subtitle Translator',
@@ -747,6 +762,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} グループの翻訳に失敗しました（{2}）——Key 失効/レート制限/ネットワークの問題が多いです。「翻訳エンジン」を確認して再試行してください。',
   postDone:'後処理完了：タグ除去 + 改行（各行 ≤ {0} 字）。',
   errOccur:'エラー：{0}',
+  errModalTitle:'AIモデルが一時的に利用できません',
+  errModalBody:'翻訳を停止しました：モデルサービスが応答しません。ネットワークの不安定、サービスの混雑、設定の無効化が考えられます。数分待って再試行するか、「翻訳エンジン」でカスタム API に切り替えてください（「接続テスト」で確認できます）。',
+  errModalGo:'エンジン設定を開く',
+  errModalLater:'後で試す',
+  errModalFatal:'翻訳エラー',
   noExport:'書き出す字幕がありません。', exported:'書き出しました：{0}（{1} 件）',
   noCopy:'コピーする内容がありません。', copied:'クリップボードにコピーしました。', copiedCompat:'コピーしました（互換モード）。',
   seoTitle:'無料のAI全自動字幕翻訳ツール',
@@ -821,6 +841,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} grupos fallaron al traducirse ({2}) — normalmente un problema de key/cuota/red. Revisa "Motor de traducción" y reintenta.',
   postDone:'Posprocesado terminado: etiquetas limpiadas + ajuste (cada línea ≤ {0} unidades).',
   errOccur:'Error: {0}',
+  errModalTitle:'El modelo de IA no está disponible temporalmente',
+  errModalBody:'Traducción detenida: el servicio del modelo no responde; puede deberse a una red inestable, servicio saturado o configuración no válida. Espera unos minutos y reintenta, o cambia a una API personalizada en «Motor de traducción» (verifica primero con «Probar conexión»).',
+  errModalGo:'Abrir ajustes del motor',
+  errModalLater:'Reintentar más tarde',
+  errModalFatal:'Error de traducción',
   noExport:'Nada que exportar.', exported:'Exportado: {0} ({1} subtítulos)',
   noCopy:'Nada que copiar.', copied:'Copiado al portapapeles.', copiedCompat:'Copiado (modo compat).',
   seoTitle:'Traductor de Subtítulos Automático Gratuito con IA',
@@ -895,6 +920,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} grupos falharam na tradução ({2}) — geralmente problema de key/cota/rede. Verifique "Motor de tradução" e tente de novo.',
   postDone:'Pós-processamento concluído: tags limpas + quebra (cada linha ≤ {0} unidades).',
   errOccur:'Erro: {0}',
+  errModalTitle:'O modelo de IA está temporariamente indisponível',
+  errModalBody:'Tradução interrompida: o serviço do modelo não responde — a rede pode estar instável, o serviço ocupado ou a configuração inválida. Aguarde alguns minutos e tente novamente, ou mude para uma API personalizada em "Motor de tradução" (verifique primeiro com "Testar conexão").',
+  errModalGo:'Abrir configurações do motor',
+  errModalLater:'Tentar mais tarde',
+  errModalFatal:'Erro de tradução',
   noExport:'Nada para exportar.', exported:'Exportado: {0} ({1} legendas)',
   noCopy:'Nada para copiar.', copied:'Copiado para a área de transferência.', copiedCompat:'Copiado (modo compat).',
   seoTitle:'Tradutor de Legendas Automático Gratuito com IA',
@@ -969,6 +999,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1}그룹 번역 실패({2}) — 대개 Key 만료/한도/네트워크 문제입니다. "번역 엔진"을 확인하고 다시 시도하세요.',
   postDone:'후처리 완료: 태그 정리 + 줄바꿈(각 줄 ≤ {0}단위).',
   errOccur:'오류: {0}',
+  errModalTitle:'AI 모델을 일시적으로 사용할 수 없습니다',
+  errModalBody:'번역이 중지되었습니다: 모델 서비스가 응답하지 않습니다. 네트워크 불안정, 서비스 혼잡 또는 구성 문제일 수 있습니다. 몇 분 후 다시 시도하거나, 「번역 엔진」에서 사용자 지정 API로 전환하세요(「연결 테스트」로 먼저 확인 가능).',
+  errModalGo:'엔진 설정 열기',
+  errModalLater:'나중에 시도',
+  errModalFatal:'번역 오류',
   noExport:'내보낼 자막이 없습니다.', exported:'내보냈습니다: {0}({1}개)',
   noCopy:'복사할 내용이 없습니다.', copied:'클립보드에 복사했습니다.', copiedCompat:'복사했습니다(호환 모드).',
   seoTitle:'무료 AI 자동 자막 번역기',
@@ -1043,6 +1078,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} Gruppen konnten nicht übersetzt werden ({2}) — meist ein Key-/Kontingent-/Netzwerkproblem. "Übersetzungs-Engine" prüfen und erneut versuchen.',
   postDone:'Nachbearbeitung fertig: Tags bereinigt + Umbruch (jede Zeile ≤ {0} Einheiten).',
   errOccur:'Fehler: {0}',
+  errModalTitle:'Das KI-Modell ist vorübergehend nicht verfügbar',
+  errModalBody:'Übersetzung gestoppt: Der Modelldienst antwortet nicht — instabiles Netz, überlasteter Dienst oder ungültige Konfiguration sind möglich. Warte ein paar Minuten und versuche es erneut oder wechsle unter „Übersetzungs-Engine“ zu einer benutzerdefinierten API (mit „Verbindung testen“ prüfbar).',
+  errModalGo:'Engine-Einstellungen öffnen',
+  errModalLater:'Später erneut versuchen',
+  errModalFatal:'Übersetzungsfehler',
   noExport:'Nichts zu exportieren.', exported:'Exportiert: {0} ({1} Untertitel)',
   noCopy:'Nichts zu kopieren.', copied:'In die Zwischenablage kopiert.', copiedCompat:'Kopiert (Kompatibilitätsmodus).',
   seoTitle:'Kostenloser KI-Untertitel-Autoübersetzer',
@@ -1117,6 +1157,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} groupes non traduits ({2}) — souvent un problème de clé/quota/réseau. Vérifiez « Moteur de traduction » et réessayez.',
   postDone:'Post-traitement terminé : balises nettoyées + retour ligne (chaque ligne ≤ {0} unités).',
   errOccur:'Erreur : {0}',
+  errModalTitle:'Le modèle d\'IA est temporairement indisponible',
+  errModalBody:'Traduction arrêtée : le service de modèle ne répond pas — réseau instable, service saturé ou configuration invalide. Attendez quelques minutes et réessayez, ou passez à une API personnalisée dans « Moteur de traduction » (vérifiez d\'abord avec « Tester la connexion »).',
+  errModalGo:'Ouvrir les réglages du moteur',
+  errModalLater:'Réessayer plus tard',
+  errModalFatal:'Erreur de traduction',
   noExport:'Rien à exporter.', exported:'Exporté : {0} ({1} sous-titres)',
   noCopy:'Rien à copier.', copied:'Copié dans le presse-papiers.', copiedCompat:'Copié (mode compatibilité).',
   seoTitle:'Traducteur de Sous-titres Automatique Gratuit par IA',
@@ -1191,6 +1236,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} grup gagal diterjemahkan ({2}) — biasanya masalah key/kuota/jaringan. Periksa "Mesin terjemahan" dan coba lagi.',
   postDone:'Pasca-proses selesai: tag dibersihkan + pembungkusan (tiap baris ≤ {0} unit).',
   errOccur:'Kesalahan: {0}',
+  errModalTitle:'Model AI sedang tidak tersedia',
+  errModalBody:'Terjemahan dihentikan: layanan model tidak merespons — jaringan mungkin tidak stabil, layanan sibuk, atau konfigurasi tidak valid. Tunggu beberapa menit lalu coba lagi, atau beralih ke API kustom di "Mesin terjemahan" (verifikasi dulu dengan "Uji koneksi").',
+  errModalGo:'Buka pengaturan mesin',
+  errModalLater:'Coba nanti',
+  errModalFatal:'Kesalahan terjemahan',
   noExport:'Tidak ada yang bisa diekspor.', exported:'Diekspor: {0} ({1} subtitle)',
   noCopy:'Tidak ada yang bisa disalin.', copied:'Tersalin ke clipboard.', copiedCompat:'Tersalin (mode kompat).',
   seoTitle:'Penerjemah Subtitle Otomatis Gratis dengan AI',
@@ -1265,6 +1315,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} समूहों का अनुवाद असफल ({2}) — आमतौर पर Key/कोटा/नेटवर्क समस्या। "अनुवाद इंजन" जाँचें और पुनः प्रयास करें।',
   postDone:'पोस्ट-प्रोसेस पूर्ण: टैग सफ़ाई + रैप (प्रत्येक पंक्ति ≤ {0} इकाई)।',
   errOccur:'त्रुटि: {0}',
+  errModalTitle:'AI मॉडल अस्थायी रूप से उपलब्ध नहीं है',
+  errModalBody:'अनुवाद रोक दिया गया: मॉडल सेवा जवाब नहीं दे रही — नेटवर्क अस्थिर, सेवा व्यस्त या कॉन्फ़िगरेशन अमान्य हो सकता है। कुछ मिनट प्रतीक्षा कर पुनः प्रयास करें, या "अनुवाद इंजन" में कस्टम API पर स्विच करें (पहले "कनेक्शन परीक्षण" से जाँचें)।',
+  errModalGo:'इंजन सेटिंग्स खोलें',
+  errModalLater:'बाद में प्रयास करें',
+  errModalFatal:'अनुवाद त्रुटि',
   noExport:'निर्यात के लिए कुछ नहीं।', exported:'निर्यातित: {0} ({1} सबटाइटल)',
   noCopy:'कॉपी करने को कुछ नहीं।', copied:'क्लिपबोर्ड पर कॉपी हुआ।', copiedCompat:'कॉपी हुआ (कम्पैट मोड)।',
   seoTitle:'मुफ़्त AI स्वचालित सबटाइटल अनुवादक',
@@ -1339,6 +1394,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} กลุ่มแปลไม่สำเร็จ ({2}) — มักเป็นปัญหา Key/โควตา/เครือข่าย ตรวจสอบ "เอนจินแปลภาษา" แล้วลองใหม่',
   postDone:'ประมวลผลท้ายเสร็จ: ล้างแท็ก + ตัดบรรทัด (แต่ละบรรทัด ≤ {0} หน่วย)',
   errOccur:'เกิดข้อผิดพลาด: {0}',
+  errModalTitle:'โมเดล AI ไม่สามารถใช้งานได้ชั่วคราว',
+  errModalBody:'หยุดการแปลแล้ว: บริการโมเดลไม่ตอบสนอง อาจเกิดจากเครือข่ายไม่เสถียร บริการแย่งกันใช้ หรือการตั้งค่าไม่ถูกต้อง โปรดรอสักครู่แล้วลองใหม่ หรือสลับไปใช้ API แบบกำหนดเองใน "เครื่องมือแปล" (ตรวจสอบก่อนด้วย "ทดสอบการเชื่อมต่อ")',
+  errModalGo:'เปิดการตั้งค่าเครื่องมือ',
+  errModalLater:'ลองใหม่ภายหลัง',
+  errModalFatal:'เกิดข้อผิดพลาดในการแปล',
   noExport:'ไม่มีซับไตเติลให้ส่งออก', exported:'ส่งออกแล้ว: {0} ({1} ซับ)',
   noCopy:'ไม่มีเนื้อหาให้คัดลอก', copied:'คัดลอกไปยังคลิปบอร์ดแล้ว', copiedCompat:'คัดลอกแล้ว (โหมดเข้ากันได้)',
   seoTitle:'ตัวแปลซับไตเติลอัตโนมัติฟรีด้วย AI',
@@ -1413,6 +1473,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} nhóm dịch thất bại ({2}) — thường là lỗi key/hạn mức/mạng. Kiểm tra "Cỗ máy dịch" rồi thử lại.',
   postDone:'Xử lý sau xong: dọn thẻ + ngắt dòng (mỗi dòng ≤ {0} đơn vị).',
   errOccur:'Lỗi: {0}',
+  errModalTitle:'Mô hình AI tạm thời không khả dụng',
+  errModalBody:'Đã dừng dịch: dịch vụ mô hình không phản hồi — có thể do mạng không ổn định, dịch vụ quá tải hoặc cấu hình không hợp lệ. Hãy đợi vài phút rồi thử lại, hoặc chuyển sang API tùy chỉnh trong "Engine dịch" (kiểm tra trước bằng "Kiểm tra kết nối").',
+  errModalGo:'Mở cài đặt engine',
+  errModalLater:'Thử lại sau',
+  errModalFatal:'Lỗi dịch',
   noExport:'Không có gì để xuất.', exported:'Đã xuất: {0} ({1} phụ đề)',
   noCopy:'Không có gì để chép.', copied:'Đã chép vào clipboard.', copiedCompat:'Đã chép (chế độ tương thích).',
   seoTitle:'Trình Dịch Phụ đề Tự động Miễn phí bằng AI',
@@ -1487,6 +1552,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} групп не перевелись ({2}) — обычно проблема ключа/квоты/сети. Проверьте «Переводчик» и повторите.',
   postDone:'Пост-обработка завершена: теги очищены + перенос (каждая строка ≤ {0} единиц).',
   errOccur:'Ошибка: {0}',
+  errModalTitle:'ИИ-модель временно недоступна',
+  errModalBody:'Перевод остановлен: сервис модели не отвечает — возможны нестабильная сеть, перегрузка сервиса или недействующая конфигурация. Подождите несколько минут и повторите либо переключитесь на пользовательский API в разделе «Движок перевода» (сначала проверьте кнопкой «Тест соединения»).',
+  errModalGo:'Открыть настройки движка',
+  errModalLater:'Повторить позже',
+  errModalFatal:'Ошибка перевода',
   noExport:'Нечего экспортировать.', exported:'Экспортировано: {0} ({1} субтитров)',
   noCopy:'Нечего копировать.', copied:'Скопировано в буфер обмена.', copiedCompat:'Скопировано (режим совместимости).',
   seoTitle:'Бесплатный автоматический ИИ-переводчик субтитров',
@@ -1561,6 +1631,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} gruppi non tradotti ({2}) — di solito è un problema di chiave/quota/rete. Controlla "Motore di traduzione" e riprova.',
   postDone:'Post-elaborazione completata: tag puliti + a capo (ogni riga ≤ {0} unità).',
   errOccur:'Errore: {0}',
+  errModalTitle:'Il modello IA è temporaneamente non disponibile',
+  errModalBody:'Traduzione interrotta: il servizio modello non risponde — rete instabile, servizio sovraccarico o configurazione non valida. Attendi qualche minuto e riprova, oppure passa a una API personalizzata in "Motore di traduzione" (verifica prima con "Test connessione").',
+  errModalGo:'Apri impostazioni motore',
+  errModalLater:'Riprova più tardi',
+  errModalFatal:'Errore di traduzione',
   noExport:'Nulla da esportare.', exported:'Esportato: {0} ({1} sottotitoli)',
   noCopy:'Nulla da copiare.', copied:'Copiato negli appunti.', copiedCompat:'Copiato (modalità compatibile).',
   seoTitle:'Traduttore Automatico di Sottotitoli Gratuito con IA',
@@ -1635,6 +1710,11 @@ const I18N = {
   warnManyMissing:'⚠️ فشل ترجمة {0}/{1} مجموعة ({2}) — عادة مشكلة مفتاح/حصة/شبكة. تحقق من «محرك الترجمة» وأعد المحاولة.',
   postDone:'انتهت المعالجة اللاحقة: نُظّفت الوسوم + لُفّت الأسطر (كل سطر ≤ {0} وحدة).',
   errOccur:'خطأ: {0}',
+  errModalTitle:'نموذج الذكاء الاصطناعي غير متاح مؤقتًا',
+  errModalBody:'توقفت الترجمة: خدمة النموذج لا تستجيب — قد تكون الشبكة غير مستقرة أو الخدمة مشغولة أو الإعداد غير صالح. انتظر بضع دقائق وأعد المحاولة، أو بدّل إلى واجهة API مخصصة في "محرك الترجمة" (تحقق أولًا عبر "اختبار الاتصال").',
+  errModalGo:'فتح إعدادات المحرك',
+  errModalLater:'المحاولة لاحقًا',
+  errModalFatal:'خطأ في الترجمة',
   noExport:'لا شيء للتصدير.', exported:'صُدّر: {0} ({1} ترجمة)',
   noCopy:'لا شيء للنسخ.', copied:'نُسخ إلى الحافظة.', copiedCompat:'نُسخ (وضع التوافق).',
   seoTitle:'مترجم ترجمات تلقائي مجاني بالذكاء الاصطناعي',
@@ -1709,6 +1789,11 @@ const I18N = {
   warnManyMissing:'⚠️ {0}/{1} grup çevrilemedi ({2}) — genellikle anahtar/kota/ağ sorunu. «Çeviri Motoru»nu kontrol edip yeniden dene.',
   postDone:'Son işlem tamam: etiketler temizlendi + satırlar sarıldı (her satır ≤ {0} birim).',
   errOccur:'Hata: {0}',
+  errModalTitle:'Yapay zekâ modeli geçici olarak kullanılamıyor',
+  errModalBody:'Çeviri durduruldu: model hizmeti yanıt vermiyor — ağ kararsız, hizmet yoğun veya yapılandırma geçersiz olabilir. Birkaç dakika bekleyip tekrar deneyin ya da "Çeviri motoru" bölümünde özel API\'ye geçin (önce "Bağlantıyı test et" ile doğrulayın).',
+  errModalGo:'Motor ayarlarını aç',
+  errModalLater:'Daha sonra dene',
+  errModalFatal:'Çeviri hatası',
   noExport:'Dışa aktarılacak bir şey yok.', exported:'Dışa aktarıldı: {0} ({1} altyazı)',
   noCopy:'Kopyalanacak bir şey yok.', copied:'Panoya kopyalandı.', copiedCompat:'Kopyalandı (uyumluluk modu).',
   seoTitle:'AI ile Ücretsiz Otomatik Altyazı Çevirici',
@@ -1814,6 +1899,54 @@ function log(msg, cls){
   $('log').scrollTop = 1e9;
 }
 function clearLog(){ $('log').innerHTML = ''; }
+
+// v0.9.56：错误弹窗（模型无响应 / 致命错误）——不再只沉底日志，用户必须能看见。
+// opts.settings !== false 时显示「自己设置翻译引擎设置」主按钮（平滑滚动到 mode 下拉并聚焦）
+function showErrModal(title, body, opts){
+  opts = opts || {};
+  const old = document.getElementById('errModal');
+  if (old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'errModal';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+  const h = document.createElement('div');
+  h.style.cssText = 'font-weight:700;font-size:16px;color:var(--del);margin-bottom:10px;';
+  h.textContent = title;
+  const b = document.createElement('div');
+  b.style.cssText = 'color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+  b.textContent = body;
+  const btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+  const mk = (txt, primary, fn) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn';
+    if (primary) btn.style.cssText = 'background:var(--acc);color:#fff;border-color:var(--acc);';
+    btn.textContent = txt;
+    btn.onclick = () => { ov.remove(); if (fn) fn(); };
+    btns.appendChild(btn);
+  };
+  mk(t('errModalLater'), false, null);
+  if (opts.settings !== false) mk(t('errModalGo'), true, () => {
+    const m = $('mode');
+    if (m) {
+      m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { try { m.focus({ preventScroll: true }); } catch (e) {} }, 380);
+    }
+  });
+  box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+  ov.appendChild(box);
+  ov.addEventListener('click', (ev) => { if (ev.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+if (!window.__errModalEsc){
+  window.__errModalEsc = true;
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') { const m = document.getElementById('errModal'); if (m) m.remove(); }
+  });
+}
 function fmtTC(s,e){ return C.fmtTime(s)+' --> '+C.fmtTime(e); }
 function tcHtml(it){ return '<span class="cue">'+esc(C.fmtTime(it.start))+'<br>'+esc(C.fmtTime(it.end))+'</span>'; }
 /* v0.9.28 进度仪表卡：sticky 可见 + 大号百分比 + ETA（EMA 平滑）+ 标签页标题进度 + 完成态 */
@@ -2378,11 +2511,12 @@ async function runTranslate(){
   const effModel= cfg.mode==='builtin' ? '' : cfg.model;
   const maxTry  = 3;
   let lastCall = 0;
+  let deadStreak = 0;   // v0.9.56：连续整批零成功计数（熔断判定用）
   // 会话元数据（仅 文件名/目标语言/条数/模型名，不含字幕内容），供站点运营统计。
   // builtin：随翻译请求捎带（模型由服务器端记录）；自带 Key：随 finish/download 上报轻量记录
   S.trMeta = { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length, model: cfg.mode==='api' ? cfg.model : '' };
   clearLog();
-  S.translating=true; S.stop=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.locale=cfg.dst;
+  S.translating=true; S.stop=false; S.modelDead=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.locale=cfg.dst;
   $('btnGo').disabled=$('btnPost').disabled=true;
   const btnText=$('btnGo').textContent;
   $('btnGo').textContent=t('btnGoStop');
@@ -2556,11 +2690,11 @@ async function runTranslate(){
             // 后端限流 / 未配置：按 code 本地化服务端消息（v0.9.33），停止整片翻译
             log(srvErrTxt(e.message), 'err');
             log(t('builtinOff'), 'err');
-            S.stop=true; break;
+            S.modelDead=true; S.stop=true; break;
           } else if(cfg.mode==='builtin' && /HTTP 502/.test(e.message) && /Upstream HTTP 40[13]/.test(e.message)){
             // 上游认证失败/额度不足（管理员 Key 问题）：重试无意义，直接停止
             log(srvErrTxt(e.message), 'err');
-            S.stop=true; break;
+            S.modelDead=true; S.stop=true; break;
           } else if(/429|rate/i.test(e.message) && attempt<maxTry-1){
             log(t('rateWait'),'err');
             await new Promise(r=>setTimeout(r,20000));
@@ -2574,21 +2708,30 @@ async function runTranslate(){
       // v0.9.29：批次重试全败 → 拆单组逐个补救（Apple Fold 评测实证：fa 语言批 8 三连败导致 3 句组 missing，
       // 同批其他句组本身无问题，隔离单组重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
       if(!ok && !S.stop){
-        let saved=0;
+        let saved=0, consecFail=0;
         for(const g1 of gBatch){
           if(S.stop) break;
-          for(let a=0;a<2;a++){
+          let got1=false;
+          for(let a=0;a<2 && !got1;a++){
             try{
               lastCall=Date.now();
               const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys);
               Object.keys(o2.byGno).forEach(k=>res.set(Number(k), o2.byGno[k]));
               o2.fillers.forEach(no=>fillerSet.add(no));
-              saved++;
-              break;
+              saved++; got1=true;
             }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
           }
+          // v0.9.56 熔断：连续 3 组补救全败 → 判定模型无响应，立即停止整片翻译
+          //（否则 24 组 × 2 次空转，最坏几十分钟才轮到下一批重复同样的失败）
+          if(!got1){ if(++consecFail>=3){ S.modelDead=true; S.stop=true; break; } }
+          else consecFail=0;
         }
         log(t('batchRescue',bi+1,saved,gBatch.length), saved===gBatch.length?'okc':'err');
+        // v0.9.56：首批即全军覆没，或连续 2 批零成功 → 模型不工作，停止并弹窗（小批次凑不满 3 连败走此兜底）
+        if(!S.stop && saved===0){
+          deadStreak++;
+          if(bi===0 || deadStreak>=2){ S.modelDead=true; S.stop=true; }
+        } else if(saved>0) deadStreak=0;
       }
     }
     setProg(100,true); $('prog').classList.remove('run'); setPrText(t('postEnd'));
@@ -2728,11 +2871,18 @@ async function runTranslate(){
     pgFinish();
   }catch(e){
     log(t('errOccur',e.message),'err');
+    try{ showErrModal(t('errModalFatal'), t('errOccur', String(e.message||e))); }catch(_){}
   }finally{
     S.translating=false;
     $('btnGo').disabled=false; $('btnPost').disabled=false;
     $('btnGo').textContent=btnText;
     if(!PG.ok){ setProg(0,false); setPrText(''); }
+    // v0.9.56：模型无响应熔断 → 弹窗告知（稍后再试 / 打开引擎设置换自定义模型）
+    if(S.modelDead){
+      S.modelDead=false;
+      log(t('errModalTitle'),'err');
+      try{ showErrModal(t('errModalTitle'), t('errModalBody')); }catch(_){}
+    }
   }
 }
 
