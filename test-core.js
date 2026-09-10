@@ -1607,6 +1607,25 @@ t('squashLines：法语省音 l\'école 被切分时不插空格（v0.9.51 审�
   assert.strictEqual(C.squashLines("de l\n'école"), "de l'école");
   assert.strictEqual(C.squashLines("qu\n'un"), "qu'un");
 });
+t('mergePunctOnlyLines：LLM 孤闭引号行并入前一行（v0.9.52）', () => {
+  assert.strictEqual(C.mergePunctOnlyLines('他说：“下次我们一定能拿下他们。\n”'), '他说：“下次我们一定能拿下他们。”');
+  assert.strictEqual(C.mergePunctOnlyLines('他说：“好了。”\n」\n下一句'), '他说：“好了。”」\n下一句');
+  assert.strictEqual(C.mergePunctOnlyLines('第一行\n”’'), '第一行”’');
+});
+t('mergePunctOnlyLines：省略号/音乐符号行不并入（刻意停顿行）', () => {
+  assert.strictEqual(C.mergePunctOnlyLines('他停顿了。\n...\n然后继续'), '他停顿了。\n...\n然后继续');
+  assert.strictEqual(C.mergePunctOnlyLines('唱歌\n♪\n结束'), '唱歌\n♪\n结束');
+  assert.strictEqual(C.mergePunctOnlyLines('单独一行'), '单独一行');
+});
+t('buildMonoParts：孤闭引号行不进导出（v0.9.52 e2e en/es 实测回归）', () => {
+  const rows = [
+    { no: 1, start: 0, end: 2000, en: 'She said, "We\'ll get \'em."', zh: '她说：“下次我们一定能拿下他们。\n”' },
+  ];
+  const parts = C.buildMonoParts(rows, { maxW: 16, dstLocale: 'zh-CN' });
+  assert.strictEqual(parts.length, 1);
+  assert.ok(!/^”/m.test(parts[0].text), '不应有孤引号行: ' + JSON.stringify(parts[0].text));
+  assert.ok(/。”$/.test(parts[0].text.replace(/\n/g, '')), '闭引号应贴句尾: ' + JSON.stringify(parts[0].text));
+});
 t('squashLines：英语 get \'em 仍补空格（单引号对白不受省音判定影响）', () => {
   assert.strictEqual(C.squashLines("get\n'em"), "get 'em");
 });

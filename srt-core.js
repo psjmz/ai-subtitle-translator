@@ -331,6 +331,20 @@
     return out;
   }
 
+  // v0.9.52：LLM 偶发把闭引号放在单独一行（译文 "他说：...\n”"）。仅由闭标点（”’"»）等）组成的行
+  // 并入前一行——闭标点永远贴前词，直接相接不加空格。省略号/♪ 等独立符号行不在此列（可能是刻意的停顿行）。
+  function mergePunctOnlyLines(src) {
+    const lines = String(src == null ? '' : src).replace(/\r/g, '').split('\n');
+    const out = [];
+    for (const ln of lines) {
+      const core = ln.trim();
+      if (out.length && core && /^["'”’»）)】\]」』》]+$/u.test(core)) {
+        out[out.length - 1] = out[out.length - 1].trimEnd() + core;
+      } else out.push(ln);
+    }
+    return out.join('\n');
+  }
+
   // 将已确认超宽的连续文本折为多行，每行 <= maxW
   function foldSeg(seg, maxW, locale) {
     const out = [];
@@ -1472,7 +1486,8 @@
         continue;
       }
       // v0.9.39：镜像源 speaker 多行结构（仅 mono 导出生效，不动 S.rows 数据/双语/ASS 路径）
-      const rawZh = mirrorSpeakerLines(String(r.zh == null ? '' : r.zh), r.en);
+      // v0.9.52：先并掉「仅闭标点」的孤行（LLM 偶发 \n”），否则 R0 会原样放行
+      const rawZh = mirrorSpeakerLines(mergePunctOnlyLines(String(r.zh == null ? '' : r.zh)), r.en);
       if (!rawZh.trim()) { last = null; continue; }
       last = { start: r.start || 0, end: r.end || 0, times: [{ start: r.start || 0, end: r.end || 0 }], rawZh: rawZh, dst: squashLines(rawZh) };
       entries.push(last);
@@ -1654,7 +1669,7 @@
     parseVtt, formatVtt, fmtTimeVtt,
     parseAss, formatAss, fmtTimeAss, parseAssTime,
     formatTxt, detectFormat,
-    isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace,
+    isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
