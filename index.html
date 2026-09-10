@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.53</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.54</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -3083,7 +3083,18 @@ else if(sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.exp
   let maxWTouched = !!(sv.maxW && ![18,24,20,16,13,21].includes(+sv.maxW));
   UI.maxWTouched = maxWTouched;   // v0.9.53：save() 据此决定是否持久化（联动值不落盘）
   const mw=$('maxW');
-  mw.addEventListener('input', ()=>{ maxWTouched=true; UI.maxWTouched=true; });
+  mw.addEventListener('input', ()=>{ if(mw.value==='') return; maxWTouched=true; UI.maxWTouched=true; });
+  // v0.9.54：清空输入框后失焦 → 恢复「随语言自动推荐」：touched 复位 + 立即联动当前语言。
+  // 之所以用 blur 而非 input：用户改值时往往先清空再输入，清空瞬间就恢复会吞掉输入。
+  mw.addEventListener('blur', ()=>{
+    if(mw.value!=='') return;
+    maxWTouched=false; UI.maxWTouched=false;
+    syncMaxW();   // 立即填回当前语言推荐值，用户可见恢复生效
+    save();       // touched=false 时不写 maxW 字段 → 旧的自定义值从 localStorage 清除
+  });
+  // v0.9.54：number 输入框聚焦时鼠标滚轮会静默改值（并触发 input 锁定联动），阻止之；
+  // 未聚焦时 hover 滚轮正常滚动页面（Chrome 默认此时不改值，preventDefault 会卡住页面滚动）
+  mw.addEventListener('wheel', (e)=>{ if(document.activeElement===mw) e.preventDefault(); }, {passive:false});
   const syncMaxW=()=>{
     if(maxWTouched) return;
     const rec=MAXW_BY_LANG[$('dstLang').value]||21;
