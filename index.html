@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.54</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.55</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -269,7 +269,7 @@
           </div>
         </div>
 
-        <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，随目标语言按 Netflix 规范推荐）</label>
+        <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，随目标语言按 Netflix 规范推荐），数字越大一行字数越多，但可减少字幕行数和字幕切分。</label>
         <input type="number" id="maxW" value="21" min="8" max="48" data-page-node-id="nHDvqEd0WVMgZv4TiIxEIq">
         <div class="btns" data-page-node-id="HF8Fbj8UJE2HRRfdXMXBs4">
           <button class="btn primary" id="btnGo" data-page-node-id="nOlcKaSvIp5ohDOevsDj1x" data-i18n="btnGo">▶ 开始翻译</button>
@@ -486,7 +486,7 @@ const I18N = {
   termsHintOn:'勾选 = 术语表内的专名强制保留原文（下方术语表已启用）。',
   termsHintOff:'已关闭：人名/机构/产品/术语将全部翻译为目标语言，术语表不生效。',
   lblTerms:'需强制保留原文的专名（可留空，逗号分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行阈值（字，随目标语言按 Netflix 规范推荐）', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止',
+  lblMaxW:'折行阈值（字，随目标语言按 Netflix 规范推荐），数字越大一行字数越多，但可减少字幕行数和字幕切分。', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止',
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
   stepExport:'导出译文', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
@@ -560,7 +560,7 @@ const I18N = {
   termsHintOn:'勾選 = 術語表內的專名強制保留原文（下方術語表已啟用）。',
   termsHintOff:'已關閉：人名/機構/產品/術語將全部翻譯為目標語言，術語表不生效。',
   lblTerms:'需強制保留原文的專名（可留空，逗號分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行閾值（字，隨目標語言按 Netflix 規範推薦）', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止',
+  lblMaxW:'折行閾值（字，隨目標語言按 Netflix 規範推薦），數字越大一行字數越多，但可減少字幕行數和字幕切分。', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止',
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
   stepExport:'匯出譯文', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
@@ -634,7 +634,7 @@ const I18N = {
   termsHintOn:'Checked = terms in the list stay in original form (list enabled).',
   termsHintOff:'Off: all names/brands/products/terms are translated; the term list is ignored.',
   lblTerms:'Proper nouns to keep in original form (optional, comma-separated)', termsPh:'e.g. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Wrap threshold (units, Netflix spec per language)', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop',
+  lblMaxW:'Wrap threshold (units, Netflix spec per language) — a larger number fits more characters per line, reducing line count and cue splits', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop',
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
   stepExport:'Export translation', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
@@ -708,7 +708,7 @@ const I18N = {
   termsHintOn:'チェック＝用語リストの固有名詞を原文のまま保持（リスト有効）。',
   termsHintOff:'オフ：人名/組織/製品/用語はすべて翻訳先言語に訳され、用語リストは無効。',
   lblTerms:'原文のまま保持する固有名詞（任意、カンマ区切り）', termsPh:'例：SpaceX, Prism, EnduroSat',
-  lblMaxW:'改行しきい値（字、Netflix規格の言語別推奨）', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止',
+  lblMaxW:'改行しきい値（字、Netflix規格の言語別推奨）、数値が大きいほど1行の文字数が増え、字幕の行数と分割を減らせます', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止',
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
   stepExport:'翻訳を書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
@@ -782,7 +782,7 @@ const I18N = {
   termsHintOn:'Marcado = los términos de la lista se mantienen en su forma original (lista activada).',
   termsHintOff:'Desactivado: todos los nombres/marcas/productos/términos se traducen; la lista se ignora.',
   lblTerms:'Nombres propios a mantener en su forma original (opcional, separados por comas)', termsPh:'p. ej. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbral de ajuste de línea (norma Netflix por idioma)', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener',
+  lblMaxW:'Umbral de ajuste de línea (norma Netflix por idioma); a mayor número, más caracteres por línea, pero menos líneas y cortes', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener',
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
   stepExport:'Exportar traducción', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
@@ -856,7 +856,7 @@ const I18N = {
   termsHintOn:'Marcado = os termos da lista ficam na forma original (lista ativada).',
   termsHintOff:'Desativado: todos os nomes/marcas/produtos/termos são traduzidos; a lista é ignorada.',
   lblTerms:'Nomes próprios a manter na forma original (opcional, separados por vírgula)', termsPh:'ex.: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Limite de quebra de linha (padrão Netflix por idioma)', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar',
+  lblMaxW:'Limite de quebra de linha (padrão Netflix por idioma); quanto maior o número, mais caracteres por linha, mas menos linhas e divisões', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar',
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
   stepExport:'Exportar tradução', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
@@ -930,7 +930,7 @@ const I18N = {
   termsHintOn:'체크 = 목록의 용어를 원문 그대로 유지(목록 활성화).',
   termsHintOff:'끔: 모든 인물/브랜드/제품/용어를 번역하며 용어 목록은 무시됩니다.',
   lblTerms:'원문으로 유지할 고유명사(선택, 쉼표로 구분)', termsPh:'예: SpaceX, Prism, EnduroSat',
-  lblMaxW:'줄바꿈 기준(단위, Netflix 규격 언어별 권장)', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지',
+  lblMaxW:'줄바꿈 기준(단위, Netflix 규격 언어별 권장), 숫자가 클수록 한 줄에 더 많은 글자가 들어가고 자막 줄 수와 분할이 줄어듭니다', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지',
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
   stepExport:'번역 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
@@ -1004,7 +1004,7 @@ const I18N = {
   termsHintOn:'Aktiviert = Begriffe aus der Liste bleiben in Originalform (Liste aktiv).',
   termsHintOff:'Aus: alle Namen/Firmen/Produkte/Begriffe werden übersetzt; die Liste wird ignoriert.',
   lblTerms:'Eigennamen, die in Originalform bleiben sollen (optional, kommagetrennt)', termsPh:'z. B. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbruch-Schwellwert (Netflix-Standard je Sprache)', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen',
+  lblMaxW:'Umbruch-Schwellwert (Netflix-Standard je Sprache); größerer Wert = mehr Zeichen pro Zeile, dafür weniger Zeilen und Aufteilungen', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen',
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
   stepExport:'Übersetzung exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
@@ -1078,7 +1078,7 @@ const I18N = {
   termsHintOn:'Coché = les termes de la liste restent en forme originale (liste activée).',
   termsHintOff:'Désactivé : tous les noms/marques/produits/termes sont traduits ; la liste est ignorée.',
   lblTerms:'Noms propres à conserver en forme originale (facultatif, séparés par des virgules)', termsPh:'ex. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Seuil de retour ligne (norme Netflix par langue)', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter',
+  lblMaxW:'Seuil de retour ligne (norme Netflix par langue) ; plus la valeur est élevée, plus il y a de caractères par ligne, mais moins de lignes et de coupures', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter',
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
   stepExport:'Exporter la traduction', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
@@ -1152,7 +1152,7 @@ const I18N = {
   termsHintOn:'Dicentang = istilah dalam daftar tetap dalam bentuk asli (daftar aktif).',
   termsHintOff:'Mati: semua nama/merek/produk/istilah diterjemahkan; daftar diabaikan.',
   lblTerms:'Nama diri yang dipertahankan dalam bentuk asli (opsional, pisahkan koma)', termsPh:'mis. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ambang pembungkusan baris (standar Netflix per bahasa)', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti',
+  lblMaxW:'Ambang pembungkusan baris (standar Netflix per bahasa); semakin besar angkanya, semakin banyak karakter per baris, tetapi baris dan pemisahan berkurang', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti',
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
   stepExport:'Ekspor terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
@@ -1226,7 +1226,7 @@ const I18N = {
   termsHintOn:'चयनित = सूची के शब्द मूल रूप में रहेंगे (सूची सक्रिय)।',
   termsHintOff:'बंद: सभी नाम/ब्रांड/उत्पाद/शब्दावली अनुवाद होंगे; सूची नज़रअंदाज़।',
   lblTerms:'मूल रूप में रखने योग्य संज्ञाएँ (वैकल्पिक, कॉमा से अलग)', termsPh:'जैसे SpaceX, Prism, EnduroSat',
-  lblMaxW:'रैप सीमा (इकाई, Netflix मानक अनुसार भाषा-वार)', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें',
+  lblMaxW:'रैप सीमा (इकाई, Netflix मानक अनुसार भाषा-वार); संख्या बड़ी होने पर प्रति पंक्ति अधिक अक्षर आते हैं, पर उपशीर्षक पंक्तियाँ और विभाजन कम होते हैं', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें',
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
   stepExport:'अनुवाद निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
@@ -1300,7 +1300,7 @@ const I18N = {
   termsHintOn:'เลือก = คำในรายการคงรูปเดิม (รายการเปิดใช้งาน)',
   termsHintOff:'ปิด: ชื่อ/แบรนด์/ผลิตภัณฑ์/คำศัพท์ทั้งหมดจะถูกแปล; รายการถูกละเว้น',
   lblTerms:'ชื่อเฉพาะที่จะคงรูปเดิม (ไม่บังคับ คั่นด้วยจุลภาค)', termsPh:'เช่น SpaceX, Prism, EnduroSat',
-  lblMaxW:'เกณฑ์ตัดบรรทัด (มาตรฐาน Netflix ตามภาษา)', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด',
+  lblMaxW:'เกณฑ์ตัดบรรทัด (มาตรฐาน Netflix ตามภาษา) ยิ่งตัวเลขมาก ยิ่งมีตัวอักษรต่อบรรทัดมากขึ้น แต่ลดจำนวนบรรทัดและการแบ่งซับ', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด',
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
   stepExport:'ส่งออกคำแปล', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
@@ -1374,7 +1374,7 @@ const I18N = {
   termsHintOn:'Đã chọn = các thuật ngữ trong danh sách giữ nguyên dạng (danh sách bật).',
   termsHintOff:'Tắt: mọi tên/thương hiệu/sản phẩm/thuật ngữ đều được dịch; danh sách bị bỏ qua.',
   lblTerms:'Tên riêng cần giữ nguyên (không bắt buộc, phân tách bằng dấu phẩy)', termsPh:'vd: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ngưỡng ngắt dòng (chuẩn Netflix theo ngôn ngữ)', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng',
+  lblMaxW:'Ngưỡng ngắt dòng (chuẩn Netflix theo ngôn ngữ); số càng lớn càng nhiều ký tự mỗi dòng, nhưng giảm số dòng và số lần tách phụ đề', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng',
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
   stepExport:'Xuất bản dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
@@ -1448,7 +1448,7 @@ const I18N = {
   termsHintOn:'Включено = термины из списка остаются в оригинальном виде (список активен).',
   termsHintOff:'Выключено: все имена/бренды/продукты/термины переводятся; список игнорируется.',
   lblTerms:'Имена собственные для сохранения оригинала (необязательно, через запятую)', termsPh:'напр. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Порог переноса строк (стандарт Netflix по языку)', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки',
+  lblMaxW:'Порог переноса строк (стандарт Netflix по языку); чем больше число, тем больше знаков в строке, но меньше строк и разбиений', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки',
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
   stepExport:'Экспорт перевода', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
@@ -1522,7 +1522,7 @@ const I18N = {
   termsHintOn:'Attivo: i termini dell\'elenco restano nella forma originale (elenco abilitato).',
   termsHintOff:'Disattivo: tutti i nomi/marchi/prodotti/termini vengono tradotti; l\'elenco viene ignorato.',
   lblTerms:'Nomi propri da mantenere in forma originale (facoltativo, separati da virgola)', termsPh:'es. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Soglia di ritorno a capo (standard Netflix per lingua)', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare',
+  lblMaxW:'Soglia di ritorno a capo (standard Netflix per lingua); un numero maggiore = più caratteri per riga, ma meno righe e suddivisioni', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare',
   btnPost:'↻ Solo post-elaborazione (a capo/pulizia tag)',
   hintPrivacy:'Modello predefinito: i sottotitoli passano dal server di questo sito verso il fornitore configurato dall\'amministratore; API personalizzata: il fornitore scelto li elabora direttamente, senza passare da questo sito.',
   stepExport:'Esporta traduzione', lblOutName:'Nome file di esportazione (automatico: nome origine + lingua di destinazione)', outPh:'xxx_tradotto.srt',
@@ -1596,7 +1596,7 @@ const I18N = {
   termsHintOn:'عند التفعيل: تبقى المصطلحات في القائمة بصيغتها الأصلية (القائمة مفعّلة).',
   termsHintOff:'عند الإيقاف: تُترجم جميع الأسماء/العلامات/المنتجات/المصطلحات؛ وتُتجاهل قائمة المصطلحات.',
   lblTerms:'أسماء خاصة تبقى بصيغتها الأصلية (اختياري، مفصولة بفواصل)', termsPh:'مثال: SpaceX, Prism, EnduroSat',
-  lblMaxW:'حد الالتفاف (معيار Netflix حسب اللغة)', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف',
+  lblMaxW:'حد الالتفاف (معيار Netflix حسب اللغة)؛ الرقم الأكبر يعني حروفًا أكثر في السطر، لكن مع صفوف وتقسيمات أقل', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف',
   btnPost:'↻ معالجة لاحقة فقط (التفاف/تنظيف الوسوم)',
   hintPrivacy:'النموذج الافتراضي: تمر الترجمات عبر خادم هذا الموقع إلى المزوّد الذي أعدّه المشرف؛ API مخصص: يعالجها المزوّد الذي اخترته مباشرة دون المرور بهذا الموقع.',
   stepExport:'تصدير الترجمة', lblOutName:'اسم ملف التصدير (تلقائي: اسم المصدر + لغة الهدف)', outPh:'xxx_translated.srt',
@@ -1670,7 +1670,7 @@ const I18N = {
   termsHintOn:'İşaretliyken listedeki terimler özgün biçimde kalır (liste etkin).',
   termsHintOff:'Kapalı: tüm isim/marka/ürün/terim çevrilir; terim listesi yok sayılır.',
   lblTerms:'Özgün biçimde korunacak özel isimler (isteğe bağlı, virgülle ayır)', termsPh:'örn. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Satır sarma eşiği (Netflix standardı, dile göre)', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla',
+  lblMaxW:'Satır sarma eşiği (Netflix standardı, dile göre); sayı büyüdükçe satırdaki karakter sayısı artar, satır ve bölünme sayısı azalır', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla',
   btnPost:'↻ Sadece son işlem (satır sarma/etiket temizleme)',
   hintPrivacy:'Varsayılan model: altyazılar bu sitenin sunucusu üzerinden yöneticinin yapılandırdığı sağlayıcıya iletilir; Özel API: seçtiğin sağlayıcı bunları doğrudan işler, bu siteye uğramaz.',
   stepExport:'Çeviriyi dışa aktar', lblOutName:'Dışa aktarma dosya adı (otomatik: kaynak adı + hedef dil)', outPh:'xxx_cevrildi.srt',
