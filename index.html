@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.57</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.58</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2726,14 +2726,24 @@ async function runTranslate(){
       // v0.9.29：批次重试全败 → 拆单组逐个补救（Apple Fold 评测实证：fa 语言批 8 三连败导致 3 句组 missing，
       // 同批其他句组本身无问题，隔离单组重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
       if(!ok && !S.stop){
-        let saved=0, consecFail=0;
+        let saved=0, consecFail=0, drifted=[];
         for(const g1 of gBatch){
           if(S.stop) break;
           let got1=false;
+          // v0.9.58：补救通道同样过语言锚定——跑偏结果不再静默溜过；第 1 次跑偏 → 第 2 次带
+          // 纠错反馈重译（与主通道 v0.9.57 同武器）；第 2 次仍跑偏 → 与主通道 anchorKeep 同策略带病接受
+          let badTexts=[];
           for(let a=0;a<2 && !got1;a++){
             try{
               lastCall=Date.now();
-              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys);
+              const fbArr=(a>0&&badTexts.length)?badTexts.map(x=>({gno:g1.gno,text:x})):null;
+              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr);
+              if((o2.badAnchor||[]).includes(g1.gno)){
+                const bt=String((o2.byGno[g1.gno]||{}).text||'').trim();
+                if(bt && !badTexts.includes(bt)) badTexts.push(bt);
+                if(a===0){ await new Promise(r=>setTimeout(r,1200)); continue; }
+                drifted.push(g1.gno);
+              }
               Object.keys(o2.byGno).forEach(k=>res.set(Number(k), o2.byGno[k]));
               o2.fillers.forEach(no=>fillerSet.add(no));
               saved++; got1=true;
@@ -2744,6 +2754,7 @@ async function runTranslate(){
           if(!got1){ if(++consecFail>=3){ S.modelDead=true; S.stop=true; break; } }
           else consecFail=0;
         }
+        if(drifted.length) log(t('anchorKeep', drifted.slice(0,5).join(',')+(drifted.length>5?'…':''), LBY(cfg.dst).zh),'err');
         log(t('batchRescue',bi+1,saved,gBatch.length), saved===gBatch.length?'okc':'err');
         // v0.9.56：首批即全军覆没，或连续 2 批零成功 → 模型不工作，停止并弹窗（小批次凑不满 3 连败走此兜底）
         if(!S.stop && saved===0){
