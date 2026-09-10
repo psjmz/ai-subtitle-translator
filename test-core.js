@@ -1021,6 +1021,15 @@ t('fixMixedChars：泰文混入的汉字术语被替换为正确泰文', () => {
   assert.strictEqual(C.fixMixedChars('มันลงทุนในโมเดล前沿ด้วย', 'th'), 'มันลงทุนในโมเดลล้ำหน้าด้วย');
   assert.strictEqual(C.fixMixedChars('ไม่ว่าจะเป็นกับห้องปฏิบัติการ前沿', 'th'), 'ไม่ว่าจะเป็นกับห้องปฏิบัติการล้ำหน้า');
 });
+t('fixMixedChars：泰文混入的整句中文前缀被替换（v0.9.57 Qualcomm 案例）', () => {
+  // DeepSeek 前几个 token 漂进中文、被泰语语气词拉回的真实输出
+  assert.strictEqual(
+    C.fixMixedChars('所以我们非常兴奋，这 เอ่อ จะเป็นหนึ่งในวิธี', 'th'),
+    'ดังนั้นเราจึงตื่นเต้นมากที่ เอ่อ จะเป็นหนึ่งในวิธี'
+  );
+  // 纯中文不受影响（词表按语言隔离）
+  assert.strictEqual(C.fixMixedChars('所以我们非常兴奋，这', 'zh-CN'), '所以我们非常兴奋，这');
+});
 t('fixMixedChars：非泰文目标语言零影响（词表按语言隔离）', () => {
   // 中文/日文译文里「前沿」是合法词汇，绝不替换
   assert.strictEqual(C.fixMixedChars('我们站在技术的前沿', 'zh-CN'), '我们站在技术的前沿');

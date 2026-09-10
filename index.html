@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.56</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.57</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2274,7 +2274,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs){
   } finally { clearTimeout(timer); }
 }
 
-async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
+async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
   const send = groups.filter(g=>!g.pureMusic);
@@ -2286,11 +2286,23 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys){
   const dstN = LBY($('dstLang').value);
   // v0.9.22：用户消息与系统提示词同语言（非中文目标用英文，防指令语言泄漏）
   const zhDst = $('dstLang').value==='zh-CN' || $('dstLang').value==='zh-TW';
+  // v0.9.57：纠错重试——顽固跑偏组盲重发（同输入→同输出）零效果，把上次跑偏的译文
+  // 明确喂回给模型让它自我纠正（Qualcomm CFO 访谈泰文版实测案例：整句前半漂成中文，
+  // 批级重试 + 单组盲重发 ×2 全部复现同样的混合输出）
+  const fb = (Array.isArray(feedback) && feedback.length)
+    ? (zhDst
+        ? '\n【纠错重试】你上次的翻译语言跑偏了——下列句组的 text 混入了非' + dstN.zh + '的字符，这是错误的：\n'
+          + JSON.stringify(feedback)
+          + '\n请重新翻译这些句组：text 必须从头到尾完整使用' + dstN.zh + '书写，严禁混入任何其他语言的文字。'
+        : '\n[CORRECTION RETRY] Your previous attempt drifted into the wrong language — the text fields below contain characters that are NOT ' + dstN.prompt + ':\n'
+          + JSON.stringify(feedback)
+          + '\nThese translations are WRONG. Re-translate these groups: every text field must be written ENTIRELY in ' + dstN.prompt + ', with no characters from any other language.')
+    : '';
   const userMsg = zhDst
     ? '句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:garr})
-      + '\n请把每个句组的 merged 翻译成'+dstN.prompt+'（'+dstN.zh+'），text 字段必须用'+dstN.zh+'书写。只输出 JSON。'
+      + '\n请把每个句组的 merged 翻译成'+dstN.prompt+'（'+dstN.zh+'），text 字段必须用'+dstN.zh+'书写。只输出 JSON。' + fb
     : 'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:garr})
-      + '\nTranslate each group\'s merged text into '+dstN.prompt+' ('+dstN.zh+'). The text field must be written in '+dstN.zh+'. Output JSON only.';
+      + '\nTranslate each group\'s merged text into '+dstN.prompt+' ('+dstN.zh+'). The text field must be written in '+dstN.zh+'. Output JSON only.' + fb;
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
     {role:'user',content:userMsg}
@@ -2649,15 +2661,18 @@ async function runTranslate(){
           }
           if(out.badAnchor && out.badAnchor.length){
             // v0.9.22：终检失败拆单组重译——整批上下文偶发触发模型跑偏，隔离单组重发通常即恢复（评测实证 5/5）
+            // v0.9.57：第 1 次仍盲重发（保留实证过的恢复通道）；第 2 次起把跑偏译文喂回模型做纠错重译
             const remain=[];
             for(const gno of out.badAnchor){
               if(S.stop){ remain.push(gno); continue; }
               const g1=gBatch.find(x=>x.gno===gno);
               let fixed=false;
               if(g1){
+                const badTexts=[String((out.byGno[gno]||{}).text||'').trim()].filter(Boolean);
                 for(let a=0;a<2 && !fixed;a++){
                   try{
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalBatch,sys);
+                    const fbArr=(a===1&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalBatch,sys,fbArr);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
                     if(!o2.badAnchor || !o2.badAnchor.length){
@@ -2667,6 +2682,9 @@ async function runTranslate(){
                         o2.fillers.forEach(no=>fillerSet.add(no));
                         fixed=true;
                       }
+                    } else {
+                      const bt=String(((o2.byGno||{})[gno]||{}).text||'').trim();
+                      if(bt && !badTexts.includes(bt)) badTexts.push(bt);
                     }
                   }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
                 }
