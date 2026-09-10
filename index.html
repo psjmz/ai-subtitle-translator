@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 AI 字幕翻译工作台</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.58</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.59</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -1976,7 +1976,8 @@ function pgBatch(bi, totalB){
   const now=Date.now();
   if(PG.t0) PG.durs.push((now-PG.t0)/1000);
   PG.t0=now;
-  setProg(Math.round(bi/totalB*100), true);
+  // v0.9.59：批翻译阶段 95% 封顶——100% 收归 pgFinish 独有（批翻完还有回填/压缩重译/折行渲染）
+  setProg(Math.round(bi/totalB*95), true);
   const etaEl=$('pgEta');
   if(PG.durs.length>=3 && bi<totalB){
     const avg=PG.durs.slice(-5).reduce((a,b)=>a+b,0)/Math.min(PG.durs.length,5);
@@ -2763,7 +2764,7 @@ async function runTranslate(){
         } else if(saved>0) deadStreak=0;
       }
     }
-    setProg(100,true); $('prog').classList.remove('run'); setPrText(t('postEnd'));
+    setProg(95,true); setPrText(t('postEnd')); // v0.9.59：批翻完只到 95%，run 动画保留到 pgFinish
     log(t('postEnd'));
 
     // 回填：整条纯水词的 cue 直接清空；句组优先合并为单条（时长/行数达标），否则按时长切分回填（时间轴不动）
@@ -2860,6 +2861,7 @@ async function runTranslate(){
     // 任何切分都会产生 >2 行的 cue。交给模型压缩改写一轮；压缩后仍放不下或校验不过
     // 则按原样保留（实测出现率 <0.2%，只影响该句组本身，不触碰其他任何译文行）。
     if(overCapGroups.length && useApi && !S.stop){
+      setProg(97,true); setPrText(t('overCapStart', overCapGroups.length)); // v0.9.59：压缩重译阶段可见化
       log(t('overCapStart', overCapGroups.length));
       const items = overCapGroups.map(oc=>({ gno:oc.g.gno, src:oc.g.text, current:oc.text, cap:oc.active.length*2*cfg.maxW }));
       let got=null;
@@ -2892,6 +2894,7 @@ async function runTranslate(){
     S.mergedN = mG;
     log(t('mergeInfo', gMulti, mG, gMulti-mG));
 
+    setProg(99,true); // v0.9.59：进入渲染/折行阶段
     renderRows();        // 先渲染译文，避免后处理误读旧 DOM
     applyPost();         // 清提示词 + 折行（超阈值自动分行）
     finalRenumberAndStats();
