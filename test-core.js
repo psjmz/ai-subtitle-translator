@@ -1835,5 +1835,48 @@ t('validateCueAlign：非数组输入 / 零时长 cue', () => {
   assert.ok(z.ok && z.cpsWarns.length === 0, '零时长 cue 不应产生 CPS 警告');
 });
 
+console.log('\n— v0.9.68 sliver 保护与专名腰斩 —');
+t('R3 细切不产生 <200ms 子 cue（Mayday ja 实测回归）', () => {
+  // 旧算法：154ms cue 被比例瓜分成 58/9/87ms 三段（CPS 爆表无法阅读）
+  const rows = [{ start: 33946, end: 34100, en: 'for her birthday.',
+                  zh: '誕生日のプレゼントに買ってやったんだ。' }];
+  const parts = C.buildBilingualParts(rows, { maxW: 13, srcLocale: 'en', dstLocale: 'ja' });
+  assert.strictEqual(parts.length, 1, '短 cue 应收敛为 1 段，实际 ' + parts.length);
+  assert.strictEqual(parts[0].start, 33946);
+  assert.strictEqual(parts[0].end, 34100);
+});
+t('正常比例切分不受 sliver 保护影响（≥200ms 各段逐一致）', () => {
+  const rows = [{ start: 33946, end: 34947, en: 'So I got Anderton for her birthday.',
+                  zh: 'それで Anderton の誕生日のプレゼントに買ってやったんだ。' }];
+  const parts = C.buildBilingualParts(rows, { maxW: 13, srcLocale: 'en', dstLocale: 'ja' });
+  assert.ok(parts.length >= 2, '应正常切分多段');
+  parts.forEach(p => assert.ok(p.end - p.start >= 200, '出现 <200ms 子段: ' + (p.end - p.start)));
+});
+t('多词拉丁专名不被腰斩（Cabbage|Patch 不切，Mayday ja/fil 回归）', () => {
+  const rows = [
+    { start: 31693, end: 33862, en: "So I got Anderton's daughter\none of those Cabbage Patch dolls",
+      zh: 'それで Anderton の娘に、Cabbage Patch dolls を誕生日のプレゼントに買ってやったんだ。' },
+    { start: 33946, end: 34947, en: 'for her birthday.', flag: 'merged' },
+  ];
+  const parts = C.buildBilingualParts(rows, { maxW: 13, srcLocale: 'en', dstLocale: 'ja' });
+  const joined = parts.map(p => p.dstLines.join('')).join('\u0001');
+  assert.ok(!/Cabbage\u0001\s*Patch/.test(joined), 'Cabbage|Patch 仍被切开');
+  assert.ok(!/Cabbage$/.test(joined), '段尾悬着 Cabbage');
+  assert.ok(joined.includes('Cabbage Patch'), '专名核心应完整出现');
+});
+t('专名惩罚不误伤：专名起点前/句读后切分照常', () => {
+  // "of those|Cabbage"（专名起点前，左词小写）与 "insane.|You"（句读后）不受罚
+  const segs = C.splitTextNatural('one of those Cabbage Patch dolls is insane. You say that like', 4, 'en');
+  const j = segs.join('\u0001');
+  assert.ok(!/Cabbage\u0001\s*Patch/.test(j), 'Cabbage|Patch 被切');
+  assert.ok(segs.every(s => s.trim().length > 0), '出现空段');
+});
+t('单语导出同样受 sliver 保护', () => {
+  const rows = [{ start: 0, end: 154, en: 'for her birthday.',
+                  zh: '誕生日のプレゼントに買ってやったんだ。' }];
+  const parts = C.buildMonoParts(rows, { maxW: 13, dstLocale: 'ja' });
+  assert.strictEqual(parts.length, 1, '短 cue 单语导出应收敛为 1 段');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

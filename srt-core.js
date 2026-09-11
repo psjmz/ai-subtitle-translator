@@ -853,6 +853,21 @@
       }
       return 0;
     };
+    // v0.9.68 多词专名腰斩惩罚（Mayday 21 语言实测：ja/fil 的 "Cabbage | Patch dolls" 被劈两半）：
+    // 切点落在两个首字母大写的拉丁词之间（Cabbage|Patch、Red|Hook）几乎必是劈开了多词专名
+    // （人名/地名/品牌/作品名）。罚 110 分——足以让位给窗口内相邻词边界（宽度项通常 ≤6），
+    // 但不覆盖词边界加分（150）与句子级断点，切点仍可落回词边界；左侧为小写词
+    // （of those|Cabbage，专名起点前）或句读（insane.|You）不受罚。
+    const properMidPenalty = (i) => {
+      if (i <= 0 || i >= pos.length) return 0;
+      if (!/[A-Z]/.test(pos[i])) return 0;                 // 右侧须为小写字母前的 Titlecase 词首
+      const prev = pos[i - 1];
+      if (prev !== ' ' && prev !== '\u3000') return 0;      // 切点须在词间空格处
+      let j = i - 2;
+      while (j >= 0 && /[A-Za-z'’]/.test(pos[j])) j--;
+      if (j === i - 2) return 0;                           // 左侧无词（连续空格/句读）
+      return /[A-Z]/.test(pos[j + 1]) ? 110 : 0;           // 左侧词同样大写开头 → 专名内部，罚
+    };
     for (let k = 1; k < n; k++) {
       const target = (dur.slice(0, k).reduce((a, b) => a + b, 0) / total) * W;
       const prevCut = cuts[cuts.length - 1];
@@ -868,7 +883,8 @@
           + (i > 0 && CLOSE_SET.includes(pos[i - 1]) ? 40 : 0)  // v0.9.51：闭引号/闭括号归前段（破平局：...friend?|" she → ...friend?"|she）
           - Math.abs(pref[i] - target)
           - noStartPenalty(i)             // v0.9.50：行首禁则（的地得/助词/小假名不起行）
-          - hangEndPenalty(i);            // v0.9.64：悬尾/碎块（这/那悬尾、1|1 单字块复合词腰斩）
+          - hangEndPenalty(i)             // v0.9.64：悬尾/碎块（这/那悬尾、1|1 单字块复合词腰斩）
+          - properMidPenalty(i);          // v0.9.68：多词专名内部（Cabbage|Patch）
         if (score > bestScore) { bestScore = score; best = i; }
       }
       if (best < 0 || best <= prevCut) {
@@ -1366,6 +1382,50 @@
   //   - flag='merged' 的行（句组合并被跳过的行）：其源文拼回承载行，避免源文丢失；
   //   - flag='drop'、无译文的行：跳过（与单语导出同口径）。
   // 返回 [{no,start,end,srcLines:[],dstLines:[]}]。
+  // v0.9.68 sliver 子 cue 保护（Mayday ja 实测：R3 细切产生 0.063s 子 cue，CPS 爆表无法阅读）。
+  // 根因：按 basis 宽度占比瓜分 [st,en] 时，basis 严重偏斜（饥饿段被 0.5 兜底抬高后仍极小）
+  // 会让相邻计算边界贴近到几十毫秒。修复：边界生成后做间距收敛——
+  //   a) 与前一保留边界距离 < 200ms 的边界删除（该段并入前段，文本拼接）；
+  //   b) 收敛后末段仍 < 200ms 则回删最后一个边界（并入前段）。
+  // 各段均 ≥200ms 的正常切分，边界与旧算法逐一致（零影响）；只有病态比例被收敛。
+  // 拼接规则：两侧均为拉丁/数字时补一个空格（for her + birthday. → for her birthday.），
+  // 其余（CJK 之间等）直接相连（誕生日 + プレゼントに買って → 誕生日プレゼントに買って）。
+  const MIN_SUB_CUE_MS = 200;
+  function subCuePlan(st, en, ss, dd, basis) {
+    const k = basis.length;
+    const W = basis.reduce((a, b) => a + b, 0) || 1;
+    const total = Math.max(0, en - st);
+    const cuts = [{ i: 0, t: st }];
+    let cum = 0;
+    for (let i = 1; i < k; i++) {
+      cum += basis[i - 1];
+      cuts.push({ i, t: Math.round(st + total * cum / W) });
+    }
+    const kept = [cuts[0]];
+    for (let c = 1; c < cuts.length; c++) {
+      if (cuts[c].t - kept[kept.length - 1].t >= MIN_SUB_CUE_MS) kept.push(cuts[c]);
+    }
+    if (kept.length > 1 && en - kept[kept.length - 1].t < MIN_SUB_CUE_MS) kept.pop();
+    kept.push({ i: k, t: en });
+    const joinTxt = (a, b) => {
+      a = String(a || ''); b = String(b || '');
+      if (!a) return b;
+      if (!b) return a;
+      const latA = /[A-Za-z0-9]/.test(a[a.length - 1]), latB = /[A-Za-z0-9]/.test(b[0]);
+      return (latA && latB) ? a + ' ' + b : a + b;
+    };
+    const out = [];
+    for (let c = 0; c + 1 < kept.length; c++) {
+      let sTxt = '', dTxt = '';
+      for (let j = kept[c].i; j < kept[c + 1].i; j++) {
+        sTxt = joinTxt(sTxt, ss ? (ss[j] || '') : '');
+        dTxt = joinTxt(dTxt, dd ? (dd[j] || '') : '');
+      }
+      out.push({ s: sTxt, d: dTxt, start: kept[c].t, end: kept[c + 1].t });
+    }
+    return out;
+  }
+
   function buildBilingualParts(rows, opts) {
     opts = opts || {};
     const maxW = (opts.maxW > 0) ? opts.maxW : 21;
@@ -1434,16 +1494,11 @@
           if ((fitsW(ss) && fitsW(dd)) || kk >= kCap2) break;
         }
         const basis = (sTxt ? ss : dd).map((s) => Math.max(0.5, textWidth(s || '')));
-        const Wt = basis.reduce((a, b) => a + b, 0) || 1;
-        const total = Math.max(0, en - st);
-        let cum = 0;
-        for (let i = 0; i < kk; i++) {
-          cum += basis[i];
-          const subStart = i === 0 ? st : Math.round(st + total * (cum - basis[i]) / Wt);
-          const subEnd = i === kk - 1 ? en : Math.round(st + total * cum / Wt);
-          const sL = ss[i] ? wrapToWidth(ss[i], maxW, { normalize: true, locale: opts.srcLocale }) : [];
-          const dL = wrapToWidth(dd[i] || '', maxW, { normalize: true, locale: opts.dstLocale });
-          pushItem(subStart, subEnd, sL, dL);
+        // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
+        for (const g of subCuePlan(st, en, ss, dd, basis)) {
+          const sL = g.s ? wrapToWidth(g.s, maxW, { normalize: true, locale: opts.srcLocale }) : [];
+          const dL = wrapToWidth(g.d || '', maxW, { normalize: true, locale: opts.dstLocale });
+          pushItem(g.start, g.end, sL, dL);
         }
       };
       // SP 双 speaker（v0.9.25）：src 块 + dst 块各自按 dash 行独立折行，
@@ -1503,17 +1558,12 @@
       }
       // 子时间轴：按源文各段宽度占比分配（无源文时按译文段宽）
       const basis = (srcText ? srcSegs : dstSegs).map((s) => Math.max(0.5, textWidth(s)));
-      const W = basis.reduce((a, b) => a + b, 0);
-      const total = Math.max(0, e.end - e.start);
-      let cum = 0;
-      for (let i = 0; i < k; i++) {
-        cum += basis[i];
-        const subStart = i === 0 ? e.start : Math.round(e.start + total * (cum - basis[i]) / W);
-        const subEnd = i === k - 1 ? e.end : Math.round(e.start + total * cum / W);
+      // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
+      for (const g of subCuePlan(e.start, e.end, srcSegs, dstSegs, basis)) {
         // 段内仍超宽（罕见：长不可断 stretch）则折行兜底，接受该段 2 行
-        const sL = srcSegs[i] ? wrapToWidth(srcSegs[i], maxW, { normalize: true, locale: opts.srcLocale }) : [];
-        const dL = wrapToWidth(dstSegs[i], maxW, { normalize: true, locale: opts.dstLocale });
-        pushItem(subStart, subEnd, sL, dL);
+        const sL = g.s ? wrapToWidth(g.s, maxW, { normalize: true, locale: opts.srcLocale }) : [];
+        const dL = wrapToWidth(g.d || '', maxW, { normalize: true, locale: opts.dstLocale });
+        pushItem(g.start, g.end, sL, dL);
       }
     }
     return out;
@@ -1605,14 +1655,9 @@
             if (fitsAll0(segs)) break;
           }
           const basis0 = segs.map((s) => Math.max(0.5, textWidth(stripSoundTags(String(s || '')))));
-          const W0 = basis0.reduce((a, b) => a + b, 0) || 1;
-          const total0 = Math.max(0, t.end - t.start);
-          let cum0 = 0;
-          for (let j = 0; j < segs.length; j++) {
-            cum0 += basis0[j];
-            const a = j === 0 ? t.start : Math.round(t.start + total0 * (cum0 - basis0[j]) / W0);
-            const b = j === segs.length - 1 ? t.end : Math.round(t.start + total0 * cum0 / W0);
-            emit(a, b, wrapToWidth(segs[j], maxW, { normalize: true, locale: locale }).join('\n'));
+          // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
+          for (const g of subCuePlan(t.start, t.end, null, segs, basis0)) {
+            emit(g.start, g.end, wrapToWidth(g.d, maxW, { normalize: true, locale: locale }).join('\n'));
           }
         }
         continue;
@@ -1633,15 +1678,9 @@
       }
       // 子时间轴按各片宽度占比瓜分（时间跟着内容走）
       const basis = segs.map((s) => Math.max(0.5, textWidth(stripSoundTags(String(s || '')))));
-      const Wsum = basis.reduce((a, b) => a + b, 0) || 1;
-      const total = Math.max(0, e.end - e.start);
-      let cum = 0;
-      for (let i = 0; i < segs.length; i++) {
-        cum += basis[i];
-        const subStart = i === 0 ? e.start : Math.round(e.start + total * (cum - basis[i]) / Wsum);
-        const subEnd = i === segs.length - 1 ? e.end : Math.round(e.start + total * cum / Wsum);
-        const dL = wrapToWidth(segs[i], maxW, { normalize: true, locale: locale });
-        emit(subStart, subEnd, dL.join('\n'));
+      // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
+      for (const g of subCuePlan(e.start, e.end, null, segs, basis)) {
+        emit(g.start, g.end, wrapToWidth(g.d, maxW, { normalize: true, locale: locale }).join('\n'));
       }
     }
     return out;
