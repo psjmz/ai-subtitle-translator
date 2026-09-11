@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 随心字幕 AI</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.66</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.67</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2088,6 +2088,7 @@ function renderRows(){
 // 从 DOM 读回人工编辑的译文
 function collectZh(){
   document.querySelectorAll('#rows .zh').forEach(el=>{
+    if(el.classList.contains('placeholder')) return;  // v0.9.67：占位符（待翻译…）不是译文，绝不回读——否则 missing 行导出字面占位符
     const id=+el.closest('.cuegrid').dataset.id;
     const r=S.rows.find(x=>x.id===id);
     if (r) r.zh=el.innerText.trim();
@@ -2152,7 +2153,7 @@ function systemPromptEn(cfg){
     + 'Rules you must follow:\n'
     + '1. [Translation style] ' + styleEn + '\n'
     + '2. [Cue-aligned output] For every group, return a "cues" array: for EVERY cue number in that group\'s input, exactly one entry {"no":<cue number>,"text":"<' + dstNative + ' text>"} — never merge, skip, renumber, or invent cue numbers.\n'
-    + '   [Duration-aware distribution] Each cue has "dur" (on-screen seconds): a cue can comfortably hold at most about ' + C.cpsLimitOf(cfg.dst) + ' character-widths per second of dur and at most two lines of text. On a very short cue (e.g. dur 0.4s) put only a short word and carry the rest of the sentence on the longer neighboring cues; the group must still read as one coherent sentence in order.\n'
+    + '   [Duration-aware distribution] Each cue has "dur" (on-screen seconds): a cue can comfortably hold at most about ' + C.cpsLimitOf(cfg.dst) + ' character-widths per second of dur and at most two lines of text. On a very short cue (e.g. dur 0.4s) put only a short word and carry the rest of the sentence on the longer neighboring cues; the group must still read as one coherent sentence in order. Distribute the content across cues in the word order natural for ' + dstNative + ' (not necessarily the source order) — e.g. move a trailing adverbial clause of the source sentence to an earlier cue when the target language prefers it.\n'
     + '   [Lyrics exception] If the group\'s merged text contains lyric segment numbers like [1] [2], do NOT use the cues array — translate the merged text as a whole into a single "text" field exactly as before.\n'
     + '3. [Transcription fixes] The source text may come from speech transcription and contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (using proper ' + srcFor + ' spelling), then translate. Proper names must also be spelling-corrected (e.g. Mennerbrigitte should first be corrected to Brigitte) before handling them per rule 4. This rule takes precedence over the glossary (rule 4.5): if a glossary entry itself carries a transcription error, correct the spelling first and apply that entry\'s rendering to the corrected form.'
     + (cfg.src === 'en' ? ' Examples: Mennerbrigitte→Brigitte, 1:00 37 Ventures→137 Ventures.\n' : '\n');
@@ -2207,7 +2208,7 @@ function systemPrompt(cfg){
   + '必须遵守：\n'
   + '1.【翻译风格】' + styleDesc(cfg) + '\n'
   + '2.【cue 对齐输出】每个句组返回一个 cues 数组：组内每个输入 cue 编号恰好对应一条 {"no":编号,"text":"<' + dstNative + '译文>"}，严禁合并、跳过、改号或发明编号。\n'
-  + '   【时长感知分配】每条 cue 有 dur（屏显秒数）：每秒最多承载约 ' + C.cpsLimitOf(cfg.dst) + ' 个字符宽度、至多两行。很短的 cue（如 dur 0.4s）只放一个短词，句子其余部分放到时长充裕的相邻 cue 上；整组按顺序读必须是一句连贯完整的话。\n'
+  + '   【时长感知分配】每条 cue 有 dur（屏显秒数）：每秒最多承载约 ' + C.cpsLimitOf(cfg.dst) + ' 个字符宽度、至多两行。很短的 cue（如 dur 0.4s）只放一个短词，句子其余部分放到时长充裕的相邻 cue 上；整组按顺序读必须是一句连贯完整的话。各条内容的分配顺序应遵循' + dstNative + '的自然语序（不必沿用原文语序）——例如原文句尾的状语从句，目标语习惯前置时可挪到更早的 cue 上。\n'
   + '   【歌词例外】若句组的 merged 含歌词分段编号（如 [1] [2]），不要用 cues 数组——照旧把 merged 整体翻译成一个 text 字段。\n'
   + '3.【听写纠错】原文可能来自语音听写，含明显听写错误（人名、地名、机构、术语、数字、同音词等），识别后先纠正（按' + srcFor + '的正确写法）再翻译。专名同样先纠正拼写（如 Mennerbrigitte 应先纠正为 Brigitte），再按规则4处理（' + (cfg.keepTerms ? '保留原文' : '译成目标语言') + '）。本规则同样优先于规则4.5（术语表）：术语条目本身若含听写错误，先纠正拼写，再按该条目的统一译法处理纠正后的形式。'
   + (cfg.src === 'en' ? ' 示例：Mennerbrigitte→Brigitte、1:00 37 Ventures→137 Ventures。\n' : '\n');
@@ -2379,11 +2380,13 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）
   const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
   const fillers=new Set((Array.isArray(obj.fillers)?obj.fillers:[]).map(Number).filter(no=>known.has(no)));
-  // v0.9.66：cue 对齐结构校验——普通句组（非音乐/非 speaker/非纯符号）带 cues 数组时逐组校验；
+  // v0.9.66：cue 对齐结构校验——非音乐/非纯符号组带 cues 数组时逐组校验；
   // 通过 → m.cueTexts 直写回填；结构错 → cueBadGnos（外层单组重发）；模型未采用 cues（旧格式 text）→ 照旧路径
+  // v0.9.67：① 移除 speaker 豁免（提示词从未豁免 dash 组，代码侧豁免属口径不一致）；
+  // ② 校验失败不再清空 m.cues——保留给回填层抢救拼接（模型部分 cue 缺文时好过整组 missing）
   const cueBadGnos = [];
   for(const g of send){
-    if(g.mFrames || g.speaker || g.pureMusic || g.filler) continue;
+    if(g.mFrames || g.pureMusic || g.filler) continue;
     const m = byGno[g.gno];
     if(!m || !m.cues) continue;
     if(m.type==='drop') continue;
@@ -2391,7 +2394,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
       maxW: (S.maxW||21), cpsLimit: C.cpsLimitOf(dstV), fillerSet: fillers
     });
     if(v.ok){ m.cueTexts = v.texts; m.cpsWarns = v.cpsWarns; m.cues = null; }
-    else { m.cues = null; cueBadGnos.push({ gno: g.gno, errs: v.errs }); }
+    else { cueBadGnos.push({ gno: g.gno, errs: v.errs }); }
   }
   return { byGno, fillers, badAnchor, musicDropGnos, cueBadGnos };
 }
@@ -2896,20 +2899,40 @@ async function runTranslate(){
         missingCount++;
         continue;
       }
+      // v0.9.67 防御网：豁免组（mFrames 等）或重试败组若带结构完整的 cues 输出 → 二次校验后采用，
+      // 不再整组 missing。mFrames 组 cue 输出无 [N] 编号标记 → 按序拼回 text 走符号复原路径。
+      if(!m.cueTexts && m.type!=='drop' && Array.isArray(m.cues) && m.cues.length){
+        try{
+          const v2=C.validateCueAlign(g.cues, m.cues, {maxW:(cfg.maxW||21), cpsLimit:C.cpsLimitOf(cfg.dst), fillerSet});
+          if(v2.ok && v2.texts.size){
+            if(g.mFrames){ m.text = g.cues.slice().sort((a,b)=>a.no-b.no).map(c=>String(v2.texts.get(c.no)||'').trim()).filter(Boolean).join(' '); }
+            else m.cueTexts = v2.texts;
+          }
+        }catch(e3){}
+      }
       // v0.9.66：cue 对齐组——模型已按时长把译文分配到每条 cue，逐条直写（跳过合并/比例切分）。
       // 折行与旧路径同款（wrapToWidth ≤2 行；speaker dash 结构原样）；盘古之白 zh 系同享；
       // 行宽/CPS 软违规由 QC 报警 + 折行兜底（实验：1400+ cue 零硬违规）。
+      // v0.9.67：覆盖不全（个别 cue 无文）→ 不直写，拼接全组可用文本改走旧路径按比例重分配，
+      // 杜绝组内单条静默空缺（v0.9.66 实测：一夜限定组内 17/18 有文而 16 空缺导出占位符）。
       if(m.cueTexts && m.cueTexts.size){
-        active.forEach(c=>{
-          const r=S.rows.find(x=>x.no===c.no);
-          if(!r) return;
-          let ct=String(m.cueTexts.get(c.no)||'').trim();
-          if(!ct) return;                       // cueTexts 校验保证全覆盖；此处防御
-          if(/^zh/.test(String(cfg.dst||''))) ct=C.panguSpace(ct);
-          r.zh=C.isSpeakerText(ct)?ct:C.wrapToWidth(ct,cfg.maxW,{normalize:true,locale:cfg.dst}).join('\n');
-          if(r.flag!=='drop') r.flag='';
-        });
-        continue;
+        const holes = active.filter(c=>!String(m.cueTexts.get(c.no)||'').trim());
+        if(!holes.length){
+          active.forEach(c=>{
+            const r=S.rows.find(x=>x.no===c.no);
+            if(!r) return;
+            let ct=String(m.cueTexts.get(c.no)||'').trim();
+            if(/^zh/.test(String(cfg.dst||''))) ct=C.panguSpace(ct);
+            r.zh=C.isSpeakerText(ct)?ct:C.wrapToWidth(ct,cfg.maxW,{normalize:true,locale:cfg.dst}).join('\n');
+            if(r.flag!=='drop') r.flag='';
+          });
+          continue;
+        }
+        if(holes.length < active.length){
+          m.text = g.cues.slice().sort((a,b)=>a.no-b.no).map(c=>String(m.cueTexts.get(c.no)||'').trim()).filter(Boolean).join(' ');
+          m.cueTexts = null;   // 落到旧路径：按各条时长比例重切
+        }
+        // holes.length===active.length：全空 → 旧路径按 !text 走 missing
       }
       const textRaw = String(m.text||'').trim();
       // 防御性丢弃判定：仅当模型显式 type='drop' 且 text 为空时才丢弃；只要给了译文就用译文
@@ -2936,9 +2959,22 @@ async function runTranslate(){
       // 模型输出时有时无，此处确定性归一；仅 zh 系目标（ja 等无此惯例不动）
       if(/^zh/.test(String(cfg.dst||''))) text = C.panguSpace(text);
       if(!text || C.musicLost(text, g.text)){
-        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
-        missingCount++;
-        continue;
+        // v0.9.67 抢救：模型 cues 输出有部分可用文本（校验失败/重试未过）→ 拼接走比例切分，
+        // 好过整组 missing（v0.9.66 实测：13 条 dash cue 整组丢失导出「待翻译…」占位符）
+        let salv='';
+        if(Array.isArray(m.cues) && m.cues.length){
+          salv = g.cues.slice().sort((a,b)=>a.no-b.no).map(c=>{
+            const oc=m.cues.find(x=>x&&Number(x.no)===Number(c.no));
+            return oc?String(oc.text||'').trim():'';
+          }).filter(Boolean).join(' ');
+        }
+        if(salv && salv.length >= 2 && !C.musicLost(salv, g.text)){
+          text = salv;
+        } else {
+          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
+          missingCount++;
+          continue;
+        }
       }
       if(active.length>1){
         gMulti++;
