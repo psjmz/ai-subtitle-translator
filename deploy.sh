@@ -11,6 +11,16 @@ APP_DIR=/opt/srt-translator
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 HTTPS_DOMAIN=""
 
+# v0.9.68 守卫：必须在应用仓库目录内运行（身旁须有 index.html/server.js）。
+# 2026-09-12 事故：在 /root 下直接运行，第 2 步把 /root 全目录（含 .bash_history/.ssh）拷进
+# 应用目录且公网可读。此守卫拒绝任何"身旁没有应用文件"的运行位置。
+if [ ! -f "$REPO_DIR/index.html" ] || [ ! -f "$REPO_DIR/server.js" ]; then
+  echo "ERROR: deploy.sh must run inside the app repo directory." >&2
+  echo "       (index.html / server.js not found in $REPO_DIR)" >&2
+  echo "       正确流程: tar -xzf srt-translator.tar.gz && cp deploy.sh srt-translator/ && cd srt-translator && bash deploy.sh --https DOMAIN" >&2
+  exit 1
+fi
+
 if [ "$1" = "--https" ] && [ -n "$2" ]; then
   HTTPS_DOMAIN="$2"
 fi

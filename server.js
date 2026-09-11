@@ -197,6 +197,13 @@ function serveStatic(req, res, urlPath){
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
   const lm = p.match(/^\/([a-zA-Z][a-zA-Z-]*)\/(.+)$/);
   if (lm && SEO_ROUTE['/' + lm[1]]) p = '/' + lm[2];
+  // v0.9.68 安全加固：点文件/点目录一律 404（.bash_history、.ssh、.git、._* AppleDouble 等）。
+  // 2026-09-12 事故：deploy.sh 被在 /root 下运行，把 /root 杂物（含 .bash_history）整体拷进
+  // 应用目录，serveStatic 无差别放行导致其公网可读约 30 小时。合法静态资源无一是点文件。
+  if (p.split('/').some((seg) => seg.startsWith('.'))) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Not Found'); return;
+  }
   const file = path.normalize(path.join(ROOT, p));
   if (!file.startsWith(ROOT)) { res.writeHead(403); res.end('Forbidden'); return; }
   fs.readFile(file, (err, buf) => {
