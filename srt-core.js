@@ -50,7 +50,10 @@
   // NS_SOFT：独立成词（助词）时不得作为段首——「的」在「的确」中是词首不罚（Segmenter 整词判定），
   //          日文格助词は/が/を/に等同理（にほん 不罚、あなた|に 罚）
   const NS_HARD = '，。、；！？：…”’」』）)]}》»' + 'っゃゅょぁぃぅぇぉゎ' + 'ー';
-  const NS_SOFT = '的了着么呢吗吧啊呀哦啦嘛呗地得' + 'はがをにでとへも';
+  const NS_SOFT = '的了着么呢吗吧啊呀哦啦嘛呗地得' + '里中内间旁' + 'はがをにでとへも';
+  // v0.9.63：方位词「里/中/内/间/旁」补入 NS_SOFT——独立成块（开孔|里|嵌入）时不作段首，
+  // 切点被推向方位词之前（「…开孔里 / 嵌入…」，里随其宿主词走）；「里面/中间/中国」等
+  // 复合词整词成块不受影响（wb 整词判定，词首不罚）。
 
   function isAlnum(c) { return !!c && /[A-Za-z0-9]/.test(c); }
 
@@ -1269,6 +1272,24 @@
           }
           if (!unit) break;
           moved.push(unit);
+        }
+      }
+      // v0.9.63 孤儿短词收编（借尾向）：借词后若施主尾巴仍悬着 ≤2 有效字的非附着短词
+      // （实测事故：借走「一件事，」后施主剩「他们做的另」，词典把「另/一件事」切成两个词，
+      // 意群被腰斩），把它随借字一并移走。附着性助词（NS_SOFT，右依附）不收编；最多收 2 块；
+      // 施主至少保留 3 个有效字；收编后受段不得以助词开头。
+      if (j < i) {
+        let ext = 0;
+        while (chunks.length && ext < 2) {
+          const tail = chunks[chunks.length - 1];
+          if (!/[\p{L}\p{N}]/u.test(tail)) break;             // 标点/空白块：已到句读，停
+          if (eff(tail) > 2) break;                           // 只收编 ≤2 有效字的短词
+          if (NS_SOFT.indexOf(tail) >= 0 || NS_HARD.indexOf(tail) >= 0) break;
+          if (eff(chunks.slice(0, -1).join('')) < 3) break;   // 施主保底
+          if (moved.length && NS_SOFT.indexOf(String(moved[0]).charAt(0)) >= 0) break;
+          chunks.pop();
+          moved.unshift(tail);
+          ext++;
         }
       }
       if (!moved.length) continue;

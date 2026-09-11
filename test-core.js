@@ -1667,5 +1667,27 @@ t('splitByDuration：闭引号不落段首（NS_HARD 扩展，回归：zh 行首
   assert.ok(!/^[”’»）)]/.test(segs[1]), '第 2 段不得以闭引号开头: ' + segs[1]);
 });
 
+t('splitByDuration：方位词不作段首（v0.9.63，回归：Gurman 折叠屏 22-23 腰斩「开/孔里」）', () => {
+  // 「里」独立成块（开孔|里|嵌入）时作段首被罚 260 分，切点推向方位词之前——里随宿主词走
+  const text = '他们往蜂窝天线开孔里嵌入所谓的陶瓷嵌件。';
+  const segs = C.splitByDuration(text, [{ start: 39320, end: 41369 }, { start: 41369, end: 43745 }], { locale: 'zh-CN' });
+  assert.ok(segs.length === 2, '应切 2 段');
+  assert.ok(!/^里/.test(segs[1]), '第 2 段不得以独立方位词「里」开头: ' + segs[1]);
+  // 复合词不受影响：「里面/中间/中国」整词成块、词首不罚
+  const segs2 = C.splitByDuration('这栋楼里面的房间都很干净整洁明亮。', [{ start: 0, end: 1500 }, { start: 1500, end: 3000 }], { locale: 'zh-CN' });
+  assert.ok(segs2.length === 2 && segs2.every((s) => s), '复合词场景应正常切分且两段非空');
+});
+
+t('splitByDuration：饥饿段借词不腰斩意群（v0.9.63，回归：Gurman 83-86「另/一件事」）', () => {
+  // 逗号切分后「就是」段饥饿 → 从左邻借词，旧版按词典词边界借走「一件事，」留下孤儿「另」；
+  // 修复后孤儿短词随借字收编：施主「他们做的」+受段「另一件事，就是」
+  const text = '他们做的另一件事，就是大幅抬高了国际客户的价格。';
+  const times = [{ start: 162075, end: 163509 }, { start: 163509, end: 164882 }, { start: 164882, end: 166555 }, { start: 166555, end: 168422 }];
+  const segs = C.splitByDuration(text, times, { locale: 'zh-CN' });
+  assert.ok(segs.length === 4, '应切 4 段');
+  assert.ok(!/另$/.test(segs[0]), '第 1 段不得以孤儿短词「另」结尾（意群腰斩）: ' + segs[0]);
+  assert.ok(segs.every((s) => s && s.trim()), '所有段非空');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
