@@ -177,6 +177,9 @@
     if (ch === ' ' || ch === '\u3000') return 4;  // 空格/全角空格处断行（多语言词边界）
     if (CLAUSE.includes(ch)) return 4;
     // 下一字符以连接词开头 → 在连接词前断开
+    // v0.9.64：指示词「这/那」之后不给连接词断点——「这就是/那就是」是指示短语而非连接词，
+    // 在其后断行必腰斩（实测：价格之上。这 / 就是他们弥补…）；PREP 同理一并豁免。
+    if (ch === '这' || ch === '那') return 0;
     const rest = pos.slice(cut).join('');
     for (const w of CONJ_WORDS) if (rest.startsWith(w)) return 3;
     if (rest && CONJ_SINGLE.includes(rest[0])) return 3;
@@ -820,6 +823,24 @@
       while (j < pos.length && !wb.has(j)) j++;
       return j === i + 1 ? 260 : 0;            // 助词独立成块 → 罚
     };
+    // v0.9.64 悬尾/碎块惩罚（Gurman 折叠屏二代实测）：
+    //  a) 1|1 单字块：切口两侧均为单字词块（「嵌|件」「开|孔」）——技术词（陶瓷嵌件/开孔）不在
+    //     分词词典里，词典边界保护对它失效，两侧皆单字块几乎必是复合词腰斩，直接罚；
+    //  b) 指示词悬尾：切口左侧是独立成块的单字「这/那」（「这|一切」「这|就是」「这|是」）——
+    //     指示词必须与其右邻成分连读，悬在段尾等价于腰斩，重罚（可压过连接词前切的 +300 加分）。
+    const hangEndPenalty = (i) => {
+      if (!wb || !wb.has(i) || i <= 0) return 0;
+      let a = i - 1; while (a > 0 && !wb.has(a)) a--;
+      const lenL = i - a;
+      let b = i + 1; while (b < pos.length && !wb.has(b)) b++;
+      const lenR = b - i;
+      const isW = (c) => /[\p{L}\p{N}]/u.test(c || '');
+      if (lenL === 1 && isW(pos[i - 1])) {
+        if (pos[i - 1] === '这' || pos[i - 1] === '那') return 220;      // b) 指示词悬尾
+        if (lenR === 1 && isW(pos[i])) return 30;                        // a) 1|1 单字块
+      }
+      return 0;
+    };
     for (let k = 1; k < n; k++) {
       const target = (dur.slice(0, k).reduce((a, b) => a + b, 0) / total) * W;
       const prevCut = cuts[cuts.length - 1];
@@ -834,7 +855,8 @@
           + (wb && wb.has(i) ? 150 : 0)   // 词边界加分：语义同级时优先不劈词
           + (i > 0 && CLOSE_SET.includes(pos[i - 1]) ? 40 : 0)  // v0.9.51：闭引号/闭括号归前段（破平局：...friend?|" she → ...friend?"|she）
           - Math.abs(pref[i] - target)
-          - noStartPenalty(i);            // v0.9.50：行首禁则（的地得/助词/小假名不起行）
+          - noStartPenalty(i)             // v0.9.50：行首禁则（的地得/助词/小假名不起行）
+          - hangEndPenalty(i);            // v0.9.64：悬尾/碎块（这/那悬尾、1|1 单字块复合词腰斩）
         if (score > bestScore) { bestScore = score; best = i; }
       }
       if (best < 0 || best <= prevCut) {
@@ -1256,6 +1278,14 @@
             if (/[\p{L}\p{N}]/u.test(c)) break;   // 吃到含字母/数字的块为止
           }
           if (!unit) break;
+          // v0.9.64：附着助词不作借出单位——「的/了…」右依附左侧宿主，随借字移动会让受段以助词开头
+          // （实测：借走「溢价，」后循环继续 pop 出「的」→ 受段「的溢价，加在…」行首悬着「的」）。
+          // 推回施主、终止借词（受段宁可薄一点也不以助词开头）。
+          const plainL = unit.replace(/[^\p{L}\p{N}]/gu, '');
+          if (plainL.length === 1 && (NS_SOFT.indexOf(plainL) >= 0 || NS_HARD.indexOf(plainL) >= 0)) {
+            chunks.push(unit);
+            break;
+          }
           moved.unshift(unit);
         } else {     // 借头：头部的词连同其后紧邻标点一起移动
           // v0.9.50 修复：旧断点条件「字母块后跟字母块」在空格语言永不成立（词间总有空格块），
@@ -1271,6 +1301,13 @@
             unit += chunks.shift();
           }
           if (!unit) break;
+          // v0.9.64：指示词不作借出单位——「这/那」必须与其右邻成分连读（这|一切、这|就是），
+          // 从施主头部借走会让受段以悬尾「这」收接、施主以「就是…」开头，制造腰斩。推回、终止。
+          const plainR = unit.replace(/[^\p{L}\p{N}]/gu, '');
+          if ((plainR === '这' || plainR === '那') && chunks.length) {
+            chunks.unshift(unit);
+            break;
+          }
           moved.push(unit);
         }
       }
@@ -1686,6 +1723,18 @@
     return out;
   }
 
+  // v0.9.64：盘古之白——汉字与拉丁字母/数字紧贴处补一个空格（「普通iPhone」→「普通 iPhone」）。
+  // 模型输出时有时无（同片 16 行带空格、5 行紧贴），确定性归一；已有空格不动（不重复加），
+  // 标点接缝不动（「iPhone，」不加）。只按字面处理，不区分术语（「AI构建」→「AI 构建」同规）。
+  // 调用方按目标语言决定是否启用（zh 系惯例加；ja 等不加，函数本身无语言判断）。
+  function panguSpace(text) {
+    const s = String(text == null ? '' : text);
+    if (!s) return s;
+    return s
+      .replace(/([\u4e00-\u9fff])([A-Za-z0-9])/g, '$1 $2')
+      .replace(/([A-Za-z0-9])([\u4e00-\u9fff])/g, '$1 $2');
+  }
+
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
@@ -1696,7 +1745,7 @@
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
-    validateItems, anchorOk, fixMixedChars,
+    validateItems, anchorOk, fixMixedChars, panguSpace,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
     extractMusicFrames, parseSegMarkers, splitByWeights, reassembleMusic, stripSegMarkers, hasSegMarkers,

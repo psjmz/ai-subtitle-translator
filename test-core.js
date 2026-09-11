@@ -1689,5 +1689,46 @@ t('splitByDuration：饥饿段借词不腰斩意群（v0.9.63，回归：Gurman 
   assert.ok(segs.every((s) => s && s.trim()), '所有段非空');
 });
 
+t('splitByDuration：1|1 单字块不切（v0.9.64，回归：Gurman 二代 22-23「陶瓷嵌|件」）', () => {
+  // 「嵌件」是技术词不在分词词典，Chrome 切成 嵌|件 两个单字块——词典边界保护失效；
+  // 修复：两侧均单字词块的切点罚 30 分，切口移向多字词边界
+  const text = '他们把所谓陶瓷嵌件塞进蜂窝天线的开孔里。';
+  const segs = C.splitByDuration(text, [{ start: 39320, end: 41369 }, { start: 41369, end: 43745 }], { locale: 'zh-CN' });
+  assert.ok(segs.length === 2, '应切 2 段');
+  assert.ok(!/嵌$/.test(segs[0]) && !/^件/.test(segs[1]), '「嵌件」不得拆开: ' + segs.join(' / '));
+});
+
+t('splitByDuration：指示词不悬尾（v0.9.64，回归：Gurman 二代 99-100「。这 / 就是」）', () => {
+  // 「这就是」是指示短语不是连接词：连接词前断点加分让切点落在「这」后，单字段再被借词修复
+  // 拼成「价格之上。这 / 就是…」；修复 1：指示词后不给连接词断点；修复 2：悬尾惩罚 220
+  const text = '比如说在澳大利亚，有 800 澳元的溢价，加在换算后的价格之上。这就是他们弥补这个缺口的方式。';
+  const times = [{ start: 187124, end: 188706 }, { start: 188706, end: 190815 }, { start: 190815, end: 193029 }, { start: 193029, end: 194987 }, { start: 194987, end: 197115 }, { start: 195855, end: 197115 }];
+  const segs = C.splitByDuration(text, times, { locale: 'zh-CN' });
+  assert.ok(segs.length === 6, '应切 6 段');
+  segs.forEach((s, i) => {
+    assert.ok(!/这$/.test(s) || i === segs.length - 1, '段 ' + (i + 1) + ' 不得以悬尾「这」结尾: ' + s);
+  });
+  const joined = segs.join('');
+  assert.ok(!joined.includes('。这，') || true, '占位');
+});
+
+t('splitByDuration：借词不带出附着助词（v0.9.64，回归：Gurman 二代 98「的溢价，」行首）', () => {
+  // 借词循环 pop 到「的」时一并搬走会让受段以「的」开头；修复：附着助词不作借出单位，推回施主
+  const segs = C.splitByDuration('比如说在澳大利亚，有 800 澳元的溢价，加在换算后的价格之上。这就是他们弥补这个缺口的方式。',
+    [{ start: 187124, end: 188706 }, { start: 188706, end: 190815 }, { start: 190815, end: 193029 }, { start: 193029, end: 194987 }, { start: 194987, end: 197115 }, { start: 195855, end: 197115 }], { locale: 'zh-CN' });
+  segs.forEach((s, i) => {
+    assert.ok(!/^[的了着里]/.test(s.trim()), '段 ' + (i + 1) + ' 不得以附着助词开头: ' + s);
+  });
+});
+
+t('panguSpace：中西文边界补空格（v0.9.64）', () => {
+  assert.strictEqual(C.panguSpace('一台普通iPhone，又能折叠'), '一台普通 iPhone，又能折叠');
+  assert.strictEqual(C.panguSpace('的AI构建。'), '的 AI 构建。');
+  assert.strictEqual(C.panguSpace('800 澳元 已有空格'), '800 澳元 已有空格');   // 幂等：已有空格不加
+  assert.strictEqual(C.panguSpace('iPhone，标点接缝不动'), 'iPhone，标点接缝不动');
+  assert.strictEqual(C.panguSpace(''), '');
+  assert.strictEqual(C.panguSpace(null), '');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

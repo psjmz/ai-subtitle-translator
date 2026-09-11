@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 随心字幕 AI</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.63</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.64</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2176,6 +2176,7 @@ function systemPromptEn(cfg){
    + '   - Note: type "drop" does not make the translation disappear — it only tells the program to clear that cue. Do not set everything to drop to be "safe".\n'
    + '   - Repetitions: when the same speaker repeats a word or phrase in a row (e.g. "No, no, no"), translating it once is usually enough; keep the repetition only when it is plot/emotion-pertinent (stuttering, emphasis, comedic rhythm).\n'
    + '   - Straddling phrases translate once: when a phrase is split across two adjacent cues (e.g. one cue ends with "people who" and the next starts with "do that"), it must appear only once in the translation — never render it on both sides of the cue boundary as an echo. Translate the full sentence as one coherent unit.\n'
+   + '   - Ellipses are for fading lyrics only: never end or pause a dialogue line with an ellipsis (……/…) — let the next cue continue the sentence naturally; use a comma or a dash for unfinished speech.\n'
    + '5.5 [Lyric segments] Lyric lines arrive with their music symbols (♪ ♫ etc.) already stripped by the program; the lyric text is marked with segment numbers like [1] [2]. When segment numbers appear in the input, keep every number exactly as-is — [1] stays [1]: never translate, renumber, add, or drop segments. Translate only the lyric text after each number; the program re-attaches the music symbols at their original positions. Conversely, when the input has NO segment numbers, you must NOT invent or add any numbers to your output. End lyric lines only with ? or ! (never a comma or period; commas may appear within a line); when a song fades into the background and is no longer subtitled, close with an ellipsis (…) to give precedence to dialogue.\n'
    + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
    + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
@@ -2228,6 +2229,7 @@ s += '5.【水词处理——默认行为是翻译】\n'
    + '   - 注意：类型 "drop" 不会让译文消失，只是程序据此清空字幕；不要为了"安全"而把所有句组都设 drop。\n'
   + '   - 重复词：同一说话人连续重复的词或短语（如 "No, no, no"）通常译一次即可；但若重复本身有情绪或剧情作用（结巴、强调、喜剧节奏），应按语境保留。\n'
   + '   - 跨条短语只译一次：源文短语拆在相邻两条 cue 之间（如一条以 "people who" 收尾、下一条以 "do that" 开头）时，该短语在译文中只出现一次，严禁在两侧各译一遍造成机械复读；按完整语义把整句作为整体翻译。\n'
+  + '   - 省略号仅限歌词淡出场景：对白译文严禁用省略号（……/…）收尾或表达句中停顿——半句话的延续交给下一条字幕自然承接，未说完的话用逗号或破折号处理。\n'
   + '5.5【歌词分段】歌词行的音乐符号（♪ ♫ 等）已由程序剥离，正文以 [1] [2] 等分段编号给出。输入出现分段编号时，编号必须原样保留——[1] 还是 [1]，严禁翻译编号、改写数字、增删或重排分段；只翻译编号后面的歌词正文，程序会把音乐符号按原文位置自动加回。反之，输入没有分段编号时，严禁自行发明或添加任何编号。歌词行末只用 ？和 ！，不用逗号或句号（行内可用逗号）；歌曲退到背景、不再翻译时用省略号（…）收尾给对白让位。\n'
   + '6.【禁止自行折行】text 一律输出单行文本，严禁包含换行符 \\n；折行由程序按显示宽度自动处理，你不要也不能手动分行。\n'
   + '   唯一例外：若该句组的原文是多行且每行以 - 开头（同一条字幕里两个说话人对话），译文必须保持相同结构——每个说话人一行、每行以「- 」开头、行与行之间用一个换行符 \\n 连接。\n'
@@ -2387,6 +2389,8 @@ function musicAlignedSegs(active, text, cfg){
 function backfillGroup(active, text, cfg){
   // v0.9.38：speaker 换行修复（与主回填循环同款，覆盖压缩重译路径）
   if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
+  // v0.9.64：盘古之白（压缩重译路径同享；幂等，主路径已处理过则无变化）
+  if(/^zh/.test(String(cfg.dst||''))) text = C.panguSpace(text);
   // v0.9.42：音乐组优先按歌词行对齐——歌词跟随各自 cue 时间轴，杜绝「♪ 孤行」/行中夹 ♪/词中硬切
   if(active.length>1){
     const mSegs=musicAlignedSegs(active, text, cfg);
@@ -2833,6 +2837,9 @@ async function runTranslate(){
         text = C.normalizeMusic(rawOld, g.text);
       }
       if(active.length===1 && C.isSpeakerText(active[0].text)) text = C.repairSpeakerLines(text, active[0].text);
+      // v0.9.64：盘古之白——中文目标的中西文边界补一个空格（「普通iPhone」→「普通 iPhone」），
+      // 模型输出时有时无，此处确定性归一；仅 zh 系目标（ja 等无此惯例不动）
+      if(/^zh/.test(String(cfg.dst||''))) text = C.panguSpace(text);
       if(!text || C.musicLost(text, g.text)){
         active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='missing'; } });
         missingCount++;
