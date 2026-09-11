@@ -1380,13 +1380,47 @@ t('cpsOf：等效宽度/秒（全角=1、半角=0.5；空/零时长返回 0）',
   assert.strictEqual(C.cpsOf('', 1000), 0);
   assert.strictEqual(C.cpsOf('abc', 0), 0);
 });
-t('cpsLimitOf：语言分档 ja 4 / ko 12 / zh 9 / 默认 8（Netflix TTSG）', () => {
+t('cpsLimitOf：语言分档 ja 4 / ko 9 / zh 9 / 默认 8（Netflix TTSG；v0.9.65 ko 由 12 改 9——谚文补入 isFull 后音节按全宽计，12 是半宽时代口径）', () => {
   assert.strictEqual(C.cpsLimitOf('ja'), 4);
-  assert.strictEqual(C.cpsLimitOf('ko'), 12);
+  assert.strictEqual(C.cpsLimitOf('ko'), 9);
   assert.strictEqual(C.cpsLimitOf('zh-CN'), 9);
   assert.strictEqual(C.cpsLimitOf('zh-TW'), 9);
   assert.strictEqual(C.cpsLimitOf('es'), 8);
 });
+// v0.9.65：韩文宽度口径修复（isFull 此前从未覆盖谚文区间 0xAC00-0xD7AF）
+t('charW/textWidth：谚文音节按全宽计（v0.9.65，回归：42 音节单行放行/折行失效/CPS 漏报）', () => {
+  assert.strictEqual(C.textWidth('가'), 1);
+  assert.strictEqual(C.textWidth('가'.repeat(42)), 42);           // 修复前 21（maxW=21 放行 42 音节单行）
+  assert.strictEqual(C.textWidth('바'.repeat(42)) > 21, true);     // 修复后 maxW=21 必须拦住
+});
+t('charW：组合标记/零宽字符计 0 宽（v0.9.65，回归：th 虚增 23%、hi 虚增 56%）', () => {
+  assert.strictEqual(C.textWidth('\u0e48'), 0);   // 泰文声调标记
+  assert.strictEqual(C.textWidth('\u0947'), 0);   // 天城文元音符号 े
+  assert.strictEqual(C.textWidth('\u200c'), 0);   // ZWNJ（波斯语用）
+  // 宽度对齐：泰文样例基字符半宽（字形窄，设计如此）+ 标记 0 宽
+  const th = 'บริษัทประกาศว่าสมาร์ทโฟนแบบพับรุ่นใหม่จะวางจำหน่ายในฤดูใบไม้ผลิหน้า';
+  const marks = Array.from(th).filter(c => /\p{M}/u.test(c)).length;
+  assert.strictEqual(C.textWidth(th), (Array.from(th).length - marks) * 0.5);
+});
+t('splitByDuration：组合标记不作段首（th/hi，v0.9.65）', () => {
+  const th = 'เทคโนโลยีการแสดงผลของหน้าจอแบบพับถือว่าเป็นความท้าทายที่สุดในประวัติศาสตร์ของอุตสาหกรรมสมาร์ทโฟน';
+  const segs = C.splitByDuration(th, [
+    { start: 0, end: 2600 }, { start: 2600, end: 5100 }, { start: 5100, end: 8400 }, { start: 8400, end: 10800 }
+  ], { locale: 'th' });
+  segs.forEach((s, i) => {
+    if (i > 0) assert.strictEqual(/\p{M}/u.test(Array.from(s)[0]), false, `段 ${i + 1} 以孤立组合标记开头: ${s.slice(0, 6)}`);
+  });
+});
+t('splitByDuration：阿语标点断点（، 后切分、؟ » 不作段首，v0.9.65）', () => {
+  const ar = 'وقال المتحدث «إن السعر المرتفع، بخلاف التوقعات الأولية، سيبقى على هذا المستوى حتى الربيع المقبل» في المؤتمر الصحفي الذي عُقد أمس في نيويورك.';
+  const segs = C.splitByDuration(ar, [
+    { start: 0, end: 2600 }, { start: 2600, end: 5100 }, { start: 5100, end: 8400 }, { start: 8400, end: 10800 }
+  ], { locale: 'ar' });
+  segs.forEach((s, i) => {
+    if (i > 0) assert.strictEqual(/[»،؟؛।॥]/.test(Array.from(s)[0]), false, `段 ${i + 1} 以收尾符号开头: ${s.slice(0, 8)}`);
+  });
+});
+
 t('readingSpeedIssues：超速 / 过短 / 纯符号豁免（zh-CN 档 9）', () => {
   const items = [
     { no: 1, start: 0, end: 1000, text: '一二三四五六七八九十' }, // 10 宽/1s = 10 > 9 → 超速
