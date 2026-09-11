@@ -646,16 +646,29 @@
     return lines.length >= 2 && lines.every((l) => SP_DASH_RE.test(l));
   }
 
-  // speaker 行独立折行：每行 ≤ maxW+4 直放（与 R1 微超宽同口径），
-  // 超宽才在该行内部折行；speaker 边界神圣——绝不跨行重分配、绝不切分时间轴。
+  // speaker 行独立折行：每行 ≤ maxW+10 直放（v0.9.69 放宽，用户方案——双说话人单行
+  // 逻辑上不长，超宽才在该行内部折行）；speaker 边界神圣——绝不跨行重分配、绝不切分时间轴。
   function foldSpeakerLines(text, maxW, locale) {
     const out = [];
     for (const ln of String(text == null ? '' : text).replace(/\r/g, '').split('\n')
       .map((s) => s.trim()).filter(Boolean)) {
-      if (textWidth(stripSoundTags(ln)) <= maxW + 4) { out.push(ln); continue; }
+      if (textWidth(stripSoundTags(ln)) <= maxW + 10) { out.push(ln); continue; }
       out.push.apply(out, wrapToWidth(ln, maxW, { normalize: true, locale: locale }));
     }
     return out;
+  }
+
+  // v0.9.69：speaker 单行合并（用户方案，仅双语导出使用）——多行 dash 结构压成单行
+  // "- A - B"（说话人之间空格分隔），dash 间距顺手归一（源文 "-No" 型无空格统一为 "- "，
+  // 一并修复 cue 18 型间距不一致）。单行输入原样返回（行内 dash 已是目标形态）；
+  // 多行但非全 dash 开头 → 返回 null（结构不适合合并，由调用方回退 2+2 布局）。
+  function mergeSpeakerLine(text) {
+    const raw = String(text == null ? '' : text).replace(/\r/g, '').trim();
+    if (!raw) return '';
+    const lines = raw.split('\n').map((s) => s.trim()).filter(Boolean);
+    if (lines.length <= 1) return lines[0] || raw;
+    if (!lines.every((l) => SP_DASH_RE.test(l))) return null;
+    return lines.map((l) => l.replace(/^([-–—])\s*/, '$1 ')).join(' ');
   }
 
   // v0.9.38：模型偶发丢掉 speaker 换行（把 "\n- " 压成行内 "- "，规则 6 例外失守），
@@ -1501,12 +1514,24 @@
           pushItem(g.start, g.end, sL, dL);
         }
       };
-      // SP 双 speaker（v0.9.25）：src 块 + dst 块各自按 dash 行独立折行，
-      // 不跨 speaker 切分、不折 2+2 容量框架（4 行上限天然满足）
+      // SP 双 speaker（v0.9.25；v0.9.69 用户方案重写）：双语导出 src/dst 各合并为单行
+      // "- A - B"（dash 归一、说话人间空格），合并行 ≤ maxW+10 直放——正好落进标准
+      // 2 行框架（1 行源文 + 1 行译文），不再需要 4 行豁免；任一侧合并结果为 null
+      // （非全 dash 结构）或超宽 → 双侧回退现行按 dash 行独立折行的 2+2 布局
+      // （不硬折行，保 dash 可读性）。时间轴依然神圣不可切分。
       if (e.speaker) {
-        const sLines = (e.srcParts.length && isSpeakerText(e.srcParts[0]))
-          ? foldSpeakerLines(e.srcParts[0], maxW, opts.srcLocale)
-          : (e.srcParts.length ? wrapToWidth(e.srcParts[0], maxW, { normalize: true, locale: opts.srcLocale }) : []);
+        const srcRaw = e.srcParts.length ? e.srcParts[0] : '';
+        const srcM = srcRaw ? mergeSpeakerLine(srcRaw) : '';
+        const dstM = mergeSpeakerLine(e.dst);
+        const srcOk = !srcRaw || (srcM !== null && textWidth(stripSoundTags(srcM)) <= maxW + 10);
+        const dstOk = dstM !== null && textWidth(stripSoundTags(dstM)) <= maxW + 10;
+        if (srcOk && dstOk) {
+          pushItem(e.start, e.end, (srcRaw && srcM) ? [srcM] : [], [dstM]);
+          continue;
+        }
+        const sLines = (srcRaw && isSpeakerText(srcRaw))
+          ? foldSpeakerLines(srcRaw, maxW, opts.srcLocale)
+          : (srcRaw ? wrapToWidth(srcRaw, maxW, { normalize: true, locale: opts.srcLocale }) : []);
         pushItem(e.start, e.end, sLines, foldSpeakerLines(e.dst, maxW, opts.dstLocale));
         continue;
       }

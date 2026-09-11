@@ -978,26 +978,46 @@ t('splitCues：双 speaker 单 cue 透传保留行结构（不被 squash）', ()
   assert.strictEqual(pieces[0], '- 走开\n- 你试试');
 });
 t('buildMonoParts SP：每行独立、行级容忍、绝不跨 speaker 折行', () => {
-  // 两行各 5 宽 ≤ 20+4 → 原样双行
+  // 两行各 5 宽 ≤ 20+10 → 原样双行
   const m1 = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: 'x', zh: '- 走开\n- 你试试啊', flag: '' }], { maxW: 20, dstLocale: 'zh-CN' });
   assert.strictEqual(m1[0].text, '- 走开\n- 你试试啊', '合规双行原样');
-  // 行宽 18.5/17.5，maxW=14：一行超容忍(>18)行内折叠、一行容忍内单行；speaker 边界不跨
+  // 行宽 18.5/17.5，maxW=14：v0.9.69 放宽为 ≤ maxW+10=24 → 均容忍内单行；speaker 边界不跨
   const zh = '- 我们现在到底要去哪里买东西呢朋友你说\n- 你不要总是管这么多行不行啊真的服了';
   const m2 = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: 'x', zh, flag: '' }], { maxW: 14, dstLocale: 'zh-CN' });
   const lines = m2[0].text.split('\n');
   assert.ok(lines.length >= 2, '至少双行');
-  lines.forEach(l => assert.ok(C.textWidth(l) <= 18, '每行 ≤ maxW+4 或折行后 ≤ maxW: [' + l + '] 宽' + C.textWidth(l)));
+  lines.forEach(l => assert.ok(C.textWidth(l) <= 24, '每行 ≤ maxW+10 或折行后 ≤ maxW: [' + l + '] 宽' + C.textWidth(l)));
   assert.ok(lines.some(l => l.trim().startsWith('-')), '保留 dash 前缀');
   // speaker 边界：每行文本守恒（去空白拼接与原文一致）
   const norm = s => String(s).replace(/\s+/g, '');
   assert.strictEqual(norm(m2[0].text), norm(zh), '文本守恒');
+  // 超过 maxW+10=24 的长行仍在该行内部折行（折行路径不失效）
+  const long = '- ' + '一二三四五六七八九'.repeat(4);
+  const m3 = C.buildMonoParts([{ no: 1, start: 0, end: 5000, en: 'x', zh: long + '\n- 乙', flag: '' }], { maxW: 14, dstLocale: 'zh-CN' });
+  m3[0].text.split('\n').forEach(l => assert.ok(C.textWidth(l) <= 14, '超宽行折后 ≤ maxW: [' + l + '] 宽' + C.textWidth(l)));
+  assert.strictEqual(norm(m3[0].text), norm(long + '\n- 乙'), '折行文本守恒');
 });
-t('buildBilingualParts SP：src 块 + dst 块各按 dash 行独立，不被 squash 内联', () => {
+t('buildBilingualParts SP：v0.9.69 src/dst 各合并单行 "- A - B"（用户方案）', () => {
   const rows = [{ no: 1, start: 0, end: 5000, en: '- Where are you going?\n- None of your business.', zh: '- 你要去哪里？\n- 不关你的事。', flag: '' }];
   const parts = C.buildBilingualParts(rows, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
   assert.strictEqual(parts.length, 1, '单条目（不切时间轴）');
-  assert.strictEqual(parts[0].srcLines.join('\n'), '- Where are you going?\n- None of your business.', 'src 保留双行');
-  assert.strictEqual(parts[0].dstLines.join('\n'), '- 你要去哪里？\n- 不关你的事。', 'dst 保留双行');
+  assert.strictEqual(parts[0].srcLines.length, 1, 'src 合并单行');
+  assert.strictEqual(parts[0].srcLines[0], '- Where are you going? - None of your business.', 'src 单行形态');
+  assert.strictEqual(parts[0].dstLines.length, 1, 'dst 合并单行');
+  assert.strictEqual(parts[0].dstLines[0], '- 你要去哪里？ - 不关你的事。', 'dst 单行形态（说话人间空格）');
+  // dash 间距归一：源文 "-No" 型无空格也统一为 "- "
+  const parts2 = C.buildBilingualParts([{ no: 1, start: 0, end: 5000, en: '-Go away\n-Make me', zh: '- 走开\n- 你试试啊', flag: '' }], { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(parts2[0].srcLines[0], '- Go away - Make me', 'src dash 间距归一');
+  // 超宽回退：合并行 > maxW+10 → 双侧回退 2+2 行布局（不硬折行）
+  const zhLong = '- ' + '一二三四五六七八九十一二三四五六七'.slice(0, 16) + '\n- ' + '一二三四五六七八九十一二三四五六七'.slice(0, 16);
+  const fb = C.buildBilingualParts([{ no: 1, start: 0, end: 5000, en: '- A long long long long long line here ok\n- Another long long long line here', zh: zhLong, flag: '' }], { maxW: 10, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(fb.length, 1, '回退仍单条目（不切时间轴）');
+  assert.strictEqual(fb[0].dstLines.length, 2, 'dst 回退双行');
+  assert.ok(fb[0].dstLines.every(l => /^[-–—] /.test(l)), '回退保持每行 dash 前缀');
+  assert.strictEqual(fb[0].srcLines.length, 2, 'src 双侧同步回退双行');
+  // 三说话人合并：全 dash 行照常合并为单行
+  const tri = C.buildBilingualParts([{ no: 1, start: 0, end: 5000, en: '- A.\n- B.\n- C.', zh: '- 甲。\n- 乙。\n- 丙。', flag: '' }], { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  assert.strictEqual(tri[0].dstLines[0], '- 甲。 - 乙。 - 丙。', '三说话人单行合并');
 });
 t('降级：模型无视豁免返回单行 → isSpeakerText 不命中 → 走旧路径不崩', () => {
   const zhDegraded = '- 走开。- 你试试啊。';   // 单行内联（模型把两行并一行）
@@ -1334,14 +1354,15 @@ t('repair/mirror：模型手动折行的 \\n 不再短路修复（v0.9.42 守卫
   // 折行压平后仍切不出段数吻合的边界 → 按原样返回（含原始 \n，宁错放不错改）
   assert.strictEqual(C.mirrorSpeakerLines('- 甲乙丙\n丁戊己', src), '- 甲乙丙\n丁戊己');
 });
-t('foldSpeakerLines：speaker 行按行独立折行（applyPost 结构保持用，v0.9.42 导出）', () => {
-  // ≤ maxW+4 的行直放，行结构不跨行重分配
+t('foldSpeakerLines：speaker 行按行独立折行（applyPost 结构保持用，v0.9.42 导出；v0.9.69 阈值 +10）', () => {
+  // ≤ maxW+10 的行直放，行结构不跨行重分配
   assert.deepStrictEqual(C.foldSpeakerLines('- 甲\n- 乙', 4, 'zh-CN'), ['- 甲', '- 乙']);
-  assert.deepStrictEqual(C.foldSpeakerLines('- 一二三四五六\n- 乙', 4, 'zh-CN'), ['- 一二三四五六', '- 乙']);
-  // 超过 maxW+4 才在该行内部折行（wrapToWidth normalize 同款结果）
+  assert.deepStrictEqual(C.foldSpeakerLines('- 一二三四五六七八九\n- 乙', 4, 'zh-CN'), ['- 一二三四五六七八九', '- 乙']);
+  // 超过 maxW+10 才在该行内部折行（wrapToWidth normalize 同款结果）
+  const longLn = '- ' + '一二三四五六七八九十一二三四五'.slice(0, 14);
   assert.deepStrictEqual(
-    C.foldSpeakerLines('- 一二三四五六七八九\n- 乙', 4, 'zh-CN'),
-    C.wrapToWidth('- 一二三四五六七八九', 4, { normalize: true, locale: 'zh-CN' }).concat(['- 乙']));
+    C.foldSpeakerLines(longLn + '\n- 乙', 4, 'zh-CN'),
+    C.wrapToWidth(longLn, 4, { normalize: true, locale: 'zh-CN' }).concat(['- 乙']));
 });
 t('splitMusicLines：形态 A——配对符号逐行切分（v0.9.42）', () => {
   assert.deepStrictEqual(
