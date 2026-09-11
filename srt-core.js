@@ -1748,6 +1748,54 @@
       .replace(/([A-Za-z0-9])([\u4e00-\u9fff])/g, '$1 $2');
   }
 
+  // v0.9.66：cue 对齐校验——模型按 cue 编号逐条返回译文时的结构校验（纯函数）。
+  // 硬校验（不过则该组降级旧路径/重发）：cue 编号集合精确匹配（缺号/多号/重号）、非空文本（filler 豁免）。
+  // 软校验（只收集不拦截——CPS/行宽由 QC 层报警，折行由 wrapToWidth 兜底）：
+  //   cpsWarns: [{no, cps}] 超过限值；wideWarns: [{no, w}] 超过 2 行物理容量。
+  // cues: 组的源 cue 数组 [{no,start,end}]；outCues: 模型输出 [{no,text}]；
+  // opts: {maxW, cpsLimit, locale, fillerSet}。
+  // 实测依据（cue-exp 实验，11 语言 1400+ cue）：结构错是概率性的且重试可修复
+  //（hi 一次带反馈重试结构清零）；CPS 违规全轻度（超限 ≤2）且重跑即消失——不做硬拦截。
+  function validateCueAlign(cues, outCues, opts) {
+    opts = opts || {};
+    const errs = [];
+    const texts = new Map();
+    const cpsWarns = [], wideWarns = [];
+    const fillerSet = opts.fillerSet || new Set();
+    const maxW = opts.maxW || 21;
+    if (!Array.isArray(outCues)) return { ok: false, errs: ['NO_CUES_ARRAY'], texts, cpsWarns, wideWarns };
+    const known = new Set(cues.map(c => c.no));
+    const seen = new Set();
+    const byNo = new Map(cues.map(c => [c.no, c]));
+    for (const oc of outCues) {
+      if (!oc || oc.no == null) { errs.push('BAD_ENTRY'); continue; }
+      const no = Number(oc.no);
+      if (!known.has(no)) { errs.push('UNKNOWN_' + no); continue; }   // 模型发明了不存在的编号
+      if (seen.has(no)) { errs.push('DUP_' + no); continue; }
+      seen.add(no);
+      const text = String(oc.text == null ? '' : oc.text).trim();
+      if (!text) {
+        if (!fillerSet.has(no)) errs.push('EMPTY_' + no); // 纯水词 cue 允许空（fillers 数组另行清空）
+        continue;
+      }
+      texts.set(no, text);
+      const src = byNo.get(no);
+      if (src) {
+        const dur = (src.end - src.start) / 1000;
+        if (dur > 0 && opts.cpsLimit) {
+          const cps = textWidth(text) / dur;
+          if (cps > opts.cpsLimit) cpsWarns.push({ no, cps: +cps.toFixed(1) });
+        }
+        const w = textWidth(text);
+        if (w > maxW * 2) wideWarns.push({ no, w: +w.toFixed(1) });
+      }
+    }
+    const missing = [];
+    for (const c of cues) if (!seen.has(c.no) && !fillerSet.has(c.no)) missing.push(c.no);
+    if (missing.length) errs.push('MISSING_' + missing.join(','));
+    return { ok: errs.length === 0, errs, texts, cpsWarns, wideWarns };
+  }
+
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
@@ -1758,7 +1806,7 @@
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
-    validateItems, anchorOk, fixMixedChars, panguSpace,
+    validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
     extractMusicFrames, parseSegMarkers, splitByWeights, reassembleMusic, stripSegMarkers, hasSegMarkers,

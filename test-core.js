@@ -1764,5 +1764,76 @@ t('panguSpace：中西文边界补空格（v0.9.64）', () => {
   assert.strictEqual(C.panguSpace(null), '');
 });
 
+// ---------------- v0.9.66 cue 对齐校验 ----------------
+const VCA_CUES = [
+  { no: 108, start: 188706, end: 190815 },
+  { no: 109, start: 190815, end: 192586 },
+  { no: 110, start: 192586, end: 194152 },
+  { no: 111, start: 194152, end: 195855 }
+];
+
+t('validateCueAlign：编号齐全 + 文本非空 = 通过（v0.9.66）', () => {
+  const v = C.validateCueAlign(VCA_CUES, [
+    { no: 108, text: '호주에서는 800 호주 달러의' },
+    { no: 109, text: '환산 환율에' },
+    { no: 110, text: '더해지는 프리미엄이' },
+    { no: 111, text: '붙습니다.' }
+  ], { maxW: 21, cpsLimit: 9, locale: 'ko' });
+  assert.ok(v.ok, '应通过: ' + v.errs.join(';'));
+  assert.strictEqual(v.texts.size, 4);
+  assert.strictEqual(v.texts.get(109), '환산 환율에');
+  assert.strictEqual(v.cpsWarns.length, 0);
+});
+
+t('validateCueAlign：缺号 = 结构错（实验中 hi 的失败形态）', () => {
+  const v = C.validateCueAlign(VCA_CUES, [
+    { no: 108, text: 'a' }, { no: 109, text: 'b' }, { no: 111, text: 'd' }
+  ], { maxW: 21, cpsLimit: 9 });
+  assert.ok(!v.ok, '缺 110 必须判结构错');
+  assert.ok(v.errs.some(e => e.startsWith('MISSING_110')), '错误信息含 MISSING_110: ' + v.errs.join(';'));
+});
+
+t('validateCueAlign：重复编号 / 发明编号 / 空文本 = 结构错', () => {
+  const dup = C.validateCueAlign(VCA_CUES, [
+    { no: 108, text: 'a' }, { no: 108, text: 'a2' }, { no: 109, text: 'b' }, { no: 110, text: 'c' }, { no: 111, text: 'd' }
+  ], {});
+  assert.ok(!dup.ok && dup.errs.some(e => e.startsWith('DUP_')), '重复 108 必须报错');
+  const unknown = C.validateCueAlign(VCA_CUES, [
+    { no: 108, text: 'a' }, { no: 109, text: 'b' }, { no: 110, text: 'c' }, { no: 111, text: 'd' }, { no: 999, text: 'x' }
+  ], {});
+  assert.ok(!unknown.ok && unknown.errs.some(e => e.startsWith('UNKNOWN_999')), '发明 999 必须报错');
+  const empty = C.validateCueAlign(VCA_CUES, [
+    { no: 108, text: 'a' }, { no: 109, text: '' }, { no: 110, text: 'c' }, { no: 111, text: 'd' }
+  ], {});
+  assert.ok(!empty.ok && empty.errs.some(e => e.startsWith('EMPTY_109')), '109 空文本必须报错');
+});
+
+t('validateCueAlign：filler 豁免——纯水词 cue 空文本不算错', () => {
+  const cues = VCA_CUES.concat([{ no: 107, start: 188000, end: 188706 }]);
+  const v = C.validateCueAlign(cues, [
+    { no: 107, text: '' },  // filler：模型列入 fillers 数组，entry 可空
+    { no: 108, text: 'a' }, { no: 109, text: 'b' }, { no: 110, text: 'c' }, { no: 111, text: 'd' }
+  ], { fillerSet: new Set([107]) });
+  assert.ok(v.ok, 'filler 空文本应豁免: ' + v.errs.join(';'));
+  assert.strictEqual(v.texts.size, 4);
+});
+
+t('validateCueAlign：CPS/行宽只软警告不拦截（超容走 QC + 折行兜底）', () => {
+  const v = C.validateCueAlign(VCA_CUES, [
+    { no: 108, text: '아주 긴 문장입니다 정말로 너무 길어서 읽을 수가 없습니다' },
+    { no: 109, text: 'b' }, { no: 110, text: 'c' }, { no: 111, text: 'd' }
+  ], { maxW: 21, cpsLimit: 4 });  // 108 时长 2.109s、宽 >8 → CPS 超 4
+  assert.ok(v.ok, 'CPS 超标是软警告，不判结构错');
+  assert.ok(v.cpsWarns.some(w => w.no === 108), '应收集 108 的 CPS 警告');
+});
+
+t('validateCueAlign：非数组输入 / 零时长 cue', () => {
+  const na = C.validateCueAlign(VCA_CUES, null, {});
+  assert.ok(!na.ok && na.errs[0] === 'NO_CUES_ARRAY');
+  // 源 cue 时间重叠（start==end）→ dur 0 → 不算 CPS（不产生 NaN/Infinity 警告）
+  const z = C.validateCueAlign([{ no: 1, start: 1000, end: 1000 }], [{ no: 1, text: '文本' }], { cpsLimit: 9 });
+  assert.ok(z.ok && z.cpsWarns.length === 0, '零时长 cue 不应产生 CPS 警告');
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
