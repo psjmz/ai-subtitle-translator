@@ -190,7 +190,7 @@
 <div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
   <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
     <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 随心字幕 AI</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.61</span>
+    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.62</span>
     <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
   </header>
   <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
@@ -2146,6 +2146,7 @@ function systemPromptEn(cfg){
     + '[MOST IMPORTANT RULE] The target output language = ' + dstN.prompt + ' (' + dstNative + '). Every translated text field must be written in ' + dstNative
     + '. This prompt is written in English, which is only the instruction language and has nothing to do with the output language — unless the target language itself is Chinese, NEVER output Chinese.\n'
     + 'Source subtitle language: ' + srcFor + '.\n'
+    + (cfg.synopsis ? 'Film context (background for your understanding only): ' + cfg.synopsis + '\n' : '')
     + 'The input contains several "sentence groups": a complete sentence may be split across multiple subtitle cues (already merged into one merged text), or may be a single cue.\n'
     + 'Task: translate each group\'s merged text into one complete, fluent sentence in ' + dstNative + '.\n'
     + 'Rules you must follow:\n'
@@ -2161,7 +2162,7 @@ function systemPromptEn(cfg){
        + ' Generic place names (e.g. the White House) should be translated following ' + dstNative + ' conventions. User-specified terms that must stay in the original: ' + tt + '.\n';
   } else {
     s += '4. [Translate proper nouns] Personal names, organizations, products, brands, and technical terms must be translated into their established ' + dstNative
-       + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists.'
+       + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists. Use an established rendering only for genuinely well-known names; whenever you are unsure whether an established rendering exists, keep the original spelling rather than inventing a transliteration.'
        + (cfg.terms ? ' User-provided terms should also be translated: ' + cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') + '.' : '') + '\n';
   }
   if (cfg.glossary){
@@ -2178,9 +2179,12 @@ function systemPromptEn(cfg){
    + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
    + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
    + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
+   + '8. [Output example] Dash-speaker structure keeps "- " per line joined by \\n; lyric segment numbers stay exactly as-is; pure-filler cue numbers go to the fillers array. The example assumes an English target for illustration only — your actual text fields must be written in ' + dstNative + ':\n'
+   + 'Input (excerpt): {"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"t":"00:01:12,200","src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"t":"00:01:15,000","src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"t":"00:01:20,100","src":"Um."},{"no":18,"t":"00:01:21,500","src":"See you tomorrow."}]}]}\n'
+   + 'Output: {"groups":[{"gno":1,"type":"text","text":"- Coming?\\n- Right behind you."},{"gno":2,"type":"text","text":"[1] Take me home [2] tonight"},{"gno":3,"type":"text","text":"See you tomorrow."}],"fillers":[17]}\n'
    + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
    + '{"groups":[{"gno":1,"type":"text","text":"…"},{"gno":2,"type":"drop"}],"fillers":[17,23]}\n'
-   + 'Once more: every text field must be written in ' + dstNative + '.';
+   + 'Once more: every text field must be written in ' + dstNative + '; keep each text single-line (except the "- " dash-speaker structure); keep the groups array one-to-one with the input gno; output JSON only, no markdown.';
   return s;
 }
 function systemPrompt(cfg){
@@ -2193,6 +2197,7 @@ function systemPrompt(cfg){
   + '【最重要的规则】目标输出语言 = ' + dstN.prompt + '（' + dstNative + '）。所有译文 text 字段必须使用' + dstNative
   + '书写。本提示词用中文书写只是指令语言，与输出语言无关——除非目标语言本身就是中文，否则严禁输出中文。\n'
   + '源字幕语言：' + srcFor + '。\n'
+  + (cfg.synopsis ? '【影片背景】' + cfg.synopsis + '（仅供理解语境）\n' : '')
   + '输入是若干「句组」：一个完整句子可能被拆在多条字幕里（已合并为 merged 一句），也可能就是单条字幕。\n'
   + '任务：把每个句组的 merged 翻译成' + dstNative + '的一个完整、通顺的句子。\n'
   + '必须遵守：\n'
@@ -2208,7 +2213,7 @@ function systemPrompt(cfg){
        + '国家城市等通用地名（如 the White House→白宫）按' + dstNative + '习惯译出。用户指定必须保留原文的术语：' + t + '。\n';
   } else {
     s += '4.【专名翻译】人名、机构、产品、品牌、技术术语一律译成' + dstNative
-       + '的通行译名，严禁保留原文写法：如 Elon Musk→埃隆·马斯克、SpaceX→太空探索技术公司、NASA→美国宇航局、Google→谷歌；即使是很知名的品牌或人名也必须译出；确实没有通行译名的才保留原文。'
+       + '的通行译名，严禁保留原文写法：如 Elon Musk→埃隆·马斯克、SpaceX→太空探索技术公司、NASA→美国宇航局、Google→谷歌；即使是很知名的品牌或人名也必须译出；确实没有通行译名、或不确定是否存在通行译名的，一律保留原文拼写——只对确实广为人知的专名使用通行译名，拿不准就保留原文，严禁生造音译。'
        + (cfg.terms ? ' 用户提供的术语也应翻译：' + cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join('、') + '。' : '') + '\n';
   }
   if (cfg.glossary){
@@ -2225,9 +2230,12 @@ s += '5.【水词处理——默认行为是翻译】\n'
   + '6.【禁止自行折行】text 一律输出单行文本，严禁包含换行符 \\n；折行由程序按显示宽度自动处理，你不要也不能手动分行。\n'
   + '   唯一例外：若该句组的原文是多行且每行以 - 开头（同一条字幕里两个说话人对话），译文必须保持相同结构——每个说话人一行、每行以「- 」开头、行与行之间用一个换行符 \\n 连接。\n'
   + '7.【数字单位一体】译文中的数字与其单位/符号必须作为整体紧邻出现（如 30%、$50、1,000、12.5、100万），严禁拆散或在数字与单位之间插入其他字符。\n'
+  + '8.【输出示例】双说话人保持「- 」结构与换行；歌词保留分段编号；纯水词 cue 编号进 fillers：\n'
+  + '输入（节选）：{"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"t":"00:01:12,200","src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"t":"00:01:15,000","src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"t":"00:01:20,100","src":"Um."},{"no":18,"t":"00:01:21,500","src":"See you tomorrow."}]}]}\n'
+  + '输出：{"groups":[{"gno":1,"type":"text","text":"- 你来吗？\\n- 就在你后面。"},{"gno":2,"type":"text","text":"[1] 带我回家 [2] 今夜"},{"gno":3,"type":"text","text":"明天见。"}],"fillers":[17]}\n'
   + '只输出 JSON（不要 markdown 代码块、不要多余解释）：\n'
   + '{"groups":[{"gno":1,"type":"text","text":"…"},{"gno":2,"type":"drop"}],"fillers":[17,23]}\n'
-  + '再次强调：所有 text 字段必须用' + dstNative + '书写。';
+  + '再次强调：所有 text 字段必须用' + dstNative + '书写；text 一律单行（「- 」双说话人结构除外）；groups 数组与输入句组 gno 一一对应；只输出 JSON，不要 markdown 代码块。';
   return s;
 }
 
@@ -2275,7 +2283,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs){
   } finally { clearTimeout(timer); }
 }
 
-async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback){
+async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
   const send = groups.filter(g=>!g.pureMusic);
@@ -2299,10 +2307,16 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
           + JSON.stringify(feedback)
           + '\nThese translations are WRONG. Re-translate these groups: every text field must be written ENTIRELY in ' + dstN.prompt + ', with no characters from any other language.')
     : '';
+  // v0.9.62：跨批上下文——前批末尾句组的原文+已定译文（只读参考，防模型重复输出/改写）
+  const ctxBlk = (Array.isArray(ctx) && ctx.length)
+    ? (zhDst
+        ? '【前文衔接】此前句组的原文与已定译文（仅供语境衔接参考，不得重复输出、不得修改、不得重新翻译）：\n'+JSON.stringify(ctx)+'\n'
+        : '[PREVIOUS CONTEXT] Source text and final translation of preceding groups (for continuity only — do NOT re-output, modify, or re-translate them):\n'+JSON.stringify(ctx)+'\n')
+    : '';
   const userMsg = zhDst
-    ? '句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:garr})
+    ? ctxBlk+'句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:garr})
       + '\n请把每个句组的 merged 翻译成'+dstN.prompt+'（'+dstN.zh+'），text 字段必须用'+dstN.zh+'书写。只输出 JSON。' + fb
-    : 'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:garr})
+    : ctxBlk+'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:garr})
       + '\nTranslate each group\'s merged text into '+dstN.prompt+' ('+dstN.zh+'). The text field must be written in '+dstN.zh+'. Output JSON only.' + fb;
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
@@ -2423,9 +2437,11 @@ async function compressBatch(base,key,model,items,dstLang){
   const userMsg = zhDst
     ? '以下字幕句组的译文过长，超出画面可显示的容量，请逐组把译文改写得更简洁：压缩冗余表述、去掉可有可无的修饰词、合并同义成分，但必须保留核心语义与通顺度，不得丢句。\n'
       +JSON.stringify({groups})
+      +'严禁用省略号截断或砍掉半句来凑宽度——必须通过改写压缩；数字、专名、术语表译法保持原样。\n'
       +'\n所有 text 字段必须用'+dstN.zh+'书写。只输出 JSON：{"groups":[{"gno":…,"text":"…"}]}。'
     : 'The following subtitle translations are too long to fit the on-screen capacity. Rewrite each one more concisely: compress redundant phrasing, drop dispensable modifiers, merge synonymous parts — but keep the core meaning and fluency, and never drop a sentence.\n'
       +JSON.stringify({groups})
+      +'Never meet the limit by truncating with an ellipsis or cutting a sentence in half — rewrite it shorter instead; keep numbers, proper names and glossary renderings intact.\n'
       +'\nEvery text field must be written in '+dstN.zh+'. Output JSON only: {"groups":[{"gno":…,"text":"…"}]}.';
   const raw=await chatOnce(base,key,model,[
     {role:'system',content: zhDst ? '你是专业字幕译后编辑，擅长在不损失可读性的前提下压缩译文长度。只输出 JSON。' : 'You are a professional post-translation subtitle editor skilled at shortening translations without losing readability. Output JSON only.'},
@@ -2467,9 +2483,9 @@ async function extractGlossary(base,key,model,cfg,srcText){
       + '原文可能来自语音听写，同一专名在片中可能出现多种拼写变体（听写错误所致）：必须先归并为一个规范拼写再入表，t 用规范拼写，严禁把同一个人/事物拆成多条。\n'
       + (cfg.keepTerms
           ? '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、统一译法 r。r 的规则：①类专有名词（人物名/呼号/品牌/机构/作品名）的 r 必须与 t 完全一致——原文写法原样保留，严禁音译或转写（如 Bobbi Thompson 的 r 就是 Bobbi Thompson，严禁写成 博比·汤普森）；只有通用地名（国家/城市/地标）与②类歧义词的 r 用'+dstN.zh+'通行译法。最多 25 条；确实没有就返回 []。\n'
-            + '只输出 JSON 数组：[{"t":"Bobbi Thompson","note":"受访者、房产经纪人","r":"Bobbi Thompson"}]\n\n字幕原文：\n'+srcText
+            + '只输出 JSON 对象：{"synopsis":"60 字以内的一句话影片概要（题材+主要人物，供翻译时理解语境）","terms":[{"t":"Bobbi Thompson","note":"受访者、房产经纪人","r":"Bobbi Thompson"}]}；没有可收术语时 terms 为 []。\n\n字幕原文：\n'+srcText
           : '每条给出：术语原文 t、简短语境注释 note（说明它在片中指什么）、'+dstN.zh+'统一译法 r。最多 25 条；确实没有就返回 []。\n'
-            + '只输出 JSON 数组：[{"t":"Outlaw 1","note":"友军战机呼号","r":"亡命徒1"}]\n\n字幕原文：\n'+srcText)
+            + '只输出 JSON 对象：{"synopsis":"60 字以内的一句话影片概要（题材+主要人物，供翻译时理解语境）","terms":[{"t":"Outlaw 1","note":"友军战机呼号","r":"亡命徒1"}]}；没有可收术语时 terms 为 []。\n\n字幕原文：\n'+srcText)
     : 'Extract a glossary from the subtitle source text below. Include ONLY two kinds:\n'
       + '(1) proper nouns: character names, callsigns/code names, place names, organizations, brands, work titles;\n'
       + '(2) context-ambiguous terms: military jargon, technical slang, polysemous words whose correct rendering depends on the story context.\n'
@@ -2477,17 +2493,21 @@ async function extractGlossary(base,key,model,cfg,srcText){
       + 'The source may come from speech transcription, so the same proper noun may appear under different misspelled variants: merge them into one canonical spelling first — use the canonical spelling as t, and never split one person/entity into multiple entries.\n'
       + (cfg.keepTerms
           ? 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r. Rules for r: for proper nouns (people / callsigns / brands / organizations / work titles), r MUST be exactly identical to t — keep the original spelling verbatim, never transliterate or transcribe it (e.g. the r for "Bobbi Thompson" is "Bobbi Thompson", not 博比·汤普森); only generic place names (countries / cities / landmarks) and category (2) ambiguous terms take the established '+dstN.zh+' rendering. Max 25 items; return [] if none.\n'
-            + 'Output JSON array only: [{"t":"Bobbi Thompson","note":"interviewee, real-estate agent","r":"Bobbi Thompson"}]\n\nSource subtitles:\n'+srcText
+            + 'Output a JSON object only: {"synopsis":"one-sentence synopsis of the film, max 60 words (genre and main subjects, for translation context)","terms":[{"t":"Bobbi Thompson","note":"interviewee, real-estate agent","r":"Bobbi Thompson"}]}; terms is [] when none.\n\nSource subtitles:\n'+srcText
           : 'For each item give: source term t, a short context note (what it refers to in this film), and the unified rendering r in '+dstN.zh+'. Max 25 items; return [] if none.\n'
-            + 'Output JSON array only: [{"t":"Outlaw 1","note":"friendly fighter callsign","r":"アウトロー1"}]\n\nSource subtitles:\n'+srcText);
+            + 'Output a JSON object only: {"synopsis":"one-sentence synopsis of the film, max 60 words (genre and main subjects, for translation context)","terms":[{"t":"Outlaw 1","note":"friendly fighter callsign","r":"アウトロー1"}]}; terms is [] when none.\n\nSource subtitles:\n'+srcText);
   // v0.9.29：术语表单独放宽到 240s（一次性成本；DeepSeek 拥塞时 8.6K 实测 161.5s，90s 必然误杀）
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
     {role:'user',content:usr}
   ],240000);
   const arr=parseLlmJson(raw);
-  if(!Array.isArray(arr)) throw new Error(t('errNoArray'));
-  return arr.filter(x=>x && typeof x.t==='string' && typeof x.r==='string' && x.t.trim() && x.r.trim()).slice(0,25);
+  // v0.9.62：返回 {terms, synopsis}——synopsis 为全片一句话概要，注入 systemPrompt 作语境 primer；
+  // 兼容旧数组返回（模型偶发无视对象指令直接给数组）
+  const terms = Array.isArray(arr) ? arr : (arr && Array.isArray(arr.terms) ? arr.terms : []);
+  if(!terms.length && !(arr && !Array.isArray(arr) && typeof arr.synopsis==='string' && arr.synopsis.trim())) throw new Error(t('errNoArray'));
+  const synopsis = (arr && !Array.isArray(arr) && typeof arr.synopsis==='string') ? arr.synopsis.trim().slice(0,200) : '';
+  return { terms: terms.filter(x=>x && typeof x.t==='string' && typeof x.r==='string' && x.t.trim() && x.r.trim()).slice(0,25), synopsis };
 }
 
 /* ---------------- 主流程 ---------------- */
@@ -2595,12 +2615,11 @@ async function runTranslate(){
       try{
         const gl = await extractGlossary(effBase,effKey,effModel,cfg,sampleSrcText(groups,20000));
         const manual=(cfg.terms||'').split(/[,，]/).map(x=>x.trim().toLowerCase()).filter(Boolean);
-        const lines=gl.filter(x=>!manual.includes(x.t.trim().toLowerCase()))
+        const lines=gl.terms.filter(x=>!manual.includes(x.t.trim().toLowerCase()))
           .map(x=>x.t.trim()+' → '+x.r.trim()+(x.note?'（'+String(x.note).trim()+'）':''));
-        if(lines.length){
-          sys = systemPrompt(Object.assign({},cfg,{glossary:lines.join('\n')}));
-          log(t('autoTermsDone',lines.length),'okc');
-          log(lines.map(l=>'  · '+l).join('\n'));
+        if(lines.length || gl.synopsis){
+          sys = systemPrompt(Object.assign({},cfg,{glossary:lines.join('\n'),synopsis:gl.synopsis||''}));
+          if(lines.length){ log(t('autoTermsDone',lines.length),'okc'); log(lines.map(l=>'  · '+l).join('\n')); }
         }
       }catch(e){ log(t('autoTermsSkip',e.message),'err'); }
     }
@@ -2618,6 +2637,7 @@ async function runTranslate(){
     const res=new Map();
     const fillerSet=new Set();
     const totalB=batches.length;
+    let ctx=[]; // v0.9.62：跨批上下文（前批末尾 ≤2 组的原文+已定译文，随批发给模型做衔接参考）
     for(let bi=0; bi<totalB; bi++){
       if(S.stop){ log(t('userStop'),'err'); break; }
       const gBatch=batches[bi];
@@ -2628,7 +2648,7 @@ async function runTranslate(){
         if(S.stop) break;
         try{
           lastCall=Date.now();
-          const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sys);
+          const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sys,null,ctx);
           // 锚定失败且还有重试机会：丢弃本次结果重试；最后一次仍失败则接受结果（内容仍可用，仅语言跑偏）
           if(out.badAnchor && out.badAnchor.length && attempt<maxTry-1){
             log(t('batchFail',bi+1,attempt+1,t('anchorFail',out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':''),LBY(cfg.dst).zh)),'err');
@@ -2644,7 +2664,7 @@ async function runTranslate(){
               let fixed=false;
               if(g1){
                 try{
-                  const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalBatch,sys);
+                  const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,null,ctx);
                   const m2=o2.byGno&&o2.byGno[gno];
                   // 救回标准：拿到非空译文且该组未触发语言跑偏锚定
                   if(m2 && String(m2.text||'').trim() && !(o2.badAnchor||[]).includes(gno)){
@@ -2673,7 +2693,7 @@ async function runTranslate(){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbArr=(a===1&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalBatch,sys,fbArr);
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
                     if(!o2.badAnchor || !o2.badAnchor.length){
@@ -2738,7 +2758,7 @@ async function runTranslate(){
             try{
               lastCall=Date.now();
               const fbArr=(a>0&&badTexts.length)?badTexts.map(x=>({gno:g1.gno,text:x})):null;
-              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr);
+              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx);
               if((o2.badAnchor||[]).includes(g1.gno)){
                 const bt=String((o2.byGno[g1.gno]||{}).text||'').trim();
                 if(bt && !badTexts.includes(bt)) badTexts.push(bt);
@@ -2763,6 +2783,10 @@ async function runTranslate(){
           if(bi===0 || deadStreak>=2){ S.modelDead=true; S.stop=true; }
         } else if(saved>0) deadStreak=0;
       }
+      // v0.9.62：批末更新跨批上下文——取本批末尾最多 2 个有实义译文的句组（截到 300 字控 token）
+      ctx = gBatch.filter(g=>{ const m=res.get(g.gno); return m && m.type!=='drop' && String(m.text||'').trim(); })
+        .slice(-2)
+        .map(g=>({ gno:g.gno, src:String(g.mFrames?g.mFrames.plainText:g.text).slice(0,300), text:String(res.get(g.gno).text).slice(0,300) }));
     }
     setProg(95,true); setPrText(t('postEnd')); // v0.9.59：批翻完只到 95%，run 动画保留到 pgFinish
     log(t('postEnd'));
