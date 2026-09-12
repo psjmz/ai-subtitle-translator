@@ -220,10 +220,31 @@ function serveStatic(req, res, urlPath){
   }
   const file = path.normalize(path.join(ROOT, p));
   if (!file.startsWith(ROOT)) { res.writeHead(403); res.end('Forbidden'); return; }
-  fs.readFile(file, (err, buf) => {
-    if (err) { res.writeHead(404, {'Content-Type':'text/plain; charset=utf-8'}); res.end('Not Found'); return; }
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
-    res.end(buf);
+  /* v0.9.75 缓存修复：此前响应无 Cache-Control/Last-Modified，浏览器启发式缓存且无法
+     协调验证——用户长期跑旧版 srt-core.js（2026-09-12 日语词切断事故根因）。
+     策略：no-cache（每次协调验证）+ Last-Modified/If-Modified-Since（未变则 304，零开销）。
+     index.html 变 fresh 后，其内 ?v= 版本参数才能及时把新版 srt-core.js 推给浏览器 */
+  fs.stat(file, (err, st) => {
+    if (err || !st.isFile()) { res.writeHead(404, {'Content-Type':'text/plain; charset=utf-8'}); res.end('Not Found'); return; }
+    const lastMod = st.mtime.toUTCString();
+    const mtimeSec = Math.floor(st.mtime.getTime() / 1000) * 1000;
+    const ims = req.headers['if-modified-since'];
+    if (ims) {
+      const t = Date.parse(ims);
+      if (!isNaN(t) && t >= mtimeSec) {
+        res.writeHead(304, { 'Cache-Control': 'no-cache', 'Last-Modified': lastMod });
+        res.end(); return;
+      }
+    }
+    res.writeHead(200, {
+      'Content-Type': MIME[path.extname(file)] || 'application/octet-stream',
+      'Cache-Control': 'no-cache',
+      'Last-Modified': lastMod
+    });
+    fs.readFile(file, (err2, buf) => {
+      if (err2) { res.writeHead(404, {'Content-Type':'text/plain; charset=utf-8'}); res.end('Not Found'); return; }
+      res.end(buf);
+    });
   });
 }
 /* ---------------- SEO 多语言版本（v0.9） ----------------
@@ -521,7 +542,8 @@ function serveIndexLang(req, res, lang){
       ? '<!-- Google tag (gtag.js) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=' + ga + '"></script>\n<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag(\'js\', new Date());\ngtag(\'config\', \'' + ga + '\');\n</script>'
       : '';
     html = html.replace('<!--ANALYTICS-->', gaTag);
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    /* v0.9.75：页面必须协调验证（no-cache），否则新版 srt-core.js?v= 参数可能被旧缓存页面屏蔽 */
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(html);
   });
 }
