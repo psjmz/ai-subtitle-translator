@@ -88,7 +88,10 @@ function appendEvent(ip, meta, model){
   for (let i = db.events.length - 1; i >= 0; i--) {
     const e = db.events[i];
     if (e.ip === ip && e.file === file && e.lang === lang && now - e.t < EVENT_DEDUP_MS) {
-      e.batches = (e.batches || 1) + 1;
+      /* v0.9.72：meta.rt=1 是前端隔离重译调用（音乐误删/跑偏/结构错重发）——单独累加 retries，
+         不计入 batches，站长可直接看到主批/重译拆分 */
+      if (meta.rt) e.retries = (e.retries || 0) + 1;
+      else e.batches = (e.batches || 1) + 1;
       if (cues > (e.cues || 0)) e.cues = cues;
       if (mdl && !e.model) e.model = mdl;
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
@@ -96,7 +99,7 @@ function appendEvent(ip, meta, model){
     }
     if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
   }
-  db.events.push({ t: now, ip, file, lang, cues, batches: 1, model: mdl });
+  db.events.push({ t: now, ip, file, lang, cues, batches: meta.rt ? 0 : 1, retries: meta.rt ? 1 : 0, model: mdl });
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
   fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
 }
