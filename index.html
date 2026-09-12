@@ -390,7 +390,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.71</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.72</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -544,7 +544,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.71</span>
+    <span class="ver-tag">v0.9.72</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -600,16 +600,18 @@
       </select>
       <div class="hint" id="builtinHint" style="display:none"></div>
 
+      <!-- v0.9.72：单批条数移出 apiBox——builtin 模式同样可调（此前免费用户根本看不到此设置） -->
+      <label class="flbl"><span data-i18n="lblBatch">单批条数</span><i class="info" data-tip-i18n="batchTip">i</i></label>
+      <input type="number" id="batch" value="40" min="8" max="60">
+
       <div id="apiBox">
         <label class="flbl" data-i18n="lblProvider">服务商</label>
         <select id="provider"></select>
         <div class="hint" id="providerNote" style="display:none"></div>
         <label class="flbl" data-i18n="lblBase">Base URL（自动拼接 /chat/completions）</label>
         <input type="text" id="base" spellcheck="false">
-        <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div><label class="flbl" data-i18n="lblModel">模型</label><input type="text" id="model" spellcheck="false"></div>
-          <div><label class="flbl" data-i18n="lblBatch">单批条数</label><input type="number" id="batch" value="24" min="1" max="60"></div>
-        </div>
+        <label class="flbl" data-i18n="lblModel">模型</label>
+        <input type="text" id="model" spellcheck="false">
         <label class="flbl"><span data-i18n="lblKey">API Key（仅保存在本机浏览器）</span><a id="keyLink" href="#" target="_blank" rel="noopener" style="float:right;font-weight:400;display:none"></a></label>
         <input type="password" id="apikey" autocomplete="off">
         <div class="btns" style="margin-top:8px">
@@ -783,7 +785,7 @@ const I18N = {
   hintPlain:'大白话：口语化、直白易懂，像日常对话；多用短句与常用词，保留说话人语气。',
   hintCustom:'自定义：下面的描述将原样作为“翻译风格”要求发给模型。',
   optCustom:"自定义…", btnTest:"⚡ 测试连接", testRun:"测试中…", testOk:"✓ 连接成功", testFail:"✗ 失败：{0}", getKey:"获取 API Key ↗", noteDoubao:"豆包需在火山方舟控制台开通模型服务；「模型」填 doubao-seed-… 或接入点 ID（ep- 开头）", noteOpenRouter:"模型名格式为 厂商/模型（如 anthropic/claude-sonnet-4.6）；一个 Key 可调用数百款模型",
-  lblProvider:'服务商', lblBase:'Base URL（自动拼接 /chat/completions）', lblModel:'模型', lblBatch:'单批条数',
+  lblProvider:'服务商', lblBase:'Base URL（自动拼接 /chat/completions）', lblModel:'模型', lblBatch:'单批条数', batchTip:'每次请求送模型的字幕条数。越大总耗时越短，但过大可能降低翻译质量；默认 40 适合大多数视频。',
   lblKey:'API Key（仅保存在本机浏览器）',
   chkKeepTerms:'专有名词（人名/机构/产品/术语）保留原文，不翻译',
   termsHintOn:'勾选 = 术语表内的专名强制保留原文（下方术语表已启用）。',
@@ -875,7 +877,7 @@ const I18N = {
   hintPlain:'大白話：口語化、直白易懂，像日常對話；多用短句與常用詞，保留說話人語氣。',
   hintCustom:'自訂：下面的描述將原樣作為「翻譯風格」要求發給模型。',
   optCustom:"自訂…", btnTest:"⚡ 測試連線", testRun:"測試中…", testOk:"✓ 連線成功", testFail:"✗ 失敗：{0}", getKey:"取得 API Key ↗", noteDoubao:"豆包需在火山方舟控制台開通模型服務；「模型」填 doubao-seed-… 或接入點 ID（ep- 開頭）", noteOpenRouter:"模型名格式為 廠商/模型（如 anthropic/claude-sonnet-4.6）；一個 Key 可呼叫數百款模型",
-  lblProvider:'服務商', lblBase:'Base URL（自動拼接 /chat/completions）', lblModel:'模型', lblBatch:'單批條數',
+  lblProvider:'服務商', lblBase:'Base URL（自動拼接 /chat/completions）', lblModel:'模型', lblBatch:'單批條數', batchTip:'每次請求送模型的字幕條數。越大總耗時越短，但過大可能降低翻譯品質；預設 40 適合大多數影片。',
   lblKey:'API Key（僅儲存在本機瀏覽器）',
   chkKeepTerms:'專有名詞（人名/機構/產品/術語）保留原文，不翻譯',
   termsHintOn:'勾選 = 術語表內的專名強制保留原文（下方術語表已啟用）。',
@@ -967,7 +969,7 @@ const I18N = {
   hintPlain:'Plain: colloquial and easy to understand, like everyday conversation; short sentences, common words, keep the speaker\'s tone.',
   hintCustom:'Custom: the description below is sent to the model verbatim as the style requirement.',
   optCustom:"Custom…", btnTest:"⚡ Test connection", testRun:"Testing…", testOk:"✓ Connected", testFail:"✗ Failed: {0}", getKey:"Get API Key ↗", noteDoubao:"Doubao requires enabling model service in the Volcano Ark console; Model = doubao-seed-… or endpoint ID (ep-…)", noteOpenRouter:"Model names use vendor/model format (e.g. anthropic/claude-sonnet-4.6); one key unlocks hundreds of models",
-  lblProvider:'Provider', lblBase:'Base URL (/chat/completions appended automatically)', lblModel:'Model', lblBatch:'Cues per batch',
+  lblProvider:'Provider', lblBase:'Base URL (/chat/completions appended automatically)', lblModel:'Model', lblBatch:'Cues per batch', batchTip:'Cues sent to the model per request. Larger values finish faster, but too large may reduce quality; the default 40 suits most videos.',
   lblKey:'API Key (stored only in this browser)',
   chkKeepTerms:'Keep proper nouns (names/brands/products/terms) untranslated',
   termsHintOn:'Checked = terms in the list stay in original form (list enabled).',
@@ -1059,7 +1061,7 @@ const I18N = {
   hintPlain:'平易：口語的で分かりやすい、日常会話のような訳文。短い文と常用語を使い、話者のトーンを保持。',
   hintCustom:'カスタム：下の説明がそのまま「翻訳スタイル」としてモデルに送られます。',
   optCustom:"カスタム…", btnTest:"⚡ 接続テスト", testRun:"テスト中…", testOk:"✓ 接続成功", testFail:"✗ 失敗：{0}", getKey:"APIキーを取得 ↗", noteDoubao:"doubao は火山方舟（Volcano Ark）コンソールでモデルサービスの有効化が必要。「モデル」は doubao-seed-… またはエンドポイント ID（ep- 始まり）", noteOpenRouter:"モデル名は ベンダー/モデル 形式（例: anthropic/claude-sonnet-4.6）。1 つのキーで数百のモデルを利用可能",
-  lblProvider:'プロバイダー', lblBase:'Base URL（/chat/completions は自動付加）', lblModel:'モデル', lblBatch:'1回のバッチ件数',
+  lblProvider:'プロバイダー', lblBase:'Base URL（/chat/completions は自動付加）', lblModel:'モデル', lblBatch:'1回のバッチ件数', batchTip:'1リクエストでモデルに送る字幕数。大きいほど総時間は短くなりますが、大きすぎると品質が落ちることがあります。デフォルトの40はほとんどの動画に適しています。',
   lblKey:'API Key（このブラウザにのみ保存）',
   chkKeepTerms:'固有名詞（人名/組織/製品/用語）は原文のまま翻訳しない',
   termsHintOn:'チェック＝用語リストの固有名詞を原文のまま保持（リスト有効）。',
@@ -1151,7 +1153,7 @@ const I18N = {
   hintPlain:'Llano: coloquial y fácil de entender, como una conversación cotidiana; frases cortas, palabras comunes, conserva el tono del hablante.',
   hintCustom:'Personalizado: la descripción de abajo se envía al modelo tal cual como requisito de estilo.',
   optCustom:"Personalizado…", btnTest:"⚡ Probar conexión", testRun:"Probando…", testOk:"✓ Conectado", testFail:"✗ Error: {0}", getKey:"Obtener API Key ↗", noteDoubao:"Doubao requiere activar el servicio de modelos en la consola Volcano Ark; Modelo = doubao-seed-… o ID de endpoint (ep-…)", noteOpenRouter:"Los nombres de modelo usan formato proveedor/modelo (p. ej. anthropic/claude-sonnet-4.6); una clave da acceso a cientos de modelos",
-  lblProvider:'Proveedor', lblBase:'Base URL (/chat/completions se añade automáticamente)', lblModel:'Modelo', lblBatch:'Subtítulos por lote',
+  lblProvider:'Proveedor', lblBase:'Base URL (/chat/completions se añade automáticamente)', lblModel:'Modelo', lblBatch:'Subtítulos por lote', batchTip:'Subtítulos enviados al modelo por solicitud. Valores mayores terminan antes, pero demasiado grande puede reducir la calidad; el valor por defecto 40 sirve para la mayoría de los vídeos.',
   lblKey:'API Key (solo se guarda en este navegador)',
   chkKeepTerms:'Mantener nombres propios (personas/marcas/productos/términos) sin traducir',
   termsHintOn:'Marcado = los términos de la lista se mantienen en su forma original (lista activada).',
@@ -1243,7 +1245,7 @@ const I18N = {
   hintPlain:'Coloquial: informal e fácil de entender, como conversa do dia a dia; frases curtas, palavras comuns, mantém o tom de quem fala.',
   hintCustom:'Personalizado: a descrição abaixo é enviada ao modelo exatamente como requisito de estilo.',
   optCustom:"Personalizado…", btnTest:"⚡ Testar conexão", testRun:"Testando…", testOk:"✓ Conectado", testFail:"✗ Falhou: {0}", getKey:"Obter API Key ↗", noteDoubao:"O Doubao exige ativar o serviço de modelos no console Volcano Ark; Modelo = doubao-seed-… ou ID do endpoint (ep-…)", noteOpenRouter:"Os nomes de modelo usam o formato fornecedor/modelo (ex.: anthropic/claude-sonnet-4.6); uma chave dá acesso a centenas de modelos",
-  lblProvider:'Provedor', lblBase:'Base URL (/chat/completions adicionado automaticamente)', lblModel:'Modelo', lblBatch:'Legendas por lote',
+  lblProvider:'Provedor', lblBase:'Base URL (/chat/completions adicionado automaticamente)', lblModel:'Modelo', lblBatch:'Legendas por lote', batchTip:'Legendas enviadas ao modelo por solicitação. Valores maiores terminam antes, mas muito grande pode reduzir a qualidade; o padrão 40 serve para a maioria dos vídeos.',
   lblKey:'API Key (guardada apenas neste navegador)',
   chkKeepTerms:'Manter nomes próprios (pessoas/marcas/produtos/termos) sem traduzir',
   termsHintOn:'Marcado = os termos da lista ficam na forma original (lista ativada).',
@@ -1335,7 +1337,7 @@ const I18N = {
   hintPlain:'구어체: 일상 대화처럼 쉽고 알기 쉽게; 짧은 문장과 흔한 단어를 쓰고 말하는 사람의 어조를 유지합니다.',
   hintCustom:'사용자 정의: 아래 설명이 그대로 "번역 스타일" 요구사항으로 모델에 전송됩니다.',
   optCustom:"사용자 지정…", btnTest:"⚡ 연결 테스트", testRun:"테스트 중…", testOk:"✓ 연결 성공", testFail:"✗ 실패: {0}", getKey:"API 키 받기 ↗", noteDoubao:"doubao는 화산방주(Volcano Ark) 콘솔에서 모델 서비스 활성화 필요. 모델은 doubao-seed-… 또는 엔드포인트 ID(ep-로 시작)", noteOpenRouter:"모델명은 벤더/모델 형식(예: anthropic/claude-sonnet-4.6). 하나의 키로 수백 개 모델 사용 가능",
-  lblProvider:'공급자', lblBase:'Base URL(/chat/completions 자동 추가)', lblModel:'모델', lblBatch:'배치당 자막 수',
+  lblProvider:'공급자', lblBase:'Base URL(/chat/completions 자동 추가)', lblModel:'모델', lblBatch:'배치당 자막 수', batchTip:'요청마다 모델로 보내는 자막 수. 클수록 총 시간이 짧아지지만 너무 크면 품질이 떨어질 수 있습니다. 기본값 40은 대부분의 영상에 적합합니다.',
   lblKey:'API Key(이 브라우저에만 저장)',
   chkKeepTerms:'고유명사(인물/브랜드/제품/용어)를 번역하지 않고 원문 유지',
   termsHintOn:'체크 = 목록의 용어를 원문 그대로 유지(목록 활성화).',
@@ -1427,7 +1429,7 @@ const I18N = {
   hintPlain:'Wortwörtlich: umgangssprachlich und leicht verständlich, wie Alltagsrede; kurze Sätze, gängige Wörter, Ton des Sprechers bleibt.',
   hintCustom:'Eigene: die Beschreibung unten wird unverändert als Stilvorgabe an das Modell gesendet.',
   optCustom:"Benutzerdefiniert…", btnTest:"⚡ Verbindung testen", testRun:"Test läuft…", testOk:"✓ Verbunden", testFail:"✗ Fehlgeschlagen: {0}", getKey:"API-Key holen ↗", noteDoubao:"Doubao erfordert die Aktivierung des Modelldienstes in der Volcano-Ark-Konsole; Modell = doubao-seed-… oder Endpunkt-ID (ep-…)", noteOpenRouter:"Modellnamen im Format Anbieter/Modell (z. B. anthropic/claude-sonnet-4.6); ein Key schaltet Hunderte Modelle frei",
-  lblProvider:'Anbieter', lblBase:'Base URL (/chat/completions wird automatisch angehängt)', lblModel:'Modell', lblBatch:'Untertitel pro Batch',
+  lblProvider:'Anbieter', lblBase:'Base URL (/chat/completions wird automatisch angehängt)', lblModel:'Modell', lblBatch:'Untertitel pro Batch', batchTip:'Untertitel pro Anfrage an das Modell. Größere Werte sind schneller, aber zu groß kann die Qualität mindern; der Standard 40 passt für die meisten Videos.',
   lblKey:'API Key (nur in diesem Browser gespeichert)',
   chkKeepTerms:'Eigennamen (Personen/Firmen/Produkte/Begriffe) unübersetzt lassen',
   termsHintOn:'Aktiviert = Begriffe aus der Liste bleiben in Originalform (Liste aktiv).',
@@ -1519,7 +1521,7 @@ const I18N = {
   hintPlain:'Courant : familier et facile à comprendre, comme une conversation quotidienne ; phrases courtes, mots courants, ton du locuteur conservé.',
   hintCustom:'Personnalisé : la description ci-dessous est envoyée telle quelle au modèle comme exigence de style.',
   optCustom:"Personnalisé…", btnTest:"⚡ Tester la connexion", testRun:"Test en cours…", testOk:"✓ Connecté", testFail:"✗ Échec : {0}", getKey:"Obtenir une clé API ↗", noteDoubao:"Doubao nécessite l'activation du service de modèles dans la console Volcano Ark ; Modèle = doubao-seed-… ou ID de point d'accès (ep-…)", noteOpenRouter:"Les noms de modèles suivent le format fournisseur/modèle (ex. anthropic/claude-sonnet-4.6) ; une clé donne accès à des centaines de modèles",
-  lblProvider:'Fournisseur', lblBase:'Base URL (/chat/completions ajouté automatiquement)', lblModel:'Modèle', lblBatch:'Sous-titres par lot',
+  lblProvider:'Fournisseur', lblBase:'Base URL (/chat/completions ajouté automatiquement)', lblModel:'Modèle', lblBatch:'Sous-titres par lot', batchTip:'Sous-titres envoyés au modèle par requête. Plus la valeur est grande, plus c\'est rapide, mais trop grand peut réduire la qualité ; 40 par défaut convient à la plupart des vidéos.',
   lblKey:'Clé API (stockée uniquement dans ce navigateur)',
   chkKeepTerms:'Conserver les noms propres (personnes/marques/produits/termes) non traduits',
   termsHintOn:'Coché = les termes de la liste restent en forme originale (liste activée).',
@@ -1611,7 +1613,7 @@ const I18N = {
   hintPlain:'Keseharian: kolokial dan mudah dipahami, seperti percakapan sehari-hari; kalimat pendek, kata umum, nada pembicara tetap terjaga.',
   hintCustom:'Kustom: deskripsi di bawah dikirim apa adanya ke model sebagai persyaratan gaya.',
   optCustom:"Kustom…", btnTest:"⚡ Uji koneksi", testRun:"Menguji…", testOk:"✓ Terhubung", testFail:"✗ Gagal: {0}", getKey:"Ambil API Key ↗", noteDoubao:"Doubao memerlukan aktivasi layanan model di konsol Volcano Ark; Model = doubao-seed-… atau ID endpoint (ep-…)", noteOpenRouter:"Nama model memakai format vendor/model (mis. anthropic/claude-sonnet-4.6); satu key membuka ratusan model",
-  lblProvider:'Penyedia', lblBase:'Base URL (/chat/completions ditambahkan otomatis)', lblModel:'Model', lblBatch:'Subtitle per batch',
+  lblProvider:'Penyedia', lblBase:'Base URL (/chat/completions ditambahkan otomatis)', lblModel:'Model', lblBatch:'Subtitle per batch', batchTip:'Jumlah subtitle yang dikirim ke model per permintaan. Nilai lebih besar lebih cepat, namun terlalu besar dapat menurunkan kualitas; default 40 cocok untuk kebanyakan video.',
   lblKey:'API Key (hanya tersimpan di browser ini)',
   chkKeepTerms:'Pertahankan nama diri (orang/merek/produk/istilah) tanpa diterjemahkan',
   termsHintOn:'Dicentang = istilah dalam daftar tetap dalam bentuk asli (daftar aktif).',
@@ -1703,7 +1705,7 @@ const I18N = {
   hintPlain:'सरल: बोलचाल और आसान, रोज़मर्रा की बातचीत जैसा; छोटे वाक्य, आम शब्द, बोलने वाले का अंदाज़ बना रहे।',
   hintCustom:'अपनी: नीचे का विवरण शैली-आवश्यकता के रूप में मॉडल को वैसे ही भेजा जाता है।',
   optCustom:"कस्टम…", btnTest:"⚡ कनेक्शन परीक्षण", testRun:"परीक्षण हो रहा है…", testOk:"✓ कनेक्ट हो गया", testFail:"✗ विफल: {0}", getKey:"API कुंजी पाएं ↗", noteDoubao:"Doubao के लिए Volcano Ark कंसोल में मॉडल सेवा सक्रिय करना आवश्यक है; मॉडल = doubao-seed-… या एंडपॉइंट ID (ep-…)", noteOpenRouter:"मॉडल नाम vendor/model प्रारूप में हैं (जैसे anthropic/claude-sonnet-4.6); एक कुंजी सैकड़ों मॉडल खोलती है",
-  lblProvider:'प्रदाता', lblBase:'Base URL (/chat/completions स्वतः जुड़ता है)', lblModel:'मॉडल', lblBatch:'प्रति बैच सबटाइटल',
+  lblProvider:'प्रदाता', lblBase:'Base URL (/chat/completions स्वतः जुड़ता है)', lblModel:'मॉडल', lblBatch:'प्रति बैच सबटाइटल', batchTip:'प्रति अनुरोध मॉडल को भेजी जाने वाली सबटाइटल संख्या। मान बड़ा होने पर कुल समय घटता है, लेकिन बहुत बड़ा होने पर गुणवत्ता गिर सकती है; डिफ़ॉल्ट 40 अधिकांश वीडियो के लिए उपयुक्त है।',
   lblKey:'API Key (केवल इस ब्राउज़र में सहेजा जाता है)',
   chkKeepTerms:'संज्ञाएँ (नाम/ब्रांड/उत्पाद/शब्दावली) अनूदित न रखें',
   termsHintOn:'चयनित = सूची के शब्द मूल रूप में रहेंगे (सूची सक्रिय)।',
@@ -1795,7 +1797,7 @@ const I18N = {
   hintPlain:'พูดง่าย: เป็นภาษาพูด เข้าใจง่าย เหมือนบทสนทนาประจำวัน; ประโยคสั้น คำทั่วไป คงโทนของผู้พูด',
   hintCustom:'กำหนดเอง: คำบรรยายด้านล่างจะถูกส่งไปยังโมเดลเป็นข้อกำหนดสไตล์ตรง ๆ',
   optCustom:"กำหนดเอง…", btnTest:"⚡ ทดสอบการเชื่อมต่อ", testRun:"กำลังทดสอบ…", testOk:"✓ เชื่อมต่อสำเร็จ", testFail:"✗ ล้มเหลว: {0}", getKey:"รับ API Key ↗", noteDoubao:"Doubao ต้องเปิดใช้บริการโมเดลในคอนโซล Volcano Ark ก่อน; โมเดล = doubao-seed-… หรือ endpoint ID (ขึ้นต้นด้วย ep-)", noteOpenRouter:"ชื่อโมเดลใช้รูปแบบ ผู้ให้บริการ/โมเดล (เช่น anthropic/claude-sonnet-4.6) คีย์เดียวใช้ได้หลายร้อยโมเดล",
-  lblProvider:'ผู้ให้บริการ', lblBase:'Base URL (/chat/completions จะถูกเติมอัตโนมัติ)', lblModel:'โมเดล', lblBatch:'ซับไตเติลต่อแบตช์',
+  lblProvider:'ผู้ให้บริการ', lblBase:'Base URL (/chat/completions จะถูกเติมอัตโนมัติ)', lblModel:'โมเดล', lblBatch:'ซับไตเติลต่อแบตช์', batchTip:'จำนวนซับที่ส่งให้โมเดลต่อคำขอ ยิ่งมากยิ่งเร็ว แต่มากเกินไปอาจลดคุณภาพ ค่าเริ่มต้น 40 เหมาะกับวิดีโอส่วนใหญ่',
   lblKey:'API Key (บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น)',
   chkKeepTerms:'คงชื่อเฉพาะ (บุคคล/แบรนด์/ผลิตภัณฑ์/คำศัพท์) ไว้ไม่แปล',
   termsHintOn:'เลือก = คำในรายการคงรูปเดิม (รายการเปิดใช้งาน)',
@@ -1887,7 +1889,7 @@ const I18N = {
   hintPlain:'Thoại thường: khẩu ngữ, dễ hiểu, như hội thoại hằng ngày; câu ngắn, từ phổ thông, giữ giọng người nói.',
   hintCustom:'Tùy chỉnh: phần mô tả bên dưới được gửi nguyên văn cho mô hình như yêu cầu phong cách.',
   optCustom:"Tùy chỉnh…", btnTest:"⚡ Kiểm tra kết nối", testRun:"Đang kiểm tra…", testOk:"✓ Kết nối thành công", testFail:"✗ Thất bại: {0}", getKey:"Lấy API Key ↗", noteDoubao:"Doubao cần kích hoạt dịch vụ mô hình trong bảng điều khiển Volcano Ark; Mô hình = doubao-seed-… hoặc ID endpoint (ep-…)", noteOpenRouter:"Tên mô hình theo định dạng nhà_cung_cấp/mô_hình (vd: anthropic/claude-sonnet-4.6); một khóa mở hàng trăm mô hình",
-  lblProvider:'Nhà cung cấp', lblBase:'Base URL (tự động thêm /chat/completions)', lblModel:'Mô hình', lblBatch:'Phụ đề mỗi lô',
+  lblProvider:'Nhà cung cấp', lblBase:'Base URL (tự động thêm /chat/completions)', lblModel:'Mô hình', lblBatch:'Phụ đề mỗi lô', batchTip:'Số phụ đề gửi lên mô hình mỗi yêu cầu. Giá trị lớn hơn hoàn thành nhanh hơn, nhưng quá lớn có thể giảm chất lượng; mặc định 40 phù hợp với hầu hết video.',
   lblKey:'API Key (chỉ lưu trong trình duyệt này)',
   chkKeepTerms:'Giữ nguyên tên riêng (người/thương hiệu/sản phẩm/thuật ngữ), không dịch',
   termsHintOn:'Đã chọn = các thuật ngữ trong danh sách giữ nguyên dạng (danh sách bật).',
@@ -1979,7 +1981,7 @@ const I18N = {
   hintPlain:'Разговорный: просто и понятно, как повседневная речь; короткие фразы, обычные слова, тон говорящего сохраняется.',
   hintCustom:'Свой: описание ниже отправляется модели дословно как требование к стилю.',
   optCustom:"Свои…", btnTest:"⚡ Проверить", testRun:"Проверка…", testOk:"✓ Подключено", testFail:"✗ Ошибка: {0}", getKey:"Получить API-ключ ↗", noteDoubao:"Для Doubao нужно включить сервис моделей в консоли Volcano Ark; Модель = doubao-seed-… или ID эндпоинта (ep-…)", noteOpenRouter:"Имена моделей в формате вендор/модель (напр. anthropic/claude-sonnet-4.6); один ключ открывает сотни моделей",
-  lblProvider:'Провайдер', lblBase:'Base URL (/chat/completions добавляется автоматически)', lblModel:'Модель', lblBatch:'Субтитров на батч',
+  lblProvider:'Провайдер', lblBase:'Base URL (/chat/completions добавляется автоматически)', lblModel:'Модель', lblBatch:'Субтитров на батч', batchTip:'Количество субтитров, отправляемых модели за один запрос. Больше — быстрее, но слишком большое значение может снизить качество; 40 по умолчанию подходит для большинства видео.',
   lblKey:'API Key (хранится только в этом браузере)',
   chkKeepTerms:'Оставлять имена собственные (лица/бренды/продукты/термины) без перевода',
   termsHintOn:'Включено = термины из списка остаются в оригинальном виде (список активен).',
@@ -2071,7 +2073,7 @@ const I18N = {
   hintPlain:'Semplice: colloquiale e facile da capire, come una conversazione quotidiana; frasi brevi, parole comuni, mantiene il tono del parlante.',
   hintCustom:'Personalizzato: la descrizione qui sotto viene inviata al modello così com\'è come requisito di stile.',
   optCustom:"Personalizzato…", btnTest:"⚡ Prova connessione", testRun:"Verifica…", testOk:"✓ Connesso", testFail:"✗ Errore: {0}", getKey:"Ottieni API Key ↗", noteDoubao:"Doubao richiede l'attivazione del servizio modelli nella console Volcano Ark; Modello = doubao-seed-… o ID endpoint (ep-…)", noteOpenRouter:"I nomi dei modelli usano il formato fornitore/modello (es. anthropic/claude-sonnet-4.6); una chiave sblocca centinaia di modelli",
-  lblProvider:'Fornitore', lblBase:'URL di base (/chat/completions aggiunto automaticamente)', lblModel:'Modello', lblBatch:'Sottotitoli per batch',
+  lblProvider:'Fornitore', lblBase:'URL di base (/chat/completions aggiunto automaticamente)', lblModel:'Modello', lblBatch:'Sottotitoli per batch', batchTip:'Sottotitoli inviati al modello per richiesta. Valori più alti sono più veloci, ma troppo alti possono ridurre la qualità; il valore predefinito 40 va bene per la maggior parte dei video.',
   lblKey:'Chiave API (salvata solo in questo browser)',
   chkKeepTerms:'Mantieni non tradotti i nomi propri (persone/marchi/prodotti/termini)',
   termsHintOn:'Attivo: i termini dell\'elenco restano nella forma originale (elenco abilitato).',
@@ -2163,7 +2165,7 @@ const I18N = {
   hintPlain:'بسيط: عامي وسهل الفهم، كحوار يومي؛ جُمل قصيرة وكلمات شائعة مع الحفاظ على نبرة المتحدث.',
   hintCustom:'مخصص: يُرسل الوصف أدناه إلى النموذج كما هو كمتطلب أسلوب.',
   optCustom:"مخصص…", btnTest:"⚡ اختبار الاتصال", testRun:"جارٍ الاختبار…", testOk:"✓ تم الاتصال", testFail:"✗ فشل: {0}", getKey:"احصل على مفتاح API ↗", noteDoubao:"يتطلب Doubao تفعيل خدمة النماذج في وحدة تحكم Volcano Ark؛ الموديل = doubao-seed-… أو معرف النقطة (ep-…)", noteOpenRouter:"أسماء النماذج بصيغة المورد/النموذج (مثل anthropic/claude-sonnet-4.6)؛ مفتاح واحد يفتح مئات النماذج",
-  lblProvider:'المزوّد', lblBase:'العنوان الأساسي (يُضاف /chat/completions تلقائيًا)', lblModel:'النموذج', lblBatch:'ترجمات لكل دفعة',
+  lblProvider:'المزوّد', lblBase:'العنوان الأساسي (يُضاف /chat/completions تلقائيًا)', lblModel:'النموذج', lblBatch:'ترجمات لكل دفعة', batchTip:'عدد الترجمات المُرسلة إلى النموذج في كل طلب. القيمة الأكبر أسرع، لكن الكبير جدًا قد يقلل الجودة؛ القيمة الافتراضية 40 مناسبة لمعظم الفيديوهات.',
   lblKey:'مفتاح API (يُحفظ في هذا المتصفح فقط)',
   chkKeepTerms:'إبقاء الأسماء الخاصة (أشخاص/علامات/منتجات/مصطلحات) دون ترجمة',
   termsHintOn:'عند التفعيل: تبقى المصطلحات في القائمة بصيغتها الأصلية (القائمة مفعّلة).',
@@ -2255,7 +2257,7 @@ const I18N = {
   hintPlain:'Sade: günlük ve anlaşılır, sıradan bir konuşma gibi; kısa cümleler, yaygın kelimeler, konuşanın tonunu korur.',
   hintCustom:'Özel: aşağıdaki açıklama, stil gereksinimi olarak modele olduğu gibi gönderilir.',
   optCustom:"Özel…", btnTest:"⚡ Bağlantıyı test et", testRun:"Test ediliyor…", testOk:"✓ Bağlandı", testFail:"✗ Başarısız: {0}", getKey:"API Anahtarı al ↗", noteDoubao:"Doubao, Volcano Ark konsolunda model servisini etkinleştirmeyi gerektirir; Model = doubao-seed-… veya endpoint ID (ep-…)", noteOpenRouter:"Model adları sağlayıcı/model biçimindedir (örn. anthropic/claude-sonnet-4.6); tek anahtar yüzlerce modele erişim sağlar",
-  lblProvider:'Sağlayıcı', lblBase:'Temel URL (/chat/completions otomatik eklenir)', lblModel:'Model', lblBatch:'Grup başına altyazı',
+  lblProvider:'Sağlayıcı', lblBase:'Temel URL (/chat/completions otomatik eklenir)', lblModel:'Model', lblBatch:'Grup başına altyazı', batchTip:'Modelle istek başına gönderilen altyazı sayısı. Daha büyük değerler daha hızlıdır, ancak çok büyük kaliteyi düşürebilir; varsayılan 40 çoğu video için uygundur.',
   lblKey:'API Anahtarı (yalnızca bu tarayıcıda saklanır)',
   chkKeepTerms:'Özel isimleri (kişi/marka/ürün/terim) çevirmeden koru',
   termsHintOn:'İşaretliyken listedeki terimler özgün biçimde kalır (liste etkin).',
@@ -2790,7 +2792,7 @@ function parseLlmJson(raw){
 
 // v0.9.29：timeoutMs 可选（默认 90s）——术语表提取是单次大请求（8.6K 采样在 DeepSeek 夜高峰实测 161.5s，
 // 正常时段仅 ~4s），共用 90s 会导致大文件在服务端拥塞时静默降级为无术语表；批次/压缩仍走默认 90s
-async function chatOnce(base,key,model,msgs,timeoutMs){
+async function chatOnce(base,key,model,msgs,timeoutMs,rt){
   const ctl=new AbortController();
   const timer=setTimeout(()=>ctl.abort(), timeoutMs>0?timeoutMs:90000);
   const builtin = (base===BUILTIN_API);
@@ -2804,7 +2806,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs){
       method:'POST',
       headers,
       body:JSON.stringify(builtin
-        ? {messages:msgs,temperature:0.2,stream:false,meta:S.trMeta||undefined}
+        ? {messages:msgs,temperature:0.2,stream:false,meta: rt ? Object.assign({rt:1},S.trMeta||{}) : (S.trMeta||undefined)}
         : {model,messages:msgs,temperature:0.2,stream:false}),
       signal:ctl.signal
     });
@@ -2816,7 +2818,24 @@ async function chatOnce(base,key,model,msgs,timeoutMs){
   } finally { clearTimeout(timer); }
 }
 
-async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx){
+/* v0.9.72：受限并发映射——隔离重译并行用（各重译是独立的单组重发，结果与串行一致；
+   worker 自行 try/catch，此处不拦截异常） */
+async function poolMap(items, limit, worker){
+  const n = items.length; if(!n) return;
+  let idx = 0;
+  const runners = [];
+  for(let i=0; i<Math.max(1, Math.min(limit, n)); i++){
+    runners.push((async function go(){
+      while(true){
+        const k = idx++;
+        if(k >= n) return;
+        await worker(items[k], k);
+      }
+    })());
+  }
+  await Promise.all(runners);
+}
+async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
   const send = groups.filter(g=>!g.pureMusic);
@@ -2862,7 +2881,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
     {role:'user',content:userMsg}
-  ]);
+  ],undefined,rt);
   const obj=parseLlmJson(raw);
   if(!obj||!Array.isArray(obj.groups)) throw new Error(t('errNoGroups'));
   const byGno={};
@@ -3225,13 +3244,14 @@ async function runTranslate(){
           // v0.9.47：音乐组 drop → 单组隔离重译一次（绝不整批重发）；再 drop 就接受模型判断，按水词删除
           if(out.musicDropGnos && out.musicDropGnos.length){
             const stillDrop=[];
-            for(const gno of out.musicDropGnos){
-              if(S.stop){ stillDrop.push(gno); continue; }
+            /* v0.9.72：并行化（并发3）——各音乐组重译相互独立，单组重发结果与串行一致 */
+            await poolMap(out.musicDropGnos, 3, async gno=>{
+              if(S.stop){ stillDrop.push(gno); return; }
               const g1=gBatch.find(x=>x.gno===gno);
               let fixed=false;
               if(g1){
                 try{
-                  const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,null,ctx);
+                  const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,null,ctx,1);
                   const m2=o2.byGno&&o2.byGno[gno];
                   // 救回标准：拿到非空译文且该组未触发语言跑偏锚定
                   if(m2 && String(m2.text||'').trim() && !(o2.badAnchor||[]).includes(gno)){
@@ -3242,7 +3262,7 @@ async function runTranslate(){
                 }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
               }
               if(!fixed) stillDrop.push(gno);
-            }
+            });
             const savedN=out.musicDropGnos.length-stillDrop.length;
             if(savedN>0) log(t('musicDropSaved',savedN),'okc');
             if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
@@ -3251,8 +3271,9 @@ async function runTranslate(){
             // v0.9.22：终检失败拆单组重译——整批上下文偶发触发模型跑偏，隔离单组重发通常即恢复（评测实证 5/5）
             // v0.9.57：第 1 次仍盲重发（保留实证过的恢复通道）；第 2 次起把跑偏译文喂回模型做纠错重译
             const remain=[];
-            for(const gno of out.badAnchor){
-              if(S.stop){ remain.push(gno); continue; }
+            /* v0.9.72：并行化（并发3）——组间独立并行；组内 a<2 两次仍串行（第 2 次要喂第 1 次译文纠错） */
+            await poolMap(out.badAnchor, 3, async gno=>{
+              if(S.stop){ remain.push(gno); return; }
               const g1=gBatch.find(x=>x.gno===gno);
               let fixed=false;
               if(g1){
@@ -3260,7 +3281,7 @@ async function runTranslate(){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbArr=(a===1&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx);
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx,1);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
                     if(!o2.badAnchor || !o2.badAnchor.length){
@@ -3278,7 +3299,7 @@ async function runTranslate(){
                 }
               }
               if(!fixed) remain.push(gno);
-            }
+            });
             if(remain.length){
               log(t('anchorKeep', remain.slice(0,5).join(',')+(remain.length>5?'…':''), LBY(cfg.dst).zh),'err');
             } else {
@@ -3290,15 +3311,16 @@ async function runTranslate(){
           // 也能走旧回填路径；两者皆无 → missing（与批失败组同待遇，可见可后处理）。
           if(out.cueBadGnos && out.cueBadGnos.length){
             const remainCue=[];
-            for(const cb of out.cueBadGnos){
-              if(S.stop){ remainCue.push(cb.gno); continue; }
+            /* v0.9.72：并行化（并发3）——组间独立并行；组内 a<2 两次仍串行（第 2 次带结构错误反馈） */
+            await poolMap(out.cueBadGnos, 3, async cb=>{
+              if(S.stop){ remainCue.push(cb.gno); return; }
               const g1=gBatch.find(x=>x.gno===cb.gno);
               let fixed=false;
               if(g1){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbCue=(a===1)?{cueErrs:cb.errs}:null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbCue,ctx);
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbCue,ctx,1);
                     const m2=o2.byGno && o2.byGno[cb.gno];
                     if(m2 && m2.cueTexts && m2.cueTexts.size && !(o2.badAnchor||[]).includes(cb.gno)){
                       out.byGno[cb.gno]=m2;
@@ -3313,7 +3335,7 @@ async function runTranslate(){
                 }
               }
               if(!fixed) remainCue.push(cb.gno);
-            }
+            });
             if(remainCue.length){
               log(t('cueAlignFallback', remainCue.slice(0,5).join(',')+(remainCue.length>5?'…':'')),'err');
             } else {
