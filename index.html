@@ -618,9 +618,6 @@
         </div>
       </div>
 
-      <div class="btns" style="margin-top:14px">
-        <button class="btn ok" id="btnPost" data-i18n="btnPost" type="button">↻ 仅后处理（折行/清提示词）</button>
-      </div>
       <div class="hint" data-i18n="hintPrivacy">默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。</div>
 
       <details class="logbox">
@@ -3120,7 +3117,7 @@ async function runTranslate(){
   S.trMeta = { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length, model: cfg.mode==='api' ? cfg.model : '' };
   clearLog();
   S.translating=true; S.stop=false; S.modelDead=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.locale=cfg.dst;
-  $('btnGo').disabled=$('btnPost').disabled=true;
+  $('btnGo').disabled=true;
   const btnText=$('btnGo').textContent;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -3597,7 +3594,7 @@ async function runTranslate(){
     try{ showErrModal(t('errModalFatal'), t('errOccur', String(e.message||e))); }catch(_){}
   }finally{
     S.translating=false;
-    $('btnGo').disabled=false; $('btnPost').disabled=false;
+    $('btnGo').disabled=false;
     $('btnGo').textContent=btnText;
     if(!PG.ok){ setProg(0,false); setPrText(''); }
     // v0.9.56：模型无响应熔断 → 弹窗告知（稍后再试 / 打开引擎设置换自定义模型）
@@ -3615,7 +3612,6 @@ function finalRenumberAndStats(){
 
 // 停止按钮 = 同一个按钮
 $('btnGo').addEventListener('click', ()=>{ if(S.translating){ S.stop=true; return; } runTranslate(); });
-$('btnPost').addEventListener('click', applyPost);
 $('filter').addEventListener('change', renderRows);
 
 /* ---------------- 导入 ---------------- */
