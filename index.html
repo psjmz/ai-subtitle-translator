@@ -83,6 +83,10 @@
   .info:hover{border-color:var(--acc);color:var(--acc)}
   .info:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
   .info:hover::before{opacity:1}
+  /* v0.9.74：左栏仅 248px、tooltip 宽 250px，居中展开会溢出视口左侧——左栏内改为自图标向右展开 */
+  .main > :first-child .info::after{left:-4px;transform:translateX(0) translateY(4px)}
+  .main > :first-child .info:hover::after{transform:translateX(0) translateY(0)}
+  .main > :first-child .info::before{left:8px;transform:rotate(45deg)}
 
   /* ============ 通用控件 ============ */
   label{display:block;font-size:11.5px;color:var(--sub);margin:10px 0 4px;letter-spacing:.2px}
@@ -390,7 +394,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.73</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.74</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -544,7 +548,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.73</span>
+    <span class="ver-tag">v0.9.74</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -601,8 +605,9 @@
       <div class="hint" id="builtinHint" style="display:none"></div>
 
       <!-- v0.9.72：单批条数移出 apiBox——builtin 模式同样可调（此前免费用户根本看不到此设置） -->
-      <label class="flbl"><span data-i18n="lblBatch">单批条数</span><i class="info" data-tip-i18n="batchTip">i</i></label>
-      <input type="number" id="batch" value="40" min="8" max="60">
+      <!-- v0.9.74：语义由「条数」改为「字符预算」——按长度自适应，短句多装、长句少装；条数上限 60 内置兜底 -->
+      <label class="flbl"><span data-i18n="lblBatch">单批字符预算</span><i class="info" data-tip-i18n="batchTip">i</i></label>
+      <input type="number" id="batch" value="3000" min="1000" max="6000" step="100">
 
       <div id="apiBox">
         <label class="flbl" data-i18n="lblProvider">服务商</label>
@@ -785,7 +790,7 @@ const I18N = {
   hintPlain:'大白话：口语化、直白易懂，像日常对话；多用短句与常用词，保留说话人语气。',
   hintCustom:'自定义：下面的描述将原样作为“翻译风格”要求发给模型。',
   optCustom:"自定义…", btnTest:"⚡ 测试连接", testRun:"测试中…", testOk:"✓ 连接成功", testFail:"✗ 失败：{0}", getKey:"获取 API Key ↗", noteDoubao:"豆包需在火山方舟控制台开通模型服务；「模型」填 doubao-seed-… 或接入点 ID（ep- 开头）", noteOpenRouter:"模型名格式为 厂商/模型（如 anthropic/claude-sonnet-4.6）；一个 Key 可调用数百款模型",
-  lblProvider:'服务商', lblBase:'Base URL（自动拼接 /chat/completions）', lblModel:'模型', lblBatch:'单批条数', batchTip:'每次请求送模型的字幕条数。越大总耗时越短，但过大可能降低翻译质量；默认 40 适合大多数视频。',
+  lblProvider:'服务商', lblBase:'Base URL（自动拼接 /chat/completions）', lblModel:'模型', lblBatch:'单批字符预算', batchTip:'每次请求送模型的字幕字符数。按长度自动分批——短句多装、长句少装，每批输出量稳定。越大总耗时略短，但过大可能降低翻译质量；默认 3000 适合大多数视频。',
   lblKey:'API Key（仅保存在本机浏览器）',
   chkKeepTerms:'专有名词（人名/机构/产品/术语）保留原文，不翻译',
   termsHintOn:'勾选 = 术语表内的专名强制保留原文（下方术语表已启用）。',
@@ -815,7 +820,7 @@ const I18N = {
   groupInfo:'已按句子分组：{0} 个句组，其中 {1} 组跨多条字幕——短句组将合并为单条字幕，长句组按各条时长切分回填。',
   mergeInfo:'跨条句组 {0} 组：{1} 组已合并为单条字幕，其余 {2} 组按时长切分回填。',
   mergedNote:'已并入上一条字幕（时间轴合并）',
-  startT:'开始整片翻译：{0} → {1}，共 {2} 条，每批 {3} 条。',
+  startT:'开始整片翻译：{0} → {1}，共 {2} 条，每批约 {3} 字符。',
   batchProg:'第 {0}/{1} 批（句组 {2}–{3}）…',
   pgRun:'翻译中', pgEta:'预计剩余 {0}', pgDone:'✓ 完成 · 用时 {0}',
   chkAutoTerms:'自动术语表：翻译前自动提取专名与歧义词，统一全片译法',
@@ -877,7 +882,7 @@ const I18N = {
   hintPlain:'大白話：口語化、直白易懂，像日常對話；多用短句與常用詞，保留說話人語氣。',
   hintCustom:'自訂：下面的描述將原樣作為「翻譯風格」要求發給模型。',
   optCustom:"自訂…", btnTest:"⚡ 測試連線", testRun:"測試中…", testOk:"✓ 連線成功", testFail:"✗ 失敗：{0}", getKey:"取得 API Key ↗", noteDoubao:"豆包需在火山方舟控制台開通模型服務；「模型」填 doubao-seed-… 或接入點 ID（ep- 開頭）", noteOpenRouter:"模型名格式為 廠商/模型（如 anthropic/claude-sonnet-4.6）；一個 Key 可呼叫數百款模型",
-  lblProvider:'服務商', lblBase:'Base URL（自動拼接 /chat/completions）', lblModel:'模型', lblBatch:'單批條數', batchTip:'每次請求送模型的字幕條數。越大總耗時越短，但過大可能降低翻譯品質；預設 40 適合大多數影片。',
+  lblProvider:'服務商', lblBase:'Base URL（自動拼接 /chat/completions）', lblModel:'模型', lblBatch:'單批字元預算', batchTip:'每次請求送模型的字幕字元數。按長度自動分批——短句多裝、長句少裝，每批輸出量穩定。越大總耗時略短，但過大可能降低翻譯品質；預設 3000 適合大多數影片。',
   lblKey:'API Key（僅儲存在本機瀏覽器）',
   chkKeepTerms:'專有名詞（人名/機構/產品/術語）保留原文，不翻譯',
   termsHintOn:'勾選 = 術語表內的專名強制保留原文（下方術語表已啟用）。',
@@ -907,7 +912,7 @@ const I18N = {
   groupInfo:'已按句子分組：{0} 個句組，其中 {1} 組跨多條字幕——短句組將合併為單條字幕，長句組按各條時長切分回填。',
   mergeInfo:'跨條句組 {0} 組：{1} 組已合併為單條字幕，其餘 {2} 組按時長切分回填。',
   mergedNote:'已併入上一條字幕（時間軸合併）',
-  startT:'開始整片翻譯：{0} → {1}，共 {2} 條，每批 {3} 條。',
+  startT:'開始整片翻譯：{0} → {1}，共 {2} 條，每批約 {3} 字元。',
   batchProg:'第 {0}/{1} 批（句組 {2}–{3}）…',
   pgRun:'翻譯中', pgEta:'預計剩餘 {0}', pgDone:'✓ 完成 · 用時 {0}',
   chkAutoTerms:'自動術語表：翻譯前自動提取專名與歧義詞，統一全片譯法',
@@ -969,7 +974,7 @@ const I18N = {
   hintPlain:'Plain: colloquial and easy to understand, like everyday conversation; short sentences, common words, keep the speaker\'s tone.',
   hintCustom:'Custom: the description below is sent to the model verbatim as the style requirement.',
   optCustom:"Custom…", btnTest:"⚡ Test connection", testRun:"Testing…", testOk:"✓ Connected", testFail:"✗ Failed: {0}", getKey:"Get API Key ↗", noteDoubao:"Doubao requires enabling model service in the Volcano Ark console; Model = doubao-seed-… or endpoint ID (ep-…)", noteOpenRouter:"Model names use vendor/model format (e.g. anthropic/claude-sonnet-4.6); one key unlocks hundreds of models",
-  lblProvider:'Provider', lblBase:'Base URL (/chat/completions appended automatically)', lblModel:'Model', lblBatch:'Cues per batch', batchTip:'Cues sent to the model per request. Larger values finish faster, but too large may reduce quality; the default 40 suits most videos.',
+  lblProvider:'Provider', lblBase:'Base URL (/chat/completions appended automatically)', lblModel:'Model', lblBatch:'Chars per batch', batchTip:'Characters of subtitles sent to the model per request. Batches are cut by length automatically: short lines fill more, long lines fewer, keeping each output stable. Larger values finish slightly faster, but too large may reduce quality; the default 3000 suits most videos.',
   lblKey:'API Key (stored only in this browser)',
   chkKeepTerms:'Keep proper nouns (names/brands/products/terms) untranslated',
   termsHintOn:'Checked = terms in the list stay in original form (list enabled).',
@@ -999,7 +1004,7 @@ const I18N = {
   groupInfo:'Grouped into {0} sentences; {1} span multiple cues — short groups merge into a single cue, long groups split back by duration.',
   mergeInfo:'Multi-cue groups: {0}; {1} merged into single cues, {2} split back by duration.',
   mergedNote:'Merged into the previous cue (timeline merged)',
-  startT:'Translating: {0} → {1}, {2} cues, {3} per batch.',
+  startT:'Translating: {0} → {1}, {2} cues, ~{3} chars per batch.',
   batchProg:'Batch {0}/{1} (sentences {2}–{3})…',
   pgRun:'Translating', pgEta:'ETA {0}', pgDone:'✓ Done · {0}',
   chkAutoTerms:'Auto glossary: extract proper nouns & ambiguous terms before translating for file-wide consistency',
@@ -1061,7 +1066,7 @@ const I18N = {
   hintPlain:'平易：口語的で分かりやすい、日常会話のような訳文。短い文と常用語を使い、話者のトーンを保持。',
   hintCustom:'カスタム：下の説明がそのまま「翻訳スタイル」としてモデルに送られます。',
   optCustom:"カスタム…", btnTest:"⚡ 接続テスト", testRun:"テスト中…", testOk:"✓ 接続成功", testFail:"✗ 失敗：{0}", getKey:"APIキーを取得 ↗", noteDoubao:"doubao は火山方舟（Volcano Ark）コンソールでモデルサービスの有効化が必要。「モデル」は doubao-seed-… またはエンドポイント ID（ep- 始まり）", noteOpenRouter:"モデル名は ベンダー/モデル 形式（例: anthropic/claude-sonnet-4.6）。1 つのキーで数百のモデルを利用可能",
-  lblProvider:'プロバイダー', lblBase:'Base URL（/chat/completions は自動付加）', lblModel:'モデル', lblBatch:'1回のバッチ件数', batchTip:'1リクエストでモデルに送る字幕数。大きいほど総時間は短くなりますが、大きすぎると品質が落ちることがあります。デフォルトの40はほとんどの動画に適しています。',
+  lblProvider:'プロバイダー', lblBase:'Base URL（/chat/completions は自動付加）', lblModel:'モデル', lblBatch:'1回あたりの文字数', batchTip:'1リクエストでモデルに送る字幕の文字数。長さに応じて自動で分割され、短い行は多く、長い行は少なく入り、各バッチの出力量が安定します。大きいほど総時間はやや短くなりますが、大きすぎると品質が落ちることがあります。デフォルトの3000はほとんどの動画に適しています。',
   lblKey:'API Key（このブラウザにのみ保存）',
   chkKeepTerms:'固有名詞（人名/組織/製品/用語）は原文のまま翻訳しない',
   termsHintOn:'チェック＝用語リストの固有名詞を原文のまま保持（リスト有効）。',
@@ -1091,7 +1096,7 @@ const I18N = {
   groupInfo:'{0} 文にグループ化（うち {1} グループが複数字幕にまたがる）。短いグループは1本の字幕に統合、長いグループは時間比で分割します。',
   mergeInfo:'複数跨ぎグループ {0} 中 {1} を1本の字幕に統合、残り {2} を時間比で分割しました。',
   mergedNote:'前の字幕に統合済み（タイムライン統合）',
-  startT:'翻訳開始：{0} → {1}、全 {2} 件、1バッチ {3} 件。',
+  startT:'翻訳開始：{0} → {1}、全 {2} 件、1バッチ約 {3} 文字。',
   batchProg:'バッチ {0}/{1}（文グループ {2}–{3}）…',
   pgRun:'翻訳中', pgEta:'残り約 {0}', pgDone:'✓ 完了 · 所要 {0}',
   chkAutoTerms:'自動用語集：翻訳前に固有名詞・曖昧語を抽出し、全編の訳を統一',
@@ -1153,7 +1158,7 @@ const I18N = {
   hintPlain:'Llano: coloquial y fácil de entender, como una conversación cotidiana; frases cortas, palabras comunes, conserva el tono del hablante.',
   hintCustom:'Personalizado: la descripción de abajo se envía al modelo tal cual como requisito de estilo.',
   optCustom:"Personalizado…", btnTest:"⚡ Probar conexión", testRun:"Probando…", testOk:"✓ Conectado", testFail:"✗ Error: {0}", getKey:"Obtener API Key ↗", noteDoubao:"Doubao requiere activar el servicio de modelos en la consola Volcano Ark; Modelo = doubao-seed-… o ID de endpoint (ep-…)", noteOpenRouter:"Los nombres de modelo usan formato proveedor/modelo (p. ej. anthropic/claude-sonnet-4.6); una clave da acceso a cientos de modelos",
-  lblProvider:'Proveedor', lblBase:'Base URL (/chat/completions se añade automáticamente)', lblModel:'Modelo', lblBatch:'Subtítulos por lote', batchTip:'Subtítulos enviados al modelo por solicitud. Valores mayores terminan antes, pero demasiado grande puede reducir la calidad; el valor por defecto 40 sirve para la mayoría de los vídeos.',
+  lblProvider:'Proveedor', lblBase:'Base URL (/chat/completions se añade automáticamente)', lblModel:'Modelo', lblBatch:'Caracteres por lote', batchTip:'Caracteres de subtítulos enviados al modelo por solicitud. Los lotes se cortan por longitud automáticamente: las líneas cortas llenan más y las largas menos, manteniendo estable la salida. Los valores mayores terminan algo antes, pero un valor demasiado grande puede reducir la calidad; el valor por defecto 3000 sirve para la mayoría de los vídeos.',
   lblKey:'API Key (solo se guarda en este navegador)',
   chkKeepTerms:'Mantener nombres propios (personas/marcas/productos/términos) sin traducir',
   termsHintOn:'Marcado = los términos de la lista se mantienen en su forma original (lista activada).',
@@ -1183,7 +1188,7 @@ const I18N = {
   groupInfo:'Agrupado en {0} frases; {1} abarcan varios subtítulos — los grupos cortos se fusionan en un solo subtítulo, los largos se reparten por duración.',
   mergeInfo:'Grupos multi-línea: {0}; {1} fusionados en un solo subtítulo, {2} repartidos por duración.',
   mergedNote:'Fusionado en el subtítulo anterior (línea de tiempo fusionada)',
-  startT:'Traduciendo: {0} → {1}, {2} subtítulos, {3} por lote.',
+  startT:'Traduciendo: {0} → {1}, {2} subtítulos, ~{3} caracteres por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
   pgRun:'Traduciendo', pgEta:'Faltan {0}', pgDone:'✓ Listo · {0}',
   chkAutoTerms:'Glosario automático: extrae nombres propios y términos ambiguos antes de traducir para uniformar todo el archivo',
@@ -1245,7 +1250,7 @@ const I18N = {
   hintPlain:'Coloquial: informal e fácil de entender, como conversa do dia a dia; frases curtas, palavras comuns, mantém o tom de quem fala.',
   hintCustom:'Personalizado: a descrição abaixo é enviada ao modelo exatamente como requisito de estilo.',
   optCustom:"Personalizado…", btnTest:"⚡ Testar conexão", testRun:"Testando…", testOk:"✓ Conectado", testFail:"✗ Falhou: {0}", getKey:"Obter API Key ↗", noteDoubao:"O Doubao exige ativar o serviço de modelos no console Volcano Ark; Modelo = doubao-seed-… ou ID do endpoint (ep-…)", noteOpenRouter:"Os nomes de modelo usam o formato fornecedor/modelo (ex.: anthropic/claude-sonnet-4.6); uma chave dá acesso a centenas de modelos",
-  lblProvider:'Provedor', lblBase:'Base URL (/chat/completions adicionado automaticamente)', lblModel:'Modelo', lblBatch:'Legendas por lote', batchTip:'Legendas enviadas ao modelo por solicitação. Valores maiores terminam antes, mas muito grande pode reduzir a qualidade; o padrão 40 serve para a maioria dos vídeos.',
+  lblProvider:'Provedor', lblBase:'Base URL (/chat/completions adicionado automaticamente)', lblModel:'Modelo', lblBatch:'Caracteres por lote', batchTip:'Caracteres de legendas enviados ao modelo por solicitação. Os lotes são cortados por comprimento automaticamente: linhas curtas cabem mais, longas menos, mantendo a saída estável. Valores maiores terminam um pouco antes, mas um valor muito grande pode reduzir a qualidade; o padrão 3000 serve para a maioria dos vídeos.',
   lblKey:'API Key (guardada apenas neste navegador)',
   chkKeepTerms:'Manter nomes próprios (pessoas/marcas/produtos/termos) sem traduzir',
   termsHintOn:'Marcado = os termos da lista ficam na forma original (lista ativada).',
@@ -1275,7 +1280,7 @@ const I18N = {
   groupInfo:'Agrupado em {0} frases; {1} abrangem várias legendas — grupos curtos fundem numa única legenda, grupos longos são divididos por duração.',
   mergeInfo:'Grupos multilinha: {0}; {1} fundidos numa única legenda, {2} divididos por duração.',
   mergedNote:'Fundida na legenda anterior (linha do tempo fundida)',
-  startT:'Traduzindo: {0} → {1}, {2} legendas, {3} por lote.',
+  startT:'Traduzindo: {0} → {1}, {2} legendas, ~{3} caracteres por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
   pgRun:'Traduzindo', pgEta:'Faltam {0}', pgDone:'✓ Concluído · {0}',
   chkAutoTerms:'Glossário automático: extrai nomes próprios e termos ambíguos antes de traduzir para uniformar o arquivo todo',
@@ -1337,7 +1342,7 @@ const I18N = {
   hintPlain:'구어체: 일상 대화처럼 쉽고 알기 쉽게; 짧은 문장과 흔한 단어를 쓰고 말하는 사람의 어조를 유지합니다.',
   hintCustom:'사용자 정의: 아래 설명이 그대로 "번역 스타일" 요구사항으로 모델에 전송됩니다.',
   optCustom:"사용자 지정…", btnTest:"⚡ 연결 테스트", testRun:"테스트 중…", testOk:"✓ 연결 성공", testFail:"✗ 실패: {0}", getKey:"API 키 받기 ↗", noteDoubao:"doubao는 화산방주(Volcano Ark) 콘솔에서 모델 서비스 활성화 필요. 모델은 doubao-seed-… 또는 엔드포인트 ID(ep-로 시작)", noteOpenRouter:"모델명은 벤더/모델 형식(예: anthropic/claude-sonnet-4.6). 하나의 키로 수백 개 모델 사용 가능",
-  lblProvider:'공급자', lblBase:'Base URL(/chat/completions 자동 추가)', lblModel:'모델', lblBatch:'배치당 자막 수', batchTip:'요청마다 모델로 보내는 자막 수. 클수록 총 시간이 짧아지지만 너무 크면 품질이 떨어질 수 있습니다. 기본값 40은 대부분의 영상에 적합합니다.',
+  lblProvider:'공급자', lblBase:'Base URL(/chat/completions 자동 추가)', lblModel:'모델', lblBatch:'배치당 글자 수', batchTip:'요청마다 모델로 보내는 자막의 글자 수입니다. 길이에 따라 자동으로 나뉘어 짧은 줄은 많이, 긴 줄은 적게 담기며 각 배치의 출력량이 안정적입니다. 값이 클수록 총 시간이 다소 짧아지지만 너무 크면 품질이 떨어질 수 있습니다. 기본값 3000은 대부분의 영상에 적합합니다.',
   lblKey:'API Key(이 브라우저에만 저장)',
   chkKeepTerms:'고유명사(인물/브랜드/제품/용어)를 번역하지 않고 원문 유지',
   termsHintOn:'체크 = 목록의 용어를 원문 그대로 유지(목록 활성화).',
@@ -1367,7 +1372,7 @@ const I18N = {
   groupInfo:'{0}개 문장으로 그룹화, 그중 {1}그룹이 여러 자막에 걸쳐 있습니다 — 짧은 그룹은 하나의 자막으로 병합되고 긴 그룹은 길이에 따라 분할됩니다.',
   mergeInfo:'다중 자막 그룹 {0}개 중 {1}개를 단일 자막으로 병합, 나머지 {2}개는 길이에 따라 분할했습니다.',
   mergedNote:'이전 자막에 병합됨(타임라인 병합)',
-  startT:'번역 시작: {0} → {1}, 총 {2}개, 배치당 {3}개.',
+  startT:'번역 시작: {0} → {1}, 총 {2}개, 배치당 약 {3}자.',
   batchProg:'배치 {0}/{1}(문장 그룹 {2}–{3})…',
   pgRun:'번역 중', pgEta:'남은 시간 약 {0}', pgDone:'✓ 완료 · 소요 {0}',
   chkAutoTerms:'자동 용어집: 번역 전 고유명사와 애매한 단어를 추출하여 전체에서 번역을 통일',
@@ -1429,7 +1434,7 @@ const I18N = {
   hintPlain:'Wortwörtlich: umgangssprachlich und leicht verständlich, wie Alltagsrede; kurze Sätze, gängige Wörter, Ton des Sprechers bleibt.',
   hintCustom:'Eigene: die Beschreibung unten wird unverändert als Stilvorgabe an das Modell gesendet.',
   optCustom:"Benutzerdefiniert…", btnTest:"⚡ Verbindung testen", testRun:"Test läuft…", testOk:"✓ Verbunden", testFail:"✗ Fehlgeschlagen: {0}", getKey:"API-Key holen ↗", noteDoubao:"Doubao erfordert die Aktivierung des Modelldienstes in der Volcano-Ark-Konsole; Modell = doubao-seed-… oder Endpunkt-ID (ep-…)", noteOpenRouter:"Modellnamen im Format Anbieter/Modell (z. B. anthropic/claude-sonnet-4.6); ein Key schaltet Hunderte Modelle frei",
-  lblProvider:'Anbieter', lblBase:'Base URL (/chat/completions wird automatisch angehängt)', lblModel:'Modell', lblBatch:'Untertitel pro Batch', batchTip:'Untertitel pro Anfrage an das Modell. Größere Werte sind schneller, aber zu groß kann die Qualität mindern; der Standard 40 passt für die meisten Videos.',
+  lblProvider:'Anbieter', lblBase:'Base URL (/chat/completions wird automatisch angehängt)', lblModel:'Modell', lblBatch:'Zeichen pro Batch', batchTip:'Zeichenanzahl der Untertitel pro Anfrage an das Modell. Batches werden automatisch nach Länge geschnitten: kurze Zeilen füllen mehr, lange weniger, so bleibt jede Ausgabe stabil. Größere Werte sind etwas schneller, aber zu groß kann die Qualität mindern; der Standard 3000 passt für die meisten Videos.',
   lblKey:'API Key (nur in diesem Browser gespeichert)',
   chkKeepTerms:'Eigennamen (Personen/Firmen/Produkte/Begriffe) unübersetzt lassen',
   termsHintOn:'Aktiviert = Begriffe aus der Liste bleiben in Originalform (Liste aktiv).',
@@ -1459,7 +1464,7 @@ const I18N = {
   groupInfo:'In {0} Sätze gruppiert; {1} erstrecken sich über mehrere Untertitel — kurze Gruppen werden zu einem Untertitel zusammengeführt, lange nach Dauer aufgeteilt.',
   mergeInfo:'Mehrzeilige Gruppen: {0}; {1} zu einem Untertitel zusammengeführt, {2} nach Dauer aufgeteilt.',
   mergedNote:'In den vorherigen Untertitel zusammengeführt (Zeitleiste vereint)',
-  startT:'Übersetze: {0} → {1}, {2} Untertitel, {3} pro Batch.',
+  startT:'Übersetze: {0} → {1}, {2} Untertitel, ~{3} Zeichen pro Batch.',
   batchProg:'Batch {0}/{1} (Sätze {2}–{3})…',
   pgRun:'Übersetzung läuft', pgEta:'Noch {0}', pgDone:'✓ Fertig · {0}',
   chkAutoTerms:'Auto-Glossar: extrahiert vor der Übersetzung Eigennamen und mehrdeutige Begriffe, um dateiweite Einheitlichkeit zu sichern',
@@ -1521,7 +1526,7 @@ const I18N = {
   hintPlain:'Courant : familier et facile à comprendre, comme une conversation quotidienne ; phrases courtes, mots courants, ton du locuteur conservé.',
   hintCustom:'Personnalisé : la description ci-dessous est envoyée telle quelle au modèle comme exigence de style.',
   optCustom:"Personnalisé…", btnTest:"⚡ Tester la connexion", testRun:"Test en cours…", testOk:"✓ Connecté", testFail:"✗ Échec : {0}", getKey:"Obtenir une clé API ↗", noteDoubao:"Doubao nécessite l'activation du service de modèles dans la console Volcano Ark ; Modèle = doubao-seed-… ou ID de point d'accès (ep-…)", noteOpenRouter:"Les noms de modèles suivent le format fournisseur/modèle (ex. anthropic/claude-sonnet-4.6) ; une clé donne accès à des centaines de modèles",
-  lblProvider:'Fournisseur', lblBase:'Base URL (/chat/completions ajouté automatiquement)', lblModel:'Modèle', lblBatch:'Sous-titres par lot', batchTip:'Sous-titres envoyés au modèle par requête. Plus la valeur est grande, plus c\'est rapide, mais trop grand peut réduire la qualité ; 40 par défaut convient à la plupart des vidéos.',
+  lblProvider:'Fournisseur', lblBase:'Base URL (/chat/completions ajouté automatiquement)', lblModel:'Modèle', lblBatch:'Caractères par lot', batchTip:'Nombre de caractères de sous-titres envoyés au modèle par requête. Les lots sont découpés automatiquement par longueur : les lignes courtes en remplissent plus, les longues moins, ce qui stabilise chaque sortie. Une valeur plus grande est légèrement plus rapide, mais une valeur trop grande peut réduire la qualité ; 3000 par défaut convient à la plupart des vidéos.',
   lblKey:'Clé API (stockée uniquement dans ce navigateur)',
   chkKeepTerms:'Conserver les noms propres (personnes/marques/produits/termes) non traduits',
   termsHintOn:'Coché = les termes de la liste restent en forme originale (liste activée).',
@@ -1551,7 +1556,7 @@ const I18N = {
   groupInfo:'Regroupé en {0} phrases ; {1} s\u2019étalent sur plusieurs sous-titres — les groupes courts fusionnent en un seul sous-titre, les longs sont répartis par durée.',
   mergeInfo:'Groupes multi-lignes : {0} ; {1} fusionnés en un sous-titre, {2} répartis par durée.',
   mergedNote:'Fusionné dans le sous-titre précédent (timeline fusionnée)',
-  startT:'Traduction : {0} → {1}, {2} sous-titres, {3} par lot.',
+  startT:'Traduction : {0} → {1}, {2} sous-titres, ~{3} caractères par lot.',
   batchProg:'Lot {0}/{1} (phrases {2}–{3})…',
   pgRun:'Traduction', pgEta:'Reste {0}', pgDone:'✓ Terminé · {0}',
   chkAutoTerms:'Glossaire auto : extrait avant traduction les noms propres et termes ambigus pour uniformiser tout le fichier',
@@ -1613,7 +1618,7 @@ const I18N = {
   hintPlain:'Keseharian: kolokial dan mudah dipahami, seperti percakapan sehari-hari; kalimat pendek, kata umum, nada pembicara tetap terjaga.',
   hintCustom:'Kustom: deskripsi di bawah dikirim apa adanya ke model sebagai persyaratan gaya.',
   optCustom:"Kustom…", btnTest:"⚡ Uji koneksi", testRun:"Menguji…", testOk:"✓ Terhubung", testFail:"✗ Gagal: {0}", getKey:"Ambil API Key ↗", noteDoubao:"Doubao memerlukan aktivasi layanan model di konsol Volcano Ark; Model = doubao-seed-… atau ID endpoint (ep-…)", noteOpenRouter:"Nama model memakai format vendor/model (mis. anthropic/claude-sonnet-4.6); satu key membuka ratusan model",
-  lblProvider:'Penyedia', lblBase:'Base URL (/chat/completions ditambahkan otomatis)', lblModel:'Model', lblBatch:'Subtitle per batch', batchTip:'Jumlah subtitle yang dikirim ke model per permintaan. Nilai lebih besar lebih cepat, namun terlalu besar dapat menurunkan kualitas; default 40 cocok untuk kebanyakan video.',
+  lblProvider:'Penyedia', lblBase:'Base URL (/chat/completions ditambahkan otomatis)', lblModel:'Model', lblBatch:'Karakter per batch', batchTip:'Jumlah karakter subtitle yang dikirim ke model per permintaan. Batch dipotong otomatis menurut panjang: baris pendek memuat lebih banyak, baris panjang lebih sedikit, sehingga keluaran setiap batch stabil. Nilai lebih besar sedikit lebih cepat, namun nilai terlalu besar dapat menurunkan kualitas; default 3000 cocok untuk sebagian besar video.',
   lblKey:'API Key (hanya tersimpan di browser ini)',
   chkKeepTerms:'Pertahankan nama diri (orang/merek/produk/istilah) tanpa diterjemahkan',
   termsHintOn:'Dicentang = istilah dalam daftar tetap dalam bentuk asli (daftar aktif).',
@@ -1643,7 +1648,7 @@ const I18N = {
   groupInfo:'Dikelompokkan menjadi {0} kalimat; {1} mencakup beberapa subtitle — grup pendek digabung menjadi satu subtitle, grup panjang dibagi berdasarkan durasi.',
   mergeInfo:'Grup multi-baris: {0}; {1} digabung menjadi satu subtitle, {2} dibagi berdasarkan durasi.',
   mergedNote:'Digabung ke subtitle sebelumnya (timeline digabung)',
-  startT:'Menerjemahkan: {0} → {1}, {2} subtitle, {3} per batch.',
+  startT:'Menerjemahkan: {0} → {1}, {2} subtitle, ~{3} karakter per batch.',
   batchProg:'Batch {0}/{1} (kalimat {2}–{3})…',
   pgRun:'Menerjemahkan', pgEta:'Sisa {0}', pgDone:'✓ Selesai · {0}',
   chkAutoTerms:'Glosarium otomatis: mengekstrak nama diri & istilah ambigu sebelum menerjemahkan agar seragam di seluruh file',
@@ -1705,7 +1710,7 @@ const I18N = {
   hintPlain:'सरल: बोलचाल और आसान, रोज़मर्रा की बातचीत जैसा; छोटे वाक्य, आम शब्द, बोलने वाले का अंदाज़ बना रहे।',
   hintCustom:'अपनी: नीचे का विवरण शैली-आवश्यकता के रूप में मॉडल को वैसे ही भेजा जाता है।',
   optCustom:"कस्टम…", btnTest:"⚡ कनेक्शन परीक्षण", testRun:"परीक्षण हो रहा है…", testOk:"✓ कनेक्ट हो गया", testFail:"✗ विफल: {0}", getKey:"API कुंजी पाएं ↗", noteDoubao:"Doubao के लिए Volcano Ark कंसोल में मॉडल सेवा सक्रिय करना आवश्यक है; मॉडल = doubao-seed-… या एंडपॉइंट ID (ep-…)", noteOpenRouter:"मॉडल नाम vendor/model प्रारूप में हैं (जैसे anthropic/claude-sonnet-4.6); एक कुंजी सैकड़ों मॉडल खोलती है",
-  lblProvider:'प्रदाता', lblBase:'Base URL (/chat/completions स्वतः जुड़ता है)', lblModel:'मॉडल', lblBatch:'प्रति बैच सबटाइटल', batchTip:'प्रति अनुरोध मॉडल को भेजी जाने वाली सबटाइटल संख्या। मान बड़ा होने पर कुल समय घटता है, लेकिन बहुत बड़ा होने पर गुणवत्ता गिर सकती है; डिफ़ॉल्ट 40 अधिकांश वीडियो के लिए उपयुक्त है।',
+  lblProvider:'प्रदाता', lblBase:'Base URL (/chat/completions स्वतः जुड़ता है)', lblModel:'मॉडल', lblBatch:'प्रति बैच अक्षर', batchTip:'प्रति अनुरोध मॉडल को भेजी जाने वाली सबटाइटल के अक्षर। बैच लंबाई के अनुसार स्वतः कटते हैं: छोटी पंक्तियाँ अधिक, लंबी पंक्तियाँ कम, जिससे हर बैच का आउटपुट स्थिर रहता है। मान बड़ा होने पर समय कुछ घटता है, लेकिन बहुत बड़ा मान गुणवत्ता गिरा सकता है; डिफ़ॉल्ट 3000 अधिकांश वीडियो के लिए उपयुक्त है।',
   lblKey:'API Key (केवल इस ब्राउज़र में सहेजा जाता है)',
   chkKeepTerms:'संज्ञाएँ (नाम/ब्रांड/उत्पाद/शब्दावली) अनूदित न रखें',
   termsHintOn:'चयनित = सूची के शब्द मूल रूप में रहेंगे (सूची सक्रिय)।',
@@ -1735,7 +1740,7 @@ const I18N = {
   groupInfo:'{0} वाक्यों में समूहित; {1} कई सबटाइटलों में फैले हैं — छोटे समूह एक सबटाइटल में विलय, लंबे अवधि से विभाजित होंगे।',
   mergeInfo:'बहु-पंक्ति समूह: {0}; {1} एक सबटाइटल में विलय, शेष {2} अवधि से विभाजित।',
   mergedNote:'पिछले सबटाइटल में विलय (टाइमलाइन विलय)',
-  startT:'अनुवाद शुरू: {0} → {1}, {2} सबटाइटल, प्रति बैच {3}।',
+  startT:'अनुवाद शुरू: {0} → {1}, {2} सबटाइटल, प्रति बैच लगभग {3} अक्षर।',
   batchProg:'बैच {0}/{1} (वाक्य {2}–{3})…',
   pgRun:'अनुवाद हो रहा है', pgEta:'शेष {0}', pgDone:'✓ पूर्ण · समय {0}',
   chkAutoTerms:'स्वचालित शब्दावली: अनुवाद से पहले संज्ञाएँ व द्विअर्थी शब्द निकालकर पूरी फ़ाइल में एकरूपता लाता है',
@@ -1797,7 +1802,7 @@ const I18N = {
   hintPlain:'พูดง่าย: เป็นภาษาพูด เข้าใจง่าย เหมือนบทสนทนาประจำวัน; ประโยคสั้น คำทั่วไป คงโทนของผู้พูด',
   hintCustom:'กำหนดเอง: คำบรรยายด้านล่างจะถูกส่งไปยังโมเดลเป็นข้อกำหนดสไตล์ตรง ๆ',
   optCustom:"กำหนดเอง…", btnTest:"⚡ ทดสอบการเชื่อมต่อ", testRun:"กำลังทดสอบ…", testOk:"✓ เชื่อมต่อสำเร็จ", testFail:"✗ ล้มเหลว: {0}", getKey:"รับ API Key ↗", noteDoubao:"Doubao ต้องเปิดใช้บริการโมเดลในคอนโซล Volcano Ark ก่อน; โมเดล = doubao-seed-… หรือ endpoint ID (ขึ้นต้นด้วย ep-)", noteOpenRouter:"ชื่อโมเดลใช้รูปแบบ ผู้ให้บริการ/โมเดล (เช่น anthropic/claude-sonnet-4.6) คีย์เดียวใช้ได้หลายร้อยโมเดล",
-  lblProvider:'ผู้ให้บริการ', lblBase:'Base URL (/chat/completions จะถูกเติมอัตโนมัติ)', lblModel:'โมเดล', lblBatch:'ซับไตเติลต่อแบตช์', batchTip:'จำนวนซับที่ส่งให้โมเดลต่อคำขอ ยิ่งมากยิ่งเร็ว แต่มากเกินไปอาจลดคุณภาพ ค่าเริ่มต้น 40 เหมาะกับวิดีโอส่วนใหญ่',
+  lblProvider:'ผู้ให้บริการ', lblBase:'Base URL (/chat/completions จะถูกเติมอัตโนมัติ)', lblModel:'โมเดล', lblBatch:'ตัวอักษรต่อแบตช์', batchTip:'จำนวนตัวอักษรซับไตเติลที่ส่งให้โมเดลต่อคำขอ แบตช์ถูกตัดอัตโนมัติตามความยาว: บรรทัดสั้นใส่ได้มาก บรรทัดยาวใส่น้อย ทำให้ปริมาณผลลัพธ์แต่ละแบตช์คงที่ ค่าที่มากขึ้นจะเร็วขึ้นเล็กน้อย แต่ค่าที่มากเกินไปอาจลดคุณภาพ ค่าเริ่มต้น 3000 เหมาะกับวิดีโอส่วนใหญ่',
   lblKey:'API Key (บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น)',
   chkKeepTerms:'คงชื่อเฉพาะ (บุคคล/แบรนด์/ผลิตภัณฑ์/คำศัพท์) ไว้ไม่แปล',
   termsHintOn:'เลือก = คำในรายการคงรูปเดิม (รายการเปิดใช้งาน)',
@@ -1827,7 +1832,7 @@ const I18N = {
   groupInfo:'จัดกลุ่มเป็น {0} ประโยค โดย {1} กลุ่มข้ามหลายซับ — กลุ่มสั้นจะรวมเป็นซับเดียว กลุ่มยาวแบ่งกลับตามช่วงเวลา',
   mergeInfo:'กลุ่มข้ามบรรทัด {0} กลุ่ม: รวมเป็นซับเดียว {1} กลุ่ม ที่เหลือ {2} กลุ่มแบ่งกลับตามช่วงเวลา',
   mergedNote:'รวมเข้าซับไตเติลก่อนหน้า (รวมไทม์ไลน์)',
-  startT:'เริ่มแปลทั้งไฟล์: {0} → {1} รวม {2} ซับ ละ {3} ต่อแบตช์',
+  startT:'เริ่มแปลทั้งไฟล์: {0} → {1} รวม {2} ซับ ประมาณ {3} ตัวอักษรต่อแบตช์',
   batchProg:'แบตช์ {0}/{1} (กลุ่มประโยค {2}–{3})…',
   pgRun:'กำลังแปล', pgEta:'เหลืออีก {0}', pgDone:'✓ เสร็จ · ใช้เวลา {0}',
   chkAutoTerms:'คลังศัพท์อัตโนมัติ: ดึงชื่อเฉพาะและคำคลุมเครือก่อนแปลเพื่อความสม่ำเสมอทั้งไฟล์',
@@ -1889,7 +1894,7 @@ const I18N = {
   hintPlain:'Thoại thường: khẩu ngữ, dễ hiểu, như hội thoại hằng ngày; câu ngắn, từ phổ thông, giữ giọng người nói.',
   hintCustom:'Tùy chỉnh: phần mô tả bên dưới được gửi nguyên văn cho mô hình như yêu cầu phong cách.',
   optCustom:"Tùy chỉnh…", btnTest:"⚡ Kiểm tra kết nối", testRun:"Đang kiểm tra…", testOk:"✓ Kết nối thành công", testFail:"✗ Thất bại: {0}", getKey:"Lấy API Key ↗", noteDoubao:"Doubao cần kích hoạt dịch vụ mô hình trong bảng điều khiển Volcano Ark; Mô hình = doubao-seed-… hoặc ID endpoint (ep-…)", noteOpenRouter:"Tên mô hình theo định dạng nhà_cung_cấp/mô_hình (vd: anthropic/claude-sonnet-4.6); một khóa mở hàng trăm mô hình",
-  lblProvider:'Nhà cung cấp', lblBase:'Base URL (tự động thêm /chat/completions)', lblModel:'Mô hình', lblBatch:'Phụ đề mỗi lô', batchTip:'Số phụ đề gửi lên mô hình mỗi yêu cầu. Giá trị lớn hơn hoàn thành nhanh hơn, nhưng quá lớn có thể giảm chất lượng; mặc định 40 phù hợp với hầu hết video.',
+  lblProvider:'Nhà cung cấp', lblBase:'Base URL (tự động thêm /chat/completions)', lblModel:'Mô hình', lblBatch:'Ký tự mỗi lô', batchTip:'Số ký tự phụ đề gửi lên mô hình mỗi yêu cầu. Batch được cắt tự động theo độ dài: câu ngắn chứa nhiều, câu dài chứa ít, giúp lượng đầu ra mỗi batch ổn định. Giá trị lớn hơn nhanh hơn một chút, nhưng giá trị quá lớn có thể giảm chất lượng; mặc định 3000 phù hợp với hầu hết video.',
   lblKey:'API Key (chỉ lưu trong trình duyệt này)',
   chkKeepTerms:'Giữ nguyên tên riêng (người/thương hiệu/sản phẩm/thuật ngữ), không dịch',
   termsHintOn:'Đã chọn = các thuật ngữ trong danh sách giữ nguyên dạng (danh sách bật).',
@@ -1919,7 +1924,7 @@ const I18N = {
   groupInfo:'Gom thành {0} câu; {1} trải qua nhiều phụ đề — nhóm ngắn gộp thành một phụ đề, nhóm dài chia lại theo thời lượng.',
   mergeInfo:'Nhóm nhiều dòng: {0}; {1} gộp thành một phụ đề, {2} chia lại theo thời lượng.',
   mergedNote:'Đã gộp vào phụ đề trước (timeline đã gộp)',
-  startT:'Đang dịch: {0} → {1}, {2} phụ đề, {3} mỗi lô.',
+  startT:'Đang dịch: {0} → {1}, {2} phụ đề, khoảng {3} ký tự mỗi lô.',
   batchProg:'Lô {0}/{1} (câu {2}–{3})…',
   pgRun:'Đang dịch', pgEta:'Còn lại {0}', pgDone:'✓ Xong · {0}',
   chkAutoTerms:'Bảng thuật ngữ tự động: trích tên riêng & từ nhiễu nghĩa trước khi dịch để thống nhất cả file',
@@ -1981,7 +1986,7 @@ const I18N = {
   hintPlain:'Разговорный: просто и понятно, как повседневная речь; короткие фразы, обычные слова, тон говорящего сохраняется.',
   hintCustom:'Свой: описание ниже отправляется модели дословно как требование к стилю.',
   optCustom:"Свои…", btnTest:"⚡ Проверить", testRun:"Проверка…", testOk:"✓ Подключено", testFail:"✗ Ошибка: {0}", getKey:"Получить API-ключ ↗", noteDoubao:"Для Doubao нужно включить сервис моделей в консоли Volcano Ark; Модель = doubao-seed-… или ID эндпоинта (ep-…)", noteOpenRouter:"Имена моделей в формате вендор/модель (напр. anthropic/claude-sonnet-4.6); один ключ открывает сотни моделей",
-  lblProvider:'Провайдер', lblBase:'Base URL (/chat/completions добавляется автоматически)', lblModel:'Модель', lblBatch:'Субтитров на батч', batchTip:'Количество субтитров, отправляемых модели за один запрос. Больше — быстрее, но слишком большое значение может снизить качество; 40 по умолчанию подходит для большинства видео.',
+  lblProvider:'Провайдер', lblBase:'Base URL (/chat/completions добавляется автоматически)', lblModel:'Модель', lblBatch:'Символов на батч', batchTip:'Количество символов субтитров, отправляемых модели за один запрос. Пакеты нарезаются автоматически по длине: короткие строки помещаются больше, длинные меньше, поэтому объём вывода каждого пакета стабилен. Большее значение немного быстрее, но слишком большое может снизить качество; 3000 по умолчанию подходит для большинства видео.',
   lblKey:'API Key (хранится только в этом браузере)',
   chkKeepTerms:'Оставлять имена собственные (лица/бренды/продукты/термины) без перевода',
   termsHintOn:'Включено = термины из списка остаются в оригинальном виде (список активен).',
@@ -2011,7 +2016,7 @@ const I18N = {
   groupInfo:'Сгруппировано в {0} предложений; {1} охватывают несколько субтитров — короткие группы объединяются в один субтитр, длинные делятся обратно по длительности.',
   mergeInfo:'Многострочных групп: {0}; {1} объединено в один субтитр, {2} разделено по длительности.',
   mergedNote:'Объединено с предыдущим субтитром (таймлайн объединён)',
-  startT:'Перевод: {0} → {1}, {2} субтитров, {3} на батч.',
+  startT:'Перевод: {0} → {1}, {2} субтитров, ~{3} символов на батч.',
   batchProg:'Батч {0}/{1} (предложения {2}–{3})…',
   pgRun:'Перевод', pgEta:'Осталось {0}', pgDone:'✓ Готово · за {0}',
   chkAutoTerms:'Автоглоссарий: перед переводом извлекает имена собственные и неоднозначные термины для единообразия по всему файлу',
@@ -2073,7 +2078,7 @@ const I18N = {
   hintPlain:'Semplice: colloquiale e facile da capire, come una conversazione quotidiana; frasi brevi, parole comuni, mantiene il tono del parlante.',
   hintCustom:'Personalizzato: la descrizione qui sotto viene inviata al modello così com\'è come requisito di stile.',
   optCustom:"Personalizzato…", btnTest:"⚡ Prova connessione", testRun:"Verifica…", testOk:"✓ Connesso", testFail:"✗ Errore: {0}", getKey:"Ottieni API Key ↗", noteDoubao:"Doubao richiede l'attivazione del servizio modelli nella console Volcano Ark; Modello = doubao-seed-… o ID endpoint (ep-…)", noteOpenRouter:"I nomi dei modelli usano il formato fornitore/modello (es. anthropic/claude-sonnet-4.6); una chiave sblocca centinaia di modelli",
-  lblProvider:'Fornitore', lblBase:'URL di base (/chat/completions aggiunto automaticamente)', lblModel:'Modello', lblBatch:'Sottotitoli per batch', batchTip:'Sottotitoli inviati al modello per richiesta. Valori più alti sono più veloci, ma troppo alti possono ridurre la qualità; il valore predefinito 40 va bene per la maggior parte dei video.',
+  lblProvider:'Fornitore', lblBase:'URL di base (/chat/completions aggiunto automaticamente)', lblModel:'Modello', lblBatch:'Caratteri per batch', batchTip:'Numero di caratteri dei sottotitoli inviati al modello per richiesta. I batch vengono tagliati automaticamente per lunghezza: le righe corte ne riempiono di più, le lunghe di meno, mantenendo stabile l\'output di ogni batch. Valori più alti sono leggermente più veloci, ma valori troppo alti possono ridurre la qualità; il predefinito 3000 va bene per la maggior parte dei video.',
   lblKey:'Chiave API (salvata solo in questo browser)',
   chkKeepTerms:'Mantieni non tradotti i nomi propri (persone/marchi/prodotti/termini)',
   termsHintOn:'Attivo: i termini dell\'elenco restano nella forma originale (elenco abilitato).',
@@ -2103,7 +2108,7 @@ const I18N = {
   groupInfo:'Raggruppate in {0} frasi; {1} si estendono su più sottotitoli — i gruppi brevi si uniscono in un solo sottotitolo, i lunghi si dividono per durata.',
   mergeInfo:'Gruppi multi-cue: {0}; {1} uniti in sottotitoli singoli, {2} divisi per durata.',
   mergedNote:'Unito nel sottotitolo precedente (timeline unificata)',
-  startT:'Traduzione: {0} → {1}, {2} sottotitoli, {3} per batch.',
+  startT:'Traduzione: {0} → {1}, {2} sottotitoli, ~{3} caratteri per batch.',
   batchProg:'Batch {0}/{1} (frasi {2}–{3})…',
   pgRun:'Traduzione', pgEta:'Mancano {0}', pgDone:'✓ Completato · {0}',
   chkAutoTerms:'Glossario automatico: estrae nomi propri e termini ambigui prima di tradurre per uniformare l\'intero file',
@@ -2165,7 +2170,7 @@ const I18N = {
   hintPlain:'بسيط: عامي وسهل الفهم، كحوار يومي؛ جُمل قصيرة وكلمات شائعة مع الحفاظ على نبرة المتحدث.',
   hintCustom:'مخصص: يُرسل الوصف أدناه إلى النموذج كما هو كمتطلب أسلوب.',
   optCustom:"مخصص…", btnTest:"⚡ اختبار الاتصال", testRun:"جارٍ الاختبار…", testOk:"✓ تم الاتصال", testFail:"✗ فشل: {0}", getKey:"احصل على مفتاح API ↗", noteDoubao:"يتطلب Doubao تفعيل خدمة النماذج في وحدة تحكم Volcano Ark؛ الموديل = doubao-seed-… أو معرف النقطة (ep-…)", noteOpenRouter:"أسماء النماذج بصيغة المورد/النموذج (مثل anthropic/claude-sonnet-4.6)؛ مفتاح واحد يفتح مئات النماذج",
-  lblProvider:'المزوّد', lblBase:'العنوان الأساسي (يُضاف /chat/completions تلقائيًا)', lblModel:'النموذج', lblBatch:'ترجمات لكل دفعة', batchTip:'عدد الترجمات المُرسلة إلى النموذج في كل طلب. القيمة الأكبر أسرع، لكن الكبير جدًا قد يقلل الجودة؛ القيمة الافتراضية 40 مناسبة لمعظم الفيديوهات.',
+  lblProvider:'المزوّد', lblBase:'العنوان الأساسي (يُضاف /chat/completions تلقائيًا)', lblModel:'النموذج', lblBatch:'أحرف لكل دفعة', batchTip:'عدد أحرف الترجمة المُرسلة إلى النموذج في كل طلب. تُقسَّم الدفعات تلقائيًا حسب الطول: الأسطر القصيرة تملأ أكثر والطويلة أقل، مما يجعل حجم مخرجات كل دفعة مستقرًا. القيمة الأكبر أسرع قليلًا، لكن القيمة الكبيرة جدًا قد تقلل الجودة؛ القيمة الافتراضية 3000 مناسبة لمعظم الفيديوهات.',
   lblKey:'مفتاح API (يُحفظ في هذا المتصفح فقط)',
   chkKeepTerms:'إبقاء الأسماء الخاصة (أشخاص/علامات/منتجات/مصطلحات) دون ترجمة',
   termsHintOn:'عند التفعيل: تبقى المصطلحات في القائمة بصيغتها الأصلية (القائمة مفعّلة).',
@@ -2195,7 +2200,7 @@ const I18N = {
   groupInfo:'جُمعت في {0} جملة؛ {1} تمتد عبر ترجمات متعددة — المجموعات القصيرة تُدمج في ترجمة واحدة، والطويلة تُقسم حسب المدة.',
   mergeInfo:'مجموعات متعددة: {0}؛ دُمج {1} في ترجمات مفردة، وقُسّم {2} حسب المدة.',
   mergedNote:'دُمجت في الترجمة السابقة (الخط الزمني مدمج)',
-  startT:'الترجمة: {0} ← {1}، {2} ترجمة، {3} لكل دفعة.',
+  startT:'الترجمة: {0} ← {1}، {2} ترجمة، نحو {3} حرفًا لكل دفعة.',
   batchProg:'دفعة {0}/{1} (جمل {2}–{3})…',
   pgRun:'جارٍ الترجمة', pgEta:'متبقي {0}', pgDone:'✓ اكتمل · {0}',
   chkAutoTerms:'قاموس تلقائي: يستخرج الأسماء الخاصة والمصطلحات الملتبسة قبل الترجمة لتوحيد الترجمة في كامل الملف',
@@ -2257,7 +2262,7 @@ const I18N = {
   hintPlain:'Sade: günlük ve anlaşılır, sıradan bir konuşma gibi; kısa cümleler, yaygın kelimeler, konuşanın tonunu korur.',
   hintCustom:'Özel: aşağıdaki açıklama, stil gereksinimi olarak modele olduğu gibi gönderilir.',
   optCustom:"Özel…", btnTest:"⚡ Bağlantıyı test et", testRun:"Test ediliyor…", testOk:"✓ Bağlandı", testFail:"✗ Başarısız: {0}", getKey:"API Anahtarı al ↗", noteDoubao:"Doubao, Volcano Ark konsolunda model servisini etkinleştirmeyi gerektirir; Model = doubao-seed-… veya endpoint ID (ep-…)", noteOpenRouter:"Model adları sağlayıcı/model biçimindedir (örn. anthropic/claude-sonnet-4.6); tek anahtar yüzlerce modele erişim sağlar",
-  lblProvider:'Sağlayıcı', lblBase:'Temel URL (/chat/completions otomatik eklenir)', lblModel:'Model', lblBatch:'Grup başına altyazı', batchTip:'Modelle istek başına gönderilen altyazı sayısı. Daha büyük değerler daha hızlıdır, ancak çok büyük kaliteyi düşürebilir; varsayılan 40 çoğu video için uygundur.',
+  lblProvider:'Sağlayıcı', lblBase:'Temel URL (/chat/completions otomatik eklenir)', lblModel:'Model', lblBatch:'Parti başına karakter', batchTip:'Modele istek başına gönderilen altyazı karakteri sayısı. Gruplar uzunluğa göre otomatik kesilir: kısa satırlar daha fazla, uzun satırlar daha az doldurulur, böylece her grubun çıktısı dengeli olur. Daha büyük değerler biraz daha hızlıdır, ancak çok büyük değerler kaliteyi düşürebilir; varsayılan 3000 çoğu video için uygundur.',
   lblKey:'API Anahtarı (yalnızca bu tarayıcıda saklanır)',
   chkKeepTerms:'Özel isimleri (kişi/marka/ürün/terim) çevirmeden koru',
   termsHintOn:'İşaretliyken listedeki terimler özgün biçimde kalır (liste etkin).',
@@ -2287,7 +2292,7 @@ const I18N = {
   groupInfo:'{0} cümleye gruplandı; {1} tanesi birden çok altyazıya yayılıyor — kısa gruplar tek altyazıda birleşir, uzun gruplar süreye göre geri bölünür.',
   mergeInfo:'Çoklu gruplar: {0}; {1} tek altyazıda birleştirildi, {2} süreye göre geri bölündü.',
   mergedNote:'Önceki altyazıyla birleştirildi (zaman çizgisi birleşik)',
-  startT:'Çevriliyor: {0} → {1}, {2} altyazı, grup başına {3}.',
+  startT:'Çevriliyor: {0} → {1}, {2} altyazı, grup başına yaklaşık {3} karakter.',
   batchProg:'Grup {0}/{1} (cümleler {2}–{3})…',
   pgRun:'Çevriliyor', pgEta:'Kalan {0}', pgDone:'✓ Tamamlandı · {0}',
   chkAutoTerms:'Otomatik sözlük: çeviriden önce özel isimleri ve belirsiz terimleri çıkararak tüm dosyada tutarlılık sağlar',
@@ -3167,7 +3172,10 @@ async function runTranslate(){
   if(cfg.mode==='builtin' && !builtinReady){ log(t('builtinOff'), 'err'); }
   let sys = systemPrompt(cfg);
   pgStart();
-  const B = Math.max(1, Math.min(60, +$('batch').value || 12));
+  // v0.9.74：改按「字符预算」切批（原按固定条数切：短剧 15字/条 批次过小浪费固定开销，
+  // 纪录片 120字/条 批次过大输出失控）。句组仍是原子单位，切批只发生在句子边界。
+  const CHAR_BUDGET = Math.max(1000, Math.min(6000, +$('batch').value || 3000));
+  const CUE_CAP = 60;   // 编号数量硬上限：字符少也不能无限装，模型维持过多 cue 编号易结构错
   const effBase = cfg.mode==='builtin' ? BUILTIN_API : cfg.base;
   const effKey  = cfg.mode==='builtin' ? '' : cfg.key;
   const effModel= cfg.mode==='builtin' ? '' : cfg.model;
@@ -3236,7 +3244,7 @@ async function runTranslate(){
       return;
     }
 
-    log(t('startT',LBY(cfg.src).zh,LBY(cfg.dst).zh,S.srcItems.length,B));
+    log(t('startT',LBY(cfg.src).zh,LBY(cfg.dst).zh,S.srcItems.length,CHAR_BUDGET));
 
     // v0.9.28 自动术语表：翻译前锁定专名/呼号/军语的全片统一译法（仅提取元数据级术语，失败自动跳过不影响主流程）
     if(cfg.autoTerms){
@@ -3253,13 +3261,17 @@ async function runTranslate(){
       }catch(e){ log(t('autoTermsSkip',e.message),'err'); }
     }
 
-    // 按句组分批：句组是原子单位不拆开；单批 cue 数不超过 B
+    // v0.9.74：按「字符预算 + 条数上限」双约束分批；句组是原子单位不拆开，单句永不跨批
+    // （字符预算管输出量稳定，CUE_CAP 兜底编号数量，两者取先到者切批）
     const batches=[];
-    let curB=[], curCues=0;
+    let curB=[], curCues=0, curChars=0;
     for(const g of groups){
       const gc=g.cues.length;
-      if(curB.length && curCues+gc>B){ batches.push(curB); curB=[]; curCues=0; }
-      curB.push(g); curCues+=gc;
+      const gChars=g.cues.reduce(function(n,c){ return n + String(c.text||'').length; }, 0);
+      if(curB.length && (curChars+gChars>CHAR_BUDGET || curCues+gc>CUE_CAP)){
+        batches.push(curB); curB=[]; curCues=0; curChars=0;
+      }
+      curB.push(g); curCues+=gc; curChars+=gChars;
     }
     if(curB.length) batches.push(curB);
     // 翻译结果暂存：gno -> {type,text}；fillers：整条纯水词的 cue 编号集合
@@ -3450,13 +3462,15 @@ async function runTranslate(){
           if(bi===0 || deadStreak>=2){ S.modelDead=true; S.stop=true; }
         } else if(saved>0) deadStreak=0;
       }
-      // v0.9.62：批末更新跨批上下文——取本批末尾最多 2 个有实义译文的句组（截到 300 字控 token）
+      // v0.9.62：批末更新跨批上下文——取本批末尾最多 3 个有实义译文的句组（截到 300 字控 token）
+      // v0.9.74：2 → 3 组。字符预算切批后长句素材（120字/条）批数变多、衔接链条变长，
+      //   每批多带一句前文的代价极小，可缓解语气/称谓在长链条上缓慢漂移
       // v0.9.66：cue 对齐组 text 为空 → 用 cues 文本按 cue 序拼接（跨批衔接参考不缺位）
       ctx = gBatch.filter(g=>{
         const m=res.get(g.gno);
         return m && m.type!=='drop' && (String(m.text||'').trim() || (m.cueTexts && m.cueTexts.size));
       })
-        .slice(-2)
+        .slice(-3)
         .map(g=>{
           const m=res.get(g.gno);
           let txt=String(m.text||'').trim();
