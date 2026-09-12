@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-page-node-id="q9jh8PUi4CuGb8DgaaZw5j">
-<head data-page-node-id="w67Jm5CfSF3443phF6wek2">
-<meta charset="UTF-8" data-page-node-id="mKcDrARkB6UIYtddznJlPi">
-<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="YMYAvGYn1BjN1mJ2DHDJE2">
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- 统计代码占位：有 analyticsId 配置时由 server.js 注入 gtag.js -->
 <!--ANALYTICS-->
 <!-- 以下 SEO head 区块由 server.js 按语言路由（/ /en/ /zh-TW/ /ja/）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
@@ -11,7 +11,7 @@
 <meta name="description" content="ai-srtsub.com 是专为影迷打造的免费 AI 字幕翻译工具。支持海外电影、美剧英剧、纪录片一键生成精准母语字幕，自动配轴对齐，无需注册，轻松告别啃生肉，让全球好内容无语言障碍随心畅享。">
 <meta name="keywords" content="AI字幕翻译,字幕翻译,SRT翻译,VTT翻译,ASS翻译,免费字幕翻译,电影字幕翻译,美剧英剧字幕,纪录片字幕,母语字幕,双语字幕,韩剧字幕,日剧字幕,泰剧字幕,动漫字幕,Netflix字幕翻译,追剧字幕,生肉字幕,海外剧字幕,字幕在线翻译,大模型翻译,视频字幕翻译,translate subtitles,免费翻译字幕工具,免费AI字幕翻译,免费在线字幕翻译">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#0E9488">
+<meta name="theme-color" content="#EC4899">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!-- Open Graph / 社交分享卡片 -->
 <meta property="og:type" content="website">
@@ -41,74 +41,246 @@
 </script>
 <!--SEO-HEAD-END-->
 <style>
+  /* ============ v0.9.70 视觉系统：暖中性框架 + 粉紫渐变点缀（按钮/图标/交互态） ============ */
   :root{
-    --bg:#F2F8F7; --card:#FFFFFF; --card-2:#F6FAF9; --line:#E2EBE9; --line-strong:#CCDBD8;
-    --ink:#1C2E2B; --sub:#576B68; --mut:#8AA19D;
-    --acc:#0E9488; --acc-weak:#DFF3F1; --acc-line:#9CD9D1;
-    --ok:#12805C; --ok-weak:#E3F4EC;
-    --warn:#9A6A0A; --warn-weak:#FBF1DC;
-    --del:#C2453A; --del-weak:#FBEAE8;
+    --bg:#F8F7F5; --card:#FFFFFF; --card-2:#F7F6F4;
+    --line:#E8E7E4; --line-strong:#D9D8D4;
+    --ink:#39363B; --sub:#6F6C72; --mut:#A5A2A8;
+    --acc:#EC4899; --acc2:#F070AE; --acc-weak:#FDEDF4; --acc-line:#F6C9DD;
+    --grad:linear-gradient(95deg,#FF6B9D,#A78BFA); --lav:#8B5CF6;
+    --ok:#10B981; --ok-weak:#E4F5EB;
+    --warn:#C77C0A; --warn-weak:#FFF4E5;
+    --del:#DC2626; --del-weak:#FEF2F2;
     --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,"PingFang SC",monospace;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
+  ::selection{background:#ECE8FA}
   body{background:var(--bg);color:var(--ink);
     font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
-  /* 顶部青色渐变带 */
-  body::before{content:"";display:block;height:3px;background:linear-gradient(90deg,#0E9488 0%,#3FB9AE 55%,#7CCDBF 100%);}
-  .wrap{max-width:1360px;margin:0 auto;padding:20px 24px 60px}
-  header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
-  header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.3px;color:var(--ink)}
-  header h1::before{content:"▌ ";color:var(--acc)}
-  header .tag{font-size:12px;color:var(--sub);background:var(--card);border:1px solid var(--line);
-    border-radius:999px;padding:2px 10px}
-  header select{background:var(--card);border:1px solid var(--line);color:var(--sub);border-radius:999px;padding:2px 8px;font-size:12px}
-  .rules{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 16px}
-  .rule{font-size:12px;color:var(--sub);background:var(--card);border:1px solid var(--line);
-    border-radius:8px;padding:3px 10px}
-  .rule b{color:var(--acc);font-weight:600}
-  .layout{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
-  @media(max-width:980px){.layout{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;
-    box-shadow:0 1px 3px rgba(14,84,78,.04)}
-  .card h2{font-size:12px;margin:0 0 12px;color:var(--sub);font-weight:600;
-    display:flex;align-items:center;gap:8px;letter-spacing:1px;text-transform:uppercase}
-  .card h2 .step{background:var(--acc);color:#FFFFFF;border-radius:5px;min-width:20px;height:20px;
-    display:inline-flex;align-items:center;justify-content:center;font-size:11px;padding:0 5px;font-weight:700}
+  button{font-family:inherit}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(6deg)}}
+
+  /* ============ 悬停解释（虚线词 + ⓘ 圆标，纯 CSS tooltip） ============ */
+  [data-tip]{position:relative;cursor:default}
+  [data-tip]::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%) translateY(4px);
+    background:#2F2D33;color:#F5F4F2;font-size:12px;line-height:1.65;text-align:left;padding:9px 13px;border-radius:12px;
+    white-space:normal;width:max-content;max-width:280px;box-shadow:0 12px 32px rgba(47,45,51,.3);
+    opacity:0;pointer-events:none;transition:opacity .18s .25s,transform .18s .25s;z-index:90}
+  [data-tip]::before{content:'';position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%) rotate(45deg);
+    width:8px;height:8px;background:#2F2D33;opacity:0;transition:opacity .18s .25s;z-index:91}
+  [data-tip]:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+  [data-tip]:hover::before{opacity:1}
+  .info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:99px;
+    border:1px solid var(--line-strong);color:var(--mut);font-size:9px;font-style:normal;cursor:default;position:relative;flex:none;margin-left:5px;vertical-align:1px}
+  .info::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 9px);transform:translateX(-50%) translateY(4px);
+    background:#2F2D33;color:#F5F4F2;font-size:12px;font-style:normal;line-height:1.65;text-align:left;padding:9px 13px;border-radius:11px;
+    white-space:normal;width:max-content;max-width:250px;box-shadow:0 12px 30px rgba(47,45,51,.32);
+    opacity:0;pointer-events:none;transition:opacity .18s .25s,transform .18s .25s;z-index:92}
+  .info::before{content:'';position:absolute;left:50%;bottom:calc(100% + 5px);transform:translateX(-50%) rotate(45deg);
+    width:8px;height:8px;background:#2F2D33;opacity:0;transition:opacity .18s .25s;z-index:93}
+  .info:hover{border-color:var(--acc);color:var(--acc)}
+  .info:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+  .info:hover::before{opacity:1}
+
+  /* ============ 通用控件 ============ */
   label{display:block;font-size:11.5px;color:var(--sub);margin:10px 0 4px;letter-spacing:.2px}
   input[type=text],input[type=password],input[type=number],select,textarea{
-    width:100%;border:1px solid var(--line-strong);border-radius:7px;padding:7px 10px;
+    width:100%;border:1.5px solid var(--line-strong);border-radius:10px;padding:7px 10px;
     font-size:13px;background:#FFFFFF;color:var(--ink);font-family:inherit}
-  input[type=text]:hover,input[type=password]:hover,input[type=number]:hover,select:hover,textarea:hover{border-color:var(--acc-line)}
+  input[type=text]:hover,input[type=password]:hover,input[type=number]:hover,select:hover,textarea:hover{border-color:#C9C8C4}
   textarea{resize:vertical;font-family:var(--mono);font-size:12.5px;line-height:1.55}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-weak)}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .btn{border:1px solid var(--line-strong);border-radius:7px;padding:8px 14px;font-size:13px;cursor:pointer;
-    background:#F0F6F5;color:var(--ink);transition:all .12s}
-  .btn:hover{background:#E5F0EE;border-color:var(--acc-line)}
-  .btn.primary{background:var(--acc);color:#FFFFFF;border-color:var(--acc);font-weight:700;letter-spacing:.2px}
-  .btn.primary:hover{background:#0B7F75;border-color:#0B7F75}
+  input:disabled,select:disabled{background:#F2F1EF;color:var(--mut);cursor:not-allowed;border-color:var(--line)}
+  .btn{border:1px solid var(--line-strong);border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer;
+    background:#F4F3F1;color:var(--ink);transition:all .12s}
+  .btn:hover{background:#ECEAE8;border-color:#C9C8C4}
+  .btn.primary{background:var(--grad);color:#FFFFFF;border:none;font-weight:700;letter-spacing:.2px;box-shadow:0 4px 14px rgba(236,72,153,.28)}
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(236,72,153,.4)}
   .btn.ok{background:var(--ok);color:#FFFFFF;border-color:var(--ok);font-weight:600}
-  .btn.ok:hover{background:#0F6E4F}
+  .btn.ok:hover{background:#0E9F6E}
   .btn.ghost{background:transparent;border:1px solid var(--line-strong)}
-  .btn.sm{padding:4px 9px;font-size:12px;border-radius:6px}
+  .btn.sm{padding:5px 10px;font-size:12px;border-radius:9px}
+  .btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
   .btn:disabled{opacity:.4;cursor:not-allowed}
-  .btns{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-  .hint{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.5}
-  .radio{display:inline-flex;align-items:center;gap:6px;margin:0 14px 0 0;font-size:12.5px;color:var(--ink);cursor:pointer;line-height:1.4}
-  .radio input,.chk input{width:auto;margin:0;accent-color:var(--acc)}
-  .chk{display:flex;align-items:center;gap:8px;margin:12px 0 2px;font-size:12.5px;color:var(--ink);cursor:pointer;font-weight:500}
-  input:disabled,select:disabled{background:#EEF3F2;color:var(--mut);cursor:not-allowed;border-color:var(--line)}
-  .hr{height:1px;background:var(--line);margin:12px 0}
-  /* 主面板 */
-  .topbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 14px;font-size:11.5px;color:var(--sub);letter-spacing:.3px}
-  .stat b{font-size:15px;color:var(--ink);margin-right:4px;font-weight:700;font-family:var(--mono)}
-  .stat.warn b{color:var(--warn)} .stat.ok b{color:var(--ok)} .stat.del b{color:var(--del)}
-  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-  .toolbar select{width:auto;font-size:12.5px}
-  /* v0.9.28 进度显示：sticky 仪表卡 + 斜纹动画 + 大号百分比 */
-  .progwrap{position:sticky;top:8px;z-index:30;display:none;align-items:center;gap:14px;background:var(--card);border:1px solid var(--acc-line);box-shadow:0 4px 14px rgba(14,148,136,.13);border-radius:12px;padding:10px 16px;margin-bottom:10px}
+  .hint{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.55}
+
+  /* ============ 第一段：首页（营销落地页） ============ */
+  #viewLanding{position:relative;overflow:hidden;animation:fadein .3s ease}
+  .blob{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+  .blob.b1{width:480px;height:480px;background:#E9E3FB;top:-160px;right:-120px;opacity:.5}
+  .blob.b2{width:420px;height:420px;background:#E8DBFF;bottom:-140px;left:-140px;opacity:.5}
+  .blob.b3{width:320px;height:320px;background:#FFE9D6;top:38%;left:58%;opacity:.4}
+  #viewLanding > .wrap, #viewLanding > .section{position:relative;z-index:1}
+  .wrap{max-width:780px;margin:0 auto;padding:36px 24px 36px}
+  .lnav{display:flex;align-items:center;gap:10px;margin-bottom:36px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16.5px;letter-spacing:.3px}
+  .logo-mark{width:32px;height:32px;border-radius:11px;background:var(--grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 4px 12px rgba(236,72,153,.3);flex:none}
+  .ver{font-size:10.5px;color:var(--mut);font-family:var(--mono);margin-left:2px}
+  .lnav .spacer{flex:1}
+  .lnav a{font-size:13px;color:var(--sub);text-decoration:none;margin-left:16px;transition:.15s}
+  .lnav a:hover{color:var(--acc)}
+  .lnav a svg{width:12px;height:12px;vertical-align:-1.5px;margin-right:4px;opacity:.65}
+  .lnav select{width:auto;border:1px solid var(--line);background:var(--card);color:var(--sub);border-radius:99px;padding:3px 8px;font-size:12px;margin-left:8px}
+
+  .hero{text-align:center;position:relative}
+  .hero .spark{position:absolute;font-size:22px;animation:floaty 3.4s ease-in-out infinite;opacity:.85}
+  .hero .spark.s1{left:4%;top:-4px}
+  .hero .spark.s2{right:6%;top:14px;animation-delay:1.1s}
+  .hero .spark.s3{right:18%;bottom:-4px;animation-delay:2s;font-size:18px}
+  .hero h1{font-size:36px;font-weight:900;letter-spacing:-.5px;line-height:1.3;margin:0}
+  .hero h1 em{font-style:normal;color:#7C4DDB}
+  .hero p{margin-top:12px;font-size:14.5px;color:var(--sub);line-height:1.75}
+
+  .upload-card{background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 10px 36px rgba(0,0,0,.05);margin-top:26px}
+  .drop{border:2px dashed #D3D2CE;border-radius:18px;padding:36px 20px;text-align:center;cursor:pointer;transition:.22s cubic-bezier(.34,1.56,.64,1);background:#FCFCFB}
+  .drop:hover,.drop.drag{border-color:var(--acc2);background:var(--acc-weak);transform:scale(1.012)}
+  .drop .ic{width:44px;height:44px;border-radius:15px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 5px 14px rgba(236,72,153,.28)}
+  .drop .ic svg{width:20px;height:20px}
+  .drop b{font-size:15.5px;display:block;margin-bottom:5px}
+  .drop span{font-size:12.5px;color:var(--mut)}
+  .alt{display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--mut);font-size:12px;flex-wrap:wrap;justify-content:center}
+  .alt-link{color:var(--acc);cursor:pointer;font-size:12.5px;font-weight:600}
+  .alt-link:hover{text-decoration:underline}
+  .alt-sep{color:var(--line-strong)}
+  .enter-hint{margin-top:13px;text-align:center;font-size:12.5px;color:var(--mut)}
+  .enter-hint b{color:var(--acc);font-weight:600}
+
+  .section{max-width:1080px;margin:0 auto;padding:0 24px}
+  .stats-band{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:48px;text-align:center}
+  .stat-ic{width:32px;height:32px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:9px}
+  .stat-ic svg{width:16px;height:16px}
+  .stat-ic.c1{background:#FDEDF4;color:#EC4899}
+  .stat-ic.c2{background:#F1EBFE;color:#8B5CF6}
+  .stat-ic.c3{background:#FFF0E3;color:#F97316}
+  .stat-ic.c4{background:#EDFBF4;color:#10B981}
+  .stat-num{font-size:33px;font-weight:900;color:var(--ink);font-family:var(--mono);line-height:1.1}
+  .stat-lab{font-size:12.5px;color:var(--sub);margin-top:4px}
+
+  .sec-head{text-align:center;margin-bottom:26px}
+  .sec-head h2{font-size:25px;font-weight:900;letter-spacing:-.4px;margin:0}
+  .sec-head p{margin-top:8px;color:var(--sub);font-size:14px}
+  .sec-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:2.5px;color:#6F6C72;background:#F4F3F1;border:1.5px solid #E5E4E1;border-radius:99px;padding:4px 15px;margin-bottom:14px}
+
+  .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .fcard{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:18px;transition:.24s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  .fcard:hover{transform:translateY(-4px) rotate(-.4deg);box-shadow:0 16px 34px rgba(0,0,0,.1);border-color:#D3D2CE}
+  .fviz{height:92px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;position:relative;gap:5px}
+  .fcard:nth-child(1) .fviz{background:linear-gradient(160deg,#FFF0F5,#FFDDE9)}
+  .fcard:nth-child(2) .fviz{background:linear-gradient(160deg,#F5EFFF,#E7DBFF)}
+  .fcard:nth-child(3) .fviz{background:linear-gradient(160deg,#FFF3EA,#FFE3D0)}
+  .fcard:nth-child(4) .fviz{background:linear-gradient(160deg,#EDFBF4,#D7F5E5)}
+  .fcard:nth-child(5) .fviz{background:linear-gradient(160deg,#EDF6FF,#D9ECFF)}
+  .fcard:nth-child(6) .fviz{background:linear-gradient(160deg,#FFFBEA,#FFF3C9)}
+  .fcard h4{font-size:15px;font-weight:800;margin:0 0 6px;display:flex;align-items:center}
+  .fcard h4 .h-ic{width:27px;height:27px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;margin-right:9px;flex:none}
+  .fcard h4 .h-ic svg{width:14px;height:14px}
+  .fcard:nth-child(1) .h-ic{background:#FFDDE9;color:#C0447F}
+  .fcard:nth-child(2) .h-ic{background:#E7DBFF;color:#7C4DDB}
+  .fcard:nth-child(3) .h-ic{background:#FFE3D0;color:#E06A2B}
+  .fcard:nth-child(4) .h-ic{background:#D7F5E5;color:#0E9F6E}
+  .fcard:nth-child(5) .h-ic{background:#D9ECFF;color:#2B7DD1}
+  .fcard:nth-child(6) .h-ic{background:#FFF3C9;color:#C79A0A}
+  .fcard p{font-size:12.5px;color:var(--sub);line-height:1.7;margin:0}
+
+  /* 卡片小插图部件 */
+  .tl-row{position:relative;width:78%;height:12px}
+  .tl-row i{position:absolute;top:0;height:100%;border-radius:6px;background:#EBC6DB}
+  .tl-row.tl-dst i{background:var(--acc)}
+  .viz-chip{font-size:10.5px;font-family:var(--mono);background:#fff;border:1.5px solid #EBC6DB;color:#C0447F;border-radius:99px;padding:2px 9px}
+  .viz-chip.keep{color:#0E9F6E;border-color:#A7E9CB}
+  .viz-player{width:82%;background:#2F2D33;border-radius:10px;padding:14px 8px 9px;display:flex;flex-direction:column;gap:5px;align-items:center}
+  .viz-player .l1{color:#fff;font-size:10.5px}
+  .viz-player .l2{color:#C9B8FF;font-size:9.5px}
+  .cut{color:#C4AAB5;text-decoration:line-through;font-size:11px}
+  .keepword{color:var(--ink);font-size:11px;font-weight:600}
+  .shield{width:36px;height:36px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 5px 14px rgba(236,72,153,.28)}
+  .shield svg{width:17px;height:17px}
+
+  /* 导出橱窗 */
+  .sc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .sc-item{margin:0}
+  .sc-screen{position:relative;height:84px;border-radius:14px;background:#2F2D33;overflow:hidden}
+  .sc-line{position:absolute;left:0;right:0;text-align:center;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sc-line.dst{color:#FFFFFF;font-size:12px}
+  .sc-line.src{color:#C9B8FF;font-size:10px}
+  .sc-mono .dst{bottom:10px}
+  .sc-bi .dst{bottom:26px} .sc-bi .src{bottom:8px;color:#fff;font-size:12px}
+  .sc-split .src{top:8px} .sc-split .dst{bottom:10px}
+  .sc-stack .dst{bottom:34px} .sc-stack .src{bottom:6px}
+  .sc-item figcaption{text-align:center;font-size:11.5px;color:var(--sub);margin-top:7px}
+  .sc-foot{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;flex-wrap:wrap}
+  .sc-chip{font-size:10.5px;color:var(--sub);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:2px 10px;font-family:var(--mono)}
+  .sc-note{font-size:11.5px;color:var(--mut);margin-left:6px}
+
+  /* 关于我们 */
+  .about-card{max-width:640px;margin:0 auto;text-align:center;background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:30px 28px;box-shadow:0 10px 36px rgba(0,0,0,.05)}
+  .about-ic{width:46px;height:46px;border-radius:16px;background:var(--grad);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 6px 16px rgba(236,72,153,.3)}
+  .about-ic svg{width:21px;height:21px}
+  .about-card h3{font-size:17px;font-weight:900;margin:0 0 10px}
+  .about-card p{font-size:13.5px;color:var(--sub);line-height:1.9;margin:0}
+  .about-links{margin-top:16px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+  .about-links a,.about-links span{font-size:12px;color:var(--acc);border:1.5px solid #F6C9DD;background:var(--acc-weak);border-radius:99px;padding:5px 14px;cursor:pointer;text-decoration:none;transition:.15s}
+  .about-links a:hover,.about-links span:hover{background:#FBDDED}
+
+  /* ============ 第二段：工作台 ============ */
+  #viewWorkspace{display:none;min-height:100vh;flex-direction:column;background:var(--bg);animation:fadein .3s ease}
+  .appbar{position:sticky;top:0;z-index:40;background:var(--card);border-bottom:1.5px solid var(--line);color:var(--ink);display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;flex:none;flex-wrap:nowrap}
+  .logo-sm{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14.5px;color:var(--ink);white-space:nowrap}
+  .logo-sm .mark{width:28px;height:28px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;box-shadow:0 3px 10px rgba(236,72,153,.3)}
+  .ver-tag{font-size:10.5px;color:var(--mut);font-family:var(--mono);white-space:nowrap}
+  .back{font-size:12.5px;color:var(--mut);background:none;border:none;cursor:pointer;padding:5px 9px;border-radius:9px;transition:.15s;white-space:nowrap}
+  .back:hover{color:var(--acc);background:var(--acc-weak)}
+  .back svg{width:11px;height:11px;vertical-align:-1px;margin-right:3px}
+  .proj{font-size:12px;color:var(--sub);background:#F4F3F1;border-radius:99px;padding:5px 13px;display:flex;align-items:center;gap:7px;max-width:34%;overflow:hidden}
+  .proj .live{width:6px;height:6px;border-radius:99px;background:#10B981;flex:none}
+  .proj span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appbar .spacer{flex:1}
+  .topbtn{font-size:12.5px;color:var(--sub);background:#F4F3F1;border:none;border-radius:11px;padding:7px 14px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .topbtn:hover{color:var(--acc);background:var(--acc-weak)}
+  .topbtn svg{width:12px;height:12px;vertical-align:-1.5px;margin-right:5px}
+  .topbtn.primary{background:var(--grad);color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(236,72,153,.32)}
+  .topbtn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(236,72,153,.42)}
+  .topbtn.primary:disabled{opacity:.55;cursor:default;transform:none}
+  .topbtn.primary svg{fill:currentColor;stroke:none}
+  .appbar-lang{width:auto;border:1px solid var(--line);background:var(--card);color:var(--sub);border-radius:99px;padding:4px 8px;font-size:12px}
+
+  .main{flex:1;display:grid;grid-template-columns:248px minmax(0,1fr) 258px;gap:14px;padding:14px 16px 20px;align-items:start}
+  .panel{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 16px 20px}
+  .sec-title{font-size:11px;font-weight:800;color:#9C9AA0;letter-spacing:1.2px;margin:18px 0 8px;text-transform:uppercase;display:flex;align-items:center}
+  .sec-title:first-child{margin-top:0}
+  .sec-title svg{width:11px;height:11px;margin-right:5px;opacity:.75}
+  .flbl{display:flex;align-items:center;font-size:11.5px;color:var(--sub);margin:10px 0 4px;letter-spacing:.2px}
+  .flbl .info{margin-left:5px}
+
+  /* 风格胶囊（原生 radio 隐藏） */
+  .style-chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .schip{position:relative;display:block;border:1.5px solid #E4E3E0;border-radius:10px;font-size:12.5px;color:var(--sub);text-align:center;padding:8px 4px;cursor:pointer;transition:.13s;margin:0}
+  .schip:hover{border-color:#D3D2CE;color:var(--ink)}
+  .schip input{position:absolute;opacity:0;pointer-events:none}
+  .schip input:checked + span{color:var(--acc);font-weight:700}
+  .schip:has(input:checked){border-color:var(--acc);background:var(--acc-weak)}
+  .schip.full{grid-column:1 / -1}
+
+  /* 开关行（原生 checkbox 隐藏） */
+  .tgl-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--sub);padding:9px 0;border-bottom:1px solid #F3F2F0;cursor:pointer}
+  .tgl-row .l{display:flex;align-items:center;font-weight:500;color:var(--ink)}
+  .tgl-row input{position:absolute;opacity:0;pointer-events:none}
+  .tgl{width:32px;height:19px;border-radius:99px;background:#D9D8D4;position:relative;transition:.16s;flex:none}
+  .tgl::after{content:'';position:absolute;top:2.5px;left:2.5px;width:14px;height:14px;border-radius:99px;background:#fff;transition:.16s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+  .tgl-row input:checked ~ .tgl{background:var(--acc)}
+  .tgl-row input:checked ~ .tgl::after{left:15.5px}
+
+  /* 中部：统计卡 + 进度 + 字幕表 */
+  .center{display:flex;flex-direction:column;min-width:0}
+  .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;flex:none}
+  .metric{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden}
+  .metric b{font-size:16px;color:var(--ink);font-weight:800;font-family:var(--mono);display:block;line-height:1.2}
+  .metric.del b{color:var(--del)} .metric.warn b{color:var(--warn)} .metric.ok b{color:var(--ok)} .metric.hl b{color:var(--acc)}
+
+  .progwrap{position:sticky;top:66px;z-index:30;display:none;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--acc-line);box-shadow:0 4px 14px rgba(236,72,153,.13);border-radius:14px;padding:10px 16px;margin:10px 0}
   .progwrap.show{display:flex}
   .pg-badge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--acc);background:var(--acc-weak);border-radius:99px;padding:5px 12px;white-space:nowrap;flex:none}
   .pg-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:pgblink 1.1s ease-in-out infinite;flex:none}
@@ -118,275 +290,409 @@
   .pg-pct{font-size:21px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums;line-height:1;min-width:52px}
   .pg-info{font-size:12px;color:var(--sub);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .pg-eta{font-size:12px;color:var(--acc);font-family:var(--mono);margin-left:auto;white-space:nowrap;flex:none}
-  .prog{height:14px;background:#E4EEEC;border-radius:99px;overflow:hidden}
-  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),#3FB9AE);transition:width .25s}
-  .prog.run i{background-image:repeating-linear-gradient(-55deg,rgba(255,255,255,.25) 0 9px,rgba(255,255,255,0) 9px 18px),linear-gradient(90deg,var(--acc),#3FB9AE);background-size:26px 100%,100% 100%;animation:pgflow .9s linear infinite}
+  .prog{height:14px;background:#EFEEEC;border-radius:99px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--grad);transition:width .25s}
+  .prog.run i{background-image:repeating-linear-gradient(-55deg,rgba(255,255,255,.25) 0 9px,rgba(255,255,255,0) 9px 18px),var(--grad);background-size:26px 100%,100% 100%;animation:pgflow .9s linear infinite}
   @keyframes pgflow{to{background-position:26px 0,0 0}}
-  .progwrap.done{border-color:#8FD6A8}
-  .progwrap.done .pg-pct{color:#1E9E5A}
-  .progwrap.done .pg-badge{color:#1E9E5A;background:#E4F5EB}
-  .progwrap.done .pg-dot{background:#1E9E5A;animation:none}
-  .progwrap.done .prog i{background:linear-gradient(90deg,#1E9E5A,#3BC46F)}
+  .progwrap.done{border-color:#A7E9CB}
+  .progwrap.done .pg-pct{color:#0E9F6E}
+  .progwrap.done .pg-badge{color:#0E9F6E;background:#E4F5EB}
+  .progwrap.done .pg-dot{background:#0E9F6E;animation:none}
+  .progwrap.done .prog i{background:linear-gradient(90deg,#0E9F6E,#10B981)}
   .prtxt{font-size:12px;color:var(--sub);font-family:var(--mono)}
-  /* cue rows */
-  .cuegrid{display:grid;grid-template-columns:52px 158px 1fr 1fr;gap:8px;align-items:center;
-    padding:8px 12px;border-bottom:1px solid var(--line);background:var(--card);transition:background .1s}
-  .cuegrid:hover{background:#F3FAF8}
-  .cuegrid.head{position:sticky;top:0;z-index:5;background:#EDF5F3;border-bottom:1px solid var(--line-strong);
-    font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;padding:7px 12px;font-weight:600}
-  .cue{font-family:var(--mono);font-size:11.5px;color:var(--mut)}
+
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 8px}
+  .toolbar select{width:auto;font-size:12.5px}
+
+  .lst{background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+  .lst .inner{max-height:calc(100vh - 300px);min-height:280px;overflow:auto}
+  .lst .inner::-webkit-scrollbar{width:8px;height:8px}
+  .lst .inner::-webkit-scrollbar-thumb{background:#D9D8D4;border-radius:99px}
+  .lst .inner::-webkit-scrollbar-thumb:hover{background:#C9C8C4}
+  .cuegrid{display:grid;grid-template-columns:44px 118px minmax(0,1fr) minmax(0,1.15fr);gap:8px;align-items:center;
+    padding:8px 12px;border-bottom:1px solid #F3F2F0;background:var(--card);transition:background .1s}
+  .cuegrid:hover{background:#FBF5F7}
+  .cuegrid.head{position:sticky;top:0;z-index:5;background:#F5F4F2;border-bottom:1px solid var(--line);
+    font-size:10.5px;color:#9C9AA0;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;font-weight:700}
+  .cue{font-family:var(--mono);font-size:11px;color:var(--mut)}
   .en{white-space:pre-wrap;word-break:break-word;font-size:12.5px;color:var(--sub)}
   .zh{white-space:pre-wrap;word-break:break-word;font-size:13px;color:var(--ink);
-    border:1px dashed transparent;border-radius:5px;padding:3px 7px;min-height:24px;outline:none;line-height:1.5}
+    border:1px dashed transparent;border-radius:6px;padding:3px 7px;min-height:24px;outline:none;line-height:1.5}
   .zh:hover{border-color:var(--line-strong)}
   .zh:focus{border-color:var(--acc);background:var(--card-2);box-shadow:0 0 0 2px var(--acc-weak)}
   .zh.placeholder{color:var(--mut)}
-  .badge{display:inline-block;font-size:10px;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px;font-weight:600;letter-spacing:.3px}
-  .b-drop{background:var(--del-weak);color:var(--del);border:1px solid #EFC7C2}
-  .b-merge{background:var(--warn-weak);color:var(--warn);border:1px solid #EBD9AE}
+  .badge{display:inline-block;font-size:10px;border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:1px;font-weight:600;letter-spacing:.3px}
+  .b-drop{background:var(--del-weak);color:var(--del);border:1px solid #F5C6C6}
+  .b-merge{background:var(--warn-weak);color:var(--warn);border:1px solid #F1DFB4}
   .b-long{background:var(--acc-weak);color:var(--acc);border:1px solid var(--acc-line)}
-  .lst{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .lst .inner{max-height:70vh;overflow:auto}
-  .lst .inner::-webkit-scrollbar{width:8px;height:8px}
-  .lst .inner::-webkit-scrollbar-thumb{background:#CCDBD8;border-radius:99px}
-  .lst .inner::-webkit-scrollbar-thumb:hover{background:#B3C9C5}
   .empty{padding:30px;text-align:center;color:var(--mut);font-size:13px}
-  .log{max-height:140px;overflow:auto;background:var(--card-2);border:1px solid var(--line);border-radius:8px;
-    padding:8px 12px;font-size:11.5px;color:var(--sub);white-space:pre-wrap;font-family:var(--mono);line-height:1.6}
-  .log .err{color:var(--del)} .log .okc{color:var(--ok)}
+  .drop-note{color:var(--del);font-size:12px;font-style:italic}
+
   details.report{margin-top:10px;font-size:12px}
   details.report summary{cursor:pointer;color:var(--sub)}
   .issue{color:var(--warn);margin:2px 0}
-  .drop-note{color:var(--del);font-size:12px;font-style:italic}
-  .footer{margin-top:18px;font-size:11px;color:var(--mut);text-align:center;letter-spacing:.3px}
-  .footer-oss{margin-top:6px;font-size:11px;text-align:center;letter-spacing:.3px}
+
+  /* 左栏日志折叠盒 */
+  details.logbox{margin-top:18px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  details.logbox summary{cursor:pointer;font-size:11px;font-weight:800;color:#9C9AA0;letter-spacing:1.2px;text-transform:uppercase;padding:9px 12px;background:#F5F4F2;list-style:none;display:flex;align-items:center}
+  details.logbox summary::after{content:'▸';margin-left:auto;transition:.15s}
+  details.logbox[open] summary::after{transform:rotate(90deg)}
+  details.logbox summary svg{width:11px;height:11px;margin-right:5px;opacity:.75}
+  .log{max-height:150px;overflow:auto;background:var(--card-2);border-top:1px solid var(--line);
+    padding:8px 12px;font-size:11.5px;color:var(--sub);white-space:pre-wrap;font-family:var(--mono);line-height:1.6;border-radius:0}
+  .log .err{color:var(--del)} .log .okc{color:var(--ok)}
+
+  /* 右栏：导出 */
+  .exp-preview{border-radius:14px;overflow:hidden;margin-bottom:12px;background:#2F2D33;aspect-ratio:16/9;position:relative}
+  .ep-line{position:absolute;left:0;right:0;text-align:center;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ep-dst{bottom:26px;color:#fff;font-size:12px}
+  .ep-src{bottom:9px;color:#C9B8FF;font-size:10.5px}
+
+  /* SEO 区（保留原版排版，仅换皮变量） */
+  .seo{max-width:1080px;margin:32px auto 0;padding:20px 24px 0;color:var(--sub);font-size:13px;line-height:1.8}
+  .footer{margin-top:22px;font-size:11px;color:var(--mut);text-align:center;letter-spacing:.3px;padding:0 24px}
+  .footer-oss{margin-top:6px;font-size:11px;text-align:center;letter-spacing:.3px;padding-bottom:26px}
   .footer-oss a{color:var(--mut);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color .15s}
   .footer-oss a:hover{color:var(--acc)}
   .footer-oss svg{width:13px;height:13px;fill:currentColor;flex:none}
-  .seg{margin:8px 0;border-left:3px solid var(--acc);padding:0 10px;font-size:12px}
-  /* 导出样式橱窗（工作区上方宣传位） */
-  .showcase{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:14px}
-  .sc-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-  .sc-title{font-size:14px;font-weight:600;color:var(--ink)}
-  .sc-sub{font-size:11.5px;color:var(--mut)}
-  .sc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .sc-item{margin:0}
-  .sc-screen{position:relative;height:84px;border-radius:8px;background:#26221F;overflow:hidden}
-  .sc-line{position:absolute;left:0;right:0;text-align:center;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sc-line.dst{color:#FFFFFF;font-size:12px}
-  .sc-line.src{color:#EFC85C;font-size:10px}
-  .sc-mono .dst{bottom:10px}
-  .sc-bi .dst{bottom:26px} .sc-bi .src{bottom:8px;color:#FFFFFF;font-size:12px}
-  .sc-split .src{top:8px} .sc-split .dst{bottom:10px}
-  .sc-stack .dst{bottom:34px} .sc-stack .src{bottom:6px}
-  .sc-item figcaption{text-align:center;font-size:11px;color:var(--sub);margin-top:6px}
-  .sc-foot{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
-  .sc-chip{font-size:10.5px;color:var(--sub);background:var(--card-2);border:1px solid var(--line);border-radius:999px;padding:1px 8px;font-family:var(--mono)}
-  .sc-note{font-size:11px;color:var(--mut);margin-inline-start:4px}
-  @media (max-width:900px){.sc-row{grid-template-columns:repeat(2,1fr)}}
+
+  /* 响应式 */
+  @media (max-width:1080px){
+    .main{grid-template-columns:1fr}
+    .metrics{grid-template-columns:repeat(3,1fr)}
+    .progwrap{position:static}
+  }
+  @media (max-width:900px){
+    .fgrid{grid-template-columns:1fr 1fr}
+    .stats-band{grid-template-columns:1fr 1fr;gap:20px}
+    .sc-row{grid-template-columns:1fr 1fr}
+    .hero .spark{display:none}
+    .appbar{flex-wrap:wrap;height:auto;padding:8px 12px;gap:8px}
+    .proj{max-width:100%}
+  }
+  @media (max-width:640px){
+    .fgrid{grid-template-columns:1fr}
+    .cuegrid{grid-template-columns:34px 96px minmax(0,1fr)}
+    .cuegrid .en{display:none}
+    .metrics{grid-template-columns:repeat(2,1fr)}
+    .lnav{flex-wrap:wrap;gap:8px 14px;margin-bottom:24px}
+    .lnav .spacer{flex:1 1 100%}
+    .lnav a{font-size:12px}
+  }
 </style>
 </head>
-<body data-page-node-id="jlLSSV1A0RBysronL6DCo5">
-<div class="wrap" data-page-node-id="auSTf1rUTGHfCCkqnfOX27">
-  <header data-page-node-id="2p3fHKvbIbhX6vNg2u7bc6">
-    <h1 data-page-node-id="C8wAK0SGcfDfiKsNhCCbcm" data-i18n="appTitle">🎬 随心字幕 AI</h1>
-    <span class="tag" data-page-node-id="MdbMHm65IlYYielLtD1YNq">v0.9.69</span>
-    <span class="tag"><span data-i18n="uiLangTag">界面语言</span> <select id="uiLang" style="width:auto;border:none;background:transparent;font-size:12px;padding:0;color:var(--ink)"></select></span>
-  </header>
-  <div class="rules" data-page-node-id="eMWPz6optEq0w9bOQjGaIB">
-    <span class="rule" data-page-node-id="DBchoK8cJtRUmpGTZbn8uE" data-i18n="rule1">① 翻译风格可选（信达雅/大白话/自定义）</span>
-    <span class="rule" data-page-node-id="XMmYaFjHSJB6yOU03jsYXB" data-i18n="rule2">② 时间轴对齐</span>
-    <span class="rule" data-page-node-id="sBzJMcqp0R6H7q8b5BDS3S" data-i18n="rule3">③ 听写纠错</span>
-    <span class="rule" data-page-node-id="I2PIQPQVCpDbld771UT8E6" data-i18n="rule4">④ 专名可保留或翻译</span>
-    <span class="rule" data-page-node-id="kfK7mFbAjWr24TBMe9ekkT" data-i18n="rule5">⑤ 去水词</span>
-    <span class="rule" data-page-node-id="743RM9R8wsdpXzi3jBDvZI" data-i18n-html="rule6">⑥ 超过<b data-page-node-id="nzmwOZ37Ws7iDNZnMHDxTp">行宽阈值</b>自动折行</span>
+<body>
+
+<!-- ================================================================
+     第一段：首页（营销落地页）——上传 + 产品优势 + 导出花样 + 关于我们
+     ================================================================ -->
+<div id="viewLanding">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="wrap">
+    <nav class="lnav">
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.70</span></div>
+      <div class="spacer"></div>
+      <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
+      <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
+      <select id="uiLang2" aria-label="UI language"></select>
+    </nav>
+
+    <div class="hero">
+      <span class="spark s1">✨</span><span class="spark s2">🎬</span><span class="spark s3">💜</span>
+      <h1 data-i18n-html="heroTitle">把字幕丢进来，<br><em>剩下的交给 AI</em></h1>
+      <p data-i18n="heroSub">翻译、对齐时间轴、整理排版一气呵成——几分钟拿到直接能压进视频的字幕。免费 · 免注册 · 隐私安全</p>
+
+      <div class="upload-card">
+        <div class="drop" id="dropzone" role="button" tabindex="0">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-6 6 6-6 6 6M4 20h16"/></svg></div>
+          <b data-i18n="dropTitle">点这里选文件，或直接拖进来 🎬</b>
+          <span data-i18n="dropSub">SRT · VTT · ASS · TXT · 20+ 语言互译</span>
+        </div>
+        <div class="alt"><span data-i18n="altNoFile">手边没文件？</span><span class="alt-link" id="altPaste" data-i18n="altPaste">直接粘贴字幕文本</span><span class="alt-sep">·</span><span class="alt-link" id="altDemo" data-i18n="altDemo">载入示例，先逛逛工作台 →</span></div>
+        <div class="enter-hint" data-i18n-html="enterHint">上传后自动进入<b>字幕工作台</b>——语言、风格、导出样式都在那里配置</div>
+      </div>
+    </div>
   </div>
 
-  <div class="layout" data-page-node-id="1eu46tPXvENLxK0QNykwAH">
-    <!-- 左：设置 -->
-    <aside data-page-node-id="T3oogXk2Yi19vgLvzIpmOv">
-      <div class="card" data-page-node-id="7W9RbnDomapvz8dsVor9lg">
-        <h2 data-page-node-id="llsfwRR8kSa409vRxDQy7o"><span class="step" data-page-node-id="GMOitxpvDv3t9O1JjDWW0e">1/4</span><span data-i18n="step1">导入字幕（支持多语言）</span></h2>
-        <div class="btns" style="margin-top:0" data-page-node-id="62GQUck6yo5dkD4LyH5Xmz">
-          <button class="btn sm" id="btnFile" data-page-node-id="MZJboQjK2wypb5w0AHYh8v" data-i18n="btnFile">📂 选择字幕文件</button>
-          <button class="btn sm ghost" id="btnDemo" data-page-node-id="PWgC8niRDVCT0UwhlLR0jg" data-i18n="btnDemo">载入示例</button>
-        </div>
-        <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.txt" hidden data-page-node-id="CxYWWcJPMOIGSAlVkv7JlH">
-        <textarea id="paste" rows="5" placeholder="或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）" data-i18n-ph="pastePh" data-page-node-id="L8fM1xQqTvR6YkNhS5tDgA"></textarea>
-        <div class="btns" data-page-node-id="Foq04Y66td5cBxPwOzD76k"><button class="btn sm" id="btnParse" data-page-node-id="SLN93w9EivB6aZIMpiF0e3" data-i18n="btnParse">解析字幕</button></div>
-        <div class="hint" id="parseInfo" data-page-node-id="DnrRionnfOHMgvQODWWoNV"></div>
-      </div>
+  <!-- 数字带 -->
+  <div class="section">
+    <div class="stats-band">
+      <div><div class="stat-ic c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg></div><div class="stat-num">20+</div><div class="stat-lab" data-i18n="statLangs">语言互译</div></div>
+      <div><div class="stat-ic c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13.5 9 5 9-5"/></svg></div><div class="stat-num">14</div><div class="stat-lab" data-i18n="statStyles">种导出样式</div></div>
+      <div><div class="stat-ic c3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></div><div class="stat-num">100%</div><div class="stat-lab" data-i18n="statAlign">时间轴对齐</div></div>
+      <div><div class="stat-ic c4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><div class="stat-num">0</div><div class="stat-lab" data-i18n="statPrivacy">字幕上传服务器</div></div>
+    </div>
+  </div>
 
-      <div class="card" data-page-node-id="HXMHfs18ST8n9Ch3hhBkhR">
-        <h2 data-page-node-id="BqofEOSZueaUsygu5h3zNV"><span class="step" data-page-node-id="xtj0CNYMvPjLqLqntZSvH6">2/4</span><span data-i18n="stepReq">翻译要求</span></h2>
-        <label data-page-node-id="SOQgfp8Um8gzLQjGbE4LH1" data-i18n="lblSrcLang">源字幕语言（选“自动检测”则让模型识别）</label>
-        <select id="srcLang" data-page-node-id="YCxMEMbOxnEYUdkVlW7mud"></select>
-        <label data-page-node-id="H7aGVs6CrAPEV5lFyp5BFF" data-i18n="lblDstLang">翻译为目标语言</label>
-        <select id="dstLang" data-page-node-id="2yAkGlnO4FLLh0AabF70EV"></select>
+  <!-- 优势 -->
+  <div class="section" style="margin-top:56px">
+    <div class="sec-head">
+      <div class="sec-tag" data-i18n="whyTag">✦ WHY US · 为什么选我们</div>
+      <h2 data-i18n="whyTitle">别人叫它「机翻」，我们叫它字幕级翻译</h2>
+      <p data-i18n="whySub">每一项能力，都为「压进视频就能用」而设计</p>
+    </div>
+    <div class="fgrid">
+      <div class="fcard">
+        <div class="fviz">
+          <div class="tl-row"><i style="left:0;width:36%"></i><i style="left:42%;width:20%"></i><i style="left:68%;width:28%"></i></div>
+          <div class="tl-row tl-dst"><i style="left:0;width:36%"></i><i style="left:42%;width:20%"></i><i style="left:68%;width:28%"></i></div>
+        </div>
+        <h4><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span><span data-i18n="feat1T">时间轴精准对齐</span></h4>
+        <p data-i18n="feat1D">译文严格贴合原字幕时间轴，一条对一条；需要合并拆分时按时长智能分配，绝不漂移、不串行。</p>
+      </div>
+      <div class="fcard">
+        <div class="fviz">
+          <span class="viz-chip keep">SpaceX ✓</span>
+          <span class="viz-chip keep">Prism ✓</span>
+        </div>
+        <h4><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.3 9.3a2 2 0 0 0 2.8 0l7.2-7.2a2 2 0 0 0 0-2.8L12 2z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg></span><span data-i18n="feat2T">全片术语统一</span></h4>
+        <p data-i18n="feat2D">翻译前自动提取专名与歧义词生成术语表，第 1 条和第 300 条译法保证一致；还能强制保留指定专名。</p>
+      </div>
+      <div class="fcard">
+        <div class="fviz">
+          <div class="viz-player"><span class="l1">求救，求救，这里是</span><span class="l1">深水地平线号。</span></div>
+        </div>
+        <h4><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg></span><span data-i18n="feat3T">智能折行</span></h4>
+        <p data-i18n="feat3D">超过行宽自动按标点与词边界折行，符合 Netflix 各语言规范，绝不把单词劈成两半。</p>
+      </div>
+      <div class="fcard">
+        <div class="fviz">
+          <div><span class="cut">you know,</span> <span class="cut">like,</span> <span class="keepword">really scared</span></div>
+          <span class="viz-chip keep">我当时真的吓坏了。</span>
+        </div>
+        <h4><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></span><span data-i18n="feat4T">去水词 · 听写纠错</span></h4>
+        <p data-i18n="feat4D">「嗯、啊、you know」自动清除，源字幕的听写错误一并修正——译文干净到可以直接压片。</p>
+      </div>
+      <div class="fcard">
+        <div class="fviz">
+          <div class="viz-player"><span class="l1">♪ 爱在空中飘荡 ♪</span><span class="l2">♪ Love is in the air ♪</span></div>
+        </div>
+        <h4><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></span><span data-i18n="feat5T">双语字幕随心排</span></h4>
+        <p data-i18n="feat5D">原文译文双行、堆叠、分屏随意切换，还能导出 TXT 对照稿，字幕组级的花样全都有。</p>
+      </div>
+      <div class="fcard">
+        <div class="fviz">
+          <div class="shield"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.4-3.4 8-8 9-4.6-1-8-4.6-8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        </div>
+        <h4><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><span data-i18n="feat6T">隐私安全</span></h4>
+        <p data-i18n="feat6D">字幕在你的浏览器里处理，默认不经任何第三方服务器；API Key 只存在本机。</p>
+      </div>
+    </div>
+  </div>
 
-        <label data-page-node-id="iB0WD4dUYmjthrBLYvlv8U" data-i18n="lblStyle">翻译风格</label>
-        <div data-page-node-id="Bms2bVTBxo9KqvMP2WzQll">
-          <label class="radio" data-page-node-id="OejTloX9tBhQ8ce0ryFlAE"><input type="radio" name="style" value="elegant" checked data-page-node-id="mBOdTRgmV0WbOm63SdbL6y"><span data-i18n="styleElegant">信达雅（默认）</span></label>
-          <label class="radio" data-page-node-id="rqrvquSZSfxhSvWyhaLg9r"><input type="radio" name="style" value="plain" data-page-node-id="LpHiwIQ8B7DWvw6T5TnxE4"><span data-i18n="stylePlain">大白话</span></label>
-          <label class="radio" data-page-node-id="QTjm86hoZBNYIizMF7wZDh"><input type="radio" name="style" value="custom" data-page-node-id="45qyUCZnnh7fxgbDdCD047"><span data-i18n="styleCustom">自定义…</span></label>
-        </div>
-        <input type="text" id="styleCustom" style="display:none" spellcheck="false"
-          placeholder="描述你想要的口吻，如：轻松幽默、像给朋友讲故事" data-i18n-ph="styleCustomPh" data-page-node-id="xMB1FgBaRH2cLqzDg8J2Dl">
-        <div class="hint" id="styleHint" data-page-node-id="epHQXeNczBvh4bnUBntfBY">信达雅：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯。</div>
+  <!-- 导出橱窗 -->
+  <div class="section" style="margin-top:56px">
+    <div class="sec-head">
+      <div class="sec-tag" data-i18n="expTag">✦ EXPORT · 导出花样</div>
+      <h2 data-i18n="showTitle">一个字幕文件，导出花样这么多</h2>
+      <p data-i18n="showSub">译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式</p>
+    </div>
+    <div class="sc-row">
+      <figure class="sc-item">
+        <div class="sc-screen sc-mono"><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span></div>
+        <figcaption data-i18n="showMono">仅译文</figcaption>
+      </figure>
+      <figure class="sc-item">
+        <div class="sc-screen sc-bi"><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span><span class="sc-line src">♪ Love is in the air ♪</span></div>
+        <figcaption data-i18n="showBi">双语双行 · SRT/VTT</figcaption>
+      </figure>
+      <figure class="sc-item">
+        <div class="sc-screen sc-split"><span class="sc-line src">♪ Love is in the air ♪</span><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span></div>
+        <figcaption data-i18n="showSplit">上下分屏 · ASS</figcaption>
+      </figure>
+      <figure class="sc-item">
+        <div class="sc-screen sc-stack"><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span><span class="sc-line src">♪ Love is in the air ♪</span></div>
+        <figcaption data-i18n="showStack">双语堆叠 · ASS</figcaption>
+      </figure>
+    </div>
+    <div class="sc-foot">
+      <span class="sc-chip">.srt</span><span class="sc-chip">.vtt</span><span class="sc-chip">.ass</span><span class="sc-chip">.txt</span>
+      <span class="sc-note" data-i18n="showNote">原文在上 / 译文在上自由切换，还能导出 TXT 对照稿</span>
+    </div>
+  </div>
 
-        <label class="chk" style="margin-top:12px" data-page-node-id="LdN1QuUELL1MXEMkQXSzRc"><input type="checkbox" id="keepTerms" checked data-page-node-id="VtzyOE6KDVb5g4wapikfCK"><span data-i18n="chkKeepTerms">专有名词（人名/机构/产品/术语）保留原文，不翻译</span></label>
-        <div class="hint" id="termsHint" style="margin-top:2px" data-page-node-id="mFblWCcO4Q2sH2GMDCeLqo">勾选 = 保留原文；取消勾选 = 全部译为目标语言。此开关关闭时下方术语表不生效。</div>
-        <label data-page-node-id="Mxih3slwTugDEl755okAwB" data-i18n="lblTerms">需强制保留原文的专名（可留空，逗号分隔）</label>
-        <input type="text" id="terms" placeholder="如：SpaceX, Prism, EnduroSat" data-i18n-ph="termsPh" data-page-node-id="H7C8HKb5FClsDcSR5Tk9HM">
-        <label class="chk" style="margin-top:10px" data-page-node-id="G7wQxT9mL2vNaR4hKj1sXb"><input type="checkbox" id="autoTerms" checked data-page-node-id="H3kRwPq5VmL8dNc2JxT4yU"><span data-i18n="chkAutoTerms">自动术语表：翻译前自动提取专名与歧义词，统一全片译法</span></label>
+  <!-- 关于我们 + SEO 文案区 -->
+  <div class="section" style="margin-top:56px;margin-bottom:52px">
+    <div class="about-card">
+      <div class="about-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 8.6c0-2.5-2-4.5-4.4-4.5-1.7 0-3.2.9-4.1 2.3C11.1 5 9.6 4.1 7.9 4.1 5.5 4.1 3.5 6.1 3.5 8.6c0 .9.3 1.8.8 2.6L12 20.5l7.7-9.3c.5-.8.8-1.7.8-2.6z"/></svg></div>
+      <h3 data-i18n="aboutTitle">关于随心字幕 AI</h3>
+      <p data-i18n="aboutBody">随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。</p>
+      <div class="about-links">
+        <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" data-i18n="aboutRepo">GitHub 开源仓库</a>
+        <a href="https://github.com/psjmz/ai-subtitle-translator/blob/main/LICENSE" target="_blank" rel="noopener" data-i18n="aboutLicense">AGPL-3.0 开源</a>
       </div>
-
-      <div class="card" data-page-node-id="HXMHfs18ST8n9Ch3hhBkhR">
-        <h2 data-page-node-id="BqofEOSZueaUsygu5h3zNV"><span class="step" data-page-node-id="xtj0CNYMvPjLqLqntZSvH6">3/4</span><span data-i18n="stepEngine">翻译引擎</span></h2>
-        <label data-page-node-id="C2tE1dkKlPd5BGBrxxTmNo" data-i18n="lblMode">工作模式</label>
-        <select id="mode" data-page-node-id="M0CoDh84NWmMOfBcVfm7bB">
-          <option value="builtin" data-page-node-id="CsQOOmQ3qqDzmEvB6ktqq1" data-i18n="optBuiltin">默认模型（站点提供，无需 Key）</option>
-          <option value="api" data-page-node-id="R7wN2xKmTvB8yUcLqDp0aA" data-i18n="optApi">自定义 API（OpenAI 兼容）</option>
-          <option value="demo" data-page-node-id="qFkQ53wvQffidsDC3yjwke" data-i18n="optDemo">规则演练（无翻译，仅演示折行/水词/重排）</option>
-        </select>
-        <div class="hint" id="builtinHint" style="display:none">默认模型由站点管理员在后台配置，无需 Key 即可使用。</div>
-
-        <div id="apiBox" data-page-node-id="ovHem8WvyQYTXOybaziYVV">
-          <label data-page-node-id="SUnvDS3tufyBvHomRzqDvl" data-i18n="lblProvider">服务商</label>
-          <select id="provider" data-page-node-id="Qp7M1u0pbbG0tgKFPXXIVA"></select>
-          <div class="hint" id="providerNote" style="display:none"></div>
-          <label data-page-node-id="nfA1PT3BiLPZQ9PkUGbUq5" data-i18n="lblBase">Base URL（自动拼接 /chat/completions）</label>
-          <input type="text" id="base" spellcheck="false" data-page-node-id="wCGA5fUI6L06JCvGtOUixF">
-          <div class="row2" data-page-node-id="DS8a4j2djWyZURvABVoXTl">
-            <div data-page-node-id="w70kaa2lesGhsnsxm7HGBP"><label data-page-node-id="bplWe2iDOdtFn8ZX04UFhe" data-i18n="lblModel">模型</label><input type="text" id="model" spellcheck="false" data-page-node-id="6iZBpwOK1D0hR3NVEkI8Zs"></div>
-            <div data-page-node-id="8SHrXD8t2tsX3V5QsQssn6"><label data-page-node-id="0ehikMdLViTyPimjBDx1NQ" data-i18n="lblBatch">单批条数</label><input type="number" id="batch" value="24" min="1" max="60" data-page-node-id="Bp5JBRmOXfUa8WNVeEAWI3"></div>
-          </div>
-          <label data-page-node-id="214kF9o0bVLmDB6BXAGLvE">API Key（仅保存在本机浏览器）<a id="keyLink" href="#" target="_blank" rel="noopener" style="float:right;font-weight:400;display:none"></a></label>
-          <input type="password" id="apikey" autocomplete="off" data-page-node-id="fjeR234CAWYss4JFEQ28Tm">
-          <div class="btns" style="margin-top:8px">
-            <button class="btn" id="btnTest" type="button" data-i18n="btnTest">⚡ 测试连接</button>
-            <span class="hint" id="testOut" style="align-self:center"></span>
-          </div>
-        </div>
-
-        <label style="margin-top:12px" data-page-node-id="R9V9Aixgxm2OgbiYf2Y8au" data-i18n="lblMaxW">折行阈值（字，随目标语言按 Netflix 规范推荐），数字越大一行字数越多，但可减少字幕行数和字幕切分。</label>
-        <input type="number" id="maxW" value="21" min="8" max="48" data-page-node-id="nHDvqEd0WVMgZv4TiIxEIq">
-        <div class="btns" data-page-node-id="HF8Fbj8UJE2HRRfdXMXBs4">
-          <button class="btn primary" id="btnGo" data-page-node-id="nOlcKaSvIp5ohDOevsDj1x" data-i18n="btnGo">▶ 开始翻译</button>
-          <button class="btn ok" id="btnPost" data-page-node-id="GQLVkZGyvxEh6Aajh4eMoI" data-i18n="btnPost">↻ 仅后处理（折行/清提示词）</button>
-        </div>
-        <div class="hint" data-page-node-id="Q4IEFSa2rZU2kRGgxiifgu" data-i18n="hintPrivacy">Key 填不填都不会把字幕发给任何第三方——API 模式由你填入的服务商直接处理。</div>
-      </div>
-
-      <div class="card" data-page-node-id="dkaIcimKzf2ApZEmATh98M">
-        <h2 data-page-node-id="67ERYGxN0FXNn6yTtMSyKn"><span class="step" data-page-node-id="Gde0qf20aEQLq4tDJQau4W">4/4</span><span data-i18n="stepExport">导出译文</span></h2>
-        <label data-i18n="lblExpStyle">导出字幕样式</label>
-        <select id="expStyle"></select>
-        <label data-page-node-id="5O0vOyIxZAhQjFYbpzrSJj" data-i18n="lblOutName">导出文件名（默认按源文件 + 目标语言自动命名）</label>
-        <input type="text" id="outName" placeholder="xxx_中文字幕.srt" data-i18n-ph="outPh" data-page-node-id="2mSNaTe9I6ePIvGWD9W6oa">
-        <div class="btns" data-page-node-id="PxiNGo6w0oUnfL67UwAP0R">
-          <button class="btn primary" id="btnDownload" data-page-node-id="MaeGj45VMIU9gtHes1fy1P" data-i18n="btnDownload">⬇ 下载字幕</button>
-          <button class="btn" id="btnCopy" data-page-node-id="90h1vqeDuRlNGzQiK2GsNr" data-i18n="btnCopy">复制到剪贴板</button>
-        </div>
-        <div class="hint" data-page-node-id="7ASARGp1Z8YcTvQHp1i3ti" data-i18n="hintOutName">切换目标语言后，文件名里的语言后缀会自动跟随。</div>
-      </div>
-
-      <div class="card" data-page-node-id="l2ADa2sLMz5oJgiHfMqcbs">
-        <h2 data-page-node-id="yYYA7Ui7XVqwjMptVo96F3" data-i18n="logTitle">运行日志</h2>
-        <div class="log" id="log" data-page-node-id="jPrbF88PVRoNmNy0x3pysU" data-i18n="logReady">就绪。导入字幕或载入示例开始。</div>
-      </div>
-    </aside>
-
-    <!-- 右：工作区 -->
-    <section data-page-node-id="6RoH8it9eEQUWJMR88c96l">
-      <!-- 导出样式橱窗：用模拟播放器画面展示导出排版花样 -->
-      <div class="showcase" data-page-node-id="kX7fQ2mN9pLrT4vB8wZcH">
-        <div class="sc-head" data-page-node-id="qA3sD6fG8hJ1kL5zXcVb">
-          <span class="sc-title" data-i18n="showTitle" data-page-node-id="mN7bV4cX2zA9sD6fG1hJ">一个字幕文件，导出花样这么多</span>
-          <span class="sc-sub" data-i18n="showSub" data-page-node-id="pL8kJ5hG2fD4sA7zX0cV">译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式</span>
-        </div>
-        <div class="sc-row" data-page-node-id="vB6nM3qW9eR2tY5uI8oP">
-          <figure class="sc-item" data-page-node-id="zX1cV4bN7mQ0wE3rT6yU">
-            <div class="sc-screen sc-mono"><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span></div>
-            <figcaption data-i18n="showMono" data-page-node-id="aS2dF5gH8jK1lZ4xC7vB">仅译文</figcaption>
-          </figure>
-          <figure class="sc-item" data-page-node-id="nM9bV2cX5zL8kJ1hG4fD">
-            <div class="sc-screen sc-bi"><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span><span class="sc-line src">♪ Love is in the air ♪</span></div>
-            <figcaption data-i18n="showBi" data-page-node-id="qW3eR6tY9uI2oP5aS8dF">双语双行</figcaption>
-          </figure>
-          <figure class="sc-item" data-page-node-id="gH4jK7lZ0xC3vB6nM9qW">
-            <div class="sc-screen sc-split"><span class="sc-line src">♪ Love is in the air ♪</span><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span></div>
-            <figcaption data-i18n="showSplit" data-page-node-id="eR5tY8uI1oP4aS7dF0gH">上下分屏</figcaption>
-          </figure>
-          <figure class="sc-item" data-page-node-id="jK6lZ9xC2vB5nM8qW1eR">
-            <div class="sc-screen sc-stack"><span class="sc-line dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span><span class="sc-line src">♪ Love is in the air ♪</span></div>
-            <figcaption data-i18n="showStack" data-page-node-id="tY7uI0oP3aS6dF9gH2jK">双语堆叠</figcaption>
-          </figure>
-        </div>
-        <div class="sc-foot" data-page-node-id="lZ8xC1vB4nM7qW0eR3tY">
-          <span class="sc-chip" data-page-node-id="uI9oP2aS5dF8gH1jK4lZ">.srt</span>
-          <span class="sc-chip" data-page-node-id="xC2vB5nM8qW1eR4tY7uI">.vtt</span>
-          <span class="sc-chip" data-page-node-id="oP3aS6dF9gH2jK5lZ8xC">.ass</span>
-          <span class="sc-chip" data-page-node-id="bN4mQ7wE0rT3yU6iO9pA">.txt</span>
-          <span class="sc-note" data-i18n="showNote" data-page-node-id="vB5nM8qW1eR4tY7uI0oP">原文在上 / 译文在上自由切换，还能导出 TXT 对照稿</span>
-        </div>
-      </div>
-      <div class="topbar" data-page-node-id="nNinBWBgxucSYsrs28BE3L">
-        <span class="stat" id="stTotal" data-page-node-id="P4GzfU9lvTridN4GUF3ck8">条数 <b data-page-node-id="DB8utxj4QAyugRRBqVCl1p">0</b></span>
-        <span class="stat" id="stDone" data-page-node-id="bcYJsG4CPlgdFNC2duFxZT">已译 <b data-page-node-id="HSpy9YcfQBNYyQE8tiWqvw">0</b></span>
-        <span class="stat del" id="stDrop" data-page-node-id="HG4ZL7JQ64nYEhPAyCpc90">水词删除 <b data-page-node-id="gOVuvwNaF0HAmkHrSME9G9">0</b></span>
-        <span class="stat warn" id="stMerge" data-page-node-id="A5rLQRNi3ULE1SfgmeGi9u">并入 <b data-page-node-id="NNC4RKYwx76FX5rElVAe31">0</b></span>
-        <span class="stat ok" id="stWrap" data-page-node-id="PE4uPHcSii2e0GOFCjXMSs">折行 <b data-page-node-id="PEDCSJlDe7W0ZAMkKR7WFa">0</b></span>
-        <span class="stat warn" id="stIssues" data-page-node-id="UTFIQ4TLN6Hh9GrGMEbaxo">待处理 <b data-page-node-id="1OTW9TzArKz1JdmXKEDH5m">0</b></span>
-      </div>
-      <div class="toolbar" data-page-node-id="hKwfXAip9DFQ58o3zURR4H">
-        <select id="filter" data-page-node-id="iJZy9f49AS0wPTksEYr5H2">
-          <option value="all" data-page-node-id="F81GqakHUIKKbcvOc3d66X" data-i18n="fAll">全部</option>
-          <option value="todo" data-page-node-id="V3X6BIL3BFaeEh2eDZnto2" data-i18n="fTodo">仅待译</option>
-          <option value="done" data-page-node-id="jEUNhJbyWruwMg3USu49vx" data-i18n="fDone">仅已译</option>
-          <option value="flag" data-page-node-id="Pr1oU2ARrTkPEfGwRPJosa" data-i18n="fFlag">仅特殊处理</option>
-        </select>
-      </div>
-      <div class="progwrap" id="progWrap" data-page-node-id="tiQ71YHWAXcWedXVPyv4fx">
-        <span class="pg-badge"><i class="pg-dot"></i><span id="pgState" data-page-node-id="QthWmOVNSYRMPAlKsVh9OY">…</span></span>
-        <div class="pg-main">
-          <div class="pg-row">
-            <span class="pg-pct" id="pgPct">0%</span>
-            <span class="pg-info" id="prText" data-page-node-id="8pgW8DbHgweimzK8h85ayP"></span>
-            <span class="pg-eta" id="pgEta"></span>
-          </div>
-          <div class="prog" id="prog"><i></i></div>
-        </div>
-      </div>
-      <div class="lst" data-page-node-id="kj7lZrKelW0vM3yK2B99vA">
-        <div class="cuegrid head" data-page-node-id="xkWHihUx7ifFz23BLGy3As">
-          <span data-page-node-id="S0NIe5bY8HCvRpU3F5br41">#</span><span data-i18n="colTc" data-page-node-id="uEW4tas4JeiYfNZQJf8LbN">时间轴</span><span id="hSrc" data-page-node-id="GEZ0kbOclMqX99QEyIB2UY">英文原文</span><span id="hDst" data-page-node-id="aIiu2HklvFib5vdvM7H7HC">中文译文（可点击编辑）</span>
-        </div>
-        <div class="inner" id="rows" data-page-node-id="LXlYK1sSejmhH6z5O5KEhw"></div>
-      </div>
-      <details class="report" id="reportBox" style="display:none" data-page-node-id="LawCRd1PhDcrFJgvJrMI1q">
-        <summary data-page-node-id="BJVosiDrxEvoFUfFnjrmOz" data-i18n="reportSummary">导出前校验报告</summary>
-        <div id="report" data-page-node-id="mCYrHDANEWeHrrDX6wPxQg"></div>
-      </details>
-    </section>
+    </div>
   </div>
 
   <!-- SEO 静态文案（页面主体由 JS 渲染，此段为爬虫提供语义化内容；同时对开启 JS 的用户也是可见介绍） -->
   <!--SEO-COPY-START-->
-  <section class="seo" aria-label="关于本工具" style="max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;">
+  <section class="seo" aria-label="关于本工具">
     <h2 data-i18n="seoTitle" style="font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;">关于随心字幕 AI</h2>
     <p data-i18n-html="seoIntro">本工具是一款<strong>基于 AI 大模型的免费在线字幕翻译服务</strong>，支持 SRT / VTT / ASS 等主流字幕格式与中文、英文、日文等多语言互译。无需注册、无需下载客户端，浏览器打开即可使用，字幕数据全程不上传服务器（除非你勾选了云端翻译）。</p>
     <p data-i18n-html="seoFeatures" style="margin-top:8px;"><strong>主要功能：</strong>SRT / VTT / ASS 字幕解析与翻译、句级智能合并（一个完整句子分布在多条字幕时合并翻译后按时长回填）、时间轴对齐、自动折行（支持 CJK 与西文混合宽度）、去水词、专有名词保留或翻译、可选翻译风格（信达雅 / 大白话 / 自定义）。译文可直接导出为 SRT / VTT / ASS / TXT 等格式压制视频。</p>
     <p data-i18n-html="seoWho" style="margin-top:8px;"><strong>适用人群：</strong>视频翻译从业者、自媒体创作者、外语学习者、字幕组、需要快速本地化视频内容的团队。</p>
   </section>
   <noscript>
-    <p data-i18n="seoNoscript" style="max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;">本工具需要启用 JavaScript 才能使用。请在浏览器中启用 JavaScript，然后上传 SRT / VTT / ASS 字幕文件即可使用 AI 免费字幕翻译。</p>
+    <p data-i18n="seoNoscript" style="max-width:1080px;margin:24px auto;padding:0 24px;color:#39363B;">本工具需要启用 JavaScript 才能使用。请在浏览器中启用 JavaScript，然后上传 SRT / VTT / ASS 字幕文件即可使用 AI 免费字幕翻译。</p>
   </noscript>
   <!--SEO-COPY-END-->
-
-  <div class="footer" data-page-node-id="V2DGSIREjxUEHMJB72TEQk" data-i18n="footer">规则引擎 srt-core.js · 支持多语言互译 · 折行口径：CJK/全角=1 字、半角每 2 字符=1 字，整条超阈值才折、每行 ≤ 阈值</div>
-  <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 </div>
+
+<!-- ================================================================
+     第二段：工作台（上传字幕后进入；顶栏常驻上传入口）
+     ================================================================ -->
+<div id="viewWorkspace">
+  <div class="appbar">
+    <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
+    <span class="ver-tag">v0.9.70</span>
+    <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
+    <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
+    <div class="spacer"></div>
+    <button class="topbtn" id="btnUploadNew" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="wsUploadNew">上传新字幕</span></button>
+    <button class="topbtn primary" id="btnGo" data-i18n="btnGo" type="button">▶ 开始翻译</button>
+    <select id="uiLang" class="appbar-lang" aria-label="UI language"></select>
+  </div>
+
+  <div class="main">
+    <!-- 左：设置面板 -->
+    <aside class="panel">
+      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-6 6 6-6 6 6M4 20h16"/></svg><span data-i18n="secImport">导入字幕</span></div>
+      <div class="btns" style="margin-top:0">
+        <button class="btn sm" id="btnFile" data-i18n="btnFile" type="button">📂 选择字幕文件</button>
+        <button class="btn sm ghost" id="btnDemo" data-i18n="btnDemo" type="button">载入示例</button>
+      </div>
+      <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.txt" hidden>
+      <textarea id="paste" rows="3" placeholder="或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）" data-i18n-ph="pastePh" style="margin-top:8px"></textarea>
+      <div class="btns"><button class="btn sm" id="btnParse" data-i18n="btnParse" type="button">解析字幕</button></div>
+      <div class="hint" id="parseInfo"></div>
+
+      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg><span data-i18n="secLang">语言</span></div>
+      <label class="flbl"><span data-i18n="lblSrcShort">原文语言</span><i class="info" data-tip-i18n="lblSrcLang">i</i></label>
+      <select id="srcLang"></select>
+      <label class="flbl" data-i18n="lblDstShort">目标语言</label>
+      <select id="dstLang"></select>
+
+      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg><span data-i18n="secStyle">翻译风格</span></div>
+      <div class="style-chips">
+        <label class="schip"><input type="radio" name="style" value="elegant" checked><span data-i18n="styleElegant">信达雅</span></label>
+        <label class="schip"><input type="radio" name="style" value="plain"><span data-i18n="stylePlain">大白话</span></label>
+        <label class="schip full"><input type="radio" name="style" value="custom"><span data-i18n="styleCustom">自定义…</span></label>
+      </div>
+      <input type="text" id="styleCustom" style="display:none" spellcheck="false"
+        placeholder="描述你想要的口吻，如：轻松幽默、像给朋友讲故事" data-i18n-ph="styleCustomPh">
+      <div class="hint" id="styleHint"></div>
+
+      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-i18n="secRules">处理规则</span></div>
+      <label class="tgl-row"><span class="l"><span data-i18n="lblKeepTermsShort">专名保留原文</span><i class="info" data-tip-i18n="chkKeepTerms">i</i></span><input type="checkbox" id="keepTerms" checked><span class="tgl"></span></label>
+      <div class="hint" id="termsHint" style="margin-top:4px"></div>
+      <label data-i18n="lblTerms">需强制保留原文的专名（可留空，逗号分隔）</label>
+      <input type="text" id="terms" placeholder="如：SpaceX, Prism, EnduroSat" data-i18n-ph="termsPh">
+      <label class="tgl-row"><span class="l"><span data-i18n="lblAutoTermsShort">自动术语表</span><i class="info" data-tip-i18n="chkAutoTerms">i</i></span><input type="checkbox" id="autoTerms" checked><span class="tgl"></span></label>
+      <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
+      <input type="number" id="maxW" value="21" min="8" max="48">
+
+      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg><span data-i18n="secEngine">翻译引擎</span></div>
+      <label class="flbl" data-i18n="lblMode">工作模式</label>
+      <select id="mode">
+        <option value="builtin" data-i18n="optBuiltin">默认模型（站点提供，无需 Key）</option>
+        <option value="api" data-i18n="optApi">自定义 API（OpenAI 兼容）</option>
+        <option value="demo" data-i18n="optDemo">规则演练（无翻译，仅演示折行/水词/重排）</option>
+      </select>
+      <div class="hint" id="builtinHint" style="display:none"></div>
+
+      <div id="apiBox">
+        <label class="flbl" data-i18n="lblProvider">服务商</label>
+        <select id="provider"></select>
+        <div class="hint" id="providerNote" style="display:none"></div>
+        <label class="flbl" data-i18n="lblBase">Base URL（自动拼接 /chat/completions）</label>
+        <input type="text" id="base" spellcheck="false">
+        <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label class="flbl" data-i18n="lblModel">模型</label><input type="text" id="model" spellcheck="false"></div>
+          <div><label class="flbl" data-i18n="lblBatch">单批条数</label><input type="number" id="batch" value="24" min="1" max="60"></div>
+        </div>
+        <label class="flbl"><span data-i18n="lblKey">API Key（仅保存在本机浏览器）</span><a id="keyLink" href="#" target="_blank" rel="noopener" style="float:right;font-weight:400;display:none"></a></label>
+        <input type="password" id="apikey" autocomplete="off">
+        <div class="btns" style="margin-top:8px">
+          <button class="btn" id="btnTest" type="button" data-i18n="btnTest">⚡ 测试连接</button>
+          <span class="hint" id="testOut" style="align-self:center"></span>
+        </div>
+      </div>
+
+      <div class="btns" style="margin-top:14px">
+        <button class="btn ok" id="btnPost" data-i18n="btnPost" type="button">↻ 仅后处理（折行/清提示词）</button>
+      </div>
+      <div class="hint" data-i18n="hintPrivacy">默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。</div>
+
+      <details class="logbox">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i18n="logTitle">运行日志</span></summary>
+        <div class="log" id="log" data-i18n="logReady">就绪。导入字幕或载入示例开始。</div>
+      </details>
+    </aside>
+
+    <!-- 中：统计 + 进度 + 字幕表 -->
+    <section class="center">
+      <div class="metrics">
+        <span class="metric" id="stTotal">条数 <b>0</b></span>
+        <span class="metric ok" id="stDone">已译 <b>0</b></span>
+        <span class="metric del" id="stDrop">水词清空 <b>0</b></span>
+        <span class="metric warn" id="stMerge">跨条句组 <b>0</b></span>
+        <span class="metric ok" id="stWrap">折行 <b>0</b></span>
+        <span class="metric warn" id="stIssues">待处理 <b>0</b></span>
+      </div>
+      <div class="progwrap" id="progWrap">
+        <span class="pg-badge"><i class="pg-dot"></i><span id="pgState">…</span></span>
+        <div class="pg-main">
+          <div class="pg-row">
+            <span class="pg-pct" id="pgPct">0%</span>
+            <span class="pg-info" id="prText"></span>
+            <span class="pg-eta" id="pgEta"></span>
+          </div>
+          <div class="prog" id="prog"><i></i></div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <select id="filter">
+          <option value="all" data-i18n="fAll">全部</option>
+          <option value="todo" data-i18n="fTodo">仅待译</option>
+          <option value="done" data-i18n="fDone">仅已译</option>
+          <option value="flag" data-i18n="fFlag">仅特殊处理</option>
+        </select>
+      </div>
+      <div class="lst">
+        <div class="cuegrid head">
+          <span>#</span><span data-i18n="colTc">时间轴</span><span id="hSrc">英文原文</span><span id="hDst">中文译文（可点击编辑）</span>
+        </div>
+        <div class="inner" id="rows"></div>
+      </div>
+      <details class="report" id="reportBox" style="display:none">
+        <summary data-i18n="reportSummary">导出前校验报告</summary>
+        <div id="report"></div>
+      </details>
+    </section>
+
+    <!-- 右：导出 -->
+    <aside class="panel">
+      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="stepExport">导出译文</span></div>
+      <div class="exp-preview">
+        <div class="ep-line ep-dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</div>
+        <div class="ep-line ep-src">♪ Love is in the air ♪</div>
+      </div>
+      <label class="flbl" data-i18n="lblExpStyle">导出字幕样式</label>
+      <select id="expStyle"></select>
+      <label class="flbl"><span data-i18n="lblOutName">导出文件名（默认按源文件 + 目标语言自动命名）</span></label>
+      <input type="text" id="outName" placeholder="xxx_中文字幕.srt" data-i18n-ph="outPh">
+      <div class="btns" style="margin-top:12px">
+        <button class="btn primary" id="btnDownload" data-i18n="btnDownload" type="button">⬇ 下载字幕</button>
+        <button class="btn" id="btnCopy" data-i18n="btnCopy" type="button">复制到剪贴板</button>
+      </div>
+      <div class="hint" data-i18n="hintOutName">切换目标语言后，文件名里的语言后缀会自动跟随。</div>
+    </aside>
+  </div>
+</div>
+
+<!-- 共享页脚（两个视图之外） -->
+<div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
+<div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 <script src="srt-core.js"></script>
 <script>
@@ -499,7 +805,7 @@ const I18N = {
   pending:'待翻译…', dropNote:'（已删除：纯水词/提示词条目）',
   emptyRows:'还没有字幕。左侧「导入」→ 选文件 / 粘贴 / 载入示例。', emptyFilter:'当前筛选无内容',
   reportSummary:'导出前校验报告',
-  footer:'规则引擎 srt-core.js · 支持多语言互译 · 折行口径：CJK/全角=1 字、半角每 2 字符=1 字，整条超阈值才折、每行 ≤ 阈值',
+  footer:'随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你',
   bDrop:'水词·已删', bMerge:'并入下行', bLong:'超长',
   parseOk:'✅ 解析成功：{0} 条字幕。', parseWarn:'⚠ 解析到 {0} 条，{1} 个格式问题：',
   imported:'已导入 {0}：{1} 条。', paste:'粘贴内容',
@@ -538,7 +844,20 @@ const I18N = {
   seoWho:'<strong>适用人群：</strong>视频翻译从业者、自媒体创作者、外语学习者、字幕组、需要快速本地化视频内容的团队。',
   seoNoscript:'本工具需要启用 JavaScript 才能使用。请在浏览器中启用 JavaScript，然后上传 SRT / VTT / ASS 字幕文件即可使用 AI 免费字幕翻译。',
   verifyOk:'✅ 校验通过：{0} 条，编号连续、时间轴无重叠、无空行。', pasteEmpty:'粘贴区为空。', issCps:'阅读速度 {0} 字/秒（建议 ≤{1}）', issShortDur:'显示时长仅 {0} 秒（建议 ≥0.83）', cpsSummary:'阅读速度检查：{0} 条超速、{1} 条过短（时间轴来自源文件，仅提示，不阻断导出）',
-  colTc:'时间轴', fnSub:'字幕', fnBi:'双语字幕', demoFile:'9月3日_示例.srt', noteDeepSeek:'推荐：性价比高、速度快，适合字幕批量翻译', errNotCfg:'管理员尚未配置默认模型，请改用自定义 API。', errIpLimit:'今日该 IP 的免费翻译额度（{0} 次请求）已用完，可填写自己的 API Key 继续使用。', errGlobalLimit:'本站今日免费翻译总额度已用完，可填写自己的 API Key 继续使用。', errBadJson:'请求体不是合法 JSON', errNoMsgs:'缺少 messages', errUpstream:'默认模型调用失败：{0}', errNotJson:'返回内容不是 JSON', errEmpty:'返回为空', errNoGroups:'JSON 缺少 groups', errNoGno:'JSON 条目缺少 gno', errMissGroup:'缺少句组 {0} 的结果', errNoArray:'JSON 缺少数组', anchorFail:'锚定校验未过（句组 {0} 译文非{1}）', issBlkNoNumTs:'无法解析该块（缺编号或时间轴）', issBlkNoTs:'无法解析该块（缺时间轴）', issBadTs:'时间轴格式不正确', issNumInc:'编号未递增', issEndLtStart:'结束时间早于开始时间', issOverlap:'与上一条时间轴重叠', issNoBlocks:'没有解析到任何字幕块', issZeroDur:'零时长', issEmptyCue:'空内容', issNoUsable:'没有可用的字幕块'
+  colTc:'时间轴', fnSub:'字幕', fnBi:'双语字幕', demoFile:'9月3日_示例.srt', noteDeepSeek:'推荐：性价比高、速度快，适合字幕批量翻译', errNotCfg:'管理员尚未配置默认模型，请改用自定义 API。', errIpLimit:'今日该 IP 的免费翻译额度（{0} 次请求）已用完，可填写自己的 API Key 继续使用。', errGlobalLimit:'本站今日免费翻译总额度已用完，可填写自己的 API Key 继续使用。', errBadJson:'请求体不是合法 JSON', errNoMsgs:'缺少 messages', errUpstream:'默认模型调用失败：{0}', errNotJson:'返回内容不是 JSON', errEmpty:'返回为空', errNoGroups:'JSON 缺少 groups', errNoGno:'JSON 条目缺少 gno', errMissGroup:'缺少句组 {0} 的结果', errNoArray:'JSON 缺少数组', anchorFail:'锚定校验未过（句组 {0} 译文非{1}）', issBlkNoNumTs:'无法解析该块（缺编号或时间轴）', issBlkNoTs:'无法解析该块（缺时间轴）', issBadTs:'时间轴格式不正确', issNumInc:'编号未递增', issEndLtStart:'结束时间早于开始时间', issOverlap:'与上一条时间轴重叠', issNoBlocks:'没有解析到任何字幕块', issZeroDur:'零时长', issEmptyCue:'空内容', issNoUsable:'没有可用的字幕块',
+  brandName:'随心字幕 AI', navGuide:'使用指南', navRepo:'开源仓库', heroTitle:'把字幕丢进来，<br><em>剩下的交给 AI</em>',
+  heroSub:'翻译、对齐时间轴、整理排版一气呵成——几分钟拿到直接能压进视频的字幕。免费 · 免注册 · 隐私安全', dropTitle:'点这里选文件，或直接拖进来 🎬', dropSub:'SRT · VTT · ASS · TXT · 20+ 语言互译', altNoFile:'手边没文件？',
+  altPaste:'直接粘贴字幕文本', altDemo:'载入示例，先逛逛工作台 →', enterHint:'上传后自动进入<b>字幕工作台</b>——语言、风格、导出样式都在那里配置', statLangs:'语言互译',
+  statStyles:'种导出样式', statAlign:'时间轴对齐', statPrivacy:'字幕上传服务器', whyTag:'✦ WHY US · 为什么选我们',
+  whyTitle:'别人叫它「机翻」，我们叫它字幕级翻译', whySub:'每一项能力，都为「压进视频就能用」而设计', feat1T:'时间轴精准对齐', feat1D:'译文严格贴合原字幕时间轴，一条对一条；需要合并拆分时按时长智能分配，绝不漂移、不串行。',
+  feat2T:'全片术语统一', feat2D:'翻译前自动提取专名与歧义词生成术语表，第 1 条和第 300 条译法保证一致；还能强制保留指定专名。', feat3T:'智能折行', feat3D:'超过行宽自动按标点与词边界折行，符合 Netflix 各语言规范，绝不把单词劈成两半。',
+  feat4T:'去水词 · 听写纠错', feat4D:'「嗯、啊、you know」自动清除，源字幕的听写错误一并修正——译文干净到可以直接压片。', feat5T:'双语字幕随心排', feat5D:'原文译文双行、堆叠、分屏随意切换，还能导出 TXT 对照稿，字幕组级的花样全都有。',
+  feat6T:'隐私安全', feat6D:'字幕在你的浏览器里处理，默认不经任何第三方服务器；API Key 只存在本机。', expTag:'✦ EXPORT · 导出花样', aboutTitle:'关于随心字幕 AI',
+  aboutBody:'随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 开源仓库', aboutLicense:'AGPL-3.0 开源', wsBackHome:'首页',
+  wsUploadNew:'上传新字幕', projEmpty:'未导入字幕', secImport:'导入字幕', secLang:'语言',
+  secStyle:'翻译风格', secRules:'处理规则', secEngine:'翻译引擎', lblSrcShort:'原文语言',
+  lblDstShort:'目标语言', lblKeepTermsShort:'专名保留原文', lblAutoTermsShort:'自动术语表', lblMaxWShort:'折行阈值',
+  /* v0.9.70 两段式界面新增 */
 },
 'zh-TW': {
   docTitle:'隨心字幕 AI (AI-SRTSub) - 全球好劇隨心看，一鍵生成專屬母語字幕', appTitle:'🎬 隨心字幕 AI',
@@ -578,7 +897,7 @@ const I18N = {
   pending:'待翻譯…', dropNote:'（已刪除：純水詞/提示詞條目）',
   emptyRows:'還沒有字幕。左側「匯入」→ 選檔案 / 貼上 / 載入範例。', emptyFilter:'目前篩選無內容',
   reportSummary:'匯出前校驗報告',
-  footer:'規則引擎 srt-core.js · 支援多語言互譯 · 折行口徑：CJK/全形=1 字、半形每 2 字元=1 字，整條超閾值才折、每行 ≤ 閾值',
+  footer:'隨心字幕 AI · 開源 AGPL-3.0 · 你的字幕永遠屬於你',
   bDrop:'水詞·已刪', bMerge:'併入下行', bLong:'超長',
   parseOk:'✅ 解析成功：{0} 條字幕。', parseWarn:'⚠ 解析到 {0} 條，{1} 個格式問題：',
   imported:'已匯入 {0}：{1} 條。', paste:'貼上內容',
@@ -617,7 +936,20 @@ const I18N = {
   seoWho:'<strong>適用人群：</strong>影片翻譯從業者、自媒體創作者、外語學習者、字幕組、需要快速在地化影片內容的團隊。',
   seoNoscript:'本工具需要啟用 JavaScript 才能使用。請在瀏覽器中啟用 JavaScript，然後上傳 SRT / VTT / ASS 字幕檔案即可使用 AI 免費字幕翻譯。',
   verifyOk:'✅ 校驗通過：{0} 條，編號連續、時間軸無重疊、無空行。', pasteEmpty:'貼上區為空。', issCps:'閱讀速度 {0} 字/秒（建議 ≤{1}）', issShortDur:'顯示時長僅 {0} 秒（建議 ≥0.83）', cpsSummary:'閱讀速度檢查：{0} 條超速、{1} 條過短（時間軸來自來源檔案，僅提示，不阻斷匯出）',
-  colTc:'時間軸', fnSub:'字幕', fnBi:'雙語字幕', demoFile:'9月3日_範例.srt', noteDeepSeek:'推薦：性價比高、速度快，適合字幕批次翻譯', errNotCfg:'管理員尚未設定預設模型，請改用自訂 API。', errIpLimit:'今日該 IP 的免費翻譯額度（{0} 次請求）已用完，可填寫自己的 API Key 繼續使用。', errGlobalLimit:'本站今日免費翻譯總額度已用完，可填寫自己的 API Key 繼續使用。', errBadJson:'請求體不是合法 JSON', errNoMsgs:'缺少 messages', errUpstream:'預設模型調用失敗：{0}', errNotJson:'返回內容不是 JSON', errEmpty:'返回為空', errNoGroups:'JSON 缺少 groups', errNoGno:'JSON 條目缺少 gno', errMissGroup:'缺少句組 {0} 的結果', errNoArray:'JSON 缺少陣列', anchorFail:'錨定校驗未過（句組 {0} 譯文非{1}）', issBlkNoNumTs:'無法解析該塊（缺編號或時間軸）', issBlkNoTs:'無法解析該塊（缺時間軸）', issBadTs:'時間軸格式不正確', issNumInc:'編號未遞增', issEndLtStart:'結束時間早於開始時間', issOverlap:'與上一條時間軸重疊', issNoBlocks:'沒有解析到任何字幕塊', issZeroDur:'零時長', issEmptyCue:'空內容', issNoUsable:'沒有可用的字幕塊'
+  colTc:'時間軸', fnSub:'字幕', fnBi:'雙語字幕', demoFile:'9月3日_範例.srt', noteDeepSeek:'推薦：性價比高、速度快，適合字幕批次翻譯', errNotCfg:'管理員尚未設定預設模型，請改用自訂 API。', errIpLimit:'今日該 IP 的免費翻譯額度（{0} 次請求）已用完，可填寫自己的 API Key 繼續使用。', errGlobalLimit:'本站今日免費翻譯總額度已用完，可填寫自己的 API Key 繼續使用。', errBadJson:'請求體不是合法 JSON', errNoMsgs:'缺少 messages', errUpstream:'預設模型調用失敗：{0}', errNotJson:'返回內容不是 JSON', errEmpty:'返回為空', errNoGroups:'JSON 缺少 groups', errNoGno:'JSON 條目缺少 gno', errMissGroup:'缺少句組 {0} 的結果', errNoArray:'JSON 缺少陣列', anchorFail:'錨定校驗未過（句組 {0} 譯文非{1}）', issBlkNoNumTs:'無法解析該塊（缺編號或時間軸）', issBlkNoTs:'無法解析該塊（缺時間軸）', issBadTs:'時間軸格式不正確', issNumInc:'編號未遞增', issEndLtStart:'結束時間早於開始時間', issOverlap:'與上一條時間軸重疊', issNoBlocks:'沒有解析到任何字幕塊', issZeroDur:'零時長', issEmptyCue:'空內容', issNoUsable:'沒有可用的字幕塊',
+  brandName:'隨心字幕 AI', navGuide:'使用指南', navRepo:'開源倉庫', heroTitle:'把字幕丟進來，<br><em>剩下的交給 AI</em>',
+  heroSub:'翻譯、對齊時間軸、整理排版一氣呵成——幾分鐘拿到直接能壓進影片的字幕。免費 · 免註冊 · 隱私安全', dropTitle:'點這裡選檔案，或直接拖進來 🎬', dropSub:'SRT · VTT · ASS · TXT · 20+ 語言互譯', altNoFile:'手邊沒檔案？',
+  altPaste:'直接貼上字幕文字', altDemo:'載入範例，先逛逛工作台 →', enterHint:'上傳後自動進入<b>字幕工作台</b>——語言、風格、匯出樣式都在那裡設定', statLangs:'語言互譯',
+  statStyles:'種匯出樣式', statAlign:'時間軸對齊', statPrivacy:'字幕上傳伺服器', whyTag:'✦ WHY US · 為什麼選我們',
+  whyTitle:'別人叫它「機翻」，我們叫它字幕級翻譯', whySub:'每一項能力，都為「壓進影片就能用」而設計', feat1T:'時間軸精準對齊', feat1D:'譯文嚴格貼合原字幕時間軸，一條對一條；需要合併拆分時按時長智慧分配，絕不漂移、不串行。',
+  feat2T:'全片術語統一', feat2D:'翻譯前自動提取專名與歧義詞產生術語表，第 1 條和第 300 條譯法保證一致；還能強制保留指定專名。', feat3T:'智慧折行', feat3D:'超過行寬自動按標點與詞邊界折行，符合 Netflix 各語言規範，絕不把單字劈成兩半。',
+  feat4T:'去贅詞 · 聽寫糾錯', feat4D:'「嗯、啊、you know」自動清除，來源字幕的聽寫錯誤一併修正——譯文乾淨到可以直接壓片。', feat5T:'雙語字幕隨心排', feat5D:'原文譯文雙行、堆疊、分割畫面隨意切換，還能匯出 TXT 對照稿，字幕組級的花樣全都有。',
+  feat6T:'隱私安全', feat6D:'字幕在你的瀏覽器裡處理，預設不經任何第三方伺服器；API Key 只存在本機。', expTag:'✦ EXPORT · 匯出花樣', aboutTitle:'關於隨心字幕 AI',
+  aboutBody:'隨心字幕 AI 是一款開源的 AI 字幕翻譯工具。我們相信好的字幕工具應該免費、乾淨、尊重隱私——不塞廣告、不要註冊、不動你的檔案。歡迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 開源倉庫', aboutLicense:'AGPL-3.0 開源', wsBackHome:'首頁',
+  wsUploadNew:'上傳新字幕', projEmpty:'未匯入字幕', secImport:'匯入字幕', secLang:'語言',
+  secStyle:'翻譯風格', secRules:'處理規則', secEngine:'翻譯引擎', lblSrcShort:'原文語言',
+  lblDstShort:'目標語言', lblKeepTermsShort:'專名保留原文', lblAutoTermsShort:'自動術語表', lblMaxWShort:'折行閾值',
+  /* v0.9.70 两段式界面新增 */
 },
 'en': {
   docTitle:'AI-SRTSub - Global Movies & Series, Subtitles in Your Language', appTitle:'🎬 AI Subtitle Translator',
@@ -657,7 +989,7 @@ const I18N = {
   pending:'Pending…', dropNote:'(removed: pure filler/sound cue)',
   emptyRows:'No subtitles yet. Import on the left → choose a file / paste / load sample.', emptyFilter:'Nothing under this filter',
   reportSummary:'Pre-export validation report',
-  footer:'Rule engine srt-core.js · multi-language · wrapping: CJK/fullwidth=1 unit, 2 halfwidth chars=1 unit; wrap only when a whole cue exceeds the threshold, each line ≤ threshold',
+  footer:'AI-SRTSub · Open source AGPL-3.0 · Your subtitles always belong to you',
   bDrop:'filler·removed', bMerge:'merged', bLong:'long',
   parseOk:'✅ Parsed OK: {0} cues.', parseWarn:'⚠ Parsed {0} cues with {1} format issues:',
   imported:'Imported {0}: {1} cues.', paste:'pasted text',
@@ -696,7 +1028,20 @@ const I18N = {
   seoWho:'<strong>Who uses it:</strong> video translators, YouTube creators and localizers, language learners, subtitle groups and teams that need to localize video content quickly.',
   seoNoscript:'This tool requires JavaScript. Please enable JavaScript in your browser, then upload a subtitle file (SRT / VTT / ASS) to translate subtitles with AI for free.',
   verifyOk:'✅ Validation passed: {0} cues, sequential numbering, no overlaps, no empty cues.', pasteEmpty:'Paste area is empty.', issCps:'Reading speed {0} chars/s (limit {1})', issShortDur:'On screen only {0}s (min 0.83)', cpsSummary:'Reading speed check: {0} too fast, {1} too short (timing comes from the source file — advisory only, export is not blocked)',
-  colTc:'Timeline', fnSub:'subtitles', fnBi:'bilingual', demoFile:'demo.srt', noteDeepSeek:'Recommended: fast and cost-effective, ideal for batch subtitle translation', errNotCfg:'The site admin has not configured a default model. Please use your own API instead.', errIpLimit:'Today\'s free translation quota for this IP ({0} requests) is used up. Enter your own API key to continue.', errGlobalLimit:'Today\'s site-wide free translation quota is used up. Enter your own API key to continue.', errBadJson:'Request body is not valid JSON', errNoMsgs:'Missing messages', errUpstream:'Default model call failed: {0}', errNotJson:'Response is not JSON', errEmpty:'Response is empty', errNoGroups:'JSON is missing groups', errNoGno:'JSON item is missing gno', errMissGroup:'Missing result for group {0}', errNoArray:'JSON is missing the array', anchorFail:'Anchor check failed (group {0} translation is not {1})', issBlkNoNumTs:'Cannot parse block (missing index or timeline)', issBlkNoTs:'Cannot parse block (missing timeline)', issBadTs:'Invalid timeline format', issNumInc:'Index not increasing', issEndLtStart:'End time earlier than start time', issOverlap:'Overlaps previous timeline', issNoBlocks:'No subtitle blocks parsed', issZeroDur:'Zero duration', issEmptyCue:'Empty content', issNoUsable:'No usable subtitle blocks'
+  colTc:'Timeline', fnSub:'subtitles', fnBi:'bilingual', demoFile:'demo.srt', noteDeepSeek:'Recommended: fast and cost-effective, ideal for batch subtitle translation', errNotCfg:'The site admin has not configured a default model. Please use your own API instead.', errIpLimit:'Today\'s free translation quota for this IP ({0} requests) is used up. Enter your own API key to continue.', errGlobalLimit:'Today\'s site-wide free translation quota is used up. Enter your own API key to continue.', errBadJson:'Request body is not valid JSON', errNoMsgs:'Missing messages', errUpstream:'Default model call failed: {0}', errNotJson:'Response is not JSON', errEmpty:'Response is empty', errNoGroups:'JSON is missing groups', errNoGno:'JSON item is missing gno', errMissGroup:'Missing result for group {0}', errNoArray:'JSON is missing the array', anchorFail:'Anchor check failed (group {0} translation is not {1})', issBlkNoNumTs:'Cannot parse block (missing index or timeline)', issBlkNoTs:'Cannot parse block (missing timeline)', issBadTs:'Invalid timeline format', issNumInc:'Index not increasing', issEndLtStart:'End time earlier than start time', issOverlap:'Overlaps previous timeline', issNoBlocks:'No subtitle blocks parsed', issZeroDur:'Zero duration', issEmptyCue:'Empty content', issNoUsable:'No usable subtitle blocks',
+  brandName:'AI-SRTSub', navGuide:'Guide', navRepo:'GitHub', heroTitle:'Drop in a subtitle,<br><em>leave the rest to AI</em>',
+  heroSub:'Translation, timeline alignment and line wrapping in one go — ready-to-use subtitles in minutes. Free · No sign-up · Private', dropTitle:'Click to choose a file, or just drag it here 🎬', dropSub:'SRT · VTT · ASS · TXT · 20+ languages', altNoFile:'No file at hand?',
+  altPaste:'Paste subtitle text', altDemo:'Load a sample & explore the studio →', enterHint:'After upload you will land in the <b>subtitle studio</b> — language, style and export options all live there', statLangs:'languages',
+  statStyles:'export styles', statAlign:'timeline aligned', statPrivacy:'subtitles uploaded', whyTag:'✦ WHY US',
+  whyTitle:'Not “machine translation” — subtitle-grade translation', whySub:'Every capability is designed for “drop it into your video and it just works”', feat1T:'Precise timeline alignment', feat1D:'Translations follow the original cue timing one-to-one; merges and splits are distributed by duration — no drift, no shifting.',
+  feat2T:'Consistent terminology', feat2D:'Proper nouns and ambiguous words are extracted into a glossary before translating, so cue 1 and cue 300 stay consistent; force-keep any term you like.', feat3T:'Smart line wrapping', feat3D:'Lines that exceed the width wrap at punctuation and word boundaries following Netflix language standards — never splitting a word in half.',
+  feat4T:'Filler removal · ASR fixes', feat4D:'“Um, uh, you know” are cleaned automatically, and transcription errors in the source are fixed along the way — clean enough to burn straight in.', feat5T:'Bilingual layouts galore', feat5D:'Dual-line, stacked or top/bottom split — switch freely, export TXT side-by-side scripts, all the fansub-grade tricks.',
+  feat6T:'Private by default', feat6D:'Subtitles are processed in your browser and never touch third-party servers; API keys stay on your device.', expTag:'✦ EXPORT STYLES', aboutTitle:'About AI-SRTSub',
+  aboutBody:'AI-SRTSub is an open-source AI subtitle translator. We believe a good subtitle tool should be free, clean and privacy-respecting — no ads, no sign-up, no touching your files. Self-host it, file requests, polish it together.', aboutRepo:'GitHub repository', aboutLicense:'AGPL-3.0 open source', wsBackHome:'Home',
+  wsUploadNew:'New subtitle', projEmpty:'No subtitle loaded', secImport:'Import', secLang:'Languages',
+  secStyle:'Style', secRules:'Rules', secEngine:'Engine', lblSrcShort:'Source language',
+  lblDstShort:'Target language', lblKeepTermsShort:'Keep proper nouns', lblAutoTermsShort:'Auto glossary', lblMaxWShort:'Line width',
+  /* v0.9.70 两段式界面新增 */
 },
 'ja': {
   docTitle:'AI-SRTSub - 世界の映画・ドラマを母国語字幕で楽しむAI字幕翻訳', appTitle:'🎬 AI字幕翻訳ツール',
@@ -736,7 +1081,7 @@ const I18N = {
   pending:'未翻訳…', dropNote:'（削除済：フィラー/効果音表記）',
   emptyRows:'字幕がありません。左の「読み込み」→ ファイル選択 / 貼り付け / サンプル。', emptyFilter:'このフィルターでは該当なし',
   reportSummary:'書き出し前チェック結果',
-  footer:'ルールエンジン srt-core.js · 多言語対応 · 改行基準：CJK/全角=1字、半角2文字=1字、全体がしきい値超のみ改行、各行 ≤ しきい値',
+  footer:'AI-SRTSub · オープンソース AGPL-3.0 · あなたの字幕はあなたのもの',
   bDrop:'フィラー·削除', bMerge:'統合', bLong:'超過',
   parseOk:'✅ 解析成功：{0} 件。', parseWarn:'⚠ {0} 件を解析、{1} 件の形式問題：',
   imported:'読み込み完了 {0}：{1} 件。', paste:'貼り付け',
@@ -775,7 +1120,20 @@ const I18N = {
   seoWho:'<strong>こんな方に：</strong>動画翻訳の業務に携わる方、YouTubeクリエイター、語学学習者、字幕チーム、動画コンテンツを素早くローカライズしたいチーム。',
   seoNoscript:'本ツールを使用するにはJavaScriptが必要です。ブラウザでJavaScriptを有効にしてから、SRT / VTT / ASS字幕ファイルをアップロードしてAI字幕翻訳をご利用ください。',
   verifyOk:'✅ チェック通過：{0} 件、番号連続・タイムライン重複なし・空行なし。', pasteEmpty:'貼り付けエリアが空です。', issCps:'読解速度 {0} 文字/秒（上限 {1}）', issShortDur:'表示時間 {0} 秒のみ（最低 0.83）', cpsSummary:'読解速度チェック：速すぎ {0} 件・短すぎ {1} 件（タイムラインはソース由来のため参考情報）',
-  colTc:'タイムライン', fnSub:'字幕', fnBi:'二カ国語字幕', demoFile:'サンプル.srt', noteDeepSeek:'推奨：高速かつ費用対効果が高く、字幕の一括翻訳に最適', errNotCfg:'管理者がデフォルトモデルを未設定です。カスタム API をご利用ください。', errIpLimit:'本日のこの IP の無料翻訳枠（{0} リクエスト）を使い切りました。独自の API Key を入力して続行できます。', errGlobalLimit:'本日のサイト全体の無料翻訳総枠を使い切りました。独自の API Key を入力して続行できます。', errBadJson:'リクエスト本文が有効な JSON ではありません', errNoMsgs:'messages がありません', errUpstream:'デフォルトモデルの呼び出しに失敗：{0}', errNotJson:'返答が JSON ではありません', errEmpty:'返答が空です', errNoGroups:'JSON に groups がありません', errNoGno:'JSON 項目に gno がありません', errMissGroup:'グループ {0} の結果がありません', errNoArray:'JSON に配列がありません', anchorFail:'アンカー検証不合格（グループ {0} の訳文が{1}ではありません）', issBlkNoNumTs:'ブロックを解析できません（番号またはタイムライン欠落）', issBlkNoTs:'ブロックを解析できません（タイムライン欠落）', issBadTs:'タイムラインの形式が不正です', issNumInc:'番号が連続していません', issEndLtStart:'終了時刻が開始時刻より前です', issOverlap:'前のタイムラインと重複しています', issNoBlocks:'字幕ブロックが一つも解析されませんでした', issZeroDur:'長さがゼロです', issEmptyCue:'内容が空です', issNoUsable:'使用可能な字幕ブロックがありません'
+  colTc:'タイムライン', fnSub:'字幕', fnBi:'二カ国語字幕', demoFile:'サンプル.srt', noteDeepSeek:'推奨：高速かつ費用対効果が高く、字幕の一括翻訳に最適', errNotCfg:'管理者がデフォルトモデルを未設定です。カスタム API をご利用ください。', errIpLimit:'本日のこの IP の無料翻訳枠（{0} リクエスト）を使い切りました。独自の API Key を入力して続行できます。', errGlobalLimit:'本日のサイト全体の無料翻訳総枠を使い切りました。独自の API Key を入力して続行できます。', errBadJson:'リクエスト本文が有効な JSON ではありません', errNoMsgs:'messages がありません', errUpstream:'デフォルトモデルの呼び出しに失敗：{0}', errNotJson:'返答が JSON ではありません', errEmpty:'返答が空です', errNoGroups:'JSON に groups がありません', errNoGno:'JSON 項目に gno がありません', errMissGroup:'グループ {0} の結果がありません', errNoArray:'JSON に配列がありません', anchorFail:'アンカー検証不合格（グループ {0} の訳文が{1}ではありません）', issBlkNoNumTs:'ブロックを解析できません（番号またはタイムライン欠落）', issBlkNoTs:'ブロックを解析できません（タイムライン欠落）', issBadTs:'タイムラインの形式が不正です', issNumInc:'番号が連続していません', issEndLtStart:'終了時刻が開始時刻より前です', issOverlap:'前のタイムラインと重複しています', issNoBlocks:'字幕ブロックが一つも解析されませんでした', issZeroDur:'長さがゼロです', issEmptyCue:'内容が空です', issNoUsable:'使用可能な字幕ブロックがありません',
+  brandName:'AI-SRTSub', navGuide:'使い方', navRepo:'GitHub', heroTitle:'字幕を放り込めば、<br><em>あとは AI におまかせ</em>',
+  heroSub:'翻訳・タイムライン整合・レイアウト調整を一括処理——数分でそのまま映像に焼ける字幕が手に入ります。無料・登録不要・プライバシー安全', dropTitle:'クリックしてファイルを選択、またはここにドラッグ 🎬', dropSub:'SRT · VTT · ASS · TXT · 20 以上の言語に対応', altNoFile:'ファイルが手元にない？',
+  altPaste:'字幕テキストを貼り付け', altDemo:'サンプルを読み込んでスタジオを見てみる →', enterHint:'アップロードすると<b>字幕スタジオ</b>に自動移動——言語・スタイル・書き出し設定はすべてそこで', statLangs:'言語ペア',
+  statStyles:'書き出しスタイル', statAlign:'タイムライン整合', statPrivacy:'サーバー送信', whyTag:'✦ WHY US · 選ばれる理由',
+  whyTitle:'「機械翻訳」ではなく、字幕グレードの翻訳', whySub:'すべての機能は「映像に焼いてすぐ使える」ために設計', feat1T:'タイムライン完全同期', feat1D:'訳文は元のタイムラインに一行ずつ正確に対応。結合・分割も再生時間に応じて自動配分——ずれも混線も起こしません。',
+  feat2T:'全編で用語統一', feat2D:'翻訳前に固有名詞や曖昧語を自動抽出して用語集を作成。1 本目も 300 本目も訳語を統一。強制的に原文のまま残す指定も可能。', feat3T:'スマート折り返し', feat3D:'行幅を超えると句読点と単語境界で折り返し。Netflix の言語別規格に準拠し、単語を真ん中で切ることはありません。',
+  feat4T:'フィラー除去・文字起こし修正', feat4D:'「えー、あの、you know」を自動削除し、ソースの聞き取りミスもまとめて修正。そのまま焼けるほどクリーンな訳文に。', feat5T:'二言語字幕も自由自在', feat5D:'二行・積み上げ・上下分割を自由に切り替え。TXT 対照稿の書き出しも可能。字幕組レベルの演出をすべて網羅。',
+  feat6T:'プライバシー保護', feat6D:'字幕はブラウザ内で処理され、原則として第三者サーバーには送信されません。API Key も端末内に保存。', expTag:'✦ EXPORT · 書き出しスタイル', aboutTitle:'AI-SRTSub について',
+  aboutBody:'AI-SRTSub はオープンソースの AI 字幕翻訳ツールです。良い字幕ツールは無料で、クリーンで、プライバシーを尊重すべき——広告なし、登録なし、ファイルに手を加えない。セルフホストも歓迎。', aboutRepo:'GitHub リポジトリ', aboutLicense:'AGPL-3.0 オープンソース', wsBackHome:'ホーム',
+  wsUploadNew:'新しい字幕', projEmpty:'字幕未読み込み', secImport:'読み込み', secLang:'言語',
+  secStyle:'翻訳スタイル', secRules:'処理ルール', secEngine:'エンジン', lblSrcShort:'原文言語',
+  lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞を保持', lblAutoTermsShort:'自動用語集', lblMaxWShort:'折り返し幅',
+  /* v0.9.70 两段式界面新增 */
 },
 'es': {
   docTitle:'AI-SRTSub - Cine y series del mundo, subtítulos en tu idioma', appTitle:'🎬 Traductor de Subtítulos IA',
@@ -815,7 +1173,7 @@ const I18N = {
   pending:'Pendiente…', dropNote:'(eliminado: puro relleno/sonido)',
   emptyRows:'Aún no hay subtítulos. Importa a la izquierda → elegir archivo / pegar / cargar ejemplo.', emptyFilter:'Nada bajo este filtro',
   reportSummary:'Informe de validación pre-exportación',
-  footer:'Motor de reglas srt-core.js · multi-idioma · ajuste: CJK/ancho completo=1 unidad, 2 caracteres de ancho medio=1 unidad; solo se ajusta cuando todo el subtítulo supera el umbral, cada línea ≤ umbral',
+  footer:'AI-SRTSub · Código abierto AGPL-3.0 · Tus subtítulos siempre son tuyos',
   bDrop:'relleno·quitado', bMerge:'fusionado', bLong:'largo',
   parseOk:'✅ Analizado OK: {0} subtítulos.', parseWarn:'⚠ Se analizaron {0} subtítulos con {1} problemas de formato:',
   imported:'Importado {0}: {1} subtítulos.', paste:'texto pegado',
@@ -854,7 +1212,20 @@ const I18N = {
   seoWho:'<strong>Para quién es:</strong> traductores de vídeo, creadores de YouTube y localizadores, estudiantes de idiomas, grupos de subtítulos y equipos que necesitan localizar contenido de vídeo rápidamente.',
   seoNoscript:'Esta herramienta necesita JavaScript. Actívalo en tu navegador y sube un archivo de subtítulos (SRT / VTT / ASS) para traducir subtítulos con IA gratis.',
   verifyOk:'✅ Validación OK: {0} subtítulos, numeración secuencial, sin solapamientos, sin vacíos.', pasteEmpty:'El área de pegado está vacía.', issCps:'Velocidad de lectura {0} car./s (límite {1})', issShortDur:'En pantalla solo {0} s (mín. 0,83)', cpsSummary:'Control de velocidad: {0} demasiado rápidas, {1} demasiado cortas (el tiempo proviene del archivo fuente; solo informativo)',
-  colTc:'Línea de tiempo', fnSub:'subtitulos', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recomendado: rápido y económico, ideal para traducir subtítulos por lotes', errNotCfg:'El administrador aún no ha configurado un modelo predeterminado. Use su propia API.', errIpLimit:'La cuota gratuita de hoy para esta IP ({0} solicitudes) se ha agotado. Introduzca su propia API key para continuar.', errGlobalLimit:'La cuota gratuita total del sitio de hoy se ha agotado. Introduzca su propia API key para continuar.', errBadJson:'El cuerpo de la solicitud no es JSON válido', errNoMsgs:'Faltan messages', errUpstream:'Falló la llamada al modelo predeterminado: {0}', errNotJson:'La respuesta no es JSON', errEmpty:'La respuesta está vacía', errNoGroups:'Falta groups en el JSON', errNoGno:'Falta gno en el elemento JSON', errMissGroup:'Falta el resultado del grupo {0}', errNoArray:'Falta el array en el JSON', anchorFail:'Verificación de anclaje fallida (la traducción del grupo {0} no es {1})', issBlkNoNumTs:'No se puede analizar el bloque (falta índice o línea de tiempo)', issBlkNoTs:'No se puede analizar el bloque (falta línea de tiempo)', issBadTs:'Formato de línea de tiempo no válido', issNumInc:'El índice no aumenta', issEndLtStart:'La hora de fin es anterior a la de inicio', issOverlap:'Se solapa con la línea de tiempo anterior', issNoBlocks:'No se analizó ningún bloque de subtítulos', issZeroDur:'Duración cero', issEmptyCue:'Contenido vacío', issNoUsable:'No hay bloques de subtítulos utilizables'
+  colTc:'Línea de tiempo', fnSub:'subtitulos', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recomendado: rápido y económico, ideal para traducir subtítulos por lotes', errNotCfg:'El administrador aún no ha configurado un modelo predeterminado. Use su propia API.', errIpLimit:'La cuota gratuita de hoy para esta IP ({0} solicitudes) se ha agotado. Introduzca su propia API key para continuar.', errGlobalLimit:'La cuota gratuita total del sitio de hoy se ha agotado. Introduzca su propia API key para continuar.', errBadJson:'El cuerpo de la solicitud no es JSON válido', errNoMsgs:'Faltan messages', errUpstream:'Falló la llamada al modelo predeterminado: {0}', errNotJson:'La respuesta no es JSON', errEmpty:'La respuesta está vacía', errNoGroups:'Falta groups en el JSON', errNoGno:'Falta gno en el elemento JSON', errMissGroup:'Falta el resultado del grupo {0}', errNoArray:'Falta el array en el JSON', anchorFail:'Verificación de anclaje fallida (la traducción del grupo {0} no es {1})', issBlkNoNumTs:'No se puede analizar el bloque (falta índice o línea de tiempo)', issBlkNoTs:'No se puede analizar el bloque (falta línea de tiempo)', issBadTs:'Formato de línea de tiempo no válido', issNumInc:'El índice no aumenta', issEndLtStart:'La hora de fin es anterior a la de inicio', issOverlap:'Se solapa con la línea de tiempo anterior', issNoBlocks:'No se analizó ningún bloque de subtítulos', issZeroDur:'Duración cero', issEmptyCue:'Contenido vacío', issNoUsable:'No hay bloques de subtítulos utilizables',
+  brandName:'AI-SRTSub', navGuide:'Guía', navRepo:'GitHub', heroTitle:'Suelta el subtítulo,<br><em>del resto se encarga la IA</em>',
+  heroSub:'Traducción, alineación de tiempos y maquetación en un solo paso: subtítulos listos para usar en minutos. Gratis · Sin registro · Privado', dropTitle:'Haz clic para elegir un archivo o arrástralo aquí 🎬', dropSub:'SRT · VTT · ASS · TXT · más de 20 idiomas', altNoFile:'¿No tienes un archivo a mano?',
+  altPaste:'Pega el texto del subtítulo', altDemo:'Cargar un ejemplo y explorar el estudio →', enterHint:'Al subir entrarás automáticamente en el <b>estudio de subtítulos</b>: idioma, estilo y exportación se configuran allí', statLangs:'idiomas',
+  statStyles:'estilos de exportación', statAlign:'tiempos alineados', statPrivacy:'subtítulos al servidor', whyTag:'✦ POR QUÉ NOSOTROS',
+  whyTitle:'No es «traducción automática», es traducción de calidad subtítulo', whySub:'Cada función está pensada para «meterlo en el vídeo y que funcione»', feat1T:'Alineación exacta de tiempos', feat1D:'La traducción sigue la línea de tiempos original una a una; fusiones y divisiones se reparten por duración, sin desvíos ni desincronización.',
+  feat2T:'Terminología uniforme', feat2D:'Antes de traducir se extraen nombres propios y palabras ambiguas en un glosario: la línea 1 y la 300 se traducen igual; y puedes forzar mantener cualquier término.', feat3T:'Salto de línea inteligente', feat3D:'Al superar el ancho, la línea salta en puntuación y límites de palabra según los estándares de Netflix por idioma, sin partir palabras por la mitad.',
+  feat4T:'Sin muletillas · corrección de transcripción', feat4D:'Los «eh, um, you know» se eliminan solos y los errores de transcripción del original se corrigen de paso: limpio para incrustar directamente.', feat5T:'Bilingüe a tu manera', feat5D:'Dos líneas, apilado o pantalla dividida: cambia a gusto y exporta guiones TXT comparados, con todos los trucos de nivel fansub.',
+  feat6T:'Privacidad ante todo', feat6D:'Los subtítulos se procesan en tu navegador y no pasan por servidores de terceros; la API Key se queda en tu equipo.', expTag:'✦ EXPORTACIÓN', aboutTitle:'Sobre AI-SRTSub',
+  aboutBody:'AI-SRTSub es un traductor de subtítulos con IA de código abierto. Creemos que una buena herramienta debe ser gratis, limpia y respetar la privacidad: sin anuncios, sin registro, sin tocar tus archivos. Despliega la tuya o ayúdanos a pulirla.', aboutRepo:'Repositorio GitHub', aboutLicense:'Código abierto AGPL-3.0', wsBackHome:'Inicio',
+  wsUploadNew:'Nuevo subtítulo', projEmpty:'Sin subtítulo cargado', secImport:'Importar', secLang:'Idiomas',
+  secStyle:'Estilo', secRules:'Reglas', secEngine:'Motor', lblSrcShort:'Idioma origen',
+  lblDstShort:'Idioma destino', lblKeepTermsShort:'Mantener nombres propios', lblAutoTermsShort:'Glosario automático', lblMaxWShort:'Ancho de línea',
+  /* v0.9.70 两段式界面新增 */
 },
 'pt': {
   docTitle:'AI-SRTSub - Filmes e séries do mundo, legendas no seu idioma', appTitle:'🎬 Tradutor de Legendas IA',
@@ -894,7 +1265,7 @@ const I18N = {
   pending:'Pendente…', dropNote:'(removida: puro preenchimento/efeito sonoro)',
   emptyRows:'Ainda não há legendas. Importe à esquerda → escolher arquivo / colar / carregar exemplo.', emptyFilter:'Nada neste filtro',
   reportSummary:'Relatório de validação pré-exportação',
-  footer:'Motor de regras srt-core.js · multi-idioma · quebra: CJK/largura total=1 unidade, 2 caracteres de meia largura=1 unidade; só quebra quando a legenda inteira excede o limite, cada linha ≤ limite',
+  footer:'AI-SRTSub · Código aberto AGPL-3.0 · Suas legendas sempre são suas',
   bDrop:'preenchimento·removido', bMerge:'fundida', bLong:'longa',
   parseOk:'✅ Análise OK: {0} legendas.', parseWarn:'⚠ {0} legendas analisadas com {1} problemas de formato:',
   imported:'Importado {0}: {1} legendas.', paste:'texto colado',
@@ -933,7 +1304,20 @@ const I18N = {
   seoWho:'<strong>Para quem é:</strong> tradutores de vídeo, criadores de YouTube e localizadores, estudantes de idiomas, grupos de legendas e equipes que precisam localizar conteúdo de vídeo rapidamente.',
   seoNoscript:'Esta ferramenta precisa de JavaScript. Ative-o no navegador e envie um arquivo de legendas (SRT / VTT / ASS) para traduzir legendas com IA de graça.',
   verifyOk:'✅ Validação OK: {0} legendas, numeração sequencial, sem sobreposições, sem vazias.', pasteEmpty:'A área de colagem está vazia.', issCps:'Velocidade de leitura {0} car./s (limite {1})', issShortDur:'Na tela apenas {0} s (mín. 0,83)', cpsSummary:'Verificação de velocidade: {0} rápidas demais, {1} curtas demais (o tempo vem do arquivo original; apenas informativo)',
-  colTc:'Linha do tempo', fnSub:'legendas', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recomendado: rápido e econômico, ideal para tradução em lote de legendas', errNotCfg:'O administrador ainda não configurou um modelo padrão. Use sua própria API.', errIpLimit:'A cota gratuita de hoje para este IP ({0} solicitações) acabou. Insira sua própria API key para continuar.', errGlobalLimit:'A cota gratuita total do site de hoje acabou. Insira sua própria API key para continuar.', errBadJson:'O corpo da requisição não é JSON válido', errNoMsgs:'Faltam messages', errUpstream:'Falha na chamada do modelo padrão: {0}', errNotJson:'A resposta não é JSON', errEmpty:'A resposta está vazia', errNoGroups:'JSON sem groups', errNoGno:'Item do JSON sem gno', errMissGroup:'Falta o resultado do grupo {0}', errNoArray:'JSON sem array', anchorFail:'Verificação de ancoragem falhou (a tradução do grupo {0} não é {1})', issBlkNoNumTs:'Não foi possível analisar o bloco (falta índice ou linha do tempo)', issBlkNoTs:'Não foi possível analisar o bloco (falta linha do tempo)', issBadTs:'Formato de linha do tempo inválido', issNumInc:'Índice não crescente', issEndLtStart:'Horário de fim anterior ao de início', issOverlap:'Sobrepõe a linha do tempo anterior', issNoBlocks:'Nenhum bloco de legendas analisado', issZeroDur:'Duração zero', issEmptyCue:'Conteúdo vazio', issNoUsable:'Nenhum bloco de legendas utilizável'
+  colTc:'Linha do tempo', fnSub:'legendas', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recomendado: rápido e econômico, ideal para tradução em lote de legendas', errNotCfg:'O administrador ainda não configurou um modelo padrão. Use sua própria API.', errIpLimit:'A cota gratuita de hoje para este IP ({0} solicitações) acabou. Insira sua própria API key para continuar.', errGlobalLimit:'A cota gratuita total do site de hoje acabou. Insira sua própria API key para continuar.', errBadJson:'O corpo da requisição não é JSON válido', errNoMsgs:'Faltam messages', errUpstream:'Falha na chamada do modelo padrão: {0}', errNotJson:'A resposta não é JSON', errEmpty:'A resposta está vazia', errNoGroups:'JSON sem groups', errNoGno:'Item do JSON sem gno', errMissGroup:'Falta o resultado do grupo {0}', errNoArray:'JSON sem array', anchorFail:'Verificação de ancoragem falhou (a tradução do grupo {0} não é {1})', issBlkNoNumTs:'Não foi possível analisar o bloco (falta índice ou linha do tempo)', issBlkNoTs:'Não foi possível analisar o bloco (falta linha do tempo)', issBadTs:'Formato de linha do tempo inválido', issNumInc:'Índice não crescente', issEndLtStart:'Horário de fim anterior ao de início', issOverlap:'Sobrepõe a linha do tempo anterior', issNoBlocks:'Nenhum bloco de legendas analisado', issZeroDur:'Duração zero', issEmptyCue:'Conteúdo vazio', issNoUsable:'Nenhum bloco de legendas utilizável',
+  brandName:'AI-SRTSub', navGuide:'Guia', navRepo:'GitHub', heroTitle:'Solte a legenda,<br><em>o resto é com a IA</em>',
+  heroSub:'Tradução, alinhamento de tempos e formatação num só passo — legendas prontas para usar em minutos. Grátis · Sem cadastro · Privado', dropTitle:'Clique para escolher um arquivo ou arraste para cá 🎬', dropSub:'SRT · VTT · ASS · TXT · mais de 20 idiomas', altNoFile:'Sem arquivo à mão?',
+  altPaste:'Cole o texto da legenda', altDemo:'Carregar um exemplo e conhecer o estúdio →', enterHint:'Ao enviar você entra automaticamente no <b>estúdio de legendas</b> — idioma, estilo e exportação ficam lá', statLangs:'idiomas',
+  statStyles:'estilos de exportação', statAlign:'tempos alinhados', statPrivacy:'legendas ao servidor', whyTag:'✦ POR QUE NÓS',
+  whyTitle:'Não é «tradução de máquina», é tradução nível legenda', whySub:'Cada recurso foi pensado para «jogar no vídeo e funcionar»', feat1T:'Alinhamento preciso de tempos', feat1D:'A tradução segue a linha de tempos original uma a uma; fusões e divisões são distribuídas por duração, sem desvio nem dessincronia.',
+  feat2T:'Terminologia uniforme', feat2D:'Nomes próprios e palavras ambíguas viram um glossário antes de traduzir: a linha 1 e a 300 saem iguais; e você pode forçar manter qualquer termo.', feat3T:'Quebra de linha inteligente', feat3D:'Ao passar da largura, a linha quebra na pontuação e nos limites de palavra conforme os padrões da Netflix por idioma — nunca parte uma palavra ao meio.',
+  feat4T:'Sem bordões · correção de transcrição', feat4D:'Os «né, tipo, you know» somem sozinhos e os erros de transcrição da fonte são corrigidos junto — limpo o bastante para embutir direto.', feat5T:'Bilíngue do seu jeito', feat5D:'Duas linhas, empilhado ou tela dividida: troque à vontade e exporte roteiros TXT comparativos, com todos os truques nível fansub.',
+  feat6T:'Privacidade em primeiro lugar', feat6D:'As legendas são processadas no seu navegador e não passam por servidores de terceiros; a API Key fica no seu aparelho.', expTag:'✦ EXPORTAÇÃO', aboutTitle:'Sobre o AI-SRTSub',
+  aboutBody:'O AI-SRTSub é um tradutor de legendas com IA, de código aberto. Acreditamos que uma boa ferramenta deve ser grátis, limpa e respeitar a privacidade — sem anúncios, sem cadastro, sem mexer nos seus arquivos. Faça seu self-host ou ajude a lapidar.', aboutRepo:'Repositório GitHub', aboutLicense:'Código aberto AGPL-3.0', wsBackHome:'Início',
+  wsUploadNew:'Nova legenda', projEmpty:'Nenhuma legenda carregada', secImport:'Importar', secLang:'Idiomas',
+  secStyle:'Estilo', secRules:'Regras', secEngine:'Motor', lblSrcShort:'Idioma de origem',
+  lblDstShort:'Idioma de destino', lblKeepTermsShort:'Manter nomes próprios', lblAutoTermsShort:'Glossário automático', lblMaxWShort:'Largura de linha',
+  /* v0.9.70 两段式界面新增 */
 },
 'ko': {
   docTitle:'AI-SRTSub - 세계 영화·드라마를 내 언어 자막으로 즐기는 AI 자막 번역기', appTitle:'🎬 AI 자막 번역기',
@@ -973,7 +1357,7 @@ const I18N = {
   pending:'대기 중…', dropNote:'(삭제됨: 순수 필러/음향 표기)',
   emptyRows:'자막이 없습니다. 왼쪽 "불러오기" → 파일 선택 / 붙여넣기 / 샘플.', emptyFilter:'이 필터에는 해당 항목이 없습니다',
   reportSummary:'내보내기 전 검증 보고서',
-  footer:'규칙 엔진 srt-core.js · 다국어 지원 · 줄바꿈 기준: CJK/전각=1단위, 반각 2문자=1단위; 자막 전체가 기준을 초과할 때만 줄바꿈, 각 줄 ≤ 기준',
+  footer:'AI-SRTSub · 오픈소스 AGPL-3.0 · 당신의 자막은 언제나 당신 것',
   bDrop:'필러·삭제', bMerge:'병합됨', bLong:'긴 항목',
   parseOk:'✅ 분석 성공: {0}개 자막.', parseWarn:'⚠ {0}개 자막 분석, {1}개 형식 문제:',
   imported:'{0} 불러옴: {1}개 자막.', paste:'붙여넣은 텍스트',
@@ -1012,7 +1396,20 @@ const I18N = {
   seoWho:'<strong>이런 분들에게 유용합니다:</strong> 영상 번역 종사자, 유튜브 크리에이터, 외국어 학습자, 자막 팀, 영상 콘텐츠를 빠르게 현지화해야 하는 팀.',
   seoNoscript:'이 도구를 사용하려면 JavaScript가 필요합니다. 브라우저에서 JavaScript를 활성화한 후 SRT / VTT / ASS 자막 파일을 업로드하여 AI 자막 번역을 무료로 이용해 보세요.',
   verifyOk:'✅ 검증 통과: {0}개, 번호 연속·타임라인 중복 없음·빈 줄 없음.', pasteEmpty:'붙여넣기 영역이 비어 있습니다.', issCps:'읽기 속도 {0}자/초(권장 ≤{1})', issShortDur:'표시 시간 {0}초(최소 0.83)', cpsSummary:'읽기 속도 검사: {0}건 과속, {1}건 과단(타임라인은 원본 파일 기준, 참고용)',
-  colTc:'타임라인', fnSub:'자막', fnBi:'이중언어자막', demoFile:'예시.srt', noteDeepSeek:'추천: 빠르고 비용 효율이 좋아 자막 일괄 번역에 적합', errNotCfg:'관리자가 기본 모델을 설정하지 않았습니다. 직접 API를 사용해 주세요.', errIpLimit:'오늘 이 IP의 무료 번역 한도({0}회 요청)를 모두 사용했습니다. 직접 API Key를 입력해 계속할 수 있습니다.', errGlobalLimit:'오늘 사이트 전체 무료 번역 총 한도를 모두 사용했습니다. 직접 API Key를 입력해 계속할 수 있습니다.', errBadJson:'요청 본문이 유효한 JSON이 아닙니다', errNoMsgs:'messages가 없습니다', errUpstream:'기본 모델 호출 실패: {0}', errNotJson:'응답이 JSON이 아닙니다', errEmpty:'응답이 비어 있습니다', errNoGroups:'JSON에 groups가 없습니다', errNoGno:'JSON 항목에 gno가 없습니다', errMissGroup:'그룹 {0}의 결과가 없습니다', errNoArray:'JSON에 배열이 없습니다', anchorFail:'앵커 검증 실패(그룹 {0} 번역이 {1}이(가) 아님)', issBlkNoNumTs:'블록을 분석할 수 없습니다(번호 또는 타임라인 누락)', issBlkNoTs:'블록을 분석할 수 없습니다(타임라인 누락)', issBadTs:'타임라인 형식이 올바르지 않습니다', issNumInc:'번호가 증가하지 않습니다', issEndLtStart:'종료 시간이 시작 시간보다 빠릅니다', issOverlap:'이전 타임라인과 겹칩니다', issNoBlocks:'자막 블록이 하나도 분석되지 않았습니다', issZeroDur:'길이가 0입니다', issEmptyCue:'내용이 비어 있습니다', issNoUsable:'사용 가능한 자막 블록이 없습니다'
+  colTc:'타임라인', fnSub:'자막', fnBi:'이중언어자막', demoFile:'예시.srt', noteDeepSeek:'추천: 빠르고 비용 효율이 좋아 자막 일괄 번역에 적합', errNotCfg:'관리자가 기본 모델을 설정하지 않았습니다. 직접 API를 사용해 주세요.', errIpLimit:'오늘 이 IP의 무료 번역 한도({0}회 요청)를 모두 사용했습니다. 직접 API Key를 입력해 계속할 수 있습니다.', errGlobalLimit:'오늘 사이트 전체 무료 번역 총 한도를 모두 사용했습니다. 직접 API Key를 입력해 계속할 수 있습니다.', errBadJson:'요청 본문이 유효한 JSON이 아닙니다', errNoMsgs:'messages가 없습니다', errUpstream:'기본 모델 호출 실패: {0}', errNotJson:'응답이 JSON이 아닙니다', errEmpty:'응답이 비어 있습니다', errNoGroups:'JSON에 groups가 없습니다', errNoGno:'JSON 항목에 gno가 없습니다', errMissGroup:'그룹 {0}의 결과가 없습니다', errNoArray:'JSON에 배열이 없습니다', anchorFail:'앵커 검증 실패(그룹 {0} 번역이 {1}이(가) 아님)', issBlkNoNumTs:'블록을 분석할 수 없습니다(번호 또는 타임라인 누락)', issBlkNoTs:'블록을 분석할 수 없습니다(타임라인 누락)', issBadTs:'타임라인 형식이 올바르지 않습니다', issNumInc:'번호가 증가하지 않습니다', issEndLtStart:'종료 시간이 시작 시간보다 빠릅니다', issOverlap:'이전 타임라인과 겹칩니다', issNoBlocks:'자막 블록이 하나도 분석되지 않았습니다', issZeroDur:'길이가 0입니다', issEmptyCue:'내용이 비어 있습니다', issNoUsable:'사용 가능한 자막 블록이 없습니다',
+  brandName:'AI-SRTSub', navGuide:'사용 가이드', navRepo:'GitHub', heroTitle:'자막을 던져 넣으면,<br><em>나머지는 AI가 알아서</em>',
+  heroSub:'번역·타임라인 정렬·줄바꿈까지 한 번에——바로 영상에 입힐 수 있는 자막을 몇 분 만에 받으세요. 무료 · 가입 불필요 · 프라이버시 안전', dropTitle:'클릭해서 파일 선택 또는 그냥 끌어다 놓으세요 🎬', dropSub:'SRT · VTT · ASS · TXT · 20개 이상 언어', altNoFile:'파일이 없나요?',
+  altPaste:'자막 텍스트 붙여넣기', altDemo:'예제 불러와서 스튜디오 둘러보기 →', enterHint:'업로드하면 <b>자막 스튜디오</b>로 자동 이동——언어·스타일·내보내기 설정은 모두 그곳에서', statLangs:'언어',
+  statStyles:'내보내기 스타일', statAlign:'타임라인 정렬', statPrivacy:'서버 업로드', whyTag:'✦ WHY US · 선택 이유',
+  whyTitle:'「기계 번역」이 아니라 자막급 번역', whySub:'모든 기능은 「영상에 넣으면 바로 쓰는」 것을 목표로 설계', feat1T:'타임라인 정밀 정렬', feat1D:'번역은 원본 자막 타임라인에 한 줄씩 정확히 대응합니다. 병합·분할도 길이에 맞게 자동 배분——밀리거나 어긋나지 않습니다.',
+  feat2T:'전편 용어 통일', feat2D:'번역 전 고유명사와 모호한 단어를 자동 추출해 용어집을 만듭니다. 1번과 300번의 번역이 같음을 보장하고, 원문 유지 지정도 가능합니다.', feat3T:'스마트 줄바꿈', feat3D:'행 폭을 넘으면 문장부호와 단어 경계에서 줄바꿈. 언어별 Netflix 기준을 따르며 단어를 절반으로 자르는 일은 없습니다.',
+  feat4T:'군더더기 제거 · 받아쓰기 교정', feat4D:'「음, 어, you know」는 자동 삭제, 원본 자막의 받아쓰기 오류도 함께 수정——바로 넣을 수 있을 만큼 깔끔합니다.', feat5T:'이중언어 자막 자유 배치', feat5D:'두 줄·쌓기·상하 분할을 자유롭게 전환하고 TXT 대조본까지 내보낼 수 있는, 자막팀급 옵션을 모두 갖췄습니다.',
+  feat6T:'프라이버시 보호', feat6D:'자막은 브라우저에서 처리되며 기본적으로 제3자 서버를 거치지 않습니다. API Key도 내 기기에만 저장됩니다.', expTag:'✦ EXPORT · 내보내기 스타일', aboutTitle:'AI-SRTSub 소개',
+  aboutBody:'AI-SRTSub는 오픈소스 AI 자막 번역 도구입니다. 좋은 자막 도구는 무료·깔끔·프라이버시 존중이어야 한다고 믿습니다——광고 없음, 가입 없음, 파일 만지지 않음. 직접 설치하거나 요청을 남겨주세요.', aboutRepo:'GitHub 저장소', aboutLicense:'AGPL-3.0 오픈소스', wsBackHome:'홈',
+  wsUploadNew:'새 자막 올리기', projEmpty:'자막 없음', secImport:'가져오기', secLang:'언어',
+  secStyle:'번역 스타일', secRules:'처리 규칙', secEngine:'엔진', lblSrcShort:'원본 언어',
+  lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사 원문 유지', lblAutoTermsShort:'자동 용어집', lblMaxWShort:'줄 폭 기준',
+  /* v0.9.70 两段式界面新增 */
 },
 'de': {
   docTitle:'AI-SRTSub - Filme & Serien weltweit, Untertitel in deiner Sprache', appTitle:'🎬 KI Untertitel-Übersetzer',
@@ -1052,7 +1449,7 @@ const I18N = {
   pending:'Offen…', dropNote:'(entfernt: reines Füllwort/Geräusch)',
   emptyRows:'Noch keine Untertitel. Links "Importieren" → Datei wählen / einfügen / Beispiel laden.', emptyFilter:'Nichts unter diesem Filter',
   reportSummary:'Validierungsbericht vor dem Export',
-  footer:'Regel-Engine srt-core.js · Mehrsprachig · Umbruch: CJK/Vollbreite=1 Einheit, 2 halbbreite Zeichen=1 Einheit; Umbruch nur wenn ganzer Untertitel über dem Schwellwert, jede Zeile ≤ Schwellwert',
+  footer:'AI-SRTSub · Open Source AGPL-3.0 · Deine Untertitel gehören immer dir',
   bDrop:'Füllwort·entfernt', bMerge:'zusammengeführt', bLong:'lang',
   parseOk:'✅ Analyse OK: {0} Untertitel.', parseWarn:'⚠ {0} Untertitel analysiert, {1} Formatprobleme:',
   imported:'Importiert {0}: {1} Untertitel.', paste:'eingefügter Text',
@@ -1091,7 +1488,20 @@ const I18N = {
   seoWho:'<strong>Für wen:</strong> Video-Übersetzer, YouTube-Creator und Localizer, Sprachlernende, Untertitel-Teams und alle, die Videoinhalte schnell lokalisieren müssen.',
   seoNoscript:'Dieses Tool benötigt JavaScript. Bitte aktivieren Sie JavaScript im Browser und laden Sie dann eine Untertiteldatei (SRT / VTT / ASS) hoch, um Untertitel kostenlos mit KI zu übersetzen.',
   verifyOk:'✅ Validierung bestanden: {0} Untertitel, fortlaufende Nummern, keine Überlappungen, keine Leerzeilen.', pasteEmpty:'Einfügebereich ist leer.', issCps:'Lesegeschwindigkeit {0} Z/s (Grenze {1})', issShortDur:'Nur {0} s eingeblendet (mind. 0,83)', cpsSummary:'Lesegeschwindigkeit: {0} zu schnell, {1} zu kurz (Zeiten stammen aus der Quelldatei — nur Hinweis)',
-  colTc:'Zeitachse', fnSub:'untertitel', fnBi:'zweisprachig', demoFile:'demo.srt', noteDeepSeek:'Empfohlen: schnell und kostengünstig, ideal für Stapelübersetzung von Untertiteln', errNotCfg:'Der Administrator hat noch kein Standardmodell konfiguriert. Bitte eigenen API-Key verwenden.', errIpLimit:'Das heutige Gratis-Kontingent für diese IP ({0} Anfragen) ist aufgebraucht. Eigenen API-Key eingeben, um weiterzumachen.', errGlobalLimit:'Das heutige Gratis-Gesamtkontingent der Seite ist aufgebraucht. Eigenen API-Key eingeben, um weiterzumachen.', errBadJson:'Anfragekörper ist kein gültiges JSON', errNoMsgs:'messages fehlt', errUpstream:'Standardmodell-Aufruf fehlgeschlagen: {0}', errNotJson:'Antwort ist kein JSON', errEmpty:'Antwort ist leer', errNoGroups:'JSON ohne groups', errNoGno:'JSON-Eintrag ohne gno', errMissGroup:'Ergebnis für Gruppe {0} fehlt', errNoArray:'JSON ohne Array', anchorFail:'Ankerprüfung fehlgeschlagen (Übersetzung der Gruppe {0} ist nicht {1})', issBlkNoNumTs:'Block kann nicht analysiert werden (Index oder Zeitachse fehlt)', issBlkNoTs:'Block kann nicht analysiert werden (Zeitachse fehlt)', issBadTs:'Ungültiges Zeitachsenformat', issNumInc:'Index nicht aufsteigend', issEndLtStart:'Endzeit liegt vor der Startzeit', issOverlap:'Überlappt mit der vorherigen Zeitachse', issNoBlocks:'Keine Untertitelblöcke analysiert', issZeroDur:'Null Dauer', issEmptyCue:'Leerer Inhalt', issNoUsable:'Keine verwendbaren Untertitelblöcke'
+  colTc:'Zeitachse', fnSub:'untertitel', fnBi:'zweisprachig', demoFile:'demo.srt', noteDeepSeek:'Empfohlen: schnell und kostengünstig, ideal für Stapelübersetzung von Untertiteln', errNotCfg:'Der Administrator hat noch kein Standardmodell konfiguriert. Bitte eigenen API-Key verwenden.', errIpLimit:'Das heutige Gratis-Kontingent für diese IP ({0} Anfragen) ist aufgebraucht. Eigenen API-Key eingeben, um weiterzumachen.', errGlobalLimit:'Das heutige Gratis-Gesamtkontingent der Seite ist aufgebraucht. Eigenen API-Key eingeben, um weiterzumachen.', errBadJson:'Anfragekörper ist kein gültiges JSON', errNoMsgs:'messages fehlt', errUpstream:'Standardmodell-Aufruf fehlgeschlagen: {0}', errNotJson:'Antwort ist kein JSON', errEmpty:'Antwort ist leer', errNoGroups:'JSON ohne groups', errNoGno:'JSON-Eintrag ohne gno', errMissGroup:'Ergebnis für Gruppe {0} fehlt', errNoArray:'JSON ohne Array', anchorFail:'Ankerprüfung fehlgeschlagen (Übersetzung der Gruppe {0} ist nicht {1})', issBlkNoNumTs:'Block kann nicht analysiert werden (Index oder Zeitachse fehlt)', issBlkNoTs:'Block kann nicht analysiert werden (Zeitachse fehlt)', issBadTs:'Ungültiges Zeitachsenformat', issNumInc:'Index nicht aufsteigend', issEndLtStart:'Endzeit liegt vor der Startzeit', issOverlap:'Überlappt mit der vorherigen Zeitachse', issNoBlocks:'Keine Untertitelblöcke analysiert', issZeroDur:'Null Dauer', issEmptyCue:'Leerer Inhalt', issNoUsable:'Keine verwendbaren Untertitelblöcke',
+  brandName:'AI-SRTSub', navGuide:'Anleitung', navRepo:'GitHub', heroTitle:'Untertitel reinwerfen,<br><em>den Rest macht die KI</em>',
+  heroSub:'Übersetzung, Zeitausrichtung und Layout in einem Durchgang — in Minuten fertige Untertitel. Kostenlos · Ohne Anmeldung · Privat', dropTitle:'Datei auswählen oder einfach hierher ziehen 🎬', dropSub:'SRT · VTT · ASS · TXT · über 20 Sprachen', altNoFile:'Keine Datei zur Hand?',
+  altPaste:'Untertiteltext einfügen', altDemo:'Beispiel laden und Studio ansehen →', enterHint:'Nach dem Upload landest du automatisch im <b>Untertitel-Studio</b> — Sprache, Stil und Export gibt es dort', statLangs:'Sprachen',
+  statStyles:'Export-Stile', statAlign:'Zeitleisten-Treue', statPrivacy:'Uploads zum Server', whyTag:'✦ WARUM WIR',
+  whyTitle:'Keine „Maschinenübersetzung“, sondern Untertitel-Qualität', whySub:'Jede Funktion ist für „direkt ins Video einbrennen“ gebaut', feat1T:'Exakte Zeitleisten-Ausrichtung', feat1D:'Die Übersetzung folgt der Original-Zeitleiste eins zu eins; Zusammenführungen und Aufteilungen werden nach Dauer verteilt — kein Verschieben, kein Verrutschen.',
+  feat2T:'Einheitliche Fachbegriffe', feat2D:'Eigennamen und mehrdeutige Wörter werden vorab in ein Glossar extrahiert: Zeile 1 und Zeile 300 bleiben identisch; beliebige Begriffe lassen sich fix im Original halten.', feat3T:'Intelligenter Zeilenumbruch', feat3D:'Zu lange Zeilen umbrechen an Satzzeichen und Wortgrenzen — nach Netflix-Standards je Sprache, niemals mitten im Wort.',
+  feat4T:'Füller raus · Transkription korrigiert', feat4D:'„Äh, hmm, you know“ fliegt automatisch raus, Abschreibfehler der Quelle werden gleich mitkorrigiert — sauber genug zum direkten Einbrennen.', feat5T:'Zweisprachig nach Lust und Laune', feat5D:'Zweizeilig, gestapelt oder oben/unten geteilt — frei umschalten, TXT-Gegenüberstellung exportieren, alle Fansub-Tricks inklusive.',
+  feat6T:'Privat von Haus aus', feat6D:'Untertitel werden im Browser verarbeitet und gehen standardmäßig an keine Drittserver; der API-Key bleibt auf deinem Gerät.', expTag:'✦ EXPORT', aboutTitle:'Über AI-SRTSub',
+  aboutBody:'AI-SRTSub ist ein Open-Source-Untertitelübersetzer mit KI. Wir finden: Gute Tools sind kostenlos, sauber und respektieren die Privatsphäre — keine Werbung, keine Anmeldung, keine Finger auf deinen Dateien. Self-Hosten und Mitschmieden willkommen.', aboutRepo:'GitHub-Repository', aboutLicense:'Open Source AGPL-3.0', wsBackHome:'Start',
+  wsUploadNew:'Neuer Untertitel', projEmpty:'Kein Untertitel geladen', secImport:'Import', secLang:'Sprachen',
+  secStyle:'Stil', secRules:'Regeln', secEngine:'Engine', lblSrcShort:'Ausgangssprache',
+  lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen behalten', lblAutoTermsShort:'Auto-Glossar', lblMaxWShort:'Zeilenbreite',
+  /* v0.9.70 两段式界面新增 */
 },
 'fr': {
   docTitle:'AI-SRTSub - Films et séries du monde, sous-titres dans votre langue', appTitle:'🎬 Traducteur de Sous-titres IA',
@@ -1131,7 +1541,7 @@ const I18N = {
   pending:'En attente…', dropNote:'(supprimé : pur remplissage/bruitage)',
   emptyRows:'Pas encore de sous-titres. À gauche « Importer » → choisir fichier / coller / exemple.', emptyFilter:'Rien sous ce filtre',
   reportSummary:'Rapport de validation avant export',
-  footer:'Moteur de règles srt-core.js · multilingue · retour ligne : CJK/pleine chasse=1 unité, 2 caractères demi-chasse=1 unité ; retour ligne seulement si tout le sous-titre dépasse le seuil, chaque ligne ≤ seuil',
+  footer:'AI-SRTSub · Open source AGPL-3.0 · Vos sous-titres vous appartiennent toujours',
   bDrop:'remplissage·supprimé', bMerge:'fusionné', bLong:'long',
   parseOk:'✅ Analyse OK : {0} sous-titres.', parseWarn:'⚠ {0} sous-titres analysés, {1} problèmes de format :',
   imported:'Importé {0} : {1} sous-titres.', paste:'texte collé',
@@ -1170,7 +1580,20 @@ const I18N = {
   seoWho:'<strong>Pour qui :</strong> traducteurs vidéo, créateurs YouTube et localisateurs, apprenants en langues, équipes de sous-titres et équipes qui doivent localiser rapidement du contenu vidéo.',
   seoNoscript:'Cet outil nécessite JavaScript. Activez-le dans votre navigateur, puis importez un fichier de sous-titres (SRT / VTT / ASS) pour traduire des sous-titres gratuitement avec l’IA.',
   verifyOk:'✅ Validation réussie : {0} sous-titres, numérotation continue, aucun chevauchement, aucune ligne vide.', pasteEmpty:'La zone de collage est vide.', issCps:'Vitesse de lecture {0} car./s (limite {1})', issShortDur:'À l’écran seulement {0} s (min. 0,83)', cpsSummary:'Vitesse de lecture : {0} trop rapides, {1} trop courtes (chronologie issue du fichier source — indicatif)',
-  colTc:'Timeline', fnSub:'sous-titres', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recommandé : rapide et économique, idéal pour la traduction de sous-titres par lots', errNotCfg:'L\'administrateur n\'a pas encore configuré de modèle par défaut. Utilisez votre propre API.', errIpLimit:'Le quota gratuit du jour pour cette IP ({0} requêtes) est épuisé. Saisissez votre propre clé API pour continuer.', errGlobalLimit:'Le quota gratuit total du site pour aujourd\'hui est épuisé. Saisissez votre propre clé API pour continuer.', errBadJson:'Le corps de la requête n\'est pas un JSON valide', errNoMsgs:'messages manquant', errUpstream:'Échec de l\'appel au modèle par défaut : {0}', errNotJson:'La réponse n\'est pas du JSON', errEmpty:'La réponse est vide', errNoGroups:'Il manque groups dans le JSON', errNoGno:'Il manque gno dans l\'élément JSON', errMissGroup:'Résultat manquant pour le groupe {0}', errNoArray:'Il manque le tableau dans le JSON', anchorFail:'Échec de la vérification d\'ancrage (la traduction du groupe {0} n\'est pas en {1})', issBlkNoNumTs:'Impossible d\'analyser le bloc (index ou timeline manquant)', issBlkNoTs:'Impossible d\'analyser le bloc (timeline manquant)', issBadTs:'Format de timeline invalide', issNumInc:'Index non croissant', issEndLtStart:'Heure de fin antérieure à l\'heure de début', issOverlap:'Chevauche la timeline précédente', issNoBlocks:'Aucun bloc de sous-titres analysé', issZeroDur:'Durée nulle', issEmptyCue:'Contenu vide', issNoUsable:'Aucun bloc de sous-titres utilisable'
+  colTc:'Timeline', fnSub:'sous-titres', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Recommandé : rapide et économique, idéal pour la traduction de sous-titres par lots', errNotCfg:'L\'administrateur n\'a pas encore configuré de modèle par défaut. Utilisez votre propre API.', errIpLimit:'Le quota gratuit du jour pour cette IP ({0} requêtes) est épuisé. Saisissez votre propre clé API pour continuer.', errGlobalLimit:'Le quota gratuit total du site pour aujourd\'hui est épuisé. Saisissez votre propre clé API pour continuer.', errBadJson:'Le corps de la requête n\'est pas un JSON valide', errNoMsgs:'messages manquant', errUpstream:'Échec de l\'appel au modèle par défaut : {0}', errNotJson:'La réponse n\'est pas du JSON', errEmpty:'La réponse est vide', errNoGroups:'Il manque groups dans le JSON', errNoGno:'Il manque gno dans l\'élément JSON', errMissGroup:'Résultat manquant pour le groupe {0}', errNoArray:'Il manque le tableau dans le JSON', anchorFail:'Échec de la vérification d\'ancrage (la traduction du groupe {0} n\'est pas en {1})', issBlkNoNumTs:'Impossible d\'analyser le bloc (index ou timeline manquant)', issBlkNoTs:'Impossible d\'analyser le bloc (timeline manquant)', issBadTs:'Format de timeline invalide', issNumInc:'Index non croissant', issEndLtStart:'Heure de fin antérieure à l\'heure de début', issOverlap:'Chevauche la timeline précédente', issNoBlocks:'Aucun bloc de sous-titres analysé', issZeroDur:'Durée nulle', issEmptyCue:'Contenu vide', issNoUsable:'Aucun bloc de sous-titres utilisable',
+  brandName:'AI-SRTSub', navGuide:'Guide', navRepo:'GitHub', heroTitle:'Dépose un sous-titre,<br><em>l\'IA fait le reste</em>',
+  heroSub:'Traduction, alignement des temps et mise en forme en une passe — des sous-titres prêts à l\'emploi en quelques minutes. Gratuit · Sans inscription · Privé', dropTitle:'Cliquez pour choisir un fichier, ou glissez-le ici 🎬', dropSub:'SRT · VTT · ASS · TXT · plus de 20 langues', altNoFile:'Pas de fichier sous la main ?',
+  altPaste:'Coller le texte du sous-titre', altDemo:'Charger un exemple et découvrir le studio →', enterHint:'Après l\'envoi, vous arrivez dans le <b>studio de sous-titres</b> — langue, style et export s\'y règlent', statLangs:'langues',
+  statStyles:'styles d\'export', statAlign:'temps alignés', statPrivacy:'sous-titres envoyés', whyTag:'✦ POURQUOI NOUS',
+  whyTitle:'Pas de la « traduction automatique », de la traduction niveau sous-titre', whySub:'Chaque fonction est pensée pour « l\'intégrer à la vidéo et ça marche »', feat1T:'Alignement temporel précis', feat1D:'La traduction suit le timecode original un à un ; fusions et découpes sont réparties selon la durée — aucun glissement, aucun décalage.',
+  feat2T:'Terminologie uniforme', feat2D:'Noms propres et mots ambigus passent dans un glossaire avant traduction : la ligne 1 et la ligne 300 restent cohérentes ; gardez n\'importe quel terme en original.', feat3T:'Retour à la ligne intelligent', feat3D:'Au-delà de la largeur, la ligne coupe à la ponctuation et aux frontières de mots selon les normes Netflix — jamais un mot coupé en deux.',
+  feat4T:'Zéro tics · correction de transcription', feat4D:'Les « euh, bah, you know » disparaissent tout seuls et les erreurs de transcription source sont corrigées au passage — propre à brûler tel quel.', feat5T:'Bilingue à volonté', feat5D:'Deux lignes, empilé ou écran divisé : changez à volonté, exportez des scripts TXT face à face, avec tous les raffinements niveau fansub.',
+  feat6T:'Vie privée d\'abord', feat6D:'Les sous-titres sont traités dans votre navigateur sans serveur tiers ; la clé API reste sur votre appareil.', expTag:'✦ EXPORT', aboutTitle:'À propos d\'AI-SRTSub',
+  aboutBody:'AI-SRTSub est un traducteur de sous-titres IA open source. Pour nous, un bon outil doit être gratuit, propre et respecter la vie privée — pas de pub, pas d\'inscription, on ne touche pas à vos fichiers. Auto-hébergez-vous ou venez le polir avec nous.', aboutRepo:'Dépôt GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Accueil',
+  wsUploadNew:'Nouveau sous-titre', projEmpty:'Aucun sous-titre chargé', secImport:'Importer', secLang:'Langues',
+  secStyle:'Style', secRules:'Règles', secEngine:'Moteur', lblSrcShort:'Langue source',
+  lblDstShort:'Langue cible', lblKeepTermsShort:'Garder les noms propres', lblAutoTermsShort:'Glossaire auto', lblMaxWShort:'Largeur de ligne',
+  /* v0.9.70 两段式界面新增 */
 },
 'id': {
   docTitle:'AI-SRTSub - Film & drama dunia, subtitle dalam bahasa Anda', appTitle:'🎬 Penerjemah Subtitle AI',
@@ -1210,7 +1633,7 @@ const I18N = {
   pending:'Tertunda…', dropNote:'(dihapus: murni pengisi/efek suara)',
   emptyRows:'Belum ada subtitle. Impor di kiri → pilih file / tempel / muat contoh.', emptyFilter:'Tidak ada hasil pada filter ini',
   reportSummary:'Laporan validasi sebelum ekspor',
-  footer:'Mesin aturan srt-core.js · multibahasa · pembungkusan: CJK/lebar penuh=1 unit, 2 karakter setengah lebar=1 unit; bungkus hanya jika seluruh subtitle melebihi ambang, tiap baris ≤ ambang',
+  footer:'AI-SRTSub · Sumber terbuka AGPL-3.0 · Subtitelmu selalu milikmu',
   bDrop:'pengisi·dihapus', bMerge:'digabung', bLong:'panjang',
   parseOk:'✅ Analisis OK: {0} subtitle.', parseWarn:'⚠ {0} subtitle dianalisis, {1} masalah format:',
   imported:'Diimpor {0}: {1} subtitle.', paste:'teks tempelan',
@@ -1249,7 +1672,20 @@ const I18N = {
   seoWho:'<strong>Untuk siapa:</strong> penerjemah video, kreator YouTube, pelajar bahasa, tim subtitle, dan tim yang perlu melokalkan konten video dengan cepat.',
   seoNoscript:'Alat ini membutuhkan JavaScript. Aktifkan JavaScript di browser Anda, lalu unggah file subtitle (SRT / VTT / ASS) untuk menerjemahkan subtitle dengan AI secara gratis.',
   verifyOk:'✅ Validasi lolos: {0} subtitle, penomoran berurutan, tanpa tumpang tindih, tanpa baris kosong.', pasteEmpty:'Area tempelan kosong.', issCps:'Kecepatan baca {0} kar./detik (batas {1})', issShortDur:'Tampil hanya {0} detik (min. 0,83)', cpsSummary:'Cek kecepatan baca: {0} terlalu cepat, {1} terlalu pendek (waktu dari file sumber — hanya informasi)',
-  colTc:'Lini masa', fnSub:'subtitle', fnBi:'dua bahasa', demoFile:'demo.srt', noteDeepSeek:'Direkomendasikan: cepat dan hemat biaya, ideal untuk terjemahan subtitle massal', errNotCfg:'Admin belum mengonfigurasi model bawaan. Gunakan API Anda sendiri.', errIpLimit:'Kuota gratis hari ini untuk IP ini ({0} permintaan) sudah habis. Masukkan API key Anda sendiri untuk melanjutkan.', errGlobalLimit:'Kuota gratis total situs hari ini sudah habis. Masukkan API key Anda sendiri untuk melanjutkan.', errBadJson:'Body permintaan bukan JSON yang valid', errNoMsgs:'messages tidak ada', errUpstream:'Panggilan model bawaan gagal: {0}', errNotJson:'Respons bukan JSON', errEmpty:'Respons kosong', errNoGroups:'JSON tidak memiliki groups', errNoGno:'Item JSON tidak memiliki gno', errMissGroup:'Hasil untuk grup {0} tidak ada', errNoArray:'JSON tidak memiliki array', anchorFail:'Pemeriksaan jangkar gagal (terjemahan grup {0} bukan {1})', issBlkNoNumTs:'Tidak dapat mengurai blok (nomor atau lini masa hilang)', issBlkNoTs:'Tidak dapat mengurai blok (lini masa hilang)', issBadTs:'Format lini masa tidak valid', issNumInc:'Nomor tidak bertambah', issEndLtStart:'Waktu selesai lebih awal dari waktu mulai', issOverlap:'Tumpang tindih dengan lini masa sebelumnya', issNoBlocks:'Tidak ada blok subtitle yang diurai', issZeroDur:'Durasi nol', issEmptyCue:'Konten kosong', issNoUsable:'Tidak ada blok subtitle yang dapat digunakan'
+  colTc:'Lini masa', fnSub:'subtitle', fnBi:'dua bahasa', demoFile:'demo.srt', noteDeepSeek:'Direkomendasikan: cepat dan hemat biaya, ideal untuk terjemahan subtitle massal', errNotCfg:'Admin belum mengonfigurasi model bawaan. Gunakan API Anda sendiri.', errIpLimit:'Kuota gratis hari ini untuk IP ini ({0} permintaan) sudah habis. Masukkan API key Anda sendiri untuk melanjutkan.', errGlobalLimit:'Kuota gratis total situs hari ini sudah habis. Masukkan API key Anda sendiri untuk melanjutkan.', errBadJson:'Body permintaan bukan JSON yang valid', errNoMsgs:'messages tidak ada', errUpstream:'Panggilan model bawaan gagal: {0}', errNotJson:'Respons bukan JSON', errEmpty:'Respons kosong', errNoGroups:'JSON tidak memiliki groups', errNoGno:'Item JSON tidak memiliki gno', errMissGroup:'Hasil untuk grup {0} tidak ada', errNoArray:'JSON tidak memiliki array', anchorFail:'Pemeriksaan jangkar gagal (terjemahan grup {0} bukan {1})', issBlkNoNumTs:'Tidak dapat mengurai blok (nomor atau lini masa hilang)', issBlkNoTs:'Tidak dapat mengurai blok (lini masa hilang)', issBadTs:'Format lini masa tidak valid', issNumInc:'Nomor tidak bertambah', issEndLtStart:'Waktu selesai lebih awal dari waktu mulai', issOverlap:'Tumpang tindih dengan lini masa sebelumnya', issNoBlocks:'Tidak ada blok subtitle yang diurai', issZeroDur:'Durasi nol', issEmptyCue:'Konten kosong', issNoUsable:'Tidak ada blok subtitle yang dapat digunakan',
+  brandName:'AI-SRTSub', navGuide:'Panduan', navRepo:'GitHub', heroTitle:'Masukkan subtitelnya,<br><em>sisanya biar AI yang urus</em>',
+  heroSub:'Terjemahan, penyelarasan waktu, dan tata letak sekaligus — subtitel siap pakai dalam beberapa menit. Gratis · Tanpa daftar · Privat', dropTitle:'Klik untuk memilih file, atau tarik ke sini 🎬', dropSub:'SRT · VTT · ASS · TXT · 20+ bahasa', altNoFile:'Tidak ada file?',
+  altPaste:'Tempel teks subtitel', altDemo:'Muat contoh & jelajahi studio →', enterHint:'Setelah diunggah, kamu langsung masuk <b>studio subtitel</b> — bahasa, gaya, dan ekspor diatur di sana', statLangs:'bahasa',
+  statStyles:'gaya ekspor', statAlign:'waktu selaras', statPrivacy:'subtitel ke server', whyTag:'✦ KENAPA KAMI',
+  whyTitle:'Bukan «terjemahan mesin», ini terjemahan kelas subtitel', whySub:'Setiap fitur dirancang untuk «langsung dipakai di video»', feat1T:'Penyelarasan waktu presisi', feat1D:'Terjemahan mengikuti timeline asli satu per satu; penggabungan dan pemisahan dibagi sesuai durasi — tanpa geser, tanpa tertukar.',
+  feat2T:'Istilah seragam sepanjang film', feat2D:'Nama diri dan kata ambigu diekstrak ke glosarium sebelum diterjemahkan: baris 1 dan baris 300 dijamin sama; istilah apa pun bisa dipaksa tetap asli.', feat3T:'Pindah baris cerdas', feat3D:'Melebihi lebar baris, otomatis pindah di tanda baca dan batas kata sesuai standar Netflix per bahasa — kata tak pernah dipotong dua.',
+  feat4T:'Buang kata sapaan · koreksi transkrip', feat4D:'«eh, em, you know» otomatis dihapus dan kesalahan transkripsi sumber ikut diperbaiki — bersih sampai siap dibakar langsung.', feat5T:'Dwibahasa sesukamu', feat5D:'Dua baris, bertumpuk, atau layar terbagi — ganti sesuka hati, ekspor naskah TXT berdampingan, lengkap dengan trik kelas fansub.',
+  feat6T:'Privasi utama', feat6D:'Subtitel diproses di browser-mu dan tidak lewat server pihak ketiga; API Key hanya tersimpan di perangkatmu.', expTag:'✦ EKSPOR', aboutTitle:'Tentang AI-SRTSub',
+  aboutBody:'AI-SRTSub adalah penerjemah subtitel AI sumber terbuka. Kami percaya alat yang baik harus gratis, bersih, dan menghormati privasi — tanpa iklan, tanpa pendaftaran, tanpa menyentuh file Anda. Silakan self-host atau ikut menyempurnakan.', aboutRepo:'Repositori GitHub', aboutLicense:'Sumber terbuka AGPL-3.0', wsBackHome:'Beranda',
+  wsUploadNew:'Subtitel baru', projEmpty:'Belum ada subtitel', secImport:'Impor', secLang:'Bahasa',
+  secStyle:'Gaya', secRules:'Aturan', secEngine:'Mesin', lblSrcShort:'Bahasa sumber',
+  lblDstShort:'Bahasa target', lblKeepTermsShort:'Pertahankan nama diri', lblAutoTermsShort:'Glosarium otomatis', lblMaxWShort:'Lebar baris',
+  /* v0.9.70 两段式界面新增 */
 },
 'hi': {
   docTitle:'AI-SRTSub - दुनिया की फ़िल्में और सीरीज़, सबटाइटल आपकी भाषा में', appTitle:'🎬 AI सबटाइटल अनुवादक',
@@ -1289,7 +1725,7 @@ const I18N = {
   pending:'प्रतीक्षारत…', dropNote:'(हटाया: शुद्ध फिलर/ध्वनि)',
   emptyRows:'अभी कोई सबटाइटल नहीं। बाईं ओर "आयात" → फ़ाइल चुनें / पेस्ट करें / नमूना लोड करें।', emptyFilter:'इस फ़िल्टर में कुछ नहीं',
   reportSummary:'निर्यात-पूर्व सत्यापन रिपोर्ट',
-  footer:'रूल इंजन srt-core.js · बहुभाषी · रैप: CJK/फुलविड्थ=1 इकाई, 2 हाफविड्थ अक्षर=1 इकाई; पूरा सबटाइटल सीमा पार करे तभी रैप, प्रत्येक पंक्ति ≤ सीमा',
+  footer:'AI-SRTSub · ओपन सोर्स AGPL-3.0 · आपके सबटाइटल हमेशा आपके हैं',
   bDrop:'फिलर·हटाया', bMerge:'विलय', bLong:'लंबा',
   parseOk:'✅ पार्स सफल: {0} सबटाइटल।', parseWarn:'⚠ {0} सबटाइटल पार्स, {1} प्रारूप समस्याएँ:',
   imported:'आयातित {0}: {1} सबटाइटल।', paste:'पेस्ट किया टेक्स्ट',
@@ -1328,7 +1764,20 @@ const I18N = {
   seoWho:'<strong>कौन उपयोग करता है:</strong> वीडियो अनुवादक, YouTube क्रिएटर और लोकलाइज़र, भाषा सीखने वाले, सबटाइटल ग्रुप और टीमें जिन्हें वीडियो सामग्री को तेज़ी से स्थानीयकृत करना हो।',
   seoNoscript:'इस टूल के लिए JavaScript आवश्यक है। कृपया अपने ब्राउज़र में JavaScript सक्षम करें, फिर AI से मुफ़्त में सबटाइटल अनुवाद करने के लिए सबटाइटल फ़ाइल (SRT / VTT / ASS) अपलोड करें।',
   verifyOk:'✅ सत्यापन पास: {0} सबटाइटल, क्रमिक क्रमांक, कोई ओवरलैप नहीं, कोई खाली पंक्ति नहीं।', pasteEmpty:'पेस्ट क्षेत्र खाली है।', issCps:'पढ़ने की गति {0} अक्षर/सेकंड (सीमा {1})', issShortDur:'केवल {0} सेकंड प्रदर्शित (न्यूनतम 0.83)', cpsSummary:'पढ़ने की गति जांच: {0} बहुत तेज़, {1} बहुत छोटे (समय स्रोत फ़ाइल से — केवल सूचनात्मक)',
-  colTc:'टाइमलाइन', fnSub:'सबटाइटल', fnBi:'द्विभाषी', demoFile:'demo.srt', noteDeepSeek:'अनुशंसित: तेज़ और किफ़ायती, सबटाइटल बैच अनुवाद के लिए आदर्श', errNotCfg:'व्यवस्थापक ने डिफ़ॉल्ट मॉडल कॉन्फ़िगर नहीं किया है। कृपया अपनी API का उपयोग करें।', errIpLimit:'आज इस IP का मुफ़्त अनुवाद कोटा ({0} अनुरोध) समाप्त हो गया है। जारी रखने के लिए अपनी API key डालें।', errGlobalLimit:'आज साइट कुल मुफ़्त अनुवाद कोटा समाप्त हो गया है। जारी रखने के लिए अपनी API key डालें।', errBadJson:'अनुरोध बॉडी मान्य JSON नहीं है', errNoMsgs:'messages अनुपस्थित', errUpstream:'डिफ़ॉल्ट मॉडल कॉल विफल: {0}', errNotJson:'प्रतिक्रिया JSON नहीं है', errEmpty:'प्रतिक्रिया खाली है', errNoGroups:'JSON में groups नहीं है', errNoGno:'JSON आइटम में gno नहीं है', errMissGroup:'समूह {0} का परिणाम नहीं मिला', errNoArray:'JSON में सरणी नहीं है', anchorFail:'एंकर जाँच विफल (समूह {0} का अनुवाद {1} नहीं है)', issBlkNoNumTs:'ब्लॉक पार्स नहीं हो सका (इंडेक्स या टाइमलाइन अनुपस्थित)', issBlkNoTs:'ब्लॉक पार्स नहीं हो सका (टाइमलाइन अनुपस्थित)', issBadTs:'अमान्य टाइमलाइन प्रारूप', issNumInc:'इंडेक्स बढ़ता नहीं है', issEndLtStart:'समाप्ति समय प्रारंभ समय से पहले है', issOverlap:'पिछली टाइमलाइन से अध्यारोपित है', issNoBlocks:'कोई सबटाइटल ब्लॉक पार्स नहीं हुआ', issZeroDur:'शून्य अवधि', issEmptyCue:'खाली सामग्री', issNoUsable:'कोई उपयोगी सबटाइटल ब्लॉक नहीं'
+  colTc:'टाइमलाइन', fnSub:'सबटाइटल', fnBi:'द्विभाषी', demoFile:'demo.srt', noteDeepSeek:'अनुशंसित: तेज़ और किफ़ायती, सबटाइटल बैच अनुवाद के लिए आदर्श', errNotCfg:'व्यवस्थापक ने डिफ़ॉल्ट मॉडल कॉन्फ़िगर नहीं किया है। कृपया अपनी API का उपयोग करें।', errIpLimit:'आज इस IP का मुफ़्त अनुवाद कोटा ({0} अनुरोध) समाप्त हो गया है। जारी रखने के लिए अपनी API key डालें।', errGlobalLimit:'आज साइट कुल मुफ़्त अनुवाद कोटा समाप्त हो गया है। जारी रखने के लिए अपनी API key डालें।', errBadJson:'अनुरोध बॉडी मान्य JSON नहीं है', errNoMsgs:'messages अनुपस्थित', errUpstream:'डिफ़ॉल्ट मॉडल कॉल विफल: {0}', errNotJson:'प्रतिक्रिया JSON नहीं है', errEmpty:'प्रतिक्रिया खाली है', errNoGroups:'JSON में groups नहीं है', errNoGno:'JSON आइटम में gno नहीं है', errMissGroup:'समूह {0} का परिणाम नहीं मिला', errNoArray:'JSON में सरणी नहीं है', anchorFail:'एंकर जाँच विफल (समूह {0} का अनुवाद {1} नहीं है)', issBlkNoNumTs:'ब्लॉक पार्स नहीं हो सका (इंडेक्स या टाइमलाइन अनुपस्थित)', issBlkNoTs:'ब्लॉक पार्स नहीं हो सका (टाइमलाइन अनुपस्थित)', issBadTs:'अमान्य टाइमलाइन प्रारूप', issNumInc:'इंडेक्स बढ़ता नहीं है', issEndLtStart:'समाप्ति समय प्रारंभ समय से पहले है', issOverlap:'पिछली टाइमलाइन से अध्यारोपित है', issNoBlocks:'कोई सबटाइटल ब्लॉक पार्स नहीं हुआ', issZeroDur:'शून्य अवधि', issEmptyCue:'खाली सामग्री', issNoUsable:'कोई उपयोगी सबटाइटल ब्लॉक नहीं',
+  brandName:'AI-SRTSub', navGuide:'उपयोग गाइड', navRepo:'GitHub', heroTitle:'सबटाइटल यहाँ डालें,<br><em>बाकी AI के भरोसे</em>',
+  heroSub:'अनुवाद, टाइमलाइन अलाइनमेंट और लेआउट एक साथ — कुछ ही मिनटों में वीडियो में सीधे इस्तेमाल होने वाले सबटाइटल। मुफ़्त · रजिस्ट्रेशन नहीं · प्राइवेसी सुरक्षित', dropTitle:'फ़ाइल चुनने के लिए क्लिक करें, या सीधे यहाँ खींचकर छोड़ें 🎬', dropSub:'SRT · VTT · ASS · TXT · 20+ भाषाएँ', altNoFile:'फ़ाइल नहीं है?',
+  altPaste:'सबटाइटल टेक्स्ट पेस्ट करें', altDemo:'नमूना लोड कर स्टूडियो देखें →', enterHint:'अपलोड के बाद आप सीधे <b>सबटाइटल स्टूडियो</b> में पहुँचेंगे — भाषा, स्टाइल और एक्सपोर्ट वहीं सेट होते हैं', statLangs:'भाषाएँ',
+  statStyles:'एक्सपोर्ट स्टाइल', statAlign:'टाइमलाइन अलाइन', statPrivacy:'सर्वर पर अपलोड', whyTag:'✦ हमारी खासियत',
+  whyTitle:'यह «मशीन ट्रांसलेशन» नहीं, सबटाइटल-ग्रेड अनुवाद है', whySub:'हर फ़ीचर «वीडियो में डालो और चल पड़े» इसी लिए बना है', feat1T:'सटीक टाइमलाइन अलाइनमेंट', feat1D:'अनुवाद मूल टाइमलाइन के साथ एक-एक कतार में चलता है; मर्ज और स्प्लिट समय के हिसाब से बँटते हैं — न खिसकता है, न बिगड़ता है।',
+  feat2T:'पूरी फ़िल्म में एक जैसे शब्द', feat2D:'अनुवाद से पहले नाम और दुविधापूर्ण शब्दों की ग्लॉसरी बनती है: पहली और 300वीं कतार एक जैसी रहती हैं; किसी भी शब्द को मूल रूप में रखना भी चुन सकते हैं।', feat3T:'स्मार्ट लाइन ब्रेक', feat3D:'चौड़ाई पार होने पर विराम चिह्न और शब्द-सीमा पर लाइन टूटती है, Netflix के भाषा-मानकों के मुताबिक — शब्द बीच से कभी नहीं कटता।',
+  feat4T:'फ़िलर हटाना · ट्रांसक्रिप्शन सुधार', feat4D:'«अरे, यानी, you know» अपने आप हट जाते हैं और स्रोत की सुनने की गलतियाँ भी साथ में ठीक होती हैं — सीधे बर्न करने लायक साफ़ अनुवाद।', feat5T:'दोभाषी सबटाइटल अपने हिसाब से', feat5D:'दो लाइन, स्टैक या ऊपर-नीचे स्प्लिट — जैसा चाहें बदलें, TXT मिलान-पाठ भी निकालें, फ़ैनसब लेवल के सारे तरीके मौजूद।',
+  feat6T:'प्राइवेसी सबसे पहले', feat6D:'सबटाइटल आपके ब्राउज़र में प्रोसेस होते हैं, किसी थर्ड-पार्टी सर्वर से नहीं गुज़रते; API Key सिर्फ़ आपके डिवाइस पर रहता है।', expTag:'✦ एक्सपोर्ट स्टाइल', aboutTitle:'AI-SRTSub के बारे में',
+  aboutBody:'AI-SRTSub एक ओपन-सोर्स AI सबटाइटल अनुवादक है। हम मानते हैं कि अच्छा टूल मुफ़्त, साफ़ और प्राइवेसी का ख्याल रखने वाला होना चाहिए — न विज्ञापन, न रजिस्ट्रेशन, न आपकी फ़ाइलों को छूना। सेल्फ-होस्ट करें या साथ में निखारें।', aboutRepo:'GitHub रिपॉज़िटरी', aboutLicense:'AGPL-3.0 ओपन सोर्स', wsBackHome:'होम',
+  wsUploadNew:'नया सबटाइटल', projEmpty:'कोई सबटाइटल नहीं', secImport:'इंपोर्ट', secLang:'भाषा',
+  secStyle:'अनुवाद स्टाइल', secRules:'नियम', secEngine:'इंजन', lblSrcShort:'स्रोत भाषा',
+  lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'नाम मूल रूप में रखें', lblAutoTermsShort:'ऑटो ग्लॉसरी', lblMaxWShort:'लाइन चौड़ाई',
+  /* v0.9.70 两段式界面新增 */
 },
 'th': {
   docTitle:'AI-SRTSub - หนังและซีรีส์จากทั่วโลก ซับในภาษาของคุณ', appTitle:'🎬 ตัวแปลซับไตเติล AI',
@@ -1368,7 +1817,7 @@ const I18N = {
   pending:'รอแปล…', dropNote:'(ลบแล้ว: คำเสียบ/เสียงเอฟเฟกต์ล้วน)',
   emptyRows:'ยังไม่มีซับไตเติล นำเข้าทางซ้าย → เลือกไฟล์ / วาง / โหลดตัวอย่าง', emptyFilter:'ไม่มีรายการภายใต้ตัวกรองนี้',
   reportSummary:'รายงานตรวจสอบก่อนส่งออก',
-  footer:'เอนจินกฎ srt-core.js · รองรับหลายภาษา · เกณฑ์ตัดบรรทัด: CJK/เต็มความกว้าง=1 หน่วย, อักษรครึ่งความกว้าง 2 ตัว=1 หน่วย; ตัดเมื่อทั้งซับเกินเกณฑ์เท่านั้น แต่ละบรรทัด ≤ เกณฑ์',
+  footer:'AI-SRTSub · โอเพนซอร์ส AGPL-3.0 · ซับของคุณเป็นของคุณเสมอ',
   bDrop:'คำเสียบ·ลบแล้ว', bMerge:'รวมแล้ว', bLong:'ยาว',
   parseOk:'✅ วิเคราะห์สำเร็จ: {0} ซับไตเติล', parseWarn:'⚠ วิเคราะห์ได้ {0} ซับ มี {1} ปัญหารูปแบบ:',
   imported:'นำเข้า {0} แล้ว: {1} ซับไตเติล', paste:'ข้อความที่วาง',
@@ -1407,7 +1856,20 @@ const I18N = {
   seoWho:'<strong>เหมาะสำหรับ:</strong> ผู้แปลวิดีโอ ครีเอเตอร์ YouTube และผู้แปลท้องถิ่น ผู้เรียนภาษา กลุ่มซับไตเติล และทีมที่ต้องการปรับเนื้อหาวิดีโอให้เป็นภาษาท้องถิ่นอย่างรวดเร็ว',
   seoNoscript:'เครื่องมือนี้ต้องใช้ JavaScript กรุณาเปิดใช้ JavaScript ในเบราว์เซอร์ของคุณ แล้วอัปโหลดไฟล์ซับไตเติล (SRT / VTT / ASS) เพื่อแปลซับไตเติลด้วย AI ฟรี',
   verifyOk:'✅ ตรวจสอบผ่าน: {0} ซับ เลขเรียงต่อเนื่อง ไทม์ไลน์ไม่ซ้อนกัน ไม่มีบรรทัดว่าง', pasteEmpty:'พื้นที่วางข้อความว่างอยู่', issCps:'ความเร็วในการอ่าน {0} ตัว/วิ (เกณฑ์ {1})', issShortDur:'แสดงเพียง {0} วิ (ขั้นต่ำ 0.83)', cpsSummary:'ตรวจความเร็วการอ่าน: {0} รายการเร็วเกิน, {1} รายการสั้นเกิน (เวลามาจากไฟล์ต้นฉบับ เป็นข้อมูลประกอบ)',
-  colTc:'ไทม์ไลน์', fnSub:'ซับไตเติล', fnBi:'สองภาษา', demoFile:'demo.srt', noteDeepSeek:'แนะนำ: เร็วและคุ้มค่า เหมาะกับการแปลซับไตเติลเป็นชุด', errNotCfg:'ผู้ดูแลยังไม่ได้ตั้งค่าโมเดลเริ่มต้น โปรดใช้ API ของคุณเอง', errIpLimit:'โควตาฟรีวันนี้ของ IP นี้ ({0} คำขอ) หมดแล้ว กรอก API Key ของคุณเองเพื่อใช้ต่อ', errGlobalLimit:'โควตาฟรีรวมของไซต์วันนี้หมดแล้ว กรอก API Key ของคุณเองเพื่อใช้ต่อ', errBadJson:'เนื้อหาคำขอไม่ใช่ JSON ที่ถูกต้อง', errNoMsgs:'ไม่มี messages', errUpstream:'เรียกโมเดลเริ่มต้นไม่สำเร็จ: {0}', errNotJson:'การตอบกลับไม่ใช่ JSON', errEmpty:'การตอบกลับว่างเปล่า', errNoGroups:'JSON ไม่มี groups', errNoGno:'รายการ JSON ไม่มี gno', errMissGroup:'ไม่มีผลลัพธ์ของกลุ่ม {0}', errNoArray:'JSON ไม่มีอาร์เรย์', anchorFail:'ตรวจสอบยึดหลักไม่ผ่าน (คำแปลของกลุ่ม {0} ไม่ใช่{1})', issBlkNoNumTs:'แยกวิเคราะห์บล็อกไม่ได้ (ขาดหมายเลขหรือไทม์ไลน์)', issBlkNoTs:'แยกวิเคราะห์บล็อกไม่ได้ (ขาดไทม์ไลน์)', issBadTs:'รูปแบบไทม์ไลน์ไม่ถูกต้อง', issNumInc:'หมายเลขไม่เรียงจากน้อยไปมาก', issEndLtStart:'เวลาจบก่อนเวลาเริ่ม', issOverlap:'ทับซ้อนกับไทม์ไลน์ก่อนหน้า', issNoBlocks:'ไม่พบบล็อกซับไตเติลเลย', issZeroDur:'ระยะเวลาเป็นศูนย์', issEmptyCue:'เนื้อหาว่างเปล่า', issNoUsable:'ไม่มีบล็อกซับไตเติลที่ใช้ได้'
+  colTc:'ไทม์ไลน์', fnSub:'ซับไตเติล', fnBi:'สองภาษา', demoFile:'demo.srt', noteDeepSeek:'แนะนำ: เร็วและคุ้มค่า เหมาะกับการแปลซับไตเติลเป็นชุด', errNotCfg:'ผู้ดูแลยังไม่ได้ตั้งค่าโมเดลเริ่มต้น โปรดใช้ API ของคุณเอง', errIpLimit:'โควตาฟรีวันนี้ของ IP นี้ ({0} คำขอ) หมดแล้ว กรอก API Key ของคุณเองเพื่อใช้ต่อ', errGlobalLimit:'โควตาฟรีรวมของไซต์วันนี้หมดแล้ว กรอก API Key ของคุณเองเพื่อใช้ต่อ', errBadJson:'เนื้อหาคำขอไม่ใช่ JSON ที่ถูกต้อง', errNoMsgs:'ไม่มี messages', errUpstream:'เรียกโมเดลเริ่มต้นไม่สำเร็จ: {0}', errNotJson:'การตอบกลับไม่ใช่ JSON', errEmpty:'การตอบกลับว่างเปล่า', errNoGroups:'JSON ไม่มี groups', errNoGno:'รายการ JSON ไม่มี gno', errMissGroup:'ไม่มีผลลัพธ์ของกลุ่ม {0}', errNoArray:'JSON ไม่มีอาร์เรย์', anchorFail:'ตรวจสอบยึดหลักไม่ผ่าน (คำแปลของกลุ่ม {0} ไม่ใช่{1})', issBlkNoNumTs:'แยกวิเคราะห์บล็อกไม่ได้ (ขาดหมายเลขหรือไทม์ไลน์)', issBlkNoTs:'แยกวิเคราะห์บล็อกไม่ได้ (ขาดไทม์ไลน์)', issBadTs:'รูปแบบไทม์ไลน์ไม่ถูกต้อง', issNumInc:'หมายเลขไม่เรียงจากน้อยไปมาก', issEndLtStart:'เวลาจบก่อนเวลาเริ่ม', issOverlap:'ทับซ้อนกับไทม์ไลน์ก่อนหน้า', issNoBlocks:'ไม่พบบล็อกซับไตเติลเลย', issZeroDur:'ระยะเวลาเป็นศูนย์', issEmptyCue:'เนื้อหาว่างเปล่า', issNoUsable:'ไม่มีบล็อกซับไตเติลที่ใช้ได้',
+  brandName:'AI-SRTSub', navGuide:'คู่มือ', navRepo:'GitHub', heroTitle:'โยนซับเข้ามาเลย<br><em>ที่เหลือให้ AI จัดการ</em>',
+  heroSub:'แปล จัดไทม์ไลน์ จัดหน้ากระดาษในรอบเดียว — ได้ซับที่ใช้ได้ทันทีในไม่กี่นาที ฟรี · ไม่ต้องสมัคร · ปลอดภัย', dropTitle:'คลิกเลือกไฟล์ หรือลากมาวางที่นี่เลย 🎬', dropSub:'SRT · VTT · ASS · TXT · 20+ ภาษา', altNoFile:'ไม่มีไฟล์ติดมือ?',
+  altPaste:'วางข้อความซับ', altDemo:'โหลดตัวอย่างแล้วเข้าชมสตูดิโอ →', enterHint:'อัปโหลดแล้วจะเข้าสู่<b>สตูดิโอซับ</b>โดยอัตโนมัติ — ตั้งค่าภาษา สไตล์ และการส่งออกได้ที่นั่น', statLangs:'ภาษา',
+  statStyles:'สไตล์ส่งออก', statAlign:'ไทม์ไลน์ตรงกัน', statPrivacy:'ซับที่อัปเซิร์ฟเวอร์', whyTag:'✦ ทำไมต้องเรา',
+  whyTitle:'นี่ไม่ใช่ «แปลเครื่อง» แต่เป็นการแปลระดับซับ', whySub:'ทุกฟีเจอร์ถูกออกแบบเพื่อ «ใส่เข้าวิดีโอแล้วใช้ได้เลย»', feat1T:'ไทม์ไลน์ตรงเป๊ะ', feat1D:'คำแปลเกาะไทม์ไลน์เดิมแบบบรรทัดต่อบรรทัด การรวม/แยกจ่ายเวลาตามความยาวอัตโนมัติ ไม่เลื่อน ไม่สลับ',
+  feat2T:'ศัพท์ตรงกันทั้งเรื่อง', feat2D:'ชื่อเฉพาะและคำกำกวมถูกดึงเป็นอภิธานศัพท์ก่อนแปล แถวที่ 1 กับแถวที่ 300 การันตีตรงกัน และกำหนดให้คงคำเดิมได้ด้วย', feat3T:'ตัดบรรทัดอัจฉริยะ', feat3D:'เกินความกว้างบรรทัดก็ตัดที่เครื่องหมายวรรคตอนและขอบคำ ตามมาตรฐาน Netflix รายภาษา ไม่มีตัดคำครึ่งเด็ดขาด',
+  feat4T:'ลบคำไร้ความหมาย · แก้คำฟังผิด', feat4D:'«อ่า, คือ, you know» ถูกลบอัตโนมัติ พร้อมแก้คำที่ถอดเสียงผิดในต้นฉบับไปด้วย — สะอาดพอจะเบิร์นลงวิดีโอได้เลย', feat5T:'ซับสองภาษาจัดได้ใจ', feat5D:'สองบรรทัด ซ้อนกัน หรือแยกบนล่าง สลับได้ตามใจ ส่งออกสคริปต์ TXT เทียบกันได้ ครบทุกเทคนิคระดับทีมซับ',
+  feat6T:'ความเป็นส่วนตัวมาก่อน', feat6D:'ซับถูกประมวลผลในเบราว์เซอร์ของคุณ ไม่ผ่านเซิร์ฟเวอร์บุคคลที่สาม และ API Key เก็บไว้ในเครื่องคุณเท่านั้น', expTag:'✦ ส่งออก', aboutTitle:'เกี่ยวกับ AI-SRTSub',
+  aboutBody:'AI-SRTSub คือเครื่องมือแปลซับด้วย AI แบบโอเพนซอร์ส เราเชื่อว่าเครื่องมือที่ดีต้องฟรี สะอาด และเคารพความเป็นส่วนตัว — ไม่มีโฆษณา ไม่ต้องสมัคร ไม่แตะไฟล์ของคุณ ติดตั้งเองได้ ช่วยกันขัดเกลาได้', aboutRepo:'รีโพซิทอรี GitHub', aboutLicense:'โอเพนซอร์ส AGPL-3.0', wsBackHome:'หน้าแรก',
+  wsUploadNew:'ซับใหม่', projEmpty:'ยังไม่มีซับ', secImport:'นำเข้า', secLang:'ภาษา',
+  secStyle:'สไตล์', secRules:'กฎการประมวลผล', secEngine:'เอนจิน', lblSrcShort:'ภาษาต้นทาง',
+  lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'คงชื่อเฉพาะภาษาเดิม', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', lblMaxWShort:'ความกว้างบรรทัด',
+  /* v0.9.70 两段式界面新增 */
 },
 'vi': {
   docTitle:'AI-SRTSub - Phim và series thế giới, phụ đề bằng ngôn ngữ của bạn', appTitle:'🎬 Trình Dịch Phụ đề AI',
@@ -1447,7 +1909,7 @@ const I18N = {
   pending:'Đang chờ…', dropNote:'(đã xóa: thuần từ đệm/âm thanh)',
   emptyRows:'Chưa có phụ đề. Nhập bên trái → chọn file / dán / tải mẫu.', emptyFilter:'Không có gì dưới bộ lọc này',
   reportSummary:'Báo cáo kiểm tra trước khi xuất',
-  footer:'Cỗ máy quy tắc srt-core.js · đa ngôn ngữ · ngắt dòng: CJK/độ rộng đầy=1 đơn vị, 2 ký tự nửa rộng=1 đơn vị; chỉ ngắt khi cả phụ đề vượt ngưỡng, mỗi dòng ≤ ngưỡng',
+  footer:'AI-SRTSub · Mã nguồn mở AGPL-3.0 · Phụ đề của bạn luôn là của bạn',
   bDrop:'đệm·đã xóa', bMerge:'gộp', bLong:'dài',
   parseOk:'✅ Phân tích OK: {0} phụ đề.', parseWarn:'⚠ Đã phân tích {0} phụ đề, {1} lỗi định dạng:',
   imported:'Đã nhập {0}: {1} phụ đề.', paste:'văn bản dán',
@@ -1486,7 +1948,20 @@ const I18N = {
   seoWho:'<strong>Ai sử dụng:</strong> người dịch video, người sáng tạo và người bản địa hóa trên YouTube, người học ngôn ngữ, các nhóm phụ đề và đội ngũ cần bản địa hóa nội dung video nhanh chóng.',
   seoNoscript:'Công cụ này yêu cầu JavaScript. Vui lòng bật JavaScript trong trình duyệt, sau đó tải lên tệp phụ đề (SRT / VTT / ASS) để dịch phụ đề bằng AI miễn phí.',
   verifyOk:'✅ Kiểm tra đạt: {0} phụ đề, số thứ tự liên tục, không chồng lấn, không dòng trống.', pasteEmpty:'Vùng dán đang trống.', issCps:'Tốc độ đọc {0} ký tự/giây (giới hạn {1})', issShortDur:'Chỉ hiển thị {0} giây (tối thiểu 0,83)', cpsSummary:'Kiểm tra tốc độ đọc: {0} quá nhanh, {1} quá ngắn (thời gian lấy từ tệp nguồn — chỉ mang tính tham khảo)',
-  colTc:'Dòng thời gian', fnSub:'phu-de', fnBi:'song-ngu', demoFile:'demo.srt', noteDeepSeek:'Đề xuất: nhanh và tiết kiệm, lý tưởng cho dịch phụ đề theo loạt', errNotCfg:'Quản trị viên chưa cấu hình mô hình mặc định. Hãy dùng API của riêng bạn.', errIpLimit:'Hạn mức miễn phí hôm nay cho IP này ({0} yêu cầu) đã hết. Nhập API key của riêng bạn để tiếp tục.', errGlobalLimit:'Hạn mức miễn phí tổng của site hôm nay đã hết. Nhập API key của riêng bạn để tiếp tục.', errBadJson:'Thân yêu cầu không phải JSON hợp lệ', errNoMsgs:'Thiếu messages', errUpstream:'Gọi mô hình mặc định thất bại: {0}', errNotJson:'Phản hồi không phải JSON', errEmpty:'Phản hồi trống', errNoGroups:'JSON thiếu groups', errNoGno:'Mục JSON thiếu gno', errMissGroup:'Thiếu kết quả của nhóm {0}', errNoArray:'JSON thiếu mảng', anchorFail:'Kiểm tra neo không đạt (bản dịch của nhóm {0} không phải {1})', issBlkNoNumTs:'Không thể phân tích khối (thiếu số thứ tự hoặc dòng thời gian)', issBlkNoTs:'Không thể phân tích khối (thiếu dòng thời gian)', issBadTs:'Định dạng dòng thời gian không hợp lệ', issNumInc:'Số thứ tự không tăng', issEndLtStart:'Thời gian kết thúc sớm hơn thời gian bắt đầu', issOverlap:'Chồng lấn với dòng thời gian trước', issNoBlocks:'Không phân tích được khối phụ đề nào', issZeroDur:'Thời lượng bằng không', issEmptyCue:'Nội dung trống', issNoUsable:'Không có khối phụ đề khả dụng'
+  colTc:'Dòng thời gian', fnSub:'phu-de', fnBi:'song-ngu', demoFile:'demo.srt', noteDeepSeek:'Đề xuất: nhanh và tiết kiệm, lý tưởng cho dịch phụ đề theo loạt', errNotCfg:'Quản trị viên chưa cấu hình mô hình mặc định. Hãy dùng API của riêng bạn.', errIpLimit:'Hạn mức miễn phí hôm nay cho IP này ({0} yêu cầu) đã hết. Nhập API key của riêng bạn để tiếp tục.', errGlobalLimit:'Hạn mức miễn phí tổng của site hôm nay đã hết. Nhập API key của riêng bạn để tiếp tục.', errBadJson:'Thân yêu cầu không phải JSON hợp lệ', errNoMsgs:'Thiếu messages', errUpstream:'Gọi mô hình mặc định thất bại: {0}', errNotJson:'Phản hồi không phải JSON', errEmpty:'Phản hồi trống', errNoGroups:'JSON thiếu groups', errNoGno:'Mục JSON thiếu gno', errMissGroup:'Thiếu kết quả của nhóm {0}', errNoArray:'JSON thiếu mảng', anchorFail:'Kiểm tra neo không đạt (bản dịch của nhóm {0} không phải {1})', issBlkNoNumTs:'Không thể phân tích khối (thiếu số thứ tự hoặc dòng thời gian)', issBlkNoTs:'Không thể phân tích khối (thiếu dòng thời gian)', issBadTs:'Định dạng dòng thời gian không hợp lệ', issNumInc:'Số thứ tự không tăng', issEndLtStart:'Thời gian kết thúc sớm hơn thời gian bắt đầu', issOverlap:'Chồng lấn với dòng thời gian trước', issNoBlocks:'Không phân tích được khối phụ đề nào', issZeroDur:'Thời lượng bằng không', issEmptyCue:'Nội dung trống', issNoUsable:'Không có khối phụ đề khả dụng',
+  brandName:'AI-SRTSub', navGuide:'Hướng dẫn', navRepo:'GitHub', heroTitle:'Thả phụ đề vào đây,<br><em>phần còn lại để AI lo</em>',
+  heroSub:'Dịch, căn thời gian và dàn trang trong một lượt — phụ đề dùng được ngay sau vài phút. Miễn phí · Không cần đăng ký · Riêng tư', dropTitle:'Bấm chọn tệp, hoặc kéo thả vào đây 🎬', dropSub:'SRT · VTT · ASS · TXT · hơn 20 ngôn ngữ', altNoFile:'Chưa có tệp?',
+  altPaste:'Dán văn bản phụ đề', altDemo:'Tải ví dụ và ghé studio →', enterHint:'Sau khi tải lên bạn sẽ vào <b>studio phụ đề</b> — ngôn ngữ, phong cách và xuất tệp đều chỉnh ở đó', statLangs:'ngôn ngữ',
+  statStyles:'kiểu xuất tệp', statAlign:'căn thời gian', statPrivacy:'phụ đề lên máy chủ', whyTag:'✦ VÌ SAO CHỌN CHÚNG TÔI',
+  whyTitle:'Không phải «dịch máy», mà là dịch chuẩn phụ đề', whySub:'Mọi tính năng đều được thiết kế để «nhét vào video là dùng được»', feat1T:'Căn thời gian chính xác', feat1D:'Bản dịch bám trục thời gian gốc từng dòng một; gộp/tách được chia theo thời lượng — không lệch, không chéo dòng.',
+  feat2T:'Thuật ngữ thống nhất cả phim', feat2D:'Tên riêng và từ gây hiểu lầm được trích thành bảng thuật ngữ trước khi dịch: dòng 1 và dòng 300 luôn nhất quán; bạn còn có thể ép giữ nguyên bất kỳ thuật ngữ nào.', feat3T:'Ngắt dòng thông minh', feat3D:'Vượt độ rộng dòng sẽ tự ngắt tại dấu câu và ranh giới từ theo chuẩn Netflix từng ngôn ngữ — không bao giờ cắt đôi một từ.',
+  feat4T:'Lọc từ đệm · sửa lỗi chép lời', feat4D:'«ừm, à, you know» tự động biến mất, lỗi chép lời ở bản gốc cũng được sửa luôn — sạch bóng đủ để nung thẳng vào video.', feat5T:'Song ngữ tùy ý', feat5D:'Hai dòng, chồng lớp hay chia trên dưới — đổi thoải mái, xuất kịch bản TXT đối chiếu, đủ mọi chiêu chuẩn đội sub.',
+  feat6T:'Riêng tư trên hết', feat6D:'Phụ đề được xử lý ngay trong trình duyệt, không qua máy chủ bên thứ ba; API Key chỉ nằm trên máy bạn.', expTag:'✦ XUẤT TỆP', aboutTitle:'Về AI-SRTSub',
+  aboutBody:'AI-SRTSub là công cụ dịch phụ đề bằng AI mã nguồn mở. Chúng tôi tin công cụ tốt phải miễn phí, sạch sẽ và tôn trọng riêng tư — không quảng cáo, không đăng ký, không động vào tệp của bạn. Tự triển khai hay cùng nhau hoàn thiện đều chào đón.', aboutRepo:'Kho GitHub', aboutLicense:'Mã nguồn mở AGPL-3.0', wsBackHome:'Trang chủ',
+  wsUploadNew:'Phụ đề mới', projEmpty:'Chưa có phụ đề', secImport:'Nhập', secLang:'Ngôn ngữ',
+  secStyle:'Phong cách', secRules:'Quy tắc', secEngine:'Engine', lblSrcShort:'Ngôn ngữ nguồn',
+  lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Giữ nguyên tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', lblMaxWShort:'Độ rộng dòng',
+  /* v0.9.70 两段式界面新增 */
 },
 'ru': {
   docTitle:'AI-SRTSub - Фильмы и сериалы всего мира с субтитрами на вашем языке', appTitle:'🎬 ИИ-переводчик Субтитров',
@@ -1526,7 +2001,7 @@ const I18N = {
   pending:'Ожидает…', dropNote:'(удалено: чистый заполнитель/звук)',
   emptyRows:'Субтитров пока нет. Импорт слева → выбрать файл / вставить / пример.', emptyFilter:'Под этим фильтром пусто',
   reportSummary:'Отчёт проверки перед экспортом',
-  footer:'Движок правил srt-core.js · многоязычность · перенос: CJK/полная ширина=1 единица, 2 символа полуширины=1 единица; перенос только когда субтитр целиком превышает порог, каждая строка ≤ порог',
+  footer:'AI-SRTSub · Открытый код AGPL-3.0 · Ваши субтитры всегда ваши',
   bDrop:'заполнитель·убран', bMerge:'объединено', bLong:'длинный',
   parseOk:'✅ Разбор успешно: {0} субтитров.', parseWarn:'⚠ Разобрано {0} субтитров, {1} проблем формата:',
   imported:'Импортировано {0}: {1} субтитров.', paste:'вставленный текст',
@@ -1565,7 +2040,20 @@ const I18N = {
   seoWho:'<strong>Кто использует:</strong> видеопереводчики, авторы и локализаторы YouTube, изучающие языки, команды субтитров и группы, которым нужно быстро локализовать видеоконтент.',
   seoNoscript:'Для этого инструмента требуется JavaScript. Пожалуйста, включите JavaScript в браузере, затем загрузите файл субтитров (SRT / VTT / ASS), чтобы бесплатно переводить субтитры с помощью ИИ.',
   verifyOk:'✅ Проверка пройдена: {0} субтитров, нумерация последовательна, наложений нет, пустых строк нет.', pasteEmpty:'Область вставки пуста.', issCps:'Скорость чтения {0} зн./с (лимит {1})', issShortDur:'На экране всего {0} с (минимум 0,83)', cpsSummary:'Проверка скорости чтения: {0} слишком быстрых, {1} слишком коротких (тайминг из исходного файла — только справочно)',
-  colTc:'Таймлайн', fnSub:'субтитры', fnBi:'двуязычные', demoFile:'demo.srt', noteDeepSeek:'Рекомендуется: быстро и недорого, идеально для пакетного перевода субтитров', errNotCfg:'Администратор ещё не настроил модель по умолчанию. Используйте свой API.', errIpLimit:'Бесплатная квота на сегодня для этого IP ({0} запросов) исчерпана. Введите свой API-ключ, чтобы продолжить.', errGlobalLimit:'Общая бесплатная квота сайта на сегодня исчерпана. Введите свой API-ключ, чтобы продолжить.', errBadJson:'Тело запроса не является корректным JSON', errNoMsgs:'Отсутствует messages', errUpstream:'Не удалось вызвать модель по умолчанию: {0}', errNotJson:'Ответ не является JSON', errEmpty:'Пустой ответ', errNoGroups:'В JSON нет groups', errNoGno:'В элементе JSON нет gno', errMissGroup:'Нет результата для группы {0}', errNoArray:'В JSON нет массива', anchorFail:'Проверка привязки не пройдена (перевод группы {0} не на {1})', issBlkNoNumTs:'Не удалось разобрать блок (нет номера или таймлайна)', issBlkNoTs:'Не удалось разобрать блок (нет таймлайна)', issBadTs:'Неверный формат таймлайна', issNumInc:'Номер не возрастает', issEndLtStart:'Время окончания раньше времени начала', issOverlap:'Пересекается с предыдущим таймлайном', issNoBlocks:'Не разобран ни один блок субтитров', issZeroDur:'Нулевая длительность', issEmptyCue:'Пустое содержимое', issNoUsable:'Нет пригодных блоков субтитров'
+  colTc:'Таймлайн', fnSub:'субтитры', fnBi:'двуязычные', demoFile:'demo.srt', noteDeepSeek:'Рекомендуется: быстро и недорого, идеально для пакетного перевода субтитров', errNotCfg:'Администратор ещё не настроил модель по умолчанию. Используйте свой API.', errIpLimit:'Бесплатная квота на сегодня для этого IP ({0} запросов) исчерпана. Введите свой API-ключ, чтобы продолжить.', errGlobalLimit:'Общая бесплатная квота сайта на сегодня исчерпана. Введите свой API-ключ, чтобы продолжить.', errBadJson:'Тело запроса не является корректным JSON', errNoMsgs:'Отсутствует messages', errUpstream:'Не удалось вызвать модель по умолчанию: {0}', errNotJson:'Ответ не является JSON', errEmpty:'Пустой ответ', errNoGroups:'В JSON нет groups', errNoGno:'В элементе JSON нет gno', errMissGroup:'Нет результата для группы {0}', errNoArray:'В JSON нет массива', anchorFail:'Проверка привязки не пройдена (перевод группы {0} не на {1})', issBlkNoNumTs:'Не удалось разобрать блок (нет номера или таймлайна)', issBlkNoTs:'Не удалось разобрать блок (нет таймлайна)', issBadTs:'Неверный формат таймлайна', issNumInc:'Номер не возрастает', issEndLtStart:'Время окончания раньше времени начала', issOverlap:'Пересекается с предыдущим таймлайном', issNoBlocks:'Не разобран ни один блок субтитров', issZeroDur:'Нулевая длительность', issEmptyCue:'Пустое содержимое', issNoUsable:'Нет пригодных блоков субтитров',
+  brandName:'AI-SRTSub', navGuide:'Руководство', navRepo:'GitHub', heroTitle:'Бросьте субтитры сюда,<br><em>остальное сделает ИИ</em>',
+  heroSub:'Перевод, выравнивание таймкодов и вёрстка за один проход — готовые субтитры через несколько минут. Бесплатно · Без регистрации · Приватно', dropTitle:'Нажмите, чтобы выбрать файл, или перетащите его сюда 🎬', dropSub:'SRT · VTT · ASS · TXT · более 20 языков', altNoFile:'Нет файла под рукой?',
+  altPaste:'Вставить текст субтитров', altDemo:'Загрузить пример и осмотреться в студии →', enterHint:'После загрузки вы попадёте в <b>студию субтитров</b> — язык, стиль и экспорт настраиваются там', statLangs:'языков',
+  statStyles:'стилей экспорта', statAlign:'таймкоды выровнены', statPrivacy:'субтитров на сервер', whyTag:'✦ ПОЧЕМУ МЫ',
+  whyTitle:'Это не «машинный перевод», а перевод уровня субтитров', whySub:'Каждая возможность создана для принципа «вставил в видео — и работает»', feat1T:'Точное выравнивание таймкодов', feat1D:'Перевод следует исходным таймкодам строка в строку; объединение и разбивка распределяются по длительности — без сдвигов и рассинхрона.',
+  feat2T:'Единая терминология', feat2D:'Имена и неоднозначные слова попадают в глоссарий до перевода: строка 1 и строка 300 будут одинаковыми; любой термин можно оставить в оригинале.', feat3T:'Умный перенос строк', feat3D:'При превышении ширины строка переносится по знакам препинания и границам слов согласно нормам Netflix для каждого языка — слово никогда не режется пополам.',
+  feat4T:'Чистка слов-паразитов · правка транскрипции', feat4D:'«эм, ну, you know» удаляются автоматически, ошибки распознавания в исходнике исправляются заодно — чисто настолько, что можно сразу вшивать в видео.', feat5T:'Двуязычные субтитры как угодно', feat5D:'Две строки, стопка или верх/низ — переключайте как хотите, экспортируйте TXT-сценарии параллельно, все приёмы уровня фансаба.',
+  feat6T:'Приватность прежде всего', feat6D:'Субтитры обрабатываются в вашем браузере и не проходят через сторонние серверы; API-ключ хранится только на вашем устройстве.', expTag:'✦ ЭКСПОРТ', aboutTitle:'Об AI-SRTSub',
+  aboutBody:'AI-SRTSub — субтитровочный ИИ-переводчик с открытым кодом. Мы уверены: хороший инструмент должен быть бесплатным, чистым и уважать приватность — без рекламы, без регистрации, не трогая ваши файлы. Разворачивайте у себя и совершенствуйте вместе с нами.', aboutRepo:'Репозиторий GitHub', aboutLicense:'Открытый код AGPL-3.0', wsBackHome:'Главная',
+  wsUploadNew:'Новые субтитры', projEmpty:'Субтитры не загружены', secImport:'Импорт', secLang:'Языки',
+  secStyle:'Стиль', secRules:'Правила', secEngine:'Движок', lblSrcShort:'Исходный язык',
+  lblDstShort:'Целевой язык', lblKeepTermsShort:'Сохранять имена', lblAutoTermsShort:'Автоглоссарий', lblMaxWShort:'Ширина строки',
+  /* v0.9.70 两段式界面新增 */
 },
 'it': {
   docTitle:'AI-SRTSub - Film e serie del mondo, sottotitoli nella tua lingua', appTitle:'🎬 Traduttore di Sottotitoli IA',
@@ -1605,7 +2093,7 @@ const I18N = {
   pending:'In attesa…', dropNote:'(rimosso: puro riempitivo/indicazione sonora)',
   emptyRows:'Nessun sottotitolo. Importa a sinistra → scegli un file / incolla / carica l\'esempio.', emptyFilter:'Nessun risultato con questo filtro',
   reportSummary:'Report di validazione pre-esportazione',
-  footer:'Motore di regole srt-core.js · multilingua · larghezza: CJK/piena=1 unità, 2 mezzi caratteri=1 unità; ritorno a capo solo se un intero sottotitolo supera la soglia, ogni riga ≤ soglia',
+  footer:'AI-SRTSub · Open source AGPL-3.0 · I tuoi sottotitoli restano sempre tuoi',
   bDrop:'riempitivo·rimosso', bMerge:'unito', bLong:'lungo',
   parseOk:'✅ Analisi riuscita: {0} sottotitoli.', parseWarn:'⚠ Analizzati {0} sottotitoli con {1} problemi di formato:',
   imported:'Importato {0}: {1} sottotitoli.', paste:'testo incollato',
@@ -1644,7 +2132,20 @@ const I18N = {
   seoWho:'<strong>Per chi è:</strong> traduttori video, creator e localizzatori di YouTube, studenti di lingue, gruppi di sottotitoli e team che devono localizzare rapidamente contenuti video.',
   seoNoscript:'Questo strumento richiede JavaScript. Abilitalo nel tuo browser, poi carica un file di sottotitoli (SRT / VTT / ASS) per tradurre i i sottotitoli gratuitamente con l’IA.',
   verifyOk:'✅ Validazione superata: {0} sottotitoli, numerazione sequenziale, nessuna sovrapposizione, nessun vuoto.', pasteEmpty:'L\'area di incollaggio è vuota.', issCps:'Velocità di lettura {0} car./s (limite {1})', issShortDur:'A schermo solo {0} s (min. 0,83)', cpsSummary:'Controllo velocità: {0} troppo veloci, {1} troppo brevi (i tempi derivano dal file sorgente — solo informativo)',
-  colTc:'Timeline', fnSub:'sottotitoli', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Consigliato: veloce ed economico, ideale per la traduzione in blocco dei sottotitoli', errNotCfg:'L\'amministratore non ha ancora configurato un modello predefinito. Usa la tua API.', errIpLimit:'La quota gratuita di oggi per questo IP ({0} richieste) è esaurita. Inserisci la tua API key per continuare.', errGlobalLimit:'La quota gratuita totale del sito di oggi è esaurita. Inserisci la tua API key per continuare.', errBadJson:'Il corpo della richiesta non è JSON valido', errNoMsgs:'Manca messages', errUpstream:'Chiamata al modello predefinito non riuscita: {0}', errNotJson:'La risposta non è JSON', errEmpty:'La risposta è vuota', errNoGroups:'Manca groups nel JSON', errNoGno:'Manca gno nell\'elemento JSON', errMissGroup:'Manca il risultato del gruppo {0}', errNoArray:'Manca l\'array nel JSON', anchorFail:'Verifica àncora non superata (la traduzione del gruppo {0} non è in {1})', issBlkNoNumTs:'Impossibile analizzare il blocco (manca indice o timeline)', issBlkNoTs:'Impossibile analizzare il blocco (manca la timeline)', issBadTs:'Formato timeline non valido', issNumInc:'Indice non crescente', issEndLtStart:'Ora di fine precedente all\'ora di inizio', issOverlap:'Si sovrappone alla timeline precedente', issNoBlocks:'Nessun blocco di sottotitoli analizzato', issZeroDur:'Durata zero', issEmptyCue:'Contenuto vuoto', issNoUsable:'Nessun blocco di sottotitoli utilizzabile'
+  colTc:'Timeline', fnSub:'sottotitoli', fnBi:'bilingue', demoFile:'demo.srt', noteDeepSeek:'Consigliato: veloce ed economico, ideale per la traduzione in blocco dei sottotitoli', errNotCfg:'L\'amministratore non ha ancora configurato un modello predefinito. Usa la tua API.', errIpLimit:'La quota gratuita di oggi per questo IP ({0} richieste) è esaurita. Inserisci la tua API key per continuare.', errGlobalLimit:'La quota gratuita totale del sito di oggi è esaurita. Inserisci la tua API key per continuare.', errBadJson:'Il corpo della richiesta non è JSON valido', errNoMsgs:'Manca messages', errUpstream:'Chiamata al modello predefinito non riuscita: {0}', errNotJson:'La risposta non è JSON', errEmpty:'La risposta è vuota', errNoGroups:'Manca groups nel JSON', errNoGno:'Manca gno nell\'elemento JSON', errMissGroup:'Manca il risultato del gruppo {0}', errNoArray:'Manca l\'array nel JSON', anchorFail:'Verifica àncora non superata (la traduzione del gruppo {0} non è in {1})', issBlkNoNumTs:'Impossibile analizzare il blocco (manca indice o timeline)', issBlkNoTs:'Impossibile analizzare il blocco (manca la timeline)', issBadTs:'Formato timeline non valido', issNumInc:'Indice non crescente', issEndLtStart:'Ora di fine precedente all\'ora di inizio', issOverlap:'Si sovrappone alla timeline precedente', issNoBlocks:'Nessun blocco di sottotitoli analizzato', issZeroDur:'Durata zero', issEmptyCue:'Contenuto vuoto', issNoUsable:'Nessun blocco di sottotitoli utilizzabile',
+  brandName:'AI-SRTSub', navGuide:'Guida', navRepo:'GitHub', heroTitle:'Trascina i sottotitoli,<br><em>al resto pensa l\'AI</em>',
+  heroSub:'Traduzione, allineamento dei tempi e impaginazione in un colpo solo — sottotitoli pronti in pochi minuti. Gratis · Senza registrazione · Privato', dropTitle:'Clicca per scegliere un file, oppure trascinalo qui 🎬', dropSub:'SRT · VTT · ASS · TXT · oltre 20 lingue', altNoFile:'Nessun file a portata di mano?',
+  altPaste:'Incolla il testo dei sottotitoli', altDemo:'Carica un esempio ed esplora lo studio →', enterHint:'Dopo il caricamento entri nello <b>studio sottotitoli</b> — lingua, stile ed export si impostano lì', statLangs:'lingue',
+  statStyles:'stili di export', statAlign:'tempi allineati', statPrivacy:'sottotitoli al server', whyTag:'✦ PERCHÉ NOI',
+  whyTitle:'Non «traduzione automatica»: traduzione da sottotitoli', whySub:'Ogni funzione è pensata per «metterlo nel video e funziona»', feat1T:'Allineamento preciso dei tempi', feat1D:'La traduzione segue la timeline originale riga per riga; fusioni e divisioni si ripartiscono per durata — nessuno slittamento, nessun disallineamento.',
+  feat2T:'Terminologia uniforme', feat2D:'Nomi propri e parole ambigue diventano un glossario prima di tradurre: la riga 1 e la riga 300 restano coerenti; puoi anche forzare il mantenimento di qualsiasi termine.', feat3T:'Interruzione di riga intelligente', feat3D:'Oltre la larghezza, la riga va a capo su punteggiatura e confini di parola secondo gli standard Netflix per lingua — mai una parola tagliata a metà.',
+  feat4T:'No parole inutili · correzione della trascrizione', feat4D:'Gli «ehm, tipo, you know» spariscono da soli e gli errori di trascrizione si correggono al volo — pulito al punto da poterlo masterizzare direttamente.', feat5T:'Bilingue come vuoi tu', feat5D:'Due righe, impilato o schermo diviso: cambia a piacere ed esporta copioni TXT affiancati, con tutti i trucchi da fansub.',
+  feat6T:'Privacy prima di tutto', feat6D:'I sottotitoli si elaborano nel tuo browser e non passano da server di terze parti; la API Key resta sul tuo dispositivo.', expTag:'✦ EXPORT', aboutTitle:'Chi è AI-SRTSub',
+  aboutBody:'AI-SRTSub è un traduttore di sottotitoli AI open source. Crediamo che un buon strumento debba essere gratuito, pulito e rispettoso della privacy — niente pubblicità, niente registrazione, nessuno tocca i tuoi file. Self-host e contributi benvenuti.', aboutRepo:'Repository GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Home',
+  wsUploadNew:'Nuovi sottotitoli', projEmpty:'Nessun sottotitolo caricato', secImport:'Importa', secLang:'Lingue',
+  secStyle:'Stile', secRules:'Regole', secEngine:'Motore', lblSrcShort:'Lingua origine',
+  lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Mantieni nomi propri', lblAutoTermsShort:'Glossario automatico', lblMaxWShort:'Larghezza riga',
+  /* v0.9.70 两段式界面新增 */
 },
 'ar': {
   docTitle:'AI-SRTSub - أفلام ومسلسلات من العالم بترجمات بلغتك', appTitle:'🎬 مترجم الترجمات بالذكاء الاصطناعي',
@@ -1684,7 +2185,7 @@ const I18N = {
   pending:'معلّق…', dropNote:'(أزيل: حشو/إشارة صوتية فقط)',
   emptyRows:'لا ترجمات بعد. استورد من اليسار ← اختر ملفًا / الصق / حمّل المثال.', emptyFilter:'لا شيء تحت هذا الفلتر',
   reportSummary:'تقرير التحقق قبل التصدير',
-  footer:'محرك القواعد srt-core.js · متعدد اللغات · العرض: CJK/كامل=1 وحدة، محرفان نصفيان=1 وحدة؛ الالتفاف فقط عندما تتجاوز الترجمة كاملة الحد، كل سطر ≤ الحد',
+  footer:'AI-SRTSub · مفتوح المصدر AGPL-3.0 · ترجماتك تبقى دائمًا ملكك',
   bDrop:'حشو·أزيل', bMerge:'مدمج', bLong:'طويل',
   parseOk:'✅ تم التحليل بنجاح: {0} ترجمة.', parseWarn:'⚠ حُلّلت {0} ترجمة مع {1} مشكلة تنسيق:',
   imported:'استُورد {0}: {1} ترجمة.', paste:'نص ملصوق',
@@ -1723,7 +2224,20 @@ const I18N = {
   seoWho:'<strong>من يستخدمها:</strong> مترجمو الفيديو، صانعو المحتوى على YouTube والمطوّلون، ومتعلمو اللغات، وفرق الترجمة، والفرق التي تحتاج إلى تعريب محتوى الفيديو بسرعة.',
   seoNoscript:'تتطلب هذه الأداة JavaScript. يرجى تفعيل JavaScript في متصفحك، ثم ارفع ملف ترجمات (SRT / VTT / ASS) لترجمة الترجمات مجاناً باستخدام الذكاء الاصطناعي.',
   verifyOk:'✅ اجتاز التحقق: {0} ترجمة، ترقيم متسلسل، بلا تداخل، بلا أسطر فارغة.', pasteEmpty:'منطقة اللصق فارغة.', issCps:'سرعة القراءة {0} حرف/ثانية (الحد {1})', issShortDur:'يظهر لمدة {0} ثانية فقط (الحد الأدنى 0.83)', cpsSummary:'فحص سرعة القراءة: {0} سريعة جدًا، {1} قصيرة جدًا (التوقيت من الملف المصدر — للعلم فقط)',
-  colTc:'الخط الزمني', fnSub:'ترجمة', fnBi:'ثنائية اللغة', demoFile:'demo.srt', noteDeepSeek:'موصى به: سريع واقتصادي، مثالي للترجمة الدفعية للترجمات', errNotCfg:'لم يُهيئ المسؤول نموذجًا افتراضيًا بعد. استخدم واجهة API الخاصة بك.', errIpLimit:'انتهت حصة الترجمة المجانية اليوم لهذا IP ({0} طلب). أدخل مفتاح API الخاص بك للمتابعة.', errGlobalLimit:'انتهت حصة الترجمة المجانية الإجمالية للموقع اليوم. أدخل مفتاح API الخاص بك للمتابعة.', errBadJson:'نص الطلب ليس JSON صالحًا', errNoMsgs:'messages مفقود', errUpstream:'فشل استدعاء النموذج الافتراضي: {0}', errNotJson:'الاستجابة ليست بصيغة JSON', errEmpty:'الاستجابة فارغة', errNoGroups:'JSON يفتقد groups', errNoGno:'العنصر في JSON يفتقد gno', errMissGroup:'نتيجة المجموعة {0} مفقودة', errNoArray:'يفتقد JSON المصفوفة', anchorFail:'فشل التحقق من التثبيت (ترجمة المجموعة {0} ليست {1})', issBlkNoNumTs:'تعذر تحليل الكتلة (رقم أو خط زمني مفقود)', issBlkNoTs:'تعذر تحليل الكتلة (خط زمني مفقود)', issBadTs:'تنسيق الخط الزمني غير صالح', issNumInc:'الرقم غير متزايد', issEndLtStart:'وقت النهاية قبل وقت البداية', issOverlap:'يتداخل مع الخط الزمني السابق', issNoBlocks:'لم يتم تحليل أي كتلة ترجمة', issZeroDur:'مدة صفرية', issEmptyCue:'محتوى فارغ', issNoUsable:'لا توجد كتل ترجمة قابلة للاستخدام'
+  colTc:'الخط الزمني', fnSub:'ترجمة', fnBi:'ثنائية اللغة', demoFile:'demo.srt', noteDeepSeek:'موصى به: سريع واقتصادي، مثالي للترجمة الدفعية للترجمات', errNotCfg:'لم يُهيئ المسؤول نموذجًا افتراضيًا بعد. استخدم واجهة API الخاصة بك.', errIpLimit:'انتهت حصة الترجمة المجانية اليوم لهذا IP ({0} طلب). أدخل مفتاح API الخاص بك للمتابعة.', errGlobalLimit:'انتهت حصة الترجمة المجانية الإجمالية للموقع اليوم. أدخل مفتاح API الخاص بك للمتابعة.', errBadJson:'نص الطلب ليس JSON صالحًا', errNoMsgs:'messages مفقود', errUpstream:'فشل استدعاء النموذج الافتراضي: {0}', errNotJson:'الاستجابة ليست بصيغة JSON', errEmpty:'الاستجابة فارغة', errNoGroups:'JSON يفتقد groups', errNoGno:'العنصر في JSON يفتقد gno', errMissGroup:'نتيجة المجموعة {0} مفقودة', errNoArray:'يفتقد JSON المصفوفة', anchorFail:'فشل التحقق من التثبيت (ترجمة المجموعة {0} ليست {1})', issBlkNoNumTs:'تعذر تحليل الكتلة (رقم أو خط زمني مفقود)', issBlkNoTs:'تعذر تحليل الكتلة (خط زمني مفقود)', issBadTs:'تنسيق الخط الزمني غير صالح', issNumInc:'الرقم غير متزايد', issEndLtStart:'وقت النهاية قبل وقت البداية', issOverlap:'يتداخل مع الخط الزمني السابق', issNoBlocks:'لم يتم تحليل أي كتلة ترجمة', issZeroDur:'مدة صفرية', issEmptyCue:'محتوى فارغ', issNoUsable:'لا توجد كتل ترجمة قابلة للاستخدام',
+  brandName:'AI-SRTSub', navGuide:'الدليل', navRepo:'GitHub', heroTitle:'ألقِ بملف الترجمة هنا,<br><em>ودَع الباقي للذكاء الاصطناعي</em>',
+  heroSub:'ترجمة ومحاذاة التوقيت وضبط التنسيق في خطوة واحدة — ترجمات جاهزة للاستخدام خلال دقائق. مجاني · بلا تسجيل · خصوصية آمنة', dropTitle:'انقر لاختيار ملف، أو اسحبه إلى هنا 🎬', dropSub:'SRT · VTT · ASS · TXT · أكثر من 20 لغة', altNoFile:'لا يوجد ملف معك؟',
+  altPaste:'الصق نص الترجمة', altDemo:'جرّب مثالًا واستكشف الاستوديو →', enterHint:'بعد الرفع ستنتقل تلقائيًا إلى <b>استوديو الترجمات</b> — اللغة والأسلوب وخيارات التصدير كلها هناك', statLangs:'لغة',
+  statStyles:'نمط تصدير', statAlign:'محاذاة التوقيت', statPrivacy:'ترجمات على الخادم', whyTag:'✦ لماذا نحن',
+  whyTitle:'ليست «ترجمة آلية»، بل ترجمة بمستوى الترجمات الاحترافية', whySub:'كل ميزة مصممة لمبدأ «أدرجه في الفيديو فيعمل مباشرة»', feat1T:'محاذاة دقيقة للتوقيت', feat1D:'الترجمة تتبع خط التوقيت الأصلي سطرًا بسطر؛ الدمج والتقسيم يوزَّعان حسب المدة — بلا انزياح أو تداخل.',
+  feat2T:'مصطلحات موحدة عبر العمل كله', feat2D:'الأسماء والكلمات الملتبسة تُستخرج في مسرد قبل الترجمة: السطر الأول والسطر 300 متطابقان، ويمكنك إبقاء أي مصطلح بلغته الأصلية.', feat3T:'التفاف أسطر ذكي', feat3D:'عند تجاوز عرض السطر يلتف عند علامات الترقيم وحدود الكلمات وفق معايير Netflix لكل لغة — لا تُقطع كلمة نصفين أبدًا.',
+  feat4T:'حذف الحشو · تصحيح النسخ الصوتي', feat4D:'«أمم، يعني، you know» تُحذف تلقائيًا وتُصحح أخطاء النسخ في المصدر معها — نظيفة بما يكفي لحرقها مباشرة في الفيديو.', feat5T:'ترجمات ثنائية اللغة كما تحب', feat5D:'سطران أو تكديس أو شاشة منقسمة — بدّل كما تشاء، وصدّر نصوص TXT مقابلة، بكل حيل فرق الترجمة.',
+  feat6T:'الخصوصية أولًا', feat6D:'تُعالج الترجمات في متصفحك ولا تمر بأي خوادم خارجية؛ ومفتاح API يبقى على جهازك فقط.', expTag:'✦ التصدير', aboutTitle:'حول AI-SRTSub',
+  aboutBody:'AI-SRTSub أداة ترجمة ترجمات بالذكاء الاصطناعي مفتوحة المصدر. نؤمن أن الأداة الجيدة يجب أن تكون مجانية ونظيفة وتحترم الخصوصية — بلا إعلانات ولا تسجيل ولا العبث بملفاتك. رحّبنا بالتثبيت الذاتي وباقتراحات التطوير.', aboutRepo:'مستودع GitHub', aboutLicense:'مفتوح المصدر AGPL-3.0', wsBackHome:'الرئيسية',
+  wsUploadNew:'ترجمة جديدة', projEmpty:'لم تُحمَّل ترجمة', secImport:'استيراد', secLang:'اللغات',
+  secStyle:'الأسلوب', secRules:'القواعد', secEngine:'المحرك', lblSrcShort:'لغة المصدر',
+  lblDstShort:'اللغة الهدف', lblKeepTermsShort:'إبقاء الأسماء الأصلية', lblAutoTermsShort:'مسرد تلقائي', lblMaxWShort:'عرض السطر',
+  /* v0.9.70 两段式界面新增 */
 },
 'tr': {
   docTitle:'AI-SRTSub - Dünyanın film ve dizileri, altyazı senin dilinde', appTitle:'🎬 AI Altyazı Çevirmeni',
@@ -1763,7 +2277,7 @@ const I18N = {
   pending:'Bekliyor…', dropNote:'(kaldırıldı: salt dolgu/ses bildirimi)',
   emptyRows:'Henüz altyazı yok. Soldan içe aktar → dosya seç / yapıştır / örnek yükle.', emptyFilter:'Bu filtrede bir şey yok',
   reportSummary:'Dışa aktarma öncesi doğrulama raporu',
-  footer:'Kural motoru srt-core.js · çok dilli · genişlik: CJK/tam genişlik=1 birim, 2 yarım karakter=1 birim; yalnızca bir altyazının tamamı eşiği aşarsa satır sarılır, her satır ≤ eşik',
+  footer:'AI-SRTSub · Açık kaynak AGPL-3.0 · Altyazıların her zaman senin',
   bDrop:'dolgu·kaldırıldı', bMerge:'birleştirildi', bLong:'uzun',
   parseOk:'✅ Çözümleme tamam: {0} altyazı.', parseWarn:'⚠ {0} altyazı çözümlendi, {1} biçim sorunu var:',
   imported:'İçe aktarıldı {0}: {1} altyazı.', paste:'yapıştırılan metin',
@@ -1802,7 +2316,20 @@ const I18N = {
   seoWho:'<strong>Kullanıcılar:</strong> video çevirmenleri, YouTube içerik üreticileri ve yerelleştiriciler, dil öğrenenleri, altyazı grupları ve video içeriğini hızla yerelleştirmesi gereken ekipler.',
   seoNoscript:'Bu araç JavaScript gerektirir. Lütfen tarayıcınızda JavaScript’i etkinleştirin, ardından altyazıları AI ile ücretsiz çevirmek için bir altyazı dosyası (SRT / VTT / ASS) yükleyin.',
   verifyOk:'✅ Doğrulama geçti: {0} altyazı, sıralı numaralandırma, çakışma yok, boş satır yok.', pasteEmpty:'Yapıştırma alanı boş.', issCps:'Okuma hızı {0} karakter/sn (sınır {1})', issShortDur:'Ekranda yalnızca {0} sn (en az 0,83)', cpsSummary:'Okuma hızı kontrolü: {0} çok hızlı, {1} çok kısa (süreler kaynak dosyadan gelir — yalnızca bilgilendirme)',
-  colTc:'Zaman çizelgesi', fnSub:'altyazi', fnBi:'iki-dilli', demoFile:'demo.srt', noteDeepSeek:'Önerilen: hızlı ve uygun maliyetli, toplu altyazı çevirisi için ideal', errNotCfg:'Yönetici henüz varsayılan modeli yapılandırmadı. Kendi API\'nizi kullanın.', errIpLimit:'Bu IP için bugünün ücretsiz çeviri kotası ({0} istek) doldu. Devam etmek için kendi API anahtarınızı girin.', errGlobalLimit:'Bugünün site geneli ücretsiz çeviri kotası doldu. Devam etmek için kendi API anahtarınızı girin.', errBadJson:'İstek gövdesi geçerli JSON değil', errNoMsgs:'messages eksik', errUpstream:'Varsayılan model çağrısı başarısız: {0}', errNotJson:'Yanıt JSON değil', errEmpty:'Yanıt boş', errNoGroups:'JSON\'da groups eksik', errNoGno:'JSON öğesinde gno eksik', errMissGroup:'Grup {0} için sonuç eksik', errNoArray:'JSON\'da dizi eksik', anchorFail:'Çapa denetimi başarısız (grup {0} çevirisi {1} değil)', issBlkNoNumTs:'Blok çözümlenemedi (numara veya zaman çizelgesi eksik)', issBlkNoTs:'Blok çözümlenemedi (zaman çizelgesi eksik)', issBadTs:'Geçersiz zaman çizelgesi biçimi', issNumInc:'Numara artmıyor', issEndLtStart:'Bitiş saati başlangıç saatinden önce', issOverlap:'Önceki zaman çizelgesiyle çakışıyor', issNoBlocks:'Hiç altyazı bloğu çözümlenmedi', issZeroDur:'Süre sıfır', issEmptyCue:'Boş içerik', issNoUsable:'Kullanılabilir altyazı bloğu yok'
+  colTc:'Zaman çizelgesi', fnSub:'altyazi', fnBi:'iki-dilli', demoFile:'demo.srt', noteDeepSeek:'Önerilen: hızlı ve uygun maliyetli, toplu altyazı çevirisi için ideal', errNotCfg:'Yönetici henüz varsayılan modeli yapılandırmadı. Kendi API\'nizi kullanın.', errIpLimit:'Bu IP için bugünün ücretsiz çeviri kotası ({0} istek) doldu. Devam etmek için kendi API anahtarınızı girin.', errGlobalLimit:'Bugünün site geneli ücretsiz çeviri kotası doldu. Devam etmek için kendi API anahtarınızı girin.', errBadJson:'İstek gövdesi geçerli JSON değil', errNoMsgs:'messages eksik', errUpstream:'Varsayılan model çağrısı başarısız: {0}', errNotJson:'Yanıt JSON değil', errEmpty:'Yanıt boş', errNoGroups:'JSON\'da groups eksik', errNoGno:'JSON öğesinde gno eksik', errMissGroup:'Grup {0} için sonuç eksik', errNoArray:'JSON\'da dizi eksik', anchorFail:'Çapa denetimi başarısız (grup {0} çevirisi {1} değil)', issBlkNoNumTs:'Blok çözümlenemedi (numara veya zaman çizelgesi eksik)', issBlkNoTs:'Blok çözümlenemedi (zaman çizelgesi eksik)', issBadTs:'Geçersiz zaman çizelgesi biçimi', issNumInc:'Numara artmıyor', issEndLtStart:'Bitiş saati başlangıç saatinden önce', issOverlap:'Önceki zaman çizelgesiyle çakışıyor', issNoBlocks:'Hiç altyazı bloğu çözümlenmedi', issZeroDur:'Süre sıfır', issEmptyCue:'Boş içerik', issNoUsable:'Kullanılabilir altyazı bloğu yok',
+  brandName:'AI-SRTSub', navGuide:'Kılavuz', navRepo:'GitHub', heroTitle:'Altyazıyı buraya bırak,<br><em>gerisini AI halleder</em>',
+  heroSub:'Çeviri, zaman çizelgesi hizalama ve dizgi tek seferde — dakikalar içinde kullanıma hazır altyazı. Ücretsiz · Kayıt yok · Gizli', dropTitle:'Dosya seçmek için tıkla ya da sürükle bırak 🎬', dropSub:'SRT · VTT · ASS · TXT · 20+ dil', altNoFile:'Elinde dosya yok mu?',
+  altPaste:'Altyazı metnini yapıştır', altDemo:'Örnek yükle, stüdyoya göz at →', enterHint:'Yükleme sonrası otomatik olarak <b>altyazı stüdyosuna</b> geçersin — dil, stil ve dışa aktarma ayarları orada', statLangs:'dil',
+  statStyles:'dışa aktarma stili', statAlign:'zaman hizalı', statPrivacy:'sunucuya altyazı', whyTag:'✦ NEDEN BİZ',
+  whyTitle:'Bu «makine çevirisi» değil, altyazı sınıfı çeviri', whySub:'Her özellik «videoya koy, çalışsın» diye tasarlandı', feat1T:'Hassas zaman hizalama', feat1D:'Çeviri orijinal zaman çizelgesini satır satır takip eder; birleştirme ve bölme süreye göre dağıtılır — kayma ya da ters dönme yok.',
+  feat2T:'Baştan sona tutarlı terminoloji', feat2D:'Özel isimler ve iki anlamlı kelimeler çeviriden önce sözlüğe alınır: 1. ve 300. satır aynı çevrilir; istediğin terimi orijinaliyle bırakabilirsin.', feat3T:'Akıllı satır bölme', feat3D:'Satır genişliğini aşınca noktalama ve kelime sınırlarında, Netflix dil standartlarına göre bölünür — kelimeyi ikiye bölmez.',
+  feat4T:'Dolgu kelimeler temiz · transkripsiyon düzeltme', feat4D:'«ıımm, yani, you know» otomatik silinir, kaynaktaki yazım hataları da yolunda düzeltilir — doğrudan basılacak kadar temiz.', feat5T:'İki dilli altyazı istediğin gibi', feat5D:'İki satır, üst üste ya da bölünmüş ekran — dilediğin gibi değiştir, TXT karşılaştırma metni çıkar, fansub seviyesinde tüm numaralar var.',
+  feat6T:'Önce gizlilik', feat6D:'Altyazılar tarayıcında işlenir, üçüncü taraf sunuculardan geçmez; API anahtarı sadece senin cihazında kalır.', expTag:'✦ DIŞA AKTARMA', aboutTitle:'AI-SRTSub Hakkında',
+  aboutBody:'AI-SRTSub, açık kaynaklı bir AI altyazı çevirmenidir. İyi bir aracın ücretsiz, temiz ve gizliliğe saygılı olması gerektiğine inanıyoruz — reklam yok, kayıt yok, dosyalarına dokunma yok. Kendi sunucunda çalıştır ya da birlikte cilalayalım.', aboutRepo:'GitHub deposu', aboutLicense:'Açık kaynak AGPL-3.0', wsBackHome:'Ana sayfa',
+  wsUploadNew:'Yeni altyazı', projEmpty:'Altyazı yüklenmedi', secImport:'İçe aktar', secLang:'Diller',
+  secStyle:'Stil', secRules:'Kurallar', secEngine:'Motor', lblSrcShort:'Kaynak dil',
+  lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimleri koru', lblAutoTermsShort:'Otomatik sözlük', lblMaxWShort:'Satır genişliği',
+  /* v0.9.70 两段式界面新增 */
 }
 };
 const UI = { lang:'zh-CN', langManual:false, dstManual:false };
@@ -3618,6 +4145,81 @@ ulang.addEventListener('change', ()=>{
 });
 
 applyI18n();
+
+/* ================= v0.9.70 两段式界面：首页 ↔ 工作台（纯增量逻辑，不改动上方任何代码） ================= */
+function showView(which){
+  var land=document.getElementById('viewLanding'), ws=document.getElementById('viewWorkspace');
+  if(!land||!ws) return;
+  var target = which==='workspace' ? 'ws' : 'land';
+  var cur = ws.style.display==='flex' ? 'ws' : (land.style.display==='none' ? 'ws' : 'land');
+  land.style.display = target==='ws' ? 'none' : 'block';
+  ws.style.display  = target==='ws' ? 'flex' : 'none';
+  if(cur!==target) window.scrollTo(0,0);
+}
+/* 悬停解释跟随界面语言：applyI18n 不认识 data-tip-i18n，这里包一层补上 */
+function applyTipI18n(){
+  document.querySelectorAll('[data-tip-i18n]').forEach(function(el){
+    el.setAttribute('data-tip', t(el.getAttribute('data-tip-i18n')));
+  });
+}
+(function(){
+  var origApply = applyI18n;
+  applyI18n = function(){
+    origApply();
+    applyTipI18n();
+    var u2=document.getElementById('uiLang2');
+    if(u2) u2.value=UI.lang;
+    if(typeof updateProjChip==='function') updateProjChip();
+  };
+})();
+/* 工作台顶栏：返回首页 / 随时上传新字幕 */
+document.getElementById('btnBackHome').addEventListener('click', function(){ showView('landing'); });
+document.getElementById('btnUploadNew').addEventListener('click', function(){ $('file').click(); });
+/* 首页上传区：点击选文件 + 键盘可达 + 拖拽投放 */
+(function(){
+  var dz=document.getElementById('dropzone');
+  if(!dz) return;
+  dz.addEventListener('click', function(){ $('file').click(); });
+  dz.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('file').click(); } });
+  dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', function(){ dz.classList.remove('drag'); });
+  dz.addEventListener('drop', function(e){
+    e.preventDefault(); dz.classList.remove('drag');
+    var f=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){ setSrc(String(rd.result||''), f.name); };
+    rd.readAsText(f,'utf-8');
+  });
+})();
+/* 首页备选入口：粘贴文本 → 工作台聚焦粘贴框；载入示例 → 走 btnDemo 原逻辑 */
+document.getElementById('altPaste').addEventListener('click', function(){ showView('workspace'); setTimeout(function(){ $('paste').focus(); }, 60); });
+document.getElementById('altDemo').addEventListener('click', function(){ $('btnDemo').click(); });
+/* 首页导航的语言镜像选择器：与工作台 uiLang 双向同步 */
+(function(){
+  var u2=document.getElementById('uiLang2');
+  if(!u2) return;
+  UI_LANGS.forEach(function(pair){ var o=document.createElement('option'); o.value=pair[0]; o.textContent=pair[1]; u2.appendChild(o); });
+  u2.value=UI.lang;
+  u2.addEventListener('change', function(){
+    var main=$('uiLang'); main.value=u2.value;
+    main.dispatchEvent(new Event('change'));
+  });
+})();
+/* 顶栏项目名：文件名 → 目标语言 */
+function updateProjChip(){
+  var el=document.getElementById('projName'); if(!el) return;
+  el.textContent = S.fileBase ? (S.fileBase+' → '+(LBY($('dstLang').value).zh||'')) : t('projEmpty');
+}
+/* 导入成功自动进入工作台（包装 setSrc，原函数不动） */
+(function(){
+  var origSetSrc = setSrc;
+  setSrc = function(text, fileName){ origSetSrc(text, fileName); showView('workspace'); updateProjChip(); };
+})();
+$('dstLang').addEventListener('change', updateProjChip);
+/* 首屏默认首页；#ws 直达工作台 */
+showView(location.hash==='#ws' ? 'workspace' : 'landing');
+applyTipI18n();
 </script>
 </body>
 </html>
