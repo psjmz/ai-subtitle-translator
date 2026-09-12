@@ -75,6 +75,16 @@ function readEvents(){
   } catch (e) {}
   return { events: [] };
 }
+/* v0.9.73：重译按类型分别计数。meta.rt: 1=音乐误删 2=语言跑偏 3=cue 结构错。
+   retries 保留为三类之和（与 v0.9.72 的总量口径一致）；rt=0（主批）累加 batches。 */
+const RT_FIELD = { 1: 'retryMusic', 2: 'retryAnchor', 3: 'retryCue' };
+function bumpRetry(ev, rt){
+  const n = Number(rt) || 0;
+  if (!n) { ev.batches = (ev.batches || 0) + 1; return; }
+  const k = RT_FIELD[n] || 'retryOther';
+  ev[k] = (ev[k] || 0) + 1;
+  ev.retries = (ev.retries || 0) + 1;
+}
 function appendEvent(ip, meta, model){
   if (!meta || typeof meta !== 'object') return;
   const now = Date.now();
@@ -88,10 +98,9 @@ function appendEvent(ip, meta, model){
   for (let i = db.events.length - 1; i >= 0; i--) {
     const e = db.events[i];
     if (e.ip === ip && e.file === file && e.lang === lang && now - e.t < EVENT_DEDUP_MS) {
-      /* v0.9.72：meta.rt=1 是前端隔离重译调用（音乐误删/跑偏/结构错重发）——单独累加 retries，
-         不计入 batches，站长可直接看到主批/重译拆分 */
-      if (meta.rt) e.retries = (e.retries || 0) + 1;
-      else e.batches = (e.batches || 1) + 1;
+      /* v0.9.73：meta.rt 是前端隔离重译调用类型——1=音乐误删 2=语言跑偏 3=cue 结构错。
+         重译不计入 batches，按类型分别累加，站长一眼看出「主批 / 哪类重译最多」 */
+      bumpRetry(e, meta.rt);
       if (cues > (e.cues || 0)) e.cues = cues;
       if (mdl && !e.model) e.model = mdl;
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
@@ -99,7 +108,9 @@ function appendEvent(ip, meta, model){
     }
     if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
   }
-  db.events.push({ t: now, ip, file, lang, cues, batches: meta.rt ? 0 : 1, retries: meta.rt ? 1 : 0, model: mdl });
+  const ev = { t: now, ip, file, lang, cues, batches: 0, retries: 0, model: mdl };
+  bumpRetry(ev, meta.rt);
+  db.events.push(ev);
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
   fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
 }

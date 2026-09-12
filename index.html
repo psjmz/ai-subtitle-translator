@@ -390,7 +390,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.72</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.73</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -544,7 +544,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.72</span>
+    <span class="ver-tag">v0.9.73</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -2664,8 +2664,34 @@ const STYLE_DESC_EN = {
   elegant: 'Faithful, fluent, tasteful: convey the original meaning accurately, read naturally, use appropriate wording, and follow the target language\'s idiomatic conventions. Do not translate word-for-word.',
   plain:   'Colloquial and plain: translate in everyday spoken style, like casual conversation; prefer short sentences and common words, avoid stiff bookish wording, and keep the speaker\'s tone.'
 };
+// v0.9.73：输出示例译文表——按目标语言给出「真实译文」而非英文占位。
+// 此前示例输出一律是英文（"- Coming?" / "See you tomorrow."），每批都往上下文注入 3 句英文样本，
+// 与【MOST IMPORTANT RULE】的目标语言锚定正面冲突，deepseek-flash 尤易被 few-shot 语言带跑
+//（实测 udio-3 英→日 1194 条触发 ~100 次隔离重译）。改成目标语言真实译文后，模型有正确模仿对象。
+// 三种结构与 systemPrompt 的 input 示例一一对应：dash=双人对白、lyric=歌词分段、plain=普通句。
+// \\n 是 JSON 字符串里的换行转义（提示词中显示的是字面 \n 两字符）。
+const EX_SAMPLE = {
+  'zh-CN':{dash:'- 你来吗？\\n- 就在你后面。', lyric:'[1] 带我回家 [2] 今夜', plain:'明天见。'},
+  'zh-TW':{dash:'- 你要來嗎？\\n- 就在你後面。', lyric:'[1] 帶我回家 [2] 今夜', plain:'明天見。'},
+  'en':   {dash:'- Coming?\\n- Right behind you.', lyric:'[1] Take me home [2] tonight', plain:'See you tomorrow.'},
+  'ja':   {dash:'- 来る？\\n- すぐ後ろにいる。', lyric:'[1] 家に連れてって [2] 今夜', plain:'また明日。'},
+  'ko':   {dash:'- 갈래?\\n- 바로 뒤에 있어.', lyric:'[1] 집에 데려가 줘 [2] 오늘 밤', plain:'내일 보자.'},
+  'es':   {dash:'- ¿Vienes?\\n- Justo detrás de ti.', lyric:'[1] Llévame a casa [2] esta noche', plain:'Hasta mañana.'},
+  'pt':   {dash:'- Você vem?\\n- Logo atrás de você.', lyric:'[1] Me leva pra casa [2] hoje à noite', plain:'Até amanhã.'},
+  'de':   {dash:'- Kommst du?\\n- Direkt hinter dir.', lyric:'[1] Bring mich heim [2] heut Nacht', plain:'Bis morgen.'},
+  'fr':   {dash:'- Tu viens ?\\n- Juste derrière toi.', lyric:'[1] Ramène-moi chez moi [2] ce soir', plain:'À demain.'},
+  'id':   {dash:'- Ikut?\\n- Tepat di belakangmu.', lyric:'[1] Bawa aku pulang [2] malam ini', plain:'Sampai besok.'},
+  'hi':   {dash:'- आ रहे हो?\\n- बिल्कुल पीछे हूँ।', lyric:'[1] मुझे घर ले चलो [2] आज रात', plain:'कल मिलते हैं।'},
+  'th':   {dash:'- มาไหม?\\n- ตามหลังเลย', lyric:'[1] พาฉันกลับบ้าน [2] คืนนี้', plain:'พรุ่งนี้เจอกัน'},
+  'vi':   {dash:'- Đi không?\\n- Ngay sau bạn đây.', lyric:'[1] Đưa tôi về nhà [2] tối nay', plain:'Hẹn ngày mai.'},
+  'ru':   {dash:'- Идёшь?\\n- Прямо за тобой.', lyric:'[1] Забери меня домой [2] сегодня вечером', plain:'До завтра.'},
+  'it':   {dash:'- Vieni?\\n- Subito dietro di te.', lyric:'[1] Portami a casa [2] stasera', plain:'A domani.'},
+  'ar':   {dash:'- قادم؟\\n- خلفك مباشرة.', lyric:'[1] خذني إلى البيت [2] الليلة', plain:'أراك غدًا.'},
+  'tr':   {dash:'- Geliyor musun?\\n- Hemen arkandayım.', lyric:'[1] Götür beni eve [2] bu gece', plain:'Yarına görüşürüz.'}
+};
 function systemPromptEn(cfg){
   const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);
+  const ex = EX_SAMPLE[cfg.dst] || EX_SAMPLE.en;
   const srcFor = cfg.src === 'auto' ? '(identify it automatically)' : srcN.prompt;
   const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
   const styleEn = (cfg.styleMode === 'custom' && cfg.styleCustom) ? ('Custom style: ' + cfg.styleCustom) : (STYLE_DESC_EN[cfg.styleMode] || STYLE_DESC_EN.elegant);
@@ -2710,9 +2736,9 @@ function systemPromptEn(cfg){
    + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
    + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
    + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
-   + '8. [Output example] Cue-aligned groups return a "cues" array (one entry per input cue number); lyric groups keep segment numbers in a single text; dash-speaker structure keeps "- " per line joined by \\n; pure-filler cue numbers go to the fillers array. The example assumes an English target for illustration only — your actual text fields must be written in ' + dstNative + ':\n'
+   + '8. [Output example] Cue-aligned groups return a "cues" array (one entry per input cue number); lyric groups keep segment numbers in a single text; dash-speaker structure keeps "- " per line joined by \\n; pure-filler cue numbers go to the fillers array. The sample translations below are written in ' + dstNative + ' — your output text fields must be in the same language as these samples:\n'
    + 'Input (excerpt): {"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"t":"00:01:12,200","dur":1.8,"src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"t":"00:01:15,000","dur":2.4,"src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"t":"00:01:20,100","dur":0.5,"src":"Um."},{"no":18,"t":"00:01:21,500","dur":2.2,"src":"See you tomorrow."}]}]}\n'
-   + 'Output: {"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"- Coming?\\n- Right behind you."}]},{"gno":2,"type":"text","text":"[1] Take me home [2] tonight"},{"gno":3,"type":"text","cues":[{"no":18,"text":"See you tomorrow."}]}],"fillers":[17]}\n'
+   + 'Output: {"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"' + ex.dash + '"}]},{"gno":2,"type":"text","text":"' + ex.lyric + '"},{"gno":3,"type":"text","cues":[{"no":18,"text":"' + ex.plain + '"}]}],"fillers":[17]}\n'
    + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
    + '{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"…"}]},{"gno":2,"type":"text","text":"[1] … [2] …"},{"gno":4,"type":"drop"}],"fillers":[17,23]}\n'
    + 'Once more: every text field must be written in ' + dstNative + '; keep each text single-line (except the "- " dash-speaker structure); cue-aligned groups must cover every input cue number exactly once (lyric groups with [N] markers use a single text instead); keep the groups array one-to-one with the input gno; output JSON only, no markdown.';
@@ -2722,6 +2748,7 @@ function systemPrompt(cfg){
   // v0.9.22 分发：非中文目标 → 英文指令；中文目标 → 中文指令
   if(cfg.dst !== 'zh-CN' && cfg.dst !== 'zh-TW') return systemPromptEn(cfg);
   const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);
+  const ex = EX_SAMPLE[cfg.dst] || EX_SAMPLE['zh-CN'];   // v0.9.73：示例译文跟随目标语言
   const srcFor = cfg.src === 'auto' ? '（由你自动识别）' : srcN.prompt;
   const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
   let s = '你是专业字幕翻译。\n'
@@ -2767,7 +2794,7 @@ s += '5.【水词处理——默认行为是翻译】\n'
   + '7.【数字单位一体】译文中的数字与其单位/符号必须作为整体紧邻出现（如 30%、$50、1,000、12.5、100万），严禁拆散或在数字与单位之间插入其他字符。\n'
   + '8.【输出示例】普通句组返回 cues 数组（每个输入 cue 编号一条）；歌词组保留分段编号输出单个 text；双说话人保持「- 」结构与换行；纯水词 cue 编号进 fillers：\n'
   + '输入（节选）：{"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"t":"00:01:12,200","dur":1.8,"src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"t":"00:01:15,000","dur":2.4,"src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"t":"00:01:20,100","dur":0.5,"src":"Um."},{"no":18,"t":"00:01:21,500","dur":2.2,"src":"See you tomorrow."}]}]}\n'
-  + '输出：{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"- 你来吗？\\n- 就在你后面。"}]},{"gno":2,"type":"text","text":"[1] 带我回家 [2] 今夜"},{"gno":3,"type":"text","cues":[{"no":18,"text":"明天见。"}]}],"fillers":[17]}\n'
+  + '输出：{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"' + ex.dash + '"}]},{"gno":2,"type":"text","text":"' + ex.lyric + '"},{"gno":3,"type":"text","cues":[{"no":18,"text":"' + ex.plain + '"}]}],"fillers":[17]}\n'
   + '只输出 JSON（不要 markdown 代码块、不要多余解释）：\n'
   + '{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"…"}]},{"gno":2,"type":"text","text":"[1] … [2] …"},{"gno":4,"type":"drop"}],"fillers":[17,23]}\n'
   + '再次强调：所有 text 字段必须用' + dstNative + '书写；text 一律单行（「- 」双说话人结构除外）；cue 对齐组必须恰好覆盖每个输入 cue 编号各一次（含 [N] 编号的歌词组改用单个 text）；groups 数组与输入句组 gno 一一对应；只输出 JSON，不要 markdown 代码块。';
@@ -2835,6 +2862,22 @@ async function poolMap(items, limit, worker){
   }
   await Promise.all(runners);
 }
+// v0.9.73：结构错误码 → 自然语言。此前把 MISSING_17 / DUP_3 这类内部错误码原样喂给模型，
+// 模型看不懂代码含义，纠错命中率打折；改成人话后一次重译即可修复的比例明显提升。
+function describeCueErrs(errs, zh){
+  const out=[];
+  (errs||[]).forEach(function(e){
+    const m=String(e); let n;
+    if(m==='NO_CUES_ARRAY') out.push(zh?'该组没有输出 cues 数组——必须逐条输出，不能用单个 text 代替':'this group returned no "cues" array — output one entry per cue, not a single "text"');
+    else if(m==='BAD_ENTRY') out.push(zh?'cues 数组里有格式损坏的条目（缺少 no 字段）':'one entry in the cues array is malformed (missing the "no" field)');
+    else if((n=m.match(/^UNKNOWN_(\d+)$/))) out.push(zh?('你写了输入里不存在的 cue 编号 '+n[1]+'——严禁发明编号'):('you invented cue number '+n[1]+', which does not exist in the input'));
+    else if((n=m.match(/^DUP_(\d+)$/))) out.push(zh?('cue 编号 '+n[1]+' 重复出现了多次——每个编号只能出现一次'):('cue number '+n[1]+' appears more than once — each number exactly once'));
+    else if((n=m.match(/^EMPTY_(\d+)$/))) out.push(zh?('cue 编号 '+n[1]+' 的译文是空的，且没有被列入 fillers'):('cue number '+n[1]+' has empty text and is not listed in fillers'));
+    else if((n=m.match(/^MISSING_([\d,]+)$/))) out.push(zh?('漏掉了 cue 编号 '+n[1].split(',').join('、')+'——输入里每个编号都必须有一条译文'):('you omitted cue number(s) '+n[1]+' — every input cue number must have one entry'));
+    else out.push(m);
+  });
+  return out;
+}
 async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
@@ -2862,9 +2905,9 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.66：cue 对齐结构纠错反馈——重发时把上一轮的结构错误清单喂回模型（实验实证一次即可修复）
   const cueFb = (feedback && Array.isArray(feedback.cueErrs) && feedback.cueErrs.length)
     ? (zhDst
-        ? '\n【结构纠错】你上次的 cue 对齐输出有结构错误，必须修正：\n- ' + feedback.cueErrs.join('\n- ')
+        ? '\n【结构纠错】你上次的 cue 对齐输出有结构错误，必须修正：\n- ' + describeCueErrs(feedback.cueErrs, true).join('\n- ')
           + '\n请修正后重新输出：每个输入 cue 编号必须恰好出现一次且文本非空（列入 fillers 的纯水词条目可留空）。'
-        : '\n[STRUCTURE RETRY] Your previous cue-aligned output had validation errors:\n- ' + feedback.cueErrs.join('\n- ')
+        : '\n[STRUCTURE RETRY] Your previous cue-aligned output had validation errors:\n- ' + describeCueErrs(feedback.cueErrs, false).join('\n- ')
           + '\nFix them and re-output: every input cue number must appear exactly once with non-empty text (pure-filler cues listed in fillers may be empty).')
     : '';
   // v0.9.62：跨批上下文——前批末尾句组的原文+已定译文（只读参考，防模型重复输出/改写）
@@ -3281,7 +3324,7 @@ async function runTranslate(){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbArr=(a===1&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx,1);
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx,2);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
                     if(!o2.badAnchor || !o2.badAnchor.length){
@@ -3320,7 +3363,7 @@ async function runTranslate(){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbCue=(a===1)?{cueErrs:cb.errs}:null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbCue,ctx,1);
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbCue,ctx,3);
                     const m2=o2.byGno && o2.byGno[cb.gno];
                     if(m2 && m2.cueTexts && m2.cueTexts.size && !(o2.badAnchor||[]).includes(cb.gno)){
                       out.byGno[cb.gno]=m2;
@@ -3382,7 +3425,7 @@ async function runTranslate(){
             try{
               lastCall=Date.now();
               const fbArr=(a>0&&badTexts.length)?badTexts.map(x=>({gno:g1.gno,text:x})):null;
-              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx);
+              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx,2);
               if((o2.badAnchor||[]).includes(g1.gno)){
                 const bt=String((o2.byGno[g1.gno]||{}).text||'').trim();
                 if(bt && !badTexts.includes(bt)) badTexts.push(bt);

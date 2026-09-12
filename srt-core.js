@@ -1772,12 +1772,25 @@
   const RE_HAN = /[\u3400-\u4dbf\u4e00-\u9fff]/;
   const RE_KANA = /[\u3040-\u30ff\u31f0-\u31ff]/;
   const RE_HANGUL = /[\u1100-\u11ff\uac00-\ud7af]/;
+  // v0.9.73：中文特征标记（简体+繁体）——这些字/词日语里不用（日语对应 の／た／私／この 等），
+  // 一旦出现在日语目标译文中，几乎可以断定是中文跑偏，而非合法的日语汉字词。
+  const RE_ZH_MARK = /[的了嗎吗呢吧這这那很]|我們|我们|你們|你们|他們|他们|什麼|什么/;
+  // v0.9.73：日语纯汉字无假名的长度闸（字符宽，复用 textWidth：汉字 1、拉丁 0.5）。
+  // 合法日语纯汉字名词（東京／首相／市場／技術／総理大臣）都很短，超过此宽度基本是中文长句跑偏。
+  const JA_HAN_SHORT_W = 6;
   function anchorOk(text, dst) {
     const s = String(text == null ? '' : text);
     if (!s.trim()) return true;
     const han = RE_HAN.test(s), kana = RE_KANA.test(s), hangul = RE_HANGUL.test(s);
     if (dst === 'zh-CN' || dst === 'zh-TW') return !kana && !hangul;
-    if (dst === 'ja') return !hangul && !(han && !kana);
+    if (dst === 'ja') {
+      if (hangul) return false;
+      if (kana) return true;          // 含假名 → 一定是日语（或至少不是纯汉字中文）
+      if (!han) return true;          // 纯拉丁/符号 → 沿用既有策略（防专名误伤），不拦
+      // 纯汉字无假名：
+      if (RE_ZH_MARK.test(s)) return false;             // ① 含中文虚词 → 中文跑偏
+      return textWidth(s) <= JA_HAN_SHORT_W;            // ② 短名词放行，长句判跑偏
+    }
     if (dst === 'ko') return !han && !kana;
     return !han && !kana && !hangul;
   }

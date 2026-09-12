@@ -770,6 +770,13 @@ t('anchorOk：日文目标拒绝中文/谚文，放行正常日文与纯专名',
   assert.strictEqual(C.anchorOk('这是中文字幕', 'ja'), false);             // 有汉字无假名 = 中文
   assert.strictEqual(C.anchorOk('我打算花大量时间提醒那些人', 'ja'), false);
   assert.strictEqual(C.anchorOk('한국어', 'ja'), false);                   // 谚文混入
+  // v0.9.73：纯汉字无假名按长度分级——合法日语短名词放行，不再误判跑偏白重译
+  assert.strictEqual(C.anchorOk('東京', 'ja'), true);                      // 2 宽纯汉字名词
+  assert.strictEqual(C.anchorOk('首相', 'ja'), true);
+  assert.strictEqual(C.anchorOk('総理大臣', 'ja'), true);                  // 4 宽
+  assert.strictEqual(C.anchorOk('経済成長率', 'ja'), true);                 // 5 宽
+  assert.strictEqual(C.anchorOk('这是中文字幕', 'ja'), false);              // 含中文标记「这」→ 拦
+  assert.strictEqual(C.anchorOk('他说明天会带我去看看', 'ja'), false);       // 中文长句（宽 10 > 6）
 });
 t('anchorOk：韩文目标拒绝汉字/假名', () => {
   assert.strictEqual(C.anchorOk('이것은 한국어 자막입니다.', 'ko'), true);
