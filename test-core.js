@@ -1939,5 +1939,53 @@ t('fail-safe 边界', () => {
   assert.strictEqual(C.isPureHumming('♪ OH-HO-HO ♪'), true);  // 大小写无关
 });
 
+
+// ---------------- 歌词标记可配置（v0.9.78）----------------
+console.log('— 歌词标记可配置 setMusicMarks（v0.9.78）—');
+t('默认标记为 ♪♫♬♩', () => {
+  assert.strictEqual(C.setMusicMarks(''), '♪♫♬♩');        // 空串回退默认
+  assert.strictEqual(C.getMusicMarks(), '♪♫♬♩');
+  assert.ok(C.musicRe().test('♪♫♬♩'));
+  assert.ok(!C.musicRe().test('#'));
+});
+t('自定义标记：# 生效、♪ 失效', () => {
+  C.setMusicMarks('#');
+  assert.ok(C.musicRe().test('a#b'));
+  assert.strictEqual(C.musicRe().test('♪♫♬♩'), false);     // 默认符号不再算歌词
+  assert.strictEqual(C.extractMusicFrames('♪♫♬♩ love ♪♫♬♩'), null);
+  const mf = C.extractMusicFrames('# love #');
+  assert.ok(mf && mf.segs.length === 1);
+  assert.strictEqual(mf.segs[0].text, 'love');
+});
+t('自定义标记下 isPureHumming 跟随新符号', () => {
+  C.setMusicMarks('#');
+  assert.strictEqual(C.isPureHumming('# oh oh #'), true);
+  assert.strictEqual(C.isPureHumming('# take me home #'), false);
+  // 符号换成 # 后，♪ 只是普通标点：分词阶段被当分隔符丢弃，不参与哼唱判定。
+  // 因此 '♪ oh oh ♪' 仍按 oh/oh 判纯哼唱——这是可接受的（该行在任何标记集下都是哼唱）。
+  assert.strictEqual(C.isPureHumming('♪♫♬♩ oh oh ♪♫♬♩'), true);
+});
+t('字符类转义：] ^ - \\ 不炸', () => {
+  C.setMusicMarks(']^-\\');
+  assert.ok(C.musicRe().test('a]b'));
+  assert.ok(C.musicRe().test('a^b'));
+  assert.ok(C.musicRe().test('a-b'));
+  assert.strictEqual(C.musicRe().test('aXb'), false);
+});
+t('留空 / 空白 → 回退默认（防整链静默失效）', () => {
+  C.setMusicMarks('   ');
+  assert.strictEqual(C.getMusicMarks(), '♪♫♬♩');
+  C.setMusicMarks(null);
+  assert.strictEqual(C.getMusicMarks(), '♪♫♬♩');
+  C.setMusicMarks(undefined);
+  assert.strictEqual(C.getMusicMarks(), '♪♫♬♩');
+});
+t('恢复默认后行为与改前一致', () => {
+  C.setMusicMarks('♪♫♬♩');
+  assert.ok(C.musicRe().test('♪♫♬♩'));
+  assert.strictEqual(C.isPureHumming('♪♫♬♩ la la ♪♫♬♩'), true);
+  assert.strictEqual(C.isPureHumming('♪♫♬♩ hey jude ♪♫♬♩'), false);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

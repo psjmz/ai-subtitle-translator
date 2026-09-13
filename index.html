@@ -261,6 +261,8 @@
 
   /* 风格胶囊（原生 radio 隐藏） */
   .style-chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+/* v0.9.78：歌词三档并排（窄列下三列仍能容下 4 字标签），与上下控件留出呼吸 */
+.lyric-chips{grid-template-columns:repeat(3,1fr);margin:6px 0 10px}
   .schip{position:relative;display:block;border:1.5px solid #E4E3E0;border-radius:10px;font-size:12.5px;color:var(--sub);text-align:center;padding:8px 4px;cursor:pointer;transition:.13s;margin:0}
   .schip:hover{border-color:#D3D2CE;color:var(--ink)}
   .schip input{position:absolute;opacity:0;pointer-events:none}
@@ -394,7 +396,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.77</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.78</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -548,7 +550,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.77</span>
+    <span class="ver-tag">v0.9.78</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -594,6 +596,19 @@
       <label class="tgl-row"><span class="l"><span data-i18n="lblAutoTermsShort">自动术语表</span><i class="info" data-tip-i18n="chkAutoTerms">i</i></span><input type="checkbox" id="autoTerms" checked><span class="tgl"></span></label>
       <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
       <input type="number" id="maxW" value="21" min="8" max="48">
+
+      <!-- v0.9.78：歌词处理——三档（翻译/保留原文/删除）+ 可编辑的歌词标记字符集合 -->
+      <label class="flbl"><span data-i18n="lblLyric">歌词处理</span><i class="info" data-tip-i18n="lyricTip">i</i></label>
+      <div class="style-chips lyric-chips">
+        <label class="schip"><input type="radio" name="lyric" value="trans" checked><span data-i18n="lyricTrans">翻译歌词</span></label>
+        <label class="schip"><input type="radio" name="lyric" value="keep"><span data-i18n="lyricKeep">保留原文</span></label>
+        <label class="schip"><input type="radio" name="lyric" value="drop"><span data-i18n="lyricDrop">删除歌词</span></label>
+      </div>
+      <label class="flbl"><span data-i18n="lblMarks">歌词标记</span><i class="info" data-tip-i18n="marksTip">i</i></label>
+      <input type="text" id="marks" value="♪♫♬♩" spellcheck="false">
+
+      <!-- v0.9.78：去水词开关——默认开（既有行为）；关闭后水词行保留原文 -->
+      <label class="tgl-row"><span class="l"><span data-i18n="lblDropFillers">去除水词</span><i class="info" data-tip-i18n="dropFillersTip">i</i></span><input type="checkbox" id="dropFillers" checked><span class="tgl"></span></label>
 
       <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg><span data-i18n="secEngine">翻译引擎</span></div>
       <label class="flbl" data-i18n="lblMode">工作模式</label>
@@ -698,7 +713,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.77"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.78"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -796,7 +811,7 @@ const I18N = {
   termsHintOn:'勾选 = 术语表内的专名强制保留原文（下方术语表已启用）。',
   termsHintOff:'已关闭：人名/机构/产品/术语将全部翻译为目标语言，术语表不生效。',
   lblTerms:'需强制保留原文的专名（可留空，逗号分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行阈值（字，随目标语言按 Netflix 规范推荐），数字越大一行字数越多，但可减少字幕行数和字幕切分。', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止',
+  lblMaxW:'折行阈值（字，随目标语言按 Netflix 规范推荐），数字越大一行字数越多，但可减少字幕行数和字幕切分。', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止', lyricTip:'歌词行的处理方式：翻译／保留原文（不翻译）／删除（整组移除）。判断依据是「歌词标记」里的字符。', marksTip:'含这些字符的字幕行视为歌词。默认 ♪♫♬♩，可增删；留空自动恢复默认。若源文件歌词不带任何符号，可加入该字幕独有的标记。一行内歌词与对白混排时，删除档会自动降级为保留原文，不会误删对白。', lyricSkipKeep:'歌词 {0} 组按设置保留原文（未翻译）', lyricSkipDrop:'歌词 {0} 组按设置移除', lyricWarn:'注意：{0}% 的字幕行被判定为歌词，可能是「歌词标记」设置过宽，请确认后重跑', dropFillersTip:'关闭后，纯语气词、无实义哼唱等「水词」字幕保留原文而不是被清空。默认开启。',
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
   stepExport:'导出译文', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
@@ -863,7 +878,7 @@ const I18N = {
   aboutBody:'随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 开源仓库', aboutLicense:'AGPL-3.0 开源', wsBackHome:'首页',
   wsUploadNew:'上传新字幕', projEmpty:'未导入字幕', secImport:'导入字幕', secLang:'语言',
   secStyle:'翻译风格', secRules:'处理规则', secEngine:'翻译引擎', lblSrcShort:'原文语言',
-  lblDstShort:'目标语言', lblKeepTermsShort:'专名保留原文', lblAutoTermsShort:'自动术语表', lblMaxWShort:'折行阈值',
+  lblDstShort:'目标语言', lblKeepTermsShort:'专名保留原文', lblAutoTermsShort:'自动术语表', lblMaxWShort:'折行阈值', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
   /* v0.9.70 两段式界面新增 */
 },
 'zh-TW': {
@@ -891,7 +906,7 @@ const I18N = {
   termsHintOn:'勾選 = 術語表內的專名強制保留原文（下方術語表已啟用）。',
   termsHintOff:'已關閉：人名/機構/產品/術語將全部翻譯為目標語言，術語表不生效。',
   lblTerms:'需強制保留原文的專名（可留空，逗號分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
-  lblMaxW:'折行閾值（字，隨目標語言按 Netflix 規範推薦），數字越大一行字數越多，但可減少字幕行數和字幕切分。', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止',
+  lblMaxW:'折行閾值（字，隨目標語言按 Netflix 規範推薦），數字越大一行字數越多，但可減少字幕行數和字幕切分。', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止', lyricTip:'歌詞行的處理方式：翻譯／保留原文（不翻譯）／刪除（整組移除）。判斷依據是「歌詞標記」裡的字元。', marksTip:'含這些字元的字幕行視為歌詞。預設 ♪♫♬♩，可增刪；留空自動恢復預設。若字幕檔歌詞不帶任何符號，可加入該檔獨有的標記。一行內歌詞與對白混排時，刪除檔會自動降級為保留原文，不會誤刪對白。', lyricSkipKeep:'歌詞 {0} 組依設定保留原文（未翻譯）', lyricSkipDrop:'歌詞 {0} 組依設定移除', lyricWarn:'注意：{0}% 的字幕行被判定為歌詞，可能是「歌詞標記」設定過寬，請確認後重跑', dropFillersTip:'關閉後，純語氣詞、無實義哼唱等「贅詞」字幕保留原文而不是被清空。預設開啟。',
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
   stepExport:'匯出譯文', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
@@ -958,7 +973,7 @@ const I18N = {
   aboutBody:'隨心字幕 AI 是一款開源的 AI 字幕翻譯工具。我們相信好的字幕工具應該免費、乾淨、尊重隱私——不塞廣告、不要註冊、不動你的檔案。歡迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 開源倉庫', aboutLicense:'AGPL-3.0 開源', wsBackHome:'首頁',
   wsUploadNew:'上傳新字幕', projEmpty:'未匯入字幕', secImport:'匯入字幕', secLang:'語言',
   secStyle:'翻譯風格', secRules:'處理規則', secEngine:'翻譯引擎', lblSrcShort:'原文語言',
-  lblDstShort:'目標語言', lblKeepTermsShort:'專名保留原文', lblAutoTermsShort:'自動術語表', lblMaxWShort:'折行閾值',
+  lblDstShort:'目標語言', lblKeepTermsShort:'專名保留原文', lblAutoTermsShort:'自動術語表', lblMaxWShort:'折行閾值', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
   /* v0.9.70 两段式界面新增 */
 },
 'en': {
@@ -986,7 +1001,7 @@ const I18N = {
   termsHintOn:'Checked = terms in the list stay in original form (list enabled).',
   termsHintOff:'Off: all names/brands/products/terms are translated; the term list is ignored.',
   lblTerms:'Proper nouns to keep in original form (optional, comma-separated)', termsPh:'e.g. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Wrap threshold (units, Netflix spec per language) — a larger number fits more characters per line, reducing line count and cue splits', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop',
+  lblMaxW:'Wrap threshold (units, Netflix spec per language) — a larger number fits more characters per line, reducing line count and cue splits', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop', lyricTip:'How to handle lyric lines: translate / keep the original text / remove them entirely. Lines are matched by the characters in “Lyric markers”.', marksTip:'Subtitle lines containing any of these characters are treated as lyrics. Default ♪♫♬♩ — add or remove freely; leave empty to restore the default. If your file uses no music symbols, add the marker it does use. When a line mixes lyrics with dialogue, “Remove” falls back to keeping the original so dialogue is never deleted.', lyricSkipKeep:'{0} lyric group(s) kept in the original language (not translated)', lyricSkipDrop:'{0} lyric group(s) removed per your setting', lyricWarn:'Heads up: {0}% of lines were classified as lyrics — the marker set may be too broad. Please check and re-run.', dropFillersTip:'When off, lines that are nothing but filler (um, uh, meaningless humming) keep their original text instead of being cleared. On by default.',
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
   stepExport:'Export translation', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
@@ -1053,7 +1068,7 @@ const I18N = {
   aboutBody:'AI-SRTSub is an open-source AI subtitle translator. We believe a good subtitle tool should be free, clean and privacy-respecting — no ads, no sign-up, no touching your files. Self-host it, file requests, polish it together.', aboutRepo:'GitHub repository', aboutLicense:'AGPL-3.0 open source', wsBackHome:'Home',
   wsUploadNew:'New subtitle', projEmpty:'No subtitle loaded', secImport:'Import', secLang:'Languages',
   secStyle:'Style', secRules:'Rules', secEngine:'Engine', lblSrcShort:'Source language',
-  lblDstShort:'Target language', lblKeepTermsShort:'Keep proper nouns', lblAutoTermsShort:'Auto glossary', lblMaxWShort:'Line width',
+  lblDstShort:'Target language', lblKeepTermsShort:'Keep proper nouns', lblAutoTermsShort:'Auto glossary', lblMaxWShort:'Line width', lblLyric:'Lyrics', lyricTrans:'Translate', lyricKeep:'Keep original', lyricDrop:'Remove', lblMarks:'Lyric markers', lblDropFillers:'Remove fillers',
   /* v0.9.70 两段式界面新增 */
 },
 'ja': {
@@ -1081,7 +1096,7 @@ const I18N = {
   termsHintOn:'チェック＝用語リストの固有名詞を原文のまま保持（リスト有効）。',
   termsHintOff:'オフ：人名/組織/製品/用語はすべて翻訳先言語に訳され、用語リストは無効。',
   lblTerms:'原文のまま保持する固有名詞（任意、カンマ区切り）', termsPh:'例：SpaceX, Prism, EnduroSat',
-  lblMaxW:'改行しきい値（字、Netflix規格の言語別推奨）、数値が大きいほど1行の文字数が増え、字幕の行数と分割を減らせます', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止',
+  lblMaxW:'改行しきい値（字、Netflix規格の言語別推奨）、数値が大きいほど1行の文字数が増え、字幕の行数と分割を減らせます', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止', lyricTip:'歌詞行の扱い：翻訳／原文のまま／削除（グループごと除去）。判定は「歌詞マーク」の文字で行います。', marksTip:'これらの文字を含む字幕行を歌詞として扱います。既定は ♪♫♬♩。追加・削除可、空にすると既定に戻ります。ファイルに音記号が無い場合はその記号を追加してください。1行に歌詞と台詞が混在する場合、「削除」は自動的に原文保持へ切り替わり、台詞を誤削除しません。', lyricSkipKeep:'歌詞 {0} グループを設定どおり原文のまま保持（未翻訳）', lyricSkipDrop:'歌詞 {0} グループを設定どおり削除', lyricWarn:'注意：{0}% の行が歌詞と判定されました。「歌詞マーク」の指定が広すぎる可能性があります。確認して再実行してください。', dropFillersTip:'オフにすると、「あー」「うー」などの中身のない行は消去せず原文のまま残します。既定はオン。',
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
   stepExport:'翻訳を書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
@@ -1148,7 +1163,7 @@ const I18N = {
   aboutBody:'AI-SRTSub はオープンソースの AI 字幕翻訳ツールです。良い字幕ツールは無料で、クリーンで、プライバシーを尊重すべき——広告なし、登録なし、ファイルに手を加えない。セルフホストも歓迎。', aboutRepo:'GitHub リポジトリ', aboutLicense:'AGPL-3.0 オープンソース', wsBackHome:'ホーム',
   wsUploadNew:'新しい字幕', projEmpty:'字幕未読み込み', secImport:'読み込み', secLang:'言語',
   secStyle:'翻訳スタイル', secRules:'処理ルール', secEngine:'エンジン', lblSrcShort:'原文言語',
-  lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞を保持', lblAutoTermsShort:'自動用語集', lblMaxWShort:'折り返し幅',
+  lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞を保持', lblAutoTermsShort:'自動用語集', lblMaxWShort:'折り返し幅', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
   /* v0.9.70 两段式界面新增 */
 },
 'es': {
@@ -1176,7 +1191,7 @@ const I18N = {
   termsHintOn:'Marcado = los términos de la lista se mantienen en su forma original (lista activada).',
   termsHintOff:'Desactivado: todos los nombres/marcas/productos/términos se traducen; la lista se ignora.',
   lblTerms:'Nombres propios a mantener en su forma original (opcional, separados por comas)', termsPh:'p. ej. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbral de ajuste de línea (norma Netflix por idioma); a mayor número, más caracteres por línea, pero menos líneas y cortes', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener',
+  lblMaxW:'Umbral de ajuste de línea (norma Netflix por idioma); a mayor número, más caracteres por línea, pero menos líneas y cortes', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener', lyricTip:'가사 줄 처리 방식: 번역／원문 유지／삭제(그룹 전체 제거). 판단 기준은 ‘가사 기호’의 문자입니다.', marksTip:'이 문자가 포함된 자막 줄을 가사로 처리합니다. 기본값 ♪♫♬♩, 추가·삭제 가능, 비우면 기본값 복원. 파일에 음악 기호가 없다면 해당 기호를 추가하세요. 한 줄에 가사와 대사가 섞인 경우 ‘삭제’는 자동으로 원문 유지로 바뀌어 대사가 지워지지 않습니다.', lyricSkipKeep:'가사 {0}개 그룹을 설정대로 원문 유지(미번역)', lyricSkipDrop:'가사 {0}개 그룹을 설정대로 삭제', lyricWarn:'주의: {0}%의 줄이 가사로 판정되었습니다. ‘가사 기호’ 지정이 너무 넓을 수 있습니다. 확인 후 다시 실행하세요.', dropFillersTip:'끄면 "음, 어" 등 뜻없는 소리만 있는 줄을 지우지 않고 원문 그대로 둡니다. 기본은 켜짐.',
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
   stepExport:'Exportar traducción', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
@@ -1243,7 +1258,7 @@ const I18N = {
   aboutBody:'AI-SRTSub es un traductor de subtítulos con IA de código abierto. Creemos que una buena herramienta debe ser gratis, limpia y respetar la privacidad: sin anuncios, sin registro, sin tocar tus archivos. Despliega la tuya o ayúdanos a pulirla.', aboutRepo:'Repositorio GitHub', aboutLicense:'Código abierto AGPL-3.0', wsBackHome:'Inicio',
   wsUploadNew:'Nuevo subtítulo', projEmpty:'Sin subtítulo cargado', secImport:'Importar', secLang:'Idiomas',
   secStyle:'Estilo', secRules:'Reglas', secEngine:'Motor', lblSrcShort:'Idioma origen',
-  lblDstShort:'Idioma destino', lblKeepTermsShort:'Mantener nombres propios', lblAutoTermsShort:'Glosario automático', lblMaxWShort:'Ancho de línea',
+  lblDstShort:'Idioma destino', lblKeepTermsShort:'Mantener nombres propios', lblAutoTermsShort:'Glosario automático', lblMaxWShort:'Ancho de línea', lblLyric:'가사 처리', lyricTrans:'번역', lyricKeep:'원문 유지', lyricDrop:'삭제', lblMarks:'가사 기호', lblDropFillers:'군더더기 제거',
   /* v0.9.70 两段式界面新增 */
 },
 'pt': {
@@ -1271,7 +1286,7 @@ const I18N = {
   termsHintOn:'Marcado = os termos da lista ficam na forma original (lista ativada).',
   termsHintOff:'Desativado: todos os nomes/marcas/produtos/termos são traduzidos; a lista é ignorada.',
   lblTerms:'Nomes próprios a manter na forma original (opcional, separados por vírgula)', termsPh:'ex.: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Limite de quebra de linha (padrão Netflix por idioma); quanto maior o número, mais caracteres por linha, mas menos linhas e divisões', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar',
+  lblMaxW:'Limite de quebra de linha (padrão Netflix por idioma); quanto maior o número, mais caracteres por linha, mas menos linhas e divisões', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar', lyricTip:'Cómo tratar las líneas de canción: traducir / mantener el original / eliminarlas. Se reconocen por los caracteres de «Marcas de letra».', marksTip:'Las líneas que contengan estos caracteres se tratan como letra de canción. Por defecto ♪♫♬♩; puedes añadir o quitar, y dejarlo vacío restaura el valor por defecto. Si tu archivo no usa símbolos musicales, añade el marcador que use. Si una línea mezcla letra y diálogo, «Eliminar» pasa a mantener el original para no borrar el diálogo.', lyricSkipKeep:'{0} grupo(s) de letra mantenidos en el original (sin traducir)', lyricSkipDrop:'{0} grupo(s) de letra eliminados según tu ajuste', lyricWarn:'Atención: el {0}% de las líneas se clasificaron como letra; puede que las marcas sean demasiado amplias. Revísalo y vuelve a ejecutar.', dropFillersTip:'Si se desactiva, las líneas que solo contienen muletillas (eh, mmm) conservan el original en lugar de vaciarse. Activado por defecto.',
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
   stepExport:'Exportar tradução', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
@@ -1338,7 +1353,7 @@ const I18N = {
   aboutBody:'O AI-SRTSub é um tradutor de legendas com IA, de código aberto. Acreditamos que uma boa ferramenta deve ser grátis, limpa e respeitar a privacidade — sem anúncios, sem cadastro, sem mexer nos seus arquivos. Faça seu self-host ou ajude a lapidar.', aboutRepo:'Repositório GitHub', aboutLicense:'Código aberto AGPL-3.0', wsBackHome:'Início',
   wsUploadNew:'Nova legenda', projEmpty:'Nenhuma legenda carregada', secImport:'Importar', secLang:'Idiomas',
   secStyle:'Estilo', secRules:'Regras', secEngine:'Motor', lblSrcShort:'Idioma de origem',
-  lblDstShort:'Idioma de destino', lblKeepTermsShort:'Manter nomes próprios', lblAutoTermsShort:'Glossário automático', lblMaxWShort:'Largura de linha',
+  lblDstShort:'Idioma de destino', lblKeepTermsShort:'Manter nomes próprios', lblAutoTermsShort:'Glossário automático', lblMaxWShort:'Largura de linha', lblLyric:'Letras de canciones', lyricTrans:'Traducir', lyricKeep:'Mantener original', lyricDrop:'Eliminar', lblMarks:'Marcas de letra', lblDropFillers:'Quitar muletillas',
   /* v0.9.70 两段式界面新增 */
 },
 'ko': {
@@ -1366,7 +1381,7 @@ const I18N = {
   termsHintOn:'체크 = 목록의 용어를 원문 그대로 유지(목록 활성화).',
   termsHintOff:'끔: 모든 인물/브랜드/제품/용어를 번역하며 용어 목록은 무시됩니다.',
   lblTerms:'원문으로 유지할 고유명사(선택, 쉼표로 구분)', termsPh:'예: SpaceX, Prism, EnduroSat',
-  lblMaxW:'줄바꿈 기준(단위, Netflix 규격 언어별 권장), 숫자가 클수록 한 줄에 더 많은 글자가 들어가고 자막 줄 수와 분할이 줄어듭니다', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지',
+  lblMaxW:'줄바꿈 기준(단위, Netflix 규격 언어별 권장), 숫자가 클수록 한 줄에 더 많은 글자가 들어가고 자막 줄 수와 분할이 줄어듭니다', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지', lyricTip:'Como tratar as linhas de música: traduzir / manter o original / remover. O reconhecimento usa os caracteres de «Marcas de letra».', marksTip:'Linhas com estes caracteres são tratadas como letra de música. Padrão ♪♫♬♩; pode acrescentar ou remover, e deixar vazio restaura o padrão. Se o seu arquivo não usa símbolos musicais, adicione o marcador que ele usa. Se uma linha misturar letra e diálogo, «Remover» passa a manter o original para não apagar o diálogo.', lyricSkipKeep:'{0} grupo(s) de letra mantidos no original (sem tradução)', lyricSkipDrop:'{0} grupo(s) de letra removidos conforme sua configuração', lyricWarn:'Atenção: {0}% das linhas foram classificadas como letra; o conjunto de marcas pode estar amplo demais. Confira e execute novamente.', dropFillersTip:'Se desativado, linhas só com vícios de linguagem (hã, hmm) mantêm o original em vez de serem apagadas. Ativado por padrão.',
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
   stepExport:'번역 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
@@ -1433,7 +1448,7 @@ const I18N = {
   aboutBody:'AI-SRTSub는 오픈소스 AI 자막 번역 도구입니다. 좋은 자막 도구는 무료·깔끔·프라이버시 존중이어야 한다고 믿습니다——광고 없음, 가입 없음, 파일 만지지 않음. 직접 설치하거나 요청을 남겨주세요.', aboutRepo:'GitHub 저장소', aboutLicense:'AGPL-3.0 오픈소스', wsBackHome:'홈',
   wsUploadNew:'새 자막 올리기', projEmpty:'자막 없음', secImport:'가져오기', secLang:'언어',
   secStyle:'번역 스타일', secRules:'처리 규칙', secEngine:'엔진', lblSrcShort:'원본 언어',
-  lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사 원문 유지', lblAutoTermsShort:'자동 용어집', lblMaxWShort:'줄 폭 기준',
+  lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사 원문 유지', lblAutoTermsShort:'자동 용어집', lblMaxWShort:'줄 폭 기준', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
   /* v0.9.70 两段式界面新增 */
 },
 'de': {
@@ -1461,7 +1476,7 @@ const I18N = {
   termsHintOn:'Aktiviert = Begriffe aus der Liste bleiben in Originalform (Liste aktiv).',
   termsHintOff:'Aus: alle Namen/Firmen/Produkte/Begriffe werden übersetzt; die Liste wird ignoriert.',
   lblTerms:'Eigennamen, die in Originalform bleiben sollen (optional, kommagetrennt)', termsPh:'z. B. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Umbruch-Schwellwert (Netflix-Standard je Sprache); größerer Wert = mehr Zeichen pro Zeile, dafür weniger Zeilen und Aufteilungen', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen',
+  lblMaxW:'Umbruch-Schwellwert (Netflix-Standard je Sprache); größerer Wert = mehr Zeichen pro Zeile, dafür weniger Zeilen und Aufteilungen', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen', lyricTip:'Umgang mit Liedzeilen: übersetzen / Original behalten / entfernen. Erkannt werden sie an den Zeichen unter „Liedmarken“.', marksTip:'Zeilen mit diesen Zeichen gelten als Liedtext. Standard ♪♫♬♩ — beliebig ergänzen oder entfernen; leer stellt den Standard wieder her. Wenn deine Datei keine Musikzeichen nutzt, trage deren Markierung ein. Enthält eine Zeile Gesang und Dialog, wechselt „Entfernen“ zu „Original behalten“, damit kein Dialog verloren geht.', lyricSkipKeep:'{0} Liedgruppen wurden gemäß Einstellung im Original belassen (nicht übersetzt)', lyricSkipDrop:'{0} Liedgruppen wurden gemäß Einstellung entfernt', lyricWarn:'Achtung: {0}% der Zeilen wurden als Liedtext eingestuft — die Marken sind womöglich zu weit gefasst. Bitte prüfen und erneut starten.', dropFillersTip:'Wenn aus, bleiben Zeilen nur mit Füllwörtern (äh, hmm) im Original stehen, statt geleert zu werden. Standardmäßig an.',
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
   stepExport:'Übersetzung exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
@@ -1528,7 +1543,7 @@ const I18N = {
   aboutBody:'AI-SRTSub ist ein Open-Source-Untertitelübersetzer mit KI. Wir finden: Gute Tools sind kostenlos, sauber und respektieren die Privatsphäre — keine Werbung, keine Anmeldung, keine Finger auf deinen Dateien. Self-Hosten und Mitschmieden willkommen.', aboutRepo:'GitHub-Repository', aboutLicense:'Open Source AGPL-3.0', wsBackHome:'Start',
   wsUploadNew:'Neuer Untertitel', projEmpty:'Kein Untertitel geladen', secImport:'Import', secLang:'Sprachen',
   secStyle:'Stil', secRules:'Regeln', secEngine:'Engine', lblSrcShort:'Ausgangssprache',
-  lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen behalten', lblAutoTermsShort:'Auto-Glossar', lblMaxWShort:'Zeilenbreite',
+  lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen behalten', lblAutoTermsShort:'Auto-Glossar', lblMaxWShort:'Zeilenbreite', lblLyric:'Liedtexte', lyricTrans:'Übersetzen', lyricKeep:'Original behalten', lyricDrop:'Entfernen', lblMarks:'Liedmarken', lblDropFillers:'Füllwörter entfernen',
   /* v0.9.70 两段式界面新增 */
 },
 'fr': {
@@ -1556,7 +1571,7 @@ const I18N = {
   termsHintOn:'Coché = les termes de la liste restent en forme originale (liste activée).',
   termsHintOff:'Désactivé : tous les noms/marques/produits/termes sont traduits ; la liste est ignorée.',
   lblTerms:'Noms propres à conserver en forme originale (facultatif, séparés par des virgules)', termsPh:'ex. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Seuil de retour ligne (norme Netflix par langue) ; plus la valeur est élevée, plus il y a de caractères par ligne, mais moins de lignes et de coupures', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter',
+  lblMaxW:'Seuil de retour ligne (norme Netflix par langue) ; plus la valeur est élevée, plus il y a de caractères par ligne, mais moins de lignes et de coupures', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter', lyricTip:'Traitement des lignes chantées : traduire / garder l\'original / supprimer. La détection utilise les caractères de « Marques de paroles ».', marksTip:'Les lignes contenant ces caractères sont traitées comme des paroles. Par défaut ♪♫♬♩ — à modifier librement ; laisser vide restaure le défaut. Si votre fichier n\'utilise aucun symbole musical, ajoutez le marqueur qu\'il emploie. Si une ligne mêle chant et dialogue, « Supprimer » bascule sur « garder l\'original » pour ne pas effacer le dialogue.', lyricSkipKeep:'{0} groupe(s) de paroles conservés en langue originale (non traduits)', lyricSkipDrop:'{0} groupe(s) de paroles supprimés selon votre réglage', lyricWarn:'Attention : {0} % des lignes ont été classées comme paroles — le jeu de marques est peut-être trop large. Vérifiez puis relancez.', dropFillersTip:'Si désactivé, les lignes ne contenant que des tics de langage (euh, hmm) conservent leur texte au lieu d\'être vidées. Activé par défaut.',
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
   stepExport:'Exporter la traduction', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
@@ -1623,7 +1638,7 @@ const I18N = {
   aboutBody:'AI-SRTSub est un traducteur de sous-titres IA open source. Pour nous, un bon outil doit être gratuit, propre et respecter la vie privée — pas de pub, pas d\'inscription, on ne touche pas à vos fichiers. Auto-hébergez-vous ou venez le polir avec nous.', aboutRepo:'Dépôt GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Accueil',
   wsUploadNew:'Nouveau sous-titre', projEmpty:'Aucun sous-titre chargé', secImport:'Importer', secLang:'Langues',
   secStyle:'Style', secRules:'Règles', secEngine:'Moteur', lblSrcShort:'Langue source',
-  lblDstShort:'Langue cible', lblKeepTermsShort:'Garder les noms propres', lblAutoTermsShort:'Glossaire auto', lblMaxWShort:'Largeur de ligne',
+  lblDstShort:'Langue cible', lblKeepTermsShort:'Garder les noms propres', lblAutoTermsShort:'Glossaire auto', lblMaxWShort:'Largeur de ligne', lblLyric:'Paroles', lyricTrans:'Traduire', lyricKeep:'Garder l\'original', lyricDrop:'Supprimer', lblMarks:'Marques de paroles', lblDropFillers:'Supprimer les tics',
   /* v0.9.70 两段式界面新增 */
 },
 'id': {
@@ -1651,7 +1666,7 @@ const I18N = {
   termsHintOn:'Dicentang = istilah dalam daftar tetap dalam bentuk asli (daftar aktif).',
   termsHintOff:'Mati: semua nama/merek/produk/istilah diterjemahkan; daftar diabaikan.',
   lblTerms:'Nama diri yang dipertahankan dalam bentuk asli (opsional, pisahkan koma)', termsPh:'mis. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ambang pembungkusan baris (standar Netflix per bahasa); semakin besar angkanya, semakin banyak karakter per baris, tetapi baris dan pemisahan berkurang', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti',
+  lblMaxW:'Ambang pembungkusan baris (standar Netflix per bahasa); semakin besar angkanya, semakin banyak karakter per baris, tetapi baris dan pemisahan berkurang', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti', lyricTip:'Cara menangani baris lirik: terjemahkan / pertahankan teks asli / hapus. Pendeteksian memakai karakter di “Penanda lirik”.', marksTip:'Baris yang memuat karakter ini dianggap lirik. Bawaan ♪♫♬♩ — bisa ditambah atau dihapus; dikosongkan akan mengembalikan bawaan. Jika berkas Anda tidak memakai simbol musik, tambahkan penanda yang dipakainya. Jika satu baris mencampur lirik dan dialog, “Hapus” otomatis turun ke mempertahankan asli agar dialog tidak ikut terhapus.', lyricSkipKeep:'{0} grup lirik dipertahankan dalam bahasa asli (tidak diterjemahkan)', lyricSkipDrop:'{0} grup lirik dihapus sesuai pengaturan', lyricWarn:'Perhatian: {0}% baris terdeteksi sebagai lirik — kemungkinan penanda terlalu luas. Periksa lalu jalankan ulang.', dropFillersTip:'Jika dimatikan, baris yang hanya berisi kata pengisi (eh, hmm) tetap mempertahankan teks aslinya, tidak dikosongkan. Aktif secara bawaan.',
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
   stepExport:'Ekspor terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
@@ -1718,7 +1733,7 @@ const I18N = {
   aboutBody:'AI-SRTSub adalah penerjemah subtitel AI sumber terbuka. Kami percaya alat yang baik harus gratis, bersih, dan menghormati privasi — tanpa iklan, tanpa pendaftaran, tanpa menyentuh file Anda. Silakan self-host atau ikut menyempurnakan.', aboutRepo:'Repositori GitHub', aboutLicense:'Sumber terbuka AGPL-3.0', wsBackHome:'Beranda',
   wsUploadNew:'Subtitel baru', projEmpty:'Belum ada subtitel', secImport:'Impor', secLang:'Bahasa',
   secStyle:'Gaya', secRules:'Aturan', secEngine:'Mesin', lblSrcShort:'Bahasa sumber',
-  lblDstShort:'Bahasa target', lblKeepTermsShort:'Pertahankan nama diri', lblAutoTermsShort:'Glosarium otomatis', lblMaxWShort:'Lebar baris',
+  lblDstShort:'Bahasa target', lblKeepTermsShort:'Pertahankan nama diri', lblAutoTermsShort:'Glosarium otomatis', lblMaxWShort:'Lebar baris', lblLyric:'Lirik', lyricTrans:'Terjemahkan', lyricKeep:'Pertahankan asli', lyricDrop:'Hapus', lblMarks:'Penanda lirik', lblDropFillers:'Hapus kata pengisi',
   /* v0.9.70 两段式界面新增 */
 },
 'hi': {
@@ -1746,7 +1761,7 @@ const I18N = {
   termsHintOn:'चयनित = सूची के शब्द मूल रूप में रहेंगे (सूची सक्रिय)।',
   termsHintOff:'बंद: सभी नाम/ब्रांड/उत्पाद/शब्दावली अनुवाद होंगे; सूची नज़रअंदाज़।',
   lblTerms:'मूल रूप में रखने योग्य संज्ञाएँ (वैकल्पिक, कॉमा से अलग)', termsPh:'जैसे SpaceX, Prism, EnduroSat',
-  lblMaxW:'रैप सीमा (इकाई, Netflix मानक अनुसार भाषा-वार); संख्या बड़ी होने पर प्रति पंक्ति अधिक अक्षर आते हैं, पर उपशीर्षक पंक्तियाँ और विभाजन कम होते हैं', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें',
+  lblMaxW:'रैप सीमा (इकाई, Netflix मानक अनुसार भाषा-वार); संख्या बड़ी होने पर प्रति पंक्ति अधिक अक्षर आते हैं, पर उपशीर्षक पंक्तियाँ और विभाजन कम होते हैं', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें', lyricTip:'गीत वाली पंक्तियों को कैसे संभालें: अनूदित करें / मूल रखें / हटाएँ। पहचान «गीत चिह्न» के अक्षरों से होती है।', marksTip:'इन अक्षरों वाली पंक्तियाँ गीत मानी जाती हैं। डिफ़ॉल्ट ♪♫♬♩ — जोड़ें या हटाएँ; खाली छोड़ने पर डिफ़ॉल्ट बहाल हो जाता है। यदि आपकी फ़ाइल में कोई संगीत चिह्न नहीं है, तो उसका चिह्न यहाँ जोड़ें। यदि एक पंक्ति में गीत और संवाद दोनों हों, तो «हटाएँ» स्वतः मूल रखने पर आ जाता है, जिससे संवाद नहीं मिटता।', lyricSkipKeep:'{0} गीत समूह सेटिंग के अनुसार मूल भाषा में रखे गए (अनूदित नहीं)', lyricSkipDrop:'{0} गीत समूह सेटिंग के अनुसार हटाए गए', lyricWarn:'ध्यान दें: {0}% पंक्तियाँ गीत मानी गईं — शायद चिह्न-समूह बहुत व्यापक है। जाँच करें और फिर चलाएँ।', dropFillersTip:'बंद करने पर, केवल भराव शब्दों (हम्म, अ…) वाली पंक्तियाँ हटाई नहीं जाएँगी, बल्कि मूल रूप में रहेंगी। डिफ़ॉल्ट रूप से चालू।',
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
   stepExport:'अनुवाद निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
@@ -1813,7 +1828,7 @@ const I18N = {
   aboutBody:'AI-SRTSub एक ओपन-सोर्स AI सबटाइटल अनुवादक है। हम मानते हैं कि अच्छा टूल मुफ़्त, साफ़ और प्राइवेसी का ख्याल रखने वाला होना चाहिए — न विज्ञापन, न रजिस्ट्रेशन, न आपकी फ़ाइलों को छूना। सेल्फ-होस्ट करें या साथ में निखारें।', aboutRepo:'GitHub रिपॉज़िटरी', aboutLicense:'AGPL-3.0 ओपन सोर्स', wsBackHome:'होम',
   wsUploadNew:'नया सबटाइटल', projEmpty:'कोई सबटाइटल नहीं', secImport:'इंपोर्ट', secLang:'भाषा',
   secStyle:'अनुवाद स्टाइल', secRules:'नियम', secEngine:'इंजन', lblSrcShort:'स्रोत भाषा',
-  lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'नाम मूल रूप में रखें', lblAutoTermsShort:'ऑटो ग्लॉसरी', lblMaxWShort:'लाइन चौड़ाई',
+  lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'नाम मूल रूप में रखें', lblAutoTermsShort:'ऑटो ग्लॉसरी', lblMaxWShort:'लाइन चौड़ाई', lblLyric:'गीत के बोल', lyricTrans:'अनूदित करें', lyricKeep:'मूल रखें', lyricDrop:'हटाएँ', lblMarks:'गीत चिह्न', lblDropFillers:'भराव शब्द हटाएँ',
   /* v0.9.70 两段式界面新增 */
 },
 'th': {
@@ -1841,7 +1856,7 @@ const I18N = {
   termsHintOn:'เลือก = คำในรายการคงรูปเดิม (รายการเปิดใช้งาน)',
   termsHintOff:'ปิด: ชื่อ/แบรนด์/ผลิตภัณฑ์/คำศัพท์ทั้งหมดจะถูกแปล; รายการถูกละเว้น',
   lblTerms:'ชื่อเฉพาะที่จะคงรูปเดิม (ไม่บังคับ คั่นด้วยจุลภาค)', termsPh:'เช่น SpaceX, Prism, EnduroSat',
-  lblMaxW:'เกณฑ์ตัดบรรทัด (มาตรฐาน Netflix ตามภาษา) ยิ่งตัวเลขมาก ยิ่งมีตัวอักษรต่อบรรทัดมากขึ้น แต่ลดจำนวนบรรทัดและการแบ่งซับ', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด',
+  lblMaxW:'เกณฑ์ตัดบรรทัด (มาตรฐาน Netflix ตามภาษา) ยิ่งตัวเลขมาก ยิ่งมีตัวอักษรต่อบรรทัดมากขึ้น แต่ลดจำนวนบรรทัดและการแบ่งซับ', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด', lyricTip:'วิธีจัดการบรรทัดเนื้อเพลง: แปล / เก็บต้นฉบับ / ลบ ตรวจสอบจากตัวอักษรใน «เครื่องหมายเนื้อเพลง»', marksTip:'บรรทัดที่มีตัวอักษรเหล่านี้จะถือเป็นเนื้อเพลง ค่าเริ่มต้น ♪♫♬♩ — เพิ่มหรือลบได้ หากเว้นว่างจะกลับไปใช้ค่าเริ่มต้น หากไฟล์ของคุณไม่มีสัญลักษณ์ดนตรี ให้เพิ่มเครื่องหมายที่ไฟล์นั้นใช้ หากบรรทัดใดมีทั้งเนื้อเพลงและบทสนทนา «ลบ» จะเปลี่ยนเป็นเก็บต้นฉบับอัตโนมัติ เพื่อไม่ให้บทสนทนาถูกลบ', lyricSkipKeep:'เก็บเนื้อเพลง {0} กลุ่มไว้เป็นภาษาต้นฉบับตามการตั้งค่า (ไม่แปล)', lyricSkipDrop:'ลบเนื้อเพลง {0} กลุ่มตามการตั้งค่า', lyricWarn:'ระวัง: {0}% ของบรรทัดถูกจัดเป็นเนื้อเพลง — อาจตั้งเครื่องหมายกว้างเกินไป โปรดตรวจสอบแล้วรันใหม่', dropFillersTip:'เมื่อปิด บรรทัดที่มีแต่คำอุทาน (เอ่อ, อืม) จะเก็บข้อความต้นฉบับไว้แทนการล้าง ค่าเริ่มต้นคือเปิด',
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
   stepExport:'ส่งออกคำแปล', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
@@ -1908,7 +1923,7 @@ const I18N = {
   aboutBody:'AI-SRTSub คือเครื่องมือแปลซับด้วย AI แบบโอเพนซอร์ส เราเชื่อว่าเครื่องมือที่ดีต้องฟรี สะอาด และเคารพความเป็นส่วนตัว — ไม่มีโฆษณา ไม่ต้องสมัคร ไม่แตะไฟล์ของคุณ ติดตั้งเองได้ ช่วยกันขัดเกลาได้', aboutRepo:'รีโพซิทอรี GitHub', aboutLicense:'โอเพนซอร์ส AGPL-3.0', wsBackHome:'หน้าแรก',
   wsUploadNew:'ซับใหม่', projEmpty:'ยังไม่มีซับ', secImport:'นำเข้า', secLang:'ภาษา',
   secStyle:'สไตล์', secRules:'กฎการประมวลผล', secEngine:'เอนจิน', lblSrcShort:'ภาษาต้นทาง',
-  lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'คงชื่อเฉพาะภาษาเดิม', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', lblMaxWShort:'ความกว้างบรรทัด',
+  lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'คงชื่อเฉพาะภาษาเดิม', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', lblMaxWShort:'ความกว้างบรรทัด', lblLyric:'เนื้อเพลง', lyricTrans:'แปล', lyricKeep:'เก็บต้นฉบับ', lyricDrop:'ลบ', lblMarks:'เครื่องหมายเนื้อเพลง', lblDropFillers:'ลบคำอุทาน',
   /* v0.9.70 两段式界面新增 */
 },
 'vi': {
@@ -1936,7 +1951,7 @@ const I18N = {
   termsHintOn:'Đã chọn = các thuật ngữ trong danh sách giữ nguyên dạng (danh sách bật).',
   termsHintOff:'Tắt: mọi tên/thương hiệu/sản phẩm/thuật ngữ đều được dịch; danh sách bị bỏ qua.',
   lblTerms:'Tên riêng cần giữ nguyên (không bắt buộc, phân tách bằng dấu phẩy)', termsPh:'vd: SpaceX, Prism, EnduroSat',
-  lblMaxW:'Ngưỡng ngắt dòng (chuẩn Netflix theo ngôn ngữ); số càng lớn càng nhiều ký tự mỗi dòng, nhưng giảm số dòng và số lần tách phụ đề', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng',
+  lblMaxW:'Ngưỡng ngắt dòng (chuẩn Netflix theo ngôn ngữ); số càng lớn càng nhiều ký tự mỗi dòng, nhưng giảm số dòng và số lần tách phụ đề', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng', lyricTip:'Cách xử lý dòng lời bài hát: dịch / giữ nguyên bản / xóa. Nhận diện bằng các ký tự trong «Dấu hiệu lời bài hát».', marksTip:'Dòng chứa các ký tự này được coi là lời bài hát. Mặc định ♪♫♬♩ — có thể thêm hoặc bớt; để trống sẽ khôi phục mặc định. Nếu tệp của bạn không dùng ký hiệu âm nhạc, hãy thêm dấu hiệu mà tệp đó dùng. Nếu một dòng vừa có lời vừa có thoại, «Xóa» sẽ tự động chuyển sang giữ nguyên bản để không xóa nhầm thoại.', lyricSkipKeep:'{0} nhóm lời bài hát được giữ nguyên bản theo cài đặt (không dịch)', lyricSkipDrop:'{0} nhóm lời bài hát bị xóa theo cài đặt', lyricWarn:'Lưu ý: {0}% số dòng được phân loại là lời bài hát — có thể bộ dấu hiệu đang quá rộng. Hãy kiểm tra rồi chạy lại.', dropFillersTip:'Khi tắt, những dòng chỉ có từ đệm (ừ, hmm) sẽ giữ nguyên bản thay vì bị xóa. Mặc định là bật.',
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
   stepExport:'Xuất bản dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
@@ -2003,7 +2018,7 @@ const I18N = {
   aboutBody:'AI-SRTSub là công cụ dịch phụ đề bằng AI mã nguồn mở. Chúng tôi tin công cụ tốt phải miễn phí, sạch sẽ và tôn trọng riêng tư — không quảng cáo, không đăng ký, không động vào tệp của bạn. Tự triển khai hay cùng nhau hoàn thiện đều chào đón.', aboutRepo:'Kho GitHub', aboutLicense:'Mã nguồn mở AGPL-3.0', wsBackHome:'Trang chủ',
   wsUploadNew:'Phụ đề mới', projEmpty:'Chưa có phụ đề', secImport:'Nhập', secLang:'Ngôn ngữ',
   secStyle:'Phong cách', secRules:'Quy tắc', secEngine:'Engine', lblSrcShort:'Ngôn ngữ nguồn',
-  lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Giữ nguyên tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', lblMaxWShort:'Độ rộng dòng',
+  lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Giữ nguyên tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', lblMaxWShort:'Độ rộng dòng', lblLyric:'Lời bài hát', lyricTrans:'Dịch', lyricKeep:'Giữ nguyên bản', lyricDrop:'Xóa', lblMarks:'Dấu hiệu lời bài hát', lblDropFillers:'Xóa từ đệm',
   /* v0.9.70 两段式界面新增 */
 },
 'ru': {
@@ -2031,7 +2046,7 @@ const I18N = {
   termsHintOn:'Включено = термины из списка остаются в оригинальном виде (список активен).',
   termsHintOff:'Выключено: все имена/бренды/продукты/термины переводятся; список игнорируется.',
   lblTerms:'Имена собственные для сохранения оригинала (необязательно, через запятую)', termsPh:'напр. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Порог переноса строк (стандарт Netflix по языку); чем больше число, тем больше знаков в строке, но меньше строк и разбиений', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки',
+  lblMaxW:'Порог переноса строк (стандарт Netflix по языку); чем больше число, тем больше знаков в строке, но меньше строк и разбиений', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки', lyricTip:'Как обрабатывать строки песен: переводить / оставить оригинал / удалить. Распознавание — по символам из «Маркеры песен».', marksTip:'Строки с этими символами считаются текстом песни. По умолчанию ♪♫♬♩ — можно добавлять и удалять; пустое поле восстанавливает значение по умолчанию. Если в вашем файле нет музыкальных символов, добавьте обозначение, которое в нём используется. Если в строке есть и песня, и диалог, «Удалить» автоматически переключается на сохранение оригинала, чтобы не удалить диалог.', lyricSkipKeep:'{0} групп текста песни оставлены на языке оригинала согласно настройке (без перевода)', lyricSkipDrop:'{0} групп текста песни удалены согласно настройке', lyricWarn:'Внимание: {0}% строк определены как текст песни — возможно, набор маркеров слишком широк. Проверьте и запустите заново.', dropFillersTip:'Если выключено, строки только из слов-паразитов (э-э, хм) сохраняют исходный текст вместо очистки. По умолчанию включено.',
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
   stepExport:'Экспорт перевода', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
@@ -2098,7 +2113,7 @@ const I18N = {
   aboutBody:'AI-SRTSub — субтитровочный ИИ-переводчик с открытым кодом. Мы уверены: хороший инструмент должен быть бесплатным, чистым и уважать приватность — без рекламы, без регистрации, не трогая ваши файлы. Разворачивайте у себя и совершенствуйте вместе с нами.', aboutRepo:'Репозиторий GitHub', aboutLicense:'Открытый код AGPL-3.0', wsBackHome:'Главная',
   wsUploadNew:'Новые субтитры', projEmpty:'Субтитры не загружены', secImport:'Импорт', secLang:'Языки',
   secStyle:'Стиль', secRules:'Правила', secEngine:'Движок', lblSrcShort:'Исходный язык',
-  lblDstShort:'Целевой язык', lblKeepTermsShort:'Сохранять имена', lblAutoTermsShort:'Автоглоссарий', lblMaxWShort:'Ширина строки',
+  lblDstShort:'Целевой язык', lblKeepTermsShort:'Сохранять имена', lblAutoTermsShort:'Автоглоссарий', lblMaxWShort:'Ширина строки', lblLyric:'Тексты песен', lyricTrans:'Переводить', lyricKeep:'Оставить оригинал', lyricDrop:'Удалить', lblMarks:'Маркеры песен', lblDropFillers:'Удалять слова-паразиты',
   /* v0.9.70 两段式界面新增 */
 },
 'it': {
@@ -2126,7 +2141,7 @@ const I18N = {
   termsHintOn:'Attivo: i termini dell\'elenco restano nella forma originale (elenco abilitato).',
   termsHintOff:'Disattivo: tutti i nomi/marchi/prodotti/termini vengono tradotti; l\'elenco viene ignorato.',
   lblTerms:'Nomi propri da mantenere in forma originale (facoltativo, separati da virgola)', termsPh:'es. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Soglia di ritorno a capo (standard Netflix per lingua); un numero maggiore = più caratteri per riga, ma meno righe e suddivisioni', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare',
+  lblMaxW:'Soglia di ritorno a capo (standard Netflix per lingua); un numero maggiore = più caratteri per riga, ma meno righe e suddivisioni', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare', lyricTip:'Come gestire le righe cantate: traduci / mantieni l\'originale / rimuovi. Il riconoscimento usa i caratteri in «Marcatori testi».', marksTip:'Le righe che contengono questi caratteri sono trattate come testi di canzoni. Predefinito ♪♫♬♩ — aggiungi o rimuovi liberamente; lasciando vuoto si ripristina il predefinito. Se il tuo file non usa simboli musicali, aggiungi il marcatore che usa. Se una riga contiene sia canto che dialogo, «Rimuovi» passa automaticamente a mantenere l\'originale, così il dialogo non viene cancellato.', lyricSkipKeep:'{0} gruppi di testi mantenuti in lingua originale secondo l\'impostazione (non tradotti)', lyricSkipDrop:'{0} gruppi di testi rimossi secondo l\'impostazione', lyricWarn:'Attenzione: il {0}% delle righe è stato classificato come testo di canzone — l\'insieme di marcatori potrebbe essere troppo ampio. Controlla e riavvia.', dropFillersTip:'Se disattivato, le righe con solo riempitivi (ehm, hmm) mantengono il testo originale invece di essere svuotate. Attivo per impostazione predefinita.',
   btnPost:'↻ Solo post-elaborazione (a capo/pulizia tag)',
   hintPrivacy:'Modello predefinito: i sottotitoli passano dal server di questo sito verso il fornitore configurato dall\'amministratore; API personalizzata: il fornitore scelto li elabora direttamente, senza passare da questo sito.',
   stepExport:'Esporta traduzione', lblOutName:'Nome file di esportazione (automatico: nome origine + lingua di destinazione)', outPh:'xxx_tradotto.srt',
@@ -2193,7 +2208,7 @@ const I18N = {
   aboutBody:'AI-SRTSub è un traduttore di sottotitoli AI open source. Crediamo che un buon strumento debba essere gratuito, pulito e rispettoso della privacy — niente pubblicità, niente registrazione, nessuno tocca i tuoi file. Self-host e contributi benvenuti.', aboutRepo:'Repository GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Home',
   wsUploadNew:'Nuovi sottotitoli', projEmpty:'Nessun sottotitolo caricato', secImport:'Importa', secLang:'Lingue',
   secStyle:'Stile', secRules:'Regole', secEngine:'Motore', lblSrcShort:'Lingua origine',
-  lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Mantieni nomi propri', lblAutoTermsShort:'Glossario automatico', lblMaxWShort:'Larghezza riga',
+  lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Mantieni nomi propri', lblAutoTermsShort:'Glossario automatico', lblMaxWShort:'Larghezza riga', lblLyric:'Testi delle canzoni', lyricTrans:'Traduci', lyricKeep:'Mantieni originale', lyricDrop:'Rimuovi', lblMarks:'Marcatori testi', lblDropFillers:'Rimuovi riempitivi',
   /* v0.9.70 两段式界面新增 */
 },
 'ar': {
@@ -2221,7 +2236,7 @@ const I18N = {
   termsHintOn:'عند التفعيل: تبقى المصطلحات في القائمة بصيغتها الأصلية (القائمة مفعّلة).',
   termsHintOff:'عند الإيقاف: تُترجم جميع الأسماء/العلامات/المنتجات/المصطلحات؛ وتُتجاهل قائمة المصطلحات.',
   lblTerms:'أسماء خاصة تبقى بصيغتها الأصلية (اختياري، مفصولة بفواصل)', termsPh:'مثال: SpaceX, Prism, EnduroSat',
-  lblMaxW:'حد الالتفاف (معيار Netflix حسب اللغة)؛ الرقم الأكبر يعني حروفًا أكثر في السطر، لكن مع صفوف وتقسيمات أقل', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف',
+  lblMaxW:'حد الالتفاف (معيار Netflix حسب اللغة)؛ الرقم الأكبر يعني حروفًا أكثر في السطر، لكن مع صفوف وتقسيمات أقل', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف', lyricTip:'كيفية التعامل مع أسطر الغناء: ترجمة / إبقاء النص الأصلي / حذف. يتم التعرّف عليها عبر المحارف في «علامات الأغنية».', marksTip:'الأسطر التي تحتوي هذه المحارف تُعامل ككلمات أغنية. الافتراضي ♪♫♬♩ — يمكن الإضافة أو الحذف، وتركه فارغاً يعيد الافتراضي. إذا كان ملفك لا يستخدم رموزاً موسيقية، أضف العلامة التي يستخدمها. إذا جمع سطر واحد بين الغناء والحوار، يتحول «حذف» تلقائياً إلى إبقاء الأصل حتى لا يُحذف الحوار.', lyricSkipKeep:'تم إبقاء {0} مجموعة غنائية باللغة الأصلية حسب الإعداد (دون ترجمة)', lyricSkipDrop:'تم حذف {0} مجموعة غنائية حسب الإعداد', lyricWarn:'تنبيه: صُنّف {0}% من الأسطر ككلمات أغنية — ربما كانت العلامات أوسع من اللازم. تحقق ثم أعد التشغيل.', dropFillersTip:'عند الإيقاف، الأسطر التي تحتوي على كلمات حشو فقط (إم، هه) تحتفظ بنصها الأصلي بدلاً من إفراغها. مفعّل افتراضياً.',
   btnPost:'↻ معالجة لاحقة فقط (التفاف/تنظيف الوسوم)',
   hintPrivacy:'النموذج الافتراضي: تمر الترجمات عبر خادم هذا الموقع إلى المزوّد الذي أعدّه المشرف؛ API مخصص: يعالجها المزوّد الذي اخترته مباشرة دون المرور بهذا الموقع.',
   stepExport:'تصدير الترجمة', lblOutName:'اسم ملف التصدير (تلقائي: اسم المصدر + لغة الهدف)', outPh:'xxx_translated.srt',
@@ -2288,7 +2303,7 @@ const I18N = {
   aboutBody:'AI-SRTSub أداة ترجمة ترجمات بالذكاء الاصطناعي مفتوحة المصدر. نؤمن أن الأداة الجيدة يجب أن تكون مجانية ونظيفة وتحترم الخصوصية — بلا إعلانات ولا تسجيل ولا العبث بملفاتك. رحّبنا بالتثبيت الذاتي وباقتراحات التطوير.', aboutRepo:'مستودع GitHub', aboutLicense:'مفتوح المصدر AGPL-3.0', wsBackHome:'الرئيسية',
   wsUploadNew:'ترجمة جديدة', projEmpty:'لم تُحمَّل ترجمة', secImport:'استيراد', secLang:'اللغات',
   secStyle:'الأسلوب', secRules:'القواعد', secEngine:'المحرك', lblSrcShort:'لغة المصدر',
-  lblDstShort:'اللغة الهدف', lblKeepTermsShort:'إبقاء الأسماء الأصلية', lblAutoTermsShort:'مسرد تلقائي', lblMaxWShort:'عرض السطر',
+  lblDstShort:'اللغة الهدف', lblKeepTermsShort:'إبقاء الأسماء الأصلية', lblAutoTermsShort:'مسرد تلقائي', lblMaxWShort:'عرض السطر', lblLyric:'كلمات الأغاني', lyricTrans:'ترجمة', lyricKeep:'إبقاء الأصل', lyricDrop:'حذف', lblMarks:'علامات الأغنية', lblDropFillers:'حذف كلمات الحشو',
   /* v0.9.70 两段式界面新增 */
 },
 'tr': {
@@ -2316,7 +2331,7 @@ const I18N = {
   termsHintOn:'İşaretliyken listedeki terimler özgün biçimde kalır (liste etkin).',
   termsHintOff:'Kapalı: tüm isim/marka/ürün/terim çevrilir; terim listesi yok sayılır.',
   lblTerms:'Özgün biçimde korunacak özel isimler (isteğe bağlı, virgülle ayır)', termsPh:'örn. SpaceX, Prism, EnduroSat',
-  lblMaxW:'Satır sarma eşiği (Netflix standardı, dile göre); sayı büyüdükçe satırdaki karakter sayısı artar, satır ve bölünme sayısı azalır', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla',
+  lblMaxW:'Satır sarma eşiği (Netflix standardı, dile göre); sayı büyüdükçe satırdaki karakter sayısı artar, satır ve bölünme sayısı azalır', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla', lyricTip:'Şarkı satırlarının işlenmesi: çevir / orijinali koru / kaldır. Tanıma, «Şarkı işaretleri»ndeki karakterlerle yapılır.', marksTip:'Bu karakterleri içeren satırlar şarkı sözü sayılır. Varsayılan ♪♫♬♩ — ekleyip çıkarabilirsiniz; boş bırakırsanız varsayılan geri gelir. Dosyanız müzik simgesi kullanmıyorsa, kullandığı işareti ekleyin. Bir satırda hem şarkı hem diyalog varsa, «Kaldır» otomatik olarak orijinali korumaya döner, böylece diyalog silinmez.', lyricSkipKeep:'{0} şarkı sözü grubu ayara göre orijinal dilde bırakıldı (çevrilmedi)', lyricSkipDrop:'{0} şarkı sözü grubu ayara göre kaldırıldı', lyricWarn:'Dikkat: satırların {0}%\'i şarkı sözü olarak sınıflandırıldı — işaret kümesi fazla geniş olabilir. Kontrol edip yeniden çalıştırın.', dropFillersTip:'Kapatıldığında, sadece dolgu sözcükleri (ıı, hmm) içeren satırlar temizlenmek yerine orijinal metni korur. Varsayılan olarak açık.',
   btnPost:'↻ Sadece son işlem (satır sarma/etiket temizleme)',
   hintPrivacy:'Varsayılan model: altyazılar bu sitenin sunucusu üzerinden yöneticinin yapılandırdığı sağlayıcıya iletilir; Özel API: seçtiğin sağlayıcı bunları doğrudan işler, bu siteye uğramaz.',
   stepExport:'Çeviriyi dışa aktar', lblOutName:'Dışa aktarma dosya adı (otomatik: kaynak adı + hedef dil)', outPh:'xxx_cevrildi.srt',
@@ -2383,7 +2398,7 @@ const I18N = {
   aboutBody:'AI-SRTSub, açık kaynaklı bir AI altyazı çevirmenidir. İyi bir aracın ücretsiz, temiz ve gizliliğe saygılı olması gerektiğine inanıyoruz — reklam yok, kayıt yok, dosyalarına dokunma yok. Kendi sunucunda çalıştır ya da birlikte cilalayalım.', aboutRepo:'GitHub deposu', aboutLicense:'Açık kaynak AGPL-3.0', wsBackHome:'Ana sayfa',
   wsUploadNew:'Yeni altyazı', projEmpty:'Altyazı yüklenmedi', secImport:'İçe aktar', secLang:'Diller',
   secStyle:'Stil', secRules:'Kurallar', secEngine:'Motor', lblSrcShort:'Kaynak dil',
-  lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimleri koru', lblAutoTermsShort:'Otomatik sözlük', lblMaxWShort:'Satır genişliği',
+  lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimleri koru', lblAutoTermsShort:'Otomatik sözlük', lblMaxWShort:'Satır genişliği', lblLyric:'Şarkı sözleri', lyricTrans:'Çevir', lyricKeep:'Orijinali koru', lyricDrop:'Kaldır', lblMarks:'Şarkı işaretleri', lblDropFillers:'Dolgu sözcükleri kaldır',
   /* v0.9.70 两段式界面新增 */
 }
 };
@@ -2606,6 +2621,8 @@ function snapFp(cfg, budget, cap){
   // 不含 base/key/model——换 Key 或换引擎续跑是合理需求，不该作废已完成批次
   return [S.fileBase, S.srcItems.length, cfg.src, cfg.dst, budget, cap,
           cfg.styleMode, cfg.styleCustom, cfg.maxW, cfg.keepTerms?1:0, cfg.terms,
+          cfg.lyricMode||'trans', cfg.musicMarks||'',   // v0.9.78：歌词设置改变译文形态，必须作废快照
+          cfg.dropFillers!==false?1:0,
           srcFingerprint(S.srcItems)].join('|');
 }
 function loadSnap(fp){
@@ -2683,6 +2700,9 @@ function getCfg(){
     keepTerms: $('keepTerms').checked,
     terms: $('terms').value.trim(),
     autoTerms: $('autoTerms').checked,
+    lyricMode: (document.querySelector('input[name=lyric]:checked')||{}).value || 'trans',
+    musicMarks: $('marks').value,
+    dropFillers: $('dropFillers').checked,
     mode: $('mode').value,
     base: $('base').value.trim(),
     key: $('apikey').value.trim(),
@@ -3027,7 +3047,7 @@ function describeCueErrs(errs, zh){
 async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
-  const send = groups.filter(g=>!g.pureMusic);
+  const send = groups.filter(g=>!g.pureMusic && !g.lyricLocal && !g.fillerKeep);
   const garr = send.map(g=>({
     gno: g.gno,
     merged: g.mFrames ? g.mFrames.plainText : g.text,
@@ -3095,7 +3115,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     // fail-safe：词表外/含实词一律返回 false，仍走救援，不会误删真歌词）
     if(m.type==='drop' && !String(m.text||'').trim()){
       const dropSrc = g.mFrames ? g.mFrames.plainText : g.text;
-      if(C.RE_MUSIC.test(String(g.text)) && C.effChars(dropSrc) > 0 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
+      if(C.musicRe().test(String(g.text)) && C.effChars(dropSrc) > 0 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
       continue;
     }
     const txt = String(m.text||'').trim();
@@ -3152,7 +3172,7 @@ function applyTailCollapse(active){
 // 每行折行须 ≤2（容量守卫）。任一条件不满足返回 null → 回落既有合并/时长切分路径（零行为变化）。
 function musicAlignedSegs(active, text, cfg){
   if(!(active.length>1)) return null;
-  if(!active.every(c=>C.RE_MUSIC.test(String(c.text)) && C.effChars(String(c.text))>0)) return null;
+  if(!active.every(c=>C.musicRe().test(String(c.text)) && C.effChars(String(c.text))>0)) return null;
   const segs=C.splitMusicLines(text, active.length);
   if(!segs) return null;
   return segs.every(p=>C.wrapToWidth(C.stripSoundTags(p),cfg.maxW,{normalize:true,locale:cfg.dst}).length<=2) ? segs : null;
@@ -3313,6 +3333,10 @@ async function runTranslate(){
   const useApi = builtinReady || apiReady;
   if(cfg.mode==='api' && !apiReady){ log(t('degradeDemo'), 'err'); }
   if(cfg.mode==='builtin' && !builtinReady){ log(t('builtinOff'), 'err'); }
+  // v0.9.78：应用用户设置的歌词标记（须早于 groupSentences——分组阶段就用它判断歌词行）
+  C.setMusicMarks(cfg.musicMarks);
+  const lyricMode = cfg.lyricMode || 'trans';
+  const dropFillers = cfg.dropFillers !== false;   // v0.9.78：默认开（未设置/旧配置都视为开）
   let sys = systemPrompt(cfg);
   pgStart();
   // v0.9.74：改按「字符预算」切批（原按固定条数切：短剧 15字/条 批次过小浪费固定开销，
@@ -3345,7 +3369,22 @@ async function runTranslate(){
     // v0.9.45b：不再因组文本含 \n 跳过（歌词 cue 几乎都是多行，cue 内换行是常态，
     // extractMusicFrames 已把 \n 当空白归一化）；speaker 组（dash 结构）仍走旧路径
     for(const g of groups){
-      if(g.filler || g.speaker) continue;
+      if(g.speaker) continue;
+      // v0.9.78：歌词设置须先于 filler 判定——纯哼唱（♪ Oh oh oh ♪）在分组阶段就被 isFillerCue
+      // 判为水词组，若沿用「filler 直接跳过」，用户选删除/保留时这类歌词会被整组漏掉。
+      if(lyricMode!=='trans'){
+        const mf0 = C.extractMusicFrames(g.text);
+        if(mf0){
+          // 混合组保护——组内只要有一条 cue 不含标记（歌词与对白混排），drop 一律降级为 keep，
+          // 宁可留下未翻译的原文，也绝不把对白一起删掉（不规范字幕常见「一行歌词一行对白」）。
+          const allMarked = g.cues.every(c=>C.musicRe().test(String(c.text||'')));
+          g.lyricLocal = (lyricMode==='drop' && allMarked) ? 'drop' : 'keep';
+          continue;   // 已按歌词处理，不再做音乐帧预处理（这些组不进模型）
+        }
+      }
+      // v0.9.78：关闭「去除水词」时，水词组不再清空——保留原文落地（与歌词 keep 同一路径）
+      if(!dropFillers && g.filler){ g.fillerKeep = true; continue; }
+      if(g.filler) continue;
       const mf = C.extractMusicFrames(g.text);
       if(!mf) continue;
       if(!mf.segs.length) g.pureMusic = true;
@@ -3353,6 +3392,16 @@ async function runTranslate(){
     }
     const gMultiN = groups.filter(g=>!g.filler && g.cues.length>1).length;
     log(t('groupInfo', groups.length, gMultiN));
+    // v0.9.78：歌词本地处理统计。占比过高几乎一定是标记字符设太宽（误把普通对白当歌词）
+    const lyricAll = groups.filter(g=>g.lyricLocal);
+    if(lyricAll.length){
+      const nDrop = lyricAll.filter(g=>g.lyricLocal==='drop').length;
+      const nKeep = lyricAll.length - nDrop;
+      if(nDrop) log(t('lyricSkipDrop', nDrop));
+      if(nKeep) log(t('lyricSkipKeep', nKeep));
+      const pct = Math.round(lyricAll.length / Math.max(1, groups.length) * 100);
+      if(pct >= 40) log(t('lyricWarn', pct), 'err');
+    }
 
     if(!useApi){
       log(t('demoNote'));
@@ -3652,12 +3701,28 @@ async function runTranslate(){
     log(t('postEnd'));
 
     // 回填：整条纯水词的 cue 直接清空；句组优先合并为单条（时长/行数达标），否则按时长切分回填（时间轴不动）
+    // v0.9.78：关闭「去除水词」时，模型判定的水词同样不清空——清空与 active 过滤都靠空集合自然失效
+    if(!dropFillers) fillerSet.clear();
     S.rows.forEach(r=>{ if(fillerSet.has(r.no)){ r.zh=null; r.flag='drop'; } });
     const overCapGroups=[];   // 超容句组（v0.9.21：压缩重译候选）
     let gMulti=0, mG=0, suspiciousDrop=0, missingCount=0;
     for(const g of groups){
       const active=g.cues.filter(c=>!fillerSet.has(c.no));
       if(!active.length) continue;
+      // v0.9.78：歌词按用户设置本地处理——keep=原文原样落地；drop=整组移除（含纯符号标记行）
+      if(g.lyricLocal){
+        if(g.lyricLocal==='drop'){
+          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='drop'; } });
+        }else{
+          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(c.text).trim(); if(r.flag!=='drop') r.flag=''; } });
+        }
+        continue;
+      }
+      // v0.9.78：关闭去水词 → 水词组保留原文（逐 cue，不整组合并）
+      if(g.fillerKeep){
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(c.text).trim(); if(r.flag!=='drop') r.flag=''; } });
+        continue;
+      }
       // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型——译文=源文原样，符号永远不丢
       if(g.pureMusic){
         active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(g.text).trim(); if(r.flag!=='drop') r.flag=''; } });

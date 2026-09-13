@@ -566,7 +566,7 @@
         const st = ['Top', 'TopMain', 'Sub'].includes(ln.style) ? ln.style : 'Bottom';
         // v0.9.41 歌词斜体：含 ♪/♫ 的行按行业惯例（Netflix TTSG：italicize lyrics）加内联斜体标记，
         // 不新增样式（{\i1}/{\i0} 内联覆盖对所有现有样式生效；SRT/VTT/TXT 纯文本路径不受影响）。
-        const musicLine = /[♪♫]/.test(tx);
+        const musicLine = musicRe().test(tx);
         evLines.push('Dialogue: ' + i + ',' + fmtTimeAss(ev.start) + ',' + fmtTimeAss(ev.end) + ',' +
           st + ',,0,0,' + (ln.mv > 0 ? Math.round(ln.mv) : 0) + ',,' + (musicLine ? '{\\i1}' + tx + '{\\i0}' : tx));
       });
@@ -779,7 +779,7 @@
       }
       // v0.9.38：音乐符号行不与对白互并——歌词行结尾常无句末标点（"…believe in ♪"），
       // endsSentence 判"句子未完"会把下一条对白吸进同一句组，译文错位到错误时间窗（实测：歌词行吸进对白 "Yo, yo."）
-      const mus = RE_MUSIC.test(String(it.text || ''));
+      const mus = musicRe().test(String(it.text || ''));
       if (mus) {
         if (effChars(String(it.text || '')) > 0) {
           // 歌词行：可与相邻歌词行同组（保留歌曲上下文），与对白互斥
@@ -1020,7 +1020,28 @@
   // 唱歌行首尾的 ♪/♫ 只是「正在唱歌」的标记，不是内容。评测发现模型两类偶发事故：
   //  a) 只回 ♪♪ 丢掉整句歌词（纯符号能通过 anchorOk，静默漏网）；
   //  b) 首尾符号丢失或叠成 ♪♪。以下两个纯函数在回填前统一纠正。
-  const RE_MUSIC = /[♪♫♬♩]/;
+  // v0.9.78：歌词标记可配置。默认 ♪♫♬♩，用户可在设置里增删——
+  // 大量字幕源的歌词行不带任何音乐符号，此前整条歌词链路（分段对齐/符号复原/丢词检测）
+  // 对它们静默失效，歌词被当普通对白处理。
+  // Marks 是「字符集合」而非正则：开放正则会引入语法错误白屏与灾难性回溯两类风险。
+  const DEF_MARKS = '♪♫♬♩';
+  let MUSIC_MARKS = DEF_MARKS;
+  let _mCls = null, _mRe = null;
+  function setMusicMarks(str) {
+    const t = String(str == null ? '' : str).replace(/\s+/g, '');
+    MUSIC_MARKS = t || DEF_MARKS;   // 留空回退默认：避免用户清空后整条链路静默失效
+    _mCls = null; _mRe = null;
+    return MUSIC_MARKS;
+  }
+  function getMusicMarks() { return MUSIC_MARKS; }
+  function mCls() {
+    if (_mCls == null) _mCls = MUSIC_MARKS.replace(/[\\\]^-]/g, '\\$&');
+    return _mCls;
+  }
+  function musicRe() { if (!_mRe) _mRe = new RegExp('[' + mCls() + ']'); return _mRe; }
+  function musicReG() { return new RegExp('[' + mCls() + ']', 'g'); }
+  function musicClsRe(flags, extra) { return new RegExp('[' + mCls() + (extra || '') + ']', flags); }
+  const RE_MUSIC = /[♪♫♬♩]/;   // 默认标记常量（导出兼容，动态场景请用 musicRe()）
 
   // 纯哼唱判别（v0.9.76）：音乐组被模型判 drop 后，若源文每个词都是感叹词（oh/la/na/mm/啦/哦…），
   // 判纯哼唱 → 直接接受 drop，跳过单组救援（v0.9.47 实测纯哼唱救援必失败，白付一次 API 往返）。
@@ -1036,7 +1057,7 @@
   ).split(','));
   function isPureHumming(text) {
     let s = String(text == null ? '' : text)
-      .replace(/[♪♫♬♩]/g, ' ')   // 音乐符号不是词
+      .replace(musicReG(), ' ')   // 音乐符号不是词（v0.9.78 可配置）
       .replace(/[\u30FC\uFF70]/g, ' ') // 日文长音符（あー 的 ー）是发音延长标记，不是字
       .replace(/\[\d+\]/g, ' ')   // [N] 歌词编号标记不是词
       .toLowerCase();
@@ -1052,9 +1073,9 @@
   }
   // 丢词判定：译文剥离音乐符号/标点/空白后无实词，而源仍有实词 → 判丢词（触发重试/missing）
   function musicLost(dst, src) {
-    const d = String(dst == null ? '' : dst).replace(/[♪♫♬♩\s\p{P}\p{S}]/gu, '');
+    const d = String(dst == null ? '' : dst).replace(musicClsRe('gu', '\\s\\p{P}\\p{S}'), '');
     if (d) return false; // 译文还有实词，没丢
-    const s = String(src == null ? '' : src).replace(/[♪♫♬♩\s\p{P}\p{S}]/gu, '');
+    const s = String(src == null ? '' : src).replace(musicClsRe('gu', '\\s\\p{P}\\p{S}'), '');
     return s.length > 0;  // 源有实词、译文没有 → 丢词
   }
   // 归一化：①折叠紧邻重复符号（♪♪ / ♪ ♪ → ♪）②源首尾有符号而译文丢失 → 用源符号补回。
@@ -1064,16 +1085,16 @@
   function normalizeMusicLine(dl, sl) {
     let s = String(dl == null ? '' : dl).trim();
     if (!s) return s;
-    s = s.replace(/([♪♫♬♩])(\s*\1)+/g, '$1');
+    s = s.replace(new RegExp('([' + mCls() + '])(\\s*\\1)+', 'g'), '$1');
     const srcS = String(sl == null ? '' : sl).trim();
-    const mh = srcS.match(/^(-\s*)?([♪♫♬♩])\s*/);
-    const mt = srcS.match(/\s*([♪♫♬♩])\s*$/);
+    const mh = srcS.match(new RegExp('^(-\\s*)?([' + mCls() + '])\\s*'));
+    const mt = srcS.match(new RegExp('\\s*([' + mCls() + '])\\s*$'));
     if (mh) {
       const dm = s.match(/^(-\s*)/);
       const afterDash = dm ? s.slice(dm[1].length) : s;
-      if (!RE_MUSIC.test(afterDash[0] || '')) s = (dm ? dm[1] : '') + mh[2] + ' ' + afterDash;
+      if (!musicRe().test(afterDash[0] || '')) s = (dm ? dm[1] : '') + mh[2] + ' ' + afterDash;
     }
-    if (mt && !RE_MUSIC.test(s[s.length - 1] || '')) s = s + ' ' + mt[1];
+    if (mt && !musicRe().test(s[s.length - 1] || '')) s = s + ' ' + mt[1];
     return s;
   }
 
@@ -1097,7 +1118,7 @@
   function splitMusicLines(text, n) {
     const s = String(text == null ? '' : text).replace(/\r/g, '').replace(/\n/g, ' ').trim();
     if (!s || !(n >= 2)) return null;
-    const PAIR = /[♪♫♬♩][^♪♫♬♩]*[♪♫♬♩]/g;
+    const PAIR = new RegExp('[' + mCls() + '][^' + mCls() + ']*[' + mCls() + ']', 'g');
     // 形态 A：n 个完整配对段，且剥离配对后无实词残余（防歌词外夹对白被丢）
     const pairs = s.match(PAIR) || [];
     if (pairs.length === n) {
@@ -1107,7 +1128,7 @@
     // 形态 B：恰好 n+1 个符号、首尾皆为符号 → 折叠形态
     const arr = Array.from(s);
     const idx = [];
-    for (let i = 0; i < arr.length; i++) if (RE_MUSIC.test(arr[i])) idx.push(i);
+    for (let i = 0; i < arr.length; i++) if (musicRe().test(arr[i])) idx.push(i);
     if (idx.length === n + 1 && idx[0] === 0 && idx[idx.length - 1] === arr.length - 1) {
       const out = [];
       for (let k = 0; k < n; k++) {
@@ -1135,9 +1156,9 @@
   // 此前含 \n 的组整组跳回旧路径，♪ 照发模型，新机制对真实歌词组基本失效
   function extractMusicFrames(src) {
     const s = String(src == null ? '' : src).replace(/\r/g, '');
-    if (!RE_MUSIC.test(s)) return null;
+    if (!musicRe().test(s)) return null;
     const items = [];
-    const re = /([♪♫♬♩]+)|([^♪♫♬♩]+)/g;
+    const re = new RegExp('([' + mCls() + ']+)|([^' + mCls() + ']+)', 'g');
     let m;
     while ((m = re.exec(s)) !== null) {
       if (m[1]) { for (const ch of m[1]) items.push({ mark: ch }); }
@@ -1915,6 +1936,7 @@
     validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, isPureHumming, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
+    setMusicMarks, getMusicMarks, musicRe,
     extractMusicFrames, parseSegMarkers, splitByWeights, reassembleMusic, stripSegMarkers, hasSegMarkers,
     MAX_W_DEFAULT: 20
   };
