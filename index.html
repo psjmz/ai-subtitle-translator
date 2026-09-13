@@ -548,7 +548,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.75</span>
+    <span class="ver-tag">v0.9.76</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -2950,9 +2950,11 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     // v0.9.47：含歌词音乐组的显式 drop 走独立通道 musicDropGnos，不再并入 badAnchor（整批重发通道）——
     // 实测 Gemini 对纯哼唱（♪ Oh-oh, oh-oh ♪）8/8 语言整批重发 2 次后仍 drop：模型对「无实义」的
     // 判断救不回，白付整批重发成本。改由外层单组隔离重译一次，再 drop 就接受模型判断
+    // v0.9.76：纯哼唱组（每个词都是感叹词）跳过救援——救援实测必失败，直接接受 drop（isPureHumming
+    // fail-safe：词表外/含实词一律返回 false，仍走救援，不会误删真歌词）
     if(m.type==='drop' && !String(m.text||'').trim()){
       const dropSrc = g.mFrames ? g.mFrames.plainText : g.text;
-      if(C.RE_MUSIC.test(String(g.text)) && C.effChars(dropSrc) > 0) musicDropGnos.push(g.gno);
+      if(C.RE_MUSIC.test(String(g.text)) && C.effChars(dropSrc) > 0 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
       continue;
     }
     const txt = String(m.text||'').trim();

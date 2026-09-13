@@ -1021,6 +1021,35 @@
   //  a) 只回 ♪♪ 丢掉整句歌词（纯符号能通过 anchorOk，静默漏网）；
   //  b) 首尾符号丢失或叠成 ♪♪。以下两个纯函数在回填前统一纠正。
   const RE_MUSIC = /[♪♫♬♩]/;
+
+  // 纯哼唱判别（v0.9.76）：音乐组被模型判 drop 后，若源文每个词都是感叹词（oh/la/na/mm/啦/哦…），
+  // 判纯哼唱 → 直接接受 drop，跳过单组救援（v0.9.47 实测纯哼唱救援必失败，白付一次 API 往返）。
+  // 设计原则（fail-safe）：①词表外一律返回 false（走原救援通道），宁可多救不误删；
+  // ②实词（love/Jude/tonight…）必返回 false；③仅作用于「模型已判 drop 的音乐组」这条小径。
+  // 词表按源语言组织（判别发生在译文产出前），目前覆盖拉丁系通用感叹词 + 中日韩常见哼唱字，
+  // 未覆盖语言自然退回救援行为，不会出错
+  const HUM_WORDS = new Set((
+    'm,oh,ah,la,na,ha,eh,uh,hm,mm,wo,ay,ho,hey,yeah,yay,hum,mhm,' +
+    '啦,哦,喔,噢,嗯,呃,嘿,呜,咦,啊,呀,诶,唔,哈,哟,噜,嘟,' +
+    'あ,え,う,ん,お,ら,り,る,れ,ろ,ラ,リ,ル,レ,ロ,ワ,' +
+    '라,아,오,에,우,음,허'
+  ).split(','));
+  function isPureHumming(text) {
+    let s = String(text == null ? '' : text)
+      .replace(/[♪♫♬♩]/g, ' ')   // 音乐符号不是词
+      .replace(/[\u30FC\uFF70]/g, ' ') // 日文长音符（あー 的 ー）是发音延长标记，不是字
+      .replace(/\[\d+\]/g, ' ')   // [N] 歌词编号标记不是词
+      .toLowerCase();
+    // CJK/假名无空格分词，按单字成词
+    s = s.replace(/([\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF])/g, ' $1 ');
+    const words = s.split(/[^a-z\u00C0-\u024F\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]+/).filter(Boolean);
+    if (!words.length) return false;  // 无 token：交回原判定（纯符号已由 effChars 过滤）
+    return words.every((w) =>
+      HUM_WORDS.has(w) ||
+      HUM_WORDS.has(w.replace(/(.)\1+/g, '$1')) ||          // ohhh→oh, mmmm→m
+      HUM_WORDS.has(w.replace(/(.{1,3}?)\1+/g, '$1'))       // lalala→la, ohohoh→oh
+    );
+  }
   // 丢词判定：译文剥离音乐符号/标点/空白后无实词，而源仍有实词 → 判丢词（触发重试/missing）
   function musicLost(dst, src) {
     const d = String(dst == null ? '' : dst).replace(/[♪♫♬♩\s\p{P}\p{S}]/gu, '');
@@ -1885,7 +1914,7 @@
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
     validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
-    musicLost, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
+    musicLost, isPureHumming, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
     extractMusicFrames, parseSegMarkers, splitByWeights, reassembleMusic, stripSegMarkers, hasSegMarkers,
     MAX_W_DEFAULT: 20
   };

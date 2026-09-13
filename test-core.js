@@ -1906,5 +1906,38 @@ t('单语导出同样受 sliver 保护', () => {
   assert.strictEqual(parts.length, 1, '短 cue 单语导出应收敛为 1 段');
 });
 
+console.log('— 纯哼唱判别 isPureHumming（v0.9.76）—');
+t('英文经典哼唱 → true', () => {
+  assert.strictEqual(C.isPureHumming('♪ Oh-oh, oh-oh ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ La la la, la-la-la ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ Mmm mmm mmm ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ Oh yeah yeah ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ Ohohoh ohoh ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ Na na na, hey hey ♪'), true);
+});
+t('含实词的歌词 → false（绝不能误删）', () => {
+  assert.strictEqual(C.isPureHumming('♪ Take me home tonight ♪'), false);
+  assert.strictEqual(C.isPureHumming('♪ Hey Jude ♪'), false);
+  assert.strictEqual(C.isPureHumming('♪ I love you, baby ♪'), false);
+  assert.strictEqual(C.isPureHumming('♪ Happy birthday to you ♪'), false);
+});
+t('中日韩哼唱字 → true', () => {
+  assert.strictEqual(C.isPureHumming('♪ 啦啦啦 啦啦啦 ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ 哦哦哦 ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ 嗯嗯 啊啊啊 ♪'), true);
+  assert.strictEqual(C.isPureHumming('♪ ラララ あー ♪'), true);
+});
+t('中文实词歌词 → false', () => {
+  assert.strictEqual(C.isPureHumming('♪ 生日快乐 歌唱你 ♪'), false);
+  assert.strictEqual(C.isPureHumming('♪ 我们一起唱歌 ♪'), false);
+});
+t('fail-safe 边界', () => {
+  assert.strictEqual(C.isPureHumming('♪ ♪'), false);          // 纯符号：交回 effChars 口径
+  assert.strictEqual(C.isPureHumming(''), false);
+  assert.strictEqual(C.isPureHumming(null), false);
+  assert.strictEqual(C.isPureHumming('♪ Café ♪'), false);     // 词表外（带变音符）→ 仍救援
+  assert.strictEqual(C.isPureHumming('♪ OH-HO-HO ♪'), true);  // 大小写无关
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
