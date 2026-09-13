@@ -394,7 +394,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.76</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.77</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -548,7 +548,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.76</span>
+    <span class="ver-tag">v0.9.77</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -698,7 +698,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.76"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.77"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -823,6 +823,9 @@ const I18N = {
   startT:'开始整片翻译：{0} → {1}，共 {2} 条，每批约 {3} 字符。',
   batchProg:'第 {0}/{1} 批（句组 {2}–{3}）…',
   pgRun:'翻译中', pgEta:'预计剩余 {0}', pgDone:'✓ 完成 · 用时 {0}',
+  resumeTitle:'发现未完成的翻译', resumeBody:'这份文件上次翻译到第 {0}/{1} 批就中断了。可以接着上次的进度继续（已完成的 {0} 批不会重跑），也可以从头重新翻译。',
+  resumeGo:'继续上次', resumeNew:'从头重来', resumeLog:'已从断点继续：跳过前 {0} 批，从第 {1} 批开始。', resumeHint:'（翻译进度已存在本机，中途关掉页面也能接着翻）',
+  resumeQuota:'断点保存失败（本机存储已满），本次不再保存进度，翻译继续。',
   chkAutoTerms:'自动术语表：翻译前自动提取专名与歧义词，统一全片译法',
   autoTermsRun:'正在提取术语表（专名/歧义词）…', autoTermsDone:'自动术语表就绪：{0} 个术语已统一译法', autoTermsSkip:'术语提取失败，跳过后继续翻译：{0}', batchRescue:'第 {0} 批多次失败，已拆单组补救：成功 {1}/{2} 组',
   batchDone:'批 {0}/{1} 完成{2}。', retried:'（重试{0}次后成功）', anchorKeep:'⚠️ 句组 {0} 译文可能不是{1}，已按原样保留', anchorRefix:'{0} 个句组译文语言跑偏，已通过单组重译全部恢复', musicDropSaved:'{0} 个音乐句组被模型判 drop，单组重译已救回', musicDropKept:'句组 {0} 判为纯哼唱，单组复核后按水词删除', cueAlignFallback:'句组 {0} cue 对齐结构错误，已按传统切分回填', cueAlignRefix:'{0} 个句组 cue 对齐结构错误，单组重发已修复',
@@ -915,6 +918,9 @@ const I18N = {
   startT:'開始整片翻譯：{0} → {1}，共 {2} 條，每批約 {3} 字元。',
   batchProg:'第 {0}/{1} 批（句組 {2}–{3}）…',
   pgRun:'翻譯中', pgEta:'預計剩餘 {0}', pgDone:'✓ 完成 · 用時 {0}',
+  resumeTitle:'發現未完成的翻譯', resumeBody:'這份檔案上次翻譯到第 {0}/{1} 批就中斷了。可以接續上次的進度（已完成的 {0} 批不會重跑），也可以從頭重新翻譯。',
+  resumeGo:'繼續上次', resumeNew:'從頭重來', resumeLog:'已從斷點繼續：跳過前 {0} 批，從第 {1} 批開始。', resumeHint:'（翻譯進度已存在本機，中途關掉頁面也能接著翻）',
+  resumeQuota:'斷點儲存失敗（本機儲存空間已滿），本次不再儲存進度，翻譯繼續。',
   chkAutoTerms:'自動術語表：翻譯前自動提取專名與歧義詞，統一全片譯法',
   autoTermsRun:'正在提取術語表（專名/歧義詞）…', autoTermsDone:'自動術語表就緒：{0} 個術語已統一譯法', autoTermsSkip:'術語提取失敗，跳過後繼續翻譯：{0}', batchRescue:'第 {0} 批多次失敗，已拆單組補救：成功 {1}/{2} 組',
   batchDone:'批 {0}/{1} 完成{2}。', retried:'（重試{0}次後成功）', anchorKeep:'⚠️ 句組 {0} 譯文可能不是{1}，已按原樣保留', anchorRefix:'{0} 個句組譯文語言跑偏，已透過單組重譯全部恢復', musicDropSaved:'{0} 個音樂句組被模型判 drop，單組重譯已救回', musicDropKept:'句組 {0} 判為純哼唱，單組複核後按水詞刪除', cueAlignFallback:'句組 {0} cue 對齊結構錯誤，已按傳統切分回填', cueAlignRefix:'{0} 個句組 cue 對齊結構錯誤，單組重發已修復',
@@ -1007,6 +1013,9 @@ const I18N = {
   startT:'Translating: {0} → {1}, {2} cues, ~{3} chars per batch.',
   batchProg:'Batch {0}/{1} (sentences {2}–{3})…',
   pgRun:'Translating', pgEta:'ETA {0}', pgDone:'✓ Done · {0}',
+  resumeTitle:'Unfinished translation found', resumeBody:'This file stopped at batch {0}/{1} last time. You can continue where it left off (the {0} finished batches will not be re-run), or start over from the beginning.',
+  resumeGo:'Continue', resumeNew:'Start over', resumeLog:'Resumed: skipped {0} batches, starting from batch {1}.', resumeHint:'(Progress is saved on this device, so you can close the page and carry on later.)',
+  resumeQuota:'Could not save progress (local storage is full). Translation continues without saving.',
   chkAutoTerms:'Auto glossary: extract proper nouns & ambiguous terms before translating for file-wide consistency',
   autoTermsRun:'Extracting glossary (proper nouns / ambiguous terms)…', autoTermsDone:'Auto glossary ready: {0} terms unified', autoTermsSkip:'Glossary extraction failed, continuing without it: {0}', batchRescue:'Batch {0} failed repeatedly; rescued {1}/{2} groups individually',
   batchDone:'Batch {0}/{1} done{2}.', retried:' (after {0} retries)', anchorKeep:'⚠️ Groups {0}: translation may not be in {1}; kept as is', anchorRefix:'{0} drifted group(s) fully recovered via isolated re-translation', musicDropSaved:'{0} music group(s) marked drop were rescued via isolated re-translation', musicDropKept:'Group(s) {0} judged pure humming; confirmed and removed as filler', cueAlignFallback:'Groups {0}: invalid cue-aligned structure; fell back to duration split', cueAlignRefix:'{0} cue-aligned structure error(s) fixed via isolated re-send',
@@ -1099,6 +1108,9 @@ const I18N = {
   startT:'翻訳開始：{0} → {1}、全 {2} 件、1バッチ約 {3} 文字。',
   batchProg:'バッチ {0}/{1}（文グループ {2}–{3}）…',
   pgRun:'翻訳中', pgEta:'残り約 {0}', pgDone:'✓ 完了 · 所要 {0}',
+  resumeTitle:'未完了の翻訳があります', resumeBody:'このファイルは前回 {0}/{1} バッチ目で中断しました。続きから再開できます（完了済みの {0} バッチは再実行しません）。最初からやり直すこともできます。',
+  resumeGo:'続きから再開', resumeNew:'最初からやり直す', resumeLog:'再開しました：前 {0} バッチをスキップし、第 {1} バッチから開始します。', resumeHint:'（進捗はこの端末に保存されます。ページを閉じても後から再開できます）',
+  resumeQuota:'再開用データの保存に失敗しました（ローカル保存領域が満杯）。今回は保存しませんが翻訳は続行します。',
   chkAutoTerms:'自動用語集：翻訳前に固有名詞・曖昧語を抽出し、全編の訳を統一',
   autoTermsRun:'用語集を抽出中（固有名詞・曖昧語）…', autoTermsDone:'自動用語集：{0} 語の訳を統一', autoTermsSkip:'用語集の抽出に失敗、スキップして翻訳を継続：{0}', batchRescue:'バッチ {0} が複数回失敗、グループ単位で救済：{1}/{2} グループ成功',
   batchDone:'バッチ {0}/{1} 完了{2}。', retried:'（{0}回再試行後に成功）', anchorKeep:'⚠️ グループ {0} の訳文は{1}ではない可能性があるため、そのまま保持しました', anchorRefix:'言語が逸脱した {0} グループを個別再翻訳で全件復元しました', musicDropSaved:'drop と判定された音楽グループ {0} 個を個別再翻訳で復元しました', musicDropKept:'グループ {0} は純粋なハミングと判定され、確認のうえフィラーとして削除しました', cueAlignFallback:'グループ {0} はキューアライン構造エラー、時間分割で代替', cueAlignRefix:'{0} グループの構造エラーを単独再送で修復',
@@ -1191,6 +1203,9 @@ const I18N = {
   startT:'Traduciendo: {0} → {1}, {2} subtítulos, ~{3} caracteres por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
   pgRun:'Traduciendo', pgEta:'Faltan {0}', pgDone:'✓ Listo · {0}',
+  resumeTitle:'Traducción sin terminar', resumeBody:'Este archivo se interrumpió en el lote {0}/{1} la última vez. Puede continuar donde quedó (los {0} lotes ya hechos no se repetirán) o empezar de nuevo.',
+  resumeGo:'Continuar', resumeNew:'Empezar de nuevo', resumeLog:'Reanudado: se omitieron {0} lotes, comenzando desde el lote {1}.', resumeHint:'(El progreso se guarda en este dispositivo: puede cerrar la página y continuar después.)',
+  resumeQuota:'No se pudo guardar el progreso (almacenamiento local lleno). La traducción continúa sin guardar.',
   chkAutoTerms:'Glosario automático: extrae nombres propios y términos ambiguos antes de traducir para uniformar todo el archivo',
   autoTermsRun:'Extrayendo glosario (nombres propios / términos ambiguos)…', autoTermsDone:'Glosario automático listo: {0} términos unificados', autoTermsSkip:'Falló la extracción del glosario, se continúa sin él: {0}', batchRescue:'Lote {0} falló varias veces; rescate individual: {1}/{2} grupos',
   batchDone:'Lote {0}/{1} terminado{2}.', retried:' (tras {0} reintentos)', anchorKeep:'⚠️ Grupos {0}: la traducción podría no estar en {1}; se mantienen tal cual', anchorRefix:'{0} grupo(s) desviados se recuperaron por completo mediante retraducción individual', musicDropSaved:'{0} grupo(s) de música marcados como drop se recuperaron mediante retraducción individual', musicDropKept:'Grupo(s) {0} considerados canto sin palabras; confirmados y eliminados como relleno', cueAlignFallback:'Grupos {0}: estructura cue-align no válida; se usó división por duración', cueAlignRefix:'{0} error(es) de estructura corregidos con reenvío aislado',
@@ -1283,6 +1298,9 @@ const I18N = {
   startT:'Traduzindo: {0} → {1}, {2} legendas, ~{3} caracteres por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
   pgRun:'Traduzindo', pgEta:'Faltam {0}', pgDone:'✓ Concluído · {0}',
+  resumeTitle:'Tradução inacabada', resumeBody:'Este arquivo parou no lote {0}/{1} da última vez. Você pode continuar de onde parou (os {0} lotes prontos não serão repetidos) ou recomeçar do zero.',
+  resumeGo:'Continuar', resumeNew:'Recomeçar', resumeLog:'Retomado: {0} lotes ignorados, começando pelo lote {1}.', resumeHint:'(O progresso é salvo neste dispositivo: feche a página e continue depois.)',
+  resumeQuota:'Não foi possível salvar o progresso (armazenamento local cheio). A tradução continua sem salvar.',
   chkAutoTerms:'Glossário automático: extrai nomes próprios e termos ambíguos antes de traduzir para uniformar o arquivo todo',
   autoTermsRun:'Extraindo glossário (nomes próprios / termos ambíguos)…', autoTermsDone:'Glossário automático pronto: {0} termos unificados', autoTermsSkip:'Falha na extração do glossário, continuando sem ele: {0}', batchRescue:'Lote {0} falhou várias vezes; resgate individual: {1}/{2} grupos',
   batchDone:'Lote {0}/{1} concluído{2}.', retried:' (após {0} tentativas)', anchorKeep:'⚠️ Grupos {0}: a tradução pode não estar em {1}; mantidos como estão', anchorRefix:'{0} grupo(s) desviados recuperados por completo por retradução individual', musicDropSaved:'{0} grupo(s) de música marcados como drop foram recuperados por retradução individual', musicDropKept:'Grupo(s) {0} considerados canto sem palavras; confirmados e removidos como preenchimento', cueAlignFallback:'Grupos {0}: estrutura cue-align inválida; divisão por duração aplicada', cueAlignRefix:'{0} erro(s) de estrutura corrigidos por reenvio isolado',
@@ -1375,6 +1393,9 @@ const I18N = {
   startT:'번역 시작: {0} → {1}, 총 {2}개, 배치당 약 {3}자.',
   batchProg:'배치 {0}/{1}(문장 그룹 {2}–{3})…',
   pgRun:'번역 중', pgEta:'남은 시간 약 {0}', pgDone:'✓ 완료 · 소요 {0}',
+  resumeTitle:'완료되지 않은 번역', resumeBody:'이 파일은 지난번에 {0}/{1} 배치에서 중단되었습니다. 이어서 계속할 수 있습니다(완료된 {0}개 배치는 다시 실행하지 않습니다). 처음부터 다시 할 수도 있습니다.',
+  resumeGo:'이어서 계속', resumeNew:'처음부터', resumeLog:'이어서 계속합니다: 앞 {0}개 배치를 건너뛰고 {1}번째 배치부터 시작합니다.', resumeHint:'(진행 상황은 이 기기에 저장되므로 페이지를 닫아도 나중에 이어서 할 수 있습니다)',
+  resumeQuota:'진행 상황을 저장하지 못했습니다(로컬 저장소 가득 참). 이번에는 저장하지 않고 번역을 계속합니다.',
   chkAutoTerms:'자동 용어집: 번역 전 고유명사와 애매한 단어를 추출하여 전체에서 번역을 통일',
   autoTermsRun:'용어집 추출 중(고유명사·애매한 단어)…', autoTermsDone:'자동 용어집: {0}개 용어 번역 통일', autoTermsSkip:'용어집 추출 실패, 건너뛰고 계속 진행: {0}', batchRescue:'배치 {0} 반복 실패, 그룹별 구조 시도: {1}/{2}개 성공',
   batchDone:'배치 {0}/{1} 완료{2}.', retried:'({0}회 재시도 후 성공)', anchorKeep:'⚠️ 그룹 {0}의 번역이 {1}가 아닐 수 있어 그대로 유지했어요', anchorRefix:'언어가 이탈한 그룹 {0}개를 개별 재번역으로 모두 복구했어요', musicDropSaved:'drop로 판정된 음악 그룹 {0}개를 개별 재번역으로 구했어요', musicDropKept:'그룹 {0}은(는) 순수 허밍으로 판정되어 확인 후 필러로 삭제했어요', cueAlignFallback:'그룹 {0} 큐 얼라인 구조 오류, 길이 기반 분할로 대체', cueAlignRefix:'{0}개 그룹 구조 오류 단독 재전송으로 수정',
@@ -1467,6 +1488,9 @@ const I18N = {
   startT:'Übersetze: {0} → {1}, {2} Untertitel, ~{3} Zeichen pro Batch.',
   batchProg:'Batch {0}/{1} (Sätze {2}–{3})…',
   pgRun:'Übersetzung läuft', pgEta:'Noch {0}', pgDone:'✓ Fertig · {0}',
+  resumeTitle:'Unfertige Übersetzung gefunden', resumeBody:'Diese Datei wurde beim letzten Mal bei Batch {0}/{1} unterbrochen. Sie können dort weitermachen (die {0} fertigen Batches werden nicht wiederholt) oder neu beginnen.',
+  resumeGo:'Fortsetzen', resumeNew:'Neu beginnen', resumeLog:'Fortgesetzt: {0} Batches übersprungen, Start bei Batch {1}.', resumeHint:'(Der Fortschritt wird auf diesem Gerät gespeichert – Sie können die Seite schließen und später weitermachen.)',
+  resumeQuota:'Fortschritt konnte nicht gespeichert werden (lokaler Speicher voll). Die Übersetzung läuft weiter.',
   chkAutoTerms:'Auto-Glossar: extrahiert vor der Übersetzung Eigennamen und mehrdeutige Begriffe, um dateiweite Einheitlichkeit zu sichern',
   autoTermsRun:'Glossar wird extrahiert (Eigennamen / mehrdeutige Begriffe)…', autoTermsDone:'Auto-Glossar bereit: {0} Begriffe vereinheitlicht', autoTermsSkip:'Glossar-Extraktion fehlgeschlagen, wird ohne fortgesetzt: {0}', batchRescue:'Batch {0} mehrfach fehlgeschlagen; Einzelrettung: {1}/{2} Gruppen',
   batchDone:'Batch {0}/{1} fertig{2}.', retried:' (nach {0} Wiederholungen)', anchorKeep:'⚠️ Gruppen {0}: Die Übersetzung ist möglicherweise nicht {1}; unverändert übernommen', anchorRefix:'{0} abgewichene Gruppe(n) durch Einzel-Re-Übersetzung vollständig wiederhergestellt', musicDropSaved:'{0} als drop markierte Musikgruppe(n) durch Einzel-Re-Übersetzung gerettet', musicDropKept:'Gruppe(n) {0} als reines Summen eingestuft; bestätigt und als Füllwort entfernt', cueAlignFallback:'Gruppen {0}: ungültige Cue-Align-Struktur; auf Daueraufteilung zurückgefallen', cueAlignRefix:'{0} Strukturfehler durch erneute Einzelübertragung behoben',
@@ -1559,6 +1583,9 @@ const I18N = {
   startT:'Traduction : {0} → {1}, {2} sous-titres, ~{3} caractères par lot.',
   batchProg:'Lot {0}/{1} (phrases {2}–{3})…',
   pgRun:'Traduction', pgEta:'Reste {0}', pgDone:'✓ Terminé · {0}',
+  resumeTitle:'Traduction inachevée', resumeBody:'Ce fichier s’est arrêté au lot {0}/{1} la dernière fois. Vous pouvez reprendre où il en était (les {0} lots finis ne seront pas refaits) ou recommencer depuis le début.',
+  resumeGo:'Reprendre', resumeNew:'Recommencer', resumeLog:'Reprise : {0} lots ignorés, démarrage au lot {1}.', resumeHint:'(La progression est enregistrée sur cet appareil : fermez la page et reprenez plus tard.)',
+  resumeQuota:'Impossible d’enregistrer la progression (stockage local plein). La traduction continue sans sauvegarde.',
   chkAutoTerms:'Glossaire auto : extrait avant traduction les noms propres et termes ambigus pour uniformiser tout le fichier',
   autoTermsRun:'Extraction du glossaire (noms propres / termes ambigus)…', autoTermsDone:'Glossaire auto prêt : {0} termes unifiés', autoTermsSkip:'Échec de l\'extraction du glossaire, poursuite sans : {0}', batchRescue:'Lot {0} a échoué plusieurs fois ; sauvetage individuel : {1}/{2} groupes',
   batchDone:'Lot {0}/{1} terminé{2}.', retried:' (après {0} tentatives)', anchorKeep:'⚠️ Groupes {0} : la traduction pourrait ne pas être en {1} ; conservée telle quelle', anchorRefix:'{0} groupe(s) déviés entièrement récupérés par retraduction individuelle', musicDropSaved:'{0} groupe(s) de musique marqués drop récupérés par retraduction individuelle', musicDropKept:'Groupe(s) {0} jugés fredonnement pur ; confirmés et supprimés comme remplissage', cueAlignFallback:'Groupes {0} : structure cue-align invalide ; repli sur découpage par durée', cueAlignRefix:'{0} erreur(s) de structure corrigée(s) par renvoi isolé',
@@ -1651,6 +1678,9 @@ const I18N = {
   startT:'Menerjemahkan: {0} → {1}, {2} subtitle, ~{3} karakter per batch.',
   batchProg:'Batch {0}/{1} (kalimat {2}–{3})…',
   pgRun:'Menerjemahkan', pgEta:'Sisa {0}', pgDone:'✓ Selesai · {0}',
+  resumeTitle:'Terjemahan belum selesai', resumeBody:'File ini terakhir kali berhenti di batch {0}/{1}. Anda bisa melanjutkan dari situ ({0} batch yang sudah selesai tidak akan diulang) atau mengulang dari awal.',
+  resumeGo:'Lanjutkan', resumeNew:'Ulangi dari awal', resumeLog:'Dilanjutkan: melewati {0} batch, mulai dari batch {1}.', resumeHint:'(Progres disimpan di perangkat ini — Anda bisa menutup halaman dan melanjutkan nanti.)',
+  resumeQuota:'Progres gagal disimpan (penyimpanan lokal penuh). Terjemahan tetap berjalan tanpa menyimpan.',
   chkAutoTerms:'Glosarium otomatis: mengekstrak nama diri & istilah ambigu sebelum menerjemahkan agar seragam di seluruh file',
   autoTermsRun:'Mengekstrak glosarium (nama diri / istilah ambigu)…', autoTermsDone:'Glosarium otomatis siap: {0} istilah diseragamkan', autoTermsSkip:'Ekstraksi glosarium gagal, dilanjutkan tanpa itu: {0}', batchRescue:'Batch {0} gagal berulang; penyelamatan per grup: {1}/{2} grup',
   batchDone:'Batch {0}/{1} selesai{2}.', retried:' (setelah {0} percobaan)', anchorKeep:'⚠️ Grup {0}: terjemahan mungkin bukan dalam {1}; tetap dipertahankan', anchorRefix:'{0} grup yang melenceng sepenuhnya dipulihkan lewat penerjemahan ulang terpisah', musicDropSaved:'{0} grup musik yang di-drop berhasil diselamatkan lewat penerjemahan ulang terpisah', musicDropKept:'Grup {0} dinilai humming murni; dikonfirmasi dan dihapus sebagai pengisi', cueAlignFallback:'Grup {0}: struktur cue-align tidak valid; kembali ke pemisahan durasi', cueAlignRefix:'{0} kesalahan struktur diperbaiki via kirim ulang terisolasi',
@@ -1743,6 +1773,9 @@ const I18N = {
   startT:'अनुवाद शुरू: {0} → {1}, {2} सबटाइटल, प्रति बैच लगभग {3} अक्षर।',
   batchProg:'बैच {0}/{1} (वाक्य {2}–{3})…',
   pgRun:'अनुवाद हो रहा है', pgEta:'शेष {0}', pgDone:'✓ पूर्ण · समय {0}',
+  resumeTitle:'अधूरा अनुवाद मिला', resumeBody:'यह फ़ाइल पिछली बार {0}/{1} बैच पर रुक गई थी। आप वहीं से जारी रख सकते हैं (पूरे हुए {0} बैच दोबारा नहीं चलेंगे) या शुरू से फिर अनुवाद कर सकते हैं।',
+  resumeGo:'जारी रखें', resumeNew:'शुरू से करें', resumeLog:'जारी रखा गया: {0} बैच छोड़े, {1}वें बैच से शुरू।', resumeHint:'(प्रगति इसी डिवाइस पर सहेजी जाती है — पेज बंद करके बाद में जारी रख सकते हैं)',
+  resumeQuota:'प्रगति सहेज नहीं सका (लोकल स्टोरेज भरा हुआ)। अनुवाद बिना सहेजे जारी रहेगा।',
   chkAutoTerms:'स्वचालित शब्दावली: अनुवाद से पहले संज्ञाएँ व द्विअर्थी शब्द निकालकर पूरी फ़ाइल में एकरूपता लाता है',
   autoTermsRun:'शब्दावली निकाली जा रही है (संज्ञाएँ / द्विअर्थी शब्द)…', autoTermsDone:'स्वचालित शब्दावली तैयार: {0} शब्द एकरूप', autoTermsSkip:'शब्दावली निकालने में विफल, इसके बिना जारी: {0}', batchRescue:'बैच {0} बार-बार विफल; प्रति-समूह बचाव: {1}/{2} समूह सफल',
   batchDone:'बैच {0}/{1} पूर्ण{2}।', retried:' ({0} पुनः प्रयास बाद)', anchorKeep:'⚠️ समूह {0}: अनुवाद {1} में नहीं हो सकता; जैसा है वैसा रखा गया', anchorRefix:'विचलित {0} समूह अलग पुनर्अनुवाद से पूरी तरह बहाल किए गए', musicDropSaved:'drop माने गए {0} संगीत समूह अलग पुनर्अनुवाद से बचाए गए', musicDropKept:'समूह {0} शुद्ध गुनगुनाहट माने गए; पुष्टि कर फिलर के रूप में हटाए गए', cueAlignFallback:'समूह {0}: cue-align संरचना अमान्य; अवधि-आधारित विभाजन पर लौटाया गया', cueAlignRefix:'{0} संरचना त्रुटियाँ पृथक पुनःप्रेषण से ठीक की गईं',
@@ -1835,6 +1868,9 @@ const I18N = {
   startT:'เริ่มแปลทั้งไฟล์: {0} → {1} รวม {2} ซับ ประมาณ {3} ตัวอักษรต่อแบตช์',
   batchProg:'แบตช์ {0}/{1} (กลุ่มประโยค {2}–{3})…',
   pgRun:'กำลังแปล', pgEta:'เหลืออีก {0}', pgDone:'✓ เสร็จ · ใช้เวลา {0}',
+  resumeTitle:'พบงานแปลที่ยังไม่เสร็จ', resumeBody:'ไฟล์นี้ครั้งที่แล้วหยุดอยู่ที่ batch {0}/{1} คุณสามารถทำงานต่อได้ (batch ที่เสร็จแล้ว {0} batch จะไม่ถูกแปลซ้ำ) หรือเริ่มใหม่ทั้งหมด',
+  resumeGo:'ทำงานต่อ', resumeNew:'เริ่มใหม่', resumeLog:'ทำงานต่อแล้ว: ข้าม {0} batch เริ่มที่ batch {1}', resumeHint:'(บันทึกความคืบหน้าไว้ในเครื่องนี้ ปิดหน้าเว็บแล้วกลับมาทำต่อได้)',
+  resumeQuota:'ไม่สามารถบันทึกความคืบหน้าได้ (พื้นที่จัดเก็บเต็ม) การแปลจะดำเนินต่อโดยไม่บันทึก',
   chkAutoTerms:'คลังศัพท์อัตโนมัติ: ดึงชื่อเฉพาะและคำคลุมเครือก่อนแปลเพื่อความสม่ำเสมอทั้งไฟล์',
   autoTermsRun:'กำลังดึงคลังศัพท์ (ชื่อเฉพาะ / คำคลุมเครือ)…', autoTermsDone:'คลังศัพท์พร้อม: รวม {0} คำ', autoTermsSkip:'ดึงคลังศัพท์ไม่สำเร็จ ข้ามและทำต่อ: {0}', batchRescue:'แบตช์ {0} ล้มเหลวซ้ำ ช่วยเหลือรายกลุ่ม: สำเร็จ {1}/{2} กลุ่ม',
   batchDone:'แบตช์ {0}/{1} เสร็จ{2}', retried:' (สำเร็จหลังลองใหม่ {0} ครั้ง)', anchorKeep:'⚠️ กลุ่ม {0} คำแปลอาจไม่ใช่{1} จึงเก็บไว้ตามเดิม', anchorRefix:'กลุ่มที่ภาษาเพี้ยน {0} กลุ่ม กู้คืนครบด้วยการแปลใหม่รายกลุ่มแล้ว', musicDropSaved:'กลุ่มเพลงที่ถูก drop {0} กลุ่ม กู้กลับมาด้วยการแปลใหม่รายกลุ่ม', musicDropKept:'กลุ่ม {0} เป็นเสียงฮัมล้วน ยืนยันแล้วจึงลบเป็นคำเติม', cueAlignFallback:'กลุ่ม {0}: โครงสร้าง cue-align ไม่ถูกต้อง; ใช้การแบ่งตามระยะเวลาแทน', cueAlignRefix:'แก้ข้อผิดพลาดโครงสร้าง {0} รายการด้วยการส่งใหม่แบบแยกกลุ่ม',
@@ -1927,6 +1963,9 @@ const I18N = {
   startT:'Đang dịch: {0} → {1}, {2} phụ đề, khoảng {3} ký tự mỗi lô.',
   batchProg:'Lô {0}/{1} (câu {2}–{3})…',
   pgRun:'Đang dịch', pgEta:'Còn lại {0}', pgDone:'✓ Xong · {0}',
+  resumeTitle:'Có bản dịch chưa hoàn thành', resumeBody:'Lần trước tệp này dừng ở batch {0}/{1}. Bạn có thể tiếp tục từ đó ({0} batch đã xong sẽ không dịch lại) hoặc dịch lại từ đầu.',
+  resumeGo:'Tiếp tục', resumeNew:'Dịch lại từ đầu', resumeLog:'Đã tiếp tục: bỏ qua {0} batch, bắt đầu từ batch {1}.', resumeHint:'(Tiến trình được lưu trên máy này — bạn có thể đóng trang và tiếp tục sau.)',
+  resumeQuota:'Không thể lưu tiến trình (bộ nhớ cục bộ đã đầy). Bản dịch vẫn tiếp tục mà không lưu.',
   chkAutoTerms:'Bảng thuật ngữ tự động: trích tên riêng & từ nhiễu nghĩa trước khi dịch để thống nhất cả file',
   autoTermsRun:'Đang trích bảng thuật ngữ (tên riêng / từ nhiễu nghĩa)…', autoTermsDone:'Bảng thuật ngữ sẵn sàng: {0} thuật ngữ đã thống nhất', autoTermsSkip:'Trích thuật ngữ thất bại, tiếp tục không có nó: {0}', batchRescue:'Batch {0} thất bại nhiều lần; cứu từng nhóm: thành công {1}/{2} nhóm',
   batchDone:'Lô {0}/{1} xong{2}.', retried:' (thành công sau {0} lần thử lại)', anchorKeep:'⚠️ Nhóm {0}: bản dịch có thể không phải {1}; giữ nguyên', anchorRefix:'Đã khôi phục hoàn toàn {0} nhóm lệch ngôn ngữ bằng cách dịch lại từng nhóm riêng lẻ', musicDropSaved:'Đã cứu {0} nhóm nhạc bị drop bằng cách dịch lại từng nhóm riêng lẻ', musicDropKept:'Nhóm {0} được xác định là tiếng ngân thuần; đã xác nhận và xóa như từ đệm', cueAlignFallback:'Nhóm {0}: cấu trúc cue-align không hợp lệ; đã dùng chia theo thời lượng', cueAlignRefix:'Đã sửa {0} lỗi cấu trúc qua gửi lại riêng lẻ',
@@ -2019,6 +2058,9 @@ const I18N = {
   startT:'Перевод: {0} → {1}, {2} субтитров, ~{3} символов на батч.',
   batchProg:'Батч {0}/{1} (предложения {2}–{3})…',
   pgRun:'Перевод', pgEta:'Осталось {0}', pgDone:'✓ Готово · за {0}',
+  resumeTitle:'Найден незавершённый перевод', resumeBody:'В прошлый раз этот файл остановился на пакете {0}/{1}. Можно продолжить с того же места (уже готовые {0} пакетов не будут переведены заново) или начать заново.',
+  resumeGo:'Продолжить', resumeNew:'Начать заново', resumeLog:'Продолжено: пропущено {0} пакетов, старт с пакета {1}.', resumeHint:'(Прогресс сохраняется на этом устройстве — можно закрыть страницу и продолжить позже.)',
+  resumeQuota:'Не удалось сохранить прогресс (локальное хранилище заполнено). Перевод продолжается без сохранения.',
   chkAutoTerms:'Автоглоссарий: перед переводом извлекает имена собственные и неоднозначные термины для единообразия по всему файлу',
   autoTermsRun:'Извлечение глоссария (имена собственные / неоднозначные термины)…', autoTermsDone:'Автоглоссарий готов: {0} терминов унифицировано', autoTermsSkip:'Не удалось извлечь глоссарий, продолжаем без него: {0}', batchRescue:'Батч {0} не прошёл несколько раз; спасение по группам: {1}/{2}',
   batchDone:'Батч {0}/{1} готов{2}.', retried:' (после {0} повторов)', anchorKeep:'⚠️ Группы {0}: перевод может быть не на {1}; оставлен как есть', anchorRefix:'{0} групп с отклонением языка полностью восстановлены изолированным повторным переводом', musicDropSaved:'{0} музыкальных групп со статусом drop спасены изолированным повторным переводом', musicDropKept:'Группы {0} признаны чистым напевом; подтверждены и удалены как слова-связки', cueAlignFallback:'Группы {0}: недопустимая структура cue-align; возврат к разбивке по длительности', cueAlignRefix:'{0} ошибок структуры исправлено повторной отправкой',
@@ -2111,6 +2153,9 @@ const I18N = {
   startT:'Traduzione: {0} → {1}, {2} sottotitoli, ~{3} caratteri per batch.',
   batchProg:'Batch {0}/{1} (frasi {2}–{3})…',
   pgRun:'Traduzione', pgEta:'Mancano {0}', pgDone:'✓ Completato · {0}',
+  resumeTitle:'Traduzione non completata', resumeBody:'L’ultima volta questo file si è fermato al batch {0}/{1}. Puoi continuare da lì (i {0} batch già fatti non verranno ripetuti) o ricominciare dall’inizio.',
+  resumeGo:'Continua', resumeNew:'Ricomincia', resumeLog:'Ripreso: saltati {0} batch, si parte dal batch {1}.', resumeHint:'(I progressi sono salvati su questo dispositivo: puoi chiudere la pagina e riprendere dopo.)',
+  resumeQuota:'Impossibile salvare i progressi (spazio locale pieno). La traduzione continua senza salvataggio.',
   chkAutoTerms:'Glossario automatico: estrae nomi propri e termini ambigui prima di tradurre per uniformare l\'intero file',
   autoTermsRun:'Estrazione del glossario (nomi propri / termini ambigui)…', autoTermsDone:'Glossario automatico pronto: {0} termini unificati', autoTermsSkip:'Estrazione del glossario fallita, si continua senza: {0}', batchRescue:'Batch {0} non riuscito più volte; recupero individuale: {1}/{2} gruppi',
   batchDone:'Batch {0}/{1} completato{2}.', retried:' (dopo {0} tentativi)', anchorKeep:'⚠️ Gruppi {0}: la traduzione potrebbe non essere in {1}; mantenuta così com\'è', anchorRefix:'{0} gruppi deviati recuperati integralmente con ritraduzione isolata', musicDropSaved:'{0} gruppi musicali contrassegnati come drop recuperati con ritraduzione isolata', musicDropKept:'Gruppo/i {0} giudicati canto senza parole; confermati e rimossi come riempitivo', cueAlignFallback:'Gruppi {0}: struttura cue-align non valida; ripiego sulla divisione per durata', cueAlignRefix:'{0} errori di struttura corretti con reinvio isolato',
@@ -2203,6 +2248,9 @@ const I18N = {
   startT:'الترجمة: {0} ← {1}، {2} ترجمة، نحو {3} حرفًا لكل دفعة.',
   batchProg:'دفعة {0}/{1} (جمل {2}–{3})…',
   pgRun:'جارٍ الترجمة', pgEta:'متبقي {0}', pgDone:'✓ اكتمل · {0}',
+  resumeTitle:'تم العثور على ترجمة غير مكتملة', resumeBody:'توقف هذا الملف في المرة الماضية عند الدفعة {0}/{1}. يمكنك المتابعة من حيث توقفت (لن تُعاد الدفعات {0} المكتملة) أو البدء من جديد.',
+  resumeGo:'متابعة', resumeNew:'ابدأ من جديد', resumeLog:'تمت المتابعة: تم تخطي {0} دفعة، البدء من الدفعة {1}.', resumeHint:'(يتم حفظ التقدم على هذا الجهاز — يمكنك إغلاق الصفحة والمتابعة لاحقًا)',
+  resumeQuota:'تعذّر حفظ التقدم (مساحة التخزين ممتلئة). ستستمر الترجمة بدون حفظ.',
   chkAutoTerms:'قاموس تلقائي: يستخرج الأسماء الخاصة والمصطلحات الملتبسة قبل الترجمة لتوحيد الترجمة في كامل الملف',
   autoTermsRun:'جارٍ استخراج القاموس (أسماء خاصة / مصطلحات ملتبسة)…', autoTermsDone:'القاموس التلقائي جاهز: تم توحيد {0} مصطلحًا', autoTermsSkip:'فشل استخراج القاموس، ستتم المتابعة بدونه: {0}', batchRescue:'فشلت الدفعة {0} عدة مرات؛ إنقاذ فردي: {1}/{2} مجموعة',
   batchDone:'اكتملت الدفعة {0}/{1}{2}.', retried:' (بعد {0} محاولات)', anchorKeep:'⚠️ المجموعات {0}: قد لا تكون الترجمة باللغة {1}؛ أُبقيت كما هي', anchorRefix:'تمت استعادة {0} مجموعة منحرفة بالكامل عبر إعادة ترجمة منفردة', musicDropSaved:'تم إنقاذ {0} مجموعة موسيقية عُلّمت drop عبر إعادة ترجمة منفردة', musicDropKept:'المجموعات {0} اعتُبرت همهمة خالصة؛ تم تأكيدها وحذفها كحشو', cueAlignFallback:'المجموعات {0}: بنية محاذاة الإشارات غير صالحة؛ تم الرجوع إلى التقسيم بالمدة', cueAlignRefix:'تم إصلاح {0} من أخطاء البنية عبر إعادة الإرسال المنفرد',
@@ -2295,6 +2343,9 @@ const I18N = {
   startT:'Çevriliyor: {0} → {1}, {2} altyazı, grup başına yaklaşık {3} karakter.',
   batchProg:'Grup {0}/{1} (cümleler {2}–{3})…',
   pgRun:'Çevriliyor', pgEta:'Kalan {0}', pgDone:'✓ Tamamlandı · {0}',
+  resumeTitle:'Tamamlanmamış çeviri bulundu', resumeBody:'Bu dosya geçen sefer {0}/{1}. partide durdu. Kaldığı yerden devam edebilirsiniz (biten {0} parti tekrar çalıştırılmaz) veya baştan başlayabilirsiniz.',
+  resumeGo:'Devam et', resumeNew:'Baştan başla', resumeLog:'Devam edildi: {0} parti atlandı, {1}. partiden başlanıyor.', resumeHint:'(İlerleme bu cihaza kaydedilir — sayfayı kapatıp sonra devam edebilirsiniz.)',
+  resumeQuota:'İlerleme kaydedilemedi (yerel depolama dolu). Çeviri kaydetmeden devam ediyor.',
   chkAutoTerms:'Otomatik sözlük: çeviriden önce özel isimleri ve belirsiz terimleri çıkararak tüm dosyada tutarlılık sağlar',
   autoTermsRun:'Sözlük çıkarılıyor (özel isimler / belirsiz terimler)…', autoTermsDone:'Otomatik sözlük hazır: {0} terim birleştirildi', autoTermsSkip:'Sözlük çıkarılamadı, onsuz devam ediliyor: {0}', batchRescue:'Batch {0} birden çok kez başarısız; tek grup kurtarma: {1}/{2} grup',
   batchDone:'Grup {0}/{1} tamamlandı{2}.', retried:' ({0} denemeden sonra)', anchorKeep:'⚠️ Gruplar {0}: çeviri {1} olmayabilir; olduğu gibi korundu', anchorRefix:'{0} sapmış grup izole yeniden çeviriyle tamamen kurtarıldı', musicDropSaved:'drop olarak işaretlenen {0} müzik grubu izole yeniden çeviriyle kurtarıldı', musicDropKept:'Grup {0} saf mırıltı olarak değerlendirildi; onaylanıp dolgu olarak silindi', cueAlignFallback:'Gruplar {0}: geçersiz cue-align yapısı; süre bazlı bölmeye geri dönüldü', cueAlignRefix:'{0} yapı hatası yalıtılmış yeniden gönderimle düzeltildi',
@@ -2415,6 +2466,7 @@ const S = {
   fileBase: '',
   translating: false,
   stop: false,
+  snapOff: false,  // v0.9.77：localStorage 写满/被禁用时置 true，之后不再尝试存断点
   dropN: 0, mergeN: 0, wrapN: 0
 };
 
@@ -2503,15 +2555,19 @@ function pgStart(){
   const st=$('pgState'); if(st) st.textContent=t('pgRun');
   $('pgEta').textContent='';
 }
-function pgBatch(bi, totalB){
+function pgBatch(bi, totalB, skip){
   const now=Date.now();
-  if(PG.t0) PG.durs.push((now-PG.t0)/1000);
-  PG.t0=now;
+  // v0.9.77：skip=断点续传跳过已完成的批——不记耗时，否则 ETA 会被这些 0 秒批拉成乐观值
+  if(PG.t0 && !skip) PG.durs.push((now-PG.t0)/1000);
+  if(!skip) PG.t0=now;
   // v0.9.59：批翻译阶段 95% 封顶——100% 收归 pgFinish 独有（批翻完还有回填/压缩重译/折行渲染）
   setProg(Math.round(bi/totalB*95), true);
   const etaEl=$('pgEta');
-  if(PG.durs.length>=3 && bi<totalB){
-    const avg=PG.durs.slice(-5).reduce((a,b)=>a+b,0)/Math.min(PG.durs.length,5);
+  // v0.9.77：第 1 批落地即出预估（原来要等满 3 批，短任务几乎看不到 ETA）；
+  // 改用 EMA（新样本权重 0.3）——单批抖动不再带着剩余时间大幅跳变
+  if(PG.durs.length>=1 && bi<totalB){
+    let avg=PG.durs[0];
+    for(let i=1;i<PG.durs.length;i++) avg=avg*0.7+PG.durs[i]*0.3;
     etaEl.textContent=t('pgEta', fmtDur((totalB-bi)*avg));
   }
 }
@@ -2529,6 +2585,91 @@ function pgFinish(){
   setTimeout(()=>{ if(!S.translating){ setProg(0,false); setPrText(''); } }, 2600);
 }
 function setPrText(t){ $('prText').textContent=t||''; }
+
+/* ---------------- v0.9.77 断点续传 ----------------
+   数千条字幕要跑十几到几十分钟，标签页一关/一刷新/网络一断就前功尽弃。
+   做法：每批落地即把「已完成的译文 + 水词集合 + 跨批上下文」写进 localStorage；
+   下次打开同一份文件按同样参数开翻时，询问是否从断点继续（已完成的批不再重发）。
+   指纹 = 文件名 + 条数 + 语言对 + 切批参数 + 源文内容哈希，任一变化即作废，绝不串片。
+   只存译文与进度，不存任何 Key / 原文。 */
+const SNAP_KEY='srt_resume_v1', SNAP_TTL=7*24*3600*1000;
+function srcFingerprint(items){
+  let h=5381;
+  for(let i=0;i<items.length;i++){
+    const s=String(items[i].text||'');
+    for(let j=0;j<s.length;j++) h=((h<<5)+h+s.charCodeAt(j))|0;
+  }
+  return (h>>>0).toString(36);
+}
+function snapFp(cfg, budget, cap){
+  // 影响译文形态的参数全部入指纹（语言对 / 风格 / 行宽 / 专名策略 / 术语）；
+  // 不含 base/key/model——换 Key 或换引擎续跑是合理需求，不该作废已完成批次
+  return [S.fileBase, S.srcItems.length, cfg.src, cfg.dst, budget, cap,
+          cfg.styleMode, cfg.styleCustom, cfg.maxW, cfg.keepTerms?1:0, cfg.terms,
+          srcFingerprint(S.srcItems)].join('|');
+}
+function loadSnap(fp){
+  try{
+    const raw=localStorage.getItem(SNAP_KEY); if(!raw) return null;
+    const o=JSON.parse(raw);
+    if(!o || o.fp!==fp || !o.done || typeof o.done!=='object') return null;
+    if(!o.ts || Date.now()-o.ts>SNAP_TTL){ localStorage.removeItem(SNAP_KEY); return null; }
+    if(!(o.bi>0) || !(o.totalB>0) || o.bi>=o.totalB) return null;
+    return o;
+  }catch(e){ return null; }
+}
+function serRes(res){
+  const o={};
+  res.forEach(function(v,k){
+    o[k]={ type:(v&&v.type)||'', text:String((v&&v.text)||''),
+           cueTexts:(v&&v.cueTexts&&v.cueTexts.size)?Array.from(v.cueTexts.entries()):null };
+  });
+  return o;
+}
+function saveSnap(fp, res, fillerSet, ctx, bi, totalB, durs, file){
+  if(S.snapOff) return;
+  try{
+    localStorage.setItem(SNAP_KEY, JSON.stringify({
+      v:1, ts:Date.now(), fp:fp, file:file||'', bi:bi, totalB:totalB,
+      done:serRes(res), fillers:Array.from(fillerSet), ctx:ctx||[], durs:(durs||[]).slice(-5)
+    }));
+  }catch(e){
+    // 存储写满 / 隐私模式禁用：只降级「不再存」，绝不影响正在跑的翻译
+    if(!S.snapOff){ S.snapOff=true; try{ log(t('resumeQuota'),'err'); }catch(_){} }
+  }
+}
+function rmSnap(){ try{ localStorage.removeItem(SNAP_KEY); }catch(e){} }
+/* 断点询问弹窗：返回 Promise<'resume'|'new'>（样式沿用错误弹窗，标题改用主色以示非错误） */
+function askResume(bi, totalB){
+  return new Promise(function(resolve){
+    const ov=document.createElement('div');
+    ov.id='resumeModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('resumeTitle');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+    b.textContent=t('resumeBody',bi,totalB);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const mk=function(txt,primary,val){
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='btn'; btn.textContent=txt;
+      if(primary) btn.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick=function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('resumeNew'),false,'new');
+    mk(t('resumeGo'),true,'resume');
+    box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+    ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('new'); } });
+    document.body.appendChild(ov);
+  });
+}
 
 // 读取左侧全部设置 → 配置对象（含校验用的错误信息）
 function getCfg(){
@@ -3281,9 +3422,31 @@ async function runTranslate(){
     const fillerSet=new Set();
     const totalB=batches.length;
     let ctx=[]; // v0.9.62：跨批上下文（前批末尾 ≤2 组的原文+已定译文，随批发给模型做衔接参考）
-    for(let bi=0; bi<totalB; bi++){
+    // v0.9.77 断点续传：同一文件 + 同语言对 + 同切批参数才认；批数对不上说明参数变了，旧快照作废
+    const snapFpStr=snapFp(cfg, CHAR_BUDGET, CUE_CAP);
+    let startBi=0;
+    const snap=loadSnap(snapFpStr);
+    if(snap && snap.totalB===totalB){
+      const choice=await askResume(snap.bi, totalB);
+      if(choice==='resume'){
+        Object.keys(snap.done).forEach(function(k){
+          const v=snap.done[k];
+          res.set(Number(k), { type:v.type||'', text:v.text||'', cueTexts:v.cueTexts?new Map(v.cueTexts):null });
+        });
+        (snap.fillers||[]).forEach(function(no){ fillerSet.add(Number(no)); });
+        ctx=snap.ctx||[]; startBi=snap.bi;
+        PG.durs=Array.isArray(snap.durs)?snap.durs.slice():[];  // ETA 沿用上次节奏，不用重新攒样本
+        log(t('resumeLog', snap.bi, snap.bi+1),'okc');
+      } else {
+        rmSnap();
+      }
+    } else if(snap){ rmSnap(); }
+    if(useApi) log(t('resumeHint'));
+    for(let bi=startBi; bi<totalB; bi++){
       if(S.stop){ log(t('userStop'),'err'); break; }
       const gBatch=batches[bi];
+      // v0.9.77：整批已有结果（断点恢复）→ 跳过不重发，只推进进度
+      if(gBatch.every(function(g){ return res.has(g.gno); })){ pgBatch(bi, totalB, true); continue; }
       pgBatch(bi, totalB);
       setPrText(t('batchProg', bi+1, totalB, gBatch[0].gno, gBatch[gBatch.length-1].gno));
       let ok=false;
@@ -3481,6 +3644,9 @@ async function runTranslate(){
           }
           return { gno:g.gno, src:String(g.mFrames?g.mFrames.plainText:g.text).slice(0,300), text:txt.slice(0,300) };
         });
+      // v0.9.77：本批落地即存盘——中断/关页后重开同一文件可从下一批续跑。
+      // 用户主动停止时不写：快照停在「上一个完成批 +1」，恢复时正好重跑被中断的那批
+      if(!S.stop) saveSnap(snapFpStr, res, fillerSet, ctx, bi+1, totalB, PG.durs, S.fileBase);
     }
     setProg(95,true); setPrText(t('postEnd')); // v0.9.59：批翻完只到 95%，run 动画保留到 pgFinish
     log(t('postEnd'));
@@ -3669,6 +3835,8 @@ async function runTranslate(){
     finalRenumberAndStats();
     log(t('allDone',S.dropN,S.mergeN,S.wrapN),'okc');
     reportEvent('finish');   // 翻译成功完成上报（仅云端模式有效）
+    // v0.9.77：只有整片跑完才作废断点。用户主动停止 / 模型熔断（S.stop）时保留，下次可续跑
+    if(!S.stop) rmSnap();
     pgFinish();
   }catch(e){
     log(t('errOccur',e.message),'err');
