@@ -1549,6 +1549,10 @@
   function buildBilingualParts(rows, opts) {
     opts = opts || {};
     const maxW = (opts.maxW > 0) ? opts.maxW : 21;
+    // v0.9.93：双语「单行」容忍宽度。源/译各自 squash 成一行后，若宽度都在此内就整条按
+    // 「1 行译文 + 1 行源文」放下，绝不切时间轴。双语观众一次只看一侧，行宽可显著大于单语；
+    // 但加绝对值封顶，避免 maxW 调大时单行无限变长。
+    const biTol = Math.min(maxW * 1.9, maxW + 20);
     // 1) 汇集成对条目：活跃行 + 其后 merged 行的源文
     const entries = [];
     let last = null;
@@ -1594,7 +1598,7 @@
       const emitPart = (st, en, sTxt, dTxt) => {
         const sw = sTxt ? textWidth(sTxt) : 0;
         const dw = textWidth(dTxt || '');
-        if (sw <= maxW + 4 && dw <= maxW + 4) { // R1
+        if (sw <= biTol && dw <= biTol) { // R1
           pushItem(st, en, sTxt ? [sTxt] : [], [dTxt || '']);
           return;
         }
@@ -1643,14 +1647,15 @@
         continue;
       }
       // 规则（可读性优先，三层兜底）：
-      //  R1 微超宽容忍：两边宽度都 ≤ maxW+4 时不折不切，直接单行放下（字幕适当长点观感更好）；
+      //  R1 单行为主（v0.9.93）：两边宽度都 ≤ biTol 时不折不切，直接单行放下——双语的理想形态
+      //     就是「1 行译文 + 1 行源文」，短字幕被撑成 2+2 行观感极差；
       //  R2 饥饿段回退：切分后任一段只剩 <=2 个有效字（如 "…"/"呃，"）时放弃切分，
       //     整 cue 显示，源/译各自最多折 2 行（2+2 封顶）——废字幕比满屏更糟；
       //  R3 强制切分：超出 2+2 容量的长 cue 才切时间轴（源文自然断点切、译文按比例对齐切 + 段内修复）。
       const effOf = (s) => Array.from(String(s || '').replace(/[\s\p{P}\p{S}]/gu, '')).length;
       const srcW = srcText ? textWidth(srcText) : 0;
       const dstW = textWidth(dstText);
-      if (srcW <= maxW + 4 && dstW <= maxW + 4) {
+      if (srcW <= biTol && dstW <= biTol) {
         pushItem(e.start, e.end, srcText ? [srcText] : [], [dstText]);
         continue;
       }
@@ -1658,14 +1663,6 @@
       const dstLines = wrapToWidth(dstText, maxW, { normalize: true, locale: opts.dstLocale });
       let k = Math.max(srcLines.length, dstLines.length);
       if (k <= 1) { pushItem(e.start, e.end, srcLines, dstLines); continue; }
-      // v0.9.92 R2 两行容忍：源/译折行后各 ≤2 行、且总宽未超 2*maxW → 整 cue 折行放下，不切时间轴。
-      // 与 emitPart 的 R2（合并句组段内，1601 行）对齐，消除两条路径行为不一致：此前主路径只有
-      // 「单行」容忍，而双语下「2 行源文 + 2 行译文」是源字幕常态（TED 等滚动字幕每条 cue 自带 2 行），
-      // 一超单行容量就被判超容量去切时间轴，实测把 83 条切成 121~153 条、英文被硬切在词中间。
-      if (k <= 2 && srcW <= 2 * maxW + 4 && dstW <= 2 * maxW + 4) {
-        pushItem(e.start, e.end, srcLines, dstLines);
-        continue;
-      }
       // v0.9.48：合并句组（entry.times > 1）——译文/源文先按各原 cue 时长比例切回（时间跟着语音走，
       // splitByDuration 内含词边界/语义停顿/原子保护），原 cue 边界即子时间轴；段内仍超容量才段内细切。
       // 背景：旧路径把整组当一个超长 cue 等宽重切（时间按文本宽度瓜分），实测把 3 条原文切出
