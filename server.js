@@ -28,7 +28,8 @@ const DEFAULTS = {
   globalDaily: 300,        // 全站每日翻译请求总量上限
   adminHash: '',           // 管理密码 sha256(hex)
   publicUrl: '',           // 站点公开 URL（SEO canonical/sitemap 前缀；空=按请求头）
-  analyticsId: ''          // GA4 统计 ID（如 G-XXXXXXX；空=不注入统计代码）
+  analyticsId: '',         // GA4 统计 ID（如 G-XXXXXXX；空=不注入统计代码）
+  temperature: 0.2         // 采样温度 0-2（v0.9.91 起可在 admin 配置，此前硬编码 0.2）
 };
 
 function ensureData(){
@@ -593,10 +594,14 @@ function publicBase(req){
 /* ---------------- 模型转发 ---------------- */
 async function callModel(cfg, messages, maxTokens){
   const url = String(cfg.base).replace(/\/+$/, '') + '/chat/completions';
+  // v0.9.91：temperature 改为配置项（admin 可调）；旧配置无该字段时回退 0.2，并夹紧到 0-2
+  let temp = Number(cfg.temperature);
+  if (!Number.isFinite(temp)) temp = 0.2;
+  temp = Math.min(2, Math.max(0, temp));
   const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
-    body: JSON.stringify({ model: cfg.model, messages, temperature: 0.2, stream: false, max_tokens: maxTokens })
+    body: JSON.stringify({ model: cfg.model, messages, temperature: temp, stream: false, max_tokens: maxTokens })
   });
   const text = await r.text();
   if (!r.ok) throw new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
@@ -705,6 +710,7 @@ const server = http.createServer(async (req, res) => {
           keySet: !!cfg.key,
           keyMask: cfg.key ? (cfg.key.slice(0, 4) + '…' + cfg.key.slice(-4)) : '',
           perIpDaily: cfg.perIpDaily, globalDaily: cfg.globalDaily,
+          temperature: (typeof cfg.temperature === 'number' && Number.isFinite(cfg.temperature)) ? cfg.temperature : 0.2,
           publicUrl: cfg.publicUrl || '',
           analyticsId: cfg.analyticsId || '',
           usedToday: usage.global, usedIps: Object.keys(usage.ips).length
@@ -767,6 +773,7 @@ const server = http.createServer(async (req, res) => {
         if (typeof body.key === 'string' && body.key.trim() !== '') cfg.key = body.key.trim(); // 留空 = 保留原 Key
         if (Number.isFinite(+body.perIpDaily)) cfg.perIpDaily = Math.max(0, Math.floor(+body.perIpDaily));
         if (Number.isFinite(+body.globalDaily)) cfg.globalDaily = Math.max(0, Math.floor(+body.globalDaily));
+        if (body.temperature != null && Number.isFinite(+body.temperature)) cfg.temperature = Math.min(2, Math.max(0, +body.temperature)); // v0.9.91：空值=保持不变
         if (typeof body.publicUrl === 'string') cfg.publicUrl = body.publicUrl.trim().replace(/\/+$/,'');
         if (typeof body.analyticsId === 'string') cfg.analyticsId = body.analyticsId.trim();
         if (typeof body.newPassword === 'string' && body.newPassword !== '') {
