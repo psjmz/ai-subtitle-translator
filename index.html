@@ -396,7 +396,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.82</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.83</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -550,7 +550,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.82</span>
+    <span class="ver-tag">v0.9.83</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -567,7 +567,7 @@
         <button class="btn sm" id="btnFile" data-i18n="btnFile" type="button">📂 选择字幕文件</button>
         <button class="btn sm ghost" id="btnDemo" data-i18n="btnDemo" type="button">载入示例</button>
       </div>
-      <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.txt" hidden>
+      <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.sbv,.txt" hidden>
       <textarea id="paste" rows="3" placeholder="或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）" data-i18n-ph="pastePh" style="margin-top:8px"></textarea>
       <div class="btns"><button class="btn sm" id="btnParse" data-i18n="btnParse" type="button">解析字幕</button></div>
       <div class="hint" id="parseInfo"></div>
@@ -713,7 +713,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.82"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.83"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -3938,8 +3938,8 @@ $('filter').addEventListener('change', renderRows);
 
 /* ---------------- 导入 ---------------- */
 function setSrc(text, fileName){
-  const inFmt=C.detectFormat(text);   // 按内容识别：srt / vtt / ass
-  const {items, issues}= inFmt==='vtt' ? C.parseVtt(text) : inFmt==='ass' ? C.parseAss(text) : C.parseSrt(text);
+  const inFmt=C.detectFormat(text);   // 按内容识别：srt / vtt / ass / sbv
+  const {items, issues}= inFmt==='vtt' ? C.parseVtt(text) : inFmt==='ass' ? C.parseAss(text) : inFmt==='sbv' ? C.parseSbv(text) : C.parseSrt(text);
   S.srcItems=items;
   // 导入后立即构建工作行，右侧对照区才能显示内容（runTranslate 时会重建为深拷贝）
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
@@ -4079,6 +4079,7 @@ function buildStyleOptions(){
   const fileOpts=(bi)=>[
     ['srt','SRT (.srt)'],
     ['vtt','WebVTT (.vtt)'],
+    ['sbv','SBV · YouTube (.sbv)'],
     ['ass', bi ? 'ASS · '+t('assSplit')+' (.ass)' : 'ASS (.ass)'],
     ...(bi ? [['ass-stack','ASS · '+t('assStack')+' (.ass)']] : []),
     ['txt','TXT (.txt)']
@@ -4100,6 +4101,7 @@ function buildExport(){
   const ff=expFileFmt();
   if(ff==='vtt') return C.formatVtt(buildExportItems());
   if(ff==='txt') return C.formatTxt(buildExportItems());
+  if(ff==='sbv') return C.formatSbv(buildExportItems());
   if(ff==='ass') return C.formatAss(buildAssEvents(), {title:S.fileBase||'translated'});
   return C.formatSrt(buildExportItems());
 }
@@ -4238,7 +4240,7 @@ if(sv.mode) $('mode').value=sv.mode;
 if(sv.maxW && ![18,24,20,16,13].includes(+sv.maxW)) $('maxW').value=sv.maxW;
 /* 导出样式记忆 + 旧版双选择器迁移：expFmt+expFileFmt → expStyle */
 if(sv.expStyle && /^[a-z-]+\|(srt|vtt|ass|ass-stack|txt)$/.test(sv.expStyle)) $('expStyle').value=sv.expStyle;
-else if(sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.expFmt) && ['srt','vtt','ass','txt'].includes(sv.expFileFmt)) $('expStyle').value=sv.expFmt+'|'+sv.expFileFmt;
+else if(sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.expFmt) && ['srt','vtt','ass','txt','sbv'].includes(sv.expFileFmt)) $('expStyle').value=sv.expFmt+'|'+sv.expFileFmt;
 
 /* 语言选择填充 */
 (function(){
@@ -4344,7 +4346,7 @@ function autoOutNameStr(){
 function autoNameRe(){ /* 自动命名检测：后缀集合 = 中/英固定词 + 当前界面语言的后缀（v0.9.33） */
   const words=[...new Set(['字幕','双语字幕','subtitles','bilingual',t('fnSub'),t('fnBi')])];
   const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return new RegExp('_[^_/]*(?:'+words.map(esc).join('|')+')\\.(srt|vtt|ass|txt)$','i');
+  return new RegExp('_[^_/]*(?:'+words.map(esc).join('|')+')\\.(srt|vtt|ass|txt|sbv)$','i');
 }
 function refreshOutName(){
   const v=$('outName').value; if(!v) return;

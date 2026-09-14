@@ -487,6 +487,44 @@
     ).join('\n\n') + '\n';
   }
 
+  // ---------------- SBV (YouTube 字幕) 解析 / 格式化 ----------------
+  // SBV 时间：H:MM:SS.mmm,H:MM:SS.mmm（起始/结束用逗号分隔、毫秒用小数点、无编号行；小时 1~2 位）。
+  // 块结构 = 时间轴行 + 若干行文本，块间空行分隔；空文本块跳过；编号按顺序重排（与 VTT 同策略）。
+  const SBV_TIME_RE = /^(\d{1,2}):(\d{2}):(\d{2})\.(\d{1,3})\s*,\s*(\d{1,2}):(\d{2}):(\d{2})\.(\d{1,3})$/;
+  function fmtTimeSbv(ms) {
+    const t = Math.max(0, Math.round(ms));
+    const p = (x, l) => String(x).padStart(l, '0');
+    return Math.floor(t / 3600000) + ':' + p(Math.floor(t / 60000) % 60, 2) + ':' +
+           p(Math.floor(t / 1000) % 60, 2) + '.' + p(t % 1000, 3);
+  }
+  function parseSbv(src) {
+    const items = [], issues = [];
+    const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    const blocks = text.split(/\n\s*\n/);
+    let prevEnd = -1;
+    blocks.forEach((b, bi) => {
+      const lines = b.split('\n').map((x) => x.trimEnd());
+      if (!lines.join('').trim()) return;
+      const m = SBV_TIME_RE.exec((lines[0] || '').trim());
+      if (!m) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺 SBV 时间轴）', code: 'blkNoSbvTs' }); return; }
+      const st = toMs(m[1], m[2], m[3], m[4].padEnd(3, '0'));
+      const en = toMs(m[5], m[6], m[7], m[8].padEnd(3, '0'));
+      const body = lines.slice(1).join('\n').trim();
+      if (!body) return;
+      if (en <= st) issues.push({ type: 'time', at: items.length + 1, msg: '结束时间早于开始时间', code: 'endLtStart' });
+      if (st < prevEnd - 1) issues.push({ type: 'overlap', at: items.length + 1, msg: '与上一条时间轴重叠', code: 'overlap' });
+      prevEnd = en;
+      items.push({ no: items.length + 1, start: st, end: en, text: body });
+    });
+    if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
+    return { items, issues };
+  }
+  function formatSbv(items) {
+    return items.map((it) =>
+      fmtTimeSbv(it.start) + ',' + fmtTimeSbv(it.end) + '\n' + it.text
+    ).join('\n\n') + '\n';
+  }
+
   // ---------------- ASS/SSA 解析 / 格式化 ----------------
   // ASS 时间：H:MM:SS.cc（厘秒）。解析 [Events] 的 Dialogue 行，按 Format 行定位列；
   // 文本剥离 {\...} 特效标签，\N→换行，\h→空格。Comment 行跳过。
@@ -597,11 +635,13 @@
     return items.map((it) => it.text).join('\n\n') + '\n';
   }
 
-  // 按内容识别字幕格式：'vtt' | 'ass' | 'srt'
+  // 按内容识别字幕格式：'vtt' | 'ass' | 'sbv' | 'srt'
   function detectFormat(src) {
     const text = String(src == null ? '' : src).replace(/^\uFEFF/, '');
     if (/^\s*WEBVTT/i.test(text)) return 'vtt';
     if (/\[Script Info\]/i.test(text)) return 'ass';
+    // SBV：独立成行的「H:MM:SS.mmm,H:MM:SS.mmm」时间轴行（SRT 时间行含 --> 不会误中）
+    if (/^\s*\d{1,2}:\d{2}:\d{2}\.\d{1,3}\s*,\s*\d{1,2}:\d{2}:\d{2}\.\d{1,3}\s*$/m.test(text)) return 'sbv';
     return 'srt';
   }
 
@@ -1944,6 +1984,7 @@
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
+    parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime,
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,

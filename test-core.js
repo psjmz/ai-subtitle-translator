@@ -2029,6 +2029,38 @@ t('真实破损文件（Sister Boniface S03E08）5 处全归位', () => {
   assert.ok(items.some(i => i.text === 'who helped you see the light'), 'cue269 歌词应归位');
   assert.strictEqual(items.length, 863);
 });
+t('detectFormat 识别 SBV（SRT 不误判）', () => {
+  assert.strictEqual(C.detectFormat('0:00:01.000,0:00:03.000\nhi\n'), 'sbv');
+  assert.strictEqual(C.detectFormat('1\n00:00:01,000 --> 00:00:03,000\nhi\n'), 'srt');
+  assert.strictEqual(C.detectFormat('WEBVTT\n\n00:01.000 --> 00:03.000\nhi\n'), 'vtt');
+});
+t('parseSbv 基本解析（多行文本/短毫秒/重编号）', () => {
+  const r = C.parseSbv('0:00:01.000,0:00:03.000\nHello there\nsecond line\n\n0:00:04.5,0:00:06.25\nBye\n');
+  assert.strictEqual(r.issues.length, 0);
+  assert.strictEqual(r.items.length, 2);
+  assert.strictEqual(r.items[0].no, 1);
+  assert.strictEqual(r.items[0].start, 1000);
+  assert.strictEqual(r.items[0].end, 3000);
+  assert.strictEqual(r.items[0].text, 'Hello there\nsecond line');
+  assert.strictEqual(r.items[1].no, 2);
+  assert.strictEqual(r.items[1].start, 4500);
+  assert.strictEqual(r.items[1].end, 6250);
+  assert.strictEqual(r.items[1].text, 'Bye');
+});
+t('parseSbv 空文本块跳过 + 坏块报 issue', () => {
+  const r = C.parseSbv('0:00:00.000,0:00:00.000\n\n\n0:00:01.000,0:00:02.000\nOk\n\nbad block\n\n0:00:03.000,0:00:04.000\nEnd\n');
+  assert.strictEqual(r.items.length, 2);
+  assert.ok(r.issues.some(i => i.code === 'blkNoSbvTs'), '坏块应报 fmt 错误');
+});
+t('formatSbv 往返一致', () => {
+  const out = C.formatSbv(C.parseSbv('0:00:01.000,0:00:03.000\nHi\n\n0:00:04.000,0:00:05.500\nYo\n').items);
+  const r2 = C.parseSbv(out);
+  assert.strictEqual(r2.issues.length, 0);
+  assert.strictEqual(r2.items.length, 2);
+  assert.strictEqual(r2.items[0].start, 1000);
+  assert.strictEqual(r2.items[1].end, 5500);
+  assert.ok(/^0:00:01\.000,0:00:03\.000\nHi\n\n0:00:04\.000,0:00:05\.500\nYo\n$/.test(out), 'SBV 输出格式应为 YouTube 惯例');
+});
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
