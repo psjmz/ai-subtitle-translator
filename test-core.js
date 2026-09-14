@@ -488,9 +488,11 @@ t('merged 行的源文拼回承载行（不丢源文）', () => {
     { no: 2, start: 3000, end: 5000, en: 'a world leader was shocked by a tariff.', zh: null, flag: 'merged' },
   ];
   const items = C.buildBilingual(rows, { maxW: 24, srcLocale: 'en', dstLocale: 'zh-CN' });
-  const allSrc = items.map(it => it.text.split('\n').filter((l, i, arr) => true)[0]).join(' ');
-  assert.ok(allSrc.includes('last time'), '应含首条源文');
-  assert.ok(allSrc.includes('shocked by a tariff'), 'merged 行的源文必须拼回: ' + allSrc);
+  // v0.9.92：双语允许 2+2 折行（源 2 行 + 译 2 行），源文可能占多行 →
+  // 取整条文本判断内容完整性，不再只取首行（旧写法隐含"每条恰好 2 行"假设）
+  const allText = items.map(it => it.text).join('\n');
+  assert.ok(allText.includes('last time'), '应含首条源文');
+  assert.ok(allText.includes('shocked by a tariff'), 'merged 行的源文必须拼回: ' + allText);
   assert.strictEqual(items[0].start, 0);
   assert.strictEqual(items[items.length - 1].end, 5000, '时间轴覆盖整组');
 });

@@ -1658,6 +1658,14 @@
       const dstLines = wrapToWidth(dstText, maxW, { normalize: true, locale: opts.dstLocale });
       let k = Math.max(srcLines.length, dstLines.length);
       if (k <= 1) { pushItem(e.start, e.end, srcLines, dstLines); continue; }
+      // v0.9.92 R2 两行容忍：源/译折行后各 ≤2 行、且总宽未超 2*maxW → 整 cue 折行放下，不切时间轴。
+      // 与 emitPart 的 R2（合并句组段内，1601 行）对齐，消除两条路径行为不一致：此前主路径只有
+      // 「单行」容忍，而双语下「2 行源文 + 2 行译文」是源字幕常态（TED 等滚动字幕每条 cue 自带 2 行），
+      // 一超单行容量就被判超容量去切时间轴，实测把 83 条切成 121~153 条、英文被硬切在词中间。
+      if (k <= 2 && srcW <= 2 * maxW + 4 && dstW <= 2 * maxW + 4) {
+        pushItem(e.start, e.end, srcLines, dstLines);
+        continue;
+      }
       // v0.9.48：合并句组（entry.times > 1）——译文/源文先按各原 cue 时长比例切回（时间跟着语音走，
       // splitByDuration 内含词边界/语义停顿/原子保护），原 cue 边界即子时间轴；段内仍超容量才段内细切。
       // 背景：旧路径把整组当一个超长 cue 等宽重切（时间按文本宽度瓜分），实测把 3 条原文切出
