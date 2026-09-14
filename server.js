@@ -134,6 +134,10 @@ function markEvent(ip, meta, ev){
     if (e.ip === ip && e.file === file && e.lang === lang) {
       if (ev === 'finish') {
         e.finishedAt = now;                    // 完成时间（重译后再完成取最新；开始时间即 e.t）
+        /* v0.9.86：丢弃遥测——dropN 被删总行数、subDrop 其中源文仍有实义的行数。
+           前端随 finish 上报，用于评估要不要放宽 drop 救援通道（纯统计，不影响行为）。 */
+        if (meta.dropN != null) e.dropN = Math.max(0, Math.floor(+meta.dropN || 0));
+        if (meta.subDrop != null) e.subDrop = Math.max(0, Math.floor(+meta.subDrop || 0));
       } else if (ev === 'download') {
         e.downloads = (e.downloads || 0) + 1;
         e.downloadedAt = now;
@@ -149,7 +153,7 @@ function markEvent(ip, meta, ev){
   /* 自带 Key 用户（翻译未经服务器，无 builtin 会话）：首次上报时创建轻量记录 */
   if (!mdl) return false;
   const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
-  if (ev === 'finish') lite.finishedAt = now;
+  if (ev === 'finish') { lite.finishedAt = now; if (meta.dropN != null) lite.dropN = Math.max(0, Math.floor(+meta.dropN || 0)); if (meta.subDrop != null) lite.subDrop = Math.max(0, Math.floor(+meta.subDrop || 0)); }
   else if (ev === 'download') { lite.downloads = 1; lite.downloadedAt = now; }
   else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
   else return false;
