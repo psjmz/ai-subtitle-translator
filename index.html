@@ -396,7 +396,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.86</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.87</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -550,7 +550,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.86</span>
+    <span class="ver-tag">v0.9.87</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -715,7 +715,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.86"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.87"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -3352,6 +3352,11 @@ function reportEvent(ev, extra){
 async function runTranslate(){
   if(S.translating) return;
   if(!S.srcItems.length){ log(t('noSrc'),'err'); return; }
+  /* v0.9.87：函数体整体纳入 try——此前 getCfg→systemPrompt→pgStart→按钮置忙 这段在保护块外，
+     任何一处抛错都是异步静默失败（无日志、按钮无变化），用户侧表现为「点了没反应」且无从排查。
+     btnText 提前到 try 外留存，finally 恢复按钮用 */
+  let btnText=$('btnGo').textContent;
+  try{
   const cfg = getCfg();
   if (cfg.src === cfg.dst){ log(t('langSame',LBY(cfg.src).zh),'err'); return; }
   if (cfg.styleMode === 'custom' && !cfg.styleCustom){ log(t('customNeed'),'err'); return; }
@@ -3383,13 +3388,11 @@ async function runTranslate(){
   clearLog();
   S.translating=true; S.stop=false; S.modelDead=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.locale=cfg.dst;
   $('btnGo').disabled=true;
-  const btnText=$('btnGo').textContent;
   $('btnGo').textContent=t('btnGoStop');
 
-  try{
-    // 初始化工作行（深拷贝源）。v0.9.84：空文本 cue（歌曲间隙等）不会进任何句组、永不被翻译，
-    // 标记 noText 让界面显示「无需翻译」而非误导性的「待翻译…」，统计计入已处理
-    S.rows = S.srcItems.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null, noText:!String(it.text||'').trim()}));
+  // 初始化工作行（深拷贝源）。v0.9.84：空文本 cue（歌曲间隙等）不会进任何句组、永不被翻译，
+  // 标记 noText 让界面显示「无需翻译」而非误导性的「待翻译…」，统计计入已处理
+  S.rows = S.srcItems.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null, noText:!String(it.text||'').trim()}));
 
     // 句子级分组：跨多条字幕的句子合并为句组，译文将按各条时长比例切分回填
     const groups = C.groupSentences(S.srcItems);
@@ -3959,6 +3962,12 @@ function finalRenumberAndStats(){
 // 停止按钮 = 同一个按钮
 $('btnGo').addEventListener('click', ()=>{ if(S.translating){ S.stop=true; return; } runTranslate(); });
 $('filter').addEventListener('change', renderRows);
+
+/* v0.9.87：全局错误显形——未捕获异常与未处理的 Promise 拒绝写进页面日志区。
+   此前这类错误只进浏览器控制台（用户根本不会打开），界面上的表现是「点了没反应」，
+   站长也无法远程定位。现在至少日志区能看到 [Error]/[Unhandled] 前缀的红字。 */
+window.addEventListener('error', function(e){ try{ log('[Error] '+String((e&&e.message)||''),'err'); }catch(_){} });
+window.addEventListener('unhandledrejection', function(e){ try{ var r=e&&e.reason; log('[Unhandled] '+(r&&r.message?r.message:String(r||'')),'err'); }catch(_){} });
 
 /* ---------------- 导入 ---------------- */
 function setSrc(text, fileName){
