@@ -1987,5 +1987,48 @@ t('恢复默认后行为与改前一致', () => {
   assert.strictEqual(C.isPureHumming('♪♫♬♩ hey jude ♪♫♬♩'), false);
 });
 
+console.log('— parseSrt 破损修复（v0.9.81 孤儿块回填）—');
+t('时间轴与正文间多余空行：孤儿文本归位，不丢内容', () => {
+  const src = '1\n00:00:01,000 --> 00:00:02,000\nHello.\n\n2\n00:00:03,000 --> 00:00:04,000\n\nwith you\n\n3\n00:00:05,000 --> 00:00:06,000\nFine.';
+  const { items, issues } = C.parseSrt(src);
+  assert.strictEqual(items.length, 3);
+  assert.strictEqual(items[1].text, 'with you');
+  assert.strictEqual(issues.filter(i => i.type === 'fmt').length, 0);
+  assert.ok(issues.some(i => /自动修复/.test(i.msg)), '应有修复提示');
+});
+t('连续孤儿（正文含空行被多次切断）按换行拼接', () => {
+  const src = '1\n00:00:01,000 --> 00:00:02,000\n\nwith\n\nyou\n\n2\n00:00:03,000 --> 00:00:04,000\nOk.';
+  const { items, issues } = C.parseSrt(src);
+  assert.strictEqual(items.length, 2);
+  assert.strictEqual(items[0].text, 'with\nyou');
+  assert.strictEqual(items[1].text, 'Ok.');
+  assert.strictEqual(issues.filter(i => i.type === 'fmt').length, 0);
+});
+t('真正无主的孤儿块仍报 issue，不误吞', () => {
+  const src = '1\n00:00:01,000 --> 00:00:02,000\nHello.\n\nstray text without number\n\n2\n00:00:03,000 --> 00:00:04,000\nOk.';
+  const { items, issues } = C.parseSrt(src);
+  assert.strictEqual(items[0].text, 'Hello.');
+  assert.ok(issues.some(i => i.code === 'blkNoNumTs'), '应保留原 fmt 错误');
+});
+t('正常空 cue（歌曲间隙）不受影响', () => {
+  const src = '1\n00:00:01,000 --> 00:00:02,000\n\n2\n00:00:03,000 --> 00:00:04,000\nOk.';
+  const { items, issues } = C.parseSrt(src);
+  assert.strictEqual(items.length, 2);
+  assert.strictEqual(items[0].text, '');
+  assert.strictEqual(items[1].text, 'Ok.');
+  assert.strictEqual(issues.length, 0);
+});
+t('真实破损文件（Sister Boniface S03E08）5 处全归位', () => {
+  const fs = require('fs');
+  const p = '/Users/jp/Downloads/Sister Boniface Mysteries S03E08 Toast To The Newly Dead-en.srt';
+  if (!fs.existsSync(p)) return; // 文件不在本机则跳过
+  const { items, issues } = C.parseSrt(fs.readFileSync(p, 'utf8'));
+  assert.strictEqual(issues.filter(i => i.type === 'fmt').length, 0, '不应再有解析失败块');
+  assert.ok(items.some(i => i.text === "to a summer's day?"), 'cue100 台词应归位');
+  assert.ok(items.some(i => i.text === 'with you'), 'cue267 歌词应归位');
+  assert.ok(items.some(i => i.text === 'who helped you see the light'), 'cue269 歌词应归位');
+  assert.strictEqual(items.length, 863);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

@@ -397,12 +397,27 @@
     const items = [], issues = [];
     const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
     const blocks = text.split(/\n\s*\n/);
-    let prevEnd = -1, prevNo = 0;
+    let prevEnd = -1, prevNo = 0, fixedN = 0, lastOrphan = false;
     blocks.forEach((b, bi) => {
       const lines = b.split('\n').map((x) => x.trimEnd());
       if (!lines.join('').trim()) return;
       const noM = /^\s*(\d+)\s*$/.exec(lines[0] || '');
       const ti = lines.findIndex((l) => l.indexOf('-->') >= 0);
+      if (!noM && ti < 0) {
+        // v0.9.81：孤儿块回填。部分工具导出的 SRT 在时间轴与正文之间多一个空行，
+        // 按空行切块后正文成了「无编号无时间轴」的孤儿块，前一条只剩空壳（编号+时间轴）。
+        // 把孤儿文本并回前一条空壳，内容不再丢失；连续孤儿（正文含空行被多次切断）按换行拼接。
+        const orphanText = lines.filter((l) => l.trim()).join('\n');
+        const prev = items[items.length - 1];
+        if (orphanText && prev && (prev.text === '' || lastOrphan)) {
+          prev.text = lastOrphan ? (prev.text + '\n' + orphanText) : orphanText;
+          fixedN++; lastOrphan = true;
+          return;
+        }
+        lastOrphan = false;
+      } else {
+        lastOrphan = false;
+      }
       if (!noM || ti < 1) { issues.push({ type: 'fmt', at: bi + 1, msg: '无法解析该块（缺编号或时间轴）', code: 'blkNoNumTs' }); return; }
       const t = parseTime(lines[ti]);
       if (!t) { issues.push({ type: 'fmt', at: +noM[1], msg: '时间轴格式不正确', code: 'badTs' }); return; }
@@ -414,6 +429,8 @@
       prevEnd = t[1]; prevNo = no;
       items.push({ no, start: t[0], end: t[1], text: body });
     });
+    // v0.9.81：修复的块不发 fmt 错误，但出一条汇总提示，让用户知道源文件本身有格式破损
+    if (fixedN) issues.push({ type: 'fixed', at: 0, msg: '已自动修复 ' + fixedN + ' 处格式破损（台词前多余空行，内容已归位，不影响使用）' });
     if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
     return { items, issues };
   }
