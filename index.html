@@ -396,7 +396,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.84</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.85</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -550,7 +550,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.84</span>
+    <span class="ver-tag">v0.9.85</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -582,6 +582,8 @@
       <div class="style-chips">
         <label class="schip"><input type="radio" name="style" value="elegant" checked><span data-i18n="styleElegant">信达雅</span></label>
         <label class="schip"><input type="radio" name="style" value="plain"><span data-i18n="stylePlain">大白话</span></label>
+        <label class="schip"><input type="radio" name="style" value="formal"><span data-i18n="styleFormal">书面专业</span></label>
+        <label class="schip"><input type="radio" name="style" value="dubbed"><span data-i18n="styleDubbed">译制腔</span></label>
         <label class="schip full"><input type="radio" name="style" value="custom"><span data-i18n="styleCustom">自定义…</span></label>
       </div>
       <input type="text" id="styleCustom" style="display:none" spellcheck="false"
@@ -713,7 +715,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.84"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.85"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -779,8 +781,10 @@ const LANGS = [
 ];
 const LBY = (v) => LANGS.find(l => l.v === v) || { zh:v, file:v, prompt:v };
 const STYLE_DESC = {
-  elegant: '信达雅：准确传达原意(信)、通顺流畅(达)、用词得体(雅)，贴合目标语言表达习惯，不逐词直译。',
-  plain:   '大白话：译文口语化、直白易懂，像日常对话；多用短句和常用词，避免生硬书面语，保留说话人语气。'
+  elegant: '均衡（默认）：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯；不逐词直译，也不过度发挥。影视、纪录片、访谈等通用。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
+  plain:   '口语自然：译文像人在说话——日常口语、短句和常用词、保留说话人的语气与节奏，书面腔和翻译腔是毛病。适合影视对白、动漫、访谈。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
+  formal:  '书面专业：正式、精炼、术语准确，像专业配音或新闻解说；避免网络用语与过度口语化，保持陈述的客观感。适合纪录片、财经、讲座、会议。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
+  dubbed:  '译制腔：像影院配音剧本——短句有节奏感，梗与习语大胆本地化，按目标语言的戏感重写，不追求字面忠实。适合娱乐向影视与动漫。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）'
 };
 
 /* ---------------- 界面多语言（跟随浏览器 + 手动切换） ---------------- */
@@ -799,7 +803,7 @@ const I18N = {
   builtinOn:'默认模型已就绪：{0}。开箱即用；单 IP 每日限 {1} 次请求，大批量建议用自己的 API。',
   builtinOff:'管理员尚未配置默认模型，当前不可用 → 请改用「自定义 API」或「规则演练」。',
   lblSrcLang:'源字幕语言（选“自动检测”则让模型识别）', autoDetect:'自动检测', lblDstLang:'翻译为目标语言',
-  lblStyle:'翻译风格', styleElegant:'信达雅（默认）', stylePlain:'大白话', styleCustom:'自定义…',
+  lblStyle:'翻译风格', styleElegant:'信达雅（默认）', stylePlain:'大白话', styleFormal:'书面专业', styleDubbed:'译制腔', styleCustom:'自定义…',
   styleCustomPh:'描述你想要的口吻，如：轻松幽默、像给朋友讲故事',
   hintElegant:'信达雅：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯。',
   hintPlain:'大白话：口语化、直白易懂，像日常对话；多用短句与常用词，保留说话人语气。',
@@ -894,7 +898,7 @@ const I18N = {
   builtinOn:'預設模型已就緒：{0}。開箱即用；單 IP 每日限 {1} 次請求，大批量建議用自己的 API。',
   builtinOff:'管理員尚未配置預設模型，目前不可用 → 請改用「自訂 API」或「規則演練」。',
   lblSrcLang:'來源字幕語言（選「自動偵測」則讓模型識別）', autoDetect:'自動偵測', lblDstLang:'翻譯為目標語言',
-  lblStyle:'翻譯風格', styleElegant:'信達雅（預設）', stylePlain:'大白話', styleCustom:'自訂…',
+  lblStyle:'翻譯風格', styleElegant:'信達雅（預設）', stylePlain:'大白話', styleFormal:'書面專業', styleDubbed:'譯製腔', styleCustom:'自訂…',
   styleCustomPh:'描述你想要的口吻，如：輕鬆幽默、像給朋友講故事',
   hintElegant:'信達雅：準確傳達原意、通順流暢、用詞得體，貼合目標語言表達習慣。',
   hintPlain:'大白話：口語化、直白易懂，像日常對話；多用短句與常用詞，保留說話人語氣。',
@@ -989,7 +993,7 @@ const I18N = {
   builtinOn:'Default model ready: {0}. Works out of the box; {1} requests per IP per day — for large files prefer your own API.',
   builtinOff:'The admin has not configured a default model yet → please use "Custom API" or "Dry run".',
   lblSrcLang:'Source language ("Auto-detect" lets the model decide)', autoDetect:'Auto-detect', lblDstLang:'Translate into',
-  lblStyle:'Translation style', styleElegant:'Faithful & elegant (default)', stylePlain:'Plain & colloquial', styleCustom:'Custom…',
+  lblStyle:'Translation style', styleElegant:'Faithful & elegant (default)', stylePlain:'Plain & colloquial', styleFormal:'Formal & professional', styleDubbed:'Dubbed-film flair', styleCustom:'Custom…',
   styleCustomPh:'Describe the tone you want, e.g. light-hearted, like telling a story to a friend',
   hintElegant:'Faithful & elegant: accurate, fluent and graceful, following the target language\'s natural expression.',
   hintPlain:'Plain: colloquial and easy to understand, like everyday conversation; short sentences, common words, keep the speaker\'s tone.',
@@ -1084,7 +1088,7 @@ const I18N = {
   builtinOn:'デフォルトモデル準備済み：{0}。すぐ使えます。1 IP あたり 1日 {1} リクエストまで。大量ファイルは自分のAPIを推奨。',
   builtinOff:'管理者がデフォルトモデルを未設定のため利用不可 →「カスタム API」または「ドライラン」をご利用ください。',
   lblSrcLang:'原文の言語（「自動検出」はモデルが判定）', autoDetect:'自動検出', lblDstLang:'翻訳先の言語',
-  lblStyle:'翻訳スタイル', styleElegant:'信達雅（デフォルト）', stylePlain:'平易な口語', styleCustom:'カスタム…',
+  lblStyle:'翻訳スタイル', styleElegant:'信達雅（デフォルト）', stylePlain:'平易な口語', styleFormal:'書面・プロ', styleDubbed:'吹き替え風', styleCustom:'カスタム…',
   styleCustomPh:'希望の口調を記入（例：親しい友人に話すような軽快なトーン）',
   hintElegant:'信達雅：原文の意味を正確に、流暢で品のある表現、翻訳先の言語に自然な文体で。',
   hintPlain:'平易：口語的で分かりやすい、日常会話のような訳文。短い文と常用語を使い、話者のトーンを保持。',
@@ -1179,7 +1183,7 @@ const I18N = {
   builtinOn:'Modelo por defecto listo: {0}. Funciona de inmediato; {1} peticiones por IP al día — para archivos grandes usa tu propia API.',
   builtinOff:'El administrador aún no ha configurado un modelo por defecto → usa "API personalizada" o "Simulación".',
   lblSrcLang:'Idioma de origen ("Detección automática" lo decide el modelo)', autoDetect:'Detección automática', lblDstLang:'Traducir a',
-  lblStyle:'Estilo de traducción', styleElegant:'Fiel y elegante (por defecto)', stylePlain:'Llano y coloquial', styleCustom:'Personalizado…',
+  lblStyle:'Estilo de traducción', styleElegant:'Fiel y elegante (por defecto)', stylePlain:'Llano y coloquial', styleFormal:'Formal y profesional', styleDubbed:'Estilo de doblaje', styleCustom:'Personalizado…',
   styleCustomPh:'Describe el tono que quieres, p. ej. distendido, como contándole un cuento a un amigo',
   hintElegant:'Fiel y elegante: preciso, fluido y cuidadoso, siguiendo la expresión natural del idioma destino.',
   hintPlain:'Llano: coloquial y fácil de entender, como una conversación cotidiana; frases cortas, palabras comunes, conserva el tono del hablante.',
@@ -1274,7 +1278,7 @@ const I18N = {
   builtinOn:'Modelo padrão pronto: {0}. Funciona de imediato; {1} requisições por IP por dia — para arquivos grandes use sua própria API.',
   builtinOff:'O administrador ainda não configurou um modelo padrão → use "API personalizada" ou "Simulação".',
   lblSrcLang:'Idioma de origem ("Detecção automática" deixa o modelo decidir)', autoDetect:'Detecção automática', lblDstLang:'Traduzir para',
-  lblStyle:'Estilo de tradução', styleElegant:'Fiel e elegante (padrão)', stylePlain:'Coloquial e simples', styleCustom:'Personalizado…',
+  lblStyle:'Estilo de tradução', styleElegant:'Fiel e elegante (padrão)', stylePlain:'Coloquial e simples', styleFormal:'Formal e profissional', styleDubbed:'Estilo de dublagem', styleCustom:'Personalizado…',
   styleCustomPh:'Descreva o tom desejado, ex.: descontraído, como contar uma história a um amigo',
   hintElegant:'Fiel e elegante: preciso, fluido e cuidado, seguindo a expressão natural do idioma destino.',
   hintPlain:'Coloquial: informal e fácil de entender, como conversa do dia a dia; frases curtas, palavras comuns, mantém o tom de quem fala.',
@@ -1369,7 +1373,7 @@ const I18N = {
   builtinOn:'기본 모델 준비됨: {0}. 바로 사용 가능; IP당 하루 {1}회 요청 — 큰 파일은 자체 API를 권장합니다.',
   builtinOff:'관리자가 아직 기본 모델을 설정하지 않았습니다 → "사용자 API" 또는 "드라이런"을 이용해 주세요.',
   lblSrcLang:'원본 언어("자동 감지"는 모델이 판단)', autoDetect:'자동 감지', lblDstLang:'번역 대상 언어',
-  lblStyle:'번역 스타일', styleElegant:'충실하고 우아하게(기본)', stylePlain:'구어체·쉽게', styleCustom:'사용자 정의…',
+  lblStyle:'번역 스타일', styleElegant:'충실하고 우아하게(기본)', stylePlain:'구어체·쉽게', styleFormal:'격십체·전문', styleDubbed:'더빙체', styleCustom:'사용자 정의…',
   styleCustomPh:'원하는 어조를 설명하세요. 예: 가볍고 유쾌하게, 친구에게 이야기하듯이',
   hintElegant:'충실하고 우아하게: 정확하고 유창하며 품위 있게, 대상 언어의 자연스러운 표현을 따릅니다.',
   hintPlain:'구어체: 일상 대화처럼 쉽고 알기 쉽게; 짧은 문장과 흔한 단어를 쓰고 말하는 사람의 어조를 유지합니다.',
@@ -1464,7 +1468,7 @@ const I18N = {
   builtinOn:'Standardmodell bereit: {0}. Sofort nutzbar; {1} Anfragen pro IP pro Tag — für große Dateien eigene API empfohlen.',
   builtinOff:'Der Administrator hat noch kein Standardmodell konfiguriert → bitte "Eigene API" oder "Probelauf" verwenden.',
   lblSrcLang:'Ausgangssprache ("Automatisch" lässt das Modell entscheiden)', autoDetect:'Automatisch', lblDstLang:'Übersetzen in',
-  lblStyle:'Übersetzungsstil', styleElegant:'Treuhert & elegant (Standard)', stylePlain:'Wortwörtlich & umgangssprachlich', styleCustom:'Eigene…',
+  lblStyle:'Übersetzungsstil', styleElegant:'Treuhert & elegant (Standard)', stylePlain:'Wortwörtlich & umgangssprachlich', styleFormal:'Formell & professionell', styleDubbed:'Synchronstil', styleCustom:'Eigene…',
   styleCustomPh:'Beschreiben Sie den gewünschten Ton, z. B. locker, wie eine Geschichte für Freunde',
   hintElegant:'Treuhert & elegant: genau, flüssig und stilvoll, der Zielsprache entsprechend.',
   hintPlain:'Wortwörtlich: umgangssprachlich und leicht verständlich, wie Alltagsrede; kurze Sätze, gängige Wörter, Ton des Sprechers bleibt.',
@@ -1559,7 +1563,7 @@ const I18N = {
   builtinOn:'Modèle par défaut prêt : {0}. Utilisable immédiatement ; {1} requêtes par IP et par jour — pour les gros fichiers, préférez votre propre API.',
   builtinOff:'L\u2019administrateur n\u2019a pas encore configuré de modèle par défaut → veuillez utiliser « API personnalisée » ou « Simulation ».',
   lblSrcLang:'Langue source (« Détection auto » laisse le modèle décider)', autoDetect:'Détection auto', lblDstLang:'Traduire en',
-  lblStyle:'Style de traduction', styleElegant:'Fidèle et élégant (défaut)', stylePlain:'Courant et familier', styleCustom:'Personnalisé…',
+  lblStyle:'Style de traduction', styleElegant:'Fidèle et élégant (défaut)', stylePlain:'Courant et familier', styleFormal:'Formel et professionnel', styleDubbed:'Style doublage', styleCustom:'Personnalisé…',
   styleCustomPh:'Décrivez le ton souhaité, ex. léger, comme une histoire racontée à un ami',
   hintElegant:'Fidèle et élégant : précis, fluide et soigné, selon l\u2019expression naturelle de la langue cible.',
   hintPlain:'Courant : familier et facile à comprendre, comme une conversation quotidienne ; phrases courtes, mots courants, ton du locuteur conservé.',
@@ -1654,7 +1658,7 @@ const I18N = {
   builtinOn:'Model bawaan siap: {0}. Langsung bisa dipakai; {1} permintaan per IP per hari — untuk file besar sebaiknya pakai API sendiri.',
   builtinOff:'Admin belum mengonfigurasi model bawaan → silakan gunakan "API kustom" atau "Uji coba".',
   lblSrcLang:'Bahasa sumber ("Deteksi otomatis" diserahkan ke model)', autoDetect:'Deteksi otomatis', lblDstLang:'Terjemahkan ke',
-  lblStyle:'Gaya terjemahan', styleElegant:'Setia & elegan (bawaan)', stylePlain:'Keseharian & santai', styleCustom:'Kustom…',
+  lblStyle:'Gaya terjemahan', styleElegant:'Setia & elegan (bawaan)', stylePlain:'Keseharian & santai', styleFormal:'Formal & profesional', styleDubbed:'Gaya dubbing', styleCustom:'Kustom…',
   styleCustomPh:'Deskripsikan nada yang diinginkan, mis. santai, seperti bercerita kepada teman',
   hintElegant:'Setia & elegan: akurat, lancar dan berkelas, mengikuti gaya alami bahasa target.',
   hintPlain:'Keseharian: kolokial dan mudah dipahami, seperti percakapan sehari-hari; kalimat pendek, kata umum, nada pembicara tetap terjaga.',
@@ -1749,7 +1753,7 @@ const I18N = {
   builtinOn:'डिफ़ॉल्ट मॉडल तैयार: {0}। तुरंत उपयोग करें; प्रति IP प्रति दिन {1} अनुरोध — बड़ी फ़ाइलों के लिए अपनी API बेहतर।',
   builtinOff:'एडमिन ने अभी डिफ़ॉल्ट मॉडल कॉन्फ़िगर नहीं किया है → कृपया "अपनी API" या "ड्राई-रन" उपयोग करें।',
   lblSrcLang:'स्रोत भाषा ("स्वतः पहचान" मॉडल तय करता है)', autoDetect:'स्वतः पहचान', lblDstLang:'इसमें अनुवाद करें',
-  lblStyle:'अनुवाद शैली', styleElegant:'सटीक और सुसंस्कृत (डिफ़ॉल्ट)', stylePlain:'सरल बोलचाल', styleCustom:'अपनी…',
+  lblStyle:'अनुवाद शैली', styleElegant:'सटीक और सुसंस्कृत (डिफ़ॉल्ट)', stylePlain:'सरल बोलचाल', styleFormal:'औपचारिक और व्यावसायिक', styleDubbed:'डबिंग शैली', styleCustom:'अपनी…',
   styleCustomPh:'वांछित अंदाज़ बताएँ, जैसे हल्का-फुल्का, दोस्त को कहानी सुनाने जैसा',
   hintElegant:'सटीक और सुसंस्कृत: सही, सहज और उचित शब्दों में, लक्ष्य भाषा की प्राकृतिक अभिव्यक्ति के अनुसार।',
   hintPlain:'सरल: बोलचाल और आसान, रोज़मर्रा की बातचीत जैसा; छोटे वाक्य, आम शब्द, बोलने वाले का अंदाज़ बना रहे।',
@@ -1844,7 +1848,7 @@ const I18N = {
   builtinOn:'โมเดลมาตรฐานพร้อมใช้: {0} ใช้ได้ทันที; {1} คำขอต่อ IP ต่อวัน — ไฟล์ใหญ่แนะนำ API ของคุณเอง',
   builtinOff:'ผู้ดูแลยังไม่ได้ตั้งค่าโมเดลมาตรฐาน → กรุณาใช้ "API ของคุณเอง" หรือ "ทดลองรัน"',
   lblSrcLang:'ภาษาต้นฉบับ ("ตรวจจับอัตโนมัติ" ให้โมเดลตัดสิน)', autoDetect:'ตรวจจับอัตโนมัติ', lblDstLang:'แปลเป็นภาษา',
-  lblStyle:'สไตล์การแปล', styleElegant:'ตรงความและสละสลวย (ค่าเริ่มต้น)', stylePlain:'พูดง่าย บุคคลสามัญ', styleCustom:'กำหนดเอง…',
+  lblStyle:'สไตล์การแปล', styleElegant:'ตรงความและสละสลวย (ค่าเริ่มต้น)', stylePlain:'พูดง่าย บุคคลสามัญ', styleFormal:'เป็นทางการ·มืออาชีพ', styleDubbed:'สไตล์พากย์', styleCustom:'กำหนดเอง…',
   styleCustomPh:'บรรยายโทนที่ต้องการ เช่น สบาย ๆ เหมือนเล่าเรื่องให้เพื่อนฟัง',
   hintElegant:'ตรงความและสละสลวย: แม่นยำ ลื่นไหล ใช้คำเหมาะสม ตามสำนวนธรรมชาติของภาษาเป้าหมาย',
   hintPlain:'พูดง่าย: เป็นภาษาพูด เข้าใจง่าย เหมือนบทสนทนาประจำวัน; ประโยคสั้น คำทั่วไป คงโทนของผู้พูด',
@@ -1939,7 +1943,7 @@ const I18N = {
   builtinOn:'Mô hình mặc định sẵn sàng: {0}. Dùng ngay được; {1} yêu cầu mỗi IP mỗi ngày — file lớn nên dùng API riêng.',
   builtinOff:'Quản trị viên chưa cấu hình mô hình mặc định → vui lòng dùng "API riêng" hoặc "Chạy thử".',
   lblSrcLang:'Ngôn ngữ nguồn ("Tự nhận diện" để mô hình quyết định)', autoDetect:'Tự nhận diện', lblDstLang:'Dịch sang',
-  lblStyle:'Phong cách dịch', styleElegant:'Chuẩn mực & trang nhã (mặc định)', stylePlain:'Thoại thường & dễ hiểu', styleCustom:'Tùy chỉnh…',
+  lblStyle:'Phong cách dịch', styleElegant:'Chuẩn mực & trang nhã (mặc định)', stylePlain:'Thoại thường & dễ hiểu', styleFormal:'Trang trọng & chuyên nghiệp', styleDubbed:'Phong cách lồng tiếng', styleCustom:'Tùy chỉnh…',
   styleCustomPh:'Mô tả giọng điệu bạn muốn, vd: nhẹ nhàng, như kể chuyện cho bạn bè',
   hintElegant:'Chuẩn mực & trang nhã: chính xác, trôi chảy, dùng từ đàng hoàng, theo cách diễn đạt tự nhiên của ngôn ngữ đích.',
   hintPlain:'Thoại thường: khẩu ngữ, dễ hiểu, như hội thoại hằng ngày; câu ngắn, từ phổ thông, giữ giọng người nói.',
@@ -2034,7 +2038,7 @@ const I18N = {
   builtinOn:'Модель по умолчанию готова: {0}. Работает сразу; {1} запросов на IP в сутки — для больших файлов лучше своя API.',
   builtinOff:'Администратор ещё не настроил модель по умолчанию → используйте «Своя API» или «Пробный запуск».',
   lblSrcLang:'Язык оригинала («Автоопределение» решает модель)', autoDetect:'Автоопределение', lblDstLang:'Перевести на',
-  lblStyle:'Стиль перевода', styleElegant:'Точный и литературный (по умолчанию)', stylePlain:'Разговорный и простой', styleCustom:'Свой…',
+  lblStyle:'Стиль перевода', styleElegant:'Точный и литературный (по умолчанию)', stylePlain:'Разговорный и простой', styleFormal:'Официальный и профессиональный', styleDubbed:'Стиль дубляжа', styleCustom:'Свой…',
   styleCustomPh:'Опишите нужный тон, напр. лёгкий, как рассказ другу',
   hintElegant:'Точный и литературный: точно, бегло и уместно, в духе естественной речи языка перевода.',
   hintPlain:'Разговорный: просто и понятно, как повседневная речь; короткие фразы, обычные слова, тон говорящего сохраняется.',
@@ -2129,7 +2133,7 @@ const I18N = {
   builtinOn:'Modello predefinito pronto: {0}. Pronto all\'uso; {1} richieste al giorno per IP — per i file di grandi dimensioni preferisci la tua API.',
   builtinOff:'L\'amministratore non ha ancora configurato un modello predefinito → per favore usa "API personalizzata" o "Simulazione".',
   lblSrcLang:'Lingua di origine ("Rilevamento automatico" lascia decidere al modello)', autoDetect:'Rilevamento automatico', lblDstLang:'Traduci in',
-  lblStyle:'Stile di traduzione', styleElegant:'Fedele ed elegante (predefinito)', stylePlain:'Semplice e colloquiale', styleCustom:'Personalizzato…',
+  lblStyle:'Stile di traduzione', styleElegant:'Fedele ed elegante (predefinito)', stylePlain:'Semplice e colloquiale', styleFormal:'Formale e professionale', styleDubbed:'Stile doppiaggio', styleCustom:'Personalizzato…',
   styleCustomPh:'Descrivi il tono che vuoi, es. leggero, come raccontare una storia a un amico',
   hintElegant:'Fedele ed elegante: accurato, scorrevole e curato, seguendo l\'espressione naturale della lingua di destinazione.',
   hintPlain:'Semplice: colloquiale e facile da capire, come una conversazione quotidiana; frasi brevi, parole comuni, mantiene il tono del parlante.',
@@ -2224,7 +2228,7 @@ const I18N = {
   builtinOn:'النموذج الافتراضي جاهز: {0}. يعمل مباشرة؛ {1} طلب يوميًا لكل IP — للملفات الكبيرة يُفضل استخدام API الخاص بك.',
   builtinOff:'لم يقم المشرف بعد بإعداد نموذج افتراضي → يرجى استخدام «API مخصص» أو «التشغيل التجريبي».',
   lblSrcLang:'لغة المصدر («كشف تلقائي» يترك القرار للنموذج)', autoDetect:'كشف تلقائي', lblDstLang:'الترجمة إلى',
-  lblStyle:'أسلوب الترجمة', styleElegant:'أمين وأنيق (افتراضي)', stylePlain:'بسيط وعامي', styleCustom:'مخصص…',
+  lblStyle:'أسلوب الترجمة', styleElegant:'أمين وأنيق (افتراضي)', stylePlain:'بسيط وعامي', styleFormal:'رسمي ومهني', styleDubbed:'أسلوب الدبلجة', styleCustom:'مخصص…',
   styleCustomPh:'صف النبرة التي تريدها، مثل: خفيفة الظل، كأنك تحكي قصة لصديق',
   hintElegant:'أمين وأنيق: دقيق وسلس ومنتقى، وفق التعبير الطبيعي للغة الهدف.',
   hintPlain:'بسيط: عامي وسهل الفهم، كحوار يومي؛ جُمل قصيرة وكلمات شائعة مع الحفاظ على نبرة المتحدث.',
@@ -2319,7 +2323,7 @@ const I18N = {
   builtinOn:'Varsayılan model hazır: {0}. Ek kurulum gerekmez; IP başına günlük {1} istek — büyük dosyalar için kendi API\'ni kullanman önerilir.',
   builtinOff:'Yönetici henüz varsayılan bir model yapılandırmadı → lütfen «Özel API» veya «Deneme modu» kullan.',
   lblSrcLang:'Kaynak dil («Otomatik algıla» kararı modele bırakır)', autoDetect:'Otomatik algıla', lblDstLang:'Çevrilecek dil',
-  lblStyle:'Çeviri tarzı', styleElegant:'Sadık ve zarif (varsayılan)', stylePlain:'Sade ve günlük', styleCustom:'Özel…',
+  lblStyle:'Çeviri tarzı', styleElegant:'Sadık ve zarif (varsayılan)', stylePlain:'Sade ve günlük', styleFormal:'Resmî ve profesyonel', styleDubbed:'Dublaj tarzı', styleCustom:'Özel…',
   styleCustomPh:'İstediğin tonu tanımla, örn. neşeli, bir arkadaşına hikâye anlatır gibi',
   hintElegant:'Sadık ve zarif: doğru, akıcı ve özenli; hedef dilin doğal ifadesine uygun.',
   hintPlain:'Sade: günlük ve anlaşılır, sıradan bir konuşma gibi; kısa cümleler, yaygın kelimeler, konuşanın tonunu korur.',
@@ -2829,8 +2833,10 @@ function mergeGroupRows(cues, text){
    背景：中文指令在日/韩等与汉字有亲缘的目标语言上偶发泄漏成译文（v0.9.17、v0.9.22 两次线上评测实证），
    英文指令经 v0.9.17 评测验证可清零该问题。中文目标（zh-CN/zh-TW）指令语言=输出语言，天然安全，沿用中文指令。 */
 const STYLE_DESC_EN = {
-  elegant: 'Faithful, fluent, tasteful: convey the original meaning accurately, read naturally, use appropriate wording, and follow the target language\'s idiomatic conventions. Do not translate word-for-word.',
-  plain:   'Colloquial and plain: translate in everyday spoken style, like casual conversation; prefer short sentences and common words, avoid stiff bookish wording, and keep the speaker\'s tone.'
+  elegant: 'Balanced (default): convey the original meaning accurately, read naturally, use appropriate wording, follow the target language\'s idiomatic conventions; neither word-for-word nor over-free. Suits general use. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.',
+  plain:   'Natural colloquial: translate like people actually talk — everyday spoken style, short sentences, common words, keep the speaker\'s tone and rhythm; stiff bookish or translationese wording is a defect. Suits film/TV dialogue, anime, interviews. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.',
+  formal:  'Formal & professional: precise, concise, terminologically accurate, like professional dubbing or news narration; avoid internet slang and over-colloquialism, keep an objective declarative tone. Suits documentaries, finance, lectures, conferences. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.',
+  dubbed:  'Dubbed-film flair: like a theatrical dubbing script — punchy rhythmic short sentences, boldly localize jokes and idioms, rewrite for dramatic feel in the target language; fidelity to the literal wording is secondary. Suits entertainment content. Style governs tone and wording only — facts, numbers, amounts, terminology, and proper nouns follow their own rules regardless of style.'
 };
 // v0.9.73：输出示例译文表——按目标语言给出「真实译文」而非英文占位。
 // 此前示例输出一律是英文（"- Coming?" / "See you tomorrow."），每批都往上下文注入 3 句英文样本，
@@ -2870,6 +2876,7 @@ function systemPromptEn(cfg){
     + (cfg.synopsis ? 'Film context (background for your understanding only): ' + cfg.synopsis + '\n' : '')
     + 'The input contains several "sentence groups": a complete sentence may be split across multiple subtitle cues (already merged into one merged text), or may be a single cue. Each group lists its cues with cue number (no), on-screen duration in seconds (dur), and source text.\n'
     + 'Task: translate each group into ' + dstNative + ' and distribute the translation across its cues cue-by-cue (cue-aligned translation), so that reading the cues of a group in order yields one complete, fluent sentence.\n'
+    + 'Content genre (film/TV dialogue, documentary narration, interviews, lectures, anime, etc.) is for you to infer from the source text; keep the register and tone consistent with that genre throughout — colloquial for dialogue, formal for narration, never mixed.\n'
     + 'Rules you must follow:\n'
     + '1. [Translation style] ' + styleEn + '\n'
     + '2. [Cue-aligned output] For every group, return a "cues" array: for EVERY cue number in that group\'s input, exactly one entry {"no":<cue number>,"text":"<' + dstNative + ' text>"} — never merge, skip, renumber, or invent cue numbers.\n'
@@ -2904,7 +2911,13 @@ function systemPromptEn(cfg){
    + '6. [No manual line breaking] text must be a single line of text. Never include newline characters (\\n); line wrapping is handled automatically by the program according to display width.\n'
    + '   Exception: if the group\'s source text contains multiple lines each starting with a dash (two speakers talking in one cue), keep that exact structure in the translation: one line per speaker, each line starting with "- ", and join the lines with \\n inside the text field.\n'
    + '7. [Numbers and units stay together] Numbers and their units/symbols must appear adjacent as a whole (e.g. 30%, $50, 1,000, 12.5); never split them apart or insert anything between them.\n'
-   + '8. [Output example] Cue-aligned groups return a "cues" array (one entry per input cue number); lyric groups keep segment numbers in a single text; dash-speaker structure keeps "- " per line joined by \\n; pure-filler cue numbers go to the fillers array. The sample translations below are written in ' + dstNative + ' — your output text fields must be in the same language as these samples:\n'
+   + '8. [Content fidelity]\n'
+   + '   - Idioms, slang, and cultural references: translate by meaning; equivalent target-language expressions may replace them to preserve their force and humor; never translate word-for-word.\n'
+   + '   - Profanity keeps its original strength and tone — never soften, sanitize, or tame it.\n'
+   + '   - Markers such as [inaudible], [crosstalk], [unintelligible] must be rendered per target-language subtitle conventions and kept — never treated as fillers.\n'
+   + '   - If the target language has honorific registers (Japanese, Korean, etc.), pick the level appropriate to the relationship between the speakers and keep it consistent across the whole file — never oscillate.\n'
+   + '   - Preserve numeric precision: never round numbers and never convert currency amounts into another currency ($50 stays 50 in the target currency word, same value).\n'
+   + '9. [Output example] Cue-aligned groups return a "cues" array (one entry per input cue number); lyric groups keep segment numbers in a single text; dash-speaker structure keeps "- " per line joined by \\n; pure-filler cue numbers go to the fillers array. The sample translations below are written in ' + dstNative + ' — your output text fields must be in the same language as these samples:\n'
    + 'Input (excerpt): {"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"t":"00:01:12,200","dur":1.8,"src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"t":"00:01:15,000","dur":2.4,"src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"t":"00:01:20,100","dur":0.5,"src":"Um."},{"no":18,"t":"00:01:21,500","dur":2.2,"src":"See you tomorrow."}]}]}\n'
    + 'Output: {"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"' + ex.dash + '"}]},{"gno":2,"type":"text","text":"' + ex.lyric + '"},{"gno":3,"type":"text","cues":[{"no":18,"text":"' + ex.plain + '"}]}],"fillers":[17]}\n'
    + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
@@ -2926,6 +2939,7 @@ function systemPrompt(cfg){
   + (cfg.synopsis ? '【影片背景】' + cfg.synopsis + '（仅供理解语境）\n' : '')
   + '输入是若干「句组」：一个完整句子可能被拆在多条字幕里（已合并为 merged 一句），也可能就是单条字幕。每组列出各 cue 的编号（no）、屏显秒数（dur）和原文。\n'
   + '任务：把每个句组翻译成' + dstNative + '，并按 cue 逐条分配译文（cue 对齐翻译）——组内各条 cue 的译文按顺序连起来是一个完整、通顺的句子。\n'
+  + '内容体裁（影视对白、纪录片解说、访谈、讲座、动漫等）由你根据原文自行判断，并全程保持该体裁的语域与语气一致——对白用口语，解说用书面语，不得混用。\n'
   + '必须遵守：\n'
   + '1.【翻译风格】' + styleDesc(cfg) + '\n'
   + '2.【cue 对齐输出】每个句组返回一个 cues 数组：组内每个输入 cue 编号恰好对应一条 {"no":编号,"text":"<' + dstNative + '译文>"}，严禁合并、跳过、改号或发明编号。\n'
@@ -2960,7 +2974,13 @@ s += '5.【水词处理——默认行为是翻译】\n'
   + '6.【禁止自行折行】text 一律输出单行文本，严禁包含换行符 \\n；折行由程序按显示宽度自动处理，你不要也不能手动分行。\n'
   + '   唯一例外：若该句组的原文是多行且每行以 - 开头（同一条字幕里两个说话人对话），译文必须保持相同结构——每个说话人一行、每行以「- 」开头、行与行之间用一个换行符 \\n 连接。\n'
   + '7.【数字单位一体】译文中的数字与其单位/符号必须作为整体紧邻出现（如 30%、$50、1,000、12.5、100万），严禁拆散或在数字与单位之间插入其他字符。\n'
-  + '8.【输出示例】普通句组返回 cues 数组（每个输入 cue 编号一条）；歌词组保留分段编号输出单个 text；双说话人保持「- 」结构与换行；纯水词 cue 编号进 fillers：\n'
+  + '8.【内容保真】\n'
+  + '   - 习语、俚语、文化梗按意思翻译，可用目标语言等效表达替换，保住原有的力度与笑点，严禁逐字直译。\n'
+  + '   - 脏话与粗口保持原文的强度和语气，不得软化、净化或改温和。\n'
+  + '   - [听不清]、[交叉说话]、[无法辨认] 等标记按目标语言字幕惯例译出并保留，不得当作水词删除。\n'
+  + '   - 目标语言有敬语体系（日语、韩语等）时，按说话人之间的关系确定敬体级别并全片一致，不得忽上忽下。\n'
+  + '   - 数字保持原文精度：严禁四舍五入，严禁货币金额换算成其他币种（$50 译作 50 美元，数值不变）。\n'
+  + '9.【输出示例】普通句组返回 cues 数组（每个输入 cue 编号一条）；歌词组保留分段编号输出单个 text；双说话人保持「- 」结构与换行；纯水词 cue 编号进 fillers：\n'
   + '输入（节选）：{"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"t":"00:01:12,200","dur":1.8,"src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"t":"00:01:15,000","dur":2.4,"src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"t":"00:01:20,100","dur":0.5,"src":"Um."},{"no":18,"t":"00:01:21,500","dur":2.2,"src":"See you tomorrow."}]}]}\n'
   + '输出：{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"' + ex.dash + '"}]},{"gno":2,"type":"text","text":"' + ex.lyric + '"},{"gno":3,"type":"text","cues":[{"no":18,"text":"' + ex.plain + '"}]}],"fillers":[17]}\n'
   + '只输出 JSON（不要 markdown 代码块、不要多余解释）：\n'
@@ -3518,30 +3538,26 @@ async function runTranslate(){
             await new Promise(r=>setTimeout(r,1500));
             continue;
           }
-          // v0.9.47：音乐组 drop → 单组隔离重译一次（绝不整批重发）；再 drop 就接受模型判断，按水词删除
-          // v0.9.82：勾选「去除水词」时模型 drop 与用户意图一致（该删），不再花 1 次/组请求复核；
-          //          未勾选（想保留水词）时 drop 与意图冲突，才隔离重译确认
+          // v0.9.47：音乐组 drop → 单组隔离重译一次；v0.9.82：勾选「去除水词」时模型 drop 与用户意图一致，直接跳过
+          // v0.9.85：合并重译——该批全部 drop 组打包成 1 次请求（此前每组 1 次，极端时 55 组=55 次往返）；
+          //          合并后仍 drop 的接受模型判断，按水词删除
           if(!dropFillers && out.musicDropGnos && out.musicDropGnos.length){
-            const stillDrop=[];
-            /* v0.9.72：并行化（并发3）——各音乐组重译相互独立，单组重发结果与串行一致 */
-            await poolMap(out.musicDropGnos, 3, async gno=>{
-              if(S.stop){ stillDrop.push(gno); return; }
-              const g1=gBatch.find(x=>x.gno===gno);
-              let fixed=false;
-              if(g1){
-                try{
-                  const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,null,ctx,1);
+            const g1s=out.musicDropGnos.map(gno=>gBatch.find(x=>x.gno===gno)).filter(Boolean);
+            const stillDrop=out.musicDropGnos.slice();
+            if(g1s.length && !S.stop){
+              try{
+                const o2=await translateBatch(effBase,effKey,effModel,g1s,bi+1,totalB,sys,null,ctx,1);
+                stillDrop.length=0;
+                for(const gno of out.musicDropGnos){
                   const m2=o2.byGno&&o2.byGno[gno];
                   // 救回标准：拿到非空译文且该组未触发语言跑偏锚定
                   if(m2 && String(m2.text||'').trim() && !(o2.badAnchor||[]).includes(gno)){
                     out.byGno[gno]=m2;
                     o2.fillers.forEach(no=>fillerSet.add(no));
-                    fixed=true;
-                  }
-                }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
-              }
-              if(!fixed) stillDrop.push(gno);
-            });
+                  } else stillDrop.push(gno);
+                }
+              }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+            }
             const savedN=out.musicDropGnos.length-stillDrop.length;
             if(savedN>0) log(t('musicDropSaved',savedN),'okc');
             if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
@@ -4309,7 +4325,7 @@ function styleUI(){
     : (cur==='plain' ? t('hintPlain') : t('hintElegant'));
 }
 (function(){
-  const sel=(sv.style==='plain'||sv.style==='custom')?sv.style:'elegant';
+  const sel=(['plain','custom','formal','dubbed'].includes(sv.style))?sv.style:'elegant';
   const el=document.querySelector('input[name=style][value="'+sel+'"]');
   if(el) el.checked=true;
   styleUI();
