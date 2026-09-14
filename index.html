@@ -396,7 +396,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.83</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.84</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -550,7 +550,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.83</span>
+    <span class="ver-tag">v0.9.84</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -713,7 +713,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.83"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.84"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -821,7 +821,7 @@ const I18N = {
   stTotal:'条数', stDone:'已译', stDrop:'水词清空', stMerge:'跨条句组', stWrap:'折行', stIssues:'待处理',
   fAll:'全部', fTodo:'仅待译', fDone:'仅已译', fFlag:'仅特殊处理',
   colSrc:'{0}原文', colDst:'{0}译文（可点击编辑）',
-  pending:'待翻译…', dropNote:'（已删除：纯水词/提示词条目）',
+  pending:'待翻译…', dropNote:'（已删除：纯水词/提示词条目）', emptyNote:'（空字幕：无需翻译）',
   emptyRows:'还没有字幕。左侧「导入」→ 选文件 / 粘贴 / 载入示例。', emptyFilter:'当前筛选无内容',
   reportSummary:'导出前校验报告',
   footer:'随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你',
@@ -916,7 +916,7 @@ const I18N = {
   stTotal:'條數', stDone:'已譯', stDrop:'水詞清空', stMerge:'跨條句組', stWrap:'折行', stIssues:'待處理',
   fAll:'全部', fTodo:'僅待譯', fDone:'僅已譯', fFlag:'僅特殊處理',
   colSrc:'{0}原文', colDst:'{0}譯文（可點擊編輯）',
-  pending:'待翻譯…', dropNote:'（已刪除：純水詞/提示詞條目）',
+  pending:'待翻譯…', dropNote:'（已刪除：純水詞/提示詞條目）', emptyNote:'（空字幕：無需翻譯）',
   emptyRows:'還沒有字幕。左側「匯入」→ 選檔案 / 貼上 / 載入範例。', emptyFilter:'目前篩選無內容',
   reportSummary:'匯出前校驗報告',
   footer:'隨心字幕 AI · 開源 AGPL-3.0 · 你的字幕永遠屬於你',
@@ -1011,7 +1011,7 @@ const I18N = {
   stTotal:'Cues', stDone:'Done', stDrop:'Fillers cleared', stMerge:'Multi-cue groups', stWrap:'Wrapped', stIssues:'Pending',
   fAll:'All', fTodo:'Pending only', fDone:'Done only', fFlag:'Flagged only',
   colSrc:'{0} source', colDst:'{0} translation (click to edit)',
-  pending:'Pending…', dropNote:'(removed: pure filler/sound cue)',
+  pending:'Pending…', dropNote:'(removed: pure filler/sound cue)', emptyNote:'(empty cue: no translation needed)',
   emptyRows:'No subtitles yet. Import on the left → choose a file / paste / load sample.', emptyFilter:'Nothing under this filter',
   reportSummary:'Pre-export validation report',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Your subtitles always belong to you',
@@ -1106,7 +1106,7 @@ const I18N = {
   stTotal:'件数', stDone:'翻訳済', stDrop:'フィラー消去', stMerge:'複数跨ぎ文', stWrap:'改行', stIssues:'未処理',
   fAll:'すべて', fTodo:'未翻訳のみ', fDone:'翻訳済のみ', fFlag:'フラグ付きのみ',
   colSrc:'{0}原文', colDst:'{0}訳文（クリックで編集）',
-  pending:'未翻訳…', dropNote:'（削除済：フィラー/効果音表記）',
+  pending:'未翻訳…', dropNote:'（削除済：フィラー/効果音表記）', emptyNote:'（空字幕：翻訳不要）',
   emptyRows:'字幕がありません。左の「読み込み」→ ファイル選択 / 貼り付け / サンプル。', emptyFilter:'このフィルターでは該当なし',
   reportSummary:'書き出し前チェック結果',
   footer:'AI-SRTSub · オープンソース AGPL-3.0 · あなたの字幕はあなたのもの',
@@ -1201,7 +1201,7 @@ const I18N = {
   stTotal:'Subtítulos', stDone:'Hechos', stDrop:'Relleno quitado', stMerge:'Grupos multi-línea', stWrap:'Ajustados', stIssues:'Pendientes',
   fAll:'Todos', fTodo:'Solo pendientes', fDone:'Solo hechos', fFlag:'Solo marcados',
   colSrc:'{0} origen', colDst:'{0} traducción (clic para editar)',
-  pending:'Pendiente…', dropNote:'(eliminado: puro relleno/sonido)',
+  pending:'Pendiente…', dropNote:'(eliminado: puro relleno/sonido)', emptyNote:'(subtítulo vacío: no requiere traducción)',
   emptyRows:'Aún no hay subtítulos. Importa a la izquierda → elegir archivo / pegar / cargar ejemplo.', emptyFilter:'Nada bajo este filtro',
   reportSummary:'Informe de validación pre-exportación',
   footer:'AI-SRTSub · Código abierto AGPL-3.0 · Tus subtítulos siempre son tuyos',
@@ -1296,7 +1296,7 @@ const I18N = {
   stTotal:'Legendas', stDone:'Feitas', stDrop:'Preenchido removido', stMerge:'Grupos multilinha', stWrap:'Quebradas', stIssues:'Pendentes',
   fAll:'Todas', fTodo:'Só pendentes', fDone:'Só feitas', fFlag:'Só marcadas',
   colSrc:'{0} origem', colDst:'{0} tradução (clique para editar)',
-  pending:'Pendente…', dropNote:'(removida: puro preenchimento/efeito sonoro)',
+  pending:'Pendente…', dropNote:'(removida: puro preenchimento/efeito sonoro)', emptyNote:'(legenda vazia: não requer tradução)',
   emptyRows:'Ainda não há legendas. Importe à esquerda → escolher arquivo / colar / carregar exemplo.', emptyFilter:'Nada neste filtro',
   reportSummary:'Relatório de validação pré-exportação',
   footer:'AI-SRTSub · Código aberto AGPL-3.0 · Suas legendas sempre são suas',
@@ -1391,7 +1391,7 @@ const I18N = {
   stTotal:'자막 수', stDone:'완료', stDrop:'필러 정리', stMerge:'다중 자막 그룹', stWrap:'줄바꿈', stIssues:'대기',
   fAll:'전체', fTodo:'미번역만', fDone:'완료만', fFlag:'표시된 것만',
   colSrc:'{0} 원문', colDst:'{0} 번역(클릭하여 편집)',
-  pending:'대기 중…', dropNote:'(삭제됨: 순수 필러/음향 표기)',
+  pending:'대기 중…', dropNote:'(삭제됨: 순수 필러/음향 표기)', emptyNote:'(빈 자막: 번역 불필요)',
   emptyRows:'자막이 없습니다. 왼쪽 "불러오기" → 파일 선택 / 붙여넣기 / 샘플.', emptyFilter:'이 필터에는 해당 항목이 없습니다',
   reportSummary:'내보내기 전 검증 보고서',
   footer:'AI-SRTSub · 오픈소스 AGPL-3.0 · 당신의 자막은 언제나 당신 것',
@@ -1486,7 +1486,7 @@ const I18N = {
   stTotal:'Untertitel', stDone:'Fertig', stDrop:'Füllwörter entfernt', stMerge:'Mehrzeilige Gruppen', stWrap:'Umgebrochen', stIssues:'Offen',
   fAll:'Alle', fTodo:'Nur offene', fDone:'Nur fertige', fFlag:'Nur markierte',
   colSrc:'{0} Original', colDst:'{0} Übersetzung (zum Bearbeiten klicken)',
-  pending:'Offen…', dropNote:'(entfernt: reines Füllwort/Geräusch)',
+  pending:'Offen…', dropNote:'(entfernt: reines Füllwort/Geräusch)', emptyNote:'(leerer Untertitel: keine Übersetzung nötig)',
   emptyRows:'Noch keine Untertitel. Links "Importieren" → Datei wählen / einfügen / Beispiel laden.', emptyFilter:'Nichts unter diesem Filter',
   reportSummary:'Validierungsbericht vor dem Export',
   footer:'AI-SRTSub · Open Source AGPL-3.0 · Deine Untertitel gehören immer dir',
@@ -1581,7 +1581,7 @@ const I18N = {
   stTotal:'Sous-titres', stDone:'Terminés', stDrop:'Remplissage retiré', stMerge:'Groupes multi-lignes', stWrap:'Répartis', stIssues:'En attente',
   fAll:'Tous', fTodo:'En attente', fDone:'Terminés', fFlag:'Marqués',
   colSrc:'{0} source', colDst:'{0} traduction (cliquer pour modifier)',
-  pending:'En attente…', dropNote:'(supprimé : pur remplissage/bruitage)',
+  pending:'En attente…', dropNote:'(supprimé : pur remplissage/bruitage)', emptyNote:'(sous-titre vide : aucune traduction requise)',
   emptyRows:'Pas encore de sous-titres. À gauche « Importer » → choisir fichier / coller / exemple.', emptyFilter:'Rien sous ce filtre',
   reportSummary:'Rapport de validation avant export',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Vos sous-titres vous appartiennent toujours',
@@ -1676,7 +1676,7 @@ const I18N = {
   stTotal:'Subtitle', stDone:'Selesai', stDrop:'Pengisi dihapus', stMerge:'Grup multi-baris', stWrap:'Dibungkus', stIssues:'Tertunda',
   fAll:'Semua', fTodo:'Tertunda saja', fDone:'Selesai saja', fFlag:'Ditandai saja',
   colSrc:'{0} asli', colDst:'{0} terjemahan (klik untuk edit)',
-  pending:'Tertunda…', dropNote:'(dihapus: murni pengisi/efek suara)',
+  pending:'Tertunda…', dropNote:'(dihapus: murni pengisi/efek suara)', emptyNote:'(takarir kosong: tidak perlu diterjemahkan)',
   emptyRows:'Belum ada subtitle. Impor di kiri → pilih file / tempel / muat contoh.', emptyFilter:'Tidak ada hasil pada filter ini',
   reportSummary:'Laporan validasi sebelum ekspor',
   footer:'AI-SRTSub · Sumber terbuka AGPL-3.0 · Subtitelmu selalu milikmu',
@@ -1771,7 +1771,7 @@ const I18N = {
   stTotal:'सबटाइटल', stDone:'पूर्ण', stDrop:'फिलर हटाए', stMerge:'बहु-पंक्ति समूह', stWrap:'रैप्ड', stIssues:'शेष',
   fAll:'सभी', fTodo:'केवल शेष', fDone:'केवल पूर्ण', fFlag:'केवल चिह्नित',
   colSrc:'{0} मूल', colDst:'{0} अनुवाद (संपादन हेतु क्लिक करें)',
-  pending:'प्रतीक्षारत…', dropNote:'(हटाया: शुद्ध फिलर/ध्वनि)',
+  pending:'प्रतीक्षारत…', dropNote:'(हटाया: शुद्ध फिलर/ध्वनि)', emptyNote:'(खाली उपशीर्षक: अनुवाद आवश्यक नहीं)',
   emptyRows:'अभी कोई सबटाइटल नहीं। बाईं ओर "आयात" → फ़ाइल चुनें / पेस्ट करें / नमूना लोड करें।', emptyFilter:'इस फ़िल्टर में कुछ नहीं',
   reportSummary:'निर्यात-पूर्व सत्यापन रिपोर्ट',
   footer:'AI-SRTSub · ओपन सोर्स AGPL-3.0 · आपके सबटाइटल हमेशा आपके हैं',
@@ -1866,7 +1866,7 @@ const I18N = {
   stTotal:'ซับไตเติล', stDone:'แปลแล้ว', stDrop:'ลบคำเสียบแล้ว', stMerge:'กลุ่มข้ามบรรทัด', stWrap:'ตัดบรรทัดแล้ว', stIssues:'ค้างอยู่',
   fAll:'ทั้งหมด', fTodo:'ยังไม่แปล', fDone:'แปลแล้ว', fFlag:'มีสถานะพิเศษ',
   colSrc:'{0} ต้นฉบับ', colDst:'{0} คำแปล (คลิกเพื่อแก้ไข)',
-  pending:'รอแปล…', dropNote:'(ลบแล้ว: คำเสียบ/เสียงเอฟเฟกต์ล้วน)',
+  pending:'รอแปล…', dropNote:'(ลบแล้ว: คำเสียบ/เสียงเอฟเฟกต์ล้วน)', emptyNote:'(ซับว่างเปล่า: ไม่ต้องแปล)',
   emptyRows:'ยังไม่มีซับไตเติล นำเข้าทางซ้าย → เลือกไฟล์ / วาง / โหลดตัวอย่าง', emptyFilter:'ไม่มีรายการภายใต้ตัวกรองนี้',
   reportSummary:'รายงานตรวจสอบก่อนส่งออก',
   footer:'AI-SRTSub · โอเพนซอร์ส AGPL-3.0 · ซับของคุณเป็นของคุณเสมอ',
@@ -1961,7 +1961,7 @@ const I18N = {
   stTotal:'Phụ đề', stDone:'Xong', stDrop:'Đã dọn đệm', stMerge:'Nhóm nhiều dòng', stWrap:'Đã ngắt dòng', stIssues:'Chờ xử lý',
   fAll:'Tất cả', fTodo:'Chờ dịch', fDone:'Đã dịch', fFlag:'Có đánh dấu',
   colSrc:'{0} gốc', colDst:'{0} bản dịch (bấm để sửa)',
-  pending:'Đang chờ…', dropNote:'(đã xóa: thuần từ đệm/âm thanh)',
+  pending:'Đang chờ…', dropNote:'(đã xóa: thuần từ đệm/âm thanh)', emptyNote:'(phụ đề trống: không cần dịch)',
   emptyRows:'Chưa có phụ đề. Nhập bên trái → chọn file / dán / tải mẫu.', emptyFilter:'Không có gì dưới bộ lọc này',
   reportSummary:'Báo cáo kiểm tra trước khi xuất',
   footer:'AI-SRTSub · Mã nguồn mở AGPL-3.0 · Phụ đề của bạn luôn là của bạn',
@@ -2056,7 +2056,7 @@ const I18N = {
   stTotal:'Субтитров', stDone:'Готово', stDrop:'Заполнители убраны', stMerge:'Многострочные группы', stWrap:'Перенесено', stIssues:'Осталось',
   fAll:'Все', fTodo:'Только не переведённые', fDone:'Только готовые', fFlag:'Только отмеченные',
   colSrc:'{0} оригинал', colDst:'{0} перевод (нажмите для правки)',
-  pending:'Ожидает…', dropNote:'(удалено: чистый заполнитель/звук)',
+  pending:'Ожидает…', dropNote:'(удалено: чистый заполнитель/звук)', emptyNote:'(пустой субтитр: перевод не требуется)',
   emptyRows:'Субтитров пока нет. Импорт слева → выбрать файл / вставить / пример.', emptyFilter:'Под этим фильтром пусто',
   reportSummary:'Отчёт проверки перед экспортом',
   footer:'AI-SRTSub · Открытый код AGPL-3.0 · Ваши субтитры всегда ваши',
@@ -2151,7 +2151,7 @@ const I18N = {
   stTotal:'Sottotitoli', stDone:'Completati', stDrop:'Riempitivi rimossi', stMerge:'Gruppi multi-cue', stWrap:'Ritorni a capo', stIssues:'In sospeso',
   fAll:'Tutti', fTodo:'Solo in sospeso', fDone:'Solo completati', fFlag:'Solo contrassegnati',
   colSrc:'{0} origine', colDst:'{0} traduzione (clicca per modificare)',
-  pending:'In attesa…', dropNote:'(rimosso: puro riempitivo/indicazione sonora)',
+  pending:'In attesa…', dropNote:'(rimosso: puro riempitivo/indicazione sonora)', emptyNote:'(sottotitolo vuoto: nessuna traduzione richiesta)',
   emptyRows:'Nessun sottotitolo. Importa a sinistra → scegli un file / incolla / carica l\'esempio.', emptyFilter:'Nessun risultato con questo filtro',
   reportSummary:'Report di validazione pre-esportazione',
   footer:'AI-SRTSub · Open source AGPL-3.0 · I tuoi sottotitoli restano sempre tuoi',
@@ -2246,7 +2246,7 @@ const I18N = {
   stTotal:'الترجمات', stDone:'مكتمل', stDrop:'حشو أزيل', stMerge:'مجموعات متعددة', stWrap:'ملتف', stIssues:'معلّق',
   fAll:'الكل', fTodo:'المعلّق فقط', fDone:'المكتمل فقط', fFlag:'المعلّم فقط',
   colSrc:'{0} المصدر', colDst:'{0} الترجمة (انقر للتحرير)',
-  pending:'معلّق…', dropNote:'(أزيل: حشو/إشارة صوتية فقط)',
+  pending:'معلّق…', dropNote:'(أزيل: حشو/إشارة صوتية فقط)', emptyNote:'(نص فارغ: لا حاجة للترجمة)',
   emptyRows:'لا ترجمات بعد. استورد من اليسار ← اختر ملفًا / الصق / حمّل المثال.', emptyFilter:'لا شيء تحت هذا الفلتر',
   reportSummary:'تقرير التحقق قبل التصدير',
   footer:'AI-SRTSub · مفتوح المصدر AGPL-3.0 · ترجماتك تبقى دائمًا ملكك',
@@ -2341,7 +2341,7 @@ const I18N = {
   stTotal:'Altyazı', stDone:'Tamamlandı', stDrop:'Dolgu temizlendi', stMerge:'Çoklu gruplar', stWrap:'Sarılan', stIssues:'Bekleyen',
   fAll:'Tümü', fTodo:'Sadece bekleyen', fDone:'Sadece tamamlanan', fFlag:'Sadece işaretli',
   colSrc:'{0} kaynak', colDst:'{0} çeviri (düzenlemek için tıkla)',
-  pending:'Bekliyor…', dropNote:'(kaldırıldı: salt dolgu/ses bildirimi)',
+  pending:'Bekliyor…', dropNote:'(kaldırıldı: salt dolgu/ses bildirimi)', emptyNote:'(boş altyazı: çeviri gerekmez)',
   emptyRows:'Henüz altyazı yok. Soldan içe aktar → dosya seç / yapıştır / örnek yükle.', emptyFilter:'Bu filtrede bir şey yok',
   reportSummary:'Dışa aktarma öncesi doğrulama raporu',
   footer:'AI-SRTSub · Açık kaynak AGPL-3.0 · Altyazıların her zaman senin',
@@ -2723,7 +2723,7 @@ function updateStats(){
   const total=S.rows.length;
   let done=0, handled=0;
   S.rows.forEach(r=>{
-    if(r.flag==='drop'||r.flag==='merged') handled++;       // 水词清空 / 已并入上条
+    if(r.flag==='drop'||r.flag==='merged'||r.noText) handled++;       // 水词清空 / 已并入上条 / 空字幕无需翻译
     else if(r.zh && r.zh.trim()) done++;
   });
   $('stTotal').innerHTML=t('stTotal')+' <b>'+total+'</b>';
@@ -2752,7 +2752,7 @@ function renderRows(){
   setColLabels();
   const box=$('rows'), f=$('filter').value;
   const list = S.rows.filter(r=>{
-    if (f==='todo') return !(r.zh && r.zh.trim()) && r.flag!=='drop' && r.flag!=='merged';
+    if (f==='todo') return !(r.zh && r.zh.trim()) && r.flag!=='drop' && r.flag!=='merged' && !r.noText;
     if (f==='done') return !!(r.zh && r.zh.trim());
     if (f==='flag') return !!r.flag;
     return true;
@@ -2770,7 +2770,9 @@ function renderRows(){
           ? '<div class="drop-note">'+t('dropNote')+'</div>'
           : r.flag==='merged'
             ? '<div class="drop-note">'+t('mergedNote')+'</div>'
-            : '<div class="zh'+(zh?'':' placeholder')+'" contenteditable="true" spellcheck="false">'+(zh||t('pending'))+'</div>'+zhBadge(r))
+            : r.noText
+              ? '<div class="drop-note">'+t('emptyNote')+'</div>'
+              : '<div class="zh'+(zh?'':' placeholder')+'" contenteditable="true" spellcheck="false">'+(zh||t('pending'))+'</div>'+zhBadge(r))
       + '</div>';
   });
   box.innerHTML=html;
@@ -3364,8 +3366,9 @@ async function runTranslate(){
   $('btnGo').textContent=t('btnGoStop');
 
   try{
-    // 初始化工作行（深拷贝源）
-    S.rows = S.srcItems.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
+    // 初始化工作行（深拷贝源）。v0.9.84：空文本 cue（歌曲间隙等）不会进任何句组、永不被翻译，
+    // 标记 noText 让界面显示「无需翻译」而非误导性的「待翻译…」，统计计入已处理
+    S.rows = S.srcItems.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null, noText:!String(it.text||'').trim()}));
 
     // 句子级分组：跨多条字幕的句子合并为句组，译文将按各条时长比例切分回填
     const groups = C.groupSentences(S.srcItems);
