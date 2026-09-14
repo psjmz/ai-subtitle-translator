@@ -118,6 +118,8 @@ function appendEvent(ip, meta, model){
    匹配窗口放宽到 3 小时（大文件翻译+用户迟些下载都算同一次会话），取最新一条。
    匹配不到但带了 model（自带 Key 用户，翻译不经服务器）→ 创建轻量记录，模型也能统计。 */
 const EVENT_LIFE_MS = 3 * 60 * 60 * 1000;
+/* v0.9.80：失败上报的错误消息清洗——去控制字符、截断 200 字，防止脏数据撑大 events.json */
+function cleanMsg(s){ return String(s || '').replace(/[\x00-\x1f]/g, ' ').trim().slice(0, 200); }
 function markEvent(ip, meta, ev){
   if (!meta || typeof meta !== 'object') return false;
   const now = Date.now();
@@ -135,6 +137,9 @@ function markEvent(ip, meta, ev){
       } else if (ev === 'download') {
         e.downloads = (e.downloads || 0) + 1;
         e.downloadedAt = now;
+      } else if (ev === 'fail') {
+        e.failedAt = now;                      // v0.9.80：客户端异常（含错误消息）上报
+        e.failMsg = cleanMsg(meta.msg);
       } else return false;
       if (mdl && !e.model) e.model = mdl;
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
@@ -146,6 +151,7 @@ function markEvent(ip, meta, ev){
   const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
   if (ev === 'finish') lite.finishedAt = now;
   else if (ev === 'download') { lite.downloads = 1; lite.downloadedAt = now; }
+  else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
   else return false;
   db.events.push(lite);
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
@@ -655,8 +661,8 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 400, { error: { message: 'Request body is not valid JSON' } });
       }
       const ev = String(body.ev || '');
-      if (ev !== 'finish' && ev !== 'download') {
-        return sendJson(res, 400, { error: { message: 'ev must be finish or download' } });
+      if (ev !== 'finish' && ev !== 'download' && ev !== 'fail') {
+        return sendJson(res, 400, { error: { message: 'ev must be finish, download or fail' } });
       }
       try { markEvent(clientIp(req), body, ev); } catch (e) {}
       return sendJson(res, 200, { ok: true });
@@ -723,11 +729,13 @@ const server = http.createServer(async (req, res) => {
             ips: new Set(todays.map(e => e.ip)).size,
             batches: todays.reduce((s, e) => s + (e.batches || 1), 0),
             finished: todays.filter(e => e.finishedAt && dateOfTs(e.finishedAt) === today).length,
-            downloaded: todays.filter(e => e.downloadedAt && dateOfTs(e.downloadedAt) === today).length
+            downloaded: todays.filter(e => e.downloadedAt && dateOfTs(e.downloadedAt) === today).length,
+            failed: todays.filter(e => e.failedAt && dateOfTs(e.failedAt) === today).length
           },
           topFiles: cnt(all, 'file'),
           topLangs: cnt(all, 'lang'),
-          topModels: cnt(all.filter(e => e.model), 'model')
+          topModels: cnt(all.filter(e => e.model), 'model'),
+          topFails: cnt(all.filter(e => e.failMsg), 'failMsg')
         };
         const newest = all.slice().reverse(); // 最新在前（倒序拷贝，不动存储的追加序数组）
         if (q.page !== undefined) {
