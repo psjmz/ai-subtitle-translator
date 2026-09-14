@@ -1046,6 +1046,61 @@
     return repairThinSegs(splitByDuration(s, times, { locale: locale }), locale);
   }
 
+  // v0.9.94：双语拆时间轴时的源文切分——优先沿「源字幕自身的换行」切。
+  // 源字幕的换行是作者标好的语义断点（TED 类滚动字幕 60/83 条自带 2 行），沿它切不会劈在词中间；
+  // 行内仍超宽（或行数不够 k）时，再在该行内部按自然断点细分。
+  // rawLines 为空（无原始换行信息）时退回等宽自然断点切 splitTextNatural，与旧行为一致。
+  function splitSrcByOwnLines(rawLines, srcText, k, locale) {
+    k = Math.max(1, k | 0);
+    if (!srcText) return new Array(k).fill('');
+    const lines = (rawLines || []).map((x) => String(x == null ? '' : x).trim()).filter(Boolean);
+    if (!lines.length) return splitTextNatural(srcText, k, locale);
+    if (k === 1) return [lines.join(' ')];
+    if (lines.length === k) return lines.slice();
+    if (lines.length > k) {
+      // 行数多于目标段数：按宽度均衡地把相邻行合并成 k 段，切点必落在原行边界
+      const ws = lines.map((l) => Math.max(0.5, textWidth(l)));
+      const target = ws.reduce((a, b) => a + b, 0) / k;
+      const out = [];
+      let cur = [];
+      for (let i = 0; i < lines.length; i++) {
+        cur.push(lines[i]);
+        const remainL = lines.length - i - 1;
+        const remainS = k - out.length - 1;
+        if (remainL <= remainS) {
+          if (remainL === remainS || textWidth(cur.join(' ')) >= target) { out.push(cur.join(' ')); cur = []; }
+        } else if (textWidth(cur.join(' ')) >= target) { out.push(cur.join(' ')); cur = []; }
+      }
+      if (cur.length) out.push(cur.join(' '));
+      while (out.length < k) out.push('');
+      return out.slice(0, k);
+    }
+    // 行数少于目标段数：切点保留全部原行边界，额外切点按行宽比例分给最宽的行
+    const ws = lines.map((l) => Math.max(0.5, textWidth(l)));
+    const total = ws.reduce((a, b) => a + b, 0);
+    const extra = k - lines.length;
+    const counts = ws.map((w) => 1 + Math.max(0, Math.round(extra * w / total) - 0));
+    let sum = counts.reduce((a, b) => a + b, 0);
+    for (let guard = 0; guard < 200 && sum !== k; guard++) {
+      if (sum > k) {
+        let mi = 0;
+        for (let i = 1; i < counts.length; i++) if (counts[i] > counts[mi]) mi = i;
+        if (counts[mi] > 1) { counts[mi]--; sum--; } else break;
+      } else {
+        let mi = 0;
+        for (let i = 1; i < counts.length; i++) if (ws[i] > ws[mi]) mi = i;
+        counts[mi]++; sum++;
+      }
+    }
+    const out = [];
+    for (let i = 0; i < lines.length; i++) {
+      if (counts[i] <= 1) out.push(lines[i]);
+      else { const p = splitTextNatural(lines[i], counts[i], locale); for (const x of p) out.push(x); }
+    }
+    while (out.length < k) out.push('');
+    return out.slice(0, k);
+  }
+
   // 单语导出分片（v0.9.13）：优先按时长占比切分（文本随语音出现），
   // 但校验每片折行 ≤ maxLines；句组内时长严重不均时（如 4.4s vs 1.3s），
   // 按时长分片会让长 cue 分到超 2 行的量，观感不可接受——此时退回按宽度均分
@@ -1549,19 +1604,24 @@
   function buildBilingualParts(rows, opts) {
     opts = opts || {};
     const maxW = (opts.maxW > 0) ? opts.maxW : 21;
-    // v0.9.93：双语「单行」容忍宽度。源/译各自 squash 成一行后，若宽度都在此内就整条按
-    // 「1 行译文 + 1 行源文」放下，绝不切时间轴。双语观众一次只看一侧，行宽可显著大于单语；
-    // 但加绝对值封顶，避免 maxW 调大时单行无限变长。
-    const biTol = Math.min(maxW * 1.9, maxW + 20);
+    // v0.9.94：双语专用行宽（与单语 maxW 解耦）。
+    //   biMaxW  = 译文行的最大全角宽（观众阅读主线，也是唯一的行宽约束），默认 32
+    //   srcCapW = 源文行的宽松兜底（2 倍）：源文原则上跟随语义断点、不单独限宽，
+    //             仅防德文复合词/超长英文行这类极端情况超出屏幕被播放器截断。
+    const biMaxW = (opts.biMaxW > 0) ? opts.biMaxW : 32;
+    const srcCapW = biMaxW * 2;
     // 1) 汇集成对条目：活跃行 + 其后 merged 行的源文
     const entries = [];
     let last = null;
     for (const r of (rows || [])) {
       if (!r) continue;
       if (r.flag === 'drop') { last = null; continue; }
-      const srcOne = squashLines(String(r.en == null ? '' : r.en));
+      const rawEn = String(r.en == null ? '' : r.en).replace(/\r/g, '').trim();
+      const srcOne = squashLines(rawEn);
+      // v0.9.94：保留源字幕自身的换行——切时间轴时作为首选断点（天然语义边界）
+      const rawLines = rawEn ? rawEn.split('\n').map((x) => x.trim()).filter(Boolean) : [];
       if (r.flag === 'merged') {
-        if (last && srcOne) last.srcParts.push(srcOne);
+        if (last && srcOne) { last.srcParts.push(srcOne); for (const x of rawLines) last.srcRawLines.push(x); }
         if (last && (r.end || 0) > last.end) last.end = r.end; // 防御：merged 行的时间覆盖并入承载行
         if (last) last.times.push({ start: r.start || 0, end: r.end || 0 }); // v0.9.48：保留原 cue 边界
         continue;
@@ -1573,6 +1633,7 @@
         last = { start: r.start || 0, end: r.end || 0, speaker: true,
                  times: [{ start: r.start || 0, end: r.end || 0 }],
                  srcParts: srcOne ? [String(r.en == null ? '' : r.en).replace(/\r/g, '').trim()] : [],
+                 srcRawLines: rawLines.slice(),
                  dst: String(r.zh).replace(/\r/g, '').trim() };
         entries.push(last);
         continue;
@@ -1580,6 +1641,7 @@
       last = { start: r.start || 0, end: r.end || 0,
                times: [{ start: r.start || 0, end: r.end || 0 }],
                srcParts: srcOne ? [srcOne] : [],
+               srcRawLines: rawLines.slice(),
                dst: squashLines(String(r.zh)) };
       entries.push(last);
     }
@@ -1593,36 +1655,32 @@
       const pushItem = (st, en, sLines, dLines) => {
         out.push({ no: out.length + 1, start: st, end: en, srcLines: sLines, dstLines: dLines });
       };
-      // v0.9.48 段级发射器：原 cue 边界切出的一个段（时间已定），只管"怎么放下"——
-      // R1 微超宽单行 → R2 折 2 行 → R3 段内细切（等宽自然断点 + 段时间按宽度占比瓜分，兜底折 2 行）
-      const emitPart = (st, en, sTxt, dTxt) => {
+      // 每段是否都装得下：双语下译文段用 biMaxW（唯一硬约束），源文段用宽松的 srcCapW（仅防超屏）
+      const fitsSeg = (segs, cap) => segs.every((x) => !x || textWidth(x) <= cap + 1e-9);
+      // v0.9.94 段级发射器：原 cue 边界切出的一个段（时间已定）。双语固定双行——
+      // ① 译文行 ≤ biMaxW 且源文行 ≤ srcCapW → 1 行译文 + 1 行源文放下，不动时间轴
+      // ② 超宽 → 直接拆时间轴：源文优先沿自身原换行切，译文按源文各段宽度分布回填
+      const emitPart = (st, en, sTxt, dTxt, rawLines) => {
         const sw = sTxt ? textWidth(sTxt) : 0;
         const dw = textWidth(dTxt || '');
-        if (sw <= biTol && dw <= biTol) { // R1
+        if (dw <= biMaxW && sw <= srcCapW) {
           pushItem(st, en, sTxt ? [sTxt] : [], [dTxt || '']);
           return;
         }
-        if (sw <= 2 * maxW && dw <= 2 * maxW) { // R2：两边折行都 ≤2 行 → 整段折行放下
-          const sL = sTxt ? wrapToWidth(sTxt, maxW, { normalize: true, locale: opts.srcLocale }) : [];
-          const dL = wrapToWidth(dTxt || '', maxW, { normalize: true, locale: opts.dstLocale });
-          if (sL.length <= 2 && dL.length <= 2) { pushItem(st, en, sL, dL); return; }
-        }
-        // R3：段内仍超容量 → 细切（k 从宽度需求起步递增；时间按各片宽度占比瓜分段时长）
-        const fitsW = (segs) => segs.every((s) => !s || textWidth(s) <= maxW + 1e-9);
-        let kk = Math.max(1, Math.ceil(Math.max(sw, dw) / maxW));
+        // k 从宽度需求起步递增，直至每段都装得下（按宽度切不保证每段等宽，
+        // 长不可断 stretch 会让某段仍超宽，必须递增重试；上限兜底防死循环）
+        let kk = Math.max(2, Math.ceil(dw / biMaxW), Math.ceil(sw / srcCapW));
         let ss = [], dd = [];
-        const kCap2 = kk + 10;
+        const kCap2 = kk + 12;
         for (;; kk++) {
-          ss = sTxt ? splitTextNatural(sTxt, kk, opts.srcLocale) : new Array(kk).fill('');
+          ss = sTxt ? splitSrcByOwnLines(rawLines, sTxt, kk, opts.srcLocale) : new Array(kk).fill('');
           dd = splitAligned(dTxt || '', sTxt ? ss : null, kk, opts.dstLocale);
-          if ((fitsW(ss) && fitsW(dd)) || kk >= kCap2) break;
+          if ((fitsSeg(ss, srcCapW) && fitsSeg(dd, biMaxW)) || kk >= kCap2) break;
         }
         const basis = (sTxt ? ss : dd).map((s) => Math.max(0.5, textWidth(s || '')));
-        // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
+        // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段）
         for (const g of subCuePlan(st, en, ss, dd, basis)) {
-          const sL = g.s ? wrapToWidth(g.s, maxW, { normalize: true, locale: opts.srcLocale }) : [];
-          const dL = wrapToWidth(g.d || '', maxW, { normalize: true, locale: opts.dstLocale });
-          pushItem(g.start, g.end, sL, dL);
+          pushItem(g.start, g.end, g.s ? [g.s] : [], g.d ? [g.d] : []);
         }
       };
       // SP 双 speaker（v0.9.25；v0.9.69 用户方案重写）：双语导出 src/dst 各合并为单行
@@ -1646,23 +1704,17 @@
         pushItem(e.start, e.end, sLines, foldSpeakerLines(e.dst, maxW, opts.dstLocale));
         continue;
       }
-      // 规则（可读性优先，三层兜底）：
-      //  R1 单行为主（v0.9.93）：两边宽度都 ≤ biTol 时不折不切，直接单行放下——双语的理想形态
-      //     就是「1 行译文 + 1 行源文」，短字幕被撑成 2+2 行观感极差；
-      //  R2 饥饿段回退：切分后任一段只剩 <=2 个有效字（如 "…"/"呃，"）时放弃切分，
-      //     整 cue 显示，源/译各自最多折 2 行（2+2 封顶）——废字幕比满屏更糟；
-      //  R3 强制切分：超出 2+2 容量的长 cue 才切时间轴（源文自然断点切、译文按比例对齐切 + 段内修复）。
-      const effOf = (s) => Array.from(String(s || '').replace(/[\s\p{P}\p{S}]/gu, '')).length;
+      // v0.9.94 规则（双语固定双行 + 独立行宽）：
+      //  R1 放下：译文行 ≤ biMaxW 且源文行 ≤ srcCapW → 1 行译文 + 1 行源文，不动时间轴
+      //  R2 拆分：超宽才拆时间轴。源文优先沿「源字幕自身的换行」切（天然语义断点，
+      //     不会劈在词中间），译文用 splitAligned 按源文各段宽度分布回填对齐
+      //  双语永不折行——短字幕被撑成多行观感极差。
       const srcW = srcText ? textWidth(srcText) : 0;
       const dstW = textWidth(dstText);
-      if (srcW <= biTol && dstW <= biTol) {
+      if (dstW <= biMaxW && srcW <= srcCapW) {
         pushItem(e.start, e.end, srcText ? [srcText] : [], [dstText]);
         continue;
       }
-      const srcLines = srcText ? wrapToWidth(srcText, maxW, { normalize: true, locale: opts.srcLocale }) : [];
-      const dstLines = wrapToWidth(dstText, maxW, { normalize: true, locale: opts.dstLocale });
-      let k = Math.max(srcLines.length, dstLines.length);
-      if (k <= 1) { pushItem(e.start, e.end, srcLines, dstLines); continue; }
       // v0.9.48：合并句组（entry.times > 1）——译文/源文先按各原 cue 时长比例切回（时间跟着语音走，
       // splitByDuration 内含词边界/语义停顿/原子保护），原 cue 边界即子时间轴；段内仍超容量才段内细切。
       // 背景：旧路径把整组当一个超长 cue 等宽重切（时间按文本宽度瓜分），实测把 3 条原文切出
@@ -1672,35 +1724,28 @@
         const sSegs = srcText ? splitByDuration(srcText, times, { locale: opts.srcLocale }) : null;
         const dSegs = splitByDuration(dstText, times, { locale: opts.dstLocale });
         for (let i = 0; i < times.length; i++) {
-          emitPart(times[i].start, times[i].end, sSegs ? (sSegs[i] || '') : '', dSegs[i] || '');
+          emitPart(times[i].start, times[i].end, sSegs ? (sSegs[i] || '') : '', dSegs[i] || '', null);
         }
         continue;
       }
-      // 切 k 条子字幕。源文按自然断点切；译文按源文各段宽度占比对齐切（splitAligned 内含段内退化修复），
-      // 保证段对段份量对应。任一段仍超宽则递增 k 重切（上限兜底：极端长词/原子切不动才接受段内折行）。
-      const fits = (segs) => segs.every((s) => !s || textWidth(s) <= maxW + 1e-9);
+      // 切 k 条子字幕：源文优先沿自身原换行切，译文按源文各段宽度分布回填对齐。
+      // k 起步：①宽度需求 ②源字幕自身的行数——保证原行边界必被尊重（否则 k<行数时
+      // splitSrcByOwnLines 会把相邻原行合并，切点就丢了作者标好的语义断点）。
+      // 随后递增直至每段都装得下（同 emitPart，防长不可断 stretch 残留超宽段）
+      const srcLineN = (e.srcRawLines || []).filter(Boolean).length;
+      let k = Math.max(2, Math.ceil(dstW / biMaxW), Math.ceil(srcW / srcCapW), srcLineN);
       let srcSegs = [], dstSegs = [];
-      const kCap = k + 10;
+      const kCap = k + 12;
       for (;; k++) {
-        srcSegs = srcText ? splitTextNatural(srcText, k, opts.srcLocale) : new Array(k).fill('');
+        srcSegs = srcText ? splitSrcByOwnLines(e.srcRawLines, srcText, k, opts.srcLocale) : new Array(k).fill('');
         dstSegs = splitAligned(dstText, srcText ? srcSegs : null, k, opts.dstLocale);
-        if ((fits(srcSegs) && fits(dstSegs)) || k >= kCap) break;
-      }
-      // R2：切分产生了饥饿段（空段不算——无源文行的译段独自成条属正常），
-      // 且整 cue 放得下 2+2 → 放弃切分，整 cue 折行显示
-      const starved = (segs) => segs.some((s) => s && effOf(s) <= 2);
-      if ((starved(srcSegs) || starved(dstSegs)) && srcW <= 2 * maxW && dstW <= 2 * maxW) {
-        pushItem(e.start, e.end, srcLines, dstLines);
-        continue;
+        if ((fitsSeg(srcSegs, srcCapW) && fitsSeg(dstSegs, biMaxW)) || k >= kCap) break;
       }
       // 子时间轴：按源文各段宽度占比分配（无源文时按译文段宽）
       const basis = (srcText ? srcSegs : dstSegs).map((s) => Math.max(0.5, textWidth(s)));
-      // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
+      // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段）
       for (const g of subCuePlan(e.start, e.end, srcSegs, dstSegs, basis)) {
-        // 段内仍超宽（罕见：长不可断 stretch）则折行兜底，接受该段 2 行
-        const sL = g.s ? wrapToWidth(g.s, maxW, { normalize: true, locale: opts.srcLocale }) : [];
-        const dL = wrapToWidth(g.d || '', maxW, { normalize: true, locale: opts.dstLocale });
-        pushItem(g.start, g.end, sL, dL);
+        pushItem(g.start, g.end, g.s ? [g.s] : [], g.d ? [g.d] : []);
       }
     }
     return out;
@@ -1994,7 +2039,7 @@
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,
-    splitTextNatural, splitAligned, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
+    splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
     validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,

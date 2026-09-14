@@ -452,13 +452,16 @@ t('长 cue 严格 1+1：切成多条子字幕，每行 <=maxW', () => {
   const en = 'This is a fairly long English subtitle line that definitely exceeds the maximum allowed display width for one single row of subtitle text on screen';
   const zh = '这是一条相当长的中文字幕译文内容，它的显示宽度明显超过了单行所能容纳的最大限制，需要切分处理';
   const rows = [{ no: 1, start: 0, end: 12000, en: en, zh: zh, flag: '' }];
-  const items = C.buildBilingual(rows, { maxW: 24, srcLocale: 'en', dstLocale: 'zh-CN' });
+  // v0.9.94：双语行宽改由独立的 biMaxW 约束（此处显式传 24 以覆盖切分路径）
+  const items = C.buildBilingual(rows, { maxW: 24, biMaxW: 24, srcLocale: 'en', dstLocale: 'zh-CN' });
   console.log('      → 切成 ' + items.length + ' 条');
   assert.ok(items.length >= 2, '长 cue 应被切分');
   items.forEach(it => {
     const lines = it.text.split('\n');
     assert.strictEqual(lines.length, 2, '每条子字幕必须恰好 2 行（源1+译1）: ' + it.text);
-    lines.forEach(l => assert.ok(C.textWidth(l) <= 24.01, '行宽超限: ' + l));
+    // 分档：译文行受 biMaxW 硬约束；源文行跟随语义断点、只受 2 倍兜底（防超屏）
+    assert.ok(C.textWidth(lines[1]) <= 24.01, '译文行超宽: ' + lines[1]);
+    assert.ok(C.textWidth(lines[0]) <= 48.01, '源文行超兜底: ' + lines[0]);
   });
   // 内容完整性：源文、译文拼回应与原文一致（空白差异忽略）
   const srcJoined = items.map(it => it.text.split('\n')[0]).join(' ').replace(/\s+/g, '');
@@ -708,7 +711,8 @@ const MG_ROWS = [
   { no: 17, start: 41478, end: 43987, flag: 'merged', en: 'importance of encouraging\nas many people as possible.', zh: null }
 ];
 t('合并句组双语导出：按原 cue 边界切回，不再等宽重切造新边界', () => {
-  const parts = C.buildBilingualParts(MG_ROWS, { maxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
+  // v0.9.94：显式传 biMaxW=20（否则默认 32 整句装得下、不触发切分）
+  const parts = C.buildBilingualParts(MG_ROWS, { maxW: 20, biMaxW: 20, srcLocale: 'en', dstLocale: 'zh-CN' });
   assert.strictEqual(parts.length, 3, '应输出原 cue 数 3 条: ' + JSON.stringify(parts.map((p) => p.dstLines)));
   assert.strictEqual(parts[0].start, 38793); assert.strictEqual(parts[0].end, 39988);
   assert.strictEqual(parts[1].start, 39988); assert.strictEqual(parts[1].end, 41478);
@@ -739,7 +743,7 @@ t('合并句组单语导出：装得下整句一条，装不下按原 cue 边界
   assert.strictEqual(joined, MG_ROWS[0].zh, '译文拼接零丢失');
 });
 t('合并句组窄宽度（maxW=14）：首边界仍为原 cue 边界，段内细切零丢失', () => {
-  const parts = C.buildBilingualParts(MG_ROWS, { maxW: 14, srcLocale: 'en', dstLocale: 'zh-CN' });
+  const parts = C.buildBilingualParts(MG_ROWS, { maxW: 14, biMaxW: 14, srcLocale: 'en', dstLocale: 'zh-CN' });
   assert.ok(parts.length >= 3, '至少 3 条');
   assert.strictEqual(parts[0].start, 38793); assert.strictEqual(parts[0].end, 39988);
   assert.strictEqual(parts[1].start, 39988, '第 2 条起点应为原边界 39.988');
@@ -751,7 +755,7 @@ t('单 cue 超容量（无 merged）：维持等宽切分不变（回归保护�
   const rows = [{ no: 1, start: 0, end: 6000, flag: '',
     en: 'So, something we were talking about when we were having coffee this morning is the importance of encouraging as many people as possible.',
     zh: '我们今天早上喝咖啡时聊到了一点，就是尽可能多去鼓励大家的重要性。' }];
-  const parts = C.buildBilingualParts(rows, { maxW: 14, srcLocale: 'en', dstLocale: 'zh-CN' });
+  const parts = C.buildBilingualParts(rows, { maxW: 14, biMaxW: 14, srcLocale: 'en', dstLocale: 'zh-CN' });
   assert.ok(parts.length >= 2, '单 cue 超容量仍应切分');
   const joined = parts.map((p) => p.dstLines.join('')).join('').replace(/\s+/g, '');
   assert.strictEqual(joined, rows[0].zh, '译文拼接零丢失');
@@ -1878,7 +1882,7 @@ t('R3 细切不产生 <200ms 子 cue（Mayday ja 实测回归）', () => {
 t('正常比例切分不受 sliver 保护影响（≥200ms 各段逐一致）', () => {
   const rows = [{ start: 33946, end: 34947, en: 'So I got Anderton for her birthday.',
                   zh: 'それで Anderton の誕生日のプレゼントに買ってやったんだ。' }];
-  const parts = C.buildBilingualParts(rows, { maxW: 13, srcLocale: 'en', dstLocale: 'ja' });
+  const parts = C.buildBilingualParts(rows, { maxW: 13, biMaxW: 13, srcLocale: 'en', dstLocale: 'ja' });
   assert.ok(parts.length >= 2, '应正常切分多段');
   parts.forEach(p => assert.ok(p.end - p.start >= 200, '出现 <200ms 子段: ' + (p.end - p.start)));
 });
