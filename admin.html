@@ -355,7 +355,7 @@ $('btnSave').addEventListener('click', async () => {
     await api('/api/admin/config', 'POST', {
       provider: $('provider').value, base, model, key,
       perIpDaily: +$('perIpDaily').value || 0, globalDaily: +$('globalDaily').value || 0,
-      temperature: +$('temperature').value
+      temperature: +$('temperature').value,
       publicUrl: $('publicUrl').value.trim(), analyticsId: $('analyticsId').value.trim()
     });
     $('key').value = '';
