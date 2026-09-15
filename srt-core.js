@@ -291,11 +291,32 @@
     }
     // 5c) 行首助词回避：下一行以助词（的了着过…）开头时，切点再往前挪一个词，
     //     让助词跟它的中心词待在一起（如「…应对 / 的冲击」→「…应对 / 关税的冲击」的兜底路径）。
-    const ASP_FIRST = '的了着过地得吗呢吧啊呀嘛么';
+    //     v0.9.95：补日文格助词/终助词（はがをにでとへものやなねよ）。此前只覆盖中文助词，
+    //     而两条路径不对称：切分路径（splitByDuration 的 NS_SOFT）有日文助词禁则、折行路径
+    //     （findCut）没有 —— 实测日语 12 句 × maxW 12~20 有 6.7% 的次行以格助词起头
+    //     （「重要な決定 ‖ を下しました」「映画を見 ‖ に行きました」）。
+    //     韩语不补：Segmenter('ko') 把「결정을」整块成词，切点进不到助词前，实测 0 违规。
+    const ASP_FIRST = '的了着过地得吗呢吧啊呀嘛么' + 'はがをにでとへものやなねよ';
+    // 日语活用词尾/促音（单字块）：只回退一步会把助词换成词尾 —— 「…驚いていた ‖ のです」
+    // 变成「…驚いてい ‖ たのです」，腰斩了「いた」。故循环回退，直到次行首块不再是附着成分。
+    const TAIL_FIRST = 'たていしますれんっきけ';
     if (bounds && c > 1 && ASP_FIRST.includes(pos[c]) && bounds.has(c) && !inAtom(c)) {
-      let ws2 = c - 1;
-      while (ws2 > 1 && !bounds.has(ws2)) ws2--;
-      if (ws2 >= 1 && bounds.has(ws2) && !inAtom(ws2)) c = ws2;
+      let nx = c + 1; while (nx < n && !bounds.has(nx)) nx++;
+      if (nx === c + 1) {                                // 只处理单字助词块（「確か」等整词不回退）
+        let ws2 = c - 1;
+        while (ws2 > 1 && !bounds.has(ws2)) ws2--;
+        if (ws2 >= 1 && bounds.has(ws2) && !inAtom(ws2)) {
+          // 回退落点本身若是活用词尾/促音块（「…驚いてい ‖ たのです」把「いた」腰斩）
+          // → 得不偿失，放弃回退：宁可让准体助词「の」孤悬，也不拆动词词尾。
+          // 循环回退（试过多达 3 步）会一路退到词干前（「…驚 ‖ いていたのです」），已否决。
+          let nx2 = ws2 + 1; while (nx2 < n && !bounds.has(nx2)) nx2++;
+          const blk2 = pos.slice(ws2, nx2).join('');
+          const badLanding = blk2.length >= 1 && blk2.length <= 3
+            && Array.from(blk2).every((x) => TAIL_FIRST.includes(x));
+          let rw = 0; for (let x = ws2; x < n; x++) rw += charW(pos[x]);
+          if (!badLanding && rw <= maxW + 1e-9) c = ws2;
+        }
+      }
     }
     // 5d) 后移补偿（v0.9.20）：若切点导致剩余超宽（词保护把长词/长合成词整体下移后常见，
     //     如 "de waardering op een koers-|winstverhouding van 170 …" 剩 22.5 > 20 折出第 3 行，
@@ -923,20 +944,26 @@
       }
       return 0;
     };
+    // v0.9.95：Unicode 大小写/词字符判定（西里尔、希腊、带音标拉丁 É/Ü 等一并覆盖）
+    const RE_UPPER = /\p{Lu}/u;
+    const RE_WORDCH = /[\p{L}'\u2019]/u;
     // v0.9.68 多词专名腰斩惩罚（Mayday 21 语言实测：ja/fil 的 "Cabbage | Patch dolls" 被劈两半）：
     // 切点落在两个首字母大写的拉丁词之间（Cabbage|Patch、Red|Hook）几乎必是劈开了多词专名
     // （人名/地名/品牌/作品名）。罚 110 分——足以让位给窗口内相邻词边界（宽度项通常 ≤6），
     // 但不覆盖词边界加分（150）与句子级断点，切点仍可落回词边界；左侧为小写词
     // （of those|Cabbage，专名起点前）或句读（insane.|You）不受罚。
+    // v0.9.95：大小写判定改 Unicode 属性 \p{Lu} —— 原 [A-Z] 只认拉丁，俄语「Иван | Петров」
+    // 这类西里尔专名腰斩完全不设防（希腊文/带音标拉丁 É 同理）。无大小写字母的文字
+    // （中日韩阿泰）不存在 \p{Lu}，行为不变。
     const properMidPenalty = (i) => {
       if (i <= 0 || i >= pos.length) return 0;
-      if (!/[A-Z]/.test(pos[i])) return 0;                 // 右侧须为小写字母前的 Titlecase 词首
+      if (!RE_UPPER.test(pos[i])) return 0;                // 右侧须为 Titlecase 词首
       const prev = pos[i - 1];
       if (prev !== ' ' && prev !== '\u3000') return 0;      // 切点须在词间空格处
       let j = i - 2;
-      while (j >= 0 && /[A-Za-z'’]/.test(pos[j])) j--;
+      while (j >= 0 && RE_WORDCH.test(pos[j])) j--;         // v0.9.95：\p{L} 认西里尔/带音标字母
       if (j === i - 2) return 0;                           // 左侧无词（连续空格/句读）
-      return /[A-Z]/.test(pos[j + 1]) ? 110 : 0;           // 左侧词同样大写开头 → 专名内部，罚
+      return RE_UPPER.test(pos[j + 1]) ? 110 : 0;          // 左侧词同样大写开头 → 专名内部，罚
     };
     for (let k = 1; k < n; k++) {
       const target = (dur.slice(0, k).reduce((a, b) => a + b, 0) / total) * W;

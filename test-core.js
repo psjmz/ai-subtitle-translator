@@ -290,6 +290,33 @@ t('v0.9.50 日文格助词不起行', () => {
   assert.strictEqual(pieces.join(''), ja, '译文零丢失');
 });
 
+console.log('— v0.9.95 折行路径补日文禁则 / 西里尔专名 —');
+t('v0.9.95 折行路径日文格助词不起行（findCut 5c 此前只认中文助词）', () => {
+  const part = 'はがをにでとへも';
+  const cases = [
+    ['彼は昨日会議で重要な決定を下しました', 15],
+    ['私は友達と一緒に映画を見に行きました', 15],
+    ['彼らは市場の変化を予測することができた', 15],
+  ];
+  for (const [ja, w] of cases) {
+    const lines = C.wrapToWidth(ja, w, { normalize: true, locale: 'ja' });
+    console.log('      → ' + lines.join(' / '));
+    assert.ok(lines.length >= 2, '应折成两行: ' + JSON.stringify(lines));
+    const second = (lines[1] || '').trim();
+    assert.ok(!part.includes(second[0]), '次行行首不得为格助词: ' + JSON.stringify(lines));
+  }
+});
+t('v0.9.95 西里尔多词专名不腰斩（properMidPenalty 改 \\p{Lu}）', () => {
+  const ru = 'Вчера утром Иван Петров принял важное решение на собрании';
+  const bad = [];
+  for (let r = 0.2; r <= 0.8; r += 0.05) {
+    const times = [{ start: 0, end: r * 4000 }, { start: r * 4000, end: 4000 }];
+    const parts = C.splitByDuration(ru, times, { locale: 'ru' });
+    if ((parts[0] || '').trim().endsWith('Иван')) bad.push(parts.join(' ‖ '));
+  }
+  assert.strictEqual(bad.length, 0, '不得在 Иван|Петров 之间切: ' + bad.join(' ; '));
+});
+
 console.log('— 词边界保护（Intl.Segmenter 分词）—');
 // 通用校验：折行的每个切点都必须落在词边界上（不劈词）
 function assertNoWordSplit(src, ls, locale) {
