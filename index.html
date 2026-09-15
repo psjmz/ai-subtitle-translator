@@ -396,7 +396,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.96</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.97</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -550,7 +550,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.96</span>
+    <span class="ver-tag">v0.9.97</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -719,7 +719,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.96"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.97"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -3548,11 +3548,15 @@ async function runTranslate(){
         try{
           lastCall=Date.now();
           const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sys,null,ctx);
-          // 锚定失败且还有重试机会：丢弃本次结果重试；最后一次仍失败则接受结果（内容仍可用，仅语言跑偏）
-          if(out.badAnchor && out.badAnchor.length && attempt<maxTry-1){
-            log(t('batchFail',bi+1,attempt+1,t('anchorFail',out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':''),LBY(cfg.dst).zh)),'err');
-            await new Promise(r=>setTimeout(r,1500));
-            continue;
+          /* v0.9.97：锚定失败不再整批盲重发，只记录一次，随即落到下方「单组隔离重译」通道。
+             理由：批级三次调用的 feedback 参数恒为 null（本文件 3550 行），三次请求体完全一致，
+             模型根本不知道自己上一轮跑偏了；v0.9.57 的实测注释（3088 行）记录「批级重试 +
+             单组盲重发 ×2 全部复现同样的混合输出」，即盲重发对跑偏零效果。真正修好跑偏的是下方
+             单组隔离通道（a=0 盲发一次、a=1 把跑偏译文喂回模型做纠错）。
+             成本：单批从最多 3 个整批请求降到 1 个整批 + 少量单组请求。
+             注意：网络错误 / 429 的重试在下方 catch 分支，与此处无关，保持原样。 */
+          if(out.badAnchor && out.badAnchor.length){
+            log(t('batchFail',bi+1,1,t('anchorFail',out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':''),LBY(cfg.dst).zh)),'err');
           }
           // v0.9.47：音乐组 drop → 单组隔离重译一次；v0.9.82：勾选「去除水词」时模型 drop 与用户意图一致，直接跳过
           // v0.9.85：合并重译——该批全部 drop 组打包成 1 次请求（此前每组 1 次，极端时 55 组=55 次往返）；
@@ -3594,23 +3598,41 @@ async function runTranslate(){
               const g1=gBatch.find(x=>x.gno===gno);
               let fixed=false;
               if(g1){
-                const badTexts=[String((out.byGno[gno]||{}).text||'').trim()].filter(Boolean);
+                /* v0.9.97：跑偏原文必须连 cue 对齐格式一起收——v0.9.66 起模型默认输出 cues
+                   （校验通过时 m.cues 被清空、只留 cueTexts，m.text 恒为空），此前 badTexts 取
+                   不到任何内容，于是 a=1 的纠错反馈永远为空，"第 2 次纠错重译"实际又是一次盲发，
+                   正解释了 v0.9.57 注释里「单组盲重发 ×2 全部复现同样输出」的现象。 */
+                const badTexts=[];
+                (function(m){
+                  if(!m) return;
+                  const t=String(m.text||'').trim(); if(t) badTexts.push(t);
+                  if(m.cueTexts && m.cueTexts.size) m.cueTexts.forEach(v=>{ const x=String(v||'').trim(); if(x) badTexts.push(x); });
+                  else if(Array.isArray(m.cues)) m.cues.forEach(c=>{ const x=String((c&&c.text)||'').trim(); if(x) badTexts.push(x); });
+                })(out.byGno[gno]);
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbArr=(a===1&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
                     const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx,2);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
+                    // v0.9.97：cue 对齐格式（cueTexts 或 cues 有文）同样算"已修复"，判据与上方 drop
+                    // 救援通道的 cueAny 对齐。此前只认 m2.text，而 cue 格式下 text 恒空 → 整条隔离
+                    // 救援对 v0.9.66 起的默认输出格式全程无效（实测 5/5 组落到「已按原样保留」）
                     if(!o2.badAnchor || !o2.badAnchor.length){
                       const m2=o2.byGno&&o2.byGno[gno];
-                      if(m2 && String(m2.text||'').trim()){
+                      const cueAny2 = m2 && ((m2.cueTexts && m2.cueTexts.size)
+                        || (Array.isArray(m2.cues) && m2.cues.some(c=>String((c&&c.text)||'').trim())));
+                      if(m2 && (String(m2.text||'').trim() || cueAny2)){
                         out.byGno[gno]=m2;
                         o2.fillers.forEach(no=>fillerSet.add(no));
                         fixed=true;
                       }
                     } else {
-                      const bt=String(((o2.byGno||{})[gno]||{}).text||'').trim();
+                      const bm=(o2.byGno||{})[gno]||{};
+                      const bt=String(bm.text||'').trim();
                       if(bt && !badTexts.includes(bt)) badTexts.push(bt);
+                      if(bm.cueTexts && bm.cueTexts.size) bm.cueTexts.forEach(v=>{ const x=String(v||'').trim(); if(x && !badTexts.includes(x)) badTexts.push(x); });
+                      else if(Array.isArray(bm.cues)) bm.cues.forEach(c=>{ const x=String((c&&c.text)||'').trim(); if(x && !badTexts.includes(x)) badTexts.push(x); });
                     }
                   }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
                 }
