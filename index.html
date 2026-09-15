@@ -396,7 +396,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.95</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.96</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -550,7 +550,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.95</span>
+    <span class="ver-tag">v0.9.96</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -595,7 +595,8 @@
       <div class="hint" id="termsHint" style="margin-top:4px"></div>
       <label data-i18n="lblTerms">需强制保留原文的专名（可留空，逗号分隔）</label>
       <input type="text" id="terms" placeholder="如：SpaceX, Prism, EnduroSat" data-i18n-ph="termsPh">
-      <label class="tgl-row"><span class="l"><span data-i18n="lblAutoTermsShort">自动术语表</span><i class="info" data-tip-i18n="chkAutoTerms">i</i></span><input type="checkbox" id="autoTerms" checked><span class="tgl"></span></label>
+      <label class="tgl-row"><span class="l"><span data-i18n="lblAutoTermsShort">自动术语表</span><i class="info" data-tip-i18n="chkAutoTerms">i</i></span><!-- v0.9.96：默认关闭。术语提取每次额外发最多 20000 字符原文，约占单文件成本 26~36% -->
+      <input type="checkbox" id="autoTerms"><span class="tgl"></span></label>
       <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
       <input type="number" id="maxW" value="21" min="8" max="48">
       <!-- v0.9.95：双语专用行宽（只约束译文行），与单语折行阈值解耦 -->
@@ -718,7 +719,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.95"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.96"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2409,7 +2410,7 @@ const I18N = {
   /* v0.9.70 两段式界面新增 */
 }
 };
-const UI = { lang:'zh-CN', langManual:false, dstManual:false };
+const UI = { lang:'zh-CN', langManual:false, dstManual:false, autoTermsSet:false };
 function t(k){
   const d = I18N[UI.lang] || I18N['zh-CN'];
   let s = (k in d) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
@@ -4268,6 +4269,7 @@ function save(){
     srcLang:$('srcLang').value, style:style,
     styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0',
     autoTerms:$('autoTerms').checked?'1':'0',
+    autoTermsSet:(UI.autoTermsSet||sv.autoTermsSet==='1')?'1':'0',
     expStyle:expStyle()
   };
   /* v0.9.53：折行阈值只在用户手动改过时才记忆——语言感知联动值（中文16/日文13）若被写入
@@ -4374,10 +4376,14 @@ function termsUI(){
   $('termsHint').textContent = on ? t('termsHintOn') : t('termsHintOff');
 }
 $('keepTerms').checked = sv.keepTerms!=='0';
-$('autoTerms').checked = sv.autoTerms!=='0';
+/* v0.9.96：自动术语表默认关闭（详见上方开关处注释）。
+   一次性迁移——老用户 localStorage 里的 '1' 多半是历史默认值或被任意一次 save() 顺带写入的，
+   并非主动选择，统一置为关闭；此后用户手动开/关会写入 autoTermsSet，迁移不再干预。 */
+if (sv.autoTermsSet !== '1') sv.autoTerms = '0';
+$('autoTerms').checked = sv.autoTerms === '1';
 termsUI();
 $('keepTerms').addEventListener('change',()=>{ termsUI(); save(); });
-$('autoTerms').addEventListener('change',()=>{ save(); });
+$('autoTerms').addEventListener('change',()=>{ UI.autoTermsSet=true; save(); });
 
 /* 语言/格式切换联动：列头 + 导出文件名 */
 function autoOutName(){
