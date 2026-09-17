@@ -253,9 +253,18 @@
 
   .main{flex:1;display:grid;grid-template-columns:248px minmax(0,1fr) 258px;gap:14px;padding:14px 16px 20px;align-items:start}
   .panel{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 16px 20px}
-  .sec-title{font-size:11px;font-weight:800;color:#9C9AA0;letter-spacing:1.2px;margin:18px 0 8px;text-transform:uppercase;display:flex;align-items:center}
+  /* v0.9.106：模块标题升级为彩色图标徽章 + 渐隐分隔线 */
+  .sec-title{font-size:11.5px;font-weight:800;color:var(--sub);letter-spacing:1.1px;margin:22px 0 10px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
   .sec-title:first-child{margin-top:0}
-  .sec-title svg{width:11px;height:11px;margin-right:5px;opacity:.75}
+  .sec-title::after{content:'';flex:1;height:1px;margin-left:2px;background:linear-gradient(90deg,var(--line),rgba(232,231,228,0))}
+  .sec-ic{width:24px;height:24px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .sec-ic svg{width:13px;height:13px;opacity:1}
+  .sec-ic.c1{background:#FDEDF4;color:#EC4899}
+  .sec-ic.c2{background:#F1EBFE;color:#8B5CF6}
+  .sec-ic.c3{background:#FFF0E3;color:#F97316}
+  .sec-ic.c4{background:#EDFBF4;color:#10B981}
+  .sec-ic.c5{background:#E8F1FE;color:#3B82F6}
+  .sec-ic.c6{background:#EEF0FE;color:#6366F1}
   .flbl{display:flex;align-items:center;font-size:11.5px;color:var(--sub);margin:10px 0 4px;letter-spacing:.2px}
   .flbl .info{margin-left:5px}
 
@@ -355,10 +364,10 @@
 
   /* 左栏日志折叠盒 */
   details.logbox{margin-top:18px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  details.logbox summary{cursor:pointer;font-size:11px;font-weight:800;color:#9C9AA0;letter-spacing:1.2px;text-transform:uppercase;padding:9px 12px;background:#F5F4F2;list-style:none;display:flex;align-items:center}
+  details.logbox summary{cursor:pointer;font-size:11px;font-weight:800;color:#9C9AA0;letter-spacing:1.2px;text-transform:uppercase;padding:8px 12px;background:#F5F4F2;list-style:none;display:flex;align-items:center;gap:7px}
   details.logbox summary::after{content:'▸';margin-left:auto;transition:.15s}
   details.logbox[open] summary::after{transform:rotate(90deg)}
-  details.logbox summary svg{width:11px;height:11px;margin-right:5px;opacity:.75}
+  details.logbox summary svg{width:12px;height:12px;opacity:.8}
   .log{max-height:150px;overflow:auto;background:var(--card-2);border-top:1px solid var(--line);
     padding:8px 12px;font-size:11.5px;color:var(--sub);white-space:pre-wrap;font-family:var(--mono);line-height:1.6;border-radius:0}
   .log .err{color:var(--del)} .log .okc{color:var(--ok)}
@@ -411,7 +420,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.105</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.106</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -565,7 +574,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.105</span>
+    <span class="ver-tag">v0.9.106</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -577,7 +586,7 @@
   <div class="main">
     <!-- 左：设置面板 -->
     <aside class="panel">
-      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-6 6 6-6 6 6M4 20h16"/></svg><span data-i18n="secImport">导入字幕</span></div>
+      <div class="sec-title"><i class="sec-ic c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-6 6 6-6 6 6M4 20h16"/></svg></i><span data-i18n="secImport">导入字幕</span></div>
       <div class="btns" style="margin-top:0">
         <button class="btn sm" id="btnFile" data-i18n="btnFile" type="button">📂 选择字幕文件</button>
         <button class="btn sm ghost" id="btnDemo" data-i18n="btnDemo" type="button">载入示例</button>
@@ -587,13 +596,13 @@
       <div class="btns"><button class="btn sm" id="btnParse" data-i18n="btnParse" type="button">解析字幕</button></div>
       <div class="hint" id="parseInfo"></div>
 
-      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg><span data-i18n="secLang">语言</span></div>
+      <div class="sec-title"><i class="sec-ic c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg></i><span data-i18n="secLang">语言</span></div>
       <label class="flbl"><span data-i18n="lblSrcShort">原文语言</span><i class="info" data-tip-i18n="lblSrcLang">i</i></label>
       <select id="srcLang"></select>
       <label class="flbl" data-i18n="lblDstShort">目标语言</label>
       <select id="dstLang"></select>
 
-      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg><span data-i18n="secStyle">翻译风格</span></div>
+      <div class="sec-title"><i class="sec-ic c3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></i><span data-i18n="secStyle">翻译风格</span></div>
       <div class="style-chips">
         <label class="schip"><input type="radio" name="style" value="elegant" checked><span data-i18n="styleElegant">均衡</span></label>
         <label class="schip"><input type="radio" name="style" value="plain"><span data-i18n="stylePlain">口语自然</span></label>
@@ -605,7 +614,7 @@
         placeholder="描述你想要的口吻，如：轻松幽默、像给朋友讲故事" data-i18n-ph="styleCustomPh">
       <div class="hint" id="styleHint"></div>
 
-      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-i18n="secRules">处理规则</span></div>
+      <div class="sec-title"><i class="sec-ic c4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></i><span data-i18n="secRules">处理规则</span></div>
       <label class="tgl-row"><span class="l"><span data-i18n="lblKeepTermsShort">专名保留原文</span><i class="info" data-tip-i18n="chkKeepTerms">i</i></span><input type="checkbox" id="keepTerms" checked><span class="tgl"></span></label>
       <div class="hint" id="termsHint" style="margin-top:4px"></div>
       <label data-i18n="lblTerms">需强制保留原文的专名（可留空，逗号分隔）</label>
@@ -623,7 +632,7 @@
       <!-- v0.9.100：ASS 导出外观（字号/颜色/离底距离）。整组只在导出格式为 ASS 时显示，
            否则 SRT/VTT/TXT 用户会看到对自己无效的设置。 -->
       <div id="assStyleBox" style="display:none">
-        <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg><span data-i18n="secAssStyle">ASS 字幕样式</span></div>
+        <div class="sec-title"><i class="sec-ic c5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></i><span data-i18n="secAssStyle">ASS 字幕样式</span></div>
         <label class="flbl"><span data-i18n="lblAssDstSize">译文字号</span></label>
         <input type="number" id="assDstSize" value="56" min="24" max="120" step="2">
         <label class="flbl"><span data-i18n="lblAssSrcSize">原文字号</span></label>
@@ -662,7 +671,7 @@
       <!-- v0.9.78：去水词开关——默认开（既有行为）；关闭后水词行保留原文 -->
       <label class="tgl-row"><span class="l"><span data-i18n="lblDropFillers">去除水词</span><i class="info" data-tip-i18n="dropFillersTip">i</i></span><input type="checkbox" id="dropFillers" checked><span class="tgl"></span></label>
 
-      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg><span data-i18n="secEngine">翻译引擎</span></div>
+      <div class="sec-title"><i class="sec-ic c6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></i><span data-i18n="secEngine">翻译引擎</span></div>
       <label class="flbl" data-i18n="lblMode">工作模式</label>
       <select id="mode">
         <option value="builtin" data-i18n="optBuiltin">默认模型（站点提供，无需 Key）</option>
@@ -695,7 +704,7 @@
       <div class="hint" data-i18n="hintPrivacy">默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。</div>
 
       <details class="logbox">
-        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i18n="logTitle">运行日志</span></summary>
+        <summary><i class="sec-ic" style="width:20px;height:20px;border-radius:6px;background:#ECEAE8;color:#8B888F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></i><span data-i18n="logTitle">运行日志</span></summary>
         <div class="log" id="log" data-i18n="logReady">就绪。导入字幕或载入示例开始。</div>
       </details>
     </aside>
@@ -743,7 +752,7 @@
 
     <!-- 右：导出 -->
     <aside class="panel">
-      <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="stepExport">导出译文</span></div>
+      <div class="sec-title"><i class="sec-ic c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></i><span data-i18n="stepExport">导出译文</span></div>
       <div class="exp-preview">
         <div class="ep-line ep-dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</div>
         <div class="ep-line ep-src">♪ Love is in the air ♪</div>
@@ -765,7 +774,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.105"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.106"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
