@@ -2178,5 +2178,62 @@ t('未知语言回落到拉丁推荐值 76', () => {
   assert.strictEqual(C.recAssSize('xx', 'auto', {maxW:21}).dstSize, 76);
 });
 
+// ---------------- v0.9.108：双行堆叠按墨迹定位 ----------------
+// 测试里自带一份几何常量（与 srt-core.js 的 BOX_DESC / INK_DESC / ASS_STACK_GAP 对应），
+// 用来反算「两行墨迹的实际间隙」，验证不是按行框堆叠。
+const BOX_DESC = 0.22, INK_DESC_CJK = 0.08, INK_DESC_LATIN = 0.21, STACK_GAP = 12;
+const inkDescOfT = (l) => ['zh-CN','zh-TW','ja','ko'].includes(l) ? INK_DESC_CJK : INK_DESC_LATIN;
+
+t('assStackMV：精确值（下方贴底 42、单行的典型组合）', () => {
+  const cases = [
+    // [下方号/语言, 上方号/语言, 期望 mv]：旧逻辑（行框 + 8）一并列出便于对照
+    ['en', 48, 'zh-CN', 56, 83],   // 中文译文在上、英文原文在下：旧 107，收紧 24
+    ['zh-CN', 56, 'en', 48, 117],  // 英文原文在上、中文译文在下：旧 116（原本就贴合，基本不变）
+    ['en', 76, 'zh-CN', 28, 108],  // 英文译文在下、中文原文在上：旧 140，收紧 32
+    ['zh-CN', 28, 'en', 76, 85],   // 中文原文在下、英文译文在上：旧 75（中文墨迹饱和，略抬高给英文下伸）
+    ['en', 48, 'en', 76, 90]       // 同为拉丁（两个 0.21 下伸互相抵消，接近行框堆叠）
+  ];
+  cases.forEach(([bl, bs, tl, ts, want]) => {
+    const got = C.assStackMV({bottomMV:42, bottomSize:bs, bottomLang:bl,
+                              bottomLines:1, topSize:ts, topLang:tl});
+    assert.strictEqual(got, want, bl + bs + ' 在下 / ' + tl + ts + ' 在上 → mv ' + got + ' 应为 ' + want);
+  });
+});
+
+t('assStackMV：两行墨迹间隙恒为 12px（不再按行框堆叠）', () => {
+  const langs = LANGS22.concat(['auto']);
+  for (const bl of langs) for (const tl of langs) for (const bs of [28, 48, 56, 76]) for (const ts of [28, 48, 56, 76]) {
+    const mv = C.assStackMV({bottomMV:42, bottomSize:bs, bottomLang:bl,
+                             bottomLines:1, topSize:ts, topLang:tl});
+    // 反算墨迹间隙：上方墨迹底 − 下方墨迹顶
+    const topInkBott = mv + BOX_DESC * ts - inkDescOfT(tl) * ts;
+    const botInkTop = 42 + BOX_DESC * bs + inkOf(bl) * bs;
+    const gap = topInkBott - botInkTop;
+    assert.ok(Math.abs(gap - STACK_GAP) <= 1.5,
+      bl + bs + '/' + tl + ts + ' 墨迹间隙 ' + gap.toFixed(1) + ' 应≈' + STACK_GAP);
+    // 上方块整体必须仍在下方块之上（允许行框重叠，那是字体留白）
+    assert.ok(mv > 42, bl + bs + '/' + tl + ts + ' 上方块 mv ' + mv + ' 不该低于贴底值');
+  }
+});
+
+t('assStackMV：下方块每多一行，上方块正好抬高一个行高', () => {
+  const base = C.assStackMV({bottomMV:42, bottomSize:48, bottomLang:'en',
+                             bottomLines:1, topSize:56, topLang:'zh-CN'});
+  for (const n of [2, 3]) {
+    const mv = C.assStackMV({bottomMV:42, bottomSize:48, bottomLang:'en',
+                             bottomLines:n, topSize:56, topLang:'zh-CN'});
+    const delta = mv - base - (n - 1) * C.assLineHeight(48);
+    assert.ok(Math.abs(delta) <= 1, 'n=' + n + ' 抬高量偏差 ' + delta);
+  }
+});
+
+t('assStackMV：缺参/异常参数不炸，且结果落在 1~1080', () => {
+  [undefined, {}, {bottomMV:0}, {bottomMV:'42', bottomLines:0}, {bottomSize:0, topSize:0}]
+    .forEach(o => {
+      const v = C.assStackMV(o);
+      assert.ok(Number.isFinite(v) && v >= 1 && v <= 1080, JSON.stringify(o) + ' → ' + v);
+    });
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

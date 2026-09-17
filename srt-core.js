@@ -665,6 +665,38 @@
     return { dstSize: dst, srcSize: srcSize };
   }
 
+  /* ---------------- v0.9.108：双行堆叠按「可见墨迹」而非行框留白定位 ----------------
+     问题：assLineHeight = 1.18 x size 是「行框」高，框内 baseline 上下压着大量字体留白
+     （拉丁小写只占中间 54.5%、汉字占 91.5%）。旧逻辑把上方行的行框底压在「下方行行框顶 + 8px」上，
+     于是两行的墨迹之间凭空空出一大条缝——实测 zh->en（中文译文 56 在上、英文原文 48 在下）
+     墨迹间隙约 36px，1080p 下是一条明显的裂缝，观感就是「两行离得太远」。
+     修法：以上方块墨迹的**下沿**贴着下方块墨迹的**上沿**，中间只留 ASS_STACK_GAP(12px)。
+       mv_top = 下方块墨迹顶距底 + 上方块下伸 - 上方块框底距 + GAP
+     模型误差（真实字体 descent 与 BOX_DESC 0.22 的差）在上下两块同向出现、基本抵消，
+     所以不必知道用户最终用哪款字体。 */
+  const BOX_DESC = 0.22;     // baseline 到行框底的距离（/em），与 assLineHeight = 1.18 配套
+  const INK_DESC = {         // baseline 下方的墨迹深度（/em）：拉丁 g/y/p/q 有下伸，汉字几乎没有
+    'zh-CN': 0.08, 'zh-TW': 0.08, 'ja': 0.08, 'ko': 0.08,
+    _default: 0.21
+  };
+  const ASS_STACK_GAP = 12;  // 两行墨迹之间想要留下的空隙（1080p px）
+  function inkDescOf(lang) { return INK_DESC[lang] || INK_DESC._default; }
+  /* 双行堆叠时「上方那块」的离底距离（MarginV）。
+     o: {bottomMV, bottomSize, bottomLang, bottomLines, topSize, topLang, gap?}
+        bottomLang / topLang 传 'auto' 会按拉丁估（本站源字幕绝大多数是拉丁书写系统）。 */
+  function assStackMV(o) {
+    o = o || {};
+    const gap = o.gap == null ? ASS_STACK_GAP : o.gap;
+    const bSz = Math.max(1, +o.bottomSize || 56), tSz = Math.max(1, +o.topSize || 56);
+    const n = Math.max(1, Math.round(+o.bottomLines || 1));
+    // 下方块 n 行（an2 底部对齐，第 1 行在最上）：最上面那行的墨迹顶距底
+    const bottomInkTop = (+o.bottomMV || 0) + (n - 1) * assLineHeight(bSz) +
+      BOX_DESC * bSz + inkRatioOf(o.bottomLang) * bSz;
+    // 上方块：墨迹底距底 = MarginV + BOX_DESC*size - INK_DESC*size
+    return Math.max(1, Math.min(1080,
+      Math.round(bottomInkTop + inkDescOf(o.topLang) * tSz - BOX_DESC * tSz + gap)));
+  }
+
   // 生成带样式分层的 ASS 文件（1080p 基准，可直压视频 / 进 Aegisub 二次编辑）。
   // events：[{start,end,lines:[{style,text,mv?}]}]
   // 样式按「角色 × 位置」正交（v0.9.35：字号跟角色走，位置跟模式走——译文恒为主阅读样式）：
@@ -2155,7 +2187,7 @@
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
     parseSbv, formatSbv, fmtTimeSbv,
-    parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight,
+    parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
