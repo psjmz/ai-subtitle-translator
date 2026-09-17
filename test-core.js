@@ -2095,5 +2095,67 @@ t('formatSbv 往返一致', () => {
   assert.ok(/^0:00:01\.000,0:00:03\.000\nHi\n\n0:00:04\.000,0:00:05\.500\nYo\n$/.test(out), 'SBV 输出格式应为 YouTube 惯例');
 });
 
+
+console.log('— v0.9.105 ASS 推荐字号（按书写系统字形高度补偿）—');
+const LANGS22 = ['en','zh-CN','zh-TW','ja','ko','fr','de','es','pt','it','ru','ar','th','vi','id','hi','tr','pl','nl','ms','fil','fa'];
+const MAXW_LANG = { 'zh-CN':16,'zh-TW':16,'ja':13,'ko':16 };
+const INK = C.INK_RATIO;
+const inkOf = (l) => (!l || l === 'auto' || typeof INK[l] !== 'number') ? INK._default : INK[l];
+t('共 22 种语言都有推荐值（漏一个就会静默回落到 76）', () => {
+  const miss = LANGS22.filter(l => typeof C.REC_ASS_SIZE[l] !== 'number');
+  assert.deepStrictEqual(miss, [], '缺推荐值: ' + miss.join(','));
+});
+t('中文锚点仍是 56（只向上补偿，绝不缩小任何一种语言）', () => {
+  ['zh-CN','zh-TW','ja','ko'].forEach(l => {
+    assert.strictEqual(C.REC_ASS_SIZE[l], 56, l);
+    assert.strictEqual(C.recAssSize(l, 'auto', {maxW:16}).dstSize, 56, l);
+  });
+});
+t('拉丁/西里尔译文字号 76、波斯最大 78', () => {
+  ['en','fr','de','es','pt','it','ru','id','tr','pl','nl','ms','fil'].forEach(l =>
+    assert.strictEqual(C.recAssSize(l, 'zh-CN', {maxW:21}).dstSize, 76, l));
+  assert.strictEqual(C.recAssSize('fa', 'zh-CN', {maxW:21}).dstSize, 78);
+});
+t('原文视觉高度 = 译文视觉高度 x 0.893（跨书写系统也保证译文是主阅读行）', () => {
+  for (const d of LANGS22) for (const s of LANGS22.concat(['auto'])) {
+    const mw = MAXW_LANG[d] || 21;
+    const r = C.recAssSize(d, s, {maxW: mw});
+    const dVis = r.dstSize * inkOf(d);
+    const sVis = r.srcSize * inkOf(s);
+    assert.ok(Math.abs(sVis / dVis - 0.893) < 0.03, d + '/' + s + ' 视觉比 ' + (sVis / dVis).toFixed(3) + ' 偏离 0.893');
+    assert.ok(sVis < dVis, d + '/' + s + ' 原文视觉不该超过译文');
+  }
+});
+t('非 CJK 语言的视觉高度被补到中文的 75%~100%', () => {
+  const zhVis = 56 * INK['zh-CN'];
+  LANGS22.forEach(l => {
+    const r = C.recAssSize(l, 'auto', {maxW: MAXW_LANG[l] || 21});
+    const vis = r.dstSize * inkOf(l);
+    const ratio = vis / zhVis;
+    assert.ok(ratio >= 0.75 && ratio <= 1.0, l + ' 视觉高度占中文 ' + (ratio * 100).toFixed(0) + '%');
+  });
+});
+t('行宽封顶：maxW 越大，推荐字号被压得越小（一行不超出 1800px）', () => {
+  [21, 24, 32, 48].forEach(mw => {
+    LANGS22.forEach(l => {
+      const r = C.recAssSize(l, 'zh-CN', {maxW: mw});
+      assert.ok(r.dstSize * mw <= 1800, l + ' maxW=' + mw + ' 行宽 ' + (r.dstSize * mw) + ' > 1800');
+      assert.ok(r.dstSize >= 24, l + ' 字号下限 24');
+    });
+  });
+  assert.strictEqual(C.recAssSize('fa', 'zh-CN', {maxW:24}).dstSize, 75, 'maxW=24 时应压到 75');
+});
+t('缺参/异常参数不炸（maxW 为 0、空、字符串）', () => {
+  const r = C.recAssSize('en', 'zh-CN');
+  assert.ok(r.dstSize >= 24 && r.srcSize >= 24);
+  [undefined, {}, {maxW:0}, {maxW:'21'}].forEach(o => {
+    const x = C.recAssSize('th', 'auto', o);
+    assert.ok(Number.isFinite(x.dstSize) && Number.isFinite(x.srcSize), JSON.stringify(o));
+  });
+});
+t('未知语言回落到拉丁推荐值 76', () => {
+  assert.strictEqual(C.recAssSize('xx', 'auto', {maxW:21}).dstSize, 76);
+});
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

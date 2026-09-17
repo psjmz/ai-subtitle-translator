@@ -607,6 +607,44 @@
     return Math.round((isFinite(n) && n > 0 ? n : 56) * 1.18);
   }
 
+  // ---------------- v0.9.105：按语言推荐 ASS 字号 ----------------
+  // 问题：Style 的 Fontsize 定的是 em 框，不是肉眼看到的字。汉字几乎撑满 em 框，拉丁小写只有一半，
+  // 同一个 pt 下非中文要矮掉四成——中文用户觉得 56pt 刚好，英语看起来就偏小。
+  // INK_RATIO = 字符实际墨迹高度 / 字号。实测方法：100px 字体栈 "PingFang SC"/"Helvetica Neue"/Arial，
+  //   逐字符取 measureText(ch).actualBoundingBoxAscent + Descent，滤掉标点与空白后取中位数。
+  const INK_RATIO = {
+    'zh-CN': 0.915, 'zh-TW': 0.907, 'ja': 0.861, 'ko': 0.874,
+    'vi': 0.712, 'hi': 0.645, 'ar': 0.610, 'th': 0.574, 'fa': 0.521,
+    _default: 0.545   // 拉丁 / 西里尔等半高书写系统（en fr de es pt it ru id tr pl nl ms fil）
+  };
+  // 推荐译文号：以「简体中文 56pt 的视觉高度」为锚，把其他书写系统补到它的 80%。
+  // 补满（100%）需要英语 94pt，而 ASS 一行宽度 = 行宽(maxW，单位 em) x 字号，必须 <= 画面可用宽
+  // 1920 - MarginL/R 60x2 = 1800px（maxW=21 时字号硬上限 85pt），补满必然溢出，故取 80%。
+  // CJK 一律维持 56：已被用户确认为合适，且这里只做「向上补偿」，不缩小任何一种语言。
+  const REC_ASS_SIZE = {
+    'zh-CN': 56, 'zh-TW': 56, 'ja': 56, 'ko': 56,
+    'vi': 58, 'hi': 64, 'ar': 68, 'th': 72, 'fa': 78,
+    'en': 76, 'fr': 76, 'de': 76, 'es': 76, 'pt': 76, 'it': 76, 'ru': 76,
+    'id': 76, 'tr': 76, 'pl': 76, 'nl': 76, 'ms': 76, 'fil': 76
+  };
+  const ASS_AVAIL_W = 1800;    // PlayResX 1920 - MarginL/R 60 x 2，超过则 ASS 自动折行
+  const SRC_VIS_RATIO = 0.893; // 原文视觉高度 / 译文视觉高度 = 旧默认 50/56，保留既有主次关系
+  function inkRatioOf(lang) { return INK_RATIO[lang] || INK_RATIO._default; }
+  function recAssSize(dstLang, srcLang, opts) {
+    opts = opts || {};
+    const maxW = +(opts.maxW || 0);
+    const cap = maxW > 0 ? Math.max(24, Math.min(200, Math.floor(ASS_AVAIL_W / maxW))) : 200;
+    const clamp = (n) => Math.max(24, Math.min(cap, Math.round(n / 2) * 2));
+    const dR = inkRatioOf(dstLang);
+    // 源语言未指定（auto）时按拉丁估：本站绝大多数源字幕是拉丁书写系统
+    const sR = inkRatioOf(srcLang === 'auto' ? '_default' : srcLang);
+    const dst = clamp(Math.min(REC_ASS_SIZE[dstLang] || 76, cap));
+    // 原文行按「视觉高度 = 译文视觉高度 x 0.893」反算出来，而不是固定字号：
+    // 固定 50 在中译英时会出现英文原文（0.545x50）比中文译文更醒目的倒挂。
+    const srcSize = clamp(dst * dR * SRC_VIS_RATIO / sR);
+    return { dstSize: dst, srcSize: srcSize };
+  }
+
   // 生成带样式分层的 ASS 文件（1080p 基准，可直压视频 / 进 Aegisub 二次编辑）。
   // events：[{start,end,lines:[{style,text,mv?}]}]
   // 样式按「角色 × 位置」正交（v0.9.35：字号跟角色走，位置跟模式走——译文恒为主阅读样式）：
@@ -2098,6 +2136,7 @@
     parseVtt, formatVtt, fmtTimeVtt,
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight,
+    recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,
