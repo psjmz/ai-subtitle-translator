@@ -626,14 +626,21 @@
     const DST_C  = RE_ASS_COLOR.test(String(AS.dstColor || '')) ? String(AS.dstColor) : '&H00FFFFFF';
     const SRC_C  = RE_ASS_COLOR.test(String(AS.srcColor || '')) ? String(AS.srcColor) : '&H0000D7FF';
     const MV     = Math.max(0, Math.min(400, Math.round(numOr(AS.marginV, 42))));
+    // v0.9.102：译文 / 原文各自的「离底边距离」（1080p 基准）。未给时沿用单一 marginV，
+    // 因此只传 marginV 的老调用输出不变。
+    const DST_MV = Math.max(0, Math.min(1080, Math.round(numOr(AS.dstMV, MV))));
+    const SRC_MV = Math.max(0, Math.min(1080, Math.round(numOr(AS.srcMV, MV))));
     const ML     = Math.max(0, Math.min(600, Math.round(numOr(AS.marginL, 60))));
     const OUTL   = Math.max(0, Math.min(10, numOr(AS.outline, 2.5)));
     const STYLE_FMT = 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding';
     // 样式行模板（v0.9.35 分工不变：字号跟角色走、位置跟模式走）
-    const styleLine = (name, size, color, align, bold) =>
+    // v0.9.102：贴底的两块各用各的离底距离（Bottom=译文 / Sub=原文）。
+    // Top / TopMain 是顶部对齐（an8），MarginV 语义为「距顶边」，真实位置由每条 Dialogue
+    // 的 mv 逐条覆盖，故样式值继续沿用 MV 兜底。
+    const styleLine = (name, size, color, align, bold, mv) =>
       'Style: ' + name + ',' + FONT + ',' + size + ',' + color +
       ',&H000000FF,&H00000000,&H64000000,' + bold + ',0,0,0,100,100,0,0,1,' + OUTL +
-      ',0,' + align + ',' + ML + ',' + ML + ',' + MV + ',1';
+      ',0,' + align + ',' + ML + ',' + ML + ',' + (mv == null ? MV : mv) + ',1';
     const header = [
       '[Script Info]',
       'Title: ' + (opts.title || 'Translated Subtitles'),
@@ -646,7 +653,7 @@
       '',
       '[V4+ Styles]',
       STYLE_FMT,
-      styleLine('Bottom', DST_SZ, DST_C, 2, -1),
+      styleLine('Bottom', DST_SZ, DST_C, 2, -1, DST_MV),
       styleLine('Top', SRC_SZ, SRC_C, 8, 0),
       // TopMain（v0.9.35）：主语言顶部样式——外观与 Bottom 一致（主字号/主色），仅对齐方式为顶部居中（an8）。
       // 「译文在上」分屏模式下译文用本样式，保证译文无论在哪都保持主阅读字号。
@@ -654,7 +661,7 @@
       // Sub：底部双行 / 副语言落底样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（副字号/副色）
       // 但对齐方式为底部居中，实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定；
       // mv=0 时回退样式默认 MarginV。
-      styleLine('Sub', SRC_SZ, SRC_C, 2, 0),
+      styleLine('Sub', SRC_SZ, SRC_C, 2, 0, SRC_MV),
       '',
       '[Events]',
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
@@ -669,8 +676,10 @@
         // v0.9.41 歌词斜体：含 ♪/♫ 的行按行业惯例（Netflix TTSG：italicize lyrics）加内联斜体标记，
         // 不新增样式（{\i1}/{\i0} 内联覆盖对所有现有样式生效；SRT/VTT/TXT 纯文本路径不受影响）。
         const musicLine = musicRe().test(tx);
+        const mvNum = Math.round(numOr(ln.mv, 0));
+        const mvOut = mvNum > 0 ? Math.max(1, Math.min(1080, mvNum)) : 0;
         evLines.push('Dialogue: ' + i + ',' + fmtTimeAss(ev.start) + ',' + fmtTimeAss(ev.end) + ',' +
-          st + ',,0,0,' + (ln.mv > 0 ? Math.round(ln.mv) : 0) + ',,' + (musicLine ? '{\\i1}' + tx + '{\\i0}' : tx));
+          st + ',,0,0,' + mvOut + ',,' + (musicLine ? '{\\i1}' + tx + '{\\i0}' : tx));
       });
     }
     return header.join('\n') + '\n' + evLines.join('\n') + '\n';
