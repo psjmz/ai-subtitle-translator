@@ -600,6 +600,13 @@
     return { items, issues };
   }
 
+  // ASS 行高（v0.9.100）：双行堆叠时「在上块」需按下方块实际行数抬高，抬高量依赖字号。
+  // 旧版把 56pt→66、50pt→59 写死（比例同为 1.18）；字号可改后必须按字号推导，否则改大字号会重叠。
+  function assLineHeight(size) {
+    const n = parseFloat(size);
+    return Math.round((isFinite(n) && n > 0 ? n : 56) * 1.18);
+  }
+
   // 生成带样式分层的 ASS 文件（1080p 基准，可直压视频 / 进 Aegisub 二次编辑）。
   // events：[{start,end,lines:[{style,text,mv?}]}]
   // 样式按「角色 × 位置」正交（v0.9.35：字号跟角色走，位置跟模式走——译文恒为主阅读样式）：
@@ -608,7 +615,25 @@
   // 双语时源/译各占一条 Dialogue（时间相同、位置分离），不挤在两行里。
   function formatAss(events, opts) {
     opts = opts || {};
+    // v0.9.100：外观可由 UI「ASS 样式」覆盖（opts.assStyle）。未提供的字段一律沿用 v0.9.35 既定值，
+    // 因此不传 assStyle 时输出与旧版逐字节一致——单语/双语/单元测试均不受影响。
+    const AS = opts.assStyle || {};
+    const numOr = (v, d) => { const n = parseFloat(v); return isFinite(n) ? n : d; };
+    const RE_ASS_COLOR = /^&H[0-9A-Fa-f]{6,8}$/;
+    const FONT   = String(AS.font || '').replace(/,/g, '').trim() || 'PingFang SC';
+    const DST_SZ = Math.max(8, Math.min(200, Math.round(numOr(AS.dstSize, 56))));
+    const SRC_SZ = Math.max(8, Math.min(200, Math.round(numOr(AS.srcSize, 50))));
+    const DST_C  = RE_ASS_COLOR.test(String(AS.dstColor || '')) ? String(AS.dstColor) : '&H00FFFFFF';
+    const SRC_C  = RE_ASS_COLOR.test(String(AS.srcColor || '')) ? String(AS.srcColor) : '&H0000D7FF';
+    const MV     = Math.max(0, Math.min(400, Math.round(numOr(AS.marginV, 42))));
+    const ML     = Math.max(0, Math.min(600, Math.round(numOr(AS.marginL, 60))));
+    const OUTL   = Math.max(0, Math.min(10, numOr(AS.outline, 2.5)));
     const STYLE_FMT = 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding';
+    // 样式行模板（v0.9.35 分工不变：字号跟角色走、位置跟模式走）
+    const styleLine = (name, size, color, align, bold) =>
+      'Style: ' + name + ',' + FONT + ',' + size + ',' + color +
+      ',&H000000FF,&H00000000,&H64000000,' + bold + ',0,0,0,100,100,0,0,1,' + OUTL +
+      ',0,' + align + ',' + ML + ',' + ML + ',' + MV + ',1';
     const header = [
       '[Script Info]',
       'Title: ' + (opts.title || 'Translated Subtitles'),
@@ -621,14 +646,15 @@
       '',
       '[V4+ Styles]',
       STYLE_FMT,
-      'Style: Bottom,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
-      'Style: Top,PingFang SC,50,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,8,60,60,42,1',
-      // TopMain（v0.9.35）：主语言顶部样式——外观与 Bottom 一致（白 56pt），仅对齐方式为顶部居中（an8）。
+      styleLine('Bottom', DST_SZ, DST_C, 2, -1),
+      styleLine('Top', SRC_SZ, SRC_C, 8, 0),
+      // TopMain（v0.9.35）：主语言顶部样式——外观与 Bottom 一致（主字号/主色），仅对齐方式为顶部居中（an8）。
       // 「译文在上」分屏模式下译文用本样式，保证译文无论在哪都保持主阅读字号。
-      'Style: TopMain,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,8,60,60,42,1',
-      // Sub：底部双行 / 副语言落底样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（金黄）但对齐方式为底部居中，
-      // 实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定；mv=0 时回退样式默认 MarginV=42。
-      'Style: Sub,PingFang SC,50,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1',
+      styleLine('TopMain', DST_SZ, DST_C, 8, -1),
+      // Sub：底部双行 / 副语言落底样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（副字号/副色）
+      // 但对齐方式为底部居中，实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定；
+      // mv=0 时回退样式默认 MarginV。
+      styleLine('Sub', SRC_SZ, SRC_C, 2, 0),
       '',
       '[Events]',
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
@@ -2062,7 +2088,7 @@
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
     parseSbv, formatSbv, fmtTimeSbv,
-    parseAss, formatAss, fmtTimeAss, parseAssTime,
+    parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight,
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,
