@@ -628,20 +628,40 @@
     'id': 76, 'tr': 76, 'pl': 76, 'nl': 76, 'ms': 76, 'fil': 76
   };
   const ASS_AVAIL_W = 1800;    // PlayResX 1920 - MarginL/R 60 x 2，超过则 ASS 自动折行
-  const SRC_VIS_RATIO = 0.893; // 原文视觉高度 / 译文视觉高度 = 旧默认 50/56，保留既有主次关系
+  /* v0.9.107 定案：SRC_VIS_RATIO 是「原文书写系统推荐值」与「视觉高度反算」共用的折扣系数。
+     旧值 0.893 只是沿用旧默认 50/56，并非设计。用户要求对标业界后定为 0.62：
+       实测业界中英双语 ASS 的 pt 数比（英文/中文）是 0.50~0.70，中位 0.6（即「中文:英文 ≈ 1.7 倍」），
+       换算成视觉高度只有 0.30~0.42（要再乘 0.596 = 英文墨迹 0.545 / 中文墨迹 0.915）。
+       本工具的用户会真的去读原文，故取中间档：视觉比 0.51（zh→en 56/48），超屏率 0%。
+     ⚠️ V 不等于最终视觉比：bySystem 主导时实际视觉比 ≈ V x 0.808 —— V=0.62 落到 0.51，
+       要 0.36（完全对齐业界）需 V≈0.45，但那会把英译中的中文原文压到 clamp 下限 24pt。 */
+  const SRC_VIS_RATIO = 0.62;
   function inkRatioOf(lang) { return INK_RATIO[lang] || INK_RATIO._default; }
   function recAssSize(dstLang, srcLang, opts) {
     opts = opts || {};
     const maxW = +(opts.maxW || 0);
     const cap = maxW > 0 ? Math.max(24, Math.min(200, Math.floor(ASS_AVAIL_W / maxW))) : 200;
     const clamp = (n) => Math.max(24, Math.min(cap, Math.round(n / 2) * 2));
+    const dst = clamp(Math.min(REC_ASS_SIZE[dstLang] || 76, cap));
     const dR = inkRatioOf(dstLang);
     // 源语言未指定（auto）时按拉丁估：本站绝大多数源字幕是拉丁书写系统
     const sR = inkRatioOf(srcLang === 'auto' ? '_default' : srcLang);
-    const dst = clamp(Math.min(REC_ASS_SIZE[dstLang] || 76, cap));
-    // 原文行按「视觉高度 = 译文视觉高度 x 0.893」反算出来，而不是固定字号：
-    // 固定 50 在中译英时会出现英文原文（0.545x50）比中文译文更醒目的倒挂。
-    const srcSize = clamp(dst * dR * SRC_VIS_RATIO / sR);
+    /* v0.9.107：原文号取「两条约束里更保守的那个」。
+       ① bySystem = 原文书写系统推荐值 x SRC_VIS_RATIO —— 防止 pt 数被墨迹比放大。
+          纯反算版在「CJK 译 + 拉丁源」会得出 84pt：视觉等高没错，但行高 99px 反超译文行 66px
+          （双行总高 133 → 173px），且 84pt 时原文行只剩 21.4 全角宽，实测 890 行英文源文
+          有 9.8% 顶出 1800px 被 ASS 自动折行（WrapStyle: 0）。
+       ② byVisual = 「原文视觉高度 = 译文视觉高度 x SRC_VIS_RATIO」反算 —— 防止原文喧宾夺主。
+          只用 ① 时，英译中的中文原文会被放到比英文译文还高（50pt 视觉 45.8px > 76pt 的 41.4px）。
+       min() 之后（SRC_VIS_RATIO = 0.62）：zh→en 48、ja/ko→en 48、zh→th 44、vi→en 46、
+       en→zh 28、en→ja 30、en→en 48、th→en 48、fa→en 46；原文号恒在 28~50。
+     ⚠️ 业界的 1.7 倍是「中文恒大于英文」的单向秩序（他们的场景永远是中文译文在上）。
+       反向照搬会让「英文译文 76 + 中文原文」= 129pt，一行 16 字 = 2064px 直接爆屏，
+       所以 ② 这条反向约束不能丢——代价是英译中时中文原文只有 28pt。 */
+    // auto 与未知源语言按拉丁估（REC_ASS_SIZE 无此键 → 回落 76）
+    const bySystem = (REC_ASS_SIZE[srcLang] || 76) * SRC_VIS_RATIO;
+    const byVisual = dst * dR * SRC_VIS_RATIO / sR;
+    const srcSize = clamp(Math.min(bySystem, byVisual));
     return { dstSize: dst, srcSize: srcSize };
   }
 

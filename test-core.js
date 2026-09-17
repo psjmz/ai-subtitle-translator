@@ -2116,14 +2116,35 @@ t('拉丁/西里尔译文字号 76、波斯最大 78', () => {
     assert.strictEqual(C.recAssSize(l, 'zh-CN', {maxW:21}).dstSize, 76, l));
   assert.strictEqual(C.recAssSize('fa', 'zh-CN', {maxW:21}).dstSize, 78);
 });
-t('原文视觉高度 = 译文视觉高度 x 0.893（跨书写系统也保证译文是主阅读行）', () => {
+t('原文号 = 原文书写系统推荐值 x 0.62（v0.9.107：不再从译文反算）', () => {
+  const cases = [
+    ['zh-CN','en',16,48], ['ja','en',13,48], ['ko','en',16,48], ['zh-CN','th',16,44],
+    ['en','zh-CN',21,28], ['en','ja',21,30], ['en','en',21,48], ['th','en',21,48],
+    ['fa','en',21,46], ['hi','th',21,44], ['zh-CN','auto',16,48], ['vi','en',21,46]
+  ];
+  cases.forEach(([d,s2,mw,want]) => {
+    const r = C.recAssSize(d, s2, {maxW: mw});
+    assert.strictEqual(r.srcSize, want, d + '/' + s2 + ' 原文号 ' + r.srcSize + ' 应为 ' + want);
+  });
+});
+t('原文号恒在 28~50：既不缩到看不清，也不会撑爆屏宽', () => {
+  // 上界 50：SRC_VIS_RATIO=0.62 时最大组合是「拉丁/波斯语原文」48pt，留 2pt 余量
+  // 下界 28：英译中时中文原文被「不喧宾夺主」压到 28pt，视觉 25.6px 仍清晰可读
+  for (const d of LANGS22) for (const s of LANGS22.concat(['auto'])) {
+    const r = C.recAssSize(d, s, {maxW: MAXW_LANG[d] || 21});
+    assert.ok(r.srcSize >= 28 && r.srcSize <= 50, d + '/' + s + ' 原文号 ' + r.srcSize + ' 越界');
+  }
+});
+t('主次关系：原文视觉高度仍低于译文，同书写系统对保持 0.62', () => {
   for (const d of LANGS22) for (const s of LANGS22.concat(['auto'])) {
     const mw = MAXW_LANG[d] || 21;
     const r = C.recAssSize(d, s, {maxW: mw});
     const dVis = r.dstSize * inkOf(d);
     const sVis = r.srcSize * inkOf(s);
-    assert.ok(Math.abs(sVis / dVis - 0.893) < 0.03, d + '/' + s + ' 视觉比 ' + (sVis / dVis).toFixed(3) + ' 偏离 0.893');
     assert.ok(sVis < dVis, d + '/' + s + ' 原文视觉不该超过译文');
+    if (Math.abs(inkOf(d) - inkOf(s)) < 1e-9) {  // 同一书写系统 → 应严格保持 0.62
+      assert.ok(Math.abs(sVis / dVis - 0.62) < 0.03, d + '/' + s + ' 同系统视觉比 ' + (sVis / dVis).toFixed(3));
+    }
   }
 });
 t('非 CJK 语言的视觉高度被补到中文的 75%~100%', () => {
