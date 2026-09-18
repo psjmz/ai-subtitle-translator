@@ -112,6 +112,10 @@
   /* v0.9.110：推荐值提示行里的可点操作（应用 / 撤销） */
   .ass-hint-act{color:var(--acc);cursor:pointer;font-weight:600;margin-left:7px;text-decoration:underline;text-underline-offset:2px}
   .ass-hint-act:hover{opacity:.75}
+  /* v0.9.111：提示行里的推荐值本身可点（点一下即填入输入框）——替代 v0.9.110 的「应用」按钮，
+     避免「应用」没有宾语造成的歧义（是应用推荐值还是应用我输入的值）。 */
+  .ass-hint-num{color:var(--acc);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+  .ass-hint-num:hover{text-decoration-style:solid;opacity:.8}
 
   /* ============ 第一段：首页（营销落地页） ============ */
   #viewLanding{position:relative;overflow:hidden;animation:fadein .3s ease}
@@ -423,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.110</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.111</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -577,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.110</span>
+    <span class="ver-tag">v0.9.111</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -788,7 +792,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.110"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.111"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4638,7 +4642,10 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
         导出回落 42 且永不联动，用户想「恢复自动」的操作反而把自己锁死，并持久化到下次访问。
    新机制区分两类切换：
      · 布局上下文（单语/双语 × 分屏/双行 × 谁在上）变化 → 旧值必然失效，自动套新推荐值，给一次「撤销」；
-     · 语言 / 行宽变化 → 同一坐标系内的微调，保留用户值，只在推荐值旁给「应用」按钮，绝不静默覆盖。 */
+     · 语言 / 行宽变化 → 同一坐标系内的微调，保留用户值，绝不静默覆盖。
+   v0.9.111 修正该提示行的表达：原「推荐 76 pt · English · 你的 70 [应用]」被实测读成三种意思
+     （「你的 70」像已失效的旧值 / 「应用」没有宾语 / 看不出是否处于自定义态）→
+     提示行只留「推荐 76 pt · English」，推荐数字本身可点即填入，状态说明交给底部 assSizeHint。 */
 var ASS_UNDO = {};                       // field -> 重置前的用户值（供撤销）
 function assLayoutCtx(){ try{ return expFmtOf() + (assStacked() ? '|stack' : '|split'); }catch(e){ return '?'; } }
 function assLangCtx(){ return (($('dstLang')||{}).value||'') + '>' + (($('srcLang')||{}).value||'') + '@' + (+($('maxW')||{}).value||21); }
@@ -4663,6 +4670,22 @@ function renderAssHint(el, text, act){
   b.textContent = t(act.kind === 'apply' ? 'assApply' : 'assUndo');
   b.setAttribute('data-ass-act', act.kind + ':' + act.field);
   el.appendChild(b);
+}
+/* v0.9.111：推荐值提示行——只说「推荐 X」，X 本身可点（点一下填入输入框）。
+   旧版在同一行里还塞了「你的 70」和一个「应用」按钮，实测三种误会：
+     ①「你的 70」被读成已失效的旧值，其实它是当前生效值（输入框里就写着 70，属于重复信息）；
+     ②「应用」没有宾语，用户不确定是应用推荐值还是应用自己的输入；
+     ③ 看不出当前是「自动跟随」还是「我已自定义」——这一档状态改由字号模块底部的 assSizeHint 说明。 */
+function renderRecHint(el, before, num, after, field){
+  if(!el) return;
+  el.textContent = '';
+  if(before) el.appendChild(document.createTextNode(before));
+  var s = document.createElement('span');
+  s.className = 'ass-hint-num';
+  s.textContent = String(num);
+  s.setAttribute('data-ass-act', 'apply:' + field);
+  el.appendChild(s);
+  if(after) el.appendChild(document.createTextNode(after));
 }
 var ASS_F = {};                          // 四个可联动字段的注册表（字号模块与离底距离模块各自填充）
 function assFieldApply(field){
@@ -4729,7 +4752,7 @@ function assCtxSync(){
   let touched = !!UI.assSizeTouched;
   UI.assSizeTouched = touched;
   const langName=function(v){ var l=LANGS.filter(function(x){return x.v===v;})[0]; return l?l.zh:''; };
-  /* v0.9.110：推荐值常驻显示；语言切换只提示不覆盖（推荐值旁给「应用」），
+  /* v0.9.111：推荐值常驻显示；语言切换只提示不覆盖（点提示行里的推荐数字才会填入），
      布局切换由 assLayoutReset 统一处理（见文件上方 v0.9.110 说明）。 */
   const recOf=function(){ return C.recAssSize($('dstLang').value, $('srcLang').value, {maxW:+$('maxW').value||21}); };
   const apply=function(reason){
@@ -4739,14 +4762,11 @@ function assCtxSync(){
     const dn=langName($('dstLang').value);
     const sn=$('srcLang').value==='auto' ? t('autoDetect') : langName($('srcLang').value);
     const mono=(typeof expFmtOf==='function') ? (expFmtOf()==='mono') : false;
-    const dDiff = touched && (+dsz.value !== rec.dstSize);
-    const sDiff = touched && (+ssz.value !== rec.srcSize);
-    renderAssHint(dhint,
-      t('assSizeRec')+rec.dstSize+' pt'+(dn?(' · '+dn):'')+(dDiff?(' · '+t('assKept')+' '+dsz.value):''),
-      dDiff?{kind:'apply',field:'dsz'}:null);
-    renderAssHint(shint, mono ? '' :
-      (t('assSizeRec')+rec.srcSize+' pt'+(sn?(' · '+sn):'')+(sDiff?(' · '+t('assKept')+' '+ssz.value):'')),
-      (!mono && sDiff)?{kind:'apply',field:'ssz'}:null);
+    /* v0.9.111：提示行只留「推荐 X pt · 语言」，X 可点即填入。不再显示「你的 70」（输入框里已有）、
+       不再给「应用」按钮（无宾语、易被理解成应用自己的输入）。是否处于自定义态由底部 assSizeHint 说明。 */
+    renderRecHint(dhint, t('assSizeRec'), rec.dstSize, ' pt' + (dn?(' · '+dn):''), 'dsz');
+    if(mono) renderAssHint(shint, '');
+    else renderRecHint(shint, t('assSizeRec'), rec.srcSize, ' pt' + (sn?(' · '+sn):''), 'ssz');
     if(hint) hint.textContent=touched?t('assSizeLocked'):t('assSizeFollow');
   };
   window.assSizeRender = function(){ apply(''); };
@@ -4905,17 +4925,14 @@ function assDefaultMV(role){
 function syncAssMVBox(){
   if(!UI.assDstMVSet && $('assDstMV')) $('assDstMV').value=assDefaultMV('dst');
   if(!UI.assSrcMVSet && $('assSrcMV')) $('assSrcMV').value=assDefaultMV('src');
-  /* v0.9.110：推荐值常驻显示；与推荐值不一致时额外标出「你的 X」并给「应用」按钮。
+  /* v0.9.111：推荐值常驻显示且可点（点一下即填入输入框），不再标「你的 X」也不再给「应用」按钮。
      单语导出没有原文行，原文那条整行隐藏（见 syncAssStyleBox）。 */
   var mono = expFmtOf()==='mono';
   var dh=$('assDstMVHint'), sh=$('assSrcMVHint');
   var dRec=assDefaultMV('dst'), sRec=assDefaultMV('src');
-  var dDiff = UI.assDstMVSet && (+$('assDstMV').value !== dRec);
-  var sDiff = UI.assSrcMVSet && (+$('assSrcMV').value !== sRec);
-  renderAssHint(dh, t('assMVRec')+dRec+(dDiff?(' · '+t('assKept')+' '+$('assDstMV').value):''),
-                dDiff?{kind:'apply',field:'dmv'}:null);
-  renderAssHint(sh, mono ? '' : (t('assMVRec')+sRec+(sDiff?(' · '+t('assKept')+' '+$('assSrcMV').value):'')),
-                (!mono && sDiff)?{kind:'apply',field:'smv'}:null);
+  renderRecHint(dh, t('assMVRec'), dRec, '', 'dmv');
+  if(mono) renderAssHint(sh, '');
+  else renderRecHint(sh, t('assMVRec'), sRec, '', 'smv');
 }
 ASS_F.dmv={el:$('assDstMV'),hint:$('assDstMVHint'),rec:function(){return assDefaultMV('dst');},
            isT:function(){return !!UI.assDstMVSet;},setT:function(v){UI.assDstMVSet=v;},after:function(){syncAssMVBox();}};
