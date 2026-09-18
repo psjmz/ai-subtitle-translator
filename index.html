@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.116</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.117</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.116</span>
+    <span class="ver-tag">v0.9.117</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -792,7 +792,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.116"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.117"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -921,6 +921,14 @@ const LANGS = [
 
 ];
 const LBY = (v) => LANGS.find(l => l.v === v) || { zh:v, file:v, prompt:v };
+/* v0.9.117：目标语言名去重——prompt 已含该语言自称时不再补一次
+   （English/English、Filipino (Tagalog)/Filipino、Hausa/Hausa、Afrikaans/Afrikaans、
+     简体中文 (Simplified Chinese)/简体中文），避免出现 "English (English)" */
+function dstLangLabel(n, zh){
+  const p = (n && n.prompt) || '', nat = (n && n.zh) || '';
+  if(!p || !nat || p.toLowerCase().indexOf(nat.toLowerCase()) >= 0) return p || nat;
+  return zh ? (p + '\uFF08' + nat + '\uFF09') : (p + ' (' + nat + ')');
+}
 const STYLE_DESC = {
   elegant: '均衡（默认）：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯；不逐词直译，也不过度发挥。影视、纪录片、访谈等通用。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
   plain:   '口语自然：译文像人在说话——日常口语、短句和常用词、保留说话人的语气与节奏，书面腔和翻译腔是毛病。适合影视对白、动漫、访谈。（风格只影响语气与用词；事实、数字、金额、术语、专名一律按对应规则处理，不受风格影响。）',
@@ -5980,9 +5988,10 @@ function systemPromptEn(cfg){
   const srcFor = cfg.src === 'auto' ? '(identify it automatically)' : srcN.prompt;
   const fixSpellEn = cfg.src === 'auto' ? 'using the correct spelling of the language you identify as the source' : 'using proper ' + srcN.prompt + ' spelling';
   const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
+  const dstLabel = dstLangLabel(dstN, false); // v0.9.117："Japanese (日本語)"，自称已在 prompt 里时不再重复
   const styleEn = (cfg.styleMode === 'custom' && cfg.styleCustom) ? ('Custom style: ' + cfg.styleCustom) : (STYLE_DESC_EN[cfg.styleMode] || STYLE_DESC_EN.elegant);
   let s = 'You are a professional subtitle translator.\n'
-    + '[MOST IMPORTANT RULE] The target output language = ' + dstN.prompt + ' (' + dstNative + '). Every translated text field must be written in ' + dstNative
+    + '[MOST IMPORTANT RULE] The target output language = ' + dstLabel + '. Every translated text field must be written in ' + dstNative
     + '. This prompt is written in English, which is only the instruction language and has nothing to do with the output language — unless the target language itself is Chinese, NEVER output Chinese.\n'
     + 'Source subtitle language: ' + srcFor + '.\n'
     + (cfg.synopsis ? 'Film context (background for your understanding only): ' + cfg.synopsis + '\n' : '')
@@ -6049,8 +6058,9 @@ function systemPrompt(cfg){
   const srcFor = cfg.src === 'auto' ? '（由你自动识别）' : srcN.prompt;
   const fixSpellZh = cfg.src === 'auto' ? '按你识别出的源语言的正确写法' : '按' + srcN.prompt + '的正确写法';
   const dstNative = dstN.zh; // 目标语言的自称（如 日本語、Français），强化语言锚定
+  const dstLabel = dstLangLabel(dstN, true); // v0.9.117：自称已在 prompt 里时不再重复
   let s = '你是专业字幕翻译。\n'
-  + '【最重要的规则】目标输出语言 = ' + dstN.prompt + '（' + dstNative + '）。所有译文 text 字段必须使用' + dstNative
+  + '【最重要的规则】目标输出语言 = ' + dstLabel + '。所有译文 text 字段必须使用' + dstNative
   + '书写。本提示词用中文书写只是指令语言，与输出语言无关——除非目标语言本身就是中文，否则严禁输出中文。\n'
   + '源字幕语言：' + srcFor + '。\n'
   + (cfg.synopsis ? '【影片背景】' + cfg.synopsis + '（仅供理解语境）\n' : '')
@@ -6227,9 +6237,9 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     : '';
   const userMsg = zhDst
     ? ctxBlk+'句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:garr})
-      + '\n请把每个句组翻译成'+dstN.prompt+'（'+dstN.zh+'）并按 cue 分配——每个句组返回 cues 数组（每个输入 cue 编号一条 {"no":…,"text":…}）；含 [N] 歌词编号的句组照旧返回单个 text。text 字段必须用'+dstN.zh+'书写。只输出 JSON。' + fb + cueFb
+      +'\n请把每个句组翻译成'+dstLangLabel(dstN,true)+'并按 cue 分配——每个句组返回 cues 数组（每个输入 cue 编号一条 {"no":…,"text":…}）；含 [N] 歌词编号的句组照旧返回单个 text。text 字段必须用'+dstN.zh+'书写。只输出 JSON。' + fb + cueFb
     : ctxBlk+'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:garr})
-      + '\nTranslate each group into '+dstN.prompt+' ('+dstN.zh+') and distribute across its cues — return a "cues" array per group (one entry {"no":…,"text":…} for every input cue number); groups whose merged text contains lyric [N] markers return a single "text" as before. The text fields must be written in '+dstN.zh+'. Output JSON only.' + fb + cueFb;
+      + '\nTranslate each group into '+dstLangLabel(dstN,false)+' and distribute across its cues — return a "cues" array per group (one entry {"no":…,"text":…} for every input cue number); groups whose merged text contains lyric [N] markers return a single "text" as before. The text fields must be written in '+dstN.zh+'. Output JSON only.' + fb + cueFb;
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
     {role:'user',content:userMsg}
