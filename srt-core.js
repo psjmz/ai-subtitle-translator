@@ -230,12 +230,31 @@
       while (j > 0 && isSpacedLetnum(pos[j - 1])) j--;
       c = Math.max(1, j);
     }
+    // v0.9.118：日语附着语禁则。Intl.Segmenter('ja') 一贯把活用形与复合名词切碎
+    // （してる→し|てる、ようだ→よう|だ、買って→買|って、やった→や|っ|たん|だ），
+    // 于是「词边界保护」反而授权了在这些位置断行。判据：切点右侧的那个分词块 <= 2 字、
+    // 全为平假名、首字属活用词尾/助动词集合 → 视为词内部，不可断。仅日语生效。
+    const JA_TAIL_HEAD = '\u3063\u3066\u305F\u308B\u3044\u304D\u3057\u3060\u3067'; // っ て た る い き し だ で
+    const isJaTail = (cut) => {
+      if (!bounds || cut <= 0 || cut >= n) return false;
+      if (!locale || String(locale).indexOf('ja') !== 0) return false;
+      let e = cut + 1;
+      while (e < n && !bounds.has(e)) e++;
+      const blk = pos.slice(cut, e).join('');
+      if (!blk || blk.length > 2) return false;
+      for (let q = 0; q < blk.length; q++) {
+        const code = blk.charCodeAt(q);
+        if (code < 0x3041 || code > 0x309F) return false;   // 非平假名 → 不是附着语块
+      }
+      return JA_TAIL_HEAD.indexOf(blk[0]) >= 0;
+    };
     // 3) 在硬切位置向前最多 10 字范围内，找最近的自然断点（保证第一行尽量满行）。
     //    伪断点（介词/连接词前断开）必须落在词边界上才有效 —— 否则「应对」的「对」
     //    会被误判为介词，把动词劈成两半。
     const effPrio = (cut) => {
       const p = breakPrio(pos, cut);
       if (p >= 4) return p;                        // 标点/空格：天然边界，不受影响
+      if (isJaTail(cut)) return 0;                 // v0.9.118：活用词尾/助动词前不断
       if (bounds && !bounds.has(cut)) return 0;    // 伪断点落在词内部 → 无效
       return p;
     };
@@ -333,6 +352,15 @@
         if (textWidth(pos.slice(nc).join('')) <= maxW + 1e-9) { c = nc; break; }
       }
     }
+    // 5e) 日语附着语回避（v0.9.118）：兜底硬切后，若切点把活用词尾/助动词甩到下一行行首
+    // （「…ぷくぷくし | てるだけ。」「…起きているよう | だ。」），把该附着块连同其词干
+    // 整体下移一行；仅当下移后剩余仍 <= maxW（不折出第 3 行）时采用，否则维持硬切。
+    if (isJaTail(c) && c > 1) {
+      let ws3 = c - 1;
+      while (ws3 > 1 && !bounds.has(ws3)) ws3--;
+      if (ws3 >= 1 && bounds.has(ws3) && !inAtom(ws3)
+          && textWidth(pos.slice(ws3).join('')) <= maxW + 1e-9) c = ws3;
+    }
     return c;
   }
 
@@ -355,6 +383,24 @@
       out.push.apply(out, foldSeg(ln, maxW, opts.locale));
     }
     return out;
+  }
+
+  // v0.9.118：回填/后处理侧的「单行 or 折行」判定，与 buildMonoParts 的 R1 同口径：
+  // 整条等效宽 <= maxW+4 时保持单行。此前回填只用 wrapToWidth（阈值 maxW），
+  // 于是「只超 1 个字」也被折行，把复合名词劈成两半（日语 maxW 13、译文 14 宽 → 娘の誕生|日に）。
+  function monoFit(s, maxW, locale) {
+    maxW = (maxW > 0) ? maxW : 21;
+    const one = squashLines(String(s == null ? '' : s));
+    if (!one) return [];
+    const w = textWidth(stripSoundTags(one));
+    if (w <= maxW) return [one];
+    const lines = wrapToWidth(one, maxW, { normalize: true, locale: locale });
+    // 微超宽（≤ maxW+4）且折行会甩出极短尾行时保持单行。极短尾行几乎都是把词劈开了
+    // （日语 maxW 13、译文 14 宽 → 「…娘の誕生|日に」，尾行只剩 2 宽），略超宽好过断在词中间。
+    // 注意不是无条件 +4：那会让「Assassin，|我的飞行控制系统…」这类自然断点也被压成超宽单行。
+    const thin = lines.length > 1 && lines.some((l) => textWidth(stripSoundTags(l)) < maxW * 0.2);
+    if (w <= maxW + 4 && thin) return [one];
+    return lines;
   }
 
   // 把多行文本合并为单行：行首尾空白去掉再拼接；
@@ -878,10 +924,15 @@
   // speaker 行独立折行：每行 ≤ maxW+10 直放（v0.9.69 放宽，用户方案——双说话人单行
   // 逻辑上不长，超宽才在该行内部折行）；speaker 边界神圣——绝不跨行重分配、绝不切分时间轴。
   function foldSpeakerLines(text, maxW, locale) {
+    const lines = String(text == null ? '' : text).replace(/\r/g, '').split('\n')
+      .map((s) => s.trim()).filter(Boolean);
+    // v0.9.118：行级宽容由绝对 +10 改为「maxW 的一半，夹在 6~10」。+10 是按 maxW=21 定的，
+    // 直接套到窄 maxW 语言会放宽过头：日语 13 -> 23（+77%）、中文 16 -> 26（+62%）。
+    // 现在：21 -> 31（不变）、16 -> 24、13 -> 20；下限 7 保证极窄阈值（maxW<=14）仍有基本宽容。
+    const slack = Math.max(7, Math.min(10, Math.round(maxW * 0.5)));
     const out = [];
-    for (const ln of String(text == null ? '' : text).replace(/\r/g, '').split('\n')
-      .map((s) => s.trim()).filter(Boolean)) {
-      if (textWidth(stripSoundTags(ln)) <= maxW + 10) { out.push(ln); continue; }
+    for (const ln of lines) {
+      if (textWidth(stripSoundTags(ln)) <= maxW + slack) { out.push(ln); continue; }
       out.push.apply(out, wrapToWidth(ln, maxW, { normalize: true, locale: locale }));
     }
     return out;
@@ -2217,7 +2268,7 @@
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,
     INK_DESC, BOX_DESC, ASS_STACK_GAP,   // v0.9.109：导出给单测读真值（此前测试自带副本，加语言会静默漂移）
     formatTxt, detectFormat,
-    isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
+    isFillerCue, stripSoundTags, monoFit, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
