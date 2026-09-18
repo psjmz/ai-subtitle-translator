@@ -109,6 +109,9 @@
   .btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
   .btn:disabled{opacity:.4;cursor:not-allowed}
   .hint{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.55}
+  /* v0.9.110：推荐值提示行里的可点操作（应用 / 撤销） */
+  .ass-hint-act{color:var(--acc);cursor:pointer;font-weight:600;margin-left:7px;text-decoration:underline;text-underline-offset:2px}
+  .ass-hint-act:hover{opacity:.75}
 
   /* ============ 第一段：首页（营销落地页） ============ */
   #viewLanding{position:relative;overflow:hidden;animation:fadein .3s ease}
@@ -420,7 +423,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.109</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.110</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -574,7 +577,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.109</span>
+    <span class="ver-tag">v0.9.110</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -636,10 +639,14 @@
         <label class="flbl"><span data-i18n="lblAssDstSize">译文字号</span></label>
         <input type="number" id="assDstSize" value="56" min="8" max="300" step="1">
         <div class="hint" id="assDstSizeHint"></div>
+        <!-- v0.9.110：单语导出没有原文行，整行隐藏（此前仍显示并可配置，配了也不生效） -->
+        <div id="assSrcSizeRow">
         <label class="flbl"><span data-i18n="lblAssSrcSize">原文字号</span></label>
         <input type="number" id="assSrcSize" value="50" min="8" max="300" step="1">
         <div class="hint" id="assSrcSizeHint"></div>
+        </div>
         <div class="hint" id="assSizeHint"></div>
+        <div class="hint" id="assResetNote"></div>
         <!-- v0.9.101：颜色改为直接输入 #RRGGBB 色值（高级选项，色值不再受预设限制），
              左侧小方块是实时预览；色值非法时预览变虚线框，导出回落默认色。 -->
         <label class="flbl"><span data-i18n="lblAssDstColor">译文颜色</span><i class="info" data-tip-i18n="assColorTip">i</i></label>
@@ -653,13 +660,16 @@
           <input type="text" id="assSrcColor" value="#FFD700" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFD700">
         </div>
         <!-- v0.9.102：离底距离拆成译文/原文两个、各自独立。默认值随「分屏/双行 + 谁在上」联动，
-             用户手动改过某个后该值固定（UI.assDstMVSet / UI.assSrcMVSet）。 -->
+             v0.9.110：改为「上下文感知」——切换布局时自动套新布局的推荐值并可撤销，
+             切换语言只提示不覆盖（详情见 assCtxSync）。 -->
         <label class="flbl"><span data-i18n="lblAssDstMarginV">译文离底距离</span><i class="info" data-tip-i18n="assDstMVTip">i</i></label>
         <input type="number" id="assDstMV" value="42" min="0" max="1080" step="2">
         <div class="hint" id="assDstMVHint"></div>
+        <div id="assSrcMVRow">
         <label class="flbl"><span data-i18n="lblAssSrcMarginV">原文离底距离</span><i class="info" data-tip-i18n="assSrcMVTip">i</i></label>
         <input type="number" id="assSrcMV" value="42" min="0" max="1080" step="2">
         <div class="hint" id="assSrcMVHint"></div>
+        </div>
       </div>
 
       <!-- v0.9.78：歌词处理——三档（翻译/保留原文/删除）+ 可编辑的歌词标记字符集合 -->
@@ -778,7 +788,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.109"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.110"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -842,7 +852,7 @@ const LANGS = [
   { v:'fil',   zh:'Filipino', en:'Filipino',         file:'菲律宾文',prompt:'Filipino (Tagalog)' },
   { v:'fa',    zh:'فارسی', en:'Persian',            file:'波斯文', prompt:'Persian (Farsi)' },
 
-  /* v0.9.109：26 种新语言（北欧 / 中东欧 / 希腊·西里尔 / 中东 / 南亚 / 东南亚 / 东非）。
+  /* v0.9.110：26 种新语言（北欧 / 中东欧 / 希腊·西里尔 / 中东 / 南亚 / 东南亚 / 东非）。
      每种都同步了四处：① 这里的显示名与文件名 ② MAXW_BY_LANG 折行阈值 ③ EX_SAMPLE 真实译文
      ④ srt-core.js 的 INK_RATIO / REC_ASS_SIZE / INK_DESC（headless canvas 实测字形）*/
   { v:'sv', zh:'Svenska', en:'Swedish', file:'瑞典文', prompt:'Swedish' },
@@ -912,7 +922,7 @@ const I18N = {
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
   stepExport:'导出译文', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
-  btnDownload:'⬇ 下载字幕', btnCopy:'复制到剪贴板', lblExpStyle:'导出字幕样式', assSplit:'分屏', assStack:'双行', lblFileFmt:'文件格式', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', secAssStyle:'ASS 字幕样式', lblAssDstSize:'译文字号', lblAssSrcSize:'原文字号', lblAssDstColor:'译文颜色', lblAssSrcColor:'原文颜色', lblAssDstMarginV:'译文离底距离', lblAssSrcMarginV:'原文离底距离', assDstMVTip:'译文行距画面底边的距离（像素，1080p 基准）。默认值随「分屏/双行」和「谁在上」自动变化；手动修改后固定不变。', assSrcMVTip:'原文行距画面底边的距离（像素，1080p 基准）。分屏模式下原文在画面上方时，同样按距底边计算；手动修改后固定不变。', assSizeRec:'推荐 ', assMVRec:'推荐 ',assSizeFollow:'按行业推荐值自动填充，可任意修改',assSizeLocked:'已用你的设置；上方为行业推荐值，仅供参考', assColorTip:'填 #RRGGBB 十六进制色值，例如 #FFFFFF 白、#FFD700 金黄。',
+  btnDownload:'⬇ 下载字幕', btnCopy:'复制到剪贴板', lblExpStyle:'导出字幕样式', assSplit:'分屏', assStack:'双行', lblFileFmt:'文件格式', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', secAssStyle:'ASS 字幕样式', lblAssDstSize:'译文字号', lblAssSrcSize:'原文字号', lblAssDstColor:'译文颜色', lblAssSrcColor:'原文颜色', lblAssDstMarginV:'译文离底距离', lblAssSrcMarginV:'原文离底距离', assDstMVTip:'译文行距画面底边的距离（像素，1080p 基准）。默认值随「分屏/双行」和「谁在上」自动变化；手动修改后固定不变。', assSrcMVTip:'原文行距画面底边的距离（像素，1080p 基准）。分屏模式下原文在画面上方时，同样按距底边计算；手动修改后固定不变。', assSizeRec:'推荐 ', assApply:'应用', assUndo:'撤销', assKept:'你的', assAutoReset:'已按新布局重置', assMVRec:'推荐 ',assSizeFollow:'按行业推荐值自动填充，可任意修改',assSizeLocked:'已用你的设置；上方为行业推荐值，仅供参考', assColorTip:'填 #RRGGBB 十六进制色值，例如 #FFFFFF 白、#FFD700 金黄。',
   showTitle:'一个字幕文件，导出花样这么多', showSub:'译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式', showMono:'仅译文', showBi:'双语双行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'双语双行 · ASS · 样式可控', showNote:'原文在上 / 译文在上自由切换，还能导出 TXT 对照稿', showLineDst:'♪ 爱在空中飘荡 ♪', fmtBiSrc:'双语 · 原文在上', fmtBiDst:'双语 · 译文在上', hintOutName:'切换目标语言后，文件名里的语言后缀会自动跟随。',
   logTitle:'运行日志', logReady:'就绪。导入字幕或载入示例开始。',
   stTotal:'条数', stDone:'已译', stDrop:'水词清空', stMerge:'跨条句组', stWrap:'折行', stIssues:'待处理',
@@ -1007,7 +1017,7 @@ const I18N = {
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
   stepExport:'匯出譯文', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
-  btnDownload:'⬇ 下載字幕', btnCopy:'複製到剪貼簿', lblExpStyle:'匯出字幕樣式', assSplit:'分割畫面', assStack:'雙行', lblFileFmt:'檔案格式', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', secAssStyle:'ASS 字幕樣式', lblAssDstSize:'譯文字號', lblAssSrcSize:'原文字號', lblAssDstColor:'譯文顏色', lblAssSrcColor:'原文顏色', lblAssDstMarginV:'譯文離底距離', lblAssSrcMarginV:'原文離底距離', assDstMVTip:'譯文行距畫面底邊的距離（像素，1080p 基準）。預設值隨「分割畫面／兩行」與「誰在上」自動變化；手動修改後固定不變。', assSrcMVTip:'原文行距畫面底邊的距離（像素，1080p 基準）。分割模式下原文在畫面上方時，同樣按距底邊計算；手動修改後固定不變。', assSizeRec:'推薦 ', assMVRec:'推薦 ',assSizeFollow:'依產業建議值自動帶入，可自由修改',assSizeLocked:'已使用你的設定；上方為產業建議值，僅供參考', assColorTip:'填 #RRGGBB 十六進位色值，例如 #FFFFFF 白、#FFD700 金黃。',
+  btnDownload:'⬇ 下載字幕', btnCopy:'複製到剪貼簿', lblExpStyle:'匯出字幕樣式', assSplit:'分割畫面', assStack:'雙行', lblFileFmt:'檔案格式', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', secAssStyle:'ASS 字幕樣式', lblAssDstSize:'譯文字號', lblAssSrcSize:'原文字號', lblAssDstColor:'譯文顏色', lblAssSrcColor:'原文顏色', lblAssDstMarginV:'譯文離底距離', lblAssSrcMarginV:'原文離底距離', assDstMVTip:'譯文行距畫面底邊的距離（像素，1080p 基準）。預設值隨「分割畫面／兩行」與「誰在上」自動變化；手動修改後固定不變。', assSrcMVTip:'原文行距畫面底邊的距離（像素，1080p 基準）。分割模式下原文在畫面上方時，同樣按距底邊計算；手動修改後固定不變。', assSizeRec:'推薦 ', assApply:'套用', assUndo:'撤銷', assKept:'你的', assAutoReset:'已依新版面重設', assMVRec:'推薦 ',assSizeFollow:'依產業建議值自動帶入，可自由修改',assSizeLocked:'已使用你的設定；上方為產業建議值，僅供參考', assColorTip:'填 #RRGGBB 十六進位色值，例如 #FFFFFF 白、#FFD700 金黃。',
   showTitle:'一個字幕檔案，匯出花樣這麼多', showSub:'譯文 + 原文隨心排版：4 種格式 × 5 種排版，共 14 種匯出樣式', showMono:'僅譯文', showBi:'雙語雙行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'雙語雙行 · ASS · 樣式可控', showNote:'原文在上 / 譯文在上自由切換，還能匯出 TXT 對照稿', showLineDst:'♪ 愛在空中飄蕩 ♪', fmtBiSrc:'雙語 · 原文在上', fmtBiDst:'雙語 · 譯文在上', hintOutName:'切換目標語言後，檔名裡的語言後綴會自動跟隨。',
   logTitle:'執行日誌', logReady:'就緒。匯入字幕或載入範例開始。',
   stTotal:'條數', stDone:'已譯', stDrop:'水詞清空', stMerge:'跨條句組', stWrap:'折行', stIssues:'待處理',
@@ -1102,7 +1112,7 @@ const I18N = {
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
   stepExport:'Export translation', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
-  btnDownload:'⬇ Download subtitles', btnCopy:'Copy to clipboard', lblExpStyle:'Export style', assSplit:'split screen', assStack:'stacked', lblFileFmt:'File format', lblExpFmt:'Export format', fmtMono:'Translated only', secAssStyle:'ASS style', lblAssDstSize:'Translation size', lblAssSrcSize:'Original size', lblAssDstColor:'Translation colour', lblAssSrcColor:'Original colour', lblAssDstMarginV:'Translation bottom margin', lblAssSrcMarginV:'Original bottom margin', assDstMVTip:'Distance from the translation line to the bottom edge (px, 1080p). The default follows the split/stacked mode and which line is on top; once you edit it, the value is kept.', assSrcMVTip:'Distance from the original line to the bottom edge (px, 1080p). In split mode, when the original sits at the top it is still measured from the bottom edge; once you edit it, the value is kept.', assSizeRec:'Recommended ', assMVRec:'Recommended ',assSizeFollow:'Prefilled from industry reference values — edit freely',assSizeLocked:'Using your value — the industry reference above is only a guide', assColorTip:'Enter a hex colour #RRGGBB, e.g. #FFFFFF (white) or #FFD700 (gold).',
+  btnDownload:'⬇ Download subtitles', btnCopy:'Copy to clipboard', lblExpStyle:'Export style', assSplit:'split screen', assStack:'stacked', lblFileFmt:'File format', lblExpFmt:'Export format', fmtMono:'Translated only', secAssStyle:'ASS style', lblAssDstSize:'Translation size', lblAssSrcSize:'Original size', lblAssDstColor:'Translation colour', lblAssSrcColor:'Original colour', lblAssDstMarginV:'Translation bottom margin', lblAssSrcMarginV:'Original bottom margin', assDstMVTip:'Distance from the translation line to the bottom edge (px, 1080p). The default follows the split/stacked mode and which line is on top; once you edit it, the value is kept.', assSrcMVTip:'Distance from the original line to the bottom edge (px, 1080p). In split mode, when the original sits at the top it is still measured from the bottom edge; once you edit it, the value is kept.', assSizeRec:'Recommended ', assApply:'Apply', assUndo:'Undo', assKept:'yours', assAutoReset:'Reset for new layout', assMVRec:'Recommended ',assSizeFollow:'Prefilled from industry reference values — edit freely',assSizeLocked:'Using your value — the industry reference above is only a guide', assColorTip:'Enter a hex colour #RRGGBB, e.g. #FFFFFF (white) or #FFD700 (gold).',
   showTitle:'One subtitle file, so many ways to export', showSub:'Mix translation and original freely: 4 formats × 5 layouts, 14 export styles', showMono:'Translation only', showBi:'Bilingual lines · SRT/VTT', showSplit:'Split screen · ASS', showStack:'Stacked lines · ASS · styled', showNote:'Original on top or translation on top, plus TXT transcript export', showLineDst:'♪ Love is in the air ♪', fmtBiSrc:'Bilingual · source on top', fmtBiDst:'Bilingual · translation on top', hintOutName:'The language suffix in the file name follows the target language.',
   logTitle:'Log', logReady:'Ready. Import subtitles or load the sample.',
   stTotal:'Cues', stDone:'Done', stDrop:'Fillers cleared', stMerge:'Multi-cue groups', stWrap:'Wrapped', stIssues:'Pending',
@@ -1197,7 +1207,7 @@ const I18N = {
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
   stepExport:'翻訳を書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
-  btnDownload:'⬇ 字幕をダウンロード', btnCopy:'クリップボードにコピー', lblExpStyle:'エクスポート形式', assSplit:'上下分割', assStack:'上下二行', lblFileFmt:'ファイル形式', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', secAssStyle:'ASS 字幕スタイル', lblAssDstSize:'訳文の文字サイズ', lblAssSrcSize:'原文の文字サイズ', lblAssDstColor:'訳文の色', lblAssSrcColor:'原文の色', lblAssDstMarginV:'訳文の下端からの距離', lblAssSrcMarginV:'原文の下端からの距離', assDstMVTip:'訳文行の画面下端からの距離（px、1080p 基準）。既定値は「上下分割／二行」と上下の組み合わせで変わります。手動で変更すると固定されます。', assSrcMVTip:'原文行の画面下端からの距離（px、1080p 基準）。上下分割で原文が上にある場合も下端からの距離で指定します。手動で変更すると固定されます。', assSizeRec:'推奨 ', assMVRec:'推奨 ',assSizeFollow:'業界の推奨値を自動入力しています。自由に変更できます',assSizeLocked:'あなたの設定を使用中。上の推奨値は参考です', assColorTip:'16 進カラーコード（#RRGGBB）を入力。例：#FFFFFF（白）、#FFD700（金色）。',
+  btnDownload:'⬇ 字幕をダウンロード', btnCopy:'クリップボードにコピー', lblExpStyle:'エクスポート形式', assSplit:'上下分割', assStack:'上下二行', lblFileFmt:'ファイル形式', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', secAssStyle:'ASS 字幕スタイル', lblAssDstSize:'訳文の文字サイズ', lblAssSrcSize:'原文の文字サイズ', lblAssDstColor:'訳文の色', lblAssSrcColor:'原文の色', lblAssDstMarginV:'訳文の下端からの距離', lblAssSrcMarginV:'原文の下端からの距離', assDstMVTip:'訳文行の画面下端からの距離（px、1080p 基準）。既定値は「上下分割／二行」と上下の組み合わせで変わります。手動で変更すると固定されます。', assSrcMVTip:'原文行の画面下端からの距離（px、1080p 基準）。上下分割で原文が上にある場合も下端からの距離で指定します。手動で変更すると固定されます。', assSizeRec:'推奨 ', assApply:'適用', assUndo:'元に戻す', assKept:'現在', assAutoReset:'新しいレイアウトで再設定', assMVRec:'推奨 ',assSizeFollow:'業界の推奨値を自動入力しています。自由に変更できます',assSizeLocked:'あなたの設定を使用中。上の推奨値は参考です', assColorTip:'16 進カラーコード（#RRGGBB）を入力。例：#FFFFFF（白）、#FFD700（金色）。',
   showTitle:'1つの字幕ファイル、書き出しはこんなに多彩', showSub:'訳文 + 原文を自由にレイアウト：4形式 × 5レイアウト、全14種の書き出しスタイル', showMono:'訳文のみ', showBi:'バイリンガル2行 · SRT/VTT', showSplit:'上下分割 · ASS', showStack:'上下二行 · ASS · スタイル指定可', showNote:'原文上・訳文上を自由に切替、TXT対訳稿も書き出せます', showLineDst:'♪ 愛が空に満ちて ♪', fmtBiSrc:'二か国語 · 原文が上', fmtBiDst:'二か国語 · 翻訳が上', hintOutName:'翻訳先言語を切り替えるとファイル名の言語suffixも自動で変わります。',
   logTitle:'ログ', logReady:'準備完了。字幕を読み込むかサンプルを開始してください。',
   stTotal:'件数', stDone:'翻訳済', stDrop:'フィラー消去', stMerge:'複数跨ぎ文', stWrap:'改行', stIssues:'未処理',
@@ -1292,7 +1302,7 @@ const I18N = {
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
   stepExport:'Exportar traducción', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
-  btnDownload:'⬇ Descargar subtítulos', btnCopy:'Copiar al portapapeles', lblExpStyle:'Estilo de exportación', assSplit:'pantalla dividida', assStack:'dos líneas', lblFileFmt:'Formato de archivo', lblExpFmt:'Formato de exportación', fmtMono:'Solo traducción', secAssStyle:'Estilo ASS', lblAssDstSize:'Tamaño de traducción', lblAssSrcSize:'Tamaño original', lblAssDstColor:'Color de traducción', lblAssSrcColor:'Color original', lblAssDstMarginV:'Margen inferior (traducción)', lblAssSrcMarginV:'Margen inferior (original)', assDstMVTip:'Distancia desde la línea de traducción al borde inferior (px, 1080p). El valor predeterminado cambia según el modo (dividido/dos líneas) y qué línea va arriba; al editarlo se fija.', assSrcMVTip:'Distancia desde la línea original al borde inferior (px, 1080p). En modo dividido, si el original va arriba también se mide desde el borde inferior; al editarlo se fija.', assSizeRec:'Recomendado: ', assMVRec:'Recomendado: ',assSizeFollow:'Se rellena con valores de referencia del sector; puedes cambiarlos',assSizeLocked:'Se usa tu valor; la referencia del sector de arriba es solo orientativa', assColorTip:'Introduce un color hexadecimal #RRGGBB, p. ej. #FFFFFF (blanco) o #FFD700 (dorado).',
+  btnDownload:'⬇ Descargar subtítulos', btnCopy:'Copiar al portapapeles', lblExpStyle:'Estilo de exportación', assSplit:'pantalla dividida', assStack:'dos líneas', lblFileFmt:'Formato de archivo', lblExpFmt:'Formato de exportación', fmtMono:'Solo traducción', secAssStyle:'Estilo ASS', lblAssDstSize:'Tamaño de traducción', lblAssSrcSize:'Tamaño original', lblAssDstColor:'Color de traducción', lblAssSrcColor:'Color original', lblAssDstMarginV:'Margen inferior (traducción)', lblAssSrcMarginV:'Margen inferior (original)', assDstMVTip:'Distancia desde la línea de traducción al borde inferior (px, 1080p). El valor predeterminado cambia según el modo (dividido/dos líneas) y qué línea va arriba; al editarlo se fija.', assSrcMVTip:'Distancia desde la línea original al borde inferior (px, 1080p). En modo dividido, si el original va arriba también se mide desde el borde inferior; al editarlo se fija.', assSizeRec:'Recomendado: ', assApply:'Aplicar', assUndo:'Deshacer', assKept:'actual', assAutoReset:'Restablecido para el nuevo diseño', assMVRec:'Recomendado: ',assSizeFollow:'Se rellena con valores de referencia del sector; puedes cambiarlos',assSizeLocked:'Se usa tu valor; la referencia del sector de arriba es solo orientativa', assColorTip:'Introduce un color hexadecimal #RRGGBB, p. ej. #FFFFFF (blanco) o #FFD700 (dorado).',
   showTitle:'Un archivo de subtítulos, tantas formas de exportarlo', showSub:'Traducción + original a tu gusto: 4 formatos × 5 diseños, 14 estilos de exportación', showMono:'Solo traducción', showBi:'Dos líneas bilingües · SRT/VTT', showSplit:'Pantalla dividida · ASS', showStack:'Dos líneas · ASS · con estilo', showNote:'Original arriba o traducción arriba, y también TXT en paralelo', showLineDst:'♪ El amor está en el aire ♪', fmtBiSrc:'Bilingüe · original arriba', fmtBiDst:'Bilingüe · traducción arriba', hintOutName:'El sufijo de idioma del nombre de archivo sigue al idioma destino.',
   logTitle:'Registro', logReady:'Listo. Importa subtítulos o carga el ejemplo.',
   stTotal:'Subtítulos', stDone:'Hechos', stDrop:'Relleno quitado', stMerge:'Grupos multi-línea', stWrap:'Ajustados', stIssues:'Pendientes',
@@ -1387,7 +1397,7 @@ const I18N = {
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
   stepExport:'Exportar tradução', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
-  btnDownload:'⬇ Baixar legendas', btnCopy:'Copiar para a área de transferência', lblExpStyle:'Estilo de exportação', assSplit:'tela dividida', assStack:'duas linhas', lblFileFmt:'Formato do arquivo', lblExpFmt:'Formato de exportação', fmtMono:'Somente tradução', secAssStyle:'Estilo ASS', lblAssDstSize:'Tamanho da tradução', lblAssSrcSize:'Tamanho original', lblAssDstColor:'Cor da tradução', lblAssSrcColor:'Cor original', lblAssDstMarginV:'Margem inferior (tradução)', lblAssSrcMarginV:'Margem inferior (original)', assDstMVTip:'Distância da linha de tradução até a borda inferior (px, 1080p). O padrão muda conforme o modo (dividido/duas linhas) e qual linha fica em cima; ao editar, o valor é fixado.', assSrcMVTip:'Distância da linha original até a borda inferior (px, 1080p). No modo dividido, quando o original fica em cima também é medido a partir da borda inferior; ao editar, o valor é fixado.', assSizeRec:'Recomendado: ', assMVRec:'Recomendado: ',assSizeFollow:'Preenchido com valores de referência do setor; pode alterar',assSizeLocked:'Usando o seu valor; a referência do setor acima é apenas uma guia', assColorTip:'Digite uma cor hexadecimal #RRGGBB, ex. #FFFFFF (branco) ou #FFD700 (dourado).',
+  btnDownload:'⬇ Baixar legendas', btnCopy:'Copiar para a área de transferência', lblExpStyle:'Estilo de exportação', assSplit:'tela dividida', assStack:'duas linhas', lblFileFmt:'Formato do arquivo', lblExpFmt:'Formato de exportação', fmtMono:'Somente tradução', secAssStyle:'Estilo ASS', lblAssDstSize:'Tamanho da tradução', lblAssSrcSize:'Tamanho original', lblAssDstColor:'Cor da tradução', lblAssSrcColor:'Cor original', lblAssDstMarginV:'Margem inferior (tradução)', lblAssSrcMarginV:'Margem inferior (original)', assDstMVTip:'Distância da linha de tradução até a borda inferior (px, 1080p). O padrão muda conforme o modo (dividido/duas linhas) e qual linha fica em cima; ao editar, o valor é fixado.', assSrcMVTip:'Distância da linha original até a borda inferior (px, 1080p). No modo dividido, quando o original fica em cima também é medido a partir da borda inferior; ao editar, o valor é fixado.', assSizeRec:'Recomendado: ', assApply:'Aplicar', assUndo:'Desfazer', assKept:'atual', assAutoReset:'Redefinido para o novo layout', assMVRec:'Recomendado: ',assSizeFollow:'Preenchido com valores de referência do setor; pode alterar',assSizeLocked:'Usando o seu valor; a referência do setor acima é apenas uma guia', assColorTip:'Digite uma cor hexadecimal #RRGGBB, ex. #FFFFFF (branco) ou #FFD700 (dourado).',
   showTitle:'Um arquivo de legendas, tantas formas de exportar', showSub:'Tradução + original do seu jeito: 4 formatos × 5 layouts, 14 estilos de exportação', showMono:'Só tradução', showBi:'Duas linhas bilíngues · SRT/VTT', showSplit:'Tela dividida · ASS', showStack:'Duas linhas · ASS · com estilo', showNote:'Original ou tradução em destaque, e também TXT comparativo', showLineDst:'♪ O amor está no ar ♪', fmtBiSrc:'Bilíngue · original acima', fmtBiDst:'Bilíngue · tradução acima', hintOutName:'O sufixo de idioma no nome do arquivo segue o idioma destino.',
   logTitle:'Registro', logReady:'Pronto. Importe legendas ou carregue o exemplo.',
   stTotal:'Legendas', stDone:'Feitas', stDrop:'Preenchido removido', stMerge:'Grupos multilinha', stWrap:'Quebradas', stIssues:'Pendentes',
@@ -1482,7 +1492,7 @@ const I18N = {
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
   stepExport:'번역 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
-  btnDownload:'⬇ 자막 다운로드', btnCopy:'클립보드에 복사', lblExpStyle:'내보내기 스타일', assSplit:'분할 화면', assStack:'두 줄', lblFileFmt:'파일 형식', lblExpFmt:'내보내기 형식', fmtMono:'번역문만', secAssStyle:'ASS 자막 스타일', lblAssDstSize:'번역 글자 크기', lblAssSrcSize:'원문 글자 크기', lblAssDstColor:'번역 색상', lblAssSrcColor:'원문 색상', lblAssDstMarginV:'번역 아래쪽 여백', lblAssSrcMarginV:'원문 아래쪽 여백', assDstMVTip:'번역 줄이 화면 아래쪽에서 떨어진 거리(px, 1080p 기준). 기본값은 분할/두 줄 모드와 위쪽 줄에 따라 달라지며, 직접 수정하면 고정됩니다.', assSrcMVTip:'원문 줄이 화면 아래쪽에서 떨어진 거리(px, 1080p 기준). 분할 모드에서 원문이 위쪽에 있어도 아래쪽 기준으로 계산됩니다. 직접 수정하면 고정됩니다.', assSizeRec:'추천 ', assMVRec:'추천 ',assSizeFollow:'업계 권장값이 자동 입력됩니다. 자유롭게 바꿀 수 있습니다',assSizeLocked:'사용자가 설정한 값을 사용합니다. 위 권장값은 참고용입니다', assColorTip:'#RRGGBB 16진수 색상값을 입력하세요. 예: #FFFFFF(흰색), #FFD700(금색).',
+  btnDownload:'⬇ 자막 다운로드', btnCopy:'클립보드에 복사', lblExpStyle:'내보내기 스타일', assSplit:'분할 화면', assStack:'두 줄', lblFileFmt:'파일 형식', lblExpFmt:'내보내기 형식', fmtMono:'번역문만', secAssStyle:'ASS 자막 스타일', lblAssDstSize:'번역 글자 크기', lblAssSrcSize:'원문 글자 크기', lblAssDstColor:'번역 색상', lblAssSrcColor:'원문 색상', lblAssDstMarginV:'번역 아래쪽 여백', lblAssSrcMarginV:'원문 아래쪽 여백', assDstMVTip:'번역 줄이 화면 아래쪽에서 떨어진 거리(px, 1080p 기준). 기본값은 분할/두 줄 모드와 위쪽 줄에 따라 달라지며, 직접 수정하면 고정됩니다.', assSrcMVTip:'원문 줄이 화면 아래쪽에서 떨어진 거리(px, 1080p 기준). 분할 모드에서 원문이 위쪽에 있어도 아래쪽 기준으로 계산됩니다. 직접 수정하면 고정됩니다.', assSizeRec:'추천 ', assApply:'적용', assUndo:'되돌리기', assKept:'현재', assAutoReset:'새 레이아웃으로 초기화', assMVRec:'추천 ',assSizeFollow:'업계 권장값이 자동 입력됩니다. 자유롭게 바꿀 수 있습니다',assSizeLocked:'사용자가 설정한 값을 사용합니다. 위 권장값은 참고용입니다', assColorTip:'#RRGGBB 16진수 색상값을 입력하세요. 예: #FFFFFF(흰색), #FFD700(금색).',
   showTitle:'자막 파일 하나, 내보내기는 이렇게 다양', showSub:'번역문 + 원문 자유 배치: 4가지 형식 × 5가지 레이아웃, 총 14가지 내보내기 스타일', showMono:'번역문만', showBi:'이중언어 2줄 · SRT/VTT', showSplit:'상하 분할 · ASS', showStack:'두 줄 · ASS · 스타일 지정', showNote:'원문 위/번역문 위 자유 전환, TXT 대조 원고도 내보내기 가능', showLineDst:'♪ 사랑이 공중에 떠있어 ♪', fmtBiSrc:'이중 언어 · 원문이 위', fmtBiDst:'이중 언어 · 번역문이 위', hintOutName:'대상 언어를 바꾸면 파일명의 언어 접미사도 자동으로 따라갑니다.',
   logTitle:'로그', logReady:'준비 완료. 자막을 불러오거나 샘플을 시작하세요.',
   stTotal:'자막 수', stDone:'완료', stDrop:'필러 정리', stMerge:'다중 자막 그룹', stWrap:'줄바꿈', stIssues:'대기',
@@ -1577,7 +1587,7 @@ const I18N = {
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
   stepExport:'Übersetzung exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
-  btnDownload:'⬇ Untertitel herunterladen', btnCopy:'In die Zwischenablage kopieren', lblExpStyle:'Exportstil', assSplit:'Split-Screen', assStack:'zweizeilig', lblFileFmt:'Dateiformat', lblExpFmt:'Exportformat', fmtMono:'Nur Übersetzung', secAssStyle:'ASS-Stil', lblAssDstSize:'Übersetzung Größe', lblAssSrcSize:'Original Größe', lblAssDstColor:'Übersetzung Farbe', lblAssSrcColor:'Original Farbe', lblAssDstMarginV:'Unterer Abstand (Übersetzung)', lblAssSrcMarginV:'Unterer Abstand (Original)', assDstMVTip:'Abstand der Übersetzungszeile zum unteren Bildrand (px, 1080p). Der Standardwert richtet sich nach dem Modus (Split/zweizeilig) und welcher Text oben steht; nach manueller Änderung bleibt der Wert fest.', assSrcMVTip:'Abstand der Originalzeile zum unteren Bildrand (px, 1080p). Im Split-Modus wird auch eine oben stehende Originalzeile vom unteren Rand aus gemessen; nach manueller Änderung bleibt der Wert fest.', assSizeRec:'Empfohlen: ', assMVRec:'Empfohlen: ',assSizeFollow:'Mit Branchen-Empfehlung vorbelegt — frei änderbar',assSizeLocked:'Dein Wert wird verwendet — die Empfehlung oben ist nur ein Anhaltspunkt', assColorTip:'Hex-Farbwert #RRGGBB eingeben, z. B. #FFFFFF (Weiß) oder #FFD700 (Gold).',
+  btnDownload:'⬇ Untertitel herunterladen', btnCopy:'In die Zwischenablage kopieren', lblExpStyle:'Exportstil', assSplit:'Split-Screen', assStack:'zweizeilig', lblFileFmt:'Dateiformat', lblExpFmt:'Exportformat', fmtMono:'Nur Übersetzung', secAssStyle:'ASS-Stil', lblAssDstSize:'Übersetzung Größe', lblAssSrcSize:'Original Größe', lblAssDstColor:'Übersetzung Farbe', lblAssSrcColor:'Original Farbe', lblAssDstMarginV:'Unterer Abstand (Übersetzung)', lblAssSrcMarginV:'Unterer Abstand (Original)', assDstMVTip:'Abstand der Übersetzungszeile zum unteren Bildrand (px, 1080p). Der Standardwert richtet sich nach dem Modus (Split/zweizeilig) und welcher Text oben steht; nach manueller Änderung bleibt der Wert fest.', assSrcMVTip:'Abstand der Originalzeile zum unteren Bildrand (px, 1080p). Im Split-Modus wird auch eine oben stehende Originalzeile vom unteren Rand aus gemessen; nach manueller Änderung bleibt der Wert fest.', assSizeRec:'Empfohlen: ', assApply:'Übernehmen', assUndo:'Rückgängig', assKept:'aktuell', assAutoReset:'Für neues Layout zurückgesetzt', assMVRec:'Empfohlen: ',assSizeFollow:'Mit Branchen-Empfehlung vorbelegt — frei änderbar',assSizeLocked:'Dein Wert wird verwendet — die Empfehlung oben ist nur ein Anhaltspunkt', assColorTip:'Hex-Farbwert #RRGGBB eingeben, z. B. #FFFFFF (Weiß) oder #FFD700 (Gold).',
   showTitle:'Eine Untertiteldatei, so viele Exportmöglichkeiten', showSub:'Übersetzung + Original frei kombinieren: 4 Formate × 5 Layouts, 14 Exportstile', showMono:'Nur Übersetzung', showBi:'Zweisprachig zweizeilig · SRT/VTT', showSplit:'Split-Screen · ASS', showStack:'Zweizeilig · ASS · mit Stil', showNote:'Original oder Übersetzung oben, plus TXT-Transkript', showLineDst:'♪ Liebe liegt in der Luft ♪', fmtBiSrc:'Zweisprachig · Original oben', fmtBiDst:'Zweisprachig · Übersetzung oben', hintOutName:'Das Sprach-Suffix im Dateinamen folgt der Zielsprache.',
   logTitle:'Protokoll', logReady:'Bereit. Untertitel importieren oder Beispiel laden.',
   stTotal:'Untertitel', stDone:'Fertig', stDrop:'Füllwörter entfernt', stMerge:'Mehrzeilige Gruppen', stWrap:'Umgebrochen', stIssues:'Offen',
@@ -1672,7 +1682,7 @@ const I18N = {
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
   stepExport:'Exporter la traduction', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
-  btnDownload:'⬇ Télécharger les sous-titres', btnCopy:'Copier dans le presse-papiers', lblExpStyle:'Style d’exportation', assSplit:'écran partagé', assStack:'deux lignes', lblFileFmt:'Format de fichier', lblExpFmt:"Format d'export", fmtMono:'Traduction seule', secAssStyle:'Style ASS', lblAssDstSize:'Taille de traduction', lblAssSrcSize:'Taille originale', lblAssDstColor:'Couleur de traduction', lblAssSrcColor:'Couleur originale', lblAssDstMarginV:'Marge basse (traduction)', lblAssSrcMarginV:'Marge basse (original)', assDstMVTip:'Distance entre la ligne de traduction et le bord inférieur (px, 1080p). La valeur par défaut suit le mode (écran partagé/deux lignes) et la ligne placée en haut ; après modification manuelle, elle est fixée.', assSrcMVTip:'Distance entre la ligne originale et le bord inférieur (px, 1080p). En mode écran partagé, même placée en haut, elle reste mesurée depuis le bord inférieur ; après modification manuelle, la valeur est fixée.', assSizeRec:'Recommandé : ', assMVRec:'Recommandé : ',assSizeFollow:'Prérempli avec les valeurs de référence du secteur — modifiable librement',assSizeLocked:'Votre valeur est utilisée ; la référence du secteur ci-dessus n’est qu’un guide', assColorTip:'Saisissez une couleur hexadécimale #RRGGBB, ex. #FFFFFF (blanc) ou #FFD700 (doré).',
+  btnDownload:'⬇ Télécharger les sous-titres', btnCopy:'Copier dans le presse-papiers', lblExpStyle:'Style d’exportation', assSplit:'écran partagé', assStack:'deux lignes', lblFileFmt:'Format de fichier', lblExpFmt:"Format d'export", fmtMono:'Traduction seule', secAssStyle:'Style ASS', lblAssDstSize:'Taille de traduction', lblAssSrcSize:'Taille originale', lblAssDstColor:'Couleur de traduction', lblAssSrcColor:'Couleur originale', lblAssDstMarginV:'Marge basse (traduction)', lblAssSrcMarginV:'Marge basse (original)', assDstMVTip:'Distance entre la ligne de traduction et le bord inférieur (px, 1080p). La valeur par défaut suit le mode (écran partagé/deux lignes) et la ligne placée en haut ; après modification manuelle, elle est fixée.', assSrcMVTip:'Distance entre la ligne originale et le bord inférieur (px, 1080p). En mode écran partagé, même placée en haut, elle reste mesurée depuis le bord inférieur ; après modification manuelle, la valeur est fixée.', assSizeRec:'Recommandé : ', assApply:'Appliquer', assUndo:'Annuler', assKept:'actuel', assAutoReset:'Réinitialisé pour la nouvelle disposition', assMVRec:'Recommandé : ',assSizeFollow:'Prérempli avec les valeurs de référence du secteur — modifiable librement',assSizeLocked:'Votre valeur est utilisée ; la référence du secteur ci-dessus n’est qu’un guide', assColorTip:'Saisissez une couleur hexadécimale #RRGGBB, ex. #FFFFFF (blanc) ou #FFD700 (doré).',
   showTitle:'Un seul fichier de sous-titres, tant de façons de l\'exporter', showSub:'Traduction + original à votre guise : 4 formats × 5 dispositions, 14 styles d\'export', showMono:'Traduction seule', showBi:'Deux lignes bilingues · SRT/VTT', showSplit:'Écran partagé · ASS', showStack:'Deux lignes · ASS · stylisées', showNote:'Original ou traduction au premier plan, et export TXT en regard', showLineDst:'♪ L\'amour est dans l\'air ♪', fmtBiSrc:'Bilingue · original en haut', fmtBiDst:'Bilingue · traduction en haut', hintOutName:'Le suffixe de langue du nom de fichier suit la langue cible.',
   logTitle:'Journal', logReady:'Prêt. Importez des sous-titres ou chargez l\u2019exemple.',
   stTotal:'Sous-titres', stDone:'Terminés', stDrop:'Remplissage retiré', stMerge:'Groupes multi-lignes', stWrap:'Répartis', stIssues:'En attente',
@@ -1767,7 +1777,7 @@ const I18N = {
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
   stepExport:'Ekspor terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
-  btnDownload:'⬇ Unduh subtitle', btnCopy:'Salin ke papan klip', lblExpStyle:'Gaya ekspor', assSplit:'layar terbagi', assStack:'dua baris', lblFileFmt:'Format file', lblExpFmt:'Format ekspor', fmtMono:'Terjemahan saja', secAssStyle:'Gaya ASS', lblAssDstSize:'Ukuran terjemahan', lblAssSrcSize:'Ukuran asli', lblAssDstColor:'Warna terjemahan', lblAssSrcColor:'Warna asli', lblAssDstMarginV:'Jarak dari bawah (terjemahan)', lblAssSrcMarginV:'Jarak dari bawah (asli)', assDstMVTip:'Jarak baris terjemahan ke tepi bawah (px, 1080p). Nilai bawaan mengikuti mode (layar terbagi/dua baris) dan baris yang di atas; setelah diubah manual, nilainya tetap.', assSrcMVTip:'Jarak baris asli ke tepi bawah (px, 1080p). Dalam mode layar terbagi, bila baris asli di atas pun tetap dihitung dari tepi bawah; setelah diubah manual, nilainya tetap.', assSizeRec:'Disarankan ', assMVRec:'Disarankan ',assSizeFollow:'Diisi otomatis dari nilai referensi industri; bisa diubah bebas',assSizeLocked:'Menggunakan nilai Anda; referensi industri di atas hanya panduan', assColorTip:'Masukkan warna heksadesimal #RRGGBB, mis. #FFFFFF (putih) atau #FFD700 (emas).',
+  btnDownload:'⬇ Unduh subtitle', btnCopy:'Salin ke papan klip', lblExpStyle:'Gaya ekspor', assSplit:'layar terbagi', assStack:'dua baris', lblFileFmt:'Format file', lblExpFmt:'Format ekspor', fmtMono:'Terjemahan saja', secAssStyle:'Gaya ASS', lblAssDstSize:'Ukuran terjemahan', lblAssSrcSize:'Ukuran asli', lblAssDstColor:'Warna terjemahan', lblAssSrcColor:'Warna asli', lblAssDstMarginV:'Jarak dari bawah (terjemahan)', lblAssSrcMarginV:'Jarak dari bawah (asli)', assDstMVTip:'Jarak baris terjemahan ke tepi bawah (px, 1080p). Nilai bawaan mengikuti mode (layar terbagi/dua baris) dan baris yang di atas; setelah diubah manual, nilainya tetap.', assSrcMVTip:'Jarak baris asli ke tepi bawah (px, 1080p). Dalam mode layar terbagi, bila baris asli di atas pun tetap dihitung dari tepi bawah; setelah diubah manual, nilainya tetap.', assSizeRec:'Disarankan ', assApply:'Terapkan', assUndo:'Urungkan', assKept:'saat ini', assAutoReset:'Direset untuk tata letak baru', assMVRec:'Disarankan ',assSizeFollow:'Diisi otomatis dari nilai referensi industri; bisa diubah bebas',assSizeLocked:'Menggunakan nilai Anda; referensi industri di atas hanya panduan', assColorTip:'Masukkan warna heksadesimal #RRGGBB, mis. #FFFFFF (putih) atau #FFD700 (emas).',
   showTitle:'Satu file subtitle, banyak cara mengekspor', showSub:'Terjemahan + asli sesukamu: 4 format × 5 tata letak, 14 gaya ekspor', showMono:'Hanya terjemahan', showBi:'Dwibahasa dua baris · SRT/VTT', showSplit:'Layar terbagi · ASS', showStack:'Dua baris · ASS · bergaya', showNote:'Asli di atas atau terjemahan di atas, plus ekspor TXT pembanding', showLineDst:'♪ Cinta di udara ♪', fmtBiSrc:'Dwibahasa · teks asli di atas', fmtBiDst:'Dwibahasa · terjemahan di atas', hintOutName:'Akhiran bahasa pada nama file mengikuti bahasa target.',
   logTitle:'Log', logReady:'Siap. Impor subtitle atau muat contoh.',
   stTotal:'Subtitle', stDone:'Selesai', stDrop:'Pengisi dihapus', stMerge:'Grup multi-baris', stWrap:'Dibungkus', stIssues:'Tertunda',
@@ -1862,7 +1872,7 @@ const I18N = {
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
   stepExport:'अनुवाद निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
-  btnDownload:'⬇ सबटाइटल डाउनलोड', btnCopy:'क्लिपबोर्ड पर कॉपी करें', lblExpStyle:'निर्यात शैली', assSplit:'स्प्लिट स्क्रीन', assStack:'दो पंक्तियाँ', lblFileFmt:'फ़ाइल प्रारूप', lblExpFmt:'निर्यात प्रारूप', fmtMono:'केवल अनुवाद', secAssStyle:'ASS शैली', lblAssDstSize:'अनुवाद आकार', lblAssSrcSize:'मूल आकार', lblAssDstColor:'अनुवाद रंग', lblAssSrcColor:'मूल रंग', lblAssDstMarginV:'अनुवाद नीचे की दूरी', lblAssSrcMarginV:'मूल नीचे की दूरी', assDstMVTip:'अनुवाद पंक्ति की निचले किनारे से दूरी (px, 1080p)। डिफ़ॉल्ट मान स्प्लिट/दो-पंक्ति मोड और ऊपर वाली पंक्ति के अनुसार बदलता है; संपादित करने के बाद स्थिर रहता है।', assSrcMVTip:'मूल पंक्ति की निचले किनारे से दूरी (px, 1080p)। स्प्लिट मोड में मूल पंक्ति ऊपर होने पर भी निचले किनारे से ही मापी जाती है; संपादित करने के बाद स्थिर रहती है।', assSizeRec:'अनुशंसित ', assMVRec:'अनुशंसित ',assSizeFollow:'उद्योग के संदर्भ मान स्वतः भरे गए; इच्छानुसार बदलें',assSizeLocked:'आपका मान उपयोग हो रहा है; ऊपर का उद्योग संदर्भ केवल मार्गदर्शन है', assColorTip:'#RRGGBB हेक्स रंग दर्ज करें, जैसे #FFFFFF (सफ़ेद) या #FFD700 (सुनहरा)।',
+  btnDownload:'⬇ सबटाइटल डाउनलोड', btnCopy:'क्लिपबोर्ड पर कॉपी करें', lblExpStyle:'निर्यात शैली', assSplit:'स्प्लिट स्क्रीन', assStack:'दो पंक्तियाँ', lblFileFmt:'फ़ाइल प्रारूप', lblExpFmt:'निर्यात प्रारूप', fmtMono:'केवल अनुवाद', secAssStyle:'ASS शैली', lblAssDstSize:'अनुवाद आकार', lblAssSrcSize:'मूल आकार', lblAssDstColor:'अनुवाद रंग', lblAssSrcColor:'मूल रंग', lblAssDstMarginV:'अनुवाद नीचे की दूरी', lblAssSrcMarginV:'मूल नीचे की दूरी', assDstMVTip:'अनुवाद पंक्ति की निचले किनारे से दूरी (px, 1080p)। डिफ़ॉल्ट मान स्प्लिट/दो-पंक्ति मोड और ऊपर वाली पंक्ति के अनुसार बदलता है; संपादित करने के बाद स्थिर रहता है।', assSrcMVTip:'मूल पंक्ति की निचले किनारे से दूरी (px, 1080p)। स्प्लिट मोड में मूल पंक्ति ऊपर होने पर भी निचले किनारे से ही मापी जाती है; संपादित करने के बाद स्थिर रहती है।', assSizeRec:'अनुशंसित ', assApply:'लागू करें', assUndo:'पूर्ववत', assKept:'आपका', assAutoReset:'नए लेआउट के लिए रीसेट', assMVRec:'अनुशंसित ',assSizeFollow:'उद्योग के संदर्भ मान स्वतः भरे गए; इच्छानुसार बदलें',assSizeLocked:'आपका मान उपयोग हो रहा है; ऊपर का उद्योग संदर्भ केवल मार्गदर्शन है', assColorTip:'#RRGGBB हेक्स रंग दर्ज करें, जैसे #FFFFFF (सफ़ेद) या #FFD700 (सुनहरा)।',
   showTitle:'एक सबटाइटल फाइल, एक्सपोर्ट के इतने तरीके', showSub:'अनुवाद + मूल अपनी पसंद से: 4 फॉर्मैट × 5 लेआउट, 14 एक्सपोर्ट स्टाइल', showMono:'केवल अनुवाद', showBi:'द्विभाषी दो पंक्तियाँ · SRT/VTT', showSplit:'ऊपर-नीचे · ASS', showStack:'दो पंक्तियाँ · ASS · स्टाइल सहित', showNote:'मूल ऊपर या अनुवाद ऊपर, साथ में TXT तुलना पाठ भी', showLineDst:'♪ प्यार हवा में है ♪', fmtBiSrc:'द्विभाषी · मूल ऊपर', fmtBiDst:'द्विभाषी · अनुवाद ऊपर', hintOutName:'फ़ाइल नाम का भाषा-प्रत्यय लक्ष्य भाषा के साथ बदलता है।',
   logTitle:'लॉग', logReady:'तैयार। सबटाइटल आयात करें या नमूना लोड करें।',
   stTotal:'सबटाइटल', stDone:'पूर्ण', stDrop:'फिलर हटाए', stMerge:'बहु-पंक्ति समूह', stWrap:'रैप्ड', stIssues:'शेष',
@@ -1957,7 +1967,7 @@ const I18N = {
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
   stepExport:'ส่งออกคำแปล', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
-  btnDownload:'⬇ ดาวน์โหลดซับไตเติล', btnCopy:'คัดลอกไปยังคลิปบอร์ด', lblExpStyle:'รูปแบบการส่งออก', assSplit:'แยกหน้าจอ', assStack:'สองบรรทัด', lblFileFmt:'รูปแบบไฟล์', lblExpFmt:'รูปแบบการส่งออก', fmtMono:'เฉพาะคำแปล', secAssStyle:'รูปแบบ ASS', lblAssDstSize:'ขนาดคำแปล', lblAssSrcSize:'ขนาดต้นฉบับ', lblAssDstColor:'สีคำแปล', lblAssSrcColor:'สีต้นฉบับ', lblAssDstMarginV:'ระยะจากขอบล่าง (คำแปล)', lblAssSrcMarginV:'ระยะจากขอบล่าง (ต้นฉบับ)', assDstMVTip:'ระยะห่างของบรรทัดคำแปลจากขอบล่าง (px, 1080p) ค่าเริ่มต้นเปลี่ยนตามโหมดแยก/สองบรรทัดและบรรทัดที่อยู่ด้านบน เมื่อแก้ไขเองค่าจะคงที่', assSrcMVTip:'ระยะห่างของบรรทัดต้นฉบับจากขอบล่าง (px, 1080p) ในโหมดแยก แม้ต้นฉบับจะอยู่ด้านบนก็ยังวัดจากขอบล่าง เมื่อแก้ไขเองค่าจะคงที่', assSizeRec:'แนะนำ ', assMVRec:'แนะนำ ',assSizeFollow:'เติมอัตโนมัติจากค่าอ้างอิงอุตสาหกรรม สามารถแก้ไขได้ตามต้องการ',assSizeLocked:'ใช้ค่าที่คุณตั้งเอง ค่าอ้างอิงอุตสาหกรรมด้านบนเป็นเพียงข้อมูลประกอบ', assColorTip:'ใส่ค่าสีฐานสิบหก #RRGGBB เช่น #FFFFFF (ขาว) หรือ #FFD700 (ทอง)',
+  btnDownload:'⬇ ดาวน์โหลดซับไตเติล', btnCopy:'คัดลอกไปยังคลิปบอร์ด', lblExpStyle:'รูปแบบการส่งออก', assSplit:'แยกหน้าจอ', assStack:'สองบรรทัด', lblFileFmt:'รูปแบบไฟล์', lblExpFmt:'รูปแบบการส่งออก', fmtMono:'เฉพาะคำแปล', secAssStyle:'รูปแบบ ASS', lblAssDstSize:'ขนาดคำแปล', lblAssSrcSize:'ขนาดต้นฉบับ', lblAssDstColor:'สีคำแปล', lblAssSrcColor:'สีต้นฉบับ', lblAssDstMarginV:'ระยะจากขอบล่าง (คำแปล)', lblAssSrcMarginV:'ระยะจากขอบล่าง (ต้นฉบับ)', assDstMVTip:'ระยะห่างของบรรทัดคำแปลจากขอบล่าง (px, 1080p) ค่าเริ่มต้นเปลี่ยนตามโหมดแยก/สองบรรทัดและบรรทัดที่อยู่ด้านบน เมื่อแก้ไขเองค่าจะคงที่', assSrcMVTip:'ระยะห่างของบรรทัดต้นฉบับจากขอบล่าง (px, 1080p) ในโหมดแยก แม้ต้นฉบับจะอยู่ด้านบนก็ยังวัดจากขอบล่าง เมื่อแก้ไขเองค่าจะคงที่', assSizeRec:'แนะนำ ', assApply:'ใช้ค่านี้', assUndo:'ย้อนกลับ', assKept:'ของคุณ', assAutoReset:'รีเซ็ตสำหรับรูปแบบใหม่', assMVRec:'แนะนำ ',assSizeFollow:'เติมอัตโนมัติจากค่าอ้างอิงอุตสาหกรรม สามารถแก้ไขได้ตามต้องการ',assSizeLocked:'ใช้ค่าที่คุณตั้งเอง ค่าอ้างอิงอุตสาหกรรมด้านบนเป็นเพียงข้อมูลประกอบ', assColorTip:'ใส่ค่าสีฐานสิบหก #RRGGBB เช่น #FFFFFF (ขาว) หรือ #FFD700 (ทอง)',
   showTitle:'ไฟล์คำบรรยายไฟล์เดียว ส่งออกได้หลากหลาย', showSub:'คำแปล + ต้นฉบับจัดได้ตามใจ: 4 รูปแบบ × 5 เลย์เอาต์ รวม 14 สไตล์การส่งออก', showMono:'เฉพาะคำแปล', showBi:'สองภาษาสองบรรทัด · SRT/VTT', showSplit:'แบ่งบน-ล่าง · ASS', showStack:'สองบรรทัด · ASS · กำหนดสไตล์ได้', showNote:'ต้นฉบับบนหรือคำแปลบนสลับได้ พร้อมส่งออก TXT เทียบข้อความ', showLineDst:'♪ ความรักอยู่ในอากาศ ♪', fmtBiSrc:'สองภาษา · ต้นฉบับอยู่บน', fmtBiDst:'สองภาษา · คำแปลอยู่บน', hintOutName:'คำลงท้ายภาษาในชื่อไฟล์จะเปลี่ยนตามภาษาเป้าหมาย',
   logTitle:'บันทึก', logReady:'พร้อมแล้ว นำเข้าซับไตเติลหรือโหลดตัวอย่างเพื่อเริ่ม',
   stTotal:'ซับไตเติล', stDone:'แปลแล้ว', stDrop:'ลบคำเสียบแล้ว', stMerge:'กลุ่มข้ามบรรทัด', stWrap:'ตัดบรรทัดแล้ว', stIssues:'ค้างอยู่',
@@ -2052,7 +2062,7 @@ const I18N = {
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
   stepExport:'Xuất bản dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
-  btnDownload:'⬇ Tải phụ đề', btnCopy:'Sao chép vào bộ nhớ tạm', lblExpStyle:'Kiểu xuất', assSplit:'chia đôi màn hình', assStack:'hai dòng', lblFileFmt:'Định dạng tệp', lblExpFmt:'Định dạng xuất', fmtMono:'Chỉ bản dịch', secAssStyle:'Kiểu ASS', lblAssDstSize:'Cỡ chữ bản dịch', lblAssSrcSize:'Cỡ chữ gốc', lblAssDstColor:'Màu bản dịch', lblAssSrcColor:'Màu gốc', lblAssDstMarginV:'Cách mép dưới (bản dịch)', lblAssSrcMarginV:'Cách mép dưới (bản gốc)', assDstMVTip:'Khoảng cách từ dòng bản dịch đến mép dưới (px, 1080p). Giá trị mặc định thay đổi theo chế độ chia đôi/hai dòng và dòng ở trên; sau khi chỉnh tay, giá trị được giữ cố định.', assSrcMVTip:'Khoảng cách từ dòng gốc đến mép dưới (px, 1080p). Trong chế độ chia đôi, dòng gốc ở trên vẫn tính từ mép dưới; sau khi chỉnh tay, giá trị được giữ cố định.', assSizeRec:'Đề xuất ', assMVRec:'Đề xuất ',assSizeFollow:'Tự động điền theo giá trị tham chiếu ngành; có thể sửa tùy ý',assSizeLocked:'Đang dùng giá trị của bạn; giá trị tham chiếu ngành ở trên chỉ để tham khảo', assColorTip:'Nhập mã màu hex #RRGGBB, ví dụ #FFFFFF (trắng) hoặc #FFD700 (vàng kim).',
+  btnDownload:'⬇ Tải phụ đề', btnCopy:'Sao chép vào bộ nhớ tạm', lblExpStyle:'Kiểu xuất', assSplit:'chia đôi màn hình', assStack:'hai dòng', lblFileFmt:'Định dạng tệp', lblExpFmt:'Định dạng xuất', fmtMono:'Chỉ bản dịch', secAssStyle:'Kiểu ASS', lblAssDstSize:'Cỡ chữ bản dịch', lblAssSrcSize:'Cỡ chữ gốc', lblAssDstColor:'Màu bản dịch', lblAssSrcColor:'Màu gốc', lblAssDstMarginV:'Cách mép dưới (bản dịch)', lblAssSrcMarginV:'Cách mép dưới (bản gốc)', assDstMVTip:'Khoảng cách từ dòng bản dịch đến mép dưới (px, 1080p). Giá trị mặc định thay đổi theo chế độ chia đôi/hai dòng và dòng ở trên; sau khi chỉnh tay, giá trị được giữ cố định.', assSrcMVTip:'Khoảng cách từ dòng gốc đến mép dưới (px, 1080p). Trong chế độ chia đôi, dòng gốc ở trên vẫn tính từ mép dưới; sau khi chỉnh tay, giá trị được giữ cố định.', assSizeRec:'Đề xuất ', assApply:'Áp dụng', assUndo:'Hoàn tác', assKept:'của bạn', assAutoReset:'Đặt lại theo bố cục mới', assMVRec:'Đề xuất ',assSizeFollow:'Tự động điền theo giá trị tham chiếu ngành; có thể sửa tùy ý',assSizeLocked:'Đang dùng giá trị của bạn; giá trị tham chiếu ngành ở trên chỉ để tham khảo', assColorTip:'Nhập mã màu hex #RRGGBB, ví dụ #FFFFFF (trắng) hoặc #FFD700 (vàng kim).',
   showTitle:'Một tệp phụ đề, bao nhiêu cách xuất', showSub:'Bản dịch + nguyên văn tùy ý: 4 định dạng × 5 bố cục, 14 kiểu xuất', showMono:'Chỉ bản dịch', showBi:'Song ngữ hai dòng · SRT/VTT', showSplit:'Chia trên-dưới · ASS', showStack:'Hai dòng · ASS · có kiểu dáng', showNote:'Nguyên văn trên hay bản dịch trên tùy chọn, còn xuất TXT đối chiếu', showLineDst:'♪ Tình yêu trong không khí ♪', fmtBiSrc:'Song ngữ · gốc ở trên', fmtBiDst:'Song ngữ · dịch ở trên', hintOutName:'Hậu tố ngôn ngữ trong tên file theo ngôn ngữ đích.',
   logTitle:'Nhật ký', logReady:'Sẵn sàng. Nhập phụ đề hoặc tải ví dụ mẫu.',
   stTotal:'Phụ đề', stDone:'Xong', stDrop:'Đã dọn đệm', stMerge:'Nhóm nhiều dòng', stWrap:'Đã ngắt dòng', stIssues:'Chờ xử lý',
@@ -2147,7 +2157,7 @@ const I18N = {
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
   stepExport:'Экспорт перевода', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
-  btnDownload:'⬇ Скачать субтитры', btnCopy:'Копировать в буфер обмена', lblExpStyle:'Стиль экспорта', assSplit:'раздельный экран', assStack:'две строки', lblFileFmt:'Формат файла', lblExpFmt:'Формат экспорта', fmtMono:'Только перевод', secAssStyle:'Стиль ASS', lblAssDstSize:'Размер перевода', lblAssSrcSize:'Размер оригинала', lblAssDstColor:'Цвет перевода', lblAssSrcColor:'Цвет оригинала', lblAssDstMarginV:'Отступ снизу (перевод)', lblAssSrcMarginV:'Отступ снизу (оригинал)', assDstMVTip:'Расстояние от строки перевода до нижнего края (px, 1080p). Значение по умолчанию зависит от режима (раздельный экран/две строки) и того, какая строка сверху; после ручного изменения оно фиксируется.', assSrcMVTip:'Расстояние от строки оригинала до нижнего края (px, 1080p). В режиме раздельного экрана строка оригинала сверху также отсчитывается от нижнего края; после ручного изменения значение фиксируется.', assSizeRec:'Рекомендуется ', assMVRec:'Рекомендуется ',assSizeFollow:'Заполнено отраслевыми справочными значениями — можно менять',assSizeLocked:'Используется ваше значение; отраслевая рекомендация выше — лишь ориентир', assColorTip:'Введите цвет в HEX (#RRGGBB), например #FFFFFF (белый) или #FFD700 (золотой).',
+  btnDownload:'⬇ Скачать субтитры', btnCopy:'Копировать в буфер обмена', lblExpStyle:'Стиль экспорта', assSplit:'раздельный экран', assStack:'две строки', lblFileFmt:'Формат файла', lblExpFmt:'Формат экспорта', fmtMono:'Только перевод', secAssStyle:'Стиль ASS', lblAssDstSize:'Размер перевода', lblAssSrcSize:'Размер оригинала', lblAssDstColor:'Цвет перевода', lblAssSrcColor:'Цвет оригинала', lblAssDstMarginV:'Отступ снизу (перевод)', lblAssSrcMarginV:'Отступ снизу (оригинал)', assDstMVTip:'Расстояние от строки перевода до нижнего края (px, 1080p). Значение по умолчанию зависит от режима (раздельный экран/две строки) и того, какая строка сверху; после ручного изменения оно фиксируется.', assSrcMVTip:'Расстояние от строки оригинала до нижнего края (px, 1080p). В режиме раздельного экрана строка оригинала сверху также отсчитывается от нижнего края; после ручного изменения значение фиксируется.', assSizeRec:'Рекомендуется ', assApply:'Применить', assUndo:'Отменить', assKept:'своё', assAutoReset:'Сброшено для новой раскладки', assMVRec:'Рекомендуется ',assSizeFollow:'Заполнено отраслевыми справочными значениями — можно менять',assSizeLocked:'Используется ваше значение; отраслевая рекомендация выше — лишь ориентир', assColorTip:'Введите цвет в HEX (#RRGGBB), например #FFFFFF (белый) или #FFD700 (золотой).',
   showTitle:'Один файл субтитров — столько способов экспорта', showSub:'Перевод + оригинал на ваш вкус: 4 формата × 5 макетов, 14 стилей экспорта', showMono:'Только перевод', showBi:'Двуязычные строки · SRT/VTT', showSplit:'Верх-низ · ASS', showStack:'Две строки · ASS · со стилями', showNote:'Оригинал или перевод сверху, плюс TXT-транскрипт', showLineDst:'♪ Любовь витает в воздухе ♪', fmtBiSrc:'Двуязычный · оригинал сверху', fmtBiDst:'Двуязычный · перевод сверху', hintOutName:'Суффикс языка в имени файла следует за языком перевода.',
   logTitle:'Журнал', logReady:'Готово. Импортируйте субтитры или загрузите пример.',
   stTotal:'Субтитров', stDone:'Готово', stDrop:'Заполнители убраны', stMerge:'Многострочные группы', stWrap:'Перенесено', stIssues:'Осталось',
@@ -2242,7 +2252,7 @@ const I18N = {
   btnPost:'↻ Solo post-elaborazione (a capo/pulizia tag)',
   hintPrivacy:'Modello predefinito: i sottotitoli passano dal server di questo sito verso il fornitore configurato dall\'amministratore; API personalizzata: il fornitore scelto li elabora direttamente, senza passare da questo sito.',
   stepExport:'Esporta traduzione', lblOutName:'Nome file di esportazione (automatico: nome origine + lingua di destinazione)', outPh:'xxx_tradotto.srt',
-  btnDownload:'⬇ Scarica sottotitoli', btnCopy:'Copia negli appunti', lblExpStyle:'Stile di esportazione', assSplit:'schermo diviso', assStack:'su due righe', lblFileFmt:'Formato file', lblExpFmt:'Formato di esportazione', fmtMono:'Solo traduzione', secAssStyle:'Stile ASS', lblAssDstSize:'Dimensione traduzione', lblAssSrcSize:'Dimensione originale', lblAssDstColor:'Colore traduzione', lblAssSrcColor:'Colore originale', lblAssDstMarginV:'Margine inferiore (traduzione)', lblAssSrcMarginV:'Margine inferiore (originale)', assDstMVTip:'Distanza della riga di traduzione dal bordo inferiore (px, 1080p). Il valore predefinito segue la modalità (schermo diviso/due righe) e quale riga sta in alto; dopo la modifica manuale resta fisso.', assSrcMVTip:'Distanza della riga originale dal bordo inferiore (px, 1080p). In modalità schermo diviso, anche se la riga originale sta in alto, si misura comunque dal bordo inferiore; dopo la modifica manuale resta fisso.', assSizeRec:'Consigliato: ', assMVRec:'Consigliato: ',assSizeFollow:'Precompilato con i valori di riferimento del settore — modificabile',assSizeLocked:'Viene usato il tuo valore; il riferimento del settore sopra è solo una guida', assColorTip:'Inserisci un colore esadecimale #RRGGBB, es. #FFFFFF (bianco) o #FFD700 (oro).',
+  btnDownload:'⬇ Scarica sottotitoli', btnCopy:'Copia negli appunti', lblExpStyle:'Stile di esportazione', assSplit:'schermo diviso', assStack:'su due righe', lblFileFmt:'Formato file', lblExpFmt:'Formato di esportazione', fmtMono:'Solo traduzione', secAssStyle:'Stile ASS', lblAssDstSize:'Dimensione traduzione', lblAssSrcSize:'Dimensione originale', lblAssDstColor:'Colore traduzione', lblAssSrcColor:'Colore originale', lblAssDstMarginV:'Margine inferiore (traduzione)', lblAssSrcMarginV:'Margine inferiore (originale)', assDstMVTip:'Distanza della riga di traduzione dal bordo inferiore (px, 1080p). Il valore predefinito segue la modalità (schermo diviso/due righe) e quale riga sta in alto; dopo la modifica manuale resta fisso.', assSrcMVTip:'Distanza della riga originale dal bordo inferiore (px, 1080p). In modalità schermo diviso, anche se la riga originale sta in alto, si misura comunque dal bordo inferiore; dopo la modifica manuale resta fisso.', assSizeRec:'Consigliato: ', assApply:'Applica', assUndo:'Annulla', assKept:'tuo', assAutoReset:'Reimpostato per il nuovo layout', assMVRec:'Consigliato: ',assSizeFollow:'Precompilato con i valori di riferimento del settore — modificabile',assSizeLocked:'Viene usato il tuo valore; il riferimento del settore sopra è solo una guida', assColorTip:'Inserisci un colore esadecimale #RRGGBB, es. #FFFFFF (bianco) o #FFD700 (oro).',
   showTitle:'Un file di sottotitoli, tanti modi per esportarlo', showSub:'Traduzione + originale a piacere: 4 formati × 5 layout, 14 stili di esportazione', showMono:'Solo traduzione', showBi:'Bilingue due righe · SRT/VTT', showSplit:'Schermo diviso · ASS', showStack:'Due righe · ASS · con stile', showNote:'Originale o traduzione in evidenza, e anche TXT affiancato', showLineDst:'♪ L\'amore è nell\'aria ♪', fmtBiSrc:'Bilingue · origine sopra', fmtBiDst:'Bilingue · traduzione sopra', hintOutName:'Il suffisso della lingua nel nome file segue la lingua di destinazione.',
   logTitle:'Registro', logReady:'Pronto. Importa i sottotitoli o carica l\'esempio.',
   stTotal:'Sottotitoli', stDone:'Completati', stDrop:'Riempitivi rimossi', stMerge:'Gruppi multi-cue', stWrap:'Ritorni a capo', stIssues:'In sospeso',
@@ -2337,7 +2347,7 @@ const I18N = {
   btnPost:'↻ معالجة لاحقة فقط (التفاف/تنظيف الوسوم)',
   hintPrivacy:'النموذج الافتراضي: تمر الترجمات عبر خادم هذا الموقع إلى المزوّد الذي أعدّه المشرف؛ API مخصص: يعالجها المزوّد الذي اخترته مباشرة دون المرور بهذا الموقع.',
   stepExport:'تصدير الترجمة', lblOutName:'اسم ملف التصدير (تلقائي: اسم المصدر + لغة الهدف)', outPh:'xxx_translated.srt',
-  btnDownload:'⬇ تنزيل الترجمات', btnCopy:'نسخ إلى الحافظة', lblExpStyle:'نمط التصدير', assSplit:'شاشة مقسومة', assStack:'سطران متراكبان', lblFileFmt:'صيغة الملف', lblExpFmt:'صيغة التصدير', fmtMono:'الترجمة فقط', secAssStyle:'نمط ASS', lblAssDstSize:'حجم الترجمة', lblAssSrcSize:'حجم النص الأصلي', lblAssDstColor:'لون الترجمة', lblAssSrcColor:'لون النص الأصلي', lblAssDstMarginV:'المسافة من الأسفل (الترجمة)', lblAssSrcMarginV:'المسافة من الأسفل (النص الأصلي)', assDstMVTip:'المسافة من سطر الترجمة إلى الحافة السفلية (بكسل، أساس 1080p). تتغير القيمة الافتراضية حسب النمط (شاشة مقسومة/سطران) وأي سطر في الأعلى؛ بعد التعديل اليدوي تُثبَّت القيمة.', assSrcMVTip:'المسافة من سطر النص الأصلي إلى الحافة السفلية (بكسل، أساس 1080p). في نمط الشاشة المقسومة، حتى لو كان النص الأصلي في الأعلى، تُحسب المسافة من الحافة السفلية؛ بعد التعديل اليدوي تُثبَّت القيمة.', assSizeRec:'مُوصى به: ', assMVRec:'مُوصى به: ',assSizeFollow:'مُعبَّأ تلقائيًا بقيم مرجعية من الصناعة — يمكنك التعديل بحرية',assSizeLocked:'يُستخدم إعدادك؛ القيم المرجعية أعلاه للاسترشاد فقط', assColorTip:'أدخل لونًا بالنظام الست عشري #RRGGBB، مثل #FFFFFF (أبيض) أو #FFD700 (ذهبي).',
+  btnDownload:'⬇ تنزيل الترجمات', btnCopy:'نسخ إلى الحافظة', lblExpStyle:'نمط التصدير', assSplit:'شاشة مقسومة', assStack:'سطران متراكبان', lblFileFmt:'صيغة الملف', lblExpFmt:'صيغة التصدير', fmtMono:'الترجمة فقط', secAssStyle:'نمط ASS', lblAssDstSize:'حجم الترجمة', lblAssSrcSize:'حجم النص الأصلي', lblAssDstColor:'لون الترجمة', lblAssSrcColor:'لون النص الأصلي', lblAssDstMarginV:'المسافة من الأسفل (الترجمة)', lblAssSrcMarginV:'المسافة من الأسفل (النص الأصلي)', assDstMVTip:'المسافة من سطر الترجمة إلى الحافة السفلية (بكسل، أساس 1080p). تتغير القيمة الافتراضية حسب النمط (شاشة مقسومة/سطران) وأي سطر في الأعلى؛ بعد التعديل اليدوي تُثبَّت القيمة.', assSrcMVTip:'المسافة من سطر النص الأصلي إلى الحافة السفلية (بكسل، أساس 1080p). في نمط الشاشة المقسومة، حتى لو كان النص الأصلي في الأعلى، تُحسب المسافة من الحافة السفلية؛ بعد التعديل اليدوي تُثبَّت القيمة.', assSizeRec:'مُوصى به: ', assApply:'تطبيق', assUndo:'تراجع', assKept:'الحالي', assAutoReset:'إعادة التعيين للتخطيط الجديد', assMVRec:'مُوصى به: ',assSizeFollow:'مُعبَّأ تلقائيًا بقيم مرجعية من الصناعة — يمكنك التعديل بحرية',assSizeLocked:'يُستخدم إعدادك؛ القيم المرجعية أعلاه للاسترشاد فقط', assColorTip:'أدخل لونًا بالنظام الست عشري #RRGGBB، مثل #FFFFFF (أبيض) أو #FFD700 (ذهبي).',
   showTitle:'ملف ترجمة واحد، وطرق تصدير كثيرة', showSub:'الترجمة + الأصل كما تشاء: 4 صيغ × 5 تخطيطات، 14 نمط تصدير', showMono:'الترجمة فقط', showBi:'سطران ثنائيا اللغة · SRT/VTT', showSplit:'تقسيم الشاشة · ASS', showStack:'سطران · ASS · بتنسيق كامل', showNote:'الأصل في الأعلى أو الترجمة في الأعلى، مع تصدير TXT للمقارنة', showLineDst:'♪ الحب في الهواء ♪', fmtBiSrc:'ثنائي اللغة · المصدر أعلى', fmtBiDst:'ثنائي اللغة · الترجمة أعلى', hintOutName:'تتبع لاحقة اللغة في اسم الملف لغة الهدف.',
   logTitle:'السجل', logReady:'جاهز. استورد الترجمات أو حمّل المثال.',
   stTotal:'الترجمات', stDone:'مكتمل', stDrop:'حشو أزيل', stMerge:'مجموعات متعددة', stWrap:'ملتف', stIssues:'معلّق',
@@ -2432,7 +2442,7 @@ const I18N = {
   btnPost:'↻ Sadece son işlem (satır sarma/etiket temizleme)',
   hintPrivacy:'Varsayılan model: altyazılar bu sitenin sunucusu üzerinden yöneticinin yapılandırdığı sağlayıcıya iletilir; Özel API: seçtiğin sağlayıcı bunları doğrudan işler, bu siteye uğramaz.',
   stepExport:'Çeviriyi dışa aktar', lblOutName:'Dışa aktarma dosya adı (otomatik: kaynak adı + hedef dil)', outPh:'xxx_cevrildi.srt',
-  btnDownload:'⬇ Altyazıları indir', btnCopy:'Panoya kopyala', lblExpStyle:'Dışa aktarma stili', assSplit:'bölünmüş ekran', assStack:'üst üste iki satır', lblFileFmt:'Dosya biçimi', lblExpFmt:'Dışa aktarma biçimi', fmtMono:'Sadece çeviri', secAssStyle:'ASS stili', lblAssDstSize:'Çeviri boyutu', lblAssSrcSize:'Orijinal boyut', lblAssDstColor:'Çeviri rengi', lblAssSrcColor:'Orijinal renk', lblAssDstMarginV:'Alt boşluk (çeviri)', lblAssSrcMarginV:'Alt boşluk (orijinal)', assDstMVTip:'Çeviri satırının alt kenara uzaklığı (px, 1080p). Varsayılan değer bölünmüş/iki satır moduna ve hangi satırın üstte olduğuna göre değişir; elle değiştirildiğinde sabit kalır.', assSrcMVTip:'Orijinal satırın alt kenara uzaklığı (px, 1080p). Bölünmüş modda orijinal satır üstte olsa bile alt kenardan ölçülür; elle değiştirildiğinde sabit kalır.', assSizeRec:'Önerilen: ', assMVRec:'Önerilen: ',assSizeFollow:'Sektör referans değerleriyle otomatik doldurulur; istediğiniz gibi değiştirebilirsiniz',assSizeLocked:'Sizin değeriniz kullanılıyor; üstteki sektör referansı yalnızca rehberdir', assColorTip:'Onaltılık #RRGGBB renk değeri girin, ör. #FFFFFF (beyaz) veya #FFD700 (altın).',
+  btnDownload:'⬇ Altyazıları indir', btnCopy:'Panoya kopyala', lblExpStyle:'Dışa aktarma stili', assSplit:'bölünmüş ekran', assStack:'üst üste iki satır', lblFileFmt:'Dosya biçimi', lblExpFmt:'Dışa aktarma biçimi', fmtMono:'Sadece çeviri', secAssStyle:'ASS stili', lblAssDstSize:'Çeviri boyutu', lblAssSrcSize:'Orijinal boyut', lblAssDstColor:'Çeviri rengi', lblAssSrcColor:'Orijinal renk', lblAssDstMarginV:'Alt boşluk (çeviri)', lblAssSrcMarginV:'Alt boşluk (orijinal)', assDstMVTip:'Çeviri satırının alt kenara uzaklığı (px, 1080p). Varsayılan değer bölünmüş/iki satır moduna ve hangi satırın üstte olduğuna göre değişir; elle değiştirildiğinde sabit kalır.', assSrcMVTip:'Orijinal satırın alt kenara uzaklığı (px, 1080p). Bölünmüş modda orijinal satır üstte olsa bile alt kenardan ölçülür; elle değiştirildiğinde sabit kalır.', assSizeRec:'Önerilen: ', assApply:'Uygula', assUndo:'Geri al', assKept:'mevcut', assAutoReset:'Yeni düzene göre sıfırlandı', assMVRec:'Önerilen: ',assSizeFollow:'Sektör referans değerleriyle otomatik doldurulur; istediğiniz gibi değiştirebilirsiniz',assSizeLocked:'Sizin değeriniz kullanılıyor; üstteki sektör referansı yalnızca rehberdir', assColorTip:'Onaltılık #RRGGBB renk değeri girin, ör. #FFFFFF (beyaz) veya #FFD700 (altın).',
   showTitle:'Tek altyazı dosyası, birçok dışa aktarma yolu', showSub:'Çeviri + orijinal dilediğiniz gibi: 4 biçim × 5 düzen, 14 dışa aktarma stili', showMono:'Yalnız çeviri', showBi:'İki dilli çift satır · SRT/VTT', showSplit:'Bölünmüş ekran · ASS', showStack:'Çift satır · ASS · biçimli', showNote:'Orijinal üstte veya çeviri üstte, ayrıca TXT karşılaştırma metni', showLineDst:'♪ Aşk havada ♪', fmtBiSrc:'İki dilli · kaynak üstte', fmtBiDst:'İki dilli · çeviri üstte', hintOutName:'Dosya adındaki dil soneki hedef dili izler.',
   logTitle:'Günlük', logReady:'Hazır. Altyazıları içe aktar veya örneği yükle.',
   stTotal:'Altyazı', stDone:'Tamamlandı', stDrop:'Dolgu temizlendi', stMerge:'Çoklu gruplar', stWrap:'Sarılan', stIssues:'Bekleyen',
@@ -2571,7 +2581,10 @@ function applyI18n(){
   if (typeof termsUI==='function') termsUI();
   if (typeof modeUI==='function') modeUI();
   if (typeof updateWidthHints==='function') updateWidthHints(); // v0.9.99：行宽换算提示跟随界面语言
-  if (typeof syncAssSizeHint==='function') syncAssSizeHint(); // v0.9.109：ASS 字号推荐值提示跟随界面语言
+  if (typeof syncAssSizeHint==='function') syncAssSizeHint(); // v0.9.110：ASS 字号推荐值提示跟随界面语言
+  /* v0.9.110：离底距离提示同样要跟随界面语言——旧版靠「字号 apply 顺带调用 syncAssMVBox」实现，
+     重构后两者解耦，必须显式重绘，否则切界面语言后提示行仍是旧语言。 */
+  if (typeof syncAssMVBox==='function') syncAssMVBox();
 }
 
 const S = {
@@ -4402,7 +4415,7 @@ function buildAssEvents(){
          用户手动改过上方块距离后（*Fix）改用用户给的值。 */
       const L=assLH(), S=assStyleOf();
       const nLines=(s)=>s?s.split('\n').length:0;
-      /* v0.9.109：抬高量改为「下方块墨迹顶 + 12px」（旧逻辑按行框堆叠，两行墨迹之间空 ~36px）。
+      /* v0.9.110：抬高量改为「下方块墨迹顶 + 12px」（旧逻辑按行框堆叠，两行墨迹之间空 ~36px）。
          下方块多行时按实际行数累加行高（第 1 行在最上，其墨迹顶最高）。 */
       const stackMV=(bottomMV,bottomSize,bottomLang,n,topSize,topLang)=>
         (typeof C.assStackMV==='function')
@@ -4502,7 +4515,7 @@ function save(){
     autoTermsSet:(UI.autoTermsSet||sv.autoTermsSet==='1')?'1':'0',
     expStyle:expStyle(),
     /* v0.9.100：ASS 外观（新键；老用户 localStorage 无这些字段 → 恢复时用 HTML 默认值） */
-    assSizeSet:(UI.assSizeTouched?'1':'0'),
+    assSizeSet:(UI.assSizeTouched?'1':'0'), assCtxV:'1',
     assDstColor:($('assDstColor')||{}).value, assSrcColor:($('assSrcColor')||{}).value,
     assDstMV:$('assDstMV').value, assSrcMV:$('assSrcMV').value,
     assDstMVSet:(UI.assDstMVSet||sv.assDstMVSet==='1')?'1':'0',
@@ -4534,13 +4547,17 @@ if(sv.maxW && ![18,24,20,16,13].includes(+sv.maxW)) $('maxW').value=sv.maxW;
 /* 导出样式记忆 + 旧版双选择器迁移：expFmt+expFileFmt → expStyle */
 if(sv.expStyle && /^[a-z-]+\|(srt|vtt|ass|ass-stack|txt)$/.test(sv.expStyle)) $('expStyle').value=sv.expStyle;
 /* v0.9.100：ASS 外观恢复 */
-/* v0.9.109：只认显式标记 assSizeSet，不再靠「猜数值」判定是否手动设过。
+/* v0.9.110：只认显式标记 assSizeSet，不再靠「猜数值」判定是否手动设过。
    旧判定用黑名单 [56,50] 反推，有两个实伤：
      ① 用户手动设成 50（或 56）会被当成默认值丢弃，下次打开被推荐值悄悄覆盖；
      ② 只改了原文字号（译文仍是 56）同样被判为「没设过」，自定义的原文字号丢失。
    v0.9.100 起就写 assSizeSet 标记；没有标记的存档 = 从未手动设过（v0.9.100 之前没有字号 UI），
    一律走推荐值。这也符合「推荐值仅供参考、用户自定义优先」的语义。 */
-UI.assSizeTouched = (sv.assSizeSet==='1');
+/* v0.9.110：旧存档（无 assCtxV 标记）里那三个「改过一次就永久锁死」的标记一律作废，
+   升级后重新跟随推荐值。保留它们等于把「跨布局沿用 → 字幕掉到画面底部」这个 bug 固化下来，
+   且用户再也无法回到自动联动（离底距离此前没有清空复位通道）。 */
+var assLegacy = (sv.assSizeSet==='1' || sv.assDstMVSet==='1' || sv.assSrcMVSet==='1') && sv.assCtxV!=='1';
+UI.assSizeTouched = (!assLegacy && sv.assSizeSet==='1');
 if(UI.assSizeTouched){
   if(sv.assDstSize) $('assDstSize').value=sv.assDstSize;
   if(sv.assSrcSize) $('assSrcSize').value=sv.assSrcSize;
@@ -4549,7 +4566,7 @@ if(sv.assDstColor!=null && sv.assDstColor!=='') $('assDstColor').value=sv.assDst
 if(sv.assSrcColor!=null && sv.assSrcColor!=='') $('assSrcColor').value=sv.assSrcColor;
 if(sv.assDstMV!=null && sv.assDstMV!=='') $('assDstMV').value=sv.assDstMV;
 if(sv.assSrcMV!=null && sv.assSrcMV!=='') $('assSrcMV').value=sv.assSrcMV;
-UI.assDstMVSet = sv.assDstMVSet==='1'; UI.assSrcMVSet = sv.assSrcMVSet==='1';
+UI.assDstMVSet = (!assLegacy && sv.assDstMVSet==='1'); UI.assSrcMVSet = (!assLegacy && sv.assSrcMVSet==='1');
 /* 旧版双选择器迁移（v0.9.102：原为上一行的 else 分支，离底距离拆成两个字段后改为独立判断，
    条件补上 !sv.expStyle，避免覆盖上面已恢复的新格式记忆） */
 if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].includes(sv.expFmt) && ['srt','vtt','ass','txt','sbv'].includes(sv.expFileFmt)) $('expStyle').value=sv.expFmt+'|'+sv.expFileFmt;
@@ -4583,7 +4600,7 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
     'en':21, 'fr':21, 'de':21, 'es':21, 'pt':21, 'it':21, 'ru':21,
     'ar':21, 'th':21, 'vi':21, 'id':21, 'hi':21, 'tr':21, 'pl':21,
     'nl':21, 'ms':21, 'fil':21, 'fa':21,
-    // v0.9.109 新增：均按 Netflix TTSG 的 42 CPL 折算为 21 全角（与既有 hi/id/tr/pl/nl/ms/fil/fa 同口径）,
+    // v0.9.110 新增：均按 Netflix TTSG 的 42 CPL 折算为 21 全角（与既有 hi/id/tr/pl/nl/ms/fil/fa 同口径）,
     'sv':21, 'da':21, 'fi':21, 'nb':21, 'cs':21, 'sk':21, 'hu':21, 'ro':21, 'ca':21, 'hr':21, 'el':21, 'uk':21, 'sr':21,
     'bg':21, 'he':21, 'ur':21, 'bn':21, 'ta':21, 'te':21, 'mr':21, 'ne':21, 'si':21, 'my':21, 'km':21, 'lo':21, 'sw':21
   };
@@ -4612,6 +4629,95 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
   syncMaxW();
 })();
 
+/* v0.9.110：ASS 字号 / 离底距离的「上下文感知联动」。
+   旧设计用三个全局布尔（assSizeTouched / assDstMVSet / assSrcMVSet）表示「用户改过」，
+   一旦置位就永久锁定，切语言、切布局都不再变。实测两个实害：
+     ① 离底距离跨布局沿用：双行推荐 83、分屏推荐 972、单语 42 是三个不同坐标系，
+        在双行下调的 120 被带到分屏，字幕会掉到画面底部（而它本该在顶部 972 附近）；
+     ② 离底距离缺「清空复位」通道（字号和行宽都有），清空后值空而标记仍在 →
+        导出回落 42 且永不联动，用户想「恢复自动」的操作反而把自己锁死，并持久化到下次访问。
+   新机制区分两类切换：
+     · 布局上下文（单语/双语 × 分屏/双行 × 谁在上）变化 → 旧值必然失效，自动套新推荐值，给一次「撤销」；
+     · 语言 / 行宽变化 → 同一坐标系内的微调，保留用户值，只在推荐值旁给「应用」按钮，绝不静默覆盖。 */
+var ASS_UNDO = {};                       // field -> 重置前的用户值（供撤销）
+function assLayoutCtx(){ try{ return expFmtOf() + (assStacked() ? '|stack' : '|split'); }catch(e){ return '?'; } }
+function assLangCtx(){ return (($('dstLang')||{}).value||'') + '>' + (($('srcLang')||{}).value||'') + '@' + (+($('maxW')||{}).value||21); }
+var ASS_CTX = { layout:'', lang:'' };
+function assCtxReason(){
+  var l = assLayoutCtx(), g = assLangCtx(), r = 'same';
+  /* ASS_CTX 在页面初始化末尾就已赋值（见 ASS_CTX.layout = ... 那行），这里不再做懒初始化——
+     懒初始化会把用户的「第一次真实切换」误判成初始化而吞掉（实测：首次切布局不生效）。 */
+  if(!ASS_CTX.layout){ ASS_CTX.layout = l; ASS_CTX.lang = g; }
+  if(l !== ASS_CTX.layout) r = 'layout'; else if(g !== ASS_CTX.lang) r = 'lang';
+  ASS_CTX.layout = l; ASS_CTX.lang = g;
+  return r;
+}
+function renderAssHint(el, text, act){
+  if(!el) return;
+  el.textContent = '';
+  if(text === '' || text == null) return;
+  var sp = document.createElement('span'); sp.textContent = text; el.appendChild(sp);
+  if(!act) return;
+  var b = document.createElement('span');
+  b.className = 'ass-hint-act';
+  b.textContent = t(act.kind === 'apply' ? 'assApply' : 'assUndo');
+  b.setAttribute('data-ass-act', act.kind + ':' + act.field);
+  el.appendChild(b);
+}
+var ASS_F = {};                          // 四个可联动字段的注册表（字号模块与离底距离模块各自填充）
+function assFieldApply(field){
+  var f = ASS_F[field]; if(!f) return;
+  ASS_UNDO[field] = f.el.value;
+  f.el.value = f.rec(); f.setT(false);
+  try{ f.after(); }catch(e){}
+  try{ save(); }catch(e){}
+}
+function assFieldUndo(field){
+  (field === 'all' ? ['dsz','ssz','dmv','smv'] : [field]).forEach(function(k){
+    var f = ASS_F[k]; if(!f || ASS_UNDO[k] == null) return;
+    f.el.value = ASS_UNDO[k]; f.setT(true); ASS_UNDO[k] = null;
+    try{ f.after(); }catch(e){}
+  });
+  try{ save(); }catch(e){}
+}
+/* 布局切换：把所有字段拉回新布局的推荐值（自定义过的记住旧值供撤销） */
+function assLayoutReset(){
+  ['dsz','ssz','dmv','smv'].forEach(function(k){
+    var f = ASS_F[k]; if(!f) return;
+    ASS_UNDO[k] = f.isT() ? f.el.value : null;
+    f.el.value = f.rec(); f.setT(false);
+  });
+}
+function assResetNote(show){
+  var el = $('assResetNote'); if(!el) return;
+  var any = ['dsz','ssz','dmv','smv'].some(function(k){ return ASS_UNDO[k] != null; });
+  renderAssHint(el, (show && any) ? t('assAutoReset') : '', (show && any) ? {kind:'undo', field:'all'} : null);
+}
+/* 上下文变化的统一入口：reason 只消费一次，再分发给两个模块，避免重复触发 */
+function assCtxSync(){
+  var r = assCtxReason();
+  if(r === 'layout'){
+    assLayoutReset();
+    try{ window.assSizeRender && window.assSizeRender(); }catch(e){}
+    try{ syncAssMVBox(); }catch(e){}
+    assResetNote(true);
+  }else if(r === 'lang'){
+    try{ window.assSizeRender && window.assSizeRender(); }catch(e){}
+    try{ syncAssMVBox(); }catch(e){}
+  }
+  try{ save(); }catch(e){}
+}
+(function(){
+  var box = $('assStyleBox'); if(!box) return;
+  box.addEventListener('click', function(e){
+    var el = e.target && e.target.closest ? e.target.closest('[data-ass-act]') : null;
+    if(!el) return;
+    var p = String(el.getAttribute('data-ass-act') || '').split(':');
+    if(p[0] === 'apply') assFieldApply(p[1]);
+    else if(p[0] === 'undo'){ assFieldUndo(p[1]); assResetNote(false); }
+  });
+})();
+
 /* v0.9.105：ASS 字号按「书写系统的实际字形高度」联动推荐——同一个 pt 下，汉字几乎撑满 em 框，
    拉丁小写只有一半高，给所有语言同一个数值等于让非中文矮掉四成。
    机制沿用 maxW（v0.9.53/54）：未手动改过则跟随语言，改过即锁定，清空输入框恢复联动。
@@ -4623,29 +4729,49 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
   let touched = !!UI.assSizeTouched;
   UI.assSizeTouched = touched;
   const langName=function(v){ var l=LANGS.filter(function(x){return x.v===v;})[0]; return l?l.zh:''; };
-  /* v0.9.109：推荐值常驻显示（改过自定义值也照显示，方便对照），状态行说明当前是跟随还是锁定 */
-  const apply=function(){
-    const rec=C.recAssSize($('dstLang').value, $('srcLang').value, {maxW:+$('maxW').value||21});
+  /* v0.9.110：推荐值常驻显示；语言切换只提示不覆盖（推荐值旁给「应用」），
+     布局切换由 assLayoutReset 统一处理（见文件上方 v0.9.110 说明）。 */
+  const recOf=function(){ return C.recAssSize($('dstLang').value, $('srcLang').value, {maxW:+$('maxW').value||21}); };
+  const apply=function(reason){
+    const rec=recOf();
+    if(reason==='layout' && touched){ touched=false; UI.assSizeTouched=false; }
     if(!touched){ dsz.value=rec.dstSize; ssz.value=rec.srcSize; }
     const dn=langName($('dstLang').value);
     const sn=$('srcLang').value==='auto' ? t('autoDetect') : langName($('srcLang').value);
-    if(dhint) dhint.textContent=t('assSizeRec')+rec.dstSize+' pt'+(dn?(' · '+dn):'');
-    if(shint) shint.textContent=t('assSizeRec')+rec.srcSize+' pt'+(sn?(' · '+sn):'');
+    const mono=(typeof expFmtOf==='function') ? (expFmtOf()==='mono') : false;
+    const dDiff = touched && (+dsz.value !== rec.dstSize);
+    const sDiff = touched && (+ssz.value !== rec.srcSize);
+    renderAssHint(dhint,
+      t('assSizeRec')+rec.dstSize+' pt'+(dn?(' · '+dn):'')+(dDiff?(' · '+t('assKept')+' '+dsz.value):''),
+      dDiff?{kind:'apply',field:'dsz'}:null);
+    renderAssHint(shint, mono ? '' :
+      (t('assSizeRec')+rec.srcSize+' pt'+(sn?(' · '+sn):'')+(sDiff?(' · '+t('assKept')+' '+ssz.value):'')),
+      (!mono && sDiff)?{kind:'apply',field:'ssz'}:null);
     if(hint) hint.textContent=touched?t('assSizeLocked'):t('assSizeFollow');
-    try{ if(typeof syncAssMVBox==='function') syncAssMVBox(); }catch(e){}
   };
-  window.syncAssSizeHint = apply;  // 界面语言切换时由 applyI18n 重绘
+  window.assSizeRender = function(){ apply(''); };
+  window.syncAssSizeHint = window.assSizeRender;  // 界面语言切换时由 applyI18n 重绘
   [dsz,ssz].forEach(function(el){
-    el.addEventListener('input',function(){ if(el.value==='') return; touched=true; UI.assSizeTouched=true; apply(); });
+    el.addEventListener('input',function(){
+      if(el.value==='') return;
+      touched=true; UI.assSizeTouched=true; apply('');
+      try{ assResetNote(false); }catch(e){}
+      try{ if(typeof syncAssMVBox==='function') syncAssMVBox(); }catch(e){}   // 离底默认值依赖字号
+    });
     el.addEventListener('blur',function(){
       if(el.value!=='') return;
-      touched=false; UI.assSizeTouched=false; apply(); save();
+      touched=false; UI.assSizeTouched=false; apply(''); save();
     });
   });
-  $('dstLang').addEventListener('change', apply);
-  $('srcLang').addEventListener('change', apply);
-  $('maxW').addEventListener('input', function(){ if(!touched) apply(); });
-  apply();
+  apply('');
+  ASS_F.dsz={el:dsz,hint:dhint,rec:function(){return recOf().dstSize;},isT:function(){return touched;},
+             setT:function(v){touched=v;UI.assSizeTouched=v;},after:function(){apply('');}};
+  ASS_F.ssz={el:ssz,hint:shint,rec:function(){return recOf().srcSize;},isT:function(){return touched;},
+             setT:function(v){touched=v;UI.assSizeTouched=v;},after:function(){apply('');}};
+  /* 语言 / 行宽 / 布局变化统一由 assCtxSync 判定：布局变→重置并可撤销，语言变→只提示 */
+  $('dstLang').addEventListener('change', assCtxSync);
+  $('srcLang').addEventListener('change', assCtxSync);
+  $('maxW').addEventListener('input', assCtxSync);
 })();
 
 /* v0.9.99 行宽换算提示：行宽单位是「全角宽」而非字数——中日韩 1 单位=1 字，
@@ -4743,7 +4869,15 @@ function refreshOutPh(){ // 占位符跟随 目标语言/导出样式（v0.9.15�
   $('outName').placeholder='xxx_'+p.langName+p.suf+'.'+expFileFmt();
 }
 /* v0.9.100：ASS 外观设置仅在导出格式为 ASS 时可见——对 SRT/VTT/TXT 无效，避免误导 */
-function syncAssStyleBox(){ var b=$('assStyleBox'); if(b) b.style.display=(expFileFmt()==='ass')?'':'none'; }
+function syncAssStyleBox(){
+  var b=$('assStyleBox'); if(b) b.style.display=(expFileFmt()==='ass')?'':'none';
+  /* v0.9.110：单语导出没有原文行 —— 原文字号与原文离底距离整行隐藏，
+     否则用户会对着一组「配了也不生效」的输入框调半天，还会被计入锁定状态。 */
+  var mono=(typeof expFmtOf==='function')?(expFmtOf()==='mono'):false;
+  var r1=$('assSrcSizeRow'), r2=$('assSrcMVRow');
+  if(r1) r1.style.display = mono ? 'none' : '';
+  if(r2) r2.style.display = mono ? 'none' : '';
+}
 /* v0.9.102：离底距离的默认值随「分屏/双行 + 谁在上」与字号联动；用户手动改过的那个不再联动。
    典型值按 1 行内容估算（双行模式下另一块 = 42 + 贴底块 1 行高 + 8）。 */
 function assDefaultMV(role){
@@ -4755,7 +4889,7 @@ function assDefaultMV(role){
   if(assStacked()){
     var atBottom = (role==='dst') !== dstFirst;   // 译文在上时贴底的是原文
     if(atBottom) return 42;
-    /* v0.9.109：上方块按「下方块墨迹顶 + 12px」定位（旧逻辑按行框堆叠 → 两行墨迹间空 ~36px）。
+    /* v0.9.110：上方块按「下方块墨迹顶 + 12px」定位（旧逻辑按行框堆叠 → 两行墨迹间空 ~36px）。
        下方块行数按 1 行估（与旧行为一致：默认值只是给个起点，导出时按实际行数重算）。 */
     var bSz   = role==='dst' ? s.srcSize : s.dstSize;
     var tSz   = role==='dst' ? s.dstSize : s.srcSize;
@@ -4771,23 +4905,43 @@ function assDefaultMV(role){
 function syncAssMVBox(){
   if(!UI.assDstMVSet && $('assDstMV')) $('assDstMV').value=assDefaultMV('dst');
   if(!UI.assSrcMVSet && $('assSrcMV')) $('assSrcMV').value=assDefaultMV('src');
-  /* v0.9.109：推荐值常驻显示（改过自定义值也照显示，方便对照）——与字号提示同一套做法。
-     单语导出没有原文行，故只给译文显示。 */
+  /* v0.9.110：推荐值常驻显示；与推荐值不一致时额外标出「你的 X」并给「应用」按钮。
+     单语导出没有原文行，原文那条整行隐藏（见 syncAssStyleBox）。 */
   var mono = expFmtOf()==='mono';
   var dh=$('assDstMVHint'), sh=$('assSrcMVHint');
-  if(dh) dh.textContent=t('assMVRec')+assDefaultMV('dst');
-  if(sh) sh.textContent=mono ? '' : t('assMVRec')+assDefaultMV('src');
+  var dRec=assDefaultMV('dst'), sRec=assDefaultMV('src');
+  var dDiff = UI.assDstMVSet && (+$('assDstMV').value !== dRec);
+  var sDiff = UI.assSrcMVSet && (+$('assSrcMV').value !== sRec);
+  renderAssHint(dh, t('assMVRec')+dRec+(dDiff?(' · '+t('assKept')+' '+$('assDstMV').value):''),
+                dDiff?{kind:'apply',field:'dmv'}:null);
+  renderAssHint(sh, mono ? '' : (t('assMVRec')+sRec+(sDiff?(' · '+t('assKept')+' '+$('assSrcMV').value):'')),
+                (!mono && sDiff)?{kind:'apply',field:'smv'}:null);
 }
-$('expStyle').addEventListener('change',()=>{ refreshOutName(); refreshOutPh(); syncAssStyleBox(); syncAssMVBox(); save(); });
+ASS_F.dmv={el:$('assDstMV'),hint:$('assDstMVHint'),rec:function(){return assDefaultMV('dst');},
+           isT:function(){return !!UI.assDstMVSet;},setT:function(v){UI.assDstMVSet=v;},after:function(){syncAssMVBox();}};
+ASS_F.smv={el:$('assSrcMV'),hint:$('assSrcMVHint'),rec:function(){return assDefaultMV('src');},
+           isT:function(){return !!UI.assSrcMVSet;},setT:function(v){UI.assSrcMVSet=v;},after:function(){syncAssMVBox();}};
+$('expStyle').addEventListener('change',function(){ refreshOutName(); refreshOutPh(); syncAssStyleBox(); assCtxSync(); save(); });
 syncAssStyleBox(); syncAssMVBox();
+/* v0.9.110：页面初始化末尾记录当前上下文，之后用户的每一次切换都能被正确判定 */
+ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
 /* v0.9.100：ASS 外观改动即时记忆 */
 ['assDstSize','assSrcSize'].forEach(function(id){ var e=$(id); if(e) e.addEventListener('change',function(){ syncAssMVBox(); save(); }); });
-/* v0.9.102：改动离底距离即视为「用户固定」，此后不再随模式/字号联动 */
+/* v0.9.102：改动离底距离即视为「用户固定」，此后不再随模式/字号联动。
+   v0.9.110：① 清空后 blur 解除固定（旧版无此通道，清空后值空而标记仍在 → 永久锁死在 42）；
+             ② 空值不再触发固定，避免「清空」这个动作本身被当成一次自定义。 */
 ['assDstMV','assSrcMV'].forEach(function(id){
   var e=$(id); if(!e) return;
   e.addEventListener('change',function(){
+    if(e.value==='') return;
     if(id==='assDstMV') UI.assDstMVSet=true; else UI.assSrcMVSet=true;
+    try{ assResetNote(false); }catch(err){}
     save();
+  });
+  e.addEventListener('blur',function(){
+    if(e.value!=='') return;
+    if(id==='assDstMV') UI.assDstMVSet=false; else UI.assSrcMVSet=false;
+    syncAssMVBox(); save();
   });
 });
 /* v0.9.101：颜色文本框——input 时实时刷新预览，change 时规范大小写并落盘 */
