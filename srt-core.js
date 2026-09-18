@@ -615,7 +615,14 @@
   const INK_RATIO = {
     'zh-CN': 0.915, 'zh-TW': 0.907, 'ja': 0.861, 'ko': 0.874,
     'vi': 0.712, 'hi': 0.645, 'ar': 0.610, 'th': 0.574, 'fa': 0.521,
-    _default: 0.545   // 拉丁 / 西里尔等半高书写系统（en fr de es pt it ru id tr pl nl ms fil）
+    /* v0.9.109 新增：同为 100px 字体栈 headless canvas 实测（方法完全同上，先验证能复现
+       en 0.545 / th 0.574 / vi 0.712 / hi 0.645 / ar 0.610 五个既有值后才取信）。
+       拉丁（sv da fi nb cs sk hu ro ca hr sw）与西里尔（uk sr bg）实测均为 0.545，
+       与既有 en/ru 同值，就不再单列、走 _default 避免抖动。*/
+    'el': 0.683, 'he': 0.524, 'ur': 0.569, 'bn': 0.657, 'ta': 0.519,
+    'te': 0.774, 'mr': 0.643, 'ne': 0.653, 'si': 0.519, 'my': 0.556,
+    'km': 0.660, 'lo': 0.531,
+    _default: 0.545   // 拉丁 / 西里尔等半高书写系统（en fr de es pt it ru uk sr bg id tr pl nl ms fil sv da fi nb cs sk hu ro ca hr sw）
   };
   // 推荐译文号：以「简体中文 56pt 的视觉高度」为锚，把其他书写系统补到它的 80%。
   // 补满（100%）需要英语 94pt，而 ASS 一行宽度 = 行宽(maxW，单位 em) x 字号，必须 <= 画面可用宽
@@ -625,7 +632,12 @@
     'zh-CN': 56, 'zh-TW': 56, 'ja': 56, 'ko': 56,
     'vi': 58, 'hi': 64, 'ar': 68, 'th': 72, 'fa': 78,
     'en': 76, 'fr': 76, 'de': 76, 'es': 76, 'pt': 76, 'it': 76, 'ru': 76,
-    'id': 76, 'tr': 76, 'pl': 76, 'nl': 76, 'ms': 76, 'fil': 76
+    'id': 76, 'tr': 76, 'pl': 76, 'nl': 76, 'ms': 76, 'fil': 76,
+    // v0.9.109 新增：均由公式 size = even(中文 56pt 墨迹 51.24px x 80% / INK_RATIO) 算出，即 even(40.992/ratio)
+    //（该公式可原样复现既有 vi 58 / hi 64 / ar 68 / th 72 / fa 78 / en 76）
+    'sv': 76, 'da': 76, 'fi': 76, 'nb': 76, 'cs': 76, 'sk': 76, 'hu': 76, 'ro': 76, 'ca': 76,
+    'hr': 76, 'el': 60, 'uk': 76, 'sr': 76, 'bg': 76, 'he': 78, 'ur': 72, 'bn': 62, 'ta': 78,
+    'te': 52, 'mr': 64, 'ne': 62, 'si': 78, 'my': 74, 'km': 62, 'lo': 78, 'sw': 76,
   };
   const ASS_AVAIL_W = 1800;    // PlayResX 1920 - MarginL/R 60 x 2，超过则 ASS 自动折行
   /* v0.9.107 定案：SRC_VIS_RATIO 是「原文书写系统推荐值」与「视觉高度反算」共用的折扣系数。
@@ -677,6 +689,11 @@
   const BOX_DESC = 0.22;     // baseline 到行框底的距离（/em），与 assLineHeight = 1.18 配套
   const INK_DESC = {         // baseline 下方的墨迹深度（/em）：拉丁 g/y/p/q 有下伸，汉字几乎没有
     'zh-CN': 0.08, 'zh-TW': 0.08, 'ja': 0.08, 'ko': 0.08,
+    /* v0.9.109 新增：baseline 下方墨迹深度（p90）。拉丁/西里尔/阿拉伯系实测 ≈ 默认 0.21，不单列；
+       下面这些与默认差得远：泰米尔依赖下伸笔划 0.25、缅甸文叠字下探极深 0.47，
+       而泰卢固/老挝几乎不下探（0.02）、希伯来几乎无下伸（0.05）。*/
+    'te': 0.02, 'lo': 0.02, 'km': 0.05, 'he': 0.05, 'mr': 0.08, 'ne': 0.08,
+    'si': 0.16, 'bn': 0.16, 'ta': 0.25, 'my': 0.47,
     _default: 0.21
   };
   const ASS_STACK_GAP = 12;  // 两行墨迹之间想要留下的空隙（1080p px）
@@ -2189,6 +2206,7 @@
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,
+    INK_DESC, BOX_DESC, ASS_STACK_GAP,   // v0.9.109：导出给单测读真值（此前测试自带副本，加语言会静默漂移）
     formatTxt, detectFormat,
     isFillerCue, stripSoundTags, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,

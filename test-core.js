@@ -2097,12 +2097,17 @@ t('formatSbv 往返一致', () => {
 
 
 console.log('— v0.9.105 ASS 推荐字号（按书写系统字形高度补偿）—');
-const LANGS22 = ['en','zh-CN','zh-TW','ja','ko','fr','de','es','pt','it','ru','ar','th','vi','id','hi','tr','pl','nl','ms','fil','fa'];
+const LANGS_ALL = [
+  'en', 'zh-CN', 'zh-TW', 'ja', 'ko', 'fr', 'de', 'es', 'pt', 'it', 'ru', 'ar', 'th', 'vi',
+  'id', 'hi', 'tr', 'pl', 'nl', 'ms', 'fil', 'fa', 'sv', 'da', 'fi', 'nb', 'cs', 'sk', 'hu',
+  'ro', 'ca', 'hr', 'el', 'uk', 'sr', 'bg', 'he', 'ur', 'bn', 'ta', 'te', 'mr', 'ne', 'si',
+  'my', 'km', 'lo', 'sw'
+];   // v0.9.109：22 → 48 种目标语言
 const MAXW_LANG = { 'zh-CN':16,'zh-TW':16,'ja':13,'ko':16 };
 const INK = C.INK_RATIO;
 const inkOf = (l) => (!l || l === 'auto' || typeof INK[l] !== 'number') ? INK._default : INK[l];
-t('共 22 种语言都有推荐值（漏一个就会静默回落到 76）', () => {
-  const miss = LANGS22.filter(l => typeof C.REC_ASS_SIZE[l] !== 'number');
+t('共 48 种语言都有推荐值（漏一个就会静默回落到 76）', () => {
+  const miss = LANGS_ALL.filter(l => typeof C.REC_ASS_SIZE[l] !== 'number');
   assert.deepStrictEqual(miss, [], '缺推荐值: ' + miss.join(','));
 });
 t('中文锚点仍是 56（只向上补偿，绝不缩小任何一种语言）', () => {
@@ -2130,13 +2135,13 @@ t('原文号 = 原文书写系统推荐值 x 0.62（v0.9.107：不再从译文�
 t('原文号恒在 28~50：既不缩到看不清，也不会撑爆屏宽', () => {
   // 上界 50：SRC_VIS_RATIO=0.62 时最大组合是「拉丁/波斯语原文」48pt，留 2pt 余量
   // 下界 28：英译中时中文原文被「不喧宾夺主」压到 28pt，视觉 25.6px 仍清晰可读
-  for (const d of LANGS22) for (const s of LANGS22.concat(['auto'])) {
+  for (const d of LANGS_ALL) for (const s of LANGS_ALL.concat(['auto'])) {
     const r = C.recAssSize(d, s, {maxW: MAXW_LANG[d] || 21});
     assert.ok(r.srcSize >= 28 && r.srcSize <= 50, d + '/' + s + ' 原文号 ' + r.srcSize + ' 越界');
   }
 });
 t('主次关系：原文视觉高度仍低于译文，同书写系统对保持 0.62', () => {
-  for (const d of LANGS22) for (const s of LANGS22.concat(['auto'])) {
+  for (const d of LANGS_ALL) for (const s of LANGS_ALL.concat(['auto'])) {
     const mw = MAXW_LANG[d] || 21;
     const r = C.recAssSize(d, s, {maxW: mw});
     const dVis = r.dstSize * inkOf(d);
@@ -2149,7 +2154,7 @@ t('主次关系：原文视觉高度仍低于译文，同书写系统对保持 0
 });
 t('非 CJK 语言的视觉高度被补到中文的 75%~100%', () => {
   const zhVis = 56 * INK['zh-CN'];
-  LANGS22.forEach(l => {
+  LANGS_ALL.forEach(l => {
     const r = C.recAssSize(l, 'auto', {maxW: MAXW_LANG[l] || 21});
     const vis = r.dstSize * inkOf(l);
     const ratio = vis / zhVis;
@@ -2158,7 +2163,7 @@ t('非 CJK 语言的视觉高度被补到中文的 75%~100%', () => {
 });
 t('行宽封顶：maxW 越大，推荐字号被压得越小（一行不超出 1800px）', () => {
   [21, 24, 32, 48].forEach(mw => {
-    LANGS22.forEach(l => {
+    LANGS_ALL.forEach(l => {
       const r = C.recAssSize(l, 'zh-CN', {maxW: mw});
       assert.ok(r.dstSize * mw <= 1800, l + ' maxW=' + mw + ' 行宽 ' + (r.dstSize * mw) + ' > 1800');
       assert.ok(r.dstSize >= 24, l + ' 字号下限 24');
@@ -2181,8 +2186,10 @@ t('未知语言回落到拉丁推荐值 76', () => {
 // ---------------- v0.9.108：双行堆叠按墨迹定位 ----------------
 // 测试里自带一份几何常量（与 srt-core.js 的 BOX_DESC / INK_DESC / ASS_STACK_GAP 对应），
 // 用来反算「两行墨迹的实际间隙」，验证不是按行框堆叠。
-const BOX_DESC = 0.22, INK_DESC_CJK = 0.08, INK_DESC_LATIN = 0.21, STACK_GAP = 12;
-const inkDescOfT = (l) => ['zh-CN','zh-TW','ja','ko'].includes(l) ? INK_DESC_CJK : INK_DESC_LATIN;
+// v0.9.109：改为直接读 core 导出的真值——此前这里维护了一份副本，
+// 新增语言（如缅甸文下伸 0.47）后副本不跟进，测试就会用错误的几何去反算间隙。
+const BOX_DESC = C.BOX_DESC, STACK_GAP = C.ASS_STACK_GAP;
+const inkDescOfT = (l) => C.INK_DESC[l] != null ? C.INK_DESC[l] : C.INK_DESC._default;
 
 t('assStackMV：精确值（下方贴底 42、单行的典型组合）', () => {
   const cases = [
@@ -2201,7 +2208,7 @@ t('assStackMV：精确值（下方贴底 42、单行的典型组合）', () => {
 });
 
 t('assStackMV：两行墨迹间隙恒为 12px（不再按行框堆叠）', () => {
-  const langs = LANGS22.concat(['auto']);
+  const langs = LANGS_ALL.concat(['auto']);
   for (const bl of langs) for (const tl of langs) for (const bs of [28, 48, 56, 76]) for (const ts of [28, 48, 56, 76]) {
     const mv = C.assStackMV({bottomMV:42, bottomSize:bs, bottomLang:bl,
                              bottomLines:1, topSize:ts, topLang:tl});
@@ -2234,6 +2241,35 @@ t('assStackMV：缺参/异常参数不炸，且结果落在 1~1080', () => {
       assert.ok(Number.isFinite(v) && v >= 1 && v <= 1080, JSON.stringify(o) + ' → ' + v);
     });
 });
+
+/* v0.9.109：EX_SAMPLE 必须覆盖全部目标语言。
+   缺失会静默回落到英文 few-shot 样本，而英文样本与「目标语言锚定」正面冲突
+   （v0.9.73 修过一次；本次又查出 pl/nl/ms/fil/fa 五种长期遗漏）。index.html 不在时跳过。 */
+{
+  const fsMod = require('fs'), pathMod = require('path');
+  const htmlPath = pathMod.join(__dirname, 'index.html');
+  if (fsMod.existsSync(htmlPath)) {
+    const html = fsMod.readFileSync(htmlPath, 'utf8');
+    const codes = (html.match(/\{ v:'[a-zA-Z-]+',\s+zh:/g) || [])
+      .map(s => s.match(/v:'([a-zA-Z-]+)'/)[1]);
+    const ex = (html.match(/^\s*'[a-zA-Z-]+':\s*\{dash:/gm) || [])
+      .map(s => s.match(/'([a-zA-Z-]+)'/)[1]);
+    t('EX_SAMPLE 覆盖全部 ' + codes.length + ' 种目标语言（缺一个就回落到英文样本）', () => {
+      assert.ok(codes.length >= 48, '解析到的目标语言数异常: ' + codes.length);
+      const miss = codes.filter(c => ex.indexOf(c) < 0);
+      assert.deepStrictEqual(miss, [], '缺译文示例: ' + miss.join(','));
+    });
+    const maxwKeys = (html.match(/'[a-zA-Z-]+':\d+(?=[,\s}])/g) || []).length;
+    t('MAXW_BY_LANG 与 REC_ASS_SIZE 均覆盖全部目标语言', () => {
+      const noSize = codes.filter(c => typeof C.REC_ASS_SIZE[c] !== 'number');
+      assert.deepStrictEqual(noSize, [], '缺推荐字号: ' + noSize.join(','));
+      // 未显式列出的语言走默认 21，这里只做最小值 sanity：至少要能解析出 CJK 那几条特值
+      t('  (行宽表含 CJK 特值)', () => {
+        assert.ok(maxwKeys >= 4, 'MAXW_BY_LANG 条目异常: ' + maxwKeys);
+      });
+    });
+  }
+}
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
