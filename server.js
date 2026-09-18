@@ -29,7 +29,19 @@ const DEFAULTS = {
   adminHash: '',           // 管理密码 sha256(hex)
   publicUrl: '',           // 站点公开 URL（SEO canonical/sitemap 前缀；空=按请求头）
   analyticsId: '',         // GA4 统计 ID（如 G-XXXXXXX；空=不注入统计代码）
-  temperature: 0.2         // 采样温度 0-2（v0.9.91 起可在 admin 配置，此前硬编码 0.2）
+  temperature: 0.2,        // 采样温度 0-2（v0.9.91 起可在 admin 配置，此前硬编码 0.2）
+  /* --- 双模型 + 按目标语言分流（v0.9.119）---
+     模型 A = 上面那组 provider/base/model/key（老配置原样可用，零迁移）；
+     模型 B = 下面带 2 后缀的那组，留空即不启用，全部语言走 A。
+     判定只看目标语言（请求里的 meta.lang），其它维度不参与。 */
+  provider2: '',
+  base2: '',
+  model2: '',
+  key2: '',
+  extraParams: {},         // 模型 A 的附加请求参数（平铺 JSON 对象，如 {"enable_thinking":false}）
+  extraParams2: {},        // 模型 B 的附加请求参数
+  langModelB: [],          // 走模型 B 的目标语言码数组（如 ['ja','th']）；空 = 全部走 A
+  fallbackToA: true        // 模型 B 调用失败时自动回退模型 A（事件里记 fallback 次数）
 };
 
 function ensureData(){
@@ -86,7 +98,7 @@ function bumpRetry(ev, rt){
   ev[k] = (ev[k] || 0) + 1;
   ev.retries = (ev.retries || 0) + 1;
 }
-function appendEvent(ip, meta, model){
+function appendEvent(ip, meta, model, extra){
   if (!meta || typeof meta !== 'object') return;
   const now = Date.now();
   const file = String(meta.file || '').replace(/[\x00-\x1f]/g, '').slice(0, 120);
@@ -104,12 +116,14 @@ function appendEvent(ip, meta, model){
       bumpRetry(e, meta.rt);
       if (cues > (e.cues || 0)) e.cues = cues;
       if (mdl && !e.model) e.model = mdl;
+      if (extra && typeof extra === 'object') Object.assign(e, extra);
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
     }
     if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
   }
   const ev = { t: now, ip, file, lang, cues, batches: 0, retries: 0, model: mdl };
+  if (extra && typeof extra === 'object') Object.assign(ev, extra);
   bumpRetry(ev, meta.rt);
   db.events.push(ev);
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
@@ -145,6 +159,12 @@ function markEvent(ip, meta, ev){
       } else if (ev === 'fail') {
         e.failedAt = now;                      // v0.9.80：客户端异常（含错误消息）上报
         e.failMsg = cleanMsg(meta.msg);
+      } else if (ev === 'fallback') {
+        /* v0.9.119：模型 B 调用失败自动回退模型 A。mdl=回退前的模型(B)，usedModel=真正生效的 A */
+        e.fallback = (e.fallback || 0) + 1;
+        e.fbModel = mdl;
+        e.fbMsg = cleanMsg(meta.msg);
+        if (meta.usedModel) e.model = String(meta.usedModel).slice(0, 60);
       } else return false;
       if (mdl && !e.model) e.model = mdl;
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
@@ -722,16 +742,62 @@ function publicBase(req){
 }
 
 /* ---------------- 模型转发 ---------------- */
+/* 附加请求参数白名单化处理：只接受平铺的 string/number/boolean，
+   且禁止覆盖核心字段（否则会打乱模型名/正文/流式与事件记录）。
+   非对象、非 JSON 字符串、数组一律回落 {}。 */
+const PARAM_RESERVED = ['model', 'messages', 'stream', 'temperature', 'max_tokens'];
+function normParams(v){
+  if (v == null) return {};
+  if (typeof v === 'string') {
+    const t = v.trim();
+    if (!t) return {};
+    try { v = JSON.parse(t); } catch (e) { return {}; }
+  }
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {};
+  const out = {};
+  for (const k of Object.keys(v)) {
+    if (PARAM_RESERVED.indexOf(k) >= 0) continue;
+    const val = v[k];
+    if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') out[k] = val;
+  }
+  return out;
+}
+/* 附加参数合并到请求体：附加项不覆盖核心字段（core 后写，始终胜出） */
+function withExtra(core, extra){
+  if (!extra || typeof extra !== 'object') return core;
+  const body = Object.assign({}, extra, core);
+  return body;
+}
+/* 模型 B 是否配全（缺任一项即视为未启用，全部走 A） */
+function modelBReady(cfg){
+  return !!(cfg.base2 && cfg.model2 && cfg.key2);
+}
+/* 取出某个模型槽位的完整调用配置（A / B 共用 temperature） */
+function slotCfg(cfg, which){
+  return which === 'B'
+    ? { base: cfg.base2, model: cfg.model2, key: cfg.key2, temperature: cfg.temperature, extraParams: cfg.extraParams2 }
+    : { base: cfg.base,  model: cfg.model,  key: cfg.key,  temperature: cfg.temperature, extraParams: cfg.extraParams };
+}
+/* 按目标语言分流：命中 langModelB 且 B 配全 → B，否则 A */
+function pickModel(cfg, lang){
+  const lg = String(lang || '');
+  if (modelBReady(cfg) && Array.isArray(cfg.langModelB) && cfg.langModelB.indexOf(lg) >= 0) {
+    return { which: 'B', cfg: slotCfg(cfg, 'B') };
+  }
+  return { which: 'A', cfg: slotCfg(cfg, 'A') };
+}
+
 async function callModel(cfg, messages, maxTokens){
   const url = String(cfg.base).replace(/\/+$/, '') + '/chat/completions';
   // v0.9.91：temperature 改为配置项（admin 可调）；旧配置无该字段时回退 0.2，并夹紧到 0-2
   let temp = Number(cfg.temperature);
   if (!Number.isFinite(temp)) temp = 0.2;
   temp = Math.min(2, Math.max(0, temp));
+  const core = { model: cfg.model, messages, temperature: temp, stream: false, max_tokens: maxTokens };
   const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
-    body: JSON.stringify({ model: cfg.model, messages, temperature: temp, stream: false, max_tokens: maxTokens })
+    body: JSON.stringify(withExtra(core, cfg.extraParams))
   });
   const text = await r.text();
   if (!r.ok) throw new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
@@ -782,11 +848,28 @@ const server = http.createServer(async (req, res) => {
       usage.ips[ip] = ipUsed + 1;
       usage.global += 1;
       writeUsage(usage);
-      try { appendEvent(ip, body.meta, cfg.model); } catch (e) {} // 行为记录失败不影响翻译主流程
+      /* v0.9.119：按目标语言分流到模型 A / B（meta.lang 由前端随每次请求带上） */
+      const lang = (body.meta && String(body.meta.lang || '')) || '';
+      const pick = pickModel(cfg, lang);
+      try { appendEvent(ip, body.meta, pick.cfg.model, pick.which === 'B' ? { viaB: 1 } : null); } catch (e) {} // 行为记录失败不影响翻译主流程
       try {
-        const out = await callModel(cfg, body.messages, undefined);
+        const out = await callModel(pick.cfg, body.messages, undefined);
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
+        /* B 失败且开启回退 → 再试 A；回退成功后把事件里的模型改写成真正生效的 A，并记 fallback 次数 */
+        if (pick.which === 'B' && cfg.fallbackToA) {
+          try {
+            const outA = await callModel(slotCfg(cfg, 'A'), body.messages, undefined);
+            try {
+              markEvent(ip, Object.assign({}, body.meta || {}, {
+                model: pick.cfg.model, usedModel: cfg.model, msg: String(e.message || '').slice(0, 200)
+              }), 'fallback');
+            } catch (e2) {}
+            return sendJson(res, 200, outA);
+          } catch (e3) {
+            return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e3.message } });
+          }
+        }
         return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e.message } });
       }
     }
@@ -839,6 +922,13 @@ const server = http.createServer(async (req, res) => {
           provider: cfg.provider, base: cfg.base, model: cfg.model,
           keySet: !!cfg.key,
           keyMask: cfg.key ? (cfg.key.slice(0, 4) + '…' + cfg.key.slice(-4)) : '',
+          extraParams: normParams(cfg.extraParams),
+          provider2: cfg.provider2 || '', base2: cfg.base2 || '', model2: cfg.model2 || '',
+          keySet2: !!cfg.key2,
+          keyMask2: cfg.key2 ? (cfg.key2.slice(0, 4) + '…' + cfg.key2.slice(-4)) : '',
+          extraParams2: normParams(cfg.extraParams2),
+          langModelB: Array.isArray(cfg.langModelB) ? cfg.langModelB.slice() : [],
+          fallbackToA: cfg.fallbackToA !== false,
           perIpDaily: cfg.perIpDaily, globalDaily: cfg.globalDaily,
           temperature: (typeof cfg.temperature === 'number' && Number.isFinite(cfg.temperature)) ? cfg.temperature : 0.2,
           publicUrl: cfg.publicUrl || '',
@@ -901,6 +991,21 @@ const server = http.createServer(async (req, res) => {
         if (typeof body.model === 'string') cfg.model = body.model.trim();
         if (typeof body.provider === 'string') cfg.provider = body.provider.trim();
         if (typeof body.key === 'string' && body.key.trim() !== '') cfg.key = body.key.trim(); // 留空 = 保留原 Key
+        /* v0.9.119：模型 B（留空 = 不启用，全部语言走 A）；clearKey2 用于「清空模型 B」 */
+        if (typeof body.base2 === 'string') cfg.base2 = body.base2.trim();
+        if (typeof body.model2 === 'string') cfg.model2 = body.model2.trim();
+        if (typeof body.provider2 === 'string') cfg.provider2 = body.provider2.trim();
+        if (typeof body.key2 === 'string' && body.key2.trim() !== '') cfg.key2 = body.key2.trim();
+        if (body.clearKey2) { cfg.key2 = ''; cfg.base2 = ''; cfg.model2 = ''; cfg.provider2 = ''; cfg.extraParams2 = {}; cfg.langModelB = []; }
+        if (body.extraParams !== undefined) cfg.extraParams = normParams(body.extraParams);
+        if (body.extraParams2 !== undefined) cfg.extraParams2 = normParams(body.extraParams2);
+        if (Array.isArray(body.langModelB)) {
+          const seen = {};
+          cfg.langModelB = body.langModelB
+            .map(x => String(x || ''))
+            .filter(x => /^[A-Za-z][A-Za-z0-9-]{0,11}$/.test(x) && !seen[x] && (seen[x] = 1));
+        }
+        if (body.fallbackToA !== undefined) cfg.fallbackToA = !!body.fallbackToA;
         if (Number.isFinite(+body.perIpDaily)) cfg.perIpDaily = Math.max(0, Math.floor(+body.perIpDaily));
         if (Number.isFinite(+body.globalDaily)) cfg.globalDaily = Math.max(0, Math.floor(+body.globalDaily));
         if (body.temperature != null && Number.isFinite(+body.temperature)) cfg.temperature = Math.min(2, Math.max(0, +body.temperature)); // v0.9.91：空值=保持不变
@@ -916,13 +1021,17 @@ const server = http.createServer(async (req, res) => {
 
       if (req.method === 'POST' && u === '/api/admin/test') {
         const cfg = readConfig();
-        if (!(cfg.base && cfg.model && cfg.key)) {
-          return sendJson(res, 400, { error: { message: '请先保存 Base URL / 模型 / API Key' } });
+        let tbody = {};
+        try { tbody = JSON.parse(await readBody(req, 64 * 1024)); } catch (e) {}
+        const which = (tbody && tbody.which === 'B') ? 'B' : 'A';
+        const slot = slotCfg(cfg, which);
+        if (!(slot.base && slot.model && slot.key)) {
+          return sendJson(res, 400, { error: { message: which === 'B' ? '请先保存模型 B 的 Base URL / 模型 / API Key' : '请先保存 Base URL / 模型 / API Key' } });
         }
         try {
           // v0.9.44：max_tokens 从 10 提到 256——Gemini 等思考型模型在 10 token 限额下 0 completion，
           //  message.content 字段直接缺失，前端拿到 undefined（误判"模型返回空"）。
-          const out = await callModel(cfg, [{ role: 'user', content: 'Reply with exactly: OK' }], 256);
+          const out = await callModel(slot, [{ role: 'user', content: 'Reply with exactly: OK' }], 256);
           const choice = out.choices && out.choices[0];
           const sample = choice && choice.message ? choice.message.content : '';
           const reason = choice ? choice.finish_reason : null;

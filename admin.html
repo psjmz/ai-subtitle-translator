@@ -45,6 +45,15 @@
   .tbl th,.tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
   .tbl th{color:var(--mut);font-weight:500;font-size:12px}
   .tbl tr:hover td{background:#f8fafc}
+  textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;min-height:54px;background:#fff;color:var(--txt)}
+  textarea:focus{outline:2px solid #bcd3fb;border-color:var(--pri)}
+  /* v0.9.119：语言分流 chips */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;max-height:280px;overflow-y:auto;padding:2px}
+  .chip2{font-size:12px;background:#f4f6f9;border:1px solid var(--line);border-radius:14px;padding:4px 11px;cursor:pointer;color:var(--mut);line-height:1.5}
+  .chip2:hover{border-color:var(--pri)}
+  .chip2.on{background:var(--pri);border-color:var(--pri);color:#fff}
+  .chip2 .cv{opacity:.65;font-size:11px;margin-left:2px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 </style>
 </head>
 <body>
@@ -63,7 +72,7 @@
 
   <div id="main" style="display:none">
     <div class="card">
-      <h2>默认模型配置</h2>
+      <h2>模型 A（默认）</h2>
       <label>服务商（Base URL 自动填充，模型名由你指定）</label>
       <select id="provider"></select>
       <div class="row">
@@ -92,6 +101,9 @@
           <input type="number" id="temperature" min="0" max="2" step="0.1">
         </div>
       </div>
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams" spellcheck="false" placeholder='{"enable_thinking": false}'></textarea>
+      <div class="note">会合并进发给该模型的请求体（如 qwen3.x 需要 <span class="mono">enable_thinking:false</span> 来关掉思考，否则容易超时）。留空 = 不附加。禁止覆盖 model / messages / stream / temperature / max_tokens。</div>
       <div class="row">
         <label>站点公开 URL（SEO 用：canonical / sitemap / og:image 的前缀；留空按当前域名）</label>
         <input type="text" id="publicUrl" spellcheck="false" placeholder="https://srt.your-domain.com">
@@ -107,6 +119,54 @@
       </div>
       <div class="usage" id="usage"></div>
       <div class="msg" id="cfgMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>模型 B（可选）</h2>
+      <div class="note" style="margin:0 0 12px">配好后在下面的「语言分流」里勾选要走模型 B 的目标语言；未勾选的语言、以及模型 B 没配全时，一律走模型 A。</div>
+      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
+      <select id="provider2"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base2" spellcheck="false" placeholder="https://api.deepseek.com">
+        </div>
+        <div>
+          <label>模型名</label>
+          <input type="text" id="model2" spellcheck="false" placeholder="deepseek-chat">
+        </div>
+      </div>
+      <label>API Key（<span class="mask" id="keyMask2">未设置</span>）</label>
+      <input type="password" id="key2" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams2" spellcheck="false" placeholder='{"enable_thinking": false}'></textarea>
+      <div class="btns">
+        <button class="primary" id="btnSave2">保存模型 B</button>
+        <button id="btnTest2">测试模型 B</button>
+        <button id="btnClear2" style="margin-left:auto">清空模型 B</button>
+      </div>
+      <div class="msg" id="cfg2Msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>语言分流（哪些目标语言走模型 B）</h2>
+      <div class="note" style="margin:0 0 12px">默认全部走模型 A；点亮的语言走模型 B。分流只看目标语言，不看源语言、文件大小。<b>模型 B 没配全时，这里的勾选不生效</b>，全部自动走 A。</div>
+      <label>搜索语言（中文名 / 英文名 / 语言码）</label>
+      <input type="text" id="langSearch" spellcheck="false" placeholder="如 日语 / Japanese / ja">
+      <div class="btns" style="margin-top:10px">
+        <button data-batch="all">全选</button>
+        <button data-batch="none">清空</button>
+        <button data-batch="cjk">中日韩</button>
+        <button data-batch="nonlatin">非拉丁文字</button>
+      </div>
+      <div class="chips" id="langChips"></div>
+      <div class="note">已选 <b id="langCount">0</b> 种语言走模型 B</div>
+      <label style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="fallbackToA" style="width:auto">
+        <span>模型 B 调用失败时自动回退模型 A（推荐；使用记录里会记 fallback 次数和原因）</span>
+      </label>
+      <div class="btns"><button class="primary" id="btnSaveRoute">保存分流设置</button></div>
+      <div class="msg" id="routeMsg"></div>
     </div>
 
     <div class="card" id="eventsCard" style="display:none">
@@ -165,6 +225,118 @@ const PRESETS = [
   { id: 'custom',      name: '手动自定义',              base: '' }
 ];
 
+/* 目标语言清单（v0.9.112 起 75 种；与 index.html 的 LANGS 同步）
+   g = 批量分组标记：cjk=中日韩 / nonlatin=非拉丁文字 */
+const LANGS = [
+  { v:'en', zh:'English', en:'English', g:'' },
+  { v:'zh-CN', zh:'简体中文', en:'Chinese', g:'cjk nonlatin' },
+  { v:'zh-TW', zh:'繁體中文', en:'Chinese (Trad.)', g:'cjk nonlatin' },
+  { v:'ja', zh:'日本語', en:'Japanese', g:'cjk nonlatin' },
+  { v:'ko', zh:'한국어', en:'Korean', g:'cjk nonlatin' },
+  { v:'fr', zh:'Français', en:'French', g:'' },
+  { v:'de', zh:'Deutsch', en:'German', g:'' },
+  { v:'es', zh:'Español', en:'Spanish', g:'' },
+  { v:'pt', zh:'Português', en:'Portuguese', g:'' },
+  { v:'it', zh:'Italiano', en:'Italian', g:'' },
+  { v:'ru', zh:'Русский', en:'Russian', g:'nonlatin' },
+  { v:'ar', zh:'العربية', en:'Arabic', g:'nonlatin' },
+  { v:'th', zh:'ไทย', en:'Thai', g:'nonlatin' },
+  { v:'vi', zh:'Tiếng Việt', en:'Vietnamese', g:'' },
+  { v:'id', zh:'Bahasa Indonesia', en:'Indonesian', g:'' },
+  { v:'hi', zh:'हिन्दी', en:'Hindi', g:'nonlatin' },
+  { v:'tr', zh:'Türkçe', en:'Turkish', g:'' },
+  { v:'pl', zh:'Polski', en:'Polish', g:'' },
+  { v:'nl', zh:'Nederlands', en:'Dutch', g:'' },
+  { v:'ms', zh:'Bahasa Melayu', en:'Malay', g:'' },
+  { v:'fil', zh:'Filipino', en:'Filipino', g:'' },
+  { v:'fa', zh:'فارسی', en:'Persian', g:'nonlatin' },
+  { v:'sv', zh:'Svenska', en:'Swedish', g:'' },
+  { v:'da', zh:'Dansk', en:'Danish', g:'' },
+  { v:'fi', zh:'Suomi', en:'Finnish', g:'' },
+  { v:'nb', zh:'Norsk bokmål', en:'Norwegian', g:'' },
+  { v:'cs', zh:'Čeština', en:'Czech', g:'' },
+  { v:'sk', zh:'Slovenčina', en:'Slovak', g:'' },
+  { v:'hu', zh:'Magyar', en:'Hungarian', g:'' },
+  { v:'ro', zh:'Română', en:'Romanian', g:'' },
+  { v:'ca', zh:'Català', en:'Catalan', g:'' },
+  { v:'hr', zh:'Hrvatski', en:'Croatian', g:'' },
+  { v:'el', zh:'Ελληνικά', en:'Greek', g:'nonlatin' },
+  { v:'uk', zh:'Українська', en:'Ukrainian', g:'nonlatin' },
+  { v:'sr', zh:'Српски', en:'Serbian', g:'nonlatin' },
+  { v:'bg', zh:'Български', en:'Bulgarian', g:'nonlatin' },
+  { v:'he', zh:'עברית', en:'Hebrew', g:'nonlatin' },
+  { v:'ur', zh:'اردو', en:'Urdu', g:'nonlatin' },
+  { v:'bn', zh:'বাংলা', en:'Bengali', g:'nonlatin' },
+  { v:'ta', zh:'தமிழ்', en:'Tamil', g:'nonlatin' },
+  { v:'te', zh:'తెలుగు', en:'Telugu', g:'nonlatin' },
+  { v:'mr', zh:'मराठी', en:'Marathi', g:'nonlatin' },
+  { v:'ne', zh:'नेपाली', en:'Nepali', g:'nonlatin' },
+  { v:'si', zh:'සිංහල', en:'Sinhala', g:'nonlatin' },
+  { v:'my', zh:'မြန်မာ', en:'Burmese', g:'nonlatin' },
+  { v:'km', zh:'ខ្មែរ', en:'Khmer', g:'nonlatin' },
+  { v:'lo', zh:'ລາວ', en:'Lao', g:'nonlatin' },
+  { v:'sw', zh:'Kiswahili', en:'Swahili', g:'' },
+  { v:'gu', zh:'ગુજરાતી', en:'Gujarati', g:'nonlatin' },
+  { v:'kn', zh:'ಕನ್ನಡ', en:'Kannada', g:'nonlatin' },
+  { v:'ml', zh:'മലയാളം', en:'Malayalam', g:'nonlatin' },
+  { v:'pa', zh:'ਪੰਜਾਬੀ', en:'Punjabi', g:'nonlatin' },
+  { v:'or', zh:'ଓଡ଼ିଆ', en:'Odia', g:'nonlatin' },
+  { v:'as', zh:'অসমীয়া', en:'Assamese', g:'nonlatin' },
+  { v:'kk', zh:'Қазақша', en:'Kazakh', g:'nonlatin' },
+  { v:'uz', zh:'O‘zbekcha', en:'Uzbek', g:'' },
+  { v:'mn', zh:'Монгол', en:'Mongolian', g:'nonlatin' },
+  { v:'az', zh:'Azərbaycan', en:'Azerbaijani', g:'' },
+  { v:'is', zh:'Íslenska', en:'Icelandic', g:'' },
+  { v:'et', zh:'Eesti', en:'Estonian', g:'' },
+  { v:'lv', zh:'Latviešu', en:'Latvian', g:'' },
+  { v:'lt', zh:'Lietuvių', en:'Lithuanian', g:'' },
+  { v:'sl', zh:'Slovenščina', en:'Slovenian', g:'' },
+  { v:'sq', zh:'Shqip', en:'Albanian', g:'' },
+  { v:'mk', zh:'Македонски', en:'Macedonian', g:'nonlatin' },
+  { v:'eu', zh:'Euskara', en:'Basque', g:'' },
+  { v:'gl', zh:'Galego', en:'Galician', g:'' },
+  { v:'am', zh:'አማርኛ', en:'Amharic', g:'nonlatin' },
+  { v:'ha', zh:'Hausa', en:'Hausa', g:'' },
+  { v:'yo', zh:'Yorùbá', en:'Yoruba', g:'' },
+  { v:'zu', zh:'isiZulu', en:'Zulu', g:'' },
+  { v:'so', zh:'Soomaali', en:'Somali', g:'' },
+  { v:'ps', zh:'پښتو', en:'Pashto', g:'nonlatin' },
+  { v:'ku', zh:'کوردی', en:'Kurdish', g:'nonlatin' },
+  { v:'af', zh:'Afrikaans', en:'Afrikaans', g:'' }
+];
+
+/* 走模型 B 的目标语言集合 */
+let langSel = new Set();
+function paramsText(v){
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return '';
+  const ks = Object.keys(v);
+  return ks.length ? JSON.stringify(v, null, 2) : '';
+}
+function readParams(id){
+  const t = $(id).value.trim();
+  if (!t) return {};
+  let o;
+  try { o = JSON.parse(t); } catch (e) { throw new Error('附加请求参数不是合法 JSON：' + e.message); }
+  if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('附加请求参数必须是 JSON 对象（如 {"enable_thinking": false}）');
+  return o;
+}
+function renderLangs(){
+  const q = ($('langSearch').value || '').trim().toLowerCase();
+  const rows = LANGS.filter(l => !q || l.zh.toLowerCase().indexOf(q) >= 0 ||
+    l.en.toLowerCase().indexOf(q) >= 0 || l.v.toLowerCase().indexOf(q) >= 0);
+  $('langChips').innerHTML = rows.map(l =>
+    '<button type="button" class="chip2' + (langSel.has(l.v) ? ' on' : '') + '" data-v="' + l.v + '">' +
+    esc(l.zh) + ' <span class="cv">' + esc(l.v) + '</span></button>').join('') ||
+    '<div class="note">没有匹配的语言</div>';
+  $('langCount').textContent = langSel.size;
+}
+function batchLangs(kind){
+  if (kind === 'none') langSel.clear();
+  else if (kind === 'all') LANGS.forEach(l => langSel.add(l.v));
+  else LANGS.forEach(l => { if ((' ' + (l.g || '') + ' ').indexOf(' ' + kind + ' ') >= 0) langSel.add(l.v); });
+  renderLangs();
+}
+
 function show(el, on){ $(el).style.display = on ? '' : 'none'; }
 function msg(el, text, cls){ const m = $(el); m.textContent = text; m.className = 'msg ' + (cls || 'ok'); }
 
@@ -188,7 +360,8 @@ async function loadConfig(){
       const hit = PRESETS.find(p => p.id === c.provider || p.name === c.provider);
       pid = hit ? hit.id : '';
     }
-    fillProviderSelect(pid);
+    fillProviderSelect(pid, 'provider');
+    fillProviderSelect(c.provider2 || '', 'provider2');
     /* 老数据如果有 base 与某预设的 base 一致，但 provider 字段没存（或存了别的东西），补上匹配预设的 id */
     if (!pid && c.base) {
       const m = PRESETS.find(p => p.base && p.base === (c.base || '').replace(/\/+$/, ''));
@@ -201,6 +374,14 @@ async function loadConfig(){
     $('perIpDaily').value = c.perIpDaily;
     $('globalDaily').value = c.globalDaily;
     $('temperature').value = (typeof c.temperature === 'number' && Number.isFinite(c.temperature)) ? c.temperature : 0.2;
+    $('extraParams').value = paramsText(c.extraParams);
+    $('base2').value = c.base2 || '';
+    $('model2').value = c.model2 || '';
+    $('keyMask2').textContent = c.keySet2 ? ('已保存：' + c.keyMask2) : '未设置';
+    $('extraParams2').value = paramsText(c.extraParams2);
+    langSel = new Set(Array.isArray(c.langModelB) ? c.langModelB : []);
+    $('fallbackToA').checked = c.fallbackToA !== false;
+    renderLangs();
     $('publicUrl').value = c.publicUrl || '';
     $('analyticsId').value = c.analyticsId || '';
     $('usage').innerHTML = '今日用量：全站 <b>' + c.usedToday + '</b> / ' + (c.globalDaily || '∞') +
@@ -213,8 +394,8 @@ async function loadConfig(){
   }
 }
 
-function fillProviderSelect(current){
-  const sel = $('provider');
+function fillProviderSelect(current, selId){
+  const sel = $(selId || 'provider');
   sel.innerHTML = '';
   /* 全部服务商平铺（与 index.html 一致） */
   PRESETS.forEach(p => {
@@ -351,12 +532,15 @@ $('provider').addEventListener('change', () => {
 $('btnSave').addEventListener('click', async () => {
   const base = $('base').value.trim(), model = $('model').value.trim(), key = $('key').value.trim();
   if (!base || !model) return msg('cfgMsg', 'Base URL 和模型名不能为空', 'err');
+  let extraParams;
+  try { extraParams = readParams('extraParams'); } catch (e) { return msg('cfgMsg', e.message, 'err'); }
   try {
     await api('/api/admin/config', 'POST', {
       provider: $('provider').value, base, model, key,
       perIpDaily: +$('perIpDaily').value || 0, globalDaily: +$('globalDaily').value || 0,
       temperature: +$('temperature').value,
-      publicUrl: $('publicUrl').value.trim(), analyticsId: $('analyticsId').value.trim()
+      publicUrl: $('publicUrl').value.trim(), analyticsId: $('analyticsId').value.trim(),
+      extraParams
     });
     $('key').value = '';
     msg('cfgMsg', '已保存并即时生效 ✓', 'ok');
@@ -364,14 +548,67 @@ $('btnSave').addEventListener('click', async () => {
   } catch (e) { msg('cfgMsg', '保存失败：' + e.message, 'err'); }
 });
 
-$('btnTest').addEventListener('click', async () => {
-  msg('cfgMsg', '测试中…', 'ok');
+async function runTest(which, msgEl, prefix){
+  msg(msgEl, '测试中…', 'ok');
   try {
-    const r = await api('/api/admin/test', 'POST');
+    const r = await api('/api/admin/test', 'POST', { which });
     // v0.9.44：服务器 ok:false 表示连通但模型没返回正文（思考型模型 token 限额/模型名错/鉴权空 body），r.hint 给可读原因
-    if (r && r.ok) msg('cfgMsg', '连通成功，模型返回：' + (r.sample || '(空字符串)'), 'ok');
-    else msg('cfgMsg', (r && r.hint) ? '连通成功但模型未返回正文：' + r.hint : '连通成功但模型未返回正文', 'err');
-  } catch (e) { msg('cfgMsg', e.message, 'err'); }
+    if (r && r.ok) msg(msgEl, prefix + '连通成功，模型返回：' + (r.sample || '(空字符串)'), 'ok');
+    else msg(msgEl, (r && r.hint) ? prefix + '连通成功但模型未返回正文：' + r.hint : prefix + '连通成功但模型未返回正文', 'err');
+  } catch (e) { msg(msgEl, e.message, 'err'); }
+}
+$('btnTest').addEventListener('click', () => runTest('A', 'cfgMsg', ''));
+$('btnTest2').addEventListener('click', () => runTest('B', 'cfg2Msg', '模型 B：'));
+
+$('btnSave2').addEventListener('click', async () => {
+  const base2 = $('base2').value.trim(), model2 = $('model2').value.trim(), key2 = $('key2').value.trim();
+  if (!base2 && !model2 && !key2) return msg('cfg2Msg', '模型 B 三项都为空 = 不启用（所有语言走模型 A），无需保存', 'err');
+  if (!base2 || !model2) return msg('cfg2Msg', 'Base URL 和模型名不能为空（除非清空模型 B）', 'err');
+  let extraParams2;
+  try { extraParams2 = readParams('extraParams2'); } catch (e) { return msg('cfg2Msg', e.message, 'err'); }
+  try {
+    await api('/api/admin/config', 'POST', {
+      provider2: $('provider2').value, base2, model2, key2, extraParams2
+    });
+    $('key2').value = '';
+    msg('cfg2Msg', '模型 B 已保存并即时生效 ✓（记得在「语言分流」里勾选目标语言）', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg2Msg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnClear2').addEventListener('click', async () => {
+  if (!confirm('确定清空模型 B 的全部配置（含 API Key）？清空后所有目标语言都会走模型 A。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { clearKey2: true });
+    msg('cfg2Msg', '模型 B 已清空 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg2Msg', '清空失败：' + e.message, 'err'); }
+});
+
+$('provider2').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider2').value);
+  if (p && p.id !== 'custom' && !$('base2').value.trim()) $('base2').value = p.base;
+});
+
+$('langSearch').addEventListener('input', renderLangs);
+$('langChips').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  const v = b.dataset.v;
+  if (langSel.has(v)) langSel.delete(v); else langSel.add(v);
+  renderLangs();
+});
+document.querySelectorAll('button[data-batch]').forEach(b => {
+  b.addEventListener('click', () => batchLangs(b.dataset.batch));
+});
+
+$('btnSaveRoute').addEventListener('click', async () => {
+  try {
+    await api('/api/admin/config', 'POST', {
+      langModelB: [...langSel], fallbackToA: $('fallbackToA').checked
+    });
+    msg('routeMsg', '已保存：' + langSel.size + ' 种语言走模型 B ✓', 'ok');
+  } catch (e) { msg('routeMsg', '保存失败：' + e.message, 'err'); }
 });
 
 $('btnPw').addEventListener('click', async () => {
