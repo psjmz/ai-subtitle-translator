@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.120</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.121</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.120</span>
+    <span class="ver-tag">v0.9.121</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -792,7 +792,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.120"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.121"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6120,6 +6120,78 @@ s += '5.【水词处理——默认行为是翻译】\n'
   return s;
 }
 
+/* v0.9.121：JSON 容错修复——仅在严格解析失败后尝试，修完再 parse，仍失败才抛错（对正常输出零影响）。
+   修四类实测/高发的模型手误：①字符串值内未转义的双引号（引号后跟 } ] : 或「, 且其后是 " } ]」视为收尾，
+   否则视为内容引号补转义）；②字符串内裸控制字符（换行/制表补转义）；③数字前导零（"no":03 → 3）；
+   ④成员间漏逗号（值结束后紧跟下一个 " 时补 , ）。修过任何一处才返回新串，全未修返回 null。 */
+function repairLlmJson(s,alt){
+  let out='',i=0;const n=s.length;let inStr=false,changed=false,prev='';
+  const ws=c=>c===' '||c==='\t'||c==='\r'||c==='\n';
+  while(i<n){
+    const c=s[i];
+    if(inStr){
+      if(c==='\\'){
+        const d=s[i+1];
+        if(d===undefined){out+='\\';changed=true;i++;continue;}
+        if('"\\/bfnrtu'.indexOf(d)>=0){out+=c+d;i+=2;continue;}
+        out+='\\\\'+d;changed=true;i+=2;continue;
+      }
+      if(c==='"'){
+        let j=i+1;while(j<n&&ws(s[j]))j++;
+        const nx=s[j];
+        let close=(nx===undefined||nx==='}'||nx===']'||nx===':');
+        if(!close&&nx===','){let k=j+1;while(k<n&&ws(s[k]))k++;if(s[k]==='"'||s[k]==='}'||s[k]===']')close=true;}
+        /* 「引号紧跟引号」天生歧义：内容引号（他说"好"）vs 收尾+漏逗号（"b""c":）。
+           默认按内容引号转义；alt=true 备选模式按收尾处理——两种策略都试，谁能 parse 通用谁 */
+        if(!close&&alt&&nx==='"')close=true;
+        if(close){inStr=false;out+=c;prev='"';i++;continue;}
+        out+='\\"';changed=true;i++;continue;
+      }
+      if(c.charCodeAt(0)<32){
+        out+=(c==='\n')?'\\n':(c==='\t')?'\\t':(c==='\r')?'\\r':'\\u'+('000'+c.charCodeAt(0).toString(16)).slice(-4);
+        changed=true;i++;continue;
+      }
+      out+=c;i++;continue;
+    }
+    if(ws(c)){out+=c;i++;continue;}
+    if(c==='"'){
+      if(prev==='"'||prev==='}'||prev===']'||(prev>='0'&&prev<='9')||prev==='e'||prev==='l'){out+=',';changed=true;}
+      inStr=true;out+=c;i++;continue;
+    }
+    if(c==='0'&&/[0-9]/.test(s[i+1]||'')){
+      let j=i+1;while(j<n&&s[j]==='0')j++;
+      if(j<n&&/[0-9]/.test(s[j])){changed=true;i=j;continue;}
+      changed=true;out+='0';i=j;continue;
+    }
+    if(/[0-9+\-]/.test(c)){
+      let j=i+1;while(j<n&&/[0-9.eE+\-]/.test(s[j]))j++;
+      out+=s.slice(i,j);prev=s[j-1];i=j;continue;
+    }
+    if(c===','){
+      let j=i+1;while(j<n&&ws(s[j]))j++;
+      if(s[j]==='}'||s[j]===']'){changed=true;i++;continue;}
+      out+=c;prev=c;i++;continue;
+    }
+    out+=c;prev=c;i++;continue;
+  }
+  return changed?out:null;
+}
+/* v0.9.121：严格解析 → 失败先 repairLlmJson 再试 → 仍失败抛错并带「响应开头 + 出错处上下文」
+   （实测表象：批 1 三连败 Expected ',' or '}' after property value，模型把未转义引号/前导零/漏逗号混进 JSON） */
+function parseWithRepair(str){
+  try{ return JSON.parse(str); }
+  catch(e){
+    const fixes=[repairLlmJson(str),repairLlmJson(str,true)];
+    for(const fixed of fixes){
+      if(fixed!==null){ try{ return JSON.parse(fixed); }catch(e2){} }
+    }
+    const m=/position (\d+)/.exec(String(e&&e.message||''));
+    const p=m?Math.min(+m[1],str.length):0;
+    const ctx=p>0?(' · 出错处: '+str.slice(Math.max(0,p-40),p+60).replace(/\s+/g,' ')):'';
+    throw new Error(String(e&&e.message||e)+' · 响应开头: '+str.slice(0,100).replace(/\s+/g,' ')+ctx);
+  }
+}
+
 function parseLlmJson(raw){
   let s=String(raw||'');
   s=s.replace(/```json|```/g,'').trim();
@@ -6128,7 +6200,7 @@ function parseLlmJson(raw){
   if (a2>=0 && (a1<0 || a2<a1)){
     const b2=s.lastIndexOf(']');
     if (b2>a2){
-      try { return JSON.parse(s.slice(a2,b2+1)); } catch(e){}
+      try { return parseWithRepair(s.slice(a2,b2+1)); } catch(e){}
     }
   }
   /* v0.9.120：对象路径优先从 {"groups": 锚点起切——部分模型会在正文里先复述输入/示例再给答案，
@@ -6137,8 +6209,7 @@ function parseLlmJson(raw){
   const a=(ga>=0?ga:s.indexOf('{')), b=s.lastIndexOf('}');
   if (a<0||b<=a) throw new Error(t('errNotJson'));
   const slice=s.slice(a,b+1);
-  try{ return JSON.parse(slice); }
-  catch(e){ throw new Error(e.message+' · 响应开头: '+slice.slice(0,100).replace(/\s+/g,' ')); }
+  return parseWithRepair(slice);
 }
 
 // v0.9.29：timeoutMs 可选（默认 90s）——术语表提取是单次大请求（8.6K 采样在 DeepSeek 夜高峰实测 161.5s，
