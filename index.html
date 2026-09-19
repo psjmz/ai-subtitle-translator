@@ -7522,7 +7522,10 @@ async function runTranslate(){
     renderRows();        // 先渲染译文，避免后处理误读旧 DOM
     applyPost();         // 清提示词 + 折行（超阈值自动分行）
     finalRenumberAndStats();
-    log(t('allDone',S.dropN,S.mergeN,S.wrapN),'okc');
+    /* v0.9.130：allDone 的第二个占位是「合并了多少条」（各语言字典措辞均为 merged / 并入），
+       必须是真正的合并数 mG；S.mergeN 现在存的是「跨多条的句组」总数（给顶部指标徽章用），
+       二者不是一回事——多数跨条句组走的是逐条对齐或时长切分，并没有真的被并成一条。 */
+    log(t('allDone',S.dropN,S.mergedN,S.wrapN),'okc');
     reportEvent('finish');   // 翻译成功完成上报（仅云端模式有效）
     // v0.9.77：只有整片跑完才作废断点。用户主动停止 / 模型熔断（S.stop）时保留，下次可续跑
     if(!S.stop) rmSnap();
