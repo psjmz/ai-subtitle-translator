@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.121</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.122</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.121</span>
+    <span class="ver-tag">v0.9.122</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -792,7 +792,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.121"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.122"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6120,13 +6120,19 @@ s += '5.【水词处理——默认行为是翻译】\n'
   return s;
 }
 
-/* v0.9.121：JSON 容错修复——仅在严格解析失败后尝试，修完再 parse，仍失败才抛错（对正常输出零影响）。
-   修四类实测/高发的模型手误：①字符串值内未转义的双引号（引号后跟 } ] : 或「, 且其后是 " } ]」视为收尾，
+/* v0.9.121/122：JSON 容错修复——仅在严格解析失败后尝试，修完再 parse，仍失败才抛错（对正常输出零影响）。
+   已修八类实测/高发的模型手误：①字符串值内未转义双引号（引号后跟 } ] : 或「, 且其后是 " } ]」视为收尾，
    否则视为内容引号补转义）；②字符串内裸控制字符（换行/制表补转义）；③数字前导零（"no":03 → 3）；
-   ④成员间漏逗号（值结束后紧跟下一个 " 时补 , ）。修过任何一处才返回新串，全未修返回 null。 */
+   ④成员间漏逗号（值结束后紧跟 " { [ 时补 , ）；⑤缺闭合括号（栈感知：] 前缺 } 补 }、} 前缺 ] 补 ]、
+   多余 } ] 丢弃）；⑥输入截断（结尾补字符串收尾引号 + 按栈补齐 } ]）；⑦裸 key / 错位引号 key
+   （fillers: 或 fillers": → 补引号，错位变体顺带清掉前一字符串值吞进的 }], 垃圾尾巴）；
+   ⑧引号紧跟引号歧义（内容引号 vs 收尾+漏逗号，alt 备选双策略，谁能 parse 通用谁）。
+   修过任何一处才返回新串，全未修返回 null。 */
 function repairLlmJson(s,alt){
   let out='',i=0;const n=s.length;let inStr=false,changed=false,prev='';
+  const stack=[];
   const ws=c=>c===' '||c==='\t'||c==='\r'||c==='\n';
+  const valEnd=()=>prev==='"'||prev==='}'||prev===']'||(prev>='0'&&prev<='9')||prev==='e'||prev==='l';
   while(i<n){
     const c=s[i];
     if(inStr){
@@ -6141,8 +6147,17 @@ function repairLlmJson(s,alt){
         const nx=s[j];
         let close=(nx===undefined||nx==='}'||nx===']'||nx===':');
         if(!close&&nx===','){let k=j+1;while(k<n&&ws(s[k]))k++;if(s[k]==='"'||s[k]==='}'||s[k]===']')close=true;}
-        /* 「引号紧跟引号」天生歧义：内容引号（他说"好"）vs 收尾+漏逗号（"b""c":）。
-           默认按内容引号转义；alt=true 备选模式按收尾处理——两种策略都试，谁能 parse 通用谁 */
+        /* v0.9.122：错位引号模式——引号后跟「裸词 + 可选引号 + :」（本串收尾引号被下一个 key 的
+           起始引号顶替）→ 视为收尾，后续交给裸 key 分支补引号。
+           守卫：往前跳过空白后的上一字符是引号（在字符串内 ⇒ 它刚被当内容转义，"b""c": /
+           "b" "c": 场景）则不触发；真错位引号前面是 }], 垃圾，不会紧跟被转义的引号 */
+        let pi=i-1;while(pi>=0&&ws(s[pi]))pi--;
+        if(!close&&!(pi>=0&&s[pi]==='"')&&nx!==undefined&&/[A-Za-z_$\u0080-\uFFFF]/.test(nx)){
+          let k2=j;while(k2<n&&/[A-Za-z0-9_$\u0080-\uFFFF]/.test(s[k2]))k2++;
+          let k3=k2;while(k3<n&&ws(s[k3]))k3++;
+          if(s[k3]==='"')k3++;
+          if(s[k3]===':'&&k2>j)close=true;
+        }
         if(!close&&alt&&nx==='"')close=true;
         if(close){inStr=false;out+=c;prev='"';i++;continue;}
         out+='\\"';changed=true;i++;continue;
@@ -6155,8 +6170,28 @@ function repairLlmJson(s,alt){
     }
     if(ws(c)){out+=c;i++;continue;}
     if(c==='"'){
-      if(prev==='"'||prev==='}'||prev===']'||(prev>='0'&&prev<='9')||prev==='e'||prev==='l'){out+=',';changed=true;}
+      if(valEnd()){out+=',';changed=true;}
       inStr=true;out+=c;i++;continue;
+    }
+    if(c==='{'||c==='['){
+      if(valEnd()){out+=',';changed=true;}
+      stack.push(c);out+=c;prev=c;i++;continue;
+    }
+    if(c==='}'){
+      while(stack.length&&stack[stack.length-1]==='['){out+=']';stack.pop();changed=true;}
+      if(stack.length&&stack[stack.length-1]==='{'){stack.pop();out+=c;prev=c;i++;continue;}
+      changed=true;i++;continue;
+    }
+    if(c===']'){
+      while(stack.length&&stack[stack.length-1]==='{'){out+='}';stack.pop();changed=true;}
+      if(stack.length&&stack[stack.length-1]==='['){
+        /* v0.9.122 alt：数组收尾 ] 后紧跟 , { 或 {（明显还要继续放元素——模型多发了一个 ]）
+           → 丢弃该 ]、数组保持开放。默认策略不启用（零回归），alt 候选才试 */
+        let j2=i+1;while(j2<n&&ws(s[j2]))j2++;
+        if(alt&&(s[j2]==='{'||(s[j2]===','&&(s[j2+1]==='{'||s.slice(j2+1,j2+3).trim()==='{')))){changed=true;i++;continue;}
+        stack.pop();out+=c;prev=c;i++;continue;
+      }
+      changed=true;i++;continue;
     }
     if(c==='0'&&/[0-9]/.test(s[i+1]||'')){
       let j=i+1;while(j<n&&s[j]==='0')j++;
@@ -6172,24 +6207,48 @@ function repairLlmJson(s,alt){
       if(s[j]==='}'||s[j]===']'){changed=true;i++;continue;}
       out+=c;prev=c;i++;continue;
     }
+    /* v0.9.122：裸 key（fillers:）或错位引号 key（fillers":）→ 补引号；错位变体顺带清掉
+       前一字符串值吞进的 }], 垃圾尾巴（实测：text 收尾引号被 key 起始引号顶替时值会吞掉 }], ） */
+    if(/[A-Za-z_$\u0080-\uFFFF]/.test(c)){
+      let j=i+1;
+      while(j<n&&s[j]!=='"'&&',{}[]:'.indexOf(s[j])<0&&!ws(s[j]))j++;
+      let k=j;while(k<n&&ws(s[k]))k++;
+      const stray=(s[k]==='"');
+      if(stray)k++;
+      if(s[k]===':'&&j>i){
+        if(stray)out=out.replace(/[\]},\t\r\n ]+(?="$)/,'');
+        if(valEnd()){out+=',';changed=true;}
+        out+='"'+s.slice(i,j)+'":';changed=true;prev=':';i=k+1;continue;
+      }
+      out+=s.slice(i,j);prev=(s[j-1]||prev);i=j;continue;
+    }
     out+=c;prev=c;i++;continue;
   }
+  /* v0.9.122：输入结束仍未闭合——补字符串收尾引号 + 按栈补齐 } ]（截断/重复文档场景） */
+  if(inStr){out+='"';changed=true;}
+  while(stack.length){out+=(stack.pop()==='{'?'}':']');changed=true;}
   return changed?out:null;
 }
-/* v0.9.121：严格解析 → 失败先 repairLlmJson 再试 → 仍失败抛错并带「响应开头 + 出错处上下文」
-   （实测表象：批 1 三连败 Expected ',' or '}' after property value，模型把未转义引号/前导零/漏逗号混进 JSON） */
+/* v0.9.121/122：严格解析 → 失败先 repairLlmJson（双策略）再试 → 仍失败抛错并带「响应开头 + 出错处上下文」。
+   v0.9.122 新增：模型把整份文档重复输出（…} {"groups":…）时，追加「第二个 {"groups": 起点截断」候选，
+   截断体配 repairLlmJson 的栈补齐可救回首份文档 */
 function parseWithRepair(str){
-  try{ return JSON.parse(str); }
-  catch(e){
-    const fixes=[repairLlmJson(str),repairLlmJson(str,true)];
-    for(const fixed of fixes){
+  let firstErr=null;
+  const cands=[str];
+  const anchor=/\{\s*"groups"\s*:/g;let m,cnt=0;
+  while((m=anchor.exec(str))){ cnt++; if(cnt===2){ if(m.index>0)cands.push(str.slice(0,m.index).replace(/[\s,]+$/,'')); break; } }
+  for(const cd of cands){
+    try{ return JSON.parse(cd); }
+    catch(e){ if(firstErr===null)firstErr=e; }
+    for(const fixed of [repairLlmJson(cd),repairLlmJson(cd,true)]){
       if(fixed!==null){ try{ return JSON.parse(fixed); }catch(e2){} }
     }
-    const m=/position (\d+)/.exec(String(e&&e.message||''));
-    const p=m?Math.min(+m[1],str.length):0;
-    const ctx=p>0?(' · 出错处: '+str.slice(Math.max(0,p-40),p+60).replace(/\s+/g,' ')):'';
-    throw new Error(String(e&&e.message||e)+' · 响应开头: '+str.slice(0,100).replace(/\s+/g,' ')+ctx);
   }
+  const e=firstErr||new Error('JSON parse failed');
+  const m2=/position (\d+)/.exec(String(e.message||''));
+  const p=m2?Math.min(+m2[1],str.length):0;
+  const ctx=p>0?(' · 出错处: '+str.slice(Math.max(0,p-40),p+60).replace(/\s+/g,' ')):'';
+  throw new Error(String(e.message||e)+' · 响应开头: '+str.slice(0,100).replace(/\s+/g,' ')+ctx);
 }
 
 function parseLlmJson(raw){
