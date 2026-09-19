@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.122</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.123</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.122</span>
+    <span class="ver-tag">v0.9.123</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -792,7 +792,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.122"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.123"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6178,6 +6178,13 @@ function repairLlmJson(s,alt){
       stack.push(c);out+=c;prev=c;i++;continue;
     }
     if(c==='}'){
+      /* v0.9.123：多余的 }（模型每个数组元素后多打一个，实测 {"gno":2,…"text":"…"}},{"gno":3,…}）。
+         栈里没有待闭合对象时，若后面还要继续放元素（下一个非空字符是 , { 或 " ）判为杂散括号丢弃；
+         旧逻辑一律「先补 ] 关数组」会把剩余元素全挤出文档（表现为「缺少句组 2/3 的结果」） */
+      if(stack.length&&stack[stack.length-1]==='['){
+        let j2=i+1;while(j2<n&&ws(s[j2]))j2++;
+        if(s[j2]===','||s[j2]==='{'||s[j2]==='"'){changed=true;i++;continue;}
+      }
       while(stack.length&&stack[stack.length-1]==='['){out+=']';stack.pop();changed=true;}
       if(stack.length&&stack[stack.length-1]==='{'){stack.pop();out+=c;prev=c;i++;continue;}
       changed=true;i++;continue;
@@ -6229,6 +6236,57 @@ function repairLlmJson(s,alt){
   while(stack.length){out+=(stack.pop()==='{'?'}':']');changed=true;}
   return changed?out:null;
 }
+/* v0.9.123：结构级抢救——字符级修复搞不定时的最后一档：不问语法，直接按键名扫描捞出句组。
+   实测畸形（弱结构化模型）：{"gno":2,"type":"text","text":"下がって！"}},{"gno":3,"type":"译文…"}}
+   ① 每个元素后多打一个 } ② 丢掉 cues 数组改用组级 text ③ 连 type 的值都被写成译文。
+   下游本来就兼容「组级 text」旧格式，所以只要捞出 (gno → 译文) 就能用；
+   仅在严格解析 + 双策略字符修复全部失败后启用（合法 JSON 永远走不到这里）。 */
+function unescStr(v){ try{ return JSON.parse('"'+v+'"'); }catch(e){ return v; } }
+/* v0.9.123：已知 type 取值白名单——模型若把译文写进了 type（实测 {"gno":3,"type":"アウトロー…"}），
+   该组既无 cues 也无 text，下游会当作空译文。此处把它搬回 text。
+   正常输出的 type 只会是 text/drop/music/song/lyric，所以对其他模型零触发。 */
+const KNOWN_GTYPE={text:1,drop:1,music:1,song:1,lyric:1};
+function normalizeGroupsShape(o){
+  if(!o||!Array.isArray(o.groups)) return o;
+  o.groups.forEach(function(g){
+    if(!g) return;
+    const hasCues=Array.isArray(g.cues)&&g.cues.length;
+    const txt=(g.text!=null?String(g.text):(g.zh!=null?String(g.zh):''));
+    if(!hasCues&&!txt.trim()&&typeof g.type==='string'&&g.type&&!KNOWN_GTYPE[g.type]){
+      g.text=g.type; g.type='text';
+    }
+  });
+  return o;
+}
+function salvageGroups(s){
+  if(!s||s.indexOf('"gno"')<0) return null;
+  const marks=[], re=/"gno"\s*:\s*(-?\d+)/g; let m;
+  while((m=re.exec(s))) marks.push({gno:+m[1], pos:m.index});
+  if(!marks.length) return null;
+  const groups=[], seen={};
+  for(let i=0;i<marks.length;i++){
+    const end=(i+1<marks.length)?marks[i+1].pos:s.length;
+    const seg=s.slice(marks[i].pos,end), g={gno:marks[i].gno};
+    if(seen[g.gno]) continue;                        // 重复文档：只保留首份
+    const cues=[], cre=/"no"\s*:\s*(\d+)\s*,\s*"text"\s*:\s*"((?:[^"\\]|\\.)*)"/g; let cm;
+    while((cm=cre.exec(seg))) cues.push({no:+cm[1], text:unescStr(cm[2])});
+    if(cues.length){ g.type='text'; g.cues=cues; }
+    else{
+      const tm=/"(?:text|zh|target|trans|translation)"\s*:\s*"((?:[^"\\]|\\.)*)"/.exec(seg);
+      if(tm){ g.type='text'; g.text=unescStr(tm[1]); }
+      else{
+        const ty=/"type"\s*:\s*"((?:[^"\\]|\\.)*)"/.exec(seg);
+        const tv=ty?unescStr(ty[1]):'';
+        if(tv&&!KNOWN_GTYPE[tv]){ g.type='text'; g.text=tv; }   // 模型把译文写进了 type
+        else { g.type=tv||'text'; g.text=''; }
+      }
+    }
+    seen[g.gno]=1;
+    groups.push(g);
+  }
+  const usable=groups.filter(g=>(g.text!=null&&String(g.text).trim())||(g.cues&&g.cues.length));
+  return usable.length?{groups:usable}:null;
+}
 /* v0.9.121/122：严格解析 → 失败先 repairLlmJson（双策略）再试 → 仍失败抛错并带「响应开头 + 出错处上下文」。
    v0.9.122 新增：模型把整份文档重复输出（…} {"groups":…）时，追加「第二个 {"groups": 起点截断」候选，
    截断体配 repairLlmJson 的栈补齐可救回首份文档 */
@@ -6238,12 +6296,14 @@ function parseWithRepair(str){
   const anchor=/\{\s*"groups"\s*:/g;let m,cnt=0;
   while((m=anchor.exec(str))){ cnt++; if(cnt===2){ if(m.index>0)cands.push(str.slice(0,m.index).replace(/[\s,]+$/,'')); break; } }
   for(const cd of cands){
-    try{ return JSON.parse(cd); }
+    try{ return normalizeGroupsShape(JSON.parse(cd)); }
     catch(e){ if(firstErr===null)firstErr=e; }
     for(const fixed of [repairLlmJson(cd),repairLlmJson(cd,true)]){
-      if(fixed!==null){ try{ return JSON.parse(fixed); }catch(e2){} }
+      if(fixed!==null){ try{ return normalizeGroupsShape(JSON.parse(fixed)); }catch(e2){} }
     }
   }
+  /* v0.9.123 最后一档：结构级抢救（对数组型 payload 返回 null，不影响术语表等场景） */
+  for(const cd of cands){ const sv=salvageGroups(cd); if(sv) return sv; }
   const e=firstErr||new Error('JSON parse failed');
   const m2=/position (\d+)/.exec(String(e.message||''));
   const p=m2?Math.min(+m2[1],str.length):0;
@@ -6275,8 +6335,12 @@ function parseLlmJson(raw){
 // 正常时段仅 ~4s），共用 90s 会导致大文件在服务端拥塞时静默降级为无术语表；批次/压缩仍走默认 90s
 async function chatOnce(base,key,model,msgs,timeoutMs,rt){
   const ctl=new AbortController();
-  const timer=setTimeout(()=>ctl.abort(), timeoutMs>0?timeoutMs:90000);
   const builtin = (base===BUILTIN_API);
+  /* v0.9.123：浏览器直连（自定义 API）没有服务端排队，但第三方中转/思考型模型慢得多——
+     恒定 90s 会让大批次必然 abort（实测表象："signal is aborted without reason"，换任何慢模型都一样）。
+     直连默认放宽到 300s；内置通道仍 90s；显式传值（测试连接 20s、术语提取 240s）优先。 */
+  const ms = timeoutMs>0 ? timeoutMs : (builtin?90000:300000);
+  const timer=setTimeout(()=>ctl.abort(), ms);
   try{
     const url = builtin ? BUILTIN_API : base.replace(/\/+$/,'')+'/chat/completions';
     const headers={'Content-Type':'application/json'};
@@ -6394,6 +6458,15 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     // v0.9.66：cue 对齐输出——保留 cues 数组供组级校验；旧格式（仅 text）优雅兼容
     byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
   });
+  /* v0.9.123：解析成功但丢组（字符级修复可能吞掉个别句组，表现为「缺少句组 N 的结果」）
+     → 用结构级抢救把缺的组补回来；只补缺失的 gno，已有结果一律不动（零回归） */
+  if(send.some(g=>!byGno[g.gno])){
+    const sv=salvageGroups(String(raw||''));
+    if(sv&&Array.isArray(sv.groups)) sv.groups.forEach(x=>{
+      if(!x||x.gno==null||byGno[x.gno]) return;
+      byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
+    });
+  }
   // 校验齐全：每个输入句组必须有结果（v0.9.45：只校验真正发给模型的 send 集）
   send.forEach(g=>{ if(!byGno[g.gno]) throw new Error(t('errMissGroup',g.gno)); });
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
