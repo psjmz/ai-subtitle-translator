@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.123</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.124</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.123</span>
+    <span class="ver-tag">v0.9.124</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -713,6 +713,9 @@
         <input type="text" id="model" spellcheck="false">
         <label class="flbl"><span data-i18n="lblKey">API Key（仅保存在本机浏览器）</span><a id="keyLink" href="#" target="_blank" rel="noopener" style="float:right;font-weight:400;display:none"></a></label>
         <input type="password" id="apikey" autocomplete="off">
+        <!-- v0.9.124：附加请求参数——透传到自定义 API 的请求体（关闭思考 / 强制 JSON 输出等） -->
+        <label class="flbl"><span data-i18n="lblExtra">附加请求参数（JSON，可选）</span><i class="info" data-tip-i18n="extraTip">i</i></label>
+        <input type="text" id="extra" spellcheck="false" placeholder='{"enable_thinking":false}'>
         <div class="btns" style="margin-top:8px">
           <button class="btn" id="btnTest" type="button" data-i18n="btnTest">⚡ 测试连接</button>
           <span class="hint" id="testOut" style="align-self:center"></span>
@@ -792,7 +795,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.123"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.124"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -939,7 +942,7 @@ const STYLE_DESC = {
 /* ---------------- 界面多语言（跟随浏览器 + 手动切换） ---------------- */
 const UI_LANGS = [ ['zh-CN','简体中文'], ['zh-TW','繁體中文'], ['en','English'], ['ja','日本語'], ['es','Español'], ['pt','Português'], ['ko','한국어'], ['de','Deutsch'], ['fr','Français'], ['id','Bahasa Indonesia'], ['hi','हिन्दी'], ['th','ไทย'], ['vi','Tiếng Việt'], ['ru','Русский'], ['it','Italiano'], ['ar','العربية'], ['tr','Türkçe'], ['nl','Nederlands'], ['pl','Polski'], ['sv','Svenska'], ['cs','Čeština'], ['uk','Українська'], ['da','Dansk'], ['fi','Suomi'], ['el','Ελληνικά'], ['he','עברית'], ['ro','Română'] ];
 const I18N = {
-'zh-CN': {
+'zh-CN': {lblExtra:'附加请求参数（JSON，可选）',extraTip:'随每次自定义 API 请求一起发送。例：{"enable_thinking":false} 关闭模型思考；{"response_format":{"type":"json_object"}} 强制 JSON 输出。model / messages / temperature / stream / max_tokens 不可覆盖。',
   docTitle:'随心字幕 AI (AI-SRTSub) - 全球好剧随心看，一键生成专属母语字幕', appTitle:'🎬 随心字幕 AI',
   tagLocal:'本地运行 · 字幕不上传服务器', uiLangTag:'界面语言',
   rule1:'① 翻译风格可选（均衡/口语自然/自定义）', rule2:'② 时间轴对齐', rule3:'③ 听写纠错',
@@ -1034,7 +1037,7 @@ const I18N = {
   lblDstShort:'目标语言', lblKeepTermsShort:'专名保留原文', lblAutoTermsShort:'自动术语表', lblMaxWShort:'折行阈值', lblBiMaxWShort:'双语行宽（译文行）', wUnit:'字符', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
   /* v0.9.70 两段式界面新增 */
 },
-'zh-TW': {
+'zh-TW': {lblExtra:'附加請求參數（JSON，可選）',extraTip:'隨每次自訂 API 請求一併送出。例：{"enable_thinking":false} 關閉模型思考；{"response_format":{"type":"json_object"}} 強制 JSON 輸出。model / messages / temperature / stream / max_tokens 不可覆寫。',
   docTitle:'隨心字幕 AI (AI-SRTSub) - 全球好劇隨心看，一鍵生成專屬母語字幕', appTitle:'🎬 隨心字幕 AI',
   tagLocal:'本機執行 · 字幕不上傳伺服器', uiLangTag:'介面語言',
   rule1:'① 翻譯風格可選（均衡/口語自然/自訂）', rule2:'② 時間軸對齊', rule3:'③ 聽寫糾錯',
@@ -1129,7 +1132,7 @@ const I18N = {
   lblDstShort:'目標語言', lblKeepTermsShort:'專名保留原文', lblAutoTermsShort:'自動術語表', lblMaxWShort:'折行閾值', lblBiMaxWShort:'雙語行寬（譯文行）', wUnit:'字元', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
   /* v0.9.70 两段式界面新增 */
 },
-'en': {
+'en': {lblExtra:'Extra request parameters (JSON, optional)',extraTip:'Merged into every custom-API request body. Examples: {"enable_thinking":false} to turn off reasoning; {"response_format":{"type":"json_object"}} to force JSON output. model / messages / temperature / stream / max_tokens cannot be overridden.',
   docTitle:'AI-SRTSub - Global Movies & Series, Subtitles in Your Language', appTitle:'🎬 AI Subtitle Translator',
   tagLocal:'Runs locally · subtitles never leave your browser', uiLangTag:'UI',
   rule1:'① Choose translation style (Balanced/Natural/Custom)', rule2:'② Timeline aligned', rule3:'③ Auto-fix transcription errors',
@@ -1224,7 +1227,7 @@ const I18N = {
   lblDstShort:'Target language', lblKeepTermsShort:'Keep proper nouns', lblAutoTermsShort:'Auto glossary', lblMaxWShort:'Line width', lblBiMaxWShort:'Bilingual width (translated)', wUnit:'characters', lblLyric:'Lyrics', lyricTrans:'Translate', lyricKeep:'Keep original', lyricDrop:'Remove', lblMarks:'Lyric markers', lblDropFillers:'Remove fillers',
   /* v0.9.70 两段式界面新增 */
 },
-'ja': {
+'ja': {lblExtra:'追加リクエストパラメータ（JSON、任意）',extraTip:'カスタム API の各リクエスト本文にマージされます。例：{"enable_thinking":false}（思考を無効化）、{"response_format":{"type":"json_object"}}（JSON 出力を強制）。model / messages / temperature / stream / max_tokens は上書きできません。',
   docTitle:'AI-SRTSub - 世界の映画・ドラマを母国語字幕で楽しむAI字幕翻訳', appTitle:'🎬 AI字幕翻訳ツール',
   tagLocal:'ローカル動作 · 字幕はサーバーに送信されません', uiLangTag:'表示言語',
   rule1:'① 翻訳スタイル選択（バランス/自然な会話/カスタム）', rule2:'② タイムライン一致', rule3:'③ 音声起こし誤りを自動修正',
@@ -1319,7 +1322,7 @@ const I18N = {
   lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞を保持', lblAutoTermsShort:'自動用語集', lblMaxWShort:'折り返し幅', lblBiMaxWShort:'バイリンガル行幅（訳文）', wUnit:'文字', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
   /* v0.9.70 两段式界面新增 */
 },
-'es': {
+'es': {lblExtra:'Parámetros adicionales (JSON, opcional)',extraTip:'Se fusiona en el cuerpo de cada solicitud de API personalizada. Ej.: {"enable_thinking":false} para desactivar el razonamiento; {"response_format":{"type":"json_object"}} para forzar JSON. model / messages / temperature / stream / max_tokens no se pueden sobrescribir.',
   docTitle:'AI-SRTSub - Cine y series del mundo, subtítulos en tu idioma', appTitle:'🎬 Traductor de Subtítulos IA',
   tagLocal:'Se ejecuta localmente · los subtítulos no salen de tu navegador', uiLangTag:'Idioma',
   rule1:'① Elige estilo de traducción (Equilibrado/Natural/Personalizado)', rule2:'② Línea de tiempo alineada', rule3:'③ Corrige errores de transcripción',
@@ -1414,7 +1417,7 @@ const I18N = {
   lblDstShort:'Idioma destino', lblKeepTermsShort:'Mantener nombres propios', lblAutoTermsShort:'Glosario automático', lblMaxWShort:'Ancho de línea', lblBiMaxWShort:'Ancho bilingüe (traducido)', wUnit:'caracteres', lblLyric:'가사 처리', lyricTrans:'번역', lyricKeep:'원문 유지', lyricDrop:'삭제', lblMarks:'가사 기호', lblDropFillers:'군더더기 제거',
   /* v0.9.70 两段式界面新增 */
 },
-'pt': {
+'pt': {lblExtra:'Parâmetros adicionais (JSON, opcional)',extraTip:'É mesclado ao corpo de cada requisição de API personalizada. Ex.: {"enable_thinking":false} para desativar o raciocínio; {"response_format":{"type":"json_object"}} para forçar JSON. model / messages / temperature / stream / max_tokens não podem ser sobrescritos.',
   docTitle:'AI-SRTSub - Filmes e séries do mundo, legendas no seu idioma', appTitle:'🎬 Tradutor de Legendas IA',
   tagLocal:'Roda localmente · as legendas não saem do seu navegador', uiLangTag:'Idioma',
   rule1:'① Escolha o estilo de tradução (Equilibrado/Natural/Personalizado)', rule2:'② Linha do tempo alinhada', rule3:'③ Corrige erros de transcrição',
@@ -1509,7 +1512,7 @@ const I18N = {
   lblDstShort:'Idioma de destino', lblKeepTermsShort:'Manter nomes próprios', lblAutoTermsShort:'Glossário automático', lblMaxWShort:'Largura de linha', lblBiMaxWShort:'Largura bilíngue (traduzido)', wUnit:'caracteres', lblLyric:'Letras de canciones', lyricTrans:'Traducir', lyricKeep:'Mantener original', lyricDrop:'Eliminar', lblMarks:'Marcas de letra', lblDropFillers:'Quitar muletillas',
   /* v0.9.70 两段式界面新增 */
 },
-'ko': {
+'ko': {lblExtra:'추가 요청 파라미터 (JSON, 선택)',extraTip:'커스텀 API 요청 본문에 함께 전송됩니다. 예: {"enable_thinking":false}(추론 비활성화), {"response_format":{"type":"json_object"}}(JSON 출력 강제). model / messages / temperature / stream / max_tokens 는 덮어쓸 수 없습니다.',
   docTitle:'AI-SRTSub - 세계 영화·드라마를 내 언어 자막으로 즐기는 AI 자막 번역기', appTitle:'🎬 AI 자막 번역기',
   tagLocal:'로컬 실행 · 자막은 브라우저를 벗어나지 않습니다', uiLangTag:'언어',
   rule1:'① 번역 스타일 선택(균형/자연스러운 구어체/사용자 정의)', rule2:'② 타임라인 정렬', rule3:'③ 전사 오류 자동 수정',
@@ -1604,7 +1607,7 @@ const I18N = {
   lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사 원문 유지', lblAutoTermsShort:'자동 용어집', lblMaxWShort:'줄 폭 기준', lblBiMaxWShort:'이중언어 너비(번역문)', wUnit:'자', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
   /* v0.9.70 两段式界面新增 */
 },
-'de': {
+'de': {lblExtra:'Zusätzliche Anfrageparameter (JSON, optional)',extraTip:'Wird in jeden Anfragetext der benutzerdefinierten API eingefügt. Z. B. {"enable_thinking":false} zum Abschalten des Nachdenkens; {"response_format":{"type":"json_object"}} erzwingt JSON. model / messages / temperature / stream / max_tokens sind nicht überschreibbar.',
   docTitle:'AI-SRTSub - Filme & Serien weltweit, Untertitel in deiner Sprache', appTitle:'🎬 KI Untertitel-Übersetzer',
   tagLocal:'Läuft lokal · Untertitel verlassen Ihren Browser nicht', uiLangTag:'Sprache',
   rule1:'① Übersetzungsstil wählbar (Ausgewogen/Natürlich/Eigene)', rule2:'② Zeitleisten-Ausrichtung', rule3:'③ Transkriptionsfehler auto-korrigieren',
@@ -1699,7 +1702,7 @@ const I18N = {
   lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen behalten', lblAutoTermsShort:'Auto-Glossar', lblMaxWShort:'Zeilenbreite', lblBiMaxWShort:'Zweisprachige Breite (Übersetzung)', wUnit:'Zeichen', lblLyric:'Liedtexte', lyricTrans:'Übersetzen', lyricKeep:'Original behalten', lyricDrop:'Entfernen', lblMarks:'Liedmarken', lblDropFillers:'Füllwörter entfernen',
   /* v0.9.70 两段式界面新增 */
 },
-'fr': {
+'fr': {lblExtra:'Paramètres de requête supplémentaires (JSON, optionnel)',extraTip:'Fusionné dans le corps de chaque requête d\'API personnalisée. Ex. : {"enable_thinking":false} pour désactiver le raisonnement ; {"response_format":{"type":"json_object"}} pour forcer le JSON. model / messages / temperature / stream / max_tokens ne peuvent pas être remplacés.',
   docTitle:'AI-SRTSub - Films et séries du monde, sous-titres dans votre langue', appTitle:'🎬 Traducteur de Sous-titres IA',
   tagLocal:'Fonctionne en local · les sous-titres ne quittent jamais votre navigateur', uiLangTag:'Langue',
   rule1:'① Choisissez le style de traduction (Équilibré/Naturel/Personnalisé)', rule2:'② Timeline alignée', rule3:'③ Corrige les erreurs de transcription',
@@ -1794,7 +1797,7 @@ const I18N = {
   lblDstShort:'Langue cible', lblKeepTermsShort:'Garder les noms propres', lblAutoTermsShort:'Glossaire auto', lblMaxWShort:'Largeur de ligne', lblBiMaxWShort:'Largeur bilingue (traduit)', wUnit:'caractères', lblLyric:'Paroles', lyricTrans:'Traduire', lyricKeep:'Garder l\'original', lyricDrop:'Supprimer', lblMarks:'Marques de paroles', lblDropFillers:'Supprimer les tics',
   /* v0.9.70 两段式界面新增 */
 },
-'id': {
+'id': {lblExtra:'Parameter permintaan tambahan (JSON, opsional)',extraTip:'Digabungkan ke setiap body permintaan API kustom. Contoh: {"enable_thinking":false} untuk mematikan penalaran; {"response_format":{"type":"json_object"}} untuk memaksa JSON. model / messages / temperature / stream / max_tokens tidak dapat ditimpa.',
   docTitle:'AI-SRTSub - Film & drama dunia, subtitle dalam bahasa Anda', appTitle:'🎬 Penerjemah Subtitle AI',
   tagLocal:'Berjalan lokal · subtitle tidak keluar dari browser Anda', uiLangTag:'Bahasa',
   rule1:'① Pilih gaya terjemahan (Seimbang/Natural/Kustom)', rule2:'② Penyelarasan timeline', rule3:'③ Perbaiki kesalahan transkripsi otomatis',
@@ -1889,7 +1892,7 @@ const I18N = {
   lblDstShort:'Bahasa target', lblKeepTermsShort:'Pertahankan nama diri', lblAutoTermsShort:'Glosarium otomatis', lblMaxWShort:'Lebar baris', lblBiMaxWShort:'Lebar dwibahasa (terjemahan)', wUnit:'karakter', lblLyric:'Lirik', lyricTrans:'Terjemahkan', lyricKeep:'Pertahankan asli', lyricDrop:'Hapus', lblMarks:'Penanda lirik', lblDropFillers:'Hapus kata pengisi',
   /* v0.9.70 两段式界面新增 */
 },
-'hi': {
+'hi': {lblExtra:'अतिरिक्त अनुरोध पैरामीटर (JSON, वैकल्पिक)',extraTip:'हर कस्टम API अनुरोध के body में जोड़ा जाता है। उदा. {"enable_thinking":false} तर्क बंद करने के लिए; {"response_format":{"type":"json_object"}} JSON लागू करने के लिए। model / messages / temperature / stream / max_tokens ओवरराइड नहीं किए जा सकते।',
   docTitle:'AI-SRTSub - दुनिया की फ़िल्में और सीरीज़, सबटाइटल आपकी भाषा में', appTitle:'🎬 AI सबटाइटल अनुवादक',
   tagLocal:'स्थानीय रूप से चलता है · सबटाइटल आपका ब्राउज़र नहीं छोड़ते', uiLangTag:'भाषा',
   rule1:'① अनुवाद शैली चुनें (संतुलित/सहज बोलचाल/अपनी)', rule2:'② टाइमलाइन संरेखण', rule3:'③ ट्रांसक्रिप्शन त्रुटियाँ स्वतः सुधारें',
@@ -1984,7 +1987,7 @@ const I18N = {
   lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'नाम मूल रूप में रखें', lblAutoTermsShort:'ऑटो ग्लॉसरी', lblMaxWShort:'लाइन चौड़ाई', lblBiMaxWShort:'द्विभाषी चौड़ाई (अनूदित)', wUnit:'अक्षर', lblLyric:'गीत के बोल', lyricTrans:'अनूदित करें', lyricKeep:'मूल रखें', lyricDrop:'हटाएँ', lblMarks:'गीत चिह्न', lblDropFillers:'भराव शब्द हटाएँ',
   /* v0.9.70 两段式界面新增 */
 },
-'th': {
+'th': {lblExtra:'พารามิเตอร์เพิ่มเติม (JSON, ไม่บังคับ)',extraTip:'รวมเข้าใน body ของทุกคำขอแบบกำหนดเอง เช่น {"enable_thinking":false} ปิดการคิดของโมเดล, {"response_format":{"type":"json_object"}} บังคับผลลัพธ์เป็น JSON model / messages / temperature / stream / max_tokens แทนที่ไม่ได้',
   docTitle:'AI-SRTSub - หนังและซีรีส์จากทั่วโลก ซับในภาษาของคุณ', appTitle:'🎬 ตัวแปลซับไตเติล AI',
   tagLocal:'ทำงานแบบโลคัล · ซับไตเติลไม่ออกจากเบราว์เซอร์ของคุณ', uiLangTag:'ภาษา',
   rule1:'① เลือกสไตล์การแปล (สมดุล/พูดเป็นธรรมชาติ/กำหนดเอง)', rule2:'② จัดแนวไทม์ไลน์', rule3:'③ แก้ข้อผิดพลาดจากการถอดเสียง',
@@ -2079,7 +2082,7 @@ const I18N = {
   lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'คงชื่อเฉพาะภาษาเดิม', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', lblMaxWShort:'ความกว้างบรรทัด', lblBiMaxWShort:'ความกว้างสองภาษา (คำแปล)', wUnit:'ตัวอักษร', lblLyric:'เนื้อเพลง', lyricTrans:'แปล', lyricKeep:'เก็บต้นฉบับ', lyricDrop:'ลบ', lblMarks:'เครื่องหมายเนื้อเพลง', lblDropFillers:'ลบคำอุทาน',
   /* v0.9.70 两段式界面新增 */
 },
-'vi': {
+'vi': {lblExtra:'Tham số yêu cầu bổ sung (JSON, tùy chọn)',extraTip:'Được gộp vào body của mỗi yêu cầu API tùy chỉnh. Ví dụ: {"enable_thinking":false} tắt suy luận; {"response_format":{"type":"json_object"}} ép xuất JSON. Không thể ghi đè model / messages / temperature / stream / max_tokens.',
   docTitle:'AI-SRTSub - Phim và series thế giới, phụ đề bằng ngôn ngữ của bạn', appTitle:'🎬 Trình Dịch Phụ đề AI',
   tagLocal:'Chạy cục bộ · phụ đề không rời khỏi trình duyệt của bạn', uiLangTag:'Ngôn ngữ',
   rule1:'① Chọn phong cách dịch (Cân bằng/Tự nhiên/Tùy chỉnh)', rule2:'② Căn chỉnh timeline', rule3:'③ Tự sửa lỗi chép lời',
@@ -2174,7 +2177,7 @@ const I18N = {
   lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Giữ nguyên tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', lblMaxWShort:'Độ rộng dòng', lblBiMaxWShort:'Chiều rộng song ngữ (bản dịch)', wUnit:'ký tự', lblLyric:'Lời bài hát', lyricTrans:'Dịch', lyricKeep:'Giữ nguyên bản', lyricDrop:'Xóa', lblMarks:'Dấu hiệu lời bài hát', lblDropFillers:'Xóa từ đệm',
   /* v0.9.70 两段式界面新增 */
 },
-'ru': {
+'ru': {lblExtra:'Дополнительные параметры запроса (JSON, необязательно)',extraTip:'Добавляется в тело каждого запроса к пользовательскому API. Например {"enable_thinking":false} отключает рассуждения; {"response_format":{"type":"json_object"}} принудительно включает JSON. model / messages / temperature / stream / max_tokens переопределить нельзя.',
   docTitle:'AI-SRTSub - Фильмы и сериалы всего мира с субтитрами на вашем языке', appTitle:'🎬 ИИ-переводчик Субтитров',
   tagLocal:'Работает локально · субтитры не покидают ваш браузер', uiLangTag:'Язык',
   rule1:'① Выбор стиля перевода (Сбалансированный/Живой/Свой)', rule2:'② Выравнивание таймлайна', rule3:'③ Авто-исправление ошибок транскрибации',
@@ -2269,7 +2272,7 @@ const I18N = {
   lblDstShort:'Целевой язык', lblKeepTermsShort:'Сохранять имена', lblAutoTermsShort:'Автоглоссарий', lblMaxWShort:'Ширина строки', lblBiMaxWShort:'Ширина билингвы (перевод)', wUnit:'символов', lblLyric:'Тексты песен', lyricTrans:'Переводить', lyricKeep:'Оставить оригинал', lyricDrop:'Удалить', lblMarks:'Маркеры песен', lblDropFillers:'Удалять слова-паразиты',
   /* v0.9.70 两段式界面新增 */
 },
-'it': {
+'it': {lblExtra:'Parametri di richiesta aggiuntivi (JSON, opzionale)',extraTip:'Unito al corpo di ogni richiesta API personalizzata. Es.: {"enable_thinking":false} per disattivare il ragionamento; {"response_format":{"type":"json_object"}} per forzare il JSON. model / messages / temperature / stream / max_tokens non sono sovrascrivibili.',
   docTitle:'AI-SRTSub - Film e serie del mondo, sottotitoli nella tua lingua', appTitle:'🎬 Traduttore di Sottotitoli IA',
   tagLocal:'Esecuzione locale · i sottotitoli non lasciano mai il tuo browser', uiLangTag:'Lingua interfaccia',
   rule1:'① Scegli lo stile di traduzione (Equilibrato/Naturale/Personalizzato)', rule2:'② Allineamento della timeline', rule3:'③ Correzione automatica degli errori di trascrizione',
@@ -2364,7 +2367,7 @@ const I18N = {
   lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Mantieni nomi propri', lblAutoTermsShort:'Glossario automatico', lblMaxWShort:'Larghezza riga', lblBiMaxWShort:'Larghezza bilingue (tradotto)', wUnit:'caratteri', lblLyric:'Testi delle canzoni', lyricTrans:'Traduci', lyricKeep:'Mantieni originale', lyricDrop:'Rimuovi', lblMarks:'Marcatori testi', lblDropFillers:'Rimuovi riempitivi',
   /* v0.9.70 两段式界面新增 */
 },
-'ar': {
+'ar': {lblExtra:'معاملات طلب إضافية (JSON، اختياري)',extraTip:'تُدمَج في جسم كل طلب لواجهة API المخصصة. مثل {"enable_thinking":false} لإيقاف التفكير، و{"response_format":{"type":"json_object"}} لإجبار JSON. لا يمكن تجاوز model / messages / temperature / stream / max_tokens.',
   docTitle:'AI-SRTSub - أفلام ومسلسلات من العالم بترجمات بلغتك', appTitle:'🎬 مترجم الترجمات بالذكاء الاصطناعي',
   tagLocal:'يعمل محليًا · الترجمات لا تغادر متصفحك أبدًا', uiLangTag:'لغة الواجهة',
   rule1:'① اختر أسلوب الترجمة (متوازن/طبيعي/مخصص)', rule2:'② محاذاة الخط الزمني', rule3:'③ تصحيح تلقائي لأخطاء التفريغ',
@@ -2459,7 +2462,7 @@ const I18N = {
   lblDstShort:'اللغة الهدف', lblKeepTermsShort:'إبقاء الأسماء الأصلية', lblAutoTermsShort:'مسرد تلقائي', lblMaxWShort:'عرض السطر', lblBiMaxWShort:'عرض ثنائي اللغة (مترجم)', wUnit:'حرف', lblLyric:'كلمات الأغاني', lyricTrans:'ترجمة', lyricKeep:'إبقاء الأصل', lyricDrop:'حذف', lblMarks:'علامات الأغنية', lblDropFillers:'حذف كلمات الحشو',
   /* v0.9.70 两段式界面新增 */
 },
-'tr': {
+'tr': {lblExtra:'Ek istek parametreleri (JSON, isteğe bağlı)',extraTip:'Her özel API isteğinin gövdesine eklenir. Örn. {"enable_thinking":false} akıl yürütmeyi kapatır; {"response_format":{"type":"json_object"}} JSON çıktısını zorlar. model / messages / temperature / stream / max_tokens üzerine yazılamaz.',
   docTitle:'AI-SRTSub - Dünyanın film ve dizileri, altyazı senin dilinde', appTitle:'🎬 AI Altyazı Çevirmeni',
   tagLocal:'Yerel çalışır · altyazılar tarayıcından asla çıkmaz', uiLangTag:'Arayüz dili',
   rule1:'① Çeviri tarzını seç (Dengeli/Doğal/Özel)', rule2:'② Zaman çizgisi hizalama', rule3:'③ Yazım hatası otomatik düzeltme',
@@ -2554,7 +2557,7 @@ const I18N = {
   lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimleri koru', lblAutoTermsShort:'Otomatik sözlük', lblMaxWShort:'Satır genişliği', lblBiMaxWShort:'İki dilli genişlik (çeviri)', wUnit:'karakter', lblLyric:'Şarkı sözleri', lyricTrans:'Çevir', lyricKeep:'Orijinali koru', lyricDrop:'Kaldır', lblMarks:'Şarkı işaretleri', lblDropFillers:'Dolgu sözcükleri kaldır',
   /* v0.9.70 两段式界面新增 */
 },
-'nl': {
+'nl': {lblExtra:'Extra verzoekparameters (JSON, optioneel)',extraTip:'Wordt samengevoegd met de body van elke aangepaste API-aanvraag. Bijv. {"enable_thinking":false} om redeneren uit te schakelen; {"response_format":{"type":"json_object"}} dwingt JSON af. model / messages / temperature / stream / max_tokens kunnen niet worden overschreven.',
   docTitle:'AI-SRTSub - Films en series wereldwijd, ondertitels in jouw taal',
   appTitle:'🎬 AI-ondertitelvertaler',
   tagLocal:'Draait lokaal · ondertitels verlaten je browser niet',
@@ -2843,7 +2846,7 @@ const I18N = {
   lblMarks:'Liedmarkeringen',
   lblDropFillers:'Stopwoorden verwijderen'
 },
-'pl': {
+'pl': {lblExtra:'Dodatkowe parametry żądania (JSON, opcjonalnie)',extraTip:'Dodawane do treści każdego żądania API niestandardowego. Np. {"enable_thinking":false} wyłącza rozumowanie; {"response_format":{"type":"json_object"}} wymusza JSON. Nie można nadpisać: model / messages / temperature / stream / max_tokens.',
   docTitle:'AI-SRTSub - Filmy i seriale z całego świata, napisy w Twoim języku',
   appTitle:'🎬 AI Tłumacz napisów',
   tagLocal:'Działa lokalnie · napisy nie opuszczają przeglądarki',
@@ -3132,7 +3135,7 @@ const I18N = {
   lblMarks:'Oznaczenia piosenek',
   lblDropFillers:'Usuń wypełniacze'
 },
-'sv': {
+'sv': {lblExtra:'Extra förfrågningsparametrar (JSON, valfritt)',extraTip:'Slås samman med varje anrop till anpassat API. T.ex. {"enable_thinking":false} för att stänga av resonemang; {"response_format":{"type":"json_object"}} tvingar JSON. model / messages / temperature / stream / max_tokens kan inte åsidosättas.',
   docTitle:'AI-SRTSub - Film och serier från hela världen, undertexter på ditt språk',
   appTitle:'🎬 AI-undertextöversättare',
   tagLocal:'Körs lokalt · undertexter lämnar aldrig din webbläsare',
@@ -3421,7 +3424,7 @@ const I18N = {
   lblMarks:'Sångmarkeringar',
   lblDropFillers:'Ta bort utfyllnad'
 },
-'cs': {
+'cs': {lblExtra:'Další parametry požadavku (JSON, volitelné)',extraTip:'Přidává se do těla každého požadavku na vlastní API. Např. {"enable_thinking":false} vypne přemýšlení; {"response_format":{"type":"json_object"}} vynutí JSON. model / messages / temperature / stream / max_tokens nelze přepsat.',
   docTitle:'AI-SRTSub - Filmy a seriály z celého světa, titulky ve vašem jazyce',
   appTitle:'🎬 AI překladač titulků',
   tagLocal:'Běží lokálně · titulky neopouští váš prohlížeč',
@@ -3710,7 +3713,7 @@ const I18N = {
   lblMarks:'Značky písní',
   lblDropFillers:'Odstranit výplně'
 },
-'uk': {
+'uk': {lblExtra:'Додаткові параметри запиту (JSON, необов’язково)',extraTip:'Додається до тіла кожного запиту власного API. Напр. {"enable_thinking":false} вимикає міркування; {"response_format":{"type":"json_object"}} примусово вмикає JSON. Неможливо перевизначити model / messages / temperature / stream / max_tokens.',
   docTitle:'AI-SRTSub - Фільми та серіали з усього світу, субтитри вашою мовою',
   appTitle:'🎬 AI-перекладач субтитрів',
   tagLocal:'Працює локально · субтитри не покидають ваш браузер',
@@ -3999,7 +4002,7 @@ const I18N = {
   lblMarks:'Позначки пісень',
   lblDropFillers:'Вилучити заповнювачі'
 },
-'da': {
+'da': {lblExtra:'Ekstra anmodningsparametre (JSON, valgfrit)',extraTip:'Føjes til body på hvert brugerdefineret API-kald. F.eks. {"enable_thinking":false} til at slå ræsonnering fra; {"response_format":{"type":"json_object"}} tvinger JSON. model / messages / temperature / stream / max_tokens kan ikke overskrives.',
   docTitle:'AI-SRTSub - Film og serier fra hele verden, undertekster på dit sprog',
   appTitle:'🎬 AI-undertekstoversætter',
   tagLocal:'Kører lokalt · undertekster forlader aldrig din browser',
@@ -6250,6 +6253,9 @@ function normalizeGroupsShape(o){
   if(!o||!Array.isArray(o.groups)) return o;
   o.groups.forEach(function(g){
     if(!g) return;
+    /* v0.9.124：gno 被写成字符串（"gno":"7"）时下游用数字 gno 取值必然查不到
+       → 直接报「缺少句组 N」。这里统一转成数字 */
+    if(typeof g.gno==='string'&&/^-?\d+$/.test(g.gno.trim())) g.gno=+g.gno.trim();
     const hasCues=Array.isArray(g.cues)&&g.cues.length;
     const txt=(g.text!=null?String(g.text):(g.zh!=null?String(g.zh):''));
     if(!hasCues&&!txt.trim()&&typeof g.type==='string'&&g.type&&!KNOWN_GTYPE[g.type]){
@@ -6260,7 +6266,7 @@ function normalizeGroupsShape(o){
 }
 function salvageGroups(s){
   if(!s||s.indexOf('"gno"')<0) return null;
-  const marks=[], re=/"gno"\s*:\s*(-?\d+)/g; let m;
+  const marks=[], re=/"gno"\s*:\s*"?(-?\d+)"?/g; let m;
   while((m=re.exec(s))) marks.push({gno:+m[1], pos:m.index});
   if(!marks.length) return null;
   const groups=[], seen={};
@@ -6331,6 +6337,24 @@ function parseLlmJson(raw){
   return parseWithRepair(slice);
 }
 
+/* v0.9.124：自定义引擎「附加请求参数」——读 UI 输入框，只接受 JSON 对象；撤销/清空 tolerable；
+   保留键 model / messages / temperature / stream / max_tokens 不可被覆盖（核心字段优先，防误配导致崩坏） */
+const EXTRA_RESERVED={model:1,messages:1,temperature:1,stream:1,max_tokens:1};
+function extraParamsFront(){
+  try{
+    const el=document.getElementById('extra');
+    const v=el?String(el.value||'').trim():'';
+    if(!v) return {};
+    const o=JSON.parse(v);
+    if(!o||typeof o!=='object'||Array.isArray(o)) return {};
+    const keep={};
+    for(const k in o){ if(!Object.prototype.hasOwnProperty.call(o,k)) continue;
+      if(EXTRA_RESERVED[k]) continue;
+      keep[k]=o[k];
+    }
+    return keep;
+  }catch(e){ return {}; }   /* 非法 JSON → 静默忽略（保存时另有校验提示） */
+}
 // v0.9.29：timeoutMs 可选（默认 90s）——术语表提取是单次大请求（8.6K 采样在 DeepSeek 夜高峰实测 161.5s，
 // 正常时段仅 ~4s），共用 90s 会导致大文件在服务端拥塞时静默降级为无术语表；批次/压缩仍走默认 90s
 async function chatOnce(base,key,model,msgs,timeoutMs,rt){
@@ -6350,9 +6374,9 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt){
     const r=await fetch(url,{
       method:'POST',
       headers,
-      body:JSON.stringify(builtin
-        ? {messages:msgs,temperature:0.2,stream:false,meta: rt ? Object.assign({rt:rt},S.trMeta||{}) : (S.trMeta||undefined)}
-        : {model,messages:msgs,temperature:0.2,stream:false}),
+    body:JSON.stringify(builtin
+      ? {messages:msgs,temperature:0.2,stream:false,meta: rt ? Object.assign({rt:rt},S.trMeta||{}) : (S.trMeta||undefined)}
+      : Object.assign(extraParamsFront(), {model,messages:msgs,temperature:0.2,stream:false})),
       signal:ctl.signal
     });
     if(!r.ok){ const t=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+t.slice(0,200)); }
@@ -6407,11 +6431,13 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
   const send = groups.filter(g=>!g.pureMusic && !g.lyricLocal && !g.fillerLocal);
-  const garr = send.map(g=>({
+  /* v0.9.124：抽成函数——补译缺失句组时复用同一套输入格式 */
+  const toArr = arr=>arr.map(g=>({
     gno: g.gno,
     merged: g.mFrames ? g.mFrames.plainText : g.text,
     cues: g.cues.map(c=>({no:c.no, t:fmtTC(c.start,c.end), dur:+((c.end-c.start)/1000).toFixed(2), src:c.text}))
   }));
+  const garr = toArr(send);
   const dstN = LBY($('dstLang').value);
   // v0.9.22：用户消息与系统提示词同语言（非中文目标用英文，防指令语言泄漏）
   const zhDst = $('dstLang').value==='zh-CN' || $('dstLang').value==='zh-TW';
@@ -6441,11 +6467,13 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
         ? '【前文衔接】此前句组的原文与已定译文（仅供语境衔接参考，不得重复输出、不得修改、不得重新翻译）：\n'+JSON.stringify(ctx)+'\n'
         : '[PREVIOUS CONTEXT] Source text and final translation of preceding groups (for continuity only — do NOT re-output, modify, or re-translate them):\n'+JSON.stringify(ctx)+'\n')
     : '';
-  const userMsg = zhDst
-    ? ctxBlk+'句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:garr})
-      +'\n请把每个句组翻译成'+dstLangLabel(dstN,true)+'并按 cue 分配——每个句组返回 cues 数组（每个输入 cue 编号一条 {"no":…,"text":…}）；含 [N] 歌词编号的句组照旧返回单个 text。text 字段必须用'+dstN.zh+'书写。只输出 JSON。' + fb + cueFb
-    : ctxBlk+'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:garr})
-      + '\nTranslate each group into '+dstLangLabel(dstN,false)+' and distribute across its cues — return a "cues" array per group (one entry {"no":…,"text":…} for every input cue number); groups whose merged text contains lyric [N] markers return a single "text" as before. The text fields must be written in '+dstN.zh+'. Output JSON only.' + fb + cueFb;
+  /* v0.9.124：mkMsg(arr) 只依赖 arr——主请求拼 fb+cueFb，补译缺失句组时单独用（更小的请求更容易成功） */
+  const mkMsg = arr => zhDst
+    ? ctxBlk+'句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:toArr(arr)})
+      +'\n请把每个句组翻译成'+dstLangLabel(dstN,true)+'并按 cue 分配——每个句组返回 cues 数组（每个输入 cue 编号一条 {"no":…,"text":…}）；含 [N] 歌词编号的句组照旧返回单个 text。text 字段必须用'+dstN.zh+'书写。只输出 JSON。'
+    : ctxBlk+'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:toArr(arr)})
+      + '\nTranslate each group into '+dstLangLabel(dstN,false)+' and distribute across its cues — return a "cues" array per group (one entry {"no":…,"text":…} for every input cue number); groups whose merged text contains lyric [N] markers return a single "text" as before. The text fields must be written in '+dstN.zh+'. Output JSON only.';
+  const userMsg = mkMsg(send) + fb + cueFb;
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
     {role:'user',content:userMsg}
@@ -6467,8 +6495,32 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
       byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
     });
   }
+  /* v0.9.124：缺组自动补译——弱模型最典型的失败不是语法错，而是「少输出了几个句组」
+     （v0.9.123 解决掉解析后暴露出来：三连败全是「缺少句组 N 的结果」）。
+     这里只对缺的那几条发一个小请求（输入更少 → 命中率显著更高，成本远低于整批重发），
+     最多补一次；仍有缺才抛错交给外层重试。正常模型永远走不到这里。 */
+  let missing = send.filter(g=>!byGno[g.gno]);
+  if(missing.length && missing.length < send.length){
+    try{
+      const raw2 = await chatOnce(base,key,model,[{role:'system',content:sys},{role:'user',content:mkMsg(missing)}],undefined,rt);
+      const obj2 = parseLlmJson(raw2);
+      if(obj2&&Array.isArray(obj2.groups)) obj2.groups.forEach(x=>{
+        if(!x||x.gno==null) return;
+        const gn=(typeof x.gno==='string'&&/^-?\d+$/.test(x.gno.trim()))?+x.gno.trim():x.gno;
+        if(byGno[gn]) return;
+        byGno[gn]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
+      });
+      // 补译结果同样做结构级抢救（这批模型的畸形率不会因为请求变小而下降）
+      const sv2=salvageGroups(String(raw2||''));
+      if(sv2&&Array.isArray(sv2.groups)) sv2.groups.forEach(x=>{
+        if(!x||x.gno==null||byGno[x.gno]) return;
+        byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
+      });
+      missing = send.filter(g=>!byGno[g.gno]);
+    }catch(e){ /* 补译失败：保持 missing 原样，走下面抛错 */ }
+  }
   // 校验齐全：每个输入句组必须有结果（v0.9.45：只校验真正发给模型的 send 集）
-  send.forEach(g=>{ if(!byGno[g.gno]) throw new Error(t('errMissGroup',g.gno)); });
+  if(missing.length) throw new Error(t('errMissGroup',missing[0].gno));
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
   const dstV = $('dstLang').value;
   const badAnchor = [];
@@ -7711,6 +7763,7 @@ function save(){
   const style=(document.querySelector('input[name=style]:checked')||{}).value||'elegant';
   const o = {
     base:$('base').value.trim(), model:$('model').value.trim(), key:$('apikey').value.trim(),
+    extra:($('extra')||{}).value||'',   /* v0.9.124：附加请求参数原样记忆（保存时不校验，仅测试连接时提示） */
     provider:(document.getElementById('provider')||{}).value||'',
     terms:$('terms').value.trim(), mode:$('mode').value,
     srcLang:$('srcLang').value, style:style,
@@ -7743,6 +7796,7 @@ function save(){
 if(sv.base) $('base').value=sv.base;
 if(sv.model) $('model').value=sv.model;
 if(sv.key) $('apikey').value=sv.key;
+if(sv.extra) $('extra').value=sv.extra;   /* v0.9.124：附加请求参数（自定义引擎透传，可能为嵌套对象如 response_format） */
 if(sv.terms) $('terms').value=sv.terms;
 if(sv.mode) $('mode').value=sv.mode;
 // 折行阈值：历史默认 18/24/20（v0.9.53 起默认 21）与联动推荐值 16/13 均不恢复，
@@ -8174,7 +8228,7 @@ $('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
 $('dstLang').addEventListener('change',()=>{ UI.dstManual=true; refreshOutName(); refreshOutPh(); setColLabels(); save(); });
 
 /* 其余字段自动保存 */
-['base','model','apikey','terms','mode','maxW'].forEach(id=>$(id).addEventListener('change',save));
+['base','model','apikey','extra','terms','mode','maxW'].forEach(id=>$(id).addEventListener('change',save));
 
 /* ---------------- 服务商预设（v0.9.30 分组：海外/国内/其他，模型自填） ---------------- */
 const sel=$('provider');
@@ -8224,6 +8278,13 @@ $('btnTest').addEventListener('click', async ()=>{
   const out=$('testOut'), btn=$('btnTest');
   const base=$('base').value.trim(), key=$('apikey').value.trim(), model=$('model').value.trim();
   if(!base||!model){ out.style.color='#dc2626'; out.textContent=t('testFail','Base URL / Model'); return; }
+  /* v0.9.124：附加参数必须是 JSON 对象——非法就当场提示（否则会被静默忽略，用户不知道没生效） */
+  const exRaw=String(($('extra')||{}).value||'').trim();
+  if(exRaw){
+    let okObj=false;
+    try{ const eo=JSON.parse(exRaw); okObj=!!eo&&typeof eo==='object'&&!Array.isArray(eo); }catch(e){ okObj=false; }
+    if(!okObj){ out.style.color='#dc2626'; out.textContent=t('errBadJson'); return; }
+  }
   btn.disabled=true; out.style.color=''; out.textContent=t('testRun');
   try{
     const r=await chatOnce(base,key,model,[{role:'user',content:'Reply with exactly: OK'}],20000);
