@@ -364,6 +364,60 @@ t('v0.9.95 西里尔多词专名不腰斩（properMidPenalty 改 \\p{Lu}）', ()
   assert.strictEqual(bad.length, 0, '不得在 Иван|Петров 之间切: ' + bad.join(' ; '));
 });
 
+console.log('— v0.9.130 专名（多词大写序列）折行保护 —');
+t('properNounRanges：识别/不识别的边界', () => {
+  const r = (s, w) => C.properNounRanges(Array.from(s), w || 21).map(x => s.slice(x[0], x[1]));
+  assert.deepStrictEqual(r('Burger King 正押注'), ['Burger King']);
+  assert.deepStrictEqual(r('New York 开会'), ['New York']);
+  assert.deepStrictEqual(r('Coca-Cola 涨价'), ['Coca-Cola']);
+  assert.deepStrictEqual(r('Иван Петров 来了'), ['Иван Петров']);   // 西里尔
+  assert.deepStrictEqual(r('burger king 正押注'), []);              // 全小写 → 不是专名
+  assert.deepStrictEqual(r('How many nuggets'), []);                // 仅首词大写（句首）→ 不是专名
+  assert.deepStrictEqual(r('A B 测试'), []);                        // 单字母词 → 不是专名
+  // 专名整体宽度 > maxW → 放弃保护（否则折不出第二行）
+  assert.deepStrictEqual(r('Los Angeles', 3), []);
+});
+t('monoFit 不在专名内部断行（Burger King）', () => {
+  const s = '- Burger King正押注于其核心菜单经典产品，';
+  const lines = C.monoFit(s, 16, 'zh-CN');
+  console.log('      → ' + JSON.stringify(lines));
+  assert.ok(lines.length >= 2, '应折成两行');
+  const joined = lines.join('');
+  assert.ok(joined.indexOf('Burger King') >= 0, '「Burger King」不得被拆到两行: ' + JSON.stringify(lines));
+  assert.ok(lines.every(l => C.textWidth(l) <= 16 + 1e-9), '折后每行仍 <= maxW: ' + JSON.stringify(lines));
+});
+t('monoFit 专名下移而非腰斩（Impossible Whopper）', () => {
+  const s = '我们要点一个 Impossible Whopper，对吧？';
+  [13, 16].forEach(w => {
+    const lines = C.monoFit(s, w, 'zh-CN');
+    console.log('      w=' + w + ' → ' + JSON.stringify(lines));
+    assert.ok(Array.from(lines.join('')).join('').indexOf('Impossible Whopper') >= 0,
+      '专名不得被拆开: ' + JSON.stringify(lines));
+  });
+});
+t('专名保护不改变无专名文本的老行为（随机句回归）', () => {
+  const cases = [
+    ['How many nuggets have you eaten in this journey?', 16, 'en'],
+    ['我们去吃了汉堡，味道不错，价格也合理。', 16, 'zh-CN'],
+    ['The company said sales rose 4.5% in the third quarter.', 16, 'en'],
+  ];
+  cases.forEach(([s, w, loc]) => {
+    const lines = C.monoFit(s, w, loc);
+    assert.ok(lines.every(l => C.textWidth(l) <= w + 4.001), '不得爆宽: ' + JSON.stringify(lines));
+  });
+});
+t('专名保护：异常输入不炸、不死循环', () => {
+  const ins = ['', ' ', 'Burger', 'Burger King', 'B K ', 'Burger-Burger-Burger-Burger', '123 456',
+    '르누보 로고를 Burger King 과 함께', '🙂🙂 Burger King 🙂🙂'];
+  ins.forEach(s => {
+    [1, 3, 8, 16, 40].forEach(w => {
+      const out = C.monoFit(s, w, 'zh-CN');
+      assert.ok(Array.isArray(out), 'monoFit 应返回数组: ' + s);
+      assert.ok(out.join('').length <= s.length + 8, '输出不应凭空变长: ' + s + ' → ' + JSON.stringify(out));
+    });
+  });
+});
+
 console.log('— 词边界保护（Intl.Segmenter 分词）—');
 // 通用校验：折行的每个切点都必须落在词边界上（不劈词）
 function assertNoWordSplit(src, ls, locale) {

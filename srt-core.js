@@ -205,6 +205,54 @@
     return 0;
   }
 
+  /* ---------------- v0.9.130：专名（多词大写序列）不可断 ----------------
+     现象：折行落在专名内部的空格上，把品牌名/人名/地名腰斩
+     （实测：maxW 16 的「- Burger King正押注于其核心菜单经典产品，」→「- Burger / King正押注…」）。
+     判据：连续 2~4 个拉丁（含拉丁扩展/希腊/西里尔）字母词，每词 ≥2 字母且首字母大写，
+     词间恰好一个空格或连字符 → 视为专名，切点不得落在其内部。
+     守卫：① 专名整体宽度 > maxW（一行放不下）→ 放弃保护，交由硬切（否则反而切不出第二行）；
+           ② 硬切仍落在专名内部时，退到专名内部最近的分隔符（至少不劈词，见 findCut 步骤 5）。 */
+  const PN_MAX_TOKENS = 4;
+  const PN_UPPER_RE = /^[A-Z\u00C0-\u00DE\u0100-\u0178\u0391-\u03A9\u0410-\u042F]/;
+  function isPnLetter(ch) {
+    return /[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF]/.test(ch || '');
+  }
+  function isPnSep(ch) { return ch === ' ' || ch === '\u3000' || ch === '-'; }
+  // pos=字符数组；返回 [[start,end), …]（end 为专名最后一个词的末尾下标，切点须满足 start<cut<end 才算落在内部）
+  function properNounRanges(pos, maxW) {
+    const n = pos.length, out = [];
+    let i = 0;
+    while (i < n) {
+      if (!isPnLetter(pos[i])) { i++; continue; }
+      const toks = [];
+      let j = i;
+      for (;;) {
+        let k = j;
+        while (k < n && isPnLetter(pos[k])) k++;
+        if (k <= j) break;
+        toks.push([j, k]);
+        if (toks.length >= PN_MAX_TOKENS) { j = k; break; }
+        if (k < n && isPnSep(pos[k]) && k + 1 < n && isPnLetter(pos[k + 1])) j = k + 1;
+        else { j = k; break; }
+      }
+      let ok = toks.length >= 2;
+      if (ok) {
+        for (let q = 0; q < toks.length; q++) {
+          const a0 = toks[q][0];
+          if (toks[q][1] - a0 < 2 || !PN_UPPER_RE.test(pos[a0])) { ok = false; break; }
+        }
+      }
+      if (ok) {
+        const a = toks[0][0], b = toks[toks.length - 1][1];
+        let w = 0;
+        for (let x = a; x < b; x++) w += charW(pos[x]);
+        if (w <= maxW + 1e-9) out.push([a, b]);
+      }
+      i = (j > i) ? j : i + 1;
+    }
+    return out;
+  }
+
   // 找 segment（单行文本）的第一个切点（返回切点下标，slice(0,cut) 为第一行）
   // locale：目标语言（BCP47，如 zh-CN / ja），用于词典分词保护词边界；缺省按 zh。
   function findCut(s, maxW, locale) {
@@ -215,6 +263,9 @@
     const inAtom = (i) => { for (let k = 0; k < atom.length; k++) if (i > atom[k][0] && i < atom[k][1]) return true; return false; };
     // 词边界（无空格语言的劈词保护）；分词器不可用时为 null → 降级
     const bounds = wordBounds(pos, locale);
+    // v0.9.130：专名区间——切点落在其内部（a<cut<b）一律不取，避免腰斩品牌名/人名/地名
+    const pn = properNounRanges(pos, maxW);
+    const inPN = (i) => { for (let k = 0; k < pn.length; k++) if (i > pn[k][0] && i < pn[k][1]) return true; return false; };
     // 1) 硬切候选：最长前缀（宽度不超过 maxW）
     let acc = 0, c = n;
     for (let i = 0; i < n; i++) {
@@ -266,7 +317,7 @@
     const lo = Math.max(1, c - 10);
     let near = -1, sentCut = -1;
     for (let cut = c; cut >= lo; cut--) {
-      if (inAtom(cut)) continue;
+      if (inAtom(cut) || inPN(cut)) continue;
       const p = effPrio(cut);
       if (textWidth(s.slice(cut)) > maxW + 1e-9) continue; // 跳过会产生额外行的切点
       if (p >= 2 && near < 0) near = cut;     // 最近合法切点（原行为）
@@ -280,13 +331,25 @@
     //    约束：剩余文本 ≤ maxW，否则会折出孤儿行+第 3 行（24 宽文本断在「，」处只剩 2 字第一行+ 22 字剩余）。
     let best = -1, bestP = 0;
     for (let cut = c; cut >= 1; cut--) {
-      if (inAtom(cut)) continue;
+      if (inAtom(cut) || inPN(cut)) continue;
       const p = effPrio(cut);
       if (textWidth(s.slice(cut)) > maxW + 1e-9) continue; // 跳过会产生额外行的切点
       if (p > bestP) { bestP = p; best = cut; if (p >= 4) break; }
     }
     if (best >= 1 && bestP >= 2) return best;
     // 5) 最后手段：纯硬切（不劈原子；行首不得是闭符号）
+    // v0.9.130：硬切若落在专名内部（前面所有断点都被专名保护挡掉、或宽度逼到这一步），
+    // 退到专名内部最近的分隔符处——拉丁串没有其它合法断点时，断在空格总好过把词劈开。
+    if (inPN(c)) {
+      for (let k = 0; k < pn.length; k++) {
+        if (c > pn[k][0] && c < pn[k][1]) {
+          for (let q = c; q > pn[k][0]; q--) {
+            if (q < n && isPnSep(pos[q - 1]) && q - 1 > pn[k][0]) { c = q; break; }
+          }
+          break;
+        }
+      }
+    }
     if (inAtom(c)) {
       const r = atom.filter((x) => c > x[0] && c < x[1])[0];
       if (r) c = (r[0] >= 1) ? r[0] : Math.min(r[1], n - 1); // 回退到原子开头；原子在行首则推到原子末尾
@@ -2326,6 +2389,7 @@
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, isPureHumming, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
     setMusicMarks, getMusicMarks, musicRe, balanceInlineTags,   // v0.9.129
+    properNounRanges, isPnLetter,   // v0.9.130 专名（多词大写序列）保护
     extractMusicFrames, parseSegMarkers, splitByWeights, reassembleMusic, stripSegMarkers, hasSegMarkers,
     MAX_W_DEFAULT: 20
   };

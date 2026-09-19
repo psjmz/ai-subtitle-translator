@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.129</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.130</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.129</span>
+    <span class="ver-tag">v0.9.130</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -795,7 +795,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.129"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.130"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -7327,6 +7327,11 @@ async function runTranslate(){
     let gMulti=0, mG=0, suspiciousDrop=0, missingCount=0;
     for(const g of groups){
       if(g.fillerLocal) continue;   // v0.9.116：本地定案已清空，无模型结果可回填
+      /* v0.9.130：跨多条的句组在此统一计数（口径与开头 groupInfo 完全一致 = !g.filler && g.cues.length>1）。
+         旧代码只在「合并 / 按时长切分」分支里 gMulti++，而模型返回 cue 逐条对齐时
+         （最优路径，实测 deepseek 全组走这条）在该分支前就 continue 了，
+         于是结尾日志「跨条句组 0 组」与开头「其中 30 组跨多条字幕」自相矛盾。 */
+      if(!g.filler && g.cues.length>1) gMulti++;
       const active=g.cues.filter(c=>!fillerSet.has(c.no));
       if(!active.length) continue;
       // v0.9.78：歌词按用户设置本地处理——keep=原文原样落地；drop=整组移除（含纯符号标记行）
@@ -7428,7 +7433,7 @@ async function runTranslate(){
         }
       }
       if(active.length>1){
-        gMulti++;
+        // v0.9.130：gMulti 已在循环开头统一计数（含 cue 逐条对齐路径），此处不再自增
         // v0.9.42：音乐组优先按歌词行对齐（♪ 边界逐 cue 回填，杜绝♪孤行/行中♪/词中硬切）
         const mSegs = musicAlignedSegs(active, text, cfg);
         if(mSegs){
@@ -7778,9 +7783,14 @@ function assMVs(){
     dstFix: !!UI.assDstMVSet, srcFix: !!UI.assSrcMVSet
   };
 }
-/* 画面上方的块也用「离底距离」表达：an8 的 MarginV 是距顶边 = 1080 − 离底 − 块高 */
+/* 画面上方的块也用「离底距离」表达：an8 的 MarginV 是距顶边 = 1080 − 离底 − 块高
+   v0.9.130：兜底下限由 1px 改为 ASS_TOP_SAFE。
+   旧逻辑在多行时会算出负值（用户给的是「离底距离」，块越高、距顶越小），
+   max(1,…) 把上方块死死压在画面顶边 1px 处 = 贴顶（2 行起即触发，3 行更严重）。
+   与样式默认 MarginV 同取 42：放不下时宁可牺牲「离底距离」，也不让字幕贴边/出画。 */
+var ASS_TOP_SAFE = 42;
 function assTopMV(bottomDist, nLines, lineH){
-  return Math.max(1, Math.min(1080, Math.round(1080 - bottomDist - (nLines||1)*lineH)));
+  return Math.max(ASS_TOP_SAFE, Math.min(1080, Math.round(1080 - bottomDist - (nLines||1)*lineH)));
 }
 function assStyleOf(){
   var m=assMVs();
