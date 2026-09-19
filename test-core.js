@@ -1808,6 +1808,92 @@ t('squashLines：闭引号贴词不加空格', () => {
 t('joinSrc：西里尔句组拼接补空格（prompt 路径）', () => {
   assert.strictEqual(C.joinSrc('что ты потратил', 'пять лет'), 'что ты потратил пять лет');
 });
+console.log('— v0.9.131 拼缝空格：无空格系统 × 空格系统要补（中西文粘连修复）—');
+t('squashLines：中文接拉丁字母补空格（回归：加了多余的粘连）', () => {
+  assert.strictEqual(C.squashLines('我们要点一个\nImpossible Whopper，对吧？'), '我们要点一个 Impossible Whopper，对吧？');
+  assert.strictEqual(C.squashLines('- Burger King\n正押注其核心菜单'), '- Burger King 正押注其核心菜单');
+});
+t('squashLines：拉丁字母接中文补空格', () => {
+  assert.strictEqual(C.squashLines('buy an\niPhone 回家'), 'buy an iPhone 回家');
+});
+t('squashLines：泰文接拉丁补空格（同样是盘古之白场景）', () => {
+  assert.strictEqual(C.squashLines('ซื้อ\niPhone แล้ว'), 'ซื้อ iPhone แล้ว');
+});
+t('squashLines：两侧都属无空格书写系统保持不加（行为不变）', () => {
+  assert.strictEqual(C.squashLines('你好\n世界'), '你好世界');
+  assert.strictEqual(C.squashLines('ไป\nซื้อของ'), 'ไปซื้อของ');
+  assert.strictEqual(C.squashLines('感兴趣的\nはず'), '感兴趣的はず');
+});
+t('squashLines：无空格系统接标点不补空格', () => {
+  assert.strictEqual(C.squashLines('我们要点一个\n。'), '我们要点一个。');
+  assert.strictEqual(C.squashLines('他说\n“不”'), '他说“不”');
+});
+t('needJoinSpace：语言感知矩阵', () => {
+  assert.strictEqual(C.needJoinSpace('我们要点一个', 'Impossible'), true);
+  assert.strictEqual(C.needJoinSpace('Burger King', '正押注'), true);
+  assert.strictEqual(C.needJoinSpace('这是', '这个'), false);
+  assert.strictEqual(C.needJoinSpace('тысячи', 'часов'), true);
+});
+t('needJoinSpace：闭标点必须粘附，不能被盘古之白拆开（跨语种回归）', () => {
+  // 中间曾实现成「只要有一侧属无空格系统就按另一侧判定是否补空格」，
+  // 导致 'Buy'+'。'→'Buy 。'、'we'+'。”'→'we 。”'，且所有语种受害。
+  // 只有「无空格那一侧本身是字」时才允许补空格；标点一律交给通用规则。
+  assert.strictEqual(C.needJoinSpace('Buy', '。'), false);
+  assert.strictEqual(C.needJoinSpace('we', '。”'), false);
+  assert.strictEqual(C.needJoinSpace('мы', '。”'), false);
+  assert.strictEqual(C.needJoinSpace('우리는', '。”'), false);
+  assert.strictEqual(C.needJoinSpace('我们', '。”'), false);
+  assert.strictEqual(C.needJoinSpace('我们', '“好'), false);      // 开引号同样不拆
+  assert.strictEqual(C.needJoinSpace('我', '、'), false);
+  assert.strictEqual(C.needJoinSpace('ข้อความ', '”'), false);
+  // 反例：另一侧是字母/数字时仍要补
+  assert.strictEqual(C.needJoinSpace('我们', 'A'), true);
+  assert.strictEqual(C.needJoinSpace('A', '我们'), true);
+  assert.strictEqual(C.needJoinSpace('我们', '2024'), true);
+});
+t('monoFit：applyPost 重跑不再撤销折行、不再粘连（回归 WSJ 实测）', () => {
+  // 旧版 squashLines 吃掉「一个|Impossible」之间的空格，拼回单行后无合法切点 → 折行被撤销成超宽单行
+  assert.deepStrictEqual(C.monoFit('我们要点一个\nImpossible Whopper，对吧？', 16, 'zh-CN'),
+    ['我们要点一个', 'Impossible Whopper，对吧？']);
+});
+t('panguSpace：幂等且只补行内边界', () => {
+  assert.strictEqual(C.panguSpace('更好的 Whopper，'), '更好的 Whopper，');
+  assert.strictEqual(C.panguSpace('增长了 8.5%。'), '增长了 8.5%。');
+});
+t('applyPost 顺序：盘古之白必须在折行之前（P1），且整轮幂等', () => {
+  // 线上 WSJ 三行实测：v0.9.130 输出缺中西文空格。修法有 P1（折行前整段补）与
+  // P2（折行后逐行补）两种，P2 补完宽度变化会把断点推走 → 重跑一次结果不同。
+  // 这里把正当工序固化下来： stripSoundTags → mergePunctOnlyLines → balanceInlineTags
+  // → panguSpace → (foldSpeakerLines | monoFit)，并要求一阶二阶都收敛。
+  const applyPost = (raw) => {
+    const t = C.panguSpace(C.balanceInlineTags(C.mergePunctOnlyLines(C.stripSoundTags(raw)), ''));
+    const lines = C.isSpeakerText(t) ? C.foldSpeakerLines(t, 16, 'zh-CN') : C.monoFit(t, 16, 'zh-CN');
+    return lines.join('\n');
+  };
+  const cases = [
+    ['- Burger King正押注于其核心菜单\n经典产品，', '- Burger King\n正押注于其核心菜单经典产品，'],
+    ['对外说：“嘿，没错，这是\n更好的Whopper，', '对外说：“嘿，没错，这是更好的\nWhopper，'],
+    ['我们要点一个Impossible Whopper，对吧？', '我们要点一个\nImpossible Whopper，对吧？'],
+    ['更好的Whopper，', '更好的 Whopper，'],
+  ];
+  cases.forEach(([src, want]) => {
+    const once = applyPost(src);
+    assert.strictEqual(once, want, '一次: ' + JSON.stringify(src));
+    assert.strictEqual(applyPost(once), once, '二阶幂等失败: ' + JSON.stringify(src));
+    assert.strictEqual(applyPost(applyPost(once)), once, '三阶幂等失败: ' + JSON.stringify(src));
+  });
+});
+t('applyPost 顺序对照：折行后再补空格（P2）不幂等——证明上面那条创设是必要的', () => {
+  const applyPost = (raw) => {
+    const t = C.balanceInlineTags(C.mergePunctOnlyLines(C.stripSoundTags(raw)), '');
+    const lines = C.isSpeakerText(t) ? C.foldSpeakerLines(t, 16, 'zh-CN') : C.monoFit(t, 16, 'zh-CN');
+    return lines.map(l => C.panguSpace(l)).join('\n');
+  };
+  // 线上 WSJ cue #20 的真实输入：一次还是单行，二次却折成了两行 → 用户重点「整理」字幕会跳。
+  const src = '我们要点一个Impossible Whopper，对吧？';
+  assert.notStrictEqual(applyPost(applyPost(src)), applyPost(src));
+});
+
 t('joinSrc：CJK 拼接不加空格（行为不变）', () => {
   assert.strictEqual(C.joinSrc('我读了', '这本书'), '我读了这本书');
 });

@@ -85,7 +85,20 @@
   function needJoinSpace(a, b) {
     if (!a || !b) return false;
     const la = a[a.length - 1], fb = b[0];
-    if (RE_UNSPACED_SCRIPT.test(la) || RE_UNSPACED_SCRIPT.test(fb)) return false;
+    // v0.9.131：旧规则「任一侧属无空格书写系统就不加空格」把「汉字|拉丁字母」也一刀切判成不加，
+    // 于是 squashLines 把已折好的两行拼回单行时吃掉中西文之间的空格——
+    // 「我们要点一个|Impossible Whopper，对吧？」→「我们要点一个Impossible Whopper，对吧？」，
+    // 且拼回后行内无合法切点，折行被撤销成超宽单行（线上 WSJ 实测 3 行中英粘连）。
+    // 区分两种情形：两侧都属无空格系统（中文|中文、泰文|泰文）保持不加；
+    // 一侧无空格系统、另一侧是空格系统的字母/数字，则按盘古之白补一个空格。
+    const unspacedA = RE_UNSPACED_SCRIPT.test(la);
+    const unspacedB = RE_UNSPACED_SCRIPT.test(fb);
+    if (unspacedA && unspacedB) return false;
+    // 关键是「无空格那一侧本身必须是字」，不能是标点：否则 'Buy'+'。'、'we'+'。”'
+    // 会走到这里被判成需要补空格，把闭标点从词上拆开（所有语种都会受害）。
+    // 标点情形一律回落到原有通用规则去裁决（那里有完整的粘附判定）。
+    if (unspacedA) return RE_LETNUM_U.test(la) && isSpacedLetnum(fb);
+    if (unspacedB) return RE_LETNUM_U.test(fb) && isSpacedLetnum(la);
     if (RE_ATTACH_AFTER.test(la)) return false;
     // v0.9.51：法语省音判定——直撇号打头的段，前段以单字母省音词（l' d' j' n' s' c' m' t'）或 qu' 结尾时
     // 属缩合词被 cue 边界切开（l|'école），不加空格；英语 "get 'em" 不受影响（t 前是字母，非单字母省音）。
