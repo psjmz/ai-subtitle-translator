@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.118</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.120</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.118</span>
+    <span class="ver-tag">v0.9.120</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -792,7 +792,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.118"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.120"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6131,9 +6131,14 @@ function parseLlmJson(raw){
       try { return JSON.parse(s.slice(a2,b2+1)); } catch(e){}
     }
   }
-  const a=s.indexOf('{'), b=s.lastIndexOf('}');
+  /* v0.9.120：对象路径优先从 {"groups": 锚点起切——部分模型会在正文里先复述输入/示例再给答案，
+     首个 { 可能落在复述段里；锚不中再回落旧逻辑（首 {），对正常输出零影响 */
+  const ga=s.search(/\{\s*"groups"\s*:/);
+  const a=(ga>=0?ga:s.indexOf('{')), b=s.lastIndexOf('}');
   if (a<0||b<=a) throw new Error(t('errNotJson'));
-  return JSON.parse(s.slice(a,b+1));
+  const slice=s.slice(a,b+1);
+  try{ return JSON.parse(slice); }
+  catch(e){ throw new Error(e.message+' · 响应开头: '+slice.slice(0,100).replace(/\s+/g,' ')); }
 }
 
 // v0.9.29：timeoutMs 可选（默认 90s）——术语表提取是单次大请求（8.6K 采样在 DeepSeek 夜高峰实测 161.5s，
@@ -6158,8 +6163,15 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt){
     });
     if(!r.ok){ const t=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+t.slice(0,200)); }
     const j=await r.json();
-    const out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+    let out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
     if(!out) throw new Error(t('errEmpty'));
+    /* v0.9.120：思考型模型（如 SiliconFlow 上的 Qwen3/GLM 系）在非流式响应里会把 <think>…</think>
+       推理文本混进 content，思考文本中的 { 会把下游「首 { 到尾 }」的 JSON 提取切进思考段
+       （实测表象：批 1 三连败 Expected ',' or '}' after property value）。出口统一剥掉；
+       未闭合（思考中输出被截断）→ 其后没有有效内容，一并弃掉。 */
+    out=String(out).replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi,'');
+    const openTag=String(out).match(/<think(?:ing)?>/i);
+    if(openTag) out=String(out).slice(0, openTag.index);
     return out;
   } finally { clearTimeout(timer); }
 }
