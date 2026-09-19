@@ -171,6 +171,53 @@ t('中文句末标点同样生效', () => {
   assert.strictEqual(gs[0].cues.length, 2);
 });
 
+console.log('— 时间间隔断组（v0.9.129 gapMs）—');
+t('间隔 2s（>1.5s）强制断组——听写稿无标点也不跨静默合并', () => {
+  const items = [
+    { no: 1, start: 0,    end: 1000, text: 'we flew out there' },
+    { no: 2, start: 3000, end: 4000, text: 'and the whole place was empty' },
+  ];
+  const gs = C.groupSentences(items);
+  assert.strictEqual(gs.length, 2, '间隔 2s 应断成 2 组');
+  assert.strictEqual(gs[0].cues.length, 1);
+  assert.strictEqual(gs[1].cues.length, 1);
+});
+t('间隔 100ms（<=1.5s）照旧合并——与旧行为一致', () => {
+  const items = [
+    { no: 1, start: 0,    end: 1000, text: 'we flew out there' },
+    { no: 2, start: 1100, end: 2100, text: 'and the whole place was empty' },
+  ];
+  assert.strictEqual(C.groupSentences(items).length, 1, '小间隔不应断组');
+});
+t('gapMs:0 可完全关闭间隔判据（旧行为）', () => {
+  const items = [
+    { no: 1, start: 0,    end: 1000, text: 'we flew out there' },
+    { no: 2, start: 3000, end: 4000, text: 'and the whole place was empty' },
+  ];
+  assert.strictEqual(C.groupSentences(items, { gapMs: 0 }).length, 1);
+});
+t('缺时间轴时不炸、且不断组', () => {
+  const items = [
+    { no: 1, text: 'we flew out there' },
+    { no: 2, text: 'and the whole place was empty' },
+  ];
+  assert.strictEqual(C.groupSentences(items).length, 1);
+});
+t('句末标点已收尾的场景不受间隔判据影响', () => {
+  const items = [
+    { no: 1, start: 0,    end: 1000, text: 'Done.' },
+    { no: 2, start: 5000, end: 6000, text: 'Next one.' },
+  ];
+  assert.strictEqual(C.groupSentences(items).length, 2);
+});
+t('重叠 / 乱序时间轴不误断组', () => {
+  const items = [
+    { no: 1, start: 1000, end: 2000, text: 'overlapping' },
+    { no: 2, start: 1500, end: 2500, text: 'cue continues' },
+  ];
+  assert.strictEqual(C.groupSentences(items).length, 1);
+});
+
 console.log('— 按时长切分（splitByDuration）—');
 t('两条等时长：均非空且拼回等于原文', () => {
   const text = '但这并不是最后一次世界领导人被关税的后果震惊';
@@ -550,14 +597,17 @@ t('编号连续 + formatSrt 整体往返', () => {
 });
 
 console.log('— 多格式：WebVTT —');
-t('parseVtt：文件头 + cue 标识行 + 行内标签剥离', () => {
+/* v0.9.129 口径变更：格式标签（<i>/<b>/<u>/<em>）不再是「剥离」对象——它们在 SRT 路径上一直是
+   原样保留的，VTT 一刀切剥掉属于两边不一致，且斜体（画外音/外语/歌曲标注）会静默丢失。
+   仍然剥离的是时间戳标签 <00:00:01.000>、<v 说话人>、<c.class> 等其余标记。 */
+t('parseVtt：文件头 + cue 标识行 + <v>/<c> 标签剥离、格式标签 <b> 保留', () => {
   const vtt = 'WEBVTT - 测试\n\ncue-1\n00:00:01.000 --> 00:00:03.500\n<v Roger>Hello</v> <b>world</b>\n\nNOTE 这是注释\n\n00:01:00.250 --> 00:01:02.000\n第二段 &amp; 内容\n';
   const { items, issues } = C.parseVtt(vtt);
   assert.strictEqual(issues.length, 0, JSON.stringify(issues));
   assert.strictEqual(items.length, 2);
   assert.strictEqual(items[0].start, 1000);
   assert.strictEqual(items[0].end, 3500);
-  assert.strictEqual(items[0].text, 'Hello world');
+  assert.strictEqual(items[0].text, 'Hello <b>world</b>', 'v/c 标签剥掉，格式标签保留');
   assert.strictEqual(items[1].text, '第二段 & 内容');
 });
 t('parseVtt：MM:SS.mmm 短格式时间', () => {
@@ -2270,6 +2320,61 @@ t('assStackMV：缺参/异常参数不炸，且结果落在 1~1080', () => {
     });
   }
 }
+
+console.log('— 行内格式标签（v0.9.129）—');
+t('VTT 导入保留斜体等格式标签（不再一刀切剥掉）', () => {
+  const vtt = 'WEBVTT\n\n1\n00:00:01.000 --> 00:00:03.000\n<i>Off-screen voice.</i>\n';
+  const r = C.parseVtt(vtt);
+  assert.strictEqual(r.items.length, 1);
+  assert.strictEqual(r.items[0].text, '<i>Off-screen voice.</i>', '斜体应保留，与 SRT 口径一致');
+});
+t('groupSentences：斜体结尾的句末标点仍然生效（不再吞掉下一条）', () => {
+  const items = [
+    { no: 1, start: 0,    end: 1000, text: '<i>Off-screen voice.</i>' },
+    { no: 2, start: 1000, end: 2000, text: 'She nodded.' },
+  ];
+  // 此前 </i> 的 '>' 挡住了句末判定 → 两条被并成一句组，译文错位到错误时间窗
+  assert.strictEqual(C.groupSentences(items).length, 2);
+});
+t('groupSentences：斜体行本身没有句末标点时照旧合并', () => {
+  const items = [
+    { no: 1, start: 0,    end: 1000, text: '<i>He left</i>' },
+    { no: 2, start: 1000, end: 2000, text: 'and never came back.' },
+  ];
+  assert.strictEqual(C.groupSentences(items).length, 1);
+});
+t('VTT 时间戳标签与 <v 说话人> 仍被剥掉（旧行为不变）', () => {
+  const vtt = 'WEBVTT\n\n1\n00:00:01.000 --> 00:00:03.000\n<c.narration><v Roger>Hello <00:00:02.000>there</v>\n';
+  const r = C.parseVtt(vtt);
+  assert.strictEqual(r.items[0].text, 'Hello there');
+});
+t('balanceInlineTags：无标签输入原样返回', () => {
+  assert.strictEqual(C.balanceInlineTags('明天见。', 'See you.'), '明天见。');
+});
+t('balanceInlineTags：已配对标签原样返回', () => {
+  assert.strictEqual(C.balanceInlineTags('<i>旁白</i>', '<i>Narration</i>'), '<i>旁白</i>');
+});
+t('balanceInlineTags：源文有斜体、译文缺闭合 → 补齐', () => {
+  assert.strictEqual(C.balanceInlineTags('<i>旁白', '<i>Narration</i>'), '<i>旁白</i>');
+});
+t('balanceInlineTags：源文有斜体、译文缺开标签 → 补齐', () => {
+  assert.strictEqual(C.balanceInlineTags('旁白</i>', '<i>Narration</i>'), '<i>旁白</i>');
+});
+t('balanceInlineTags：源文无斜体、译文凭空冒出 → 以源文为准剥掉', () => {
+  assert.strictEqual(C.balanceInlineTags('<i>明天见。</i>', 'See you.'), '明天见。');
+  assert.strictEqual(C.balanceInlineTags('<i>明天见。', 'See you.'), '明天见。');
+});
+t('balanceInlineTags：<b>/<u> 同样配对修复', () => {
+  assert.strictEqual(C.balanceInlineTags('<b>粗体', '<b>bold</b>'), '<b>粗体</b>');
+  assert.strictEqual(C.balanceInlineTags('下划线</u>', '<u>x</u>'), '<u>下划线</u>');
+});
+t('balanceInlineTags：多种标签互不干扰', () => {
+  assert.strictEqual(C.balanceInlineTags('<i>a</i> <b>b', '<i>a</i> <b>b</b>'), '<i>a</i> <b>b</b>');
+});
+t('balanceInlineTags：异常输入不炸', () => {
+  assert.strictEqual(C.balanceInlineTags(null, null), '');
+  assert.strictEqual(C.balanceInlineTags(undefined, 'x'), '');
+});
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

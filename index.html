@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.128</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.129</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.128</span>
+    <span class="ver-tag">v0.9.129</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -795,7 +795,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.128"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.129"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -5861,7 +5861,11 @@ function applyPost(){
   let wrapN=0;
   S.rows.forEach(r=>{
     if (r.flag==='drop' || r.flag==='merged' || !r.zh) return;
-    const t = C.mergePunctOnlyLines(C.stripSoundTags(r.zh)); // v0.9.52：先并掉仅闭标点的孤行（LLM 偶发 \n”）
+    /* v0.9.52：先并掉仅闭标点的孤行（LLM 偶发 \n”）
+       v0.9.129：再做行内格式标签配对修复——模型偶发只输出半个 <i>（缺 </i>），导出会破坏整条渲染。
+       以源文为准：源文无斜体→剥掉译文里凭空冒出的标签；源文有斜体且译文不配对→补齐缺失的一半。
+       正常输入（无标签或已配对）原样返回，零影响。 */
+    const t = C.balanceInlineTags(C.mergePunctOnlyLines(C.stripSoundTags(r.zh)), r.en);
     // v0.9.42：speaker 行保持 dash 行结构、按行独立折行——normalize 的 squashLines 会把
     // 「\n- 」压成行内 dash（#17 曾靠折行巧合复原，属未定义行为）；非 speaker 行维持原 normalize 路径
     const lines = C.isSpeakerText(t)
@@ -5925,65 +5929,65 @@ const EX_SAMPLE = {
   'ar':   {dash:'- قادم؟\\n- خلفك مباشرة.', lyric:'[1] خذني إلى البيت [2] الليلة', plain:'أراك غدًا.'},
   'tr':   {dash:'- Geliyor musun?\\n- Hemen arkandayım.', lyric:'[1] Götür beni eve [2] bu gece', plain:'Yarına görüşürüz.'}
 ,
-  'sv':   {dash:'- Kommer du?\n- Precis bakom dig.', lyric:'[1] Ta mig hem [2] i kväll', plain:'Vi ses i morgon.'},
-  'da':   {dash:'- Kommer du?\n- Lige bag dig.', lyric:'[1] Tag mig hjem [2] i aften', plain:'Vi ses i morgen.'},
-  'fi':   {dash:'- Tuletko?\n- Aivan takanasi.', lyric:'[1] Vie minut kotiin [2] tänä iltana', plain:'Nähdään huomenna.'},
-  'nb':   {dash:'- Kommer du?\n- Rett bak deg.', lyric:'[1] Ta meg hjem [2] i kveld', plain:'Vi ses i morgen.'},
-  'cs':   {dash:'- Jdeš?\n- Hned za tebou.', lyric:'[1] Vezmi mě domů [2] dnes večer', plain:'Uvidíme se zítra.'},
-  'sk':   {dash:'- Ideš?\n- Hneď za tebou.', lyric:'[1] Zaveď ma domov [2] dnes večer', plain:'Vidíme sa zajtra.'},
-  'hu':   {dash:'- Jössz?\n- Rögtön mögötted.', lyric:'[1] Vigyél haza [2] ma este', plain:'Holnap találkozunk.'},
-  'ro':   {dash:'- Vii?\n- Chiar în spatele tău.', lyric:'[1] Du-mă acasă [2] în seara asta', plain:'Ne vedem mâine.'},
-  'ca':   {dash:'- Vens?\n- Just darrere teu.', lyric:'[1] Porta-m a casa [2] aquesta nit', plain:'Fins demà.'},
-  'hr':   {dash:'- Dolaziš?\n- Odmah iza tebe.', lyric:'[1] Odvedi me kući [2] večeras', plain:'Vidimo se sutra.'},
-  'el':   {dash:'- Έρχεσαι;\n- Ακριβώς πίσω σου.', lyric:'[1] Πάρε με σπίτι [2] απόψε', plain:'Τα λέμε αύριο.'},
-  'uk':   {dash:'- Йдеш?\n- Одразу за тобою.', lyric:'[1] Забери мене додому [2] сьогодні ввечері', plain:'До завтра.'},
-  'sr':   {dash:'- Долазиш?\n- Одмах иза тебе.', lyric:'[1] Води ме кући [2] вечерас', plain:'Видимо се сутра.'},
-  'bg':   {dash:'- Идваш ли?\n- Точно зад теб.', lyric:'[1] Заведи ме у дома [2] тази вечер', plain:'До утре.'},
-  'he':   {dash:'- בא?\n- ממש מאחוריך.', lyric:'[1] קח אותי הביתה [2] הלילה', plain:'נתראה מחר.'},
-  'ur':   {dash:'- آ رہے ہو؟\n- بالکل پیچھے ہوں۔', lyric:'[1] مجھے گھر لے چلو [2] آج رات', plain:'کل ملیں گے۔'},
-  'bn':   {dash:'- আসছ?\n- ঠিক পিছনে আছি।', lyric:'[1] আমাকে বাড়ি নিয়ে যাও [2] আজ রাতে', plain:'কাল দেখা হবে।'},
-  'ta':   {dash:'- வர்றியா?\n- உன் பின்னாலேயே இருக்கேன்.', lyric:'[1] என்னை வீட்டுக்கு கூட்டிச் செல் [2] இன்று இரவு', plain:'நாளை பார்க்கலாம்.'},
-  'te':   {dash:'- వస్తున్నావా?\n- నీ వెనకాలే ఉన్నాను.', lyric:'[1] నన్ను ఇంటికి తీసుకెళ్ళు [2] ఈ రాత్రి', plain:'రేపు కలుద్దాం.'},
-  'mr':   {dash:'- येतोय का?\n- अगदी मागे आहे.', lyric:'[1] मला घरी घेऊन जा [2] आज रात्री', plain:'उद्या भेटू.'},
-  'ne':   {dash:'- आउँदै छौ?\n- एकदम पछाडि छु।', lyric:'[1] मलाई घर लैजाऊ [2] आज राति', plain:'भोलि भेटौँला।'},
-  'si':   {dash:'- එනවද?\n- හරියටම පිටිපස්සෙන්.', lyric:'[1] මාව ගෙදර එක්කගෙන යන්න [2] අද රෑ', plain:'හෙට හමුවෙමු.'},
-  'my':   {dash:'- လာမလား?\n- နောက်မှာပဲ။', lyric:'[1] အိမ်ကို ခေါ်သွားပါ [2] ဒီည', plain:'မနက်ဖြန် တွေ့မယ်။'},
-  'km':   {dash:'- មកទេ?\n- នៅពីក្រោយអ្នក។', lyric:'[1] យកខ្ញុំទៅផ្ទះ [2] យប់នេះ', plain:'ជួបគ្នាថ្ងៃស្អែក។'},
-  'lo':   {dash:'- ມາບໍ່?\n- ຢູ່ຫຼັງເຈົ້ານີ້ແຫຼະ.', lyric:'[1] ພາຂ້ອຍໄປບ້ານ [2] ຄືນນີ້', plain:'ພົບກັນມື້ອື່ນ.'},
-  'sw':   {dash:'- Unakuja?\n- Nyuma yako kabisa.', lyric:'[1] Nipeleke nyumbani [2] usiku wa leo', plain:'Tutaonana kesho.'},
-  'pl':   {dash:'- Idziesz?\n- Tuż za tobą.', lyric:'[1] Zabierz mnie do domu [2] dziś wieczorem', plain:'Do jutra.'},
-  'nl':   {dash:'- Kom je?\n- Vlak achter je.', lyric:'[1] Neem me mee naar huis [2] vanavond', plain:'Tot morgen.'},
-  'ms':   {dash:'- Nak datang?\n- Terus di belakang awak.', lyric:'[1] Bawa aku pulang [2] malam ini', plain:'Jumpa esok.'},
-  'fil':  {dash:'- Sasama ka?\n- Nasa likod mo lang ako.', lyric:'[1] Iuwi mo ako [2] ngayong gabi', plain:'Kita bukas.'},
-  'fa':   {dash:'- میای؟\n- درست پشت سرت.', lyric:'[1] منو ببر خونه [2] امشب', plain:'فردا می‌بینمت.'},
+  'sv':   {dash:'- Kommer du?\\n- Precis bakom dig.', lyric:'[1] Ta mig hem [2] i kväll', plain:'Vi ses i morgon.'},
+  'da':   {dash:'- Kommer du?\\n- Lige bag dig.', lyric:'[1] Tag mig hjem [2] i aften', plain:'Vi ses i morgen.'},
+  'fi':   {dash:'- Tuletko?\\n- Aivan takanasi.', lyric:'[1] Vie minut kotiin [2] tänä iltana', plain:'Nähdään huomenna.'},
+  'nb':   {dash:'- Kommer du?\\n- Rett bak deg.', lyric:'[1] Ta meg hjem [2] i kveld', plain:'Vi ses i morgen.'},
+  'cs':   {dash:'- Jdeš?\\n- Hned za tebou.', lyric:'[1] Vezmi mě domů [2] dnes večer', plain:'Uvidíme se zítra.'},
+  'sk':   {dash:'- Ideš?\\n- Hneď za tebou.', lyric:'[1] Zaveď ma domov [2] dnes večer', plain:'Vidíme sa zajtra.'},
+  'hu':   {dash:'- Jössz?\\n- Rögtön mögötted.', lyric:'[1] Vigyél haza [2] ma este', plain:'Holnap találkozunk.'},
+  'ro':   {dash:'- Vii?\\n- Chiar în spatele tău.', lyric:'[1] Du-mă acasă [2] în seara asta', plain:'Ne vedem mâine.'},
+  'ca':   {dash:'- Vens?\\n- Just darrere teu.', lyric:'[1] Porta-m a casa [2] aquesta nit', plain:'Fins demà.'},
+  'hr':   {dash:'- Dolaziš?\\n- Odmah iza tebe.', lyric:'[1] Odvedi me kući [2] večeras', plain:'Vidimo se sutra.'},
+  'el':   {dash:'- Έρχεσαι;\\n- Ακριβώς πίσω σου.', lyric:'[1] Πάρε με σπίτι [2] απόψε', plain:'Τα λέμε αύριο.'},
+  'uk':   {dash:'- Йдеш?\\n- Одразу за тобою.', lyric:'[1] Забери мене додому [2] сьогодні ввечері', plain:'До завтра.'},
+  'sr':   {dash:'- Долазиш?\\n- Одмах иза тебе.', lyric:'[1] Води ме кући [2] вечерас', plain:'Видимо се сутра.'},
+  'bg':   {dash:'- Идваш ли?\\n- Точно зад теб.', lyric:'[1] Заведи ме у дома [2] тази вечер', plain:'До утре.'},
+  'he':   {dash:'- בא?\\n- ממש מאחוריך.', lyric:'[1] קח אותי הביתה [2] הלילה', plain:'נתראה מחר.'},
+  'ur':   {dash:'- آ رہے ہو؟\\n- بالکل پیچھے ہوں۔', lyric:'[1] مجھے گھر لے چلو [2] آج رات', plain:'کل ملیں گے۔'},
+  'bn':   {dash:'- আসছ?\\n- ঠিক পিছনে আছি।', lyric:'[1] আমাকে বাড়ি নিয়ে যাও [2] আজ রাতে', plain:'কাল দেখা হবে।'},
+  'ta':   {dash:'- வர்றியா?\\n- உன் பின்னாலேயே இருக்கேன்.', lyric:'[1] என்னை வீட்டுக்கு கூட்டிச் செல் [2] இன்று இரவு', plain:'நாளை பார்க்கலாம்.'},
+  'te':   {dash:'- వస్తున్నావా?\\n- నీ వెనకాలే ఉన్నాను.', lyric:'[1] నన్ను ఇంటికి తీసుకెళ్ళు [2] ఈ రాత్రి', plain:'రేపు కలుద్దాం.'},
+  'mr':   {dash:'- येतोय का?\\n- अगदी मागे आहे.', lyric:'[1] मला घरी घेऊन जा [2] आज रात्री', plain:'उद्या भेटू.'},
+  'ne':   {dash:'- आउँदै छौ?\\n- एकदम पछाडि छु।', lyric:'[1] मलाई घर लैजाऊ [2] आज राति', plain:'भोलि भेटौँला।'},
+  'si':   {dash:'- එනවද?\\n- හරියටම පිටිපස්සෙන්.', lyric:'[1] මාව ගෙදර එක්කගෙන යන්න [2] අද රෑ', plain:'හෙට හමුවෙමු.'},
+  'my':   {dash:'- လာမလား?\\n- နောက်မှာပဲ။', lyric:'[1] အိမ်ကို ခေါ်သွားပါ [2] ဒီည', plain:'မနက်ဖြန် တွေ့မယ်။'},
+  'km':   {dash:'- មកទេ?\\n- នៅពីក្រោយអ្នក។', lyric:'[1] យកខ្ញុំទៅផ្ទះ [2] យប់នេះ', plain:'ជួបគ្នាថ្ងៃស្អែក។'},
+  'lo':   {dash:'- ມາບໍ່?\\n- ຢູ່ຫຼັງເຈົ້ານີ້ແຫຼະ.', lyric:'[1] ພາຂ້ອຍໄປບ້ານ [2] ຄືນນີ້', plain:'ພົບກັນມື້ອື່ນ.'},
+  'sw':   {dash:'- Unakuja?\\n- Nyuma yako kabisa.', lyric:'[1] Nipeleke nyumbani [2] usiku wa leo', plain:'Tutaonana kesho.'},
+  'pl':   {dash:'- Idziesz?\\n- Tuż za tobą.', lyric:'[1] Zabierz mnie do domu [2] dziś wieczorem', plain:'Do jutra.'},
+  'nl':   {dash:'- Kom je?\\n- Vlak achter je.', lyric:'[1] Neem me mee naar huis [2] vanavond', plain:'Tot morgen.'},
+  'ms':   {dash:'- Nak datang?\\n- Terus di belakang awak.', lyric:'[1] Bawa aku pulang [2] malam ini', plain:'Jumpa esok.'},
+  'fil':  {dash:'- Sasama ka?\\n- Nasa likod mo lang ako.', lyric:'[1] Iuwi mo ako [2] ngayong gabi', plain:'Kita bukas.'},
+  'fa':   {dash:'- میای؟\\n- درست پشت سرت.', lyric:'[1] منو ببر خونه [2] امشب', plain:'فردا می‌بینمت.'},
   // v0.9.112 新增 27 种：对白 / 歌词 / 普通句 三条真实译文样本
-  'gu':{dash:'- આવે છે?\n- તારી પાછળ જ છું.', lyric:'[1] મને ઘરે લઈ જા [2] આજે રાતે', plain:'આવતીકાલે મળીશું.'},
-  'kn':{dash:'- ಬರ್ತೀಯಾ?\n- ನಿನ್ನ ಹಿಂದೆನೇ ಇದ್ದೀನಿ.', lyric:'[1] ನನ್ನನ್ನು ಮನೆಗೆ ಕರೆದುಕೊಂಡು ಹೋಗು [2] ಈ ರಾತ್ರಿ', plain:'ನಾಳೆ ಸಿಗೋಣ.'},
-  'ml':{dash:'- വരുന്നോ?\n- നിന്റെ പിന്നിലുണ്ട്.', lyric:'[1] എന്നെ വീട്ടിലേക്ക് കൊണ്ടുപോകൂ [2] ഇന്ന് രാത്രി', plain:'നാളെ കാണാം.'},
-  'pa':{dash:'- ਆਉਂਦਾ ਏਂ?\n- ਬਿਲਕੁਲ ਪਿੱਛੇ ਹਾਂ।', lyric:'[1] ਮੈਨੂੰ ਘਰ ਲੈ ਚੱਲ [2] ਅੱਜ ਰਾਤ', plain:'ਕੱਲ ਮਿਲਾਂਗੇ।'},
-  'or':{dash:'- ଆସୁଛ?\n- ଠିକ୍ ପଛରେ ଅଛି।', lyric:'[1] ମୋତେ ଘରକୁ ନେଇଯା [2] ଆଜି ରାତି', plain:'କାଲି ଦେଖା ହେବ।'},
-  'as':{dash:'- আহিছা?\n- ঠিক পিছতে আছোঁ।', lyric:'[1] মোক ঘরলৈ লৈ যা [2] আজি রাতি', plain:'কাইলৈ দেখা হ’ব।'},
-  'kk':{dash:'- Келесің бе?\n- Дәл артыңдамын.', lyric:'[1] Мені үйге апар [2] бүгін кешке', plain:'Ертең кездесеміз.'},
-  'uz':{dash:'- Kelyapsanmi?\n- Aynan orqangdaman.', lyric:'[1] Meni uyga olib ket [2] bugun kechqurun', plain:'Ertaga ko‘rishguncha.'},
-  'mn':{dash:'- Ирж байна уу?\n- Яг ард чинь байна.', lyric:'[1] Намайг гүрт минь хүргээд өг [2] өнөө орой', plain:'Маргааш уулзая.'},
-  'az':{dash:'- Gəlirsən?\n- Düz arxandayam.', lyric:'[1] Məni evə apar [2] bu gecə', plain:'Sabah görüşərik.'},
-  'is':{dash:'- Kemurðu?\n- Rétt á eftir þér.', lyric:'[1] Farðu með mig heim [2] í kvöld', plain:'Sjáumst á morgun.'},
-  'et':{dash:'- Tuled?\n- Otse su taga.', lyric:'[1] Vii mind koju [2] täna õhtul', plain:'Näeme homme.'},
-  'lv':{dash:'- Nāc?\n- Tūlīt aiz tevis.', lyric:'[1] Aizved mani mājās [2] šovakar', plain:'Tiksimies rīt.'},
-  'lt':{dash:'- Ateini?\n- Tuoj pat už tavęs.', lyric:'[1] Parsivežk mane namo [2] šįvakar', plain:'Iki rytojaus.'},
-  'sl':{dash:'- Prideš?\n- Takoj za tabo.', lyric:'[1] Pelji me domov [2] nocoj', plain:'Se vidimo jutri.'},
-  'sq':{dash:'- Vjen?\n- Menjëherë pas teje.', lyric:'[1] Më ço në shtëpi [2] sonte', plain:'Shihemi nesër.'},
-  'mk':{dash:'- Доаѓаш?\n- Веднаш зад тебе.', lyric:'[1] Однеси ме дома [2] вечерва', plain:'Се гледаме утре.'},
-  'eu':{dash:'- Etorriko zara?\n- Zure atzean bertan.', lyric:'[1] Eraman nazazu etxera [2] gaur gauean', plain:'Bihar arte.'},
-  'gl':{dash:'- Vés?\n- Xusto detrás de ti.', lyric:'[1] Levaime á casa [2] esta noite', plain:'Vémonos mañá.'},
-  'am':{dash:'- ትመጣለህ?\n- ከዋላህ ነን።', lyric:'[1] ወደ ቤት ውሰደኛ [2] ዝረ ማታ', plain:'ነገ እንገናኝ።'},
-  'ha':{dash:'- Kana zuwa?\n- Daidai bayanka.', lyric:'[1] Kai ni gida [2] daren nan', plain:'Sai gobe.'},
-  'yo':{dash:'- Ṣe o n bọ?\n- Lẹ́sẹ̀kẹ́sẹ̀ lẹ́yìn rẹ.', lyric:'[1] Mú mi lọ sílé [2] lálẹ́ yíí', plain:'A ó pàdé lọ́la.'},
-  'zu':{dash:'- Uyeza?\n- Ngemuva kwakho nje.', lyric:'[1] Ngise ekhaya [2] kulobu busuku', plain:'Sizobonana kusasa.'},
-  'so':{dash:'- Ma imanaysaa?\n- Waxaan ahay gadaashaada.', lyric:'[1] Guriga i gee [2] caawa', plain:'Berri ayaan kulmi doonaa.'},
-  'ps':{dash:'- راځې؟\n- ستا په شا کې یم.', lyric:'[1] ما کور ته یوسه [2] نن شپه', plain:'سبا به سره وګورو.'},
-  'ku':{dash:'- دێیت؟\n- ڕاست لە دواوەتەوەم.', lyric:'[1] بمبەرەوە ماٵەوە [2] ئەم شەوە', plain:'سبەی دەبینینەوە.'},
-  'af':{dash:'- Kom jy?\n- Net agter jou.', lyric:'[1] Vat my huis toe [2] vanaand', plain:'Sien jou môre.'},
+  'gu':{dash:'- આવે છે?\\n- તારી પાછળ જ છું.', lyric:'[1] મને ઘરે લઈ જા [2] આજે રાતે', plain:'આવતીકાલે મળીશું.'},
+  'kn':{dash:'- ಬರ್ತೀಯಾ?\\n- ನಿನ್ನ ಹಿಂದೆನೇ ಇದ್ದೀನಿ.', lyric:'[1] ನನ್ನನ್ನು ಮನೆಗೆ ಕರೆದುಕೊಂಡು ಹೋಗು [2] ಈ ರಾತ್ರಿ', plain:'ನಾಳೆ ಸಿಗೋಣ.'},
+  'ml':{dash:'- വരുന്നോ?\\n- നിന്റെ പിന്നിലുണ്ട്.', lyric:'[1] എന്നെ വീട്ടിലേക്ക് കൊണ്ടുപോകൂ [2] ഇന്ന് രാത്രി', plain:'നാളെ കാണാം.'},
+  'pa':{dash:'- ਆਉਂਦਾ ਏਂ?\\n- ਬਿਲਕੁਲ ਪਿੱਛੇ ਹਾਂ।', lyric:'[1] ਮੈਨੂੰ ਘਰ ਲੈ ਚੱਲ [2] ਅੱਜ ਰਾਤ', plain:'ਕੱਲ ਮਿਲਾਂਗੇ।'},
+  'or':{dash:'- ଆସୁଛ?\\n- ଠିକ୍ ପଛରେ ଅଛି।', lyric:'[1] ମୋତେ ଘରକୁ ନେଇଯା [2] ଆଜି ରାତି', plain:'କାଲି ଦେଖା ହେବ।'},
+  'as':{dash:'- আহিছা?\\n- ঠিক পিছতে আছোঁ।', lyric:'[1] মোক ঘরলৈ লৈ যা [2] আজি রাতি', plain:'কাইলৈ দেখা হ’ব।'},
+  'kk':{dash:'- Келесің бе?\\n- Дәл артыңдамын.', lyric:'[1] Мені үйге апар [2] бүгін кешке', plain:'Ертең кездесеміз.'},
+  'uz':{dash:'- Kelyapsanmi?\\n- Aynan orqangdaman.', lyric:'[1] Meni uyga olib ket [2] bugun kechqurun', plain:'Ertaga ko‘rishguncha.'},
+  'mn':{dash:'- Ирж байна уу?\\n- Яг ард чинь байна.', lyric:'[1] Намайг гүрт минь хүргээд өг [2] өнөө орой', plain:'Маргааш уулзая.'},
+  'az':{dash:'- Gəlirsən?\\n- Düz arxandayam.', lyric:'[1] Məni evə apar [2] bu gecə', plain:'Sabah görüşərik.'},
+  'is':{dash:'- Kemurðu?\\n- Rétt á eftir þér.', lyric:'[1] Farðu með mig heim [2] í kvöld', plain:'Sjáumst á morgun.'},
+  'et':{dash:'- Tuled?\\n- Otse su taga.', lyric:'[1] Vii mind koju [2] täna õhtul', plain:'Näeme homme.'},
+  'lv':{dash:'- Nāc?\\n- Tūlīt aiz tevis.', lyric:'[1] Aizved mani mājās [2] šovakar', plain:'Tiksimies rīt.'},
+  'lt':{dash:'- Ateini?\\n- Tuoj pat už tavęs.', lyric:'[1] Parsivežk mane namo [2] šįvakar', plain:'Iki rytojaus.'},
+  'sl':{dash:'- Prideš?\\n- Takoj za tabo.', lyric:'[1] Pelji me domov [2] nocoj', plain:'Se vidimo jutri.'},
+  'sq':{dash:'- Vjen?\\n- Menjëherë pas teje.', lyric:'[1] Më ço në shtëpi [2] sonte', plain:'Shihemi nesër.'},
+  'mk':{dash:'- Доаѓаш?\\n- Веднаш зад тебе.', lyric:'[1] Однеси ме дома [2] вечерва', plain:'Се гледаме утре.'},
+  'eu':{dash:'- Etorriko zara?\\n- Zure atzean bertan.', lyric:'[1] Eraman nazazu etxera [2] gaur gauean', plain:'Bihar arte.'},
+  'gl':{dash:'- Vés?\\n- Xusto detrás de ti.', lyric:'[1] Levaime á casa [2] esta noite', plain:'Vémonos mañá.'},
+  'am':{dash:'- ትመጣለህ?\\n- ከዋላህ ነን።', lyric:'[1] ወደ ቤት ውሰደኛ [2] ዝረ ማታ', plain:'ነገ እንገናኝ።'},
+  'ha':{dash:'- Kana zuwa?\\n- Daidai bayanka.', lyric:'[1] Kai ni gida [2] daren nan', plain:'Sai gobe.'},
+  'yo':{dash:'- Ṣe o n bọ?\\n- Lẹ́sẹ̀kẹ́sẹ̀ lẹ́yìn rẹ.', lyric:'[1] Mú mi lọ sílé [2] lálẹ́ yíí', plain:'A ó pàdé lọ́la.'},
+  'zu':{dash:'- Uyeza?\\n- Ngemuva kwakho nje.', lyric:'[1] Ngise ekhaya [2] kulobu busuku', plain:'Sizobonana kusasa.'},
+  'so':{dash:'- Ma imanaysaa?\\n- Waxaan ahay gadaashaada.', lyric:'[1] Guriga i gee [2] caawa', plain:'Berri ayaan kulmi doonaa.'},
+  'ps':{dash:'- راځې؟\\n- ستا په شا کې یم.', lyric:'[1] ما کور ته یوسه [2] نن شپه', plain:'سبا به سره وګورو.'},
+  'ku':{dash:'- دێیت؟\\n- ڕاست لە دواوەتەوەم.', lyric:'[1] بمبەرەوە ماٵەوە [2] ئەم شەوە', plain:'سبەی دەبینینەوە.'},
+  'af':{dash:'- Kom jy?\\n- Net agter jou.', lyric:'[1] Vat my huis toe [2] vanaand', plain:'Sien jou môre.'},
 };
 function systemPromptEn(cfg){
   const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);

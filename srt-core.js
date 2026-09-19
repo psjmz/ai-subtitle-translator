@@ -536,7 +536,9 @@
       const st = toMs(m[1] || 0, m[2], m[3], m[4]);
       const en = toMs(m[5] || 0, m[6], m[7], m[8]);
       const body = lines.slice(ti + 1).join('\n')
-        .replace(/<[^>]+>/g, '')                       // <c>/<v>/<b> 等行内标签
+        /* v0.9.129：只剥非格式标签——时间戳 <00:00:01.000>、<v 说话人>、<c.class> 等照旧剥掉，
+           但 <i>/<b>/<u> 这类格式标签保留，与 SRT 路径口径一致（此前一刀切剥掉，斜体静默丢失）。 */
+        .replace(/<[^>]+>/g, function (tag) { return /^<\/?(i|b|u|em)\s*\/?>$/i.test(tag) ? tag : ''; })
         .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
         .replace(/&nbsp;/g, ' ').trim();
       if (!body) return;
@@ -910,6 +912,39 @@
       .trim();
   }
 
+  /* ---------------- 行内格式标签（v0.9.129）----------------
+     斜体（<i>…</i>）是字幕里画外音 / 外语 / 歌曲 / 内心独白的标准标注，属于「确定性信息」，
+     不该由模型决定去留。两条口径：
+     ① 导入：VTT 此前一刀切剥掉所有 <…> 标签，斜体在解析阶段就静默丢失（SRT 路径是原样保留的，
+        两边不一致）。改为只剥时间戳标签 <00:00:01.000>、<v 说话人>、<c.class> 等，格式标签保留。
+     ② 译后：模型偶发只输出半个标签（<i>文本 缺 </i>），导出会破坏整条渲染。以源文为准做配对修复。
+     ⚠️ 该函数只在「标签不平衡」或「源文无格式标签」时才改动字符串；正常输入（无标签或已配对）原样返回。 */
+  const INLINE_FMT_TAGS = ['i', 'b', 'u', 'em'];
+  function balanceInlineTags(dst, src) {
+    const s0 = String(dst == null ? '' : dst);
+    const srcStr = String(src == null ? '' : src);
+    let out = s0;
+    INLINE_FMT_TAGS.forEach(function (tag) {
+      const openRe = new RegExp('<' + tag + '\\s*>', 'gi');
+      const closeRe = new RegExp('</' + tag + '\\s*>', 'gi');
+      const anyRe = new RegExp('</?' + tag + '\\s*>', 'gi');
+      const srcHas = new RegExp('<' + tag + '\\s*>', 'i').test(srcStr);
+      const open = (out.match(openRe) || []).length;
+      const close = (out.match(closeRe) || []).length;
+      if (open === close) {
+        // 源文没有该格式、译文却冒出来（模型幻觉）→ 以源文为准剥干净
+        if (open > 0 && !srcHas) out = out.replace(anyRe, '');
+        return;
+      }
+      if (!srcHas) { out = out.replace(anyRe, ''); return; }
+      // 源文有该格式、译文标签不配对 → 补齐缺失的一半（宁可整条带格式，也不留半个标签）
+      if (open > close) out = out + ('</' + tag + '>').repeat(open - close);
+      else out = ('<' + tag + '>').repeat(close - open) + out;
+    });
+    // 仅在确实改动过时才清理空白；未改动时原样返回（零影响路径）
+    return out === s0 ? s0 : out.replace(/[ \t]{2,}/g, ' ').trim();
+  }
+
   // ---------------- 双 speaker 对话（v0.9.25）----------------
   // 电影字幕常见格式：同一条 cue 内两个说话人各占一行、以 - 开头（Netflix/BBC 惯例）。
   // 窄门检测（宁窄勿宽，单行 dash 的普通字幕不进此轨道）：
@@ -1013,9 +1048,13 @@
   // 翻译以句组为单位进行，译回时按各条字幕的时长比例切分回填（时间轴不动）。
   const SENT_FINAL = '.!?…。！？…';
   const CLOSE_BRKS = '”’』】》）)]"\'';
+  /* v0.9.129：判断句末标点前先剥掉行内标签。带斜体的行形如 <i>He left.</i>，
+     末字符是 '>' 而不是句号——此前会被判成「句子未完」，把下一条也吸进同一句组，
+     译文错位到错误的时间窗。标签是标注不是内容，判句末时应当透明。 */
+  const INLINE_TAG_RE = /<\/?(?:i|b|u|em|strong|font|c|v|lang|ruby|rt|span|p)\b[^>]*>/gi;
 
   function endsSentence(text) {
-    const t = stripSoundTags(text).trim();
+    const t = stripSoundTags(String(text == null ? '' : text).replace(INLINE_TAG_RE, '')).trim();
     if (!t) return false;
     for (let i = t.length - 1; i >= 0; i--) {
       const ch = t[i];
@@ -1038,6 +1077,12 @@
     opts = opts || {};
     const maxCues = opts.maxCues || 6;
     const maxWidth = opts.maxWidth || 200;
+    /* v0.9.129：时间间隔断组判据。此前只看句末标点——听写稿整段无标点时，
+       中间隔着好几秒静默的两条也会被并进同一句组，译文就跨着静默挂在屏幕上。
+       判据：当前 cue 与组内上一条 cue 的间隔超过 gapMs（默认 1.5s）就强制断组。
+       只在「上一句还没收尾」时才可能触发（已收尾的组早就 flush 了），因此对
+       正常标点分句的场景零影响。gapMs 传 0 可完全关闭（旧行为）。 */
+    const gapMs = opts.gapMs === undefined ? 1500 : (Number(opts.gapMs) || 0);
     const groups = [];
     let cur = null;
     const flush = () => {
@@ -1075,6 +1120,11 @@
       }
       const txt = String(it.text || '').trim();
       if (!txt) continue;
+      // v0.9.129：间隔过大 → 断组（见上方 gapMs 说明）；时间轴缺失时该判据自动不生效
+      if (gapMs > 0 && cur && cur.cues.length) {
+        const prevEnd = cur.cues[cur.cues.length - 1].end;
+        if (Number.isFinite(prevEnd) && Number.isFinite(it.start) && (it.start - prevEnd) > gapMs) flush();
+      }
       if (cur && (cur.cues.length >= maxCues || textWidth(joinSrc(cur.text, txt)) > maxWidth)) flush();
       if (!cur) cur = { cues: [], text: '', music: mus };
       cur.text = cur.text ? joinSrc(cur.text, txt) : txt;
@@ -2275,7 +2325,7 @@
     validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, isPureHumming, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
-    setMusicMarks, getMusicMarks, musicRe,
+    setMusicMarks, getMusicMarks, musicRe, balanceInlineTags,   // v0.9.129
     extractMusicFrames, parseSegMarkers, splitByWeights, reassembleMusic, stripSegMarkers, hasSegMarkers,
     MAX_W_DEFAULT: 20
   };
