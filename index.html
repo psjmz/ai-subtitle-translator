@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.132</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.133</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.132</span>
+    <span class="ver-tag">v0.9.133</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -795,7 +795,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.132"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.133"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -8014,6 +8014,32 @@ let sv={};
 try{ sv=JSON.parse(localStorage.getItem('srtTool')||'{}'); }catch(e){ sv={}; }
 if(sv.mode==='free') sv.mode='builtin';           // 旧版「免费模型」→「默认模型」
 if(sv.mode && !['builtin','api','demo'].includes(sv.mode)) sv.mode='builtin';
+/* v0.9.133：折行宽度改为「按目标语言记账」——{语言: 手调值}，槽里存的必然是用户手动改过的。
+   旧设计（v0.9.41 起）只有一个全局 maxW，并靠「值是否落在 [18,24,20,16,13,21] 里」推断用户有没有手调过：
+   这些值是历代默认值与联动推荐值，于是真手调了 20/21/13/16 的用户，下次加载会被判成"系统填的"
+   → 不回填 + 判定为未手调 → 被语言联动改回推荐值（手调值凭空消失）。
+   根因是数据模型没区分「谁写的值」，只能猜；改成分语言记账后无需再猜。 */
+const MW_SYS_VALS=[18,24,20,16,13,21];   // 仅供迁移旧数据：这些值无法区分是系统填的还是用户手调的
+const mwMemo=(function(){
+  try{
+    const m=sv.maxWByLang;
+    if(m && typeof m==='object' && !Array.isArray(m)){
+      const out={};
+      Object.keys(m).forEach(function(k){ const v=+m[k]; if(v>=8&&v<=48) out[k]=v; });
+      if(Object.keys(out).length) return out;
+    }
+  }catch(e){}
+  return {};
+})();
+/* 迁移：旧记录只有一个全局 maxW。属 MW_SYS_VALS 的无法确认是否被手调过 → 不认（保持联动推荐）；
+   其余认定为「用户在当时那个目标语言下调的」，记入该语言槽。 */
+(function(){
+  if(Object.keys(mwMemo).length) return;
+  const legacy=+sv.maxW;
+  if(!legacy || MW_SYS_VALS.includes(legacy)) return;
+  const lang=String(sv.dstLang||'').trim();
+  if(lang) mwMemo[lang]=legacy;
+})();
 function save(){
   const style=(document.querySelector('input[name=style]:checked')||{}).value||'elegant';
   const o = {
@@ -8036,9 +8062,10 @@ function save(){
   /* v0.9.105：ASS 字号「联动推荐值」不落盘——否则下次加载会被误判为用户自定义而永久锁死
      （同 v0.9.53 对 maxW 的处理）。只有明确标记为自定义时才写入。 */
   if(UI.assSizeTouched){ o.assDstSize=$('assDstSize').value; o.assSrcSize=$('assSrcSize').value; }
-  /* v0.9.53：折行阈值只在用户手动改过时才记忆——语言感知联动值（中文16/日文13）若被写入
-     localStorage，下次加载会被误判为「用户自定义」，从此锁死、切目标语言不再联动推荐 */
-  if (UI.maxWTouched) o.maxW = $('maxW').value;
+  /* v0.9.133：折行宽度按语言落盘（各语言独立记忆），不再用「值猜有没有手调过」。
+     同时镜像一份到旧字段 maxW —— 仅当前语言有记忆时才写，这样回滚到旧版时行为与原先一致。 */
+  if(Object.keys(mwMemo).length) o.maxWByLang=mwMemo;
+  try{ const _cw=mwMemo[$('dstLang').value]; if(_cw!==undefined) o.maxW=String(_cw); }catch(e){}
   /* 语言只在用户手动切换过时才记忆——避免页面加载时的 save() 把默认值/检测值写死，
      否则第二次访问起浏览器语言自动检测会被 localStorage 里的旧值永久覆盖 */
   if (UI.langManual)      { o.uiLang = UI.lang;   o.langManual = 1; }
@@ -8054,9 +8081,8 @@ if(sv.key) $('apikey').value=sv.key;
 if(sv.extra) $('extra').value=sv.extra;   /* v0.9.124：附加请求参数（自定义引擎透传，可能为嵌套对象如 response_format） */
 if(sv.terms) $('terms').value=sv.terms;
 if(sv.mode) $('mode').value=sv.mode;
-// 折行阈值：历史默认 18/24/20（v0.9.53 起默认 21）与联动推荐值 16/13 均不恢复，
-// 否则 maxWTouched 误判锁死联动。真手动设过这些值的用户会被重新纳入联动（值不变，仅失去锁定）
-if(sv.maxW && ![18,24,20,16,13].includes(+sv.maxW)) $('maxW').value=sv.maxW;
+/* v0.9.133：折行宽度不再在这里回填——统一交给下方 IIFE 的 syncMaxW()：
+   按当前目标语言取「该语言的手调记忆」，没有就用该语言的推荐值。 */
 /* 导出样式记忆 + 旧版双选择器迁移：expFmt+expFileFmt → expStyle */
 if(sv.expStyle && /^[a-z-]+\|(srt|vtt|ass|ass-stack|txt)$/.test(sv.expStyle)) $('expStyle').value=sv.expStyle;
 /* v0.9.100：ASS 外观恢复 */
@@ -8119,26 +8145,34 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
     // v0.9.112 新增：非 CJK 一律 21 全角（Netflix TTSG 42 CPL 口径）
     'gu':21, 'kn':21, 'ml':21, 'pa':21, 'or':21, 'as':21, 'kk':21, 'uz':21, 'mn':21, 'az':21, 'is':21, 'et':21, 'lv':21, 'lt':21, 'sl':21, 'sq':21, 'mk':21, 'eu':21, 'gl':21, 'am':21, 'ha':21, 'yo':21, 'zu':21, 'so':21, 'ps':21, 'ku':21, 'af':21
   };
-  // 用户自定义 = localStorage 里存有非默认/非推荐值（18/24/20/16/13 均为历史或现行默认，21 现默认）
-  let maxWTouched = !!(sv.maxW && ![18,24,20,16,13,21].includes(+sv.maxW));
-  UI.maxWTouched = maxWTouched;   // v0.9.53：save() 据此决定是否持久化（联动值不落盘）
+  // v0.9.133：不再推断「用户有没有手调过」——改由 mwMemo 按语言记账（见「本地记忆」段）
   const mw=$('maxW');
-  mw.addEventListener('input', ()=>{ if(mw.value==='') return; maxWTouched=true; UI.maxWTouched=true; });
-  // v0.9.54：清空输入框后失焦 → 恢复「随语言自动推荐」：touched 复位 + 立即联动当前语言。
-  // 之所以用 blur 而非 input：用户改值时往往先清空再输入，清空瞬间就恢复会吞掉输入。
+  /* 改值 → 立刻记入「当前语言」的槽并落盘。旧版只在按钮/失焦时 save()，
+     于是手调值常常还没写入就刷新，回过头被联动覆盖；这里即时持久化是修复的关键一环。 */
+  mw.addEventListener('input', ()=>{
+    if(mw.value==='') return;
+    const v=+mw.value;
+    if(!(v>=8&&v<=48)) return;            // 越界不记账（HTML min/max 之外的手输值）
+    mwMemo[$('dstLang').value]=v;
+    save();
+  });
+  /* 清空后失焦 → 只清除「当前语言」的记忆，立即填回该语言的推荐值。
+     其它语言的记忆不受影响；之所以用 blur 而非 input：改值时往往先清空再输入，清空瞬间清除会吞掉输入。 */
   mw.addEventListener('blur', ()=>{
     if(mw.value!=='') return;
-    maxWTouched=false; UI.maxWTouched=false;
-    syncMaxW();   // 立即填回当前语言推荐值，用户可见恢复生效
-    save();       // touched=false 时不写 maxW 字段 → 旧的自定义值从 localStorage 清除
+    delete mwMemo[$('dstLang').value];
+    syncMaxW();   // 可见地恢复成该语言的推荐值
+    save();
   });
   // v0.9.54：number 输入框聚焦时鼠标滚轮会静默改值（并触发 input 锁定联动），阻止之；
   // 未聚焦时 hover 滚轮正常滚动页面（Chrome 默认此时不改值，preventDefault 会卡住页面滚动）
   mw.addEventListener('wheel', (e)=>{ if(document.activeElement===mw) e.preventDefault(); }, {passive:false});
+  /* 切目标语言 → 该语言有手调记忆就用它，没有才用推荐值。
+     因此「跟着语言变」与「在该语言下改过就记住」两者不再互相排斥。 */
   const syncMaxW=()=>{
-    if(maxWTouched) return;
-    const rec=MAXW_BY_LANG[$('dstLang').value]||21;
-    if(+mw.value!==rec) mw.value=rec;
+    const lang=$('dstLang').value;
+    const v=(mwMemo[lang]!==undefined)?mwMemo[lang]:(MAXW_BY_LANG[lang]||21);
+    if(+mw.value!==v) mw.value=v;
   };
   $('dstLang').addEventListener('change', syncMaxW);
   syncMaxW();
