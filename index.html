@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.133</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.134</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.133</span>
+    <span class="ver-tag">v0.9.134</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -622,11 +622,26 @@
       <div class="hint" id="styleHint"></div>
 
       <div class="sec-title"><i class="sec-ic c4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></i><span data-i18n="secRules">处理规则</span></div>
-      <label class="tgl-row"><span class="l"><span data-i18n="lblKeepTermsShort">专名保留原文</span><i class="info" data-tip-i18n="chkKeepTerms">i</i></span><input type="checkbox" id="keepTerms" checked><span class="tgl"></span></label>
+      <!-- v0.9.134：原「专名保留原文」开关 + 逗号分隔输入框，重构为「策略二选一 + 统一术语表」。
+           拆开的理由：旧结构里 keepTerms 一关就把输入框禁用（用户彻底失去对专名的控制），
+           且关掉时提示词说的是「用户提供的术语也要翻译」——与输入框标签语义相反。
+           现在「怎么处理」(此项) 与「认哪些词」(下方术语表) 是两个互不排斥的维度。 -->
+      <label class="flbl"><span data-i18n="lblKeepTermsShort">专名处理</span></label>
+      <div class="style-chips">
+        <label class="schip"><input type="radio" name="pnMode" value="keep"><span data-i18n="pnKeep">保留原文</span></label>
+        <label class="schip"><input type="radio" name="pnMode" value="trans" checked><span data-i18n="pnTrans">全部译出</span></label>
+      </div>
       <div class="hint" id="termsHint" style="margin-top:4px"></div>
-      <label data-i18n="lblTerms">需强制保留原文的专名（可留空，逗号分隔）</label>
-      <input type="text" id="terms" placeholder="如：SpaceX, Prism, EnduroSat" data-i18n-ph="termsPh">
-      <label class="tgl-row"><span class="l"><span data-i18n="lblAutoTermsShort">自动术语表</span><i class="info" data-tip-i18n="chkAutoTerms">i</i></span><!-- v0.9.96：默认关闭。术语提取每次额外发最多 20000 字符原文，约占单文件成本 26~36% -->
+
+      <label class="flbl"><span data-i18n="lblTerms">统一译名（术语表，每行一条）</span></label>
+      <textarea id="terms" rows="4" spellcheck="false"
+        placeholder="每行一条：SpaceX 表示保留原文；Burger King → 汉堡王 表示指定译法" data-i18n-ph="termsPh"></textarea>
+      <div class="btns" style="margin-top:6px">
+        <button class="btn sm ghost" id="btnGlossFile" type="button" data-i18n="btnGlossFile">📂 上传术语表</button>
+      </div>
+      <input type="file" id="glossFile" accept=".txt,.csv,.tsv,.json" hidden>
+      <div class="hint" id="glossHint"></div>
+      <label class="tgl-row"><span class="l"><span data-i18n="lblAutoTermsShort">自动术语表</span><i class="info" data-tip-i18n="chkAutoTerms">i</i></span><!-- v0.9.96：默认关闭。术语提取每次额外发最多 20000 字符原文，约占单文件成本 26~36%（短文件比例更高） -->
       <input type="checkbox" id="autoTerms"><span class="tgl"></span></label>
       <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
       <input type="number" id="maxW" value="21" min="8" max="48">
@@ -795,7 +810,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.133"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.134"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -964,9 +979,9 @@ const I18N = {
   lblProvider:'服务商', lblBase:'Base URL（自动拼接 /chat/completions）', lblModel:'模型', lblBatch:'单批字符预算', batchTip:'每次请求送模型的字幕字符数。按长度自动分批——短句多装、长句少装，每批输出量稳定。越大总耗时略短，但过大可能降低翻译质量；默认 3000 适合大多数视频。',
   lblKey:'API Key（仅保存在本机浏览器）',
   chkKeepTerms:'专有名词（人名/机构/产品/术语）保留原文，不翻译',
-  termsHintOn:'勾选 = 术语表内的专名强制保留原文（下方术语表已启用）。',
-  termsHintOff:'已关闭：人名/机构/产品/术语将全部翻译为目标语言，术语表不生效。',
-  lblTerms:'需强制保留原文的专名（可留空，逗号分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
+  termsHintOn:'人名/机构/品牌一律保留原文写法，不翻译。术语表中指定的词条仍以术语表为准。',
+  termsHintOff:'人名/机构/品牌一律译成目标语言译名。术语表中指定的词条仍以术语表为准。', pnKeep:'保留原文', pnTrans:'全部译出', btnGlossFile:'📂 上传术语表', glossHit:'术语表 {0} 条：本片命中 {1} 条，{2} 行无法识别',
+  lblTerms:'统一译名（术语表，每行一条）', termsPh:'每行一条：原文 → 译法；只写原文表示保留原文',
   lblMaxW:'折行宽度（单位=全角宽，不是字数：1 个汉字/假名/韩文音节=1；拉丁·西里尔·泰文·阿拉伯字母=0.5，即半角文字 1 单位≈2 字符）。作用于单语折行，以及双语的「- A - B」双说话人行。默认随目标语言按 Netflix 规范推荐（中/韩 16、日 13、其余 21）。调大 → 一行更长、行数和切分更少。', lblBiMaxW:'双语导出时【译文行】的宽度上限（同为全角宽单位，不是字数：同样 32，中文≈32 字，泰文≈64 字符）。只约束译文行，源文行跟随语义断点、不限宽；双说话人行走上方「折行阈值」。只有译文超出才拆时间轴。此值不随语言变化。调大 → 拆分更少但译文行更长。', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止', lyricTip:'歌词行的处理方式：翻译／保留原文（不翻译）／删除（整组移除）。判断依据是「歌词标记」里的字符。', marksTip:'含这些字符的字幕行视为歌词。默认 ♪♫♬♩，可增删；留空自动恢复默认。若源文件歌词不带任何符号，可加入该字幕独有的标记。一行内歌词与对白混排时，删除档会自动降级为保留原文，不会误删对白。', lyricSkipKeep:'歌词 {0} 组按设置保留原文（未翻译）', lyricSkipDrop:'歌词 {0} 组按设置移除', lyricWarn:'注意：{0}% 的字幕行被判定为歌词，可能是「歌词标记」设置过宽，请确认后重跑', dropFillersTip:'开启：本地判定的纯水词字幕（um、uh、无实义哼唱等）直接移除，不送模型，结果确定。关闭：全部送模型，由模型逐条判断该翻、该留还是该删。默认开启。',
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
@@ -1034,7 +1049,7 @@ const I18N = {
   aboutBody:'随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 开源仓库', aboutLicense:'AGPL-3.0 开源', wsBackHome:'首页',
   wsUploadNew:'上传新字幕', projEmpty:'未导入字幕', secImport:'导入字幕', secLang:'语言',
   secStyle:'翻译风格', secRules:'处理规则', secEngine:'翻译引擎', lblSrcShort:'原文语言',
-  lblDstShort:'目标语言', lblKeepTermsShort:'专名保留原文', lblAutoTermsShort:'自动术语表', lblMaxWShort:'折行阈值', lblBiMaxWShort:'双语行宽（译文行）', wUnit:'字符', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
+  lblDstShort:'目标语言', lblKeepTermsShort:'专名处理', lblAutoTermsShort:'自动术语表', lblMaxWShort:'折行阈值', lblBiMaxWShort:'双语行宽（译文行）', wUnit:'字符', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
   /* v0.9.70 两段式界面新增 */
 },
 'zh-TW': {pureMTMode:'偵測到純翻譯模型（{0}）：改用逐組直譯（共 {1} 組，並行 4 路，成功的組有快取）…',pureMTDone:'逐組直譯完成：成功 {0}/{1} 組',gotClick:'已收到「開始翻譯」的請求，正在準備…',reqSent:'第 {0} 批請求已送出（{1} 個句組），正在等待模型回應…',waitSec:'已等待 {0} 秒，仍在等待模型的回應…',errTimeout:'等待 {0} 秒仍無回應，已放棄本次請求（逾時）。建議：把「每批字元」調小以縮小批次，或換一個回應更快的模型；若所用模型會先思考再回答（Qwen3 / GLM 等），在「附加請求參數」裡填 {"enable_thinking":false}',alreadyRunning:'上一輪翻譯尚未結束（可能仍在等待某次請求的回應），已請求停止——請等目前批次收尾後再重新開始',modeMismatch:'注意：下方已填寫自訂 API（{0}），但目前是「預設模型」模式，本次不會用到它——要使用請先在上方切換到「自訂 API」',errTruncOut:'模型輸出被長度上限截斷（還沒生成完就結束）——請在「附加請求參數」裡加大 max_tokens，例如 {"max_tokens":8192}',lblExtra:'附加請求參數（JSON，可選）',extraTip:'隨每次自訂 API 請求一併送出。例：{"enable_thinking":false} 關閉模型思考；{"response_format":{"type":"json_object"}} 強制 JSON 輸出。model / messages / temperature / stream 不可覆寫。',
@@ -1059,9 +1074,9 @@ const I18N = {
   lblProvider:'服務商', lblBase:'Base URL（自動拼接 /chat/completions）', lblModel:'模型', lblBatch:'單批字元預算', batchTip:'每次請求送模型的字幕字元數。按長度自動分批——短句多裝、長句少裝，每批輸出量穩定。越大總耗時略短，但過大可能降低翻譯品質；預設 3000 適合大多數影片。',
   lblKey:'API Key（僅儲存在本機瀏覽器）',
   chkKeepTerms:'專有名詞（人名/機構/產品/術語）保留原文，不翻譯',
-  termsHintOn:'勾選 = 術語表內的專名強制保留原文（下方術語表已啟用）。',
-  termsHintOff:'已關閉：人名/機構/產品/術語將全部翻譯為目標語言，術語表不生效。',
-  lblTerms:'需強制保留原文的專名（可留空，逗號分隔）', termsPh:'如：SpaceX, Prism, EnduroSat',
+  termsHintOn:'人名/機構/品牌一律保留原文寫法，不翻譯。術語表中指定的詞條仍以術語表為準。',
+  termsHintOff:'人名/機構/品牌一律譯成目標語言譯名。術語表中指定的詞條仍以術語表為準。', pnKeep:'保留原文', pnTrans:'全部譯出', btnGlossFile:'📂 上傳術語表', glossHit:'術語表 {0} 條：本片命中 {1} 條，{2} 行無法辨識',
+  lblTerms:'統一譯名（術語表，每行一條）', termsPh:'每行一條：原文 → 譯法；只寫原文表示保留原文',
   lblMaxW:'折行寬度（單位=全角寬，不是字數：1 個漢字/假名/韓文音節=1；拉丁·西里爾·泰文·阿拉伯字母=0.5，即半角文字 1 單位≈2 字元）。作用於單語折行，以及雙語的「- A - B」雙說話人行。預設隨目標語言按 Netflix 規範推薦（中/韓 16、日 13、其餘 21）。調大 → 一行更長、行數和切分更少。', lblBiMaxW:'雙語匯出時【譯文行】的寬度上限（同為全角寬單位，不是字數：同樣 32，中文≈32 字，泰文≈64 字元）。只約束譯文行，源文行跟隨語義斷點、不限寬；雙說話人行走上方「折行閾值」。只有譯文超出才拆時間軸。此值不隨語言變化。調大 → 拆分更少但譯文行更長。', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止', lyricTip:'歌詞行的處理方式：翻譯／保留原文（不翻譯）／刪除（整組移除）。判斷依據是「歌詞標記」裡的字元。', marksTip:'含這些字元的字幕行視為歌詞。預設 ♪♫♬♩，可增刪；留空自動恢復預設。若字幕檔歌詞不帶任何符號，可加入該檔獨有的標記。一行內歌詞與對白混排時，刪除檔會自動降級為保留原文，不會誤刪對白。', lyricSkipKeep:'歌詞 {0} 組依設定保留原文（未翻譯）', lyricSkipDrop:'歌詞 {0} 組依設定移除', lyricWarn:'注意：{0}% 的字幕行被判定為歌詞，可能是「歌詞標記」設定過寬，請確認後重跑', dropFillersTip:'開啟：本地判定的純贅詞字幕（um、uh、無意義哼唱等）直接移除，不送模型，結果確定。關閉：全部送模型，由模型逐條判斷該翻、該留還是該刪。預設開啟。',
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
@@ -1129,7 +1144,7 @@ const I18N = {
   aboutBody:'隨心字幕 AI 是一款開源的 AI 字幕翻譯工具。我們相信好的字幕工具應該免費、乾淨、尊重隱私——不塞廣告、不要註冊、不動你的檔案。歡迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 開源倉庫', aboutLicense:'AGPL-3.0 開源', wsBackHome:'首頁',
   wsUploadNew:'上傳新字幕', projEmpty:'未匯入字幕', secImport:'匯入字幕', secLang:'語言',
   secStyle:'翻譯風格', secRules:'處理規則', secEngine:'翻譯引擎', lblSrcShort:'原文語言',
-  lblDstShort:'目標語言', lblKeepTermsShort:'專名保留原文', lblAutoTermsShort:'自動術語表', lblMaxWShort:'折行閾值', lblBiMaxWShort:'雙語行寬（譯文行）', wUnit:'字元', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
+  lblDstShort:'目標語言', lblKeepTermsShort:'專名處理', lblAutoTermsShort:'自動術語表', lblMaxWShort:'折行閾值', lblBiMaxWShort:'雙語行寬（譯文行）', wUnit:'字元', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
   /* v0.9.70 两段式界面新增 */
 },
 'en': {pureMTMode:'Pure translation model detected ({0}): switching to per-group direct translation ({1} groups, 4 in parallel, successful groups are cached)…',pureMTDone:'Per-group translation finished: {0}/{1} groups succeeded',gotClick:'Received “start translation” — preparing…',reqSent:'Batch {0} request sent ({1} groups) — waiting for the model…',waitSec:'Waited {0} s — still no reply from the model…',errTimeout:'No response after {0} s — request abandoned (timeout). Try lowering the per-batch character budget, or switch to a faster model; if the model reasons before answering (Qwen3, GLM…), put {"enable_thinking":false} in Extra request parameters',alreadyRunning:'The previous run has not finished yet — a stop has been requested. Please wait for the current batch to wrap up before starting again',modeMismatch:'Heads up: custom API fields are filled in below ({0}), but the mode above is “Default model”, so none of them will be used. Switch the mode to “Custom API” to actually use it',errTruncOut:'Model output hit the token limit and was cut off before finishing — raise max_tokens in Extra request parameters, e.g. {"max_tokens":8192}',lblExtra:'Extra request parameters (JSON, optional)',extraTip:'Merged into every custom-API request body. Examples: {"enable_thinking":false} to turn off reasoning; {"response_format":{"type":"json_object"}} to force JSON output. model / messages / temperature / stream cannot be overridden.',
@@ -1154,9 +1169,9 @@ const I18N = {
   lblProvider:'Provider', lblBase:'Base URL (/chat/completions appended automatically)', lblModel:'Model', lblBatch:'Chars per batch', batchTip:'Characters of subtitles sent to the model per request. Batches are cut by length automatically: short lines fill more, long lines fewer, keeping each output stable. Larger values finish slightly faster, but too large may reduce quality; the default 3000 suits most videos.',
   lblKey:'API Key (stored only in this browser)',
   chkKeepTerms:'Keep proper nouns (names/brands/products/terms) untranslated',
-  termsHintOn:'Checked = terms in the list stay in original form (list enabled).',
-  termsHintOff:'Off: all names/brands/products/terms are translated; the term list is ignored.',
-  lblTerms:'Proper nouns to keep in original form (optional, comma-separated)', termsPh:'e.g. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Names, organizations and brands keep their original spelling and are not translated. Entries in the glossary below still take precedence.',
+  termsHintOff:'Names, organizations and brands are all translated into the target language. Entries in the glossary below still take precedence.', pnKeep:'Keep original', pnTrans:'Translate all', btnGlossFile:'📂 Upload glossary', glossHit:'Glossary: {0} entries, {1} matched in this file, {2} lines unrecognized',
+  lblTerms:'Unified glossary (one term per line)', termsPh:'One per line: source → rendering; a line with only the source term keeps the original',
   lblMaxW:'Line width in full-width UNITS, not characters: 1 CJK char = 1; Latin, Cyrillic, Thai and Arabic letters = 0.5, so 1 unit is about 2 characters for half-width scripts. Governs monolingual wrapping and "- A - B" dual-speaker lines in bilingual export. Default follows the Netflix spec per language (zh/ko 16, ja 13, others 21). Larger = longer lines, fewer line breaks and cue splits.', lblBiMaxW:'Max width of the TRANSLATED line in bilingual export (same full-width unit, not characters: the same 32 is about 32 Chinese characters but about 64 Thai characters). Constrains the translated line only; the source line follows semantic breaks and is not width-limited, and dual-speaker lines use "Line width" above. Exceeding it is the only thing that splits the timeline. This value does NOT change per language. Larger = fewer splits but longer translated lines.', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop', lyricTip:'How to handle lyric lines: translate / keep the original text / remove them entirely. Lines are matched by the characters in “Lyric markers”.', marksTip:'Subtitle lines containing any of these characters are treated as lyrics. Default ♪♫♬♩ — add or remove freely; leave empty to restore the default. If your file uses no music symbols, add the marker it does use. When a line mixes lyrics with dialogue, “Remove” falls back to keeping the original so dialogue is never deleted.', lyricSkipKeep:'{0} lyric group(s) kept in the original language (not translated)', lyricSkipDrop:'{0} lyric group(s) removed per your setting', lyricWarn:'Heads up: {0}% of lines were classified as lyrics — the marker set may be too broad. Please check and re-run.', dropFillersTip:'On: lines that the local rule judges to be pure filler (um, uh, meaningless humming) are removed outright and never sent to the model, so the result is deterministic. Off: every line goes to the model, which decides case by case whether to translate, keep or drop it. On by default.',
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
@@ -1224,7 +1239,7 @@ const I18N = {
   aboutBody:'AI-SRTSub is an open-source AI subtitle translator. We believe a good subtitle tool should be free, clean and privacy-respecting — no ads, no sign-up, no touching your files. Self-host it, file requests, polish it together.', aboutRepo:'GitHub repository', aboutLicense:'AGPL-3.0 open source', wsBackHome:'Home',
   wsUploadNew:'New subtitle', projEmpty:'No subtitle loaded', secImport:'Import', secLang:'Languages',
   secStyle:'Style', secRules:'Rules', secEngine:'Engine', lblSrcShort:'Source language',
-  lblDstShort:'Target language', lblKeepTermsShort:'Keep proper nouns', lblAutoTermsShort:'Auto glossary', lblMaxWShort:'Line width', lblBiMaxWShort:'Bilingual width (translated)', wUnit:'characters', lblLyric:'Lyrics', lyricTrans:'Translate', lyricKeep:'Keep original', lyricDrop:'Remove', lblMarks:'Lyric markers', lblDropFillers:'Remove fillers',
+  lblDstShort:'Target language', lblKeepTermsShort:'Proper nouns', lblAutoTermsShort:'Auto glossary', lblMaxWShort:'Line width', lblBiMaxWShort:'Bilingual width (translated)', wUnit:'characters', lblLyric:'Lyrics', lyricTrans:'Translate', lyricKeep:'Keep original', lyricDrop:'Remove', lblMarks:'Lyric markers', lblDropFillers:'Remove fillers',
   /* v0.9.70 两段式界面新增 */
 },
 'ja': {pureMTMode:'純翻訳モデル（{0}）を検出：グループごとの直接翻訳に切り替えます（全 {1} グループ、4 並列、成功分はキャッシュ）…',pureMTDone:'グループごとの翻訳が完了：{1} グループ中 {0} 件成功',gotClick:'「翻訳開始」を受け付けました—準備中…',reqSent:'第 {0} 批のリクエストを送信しました（{1} グループ）——モデルの応答を待っています…',waitSec:'{0} 秒待機中——まだモデルの応答がありません…',errTimeout:'{0} 秒応答がなく、このリクエストを打ち切りました（タイムアウト）。「1 バッチの文字数」を小さくするか、より速いモデルに変更してください。Qwen3 / GLM など思考してから答えるモデルの場合は「追加リクエストパラメータ」に {"enable_thinking":false} を指定してください',alreadyRunning:'前回の翻訳がまだ終了していません（いずれかのリクエストの応答待ちの可能性があります）——停止を要求しました。現在のバッチが終わるまでお待ちください',modeMismatch:'注意：下欄にカスタム API（{0}）が入力されていますが、現在のモードは「既定モデル」のため使用されません。使うには上のモードを「カスタム API」に切り替えてください',errTruncOut:'モデルの出力が長さ上限で打ち切られました（最後まで生成されていません）——「追加リクエストパラメータ」で max_tokens を増やしてください。例：{"max_tokens":8192}',lblExtra:'追加リクエストパラメータ（JSON、任意）',extraTip:'カスタム API の各リクエスト本文にマージされます。例：{"enable_thinking":false}（思考を無効化）、{"response_format":{"type":"json_object"}}（JSON 出力を強制）。model / messages / temperature / stream は上書きできません。',
@@ -1249,9 +1264,9 @@ const I18N = {
   lblProvider:'プロバイダー', lblBase:'Base URL（/chat/completions は自動付加）', lblModel:'モデル', lblBatch:'1回あたりの文字数', batchTip:'1リクエストでモデルに送る字幕の文字数。長さに応じて自動で分割され、短い行は多く、長い行は少なく入り、各バッチの出力量が安定します。大きいほど総時間はやや短くなりますが、大きすぎると品質が落ちることがあります。デフォルトの3000はほとんどの動画に適しています。',
   lblKey:'API Key（このブラウザにのみ保存）',
   chkKeepTerms:'固有名詞（人名/組織/製品/用語）は原文のまま翻訳しない',
-  termsHintOn:'チェック＝用語リストの固有名詞を原文のまま保持（リスト有効）。',
-  termsHintOff:'オフ：人名/組織/製品/用語はすべて翻訳先言語に訳され、用語リストは無効。',
-  lblTerms:'原文のまま保持する固有名詞（任意、カンマ区切り）', termsPh:'例：SpaceX, Prism, EnduroSat',
+  termsHintOn:'人名・組織・ブランドは原文のまま訳しません。下の用語集に指定した語は用語集が優先されます。',
+  termsHintOff:'人名・組織・ブランドはすべて対象言語の訳語にします。下の用語集に指定した語は用語集が優先されます。', pnKeep:'原文のまま', pnTrans:'すべて訳す', btnGlossFile:'📂 用語集をアップロード', glossHit:'用語集 {0} 語：このファイルで {1} 語が一致、{2} 行は判別できませんでした',
+  lblTerms:'訳語統一（用語集、1 行に 1 語）', termsPh:'1 行に 1 語：原文 → 訳語。原文だけの行は原文のまま保持',
   lblMaxW:'折り返し幅（単位は全角幅で、文字数ではありません：漢字・かな・ハングルは 1、ラテン・キリル・タイ・アラビア文字は 0.5＝半角文字は 1 単位≈2 文字）。単語字幕の折り返しと、バイリンガルの「- A - B」二人の話者行に適用されます。初期値は言語ごとの Netflix 規範（中/韓 16、日 13、その他 21）。大きくすると行が長くなり、行数と分割が減ります。', lblBiMaxW:'バイリンガル書き出し時の【訳文行】の最大幅（同じく全角幅単位で文字数ではありません：同じ 32 でも中国語≈32 文字、タイ語≈64 文字）。訳文行のみを制限し、原文行は意味の切れ目に従い幅制限なし。二人の話者行は上の「折り返し幅」を使います。訳文が超えた場合のみタイムラインを分割します。この値は言語で変わりません。大きくすると分割は減りますが訳文行が長くなります。', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止', lyricTip:'歌詞行の扱い：翻訳／原文のまま／削除（グループごと除去）。判定は「歌詞マーク」の文字で行います。', marksTip:'これらの文字を含む字幕行を歌詞として扱います。既定は ♪♫♬♩。追加・削除可、空にすると既定に戻ります。ファイルに音記号が無い場合はその記号を追加してください。1行に歌詞と台詞が混在する場合、「削除」は自動的に原文保持へ切り替わり、台詞を誤削除しません。', lyricSkipKeep:'歌詞 {0} グループを設定どおり原文のまま保持（未翻訳）', lyricSkipDrop:'歌詞 {0} グループを設定どおり削除', lyricWarn:'注意：{0}% の行が歌詞と判定されました。「歌詞マーク」の指定が広すぎる可能性があります。確認して再実行してください。', dropFillersTip:'オン：ローカル判定で純粋なフィラー（「あー」「うーん」、意味のないハミングなど）と判断された行はそのまま削除し、モデルには送りません（結果は決定的）。オフ：すべての行をモデルに送り、翻訳・保持・削除を行ごとにモデルが判断します。既定はオン。',
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
@@ -1319,7 +1334,7 @@ const I18N = {
   aboutBody:'AI-SRTSub はオープンソースの AI 字幕翻訳ツールです。良い字幕ツールは無料で、クリーンで、プライバシーを尊重すべき——広告なし、登録なし、ファイルに手を加えない。セルフホストも歓迎。', aboutRepo:'GitHub リポジトリ', aboutLicense:'AGPL-3.0 オープンソース', wsBackHome:'ホーム',
   wsUploadNew:'新しい字幕', projEmpty:'字幕未読み込み', secImport:'読み込み', secLang:'言語',
   secStyle:'翻訳スタイル', secRules:'処理ルール', secEngine:'エンジン', lblSrcShort:'原文言語',
-  lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞を保持', lblAutoTermsShort:'自動用語集', lblMaxWShort:'折り返し幅', lblBiMaxWShort:'バイリンガル行幅（訳文）', wUnit:'文字', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
+  lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞', lblAutoTermsShort:'自動用語集', lblMaxWShort:'折り返し幅', lblBiMaxWShort:'バイリンガル行幅（訳文）', wUnit:'文字', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
   /* v0.9.70 两段式界面新增 */
 },
 'es': {pureMTMode:'Modelo de traducción pura detectado ({0}): se cambia a traducción directa por grupo ({1} grupos, 4 en paralelo, los grupos con éxito se guardan en caché)…',pureMTDone:'Traducción por grupo terminada: {0}/{1} grupos con éxito',gotClick:'Recibida la solicitud de iniciar traducción — preparando…',reqSent:'Solicitud del lote {0} enviada ({1} grupos): esperando la respuesta del modelo…',waitSec:'Esperando desde hace {0} s — todavía sin respuesta del modelo…',errTimeout:'Sin respuesta tras {0} s — se abandonó la solicitud (tiempo de espera agotado). Prueba a reducir el presupuesto de caracteres por lote o a usar un modelo más rápido; si el modelo razona antes de responder (Qwen3, GLM…), pon {"enable_thinking":false} en los parámetros adicionales',alreadyRunning:'La ejecución anterior aún no ha terminado — se ha solicitado la detención. Espera a que cierre el lote actual antes de volver a empezar',modeMismatch:'Atención: hay una API personalizada configurada abajo ({0}), pero el modo actual es “Modelo predeterminado”, así que no se usará. Cambia el modo a “API personalizada” para usarla',errTruncOut:'La salida del modelo alcanzó el límite de tokens y se truncó antes de terminar — aumenta max_tokens en Parámetros adicionales, p. ej. {"max_tokens":8192}',lblExtra:'Parámetros adicionales (JSON, opcional)',extraTip:'Se fusiona en el cuerpo de cada solicitud de API personalizada. Ej.: {"enable_thinking":false} para desactivar el razonamiento; {"response_format":{"type":"json_object"}} para forzar JSON. model / messages / temperature / stream no se pueden sobrescribir.',
@@ -1344,9 +1359,9 @@ const I18N = {
   lblProvider:'Proveedor', lblBase:'Base URL (/chat/completions se añade automáticamente)', lblModel:'Modelo', lblBatch:'Caracteres por lote', batchTip:'Caracteres de subtítulos enviados al modelo por solicitud. Los lotes se cortan por longitud automáticamente: las líneas cortas llenan más y las largas menos, manteniendo estable la salida. Los valores mayores terminan algo antes, pero un valor demasiado grande puede reducir la calidad; el valor por defecto 3000 sirve para la mayoría de los vídeos.',
   lblKey:'API Key (solo se guarda en este navegador)',
   chkKeepTerms:'Mantener nombres propios (personas/marcas/productos/términos) sin traducir',
-  termsHintOn:'Marcado = los términos de la lista se mantienen en su forma original (lista activada).',
-  termsHintOff:'Desactivado: todos los nombres/marcas/productos/términos se traducen; la lista se ignora.',
-  lblTerms:'Nombres propios a mantener en su forma original (opcional, separados por comas)', termsPh:'p. ej. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Nombres, organizaciones y marcas conservan su forma original y no se traducen. Las entradas del glosario de abajo siguen teniendo prioridad.',
+  termsHintOff:'Nombres, organizaciones y marcas se traducen todos al idioma de destino. Las entradas del glosario de abajo siguen teniendo prioridad.', pnKeep:'Mantener original', pnTrans:'Traducir todo', btnGlossFile:'📂 Subir glosario', glossHit:'Glosario: {0} términos, {1} coinciden en este archivo, {2} líneas no reconocidas',
+  lblTerms:'Glosario unificado (un término por línea)', termsPh:'Uno por línea: original → traducción; una línea con solo el original lo mantiene sin traducir',
   lblMaxW:'Ancho de línea en UNIDADES de ancho completo, no en caracteres: 1 carácter CJK = 1; las letras latinas, cirílicas, tailandesas y árabes = 0.5, es decir 1 unidad ≈ 2 caracteres en escrituras de medio ancho. Rige el ajuste monolingüe y las líneas de dos hablantes «- A - B» en exportación bilingüe. El valor predeterminado sigue la norma Netflix por idioma (zh/ko 16, ja 13, otros 21). Mayor = líneas más largas, menos saltos y divisiones.', lblBiMaxW:'Ancho máximo de la línea TRADUCIDA en exportación bilingüe (misma unidad de ancho completo, no caracteres: el mismo 32 equivale a unos 32 caracteres chinos pero unos 64 caracteres tailandeses). Limita solo la línea traducida; la línea original sigue los cortes semánticos y no tiene límite de ancho, y las líneas de dos hablantes usan el «Ancho de línea» de arriba. Solo superarlo divide la línea de tiempo. Este valor NO cambia por idioma. Mayor = menos divisiones pero líneas traducidas más largas.', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener', lyricTip:'가사 줄 처리 방식: 번역／원문 유지／삭제(그룹 전체 제거). 판단 기준은 ‘가사 기호’의 문자입니다.', marksTip:'이 문자가 포함된 자막 줄을 가사로 처리합니다. 기본값 ♪♫♬♩, 추가·삭제 가능, 비우면 기본값 복원. 파일에 음악 기호가 없다면 해당 기호를 추가하세요. 한 줄에 가사와 대사가 섞인 경우 ‘삭제’는 자동으로 원문 유지로 바뀌어 대사가 지워지지 않습니다.', lyricSkipKeep:'가사 {0}개 그룹을 설정대로 원문 유지(미번역)', lyricSkipDrop:'가사 {0}개 그룹을 설정대로 삭제', lyricWarn:'주의: {0}%의 줄이 가사로 판정되었습니다. ‘가사 기호’ 지정이 너무 넓을 수 있습니다. 확인 후 다시 실행하세요.', dropFillersTip:'Activado: las líneas que la regla local considera relleno puro (eh, mmm, tarareo sin sentido) se eliminan directamente y no se envían al modelo, así que el resultado es determinista. Desactivado: todas las líneas van al modelo, que decide una por una si traducirlas, mantenerlas o eliminarlas. Activado por defecto.',
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
@@ -1414,7 +1429,7 @@ const I18N = {
   aboutBody:'AI-SRTSub es un traductor de subtítulos con IA de código abierto. Creemos que una buena herramienta debe ser gratis, limpia y respetar la privacidad: sin anuncios, sin registro, sin tocar tus archivos. Despliega la tuya o ayúdanos a pulirla.', aboutRepo:'Repositorio GitHub', aboutLicense:'Código abierto AGPL-3.0', wsBackHome:'Inicio',
   wsUploadNew:'Nuevo subtítulo', projEmpty:'Sin subtítulo cargado', secImport:'Importar', secLang:'Idiomas',
   secStyle:'Estilo', secRules:'Reglas', secEngine:'Motor', lblSrcShort:'Idioma origen',
-  lblDstShort:'Idioma destino', lblKeepTermsShort:'Mantener nombres propios', lblAutoTermsShort:'Glosario automático', lblMaxWShort:'Ancho de línea', lblBiMaxWShort:'Ancho bilingüe (traducido)', wUnit:'caracteres', lblLyric:'가사 처리', lyricTrans:'번역', lyricKeep:'원문 유지', lyricDrop:'삭제', lblMarks:'가사 기호', lblDropFillers:'군더더기 제거',
+  lblDstShort:'Idioma destino', lblKeepTermsShort:'Nombres propios', lblAutoTermsShort:'Glosario automático', lblMaxWShort:'Ancho de línea', lblBiMaxWShort:'Ancho bilingüe (traducido)', wUnit:'caracteres', lblLyric:'가사 처리', lyricTrans:'번역', lyricKeep:'원문 유지', lyricDrop:'삭제', lblMarks:'가사 기호', lblDropFillers:'군더더기 제거',
   /* v0.9.70 两段式界面新增 */
 },
 'pt': {pureMTMode:'Modelo de tradução pura detectado ({0}): mudando para tradução direta por grupo ({1} grupos, 4 em paralelo, grupos bem-sucedidos ficam em cache)…',pureMTDone:'Tradução por grupo concluída: {0}/{1} grupos com sucesso',gotClick:'Pedido para iniciar a tradução recebido — a preparar…',reqSent:'Pedido do lote {0} enviado ({1} grupos) — aguardando a resposta do modelo…',waitSec:'Aguardando há {0} s — ainda sem resposta do modelo…',errTimeout:'Sem resposta após {0} s — pedido abandonado (tempo esgotado). Tente reduzir o orçamento de caracteres por lote ou usar um modelo mais rápido; se o modelo raciocina antes de responder (Qwen3, GLM…), coloque {"enable_thinking":false} nos parâmetros adicionais',alreadyRunning:'A execução anterior ainda não terminou — foi pedida a paragem. Aguarda que o lote atual conclua antes de recomeçar',modeMismatch:'Atenção: tens uma API personalizada preenchida abaixo ({0}), mas o modo atual é “Modelo predefinido”, por isso não será usada. Muda o modo para “API personalizada” para a utilizar',errTruncOut:'A saída do modelo atingiu o limite de tokens e foi truncada antes de terminar — aumente max_tokens em Parâmetros adicionais, p. ex. {"max_tokens":8192}',lblExtra:'Parâmetros adicionais (JSON, opcional)',extraTip:'É mesclado ao corpo de cada requisição de API personalizada. Ex.: {"enable_thinking":false} para desativar o raciocínio; {"response_format":{"type":"json_object"}} para forçar JSON. model / messages / temperature / stream não podem ser sobrescritos.',
@@ -1439,9 +1454,9 @@ const I18N = {
   lblProvider:'Provedor', lblBase:'Base URL (/chat/completions adicionado automaticamente)', lblModel:'Modelo', lblBatch:'Caracteres por lote', batchTip:'Caracteres de legendas enviados ao modelo por solicitação. Os lotes são cortados por comprimento automaticamente: linhas curtas cabem mais, longas menos, mantendo a saída estável. Valores maiores terminam um pouco antes, mas um valor muito grande pode reduzir a qualidade; o padrão 3000 serve para a maioria dos vídeos.',
   lblKey:'API Key (guardada apenas neste navegador)',
   chkKeepTerms:'Manter nomes próprios (pessoas/marcas/produtos/termos) sem traduzir',
-  termsHintOn:'Marcado = os termos da lista ficam na forma original (lista ativada).',
-  termsHintOff:'Desativado: todos os nomes/marcas/produtos/termos são traduzidos; a lista é ignorada.',
-  lblTerms:'Nomes próprios a manter na forma original (opcional, separados por vírgula)', termsPh:'ex.: SpaceX, Prism, EnduroSat',
+  termsHintOn:'Nomes, organizações e marcas mantêm a forma original e não são traduzidos. As entradas do glossário abaixo continuam tendo prioridade.',
+  termsHintOff:'Nomes, organizações e marcas são todos traduzidos para o idioma de destino. As entradas do glossário abaixo continuam tendo prioridade.', pnKeep:'Manter original', pnTrans:'Traduzir tudo', btnGlossFile:'📂 Enviar glossário', glossHit:'Glossário: {0} termos, {1} correspondem neste arquivo, {2} linhas não reconhecidas',
+  lblTerms:'Glossário unificado (um termo por linha)', termsPh:'Um por linha: original → tradução; uma linha com apenas o original mantém o original',
   lblMaxW:'Largura da linha em UNIDADES de largura cheia, não em caracteres: 1 caractere CJK = 1; letras latinas, cirílicas, tailandesas e árabes = 0.5, ou seja 1 unidade ≈ 2 caracteres em escritas de meia largura. Rege a quebra monolíngue e as linhas de dois falantes «- A - B» na exportação bilíngue. O padrão segue a norma Netflix por idioma (zh/ko 16, ja 13, outros 21). Maior = linhas mais longas, menos quebras e divisões.', lblBiMaxW:'Largura máxima da linha TRADUZIDA na exportação bilíngue (mesma unidade de largura cheia, não caracteres: o mesmo 32 equivale a cerca de 32 caracteres chineses mas cerca de 64 caracteres tailandeses). Limita apenas a linha traduzida; a linha original segue os cortes semânticos e não tem limite de largura, e as linhas de dois falantes usam a «Largura de linha» acima. Somente ultrapassá-la divide a linha de tempo. Este valor NÃO muda por idioma. Maior = menos divisões mas linhas traduzidas mais longas.', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar', lyricTip:'Cómo tratar las líneas de canción: traducir / mantener el original / eliminarlas. Se reconocen por los caracteres de «Marcas de letra».', marksTip:'Las líneas que contengan estos caracteres se tratan como letra de canción. Por defecto ♪♫♬♩; puedes añadir o quitar, y dejarlo vacío restaura el valor por defecto. Si tu archivo no usa símbolos musicales, añade el marcador que use. Si una línea mezcla letra y diálogo, «Eliminar» pasa a mantener el original para no borrar el diálogo.', lyricSkipKeep:'{0} grupo(s) de letra mantenidos en el original (sin traducir)', lyricSkipDrop:'{0} grupo(s) de letra eliminados según tu ajuste', lyricWarn:'Atención: el {0}% de las líneas se clasificaron como letra; puede que las marcas sean demasiado amplias. Revísalo y vuelve a ejecutar.', dropFillersTip:'Ativado: as linhas que a regra local considera preenchimento puro (hã, hmm, cantarolar sem sentido) são removidas diretamente e não enviadas ao modelo, portanto o resultado é determinístico. Desativado: todas as linhas vão para o modelo, que decide uma a uma se traduz, mantém ou remove. Ativado por padrão.',
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
@@ -1509,7 +1524,7 @@ const I18N = {
   aboutBody:'O AI-SRTSub é um tradutor de legendas com IA, de código aberto. Acreditamos que uma boa ferramenta deve ser grátis, limpa e respeitar a privacidade — sem anúncios, sem cadastro, sem mexer nos seus arquivos. Faça seu self-host ou ajude a lapidar.', aboutRepo:'Repositório GitHub', aboutLicense:'Código aberto AGPL-3.0', wsBackHome:'Início',
   wsUploadNew:'Nova legenda', projEmpty:'Nenhuma legenda carregada', secImport:'Importar', secLang:'Idiomas',
   secStyle:'Estilo', secRules:'Regras', secEngine:'Motor', lblSrcShort:'Idioma de origem',
-  lblDstShort:'Idioma de destino', lblKeepTermsShort:'Manter nomes próprios', lblAutoTermsShort:'Glossário automático', lblMaxWShort:'Largura de linha', lblBiMaxWShort:'Largura bilíngue (traduzido)', wUnit:'caracteres', lblLyric:'Letras de canciones', lyricTrans:'Traducir', lyricKeep:'Mantener original', lyricDrop:'Eliminar', lblMarks:'Marcas de letra', lblDropFillers:'Quitar muletillas',
+  lblDstShort:'Idioma de destino', lblKeepTermsShort:'Nomes próprios', lblAutoTermsShort:'Glossário automático', lblMaxWShort:'Largura de linha', lblBiMaxWShort:'Largura bilíngue (traduzido)', wUnit:'caracteres', lblLyric:'Letras de canciones', lyricTrans:'Traducir', lyricKeep:'Mantener original', lyricDrop:'Eliminar', lblMarks:'Marcas de letra', lblDropFillers:'Quitar muletillas',
   /* v0.9.70 两段式界面新增 */
 },
 'ko': {pureMTMode:'순수 번역 모델 감지됨({0}): 그룹별 직접 번역으로 전환합니다(총 {1}개 그룹, 4개 동시 처리, 성공한 그룹은 캐시)…',pureMTDone:'그룹별 번역 완료: {1}개 중 {0}개 성공',gotClick:'“번역 시작” 요청을 받았습니다 — 준비 중…',reqSent:'{0}번째 배치 요청 전송 완료({1}개 그룹) — 모델 응답 대기 중…',waitSec:'{0}초 대기 중 — 아직 모델 응답이 없습니다…',errTimeout:'{0}초 동안 응답이 없어 이번 요청을 포기했습니다(시간 초과). 「배치당 문자 수」를 줄이거나 더 빠른 모델로 바꿔 보세요. Qwen3 / GLM 처럼 먼저 추론하는 모델이라면 추가 요청 파라미터에 {"enable_thinking":false} 를 넣으세요',alreadyRunning:'이전 실행이 아직 끝나지 않았습니다 — 정지를 요청했습니다. 현재 배치가 마무리된 후 다시 시작하세요',modeMismatch:'주의: 아래에 사용자 지정 API({0})가 입력되어 있지만 현재 모드는 “기본 모델”이므로 사용되지 않습니다. 사용하려면 모드를 “사용자 지정 API”로 바꾸세요',errTruncOut:'모델 출력이 토큰 한도에 걸려 완성되지 못하고 잘렸습니다 — 추가 요청 파라미터에서 max_tokens를 늘리세요. 예: {"max_tokens":8192}',lblExtra:'추가 요청 파라미터 (JSON, 선택)',extraTip:'커스텀 API 요청 본문에 함께 전송됩니다. 예: {"enable_thinking":false}(추론 비활성화), {"response_format":{"type":"json_object"}}(JSON 출력 강제). model / messages / temperature / stream 는 덮어쓸 수 없습니다.',
@@ -1534,9 +1549,9 @@ const I18N = {
   lblProvider:'공급자', lblBase:'Base URL(/chat/completions 자동 추가)', lblModel:'모델', lblBatch:'배치당 글자 수', batchTip:'요청마다 모델로 보내는 자막의 글자 수입니다. 길이에 따라 자동으로 나뉘어 짧은 줄은 많이, 긴 줄은 적게 담기며 각 배치의 출력량이 안정적입니다. 값이 클수록 총 시간이 다소 짧아지지만 너무 크면 품질이 떨어질 수 있습니다. 기본값 3000은 대부분의 영상에 적합합니다.',
   lblKey:'API Key(이 브라우저에만 저장)',
   chkKeepTerms:'고유명사(인물/브랜드/제품/용어)를 번역하지 않고 원문 유지',
-  termsHintOn:'체크 = 목록의 용어를 원문 그대로 유지(목록 활성화).',
-  termsHintOff:'끔: 모든 인물/브랜드/제품/용어를 번역하며 용어 목록은 무시됩니다.',
-  lblTerms:'원문으로 유지할 고유명사(선택, 쉼표로 구분)', termsPh:'예: SpaceX, Prism, EnduroSat',
+  termsHintOn:'인명·기관·브랜드는 원문 철자 그대로 두고 번역하지 않습니다. 아래 용어집에 지정한 항목이 우선합니다.',
+  termsHintOff:'인명·기관·브랜드는 모두 대상 언어의 관용 표기로 번역합니다. 아래 용어집에 지정한 항목이 우선합니다.', pnKeep:'원문 유지', pnTrans:'모두 번역', btnGlossFile:'📂 용어집 업로드', glossHit:'용어집 {0}개: 이 파일에서 {1}개 일치, {2}줄은 인식하지 못했습니다',
+  lblTerms:'용어 통일(용어집, 한 줄에 하나)', termsPh:'한 줄에 하나: 원문 → 역어. 원문만 적으면 원문 유지',
   lblMaxW:'줄 너비는 글자 수가 아닌 전각 단위입니다: CJK 1자 = 1, 라틴·키릴·태국·아랍 문자 = 0.5(반각 문자는 1단위≈2자). 단일 언어 줄바꿈과 이중언어의 「- A - B」 두 화자 줄에 적용됩니다. 기본값은 언어별 Netflix 규격(중/한 16, 일 13, 기타 21). 크게 하면 줄이 길어지고 줄 수와 분할이 줄어듭니다.', lblBiMaxW:'이중언어 내보내기에서 【번역문 줄】의 최대 너비(같은 전각 단위이며 글자 수가 아님: 똑같이 32여도 중국어≈32자, 태국어≈64자). 번역문 줄만 제한하고 원문 줄은 의미 단위를 따르며 너비 제한이 없고, 두 화자 줄은 위의 「줄 폭 기준」을 씁니다. 번역문이 넘칠 때만 타임라인을 분할합니다. 이 값은 언어별로 바뀌지 않습니다. 크게 하면 분할은 줄지만 번역문 줄이 길어집니다.', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지', lyricTip:'Como tratar as linhas de música: traduzir / manter o original / remover. O reconhecimento usa os caracteres de «Marcas de letra».', marksTip:'Linhas com estes caracteres são tratadas como letra de música. Padrão ♪♫♬♩; pode acrescentar ou remover, e deixar vazio restaura o padrão. Se o seu arquivo não usa símbolos musicais, adicione o marcador que ele usa. Se uma linha misturar letra e diálogo, «Remover» passa a manter o original para não apagar o diálogo.', lyricSkipKeep:'{0} grupo(s) de letra mantidos no original (sem tradução)', lyricSkipDrop:'{0} grupo(s) de letra removidos conforme sua configuração', lyricWarn:'Atenção: {0}% das linhas foram classificadas como letra; o conjunto de marcas pode estar amplo demais. Confira e execute novamente.', dropFillersTip:'켜짐: 로컬 규칙이 순수 채움말(음, 어, 의미 없는 콧노래 등)로 판정한 줄은 바로 제거하고 모델에 보내지 않습니다(결과가 확정적). 꺼짐: 모든 줄을 모델에 보내 번역·유지·삭제를 줄마다 모델이 판단합니다. 기본은 켜짐.',
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
@@ -1604,7 +1619,7 @@ const I18N = {
   aboutBody:'AI-SRTSub는 오픈소스 AI 자막 번역 도구입니다. 좋은 자막 도구는 무료·깔끔·프라이버시 존중이어야 한다고 믿습니다——광고 없음, 가입 없음, 파일 만지지 않음. 직접 설치하거나 요청을 남겨주세요.', aboutRepo:'GitHub 저장소', aboutLicense:'AGPL-3.0 오픈소스', wsBackHome:'홈',
   wsUploadNew:'새 자막 올리기', projEmpty:'자막 없음', secImport:'가져오기', secLang:'언어',
   secStyle:'번역 스타일', secRules:'처리 규칙', secEngine:'엔진', lblSrcShort:'원본 언어',
-  lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사 원문 유지', lblAutoTermsShort:'자동 용어집', lblMaxWShort:'줄 폭 기준', lblBiMaxWShort:'이중언어 너비(번역문)', wUnit:'자', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
+  lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사', lblAutoTermsShort:'자동 용어집', lblMaxWShort:'줄 폭 기준', lblBiMaxWShort:'이중언어 너비(번역문)', wUnit:'자', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
   /* v0.9.70 两段式界面新增 */
 },
 'de': {pureMTMode:'Reines Übersetzungsmodell erkannt ({0}): Wechsel zur direkten Übersetzung pro Gruppe ({1} Gruppen, 4 parallel, erfolgreiche Gruppen werden zwischengespeichert)…',pureMTDone:'Gruppenweise Übersetzung abgeschlossen: {0}/{1} Gruppen erfolgreich',gotClick:'Anfrage zum Start der Übersetzung erhalten — wird vorbereitet…',reqSent:'Anfrage für Batch {0} gesendet ({1} Gruppen) — warte auf die Antwort des Modells…',waitSec:'Seit {0} s gewartet — weiterhin keine Antwort des Modells…',errTimeout:'Nach {0} s keine Antwort — Anfrage abgebrochen (Zeitüberschreitung). Verringere das Zeichenbudget pro Batch oder wechsle zu einem schnelleren Modell; wenn das Modell vor der Antwort nachdenkt (Qwen3, GLM…), trage {"enable_thinking":false} bei den zusätzlichen Anfrageparametern ein',alreadyRunning:'Der vorherige Lauf ist noch nicht beendet — der Stopp wurde angefordert. Warte, bis der aktuelle Batch abgeschlossen ist, bevor du neu startest',modeMismatch:'Achtung: Unten ist eine benutzerdefinierte API eingetragen ({0}), der Modus ist aber „Standardmodell“ — sie wird nicht verwendet. Wechsle oben auf „Benutzerdefinierte API“, um sie zu nutzen',errTruncOut:'Die Modellausgabe erreichte das Token-Limit und wurde vorzeitig abgeschnitten — erhöhe max_tokens in den zusätzlichen Anfrageparametern, z. B. {"max_tokens":8192}',lblExtra:'Zusätzliche Anfrageparameter (JSON, optional)',extraTip:'Wird in jeden Anfragetext der benutzerdefinierten API eingefügt. Z. B. {"enable_thinking":false} zum Abschalten des Nachdenkens; {"response_format":{"type":"json_object"}} erzwingt JSON. model / messages / temperature / stream sind nicht überschreibbar.',
@@ -1629,9 +1644,9 @@ const I18N = {
   lblProvider:'Anbieter', lblBase:'Base URL (/chat/completions wird automatisch angehängt)', lblModel:'Modell', lblBatch:'Zeichen pro Batch', batchTip:'Zeichenanzahl der Untertitel pro Anfrage an das Modell. Batches werden automatisch nach Länge geschnitten: kurze Zeilen füllen mehr, lange weniger, so bleibt jede Ausgabe stabil. Größere Werte sind etwas schneller, aber zu groß kann die Qualität mindern; der Standard 3000 passt für die meisten Videos.',
   lblKey:'API Key (nur in diesem Browser gespeichert)',
   chkKeepTerms:'Eigennamen (Personen/Firmen/Produkte/Begriffe) unübersetzt lassen',
-  termsHintOn:'Aktiviert = Begriffe aus der Liste bleiben in Originalform (Liste aktiv).',
-  termsHintOff:'Aus: alle Namen/Firmen/Produkte/Begriffe werden übersetzt; die Liste wird ignoriert.',
-  lblTerms:'Eigennamen, die in Originalform bleiben sollen (optional, kommagetrennt)', termsPh:'z. B. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Personen, Organisationen und Marken behalten ihre Originalschreibweise und werden nicht übersetzt. Einträge im Glossar unten haben weiterhin Vorrang.',
+  termsHintOff:'Personen, Organisationen und Marken werden alle in die Zielsprache übersetzt. Einträge im Glossar unten haben weiterhin Vorrang.', pnKeep:'Original behalten', pnTrans:'Alle übersetzen', btnGlossFile:'📂 Glossar hochladen', glossHit:'Glossar: {0} Einträge, {1} in dieser Datei gefunden, {2} Zeilen nicht erkannt',
+  lblTerms:'Einheitliches Glossar (ein Begriff pro Zeile)', termsPh:'Eine pro Zeile: Original → Übersetzung; eine Zeile nur mit dem Original behält dieses bei',
   lblMaxW:'Zeilenbreite in Vollbreiten-EINHEITEN, nicht in Zeichen: 1 CJK-Zeichen = 1; lateinische, kyrillische, thailändische und arabische Buchstaben = 0.5, also 1 Einheit ≈ 2 Zeichen bei halbbreiten Schriften. Gilt für den einsprachigen Umbruch und für "- A - B"-Zwei-Sprecher-Zeilen im zweisprachigen Export. Standard folgt der Netflix-Norm je Sprache (zh/ko 16, ja 13, andere 21). Größer = längere Zeilen, weniger Umbrüche und Teilungen.', lblBiMaxW:'Maximale Breite der ÜBERSETZTEN Zeile im zweisprachigen Export (gleiche Vollbreiten-Einheit, nicht Zeichen: dieselben 32 entsprechen etwa 32 chinesischen Zeichen, aber etwa 64 thailändischen Zeichen). Beschränkt nur die übersetzte Zeile; die Quellzeile folgt semantischen Brüchen und ist nicht breitenbegrenzt, und Zwei-Sprecher-Zeilen nutzen "Zeilenbreite" oben. Nur ein Überschreiten teilt die Timeline. Dieser Wert ändert sich NICHT je Sprache. Größer = weniger Teilungen, aber längere Übersetzungszeilen.', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen', lyricTip:'Umgang mit Liedzeilen: übersetzen / Original behalten / entfernen. Erkannt werden sie an den Zeichen unter „Liedmarken“.', marksTip:'Zeilen mit diesen Zeichen gelten als Liedtext. Standard ♪♫♬♩ — beliebig ergänzen oder entfernen; leer stellt den Standard wieder her. Wenn deine Datei keine Musikzeichen nutzt, trage deren Markierung ein. Enthält eine Zeile Gesang und Dialog, wechselt „Entfernen“ zu „Original behalten“, damit kein Dialog verloren geht.', lyricSkipKeep:'{0} Liedgruppen wurden gemäß Einstellung im Original belassen (nicht übersetzt)', lyricSkipDrop:'{0} Liedgruppen wurden gemäß Einstellung entfernt', lyricWarn:'Achtung: {0}% der Zeilen wurden als Liedtext eingestuft — die Marken sind womöglich zu weit gefasst. Bitte prüfen und erneut starten.', dropFillersTip:'Ein: Zeilen, die die lokale Regel als reines Füllmaterial einstuft (äh, hmm, bedeutungsloses Summen), werden direkt entfernt und nicht an das Modell gesendet, das Ergebnis ist also bestimmt. Aus: Alle Zeilen gehen an das Modell, das pro Zeile entscheidet, ob sie übersetzt, behalten oder entfernt wird. Standardmäßig ein.',
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
@@ -1699,7 +1714,7 @@ const I18N = {
   aboutBody:'AI-SRTSub ist ein Open-Source-Untertitelübersetzer mit KI. Wir finden: Gute Tools sind kostenlos, sauber und respektieren die Privatsphäre — keine Werbung, keine Anmeldung, keine Finger auf deinen Dateien. Self-Hosten und Mitschmieden willkommen.', aboutRepo:'GitHub-Repository', aboutLicense:'Open Source AGPL-3.0', wsBackHome:'Start',
   wsUploadNew:'Neuer Untertitel', projEmpty:'Kein Untertitel geladen', secImport:'Import', secLang:'Sprachen',
   secStyle:'Stil', secRules:'Regeln', secEngine:'Engine', lblSrcShort:'Ausgangssprache',
-  lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen behalten', lblAutoTermsShort:'Auto-Glossar', lblMaxWShort:'Zeilenbreite', lblBiMaxWShort:'Zweisprachige Breite (Übersetzung)', wUnit:'Zeichen', lblLyric:'Liedtexte', lyricTrans:'Übersetzen', lyricKeep:'Original behalten', lyricDrop:'Entfernen', lblMarks:'Liedmarken', lblDropFillers:'Füllwörter entfernen',
+  lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen', lblAutoTermsShort:'Auto-Glossar', lblMaxWShort:'Zeilenbreite', lblBiMaxWShort:'Zweisprachige Breite (Übersetzung)', wUnit:'Zeichen', lblLyric:'Liedtexte', lyricTrans:'Übersetzen', lyricKeep:'Original behalten', lyricDrop:'Entfernen', lblMarks:'Liedmarken', lblDropFillers:'Füllwörter entfernen',
   /* v0.9.70 两段式界面新增 */
 },
 'fr': {pureMTMode:'Modèle de traduction pure détecté ({0}) : passage à la traduction directe par groupe ({1} groupes, 4 en parallèle, les groupes réussis sont mis en cache)…',pureMTDone:'Traduction par groupe terminée : {0}/{1} groupes réussis',gotClick:'Demande de démarrage de la traduction reçue — préparation…',reqSent:'Requête du lot {0} envoyée ({1} groupes) — en attente de la réponse du modèle…',waitSec:'{0} s d’attente — toujours aucune réponse du modèle…',errTimeout:'Aucune réponse après {0} s — requête abandonnée (délai dépassé). Réduisez le budget de caractères par lot ou choisissez un modèle plus rapide ; si le modèle réfléchit avant de répondre (Qwen3, GLM…), mettez {"enable_thinking":false} dans les paramètres supplémentaires',alreadyRunning:'L’exécution précédente n’est pas encore terminée — l’arrêt a été demandé. Attendez la fin du lot en cours avant de relancer',modeMismatch:'Attention : une API personnalisée est renseignée ci-dessous ({0}), mais le mode est « Modèle par défaut » — elle ne sera donc pas utilisée. Passez le mode sur « API personnalisée » pour l’utiliser',errTruncOut:'La sortie du modèle a atteint la limite de jetons et a été tronquée avant la fin — augmentez max_tokens dans les paramètres supplémentaires, p. ex. {"max_tokens":8192}',lblExtra:'Paramètres de requête supplémentaires (JSON, optionnel)',extraTip:'Fusionné dans le corps de chaque requête d\'API personnalisée. Ex. : {"enable_thinking":false} pour désactiver le raisonnement ; {"response_format":{"type":"json_object"}} pour forcer le JSON. model / messages / temperature / stream ne peuvent pas être remplacés.',
@@ -1724,9 +1739,9 @@ const I18N = {
   lblProvider:'Fournisseur', lblBase:'Base URL (/chat/completions ajouté automatiquement)', lblModel:'Modèle', lblBatch:'Caractères par lot', batchTip:'Nombre de caractères de sous-titres envoyés au modèle par requête. Les lots sont découpés automatiquement par longueur : les lignes courtes en remplissent plus, les longues moins, ce qui stabilise chaque sortie. Une valeur plus grande est légèrement plus rapide, mais une valeur trop grande peut réduire la qualité ; 3000 par défaut convient à la plupart des vidéos.',
   lblKey:'Clé API (stockée uniquement dans ce navigateur)',
   chkKeepTerms:'Conserver les noms propres (personnes/marques/produits/termes) non traduits',
-  termsHintOn:'Coché = les termes de la liste restent en forme originale (liste activée).',
-  termsHintOff:'Désactivé : tous les noms/marques/produits/termes sont traduits ; la liste est ignorée.',
-  lblTerms:'Noms propres à conserver en forme originale (facultatif, séparés par des virgules)', termsPh:'ex. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Les noms de personnes, d’organisations et de marques gardent leur forme originale et ne sont pas traduits. Les entrées du glossaire ci-dessous restent prioritaires.',
+  termsHintOff:'Les noms de personnes, d’organisations et de marques sont tous traduits dans la langue cible. Les entrées du glossaire ci-dessous restent prioritaires.', pnKeep:'Garder l’original', pnTrans:'Tout traduire', btnGlossFile:'📂 Importer un glossaire', glossHit:'Glossaire : {0} entrées, {1} trouvées dans ce fichier, {2} lignes non reconnues',
+  lblTerms:'Glossaire unifié (un terme par ligne)', termsPh:'Un par ligne : original → traduction ; une ligne contenant uniquement l’original conserve l’original',
   lblMaxW:'Largeur de ligne en UNITÉS de pleine largeur, non en caractères : 1 caractère CJC = 1 ; les lettres latines, cyrilliques, thaïes et arabes = 0,5, soit 1 unité ≈ 2 caractères pour les écritures à demi-largeur. Régit le retour à la ligne monolingue et les lignes à deux locuteurs « - A - B » en export bilingue. La valeur par défaut suit la norme Netflix par langue (zh/ko 16, ja 13, autres 21). Plus grand = lignes plus longues, moins de retours et de divisions.', lblBiMaxW:'Largeur maximale de la ligne TRADUITE en export bilingue (même unité de pleine largeur, non des caractères : le même 32 correspond à environ 32 caractères chinois mais environ 64 caractères thaïs). Ne limite que la ligne traduite ; la ligne source suit les coupures sémantiques et n est pas limitée en largeur, et les lignes à deux locuteurs utilisent la « Largeur de ligne » ci-dessus. Seul un dépassement divise la timeline. Cette valeur ne change PAS selon la langue. Plus grand = moins de divisions mais lignes traduites plus longues.', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter', lyricTip:'Traitement des lignes chantées : traduire / garder l\'original / supprimer. La détection utilise les caractères de « Marques de paroles ».', marksTip:'Les lignes contenant ces caractères sont traitées comme des paroles. Par défaut ♪♫♬♩ — à modifier librement ; laisser vide restaure le défaut. Si votre fichier n\'utilise aucun symbole musical, ajoutez le marqueur qu\'il emploie. Si une ligne mêle chant et dialogue, « Supprimer » bascule sur « garder l\'original » pour ne pas effacer le dialogue.', lyricSkipKeep:'{0} groupe(s) de paroles conservés en langue originale (non traduits)', lyricSkipDrop:'{0} groupe(s) de paroles supprimés selon votre réglage', lyricWarn:'Attention : {0} % des lignes ont été classées comme paroles — le jeu de marques est peut-être trop large. Vérifiez puis relancez.', dropFillersTip:'Activé : les lignes que la règle locale juge comme pur remplissage (euh, hmm, fredonnement sans signification) sont supprimées directement et ne sont pas envoyées au modèle, le résultat est donc déterministe. Désactivé : toutes les lignes vont au modèle, qui décide au cas par cas s’il faut les traduire, les conserver ou les supprimer. Activé par défaut.',
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
@@ -1794,7 +1809,7 @@ const I18N = {
   aboutBody:'AI-SRTSub est un traducteur de sous-titres IA open source. Pour nous, un bon outil doit être gratuit, propre et respecter la vie privée — pas de pub, pas d\'inscription, on ne touche pas à vos fichiers. Auto-hébergez-vous ou venez le polir avec nous.', aboutRepo:'Dépôt GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Accueil',
   wsUploadNew:'Nouveau sous-titre', projEmpty:'Aucun sous-titre chargé', secImport:'Importer', secLang:'Langues',
   secStyle:'Style', secRules:'Règles', secEngine:'Moteur', lblSrcShort:'Langue source',
-  lblDstShort:'Langue cible', lblKeepTermsShort:'Garder les noms propres', lblAutoTermsShort:'Glossaire auto', lblMaxWShort:'Largeur de ligne', lblBiMaxWShort:'Largeur bilingue (traduit)', wUnit:'caractères', lblLyric:'Paroles', lyricTrans:'Traduire', lyricKeep:'Garder l\'original', lyricDrop:'Supprimer', lblMarks:'Marques de paroles', lblDropFillers:'Supprimer les tics',
+  lblDstShort:'Langue cible', lblKeepTermsShort:'Noms propres', lblAutoTermsShort:'Glossaire auto', lblMaxWShort:'Largeur de ligne', lblBiMaxWShort:'Largeur bilingue (traduit)', wUnit:'caractères', lblLyric:'Paroles', lyricTrans:'Traduire', lyricKeep:'Garder l\'original', lyricDrop:'Supprimer', lblMarks:'Marques de paroles', lblDropFillers:'Supprimer les tics',
   /* v0.9.70 两段式界面新增 */
 },
 'id': {pureMTMode:'Model terjemahan murni terdeteksi ({0}): beralih ke terjemahan langsung per grup ({1} grup, 4 paralel, grup yang berhasil disimpan dalam cache)…',pureMTDone:'Terjemahan per grup selesai: {0}/{1} grup berhasil',gotClick:'Permintaan mulai terjemahan diterima — menyiapkan…',reqSent:'Permintaan batch {0} terkirim ({1} grup) — menunggu respons model…',waitSec:'Menunggu {0} dtk — model masih belum merespons…',errTimeout:'Tidak ada respons setelah {0} dtk — permintaan dibatalkan (waktu habis). Coba kecilkan anggaran karakter per batch atau ganti ke model yang lebih cepat; jika model berpikir sebelum menjawab (Qwen3, GLM…), isi {"enable_thinking":false} di parameter permintaan tambahan',alreadyRunning:'Eksekusi sebelumnya belum selesai — penghentian diminta. Tunggu batch saat ini selesai sebelum mulai lagi',modeMismatch:'Perhatian: API kustom sudah terisi di bawah ({0}), tetapi mode saat ini adalah “Model bawaan”, jadi tidak akan dipakai. Ganti mode ke “API kustom” untuk menggunakannya',errTruncOut:'Keluaran model mencapai batas token dan terpotong sebelum selesai — naikkan max_tokens di Parameter permintaan tambahan, mis. {"max_tokens":8192}',lblExtra:'Parameter permintaan tambahan (JSON, opsional)',extraTip:'Digabungkan ke setiap body permintaan API kustom. Contoh: {"enable_thinking":false} untuk mematikan penalaran; {"response_format":{"type":"json_object"}} untuk memaksa JSON. model / messages / temperature / stream tidak dapat ditimpa.',
@@ -1819,9 +1834,9 @@ const I18N = {
   lblProvider:'Penyedia', lblBase:'Base URL (/chat/completions ditambahkan otomatis)', lblModel:'Model', lblBatch:'Karakter per batch', batchTip:'Jumlah karakter subtitle yang dikirim ke model per permintaan. Batch dipotong otomatis menurut panjang: baris pendek memuat lebih banyak, baris panjang lebih sedikit, sehingga keluaran setiap batch stabil. Nilai lebih besar sedikit lebih cepat, namun nilai terlalu besar dapat menurunkan kualitas; default 3000 cocok untuk sebagian besar video.',
   lblKey:'API Key (hanya tersimpan di browser ini)',
   chkKeepTerms:'Pertahankan nama diri (orang/merek/produk/istilah) tanpa diterjemahkan',
-  termsHintOn:'Dicentang = istilah dalam daftar tetap dalam bentuk asli (daftar aktif).',
-  termsHintOff:'Mati: semua nama/merek/produk/istilah diterjemahkan; daftar diabaikan.',
-  lblTerms:'Nama diri yang dipertahankan dalam bentuk asli (opsional, pisahkan koma)', termsPh:'mis. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Nama orang, organisasi dan merek tetap dalam ejaan aslinya dan tidak diterjemahkan. Entri di glosarium bawah tetap diutamakan.',
+  termsHintOff:'Nama orang, organisasi dan merek semuanya diterjemahkan ke bahasa target. Entri di glosarium bawah tetap diutamakan.', pnKeep:'Pertahankan asli', pnTrans:'Terjemahkan semua', btnGlossFile:'📂 Unggah glosarium', glossHit:'Glosarium: {0} entri, {1} cocok di file ini, {2} baris tidak dikenali',
+  lblTerms:'Glosarium terpadu (satu istilah per baris)', termsPh:'Satu per baris: asli → terjemahan; baris yang hanya berisi kata asli mempertahankan bentuk aslinya',
   lblMaxW:'Lebar baris dalam UNIT lebar penuh, bukan jumlah karakter: 1 karakter CJK = 1; huruf Latin, Sirilik, Thai, dan Arab = 0.5, jadi 1 unit ≈ 2 karakter untuk aksara setengah lebar. Mengatur pembungkusan ekabahasa dan baris dua pembicara «- A - B» pada ekspor dwibahasa. Nilai default mengikuti norma Netflix per bahasa (zh/ko 16, ja 13, lainnya 21). Lebih besar = baris lebih panjang, lebih sedikit pemotongan baris dan pemisahan.', lblBiMaxW:'Lebar maksimum baris TERJEMAHAN pada ekspor dwibahasa (satuan lebar penuh yang sama, bukan jumlah karakter: nilai 32 yang sama ≈ 32 karakter Tionghoa tetapi ≈ 64 karakter Thai). Hanya membatasi baris terjemahan; baris sumber mengikuti jeda semantik dan tidak dibatasi lebarnya, dan baris dua pembicara memakai «Lebar baris» di atas. Hanya jika terlampaui barulah timeline dibelah. Nilai ini TIDAK berubah per bahasa. Lebih besar = lebih sedikit pemisahan tetapi baris terjemahan lebih panjang.', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti', lyricTip:'Cara menangani baris lirik: terjemahkan / pertahankan teks asli / hapus. Pendeteksian memakai karakter di “Penanda lirik”.', marksTip:'Baris yang memuat karakter ini dianggap lirik. Bawaan ♪♫♬♩ — bisa ditambah atau dihapus; dikosongkan akan mengembalikan bawaan. Jika berkas Anda tidak memakai simbol musik, tambahkan penanda yang dipakainya. Jika satu baris mencampur lirik dan dialog, “Hapus” otomatis turun ke mempertahankan asli agar dialog tidak ikut terhapus.', lyricSkipKeep:'{0} grup lirik dipertahankan dalam bahasa asli (tidak diterjemahkan)', lyricSkipDrop:'{0} grup lirik dihapus sesuai pengaturan', lyricWarn:'Perhatian: {0}% baris terdeteksi sebagai lirik — kemungkinan penanda terlalu luas. Periksa lalu jalankan ulang.', dropFillersTip:'Aktif: baris yang dinilai aturan lokal sebagai pengisi murni (eh, hmm, bersenandung tanpa arti) langsung dihapus dan tidak dikirim ke model, sehingga hasilnya pasti. Nonaktif: semua baris dikirim ke model, yang memutuskan per baris apakah diterjemahkan, dipertahankan, atau dihapus. Aktif secara bawaan.',
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
@@ -1889,7 +1904,7 @@ const I18N = {
   aboutBody:'AI-SRTSub adalah penerjemah subtitel AI sumber terbuka. Kami percaya alat yang baik harus gratis, bersih, dan menghormati privasi — tanpa iklan, tanpa pendaftaran, tanpa menyentuh file Anda. Silakan self-host atau ikut menyempurnakan.', aboutRepo:'Repositori GitHub', aboutLicense:'Sumber terbuka AGPL-3.0', wsBackHome:'Beranda',
   wsUploadNew:'Subtitel baru', projEmpty:'Belum ada subtitel', secImport:'Impor', secLang:'Bahasa',
   secStyle:'Gaya', secRules:'Aturan', secEngine:'Mesin', lblSrcShort:'Bahasa sumber',
-  lblDstShort:'Bahasa target', lblKeepTermsShort:'Pertahankan nama diri', lblAutoTermsShort:'Glosarium otomatis', lblMaxWShort:'Lebar baris', lblBiMaxWShort:'Lebar dwibahasa (terjemahan)', wUnit:'karakter', lblLyric:'Lirik', lyricTrans:'Terjemahkan', lyricKeep:'Pertahankan asli', lyricDrop:'Hapus', lblMarks:'Penanda lirik', lblDropFillers:'Hapus kata pengisi',
+  lblDstShort:'Bahasa target', lblKeepTermsShort:'Nama diri', lblAutoTermsShort:'Glosarium otomatis', lblMaxWShort:'Lebar baris', lblBiMaxWShort:'Lebar dwibahasa (terjemahan)', wUnit:'karakter', lblLyric:'Lirik', lyricTrans:'Terjemahkan', lyricKeep:'Pertahankan asli', lyricDrop:'Hapus', lblMarks:'Penanda lirik', lblDropFillers:'Hapus kata pengisi',
   /* v0.9.70 两段式界面新增 */
 },
 'hi': {pureMTMode:'शुद्ध अनुवाद मॉडल पाया गया ({0}): प्रति-समूह सीधे अनुवाद पर जा रहे हैं ({1} समूह, 4 समानांतर, सफल समूह कैश होंगे)…',pureMTDone:'प्रति-समूह अनुवाद पूरा: {1} में {0} समूह सफल',gotClick:'“अनुवाद शुरू करें” अनुरोध मिला — तैयार किया जा रहा है…',reqSent:'बैच {0} का अनुरोध भेजा गया ({1} समूह) — मॉडल की प्रतिक्रिया की प्रतीक्षा…',waitSec:'{0} सेकंड हो गए — अभी भी मॉडल से कोई प्रतिक्रिया नहीं…',errTimeout:'{0} सेकंड तक कोई प्रतिक्रिया नहीं — अनुरोध छोड़ दिया गया (समय समाप्त)। प्रति बैच अक्षर बजट घटाएँ या तेज़ मॉडल अपनाएँ; यदि मॉडल उत्तर से पहले तर्क करता है (Qwen3, GLM…), तो अतिरिक्त अनुरोध पैरामीटर में {"enable_thinking":false} डालें',alreadyRunning:'पिछला रन अभी समाप्त नहीं हुआ है — रोकने का अनुरोध भेज दिया गया। फिर से शुरू करने से पहले वर्तमान बैच के पूरा होने तक प्रतीक्षा करें',modeMismatch:'ध्यान दें: नीचे कस्टम API ({0}) भरी हुई है, लेकिन ऊपर का मोड “डिफ़ॉल्ट मॉडल” है, इसलिए इसका उपयोग नहीं होगा। उपयोग करने के लिए मोड को “कस्टम API” पर बदलें',errTruncOut:'मॉडल का आउटपुट टोकन सीमा पर पहुँचकर अधूरा कट गया — अतिरिक्त अनुरोध पैरामीटर में max_tokens बढ़ाएँ, जैसे {"max_tokens":8192}',lblExtra:'अतिरिक्त अनुरोध पैरामीटर (JSON, वैकल्पिक)',extraTip:'हर कस्टम API अनुरोध के body में जोड़ा जाता है। उदा. {"enable_thinking":false} तर्क बंद करने के लिए; {"response_format":{"type":"json_object"}} JSON लागू करने के लिए। model / messages / temperature / stream ओवरराइड नहीं किए जा सकते।',
@@ -1914,9 +1929,9 @@ const I18N = {
   lblProvider:'प्रदाता', lblBase:'Base URL (/chat/completions स्वतः जुड़ता है)', lblModel:'मॉडल', lblBatch:'प्रति बैच अक्षर', batchTip:'प्रति अनुरोध मॉडल को भेजी जाने वाली सबटाइटल के अक्षर। बैच लंबाई के अनुसार स्वतः कटते हैं: छोटी पंक्तियाँ अधिक, लंबी पंक्तियाँ कम, जिससे हर बैच का आउटपुट स्थिर रहता है। मान बड़ा होने पर समय कुछ घटता है, लेकिन बहुत बड़ा मान गुणवत्ता गिरा सकता है; डिफ़ॉल्ट 3000 अधिकांश वीडियो के लिए उपयुक्त है।',
   lblKey:'API Key (केवल इस ब्राउज़र में सहेजा जाता है)',
   chkKeepTerms:'संज्ञाएँ (नाम/ब्रांड/उत्पाद/शब्दावली) अनूदित न रखें',
-  termsHintOn:'चयनित = सूची के शब्द मूल रूप में रहेंगे (सूची सक्रिय)।',
-  termsHintOff:'बंद: सभी नाम/ब्रांड/उत्पाद/शब्दावली अनुवाद होंगे; सूची नज़रअंदाज़।',
-  lblTerms:'मूल रूप में रखने योग्य संज्ञाएँ (वैकल्पिक, कॉमा से अलग)', termsPh:'जैसे SpaceX, Prism, EnduroSat',
+  termsHintOn:'व्यक्ति, संस्था और ब्रांड के नाम मूल रूप में रखे जाते हैं और अनूदित नहीं किए जाते। नीचे दी गई शब्दावली के शब्द प्राथमिक रहते हैं।',
+  termsHintOff:'व्यक्ति, संस्था और ब्रांड के नाम सभी लक्ष्य भाषा में अनूदित किए जाते हैं। नीचे दी गई शब्दावली के शब्द प्राथमिक रहते हैं।', pnKeep:'मूल रखें', pnTrans:'सबका अनुवाद', btnGlossFile:'📂 शब्दावली अपलोड करें', glossHit:'शब्दावली: {0} शब्द, इस फ़ाइल में {1} मिले, {2} पंक्तियाँ अपरिचित',
+  lblTerms:'एकरूप शब्दावली (एक पंक्ति में एक शब्द)', termsPh:'प्रति पंक्ति एक: मूल → अनुवाद; केवल मूल शब्द वाली पंक्ति मूल रूप रखती है',
   lblMaxW:'पंक्ति चौड़ाई पूर्ण-चौड़ाई इकाइयों में है, अक्षरों में नहीं: 1 CJK अक्षर = 1; लैटिन, सिरिलिक, थाई और अरबी अक्षर = 0.5, अतः अर्द्ध-चौड़ाई लिपियों में 1 इकाई ≈ 2 अक्षर। एकभाषी रैपिंग और द्विभाषी निर्यात में «- A - B» दो-वक्ता पंक्तियों पर लागू। डिफ़ॉल्ट भाषा अनुसार Netflix मानक (zh/ko 16, ja 13, अन्य 21)। बड़ा = लंबी पंक्तियाँ, कम विभाजन।', lblBiMaxW:'द्विभाषी निर्यात में अनूदित पंक्ति की अधिकतम चौड़ाई (वही पूर्ण-चौड़ाई इकाई, अक्षर नहीं: वही 32 ≈ 32 चीनी अक्षर लेकिन ≈ 64 थाई अक्षर)। केवल अनूदित पंक्ति सीमित; स्रोत पंक्ति अर्थ-विराम का पालन करती है और चौड़ाई-मुक्त है; दो-वक्ता पंक्तियाँ ऊपर «पंक्ति चौड़ाई» उपयोग करती हैं। केवल सीमा पार करने पर समयरेखा विभाजित होती है। यह मान भाषा अनुसार नहीं बदलता। बड़ा = कम विभाजन परंतु लंबी अनूदित पंक्तियाँ।', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें', lyricTip:'गीत वाली पंक्तियों को कैसे संभालें: अनूदित करें / मूल रखें / हटाएँ। पहचान «गीत चिह्न» के अक्षरों से होती है।', marksTip:'इन अक्षरों वाली पंक्तियाँ गीत मानी जाती हैं। डिफ़ॉल्ट ♪♫♬♩ — जोड़ें या हटाएँ; खाली छोड़ने पर डिफ़ॉल्ट बहाल हो जाता है। यदि आपकी फ़ाइल में कोई संगीत चिह्न नहीं है, तो उसका चिह्न यहाँ जोड़ें। यदि एक पंक्ति में गीत और संवाद दोनों हों, तो «हटाएँ» स्वतः मूल रखने पर आ जाता है, जिससे संवाद नहीं मिटता।', lyricSkipKeep:'{0} गीत समूह सेटिंग के अनुसार मूल भाषा में रखे गए (अनूदित नहीं)', lyricSkipDrop:'{0} गीत समूह सेटिंग के अनुसार हटाए गए', lyricWarn:'ध्यान दें: {0}% पंक्तियाँ गीत मानी गईं — शायद चिह्न-समूह बहुत व्यापक है। जाँच करें और फिर चलाएँ।', dropFillersTip:'चालू: जिन पंक्तियों को स्थानीय नियम शुद्ध भराव (हम्म, अ…, अर्थहीन गुनगुनाहट) मानता है, वे सीधे हटा दी जाती हैं और मॉडल को नहीं भेजी जातीं, इसलिए परिणाम निश्चित रहता है। बंद: सभी पंक्तियाँ मॉडल को भेजी जाती हैं, और मॉडल हर पंक्ति के लिए तय करता है कि अनुवाद करना है, रखना है या हटाना है। डिफ़ॉल्ट रूप से चालू।',
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
@@ -1984,7 +1999,7 @@ const I18N = {
   aboutBody:'AI-SRTSub एक ओपन-सोर्स AI सबटाइटल अनुवादक है। हम मानते हैं कि अच्छा टूल मुफ़्त, साफ़ और प्राइवेसी का ख्याल रखने वाला होना चाहिए — न विज्ञापन, न रजिस्ट्रेशन, न आपकी फ़ाइलों को छूना। सेल्फ-होस्ट करें या साथ में निखारें।', aboutRepo:'GitHub रिपॉज़िटरी', aboutLicense:'AGPL-3.0 ओपन सोर्स', wsBackHome:'होम',
   wsUploadNew:'नया सबटाइटल', projEmpty:'कोई सबटाइटल नहीं', secImport:'इंपोर्ट', secLang:'भाषा',
   secStyle:'अनुवाद स्टाइल', secRules:'नियम', secEngine:'इंजन', lblSrcShort:'स्रोत भाषा',
-  lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'नाम मूल रूप में रखें', lblAutoTermsShort:'ऑटो ग्लॉसरी', lblMaxWShort:'लाइन चौड़ाई', lblBiMaxWShort:'द्विभाषी चौड़ाई (अनूदित)', wUnit:'अक्षर', lblLyric:'गीत के बोल', lyricTrans:'अनूदित करें', lyricKeep:'मूल रखें', lyricDrop:'हटाएँ', lblMarks:'गीत चिह्न', lblDropFillers:'भराव शब्द हटाएँ',
+  lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'संज्ञाएँ', lblAutoTermsShort:'ऑटो ग्लॉसरी', lblMaxWShort:'लाइन चौड़ाई', lblBiMaxWShort:'द्विभाषी चौड़ाई (अनूदित)', wUnit:'अक्षर', lblLyric:'गीत के बोल', lyricTrans:'अनूदित करें', lyricKeep:'मूल रखें', lyricDrop:'हटाएँ', lblMarks:'गीत चिह्न', lblDropFillers:'भराव शब्द हटाएँ',
   /* v0.9.70 两段式界面新增 */
 },
 'th': {pureMTMode:'ตรวจพบโมเดลแปลภาษาล้วน ({0}): เปลี่ยนไปแปลตรงรายกลุ่ม ({1} กลุ่ม, ขนาน 4 งาน, กลุ่มที่สำเร็จจะถูกแคช)…',pureMTDone:'แปลรายกลุ่มเสร็จ: สำเร็จ {0}/{1} กลุ่ม',gotClick:'ได้รับคำขอ “เริ่มแปล” — กำลังเตรียม…',reqSent:'ส่งคำขอชุดที่ {0} แล้ว ({1} กลุ่ม) — กำลังรอการตอบสนองจากโมเดล…',waitSec:'รอมา {0} วินาทีแล้ว — ยังไม่ได้รับการตอบสนองจากโมเดล…',errTimeout:'ไม่มีการตอบสนองหลังจาก {0} วินาที — ยกเลิกคำขอนี้ (หมดเวลา) แนะนำให้ลดงบประมาณตัวอักษรต่อชุด หรือเปลี่ยนไปใช้โมเดลที่เร็วกว่า หากโมเดลคิดก่อนตอบ (Qwen3, GLM ฯลฯ) ให้ใส่ {"enable_thinking":false} ในพารามิเตอร์เพิ่มเติม',alreadyRunning:'รอบก่อนหน้ายังไม่จบ — ได้ส่งคำขอหยุดแล้ว รอชุดปัจจุบันจบก่อนแล้วค่อยเริ่มใหม่',modeMismatch:'หมายเหตุ: มีการกรอก API แบบกำหนดเองด้านล่าง ({0}) แต่โหมดด้านบนคือ “โมเดลเริ่มต้น” จึงไม่ถูกนำมาใช้ เปลี่ยนโหมดเป็น “API แบบกำหนดเอง” เพื่อใช้งาน',errTruncOut:'ผลลัพธ์ของโมเดลถูกลิมิต token ตัดก่อนจบ — เพิ่ม max_tokens ในพารามิเตอร์เพิ่มเติม เช่น {"max_tokens":8192}',lblExtra:'พารามิเตอร์เพิ่มเติม (JSON, ไม่บังคับ)',extraTip:'รวมเข้าใน body ของทุกคำขอแบบกำหนดเอง เช่น {"enable_thinking":false} ปิดการคิดของโมเดล, {"response_format":{"type":"json_object"}} บังคับผลลัพธ์เป็น JSON model / messages / temperature / stream แทนที่ไม่ได้',
@@ -2009,9 +2024,9 @@ const I18N = {
   lblProvider:'ผู้ให้บริการ', lblBase:'Base URL (/chat/completions จะถูกเติมอัตโนมัติ)', lblModel:'โมเดล', lblBatch:'ตัวอักษรต่อแบตช์', batchTip:'จำนวนตัวอักษรซับไตเติลที่ส่งให้โมเดลต่อคำขอ แบตช์ถูกตัดอัตโนมัติตามความยาว: บรรทัดสั้นใส่ได้มาก บรรทัดยาวใส่น้อย ทำให้ปริมาณผลลัพธ์แต่ละแบตช์คงที่ ค่าที่มากขึ้นจะเร็วขึ้นเล็กน้อย แต่ค่าที่มากเกินไปอาจลดคุณภาพ ค่าเริ่มต้น 3000 เหมาะกับวิดีโอส่วนใหญ่',
   lblKey:'API Key (บันทึกไว้ในเบราว์เซอร์นี้เท่านั้น)',
   chkKeepTerms:'คงชื่อเฉพาะ (บุคคล/แบรนด์/ผลิตภัณฑ์/คำศัพท์) ไว้ไม่แปล',
-  termsHintOn:'เลือก = คำในรายการคงรูปเดิม (รายการเปิดใช้งาน)',
-  termsHintOff:'ปิด: ชื่อ/แบรนด์/ผลิตภัณฑ์/คำศัพท์ทั้งหมดจะถูกแปล; รายการถูกละเว้น',
-  lblTerms:'ชื่อเฉพาะที่จะคงรูปเดิม (ไม่บังคับ คั่นด้วยจุลภาค)', termsPh:'เช่น SpaceX, Prism, EnduroSat',
+  termsHintOn:'ชื่อบุคคล องค์กร และแบรนด์คงรูปเดิมและไม่แปล รายการในคลังศัพท์ด้านล่างยังคงมีผลเหนือกว่า',
+  termsHintOff:'ชื่อบุคคล องค์กร และแบรนด์ทั้งหมดแปลเป็นภาษาเป้าหมาย รายการในคลังศัพท์ด้านล่างยังคงมีผลเหนือกว่า', pnKeep:'คงรูปเดิม', pnTrans:'แปลทั้งหมด', btnGlossFile:'📂 อัปโหลดคลังศัพท์', glossHit:'คลังศัพท์: {0} รายการ ตรงกับไฟล์นี้ {1} รายการ ไม่รู้จัก {2} บรรทัด',
+  lblTerms:'คลังศัพท์รวม (หนึ่งคำต่อบรรทัด)', termsPh:'หนึ่งรายการต่อบรรทัด: ต้นฉบับ → คำแปล; บรรทัดที่มีแต่ต้นฉบับจะคงรูปเดิม',
   lblMaxW:'ความกว้างบรรทัดในหน่วยเต็มความกว้าง ไม่ใช่จำนวนตัวอักษร: 1 ตัวอักษร CJK = 1; อักษรละติน ซีริลลิก ไทย และอาหรับ = 0.5 ดังนั้น 1 หน่วย ≈ 2 ตัวอักษร สำหรับอักษรครึ่งความกว้าง ใช้กับการขึ้นบรรทัดใหม่แบบภาษาเดียว และบรรทัดสองผู้พูด «- A - B» ในการส่งออกสองภาษา ค่าเริ่มต้นตามมาตรฐาน Netflix แยกตามภาษา (zh/ko 16, ja 13, อื่นๆ 21) ค่ามากขึ้น = บรรทัดยาวขึ้น แบ่งน้อยลง', lblBiMaxW:'ความกว้างสูงสุดของบรรทัดคำแปลในการส่งออกสองภาษา (หน่วยเต็มความกว้างเช่นเดียวกัน ไม่ใช่จำนวนตัวอักษร: ค่า 32 เท่ากัน ≈ 32 ตัวอักษรจีน แต่ ≈ 64 ตัวอักษรไทย) จำกัดเฉพาะบรรทัดคำแปล บรรทัดต้นฉบับตามจุดหมายความหมายและไม่จำกัดความกว้าง ส่วนบรรทัดสองผู้พูดใช้ «ความกว้างบรรทัด» ด้านบน การแบ่งไทม์ไลน์เกิดเฉพาะเมื่อคำแปลเกินค่านี้ ค่านี้ไม่เปลี่ยนตามภาษา ค่ามากขึ้น = แบ่งน้อยลงแต่บรรทัดคำแปลยาวขึ้น', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด', lyricTip:'วิธีจัดการบรรทัดเนื้อเพลง: แปล / เก็บต้นฉบับ / ลบ ตรวจสอบจากตัวอักษรใน «เครื่องหมายเนื้อเพลง»', marksTip:'บรรทัดที่มีตัวอักษรเหล่านี้จะถือเป็นเนื้อเพลง ค่าเริ่มต้น ♪♫♬♩ — เพิ่มหรือลบได้ หากเว้นว่างจะกลับไปใช้ค่าเริ่มต้น หากไฟล์ของคุณไม่มีสัญลักษณ์ดนตรี ให้เพิ่มเครื่องหมายที่ไฟล์นั้นใช้ หากบรรทัดใดมีทั้งเนื้อเพลงและบทสนทนา «ลบ» จะเปลี่ยนเป็นเก็บต้นฉบับอัตโนมัติ เพื่อไม่ให้บทสนทนาถูกลบ', lyricSkipKeep:'เก็บเนื้อเพลง {0} กลุ่มไว้เป็นภาษาต้นฉบับตามการตั้งค่า (ไม่แปล)', lyricSkipDrop:'ลบเนื้อเพลง {0} กลุ่มตามการตั้งค่า', lyricWarn:'ระวัง: {0}% ของบรรทัดถูกจัดเป็นเนื้อเพลง — อาจตั้งเครื่องหมายกว้างเกินไป โปรดตรวจสอบแล้วรันใหม่', dropFillersTip:'เปิด: บรรทัดที่กฎในตัวโปรแกรมตัดสินว่าเป็นคำอุทานล้วน (เอ่อ, อืม, การฮัมที่ไม่มีความหมาย) จะถูกลบทันทีและไม่ส่งให้โมเดล ผลลัพธ์จึงแน่นอน ปิด: ส่งทุกบรรทัดให้โมเดล แล้วโมเดลตัดสินทีละบรรทัดว่าจะแปล เก็บไว้ หรือลบ ค่าเริ่มต้นคือเปิด',
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
@@ -2079,7 +2094,7 @@ const I18N = {
   aboutBody:'AI-SRTSub คือเครื่องมือแปลซับด้วย AI แบบโอเพนซอร์ส เราเชื่อว่าเครื่องมือที่ดีต้องฟรี สะอาด และเคารพความเป็นส่วนตัว — ไม่มีโฆษณา ไม่ต้องสมัคร ไม่แตะไฟล์ของคุณ ติดตั้งเองได้ ช่วยกันขัดเกลาได้', aboutRepo:'รีโพซิทอรี GitHub', aboutLicense:'โอเพนซอร์ส AGPL-3.0', wsBackHome:'หน้าแรก',
   wsUploadNew:'ซับใหม่', projEmpty:'ยังไม่มีซับ', secImport:'นำเข้า', secLang:'ภาษา',
   secStyle:'สไตล์', secRules:'กฎการประมวลผล', secEngine:'เอนจิน', lblSrcShort:'ภาษาต้นทาง',
-  lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'คงชื่อเฉพาะภาษาเดิม', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', lblMaxWShort:'ความกว้างบรรทัด', lblBiMaxWShort:'ความกว้างสองภาษา (คำแปล)', wUnit:'ตัวอักษร', lblLyric:'เนื้อเพลง', lyricTrans:'แปล', lyricKeep:'เก็บต้นฉบับ', lyricDrop:'ลบ', lblMarks:'เครื่องหมายเนื้อเพลง', lblDropFillers:'ลบคำอุทาน',
+  lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'ชื่อเฉพาะ', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', lblMaxWShort:'ความกว้างบรรทัด', lblBiMaxWShort:'ความกว้างสองภาษา (คำแปล)', wUnit:'ตัวอักษร', lblLyric:'เนื้อเพลง', lyricTrans:'แปล', lyricKeep:'เก็บต้นฉบับ', lyricDrop:'ลบ', lblMarks:'เครื่องหมายเนื้อเพลง', lblDropFillers:'ลบคำอุทาน',
   /* v0.9.70 两段式界面新增 */
 },
 'vi': {pureMTMode:'Phát hiện mô hình dịch thuần ({0}): chuyển sang dịch trực tiếp từng nhóm ({1} nhóm, 4 song song, nhóm thành công sẽ được lưu cache)…',pureMTDone:'Dịch từng nhóm hoàn tất: thành công {0}/{1} nhóm',gotClick:'Đã nhận yêu cầu “bắt đầu dịch” — đang chuẩn bị…',reqSent:'Đã gửi yêu cầu lô {0} ({1} nhóm) — đang chờ phản hồi của mô hình…',waitSec:'Đã chờ {0} giây — vẫn chưa có phản hồi từ mô hình…',errTimeout:'Không có phản hồi sau {0} giây — đã bỏ yêu cầu này (hết thời gian chờ). Hãy giảm ngân sách ký tự mỗi lô hoặc đổi sang mô hình nhanh hơn; nếu mô hình suy luận trước khi trả lời (Qwen3, GLM…), hãy điền {"enable_thinking":false} vào tham số yêu cầu bổ sung',alreadyRunning:'Lần chạy trước vẫn chưa kết thúc — đã yêu cầu dừng. Hãy đợi lô hiện tại hoàn tất rồi mới bắt đầu lại',modeMismatch:'Lưu ý: đã điền API tùy chỉnh ở dưới ({0}), nhưng chế độ hiện tại là “Mô hình mặc định” nên sẽ không được dùng. Hãy chuyển sang “API tùy chỉnh” để sử dụng',errTruncOut:'Kết quả của mô hình bị giới hạn token cắt ngắn trước khi hoàn tất — hãy tăng max_tokens trong Tham số yêu cầu bổ sung, ví dụ {"max_tokens":8192}',lblExtra:'Tham số yêu cầu bổ sung (JSON, tùy chọn)',extraTip:'Được gộp vào body của mỗi yêu cầu API tùy chỉnh. Ví dụ: {"enable_thinking":false} tắt suy luận; {"response_format":{"type":"json_object"}} ép xuất JSON. Không thể ghi đè model / messages / temperature / stream.',
@@ -2104,9 +2119,9 @@ const I18N = {
   lblProvider:'Nhà cung cấp', lblBase:'Base URL (tự động thêm /chat/completions)', lblModel:'Mô hình', lblBatch:'Ký tự mỗi lô', batchTip:'Số ký tự phụ đề gửi lên mô hình mỗi yêu cầu. Batch được cắt tự động theo độ dài: câu ngắn chứa nhiều, câu dài chứa ít, giúp lượng đầu ra mỗi batch ổn định. Giá trị lớn hơn nhanh hơn một chút, nhưng giá trị quá lớn có thể giảm chất lượng; mặc định 3000 phù hợp với hầu hết video.',
   lblKey:'API Key (chỉ lưu trong trình duyệt này)',
   chkKeepTerms:'Giữ nguyên tên riêng (người/thương hiệu/sản phẩm/thuật ngữ), không dịch',
-  termsHintOn:'Đã chọn = các thuật ngữ trong danh sách giữ nguyên dạng (danh sách bật).',
-  termsHintOff:'Tắt: mọi tên/thương hiệu/sản phẩm/thuật ngữ đều được dịch; danh sách bị bỏ qua.',
-  lblTerms:'Tên riêng cần giữ nguyên (không bắt buộc, phân tách bằng dấu phẩy)', termsPh:'vd: SpaceX, Prism, EnduroSat',
+  termsHintOn:'Tên người, tổ chức và thương hiệu giữ nguyên dạng gốc và không dịch. Các mục trong bảng thuật ngữ bên dưới vẫn được ưu tiên.',
+  termsHintOff:'Tên người, tổ chức và thương hiệu đều được dịch sang ngôn ngữ đích. Các mục trong bảng thuật ngữ bên dưới vẫn được ưu tiên.', pnKeep:'Giữ nguyên gốc', pnTrans:'Dịch tất cả', btnGlossFile:'📂 Tải lên bảng thuật ngữ', glossHit:'Bảng thuật ngữ: {0} mục, {1} mục khớp trong file này, {2} dòng không nhận diện được',
+  lblTerms:'Bảng thuật ngữ thống nhất (mỗi dòng một thuật ngữ)', termsPh:'Mỗi dòng một mục: gốc → bản dịch; dòng chỉ có từ gốc sẽ giữ nguyên gốc',
   lblMaxW:'Độ rộng dòng tính theo ĐƠN VỊ toàn chiều rộng, không phải số ký tự: 1 ký tự CJK = 1; chữ Latinh, Kirin, Thái, Ả Rập = 0.5, tức 1 đơn vị ≈ 2 ký tự với chữ viết nửa chiều rộng. Áp dụng cho ngắt dòng đơn ngữ và dòng hai người nói «- A - B» khi xuất song ngữ. Mặc định theo chuẩn Netflix từng ngôn ngữ (zh/ko 16, ja 13, khác 21). Lớn hơn = dòng dài hơn, ít ngắt và ít chia hơn.', lblBiMaxW:'Độ rộng tối đa của dòng BẢN DỊCH khi xuất song ngữ (cùng đơn vị toàn chiều rộng, không phải số ký tự: cùng là 32 nhưng tiếng Trung ≈ 32 ký tự, tiếng Thái ≈ 64 ký tự). Chỉ giới hạn dòng bản dịch; dòng nguồn theo điểm ngắt ngữ nghĩa, không giới hạn rộng; dòng hai người nói dùng «Độ rộng dòng» ở trên. Chỉ khi vượt quá mới chia timeline. Giá trị này KHÔNG đổi theo ngôn ngữ. Lớn hơn = ít chia hơn nhưng dòng bản dịch dài hơn.', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng', lyricTip:'Cách xử lý dòng lời bài hát: dịch / giữ nguyên bản / xóa. Nhận diện bằng các ký tự trong «Dấu hiệu lời bài hát».', marksTip:'Dòng chứa các ký tự này được coi là lời bài hát. Mặc định ♪♫♬♩ — có thể thêm hoặc bớt; để trống sẽ khôi phục mặc định. Nếu tệp của bạn không dùng ký hiệu âm nhạc, hãy thêm dấu hiệu mà tệp đó dùng. Nếu một dòng vừa có lời vừa có thoại, «Xóa» sẽ tự động chuyển sang giữ nguyên bản để không xóa nhầm thoại.', lyricSkipKeep:'{0} nhóm lời bài hát được giữ nguyên bản theo cài đặt (không dịch)', lyricSkipDrop:'{0} nhóm lời bài hát bị xóa theo cài đặt', lyricWarn:'Lưu ý: {0}% số dòng được phân loại là lời bài hát — có thể bộ dấu hiệu đang quá rộng. Hãy kiểm tra rồi chạy lại.', dropFillersTip:'Bật: những dòng được quy tắc nội bộ đánh giá là từ đệm thuần túy (ừ, hmm, ngân nga vô nghĩa) sẽ bị xóa ngay và không gửi cho mô hình, nên kết quả xác định. Tắt: mọi dòng đều gửi cho mô hình, và mô hình quyết định từng dòng nên dịch, giữ hay xóa. Mặc định là bật.',
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
@@ -2174,7 +2189,7 @@ const I18N = {
   aboutBody:'AI-SRTSub là công cụ dịch phụ đề bằng AI mã nguồn mở. Chúng tôi tin công cụ tốt phải miễn phí, sạch sẽ và tôn trọng riêng tư — không quảng cáo, không đăng ký, không động vào tệp của bạn. Tự triển khai hay cùng nhau hoàn thiện đều chào đón.', aboutRepo:'Kho GitHub', aboutLicense:'Mã nguồn mở AGPL-3.0', wsBackHome:'Trang chủ',
   wsUploadNew:'Phụ đề mới', projEmpty:'Chưa có phụ đề', secImport:'Nhập', secLang:'Ngôn ngữ',
   secStyle:'Phong cách', secRules:'Quy tắc', secEngine:'Engine', lblSrcShort:'Ngôn ngữ nguồn',
-  lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Giữ nguyên tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', lblMaxWShort:'Độ rộng dòng', lblBiMaxWShort:'Chiều rộng song ngữ (bản dịch)', wUnit:'ký tự', lblLyric:'Lời bài hát', lyricTrans:'Dịch', lyricKeep:'Giữ nguyên bản', lyricDrop:'Xóa', lblMarks:'Dấu hiệu lời bài hát', lblDropFillers:'Xóa từ đệm',
+  lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', lblMaxWShort:'Độ rộng dòng', lblBiMaxWShort:'Chiều rộng song ngữ (bản dịch)', wUnit:'ký tự', lblLyric:'Lời bài hát', lyricTrans:'Dịch', lyricKeep:'Giữ nguyên bản', lyricDrop:'Xóa', lblMarks:'Dấu hiệu lời bài hát', lblDropFillers:'Xóa từ đệm',
   /* v0.9.70 两段式界面新增 */
 },
 'ru': {pureMTMode:'Обнаружена чистая переводческая модель ({0}): переход на прямой перевод по группам ({1} групп, 4 параллельно, успешные группы кэшируются)…',pureMTDone:'Погрупповой перевод завершён: успешно {0}/{1}',gotClick:'Получен запрос на начало перевода — подготовка…',reqSent:'Запрос пакета {0} отправлен ({1} групп) — ждём ответа модели…',waitSec:'Ожидание {0} с — ответа от модели всё ещё нет…',errTimeout:'За {0} с ответа не получено — запрос отменён (тайм-аут). Уменьшите лимит символов на пакет или выберите более быструю модель; если модель рассуждает перед ответом (Qwen3, GLM…), укажите {"enable_thinking":false} в дополнительных параметрах',alreadyRunning:'Предыдущий запуск ещё не завершён — запрошена остановка. Дождитесь завершения текущего пакета, прежде чем начинать заново',modeMismatch:'Внимание: ниже заполнены поля пользовательского API ({0}), но выбран режим «Модель по умолчанию», поэтому они не будут использованы. Переключите режим на «Свой API»',errTruncOut:'Вывод модели достиг лимита токенов и оборвался, не закончив генерацию — увеличьте max_tokens в дополнительных параметрах, например {"max_tokens":8192}',lblExtra:'Дополнительные параметры запроса (JSON, необязательно)',extraTip:'Добавляется в тело каждого запроса к пользовательскому API. Например {"enable_thinking":false} отключает рассуждения; {"response_format":{"type":"json_object"}} принудительно включает JSON. model / messages / temperature / stream переопределить нельзя.',
@@ -2199,9 +2214,9 @@ const I18N = {
   lblProvider:'Провайдер', lblBase:'Base URL (/chat/completions добавляется автоматически)', lblModel:'Модель', lblBatch:'Символов на батч', batchTip:'Количество символов субтитров, отправляемых модели за один запрос. Пакеты нарезаются автоматически по длине: короткие строки помещаются больше, длинные меньше, поэтому объём вывода каждого пакета стабилен. Большее значение немного быстрее, но слишком большое может снизить качество; 3000 по умолчанию подходит для большинства видео.',
   lblKey:'API Key (хранится только в этом браузере)',
   chkKeepTerms:'Оставлять имена собственные (лица/бренды/продукты/термины) без перевода',
-  termsHintOn:'Включено = термины из списка остаются в оригинальном виде (список активен).',
-  termsHintOff:'Выключено: все имена/бренды/продукты/термины переводятся; список игнорируется.',
-  lblTerms:'Имена собственные для сохранения оригинала (необязательно, через запятую)', termsPh:'напр. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Имена, организации и бренды сохраняют исходное написание и не переводятся. Записи в глоссарии ниже остаются в приоритете.',
+  termsHintOff:'Имена, организации и бренды переводятся на целевой язык. Записи в глоссарии ниже остаются в приоритете.', pnKeep:'Сохранить оригинал', pnTrans:'Переводить всё', btnGlossFile:'📂 Загрузить глоссарий', glossHit:'Глоссарий: {0} записей, совпало в этом файле {1}, не распознано строк: {2}',
+  lblTerms:'Единый глоссарий (один термин в строке)', termsPh:'Одна на строку: оригинал → перевод; строка только с оригиналом сохраняет его как есть',
   lblMaxW:'Ширина строки в ЕДИНИЦАХ полной ширины, а не в символах: 1 символ CJK = 1; латиница, кириллица, тайский и арабский = 0.5, то есть 1 единица ≈ 2 символа для полуширинных письменностей. Управляет переносом в одноязычном выводе и строками двух говорящих «- A - B» в двуязычном экспорте. Значение по умолчанию по нормам Netflix для каждого языка (zh/ko 16, ja 13, остальные 21). Больше = строки длиннее, меньше переносов и разбиений.', lblBiMaxW:'Максимальная ширина строки ПЕРЕВОДА при двуязычном экспорте (та же единица полной ширины, не символы: те же 32 ≈ 32 китайским символам, но ≈ 64 тайским символам). Ограничивает только строку перевода; строка источника следует смысловым разрывам и не ограничена по ширине, а строки двух говорящих используют «Ширину строки» выше. Только превышение разбивает таймлайн. Это значение НЕ меняется по языкам. Больше = меньше разбиений, но строки перевода длиннее.', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки', lyricTip:'Как обрабатывать строки песен: переводить / оставить оригинал / удалить. Распознавание — по символам из «Маркеры песен».', marksTip:'Строки с этими символами считаются текстом песни. По умолчанию ♪♫♬♩ — можно добавлять и удалять; пустое поле восстанавливает значение по умолчанию. Если в вашем файле нет музыкальных символов, добавьте обозначение, которое в нём используется. Если в строке есть и песня, и диалог, «Удалить» автоматически переключается на сохранение оригинала, чтобы не удалить диалог.', lyricSkipKeep:'{0} групп текста песни оставлены на языке оригинала согласно настройке (без перевода)', lyricSkipDrop:'{0} групп текста песни удалены согласно настройке', lyricWarn:'Внимание: {0}% строк определены как текст песни — возможно, набор маркеров слишком широк. Проверьте и запустите заново.', dropFillersTip:'Включено: строки, которые локальное правило считает чистыми словами-паразитами (э-э, хм, бессмысленное напевание), удаляются сразу и не отправляются в модель, поэтому результат определён. Выключено: все строки уходят в модель, которая для каждой решает — перевести, оставить или удалить. По умолчанию включено.',
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
@@ -2269,7 +2284,7 @@ const I18N = {
   aboutBody:'AI-SRTSub — субтитровочный ИИ-переводчик с открытым кодом. Мы уверены: хороший инструмент должен быть бесплатным, чистым и уважать приватность — без рекламы, без регистрации, не трогая ваши файлы. Разворачивайте у себя и совершенствуйте вместе с нами.', aboutRepo:'Репозиторий GitHub', aboutLicense:'Открытый код AGPL-3.0', wsBackHome:'Главная',
   wsUploadNew:'Новые субтитры', projEmpty:'Субтитры не загружены', secImport:'Импорт', secLang:'Языки',
   secStyle:'Стиль', secRules:'Правила', secEngine:'Движок', lblSrcShort:'Исходный язык',
-  lblDstShort:'Целевой язык', lblKeepTermsShort:'Сохранять имена', lblAutoTermsShort:'Автоглоссарий', lblMaxWShort:'Ширина строки', lblBiMaxWShort:'Ширина билингвы (перевод)', wUnit:'символов', lblLyric:'Тексты песен', lyricTrans:'Переводить', lyricKeep:'Оставить оригинал', lyricDrop:'Удалить', lblMarks:'Маркеры песен', lblDropFillers:'Удалять слова-паразиты',
+  lblDstShort:'Целевой язык', lblKeepTermsShort:'Имена собственные', lblAutoTermsShort:'Автоглоссарий', lblMaxWShort:'Ширина строки', lblBiMaxWShort:'Ширина билингвы (перевод)', wUnit:'символов', lblLyric:'Тексты песен', lyricTrans:'Переводить', lyricKeep:'Оставить оригинал', lyricDrop:'Удалить', lblMarks:'Маркеры песен', lblDropFillers:'Удалять слова-паразиты',
   /* v0.9.70 两段式界面新增 */
 },
 'it': {pureMTMode:'Modello di traduzione pura rilevato ({0}): si passa alla traduzione diretta per gruppo ({1} gruppi, 4 in parallelo, i gruppi riusciti vengono messi in cache)…',pureMTDone:'Traduzione per gruppo completata: {0}/{1} gruppi riusciti',gotClick:'Ricevuta la richiesta di avvio traduzione — preparazione…',reqSent:'Richiesta del lotto {0} inviata ({1} gruppi) — in attesa della risposta del modello…',waitSec:'Attesa di {0} s — ancora nessuna risposta dal modello…',errTimeout:'Nessuna risposta dopo {0} s — richiesta abbandonata (timeout). Riduci il budget di caratteri per lotto oppure passa a un modello più veloce; se il modello ragiona prima di rispondere (Qwen3, GLM…), inserisci {"enable_thinking":false} nei parametri aggiuntivi',alreadyRunning:'L’esecuzione precedente non è ancora finita — è stato richiesto l’arresto. Attendi la fine del lotto corrente prima di riavviare',modeMismatch:'Attenzione: i campi API personalizzata sono compilati qui sotto ({0}), ma la modalità è «Modello predefinito», quindi non verranno usati. Passa alla modalità «API personalizzata» per usarli',errTruncOut:'L\'output del modello ha raggiunto il limite di token ed è stato troncato prima della fine — aumenta max_tokens nei parametri aggiuntivi, es. {"max_tokens":8192}',lblExtra:'Parametri di richiesta aggiuntivi (JSON, opzionale)',extraTip:'Unito al corpo di ogni richiesta API personalizzata. Es.: {"enable_thinking":false} per disattivare il ragionamento; {"response_format":{"type":"json_object"}} per forzare il JSON. model / messages / temperature / stream non sono sovrascrivibili.',
@@ -2294,9 +2309,9 @@ const I18N = {
   lblProvider:'Fornitore', lblBase:'URL di base (/chat/completions aggiunto automaticamente)', lblModel:'Modello', lblBatch:'Caratteri per batch', batchTip:'Numero di caratteri dei sottotitoli inviati al modello per richiesta. I batch vengono tagliati automaticamente per lunghezza: le righe corte ne riempiono di più, le lunghe di meno, mantenendo stabile l\'output di ogni batch. Valori più alti sono leggermente più veloci, ma valori troppo alti possono ridurre la qualità; il predefinito 3000 va bene per la maggior parte dei video.',
   lblKey:'Chiave API (salvata solo in questo browser)',
   chkKeepTerms:'Mantieni non tradotti i nomi propri (persone/marchi/prodotti/termini)',
-  termsHintOn:'Attivo: i termini dell\'elenco restano nella forma originale (elenco abilitato).',
-  termsHintOff:'Disattivo: tutti i nomi/marchi/prodotti/termini vengono tradotti; l\'elenco viene ignorato.',
-  lblTerms:'Nomi propri da mantenere in forma originale (facoltativo, separati da virgola)', termsPh:'es. SpaceX, Prism, EnduroSat',
+  termsHintOn:'I nomi di persone, organizzazioni e marchi mantengono la grafia originale e non vengono tradotti. Le voci nel glossario sotto restano prioritarie.',
+  termsHintOff:'I nomi di persone, organizzazioni e marchi vengono tutti tradotti nella lingua di destinazione. Le voci nel glossario sotto restano prioritarie.', pnKeep:'Mantieni originale', pnTrans:'Traduci tutto', btnGlossFile:'📂 Carica glossario', glossHit:'Glossario: {0} voci, {1} trovate in questo file, {2} righe non riconosciute',
+  lblTerms:'Glossario unificato (un termine per riga)', termsPh:'Uno per riga: originale → traduzione; una riga con solo l’originale lo mantiene',
   lblMaxW:'Larghezza della riga in UNITÀ a larghezza piena, non in caratteri: 1 carattere CJK = 1; lettere latine, cirilliche, thai e arabe = 0.5, quindi 1 unità ≈ 2 caratteri per le scritture a mezza larghezza. Regola il ritorno a capo monolingue e le righe a due parlanti «- A - B» in esportazione bilingue. Il predefinito segue la norma Netflix per lingua (zh/ko 16, ja 13, altre 21). Più grande = righe più lunghe, meno a capo e meno divisioni.', lblBiMaxW:'Larghezza massima della riga TRADOTTA in esportazione bilingue (stessa unità a larghezza piena, non caratteri: lo stesso 32 corrisponde a circa 32 caratteri cinesi ma circa 64 caratteri thai). Limita solo la riga tradotta; la riga sorgente segue le interruzioni semantiche e non è limitata in larghezza, e le righe a due parlanti usano la «Larghezza riga» sopra. Solo il superamento divide la timeline. Questo valore NON cambia per lingua. Più grande = meno divisioni ma righe tradotte più lunghe.', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare', lyricTip:'Come gestire le righe cantate: traduci / mantieni l\'originale / rimuovi. Il riconoscimento usa i caratteri in «Marcatori testi».', marksTip:'Le righe che contengono questi caratteri sono trattate come testi di canzoni. Predefinito ♪♫♬♩ — aggiungi o rimuovi liberamente; lasciando vuoto si ripristina il predefinito. Se il tuo file non usa simboli musicali, aggiungi il marcatore che usa. Se una riga contiene sia canto che dialogo, «Rimuovi» passa automaticamente a mantenere l\'originale, così il dialogo non viene cancellato.', lyricSkipKeep:'{0} gruppi di testi mantenuti in lingua originale secondo l\'impostazione (non tradotti)', lyricSkipDrop:'{0} gruppi di testi rimossi secondo l\'impostazione', lyricWarn:'Attenzione: il {0}% delle righe è stato classificato come testo di canzone — l\'insieme di marcatori potrebbe essere troppo ampio. Controlla e riavvia.', dropFillersTip:'Attivo: le righe che la regola locale considera puro riempitivo (ehm, hmm, canticchiare senza senso) vengono rimosse direttamente e non inviate al modello, quindi il risultato è deterministico. Disattivo: tutte le righe vanno al modello, che decide caso per caso se tradurre, mantenere o rimuovere. Attivo per impostazione predefinita.',
   btnPost:'↻ Solo post-elaborazione (a capo/pulizia tag)',
   hintPrivacy:'Modello predefinito: i sottotitoli passano dal server di questo sito verso il fornitore configurato dall\'amministratore; API personalizzata: il fornitore scelto li elabora direttamente, senza passare da questo sito.',
@@ -2364,7 +2379,7 @@ const I18N = {
   aboutBody:'AI-SRTSub è un traduttore di sottotitoli AI open source. Crediamo che un buon strumento debba essere gratuito, pulito e rispettoso della privacy — niente pubblicità, niente registrazione, nessuno tocca i tuoi file. Self-host e contributi benvenuti.', aboutRepo:'Repository GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Home',
   wsUploadNew:'Nuovi sottotitoli', projEmpty:'Nessun sottotitolo caricato', secImport:'Importa', secLang:'Lingue',
   secStyle:'Stile', secRules:'Regole', secEngine:'Motore', lblSrcShort:'Lingua origine',
-  lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Mantieni nomi propri', lblAutoTermsShort:'Glossario automatico', lblMaxWShort:'Larghezza riga', lblBiMaxWShort:'Larghezza bilingue (tradotto)', wUnit:'caratteri', lblLyric:'Testi delle canzoni', lyricTrans:'Traduci', lyricKeep:'Mantieni originale', lyricDrop:'Rimuovi', lblMarks:'Marcatori testi', lblDropFillers:'Rimuovi riempitivi',
+  lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Nomi propri', lblAutoTermsShort:'Glossario automatico', lblMaxWShort:'Larghezza riga', lblBiMaxWShort:'Larghezza bilingue (tradotto)', wUnit:'caratteri', lblLyric:'Testi delle canzoni', lyricTrans:'Traduci', lyricKeep:'Mantieni originale', lyricDrop:'Rimuovi', lblMarks:'Marcatori testi', lblDropFillers:'Rimuovi riempitivi',
   /* v0.9.70 两段式界面新增 */
 },
 'ar': {pureMTMode:'تم اكتشاف نموذج ترجمة خالص ({0}): التحويل إلى الترجمة المباشرة لكل مجموعة ({1} مجموعات، 4 بالتوازي، تُخزَّن المجموعات الناجحة مؤقتًا)…',pureMTDone:'اكتملت الترجمة لكل مجموعة: نجحت {0} من {1}',gotClick:'تم استلام طلب بدء الترجمة — جارٍ التحضير…',reqSent:'تم إرسال طلب الدفعة {0} ({1} مجموعة) — في انتظار رد النموذج…',waitSec:'انتظار {0} ثانية — لا تزال الاستجابة من النموذج غير واردة…',errTimeout:'لا استجابة بعد {0} ثانية — تم إلغاء الطلب (انتهت المهلة). جرّب تقليل ميزانية الأحرف لكل دفعة أو استخدم نموذجاً أسرع؛ وإذا كان النموذج يفكر قبل الإجابة (Qwen3، GLM…)، ضع {"enable_thinking":false} في معاملات الطلب الإضافية',alreadyRunning:'التشغيل السابق لم ينتهِ بعد — تم طلب الإيقاف. انتظر انتهاء الدفعة الحالية قبل البدء من جديد',modeMismatch:'تنبيه: تم تعبئة حقول API مخصصة أدناه ({0})، لكن الوضع الحالي هو «النموذج الافتراضي»، لذا لن تُستخدم. غيّر الوضع إلى «API مخصصة» لاستخدامها',errTruncOut:'تم قطع إخراج النموذج عند حد الرموز قبل اكتماله — ارفع max_tokens في معاملات الطلب الإضافية، مثل {"max_tokens":8192}',lblExtra:'معاملات طلب إضافية (JSON، اختياري)',extraTip:'تُدمَج في جسم كل طلب لواجهة API المخصصة. مثل {"enable_thinking":false} لإيقاف التفكير، و{"response_format":{"type":"json_object"}} لإجبار JSON. لا يمكن تجاوز model / messages / temperature / stream.',
@@ -2389,9 +2404,9 @@ const I18N = {
   lblProvider:'المزوّد', lblBase:'العنوان الأساسي (يُضاف /chat/completions تلقائيًا)', lblModel:'النموذج', lblBatch:'أحرف لكل دفعة', batchTip:'عدد أحرف الترجمة المُرسلة إلى النموذج في كل طلب. تُقسَّم الدفعات تلقائيًا حسب الطول: الأسطر القصيرة تملأ أكثر والطويلة أقل، مما يجعل حجم مخرجات كل دفعة مستقرًا. القيمة الأكبر أسرع قليلًا، لكن القيمة الكبيرة جدًا قد تقلل الجودة؛ القيمة الافتراضية 3000 مناسبة لمعظم الفيديوهات.',
   lblKey:'مفتاح API (يُحفظ في هذا المتصفح فقط)',
   chkKeepTerms:'إبقاء الأسماء الخاصة (أشخاص/علامات/منتجات/مصطلحات) دون ترجمة',
-  termsHintOn:'عند التفعيل: تبقى المصطلحات في القائمة بصيغتها الأصلية (القائمة مفعّلة).',
-  termsHintOff:'عند الإيقاف: تُترجم جميع الأسماء/العلامات/المنتجات/المصطلحات؛ وتُتجاهل قائمة المصطلحات.',
-  lblTerms:'أسماء خاصة تبقى بصيغتها الأصلية (اختياري، مفصولة بفواصل)', termsPh:'مثال: SpaceX, Prism, EnduroSat',
+  termsHintOn:'تبقى أسماء الأشخاص والمؤسسات والعلامات بحروفها الأصلية دون ترجمة، وتبقى المدخلات في المسرد أدناه هي الأولى بالاتباع.',
+  termsHintOff:'تُترجم أسماء الأشخاص والمؤسسات والعلامات كلها إلى اللغة الهدف، وتبقى المدخلات في المسرد أدناه هي الأولى بالاتباع.', pnKeep:'إبقاء الأصل', pnTrans:'ترجمة الكل', btnGlossFile:'📂 رفع مسرد', glossHit:'المسرد: {0} مدخلًا، المطابق في هذا الملف {1}، ولم يُتعرّف على {2} سطرًا',
+  lblTerms:'مسرد موحد (مصطلح واحد في كل سطر)', termsPh:'مصطلح واحد في كل سطر: الأصل ← الترجمة؛ والسطر الذي يحتوي الأصل فقط يبقيه كما هو',
   lblMaxW:'عرض السطر بوحدات العرض الكامل، لا بعدد الأحرف: حرف CJK واحد = 1؛ الحروف اللاتينية والسيريلية والتايلاندية والعربية = 0.5، أي أن الوحدة الواحدة ≈ حرفان في الكتابات نصف العرض. يتحكم في التفاف السطر أحادي اللغة وفي سطور المتحدثين «- A - B» عند التصدير ثنائي اللغة. القيمة الافتراضية وفق معيار Netflix لكل لغة (zh/ko 16، ja 13، أخرى 21). أكبر = سطور أطول وتقسيمات أقل.', lblBiMaxW:'أقصى عرض لسطر الترجمة عند التصدير ثنائي اللغة (بنفس وحدة العرض الكامل، لا بعدد الأحرف: القيمة 32 نفسها ≈ 32 حرفاً صينياً لكن ≈ 64 حرفاً تايلاندياً). يقيد سطر الترجمة فقط؛ سطر المصدر يتبع الفواصل الدلالية وغير مقيد بالعرض، وسطور المتحدثين تستخدم «عرض السطر» أعلاه. تجاوز هذا الحد وحده هو ما يقسم الخط الزمني. هذه القيمة لا تتغير حسب اللغة. أكبر = تقسيمات أقل لكن سطور ترجمة أطول.', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف', lyricTip:'كيفية التعامل مع أسطر الغناء: ترجمة / إبقاء النص الأصلي / حذف. يتم التعرّف عليها عبر المحارف في «علامات الأغنية».', marksTip:'الأسطر التي تحتوي هذه المحارف تُعامل ككلمات أغنية. الافتراضي ♪♫♬♩ — يمكن الإضافة أو الحذف، وتركه فارغاً يعيد الافتراضي. إذا كان ملفك لا يستخدم رموزاً موسيقية، أضف العلامة التي يستخدمها. إذا جمع سطر واحد بين الغناء والحوار، يتحول «حذف» تلقائياً إلى إبقاء الأصل حتى لا يُحذف الحوار.', lyricSkipKeep:'تم إبقاء {0} مجموعة غنائية باللغة الأصلية حسب الإعداد (دون ترجمة)', lyricSkipDrop:'تم حذف {0} مجموعة غنائية حسب الإعداد', lyricWarn:'تنبيه: صُنّف {0}% من الأسطر ككلمات أغنية — ربما كانت العلامات أوسع من اللازم. تحقق ثم أعد التشغيل.', dropFillersTip:'مفعّل: الأسطر التي تعدّها القاعدة المحلية حشواً خالصاً (إم، همهمة بلا معنى) تُحذف مباشرة ولا تُرسل إلى النموذج، فتكون النتيجة محددة. معطّل: تُرسل كل الأسطر إلى النموذج، وهو يقرر سطراً بسطر هل يترجمها أم يبقيها أم يحذفها. مفعّل افتراضياً.',
   btnPost:'↻ معالجة لاحقة فقط (التفاف/تنظيف الوسوم)',
   hintPrivacy:'النموذج الافتراضي: تمر الترجمات عبر خادم هذا الموقع إلى المزوّد الذي أعدّه المشرف؛ API مخصص: يعالجها المزوّد الذي اخترته مباشرة دون المرور بهذا الموقع.',
@@ -2459,7 +2474,7 @@ const I18N = {
   aboutBody:'AI-SRTSub أداة ترجمة ترجمات بالذكاء الاصطناعي مفتوحة المصدر. نؤمن أن الأداة الجيدة يجب أن تكون مجانية ونظيفة وتحترم الخصوصية — بلا إعلانات ولا تسجيل ولا العبث بملفاتك. رحّبنا بالتثبيت الذاتي وباقتراحات التطوير.', aboutRepo:'مستودع GitHub', aboutLicense:'مفتوح المصدر AGPL-3.0', wsBackHome:'الرئيسية',
   wsUploadNew:'ترجمة جديدة', projEmpty:'لم تُحمَّل ترجمة', secImport:'استيراد', secLang:'اللغات',
   secStyle:'الأسلوب', secRules:'القواعد', secEngine:'المحرك', lblSrcShort:'لغة المصدر',
-  lblDstShort:'اللغة الهدف', lblKeepTermsShort:'إبقاء الأسماء الأصلية', lblAutoTermsShort:'مسرد تلقائي', lblMaxWShort:'عرض السطر', lblBiMaxWShort:'عرض ثنائي اللغة (مترجم)', wUnit:'حرف', lblLyric:'كلمات الأغاني', lyricTrans:'ترجمة', lyricKeep:'إبقاء الأصل', lyricDrop:'حذف', lblMarks:'علامات الأغنية', lblDropFillers:'حذف كلمات الحشو',
+  lblDstShort:'اللغة الهدف', lblKeepTermsShort:'الأسماء الخاصة', lblAutoTermsShort:'مسرد تلقائي', lblMaxWShort:'عرض السطر', lblBiMaxWShort:'عرض ثنائي اللغة (مترجم)', wUnit:'حرف', lblLyric:'كلمات الأغاني', lyricTrans:'ترجمة', lyricKeep:'إبقاء الأصل', lyricDrop:'حذف', lblMarks:'علامات الأغنية', lblDropFillers:'حذف كلمات الحشو',
   /* v0.9.70 两段式界面新增 */
 },
 'tr': {pureMTMode:'Saf çeviri modeli algılandı ({0}): grup başına doğrudan çeviriye geçiliyor ({1} grup, 4 paralel, başarılı gruplar önbelleğe alınıyor)…',pureMTDone:'Grup çevirisi tamamlandı: {0}/{1} grup başarılı',gotClick:'“Çeviriyi başlat” isteği alındı — hazırlanıyor…',reqSent:'{0}. parti isteği gönderildi ({1} grup) — model yanıtı bekleniyor…',waitSec:'{0} saniye geçti — modelden hâlâ yanıt yok…',errTimeout:'{0} saniye sonra yanıt yok — istek iptal edildi (zaman aşımı). Parti başına karakter bütçesini küçültmeyi veya daha hızlı bir modele geçmeyi deneyin; model yanıt vermeden önce düşünüyorsa (Qwen3, GLM…), ek istek parametrelerine {"enable_thinking":false} yazın',alreadyRunning:'Önceki çalıştırma henüz bitmedi — durdurma istendi. Yeniden başlamadan önce mevcut partinin tamamlanmasını bekleyin',modeMismatch:'Dikkat: aşağıda özel API alanları doldurulmuş ({0}), ancak mod “Varsayılan model” olduğu için kullanılmayacak. Kullanmak için modu “Özel API” olarak değiştirin',errTruncOut:'Model çıktısı token sınırına takılıp tamamlanmadan kesildi — Ek istek parametrelerinde max_tokens değerini artırın, örn. {"max_tokens":8192}',lblExtra:'Ek istek parametreleri (JSON, isteğe bağlı)',extraTip:'Her özel API isteğinin gövdesine eklenir. Örn. {"enable_thinking":false} akıl yürütmeyi kapatır; {"response_format":{"type":"json_object"}} JSON çıktısını zorlar. model / messages / temperature / stream üzerine yazılamaz.',
@@ -2484,9 +2499,9 @@ const I18N = {
   lblProvider:'Sağlayıcı', lblBase:'Temel URL (/chat/completions otomatik eklenir)', lblModel:'Model', lblBatch:'Parti başına karakter', batchTip:'Modele istek başına gönderilen altyazı karakteri sayısı. Gruplar uzunluğa göre otomatik kesilir: kısa satırlar daha fazla, uzun satırlar daha az doldurulur, böylece her grubun çıktısı dengeli olur. Daha büyük değerler biraz daha hızlıdır, ancak çok büyük değerler kaliteyi düşürebilir; varsayılan 3000 çoğu video için uygundur.',
   lblKey:'API Anahtarı (yalnızca bu tarayıcıda saklanır)',
   chkKeepTerms:'Özel isimleri (kişi/marka/ürün/terim) çevirmeden koru',
-  termsHintOn:'İşaretliyken listedeki terimler özgün biçimde kalır (liste etkin).',
-  termsHintOff:'Kapalı: tüm isim/marka/ürün/terim çevrilir; terim listesi yok sayılır.',
-  lblTerms:'Özgün biçimde korunacak özel isimler (isteğe bağlı, virgülle ayır)', termsPh:'örn. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Kişi, kurum ve marka adları özgün yazımıyla kalır ve çevrilmez. Aşağıdaki sözlükte tanımlı maddeler yine önceliklidir.',
+  termsHintOff:'Kişi, kurum ve marka adlarının tamamı hedef dile çevrilir. Aşağıdaki sözlükte tanımlı maddeler yine önceliklidir.', pnKeep:'Özgün kalsın', pnTrans:'Tümünü çevir', btnGlossFile:'📂 Sözlük yükle', glossHit:'Sözlük: {0} madde, bu dosyada {1} eşleşti, {2} satır tanınmadı',
+  lblTerms:'Birleşik sözlük (her satıra bir terim)', termsPh:'Her satıra bir: özgün → çeviri; yalnızca özgün yazılan satır özgün kalır',
   lblMaxW:'Satır genişliği tam genişlik BİRİMİ cinsindendir, karakter sayısı değil: 1 CJK karakteri = 1; Latin, Kiril, Tay ve Arap harfleri = 0.5, yani yarım genişlikli yazılarda 1 birim ≈ 2 karakter. Tek dilli sarma ve iki dilli dışa aktarımda «- A - B» iki konuşmacı satırlarını yönetir. Varsayılan dile göre Netflix standardını izler (zh/ko 16, ja 13, diğer 21). Büyütmek = daha uzun satırlar, daha az sarma ve bölme.', lblBiMaxW:'İki dilli dışa aktarımda ÇEVİRİ satırının maksimum genişliği (aynı tam genişlik birimi, karakter sayısı değil: aynı 32 değeri ≈ 32 Çince karakter ama ≈ 64 Tay karakteri). Yalnızca çeviri satırını sınırlar; kaynak satır anlamsal kesme noktalarını izler ve genişlikle sınırlı değildir, iki konuşmacı satırları yukarıdaki «Satır genişliği» değerini kullanır. Yalnızca aşılması zaman çizelgesini böler. Bu değer dile göre DEĞİŞMEZ. Büyütmek = daha az bölme ama daha uzun çeviri satırları.', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla', lyricTip:'Şarkı satırlarının işlenmesi: çevir / orijinali koru / kaldır. Tanıma, «Şarkı işaretleri»ndeki karakterlerle yapılır.', marksTip:'Bu karakterleri içeren satırlar şarkı sözü sayılır. Varsayılan ♪♫♬♩ — ekleyip çıkarabilirsiniz; boş bırakırsanız varsayılan geri gelir. Dosyanız müzik simgesi kullanmıyorsa, kullandığı işareti ekleyin. Bir satırda hem şarkı hem diyalog varsa, «Kaldır» otomatik olarak orijinali korumaya döner, böylece diyalog silinmez.', lyricSkipKeep:'{0} şarkı sözü grubu ayara göre orijinal dilde bırakıldı (çevrilmedi)', lyricSkipDrop:'{0} şarkı sözü grubu ayara göre kaldırıldı', lyricWarn:'Dikkat: satırların {0}%\'i şarkı sözü olarak sınıflandırıldı — işaret kümesi fazla geniş olabilir. Kontrol edip yeniden çalıştırın.', dropFillersTip:'Açık: yerel kuralın salt dolgu sözcük olarak değerlendirdiği satırlar (ıı, hmm, anlamsız mırıldanma) doğrudan kaldırılır ve modele gönderilmez, bu yüzden sonuç kesindir. Kapalı: tüm satırlar modele gider ve model her satır için çevirmek mi, korumak mı yoksa silmek mi gerektiğine tek tek karar verir. Varsayılan olarak açık.',
   btnPost:'↻ Sadece son işlem (satır sarma/etiket temizleme)',
   hintPrivacy:'Varsayılan model: altyazılar bu sitenin sunucusu üzerinden yöneticinin yapılandırdığı sağlayıcıya iletilir; Özel API: seçtiğin sağlayıcı bunları doğrudan işler, bu siteye uğramaz.',
@@ -2554,7 +2569,7 @@ const I18N = {
   aboutBody:'AI-SRTSub, açık kaynaklı bir AI altyazı çevirmenidir. İyi bir aracın ücretsiz, temiz ve gizliliğe saygılı olması gerektiğine inanıyoruz — reklam yok, kayıt yok, dosyalarına dokunma yok. Kendi sunucunda çalıştır ya da birlikte cilalayalım.', aboutRepo:'GitHub deposu', aboutLicense:'Açık kaynak AGPL-3.0', wsBackHome:'Ana sayfa',
   wsUploadNew:'Yeni altyazı', projEmpty:'Altyazı yüklenmedi', secImport:'İçe aktar', secLang:'Diller',
   secStyle:'Stil', secRules:'Kurallar', secEngine:'Motor', lblSrcShort:'Kaynak dil',
-  lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimleri koru', lblAutoTermsShort:'Otomatik sözlük', lblMaxWShort:'Satır genişliği', lblBiMaxWShort:'İki dilli genişlik (çeviri)', wUnit:'karakter', lblLyric:'Şarkı sözleri', lyricTrans:'Çevir', lyricKeep:'Orijinali koru', lyricDrop:'Kaldır', lblMarks:'Şarkı işaretleri', lblDropFillers:'Dolgu sözcükleri kaldır',
+  lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimler', lblAutoTermsShort:'Otomatik sözlük', lblMaxWShort:'Satır genişliği', lblBiMaxWShort:'İki dilli genişlik (çeviri)', wUnit:'karakter', lblLyric:'Şarkı sözleri', lyricTrans:'Çevir', lyricKeep:'Orijinali koru', lyricDrop:'Kaldır', lblMarks:'Şarkı işaretleri', lblDropFillers:'Dolgu sözcükleri kaldır',
   /* v0.9.70 两段式界面新增 */
 },
 'nl': {pureMTMode:'Pure vertaalmodel gedetecteerd ({0}): overschakelen naar directe vertaling per groep ({1} groepen, 4 parallel, geslaagde groepen worden gecacht)…',pureMTDone:'Per groep vertalen voltooid: {0}/{1} groepen geslaagd',gotClick:'Verzoek om te starten met vertalen ontvangen — aan het voorbereiden…',reqSent:'Verzoek voor batch {0} verzonden ({1} groepen) — wachten op antwoord van het model…',waitSec:'{0} s gewacht — nog steeds geen antwoord van het model…',errTimeout:'Geen antwoord na {0} s — verzoek afgebroken (time-out). Verlaag het tekensbudget per batch of kies een sneller model; als het model eerst redeneert voordat het antwoordt (Qwen3, GLM…), zet {"enable_thinking":false} bij Extra verzoekparameters',alreadyRunning:'De vorige run is nog niet klaar — stop is aangevraagd. Wacht tot de huidige batch is afgerond voordat je opnieuw start',modeMismatch:'Let op: hieronder is een aangepaste API ingevuld ({0}), maar de modus is “Standaardmodel”, dus wordt die niet gebruikt. Zet de modus op “Aangepaste API” om hem te gebruiken',errTruncOut:'De modeluitvoer bereikte de tokenlimiet en werd voortijdig afgebroken — verhoog max_tokens bij Extra verzoekparameters, bijv. {"max_tokens":8192}',lblExtra:'Extra verzoekparameters (JSON, optioneel)',extraTip:'Wordt samengevoegd met de body van elke aangepaste API-aanvraag. Bijv. {"enable_thinking":false} om redeneren uit te schakelen; {"response_format":{"type":"json_object"}} dwingt JSON af. model / messages / temperature / stream kunnen niet worden overschreven.',
@@ -2609,10 +2624,10 @@ const I18N = {
   batchTip:'Aantal tekens ondertitel dat per verzoek naar het model gaat. Batches worden automatisch op lengte verdeeld: korte regels vullen meer, lange minder, zodat elke uitvoer stabiel blijft. Grotere waardes zijn iets sneller klaar, maar te groot kan de kwaliteit verlagen; de standaard 3000 past bij de meeste video\'s.',
   lblKey:'API-sleutel (alleen opgeslagen in deze browser)',
   chkKeepTerms:'Eigennamen (namen/merken/producten/termen) onvertaald laten',
-  termsHintOn:'Aangevinkt = termen in de lijst blijven in de oorspronkelijke vorm (lijst actief).',
-  termsHintOff:'Uit: alle namen/merken/producten/termen worden vertaald; de termenlijst wordt genegeerd.',
-  lblTerms:'Eigennamen die in de oorspronkelijke vorm blijven (optioneel, kommagescheiden)',
-  termsPh:'bijv. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Namen van personen, organisaties en merken behouden hun oorspronkelijke spelling en worden niet vertaald. Invoer in de woordenlijst hieronder blijft voorrang hebben.',
+  termsHintOff:'Namen van personen, organisaties en merken worden allemaal naar de doeltaal vertaald. Invoer in de woordenlijst hieronder blijft voorrang hebben.', pnKeep:'Origineel behouden', pnTrans:'Alles vertalen', btnGlossFile:'📂 Woordenlijst uploaden', glossHit:'Woordenlijst: {0} termen, {1} gevonden in dit bestand, {2} regels niet herkend',
+  lblTerms:'Uniforme woordenlijst (één term per regel)',
+  termsPh:'Eén per regel: bron → vertaling; een regel met alleen de bron behoudt het origineel',
   lblMaxW:'Regelbreedte in volle-breedte-EENHEDEN, niet tekens: 1 CJK-teken = 1; Latijnse, Cyrillische, Thaise en Arabische letters = 0,5, dus 1 eenheid is bij halfbrede schriften ongeveer 2 tekens. Bepaalt het afbreken bij eentalige uitvoer en de regels met twee sprekers („- A - B”) bij tweetalige uitvoer. De standaard volgt de Netflix-norm per taal (zh/ko 16, ja 13, overige 21). Hoger = langere regels, minder afbrekingen en cuesplitsingen.',
   lblBiMaxW:'Maximale breedte van de VERTAALDE regel bij tweetalige uitvoer (dezelfde volle-breedte-eenheid, geen tekens: dezelfde 32 is ongeveer 32 Chinese tekens maar ongeveer 64 Thaise tekens). Beperkt alleen de vertaalde regel; de bronregel volgt semantische breukpunten en wordt niet op breedte beperkt, en regels met twee sprekers gebruiken „Regelbreedte” hierboven. Alleen overschrijding hiervan splitst de tijdlijn. Deze waarde verandert NIET per taal. Hoger = minder splitsingen maar langere vertaalde regels.',
   btnGo:'▶ Vertaling starten',
@@ -2834,7 +2849,7 @@ const I18N = {
   secEngine:'Motor',
   lblSrcShort:'Brontaal',
   lblDstShort:'Doeltaal',
-  lblKeepTermsShort:'Eigennamen behouden',
+  lblKeepTermsShort:'Eigennamen',
   lblAutoTermsShort:'Automatische woordenlijst',
   lblMaxWShort:'Regelbreedte',
   lblBiMaxWShort:'Tweetalige breedte (vertaald)',
@@ -2898,10 +2913,10 @@ const I18N = {
   batchTip:'Liczba znaków napisów wysyłanych do modelu w jednym żądaniu. Partycje są dzielone według długości automatycznie: krótkie linie wypełniają więcej, długie mniej, co utrzymuje stabilny rozmiar wyniku. Większa wartość nieco skraca czas, ale zbyt duża może obniżyć jakość; domyślne 3000 pasuje do większości filmów.',
   lblKey:'Klucz API (zapisany tylko w tej przeglądarce)',
   chkKeepTerms:'Zachowaj nazwy własne (imiona/marki/produkty/terminy) bez tłumaczenia',
-  termsHintOn:'Zaznaczone = terminy z listy zostają w oryginalnej formie (lista aktywna).',
-  termsHintOff:'Wyłączone: wszystkie nazwy/marki/produkty/terminy są tłumaczone; lista terminów jest ignorowana.',
-  lblTerms:'Nazwy własne do zachowania w oryginale (opcjonalnie, oddzielone przecinkami)',
-  termsPh:'np. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Nazwiska, organizacje i marki zachowują oryginalną pisownię i nie są tłumaczone. Wpisy w słowniku poniżej mają nadal pierwszeństwo.',
+  termsHintOff:'Nazwiska, organizacje i marki są wszystkie tłumaczone na język docelowy. Wpisy w słowniku poniżej mają nadal pierwszeństwo.', pnKeep:'Zachowaj oryginał', pnTrans:'Tłumacz wszystko', btnGlossFile:'📂 Wczytaj słownik', glossHit:'Słownik: {0} haseł, {1} pasuje w tym pliku, {2} wierszy nierozpoznanych',
+  lblTerms:'Ujednolicony słownik (jeden termin w wierszu)',
+  termsPh:'Jeden w wierszu: oryginał → tłumaczenie; wiersz z samym oryginałem zachowuje go bez zmian',
   lblMaxW:'Szerokość linii w JEDNOSTKACH pełnej szerokości, nie w znakach: 1 znak CJK = 1; litery łacińskie, cyrylickie, tajskie i arabskie = 0,5, więc 1 jednostka to przy półszerokich pismach około 2 znaki. Odpowiada za łamanie w eksporcie jednojęzycznym oraz linie z dwoma mówiącymi („- A - B”) w eksporcie dwujęzycznym. Domyślna wartość wynika z norm Netflixa dla danego języka (zh/ko 16, ja 13, pozostałe 21). Więcej = dłuższe linie, mniej łamań i podziałów linii.',
   lblBiMaxW:'Maksymalna szerokość PRZETŁUMACZONEJ linii w eksporcie dwujęzycznym (ta sama jednostka pełnej szerokości, nie znaki: te same 32 to około 32 znaki chińskie, ale około 64 tajskie). Ogranicza tylko linię tłumaczenia; linia oryginału podąża za granicami znaczeniowymi i nie jest ograniczona szerokością, a linie z dwoma mówiącymi używają „Szerokość linii” powyżej. Tylko przekroczenie tej wartości dzieli oś czasu. Wartość NIE zmienia się wraz z językiem. Więcej = mniej podziałów, ale dłuższe linie tłumaczenia.',
   btnGo:'▶ Rozpocznij tłumaczenie',
@@ -3123,7 +3138,7 @@ const I18N = {
   secEngine:'Silnik',
   lblSrcShort:'Język źródłowy',
   lblDstShort:'Język docelowy',
-  lblKeepTermsShort:'Zachowaj nazwy własne',
+  lblKeepTermsShort:'Nazwy własne',
   lblAutoTermsShort:'Automatyczny słownik',
   lblMaxWShort:'Szerokość linii',
   lblBiMaxWShort:'Szerokość dwujęzyczna (tłumaczenie)',
@@ -3187,10 +3202,10 @@ const I18N = {
   batchTip:'Antal tecken undertext som skickas till modellen per förfrågan. Batcher delas automatiskt efter längd: korta rader fyller mer, långa mindre, vilket håller varje utdata stabil. Större värden blir något snabbare klara, men för stora kan sänka kvaliteten; standardvärdet 3000 passar de flesta videor.',
   lblKey:'API-nyckel (sparas endast i den här webbläsaren)',
   chkKeepTerms:'Behåll egennamn (namn/varumärken/produkter/termer) oöversatta',
-  termsHintOn:'Markerad = termer i listan behåller originalformen (listan är aktiv).',
-  termsHintOff:'Av: alla namn/varumärken/produkter/termer översätts; termlistan ignoreras.',
-  lblTerms:'Egennamn som ska behålla originalformen (valfritt, kommaseparerat)',
-  termsPh:'t.ex. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Personer, organisationer och varumärken behåller sin ursprungliga stavning och översätts inte. Poster i ordlistan nedan har fortfarande företräde.',
+  termsHintOff:'Personer, organisationer och varumärken översätts alla till målspråket. Poster i ordlistan nedan har fortfarande företräde.', pnKeep:'Behåll original', pnTrans:'Översätt allt', btnGlossFile:'📂 Ladda upp ordlista', glossHit:'Ordlista: {0} poster, {1} matchar i denna fil, {2} rader okända',
+  lblTerms:'Enhetlig ordlista (en term per rad)',
+  termsPh:'En per rad: original → översättning; en rad med bara originalet behåller det',
   lblMaxW:'Rad bredd i helbredsENHETER, inte tecken: 1 CJK-tecken = 1; latinska, kyrilliska, thailändska och arabiska bokstäver = 0,5, så 1 enhet är cirka 2 tecken för halvbreda skriftsystem. Styr radbrytning i enspråkig export och ”- A - B”-rader med två talare i tvåspråkig export. Standardvärdet följer Netflix-riktlinjen per språk (zh/ko 16, ja 13, övriga 21). Högre = längre rader, färre radbrytningar och uppdelningar.',
   lblBiMaxW:'Maxbredd för den ÖVERSATTA raden vid tvåspråkig export (samma helbredsenhet, inte tecken: samma 32 är cirka 32 kinesiska tecken men cirka 64 thailändska). Begränsar bara den översatta raden; originalraden följer semantiska brytpunkter och begränsas inte av bredden, och rader med två talare använder ”Rad bredd” ovan. Det är bara överskridande här som delar tidslinjen. Värdet ändras INTE med språket. Högre = färre uppdelningar men längre översatta rader.',
   btnGo:'▶ Starta översättning',
@@ -3412,7 +3427,7 @@ const I18N = {
   secEngine:'Motor',
   lblSrcShort:'Källspråk',
   lblDstShort:'Målspråk',
-  lblKeepTermsShort:'Behåll egennamn',
+  lblKeepTermsShort:'Egennamn',
   lblAutoTermsShort:'Automatisk ordlista',
   lblMaxWShort:'Radbredd',
   lblBiMaxWShort:'Tvåspråkig bredd (översatt)',
@@ -3476,10 +3491,10 @@ const I18N = {
   batchTip:'Počet znaků titulků odeslaných modelu v jednom požadavku. Dávky se dělí automaticky podle délky: krátké řádky zaplní více, dlouhé méně, takže výstup zůstává stabilní. Vyšší hodnota je o něco rychlejší, ale příliš velká může snížit kvalitu; výchozích 3000 sedí většině videí.',
   lblKey:'API klíč (uložen jen v tomto prohlížeči)',
   chkKeepTerms:'Ponechat vlastní jména (jména/značky/produkty/termíny) nepřeložená',
-  termsHintOn:'Zaškrtnuto = termíny ze seznamu zůstanou v původní podobě (seznam je aktivní).',
-  termsHintOff:'Vypnuto: všechna jména/značky/produkty/termíny se přeloží; seznam termínů se ignoruje.',
-  lblTerms:'Vlastní jména, která mají zůstat v originále (volitelné, oddělené čárkami)',
-  termsPh:'např. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Jména osob, organizací a značek si ponechávají původní podobu a nepřekládají se. Položky ve slovníčku níže mají stále přednost.',
+  termsHintOff:'Jména osob, organizací a značek se všechna překládají do cílového jazyka. Položky ve slovníčku níže mají stále přednost.', pnKeep:'Ponechat originál', pnTrans:'Přeložit vše', btnGlossFile:'📂 Nahrát slovníček', glossHit:'Slovníček: {0} položek, {1} nalezeno v tomto souboru, {2} řádků nerozpoznáno',
+  lblTerms:'Jednotný slovníček (jeden termín na řádek)',
+  termsPh:'Jeden na řádek: originál → překlad; řádek s pouhým originálem jej ponechává beze změny',
   lblMaxW:'Šířka řádku v JEDNOTKÁCH plné šířky, ne ve znacích: 1 znak CJK = 1; latinské, cyrilské, thajské a arabské znaky = 0,5, takže 1 jednotka je u pološířkových písem asi 2 znaky. Řídí zalamování u jednojazyčného exportu a řádky se dvěma mluvčími („- A - B”) u dvojjazyčného exportu. Výchozí hodnota se řídí normou Netflix podle jazyka (zh/ko 16, ja 13, ostatní 21). Vyšší = delší řádky, méně zalamování a dělení.',
   lblBiMaxW:'Maximální šířka PŘELOŽENÉHO řádku u dvojjazyčného exportu (stejná jednotka plné šířky, ne znaky: stejných 32 je asi 32 čínských znaků, ale asi 64 thajských). Omezuje jen přeložený řádek; zdrojový řádek sleduje sémantické předěly a šířkou omezen není, řádky se dvěma mluvčími používají „Šířka řádku” výše. Časovou osu dělí pouze překročení této hodnoty. Hodnota se NEMĚNÍ podle jazyka. Vyšší = méně dělení, ale delší přeložené řádky.',
   btnGo:'▶ Spustit překlad',
@@ -3701,7 +3716,7 @@ const I18N = {
   secEngine:'Stroj',
   lblSrcShort:'Zdrojový jazyk',
   lblDstShort:'Cílový jazyk',
-  lblKeepTermsShort:'Ponechat vlastní jména',
+  lblKeepTermsShort:'Vlastní jména',
   lblAutoTermsShort:'Automatický slovníček',
   lblMaxWShort:'Šířka řádku',
   lblBiMaxWShort:'Dvojjazyčná šířka (překlad)',
@@ -3765,10 +3780,10 @@ const I18N = {
   batchTip:'Скільки символів субтитрів надсилається моделі за один запит. Пакети формуються автоматично за довжиною: короткі рядки заповнюють більше, довгі менше, тож обсяг відповіді стабільний. Більше значення трохи пришвидшує роботу, але надто велике може знизити якість; типові 3000 підходять для більшості відео.',
   lblKey:'API-ключ (зберігається лише в цьому браузері)',
   chkKeepTerms:'Залишити власні назви (імена/бренди/продукти/терміни) без перекладу',
-  termsHintOn:'Позначено = терміни зі списку зберігають оригінальну форму (список увімкнено).',
-  termsHintOff:'Вимкнено: усі імена/бренди/продукти/терміни перекладаються; список термінів ігнорується.',
-  lblTerms:'Власні назви, які слід лишити в оригіналі (необов’язково, через кому)',
-  termsPh:'напр. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Імена, організації та бренди зберігають оригінальне написання і не перекладаються. Записи в глосарії нижче мають перевагу.',
+  termsHintOff:'Імена, організації та бренди всі перекладаються цільовою мовою. Записи в глосарії нижче мають перевагу.', pnKeep:'Зберегти оригінал', pnTrans:'Перекладати все', btnGlossFile:'📂 Завантажити глосарій', glossHit:'Глосарій: {0} записів, збігів у цьому файлі {1}, нерозпізнаних рядків {2}',
+  lblTerms:'Єдиний глосарій (один термін у рядку)',
+  termsPh:'Один у рядку: оригінал → переклад; рядок лише з оригіналом зберігає його',
   lblMaxW:'Ширина рядка в ОДИНИЦЯХ повної ширини, а не в символах: 1 символ CJK = 1; латиниця, кирилиця, тайська та арабська абетки = 0,5, тобто 1 одиниця — це приблизно 2 символи для вузьких писемностей. Керує перенесенням в одномувному експорті та рядками «- A - B» з двома мовцями у двомовному експорті. Типове значення відповідає нормі Netflix для мови (zh/ko 16, ja 13, інші 21). Більше = довші рядки, менше перенесень і поділів.',
   lblBiMaxW:'Максимальна ширина ПЕРЕКЛАДЕНОГО рядка у двомовному експорті (ті самі одиниці повної ширини, не символи: ті самі 32 — це приблизно 32 китайські символи, але близько 64 тайських). Обмежує лише рядок перекладу; рядок оригіналу йде за змістовими межами й не обмежений шириною, а рядки з двома мовцями використовують «Ширина рядка» вище. Лише перевищення цієї величини розділяє часову шкалу. Значення НЕ змінюється залежно від мови. Більше = менше поділів, але довші рядки перекладу.',
   btnGo:'▶ Почати переклад',
@@ -3990,7 +4005,7 @@ const I18N = {
   secEngine:'Механізм',
   lblSrcShort:'Мова джерела',
   lblDstShort:'Мова перекладу',
-  lblKeepTermsShort:'Зберегти власні назви',
+  lblKeepTermsShort:'Власні назви',
   lblAutoTermsShort:'Автоматичний глосарій',
   lblMaxWShort:'Ширина рядка',
   lblBiMaxWShort:'Двомовна ширина (переклад)',
@@ -4054,10 +4069,10 @@ const I18N = {
   batchTip:'Antal tegn undertekst der sendes til modellen pr. anmodning. Batcher deles automatisk efter længde: korte linjer fylder mere, lange mindre, så hvert output holdes stabilt. Større værdier bliver lidt hurtigere færdige, men for store kan sænke kvaliteten; standarden 3000 passer til de fleste videoer.',
   lblKey:'API-nøgle (gemmes kun i denne browser)',
   chkKeepTerms:'Behold egennavne (navne/mærker/produkter/termer) uoversatte',
-  termsHintOn:'Markeret = termer på listen beholder originalformen (listen er aktiv).',
-  termsHintOff:'Fra: alle navne/mærker/produkter/termer oversættes; termlisten ignoreres.',
-  lblTerms:'Egennavne der skal beholdes på originalsproget (valgfrit, kommasepareret)',
-  termsPh:'f.eks. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Personer, organisationer og brands beholder deres oprindelige stavemåde og oversættes ikke. Poster i ordlisten nedenfor har stadig forrang.',
+  termsHintOff:'Personer, organisationer og brands oversættes alle til målsproget. Poster i ordlisten nedenfor har stadig forrang.', pnKeep:'Behold original', pnTrans:'Oversæt alt', btnGlossFile:'📂 Upload ordliste', glossHit:'Ordliste: {0} poster, {1} fundet i denne fil, {2} linjer ikke genkendt',
+  lblTerms:'Ensartet ordliste (ét udtryk pr. linje)',
+  termsPh:'Ét pr. linje: original → oversættelse; en linje med kun originalen beholder den',
   lblMaxW:'Linjebredde i fuldbrede-ENHEDER, ikke tegn: 1 CJK-tegn = 1; latinske, kyrilliske, thailandske og arabiske bogstaver = 0,5, så 1 enhed er ca. 2 tegn for halvbrede skriftsystemer. Styrer ombrud ved ensproget eksport og ”- A - B”-linjer med to talere ved tosproget eksport. Standard følger Netflix-retningslinjen pr. sprog (zh/ko 16, ja 13, øvrige 21). Højere = længere linjer, færre ombrud og opdelinger.',
   lblBiMaxW:'Maks. bredde på den OVERSATTE linje ved tosproget eksport (samme fuldbrede-enhed, ikke tegn: de samme 32 er ca. 32 kinesiske tegn men ca. 64 thailandske). Begrænser kun den oversatte linje; kildelinjen følger semantiske brudpunkter og er ikke breddebegrænset, og linjer med to talere bruger ”Linjebredde” ovenfor. Kun overskridelse her deler tidslinjen. Værdien ændres IKKE med sproget. Højere = færre opdelinger men længere oversatte linjer.',
   btnGo:'▶ Start oversættelse',
@@ -4279,7 +4294,7 @@ const I18N = {
   secEngine:'Motor',
   lblSrcShort:'Kildesprog',
   lblDstShort:'Målsprog',
-  lblKeepTermsShort:'Behold egennavne',
+  lblKeepTermsShort:'Egennavne',
   lblAutoTermsShort:'Automatisk ordliste',
   lblMaxWShort:'Linjebredde',
   lblBiMaxWShort:'Tosproget bredde (oversat)',
@@ -4343,10 +4358,10 @@ const I18N = {
   batchTip:'Kuinka monta tekstityksen merkkiä lähetetään mallille yhdellä pyynnöllä. Erät jaetaan automaattisesti pituuden mukaan: lyhyet rivit täyttävät enemmän, pitkät vähemmän, jolloin tuloksen koko pysyy tasaisena. Suurempi arvo valmistuu hieman nopeammin, mutta liian suuri voi heikentää laatua; oletus 3000 sopii useimpiin videoihin.',
   lblKey:'API-avain (tallennetaan vain tähän selaimeen)',
   chkKeepTerms:'Säilytä erisnimet (nimet/brändit/tuotteet/termit) kääntämättä',
-  termsHintOn:'Valittuna = luettelon termit säilyvät alkuperäisessä muodossa (luettelo on käytössä).',
-  termsHintOff:'Pois käytöstä: kaikki nimet/brändit/tuotteet/termit käännetään; termiluetteloa ei huomioida.',
-  lblTerms:'Erisnimet, jotka säilytetään alkuperäisinä (valinnainen, pilkuilla eroteltuna)',
-  termsPh:'esim. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Henkilöiden, organisaatioiden ja tuotemerkkien nimet säilyvät alkuperäisessä muodossaan eikä niitä käännetä. Alla olevan sanaston merkinnät ovat edelleen ensisijaisia.',
+  termsHintOff:'Henkilöiden, organisaatioiden ja tuotemerkkien nimet käännetään kaikki kohdekielelle. Alla olevan sanaston merkinnät ovat edelleen ensisijaisia.', pnKeep:'Säilytä alkuperäinen', pnTrans:'Käännä kaikki', btnGlossFile:'📂 Lataa sanasto', glossHit:'Sanasto: {0} merkintää, tästä tiedostosta löytyi {1}, {2} riviä ei tunnistettu',
+  lblTerms:'Yhtenäinen sanasto (yksi termi per rivi)',
+  termsPh:'Yksi per rivi: alkuperäinen → käännös; rivi, jossa on vain alkuperäinen, säilyttää sen',
   lblMaxW:'Rivin leveys täysleveys-YKSIKKÖINÄ, ei merkkeinä: 1 CJK-merkki = 1; latinalaiset, kyrilliset, thai- ja arabialaiset kirjaimet = 0,5, eli 1 yksikkö on noin 2 merkkiä puolileveissä kirjoitusjärjestelmissä. Ohjaa rivittelyä yksikielisessä viennissä ja kahden puhujan ”- A - B” -rivejä kaksikielisessä viennissä. Oletus noudattaa Netflixin kielikohtaista ohjetta (zh/ko 16, ja 13, muut 21). Suurempi = pidemmät rivit, vähemmän rivinvaihtoja ja jakoja.',
   lblBiMaxW:'Kaksikielisessä viennissä KÄÄNNETYN rivin enimmäisleveys (sama täysleveysyksikkö, ei merkkejä: sama 32 on noin 32 kiinalaista merkkiä mutta noin 64 thai-merkkiä). Rajoittaa vain käännettyä riviä; lähderivi seuraa merkitysrajoja eikä ole leveysrajoitettu, ja kahden puhujan rivit käyttävät yllä olevaa ”Rivin leveys” -arvoa. Vain tämän ylittäminen jakaa aikajanan. Arvo EI muutu kielen mukaan. Suurempi = vähemmän jakoja mutta pidemmät käännetyt rivit.',
   btnGo:'▶ Aloita käännös',
@@ -4568,7 +4583,7 @@ const I18N = {
   secEngine:'Moottori',
   lblSrcShort:'Lähdekieli',
   lblDstShort:'Kohdekieli',
-  lblKeepTermsShort:'Säilytä erisnimet',
+  lblKeepTermsShort:'Erisnimet',
   lblAutoTermsShort:'Automaattinen sanasto',
   lblMaxWShort:'Rivin leveys',
   lblBiMaxWShort:'Kaksikielinen leveys (käännös)',
@@ -4632,10 +4647,10 @@ const I18N = {
   batchTip:'Πόσοι χαρακτήρες υποτίτλων αποστέλλονται στο μοντέλο ανά αίτημα. Οι παρτίδες κόβονται αυτόματα ανάλογα με το μήκος: οι σύντομες γραμμές γεμίζουν περισσότερο, οι μακριές λιγότερο, οπότε το μέγεθος εξόδου παραμένει σταθερό. Μεγαλύτερες τιμές ολοκληρώνονται λίγο πιο γρήγορα, αλλά η υπερβολή μπορεί να μειώσει την ποιότητα· η προεπιλογή 3000 ταιριάζει στα περισσότερα βίντεο.',
   lblKey:'API κλειδί (αποθηκεύεται μόνο σε αυτόν τον περιηγητή)',
   chkKeepTerms:'Διατήρηση κύριων ονομάτων (ονόματα/επωνυμίες/προϊόντα/όροι) χωρίς μετάφραση',
-  termsHintOn:'Επιλεγμένο = οι όροι της λίστας διατηρούν την πρωτότυπη μορφή τους (η λίστα είναι ενεργή).',
-  termsHintOff:'Ανενεργό: όλα τα ονόματα/επωνυμίες/προϊόντα/όροι μεταφράζονται· η λίστα όρων αγνοείται.',
-  lblTerms:'Κύρια ονόματα που θα διατηρηθούν ως έχουν (προαιρετικά, χωρισμένα με κόμμα)',
-  termsPh:'π.χ. SpaceX, Prism, EnduroSat',
+  termsHintOn:'Τα ονόματα προσώπων, οργανισμών και εμπορικών σημάτων διατηρούν την αρχική τους μορφή και δεν μεταφράζονται. Οι καταχωρίσεις στο γλωσσάρι παρακάτω εξακολουθούν να υπερισχύουν.',
+  termsHintOff:'Τα ονόματα προσώπων, οργανισμών και εμπορικών σημάτων μεταφράζονται όλα στη γλώσσα στόχο. Οι καταχωρίσεις στο γλωσσάρι παρακάτω εξακολουθούν να υπερισχύουν.', pnKeep:'Διατήρηση πρωτοτύπου', pnTrans:'Μετάφραση όλων', btnGlossFile:'📂 Μεταφόρτωση γλωσσαρίου', glossHit:'Γλωσσάρι: {0} καταχωρίσεις, {1} βρέθηκαν σε αυτό το αρχείο, {2} γραμμές δεν αναγνωρίστηκαν',
+  lblTerms:'Ενιαίο γλωσσάρι (ένας όρος ανά γραμμή)',
+  termsPh:'Ένας ανά γραμμή: πρωτότυπο → απόδοση· μια γραμμή με μόνο το πρωτότυπο το διατηρεί',
   lblMaxW:'Πλάτος γραμμής σε ΜΟΝΑΔΕΣ πλήρους πλάτους, όχι σε χαρακτήρες: 1 χαρακτήρας CJK = 1· λατινικοί, κυριλλικοί, ταϊλανδικοί και αραβικοί χαρακτήρες = 0,5, δηλαδή 1 μονάδα είναι περίπου 2 χαρακτήρες για γραφές μισού πλάτους. Καθορίζει το σπάσιμο στη μονόγλωσση εξαγωγή και τις γραμμές «- A - B» με δύο ομιλητές στη δίγλωσση εξαγωγή. Η προεπιλογή ακολουθεί την προδιαγραφή Netflix ανά γλώσσα (zh/ko 16, ja 13, άλλες 21). Μεγαλύτερο = πιο μακριές γραμμές, λιγότερα σπασίματα και διασπάσεις.',
   lblBiMaxW:'Μέγιστο πλάτος της ΜΕΤΑΦΡΑΣΜΕΝΗΣ γραμμής στη δίγλωσση εξαγωγή (ίδια μονάδα πλήρους πλάτους, όχι χαρακτήρες: το ίδιο 32 είναι περίπου 32 κινεζικοί χαρακτήρες αλλά περίπου 64 ταϊλανδικοί). Περιορίζει μόνο τη μεταφρασμένη γραμμή· η γραμμή πηγής ακολουθεί τα σημασιολογικά όρια και δεν περιορίζεται ως προς το πλάτος, ενώ οι γραμμές με δύο ομιλητές χρησιμοποιούν το «Πλάτος γραμμής» παραπάνω. Μόνο η υπέρβασή του διασπά τη χρονική γραμμή. Η τιμή ΔΕΝ αλλάζει ανάλογα με τη γλώσσα. Μεγαλύτερο = λιγότερες διασπάσεις αλλά πιο μακριές μεταφρασμένες γραμμές.',
   btnGo:'▶ Έναρξη μετάφρασης',
@@ -4857,7 +4872,7 @@ const I18N = {
   secEngine:'Μηχανή',
   lblSrcShort:'Γλώσσα πηγής',
   lblDstShort:'Γλώσσα στόχος',
-  lblKeepTermsShort:'Διατήρηση κύριων ονομάτων',
+  lblKeepTermsShort:'Κύρια ονόματα',
   lblAutoTermsShort:'Αυτόματο γλωσσάρι',
   lblMaxWShort:'Πλάτος γραμμής',
   lblBiMaxWShort:'Δίγλωσσο πλάτος (μετάφραση)',
@@ -4921,10 +4936,10 @@ const I18N = {
   batchTip:'כמות תווי הכתוביות שנשלחת למודל בבקשה אחת. האצוות נחתכות אוטומטית לפי אורך: שורות קצרות ממלאות יותר, ארוכות פחות, כך שנפח הפלט נשאר יציב. ערך גדול יותר מסתיים מעט מהר יותר, אך גדול מדי עלול לפגוע באיכות; ברירת המחדל 3000 מתאימה לרוב הסרטונים.',
   lblKey:'מפתח API (נשמר רק בדפדפן הזה)',
   chkKeepTerms:'להשאיר שמות פרטיים (שמות/מותגים/מוצרים/מונחים) בלי תרגום',
-  termsHintOn:'מסומן = המונחים ברשימה נשארים בצורתם המקורית (הרשימה פעילה).',
-  termsHintOff:'כבוי: כל השמות/מותגים/מוצרים/מונחים מתורגמים; רשימת המונחים מתעלמת.',
-  lblTerms:'שמות פרטיים שיישארו במקור (אופציונלי, מופרדים בפסיקים)',
-  termsPh:'למשל SpaceX, Prism, EnduroSat',
+  termsHintOn:'שמות של אנשים, ארגונים ומותגים נשארים בכתיב המקורי ולא מתורגמים. הערכים במונחון שלמטה עדיין קודמים.',
+  termsHintOff:'שמות של אנשים, ארגונים ומותגים כולם מתורגמים לשפת היעד. הערכים במונחון שלמטה עדיין קודמים.', pnKeep:'שמירת המקור', pnTrans:'תרגום הכול', btnGlossFile:'📂 העלאת מונחון', glossHit:'מונחון: {0} ערכים, {1} נמצאו בקובץ זה, {2} שורות לא זוהו',
+  lblTerms:'מונחון מאוחד (מונח אחד בכל שורה)',
+  termsPh:'אחד בכל שורה: מקור → תרגום; שורה עם המקור בלבד שומרת עליו',
   lblMaxW:'רוחב שורה ביחידות רוחב מלא, לא בתווים: תו CJK אחד = 1; אותיות לטיניות, קיריליות, תאילנדיות וערביות = 0.5, כלומר יחידה אחת היא כ-2 תווים בכתבים חצי-רחבים. קובע את שבירת השורה בייצוא חד-לשוני ואת שורות שני הדוברים („- A - B”) בייצוא דו-לשוני. ברירת המחדל נגזרת מתקן Netflix לפי שפה (zh/ko 16, ja 13, אחרות 21). גדול יותר = שורות ארוכות יותר, פחות שבירות ופיצולים.',
   lblBiMaxW:'רוחב מרבי של השורה המתורגמת בייצוא דו-לשוני (אותה יחידת רוחב מלא, לא תווים: אותו 32 הוא כ-32 תווים סיניים אבל כ-64 תאילנדיים). מגביל רק את השורה המתורגמת; שורת המקור נעה לפי נקודות משמעות ואינה מוגבלת ברוחב, ושורות עם שני דוברים משתמשות ב„רוחב שורה” למעלה. רק חריגה ממנו מפצלת את ציר הזמן. הערך אינו משתנה לפי שפה. גדול יותר = פחות פיצולים אבל שורות מתורגמות ארוכות יותר.',
   btnGo:'▶ התחלת תרגום',
@@ -5146,7 +5161,7 @@ const I18N = {
   secEngine:'מנוע',
   lblSrcShort:'שפת מקור',
   lblDstShort:'שפת יעד',
-  lblKeepTermsShort:'שמירת שמות פרטיים',
+  lblKeepTermsShort:'שמות פרטיים',
   lblAutoTermsShort:'מונחון אוטומטי',
   lblMaxWShort:'רוחב שורה',
   lblBiMaxWShort:'רוחב דו-לשוני (תרגום)',
@@ -5210,10 +5225,10 @@ const I18N = {
   batchTip:'Câte caractere de subtitrare sunt trimise modelului per cerere. Lotele se împart automat după lungime: rândurile scurte umplu mai mult, cele lungi mai puțin, astfel încât volumul răspunsului rămâne stabil. O valoare mai mare termină puțin mai repede, dar prea mare poate reduce calitatea; valoarea implicită 3000 se potrivește majorității clipurilor.',
   lblKey:'Cheie API (salvată doar în acest browser)',
   chkKeepTerms:'Păstrează numele proprii (nume/mărci/produse/termeni) netraduse',
-  termsHintOn:'Bifat = termenii din listă rămân în forma originală (lista este activă).',
-  termsHintOff:'Dezactivat: toate numele/mărcile/produsele/termenii sunt traduse; lista de termeni este ignorată.',
-  lblTerms:'Nume proprii care rămân în original (opțional, separate prin virgulă)',
-  termsPh:'de exemplu SpaceX, Prism, EnduroSat',
+  termsHintOn:'Numele persoanelor, organizațiilor și mărcilor își păstrează forma originală și nu se traduc. Intrările din glosarul de mai jos rămân prioritare.',
+  termsHintOff:'Numele persoanelor, organizațiilor și mărcilor se traduc toate în limba țintă. Intrările din glosarul de mai jos rămân prioritare.', pnKeep:'Păstrează originalul', pnTrans:'Tradu tot', btnGlossFile:'📂 Încarcă glosar', glossHit:'Glosar: {0} intrări, {1} potrivite în acest fișier, {2} linii nerecunoscute',
+  lblTerms:'Glosar unificat (câte un termen pe linie)',
+  termsPh:'Câte unul pe linie: original → traducere; o linie cu doar originalul îl păstrează',
   lblMaxW:'Lățimea rândului în UNITĂȚI de lățime întreagă, nu în caractere: 1 caracter CJK = 1; litere latine, chirilice, thailandeze și arabe = 0,5, deci 1 unitate este circa 2 caractere pentru scrierile de jumătate de lățime. Controlează împărțirea în exportul monolingv și rândurile cu doi vorbitori („- A - B”) în exportul bilingv. Valoarea implicită urmează norma Netflix pe limbă (zh/ko 16, ja 13, altele 21). Mai mare = rânduri mai lungi, mai puține împărțiri și separări.',
   lblBiMaxW:'Lățimea maximă a rândului TRADUS în exportul bilingv (aceeași unitate de lățime întreagă, nu caractere: același 32 înseamnă circa 32 de caractere chinezești, dar circa 64 thailandeze). Limitează doar rândul tradus; rândul sursă urmează limitele de sens și nu este limitat ca lățime, iar rândurile cu doi vorbitori folosesc „Lățimea rândului” de mai sus. Doar depășirea acestei valori separă axa temporală. Valoarea NU se schimbă în funcție de limbă. Mai mare = mai puține separări, dar rânduri traduse mai lungi.',
   btnGo:'▶ Pornește traducerea',
@@ -5435,7 +5450,7 @@ const I18N = {
   secEngine:'Motor',
   lblSrcShort:'Limba sursă',
   lblDstShort:'Limba țintă',
-  lblKeepTermsShort:'Păstrează nume proprii',
+  lblKeepTermsShort:'Nume proprii',
   lblAutoTermsShort:'Glosar automat',
   lblMaxWShort:'Lățimea rândului',
   lblBiMaxWShort:'Lățime bilingvă (tradus)',
@@ -5686,7 +5701,7 @@ function snapFp(cfg, budget, cap){
   // 影响译文形态的参数全部入指纹（语言对 / 风格 / 行宽 / 专名策略 / 术语）；
   // 不含 base/key/model——换 Key 或换引擎续跑是合理需求，不该作废已完成批次
   return [S.fileBase, S.srcItems.length, cfg.src, cfg.dst, budget, cap,
-          cfg.styleMode, cfg.styleCustom, cfg.maxW, cfg.keepTerms?1:0, cfg.terms,
+          cfg.styleMode, cfg.styleCustom, cfg.maxW, cfg.keepTerms?1:0, cfg.glossKey,
           cfg.lyricMode||'keep', cfg.musicMarks||'',   // v0.9.78：歌词设置改变译文形态，必须作废快照
           cfg.dropFillers!==false?1:0,
           srcFingerprint(S.srcItems)].join('|');
@@ -5763,8 +5778,11 @@ function getCfg(){
     maxW: +$('maxW').value || 21,
     styleMode,
     styleCustom: $('styleCustom').value.trim(),
-    keepTerms: $('keepTerms').checked,
-    terms: $('terms').value.trim(),
+    /* v0.9.134：keepTerms 语义不变（true=保留原文 / false=全部译出），只是取值从复选框换成二选一；
+       原先那个逗号分隔输入框已并入下方术语表——用户条目走规则 4.5，不再拼进规则 4。 */
+    keepTerms: (document.querySelector('input[name=pnMode]:checked')||{}).value === 'keep',
+    glossRows: GLOSS_ROWS,
+    glossKey: GLOSS_ROWS.map(function(x){ return x.t+'\u0001'+x.r; }).join('\u0002'),
     autoTerms: $('autoTerms').checked,
     lyricMode: (document.querySelector('input[name=lyric]:checked')||{}).value || 'keep',
     musicMarks: $('marks').value,
@@ -6024,15 +6042,17 @@ function systemPromptEn(cfg){
     + '   [Typical cases] a proper name spelled the way it sounds (Mennerbrigitte→Brigitte), and numbers misheard across a run-on (\"1:00 37 Ventures\"→\"137 Ventures\"). These only illustrate the type of error — judge the same way whatever the source language is.\n'
     + '   [Glossary interaction] If a form matches a glossary entry (rule 4.5) exactly, apply that entry as-is and do NOT correct it; only when it matches no entry verbatim does this rule apply — then correct the spelling first and apply that entry\'s rendering to the corrected form.\n'
   if (cfg.keepTerms){
-    const tt = cfg.terms ? cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') : '(none)';
+    /* v0.9.134：这里原本拼的是「用户输入框里的逗号列表」，现已整体迁到规则 4.5 的术语表。
+       保留 '(none)' 字面量是为了让未使用术语表时的提示词与旧版逐字节一致——
+       本项目凡是改动提示词都必须做全语种 A/B，这次刻意不动一个字符。 */
     s += '4. [Keep proper nouns] Personal names, organizations, products, brands, and technical terms must keep their original spelling — never render them in ' + dstNative
        + ': even widely known ' + dstNative + ' renderings must not be used (e.g. Elon Musk stays Elon Musk, SpaceX stays SpaceX, Taylor Swift stays Taylor Swift).'
        + ' Even if the target language normally transliterates names (katakana, hangul, Cyrillic transliteration, Devanagari, etc.), Latin-script names and brands must keep their exact Latin spelling, letter for letter (Bobbi Thompson stays Bobbi Thompson — never 博比·汤普森 / 보비 톰슨 / Бобби Томпсон).'
-       + ' Generic place names (e.g. the White House) should be translated following ' + dstNative + ' conventions. User-specified terms that must stay in the original: ' + tt + '.\n';
+       + ' Generic place names (e.g. the White House) should be translated following ' + dstNative        + ' conventions. User-specified terms that must stay in the original: (none).\n';
   } else {
     s += '4. [Translate proper nouns] Personal names, organizations, products, brands, and technical terms must be translated into their established ' + dstNative
        + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists. Use an established rendering only for genuinely well-known names; whenever you are unsure whether an established rendering exists, keep the original spelling rather than inventing a transliteration.'
-       + (cfg.terms ? ' User-provided terms should also be translated: ' + cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join(', ') + '.' : '') + '\n';
+       + '\n';
   }
   if (cfg.glossary){
     s += '4.5 [Glossary] The following terms MUST be rendered exactly as specified, consistently across the whole file (callsigns / proper nouns / jargon, disambiguated from story context; this table takes precedence over rule 4 for these terms):\n'
@@ -6093,15 +6113,16 @@ function systemPrompt(cfg){
   + '   【典型情形】专名被按发音写成近形拼写（Mennerbrigitte→Brigitte）、连读导致数字听错（1:00 37 Ventures→137 Ventures）；这些只是错误类型的举例，源语言不同时按同理判断。\n'
   + '   【与术语表的关系】若某写法与术语表（规则4.5）条目完全一致，直接按该条目处理、不再纠错；只有在无法原样命中时才适用本规则——先纠正拼写，再按该条目的统一译法处理纠正后的形式。\n'
   if (cfg.keepTerms){
-    const t = cfg.terms ? cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join('、') : '（无）';
+    /* v0.9.134：原「用户指定必须保留原文的术语」逗号列表已并入规则 4.5 术语表，
+       这里固定输出 '（无）'，保证不用术语表时提示词与旧版逐字节一致。 */
     s += '4.【专名保留】人名、机构、产品、品牌、技术术语一律保留原文写法、严禁译成' + dstNative
        + '：即使有广为人知的' + dstNative + '译名也保持原文，如 Elon Musk 保持 Elon Musk（严禁写成 埃隆·马斯克）、SpaceX 保持 SpaceX、Taylor Swift 保持 Taylor Swift（严禁写成 泰勒·斯威夫特）。'
        + '即使目标语言习惯音译人名（片假名、谚文、西里尔字母转写、天城文等），拉丁字母的人名/品牌也必须保持拉丁字母原文写法、一个字母都不改（Bobbi Thompson 保持 Bobbi Thompson，严禁写成 博比·汤普森/보비 톰슨）。'
-       + '国家城市等通用地名（如 the White House→白宫）按' + dstNative + '习惯译出。用户指定必须保留原文的术语：' + t + '。\n';
+       + '国家城市等通用地名（如 the White House→白宫）按' + dstNative + '习惯译出。用户指定必须保留原文的术语：（无）。\n';
   } else {
     s += '4.【专名翻译】人名、机构、产品、品牌、技术术语一律译成' + dstNative
        + '的通行译名，严禁保留原文写法：如 Elon Musk→埃隆·马斯克、SpaceX→太空探索技术公司、NASA→美国宇航局、Google→谷歌；即使是很知名的品牌或人名也必须译出；确实没有通行译名、或不确定是否存在通行译名的，一律保留原文拼写——只对确实广为人知的专名使用通行译名，拿不准就保留原文，严禁生造音译。'
-       + (cfg.terms ? ' 用户提供的术语也应翻译：' + cfg.terms.split(/[,，]/).map(x=>x.trim()).filter(Boolean).join('、') + '。' : '') + '\n';
+       + '\n';
   }
   if (cfg.glossary){
     s += '4.5【术语表】以下术语必须严格按给定译法、全片统一处理（呼号/专名/军语，译法已按剧情语境确定；这些术语优先于规则4）：\n'
@@ -6914,6 +6935,141 @@ function sampleSrcText(groups, budget){
   for(let i=0;i<texts.length && len<budget;i+=stride){ picked.push(texts[i]); len+=texts[i].length+1; }
   return picked.join('\n');
 }
+/* ================= v0.9.134：术语表解析/过滤 =================
+   行语法（三种都归一成 {t, r, note}）：
+     SpaceX                          → 只给 t：保留原文（r 取 t）
+     Burger King → 汉堡王            → 指定译法（箭头也认 -> / => / =）
+     Outlaw 1 → 亡命徒1（战机呼号）   → 尾部括号是语境注释，不进译法
+   注：裸 t 之所以等价于 r=t，是因为规则 4.5 明文优先于规则 4——
+   「这条保留原文」因此能盖过全局的「全部译出」，无需在提示词里另加分支。 */
+const GLOSS_ARROW = /(?:->|→|=>|=)/;
+const GLOSS_HEAD = /^(term|terms|source|src|original|原文|源|t|t\u00e9rmino|translation|trans|target|dst|译文|目标|译名|r|note|notes|comment|注释|备注)$/i;
+// 剥掉尾部注释括号，返回 [主串, 注释]
+function glossSplitNote(line){
+  const m = String(line).match(/[（(]([^（()）]*)[）)]\s*$/);
+  if(!m) return [String(line).trim(), ''];
+  return [String(line).slice(0, m.index).trim(), m[1].trim()];
+}
+// 单个写入条目 → 提示词里的一行
+function glossRowText(x){ return x.t + ' → ' + x.r + (x.note ? '（' + x.note + '）' : ''); }
+function glossParseRow(line){
+  let s = String(line||'').trim();
+  if(!s || /^#|^\/\//.test(s)) return null;
+  let [body, note] = glossSplitNote(s);
+  let t = body, r = '';
+  if(GLOSS_ARROW.test(body)){
+    const i = body.search(GLOSS_ARROW);
+    t = body.slice(0, i).trim();
+    r = body.slice(i).replace(GLOSS_ARROW, '').trim();
+  }
+  if(!t) return null;
+  return { t, r: r || t, note };
+}
+// 整份文本 → 条目数组。自动识别 纯文本 / TSV / CSV / JSON，并跳过表头。
+// 返回 {rows, bad}：bad = 无法识别的行数（用于给用户明确反馈）
+function glossParse(text){
+  const raw = String(text||'').replace(/\r/g,'');
+  const trimmed = raw.trim();
+  const rows=[]; let bad=0;
+  const push=obj=>{
+    if(!obj) return;
+    const k=obj.t.toLowerCase();
+    const hit=rows.findIndex(y=>y.t.toLowerCase()===k);
+    if(hit>=0) rows[hit]=obj; else rows.push(obj);   // 同名后者覆盖前者（上传的表因此能盖住旧内容）
+  };
+  if(trimmed.charAt(0)==='[' || trimmed.charAt(0)==='{'){
+    let arr=null;
+    try{
+      const j=JSON.parse(trimmed);
+      if(Array.isArray(j)) arr=j;
+      else if(j && Array.isArray(j.terms)) arr=j.terms;
+      else if(j && typeof j==='object') arr=Object.keys(j).map(k=>({t:k, r:j[k]}));
+    }catch(e){ arr=null; }
+    if(arr){
+      arr.forEach(o=>{
+        if(o==null) { bad++; return; }
+        if(typeof o==='string'){ const p=glossParseRow(o); p?push(p):bad++; return; }
+        const t=o.t!=null?o.t:(o.term!=null?o.term:(o.src!=null?o.src:(o.source!=null?o.source:o[Object.keys(o)[0]])));
+        const r=o.r!=null?o.r:(o.translation!=null?o.translation:(o.dst!=null?o.dst:(o.target!=null?o.target:o.render)));
+        if(t==null||r==null){ bad++; return; }
+        push({t:String(t).trim(), r:String(r).trim()||String(t).trim(), note:String(o.note||o.comment||'').trim()});
+      });
+      return {rows, bad};
+    }
+    /* JSON 看着像 JSON 但解析失败：按行逐条再试一次（有些导出是每行一个对象的 NDJSON） */
+  }
+  const lines=raw.split('\n').filter(l=>l.trim());
+  if(!lines.length) return {rows, bad};
+  /* 逐行判定分隔符，而不是「先在整份文件上投票」——投票法遇到混合内容就失效
+     （实测：3 行箭头语法 + 1 行 CSV，CSV 那行会被当成裸词，整条变成 "Prism,棱晶"）。
+     优先级 箭头 > 制表符 > 单个逗号：箭头最无歧义，逗号最容易与术语本身冲突。 */
+  lines.forEach((l,idx)=>{
+    const s=l.trim();
+    if(!s || /^#|^\/\//.test(s)) return;
+    let cells=null;
+    if(GLOSS_ARROW.test(s)){
+      const i=s.search(GLOSS_ARROW);
+      cells=[s.slice(0,i), s.slice(i).replace(GLOSS_ARROW,'')];
+    } else if(s.indexOf('\t')>=0){
+      cells=s.split('\t');
+    } else {
+      const n=(s.match(/[,，]/g)||[]).length;
+      if(n===1) cells=s.split(/[,，]/);
+    }
+    if(cells){
+      const c=cells.map(x=>String(x).trim()).filter(Boolean);
+      // 表头：第一行的字段全是列名
+      if(idx===0 && c.length>=2 && c.every(x=>GLOSS_HEAD.test(x))) return;
+      if(c.length<1 || !c[0]){ bad++; return; }
+      const nb=glossSplitNote(c[1]||'');   // 译法里的括号仍是语境注释，不是译法的一部分
+      push({t:c[0], r:nb[0]||c[0], note:(c[2]||nb[1]||'')});
+      return;
+    }
+    const p=glossParseRow(s);
+    p?push(p):bad++;
+  });
+  return {rows, bad};
+}
+/* 按批次的源文本过滤：只保留这批里真的出现的条目。
+   动机是成本而非准确性——线上实测（deepseek-chat，术语表 8~3000 条）命中率恒为 8/8，
+   无关条目不会稀释注意力；但 3000 条 ≈ 8.5 万字/批，账单会被拖垮。
+   匹配规则：含拉丁/西里尔/希腊字母的术语要求词边界（避免 AI 因 said 命中 AI 这种误伤），
+   其余（中日韩等无空格书写系统）用包含匹配。 */
+function glossHit(row, srcText){
+  const t=row.t, src=String(srcText||'');
+  if(!t) return false;
+  if(!src) return false;
+  const latin=/[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u05D0-\u05EA\u0600-\u06FF]/.test(t);
+  if(!latin) return src.indexOf(t)>=0;
+  const esc=t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+');
+  try{ return new RegExp('(^|[^\\p{L}\\p{N}])'+esc+'([^\\p{L}\\p{N}]|$)','iu').test(src); }
+  catch(e){ return src.toLowerCase().indexOf(t.toLowerCase())>=0; }
+}
+function glossFilter(rows, srcText){ return rows.filter(r=>glossHit(r, srcText)); }
+// 本次运行的术语表快照（由 runTranslate 在抽取/换表后重建）
+let GLOSS_ROWS=[];
+let GLOSS_BAD=0;
+function glossRefresh(){
+  const p=glossParse(($('terms')||{}).value||'');
+  GLOSS_ROWS=p.rows; GLOSS_BAD=p.bad;
+  return p;
+}
+// 一批原始建议方案的源文本（merged + 各 cue 原文都要——merged 是拼好的整句，cue 是原始分行）
+function glossBatchSource(gBatch){
+  const parts=[];
+  (gBatch||[]).forEach(function(g){
+    if(g && typeof g.merged==='string') parts.push(g.merged);
+    (g.cues||[]).forEach(function(c){ if(c && typeof c.text==='string') parts.push(c.text); });
+  });
+  return parts.join('\n');
+}
+/* 生成这一批要用的提示词。没有术语表时直接返回基础 sys——
+   与旧逻辑完全等价（旧版整个文件共用一个 sys），所以不用术语表的用户不受任何影响。 */
+function glossSysFor(gBatch, cfg, baseSys){
+  if(!GLOSS_ROWS.length) return baseSys;
+  const hit=glossFilter(GLOSS_ROWS, glossBatchSource(gBatch));
+  return systemPrompt(Object.assign({}, cfg, {glossary: hit.map(glossRowText).join('\n')}));
+}
 async function extractGlossary(base,key,model,cfg,srcText){
   const dstN=LBY(cfg.dst), zhDst=(cfg.dst==='zh-CN'||cfg.dst==='zh-TW');
   const sys = zhDst
@@ -6986,6 +7142,7 @@ async function runTranslate(){
      btnText 提前到 try 外留存，finally 恢复按钮用 */
   let btnText=$('btnGo').textContent;
   try{
+  glossRefresh();   // v0.9.134：以输入框的当前内容为准重建术语表快照（用户可能刚改过还没失焦）
   const cfg = getCfg();
   if (cfg.src === cfg.dst){ log(t('langSame',LBY(cfg.src).zh),'err'); return; }
   if (cfg.styleMode === 'custom' && !cfg.styleCustom){ log(t('customNeed'),'err'); try{$('styleCustom').focus();}catch(e){} return; }
@@ -7112,18 +7269,28 @@ async function runTranslate(){
 
     log(t('startT',LBY(cfg.src).zh,LBY(cfg.dst).zh,S.srcItems.length,CHAR_BUDGET));
 
-    // v0.9.28 自动术语表：翻译前锁定专名/呼号/军语的全片统一译法（仅提取元数据级术语，失败自动跳过不影响主流程）
+    /* v0.9.134：AI 抽出的条目写进术语表输入框（可见、可改），而不是藏进 cfg 直接喂提示词。
+       此前抽取结果对用户完全不可见——抽错没机会发现、也没机会补一条自己的。
+       优先级沿用「框里的内容就是唯一的真相」：同名的已有条目不动，AI 只补缺。 */
     if(cfg.autoTerms){
       setPrText(t('autoTermsRun')); setProg(0,true);
       try{
         const gl = await extractGlossary(effBase,effKey,effModel,cfg,sampleSrcText(groups,20000));
-        const manual=(cfg.terms||'').split(/[,，]/).map(x=>x.trim().toLowerCase()).filter(Boolean);
-        const lines=gl.terms.filter(x=>!manual.includes(x.t.trim().toLowerCase()))
-          .map(x=>x.t.trim()+' → '+x.r.trim()+(x.note?'（'+String(x.note).trim()+'）':''));
-        if(lines.length || gl.synopsis){
-          sys = systemPrompt(Object.assign({},cfg,{glossary:lines.join('\n'),synopsis:gl.synopsis||''}));
-          if(lines.length){ log(t('autoTermsDone',lines.length),'okc'); log(lines.map(l=>'  · '+l).join('\n')); }
+        const have = glossParse(($('terms')||{}).value||'').rows;
+        const taken = have.map(x=>x.t.toLowerCase());
+        const added = gl.terms
+          .filter(x=>x && typeof x.t==='string' && typeof x.r==='string' && x.t.trim() && x.r.trim())
+          .filter(x=>taken.indexOf(x.t.trim().toLowerCase())<0)
+          .map(x=>({t:x.t.trim(), r:x.r.trim(), note:String(x.note||'').trim()}));
+        if(added.length){
+          $('terms').value = have.concat(added).map(glossRowText).join('\n');
+          glossRefresh();
+          cfg.glossRows = GLOSS_ROWS;
+          cfg.glossKey  = GLOSS_ROWS.map(function(x){ return x.t+'\u0001'+x.r; }).join('\u0002');
+          log(t('autoTermsDone',added.length),'okc');
+          log(added.map(x=>'  · '+glossRowText(x)).join('\n'));
         }
+        if(gl.synopsis){ cfg.synopsis=gl.synopsis; sys = systemPrompt(cfg); }
       }catch(e){ log(t('autoTermsSkip',e.message),'err'); }
     }
 
@@ -7172,12 +7339,15 @@ async function runTranslate(){
       if(gBatch.every(function(g){ return res.has(g.gno); })){ pgBatch(bi, totalB, true); continue; }
       pgBatch(bi, totalB);
       setPrText(t('batchProg', bi+1, totalB, gBatch[0].gno, gBatch[gBatch.length-1].gno));
+      /* v0.9.134：提示词按批定制——只把本批原文里真出现的术语带进 4.5。
+         无术语表时直接复用同一份 sys（与旧行为完全一致）。 */
+      const sysB = glossSysFor(gBatch, cfg, sys);
       let ok=false;
       for(let attempt=0; attempt<maxTry && !ok; attempt++){
         if(S.stop) break;
         try{
           lastCall=Date.now();
-          const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sys,null,ctx);
+          const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sysB,null,ctx);
           /* v0.9.97：锚定失败不再整批盲重发，只记录一次，随即落到下方「单组隔离重译」通道。
              理由：批级三次调用的 feedback 参数恒为 null（本文件 3550 行），三次请求体完全一致，
              模型根本不知道自己上一轮跑偏了；v0.9.57 的实测注释（3088 行）记录「批级重试 +
@@ -7201,7 +7371,7 @@ async function runTranslate(){
             const stillDrop=rescueGnos.slice();
             if(g1s.length && !S.stop){
               try{
-                const o2=await translateBatch(effBase,effKey,effModel,g1s,bi+1,totalB,sys,null,ctx,1);
+                const o2=await translateBatch(effBase,effKey,effModel,g1s,bi+1,totalB,sysB,null,ctx,1);
                 stillDrop.length=0;
                 for(const gno of rescueGnos){
                   const m2=o2.byGno&&o2.byGno[gno];
@@ -7242,7 +7412,7 @@ async function runTranslate(){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbArr=(a===1&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx,2);
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,2);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
                     // v0.9.97：cue 对齐格式（cueTexts 或 cues 有文）同样算"已修复"，判据与上方 drop
@@ -7289,7 +7459,7 @@ async function runTranslate(){
                 for(let a=0;a<2 && !fixed;a++){
                   try{
                     const fbCue=(a===1)?{cueErrs:cb.errs}:null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbCue,ctx,3);
+                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbCue,ctx,3);
                     const m2=o2.byGno && o2.byGno[cb.gno];
                     if(m2 && m2.cueTexts && m2.cueTexts.size && !(o2.badAnchor||[]).includes(cb.gno)){
                       out.byGno[cb.gno]=m2;
@@ -7351,7 +7521,7 @@ async function runTranslate(){
             try{
               lastCall=Date.now();
               const fbArr=(a>0&&badTexts.length)?badTexts.map(x=>({gno:g1.gno,text:x})):null;
-              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sys,fbArr,ctx,2);
+              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,2);
               if((o2.badAnchor||[]).includes(g1.gno)){
                 const bt=String((o2.byGno[g1.gno]||{}).text||'').trim();
                 if(bt && !badTexts.includes(bt)) badTexts.push(bt);
@@ -8046,9 +8216,14 @@ function save(){
     base:$('base').value.trim(), model:$('model').value.trim(), key:$('apikey').value.trim(),
     extra:($('extra')||{}).value||'',   /* v0.9.124：附加请求参数原样记忆（保存时不校验，仅测试连接时提示） */
     provider:(document.getElementById('provider')||{}).value||'',
-    terms:$('terms').value.trim(), mode:$('mode').value,
+    /* v0.9.134：术语表内容按用户所见保存，但设 2 万字上限——
+       术语表跟着片子走，存下一张几千条的表既没意义又占 localStorage（历史上这台机器存满过）。 */
+    terms:(String(($('terms')||{}).value||'').length>20000 ? '' : ($('terms')||{}).value),
+    mode:$('mode').value,
     srcLang:$('srcLang').value, style:style,
-    styleCustom:$('styleCustom').value.trim(), keepTerms:$('keepTerms').checked?'1':'0',
+    styleCustom:$('styleCustom').value.trim(),
+    pnMode:(document.querySelector('input[name=pnMode]:checked')||{}).value||'trans',
+    pnModeSet:(UI.pnModeSet||sv.pnModeSet==='1')?'1':'0',
     autoTerms:$('autoTerms').checked?'1':'0',
     autoTermsSet:(UI.autoTermsSet||sv.autoTermsSet==='1')?'1':'0',
     expStyle:expStyle(),
@@ -8079,7 +8254,14 @@ if(sv.base) $('base').value=sv.base;
 if(sv.model) $('model').value=sv.model;
 if(sv.key) $('apikey').value=sv.key;
 if(sv.extra) $('extra').value=sv.extra;   /* v0.9.124：附加请求参数（自定义引擎透传，可能为嵌套对象如 response_format） */
-if(sv.terms) $('terms').value=sv.terms;
+/* v0.9.134：旧的逗号分隔列表 → 现在的每行一条。旧值里不含换行但含逗号，据此判断；
+   不含逗号的旧值（如单个 "SpaceX"）在新语法下等价于「保留原文」，原样保留即可。 */
+if(sv.terms){
+  const _v=String(sv.terms);
+  $('terms').value = (_v.indexOf('\n')<0 && /[,，]/.test(_v))
+    ? _v.split(/[,，]/).map(function(x){return x.trim();}).filter(Boolean).join('\n')
+    : _v;
+}
 if(sv.mode) $('mode').value=sv.mode;
 /* v0.9.133：折行宽度不再在这里回填——统一交给下方 IIFE 的 syncMaxW()：
    按当前目标语言取「该语言的手调记忆」，没有就用该语言的推荐值。 */
@@ -8387,22 +8569,66 @@ function styleUI(){
 document.querySelectorAll('input[name=style]').forEach(r=>r.addEventListener('change',()=>{ styleUI(); save(); }));
 $('styleCustom').addEventListener('change',save);
 
-/* 专名保留开关 */
-function termsUI(){
-  const on=$('keepTerms').checked;
-  $('terms').disabled=!on;
-  $('terms').style.opacity=on?'':'0.5';
-  $('termsHint').textContent = on ? t('termsHintOn') : t('termsHintOff');
+/* ============ v0.9.134：专名策略 + 统一术语表 ============
+   旧结构是「一个 keepTerms 复选框 + 一个逗号分隔输入框」，有三个问题：
+     ① keepTerms 一关就把输入框 disabled，用户彻底失去对专名的控制；
+     ② 提示文案说「术语表不生效」，但 cfg.glossary 的注入压根不看 keepTerms；
+     ③ 最严重：keepTerms 关闭时，输入框里的词被拼成「用户提供的术语也要翻译」——与标签语义相反。
+   现在拆成两个互不排斥的维度：策略（这次到底保不保留）+ 术语表（认哪些词、译成什么）。
+   术语表统一走规则 4.5，而 4.5 明文优先于规则 4，所以「保留原文」能盖过「全部译出」的全局设置。 */
+function glossCountUI(){
+  const el=$('glossHint'); if(!el) return;
+  const n=GLOSS_ROWS.length;
+  if(!n){ el.textContent=''; return; }
+  el.textContent = t('glossHit', n, glossFileHits(), GLOSS_BAD);
 }
-$('keepTerms').checked = sv.keepTerms!=='0';
-/* v0.9.96：自动术语表默认关闭（详见上方开关处注释）。
-   一次性迁移——老用户 localStorage 里的 '1' 多半是历史默认值或被任意一次 save() 顺带写入的，
-   并非主动选择，统一置为关闭；此后用户手动开/关会写入 autoTermsSet，迁移不再干预。 */
+// 全片源文里命中了多少条——没有这个反馈，用户无法判断自己的表到底生效没有
+function glossFileHits(){
+  const src=(S.srcItems||[]).map(function(x){ return String(x.text||''); }).join('\n');
+  return glossFilter(GLOSS_ROWS, src).length;
+}
+function termsUI(){
+  const keep=(document.querySelector('input[name=pnMode]:checked')||{}).value==='keep';
+  $('termsHint').textContent = keep ? t('termsHintOn') : t('termsHintOff');
+  glossRefresh();
+  glossCountUI();
+}
+/* v0.9.134：默认值从「保留原文」改为「全部译出」——旧默认值会把 Elon Musk、SpaceX
+   这类词原样留在中文字幕里，对中文用户几乎从不是想要的行为。
+   一次性迁移：没有 pnModeSet 标记的存档一律切到 trans（与 v0.9.96 迁移 autoTerms 同一套做法），
+   没有标记意味着用户从未主动选过这个策略。手动选过之后写标记，迁移不再干预。 */
+if (sv.pnModeSet !== '1') sv.pnMode = 'trans';
+(function(){
+  const mode = (sv.pnMode==='keep') ? 'keep' : 'trans';
+  const el=document.querySelector('input[name=pnMode][value="'+mode+'"]');
+  if(el) el.checked=true;
+})();
 if (sv.autoTermsSet !== '1') sv.autoTerms = '0';
 $('autoTerms').checked = sv.autoTerms === '1';
 termsUI();
-$('keepTerms').addEventListener('change',()=>{ termsUI(); save(); });
+document.querySelectorAll('input[name=pnMode]').forEach(r=>r.addEventListener('change',()=>{
+  UI.pnModeSet=true; termsUI(); save();
+}));
 $('autoTerms').addEventListener('change',()=>{ UI.autoTermsSet=true; save(); });
+$('terms').addEventListener('input', ()=>{ glossRefresh(); glossCountUI(); });
+$('terms').addEventListener('change', ()=>{ termsUI(); save(); });
+/* 上传：把文件里的条目并进已有内容，同名的以新文件为准（故先写旧的、再写新的） */
+$('btnGlossFile').addEventListener('click', ()=>{ try{ $('glossFile').click(); }catch(e){} });
+$('glossFile').addEventListener('change', async ev=>{
+  const f=(ev.target.files||[])[0];
+  try{ ev.target.value=''; }catch(e){}
+  if(!f) return;
+  try{
+    const txt=await f.text();
+    const p=glossParse(txt);
+    /* 复用「导入字幕」那两条既有文案，避免为上传功能新造 27×2 个词条 */
+    if(!p.rows.length){ log(t('imported', f.name, 0),'err'); return; }
+    const cur=glossParse($('terms').value).rows;
+    $('terms').value = cur.concat(p.rows).map(glossRowText).join('\n');
+    termsUI(); save();
+    log(t('imported', f.name, p.rows.length),'okc');
+  }catch(e){ log(t('errOccur', e.message||String(e)),'err'); }
+});
 
 /* 语言/格式切换联动：列头 + 导出文件名 */
 function autoOutName(){

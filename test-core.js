@@ -2626,5 +2626,129 @@ console.log('— response_format 默认注入（v0.9.132）—');
   });
 }
 
+/* v0.9.134：专名策略 + 统一术语表。
+   老结构的三个问题（keepTerms 一关就禁用输入框 / 提示文案说谎 / 关闭时把用户给的词反向送去翻译）
+   在这里逐条钉住，另外覆盖解析、过滤、优先级与 localStorage 迁移。
+   解析与匹配函数直接从 index.html 抠源码求值，避免测试与实现各写一份。 */
+console.log('— 专名策略与术语表（v0.9.134）—');
+{
+  const fsM = require('fs'), pathM = require('path');
+  const html = fsM.existsSync(pathM.join(__dirname,'index.html')) ? fsM.readFileSync(pathM.join(__dirname,'index.html'),'utf8') : '';
+  let G = null;
+  try{
+    const m = html.match(/const GLOSS_ARROW = [\s\S]*?function glossFilter\(rows, srcText\)\{[^}]*\}/);
+    if (m) G = new Function(m[0] + '\nreturn {glossParse:glossParse,glossHit:glossHit,glossFilter:glossFilter,glossRowText:glossRowText,glossParseRow:glossParseRow};')();
+  }catch(e){ G = null; }
+
+  t('术语解析/匹配能从 index.html 抠出来求值（测试未与实现脱节）', () => { assert.ok(G, 'glossParse/glossHit 未命中'); });
+
+  t('纯文本箭头语法：三种箭头都认', () => {
+    ['Burger King → 汉堡王','Burger King -> 汉堡王','Burger King => 汉堡王'].forEach(s=>{
+      const r = G.glossParse(s).rows;
+      assert.strictEqual(r.length, 1, s);
+      assert.strictEqual(r[0].t, 'Burger King', s);
+      assert.strictEqual(r[0].r, '汉堡王', s);
+    });
+  });
+  t('只写原文字 → 视为「保留原文」（r 取 t）', () => {
+    const r = G.glossParse('SpaceX\nNASA').rows;
+    assert.deepStrictEqual(r, [{t:'SpaceX', r:'SpaceX', note:''},{t:'NASA', r:'NASA', note:''}]);
+  });
+  t('尾部括号是语境注释，不进译法', () => {
+    const r = G.glossParse('Outlaw 1 → 亡命徒1（战机呼号）').rows;
+    assert.deepStrictEqual(r, [{t:'Outlaw 1', r:'亡命徒1', note:'战机呼号'}]);
+  });
+  t('TSV（Excel 直接复制出来那种）能识别，且跳过表头', () => {
+    const r = G.glossParse('source\ttranslation\tnote\nBobbi Thompson\t博比·汤普森\t受访者\nOutlaw 1\t亡命徒1\t').rows;
+    assert.strictEqual(r.length, 2);
+    assert.deepStrictEqual(r[0], {t:'Bobbi Thompson', r:'博比·汤普森', note:'受访者'});
+    assert.strictEqual(r[1].t, 'Outlaw 1');
+  });
+  t('CSV 逗号分隔能识别（多数行含逗号才判定为 CSV，避免误伤含逗号的术语）', () => {
+    const r = G.glossParse('Prism,棱晶\nEnduroSat,耐力卫星').rows;
+    assert.strictEqual(r.length, 2);
+    assert.strictEqual(r[0].r, '棱晶');
+  });
+  t('JSON 数组与 JSON 映射都能吃', () => {
+    const a = G.glossParse('[{"t":"Prism","r":"棱晶"},{"src":"EnduroSat","dst":"耐力卫星"}]').rows;
+    assert.strictEqual(a.length, 2);
+    assert.strictEqual(a[1].t, 'EnduroSat');
+    const b = G.glossParse('{"Prism":"棱晶","EnduroSat":"耐力卫星"}').rows;
+    assert.strictEqual(b.length, 2);
+    assert.strictEqual(b[0].r, '棱晶');
+  });
+  t('注释行不计入条目、也不算「无法识别」', () => {
+    const p = G.glossParse('# 这是一张术语表\n// 同上\nSpaceX');
+    assert.strictEqual(p.rows.length, 1);
+    assert.strictEqual(p.bad, 0);
+  });
+  t('同名条目后者覆盖前者（上传的表因此能盖住旧内容）', () => {
+    const r = G.glossParse('Prism → 棱晶\nPrism → 棱镜').rows;
+    assert.strictEqual(r.length, 1);
+    assert.strictEqual(r[0].r, '棱镜');
+  });
+  t('词边界：AI 不能因为 said 而命中', () => {
+    assert.strictEqual(G.glossHit({t:'AI', r:'AI'}, 'He said it. It is AI.'), true);
+    assert.strictEqual(G.glossHit({t:'AI', r:'AI'}, 'He said it.'), false, 'said 里的 ai 被误判为命中');
+  });
+  t('无空格书写系统走包含匹配', () => {
+    assert.strictEqual(G.glossHit({t:'汉堡王', r:'汉堡王'}, '我们去了汉堡王。'), true);
+    assert.strictEqual(G.glossHit({t:'汉堡王', r:'汉堡王'}, '我们去了麦当劳。'), false);
+  });
+  t('按源文本过滤：只留下片中真出现的条目', () => {
+    const rows = G.glossParse('SpaceX\nEnduroSat → 耐力卫星\nPrism → 棱晶').rows;
+    const kept = G.glossFilter(rows, 'SpaceX launched a satellite today.');
+    assert.deepStrictEqual(kept.map(x=>x.t), ['SpaceX']);
+  });
+
+  t('默认策略已迁到「全部译出」（无 pnModeSet 标记者一律切换）', () => {
+    assert.ok(/if \(sv\.pnModeSet !== '1'\) sv\.pnMode = 'trans';/.test(html), '未实现默认值迁移');
+    const m = html.match(/<input type="radio" name="pnMode" value="trans"[^>]*>/);
+    assert.ok(m && /checked/.test(m[0]), 'HTML 默认值未指向 trans');
+    const k = html.match(/<input type="radio" name="pnMode" value="keep"[^>]*>/);
+    assert.ok(k && !/checked/.test(k[0]), 'keep 不应默认勾选');
+  });
+  t('专名策略与术语表解耦：输入框不再被策略禁用', () => {
+    assert.ok(!/\$\('terms'\)\.disabled\s*=/.test(html), '仍在按策略禁用术语表输入框');
+  });
+  t('提示词不再引用 cfg.terms（用户条目统一走规则 4.5）', () => {
+    assert.ok(!/cfg\.terms/.test(html), '提示词里仍在使用 cfg.terms');
+  });
+  t('未用术语表时提示词与旧版逐字节一致（保底 (none) / （无））', () => {
+    assert.ok(/User-specified terms that must stay in the original: \(none\)/.test(html));
+    assert.ok(/用户指定必须保留原文的术语：（无）/.test(html));
+  });
+  t('断点续传指纹计入术语表（换表必须作废旧译文）', () => {
+    assert.ok(/cfg\.keepTerms\?1:0, cfg\.glossKey/.test(html), 'snapFp 未计入术语表');
+  });
+  t('AI 抽出的条目写进输入框，且同名条目以用户已有为准', () => {
+    assert.ok(/have\.concat\(added\)/.test(html), 'AI 结果未落到输入框');
+    assert.ok(/taken\.indexOf\(x\.t\.trim\(\)\.toLowerCase\(\)\)<0/.test(html), 'AI 条目未跳过用户已有的同名条目');
+  });
+  t('每批只注入本批命中的术语（省成本）', () => {
+    assert.ok(/const sysB = glossSysFor\(gBatch, cfg, sys\);/.test(html));
+    assert.ok(/if\(!GLOSS_ROWS\.length\) return baseSys;/.test(html), '无术语表时应完全复用原 sys');
+  });
+  t('旧版逗号列表自动迁成每行一条', () => {
+    assert.ok(/indexOf\('\\n'\)<0 && \/\[,，\]\/\.test\(_v\)/.test(html), '未实现逗号列表迁移');
+  });
+  t('术语表写入 localStorage 有 2 万字上限（这台机器存满过）', () => {
+    assert.ok(/length>20000/.test(html), '未设上限');
+  });
+  t('27 个界面字典都补齐了新增词条', () => {
+    const need = ['pnKeep','pnTrans','btnGlossFile','glossHit'];
+    const blocks = html.split(/\n(?=\s*'[a-zA-Z\-]+':\s*\{)/);
+    let checked = 0;
+    for (const b of blocks){
+      /* 只认首行就带 pureMTMode 的界面字典；EX_SAMPLE 那批没有它，不能用宽松的跨行匹配，
+         否则会把 EX_SAMPLE 之后的所有代码误当成一个字典块。 */
+      if (!/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/.test(b)) continue;
+      need.forEach(k=>{ assert.ok(new RegExp("(?<![A-Za-z0-9_])"+k+"\\s*:").test(b), '缺少词条 ' + k); });
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+}
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
