@@ -2779,6 +2779,36 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/data-i18n-html="rkTx"/.test(html), '文案未走 i18n（html）');
     assert.ok(/data-i18n="rkGo"/.test(html), 'CTA 未走 i18n');
   });
+
+  /* 从 index.html 抠出真实的 detectUiLang 来跑，避免测试与实现各写一套而漂移 */
+  const detectFn = () => {
+    const src = html.match(/function detectUiLang\(\)\{[\s\S]*?\n\}/);
+    assert.ok(src, '没找到 detectUiLang');
+    /* 注意末尾是调用形式：返回 detectUiLang 的话外面拿到的只是函数对象，调用结果会变成 undefined */
+    return new Function('navigator', src[0] + ';return detectUiLang();');
+  };
+  t('未收录的浏览器语言兜底为英文（v0.9.136：原先是中文）', () => {
+    const d = langs => detectFn()({ languages: langs });
+    assert.strictEqual(d(['nb-NO','nb']), 'en', '挪威语应兜底英文');
+    assert.strictEqual(d(['hu-HU']), 'en', '匈牙利语应兜底英文');
+    assert.strictEqual(d(['ms-MY']), 'en', '马来语应兜底英文');
+    assert.strictEqual(d(['zh-CN','zh']), 'zh-CN', '简体中文不受影响');
+    assert.strictEqual(d(['zh-TW','zh-Hant']), 'zh-TW', '繁体中文不受影响');
+    assert.strictEqual(d(['zh']), 'zh-CN');
+    assert.strictEqual(d(['ja-JP']), 'ja');
+    assert.strictEqual(d(['iw']), 'he', '旧希伯来码 iw 应认作 he');
+    assert.strictEqual(d(['nb-NO','de-DE']), 'de', '首项没命中应继续看后项');
+    /* 没有 languages 数组的老浏览器，退回 navigator.language 单值 */
+    assert.strictEqual(detectFn()({ languages: [], language: 'pt-BR' }), 'pt');
+  });
+  t('27 种界面语言都能被浏览器语言检测到（加语言别漏）', () => {
+    const detect = detectFn();
+    const ui = html.match(/const UI_LANGS = \[([\s\S]*?)\];/)[1];
+    const codes = [...ui.matchAll(/\['([^']+)'/g)].map(m => m[1]);
+    assert.strictEqual(codes.length, 27, '界面语言数 ' + codes.length);
+    const bad = codes.filter(c => detect({ languages: [c] }) !== c);
+    assert.deepStrictEqual(bad, [], '检测不到的语言: ' + bad.join(','));
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
