@@ -2748,6 +2748,37 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     }
     assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
+
+  /* ===== v0.9.135：risekol.com 引流条 ===== */
+  t('27 个界面字典都有引流条文案（v0.9.135）', () => {
+    const blocks = html.split(/\n(?=\s*'[a-zA-Z\-]+':\s*\{)/);
+    let checked = 0;
+    for (const b of blocks){
+      if (!/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/.test(b)) continue;
+      const tx = b.match(/rkTx\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      const go = b.match(/rkGo\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      assert.ok(tx, '缺少词条 rkTx');
+      assert.ok(go, '缺少词条 rkGo');
+      assert.ok(tx[1].length > 5, 'rkTx 文案为空');
+      assert.ok(tx[1].indexOf('RiseKol') >= 0, 'rkTx 未带品牌名');
+      assert.ok(go[1].length > 1, 'rkGo 为空');
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+  t('引流条只在官方域名或调试标记下显示（开源版不挂外链）', () => {
+    assert.ok(/ai-srtsub\\\.com\$\/i\.test\(host\)/.test(html), '缺少官方域名判断');
+    assert.ok(/sessionStorage\.setItem\('rkForce','1'\)/.test(html), '调试标记未落 sessionStorage');
+    assert.ok(/sessionStorage\.getItem\('rkForce'\)==='1'/.test(html), '调试标记未回读');
+    assert.ok(/hero\.classList\.toggle\('has-rk'/.test(html), '未切换 hero class');
+  });
+  t('引流条的链接、图标与装饰让位', () => {
+    assert.ok(/href="https:\/\/risekol\.com\/video"/.test(html), '链接不对');
+    assert.ok(/id="rkBanner"[^>]*target="_blank"/.test(html), '未新窗口打开');
+    assert.ok(/\.hero\.has-rk \.spark\.s3\{display:none\}/.test(html), '底部装饰未让位');
+    assert.ok(/data-i18n-html="rkTx"/.test(html), '文案未走 i18n（html）');
+    assert.ok(/data-i18n="rkGo"/.test(html), 'CTA 未走 i18n');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
