@@ -746,6 +746,41 @@ function publicBase(req){
    且禁止覆盖核心字段（否则会打乱模型名/正文/流式与事件记录）。
    非对象、非 JSON 字符串、数组一律回落 {}。 */
 const PARAM_RESERVED = ['model', 'messages', 'stream', 'temperature', 'max_tokens'];
+/* v0.9.132：response_format 默认注入的白名单（与前端 index.html 的 RF_SUPPORT 逐项保持一致）。
+   实测 api.deepseek.com / deepseek-chat（2026-09-20，真 key）：
+     带 response_format 且 prompt 含 JSON 字样   → 200
+     带 response_format 但 prompt 不含 json 字样 → 400 "Prompt must contain the word 'json'
+                                                    in some form to use 'response_format' of type 'json_object'."
+   ⚠️ 所以只给「前端显式声明要 JSON 输出」的请求注入（前端通过 meta.json 传意图）；
+      像「回复 OK」这种非 JSON 请求一旦被注入会直接 400。
+   未知端点一律不注入（未知 API 表面不猜）；Anthropic / Gemini 原生端点无此字段，显式排除。 */
+const RF_SUPPORT = [
+  /api\.deepseek\.com/i,
+  /api\.openai\.com/i,
+  /api\.moonshot\.(cn|ai)/i,
+  /dashscope[a-z\-]*\.aliyuncs\.com/i,
+  /open\.bigmodel\.cn/i,
+  /api\.z\.ai/i,
+  /api\.siliconflow\.(cn|com)/i,
+  /openrouter\.ai/i,
+  /api\.groq\.com/i,
+  /api\.together\.xyz/i,
+  /api\.x\.ai/i,
+  /localhost/i, /127\.0\.0\.1/i, /\[::1\]/i
+];
+const RF_DENY = [
+  /anthropic\.com/i,
+  /generativelanguage\.googleapis\.com/i
+];
+function rfSupported(base){
+  try{
+    const b = String(base || '');
+    if (!b) return false;
+    for (const re of RF_DENY) if (re.test(b)) return false;
+    for (const re of RF_SUPPORT) if (re.test(b)) return true;
+    return false;
+  }catch(e){ return false; }
+}
 function normParams(v){
   if (v == null) return {};
   if (typeof v === 'string') {
@@ -787,21 +822,39 @@ function pickModel(cfg, lang){
   return { which: 'A', cfg: slotCfg(cfg, 'A') };
 }
 
-async function callModel(cfg, messages, maxTokens){
+/* 上游是否因 response_format 拒收（HTTP 4xx + 文案相关）→ 摘掉参数重试一次 */
+function rfRejected(e){
+  const s = String((e && e.message) || '');
+  if (!/HTTP (400|404|415|422)/.test(s)) return false;
+  return /response[_ -]?format|json[_ -]?object|json[_ -]?mode|response[_ -]?schema|unsupported/i.test(s);
+}
+async function callModel(cfg, messages, maxTokens, opts){
   const url = String(cfg.base).replace(/\/+$/, '') + '/chat/completions';
   // v0.9.91：temperature 改为配置项（admin 可调）；旧配置无该字段时回退 0.2，并夹紧到 0-2
   let temp = Number(cfg.temperature);
   if (!Number.isFinite(temp)) temp = 0.2;
   temp = Math.min(2, Math.max(0, temp));
-  const core = { model: cfg.model, messages, temperature: temp, stream: false, max_tokens: maxTokens };
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
-    body: JSON.stringify(withExtra(core, cfg.extraParams))
-  });
-  const text = await r.text();
-  if (!r.ok) throw new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
-  return JSON.parse(text);
+  /* v0.9.132：opts.json 由前端 meta.json 传来，标明「这条请求期望 JSON 输出」 */
+  const useRf = !!(opts && opts.json) && rfSupported(cfg.base);
+  const once = async (withRf) => {
+    const core = { model: cfg.model, messages, temperature: temp, stream: false, max_tokens: maxTokens };
+    if (withRf) core.response_format = { type: 'json_object' };
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+      body: JSON.stringify(withExtra(core, cfg.extraParams))
+    });
+    const text = await r.text();
+    if (!r.ok) throw new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
+    return JSON.parse(text);
+  };
+  /* 白名单错判 / 平台侧变更 / 该模型不支持 → 摘掉 response_format 重发一次，绝不放弃整次翻译 */
+  try {
+    return await once(useRf);
+  } catch (e) {
+    if (useRf && rfRejected(e)) return await once(false);
+    throw e;
+  }
 }
 
 /* ---------------- 路由 ---------------- */
@@ -852,14 +905,16 @@ const server = http.createServer(async (req, res) => {
       const lang = (body.meta && String(body.meta.lang || '')) || '';
       const pick = pickModel(cfg, lang);
       try { appendEvent(ip, body.meta, pick.cfg.model, pick.which === 'B' ? { viaB: 1 } : null); } catch (e) {} // 行为记录失败不影响翻译主流程
+      /* v0.9.132：前端在 meta.json 里声明「本请求期望 JSON 输出」（非 JSON 请求不注入，否则上游会 400） */
+      const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
       try {
-        const out = await callModel(pick.cfg, body.messages, undefined);
+        const out = await callModel(pick.cfg, body.messages, undefined, jsonOpts);
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
         /* B 失败且开启回退 → 再试 A；回退成功后把事件里的模型改写成真正生效的 A，并记 fallback 次数 */
         if (pick.which === 'B' && cfg.fallbackToA) {
           try {
-            const outA = await callModel(slotCfg(cfg, 'A'), body.messages, undefined);
+            const outA = await callModel(slotCfg(cfg, 'A'), body.messages, undefined, jsonOpts);
             try {
               markEvent(ip, Object.assign({}, body.meta || {}, {
                 model: pick.cfg.model, usedModel: cfg.model, msg: String(e.message || '').slice(0, 200)

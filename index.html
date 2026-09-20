@@ -427,7 +427,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.131</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.132</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -581,7 +581,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.131</span>
+    <span class="ver-tag">v0.9.132</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -795,7 +795,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.131"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.132"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6398,6 +6398,56 @@ const ENGINE_DEFAULTS=[
   /* Anthropic OpenAI 兼容层：max_tokens 是必填字段，不给会直接报错 */
   { test:/anthropic\.com/i, params:{max_tokens:8192} }
 ];
+/* v0.9.132：response_format 默认注入——把「事后救」变「事前防」的前提，是这个参数必须真的被平台接受。
+   实测（2026-09-20，线上 api.deepseek.com / deepseek-chat 真 key）：
+     不带该参数                        → 200
+     带该参数但 prompt 不含 json 字样  → **400** "Prompt must contain the word 'json' in some form
+                                          to use 'response_format' of type 'json_object'."
+     带该参数且 prompt 含大写 JSON     → 200（我们 systemPrompt 的真实形态）
+     带该参数且 prompt 含小写 json     → 200
+   ⚠️ 因此**绝不能全局注入**——「测试连接」那条请求正文是 "Reply with exactly: OK"（不含 json），
+      逐组直译通道（Hunyuan-MT）要的更是纯译文而非 JSON，两者被注入必然 400 或直接逻辑错乱。
+      注入与否由调用点在 opts.json 里显式声明，这里只负责「该平台是否支持」这一层。
+   白名单而非黑名单：未知的第三方端点一律不注入（未知 API 表面不猜，与 ENGINE_DEFAULTS 同一原则）。
+   Anthropic / Gemini 原生端点的 OpenAI 兼容语义里没有这个字段，显式排除。 */
+const RF_SUPPORT=[
+  /api\.deepseek\.com/i,
+  /api\.openai\.com/i,
+  /api\.moonshot\.(cn|ai)/i,
+  /dashscope[a-z\-]*\.aliyuncs\.com/i,
+  /open\.bigmodel\.cn/i,
+  /api\.z\.ai/i,
+  /api\.siliconflow\.(cn|com)/i,
+  /openrouter\.ai/i,
+  /api\.groq\.com/i,
+  /api\.together\.xyz/i,
+  /api\.x\.ai/i,
+  /localhost/i, /127\.0\.0\.1/i, /\[::1\]/i   /* vLLM / Ollama / LM Studio 本地 OpenAI 兼容端 */
+];
+const RF_DENY=[
+  /anthropic\.com/i,                        /* 原生 Anthropic：无此字段 */
+  /generativelanguage\.googleapis\.com/i    /* Gemini 原生：走 generationConfig.responseMimeType */
+];
+/* 会话内「该端点不支持」的墓碑——白名单填错或平台变更时，首个批次会多花一次往返，
+   之后一律直发，不会让整片翻译卡死。 */
+const RF_BANNED={};
+function banRf(base){ try{ RF_BANNED[String(base||'')]=1; }catch(e){} }
+function jsonFormatParam(base,model,opts){
+  try{
+    if(!opts || !opts.json) return {};
+    const b=String(base||'');
+    if(!b || RF_BANNED[b]) return {};
+    for(const re of RF_DENY) if(re.test(b)) return {};
+    for(const re of RF_SUPPORT) if(re.test(b)) return {response_format:{type:'json_object'}};
+    return {};
+  }catch(e){ return {}; }
+}
+/* 该错误是否由 response_format 引起（平台拒收 / 不支持）→ 摘掉参数重试一次 */
+function isRfReject(err){
+  const s=String((err&&err.message)||'');
+  if(!/HTTP (400|404|415|422)/.test(s) && !/\b(400|422)\b/.test(s)) return false;
+  return /response[_ -]?format|json[_ -]?object|json[_ -]?mode|response[_ -]?schema|unsupported/i.test(s);
+}
 function engineDefaults(base,model){
   try{
     const b=String(base||''), m=String(model||'');
@@ -6414,7 +6464,7 @@ function engineDefaults(base,model){
 // v0.9.29：timeoutMs 可选（默认 90s）——术语表提取是单次大请求（8.6K 采样在 DeepSeek 夜高峰实测 161.5s，
 // 正常时段仅 ~4s），共用 90s 会导致大文件在服务端拥塞时静默降级为无术语表；批次/压缩仍走默认 90s
 let LAST_FINISH='';   // v0.9.125：上一次 chatOnce 拿到 finish_reason（'length' = 输出被长度上限截断）
-async function chatOnce(base,key,model,msgs,timeoutMs,rt){
+async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
   const ctl=new AbortController();
   const builtin = (base===BUILTIN_API);
   /* v0.9.123：浏览器直连（自定义 API）没有服务端排队，但第三方中转/思考型模型慢得多——
@@ -6444,31 +6494,57 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt){
     if(!builtin && key) headers.Authorization='Bearer '+key;
     /* Anthropic OpenAI 兼容层：浏览器直连必须带此 header（否则 CORS 拒绝） */
     if(!builtin && /anthropic\.com/.test(url)) headers['anthropic-dangerous-direct-browser-access']='true';
-    const r=await fetch(url,{
-      method:'POST',
-      headers,
-    /* v0.9.125：自定义链路的请求体 = 平台默认参数 < 用户附加参数 < 核心字段（模型/正文……）。
-       此前核心字段之外只有用户附加参数，max_tokens 从未被发送——平台侧按自己的默认值截断输出。 */
-    body:JSON.stringify(builtin
-      ? {messages:msgs,temperature:0.2,stream:false,meta: rt ? Object.assign({rt:rt},S.trMeta||{}) : (S.trMeta||undefined)}
-      : Object.assign(engineDefaults(base,model), extraParamsFront(), {model,messages:msgs,temperature:0.2,stream:false})),
-      signal:ctl.signal
-    });
-    if(!r.ok){ const t=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+t.slice(0,200)); }
-    const j=await r.json();
-    /* v0.9.125：记录 finish_reason——'length' 表示输出撞到上限被服务端截断（不是模型写完），
-       下游据此给出「请加大 max_tokens」的确切提示，而不是拿半截 JSON 去修 */
-    try{ LAST_FINISH=String((j.choices&&j.choices[0]&&j.choices[0].finish_reason)||''); }catch(e){ LAST_FINISH=''; }
-    let out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-    if(!out) throw new Error(t('errEmpty'));
-    /* v0.9.120：思考型模型（如 SiliconFlow 上的 Qwen3/GLM 系）在非流式响应里会把 <think>…</think>
-       推理文本混进 content，思考文本中的 { 会把下游「首 { 到尾 }」的 JSON 提取切进思考段
-       （实测表象：批 1 三连败 Expected ',' or '}' after property value）。出口统一剥掉；
-       未闭合（思考中输出被截断）→ 其后没有有效内容，一并弃掉。 */
-    out=String(out).replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi,'');
-    const openTag=String(out).match(/<think(?:ing)?>/i);
-    if(openTag) out=String(out).slice(0, openTag.index);
-    return out;
+    /* v0.9.132：请求体构造抽成函数——withRf 决定本次是否带 response_format。
+       自定义直连链路优先级：平台默认参数 < response_format 默认值 < 用户附加参数 < 核心字段。
+       用户在「附加请求参数」里显式写了 response_format（含置 null 关闭）→ 完全以用户为准，不注入默认值。
+       内置通道：那一套注入发生在服务端（浏览器看不到上游地址与 Key），这里只通过 meta.json 传递意图。 */
+    const ex = builtin ? {} : extraParamsFront();
+    const userHasRf = !builtin && Object.prototype.hasOwnProperty.call(ex,'response_format');
+    const mkBody=(withRf)=>{
+      if(builtin){
+        const meta=Object.assign({}, rt?{rt:rt}:{}, S.trMeta||{}, (opts&&opts.json&&withRf)?{json:1}:{});
+        return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
+      }
+      const rf=(withRf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
+      return Object.assign(engineDefaults(base,model), rf, ex, {model,messages:msgs,temperature:0.2,stream:false});
+    };
+    const once=async(withRf)=>{
+      const r=await fetch(url,{
+        method:'POST',
+        headers,
+      /* v0.9.125：自定义链路的请求体 = 平台默认参数 < 用户附加参数 < 核心字段（模型/正文……）。
+         此前核心字段之外只有用户附加参数，max_tokens 从未被发送——平台侧按自己的默认值截断输出。 */
+        body:JSON.stringify(mkBody(withRf)),
+        signal:ctl.signal
+      });
+      if(!r.ok){ const tx=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+tx.slice(0,200)); }
+      const j=await r.json();
+      /* v0.9.125：记录 finish_reason——'length' 表示输出撞到上限被服务端截断（不是模型写完），
+         下游据此给出「请加大 max_tokens」的确切提示，而不是拿半截 JSON 去修 */
+      try{ LAST_FINISH=String((j.choices&&j.choices[0]&&j.choices[0].finish_reason)||''); }catch(e){ LAST_FINISH=''; }
+      let out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+      if(!out) throw new Error(t('errEmpty'));
+      /* v0.9.120：思考型模型（如 SiliconFlow 上的 Qwen3/GLM 系）在非流式响应里会把 <think>…</think>
+         推理文本混进 content，思考文本中的 { 会把下游「首 { 到尾 }」的 JSON 提取切进思考段
+         （实测表象：批 1 三连败 Expected ',' or '}' after property value）。出口统一剥掉；
+         未闭合（思考中输出被截断）→ 其后没有有效内容，一并弃掉。 */
+      out=String(out).replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi,'');
+      const openTag=String(out).match(/<think(?:ing)?>/i);
+      if(openTag) out=String(out).slice(0, openTag.index);
+      return out;
+    };
+    const withRf = !!(opts&&opts.json) && (builtin || !!jsonFormatParam(base,model,opts).response_format);
+    try{
+      return await once(withRf);
+    }catch(e){
+      /* v0.9.132：平台拒收 response_format（白名单错判 / 平台侧变更 / 该模型不支持）。
+         摘掉参数重发一次，并给该端点在会话内立墓碑——代价只有一次往返，绝不会让整片翻译卡死。 */
+      if(withRf && isRfReject(e) && !(e&&e.name==='AbortError') && !ctl.signal.aborted){
+        banRf(base);
+        return await once(false);
+      }
+      throw e;
+    }
   }catch(e){
     /* v0.9.126：AbortController 到点后 fetch 抛的是浏览器原生 DOMException
        （"signal is aborted without reason"），用户完全无法据此判断发生了什么。
@@ -6580,7 +6656,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     raw=await chatOnce(base,key,model,[
       {role:'system',content:sys},
       {role:'user',content:userMsg}
-    ],undefined,rt);
+    ],undefined,rt,{json:1});
     /* v0.9.125：输出被长度上限截断（finish_reason='length'）→ 内容必然不完整。
        此前这种情况会落到容错修复里「整形成功但丢句组」，表现为随机位置的 JSON 语法错 / 缺少句组 N，
        看起来像模型不行，实际是我们没发 max_tokens。这里直接报出确切原因。 */
@@ -6610,7 +6686,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   let missing = send.filter(g=>!byGno[g.gno]);
   if(missing.length && missing.length < send.length){
     try{
-      const raw2 = await chatOnce(base,key,model,[{role:'system',content:sys},{role:'user',content:mkMsg(missing)}],undefined,rt);
+      const raw2 = await chatOnce(base,key,model,[{role:'system',content:sys},{role:'user',content:mkMsg(missing)}],undefined,rt,{json:1});
       const obj2 = parseLlmJson(raw2);
       if(obj2&&Array.isArray(obj2.groups)) obj2.groups.forEach(x=>{
         if(!x||x.gno==null) return;
@@ -6818,7 +6894,7 @@ async function compressBatch(base,key,model,items,dstLang){
   const raw=await chatOnce(base,key,model,[
     {role:'system',content: zhDst ? '你是专业字幕译后编辑，擅长在不损失可读性的前提下压缩译文长度。只输出 JSON。' : 'You are a professional post-translation subtitle editor skilled at shortening translations without losing readability. Output JSON only.'},
     {role:'user',content:userMsg}
-  ]);
+  ],undefined,undefined,{json:1});
   const obj=parseLlmJson(raw);
   if(!obj||!Array.isArray(obj.groups)) throw new Error(t('errNoGroups'));
   const byGno={};
@@ -6872,7 +6948,7 @@ async function extractGlossary(base,key,model,cfg,srcText){
   const raw=await chatOnce(base,key,model,[
     {role:'system',content:sys},
     {role:'user',content:usr}
-  ],240000);
+  ],240000,undefined,{json:1});
   const arr=parseLlmJson(raw);
   // v0.9.62：返回 {terms, synopsis}——synopsis 为全片一句话概要，注入 systemPrompt 作语境 primer；
   // 兼容旧数组返回（模型偶发无视对象指令直接给数组）

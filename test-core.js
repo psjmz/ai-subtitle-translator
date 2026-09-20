@@ -2516,5 +2516,115 @@ t('balanceInlineTags：异常输入不炸', () => {
   assert.strictEqual(C.balanceInlineTags(undefined, 'x'), '');
 });
 
+/* v0.9.132：response_format 默认注入。
+   实测（2026-09-20，api.deepseek.com 真 key）：prompt 不含 json 字样时带该参数会直接 400
+   "Prompt must contain the word 'json' in some form to use 'response_format' of type 'json_object'."
+   → 注入与否必须逐调用点甄别，绝不能全局注入。以下用例直接对着 index.html / server.js 的真实源码求值，
+     防止日后有人把它简化成「所有请求统一带上」。 */
+console.log('— response_format 默认注入（v0.9.132）—');
+{
+  const fsM = require('fs'), pathM = require('path');
+  const html = fsM.existsSync(pathM.join(__dirname,'index.html')) ? fsM.readFileSync(pathM.join(__dirname,'index.html'),'utf8') : '';
+  const srv  = fsM.existsSync(pathM.join(__dirname,'server.js'))  ? fsM.readFileSync(pathM.join(__dirname,'server.js'),'utf8')  : '';
+  let FE = null, SV = null;
+  try{
+    const m1 = html.match(/const RF_SUPPORT=\[[\s\S]*?\nfunction isRfReject\(err\)\{[\s\S]*?\n\}/);
+    if (m1) FE = new Function(m1[0] + '\nreturn {jsonFormatParam:jsonFormatParam,isRfReject:isRfReject,banRf:banRf,RF_SUPPORT:RF_SUPPORT,RF_DENY:RF_DENY};')();
+  }catch(e){ FE = null; }
+  try{
+    const m2 = srv.match(/const RF_SUPPORT = \[[\s\S]*?\nfunction rfSupported\(base\)\{[\s\S]*?\n\}/);
+    const m3 = srv.match(/function rfRejected\(e\)\{[\s\S]*?\n\}/);
+    if (m2 && m3) SV = new Function(m2[0] + '\n' + m3[0] + '\nreturn {rfSupported:rfSupported,rfRejected:rfRejected,RF_SUPPORT:RF_SUPPORT,RF_DENY:RF_DENY};')();
+  }catch(e){ SV = null; }
+
+  t('源码里的判定块能被抠出来求值（测试未与实现脱节）', () => {
+    assert.ok(FE, 'index.html 的 RF_SUPPORT/isRfReject 未命中');
+    assert.ok(SV, 'server.js 的 RF_SUPPORT/rfRejected 未命中');
+  });
+
+  const RF = () => ({ response_format: { type: 'json_object' } });
+  t('白名单端点（DeepSeek / OpenAI / 硅基流动 / 阿里云 / 智谱 / 本地 vLLM）注入', () => {
+    ['https://api.deepseek.com','https://api.openai.com','https://api.siliconflow.cn/v1',
+     'https://dashscope.aliyuncs.com/compatible-mode/v1','https://open.bigmodel.cn/api/paas/v4',
+     'http://127.0.0.1:11434/v1'].forEach(b => {
+      assert.deepStrictEqual(FE.jsonFormatParam(b,'m',{json:1}), RF(), b + ' 应注入');
+    });
+  });
+  t('未收录的第三方端点一律不注入（未知 API 表面不猜）', () => {
+    ['https://my-gateway.example.com/v1','https://ai.internal.corp/v1',''].forEach(b => {
+      assert.deepStrictEqual(FE.jsonFormatParam(b,'m',{json:1}), {}, JSON.stringify(b) + ' 不应注入');
+    });
+  });
+  t('Anthropic / Gemini 原生端点不注入（该字段在其 OpenAI 兼容语义里不存在）', () => {
+    ['https://api.anthropic.com','https://generativelanguage.googleapis.com/v1beta/openai'].forEach(b => {
+      assert.deepStrictEqual(FE.jsonFormatParam(b,'m',{json:1}), {}, b + ' 不应注入');
+    });
+  });
+  t('调用点未声明 json → 不注入（所得故而禁止全局注入）', () => {
+    assert.deepStrictEqual(FE.jsonFormatParam('https://api.deepseek.com','m'), {});
+    assert.deepStrictEqual(FE.jsonFormatParam('https://api.deepseek.com','m',{}), {});
+    assert.deepStrictEqual(FE.jsonFormatParam('https://api.deepseek.com','m',{json:0}), {});
+  });
+  t('端点被拒一次后会话内不再注入（退降级重试后不再重复踩坑）', () => {
+    const b='https://api.deepseek.com/ban-probe-'+Math.random().toString(36).slice(2);
+    assert.deepStrictEqual(FE.jsonFormatParam(b,'m',{json:1}), RF(), '首次应注入');
+    FE.banRf(b);
+    assert.deepStrictEqual(FE.jsonFormatParam(b,'m',{json:1}), {}, '被拒后不应再注入');
+  });
+  t('参数异常不炸（防御：base 为 null / opts 为字符串）', () => {
+    [undefined,null,{},7].forEach(v => {
+      assert.deepStrictEqual(FE.jsonFormatParam(v,'m',{json:1}), {});
+    });
+    assert.deepStrictEqual(FE.jsonFormatParam('https://api.deepseek.com','m','x'), {});
+  });
+  t('isRfReject 认出 DeepSeek 真实 400 文案', () => {
+    const real = "HTTP 400 {\"error\":{\"message\":\"Prompt must contain the word 'json' in some form to use 'response_format' of type 'json_object'.\"}}";
+    assert.ok(FE.isRfReject(new Error(real)), '真实拒收文案应命中');
+    assert.ok(FE.isRfReject(new Error('HTTP 422 unsupported response_format for this model')), '模型不支持应命中');
+    assert.ok(!FE.isRfReject(new Error('HTTP 401 Invalid Api key')), '401 不应被当成 rf 问题');
+    assert.ok(!FE.isRfReject(new Error('HTTP 500 upstream internal error')), '500 不应误判');
+    assert.ok(!FE.isRfReject(new Error('HTTP 400 {"error":{"message":"Request body is not valid JSON"}}')), '无关 400 不应误判');
+    assert.ok(!FE.isRfReject(new Error('signal is aborted without reason')), '超时不应误判');
+  });
+  t('服务端 rfSupported / rfRejected 与前端判定一致（防白名单漂移）', () => {
+    assert.deepStrictEqual(FE.RF_SUPPORT.map(String), SV.RF_SUPPORT.map(String), 'RF_SUPPORT 两端已不一致');
+    assert.deepStrictEqual(FE.RF_DENY.map(String), SV.RF_DENY.map(String), 'RF_DENY 两端已不一致');
+    assert.strictEqual(SV.rfSupported('https://api.deepseek.com'), true);
+    assert.strictEqual(SV.rfSupported('https://api.anthropic.com'), false);
+    assert.strictEqual(SV.rfSupported('https://unknown.example.com/v1'), false);
+    assert.strictEqual(SV.rfRejected(new Error("HTTP 400 ... response_format ...")), true);
+    assert.strictEqual(SV.rfRejected(new Error('HTTP 401 Invalid Api key')), false);
+  });
+
+  /* 逐调用点甄别：这是本功能最容易被「简化」掉的地方 */
+  const calls = html.match(/await chatOnce\([\s\S]*?\);/g) || [];
+  t('chatOnce 调用点数量与 JSON 标记分布符合预期', () => {
+    assert.strictEqual(calls.length, 6, '调用点数变了(' + calls.length + ')，新增调用点请先确认要不要 JSON 模式');
+    const need = calls.filter(s => /json\s*:\s*1/.test(s));
+    assert.strictEqual(need.length, 4, '应注入的调用点应为 4 处（翻译/缺组补译/压缩/术语提取），现 ' + need.length + ' 处');
+  });
+  t('「测试连接」请求严禁注入（正文 Reply with exactly: OK 不含 json，注入必 400）', () => {
+    const c = calls.find(s => s.indexOf('Reply with exactly: OK') >= 0);
+    assert.ok(c, '未找到测试连接调用点');
+    assert.ok(!/json\s*:\s*1/.test(c), '测试连接被注入了 JSON 模式，连不上') ;
+  });
+  t('逐组直译通道（纯翻译模型 Hunyuan-MT）严禁注入（它要的是纯译文）', () => {
+    const c = calls.find(s => s.indexOf('o.base,o.key,o.model') >= 0);
+    assert.ok(c, '未找到逐组直译调用点');
+    assert.ok(!/json\s*:\s*1/.test(c), '逐组直译被注入了 JSON 模式');
+  });
+  t('内置通道通过 meta.json 传递意图，且服务端据此注入', () => {
+    assert.ok(/meta:Object\.keys\(meta\)\.length\?meta:undefined/.test(html), 'meta 构造写法变了');
+    assert.ok(/opts&&opts\.json&&withRf\)\?\{json:1\}/.test(html), 'meta.json 未随 opts.json 传递');
+    assert.ok(/const jsonOpts = \(body\.meta && body\.meta\.json\)/.test(srv), '服务端未读取 meta.json');
+    assert.ok(/callModel\(pick\.cfg, body\.messages, undefined, jsonOpts\)/.test(srv), '服务端主调用未传 jsonOpts');
+    assert.ok(/callModel\(slotCfg\(cfg, 'A'\), body\.messages, undefined, jsonOpts\)/.test(srv), '服务端回退调用未传 jsonOpts');
+  });
+  t('优先级：用户在附加参数里显式给 response_format 时不注入默认值', () => {
+    assert.ok(/ex\.response_format===undefined/.test(html) || /hasOwnProperty\.call\(ex,'response_format'\)/.test(html),
+      '未实现用户优先的判据');
+  });
+}
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
