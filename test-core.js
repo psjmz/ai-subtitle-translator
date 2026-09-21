@@ -2727,7 +2727,9 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/glossAIEntries\(gl, have\)/.test(html), 'AI 条目未经同名判重就写入');
     const gae = html.match(/function glossAIEntries\(gl, have\)\{[\s\S]*?\n\}/);
     assert.ok(gae, '找不到 glossAIEntries');
-    assert.ok(/if\(seen\[lk\]\) return/.test(gae[0]), 'glossAIEntries 未跳过同名条目，会覆盖用户手写的译法');
+    // v0.9.141：变体并进同一条的 alts，判重仍是「命中 seen 就跳过」——
+    // 用户已有的同名条目（含他手写的译法）绝不能被 AI 的结果盖掉
+    assert.ok(/seen\[[^\]]+\]\)\s*return/.test(gae[0]), 'glossAIEntries 未跳过同名条目，会覆盖用户手写的译法');
   });
   t('每批只注入本批命中的术语（省成本）', () => {
     assert.ok(/const sysB = glossSysFor\(gBatch, cfg, sys\);/.test(html));
@@ -3060,6 +3062,88 @@ console.log('— 专名策略与术语表（v0.9.134）—');
 
   t('v0.9.140 新增词条 27 语言齐全', () => {
     const keys = ['glossMiss', 'glossAiCleared', 'glossVariant'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    let checked = 0;
+    for (const b of blocks) {
+      const code = (b.match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = html.indexOf(b);
+      const seg = html.slice(i, i + 9000);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+
+  /* v0.9.141：用户反馈「改了译名没用，而且根本不知道那行提示」。
+     三件事：①AI 抽出的拼写变体并进同一条，改一次译法全部跟随；
+     ②未命中的提示从灰色小字变成警告色；③翻译完成后核对成片译文里到底用上没有。 */
+  let G141 = null;
+  try{
+    const m = html.match(/const GLOSS_ARROW = [\s\S]*?function glossFilter\(rows, srcText\)\{[^}]*\}/);
+    if (m) G141 = new Function(m[0] + '\nreturn {glossParse:glossParse,glossHit:glossHit,glossFilter:glossFilter,glossRowText:glossRowText};')();
+  }catch(e){ G141 = null; }
+
+  t('一条术语可以写多个拼写（| 分隔），共用一个译法', () => {
+    assert.ok(G141, '解析函数未抠到');
+    const r = G141.glossParse('Whopper|Whoppers → 华堡').rows;
+    assert.strictEqual(r.length, 1, '多拼写必须仍是同一条');
+    assert.strictEqual(r[0].t, 'Whopper');
+    assert.deepStrictEqual(r[0].alts, ['Whoppers']);
+    assert.strictEqual(r[0].r, '华堡');
+  });
+
+  t('多拼写条目的每个拼写都要命中，且不能放宽成模糊匹配', () => {
+    const r = G141.glossParse('Whopper|Whoppers → 华堡').rows;
+    assert.strictEqual(G141.glossHit(r[0], 'He ordered a Whopper.'), true);
+    assert.strictEqual(G141.glossHit(r[0], 'Two Whoppers, please.'), true,
+      '变体拼写没命中——主条目改了译法后这些句子就不会跟随');
+    assert.strictEqual(G141.glossHit(r[0], 'Whopperino please.'), false, '放宽成了模糊匹配');
+  });
+
+  t('改一条的译法，所有拼写都跟随（| 的意义就在这里）', () => {
+    const row = G141.glossParse('Whopper|Whoppers → 华堡').rows[0];
+    row.r = '皇堡';
+    const txt = G141.glossRowText(row);
+    assert.ok(txt.indexOf('Whopper|Whoppers') === 0, '序列化丢了变体拼写：' + txt);
+    assert.ok(txt.indexOf('皇堡') > 0, '序列化丢了新译法');
+  });
+
+  t('没有变体的条目形状保持原样（不凭空多出 alts）', () => {
+    assert.deepStrictEqual(G141.glossParse('SpaceX').rows, [{t:'SpaceX', r:'SpaceX', note:''}],
+      '多出 alts 会破坏既有条目形状');
+  });
+
+  t('AI 抽出的变体并进同一条，不再各占一行', () => {
+    const gae = html.match(/function glossAIEntries\(gl, have\)\{[\s\S]*?\n\}/);
+    assert.ok(gae, '找不到 glossAIEntries');
+    assert.ok(/row\.alts\s*=\s*alts/.test(gae[0]), '变体没有并进 alts');
+    assert.ok(!/glossVariant/.test(gae[0]), '还在把变体写成独立行（改主条目时它不跟随）');
+  });
+
+  t('未命中的提示必须变成警告色（灰色小字用户不看）', () => {
+    const gcu = html.match(/function glossCountUI\(\)\{[\s\S]*?\n\}/);
+    assert.ok(gcu, '找不到 glossCountUI');
+    assert.ok(/classList\.add\('alert'\)/.test(gcu[0]), '未命中时提示没有变警告色');
+    assert.ok(/classList\.remove\('alert'\)/.test(gcu[0]), '命中后没有恢复常态');
+    assert.ok(/\.hint\.alert\{/.test(html), '缺少 .hint.alert 样式');
+  });
+
+  t('翻译完成后核对成片译文里到底用上没有指定译法', () => {
+    const gv = html.match(/function glossVerify\(\)\{[\s\S]*?\n\}/);
+    assert.ok(gv, '找不到 glossVerify');
+    assert.ok(/out\.indexOf\(g\.r\)/.test(gv[0]), '没有在成片译文里找指定译法');
+    assert.ok(/g\.r===g\.t\)\s*return/.test(gv[0]), '保留原文的条目会被误报');
+    assert.ok(/!glossHit\(g, src\)\)\s*return/.test(gv[0]), '本片没出现的条目会被误报');
+    const seg = html.match(/log\(t\('allDone'[\s\S]{0,240}/);
+    assert.ok(seg && /glossVerify\(\)/.test(seg[0]), '翻译完成后没有调用核对');
+  });
+
+  t('v0.9.141 新增词条 27 语言齐全', () => {
+    const keys = ['glossVerifyOk', 'glossVerifyMiss', 'glossHelpS5'];
     const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
     let checked = 0;
     for (const b of blocks) {
