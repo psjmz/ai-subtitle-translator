@@ -2723,7 +2723,11 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   });
   t('AI 抽出的条目写进输入框，且同名条目以用户已有为准', () => {
     assert.ok(/have\.concat\(added\)/.test(html), 'AI 结果未落到输入框');
-    assert.ok(/taken\.indexOf\(x\.t\.trim\(\)\.toLowerCase\(\)\)<0/.test(html), 'AI 条目未跳过用户已有的同名条目');
+    // v0.9.140：判重逻辑抽进 glossAIEntries（同时要吃下 variants），改判存在性而非内联写法
+    assert.ok(/glossAIEntries\(gl, have\)/.test(html), 'AI 条目未经同名判重就写入');
+    const gae = html.match(/function glossAIEntries\(gl, have\)\{[\s\S]*?\n\}/);
+    assert.ok(gae, '找不到 glossAIEntries');
+    assert.ok(/if\(seen\[lk\]\) return/.test(gae[0]), 'glossAIEntries 未跳过同名条目，会覆盖用户手写的译法');
   });
   t('每批只注入本批命中的术语（省成本）', () => {
     assert.ok(/const sysB = glossSysFor\(gBatch, cfg, sys\);/.test(html));
@@ -3006,7 +3010,70 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const fn = html.match(/async function glossAIRun\(\)\{[\s\S]*?\n\}/);
     assert.ok(fn, '找不到 glossAIRun');
     assert.ok(/\$\('terms'\)\.value\s*=/.test(fn[0]), '抽取结果没有写回术语表输入框');
-    assert.ok(/taken\.indexOf/.test(fn[0]), '没有跳过用户已有的同名条目，会覆盖用户手写的译法');
+    assert.ok(/glossAIEntries\(gl, have\)/.test(fn[0]), '没有跳过用户已有的同名条目，会覆盖用户手写的译法');
+    assert.ok(/save\(\);/.test(fn[0]), '抽取结果没有立刻落盘，刷新页面会丢');
+  });
+
+  /* v0.9.140：用户报「AI 抽取后改了没用」。实测主链路（写回→解析→过滤→提示词）是通的，
+     真正的原因是四条静默失效路径。这里逐条钉死，防止回退。 */
+  t('未命中的条目必须显式列出来（否则用户不知道自己白改了）', () => {
+    const gcu = html.match(/function glossCountUI\(\)\{[\s\S]*?\n\}/);
+    assert.ok(gcu, '找不到 glossCountUI');
+    assert.ok(/glossMissRows\(\)/.test(gcu[0]), 'glossCountUI 没有列出未命中条目');
+    assert.ok(/t\('glossMiss'/.test(gcu[0]), '未命中提示没有走 i18n');
+    const gmr = html.match(/function glossMissRows\(\)\{[\s\S]*?\n\}/);
+    assert.ok(gmr, '找不到 glossMissRows');
+    assert.ok(/!glossHit\(r, src\)/.test(gmr[0]), 'glossMissRows 未按命中过滤');
+  });
+
+  t('匹配归一化只抹平无信息量差异，不放宽到形变', () => {
+    const gn = html.match(/function glossNorm\(s\)\{[\s\S]*?\n\}/);
+    assert.ok(gn, '找不到 glossNorm');
+    assert.ok(/toLowerCase/.test(gn[0]), '归一化未处理大小写');
+    assert.ok(/\\s/.test(gn[0]), '归一化未处理空白');
+    // 关键：绝不能出现编辑距离/模糊匹配——放开到形变会误伤相近词（Bob 命中 Bobby）
+    assert.ok(!/levenshtein|editDistance|fuzzy/i.test(html), '引入了模糊匹配，会误伤相近词');
+  });
+
+  t('AI 注释归一化：剥掉自带括号，避免双层括号污染译文', () => {
+    const gnn = html.match(/function glossNormNote\(n\)\{[\s\S]*?\n\}/);
+    assert.ok(gnn, '找不到 glossNormNote');
+    assert.ok(/replace\(\/\^\[（\(\]\+\//.test(gnn[0]), '未剥掉开头括号');
+    assert.ok(/\[）\)\]\+\$\//.test(gnn[0]), '未剥掉结尾括号');
+  });
+
+  t('换字幕时清掉上一部的 AI 抽取条目，手写的保留', () => {
+    assert.ok(/clearedAI=glossClearAI\(\)/.test(html), 'setSrc 未清理 AI 抽取条目');
+    assert.ok(/t\('glossAiCleared',clearedAI\)/.test(html), '清理后未告知用户');
+    const gca = html.match(/function glossClearAI\(\)\{[\s\S]*?\n\}/);
+    assert.ok(gca, '找不到 glossClearAI');
+    // 只清 AI 标记过的，用户手写的一律不动
+    assert.ok(/!gk\.has\(/.test(gca[0]), 'glossClearAI 未按 AI 标记过滤，会误删用户手写的条目');
+  });
+
+  t('抽取提示词要求 AI 用片中真实出现的拼写 + 给出变体', () => {
+    assert.ok(/occurs MOST OFTEN in the source/.test(html), '英文抽取提示词未要求用片中真实拼写');
+    assert.ok(/片中实际出现次数最多的那个拼写/.test(html), '中文抽取提示词未要求用片中真实拼写');
+    assert.ok(/"variants":\["Bobbi Thomson"\]/.test(html), '英文 JSON 示例未给 variants');
+    assert.ok(/"variants":\["Bobbi Thomson"\]/.test(html), '中文 JSON 示例未给 variants');
+  });
+
+  t('v0.9.140 新增词条 27 语言齐全', () => {
+    const keys = ['glossMiss', 'glossAiCleared', 'glossVariant'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    let checked = 0;
+    for (const b of blocks) {
+      const code = (b.match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = html.indexOf(b);
+      const seg = html.slice(i, i + 9000);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
 }
 
