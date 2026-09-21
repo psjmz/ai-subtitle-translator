@@ -2972,6 +2972,42 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     }
     assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
+
+  t('自动术语表开关已换成「AI 抽取」按钮', () => {
+    // 开关留在末尾时，抽完紧接着翻译，用户没机会改——这是 v0.9.139 要根治的问题
+    assert.ok(!/id="autoTerms"/.test(html), '开关 HTML 还在，应已移除');
+    assert.ok(!/\$\('autoTerms'\)/.test(html), '还有代码在读已经删掉的开关 DOM');
+    assert.ok(/id="btnGlossAI"/.test(html), '缺少 AI 抽取按钮');
+    const btnAt = html.indexOf('id="btnGlossAI"');
+    const taAt = html.indexOf('<textarea id="terms"');
+    assert.ok(btnAt > 0 && taAt > 0 && btnAt < taAt,
+      '按钮必须排在术语表文本框之上，否则「抽完填进下面的框」在视觉上不成立');
+  });
+
+  t('AI 抽取按钮的 27 语言文案齐全', () => {
+    const keys = ['btnGlossAI', 'glossAiRun', 'glossAiDone', 'glossAiNone', 'glossAiNeedFile'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    let checked = 0;
+    for (const b of blocks) {
+      const code = (b.match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = html.indexOf(b);
+      const seg = html.slice(i, i + 9000);
+      for (const k of keys) {
+        const m = seg.match(new RegExp(k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+
+  t('抽取结果写回文本框（可见可改），不是直接喂给模型', () => {
+    const fn = html.match(/async function glossAIRun\(\)\{[\s\S]*?\n\}/);
+    assert.ok(fn, '找不到 glossAIRun');
+    assert.ok(/\$\('terms'\)\.value\s*=/.test(fn[0]), '抽取结果没有写回术语表输入框');
+    assert.ok(/taken\.indexOf/.test(fn[0]), '没有跳过用户已有的同名条目，会覆盖用户手写的译法');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
