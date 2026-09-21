@@ -2874,28 +2874,35 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     }
     assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
-  t('引子讲清了「术语表优先于专名处理」', () => {
-    assert.ok(/data-i18n-html="glossHelpLead"/.test(html), '引子未走 i18n-html（内含 <b> 标记）');
+  // v0.9.142：整块重写。此前整节在讲「支持哪些符号」（内部实现），而用户真正要问的是
+  // 「我写了为什么不生效」；「怎么匹配」那节还在讲算法，且第 4 条与 | 写法自相矛盾。
+  t('引子讲清「找不到就不提交」这个唯一失效机制', () => {
+    assert.ok(/data-i18n="glossWhy"/.test(html), '引子未改用 glossWhy');
     const blocks = html.split(/\n(?=\s*'[a-zA-Z\-]+':\s*\{)/);
     for (const code of ['zh-CN', 'en']){
       const b = blocks.find(x => new RegExp("^\\s*'" + code + "':\\s*\\{[^\n]*pureMTMode").test(x));
       assert.ok(b, '未找到 ' + code + ' 字典');
-      const lead = b.match(/glossHelpLead\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      const lead = b.match(/glossWhy\s*:\s*'((?:[^'\\]|\\.)*)'/);
       const pn   = b.match(/lblKeepTermsShort\s*:\s*'((?:[^'\\]|\\.)*)'/);
-      assert.ok(lead && pn, code + ' 缺少 glossHelpLead 或 lblKeepTermsShort');
+      assert.ok(lead && pn, code + ' 缺少 glossWhy 或 lblKeepTermsShort');
       assert.ok(lead[1].indexOf(pn[1]) >= 0,
         code + ' 引子未引用「专名处理」的实际用词「' + pn[1] + '」，两处会前后不一致');
     }
+    assert.ok(/class="gh-warn"[\s\S]{0,240}data-i18n="glossNoEffT"/.test(html),
+      '缺少「改了没生效」警告块——这是用户唯一用得上的排错入口');
   });
-  t('说明区分成三节（写法 / 怎么匹配 / 上传）', () => {
+  t('说明区只剩「写法」一节，「怎么匹配」整节已删除', () => {
     const at = html.indexOf('id="glossHelp"');
     assert.ok(at > 0, '说明区不存在');
     const body = html.slice(at, at + 2600);
-    const heads = body.match(/class="gh-h"/g) || [];
-    assert.strictEqual(heads.length, 3, '小节标题数 ' + heads.length);
-    for (const k of ['glossHelpFmt', 'glossHelpMatch', 'glossHelpUp']){
-      assert.ok(new RegExp('data-i18n="' + k + '"').test(body), '缺少小节 ' + k);
-    }
+    assert.strictEqual((body.match(/class="gh-h"/g) || []).length, 1,
+      '小节标题应只剩「写法」一个');
+    assert.ok(/data-i18n="glossHelpFmt"/.test(body), '缺少小节 glossHelpFmt');
+    assert.ok(!/data-i18n="glossHelpMatch"/.test(body), '「怎么匹配」是算法描述，整节应当删除');
+    assert.ok(!/data-i18n="glossHelpM4"/.test(html),
+      '「变形要另写一行」与 Whopper|Whoppers 写法直接矛盾，不得再引用');
+    assert.ok(!/data-i18n="glossHelpU1"/.test(body), '上传应当压成一行');
+    assert.ok(/data-i18n="glossUpOne"/.test(body), '缺少压缩后的上传说明');
   });
 
   // v0.9.137：折叠说明的"看得出可点"是硬要求。初版只用了一个 11px 最弱色小三角，
@@ -3158,6 +3165,52 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       checked++;
     }
     assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+
+  t('v0.9.142 新增词条 27 语言齐全', () => {
+    const keys = ['glossUseTitle', 'glossWhy', 'glossHelpSep', 'glossNoEffT', 'glossNoEffB',
+                  'glossUpOne', 'btnGlossDemo', 'glossDemoOk', 'glossDemoNone'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    const at = blocks.map(b => html.indexOf(b));
+    let checked = 0;
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const code = (blocks[bi].match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = at[bi];
+      // 用下一个字典的起点收尾，别用固定长度：字典逐版变长，切短了会漏掉末尾词条
+      const seg = html.slice(i, bi + 1 < at.length ? at[bi + 1] : html.length);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+
+  t('填入示例按钮：只往空处补，不覆盖用户已有条目', () => {
+    const fn = html.match(/\$\('btnGlossDemo'\)\.addEventListener[\s\S]*?\n\}\);/);
+    assert.ok(fn, '找不到示例按钮的绑定');
+    assert.ok(/glossParse\(/.test(fn[0]), '没有走解析器判重，会覆盖用户已写的同名条目');
+    assert.ok(/glossRefresh\(\)/.test(fn[0]), '填完没有刷新计数，下方命中提示会不同步');
+    assert.ok(/save\(\)/.test(fn[0]), '填完没有落盘，刷新页面就丢');
+    assert.ok(/add\.length\)/.test(fn[0]), '示例已存在时应提示而不是重复写入');
+  });
+
+  // v0.9.142 踩的坑：i18n 注入时漏补行尾逗号 → 整段内联脚本语法错误 → 浏览器里
+  // 所有函数都是 undefined、界面全点不动，而单测里基于正则的断言照样全绿。
+  t('内联脚本可被解析（防 i18n 注入漏逗号）', () => {
+    const vm = require('vm');
+    const blocks = html.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
+    let checked = 0;
+    for (const b of blocks) {
+      const code = b.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');
+      if (!/pureMTMode/.test(code)) continue;   // 只校验含 i18n 字典的那段主脚本
+      try { new vm.Script(code); }
+      catch (e) { assert.fail('主脚本语法错误（多半是字典行尾漏逗号）: ' + e.message); }
+      checked++;
+    }
+    assert.strictEqual(checked, 1, '应恰好命中 1 段主脚本，实际 ' + checked);
   });
 }
 
