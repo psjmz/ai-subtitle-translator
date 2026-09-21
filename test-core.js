@@ -2922,5 +2922,57 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   });
 }
 
+/* v0.9.138：术语表必须真的优先于「专名处理」，且这个优先级要写进提示词本身。
+   两条硬约束：
+   ① 没填术语表时提示词一字不变（回归面为零）——用条件注入实现，不能改成无条件拼接
+   ② 填了术语表 + 保留原文时，不能出现「用户指定必须保留原文的术语：（无）」这句自相矛盾的话 */
+{
+  const fsM2 = require('fs'), pathM2 = require('path');
+  const html = fsM2.readFileSync(pathM2.join(__dirname, 'index.html'), 'utf8');
+  const spEn = html.match(/function systemPromptEn\(cfg\)\{[\s\S]*?\n\}/);
+  const spZh = html.match(/function systemPrompt\(cfg\)\{[\s\S]*?\n\}/);
+  assert.ok(spEn && spZh, '找不到提示词函数');
+
+  t('术语表优先级声明只在有术语表时才注入（没填时提示词一字不变）', () => {
+    // 两处新增都必须包在 cfg.glossary 的三元里，写成无条件拼接就会波及所有用户
+    const conds = [
+      /\(cfg\.glossary \? '\[Glossary precedence\]/,
+      /\(cfg\.glossary \? '【术语表优先】/,
+      /\(cfg\.glossary\s*\n?\s*\? ' Exempt from this rule/,
+      /\(cfg\.glossary\s*\n?\s*\? '本规则的例外/,
+    ];
+    conds.forEach((re, i) => assert.ok(re.test(html), '第 ' + (i + 1) + ' 处不是条件注入: ' + re));
+  });
+
+  t('保留原文分支：有术语表时矛盾句让位、豁免句补上', () => {
+    const en = spEn[0], zh = spZh[0];
+    // 矛盾句只能出现在「无术语表」那一支
+    const enBad = en.indexOf('User-specified terms that must stay in the original: (none).');
+    const zhBad = zh.indexOf('用户指定必须保留原文的术语：（无）。');
+    assert.ok(enBad > 0 && zhBad > 0, '无术语表时仍应保留原字面量（否则就要跑全语种回归）');
+    assert.ok(/cfg\.glossary\s*\n?\s*\?[\s\S]{0,400}?:\s*' User-specified terms/.test(en),
+      '英文：矛盾句没有放进「无术语表」分支');
+    assert.ok(/cfg\.glossary\s*\n?\s*\?[\s\S]{0,400}?:\s*'用户指定必须保留原文的术语/.test(zh),
+      '中文：矛盾句没有放进「无术语表」分支');
+    assert.ok(/Exempt from this rule/.test(en), '英文缺豁免句');
+    assert.ok(/本规则的例外/.test(zh), '中文缺豁免句');
+  });
+
+  t('自动抽表在保留原文下的说明词条 27 语言齐全', () => {
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    let checked = 0;
+    for (const b of blocks) {
+      const code = (b.match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = html.indexOf(b);
+      const seg = html.slice(i, i + 9000);
+      const m = seg.match(/autoTermsKeepNote\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      assert.ok(m && m[1].length > 10, code + ' 缺 autoTermsKeepNote');
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+}
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
