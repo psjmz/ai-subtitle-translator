@@ -2809,6 +2809,117 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const bad = codes.filter(c => detect({ languages: [c] }) !== c);
     assert.deepStrictEqual(bad, [], '检测不到的语言: ' + bad.join(','));
   });
+
+  /* v0.9.137：术语表使用说明 / 引号 CSV / 上传模式 / CSV 模板 */
+  const glossFn = () => {
+    const a = html.indexOf('const GLOSS_ARROW');
+    const b = html.indexOf('function glossHit(');
+    assert.ok(a > 0 && b > a, '抠取解析代码失败');
+    return new Function(html.slice(a, b) + ';return {glossParse:glossParse};')();
+  };
+  t('支持 Excel 导出的引号 CSV（字段内可含逗号）', () => {
+    const P = glossFn().glossParse;
+    let r = P('"Burger King, Inc.","汉堡王"');
+    assert.strictEqual(r.rows.length, 1);
+    assert.strictEqual(r.rows[0].t, 'Burger King, Inc.', '字段内逗号被切坏了');
+    assert.strictEqual(r.rows[0].r, '汉堡王');
+    r = P('"A ""q"" name","译名"');
+    assert.strictEqual(r.rows[0].t, 'A "q" name', '双写引号未转义');
+    r = P('"source","target"\n"Prism","棱晶"');
+    assert.strictEqual(r.rows.length, 1, '带引号的表头未跳过');
+    assert.strictEqual(r.rows[0].r, '棱晶');
+    /* 没引号的行必须仍走旧规则，否则就是改坏了老输入 */
+    r = P('a,b,c');
+    assert.strictEqual(r.rows[0].t, 'a,b,c', '无引号多逗号行为被改坏了');
+  });
+  t('CSV 模板能被自己的解析器正确读出（含 BOM）', () => {
+    const m = html.match(/function glossTplCsv\(\)\{[\s\S]*?\n\}/);
+    assert.ok(m, '没找到 glossTplCsv');
+    const tpl = new Function(m[0] + ';return glossTplCsv();')();
+    const r = glossFn().glossParse(tpl);
+    assert.strictEqual(r.rows.length, 2, '模板条目数 ' + r.rows.length);
+    assert.strictEqual(r.bad, 0, '模板里有解析不出的行');
+    assert.strictEqual(r.rows[0].t, 'SpaceX');
+    assert.strictEqual(r.rows[1].r, '汉堡王', '译法示例丢失');
+    assert.ok(/\\uFEFF/.test(html), '模板下载缺少 UTF-8 BOM（Excel 会乱码）');
+  });
+  t('上传分追加 / 替换两种模式', () => {
+    assert.ok(/id="btnGlossAppend"/.test(html) && /id="btnGlossReplace"/.test(html), '两个按钮缺一个');
+    assert.ok(/GLOSS_FILE_MODE==='replace' \? \[\] : glossParse/.test(html), '替换模式未清空原内容');
+    assert.ok(/GLOSS_FILE_MODE='append'/.test(html), '默认应为追加');
+  });
+  t('格式说明默认收起（左栏已经很长，不能常驻）', () => {
+    assert.ok(/<details id="glossHelp"/.test(html), '折叠块不存在');
+    assert.ok(!/<details[^>]*id="glossHelp"[^>]*\bopen\b/.test(html), '不该默认展开');
+  });
+  t('27 个界面字典都补齐了术语表说明词条', () => {
+    const need = ['glossHelpTitle','btnGlossAppend','btnGlossReplace','btnGlossTpl',
+                  'glossHelpLead','glossHelpFmt','glossHelpS1','glossHelpS2','glossHelpS3','glossHelpS4',
+                  'glossHelpArrow','glossHelpMatch','glossHelpM1','glossHelpM2','glossHelpM3','glossHelpM4',
+                  'glossHelpUp','glossHelpU1','glossHelpU2','glossHelpU3','glossHelpU4'];
+    const blocks = html.split(/\n(?=\s*'[a-zA-Z\-]+':\s*\{)/);
+    let checked = 0;
+    for (const b of blocks){
+      if (!/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/.test(b)) continue;
+      for (const k of need){
+        assert.ok(new RegExp('(?<![A-Za-z0-9_])' + k + "\\s*:\\s*'").test(b), '缺少词条 ' + k);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+  t('引子讲清了「术语表优先于专名处理」', () => {
+    assert.ok(/data-i18n-html="glossHelpLead"/.test(html), '引子未走 i18n-html（内含 <b> 标记）');
+    const blocks = html.split(/\n(?=\s*'[a-zA-Z\-]+':\s*\{)/);
+    for (const code of ['zh-CN', 'en']){
+      const b = blocks.find(x => new RegExp("^\\s*'" + code + "':\\s*\\{[^\n]*pureMTMode").test(x));
+      assert.ok(b, '未找到 ' + code + ' 字典');
+      const lead = b.match(/glossHelpLead\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      const pn   = b.match(/lblKeepTermsShort\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      assert.ok(lead && pn, code + ' 缺少 glossHelpLead 或 lblKeepTermsShort');
+      assert.ok(lead[1].indexOf(pn[1]) >= 0,
+        code + ' 引子未引用「专名处理」的实际用词「' + pn[1] + '」，两处会前后不一致');
+    }
+  });
+  t('说明区分成三节（写法 / 怎么匹配 / 上传）', () => {
+    const at = html.indexOf('id="glossHelp"');
+    assert.ok(at > 0, '说明区不存在');
+    const body = html.slice(at, at + 2600);
+    const heads = body.match(/class="gh-h"/g) || [];
+    assert.strictEqual(heads.length, 3, '小节标题数 ' + heads.length);
+    for (const k of ['glossHelpFmt', 'glossHelpMatch', 'glossHelpUp']){
+      assert.ok(new RegExp('data-i18n="' + k + '"').test(body), '缺少小节 ' + k);
+    }
+  });
+
+  // v0.9.137：折叠说明的"看得出可点"是硬要求。初版只用了一个 11px 最弱色小三角，
+  // 跟旁边的灰色 hint 混成一片，用户看不出能展开 —— 这几条把它钉住。
+  t('折叠说明的指示器足够显眼', () => {
+    const i = html.indexOf('.ghelp{');
+    assert.ok(i > 0, '找不到 .ghelp 样式');
+    const css = html.slice(i, html.indexOf('.gh-body{', i));
+
+    // 标题要有底色和足够的高度，不能是裸文字
+    const sumRule = (css.match(/\.ghelp>summary\{[^}]*\}/) || [''])[0];
+    assert.ok(/background:\s*var\(--card-2\)/.test(sumRule), '标题条缺底色');
+    assert.ok(/padding:\s*6px 9px/.test(sumRule), '标题条缺内边距');
+
+    // 右侧指示器做成方块按钮，不是裸三角
+    const afterRule = (css.match(/\.ghelp>summary::after\{[^}]*\}/) || [''])[0];
+    assert.ok(/width:18px/.test(afterRule) && /border:1px solid/.test(afterRule),
+      '右侧指示器不是方块按钮');
+    assert.ok(/content:'\\25B8'/.test(afterRule), 'LTR 箭头应为 ▸');
+
+    // 问号图标：浅底 + 深字（写反成白字会看不见）
+    const beforeRule = (css.match(/\.ghelp>summary::before\{[^}]*\}/) || [''])[0];
+    assert.ok(/color:var\(--sub\)/.test(beforeRule), '问号图标应为深字浅底');
+
+    // RTL 必须同时换字符 + 反向旋转：◂ 顺时针转 90° 会变成 ▲
+    assert.ok(/\[dir="rtl"\]\s*\.ghelp>summary::after\{content:'\\25C2'\}/.test(css),
+      'RTL 箭头未反转成 ◂');
+    assert.ok(/\[dir="rtl"\]\s*\.ghelp\[open\]>summary::after\{transform:rotate\(-90deg\)\}/.test(css),
+      'RTL 展开态旋转方向未取反（会变成朝上）');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
