@@ -3051,13 +3051,35 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/\[）\)\]\+\$\//.test(gnn[0]), '未剥掉结尾括号');
   });
 
-  t('换字幕时清掉上一部的 AI 抽取条目，手写的保留', () => {
-    assert.ok(/clearedAI=glossClearAI\(\)/.test(html), 'setSrc 未清理 AI 抽取条目');
-    assert.ok(/t\('glossAiCleared',clearedAI\)/.test(html), '清理后未告知用户');
-    const gca = html.match(/function glossClearAI\(\)\{[\s\S]*?\n\}/);
-    assert.ok(gca, '找不到 glossClearAI');
-    // 只清 AI 标记过的，用户手写的一律不动
-    assert.ok(/!gk\.has\(/.test(gca[0]), 'glossClearAI 未按 AI 标记过滤，会误删用户手写的条目');
+  /* v0.9.144：换片改为清空整张表（AI 抽的 + 手写的都清）。
+     旧版只清 AI 抽的，但 AI 标记存在内存里、没落盘，刷新一次就全忘——
+     换片后整张旧表照单全留，在新片里命中 0。这里钉死新行为。 */
+  t('换字幕时清空整张术语表（不再区分 AI / 手写）', () => {
+    const ss = html.match(/function setSrc\([\s\S]*?\n\}/);
+    assert.ok(ss, '找不到 setSrc');
+    assert.ok(/isNewFilm/.test(ss[0]), 'setSrc 未判断是否换了新片');
+    assert.ok(/ta\.value=''/.test(ss[0]), '换片未清空术语表输入框');
+    assert.ok(/glossRefresh\(\)[^\n]*glossCountUI\(\)[^\n]*save\(\)/.test(ss[0]),
+      '清完没有刷新计数并落盘');
+    assert.ok(/t\('glossClearedAll',clearedN\)/.test(html), '清空后未告知用户清了几条');
+    // 旧的「只清 AI 标记」机制必须彻底移除，否则会被误以为还在生效
+    assert.ok(!/glossClearAI|glossMarkAI|glossAiKeys/.test(html), 'AI 标记机制残留，已废弃');
+  });
+
+  t('重新载入同一部片不清空术语表（内容指纹判据）', () => {
+    assert.ok(/function srcTextFp\(/.test(html), '缺少整片文本指纹函数');
+    /* 必须叫 srcTextFp：5821 行已存在 srcFingerprint(items)（断点快照 snapFp 在用）。
+       同名会让函数声明提升互相覆盖，直接毁掉续跑/断点——这是改这版时真实踩到的。 */
+    assert.ok(!/function srcFingerprint\(text\)/.test(html),
+      '新指纹函数与快照用的 srcFingerprint(items) 重名，会覆盖它');
+    assert.ok(/function srcFingerprint\(items\)/.test(html), '快照用的 srcFingerprint(items) 不见了');
+    // 指纹必须落盘，否则刷新一次就忘了上一部片是啥（与 v0.9.140 那个内存标记同一个坑）
+    assert.ok(/srcFp:S\.srcFp\|\|''/.test(html), '指纹未落盘');
+    assert.ok(/if\(sv\.srcFp\) S\.srcFp=/.test(html), '指纹未从存档恢复');
+    const ss = html.match(/function setSrc\([\s\S]*?\n\}/);
+    assert.ok(/S\.srcFp\s*&&\s*fp\s*&&\s*fp!==S\.srcFp/.test(ss[0]),
+      '换片判据必须排除「首次载入」与「同一部片重传」，否则会误删刚写好的表');
+    assert.ok(/S\.srcFp=fp/.test(ss[0]), '未记录当前片指纹，下次无法比对');
   });
 
   t('抽取提示词要求 AI 用片中真实出现的拼写 + 给出变体', () => {
@@ -3161,6 +3183,26 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       for (const k of keys) {
         const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
         assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+
+  t('v0.9.144 新增词条 27 语言齐全', () => {
+    const keys = ['glossClearedAll'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    const at = blocks.map(b => html.indexOf(b));
+    let checked = 0;
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const code = (blocks[bi].match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = at[bi];
+      const seg = html.slice(i, bi + 1 < at.length ? at[bi + 1] : html.length);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+        assert.ok(/\{0\}/.test(m[1]), code + ' 的 ' + k + ' 缺少 {0} 占位符（日志要显示条数）');
       }
       checked++;
     }
