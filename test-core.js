@@ -3188,13 +3188,28 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
 
-  t('填入示例按钮：只往空处补，不覆盖用户已有条目', () => {
-    const fn = html.match(/\$\('btnGlossDemo'\)\.addEventListener[\s\S]*?\n\}\);/);
-    assert.ok(fn, '找不到示例按钮的绑定');
-    assert.ok(/glossParse\(/.test(fn[0]), '没有走解析器判重，会覆盖用户已写的同名条目');
-    assert.ok(/glossRefresh\(\)/.test(fn[0]), '填完没有刷新计数，下方命中提示会不同步');
-    assert.ok(/save\(\)/.test(fn[0]), '填完没有落盘，刷新页面就丢');
-    assert.ok(/add\.length\)/.test(fn[0]), '示例已存在时应提示而不是重复写入');
+  // v0.9.143：示例按钮被移除。它会把假数据写进用户真正的术语表，忘了删就被当真术语提交给 AI
+  // （片里真出现 Burger King 就会被译成汉堡王）。示例回到 placeholder：灰色、输入即消失、不进数据。
+  t('「填入示例」按钮已彻底移除', () => {
+    assert.ok(!/id="btnGlossDemo"/.test(html), '按钮 DOM 仍在');
+    assert.ok(!/\$\('btnGlossDemo'\)/.test(html), '按钮的事件绑定仍在');
+    // 词条本身按项目约定保留不删，但不该再被任何 DOM 引用
+    assert.ok(!/data-i18n="btnGlossDemo"/.test(html), '仍有元素引用 btnGlossDemo 文案');
+  });
+
+  t('placeholder 是纯示例，不再混说明文字', () => {
+    const at = html.indexOf('id="terms"');
+    assert.ok(at > 0, '术语表输入框不存在');
+    assert.ok(/data-i18n-ph="termsPh3"/.test(html.slice(at, at + 400)), 'placeholder 未走新词条 termsPh3');
+    for (const code of ['zh-CN', 'en']) {
+      const m = html.match(new RegExp("^\\s*'" + code + "':\\s*\\{[^\\n]*pureMTMode", 'm'));
+      assert.ok(m, '未找到 ' + code + ' 字典');
+      const i = html.indexOf(m[0]);
+      const v = html.slice(i, i + 9000).match(/termsPh3\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      assert.ok(v, code + ' 缺少 termsPh3');
+      assert.ok(/\\n/.test(v[1]), code + ' 示例不是多行（起不到示范作用）');
+      assert.ok(!/每行一条|表示保留|表示指定|如何|怎么/.test(v[1]), code + ' placeholder 里仍混着说明文字');
+    }
   });
 
   // v0.9.142 踩的坑：i18n 注入时漏补行尾逗号 → 整段内联脚本语法错误 → 浏览器里
