@@ -2668,7 +2668,8 @@ console.log('— response_format 默认注入（v0.9.132）—');
   });
   t('内置通道通过 meta.json 传递意图，且服务端据此注入', () => {
     assert.ok(/meta:Object\.keys\(meta\)\.length\?meta:undefined/.test(html), 'meta 构造写法变了');
-    assert.ok(/opts&&opts\.json&&withRf\)\?\{json:1\}/.test(html), 'meta.json 未随 opts.json 传递');
+    /* v0.9.154：随降级链改成 plan.rf（初值即 withRf，语义不变；此处同步护栏写法） */
+    assert.ok(/opts&&opts\.json&&plan\.rf\)\?\{json:1\}/.test(html), 'meta.json 未随 opts.json 传递');
     assert.ok(/const jsonOpts = \(body\.meta && body\.meta\.json\)/.test(srv), '服务端未读取 meta.json');
     assert.ok(/callModel\(pick\.cfg, body\.messages, undefined, jsonOpts\)/.test(srv), '服务端主调用未传 jsonOpts');
     assert.ok(/callModel\(slotCfg\(cfg, 'A'\), body\.messages, undefined, jsonOpts\)/.test(srv), '服务端回退调用未传 jsonOpts');

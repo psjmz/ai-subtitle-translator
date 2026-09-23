@@ -496,7 +496,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.154</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.155</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -656,7 +656,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.154</span>
+    <span class="ver-tag">v0.9.155</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -913,7 +913,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.154"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.155"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6674,22 +6674,41 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
        内置通道：那一套注入发生在服务端（浏览器看不到上游地址与 Key），这里只通过 meta.json 传递意图。 */
     const ex = builtin ? {} : extraParamsFront();
     const userHasRf = !builtin && Object.prototype.hasOwnProperty.call(ex,'response_format');
-    const mkBody=(withRf)=>{
+    /* v0.9.154：自定义 API 的降级裁定——三条判定都靠上游错误文案识别，不维护模型名名单。
+       MAX_TOKENS 改名（OpenAI o 系列 / gpt-5 只认 max_completion_tokens）与 TEMPERATURE
+       （同一批模型只接受默认 1）常常在同一个端点上先后报错，所以要能连修多项。
+       ⚠️ 三者都以 "Unsupported" 开头，会被最宽泛的 isRfReject 一并命中，故判定顺序必须
+       由具体到宽泛（点名具体参数的在前），否则后面两项永远轮不到，成为死代码。 */
+    const isTokNameReject=(e)=>{ const s=String((e&&e.message)||'');
+      return /HTTP (400|404|415|422)/.test(s) && /max_tokens/i.test(s) && /max_completion_tokens/i.test(s); };
+    const isTempReject=(e)=>{ const s=String((e&&e.message)||'');
+      return /HTTP (400|404|415|422)/.test(s) && /temperature/i.test(s) && /(does not support|not supported|only the default)/i.test(s); };
+    /* 把已确认的修复落到请求体上。max_tokens 可能来自平台默认表，也可能来自用户附加参数，
+       统一在最终 body 上改名，来源无关。内置通道不在此处理——那一侧由服务端统一降级。 */
+    const applyDegrade=(body,plan)=>{
+      if(builtin) return body;
+      if(plan.newTok && Object.prototype.hasOwnProperty.call(body,'max_tokens')){
+        body.max_completion_tokens=body.max_tokens; delete body.max_tokens;
+      }
+      if(!plan.temp) delete body.temperature;
+      return body;
+    };
+    const mkBody=(plan)=>{
       if(builtin){
-        const meta=Object.assign({}, rt?{rt:rt}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (opts&&opts.json&&withRf)?{json:1}:{});
+        const meta=Object.assign({}, rt?{rt:rt}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
         _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
-      const rf=(withRf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
-      return Object.assign(engineDefaults(base,model), rf, ex, {model,messages:msgs,temperature:0.2,stream:false});
+      const rf=(plan.rf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
+      return applyDegrade(Object.assign(engineDefaults(base,model), rf, ex, {model,messages:msgs,temperature:0.2,stream:false}), plan);
     };
-    const once=async(withRf)=>{
+    const once=async(plan)=>{
       const r=await fetch(url,{
         method:'POST',
         headers,
       /* v0.9.125：自定义链路的请求体 = 平台默认参数 < 用户附加参数 < 核心字段（模型/正文……）。
          此前核心字段之外只有用户附加参数，max_tokens 从未被发送——平台侧按自己的默认值截断输出。 */
-        body:JSON.stringify(mkBody(withRf)),
+        body:JSON.stringify(mkBody(plan)),
         signal:ctl.signal
       });
       if(!r.ok){ const tx=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+tx.slice(0,200)); }
@@ -6709,17 +6728,27 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
       return out;
     };
     const withRf = !!(opts&&opts.json) && (builtin || !!jsonFormatParam(base,model,opts).response_format);
-    try{
-      return await once(withRf);
-    }catch(e){
-      /* v0.9.132：平台拒收 response_format（白名单错判 / 平台侧变更 / 该模型不支持）。
-         摘掉参数重发一次，并给该端点在会话内立墓碑——代价只有一次往返，绝不会让整片翻译卡死。 */
-      if(withRf && isRfReject(e) && !(e&&e.name==='AbortError') && !ctl.signal.aborted){
-        banRf(base);
-        return await once(false);
+    /* v0.9.154：逐项降级重发（与服务端 callModel 同一套），取代原先「一次 rf 兜底」。
+       每轮只修一个维度并沿用上一轮已生效的修复，最多四轮；超时/用户主动停止不重试；
+       三条判定都拿不到匹配就立刻抛出原错误，不做无谓尝试。端点只在第一次吃亏。 */
+    let plan={rf:withRf,newTok:false,temp:true};
+    let lastErr=null;
+    for(let round=0; round<4; round++){
+        try{
+          return await once(plan);
+        }catch(e){
+          lastErr=e;
+          if(e&&e.name==='AbortError') throw e;
+          if(ctl.signal.aborted) throw e;
+          if(!plan.newTok && isTokNameReject(e)){ plan={rf:false,newTok:true,temp:plan.temp}; continue; }
+          if(plan.temp && isTempReject(e)){ plan={rf:false,newTok:plan.newTok,temp:false}; continue; }
+          /* v0.9.132：平台拒收 response_format（白名单错判 / 平台侧变更 / 该模型不支持）。
+             摘掉参数重发，并给该端点在会话内立墓碑——代价只有一次往返。 */
+          if(plan.rf && isRfReject(e)){ banRf(base); plan={rf:false,newTok:plan.newTok,temp:plan.temp}; continue; }
+          throw e;
+        }
       }
-      throw e;
-    }
+      throw lastErr;
   }catch(e){
     /* v0.9.126：AbortController 到点后 fetch 抛的是浏览器原生 DOMException
        （"signal is aborted without reason"），用户完全无法据此判断发生了什么。
