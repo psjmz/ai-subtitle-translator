@@ -496,7 +496,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.144</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.146</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -656,7 +656,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.144</span>
+    <span class="ver-tag">v0.9.146</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -913,7 +913,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.144"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.146"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6633,6 +6633,9 @@ function engineDefaults(base,model){
 // v0.9.29：timeoutMs 可选（默认 90s）——术语表提取是单次大请求（8.6K 采样在 DeepSeek 夜高峰实测 161.5s，
 // 正常时段仅 ~4s），共用 90s 会导致大文件在服务端拥塞时静默降级为无术语表；批次/压缩仍走默认 90s
 let LAST_FINISH='';   // v0.9.125：上一次 chatOnce 拿到 finish_reason（'length' = 输出被长度上限截断）
+/* v0.9.146：整批失败原因的一次性上报标记。声明必须在 chatOnce（下方 6674 处读取它）之前，
+   否则若将来有人在脚本求值阶段就触发请求，let 的暂时性死区会直接抛 ReferenceError。 */
+let _failWhy = null;
 async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
   const ctl=new AbortController();
   const builtin = (base===BUILTIN_API);
@@ -6671,7 +6674,8 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
     const userHasRf = !builtin && Object.prototype.hasOwnProperty.call(ex,'response_format');
     const mkBody=(withRf)=>{
       if(builtin){
-        const meta=Object.assign({}, rt?{rt:rt}:{}, S.trMeta||{}, (opts&&opts.json&&withRf)?{json:1}:{});
+        const meta=Object.assign({}, rt?{rt:rt}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (opts&&opts.json&&withRf)?{json:1}:{});
+        _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
       const rf=(withRf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
@@ -6758,6 +6762,18 @@ function describeCueErrs(errs, zh){
     else out.push(m);
   });
   return out;
+}
+/* v0.9.146：整批请求失败原因分类——只用于统计，不参与任何流程判断。
+   events 此前只记「重试了几次」，看不出整批为什么失败（截断 / JSON 畸形 / 网络），只能靠猜。
+   _failWhy 为一次性标记（声明在 LAST_FINISH 旁）：随补救通道的第一个请求上报后立即清除，
+   绝不残留到后续请求。
+   判据：LAST_FINISH==='length' 是服务端回填的确切截断信号，优先于错误消息文本（后者随界面语言变化）。 */
+function failWhyOf(msg){
+  const s = String(msg == null ? '' : msg);
+  if (LAST_FINISH === 'length') return 'trunc';
+  if (/HTTP\s*(5\d\d|429)/.test(s) || /Failed to fetch|NetworkError|ETIMEDOUT|timeout/i.test(s)) return 'net';
+  if (/JSON|Unexpected|errNoGroups|errNoGno|组/i.test(s)) return 'json';
+  return 'other';
 }
 async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
@@ -7597,7 +7613,7 @@ async function runTranslate(){
       /* v0.9.134：提示词按批定制——只把本批原文里真出现的术语带进 4.5。
          无术语表时直接复用同一份 sys（与旧行为完全一致）。 */
       const sysB = glossSysFor(gBatch, cfg, sys);
-      let ok=false;
+      let ok=false, lastWhy='';
       for(let attempt=0; attempt<maxTry && !ok; attempt++){
         if(S.stop) break;
         try{
@@ -7742,6 +7758,7 @@ async function runTranslate(){
           log(t('batchDone',bi+1,totalB, attempt?t('retried',attempt):''),'okc');
         }catch(e){
           log(t('batchFail',bi+1,attempt+1,e.message),'err');
+          lastWhy=failWhyOf(e); /* v0.9.146：记下整批失败原因，供下方补救通道上报 */
           if(S.stop) break;
           if(cfg.mode==='builtin' && /HTTP (429|503)/.test(e.message)){
             // 后端限流 / 未配置：按 code 本地化服务端消息（v0.9.33），停止整片翻译
@@ -7766,8 +7783,14 @@ async function runTranslate(){
       // 同批其他句组本身无问题，隔离单组重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
       if(!ok && !S.stop){
         let saved=0, consecFail=0, drifted=[];
+        /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留） */
+        _failWhy = lastWhy || null;
         for(const g1 of gBatch){
           if(S.stop) break;
+          /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
+             此前会连同这些组一起逐组补救，白白多烧请求。纯统计外的唯一行为改动，
+             语义与上方「整批已有结果则跳过」（v0.9.77）一致。 */
+          if(res.has(g1.gno)){ saved++; continue; }
           let got1=false;
           // v0.9.58：补救通道同样过语言锚定——跑偏结果不再静默溜过；第 1 次跑偏 → 第 2 次带
           // 纠错反馈重译（与主通道 v0.9.57 同武器）；第 2 次仍跑偏 → 与主通道 anchorKeep 同策略带病接受
@@ -7776,7 +7799,9 @@ async function runTranslate(){
             try{
               lastCall=Date.now();
               const fbArr=(a>0&&badTexts.length)?badTexts.map(x=>({gno:g1.gno,text:x})):null;
-              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,2);
+              /* v0.9.146：rt 由 2 改 4——这是「整批请求失败后的逐组补救」，不是语言跑偏。
+                 此前混用 rt=2，统计把网络/截断造成的补救全算进 retryAnchor，排查方向被带偏。 */
+              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,4);
               if((o2.badAnchor||[]).includes(g1.gno)){
                 const bt=String((o2.byGno[g1.gno]||{}).text||'').trim();
                 if(bt && !badTexts.includes(bt)) badTexts.push(bt);
