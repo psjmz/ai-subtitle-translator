@@ -450,7 +450,12 @@ async function loadEvents(){
       const durTd = (e.finishedAt && !e.byok) ? fmtDur(e.finishedAt - e.t) : '-';
       const mdlTd = e.model ? esc(e.model) + (e.byok ? ' <span style="color:var(--mut);font-size:11px">(自带Key)</span>' : '') : '<span style="color:var(--mut)">-</span>';
       const dlTd = e.downloads ? '✓ ×' + e.downloads : '<span style="color:var(--mut)">-</span>';
-      return '<tr><td>' + evTime(e.t) + '</td><td>' + endTd + '</td><td>' + durTd + '</td><td>' + esc(e.ip) +
+      /* v0.9.158：被会话去重合并进来的批次不新建条目、也不改 t，列表位置纹丝不动。
+         有 lastAt 就在开始时间下补一行「末次」，让用户一眼看出这条会话刚刚还在跑。 */
+      const lastTd = (e.lastAt && e.lastAt - e.t > 1000)
+        ? '<div style="color:var(--mut);font-size:11px" title="最后活动时间 ' + new Date(e.lastAt).toLocaleTimeString() + '">末次 ' + evTime(e.lastAt) + '</div>'
+        : '';
+      return '<tr><td>' + evTime(e.t) + lastTd + '</td><td>' + endTd + '</td><td>' + durTd + '</td><td>' + esc(e.ip) +
         '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
         '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + dlTd + '</td></tr>';
     }).join('') || '<tr><td colspan="10" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';

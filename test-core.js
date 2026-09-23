@@ -3370,6 +3370,21 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/t\('fbRoute'/.test(html), '前端未调用 fbRoute 文案');
     assert.ok(/\.log \.warn\{/.test(html), '缺少 .log .warn 样式（回退提示要看得见）');
   });
+
+  t('v0.9.158 会话去重命中时要记 lastAt（否则后台看不出这次跑了）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 去重窗口命中只累加、不新建也不改 t；后台按追加序倒序且只显示 t
+       → 刚翻完的那次在列表上纹丝不动，用户判定「后台没日志」。 */
+    assert.ok(/e\.lastAt\s*=\s*now;/.test(srvSrc),
+      'appendEvent 合并分支未记 lastAt（后台将无法体现最后一次活动时间）');
+  });
+
+  t('v0.9.158 后台要把 lastAt 显示出来', () => {
+    const admSrc = require('fs').readFileSync(require('path').join(__dirname, 'admin.html'), 'utf8');
+    assert.ok(/e\.lastAt\s*&&\s*e\.lastAt\s*-\s*e\.t\s*>\s*1000/.test(admSrc),
+      '后台表格未渲染「末次」活动时间的条件分支');
+    assert.ok(/末次/.test(admSrc), '后台表格未输出「末次」文案');
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

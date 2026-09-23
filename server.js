@@ -136,6 +136,10 @@ function appendEvent(ip, meta, model, extra){
          后台看起来就是「我明明移除了，怎么还在走 B」。故这里不再加条件，配合调用处
          恒传 viaB（0/1）保证旧标记被覆盖。 */
       if (mdl) e.model = mdl;
+      /* v0.9.158：记「最后活动时间」。会话去重命中时只累加、不新建条目也不改 t，
+         后台列表（按追加序倒序、显示 t）于是纹丝不动 → 用户翻完一次以为「后台没日志」。
+         只补这一个字段，不动 t、不改任何计数口径。 */
+      e.lastAt = now;
       if (extra && typeof extra === 'object') Object.assign(e, extra);
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
