@@ -183,6 +183,43 @@ function markEvent(ip, meta, ev){
   fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
   return true;
 }
+/* v0.9.145：token 用量埋点。上游返回 usage 之后，把 prompt/completion tokens 累加到「同一条」任务事件上。
+   只累加已存在的记录，找不到就丢弃——绝不新建记录（否则会给自带 Key 用户凭空造出带 token 的脏数据）。
+   全程同步读写，读-改-写是原子的，并发请求不会互相覆盖；任何异常都不许冒泡到翻译主流程。 */
+function tokNum(v){
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+function usageTokens(u){
+  if (!u || typeof u !== 'object') return null;
+  const tin  = tokNum(u.prompt_tokens != null ? u.prompt_tokens : u.input_tokens);
+  const tout = tokNum(u.completion_tokens != null ? u.completion_tokens : u.output_tokens);
+  let tch = tokNum(u.cached_tokens != null ? u.cached_tokens : (u.prompt_tokens_details && u.prompt_tokens_details.cached_tokens));
+  if (!tin && !tout) return null;
+  if (tch > tin) tch = tin; // 缓存命中数不可能大于输入总数，异常值夹回去
+  return { tin: tin, tout: tout, tch: tch };
+}
+function recordTokens(ip, meta, usage){
+  const tk = usageTokens(usage);
+  if (!tk) return false;
+  if (!meta || typeof meta !== 'object') return false;
+  const now = Date.now();
+  const file = String(meta.file || '').replace(/[\x00-\x1f]/g, '').slice(0, 120);
+  const lang = String(meta.lang || '').slice(0, 10);
+  if (!file && !lang) return false;
+  const db = readEvents();
+  for (let i = db.events.length - 1; i >= 0; i--) {
+    const e = db.events[i];
+    if (now - e.t >= EVENT_LIFE_MS) break;
+    if (e.ip !== ip || e.file !== file || e.lang !== lang) continue;
+    e.tkIn = (e.tkIn || 0) + tk.tin;
+    e.tkOut = (e.tkOut || 0) + tk.tout;
+    if (tk.tch) e.tkCache = (e.tkCache || 0) + tk.tch;
+    fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+    return true;
+  }
+  return false;
+}
 function dateOfTs(ts){
   const d = new Date(ts);
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -909,6 +946,7 @@ const server = http.createServer(async (req, res) => {
       const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
       try {
         const out = await callModel(pick.cfg, body.messages, undefined, jsonOpts);
+        try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
         /* B 失败且开启回退 → 再试 A；回退成功后把事件里的模型改写成真正生效的 A，并记 fallback 次数 */
@@ -920,6 +958,7 @@ const server = http.createServer(async (req, res) => {
                 model: pick.cfg.model, usedModel: cfg.model, msg: String(e.message || '').slice(0, 200)
               }), 'fallback');
             } catch (e2) {}
+            try { recordTokens(ip, body.meta, outA && outA.usage); } catch (e4) {} // v0.9.145：回退到 A 也算真实开销
             return sendJson(res, 200, outA);
           } catch (e3) {
             return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e3.message } });
