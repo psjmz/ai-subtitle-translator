@@ -2305,12 +2305,41 @@
   const RE_FOREIGN_ANY = /[\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff\u31f0-\u31ff\u1100-\u11ff\uac00-\ud7af]/; // 其他：全部 CJK
   const ANCHOR_FOREIGN_MAX = 0.35;
   const ANCHOR_FOREIGN_ABS = 4;
-  function anchorForeignOk(s, foreignRe){
+  /* v0.9.149：专名保留模式（界面「专名处理 = 保留原文」）下的兜底阈值——
+     此模式只在「整段几乎都是外来字符」时才判跑偏：CJK 总数 ≥8 且外来占比 ≥0.6。
+     取 0.6（而非常规模式的 0.35）是因为保留原文下外来字符本就合法，
+     实测「我去吃了ラーメン」这类合法保留约 0.44，而整段没翻译的日文约 0.7~1。 */
+  const ANCHOR_KEEP_MIN = 8;
+  const ANCHOR_KEEP_MAX = 0.6;
+  const RE_STRIP_EDGE = /[\s\p{P}\p{S}]/gu;     // 空白 + 标点 + 符号（判「骨架」时先剥掉）
+  /* 目标语言非 CJK 时（英/法/泰/阿…），所有 CJK 都是外来字符，占比恒为 100%，
+     只能看「骨架还在不在」：剥掉空白与标点后仍有 ≥2 个非 CJK 字符 = 句子主体是目标语言，
+     CJK 只是按用户设置保留的专名 → 放行；否则是整段没翻译 → 拦。
+     只在本分支使用（CJK 目标有自己的外来字符定义，比这准得多）。 */
+  function anchorNonCjkBody(s){
+    const core = String(s == null ? '' : s).replace(RE_STRIP_EDGE, '');
+    if (!core) return true;
+    const cjk = core.match(RE_ALL_CJK);
+    const nonCjk = cjk ? core.length - cjk.length : core.length;
+    return nonCjk >= 2;
+  }
+  function anchorForeignOk(s, foreignRe, keepNames, cjkDst){
     const cjk = s.match(RE_ALL_CJK);
     if (!cjk || !cjk.length) return true;      // 无 CJK（纯拉丁/符号）→ 沿用既有策略，不拦
     let bad = 0;
     for (let i = 0; i < cjk.length; i++) if (foreignRe.test(cjk[i])) bad++;
     if (!bad) return true;
+    /* v0.9.149：专名保留模式——用户明确要求专名原样保留，译文里出现源语言专名
+       （中→英保留「北京」、日→中保留「さん／ラーメン」、韩→日保留谚文）是**预期结果**，
+       按常规阈值判「外来字符跑偏」就是批量误伤（重试也是同样的输出，纯烧钱）。
+       此模式只保留一条硬兜底：整段几乎全是外来字符 = 确实没翻译，这与保留专名无关。
+         · CJK 目标（本语言也在 CJK 集合里）：数量 ≥8 且外来占比 ≥0.6 → 拦
+         · 其他目标：CJK 一律算外来，改看骨架（anchorNonCjkBody）——
+           主体仍是目标语言就放行，只有整段都是源语言 CJK 才拦 */
+    if (keepNames){
+      if (cjkDst) return !(cjk.length >= ANCHOR_KEEP_MIN && bad / cjk.length >= ANCHOR_KEEP_MAX);
+      return anchorNonCjkBody(s);
+    }
     /* CJK 只有一两个字符 → 不足以判定「整段跑偏」，一律放行。
        场景：非 CJK 目标 + 勾选「保留原文」时，中文地名/人名（北京、张三）会原样留在译文里，
        旧规则（出现一个 CJK 即判跑偏）会把这类合法译文全部误伤。 */
@@ -2320,12 +2349,19 @@
     if (bad <= ANCHOR_FOREIGN_ABS) return true;   // 零星几个：专名/引用/菜名
     return bad / cjk.length <= ANCHOR_FOREIGN_MAX;
   }
-  function anchorOk(text, dst) {
+  function anchorOk(text, dst, keepNames) {
     const s = String(text == null ? '' : text);
     if (!s.trim()) return true;
     const han = RE_HAN.test(s), kana = RE_KANA.test(s), hangul = RE_HANGUL.test(s);
-    if (dst === 'zh-CN' || dst === 'zh-TW') return anchorForeignOk(s, RE_FOREIGN_ZH);
+    if (dst === 'zh-CN' || dst === 'zh-TW') return anchorForeignOk(s, RE_FOREIGN_ZH, keepNames, true);
     if (dst === 'ja') {
+      /* v0.9.149：专名保留模式——谚文/假名/纯拉丁一律放行（源语言专名原样保留是预期结果），
+         长度闸（JA_HAN_SHORT_W）也关掉（长中文专名会被它误判）。
+         只拦「一句假名都没有 + 含中文虚词」的整段中文 = 确实没翻译。 */
+      if (keepNames){
+        if (kana || hangul || !han) return true;
+        return !RE_ZH_MARK.test(s);
+      }
       if (hangul) return false;
       if (kana) return true;          // 含假名 → 一定是日语（或至少不是纯汉字中文）
       if (!han) return true;          // 纯拉丁/符号 → 沿用既有策略（防专名误伤），不拦
@@ -2334,8 +2370,8 @@
       return textWidth(s) <= JA_HAN_SHORT_W;            // ② 短名词放行，长句判跑偏
     }
     /* v0.9.147：同上放宽——韩译目标里的汉字专名、其他语言里的零星 CJK 不再整组判跑偏 */
-    if (dst === 'ko') return anchorForeignOk(s, RE_FOREIGN_KO);
-    return anchorForeignOk(s, RE_FOREIGN_ANY);
+    if (dst === 'ko') return anchorForeignOk(s, RE_FOREIGN_KO, keepNames, true);
+    return anchorForeignOk(s, RE_FOREIGN_ANY, keepNames, false);
   }
 
   // 已知混字词表（按目标语言隔离）：实测 DeepSeek 偶发在个别术语上写出汉字字面

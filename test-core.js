@@ -929,6 +929,59 @@ t('anchorOk：拉丁/西里尔等目标拒绝 CJK', () => {
   assert.strictEqual(C.anchorOk('これは日本語です', 'fr'), false);
   assert.strictEqual(C.anchorOk('한국어', 'de'), false);
 });
+/* v0.9.147：语言锚定放宽——只拦「整段跑偏」，零星外来字符一律放行。
+   此前 zh-CN 目标只要出现一个假名/谚文就整组判跑偏，日语源 → 中文目标时
+   「さん」「ありがとう」「ラーメン」这类合法保留被批量误伤（实测 2 个任务 15 次重试全来自此）。
+   下面两组必须同时成立：合法保留放行 + 整段没翻译仍拦住。 */
+t('v0.9.147 语言锚定放宽：专名/引用/菜名等零星外来字符放行', () => {
+  assert.strictEqual(C.anchorOk('田中さん说他明天会来北京。', 'zh-CN'), true);
+  assert.strictEqual(C.anchorOk('他对我说了声ありがとう，然后就走了。', 'zh-CN'), true);
+  assert.strictEqual(C.anchorOk('她喊了一句「すみません」，然后跑开了。', 'zh-CN'), true);
+  assert.strictEqual(C.anchorOk('这家公司是삼성的子公司。', 'zh-CN'), true);
+  assert.strictEqual(C.anchorOk('我们去了北海道，吃了ラーメン，很好吃。', 'zh-CN'), true);
+  assert.strictEqual(C.anchorOk('OpenAI 发布了新产品', 'zh-CN'), true);   // 纯拉丁专名
+});
+t('v0.9.147 语言锚定放宽后，整段没翻译仍必须拦住', () => {
+  assert.strictEqual(C.anchorOk('すみません、もう一度お願いします。', 'zh-CN'), false);
+  assert.strictEqual(C.anchorOk('죄송합니다 다시 한 번 부탁드립니다', 'zh-CN'), false);
+  assert.strictEqual(C.anchorOk('これは日本語です', 'zh-CN'), false);
+  assert.strictEqual(C.anchorOk('这是中文', 'ko'), false);          // 再短也拦（全外来）
+  assert.strictEqual(C.anchorOk('한국어', 'de'), false);            // 再短也拦（全外来）
+});
+/* v0.9.149：专名处理选「保留原文」时，语言锚定不再按外来字符判跑偏——
+   用户明确要求专名原样保留，源语言专名出现在译文里是**预期结果**，重发一遍也是同样输出（纯烧钱）。
+   只保留一条硬兜底：整段几乎全是外来字符 = 确实没翻译，这与保留专名无关。 */
+t('v0.9.149 保留原文模式：源语言专名保留不再判跑偏', () => {
+  // 中 → 英：中文专名按用户设置原样保留，句子主体是英文（骨架还在）
+  assert.strictEqual(C.anchorOk('Welcome to 北京, Mr. 张三.', 'en', true), true);
+  assert.strictEqual(C.anchorOk('He joined 阿里巴巴集团 last year.', 'en', true), true);
+  // 日 → 中：假名专名/菜名保留，句子主体是汉字
+  assert.strictEqual(C.anchorOk('我去吃了ラーメン，很好吃。', 'zh-CN', true), true);
+  assert.strictEqual(C.anchorOk('田中さん明天会来北京。', 'zh-CN', true), true);
+  // 韩 → 日：谚文专名保留（常规模式会被 hangul 直接拦）
+  assert.strictEqual(C.anchorOk('삼성の新しい工場を見学した。', 'ja', true), true);
+  // 中 → 日：长中文专名（常规模式会被「纯汉字长度闸」误伤）
+  assert.strictEqual(C.anchorOk('北京首都国际机场に着きました。', 'ja', true), true);
+});
+t('v0.9.149 保留原文模式：整段没翻译仍然要拦住', () => {
+  // 中 → 英/法：整段中文，一个目标语言字母都没有（骨架没了）
+  assert.strictEqual(C.anchorOk('这是一个中文字幕测试句子', 'en', true), false);
+  assert.strictEqual(C.anchorOk('北京首都国际机场欢迎您到此参观。', 'fr', true), false);
+  // 日 → 中：整段日文（外来占比 ≈0.8~1）
+  assert.strictEqual(C.anchorOk('すみません、もう一度お願いします。', 'zh-CN', true), false);
+  assert.strictEqual(C.anchorOk('ありがとうございます', 'zh-CN', true), false);
+  // 中 → 日：整段中文（一句假名都没有 + 含中文虚词「那」）
+  assert.strictEqual(C.anchorOk('我打算花大量时间提醒那些人', 'ja', true), false);
+});
+t('v0.9.149 保留原文模式不动默认（全部译出）的判定', () => {
+  assert.strictEqual(C.anchorOk('これは日本語です', 'zh-CN'), false);
+  assert.strictEqual(C.anchorOk('这是一个中文字幕', 'es'), false);
+  assert.strictEqual(C.anchorOk('한국어', 'ja'), false);
+  assert.strictEqual(C.anchorOk('田中さん说他明天会来北京。', 'zh-CN'), true);
+  // 第三参数传 false / undefined 与非保留模式完全等价
+  assert.strictEqual(C.anchorOk('これは日本語です', 'zh-CN', false), false);
+  assert.strictEqual(C.anchorOk('これは日本語です', 'zh-CN', undefined), false);
+});
 t('anchorOk：空文本与未知语言放行', () => {
   assert.strictEqual(C.anchorOk('', 'ja'), true);
   assert.strictEqual(C.anchorOk('   ', 'ko'), true);
