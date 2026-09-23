@@ -3385,6 +3385,19 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '后台表格未渲染「末次」活动时间的条件分支');
     assert.ok(/末次/.test(admSrc), '后台表格未输出「末次」文案');
   });
+
+  t('v0.9.159 每次点翻译要算一条独立记录（合并依据改为任务号）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 此前按「IP+文件名+语言+30 分钟」合并 → 同一文件连翻两次被并进同一条，后台看不出第二次；
+       不合并则一次任务（十几批）会刷出十几条。故改为按前端每次点翻译生成的任务号合并。 */
+    assert.ok(/const task = String\(meta\.taskId/.test(srvSrc), '服务端未读取任务号');
+    assert.ok(/const hit = task \? \(e\.taskId === task\)/.test(srvSrc),
+      '去重未以任务号为准（会退回成按文件名合并，第二次翻译又看不见了）');
+    assert.ok(/if \(task\) ev\.taskId = task;/.test(srvSrc), '新建记录未存任务号（后续批次归不进来）');
+    assert.ok(/S\.taskId = 't'/.test(html), '前端未生成任务号');
+    assert.ok(/taskId: S\.taskId/.test(html), '翻译请求的 meta 未带任务号');
+    assert.ok(/taskId:S\.taskId/.test(html), '完成/下载上报未带任务号（完成时间会记到上一条）');
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

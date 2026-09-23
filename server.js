@@ -120,11 +120,17 @@ function appendEvent(ip, meta, model, extra){
   const cues = Math.max(0, Math.floor(+meta.cues || 0));
   if (!file && !lang) return; // 无有效元数据（老版前端/异常请求）不记
   const mdl = String(model || '').replace(/[\x00-\x1f]/g, '').slice(0, 60);
+  /* v0.9.159：任务号（前端每次点「开始翻译」生成一个，随每个请求带上）。
+     合并依据以它为准——同一任务的各批归到一条，重新点翻译就是新的一条；
+     老前端不带任务号时回退到「文件名+语言」的旧口径，行为不变。 */
+  const task = String(meta.taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
   const db = readEvents();
-  // 会话去重：从尾部找同 ip+file+lang 且时间窗口内的记录 → 批次 +1
+  // 会话去重：从尾部找同 ip + 同任务号（或同文件名+语言）且时间窗口内的记录 → 批次 +1
   for (let i = db.events.length - 1; i >= 0; i--) {
     const e = db.events[i];
-    if (e.ip === ip && e.file === file && e.lang === lang && now - e.t < EVENT_DEDUP_MS) {
+    /* 不带任务号（老版本页面）时完全沿用旧口径，行为不变——否则老页面一次任务会刷出十几条 */
+    const hit = task ? (e.taskId === task) : (e.file === file && e.lang === lang);
+    if (e.ip === ip && hit && now - e.t < EVENT_DEDUP_MS) {
       /* v0.9.73：meta.rt 是前端隔离重译调用类型——1=音乐误删 2=语言跑偏 3=cue 结构错。
          重译不计入 batches，按类型分别累加，站长一眼看出「主批 / 哪类重译最多」 */
       bumpRetry(e, meta.rt);
@@ -147,6 +153,7 @@ function appendEvent(ip, meta, model, extra){
     if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
   }
   const ev = { t: now, ip, file, lang, cues, batches: 0, retries: 0, model: mdl };
+  if (task) ev.taskId = task;   // v0.9.159：存任务号，后续批次才能归到这一条
   if (extra && typeof extra === 'object') Object.assign(ev, extra);
   bumpRetry(ev, meta.rt);
   if (meta.fwhy) bumpFail(ev, meta.fwhy);
@@ -167,11 +174,15 @@ function markEvent(ip, meta, ev){
   const lang = String(meta.lang || '').slice(0, 10);
   const mdl = String(meta.model || '').replace(/[\x00-\x1f]/g, '').slice(0, 60);
   if (!file && !lang) return false;
+  /* v0.9.159：完成/下载上报同样按任务号匹配——否则同一文件连翻两次，
+     第二次的完成时间会被记到第一条上。老前端不带任务号时回退旧口径。 */
+  const task = String(meta.taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
   const db = readEvents();
   for (let i = db.events.length - 1; i >= 0; i--) {
     const e = db.events[i];
     if (now - e.t >= EVENT_LIFE_MS) break; // 更早的必不在窗口内
-    if (e.ip === ip && e.file === file && e.lang === lang) {
+    const hit = task ? (e.taskId === task) : (e.file === file && e.lang === lang);
+    if (e.ip === ip && hit) {
       if (ev === 'finish') {
         e.finishedAt = now;                    // 完成时间（重译后再完成取最新；开始时间即 e.t）
         /* v0.9.86：丢弃遥测——dropN 被删总行数、subDrop 其中源文仍有实义的行数。
