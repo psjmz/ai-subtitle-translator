@@ -496,7 +496,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.147</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.148</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -656,7 +656,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.147</span>
+    <span class="ver-tag">v0.9.148</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -913,7 +913,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.147"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.148"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -5690,7 +5690,7 @@ const S = {
   translating: false,
   stop: false,
   snapOff: false,  // v0.9.77：localStorage 写满/被禁用时置 true，之后不再尝试存断点
-  dropN: 0, mergeN: 0, wrapN: 0
+  dropN: 0, mergeN: 0, wrapN: 0, dropLocal: 0, dropAiFiller: 0, dropAiDrop: 0,
 };
 
 /* ---------------- 工具函数 ---------------- */
@@ -7395,7 +7395,9 @@ function reportEvent(ev, extra){
   if(!S.trMeta) return;
   try{
     // v0.9.86：捎带丢弃遥测——dropN 被删总行数、subDrop 其中「源文仍有实义」的行数（纯统计，不影响任何行为）
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',dropN:S.dropN||0,subDrop:S.subDrop||0});
+    /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
+       dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
     if(navigator.sendBeacon && typeof Blob==='function'){
       try{ if(navigator.sendBeacon('/api/event', new Blob([body],{type:'application/json'}))) return; }catch(_){}
@@ -7453,7 +7455,7 @@ async function runTranslate(){
      实际这些值一个都不会被使用（切模式不清空输入框，值一直留着）。此前零提示。
      ⚠️ 必须在 clearLog 之后才写，否则会被同一轮的开场清屏擦掉。 */
   if(cfg.mode!=='api' && cfg.base && cfg.key && cfg.model) log(t('modeMismatch', cfg.base),'err');
-  S.translating=true; S.stop=false; S.modelDead=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.locale=cfg.dst;
+  S.translating=true; S.stop=false; S.modelDead=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.locale=cfg.dst;
   $('btnGo').disabled=true;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -7510,7 +7512,7 @@ async function runTranslate(){
         if(g.filler){
           if(dropFillers){
             const row=S.rows.find(x=>x.no===g.cues[0].no);
-            if(row){ row.zh=null; row.flag='drop'; }
+            if(row){ if(row.flag!=='drop') S.dropLocal++; row.zh=null; row.flag='drop'; }
             drop++;
           }else{
             // v0.9.116：不勾选且无模型可交由判断 → 保留原文（本地能给出的最接近「交给模型」的结果）
@@ -7852,10 +7854,11 @@ async function runTranslate(){
 
     // 回填：整条纯水词的 cue 直接清空；句组优先合并为单条（时长/行数达标），否则按时长切分回填（时间轴不动）
     // v0.9.116：fillers 始终生效——勾选时是对本地判定的补充；不勾选时删除属于「交给模型」的预期结果
-    S.rows.forEach(r=>{ if(fillerSet.has(r.no)){ r.zh=null; r.flag='drop'; } });
+    /* v0.9.148：丢行归因——只计「本次新标记为 drop」的行，同一行不会被多个原因重复计数 */
+    S.rows.forEach(r=>{ if(fillerSet.has(r.no)){ if(r.flag!=='drop') S.dropAiFiller++; r.zh=null; r.flag='drop'; } });
     // 勾选「去除水词」→ 本地判定的水词组直接清空（未送模型，模型无从干预）
     groups.forEach(g=>{ if(!g.fillerLocal) return; g.cues.forEach(c=>{
-      const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='drop'; }
+      const r=S.rows.find(x=>x.no===c.no); if(r){ if(r.flag!=='drop') S.dropLocal++; r.zh=null; r.flag='drop'; }
     }); });
     const overCapGroups=[];   // 超容句组（v0.9.21：压缩重译候选）
     let gMulti=0, mG=0, suspiciousDrop=0, missingCount=0;
@@ -7871,7 +7874,7 @@ async function runTranslate(){
       // v0.9.78：歌词按用户设置本地处理——keep=原文原样落地；drop=整组移除（含纯符号标记行）
       if(g.lyricLocal){
         if(g.lyricLocal==='drop'){
-          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='drop'; } });
+          active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ if(r.flag!=='drop') S.dropLocal++; r.zh=null; r.flag='drop'; } });
         }else{
           active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=String(c.text).trim(); if(r.flag!=='drop') r.flag=''; } });
         }
@@ -7929,7 +7932,7 @@ async function runTranslate(){
       // v0.9.47：音乐组 drop 已在批次层经单组隔离重译确认（再 drop 即信模型），与其他水词同路径按 drop 落标
       const explicitDrop = m.type==='drop' && !textRaw;
       if(explicitDrop){
-        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ r.zh=null; r.flag='drop'; } });
+        active.forEach(c=>{ const r=S.rows.find(x=>x.no===c.no); if(r){ if(r.flag!=='drop') S.dropAiDrop++; r.zh=null; r.flag='drop'; } });
         suspiciousDrop++;
         continue;
       }
@@ -8144,7 +8147,7 @@ function setSrc(text, fileName){
   S.srcItems=items;
   // 导入后立即构建工作行，右侧对照区才能显示内容（runTranslate 时会重建为深拷贝）
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
-  S.dropN=S.mergeN=S.mergedN=S.wrapN=0;
+  S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
     autoOutName();

@@ -166,9 +166,11 @@ function markEvent(ip, meta, ev){
       if (ev === 'finish') {
         e.finishedAt = now;                    // 完成时间（重译后再完成取最新；开始时间即 e.t）
         /* v0.9.86：丢弃遥测——dropN 被删总行数、subDrop 其中源文仍有实义的行数。
-           前端随 finish 上报，用于评估要不要放宽 drop 救援通道（纯统计，不影响行为）。 */
-        if (meta.dropN != null) e.dropN = Math.max(0, Math.floor(+meta.dropN || 0));
-        if (meta.subDrop != null) e.subDrop = Math.max(0, Math.floor(+meta.subDrop || 0));
+           v0.9.148 再加三项归因：dropLocal（本地决策：水词组 + 歌词按设置删除）、
+           dropAiFiller（模型声明的水词）、dropAiDrop（模型显式判 drop）。
+           前端保证每行只按第一个把它标记为 drop 的原因计一次，故三项之和 ≤ dropN。
+           纯统计，不影响任何行为。 */
+        Object.assign(e, dropFields(meta));
       } else if (ev === 'download') {
         e.downloads = (e.downloads || 0) + 1;
         e.downloadedAt = now;
@@ -190,7 +192,7 @@ function markEvent(ip, meta, ev){
   /* 自带 Key 用户（翻译未经服务器，无 builtin 会话）：首次上报时创建轻量记录 */
   if (!mdl) return false;
   const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
-  if (ev === 'finish') { lite.finishedAt = now; if (meta.dropN != null) lite.dropN = Math.max(0, Math.floor(+meta.dropN || 0)); if (meta.subDrop != null) lite.subDrop = Math.max(0, Math.floor(+meta.subDrop || 0)); }
+  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta)); }
   else if (ev === 'download') { lite.downloads = 1; lite.downloadedAt = now; }
   else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
   else return false;
@@ -235,6 +237,17 @@ function recordTokens(ip, meta, usage){
     return true;
   }
   return false;
+}
+/* v0.9.148：丢行归因字段的统一清洗（三处上报点共用，避免各处口径漂移）。
+   规则与 dropN/subDrop 一致：非数字按 0，负数夹到 0，一律取整。 */
+function dropFields(meta){
+  const o = {};
+  if (meta.dropN        != null) o.dropN        = Math.max(0, Math.floor(+meta.dropN || 0));
+  if (meta.subDrop      != null) o.subDrop      = Math.max(0, Math.floor(+meta.subDrop || 0));
+  if (meta.dropLocal    != null) o.dropLocal    = Math.max(0, Math.floor(+meta.dropLocal || 0));
+  if (meta.dropAiFiller != null) o.dropAiFiller = Math.max(0, Math.floor(+meta.dropAiFiller || 0));
+  if (meta.dropAiDrop   != null) o.dropAiDrop   = Math.max(0, Math.floor(+meta.dropAiDrop || 0));
+  return o;
 }
 function dateOfTs(ts){
   const d = new Date(ts);
