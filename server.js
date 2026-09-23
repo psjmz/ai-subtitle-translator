@@ -906,6 +906,13 @@ function rfRejected(e){
   if (!/HTTP (400|404|415|422)/.test(s)) return false;
   return /response[_ -]?format|json[_ -]?object|json[_ -]?mode|response[_ -]?schema|unsupported/i.test(s);
 }
+/* 上游是否因 max_tokens 改名而拒收（OpenAI o 系列 / gpt-5 起只认 max_completion_tokens）→ 改名重发一次。
+   与 rfRejected 同一套路：靠错误文案判定，不维护模型名名单，新出的模型无需改代码就能自适应。 */
+function tokNameRejected(e){
+  const s = String((e && e.message) || '');
+  if (!/HTTP (400|404|415|422)/.test(s)) return false;
+  return /max_tokens/i.test(s) && /max_completion_tokens/i.test(s);
+}
 async function callModel(cfg, messages, maxTokens, opts){
   const url = String(cfg.base).replace(/\/+$/, '') + '/chat/completions';
   // v0.9.91：temperature 改为配置项（admin 可调）；旧配置无该字段时回退 0.2，并夹紧到 0-2
@@ -914,8 +921,10 @@ async function callModel(cfg, messages, maxTokens, opts){
   temp = Math.min(2, Math.max(0, temp));
   /* v0.9.132：opts.json 由前端 meta.json 传来，标明「这条请求期望 JSON 输出」 */
   const useRf = !!(opts && opts.json) && rfSupported(cfg.base);
-  const once = async (withRf) => {
-    const core = { model: cfg.model, messages, temperature: temp, stream: false, max_tokens: maxTokens };
+  // v0.9.153：newTok 为真时用 OpenAI 新参数名 max_completion_tokens；maxTokens 为空则两个都不写
+  const once = async (withRf, newTok) => {
+    const core = { model: cfg.model, messages, temperature: temp, stream: false };
+    if (maxTokens != null) core[newTok ? 'max_completion_tokens' : 'max_tokens'] = maxTokens;
     if (withRf) core.response_format = { type: 'json_object' };
     const r = await fetch(url, {
       method: 'POST',
@@ -928,9 +937,16 @@ async function callModel(cfg, messages, maxTokens, opts){
   };
   /* 白名单错判 / 平台侧变更 / 该模型不支持 → 摘掉 response_format 重发一次，绝不放弃整次翻译 */
   try {
-    return await once(useRf);
+    return await once(useRf, false);
   } catch (e) {
-    if (useRf && rfRejected(e)) return await once(false);
+    /* ⚠️ 顺序不可调换：必须先判参数名，再判 response_format。
+       OpenAI 的报错文案是 "Unsupported parameter: 'max_tokens'…"，其中的 Unsupported
+       会被 rfRejected 的 /unsupported/i 命中。若让 rf 判定抢先，它会摘掉 response_format
+       重发——同一条 max_tokens 错误必然再现，而这条分支是 return，改名就成了永远到不了的死代码。
+       （翻译通道因白名单命中 api.openai.com 会带上 response_format，属踩得到的高频路径。） */
+    if (maxTokens != null && tokNameRejected(e)) return await once(false, true);
+    /* 白名单错判 / 平台侧变更 / 该模型不支持 → 摘掉参数重试一次，绝不放弃整次翻译 */
+    if (useRf && rfRejected(e)) return await once(false, false);
     throw e;
   }
 }
