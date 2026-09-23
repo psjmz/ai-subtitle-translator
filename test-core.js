@@ -3321,9 +3321,46 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       catch (e) { assert.fail('主脚本语法错误（多半是字典行尾漏逗号）: ' + e.message); }
       checked++;
     }
-    assert.strictEqual(checked, 1, '应恰好命中 1 段主脚本，实际 ' + checked);
+     assert.strictEqual(checked, 1, '应恰好命中 1 段主脚本，实际 ' + checked);
+   });
+
+  t('v0.9.156 新增词条 27 语言齐全', () => {
+    const keys = ['fbRoute'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    const at = blocks.map(b => html.indexOf(b));
+    let checked = 0;
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const code = (blocks[bi].match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = at[bi];
+      const seg = html.slice(i, bi + 1 < at.length ? at[bi + 1] : html.length);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+        for (const ph of ['{0}', '{1}', '{2}']) {
+          assert.ok(m[1].indexOf(ph) >= 0, code + ' 的 ' + k + ' 缺占位符 ' + ph);
+        }
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
-}
+
+  t('v0.9.156 走模型B时事件里要记B的名字', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 此前只在 e.model 为空时才写入 → 去重窗口命中「分流改动前的旧事件」时名字一直停在 A，
+       后台看到的仍是 deepseek-chat，表现为「设了走 B 却没走 B」 */
+    assert.ok(/\(!e\.model \|\| \(extra && extra\.viaB\)\)/.test(srvSrc),
+      'appendEvent 去重分支未对 viaB 覆写 model');
+    assert.ok(/outA\._fb\s*=/.test(srvSrc), '回退响应未带 _fb 回执');
+  });
+
+  t('v0.9.156 前端要读回退回执并打日志', () => {
+    assert.ok(/j\._fb/.test(html), '前端未检测服务端回退回执 _fb');
+    assert.ok(/t\('fbRoute'/.test(html), '前端未调用 fbRoute 文案');
+    assert.ok(/\.log \.warn\{/.test(html), '缺少 .log .warn 样式（回退提示要看得见）');
+  });
+ }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

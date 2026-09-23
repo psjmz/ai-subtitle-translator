@@ -130,7 +130,10 @@ function appendEvent(ip, meta, model, extra){
       bumpRetry(e, meta.rt);
       if (meta.fwhy) bumpFail(e, meta.fwhy);
       if (cues > (e.cues || 0)) e.cues = cues;
-      if (mdl && !e.model) e.model = mdl;
+      /* v0.9.156：本次走了模型 B 就把名字记成 B。此前只在 model 为空时才写入，
+         去重窗口内命中「分流改动前那条旧事件」时名字一直停在 A，
+         后台看到的依然是 deepseek-chat → 表现为「设了走 B 却没走 B」。 */
+      if (mdl && (!e.model || (extra && extra.viaB))) e.model = mdl;
       if (extra && typeof extra === 'object') Object.assign(e, extra);
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
@@ -1035,6 +1038,9 @@ const server = http.createServer(async (req, res) => {
               }), 'fallback');
             } catch (e2) {}
             try { recordTokens(ip, body.meta, outA && outA.usage); } catch (e4) {} // v0.9.145：回退到 A 也算真实开销
+            /* v0.9.156：回退必须让用户看得见。此前静默降级——界面无任何提示，
+               后台又因为上面那条记账问题显示的是 A 的名字，用户只能判定「分流没生效」。 */
+            try { if (outA && typeof outA === 'object') outA._fb = { from: pick.cfg.model, to: cfg.model, msg: String(e.message || '').slice(0, 200) }; } catch (e5) {}
             return sendJson(res, 200, outA);
           } catch (e3) {
             return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e3.message } });
