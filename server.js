@@ -130,10 +130,12 @@ function appendEvent(ip, meta, model, extra){
       bumpRetry(e, meta.rt);
       if (meta.fwhy) bumpFail(e, meta.fwhy);
       if (cues > (e.cues || 0)) e.cues = cues;
-      /* v0.9.156：本次走了模型 B 就把名字记成 B。此前只在 model 为空时才写入，
-         去重窗口内命中「分流改动前那条旧事件」时名字一直停在 A，
-         后台看到的依然是 deepseek-chat → 表现为「设了走 B 却没走 B」。 */
-      if (mdl && (!e.model || (extra && extra.viaB))) e.model = mdl;
+      /* v0.9.157：模型名一律以「本次实际生效的」为准覆写，走 A / 走 B 都要写。
+         v0.9.156 只补了「走 B 时覆写」这一半，反方向漏了：把某语言从 B 列表移除后，
+         本次走 A 命中 30 分钟去重窗口里那条旧事件，名字仍停在旧模型、viaB 仍是 1，
+         后台看起来就是「我明明移除了，怎么还在走 B」。故这里不再加条件，配合调用处
+         恒传 viaB（0/1）保证旧标记被覆盖。 */
+      if (mdl) e.model = mdl;
       if (extra && typeof extra === 'object') Object.assign(e, extra);
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
@@ -1020,12 +1022,17 @@ const server = http.createServer(async (req, res) => {
       /* v0.9.119：按目标语言分流到模型 A / B（meta.lang 由前端随每次请求带上） */
       const lang = (body.meta && String(body.meta.lang || '')) || '';
       const pick = pickModel(cfg, lang);
-      try { appendEvent(ip, body.meta, pick.cfg.model, pick.which === 'B' ? { viaB: 1 } : null); } catch (e) {} // 行为记录失败不影响翻译主流程
+      /* v0.9.157：viaB 恒传 0/1（此前走 A 时传 null，旧事件上的 viaB=1 不会被清掉） */
+      try { appendEvent(ip, body.meta, pick.cfg.model, { viaB: pick.which === 'B' ? 1 : 0 }); } catch (e) {} // 行为记录失败不影响翻译主流程
       /* v0.9.132：前端在 meta.json 里声明「本请求期望 JSON 输出」（非 JSON 请求不注入，否则上游会 400） */
       const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
       try {
         const out = await callModel(pick.cfg, body.messages, undefined, jsonOpts);
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
+        /* v0.9.157：本次实际生效的模型名回传前端。分流只在服务端发生，前端原本无从得知
+           自己这次用的是 A 还是 B，只能靠后台 events 反推（而后台记账又有延迟/去重问题）。
+           模型名是专有名词，不需要进界面字典，直接原样输出。 */
+        try { if (out && typeof out === 'object') out._used = String(pick.cfg.model || ''); } catch (e9) {}
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
         /* B 失败且开启回退 → 再试 A；回退成功后把事件里的模型改写成真正生效的 A，并记 fallback 次数 */
@@ -1041,6 +1048,7 @@ const server = http.createServer(async (req, res) => {
             /* v0.9.156：回退必须让用户看得见。此前静默降级——界面无任何提示，
                后台又因为上面那条记账问题显示的是 A 的名字，用户只能判定「分流没生效」。 */
             try { if (outA && typeof outA === 'object') outA._fb = { from: pick.cfg.model, to: cfg.model, msg: String(e.message || '').slice(0, 200) }; } catch (e5) {}
+            try { if (outA && typeof outA === 'object') outA._used = String(cfg.model || ''); } catch (e6) {} // v0.9.157：回退后真正生效的是 A
             return sendJson(res, 200, outA);
           } catch (e3) {
             return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e3.message } });

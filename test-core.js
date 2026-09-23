@@ -3346,12 +3346,22 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
 
-  t('v0.9.156 走模型B时事件里要记B的名字', () => {
+  t('v0.9.157 事件里的模型名一律以本次实际生效的为准（走A走B都要覆写）', () => {
     const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
-    /* 此前只在 e.model 为空时才写入 → 去重窗口命中「分流改动前的旧事件」时名字一直停在 A，
-       后台看到的仍是 deepseek-chat，表现为「设了走 B 却没走 B」 */
-    assert.ok(/\(!e\.model \|\| \(extra && extra\.viaB\)\)/.test(srvSrc),
-      'appendEvent 去重分支未对 viaB 覆写 model');
+    /* v0.9.156 只补了「走 B 时覆写」这一半，反方向漏了：把语言从 B 列表移除后，本次走 A
+       命中 30 分钟去重窗口里那条旧事件，名字仍停在旧模型、viaB 仍是 1 → 后台看起来是
+       「我明明移除了，怎么还在走 B」。故这里必须是不带条件的覆写。 */
+    assert.ok(/if \(mdl\) e\.model = mdl;/.test(srvSrc),
+      'appendEvent 去重分支未无条件覆写 model（会退化成 v0.9.156 的半边修复）');
+    assert.ok(!/\(!e\.model \|\| \(extra && extra\.viaB\)\)/.test(srvSrc),
+      '仍在用 v0.9.156 的条件式覆写：移除语言后走 A 不会回退模型名');
+  });
+
+  t('v0.9.157 viaB 标记必须按本次真实值写（走A时传0）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 走 A 时若传 null，旧事件上的 viaB=1 永远不会被清掉 */
+    assert.ok(/\{ viaB: pick\.which === 'B' \? 1 : 0 \}/.test(srvSrc),
+      'appendEvent 调用处未恒传 viaB 0/1');
     assert.ok(/outA\._fb\s*=/.test(srvSrc), '回退响应未带 _fb 回执');
   });
 
