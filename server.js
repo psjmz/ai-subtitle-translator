@@ -913,6 +913,14 @@ function tokNameRejected(e){
   if (!/HTTP (400|404|415|422)/.test(s)) return false;
   return /max_tokens/i.test(s) && /max_completion_tokens/i.test(s);
 }
+/* 上游是否拒收自定义 temperature（OpenAI o 系列 / gpt-5 只接受默认 1）→ 不再发送该字段。
+   典型文案："Unsupported value: 'temperature' does not support 0.2 with this model.
+   Only the default (1) value is supported." */
+function tempRejected(e){
+  const s = String((e && e.message) || '');
+  if (!/HTTP (400|404|415|422)/.test(s)) return false;
+  return /temperature/i.test(s) && /(does not support|not supported|only the default)/i.test(s);
+}
 async function callModel(cfg, messages, maxTokens, opts){
   const url = String(cfg.base).replace(/\/+$/, '') + '/chat/completions';
   // v0.9.91：temperature 改为配置项（admin 可调）；旧配置无该字段时回退 0.2，并夹紧到 0-2
@@ -921,11 +929,13 @@ async function callModel(cfg, messages, maxTokens, opts){
   temp = Math.min(2, Math.max(0, temp));
   /* v0.9.132：opts.json 由前端 meta.json 传来，标明「这条请求期望 JSON 输出」 */
   const useRf = !!(opts && opts.json) && rfSupported(cfg.base);
-  // v0.9.153：newTok 为真时用 OpenAI 新参数名 max_completion_tokens；maxTokens 为空则两个都不写
-  const once = async (withRf, newTok) => {
-    const core = { model: cfg.model, messages, temperature: temp, stream: false };
-    if (maxTokens != null) core[newTok ? 'max_completion_tokens' : 'max_tokens'] = maxTokens;
-    if (withRf) core.response_format = { type: 'json_object' };
+  /* plan = { rf, newTok, temp }：分别决定是否带 response_format / 用哪个 token 上限参数名 / 是否带 temperature。
+     v0.9.154：把原来的「两项布尔参数」改成 plan 对象，因为端点不兼容往往是成串出现的。 */
+  const once = async (plan) => {
+    const core = { model: cfg.model, messages, stream: false };
+    if (maxTokens != null) core[plan.newTok ? 'max_completion_tokens' : 'max_tokens'] = maxTokens;
+    if (plan.temp) core.temperature = temp;
+    if (plan.rf) core.response_format = { type: 'json_object' };
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
@@ -935,20 +945,29 @@ async function callModel(cfg, messages, maxTokens, opts){
     if (!r.ok) throw new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
     return JSON.parse(text);
   };
-  /* 白名单错判 / 平台侧变更 / 该模型不支持 → 摘掉 response_format 重发一次，绝不放弃整次翻译 */
-  try {
-    return await once(useRf, false);
-  } catch (e) {
-    /* ⚠️ 顺序不可调换：必须先判参数名，再判 response_format。
-       OpenAI 的报错文案是 "Unsupported parameter: 'max_tokens'…"，其中的 Unsupported
-       会被 rfRejected 的 /unsupported/i 命中。若让 rf 判定抢先，它会摘掉 response_format
-       重发——同一条 max_tokens 错误必然再现，而这条分支是 return，改名就成了永远到不了的死代码。
-       （翻译通道因白名单命中 api.openai.com 会带上 response_format，属踩得到的高频路径。） */
-    if (maxTokens != null && tokNameRejected(e)) return await once(false, true);
-    /* 白名单错判 / 平台侧变更 / 该模型不支持 → 摘掉参数重试一次，绝不放弃整次翻译 */
-    if (useRf && rfRejected(e)) return await once(false, false);
-    throw e;
+  /* v0.9.154：逐项降级重发，而不是「失败一次就放弃」。
+     端点不兼容常常成串出现——OpenAI o 系列同一条请求既不要 max_tokens 也不要自定义
+     temperature，只修一项下一轮照样 400。这里每轮只修一个维度，沿用上一轮已生效的修复，
+     最多四轮；三者 any 都拿不到对应错误就立刻抛，不会瞎试。
+
+     ⚠️ 判定顺序不可调换：OpenAI 的报错文案一律以 Unsupported 开头，
+     会被最宽泛的 rfRejected（正则含 /unsupported/i）一并命中。若让它抢先，
+     会摘掉 response_format 重发——同一条参数错误必然再现，后面两项就成了永远到不了的死代码。
+     所以必须由具体到宽泛：先 tokName / temp（要求点名具体参数），最后才轮到 rf。 */
+  let plan = { rf: useRf, newTok: false, temp: true };
+  let lastErr = null;
+  for (let round = 0; round < 4; round++) {
+    try {
+      return await once(plan);
+    } catch (e) {
+      lastErr = e;
+      if (maxTokens != null && !plan.newTok && tokNameRejected(e)) { plan = { rf: false, newTok: true,  temp: plan.temp }; continue; }
+      if (plan.temp && tempRejected(e))                            { plan = { rf: false, newTok: plan.newTok, temp: false }; continue; }
+      if (plan.rf && rfRejected(e))                                { plan = { rf: false, newTok: plan.newTok, temp: plan.temp }; continue; }
+      throw e;
+    }
   }
+  throw lastErr;
 }
 
 /* ---------------- 路由 ---------------- */
