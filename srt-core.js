@@ -2290,11 +2290,41 @@
   // v0.9.73：日语纯汉字无假名的长度闸（字符宽，复用 textWidth：汉字 1、拉丁 0.5）。
   // 合法日语纯汉字名词（東京／首相／市場／技術／総理大臣）都很短，超过此宽度基本是中文长句跑偏。
   const JA_HAN_SHORT_W = 6;
+  /* v0.9.147：语言锚定放宽——只拦「整段跑偏」，零星外来字符一律放行。
+     背景：日语源 → 中文目标时，「さん」「ありがとう」「ラーメン」这类合法保留/引用/菜名，
+     会被旧规则（出现一个假名即整组判跑偏）批量误伤——实测部署后 2 个 zh-CN 任务
+     15 次重试全部来自这里，模型本身翻得没问题。
+     判据：目标文种之外的 CJK 字符 占 全部 CJK 字符 的比例；
+       ① 完全没有此类字符 → 放行；② 只有零星几个（≤4）→ 放行（专名/引用/菜名通常就这些）；
+       ③ 占比 ≤ 35% → 放行；④ 否则判跑偏。
+     整段没翻译（占比接近 1）仍 100% 拦住，anchorOk 的兜底作用不变。
+     注意：foreignRe 不可带 g 标志（带 g 的 test 会推进 lastIndex，逐字符判断会串行出错）。 */
+  const RE_ALL_CJK = /[\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff\u31f0-\u31ff\u1100-\u11ff\uac00-\ud7af]/g;
+  const RE_FOREIGN_ZH = /[\u3040-\u30ff\u31f0-\u31ff\u1100-\u11ff\uac00-\ud7af]/; // 中译目标：假名+谚文
+  const RE_FOREIGN_KO = /[\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff\u31f0-\u31ff]/; // 韩译目标：汉字+假名
+  const RE_FOREIGN_ANY = /[\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff\u31f0-\u31ff\u1100-\u11ff\uac00-\ud7af]/; // 其他：全部 CJK
+  const ANCHOR_FOREIGN_MAX = 0.35;
+  const ANCHOR_FOREIGN_ABS = 4;
+  function anchorForeignOk(s, foreignRe){
+    const cjk = s.match(RE_ALL_CJK);
+    if (!cjk || !cjk.length) return true;      // 无 CJK（纯拉丁/符号）→ 沿用既有策略，不拦
+    let bad = 0;
+    for (let i = 0; i < cjk.length; i++) if (foreignRe.test(cjk[i])) bad++;
+    if (!bad) return true;
+    /* CJK 只有一两个字符 → 不足以判定「整段跑偏」，一律放行。
+       场景：非 CJK 目标 + 勾选「保留原文」时，中文地名/人名（北京、张三）会原样留在译文里，
+       旧规则（出现一个 CJK 即判跑偏）会把这类合法译文全部误伤。 */
+    if (cjk.length <= 2) return true;
+    // 全是外来字符 = 整段没翻译，再短也拦（否则「这是中文」「한국어」这类会被放过）
+    if (bad === cjk.length) return false;
+    if (bad <= ANCHOR_FOREIGN_ABS) return true;   // 零星几个：专名/引用/菜名
+    return bad / cjk.length <= ANCHOR_FOREIGN_MAX;
+  }
   function anchorOk(text, dst) {
     const s = String(text == null ? '' : text);
     if (!s.trim()) return true;
     const han = RE_HAN.test(s), kana = RE_KANA.test(s), hangul = RE_HANGUL.test(s);
-    if (dst === 'zh-CN' || dst === 'zh-TW') return !kana && !hangul;
+    if (dst === 'zh-CN' || dst === 'zh-TW') return anchorForeignOk(s, RE_FOREIGN_ZH);
     if (dst === 'ja') {
       if (hangul) return false;
       if (kana) return true;          // 含假名 → 一定是日语（或至少不是纯汉字中文）
@@ -2303,8 +2333,9 @@
       if (RE_ZH_MARK.test(s)) return false;             // ① 含中文虚词 → 中文跑偏
       return textWidth(s) <= JA_HAN_SHORT_W;            // ② 短名词放行，长句判跑偏
     }
-    if (dst === 'ko') return !han && !kana;
-    return !han && !kana && !hangul;
+    /* v0.9.147：同上放宽——韩译目标里的汉字专名、其他语言里的零星 CJK 不再整组判跑偏 */
+    if (dst === 'ko') return anchorForeignOk(s, RE_FOREIGN_KO);
+    return anchorForeignOk(s, RE_FOREIGN_ANY);
   }
 
   // 已知混字词表（按目标语言隔离）：实测 DeepSeek 偶发在个别术语上写出汉字字面
