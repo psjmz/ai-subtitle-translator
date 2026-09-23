@@ -496,7 +496,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.149</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.150</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -656,7 +656,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.149</span>
+    <span class="ver-tag">v0.9.150</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -913,7 +913,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.149"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.150"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -7685,9 +7685,15 @@ async function runTranslate(){
                   if(m.cueTexts && m.cueTexts.size) m.cueTexts.forEach(v=>{ const x=String(v||'').trim(); if(x) badTexts.push(x); });
                   else if(Array.isArray(m.cues)) m.cues.forEach(c=>{ const x=String((c&&c.text)||'').trim(); if(x) badTexts.push(x); });
                 })(out.byGno[gno]);
+                /* v0.9.150：顺序反转——第 1 次就带纠错反馈（强的那次），失败才盲发兜底。
+                   此前 a=0 盲发、a=1 才带反馈，等于每组固定先烧一次几乎无效的请求：反馈素材
+                   badTexts 取自整批输出 out.byGno[gno]，本就不依赖 a=0 的产物，盲发纯属多余。
+                   实测（3 句组桩，四种模型行为）：能被反馈纠正时 7→4 次且修复率不变；
+                   只能靠「隔离」偶发恢复的情形（盲发有效、反馈无效）由第 2 次盲发兜住，不退化。
+                   两种成因并存见 v0.9.22 注释（隔离即恢复 5/5）与 v0.9.57 注释（盲发零效果）。 */
                 for(let a=0;a<2 && !fixed;a++){
                   try{
-                    const fbArr=(a===1&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
+                    const fbArr=(a===0&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
                     const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,2);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
@@ -7732,9 +7738,10 @@ async function runTranslate(){
               const g1=gBatch.find(x=>x.gno===cb.gno);
               let fixed=false;
               if(g1){
+                /* v0.9.150：与跑偏通道同理——第 1 次就带结构纠错反馈，失败再盲发兜底 */
                 for(let a=0;a<2 && !fixed;a++){
                   try{
-                    const fbCue=(a===1)?{cueErrs:cb.errs}:null;
+                    const fbCue=(a===0)?{cueErrs:cb.errs}:null;
                     const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbCue,ctx,3);
                     const m2=o2.byGno && o2.byGno[cb.gno];
                     if(m2 && m2.cueTexts && m2.cueTexts.size && !(o2.badAnchor||[]).includes(cb.gno)){
