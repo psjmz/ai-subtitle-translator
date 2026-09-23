@@ -170,7 +170,7 @@ function markEvent(ip, meta, ev){
            dropAiFiller（模型声明的水词）、dropAiDrop（模型显式判 drop）。
            前端保证每行只按第一个把它标记为 drop 的原因计一次，故三项之和 ≤ dropN。
            纯统计，不影响任何行为。 */
-        Object.assign(e, dropFields(meta));
+        Object.assign(e, dropFields(meta), cueErrFields(meta));
       } else if (ev === 'download') {
         e.downloads = (e.downloads || 0) + 1;
         e.downloadedAt = now;
@@ -192,7 +192,7 @@ function markEvent(ip, meta, ev){
   /* 自带 Key 用户（翻译未经服务器，无 builtin 会话）：首次上报时创建轻量记录 */
   if (!mdl) return false;
   const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
-  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta)); }
+  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta)); }
   else if (ev === 'download') { lite.downloads = 1; lite.downloadedAt = now; }
   else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
   else return false;
@@ -247,6 +247,18 @@ function dropFields(meta){
   if (meta.dropLocal    != null) o.dropLocal    = Math.max(0, Math.floor(+meta.dropLocal || 0));
   if (meta.dropAiFiller != null) o.dropAiFiller = Math.max(0, Math.floor(+meta.dropAiFiller || 0));
   if (meta.dropAiDrop   != null) o.dropAiDrop   = Math.max(0, Math.floor(+meta.dropAiDrop || 0));
+  return o;
+}
+/* v0.9.151：cue 结构错类型字段的统一清洗（与 dropFields 同口径：非数字按 0、负数夹 0、取整）。
+   字段列表写死为白名单——绝不按前端传来的字符串动态建字段。
+   用途：retryCue 只有一个总数，分不清「模型漏条目 MISSING」与「译文被判空 EMPTY」，
+   两者解法相反（调小批次 vs 扩充 fillers 白名单），必须先有类型分布才能定性。 */
+const CUE_ERR_FIELDS = ['cueEmpty','cueMissing','cueDup','cueUnknown','cueBadEntry','cueNoArr','cueOther'];
+function cueErrFields(meta){
+  const o = {};
+  for (const k of CUE_ERR_FIELDS) {
+    if (meta[k] != null) o[k] = Math.max(0, Math.min(100000, Math.floor(+meta[k] || 0)));
+  }
   return o;
 }
 function dateOfTs(ts){

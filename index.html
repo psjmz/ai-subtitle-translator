@@ -496,7 +496,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.150</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.151</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -656,7 +656,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.150</span>
+    <span class="ver-tag">v0.9.151</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -913,7 +913,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.150"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.151"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -7400,7 +7400,8 @@ function reportEvent(ev, extra){
     // v0.9.86：捎带丢弃遥测——dropN 被删总行数、subDrop 其中「源文仍有实义」的行数（纯统计，不影响任何行为）
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0});
+    /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
     if(navigator.sendBeacon && typeof Blob==='function'){
       try{ if(navigator.sendBeacon('/api/event', new Blob([body],{type:'application/json'}))) return; }catch(_){}
@@ -7411,6 +7412,30 @@ function reportEvent(ev, extra){
       body:body
     }).catch(()=>{});
   }catch(e){}
+}
+
+/* v0.9.151：cue 结构错的类型归因（纯统计，不影响任何行为）。
+   validateCueAlign 的 errs 元素形如 EMPTY_17 / MISSING_3,4 / DUP_5 / UNKNOWN_9 / BAD_ENTRY / NO_CUES_ARRAY。
+   此前服务端只有 retryCue 一个总数，看不出是「模型漏条目」还是「译文被判空」——
+   前者的解法是调小批次，后者是把短叹词加进 fillers 白名单，方向完全相反，不该猜。
+   单位统一为「受影响的 cue 条数」：MISSING 按逗号列表里的编号个数计，其余每个错误码计 1。
+   只在主批解析失败时计一次（单组重译的返回不再计），避免同一组被重复累加。 */
+const CUE_ERR_FIELD = { EMPTY:'cueEmpty', MISSING:'cueMissing', DUP:'cueDup', UNKNOWN:'cueUnknown', BAD_ENTRY:'cueBadEntry', NO_CUES_ARRAY:'cueNoArr', OTHER:'cueOther' };
+function bumpCueErrs(list){
+  if(!Array.isArray(list)) return;
+  for(const cb of list){
+    const errs = (cb && Array.isArray(cb.errs)) ? cb.errs : [];
+    for(const raw of errs){
+      const s = String(raw == null ? '' : raw);
+      let kind = 'OTHER', n = 1, m = /^MISSING_([\d,]+)$/.exec(s);
+      if(m){ kind = 'MISSING'; n = m[1].split(',').length || 1; }
+      else if((m = /^(EMPTY|DUP|UNKNOWN)_\d+$/.exec(s))) kind = m[1];
+      else if(s === 'BAD_ENTRY' || s === 'NO_CUES_ARRAY') kind = s;
+      /* 白名单映射必须 hasOwnProperty：命中原型链上的键会返回 truthy 的垃圾值，把计数写进脏字段 */
+      const k = Object.prototype.hasOwnProperty.call(CUE_ERR_FIELD, kind) ? CUE_ERR_FIELD[kind] : 'cueOther';
+      S[k] = (S[k] || 0) + Math.max(1, Math.min(1000, Math.floor(+n || 1)));
+    }
+  }
 }
 
 async function runTranslate(){
@@ -7459,6 +7484,8 @@ async function runTranslate(){
      ⚠️ 必须在 clearLog 之后才写，否则会被同一轮的开场清屏擦掉。 */
   if(cfg.mode!=='api' && cfg.base && cfg.key && cfg.model) log(t('modeMismatch', cfg.base),'err');
   S.translating=true; S.stop=false; S.modelDead=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.locale=cfg.dst;
+  /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
+  S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
   $('btnGo').disabled=true;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -7731,6 +7758,7 @@ async function runTranslate(){
           // hi 天城文 2 结构错 → 重试清零）。仍败则该组按旧格式回落：重发结果若无 cueTexts 但有 text
           // 也能走旧回填路径；两者皆无 → missing（与批失败组同待遇，可见可后处理）。
           if(out.cueBadGnos && out.cueBadGnos.length){
+            bumpCueErrs(out.cueBadGnos);   // v0.9.151：类型归因（只在此处计一次，单组重译的返回不再计）
             const remainCue=[];
             /* v0.9.72：并行化（并发3）——组间独立并行；组内 a<2 两次仍串行（第 2 次带结构错误反馈） */
             await poolMap(out.cueBadGnos, 3, async cb=>{
@@ -8158,6 +8186,7 @@ function setSrc(text, fileName){
   // 导入后立即构建工作行，右侧对照区才能显示内容（runTranslate 时会重建为深拷贝）
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
+  S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
     autoOutName();
