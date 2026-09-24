@@ -3398,6 +3398,21 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/taskId: S\.taskId/.test(html), '翻译请求的 meta 未带任务号');
     assert.ok(/taskId:S\.taskId/.test(html), '完成/下载上报未带任务号（完成时间会记到上一条）');
   });
+
+  t('v0.9.160 各家的缓存命中字段都要读（DeepSeek 与 OpenAI 口径不同名）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* DeepSeek 的字段名是 prompt_cache_hit_tokens，不在 cached_tokens / prompt_tokens_details 里。
+       此前只读 OpenAI 系 → 走 A 槽的任务 tkCache 恒为 0，后台看着像「没命中」。 */
+    assert.ok(/prompt_cache_hit_tokens/.test(srvSrc),
+      '未读 DeepSeek 的 prompt_cache_hit_tokens（走 A 槽时缓存命中会一直显示 0）');
+    assert.ok(/cached_tokens/.test(srvSrc), 'OpenAI 系字段被覆盖掉了');
+    assert.ok(/prompt_tokens_details/.test(srvSrc), 'prompt_tokens_details 口径被覆盖掉了');
+    /* 补读必须排在原有口径之后、且不能叠加 */
+    assert.ok(/if \(!tch\) tch = tokNum\(u\.prompt_cache_hit_tokens\);/.test(srvSrc),
+      '补读逻辑不在原口径之后（会覆盖 OpenAI 系结果）');
+    /* 异常值夹取不能破 */
+    assert.ok(/if \(tch > tin\) tch = tin;/.test(srvSrc), '命中数大于输入数时的夹取被删掉了');
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

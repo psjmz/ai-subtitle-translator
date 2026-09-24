@@ -233,6 +233,10 @@ function usageTokens(u){
   const tin  = tokNum(u.prompt_tokens != null ? u.prompt_tokens : u.input_tokens);
   const tout = tokNum(u.completion_tokens != null ? u.completion_tokens : u.output_tokens);
   let tch = tokNum(u.cached_tokens != null ? u.cached_tokens : (u.prompt_tokens_details && u.prompt_tokens_details.cached_tokens));
+  /* v0.9.160：DeepSeek 的缓存命中字段名是 prompt_cache_hit_tokens，不在上面两种口径里。
+     此前只读 OpenAI 系字段 → 走 A 槽（deepseek-chat）的任务 tkCache 恒为 0，
+     后台看着像「没命中」，实际命中率 90%+。补读这一个字段即可，前面的优先。 */
+  if (!tch) tch = tokNum(u.prompt_cache_hit_tokens);
   if (!tin && !tout) return null;
   if (tch > tin) tch = tin; // 缓存命中数不可能大于输入总数，异常值夹回去
   return { tin: tin, tout: tout, tch: tch };
