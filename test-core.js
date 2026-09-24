@@ -3526,6 +3526,41 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 该值计入续传指纹：改它必须让旧快照失效，否则批数对不上却拿旧进度续传 */
     assert.ok(/snapFp\(cfg, CHAR_BUDGET, CUE_CAP\)/.test(html), 'snapFp 未计入 CUE_CAP');
   });
+
+  t('v0.9.165 方案 A：纯符号行判水词，且不误杀任何语言的实义句', () => {
+    /* 起因：sv 任务 32 次重试全是 EMPTY。根因是 normFill 只保留 a-z0-9，汉字被整片抹掉，
+       于是「♪」和「你好」归一化后都是空字符串 —— 程序分不清装饰符号和中文台词，
+       只能一刀切当台词送去翻译，模型恒返回空。改判「有没有任何文字字符」才分得开。
+       ⚠️ 反向用法是错的：拿「normFill 后为空」当水词判据会误杀全部中日韩台词。 */
+    ['♪', '...', '?!', '♪♪♪', '♪ ♪'].forEach(s => {
+      assert.ok(C.isFillerCue(s), '纯符号应判水词: ' + s);
+    });
+    /* 反向护栏更要紧 —— 改判据最怕误杀：中日韩、西里尔、阿拉伯、带重音拉丁字母都要放行 */
+    ['你好', 'こんにちは', '안녕하세요', 'Hello there.', 'Oui.', 'Привет', 'مرحبا'].forEach(s => {
+      assert.ok(!C.isFillerCue(s), '误杀实义句: ' + s);
+    });
+    /* '-' 开头是双说话人标记，必须让给 isSpeakerText，不能被当成水词清掉 */
+    assert.ok(!C.isFillerCue('- ...'), 'dash speaker 标记不能被判水词');
+  });
+
+  t('v0.9.165 方案 C：源文本无实义时，空译文不算 EMPTY（不再空转重译）', () => {
+    /* 只在「模型已返回空译文」时生效，不会删任何已有译文 —— 最坏结果是这条留空，
+       而不是重试 32 次还是空（sv 案例实证：输出 token 照烧、结果没变）。
+       判据不依赖多语言词表：整条被 [ ] / ( ) 包裹 = 音效标注形态（[musique]、[soupir]），
+       不认识这个词也认得出它是标注而不是台词。 */
+    const cues = [
+      { no: 1, start: 0, end: 900, text: '[musique]' },
+      { no: 2, start: 900, end: 1800, text: 'Hello there.' },
+    ];
+    const v = C.validateCueAlign(cues, [{ no: 1, text: '' }, { no: 2, text: 'Bonjour.' }], {});
+    assert.ok(!v.errs.some(e => e.indexOf('EMPTY_') === 0), '法语标注的空译文不该判 EMPTY: ' + v.errs.join(';'));
+    /* 实义句返回空仍然必须判错 —— 豁免只针对源文本本来就无内容的情形 */
+    const v2 = C.validateCueAlign(cues, [{ no: 1, text: 'x' }, { no: 2, text: '' }], {});
+    assert.ok(v2.errs.some(e => e.indexOf('EMPTY_2') === 0), '实义句空译文仍须判 EMPTY');
+    /* 拿不到源文本时必须维持判错 —— 否则 EMPTY 判定会整体静默失效（默认豁免 = 等于取消该校验） */
+    const v3 = C.validateCueAlign([{ no: 1, start: 0, end: 900 }], [{ no: 1, text: '' }], {});
+    assert.ok(v3.errs.some(e => e.indexOf('EMPTY_') === 0), '无源文本时不能默认豁免');
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

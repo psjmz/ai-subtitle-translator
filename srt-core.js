@@ -963,11 +963,44 @@
       .trim();
   }
 
+  /* v0.9.165：这条文本里有没有「任何一个文字字符」——任何书写系统的字母、数字都算
+     （拉丁、汉字、假名、谚文、西里尔、阿拉伯、希伯来……）。\p{L} 覆盖字母，\p{N} 覆盖数字。
+     为什么需要它：normFill 只保留 a-z0-9，汉字会被整片抹掉，于是「你好」和「♪」归一化后
+     都是空字符串、长得一模一样，程序根本分不清哪句是台词、哪个是装饰符号。
+     ⚠️ 反向用法是错的：不能拿「normFill 后为空」当水词判据 —— 那会误杀全部中文日文台词。 */
+  const HAS_WORD_RE = /[\p{L}\p{N}]/u;
+  function hasWordChar(s) {
+    return HAS_WORD_RE.test(String(s == null ? '' : s));
+  }
+
+  /* v0.9.165：整条被 [ ] / ( ) / 【】/（）包裹 —— 各语言音效标注的通用形态
+     （法 [musique]、[soupir]、(rires)，英 [music]）。不认识这个词也能认出它是「标注」
+     而不是「台词」，所以不需要给每种语言列词表（用户明确否决扩词表）。 */
+  const WRAPPED_TAG_RE = /^[\[【(（][^\]】)）]*[\]】)）]$/;
+
+  /* v0.9.165：源文本是否「本来就没有可译内容」——EMPTY 判定的兜底豁免（方案 C）。
+     只在模型已经返回空译文时才被调用，作用是别再重译：重译多少次都还是空
+     （sv 案例实证：同一任务 32 次重试全是 EMPTY，输出 token 照烧、结果没变）。
+     ⚠️ 拿不到源文本时一律返回 false（不豁免）——保守，维持原来的判错行为；
+        否则单测里没带 text 的固定用例会被全部静默豁免。 */
+  function isSrcMeaningless(text) {
+    const t = String(text == null ? '' : text).trim();
+    if (!t) return false;
+    if (!hasWordChar(t)) return true;        // 纯符号 / 纯标点（♪、...、?!）
+    if (WRAPPED_TAG_RE.test(t)) return true; // 任意语言的方括号 / 圆括号标注
+    return isFillerCue(t);                   // 本地已知水词（中英）
+  }
+
   // 整条是否属于「纯水词 / 纯提示词」（上层据此 drop 或 merge）
   function isFillerCue(text) {
     if (!text || !text.trim()) return false;
     const t = text.trim();
     if (soundOnlyRe().test(t)) return true;
+    /* v0.9.165：一个文字字符都没有 → 纯符号 / 纯标点行（♪、...、-、?!），没有可译内容。
+       此前判不出（normFill 把汉字也抹成空，两者无法区分）→ 被当台词送去翻译 → 模型恒返回空
+       → 判 EMPTY → 反复重译（sv 案例 32 次空转）。
+       ⚠️ 以 - 开头的让给 isSpeakerText —— 那是双说话人标记，不是水词。 */
+    if (!hasWordChar(t) && !/^[-–—]/.test(t)) return true;
     const n = normFill(t);
     if (!n) return false;
     if (n.length > 12) return false;
@@ -2431,7 +2464,14 @@
       seen.add(no);
       const text = String(oc.text == null ? '' : oc.text).trim();
       if (!text) {
-        if (!fillerSet.has(no)) errs.push('EMPTY_' + no); // 纯水词 cue 允许空（fillers 数组另行清空）
+        /* v0.9.165（方案 C）：译文空，先回看源文本——如果源文本本来就没有可译内容
+           （纯符号、任意语言的方括号/圆括号音效标注、本地已知水词），那空译文是合理的，
+           不算结构错、不再重译。此前只看「编号在不在 fillers 里」，而 fillers 靠模型列、
+           本地白名单只认中英 → 法语轨的 [musique] 之类永远判不出，于是反复空转。
+           ⚠️ 源文本缺失时按原逻辑判错（拿不到就没法判断，不能默认豁免）。 */
+        const srcT = (byNo.get(no) || {}).text;
+        const srcOk = typeof srcT === 'string' && isSrcMeaningless(srcT);
+        if (!fillerSet.has(no) && !srcOk) errs.push('EMPTY_' + no); // 纯水词 cue 允许空（fillers 数组另行清空）
         continue;
       }
       texts.set(no, text);
@@ -2461,7 +2501,7 @@
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,
     INK_DESC, BOX_DESC, ASS_STACK_GAP,   // v0.9.109：导出给单测读真值（此前测试自带副本，加语言会静默漂移）
     formatTxt, detectFormat,
-    isFillerCue, stripSoundTags, monoFit, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
+    isFillerCue, hasWordChar, isSrcMeaningless, stripSoundTags, monoFit, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
