@@ -3432,6 +3432,52 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 匹配必须先看 IP，否则跨 IP 会串账 */
     assert.ok(/if \(e\.ip !== ip\) return false;/.test(srvSrc), 'evHit 未先校验 IP');
   });
+
+  /* v0.9.162：工作台字幕表下方的 risekol 引流卡。与首页横条共用 rkTx / rkGo 文案，
+     新增的只有副标题 wsRkSub；显示开关也必须同源，否则开源版会漏挂一条外链。 */
+  t('v0.9.162 工作台引流卡：DOM、链接、位置、开关同源', () => {
+    const at = html.indexOf('id="rkBannerWs"');
+    assert.ok(at > 0, '工作台引流卡 DOM 不存在');
+    const seg = html.slice(Math.max(0, at - 400), at + 900);
+    assert.ok(/class="ws-rk"/.test(seg), '卡片未用 .ws-rk 样式类');
+    assert.ok(/href="https:\/\/risekol\.com\/video"/.test(seg), '链接未指向 risekol.com/video');
+    assert.ok(/target="_blank"/.test(seg), '未新窗口打开');
+    assert.ok(/rel="noopener"/.test(seg), '缺 noopener');
+    /* 文案三处：标题复用 rkTx（含 <b>，必须走 data-i18n-html）、CTA 复用 rkGo、副标题走新词条 wsRkSub */
+    assert.ok(/data-i18n-html="rkTx"/.test(seg), '标题未复用 rkTx 词条');
+    assert.ok(/data-i18n="wsRkSub"/.test(seg), '副标题未接 wsRkSub 词条');
+    assert.ok(/data-i18n="rkGo"/.test(seg), 'CTA 未复用 rkGo 词条');
+    /* 位置：排在「导出前校验报告」之后——插进字幕表与报告之间会切断两者的关联 */
+    const rep = html.indexOf('<details class="report"');
+    assert.ok(rep > 0 && rep < at, '卡片应排在 reportBox 之后');
+    /* 开关同源：两处各自判空再设，不能再有「首页那条不存在就 return」的早退 */
+    const fn = html.slice(html.indexOf('function rkBanner()'));
+    const body = fn.slice(0, fn.indexOf('\n}'));
+    assert.ok(/if \(el\) el\.style\.display/.test(body), '首页横条未改成判空后赋值');
+    assert.ok(/const ws=\$\('rkBannerWs'\); if \(ws\) ws\.style\.display/.test(body),
+      '工作台卡片未纳入 rkBanner() 的显示开关（开源版会漏挂外链）');
+    assert.ok(!/if\(!el\) return;/.test(body),
+      'rkBanner() 里仍有早退：首页那条一缺失就会连带吞掉工作台卡片');
+  });
+
+  t('v0.9.162 新增词条 27 语言齐全', () => {
+    const keys = ['wsRkSub'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    const at = blocks.map(b => html.indexOf(b));
+    let checked = 0;
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const code = (blocks[bi].match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = at[bi];
+      const seg = html.slice(i, bi + 1 < at.length ? at[bi + 1] : html.length);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
