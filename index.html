@@ -531,7 +531,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.162</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.163</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -691,7 +691,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.162</span>
+    <span class="ver-tag">v0.9.163</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -959,7 +959,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.162"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.163"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6215,7 +6215,11 @@ function systemPromptEn(cfg){
     + 'Content genre (film/TV dialogue, documentary narration, interviews, lectures, anime, etc.) is for you to infer from the source text; keep the register and tone consistent with that genre throughout — colloquial for dialogue, formal for narration, never mixed.\n'
     + 'Rules you must follow:\n'
     + '1. [Translation style] ' + styleEn + '\n'
-    + '2. [Cue-aligned output] For every group, return a "cues" array: for EVERY cue number in that group\'s input, exactly one entry {"no":<cue number>,"text":"<' + dstNative + ' text>"} — never merge, skip, renumber, or invent cue numbers.\n'
+    /* v0.9.163：补上 repeat 禁令。2026-09-24 线上实测：结构错里 DUP（同一 cue 编号被输出多次）42 次，
+       远多于 MISSING 12 / EMPTY 7；原文案只禁了合并、跳过、改号、发明编号，唯独漏了「重复」，
+       模型在「一句拆多条」时会把同一句的两条 cue 写成同一个编号。
+       后半句的解释从句不可省——只加一个 repeat 会被理解成「别重复内容」而不是「别复用编号」。 */
+    + '2. [Cue-aligned output] For every group, return a "cues" array: for EVERY cue number in that group\'s input, exactly one entry {"no":<cue number>,"text":"<' + dstNative + ' text>"} — never merge, skip, renumber, repeat, or invent cue numbers; even when two cues belong to the same sentence, each keeps its own number and appears exactly once.\n'
     + '   [Duration-aware distribution] Each cue has "dur" (on-screen seconds): a cue can comfortably hold at most about ' + C.cpsLimitOf(cfg.dst) + ' character-widths per second of dur and at most two lines of text. On a very short cue (e.g. dur 0.4s) put only a short word and carry the rest of the sentence on the longer neighboring cues; the group must still read as one coherent sentence in order. Distribute the content across cues in the word order natural for ' + dstNative + ' (not necessarily the source order) — e.g. move a trailing adverbial clause of the source sentence to an earlier cue when the target language prefers it.\n'
     + '   [Word-boundary splits] The split between adjacent cues must fall between words: never break a single word, fixed phrase, or inflected form in the middle (e.g. splitting Japanese なり|たい apart), never detach a bound particle or affix from the word it depends on; it is far better for one cue to run slightly longer or shorter than to split a word.\n'
     + '   [Lyrics exception] If the group\'s merged text contains lyric segment numbers like [1] [2], do NOT use the cues array — translate the merged text as a whole into a single "text" field exactly as before.\n'
@@ -6296,7 +6300,9 @@ function systemPrompt(cfg){
   + '内容体裁（影视对白、纪录片解说、访谈、讲座、动漫等）由你根据原文自行判断，并全程保持该体裁的语域与语气一致——对白用口语，解说用书面语，不得混用。\n'
   + '必须遵守：\n'
   + '1.【翻译风格】' + styleDesc(cfg) + '\n'
-  + '2.【cue 对齐输出】每个句组返回一个 cues 数组：组内每个输入 cue 编号恰好对应一条 {"no":编号,"text":"<' + dstNative + '译文>"}，严禁合并、跳过、改号或发明编号。\n'
+  /* v0.9.163：同英文版，补「重复」禁令——实测结构错里 DUP 是大宗（详见 systemPromptEn 同处注释）。
+     提示词有中英两套，改文案必须两处都改，只改一处等于没改。 */
+  + '2.【cue 对齐输出】每个句组返回一个 cues 数组：组内每个输入 cue 编号恰好对应一条 {"no":编号,"text":"<' + dstNative + '译文>"}，严禁合并、跳过、改号、重复或发明编号；即使两条 cue 属于同一个句子，也各用各的编号、各出现一次。\n'
   + '   【时长感知分配】每条 cue 有 dur（屏显秒数）：每秒最多承载约 ' + C.cpsLimitOf(cfg.dst) + ' 个字符宽度、至多两行。很短的 cue（如 dur 0.4s）只放一个短词，句子其余部分放到时长充裕的相邻 cue 上；整组按顺序读必须是一句连贯完整的话。各条内容的分配顺序应遵循' + dstNative + '的自然语序（不必沿用原文语序）——例如原文句尾的状语从句，目标语习惯前置时可挪到更早的 cue 上。\n'
   + '   【词边界切分】相邻 cue 之间的切分点必须落在词与词之间：严禁把一个词、固定词组或活用形从中间劈开（如日语「なり｜たい」这类活用形被劈成两半），严禁把助词、词缀与它所依附的词拆到两条 cue 上；宁可某条 cue 的译文略长或略短，也绝不劈词。\n'
   + '   【歌词例外】若句组的 merged 含歌词分段编号（如 [1] [2]），不要用 cues 数组——照旧把 merged 整体翻译成一个 text 字段。\n'

@@ -3478,6 +3478,38 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     }
     assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
   });
+
+  t('v0.9.163 规则 2 明令禁止重复编号（中英两套都要改）', () => {
+    /* 2026-09-24 线上实测：结构错里 DUP（同一 cue 编号被输出多次）42 次，远多于 MISSING 12、EMPTY 7。
+       原规则 2 只写「严禁合并、跳过、改号或发明编号」，唯独漏了「重复」——口子就在这。 */
+    const en = html.slice(html.indexOf('function systemPromptEn('), html.indexOf('function systemPrompt('));
+    const zh = html.slice(html.indexOf('function systemPrompt('));
+    assert.ok(en.length > 0 && zh.length > 0, '提示词函数定位失败');
+    assert.ok(/never merge, skip, renumber, repeat, or invent cue numbers/.test(en),
+      '英文版规则 2 未加入 repeat 禁令');
+    assert.ok(/严禁合并、跳过、改号、重复或发明编号/.test(zh),
+      '中文版规则 2 未加入重复禁令（提示词有两套，只改一处等于没改）');
+    /* 光加一个词力度不够：必须解释「同属一句也各用各的编号」，
+       否则模型可能把 repeat 理解成「别重复内容」而不是「别复用编号」 */
+    assert.ok(/even when two cues belong to the same sentence/.test(en),
+      '英文版缺「同句各用各编号」的解释');
+    assert.ok(/即使两条 cue 属于同一个句子/.test(zh),
+      '中文版缺「同句各用各编号」的解释');
+    assert.ok(!/never merge, skip, renumber, or invent cue numbers\./.test(en) &&
+              !/严禁合并、跳过、改号或发明编号/.test(zh),
+      '旧文案仍有残留（说明只改了一处或改漏了）');
+  });
+
+  t('版本号三处必须同步（ver / ver-tag / srt-core.js）', () => {
+    /* 不硬编码具体版本号——每次发版不用改这条，只校验三处互相同等。
+       注释里的历史版本号不参与比较（那是变更记录，本来就该留着）。 */
+    const a = (html.match(/<span class="ver">v(0\.9\.\d+)<\/span>/) || [])[1];
+    const b = (html.match(/<span class="ver-tag">v(0\.9\.\d+)<\/span>/) || [])[1];
+    const c = (html.match(/srt-core\.js\?v=(0\.9\.\d+)/) || [])[1];
+    assert.ok(a && b && c, '三处版本号有缺失: ' + [a, b, c].join(' / '));
+    assert.strictEqual(a, b, 'ver 与 ver-tag 不一致: ' + a + ' vs ' + b);
+    assert.strictEqual(b, c, 'ver-tag 与 srt-core.js 版本号不一致: ' + b + ' vs ' + c);
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
