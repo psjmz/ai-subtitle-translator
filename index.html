@@ -531,7 +531,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.163</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.164</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -691,7 +691,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.163</span>
+    <span class="ver-tag">v0.9.164</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -959,7 +959,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.163"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.164"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -7552,7 +7552,20 @@ async function runTranslate(){
   // v0.9.74：改按「字符预算」切批（原按固定条数切：短剧 15字/条 批次过小浪费固定开销，
   // 纪录片 120字/条 批次过大输出失控）。句组仍是原子单位，切批只发生在句子边界。
   const CHAR_BUDGET = Math.max(1000, Math.min(6000, +$('batch').value || 3000));
-  const CUE_CAP = 60;   // 编号数量硬上限：字符少也不能无限装，模型维持过多 cue 编号易结构错
+  /* v0.9.164：编号上限按目标语言分化。此前所有语言一律 60，而 2026-09-24 的运营数据显示
+     「每批条数高」与「重试高」两条同时成立的只有 ja / nl / sv：
+     日语每批 54.6 条 / 每批重试 0.497，荷兰 55.8 / 0.282（重复编号 199 次每千批，全站最高），
+     瑞典 58.0 / 0.300。反例同样重要，说明为什么不能一刀切全局降：
+       法语每批 55.9 条但重试仅 0.036 —— 不出错，降了纯浪费；
+       意大利语重试率最高（0.888）但每批只有 41 条 —— 病因不是密度，降了无效；
+       中文 43.7 / 0.053 —— 排在总量六成，动了就是白付成本。
+     目标值 45 的依据：gpt-6-luna 上每批 <50 条重试为 0.000、50 条以上升到 0.26~0.28，
+     是目前唯一可复现的拐点（deepseek 上的分档不单调，被语言构成混淆，不能拿来定阈值），取 45 留余量。
+     ⚠️ 该值已计入 snapFp，改它会让旧断点续传快照失效——批数本来就不一样，失效是正确行为。 */
+  const CUE_CAP_BY_LANG = { ja:45, nl:45, sv:45 };
+  /* 用 `+x || 60` 而不是直接取键：cfg.dst 是外部字符串，命中原型链上的键（如 '__proto__'）
+     会返回 truthy 的对象，让后面的数值比较全变 NaN 而静默不切批。复数运算把这种情况兜回 60。 */
+  const CUE_CAP = +CUE_CAP_BY_LANG[cfg.dst] || 60;
   const effBase = cfg.mode==='builtin' ? BUILTIN_API : cfg.base;
   const effKey  = cfg.mode==='builtin' ? '' : cfg.key;
   const effModel= cfg.mode==='builtin' ? '' : cfg.model;

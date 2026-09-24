@@ -3510,6 +3510,22 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.strictEqual(a, b, 'ver 与 ver-tag 不一致: ' + a + ' vs ' + b);
     assert.strictEqual(b, c, 'ver-tag 与 srt-core.js 版本号不一致: ' + b + ' vs ' + c);
   });
+
+  t('v0.9.164 每批 cue 上限按目标语言分化（只降 ja/nl/sv）', () => {
+    /* 2026-09-24 清洗后取数（剔除僵尸任务）：「每批条数高」且「重试高」两条同时成立的只有这三个语言。
+       反例必须一起锁住，否则后人很容易改成一刀切全局降：
+         fr 每批 55.9 条但重试仅 0.036（不出错）、it 重试最高 0.888 但每批只有 41 条（病因不是密度）、
+         zh-CN 43.7 / 0.053 占总量六成 —— 这三个都不该动。 */
+    assert.ok(/const CUE_CAP_BY_LANG = \{ ja:45, nl:45, sv:45 \};/.test(html),
+      'CUE_CAP_BY_LANG 缺失或取值不是 ja/nl/sv = 45');
+    /* 取值必须防原型链：cfg.dst 是外部字符串，直接取键命中 '__proto__' 会返回 truthy 的对象，
+       后面的数值比较全变 NaN，切批会静默失效（同 CUE_ERR_FIELD 那条教训） */
+    assert.ok(/const CUE_CAP = \+CUE_CAP_BY_LANG\[cfg\.dst\] \|\| 60;/.test(html),
+      'CUE_CAP 未按「+x || 60」取值（原型链防护掉了会静默不切批）');
+    assert.ok(/curCues\+gc>CUE_CAP/.test(html), '分批判定不再使用 CUE_CAP');
+    /* 该值计入续传指纹：改它必须让旧快照失效，否则批数对不上却拿旧进度续传 */
+    assert.ok(/snapFp\(cfg, CHAR_BUDGET, CUE_CAP\)/.test(html), 'snapFp 未计入 CUE_CAP');
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
