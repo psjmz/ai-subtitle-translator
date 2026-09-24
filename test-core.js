@@ -3390,8 +3390,9 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
     /* 此前按「IP+文件名+语言+30 分钟」合并 → 同一文件连翻两次被并进同一条，后台看不出第二次；
        不合并则一次任务（十几批）会刷出十几条。故改为按前端每次点翻译生成的任务号合并。 */
-    assert.ok(/const task = String\(meta\.taskId/.test(srvSrc), '服务端未读取任务号');
-    assert.ok(/const hit = task \? \(e\.taskId === task\)/.test(srvSrc),
+    /* v0.9.161 把三处的清洗与命中判定收进了 evFields / evHit，判据随之更新（语义不变） */
+    assert.ok(/task: String\(m\.taskId \|\| ''\)/.test(srvSrc), '服务端未读取任务号');
+    assert.ok(/f\.task \? \(e\.taskId === f\.task\)/.test(srvSrc),
       '去重未以任务号为准（会退回成按文件名合并，第二次翻译又看不见了）');
     assert.ok(/if \(task\) ev\.taskId = task;/.test(srvSrc), '新建记录未存任务号（后续批次归不进来）');
     assert.ok(/S\.taskId = 't'/.test(html), '前端未生成任务号');
@@ -3412,6 +3413,24 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '补读逻辑不在原口径之后（会覆盖 OpenAI 系结果）');
     /* 异常值夹取不能破 */
     assert.ok(/if \(tch > tin\) tch = tin;/.test(srvSrc), '命中数大于输入数时的夹取被删掉了');
+  });
+
+  t('v0.9.161 事件匹配口径必须收归一处（三处记账共用，不可各写各的）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 三处：appendEvent（批次计数）/ markEvent（完成时间）/ recordTokens（token）。
+       前两处在 v0.9.159 已按任务号匹配，recordTokens 漏了 → 同一文件连翻两次时
+       两条记录的 token 全记到后一条，前一条 tkIn 显示 0。根因是口径分散，故抽成共用函数。 */
+    assert.ok(/function evFields\(meta\)/.test(srvSrc), '缺少统一的字段清洗 evFields');
+    assert.ok(/function evHit\(e, ip, f\)/.test(srvSrc), '缺少统一的命中判定 evHit');
+    const hits = srvSrc.match(/evHit\(/g) || [];
+    assert.strictEqual(hits.length, 4, 'evHit 应为 1 处定义 + 3 处调用，实际 ' + hits.length);
+    /* 旧的分散写法必须消失，否则又回到各写各的 */
+    assert.ok(!/e\.file === file && e\.lang === lang/.test(srvSrc),
+      '还有地方在各自判断「文件名+语言」（口径又分散了，迟早再漏改一处）');
+    assert.ok(!/e\.ip !== ip \|\| e\.file !== file/.test(srvSrc),
+      'recordTokens 仍在用旧的 IP+文件名+语言 匹配');
+    /* 匹配必须先看 IP，否则跨 IP 会串账 */
+    assert.ok(/if \(e\.ip !== ip\) return false;/.test(srvSrc), 'evHit 未先校验 IP');
   });
  }
 
