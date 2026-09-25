@@ -3682,11 +3682,17 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        不回填的话，用户点了保存，换一部片照样被清空，这个功能等于没有。 */
     assert.ok(/try\{ const p=glossLibRestore\(\); /.test(html), '换片分支没有调用回填');
     const setSrc = html.slice(html.indexOf('function setSrc(text, fileName){'));
-    const seg = setSrc.slice(0, setSrc.indexOf('S.srcFp=fp;'));
-    assert.ok(/glossLibRestore\(\)/.test(seg), '回填不在换片清表之后——顺序错了会被清表覆盖');
-    /* 只在新片分支里回填：重新载入同一部片（指纹相同）不能覆盖用户刚改好的表 */
+    /* 顺序：清表必须在回填之前，否则刚填进去的表立刻被清掉 */
+    const iClear = setSrc.indexOf("ta.value='';");
+    const iRestore = setSrc.indexOf('glossLibRestore()');
+    assert.ok(iClear > 0 && iRestore > iClear, '回填在清表之前——会被清表覆盖');
+    /* v0.9.171：回填从 isNewFilm 分支内挪到了 S.srcFp 赋值之后。
+       分支内只在「确认换了片」时触发，而换片要求上一部片的指纹存在，
+       首次传片 / 清过浏览数据 / 换机器时它永远为假 → 保存的术语一直载不进来。 */
+    const after = setSrc.slice(setSrc.indexOf('S.srcFp=fp;'));
+    assert.ok(/glossLibRestore\(\)/.test(after), 'S.srcFp 赋值之后没有回填');
     const clearIf = setSrc.slice(setSrc.indexOf('if(isNewFilm){'), setSrc.indexOf('S.srcFp=fp;'));
-    assert.ok(/glossLibRestore\(\)/.test(clearIf), '回填不在 isNewFilm 分支内');
+    assert.ok(!/glossLibRestore\(\)/.test(clearIf), '回填又缩回 isNewFilm 分支内——首次传片会漏');
 
     /* 清空 = 文本框 + 库一起删。只清文本框的话，下一部片又被自动填回来，
        用户看到「我明明清空了怎么又回来了」，比不清更困惑。 */
@@ -3701,7 +3707,8 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   });
 
   t('v0.9.168 术语库：语言对不上要拦，且不能自动丢弃', () => {
-    const rs = html.slice(html.indexOf('async function glossLibRestore(){'));
+    const rs = html.slice(html.indexOf('async function glossLibRestore(opt){'));
+    assert.ok(rs.length > 400, 'glossLibRestore 找不到——签名可能又改了，单测要跟着改');
     const rsBody = rs.slice(0, rs.indexOf('\n}'));
     /* v0.9.170：语言检查抽成了 glossLangGuard，换片与开翻共用。rsBody 里现在只有一句调用 */
     assert.ok(/await glossLangGuard\(curLang, false\)/.test(rsBody), '换片回填没有走统一的语言守卫');
@@ -3768,6 +3775,31 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     }
     /* 占位符必须与代码里的 t('glossLangRunBody', a, b) 对齐 */
     assert.ok(/glossLangRunBody:'[^']*\{0\}[^']*\{1\}/.test(html), '缺 {0}/{1} 占位符');
+  });
+
+  t('v0.9.171 术语库回填：判据改成「框为空」，不只看换片', () => {
+    const rs = html.slice(html.indexOf('async function glossLibRestore(opt){'));
+    const rsBody = rs.slice(0, rs.indexOf('\n}'));
+    assert.ok(rs.length > 400, 'glossLibRestore 找不到——签名可能又改了');
+    /* 框里已有内容绝不覆盖：那是当前这部片在用的表，覆盖它比不回填更糟。
+       这一条同时保住了「重新载入同一部片不覆盖刚改好的表」这个旧行为。 */
+    assert.ok(/if\(String\(ta\.value\|\|''\)\.trim\(\)\) return;/.test(rsBody), '回填没有「框非空就跳过」的保护');
+    /* 传片那条路仍然要弹窗确认（语言对不上时） */
+    assert.ok(/await glossLangGuard\(curLang, false\)/.test(rsBody), '非 silent 路径没走语言守卫');
+    /* 页面刚打开时静默：语言对不上只写日志说清原因，绝不开屏弹窗 */
+    assert.ok(/if\(o\.silent\)\{/.test(rsBody), '缺少 silent 分支');
+    assert.ok(/t\('glossLibSkip', LBY\(lib\.lang\)\.zh, LBY\(curLang\)\.zh\)/.test(rsBody), 'silent 下语言不匹配没说明原因');
+    /* 页面初始化必须补一次，否则重新打开网页时框里是什么全看上次剩下什么 */
+    assert.ok(/glossLibRestore\(\{silent:true\}\)/.test(html), '页面初始化没有静默回填');
+  });
+
+  t('v0.9.171 新增词条 27 语言齐全', () => {
+    for (const k of ['glossLibSkip']) {
+      const n = (html.match(new RegExp('\\b' + k + "\\s*:\\s*'[^']*'", 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 应 27 条，实际 ' + n);
+    }
+    /* 占位符必须与代码里的 t('glossLibSkip', a, b) 对齐 */
+    assert.ok(/glossLibSkip:'[^']*\{0\}[^']*\{1\}/.test(html), '缺 {0}/{1} 占位符');
   });
  }
 
