@@ -3511,13 +3511,25 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.strictEqual(b, c, 'ver-tag 与 srt-core.js 版本号不一致: ' + b + ' vs ' + c);
   });
 
-  t('v0.9.164 每批 cue 上限按目标语言分化（只降 ja/nl/sv）', () => {
-    /* 2026-09-24 清洗后取数（剔除僵尸任务）：「每批条数高」且「重试高」两条同时成立的只有这三个语言。
+  t('v0.9.166 每批 cue 上限按目标语言分化（ja/nl/sv/zh-CN/zh-TW = 45，fr/it 明确不降）', () => {
+    /* 2026-09-24 清洗后取数（剔除僵尸任务）：「每批条数高」且「重试高」两条同时成立的是 ja / nl / sv。
+       v0.9.166 补进中文：9/25 实测 zh-CN 每批 55.8 条，扛下当天 19 次 EMPTY 里的 18 次（每千行 1.07）；
+       分桶证据是每批 <45（13272 行）与 45~52（2802 行）EMPTY 均为 0，只有 52~60 桶（35280 行）
+       吃下全部 54 次 —— 降到 45 就是让它落进零区间。zh-TW 同源同理一并纳入。
        反例必须一起锁住，否则后人很容易改成一刀切全局降：
-         fr 每批 55.9 条但重试仅 0.036（不出错）、it 重试最高 0.888 但每批只有 41 条（病因不是密度）、
-         zh-CN 43.7 / 0.053 占总量六成 —— 这三个都不该动。 */
-    assert.ok(/const CUE_CAP_BY_LANG = \{ ja:45, nl:45, sv:45 \};/.test(html),
-      'CUE_CAP_BY_LANG 缺失或取值不是 ja/nl/sv = 45');
+         fr 每批 55.9 条但重试仅 0.036（不出错）、it 重试最高 0.888 但每批只有 41 条（病因不是密度）。
+       ⚠️ 这里解析真实的表再逐项比对，而不是拿正则卡整行字符串——重排顺序或换写法时正则会假红，
+       而拼错 key（zhCN / zh_cn）才是真正要防的事，只有取值能抓到。 */
+    const capM = /const CUE_CAP_BY_LANG = (\{[^}]*\});/.exec(html);
+    assert.ok(capM, '找不到 CUE_CAP_BY_LANG 定义');
+    /* 源码里是无引号 key（ja:45）与引号 key（'zh-CN':45）混写，统一补成双引号再交给 JSON.parse */
+    const capTbl = JSON.parse(
+      capM[1].replace(/'/g, '"').replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_-]*)\s*:/g, '$1"$2":'));
+    ['ja', 'nl', 'sv', 'zh-CN', 'zh-TW'].forEach(function (k) {
+      assert.strictEqual(capTbl[k], 45, 'CUE_CAP_BY_LANG.' + k + ' 应为 45，实际 ' + capTbl[k]);
+    });
+    assert.strictEqual(capTbl.fr, undefined, 'fr 不该降：每批虽高但重试仅 0.036');
+    assert.strictEqual(capTbl.it, undefined, 'it 不该降：重试虽高但每批只有 41 条，病因不是密度');
     /* 取值必须防原型链：cfg.dst 是外部字符串，直接取键命中 '__proto__' 会返回 truthy 的对象，
        后面的数值比较全变 NaN，切批会静默失效（同 CUE_ERR_FIELD 那条教训） */
     assert.ok(/const CUE_CAP = \+CUE_CAP_BY_LANG\[cfg\.dst\] \|\| 60;/.test(html),
