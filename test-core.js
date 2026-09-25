@@ -3831,7 +3831,8 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const p = pathD.join(__dirname, 'donate-qr.jpg');
     assert.ok(fsD.existsSync(p), 'donate-qr.jpg 不在站点根目录');
     const sz = fsD.statSync(p).size;
-    assert.ok(sz > 5000 && sz < 100 * 1024, 'donate-qr.jpg 体积异常: ' + sz);
+    /* 上限 200KB：v0.9.175 换高清裁剪版（1200×1440 q87 ≈ 118KB），清晰度优先 */
+    assert.ok(sz > 5000 && sz < 200 * 1024, 'donate-qr.jpg 体积异常: ' + sz);
   });
 }
 
