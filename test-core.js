@@ -3642,6 +3642,91 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/const choice=await askResume\(snap\.bi, totalB\);/.test(html), '原断点续传入口不见了');
     assert.ok(/t\('resumeLog', snap\.bi, snap\.bi\+1\)/.test(html), '原续传日志不见了');
   });
+
+  t('v0.9.168 新增词条 27 语言齐全', () => {
+    const keys = ['btnGlossSave', 'btnGlossClear', 'glossLibHint', 'glossSaveEmpty', 'glossSaveTooBig',
+      'glossSaved', 'glossClearTitle', 'glossClearBody', 'glossClearGo', 'glossCleared', 'glossClearNone',
+      'glossLibTitle', 'glossLibBody', 'glossLibGo', 'glossLibLoaded'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    const at = blocks.map(b => html.indexOf(b));
+    let checked = 0;
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const code = (blocks[bi].match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = at[bi];
+      const seg = html.slice(i, bi + 1 < at.length ? at[bi + 1] : html.length);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      /* 占位符缺一个，界面上就会把 {1} 这种裸标记直接显示给用户 */
+      const need = { glossLibHint: 2, glossSaveTooBig: 2, glossSaved: 2, glossClearBody: 2, glossLibBody: 2, glossLibLoaded: 1 };
+      for (const k of Object.keys(need)) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        for (let n = 0; n < need[k]; n++) {
+          assert.ok(m && m[1].indexOf('{' + n + '}') >= 0, code + ' 的 ' + k + ' 缺占位符 {' + n + '}');
+        }
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+    /* 两个按钮必须真的挂在页面上，否则只有词条没有功能 */
+    assert.ok(/id="btnGlossSave"/.test(html), '缺保存按钮');
+    assert.ok(/id="btnGlossClear"/.test(html), '缺清空按钮');
+    assert.ok(/\$\('btnGlossSave'\)\.addEventListener\('click'/.test(html), '保存按钮没绑事件');
+    assert.ok(/\$\('btnGlossClear'\)\.addEventListener\('click'/.test(html), '清空按钮没绑事件');
+  });
+
+  t('v0.9.168 术语库：换片必回填、清空必连库一起删', () => {
+    /* 换片清表（v0.9.144）与「保存的术语要留到下一部片」是直接冲突的：
+       不回填的话，用户点了保存，换一部片照样被清空，这个功能等于没有。 */
+    assert.ok(/try\{ const p=glossLibRestore\(\); /.test(html), '换片分支没有调用回填');
+    const setSrc = html.slice(html.indexOf('function setSrc(text, fileName){'));
+    const seg = setSrc.slice(0, setSrc.indexOf('S.srcFp=fp;'));
+    assert.ok(/glossLibRestore\(\)/.test(seg), '回填不在换片清表之后——顺序错了会被清表覆盖');
+    /* 只在新片分支里回填：重新载入同一部片（指纹相同）不能覆盖用户刚改好的表 */
+    const clearIf = setSrc.slice(setSrc.indexOf('if(isNewFilm){'), setSrc.indexOf('S.srcFp=fp;'));
+    assert.ok(/glossLibRestore\(\)/.test(clearIf), '回填不在 isNewFilm 分支内');
+
+    /* 清空 = 文本框 + 库一起删。只清文本框的话，下一部片又被自动填回来，
+       用户看到「我明明清空了怎么又回来了」，比不清更困惑。 */
+    const clr = html.slice(html.indexOf('async function glossLibClearNow(){'));
+    const clrBody = clr.slice(0, clr.indexOf('\n}'));
+    assert.ok(/glossLibDrop\(\);/.test(clrBody), '清空没有删术语库');
+    assert.ok(/\$\('terms'\)\.value='';/.test(clrBody), '清空没有清文本框');
+    /* 删的是用户特意保存的东西 → 必须确认，点错了要能退出来 */
+    assert.ok(/await askGlossClear\(/.test(clrBody), '清空没有确认弹窗');
+    assert.ok(/if\(choice!=='yes'\) return;/.test(clrBody), '确认弹窗的取消没有生效');
+    assert.ok(/save\(\);/.test(clrBody), '清空后没有落盘——刷新一次旧表又回来了');
+  });
+
+  t('v0.9.168 术语库：语言对不上要拦，且不能自动丢弃', () => {
+    const rs = html.slice(html.indexOf('async function glossLibRestore(){'));
+    const rsBody = rs.slice(0, rs.indexOf('\n}'));
+    /* 语言不同必须问一句：表里写的是「译成什么」，给中文存的表拿去翻日语，译法本身就是错的 */
+    assert.ok(/lib\.lang!==curLang/.test(rsBody), '没有比对语言');
+    assert.ok(/await askGlossLang\(/.test(rsBody), '语言不匹配没有弹窗');
+    /* 但只提示、不自动丢弃：SpaceX 这类「保留原文」的条目跨语言照样通用，硬拦会逼用户每次重存 */
+    assert.ok(/if\(choice!=='go'\) return;/.test(rsBody), '用户选择载入的路径不通');
+
+    const ask = html.slice(html.indexOf('function askGlossLang('));
+    const askBody = ask.slice(0, ask.indexOf('\n}'));
+    /* 两个弹窗都得有取消出口，且点遮罩 = 取消（点遮罩等于「执行」会误伤只想关窗的人） */
+    assert.ok(/mk\(t\('glossLibGo'\),true,'go'\)/.test(askBody), '缺「仍要载入」按钮');
+    assert.ok(/ev\.target===ov\)\{ ov\.remove\(\); resolve\('cancel'\)/.test(askBody), '点遮罩不是取消');
+
+    const ac = html.slice(html.indexOf('function askGlossClear('));
+    const acBody = ac.slice(0, ac.indexOf('\n}'));
+    assert.ok(/ev\.target===ov\)\{ ov\.remove\(\); resolve\('no'\)/.test(acBody), '清空弹窗点遮罩不是取消');
+
+    /* 保存时记语言：没有它，下次根本无从判断这份库是给哪个语言存的 */
+    const wr = html.slice(html.indexOf('function glossLibWrite('));
+    const wrBody = wr.slice(0, wr.indexOf('\n}'));
+    assert.ok(/lang:String\(\(\$\('dstLang'\)\|\|\{\}\)\.value\|\|''\)/.test(wrBody), '保存时没记目标语言');
+    /* 与 srtTool.terms 同口径：超 2 万字不落盘（这台机器的 localStorage 历史上被存满过） */
+    assert.ok(/GLOSS_LIB_MAX=20000/.test(html), '术语库没有体积上限');
+    assert.ok(/v\.length>GLOSS_LIB_MAX/.test(html), '超出上限仍在写入');
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
