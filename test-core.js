@@ -3803,5 +3803,37 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   });
  }
 
+/* v0.9.173：赞助入口 —— 仅简中显示、收起态零请求。三条防线：
+   ① JS 按语言裁剪（非 zh-CN 连 DOM 都不留）② 图片懒加载 ③ 二维码图实体随包发布 */
+{
+  const fsD = require('fs'), pathD = require('path');
+  const html = fsD.readFileSync(pathD.join(__dirname, 'index.html'), 'utf8');
+
+  t('v0.9.173 赞助入口：默认隐藏 + 仅 zh-CN 渲染', () => {
+    assert.ok(/<div id="donateBox" hidden>/.test(html), 'donateBox 必须默认 hidden');
+    /* ⚠️ 用 lastIndexOf：样式区还有一条同名 CSS 注释，indexOf 会切错位置 */
+    const init = html.slice(html.lastIndexOf('/* v0.9.173：赞助入口'));
+    assert.ok(init.length > 100 && init.length < 2000, '赞助初始化代码找不到');
+    assert.ok(/if\(UI\.lang!=='zh-CN'\)\{/.test(init), '缺少语言裁剪判断');
+    assert.ok(/removeChild\(box\)/.test(init), '非简中必须把节点整个移除');
+    assert.ok(/box\.hidden=false;/.test(init), '简中没解除 hidden');
+  });
+
+  t('v0.9.173 赞助二维码懒加载：首次展开才赋 src', () => {
+    const init = html.slice(html.indexOf('/* v0.9.173：赞助入口'));
+    assert.ok(!/<img id="donateImg" alt="支付宝收款码" src=/i.test(html), 'img 不许带静态 src（收起态会偷跑请求）');
+    assert.ok(/donate-qr\.jpg\?v=/.test(init), '展开时没赋图片 src');
+    assert.ok(/var opening=qr\.hidden;/.test(init), '展开/收起切换逻辑找不到');
+    assert.strictEqual((html.match(/工具很棒，赞助1元/g) || []).length, 2, '文案应恰好出现 2 次（按钮默认 + 收起态）');
+  });
+
+  t('v0.9.173 二维码图片实体存在且体积可控', () => {
+    const p = pathD.join(__dirname, 'donate-qr.jpg');
+    assert.ok(fsD.existsSync(p), 'donate-qr.jpg 不在站点根目录');
+    const sz = fsD.statSync(p).size;
+    assert.ok(sz > 5000 && sz < 100 * 1024, 'donate-qr.jpg 体积异常: ' + sz);
+  });
+}
+
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);
