@@ -3703,16 +3703,33 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   t('v0.9.168 术语库：语言对不上要拦，且不能自动丢弃', () => {
     const rs = html.slice(html.indexOf('async function glossLibRestore(){'));
     const rsBody = rs.slice(0, rs.indexOf('\n}'));
-    /* 语言不同必须问一句：表里写的是「译成什么」，给中文存的表拿去翻日语，译法本身就是错的 */
-    assert.ok(/lib\.lang!==curLang/.test(rsBody), '没有比对语言');
-    assert.ok(/await askGlossLang\(/.test(rsBody), '语言不匹配没有弹窗');
+    /* v0.9.170：语言检查抽成了 glossLangGuard，换片与开翻共用。rsBody 里现在只有一句调用 */
+    assert.ok(/await glossLangGuard\(curLang, false\)/.test(rsBody), '换片回填没有走统一的语言守卫');
     /* 但只提示、不自动丢弃：SpaceX 这类「保留原文」的条目跨语言照样通用，硬拦会逼用户每次重存 */
-    assert.ok(/if\(choice!=='go'\) return;/.test(rsBody), '用户选择载入的路径不通');
+    assert.ok(/if\(!\(await glossLangGuard\(curLang, false\)\)\) return;/.test(rsBody), '用户取消后仍然载入了');
+
+    const gd = html.slice(html.indexOf('async function glossLangGuard('));
+    const gdBody = gd.slice(0, gd.indexOf('\n}'));
+    /* 语言不同必须问一句：表里写的是「译成什么」，给中文存的表拿去翻日语，译法本身就是错的 */
+    assert.ok(/lib\.lang===curLang\) return true;/.test(gdBody), '没有比对语言');
+    assert.ok(/await askGlossLang\(/.test(gdBody), '语言不匹配没有弹窗');
+    assert.ok(/if\(choice!=='go'\) return false;/.test(gdBody), '取消没有返回 false（调用方会照样继续）');
+    assert.ok(/return true;\s*$/.test(gdBody), '守卫不返回继续');
+    /* 同一组合只问一次：换片选了「仍要载入」、点开始翻译又被拦一次，等于同一个问题问两回。
+       ⚠️ 但只记「继续」，不记「取消」——取消说明用户还没决定，下次必须再问，
+          否则第二次点开始翻译就静默放行，「取消」变成了「第二次默认同意」。 */
+    assert.ok(/if\(GLOSS_LANG_ASKED===key\) return true;/.test(gdBody), '缺少「同一语言组合只问一次」');
+    const iAsk = gdBody.indexOf('askGlossLang(');
+    const iMark = gdBody.indexOf('GLOSS_LANG_ASKED=key;');
+    assert.ok(iMark > iAsk, '「已问过」记在弹窗之前，取消也会被当成已确认');
+    /* runMode 才要求表非空；换片回填时表刚被清空，照样得问 */
+    assert.ok(/if\(runMode\)\{/.test(gdBody) && /\.trim\(\)\) return true;/.test(gdBody), 'runMode 的空表判断缺失');
 
     const ask = html.slice(html.indexOf('function askGlossLang('));
     const askBody = ask.slice(0, ask.indexOf('\n}'));
     /* 两个弹窗都得有取消出口，且点遮罩 = 取消（点遮罩等于「执行」会误伤只想关窗的人） */
-    assert.ok(/mk\(t\('glossLibGo'\),true,'go'\)/.test(askBody), '缺「仍要载入」按钮');
+    assert.ok(/mk\(runMode \? t\('glossLangRunGo'\) : t\('glossLibGo'\),true,'go'\)/.test(askBody), '缺「仍要载入 / 继续进行」按钮');
+    assert.ok(/runMode \? t\('glossLangRunBody', savedLang, curLang\) : t\('glossLibBody', savedLang, curLang\)/.test(askBody), '开翻场景没有自己的文案');
     assert.ok(/ev\.target===ov\)\{ ov\.remove\(\); resolve\('cancel'\)/.test(askBody), '点遮罩不是取消');
 
     const ac = html.slice(html.indexOf('function askGlossClear('));
@@ -3726,6 +3743,31 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 与 srtTool.terms 同口径：超 2 万字不落盘（这台机器的 localStorage 历史上被存满过） */
     assert.ok(/GLOSS_LIB_MAX=20000/.test(html), '术语库没有体积上限');
     assert.ok(/v\.length>GLOSS_LIB_MAX/.test(html), '超出上限仍在写入');
+  });
+
+  t('v0.9.170 术语库语言检查：开翻前必查一次（改语言但不换片也能拦到）', () => {
+    /* 光靠「换片时检查」覆盖不到「同一部片改目标语言」——那条路压根不进 isNewFilm 分支，
+       而术语表真正被用上的时刻是开翻这一刻，守在这里才拦得住。 */
+    const rt = html.slice(html.indexOf('async function runTranslate(){'));
+    const rtHead = rt.slice(0, rt.indexOf('const snap='));
+    assert.ok(/await glossLangGuard\(cfg\.dst, true\)/.test(rtHead), '开翻前没有查术语库语言');
+    assert.ok(/if\(!\(await glossLangGuard\(cfg\.dst, true\)\)\) return;/.test(rtHead), '取消后仍然继续翻译了');
+    /* 守卫必须排在发请求之前，否则「取消」取消不掉已经花出去的钱 */
+    const iGuard = rtHead.indexOf('glossLangGuard(');
+    const iCfg = rtHead.indexOf('const cfg = getCfg();');
+    assert.ok(iCfg >= 0 && iGuard > iCfg, '守卫排在取配置之前，拿不到 cfg.dst');
+    assert.ok(!/pgStart\(/.test(rtHead.slice(0, iGuard)), '守卫排在进度条启动之后，取消等于没取消');
+  });
+
+  t('v0.9.170 新增词条 27 语言齐全', () => {
+    const dicts = [...html.matchAll(/^\s*['"]([A-Za-z\-]{2,10})['"]\s*:\s*\{\s*pureMTMode\s*:/gm)].map(m => m[1]);
+    assert.strictEqual(dicts.length, 27, '界面字典应 27 个，实际 ' + dicts.length);
+    for (const k of ['glossLangRunBody', 'glossLangRunGo']) {
+      const n = (html.match(new RegExp('\\b' + k + "\\s*:\\s*'[^']*'", 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 应 27 条，实际 ' + n);
+    }
+    /* 占位符必须与代码里的 t('glossLangRunBody', a, b) 对齐 */
+    assert.ok(/glossLangRunBody:'[^']*\{0\}[^']*\{1\}/.test(html), '缺 {0}/{1} 占位符');
   });
  }
 
