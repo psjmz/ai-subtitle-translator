@@ -531,7 +531,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.166</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.167</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -691,7 +691,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.166</span>
+    <span class="ver-tag">v0.9.167</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -959,7 +959,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.166"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.167"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1160,6 +1160,7 @@ const I18N = {
   pgRun:'翻译中', pgEta:'预计剩余 {0}', pgDone:'✓ 完成 · 用时 {0}',
   resumeTitle:'发现未完成的翻译', resumeBody:'这份文件上次翻译到第 {0}/{1} 批就中断了。可以接着上次的进度继续（已完成的 {0} 批不会重跑），也可以从头重新翻译。',
   resumeGo:'继续上次', resumeNew:'从头重来', resumeLog:'已从断点继续：跳过前 {0} 批，从第 {1} 批开始。', resumeHint:'（翻译进度已存在本机，中途关掉页面也能接着翻）',
+  reuseTitle:'上次的结果还在', reuseBody:'{0}（{1} 行 · {2}）翻译完成于 {3}，还没有导出。可以直接载入，不用再翻译一次。', reuseGo:'用上次的结果', reuseLog:'已载入上次的翻译结果（未调用模型）。', reuseCancel:'取消', reuseNote:'注：这份结果保存在你自己的这台设备上，不会上传到服务器。',
   resumeQuota:'断点保存失败（本机存储已满），本次不再保存进度，翻译继续。',
   chkAutoTerms:'自动术语表：翻译前自动提取专名与歧义词，统一全片译法',
   autoTermsRun:'正在提取术语表（专名/歧义词）…', autoTermsDone:'自动术语表就绪：{0} 个术语已统一译法', autoTermsSkip:'术语提取失败，跳过后继续翻译：{0}', batchRescue:'第 {0} 批多次失败，已拆单组补救：成功 {1}/{2} 组',
@@ -1255,6 +1256,7 @@ const I18N = {
   pgRun:'翻譯中', pgEta:'預計剩餘 {0}', pgDone:'✓ 完成 · 用時 {0}',
   resumeTitle:'發現未完成的翻譯', resumeBody:'這份檔案上次翻譯到第 {0}/{1} 批就中斷了。可以接續上次的進度（已完成的 {0} 批不會重跑），也可以從頭重新翻譯。',
   resumeGo:'繼續上次', resumeNew:'從頭重來', resumeLog:'已從斷點繼續：跳過前 {0} 批，從第 {1} 批開始。', resumeHint:'（翻譯進度已存在本機，中途關掉頁面也能接著翻）',
+  reuseTitle:'上次的結果還在', reuseBody:'{0}（{1} 行 · {2}）翻譯完成於 {3}，還沒有匯出。可以直接載入，不用再翻譯一次。', reuseGo:'用上次的結果', reuseLog:'已載入上次的翻譯結果（未呼叫模型）。', reuseCancel:'取消', reuseNote:'註：這份結果保存在你自己的這台設備上，不會上傳到伺服器。',
   resumeQuota:'斷點儲存失敗（本機儲存空間已滿），本次不再儲存進度，翻譯繼續。',
   chkAutoTerms:'自動術語表：翻譯前自動提取專名與歧義詞，統一全片譯法',
   autoTermsRun:'正在提取術語表（專名/歧義詞）…', autoTermsDone:'自動術語表就緒：{0} 個術語已統一譯法', autoTermsSkip:'術語提取失敗，跳過後繼續翻譯：{0}', batchRescue:'第 {0} 批多次失敗，已拆單組補救：成功 {1}/{2} 組',
@@ -1350,6 +1352,7 @@ const I18N = {
   pgRun:'Translating', pgEta:'ETA {0}', pgDone:'✓ Done · {0}',
   resumeTitle:'Unfinished translation found', resumeBody:'This file stopped at batch {0}/{1} last time. You can continue where it left off (the {0} finished batches will not be re-run), or start over from the beginning.',
   resumeGo:'Continue', resumeNew:'Start over', resumeLog:'Resumed: skipped {0} batches, starting from batch {1}.', resumeHint:'(Progress is saved on this device, so you can close the page and carry on later.)',
+  reuseTitle:'Previous result still available', reuseBody:'{0} ({1} lines · {2}) finished translating at {3} and has not been exported yet. You can load it directly without translating again.', reuseGo:'Use previous result', reuseLog:'Loaded the previous result (no model request was made).', reuseCancel:'Cancel', reuseNote:'Note: this result is stored in the browser on your own device. It is never uploaded to the server.',
   resumeQuota:'Could not save progress (local storage is full). Translation continues without saving.',
   chkAutoTerms:'Auto glossary: extract proper nouns & ambiguous terms before translating for file-wide consistency',
   autoTermsRun:'Extracting glossary (proper nouns / ambiguous terms)…', autoTermsDone:'Auto glossary ready: {0} terms unified', autoTermsSkip:'Glossary extraction failed, continuing without it: {0}', batchRescue:'Batch {0} failed repeatedly; rescued {1}/{2} groups individually',
@@ -1445,6 +1448,7 @@ const I18N = {
   pgRun:'翻訳中', pgEta:'残り約 {0}', pgDone:'✓ 完了 · 所要 {0}',
   resumeTitle:'未完了の翻訳があります', resumeBody:'このファイルは前回 {0}/{1} バッチ目で中断しました。続きから再開できます（完了済みの {0} バッチは再実行しません）。最初からやり直すこともできます。',
   resumeGo:'続きから再開', resumeNew:'最初からやり直す', resumeLog:'再開しました：前 {0} バッチをスキップし、第 {1} バッチから開始します。', resumeHint:'（進捗はこの端末に保存されます。ページを閉じても後から再開できます）',
+  reuseTitle:'前回の結果が残っています', reuseBody:'{0}（{1} 行 · {2}）は {3} に翻訳が完了し、まだ書き出されていません。そのまま読み込めば、もう一度翻訳する必要はありません。', reuseGo:'前回の結果を使う', reuseLog:'前回の翻訳結果を読み込みました（モデル呼び出しなし）。', reuseCancel:'キャンセル', reuseNote:'注：この結果はお使いの端末のブラウザに保存されています。サーバーには送信されません。',
   resumeQuota:'再開用データの保存に失敗しました（ローカル保存領域が満杯）。今回は保存しませんが翻訳は続行します。',
   chkAutoTerms:'自動用語集：翻訳前に固有名詞・曖昧語を抽出し、全編の訳を統一',
   autoTermsRun:'用語集を抽出中（固有名詞・曖昧語）…', autoTermsDone:'自動用語集：{0} 語の訳を統一', autoTermsSkip:'用語集の抽出に失敗、スキップして翻訳を継続：{0}', batchRescue:'バッチ {0} が複数回失敗、グループ単位で救済：{1}/{2} グループ成功',
@@ -1540,6 +1544,7 @@ const I18N = {
   pgRun:'Traduciendo', pgEta:'Faltan {0}', pgDone:'✓ Listo · {0}',
   resumeTitle:'Traducción sin terminar', resumeBody:'Este archivo se interrumpió en el lote {0}/{1} la última vez. Puede continuar donde quedó (los {0} lotes ya hechos no se repetirán) o empezar de nuevo.',
   resumeGo:'Continuar', resumeNew:'Empezar de nuevo', resumeLog:'Reanudado: se omitieron {0} lotes, comenzando desde el lote {1}.', resumeHint:'(El progreso se guarda en este dispositivo: puede cerrar la página y continuar después.)',
+  reuseTitle:'El resultado anterior sigue disponible', reuseBody:'{0} ({1} líneas · {2}) terminó de traducirse a las {3} y todavía no se ha exportado. Puedes cargarlo directamente sin volver a traducir.', reuseGo:'Usar el resultado anterior', reuseLog:'Se cargó el resultado anterior (sin llamar al modelo).', reuseCancel:'Cancelar', reuseNote:'Nota: el resultado se guarda en el navegador de tu propio dispositivo y nunca se envía al servidor.',
   resumeQuota:'No se pudo guardar el progreso (almacenamiento local lleno). La traducción continúa sin guardar.',
   chkAutoTerms:'Glosario automático: extrae nombres propios y términos ambiguos antes de traducir para uniformar todo el archivo',
   autoTermsRun:'Extrayendo glosario (nombres propios / términos ambiguos)…', autoTermsDone:'Glosario automático listo: {0} términos unificados', autoTermsSkip:'Falló la extracción del glosario, se continúa sin él: {0}', batchRescue:'Lote {0} falló varias veces; rescate individual: {1}/{2} grupos',
@@ -1635,6 +1640,7 @@ const I18N = {
   pgRun:'Traduzindo', pgEta:'Faltam {0}', pgDone:'✓ Concluído · {0}',
   resumeTitle:'Tradução inacabada', resumeBody:'Este arquivo parou no lote {0}/{1} da última vez. Você pode continuar de onde parou (os {0} lotes prontos não serão repetidos) ou recomeçar do zero.',
   resumeGo:'Continuar', resumeNew:'Recomeçar', resumeLog:'Retomado: {0} lotes ignorados, começando pelo lote {1}.', resumeHint:'(O progresso é salvo neste dispositivo: feche a página e continue depois.)',
+  reuseTitle:'O resultado anterior ainda está disponível', reuseBody:'{0} ({1} linhas · {2}) terminou de ser traduzido às {3} e ainda não foi exportado. Podes carregá-lo diretamente, sem traduzir tudo outra vez.', reuseGo:'Usar o resultado anterior', reuseLog:'Resultado anterior carregado (nenhuma chamada ao modelo).', reuseCancel:'Cancelar', reuseNote:'Nota: este resultado fica guardado no navegador do teu próprio dispositivo e nunca é enviado para o servidor.',
   resumeQuota:'Não foi possível salvar o progresso (armazenamento local cheio). A tradução continua sem salvar.',
   chkAutoTerms:'Glossário automático: extrai nomes próprios e termos ambíguos antes de traduzir para uniformar o arquivo todo',
   autoTermsRun:'Extraindo glossário (nomes próprios / termos ambíguos)…', autoTermsDone:'Glossário automático pronto: {0} termos unificados', autoTermsSkip:'Falha na extração do glossário, continuando sem ele: {0}', batchRescue:'Lote {0} falhou várias vezes; resgate individual: {1}/{2} grupos',
@@ -1730,6 +1736,7 @@ const I18N = {
   pgRun:'번역 중', pgEta:'남은 시간 약 {0}', pgDone:'✓ 완료 · 소요 {0}',
   resumeTitle:'완료되지 않은 번역', resumeBody:'이 파일은 지난번에 {0}/{1} 배치에서 중단되었습니다. 이어서 계속할 수 있습니다(완료된 {0}개 배치는 다시 실행하지 않습니다). 처음부터 다시 할 수도 있습니다.',
   resumeGo:'이어서 계속', resumeNew:'처음부터', resumeLog:'이어서 계속합니다: 앞 {0}개 배치를 건너뛰고 {1}번째 배치부터 시작합니다.', resumeHint:'(진행 상황은 이 기기에 저장되므로 페이지를 닫아도 나중에 이어서 할 수 있습니다)',
+  reuseTitle:'이전 결과가 아직 남아 있습니다', reuseBody:'{0}({1}줄 · {2})은 {3}에 번역이 끝났고 아직 내보내지 않았습니다. 다시 번역하지 않고 그대로 불러올 수 있습니다.', reuseGo:'이전 결과 사용', reuseLog:'이전 번역 결과를 불러왔습니다(모델 호출 없음).', reuseCancel:'취소', reuseNote:'참고: 이 결과는 사용 중인 기기의 브라우저에 저장되며 서버로 업로드되지 않습니다.',
   resumeQuota:'진행 상황을 저장하지 못했습니다(로컬 저장소 가득 참). 이번에는 저장하지 않고 번역을 계속합니다.',
   chkAutoTerms:'자동 용어집: 번역 전 고유명사와 애매한 단어를 추출하여 전체에서 번역을 통일',
   autoTermsRun:'용어집 추출 중(고유명사·애매한 단어)…', autoTermsDone:'자동 용어집: {0}개 용어 번역 통일', autoTermsSkip:'용어집 추출 실패, 건너뛰고 계속 진행: {0}', batchRescue:'배치 {0} 반복 실패, 그룹별 구조 시도: {1}/{2}개 성공',
@@ -1825,6 +1832,7 @@ const I18N = {
   pgRun:'Übersetzung läuft', pgEta:'Noch {0}', pgDone:'✓ Fertig · {0}',
   resumeTitle:'Unfertige Übersetzung gefunden', resumeBody:'Diese Datei wurde beim letzten Mal bei Batch {0}/{1} unterbrochen. Sie können dort weitermachen (die {0} fertigen Batches werden nicht wiederholt) oder neu beginnen.',
   resumeGo:'Fortsetzen', resumeNew:'Neu beginnen', resumeLog:'Fortgesetzt: {0} Batches übersprungen, Start bei Batch {1}.', resumeHint:'(Der Fortschritt wird auf diesem Gerät gespeichert – Sie können die Seite schließen und später weitermachen.)',
+  reuseTitle:'Vorheriges Ergebnis noch verfügbar', reuseBody:'{0} ({1} Zeilen · {2}) wurde um {3} fertig übersetzt und noch nicht exportiert. Du kannst es direkt laden, ohne erneut zu übersetzen.', reuseGo:'Vorheriges Ergebnis verwenden', reuseLog:'Vorheriges Übersetzungsergebnis geladen (kein Modellaufruf).', reuseCancel:'Abbrechen', reuseNote:'Hinweis: Dieses Ergebnis wird im Browser auf deinem eigenen Gerät gespeichert und nicht an den Server gesendet.',
   resumeQuota:'Fortschritt konnte nicht gespeichert werden (lokaler Speicher voll). Die Übersetzung läuft weiter.',
   chkAutoTerms:'Auto-Glossar: extrahiert vor der Übersetzung Eigennamen und mehrdeutige Begriffe, um dateiweite Einheitlichkeit zu sichern',
   autoTermsRun:'Glossar wird extrahiert (Eigennamen / mehrdeutige Begriffe)…', autoTermsDone:'Auto-Glossar bereit: {0} Begriffe vereinheitlicht', autoTermsSkip:'Glossar-Extraktion fehlgeschlagen, wird ohne fortgesetzt: {0}', batchRescue:'Batch {0} mehrfach fehlgeschlagen; Einzelrettung: {1}/{2} Gruppen',
@@ -1920,6 +1928,7 @@ const I18N = {
   pgRun:'Traduction', pgEta:'Reste {0}', pgDone:'✓ Terminé · {0}',
   resumeTitle:'Traduction inachevée', resumeBody:'Ce fichier s’est arrêté au lot {0}/{1} la dernière fois. Vous pouvez reprendre où il en était (les {0} lots finis ne seront pas refaits) ou recommencer depuis le début.',
   resumeGo:'Reprendre', resumeNew:'Recommencer', resumeLog:'Reprise : {0} lots ignorés, démarrage au lot {1}.', resumeHint:'(La progression est enregistrée sur cet appareil : fermez la page et reprenez plus tard.)',
+  reuseTitle:'Le résultat précédent est encore disponible', reuseBody:'{0} ({1} lignes · {2}) a terminé sa traduction à {3} et n’a pas encore été exporté. Vous pouvez le charger directement sans traduire à nouveau.', reuseGo:'Utiliser le résultat précédent', reuseLog:'Résultat précédent chargé (aucun appel au modèle).', reuseCancel:'Annuler', reuseNote:'Remarque : ce résultat est enregistré dans le navigateur de votre propre appareil et n’est jamais envoyé au serveur.',
   resumeQuota:'Impossible d’enregistrer la progression (stockage local plein). La traduction continue sans sauvegarde.',
   chkAutoTerms:'Glossaire auto : extrait avant traduction les noms propres et termes ambigus pour uniformiser tout le fichier',
   autoTermsRun:'Extraction du glossaire (noms propres / termes ambigus)…', autoTermsDone:'Glossaire auto prêt : {0} termes unifiés', autoTermsSkip:'Échec de l\'extraction du glossaire, poursuite sans : {0}', batchRescue:'Lot {0} a échoué plusieurs fois ; sauvetage individuel : {1}/{2} groupes',
@@ -2015,6 +2024,7 @@ const I18N = {
   pgRun:'Menerjemahkan', pgEta:'Sisa {0}', pgDone:'✓ Selesai · {0}',
   resumeTitle:'Terjemahan belum selesai', resumeBody:'File ini terakhir kali berhenti di batch {0}/{1}. Anda bisa melanjutkan dari situ ({0} batch yang sudah selesai tidak akan diulang) atau mengulang dari awal.',
   resumeGo:'Lanjutkan', resumeNew:'Ulangi dari awal', resumeLog:'Dilanjutkan: melewati {0} batch, mulai dari batch {1}.', resumeHint:'(Progres disimpan di perangkat ini — Anda bisa menutup halaman dan melanjutkan nanti.)',
+  reuseTitle:'Hasil sebelumnya masih tersimpan', reuseBody:'{0} ({1} baris · {2}) selesai diterjemahkan pada {3} dan belum diekspor. Anda dapat memuatnya langsung tanpa menerjemahkan ulang.', reuseGo:'Gunakan hasil sebelumnya', reuseLog:'Hasil terjemahan sebelumnya dimuat (tanpa memanggil model).', reuseCancel:'Batal', reuseNote:'Catatan: hasil ini disimpan di browser pada perangkat Anda sendiri dan tidak dikirim ke server.',
   resumeQuota:'Progres gagal disimpan (penyimpanan lokal penuh). Terjemahan tetap berjalan tanpa menyimpan.',
   chkAutoTerms:'Glosarium otomatis: mengekstrak nama diri & istilah ambigu sebelum menerjemahkan agar seragam di seluruh file',
   autoTermsRun:'Mengekstrak glosarium (nama diri / istilah ambigu)…', autoTermsDone:'Glosarium otomatis siap: {0} istilah diseragamkan', autoTermsSkip:'Ekstraksi glosarium gagal, dilanjutkan tanpa itu: {0}', batchRescue:'Batch {0} gagal berulang; penyelamatan per grup: {1}/{2} grup',
@@ -2110,6 +2120,7 @@ const I18N = {
   pgRun:'अनुवाद हो रहा है', pgEta:'शेष {0}', pgDone:'✓ पूर्ण · समय {0}',
   resumeTitle:'अधूरा अनुवाद मिला', resumeBody:'यह फ़ाइल पिछली बार {0}/{1} बैच पर रुक गई थी। आप वहीं से जारी रख सकते हैं (पूरे हुए {0} बैच दोबारा नहीं चलेंगे) या शुरू से फिर अनुवाद कर सकते हैं।',
   resumeGo:'जारी रखें', resumeNew:'शुरू से करें', resumeLog:'जारी रखा गया: {0} बैच छोड़े, {1}वें बैच से शुरू।', resumeHint:'(प्रगति इसी डिवाइस पर सहेजी जाती है — पेज बंद करके बाद में जारी रख सकते हैं)',
+  reuseTitle:'पिछला परिणाम अभी भी मौजूद है', reuseBody:'{0}（{1} पंक्तियाँ · {2}）का अनुवाद {3} को पूरा हुआ और अभी तक एक्सपोर्ट नहीं किया गया। आप इसे सीधे लोड कर सकते हैं, दोबारा अनुवाद करने की ज़रूरत नहीं।', reuseGo:'पिछला परिणाम उपयोग करें', reuseLog:'पिछला अनुवाद परिणाम लोड हो गया（मॉडल कॉल नहीं हुआ）।', reuseCancel:'रद्द करें', reuseNote:'ध्यान दें: यह परिणाम आपके अपने डिवाइस के ब्राउज़र में सुरक्षित है, सर्वर पर नहीं भेजा जाता।',
   resumeQuota:'प्रगति सहेज नहीं सका (लोकल स्टोरेज भरा हुआ)। अनुवाद बिना सहेजे जारी रहेगा।',
   chkAutoTerms:'स्वचालित शब्दावली: अनुवाद से पहले संज्ञाएँ व द्विअर्थी शब्द निकालकर पूरी फ़ाइल में एकरूपता लाता है',
   autoTermsRun:'शब्दावली निकाली जा रही है (संज्ञाएँ / द्विअर्थी शब्द)…', autoTermsDone:'स्वचालित शब्दावली तैयार: {0} शब्द एकरूप', autoTermsSkip:'शब्दावली निकालने में विफल, इसके बिना जारी: {0}', batchRescue:'बैच {0} बार-बार विफल; प्रति-समूह बचाव: {1}/{2} समूह सफल',
@@ -2205,6 +2216,7 @@ const I18N = {
   pgRun:'กำลังแปล', pgEta:'เหลืออีก {0}', pgDone:'✓ เสร็จ · ใช้เวลา {0}',
   resumeTitle:'พบงานแปลที่ยังไม่เสร็จ', resumeBody:'ไฟล์นี้ครั้งที่แล้วหยุดอยู่ที่ batch {0}/{1} คุณสามารถทำงานต่อได้ (batch ที่เสร็จแล้ว {0} batch จะไม่ถูกแปลซ้ำ) หรือเริ่มใหม่ทั้งหมด',
   resumeGo:'ทำงานต่อ', resumeNew:'เริ่มใหม่', resumeLog:'ทำงานต่อแล้ว: ข้าม {0} batch เริ่มที่ batch {1}', resumeHint:'(บันทึกความคืบหน้าไว้ในเครื่องนี้ ปิดหน้าเว็บแล้วกลับมาทำต่อได้)',
+  reuseTitle:'ผลลัพธ์ก่อนหน้ายังอยู่', reuseBody:'{0}（{1} บรรทัด · {2}）แปลเสร็จเมื่อ {3} และยังไม่ได้ส่งออก คุณสามารถโหลดผลลัพธ์นั้นมาใช้ได้เลยโดยไม่ต้องแปลใหม่', reuseGo:'ใช้ผลลัพธ์ก่อนหน้า', reuseLog:'โหลดผลลัพธ์การแปลก่อนหน้าแล้ว（ไม่ได้เรียกโมเดล）', reuseCancel:'ยกเลิก', reuseNote:'หมายเหตุ: ผลลัพธ์นี้ถูกบันทึกไว้ในเบราว์เซอร์บนอุปกรณ์ของคุณเอง และไม่ถูกส่งขึ้นเซิร์ฟเวอร์',
   resumeQuota:'ไม่สามารถบันทึกความคืบหน้าได้ (พื้นที่จัดเก็บเต็ม) การแปลจะดำเนินต่อโดยไม่บันทึก',
   chkAutoTerms:'คลังศัพท์อัตโนมัติ: ดึงชื่อเฉพาะและคำคลุมเครือก่อนแปลเพื่อความสม่ำเสมอทั้งไฟล์',
   autoTermsRun:'กำลังดึงคลังศัพท์ (ชื่อเฉพาะ / คำคลุมเครือ)…', autoTermsDone:'คลังศัพท์พร้อม: รวม {0} คำ', autoTermsSkip:'ดึงคลังศัพท์ไม่สำเร็จ ข้ามและทำต่อ: {0}', batchRescue:'แบตช์ {0} ล้มเหลวซ้ำ ช่วยเหลือรายกลุ่ม: สำเร็จ {1}/{2} กลุ่ม',
@@ -2300,6 +2312,7 @@ const I18N = {
   pgRun:'Đang dịch', pgEta:'Còn lại {0}', pgDone:'✓ Xong · {0}',
   resumeTitle:'Có bản dịch chưa hoàn thành', resumeBody:'Lần trước tệp này dừng ở batch {0}/{1}. Bạn có thể tiếp tục từ đó ({0} batch đã xong sẽ không dịch lại) hoặc dịch lại từ đầu.',
   resumeGo:'Tiếp tục', resumeNew:'Dịch lại từ đầu', resumeLog:'Đã tiếp tục: bỏ qua {0} batch, bắt đầu từ batch {1}.', resumeHint:'(Tiến trình được lưu trên máy này — bạn có thể đóng trang và tiếp tục sau.)',
+  reuseTitle:'Kết quả trước đó vẫn còn', reuseBody:'{0}（{1} dòng · {2}）đã dịch xong lúc {3} và chưa được xuất. Bạn có thể tải trực tiếp mà không cần dịch lại.', reuseGo:'Dùng kết quả trước đó', reuseLog:'Đã tải kết quả dịch trước đó（không gọi mô hình）.', reuseCancel:'Hủy', reuseNote:'Lưu ý: kết quả này được lưu trong trình duyệt trên chính thiết bị của bạn và không được tải lên máy chủ.',
   resumeQuota:'Không thể lưu tiến trình (bộ nhớ cục bộ đã đầy). Bản dịch vẫn tiếp tục mà không lưu.',
   chkAutoTerms:'Bảng thuật ngữ tự động: trích tên riêng & từ nhiễu nghĩa trước khi dịch để thống nhất cả file',
   autoTermsRun:'Đang trích bảng thuật ngữ (tên riêng / từ nhiễu nghĩa)…', autoTermsDone:'Bảng thuật ngữ sẵn sàng: {0} thuật ngữ đã thống nhất', autoTermsSkip:'Trích thuật ngữ thất bại, tiếp tục không có nó: {0}', batchRescue:'Batch {0} thất bại nhiều lần; cứu từng nhóm: thành công {1}/{2} nhóm',
@@ -2395,6 +2408,7 @@ const I18N = {
   pgRun:'Перевод', pgEta:'Осталось {0}', pgDone:'✓ Готово · за {0}',
   resumeTitle:'Найден незавершённый перевод', resumeBody:'В прошлый раз этот файл остановился на пакете {0}/{1}. Можно продолжить с того же места (уже готовые {0} пакетов не будут переведены заново) или начать заново.',
   resumeGo:'Продолжить', resumeNew:'Начать заново', resumeLog:'Продолжено: пропущено {0} пакетов, старт с пакета {1}.', resumeHint:'(Прогресс сохраняется на этом устройстве — можно закрыть страницу и продолжить позже.)',
+  reuseTitle:'Предыдущий результат ещё сохранён', reuseBody:'{0}（{1} строк · {2}）перевод завершён в {3} и ещё не экспортирован. Можно загрузить его сразу, не переводя заново.', reuseGo:'Использовать предыдущий результат', reuseLog:'Загружен предыдущий результат перевода（без обращения к модели）.', reuseCancel:'Отмена', reuseNote:'Примечание: результат хранится в браузере на вашем устройстве и не отправляется на сервер.',
   resumeQuota:'Не удалось сохранить прогресс (локальное хранилище заполнено). Перевод продолжается без сохранения.',
   chkAutoTerms:'Автоглоссарий: перед переводом извлекает имена собственные и неоднозначные термины для единообразия по всему файлу',
   autoTermsRun:'Извлечение глоссария (имена собственные / неоднозначные термины)…', autoTermsDone:'Автоглоссарий готов: {0} терминов унифицировано', autoTermsSkip:'Не удалось извлечь глоссарий, продолжаем без него: {0}', batchRescue:'Батч {0} не прошёл несколько раз; спасение по группам: {1}/{2}',
@@ -2490,6 +2504,7 @@ const I18N = {
   pgRun:'Traduzione', pgEta:'Mancano {0}', pgDone:'✓ Completato · {0}',
   resumeTitle:'Traduzione non completata', resumeBody:'L’ultima volta questo file si è fermato al batch {0}/{1}. Puoi continuare da lì (i {0} batch già fatti non verranno ripetuti) o ricominciare dall’inizio.',
   resumeGo:'Continua', resumeNew:'Ricomincia', resumeLog:'Ripreso: saltati {0} batch, si parte dal batch {1}.', resumeHint:'(I progressi sono salvati su questo dispositivo: puoi chiudere la pagina e riprendere dopo.)',
+  reuseTitle:'Il risultato precedente è ancora disponibile', reuseBody:'{0} ({1} righe · {2}) ha completato la traduzione alle {3} e non è ancora stato esportato. Puoi caricarlo direttamente senza tradurre di nuovo.', reuseGo:'Usa il risultato precedente', reuseLog:'Risultato precedente caricato (nessuna chiamata al modello).', reuseCancel:'Annulla', reuseNote:'Nota: il risultato è salvato nel browser del tuo dispositivo e non viene mai inviato al server.',
   resumeQuota:'Impossibile salvare i progressi (spazio locale pieno). La traduzione continua senza salvataggio.',
   chkAutoTerms:'Glossario automatico: estrae nomi propri e termini ambigui prima di tradurre per uniformare l\'intero file',
   autoTermsRun:'Estrazione del glossario (nomi propri / termini ambigui)…', autoTermsDone:'Glossario automatico pronto: {0} termini unificati', autoTermsSkip:'Estrazione del glossario fallita, si continua senza: {0}', batchRescue:'Batch {0} non riuscito più volte; recupero individuale: {1}/{2} gruppi',
@@ -2585,6 +2600,7 @@ const I18N = {
   pgRun:'جارٍ الترجمة', pgEta:'متبقي {0}', pgDone:'✓ اكتمل · {0}',
   resumeTitle:'تم العثور على ترجمة غير مكتملة', resumeBody:'توقف هذا الملف في المرة الماضية عند الدفعة {0}/{1}. يمكنك المتابعة من حيث توقفت (لن تُعاد الدفعات {0} المكتملة) أو البدء من جديد.',
   resumeGo:'متابعة', resumeNew:'ابدأ من جديد', resumeLog:'تمت المتابعة: تم تخطي {0} دفعة، البدء من الدفعة {1}.', resumeHint:'(يتم حفظ التقدم على هذا الجهاز — يمكنك إغلاق الصفحة والمتابعة لاحقًا)',
+  reuseTitle:'النتيجة السابقة لا تزال متاحة', reuseBody:'اكتملت ترجمة {0}（{1} سطرًا · {2}）في {3} ولم يتم تصديرها بعد. يمكنك تحميلها مباشرة دون ترجمة أخرى.', reuseGo:'استخدام النتيجة السابقة', reuseLog:'تم تحميل نتيجة الترجمة السابقة（بدون استدعاء النموذج）.', reuseCancel:'إلغاء', reuseNote:'ملاحظة: تُحفظ هذه النتيجة في متصفح جهازك الخاص ولا تُرفع إلى الخادم.',
   resumeQuota:'تعذّر حفظ التقدم (مساحة التخزين ممتلئة). ستستمر الترجمة بدون حفظ.',
   chkAutoTerms:'قاموس تلقائي: يستخرج الأسماء الخاصة والمصطلحات الملتبسة قبل الترجمة لتوحيد الترجمة في كامل الملف',
   autoTermsRun:'جارٍ استخراج القاموس (أسماء خاصة / مصطلحات ملتبسة)…', autoTermsDone:'القاموس التلقائي جاهز: تم توحيد {0} مصطلحًا', autoTermsSkip:'فشل استخراج القاموس، ستتم المتابعة بدونه: {0}', batchRescue:'فشلت الدفعة {0} عدة مرات؛ إنقاذ فردي: {1}/{2} مجموعة',
@@ -2680,6 +2696,7 @@ const I18N = {
   pgRun:'Çevriliyor', pgEta:'Kalan {0}', pgDone:'✓ Tamamlandı · {0}',
   resumeTitle:'Tamamlanmamış çeviri bulundu', resumeBody:'Bu dosya geçen sefer {0}/{1}. partide durdu. Kaldığı yerden devam edebilirsiniz (biten {0} parti tekrar çalıştırılmaz) veya baştan başlayabilirsiniz.',
   resumeGo:'Devam et', resumeNew:'Baştan başla', resumeLog:'Devam edildi: {0} parti atlandı, {1}. partiden başlanıyor.', resumeHint:'(İlerleme bu cihaza kaydedilir — sayfayı kapatıp sonra devam edebilirsiniz.)',
+  reuseTitle:'Önceki sonuç hâlâ duruyor', reuseBody:'{0}（{1} satır · {2}）çevirisi {3} tarihinde tamamlandı ve henüz dışa aktarılmadı. Yeniden çevirtmeden doğrudan yükleyebilirsiniz.', reuseGo:'Önceki sonucu kullan', reuseLog:'Önceki çeviri sonucu yüklendi（model çağrılmadı）.', reuseCancel:'İptal', reuseNote:'Not: Bu sonuç kendi cihazınızdaki tarayıcıda saklanır ve sunucuya gönderilmez.',
   resumeQuota:'İlerleme kaydedilemedi (yerel depolama dolu). Çeviri kaydetmeden devam ediyor.',
   chkAutoTerms:'Otomatik sözlük: çeviriden önce özel isimleri ve belirsiz terimleri çıkararak tüm dosyada tutarlılık sağlar',
   autoTermsRun:'Sözlük çıkarılıyor (özel isimler / belirsiz terimler)…', autoTermsDone:'Otomatik sözlük hazır: {0} terim birleştirildi', autoTermsSkip:'Sözlük çıkarılamadı, onsuz devam ediliyor: {0}', batchRescue:'Batch {0} birden çok kez başarısız; tek grup kurtarma: {1}/{2} grup',
@@ -2873,6 +2890,7 @@ const I18N = {
   resumeTitle:'Onvoltooide vertaling gevonden',
   resumeBody:'Dit bestand stopte de vorige keer bij batch {0}/{1}. Je kunt verdergaan waar je gebleven was (de {0} afgeronde batches worden niet opnieuw gedraaid), of helemaal opnieuw beginnen.',
   resumeGo:'Doorgaan',
+  reuseTitle:'Vorig resultaat nog beschikbaar', reuseBody:'{0} ({1} regels · {2}) was om {3} klaar met vertalen en is nog niet geëxporteerd. Je kunt het direct laden zonder opnieuw te vertalen.', reuseGo:'Vorig resultaat gebruiken', reuseLog:'Vorig vertaalresultaat geladen (geen model aangeroepen).', reuseCancel:'Annuleren', reuseNote:'Let op: dit resultaat wordt bewaard in de browser op je eigen apparaat en wordt niet naar de server gestuurd.',
   resumeNew:'Opnieuw beginnen',
   resumeLog:'Hervat: {0} batches overgeslagen, gestart vanaf batch {1}.',
   resumeHint:'(De voortgang wordt op dit apparaat bewaard, je kunt de pagina sluiten en later verdergaan.)',
@@ -3162,6 +3180,7 @@ const I18N = {
   resumeTitle:'Znaleziono niedokończone tłumaczenie',
   resumeBody:'Ten plik zatrzymał się ostatnio na partii {0}/{1}. Możesz kontynuować od miejsca przerwania ({0} wykonanych partii nie będzie powtarzane) albo zacząć od początku.',
   resumeGo:'Kontynuuj',
+  reuseTitle:'Poprzedni wynik jest nadal dostępny', reuseBody:'{0}（{1} wierszy · {2}）ukończono o {3} i jeszcze nie wyeksportowano. Możesz wczytać go bezpośrednio, bez ponownego tłumaczenia.', reuseGo:'Użyj poprzedniego wyniku', reuseLog:'Wczytano poprzedni wynik tłumaczenia (bez wywołania modelu).', reuseCancel:'Anuluj', reuseNote:'Uwaga: ten wynik jest przechowywany w przeglądarce na Twoim własnym urządzeniu i nie jest wysyłany na serwer.',
   resumeNew:'Zacznij od nowa',
   resumeLog:'Wznowiono: pominięto {0} partii, start od partii {1}.',
   resumeHint:'(Postęp jest zapisywany na tym urządzeniu, możesz zamknąć stronę i wrócić później.)',
@@ -3451,6 +3470,7 @@ const I18N = {
   resumeTitle:'Oavslutad översättning hittades',
   resumeBody:'Den här filen stannade vid batch {0}/{1} förra gången. Du kan fortsätta där du slutade (de {0} färdiga batcharna körs inte om) eller börja om från början.',
   resumeGo:'Fortsätt',
+  reuseTitle:'Föregående resultat finns kvar', reuseBody:'{0}（{1} rader · {2}）blev klart {3} och har inte exporterats än. Du kan läsa in det direkt utan att översätta igen.', reuseGo:'Använd föregående resultat', reuseLog:'Föregående översättningsresultat har lästs in (inget modellanrop).', reuseCancel:'Avbryt', reuseNote:'Obs: resultatet sparas i webbläsaren på din egen enhet och skickas aldrig till servern.',
   resumeNew:'Börja om',
   resumeLog:'Återupptog: hoppade över {0} batchar, startar från batch {1}.',
   resumeHint:'(Framstegen sparas på den här enheten, så du kan stänga sidan och fortsätta senare.)',
@@ -3740,6 +3760,7 @@ const I18N = {
   resumeTitle:'Nalezen nedokončený překlad',
   resumeBody:'Tento soubor se minule zastavil na dávce {0}/{1}. Můžete pokračovat tam, kde jste skončili ({0} hotových dávek se nebude opakovat), nebo začít znovu od začátku.',
   resumeGo:'Pokračovat',
+  reuseTitle:'Předchozí výsledek je stále k dispozici', reuseBody:'{0}（{1} řádků · {2}）bylo přeloženo v {3} a ještě nebylo exportováno. Můžete ho načíst přímo, bez opětovného překladu.', reuseGo:'Použít předchozí výsledek', reuseLog:'Předchozí výsledek překladu byl načten (bez volání modelu).', reuseCancel:'Zrušit', reuseNote:'Poznámka: tento výsledek je uložen v prohlížeči na vašem vlastním zařízení a nikdy se neodesílá na server.',
   resumeNew:'Začít znovu',
   resumeLog:'Obnoveno: přeskočeno {0} dávek, start od dávky {1}.',
   resumeHint:'(Průběh se ukládá na tomto zařízení, můžete stránku zavřít a pokračovat později.)',
@@ -4029,6 +4050,7 @@ const I18N = {
   resumeTitle:'Знайдено незавершений переклад',
   resumeBody:'Цей файл минулого разу зупинився на пакеті {0}/{1}. Можна продовжити з того самого місця ({0} виконаних пакетів не повторюватимуться) або почати спочатку.',
   resumeGo:'Продовжити',
+  reuseTitle:'Попередній результат ще зберігається', reuseBody:'{0}（{1} рядків · {2}）переклад завершено о {3} і ще не експортовано. Ви можете завантажити його напряму, не перекладаючи знову.', reuseGo:'Використати попередній результат', reuseLog:'Завантажено попередній результат перекладу (без звернення до моделі).', reuseCancel:'Скасувати', reuseNote:'Примітка: цей результат зберігається у браузері на вашому власному пристрої й ніколи не надсилається на сервер.',
   resumeNew:'Почати спочатку',
   resumeLog:'Продовжено: пропущено {0} пакетів, старт із пакета {1}.',
   resumeHint:'(Прогрес зберігається на цьому пристрої, тож сторінку можна закрити й повернутися пізніше.)',
@@ -4318,6 +4340,7 @@ const I18N = {
   resumeTitle:'Uafsluttet oversættelse fundet',
   resumeBody:'Denne fil stoppede ved batch {0}/{1} sidst. Du kan fortsætte, hvor du slap (de {0} færdige batches køres ikke igen), eller starte forfra.',
   resumeGo:'Fortsæt',
+  reuseTitle:'Forrige resultat er stadig tilgængeligt', reuseBody:'{0}（{1} linjer · {2}）blev færdigoversat kl. {3} og er ikke eksporteret endnu. Du kan indlæse det direkte uden at oversætte igen.', reuseGo:'Brug forrige resultat', reuseLog:'Forrige oversættelsesresultat blev indlæst (intet modelkald).', reuseCancel:'Annuller', reuseNote:'Bemærk: resultatet gemmes i browseren på din egen enhed og sendes aldrig til serveren.',
   resumeNew:'Start forfra',
   resumeLog:'Genoptog: sprang {0} batches over, starter fra batch {1}.',
   resumeHint:'(Fremdriften gemmes på denne enhed, så du kan lukke siden og fortsætte senere.)',
@@ -4607,6 +4630,7 @@ const I18N = {
   resumeTitle:'Löytyi keskeneräinen käännös',
   resumeBody:'Tämä tiedosto pysähtyi viimeksi erään {0}/{1}. Voit jatkaa siitä mihin jäit ({0} valmista erää ei ajeta uudelleen) tai aloittaa alusta.',
   resumeGo:'Jatka',
+  reuseTitle:'Edellinen tulos on vielä tallessa', reuseBody:'{0}（{1} riviä · {2}）valmistui käännöksestä {3} eikä ole vielä viety. Voit ladata sen suoraan ilman uutta käännöstä.', reuseGo:'Käytä edellistä tulosta', reuseLog:'Edellinen käännöstulos ladattiin (ei mallikutsua).', reuseCancel:'Peruuta', reuseNote:'Huom: tulos tallennetaan selaimeen omalla laitteellasi, eikä sitä lähetetä palvelimelle.',
   resumeNew:'Aloita alusta',
   resumeLog:'Jatkettu: ohitettiin {0} erää, aloitetaan erästä {1}.',
   resumeHint:'(Edistys tallennetaan tälle laitteelle, joten voit sulkea sivun ja jatkaa myöhemmin.)',
@@ -4896,6 +4920,7 @@ const I18N = {
   resumeTitle:'Βρέθηκε ημιτελής μετάφραση',
   resumeBody:'Αυτό το αρχείο σταμάτησε την προηγούμενη φορά στην παρτίδα {0}/{1}. Μπορείτε να συνεχίσετε από εκεί που μείνατε (οι {0} ολοκληρωμένες παρτίδες δεν θα εκτελεστούν ξανά) ή να ξεκινήσετε από την αρχή.',
   resumeGo:'Συνέχεια',
+  reuseTitle:'Το προηγούμενο αποτέλεσμα είναι ακόμα διαθέσιμο', reuseBody:'Το {0}（{1} γραμμές · {2}）ολοκλήρωσε τη μετάφραση στις {3} και δεν έχει εξαχθεί ακόμη. Μπορείτε να το φορτώσετε απευθείας, χωρίς νέα μετάφραση.', reuseGo:'Χρήση προηγούμενου αποτελέσματος', reuseLog:'Φορτώθηκε το προηγούμενο αποτέλεσμα μετάφρασης (δεν έγινε κλήση μοντέλου).', reuseCancel:'Άκυρο', reuseNote:'Σημείωση: το αποτέλεσμα αποθηκεύεται στο πρόγραμμα περιήγησης της δικής σας συσκευής και δεν αποστέλλεται ποτέ στον διακομιστή.',
   resumeNew:'Επανεκκίνηση',
   resumeLog:'Συνεχίστηκε: παρακάμφθηκαν {0} παρτίδες, εκκίνηση από την παρτίδα {1}.',
   resumeHint:'(Η πρόοδος αποθηκεύεται σε αυτή τη συσκευή, οπότε μπορείτε να κλείσετε τη σελίδα και να συνεχίσετε αργότερα.)',
@@ -5185,6 +5210,7 @@ const I18N = {
   resumeTitle:'נמצא תרגום שלא הושלם',
   resumeBody:'הקובץ הזה נעצר בפעם הקודמת באצווה {0}/{1}. אפשר להמשיך מהמקום שבו נעצרתם ({0} האצוות שהסתיימו לא ירוצו שוב), או להתחיל מחדש.',
   resumeGo:'המשך',
+  reuseTitle:'התוצאה הקודמת עדיין שמורה', reuseBody:'{0}（{1} שורות · {2}）סיים את התרגום ב {3} וטרם יוצא. אפשר לטעון אותו ישירות, בלי לתרגם שוב.', reuseGo:'השתמש בתוצאה הקודמת', reuseLog:'תוצאת התרגום הקודמת נטענה (ללא קריאה למודל).', reuseCancel:'ביטול', reuseNote:'הערה: התוצאה נשמרת בדפדפן במכשיר שלך בלבד ואינה מועלה לשרת.',
   resumeNew:'התחלה מחדש',
   resumeLog:'חודש: דילג על {0} אצוות, מתחיל מאצווה {1}.',
   resumeHint:'(ההתקדמות נשמרת במכשיר הזה, אז אפשר לסגור את הדף ולהמשיך אחר כך.)',
@@ -5474,6 +5500,7 @@ const I18N = {
   resumeTitle:'A fost găsită o traducere neterminată',
   resumeBody:'Acest fișier s-a oprit data trecută la lotul {0}/{1}. Poți continua de unde ai rămas (cele {0} loturi finalizate nu vor fi reluate) sau poți lua totul de la capăt.',
   resumeGo:'Continuă',
+  reuseTitle:'Rezultatul anterior este încă disponibil', reuseBody:'{0}（{1} rânduri · {2}）a terminat traducerea la {3} și nu a fost exportat încă. Îl poți încărca direct, fără să traduci din nou.', reuseGo:'Folosește rezultatul anterior', reuseLog:'Rezultatul anterior al traducerii a fost încărcat (fără apel la model).', reuseCancel:'Anulează', reuseNote:'Notă: rezultatul este stocat în browserul de pe dispozitivul tău și nu este trimis niciodată pe server.',
   resumeNew:'Ia de la capăt',
   resumeLog:'Reluat: au fost sărite {0} loturi, pornind de la lotul {1}.',
   resumeHint:'(Progresul este salvat pe acest dispozitiv, deci poți închide pagina și continua mai târziu.)',
@@ -5866,6 +5893,10 @@ function setPrText(t){ $('prText').textContent=t||''; }
    指纹 = 文件名 + 条数 + 语言对 + 切批参数 + 源文内容哈希，任一变化即作废，绝不串片。
    只存译文与进度，不存任何 Key / 原文。 */
 const SNAP_KEY='srt_resume_v1', SNAP_TTL=7*24*3600*1000;
+/* v0.9.167：整片跑完的快照不再删除（可让二次运行的同一文件免于重译），但它只在「最近一次」有意义——
+   隔一周再翻同一部片通常是想要新译文。故给已完成的快照单独一个短时限；
+   未跑完的仍是 7 天：用户可能隔天才回来接着翻，那是 SNAP_TTL 原本的用途。 */
+const FIN_SNAP_TTL=24*3600*1000;
 function srcFingerprint(items){
   let h=5381;
   for(let i=0;i<items.length;i++){
@@ -5888,8 +5919,10 @@ function loadSnap(fp){
     const raw=localStorage.getItem(SNAP_KEY); if(!raw) return null;
     const o=JSON.parse(raw);
     if(!o || o.fp!==fp || !o.done || typeof o.done!=='object') return null;
-    if(!o.ts || Date.now()-o.ts>SNAP_TTL){ localStorage.removeItem(SNAP_KEY); return null; }
-    if(!(o.bi>0) || !(o.totalB>0) || o.bi>=o.totalB) return null;
+    if(!o.ts || Date.now()-o.ts>(o.fin?FIN_SNAP_TTL:SNAP_TTL)){ localStorage.removeItem(SNAP_KEY); return null; }
+    /* v0.9.167：已跑满（bi===totalB）的快照不再作废——它是「整片译完」的那份，用来免二次翻译。
+       未跑完的（bi<totalB）走下方断点续传逻辑，行为完全不变。 */
+    if(!(o.bi>0) || !(o.totalB>0) || o.bi>o.totalB) return null;
     return o;
   }catch(e){ return null; }
 }
@@ -5914,6 +5947,31 @@ function saveSnap(fp, res, fillerSet, ctx, bi, totalB, durs, file){
   }
 }
 function rmSnap(){ try{ localStorage.removeItem(SNAP_KEY); }catch(e){} }
+/* v0.9.167：任务整片跑完时「不再删除」快照，只把它标成已完成（fin=1）并刷新时间戳——
+   下次同一文件 + 同一套参数再点翻译，可以弹窗让用户直接取回这份结果，一个模型请求都不发。
+   此前这里直接 rmSnap()，结果是：用户翻完没导出、回头刷新页面或重传一次再跑，
+   就得从头付第二遍钱（9/25 全站 189 组重复任务里有 100 组从未下载，多数是这个形态）。
+   ⚠️ 只改「跑成功」这一处：用户主动停止 / 模型熔断（S.stop）时快照不标 fin，
+   仍然保留为「未完成」状态，走原来的断点续传，行为不变。 */
+function markSnapDone(){
+  if(S.snapOff) return;
+  try{
+    const raw=localStorage.getItem(SNAP_KEY); if(!raw) return;
+    const o=JSON.parse(raw);
+    if(!o || typeof o!=='object') return;
+    o.fin=1; o.ts=Date.now();
+    localStorage.setItem(SNAP_KEY, JSON.stringify(o));
+  }catch(e){ /* 存不下就算了：最坏结果是下次照常重翻，不影响任何东西 */ }
+}
+/* v0.9.167：把快照里的译文还原进本次运行的容器（两条路径共用，避免还原逻辑漂移）。
+   值与当初 saveSnap 存进去的完全一致——cueTexts 这个 Map 已序列化成数组，这里原样还原。 */
+function applySnapInto(snap, res, fillerSet){
+  Object.keys(snap.done).forEach(function(k){
+    const v=snap.done[k];
+    res.set(Number(k), { type:v.type||'', text:v.text||'', cueTexts:v.cueTexts?new Map(v.cueTexts):null });
+  });
+  (snap.fillers||[]).forEach(function(no){ fillerSet.add(Number(no)); });
+}
 /* 断点询问弹窗：返回 Promise<'resume'|'new'>（样式沿用错误弹窗，标题改用主色以示非错误） */
 function askResume(bi, totalB){
   return new Promise(function(resolve){
@@ -5942,6 +6000,50 @@ function askResume(bi, totalB){
     box.appendChild(h); box.appendChild(b); box.appendChild(btns);
     ov.appendChild(box);
     ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('new'); } });
+    document.body.appendChild(ov);
+  });
+}
+/* v0.9.167：整片跑完且快照还在 → 询问要不要直接取回上次那份结果。
+   样式与 askResume 完全一致，只有文案与返回值不同。三个返回值各有各的必要性：
+    'reuse'  把上次译文灌回去；因 startBi=bi=totalB，批次循环零次执行，全程零模型请求
+    'new'    删快照从头翻译（就是现在的行为）
+    'cancel' 什么都不做，回到翻译前状态。⚠️ 这个出口不能省——点遮罩关闭若等于「重译」，
+             只是想关掉窗口的用户会被迫付一次钱；此处点遮罩 = cancel，语义安全。 */
+function askReuse(file, lines, langName, ts){
+  return new Promise(function(resolve){
+    const d=new Date(ts||Date.now()), now=new Date();
+    const hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    const when=(d.toDateString()===now.toDateString())?hh:((d.getMonth()+1)+'/'+d.getDate()+' '+hh);
+    const ov=document.createElement('div');
+    ov.id='reuseModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('reuseTitle');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:18px;white-space:pre-wrap;';
+    b.textContent=t('reuseBody', file, lines, langName, when);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const mk=function(txt,primary,val){
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='btn'; btn.textContent=txt;
+      if(primary) btn.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick=function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('reuseCancel'),false,'cancel');
+    mk(t('resumeNew'),false,'new');
+    mk(t('reuseGo'),true,'reuse');
+    box.appendChild(h); box.appendChild(b); box.appendChild(btns);
+    const note=document.createElement('div');
+    note.style.cssText='color:var(--sub);font-size:12px;line-height:1.6;margin-top:14px;';
+    note.textContent=t('reuseNote');
+    box.appendChild(note);
+    ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('cancel'); } });
     document.body.appendChild(ov);
   });
 }
@@ -7538,6 +7640,7 @@ async function runTranslate(){
   if (cfg.src === cfg.dst){ log(t('langSame',LBY(cfg.src).zh),'err'); return; }
   if (cfg.styleMode === 'custom' && !cfg.styleCustom){ log(t('customNeed'),'err'); try{$('styleCustom').focus();}catch(e){} return; }
   S.maxW = cfg.maxW;
+  S.reuse = 0;   // v0.9.167：每轮重置。为 1 时说明本轮是「取回上次结果」，不调用模型、不上报 finish
   const apiReady = (cfg.mode==='api' && cfg.base && cfg.key && cfg.model);
   const builtinReady = (cfg.mode==='builtin' && BUILTIN_INFO.configured);
   const useApi = builtinReady || apiReady;
@@ -7731,18 +7834,35 @@ async function runTranslate(){
     let startBi=0;
     const snap=loadSnap(snapFpStr);
     if(snap && snap.totalB===totalB){
-      const choice=await askResume(snap.bi, totalB);
-      if(choice==='resume'){
-        Object.keys(snap.done).forEach(function(k){
-          const v=snap.done[k];
-          res.set(Number(k), { type:v.type||'', text:v.text||'', cueTexts:v.cueTexts?new Map(v.cueTexts):null });
-        });
-        (snap.fillers||[]).forEach(function(no){ fillerSet.add(Number(no)); });
-        ctx=snap.ctx||[]; startBi=snap.bi;
-        PG.durs=Array.isArray(snap.durs)?snap.durs.slice():[];  // ETA 沿用上次节奏，不用重新攒样本
-        log(t('resumeLog', snap.bi, snap.bi+1),'okc');
+      /* v0.9.167：快照分两种形态，走两条互不相干的路。
+         未跑完（无 fin）——原断点续传逻辑，一字未改；
+         整片跑完（fin=1）——新增：问用户要不要直接取回这份结果。 */
+      if(snap.fin){
+        /* 取回时 startBi=bi=totalB，下方批次循环零次执行，直接落到回填/渲染/导出。
+           与正常跑完完全同构：快照存的是「未经任何后处理的模型原始输出」，
+           而 renderRows / applyPost 在循环之后，所以不会出现二次折行、重复加空格。 */
+        const c2=await askReuse(snap.file||S.fileBase, S.srcItems.length, LBY(cfg.dst).zh, snap.ts);
+        if(c2==='reuse'){
+          applySnapInto(snap, res, fillerSet);
+          ctx=snap.ctx||[]; startBi=snap.bi;
+          PG.durs=Array.isArray(snap.durs)?snap.durs.slice():[];
+          S.reuse=1;   // 用于跳过 finish 上报——这次没调模型，不该当成一次任务计入 events.json
+          log(t('reuseLog'),'okc');
+        } else if(c2==='new'){
+          rmSnap();
+        } else {
+          return;   // cancel：不删快照也不翻译，回到翻译前状态（按钮与进度条由 finally 复原）
+        }
       } else {
-        rmSnap();
+        const choice=await askResume(snap.bi, totalB);
+        if(choice==='resume'){
+          applySnapInto(snap, res, fillerSet);
+          ctx=snap.ctx||[]; startBi=snap.bi;
+          PG.durs=Array.isArray(snap.durs)?snap.durs.slice():[];  // ETA 沿用上次节奏，不用重新攒样本
+          log(t('resumeLog', snap.bi, snap.bi+1),'okc');
+        } else {
+          rmSnap();
+        }
       }
     } else if(snap){ rmSnap(); }
     if(useApi) log(t('resumeHint'));
@@ -8213,9 +8333,16 @@ async function runTranslate(){
        二者不是一回事——多数跨条句组走的是逐条对齐或时长切分，并没有真的被并成一条。 */
     log(t('allDone',S.dropN,S.mergedN,S.wrapN),'okc');
     try{ glossVerify(); }catch(e){}   // v0.9.141：术语表核对，失败不影响已完成的结果
-    reportEvent('finish');   // 翻译成功完成上报（仅云端模式有效）
+    /* v0.9.167：从上次结果「取回」的这一轮没有调用模型，不是一次翻译任务。
+       若照旧上报 finish，events.json 会多出一条「行数齐全、批次与 token 全为 0」的记录，
+       看起来就是一次正常任务，会污染所有基于 batches / tkIn 的分析口径。
+       ⚠️ 这里只做「跳过」，没有新增 restore 事件类型——那需要改 server.js 的 ev 白名单（server.js:1106），
+       会把一个纯前端改动升级成动服务的改动（三副本同步 + node --check + 重启）。量化留到以后单独做。 */
+    if(!S.reuse) reportEvent('finish');   // 翻译成功完成上报（仅云端模式有效）
     // v0.9.77：只有整片跑完才作废断点。用户主动停止 / 模型熔断（S.stop）时保留，下次可续跑
-    if(!S.stop) rmSnap();
+    /* v0.9.167：「作废」改为「标记完成」——跑完的快照留在本机（24 小时），
+       下次同一文件 + 同一套参数可以直接把它取回来，不必重译。详见 markSnapDone。 */
+    if(!S.stop) markSnapDone();
     pgFinish();
   }catch(e){
     log(t('errOccur',e.message),'err');

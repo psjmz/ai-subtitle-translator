@@ -3573,6 +3573,75 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const v3 = C.validateCueAlign([{ no: 1, start: 0, end: 900 }], [{ no: 1, text: '' }], {});
     assert.ok(v3.errs.some(e => e.indexOf('EMPTY_') === 0), '无源文本时不能默认豁免');
   });
+
+  t('v0.9.167 新增词条 27 语言齐全', () => {
+    const keys = ['reuseTitle', 'reuseBody', 'reuseGo', 'reuseLog', 'reuseCancel', 'reuseNote'];
+    const blocks = html.match(/^\s*'[a-zA-Z\-]+':\s*\{[^\n]*pureMTMode/gm) || [];
+    const at = blocks.map(b => html.indexOf(b));
+    let checked = 0;
+    for (let bi = 0; bi < blocks.length; bi++) {
+      const code = (blocks[bi].match(/'([a-zA-Z\-]+)'/) || [])[1];
+      if (!code) continue;
+      const i = at[bi];
+      const seg = html.slice(i, bi + 1 < at.length ? at[bi + 1] : html.length);
+      for (const k of keys) {
+        const m = seg.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, code + ' 缺 ' + k);
+      }
+      /* 弹窗正文四个占位符缺一个，界面上就会把 {2} 这种裸标记直接显示给用户 */
+      const body = seg.match(new RegExp("(?<![A-Za-z0-9_])reuseBody\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+      for (const ph of ['{0}', '{1}', '{2}', '{3}']) {
+        assert.ok(body && body[1].indexOf(ph) >= 0, code + ' 的 reuseBody 缺占位符 ' + ph);
+      }
+      checked++;
+    }
+    assert.strictEqual(checked, 27, '实际校验的字典数 ' + checked);
+  });
+
+  t('v0.9.167 跑完的快照改为保留，且不能改坏原有的作废逻辑', () => {
+    /* 以前是 `if(!S.stop) rmSnap()` —— 跑完就删，导致「翻完没导出、回头再跑」要付两遍钱 */
+    assert.ok(/if\(!S\.stop\) markSnapDone\(\);/.test(html), '跑完没有改为标记完成');
+    assert.ok(!/if\(!S\.stop\) rmSnap\(\);/.test(html), '仍在跑完时删除快照');
+    /* 主动停止 / 熔断（S.stop）时不标 fin，快照仍是「未完成」形态 —— 续跑能力不能丢 */
+    const msd = html.slice(html.indexOf('function markSnapDone(){'));
+    const msdBody = msd.slice(0, msd.indexOf('\n}'));
+    assert.ok(/o\.fin=1/.test(msdBody), 'markSnapDone 没有打 fin 标记');
+    assert.ok(/o\.ts=Date\.now\(\)/.test(msdBody), '未刷新时间戳——时限会从首次写入起算，实际留存变短');
+    /* loadSnap 必须放行「已跑满」：bi===totalB 正是整片译完的状态 */
+    assert.ok(/o\.bi>o\.totalB/.test(html), 'loadSnap 仍把跑满的快照判作废，找回无从谈起');
+    /* 差异化时限：未跑完沿用 7 天；跑完的单独一个短时限——隔周再翻通常是想要新译文 */
+    assert.ok(/Date\.now\(\)-o\.ts>\(o\.fin\?FIN_SNAP_TTL:SNAP_TTL\)/.test(html), '快照时限没有按 fin 分开');
+    assert.ok(/const FIN_SNAP_TTL=24\*3600\*1000;/.test(html), '已完成快照的时限不是 24 小时');
+    /* 向后兼容：老快照没有 fin 字段 → falsy → 自动走原来的断点续传，不需要数据迁移 */
+    assert.ok(/if\(snap\.fin\)\{/.test(html), '新分支不是按 fin 判断（老快照会走错路）');
+  });
+
+  t('v0.9.167 取回上次结果：零模型请求，且不污染埋点', () => {
+    const rt = html.slice(html.indexOf('async function runTranslate(){'));
+    const seg = rt.slice(0, rt.indexOf('for(let bi=startBi'));
+    assert.ok(seg.length > 100, '没切到 runTranslate 的快照处理段');
+    assert.ok(/applySnapInto\(snap, res, fillerSet\);/.test(seg), '没有把上次译文灌回 res');
+    /* startBi 推到 snap.bi：fin 时它等于 totalB，下方批次循环零次执行 = 零请求。
+       这条是「秒出」的全部原理，改了就变成重新翻译一遍。 */
+    assert.ok(/startBi=snap\.bi;/.test(seg), '未把 startBi 推到快照处，批次不会跳过');
+    assert.ok(/S\.reuse=1;/.test(seg), '未打复用标记');
+    /* 复用的一轮没调模型，若照旧上报会多出一条「行数齐全、批次与 token 全 0」的假任务，
+       看起来就是一次正常翻译，会污染所有基于 batches / tkIn 的分析口径。 */
+    assert.ok(/if\(!S\.reuse\) reportEvent\('finish'\);/.test(html), '复用路径仍在上报 finish');
+    assert.ok(/S\.reuse = 0;/.test(rt.slice(0, 6000)), '每轮没有重置复用标记');
+  });
+
+  t('v0.9.167 取回弹窗必须留「取消」出口，且老的续传路径不能动', () => {
+    const fn = html.slice(html.indexOf('function askReuse('));
+    const body = fn.slice(0, fn.indexOf('\n}'));
+    assert.ok(/mk\(t\('reuseCancel'\),false,'cancel'\)/.test(body), '缺取消按钮');
+    /* 点遮罩必须等于取消：若等于「重译」，只是想关掉窗口的用户会被迫付一次钱 */
+    assert.ok(/ev\.target===ov\)\{ ov\.remove\(\); resolve\('cancel'\)/.test(body), '点遮罩不是取消');
+    assert.ok(/mk\(t\('resumeNew'\),false,'new'\)/.test(body), '缺「从头重来」——用户必须能推翻重译');
+    /* 原断点续传那条路必须还在，不能被新分支替换掉 */
+    assert.ok(/const choice=await askResume\(snap\.bi, totalB\);/.test(html), '原断点续传入口不见了');
+    assert.ok(/t\('resumeLog', snap\.bi, snap\.bi\+1\)/.test(html), '原续传日志不见了');
+  });
  }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
