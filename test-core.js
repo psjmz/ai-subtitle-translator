@@ -3846,6 +3846,24 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const seg = html.slice(html.indexOf('function setColLabels()'), html.indexOf('function setColLabels()') + 500);
     assert.ok(/srcV0 === 'auto' \? t\('autoDetect'\) : LBY\(srcV0\)\.zh/.test(seg), '列头没对 auto 做文案回退');
   });
+
+  t('v0.9.178 双语导出：auto 时按字符分布猜源语言方言', () => {
+    const m = html.match(/function srcLocaleForExport\(\)\{[\s\S]*?\n\}/);
+    assert.ok(m, 'srcLocaleForExport 找不到');
+    const fn = new Function('$', 'S', m[0] + '\nreturn srcLocaleForExport();');
+    const mk = (val, rows) => fn(() => ({ value: val }), { rows: rows });
+    assert.strictEqual(mk('ja', [{ en: '任意' }]), 'ja', '手动指定必须原样返回，不猜');
+    assert.strictEqual(mk('en', [{ en: 'こんにちは' }]), 'en', '手动指定优先于猜测');
+    assert.strictEqual(mk('auto', [{ en: '子どもたちが公園で楽しく遊んでいた' }]), 'ja', '假名应判 ja');
+    assert.strictEqual(mk('auto', [{ en: '어제 역 앞에서 친구를 만났어요' }]), 'ko', '谚文应判 ko');
+    assert.strictEqual(mk('auto', [{ en: 'Yesterday I met a friend at the cafe' }]), '', '西文猜不出应回退空串');
+    assert.strictEqual(mk('auto', [{ en: '昨天我在车站前见了朋友' }]), '', '中文回退空串（zh 分词器本就合适）');
+    assert.strictEqual(mk('auto', []), '', '无源文不得崩，回退空串');
+    assert.strictEqual(mk('auto', [{ en: '中文里偶尔出现一个の字' }]), '', '单个假名不得误判为 ja');
+    /* 两处双语调用点都必须换成 srcLocaleForExport() */
+    assert.strictEqual((html.match(/srcLocale: srcLocaleForExport\(\)/g) || []).length, 2, '双语两处 srcLocale 都要走猜测函数');
+    assert.ok(!/srcLocale: srcV==='auto'/.test(html), '残留旧的 auto 直通空串写法');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
