@@ -3887,6 +3887,36 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/topSrcs: cnt\(all\.filter\(e => e\.src\), 'src'\)/.test(srvSrc),
       '后台汇总未加 topSrcs（看不见 auto 占比）');
   });
+
+  t('v0.9.180 提示词要有标点规则 8.5（只给原则，不列字符黑名单）', () => {
+    /* 背景：中译英偶发出中文标点。2026-09-26 实测（ja/fr/ar × 四版，同一模型 gpt-6-luna）：
+       ① "for English" 举例不会把其他语言带跑（法 « »+前置空格、阿 ؟、日「」全部保留）
+       ② 字符黑名单唯一稳定生效的一次是误伤：法语的 … 被改成 ...
+       ③ 残留本身低频偶发（无规则 1/80、纯原则 0/80、带黑名单 0/80）→ 举例无可测收益
+       故定案：只写原则句，一个码位都不列。改这条前先看上面三条实测。 */
+    assert.ok(/8\.5 \[Punctuation belongs to the target language\]/.test(html), '英文套提示词（非中文目标）缺 8.5');
+    assert.ok(/8\.5【标点跟随目标语言】/.test(html), '中文套提示词缺 8.5');
+    /* 位置必须夹在规则 8 与 9【输出示例】之间：追加到提示词末尾会被末尾的收尾指令挤掉注意力 */
+    assert.ok(/8\. \[Content fidelity\][\s\S]*?8\.5 \[Punctuation belongs to the target language\][\s\S]*?9\. \[Output example\]/.test(html),
+      '英文 8.5 未插在规则 8 与 9 之间');
+    assert.ok(/8\.【内容保真】[\s\S]*?8\.5【标点跟随目标语言】[\s\S]*?9\.【输出示例】/.test(html),
+      '中文 8.5 未插在规则 8 与 9 之间');
+    /* 否定断言：8.5 句子里不许出现任何码位黑名单项。…(U+2026) 与弯引号 “”‘’ 都不是 CJK 专属，
+       列进去会误伤法语/西语/德语/阿拉伯语的合法排印（实测法语 … → ...），且实测无可测收益。 */
+    const lines85 = html.match(/'8\.5 ?(?:\[|【)[^\n]*/g) || [];
+    assert.strictEqual(lines85.length, 2, '8.5 应正好两条（中/英各一），实到 ' + lines85.length);
+    /* 英文那句可以全量查（英文句子不会自然带 CJK 标点）；中文那句本身要用中文字面写，
+       全量查会误伤自己的句号逗号，只查「引号类 / 省略号 / 书名号」这些不该被点名的字符。 */
+    const lineEn = lines85.find(s => s.includes('Punctuation belongs'));
+    const lineZh = lines85.find(s => s.includes('标点跟随目标语言'));
+    assert.ok(lineEn && lineZh, '中/英两条 8.5 未同时命中');
+    const badEn = '，。、；：？！（）【】《》「」『』～…“”‘’';
+    const badZh = '「」『』《》…“”‘’～';
+    badEn.split('').forEach(ch => assert.ok(!lineEn.includes(ch),
+      '英文 8.5 里出现了黑名单字符 ' + ch + '（会误伤非 CJK 语言的合法排印）'));
+    badZh.split('').forEach(ch => assert.ok(!lineZh.includes(ch),
+      '中文 8.5 里点名了 ' + ch + '（该字符不是 CJK 专属，或会与歌词淡出省略号规则 5.5 打架）'));
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
