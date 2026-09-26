@@ -3864,6 +3864,29 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.strictEqual((html.match(/srcLocale: srcLocaleForExport\(\)/g) || []).length, 2, '双语两处 srcLocale 都要走猜测函数');
     assert.ok(!/srcLocale: srcV==='auto'/.test(html), '残留旧的 auto 直通空串写法');
   });
+
+  t('v0.9.179 events 要记源语言 src（否则无法评估 auto 默认值改动的好坏）', () => {
+    /* 背景：v0.9.177 把源语言默认值从 en 改成 auto，但 events.json 只记目标语言 lang，
+       重试率 / cue 结构错这些指标无法按「auto 组 vs 手动指定组」分组 → 改动好坏无从验证。
+       埋点纪律：纯统计字段，不参与 evFields 匹配（匹配口径改一处即可），也不参与任何路由判定。 */
+    assert.ok(/S\.trMeta = \{[^}]*src: cfg\.src \|\| ''/.test(html),
+      'S.trMeta 未带 src（服务端只能在翻译请求里拿到它）');
+    assert.ok(/src:S\.trMeta\.src\|\|''/.test(html),
+      'reportEvent 未上报 src（自带 Key 用户没有 appendEvent，只有这条上报）');
+
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    assert.ok(/const src = String\(meta\.src \|\| ''\)\.replace\(\/\[\\x00-\\x1f\]\/g, ''\)\.slice\(0, 10\);/.test(srvSrc),
+      '服务端未清洗 meta.src（脏数据会撑大 events.json）');
+    assert.ok(/if \(src\) ev\.src = src;/.test(srvSrc), 'appendEvent 新建记录未写 src');
+    assert.ok(/if \(src\) e\.src = src;[\s\S]{0,200}if \(extra && typeof extra === 'object'\) Object\.assign\(e, extra\);/.test(srvSrc),
+      'appendEvent 去重命中分支未补 src（首批之后才带到的场景会漏）');
+    assert.ok(/if \(src && !e\.src\) e\.src = src;/.test(srvSrc), 'markEvent 命中分支未补 src');
+    assert.ok(/if \(src\) lite\.src = src;/.test(srvSrc), '自带 Key 的轻量记录未写 src');
+    /* 匹配口径不能跟着动：src 一旦进 evFields，任务号缺失时的旧口径会被悄悄改变 */
+    assert.ok(!/src: String\(m\.src/.test(srvSrc), 'src 绝不能进 evFields（会改变事件匹配口径）');
+    assert.ok(/topSrcs: cnt\(all\.filter\(e => e\.src\), 'src'\)/.test(srvSrc),
+      '后台汇总未加 topSrcs（看不见 auto 占比）');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

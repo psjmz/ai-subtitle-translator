@@ -139,6 +139,10 @@ function appendEvent(ip, meta, model, extra){
   const cues = Math.max(0, Math.floor(+meta.cues || 0));
   if (!file && !lang) return; // 无有效元数据（老版前端/异常请求）不记
   const mdl = String(model || '').replace(/[\x00-\x1f]/g, '').slice(0, 60);
+  /* v0.9.179: src = source language ('auto' or a concrete code). Stats only - never used for
+     matching or routing (batching reads dst; bilingual wrapping has its own guessing helper).
+     Needed to tell whether the v0.9.177 "default to auto" change helped or hurt. */
+  const src = String(meta.src || '').replace(/[\x00-\x1f]/g, '').slice(0, 10);
   const db = readEvents();
   // 会话去重：从尾部找同 ip + 同任务号（或同文件名+语言）且时间窗口内的记录 → 批次 +1
   for (let i = db.events.length - 1; i >= 0; i--) {
@@ -160,6 +164,7 @@ function appendEvent(ip, meta, model, extra){
          后台列表（按追加序倒序、显示 t）于是纹丝不动 → 用户翻完一次以为「后台没日志」。
          只补这一个字段，不动 t、不改任何计数口径。 */
       e.lastAt = now;
+      if (src) e.src = src;   // v0.9.179: keep the newest known source language on the record
       if (extra && typeof extra === 'object') Object.assign(e, extra);
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
@@ -167,6 +172,7 @@ function appendEvent(ip, meta, model, extra){
     if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
   }
   const ev = { t: now, ip, file, lang, cues, batches: 0, retries: 0, model: mdl };
+  if (src) ev.src = src;        // v0.9.179
   if (task) ev.taskId = task;   // v0.9.159：存任务号，后续批次才能归到这一条
   if (extra && typeof extra === 'object') Object.assign(ev, extra);
   bumpRetry(ev, meta.rt);
@@ -187,6 +193,8 @@ function markEvent(ip, meta, ev){
   const f = evFields(meta);
   const file = f.file, lang = f.lang;
   const mdl = String(meta.model || '').replace(/[\x00-\x1f]/g, '').slice(0, 60);
+  /* v0.9.179: BYOK users never hit appendEvent, so src only arrives via the finish/download report. */
+  const src = String(meta.src || '').replace(/[\x00-\x1f]/g, '').slice(0, 10);
   if (!file && !lang) return false;
   /* v0.9.159：完成/下载上报同样按任务号匹配——否则同一文件连翻两次，
      第二次的完成时间会被记到第一条上。老前端不带任务号时回退旧口径。 */
@@ -217,6 +225,7 @@ function markEvent(ip, meta, ev){
         if (meta.usedModel) e.model = String(meta.usedModel).slice(0, 60);
       } else return false;
       if (mdl && !e.model) e.model = mdl;
+      if (src && !e.src) e.src = src;   // v0.9.179
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return true;
     }
@@ -224,6 +233,7 @@ function markEvent(ip, meta, ev){
   /* 自带 Key 用户（翻译未经服务器，无 builtin 会话）：首次上报时创建轻量记录 */
   if (!mdl) return false;
   const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
+  if (src) lite.src = src;              // v0.9.179
   if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta)); }
   else if (ev === 'download') { lite.downloads = 1; lite.downloadedAt = now; }
   else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
@@ -1184,6 +1194,7 @@ const server = http.createServer(async (req, res) => {
           },
           topFiles: cnt(all, 'file'),
           topLangs: cnt(all, 'lang'),
+          topSrcs: cnt(all.filter(e => e.src), 'src'),   // v0.9.179: auto vs manually-picked source language
           topModels: cnt(all.filter(e => e.model), 'model'),
           topFails: cnt(all.filter(e => e.failMsg), 'failMsg')
         };
