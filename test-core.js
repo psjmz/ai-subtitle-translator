@@ -3834,6 +3834,18 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 上限 200KB：v0.9.175 换高清裁剪版（1200×1440 q87 ≈ 118KB），清晰度优先 */
     assert.ok(sz > 5000 && sz < 200 * 1024, 'donate-qr.jpg 体积异常: ' + sz);
   });
+
+  t('v0.9.177 源语言默认「自动检测」：未手动选过不再默认 en', () => {
+    const fill = html.slice(html.indexOf('/* 语言选择填充 */'), html.indexOf('/* 语言选择填充 */') + 1400);
+    assert.ok(/src\.value = okSrc\(sv\.srcLang\) \? sv\.srcLang : 'auto';/.test(fill), '源语言默认值必须是 auto（不是 en）');
+    assert.ok(!/okSrc\(sv\.srcLang\) \? sv\.srcLang : 'en'/.test(html), '残留旧的 en 默认值');
+    assert.ok(/ao\.value='auto'/.test(fill), '下拉首项 auto 选项丢失');
+  });
+
+  t('v0.9.177 源语言=auto 时列头显示「自动检测」而非 auto', () => {
+    const seg = html.slice(html.indexOf('function setColLabels()'), html.indexOf('function setColLabels()') + 500);
+    assert.ok(/srcV0 === 'auto' \? t\('autoDetect'\) : LBY\(srcV0\)\.zh/.test(seg), '列头没对 auto 做文案回退');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
