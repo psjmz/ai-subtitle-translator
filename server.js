@@ -971,7 +971,14 @@ const RATE_MAX_WAIT = 60;      // 最多等一个滑窗。要等更久说明额�
 const RATE_INFLIGHT = 4;       // 同一 IP 同时在途的请求数（防多标签页霸占队列）
 const RATE_EST_MIN  = 3000;    // 单批消耗预估下限（token）
 const RATE = { A: [], B: [] };              // 各槽位滑窗 [{t, tk}]
-const RATE_LIMIT = { A: 0, B: 200000 };     // 0 = 该槽位不限，永不 wait
+/* v0.9.187：B 的种子值 20 万 → 200 万。
+   2026-09-27 直连 api.openai.com 实测：x-ratelimit-limit-tokens = **2,000,000** TPM
+   （remaining 1,999,997 / reset 0s；另有 limit-requests 5000 RPM，我们没跟踪）。
+   20 万是用户提额**之前**从 429 文案「Limit 200000, Used 199713」里学到的旧值。
+   ⚠️ 种子值只用于「进程刚起来、还没读到第一个响应头」的那一瞬；一旦读到上游头，
+   noteQuota() 会按真实值再校准（可高可低）。但种子太低会在重启后头几秒无谓地排队，
+   所以种子必须跟真实额度同量级。 */
+const RATE_LIMIT = { A: 0, B: 2000000 };    // 0 = 该槽位不限，永不 wait
 const RATE_OUT_EMA = { A: 0, B: 0 };        // 各槽位平均每批输出 token，供预估
 const INFLIGHT = Object.create(null);       // ip -> 在途请求数
 /* v0.9.185：短等由服务端自己扛。额度只差几秒时让客户端空跑一趟往返、再倒数重发，

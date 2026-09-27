@@ -3926,7 +3926,13 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
     /* ① 账本与限额都按槽位分开 */
     assert.ok(/const RATE = \{ A: \[\], B: \[\] \};/.test(srvSrc), '滑窗账本没有按槽位分开——A 会被 B 的拥堵连坐');
-    assert.ok(/const RATE_LIMIT = \{ A: 0, B: 200000 \};/.test(srvSrc), 'A 槽限额不是 0（不限）；A 从未限流，排队纯属拖慢用户');
+    assert.ok(/const RATE_LIMIT = \{ A: 0, B: 2000000 \};/.test(srvSrc), 'A 槽限额不是 0（不限）；A 从未限流，排队纯属拖慢用户');
+    /* v0.9.187：B 的种子值必须是 200 万（2026-09-27 直连 api.openai.com 实测
+       x-ratelimit-limit-tokens = 2,000,000），不是提额前从 429 文案里学到的 20 万。
+       ⚠️ 种子只在「进程刚起、还没读到第一个响应头」那一瞬生效，但种子太低会让重启后
+       头几批无谓地排队——而这时上游其实有 200 万额度。 */
+    const seedB = (srvSrc.match(/const RATE_LIMIT = \{ A: 0, B: (\d+) \};/) || [])[1];
+    assert.strictEqual(seedB, '2000000', 'B 槽种子值应跟真实额度 200 万同量级，实际 ' + seedB);
     assert.ok(/if \(limit <= 0\) return 0;/.test(srvSrc), 'LIMIT=0 的槽位没有直接放行');
     /* ② 判定必须在 pickModel 之后：不知道走哪个槽位就查不了对应的账本 */
     const iPick = srvSrc.indexOf('const pick = pickModel(cfg, lang);');
