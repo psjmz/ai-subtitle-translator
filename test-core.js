@@ -4152,6 +4152,31 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/if\(!S\.paceOut\) log\(t\('allDone'/.test(html),
       '没跑完却还在报「全部完成」');
   });
+
+  t('v0.9.188 提示词第 2 行：删掉自相矛盾的「严禁输出中文」', () => {
+    /* 起因（用户揪出来的低级错误）：英文版开头写着
+       「unless the target language itself is Chinese, NEVER output Chinese」，三重错——
+       ① 英文版只在 dst≠zh 时被调用（systemPrompt 首行分发），那个「除非」恒不成立 → 死条件
+       ② 中文版 dst 恒=zh，「严禁输出中文」恒被自己那句「除非」豁免 → 自相矛盾的废话
+       ③ 本站主力是中译外，源文通篇中文，却在 [MOST IMPORTANT RULE] 喊 NEVER output Chinese
+       实测（中译日，三版各 7 轮）：末尾再锚定一次目标语言自称 = 7/7；删掉重复的 = 5/7；
+       并进上一句的最简洁版 = 1/7（水词几乎从不清理）→ 取第一版。 */
+    assert.ok(!/NEVER output Chinese/.test(html), '英文版仍有 NEVER output Chinese');
+    assert.ok(!/严禁输出中文/.test(html), '中文版仍有「严禁输出中文」');
+    assert.ok(!/除非目标语言本身就是中文/.test(html), '中文版仍留着那个自相矛盾的豁免从句');
+    /* 替代文案必须到位：讲清「指令语言≠输出语言」+ 禁止照抄原文（对任何源语言都成立，
+       不像原来只针对中文） */
+    assert.ok(/it never determines the output language\. Never copy the source text unchanged/.test(html),
+      '英文版缺少替代文案');
+    assert.ok(/不要把源语言的原文原样留下/.test(html), '中文版缺少替代文案');
+    /* 收尾必须用目标语言自称（dstNative 变量）再锚定一次，不能硬编码 —— 实测这版最稳。
+       [MOST IMPORTANT RULE] 的最后一句权重最高，用自称收尾 vs 用禁令收尾，行为不同。 */
+    assert.ok(/Never copy the source text unchanged: every text field must be written in ' \+ dstNative \+ '\./.test(html),
+      '英文版收尾没有用 dstNative 锚定目标语言');
+    /* 中文版的「本提示词用中文书写只是指令语言，与输出语言无关」也一并删了：
+       中文版只在 dst=zh 时调用，指令语言恒等于输出语言，那句解释的是不存在的冲突 */
+    assert.ok(!/本提示词用中文书写只是指令语言/.test(html), '中文版仍留着解释「指令语言≠输出语言」的废话');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
