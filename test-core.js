@@ -3917,6 +3917,42 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     badZh.split('').forEach(ch => assert.ok(!lineZh.includes(ch),
       '中文 8.5 里点名了 ' + ch + '（该字符不是 CJK 专属，或会与歌词淡出省略号规则 5.5 打架）'));
   });
+
+  t('v0.9.181 排队闸门：只拦免费通道，放行时刻递增，文案 27 语齐全', () => {
+    /* 背景：上游免费模型有 200k TPM 配额，重度用户一次开多个标签页连刷多集会把它打满 → 429
+       → 静默降级到备用模型，同一部剧前后两个模型、风格不一致，而界面此前只有一行日志被刷过去。
+       2026-09-27 实测：今日 20 条回退里 12 条限流、78 次回退全来自同一个 IP（Ludwig，日语剧）。
+       ⚠️ 只拦免费通道：自带 Key 的用户不消耗站点额度，拦他是纯误伤。
+       ⚠️ 放行时刻必须递增：每个页面都只等 60 秒会同时放行、再打满一次，这 60 秒就白等了。 */
+    const dicts = [...html.matchAll(/^\s*['"]([A-Za-z\-]{2,10})['"]\s*:\s*\{\s*pureMTMode\s*:/gm)].map(m => m[1]);
+    assert.strictEqual(dicts.length, 27, '界面字典应 27 个，实际 ' + dicts.length);
+    for (const k of ['paceTitle', 'paceBody', 'paceTick', 'paceNote']) {
+      const n = (html.match(new RegExp('\\b' + k + "\\s*:\\s*'[^']*'", 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 应 27 条，实际 ' + n);
+    }
+    /* paceTick 是「排队倒计时」专用行，不复用 ratePace（后者是批次内 429 等待，语义不同）。
+       两条必须并存且各自带 {0}，串用会让某一处突然变成另一种场景的措辞。 */
+    assert.ok(/paceTick:'[^']*\{0\}/.test(html), 'paceTick 缺 {0} 占位符（倒计时秒数传不进去）');
+    assert.ok(/ratePace:'[^']*\{0\}/.test(html), 'ratePace 被 paceTick 顶掉了——批次内等待那处会没文案');
+    /* 自带 Key 直接放行，一行都不能少 */
+    assert.ok(/function paceGate\(cues, byok\)\{/.test(html), 'paceGate 签名变了（缺 byok 参数就拦不住误伤）');
+    assert.ok(/if\(byok\) return true;/.test(html), '自带 API Key 没被豁免——那是纯误伤，且不消耗站点额度');
+    /* 放行时刻递增：已排上队的排前面，新来的排到后面 */
+    assert.ok(/const until=Math\.max\(st\.until, now\)\+PACE_STEP;/.test(html),
+      '放行时刻没有取 max(已有时刻, 现在)：多标签页会同时放行、再打满一次配额');
+    /* 倒计时期间必须重读共享值：别的标签页可能把截止时间推后了，本页要跟着延长 */
+    const pw = html.slice(html.indexOf('function paceWaitModal('));
+    const pwBody = pw.slice(0, pw.indexOf('\n}'));
+    assert.ok(/paceRead\(\)/.test(pwBody), '倒计时期间不重读共享值，别的标签页排队会失效');
+    assert.ok(/Math\.max\(until, st\.until\)/.test(pwBody), '重读了但没取 max：本页会提前放行，与别人撞车');
+    /* 闸门必须排在语言/风格校验之后，否则用户选错语言还得先干等 60 秒才看到报错 */
+    const rt = html.slice(html.indexOf('async function runTranslate(){'));
+    const iGuard = rt.indexOf('glossLangGuard(');
+    const iGate = rt.indexOf('paceGate(');
+    assert.ok(iGuard >= 0 && iGate > iGuard, '闸门排在校验之前：报错前先白等 60 秒');
+    /* 限流回执要留痕：_fb 是上游亲口说「我在限流」，比频率计数可靠 */
+    assert.ok(/j\._fb\)\{[\s\S]{0,120}paceMarkFb\(\)/.test(html), '收到 _fb 没记信号——下一个任务不会自动排队');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

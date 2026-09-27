@@ -545,7 +545,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.180</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.181</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -705,7 +705,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.180</span>
+    <span class="ver-tag">v0.9.181</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -990,7 +990,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.180"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.181"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1202,6 +1202,7 @@ const I18N = {
   overCapStart:'检测到 {0} 个句组译文过长（超出该时长内可显示的 2 行容量），压缩重译中…', overCapDone:'超容压缩完成：{0}/{1} 个句组已收进容量。', overCapFail:'超容压缩重译失败，过长句组按原样保留。', overCapCallFail:'压缩重译第 {0} 次失败：{1}',
   batchFail:'批 {0} 第 {1} 次失败：{2}', batchSkip:'该批跳过，可在完成后整篇重试。',
   ratePace:'免费模型限流中，{0} 秒后继续…', rateWait:'遇到限流（429），等待 20 秒后重试…',
+paceTitle:'先排个队，稍等一下', paceBody:'免费通道的额度是所有用户共用的。连续提交太密，跑到一半会被限速，字幕可能变慢，甚至中途换成备用模型，前后语气就不一致了。让这个文件晚几十秒开始，就能一口气跑完。', paceTick:'排队中…{0} 秒后自动开始', paceNote:'用自己的 API Key 不受排队限制，随时可以开始。',
   userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折行 …',
   allDone:'全部完成：删除水词 {0} 条，并入 {1} 条，折行 {2} 条。',
   warnManyDrop:'⚠️ 异常丢弃率：{0}/{1} 个句组被判为 drop（{2}）——请检查模型配置或在「翻译引擎」更换模型后重试。',
@@ -1301,6 +1302,7 @@ const I18N = {
   overCapStart:'偵測到 {0} 個句組譯文過長（超出該時長內可顯示的 2 行容量），壓縮重譯中…', overCapDone:'超容壓縮完成：{0}/{1} 個句組已收進容量。', overCapFail:'超容壓縮重譯失敗，過長句組按原樣保留。', overCapCallFail:'壓縮重譯第 {0} 次失敗：{1}',
   batchFail:'批 {0} 第 {1} 次失敗：{2}', batchSkip:'該批跳過，可在完成後整篇重試。',
   ratePace:'免費模型限流中，{0} 秒後繼續…', rateWait:'遇到限流（429），等待 20 秒後重試…',
+paceTitle:'先排個隊，稍等一下', paceBody:'免費通道的額度是所有用戶共用的。連續提交太密，跑到一半會被限速，字幕可能變慢，甚至中途換成備用模型，前後語氣就不一致了。讓這個檔案晚幾十秒開始，就能一口氣跑完。', paceTick:'排隊中…{0} 秒後自動開始', paceNote:'用自己的 API Key 不受排隊限制，隨時可以開始。',
   userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 折行 …',
   allDone:'全部完成：刪除水詞 {0} 條，併入 {1} 條，折行 {2} 條。',
   warnManyDrop:'⚠️ 異常丟棄率：{0}/{1} 個句組被判為 drop（{2}）——請檢查模型配置或在「翻譯引擎」更換模型後重試。',
@@ -1400,6 +1402,7 @@ const I18N = {
   overCapStart:'Detected {0} group(s) with translations too long for the screen (over 2 lines), re-translating more concisely…', overCapDone:'Length compression done: {0}/{1} group(s) now fit.', overCapFail:'Length compression failed; over-long groups kept as-is.', overCapCallFail:'Compression attempt {0} failed: {1}',
   batchFail:'Batch {0} attempt {1} failed: {2}', batchSkip:'Batch skipped; you can re-run the whole file later.',
   ratePace:'Free-model rate limit, continuing in {0}s…', rateWait:'Rate limited (429), waiting 20s before retry…',
+paceTitle:'Queued — just a short wait', paceBody:'Free-channel capacity is shared by everyone. Submitting file after file can hit the speed limit halfway through: subtitles slow down, or the model gets swapped mid-run and the tone drifts. Letting this file start a few dozen seconds later means it finishes in one go.', paceTick:'Queued… starting automatically in {0}s', paceNote:'Using your own API Key skips the queue entirely.',
   userStop:'Stopped by user.', postEnd:'Translation finished, applying filler removal / wrapping…',
   allDone:'All done: {0} fillers removed, {1} merged, {2} wrapped.',
   warnManyDrop:'⚠️ Abnormal drop rate: {0}/{1} groups marked as drop ({2}). Please check your model configuration or switch models under "Translation Engine" and retry.',
@@ -1499,6 +1502,7 @@ const I18N = {
   overCapStart:'画面の2行容量を超える長い訳文の句組が {0} 件検出されました。圧縮して再翻訳中…', overCapDone:'圧縮再翻訳完了：{0}/{1} 件が容量内に収まりました。', overCapFail:'圧縮再翻訳に失敗したため、長すぎる句組はそのまま保持します。', overCapCallFail:'圧縮再翻訳の第 {0} 回目が失敗：{1}',
   batchFail:'バッチ {0} の第 {1} 回失敗：{2}', batchSkip:'このバッチはスキップ。後で全体を再実行できます。',
   ratePace:'無料モデルのレート制限中、{0} 秒後に続行…', rateWait:'レート制限（429）、20秒待って再試行…',
+paceTitle:'少しだけ順番待ちします', paceBody:'無料チャンネルの枠はすべての利用者で共有しています。立て続けに送信すると、途中で速度制限にかかり、字幕が遅くなったり、予備のモデルに切り替わって前後で語調が変わってしまうことがあります。このファイルを数十秒遅らせて開始すれば、最後まで一気に処理できます。', paceTick:'順番待ち中…{0} 秒後に自動で開始します', paceNote:'自分の API キーを使う場合は順番待ちは不要で、すぐに開始できます。',
   userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了、フィラー除去 / 改行を適用中…',
   allDone:'完了：フィラー削除 {0} 件、統合 {1} 件、改行 {2} 件。',
   warnManyDrop:'⚠️ 異常な破棄率：{0}/{1} グループが drop と判定されました（{2}）——「翻訳エンジン」のモデル設定を確認または変更して再試行してください。',
@@ -1598,6 +1602,7 @@ const I18N = {
   overCapStart:'Detectadas {0} traducciones demasiado largas para la pantalla (más de 2 líneas); se retraducen de forma más concisa…', overCapDone:'Compresión completada: {0}/{1} grupos ahora caben.', overCapFail:'La compresión falló; los grupos demasiado largos se mantienen tal cual.', overCapCallFail:'Intento de compresión {0} fallido: {1}',
   batchFail:'Lote {0} intento {1} falló: {2}', batchSkip:'Lote omitido; puedes reejecutar todo el archivo más tarde.',
   ratePace:'Límite de velocidad del modelo gratuito, continuando en {0}s…', rateWait:'Limitado (429), esperando 20s antes de reintentar…',
+paceTitle:'Un momento, este archivo hace cola', paceBody:'La capacidad del canal gratuito es compartida por todos los usuarios. Enviar archivos uno tras otro puede provocar un límite de velocidad a mitad del proceso: los subtítulos se ralentizan o el modelo cambia sobre la marcha y el tono deja de ser uniforme. Dejar que este archivo empiece unas decenas de segundos más tarde permite terminarlo de una sola vez.', paceTick:'En cola… comienza automáticamente en {0}s', paceNote:'Con tu propia API key no hay cola y puedes empezar cuando quieras.',
   userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando limpieza de relleno / ajuste…',
   allDone:'Todo listo: {0} rellenos eliminados, {1} fusionados, {2} ajustados.',
   warnManyDrop:'⚠️ Tasa de descarte anómala: {0}/{1} grupos marcados como drop ({2}). Revisa la configuración del modelo o cámbialo en "Motor de traducción" y reintenta.',
@@ -1697,6 +1702,7 @@ const I18N = {
   overCapStart:'Detectadas {0} traduções longas demais para a tela (mais de 2 linhas); retraduzindo de forma mais concisa…', overCapDone:'Compressão concluída: {0}/{1} grupos agora cabem.', overCapFail:'A compressão falhou; os grupos longos demais foram mantidos como estão.', overCapCallFail:'Tentativa de compressão {0} falhou: {1}',
   batchFail:'Lote {0} tentativa {1} falhou: {2}', batchSkip:'Lote ignorado; você pode reexecutar o arquivo inteiro depois.',
   ratePace:'Limite de taxa do modelo gratuito, continuando em {0}s…', rateWait:'Limitado (429), aguardando 20s antes de tentar de novo…',
+paceTitle:'Um momento, este arquivo entra na fila', paceBody:'A capacidade do canal gratuito é compartilhada por todos os usuários. Enviar arquivos em sequência pode atingir o limite de velocidade no meio do processo: as legendas ficam mais lentas ou o modelo é trocado no meio e o tom deixa de ser uniforme. Deixar este arquivo começar algumas dezenas de segundos depois permite concluí-lo de uma só vez.', paceTick:'Na fila… começa automaticamente em {0}s', paceNote:'Com sua própria API key não há fila e você pode começar quando quiser.',
   userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicando remoção de preenchimento / quebra…',
   allDone:'Tudo pronto: {0} preenchimentos removidos, {1} fundidos, {2} quebrados.',
   warnManyDrop:'⚠️ Taxa anormal de descarte: {0}/{1} grupos marcados como drop ({2}). Verifique a configuração do modelo ou troque de modelo em "Motor de tradução" e tente de novo.',
@@ -1796,6 +1802,7 @@ const I18N = {
   overCapStart:'화면 2줄 용량을 초과하는 번역 그룹 {0}개를 발견했습니다. 압축 재번역 중…', overCapDone:'압축 재번역 완료: {0}/{1}개 그룹이 용량 안에 들어맞습니다.', overCapFail:'압축 재번역에 실패하여 과도하게 긴 그룹은 그대로 유지합니다.', overCapCallFail:'압축 재번역 {0}번째 시도 실패: {1}',
   batchFail:'배치 {0} {1}번째 시도 실패: {2}', batchSkip:'이 배치는 건너뛰었습니다; 나중에 전체를 다시 실행할 수 있습니다.',
   ratePace:'무료 모델 속도 제한, {0}초 후 계속…', rateWait:'속도 제한(429), 20초 대기 후 재시도…',
+paceTitle:'잠시만요, 이 작업은 대기합니다', paceBody:'무료 채널의 용량은 모든 사용자가 함께 씁니다. 파일을 잇달아 제출하면 중간에 속도 제한에 걸려 자막이 느려지거나 모델이 바뀌어 앞뒤 어조가 달라질 수 있습니다. 이 파일을 몇십 초 늦게 시작하면 처음부터 끝까지 한 번에 끝낼 수 있습니다.', paceTick:'대기 중… {0}초 후 자동으로 시작됩니다', paceNote:'자신의 API 키를 쓰면 대기 없이 바로 시작할 수 있습니다.',
   userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제거 / 줄바꿈 적용 중…',
   allDone:'모두 완료: 필러 {0}개 삭제, {1}개 병합, {2}개 줄바꿈.',
   warnManyDrop:'⚠️ 비정상적 폐기율: {0}/{1}그룹이 drop으로 판정되었습니다({2}). "번역 엔진"에서 모델 설정을 확인하거나 교체한 뒤 다시 시도하세요.',
@@ -1895,6 +1902,7 @@ const I18N = {
   overCapStart:'{0} Gruppe(n) mit zu langen Übersetzungen für den Bildschirm (mehr als 2 Zeilen) erkannt – werde kürzer neu übersetzen…', overCapDone:'Kürzung abgeschlossen: {0}/{1} Gruppen passen jetzt.', overCapFail:'Kürzung fehlgeschlagen; zu lange Gruppen bleiben unverändert.', overCapCallFail:'Kürzungsversuch {0} fehlgeschlagen: {1}',
   batchFail:'Batch {0} Versuch {1} fehlgeschlagen: {2}', batchSkip:'Batch übersprungen; Sie können die ganze Datei später erneut ausführen.',
   ratePace:'Geschwindigkeitslimit des Gratis-Modells, weiter in {0}s…', rateWait:'Rate-Limit (429), warte 20s vor dem erneuten Versuch…',
+paceTitle:'Kurz warten, diese Datei stellt sich an', paceBody:'Die Kapazität des kostenlosen Kanals teilen sich alle Nutzer. Werden Dateien direkt hintereinander gestartet, kann mitten in der Aufgabe die Drosselung greifen: Untertitel werden langsamer oder das Modell wechselt und der Ton passt nicht mehr zusammen. Startet diese Datei einige Dutzend Sekunden später, läuft sie in einem Durchgang durch.', paceTick:'In der Warteschlange… automatischer Start in {0}s', paceNote:'Mit einem eigenen API-Key gibt es keine Warteschlange, du kannst sofort starten.',
   userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende Füllwort-Entfernung / Umbruch an…',
   allDone:'Alles fertig: {0} Füllwörter entfernt, {1} zusammengeführt, {2} umgebrochen.',
   warnManyDrop:'⚠️ Auffällige Verlustrate: {0}/{1} Gruppen als drop markiert ({2}). Bitte Modellkonfiguration prüfen oder unter "Übersetzungs-Engine" wechseln und erneut versuchen.',
@@ -1994,6 +2002,7 @@ const I18N = {
   overCapStart:'{0} groupe(s) avec des traductions trop longues pour l’écran (plus de 2 lignes) détecté(s), retraduction plus concise en cours…', overCapDone:'Compression terminée : {0}/{1} groupe(s) tiennent maintenant.', overCapFail:'La compression a échoué ; les groupes trop longs sont conservés tels quels.', overCapCallFail:'Tentative de compression {0} échouée : {1}',
   batchFail:'Lot {0} tentative {1} échouée : {2}', batchSkip:'Lot ignoré ; vous pourrez relancer tout le fichier plus tard.',
   ratePace:'Limite de débit du modèle gratuit, reprise dans {0}s…', rateWait:'Limité (429), attente de 20s avant nouvel essai…',
+paceTitle:'Un instant, ce fichier fait la queue', paceBody:'La capacité du canal gratuit est partagée par tous les utilisateurs. Envoyer les fichiers à la chaîne peut déclencher la limitation de débit en cours de route : les sous-titres ralentissent ou le modèle est remplacé en cours de tâche et le ton n’est plus homogène. Laisser ce fichier démarrer quelques dizaines de secondes plus tard permet de le terminer d’une seule traite.', paceTick:'En file d’attente… démarrage automatique dans {0}s', paceNote:'Avec votre propre clé API, aucune attente : vous pouvez démarrer quand vous voulez.',
   userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, application suppression remplissage / retour ligne…',
   allDone:'Tout est fini : {0} remplissages supprimés, {1} fusionnés, {2} répartis.',
   warnManyDrop:'⚠️ Taux de rejet anormal : {0}/{1} groupes marqués drop ({2}). Vérifiez la configuration du modèle ou changez de modèle dans « Moteur de traduction » puis réessayez.',
@@ -2093,6 +2102,7 @@ const I18N = {
   overCapStart:'Terdeteksi {0} grup dengan terjemahan terlalu panjang untuk layar (lebih dari 2 baris), menerjemahkan ulang secara lebih ringkas…', overCapDone:'Pemadatan selesai: {0}/{1} grup kini muat.', overCapFail:'Pemadatan gagal; grup yang terlalu panjang tetap dipertahankan.', overCapCallFail:'Percobaan pemadatan {0} gagal: {1}',
   batchFail:'Batch {0} percobaan {1} gagal: {2}', batchSkip:'Batch dilewati; Anda bisa menjalankan ulang seluruh file nanti.',
   ratePace:'Batas laju model gratis, lanjut dalam {0} dtk…', rateWait:'Dibatasi (429), menunggu 20 dtk sebelum mencoba lagi…',
+paceTitle:'Sebentar, tugas ini mengantre', paceBody:'Kapasitas kanal gratis dipakai bersama oleh semua pengguna. Mengirim file berturut-turut bisa terkena pembatasan kecepatan di tengah proses: subtitle melambat atau modelnya berganti sehingga nadanya tidak konsisten. Menunda file ini beberapa puluh detik justru membuatnya selesai sekali jalan.', paceTick:'Mengantre… mulai otomatis dalam {0} dtk', paceNote:'Dengan API key sendiri tidak perlu mengantre dan bisa mulai kapan saja.',
   userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghapusan pengisi / pembungkusan…',
   allDone:'Semua selesai: {0} pengisi dihapus, {1} digabung, {2} dibungkus.',
   warnManyDrop:'⚠️ Tingkat pembuangan abnormal: {0}/{1} grup ditandai drop ({2}). Periksa konfigurasi model atau ganti model di "Mesin terjemahan" lalu coba lagi.',
@@ -2192,6 +2202,7 @@ const I18N = {
   overCapStart:'स्क्रीन की 2-पंक्ति क्षमता से अधिक लंबे अनुवाद वाले {0} समूह मिले, अधिक संक्षिप्त रूप से पुनः अनुवाद हो रहे हैं…', overCapDone:'संपीडन पूर्ण: {0}/{1} समूह अब क्षमता में आ गए।', overCapFail:'संपीडन विफल; बहुत लंबे समूह जस के तस रखे गए।', overCapCallFail:'संपीडन प्रयास {0} विफल: {1}',
   batchFail:'बैच {0} प्रयास {1} असफल: {2}', batchSkip:'बैच छोड़ा गया; बाद में पूरी फ़ाइल दोबारा चला सकते हैं।',
   ratePace:'मुफ़्त मॉडल दर-सीमा, {0} सेकंड में जारी…', rateWait:'सीमित (429), 20 सेकंड प्रतीक्षा बाद पुनः प्रयास…',
+paceTitle:'एक पल रुकें, यह फ़ाइल कतार में है', paceBody:'मुफ़्त चैनल की क्षमता सभी उपयोगकर्ताओं के बीच साझा है। लगातार फ़ाइलें भेजने पर बीच में गति-सीमा लग सकती है: उपशीर्षक धीमे हो जाते हैं या मॉडल बदल जाता है और शैली बदल जाती है। इस फ़ाइल को कुछ दसियों सेकंड बाद शुरू करने देने से वह एक ही बार में पूरी हो जाती है।', paceTick:'कतार में… {0} सेकंड में अपने आप शुरू होगा', paceNote:'अपनी API key के साथ कतार नहीं लगती, आप कभी भी शुरू कर सकते हैं।',
   userStop:'उपयोगकर्ता ने रोका।', postEnd:'अनुवाद समाप्त, फिलर हटाना / रैप लागू हो रहा है…',
   allDone:'सब पूर्ण: {0} फिलर हटाए, {1} विलय, {2} रैप्ड।',
   warnManyDrop:'⚠️ असामान्य drop दर: {0}/{1} समूह drop चिह्नित ({2})। मॉडल कॉन्फ़िगरेशन जाँचें या "अनुवाद इंजन" में मॉडल बदलें और पुनः प्रयास करें।',
@@ -2291,6 +2302,7 @@ const I18N = {
   overCapStart:'พบคำแปลที่ยาวเกินความจุ 2 บรรทัดบนจอ {0} กลุ่ม กำลังแปลใหม่แบบกระชับ…', overCapDone:'บีบอัดเสร็จสมบูรณ์: {0}/{1} กลุ่มเข้าได้ในความจุแล้ว', overCapFail:'บีบอัดไม่สำเร็จ กลุ่มที่ยาวเกินคงไว้ตามเดิม', overCapCallFail:'ความพยายามบีบอัดครั้งที่ {0} ล้มเหลว: {1}',
   batchFail:'แบตช์ {0} ครั้งที่ {1} ล้มเหลว: {2}', batchSkip:'ข้ามแบตช์นี้ สามารถรันทั้งไฟล์ใหม่ภายหลังได้',
   ratePace:'โมเดลฟรีถูกจำกัดอัตรา จะไปต่อใน {0} วินาที…', rateWait:'โดนจำกัดอัตรา (429) รอ 20 วินาทีแล้วลองใหม่…',
+paceTitle:'รอสักครู่ งานนี้ต้องต่อคิว', paceBody:'ความจุของช่องทางฟรีใช้ร่วมกันกับผู้ใช้ทุกคน การส่งไฟล์ติดกันหลายครั้งอาจเจอการจำกัดอัตรากลางคัน: ซับไตเติลช้าลง หรือเปลี่ยนโมเดลระหว่างทางจนโทนไม่สม่ำเสมอ การให้ไฟล์นี้เริ่มช้าลงสักหลายสิบวินาทีจะทำให้ประมวลผลจบในรอบเดียว', paceTick:'กำลังต่อคิว… จะเริ่มอัตโนมัติใน {0} วินาที', paceNote:'ใช้ API key ของตัวเองไม่ต้องต่อคิว สามารถเริ่มได้ทันที',
   userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร็จ กำลังลบคำเสียบ / ตัดบรรทัด…',
   allDone:'เสร็จทั้งหมด: ลบคำเสียบ {0} ซับ รวม {1} ซับ ตัดบรรทัด {2} ซับ',
   warnManyDrop:'⚠️ อัตราการทิ้งผิดปกติ: {0}/{1} กลุ่มถูกตัดสินว่า drop ({2}) — ตรวจสอบการตั้งค่าโมเดล หรือเปลี่ยนโมเดลใน "เอนจินแปลภาษา" แล้วลองใหม่',
@@ -2390,6 +2402,7 @@ const I18N = {
   overCapStart:'Phát hiện {0} nhóm bản dịch quá dài so với màn hình (trên 2 dòng), đang dịch lại ngắn gọn hơn…', overCapDone:'Nén hoàn tất: {0}/{1} nhóm đã vừa màn hình.', overCapFail:'Nén thất bại; các nhóm quá dài được giữ nguyên.', overCapCallFail:'Lần nén thứ {0} thất bại: {1}',
   batchFail:'Lô {0} lần thử {1} thất bại: {2}', batchSkip:'Lô bị bỏ qua; bạn có thể chạy lại cả file sau.',
   ratePace:'Mô hình miễn phí bị giới hạn tốc độ, tiếp tục sau {0}s…', rateWait:'Bị giới hạn (429), chờ 20s rồi thử lại…',
+paceTitle:'Đợi một chút, tệp này sẽ xếp hàng', paceBody:'Dung lượng kênh miễn phí được dùng chung cho mọi người. Gửi các tệp liên tiếp có thể vấp phải giới hạn tốc độ giữa chừng: phụ đề chậm lại hoặc mô hình bị đổi và giọng điệu không còn nhất quán. Để tệp này bắt đầu muộn vài chục giây thì nó sẽ chạy xong trong một lượt.', paceTick:'Đang xếp hàng… tự động bắt đầu sau {0} giây', paceNote:'Dùng API key riêng thì không phải xếp hàng, bạn có thể bắt đầu bất cứ lúc nào.',
   userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn từ đệm / ngắt dòng…',
   allDone:'Hoàn tất: đã xóa {0} từ đệm, gộp {1}, ngắt dòng {2}.',
   warnManyDrop:'⚠️ Tỷ lệ bỏ bất thường: {0}/{1} nhóm bị đánh dấu drop ({2}). Kiểm tra cấu hình mô hình hoặc đổi mô hình trong "Cỗ máy dịch" rồi thử lại.',
@@ -2489,6 +2502,7 @@ const I18N = {
   overCapStart:'Обнаружены группы с переводами длиннее ёмкости экрана (более 2 строк): {0}. Идёт более сжатый повторный перевод…', overCapDone:'Сжатие завершено: {0}/{1} групп помещаются.', overCapFail:'Сжатие не удалось; слишком длинные группы сохранены как есть.', overCapCallFail:'Попытка сжатия {0} не удалась: {1}',
   batchFail:'Батч {0} попытка {1} не удалась: {2}', batchSkip:'Батч пропущен; можно перезапустить весь файл позже.',
   ratePace:'Ограничение скорости бесплатной модели, продолжаю через {0}с…', rateWait:'Лимит (429), жду 20с перед повтором…',
+paceTitle:'Небольшая очередь, подождите', paceBody:'Ёмкость бесплатного канала общая для всех пользователей. Если отправлять файлы один за другим, можно упереться в ограничение скорости на середине: субтитры замедляются или модель подменяется, и тон перестаёт быть ровным. Если этот файл начнётся на несколько десятков секунд позже, он пройдёт целиком за один раз.', paceTick:'В очереди… автозапуск через {0} с', paceNote:'Со своим API-key очереди нет — можно начинать в любой момент.',
   userStop:'Остановлено пользователем.', postEnd:'Перевод завершён, применяю удаление заполнителей / перенос строк…',
   allDone:'Всё готово: удалено заполнителей {0}, объединено {1}, перенесено {2}.',
   warnManyDrop:'⚠️ Аномальный процент отбраковки: {0}/{1} групп помечены как drop ({2}). Проверьте конфигурацию модели или смените модель в «Переводчик» и повторите.',
@@ -2588,6 +2602,7 @@ const I18N = {
   overCapStart:'Rilevati {0} gruppi con traduzioni troppo lunghe per lo schermo (oltre 2 righe), ritraduco in modo più conciso…', overCapDone:'Compressione completata: {0}/{1} gruppi ora entrano.', overCapFail:'Compressione fallita; i gruppi troppo lunghi restano invariati.', overCapCallFail:'Tentativo di compressione {0} fallito: {1}',
   batchFail:'Tentativo {1} del batch {0} non riuscito: {2}', batchSkip:'Batch saltato; puoi rieseguire l\'intero file più tardi.',
   ratePace:'Limite di frequenza del modello gratuito, ripresa tra {0}s…', rateWait:'Limite raggiunto (429), attesa di 20s prima di riprovare…',
+paceTitle:'Un attimo, questo file è in coda', paceBody:'La capacità del canale gratuito è condivisa da tutti gli utenti. Inviare file uno dopo l’altro può far scattare il limite di velocità a metà: i sottotitoli rallentano o il modello viene sostituito e il tono non è più uniforme. Far partire questo file qualche decina di secondi dopo permette di completarlo in un’unica passata.', paceTick:'In coda… avvio automatico tra {0}s', paceNote:'Con una tua chiave API non c’è coda: puoi partire quando vuoi.',
   userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozione riempitivi / a capo…',
   allDone:'Completato: {0} riempitivi rimossi, {1} uniti, {2} ritorni a capo.',
   warnManyDrop:'⚠️ Percentuale di rimozione anomala: {0}/{1} gruppi contrassegnati come drop ({2}). Controlla la configurazione del modello o cambialo in "Motore di traduzione" e riprova.',
@@ -2687,6 +2702,7 @@ const I18N = {
   overCapStart:'تم اكتشاف {0} مجموعة بترجمات أطول من سعة الشاشة (أكثر من سطرين)، تجري إعادة ترجمة أكثر إيجازًا…', overCapDone:'اكتمل الضغط: {0}/{1} مجموعة أصبحت ضمن السعة.', overCapFail:'فشل الضغط؛ تم الإبقاء على المجموعات الطويلة جدًا كما هي.', overCapCallFail:'فشلت محاولة الضغط {0}: {1}',
   batchFail:'فشلت محاولة {1} للدفعة {0}: {2}', batchSkip:'تخطّيت الدفعة؛ يمكنك إعادة تشغيل الملف كاملًا لاحقًا.',
   ratePace:'حد معدل النموذج المجاني، سنكمل خلال {0} ث…', rateWait:'بلغنا حد المعدل (429)، انتظار 20 ث قبل إعادة المحاولة…',
+paceTitle:'لحظة من فضلك، هذا الملف في قائمة الانتظار', paceBody:'سعة القناة المجانية مشتركة بين جميع المستخدمين. إرسال الملفات واحداً تلو الآخر قد يؤدي إلى تفعيل حد السرعة في منتصف العمل: تتباطأ الترجمة أو يُستبدل النموذج فتختلف النبرة. تأخير بدء هذا الملف بضع عشرات من الثواني يجعله يُنجز بالكامل دفعة واحدة.', paceTick:'في قائمة الانتظار… سيبدأ تلقائياً بعد {0} ثانية', paceNote:'باستخدام مفتاح API الخاص بك لا يوجد انتظار، ويمكنك البدء في أي وقت.',
   userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، تُطبَّق إزالة الحشو / الالتفاف…',
   allDone:'اكتمل كل شيء: أُزيل {0} حشوًا، ودُمج {1}، والُفّ {2}.',
   warnManyDrop:'⚠️ نسبة حذف غير طبيعية: {0}/{1} مجموعة معلّمة كمحذوفة ({2}). تحقق من إعداد النموذج أو بدّله من «محرك الترجمة» وأعد المحاولة.',
@@ -2786,6 +2802,7 @@ const I18N = {
   overCapStart:'Ekrana sığmayan (2 satırdan uzun) çevirileri olan {0} grup algılandı, daha kısa yeniden çevriliyor…', overCapDone:'Kısaltma tamamlandı: {0}/{1} grup artık sığıyor.', overCapFail:'Kısaltma başarısız; çok uzun gruplar olduğu gibi korundu.', overCapCallFail:'Kısaltma denemesi {0} başarısız: {1}',
   batchFail:'Grup {0} deneme {1} başarısız: {2}', batchSkip:'Grup atlandı; tüm dosyayı daha sonra yeniden çalıştırabilirsin.',
   ratePace:'Ücretsiz model hız limiti, {0} sn içinde devam ediliyor…', rateWait:'Hız limiti (429), yeniden denemeden önce 20 sn bekleniyor…',
+paceTitle:'Biraz bekleyin, bu dosya sıraya girdi', paceBody:'Ücretsiz kanalın kapasitesi tüm kullanıcılar tarafından paylaşılır. Dosyaları peş peşe göndermek işin ortasında hız sınırına takılabilir: altyazılar yavaşlar veya model değişir ve üslup tutarsız olur. Bu dosyanın birkaç on saniye geç başlaması, tek seferde bitmesini sağlar.', paceTick:'Sırada… {0} saniye sonra otomatik başlayacak', paceNote:'Kendi API anahtarınızla sıra beklemek gerekmez, istediğiniz zaman başlayabilirsiniz.',
   userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu temizleme / satır sarma uygulanıyor…',
   allDone:'Tümü tamam: {0} dolgu kaldırıldı, {1} birleştirildi, {2} satır sarıldı.',
   warnManyDrop:'⚠️ Anormal kaldırma oranı: {0}/{1} grup drop olarak işaretlendi ({2}). Model yapılandırmanı kontrol et ya da «Çeviri Motoru» altında modeli değiştir ve yeniden dene.',
@@ -3000,6 +3017,7 @@ const I18N = {
   batchFail:'Batch {0}, poging {1} mislukt: {2}',
   batchSkip:'Batch overgeslagen; je kunt het hele bestand later opnieuw draaien.',
   ratePace:'Snelheidslimiet van het gratis model, verder over {0}s…',
+paceTitle:'Even geduld, dit bestand wacht in de rij', paceBody:'De capaciteit van het gratis kanaal wordt door alle gebruikers gedeeld. Bestanden vlak na elkaar insturen kan halverwege de snelheidslimiet raken: ondertiteling wordt trager of het model wordt gewisseld en de toon is niet meer gelijk. Dit bestand een paar tientallen seconden later laten starten betekent dat het in één keer afloopt.', paceTick:'In de wachtrij… start automatisch over {0}s', paceNote:'Met je eigen API-sleutel hoef je niet te wachten en kun je op elk moment starten.',
   rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   userStop:'Door de gebruiker gestopt.',
   postEnd:'Vertaling afgerond, stopwoorden verwijderen / afbreken toepassen…',
@@ -3293,6 +3311,7 @@ const I18N = {
   batchFail:'Partia {0}, próba {1} nie udała się: {2}',
   batchSkip:'Partia pominięta; możesz uruchomić cały plik później.',
   ratePace:'Limit modelu darmowego, kontynuacja za {0} s…',
+paceTitle:'Chwilę cierpliwości, ten plik czeka w kolejce', paceBody:'Przepustowość darmowego kanału jest współdzielona przez wszystkich użytkowników. Wysyłanie plików jeden po drugim może w połowie trafić na ograniczenie szybkości: napisy zwalniają albo model zostaje zmieniony i ton przestaje być spójny. Jeśli ten plik wystartuje kilkadziesiąt sekund później, przejdzie w całości za jednym razem.', paceTick:'W kolejce… uruchomi się automatycznie za {0}s', paceNote:'Z własnym kluczem API nie ma kolejki — możesz zacząć w dowolnym momencie.',
   rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   userStop:'Przerwane przez użytkownika.',
   postEnd:'Tłumaczenie zakończone, usuwanie wypełniaczy / łamanie linii…',
@@ -3586,6 +3605,7 @@ const I18N = {
   batchFail:'Batch {0}, försök {1} misslyckades: {2}',
   batchSkip:'Batch överhoppad; du kan köra hela filen igen senare.',
   ratePace:'Begränsning för gratis-modellen, fortsätter om {0} s…',
+paceTitle:'Ett litet ögonblick, den här filen står i kö', paceBody:'Kapaciteten i den kostnadsfria kanalen delas av alla användare. Skickar du filerna tätt efter varandra kan hastighetsgränsen slå till mitt i arbetet: undertexterna blir långsammare eller så byts modellen och tonen blir ojämn. Låter du filen starta några tiotals sekunder senare blir den klar i ett svep.', paceTick:'I kö… startar automatiskt om {0}s', paceNote:'Med din egen API-nyckel behöver du inte köa, du kan starta när som helst.',
   rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   userStop:'Stoppad av användaren.',
   postEnd:'Översättning klar, tillämpar borttagning av utfyllnad / radbrytning…',
@@ -3879,6 +3899,7 @@ const I18N = {
   batchFail:'Dávka {0}, pokus {1} selhal: {2}',
   batchSkip:'Dávka přeskočena; celý soubor můžete spustit později.',
   ratePace:'Omezení bezplatného modelu, pokračuji za {0} s…',
+paceTitle:'Chvilku strpení, tento soubor čeká ve frontě', paceBody:'Kapacita bezplatného kanálu je společná pro všechny uživatele. Když posíláte soubory jeden za druhým, může se v polovině spustit omezení rychlosti: titulky zpomalí nebo se model vymění a tón přestane být jednotný. Když tento soubor začne o několik desítek sekund později, projde celý najednou.', paceTick:'Ve frontě… automatické spuštění za {0}s', paceNote:'S vlastním API klíčem se nečeká — můžete začít kdykoli.',
   rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   userStop:'Zastaveno uživatelem.',
   postEnd:'Překlad dokončen, aplikuji mazání výplní / zalamování…',
@@ -4172,6 +4193,7 @@ const I18N = {
   batchFail:'Пакет {0}, спроба {1} не вдалася: {2}',
   batchSkip:'Пакет пропущено; весь файл можна запустити пізніше.',
   ratePace:'Обмеження безкоштовної моделі, продовження через {0} с…',
+paceTitle:'Невелика черга, зачекайте', paceBody:'Ємність безкоштовного каналу спільна для всіх користувачів. Якщо надсилати файли один за одним, можна натрапити на обмеження швидкості на середині: субтитри сповільнюються або модель змінюється, і тон стає нерівним. Якщо цей файл почнеться на кілька десятків секунд пізніше, він пройде повністю за один раз.', paceTick:'У черзі… автозапуск через {0} с', paceNote:'З власним API-key черги немає — можна починати будь-коли.',
   rateWait:'Перевищено ліміт (429), очікування 20 с перед повтором…',
   userStop:'Зупинено користувачем.',
   postEnd:'Переклад завершено, застосовую вилучення заповнювачів / перенесення…',
@@ -4465,6 +4487,7 @@ const I18N = {
   batchFail:'Batch {0}, forsøg {1} mislykkedes: {2}',
   batchSkip:'Batch sprunget over; du kan køre hele filen igen senere.',
   ratePace:'Begrænsning for gratis-modellen, fortsætter om {0} s…',
+paceTitle:'Et øjeblik, denne fil står i kø', paceBody:'Kapaciteten på den gratis kanal deles af alle brugere. Sender du filerne lige efter hinanden, kan hastighedsbegrænsningen slå til midtvejs: underteksterne bliver langsommere, eller modellen skiftes ud, og tonen bliver ujævn. Lader du denne fil starte nogle dusin sekunder senere, bliver den færdig i ét stræk.', paceTick:'I kø… starter automatisk om {0}s', paceNote:'Med din egen API-nøgle er der ingen kø — du kan starte når som helst.',
   rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   userStop:'Stoppet af brugeren.',
   postEnd:'Oversættelse færdig, anvender fyldfjernelse / ombrud…',
@@ -4758,6 +4781,7 @@ const I18N = {
   batchFail:'Erä {0}, yritys {1} epäonnistui: {2}',
   batchSkip:'Erä ohitettu; voit ajaa koko tiedoston myöhemmin uudelleen.',
   ratePace:'Ilmaisen mallin nopeusrajoitus, jatketaan {0} s kuluttua…',
+paceTitle:'Hetkinen, tämä tiedosto jonottaa', paceBody:'Ilmaisen kanavan kapasiteetti on kaikkien käyttäjien yhteinen. Tiedostojen lähettäminen peräkkäin voi osua nopeusrajoitukseen kesken kaiken: tekstitys hidastuu tai malli vaihtuu ja sävy muuttuu epätasaiseksi. Jos tämä tiedosto aloittaa muutaman kymmenen sekuntia myöhemmin, se valmistuu kerralla.', paceTick:'Jonossa… käynnistyy automaattisesti {0}s kuluttua', paceNote:'Omalla API-avaimella ei tarvitse jonottaa, voit aloittaa milloin tahansa.',
   rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   userStop:'Käyttäjä pysäytti.',
   postEnd:'Käännös valmis, poistetaan täytteet / rivitetään…',
@@ -5051,6 +5075,7 @@ const I18N = {
   batchFail:'Παρτίδα {0}, προσπάθεια {1} απέτυχε: {2}',
   batchSkip:'Η παρτίδα παρακάμφθηκε· μπορείτε να εκτελέσετε ξανά όλο το αρχείο αργότερα.',
   ratePace:'Όριο ρυθμού του δωρεάν μοντέλου, συνεχίζουμε σε {0} δ…',
+paceTitle:'Μια στιγμή, αυτό το αρχείο περιμένει στη σειρά', paceBody:'Η χωρητικότητα του δωρεάν καναλιού είναι κοινή για όλους τους χρήστες. Η αποστολή αρχείων το ένα μετά το άλλο μπορεί να πέσει στον περιορισμό ταχύτητας στη μέση: οι υπότιτλοι καθυστερούν ή το μοντέλο αλλάζει και το ύφος δεν είναι πια ομοιόμορφο. Αν αυτό το αρχείο ξεκινήσει μερικές δεκάδες δευτερόλεπτα αργότερα, θα ολοκληρωθεί με μία κίνηση.', paceTick:'Στη σειρά… αυτόματη εκκίνηση σε {0}s', paceNote:'Με δικό σου API key δεν υπάρχει αναμονή, μπορείς να ξεκινήσεις όποτε θέλεις.',
   rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επανάληψη…',
   userStop:'Διακόπηκε από τον χρήστη.',
   postEnd:'Η μετάφραση ολοκληρώθηκε, εφαρμόζεται αφαίρεση πληρωτικών / σπάσιμο…',
@@ -5344,6 +5369,7 @@ const I18N = {
   batchFail:'אצווה {0}, ניסיון {1} נכשל: {2}',
   batchSkip:'האצווה דולגה; אפשר להריץ את כל הקובץ מחדש אחר כך.',
   ratePace:'הגבלת קצב של המודל החינמי, ממשיכים בעוד {0} שניות…',
+paceTitle:'רגע קטן, הקובץ הזה בתור', paceBody:'הקיבולת של הערוץ החינמי משותפת לכל המשתמשים. שליחת קבצים בזה אחר זה עלולה להיתקל בהגבלת הקצב באמצע העבודה: הכתוביות מתארכות או שהמודל מתחלף והסגנון כבר לא אחיד. אם הקובץ הזה יתחיל כמה עשרות שניות מאוחר יותר, הוא יסתיים בבת אחת.', paceTick:'בתור… יתחיל אוטומטית בעוד {0} שניות', paceNote:'עם מפתח API משלך אין תור, ואפשר להתחיל בכל רגע.',
   rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניסיון חוזר…',
   userStop:'נעצר על ידי המשתמש.',
   postEnd:'התרגום הסתיים, מיישמים הסרת מילוי / שבירת שורות…',
@@ -5637,6 +5663,7 @@ const I18N = {
   batchFail:'Lotul {0}, încercarea {1} a eșuat: {2}',
   batchSkip:'Lot sărit; poți rula tot fișierul din nou mai târziu.',
   ratePace:'Limită de rată a modelului gratuit, continuu în {0} s…',
+paceTitle:'Un moment, acest fișier stă la coadă', paceBody:'Capacitatea canalului gratuit este împărțită de toți utilizatorii. Trimiterea fișierelor unul după altul poate atinge limita de viteză la jumătatea drumului: subtitrările încetinesc sau modelul este schimbat și tonul nu mai este uniform. Dacă acest fișier pornește cu câteva zeci de secunde mai târziu, se finalizează dintr-o singură trecere.', paceTick:'La coadă… pornește automat în {0}s', paceNote:'Cu propria cheie API nu există coadă, poți porni oricând.',
   rateWait:'Limită de rată atinsă (429), aștept 20 s înainte de reîncercare…',
   userStop:'Oprit de utilizator.',
   postEnd:'Traducere terminată, aplic eliminarea umpluturilor / împărțirea…',
@@ -6989,7 +7016,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
       try{ LAST_FINISH=String((j.choices&&j.choices[0]&&j.choices[0].finish_reason)||''); }catch(e){ LAST_FINISH=''; }
       /* v0.9.156：服务端「模型 B 失败 → 已回退模型 A」的回执（仅内置通道，直连通道没有服务端）。
          此前回退完全静默，加上后台记账又记着 A 的名字，用户只能判定「分流没生效」。 */
-      try{ if(builtin && j && j._fb) log(t('fbRoute', String(j._fb.from||''), String(j._fb.to||''), String(j._fb.msg||'').slice(0,80)), 'warn'); }catch(e){}
+      try{ if(builtin && j && j._fb){ log(t('fbRoute', String(j._fb.from||''), String(j._fb.to||''), String(j._fb.msg||'').slice(0,80)), 'warn'); paceMarkFb(); } }catch(e){}
       let out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
       if(!out) throw new Error(t('errEmpty'));
       /* v0.9.120：思考型模型（如 SiliconFlow 上的 Qwen3/GLM 系）在非流式响应里会把 <think>…</think>
@@ -7743,6 +7770,101 @@ function bumpCueErrs(list){
   }
 }
 
+/* v0.9.181：频繁提交闸门 —— 点「开始翻译」那一刻的前置拦截。
+   背景：上游免费模型有每分钟 token 配额（实测 OpenAI 组织级 200k TPM）。重度用户一次开多个
+   标签页连刷多集（Ludwig 20 秒内开 4 个标签页各跑一集）会把它打满 → 429 → 静默降级到备用模型，
+   同一部剧前后由两个模型翻译、风格不一致，而界面此前完全无感（只有一行日志被刷过去）。
+   ⚠️ 只拦免费通道：自带 API Key 的用户不消耗站点额度，拦他是纯误伤。
+   ⚠️ 计数与放行时刻写 localStorage（同源跨标签页共享）——内存变量管不住多标签页，
+      而跨标签页并发正是触发限流的主要方式。
+   ⚠️ 放行时刻必须递增（第 3 个 +60s、第 4 个 +120s…）：若每个页面都只等 60 秒，它们会同时
+      放行、再次打满配额，这 60 秒就白等了。倒计时期间每秒重读共享值也是为此。
+   ⚠️ 双路触发：①频率（60s 滑窗内已跑满 2 个）②真实信号（上一批收到过 _fb 限流回退）。
+      第二条是上游亲口说「我在限流」，比计数准，偶发用户只有真被限流时才会被拦。
+   ⚠️ 这是「劝阻 + 错峰」，不是硬限流：清掉 localStorage 就能绕过。要真拦得住必须服务端按 IP
+      计数，那是另一档（且共享出口 IP 会误伤），此刻不做。 */
+const PACE_KEY='srt_pace_v1', PACE_WIN=60000, PACE_FREE=2, PACE_STEP=60000,
+      PACE_MIN_CUES=100, PACE_FB_WIN=300000;
+function paceRead(){
+  try{
+    const o=JSON.parse(localStorage.getItem(PACE_KEY)||'{}')||{};
+    const ts=Array.isArray(o.ts)?o.ts.map(Number).filter(function(x){return x>0;}):[];
+    return { ts:ts, until:+(o.until)||0, fb:+(o.fb)||0 };
+  }catch(e){ return { ts:[], until:0, fb:0 }; }
+}
+function paceWrite(st){ try{ localStorage.setItem(PACE_KEY, JSON.stringify(st)); }catch(e){} }
+/* 服务端回执 _fb 表示「本批已被限流、已降级到备用模型」（见 6992 行附近）。
+   记下时间戳，下一个任务直接排队 —— 这是真实信号，比频率计数可靠。 */
+function paceMarkFb(){ try{ const st=paceRead(); st.fb=Date.now(); paceWrite(st); }catch(e){} }
+/* 返回 true = 放行；false = 用户点了取消，调用方什么都不做。 */
+async function paceGate(cues, byok){
+  if(byok) return true;                                  /* 自带 Key 不消耗站点额度，不拦 */
+  const now=Date.now();
+  let st=paceRead();
+  st.ts=st.ts.filter(function(x){ return now-x<PACE_WIN; });
+  const hitFb = st.fb>0 && now-st.fb<PACE_FB_WIN;
+  /* 小任务豁免：100 行约 4~5 批，对 20 万 TPM 的配额几乎无感，为它拦人是白白惹恼用户 */
+  if(!hitFb && (+cues||0) < PACE_MIN_CUES){ st.ts.push(now); paceWrite(st); return true; }
+  if(!hitFb && st.ts.length < PACE_FREE){ st.ts.push(now); paceWrite(st); return true; }
+  const until=Math.max(st.until, now)+PACE_STEP;         /* 已排上队的排前面，新来的排到后面 */
+  st.until=until; paceWrite(st);
+  const go=await paceWaitModal(until);
+  if(!go) return false;
+  st=paceRead();
+  const now2=Date.now();
+  st.ts=st.ts.filter(function(x){ return now2-x<PACE_WIN; });
+  st.ts.push(now2); st.fb=0; paceWrite(st);              /* 等完了，清掉限流信号重新计 */
+  return true;
+}
+/* 倒计时弹窗：纯 DOM + Promise，无框架。每秒重读共享的 until —— 别的标签页可能把截止时间
+   推后了，本页要跟着延长，否则会与别的标签页同时放行。 */
+function paceWaitModal(until){
+  return new Promise(function(resolve){
+    let timer=null;
+    const total=Math.max(1, until-Date.now());
+    const ov=document.createElement('div');
+    ov.id='paceModal';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent=t('paceTitle');
+    const b=document.createElement('div');
+    b.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;margin-bottom:14px;';
+    b.textContent=t('paceBody');
+    const cd=document.createElement('div');
+    cd.style.cssText='color:var(--acc);font-size:17px;font-weight:700;margin-bottom:8px;';
+    const bar=document.createElement('div');
+    bar.style.cssText='height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:16px;';
+    const fill=document.createElement('div');
+    fill.style.cssText='height:100%;width:0;background:var(--acc);';
+    bar.appendChild(fill);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;';
+    const btn=document.createElement('button');
+    btn.type='button'; btn.className='btn'; btn.textContent=t('reuseCancel');
+    btn.onclick=function(){ if(timer) clearInterval(timer); ov.remove(); resolve(false); };
+    btns.appendChild(btn);
+    const note=document.createElement('div');
+    note.style.cssText='color:var(--sub);font-size:12px;line-height:1.6;margin-top:14px;border-top:1px solid var(--line);padding-top:12px;';
+    note.textContent=t('paceNote');
+    box.appendChild(h); box.appendChild(b); box.appendChild(cd); box.appendChild(bar);
+    box.appendChild(btns); box.appendChild(note);
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+    function tick(){
+      const st=paceRead();
+      const rem=Math.max(0, Math.max(until, st.until)-Date.now());
+      cd.textContent=t('paceTick', Math.ceil(rem/1000));
+      fill.style.width=Math.round(Math.min(100, (1-rem/total)*100))+'%';
+      if(rem<=0){ clearInterval(timer); ov.remove(); resolve(true); }
+    }
+    tick();
+    timer=setInterval(tick, 250);
+  });
+}
+
 async function runTranslate(){
   if(S.translating) return;
   if(!S.srcItems.length){ log(t('noSrc'),'err'); return; }
@@ -7759,6 +7881,9 @@ async function runTranslate(){
   /* v0.9.170：开翻前统一拦一次。换片那条路只覆盖「换了文件」，同一部片改目标语言不会触发，
      而术语表真正在用的时刻是开翻这一刻，守在这里最准。false = 用户取消，直接返回不动任何东西。 */
   if(!(await glossLangGuard(cfg.dst, true))) return;
+  /* v0.9.181：排队闸门。放在本地校验之后 —— 否则用户选错语言还得先干等 60 秒才看到报错。
+     false = 用户点了「取消这个任务」，直接返回，不动任何状态。 */
+  if(!(await paceGate(S.srcItems.length, cfg.mode==='api'))) return;
   S.reuse = 0;   // v0.9.167：每轮重置。为 1 时说明本轮是「取回上次结果」，不调用模型、不上报 finish
   const apiReady = (cfg.mode==='api' && cfg.base && cfg.key && cfg.model);
   const builtinReady = (cfg.mode==='builtin' && BUILTIN_INFO.configured);
