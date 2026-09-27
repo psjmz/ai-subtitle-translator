@@ -3979,6 +3979,22 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* _fb 提示必须留着：非 429 的失败（网络错 / 5xx）仍会回退，用户得看得见 */
     assert.ok(/j\._fb\)\{[\s\S]{0,160}fbRoute/.test(html), '_fb 回退提示被删了——网络类回退会重新变成静默降级');
   });
+
+  t('v0.9.184 完成态不再自动收起：用时与本次消耗要一直看得见', () => {
+    /* v0.9.183 把停留时间从 2.6s 提到 6s 仍不够：实测 1.5s 出完成态、7.5s 进度条就没了。
+       跑完一整集的人通常在看结果区 / 下载，回头想看「这一趟花了多少 token」时已经没了。 */
+    const at = html.indexOf('function pgFinish(){');
+    assert.ok(at > 0, 'pgFinish 缺失');
+    const body = html.slice(at, at + 1200);
+    assert.ok(!/setTimeout/.test(body), 'pgFinish 里还有自动收起的定时器——完成态迟早会消失');
+    assert.ok(/w\.classList\.add\('done'\)/.test(body), '完成态没打上 done');
+    assert.ok(/t\('pgTok', tkTot/.test(body), '完成态没有展示本次消耗');
+    /* 常驻就必须有清场：下一轮开翻、导入新片，两处都要把上一轮的数字抹掉，否则会串着显示 */
+    const st = html.indexOf('function pgStart(){');
+    assert.ok(/setPrText\(''\)/.test(html.slice(st, st + 700)), 'pgStart 没清掉上一轮的消耗行');
+    const ss = html.indexOf('function setSrc(text, fileName){');
+    assert.ok(/setProg\(0,false\); setPrText\(''\)/.test(html.slice(ss, ss + 400)), '导入新字幕没清掉上一部的完成态');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
