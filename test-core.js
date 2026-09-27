@@ -4086,7 +4086,11 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/psec\*1000 > paceBudget/.test(html), '预算耗尽时没有放弃本批');
     /* 耗尽要抛独立的「排队超时」，不能掉进 errEmpty——那会把排队超时记成上游返空 */
     assert.ok(/_failWhy='pace_giveup'/.test(html), '排队超时没有自己的埋点标记');
-    assert.ok(/throw new Error\(t\('pgGiveUp'\)\)/.test(html), '排队超时复用了 errEmpty——统计口径会错');
+    /* v0.9.186：改成先建对象再打标记再抛（下游要靠 paceGiveUp 判定「不重试」）。
+       同时仍然不能掉进 errEmpty——那会把排队超时记成上游返空。 */
+    assert.ok(/new Error\(t\('pgGiveUp'\)\)/.test(html), '排队超时复用了 errEmpty——统计口径会错');
+    assert.ok(/e9\.paceGiveUp=true/.test(html), '排队超时的错误没带机器标识——下游只能靠文案猜');
+    assert.ok(/throw e9/.test(html), '排队超时的错误没有抛出');
     const n = (html.match(/\bpgGiveUp\s*:\s*'[^']*'/g) || []).length;
     assert.strictEqual(n, 27, 'pgGiveUp 应 27 条，实际 ' + n);
     /* 排队中点停止要立刻响应，不能干等 60 秒 */
@@ -4097,6 +4101,50 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 排队号：重发必须带回，否则服务端当成新请求重新发号，先来先出失效 */
     assert.ok(/qTok\?\{q:qTok\}:\{\}/.test(html), '重发没带排队号');
     assert.ok(/qTok=j\.q/.test(html), '没有记住服务端下发的排队号');
+  });
+
+  t('v0.9.186 排队超时后不再重试：立刻停，说清原因，断点留着可续', () => {
+    /* 起因（实测）：排队预算是批级的，批重试会把它重置（3 × 90 秒），失败后还有
+       「逐组隔离补救」每组各来一轮 —— 一个 4 行的小任务干等 150 秒以上仍在排。
+       上游此刻就是挤，重试只会更挤；已翻好的批留在本机断点里，稍后可直接续。 */
+    const iCatch = html.indexOf("log(t('batchFail',bi+1,attempt+1,e.message),'err')");
+    assert.ok(iCatch > 0, '批重试的 catch 分支找不到');
+    const seg = html.slice(iCatch, iCatch + 1200);
+    /* 判定必须靠机器标识，不能靠文案——文案随界面语言变，27 种语言都匹配一遍不现实 */
+    assert.ok(/e && e\.paceGiveUp\)\{ S\.paceOut=true; S\.stop=true; break; \}/.test(seg),
+      '排队超时没有「不再重试」的分支——会一路重试到 maxTry 再进逐组补救');
+    assert.ok(seg.indexOf('e.paceGiveUp') < seg.indexOf('HTTP (429|503)'),
+      '排队超时的判定排在了 429 之后——会被别的分支先截走');
+    /* S.stop 一置位，下面的逐组补救（if(!ok && !S.stop)）自然被跳过 */
+    assert.ok(/if\(!ok && !S\.stop\)\{/.test(html), '逐组补救没有 S.stop 守卫——排队超时后仍会每组再排一轮');
+    /* 纯翻译模型那条独立通道同样是「失败重试一次」，也要立刻放弃 */
+    assert.ok(/catch\(e\)\{ lastE=e; if\(e&&e\.paceGiveUp\) throw e;/.test(html),
+      '纯翻译通道遇到排队超时仍会重试');
+    /* 停止原因要说得准：不是用户点的，别写「已由用户停止」 */
+    assert.ok(/if\(S\.stop\)\{ if\(!S\.paceOut\) log\(t\('userStop'\),'err'\); break; \}/.test(html),
+      '排队超时导致的停止会被记成用户主动停止');
+    /* 终态：弹窗 + 进度条不写「完成」。modelDead 那套是「模型不响应，建议换 API」，
+       这边是「额度挤，建议等会儿再来」，处理建议完全不同，不能共用文案。 */
+    assert.ok(/if\(S\.paceOut\)\{\s*S\.paceOut=false;\s*log\(t\('busyTitle'\),'err'\);[\s\S]{0,200}showErrModal\(t\('busyTitle'\), t\('busyBody'\)\)/.test(html),
+      '排队超时没有自己的终态弹窗');
+    assert.ok(/S\.modelDead=false; S\.paceOut=false;/.test(html), 'S.paceOut 没有随任务重置——上一轮的停药会残留');
+    /* 没跑完就不写「完成」，否则进度条和弹窗自相矛盾 */
+    const iFin = html.indexOf('function pgFinish');
+    assert.ok(iFin > 0, 'pgFinish 找不到');
+    assert.ok(/if\(S\.paceOut\)\{[\s\S]{0,300}pgState'\)\.textContent=t\('busyTitle'\)/.test(html.slice(iFin, iFin + 1600)),
+      '排队超时后进度条仍写「完成」');
+    /* 断点必须留着：markSnapDone 只在 !S.stop 时跑，排队超时时 S.stop 为真 → 快照不标记完成，下次可续 */
+    assert.ok(/if\(!S\.stop\) markSnapDone\(\);/.test(html), '停止时会把断点标记完成——下次就无法续跑了');
+    for (const k of ['busyTitle', 'busyBody']) {
+      const c = (html.match(new RegExp("\\b" + k + "\\s*:\\s*'[^']*'", 'g')) || []).length;
+      assert.strictEqual(c, 27, k + ' 应 27 条，实际 ' + c);
+    }
+    assert.ok(!/busyBody:'[^']*\{0\}/.test(html), 'busyBody 不该带占位符');
+    /* 别在「上游繁忙」旁边再劝用户去检查配置 / 报「全部完成」——三条消息互相打架 */
+    assert.ok(/missingCount >= grpTotal \* 0\.3 && !S\.paceOut/.test(html),
+      '排队超时时仍在劝用户去检查「翻译引擎」配置');
+    assert.ok(/if\(!S\.paceOut\) log\(t\('allDone'/.test(html),
+      '没跑完却还在报「全部完成」');
   });
 }
 
