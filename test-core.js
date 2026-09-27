@@ -3918,40 +3918,66 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '中文 8.5 里点名了 ' + ch + '（该字符不是 CJK 专属，或会与歌词淡出省略号规则 5.5 打架）'));
   });
 
-  t('v0.9.181 排队闸门：只拦免费通道，放行时刻递增，文案 27 语齐全', () => {
-    /* 背景：上游免费模型有 200k TPM 配额，重度用户一次开多个标签页连刷多集会把它打满 → 429
-       → 静默降级到备用模型，同一部剧前后两个模型、风格不一致，而界面此前只有一行日志被刷过去。
-       2026-09-27 实测：今日 20 条回退里 12 条限流、78 次回退全来自同一个 IP（Ludwig，日语剧）。
-       ⚠️ 只拦免费通道：自带 Key 的用户不消耗站点额度，拦他是纯误伤。
-       ⚠️ 放行时刻必须递增：每个页面都只等 60 秒会同时放行、再打满一次，这 60 秒就白等了。 */
+  t('v0.9.183 服务端排队：账本按槽位分开，A 槽不限流，限额从 429 自学', () => {
+    /* 背景（2026-09-27 实测）：B 槽 gpt-6-luna 345 个任务挨了 82 次 429（Limit 200000、Used 199713），
+       A 槽 deepseek-chat 1133 个任务、零限流、且没有任何 failMsg。两槽额度是两套独立的东西，
+       共用一个账本会让 A 的请求被 B 的拥堵连坐——而 A 压根不需要排队，给它排就是白白拖慢用户。
+       排队放在服务端（额度本来就是所有用户共享的），并且按槽位分别记账、分别判定。 */
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* ① 账本与限额都按槽位分开 */
+    assert.ok(/const RATE = \{ A: \[\], B: \[\] \};/.test(srvSrc), '滑窗账本没有按槽位分开——A 会被 B 的拥堵连坐');
+    assert.ok(/const RATE_LIMIT = \{ A: 0, B: 200000 \};/.test(srvSrc), 'A 槽限额不是 0（不限）；A 从未限流，排队纯属拖慢用户');
+    assert.ok(/if \(limit <= 0\) return 0;/.test(srvSrc), 'LIMIT=0 的槽位没有直接放行');
+    /* ② 判定必须在 pickModel 之后：不知道走哪个槽位就查不了对应的账本 */
+    const iPick = srvSrc.indexOf('const pick = pickModel(cfg, lang);');
+    const iPace = srvSrc.indexOf('paceCheck(pick.which, est)');
+    assert.ok(iPick > 0 && iPace > iPick, '排队判定跑在 pickModel 之前，查不到对应槽位的账本');
+    /* ③ 版本协商：不带 meta.pace 的旧前端永远不能收到 wait，
+          否则它拿到一个没有 choices 的响应会当成「上游返回空」去走降级重试 */
+    assert.ok(/body\.meta\.pace === 1/.test(srvSrc), '缺少 meta.pace 版本协商——旧前端会被 wait 响应打乱');
+    assert.ok(/wait: w, slot: pick\.which/.test(srvSrc), '额度类 wait 出口缺失');
+    assert.ok(/wait: inflightWait\(\)/.test(srvSrc), '在途类 wait 出口缺失');
+    /* ④ 限额别硬编码：429 文案里带着上游亲口报的数，学下来（只收紧不放松） */
+    assert.ok(/Limit\\s\+\(\\d\{3,\}\)/.test(srvSrc), '没有从 429 文案里解析 Limit——上游改配额就得改代码');
+    assert.ok(/v < RATE_LIMIT\[which\]/.test(srvSrc), '学到的限额没有「只收紧不放松」');
+    /* ⑤ 回退那一趟走的是 A 槽，消耗必须记进 A 的账本：记到 B 上会凭空吃掉 B 的额度 */
+    assert.ok(/rateAdd\('A', tkA\.tin \+ tkA\.tout\)/.test(srvSrc), 'B→A 回退的消耗没记进 A 槽账本');
+    /* ⑥ 每 IP 在途上限，且无论成功 / 回退 / 失败都要还回去 */
+    assert.ok(/RATE_INFLIGHT = 2/.test(srvSrc), '每 IP 在途上限没设——一个人开多标签页会霸占队列');
+    assert.ok(/\} finally \{\s*if \(held\) inflightFree\(ip\);/.test(srvSrc), '在途名额没有 finally 释放——失败路径会泄漏');
+    /* ⑦ 预扣：放行那一刻就把预估值记账，否则并发请求一起判定、一起放行、又一起撞墙 */
+    assert.ok(/rateAdd\(pick\.which, est\);/.test(srvSrc), '缺少预扣：并发请求看不见彼此');
+  });
+
+  t('v0.9.183 前端：撤掉本地闸门，改用服务端回执驱动进度条 + 完成态报 token', () => {
+    /* v0.9.181 那套 localStorage 计数是在「猜」一个只有服务端才知道的数，而且清缓存就能绕过。
+       服务端有权威计数后它就是重复逻辑，一并撤掉（撤词条必须删全套，只删中文会留一堆死词条）。 */
+    ['paceGate', 'paceWaitModal', 'paceMarkFb', 'PACE_KEY', 'paceTitle', 'paceBody', 'paceTick', 'paceNote']
+      .forEach(k => assert.strictEqual(html.indexOf(k), -1, '旧闸门残留 ' + k + '：两套逻辑并存会让用户被拦两次'));
+    /* 新文案三条 × 27 语：排队徽章 / 倒计时 / 完成态 token */
     const dicts = [...html.matchAll(/^\s*['"]([A-Za-z\-]{2,10})['"]\s*:\s*\{\s*pureMTMode\s*:/gm)].map(m => m[1]);
     assert.strictEqual(dicts.length, 27, '界面字典应 27 个，实际 ' + dicts.length);
-    for (const k of ['paceTitle', 'paceBody', 'paceTick', 'paceNote']) {
+    for (const k of ['pgWait', 'pgWaitSec', 'pgTok']) {
       const n = (html.match(new RegExp('\\b' + k + "\\s*:\\s*'[^']*'", 'g')) || []).length;
       assert.strictEqual(n, 27, k + ' 应 27 条，实际 ' + n);
     }
-    /* paceTick 是「排队倒计时」专用行，不复用 ratePace（后者是批次内 429 等待，语义不同）。
-       两条必须并存且各自带 {0}，串用会让某一处突然变成另一种场景的措辞。 */
-    assert.ok(/paceTick:'[^']*\{0\}/.test(html), 'paceTick 缺 {0} 占位符（倒计时秒数传不进去）');
-    assert.ok(/ratePace:'[^']*\{0\}/.test(html), 'ratePace 被 paceTick 顶掉了——批次内等待那处会没文案');
-    /* 自带 Key 直接放行，一行都不能少 */
-    assert.ok(/function paceGate\(cues, byok\)\{/.test(html), 'paceGate 签名变了（缺 byok 参数就拦不住误伤）');
-    assert.ok(/if\(byok\) return true;/.test(html), '自带 API Key 没被豁免——那是纯误伤，且不消耗站点额度');
-    /* 放行时刻递增：已排上队的排前面，新来的排到后面 */
-    assert.ok(/const until=Math\.max\(st\.until, now\)\+PACE_STEP;/.test(html),
-      '放行时刻没有取 max(已有时刻, 现在)：多标签页会同时放行、再打满一次配额');
-    /* 倒计时期间必须重读共享值：别的标签页可能把截止时间推后了，本页要跟着延长 */
-    const pw = html.slice(html.indexOf('function paceWaitModal('));
-    const pwBody = pw.slice(0, pw.indexOf('\n}'));
-    assert.ok(/paceRead\(\)/.test(pwBody), '倒计时期间不重读共享值，别的标签页排队会失效');
-    assert.ok(/Math\.max\(until, st\.until\)/.test(pwBody), '重读了但没取 max：本页会提前放行，与别人撞车');
-    /* 闸门必须排在语言/风格校验之后，否则用户选错语言还得先干等 60 秒才看到报错 */
-    const rt = html.slice(html.indexOf('async function runTranslate(){'));
-    const iGuard = rt.indexOf('glossLangGuard(');
-    const iGate = rt.indexOf('paceGate(');
-    assert.ok(iGuard >= 0 && iGate > iGuard, '闸门排在校验之前：报错前先白等 60 秒');
-    /* 限流回执要留痕：_fb 是上游亲口说「我在限流」，比频率计数可靠 */
-    assert.ok(/j\._fb\)\{[\s\S]{0,120}paceMarkFb\(\)/.test(html), '收到 _fb 没记信号——下一个任务不会自动排队');
+    assert.ok(/pgWaitSec:'[^']*\{0\}/.test(html), 'pgWaitSec 缺 {0} 占位符——倒计时秒数传不进去');
+    /* 协议：内置通道声明 pace=1 才可能收到 wait */
+    assert.ok(/Object\.assign\(\{pace:1\}/.test(html), '内置通道没有声明 pace:1——服务端不会给它 wait');
+    /* 收到 wait → 进度条倒计时 → 自动重发同一批（不是换模型、不是新任务） */
+    assert.ok(/\+\(j\.wait\|\|0\)>0/.test(html), 'once() 不识别 wait 回执');
+    assert.ok(/await pgPace\(/.test(html), '识别了 wait 但没走进度条倒计时');
+    assert.ok(/function pgPace\(sec\)\{/.test(html), 'pgPace 缺失');
+    const pg = html.slice(html.indexOf('function pgPace(sec){'));
+    const pgBody = pg.slice(0, pg.indexOf('\n}'));
+    assert.ok(/classList\.remove\('run'\)/.test(pgBody), '排队时没暂停进度条动画——看着像还在跑');
+    assert.ok(/classList\.add\('run'\)/.test(pgBody), '倒计时结束没恢复动画');
+    /* 完成态报本次消耗 */
+    assert.ok(/S\.tkSum\.in/.test(html) && /S\.tkSum\.out/.test(html), '没有累加 token');
+    assert.ok(/S\.tkSum=\{in:0,out:0,cache:0\};/.test(html), 'pgStart 没清零——会带上一次任务的数');
+    assert.ok(/t\('pgTok', tkTot\.toLocaleString/.test(html), '完成态没有展示本次消耗');
+    /* _fb 提示必须留着：非 429 的失败（网络错 / 5xx）仍会回退，用户得看得见 */
+    assert.ok(/j\._fb\)\{[\s\S]{0,160}fbRoute/.test(html), '_fb 回退提示被删了——网络类回退会重新变成静默降级');
   });
 }
 

@@ -951,6 +951,103 @@ function pickModel(cfg, lang){
   return { which: 'A', cfg: slotCfg(cfg, 'A') };
 }
 
+/* ---------------- v0.9.183 上游额度排队（按模型槽位分开） ----------------
+   为什么必须分槽：实测近 14 天，A 槽 deepseek-chat 跑了 1133 个任务、从未限流；
+   B 槽 gpt-6-luna 只有 345 个任务却挨了 82 次 429（Limit 200000、Used 打到 199713）。
+   两槽的额度是两套完全独立的东西，共用一个账本会让 A 的请求被 B 的拥堵连坐 ——
+   而 A 压根不需要排队，给它排就是白白拖慢用户。所以账本与限额都按槽位分开，
+   且 A 默认「不限」（LIMIT.A = 0），行为与此前完全一致。
+
+   只做「延迟」不做「拒绝」：额度不够时回 200 {wait:N}，前端等完重发同一批，
+   而不是现在这样挨一记 429 就降级换模型（一集前后两个模型，语气会不一致）。 */
+const RATE_WIN_MS   = 60000;   // 滑窗长度，与上游 TPM 的统计窗口对齐
+const RATE_SAFE     = 0.85;    // 只用额度的 85%，余量留给估算误差和并发穿透
+const RATE_MAX_WAIT = 60;      // 最多等一个滑窗。要等更久说明额度被最近几秒的请求占满了，
+                               // 而等待的上限本来就是「滑窗里最早那笔滑出去」——正好 60 秒。
+                               // 定成 45 会让这种最常见的情况直接放行降级，排队就白做了
+const RATE_INFLIGHT = 2;       // 同一 IP 同时在途的请求数（防多标签页霸占队列）
+const RATE_EST_MIN  = 3000;    // 单批消耗预估下限（token）
+const RATE = { A: [], B: [] };              // 各槽位滑窗 [{t, tk}]
+const RATE_LIMIT = { A: 0, B: 200000 };     // 0 = 该槽位不限，永不 wait
+const RATE_OUT_EMA = { A: 0, B: 0 };        // 各槽位平均每批输出 token，供预估
+const INFLIGHT = Object.create(null);       // ip -> 在途请求数
+
+/* 预估本批消耗：输入按字符数折算（中英混排实测约 2.5 字符/token），输出用该槽位 EMA */
+function estTokens(messages, which){
+  let chars = 0;
+  if (Array.isArray(messages)) {
+    for (const m of messages) {
+      if (!m) continue;
+      const c = typeof m.content === 'string' ? m.content
+        : Array.isArray(m.content) ? JSON.stringify(m.content) : '';
+      chars += c.length;
+    }
+  }
+  const tin = Math.round(chars / 2.5);
+  return Math.max(RATE_EST_MIN, tin + (RATE_OUT_EMA[which] || 0));
+}
+/* 该槽位过去 60 秒用了多少（顺带清掉过期记录） */
+function rateUsed(which){
+  const arr = RATE[which] || (RATE[which] = []);
+  const cut = Date.now() - RATE_WIN_MS;
+  while (arr.length && arr[0].t < cut) arr.shift();
+  let sum = 0;
+  for (const r of arr) sum += r.tk;
+  return sum;
+}
+/* 记账。并发请求会同时判定，所以放行那一刻就先「预扣」预估值，
+   真实 usage 回来后只补正差额（实际比预估少的部分随滑窗自然滑出，偏保守但不会穿透） */
+function rateAdd(which, tk){
+  const v = Math.round(Number(tk) || 0);
+  if (v <= 0) return;
+  const arr = RATE[which] || (RATE[which] = []);
+  arr.push({ t: Date.now(), tk: v });
+  if (arr.length > 400) arr.splice(0, arr.length - 400);
+}
+/* 从上游 429 文案里学限额："Rate limit ... Limit 200000, Used 199713, Requested 5018"。
+   硬编码的额度迟早会变（上游改配额、换模型），而这个数字是上游亲口报的，最准。
+   只收紧不放松：万一某次报的是别的配额，取小的更保险。 */
+function learnLimit(which, msg){
+  const m = String(msg || '').match(/Limit\s+(\d{3,})/i);
+  if (!m) return;
+  const v = Number(m[1]);
+  if (!Number.isFinite(v) || v <= 0) return;
+  if (!RATE_LIMIT[which] || v < RATE_LIMIT[which]) RATE_LIMIT[which] = v;
+}
+/* 判定：0 = 放行；>0 = 需要等待的秒数 */
+function paceCheck(which, est){
+  const limit = RATE_LIMIT[which] || 0;
+  if (limit <= 0) return 0;                          // 该槽位不限流，永不排队
+  const used = rateUsed(which);
+  const budget = limit * RATE_SAFE;
+  if (used + est <= budget) return 0;
+  /* 要腾出 need 这么多额度：从滑窗最早的记录往前推，看多久之后累计用量降到预算内 */
+  const arr = RATE[which] || [];
+  const need = used + est - budget;
+  let freed = 0, wait = RATE_MAX_WAIT;
+  for (const r of arr) {
+    freed += r.tk;
+    if (freed >= need) { wait = Math.ceil((r.t + RATE_WIN_MS - Date.now()) / 1000) + 1; break; }
+  }
+  if (wait > RATE_MAX_WAIT) return 0;                // 等太久不如放行
+  if (wait < 1) wait = 1;
+  /* 抖动 ±15%：同一批被放行的人别再整整齐齐地一起撞回来 */
+  wait = Math.round(wait * (0.85 + Math.random() * 0.3));
+  return Math.min(RATE_MAX_WAIT, Math.max(1, wait));
+}
+/* 每 IP 在途：拿不到就返回需要等待的秒数（不知道别人的批多久跑完，给个保守值） */
+function inflightTake(ip){
+  const n = INFLIGHT[ip] || 0;
+  if (n >= RATE_INFLIGHT) return 0;
+  INFLIGHT[ip] = n + 1;
+  return 1;
+}
+function inflightFree(ip){
+  const n = (INFLIGHT[ip] || 1) - 1;
+  if (n <= 0) delete INFLIGHT[ip]; else INFLIGHT[ip] = n;
+}
+function inflightWait(){ return 8 + Math.floor(Math.random() * 8); }
+
 /* 上游是否因 response_format 拒收（HTTP 4xx + 文案相关）→ 摘掉参数重试一次 */
 function rfRejected(e){
   const s = String((e && e.message) || '');
@@ -1062,12 +1159,30 @@ const server = http.createServer(async (req, res) => {
       if (!Array.isArray(body.messages) || !body.messages.length) {
         return sendJson(res, 400, { error: { code: 'missing_messages', message: 'Missing messages' } });
       }
-      usage.ips[ip] = ipUsed + 1;
-      usage.global += 1;
-      writeUsage(usage);
       /* v0.9.119：按目标语言分流到模型 A / B（meta.lang 由前端随每次请求带上） */
       const lang = (body.meta && String(body.meta.lang || '')) || '';
       const pick = pickModel(cfg, lang);
+      /* v0.9.183：排队闸门，按槽位判定。只有前端在 meta 里声明 pace=1 才可能收到 wait——
+         旧版本不带这个标记，走的是原路径，不会因为收到一个没有 choices 的响应而误判成「上游返回空」。
+         日配额与埋点都放在闸门之后再记：排队只是「晚点再来」，既没真翻译也不该留下事件。 */
+      const canPace = !!(body.meta && body.meta.pace === 1);
+      const est = canPace ? estTokens(body.messages, pick.which) : 0;
+      let held = false;
+      if (canPace) {
+        if (!inflightTake(ip)) {
+          return sendJson(res, 200, { wait: inflightWait(), slot: pick.which, why: 'inflight' });
+        }
+        const w = paceCheck(pick.which, est);
+        if (w > 0) {
+          inflightFree(ip);
+          return sendJson(res, 200, { wait: w, slot: pick.which, why: 'quota' });
+        }
+        held = true;
+        rateAdd(pick.which, est); // 预扣：并发请求要看得见彼此，否则一起判定、一起放行、又一起撞墙
+      }
+      usage.ips[ip] = ipUsed + 1;
+      usage.global += 1;
+      writeUsage(usage);
       /* v0.9.157：viaB 恒传 0/1（此前走 A 时传 null，旧事件上的 viaB=1 不会被清掉） */
       try { appendEvent(ip, body.meta, pick.cfg.model, { viaB: pick.which === 'B' ? 1 : 0 }); } catch (e) {} // 行为记录失败不影响翻译主流程
       /* v0.9.132：前端在 meta.json 里声明「本请求期望 JSON 输出」（非 JSON 请求不注入，否则上游会 400） */
@@ -1075,12 +1190,27 @@ const server = http.createServer(async (req, res) => {
       try {
         const out = await callModel(pick.cfg, body.messages, undefined, jsonOpts);
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
+        /* v0.9.183：按真实消耗修正预扣（只补正差额，实际比预估少的部分随滑窗自然滑出），
+           并把本批输出喂给该槽位的 EMA，让下一批预估更准 */
+        try {
+          if (canPace) {
+            const tk = usageTokens(out && out.usage);
+            if (tk) {
+              rateAdd(pick.which, tk.tin + tk.tout - est);
+              const ema = RATE_OUT_EMA[pick.which] || 0;
+              RATE_OUT_EMA[pick.which] = ema ? ema * 0.7 + tk.tout * 0.3 : tk.tout;
+            }
+          }
+        } catch (e10) {}
         /* v0.9.157：本次实际生效的模型名回传前端。分流只在服务端发生，前端原本无从得知
            自己这次用的是 A 还是 B，只能靠后台 events 反推（而后台记账又有延迟/去重问题）。
            模型名是专有名词，不需要进界面字典，直接原样输出。 */
         try { if (out && typeof out === 'object') out._used = String(pick.cfg.model || ''); } catch (e9) {}
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
+        /* v0.9.183：429 的报错文案里带着上游的限额，学下来。硬编码的额度迟早会变，
+           而这个数字是上游亲口报的——哪天 A 槽也开始限流了，不用改代码就能自动生效。 */
+        try { if (canPace) learnLimit(pick.which, e && e.message); } catch (e11) {}
         /* B 失败且开启回退 → 再试 A；回退成功后把事件里的模型改写成真正生效的 A，并记 fallback 次数 */
         if (pick.which === 'B' && cfg.fallbackToA) {
           try {
@@ -1091,6 +1221,14 @@ const server = http.createServer(async (req, res) => {
               }), 'fallback');
             } catch (e2) {}
             try { recordTokens(ip, body.meta, outA && outA.usage); } catch (e4) {} // v0.9.145：回退到 A 也算真实开销
+            /* v0.9.183：回退这一趟走的是 A 槽，消耗必须记进 A 的账本。记到 B 上会凭空吃掉
+               B 的额度——B 正堵着呢，等于火上浇油。 */
+            try {
+              if (canPace) {
+                const tkA = usageTokens(outA && outA.usage);
+                if (tkA) rateAdd('A', tkA.tin + tkA.tout);
+              }
+            } catch (e12) {}
             /* v0.9.156：回退必须让用户看得见。此前静默降级——界面无任何提示，
                后台又因为上面那条记账问题显示的是 A 的名字，用户只能判定「分流没生效」。 */
             try { if (outA && typeof outA === 'object') outA._fb = { from: pick.cfg.model, to: cfg.model, msg: String(e.message || '').slice(0, 200) }; } catch (e5) {}
@@ -1101,6 +1239,8 @@ const server = http.createServer(async (req, res) => {
           }
         }
         return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e.message } });
+      } finally {
+        if (held) inflightFree(ip); // 成功 / 回退 / 失败，都要把在途名额还回去
       }
     }
 
