@@ -965,12 +965,25 @@ const RATE_SAFE     = 0.85;    // 只用额度的 85%，余量留给估算误差
 const RATE_MAX_WAIT = 60;      // 最多等一个滑窗。要等更久说明额度被最近几秒的请求占满了，
                                // 而等待的上限本来就是「滑窗里最早那笔滑出去」——正好 60 秒。
                                // 定成 45 会让这种最常见的情况直接放行降级，排队就白做了
-const RATE_INFLIGHT = 2;       // 同一 IP 同时在途的请求数（防多标签页霸占队列）
+/* v0.9.185：2 → 4。前端隔离重译是 poolMap(…, 3)、术语提取是 poolMap(…, 4)，
+   而「同一 IP 同时在途」此前只给 2 → 同一个用户自己并发的第 3 个请求必然被判
+   inflight 拒掉，白等 8~16 秒再撞一次。上限必须盖住前端自己的并发度。 */
+const RATE_INFLIGHT = 4;       // 同一 IP 同时在途的请求数（防多标签页霸占队列）
 const RATE_EST_MIN  = 3000;    // 单批消耗预估下限（token）
 const RATE = { A: [], B: [] };              // 各槽位滑窗 [{t, tk}]
 const RATE_LIMIT = { A: 0, B: 200000 };     // 0 = 该槽位不限，永不 wait
 const RATE_OUT_EMA = { A: 0, B: 0 };        // 各槽位平均每批输出 token，供预估
 const INFLIGHT = Object.create(null);       // ip -> 在途请求数
+/* v0.9.185：短等由服务端自己扛。额度只差几秒时让客户端空跑一趟往返、再倒数重发，
+   既多一次 RTT、又会让一批人整整齐齐撞回来（惊群）。服务端 await 掉这几秒，客户端完全无感。
+   上限 15 秒——再长就交给客户端排队（用户 9/27 拍板：排再久也不换模型）。 */
+const HOLD_MAX_MS      = 15000;
+const HOLD_MAX_WAITERS = 8;    // 同时在服务端等待的请求数，别把 Node 变成等待池
+let   HOLD_N           = 0;
+/* v0.9.185：上游每次响应都会报剩余额度（OpenAI 系：x-ratelimit-remaining-tokens）。
+   这是权威数字，比我们按字符数估算准得多；没有这个头的端点才回落到本地滑窗账本。 */
+const QUOTA       = { A: null, B: null };   // {rem, at}
+const RETRY_UNTIL = { A: 0, B: 0 };         // 上游 Retry-After 报的下次可试时刻
 
 /* 预估本批消耗：输入按字符数折算（中英混排实测约 2.5 字符/token），输出用该槽位 EMA */
 function estTokens(messages, which){
@@ -993,20 +1006,24 @@ function rateUsed(which){
   while (arr.length && arr[0].t < cut) arr.shift();
   let sum = 0;
   for (const r of arr) sum += r.tk;
-  return sum;
+  return sum > 0 ? sum : 0;   // v0.9.185：有负值补正，别让账本算出负数
 }
 /* 记账。并发请求会同时判定，所以放行那一刻就先「预扣」预估值，
    真实 usage 回来后只补正差额（实际比预估少的部分随滑窗自然滑出，偏保守但不会穿透） */
 function rateAdd(which, tk){
   const v = Math.round(Number(tk) || 0);
-  if (v <= 0) return;
+  /* v0.9.185：允许负值。预估偏高时差额是负数，此前直接 return 丢弃 → 账本只增不减、
+     累计虚高 → 本来有额度也让人排队；排队没发成的预扣也要原样退还。 */
+  if (!v) return;
   const arr = RATE[which] || (RATE[which] = []);
   arr.push({ t: Date.now(), tk: v });
   if (arr.length > 400) arr.splice(0, arr.length - 400);
 }
 /* 从上游 429 文案里学限额："Rate limit ... Limit 200000, Used 199713, Requested 5018"。
    硬编码的额度迟早会变（上游改配额、换模型），而这个数字是上游亲口报的，最准。
-   只收紧不放松：万一某次报的是别的配额，取小的更保险。 */
+   只收紧不放松：万一某次报的是别的配额，取小的更保险。
+   ⚠️ 收紧只走这一条；**放宽走另外两条**（v0.9.185）：响应头里的 x-ratelimit-limit-tokens、
+   以及「实测用量超过旧限额却没挨限流」。缺了放宽通道，用户提了额度我们永远看不到。 */
 function learnLimit(which, msg){
   const m = String(msg || '').match(/Limit\s+(\d{3,})/i);
   if (!m) return;
@@ -1014,6 +1031,90 @@ function learnLimit(which, msg){
   if (!Number.isFinite(v) || v <= 0) return;
   if (!RATE_LIMIT[which] || v < RATE_LIMIT[which]) RATE_LIMIT[which] = v;
 }
+/* OpenAI 的 reset 形如 "6m0s" / "1.5s" / "800ms"，逐段相加（不猜默认单位） */
+function parseResetMs(v){
+  const s = String(v == null ? '' : v).trim();
+  if (!s) return 0;
+  const re = /(\d+(?:\.\d+)?)\s*(ms|h|m|s)/gi;
+  let m, total = 0, hit = false;
+  while ((m = re.exec(s))) {
+    hit = true;
+    const n = Number(m[1]); const u = String(m[2]).toLowerCase();
+    total += u === 'ms' ? n : u === 's' ? n * 1000 : u === 'm' ? n * 60000 : n * 3600000;
+  }
+  return hit ? Math.round(total) : 0;
+}
+function numOrNull(v){ const n = Number(String(v == null ? '' : v).trim()); return Number.isFinite(n) ? n : null; }
+/* 抓上游的额度头。OpenAI 官方端点每次响应都带，这是权威数字 */
+function rateHeaders(h){
+  const g = (k) => { try { return (h && typeof h.get === 'function') ? h.get(k) : ''; } catch (e) { return ''; } };
+  return { remTok: numOrNull(g('x-ratelimit-remaining-tokens')), limTok: numOrNull(g('x-ratelimit-limit-tokens')),
+           resetTok: g('x-ratelimit-reset-tokens') || '' };
+}
+function retryAfterMs(h){
+  const v = (h && typeof h.get === 'function') ? (h.get('retry-after') || '') : '';
+  const n = Number(String(v).trim());
+  return Number.isFinite(n) && n > 0 ? Math.round(n * 1000) : 0;
+}
+/* 记下上游报的余额，并用它校正限额。
+   ⚠️ 旧的 learnLimit 只收紧不放宽，会把 429 文案里学到的 20 万永久锁死——
+   用户在 OpenAI 后台提了额我们也看不到。放宽只认上游头/实测用量，不认猜测。 */
+function noteQuota(which, rl){
+  if (!rl || typeof rl !== 'object') return;
+  if (rl.limTok > 0 && RATE_LIMIT[which] > 0 && rl.limTok > RATE_LIMIT[which]) RATE_LIMIT[which] = rl.limTok;
+  /* 桶的大小也记下来：回补速度要按上游自己的桶算，不能拿我们这边学来的限额去套 */
+  if (rl.remTok != null) QUOTA[which] = { rem: rl.remTok, lim: rl.limTok || 0, at: Date.now() };
+}
+/* 按上游余额算要等几秒；没有余额数据返回 null（交给本地滑窗账本） */
+function quotaWait(which, est){
+  const q = QUOTA[which];
+  if (!q) return null;
+  const age = Date.now() - q.at;
+  if (age > 120000) return null;                 // 太久没有新数据，不敢再拿它判定
+  const cap = (q.lim > 0 ? q.lim : 0) || (RATE_LIMIT[which] || 0) || Math.max(q.rem, est);
+  if (est > cap) return 0;                       // 本批本身就超过整个额度，等也没用
+  const frac = Math.min(1, age / RATE_WIN_MS);
+  const eff  = q.rem + (Math.max(cap, q.rem) - q.rem) * frac;   // 令牌桶按线性回补估当前可用
+  let w = 0;
+  if (eff < est) {
+    const rate = Math.max((Math.max(cap, q.rem) - q.rem) / RATE_WIN_MS, 1e-9);   // token/ms
+    w = Math.ceil((est - eff) / rate / 1000) + 1;
+  }
+  const ra = Math.ceil((RETRY_UNTIL[which] - Date.now()) / 1000);  // 上游 Retry-After 亲口说的，优先
+  if (ra > w) w = ra;
+  return w > 0 ? Math.min(RATE_MAX_WAIT, w) : 0;
+}
+const sleepMs = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* ---------------- v0.9.185 先来先出（FIFO） ----------------
+   「等 N 秒再重发」本身不是 FIFO：谁先重发谁先进，后到的新请求反而插队。
+   所以给每个排队的请求发一个顺序号（token 形式回给客户端，重发时带回）：
+   判定不只看额度——只要队里还有比我更早的号，就继续等。
+   号只在客户端按服务端给的秒数回来重发时才续期，标签页关掉 90 秒后自动出队，
+   不会让一个消失的请求把后面所有人堵死。 */
+const Q_SEQ   = { A: 0, B: 0 };
+const Q_WAIT  = { A: Object.create(null), B: Object.create(null) };  // token -> {seq, at}
+const Q_TTL   = 90000;   // 续期窗口（> 服务端单次最长 60 秒的等待）
+const FIFO_POLL = 3;     // 不是队首时的回问间隔（秒）：队首一走要能立刻顶上
+function qSweep(which){
+  const m = Q_WAIT[which] || (Q_WAIT[which] = Object.create(null));
+  const cut = Date.now() - Q_TTL;
+  for (const k in m) if (m[k].at < cut) delete m[k];
+  return m;
+}
+function qMinSeq(which){
+  const m = Q_WAIT[which] || {};
+  let min = Infinity;
+  for (const k in m) if (m[k].seq < min) min = m[k].seq;
+  return min;
+}
+function qTouch(which, tok, seq){
+  const m = Q_WAIT[which] || (Q_WAIT[which] = Object.create(null));
+  m[tok] = { seq: seq, at: Date.now() };
+}
+function qDrop(which, tok){ const m = Q_WAIT[which]; if (m) delete m[tok]; }
+function qNewTok(which, seq){ return which + ':' + seq + ':' + Math.random().toString(36).slice(2, 8); }
+
 /* 判定：0 = 放行；>0 = 需要等待的秒数 */
 function paceCheck(which, est){
   const limit = RATE_LIMIT[which] || 0;
@@ -1089,9 +1190,17 @@ async function callModel(cfg, messages, maxTokens, opts){
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
       body: JSON.stringify(withExtra(core, cfg.extraParams))
     });
+    /* v0.9.185：无论成败都要看额度头——成功时它告诉我们还剩多少，429 时它告诉我们何时能再试 */
+    const rl = rateHeaders(r.headers);
     const text = await r.text();
-    if (!r.ok) throw new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
-    return JSON.parse(text);
+    if (!r.ok) {
+      const err = new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
+      err._rl = rl; err._status = r.status; err._ra = retryAfterMs(r.headers);
+      throw err;
+    }
+    const out = JSON.parse(text);
+    if (out && typeof out === 'object') out._rl = rl;
+    return out;
   };
   /* v0.9.154：逐项降级重发，而不是「失败一次就放弃」。
      端点不兼容常常成串出现——OpenAI o 系列同一条请求既不要 max_tokens 也不要自定义
@@ -1166,19 +1275,72 @@ const server = http.createServer(async (req, res) => {
          旧版本不带这个标记，走的是原路径，不会因为收到一个没有 choices 的响应而误判成「上游返回空」。
          日配额与埋点都放在闸门之后再记：排队只是「晚点再来」，既没真翻译也不该留下事件。 */
       const canPace = !!(body.meta && body.meta.pace === 1);
-      const est = canPace ? estTokens(body.messages, pick.which) : 0;
-      let held = false;
-      if (canPace) {
-        if (!inflightTake(ip)) {
-          return sendJson(res, 200, { wait: inflightWait(), slot: pick.which, why: 'inflight' });
+      /* v0.9.185：A 槽默认整个闸门都不进（不只是豁免在途闸）。
+         ⚠️ 首次线上冒烟就抓到：只豁免在途闸、仍让它进 FIFO 队列的话，只要队里有更早的号，
+         A 的请求照样被回 wait（实测 zh-CN 拿到 why=fifo、wait=5）。而 A 槽（deepseek 官方端点）
+         1133 个任务零限流，让它排队纯属拖慢。
+         但也不能一刀切永久豁免：A 真挨了 429 时 learnLimit 会把 RATE_LIMIT.A 从 0 改成非零，
+         那时它确实得排队保护——所以「A 是否进闸门」取决于它自己有没有被限流。 */
+      const needGate = canPace && (pick.which !== 'A' || (RATE_LIMIT[pick.which] || 0) > 0);
+      const est = needGate ? estTokens(body.messages, pick.which) : 0;
+      let tookInflight = false;
+      if (needGate) {
+        if (pick.which !== 'A') {
+          /* 在途闸只用来防止单个 IP 的多标签页霸占 B 的额度 */
+          if (!inflightTake(ip)) return sendJson(res, 200, { wait: inflightWait(), slot: pick.which, why: 'inflight' });
+          tookInflight = true;
         }
-        const w = paceCheck(pick.which, est);
-        if (w > 0) {
-          inflightFree(ip);
-          return sendJson(res, 200, { wait: w, slot: pick.which, why: 'quota' });
+        /* 顺序号：客户端把上次的 q 带回来就沿用旧号（保持先来先出），否则新领一个 */
+        let tok = (body.meta && typeof body.meta.q === 'string') ? body.meta.q : '';
+        let seq = (tok && Q_WAIT[pick.which] && Q_WAIT[pick.which][tok]) ? Q_WAIT[pick.which][tok].seq : 0;
+        if (!seq) { seq = ++Q_SEQ[pick.which]; tok = qNewTok(pick.which, seq); }
+
+        let admitted = false;
+        /* 服务端静默等待**累计**封顶 HOLD_MAX_MS（不是每轮 15 秒 × 4 = 60 秒）。
+           ⚠️ 前端给内置通道的超时是 105 秒 = 90 秒模型预算 + 15 秒服务端静默排队冗余（v0.9.185）。
+           服务端要是能静默等 60 秒，客户端那 15 秒冗余就不够，会出现「替你排了 60 秒、
+           模型只剩 45 秒就被 abort」——排队反而制造失败。累计封顶，超了就交回客户端排。 */
+        let holdUsed = 0;
+        for (let guard = 0; guard < 4; guard++) {
+          qSweep(pick.which);
+          const head = qMinSeq(pick.which);
+          let w = 0, why = 'quota';
+          if (seq <= head) {
+            /* 轮到我了：先看上游亲口报的余额，没有才回落本地滑窗估算 */
+            let qw = quotaWait(pick.which, est);
+            if (qw == null) qw = paceCheck(pick.which, est);
+            w = qw;
+          } else {
+            why = 'fifo';
+            w = FIFO_POLL + Math.floor(Math.random() * 3);   // 前面还有人：短间隔回来问，队首一走立刻顶上
+          }
+          if (w <= 0) {
+            rateAdd(pick.which, est);   // 预扣：并发请求要看得见彼此，否则一起判定、一起放行、又一起撞墙
+            qDrop(pick.which, tok);
+            admitted = true;
+            break;
+          }
+          qTouch(pick.which, tok, seq);
+          /* 只有「轮到我了、且差得不多」才值得服务端静默等。排在别人后面时等也没意义
+             （不知道前面那位要跑多久），直接回短间隔让客户端来问，别白占一条连接。 */
+          const wms = w * 1000;
+          if (why === 'quota' && holdUsed + wms <= HOLD_MAX_MS && HOLD_N < HOLD_MAX_WAITERS) {
+            /* 短等：服务端自己等完再判一次。客户端完全无感——不多一次往返，也不惊群。 */
+            HOLD_N++;
+            holdUsed += wms;
+            try { await sleepMs(wms); } finally { HOLD_N--; }
+            continue;
+          }
+          /* 长等：告诉客户端排多久，让它倒数后把同一批原样重发。
+             ⚠️ 用户 9/27 拍板：排再久也不换模型（一集里两个模型语气会不一致），
+             所以这里只给 wait，绝不放行去撞 429（那会触发 fallbackToA 换道）。 */
+          if (tookInflight) inflightFree(ip);
+          return sendJson(res, 200, { wait: w, q: tok, slot: pick.which, why: why });
         }
-        held = true;
-        rateAdd(pick.which, est); // 预扣：并发请求要看得见彼此，否则一起判定、一起放行、又一起撞墙
+        if (!admitted) {
+          if (tookInflight) inflightFree(ip);
+          return sendJson(res, 200, { wait: 10, q: tok, slot: pick.which, why: 'quota' });
+        }
       }
       usage.ips[ip] = ipUsed + 1;
       usage.global += 1;
@@ -1189,16 +1351,25 @@ const server = http.createServer(async (req, res) => {
       const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
       try {
         const out = await callModel(pick.cfg, body.messages, undefined, jsonOpts);
+        try { if (canPace) { noteQuota(pick.which, out && out._rl); if (out) delete out._rl; } } catch (e13) {}
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
         /* v0.9.183：按真实消耗修正预扣（只补正差额，实际比预估少的部分随滑窗自然滑出），
            并把本批输出喂给该槽位的 EMA，让下一批预估更准 */
         try {
-          if (canPace) {
+          if (needGate) {
+            /* ⚠️ 只补正「真实消耗 − 预扣」。A 槽默认不进闸门（est=0），这里也必须同步跳过，
+               否则会把没预扣过的 est 当成预扣减掉，账本被冲成负数。 */
             const tk = usageTokens(out && out.usage);
             if (tk) {
               rateAdd(pick.which, tk.tin + tk.tout - est);
               const ema = RATE_OUT_EMA[pick.which] || 0;
               RATE_OUT_EMA[pick.which] = ema ? ema * 0.7 + tk.tout * 0.3 : tk.tout;
+            }
+            /* v0.9.185：实测用量超过了「以为的额度」却没挨限流 → 说明额度被上调了
+               （用户在 OpenAI 后台提了额）。只收紧不放宽会把它永久锁死在旧值上。 */
+            const usedNow = rateUsed(pick.which);
+            if (RATE_LIMIT[pick.which] > 0 && usedNow > RATE_LIMIT[pick.which]) {
+              RATE_LIMIT[pick.which] = Math.round(usedNow / RATE_SAFE);
             }
           }
         } catch (e10) {}
@@ -1210,7 +1381,16 @@ const server = http.createServer(async (req, res) => {
       } catch (e) {
         /* v0.9.183：429 的报错文案里带着上游的限额，学下来。硬编码的额度迟早会变，
            而这个数字是上游亲口报的——哪天 A 槽也开始限流了，不用改代码就能自动生效。 */
-        try { if (canPace) learnLimit(pick.which, e && e.message); } catch (e11) {}
+        try {
+          if (canPace) {
+            learnLimit(pick.which, e && e.message);
+            noteQuota(pick.which, e && e._rl);
+            /* 429 时余额基本见底；上游若给了 Retry-After，那是最权威的等待时间，优先于我们算的 */
+            const ra = Number(e && e._ra) || 0;
+            if (ra > 0) RETRY_UNTIL[pick.which] = Date.now() + ra;
+            if (e && e._status === 429) QUOTA[pick.which] = { rem: 0, at: Date.now() };
+          }
+        } catch (e11) {}
         /* B 失败且开启回退 → 再试 A；回退成功后把事件里的模型改写成真正生效的 A，并记 fallback 次数 */
         if (pick.which === 'B' && cfg.fallbackToA) {
           try {
@@ -1228,6 +1408,7 @@ const server = http.createServer(async (req, res) => {
                 const tkA = usageTokens(outA && outA.usage);
                 if (tkA) rateAdd('A', tkA.tin + tkA.tout);
               }
+              try { noteQuota('A', outA && outA._rl); if (outA) delete outA._rl; } catch (e14) {}
             } catch (e12) {}
             /* v0.9.156：回退必须让用户看得见。此前静默降级——界面无任何提示，
                后台又因为上面那条记账问题显示的是 A 的名字，用户只能判定「分流没生效」。 */
@@ -1240,7 +1421,7 @@ const server = http.createServer(async (req, res) => {
         }
         return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e.message } });
       } finally {
-        if (held) inflightFree(ip); // 成功 / 回退 / 失败，都要把在途名额还回去
+        if (tookInflight) inflightFree(ip); // 成功 / 回退 / 失败，都要把在途名额还回去
       }
     }
 

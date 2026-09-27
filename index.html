@@ -545,7 +545,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.184</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.185</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -705,7 +705,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.184</span>
+    <span class="ver-tag">v0.9.185</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -990,7 +990,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.184"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.185"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1191,7 +1191,7 @@ const I18N = {
   mergedNote:'已并入上一条字幕（时间轴合并）',
   startT:'开始整片翻译：{0} → {1}，共 {2} 条，每批约 {3} 字符。',
   batchProg:'第 {0}/{1} 批（句组 {2}–{3}）…',
-  pgRun:'翻译中', pgEta:'预计剩余 {0}', pgWait:'排队中', pgWaitSec:'{0} 秒后继续', pgTok:'本次消耗 {0} token', pgDone:'✓ 完成 · 用时 {0}',
+  pgRun:'翻译中', pgEta:'预计剩余 {0}', pgWait:'排队中', pgWaitSec:'{0} 秒后继续', pgTok:'本次消耗 {0} token', pgGiveUp:'排队超时，本批先跳过', pgDone:'✓ 完成 · 用时 {0}',
   resumeTitle:'发现未完成的翻译', resumeBody:'这份文件上次翻译到第 {0}/{1} 批就中断了。可以接着上次的进度继续（已完成的 {0} 批不会重跑），也可以从头重新翻译。',
   resumeGo:'继续上次', resumeNew:'从头重来', resumeLog:'已从断点继续：跳过前 {0} 批，从第 {1} 批开始。', resumeHint:'（翻译进度已存在本机，中途关掉页面也能接着翻）',
   reuseTitle:'上次的结果还在', reuseBody:'{0}（{1} 行 · {2}）翻译完成于 {3}，还没有导出。可以直接载入，不用再翻译一次。', reuseGo:'用上次的结果', reuseLog:'已载入上次的翻译结果（未调用模型）。', reuseCancel:'取消', reuseNote:'注：这份结果保存在你自己的这台设备上，不会上传到服务器。',
@@ -1290,7 +1290,7 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   mergedNote:'已併入上一條字幕（時間軸合併）',
   startT:'開始整片翻譯：{0} → {1}，共 {2} 條，每批約 {3} 字元。',
   batchProg:'第 {0}/{1} 批（句組 {2}–{3}）…',
-  pgRun:'翻譯中', pgEta:'預計剩餘 {0}', pgWait:'排隊中', pgWaitSec:'{0} 秒後繼續', pgTok:'本次消耗 {0} token', pgDone:'✓ 完成 · 用時 {0}',
+  pgRun:'翻譯中', pgEta:'預計剩餘 {0}', pgWait:'排隊中', pgWaitSec:'{0} 秒後繼續', pgTok:'本次消耗 {0} token', pgGiveUp:'排隊逾時，本批先跳過', pgDone:'✓ 完成 · 用時 {0}',
   resumeTitle:'發現未完成的翻譯', resumeBody:'這份檔案上次翻譯到第 {0}/{1} 批就中斷了。可以接續上次的進度（已完成的 {0} 批不會重跑），也可以從頭重新翻譯。',
   resumeGo:'繼續上次', resumeNew:'從頭重來', resumeLog:'已從斷點繼續：跳過前 {0} 批，從第 {1} 批開始。', resumeHint:'（翻譯進度已存在本機，中途關掉頁面也能接著翻）',
   reuseTitle:'上次的結果還在', reuseBody:'{0}（{1} 行 · {2}）翻譯完成於 {3}，還沒有匯出。可以直接載入，不用再翻譯一次。', reuseGo:'用上次的結果', reuseLog:'已載入上次的翻譯結果（未呼叫模型）。', reuseCancel:'取消', reuseNote:'註：這份結果保存在你自己的這台設備上，不會上傳到伺服器。',
@@ -1389,7 +1389,7 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   mergedNote:'Merged into the previous cue (timeline merged)',
   startT:'Translating: {0} → {1}, {2} cues, ~{3} chars per batch.',
   batchProg:'Batch {0}/{1} (sentences {2}–{3})…',
-  pgRun:'Translating', pgEta:'ETA {0}', pgWait:'Queued', pgWaitSec:'resumes in {0}s', pgTok:'{0} tokens used', pgDone:'✓ Done · {0}',
+  pgRun:'Translating', pgEta:'ETA {0}', pgWait:'Queued', pgWaitSec:'resumes in {0}s', pgTok:'{0} tokens used', pgGiveUp:'Queue timed out, skipping this batch', pgDone:'✓ Done · {0}',
   resumeTitle:'Unfinished translation found', resumeBody:'This file stopped at batch {0}/{1} last time. You can continue where it left off (the {0} finished batches will not be re-run), or start over from the beginning.',
   resumeGo:'Continue', resumeNew:'Start over', resumeLog:'Resumed: skipped {0} batches, starting from batch {1}.', resumeHint:'(Progress is saved on this device, so you can close the page and carry on later.)',
   reuseTitle:'Previous result still available', reuseBody:'{0} ({1} lines · {2}) finished translating at {3} and has not been exported yet. You can load it directly without translating again.', reuseGo:'Use previous result', reuseLog:'Loaded the previous result (no model request was made).', reuseCancel:'Cancel', reuseNote:'Note: this result is stored in the browser on your own device. It is never uploaded to the server.',
@@ -1488,7 +1488,7 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   mergedNote:'前の字幕に統合済み（タイムライン統合）',
   startT:'翻訳開始：{0} → {1}、全 {2} 件、1バッチ約 {3} 文字。',
   batchProg:'バッチ {0}/{1}（文グループ {2}–{3}）…',
-  pgRun:'翻訳中', pgEta:'残り約 {0}', pgWait:'順番待ち', pgWaitSec:'{0} 秒後に再開', pgTok:'今回の消費: {0} トークン', pgDone:'✓ 完了 · 所要 {0}',
+  pgRun:'翻訳中', pgEta:'残り約 {0}', pgWait:'順番待ち', pgWaitSec:'{0} 秒後に再開', pgTok:'今回の消費: {0} トークン', pgGiveUp:'順番待ちがタイムアウトしたため、このバッチを跳過', pgDone:'✓ 完了 · 所要 {0}',
   resumeTitle:'未完了の翻訳があります', resumeBody:'このファイルは前回 {0}/{1} バッチ目で中断しました。続きから再開できます（完了済みの {0} バッチは再実行しません）。最初からやり直すこともできます。',
   resumeGo:'続きから再開', resumeNew:'最初からやり直す', resumeLog:'再開しました：前 {0} バッチをスキップし、第 {1} バッチから開始します。', resumeHint:'（進捗はこの端末に保存されます。ページを閉じても後から再開できます）',
   reuseTitle:'前回の結果が残っています', reuseBody:'{0}（{1} 行 · {2}）は {3} に翻訳が完了し、まだ書き出されていません。そのまま読み込めば、もう一度翻訳する必要はありません。', reuseGo:'前回の結果を使う', reuseLog:'前回の翻訳結果を読み込みました（モデル呼び出しなし）。', reuseCancel:'キャンセル', reuseNote:'注：この結果はお使いの端末のブラウザに保存されています。サーバーには送信されません。',
@@ -1587,7 +1587,7 @@ userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了�
   mergedNote:'Fusionado en el subtítulo anterior (línea de tiempo fusionada)',
   startT:'Traduciendo: {0} → {1}, {2} subtítulos, ~{3} caracteres por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
-  pgRun:'Traduciendo', pgEta:'Faltan {0}', pgWait:'En cola', pgWaitSec:'continúa en {0} s', pgTok:'{0} tokens consumidos', pgDone:'✓ Listo · {0}',
+  pgRun:'Traduciendo', pgEta:'Faltan {0}', pgWait:'En cola', pgWaitSec:'continúa en {0} s', pgTok:'{0} tokens consumidos', pgGiveUp:'Cola agotada, se omite este lote', pgDone:'✓ Listo · {0}',
   resumeTitle:'Traducción sin terminar', resumeBody:'Este archivo se interrumpió en el lote {0}/{1} la última vez. Puede continuar donde quedó (los {0} lotes ya hechos no se repetirán) o empezar de nuevo.',
   resumeGo:'Continuar', resumeNew:'Empezar de nuevo', resumeLog:'Reanudado: se omitieron {0} lotes, comenzando desde el lote {1}.', resumeHint:'(El progreso se guarda en este dispositivo: puede cerrar la página y continuar después.)',
   reuseTitle:'El resultado anterior sigue disponible', reuseBody:'{0} ({1} líneas · {2}) terminó de traducirse a las {3} y todavía no se ha exportado. Puedes cargarlo directamente sin volver a traducir.', reuseGo:'Usar el resultado anterior', reuseLog:'Se cargó el resultado anterior (sin llamar al modelo).', reuseCancel:'Cancelar', reuseNote:'Nota: el resultado se guarda en el navegador de tu propio dispositivo y nunca se envía al servidor.',
@@ -1686,7 +1686,7 @@ userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando l
   mergedNote:'Fundida na legenda anterior (linha do tempo fundida)',
   startT:'Traduzindo: {0} → {1}, {2} legendas, ~{3} caracteres por lote.',
   batchProg:'Lote {0}/{1} (frases {2}–{3})…',
-  pgRun:'Traduzindo', pgEta:'Faltam {0}', pgWait:'Na fila', pgWaitSec:'continua em {0} s', pgTok:'{0} tokens usados', pgDone:'✓ Concluído · {0}',
+  pgRun:'Traduzindo', pgEta:'Faltam {0}', pgWait:'Na fila', pgWaitSec:'continua em {0} s', pgTok:'{0} tokens usados', pgGiveUp:'Fila esgotada, ignorando este lote', pgDone:'✓ Concluído · {0}',
   resumeTitle:'Tradução inacabada', resumeBody:'Este arquivo parou no lote {0}/{1} da última vez. Você pode continuar de onde parou (os {0} lotes prontos não serão repetidos) ou recomeçar do zero.',
   resumeGo:'Continuar', resumeNew:'Recomeçar', resumeLog:'Retomado: {0} lotes ignorados, começando pelo lote {1}.', resumeHint:'(O progresso é salvo neste dispositivo: feche a página e continue depois.)',
   reuseTitle:'O resultado anterior ainda está disponível', reuseBody:'{0} ({1} linhas · {2}) terminou de ser traduzido às {3} e ainda não foi exportado. Podes carregá-lo diretamente, sem traduzir tudo outra vez.', reuseGo:'Usar o resultado anterior', reuseLog:'Resultado anterior carregado (nenhuma chamada ao modelo).', reuseCancel:'Cancelar', reuseNote:'Nota: este resultado fica guardado no navegador do teu próprio dispositivo e nunca é enviado para o servidor.',
@@ -1785,7 +1785,7 @@ userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicand
   mergedNote:'이전 자막에 병합됨(타임라인 병합)',
   startT:'번역 시작: {0} → {1}, 총 {2}개, 배치당 약 {3}자.',
   batchProg:'배치 {0}/{1}(문장 그룹 {2}–{3})…',
-  pgRun:'번역 중', pgEta:'남은 시간 약 {0}', pgWait:'대기 중', pgWaitSec:'{0}초 후 계속', pgTok:'사용 토큰 {0}', pgDone:'✓ 완료 · 소요 {0}',
+  pgRun:'번역 중', pgEta:'남은 시간 약 {0}', pgWait:'대기 중', pgWaitSec:'{0}초 후 계속', pgTok:'사용 토큰 {0}', pgGiveUp:'대기 시간 초과로 이 배치를 건너뜁니다', pgDone:'✓ 완료 · 소요 {0}',
   resumeTitle:'완료되지 않은 번역', resumeBody:'이 파일은 지난번에 {0}/{1} 배치에서 중단되었습니다. 이어서 계속할 수 있습니다(완료된 {0}개 배치는 다시 실행하지 않습니다). 처음부터 다시 할 수도 있습니다.',
   resumeGo:'이어서 계속', resumeNew:'처음부터', resumeLog:'이어서 계속합니다: 앞 {0}개 배치를 건너뛰고 {1}번째 배치부터 시작합니다.', resumeHint:'(진행 상황은 이 기기에 저장되므로 페이지를 닫아도 나중에 이어서 할 수 있습니다)',
   reuseTitle:'이전 결과가 아직 남아 있습니다', reuseBody:'{0}({1}줄 · {2})은 {3}에 번역이 끝났고 아직 내보내지 않았습니다. 다시 번역하지 않고 그대로 불러올 수 있습니다.', reuseGo:'이전 결과 사용', reuseLog:'이전 번역 결과를 불러왔습니다(모델 호출 없음).', reuseCancel:'취소', reuseNote:'참고: 이 결과는 사용 중인 기기의 브라우저에 저장되며 서버로 업로드되지 않습니다.',
@@ -1884,7 +1884,7 @@ userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제�
   mergedNote:'In den vorherigen Untertitel zusammengeführt (Zeitleiste vereint)',
   startT:'Übersetze: {0} → {1}, {2} Untertitel, ~{3} Zeichen pro Batch.',
   batchProg:'Batch {0}/{1} (Sätze {2}–{3})…',
-  pgRun:'Übersetzung läuft', pgEta:'Noch {0}', pgWait:'Wartet', pgWaitSec:'weiter in {0} s', pgTok:'{0} Token verbraucht', pgDone:'✓ Fertig · {0}',
+  pgRun:'Übersetzung läuft', pgEta:'Noch {0}', pgWait:'Wartet', pgWaitSec:'weiter in {0} s', pgTok:'{0} Token verbraucht', pgGiveUp:'Wartezeit überschritten, dieser Batch wird übersprungen', pgDone:'✓ Fertig · {0}',
   resumeTitle:'Unfertige Übersetzung gefunden', resumeBody:'Diese Datei wurde beim letzten Mal bei Batch {0}/{1} unterbrochen. Sie können dort weitermachen (die {0} fertigen Batches werden nicht wiederholt) oder neu beginnen.',
   resumeGo:'Fortsetzen', resumeNew:'Neu beginnen', resumeLog:'Fortgesetzt: {0} Batches übersprungen, Start bei Batch {1}.', resumeHint:'(Der Fortschritt wird auf diesem Gerät gespeichert – Sie können die Seite schließen und später weitermachen.)',
   reuseTitle:'Vorheriges Ergebnis noch verfügbar', reuseBody:'{0} ({1} Zeilen · {2}) wurde um {3} fertig übersetzt und noch nicht exportiert. Du kannst es direkt laden, ohne erneut zu übersetzen.', reuseGo:'Vorheriges Ergebnis verwenden', reuseLog:'Vorheriges Übersetzungsergebnis geladen (kein Modellaufruf).', reuseCancel:'Abbrechen', reuseNote:'Hinweis: Dieses Ergebnis wird im Browser auf deinem eigenen Gerät gespeichert und nicht an den Server gesendet.',
@@ -1983,7 +1983,7 @@ userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende F�
   mergedNote:'Fusionné dans le sous-titre précédent (timeline fusionnée)',
   startT:'Traduction : {0} → {1}, {2} sous-titres, ~{3} caractères par lot.',
   batchProg:'Lot {0}/{1} (phrases {2}–{3})…',
-  pgRun:'Traduction', pgEta:'Reste {0}', pgWait:'En attente', pgWaitSec:'reprend dans {0} s', pgTok:'{0} jetons utilisés', pgDone:'✓ Terminé · {0}',
+  pgRun:'Traduction', pgEta:'Reste {0}', pgWait:'En attente', pgWaitSec:'reprend dans {0} s', pgTok:'{0} jetons utilisés', pgGiveUp:'File expirée, ce lot est ignoré', pgDone:'✓ Terminé · {0}',
   resumeTitle:'Traduction inachevée', resumeBody:'Ce fichier s’est arrêté au lot {0}/{1} la dernière fois. Vous pouvez reprendre où il en était (les {0} lots finis ne seront pas refaits) ou recommencer depuis le début.',
   resumeGo:'Reprendre', resumeNew:'Recommencer', resumeLog:'Reprise : {0} lots ignorés, démarrage au lot {1}.', resumeHint:'(La progression est enregistrée sur cet appareil : fermez la page et reprenez plus tard.)',
   reuseTitle:'Le résultat précédent est encore disponible', reuseBody:'{0} ({1} lignes · {2}) a terminé sa traduction à {3} et n’a pas encore été exporté. Vous pouvez le charger directement sans traduire à nouveau.', reuseGo:'Utiliser le résultat précédent', reuseLog:'Résultat précédent chargé (aucun appel au modèle).', reuseCancel:'Annuler', reuseNote:'Remarque : ce résultat est enregistré dans le navigateur de votre propre appareil et n’est jamais envoyé au serveur.',
@@ -2082,7 +2082,7 @@ userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, appl
   mergedNote:'Digabung ke subtitle sebelumnya (timeline digabung)',
   startT:'Menerjemahkan: {0} → {1}, {2} subtitle, ~{3} karakter per batch.',
   batchProg:'Batch {0}/{1} (kalimat {2}–{3})…',
-  pgRun:'Menerjemahkan', pgEta:'Sisa {0}', pgWait:'Mengantre', pgWaitSec:'lanjut {0} d lagi', pgTok:'{0} token terpakai', pgDone:'✓ Selesai · {0}',
+  pgRun:'Menerjemahkan', pgEta:'Sisa {0}', pgWait:'Mengantre', pgWaitSec:'lanjut {0} d lagi', pgTok:'{0} token terpakai', pgGiveUp:'Antrean kehabisan waktu, batch ini dilewati', pgDone:'✓ Selesai · {0}',
   resumeTitle:'Terjemahan belum selesai', resumeBody:'File ini terakhir kali berhenti di batch {0}/{1}. Anda bisa melanjutkan dari situ ({0} batch yang sudah selesai tidak akan diulang) atau mengulang dari awal.',
   resumeGo:'Lanjutkan', resumeNew:'Ulangi dari awal', resumeLog:'Dilanjutkan: melewati {0} batch, mulai dari batch {1}.', resumeHint:'(Progres disimpan di perangkat ini — Anda bisa menutup halaman dan melanjutkan nanti.)',
   reuseTitle:'Hasil sebelumnya masih tersimpan', reuseBody:'{0} ({1} baris · {2}) selesai diterjemahkan pada {3} dan belum diekspor. Anda dapat memuatnya langsung tanpa menerjemahkan ulang.', reuseGo:'Gunakan hasil sebelumnya', reuseLog:'Hasil terjemahan sebelumnya dimuat (tanpa memanggil model).', reuseCancel:'Batal', reuseNote:'Catatan: hasil ini disimpan di browser pada perangkat Anda sendiri dan tidak dikirim ke server.',
@@ -2181,7 +2181,7 @@ userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghap
   mergedNote:'पिछले सबटाइटल में विलय (टाइमलाइन विलय)',
   startT:'अनुवाद शुरू: {0} → {1}, {2} सबटाइटल, प्रति बैच लगभग {3} अक्षर।',
   batchProg:'बैच {0}/{1} (वाक्य {2}–{3})…',
-  pgRun:'अनुवाद हो रहा है', pgEta:'शेष {0}', pgWait:'कतार में', pgWaitSec:'{0} सेकंड में जारी', pgTok:'{0} टोकन उपयोग', pgDone:'✓ पूर्ण · समय {0}',
+  pgRun:'अनुवाद हो रहा है', pgEta:'शेष {0}', pgWait:'कतार में', pgWaitSec:'{0} सेकंड में जारी', pgTok:'{0} टोकन उपयोग', pgGiveUp:'कतार का समय समाप्त, यह बैच छोड़ दिया', pgDone:'✓ पूर्ण · समय {0}',
   resumeTitle:'अधूरा अनुवाद मिला', resumeBody:'यह फ़ाइल पिछली बार {0}/{1} बैच पर रुक गई थी। आप वहीं से जारी रख सकते हैं (पूरे हुए {0} बैच दोबारा नहीं चलेंगे) या शुरू से फिर अनुवाद कर सकते हैं।',
   resumeGo:'जारी रखें', resumeNew:'शुरू से करें', resumeLog:'जारी रखा गया: {0} बैच छोड़े, {1}वें बैच से शुरू।', resumeHint:'(प्रगति इसी डिवाइस पर सहेजी जाती है — पेज बंद करके बाद में जारी रख सकते हैं)',
   reuseTitle:'पिछला परिणाम अभी भी मौजूद है', reuseBody:'{0}（{1} पंक्तियाँ · {2}）का अनुवाद {3} को पूरा हुआ और अभी तक एक्सपोर्ट नहीं किया गया। आप इसे सीधे लोड कर सकते हैं, दोबारा अनुवाद करने की ज़रूरत नहीं।', reuseGo:'पिछला परिणाम उपयोग करें', reuseLog:'पिछला अनुवाद परिणाम लोड हो गया（मॉडल कॉल नहीं हुआ）।', reuseCancel:'रद्द करें', reuseNote:'ध्यान दें: यह परिणाम आपके अपने डिवाइस के ब्राउज़र में सुरक्षित है, सर्वर पर नहीं भेजा जाता।',
@@ -2280,7 +2280,7 @@ userStop:'उपयोगकर्ता ने रोका।', postEnd:'अ�
   mergedNote:'รวมเข้าซับไตเติลก่อนหน้า (รวมไทม์ไลน์)',
   startT:'เริ่มแปลทั้งไฟล์: {0} → {1} รวม {2} ซับ ประมาณ {3} ตัวอักษรต่อแบตช์',
   batchProg:'แบตช์ {0}/{1} (กลุ่มประโยค {2}–{3})…',
-  pgRun:'กำลังแปล', pgEta:'เหลืออีก {0}', pgWait:'ต่อคิว', pgWaitSec:'อีก {0} วินาที', pgTok:'ใช้ {0} โทเค็น', pgDone:'✓ เสร็จ · ใช้เวลา {0}',
+  pgRun:'กำลังแปล', pgEta:'เหลืออีก {0}', pgWait:'ต่อคิว', pgWaitSec:'อีก {0} วินาที', pgTok:'ใช้ {0} โทเค็น', pgGiveUp:'คิวหมดเวลา ข้ามชุดนี้', pgDone:'✓ เสร็จ · ใช้เวลา {0}',
   resumeTitle:'พบงานแปลที่ยังไม่เสร็จ', resumeBody:'ไฟล์นี้ครั้งที่แล้วหยุดอยู่ที่ batch {0}/{1} คุณสามารถทำงานต่อได้ (batch ที่เสร็จแล้ว {0} batch จะไม่ถูกแปลซ้ำ) หรือเริ่มใหม่ทั้งหมด',
   resumeGo:'ทำงานต่อ', resumeNew:'เริ่มใหม่', resumeLog:'ทำงานต่อแล้ว: ข้าม {0} batch เริ่มที่ batch {1}', resumeHint:'(บันทึกความคืบหน้าไว้ในเครื่องนี้ ปิดหน้าเว็บแล้วกลับมาทำต่อได้)',
   reuseTitle:'ผลลัพธ์ก่อนหน้ายังอยู่', reuseBody:'{0}（{1} บรรทัด · {2}）แปลเสร็จเมื่อ {3} และยังไม่ได้ส่งออก คุณสามารถโหลดผลลัพธ์นั้นมาใช้ได้เลยโดยไม่ต้องแปลใหม่', reuseGo:'ใช้ผลลัพธ์ก่อนหน้า', reuseLog:'โหลดผลลัพธ์การแปลก่อนหน้าแล้ว（ไม่ได้เรียกโมเดล）', reuseCancel:'ยกเลิก', reuseNote:'หมายเหตุ: ผลลัพธ์นี้ถูกบันทึกไว้ในเบราว์เซอร์บนอุปกรณ์ของคุณเอง และไม่ถูกส่งขึ้นเซิร์ฟเวอร์',
@@ -2379,7 +2379,7 @@ userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร�
   mergedNote:'Đã gộp vào phụ đề trước (timeline đã gộp)',
   startT:'Đang dịch: {0} → {1}, {2} phụ đề, khoảng {3} ký tự mỗi lô.',
   batchProg:'Lô {0}/{1} (câu {2}–{3})…',
-  pgRun:'Đang dịch', pgEta:'Còn lại {0}', pgWait:'Đang xếp hàng', pgWaitSec:'tiếp tục sau {0} giây', pgTok:'đã dùng {0} token', pgDone:'✓ Xong · {0}',
+  pgRun:'Đang dịch', pgEta:'Còn lại {0}', pgWait:'Đang xếp hàng', pgWaitSec:'tiếp tục sau {0} giây', pgTok:'đã dùng {0} token', pgGiveUp:'Hết hạn xếp hàng, bỏ qua lô này', pgDone:'✓ Xong · {0}',
   resumeTitle:'Có bản dịch chưa hoàn thành', resumeBody:'Lần trước tệp này dừng ở batch {0}/{1}. Bạn có thể tiếp tục từ đó ({0} batch đã xong sẽ không dịch lại) hoặc dịch lại từ đầu.',
   resumeGo:'Tiếp tục', resumeNew:'Dịch lại từ đầu', resumeLog:'Đã tiếp tục: bỏ qua {0} batch, bắt đầu từ batch {1}.', resumeHint:'(Tiến trình được lưu trên máy này — bạn có thể đóng trang và tiếp tục sau.)',
   reuseTitle:'Kết quả trước đó vẫn còn', reuseBody:'{0}（{1} dòng · {2}）đã dịch xong lúc {3} và chưa được xuất. Bạn có thể tải trực tiếp mà không cần dịch lại.', reuseGo:'Dùng kết quả trước đó', reuseLog:'Đã tải kết quả dịch trước đó（không gọi mô hình）.', reuseCancel:'Hủy', reuseNote:'Lưu ý: kết quả này được lưu trong trình duyệt trên chính thiết bị của bạn và không được tải lên máy chủ.',
@@ -2478,7 +2478,7 @@ userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn 
   mergedNote:'Объединено с предыдущим субтитром (таймлайн объединён)',
   startT:'Перевод: {0} → {1}, {2} субтитров, ~{3} символов на батч.',
   batchProg:'Батч {0}/{1} (предложения {2}–{3})…',
-  pgRun:'Перевод', pgEta:'Осталось {0}', pgWait:'В очереди', pgWaitSec:'через {0} с', pgTok:'израсходовано {0} токенов', pgDone:'✓ Готово · за {0}',
+  pgRun:'Перевод', pgEta:'Осталось {0}', pgWait:'В очереди', pgWaitSec:'через {0} с', pgTok:'израсходовано {0} токенов', pgGiveUp:'Время ожидания истекло, этот пакет пропущен', pgDone:'✓ Готово · за {0}',
   resumeTitle:'Найден незавершённый перевод', resumeBody:'В прошлый раз этот файл остановился на пакете {0}/{1}. Можно продолжить с того же места (уже готовые {0} пакетов не будут переведены заново) или начать заново.',
   resumeGo:'Продолжить', resumeNew:'Начать заново', resumeLog:'Продолжено: пропущено {0} пакетов, старт с пакета {1}.', resumeHint:'(Прогресс сохраняется на этом устройстве — можно закрыть страницу и продолжить позже.)',
   reuseTitle:'Предыдущий результат ещё сохранён', reuseBody:'{0}（{1} строк · {2}）перевод завершён в {3} и ещё не экспортирован. Можно загрузить его сразу, не переводя заново.', reuseGo:'Использовать предыдущий результат', reuseLog:'Загружен предыдущий результат перевода（без обращения к модели）.', reuseCancel:'Отмена', reuseNote:'Примечание: результат хранится в браузере на вашем устройстве и не отправляется на сервер.',
@@ -2577,7 +2577,7 @@ userStop:'Остановлено пользователем.', postEnd:'Пере
   mergedNote:'Unito nel sottotitolo precedente (timeline unificata)',
   startT:'Traduzione: {0} → {1}, {2} sottotitoli, ~{3} caratteri per batch.',
   batchProg:'Batch {0}/{1} (frasi {2}–{3})…',
-  pgRun:'Traduzione', pgEta:'Mancano {0}', pgWait:'In coda', pgWaitSec:'riprende tra {0} s', pgTok:'{0} token usati', pgDone:'✓ Completato · {0}',
+  pgRun:'Traduzione', pgEta:'Mancano {0}', pgWait:'In coda', pgWaitSec:'riprende tra {0} s', pgTok:'{0} token usati', pgGiveUp:'Coda scaduta, questo lotto viene saltato', pgDone:'✓ Completato · {0}',
   resumeTitle:'Traduzione non completata', resumeBody:'L’ultima volta questo file si è fermato al batch {0}/{1}. Puoi continuare da lì (i {0} batch già fatti non verranno ripetuti) o ricominciare dall’inizio.',
   resumeGo:'Continua', resumeNew:'Ricomincia', resumeLog:'Ripreso: saltati {0} batch, si parte dal batch {1}.', resumeHint:'(I progressi sono salvati su questo dispositivo: puoi chiudere la pagina e riprendere dopo.)',
   reuseTitle:'Il risultato precedente è ancora disponibile', reuseBody:'{0} ({1} righe · {2}) ha completato la traduzione alle {3} e non è ancora stato esportato. Puoi caricarlo direttamente senza tradurre di nuovo.', reuseGo:'Usa il risultato precedente', reuseLog:'Risultato precedente caricato (nessuna chiamata al modello).', reuseCancel:'Annulla', reuseNote:'Nota: il risultato è salvato nel browser del tuo dispositivo e non viene mai inviato al server.',
@@ -2676,7 +2676,7 @@ userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozi
   mergedNote:'دُمجت في الترجمة السابقة (الخط الزمني مدمج)',
   startT:'الترجمة: {0} ← {1}، {2} ترجمة، نحو {3} حرفًا لكل دفعة.',
   batchProg:'دفعة {0}/{1} (جمل {2}–{3})…',
-  pgRun:'جارٍ الترجمة', pgEta:'متبقي {0}', pgWait:'في الانتظار', pgWaitSec:'يستأنف بعد {0} ثانية', pgTok:'تم استهلاك {0} رمز', pgDone:'✓ اكتمل · {0}',
+  pgRun:'جارٍ الترجمة', pgEta:'متبقي {0}', pgWait:'في الانتظار', pgWaitSec:'يستأنف بعد {0} ثانية', pgTok:'تم استهلاك {0} رمز', pgGiveUp:'انتهت مهلة الانتظار، تم تخطي هذه الدفعة', pgDone:'✓ اكتمل · {0}',
   resumeTitle:'تم العثور على ترجمة غير مكتملة', resumeBody:'توقف هذا الملف في المرة الماضية عند الدفعة {0}/{1}. يمكنك المتابعة من حيث توقفت (لن تُعاد الدفعات {0} المكتملة) أو البدء من جديد.',
   resumeGo:'متابعة', resumeNew:'ابدأ من جديد', resumeLog:'تمت المتابعة: تم تخطي {0} دفعة، البدء من الدفعة {1}.', resumeHint:'(يتم حفظ التقدم على هذا الجهاز — يمكنك إغلاق الصفحة والمتابعة لاحقًا)',
   reuseTitle:'النتيجة السابقة لا تزال متاحة', reuseBody:'اكتملت ترجمة {0}（{1} سطرًا · {2}）في {3} ولم يتم تصديرها بعد. يمكنك تحميلها مباشرة دون ترجمة أخرى.', reuseGo:'استخدام النتيجة السابقة', reuseLog:'تم تحميل نتيجة الترجمة السابقة（بدون استدعاء النموذج）.', reuseCancel:'إلغاء', reuseNote:'ملاحظة: تُحفظ هذه النتيجة في متصفح جهازك الخاص ولا تُرفع إلى الخادم.',
@@ -2775,7 +2775,7 @@ userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، ت
   mergedNote:'Önceki altyazıyla birleştirildi (zaman çizgisi birleşik)',
   startT:'Çevriliyor: {0} → {1}, {2} altyazı, grup başına yaklaşık {3} karakter.',
   batchProg:'Grup {0}/{1} (cümleler {2}–{3})…',
-  pgRun:'Çevriliyor', pgEta:'Kalan {0}', pgWait:'Sırada', pgWaitSec:'{0} saniye sonra', pgTok:'{0} jeton kullanıldı', pgDone:'✓ Tamamlandı · {0}',
+  pgRun:'Çevriliyor', pgEta:'Kalan {0}', pgWait:'Sırada', pgWaitSec:'{0} saniye sonra', pgTok:'{0} jeton kullanıldı', pgGiveUp:'Kuyruk zaman aşımı, bu parti atlandı', pgDone:'✓ Tamamlandı · {0}',
   resumeTitle:'Tamamlanmamış çeviri bulundu', resumeBody:'Bu dosya geçen sefer {0}/{1}. partide durdu. Kaldığı yerden devam edebilirsiniz (biten {0} parti tekrar çalıştırılmaz) veya baştan başlayabilirsiniz.',
   resumeGo:'Devam et', resumeNew:'Baştan başla', resumeLog:'Devam edildi: {0} parti atlandı, {1}. partiden başlanıyor.', resumeHint:'(İlerleme bu cihaza kaydedilir — sayfayı kapatıp sonra devam edebilirsiniz.)',
   reuseTitle:'Önceki sonuç hâlâ duruyor', reuseBody:'{0}（{1} satır · {2}）çevirisi {3} tarihinde tamamlandı ve henüz dışa aktarılmadı. Yeniden çevirtmeden doğrudan yükleyebilirsiniz.', reuseGo:'Önceki sonucu kullan', reuseLog:'Önceki çeviri sonucu yüklendi（model çağrılmadı）.', reuseCancel:'İptal', reuseNote:'Not: Bu sonuç kendi cihazınızdaki tarayıcıda saklanır ve sunucuya gönderilmez.',
@@ -2971,7 +2971,7 @@ userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu te
   batchProg:'Batch {0}/{1} (zinnen {2}–{3})…',
   pgRun:'Vertalen',
   pgEta:'Nog {0}',
-  pgWait:'In wachtrij', pgWaitSec:'over {0} s verder', pgTok:'{0} tokens gebruikt', pgDone:'✓ Klaar · {0}',
+  pgWait:'In wachtrij', pgWaitSec:'over {0} s verder', pgTok:'{0} tokens gebruikt', pgGiveUp:'Wachtrij verlopen, deze batch overgeslagen', pgDone:'✓ Klaar · {0}',
   resumeTitle:'Onvoltooide vertaling gevonden',
   resumeBody:'Dit bestand stopte de vorige keer bij batch {0}/{1}. Je kunt verdergaan waar je gebleven was (de {0} afgeronde batches worden niet opnieuw gedraaid), of helemaal opnieuw beginnen.',
   resumeGo:'Doorgaan',
@@ -3264,7 +3264,7 @@ rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   batchProg:'Partia {0}/{1} (zdania {2}–{3})…',
   pgRun:'Tłumaczenie',
   pgEta:'Pozostało {0}',
-  pgWait:'W kolejce', pgWaitSec:'za {0} s', pgTok:'zużyto {0} tokenów', pgDone:'✓ Gotowe · {0}',
+  pgWait:'W kolejce', pgWaitSec:'za {0} s', pgTok:'zużyto {0} tokenów', pgGiveUp:'Kolejka przekroczyła czas, ten pakiet pominięto', pgDone:'✓ Gotowe · {0}',
   resumeTitle:'Znaleziono niedokończone tłumaczenie',
   resumeBody:'Ten plik zatrzymał się ostatnio na partii {0}/{1}. Możesz kontynuować od miejsca przerwania ({0} wykonanych partii nie będzie powtarzane) albo zacząć od początku.',
   resumeGo:'Kontynuuj',
@@ -3557,7 +3557,7 @@ rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   batchProg:'Batch {0}/{1} (meningar {2}–{3})…',
   pgRun:'Översätter',
   pgEta:'Återstår {0}',
-  pgWait:'I kö', pgWaitSec:'fortsätter om {0} s', pgTok:'{0} tokens använda', pgDone:'✓ Klar · {0}',
+  pgWait:'I kö', pgWaitSec:'fortsätter om {0} s', pgTok:'{0} tokens använda', pgGiveUp:'Kön tog slut, denna batch hoppas över', pgDone:'✓ Klar · {0}',
   resumeTitle:'Oavslutad översättning hittades',
   resumeBody:'Den här filen stannade vid batch {0}/{1} förra gången. Du kan fortsätta där du slutade (de {0} färdiga batcharna körs inte om) eller börja om från början.',
   resumeGo:'Fortsätt',
@@ -3850,7 +3850,7 @@ rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   batchProg:'Dávka {0}/{1} (věty {2}–{3})…',
   pgRun:'Překlad',
   pgEta:'Zbývá {0}',
-  pgWait:'Ve frontě', pgWaitSec:'za {0} s', pgTok:'spotřebováno {0} tokenů', pgDone:'✓ Hotovo · {0}',
+  pgWait:'Ve frontě', pgWaitSec:'za {0} s', pgTok:'spotřebováno {0} tokenů', pgGiveUp:'Fronta vypršela, tato dávka přeskočena', pgDone:'✓ Hotovo · {0}',
   resumeTitle:'Nalezen nedokončený překlad',
   resumeBody:'Tento soubor se minule zastavil na dávce {0}/{1}. Můžete pokračovat tam, kde jste skončili ({0} hotových dávek se nebude opakovat), nebo začít znovu od začátku.',
   resumeGo:'Pokračovat',
@@ -4143,7 +4143,7 @@ rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   batchProg:'Пакет {0}/{1} (речення {2}–{3})…',
   pgRun:'Переклад',
   pgEta:'Залишилось {0}',
-  pgWait:'У черзі', pgWaitSec:'через {0} с', pgTok:'витрачено {0} токенів', pgDone:'✓ Готово · {0}',
+  pgWait:'У черзі', pgWaitSec:'через {0} с', pgTok:'витрачено {0} токенів', pgGiveUp:'Час очікування вичерпано, цей пакет пропущено', pgDone:'✓ Готово · {0}',
   resumeTitle:'Знайдено незавершений переклад',
   resumeBody:'Цей файл минулого разу зупинився на пакеті {0}/{1}. Можна продовжити з того самого місця ({0} виконаних пакетів не повторюватимуться) або почати спочатку.',
   resumeGo:'Продовжити',
@@ -4436,7 +4436,7 @@ rateWait:'Перевищено ліміт (429), очікування 20 с пе
   batchProg:'Batch {0}/{1} (sætninger {2}–{3})…',
   pgRun:'Oversætter',
   pgEta:'{0} tilbage',
-  pgWait:'I kø', pgWaitSec:'om {0} s', pgTok:'{0} tokens brugt', pgDone:'✓ Færdig · {0}',
+  pgWait:'I kø', pgWaitSec:'om {0} s', pgTok:'{0} tokens brugt', pgGiveUp:'Køen udløb, dette batch springes over', pgDone:'✓ Færdig · {0}',
   resumeTitle:'Uafsluttet oversættelse fundet',
   resumeBody:'Denne fil stoppede ved batch {0}/{1} sidst. Du kan fortsætte, hvor du slap (de {0} færdige batches køres ikke igen), eller starte forfra.',
   resumeGo:'Fortsæt',
@@ -4729,7 +4729,7 @@ rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   batchProg:'Erä {0}/{1} (virkkeet {2}–{3})…',
   pgRun:'Käännetään',
   pgEta:'Jäljellä {0}',
-  pgWait:'Jonossa', pgWaitSec:'{0} s päästä', pgTok:'{0} tokenia käytetty', pgDone:'✓ Valmis · {0}',
+  pgWait:'Jonossa', pgWaitSec:'{0} s päästä', pgTok:'{0} tokenia käytetty', pgGiveUp:'Jonotus aikakatkaistiin, tämä erä ohitetaan', pgDone:'✓ Valmis · {0}',
   resumeTitle:'Löytyi keskeneräinen käännös',
   resumeBody:'Tämä tiedosto pysähtyi viimeksi erään {0}/{1}. Voit jatkaa siitä mihin jäit ({0} valmista erää ei ajeta uudelleen) tai aloittaa alusta.',
   resumeGo:'Jatka',
@@ -5022,7 +5022,7 @@ rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   batchProg:'Παρτίδα {0}/{1} (προτάσεις {2}–{3})…',
   pgRun:'Μετάφραση',
   pgEta:'Απομένουν {0}',
-  pgWait:'Στην ουρά', pgWaitSec:'σε {0} δευτ.', pgTok:'χρησιμοποιήθηκαν {0} tokens', pgDone:'✓ Έτοιμο · {0}',
+  pgWait:'Στην ουρά', pgWaitSec:'σε {0} δευτ.', pgTok:'χρησιμοποιήθηκαν {0} tokens', pgGiveUp:'Η ουρά έληξε, αυτή η παρτίδα παραλείπεται', pgDone:'✓ Έτοιμο · {0}',
   resumeTitle:'Βρέθηκε ημιτελής μετάφραση',
   resumeBody:'Αυτό το αρχείο σταμάτησε την προηγούμενη φορά στην παρτίδα {0}/{1}. Μπορείτε να συνεχίσετε από εκεί που μείνατε (οι {0} ολοκληρωμένες παρτίδες δεν θα εκτελεστούν ξανά) ή να ξεκινήσετε από την αρχή.',
   resumeGo:'Συνέχεια',
@@ -5315,7 +5315,7 @@ rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επ
   batchProg:'אצווה {0}/{1} (משפטים {2}–{3})…',
   pgRun:'מתרגם',
   pgEta:'נותר {0}',
-  pgWait:'בתור', pgWaitSec:'ימשיך בעוד {0} שניות', pgTok:'נעשה שימוש ב-{0} טוקנים', pgDone:'✓ הסתיים · {0}',
+  pgWait:'בתור', pgWaitSec:'ימשיך בעוד {0} שניות', pgTok:'נעשה שימוש ב-{0} טוקנים', pgGiveUp:'התור פג, חבילה זו מדולגת', pgDone:'✓ הסתיים · {0}',
   resumeTitle:'נמצא תרגום שלא הושלם',
   resumeBody:'הקובץ הזה נעצר בפעם הקודמת באצווה {0}/{1}. אפשר להמשיך מהמקום שבו נעצרתם ({0} האצוות שהסתיימו לא ירוצו שוב), או להתחיל מחדש.',
   resumeGo:'המשך',
@@ -5608,7 +5608,7 @@ rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניס�
   batchProg:'Lotul {0}/{1} (propozițiile {2}–{3})…',
   pgRun:'Se traduce',
   pgEta:'Au rămas {0}',
-  pgWait:'La rând', pgWaitSec:'continuă în {0} s', pgTok:'{0} jetoane folosite', pgDone:'✓ Gata · {0}',
+  pgWait:'La rând', pgWaitSec:'continuă în {0} s', pgTok:'{0} jetoane folosite', pgGiveUp:'Coada a expirat, acest lot este omis', pgDone:'✓ Gata · {0}',
   resumeTitle:'A fost găsită o traducere neterminată',
   resumeBody:'Acest fișier s-a oprit data trecută la lotul {0}/{1}. Poți continua de unde ai rămas (cele {0} loturi finalizate nu vor fi reluate) sau poți lua totul de la capăt.',
   resumeGo:'Continuă',
@@ -5996,16 +5996,18 @@ function pgPace(sec){
     let left=Math.max(1, Math.round(sec));
     const show=function(){ if(eta) eta.textContent=t('pgWaitSec', left); };
     show();
+    const restore=function(val){
+      clearInterval(timer);
+      if(eta) eta.textContent='';
+      if(stEl) stEl.textContent=t('pgRun');
+      if(bar) bar.classList.add('run');
+      resolve(val);
+    };
     const timer=setInterval(function(){
+      /* v0.9.185：排队中点「停止」要立刻响应。此前最长要干等 60 秒才理用户。 */
+      if(typeof S!=='undefined' && S && S.stop){ restore('stop'); return; }
       left--;
-      if(left<=0){
-        clearInterval(timer);
-        if(eta) eta.textContent='';
-        if(stEl) stEl.textContent=t('pgRun');
-        if(bar) bar.classList.add('run');
-        resolve();
-        return;
-      }
+      if(left<=0){ restore('done'); return; }
       show();
     }, 1000);
   });
@@ -6945,14 +6947,30 @@ let LAST_FINISH='';   // v0.9.125：上一次 chatOnce 拿到 finish_reason（'l
 /* v0.9.146：整批失败原因的一次性上报标记。声明必须在 chatOnce（下方 6674 处读取它）之前，
    否则若将来有人在脚本求值阶段就触发请求，let 的暂时性死区会直接抛 ReferenceError。 */
 let _failWhy = null;
+/* v0.9.185：单个请求的排队总预算（毫秒）。此前是「最多排 8 轮」，而服务端每轮最多让等 60 秒
+   → 一批最多干等 480 秒，等于原地打转；而且耗尽后会掉进 errEmpty，
+   埋点把「排队超时」记成「上游返回空」，统计口径全错。改成按秒计的预算，耗尽抛独立错误。 */
+const PACE_BUDGET_MS = 90000;
 async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
   const ctl=new AbortController();
   const builtin = (base===BUILTIN_API);
   /* v0.9.123：浏览器直连（自定义 API）没有服务端排队，但第三方中转/思考型模型慢得多——
      恒定 90s 会让大批次必然 abort（实测表象："signal is aborted without reason"，换任何慢模型都一样）。
      直连默认放宽到 300s；内置通道仍 90s；显式传值（测试连接 20s、术语提取 240s）优先。 */
-  const ms = timeoutMs>0 ? timeoutMs : (builtin?90000:300000);
-  const timer=setTimeout(()=>ctl.abort(), ms);
+  /* v0.9.185：内置通道 90s → 105s。服务端最多替客户端静默排队 15 秒（HOLD_MAX_MS），
+     那段等待客户端也在等同一个 HTTP 响应，必须算进总预算——否则「帮你排队」反而
+     变成「吃掉模型调用的时间」，排队结束后只剩几十秒就 abort。 */
+  const ms = timeoutMs>0 ? timeoutMs : (builtin?105000:300000);
+  let timer=setTimeout(()=>ctl.abort(), ms);
+  /* v0.9.185：排队等待期间暂停计时。排队是「上游额度不够、晚点再来」，不是模型在计算——
+     此前它照样扣模型调用的超时预算，于是出现「排了 60 秒、只剩 30 秒就 abort」：
+     用户以为在排队，实际是被超时打断，接着走批重试，比直接吃一记 429 降级还糟。 */
+  let pacing=false;
+  const pauseTimer =function(){ clearTimeout(timer); };
+  const resumeTimer=function(){ clearTimeout(timer); timer=setTimeout(()=>ctl.abort(), ms); };
+  /* v0.9.185：服务端 FIFO 排队的顺序号。首次被要求排队时服务端下发，之后每次重发原样带回——
+     不带上它，服务端会当成新请求重新发号，先来先出就失效了。 */
+  let qTok='';
   LAST_FINISH='';
   /* v0.9.126：等待可视化。网关排队 / 超长输出 / 平台侧异常时，一次请求可能几分钟不吐一个字节，
      而界面在此期间毫无变化（非流式请求没有任何中间态），用户只能判断为「卡死/没反应」。
@@ -6962,12 +6980,14 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
   const hbT=setTimeout(()=>{
     /* 立刻报一次再转周期——若这里只启动 setInterval，第一次心跳要等到 90 秒才出现，
        等于最需要反馈的那半分钟仍然空白。 */
-    try{ log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){}
+    try{ if(!pacing) log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){}
     /* 恢复按钮可点：翻译期间 $('btnGo') 一直是 disabled，而按钮文案写着「翻译中…点击可停止」——
        平台迟迟不回话时用户既不能停止、也收不到任何反馈，界面跟死了没两样。
        停滞 30 秒即放开（正常批次早在此之前返回，不影响常规操作）。 */
     try{ var b=$('btnGo'); if(b) b.disabled=false; }catch(e){}
-    hbI=setInterval(()=>{ try{ log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){} }, 60000);
+    /* v0.9.185：排队中不报「已等待 N 秒」——进度条右侧正在倒数「N 秒后继续」，
+       两条文案同时出现会让用户以为卡了两遍。 */
+    hbI=setInterval(()=>{ try{ if(!pacing) log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){} }, 60000);
   }, 30000);
   try{
     const url = builtin ? BUILTIN_API : base.replace(/\/+$/,'')+'/chat/completions';
@@ -7005,7 +7025,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         /* v0.9.183：pace=1 = 告诉服务端「我认得 {wait:N} 这种回执」。旧服务端不认识这个字段，
       直接忽略，行为不变；反过来，服务端也只对带这个标记的请求才可能返回 wait——
       否则旧版本的前端收到一个没有 choices 的响应，会当成「上游返回空」去走降级重试。 */
-      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
+      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
         _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
@@ -7016,7 +7036,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
        等 N 秒后把同一批原样重发：既不降级换模型（一集里前后两个模型会让语气不一致），
        也不弹窗打断用户，进度条只是停了一下又继续。 */
     const once=async(plan)=>{
-      let paceLeft=8;            /* 同一批最多排 8 轮，避免极端情况下原地打转 */
+      let paceBudget=PACE_BUDGET_MS;   /* v0.9.185：等待预算按「秒」算，不按轮数 */
       for(;;){
         const r=await fetch(url,{
           method:'POST',
@@ -7029,9 +7049,22 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         if(!r.ok){ const tx=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+tx.slice(0,200)); }
         const j=await r.json();
         /* v0.9.183：服务端算出来「额度不够，等 N 秒再来」。只有内置通道会有（直连没有服务端）。 */
-        if(builtin && j && +(j.wait||0)>0 && paceLeft>0){
-          paceLeft--;
-          await pgPace(Math.min(60, Math.max(1, Math.round(+j.wait))));
+        if(builtin && j && +(j.wait||0)>0){
+          /* v0.9.185：记住排队号，重发时带回——服务端靠它判断「还有没有比我更早的」 */
+          if(typeof j.q==='string' && j.q) qTok=j.q;
+          const psec=Math.min(60, Math.max(1, Math.round(+j.wait)));
+          /* 预算不够排这一轮 → 放弃本批，抛独立的「排队超时」。
+             ⚠️ 绝不能因为排太久就放行去撞上游：那必然 429 → 服务端回退 A 槽，
+             一集里前后两个模型语气会不一致（用户 9/27 拍板：等再久也不换道）。 */
+          if(psec*1000 > paceBudget){
+            _failWhy='pace_giveup';      /* v0.9.146 起的一次性标记：让后台能分辨「排队超时」而不是「上游返空」 */
+            throw new Error(t('pgGiveUp'));
+          }
+          paceBudget -= psec*1000;
+          pacing=true; pauseTimer();     /* 排队不吃模型调用的超时预算 */
+          let why='';
+          try{ why=await pgPace(psec); } finally { pacing=false; resumeTimer(); }
+          if(why==='stop') throw new Error(t('userStop'));   /* 排队期间点停止要立刻响应 */
           continue;
         }
         /* v0.9.183：累加本次消耗，供完成态展示。缓存命中两种字段名都要读：

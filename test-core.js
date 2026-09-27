@@ -3935,7 +3935,8 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* ③ 版本协商：不带 meta.pace 的旧前端永远不能收到 wait，
           否则它拿到一个没有 choices 的响应会当成「上游返回空」去走降级重试 */
     assert.ok(/body\.meta\.pace === 1/.test(srvSrc), '缺少 meta.pace 版本协商——旧前端会被 wait 响应打乱');
-    assert.ok(/wait: w, slot: pick\.which/.test(srvSrc), '额度类 wait 出口缺失');
+    /* v0.9.185：wait 回执多带一个排队号 q（客户端重发时带回，先来先出靠它） */
+    assert.ok(/wait: w, q: tok, slot: pick\.which/.test(srvSrc), '额度类 wait 出口缺失（或未带排队号）');
     assert.ok(/wait: inflightWait\(\)/.test(srvSrc), '在途类 wait 出口缺失');
     /* ④ 限额别硬编码：429 文案里带着上游亲口报的数，学下来（只收紧不放松） */
     assert.ok(/Limit\\s\+\(\\d\{3,\}\)/.test(srvSrc), '没有从 429 文案里解析 Limit——上游改配额就得改代码');
@@ -3943,8 +3944,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* ⑤ 回退那一趟走的是 A 槽，消耗必须记进 A 的账本：记到 B 上会凭空吃掉 B 的额度 */
     assert.ok(/rateAdd\('A', tkA\.tin \+ tkA\.tout\)/.test(srvSrc), 'B→A 回退的消耗没记进 A 槽账本');
     /* ⑥ 每 IP 在途上限，且无论成功 / 回退 / 失败都要还回去 */
-    assert.ok(/RATE_INFLIGHT = 2/.test(srvSrc), '每 IP 在途上限没设——一个人开多标签页会霸占队列');
-    assert.ok(/\} finally \{\s*if \(held\) inflightFree\(ip\);/.test(srvSrc), '在途名额没有 finally 释放——失败路径会泄漏');
+    /* v0.9.185：2 → 4。前端隔离重译 poolMap(…,3)、术语提取 poolMap(…,4)，
+       上限低于自己的并发度就会「自己挤自己」（第 3 个请求必然被判在途、白等 8~16 秒）。 */
+    assert.ok(/RATE_INFLIGHT = 4/.test(srvSrc), '每 IP 在途上限没设或低于前端并发度——会自己挤自己');
+    assert.ok(/\} finally \{\s*if \(tookInflight\) inflightFree\(ip\);/.test(srvSrc), '在途名额没有 finally 释放——失败路径会泄漏');
     /* ⑦ 预扣：放行那一刻就把预估值记账，否则并发请求一起判定、一起放行、又一起撞墙 */
     assert.ok(/rateAdd\(pick\.which, est\);/.test(srvSrc), '缺少预扣：并发请求看不见彼此');
   });
@@ -3994,6 +3997,106 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/setPrText\(''\)/.test(html.slice(st, st + 700)), 'pgStart 没清掉上一轮的消耗行');
     const ss = html.indexOf('function setSrc(text, fileName){');
     assert.ok(/setProg\(0,false\); setPrText\(''\)/.test(html.slice(ss, ss + 400)), '导入新字幕没清掉上一部的完成态');
+  });
+
+  t('v0.9.185 服务端：额度以「上游亲口报的」为准，且放宽通道必须存在', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* ① 读响应头。B 槽是 api.openai.com 官方端点，每次响应都带 x-ratelimit-remaining-tokens /
+       reset-tokens——这是权威数字；此前全靠「字符数 ÷ 2.5」估算 + 从 429 文案里抠 Limit 200000。 */
+    assert.ok(/x-ratelimit-remaining-tokens/.test(srvSrc), '没读上游的剩余额度头——还在用估算代替测量');
+    assert.ok(/x-ratelimit-limit-tokens/.test(srvSrc), '没读上游的额度上限头');
+    assert.ok(/retry-after/.test(srvSrc), '没读 Retry-After——上游亲口说的等待时间被忽略了（OpenAI 官方：优先于自算）');
+    /* ② 解析 "6m0s" / "1.5s" / "800ms" 这种格式，不能假定单位 */
+    assert.ok(/function parseResetMs/.test(srvSrc), '缺少 reset 时长解析');
+    assert.ok(/u === 'ms' \? n : u === 's' \? n \* 1000/.test(srvSrc), 'reset 解析没区分 ms/s/m/h');
+    /* ③ 判定顺序：先问上游余额，没有才回落本地滑窗 */
+    assert.ok(/quotaWait\(pick\.which, est\)/.test(srvSrc), '没有先问上游余额');
+    assert.ok(/if \(qw == null\) qw = paceCheck\(pick\.which, est\)/.test(srvSrc), '上游余额拿不到时没有回落本地账本');
+    /* ④ 放宽通道（用户 9/27 在 OpenAI 后台提了额）：
+           旧的 learnLimit 只收紧不放松，会把学到的 20 万永久锁死，提了额也看不到。 */
+    assert.ok(/rl\.limTok > RATE_LIMIT\[which\]/.test(srvSrc), '响应头报的更高额度没有采纳');
+    assert.ok(/usedNow > RATE_LIMIT\[pick\.which\]/.test(srvSrc), '实测用量超过旧限额却没挨限流时，没有据此放宽');
+    /* ⑤ 429 时余额见底 + Retry-After 要落成后续判定 */
+    assert.ok(/e && e\._status === 429/.test(srvSrc), '429 后没把余额记成见底');
+    assert.ok(/RETRY_UNTIL\[pick\.which\] = Date\.now\(\) \+ ra/.test(srvSrc), 'Retry-After 没有落进后续判定');
+    /* ⑥ 账本必须能减：预估偏高时差额是负数，此前被 if(v<=0) return 丢掉 → 只增不减、虚高 */
+    assert.ok(/if \(!v\) return;/.test(srvSrc), 'rateAdd 仍丢弃负值——账本只增不减，本来有额度也让人排队');
+    assert.ok(/return sum > 0 \? sum : 0;/.test(srvSrc), 'rateUsed 可能算出负数');
+    /* ⑦ A 槽豁免在途闸：A 从未限流（1133 任务零 429），拦它只会拖慢开多标签页的用户 */
+    assert.ok(/if \(pick\.which !== 'A'\)/.test(srvSrc), 'A 槽没豁免在途闸');
+  });
+
+  t('v0.9.185 服务端：先来先出的排队，短等服务端静默 hold，长等只排队不换道', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 「等 N 秒再重发」天然不是 FIFO：谁先重发谁先进，后到的请求反而插队。
+       所以每个排队的请求都要有顺序号，判定不只看额度，还看队里有没有更早的号。 */
+    for (const k of ['Q_SEQ', 'Q_WAIT', 'Q_TTL', 'qMinSeq', 'qTouch', 'qDrop', 'qNewTok']) {
+      assert.ok(new RegExp('\\b' + k + '\\b').test(srvSrc), 'FIFO 缺件: ' + k);
+    }
+    assert.ok(/seq <= head/.test(srvSrc), '没有「轮到我了」的判定——先来先出不成立');
+    assert.ok(/why = 'fifo'/.test(srvSrc), '排在别人后面时没有标出 fifo 原因');
+    assert.ok(/w = FIFO_POLL \+ Math\.floor\(Math\.random\(\) \* 3\)/.test(srvSrc),
+      '非队首没有用短间隔回问——队首一走后面顶不上（要干等上一轮的 60 秒）');
+    /* 短等由服务端扛：不多一次往返、不惊群，客户端完全无感 */
+    assert.ok(/HOLD_MAX_MS      = 15000/.test(srvSrc), '服务端静默等待上限不是 15 秒');
+    assert.ok(/HOLD_MAX_WAITERS = 8/.test(srvSrc), '没有限制同时在服务端等待的请求数——会把 Node 变成等待池');
+    assert.ok(/await sleepMs\(wms\)/.test(srvSrc), '服务端没有真的等——短等仍要客户端空跑一趟');
+    assert.ok(/for \(let guard = 0; guard < 4; guard\+\+\)/.test(srvSrc), 'hold 循环没有次数上限——连接会被占死');
+    /* ⚠️ 静默等待必须**累计**封顶 15 秒，不是「每轮 ≤15 秒 × 4 轮 = 60 秒」。
+       前端只给了 15 秒冗余（90→105 秒）；服务端能等 60 秒的话，模型就只剩 45 秒 → abort。
+       排队是帮用户，不能反手制造超时失败。 */
+    assert.ok(/let holdUsed = 0;/.test(srvSrc), '静默等待没有累计计数');
+    assert.ok(/holdUsed \+ wms <= HOLD_MAX_MS/.test(srvSrc), '静默等待没按累计封顶——4 轮 ×15 秒会吃掉客户端超时预算');
+    assert.ok(/holdUsed \+= wms;/.test(srvSrc), '静默等待没有累加');
+    /* ⚠️ 长等只给 wait，绝不放行去撞上游：那必然 429 → fallbackToA 换道，
+       一集里前后两个模型语气会不一致（用户 9/27 拍板：排再久也不换模型）。 */
+    const iHold = srvSrc.indexOf('let tookInflight = false;');   // 从准入段开始切，别切到常量声明那一段
+    const seg = srvSrc.slice(iHold, iHold + 2600);
+    assert.ok(/wait: w, q: tok, slot: pick\.which, why: why/.test(seg), '长等出口丢了');
+    assert.ok(!/return sendJson\(res, 200, \{ wait: 0/.test(seg), '出现「等太久就放行」的出口——那等于变相换道');
+  });
+
+  t('v0.9.185 服务端：A 槽没被限流时整个闸门都不进（线上冒烟抓到的真 bug）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 首次线上冒烟实测：zh-CN（A 槽）拿到 wait=5 / why=fifo。
+       因为最初只豁免了「在途闸」，A 照样进 FIFO 队列——队里只要有个更早的号就被拦。
+       A 槽 1133 个任务零限流，让它排队纯属拖慢。
+       但也不能永久豁免：A 真挨 429 时 learnLimit 会把 RATE_LIMIT.A 从 0 改成非零，那时它确实要排队。 */
+    assert.ok(/const needGate = canPace && \(pick\.which !== 'A' \|\| \(RATE_LIMIT\[pick\.which\] \|\| 0\) > 0\);/.test(srvSrc),
+      'A 槽没有按「自己有没有被限流」决定是否进闸门——要么限流时裸奔，要么零限流时也排队');
+    assert.ok(/if \(needGate\) \{[\s\S]{0,240}inflightTake/.test(srvSrc), '闸门仍由 canPace 控制，A 槽会被队列拦住');
+    /* est 只在真进闸门时才非零：A 不进闸门却拿 est 去补正，等于把没预扣过的量减掉，账本被冲成负数 */
+    assert.ok(/const est = needGate \? estTokens/.test(srvSrc), 'est 仍按 canPace 算——A 槽没预扣却会被减掉');
+    assert.ok(/if \(needGate\) \{\s*\/\* ⚠️ 只补正/.test(srvSrc), '预扣补正没有跟着 needGate 走');
+    /* 读余额头 / 学限额仍对所有槽生效：A 真限流了要靠它们把 RATE_LIMIT.A 从 0 抬起来 */
+    assert.ok(/if \(canPace\) \{\s*learnLimit\(pick\.which/.test(srvSrc), 'learnLimit 不该被 needGate 挡掉——A 限流后要靠它进闸门');
+    assert.ok(/if \(canPace\) \{ noteQuota\(pick\.which, out && out\._rl\)/.test(srvSrc), 'noteQuota 不该被 needGate 挡掉');
+  });
+
+  t('v0.9.185 前端：排队不再吃掉批次超时，且可取消、有预算、带排队号', () => {
+    /* P0：此前 chatOnce 的 90s 计时器在 pgPace 等待期间照走 → 排 60 秒只剩 30 秒就 abort，
+       用户以为在排队，实际被超时打断，接着走批重试，比直接吃一记 429 降级还糟。 */
+    assert.ok(/builtin\?105000/.test(html), '内置通道超时没给服务端 15 秒静默排队留位置');
+    assert.ok(/let timer=setTimeout/.test(html), 'timer 不是 let——等待期间无法暂停');
+    assert.ok(/pacing=true; pauseTimer\(\)/.test(html), '等待期间没有暂停超时计时');
+    assert.ok(/pacing=false; resumeTimer\(\)/.test(html), '等待结束没有恢复超时计时');
+    /* 预算按秒，不按轮数：8 轮 × 60 秒 = 一批最多干等 480 秒，等于原地打转 */
+    assert.ok(/PACE_BUDGET_MS = 90000/.test(html), '排队预算没设或不是按秒计');
+    assert.strictEqual(html.indexOf('paceLeft'), -1, '还在用「轮数」当预算——每轮最长 60 秒会打转');
+    assert.ok(/psec\*1000 > paceBudget/.test(html), '预算耗尽时没有放弃本批');
+    /* 耗尽要抛独立的「排队超时」，不能掉进 errEmpty——那会把排队超时记成上游返空 */
+    assert.ok(/_failWhy='pace_giveup'/.test(html), '排队超时没有自己的埋点标记');
+    assert.ok(/throw new Error\(t\('pgGiveUp'\)\)/.test(html), '排队超时复用了 errEmpty——统计口径会错');
+    const n = (html.match(/\bpgGiveUp\s*:\s*'[^']*'/g) || []).length;
+    assert.strictEqual(n, 27, 'pgGiveUp 应 27 条，实际 ' + n);
+    /* 排队中点停止要立刻响应，不能干等 60 秒 */
+    assert.ok(/S\.stop\)\{ restore\('stop'\)/.test(html), 'pgPace 不响应取消');
+    assert.ok(/why==='stop'\) throw new Error/.test(html), '取消后没有抛出让用户停下来');
+    /* 排队中不要再报「已等待 N 秒」——和右侧「N 秒后继续」两条文案打架 */
+    assert.ok(/if\(!pacing\) log\(t\('waitSec'/.test(html), '排队中仍在报等待秒数');
+    /* 排队号：重发必须带回，否则服务端当成新请求重新发号，先来先出失效 */
+    assert.ok(/qTok\?\{q:qTok\}:\{\}/.test(html), '重发没带排队号');
+    assert.ok(/qTok=j\.q/.test(html), '没有记住服务端下发的排队号');
   });
 }
 
