@@ -41,7 +41,18 @@ const DEFAULTS = {
   extraParams: {},         // 模型 A 的附加请求参数（平铺 JSON 对象，如 {"enable_thinking":false}）
   extraParams2: {},        // 模型 B 的附加请求参数
   langModelB: [],          // 走模型 B 的目标语言码数组（如 ['ja','th']）；空 = 全部走 A
-  fallbackToA: true        // 模型 B 调用失败时自动回退模型 A（事件里记 fallback 次数）
+  fallbackToA: true,       // 模型 B/C 调用失败时自动回退（事件里记 fallback 次数）
+  /* --- 模型 C（v0.9.193）：与 B 同结构，后缀 3。优先级 C > B > A ---
+     分流：先查 langModelC → C，再查 langModelB → B，否则 A。
+     回退：C 失败 → B → A（逐级，B 未配全则直接跳到 A）。
+     ⚠️ langModelC 默认留空 = C 不接管任何语言，配好参数也不会有流量进来，
+        由你在后台手动挑语言试点。要让它接管，把语言码填进 langModelC 即可。 */
+  provider3: '',
+  base3: '',
+  model3: '',
+  key3: '',
+  extraParams3: {},        // 模型 C 的附加请求参数
+  langModelC: []           // 走模型 C 的目标语言码数组；空 = C 不参与分流
 };
 
 function ensureData(){
@@ -932,23 +943,40 @@ function withExtra(core, extra){
   const body = Object.assign({}, extra, core);
   return body;
 }
-/* 模型 B 是否配全（缺任一项即视为未启用，全部走 A） */
-function modelBReady(cfg){
-  return !!(cfg.base2 && cfg.model2 && cfg.key2);
+/* 槽位是否配全（缺任一项即视为未启用）。A 是兜底槽，永不参与「未启用」判断。
+   v0.9.193：B/C 同构，故抽成通用函数；modelBReady 保留为别名，别处的引用不用改。 */
+function slotReady(cfg, which){
+  if (which === 'B') return !!(cfg.base2 && cfg.model2 && cfg.key2);
+  if (which === 'C') return !!(cfg.base3 && cfg.model3 && cfg.key3);
+  return false;
 }
-/* 取出某个模型槽位的完整调用配置（A / B 共用 temperature） */
+function modelBReady(cfg){ return slotReady(cfg, 'B'); }
+function modelCReady(cfg){ return slotReady(cfg, 'C'); }
+/* 取出某个模型槽位的完整调用配置（A / B / C 共用 temperature） */
 function slotCfg(cfg, which){
-  return which === 'B'
-    ? { base: cfg.base2, model: cfg.model2, key: cfg.key2, temperature: cfg.temperature, extraParams: cfg.extraParams2 }
-    : { base: cfg.base,  model: cfg.model,  key: cfg.key,  temperature: cfg.temperature, extraParams: cfg.extraParams };
+  if (which === 'B') return { base: cfg.base2, model: cfg.model2, key: cfg.key2, temperature: cfg.temperature, extraParams: cfg.extraParams2 };
+  if (which === 'C') return { base: cfg.base3, model: cfg.model3, key: cfg.key3, temperature: cfg.temperature, extraParams: cfg.extraParams3 };
+  return { base: cfg.base,  model: cfg.model,  key: cfg.key,  temperature: cfg.temperature, extraParams: cfg.extraParams };
 }
-/* 按目标语言分流：命中 langModelB 且 B 配全 → B，否则 A */
+/* v0.9.193：按目标语言分流，优先级 C > B > A。
+   先查 langModelC（C 配全才作数）→ 再查 langModelB → 否则 A。
+   ⚠️ 只有 C 明确列出的语言才走 C；C 没列出的语言照旧走 B，互不挤占。 */
 function pickModel(cfg, lang){
   const lg = String(lang || '');
-  if (modelBReady(cfg) && Array.isArray(cfg.langModelB) && cfg.langModelB.indexOf(lg) >= 0) {
+  if (slotReady(cfg, 'C') && Array.isArray(cfg.langModelC) && cfg.langModelC.indexOf(lg) >= 0) {
+    return { which: 'C', cfg: slotCfg(cfg, 'C') };
+  }
+  if (slotReady(cfg, 'B') && Array.isArray(cfg.langModelB) && cfg.langModelB.indexOf(lg) >= 0) {
     return { which: 'B', cfg: slotCfg(cfg, 'B') };
   }
   return { which: 'A', cfg: slotCfg(cfg, 'A') };
+}
+/* v0.9.193：回退链。C → B → A，B → A，A 是终点（它自己失败就真的失败了）。
+   前一级没配全就直接跳过（比如 C 挂了但 B 压根没配 → 直接退 A）。 */
+function fallbackChain(cfg, which){
+  if (which === 'C') return [slotReady(cfg, 'B') ? 'B' : null, 'A'].filter(Boolean);
+  if (which === 'B') return ['A'];
+  return [];
 }
 
 /* ---------------- v0.9.183 上游额度排队（按模型槽位分开） ----------------
@@ -970,7 +998,7 @@ const RATE_MAX_WAIT = 60;      // 最多等一个滑窗。要等更久说明额�
    inflight 拒掉，白等 8~16 秒再撞一次。上限必须盖住前端自己的并发度。 */
 const RATE_INFLIGHT = 4;       // 同一 IP 同时在途的请求数（防多标签页霸占队列）
 const RATE_EST_MIN  = 3000;    // 单批消耗预估下限（token）
-const RATE = { A: [], B: [] };              // 各槽位滑窗 [{t, tk}]
+const RATE = { A: [], B: [], C: [] };       // 各槽位滑窗 [{t, tk}]（v0.9.193 加 C）
 /* v0.9.187：B 的种子值 20 万 → 200 万。
    2026-09-27 直连 api.openai.com 实测：x-ratelimit-limit-tokens = **2,000,000** TPM
    （remaining 1,999,997 / reset 0s；另有 limit-requests 5000 RPM，我们没跟踪）。
@@ -978,8 +1006,10 @@ const RATE = { A: [], B: [] };              // 各槽位滑窗 [{t, tk}]
    ⚠️ 种子值只用于「进程刚起来、还没读到第一个响应头」的那一瞬；一旦读到上游头，
    noteQuota() 会按真实值再校准（可高可低）。但种子太低会在重启后头几秒无谓地排队，
    所以种子必须跟真实额度同量级。 */
-const RATE_LIMIT = { A: 0, B: 2000000 };    // 0 = 该槽位不限，永不 wait
-const RATE_OUT_EMA = { A: 0, B: 0 };        // 各槽位平均每批输出 token，供预估
+/* v0.9.193：C 的种子值与 B 对齐（200 万 TPM）。C 若接的是别的家，跑到第一个响应就会被
+   noteQuota() 按上游头校准，种子只影响进程刚起来的那一瞬。 */
+const RATE_LIMIT = { A: 0, B: 2000000, C: 2000000 };  // 0 = 该槽位不限，永不 wait
+const RATE_OUT_EMA = { A: 0, B: 0, C: 0 };  // 各槽位平均每批输出 token，供预估
 const INFLIGHT = Object.create(null);       // ip -> 在途请求数
 /* v0.9.185：短等由服务端自己扛。额度只差几秒时让客户端空跑一趟往返、再倒数重发，
    既多一次 RTT、又会让一批人整整齐齐撞回来（惊群）。服务端 await 掉这几秒，客户端完全无感。
@@ -989,8 +1019,8 @@ const HOLD_MAX_WAITERS = 8;    // 同时在服务端等待的请求数，别把 
 let   HOLD_N           = 0;
 /* v0.9.185：上游每次响应都会报剩余额度（OpenAI 系：x-ratelimit-remaining-tokens）。
    这是权威数字，比我们按字符数估算准得多；没有这个头的端点才回落到本地滑窗账本。 */
-const QUOTA       = { A: null, B: null };   // {rem, at}
-const RETRY_UNTIL = { A: 0, B: 0 };         // 上游 Retry-After 报的下次可试时刻
+const QUOTA       = { A: null, B: null, C: null };  // {rem, at}
+const RETRY_UNTIL = { A: 0, B: 0, C: 0 };   // 上游 Retry-After 报的下次可试时刻
 
 /* 预估本批消耗：输入按字符数折算（中英混排实测约 2.5 字符/token），输出用该槽位 EMA */
 function estTokens(messages, which){
@@ -1353,7 +1383,11 @@ const server = http.createServer(async (req, res) => {
       usage.global += 1;
       writeUsage(usage);
       /* v0.9.157：viaB 恒传 0/1（此前走 A 时传 null，旧事件上的 viaB=1 不会被清掉） */
-      try { appendEvent(ip, body.meta, pick.cfg.model, { viaB: pick.which === 'B' ? 1 : 0 }); } catch (e) {} // 行为记录失败不影响翻译主流程
+      /* v0.9.193：加 viaC。viaB 语义不动（走 B 记 1），走 C 时 viaC=1、viaB=0，
+         这样既有的「viaB=1 即 B 槽」统计口径继续成立，C 用 viaC 单独识别。
+         ⚠️ 两个标记记的都是**分流归属**（初次选中谁），不是最终落地模型 ——
+         回退会把 e.model 覆写成真正生效的那个，跟既有行为一致。 */
+      try { appendEvent(ip, body.meta, pick.cfg.model, { viaB: pick.which === 'B' ? 1 : 0, viaC: pick.which === 'C' ? 1 : 0 }); } catch (e) {} // 行为记录失败不影响翻译主流程
       /* v0.9.132：前端在 meta.json 里声明「本请求期望 JSON 输出」（非 JSON 请求不注入，否则上游会 400） */
       const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
       try {
@@ -1398,33 +1432,36 @@ const server = http.createServer(async (req, res) => {
             if (e && e._status === 429) QUOTA[pick.which] = { rem: 0, at: Date.now() };
           }
         } catch (e11) {}
-        /* B 失败且开启回退 → 再试 A；回退成功后把事件里的模型改写成真正生效的 A，并记 fallback 次数 */
-        if (pick.which === 'B' && cfg.fallbackToA) {
-          try {
-            const outA = await callModel(slotCfg(cfg, 'A'), body.messages, undefined, jsonOpts);
+        /* v0.9.193：C/B 失败且开启回退 → 按 C→B→A 逐级再试（此前只写了 B→A 一条）。
+           回退成功后把事件里的模型改写成真正生效的那个，并记 fallback 次数。
+           ⚠️ 每一级回退都走自己的槽位记账：记到原槽位上会凭空吃掉它的额度（原槽正堵着，等于火上浇油）。 */
+        if (cfg.fallbackToA && pick.which !== 'A') {
+          let lastErr = e;
+          for (const fb of fallbackChain(cfg, pick.which)) {
             try {
-              markEvent(ip, Object.assign({}, body.meta || {}, {
-                model: pick.cfg.model, usedModel: cfg.model, msg: String(e.message || '').slice(0, 200)
-              }), 'fallback');
-            } catch (e2) {}
-            try { recordTokens(ip, body.meta, outA && outA.usage); } catch (e4) {} // v0.9.145：回退到 A 也算真实开销
-            /* v0.9.183：回退这一趟走的是 A 槽，消耗必须记进 A 的账本。记到 B 上会凭空吃掉
-               B 的额度——B 正堵着呢，等于火上浇油。 */
-            try {
-              if (canPace) {
-                const tkA = usageTokens(outA && outA.usage);
-                if (tkA) rateAdd('A', tkA.tin + tkA.tout);
-              }
-              try { noteQuota('A', outA && outA._rl); if (outA) delete outA._rl; } catch (e14) {}
-            } catch (e12) {}
-            /* v0.9.156：回退必须让用户看得见。此前静默降级——界面无任何提示，
-               后台又因为上面那条记账问题显示的是 A 的名字，用户只能判定「分流没生效」。 */
-            try { if (outA && typeof outA === 'object') outA._fb = { from: pick.cfg.model, to: cfg.model, msg: String(e.message || '').slice(0, 200) }; } catch (e5) {}
-            try { if (outA && typeof outA === 'object') outA._used = String(cfg.model || ''); } catch (e6) {} // v0.9.157：回退后真正生效的是 A
-            return sendJson(res, 200, outA);
-          } catch (e3) {
-            return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e3.message } });
+              const slotFb = slotCfg(cfg, fb);
+              const outF = await callModel(slotFb, body.messages, undefined, jsonOpts);
+              try {
+                markEvent(ip, Object.assign({}, body.meta || {}, {
+                  model: pick.cfg.model, usedModel: slotFb.model, msg: String(e.message || '').slice(0, 200)
+                }), 'fallback');
+              } catch (e2) {}
+              try { recordTokens(ip, body.meta, outF && outF.usage); } catch (e4) {} // v0.9.145：回退也算真实开销
+              try {
+                if (canPace) {
+                  const tkF = usageTokens(outF && outF.usage);
+                  if (tkF) rateAdd(fb, tkF.tin + tkF.tout);
+                }
+                try { noteQuota(fb, outF && outF._rl); if (outF) delete outF._rl; } catch (e14) {}
+              } catch (e12) {}
+              /* v0.9.156：回退必须让用户看得见。此前静默降级——界面无任何提示，
+                 后台又因为上面那条记账问题显示的是 A 的名字，用户只能判定「分流没生效」。 */
+              try { if (outF && typeof outF === 'object') outF._fb = { from: pick.cfg.model, to: slotFb.model, msg: String(e.message || '').slice(0, 200) }; } catch (e5) {}
+              try { if (outF && typeof outF === 'object') outF._used = String(slotFb.model || ''); } catch (e6) {} // v0.9.157：回退后真正生效的是 fb
+              return sendJson(res, 200, outF);
+            } catch (e3) { lastErr = e3; }
           }
+          return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + lastErr.message } });
         }
         return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e.message } });
       } finally {
@@ -1486,6 +1523,12 @@ const server = http.createServer(async (req, res) => {
           keyMask2: cfg.key2 ? (cfg.key2.slice(0, 4) + '…' + cfg.key2.slice(-4)) : '',
           extraParams2: normParams(cfg.extraParams2),
           langModelB: Array.isArray(cfg.langModelB) ? cfg.langModelB.slice() : [],
+          /* v0.9.193：模型 C 同结构返回（后缀 3）。langModelC 空数组 = C 不接管任何语言 */
+          provider3: cfg.provider3 || '', base3: cfg.base3 || '', model3: cfg.model3 || '',
+          keySet3: !!cfg.key3,
+          keyMask3: cfg.key3 ? (cfg.key3.slice(0, 4) + '…' + cfg.key3.slice(-4)) : '',
+          extraParams3: normParams(cfg.extraParams3),
+          langModelC: Array.isArray(cfg.langModelC) ? cfg.langModelC.slice() : [],
           fallbackToA: cfg.fallbackToA !== false,
           perIpDaily: cfg.perIpDaily, globalDaily: cfg.globalDaily,
           temperature: (typeof cfg.temperature === 'number' && Number.isFinite(cfg.temperature)) ? cfg.temperature : 0.2,
@@ -1564,6 +1607,19 @@ const server = http.createServer(async (req, res) => {
             .map(x => String(x || ''))
             .filter(x => /^[A-Za-z][A-Za-z0-9-]{0,11}$/.test(x) && !seen[x] && (seen[x] = 1));
         }
+        /* v0.9.193：模型 C（与 B 同规则；clearKey3 用于「清空模型 C」） */
+        if (typeof body.base3 === 'string') cfg.base3 = body.base3.trim();
+        if (typeof body.model3 === 'string') cfg.model3 = body.model3.trim();
+        if (typeof body.provider3 === 'string') cfg.provider3 = body.provider3.trim();
+        if (typeof body.key3 === 'string' && body.key3.trim() !== '') cfg.key3 = body.key3.trim(); // 留空 = 保留原 Key
+        if (body.clearKey3) { cfg.key3 = ''; cfg.base3 = ''; cfg.model3 = ''; cfg.provider3 = ''; cfg.extraParams3 = {}; cfg.langModelC = []; }
+        if (body.extraParams3 !== undefined) cfg.extraParams3 = normParams(body.extraParams3);
+        if (Array.isArray(body.langModelC)) {
+          const seenC = {};
+          cfg.langModelC = body.langModelC
+            .map(x => String(x || ''))
+            .filter(x => /^[A-Za-z][A-Za-z0-9-]{0,11}$/.test(x) && !seenC[x] && (seenC[x] = 1));
+        }
         if (body.fallbackToA !== undefined) cfg.fallbackToA = !!body.fallbackToA;
         if (Number.isFinite(+body.perIpDaily)) cfg.perIpDaily = Math.max(0, Math.floor(+body.perIpDaily));
         if (Number.isFinite(+body.globalDaily)) cfg.globalDaily = Math.max(0, Math.floor(+body.globalDaily));
@@ -1582,10 +1638,13 @@ const server = http.createServer(async (req, res) => {
         const cfg = readConfig();
         let tbody = {};
         try { tbody = JSON.parse(await readBody(req, 64 * 1024)); } catch (e) {}
-        const which = (tbody && tbody.which === 'B') ? 'B' : 'A';
+        /* v0.9.193：连通性测试支持 C 槽 */
+        const which = (tbody && (tbody.which === 'B' || tbody.which === 'C')) ? tbody.which : 'A';
         const slot = slotCfg(cfg, which);
         if (!(slot.base && slot.model && slot.key)) {
-          return sendJson(res, 400, { error: { message: which === 'B' ? '请先保存模型 B 的 Base URL / 模型 / API Key' : '请先保存 Base URL / 模型 / API Key' } });
+          const hint = which === 'A' ? '请先保存 Base URL / 模型 / API Key'
+            : ('请先保存模型 ' + which + ' 的 Base URL / 模型 / API Key');
+          return sendJson(res, 400, { error: { message: hint } });
         }
         try {
           // v0.9.44：max_tokens 从 10 提到 256——Gemini 等思考型模型在 10 token 限额下 0 completion，

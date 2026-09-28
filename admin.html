@@ -149,8 +149,51 @@
     </div>
 
     <div class="card">
-      <h2>语言分流（哪些目标语言走模型 B）</h2>
-      <div class="note" style="margin:0 0 12px">默认全部走模型 A；点亮的语言走模型 B。分流只看目标语言，不看源语言、文件大小。<b>模型 B 没配全时，这里的勾选不生效</b>，全部自动走 A。</div>
+      <h2>模型 C（可选，优先级最高）</h2>
+      <div class="note" style="margin:0 0 12px">参数结构与模型 B 完全相同。分流优先级 <b>C &gt; B &gt; A</b>：勾给 C 的语言走 C，没勾 C 的才看 B，都没有就走 A。<b>C 没配全、或没勾任何语言时，C 完全不参与</b>（默认留空，先配参数再挑语言试点）。</div>
+      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
+      <select id="provider3"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base3" spellcheck="false" placeholder="https://api.openai.com">
+        </div>
+        <div>
+          <label>模型名</label>
+          <input type="text" id="model3" spellcheck="false" placeholder="gpt-6-luna">
+        </div>
+      </div>
+      <label>API Key（<span class="mask" id="keyMask3">未设置</span>）</label>
+      <input type="password" id="key3" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams3" spellcheck="false" placeholder='{"reasoning_effort": "low"}'></textarea>
+      <div class="btns">
+        <button class="primary" id="btnSave3">保存模型 C</button>
+        <button id="btnTest3">测试模型 C</button>
+        <button id="btnClear3" style="margin-left:auto">清空模型 C</button>
+      </div>
+      <div class="msg" id="cfg3Msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>语言分流（优先级 C &gt; B &gt; A）</h2>
+      <div class="note" style="margin:0 0 12px">默认全部走模型 A。判定顺序：先查 C 的勾选 → 再查 B 的勾选 → 都没有走 A。分流只看目标语言，不看源语言、文件大小。<b>某个模型没配全时，它的勾选不生效</b>。</div>
+
+      <h3 style="margin:18px 0 6px;font-size:14px">模型 C（优先级最高）</h3>
+      <div class="note" style="margin:0 0 12px">留空 = C 不接管任何语言。同一门语言在 C 和 B 里都勾了，以 C 为准。</div>
+      <label>搜索语言（中文名 / 英文名 / 语言码）</label>
+      <input type="text" id="langSearchC" spellcheck="false" placeholder="如 日语 / Japanese / ja">
+      <div class="btns" style="margin-top:10px">
+        <button data-batchc="all">全选</button>
+        <button data-batchc="none">清空</button>
+        <button data-batchc="cjk">中日韩</button>
+        <button data-batchc="nonlatin">非拉丁文字</button>
+      </div>
+      <div class="chips" id="langChipsC"></div>
+      <div class="note">已选 <b id="langCountC">0</b> 种语言走模型 C</div>
+
+      <h3 style="margin:18px 0 6px;font-size:14px">模型 B</h3>
+      <div class="note" style="margin:0 0 12px">被 C 接管的语言不会再走 B；只有 C 没勾的才轮到 B。</div>
       <label>搜索语言（中文名 / 英文名 / 语言码）</label>
       <input type="text" id="langSearch" spellcheck="false" placeholder="如 日语 / Japanese / ja">
       <div class="btns" style="margin-top:10px">
@@ -163,7 +206,7 @@
       <div class="note">已选 <b id="langCount">0</b> 种语言走模型 B</div>
       <label style="margin-top:16px;display:flex;align-items:center;gap:8px">
         <input type="checkbox" id="fallbackToA" style="width:auto">
-        <span>模型 B 调用失败时自动回退模型 A（推荐；使用记录里会记 fallback 次数和原因）</span>
+        <span>模型 B / C 调用失败时自动回退（C → B → A，推荐；使用记录里会记 fallback 次数和原因）</span>
       </label>
       <div class="btns"><button class="primary" id="btnSaveRoute">保存分流设置</button></div>
       <div class="msg" id="routeMsg"></div>
@@ -307,6 +350,8 @@ const LANGS = [
 
 /* 走模型 B 的目标语言集合 */
 let langSel = new Set();
+/* v0.9.193：走模型 C 的目标语言集合（判定优先于 B，两者可重叠） */
+let langSelC = new Set();
 function paramsText(v){
   if (!v || typeof v !== 'object' || Array.isArray(v)) return '';
   const ks = Object.keys(v);
@@ -320,21 +365,25 @@ function readParams(id){
   if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('附加请求参数必须是 JSON 对象（如 {"enable_thinking": false}）');
   return o;
 }
-function renderLangs(){
-  const q = ($('langSearch').value || '').trim().toLowerCase();
+/* v0.9.193：which = 'C' 渲染模型 C 那组 chips，否则渲染模型 B 那组（无参调用 = B，旧行为不变） */
+function renderLangs(which){
+  const isC = which === 'C';
+  const sel = isC ? langSelC : langSel;
+  const q = ($(isC ? 'langSearchC' : 'langSearch').value || '').trim().toLowerCase();
   const rows = LANGS.filter(l => !q || l.zh.toLowerCase().indexOf(q) >= 0 ||
     l.en.toLowerCase().indexOf(q) >= 0 || l.v.toLowerCase().indexOf(q) >= 0);
-  $('langChips').innerHTML = rows.map(l =>
-    '<button type="button" class="chip2' + (langSel.has(l.v) ? ' on' : '') + '" data-v="' + l.v + '">' +
+  $(isC ? 'langChipsC' : 'langChips').innerHTML = rows.map(l =>
+    '<button type="button" class="chip2' + (sel.has(l.v) ? ' on' : '') + '" data-v="' + l.v + '">' +
     esc(l.zh) + ' <span class="cv">' + esc(l.v) + '</span></button>').join('') ||
     '<div class="note">没有匹配的语言</div>';
-  $('langCount').textContent = langSel.size;
+  $(isC ? 'langCountC' : 'langCount').textContent = sel.size;
 }
-function batchLangs(kind){
-  if (kind === 'none') langSel.clear();
-  else if (kind === 'all') LANGS.forEach(l => langSel.add(l.v));
-  else LANGS.forEach(l => { if ((' ' + (l.g || '') + ' ').indexOf(' ' + kind + ' ') >= 0) langSel.add(l.v); });
-  renderLangs();
+function batchLangs(kind, which){
+  const sel = which === 'C' ? langSelC : langSel;
+  if (kind === 'none') sel.clear();
+  else if (kind === 'all') LANGS.forEach(l => sel.add(l.v));
+  else LANGS.forEach(l => { if ((' ' + (l.g || '') + ' ').indexOf(' ' + kind + ' ') >= 0) sel.add(l.v); });
+  renderLangs(which);
 }
 
 function show(el, on){ $(el).style.display = on ? '' : 'none'; }
@@ -362,6 +411,7 @@ async function loadConfig(){
     }
     fillProviderSelect(pid, 'provider');
     fillProviderSelect(c.provider2 || '', 'provider2');
+    fillProviderSelect(c.provider3 || '', 'provider3');
     /* 老数据如果有 base 与某预设的 base 一致，但 provider 字段没存（或存了别的东西），补上匹配预设的 id */
     if (!pid && c.base) {
       const m = PRESETS.find(p => p.base && p.base === (c.base || '').replace(/\/+$/, ''));
@@ -379,9 +429,16 @@ async function loadConfig(){
     $('model2').value = c.model2 || '';
     $('keyMask2').textContent = c.keySet2 ? ('已保存：' + c.keyMask2) : '未设置';
     $('extraParams2').value = paramsText(c.extraParams2);
+    /* v0.9.193：模型 C 的字段（老 config.json 没有这些字段 → 走空值，不影响既有行为） */
+    $('base3').value = c.base3 || '';
+    $('model3').value = c.model3 || '';
+    $('keyMask3').textContent = c.keySet3 ? ('已保存：' + c.keyMask3) : '未设置';
+    $('extraParams3').value = paramsText(c.extraParams3);
     langSel = new Set(Array.isArray(c.langModelB) ? c.langModelB : []);
+    langSelC = new Set(Array.isArray(c.langModelC) ? c.langModelC : []);
     $('fallbackToA').checked = c.fallbackToA !== false;
     renderLangs();
+    renderLangs('C');
     $('publicUrl').value = c.publicUrl || '';
     $('analyticsId').value = c.analyticsId || '';
     $('usage').innerHTML = '今日用量：全站 <b>' + c.usedToday + '</b> / ' + (c.globalDaily || '∞') +
@@ -564,6 +621,7 @@ async function runTest(which, msgEl, prefix){
 }
 $('btnTest').addEventListener('click', () => runTest('A', 'cfgMsg', ''));
 $('btnTest2').addEventListener('click', () => runTest('B', 'cfg2Msg', '模型 B：'));
+$('btnTest3').addEventListener('click', () => runTest('C', 'cfg3Msg', '模型 C：'));
 
 $('btnSave2').addEventListener('click', async () => {
   const base2 = $('base2').value.trim(), model2 = $('model2').value.trim(), key2 = $('key2').value.trim();
@@ -595,7 +653,38 @@ $('provider2').addEventListener('change', () => {
   if (p && p.id !== 'custom' && !$('base2').value.trim()) $('base2').value = p.base;
 });
 
-$('langSearch').addEventListener('input', renderLangs);
+/* v0.9.193：模型 C（与 B 同逻辑） */
+$('btnSave3').addEventListener('click', async () => {
+  const base3 = $('base3').value.trim(), model3 = $('model3').value.trim(), key3 = $('key3').value.trim();
+  if (!base3 && !model3 && !key3) return msg('cfg3Msg', '模型 C 三项都为空 = 不启用（不会接管任何语言），无需保存', 'err');
+  if (!base3 || !model3) return msg('cfg3Msg', 'Base URL 和模型名不能为空（除非清空模型 C）', 'err');
+  let extraParams3;
+  try { extraParams3 = readParams('extraParams3'); } catch (e) { return msg('cfg3Msg', e.message, 'err'); }
+  try {
+    await api('/api/admin/config', 'POST', {
+      provider3: $('provider3').value, base3, model3, key3, extraParams3
+    });
+    $('key3').value = '';
+    msg('cfg3Msg', '模型 C 已保存并即时生效 ✓（还要在「语言分流」里勾选要交给 C 的语言，否则 C 不接管流量）', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg3Msg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnClear3').addEventListener('click', async () => {
+  if (!confirm('确定清空模型 C 的全部配置（含 API Key）？清空后 C 不再接管任何语言，流量回到模型 B / A。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { clearKey3: true });
+    msg('cfg3Msg', '模型 C 已清空 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg3Msg', '清空失败：' + e.message, 'err'); }
+});
+
+$('provider3').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider3').value);
+  if (p && p.id !== 'custom' && !$('base3').value.trim()) $('base3').value = p.base;
+});
+
+$('langSearch').addEventListener('input', () => renderLangs());
 $('langChips').addEventListener('click', e => {
   const b = e.target.closest('button[data-v]');
   if (!b) return;
@@ -606,13 +695,25 @@ $('langChips').addEventListener('click', e => {
 document.querySelectorAll('button[data-batch]').forEach(b => {
   b.addEventListener('click', () => batchLangs(b.dataset.batch));
 });
+/* v0.9.193：模型 C 的语言 chips（独立一组，与 B 互不干扰） */
+$('langSearchC').addEventListener('input', () => renderLangs('C'));
+$('langChipsC').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  const v = b.dataset.v;
+  if (langSelC.has(v)) langSelC.delete(v); else langSelC.add(v);
+  renderLangs('C');
+});
+document.querySelectorAll('button[data-batchc]').forEach(b => {
+  b.addEventListener('click', () => batchLangs(b.dataset.batchc, 'C'));
+});
 
 $('btnSaveRoute').addEventListener('click', async () => {
   try {
     await api('/api/admin/config', 'POST', {
-      langModelB: [...langSel], fallbackToA: $('fallbackToA').checked
+      langModelB: [...langSel], langModelC: [...langSelC], fallbackToA: $('fallbackToA').checked
     });
-    msg('routeMsg', '已保存：' + langSel.size + ' 种语言走模型 B ✓', 'ok');
+    msg('routeMsg', '已保存：' + langSelC.size + ' 种语言走模型 C、' + langSel.size + ' 种语言走模型 B ✓', 'ok');
   } catch (e) { msg('routeMsg', '保存失败：' + e.message, 'err'); }
 });
 
