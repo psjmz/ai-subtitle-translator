@@ -107,12 +107,25 @@
   .btn.ghost{background:transparent;border:1px solid var(--line-strong)}
   .btn.sm{padding:5px 10px;font-size:12px;border-radius:9px}
   .btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-  /* v0.9.189：导出面板里「文件命名」与「折行排版」两组设置的分隔线。折行设置从左侧搬来后，
-     若不加分隔会紧贴在「导出文件名」下面，看起来像文件名的附属项。只一条细线，不加标题
-     （加标题要新增 27 种界面语言词条，收益不抵成本）。 */
-  .wrap-div{height:1px;background:var(--line);margin:18px 0 0}
+  /* v0.9.189：折行设置从左侧搬到导出区后，原先是画一条 1px 细线与「导出文件名」分隔
+     （当时为了省 27 种界面语言词条没加标题）。v0.9.190 用户拍板要标题 + 说明，
+     于是细线改用 .sec-title 自带的渐隐尾线，.wrap-div 整个删掉。 */
+  /* v0.9.190：「折行阈值 / 双语行宽」两列并排（右栏只有 226px 可用宽，两列各 ~108px，
+     number 输入框足够；hint 是「21 ≈ 50 个字符」这类短句，2 行内放得下）。
+     目的：把竖排时的两组 label+input+hint 并成一组，矮屏右栏不再出现内滚动条。 */
+  .wrap-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .wr-cell{min-width:0}
+  /* 两个 label 字数差得多（「折行阈值」4 字 vs「双语行宽（译文行）」9 字，其余语言同样长短不齐），
+     窄列里右边会折成两行 → 两个输入框上下错开一行，看着像没对齐。给 label 固定两行高，
+     多行的那侧顶对齐，两个输入框就齐平了。 */
+  .wr-cell .flbl{margin-top:0;min-height:31px;align-items:flex-start}
   .btn:disabled{opacity:.4;cursor:not-allowed}
   .hint{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.55}
+  /* v0.9.190：折行设置的分节标题与说明。sec-title 默认 margin-top:22px 是为左右栏之间的
+     大分节留的，这里紧跟在「导出字幕样式」下方，收到 18px；说明行紧跟标题（标题自带
+     margin-bottom:10px，说明不再要 margin-top）。 */
+  .sec-title.sub{margin-top:18px;margin-bottom:8px}
+  .hint.wtip{margin:0 0 4px}
   /* v0.9.141：术语表有「改了也不生效」的条目时，这行必须从灰色小字变成警告色——
      灰色小字用户根本不看，于是「改了译名没用」变成完全无提示的哑谜 */
   .hint.alert{color:var(--warn);font-weight:600}
@@ -371,8 +384,13 @@
   /* v0.9.172：PC 宽屏（>1080px 三栏布局）下右侧「导出译文」卡跟随滚动常驻。
      top:66px = 吸顶 appbar 52px + 14px 栏间距（与 .progwrap 同款偏移）；
      max-height + overflow 兜底矮视口：卡片高于可视区时自身滚动，底部按钮不至于够不着。 */
+  /* v0.9.190：右栏搬到导出区后多了折行两组设置，100vh-80 的余量不够、矮屏会出内滚动条：
+     top 66→54（appbar 52px + 2px 呼吸），底部留白 14→8px，净增 18px 可视高度。 */
   @media (min-width:1081px){
-    .main>aside.panel:last-child{position:sticky;top:66px;max-height:calc(100vh - 80px);overflow:auto}
+    .main>aside.panel:last-child{position:sticky;top:54px;max-height:calc(100vh - 60px);overflow:auto;scrollbar-width:thin}
+    /* 兜底真的触发时（矮屏 / 展开赞助二维码）滚动条做细，别抢视觉 */
+    .main>aside.panel:last-child::-webkit-scrollbar{width:6px}
+    .main>aside.panel:last-child::-webkit-scrollbar-thumb{background:#D9D8D4;border-radius:99px}
   }
   /* v0.9.173：赞助入口（仅 zh-CN 界面显示，JS 按语言裁剪；非中文连 DOM 都不留）。
      淡粉描边幽灵按钮，展开后显示支付宝收款码（图片懒加载：首次展开才赋 src，收起态零请求）。 */
@@ -549,7 +567,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.189</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.190</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -709,7 +727,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.189</span>
+    <span class="ver-tag">v0.9.190</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -962,26 +980,39 @@
       </div>
       <label class="flbl" data-i18n="lblExpStyle">导出字幕样式</label>
       <select id="expStyle"></select>
-      <label class="flbl"><span data-i18n="lblOutName">导出文件名（默认按源文件 + 目标语言自动命名）</span></label>
-      <input type="text" id="outName" placeholder="xxx_中文字幕.srt" data-i18n-ph="outPh">
+      <!-- v0.9.190：删掉「导出文件名」输入框 —— 文件名本来就按「源文件名 + 目标语言 + 样式」自动生成，
+           让用户手改属于伪需求（改完还得自己保证后缀正确），label 里的括号说明也纯属解释文案。
+           导出时直接用 autoOutNameStr() 现算（见 btnDownload）。 -->
       <!-- v0.9.189：折行阈值 / 双语行宽由左栏「翻译设置」移到这里。折行是翻译完成后的排版处理，
            cfg.maxW 从不写进 system prompt（见 MEMORY「完全不进提示词」），与翻译无关；
            放在导出区、和「导出字幕样式」同处一地，才符合「先翻译、再调排版、再导出」的操作顺序。
            两个 id（maxW / biMaxW）原样保留 → 语言联动（MAXW_BY_LANG/mwMemo）、ASS 字号推荐（assLangCtx）、
            行宽换算提示（updateWidthHints）全部无需改动。 -->
-      <div class="wrap-div"></div>
-      <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
-      <input type="number" id="maxW" value="21" min="8" max="48">
-      <div class="hint" id="maxWHint"></div>
-      <!-- v0.9.95：双语专用行宽（只约束译文行），与单语折行阈值解耦 -->
-      <label class="flbl"><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" data-tip-i18n="lblBiMaxW">i</i></label>
-      <input type="number" id="biMaxW" value="32" min="12" max="64">
-      <div class="hint" id="biMaxWHint"></div>
+      <!-- v0.9.190：折行设置分节标题。原来这里是一条 1px 细线（.wrap-div），
+           现在换成与「导出译文」同款的节标题（图标徽章 + 渐隐尾线），并补一句说明：
+           折行是本地排版处理，改完不必重跑翻译 —— 之前用户以为要重新翻译，
+           因此宁可不改设置也不动它。 -->
+      <div class="sec-title sub"><i class="sec-ic c5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16-2 2 2 2"/><path d="M3 12h15a3 3 0 1 1 0 6h-4"/><path d="M3 18h7"/><path d="M3 6h18"/></svg></i><span data-i18n="secWrap">折行设置</span></div>
+      <div class="hint wtip" data-i18n="wrapTip">修改设置，无须重新翻译，可在编辑区查看单语字幕的折行效果。</div>
+      <!-- v0.9.190：两个宽度并排一行（原来是上下两组，各占 label+input+hint 三行），
+           竖着排时右栏卡片过高、矮屏会出内滚动条。id 与 data-i18n key 全部原样保留。 -->
+      <div class="wrap-row">
+        <div class="wr-cell">
+          <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
+          <input type="number" id="maxW" value="21" min="8" max="48">
+          <div class="hint" id="maxWHint"></div>
+        </div>
+        <!-- v0.9.95：双语专用行宽（只约束译文行），与单语折行阈值解耦 -->
+        <div class="wr-cell">
+          <label class="flbl"><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" data-tip-i18n="lblBiMaxW">i</i></label>
+          <input type="number" id="biMaxW" value="32" min="12" max="64">
+          <div class="hint" id="biMaxWHint"></div>
+        </div>
+      </div>
       <div class="btns" style="margin-top:12px">
         <button class="btn primary" id="btnDownload" data-i18n="btnDownload" type="button">⬇ 下载字幕</button>
         <button class="btn" id="btnCopy" data-i18n="btnCopy" type="button">复制到剪贴板</button>
       </div>
-      <div class="hint" data-i18n="hintOutName">切换目标语言后，文件名里的语言后缀会自动跟随。</div>
       <!-- v0.9.173：赞助入口。默认 hidden，JS 确认界面语言是 zh-CN 才显示（其他语言整个移除）；
            文案固定中文（不进 i18n 字典——只有简中用户看得见）。 -->
       <div id="donateBox" hidden>
@@ -1002,7 +1033,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.189"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.190"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1180,9 +1211,9 @@ const I18N = {
   lblMaxW:'折行宽度（单位=全角宽，不是字数：1 个汉字/假名/韩文音节=1；拉丁·西里尔·泰文·阿拉伯字母=0.5，即半角文字 1 单位≈2 字符）。作用于单语折行，以及双语的「- A - B」双说话人行。默认随目标语言按 Netflix 规范推荐（中/韩 16、日 13、其余 21）。调大 → 一行更长、行数和切分更少。', lblBiMaxW:'双语导出时【译文行】的宽度上限（同为全角宽单位，不是字数：同样 32，中文≈32 字，泰文≈64 字符）。只约束译文行，源文行跟随语义断点、不限宽；双说话人行走上方「折行阈值」。只有译文超出才拆时间轴。此值不随语言变化。调大 → 拆分更少但译文行更长。', btnGo:'▶ 开始翻译', btnGoStop:'翻译中…点击可停止', lyricTip:'歌词行的处理方式：翻译／保留原文（不翻译）／删除（整组移除）。判断依据是「歌词标记」里的字符。', marksTip:'含这些字符的字幕行视为歌词。默认 ♪♫♬♩，可增删；留空自动恢复默认。若源文件歌词不带任何符号，可加入该字幕独有的标记。一行内歌词与对白混排时，删除档会自动降级为保留原文，不会误删对白。', lyricSkipKeep:'歌词 {0} 组按设置保留原文（未翻译）', lyricSkipDrop:'歌词 {0} 组按设置移除', lyricWarn:'注意：{0}% 的字幕行被判定为歌词，可能是「歌词标记」设置过宽，请确认后重跑', dropFillersTip:'开启：本地判定的纯水词字幕（um、uh、无实义哼唱等）直接移除，不送模型，结果确定。关闭：全部送模型，由模型逐条判断该翻、该留还是该删。默认开启。',
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
-  stepExport:'导出译文', lblOutName:'导出文件名（默认按源文件 + 目标语言自动命名）', outPh:'xxx_中文字幕.srt',
+  stepExport:'导出译文',  
   btnDownload:'⬇ 下载字幕', btnCopy:'复制到剪贴板', lblExpStyle:'导出字幕样式', assSplit:'分屏', assStack:'双行', lblFileFmt:'文件格式', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', secAssStyle:'ASS 字幕样式', lblAssDstSize:'译文字号', lblAssSrcSize:'原文字号', lblAssDstColor:'译文颜色', lblAssSrcColor:'原文颜色', lblAssDstMarginV:'译文离底距离', lblAssSrcMarginV:'原文离底距离', assDstMVTip:'译文行距画面底边的距离（像素，1080p 基准）。默认值随「分屏/双行」和「谁在上」自动变化；手动修改后固定不变。', assSrcMVTip:'原文行距画面底边的距离（像素，1080p 基准）。分屏模式下原文在画面上方时，同样按距底边计算；手动修改后固定不变。', assSizeRec:'推荐 ', assApply:'应用', assUndo:'撤销', assKept:'你的', assAutoReset:'已按新布局重置', assMVRec:'推荐 ',assSizeFollow:'按行业推荐值自动填充，可任意修改',assSizeLocked:'已用你的设置；上方为行业推荐值，仅供参考', assColorTip:'填 #RRGGBB 十六进制色值，例如 #FFFFFF 白、#FFD700 金黄。',
-  showTitle:'一个字幕文件，导出花样这么多', showSub:'译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式', showMono:'仅译文', showBi:'双语双行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'双语双行 · ASS · 样式可控', showNote:'原文在上 / 译文在上自由切换，还能导出 TXT 对照稿', showLineDst:'♪ 爱在空中飘荡 ♪', fmtBiSrc:'双语 · 原文在上', fmtBiDst:'双语 · 译文在上', hintOutName:'切换目标语言后，文件名里的语言后缀会自动跟随。',
+  showTitle:'一个字幕文件，导出花样这么多', showSub:'译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式', showMono:'仅译文', showBi:'双语双行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'双语双行 · ASS · 样式可控', showNote:'原文在上 / 译文在上自由切换，还能导出 TXT 对照稿', showLineDst:'♪ 爱在空中飘荡 ♪', fmtBiSrc:'双语 · 原文在上', fmtBiDst:'双语 · 译文在上', 
   logTitle:'运行日志', logReady:'就绪。导入字幕或载入示例开始。',
   stTotal:'条数', stDone:'已译', stDrop:'水词清空', stMerge:'跨条句组', stWrap:'折行', stIssues:'待处理',
   fAll:'全部', fTodo:'仅待译', fDone:'仅已译', fFlag:'仅特殊处理',
@@ -1245,7 +1276,7 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   aboutBody:'随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 开源仓库', aboutLicense:'AGPL-3.0 开源', wsBackHome:'首页',
   wsUploadNew:'上传新字幕', projEmpty:'未导入字幕', secImport:'导入字幕', secLang:'语言',
   secStyle:'翻译风格', secRules:'处理规则', secEngine:'翻译引擎', lblSrcShort:'原文语言',
-  lblDstShort:'目标语言', lblKeepTermsShort:'专名处理', lblAutoTermsShort:'自动术语表', lblMaxWShort:'折行阈值', lblBiMaxWShort:'双语行宽（译文行）', wUnit:'字符', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
+  lblDstShort:'目标语言', lblKeepTermsShort:'专名处理', lblAutoTermsShort:'自动术语表', secWrap:'折行设置', wrapTip:'修改设置，无须重新翻译，可在编辑区查看单语字幕的折行效果。', lblMaxWShort:'折行阈值', lblBiMaxWShort:'双语行宽', wUnit:'字符', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
   /* v0.9.70 两段式界面新增 */
 },
 'zh-TW': {pureMTMode:'偵測到純翻譯模型（{0}）：改用逐組直譯（共 {1} 組，並行 4 路，成功的組有快取）…',pureMTDone:'逐組直譯完成：成功 {0}/{1} 組',gotClick:'已收到「開始翻譯」的請求，正在準備…',reqSent:'第 {0} 批請求已送出（{1} 個句組），正在等待模型回應…',waitSec:'已等待 {0} 秒，仍在等待模型的回應…',errTimeout:'等待 {0} 秒仍無回應，已放棄本次請求（逾時）。建議：把「每批字元」調小以縮小批次，或換一個回應更快的模型；若所用模型會先思考再回答（Qwen3 / GLM 等），在「附加請求參數」裡填 {"enable_thinking":false}',alreadyRunning:'上一輪翻譯尚未結束（可能仍在等待某次請求的回應），已請求停止——請等目前批次收尾後再重新開始',modeMismatch:'注意：下方已填寫自訂 API（{0}），但目前是「預設模型」模式，本次不會用到它——要使用請先在上方切換到「自訂 API」',errTruncOut:'模型輸出被長度上限截斷（還沒生成完就結束）——請在「附加請求參數」裡加大 max_tokens，例如 {"max_tokens":8192}',lblExtra:'附加請求參數（JSON，可選）',extraTip:'隨每次自訂 API 請求一併送出。例：{"enable_thinking":false} 關閉模型思考；{"response_format":{"type":"json_object"}} 強制 JSON 輸出。model / messages / temperature / stream 不可覆寫。',fbRoute:'注意：模型 B（{0}）呼叫失敗，本次已改用模型 A（{1}）。原因：{2}',
@@ -1279,9 +1310,9 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   lblMaxW:'折行寬度（單位=全角寬，不是字數：1 個漢字/假名/韓文音節=1；拉丁·西里爾·泰文·阿拉伯字母=0.5，即半角文字 1 單位≈2 字元）。作用於單語折行，以及雙語的「- A - B」雙說話人行。預設隨目標語言按 Netflix 規範推薦（中/韓 16、日 13、其餘 21）。調大 → 一行更長、行數和切分更少。', lblBiMaxW:'雙語匯出時【譯文行】的寬度上限（同為全角寬單位，不是字數：同樣 32，中文≈32 字，泰文≈64 字元）。只約束譯文行，源文行跟隨語義斷點、不限寬；雙說話人行走上方「折行閾值」。只有譯文超出才拆時間軸。此值不隨語言變化。調大 → 拆分更少但譯文行更長。', btnGo:'▶ 開始翻譯', btnGoStop:'翻譯中…點擊可停止', lyricTip:'歌詞行的處理方式：翻譯／保留原文（不翻譯）／刪除（整組移除）。判斷依據是「歌詞標記」裡的字元。', marksTip:'含這些字元的字幕行視為歌詞。預設 ♪♫♬♩，可增刪；留空自動恢復預設。若字幕檔歌詞不帶任何符號，可加入該檔獨有的標記。一行內歌詞與對白混排時，刪除檔會自動降級為保留原文，不會誤刪對白。', lyricSkipKeep:'歌詞 {0} 組依設定保留原文（未翻譯）', lyricSkipDrop:'歌詞 {0} 組依設定移除', lyricWarn:'注意：{0}% 的字幕行被判定為歌詞，可能是「歌詞標記」設定過寬，請確認後重跑', dropFillersTip:'開啟：本地判定的純贅詞字幕（um、uh、無意義哼唱等）直接移除，不送模型，結果確定。關閉：全部送模型，由模型逐條判斷該翻、該留還是該刪。預設開啟。',
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
-  stepExport:'匯出譯文', lblOutName:'匯出檔名（預設按來源檔 + 目標語言自動命名）', outPh:'xxx_中文字幕.srt',
+  stepExport:'匯出譯文',  
   btnDownload:'⬇ 下載字幕', btnCopy:'複製到剪貼簿', lblExpStyle:'匯出字幕樣式', assSplit:'分割畫面', assStack:'雙行', lblFileFmt:'檔案格式', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', secAssStyle:'ASS 字幕樣式', lblAssDstSize:'譯文字號', lblAssSrcSize:'原文字號', lblAssDstColor:'譯文顏色', lblAssSrcColor:'原文顏色', lblAssDstMarginV:'譯文離底距離', lblAssSrcMarginV:'原文離底距離', assDstMVTip:'譯文行距畫面底邊的距離（像素，1080p 基準）。預設值隨「分割畫面／兩行」與「誰在上」自動變化；手動修改後固定不變。', assSrcMVTip:'原文行距畫面底邊的距離（像素，1080p 基準）。分割模式下原文在畫面上方時，同樣按距底邊計算；手動修改後固定不變。', assSizeRec:'推薦 ', assApply:'套用', assUndo:'撤銷', assKept:'你的', assAutoReset:'已依新版面重設', assMVRec:'推薦 ',assSizeFollow:'依產業建議值自動帶入，可自由修改',assSizeLocked:'已使用你的設定；上方為產業建議值，僅供參考', assColorTip:'填 #RRGGBB 十六進位色值，例如 #FFFFFF 白、#FFD700 金黃。',
-  showTitle:'一個字幕檔案，匯出花樣這麼多', showSub:'譯文 + 原文隨心排版：4 種格式 × 5 種排版，共 14 種匯出樣式', showMono:'僅譯文', showBi:'雙語雙行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'雙語雙行 · ASS · 樣式可控', showNote:'原文在上 / 譯文在上自由切換，還能匯出 TXT 對照稿', showLineDst:'♪ 愛在空中飄蕩 ♪', fmtBiSrc:'雙語 · 原文在上', fmtBiDst:'雙語 · 譯文在上', hintOutName:'切換目標語言後，檔名裡的語言後綴會自動跟隨。',
+  showTitle:'一個字幕檔案，匯出花樣這麼多', showSub:'譯文 + 原文隨心排版：4 種格式 × 5 種排版，共 14 種匯出樣式', showMono:'僅譯文', showBi:'雙語雙行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'雙語雙行 · ASS · 樣式可控', showNote:'原文在上 / 譯文在上自由切換，還能匯出 TXT 對照稿', showLineDst:'♪ 愛在空中飄蕩 ♪', fmtBiSrc:'雙語 · 原文在上', fmtBiDst:'雙語 · 譯文在上', 
   logTitle:'執行日誌', logReady:'就緒。匯入字幕或載入範例開始。',
   stTotal:'條數', stDone:'已譯', stDrop:'水詞清空', stMerge:'跨條句組', stWrap:'折行', stIssues:'待處理',
   fAll:'全部', fTodo:'僅待譯', fDone:'僅已譯', fFlag:'僅特殊處理',
@@ -1344,7 +1375,7 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   aboutBody:'隨心字幕 AI 是一款開源的 AI 字幕翻譯工具。我們相信好的字幕工具應該免費、乾淨、尊重隱私——不塞廣告、不要註冊、不動你的檔案。歡迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 開源倉庫', aboutLicense:'AGPL-3.0 開源', wsBackHome:'首頁',
   wsUploadNew:'上傳新字幕', projEmpty:'未匯入字幕', secImport:'匯入字幕', secLang:'語言',
   secStyle:'翻譯風格', secRules:'處理規則', secEngine:'翻譯引擎', lblSrcShort:'原文語言',
-  lblDstShort:'目標語言', lblKeepTermsShort:'專名處理', lblAutoTermsShort:'自動術語表', lblMaxWShort:'折行閾值', lblBiMaxWShort:'雙語行寬（譯文行）', wUnit:'字元', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
+  lblDstShort:'目標語言', lblKeepTermsShort:'專名處理', lblAutoTermsShort:'自動術語表', secWrap:'折行設定', wrapTip:'修改設定，無須重新翻譯，可在編輯區查看單語字幕的折行效果。', lblMaxWShort:'折行閾值', lblBiMaxWShort:'雙語行寬', wUnit:'字元', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
   /* v0.9.70 两段式界面新增 */
 },
 'en': {pureMTMode:'Pure translation model detected ({0}): switching to per-group direct translation ({1} groups, 4 in parallel, successful groups are cached)…',pureMTDone:'Per-group translation finished: {0}/{1} groups succeeded',gotClick:'Received “start translation” — preparing…',reqSent:'Batch {0} request sent ({1} groups) — waiting for the model…',waitSec:'Waited {0} s — still no reply from the model…',errTimeout:'No response after {0} s — request abandoned (timeout). Try lowering the per-batch character budget, or switch to a faster model; if the model reasons before answering (Qwen3, GLM…), put {"enable_thinking":false} in Extra request parameters',alreadyRunning:'The previous run has not finished yet — a stop has been requested. Please wait for the current batch to wrap up before starting again',modeMismatch:'Heads up: custom API fields are filled in below ({0}), but the mode above is “Default model”, so none of them will be used. Switch the mode to “Custom API” to actually use it',errTruncOut:'Model output hit the token limit and was cut off before finishing — raise max_tokens in Extra request parameters, e.g. {"max_tokens":8192}',lblExtra:'Extra request parameters (JSON, optional)',extraTip:'Merged into every custom-API request body. Examples: {"enable_thinking":false} to turn off reasoning; {"response_format":{"type":"json_object"}} to force JSON output. model / messages / temperature / stream cannot be overridden.',fbRoute:'Note: model B ({0}) failed, so this batch was translated by model A ({1}). Reason: {2}',
@@ -1378,9 +1409,9 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   lblMaxW:'Line width in full-width UNITS, not characters: 1 CJK char = 1; Latin, Cyrillic, Thai and Arabic letters = 0.5, so 1 unit is about 2 characters for half-width scripts. Governs monolingual wrapping and "- A - B" dual-speaker lines in bilingual export. Default follows the Netflix spec per language (zh/ko 16, ja 13, others 21). Larger = longer lines, fewer line breaks and cue splits.', lblBiMaxW:'Max width of the TRANSLATED line in bilingual export (same full-width unit, not characters: the same 32 is about 32 Chinese characters but about 64 Thai characters). Constrains the translated line only; the source line follows semantic breaks and is not width-limited, and dual-speaker lines use "Line width" above. Exceeding it is the only thing that splits the timeline. This value does NOT change per language. Larger = fewer splits but longer translated lines.', btnGo:'▶ Start translation', btnGoStop:'Translating… click to stop', lyricTip:'How to handle lyric lines: translate / keep the original text / remove them entirely. Lines are matched by the characters in “Lyric markers”.', marksTip:'Subtitle lines containing any of these characters are treated as lyrics. Default ♪♫♬♩ — add or remove freely; leave empty to restore the default. If your file uses no music symbols, add the marker it does use. When a line mixes lyrics with dialogue, “Remove” falls back to keeping the original so dialogue is never deleted.', lyricSkipKeep:'{0} lyric group(s) kept in the original language (not translated)', lyricSkipDrop:'{0} lyric group(s) removed per your setting', lyricWarn:'Heads up: {0}% of lines were classified as lyrics — the marker set may be too broad. Please check and re-run.', dropFillersTip:'On: lines that the local rule judges to be pure filler (um, uh, meaningless humming) are removed outright and never sent to the model, so the result is deterministic. Off: every line goes to the model, which decides case by case whether to translate, keep or drop it. On by default.',
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
-  stepExport:'Export translation', lblOutName:'Export file name (auto: source name + target language)', outPh:'xxx_translated.srt',
+  stepExport:'Export translation',  
   btnDownload:'⬇ Download subtitles', btnCopy:'Copy to clipboard', lblExpStyle:'Export style', assSplit:'split screen', assStack:'stacked', lblFileFmt:'File format', lblExpFmt:'Export format', fmtMono:'Translated only', secAssStyle:'ASS style', lblAssDstSize:'Translation size', lblAssSrcSize:'Original size', lblAssDstColor:'Translation colour', lblAssSrcColor:'Original colour', lblAssDstMarginV:'Translation bottom margin', lblAssSrcMarginV:'Original bottom margin', assDstMVTip:'Distance from the translation line to the bottom edge (px, 1080p). The default follows the split/stacked mode and which line is on top; once you edit it, the value is kept.', assSrcMVTip:'Distance from the original line to the bottom edge (px, 1080p). In split mode, when the original sits at the top it is still measured from the bottom edge; once you edit it, the value is kept.', assSizeRec:'Recommended ', assApply:'Apply', assUndo:'Undo', assKept:'yours', assAutoReset:'Reset for new layout', assMVRec:'Recommended ',assSizeFollow:'Prefilled from industry reference values — edit freely',assSizeLocked:'Using your value — the industry reference above is only a guide', assColorTip:'Enter a hex colour #RRGGBB, e.g. #FFFFFF (white) or #FFD700 (gold).',
-  showTitle:'One subtitle file, so many ways to export', showSub:'Mix translation and original freely: 4 formats × 5 layouts, 14 export styles', showMono:'Translation only', showBi:'Bilingual lines · SRT/VTT', showSplit:'Split screen · ASS', showStack:'Stacked lines · ASS · styled', showNote:'Original on top or translation on top, plus TXT transcript export', showLineDst:'♪ Love is in the air ♪', fmtBiSrc:'Bilingual · source on top', fmtBiDst:'Bilingual · translation on top', hintOutName:'The language suffix in the file name follows the target language.',
+  showTitle:'One subtitle file, so many ways to export', showSub:'Mix translation and original freely: 4 formats × 5 layouts, 14 export styles', showMono:'Translation only', showBi:'Bilingual lines · SRT/VTT', showSplit:'Split screen · ASS', showStack:'Stacked lines · ASS · styled', showNote:'Original on top or translation on top, plus TXT transcript export', showLineDst:'♪ Love is in the air ♪', fmtBiSrc:'Bilingual · source on top', fmtBiDst:'Bilingual · translation on top', 
   logTitle:'Log', logReady:'Ready. Import subtitles or load the sample.',
   stTotal:'Cues', stDone:'Done', stDrop:'Fillers cleared', stMerge:'Multi-cue groups', stWrap:'Wrapped', stIssues:'Pending',
   fAll:'All', fTodo:'Pending only', fDone:'Done only', fFlag:'Flagged only',
@@ -1443,7 +1474,7 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   aboutBody:'AI-SRTSub is an open-source AI subtitle translator. We believe a good subtitle tool should be free, clean and privacy-respecting — no ads, no sign-up, no touching your files. Self-host it, file requests, polish it together.', aboutRepo:'GitHub repository', aboutLicense:'AGPL-3.0 open source', wsBackHome:'Home',
   wsUploadNew:'New subtitle', projEmpty:'No subtitle loaded', secImport:'Import', secLang:'Languages',
   secStyle:'Style', secRules:'Rules', secEngine:'Engine', lblSrcShort:'Source language',
-  lblDstShort:'Target language', lblKeepTermsShort:'Proper nouns', lblAutoTermsShort:'Auto glossary', lblMaxWShort:'Line width', lblBiMaxWShort:'Bilingual width (translated)', wUnit:'characters', lblLyric:'Lyrics', lyricTrans:'Translate', lyricKeep:'Keep original', lyricDrop:'Remove', lblMarks:'Lyric markers', lblDropFillers:'Remove fillers',
+  lblDstShort:'Target language', lblKeepTermsShort:'Proper nouns', lblAutoTermsShort:'Auto glossary', secWrap:'Line wrapping', wrapTip:'No re-translation needed — the wrapping of the monolingual subtitles updates in the editor right away.', lblMaxWShort:'Line width', lblBiMaxWShort:'Bilingual width', wUnit:'characters', lblLyric:'Lyrics', lyricTrans:'Translate', lyricKeep:'Keep original', lyricDrop:'Remove', lblMarks:'Lyric markers', lblDropFillers:'Remove fillers',
   /* v0.9.70 两段式界面新增 */
 },
 'ja': {pureMTMode:'純翻訳モデル（{0}）を検出：グループごとの直接翻訳に切り替えます（全 {1} グループ、4 並列、成功分はキャッシュ）…',pureMTDone:'グループごとの翻訳が完了：{1} グループ中 {0} 件成功',gotClick:'「翻訳開始」を受け付けました—準備中…',reqSent:'第 {0} 批のリクエストを送信しました（{1} グループ）——モデルの応答を待っています…',waitSec:'{0} 秒待機中——まだモデルの応答がありません…',errTimeout:'{0} 秒応答がなく、このリクエストを打ち切りました（タイムアウト）。「1 バッチの文字数」を小さくするか、より速いモデルに変更してください。Qwen3 / GLM など思考してから答えるモデルの場合は「追加リクエストパラメータ」に {"enable_thinking":false} を指定してください',alreadyRunning:'前回の翻訳がまだ終了していません（いずれかのリクエストの応答待ちの可能性があります）——停止を要求しました。現在のバッチが終わるまでお待ちください',modeMismatch:'注意：下欄にカスタム API（{0}）が入力されていますが、現在のモードは「既定モデル」のため使用されません。使うには上のモードを「カスタム API」に切り替えてください',errTruncOut:'モデルの出力が長さ上限で打ち切られました（最後まで生成されていません）——「追加リクエストパラメータ」で max_tokens を増やしてください。例：{"max_tokens":8192}',lblExtra:'追加リクエストパラメータ（JSON、任意）',extraTip:'カスタム API の各リクエスト本文にマージされます。例：{"enable_thinking":false}（思考を無効化）、{"response_format":{"type":"json_object"}}（JSON 出力を強制）。model / messages / temperature / stream は上書きできません。',fbRoute:'注意：モデル B（{0}）の呼び出しに失敗したため、今回はモデル A（{1}）で翻訳しました。理由：{2}',
@@ -1477,9 +1508,9 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   lblMaxW:'折り返し幅（単位は全角幅で、文字数ではありません：漢字・かな・ハングルは 1、ラテン・キリル・タイ・アラビア文字は 0.5＝半角文字は 1 単位≈2 文字）。単語字幕の折り返しと、バイリンガルの「- A - B」二人の話者行に適用されます。初期値は言語ごとの Netflix 規範（中/韓 16、日 13、その他 21）。大きくすると行が長くなり、行数と分割が減ります。', lblBiMaxW:'バイリンガル書き出し時の【訳文行】の最大幅（同じく全角幅単位で文字数ではありません：同じ 32 でも中国語≈32 文字、タイ語≈64 文字）。訳文行のみを制限し、原文行は意味の切れ目に従い幅制限なし。二人の話者行は上の「折り返し幅」を使います。訳文が超えた場合のみタイムラインを分割します。この値は言語で変わりません。大きくすると分割は減りますが訳文行が長くなります。', btnGo:'▶ 翻訳開始', btnGoStop:'翻訳中…クリックで停止', lyricTip:'歌詞行の扱い：翻訳／原文のまま／削除（グループごと除去）。判定は「歌詞マーク」の文字で行います。', marksTip:'これらの文字を含む字幕行を歌詞として扱います。既定は ♪♫♬♩。追加・削除可、空にすると既定に戻ります。ファイルに音記号が無い場合はその記号を追加してください。1行に歌詞と台詞が混在する場合、「削除」は自動的に原文保持へ切り替わり、台詞を誤削除しません。', lyricSkipKeep:'歌詞 {0} グループを設定どおり原文のまま保持（未翻訳）', lyricSkipDrop:'歌詞 {0} グループを設定どおり削除', lyricWarn:'注意：{0}% の行が歌詞と判定されました。「歌詞マーク」の指定が広すぎる可能性があります。確認して再実行してください。', dropFillersTip:'オン：ローカル判定で純粋なフィラー（「あー」「うーん」、意味のないハミングなど）と判断された行はそのまま削除し、モデルには送りません（結果は決定的）。オフ：すべての行をモデルに送り、翻訳・保持・削除を行ごとにモデルが判断します。既定はオン。',
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
-  stepExport:'翻訳を書き出す', lblOutName:'書き出しファイル名（既定：ソース名＋翻訳先言語）', outPh:'xxx_日本語字幕.srt',
+  stepExport:'翻訳を書き出す',  
   btnDownload:'⬇ 字幕をダウンロード', btnCopy:'クリップボードにコピー', lblExpStyle:'エクスポート形式', assSplit:'上下分割', assStack:'上下二行', lblFileFmt:'ファイル形式', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', secAssStyle:'ASS 字幕スタイル', lblAssDstSize:'訳文の文字サイズ', lblAssSrcSize:'原文の文字サイズ', lblAssDstColor:'訳文の色', lblAssSrcColor:'原文の色', lblAssDstMarginV:'訳文の下端からの距離', lblAssSrcMarginV:'原文の下端からの距離', assDstMVTip:'訳文行の画面下端からの距離（px、1080p 基準）。既定値は「上下分割／二行」と上下の組み合わせで変わります。手動で変更すると固定されます。', assSrcMVTip:'原文行の画面下端からの距離（px、1080p 基準）。上下分割で原文が上にある場合も下端からの距離で指定します。手動で変更すると固定されます。', assSizeRec:'推奨 ', assApply:'適用', assUndo:'元に戻す', assKept:'現在', assAutoReset:'新しいレイアウトで再設定', assMVRec:'推奨 ',assSizeFollow:'業界の推奨値を自動入力しています。自由に変更できます',assSizeLocked:'あなたの設定を使用中。上の推奨値は参考です', assColorTip:'16 進カラーコード（#RRGGBB）を入力。例：#FFFFFF（白）、#FFD700（金色）。',
-  showTitle:'1つの字幕ファイル、書き出しはこんなに多彩', showSub:'訳文 + 原文を自由にレイアウト：4形式 × 5レイアウト、全14種の書き出しスタイル', showMono:'訳文のみ', showBi:'バイリンガル2行 · SRT/VTT', showSplit:'上下分割 · ASS', showStack:'上下二行 · ASS · スタイル指定可', showNote:'原文上・訳文上を自由に切替、TXT対訳稿も書き出せます', showLineDst:'♪ 愛が空に満ちて ♪', fmtBiSrc:'二か国語 · 原文が上', fmtBiDst:'二か国語 · 翻訳が上', hintOutName:'翻訳先言語を切り替えるとファイル名の言語suffixも自動で変わります。',
+  showTitle:'1つの字幕ファイル、書き出しはこんなに多彩', showSub:'訳文 + 原文を自由にレイアウト：4形式 × 5レイアウト、全14種の書き出しスタイル', showMono:'訳文のみ', showBi:'バイリンガル2行 · SRT/VTT', showSplit:'上下分割 · ASS', showStack:'上下二行 · ASS · スタイル指定可', showNote:'原文上・訳文上を自由に切替、TXT対訳稿も書き出せます', showLineDst:'♪ 愛が空に満ちて ♪', fmtBiSrc:'二か国語 · 原文が上', fmtBiDst:'二か国語 · 翻訳が上', 
   logTitle:'ログ', logReady:'準備完了。字幕を読み込むかサンプルを開始してください。',
   stTotal:'件数', stDone:'翻訳済', stDrop:'フィラー消去', stMerge:'複数跨ぎ文', stWrap:'改行', stIssues:'未処理',
   fAll:'すべて', fTodo:'未翻訳のみ', fDone:'翻訳済のみ', fFlag:'フラグ付きのみ',
@@ -1542,7 +1573,7 @@ userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了�
   aboutBody:'AI-SRTSub はオープンソースの AI 字幕翻訳ツールです。良い字幕ツールは無料で、クリーンで、プライバシーを尊重すべき——広告なし、登録なし、ファイルに手を加えない。セルフホストも歓迎。', aboutRepo:'GitHub リポジトリ', aboutLicense:'AGPL-3.0 オープンソース', wsBackHome:'ホーム',
   wsUploadNew:'新しい字幕', projEmpty:'字幕未読み込み', secImport:'読み込み', secLang:'言語',
   secStyle:'翻訳スタイル', secRules:'処理ルール', secEngine:'エンジン', lblSrcShort:'原文言語',
-  lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞', lblAutoTermsShort:'自動用語集', lblMaxWShort:'折り返し幅', lblBiMaxWShort:'バイリンガル行幅（訳文）', wUnit:'文字', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
+  lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞', lblAutoTermsShort:'自動用語集', secWrap:'折り返し設定', wrapTip:'変更しても再翻訳は不要です。編集エリアで単言語字幕の折り返しをすぐ確認できます。', lblMaxWShort:'折り返し幅', lblBiMaxWShort:'バイリンガル行幅', wUnit:'文字', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
   /* v0.9.70 两段式界面新增 */
 },
 'es': {pureMTMode:'Modelo de traducción pura detectado ({0}): se cambia a traducción directa por grupo ({1} grupos, 4 en paralelo, los grupos con éxito se guardan en caché)…',pureMTDone:'Traducción por grupo terminada: {0}/{1} grupos con éxito',gotClick:'Recibida la solicitud de iniciar traducción — preparando…',reqSent:'Solicitud del lote {0} enviada ({1} grupos): esperando la respuesta del modelo…',waitSec:'Esperando desde hace {0} s — todavía sin respuesta del modelo…',errTimeout:'Sin respuesta tras {0} s — se abandonó la solicitud (tiempo de espera agotado). Prueba a reducir el presupuesto de caracteres por lote o a usar un modelo más rápido; si el modelo razona antes de responder (Qwen3, GLM…), pon {"enable_thinking":false} en los parámetros adicionales',alreadyRunning:'La ejecución anterior aún no ha terminado — se ha solicitado la detención. Espera a que cierre el lote actual antes de volver a empezar',modeMismatch:'Atención: hay una API personalizada configurada abajo ({0}), pero el modo actual es “Modelo predeterminado”, así que no se usará. Cambia el modo a “API personalizada” para usarla',errTruncOut:'La salida del modelo alcanzó el límite de tokens y se truncó antes de terminar — aumenta max_tokens en Parámetros adicionales, p. ej. {"max_tokens":8192}',lblExtra:'Parámetros adicionales (JSON, opcional)',extraTip:'Se fusiona en el cuerpo de cada solicitud de API personalizada. Ej.: {"enable_thinking":false} para desactivar el razonamiento; {"response_format":{"type":"json_object"}} para forzar JSON. model / messages / temperature / stream no se pueden sobrescribir.',fbRoute:'Aviso: la llamada al modelo B ({0}) falló; este lote se tradujo con el modelo A ({1}). Motivo: {2}',
@@ -1576,9 +1607,9 @@ userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了�
   lblMaxW:'Ancho de línea en UNIDADES de ancho completo, no en caracteres: 1 carácter CJK = 1; las letras latinas, cirílicas, tailandesas y árabes = 0.5, es decir 1 unidad ≈ 2 caracteres en escrituras de medio ancho. Rige el ajuste monolingüe y las líneas de dos hablantes «- A - B» en exportación bilingüe. El valor predeterminado sigue la norma Netflix por idioma (zh/ko 16, ja 13, otros 21). Mayor = líneas más largas, menos saltos y divisiones.', lblBiMaxW:'Ancho máximo de la línea TRADUCIDA en exportación bilingüe (misma unidad de ancho completo, no caracteres: el mismo 32 equivale a unos 32 caracteres chinos pero unos 64 caracteres tailandeses). Limita solo la línea traducida; la línea original sigue los cortes semánticos y no tiene límite de ancho, y las líneas de dos hablantes usan el «Ancho de línea» de arriba. Solo superarlo divide la línea de tiempo. Este valor NO cambia por idioma. Mayor = menos divisiones pero líneas traducidas más largas.', btnGo:'▶ Iniciar traducción', btnGoStop:'Traduciendo… clic para detener', lyricTip:'가사 줄 처리 방식: 번역／원문 유지／삭제(그룹 전체 제거). 판단 기준은 ‘가사 기호’의 문자입니다.', marksTip:'이 문자가 포함된 자막 줄을 가사로 처리합니다. 기본값 ♪♫♬♩, 추가·삭제 가능, 비우면 기본값 복원. 파일에 음악 기호가 없다면 해당 기호를 추가하세요. 한 줄에 가사와 대사가 섞인 경우 ‘삭제’는 자동으로 원문 유지로 바뀌어 대사가 지워지지 않습니다.', lyricSkipKeep:'가사 {0}개 그룹을 설정대로 원문 유지(미번역)', lyricSkipDrop:'가사 {0}개 그룹을 설정대로 삭제', lyricWarn:'주의: {0}%의 줄이 가사로 판정되었습니다. ‘가사 기호’ 지정이 너무 넓을 수 있습니다. 확인 후 다시 실행하세요.', dropFillersTip:'Activado: las líneas que la regla local considera relleno puro (eh, mmm, tarareo sin sentido) se eliminan directamente y no se envían al modelo, así que el resultado es determinista. Desactivado: todas las líneas van al modelo, que decide una por una si traducirlas, mantenerlas o eliminarlas. Activado por defecto.',
   btnPost:'↻ Solo posprocesar (ajustar/limpiar etiquetas)',
   hintPrivacy:'Modelo por defecto: los subtítulos pasan por el servidor de este sitio al proveedor configurado por el administrador; API personalizada: tu proveedor los procesa directamente, sin pasar por este sitio.',
-  stepExport:'Exportar traducción', lblOutName:'Nombre del archivo (auto: nombre de origen + idioma destino)', outPh:'xxx_traducido.srt',
+  stepExport:'Exportar traducción',  
   btnDownload:'⬇ Descargar subtítulos', btnCopy:'Copiar al portapapeles', lblExpStyle:'Estilo de exportación', assSplit:'pantalla dividida', assStack:'dos líneas', lblFileFmt:'Formato de archivo', lblExpFmt:'Formato de exportación', fmtMono:'Solo traducción', secAssStyle:'Estilo ASS', lblAssDstSize:'Tamaño de traducción', lblAssSrcSize:'Tamaño original', lblAssDstColor:'Color de traducción', lblAssSrcColor:'Color original', lblAssDstMarginV:'Margen inferior (traducción)', lblAssSrcMarginV:'Margen inferior (original)', assDstMVTip:'Distancia desde la línea de traducción al borde inferior (px, 1080p). El valor predeterminado cambia según el modo (dividido/dos líneas) y qué línea va arriba; al editarlo se fija.', assSrcMVTip:'Distancia desde la línea original al borde inferior (px, 1080p). En modo dividido, si el original va arriba también se mide desde el borde inferior; al editarlo se fija.', assSizeRec:'Recomendado: ', assApply:'Aplicar', assUndo:'Deshacer', assKept:'actual', assAutoReset:'Restablecido para el nuevo diseño', assMVRec:'Recomendado: ',assSizeFollow:'Se rellena con valores de referencia del sector; puedes cambiarlos',assSizeLocked:'Se usa tu valor; la referencia del sector de arriba es solo orientativa', assColorTip:'Introduce un color hexadecimal #RRGGBB, p. ej. #FFFFFF (blanco) o #FFD700 (dorado).',
-  showTitle:'Un archivo de subtítulos, tantas formas de exportarlo', showSub:'Traducción + original a tu gusto: 4 formatos × 5 diseños, 14 estilos de exportación', showMono:'Solo traducción', showBi:'Dos líneas bilingües · SRT/VTT', showSplit:'Pantalla dividida · ASS', showStack:'Dos líneas · ASS · con estilo', showNote:'Original arriba o traducción arriba, y también TXT en paralelo', showLineDst:'♪ El amor está en el aire ♪', fmtBiSrc:'Bilingüe · original arriba', fmtBiDst:'Bilingüe · traducción arriba', hintOutName:'El sufijo de idioma del nombre de archivo sigue al idioma destino.',
+  showTitle:'Un archivo de subtítulos, tantas formas de exportarlo', showSub:'Traducción + original a tu gusto: 4 formatos × 5 diseños, 14 estilos de exportación', showMono:'Solo traducción', showBi:'Dos líneas bilingües · SRT/VTT', showSplit:'Pantalla dividida · ASS', showStack:'Dos líneas · ASS · con estilo', showNote:'Original arriba o traducción arriba, y también TXT en paralelo', showLineDst:'♪ El amor está en el aire ♪', fmtBiSrc:'Bilingüe · original arriba', fmtBiDst:'Bilingüe · traducción arriba', 
   logTitle:'Registro', logReady:'Listo. Importa subtítulos o carga el ejemplo.',
   stTotal:'Subtítulos', stDone:'Hechos', stDrop:'Relleno quitado', stMerge:'Grupos multi-línea', stWrap:'Ajustados', stIssues:'Pendientes',
   fAll:'Todos', fTodo:'Solo pendientes', fDone:'Solo hechos', fFlag:'Solo marcados',
@@ -1641,7 +1672,7 @@ userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando l
   aboutBody:'AI-SRTSub es un traductor de subtítulos con IA de código abierto. Creemos que una buena herramienta debe ser gratis, limpia y respetar la privacidad: sin anuncios, sin registro, sin tocar tus archivos. Despliega la tuya o ayúdanos a pulirla.', aboutRepo:'Repositorio GitHub', aboutLicense:'Código abierto AGPL-3.0', wsBackHome:'Inicio',
   wsUploadNew:'Nuevo subtítulo', projEmpty:'Sin subtítulo cargado', secImport:'Importar', secLang:'Idiomas',
   secStyle:'Estilo', secRules:'Reglas', secEngine:'Motor', lblSrcShort:'Idioma origen',
-  lblDstShort:'Idioma destino', lblKeepTermsShort:'Nombres propios', lblAutoTermsShort:'Glosario automático', lblMaxWShort:'Ancho de línea', lblBiMaxWShort:'Ancho bilingüe (traducido)', wUnit:'caracteres', lblLyric:'가사 처리', lyricTrans:'번역', lyricKeep:'원문 유지', lyricDrop:'삭제', lblMarks:'가사 기호', lblDropFillers:'군더더기 제거',
+  lblDstShort:'Idioma destino', lblKeepTermsShort:'Nombres propios', lblAutoTermsShort:'Glosario automático', secWrap:'Ajuste de línea', wrapTip:'No hace falta retraducir: el ajuste de línea de los subtítulos monolingües se ve al instante en el editor.', lblMaxWShort:'Ancho de línea', lblBiMaxWShort:'Ancho bilingüe', wUnit:'caracteres', lblLyric:'가사 처리', lyricTrans:'번역', lyricKeep:'원문 유지', lyricDrop:'삭제', lblMarks:'가사 기호', lblDropFillers:'군더더기 제거',
   /* v0.9.70 两段式界面新增 */
 },
 'pt': {pureMTMode:'Modelo de tradução pura detectado ({0}): mudando para tradução direta por grupo ({1} grupos, 4 em paralelo, grupos bem-sucedidos ficam em cache)…',pureMTDone:'Tradução por grupo concluída: {0}/{1} grupos com sucesso',gotClick:'Pedido para iniciar a tradução recebido — a preparar…',reqSent:'Pedido do lote {0} enviado ({1} grupos) — aguardando a resposta do modelo…',waitSec:'Aguardando há {0} s — ainda sem resposta do modelo…',errTimeout:'Sem resposta após {0} s — pedido abandonado (tempo esgotado). Tente reduzir o orçamento de caracteres por lote ou usar um modelo mais rápido; se o modelo raciocina antes de responder (Qwen3, GLM…), coloque {"enable_thinking":false} nos parâmetros adicionais',alreadyRunning:'A execução anterior ainda não terminou — foi pedida a paragem. Aguarda que o lote atual conclua antes de recomeçar',modeMismatch:'Atenção: tens uma API personalizada preenchida abaixo ({0}), mas o modo atual é “Modelo predefinido”, por isso não será usada. Muda o modo para “API personalizada” para a utilizar',errTruncOut:'A saída do modelo atingiu o limite de tokens e foi truncada antes de terminar — aumente max_tokens em Parâmetros adicionais, p. ex. {"max_tokens":8192}',lblExtra:'Parâmetros adicionais (JSON, opcional)',extraTip:'É mesclado ao corpo de cada requisição de API personalizada. Ex.: {"enable_thinking":false} para desativar o raciocínio; {"response_format":{"type":"json_object"}} para forçar JSON. model / messages / temperature / stream não podem ser sobrescritos.',fbRoute:'Aviso: a chamada ao modelo B ({0}) falhou; este lote foi traduzido pelo modelo A ({1}). Motivo: {2}',
@@ -1675,9 +1706,9 @@ userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando l
   lblMaxW:'Largura da linha em UNIDADES de largura cheia, não em caracteres: 1 caractere CJK = 1; letras latinas, cirílicas, tailandesas e árabes = 0.5, ou seja 1 unidade ≈ 2 caracteres em escritas de meia largura. Rege a quebra monolíngue e as linhas de dois falantes «- A - B» na exportação bilíngue. O padrão segue a norma Netflix por idioma (zh/ko 16, ja 13, outros 21). Maior = linhas mais longas, menos quebras e divisões.', lblBiMaxW:'Largura máxima da linha TRADUZIDA na exportação bilíngue (mesma unidade de largura cheia, não caracteres: o mesmo 32 equivale a cerca de 32 caracteres chineses mas cerca de 64 caracteres tailandeses). Limita apenas a linha traduzida; a linha original segue os cortes semânticos e não tem limite de largura, e as linhas de dois falantes usam a «Largura de linha» acima. Somente ultrapassá-la divide a linha de tempo. Este valor NÃO muda por idioma. Maior = menos divisões mas linhas traduzidas mais longas.', btnGo:'▶ Iniciar tradução', btnGoStop:'Traduzindo… clique para parar', lyricTip:'Cómo tratar las líneas de canción: traducir / mantener el original / eliminarlas. Se reconocen por los caracteres de «Marcas de letra».', marksTip:'Las líneas que contengan estos caracteres se tratan como letra de canción. Por defecto ♪♫♬♩; puedes añadir o quitar, y dejarlo vacío restaura el valor por defecto. Si tu archivo no usa símbolos musicales, añade el marcador que use. Si una línea mezcla letra y diálogo, «Eliminar» pasa a mantener el original para no borrar el diálogo.', lyricSkipKeep:'{0} grupo(s) de letra mantenidos en el original (sin traducir)', lyricSkipDrop:'{0} grupo(s) de letra eliminados según tu ajuste', lyricWarn:'Atención: el {0}% de las líneas se clasificaron como letra; puede que las marcas sean demasiado amplias. Revísalo y vuelve a ejecutar.', dropFillersTip:'Ativado: as linhas que a regra local considera preenchimento puro (hã, hmm, cantarolar sem sentido) são removidas diretamente e não enviadas ao modelo, portanto o resultado é determinístico. Desativado: todas as linhas vão para o modelo, que decide uma a uma se traduz, mantém ou remove. Ativado por padrão.',
   btnPost:'↻ Só pós-processar (quebrar/limpar tags)',
   hintPrivacy:'Modelo padrão: as legendas passam pelo servidor deste site até o provedor configurado pelo administrador; API personalizada: seu provedor processa diretamente, sem passar por este site.',
-  stepExport:'Exportar tradução', lblOutName:'Nome do arquivo (auto: nome de origem + idioma destino)', outPh:'xxx_traduzido.srt',
+  stepExport:'Exportar tradução',  
   btnDownload:'⬇ Baixar legendas', btnCopy:'Copiar para a área de transferência', lblExpStyle:'Estilo de exportação', assSplit:'tela dividida', assStack:'duas linhas', lblFileFmt:'Formato do arquivo', lblExpFmt:'Formato de exportação', fmtMono:'Somente tradução', secAssStyle:'Estilo ASS', lblAssDstSize:'Tamanho da tradução', lblAssSrcSize:'Tamanho original', lblAssDstColor:'Cor da tradução', lblAssSrcColor:'Cor original', lblAssDstMarginV:'Margem inferior (tradução)', lblAssSrcMarginV:'Margem inferior (original)', assDstMVTip:'Distância da linha de tradução até a borda inferior (px, 1080p). O padrão muda conforme o modo (dividido/duas linhas) e qual linha fica em cima; ao editar, o valor é fixado.', assSrcMVTip:'Distância da linha original até a borda inferior (px, 1080p). No modo dividido, quando o original fica em cima também é medido a partir da borda inferior; ao editar, o valor é fixado.', assSizeRec:'Recomendado: ', assApply:'Aplicar', assUndo:'Desfazer', assKept:'atual', assAutoReset:'Redefinido para o novo layout', assMVRec:'Recomendado: ',assSizeFollow:'Preenchido com valores de referência do setor; pode alterar',assSizeLocked:'Usando o seu valor; a referência do setor acima é apenas uma guia', assColorTip:'Digite uma cor hexadecimal #RRGGBB, ex. #FFFFFF (branco) ou #FFD700 (dourado).',
-  showTitle:'Um arquivo de legendas, tantas formas de exportar', showSub:'Tradução + original do seu jeito: 4 formatos × 5 layouts, 14 estilos de exportação', showMono:'Só tradução', showBi:'Duas linhas bilíngues · SRT/VTT', showSplit:'Tela dividida · ASS', showStack:'Duas linhas · ASS · com estilo', showNote:'Original ou tradução em destaque, e também TXT comparativo', showLineDst:'♪ O amor está no ar ♪', fmtBiSrc:'Bilíngue · original acima', fmtBiDst:'Bilíngue · tradução acima', hintOutName:'O sufixo de idioma no nome do arquivo segue o idioma destino.',
+  showTitle:'Um arquivo de legendas, tantas formas de exportar', showSub:'Tradução + original do seu jeito: 4 formatos × 5 layouts, 14 estilos de exportação', showMono:'Só tradução', showBi:'Duas linhas bilíngues · SRT/VTT', showSplit:'Tela dividida · ASS', showStack:'Duas linhas · ASS · com estilo', showNote:'Original ou tradução em destaque, e também TXT comparativo', showLineDst:'♪ O amor está no ar ♪', fmtBiSrc:'Bilíngue · original acima', fmtBiDst:'Bilíngue · tradução acima', 
   logTitle:'Registro', logReady:'Pronto. Importe legendas ou carregue o exemplo.',
   stTotal:'Legendas', stDone:'Feitas', stDrop:'Preenchido removido', stMerge:'Grupos multilinha', stWrap:'Quebradas', stIssues:'Pendentes',
   fAll:'Todas', fTodo:'Só pendentes', fDone:'Só feitas', fFlag:'Só marcadas',
@@ -1740,7 +1771,7 @@ userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicand
   aboutBody:'O AI-SRTSub é um tradutor de legendas com IA, de código aberto. Acreditamos que uma boa ferramenta deve ser grátis, limpa e respeitar a privacidade — sem anúncios, sem cadastro, sem mexer nos seus arquivos. Faça seu self-host ou ajude a lapidar.', aboutRepo:'Repositório GitHub', aboutLicense:'Código aberto AGPL-3.0', wsBackHome:'Início',
   wsUploadNew:'Nova legenda', projEmpty:'Nenhuma legenda carregada', secImport:'Importar', secLang:'Idiomas',
   secStyle:'Estilo', secRules:'Regras', secEngine:'Motor', lblSrcShort:'Idioma de origem',
-  lblDstShort:'Idioma de destino', lblKeepTermsShort:'Nomes próprios', lblAutoTermsShort:'Glossário automático', lblMaxWShort:'Largura de linha', lblBiMaxWShort:'Largura bilíngue (traduzido)', wUnit:'caracteres', lblLyric:'Letras de canciones', lyricTrans:'Traducir', lyricKeep:'Mantener original', lyricDrop:'Eliminar', lblMarks:'Marcas de letra', lblDropFillers:'Quitar muletillas',
+  lblDstShort:'Idioma de destino', lblKeepTermsShort:'Nomes próprios', lblAutoTermsShort:'Glossário automático', secWrap:'Quebra de linha', wrapTip:'Não precisa traduzir de novo: a quebra de linha das legendas monolíngues aparece na hora no editor.', lblMaxWShort:'Largura de linha', lblBiMaxWShort:'Largura bilíngue', wUnit:'caracteres', lblLyric:'Letras de canciones', lyricTrans:'Traducir', lyricKeep:'Mantener original', lyricDrop:'Eliminar', lblMarks:'Marcas de letra', lblDropFillers:'Quitar muletillas',
   /* v0.9.70 两段式界面新增 */
 },
 'ko': {pureMTMode:'순수 번역 모델 감지됨({0}): 그룹별 직접 번역으로 전환합니다(총 {1}개 그룹, 4개 동시 처리, 성공한 그룹은 캐시)…',pureMTDone:'그룹별 번역 완료: {1}개 중 {0}개 성공',gotClick:'“번역 시작” 요청을 받았습니다 — 준비 중…',reqSent:'{0}번째 배치 요청 전송 완료({1}개 그룹) — 모델 응답 대기 중…',waitSec:'{0}초 대기 중 — 아직 모델 응답이 없습니다…',errTimeout:'{0}초 동안 응답이 없어 이번 요청을 포기했습니다(시간 초과). 「배치당 문자 수」를 줄이거나 더 빠른 모델로 바꿔 보세요. Qwen3 / GLM 처럼 먼저 추론하는 모델이라면 추가 요청 파라미터에 {"enable_thinking":false} 를 넣으세요',alreadyRunning:'이전 실행이 아직 끝나지 않았습니다 — 정지를 요청했습니다. 현재 배치가 마무리된 후 다시 시작하세요',modeMismatch:'주의: 아래에 사용자 지정 API({0})가 입력되어 있지만 현재 모드는 “기본 모델”이므로 사용되지 않습니다. 사용하려면 모드를 “사용자 지정 API”로 바꾸세요',errTruncOut:'모델 출력이 토큰 한도에 걸려 완성되지 못하고 잘렸습니다 — 추가 요청 파라미터에서 max_tokens를 늘리세요. 예: {"max_tokens":8192}',lblExtra:'추가 요청 파라미터 (JSON, 선택)',extraTip:'커스텀 API 요청 본문에 함께 전송됩니다. 예: {"enable_thinking":false}(추론 비활성화), {"response_format":{"type":"json_object"}}(JSON 출력 강제). model / messages / temperature / stream 는 덮어쓸 수 없습니다.',fbRoute:'안내: 모델 B({0}) 호출이 실패해 이번에는 모델 A({1})로 번역했습니다. 이유: {2}',
@@ -1774,9 +1805,9 @@ userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicand
   lblMaxW:'줄 너비는 글자 수가 아닌 전각 단위입니다: CJK 1자 = 1, 라틴·키릴·태국·아랍 문자 = 0.5(반각 문자는 1단위≈2자). 단일 언어 줄바꿈과 이중언어의 「- A - B」 두 화자 줄에 적용됩니다. 기본값은 언어별 Netflix 규격(중/한 16, 일 13, 기타 21). 크게 하면 줄이 길어지고 줄 수와 분할이 줄어듭니다.', lblBiMaxW:'이중언어 내보내기에서 【번역문 줄】의 최대 너비(같은 전각 단위이며 글자 수가 아님: 똑같이 32여도 중국어≈32자, 태국어≈64자). 번역문 줄만 제한하고 원문 줄은 의미 단위를 따르며 너비 제한이 없고, 두 화자 줄은 위의 「줄 폭 기준」을 씁니다. 번역문이 넘칠 때만 타임라인을 분할합니다. 이 값은 언어별로 바뀌지 않습니다. 크게 하면 분할은 줄지만 번역문 줄이 길어집니다.', btnGo:'▶ 번역 시작', btnGoStop:'번역 중… 클릭하면 정지', lyricTip:'Como tratar as linhas de música: traduzir / manter o original / remover. O reconhecimento usa os caracteres de «Marcas de letra».', marksTip:'Linhas com estes caracteres são tratadas como letra de música. Padrão ♪♫♬♩; pode acrescentar ou remover, e deixar vazio restaura o padrão. Se o seu arquivo não usa símbolos musicais, adicione o marcador que ele usa. Se uma linha misturar letra e diálogo, «Remover» passa a manter o original para não apagar o diálogo.', lyricSkipKeep:'{0} grupo(s) de letra mantidos no original (sem tradução)', lyricSkipDrop:'{0} grupo(s) de letra removidos conforme sua configuração', lyricWarn:'Atenção: {0}% das linhas foram classificadas como letra; o conjunto de marcas pode estar amplo demais. Confira e execute novamente.', dropFillersTip:'켜짐: 로컬 규칙이 순수 채움말(음, 어, 의미 없는 콧노래 등)로 판정한 줄은 바로 제거하고 모델에 보내지 않습니다(결과가 확정적). 꺼짐: 모든 줄을 모델에 보내 번역·유지·삭제를 줄마다 모델이 판단합니다. 기본은 켜짐.',
   btnPost:'↻ 후처리만(줄바꿈/태그 정리)',
   hintPrivacy:'기본 모델: 자막이 이 사이트의 서버를 거쳐 관리자가 설정한 공급자로 전달됩니다; 사용자 API: 입력한 공급자가 직접 처리하며 이 사이트를 경유하지 않습니다.',
-  stepExport:'번역 내보내기', lblOutName:'내보낼 파일명(자동: 원본 이름 + 대상 언어)', outPh:'xxx_번역.srt',
+  stepExport:'번역 내보내기',  
   btnDownload:'⬇ 자막 다운로드', btnCopy:'클립보드에 복사', lblExpStyle:'내보내기 스타일', assSplit:'분할 화면', assStack:'두 줄', lblFileFmt:'파일 형식', lblExpFmt:'내보내기 형식', fmtMono:'번역문만', secAssStyle:'ASS 자막 스타일', lblAssDstSize:'번역 글자 크기', lblAssSrcSize:'원문 글자 크기', lblAssDstColor:'번역 색상', lblAssSrcColor:'원문 색상', lblAssDstMarginV:'번역 아래쪽 여백', lblAssSrcMarginV:'원문 아래쪽 여백', assDstMVTip:'번역 줄이 화면 아래쪽에서 떨어진 거리(px, 1080p 기준). 기본값은 분할/두 줄 모드와 위쪽 줄에 따라 달라지며, 직접 수정하면 고정됩니다.', assSrcMVTip:'원문 줄이 화면 아래쪽에서 떨어진 거리(px, 1080p 기준). 분할 모드에서 원문이 위쪽에 있어도 아래쪽 기준으로 계산됩니다. 직접 수정하면 고정됩니다.', assSizeRec:'추천 ', assApply:'적용', assUndo:'되돌리기', assKept:'현재', assAutoReset:'새 레이아웃으로 초기화', assMVRec:'추천 ',assSizeFollow:'업계 권장값이 자동 입력됩니다. 자유롭게 바꿀 수 있습니다',assSizeLocked:'사용자가 설정한 값을 사용합니다. 위 권장값은 참고용입니다', assColorTip:'#RRGGBB 16진수 색상값을 입력하세요. 예: #FFFFFF(흰색), #FFD700(금색).',
-  showTitle:'자막 파일 하나, 내보내기는 이렇게 다양', showSub:'번역문 + 원문 자유 배치: 4가지 형식 × 5가지 레이아웃, 총 14가지 내보내기 스타일', showMono:'번역문만', showBi:'이중언어 2줄 · SRT/VTT', showSplit:'상하 분할 · ASS', showStack:'두 줄 · ASS · 스타일 지정', showNote:'원문 위/번역문 위 자유 전환, TXT 대조 원고도 내보내기 가능', showLineDst:'♪ 사랑이 공중에 떠있어 ♪', fmtBiSrc:'이중 언어 · 원문이 위', fmtBiDst:'이중 언어 · 번역문이 위', hintOutName:'대상 언어를 바꾸면 파일명의 언어 접미사도 자동으로 따라갑니다.',
+  showTitle:'자막 파일 하나, 내보내기는 이렇게 다양', showSub:'번역문 + 원문 자유 배치: 4가지 형식 × 5가지 레이아웃, 총 14가지 내보내기 스타일', showMono:'번역문만', showBi:'이중언어 2줄 · SRT/VTT', showSplit:'상하 분할 · ASS', showStack:'두 줄 · ASS · 스타일 지정', showNote:'원문 위/번역문 위 자유 전환, TXT 대조 원고도 내보내기 가능', showLineDst:'♪ 사랑이 공중에 떠있어 ♪', fmtBiSrc:'이중 언어 · 원문이 위', fmtBiDst:'이중 언어 · 번역문이 위', 
   logTitle:'로그', logReady:'준비 완료. 자막을 불러오거나 샘플을 시작하세요.',
   stTotal:'자막 수', stDone:'완료', stDrop:'필러 정리', stMerge:'다중 자막 그룹', stWrap:'줄바꿈', stIssues:'대기',
   fAll:'전체', fTodo:'미번역만', fDone:'완료만', fFlag:'표시된 것만',
@@ -1839,7 +1870,7 @@ userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제�
   aboutBody:'AI-SRTSub는 오픈소스 AI 자막 번역 도구입니다. 좋은 자막 도구는 무료·깔끔·프라이버시 존중이어야 한다고 믿습니다——광고 없음, 가입 없음, 파일 만지지 않음. 직접 설치하거나 요청을 남겨주세요.', aboutRepo:'GitHub 저장소', aboutLicense:'AGPL-3.0 오픈소스', wsBackHome:'홈',
   wsUploadNew:'새 자막 올리기', projEmpty:'자막 없음', secImport:'가져오기', secLang:'언어',
   secStyle:'번역 스타일', secRules:'처리 규칙', secEngine:'엔진', lblSrcShort:'원본 언어',
-  lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사', lblAutoTermsShort:'자동 용어집', lblMaxWShort:'줄 폭 기준', lblBiMaxWShort:'이중언어 너비(번역문)', wUnit:'자', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
+  lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사', lblAutoTermsShort:'자동 용어집', secWrap:'줄바꿈 설정', wrapTip:'설정을 바꿔도 다시 번역할 필요 없이 편집 영역에서 단일 언어 자막의 줄바꿈을 바로 확인할 수 있습니다.', lblMaxWShort:'줄 폭 기준', lblBiMaxWShort:'이중언어 너비', wUnit:'자', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
   /* v0.9.70 两段式界面新增 */
 },
 'de': {pureMTMode:'Reines Übersetzungsmodell erkannt ({0}): Wechsel zur direkten Übersetzung pro Gruppe ({1} Gruppen, 4 parallel, erfolgreiche Gruppen werden zwischengespeichert)…',pureMTDone:'Gruppenweise Übersetzung abgeschlossen: {0}/{1} Gruppen erfolgreich',gotClick:'Anfrage zum Start der Übersetzung erhalten — wird vorbereitet…',reqSent:'Anfrage für Batch {0} gesendet ({1} Gruppen) — warte auf die Antwort des Modells…',waitSec:'Seit {0} s gewartet — weiterhin keine Antwort des Modells…',errTimeout:'Nach {0} s keine Antwort — Anfrage abgebrochen (Zeitüberschreitung). Verringere das Zeichenbudget pro Batch oder wechsle zu einem schnelleren Modell; wenn das Modell vor der Antwort nachdenkt (Qwen3, GLM…), trage {"enable_thinking":false} bei den zusätzlichen Anfrageparametern ein',alreadyRunning:'Der vorherige Lauf ist noch nicht beendet — der Stopp wurde angefordert. Warte, bis der aktuelle Batch abgeschlossen ist, bevor du neu startest',modeMismatch:'Achtung: Unten ist eine benutzerdefinierte API eingetragen ({0}), der Modus ist aber „Standardmodell“ — sie wird nicht verwendet. Wechsle oben auf „Benutzerdefinierte API“, um sie zu nutzen',errTruncOut:'Die Modellausgabe erreichte das Token-Limit und wurde vorzeitig abgeschnitten — erhöhe max_tokens in den zusätzlichen Anfrageparametern, z. B. {"max_tokens":8192}',lblExtra:'Zusätzliche Anfrageparameter (JSON, optional)',extraTip:'Wird in jeden Anfragetext der benutzerdefinierten API eingefügt. Z. B. {"enable_thinking":false} zum Abschalten des Nachdenkens; {"response_format":{"type":"json_object"}} erzwingt JSON. model / messages / temperature / stream sind nicht überschreibbar.',fbRoute:'Hinweis: Der Aufruf von Modell B ({0}) ist fehlgeschlagen; dieser Durchgang wurde mit Modell A ({1}) übersetzt. Grund: {2}',
@@ -1873,9 +1904,9 @@ userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제�
   lblMaxW:'Zeilenbreite in Vollbreiten-EINHEITEN, nicht in Zeichen: 1 CJK-Zeichen = 1; lateinische, kyrillische, thailändische und arabische Buchstaben = 0.5, also 1 Einheit ≈ 2 Zeichen bei halbbreiten Schriften. Gilt für den einsprachigen Umbruch und für "- A - B"-Zwei-Sprecher-Zeilen im zweisprachigen Export. Standard folgt der Netflix-Norm je Sprache (zh/ko 16, ja 13, andere 21). Größer = längere Zeilen, weniger Umbrüche und Teilungen.', lblBiMaxW:'Maximale Breite der ÜBERSETZTEN Zeile im zweisprachigen Export (gleiche Vollbreiten-Einheit, nicht Zeichen: dieselben 32 entsprechen etwa 32 chinesischen Zeichen, aber etwa 64 thailändischen Zeichen). Beschränkt nur die übersetzte Zeile; die Quellzeile folgt semantischen Brüchen und ist nicht breitenbegrenzt, und Zwei-Sprecher-Zeilen nutzen "Zeilenbreite" oben. Nur ein Überschreiten teilt die Timeline. Dieser Wert ändert sich NICHT je Sprache. Größer = weniger Teilungen, aber längere Übersetzungszeilen.', btnGo:'▶ Übersetzung starten', btnGoStop:'Übersetze… Klick zum Stoppen', lyricTip:'Umgang mit Liedzeilen: übersetzen / Original behalten / entfernen. Erkannt werden sie an den Zeichen unter „Liedmarken“.', marksTip:'Zeilen mit diesen Zeichen gelten als Liedtext. Standard ♪♫♬♩ — beliebig ergänzen oder entfernen; leer stellt den Standard wieder her. Wenn deine Datei keine Musikzeichen nutzt, trage deren Markierung ein. Enthält eine Zeile Gesang und Dialog, wechselt „Entfernen“ zu „Original behalten“, damit kein Dialog verloren geht.', lyricSkipKeep:'{0} Liedgruppen wurden gemäß Einstellung im Original belassen (nicht übersetzt)', lyricSkipDrop:'{0} Liedgruppen wurden gemäß Einstellung entfernt', lyricWarn:'Achtung: {0}% der Zeilen wurden als Liedtext eingestuft — die Marken sind womöglich zu weit gefasst. Bitte prüfen und erneut starten.', dropFillersTip:'Ein: Zeilen, die die lokale Regel als reines Füllmaterial einstuft (äh, hmm, bedeutungsloses Summen), werden direkt entfernt und nicht an das Modell gesendet, das Ergebnis ist also bestimmt. Aus: Alle Zeilen gehen an das Modell, das pro Zeile entscheidet, ob sie übersetzt, behalten oder entfernt wird. Standardmäßig ein.',
   btnPost:'↻ Nur Nachbearbeitung (Umbruch/Tags bereinigen)',
   hintPrivacy:'Standardmodell: Untertitel laufen über den Server dieser Site zum vom Administrator konfigurierten Anbieter; Eigene API: Ihr Anbieter verarbeitet direkt, nicht über diese Site.',
-  stepExport:'Übersetzung exportieren', lblOutName:'Exportdateiname (auto: Quellname + Zielsprache)', outPh:'xxx_uebersetzt.srt',
+  stepExport:'Übersetzung exportieren',  
   btnDownload:'⬇ Untertitel herunterladen', btnCopy:'In die Zwischenablage kopieren', lblExpStyle:'Exportstil', assSplit:'Split-Screen', assStack:'zweizeilig', lblFileFmt:'Dateiformat', lblExpFmt:'Exportformat', fmtMono:'Nur Übersetzung', secAssStyle:'ASS-Stil', lblAssDstSize:'Übersetzung Größe', lblAssSrcSize:'Original Größe', lblAssDstColor:'Übersetzung Farbe', lblAssSrcColor:'Original Farbe', lblAssDstMarginV:'Unterer Abstand (Übersetzung)', lblAssSrcMarginV:'Unterer Abstand (Original)', assDstMVTip:'Abstand der Übersetzungszeile zum unteren Bildrand (px, 1080p). Der Standardwert richtet sich nach dem Modus (Split/zweizeilig) und welcher Text oben steht; nach manueller Änderung bleibt der Wert fest.', assSrcMVTip:'Abstand der Originalzeile zum unteren Bildrand (px, 1080p). Im Split-Modus wird auch eine oben stehende Originalzeile vom unteren Rand aus gemessen; nach manueller Änderung bleibt der Wert fest.', assSizeRec:'Empfohlen: ', assApply:'Übernehmen', assUndo:'Rückgängig', assKept:'aktuell', assAutoReset:'Für neues Layout zurückgesetzt', assMVRec:'Empfohlen: ',assSizeFollow:'Mit Branchen-Empfehlung vorbelegt — frei änderbar',assSizeLocked:'Dein Wert wird verwendet — die Empfehlung oben ist nur ein Anhaltspunkt', assColorTip:'Hex-Farbwert #RRGGBB eingeben, z. B. #FFFFFF (Weiß) oder #FFD700 (Gold).',
-  showTitle:'Eine Untertiteldatei, so viele Exportmöglichkeiten', showSub:'Übersetzung + Original frei kombinieren: 4 Formate × 5 Layouts, 14 Exportstile', showMono:'Nur Übersetzung', showBi:'Zweisprachig zweizeilig · SRT/VTT', showSplit:'Split-Screen · ASS', showStack:'Zweizeilig · ASS · mit Stil', showNote:'Original oder Übersetzung oben, plus TXT-Transkript', showLineDst:'♪ Liebe liegt in der Luft ♪', fmtBiSrc:'Zweisprachig · Original oben', fmtBiDst:'Zweisprachig · Übersetzung oben', hintOutName:'Das Sprach-Suffix im Dateinamen folgt der Zielsprache.',
+  showTitle:'Eine Untertiteldatei, so viele Exportmöglichkeiten', showSub:'Übersetzung + Original frei kombinieren: 4 Formate × 5 Layouts, 14 Exportstile', showMono:'Nur Übersetzung', showBi:'Zweisprachig zweizeilig · SRT/VTT', showSplit:'Split-Screen · ASS', showStack:'Zweizeilig · ASS · mit Stil', showNote:'Original oder Übersetzung oben, plus TXT-Transkript', showLineDst:'♪ Liebe liegt in der Luft ♪', fmtBiSrc:'Zweisprachig · Original oben', fmtBiDst:'Zweisprachig · Übersetzung oben', 
   logTitle:'Protokoll', logReady:'Bereit. Untertitel importieren oder Beispiel laden.',
   stTotal:'Untertitel', stDone:'Fertig', stDrop:'Füllwörter entfernt', stMerge:'Mehrzeilige Gruppen', stWrap:'Umgebrochen', stIssues:'Offen',
   fAll:'Alle', fTodo:'Nur offene', fDone:'Nur fertige', fFlag:'Nur markierte',
@@ -1938,7 +1969,7 @@ userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende F�
   aboutBody:'AI-SRTSub ist ein Open-Source-Untertitelübersetzer mit KI. Wir finden: Gute Tools sind kostenlos, sauber und respektieren die Privatsphäre — keine Werbung, keine Anmeldung, keine Finger auf deinen Dateien. Self-Hosten und Mitschmieden willkommen.', aboutRepo:'GitHub-Repository', aboutLicense:'Open Source AGPL-3.0', wsBackHome:'Start',
   wsUploadNew:'Neuer Untertitel', projEmpty:'Kein Untertitel geladen', secImport:'Import', secLang:'Sprachen',
   secStyle:'Stil', secRules:'Regeln', secEngine:'Engine', lblSrcShort:'Ausgangssprache',
-  lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen', lblAutoTermsShort:'Auto-Glossar', lblMaxWShort:'Zeilenbreite', lblBiMaxWShort:'Zweisprachige Breite (Übersetzung)', wUnit:'Zeichen', lblLyric:'Liedtexte', lyricTrans:'Übersetzen', lyricKeep:'Original behalten', lyricDrop:'Entfernen', lblMarks:'Liedmarken', lblDropFillers:'Füllwörter entfernen',
+  lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen', lblAutoTermsShort:'Auto-Glossar', secWrap:'Zeilenumbruch', wrapTip:'Kein Neuübersetzen nötig – der Umbruch der einsprachigen Untertitel ist sofort im Editor sichtbar.', lblMaxWShort:'Zeilenbreite', lblBiMaxWShort:'Zweisprachige Breite', wUnit:'Zeichen', lblLyric:'Liedtexte', lyricTrans:'Übersetzen', lyricKeep:'Original behalten', lyricDrop:'Entfernen', lblMarks:'Liedmarken', lblDropFillers:'Füllwörter entfernen',
   /* v0.9.70 两段式界面新增 */
 },
 'fr': {pureMTMode:'Modèle de traduction pure détecté ({0}) : passage à la traduction directe par groupe ({1} groupes, 4 en parallèle, les groupes réussis sont mis en cache)…',pureMTDone:'Traduction par groupe terminée : {0}/{1} groupes réussis',gotClick:'Demande de démarrage de la traduction reçue — préparation…',reqSent:'Requête du lot {0} envoyée ({1} groupes) — en attente de la réponse du modèle…',waitSec:'{0} s d’attente — toujours aucune réponse du modèle…',errTimeout:'Aucune réponse après {0} s — requête abandonnée (délai dépassé). Réduisez le budget de caractères par lot ou choisissez un modèle plus rapide ; si le modèle réfléchit avant de répondre (Qwen3, GLM…), mettez {"enable_thinking":false} dans les paramètres supplémentaires',alreadyRunning:'L’exécution précédente n’est pas encore terminée — l’arrêt a été demandé. Attendez la fin du lot en cours avant de relancer',modeMismatch:'Attention : une API personnalisée est renseignée ci-dessous ({0}), mais le mode est « Modèle par défaut » — elle ne sera donc pas utilisée. Passez le mode sur « API personnalisée » pour l’utiliser',errTruncOut:'La sortie du modèle a atteint la limite de jetons et a été tronquée avant la fin — augmentez max_tokens dans les paramètres supplémentaires, p. ex. {"max_tokens":8192}',lblExtra:'Paramètres de requête supplémentaires (JSON, optionnel)',extraTip:'Fusionné dans le corps de chaque requête d\'API personnalisée. Ex. : {"enable_thinking":false} pour désactiver le raisonnement ; {"response_format":{"type":"json_object"}} pour forcer le JSON. model / messages / temperature / stream ne peuvent pas être remplacés.',fbRoute:'Note : l’appel au modèle B ({0}) a échoué ; ce lot a été traduit par le modèle A ({1}). Raison : {2}',
@@ -1972,9 +2003,9 @@ userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende F�
   lblMaxW:'Largeur de ligne en UNITÉS de pleine largeur, non en caractères : 1 caractère CJC = 1 ; les lettres latines, cyrilliques, thaïes et arabes = 0,5, soit 1 unité ≈ 2 caractères pour les écritures à demi-largeur. Régit le retour à la ligne monolingue et les lignes à deux locuteurs « - A - B » en export bilingue. La valeur par défaut suit la norme Netflix par langue (zh/ko 16, ja 13, autres 21). Plus grand = lignes plus longues, moins de retours et de divisions.', lblBiMaxW:'Largeur maximale de la ligne TRADUITE en export bilingue (même unité de pleine largeur, non des caractères : le même 32 correspond à environ 32 caractères chinois mais environ 64 caractères thaïs). Ne limite que la ligne traduite ; la ligne source suit les coupures sémantiques et n est pas limitée en largeur, et les lignes à deux locuteurs utilisent la « Largeur de ligne » ci-dessus. Seul un dépassement divise la timeline. Cette valeur ne change PAS selon la langue. Plus grand = moins de divisions mais lignes traduites plus longues.', btnGo:'▶ Démarrer la traduction', btnGoStop:'Traduction en cours… cliquer pour arrêter', lyricTip:'Traitement des lignes chantées : traduire / garder l\'original / supprimer. La détection utilise les caractères de « Marques de paroles ».', marksTip:'Les lignes contenant ces caractères sont traitées comme des paroles. Par défaut ♪♫♬♩ — à modifier librement ; laisser vide restaure le défaut. Si votre fichier n\'utilise aucun symbole musical, ajoutez le marqueur qu\'il emploie. Si une ligne mêle chant et dialogue, « Supprimer » bascule sur « garder l\'original » pour ne pas effacer le dialogue.', lyricSkipKeep:'{0} groupe(s) de paroles conservés en langue originale (non traduits)', lyricSkipDrop:'{0} groupe(s) de paroles supprimés selon votre réglage', lyricWarn:'Attention : {0} % des lignes ont été classées comme paroles — le jeu de marques est peut-être trop large. Vérifiez puis relancez.', dropFillersTip:'Activé : les lignes que la règle locale juge comme pur remplissage (euh, hmm, fredonnement sans signification) sont supprimées directement et ne sont pas envoyées au modèle, le résultat est donc déterministe. Désactivé : toutes les lignes vont au modèle, qui décide au cas par cas s’il faut les traduire, les conserver ou les supprimer. Activé par défaut.',
   btnPost:'↻ Post-traitement seul (retour ligne/nettoyage des balises)',
   hintPrivacy:'Modèle par défaut : les sous-titres transitent par le serveur de ce site vers le fournisseur configuré par l\u2019administrateur ; API personnalisée : votre fournisseur les traite directement, sans passer par ce site.',
-  stepExport:'Exporter la traduction', lblOutName:'Nom du fichier d\u2019export (auto : nom source + langue cible)', outPh:'xxx_traduit.srt',
+  stepExport:'Exporter la traduction',  
   btnDownload:'⬇ Télécharger les sous-titres', btnCopy:'Copier dans le presse-papiers', lblExpStyle:'Style d’exportation', assSplit:'écran partagé', assStack:'deux lignes', lblFileFmt:'Format de fichier', lblExpFmt:"Format d'export", fmtMono:'Traduction seule', secAssStyle:'Style ASS', lblAssDstSize:'Taille de traduction', lblAssSrcSize:'Taille originale', lblAssDstColor:'Couleur de traduction', lblAssSrcColor:'Couleur originale', lblAssDstMarginV:'Marge basse (traduction)', lblAssSrcMarginV:'Marge basse (original)', assDstMVTip:'Distance entre la ligne de traduction et le bord inférieur (px, 1080p). La valeur par défaut suit le mode (écran partagé/deux lignes) et la ligne placée en haut ; après modification manuelle, elle est fixée.', assSrcMVTip:'Distance entre la ligne originale et le bord inférieur (px, 1080p). En mode écran partagé, même placée en haut, elle reste mesurée depuis le bord inférieur ; après modification manuelle, la valeur est fixée.', assSizeRec:'Recommandé : ', assApply:'Appliquer', assUndo:'Annuler', assKept:'actuel', assAutoReset:'Réinitialisé pour la nouvelle disposition', assMVRec:'Recommandé : ',assSizeFollow:'Prérempli avec les valeurs de référence du secteur — modifiable librement',assSizeLocked:'Votre valeur est utilisée ; la référence du secteur ci-dessus n’est qu’un guide', assColorTip:'Saisissez une couleur hexadécimale #RRGGBB, ex. #FFFFFF (blanc) ou #FFD700 (doré).',
-  showTitle:'Un seul fichier de sous-titres, tant de façons de l\'exporter', showSub:'Traduction + original à votre guise : 4 formats × 5 dispositions, 14 styles d\'export', showMono:'Traduction seule', showBi:'Deux lignes bilingues · SRT/VTT', showSplit:'Écran partagé · ASS', showStack:'Deux lignes · ASS · stylisées', showNote:'Original ou traduction au premier plan, et export TXT en regard', showLineDst:'♪ L\'amour est dans l\'air ♪', fmtBiSrc:'Bilingue · original en haut', fmtBiDst:'Bilingue · traduction en haut', hintOutName:'Le suffixe de langue du nom de fichier suit la langue cible.',
+  showTitle:'Un seul fichier de sous-titres, tant de façons de l\'exporter', showSub:'Traduction + original à votre guise : 4 formats × 5 dispositions, 14 styles d\'export', showMono:'Traduction seule', showBi:'Deux lignes bilingues · SRT/VTT', showSplit:'Écran partagé · ASS', showStack:'Deux lignes · ASS · stylisées', showNote:'Original ou traduction au premier plan, et export TXT en regard', showLineDst:'♪ L\'amour est dans l\'air ♪', fmtBiSrc:'Bilingue · original en haut', fmtBiDst:'Bilingue · traduction en haut', 
   logTitle:'Journal', logReady:'Prêt. Importez des sous-titres ou chargez l\u2019exemple.',
   stTotal:'Sous-titres', stDone:'Terminés', stDrop:'Remplissage retiré', stMerge:'Groupes multi-lignes', stWrap:'Répartis', stIssues:'En attente',
   fAll:'Tous', fTodo:'En attente', fDone:'Terminés', fFlag:'Marqués',
@@ -2037,7 +2068,7 @@ userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, appl
   aboutBody:'AI-SRTSub est un traducteur de sous-titres IA open source. Pour nous, un bon outil doit être gratuit, propre et respecter la vie privée — pas de pub, pas d\'inscription, on ne touche pas à vos fichiers. Auto-hébergez-vous ou venez le polir avec nous.', aboutRepo:'Dépôt GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Accueil',
   wsUploadNew:'Nouveau sous-titre', projEmpty:'Aucun sous-titre chargé', secImport:'Importer', secLang:'Langues',
   secStyle:'Style', secRules:'Règles', secEngine:'Moteur', lblSrcShort:'Langue source',
-  lblDstShort:'Langue cible', lblKeepTermsShort:'Noms propres', lblAutoTermsShort:'Glossaire auto', lblMaxWShort:'Largeur de ligne', lblBiMaxWShort:'Largeur bilingue (traduit)', wUnit:'caractères', lblLyric:'Paroles', lyricTrans:'Traduire', lyricKeep:'Garder l\'original', lyricDrop:'Supprimer', lblMarks:'Marques de paroles', lblDropFillers:'Supprimer les tics',
+  lblDstShort:'Langue cible', lblKeepTermsShort:'Noms propres', lblAutoTermsShort:'Glossaire auto', secWrap:'Retour à la ligne', wrapTip:'Aucune retraduction nécessaire : le retour à la ligne des sous-titres monolingues est visible aussitôt dans l’éditeur.', lblMaxWShort:'Largeur de ligne', lblBiMaxWShort:'Largeur bilingue', wUnit:'caractères', lblLyric:'Paroles', lyricTrans:'Traduire', lyricKeep:'Garder l\'original', lyricDrop:'Supprimer', lblMarks:'Marques de paroles', lblDropFillers:'Supprimer les tics',
   /* v0.9.70 两段式界面新增 */
 },
 'id': {pureMTMode:'Model terjemahan murni terdeteksi ({0}): beralih ke terjemahan langsung per grup ({1} grup, 4 paralel, grup yang berhasil disimpan dalam cache)…',pureMTDone:'Terjemahan per grup selesai: {0}/{1} grup berhasil',gotClick:'Permintaan mulai terjemahan diterima — menyiapkan…',reqSent:'Permintaan batch {0} terkirim ({1} grup) — menunggu respons model…',waitSec:'Menunggu {0} dtk — model masih belum merespons…',errTimeout:'Tidak ada respons setelah {0} dtk — permintaan dibatalkan (waktu habis). Coba kecilkan anggaran karakter per batch atau ganti ke model yang lebih cepat; jika model berpikir sebelum menjawab (Qwen3, GLM…), isi {"enable_thinking":false} di parameter permintaan tambahan',alreadyRunning:'Eksekusi sebelumnya belum selesai — penghentian diminta. Tunggu batch saat ini selesai sebelum mulai lagi',modeMismatch:'Perhatian: API kustom sudah terisi di bawah ({0}), tetapi mode saat ini adalah “Model bawaan”, jadi tidak akan dipakai. Ganti mode ke “API kustom” untuk menggunakannya',errTruncOut:'Keluaran model mencapai batas token dan terpotong sebelum selesai — naikkan max_tokens di Parameter permintaan tambahan, mis. {"max_tokens":8192}',lblExtra:'Parameter permintaan tambahan (JSON, opsional)',extraTip:'Digabungkan ke setiap body permintaan API kustom. Contoh: {"enable_thinking":false} untuk mematikan penalaran; {"response_format":{"type":"json_object"}} untuk memaksa JSON. model / messages / temperature / stream tidak dapat ditimpa.',fbRoute:'Catatan: panggilan model B ({0}) gagal; batch ini diterjemahkan oleh model A ({1}). Alasan: {2}',
@@ -2071,9 +2102,9 @@ userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, appl
   lblMaxW:'Lebar baris dalam UNIT lebar penuh, bukan jumlah karakter: 1 karakter CJK = 1; huruf Latin, Sirilik, Thai, dan Arab = 0.5, jadi 1 unit ≈ 2 karakter untuk aksara setengah lebar. Mengatur pembungkusan ekabahasa dan baris dua pembicara «- A - B» pada ekspor dwibahasa. Nilai default mengikuti norma Netflix per bahasa (zh/ko 16, ja 13, lainnya 21). Lebih besar = baris lebih panjang, lebih sedikit pemotongan baris dan pemisahan.', lblBiMaxW:'Lebar maksimum baris TERJEMAHAN pada ekspor dwibahasa (satuan lebar penuh yang sama, bukan jumlah karakter: nilai 32 yang sama ≈ 32 karakter Tionghoa tetapi ≈ 64 karakter Thai). Hanya membatasi baris terjemahan; baris sumber mengikuti jeda semantik dan tidak dibatasi lebarnya, dan baris dua pembicara memakai «Lebar baris» di atas. Hanya jika terlampaui barulah timeline dibelah. Nilai ini TIDAK berubah per bahasa. Lebih besar = lebih sedikit pemisahan tetapi baris terjemahan lebih panjang.', btnGo:'▶ Mulai terjemahan', btnGoStop:'Menerjemahkan… klik untuk berhenti', lyricTip:'Cara menangani baris lirik: terjemahkan / pertahankan teks asli / hapus. Pendeteksian memakai karakter di “Penanda lirik”.', marksTip:'Baris yang memuat karakter ini dianggap lirik. Bawaan ♪♫♬♩ — bisa ditambah atau dihapus; dikosongkan akan mengembalikan bawaan. Jika berkas Anda tidak memakai simbol musik, tambahkan penanda yang dipakainya. Jika satu baris mencampur lirik dan dialog, “Hapus” otomatis turun ke mempertahankan asli agar dialog tidak ikut terhapus.', lyricSkipKeep:'{0} grup lirik dipertahankan dalam bahasa asli (tidak diterjemahkan)', lyricSkipDrop:'{0} grup lirik dihapus sesuai pengaturan', lyricWarn:'Perhatian: {0}% baris terdeteksi sebagai lirik — kemungkinan penanda terlalu luas. Periksa lalu jalankan ulang.', dropFillersTip:'Aktif: baris yang dinilai aturan lokal sebagai pengisi murni (eh, hmm, bersenandung tanpa arti) langsung dihapus dan tidak dikirim ke model, sehingga hasilnya pasti. Nonaktif: semua baris dikirim ke model, yang memutuskan per baris apakah diterjemahkan, dipertahankan, atau dihapus. Aktif secara bawaan.',
   btnPost:'↻ Hanya pasca-proses (bungkus/bersihkan tag)',
   hintPrivacy:'Model bawaan: subtitle diteruskan melalui server situs ini ke penyedia yang dikonfigurasi admin; API kustom: penyedia pilihan Anda memproses langsung, tanpa melewati situs ini.',
-  stepExport:'Ekspor terjemahan', lblOutName:'Nama file ekspor (otomatis: nama sumber + bahasa target)', outPh:'xxx_terjemahan.srt',
+  stepExport:'Ekspor terjemahan',  
   btnDownload:'⬇ Unduh subtitle', btnCopy:'Salin ke papan klip', lblExpStyle:'Gaya ekspor', assSplit:'layar terbagi', assStack:'dua baris', lblFileFmt:'Format file', lblExpFmt:'Format ekspor', fmtMono:'Terjemahan saja', secAssStyle:'Gaya ASS', lblAssDstSize:'Ukuran terjemahan', lblAssSrcSize:'Ukuran asli', lblAssDstColor:'Warna terjemahan', lblAssSrcColor:'Warna asli', lblAssDstMarginV:'Jarak dari bawah (terjemahan)', lblAssSrcMarginV:'Jarak dari bawah (asli)', assDstMVTip:'Jarak baris terjemahan ke tepi bawah (px, 1080p). Nilai bawaan mengikuti mode (layar terbagi/dua baris) dan baris yang di atas; setelah diubah manual, nilainya tetap.', assSrcMVTip:'Jarak baris asli ke tepi bawah (px, 1080p). Dalam mode layar terbagi, bila baris asli di atas pun tetap dihitung dari tepi bawah; setelah diubah manual, nilainya tetap.', assSizeRec:'Disarankan ', assApply:'Terapkan', assUndo:'Urungkan', assKept:'saat ini', assAutoReset:'Direset untuk tata letak baru', assMVRec:'Disarankan ',assSizeFollow:'Diisi otomatis dari nilai referensi industri; bisa diubah bebas',assSizeLocked:'Menggunakan nilai Anda; referensi industri di atas hanya panduan', assColorTip:'Masukkan warna heksadesimal #RRGGBB, mis. #FFFFFF (putih) atau #FFD700 (emas).',
-  showTitle:'Satu file subtitle, banyak cara mengekspor', showSub:'Terjemahan + asli sesukamu: 4 format × 5 tata letak, 14 gaya ekspor', showMono:'Hanya terjemahan', showBi:'Dwibahasa dua baris · SRT/VTT', showSplit:'Layar terbagi · ASS', showStack:'Dua baris · ASS · bergaya', showNote:'Asli di atas atau terjemahan di atas, plus ekspor TXT pembanding', showLineDst:'♪ Cinta di udara ♪', fmtBiSrc:'Dwibahasa · teks asli di atas', fmtBiDst:'Dwibahasa · terjemahan di atas', hintOutName:'Akhiran bahasa pada nama file mengikuti bahasa target.',
+  showTitle:'Satu file subtitle, banyak cara mengekspor', showSub:'Terjemahan + asli sesukamu: 4 format × 5 tata letak, 14 gaya ekspor', showMono:'Hanya terjemahan', showBi:'Dwibahasa dua baris · SRT/VTT', showSplit:'Layar terbagi · ASS', showStack:'Dua baris · ASS · bergaya', showNote:'Asli di atas atau terjemahan di atas, plus ekspor TXT pembanding', showLineDst:'♪ Cinta di udara ♪', fmtBiSrc:'Dwibahasa · teks asli di atas', fmtBiDst:'Dwibahasa · terjemahan di atas', 
   logTitle:'Log', logReady:'Siap. Impor subtitle atau muat contoh.',
   stTotal:'Subtitle', stDone:'Selesai', stDrop:'Pengisi dihapus', stMerge:'Grup multi-baris', stWrap:'Dibungkus', stIssues:'Tertunda',
   fAll:'Semua', fTodo:'Tertunda saja', fDone:'Selesai saja', fFlag:'Ditandai saja',
@@ -2136,7 +2167,7 @@ userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghap
   aboutBody:'AI-SRTSub adalah penerjemah subtitel AI sumber terbuka. Kami percaya alat yang baik harus gratis, bersih, dan menghormati privasi — tanpa iklan, tanpa pendaftaran, tanpa menyentuh file Anda. Silakan self-host atau ikut menyempurnakan.', aboutRepo:'Repositori GitHub', aboutLicense:'Sumber terbuka AGPL-3.0', wsBackHome:'Beranda',
   wsUploadNew:'Subtitel baru', projEmpty:'Belum ada subtitel', secImport:'Impor', secLang:'Bahasa',
   secStyle:'Gaya', secRules:'Aturan', secEngine:'Mesin', lblSrcShort:'Bahasa sumber',
-  lblDstShort:'Bahasa target', lblKeepTermsShort:'Nama diri', lblAutoTermsShort:'Glosarium otomatis', lblMaxWShort:'Lebar baris', lblBiMaxWShort:'Lebar dwibahasa (terjemahan)', wUnit:'karakter', lblLyric:'Lirik', lyricTrans:'Terjemahkan', lyricKeep:'Pertahankan asli', lyricDrop:'Hapus', lblMarks:'Penanda lirik', lblDropFillers:'Hapus kata pengisi',
+  lblDstShort:'Bahasa target', lblKeepTermsShort:'Nama diri', lblAutoTermsShort:'Glosarium otomatis', secWrap:'Pembungkusan baris', wrapTip:'Tanpa perlu menerjemahkan ulang — pembungkusan baris subtitle satu bahasa langsung terlihat di area editor.', lblMaxWShort:'Lebar baris', lblBiMaxWShort:'Lebar dwibahasa', wUnit:'karakter', lblLyric:'Lirik', lyricTrans:'Terjemahkan', lyricKeep:'Pertahankan asli', lyricDrop:'Hapus', lblMarks:'Penanda lirik', lblDropFillers:'Hapus kata pengisi',
   /* v0.9.70 两段式界面新增 */
 },
 'hi': {pureMTMode:'शुद्ध अनुवाद मॉडल पाया गया ({0}): प्रति-समूह सीधे अनुवाद पर जा रहे हैं ({1} समूह, 4 समानांतर, सफल समूह कैश होंगे)…',pureMTDone:'प्रति-समूह अनुवाद पूरा: {1} में {0} समूह सफल',gotClick:'“अनुवाद शुरू करें” अनुरोध मिला — तैयार किया जा रहा है…',reqSent:'बैच {0} का अनुरोध भेजा गया ({1} समूह) — मॉडल की प्रतिक्रिया की प्रतीक्षा…',waitSec:'{0} सेकंड हो गए — अभी भी मॉडल से कोई प्रतिक्रिया नहीं…',errTimeout:'{0} सेकंड तक कोई प्रतिक्रिया नहीं — अनुरोध छोड़ दिया गया (समय समाप्त)। प्रति बैच अक्षर बजट घटाएँ या तेज़ मॉडल अपनाएँ; यदि मॉडल उत्तर से पहले तर्क करता है (Qwen3, GLM…), तो अतिरिक्त अनुरोध पैरामीटर में {"enable_thinking":false} डालें',alreadyRunning:'पिछला रन अभी समाप्त नहीं हुआ है — रोकने का अनुरोध भेज दिया गया। फिर से शुरू करने से पहले वर्तमान बैच के पूरा होने तक प्रतीक्षा करें',modeMismatch:'ध्यान दें: नीचे कस्टम API ({0}) भरी हुई है, लेकिन ऊपर का मोड “डिफ़ॉल्ट मॉडल” है, इसलिए इसका उपयोग नहीं होगा। उपयोग करने के लिए मोड को “कस्टम API” पर बदलें',errTruncOut:'मॉडल का आउटपुट टोकन सीमा पर पहुँचकर अधूरा कट गया — अतिरिक्त अनुरोध पैरामीटर में max_tokens बढ़ाएँ, जैसे {"max_tokens":8192}',lblExtra:'अतिरिक्त अनुरोध पैरामीटर (JSON, वैकल्पिक)',extraTip:'हर कस्टम API अनुरोध के body में जोड़ा जाता है। उदा. {"enable_thinking":false} तर्क बंद करने के लिए; {"response_format":{"type":"json_object"}} JSON लागू करने के लिए। model / messages / temperature / stream ओवरराइड नहीं किए जा सकते।',fbRoute:'सूचना: मॉडल B ({0}) का कॉल विफल रहा; यह बैच मॉडल A ({1}) से अनूदित किया गया। कारण: {2}',
@@ -2170,9 +2201,9 @@ userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghap
   lblMaxW:'पंक्ति चौड़ाई पूर्ण-चौड़ाई इकाइयों में है, अक्षरों में नहीं: 1 CJK अक्षर = 1; लैटिन, सिरिलिक, थाई और अरबी अक्षर = 0.5, अतः अर्द्ध-चौड़ाई लिपियों में 1 इकाई ≈ 2 अक्षर। एकभाषी रैपिंग और द्विभाषी निर्यात में «- A - B» दो-वक्ता पंक्तियों पर लागू। डिफ़ॉल्ट भाषा अनुसार Netflix मानक (zh/ko 16, ja 13, अन्य 21)। बड़ा = लंबी पंक्तियाँ, कम विभाजन।', lblBiMaxW:'द्विभाषी निर्यात में अनूदित पंक्ति की अधिकतम चौड़ाई (वही पूर्ण-चौड़ाई इकाई, अक्षर नहीं: वही 32 ≈ 32 चीनी अक्षर लेकिन ≈ 64 थाई अक्षर)। केवल अनूदित पंक्ति सीमित; स्रोत पंक्ति अर्थ-विराम का पालन करती है और चौड़ाई-मुक्त है; दो-वक्ता पंक्तियाँ ऊपर «पंक्ति चौड़ाई» उपयोग करती हैं। केवल सीमा पार करने पर समयरेखा विभाजित होती है। यह मान भाषा अनुसार नहीं बदलता। बड़ा = कम विभाजन परंतु लंबी अनूदित पंक्तियाँ।', btnGo:'▶ अनुवाद शुरू करें', btnGoStop:'अनुवाद हो रहा है… रोकने के लिए क्लिक करें', lyricTip:'गीत वाली पंक्तियों को कैसे संभालें: अनूदित करें / मूल रखें / हटाएँ। पहचान «गीत चिह्न» के अक्षरों से होती है।', marksTip:'इन अक्षरों वाली पंक्तियाँ गीत मानी जाती हैं। डिफ़ॉल्ट ♪♫♬♩ — जोड़ें या हटाएँ; खाली छोड़ने पर डिफ़ॉल्ट बहाल हो जाता है। यदि आपकी फ़ाइल में कोई संगीत चिह्न नहीं है, तो उसका चिह्न यहाँ जोड़ें। यदि एक पंक्ति में गीत और संवाद दोनों हों, तो «हटाएँ» स्वतः मूल रखने पर आ जाता है, जिससे संवाद नहीं मिटता।', lyricSkipKeep:'{0} गीत समूह सेटिंग के अनुसार मूल भाषा में रखे गए (अनूदित नहीं)', lyricSkipDrop:'{0} गीत समूह सेटिंग के अनुसार हटाए गए', lyricWarn:'ध्यान दें: {0}% पंक्तियाँ गीत मानी गईं — शायद चिह्न-समूह बहुत व्यापक है। जाँच करें और फिर चलाएँ।', dropFillersTip:'चालू: जिन पंक्तियों को स्थानीय नियम शुद्ध भराव (हम्म, अ…, अर्थहीन गुनगुनाहट) मानता है, वे सीधे हटा दी जाती हैं और मॉडल को नहीं भेजी जातीं, इसलिए परिणाम निश्चित रहता है। बंद: सभी पंक्तियाँ मॉडल को भेजी जाती हैं, और मॉडल हर पंक्ति के लिए तय करता है कि अनुवाद करना है, रखना है या हटाना है। डिफ़ॉल्ट रूप से चालू।',
   btnPost:'↻ केवल पोस्ट-प्रोसेस (रैप/टैग सफ़ाई)',
   hintPrivacy:'डिफ़ॉल्ट मॉडल: सबटाइटल इस साइट के सर्वर से होकर एडमिन के प्रदाता तक जाते हैं; अपनी API: आपका प्रदाता सीधे प्रोसेस करता है, इस साइट से नहीं।',
-  stepExport:'अनुवाद निर्यात करें', lblOutName:'निर्यात फ़ाइल नाम (स्वतः: स्रोत नाम + लक्ष्य भाषा)', outPh:'xxx_अनुवाद.srt',
+  stepExport:'अनुवाद निर्यात करें',  
   btnDownload:'⬇ सबटाइटल डाउनलोड', btnCopy:'क्लिपबोर्ड पर कॉपी करें', lblExpStyle:'निर्यात शैली', assSplit:'स्प्लिट स्क्रीन', assStack:'दो पंक्तियाँ', lblFileFmt:'फ़ाइल प्रारूप', lblExpFmt:'निर्यात प्रारूप', fmtMono:'केवल अनुवाद', secAssStyle:'ASS शैली', lblAssDstSize:'अनुवाद आकार', lblAssSrcSize:'मूल आकार', lblAssDstColor:'अनुवाद रंग', lblAssSrcColor:'मूल रंग', lblAssDstMarginV:'अनुवाद नीचे की दूरी', lblAssSrcMarginV:'मूल नीचे की दूरी', assDstMVTip:'अनुवाद पंक्ति की निचले किनारे से दूरी (px, 1080p)। डिफ़ॉल्ट मान स्प्लिट/दो-पंक्ति मोड और ऊपर वाली पंक्ति के अनुसार बदलता है; संपादित करने के बाद स्थिर रहता है।', assSrcMVTip:'मूल पंक्ति की निचले किनारे से दूरी (px, 1080p)। स्प्लिट मोड में मूल पंक्ति ऊपर होने पर भी निचले किनारे से ही मापी जाती है; संपादित करने के बाद स्थिर रहती है।', assSizeRec:'अनुशंसित ', assApply:'लागू करें', assUndo:'पूर्ववत', assKept:'आपका', assAutoReset:'नए लेआउट के लिए रीसेट', assMVRec:'अनुशंसित ',assSizeFollow:'उद्योग के संदर्भ मान स्वतः भरे गए; इच्छानुसार बदलें',assSizeLocked:'आपका मान उपयोग हो रहा है; ऊपर का उद्योग संदर्भ केवल मार्गदर्शन है', assColorTip:'#RRGGBB हेक्स रंग दर्ज करें, जैसे #FFFFFF (सफ़ेद) या #FFD700 (सुनहरा)।',
-  showTitle:'एक सबटाइटल फाइल, एक्सपोर्ट के इतने तरीके', showSub:'अनुवाद + मूल अपनी पसंद से: 4 फॉर्मैट × 5 लेआउट, 14 एक्सपोर्ट स्टाइल', showMono:'केवल अनुवाद', showBi:'द्विभाषी दो पंक्तियाँ · SRT/VTT', showSplit:'ऊपर-नीचे · ASS', showStack:'दो पंक्तियाँ · ASS · स्टाइल सहित', showNote:'मूल ऊपर या अनुवाद ऊपर, साथ में TXT तुलना पाठ भी', showLineDst:'♪ प्यार हवा में है ♪', fmtBiSrc:'द्विभाषी · मूल ऊपर', fmtBiDst:'द्विभाषी · अनुवाद ऊपर', hintOutName:'फ़ाइल नाम का भाषा-प्रत्यय लक्ष्य भाषा के साथ बदलता है।',
+  showTitle:'एक सबटाइटल फाइल, एक्सपोर्ट के इतने तरीके', showSub:'अनुवाद + मूल अपनी पसंद से: 4 फॉर्मैट × 5 लेआउट, 14 एक्सपोर्ट स्टाइल', showMono:'केवल अनुवाद', showBi:'द्विभाषी दो पंक्तियाँ · SRT/VTT', showSplit:'ऊपर-नीचे · ASS', showStack:'दो पंक्तियाँ · ASS · स्टाइल सहित', showNote:'मूल ऊपर या अनुवाद ऊपर, साथ में TXT तुलना पाठ भी', showLineDst:'♪ प्यार हवा में है ♪', fmtBiSrc:'द्विभाषी · मूल ऊपर', fmtBiDst:'द्विभाषी · अनुवाद ऊपर', 
   logTitle:'लॉग', logReady:'तैयार। सबटाइटल आयात करें या नमूना लोड करें।',
   stTotal:'सबटाइटल', stDone:'पूर्ण', stDrop:'फिलर हटाए', stMerge:'बहु-पंक्ति समूह', stWrap:'रैप्ड', stIssues:'शेष',
   fAll:'सभी', fTodo:'केवल शेष', fDone:'केवल पूर्ण', fFlag:'केवल चिह्नित',
@@ -2235,7 +2266,7 @@ userStop:'उपयोगकर्ता ने रोका।', postEnd:'अ�
   aboutBody:'AI-SRTSub एक ओपन-सोर्स AI सबटाइटल अनुवादक है। हम मानते हैं कि अच्छा टूल मुफ़्त, साफ़ और प्राइवेसी का ख्याल रखने वाला होना चाहिए — न विज्ञापन, न रजिस्ट्रेशन, न आपकी फ़ाइलों को छूना। सेल्फ-होस्ट करें या साथ में निखारें।', aboutRepo:'GitHub रिपॉज़िटरी', aboutLicense:'AGPL-3.0 ओपन सोर्स', wsBackHome:'होम',
   wsUploadNew:'नया सबटाइटल', projEmpty:'कोई सबटाइटल नहीं', secImport:'इंपोर्ट', secLang:'भाषा',
   secStyle:'अनुवाद स्टाइल', secRules:'नियम', secEngine:'इंजन', lblSrcShort:'स्रोत भाषा',
-  lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'संज्ञाएँ', lblAutoTermsShort:'ऑटो ग्लॉसरी', lblMaxWShort:'लाइन चौड़ाई', lblBiMaxWShort:'द्विभाषी चौड़ाई (अनूदित)', wUnit:'अक्षर', lblLyric:'गीत के बोल', lyricTrans:'अनूदित करें', lyricKeep:'मूल रखें', lyricDrop:'हटाएँ', lblMarks:'गीत चिह्न', lblDropFillers:'भराव शब्द हटाएँ',
+  lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'संज्ञाएँ', lblAutoTermsShort:'ऑटो ग्लॉसरी', secWrap:'लाइन रैपिंग', wrapTip:'दोबारा अनुवाद की ज़रूरत नहीं — संपादन क्षेत्र में एकभाषी उपशीर्षक की रैपिंग तुरंत दिखती है।', lblMaxWShort:'लाइन चौड़ाई', lblBiMaxWShort:'द्विभाषी चौड़ाई', wUnit:'अक्षर', lblLyric:'गीत के बोल', lyricTrans:'अनूदित करें', lyricKeep:'मूल रखें', lyricDrop:'हटाएँ', lblMarks:'गीत चिह्न', lblDropFillers:'भराव शब्द हटाएँ',
   /* v0.9.70 两段式界面新增 */
 },
 'th': {pureMTMode:'ตรวจพบโมเดลแปลภาษาล้วน ({0}): เปลี่ยนไปแปลตรงรายกลุ่ม ({1} กลุ่ม, ขนาน 4 งาน, กลุ่มที่สำเร็จจะถูกแคช)…',pureMTDone:'แปลรายกลุ่มเสร็จ: สำเร็จ {0}/{1} กลุ่ม',gotClick:'ได้รับคำขอ “เริ่มแปล” — กำลังเตรียม…',reqSent:'ส่งคำขอชุดที่ {0} แล้ว ({1} กลุ่ม) — กำลังรอการตอบสนองจากโมเดล…',waitSec:'รอมา {0} วินาทีแล้ว — ยังไม่ได้รับการตอบสนองจากโมเดล…',errTimeout:'ไม่มีการตอบสนองหลังจาก {0} วินาที — ยกเลิกคำขอนี้ (หมดเวลา) แนะนำให้ลดงบประมาณตัวอักษรต่อชุด หรือเปลี่ยนไปใช้โมเดลที่เร็วกว่า หากโมเดลคิดก่อนตอบ (Qwen3, GLM ฯลฯ) ให้ใส่ {"enable_thinking":false} ในพารามิเตอร์เพิ่มเติม',alreadyRunning:'รอบก่อนหน้ายังไม่จบ — ได้ส่งคำขอหยุดแล้ว รอชุดปัจจุบันจบก่อนแล้วค่อยเริ่มใหม่',modeMismatch:'หมายเหตุ: มีการกรอก API แบบกำหนดเองด้านล่าง ({0}) แต่โหมดด้านบนคือ “โมเดลเริ่มต้น” จึงไม่ถูกนำมาใช้ เปลี่ยนโหมดเป็น “API แบบกำหนดเอง” เพื่อใช้งาน',errTruncOut:'ผลลัพธ์ของโมเดลถูกลิมิต token ตัดก่อนจบ — เพิ่ม max_tokens ในพารามิเตอร์เพิ่มเติม เช่น {"max_tokens":8192}',lblExtra:'พารามิเตอร์เพิ่มเติม (JSON, ไม่บังคับ)',extraTip:'รวมเข้าใน body ของทุกคำขอแบบกำหนดเอง เช่น {"enable_thinking":false} ปิดการคิดของโมเดล, {"response_format":{"type":"json_object"}} บังคับผลลัพธ์เป็น JSON model / messages / temperature / stream แทนที่ไม่ได้',fbRoute:'หมายเหตุ: การเรียกโมเดล B ({0}) ล้มเหลว ชุดนี้จึงแปลด้วยโมเดล A ({1}) สาเหตุ: {2}',
@@ -2269,9 +2300,9 @@ userStop:'उपयोगकर्ता ने रोका।', postEnd:'अ�
   lblMaxW:'ความกว้างบรรทัดในหน่วยเต็มความกว้าง ไม่ใช่จำนวนตัวอักษร: 1 ตัวอักษร CJK = 1; อักษรละติน ซีริลลิก ไทย และอาหรับ = 0.5 ดังนั้น 1 หน่วย ≈ 2 ตัวอักษร สำหรับอักษรครึ่งความกว้าง ใช้กับการขึ้นบรรทัดใหม่แบบภาษาเดียว และบรรทัดสองผู้พูด «- A - B» ในการส่งออกสองภาษา ค่าเริ่มต้นตามมาตรฐาน Netflix แยกตามภาษา (zh/ko 16, ja 13, อื่นๆ 21) ค่ามากขึ้น = บรรทัดยาวขึ้น แบ่งน้อยลง', lblBiMaxW:'ความกว้างสูงสุดของบรรทัดคำแปลในการส่งออกสองภาษา (หน่วยเต็มความกว้างเช่นเดียวกัน ไม่ใช่จำนวนตัวอักษร: ค่า 32 เท่ากัน ≈ 32 ตัวอักษรจีน แต่ ≈ 64 ตัวอักษรไทย) จำกัดเฉพาะบรรทัดคำแปล บรรทัดต้นฉบับตามจุดหมายความหมายและไม่จำกัดความกว้าง ส่วนบรรทัดสองผู้พูดใช้ «ความกว้างบรรทัด» ด้านบน การแบ่งไทม์ไลน์เกิดเฉพาะเมื่อคำแปลเกินค่านี้ ค่านี้ไม่เปลี่ยนตามภาษา ค่ามากขึ้น = แบ่งน้อยลงแต่บรรทัดคำแปลยาวขึ้น', btnGo:'▶ เริ่มแปล', btnGoStop:'กำลังแปล… คลิกเพื่อหยุด', lyricTip:'วิธีจัดการบรรทัดเนื้อเพลง: แปล / เก็บต้นฉบับ / ลบ ตรวจสอบจากตัวอักษรใน «เครื่องหมายเนื้อเพลง»', marksTip:'บรรทัดที่มีตัวอักษรเหล่านี้จะถือเป็นเนื้อเพลง ค่าเริ่มต้น ♪♫♬♩ — เพิ่มหรือลบได้ หากเว้นว่างจะกลับไปใช้ค่าเริ่มต้น หากไฟล์ของคุณไม่มีสัญลักษณ์ดนตรี ให้เพิ่มเครื่องหมายที่ไฟล์นั้นใช้ หากบรรทัดใดมีทั้งเนื้อเพลงและบทสนทนา «ลบ» จะเปลี่ยนเป็นเก็บต้นฉบับอัตโนมัติ เพื่อไม่ให้บทสนทนาถูกลบ', lyricSkipKeep:'เก็บเนื้อเพลง {0} กลุ่มไว้เป็นภาษาต้นฉบับตามการตั้งค่า (ไม่แปล)', lyricSkipDrop:'ลบเนื้อเพลง {0} กลุ่มตามการตั้งค่า', lyricWarn:'ระวัง: {0}% ของบรรทัดถูกจัดเป็นเนื้อเพลง — อาจตั้งเครื่องหมายกว้างเกินไป โปรดตรวจสอบแล้วรันใหม่', dropFillersTip:'เปิด: บรรทัดที่กฎในตัวโปรแกรมตัดสินว่าเป็นคำอุทานล้วน (เอ่อ, อืม, การฮัมที่ไม่มีความหมาย) จะถูกลบทันทีและไม่ส่งให้โมเดล ผลลัพธ์จึงแน่นอน ปิด: ส่งทุกบรรทัดให้โมเดล แล้วโมเดลตัดสินทีละบรรทัดว่าจะแปล เก็บไว้ หรือลบ ค่าเริ่มต้นคือเปิด',
   btnPost:'↻ ประมวลผลท้ายอย่างเดียว (ตัดบรรทัด/ล้างแท็ก)',
   hintPrivacy:'โมเดลมาตรฐาน: ซับไตเติลจะผ่านเซิร์ฟเวอร์ของเว็บนี้ไปยังผู้ให้บริการที่ผู้ดูแลตั้งไว้; API ของคุณเอง: ผู้ให้บริการที่คุณกรอกจัดการโดยตรง ไม่ผ่านเว็บนี้',
-  stepExport:'ส่งออกคำแปล', lblOutName:'ชื่อไฟล์ที่ส่งออก (อัตโนมัติ: ชื่อต้นฉบับ + ภาษาเป้าหมาย)', outPh:'xxx_แปลแล้ว.srt',
+  stepExport:'ส่งออกคำแปล',  
   btnDownload:'⬇ ดาวน์โหลดซับไตเติล', btnCopy:'คัดลอกไปยังคลิปบอร์ด', lblExpStyle:'รูปแบบการส่งออก', assSplit:'แยกหน้าจอ', assStack:'สองบรรทัด', lblFileFmt:'รูปแบบไฟล์', lblExpFmt:'รูปแบบการส่งออก', fmtMono:'เฉพาะคำแปล', secAssStyle:'รูปแบบ ASS', lblAssDstSize:'ขนาดคำแปล', lblAssSrcSize:'ขนาดต้นฉบับ', lblAssDstColor:'สีคำแปล', lblAssSrcColor:'สีต้นฉบับ', lblAssDstMarginV:'ระยะจากขอบล่าง (คำแปล)', lblAssSrcMarginV:'ระยะจากขอบล่าง (ต้นฉบับ)', assDstMVTip:'ระยะห่างของบรรทัดคำแปลจากขอบล่าง (px, 1080p) ค่าเริ่มต้นเปลี่ยนตามโหมดแยก/สองบรรทัดและบรรทัดที่อยู่ด้านบน เมื่อแก้ไขเองค่าจะคงที่', assSrcMVTip:'ระยะห่างของบรรทัดต้นฉบับจากขอบล่าง (px, 1080p) ในโหมดแยก แม้ต้นฉบับจะอยู่ด้านบนก็ยังวัดจากขอบล่าง เมื่อแก้ไขเองค่าจะคงที่', assSizeRec:'แนะนำ ', assApply:'ใช้ค่านี้', assUndo:'ย้อนกลับ', assKept:'ของคุณ', assAutoReset:'รีเซ็ตสำหรับรูปแบบใหม่', assMVRec:'แนะนำ ',assSizeFollow:'เติมอัตโนมัติจากค่าอ้างอิงอุตสาหกรรม สามารถแก้ไขได้ตามต้องการ',assSizeLocked:'ใช้ค่าที่คุณตั้งเอง ค่าอ้างอิงอุตสาหกรรมด้านบนเป็นเพียงข้อมูลประกอบ', assColorTip:'ใส่ค่าสีฐานสิบหก #RRGGBB เช่น #FFFFFF (ขาว) หรือ #FFD700 (ทอง)',
-  showTitle:'ไฟล์คำบรรยายไฟล์เดียว ส่งออกได้หลากหลาย', showSub:'คำแปล + ต้นฉบับจัดได้ตามใจ: 4 รูปแบบ × 5 เลย์เอาต์ รวม 14 สไตล์การส่งออก', showMono:'เฉพาะคำแปล', showBi:'สองภาษาสองบรรทัด · SRT/VTT', showSplit:'แบ่งบน-ล่าง · ASS', showStack:'สองบรรทัด · ASS · กำหนดสไตล์ได้', showNote:'ต้นฉบับบนหรือคำแปลบนสลับได้ พร้อมส่งออก TXT เทียบข้อความ', showLineDst:'♪ ความรักอยู่ในอากาศ ♪', fmtBiSrc:'สองภาษา · ต้นฉบับอยู่บน', fmtBiDst:'สองภาษา · คำแปลอยู่บน', hintOutName:'คำลงท้ายภาษาในชื่อไฟล์จะเปลี่ยนตามภาษาเป้าหมาย',
+  showTitle:'ไฟล์คำบรรยายไฟล์เดียว ส่งออกได้หลากหลาย', showSub:'คำแปล + ต้นฉบับจัดได้ตามใจ: 4 รูปแบบ × 5 เลย์เอาต์ รวม 14 สไตล์การส่งออก', showMono:'เฉพาะคำแปล', showBi:'สองภาษาสองบรรทัด · SRT/VTT', showSplit:'แบ่งบน-ล่าง · ASS', showStack:'สองบรรทัด · ASS · กำหนดสไตล์ได้', showNote:'ต้นฉบับบนหรือคำแปลบนสลับได้ พร้อมส่งออก TXT เทียบข้อความ', showLineDst:'♪ ความรักอยู่ในอากาศ ♪', fmtBiSrc:'สองภาษา · ต้นฉบับอยู่บน', fmtBiDst:'สองภาษา · คำแปลอยู่บน', 
   logTitle:'บันทึก', logReady:'พร้อมแล้ว นำเข้าซับไตเติลหรือโหลดตัวอย่างเพื่อเริ่ม',
   stTotal:'ซับไตเติล', stDone:'แปลแล้ว', stDrop:'ลบคำเสียบแล้ว', stMerge:'กลุ่มข้ามบรรทัด', stWrap:'ตัดบรรทัดแล้ว', stIssues:'ค้างอยู่',
   fAll:'ทั้งหมด', fTodo:'ยังไม่แปล', fDone:'แปลแล้ว', fFlag:'มีสถานะพิเศษ',
@@ -2334,7 +2365,7 @@ userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร�
   aboutBody:'AI-SRTSub คือเครื่องมือแปลซับด้วย AI แบบโอเพนซอร์ส เราเชื่อว่าเครื่องมือที่ดีต้องฟรี สะอาด และเคารพความเป็นส่วนตัว — ไม่มีโฆษณา ไม่ต้องสมัคร ไม่แตะไฟล์ของคุณ ติดตั้งเองได้ ช่วยกันขัดเกลาได้', aboutRepo:'รีโพซิทอรี GitHub', aboutLicense:'โอเพนซอร์ส AGPL-3.0', wsBackHome:'หน้าแรก',
   wsUploadNew:'ซับใหม่', projEmpty:'ยังไม่มีซับ', secImport:'นำเข้า', secLang:'ภาษา',
   secStyle:'สไตล์', secRules:'กฎการประมวลผล', secEngine:'เอนจิน', lblSrcShort:'ภาษาต้นทาง',
-  lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'ชื่อเฉพาะ', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', lblMaxWShort:'ความกว้างบรรทัด', lblBiMaxWShort:'ความกว้างสองภาษา (คำแปล)', wUnit:'ตัวอักษร', lblLyric:'เนื้อเพลง', lyricTrans:'แปล', lyricKeep:'เก็บต้นฉบับ', lyricDrop:'ลบ', lblMarks:'เครื่องหมายเนื้อเพลง', lblDropFillers:'ลบคำอุทาน',
+  lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'ชื่อเฉพาะ', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', secWrap:'การตัดบรรทัด', wrapTip:'ไม่ต้องแปลใหม่ — ดูการตัดบรรทัดของซับไตเติลภาษาเดียวได้ทันทีในพื้นที่แก้ไข', lblMaxWShort:'ความกว้างบรรทัด', lblBiMaxWShort:'ความกว้างสองภาษา', wUnit:'ตัวอักษร', lblLyric:'เนื้อเพลง', lyricTrans:'แปล', lyricKeep:'เก็บต้นฉบับ', lyricDrop:'ลบ', lblMarks:'เครื่องหมายเนื้อเพลง', lblDropFillers:'ลบคำอุทาน',
   /* v0.9.70 两段式界面新增 */
 },
 'vi': {pureMTMode:'Phát hiện mô hình dịch thuần ({0}): chuyển sang dịch trực tiếp từng nhóm ({1} nhóm, 4 song song, nhóm thành công sẽ được lưu cache)…',pureMTDone:'Dịch từng nhóm hoàn tất: thành công {0}/{1} nhóm',gotClick:'Đã nhận yêu cầu “bắt đầu dịch” — đang chuẩn bị…',reqSent:'Đã gửi yêu cầu lô {0} ({1} nhóm) — đang chờ phản hồi của mô hình…',waitSec:'Đã chờ {0} giây — vẫn chưa có phản hồi từ mô hình…',errTimeout:'Không có phản hồi sau {0} giây — đã bỏ yêu cầu này (hết thời gian chờ). Hãy giảm ngân sách ký tự mỗi lô hoặc đổi sang mô hình nhanh hơn; nếu mô hình suy luận trước khi trả lời (Qwen3, GLM…), hãy điền {"enable_thinking":false} vào tham số yêu cầu bổ sung',alreadyRunning:'Lần chạy trước vẫn chưa kết thúc — đã yêu cầu dừng. Hãy đợi lô hiện tại hoàn tất rồi mới bắt đầu lại',modeMismatch:'Lưu ý: đã điền API tùy chỉnh ở dưới ({0}), nhưng chế độ hiện tại là “Mô hình mặc định” nên sẽ không được dùng. Hãy chuyển sang “API tùy chỉnh” để sử dụng',errTruncOut:'Kết quả của mô hình bị giới hạn token cắt ngắn trước khi hoàn tất — hãy tăng max_tokens trong Tham số yêu cầu bổ sung, ví dụ {"max_tokens":8192}',lblExtra:'Tham số yêu cầu bổ sung (JSON, tùy chọn)',extraTip:'Được gộp vào body của mỗi yêu cầu API tùy chỉnh. Ví dụ: {"enable_thinking":false} tắt suy luận; {"response_format":{"type":"json_object"}} ép xuất JSON. Không thể ghi đè model / messages / temperature / stream.',fbRoute:'Lưu ý: lệnh gọi mô hình B ({0}) thất bại; lô này được dịch bằng mô hình A ({1}). Lý do: {2}',
@@ -2368,9 +2399,9 @@ userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร�
   lblMaxW:'Độ rộng dòng tính theo ĐƠN VỊ toàn chiều rộng, không phải số ký tự: 1 ký tự CJK = 1; chữ Latinh, Kirin, Thái, Ả Rập = 0.5, tức 1 đơn vị ≈ 2 ký tự với chữ viết nửa chiều rộng. Áp dụng cho ngắt dòng đơn ngữ và dòng hai người nói «- A - B» khi xuất song ngữ. Mặc định theo chuẩn Netflix từng ngôn ngữ (zh/ko 16, ja 13, khác 21). Lớn hơn = dòng dài hơn, ít ngắt và ít chia hơn.', lblBiMaxW:'Độ rộng tối đa của dòng BẢN DỊCH khi xuất song ngữ (cùng đơn vị toàn chiều rộng, không phải số ký tự: cùng là 32 nhưng tiếng Trung ≈ 32 ký tự, tiếng Thái ≈ 64 ký tự). Chỉ giới hạn dòng bản dịch; dòng nguồn theo điểm ngắt ngữ nghĩa, không giới hạn rộng; dòng hai người nói dùng «Độ rộng dòng» ở trên. Chỉ khi vượt quá mới chia timeline. Giá trị này KHÔNG đổi theo ngôn ngữ. Lớn hơn = ít chia hơn nhưng dòng bản dịch dài hơn.', btnGo:'▶ Bắt đầu dịch', btnGoStop:'Đang dịch… bấm để dừng', lyricTip:'Cách xử lý dòng lời bài hát: dịch / giữ nguyên bản / xóa. Nhận diện bằng các ký tự trong «Dấu hiệu lời bài hát».', marksTip:'Dòng chứa các ký tự này được coi là lời bài hát. Mặc định ♪♫♬♩ — có thể thêm hoặc bớt; để trống sẽ khôi phục mặc định. Nếu tệp của bạn không dùng ký hiệu âm nhạc, hãy thêm dấu hiệu mà tệp đó dùng. Nếu một dòng vừa có lời vừa có thoại, «Xóa» sẽ tự động chuyển sang giữ nguyên bản để không xóa nhầm thoại.', lyricSkipKeep:'{0} nhóm lời bài hát được giữ nguyên bản theo cài đặt (không dịch)', lyricSkipDrop:'{0} nhóm lời bài hát bị xóa theo cài đặt', lyricWarn:'Lưu ý: {0}% số dòng được phân loại là lời bài hát — có thể bộ dấu hiệu đang quá rộng. Hãy kiểm tra rồi chạy lại.', dropFillersTip:'Bật: những dòng được quy tắc nội bộ đánh giá là từ đệm thuần túy (ừ, hmm, ngân nga vô nghĩa) sẽ bị xóa ngay và không gửi cho mô hình, nên kết quả xác định. Tắt: mọi dòng đều gửi cho mô hình, và mô hình quyết định từng dòng nên dịch, giữ hay xóa. Mặc định là bật.',
   btnPost:'↻ Chỉ xử lý sau (ngắt dòng/dọn thẻ)',
   hintPrivacy:'Mô hình mặc định: phụ đề đi qua máy chủ site này tới nhà cung cấp do quản trị viên cấu hình; API riêng: nhà cung cấp bạn nhập xử lý trực tiếp, không qua site này.',
-  stepExport:'Xuất bản dịch', lblOutName:'Tên file xuất (tự động: tên nguồn + ngôn ngữ đích)', outPh:'xxx_dich.srt',
+  stepExport:'Xuất bản dịch',  
   btnDownload:'⬇ Tải phụ đề', btnCopy:'Sao chép vào bộ nhớ tạm', lblExpStyle:'Kiểu xuất', assSplit:'chia đôi màn hình', assStack:'hai dòng', lblFileFmt:'Định dạng tệp', lblExpFmt:'Định dạng xuất', fmtMono:'Chỉ bản dịch', secAssStyle:'Kiểu ASS', lblAssDstSize:'Cỡ chữ bản dịch', lblAssSrcSize:'Cỡ chữ gốc', lblAssDstColor:'Màu bản dịch', lblAssSrcColor:'Màu gốc', lblAssDstMarginV:'Cách mép dưới (bản dịch)', lblAssSrcMarginV:'Cách mép dưới (bản gốc)', assDstMVTip:'Khoảng cách từ dòng bản dịch đến mép dưới (px, 1080p). Giá trị mặc định thay đổi theo chế độ chia đôi/hai dòng và dòng ở trên; sau khi chỉnh tay, giá trị được giữ cố định.', assSrcMVTip:'Khoảng cách từ dòng gốc đến mép dưới (px, 1080p). Trong chế độ chia đôi, dòng gốc ở trên vẫn tính từ mép dưới; sau khi chỉnh tay, giá trị được giữ cố định.', assSizeRec:'Đề xuất ', assApply:'Áp dụng', assUndo:'Hoàn tác', assKept:'của bạn', assAutoReset:'Đặt lại theo bố cục mới', assMVRec:'Đề xuất ',assSizeFollow:'Tự động điền theo giá trị tham chiếu ngành; có thể sửa tùy ý',assSizeLocked:'Đang dùng giá trị của bạn; giá trị tham chiếu ngành ở trên chỉ để tham khảo', assColorTip:'Nhập mã màu hex #RRGGBB, ví dụ #FFFFFF (trắng) hoặc #FFD700 (vàng kim).',
-  showTitle:'Một tệp phụ đề, bao nhiêu cách xuất', showSub:'Bản dịch + nguyên văn tùy ý: 4 định dạng × 5 bố cục, 14 kiểu xuất', showMono:'Chỉ bản dịch', showBi:'Song ngữ hai dòng · SRT/VTT', showSplit:'Chia trên-dưới · ASS', showStack:'Hai dòng · ASS · có kiểu dáng', showNote:'Nguyên văn trên hay bản dịch trên tùy chọn, còn xuất TXT đối chiếu', showLineDst:'♪ Tình yêu trong không khí ♪', fmtBiSrc:'Song ngữ · gốc ở trên', fmtBiDst:'Song ngữ · dịch ở trên', hintOutName:'Hậu tố ngôn ngữ trong tên file theo ngôn ngữ đích.',
+  showTitle:'Một tệp phụ đề, bao nhiêu cách xuất', showSub:'Bản dịch + nguyên văn tùy ý: 4 định dạng × 5 bố cục, 14 kiểu xuất', showMono:'Chỉ bản dịch', showBi:'Song ngữ hai dòng · SRT/VTT', showSplit:'Chia trên-dưới · ASS', showStack:'Hai dòng · ASS · có kiểu dáng', showNote:'Nguyên văn trên hay bản dịch trên tùy chọn, còn xuất TXT đối chiếu', showLineDst:'♪ Tình yêu trong không khí ♪', fmtBiSrc:'Song ngữ · gốc ở trên', fmtBiDst:'Song ngữ · dịch ở trên', 
   logTitle:'Nhật ký', logReady:'Sẵn sàng. Nhập phụ đề hoặc tải ví dụ mẫu.',
   stTotal:'Phụ đề', stDone:'Xong', stDrop:'Đã dọn đệm', stMerge:'Nhóm nhiều dòng', stWrap:'Đã ngắt dòng', stIssues:'Chờ xử lý',
   fAll:'Tất cả', fTodo:'Chờ dịch', fDone:'Đã dịch', fFlag:'Có đánh dấu',
@@ -2433,7 +2464,7 @@ userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn 
   aboutBody:'AI-SRTSub là công cụ dịch phụ đề bằng AI mã nguồn mở. Chúng tôi tin công cụ tốt phải miễn phí, sạch sẽ và tôn trọng riêng tư — không quảng cáo, không đăng ký, không động vào tệp của bạn. Tự triển khai hay cùng nhau hoàn thiện đều chào đón.', aboutRepo:'Kho GitHub', aboutLicense:'Mã nguồn mở AGPL-3.0', wsBackHome:'Trang chủ',
   wsUploadNew:'Phụ đề mới', projEmpty:'Chưa có phụ đề', secImport:'Nhập', secLang:'Ngôn ngữ',
   secStyle:'Phong cách', secRules:'Quy tắc', secEngine:'Engine', lblSrcShort:'Ngôn ngữ nguồn',
-  lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', lblMaxWShort:'Độ rộng dòng', lblBiMaxWShort:'Chiều rộng song ngữ (bản dịch)', wUnit:'ký tự', lblLyric:'Lời bài hát', lyricTrans:'Dịch', lyricKeep:'Giữ nguyên bản', lyricDrop:'Xóa', lblMarks:'Dấu hiệu lời bài hát', lblDropFillers:'Xóa từ đệm',
+  lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', secWrap:'Ngắt dòng', wrapTip:'Không cần dịch lại — ngắt dòng của phụ đề đơn ngữ hiện ngay trong vùng chỉnh sửa.', lblMaxWShort:'Độ rộng dòng', lblBiMaxWShort:'Chiều rộng song ngữ', wUnit:'ký tự', lblLyric:'Lời bài hát', lyricTrans:'Dịch', lyricKeep:'Giữ nguyên bản', lyricDrop:'Xóa', lblMarks:'Dấu hiệu lời bài hát', lblDropFillers:'Xóa từ đệm',
   /* v0.9.70 两段式界面新增 */
 },
 'ru': {pureMTMode:'Обнаружена чистая переводческая модель ({0}): переход на прямой перевод по группам ({1} групп, 4 параллельно, успешные группы кэшируются)…',pureMTDone:'Погрупповой перевод завершён: успешно {0}/{1}',gotClick:'Получен запрос на начало перевода — подготовка…',reqSent:'Запрос пакета {0} отправлен ({1} групп) — ждём ответа модели…',waitSec:'Ожидание {0} с — ответа от модели всё ещё нет…',errTimeout:'За {0} с ответа не получено — запрос отменён (тайм-аут). Уменьшите лимит символов на пакет или выберите более быструю модель; если модель рассуждает перед ответом (Qwen3, GLM…), укажите {"enable_thinking":false} в дополнительных параметрах',alreadyRunning:'Предыдущий запуск ещё не завершён — запрошена остановка. Дождитесь завершения текущего пакета, прежде чем начинать заново',modeMismatch:'Внимание: ниже заполнены поля пользовательского API ({0}), но выбран режим «Модель по умолчанию», поэтому они не будут использованы. Переключите режим на «Свой API»',errTruncOut:'Вывод модели достиг лимита токенов и оборвался, не закончив генерацию — увеличьте max_tokens в дополнительных параметрах, например {"max_tokens":8192}',lblExtra:'Дополнительные параметры запроса (JSON, необязательно)',extraTip:'Добавляется в тело каждого запроса к пользовательскому API. Например {"enable_thinking":false} отключает рассуждения; {"response_format":{"type":"json_object"}} принудительно включает JSON. model / messages / temperature / stream переопределить нельзя.',fbRoute:'Внимание: вызов модели B ({0}) не удался; этот пакет переведён моделью A ({1}). Причина: {2}',
@@ -2467,9 +2498,9 @@ userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn 
   lblMaxW:'Ширина строки в ЕДИНИЦАХ полной ширины, а не в символах: 1 символ CJK = 1; латиница, кириллица, тайский и арабский = 0.5, то есть 1 единица ≈ 2 символа для полуширинных письменностей. Управляет переносом в одноязычном выводе и строками двух говорящих «- A - B» в двуязычном экспорте. Значение по умолчанию по нормам Netflix для каждого языка (zh/ko 16, ja 13, остальные 21). Больше = строки длиннее, меньше переносов и разбиений.', lblBiMaxW:'Максимальная ширина строки ПЕРЕВОДА при двуязычном экспорте (та же единица полной ширины, не символы: те же 32 ≈ 32 китайским символам, но ≈ 64 тайским символам). Ограничивает только строку перевода; строка источника следует смысловым разрывам и не ограничена по ширине, а строки двух говорящих используют «Ширину строки» выше. Только превышение разбивает таймлайн. Это значение НЕ меняется по языкам. Больше = меньше разбиений, но строки перевода длиннее.', btnGo:'▶ Начать перевод', btnGoStop:'Перевожу… нажмите для остановки', lyricTip:'Как обрабатывать строки песен: переводить / оставить оригинал / удалить. Распознавание — по символам из «Маркеры песен».', marksTip:'Строки с этими символами считаются текстом песни. По умолчанию ♪♫♬♩ — можно добавлять и удалять; пустое поле восстанавливает значение по умолчанию. Если в вашем файле нет музыкальных символов, добавьте обозначение, которое в нём используется. Если в строке есть и песня, и диалог, «Удалить» автоматически переключается на сохранение оригинала, чтобы не удалить диалог.', lyricSkipKeep:'{0} групп текста песни оставлены на языке оригинала согласно настройке (без перевода)', lyricSkipDrop:'{0} групп текста песни удалены согласно настройке', lyricWarn:'Внимание: {0}% строк определены как текст песни — возможно, набор маркеров слишком широк. Проверьте и запустите заново.', dropFillersTip:'Включено: строки, которые локальное правило считает чистыми словами-паразитами (э-э, хм, бессмысленное напевание), удаляются сразу и не отправляются в модель, поэтому результат определён. Выключено: все строки уходят в модель, которая для каждой решает — перевести, оставить или удалить. По умолчанию включено.',
   btnPost:'↻ Только пост-обработка (перенос/очистка тегов)',
   hintPrivacy:'Модель по умолчанию: субтитры проходят через сервер сайта к провайдеру, настроенному администратором; Своя API: ваш провайдер обрабатывает напрямую, минуя этот сайт.',
-  stepExport:'Экспорт перевода', lblOutName:'Имя файла экспорта (авто: исходное имя + язык перевода)', outPh:'xxx_perevod.srt',
+  stepExport:'Экспорт перевода',  
   btnDownload:'⬇ Скачать субтитры', btnCopy:'Копировать в буфер обмена', lblExpStyle:'Стиль экспорта', assSplit:'раздельный экран', assStack:'две строки', lblFileFmt:'Формат файла', lblExpFmt:'Формат экспорта', fmtMono:'Только перевод', secAssStyle:'Стиль ASS', lblAssDstSize:'Размер перевода', lblAssSrcSize:'Размер оригинала', lblAssDstColor:'Цвет перевода', lblAssSrcColor:'Цвет оригинала', lblAssDstMarginV:'Отступ снизу (перевод)', lblAssSrcMarginV:'Отступ снизу (оригинал)', assDstMVTip:'Расстояние от строки перевода до нижнего края (px, 1080p). Значение по умолчанию зависит от режима (раздельный экран/две строки) и того, какая строка сверху; после ручного изменения оно фиксируется.', assSrcMVTip:'Расстояние от строки оригинала до нижнего края (px, 1080p). В режиме раздельного экрана строка оригинала сверху также отсчитывается от нижнего края; после ручного изменения значение фиксируется.', assSizeRec:'Рекомендуется ', assApply:'Применить', assUndo:'Отменить', assKept:'своё', assAutoReset:'Сброшено для новой раскладки', assMVRec:'Рекомендуется ',assSizeFollow:'Заполнено отраслевыми справочными значениями — можно менять',assSizeLocked:'Используется ваше значение; отраслевая рекомендация выше — лишь ориентир', assColorTip:'Введите цвет в HEX (#RRGGBB), например #FFFFFF (белый) или #FFD700 (золотой).',
-  showTitle:'Один файл субтитров — столько способов экспорта', showSub:'Перевод + оригинал на ваш вкус: 4 формата × 5 макетов, 14 стилей экспорта', showMono:'Только перевод', showBi:'Двуязычные строки · SRT/VTT', showSplit:'Верх-низ · ASS', showStack:'Две строки · ASS · со стилями', showNote:'Оригинал или перевод сверху, плюс TXT-транскрипт', showLineDst:'♪ Любовь витает в воздухе ♪', fmtBiSrc:'Двуязычный · оригинал сверху', fmtBiDst:'Двуязычный · перевод сверху', hintOutName:'Суффикс языка в имени файла следует за языком перевода.',
+  showTitle:'Один файл субтитров — столько способов экспорта', showSub:'Перевод + оригинал на ваш вкус: 4 формата × 5 макетов, 14 стилей экспорта', showMono:'Только перевод', showBi:'Двуязычные строки · SRT/VTT', showSplit:'Верх-низ · ASS', showStack:'Две строки · ASS · со стилями', showNote:'Оригинал или перевод сверху, плюс TXT-транскрипт', showLineDst:'♪ Любовь витает в воздухе ♪', fmtBiSrc:'Двуязычный · оригинал сверху', fmtBiDst:'Двуязычный · перевод сверху', 
   logTitle:'Журнал', logReady:'Готово. Импортируйте субтитры или загрузите пример.',
   stTotal:'Субтитров', stDone:'Готово', stDrop:'Заполнители убраны', stMerge:'Многострочные группы', stWrap:'Перенесено', stIssues:'Осталось',
   fAll:'Все', fTodo:'Только не переведённые', fDone:'Только готовые', fFlag:'Только отмеченные',
@@ -2532,7 +2563,7 @@ userStop:'Остановлено пользователем.', postEnd:'Пере
   aboutBody:'AI-SRTSub — субтитровочный ИИ-переводчик с открытым кодом. Мы уверены: хороший инструмент должен быть бесплатным, чистым и уважать приватность — без рекламы, без регистрации, не трогая ваши файлы. Разворачивайте у себя и совершенствуйте вместе с нами.', aboutRepo:'Репозиторий GitHub', aboutLicense:'Открытый код AGPL-3.0', wsBackHome:'Главная',
   wsUploadNew:'Новые субтитры', projEmpty:'Субтитры не загружены', secImport:'Импорт', secLang:'Языки',
   secStyle:'Стиль', secRules:'Правила', secEngine:'Движок', lblSrcShort:'Исходный язык',
-  lblDstShort:'Целевой язык', lblKeepTermsShort:'Имена собственные', lblAutoTermsShort:'Автоглоссарий', lblMaxWShort:'Ширина строки', lblBiMaxWShort:'Ширина билингвы (перевод)', wUnit:'символов', lblLyric:'Тексты песен', lyricTrans:'Переводить', lyricKeep:'Оставить оригинал', lyricDrop:'Удалить', lblMarks:'Маркеры песен', lblDropFillers:'Удалять слова-паразиты',
+  lblDstShort:'Целевой язык', lblKeepTermsShort:'Имена собственные', lblAutoTermsShort:'Автоглоссарий', secWrap:'Перенос строк', wrapTip:'Повторный перевод не нужен — перенос строк в одноязычных субтитрах виден в редакторе сразу.', lblMaxWShort:'Ширина строки', lblBiMaxWShort:'Ширина билингвы', wUnit:'символов', lblLyric:'Тексты песен', lyricTrans:'Переводить', lyricKeep:'Оставить оригинал', lyricDrop:'Удалить', lblMarks:'Маркеры песен', lblDropFillers:'Удалять слова-паразиты',
   /* v0.9.70 两段式界面新增 */
 },
 'it': {pureMTMode:'Modello di traduzione pura rilevato ({0}): si passa alla traduzione diretta per gruppo ({1} gruppi, 4 in parallelo, i gruppi riusciti vengono messi in cache)…',pureMTDone:'Traduzione per gruppo completata: {0}/{1} gruppi riusciti',gotClick:'Ricevuta la richiesta di avvio traduzione — preparazione…',reqSent:'Richiesta del lotto {0} inviata ({1} gruppi) — in attesa della risposta del modello…',waitSec:'Attesa di {0} s — ancora nessuna risposta dal modello…',errTimeout:'Nessuna risposta dopo {0} s — richiesta abbandonata (timeout). Riduci il budget di caratteri per lotto oppure passa a un modello più veloce; se il modello ragiona prima di rispondere (Qwen3, GLM…), inserisci {"enable_thinking":false} nei parametri aggiuntivi',alreadyRunning:'L’esecuzione precedente non è ancora finita — è stato richiesto l’arresto. Attendi la fine del lotto corrente prima di riavviare',modeMismatch:'Attenzione: i campi API personalizzata sono compilati qui sotto ({0}), ma la modalità è «Modello predefinito», quindi non verranno usati. Passa alla modalità «API personalizzata» per usarli',errTruncOut:'L\'output del modello ha raggiunto il limite di token ed è stato troncato prima della fine — aumenta max_tokens nei parametri aggiuntivi, es. {"max_tokens":8192}',lblExtra:'Parametri di richiesta aggiuntivi (JSON, opzionale)',extraTip:'Unito al corpo di ogni richiesta API personalizzata. Es.: {"enable_thinking":false} per disattivare il ragionamento; {"response_format":{"type":"json_object"}} per forzare il JSON. model / messages / temperature / stream non sono sovrascrivibili.',fbRoute:'Nota: la chiamata al modello B ({0}) non è riuscita; questo lotto è stato tradotto dal modello A ({1}). Motivo: {2}',
@@ -2566,9 +2597,9 @@ userStop:'Остановлено пользователем.', postEnd:'Пере
   lblMaxW:'Larghezza della riga in UNITÀ a larghezza piena, non in caratteri: 1 carattere CJK = 1; lettere latine, cirilliche, thai e arabe = 0.5, quindi 1 unità ≈ 2 caratteri per le scritture a mezza larghezza. Regola il ritorno a capo monolingue e le righe a due parlanti «- A - B» in esportazione bilingue. Il predefinito segue la norma Netflix per lingua (zh/ko 16, ja 13, altre 21). Più grande = righe più lunghe, meno a capo e meno divisioni.', lblBiMaxW:'Larghezza massima della riga TRADOTTA in esportazione bilingue (stessa unità a larghezza piena, non caratteri: lo stesso 32 corrisponde a circa 32 caratteri cinesi ma circa 64 caratteri thai). Limita solo la riga tradotta; la riga sorgente segue le interruzioni semantiche e non è limitata in larghezza, e le righe a due parlanti usano la «Larghezza riga» sopra. Solo il superamento divide la timeline. Questo valore NON cambia per lingua. Più grande = meno divisioni ma righe tradotte più lunghe.', btnGo:'▶ Avvia traduzione', btnGoStop:'Traduzione in corso… clicca per fermare', lyricTip:'Come gestire le righe cantate: traduci / mantieni l\'originale / rimuovi. Il riconoscimento usa i caratteri in «Marcatori testi».', marksTip:'Le righe che contengono questi caratteri sono trattate come testi di canzoni. Predefinito ♪♫♬♩ — aggiungi o rimuovi liberamente; lasciando vuoto si ripristina il predefinito. Se il tuo file non usa simboli musicali, aggiungi il marcatore che usa. Se una riga contiene sia canto che dialogo, «Rimuovi» passa automaticamente a mantenere l\'originale, così il dialogo non viene cancellato.', lyricSkipKeep:'{0} gruppi di testi mantenuti in lingua originale secondo l\'impostazione (non tradotti)', lyricSkipDrop:'{0} gruppi di testi rimossi secondo l\'impostazione', lyricWarn:'Attenzione: il {0}% delle righe è stato classificato come testo di canzone — l\'insieme di marcatori potrebbe essere troppo ampio. Controlla e riavvia.', dropFillersTip:'Attivo: le righe che la regola locale considera puro riempitivo (ehm, hmm, canticchiare senza senso) vengono rimosse direttamente e non inviate al modello, quindi il risultato è deterministico. Disattivo: tutte le righe vanno al modello, che decide caso per caso se tradurre, mantenere o rimuovere. Attivo per impostazione predefinita.',
   btnPost:'↻ Solo post-elaborazione (a capo/pulizia tag)',
   hintPrivacy:'Modello predefinito: i sottotitoli passano dal server di questo sito verso il fornitore configurato dall\'amministratore; API personalizzata: il fornitore scelto li elabora direttamente, senza passare da questo sito.',
-  stepExport:'Esporta traduzione', lblOutName:'Nome file di esportazione (automatico: nome origine + lingua di destinazione)', outPh:'xxx_tradotto.srt',
+  stepExport:'Esporta traduzione',  
   btnDownload:'⬇ Scarica sottotitoli', btnCopy:'Copia negli appunti', lblExpStyle:'Stile di esportazione', assSplit:'schermo diviso', assStack:'su due righe', lblFileFmt:'Formato file', lblExpFmt:'Formato di esportazione', fmtMono:'Solo traduzione', secAssStyle:'Stile ASS', lblAssDstSize:'Dimensione traduzione', lblAssSrcSize:'Dimensione originale', lblAssDstColor:'Colore traduzione', lblAssSrcColor:'Colore originale', lblAssDstMarginV:'Margine inferiore (traduzione)', lblAssSrcMarginV:'Margine inferiore (originale)', assDstMVTip:'Distanza della riga di traduzione dal bordo inferiore (px, 1080p). Il valore predefinito segue la modalità (schermo diviso/due righe) e quale riga sta in alto; dopo la modifica manuale resta fisso.', assSrcMVTip:'Distanza della riga originale dal bordo inferiore (px, 1080p). In modalità schermo diviso, anche se la riga originale sta in alto, si misura comunque dal bordo inferiore; dopo la modifica manuale resta fisso.', assSizeRec:'Consigliato: ', assApply:'Applica', assUndo:'Annulla', assKept:'tuo', assAutoReset:'Reimpostato per il nuovo layout', assMVRec:'Consigliato: ',assSizeFollow:'Precompilato con i valori di riferimento del settore — modificabile',assSizeLocked:'Viene usato il tuo valore; il riferimento del settore sopra è solo una guida', assColorTip:'Inserisci un colore esadecimale #RRGGBB, es. #FFFFFF (bianco) o #FFD700 (oro).',
-  showTitle:'Un file di sottotitoli, tanti modi per esportarlo', showSub:'Traduzione + originale a piacere: 4 formati × 5 layout, 14 stili di esportazione', showMono:'Solo traduzione', showBi:'Bilingue due righe · SRT/VTT', showSplit:'Schermo diviso · ASS', showStack:'Due righe · ASS · con stile', showNote:'Originale o traduzione in evidenza, e anche TXT affiancato', showLineDst:'♪ L\'amore è nell\'aria ♪', fmtBiSrc:'Bilingue · origine sopra', fmtBiDst:'Bilingue · traduzione sopra', hintOutName:'Il suffisso della lingua nel nome file segue la lingua di destinazione.',
+  showTitle:'Un file di sottotitoli, tanti modi per esportarlo', showSub:'Traduzione + originale a piacere: 4 formati × 5 layout, 14 stili di esportazione', showMono:'Solo traduzione', showBi:'Bilingue due righe · SRT/VTT', showSplit:'Schermo diviso · ASS', showStack:'Due righe · ASS · con stile', showNote:'Originale o traduzione in evidenza, e anche TXT affiancato', showLineDst:'♪ L\'amore è nell\'aria ♪', fmtBiSrc:'Bilingue · origine sopra', fmtBiDst:'Bilingue · traduzione sopra', 
   logTitle:'Registro', logReady:'Pronto. Importa i sottotitoli o carica l\'esempio.',
   stTotal:'Sottotitoli', stDone:'Completati', stDrop:'Riempitivi rimossi', stMerge:'Gruppi multi-cue', stWrap:'Ritorni a capo', stIssues:'In sospeso',
   fAll:'Tutti', fTodo:'Solo in sospeso', fDone:'Solo completati', fFlag:'Solo contrassegnati',
@@ -2631,7 +2662,7 @@ userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozi
   aboutBody:'AI-SRTSub è un traduttore di sottotitoli AI open source. Crediamo che un buon strumento debba essere gratuito, pulito e rispettoso della privacy — niente pubblicità, niente registrazione, nessuno tocca i tuoi file. Self-host e contributi benvenuti.', aboutRepo:'Repository GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Home',
   wsUploadNew:'Nuovi sottotitoli', projEmpty:'Nessun sottotitolo caricato', secImport:'Importa', secLang:'Lingue',
   secStyle:'Stile', secRules:'Regole', secEngine:'Motore', lblSrcShort:'Lingua origine',
-  lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Nomi propri', lblAutoTermsShort:'Glossario automatico', lblMaxWShort:'Larghezza riga', lblBiMaxWShort:'Larghezza bilingue (tradotto)', wUnit:'caratteri', lblLyric:'Testi delle canzoni', lyricTrans:'Traduci', lyricKeep:'Mantieni originale', lyricDrop:'Rimuovi', lblMarks:'Marcatori testi', lblDropFillers:'Rimuovi riempitivi',
+  lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Nomi propri', lblAutoTermsShort:'Glossario automatico', secWrap:'A capo', wrapTip:'Nessuna ritraduzione necessaria: l’a capo dei sottotitoli monolingui si vede subito nell’editor.', lblMaxWShort:'Larghezza riga', lblBiMaxWShort:'Larghezza bilingue', wUnit:'caratteri', lblLyric:'Testi delle canzoni', lyricTrans:'Traduci', lyricKeep:'Mantieni originale', lyricDrop:'Rimuovi', lblMarks:'Marcatori testi', lblDropFillers:'Rimuovi riempitivi',
   /* v0.9.70 两段式界面新增 */
 },
 'ar': {pureMTMode:'تم اكتشاف نموذج ترجمة خالص ({0}): التحويل إلى الترجمة المباشرة لكل مجموعة ({1} مجموعات، 4 بالتوازي، تُخزَّن المجموعات الناجحة مؤقتًا)…',pureMTDone:'اكتملت الترجمة لكل مجموعة: نجحت {0} من {1}',gotClick:'تم استلام طلب بدء الترجمة — جارٍ التحضير…',reqSent:'تم إرسال طلب الدفعة {0} ({1} مجموعة) — في انتظار رد النموذج…',waitSec:'انتظار {0} ثانية — لا تزال الاستجابة من النموذج غير واردة…',errTimeout:'لا استجابة بعد {0} ثانية — تم إلغاء الطلب (انتهت المهلة). جرّب تقليل ميزانية الأحرف لكل دفعة أو استخدم نموذجاً أسرع؛ وإذا كان النموذج يفكر قبل الإجابة (Qwen3، GLM…)، ضع {"enable_thinking":false} في معاملات الطلب الإضافية',alreadyRunning:'التشغيل السابق لم ينتهِ بعد — تم طلب الإيقاف. انتظر انتهاء الدفعة الحالية قبل البدء من جديد',modeMismatch:'تنبيه: تم تعبئة حقول API مخصصة أدناه ({0})، لكن الوضع الحالي هو «النموذج الافتراضي»، لذا لن تُستخدم. غيّر الوضع إلى «API مخصصة» لاستخدامها',errTruncOut:'تم قطع إخراج النموذج عند حد الرموز قبل اكتماله — ارفع max_tokens في معاملات الطلب الإضافية، مثل {"max_tokens":8192}',lblExtra:'معاملات طلب إضافية (JSON، اختياري)',extraTip:'تُدمَج في جسم كل طلب لواجهة API المخصصة. مثل {"enable_thinking":false} لإيقاف التفكير، و{"response_format":{"type":"json_object"}} لإجبار JSON. لا يمكن تجاوز model / messages / temperature / stream.',fbRoute:'تنبيه: تعذّر استدعاء النموذج B ({0})؛ تمت ترجمة هذه الدفعة بالنموذج A ({1}). السبب: {2}',
@@ -2665,9 +2696,9 @@ userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozi
   lblMaxW:'عرض السطر بوحدات العرض الكامل، لا بعدد الأحرف: حرف CJK واحد = 1؛ الحروف اللاتينية والسيريلية والتايلاندية والعربية = 0.5، أي أن الوحدة الواحدة ≈ حرفان في الكتابات نصف العرض. يتحكم في التفاف السطر أحادي اللغة وفي سطور المتحدثين «- A - B» عند التصدير ثنائي اللغة. القيمة الافتراضية وفق معيار Netflix لكل لغة (zh/ko 16، ja 13، أخرى 21). أكبر = سطور أطول وتقسيمات أقل.', lblBiMaxW:'أقصى عرض لسطر الترجمة عند التصدير ثنائي اللغة (بنفس وحدة العرض الكامل، لا بعدد الأحرف: القيمة 32 نفسها ≈ 32 حرفاً صينياً لكن ≈ 64 حرفاً تايلاندياً). يقيد سطر الترجمة فقط؛ سطر المصدر يتبع الفواصل الدلالية وغير مقيد بالعرض، وسطور المتحدثين تستخدم «عرض السطر» أعلاه. تجاوز هذا الحد وحده هو ما يقسم الخط الزمني. هذه القيمة لا تتغير حسب اللغة. أكبر = تقسيمات أقل لكن سطور ترجمة أطول.', btnGo:'▶ ابدأ الترجمة', btnGoStop:'جارٍ الترجمة… انقر للإيقاف', lyricTip:'كيفية التعامل مع أسطر الغناء: ترجمة / إبقاء النص الأصلي / حذف. يتم التعرّف عليها عبر المحارف في «علامات الأغنية».', marksTip:'الأسطر التي تحتوي هذه المحارف تُعامل ككلمات أغنية. الافتراضي ♪♫♬♩ — يمكن الإضافة أو الحذف، وتركه فارغاً يعيد الافتراضي. إذا كان ملفك لا يستخدم رموزاً موسيقية، أضف العلامة التي يستخدمها. إذا جمع سطر واحد بين الغناء والحوار، يتحول «حذف» تلقائياً إلى إبقاء الأصل حتى لا يُحذف الحوار.', lyricSkipKeep:'تم إبقاء {0} مجموعة غنائية باللغة الأصلية حسب الإعداد (دون ترجمة)', lyricSkipDrop:'تم حذف {0} مجموعة غنائية حسب الإعداد', lyricWarn:'تنبيه: صُنّف {0}% من الأسطر ككلمات أغنية — ربما كانت العلامات أوسع من اللازم. تحقق ثم أعد التشغيل.', dropFillersTip:'مفعّل: الأسطر التي تعدّها القاعدة المحلية حشواً خالصاً (إم، همهمة بلا معنى) تُحذف مباشرة ولا تُرسل إلى النموذج، فتكون النتيجة محددة. معطّل: تُرسل كل الأسطر إلى النموذج، وهو يقرر سطراً بسطر هل يترجمها أم يبقيها أم يحذفها. مفعّل افتراضياً.',
   btnPost:'↻ معالجة لاحقة فقط (التفاف/تنظيف الوسوم)',
   hintPrivacy:'النموذج الافتراضي: تمر الترجمات عبر خادم هذا الموقع إلى المزوّد الذي أعدّه المشرف؛ API مخصص: يعالجها المزوّد الذي اخترته مباشرة دون المرور بهذا الموقع.',
-  stepExport:'تصدير الترجمة', lblOutName:'اسم ملف التصدير (تلقائي: اسم المصدر + لغة الهدف)', outPh:'xxx_translated.srt',
+  stepExport:'تصدير الترجمة',  
   btnDownload:'⬇ تنزيل الترجمات', btnCopy:'نسخ إلى الحافظة', lblExpStyle:'نمط التصدير', assSplit:'شاشة مقسومة', assStack:'سطران متراكبان', lblFileFmt:'صيغة الملف', lblExpFmt:'صيغة التصدير', fmtMono:'الترجمة فقط', secAssStyle:'نمط ASS', lblAssDstSize:'حجم الترجمة', lblAssSrcSize:'حجم النص الأصلي', lblAssDstColor:'لون الترجمة', lblAssSrcColor:'لون النص الأصلي', lblAssDstMarginV:'المسافة من الأسفل (الترجمة)', lblAssSrcMarginV:'المسافة من الأسفل (النص الأصلي)', assDstMVTip:'المسافة من سطر الترجمة إلى الحافة السفلية (بكسل، أساس 1080p). تتغير القيمة الافتراضية حسب النمط (شاشة مقسومة/سطران) وأي سطر في الأعلى؛ بعد التعديل اليدوي تُثبَّت القيمة.', assSrcMVTip:'المسافة من سطر النص الأصلي إلى الحافة السفلية (بكسل، أساس 1080p). في نمط الشاشة المقسومة، حتى لو كان النص الأصلي في الأعلى، تُحسب المسافة من الحافة السفلية؛ بعد التعديل اليدوي تُثبَّت القيمة.', assSizeRec:'مُوصى به: ', assApply:'تطبيق', assUndo:'تراجع', assKept:'الحالي', assAutoReset:'إعادة التعيين للتخطيط الجديد', assMVRec:'مُوصى به: ',assSizeFollow:'مُعبَّأ تلقائيًا بقيم مرجعية من الصناعة — يمكنك التعديل بحرية',assSizeLocked:'يُستخدم إعدادك؛ القيم المرجعية أعلاه للاسترشاد فقط', assColorTip:'أدخل لونًا بالنظام الست عشري #RRGGBB، مثل #FFFFFF (أبيض) أو #FFD700 (ذهبي).',
-  showTitle:'ملف ترجمة واحد، وطرق تصدير كثيرة', showSub:'الترجمة + الأصل كما تشاء: 4 صيغ × 5 تخطيطات، 14 نمط تصدير', showMono:'الترجمة فقط', showBi:'سطران ثنائيا اللغة · SRT/VTT', showSplit:'تقسيم الشاشة · ASS', showStack:'سطران · ASS · بتنسيق كامل', showNote:'الأصل في الأعلى أو الترجمة في الأعلى، مع تصدير TXT للمقارنة', showLineDst:'♪ الحب في الهواء ♪', fmtBiSrc:'ثنائي اللغة · المصدر أعلى', fmtBiDst:'ثنائي اللغة · الترجمة أعلى', hintOutName:'تتبع لاحقة اللغة في اسم الملف لغة الهدف.',
+  showTitle:'ملف ترجمة واحد، وطرق تصدير كثيرة', showSub:'الترجمة + الأصل كما تشاء: 4 صيغ × 5 تخطيطات، 14 نمط تصدير', showMono:'الترجمة فقط', showBi:'سطران ثنائيا اللغة · SRT/VTT', showSplit:'تقسيم الشاشة · ASS', showStack:'سطران · ASS · بتنسيق كامل', showNote:'الأصل في الأعلى أو الترجمة في الأعلى، مع تصدير TXT للمقارنة', showLineDst:'♪ الحب في الهواء ♪', fmtBiSrc:'ثنائي اللغة · المصدر أعلى', fmtBiDst:'ثنائي اللغة · الترجمة أعلى', 
   logTitle:'السجل', logReady:'جاهز. استورد الترجمات أو حمّل المثال.',
   stTotal:'الترجمات', stDone:'مكتمل', stDrop:'حشو أزيل', stMerge:'مجموعات متعددة', stWrap:'ملتف', stIssues:'معلّق',
   fAll:'الكل', fTodo:'المعلّق فقط', fDone:'المكتمل فقط', fFlag:'المعلّم فقط',
@@ -2730,7 +2761,7 @@ userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، ت
   aboutBody:'AI-SRTSub أداة ترجمة ترجمات بالذكاء الاصطناعي مفتوحة المصدر. نؤمن أن الأداة الجيدة يجب أن تكون مجانية ونظيفة وتحترم الخصوصية — بلا إعلانات ولا تسجيل ولا العبث بملفاتك. رحّبنا بالتثبيت الذاتي وباقتراحات التطوير.', aboutRepo:'مستودع GitHub', aboutLicense:'مفتوح المصدر AGPL-3.0', wsBackHome:'الرئيسية',
   wsUploadNew:'ترجمة جديدة', projEmpty:'لم تُحمَّل ترجمة', secImport:'استيراد', secLang:'اللغات',
   secStyle:'الأسلوب', secRules:'القواعد', secEngine:'المحرك', lblSrcShort:'لغة المصدر',
-  lblDstShort:'اللغة الهدف', lblKeepTermsShort:'الأسماء الخاصة', lblAutoTermsShort:'مسرد تلقائي', lblMaxWShort:'عرض السطر', lblBiMaxWShort:'عرض ثنائي اللغة (مترجم)', wUnit:'حرف', lblLyric:'كلمات الأغاني', lyricTrans:'ترجمة', lyricKeep:'إبقاء الأصل', lyricDrop:'حذف', lblMarks:'علامات الأغنية', lblDropFillers:'حذف كلمات الحشو',
+  lblDstShort:'اللغة الهدف', lblKeepTermsShort:'الأسماء الخاصة', lblAutoTermsShort:'مسرد تلقائي', secWrap:'التفاف الأسطر', wrapTip:'لا حاجة لإعادة الترجمة — يظهر التفاف الأسطر في الترجمة أحادية اللغة فورًا في منطقة التحرير.', lblMaxWShort:'عرض السطر', lblBiMaxWShort:'عرض ثنائي اللغة', wUnit:'حرف', lblLyric:'كلمات الأغاني', lyricTrans:'ترجمة', lyricKeep:'إبقاء الأصل', lyricDrop:'حذف', lblMarks:'علامات الأغنية', lblDropFillers:'حذف كلمات الحشو',
   /* v0.9.70 两段式界面新增 */
 },
 'tr': {pureMTMode:'Saf çeviri modeli algılandı ({0}): grup başına doğrudan çeviriye geçiliyor ({1} grup, 4 paralel, başarılı gruplar önbelleğe alınıyor)…',pureMTDone:'Grup çevirisi tamamlandı: {0}/{1} grup başarılı',gotClick:'“Çeviriyi başlat” isteği alındı — hazırlanıyor…',reqSent:'{0}. parti isteği gönderildi ({1} grup) — model yanıtı bekleniyor…',waitSec:'{0} saniye geçti — modelden hâlâ yanıt yok…',errTimeout:'{0} saniye sonra yanıt yok — istek iptal edildi (zaman aşımı). Parti başına karakter bütçesini küçültmeyi veya daha hızlı bir modele geçmeyi deneyin; model yanıt vermeden önce düşünüyorsa (Qwen3, GLM…), ek istek parametrelerine {"enable_thinking":false} yazın',alreadyRunning:'Önceki çalıştırma henüz bitmedi — durdurma istendi. Yeniden başlamadan önce mevcut partinin tamamlanmasını bekleyin',modeMismatch:'Dikkat: aşağıda özel API alanları doldurulmuş ({0}), ancak mod “Varsayılan model” olduğu için kullanılmayacak. Kullanmak için modu “Özel API” olarak değiştirin',errTruncOut:'Model çıktısı token sınırına takılıp tamamlanmadan kesildi — Ek istek parametrelerinde max_tokens değerini artırın, örn. {"max_tokens":8192}',lblExtra:'Ek istek parametreleri (JSON, isteğe bağlı)',extraTip:'Her özel API isteğinin gövdesine eklenir. Örn. {"enable_thinking":false} akıl yürütmeyi kapatır; {"response_format":{"type":"json_object"}} JSON çıktısını zorlar. model / messages / temperature / stream üzerine yazılamaz.',fbRoute:'Not: model B ({0}) çağrısı başarısız oldu; bu parti model A ({1}) ile çevrildi. Sebep: {2}',
@@ -2764,9 +2795,9 @@ userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، ت
   lblMaxW:'Satır genişliği tam genişlik BİRİMİ cinsindendir, karakter sayısı değil: 1 CJK karakteri = 1; Latin, Kiril, Tay ve Arap harfleri = 0.5, yani yarım genişlikli yazılarda 1 birim ≈ 2 karakter. Tek dilli sarma ve iki dilli dışa aktarımda «- A - B» iki konuşmacı satırlarını yönetir. Varsayılan dile göre Netflix standardını izler (zh/ko 16, ja 13, diğer 21). Büyütmek = daha uzun satırlar, daha az sarma ve bölme.', lblBiMaxW:'İki dilli dışa aktarımda ÇEVİRİ satırının maksimum genişliği (aynı tam genişlik birimi, karakter sayısı değil: aynı 32 değeri ≈ 32 Çince karakter ama ≈ 64 Tay karakteri). Yalnızca çeviri satırını sınırlar; kaynak satır anlamsal kesme noktalarını izler ve genişlikle sınırlı değildir, iki konuşmacı satırları yukarıdaki «Satır genişliği» değerini kullanır. Yalnızca aşılması zaman çizelgesini böler. Bu değer dile göre DEĞİŞMEZ. Büyütmek = daha az bölme ama daha uzun çeviri satırları.', btnGo:'▶ Çeviriyi başlat', btnGoStop:'Çevriliyor… durdurmak için tıkla', lyricTip:'Şarkı satırlarının işlenmesi: çevir / orijinali koru / kaldır. Tanıma, «Şarkı işaretleri»ndeki karakterlerle yapılır.', marksTip:'Bu karakterleri içeren satırlar şarkı sözü sayılır. Varsayılan ♪♫♬♩ — ekleyip çıkarabilirsiniz; boş bırakırsanız varsayılan geri gelir. Dosyanız müzik simgesi kullanmıyorsa, kullandığı işareti ekleyin. Bir satırda hem şarkı hem diyalog varsa, «Kaldır» otomatik olarak orijinali korumaya döner, böylece diyalog silinmez.', lyricSkipKeep:'{0} şarkı sözü grubu ayara göre orijinal dilde bırakıldı (çevrilmedi)', lyricSkipDrop:'{0} şarkı sözü grubu ayara göre kaldırıldı', lyricWarn:'Dikkat: satırların {0}%\'i şarkı sözü olarak sınıflandırıldı — işaret kümesi fazla geniş olabilir. Kontrol edip yeniden çalıştırın.', dropFillersTip:'Açık: yerel kuralın salt dolgu sözcük olarak değerlendirdiği satırlar (ıı, hmm, anlamsız mırıldanma) doğrudan kaldırılır ve modele gönderilmez, bu yüzden sonuç kesindir. Kapalı: tüm satırlar modele gider ve model her satır için çevirmek mi, korumak mı yoksa silmek mi gerektiğine tek tek karar verir. Varsayılan olarak açık.',
   btnPost:'↻ Sadece son işlem (satır sarma/etiket temizleme)',
   hintPrivacy:'Varsayılan model: altyazılar bu sitenin sunucusu üzerinden yöneticinin yapılandırdığı sağlayıcıya iletilir; Özel API: seçtiğin sağlayıcı bunları doğrudan işler, bu siteye uğramaz.',
-  stepExport:'Çeviriyi dışa aktar', lblOutName:'Dışa aktarma dosya adı (otomatik: kaynak adı + hedef dil)', outPh:'xxx_cevrildi.srt',
+  stepExport:'Çeviriyi dışa aktar',  
   btnDownload:'⬇ Altyazıları indir', btnCopy:'Panoya kopyala', lblExpStyle:'Dışa aktarma stili', assSplit:'bölünmüş ekran', assStack:'üst üste iki satır', lblFileFmt:'Dosya biçimi', lblExpFmt:'Dışa aktarma biçimi', fmtMono:'Sadece çeviri', secAssStyle:'ASS stili', lblAssDstSize:'Çeviri boyutu', lblAssSrcSize:'Orijinal boyut', lblAssDstColor:'Çeviri rengi', lblAssSrcColor:'Orijinal renk', lblAssDstMarginV:'Alt boşluk (çeviri)', lblAssSrcMarginV:'Alt boşluk (orijinal)', assDstMVTip:'Çeviri satırının alt kenara uzaklığı (px, 1080p). Varsayılan değer bölünmüş/iki satır moduna ve hangi satırın üstte olduğuna göre değişir; elle değiştirildiğinde sabit kalır.', assSrcMVTip:'Orijinal satırın alt kenara uzaklığı (px, 1080p). Bölünmüş modda orijinal satır üstte olsa bile alt kenardan ölçülür; elle değiştirildiğinde sabit kalır.', assSizeRec:'Önerilen: ', assApply:'Uygula', assUndo:'Geri al', assKept:'mevcut', assAutoReset:'Yeni düzene göre sıfırlandı', assMVRec:'Önerilen: ',assSizeFollow:'Sektör referans değerleriyle otomatik doldurulur; istediğiniz gibi değiştirebilirsiniz',assSizeLocked:'Sizin değeriniz kullanılıyor; üstteki sektör referansı yalnızca rehberdir', assColorTip:'Onaltılık #RRGGBB renk değeri girin, ör. #FFFFFF (beyaz) veya #FFD700 (altın).',
-  showTitle:'Tek altyazı dosyası, birçok dışa aktarma yolu', showSub:'Çeviri + orijinal dilediğiniz gibi: 4 biçim × 5 düzen, 14 dışa aktarma stili', showMono:'Yalnız çeviri', showBi:'İki dilli çift satır · SRT/VTT', showSplit:'Bölünmüş ekran · ASS', showStack:'Çift satır · ASS · biçimli', showNote:'Orijinal üstte veya çeviri üstte, ayrıca TXT karşılaştırma metni', showLineDst:'♪ Aşk havada ♪', fmtBiSrc:'İki dilli · kaynak üstte', fmtBiDst:'İki dilli · çeviri üstte', hintOutName:'Dosya adındaki dil soneki hedef dili izler.',
+  showTitle:'Tek altyazı dosyası, birçok dışa aktarma yolu', showSub:'Çeviri + orijinal dilediğiniz gibi: 4 biçim × 5 düzen, 14 dışa aktarma stili', showMono:'Yalnız çeviri', showBi:'İki dilli çift satır · SRT/VTT', showSplit:'Bölünmüş ekran · ASS', showStack:'Çift satır · ASS · biçimli', showNote:'Orijinal üstte veya çeviri üstte, ayrıca TXT karşılaştırma metni', showLineDst:'♪ Aşk havada ♪', fmtBiSrc:'İki dilli · kaynak üstte', fmtBiDst:'İki dilli · çeviri üstte', 
   logTitle:'Günlük', logReady:'Hazır. Altyazıları içe aktar veya örneği yükle.',
   stTotal:'Altyazı', stDone:'Tamamlandı', stDrop:'Dolgu temizlendi', stMerge:'Çoklu gruplar', stWrap:'Sarılan', stIssues:'Bekleyen',
   fAll:'Tümü', fTodo:'Sadece bekleyen', fDone:'Sadece tamamlanan', fFlag:'Sadece işaretli',
@@ -2829,7 +2860,7 @@ userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu te
   aboutBody:'AI-SRTSub, açık kaynaklı bir AI altyazı çevirmenidir. İyi bir aracın ücretsiz, temiz ve gizliliğe saygılı olması gerektiğine inanıyoruz — reklam yok, kayıt yok, dosyalarına dokunma yok. Kendi sunucunda çalıştır ya da birlikte cilalayalım.', aboutRepo:'GitHub deposu', aboutLicense:'Açık kaynak AGPL-3.0', wsBackHome:'Ana sayfa',
   wsUploadNew:'Yeni altyazı', projEmpty:'Altyazı yüklenmedi', secImport:'İçe aktar', secLang:'Diller',
   secStyle:'Stil', secRules:'Kurallar', secEngine:'Motor', lblSrcShort:'Kaynak dil',
-  lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimler', lblAutoTermsShort:'Otomatik sözlük', lblMaxWShort:'Satır genişliği', lblBiMaxWShort:'İki dilli genişlik (çeviri)', wUnit:'karakter', lblLyric:'Şarkı sözleri', lyricTrans:'Çevir', lyricKeep:'Orijinali koru', lyricDrop:'Kaldır', lblMarks:'Şarkı işaretleri', lblDropFillers:'Dolgu sözcükleri kaldır',
+  lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimler', lblAutoTermsShort:'Otomatik sözlük', secWrap:'Satır kaydırma', wrapTip:'Yeniden çeviri gerekmez — tek dilli altyazıların satır kaydırması düzenleme alanında hemen görünür.', lblMaxWShort:'Satır genişliği', lblBiMaxWShort:'İki dilli genişlik', wUnit:'karakter', lblLyric:'Şarkı sözleri', lyricTrans:'Çevir', lyricKeep:'Orijinali koru', lyricDrop:'Kaldır', lblMarks:'Şarkı işaretleri', lblDropFillers:'Dolgu sözcükleri kaldır',
   /* v0.9.70 两段式界面新增 */
 },
 'nl': {pureMTMode:'Pure vertaalmodel gedetecteerd ({0}): overschakelen naar directe vertaling per groep ({1} groepen, 4 parallel, geslaagde groepen worden gecacht)…',pureMTDone:'Per groep vertalen voltooid: {0}/{1} groepen geslaagd',gotClick:'Verzoek om te starten met vertalen ontvangen — aan het voorbereiden…',reqSent:'Verzoek voor batch {0} verzonden ({1} groepen) — wachten op antwoord van het model…',waitSec:'{0} s gewacht — nog steeds geen antwoord van het model…',errTimeout:'Geen antwoord na {0} s — verzoek afgebroken (time-out). Verlaag het tekensbudget per batch of kies een sneller model; als het model eerst redeneert voordat het antwoordt (Qwen3, GLM…), zet {"enable_thinking":false} bij Extra verzoekparameters',alreadyRunning:'De vorige run is nog niet klaar — stop is aangevraagd. Wacht tot de huidige batch is afgerond voordat je opnieuw start',modeMismatch:'Let op: hieronder is een aangepaste API ingevuld ({0}), maar de modus is “Standaardmodel”, dus wordt die niet gebruikt. Zet de modus op “Aangepaste API” om hem te gebruiken',errTruncOut:'De modeluitvoer bereikte de tokenlimiet en werd voortijdig afgebroken — verhoog max_tokens bij Extra verzoekparameters, bijv. {"max_tokens":8192}',lblExtra:'Extra verzoekparameters (JSON, optioneel)',extraTip:'Wordt samengevoegd met de body van elke aangepaste API-aanvraag. Bijv. {"enable_thinking":false} om redeneren uit te schakelen; {"response_format":{"type":"json_object"}} dwingt JSON af. model / messages / temperature / stream kunnen niet worden overschreven.',fbRoute:'Let op: de aanroep van model B ({0}) is mislukt; deze batch is vertaald door model A ({1}). Reden: {2}',
@@ -2904,8 +2935,6 @@ userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu te
   btnPost:'↻ Alleen naverwerken (afbreken/tags opruimen)',
   hintPrivacy:'Standaardmodel: ondertitels gaan via de server van deze site naar de door de beheerder ingestelde aanbieder; Eigen API: jouw gekozen aanbieder verwerkt ze rechtstreeks, niet via deze site.',
   stepExport:'Vertaling exporteren',
-  lblOutName:'Exportbestandsnaam (automatisch: bronnaam + doeltaal)',
-  outPh:'xxx_vertaald.srt',
   btnDownload:'⬇ Ondertitels downloaden',
   btnCopy:'Naar klembord kopiëren',
   lblExpStyle:'Exportstijl',
@@ -2942,7 +2971,6 @@ userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu te
   showLineDst:'♪ De liefde hangt in de lucht ♪',
   fmtBiSrc:'Tweetalig · origineel bovenaan',
   fmtBiDst:'Tweetalig · vertaling bovenaan',
-  hintOutName:'Het taalachtervoegsel in de bestandsnaam volgt de doeltaal.',
   logTitle:'Logboek',
   logReady:'Gereed. Importeer ondertitels of laad het voorbeeld.',
   stTotal:'Cues',
@@ -3115,8 +3143,8 @@ rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   lblDstShort:'Doeltaal',
   lblKeepTermsShort:'Eigennamen',
   lblAutoTermsShort:'Automatische woordenlijst',
-  lblMaxWShort:'Regelbreedte',
-  lblBiMaxWShort:'Tweetalige breedte (vertaald)',
+  secWrap:'Regelafbreking', wrapTip:'Niet opnieuw vertalen: de regelafbreking van de eentalige ondertitels is direct in de editor te zien.', lblMaxWShort:'Regelbreedte',
+  lblBiMaxWShort:'Tweetalige breedte',
   wUnit:'tekens',
   lblLyric:'Liedteksten',
   lyricTrans:'Vertalen',
@@ -3197,8 +3225,6 @@ rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   btnPost:'↻ Tylko post-processing (łamanie/czyszczenie tagów)',
   hintPrivacy:'Model domyślny: napisy przechodzą przez serwer tej strony do dostawcy ustawionego przez administratora; Własne API: wybrany dostawca przetwarza je bezpośrednio, bez udziału tej strony.',
   stepExport:'Eksport tłumaczenia',
-  lblOutName:'Nazwa pliku eksportu (auto: nazwa źródła + język docelowy)',
-  outPh:'xxx_przetlumaczone.srt',
   btnDownload:'⬇ Pobierz napisy',
   btnCopy:'Kopiuj do schowka',
   lblExpStyle:'Styl eksportu',
@@ -3235,7 +3261,6 @@ rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   showLineDst:'♪ Miłość wisi w powietrzu ♪',
   fmtBiSrc:'Dwujęzyczne · oryginał na górze',
   fmtBiDst:'Dwujęzyczne · tłumaczenie na górze',
-  hintOutName:'Przyrostek języka w nazwie pliku zależy od języka docelowego.',
   logTitle:'Dziennik',
   logReady:'Gotowe. Zaimportuj napisy lub wczytaj przykład.',
   stTotal:'Linie',
@@ -3408,8 +3433,8 @@ rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   lblDstShort:'Język docelowy',
   lblKeepTermsShort:'Nazwy własne',
   lblAutoTermsShort:'Automatyczny słownik',
-  lblMaxWShort:'Szerokość linii',
-  lblBiMaxWShort:'Szerokość dwujęzyczna (tłumaczenie)',
+  secWrap:'Zawijanie wierszy', wrapTip:'Bez ponownego tłumaczenia — zawijanie wierszy w napisach jednojęzycznych widać od razu w edytorze.', lblMaxWShort:'Szerokość linii',
+  lblBiMaxWShort:'Szerokość dwujęzyczna',
   wUnit:'znaków',
   lblLyric:'Teksty piosenek',
   lyricTrans:'Tłumacz',
@@ -3490,8 +3515,6 @@ rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   btnPost:'↻ Endast efterbehandling (radbryt/städa taggar)',
   hintPrivacy:'Standardmodell: undertexter skickas via den här sajtens server till den leverantör administratören valt; Eget API: din valda leverantör behandlar dem direkt, inte via den här sajten.',
   stepExport:'Exportera översättning',
-  lblOutName:'Exportfilens namn (auto: källnamn + målspråk)',
-  outPh:'xxx_oversatt.srt',
   btnDownload:'⬇ Ladda ner undertexter',
   btnCopy:'Kopiera till urklipp',
   lblExpStyle:'Exportstil',
@@ -3528,7 +3551,6 @@ rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   showLineDst:'♪ Kärleken är i luften ♪',
   fmtBiSrc:'Tvåspråkig · original överst',
   fmtBiDst:'Tvåspråkig · översättning överst',
-  hintOutName:'Språksuffixet i filnamnet följer målspråket.',
   logTitle:'Logg',
   logReady:'Klar. Importera undertexter eller ladda exemplet.',
   stTotal:'Repliker',
@@ -3701,8 +3723,8 @@ rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   lblDstShort:'Målspråk',
   lblKeepTermsShort:'Egennamn',
   lblAutoTermsShort:'Automatisk ordlista',
-  lblMaxWShort:'Radbredd',
-  lblBiMaxWShort:'Tvåspråkig bredd (översatt)',
+  secWrap:'Radbrytning', wrapTip:'Ingen ny översättning behövs — radbrytningen för enspråkiga undertexter syns direkt i redigeraren.', lblMaxWShort:'Radbredd',
+  lblBiMaxWShort:'Tvåspråkig bredd',
   wUnit:'tecken',
   lblLyric:'Sångtexter',
   lyricTrans:'Översätt',
@@ -3783,8 +3805,6 @@ rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   btnPost:'↻ Jen post-processing (zalamování/čištění značek)',
   hintPrivacy:'Výchozí model: titulky jdou přes server tohoto webu k poskytovateli nastavenému správcem; Vlastní API: zpracuje je vámi zvolený poskytovatel přímo, nikoli přes tento web.',
   stepExport:'Export překladu',
-  lblOutName:'Název exportovaného souboru (auto: název zdroje + cílový jazyk)',
-  outPh:'xxx_prelozeno.srt',
   btnDownload:'⬇ Stáhnout titulky',
   btnCopy:'Kopírovat do schránky',
   lblExpStyle:'Styl exportu',
@@ -3821,7 +3841,6 @@ rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   showLineDst:'♪ Láska visí ve vzduchu ♪',
   fmtBiSrc:'Dvojjazyčně · originál nahoře',
   fmtBiDst:'Dvojjazyčně · překlad nahoře',
-  hintOutName:'Přípona jazyka v názvu souboru se řídí cílovým jazykem.',
   logTitle:'Záznam',
   logReady:'Připraveno. Importujte titulky nebo načtěte ukázku.',
   stTotal:'Titulky',
@@ -3994,8 +4013,8 @@ rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   lblDstShort:'Cílový jazyk',
   lblKeepTermsShort:'Vlastní jména',
   lblAutoTermsShort:'Automatický slovníček',
-  lblMaxWShort:'Šířka řádku',
-  lblBiMaxWShort:'Dvojjazyčná šířka (překlad)',
+  secWrap:'Zalamování řádků', wrapTip:'Bez nového překladu — zalamování řádků u jednojazyčných titulků uvidíte hned v editoru.', lblMaxWShort:'Šířka řádku',
+  lblBiMaxWShort:'Dvojjazyčná šířka',
   wUnit:'znaků',
   lblLyric:'Texty písní',
   lyricTrans:'Přeložit',
@@ -4076,8 +4095,6 @@ rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   btnPost:'↻ Лише постобробка (перенесення/очищення тегів)',
   hintPrivacy:'Модель за замовчуванням: субтитри йдуть через сервер цього сайту до постачальника, налаштованого адміністратором; Власний API: обраний постачальник обробляє їх напряму, без участі цього сайту.',
   stepExport:'Експорт перекладу',
-  lblOutName:'Назва файлу експорту (авто: назва джерела + мова перекладу)',
-  outPh:'xxx_perekladeno.srt',
   btnDownload:'⬇ Завантажити субтитри',
   btnCopy:'Копіювати в буфер обміну',
   lblExpStyle:'Стиль експорту',
@@ -4114,7 +4131,6 @@ rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   showLineDst:'♪ Кохання витає в повітрі ♪',
   fmtBiSrc:'Двомовний · оригінал угорі',
   fmtBiDst:'Двомовний · переклад угорі',
-  hintOutName:'Мовний суфікс у назві файлу відповідає мові перекладу.',
   logTitle:'Журнал',
   logReady:'Готово. Імпортуйте субтитри або завантажте приклад.',
   stTotal:'Репліки',
@@ -4287,8 +4303,8 @@ rateWait:'Перевищено ліміт (429), очікування 20 с пе
   lblDstShort:'Мова перекладу',
   lblKeepTermsShort:'Власні назви',
   lblAutoTermsShort:'Автоматичний глосарій',
-  lblMaxWShort:'Ширина рядка',
-  lblBiMaxWShort:'Двомовна ширина (переклад)',
+  secWrap:'Перенесення рядків', wrapTip:'Повторний переклад не потрібен — перенесення рядків в одномовних субтитрах видно в редакторі одразу.', lblMaxWShort:'Ширина рядка',
+  lblBiMaxWShort:'Двомовна ширина',
   wUnit:'символів',
   lblLyric:'Тексти пісень',
   lyricTrans:'Перекласти',
@@ -4369,8 +4385,6 @@ rateWait:'Перевищено ліміт (429), очікування 20 с пе
   btnPost:'↻ Kun efterbehandling (ombrud/rens tags)',
   hintPrivacy:'Standardmodel: undertekster sendes via dette sites server til den udbyder, administratoren har valgt; Eget API: din valgte udbyder behandler dem direkte, ikke via dette site.',
   stepExport:'Eksportér oversættelse',
-  lblOutName:'Eksportfilens navn (auto: kildefilens navn + målsprog)',
-  outPh:'xxx_oversat.srt',
   btnDownload:'⬇ Download undertekster',
   btnCopy:'Kopiér til udklipsholder',
   lblExpStyle:'Eksportstil',
@@ -4407,7 +4421,6 @@ rateWait:'Перевищено ліміт (429), очікування 20 с пе
   showLineDst:'♪ Kærligheden er i luften ♪',
   fmtBiSrc:'Tosproget · original øverst',
   fmtBiDst:'Tosproget · oversættelse øverst',
-  hintOutName:'Sprogsuffikset i filnavnet følger målsproget.',
   logTitle:'Log',
   logReady:'Klar. Importér undertekster eller indlæs eksemplet.',
   stTotal:'Replikker',
@@ -4580,8 +4593,8 @@ rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   lblDstShort:'Målsprog',
   lblKeepTermsShort:'Egennavne',
   lblAutoTermsShort:'Automatisk ordliste',
-  lblMaxWShort:'Linjebredde',
-  lblBiMaxWShort:'Tosproget bredde (oversat)',
+  secWrap:'Linjeskift', wrapTip:'Ingen ny oversættelse nødvendig — linjeskiftet for etsprogede undertekster ses direkte i editoren.', lblMaxWShort:'Linjebredde',
+  lblBiMaxWShort:'Tosproget bredde',
   wUnit:'tegn',
   lblLyric:'Sangtekster',
   lyricTrans:'Oversæt',
@@ -4662,8 +4675,6 @@ rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   btnPost:'↻ Vain jälkikäsittely (rivitys/tagien siivous)',
   hintPrivacy:'Oletusmalli: tekstitykset kulkevat tämän sivuston palvelimen kautta ylläpitäjän määrittämälle tarjoajalle; Oma API: valitsemasi tarjoaja käsittelee ne suoraan, ei tämän sivuston kautta.',
   stepExport:'Vie käännös',
-  lblOutName:'Vientitiedoston nimi (auto: lähdetiedoston nimi + kohdekieli)',
-  outPh:'xxx_kaannetty.srt',
   btnDownload:'⬇ Lataa tekstitykset',
   btnCopy:'Kopioi leikepöydälle',
   lblExpStyle:'Vientityyli',
@@ -4700,7 +4711,6 @@ rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   showLineDst:'♪ Rakkaus on ilmassa ♪',
   fmtBiSrc:'Kaksikielinen · alkuperäinen ylhäällä',
   fmtBiDst:'Kaksikielinen · käännös ylhäällä',
-  hintOutName:'Tiedostonimen kielipääte seuraa kohdekieltä.',
   logTitle:'Loki',
   logReady:'Valmis. Tuo tekstitykset tai lataa esimerkki.',
   stTotal:'Tekstitystä',
@@ -4873,8 +4883,8 @@ rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   lblDstShort:'Kohdekieli',
   lblKeepTermsShort:'Erisnimet',
   lblAutoTermsShort:'Automaattinen sanasto',
-  lblMaxWShort:'Rivin leveys',
-  lblBiMaxWShort:'Kaksikielinen leveys (käännös)',
+  secWrap:'Rivitys', wrapTip:'Uudelleenkääntöä ei tarvita — yksikielisten tekstitysten rivitys näkyy heti editorissa.', lblMaxWShort:'Rivin leveys',
+  lblBiMaxWShort:'Kaksikielinen leveys',
   wUnit:'merkkiä',
   lblLyric:'Laulujen sanat',
   lyricTrans:'Käännä',
@@ -4955,8 +4965,6 @@ rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   btnPost:'↻ Μόνο μετεπεξεργασία (σπάσιμο/καθαρισμός ετικετών)',
   hintPrivacy:'Προεπιλεγμένο μοντέλο: οι υπότιτλοι περνούν από τον διακομιστή αυτού του ιστότοπου προς τον παροχέα που όρισε ο διαχειριστής· Δικό σας API: ο παροχέας που επιλέξατε τους επεξεργάζεται απευθείας, χωρίς να περνούν από αυτόν τον ιστότοπο.',
   stepExport:'Εξαγωγή μετάφρασης',
-  lblOutName:'Όνομα αρχείου εξαγωγής (αυτόματα: όνομα πηγής + γλώσσα στόχος)',
-  outPh:'xxx_metafrasmeno.srt',
   btnDownload:'⬇ Λήψη υποτίτλων',
   btnCopy:'Αντιγραφή στο πρόχειρο',
   lblExpStyle:'Ύφος εξαγωγής',
@@ -4993,7 +5001,6 @@ rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   showLineDst:'♪ Η αγάπη είναι στον αέρα ♪',
   fmtBiSrc:'Δίγλωσσο · πρωτότυπο πάνω',
   fmtBiDst:'Δίγλωσσο · μετάφραση πάνω',
-  hintOutName:'Το επίθημα γλώσσας στο όνομα του αρχείου ακολουθεί τη γλώσσα στόχο.',
   logTitle:'Καταγραφή',
   logReady:'Έτοιμο. Εισάγετε υπότιτλους ή φορτώστε το δείγμα.',
   stTotal:'Υπότιτλοι',
@@ -5166,8 +5173,8 @@ rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επ
   lblDstShort:'Γλώσσα στόχος',
   lblKeepTermsShort:'Κύρια ονόματα',
   lblAutoTermsShort:'Αυτόματο γλωσσάρι',
-  lblMaxWShort:'Πλάτος γραμμής',
-  lblBiMaxWShort:'Δίγλωσσο πλάτος (μετάφραση)',
+  secWrap:'Αναδίπλωση γραμμών', wrapTip:'Δεν χρειάζεται νέα μετάφραση — η αναδίπλωση γραμμών στους μονόγλωσσους υπότιτλους φαίνεται αμέσως στον επεξεργαστή.', lblMaxWShort:'Πλάτος γραμμής',
+  lblBiMaxWShort:'Δίγλωσσο πλάτος',
   wUnit:'χαρακτήρες',
   lblLyric:'Στίχοι τραγουδιών',
   lyricTrans:'Μετάφραση',
@@ -5248,8 +5255,6 @@ rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επ
   btnPost:'↻ עיבוד לאחר בלבד (שבירת שורות/ניקוי תגיות)',
   hintPrivacy:'מודל ברירת מחדל: הכתוביות עוברות דרך שרת האתר לספק שהגדיר המנהל; API משלכם: הספק שבחרתם מעבד אותן ישירות, לא דרך האתר הזה.',
   stepExport:'ייצוא התרגום',
-  lblOutName:'שם קובץ הייצוא (אוטומטי: שם המקור + שפת היעד)',
-  outPh:'xxx_מתורגם.srt',
   btnDownload:'⬇ הורדת כתוביות',
   btnCopy:'העתקה ללוח',
   lblExpStyle:'סגנון ייצוא',
@@ -5286,7 +5291,6 @@ rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επ
   showLineDst:'♪ האהבה באוויר ♪',
   fmtBiSrc:'דו-לשוני · מקור למעלה',
   fmtBiDst:'דו-לשוני · תרגום למעלה',
-  hintOutName:'סיומת השפה בשם הקובץ נגזרת משפת היעד.',
   logTitle:'יומן',
   logReady:'מוכן. ייבאו כתוביות או טענו את הדוגמה.',
   stTotal:'כתוביות',
@@ -5459,8 +5463,8 @@ rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניס�
   lblDstShort:'שפת יעד',
   lblKeepTermsShort:'שמות פרטיים',
   lblAutoTermsShort:'מונחון אוטומטי',
-  lblMaxWShort:'רוחב שורה',
-  lblBiMaxWShort:'רוחב דו-לשוני (תרגום)',
+  secWrap:'שבירת שורות', wrapTip:'אין צורך לתרגם מחדש — שבירת השורות בכתוביות בשפה אחת מוצגת מיד באזור העריכה.', lblMaxWShort:'רוחב שורה',
+  lblBiMaxWShort:'רוחב דו-לשוני',
   wUnit:'תווים',
   lblLyric:'שורות שיר',
   lyricTrans:'תרגום',
@@ -5541,8 +5545,6 @@ rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניס�
   btnPost:'↻ Doar post-procesare (împărțire/curățare etichete)',
   hintPrivacy:'Model implicit: subtitrările trec prin serverul acestui site către furnizorul configurat de administrator; API propriu: furnizorul ales de tine le procesează direct, nu prin acest site.',
   stepExport:'Exportă traducerea',
-  lblOutName:'Numele fișierului exportat (auto: numele sursei + limba țintă)',
-  outPh:'xxx_tradus.srt',
   btnDownload:'⬇ Descarcă subtitrările',
   btnCopy:'Copiază în clipboard',
   lblExpStyle:'Stil de export',
@@ -5579,7 +5581,6 @@ rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניס�
   showLineDst:'♪ Dragostea plutește în aer ♪',
   fmtBiSrc:'Bilingv · originalul sus',
   fmtBiDst:'Bilingv · traducerea sus',
-  hintOutName:'Sufixul de limbă din numele fișierului urmează limba țintă.',
   logTitle:'Jurnal',
   logReady:'Gata. Importă subtitrări sau încarcă exemplul.',
   stTotal:'Replici',
@@ -5752,8 +5753,8 @@ rateWait:'Limită de rată atinsă (429), aștept 20 s înainte de reîncercare�
   lblDstShort:'Limba țintă',
   lblKeepTermsShort:'Nume proprii',
   lblAutoTermsShort:'Glosar automat',
-  lblMaxWShort:'Lățimea rândului',
-  lblBiMaxWShort:'Lățime bilingvă (tradus)',
+  secWrap:'Ruperea rândurilor', wrapTip:'Nu e nevoie de o nouă traducere — ruperea rândurilor la subtitrările monolingve se vede imediat în editor.', lblMaxWShort:'Lățimea rândului',
+  lblBiMaxWShort:'Lățime bilingvă',
   wUnit:'caractere',
   lblLyric:'Versuri',
   lyricTrans:'Tradu',
@@ -5865,7 +5866,6 @@ function applyI18n(){
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPh); });
   if (typeof buildStyleOptions === 'function') buildStyleOptions(); // 导出样式选项的组标签跟随界面语言
   if (typeof buildProviderOptions === 'function') buildProviderOptions(); // 服务商分组的组标签跟随界面语言
-  if (typeof refreshOutPh === 'function') refreshOutPh(); // 导出文件名占位符动态化，覆盖字典静态值
   const ao = document.querySelector('#srcLang option[value=auto]');
   if (ao) ao.textContent = t('autoDetect');
   if (typeof renderRows==='function') renderRows();
@@ -8900,7 +8900,6 @@ function setSrc(text, fileName){
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
-    autoOutName();
   }
   const w=issues.length;
   $('parseInfo').innerHTML= w
@@ -9246,7 +9245,8 @@ function runReport(){
 $('btnDownload').addEventListener('click', ()=>{
   if(!S.rows.length){ log(t('noExport'),'err'); return; }
   runReport();
-  const name=($('outName').value.trim()||('translated.'+expFileFmt()));
+  /* v0.9.190：文件名输入框已删——直接按「源文件名 + 目标语言 + 样式」现算，不再读 DOM */
+  const name=(S.fileBase?autoOutNameStr():('translated.'+expFileFmt()));
   const blob=new Blob([buildExport()],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -9879,11 +9879,7 @@ $('glossFile').addEventListener('change', async ev=>{
   }catch(e){ log(t('errOccur', e.message||String(e)),'err'); }
 });
 
-/* 语言/格式切换联动：列头 + 导出文件名 */
-function autoOutName(){
-  if(!S.fileBase) return;
-  $('outName').value=autoOutNameStr();
-}
+/* 语言/格式切换联动：列头 + 导出文件名（v0.9.190：文件名已无输入框，导出时现算，无需刷新占位符/联动覆盖） */
 function outNameParts(){ /* v0.9.33：文件名按界面语言生成——zh 界面沿用中文语言名+字幕；其余界面用英文语言名+本地化后缀 */
   const fmt=expFmtOf();
   const zhUI=UI.lang==='zh-CN'||UI.lang==='zh-TW';
@@ -9894,19 +9890,6 @@ function outNameParts(){ /* v0.9.33：文件名按界面语言生成——zh 界
 function autoOutNameStr(){
   const p=outNameParts();
   return S.fileBase+'_'+p.langName+p.suf+'.'+expFileFmt();
-}
-function autoNameRe(){ /* 自动命名检测：后缀集合 = 中/英固定词 + 当前界面语言的后缀（v0.9.33） */
-  const words=[...new Set(['字幕','双语字幕','subtitles','bilingual',t('fnSub'),t('fnBi')])];
-  const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return new RegExp('_[^_/]*(?:'+words.map(esc).join('|')+')\\.(srt|vtt|ass|txt|sbv)$','i');
-}
-function refreshOutName(){
-  const v=$('outName').value; if(!v) return;
-  if(autoNameRe().test(v)) autoOutName(); // 仅当仍是自动命名时跟随（v0.9.33 支持各语言后缀），用户改过的名不覆盖
-}
-function refreshOutPh(){ // 占位符跟随 目标语言/导出样式（v0.9.15；v0.9.33 按界面语言命名）
-  const p=outNameParts();
-  $('outName').placeholder='xxx_'+p.langName+p.suf+'.'+expFileFmt();
 }
 /* v0.9.100：ASS 外观设置仅在导出格式为 ASS 时可见——对 SRT/VTT/TXT 无效，避免误导 */
 function syncAssStyleBox(){
@@ -9958,7 +9941,7 @@ ASS_F.dmv={el:$('assDstMV'),hint:$('assDstMVHint'),rec:function(){return assDefa
            isT:function(){return !!UI.assDstMVSet;},setT:function(v){UI.assDstMVSet=v;},after:function(){syncAssMVBox();}};
 ASS_F.smv={el:$('assSrcMV'),hint:$('assSrcMVHint'),rec:function(){return assDefaultMV('src');},
            isT:function(){return !!UI.assSrcMVSet;},setT:function(v){UI.assSrcMVSet=v;},after:function(){syncAssMVBox();}};
-$('expStyle').addEventListener('change',function(){ refreshOutName(); refreshOutPh(); syncAssStyleBox(); assCtxSync(); save(); });
+$('expStyle').addEventListener('change',function(){ syncAssStyleBox(); assCtxSync(); save(); });
 syncAssStyleBox(); syncAssMVBox();
 /* v0.9.110：页面初始化末尾记录当前上下文，之后用户的每一次切换都能被正确判定 */
 ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
@@ -9989,7 +9972,7 @@ ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
 });
 syncColorSw('assDstColor'); syncColorSw('assSrcColor');
 $('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
-$('dstLang').addEventListener('change',()=>{ UI.dstManual=true; refreshOutName(); refreshOutPh(); setColLabels(); save(); });
+$('dstLang').addEventListener('change',()=>{ UI.dstManual=true; setColLabels(); save(); });
 
 /* 其余字段自动保存 */
 ['base','model','apikey','extra','terms','mode','maxW'].forEach(id=>$(id).addEventListener('change',save));
@@ -10090,7 +10073,6 @@ ulang.addEventListener('change', ()=>{
   /* 界面语言切换时，若用户从未手动选过目标语言，目标语言跟随切换 */
   if(!UI.dstManual && LANGS.some(l=>l.v===UI.lang)){
     $('dstLang').value = UI.lang;
-    refreshOutName();
   }
   applyI18n();
   /* URL 与界面语言保持一致（可分享、可被搜索引擎按语言收录）；仅 http(s) 环境下改写 */

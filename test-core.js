@@ -4201,6 +4201,74 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/mw\.addEventListener\('change'/.test(html), 'maxW 没有绑 change 触发重排');
     assert.ok(/if \(S\.translating\) return;/.test(html), 'reflowRows 没有排除翻译进行中的情况');
   });
+
+  /* v0.9.190：① 删掉「导出文件名」输入框（纯伪需求，文件名本来就自动生成）
+     ② 折行设置加标题 + 说明（用户以为改折行要重跑翻译，所以宁可不改）
+     ③ 右栏卡片放开高度（加了两组折行设置后矮屏出内滚动条）。 */
+  t('v0.9.190 删掉导出文件名输入框（占位与提示文案一并清干净）', () => {
+    assert.ok(!/id="outName"/.test(html), '文件名输入框还在');
+    assert.ok(!/\$\('outName'\)/.test(html), '还有代码在读已经删掉的输入框');
+    assert.ok(!/data-i18n-ph="outPh"/.test(html), 'placeholder 词条引用还在');
+    assert.ok(!/data-i18n="hintOutName"/.test(html), '「文件名后缀自动跟随」提示还在（输入框都没了）');
+    /* 三个词条要删全套：字典里一个都不许剩（27 语言 × 3） */
+    assert.strictEqual((html.match(/lblOutName\s*:/g) || []).length, 0, '字典里还留着 lblOutName');
+    assert.strictEqual((html.match(/[^A-Za-z]outPh\s*:/g) || []).length, 0, '字典里还留着 outPh');
+    assert.strictEqual((html.match(/hintOutName\s*:/g) || []).length, 0, '字典里还留着 hintOutName');
+    /* 自动命名链路必须留着：导出时现算文件名 */
+    assert.ok(/function outNameParts\(/.test(html) && /function autoOutNameStr\(/.test(html),
+      '自动命名函数被误删（文件名会退回 translated.xxx）');
+    assert.ok(/const name=\(S\.fileBase\?autoOutNameStr\(\):\('translated\.'\+expFileFmt\(\)\)\);/.test(html),
+      '下载时没有按「源文件名 + 目标语言」现算文件名');
+    /* 删掉的联动函数不该有残留调用 */
+    ['autoOutName()', 'refreshOutName()', 'refreshOutPh()', 'autoNameRe'].forEach((fn) => {
+      assert.ok(!html.includes(fn), '还残留对已删函数的调用：' + fn);
+    });
+  });
+
+  t('v0.9.190 折行设置加标题与说明（并接上 27 语言）', () => {
+    assert.ok(/data-i18n="secWrap"/.test(html), '折行设置缺标题');
+    assert.ok(/data-i18n="wrapTip"/.test(html), '折行设置缺「不用重跑翻译」的说明');
+    /* 标题与说明必须在折行输入之上（标题先出现），且落在导出面板内 */
+    const lines = html.split('\n');
+    const iExport = lines.findIndex((l) => /stepExport/.test(l));
+    const iTitle = lines.findIndex((l) => /data-i18n="secWrap"/.test(l));
+    const iTip = lines.findIndex((l) => /data-i18n="wrapTip"/.test(l));
+    const iMaxW = lines.findIndex((l) => /id="maxW"/.test(l));
+    assert.ok(iExport >= 0 && iTitle > iExport, '折行标题没在导出面板里');
+    assert.ok(iTip > iTitle && iMaxW > iTip, '标题/说明必须排在折行输入框之前');
+    /* 两个新词条 27 语言齐全。锚点用「块起点 → 下一块起点」精确切段：
+       原先其它用例的 slice(i, i+9000) 对 zh-CN 块不够（该块 secWrap 距块首 13.3k 字符），
+       会误报「zh-CN 缺 secWrap」。 */
+    const keys = ['secWrap', 'wrapTip'];
+    const starts = [];
+    const reStart = /^'([a-zA-Z\-]+)':\s*\{/gm;
+    let sm;
+    while ((sm = reStart.exec(html))) {
+      if (!/pureMTMode/.test(html.slice(sm.index, sm.index + 400))) continue; // 只认 i18n 字典块
+      starts.push({ code: sm[1], at: sm.index });
+    }
+    assert.strictEqual(starts.length, 27, '字典块数 ' + starts.length);
+    starts.forEach((blk, i) => {
+      const end = i + 1 < starts.length ? starts[i + 1].at : html.length;
+      const seg = html.slice(blk.at, end);
+      for (const k of keys) {
+        const m = seg.match(new RegExp(k + "\\s*:\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+        assert.ok(m && m[1].length > 0, blk.code + ' 缺 ' + k);
+      }
+    });
+  });
+
+  t('v0.9.190 右栏卡片放开高度（矮屏不再出内滚动条）', () => {
+    /* 加了两组折行设置后 100vh-80px 不够用：top 66→54、底部留白 14→6，净增 20px；
+       滚动条也收窄（scrollbar-width:thin），免得细滚动条挤掉右栏内容宽。 */
+    assert.ok(/top:54px;max-height:calc\(100vh - 60px\)/.test(html),
+      '右栏 sticky 高度没放宽（矮屏会出内滚动条）');
+    assert.ok(!/max-height:calc\(100vh - 80px\)/.test(html), '还留着旧的高度限制');
+    /* 两组宽度并排一行，别退回竖排（竖排会多出 ~90px 卡片高） */
+    assert.ok(/class="wrap-row"/.test(html), '折行两项没有并排');
+    assert.ok(/\.wrap-row\{display:grid;grid-template-columns:1fr 1fr/.test(html), 'wrap-row 不是两列网格');
+    assert.ok(!/class="wrap-div"/.test(html), 'wrap-div 细线已被标题取代，DOM 里不该还有它');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
