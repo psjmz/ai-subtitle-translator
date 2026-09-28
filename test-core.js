@@ -4306,10 +4306,54 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/id="splitWarnHint"/.test(html), '缺少 splitWarnHint 提示行');
     assert.ok(/class="hint alert" id="splitWarnHint"/.test(html), '提示行没用告警样式');
     assert.ok(/function paintSplitWarn\(/.test(html) && /function updateSplitWarn\(/.test(html), '缺 paintSplitWarn / updateSplitWarn');
-    assert.ok(/paintSplitWarn\(out && out\.splitInfo\)/.test(html), '导出 mono 分支没有刷新提示');
+    // v0.9.192：paintSplitWarn 多了一个 fmt 参数（区分单语/双语文案）
+    assert.ok(/paintSplitWarn\(out && out\.splitInfo, fmt\)/.test(html), '导出 mono 分支没有刷新提示');
     assert.ok(/updateSplitWarn\(\); \}\} catch/.test(html) || /try\{ updateSplitWarn\(\); \}/.test(html), '翻译完成处没有刷新提示');
     const vals = [...html.matchAll(/splitWarn\s*:\s*'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
     assert.strictEqual(vals.length, 27, 'splitWarn 词条数 ' + vals.length);
+    vals.forEach(v => assert.ok(v.includes('{0}') && v.includes('{1}') && v.includes('{2}'), '占位符不全: ' + v));
+  });
+
+  t('v0.9.192 双语切分也要记账（此前完全静默）', () => {
+    const en = 'He told us the match took three months and everyone gave it their all so now we just want to enjoy this moment.';
+    const rows = [{ no:1, start:0, end:2000, zh:_mkZh(43), en:en, flag:'' }];
+    const o = { maxW:16, biMaxW:32, srcLocale:'zh-CN', dstLocale:'en' };
+    const b = C.buildBilingual(rows, o);
+    assert.strictEqual(b.length, 2, '双语下这条确实会被切成 2 条');
+    const si = b.splitInfo;
+    assert.ok(si, 'buildBilingual 没带 splitInfo（map 会丢属性，必须显式传递）');
+    assert.strictEqual(si.srcs, 1, '被切的源条数应为 1');
+    assert.strictEqual(si.items, 2, '切后条数应为 2');
+    // need = max(ceil(译文整条宽), ceil(源文整条宽/2))：译文 43 宽中文 → 43
+    assert.strictEqual(si.need, 43, '建议双语行宽算错');
+    // 按建议值调完必须真的不再切 —— 提示里给出的数字必须可信
+    const b2 = C.buildBilingual(rows, Object.assign({}, o, { biMaxW: si.need }));
+    assert.strictEqual(b2.length, 1, '按提示调到 ' + si.need + ' 后仍被切，说明 need 算错');
+    assert.strictEqual(b2.splitInfo.srcs, 0);
+    // buildBilingualParts 同样要带（ASS 分屏走这条）
+    assert.ok(C.buildBilingualParts(rows, o).splitInfo, 'buildBilingualParts 没带 splitInfo');
+  });
+
+  t('v0.9.192 双语不该误报：短句 / 沿原 cue 边界的正常分段', () => {
+    const o = { maxW:16, biMaxW:32, srcLocale:'zh-CN', dstLocale:'en' };
+    const b1 = C.buildBilingual([{ no:1, start:0, end:2000, zh:'我们要走了', en:'We have to go.', flag:'' }], o);
+    assert.strictEqual(b1.length, 1);
+    assert.strictEqual(b1.splitInfo.srcs, 0, '短句不该记为切分');
+    // 合并句组沿原 cue 边界还原（v0.9.48）是正确行为，不算「按宽度瓜分」
+    const mg = [{ no:1, start:0, end:1000, zh:'第一部分内容在这里', en:'Part one here.', flag:'' },
+                { no:2, start:1000, end:2000, zh:'第二部分内容在这里', en:'Part two here.', flag:'merged' }];
+    const bm = C.buildBilingual(mg, o);
+    assert.strictEqual(bm.splitInfo.srcs, 0, '沿原 cue 边界分段不该记为切分');
+  });
+
+  t('v0.9.192 双语提示走 splitWarnBi，且 27 语齐全', () => {
+    assert.ok(/paintSplitWarn\(biOut && biOut\.splitInfo, fmt\)/.test(html), '导出双语分支没有刷新提示');
+    assert.ok(/t\('splitWarnBi', si\.srcs, si\.items, si\.need\)/.test(html), '双语没走 splitWarnBi 文案');
+    assert.ok(/bi = fmt && fmt !== 'mono'/.test(html) || /const bi = fmt && fmt !== 'mono'/.test(html), '没按导出样式区分文案');
+    // 改双语行宽也要刷新提示（否则提示是死的）
+    assert.ok(/\$\('biMaxW'\)/.test(html) && /bw\.addEventListener\('change', updateSplitWarn\)/.test(html), 'biMaxW 变化没刷新提示');
+    const vals = [...html.matchAll(/splitWarnBi\s*:\s*'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
+    assert.strictEqual(vals.length, 27, 'splitWarnBi 词条数 ' + vals.length);
     vals.forEach(v => assert.ok(v.includes('{0}') && v.includes('{1}') && v.includes('{2}'), '占位符不全: ' + v));
   });
 }

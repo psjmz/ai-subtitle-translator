@@ -1998,6 +1998,23 @@
     //             仅防德文复合词/超长英文行这类极端情况超出屏幕被播放器截断。
     const biMaxW = (opts.biMaxW > 0) ? opts.biMaxW : 32;
     const srcCapW = biMaxW * 2;
+    // v0.9.192：与单语 buildMonoParts 同口径，挂 out.splitInfo = {srcs,items,need}。
+    //   双语此前完全静默——实测一条 2 秒字幕在 biMaxW=32 下照样被切成两条，用户无从知晓。
+    //   need = 完全不切所需的最小 biMaxW：放下需同时满足「译文行 ≤ biMaxW」与「源文行 ≤ biMaxW×2」
+    //         → need = max(ceil(译文整条宽), ceil(源文整条宽 / 2))
+    //   ⚠️ 只记「按宽度瓜分时间轴」的细切；合并句组沿原 cue 边界还原分段（v0.9.48）是正确行为，不算。
+    //   ⚠️ srcs 按源条目计（一条 entry 内多段各自细切仍只算 1 条），items 累加细切出的条数。
+    const splitInfo = { srcs: 0, items: 0, need: 0 };
+    let curN = 0, curNeed = 0;
+    const noteSeg = (n, needW) => { if (n <= 1) return; curN += n; curNeed = Math.max(curNeed, needW); };
+    const flushEntry = () => {
+      if (curN > 0) {
+        splitInfo.srcs++;
+        splitInfo.items += curN;
+        splitInfo.need = Math.max(splitInfo.need, curNeed);
+      }
+      curN = 0; curNeed = 0;
+    };
     // 1) 汇集成对条目：活跃行 + 其后 merged 行的源文
     const entries = [];
     let last = null;
@@ -2067,9 +2084,12 @@
         }
         const basis = (sTxt ? ss : dd).map((s) => Math.max(0.5, textWidth(s || '')));
         // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段）
-        for (const g of subCuePlan(st, en, ss, dd, basis)) {
+        const plan = subCuePlan(st, en, ss, dd, basis);
+        for (const g of plan) {
           pushItem(g.start, g.end, g.s ? [g.s] : [], g.d ? [g.d] : []);
         }
+        // v0.9.192：段内细切（按宽度瓜分）才记账；need 取整条宽，调大后整条即可装下
+        noteSeg(plan.length, Math.max(Math.ceil(dstW), Math.ceil(srcW / 2)));
       };
       // SP 双 speaker（v0.9.25；v0.9.69 用户方案重写）：双语导出 src/dst 各合并为单行
       // "- A - B"（dash 归一、说话人间空格），合并行 ≤ maxW+10 直放——正好落进标准
@@ -2114,6 +2134,7 @@
         for (let i = 0; i < times.length; i++) {
           emitPart(times[i].start, times[i].end, sSegs ? (sSegs[i] || '') : '', dSegs[i] || '', null);
         }
+        flushEntry(); // v0.9.192：每段可能各自细切，但源条目只算 1 条
         continue;
       }
       // 切 k 条子字幕：源文优先沿自身原换行切，译文按源文各段宽度分布回填对齐。
@@ -2132,10 +2153,15 @@
       // 子时间轴：按源文各段宽度占比分配（无源文时按译文段宽）
       const basis = (srcText ? srcSegs : dstSegs).map((s) => Math.max(0.5, textWidth(s)));
       // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段）
-      for (const g of subCuePlan(e.start, e.end, srcSegs, dstSegs, basis)) {
+      const plan = subCuePlan(e.start, e.end, srcSegs, dstSegs, basis);
+      for (const g of plan) {
         pushItem(g.start, g.end, g.s ? [g.s] : [], g.d ? [g.d] : []);
       }
+      // v0.9.192：整条超容量 → 按宽度瓜分时间轴，记账（同单语 R3）
+      noteSeg(plan.length, Math.max(Math.ceil(dstW), Math.ceil(srcW / 2)));
+      flushEntry();
     }
+    out.splitInfo = splitInfo;
     return out;
   }
 
@@ -2143,10 +2169,13 @@
   // 规则与 buildBilingualParts 相同；opts.order：'src-first'（源文在上，默认）| 'dst-first'（译文在上）。
   function buildBilingual(rows, opts) {
     const srcFirst = !opts || opts.order !== 'dst-first';
-    return buildBilingualParts(rows, opts).map((p) => ({
+    const parts = buildBilingualParts(rows, opts);
+    const out = parts.map((p) => ({
       no: p.no, start: p.start, end: p.end,
       text: (srcFirst ? p.srcLines.concat(p.dstLines) : p.dstLines.concat(p.srcLines)).join('\n')
     }));
+    out.splitInfo = parts.splitInfo; // v0.9.192：map 会丢属性，切分统计要显式带过去
+    return out;
   }
 
   // 单语字幕条目（v0.9.23）：替代此前 filter+map 直透 S.rows 的零处理路径——
