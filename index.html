@@ -107,6 +107,10 @@
   .btn.ghost{background:transparent;border:1px solid var(--line-strong)}
   .btn.sm{padding:5px 10px;font-size:12px;border-radius:9px}
   .btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  /* v0.9.189：导出面板里「文件命名」与「折行排版」两组设置的分隔线。折行设置从左侧搬来后，
+     若不加分隔会紧贴在「导出文件名」下面，看起来像文件名的附属项。只一条细线，不加标题
+     （加标题要新增 27 种界面语言词条，收益不抵成本）。 */
+  .wrap-div{height:1px;background:var(--line);margin:18px 0 0}
   .btn:disabled{opacity:.4;cursor:not-allowed}
   .hint{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.55}
   /* v0.9.141：术语表有「改了也不生效」的条目时，这行必须从灰色小字变成警告色——
@@ -545,7 +549,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.188</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.189</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -705,7 +709,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.188</span>
+    <span class="ver-tag">v0.9.189</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -800,13 +804,8 @@
           <p class="gh-tip" data-i18n="glossUpOne">上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。</p>
         </div>
       </details>
-      <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
-      <input type="number" id="maxW" value="21" min="8" max="48">
-      <div class="hint" id="maxWHint"></div>
-      <!-- v0.9.95：双语专用行宽（只约束译文行），与单语折行阈值解耦 -->
-      <label class="flbl"><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" data-tip-i18n="lblBiMaxW">i</i></label>
-      <input type="number" id="biMaxW" value="32" min="12" max="64">
-      <div class="hint" id="biMaxWHint"></div>
+      <!-- v0.9.189：折行阈值 / 双语行宽两项已移到右侧「导出译文」面板（见那里的说明）。
+           折行是翻译完成后的排版处理，不属于翻译设置，放左栏会让用户以为它影响翻译结果。 -->
 
       <!-- v0.9.100：ASS 导出外观（字号/颜色/离底距离）。整组只在导出格式为 ASS 时显示，
            否则 SRT/VTT/TXT 用户会看到对自己无效的设置。 -->
@@ -965,6 +964,19 @@
       <select id="expStyle"></select>
       <label class="flbl"><span data-i18n="lblOutName">导出文件名（默认按源文件 + 目标语言自动命名）</span></label>
       <input type="text" id="outName" placeholder="xxx_中文字幕.srt" data-i18n-ph="outPh">
+      <!-- v0.9.189：折行阈值 / 双语行宽由左栏「翻译设置」移到这里。折行是翻译完成后的排版处理，
+           cfg.maxW 从不写进 system prompt（见 MEMORY「完全不进提示词」），与翻译无关；
+           放在导出区、和「导出字幕样式」同处一地，才符合「先翻译、再调排版、再导出」的操作顺序。
+           两个 id（maxW / biMaxW）原样保留 → 语言联动（MAXW_BY_LANG/mwMemo）、ASS 字号推荐（assLangCtx）、
+           行宽换算提示（updateWidthHints）全部无需改动。 -->
+      <div class="wrap-div"></div>
+      <label class="flbl"><span data-i18n="lblMaxWShort">折行阈值</span><i class="info" data-tip-i18n="lblMaxW">i</i></label>
+      <input type="number" id="maxW" value="21" min="8" max="48">
+      <div class="hint" id="maxWHint"></div>
+      <!-- v0.9.95：双语专用行宽（只约束译文行），与单语折行阈值解耦 -->
+      <label class="flbl"><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" data-tip-i18n="lblBiMaxW">i</i></label>
+      <input type="number" id="biMaxW" value="32" min="12" max="64">
+      <div class="hint" id="biMaxWHint"></div>
       <div class="btns" style="margin-top:12px">
         <button class="btn primary" id="btnDownload" data-i18n="btnDownload" type="button">⬇ 下载字幕</button>
         <button class="btn" id="btnCopy" data-i18n="btnCopy" type="button">复制到剪贴板</button>
@@ -990,7 +1002,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.188"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.189"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6316,35 +6328,77 @@ function collectZh(){
 }
 
 /* ---------------- 后处理：清提示词 + 折行 + 统计 ---------------- */
+/* v0.9.189：单行重排抽成函数，applyPost（翻译后跑一次）与 reflowRows（改行宽即时重排）共用，
+   避免两处各写一份导致逻辑漂移。处理链顺序不可调换，理由见下方注释。 */
+function reflowOne(r){
+  /* v0.9.52：先并掉仅闭标点的孤行（LLM 偶发 \n”）
+     v0.9.129：再做行内格式标签配对修复——模型偶发只输出半个 <i>（缺 </i>），导出会破坏整条渲染。
+     以源文为准：源文无斜体→剥掉译文里凭空冒出的标签；源文有斜体且译文不配对→补齐缺失的一半。
+     正常输入（无标签或已配对）原样返回，零影响。
+     v0.9.131：盘古之白必须作用在折行「之前」的整段上（P1），不能折完再逐行补（P2）。
+     模型直出的译文常缺中西文之间的空格（线上 WSJ 实测「这是|更好的Whopper，」
+     「Burger King|正押注于」「要点一个|Impossible Whopper」），而 needJoinSpace
+     只管跨行拼缝、够不着行内边界。
+     之所以放折行前：实测 P2（折后逐行补）虽同样补齐空格，但有 3 行不幂等——
+     补空格后行宽变化 → 专名保护把断点推到别处 → 用户再点一次「整理」字幕就跳动。
+     P1 先归一化文本再排版，一阶二阶都收敛；顺带让超宽行从 4 降到 3（宽度算准了）。 */
+  const rawZh = C.balanceInlineTags(C.mergePunctOnlyLines(C.stripSoundTags(r.zh)), r.en);
+  const t = /^zh/.test(String(S.locale || '')) ? C.panguSpace(rawZh) : rawZh;
+  // v0.9.42：speaker 行保持 dash 行结构、按行独立折行——normalize 的 squashLines 会把
+  // 「\n- 」压成行内 dash（#17 曾靠折行巧合复原，属未定义行为）；非 speaker 行维持原 normalize 路径
+  const lines = C.isSpeakerText(t)
+    ? C.foldSpeakerLines(t, S.maxW, S.locale || 'zh-CN')
+    : C.monoFit(t, S.maxW, S.locale || 'zh-CN');
+  return { text: lines.join('\n'), changed: lines.join('\n') !== rawZh, rawZh: rawZh };
+}
 function applyPost(){
   collectZh();
   let wrapN=0;
   S.rows.forEach(r=>{
     if (r.flag==='drop' || r.flag==='merged' || !r.zh) return;
-    /* v0.9.52：先并掉仅闭标点的孤行（LLM 偶发 \n”）
-       v0.9.129：再做行内格式标签配对修复——模型偶发只输出半个 <i>（缺 </i>），导出会破坏整条渲染。
-       以源文为准：源文无斜体→剥掉译文里凭空冒出的标签；源文有斜体且译文不配对→补齐缺失的一半。
-       正常输入（无标签或已配对）原样返回，零影响。
-       v0.9.131：盘古之白必须作用在折行「之前」的整段上（P1），不能折完再逐行补（P2）。
-       模型直出的译文常缺中西文之间的空格（线上 WSJ 实测「这是|更好的Whopper，」
-       「Burger King|正押注于」「要点一个|Impossible Whopper」），而 needJoinSpace
-       只管跨行拼缝、够不着行内边界。
-       之所以放折行前：实测 P2（折后逐行补）虽同样补齐空格，但有 3 行不幂等——
-       补空格后行宽变化 → 专名保护把断点推到别处 → 用户再点一次「整理」字幕就跳动。
-       P1 先归一化文本再排版，一阶二阶都收敛；顺带让超宽行从 4 降到 3（宽度算准了）。 */
-    const rawZh = C.balanceInlineTags(C.mergePunctOnlyLines(C.stripSoundTags(r.zh)), r.en);
-    const t = /^zh/.test(String(S.locale || '')) ? C.panguSpace(rawZh) : rawZh;
-    // v0.9.42：speaker 行保持 dash 行结构、按行独立折行——normalize 的 squashLines 会把
-    // 「\n- 」压成行内 dash（#17 曾靠折行巧合复原，属未定义行为）；非 speaker 行维持原 normalize 路径
-    const lines = C.isSpeakerText(t)
-      ? C.foldSpeakerLines(t, S.maxW, S.locale || 'zh-CN')
-      : C.monoFit(t, S.maxW, S.locale || 'zh-CN');
-    if (lines.join('\n') !== rawZh) wrapN++;
-    r.zh = lines.join('\n');
+    const o = reflowOne(r);
+    if (o.changed) wrapN++;
+    r.zh = o.text;
   });
   S.wrapN=wrapN;
   renderRows();
   log(t('postDone',S.maxW), 'okc');
+}
+/* v0.9.189：手工编辑标记。用事件委托且只绑一次——renderRows 每次重建 DOM，逐个 .zh 绑会泄漏。
+   用户在译文框里敲过字 → 该行 r.edited=true → reflowRows 跳过它，保住手工折行 / 音效标记 / 空行。
+   标记挂在 row 对象上而非 DOM 上，所以重画表格不会丢；重新导入文件（S.rows 重建）自然清零。 */
+(function(){
+  const box=$('rows'); if(!box) return;
+  box.addEventListener('input', function(ev){
+    const el=ev.target && ev.target.closest ? ev.target.closest('.zh') : null;
+    if(!el) return;
+    const grid=el.closest('.cuegrid'); if(!grid) return;
+    const r=(S.rows||[]).find(x=>x.id===+grid.dataset.id);
+    if(r) r.edited=true;
+  });
+})();
+
+/* v0.9.189：改折行阈值后立刻按新阈值重排，让表格里看得见效果（导出本来就实时生效，
+   只是表格预览不跟着变）。
+   ⚠️ 必跳过 r.edited（用户在表格里手工编辑过的行）：monoFit 先 squashLines 压平，
+   会把手工折行、手写的音效标记（stripSoundTags 会删）、故意留的空行一起抹掉
+   （实测「我们要走了\n你别送了」→「我们要走了你别送了」）。这与 buildMonoParts R0
+   「尊重用户手工折行」的意图直接冲突，所以手工改过的行一律不动。 */
+function reflowRows(){
+  if (S.translating) return;                       // 翻译中不插手
+  if (!S.rows || !S.rows.some(r=>r && r.zh)) return; // 没译文时无事可做
+  collectZh();                                     // 先把 DOM 里的最新编辑读回（含 edited 行）
+  let n=0, skip=0;
+  S.rows.forEach(r=>{
+    if (!r || r.flag==='drop' || r.flag==='merged' || !r.zh) return;
+    if (r.edited) { skip++; return; }
+    const o = reflowOne(r);
+    if (o.text !== r.zh) n++;
+    r.zh = o.text;
+  });
+  S.wrapN=n;
+  renderRows();
+  if (n) log(t('postDone',S.maxW), 'okc');
 }
 
 /* ---------------- 翻译（API / 演练） ---------------- */
@@ -9384,6 +9438,16 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
     delete mwMemo[$('dstLang').value];
     syncMaxW();   // 可见地恢复成该语言的推荐值
     save();
+  });
+  /* v0.9.189：改完折行阈值 → 立刻按新阈值重排表格（跳过手工编辑过的行，见 reflowRows）。
+     用 change 而非 input：number 框逐字输入时 input 会先触发中间值（如 "1"），越界重排没意义还抖动；
+     change 在失焦 / 回车 / 点步进箭头时触发，正是「这个值定下来了」的时刻。
+     程序赋值 mw.value（syncMaxW 切语言联动）不触发 change，所以切语言不会误重排。 */
+  mw.addEventListener('change', ()=>{
+    const v=+mw.value;
+    if(!(v>=8&&v<=48)) return;
+    S.maxW=v;
+    reflowRows();
   });
   // v0.9.54：number 输入框聚焦时鼠标滚轮会静默改值（并触发 input 锁定联动），阻止之；
   // 未聚焦时 hover 滚轮正常滚动页面（Chrome 默认此时不改值，preventDefault 会卡住页面滚动）

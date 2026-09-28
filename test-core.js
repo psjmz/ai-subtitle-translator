@@ -4177,6 +4177,30 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        中文版只在 dst=zh 时调用，指令语言恒等于输出语言，那句解释的是不存在的冲突 */
     assert.ok(!/本提示词用中文书写只是指令语言/.test(html), '中文版仍留着解释「指令语言≠输出语言」的废话');
   });
+
+  /* v0.9.189：折行设置搬到右侧导出区 + 改完阈值即时重排。
+     两条硬约束：① 位置搬了但 id 不能变（语言联动 / ASS 字号推荐 / 行宽提示全靠 id 取值）
+     ② 即时重排必须跳过手工编辑过的行，否则会抹掉用户手工折行、手写音效标记、故意留的空行
+       （实测「我们要走了\n你别送了」被 monoFit 的 squashLines 压成「我们要走了你别送了」）。 */
+  t('v0.9.189 折行设置搬到导出区 + 改完即时重排（且不动手工编辑过的行）', () => {
+    // ① id 原样保留，且在文件里只出现一次（搬过去而不是复制）
+    assert.strictEqual((html.match(/id="maxW"/g) || []).length, 1, 'maxW 不是恰好一处');
+    assert.strictEqual((html.match(/id="biMaxW"/g) || []).length, 1, 'biMaxW 不是恰好一处');
+    /* ② 折行两项必须在「导出译文」面板内（右栏 aside.panel），不能还在左栏的翻译设置里。
+       判据：id="maxW" 的行号必须晚于「导出译文」标题的行号。 */
+    const lines = html.split('\n');
+    const iExport = lines.findIndex((l) => /stepExport/.test(l));
+    const iMaxW = lines.findIndex((l) => /id="maxW"/.test(l));
+    assert.ok(iExport >= 0 && iMaxW > iExport, '折行阈值没落在右侧导出面板里');
+    // ③ 即时重排三件套：共用单行函数、跳过 edited、change 触发（不是 input，避免逐字重排）
+    assert.ok(/function reflowOne\(/.test(html), '缺少单行重排函数 reflowOne');
+    assert.ok(/function reflowRows\(/.test(html), '缺少即时重排入口 reflowRows');
+    assert.ok(/const o = reflowOne\(r\)/.test(html), 'applyPost 没有复用 reflowOne（两处逻辑会漂移）');
+    assert.ok(/if \(r\.edited\) \{ skip\+\+; return; \}/.test(html), 'reflowRows 没有跳过手工编辑过的行');
+    assert.ok(/r\.edited=true/.test(html), '没有给手工编辑的行打标记');
+    assert.ok(/mw\.addEventListener\('change'/.test(html), 'maxW 没有绑 change 触发重排');
+    assert.ok(/if \(S\.translating\) return;/.test(html), 'reflowRows 没有排除翻译进行中的情况');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
