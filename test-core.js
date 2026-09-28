@@ -4269,6 +4269,49 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/\.wrap-row\{display:grid;grid-template-columns:1fr 1fr/.test(html), 'wrap-row 不是两列网格');
     assert.ok(!/class="wrap-div"/.test(html), 'wrap-div 细线已被标题取代，DOM 里不该还有它');
   });
+
+  console.log('\n— v0.9.191 R3 切分可见化（只提示，不偷偷放宽行宽）—');
+  const _zhBase = '他告诉我们这场比赛准备了整整三个月每个人都拼尽了全力所以现在只想好好享受这一刻';
+  const _mkZh = (n) => { let s = ''; while (s.length < n) s += _zhBase; return s.slice(0, n); };
+
+  t('被切分时 splitInfo 报出条数与建议阈值', () => {
+    const rows = [
+      { no:1, start:0,    end:2000, zh:_mkZh(43), en:'x', flag:'' },
+      { no:2, start:2000, end:4000, zh:_mkZh(30), en:'x', flag:'' }
+    ];
+    const o = C.buildMonoParts(rows, { maxW:16, maxLines:2, dstLocale:'zh-CN' });
+    assert.strictEqual(o.length, 3, '43 宽在阈值 16 下应被切成 2 条（另一条 30 宽不切）');
+    assert.ok(o.splitInfo, 'splitInfo 没挂上');
+    assert.strictEqual(o.splitInfo.srcs, 1, '被切的源条目数应为 1');
+    assert.strictEqual(o.splitInfo.items, 2, '切出的条数应为 2');
+    assert.strictEqual(o.splitInfo.need, 22, '建议阈值应为 22');
+    const o2 = C.buildMonoParts(rows, { maxW:o.splitInfo.need, dstLocale:'zh-CN' });
+    assert.strictEqual(o2.length, 2, '按建议阈值调完就不该再切');
+    assert.strictEqual(o2.splitInfo.srcs, 0, '调完 srcs 应为 0');
+  });
+
+  t('没触发切分时 splitInfo 全 0（提示保持隐藏）', () => {
+    const o = C.buildMonoParts([{ no:1, start:0, end:3000, zh:'这是一条很短的字幕。', en:'x', flag:'' }], { maxW:16, dstLocale:'zh-CN' });
+    assert.strictEqual(o.splitInfo.srcs, 0);
+    assert.strictEqual(o.splitInfo.items, 0);
+    assert.strictEqual(o.splitInfo.need, 0);
+  });
+
+  t('折行逻辑本身一个字没改：阈值 16 下 36 宽仍切分', () => {
+    const o = C.buildMonoParts([{ no:1, start:0, end:2000, zh:_mkZh(36), en:'x', flag:'' }], { maxW:16, dstLocale:'zh-CN' });
+    assert.strictEqual(o.length, 2, '本次只做提示，不放宽行宽 —— 36 宽仍应切分');
+  });
+
+  t('界面有切分提示行 + splitWarn 27 语齐全且占位符完整', () => {
+    assert.ok(/id="splitWarnHint"/.test(html), '缺少 splitWarnHint 提示行');
+    assert.ok(/class="hint alert" id="splitWarnHint"/.test(html), '提示行没用告警样式');
+    assert.ok(/function paintSplitWarn\(/.test(html) && /function updateSplitWarn\(/.test(html), '缺 paintSplitWarn / updateSplitWarn');
+    assert.ok(/paintSplitWarn\(out && out\.splitInfo\)/.test(html), '导出 mono 分支没有刷新提示');
+    assert.ok(/updateSplitWarn\(\); \}\} catch/.test(html) || /try\{ updateSplitWarn\(\); \}/.test(html), '翻译完成处没有刷新提示');
+    const vals = [...html.matchAll(/splitWarn\s*:\s*'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
+    assert.strictEqual(vals.length, 27, 'splitWarn 词条数 ' + vals.length);
+    vals.forEach(v => assert.ok(v.includes('{0}') && v.includes('{1}') && v.includes('{2}'), '占位符不全: ' + v));
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

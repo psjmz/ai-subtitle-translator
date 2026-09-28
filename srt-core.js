@@ -2159,11 +2159,21 @@
   //      子时间轴按各片宽度占比瓜分（时间跟着内容走）；段内仍超宽递增 k 重切（上限 k+10）
   // rows 口径与 buildBilingualParts 相同：'merged' 行并入承载行（end 延展），'drop'/空译文跳过。
   // 返回 [{no,start,end,text}]（text 可含 \n，与旧 mono 输出同构）。
+  // v0.9.191：额外挂 out.splitInfo = {srcs,items,need}——R3 切分的统计，供界面提示用户「调大阈值可避免切分」。
+  //   srcs = 被切分的源条目数；items = 切分后总条数；need = 完全不切所需的最小 maxW（= ceil(整句宽 / maxLines) 的最大值）。
+  //   挂属性而非改返回结构：调用方全是数组消费（导出/校验），加属性零影响。
   function buildMonoParts(rows, opts) {
     opts = opts || {};
     const maxW = (opts.maxW > 0) ? opts.maxW : 21;
     const maxLines = (opts.maxLines > 0) ? opts.maxLines : 2;
     const locale = opts.dstLocale || opts.locale;
+    const splitInfo = { srcs: 0, items: 0, need: 0 };
+    const noteSplit = (n, wholeWidth) => {
+      if (n <= 1) return;
+      splitInfo.srcs++;
+      splitInfo.items += n;
+      splitInfo.need = Math.max(splitInfo.need, Math.ceil(wholeWidth / maxLines));
+    };
     // 1) 汇集条目（与 buildBilingualParts 第 1 步同构）
     const entries = [];
     let last = null;
@@ -2226,9 +2236,11 @@
           }
           const basis0 = segs.map((s) => Math.max(0.5, textWidth(stripSoundTags(String(s || '')))));
           // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
-          for (const g of subCuePlan(t.start, t.end, null, segs, basis0)) {
+          const plan0 = subCuePlan(t.start, t.end, null, segs, basis0);
+          for (const g of plan0) {
             emit(g.start, g.end, wrapToWidth(g.d, maxW, { normalize: true, locale: locale }).join('\n'));
           }
+          noteSplit(plan0.length, sw);
         }
         continue;
       }
@@ -2249,10 +2261,13 @@
       // 子时间轴按各片宽度占比瓜分（时间跟着内容走）
       const basis = segs.map((s) => Math.max(0.5, textWidth(stripSoundTags(String(s || '')))));
       // v0.9.68：subCuePlan 含 sliver 保护（<200ms 子段并入邻段），正常切分与旧算法一致
-      for (const g of subCuePlan(e.start, e.end, null, segs, basis)) {
+      const plan = subCuePlan(e.start, e.end, null, segs, basis);
+      for (const g of plan) {
         emit(g.start, g.end, wrapToWidth(g.d, maxW, { normalize: true, locale: locale }).join('\n'));
       }
+      noteSplit(plan.length, w);
     }
+    out.splitInfo = splitInfo;
     return out;
   }
 
