@@ -573,7 +573,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.194</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.195</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -733,7 +733,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.194</span>
+    <span class="ver-tag">v0.9.195</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -976,14 +976,18 @@
         <div class="hint" id="assResetNote"></div>
         <!-- v0.9.101：颜色直接输入 #RRGGBB；左侧小方块是实时预览，色值非法时预览变虚线框 -->
         <div class="wrap-row">
-          <div class="wr-cell">
+          <!-- v0.9.195：这两格当初没给 id —— 连带后果是 syncAssStyleBox() 找不到它们，
+               单语导出时「原文颜色」照常显示（配了也不生效：单语 ASS 不生成原文行，
+               Top/Sub 两个样式写在头部却无人引用，改了播放器里纹丝不动）。
+               补 id 只为让隐藏逻辑能抓到，别再删。 -->
+          <div class="wr-cell" id="assDstColorRow">
             <label class="flbl"><span data-i18n="lblAssDstColor">译文颜色</span><i class="info" data-tip-i18n="assColorTip">i</i></label>
             <div class="ass-color-row">
               <span class="csw" id="assDstColorSw" style="background:#FFFFFF"></span>
               <input type="text" id="assDstColor" value="#FFFFFF" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFFFFF">
             </div>
           </div>
-          <div class="wr-cell">
+          <div class="wr-cell" id="assSrcColorRow">
             <label class="flbl"><span data-i18n="lblAssSrcColor">原文颜色</span><i class="info" data-tip-i18n="assColorTip">i</i></label>
             <div class="ass-color-row">
               <span class="csw" id="assSrcColorSw" style="background:#FFD700"></span>
@@ -1063,7 +1067,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.194"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.195"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -9967,14 +9971,15 @@ function syncAssStyleBox(){
   /* v0.9.110：单语导出没有原文行 —— 原文字号与原文离底距离整行隐藏，
      否则用户会对着一组「配了也不生效」的输入框调半天，还会被计入锁定状态。 */
   var mono=(typeof expFmtOf==='function')?(expFmtOf()==='mono'):false;
-  var r1=$('assSrcSizeRow'), r2=$('assSrcMVRow');
-  if(r1) r1.style.display = mono ? 'none' : '';
-  if(r2) r2.style.display = mono ? 'none' : '';
-  /* v0.9.194：两列并排后，原文列隐藏会让译文列只占左半边、右半空着。
-     给译文列加 span2 让它跨满整行（.wrap-row 是固定两列网格，display:none 不会自动补位）。 */
-  var d1=$('assDstSizeRow'), d2=$('assDstMVRow');
-  if(d1 && d1.classList) d1.classList.toggle('span2', !!mono);
-  if(d2 && d2.classList) d2.classList.toggle('span2', !!mono);
+  /* v0.9.195：字号/颜色/离底三组统一走这同一份清单。此前按 id 逐个硬写两个变量，
+     颜色那两格没 id 就自动漏掉了（单语时照样显示原文颜色，而单语 ASS 根本没原文行，
+     改了播放器里纹丝不动）。清单化之后再加组也不会漏。 */
+  var tri=[['assSrcSizeRow','assDstSizeRow'],['assSrcColorRow','assDstColorRow'],['assSrcMVRow','assDstMVRow']];
+  tri.forEach(function(p){
+    var s=$(p[0]), d=$(p[1]);
+    if(s) s.style.display = mono ? 'none' : '';
+    if(d && d.classList) d.classList.toggle('span2', !!mono);
+  });
 }
 /* v0.9.102：离底距离的默认值随「分屏/双行 + 谁在上」与字号联动；用户手动改过的那个不再联动。
    典型值按 1 行内容估算（双行模式下另一块 = 42 + 贴底块 1 行高 + 8）。 */

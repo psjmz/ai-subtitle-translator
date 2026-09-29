@@ -4384,8 +4384,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       'ASS 标题不是右栏子节样式（或图标色与折行的 c5 撞了）');
     /* 控制逻辑一个字没改：仍由 syncAssStyleBox 判 ass 才显示 + 单语隐藏原文列 */
     assert.ok(/b\.style\.display=\(expFileFmt\(\)==='ass'\)\?'':'none'/.test(html), 'ASS 显示判定被改了');
-    assert.ok(/r1\.style\.display = mono \? 'none' : ''/.test(html), '单语隐藏原文字号列的逻辑被改了');
-    assert.ok(/r2\.style\.display = mono \? 'none' : ''/.test(html), '单语隐藏原文离底列的逻辑被改了');
+    /* v0.9.195 起走统一的 tri 清单（原来按 id 逐个硬写两个变量，漏一组也看不出来） */
+    assert.ok(/var tri=\[\['assSrcSizeRow','assDstSizeRow'\],\['assSrcColorRow','assDstColorRow'\],\['assSrcMVRow','assDstMVRow'\]\]/.test(html),
+      '单语隐藏清单 tri 被改了（必须三组齐全：字号 / 颜色 / 离底）');
+    assert.ok(/s\.style\.display = mono \? 'none' : ''/.test(html), '单语隐藏原文列的逻辑被改了');
   });
 
   t('v0.9.194 ASS 七个字段三行并排（竖排会撑出滚动条）', () => {
@@ -4407,10 +4409,29 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       k + ' 不是恰好 1 处（搬运动了 id 会让整组联动失效）'));
     /* 单语时原文列隐藏 → 译文列要跨满整行，否则右半栏空着 */
     assert.ok(/\.wr-cell\.span2\{grid-column:1 \/ -1\}/.test(html), '缺少 span2 跨列样式');
-    assert.ok(/d1\.classList\.toggle\('span2', !!mono\)/.test(html) && /d2\.classList\.toggle\('span2', !!mono\)/.test(html),
-      '单语时译文列没有跨满整行');
+    assert.ok(/d\.classList\.toggle\('span2', !!mono\)/.test(html), '单语时译文列没有跨满整行');
     /* 零新增 i18n：secAssStyle 等词条本来就存在 */
     assert.strictEqual((html.match(/data-i18n="secAssStyle"/g) || []).length, 1, 'secAssStyle 引用不唯一');
+  });
+
+  t('v0.9.195 单语 + ASS 时「原文颜色」跟着字号/离底一起隐藏', () => {
+    /* 单语 ASS 不生成原文行：buildAssEvents 仍把 Top/Sub 两个样式写进 [V4+ Styles]，
+       但没有任何 Dialogue 引用它们 → 改「原文颜色」导出后播放器里纹丝不动。
+       v0.9.110 就立了「单语隐藏原文那几列」的规矩，可颜色那两格当初是裸 wr-cell、没有 id，
+       隐藏逻辑按 id 逐个抓 → 抓不到，漏到现在，并被 v0.9.194 的并排放大（右半边整块空着）。 */
+    ['assDstColorRow', 'assSrcColorRow'].forEach(k =>
+      assert.strictEqual((html.match(new RegExp('id="' + k + '"', 'g')) || []).length, 1, k + ' 不是恰好 1 处'));
+    assert.ok(/<div class="wr-cell" id="assSrcColorRow">[\s\S]{0,320}id="assSrcColor"/.test(html),
+      'id 没挂在原文颜色的 wr-cell 上（整列就藏不掉）');
+    /* 结构性防漏：ASS 组里 6 个格子必须个个有 id —— 再漏一组就是同一个 bug 重演 */
+    const iA = html.indexOf('id="assStyleBox"'), iEnd = html.indexOf('data-i18n="secWrap"');
+    assert.ok(iA > 0 && iEnd > iA, 'ASS 区块定位失败');
+    const cells = (html.slice(iA, iEnd).match(/<div class="wr-cell"[^>]*>/g) || []);
+    assert.strictEqual(cells.length, 6, 'ASS 组 wr-cell 应是 6 个（三组各两列）');
+    assert.deepStrictEqual(cells.filter(c => !/ id="/.test(c)), [], 'ASS 组里还有 wr-cell 没 id（单语时会被漏掉）');
+    /* 隐藏靠 display:none，不能去动 value：用户在双语下配的原文颜色，切单语再切回来必须还在 */
+    assert.ok(/s\.style\.display = mono \? 'none' : ''/.test(html), '隐藏方式被改成非 display 了');
+    assert.ok(!/tri\.forEach[\s\S]{0,200}\$\('assSrcColor'\)\.value/.test(html), '同步函数里不要改写原文颜色的 value');
   });
 }
 
