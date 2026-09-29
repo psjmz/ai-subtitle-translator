@@ -4458,6 +4458,33 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 位置变、字号不变：译文恒大于原文，与 ASS 导出「字号跟角色走」一致 */
     assert.ok(!/pv-rev \.ep-dst\{[^}]*font-size:var\(--pv-src/.test(html), 'pv-rev 里把译文字号换成原文的了');
   });
+
+  t('v0.9.197 预览纵向位置跟随「离底距离」+ 单语不再摆到画面正中', () => {
+    /* 用户实测两条反馈：① 改「译文/原文离底距离」预览不动；② 单语 SRT 在播放器里是贴底的，
+       预览摆到画面正中会让人误解导出后的位置。 */
+    /* ① 纵向位置按「1080 → 预览框实测高」的比例映射。两个 mv 的语义统一是「距底边像素」
+       （分屏时画面上方那块，UI 里给的就是 1080−离底−块高 的大数），所以不用再分顶部/底部。 */
+    assert.ok(/n\/1080\*pvH/.test(html), '预览没按离底距离映射纵向位置');
+    assert.ok(/var ML=assLH\(\)/.test(html), '预览没读 mv 值（assLH）');
+    assert.ok(/dst\.style\.bottom=dMV\+'px'/.test(html) && /src\.style\.bottom=sMV\+'px'/.test(html),
+      '两块各用自己 mv 的落位逻辑没了');
+    /* 双行(stack)的上方块：用户手动改过就用他自己的值，否则沿用导出端的抬高量 */
+    assert.ok(/ML\.srcFix\? sMV : \(dMV\+lhOf\(dst\)\+up\)/.test(html) &&
+      /ML\.dstFix\? dMV : \(sMV\+lhOf\(src\)\+up\)/.test(html), 'stack 上方块的抬高量算错/丢失');
+    /* ⚠️ inline 的 top:auto 必须显式写：.pv-split 的 CSS 有 top:22px，只改 bottom 会既 top 又 bottom，
+       元素被拉长。 */
+    assert.ok(/dst\.style\.top='auto'; src\.style\.top='auto'/.test(html),
+      '没写 top:auto，会与 pv-split 的 CSS top 打架');
+    /* 非 ASS 不套 mv（那两个输入框本来隐藏），要清掉 inline 回落到 CSS 示意位 */
+    assert.ok(/el\.style\.top=''; el\.style\.bottom='';/.test(html), '非 ASS 没清 inline 位置');
+    /* ② 单语贴底 */
+    assert.ok(/\.exp-preview\.pv-mono \.ep-dst\{bottom:9px\}/.test(html), '单语预览应贴底（bottom:9px）');
+    assert.ok(!/pv-mono \.ep-dst\{bottom:50%/.test(html), '单语预览又摆到画面正中了（播放器里字幕在底部）');
+    /* 比例依赖预览框实测高：窗口变化、切进工作台都要重算，否则位置会飘 */
+    assert.ok(/addEventListener\('resize', function\(\)\{ try\{ syncExpPreview\(\); \}catch\(e\)\{\} \}\)/.test(html),
+      '缺 resize 重算');
+    assert.ok(/try\{ syncExpPreview\(\); \}catch\(e\)\{\}/.test(html), 'showView 里没补算（隐藏时高=0，算不出位置）');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

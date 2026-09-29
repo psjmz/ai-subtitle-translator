@@ -537,9 +537,14 @@
      ⚠️ 字号只跟角色走（译文恒大于原文），位置变化不交换字号，与 ASS 导出规则一致。 */
   .exp-preview.pv-rev .ep-dst{bottom:9px}
   .exp-preview.pv-rev .ep-src{bottom:26px}
+  /* v0.9.197：下面这几条只是「syncExpPreview 还没跑 / 非 ASS」时的兜底示意位。
+     ASS 模式下两行的真实纵向位置由 syncExpPreview 按「离底距离」现算并写成 inline style
+     （inline 的 top:auto 会压掉这里的 top，所以不会打架）。 */
   .exp-preview.pv-split .ep-src{top:22px;bottom:auto}
   .exp-preview.pv-split-rev .ep-dst{top:22px;bottom:auto}
-  .exp-preview.pv-mono .ep-dst{bottom:50%;transform:translateY(50%)}
+  /* v0.9.196 初版这里写的是垂直居中（bottom:50% + translateY）。v0.9.197 改掉：
+     真实播放器里单语字幕也在底部（ASS 的 Bottom 样式就是 an2 贴底），摆到画面正中会误导。 */
+  .exp-preview.pv-mono .ep-dst{bottom:9px}
 
   /* SEO 区（保留原版排版，仅换皮变量） */
   .seo{max-width:1080px;margin:32px auto 0;padding:20px 24px 0;color:var(--sub);font-size:13px;line-height:1.8}
@@ -583,7 +588,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.196</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.197</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -743,7 +748,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.196</span>
+    <span class="ver-tag">v0.9.197</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -1077,7 +1082,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.196"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.197"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -10006,9 +10011,9 @@ function syncExpPreview(){
   var dst=box.querySelector('.ep-dst'), src=box.querySelector('.ep-src');
   if(!dst||!src) return;
   var fmt=expFmtOf(), mono=(fmt==='mono'), srcFirst=(fmt==='bi-src');
-  var isAss=(expFileFmt()==='ass');
+  var isAss=(expFileFmt()==='ass'), stacked=assStacked();
   /* 分屏只在 ASS 且非双行时有意义：SRT/VTT 与 ASS 双行都是两块相邻贴底 */
-  var split = isAss && !assStacked() && !mono;
+  var split = isAss && !stacked && !mono;
   box.classList.toggle('pv-mono', mono);
   /* ⚠️ bi-src 是「原文在上」（见 i18n fmtBiSrc），所以 srcFirst 时贴顶的是 ep-src，
      对应 pv-split（.ep-src{top}）；bi-dst 才轮到译文贴顶的 pv-split-rev。别写反。 */
@@ -10027,9 +10032,44 @@ function syncExpPreview(){
     /* 回落 CSS 默认（白 + 淡紫）：SRT/VTT 播放器不读 ASS 那套自定义色 */
     ['--pv-dst-c','--pv-src-c','--pv-dst','--pv-src'].forEach(function(k){ box.style.removeProperty(k); });
   }
+  /* v0.9.197：纵向位置也跟着「离底距离」动。两个 mv 输入框的语义统一是「距底边像素」
+     —— 分屏时画面上方那块，UI 里给的就是「1080 − 离底 − 块高」那个大数 —— 所以统一按
+     1080 → 预览框高 的比例映射成 bottom 就行，不必再区分顶部/底部。
+     贴底那块用它自己的 mv；双行(stack)的上方块沿用导出端的抬高量（用户手动改过就用他自己的）。
+     ⚠️ 非 ASS 不套 mv（那两个输入框本来就隐藏，SRT/VTT 的位置由播放器定）→ 清掉 inline 回 CSS 示意位。 */
+  dst.style.top='auto'; src.style.top='auto';
+  var pvH=box.clientHeight;
+  if(isAss && pvH>0){
+    var toPx=function(v){ var n=parseFloat(v); if(!isFinite(n)) return null;
+      return Math.max(2, Math.min(pvH-12, Math.round(n/1080*pvH))); };
+    var ML=assLH();
+    var lhOf=function(el){ return Math.round(parseFloat(getComputedStyle(el).fontSize)*1.25); };
+    var dMV=toPx(ML.dstMV), sMV=toPx(ML.srcMV), up=2;
+    if(stacked){
+      if(srcFirst){                 /* 原文在上：译文 Bottom(distMV) 贴底 */
+        dst.style.bottom=dMV+'px';
+        src.style.bottom=(ML.srcFix? sMV : (dMV+lhOf(dst)+up))+'px';
+      }else{                        /* 译文在上：原文 Sub(srcMV) 贴底 */
+        src.style.bottom=sMV+'px';
+        dst.style.bottom=(ML.dstFix? dMV : (sMV+lhOf(src)+up))+'px';
+      }
+    }else{
+      dst.style.bottom=dMV+'px';
+      src.style.bottom=sMV+'px';
+    }
+  }else{
+    ['dst','src'].forEach(function(k){
+      var el = k==='dst'? dst : src;
+      el.style.top=''; el.style.bottom='';
+    });
+  }
 }
-/* 预览里的字号/颜色只在 ASS 模式下有意义，但统一用委托监听最省：改哪个字段都能立刻反映 */
+/* 预览里的字号/颜色只在 ASS 模式下有意义，但统一用委托监听最省：改哪个字段都能立刻反映。
+   v0.9.197：离底距离两个输入框也在这块里，靠同一条委托就能跟着动。 */
 (function(){ var ab=$('assStyleBox'); if(ab) ab.addEventListener('input', function(){ syncExpPreview(); }); })();
+/* v0.9.197：位置是按「1080 → 预览框高」的比例算的，框变高变矮都得重算（否则换窗口大小、
+   切布局后位置就飘了）。 */
+(function(){ window.addEventListener('resize', function(){ try{ syncExpPreview(); }catch(e){} }); })();
 /* v0.9.102：离底距离的默认值随「分屏/双行 + 谁在上」与字号联动；用户手动改过的那个不再联动。
    典型值按 1 行内容估算（双行模式下另一块 = 42 + 贴底块 1 行高 + 8）。 */
 function assDefaultMV(role){
@@ -10225,6 +10265,8 @@ function showView(which){
   ws.style.display  = target==='ws' ? 'flex' : 'none';
   if(cur!==target) window.scrollTo(0,0);
   if(window.syncLstQueue) window.syncLstQueue();
+  /* v0.9.197：预览的纵向位置按「预览框实测高」算比例，隐藏时拿不到高度（=0）→ 进工作台补算一次 */
+  try{ syncExpPreview(); }catch(e){}
 }
 /* v0.9.104：编辑区上限 = 与左栏齐平（宽屏）。左栏折叠/展开、面板显隐、进度条出现都会改变可用高度，
    故用 ResizeObserver 跟着重算；窄屏（三列变单列）清掉上限，回落到 CSS 里的视口上限。 */
