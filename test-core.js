@@ -4485,6 +4485,32 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '缺 resize 重算');
     assert.ok(/try\{ syncExpPreview\(\); \}catch\(e\)\{\}/.test(html), 'showView 里没补算（隐藏时高=0，算不出位置）');
   });
+
+  t('v0.9.198 ⓘ 提示浮层不再撑出横向滚动条（改成贴着字段铺开）', () => {
+    /* 病根：.info::after 宽 250px、以图标为中心向两侧展开；而左右面板内容区只有 224~246px，
+       浮层两边必然探出面板。面板是 overflow:auto，于是①冒出横向滚动条（实测左栏溢 118px、
+       右栏 97px，正是用户说的「要左右滚动」）②探出去的部分被裁掉，滚过去也看不全。
+       加宽面板治不了根——250px 的浮层塞不进任何一栏，只能让浮层不再比容器宽。 */
+    assert.ok(/\.info\{position:static\}/.test(html),
+      'ⓘ 仍是 position:relative，浮层会以图标为中心左右展开（250px 装不进 224px 的面板）');
+    assert.ok(/\.info::after\{left:0;right:0;width:auto;max-width:none;transform:translateY\(4px\)\}/.test(html),
+      '浮层没有改成左右贴边铺开');
+    /* hover 时必须把 translateX(-50%) 一起去掉，否则浮层会整体左移半个宽度、从左边探出去 */
+    assert.ok(/\.info:hover::after\{opacity:1;transform:translateY\(0\)\}/.test(html),
+      'hover 态还留着 translateX(-50%)，浮层会左移半宽探出容器');
+    /* 定位上下文：左栏字段标签 / 开关整行（不能挂 .l，它只裹文字，实测浮层只有 44px 宽） */
+    assert.ok(/\.flbl,\.tgl-row\{position:relative\}/.test(html), '字段容器没有成为定位上下文');
+    /* 并排两列按「整行」铺开：按列铺只有 107px，浮层细长没法读 */
+    assert.ok(/\.wrap-row\{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative\}/.test(html),
+      'wrap-row 没有成为定位上下文（浮层会退化成单列宽 107px）');
+    assert.ok(/\.wrap-row>\.wr-cell>\.flbl\{position:static\}/.test(html),
+      'wrap-row 内的 .flbl 仍自成定位上下文，浮层铺不满整行');
+    /* 反向：v0.9.74 那条「左栏自图标向右展开」的老 hack 必须彻底删掉——
+       它只治左栏、且照样从右边界探出，留着会与新规则打架 */
+    assert.ok(!/\.main > :first-child \.info::after/.test(html), 'v0.9.74 的旧 hack 还留着');
+    /* 右栏加宽、左栏略收：右栏内容从 224 → 266px，hint 由折 2 行变 1 行 */
+    assert.ok(/grid-template-columns:240px minmax\(0,1fr\) 300px/.test(html), '左右栏宽度没按 198 调整');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
