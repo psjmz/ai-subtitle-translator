@@ -119,6 +119,12 @@
      窄列里右边会折成两行 → 两个输入框上下错开一行，看着像没对齐。给 label 固定两行高，
      多行的那侧顶对齐，两个输入框就齐平了。 */
   .wr-cell .flbl{margin-top:0;min-height:31px;align-items:flex-start}
+  /* v0.9.194：窄列里「原文离底距离 + info 图标」这类长标签会横向溢出，把小图标顶到格子外面
+     （实测 en/ja/ar 更明显）。让文字可断行，图标就能留在原位。 */
+  .wr-cell .flbl>span{overflow-wrap:anywhere}
+  /* v0.9.194：ASS 原文列在单语导出时整列隐藏，剩下的译文列要跨满整行
+     （.wrap-row 是固定两列网格，某一列 display:none 不会自动补位，右半栏会空着）。 */
+  .wr-cell.span2{grid-column:1 / -1}
   .btn:disabled{opacity:.4;cursor:not-allowed}
   .hint{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.55}
   /* v0.9.190：折行设置的分节标题与说明。sec-title 默认 margin-top:22px 是为左右栏之间的
@@ -567,7 +573,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.192</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.194</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -727,7 +733,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.192</span>
+    <span class="ver-tag">v0.9.194</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -825,45 +831,10 @@
       <!-- v0.9.189：折行阈值 / 双语行宽两项已移到右侧「导出译文」面板（见那里的说明）。
            折行是翻译完成后的排版处理，不属于翻译设置，放左栏会让用户以为它影响翻译结果。 -->
 
-      <!-- v0.9.100：ASS 导出外观（字号/颜色/离底距离）。整组只在导出格式为 ASS 时显示，
-           否则 SRT/VTT/TXT 用户会看到对自己无效的设置。 -->
-      <div id="assStyleBox" style="display:none">
-        <div class="sec-title"><i class="sec-ic c5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></i><span data-i18n="secAssStyle">ASS 字幕样式</span></div>
-        <label class="flbl"><span data-i18n="lblAssDstSize">译文字号</span></label>
-        <input type="number" id="assDstSize" value="56" min="8" max="300" step="1">
-        <div class="hint" id="assDstSizeHint"></div>
-        <!-- v0.9.110：单语导出没有原文行，整行隐藏（此前仍显示并可配置，配了也不生效） -->
-        <div id="assSrcSizeRow">
-        <label class="flbl"><span data-i18n="lblAssSrcSize">原文字号</span></label>
-        <input type="number" id="assSrcSize" value="50" min="8" max="300" step="1">
-        <div class="hint" id="assSrcSizeHint"></div>
-        </div>
-        <div class="hint" id="assSizeHint"></div>
-        <div class="hint" id="assResetNote"></div>
-        <!-- v0.9.101：颜色改为直接输入 #RRGGBB 色值（高级选项，色值不再受预设限制），
-             左侧小方块是实时预览；色值非法时预览变虚线框，导出回落默认色。 -->
-        <label class="flbl"><span data-i18n="lblAssDstColor">译文颜色</span><i class="info" data-tip-i18n="assColorTip">i</i></label>
-        <div class="ass-color-row">
-          <span class="csw" id="assDstColorSw" style="background:#FFFFFF"></span>
-          <input type="text" id="assDstColor" value="#FFFFFF" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFFFFF">
-        </div>
-        <label class="flbl"><span data-i18n="lblAssSrcColor">原文颜色</span><i class="info" data-tip-i18n="assColorTip">i</i></label>
-        <div class="ass-color-row">
-          <span class="csw" id="assSrcColorSw" style="background:#FFD700"></span>
-          <input type="text" id="assSrcColor" value="#FFD700" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFD700">
-        </div>
-        <!-- v0.9.102：离底距离拆成译文/原文两个、各自独立。默认值随「分屏/双行 + 谁在上」联动，
-             v0.9.110：改为「上下文感知」——切换布局时自动套新布局的推荐值并可撤销，
-             切换语言只提示不覆盖（详情见 assCtxSync）。 -->
-        <label class="flbl"><span data-i18n="lblAssDstMarginV">译文离底距离</span><i class="info" data-tip-i18n="assDstMVTip">i</i></label>
-        <input type="number" id="assDstMV" value="42" min="0" max="1080" step="2">
-        <div class="hint" id="assDstMVHint"></div>
-        <div id="assSrcMVRow">
-        <label class="flbl"><span data-i18n="lblAssSrcMarginV">原文离底距离</span><i class="info" data-tip-i18n="assSrcMVTip">i</i></label>
-        <input type="number" id="assSrcMV" value="42" min="0" max="1080" step="2">
-        <div class="hint" id="assSrcMVHint"></div>
-        </div>
-      </div>
+      <!-- v0.9.194：ASS 字幕样式（字号/颜色/离底距离）已移到右侧「导出译文」面板，
+           紧跟在「导出字幕样式」下面。它本来就由右边那个下拉框控制（选 ASS 才出现），
+           是导出期的外观设置、不是翻译参数，放左栏会让用户以为它影响翻译结果。
+           搬运只动位置：id 与 data-i18n 全保留，控制逻辑（syncAssStyleBox）不变。 -->
 
       <!-- v0.9.78：歌词处理——三档（翻译/保留原文/删除）+ 可编辑的歌词标记字符集合 -->
       <label class="flbl"><span data-i18n="lblLyric">歌词处理</span><i class="info" data-tip-i18n="lyricTip">i</i></label>
@@ -980,6 +951,61 @@
       </div>
       <label class="flbl" data-i18n="lblExpStyle">导出字幕样式</label>
       <select id="expStyle"></select>
+      <!-- v0.9.194：ASS 外观设置由左栏搬到这里（理由见左栏那条注释）。
+           位置在「导出字幕样式」正下方——选了 ASS 立刻在下面冒出它的设置，因果顺序最顺。
+           控制逻辑与左栏时期完全一致：syncAssStyleBox() 判 expFileFmt()==='ass' 才显示，
+           单语导出没有原文行时隐藏原文那两列（v0.9.110）。
+           ⚠️ 字号/颜色/离底各自「译文 + 原文」两列并排：竖排 7 个字段会让右栏卡片过高、
+           矮屏出内滚动条（v0.9.190 刚因折行两组调过一次高度），并排后从约 14 行压到 7 行。 -->
+      <div id="assStyleBox" style="display:none">
+        <div class="sec-title sub"><i class="sec-ic c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></i><span data-i18n="secAssStyle">ASS 字幕样式</span></div>
+        <div class="wrap-row">
+          <div class="wr-cell" id="assDstSizeRow">
+            <label class="flbl"><span data-i18n="lblAssDstSize">译文字号</span></label>
+            <input type="number" id="assDstSize" value="56" min="8" max="300" step="1">
+            <div class="hint" id="assDstSizeHint"></div>
+          </div>
+          <!-- v0.9.110：单语导出没有原文行，整列隐藏（此前仍显示并可配置，配了也不生效） -->
+          <div class="wr-cell" id="assSrcSizeRow">
+            <label class="flbl"><span data-i18n="lblAssSrcSize">原文字号</span></label>
+            <input type="number" id="assSrcSize" value="50" min="8" max="300" step="1">
+            <div class="hint" id="assSrcSizeHint"></div>
+          </div>
+        </div>
+        <div class="hint" id="assSizeHint"></div>
+        <div class="hint" id="assResetNote"></div>
+        <!-- v0.9.101：颜色直接输入 #RRGGBB；左侧小方块是实时预览，色值非法时预览变虚线框 -->
+        <div class="wrap-row">
+          <div class="wr-cell">
+            <label class="flbl"><span data-i18n="lblAssDstColor">译文颜色</span><i class="info" data-tip-i18n="assColorTip">i</i></label>
+            <div class="ass-color-row">
+              <span class="csw" id="assDstColorSw" style="background:#FFFFFF"></span>
+              <input type="text" id="assDstColor" value="#FFFFFF" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFFFFF">
+            </div>
+          </div>
+          <div class="wr-cell">
+            <label class="flbl"><span data-i18n="lblAssSrcColor">原文颜色</span><i class="info" data-tip-i18n="assColorTip">i</i></label>
+            <div class="ass-color-row">
+              <span class="csw" id="assSrcColorSw" style="background:#FFD700"></span>
+              <input type="text" id="assSrcColor" value="#FFD700" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFD700">
+            </div>
+          </div>
+        </div>
+        <!-- v0.9.102：离底距离拆成译文/原文两个、各自独立。默认值随「分屏/双行 + 谁在上」联动，
+             v0.9.110：改为上下文感知——切换布局时自动套推荐值并可撤销，切换语言只提示不覆盖。 -->
+        <div class="wrap-row">
+          <div class="wr-cell" id="assDstMVRow">
+            <label class="flbl"><span data-i18n="lblAssDstMarginV">译文离底距离</span><i class="info" data-tip-i18n="assDstMVTip">i</i></label>
+            <input type="number" id="assDstMV" value="42" min="0" max="1080" step="2">
+            <div class="hint" id="assDstMVHint"></div>
+          </div>
+          <div class="wr-cell" id="assSrcMVRow">
+            <label class="flbl"><span data-i18n="lblAssSrcMarginV">原文离底距离</span><i class="info" data-tip-i18n="assSrcMVTip">i</i></label>
+            <input type="number" id="assSrcMV" value="42" min="0" max="1080" step="2">
+            <div class="hint" id="assSrcMVHint"></div>
+          </div>
+        </div>
+      </div>
       <!-- v0.9.190：删掉「导出文件名」输入框 —— 文件名本来就按「源文件名 + 目标语言 + 样式」自动生成，
            让用户手改属于伪需求（改完还得自己保证后缀正确），label 里的括号说明也纯属解释文案。
            导出时直接用 autoOutNameStr() 现算（见 btnDownload）。 -->
@@ -1037,7 +1063,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.192"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.194"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -9944,6 +9970,11 @@ function syncAssStyleBox(){
   var r1=$('assSrcSizeRow'), r2=$('assSrcMVRow');
   if(r1) r1.style.display = mono ? 'none' : '';
   if(r2) r2.style.display = mono ? 'none' : '';
+  /* v0.9.194：两列并排后，原文列隐藏会让译文列只占左半边、右半空着。
+     给译文列加 span2 让它跨满整行（.wrap-row 是固定两列网格，display:none 不会自动补位）。 */
+  var d1=$('assDstSizeRow'), d2=$('assDstMVRow');
+  if(d1 && d1.classList) d1.classList.toggle('span2', !!mono);
+  if(d2 && d2.classList) d2.classList.toggle('span2', !!mono);
 }
 /* v0.9.102：离底距离的默认值随「分屏/双行 + 谁在上」与字号联动；用户手动改过的那个不再联动。
    典型值按 1 行内容估算（双行模式下另一块 = 42 + 贴底块 1 行高 + 8）。 */

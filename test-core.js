@@ -2672,7 +2672,9 @@ console.log('— response_format 默认注入（v0.9.132）—');
     assert.ok(/opts&&opts\.json&&plan\.rf\)\?\{json:1\}/.test(html), 'meta.json 未随 opts.json 传递');
     assert.ok(/const jsonOpts = \(body\.meta && body\.meta\.json\)/.test(srv), '服务端未读取 meta.json');
     assert.ok(/callModel\(pick\.cfg, body\.messages, undefined, jsonOpts\)/.test(srv), '服务端主调用未传 jsonOpts');
-    assert.ok(/callModel\(slotCfg\(cfg, 'A'\), body\.messages, undefined, jsonOpts\)/.test(srv), '服务端回退调用未传 jsonOpts');
+    /* v0.9.193：回退从「写死 B→A」改成 fallbackChain 逐级循环，调用点是 slotFb 而非 slotCfg(cfg,'A')。
+       语义不变：每一级回退都必须同样带上 jsonOpts，否则术语抽取在回退链上会拿到非 JSON 正文。 */
+    assert.ok(/callModel\(slotFb, body\.messages, undefined, jsonOpts\)/.test(srv), '服务端回退调用未传 jsonOpts');
   });
   t('优先级：用户在附加参数里显式给 response_format 时不注入默认值', () => {
     assert.ok(/ex\.response_format===undefined/.test(html) || /hasOwnProperty\.call\(ex,'response_format'\)/.test(html),
@@ -3360,9 +3362,13 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   t('v0.9.157 viaB 标记必须按本次真实值写（走A时传0）', () => {
     const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
     /* 走 A 时若传 null，旧事件上的 viaB=1 永远不会被清掉 */
-    assert.ok(/\{ viaB: pick\.which === 'B' \? 1 : 0 \}/.test(srvSrc),
-      'appendEvent 调用处未恒传 viaB 0/1');
-    assert.ok(/outA\._fb\s*=/.test(srvSrc), '回退响应未带 _fb 回执');
+    /* v0.9.193：三槽后多带 viaC。要求 viaB 仍是「走 B 才 1」的无条件 0/1 写法 —— 否则
+       「viaB=1 即 B 槽」这个既有统计口径会被 C 槽污染（走 C 时 viaB 必须是 0）。 */
+    assert.ok(/\{ viaB: pick\.which === 'B' \? 1 : 0, viaC: pick\.which === 'C' \? 1 : 0 \}/.test(srvSrc),
+      'appendEvent 调用处未恒传 viaB 0/1（三槽后还要同时恒传 viaC）');
+    /* v0.9.193：回退改成 fallbackChain 循环，变量从写死的 outA 变成 outF（语义不变：
+       每一级回退都要给前端带回 _fb 回执，否则用户永远不知道自己被降级了）。 */
+    assert.ok(/outF\._fb\s*=/.test(srvSrc), '回退响应未带 _fb 回执');
   });
 
   t('v0.9.156 前端要读回退回执并打日志', () => {
@@ -3925,13 +3931,15 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        排队放在服务端（额度本来就是所有用户共享的），并且按槽位分别记账、分别判定。 */
     const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
     /* ① 账本与限额都按槽位分开 */
-    assert.ok(/const RATE = \{ A: \[\], B: \[\] \};/.test(srvSrc), '滑窗账本没有按槽位分开——A 会被 B 的拥堵连坐');
-    assert.ok(/const RATE_LIMIT = \{ A: 0, B: 2000000 \};/.test(srvSrc), 'A 槽限额不是 0（不限）；A 从未限流，排队纯属拖慢用户');
+    /* v0.9.193：三槽（A/B/C）。账本与限额必须三个槽位都齐 —— 漏一个就是 undefined，
+       要么崩溃要么静默不限流。C 的种子额度与 B 对齐。 */
+    assert.ok(/const RATE = \{ A: \[\], B: \[\], C: \[\] \};/.test(srvSrc), '滑窗账本没有按槽位分开——A 会被 B 的拥堵连坐');
+    assert.ok(/const RATE_LIMIT = \{ A: 0, B: 2000000, C: 2000000 \};/.test(srvSrc), 'A 槽限额不是 0（不限）；A 从未限流，排队纯属拖慢用户');
     /* v0.9.187：B 的种子值必须是 200 万（2026-09-27 直连 api.openai.com 实测
        x-ratelimit-limit-tokens = 2,000,000），不是提额前从 429 文案里学到的 20 万。
        ⚠️ 种子只在「进程刚起、还没读到第一个响应头」那一瞬生效，但种子太低会让重启后
        头几批无谓地排队——而这时上游其实有 200 万额度。 */
-    const seedB = (srvSrc.match(/const RATE_LIMIT = \{ A: 0, B: (\d+) \};/) || [])[1];
+    const seedB = (srvSrc.match(/const RATE_LIMIT = \{ A: 0, B: (\d+), C: \d+ \};/) || [])[1];
     assert.strictEqual(seedB, '2000000', 'B 槽种子值应跟真实额度 200 万同量级，实际 ' + seedB);
     assert.ok(/if \(limit <= 0\) return 0;/.test(srvSrc), 'LIMIT=0 的槽位没有直接放行');
     /* ② 判定必须在 pickModel 之后：不知道走哪个槽位就查不了对应的账本 */
@@ -3947,8 +3955,11 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* ④ 限额别硬编码：429 文案里带着上游亲口报的数，学下来（只收紧不放松） */
     assert.ok(/Limit\\s\+\(\\d\{3,\}\)/.test(srvSrc), '没有从 429 文案里解析 Limit——上游改配额就得改代码');
     assert.ok(/v < RATE_LIMIT\[which\]/.test(srvSrc), '学到的限额没有「只收紧不放松」');
-    /* ⑤ 回退那一趟走的是 A 槽，消耗必须记进 A 的账本：记到 B 上会凭空吃掉 B 的额度 */
-    assert.ok(/rateAdd\('A', tkA\.tin \+ tkA\.tout\)/.test(srvSrc), 'B→A 回退的消耗没记进 A 槽账本');
+    /* ⑤ 回退那一趟走的是别的槽，消耗必须记进真正出力的那个槽的账本：
+       记到上级槽上会凭空吃掉上级的额度（上级正堵着，等于火上浇油）。
+       v0.9.193：三槽后回退是 C→B→A 循环，记账点从写死的 'A' 变成当前这一级 fb。 */
+    assert.ok(/rateAdd\(fb, tkF\.tin \+ tkF\.tout\)/.test(srvSrc), '回退的消耗没记进真正出力的那个槽的账本');
+    assert.ok(!/rateAdd\([^,]+, tkA\.tin/.test(srvSrc), '回退记账还在写死槽位（三槽后必须按当前级记）');
     /* ⑥ 每 IP 在途上限，且无论成功 / 回退 / 失败都要还回去 */
     /* v0.9.185：2 → 4。前端隔离重译 poolMap(…,3)、术语提取 poolMap(…,4)，
        上限低于自己的并发度就会「自己挤自己」（第 3 个请求必然被判在途、白等 8~16 秒）。 */
@@ -4355,6 +4366,51 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const vals = [...html.matchAll(/splitWarnBi\s*:\s*'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
     assert.strictEqual(vals.length, 27, 'splitWarnBi 词条数 ' + vals.length);
     vals.forEach(v => assert.ok(v.includes('{0}') && v.includes('{1}') && v.includes('{2}'), '占位符不全: ' + v));
+  });
+
+  t('v0.9.194 ASS 样式设置搬到右栏「导出字幕样式」下方（不再留在左栏翻译设置里）', () => {
+    /* 它本来就由右边的「导出字幕样式」控制（选 ASS 才出现），却摆在左栏翻译设置里，
+       用户会以为它影响翻译结果。搬运只动位置：id 与 data-i18n 全保留、控制逻辑不变。 */
+    const iExport = html.indexOf('data-i18n="stepExport"');   // 右栏「导出译文」标题
+    const iExpSel = html.indexOf('<select id="expStyle"></select>');
+    const iAss    = html.indexOf('id="assStyleBox"');
+    const iWrap   = html.indexOf('data-i18n="secWrap"');      // 折行设置
+    assert.ok(iExport > 0 && iExpSel > iExport, '右栏导出区定位失败');
+    assert.ok(iAss > iExpSel, 'ASS 组不在「导出字幕样式」之后（应紧跟它，因果顺序最顺）');
+    assert.ok(iAss < iWrap, 'ASS 组跑到折行设置后面去了');
+    assert.strictEqual(html.split('id="assStyleBox"').length - 1, 1, 'assStyleBox 不唯一（左栏还留着？）');
+    /* 标题降级为 .sec-title.sub：右栏里「导出译文」是主标题，ASS 与折行同为子节，不能并列主标题 */
+    assert.ok(/<div class="sec-title sub"><i class="sec-ic c2">[\s\S]{0,200}data-i18n="secAssStyle"/.test(html),
+      'ASS 标题不是右栏子节样式（或图标色与折行的 c5 撞了）');
+    /* 控制逻辑一个字没改：仍由 syncAssStyleBox 判 ass 才显示 + 单语隐藏原文列 */
+    assert.ok(/b\.style\.display=\(expFileFmt\(\)==='ass'\)\?'':'none'/.test(html), 'ASS 显示判定被改了');
+    assert.ok(/r1\.style\.display = mono \? 'none' : ''/.test(html), '单语隐藏原文字号列的逻辑被改了');
+    assert.ok(/r2\.style\.display = mono \? 'none' : ''/.test(html), '单语隐藏原文离底列的逻辑被改了');
+  });
+
+  t('v0.9.194 ASS 七个字段三行并排（竖排会撑出滚动条）', () => {
+    /* 右栏 max-height 是 100vh-60px（v0.9.190 刚因折行两组调过一次），
+       竖排 7 个字段必然出内滚动条。字号/颜色/离底各自「译文+原文」两列并排 → 约 14 行压到 7 行。 */
+    assert.strictEqual((html.match(/class="wrap-row"/g) || []).length, 4, 'wrap-row 应是 4 组（折行 1 + ASS 3）');
+    /* 三组的译文/原文必须同处一个 wrap-row 内，而不是各占一行 */
+    const rows = html.match(/<div class="wrap-row">[\s\S]*?\n        <\/div>/g) || [];
+    const assRows = rows.filter(r => /assDstSize|assDstColor|assDstMV/.test(r));
+    assert.strictEqual(assRows.length, 3, 'ASS 并排组数 ' + assRows.length);
+    assert.ok(assRows.some(r => /assSrcSize/.test(r)), '字号没有并排');
+    assert.ok(assRows.some(r => /assSrcColor/.test(r)), '颜色没有并排');
+    assert.ok(assRows.some(r => /assSrcMV/.test(r)), '离底距离没有并排');
+    /* 16 个 id 全部原样保留 → assCtxSync / 字号推荐 / 离底联动 / 27 语翻译零改动 */
+    const ids = ['assDstSize', 'assSrcSize', 'assDstColor', 'assSrcColor', 'assDstMV', 'assSrcMV',
+      'assDstColorSw', 'assSrcColorSw', 'assDstSizeHint', 'assSrcSizeHint',
+      'assDstMVHint', 'assSrcMVHint', 'assSizeHint', 'assResetNote', 'assSrcSizeRow', 'assSrcMVRow'];
+    ids.forEach(k => assert.strictEqual((html.match(new RegExp('id="' + k + '"', 'g')) || []).length, 1,
+      k + ' 不是恰好 1 处（搬运动了 id 会让整组联动失效）'));
+    /* 单语时原文列隐藏 → 译文列要跨满整行，否则右半栏空着 */
+    assert.ok(/\.wr-cell\.span2\{grid-column:1 \/ -1\}/.test(html), '缺少 span2 跨列样式');
+    assert.ok(/d1\.classList\.toggle\('span2', !!mono\)/.test(html) && /d2\.classList\.toggle\('span2', !!mono\)/.test(html),
+      '单语时译文列没有跨满整行');
+    /* 零新增 i18n：secAssStyle 等词条本来就存在 */
+    assert.strictEqual((html.match(/data-i18n="secAssStyle"/g) || []).length, 1, 'secAssStyle 引用不唯一');
   });
 }
 
