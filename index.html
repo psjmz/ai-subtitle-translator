@@ -528,8 +528,18 @@
   /* 右栏：导出 */
   .exp-preview{border-radius:14px;overflow:hidden;margin-bottom:12px;background:#2F2D33;aspect-ratio:16/9;position:relative}
   .ep-line{position:absolute;left:0;right:0;text-align:center;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ep-dst{bottom:26px;color:#fff;font-size:12px}
-  .ep-src{bottom:9px;color:#C9B8FF;font-size:10.5px}
+  .ep-dst{bottom:26px;font-size:var(--pv-dst,12px);color:var(--pv-dst-c,#fff)}
+  .ep-src{bottom:9px;font-size:var(--pv-src,10.5px);color:var(--pv-src-c,#C9B8FF)}
+  /* v0.9.196：预览跟随「导出字幕样式」。原来这四行是写死的——永远是「译文在上 + 原文在下」的两行双语，
+     选单语（mono）或「原文在上」（bi-src）纹丝不动，用户看到的从来不是自己即将导出的样子。
+     类由 syncExpPreview() 打：pv-mono 只有译文一行且居中；pv-rev 相邻双行换成原文在上；
+     pv-split 是 ASS 分屏（原文贴顶 / 译文贴底），pv-split-rev 则译文贴顶。
+     ⚠️ 字号只跟角色走（译文恒大于原文），位置变化不交换字号，与 ASS 导出规则一致。 */
+  .exp-preview.pv-rev .ep-dst{bottom:9px}
+  .exp-preview.pv-rev .ep-src{bottom:26px}
+  .exp-preview.pv-split .ep-src{top:22px;bottom:auto}
+  .exp-preview.pv-split-rev .ep-dst{top:22px;bottom:auto}
+  .exp-preview.pv-mono .ep-dst{bottom:50%;transform:translateY(50%)}
 
   /* SEO 区（保留原版排版，仅换皮变量） */
   .seo{max-width:1080px;margin:32px auto 0;padding:20px 24px 0;color:var(--sub);font-size:13px;line-height:1.8}
@@ -573,7 +583,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.195</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.196</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -733,7 +743,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.195</span>
+    <span class="ver-tag">v0.9.196</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -1067,7 +1077,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.195"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.196"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -9981,6 +9991,45 @@ function syncAssStyleBox(){
     if(d && d.classList) d.classList.toggle('span2', !!mono);
   });
 }
+/* v0.9.196：导出预览跟随「导出字幕样式」。此前 .exp-preview 里两行是写死的双语排布，
+   选 mono / bi-src / 换文件格式都不动——预览等于没用。
+   规则（与 srt-core.js 的 ASS 生成、以及 SRT/VTT 双行导出保持一致）：
+     mono                → 只留译文一行、垂直居中
+     bi-src              → 原文在上、译文在下
+     bi-dst              → 译文在上、原文在下
+     ASS 分屏（非 stack）→ 两块一上一下分开（原文贴顶 / 译文贴底）
+     ASS 双行 + SRT/VTT  → 两块相邻贴底
+   选 ASS 时颜色与字号再跟着上面的设置走（非 ASS 不跟：播放器用的不是这套样式，跟着反而误导）。
+   ⚠️ 字号按 pt 等比缩进预览框（56pt→12px / 50pt→10.5px 基准），并夹在 8~22px —— 不夹会被 200pt 撑破。 */
+function syncExpPreview(){
+  var box=document.querySelector('.exp-preview'); if(!box) return;
+  var dst=box.querySelector('.ep-dst'), src=box.querySelector('.ep-src');
+  if(!dst||!src) return;
+  var fmt=expFmtOf(), mono=(fmt==='mono'), srcFirst=(fmt==='bi-src');
+  var isAss=(expFileFmt()==='ass');
+  /* 分屏只在 ASS 且非双行时有意义：SRT/VTT 与 ASS 双行都是两块相邻贴底 */
+  var split = isAss && !assStacked() && !mono;
+  box.classList.toggle('pv-mono', mono);
+  /* ⚠️ bi-src 是「原文在上」（见 i18n fmtBiSrc），所以 srcFirst 时贴顶的是 ep-src，
+     对应 pv-split（.ep-src{top}）；bi-dst 才轮到译文贴顶的 pv-split-rev。别写反。 */
+  box.classList.toggle('pv-split', split && srcFirst);
+  box.classList.toggle('pv-split-rev', split && !srcFirst);
+  box.classList.toggle('pv-rev', !split && !mono && srcFirst);
+  src.style.display = mono ? 'none' : '';
+  if(isAss){
+    var col=function(id,def){ var v=String(($(id)||{}).value||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:def; };
+    var px=function(id,ratio,def){ var n=parseFloat(($(id)||{}).value); return (isFinite(n)?Math.max(8,Math.min(22,Math.round(n*ratio))):def)+'px'; };
+    box.style.setProperty('--pv-dst-c', col('assDstColor','#FFFFFF'));
+    box.style.setProperty('--pv-src-c', col('assSrcColor','#FFD700'));
+    box.style.setProperty('--pv-dst', px('assDstSize', 12/56, 12));
+    box.style.setProperty('--pv-src', px('assSrcSize', 21/100, 10.5));
+  }else{
+    /* 回落 CSS 默认（白 + 淡紫）：SRT/VTT 播放器不读 ASS 那套自定义色 */
+    ['--pv-dst-c','--pv-src-c','--pv-dst','--pv-src'].forEach(function(k){ box.style.removeProperty(k); });
+  }
+}
+/* 预览里的字号/颜色只在 ASS 模式下有意义，但统一用委托监听最省：改哪个字段都能立刻反映 */
+(function(){ var ab=$('assStyleBox'); if(ab) ab.addEventListener('input', function(){ syncExpPreview(); }); })();
 /* v0.9.102：离底距离的默认值随「分屏/双行 + 谁在上」与字号联动；用户手动改过的那个不再联动。
    典型值按 1 行内容估算（双行模式下另一块 = 42 + 贴底块 1 行高 + 8）。 */
 function assDefaultMV(role){
@@ -10021,8 +10070,8 @@ ASS_F.dmv={el:$('assDstMV'),hint:$('assDstMVHint'),rec:function(){return assDefa
            isT:function(){return !!UI.assDstMVSet;},setT:function(v){UI.assDstMVSet=v;},after:function(){syncAssMVBox();}};
 ASS_F.smv={el:$('assSrcMV'),hint:$('assSrcMVHint'),rec:function(){return assDefaultMV('src');},
            isT:function(){return !!UI.assSrcMVSet;},setT:function(v){UI.assSrcMVSet=v;},after:function(){syncAssMVBox();}};
-$('expStyle').addEventListener('change',function(){ syncAssStyleBox(); assCtxSync(); save(); });
-syncAssStyleBox(); syncAssMVBox();
+$('expStyle').addEventListener('change',function(){ syncAssStyleBox(); assCtxSync(); syncExpPreview(); save(); });
+syncAssStyleBox(); syncAssMVBox(); syncExpPreview();
 /* v0.9.110：页面初始化末尾记录当前上下文，之后用户的每一次切换都能被正确判定 */
 ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
 /* v0.9.100：ASS 外观改动即时记忆 */

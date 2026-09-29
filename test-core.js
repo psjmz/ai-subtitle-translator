@@ -4433,6 +4433,31 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/s\.style\.display = mono \? 'none' : ''/.test(html), '隐藏方式被改成非 display 了');
     assert.ok(!/tri\.forEach[\s\S]{0,200}\$\('assSrcColor'\)\.value/.test(html), '同步函数里不要改写原文颜色的 value');
   });
+
+  t('v0.9.196 导出预览跟随「导出字幕样式」（不再是写死的双语两行）', () => {
+    /* 此前 .exp-preview 里两行是死排布：译文在上、原文在下，选 mono / bi-src / 换格式都不动，
+       用户看到的永远不是即将导出的样子。现在由 syncExpPreview() 打四个类来驱动。 */
+    assert.ok(/function syncExpPreview\(\)/.test(html), '缺少 syncExpPreview');
+    ['pv-mono', 'pv-rev', 'pv-split', 'pv-split-rev'].forEach(k =>
+      assert.ok(new RegExp('\\.exp-preview\\.' + k).test(html), '缺少样式 .exp-preview.' + k));
+    /* ⚠️ 语义陷阱：bi-src 是「原文在上」（见 i18n fmtBiSrc），所以 srcFirst 时贴顶的是 ep-src → pv-split。
+       这两行写反过一次（实测分屏上下颠倒），单测把它钉住。 */
+    assert.ok(/classList\.toggle\('pv-split', split && srcFirst\)/.test(html),
+      'bi-src 应走 pv-split（原文贴顶），别和 pv-split-rev 写反');
+    assert.ok(/classList\.toggle\('pv-split-rev', split && !srcFirst\)/.test(html), 'bi-dst 应走 pv-split-rev');
+    /* 单语：原文那一行必须藏掉（否则预览里还是"双语句式"） */
+    assert.ok(/src\.style\.display = mono \? 'none' : ''/.test(html), '单语时预览的原文行没隐藏');
+    /* 接线：下拉框变化 + 初始化都要刷，漏了就是白做 */
+    assert.ok(/\$\('expStyle'\)\.addEventListener\('change',function\(\)\{ syncAssStyleBox\(\); assCtxSync\(\); syncExpPreview\(\); save\(\); \}\)/.test(html),
+      'expStyle change 里没调 syncExpPreview');
+    assert.ok(/syncAssStyleBox\(\); syncAssMVBox\(\); syncExpPreview\(\);/.test(html), '初始化没调 syncExpPreview');
+    /* ASS 才跟颜色/字号；非 ASS 必须回落默认，否则拿 ASS 的自定义色误导（播放器不读那套） */
+    assert.ok(/setProperty\('--pv-dst-c'/.test(html) && /removeProperty\(k\)/.test(html),
+      'ASS 颜色/字号的跟随或回落不完整');
+    assert.ok(/Math\.max\(8,Math\.min\(22,Math\.round\(n\*ratio\)\)\)/.test(html), '预览字号没有夹在 8~22px（200pt 会撑破预览框）');
+    /* 位置变、字号不变：译文恒大于原文，与 ASS 导出「字号跟角色走」一致 */
+    assert.ok(!/pv-rev \.ep-dst\{[^}]*font-size:var\(--pv-src/.test(html), 'pv-rev 里把译文字号换成原文的了');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
