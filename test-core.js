@@ -4379,9 +4379,13 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(iAss > iExpSel, 'ASS 组不在「导出字幕样式」之后（应紧跟它，因果顺序最顺）');
     assert.ok(iAss < iWrap, 'ASS 组跑到折行设置后面去了');
     assert.strictEqual(html.split('id="assStyleBox"').length - 1, 1, 'assStyleBox 不唯一（左栏还留着？）');
-    /* 标题降级为 .sec-title.sub：右栏里「导出译文」是主标题，ASS 与折行同为子节，不能并列主标题 */
-    assert.ok(/<div class="sec-title sub"><i class="sec-ic c2">[\s\S]{0,200}data-i18n="secAssStyle"/.test(html),
-      'ASS 标题不是右栏子节样式（或图标色与折行的 c5 撞了）');
+    /* v0.9.199：标题再降一级 —— 从 .sec-title.sub（图标徽章 + 渐隐尾线）改为 .blk-title，
+       层级交给 .param-blk 的浅底色承担，而不是靠标题自身的重量。
+       （194 时只降到 sub，仍与「导出译文」主标题同款，三者在 300px 栏里看着平级。） */
+    assert.ok(/<div class="param-blk">[\s\S]{0,240}<div class="blk-title"><span data-i18n="secAssStyle"/.test(html),
+      'ASS 标题不是参数块内的块标题（层级没降下来）');
+    assert.ok(!/<div class="sec-title sub"><i class="sec-ic c2">[\s\S]{0,200}data-i18n="secAssStyle"/.test(html),
+      'ASS 还在用与「导出译文」同款的 sec-title（又平级了）');
     /* 控制逻辑一个字没改：仍由 syncAssStyleBox 判 ass 才显示 + 单语隐藏原文列 */
     assert.ok(/b\.style\.display=\(expFileFmt\(\)==='ass'\)\?'':'none'/.test(html), 'ASS 显示判定被改了');
     /* v0.9.195 起走统一的 tri 清单（原来按 id 逐个硬写两个变量，漏一组也看不出来） */
@@ -4393,11 +4397,15 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   t('v0.9.194 ASS 七个字段三行并排（竖排会撑出滚动条）', () => {
     /* 右栏 max-height 是 100vh-60px（v0.9.190 刚因折行两组调过一次），
        竖排 7 个字段必然出内滚动条。字号/颜色/离底各自「译文+原文」两列并排 → 约 14 行压到 7 行。 */
-    assert.strictEqual((html.match(/class="wrap-row"/g) || []).length, 4, 'wrap-row 应是 4 组（折行 1 + ASS 3）');
-    /* 三组的译文/原文必须同处一个 wrap-row 内，而不是各占一行 */
-    const rows = html.match(/<div class="wrap-row">[\s\S]*?\n        <\/div>/g) || [];
+    /* v0.9.199：ASS 那三组从 .wrap-row（标签在上、两列并排）升级成 .wr-row3（行标签 + 两列），
+       所以 wrap-row 只剩折行那 1 组；ASS 的三组改数 wr-row3。 */
+    assert.strictEqual((html.match(/class="wrap-row"/g) || []).length, 1, 'wrap-row 现在只该剩折行那 1 组');
+    assert.strictEqual((html.match(/class="wr-row3"/g) || []).length, 3, 'ASS 三行参数表（字号/颜色/离底）缺失');
+    /* 三行的译文/原文必须同处一行内，而不是各占一行。
+       v0.9.199：容器由 .wrap-row（标签在上、两列）换成 .wr-row3（行标签 + 两列）。 */
+    const rows = html.match(/<div class="wr-row3">[\s\S]*?\n        <\/div>/g) || [];
     const assRows = rows.filter(r => /assDstSize|assDstColor|assDstMV/.test(r));
-    assert.strictEqual(assRows.length, 3, 'ASS 并排组数 ' + assRows.length);
+    assert.strictEqual(assRows.length, 3, 'ASS 参数行数 ' + assRows.length);
     assert.ok(assRows.some(r => /assSrcSize/.test(r)), '字号没有并排');
     assert.ok(assRows.some(r => /assSrcColor/.test(r)), '颜色没有并排');
     assert.ok(assRows.some(r => /assSrcMV/.test(r)), '离底距离没有并排');
@@ -4421,7 +4429,13 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        隐藏逻辑按 id 逐个抓 → 抓不到，漏到现在，并被 v0.9.194 的并排放大（右半边整块空着）。 */
     ['assDstColorRow', 'assSrcColorRow'].forEach(k =>
       assert.strictEqual((html.match(new RegExp('id="' + k + '"', 'g')) || []).length, 1, k + ' 不是恰好 1 处'));
-    assert.ok(/<div class="wr-cell" id="assSrcColorRow">[\s\S]{0,320}id="assSrcColor"/.test(html),
+    /* v0.9.199：原来是 /…{0,320}id="assSrcColor"/ 的字符窗口匹配——给 ⓘ 补了 tabindex 之后
+       这段就超过 320 了，断言误报（194 那次同样是窄窗口假 MISS）。改成零窗口的结构判定：
+       assSrcColor 的位置必须落在 assSrcColorRow 之后、下一个 wr-cell 之前。 */
+    const pRow = html.indexOf('id="assSrcColorRow"');
+    const pInp = html.indexOf('id="assSrcColor"');
+    const pNext = html.indexOf('<div class="wr-cell"', pRow + 10);
+    assert.ok(pRow > 0 && pInp > pRow && (pNext < 0 || pInp < pNext),
       'id 没挂在原文颜色的 wr-cell 上（整列就藏不掉）');
     /* 结构性防漏：ASS 组里 6 个格子必须个个有 id —— 再漏一组就是同一个 bug 重演 */
     const iA = html.indexOf('id="assStyleBox"'), iEnd = html.indexOf('data-i18n="secWrap"');
@@ -4508,8 +4522,124 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 反向：v0.9.74 那条「左栏自图标向右展开」的老 hack 必须彻底删掉——
        它只治左栏、且照样从右边界探出，留着会与新规则打架 */
     assert.ok(!/\.main > :first-child \.info::after/.test(html), 'v0.9.74 的旧 hack 还留着');
-    /* 右栏加宽、左栏略收：右栏内容从 224 → 266px，hint 由折 2 行变 1 行 */
-    assert.ok(/grid-template-columns:240px minmax\(0,1fr\) 300px/.test(html), '左右栏宽度没按 198 调整');
+    /* 右栏加宽、左栏略收：右栏内容从 224 → 266px，hint 由折 2 行变 1 行。
+       v0.9.199 再 +20 → 320（右栏内容 286px）：ASS 参数表改成「列头 + 三行」后，
+       266px 里放不下「66px 行标签 + 两个 85px 色值框」（242 < 66+16+85×2），
+       差 10px，结果必然是标签折行或 #RRGGBB 被裁。改宽了就要同步改这个数字。 */
+    assert.ok(/grid-template-columns:240px minmax\(0,1fr\) 320px/.test(html), '左右栏宽度没按 198/199 调整');
+  });
+
+  t('v0.9.199 右栏嵌套：折行设置 / 下载按钮 / 赞助入口必须还在 aside.panel 里', () => {
+    /* 血泪教训：给 ASS 参数区包 .param-blk 时多写了一个 </div>，把右栏 aside.panel 提前闭合，
+       折行设置、下载按钮、复制、赞助入口全被甩成 #viewWorkspace 的直系子 → 整页宽的区块。
+       ⚠️ 为什么之前的检查全没发现：所有老断言都是「在整份 HTML 里找字符串」，元素跑到哪儿都照样匹配；
+       浏览器检查里右栏 scrollHeight == clientHeight 也「看着正常」——内容被搬走了当然不滚。
+       只有数 div 配对能拦住。 */
+    const seg = html.slice(html.indexOf('<div id="assStyleBox"'), html.indexOf('<div class="footer"'))
+                    .replace(/<!--[\s\S]*?-->/g, '');
+    const opens = (seg.match(/<div/g) || []).length, closes = (seg.match(/<\/div>/g) || []).length;
+    /* 期望 -2：这里面最后两个 </div> 关的是切片之前就已打开的 .main 与 #viewWorkspace */
+    assert.strictEqual(opens - closes, -2,
+      '右栏区块 div 不配对（净 ' + (opens - closes) + '，应为 -2）——多半是多写/漏写了一个 </div>');
+    assert.strictEqual((seg.match(/<\/aside>/g) || []).length, 1, '右栏 aside 没有恰好闭合一次');
+    const iAside = seg.indexOf('</aside>');
+    [['<div class="exp-actions">', '下载/复制按钮区'], ['id="donateBox"', '赞助入口'],
+     ['id="splitWarnHint"', '切分提示'], ['id="maxW"', '折行设置']].forEach(p => {
+      const i = seg.indexOf(p[0]);
+      assert.ok(i > 0 && i < iAside, p[1] + '跑到 aside.panel 外面去了（会变成整页宽的区块）');
+    });
+  });
+
+  t('v0.9.199 无障碍：每个控件都有名字，ⓘ 能聚焦，radio 成组', () => {
+    /* 审计实测：22 个字段标签没有 for=、28 个 input 没有可访问名、12 个 ⓘ 只有 hover 能触发。
+       逐项补齐，并用「结构性断言」钉住（逐个列清单会漏，直接扫 HTML）。 */
+    // ① .flbl 必须绑到某个控件：例外只有两个 radiogroup 的组标题（它们靠 aria-labelledby 反向引用）
+    const flbls = html.match(/<label[^>]*class="[^"]*\bflbl\b[^"]*"[^>]*>/g) || [];
+    assert.ok(flbls.length >= 14, '.flbl 数量异常: ' + flbls.length);
+    assert.deepStrictEqual(flbls.filter(l => !/\sfor="/.test(l)),
+      ['<label class="flbl" id="lblPnModeLbl">', '<label class="flbl" id="lblLyricLbl">'],
+      '不该有没有 for= 的 .flbl（例外只允许两个 radiogroup 组标题）');
+    // ② 没有可见标签的两个自由文本框 → 用 placeholder 词条当 aria-label（有可见标签的别加，会重复播报）
+    assert.ok(/<textarea id="paste"[^>]*data-i18n-aria="pastePh"/.test(html), 'paste 缺 aria-label');
+    assert.ok(/id="styleCustom"[^>]*data-i18n-aria="styleCustomPh"/.test(html), 'styleCustom 缺 aria-label');
+    assert.ok(/data-i18n-aria/.test(html) && /querySelectorAll\('\[data-i18n-aria\]'\)\.forEach\(el=>\{ el\.setAttribute\('aria-label'/.test(html),
+      '缺 data-i18n-aria 的处理（加了属性也得有人把它变成 aria-label）');
+    // v0.9.199：工具栏「筛选」下拉框左右都是按钮、没有可见标签，读屏只念「组合框 全部」
+    assert.ok(/<select id="filter" data-i18n-aria="filterAria">/.test(html), '#filter 缺无障碍名');
+    assert.strictEqual((html.match(/filterAria\s*:\s*'/g) || []).length, 27, 'filterAria 不是 27 语齐全');
+    // ③ ⓘ 必须能 Tab 聚焦 + 聚焦即显示（原本只有 :hover，键盘用户永远看不到提示）
+    const infos = html.match(/<i class="info"[^>]*>/g) || [];
+    assert.ok(infos.length >= 8, '.info 数量异常: ' + infos.length);
+    assert.deepStrictEqual(infos.filter(i => !/tabindex="0"/.test(i)), [], '还有 ⓘ 不能聚焦');
+    assert.ok(/\.info:focus-visible\{outline:2px solid var\(--acc\)/.test(html), 'ⓘ 聚焦没有焦点环');
+    assert.ok(/\.info:focus::after\{opacity:1;transform:translateY\(0\)\}/.test(html), 'ⓘ 聚焦时提示不显示');
+    assert.ok(/\[data-tip\]:focus-visible\{outline:2px solid var\(--acc\)/.test(html), '其它提示图标缺焦点环');
+    // ④ 三组 chip（风格 / 专名 / 歌词）是 radiogroup：组名不能靠 label 的 for（一个 label 只能绑一个控件）
+    assert.strictEqual((html.match(/role="radiogroup"/g) || []).length, 3, 'radiogroup 不是 3 组');
+    ['secStyleLbl', 'lblPnModeLbl', 'lblLyricLbl'].forEach(id =>
+      assert.ok(new RegExp('aria-labelledby="' + id + '"').test(html), '缺指向 ' + id + ' 的 radiogroup'));
+    ['secStyleLbl', 'lblPnModeLbl', 'lblLyricLbl'].forEach(id =>
+      assert.strictEqual((html.match(new RegExp('id="' + id + '"', 'g')) || []).length, 1, id + ' 不唯一'));
+  });
+
+  t('v0.9.199 结构：层级靠底色不靠标题重量，按钮分主次', () => {
+    /* 原来 ASS 区的标题与「导出译文」同款（图标徽章 + 渐隐尾线），三者在栏里看着平级；
+       下载与复制并排各占一半、重量接近，分不清主次；赞助按钮是实心主色，比下载还重。 */
+    assert.ok(/\.param-blk\{background:var\(--card-2\);border-radius:12px;padding:12px;margin-top:12px\}/.test(html),
+      '参数块没有浅底色（层级仍全靠标题重量）');
+    assert.ok(/\.blk-title\{font-size:11px;font-weight:600;color:var\(--sub\);letter-spacing:\.4px/.test(html),
+      '块标题没有降重（11px / --sub）');
+    // 主 CTA 独占一行满宽，复制降为文字链
+    assert.ok(/\.exp-actions\{display:flex;flex-direction:column;gap:8px/.test(html), '导出按钮区没有改成竖排');
+    assert.ok(/\.exp-actions \.btn\.primary\{width:100%\}/.test(html), '主 CTA 没有满宽');
+    assert.ok(/\.btn\.link\{background:none;border:none;color:var\(--sub\)/.test(html), '复制没有降级为文字链');
+    // 赞助：可点击元素必须过 4.5:1，--mut(#A5A2A8) 实测只有 2.5:1，所以用 --sub 不用 --mut
+    assert.ok(/#btnDonate\{[^}]*color:var\(--sub\)/.test(html), '赞助按钮还在用 --mut（对比度 2.5:1 不过 AA）');
+    assert.ok(!/#btnDonate\{[^}]*background:var\(--acc\)/.test(html), '赞助按钮还是实心主色（比下载还重）');
+  });
+
+  t('v0.9.199 ASS 参数表：列头说一次「译文｜原文」，6 字段从 9 行压到 3 行', () => {
+    /* 原来每个字段都是「标签 + 输入 + hint」竖排，「译文/原文」在标签里重复 6 遍
+       （译文X号 / 原文X号 × 字号、颜色、离底），在 320px 的栏里就是一堵字段墙。 */
+    assert.ok(/<div class="wr-head" id="assHead">/.test(html), '缺列头 wr-head');
+    assert.ok(/id="assHeadDst"/.test(html) && /id="assHeadSrc"/.test(html), '列头缺译文/原文两列的 id');
+    assert.strictEqual((html.match(/class="wr-row3"/g) || []).length, 3, '参数表不是 3 行');
+    /* 列头与三行必须共用同一套列宽，否则表头和数据列对不齐 */
+    assert.ok(/\.wr-head\{display:grid;grid-template-columns:66px 1fr 1fr/.test(html), '列头列宽不对');
+    assert.ok(/\.wr-row3\{display:grid;grid-template-columns:66px 1fr 1fr/.test(html), '三行列宽与列头不一致');
+    /* 66px = 实测最长的行标签（意大利语 Dimensione 63.8px）+ 余量；
+       此前 56px 会让 11 种语言折成两行（英文、西语、葡语、韩语、法语、泰语、意语、乌语…） */
+    // 单语只剩一列 → 列头跟着收起（只剩一列时不需要说明哪列是哪列）
+    assert.ok(/var hd=\$\('assHead'\); if\(hd\) hd\.style\.display = mono \? 'none' : '';/.test(html),
+      '单语时列头没收起（「原文」两个字会孤零零留在上面）');
+    // 6 个输入的名字 = 列头 + 行标签（读屏念「译文 字号」，而不是只念「字号」）
+    [['assDstSize','assHeadDst','assRowSize'], ['assSrcSize','assHeadSrc','assRowSize'],
+     ['assDstColor','assHeadDst','assRowColor'], ['assSrcColor','assHeadSrc','assRowColor'],
+     ['assDstMV','assHeadDst','assRowMV'], ['assSrcMV','assHeadSrc','assRowMV']].forEach(p => {
+      const re = new RegExp('id="' + p[0] + '"[^>]*aria-labelledby="' + p[1] + ' ' + p[2] + '"');
+      assert.ok(re.test(html) || new RegExp('aria-labelledby="' + p[1] + ' ' + p[2] + '"[^>]*id="' + p[0] + '"').test(html),
+        p[0] + ' 的名字不是「' + p[1] + ' + ' + p[2] + '」');
+    });
+    ['assRowSize', 'assRowColor', 'assRowMV'].forEach(id =>
+      assert.strictEqual((html.match(new RegExp('id="' + id + '"', 'g')) || []).length, 1, id + ' 不唯一'));
+    // 5 个新词条 27 语齐全（列头 + 三个行标签的短名）
+    ['lblSizeShort', 'lblColorShort', 'lblMVShort', 'colDstShort', 'colSrcShort'].forEach(k => {
+      const n = (html.match(new RegExp(k + '\\s*:\\s*\'', 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 词条数 ' + n + '（应为 27）');
+    });
+  });
+
+  t('v0.9.199 三行表不能把 #RRGGBB 挤成 #FFD7', () => {
+    /* 三行布局把单格压到 85px：色块 16px + gap 8px 吃掉 24px，剩下 61px 减内边距只有 46px，
+       而 7 位十六进制在 11.5px 等宽字体下要 52px —— 实测 #FFD700 被裁成 #FFD7，
+       用户看不到自己输入的完整色值（改个颜色靠猜）。三处各收一点把内容宽拉回 53px+。 */
+    assert.ok(/\.wr-row3 \.ass-color-row\{gap:3px\}/.test(html), '色块与输入框的间距没收窄');
+    assert.ok(/\.wr-row3 \.ass-color-row \.csw\{width:14px;height:14px;flex:0 0 14px;margin-right:0\}/.test(html),
+      '色块没收小到 14px');
+    assert.ok(/\.wr-row3 \.ass-color-row input\{padding:8px 6px;font-size:11\.5px;letter-spacing:\.2px\}/.test(html),
+      '颜色输入框没收内边距 / 字号（纵向补到 8px 是为了与同行 number 框等高）');
+    // 兜底：万一将来加的语言行标签超长，宁可折行也别把右栏顶出横向滚动条
+    assert.ok(/\.wr-row3>\.r3-l\{overflow-wrap:anywhere\}/.test(html), '行标签缺断行兜底');
   });
 }
 
