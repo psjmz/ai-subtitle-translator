@@ -4276,7 +4276,7 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '右栏 sticky 高度没放宽（矮屏会出内滚动条）');
     assert.ok(!/max-height:calc\(100vh - 80px\)/.test(html), '还留着旧的高度限制');
     /* 两组宽度并排一行，别退回竖排（竖排会多出 ~90px 卡片高） */
-    assert.ok(/class="wrap-row"/.test(html), '折行两项没有并排');
+    assert.ok(/class="wrap-row solo"/.test(html), '折行两项没按模式二选一（v0.9.202：并排摆着 = 一半时间是改了没反应的假控件）');
     assert.ok(/\.wrap-row\{display:grid;grid-template-columns:1fr 1fr/.test(html), 'wrap-row 不是两列网格');
     assert.ok(!/class="wrap-div"/.test(html), 'wrap-div 细线已被标题取代，DOM 里不该还有它');
   });
@@ -4399,7 +4399,7 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        竖排 7 个字段必然出内滚动条。字号/颜色/离底各自「译文+原文」两列并排 → 约 14 行压到 7 行。 */
     /* v0.9.199：ASS 那三组从 .wrap-row（标签在上、两列并排）升级成 .wr-row3（行标签 + 两列），
        所以 wrap-row 只剩折行那 1 组；ASS 的三组改数 wr-row3。 */
-    assert.strictEqual((html.match(/class="wrap-row"/g) || []).length, 1, 'wrap-row 现在只该剩折行那 1 组');
+    assert.strictEqual((html.match(/class="wrap-row solo"/g) || []).length, 1, 'wrap-row 现在只该剩折行那 1 组');
     assert.strictEqual((html.match(/class="wr-row3"/g) || []).length, 3, 'ASS 三行参数表（字号/颜色/离底）缺失');
     /* 三行的译文/原文必须同处一行内，而不是各占一行。
        v0.9.199：容器由 .wrap-row（标签在上、两列）换成 .wr-row3（行标签 + 两列）。 */
@@ -4462,7 +4462,7 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 单语：原文那一行必须藏掉（否则预览里还是"双语句式"） */
     assert.ok(/src\.style\.display = mono \? 'none' : ''/.test(html), '单语时预览的原文行没隐藏');
     /* 接线：下拉框变化 + 初始化都要刷，漏了就是白做 */
-    assert.ok(/\$\('expStyle'\)\.addEventListener\('change',function\(\)\{ syncAssStyleBox\(\); assCtxSync\(\); syncExpPreview\(\); save\(\); \}\)/.test(html),
+    assert.ok(/\$\('expStyle'\)\.addEventListener\('change',function\(\)\{ syncAssStyleBox\(\); assCtxSync\(\); syncExpPreview\(\); syncWrapField\(\); save\(\); \}\)/.test(html),
       'expStyle change 里没调 syncExpPreview');
     assert.ok(/syncAssStyleBox\(\); syncAssMVBox\(\); syncExpPreview\(\);/.test(html), '初始化没调 syncExpPreview');
     /* ASS 才跟颜色/字号；非 ASS 必须回落默认，否则拿 ASS 的自定义色误导（播放器不读那套） */
@@ -4755,6 +4755,101 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.strictEqual((left.match(/class="sec-ic/g) || []).length, 7, '左栏徽章数变了（6 个分节 + 运行日志）');
     assert.ok(/\.sec-ic\{width:20px;height:20px;border-radius:7px/.test(html), '徽章没收到 20px');
     assert.ok(/\.sec-ic\.c7\{background:#E6F7F8;color:#0E9AA7\}/.test(html), '缺「内容过滤」的语义色 c7');
+  });
+
+  t('v0.9.202 行宽设置按字幕模式二选一（单语→单语行宽，双语→双语行宽）', () => {
+    /* 此前两个行宽永远并排：单语模式下 biMaxW 完全不参与折行，双语模式下 maxW 只管
+       「- A / - B」双说话人行 —— 两个框各自都有一半时间是改了没反应的假控件。 */
+    assert.ok(/id="wcellMaxW"/.test(html) && /id="wcellBiMaxW"/.test(html), '两个行宽单元需要有 id 才能被切换');
+    assert.ok(/<div class="wr-cell" id="wcellBiMaxW" hidden>/.test(html), '双语行宽默认该是隐藏的（默认导出单语）');
+    assert.ok(/function syncWrapField\(\)\{/.test(html), '缺 syncWrapField');
+    assert.ok(/const mono = \(typeof expFmtOf === 'function'\) \? \(expFmtOf\(\) === 'mono'\) : true;/.test(html),
+      'syncWrapField 没按 expFmtOf() 判单语');
+    assert.ok(/if \(a\) a\.hidden = !mono;/.test(html) && /if \(b\) b\.hidden = mono;/.test(html),
+      '两个单元的显隐没写反？（单语显 maxW、双语显 biMaxW）');
+    /* 接线三处：下拉框变化、切语言、初始化。漏一处就是「切过去不跟着变」 */
+    assert.ok(/\$\('expStyle'\)\.addEventListener\('change',function\(\)\{[^}]*syncWrapField\(\)/.test(html),
+      'expStyle 变化时没重算');
+    assert.ok(/origApply\(\);[\s\S]{0,300}?if\(typeof syncWrapField==='function'\) syncWrapField\(\);/.test(html),
+      '切界面语言后没重设（applyI18n 会把 data-i18n 覆盖回单语文案）');
+    assert.ok(/applyI18n\(\);[\s\S]{0,200}?if\(typeof syncWrapField==='function'\) syncWrapField\(\);/.test(html),
+      '初始化没调（上次记住的是双语时，首屏会显示错的那一个）');
+  });
+
+  t('v0.9.202 只做显隐：两个值和它们的接线一个都不能少', () => {
+    /* 双语下双说话人对白行仍按 maxW 折，所以那个输入框必须还在、值必须还读得到 ——
+       不能因为「看不见」就把 id 或取值删掉。 */
+    assert.ok(/id="maxW"/.test(html) && /id="biMaxW"/.test(html), '两个输入框的 id 不能动');
+    assert.ok(/\$\('maxW'\)\.value/.test(html) && /\$\('biMaxW'\)\.value/.test(html), '两个值的读取不能动');
+    ['maxW','biMaxW'].forEach(id => {
+      const n = (html.match(new RegExp("id=\"" + id + "\"", 'g')) || []).length;
+      assert.strictEqual(n, 1, id + ' 不是恰好一处（' + n + '）');
+    });
+    /* 语言联动与切分提示仍要覆盖两个框 */
+    assert.ok(/set\('maxW', 'maxWHint'\);/.test(html) && /set\('biMaxW', 'biMaxWHint'\);/.test(html),
+      '行宽换算提示漏了一个');
+    assert.ok(/\['maxW','biMaxW'\]\.forEach/.test(html), '两个框的 input 监听漏了');
+  });
+
+  t('v0.9.202 「折行阈值」改名「单语行宽」，27 语全覆盖且旧名不再出现', () => {
+    /* 单语模式下那个框叫「折行阈值」，看不出它只管单语 —— 与「双语行宽」不成对。
+       改名后凡是引用旧控件名的提示文案都得跟着改，否则用户按提示找不到那控件。 */
+    /* ⚠️ 只查「用户看得见的部分」= 27 语字典，不查注释：
+       代码注释里留着旧名是在描述改动前的状态（历史记录，不该被重写）。 */
+    /* ⚠️ 只查「用户看得见的部分」= 27 语字典的每条译文，不查注释也不查代码：
+       代码注释里留着旧名是在描述改动前的状态（历史记录，不该被重写）。
+       ⚠️ 切片边界必须取到字典块自己的结尾 —— 直接切到下一个块会把中间的
+       JS 代码和注释一起圈进来，于是注释里的旧名会造成假报警。 */
+    const dictSegs = (function(){
+      const re = /\n\s*'([a-z]{2}(?:-[A-Za-z]{2,4})?)'\s*:\s*\{/g;
+      const pos = []; let m;
+      while ((m = re.exec(html))) pos.push(m.index);
+      if (pos.length < 27) return null;
+      const endOfBlock = (start) => {
+        const mm = /\n\}/.exec(html.slice(start));
+        return mm ? start + mm.index : html.length;
+      };
+      const out = [];
+      for (let i = 0; i < 27; i++) {
+        const a = pos[i];
+        const b = (i + 1 < pos.length) ? Math.min(pos[i + 1], endOfBlock(a)) : endOfBlock(a);
+        out.push(html.slice(a, b));
+      }
+      return out;
+    })();
+    assert.ok(dictSegs, '没定位到 27 语字典');
+    dictSegs.forEach(function (seg, i) {
+      assert.ok(seg.indexOf('折行阈值') < 0, '字典第 ' + (i + 1) + ' 块还有「折行阈值」残留');
+      assert.ok(seg.indexOf('折行閾值') < 0, '字典第 ' + (i + 1) + ' 块还有「折行閾值」残留');
+    });
+    ['lblMaxWShort','lblBiMaxWShort','wrapTip','wrapTipBi'].forEach(k => {
+      const n = (html.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:", 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 词条数 ' + n + '（应为 27）');
+    });
+    assert.ok(/lblMaxWShort:'单语行宽'/.test(html), '中文标签没改成「单语行宽」');
+    assert.ok(/lblBiMaxWShort:'双语行宽'/.test(html), '「双语行宽」被误改');
+    /* 双语提示里那句「双说话人行走上方「折行阈值」」必须跟着改名 */
+    const bi = html.match(/lblBiMaxW:'((?:[^'\\]|\\.)*)'/);
+    assert.ok(bi && bi[1].indexOf('单语行宽') >= 0, '双语提示里还在引用旧名');
+    /* 切分提示：单语那条说「把折行阈值调到 X」，改名后必须同步 */
+    const sw = html.match(/splitWarn:'((?:[^'\\]|\\.)*)'/);
+    assert.ok(sw && sw[1].indexOf('单语行宽') >= 0, '单语切分提示里还在说「折行阈值」');
+  });
+
+  t('v0.9.202 折行说明文案跟着模式走（双语下不该还写「单语字幕」）', () => {
+    assert.ok(/id="wrapTipEl"/.test(html), '折行说明缺 id（没法按模式换文案）');
+    assert.ok(/tip\.dataset\.i18n = mono \? 'wrapTip' : 'wrapTipBi';/.test(html),
+      '说明文案没按模式切换');
+    assert.ok(/tip\.textContent = t\(tip\.dataset\.i18n\);/.test(html), '切完没重新取文案');
+    assert.ok(/wrapTipBi:'修改设置，无须重新翻译，可在编辑区查看双语字幕的折行效果。'/.test(html),
+      '双语版说明文案不对');
+  });
+
+  t('v0.9.202 只显示一个行宽时不能留半行空白', () => {
+    /* .wrap-row 原来是 1fr 1fr 两列；二选一之后永远只显示一个，
+       不收成单列的话输入框只占一半宽、右边空一大块。 */
+    assert.ok(/\.wrap-row\.solo\{grid-template-columns:1fr\}/.test(html), '缺 .wrap-row.solo 单列规则');
+    assert.ok(/<div class="wrap-row solo">/.test(html), 'HTML 没挂 solo');
   });
 }
 
