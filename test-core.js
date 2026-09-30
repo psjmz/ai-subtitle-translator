@@ -4641,6 +4641,31 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     // 兜底：万一将来加的语言行标签超长，宁可折行也别把右栏顶出横向滚动条
     assert.ok(/\.wr-row3>\.r3-l\{overflow-wrap:anywhere\}/.test(html), '行标签缺断行兜底');
   });
+
+  t('v0.9.200 SRT / VTT 预览不许画样式（纯文本格式没有颜色和字号）', () => {
+    /* 用户报：「srt 双语字幕是没字体效果的，所以是不是不用显示字体效果？」
+       属实。SRT / VTT 是纯文本容器，文件里没有颜色、没有字号、没有位置，全交给播放器
+       按自己的默认样式渲染。可 v0.9.196 之后非 ASS 只把 --pv-* 变量 removeProperty 掉，
+       于是回落成 CSS 兜底值「译文 #fff / 原文 #C9B8FF（淡紫）、12px / 10.5px」——
+       等于给一个根本没有样式的格式画了样式，用户会以为导出后原文就是淡紫小字。 */
+    assert.ok(/\.exp-preview\.pv-plain \.ep-dst,\n  \.exp-preview\.pv-plain \.ep-src\{color:#fff;font-size:12px;font-weight:400\}/.test(html),
+      '缺 .pv-plain 规则（非 ASS 两行没被拉回中性）');
+    assert.ok(/box\.classList\.toggle\('pv-plain', !isAss\);/.test(html),
+      'syncExpPreview 没打 pv-plain 类');
+    /* 反向断言：兜底值本身必须还是「一深一浅」——ASS 模式下 --pv-* 一定被写入，
+       这里的兜底只用于 pv-plain 之外的极少数场景（脚本没跑完）。别为了这条把 ASS 的颜色串了。 */
+    assert.ok(/\.ep-dst\{bottom:26px;font-size:var\(--pv-dst,12px\);color:var\(--pv-dst-c,#fff\)\}/.test(html),
+      'ASS 的兜底样式被动过（.ep-dst）');
+    assert.ok(/\.ep-src\{bottom:9px;font-size:var\(--pv-src,10\.5px\);color:var\(--pv-src-c,#C9B8FF\)\}/.test(html),
+      'ASS 的兜底样式被动过（.ep-src）');
+    /* 关键：pv-plain 只压颜色/字号，不能把「行序」也压掉——SRT 双语谁在上仍然是真的 */
+    assert.ok(/\.exp-preview\.pv-rev \.ep-dst\{bottom:9px\}/.test(html) &&
+              /\.exp-preview\.pv-rev \.ep-src\{bottom:26px\}/.test(html),
+      'pv-rev（原文在上）的行序被连带改掉了');
+    assert.ok(/\.exp-preview\.pv-mono \.ep-dst\{bottom:9px\}/.test(html), '单语贴底被连带改掉了');
+    /* 只对非 ASS 生效：ASS 的两种布局都不是 plain */
+    assert.ok(!/isAss&&!isAss|pv-plain', isAss/.test(html), 'pv-plain 的判定写反了（应 !isAss）');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
