@@ -4666,6 +4666,96 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 只对非 ASS 生效：ASS 的两种布局都不是 plain */
     assert.ok(!/isAss&&!isAss|pv-plain', isAss/.test(html), 'pv-plain 的判定写反了（应 !isAss）');
   });
+
+  t('v0.9.201 说明文字过 WCAG AA（--mut → --sub）', () => {
+    /* 实测 --mut(#A5A2A8) 在白底上只有 2.52:1，远低于 AA 的 4.5:1 ——
+       左栏的错误提示、隐私声明、术语表说明全是这个色，等于「写了但看不见」。
+       --sub(#6F6C72) 是 5.17:1，过 AA，且仍比正文 --ink 浅，层级没丢。 */
+    assert.ok(/\.hint\{font-size:11px;color:var\(--sub\);margin-top:4px;line-height:1\.55\}/.test(html),
+      'hint 没改成 --sub');
+    assert.ok(/\.gh-tip\{margin:6px 0 0;color:var\(--sub\);font-size:11\.5px;line-height:1\.6\}/.test(html),
+      '折叠说明里的补充文字还是 --mut');
+    assert.ok(!/\.hint\{[^}]*color:var\(--mut\)/.test(html), '还有 hint 在用 --mut');
+  });
+
+  t('v0.9.201 按钮高度统一（.btn.sm 与 .btn 同为 32px）', () => {
+    /* 实测左栏按钮两种高度：「解析字幕」29px vs 其余 32px —— 同一列里看着像没对齐 */
+    assert.ok(/\.btn\.sm\{padding:5px 10px;font-size:12px;line-height:1\.35;border-radius:10px;min-height:32px\}/.test(html),
+      '.btn.sm 没补 min-height:32px');
+    assert.ok(/\.btn\.xs\{display:inline-flex;align-items:center;justify-content:center;gap:4px;\n    padding:0 9px;font-size:11\.5px;line-height:1;border-radius:7px;height:26px\}/.test(html),
+      '标签行小按钮 .btn.xs 缺失（触摸高度至少 26px）');
+  });
+
+  t('v0.9.201 术语库操作等宽 2×2，CSV 模板挪进「这个表怎么用」', () => {
+    /* 原先 5 个按钮靠 flex-wrap 自然换行：64/64 → 64/59 → 92，第三行右侧空 114px。
+       固定两列后每行等宽；CSV 模板不改这张表的内容，属于「怎么用」不是「怎么操作」。 */
+    assert.ok(/\.gloss-ops\{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px\}/.test(html),
+      '缺 .gloss-ops 等宽两列');
+    const ops = html.indexOf('class="gloss-ops"');
+    const opsEnd = html.indexOf('</div>', ops);
+    assert.ok(ops > 0 && opsEnd > ops, 'gloss-ops 区块没找到');
+    ['btnGlossAppend', 'btnGlossReplace', 'btnGlossSave', 'btnGlossClear'].forEach(id => {
+      const at = html.indexOf('id="' + id + '"');
+      assert.ok(at > ops && at < opsEnd, id + ' 不在 gloss-ops 里');
+    });
+    const help = html.indexOf('<details id="glossHelp"');
+    const tpl = html.indexOf('id="btnGlossTpl"');
+    assert.ok(tpl > help && help > ops, 'CSV 模板没挪进「这个表怎么用」');
+    assert.ok(html.indexOf('id="btnGlossTpl"', ops) > help, 'CSV 模板还留在操作区');
+  });
+
+  t('v0.9.201 ✨ AI 抽取挂到标签行右端（不再打断「标签 → 控件」）', () => {
+    /* 它原先夹在标签(774)与文本框(833)之间，把「标签 → 控件」的配对硬生生打断。
+       按钮不能塞进 <label>：label 的可点区会吞掉按钮语义、读屏也会当标签念一遍。 */
+    const row = html.indexOf('class="flbl-row"');
+    const lbl = html.indexOf('for="terms"');
+    const ta = html.indexOf('id="terms" rows="4"');
+    const ai = html.indexOf('id="btnGlossAI"');
+    assert.ok(row > 0 && lbl > row && ai > lbl && ai < ta, 'AI 抽取没落在「标签行 → 文本框」之间');
+    assert.ok(/class="btn xs ghost" id="btnGlossAI"/.test(html), 'AI 抽取没用小按钮档');
+    assert.ok(html.slice(lbl, ai).indexOf('</label>') >= 0, 'AI 抽取被塞进了 <label> 里');
+  });
+
+  t('v0.9.201 「处理规则」拆成「术语与专名」+「内容过滤」', () => {
+    /* 原「处理规则」一节 670px，占左栏 41%，里面装的是两类事：
+       「哪些词怎么译」（专名 + 术语表）和「哪些内容留不留」（歌词 + 水词）。 */
+    ['secTerms', 'secFilter'].forEach(k => {
+      const n = (html.match(new RegExp(k + '\\s*:\\s*\'', 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 词条数 ' + n + '（应为 27）');
+    });
+    assert.strictEqual((html.match(/secRules\s*:\s*'/g) || []).length, 0, 'secRules 已无 DOM 引用，字典该删干净');
+    assert.ok(/data-i18n="secTerms"/.test(html) && /data-i18n="secFilter"/.test(html), '两个新分节标题没走 i18n');
+    assert.ok(html.indexOf('data-i18n="secTerms"') < html.indexOf('id="lblPnModeLbl"'), '「术语与专名」不在专名处理之前');
+    const ft = html.indexOf('data-i18n="secFilter"');
+    assert.ok(ft > html.indexOf('data-i18n="secTerms"') && ft < html.indexOf('id="lblLyricLbl"'), '「内容过滤」位置不对');
+    /* 徽章归属：用索引判断，不用字符窗口正则（svg 本身就有 200+ 字符，窗口必漏） */
+    const ic = html.lastIndexOf('class="sec-ic c7"', ft);
+    assert.ok(ic > 0 && ft - ic < 420, '「内容过滤」没有自己的徽章');
+  });
+
+  t('v0.9.201 左栏间距收成四档（0 / 4 / 8 / 20），内联 margin 清零', () => {
+    const a = html.indexOf('<div class="main">'), b = html.indexOf('<!-- 中：');
+    const left = html.slice(a, b);
+    assert.strictEqual((left.match(/style="margin-top/g) || []).length, 0, '左栏还有内联 margin-top');
+    ['.main>aside.panel:first-child>.btns{margin-top:8px}',
+     '.main>aside.panel:first-child>.btns.mt0{margin-top:0}',
+     '.main>aside.panel:first-child>.hint{margin-top:4px}',
+     '.main>aside.panel:first-child>textarea{margin-top:8px}'].forEach(r =>
+      assert.ok(html.indexOf(r) > 0, '缺间距规则 ' + r));
+    assert.ok(/\.sec-title\{[^}]*margin:20px 0 8px/.test(html), '分节间距没收进 20/8');
+    assert.ok(/\.flbl\{[^}]*margin:8px 0 4px/.test(html), '标签间距没收进 8/4');
+  });
+
+  t('v0.9.201 装饰图标一个没丢（7 个 emoji + 7 个徽章）', () => {
+    /* 用户硬要求：改进不许顺手删掉装饰小图标。这里把左栏现有的全数一遍。 */
+    const a = html.indexOf('<div class="main">'), b = html.indexOf('<!-- 中：');
+    const left = html.slice(a, b);
+    ['📂', '✨', '📥', '🔄', '💾', '📄', '⚡'].forEach(e =>
+      assert.ok(left.indexOf(e) > 0, '左栏丢了 emoji ' + e));
+    assert.strictEqual((left.match(/class="sec-ic/g) || []).length, 7, '左栏徽章数变了（6 个分节 + 运行日志）');
+    assert.ok(/\.sec-ic\{width:20px;height:20px;border-radius:7px/.test(html), '徽章没收到 20px');
+    assert.ok(/\.sec-ic\.c7\{background:#E6F7F8;color:#0E9AA7\}/.test(html), '缺「内容过滤」的语义色 c7');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');

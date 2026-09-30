@@ -126,7 +126,17 @@
   .btn.ok{background:var(--ok);color:#FFFFFF;border-color:var(--ok);font-weight:600}
   .btn.ok:hover{background:#0E9F6E}
   .btn.ghost{background:transparent;border:1px solid var(--line-strong)}
-  .btn.sm{padding:5px 10px;font-size:12px;border-radius:9px}
+  /* v0.9.201：.btn.sm 实测高 29px，而同栏 .btn 是 32px —— 同一列里两种按钮高度，
+     视觉上像没对齐。给 sm 补 min-height:32px（button 内容本就垂直居中，不影响排版），
+     顺带把圆角从 9 并到控件统一档 10。 */
+  /* line-height 必须写死：按钮里的 emoji（📂 ✨ 📥 等）在默认行高下比汉字高一大截，
+     实测同一个 .btn.sm 带 emoji 是 34px、不带是 29px——看着像两种按钮。
+     写死 1.35 后内容高恒 16px，min-height 兜底，所有 sm 一律 32px。 */
+  .btn.sm{padding:5px 10px;font-size:12px;line-height:1.35;border-radius:10px;min-height:32px}
+  /* v0.9.201：标签行内的小按钮（如术语表「✨ AI 抽取」）。
+     比 sm 再小一档，触摸高度保 26px；inline-flex 是为了让 emoji 与文字基线对齐。 */
+  .btn.xs{display:inline-flex;align-items:center;justify-content:center;gap:4px;
+    padding:0 9px;font-size:11.5px;line-height:1;border-radius:7px;height:26px}
   .btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
   /* v0.9.189：折行设置从左侧搬到导出区后，原先是画一条 1px 细线与「导出文件名」分隔
      （当时为了省 27 种界面语言词条没加标题）。v0.9.190 用户拍板要标题 + 说明，
@@ -147,7 +157,10 @@
      （.wrap-row 是固定两列网格，某一列 display:none 不会自动补位，右半栏会空着）。 */
   .wr-cell.span2{grid-column:1 / -1}
   .btn:disabled{opacity:.4;cursor:not-allowed}
-  .hint{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.55}
+  /* v0.9.201：说明文字此前用 --mut（#A5A2A8），在白底上对比度只有 2.52:1，远低于
+     WCAG AA 要求的 4.5:1 —— 等于「写了但看不见」。改 --sub（#6F6C72，5.17:1）过 AA。
+     代价只是弱一点，可读性换来的层级差仍在（正文 --ink #39363B 更深）。 */
+  .hint{font-size:11px;color:var(--sub);margin-top:4px;line-height:1.55}
   /* v0.9.190：折行设置的分节标题与说明。sec-title 默认 margin-top:22px 是为左右栏之间的
      大分节留的，这里紧跟在「导出字幕样式」下方，收到 18px；说明行紧跟标题（标题自带
      margin-bottom:10px，说明不再要 margin-top）。 */
@@ -198,7 +211,7 @@
   /* v0.9.137：折叠说明。沿用 details.logbox 的成熟做法——整块包成卡片、标题做成带背景的条、
      箭头放右侧并旋转。早先那版是裸文字 + 一个 11px 最弱色小三角，跟旁边的灰色 hint 混成一片，
      用户看不出可点。data-i18n 是 textContent 赋值，所以图标只能用伪元素画，不能内嵌 span。 */
-  .ghelp{margin-top:8px;font-size:12.5px;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--card)}
+  .ghelp{margin-top:8px;font-size:12.5px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
   .ghelp>summary{
     cursor:pointer;user-select:none;list-style:none;
     display:flex;align-items:center;gap:6px;padding:6px 9px;
@@ -236,7 +249,7 @@
   .gh-row{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
   .gh-row code{font-family:var(--mono);font-size:11.5px;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 5px;white-space:nowrap}
   .gh-row i{font-style:normal;color:var(--sub);font-size:11.5px}
-  .gh-tip{margin:6px 0 0;color:var(--mut);font-size:11.5px;line-height:1.6}
+  .gh-tip{margin:6px 0 0;color:var(--sub);font-size:11.5px;line-height:1.6}
   .gh-warn{margin:9px 0 0;padding:7px 9px;border-radius:6px;background:var(--warn-weak);color:var(--warn);font-size:11.5px;line-height:1.65}
   .gh-warn b{color:var(--warn);font-weight:600}
   /* v0.9.137：说明区三节结构——引子（含优先于专名处理的说明）/ 写法 / 怎么匹配 / 上传 */
@@ -479,19 +492,34 @@
   #donateQr img{width:176px;max-width:100%;border-radius:8px;display:block;margin:0 auto}
   #donateQr .hint{text-align:center;margin-top:6px}
   /* v0.9.106：模块标题升级为彩色图标徽章 + 渐隐分隔线 */
-  .sec-title{font-size:11.5px;font-weight:800;color:var(--sub);letter-spacing:1.1px;margin:22px 0 10px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  /* v0.9.201：分节间距收进 4 档体系（0 / 4 / 8 / 20），22/10 → 20/8。 */
+  .sec-title{font-size:11.5px;font-weight:800;color:var(--sub);letter-spacing:1.1px;margin:20px 0 8px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
   .sec-title:first-child{margin-top:0}
   .sec-title::after{content:'';flex:1;height:1px;margin-left:2px;background:linear-gradient(90deg,var(--line),rgba(232,231,228,0))}
-  .sec-ic{width:24px;height:24px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:none}
-  .sec-ic svg{width:13px;height:13px;opacity:1}
+  /* v0.9.201：徽章 24 → 20px。24px 的方块比 11.5px 的标题字高出一大截，
+     5 个分节标题各占 24px 高，视觉重量压过标题本身；20px 与两行标题文字齐平。
+     图标缩到 12px 保持留白比例，语义色一色一义，新增 c7（青）= 内容过滤。 */
+  .sec-ic{width:20px;height:20px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .sec-ic svg{width:12px;height:12px;opacity:1}
+  /* 语义固色：导入=粉 / 语言=紫 / 风格=橙 / 术语与专名=绿 / 内容过滤=青 / 引擎=靛 */
   .sec-ic.c1{background:#FDEDF4;color:#EC4899}
   .sec-ic.c2{background:#F1EBFE;color:#8B5CF6}
   .sec-ic.c3{background:#FFF0E3;color:#F97316}
   .sec-ic.c4{background:#EDFBF4;color:#10B981}
   .sec-ic.c5{background:#E8F1FE;color:#3B82F6}
   .sec-ic.c6{background:#EEF0FE;color:#6366F1}
-  .flbl{display:flex;align-items:center;font-size:11.5px;color:var(--sub);margin:10px 0 4px;letter-spacing:.2px}
-  .flbl .info{margin-left:5px}
+  .sec-ic.c7{background:#E6F7F8;color:#0E9AA7}
+  /* v0.9.201：margin 10 → 8（进 4 档体系）；gap:6px 取代子元素各自的 margin，
+     这样标签行右侧可以直接挂一个小按钮（术语表的「✨ AI 抽取」）。 */
+  .flbl{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--sub);margin:8px 0 4px;letter-spacing:.2px}
+  .flbl .info{margin-left:0}
+  .flbl>.btn.xs,.flbl>.btn.sm{margin-left:auto;flex:none}
+  /* v0.9.201：标签 + 行内小按钮（术语表「✨ AI 抽取」）。
+     按钮不能塞进 <label> 里：label 的可点区域会吞掉按钮的点击语义，
+     屏幕阅读器也会把它当成标签文字念一遍。所以用外层 flex 行：
+     标签吃掉剩余宽度，按钮自然靠右。 */
+  .flbl-row{display:flex;align-items:center;gap:6px;margin:8px 0 4px}
+  .flbl-row>.flbl{margin:0;flex:1 1 auto;min-width:0}
 
   /* 风格胶囊（原生 radio 隐藏） */
   .style-chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -505,6 +533,28 @@
   .schip input:checked ~ span{color:var(--acc);font-weight:700}
   .schip:has(input:checked){border-color:var(--acc);background:var(--acc-weak)}
   .schip.full{grid-column:1 / -1}
+
+  /* ====== v0.9.201 左栏改造：间距四档 / 术语库等宽 / 分节拆分 ======
+     间距从 8 档收到 4 档：0 · 4 · 8 · 20（20 只用于分节标题）。
+     此前左栏里散着 8 处内联 margin-top（0/3/4/6/8 五档），同一个面板里
+     「标签到控件」「控件到说明」的距离每处都不一样，看着就是没排过版。
+     现在全部由下面这几条规则给，HTML 里不再写内联 margin。 */
+  .main>aside.panel:first-child>.btns{margin-top:8px}
+  .main>aside.panel:first-child>.btns.mt0{margin-top:0}
+  .main>aside.panel:first-child>.hint{margin-top:4px}
+  .main>aside.panel:first-child>textarea{margin-top:8px}
+  #apiBox>.btns{margin-top:8px}
+  /* v0.9.201：术语库四个操作按钮等宽 2×2。
+     此前 5 个按钮靠 flex-wrap 自然换行，实测三行（64/64 → 64/59 → 92），
+     第三行右侧空 114px，既不对齐也看不出分组。
+     固定两列后两行等宽；「📄 CSV 模板」挪进下面「这个表怎么用」折叠块——
+     它是文档动作，不是这张表的操作。 */
+  .gloss-ops{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+  .gloss-ops .btn{width:100%;justify-content:center;padding:6px 4px;text-align:center}
+  /* v0.9.201：折叠说明里的动作按钮（「📄 CSV 模板」）。折叠块内部自成一格，
+     间距由它自己给，不占上面的四档体系。 */
+  .gh-ops{margin-top:6px;display:flex;gap:6px}
+
   /* v0.9.101：颜色输入框前的预览色块（浅色如白需描边才可见） */
   .csw{display:inline-block;width:11px;height:11px;border-radius:2px;border:1px solid rgba(0,0,0,.28);margin-right:5px;vertical-align:-1px}
   /* v0.9.101：颜色改为直接输入 #RRGGBB，取消预设色板 */
@@ -668,7 +718,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.200</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.201</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -828,7 +878,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.200</span>
+    <span class="ver-tag">v0.9.201</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -841,12 +891,12 @@
     <!-- 左：设置面板 -->
     <aside class="panel">
       <div class="sec-title"><i class="sec-ic c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-6 6 6-6 6 6M4 20h16"/></svg></i><span data-i18n="secImport">导入字幕</span></div>
-      <div class="btns" style="margin-top:0">
+      <div class="btns mt0">
         <button class="btn sm" id="btnFile" data-i18n="btnFile" type="button">📂 选择字幕文件</button>
         <button class="btn sm ghost" id="btnDemo" data-i18n="btnDemo" type="button">载入示例</button>
       </div>
       <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.sbv,.txt" hidden>
-      <textarea id="paste" rows="3" placeholder="或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）" data-i18n-ph="pastePh" data-i18n-aria="pastePh" style="margin-top:8px"></textarea>
+      <textarea id="paste" rows="3" placeholder="或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）" data-i18n-ph="pastePh" data-i18n-aria="pastePh"></textarea>
       <div class="btns"><button class="btn sm" id="btnParse" data-i18n="btnParse" type="button">解析字幕</button></div>
       <div class="hint" id="parseInfo"></div>
 
@@ -868,7 +918,7 @@
         placeholder="描述你想要的口吻，如：轻松幽默、像给朋友讲故事" data-i18n-ph="styleCustomPh" data-i18n-aria="styleCustomPh">
       <div class="hint" id="styleHint"></div>
 
-      <div class="sec-title"><i class="sec-ic c4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></i><span data-i18n="secRules">处理规则</span></div>
+      <div class="sec-title"><i class="sec-ic c4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></i><span data-i18n="secTerms">术语与专名</span></div>
       <!-- v0.9.134：原「专名保留原文」开关 + 逗号分隔输入框，重构为「策略二选一 + 统一术语表」。
            拆开的理由：旧结构里 keepTerms 一关就把输入框禁用（用户彻底失去对专名的控制），
            且关掉时提示词说的是「用户提供的术语也要翻译」——与输入框标签语义相反。
@@ -878,29 +928,34 @@
         <label class="schip"><input type="radio" name="pnMode" value="keep"><span data-i18n="pnKeep">保留原文</span></label>
         <label class="schip"><input type="radio" name="pnMode" value="trans" checked><span data-i18n="pnTrans">全部译出</span></label>
       </div>
-      <div class="hint" id="termsHint" style="margin-top:4px"></div>
+      <div class="hint" id="termsHint"></div>
 
-      <label class="flbl" for="terms"><span data-i18n="lblTerms">统一译名（术语表，每行一条）</span></label>
+      <!-- v0.9.201：把「✨ AI 抽取」从独立一行挪到标签行右端。
+           它夹在标签（774）与文本框（833）之间，硬生生把「标签 → 控件」的配对打断，
+           读起来像「统一译名」下面挂了个跟文本框无关的按钮。放到标签行右侧后，
+           「标签 + 动作」是一行，下面是它的文本框，配对关系一眼可见。
+           按钮不进 <label>：label 的可点区会吞掉按钮语义，改由外层 .flbl-row 撑开。 -->
       <!-- v0.9.139：原先的「自动术语表」开关在这一块的末尾，中间隔着上传按钮和整块格式说明，
-           看不出它和上面这个文本框是一件事。改为标题正下方的独立按钮：点一次就抽，
+           看不出它和上面这个文本框是一件事。点一次就抽，
            结果直接填进下面的框，用户看得见、能改、能删，改完再点开始翻译。
            开关被移除是因为「翻译前自动抽」抽完立刻接着翻译，用户根本没机会改——那是原设计的缺陷。 -->
-      <div class="btns" style="margin-top:6px">
-        <button class="btn sm ghost" id="btnGlossAI" type="button" data-i18n="btnGlossAI">✨ AI 抽取</button>
+      <div class="flbl-row">
+        <label class="flbl" for="terms"><span data-i18n="lblTerms">统一译名（术语表，每行一条）</span></label>
+        <button class="btn xs ghost" id="btnGlossAI" type="button" data-i18n="btnGlossAI">✨ AI 抽取</button>
       </div>
-      <div class="hint" id="glossAiHint" style="margin-top:3px"></div>
+      <div class="hint" id="glossAiHint"></div>
       <textarea id="terms" rows="4" spellcheck="false"
         placeholder="SpaceX&#10;Burger King → 汉堡王&#10;Whopper|Whoppers → 华堡" data-i18n-ph="termsPh3"></textarea>
-      <div class="btns" style="margin-top:6px">
+      <div class="gloss-ops">
         <button class="btn sm ghost" id="btnGlossAppend" type="button" data-i18n="btnGlossAppend">📥 追加</button>
         <button class="btn sm ghost" id="btnGlossReplace" type="button" data-i18n="btnGlossReplace">🔄 替换</button>
         <button class="btn sm ghost" id="btnGlossSave" type="button" data-i18n="btnGlossSave">💾 保存</button>
         <button class="btn sm ghost" id="btnGlossClear" type="button" data-i18n="btnGlossClear">✕ 清空</button>
-        <button class="btn sm ghost" id="btnGlossTpl" type="button" data-i18n="btnGlossTpl">📄 CSV 模板</button>
         <!-- v0.9.168：术语库「保存 / 清空」。与上面的上传按钮是两回事：
-             上传管的是「这张表从哪来」，保存/清空管的是「这张表要不要留到下一部片」。 -->
+             上传管的是「这张表从哪来」，保存/清空管的是「这张表要不要留到下一部片」。
+             v0.9.201：「📄 CSV 模板」不是这张表的操作（它不改内容），挪进下方「这个表怎么用」。 -->
       </div>
-      <div class="hint" id="glossLibHint" style="margin-top:3px"></div>
+      <div class="hint" id="glossLibHint"></div>
       <input type="file" id="glossFile" accept=".txt,.csv,.tsv,.json" hidden>
       <div class="hint" id="glossHint"></div>
       <details id="glossHelp" class="ghelp">
@@ -921,6 +976,11 @@
           <p class="gh-warn"><b data-i18n="glossNoEffT">改了没生效？</b><span data-i18n="glossNoEffB">只有一种可能：你写的原文在字幕里没逐字出现过（多一个标点、少个 s 都配不上）。这时下方那行提示会变橙色，并点名是哪几条。</span></p>
 
           <p class="gh-tip" data-i18n="glossUpOne">上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。</p>
+          <!-- v0.9.201：从上面那排操作按钮挪来。它不改变这张表的内容，
+               只是下载一份空白模板给用户照着填，属于「怎么用」而不是「怎么操作」。 -->
+          <div class="gh-ops">
+            <button class="btn sm ghost" id="btnGlossTpl" type="button" data-i18n="btnGlossTpl">📄 CSV 模板</button>
+          </div>
         </div>
       </details>
       <!-- v0.9.189：折行阈值 / 双语行宽两项已移到右侧「导出译文」面板（见那里的说明）。
@@ -930,6 +990,13 @@
            紧跟在「导出字幕样式」下面。它本来就由右边那个下拉框控制（选 ASS 才出现），
            是导出期的外观设置、不是翻译参数，放左栏会让用户以为它影响翻译结果。
            搬运只动位置：id 与 data-i18n 全保留，控制逻辑（syncAssStyleBox）不变。 -->
+
+      <!-- v0.9.201：歌词 / 水词从「处理规则」里拆出来，自成一节「内容过滤」。
+           原「处理规则」一节高 670px，占左栏 41%——它其实装了两类完全不同的事：
+           「哪些词要怎么译」（专名处理 + 术语表）和「哪些内容要不要留下」（歌词 + 水词）。
+           混在一节里，用户想关歌词时得先穿过整块术语表。拆开后两节各管一件事，
+           标题也能说人话（「处理规则」没有告诉用户这里面有什么）。 -->
+      <div class="sec-title"><i class="sec-ic c7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg></i><span data-i18n="secFilter">内容过滤</span></div>
 
       <!-- v0.9.78：歌词处理——三档（翻译/保留原文/删除）+ 可编辑的歌词标记字符集合 -->
       <label class="flbl" id="lblLyricLbl"><span data-i18n="lblLyric">歌词处理</span><i class="info" tabindex="0" data-tip-i18n="lyricTip">i</i></label>
@@ -971,7 +1038,7 @@
         <!-- v0.9.124：附加请求参数——透传到自定义 API 的请求体（关闭思考 / 强制 JSON 输出等） -->
         <label class="flbl" for="extra"><span data-i18n="lblExtra">附加请求参数（JSON，可选）</span><i class="info" tabindex="0" data-tip-i18n="extraTip">i</i></label>
         <input type="text" id="extra" spellcheck="false" placeholder='{"enable_thinking":false,"max_tokens":8192}'>
-        <div class="btns" style="margin-top:8px">
+        <div class="btns">
           <button class="btn" id="btnTest" type="button" data-i18n="btnTest">⚡ 测试连接</button>
           <span class="hint" id="testOut" style="align-self:center"></span>
         </div>
@@ -1181,7 +1248,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.200"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.201"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1423,7 +1490,7 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   feat6T:'隐私安全', feat6D:'字幕在你的浏览器里处理，默认不经任何第三方服务器；API Key 只存在本机。', expTag:'✦ EXPORT · 导出花样', aboutTitle:'关于随心字幕 AI',
   aboutBody:'随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 开源仓库', aboutLicense:'AGPL-3.0 开源', wsBackHome:'首页',
   wsUploadNew:'上传新字幕', projEmpty:'未导入字幕', secImport:'导入字幕', secLang:'语言',
-  secStyle:'翻译风格', secRules:'处理规则', secEngine:'翻译引擎', lblSrcShort:'原文语言',
+  secStyle:'翻译风格', secTerms:'术语与专名', secFilter:'内容过滤', secEngine:'翻译引擎', lblSrcShort:'原文语言',
   lblDstShort:'目标语言', lblKeepTermsShort:'专名处理', lblAutoTermsShort:'自动术语表', secWrap:'折行设置', splitWarn:'{0} 条字幕过长被切成 {1} 条，时间轴随之拆分。把折行阈值调到 {2} 以上即可保留原时间轴。', splitWarnBi:'{0} 条双语字幕过长被切成 {1} 条，时间轴随之拆分。把双语行宽调到 {2} 以上即可保留原时间轴。', wrapTip:'修改设置，无须重新翻译，可在编辑区查看单语字幕的折行效果。', lblMaxWShort:'折行阈值', lblBiMaxWShort:'双语行宽', wUnit:'字符', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
   /* v0.9.70 两段式界面新增 */
 },
@@ -1522,7 +1589,7 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   feat6T:'隱私安全', feat6D:'字幕在你的瀏覽器裡處理，預設不經任何第三方伺服器；API Key 只存在本機。', expTag:'✦ EXPORT · 匯出花樣', aboutTitle:'關於隨心字幕 AI',
   aboutBody:'隨心字幕 AI 是一款開源的 AI 字幕翻譯工具。我們相信好的字幕工具應該免費、乾淨、尊重隱私——不塞廣告、不要註冊、不動你的檔案。歡迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 開源倉庫', aboutLicense:'AGPL-3.0 開源', wsBackHome:'首頁',
   wsUploadNew:'上傳新字幕', projEmpty:'未匯入字幕', secImport:'匯入字幕', secLang:'語言',
-  secStyle:'翻譯風格', secRules:'處理規則', secEngine:'翻譯引擎', lblSrcShort:'原文語言',
+  secStyle:'翻譯風格', secTerms:'術語與專名', secFilter:'內容過濾', secEngine:'翻譯引擎', lblSrcShort:'原文語言',
   lblDstShort:'目標語言', lblKeepTermsShort:'專名處理', lblAutoTermsShort:'自動術語表', secWrap:'折行設定', splitWarn:'{0} 條字幕過長被切成 {1} 條，時間軸隨之拆分。把折行閾值調到 {2} 以上即可保留原時間軸。', splitWarnBi:'{0} 條雙語字幕過長被切成 {1} 條，時間軸隨之拆分。把雙語行寬調到 {2} 以上即可保留原時間軸。', wrapTip:'修改設定，無須重新翻譯，可在編輯區查看單語字幕的折行效果。', lblMaxWShort:'折行閾值', lblBiMaxWShort:'雙語行寬', wUnit:'字元', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
   /* v0.9.70 两段式界面新增 */
 },
@@ -1621,7 +1688,7 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   feat6T:'Private by default', feat6D:'Subtitles are processed in your browser and never touch third-party servers; API keys stay on your device.', expTag:'✦ EXPORT STYLES', aboutTitle:'About AI-SRTSub',
   aboutBody:'AI-SRTSub is an open-source AI subtitle translator. We believe a good subtitle tool should be free, clean and privacy-respecting — no ads, no sign-up, no touching your files. Self-host it, file requests, polish it together.', aboutRepo:'GitHub repository', aboutLicense:'AGPL-3.0 open source', wsBackHome:'Home',
   wsUploadNew:'New subtitle', projEmpty:'No subtitle loaded', secImport:'Import', secLang:'Languages',
-  secStyle:'Style', secRules:'Rules', secEngine:'Engine', lblSrcShort:'Source language',
+  secStyle:'Style', secTerms:'Terms & Names', secFilter:'Filtering', secEngine:'Engine', lblSrcShort:'Source language',
   lblDstShort:'Target language', lblKeepTermsShort:'Proper nouns', lblAutoTermsShort:'Auto glossary', secWrap:'Line wrapping', splitWarn:'{0} long lines were split into {1}, which breaks up the timing. Raise the line width to {2} or more to keep the original timing.', splitWarnBi:'{0} bilingual lines were too long and split into {1}, which breaks up the timing. Raise the bilingual line width to {2} or more to keep the original timing.', wrapTip:'No re-translation needed — the wrapping of the monolingual subtitles updates in the editor right away.', lblMaxWShort:'Line width', lblBiMaxWShort:'Bilingual width', wUnit:'characters', lblLyric:'Lyrics', lyricTrans:'Translate', lyricKeep:'Keep original', lyricDrop:'Remove', lblMarks:'Lyric markers', lblDropFillers:'Remove fillers',
   /* v0.9.70 两段式界面新增 */
 },
@@ -1720,7 +1787,7 @@ userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了�
   feat6T:'プライバシー保護', feat6D:'字幕はブラウザ内で処理され、原則として第三者サーバーには送信されません。API Key も端末内に保存。', expTag:'✦ EXPORT · 書き出しスタイル', aboutTitle:'AI-SRTSub について',
   aboutBody:'AI-SRTSub はオープンソースの AI 字幕翻訳ツールです。良い字幕ツールは無料で、クリーンで、プライバシーを尊重すべき——広告なし、登録なし、ファイルに手を加えない。セルフホストも歓迎。', aboutRepo:'GitHub リポジトリ', aboutLicense:'AGPL-3.0 オープンソース', wsBackHome:'ホーム',
   wsUploadNew:'新しい字幕', projEmpty:'字幕未読み込み', secImport:'読み込み', secLang:'言語',
-  secStyle:'翻訳スタイル', secRules:'処理ルール', secEngine:'エンジン', lblSrcShort:'原文言語',
+  secStyle:'翻訳スタイル', secTerms:'用語と固有名詞', secFilter:'内容のフィルタ', secEngine:'エンジン', lblSrcShort:'原文言語',
   lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞', lblAutoTermsShort:'自動用語集', secWrap:'折り返し設定', splitWarn:'{0} 件の字幕が長すぎるため {1} 件に分割され、時間軸も分かれます。折り返し幅を {2} 以上にすると元の時間軸を保てます。', splitWarnBi:'{0} 件のバイリンガル字幕が長すぎるため {1} 件に分割され、時間軸も分かれます。バイリンガル行幅を {2} 以上にすると元の時間軸を保てます。', wrapTip:'変更しても再翻訳は不要です。編集エリアで単言語字幕の折り返しをすぐ確認できます。', lblMaxWShort:'折り返し幅', lblBiMaxWShort:'バイリンガル行幅', wUnit:'文字', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
   /* v0.9.70 两段式界面新增 */
 },
@@ -1819,7 +1886,7 @@ userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando l
   feat6T:'Privacidad ante todo', feat6D:'Los subtítulos se procesan en tu navegador y no pasan por servidores de terceros; la API Key se queda en tu equipo.', expTag:'✦ EXPORTACIÓN', aboutTitle:'Sobre AI-SRTSub',
   aboutBody:'AI-SRTSub es un traductor de subtítulos con IA de código abierto. Creemos que una buena herramienta debe ser gratis, limpia y respetar la privacidad: sin anuncios, sin registro, sin tocar tus archivos. Despliega la tuya o ayúdanos a pulirla.', aboutRepo:'Repositorio GitHub', aboutLicense:'Código abierto AGPL-3.0', wsBackHome:'Inicio',
   wsUploadNew:'Nuevo subtítulo', projEmpty:'Sin subtítulo cargado', secImport:'Importar', secLang:'Idiomas',
-  secStyle:'Estilo', secRules:'Reglas', secEngine:'Motor', lblSrcShort:'Idioma origen',
+  secStyle:'Estilo', secTerms:'Términos y nombres', secFilter:'Filtrado', secEngine:'Motor', lblSrcShort:'Idioma origen',
   lblDstShort:'Idioma destino', lblKeepTermsShort:'Nombres propios', lblAutoTermsShort:'Glosario automático', secWrap:'Ajuste de línea', splitWarn:'{0} subtítulos demasiado largos se dividieron en {1}, lo que parte el eje de tiempo. Sube el ancho de línea a {2} o más para conservar el tiempo original.', splitWarnBi:'{0} subtítulos bilingües demasiado largos se dividieron en {1}, lo que parte el eje de tiempo. Sube el ancho de línea bilingüe a {2} o más para conservar el tiempo original.', wrapTip:'No hace falta retraducir: el ajuste de línea de los subtítulos monolingües se ve al instante en el editor.', lblMaxWShort:'Ancho de línea', lblBiMaxWShort:'Ancho bilingüe', wUnit:'caracteres', lblLyric:'가사 처리', lyricTrans:'번역', lyricKeep:'원문 유지', lyricDrop:'삭제', lblMarks:'가사 기호', lblDropFillers:'군더더기 제거',
   /* v0.9.70 两段式界面新增 */
 },
@@ -1918,7 +1985,7 @@ userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicand
   feat6T:'Privacidade em primeiro lugar', feat6D:'As legendas são processadas no seu navegador e não passam por servidores de terceiros; a API Key fica no seu aparelho.', expTag:'✦ EXPORTAÇÃO', aboutTitle:'Sobre o AI-SRTSub',
   aboutBody:'O AI-SRTSub é um tradutor de legendas com IA, de código aberto. Acreditamos que uma boa ferramenta deve ser grátis, limpa e respeitar a privacidade — sem anúncios, sem cadastro, sem mexer nos seus arquivos. Faça seu self-host ou ajude a lapidar.', aboutRepo:'Repositório GitHub', aboutLicense:'Código aberto AGPL-3.0', wsBackHome:'Início',
   wsUploadNew:'Nova legenda', projEmpty:'Nenhuma legenda carregada', secImport:'Importar', secLang:'Idiomas',
-  secStyle:'Estilo', secRules:'Regras', secEngine:'Motor', lblSrcShort:'Idioma de origem',
+  secStyle:'Estilo', secTerms:'Termos e nomes', secFilter:'Filtragem', secEngine:'Motor', lblSrcShort:'Idioma de origem',
   lblDstShort:'Idioma de destino', lblKeepTermsShort:'Nomes próprios', lblAutoTermsShort:'Glossário automático', secWrap:'Quebra de linha', splitWarn:'{0} legendas longas demais foram divididas em {1}, o que parte o eixo de tempo. Aumente a largura da linha para {2} ou mais para manter o tempo original.', splitWarnBi:'{0} legendas bilíngues longas demais foram divididas em {1}, o que parte o eixo de tempo. Aumente a largura da linha bilíngue para {2} ou mais para manter o tempo original.', wrapTip:'Não precisa traduzir de novo: a quebra de linha das legendas monolíngues aparece na hora no editor.', lblMaxWShort:'Largura de linha', lblBiMaxWShort:'Largura bilíngue', wUnit:'caracteres', lblLyric:'Letras de canciones', lyricTrans:'Traducir', lyricKeep:'Mantener original', lyricDrop:'Eliminar', lblMarks:'Marcas de letra', lblDropFillers:'Quitar muletillas',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2017,7 +2084,7 @@ userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제�
   feat6T:'프라이버시 보호', feat6D:'자막은 브라우저에서 처리되며 기본적으로 제3자 서버를 거치지 않습니다. API Key도 내 기기에만 저장됩니다.', expTag:'✦ EXPORT · 내보내기 스타일', aboutTitle:'AI-SRTSub 소개',
   aboutBody:'AI-SRTSub는 오픈소스 AI 자막 번역 도구입니다. 좋은 자막 도구는 무료·깔끔·프라이버시 존중이어야 한다고 믿습니다——광고 없음, 가입 없음, 파일 만지지 않음. 직접 설치하거나 요청을 남겨주세요.', aboutRepo:'GitHub 저장소', aboutLicense:'AGPL-3.0 오픈소스', wsBackHome:'홈',
   wsUploadNew:'새 자막 올리기', projEmpty:'자막 없음', secImport:'가져오기', secLang:'언어',
-  secStyle:'번역 스타일', secRules:'처리 규칙', secEngine:'엔진', lblSrcShort:'원본 언어',
+  secStyle:'번역 스타일', secTerms:'용어와 고유명사', secFilter:'내용 필터링', secEngine:'엔진', lblSrcShort:'원본 언어',
   lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사', lblAutoTermsShort:'자동 용어집', secWrap:'줄바꿈 설정', splitWarn:'{0}개의 자막이 너무 길어 {1}개로 나뉘어 시간축도 쪼개졌습니다. 줄 너비를 {2} 이상으로 올리면 원래 시간축을 유지할 수 있습니다.', splitWarnBi:'{0}개의 이중 언어 자막이 너무 길어 {1}개로 나뉘어 시간축도 쪼개졌습니다. 이중 언어 줄 너비를 {2} 이상으로 올리면 원래 시간축을 유지할 수 있습니다.', wrapTip:'설정을 바꿔도 다시 번역할 필요 없이 편집 영역에서 단일 언어 자막의 줄바꿈을 바로 확인할 수 있습니다.', lblMaxWShort:'줄 폭 기준', lblBiMaxWShort:'이중언어 너비', wUnit:'자', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2116,7 +2183,7 @@ userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende F�
   feat6T:'Privat von Haus aus', feat6D:'Untertitel werden im Browser verarbeitet und gehen standardmäßig an keine Drittserver; der API-Key bleibt auf deinem Gerät.', expTag:'✦ EXPORT', aboutTitle:'Über AI-SRTSub',
   aboutBody:'AI-SRTSub ist ein Open-Source-Untertitelübersetzer mit KI. Wir finden: Gute Tools sind kostenlos, sauber und respektieren die Privatsphäre — keine Werbung, keine Anmeldung, keine Finger auf deinen Dateien. Self-Hosten und Mitschmieden willkommen.', aboutRepo:'GitHub-Repository', aboutLicense:'Open Source AGPL-3.0', wsBackHome:'Start',
   wsUploadNew:'Neuer Untertitel', projEmpty:'Kein Untertitel geladen', secImport:'Import', secLang:'Sprachen',
-  secStyle:'Stil', secRules:'Regeln', secEngine:'Engine', lblSrcShort:'Ausgangssprache',
+  secStyle:'Stil', secTerms:'Begriffe & Namen', secFilter:'Filterung', secEngine:'Engine', lblSrcShort:'Ausgangssprache',
   lblDstShort:'Zielsprache', lblKeepTermsShort:'Eigennamen', lblAutoTermsShort:'Auto-Glossar', secWrap:'Zeilenumbruch', splitWarn:'{0} zu lange Untertitel wurden in {1} geteilt, wodurch die Zeitachse zerfällt. Erhöhe die Zeilenbreite auf {2} oder mehr, um die ursprüngliche Zeitachse zu behalten.', splitWarnBi:'{0} zu lange zweisprachige Untertitel wurden in {1} geteilt, wodurch die Zeitachse zerfällt. Erhöhe die zweisprachige Zeilenbreite auf {2} oder mehr, um die ursprüngliche Zeitachse zu behalten.', wrapTip:'Kein Neuübersetzen nötig – der Umbruch der einsprachigen Untertitel ist sofort im Editor sichtbar.', lblMaxWShort:'Zeilenbreite', lblBiMaxWShort:'Zweisprachige Breite', wUnit:'Zeichen', lblLyric:'Liedtexte', lyricTrans:'Übersetzen', lyricKeep:'Original behalten', lyricDrop:'Entfernen', lblMarks:'Liedmarken', lblDropFillers:'Füllwörter entfernen',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2215,7 +2282,7 @@ userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, appl
   feat6T:'Vie privée d\'abord', feat6D:'Les sous-titres sont traités dans votre navigateur sans serveur tiers ; la clé API reste sur votre appareil.', expTag:'✦ EXPORT', aboutTitle:'À propos d\'AI-SRTSub',
   aboutBody:'AI-SRTSub est un traducteur de sous-titres IA open source. Pour nous, un bon outil doit être gratuit, propre et respecter la vie privée — pas de pub, pas d\'inscription, on ne touche pas à vos fichiers. Auto-hébergez-vous ou venez le polir avec nous.', aboutRepo:'Dépôt GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Accueil',
   wsUploadNew:'Nouveau sous-titre', projEmpty:'Aucun sous-titre chargé', secImport:'Importer', secLang:'Langues',
-  secStyle:'Style', secRules:'Règles', secEngine:'Moteur', lblSrcShort:'Langue source',
+  secStyle:'Style', secTerms:'Termes et noms', secFilter:'Filtrage', secEngine:'Moteur', lblSrcShort:'Langue source',
   lblDstShort:'Langue cible', lblKeepTermsShort:'Noms propres', lblAutoTermsShort:'Glossaire auto', secWrap:'Retour à la ligne', splitWarn:'{0} sous-titres trop longs ont été divisés en {1}, ce qui fragmente la timeline. Montez la largeur de ligne à {2} ou plus pour garder le timing d’origine.', splitWarnBi:'{0} sous-titres bilingues trop longs ont été divisés en {1}, ce qui fragmente la timeline. Montez la largeur de ligne bilingue à {2} ou plus pour garder le timing d’origine.', wrapTip:'Aucune retraduction nécessaire : le retour à la ligne des sous-titres monolingues est visible aussitôt dans l’éditeur.', lblMaxWShort:'Largeur de ligne', lblBiMaxWShort:'Largeur bilingue', wUnit:'caractères', lblLyric:'Paroles', lyricTrans:'Traduire', lyricKeep:'Garder l\'original', lyricDrop:'Supprimer', lblMarks:'Marques de paroles', lblDropFillers:'Supprimer les tics',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2314,7 +2381,7 @@ userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghap
   feat6T:'Privasi utama', feat6D:'Subtitel diproses di browser-mu dan tidak lewat server pihak ketiga; API Key hanya tersimpan di perangkatmu.', expTag:'✦ EKSPOR', aboutTitle:'Tentang AI-SRTSub',
   aboutBody:'AI-SRTSub adalah penerjemah subtitel AI sumber terbuka. Kami percaya alat yang baik harus gratis, bersih, dan menghormati privasi — tanpa iklan, tanpa pendaftaran, tanpa menyentuh file Anda. Silakan self-host atau ikut menyempurnakan.', aboutRepo:'Repositori GitHub', aboutLicense:'Sumber terbuka AGPL-3.0', wsBackHome:'Beranda',
   wsUploadNew:'Subtitel baru', projEmpty:'Belum ada subtitel', secImport:'Impor', secLang:'Bahasa',
-  secStyle:'Gaya', secRules:'Aturan', secEngine:'Mesin', lblSrcShort:'Bahasa sumber',
+  secStyle:'Gaya', secTerms:'Istilah & nama', secFilter:'Filter konten', secEngine:'Mesin', lblSrcShort:'Bahasa sumber',
   lblDstShort:'Bahasa target', lblKeepTermsShort:'Nama diri', lblAutoTermsShort:'Glosarium otomatis', secWrap:'Pembungkusan baris', splitWarn:'{0} subtitle terlalu panjang dipecah menjadi {1}, sehingga timeline ikut terpecah. Naikkan lebar baris ke {2} atau lebih untuk mempertahankan timeline asli.', splitWarnBi:'{0} subtitle dwibahasa terlalu panjang dipecah menjadi {1}, sehingga timeline ikut terpecah. Naikkan lebar baris dwibahasa ke {2} atau lebih untuk mempertahankan timeline asli.', wrapTip:'Tanpa perlu menerjemahkan ulang — pembungkusan baris subtitle satu bahasa langsung terlihat di area editor.', lblMaxWShort:'Lebar baris', lblBiMaxWShort:'Lebar dwibahasa', wUnit:'karakter', lblLyric:'Lirik', lyricTrans:'Terjemahkan', lyricKeep:'Pertahankan asli', lyricDrop:'Hapus', lblMarks:'Penanda lirik', lblDropFillers:'Hapus kata pengisi',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2413,7 +2480,7 @@ userStop:'उपयोगकर्ता ने रोका।', postEnd:'अ�
   feat6T:'प्राइवेसी सबसे पहले', feat6D:'सबटाइटल आपके ब्राउज़र में प्रोसेस होते हैं, किसी थर्ड-पार्टी सर्वर से नहीं गुज़रते; API Key सिर्फ़ आपके डिवाइस पर रहता है।', expTag:'✦ एक्सपोर्ट स्टाइल', aboutTitle:'AI-SRTSub के बारे में',
   aboutBody:'AI-SRTSub एक ओपन-सोर्स AI सबटाइटल अनुवादक है। हम मानते हैं कि अच्छा टूल मुफ़्त, साफ़ और प्राइवेसी का ख्याल रखने वाला होना चाहिए — न विज्ञापन, न रजिस्ट्रेशन, न आपकी फ़ाइलों को छूना। सेल्फ-होस्ट करें या साथ में निखारें।', aboutRepo:'GitHub रिपॉज़िटरी', aboutLicense:'AGPL-3.0 ओपन सोर्स', wsBackHome:'होम',
   wsUploadNew:'नया सबटाइटल', projEmpty:'कोई सबटाइटल नहीं', secImport:'इंपोर्ट', secLang:'भाषा',
-  secStyle:'अनुवाद स्टाइल', secRules:'नियम', secEngine:'इंजन', lblSrcShort:'स्रोत भाषा',
+  secStyle:'अनुवाद स्टाइल', secTerms:'शब्दावली और नाम', secFilter:'सामग्री फ़िल्टर', secEngine:'इंजन', lblSrcShort:'स्रोत भाषा',
   lblDstShort:'लक्ष्य भाषा', lblKeepTermsShort:'संज्ञाएँ', lblAutoTermsShort:'ऑटो ग्लॉसरी', secWrap:'लाइन रैपिंग', splitWarn:'{0} लंबी लाइनें {1} में बँट गईं, जिससे समय-रेखा भी टूटी है। मूल समय-रेखा रखने के लिए लाइन चौड़ाई {2} या अधिक करें।', splitWarnBi:'{0} द्विभाषी लाइनें {1} में बँट गईं, जिससे समय-रेखा भी टूटी है। मूल समय-रेखा रखने के लिए द्विभाषी लाइन चौड़ाई {2} या अधिक करें।', wrapTip:'दोबारा अनुवाद की ज़रूरत नहीं — संपादन क्षेत्र में एकभाषी उपशीर्षक की रैपिंग तुरंत दिखती है।', lblMaxWShort:'लाइन चौड़ाई', lblBiMaxWShort:'द्विभाषी चौड़ाई', wUnit:'अक्षर', lblLyric:'गीत के बोल', lyricTrans:'अनूदित करें', lyricKeep:'मूल रखें', lyricDrop:'हटाएँ', lblMarks:'गीत चिह्न', lblDropFillers:'भराव शब्द हटाएँ',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2512,7 +2579,7 @@ userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร�
   feat6T:'ความเป็นส่วนตัวมาก่อน', feat6D:'ซับถูกประมวลผลในเบราว์เซอร์ของคุณ ไม่ผ่านเซิร์ฟเวอร์บุคคลที่สาม และ API Key เก็บไว้ในเครื่องคุณเท่านั้น', expTag:'✦ ส่งออก', aboutTitle:'เกี่ยวกับ AI-SRTSub',
   aboutBody:'AI-SRTSub คือเครื่องมือแปลซับด้วย AI แบบโอเพนซอร์ส เราเชื่อว่าเครื่องมือที่ดีต้องฟรี สะอาด และเคารพความเป็นส่วนตัว — ไม่มีโฆษณา ไม่ต้องสมัคร ไม่แตะไฟล์ของคุณ ติดตั้งเองได้ ช่วยกันขัดเกลาได้', aboutRepo:'รีโพซิทอรี GitHub', aboutLicense:'โอเพนซอร์ส AGPL-3.0', wsBackHome:'หน้าแรก',
   wsUploadNew:'ซับใหม่', projEmpty:'ยังไม่มีซับ', secImport:'นำเข้า', secLang:'ภาษา',
-  secStyle:'สไตล์', secRules:'กฎการประมวลผล', secEngine:'เอนจิน', lblSrcShort:'ภาษาต้นทาง',
+  secStyle:'สไตล์', secTerms:'คำศัพท์และชื่อเฉพาะ', secFilter:'การกรองเนื้อหา', secEngine:'เอนจิน', lblSrcShort:'ภาษาต้นทาง',
   lblDstShort:'ภาษาปลายทาง', lblKeepTermsShort:'ชื่อเฉพาะ', lblAutoTermsShort:'อภิธานศัพท์อัตโนมัติ', secWrap:'การตัดบรรทัด', splitWarn:'{0} บรรทัดที่ยาวเกินไปถูกแบ่งเป็น {1} ทำให้เส้นเวลาแตกออก ถ้าอยากรักษาเส้นเวลาเดิม ให้เพิ่มความกว้างบรรทัดเป็น {2} ขึ้นไป', splitWarnBi:'{0} บรรทัดสองภาษาที่ยาวเกินไปถูกแบ่งเป็น {1} ทำให้เส้นเวลาแตกออก ถ้าอยากรักษาเส้นเวลาเดิม ให้เพิ่มความกว้างบรรทัดสองภาษาเป็น {2} ขึ้นไป', wrapTip:'ไม่ต้องแปลใหม่ — ดูการตัดบรรทัดของซับไตเติลภาษาเดียวได้ทันทีในพื้นที่แก้ไข', lblMaxWShort:'ความกว้างบรรทัด', lblBiMaxWShort:'ความกว้างสองภาษา', wUnit:'ตัวอักษร', lblLyric:'เนื้อเพลง', lyricTrans:'แปล', lyricKeep:'เก็บต้นฉบับ', lyricDrop:'ลบ', lblMarks:'เครื่องหมายเนื้อเพลง', lblDropFillers:'ลบคำอุทาน',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2611,7 +2678,7 @@ userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn 
   feat6T:'Riêng tư trên hết', feat6D:'Phụ đề được xử lý ngay trong trình duyệt, không qua máy chủ bên thứ ba; API Key chỉ nằm trên máy bạn.', expTag:'✦ XUẤT TỆP', aboutTitle:'Về AI-SRTSub',
   aboutBody:'AI-SRTSub là công cụ dịch phụ đề bằng AI mã nguồn mở. Chúng tôi tin công cụ tốt phải miễn phí, sạch sẽ và tôn trọng riêng tư — không quảng cáo, không đăng ký, không động vào tệp của bạn. Tự triển khai hay cùng nhau hoàn thiện đều chào đón.', aboutRepo:'Kho GitHub', aboutLicense:'Mã nguồn mở AGPL-3.0', wsBackHome:'Trang chủ',
   wsUploadNew:'Phụ đề mới', projEmpty:'Chưa có phụ đề', secImport:'Nhập', secLang:'Ngôn ngữ',
-  secStyle:'Phong cách', secRules:'Quy tắc', secEngine:'Engine', lblSrcShort:'Ngôn ngữ nguồn',
+  secStyle:'Phong cách', secTerms:'Thuật ngữ & tên riêng', secFilter:'Lọc nội dung', secEngine:'Engine', lblSrcShort:'Ngôn ngữ nguồn',
   lblDstShort:'Ngôn ngữ đích', lblKeepTermsShort:'Tên riêng', lblAutoTermsShort:'Bảng thuật ngữ tự động', secWrap:'Ngắt dòng', splitWarn:'{0} dòng quá dài bị tách thành {1}, làm vỡ cả trục thời gian. Tăng độ rộng dòng lên {2} trở lên để giữ nguyên trục thời gian.', splitWarnBi:'{0} dòng song ngữ quá dài bị tách thành {1}, làm vỡ cả trục thời gian. Tăng độ rộng dòng song ngữ lên {2} trở lên để giữ nguyên trục thời gian.', wrapTip:'Không cần dịch lại — ngắt dòng của phụ đề đơn ngữ hiện ngay trong vùng chỉnh sửa.', lblMaxWShort:'Độ rộng dòng', lblBiMaxWShort:'Chiều rộng song ngữ', wUnit:'ký tự', lblLyric:'Lời bài hát', lyricTrans:'Dịch', lyricKeep:'Giữ nguyên bản', lyricDrop:'Xóa', lblMarks:'Dấu hiệu lời bài hát', lblDropFillers:'Xóa từ đệm',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2710,7 +2777,7 @@ userStop:'Остановлено пользователем.', postEnd:'Пере
   feat6T:'Приватность прежде всего', feat6D:'Субтитры обрабатываются в вашем браузере и не проходят через сторонние серверы; API-ключ хранится только на вашем устройстве.', expTag:'✦ ЭКСПОРТ', aboutTitle:'Об AI-SRTSub',
   aboutBody:'AI-SRTSub — субтитровочный ИИ-переводчик с открытым кодом. Мы уверены: хороший инструмент должен быть бесплатным, чистым и уважать приватность — без рекламы, без регистрации, не трогая ваши файлы. Разворачивайте у себя и совершенствуйте вместе с нами.', aboutRepo:'Репозиторий GitHub', aboutLicense:'Открытый код AGPL-3.0', wsBackHome:'Главная',
   wsUploadNew:'Новые субтитры', projEmpty:'Субтитры не загружены', secImport:'Импорт', secLang:'Языки',
-  secStyle:'Стиль', secRules:'Правила', secEngine:'Движок', lblSrcShort:'Исходный язык',
+  secStyle:'Стиль', secTerms:'Термины и имена', secFilter:'Фильтрация', secEngine:'Движок', lblSrcShort:'Исходный язык',
   lblDstShort:'Целевой язык', lblKeepTermsShort:'Имена собственные', lblAutoTermsShort:'Автоглоссарий', secWrap:'Перенос строк', splitWarn:'{0} слишком длинных строк разбиты на {1}, из-за чего рвётся таймлайн. Поднимите ширину строки до {2} или больше, чтобы сохранить исходные тайминги.', splitWarnBi:'{0} слишком длинных двуязычных строк разбиты на {1}, из-за чего рвётся таймлайн. Поднимите ширину двуязычной строки до {2} или больше, чтобы сохранить исходные тайминги.', wrapTip:'Повторный перевод не нужен — перенос строк в одноязычных субтитрах виден в редакторе сразу.', lblMaxWShort:'Ширина строки', lblBiMaxWShort:'Ширина билингвы', wUnit:'символов', lblLyric:'Тексты песен', lyricTrans:'Переводить', lyricKeep:'Оставить оригинал', lyricDrop:'Удалить', lblMarks:'Маркеры песен', lblDropFillers:'Удалять слова-паразиты',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2809,7 +2876,7 @@ userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozi
   feat6T:'Privacy prima di tutto', feat6D:'I sottotitoli si elaborano nel tuo browser e non passano da server di terze parti; la API Key resta sul tuo dispositivo.', expTag:'✦ EXPORT', aboutTitle:'Chi è AI-SRTSub',
   aboutBody:'AI-SRTSub è un traduttore di sottotitoli AI open source. Crediamo che un buon strumento debba essere gratuito, pulito e rispettoso della privacy — niente pubblicità, niente registrazione, nessuno tocca i tuoi file. Self-host e contributi benvenuti.', aboutRepo:'Repository GitHub', aboutLicense:'Open source AGPL-3.0', wsBackHome:'Home',
   wsUploadNew:'Nuovi sottotitoli', projEmpty:'Nessun sottotitolo caricato', secImport:'Importa', secLang:'Lingue',
-  secStyle:'Stile', secRules:'Regole', secEngine:'Motore', lblSrcShort:'Lingua origine',
+  secStyle:'Stile', secTerms:'Termini e nomi', secFilter:'Filtri contenuto', secEngine:'Motore', lblSrcShort:'Lingua origine',
   lblDstShort:'Lingua destinazione', lblKeepTermsShort:'Nomi propri', lblAutoTermsShort:'Glossario automatico', secWrap:'A capo', splitWarn:'{0} righe troppo lunghe sono state divise in {1}, spezzando la linea del tempo. Alza la larghezza di riga a {2} o più per conservare i tempi originali.', splitWarnBi:'{0} righe bilingue troppo lunghe sono state divise in {1}, spezzando la linea del tempo. Alza la larghezza della riga bilingue a {2} o più per conservare i tempi originali.', wrapTip:'Nessuna ritraduzione necessaria: l’a capo dei sottotitoli monolingui si vede subito nell’editor.', lblMaxWShort:'Larghezza riga', lblBiMaxWShort:'Larghezza bilingue', wUnit:'caratteri', lblLyric:'Testi delle canzoni', lyricTrans:'Traduci', lyricKeep:'Mantieni originale', lyricDrop:'Rimuovi', lblMarks:'Marcatori testi', lblDropFillers:'Rimuovi riempitivi',
   /* v0.9.70 两段式界面新增 */
 },
@@ -2908,7 +2975,7 @@ userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، ت
   feat6T:'الخصوصية أولًا', feat6D:'تُعالج الترجمات في متصفحك ولا تمر بأي خوادم خارجية؛ ومفتاح API يبقى على جهازك فقط.', expTag:'✦ التصدير', aboutTitle:'حول AI-SRTSub',
   aboutBody:'AI-SRTSub أداة ترجمة ترجمات بالذكاء الاصطناعي مفتوحة المصدر. نؤمن أن الأداة الجيدة يجب أن تكون مجانية ونظيفة وتحترم الخصوصية — بلا إعلانات ولا تسجيل ولا العبث بملفاتك. رحّبنا بالتثبيت الذاتي وباقتراحات التطوير.', aboutRepo:'مستودع GitHub', aboutLicense:'مفتوح المصدر AGPL-3.0', wsBackHome:'الرئيسية',
   wsUploadNew:'ترجمة جديدة', projEmpty:'لم تُحمَّل ترجمة', secImport:'استيراد', secLang:'اللغات',
-  secStyle:'الأسلوب', secRules:'القواعد', secEngine:'المحرك', lblSrcShort:'لغة المصدر',
+  secStyle:'الأسلوب', secTerms:'المصطلحات والأسماء', secFilter:'تصفية المحتوى', secEngine:'المحرك', lblSrcShort:'لغة المصدر',
   lblDstShort:'اللغة الهدف', lblKeepTermsShort:'الأسماء الخاصة', lblAutoTermsShort:'مسرد تلقائي', secWrap:'التفاف الأسطر', splitWarn:'{0} سطرًا طويلًا جدًا قُسّم إلى {1}، مما يقطع محور الوقت. ارفع عرض السطر إلى {2} أو أكثر للحفاظ على التوقيت الأصلي.', splitWarnBi:'{0} سطرًا ثنائي اللغة طويلًا جدًا قُسّم إلى {1}، مما يقطع محور الوقت. ارفع عرض السطر الثنائي إلى {2} أو أكثر للحفاظ على التوقيت الأصلي.', wrapTip:'لا حاجة لإعادة الترجمة — يظهر التفاف الأسطر في الترجمة أحادية اللغة فورًا في منطقة التحرير.', lblMaxWShort:'عرض السطر', lblBiMaxWShort:'عرض ثنائي اللغة', wUnit:'حرف', lblLyric:'كلمات الأغاني', lyricTrans:'ترجمة', lyricKeep:'إبقاء الأصل', lyricDrop:'حذف', lblMarks:'علامات الأغنية', lblDropFillers:'حذف كلمات الحشو',
   /* v0.9.70 两段式界面新增 */
 },
@@ -3007,7 +3074,7 @@ userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu te
   feat6T:'Önce gizlilik', feat6D:'Altyazılar tarayıcında işlenir, üçüncü taraf sunuculardan geçmez; API anahtarı sadece senin cihazında kalır.', expTag:'✦ DIŞA AKTARMA', aboutTitle:'AI-SRTSub Hakkında',
   aboutBody:'AI-SRTSub, açık kaynaklı bir AI altyazı çevirmenidir. İyi bir aracın ücretsiz, temiz ve gizliliğe saygılı olması gerektiğine inanıyoruz — reklam yok, kayıt yok, dosyalarına dokunma yok. Kendi sunucunda çalıştır ya da birlikte cilalayalım.', aboutRepo:'GitHub deposu', aboutLicense:'Açık kaynak AGPL-3.0', wsBackHome:'Ana sayfa',
   wsUploadNew:'Yeni altyazı', projEmpty:'Altyazı yüklenmedi', secImport:'İçe aktar', secLang:'Diller',
-  secStyle:'Stil', secRules:'Kurallar', secEngine:'Motor', lblSrcShort:'Kaynak dil',
+  secStyle:'Stil', secTerms:'Terimler ve adlar', secFilter:'İçerik filtreleme', secEngine:'Motor', lblSrcShort:'Kaynak dil',
   lblDstShort:'Hedef dil', lblKeepTermsShort:'Özel isimler', lblAutoTermsShort:'Otomatik sözlük', secWrap:'Satır kaydırma', splitWarn:'{0} çok uzun satır {1} parçaya bölündü ve zaman çizgisi de parçalandı. Orijinal zamanlamayı korumak için satır genişliğini {2} veya üzerine çıkarın.', splitWarnBi:'{0} çok uzun iki dilli satır {1} parçaya bölündü ve zaman çizgisi de parçalandı. Orijinal zamanlamayı korumak için iki dilli satır genişliğini {2} veya üzerine çıkarın.', wrapTip:'Yeniden çeviri gerekmez — tek dilli altyazıların satır kaydırması düzenleme alanında hemen görünür.', lblMaxWShort:'Satır genişliği', lblBiMaxWShort:'İki dilli genişlik', wUnit:'karakter', lblLyric:'Şarkı sözleri', lyricTrans:'Çevir', lyricKeep:'Orijinali koru', lyricDrop:'Kaldır', lblMarks:'Şarkı işaretleri', lblDropFillers:'Dolgu sözcükleri kaldır',
   /* v0.9.70 两段式界面新增 */
 },
@@ -3285,7 +3352,7 @@ rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   secImport:'Import',
   secLang:'Talen',
   secStyle:'Stijl',
-  secRules:'Regels',
+  secTerms:'Termen & namen', secFilter:'Inhoud filteren',
   secEngine:'Motor',
   lblSrcShort:'Brontaal',
   lblDstShort:'Doeltaal',
@@ -3575,7 +3642,7 @@ rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   secImport:'Import',
   secLang:'Języki',
   secStyle:'Styl',
-  secRules:'Reguły',
+  secTerms:'Terminy i nazwy', secFilter:'Filtrowanie treści',
   secEngine:'Silnik',
   lblSrcShort:'Język źródłowy',
   lblDstShort:'Język docelowy',
@@ -3865,7 +3932,7 @@ rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   secImport:'Import',
   secLang:'Språk',
   secStyle:'Stil',
-  secRules:'Regler',
+  secTerms:'Termer och namn', secFilter:'Filtrering',
   secEngine:'Motor',
   lblSrcShort:'Källspråk',
   lblDstShort:'Målspråk',
@@ -4155,7 +4222,7 @@ rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   secImport:'Import',
   secLang:'Jazyky',
   secStyle:'Styl',
-  secRules:'Pravidla',
+  secTerms:'Termíny a jména', secFilter:'Filtrování obsahu',
   secEngine:'Stroj',
   lblSrcShort:'Zdrojový jazyk',
   lblDstShort:'Cílový jazyk',
@@ -4445,7 +4512,7 @@ rateWait:'Перевищено ліміт (429), очікування 20 с пе
   secImport:'Імпорт',
   secLang:'Мови',
   secStyle:'Стиль',
-  secRules:'Правила',
+  secTerms:'Терміни та імена', secFilter:'Фільтрація контенту',
   secEngine:'Механізм',
   lblSrcShort:'Мова джерела',
   lblDstShort:'Мова перекладу',
@@ -4735,7 +4802,7 @@ rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   secImport:'Import',
   secLang:'Sprog',
   secStyle:'Stil',
-  secRules:'Regler',
+  secTerms:'Termer og navne', secFilter:'Filtrering af indhold',
   secEngine:'Motor',
   lblSrcShort:'Kildesprog',
   lblDstShort:'Målsprog',
@@ -5025,7 +5092,7 @@ rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   secImport:'Tuonti',
   secLang:'Kielet',
   secStyle:'Tyyli',
-  secRules:'Säännöt',
+  secTerms:'Termit ja nimet', secFilter:'Sisällön suodatus',
   secEngine:'Moottori',
   lblSrcShort:'Lähdekieli',
   lblDstShort:'Kohdekieli',
@@ -5315,7 +5382,7 @@ rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επ
   secImport:'Εισαγωγή',
   secLang:'Γλώσσες',
   secStyle:'Ύφος',
-  secRules:'Κανόνες',
+  secTerms:'Όροι και ονόματα', secFilter:'Φιλτράρισμα περιεχομένου',
   secEngine:'Μηχανή',
   lblSrcShort:'Γλώσσα πηγής',
   lblDstShort:'Γλώσσα στόχος',
@@ -5605,7 +5672,7 @@ rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניס�
   secImport:'ייבוא',
   secLang:'שפות',
   secStyle:'סגנון',
-  secRules:'כללים',
+  secTerms:'מונחים ושמות', secFilter:'סינון תוכן',
   secEngine:'מנוע',
   lblSrcShort:'שפת מקור',
   lblDstShort:'שפת יעד',
@@ -5895,7 +5962,7 @@ rateWait:'Limită de rată atinsă (429), aștept 20 s înainte de reîncercare�
   secImport:'Import',
   secLang:'Limbi',
   secStyle:'Stil',
-  secRules:'Reguli',
+  secTerms:'Termeni și nume', secFilter:'Filtrare conținut',
   secEngine:'Motor',
   lblSrcShort:'Limba sursă',
   lblDstShort:'Limba țintă',
