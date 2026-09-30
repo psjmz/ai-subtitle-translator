@@ -4590,7 +4590,7 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/\.blk-title\{font-size:11px;font-weight:600;color:var\(--sub\);letter-spacing:\.4px/.test(html),
       '块标题没有降重（11px / --sub）');
     // 主 CTA 独占一行满宽，复制降为文字链
-    assert.ok(/\.exp-actions\{display:flex;flex-direction:column;gap:8px/.test(html), '导出按钮区没有改成竖排');
+    assert.ok(/\.exp-actions\{display:flex;flex-direction:column;gap:10px/.test(html), '导出按钮区没有改成竖排');
     assert.ok(/\.exp-actions \.btn\.primary\{width:100%\}/.test(html), '主 CTA 没有满宽');
     assert.ok(/\.btn\.link\{background:none;border:none;color:var\(--sub\)/.test(html), '复制没有降级为文字链');
     // 赞助：可点击元素必须过 4.5:1，--mut(#A5A2A8) 实测只有 2.5:1，所以用 --sub 不用 --mut
@@ -4850,6 +4850,39 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        不收成单列的话输入框只占一半宽、右边空一大块。 */
     assert.ok(/\.wrap-row\.solo\{grid-template-columns:1fr\}/.test(html), '缺 .wrap-row.solo 单列规则');
     assert.ok(/<div class="wrap-row solo">/.test(html), 'HTML 没挂 solo');
+  });
+
+  t('v0.9.203 「✨ AI 抽取」不再被长标签挤成两行', () => {
+    /* 标签原为「统一译名（术语表，每行一条）」15 字占满整行，按钮被压到 ~60px，
+       里面的字竖着折成「AI 抽」/「取」。修法两条：标签缩短 + 按钮不折行不收缩。 */
+    assert.ok(/<span data-i18n="lblTermsShort">统一译名<\/span><i class="info" tabindex="0" data-tip-i18n="lblTerms">i<\/i>/.test(html),
+      '标签没改成短名 + ⓘ（说明信息不该丢）');
+    assert.ok(/\.flbl-row>\{?\.btn|\.flbl-row>\.btn\{flex:none;white-space:nowrap;margin-left:auto\}/.test(html),
+      '标签行按钮没加 flex:none + nowrap');
+    /* 短名 27 语齐全，且长文案仍保留（作为 ⓘ 提示） */
+    ['lblTermsShort','lblTerms'].forEach(k => {
+      const n = (html.match(new RegExp("(?<![A-Za-z])" + k + "\\s*:", 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 词条数 ' + n + '（应为 27）');
+    });
+    assert.ok(/lblTermsShort:'统一译名'/.test(html), '中文短名不对');
+    /* 短名必须是长文案去掉括号说明后的部分 —— 不能再出现括号 */
+    const sh = html.match(/lblTermsShort:'((?:[^'\\]|\\.)*)'/);
+    assert.ok(sh && !/[（(]/.test(sh[1]), '短名里还带着括号说明');
+  });
+
+  t('v0.9.203 下载区：文字链不再挂静态下划线，且与主按钮同中轴', () => {
+    /* 满宽渐变按钮下面吊着一条带下划线的灰字，像没排版完的默认链接；
+       而且它左对齐、主按钮居中，中轴也不齐。 */
+    assert.ok(/\.btn\.link\{background:none;border:none;color:var\(--sub\);font-size:11\.5px;text-decoration:none;/.test(html),
+      '文字链还挂着静态下划线');
+    assert.ok(/\.btn\.link\{[^}]*align-self:center/.test(html), '文字链没跟主按钮同中轴');
+    assert.ok(/\.btn\.link:hover\{color:var\(--acc\);text-decoration:underline\}/.test(html),
+      '悬停时该给下划线提示可点');
+    /* 赞助入口同理 */
+    assert.ok(/#btnDonate\{[^}]*text-decoration:none/.test(html), '赞助入口还挂着静态下划线');
+    assert.ok(!/#btnDonate\{[^}]*text-decoration:underline/.test(html), '赞助入口的静态下划线没去掉');
+    assert.ok(/#donateBox\{text-align:center\}/.test(html), '赞助入口没居中');
+    assert.ok(/\.exp-actions\{display:flex;flex-direction:column;gap:10px/.test(html), '按钮间距没收成 10px');
   });
 }
 
