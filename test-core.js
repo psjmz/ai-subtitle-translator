@@ -4490,8 +4490,11 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/dst\.style\.bottom=dMV\+'px'/.test(html) && /src\.style\.bottom=sMV\+'px'/.test(html),
       '两块各用自己 mv 的落位逻辑没了');
     /* 双行(stack)的上方块：用户手动改过就用他自己的值，否则沿用导出端的抬高量 */
-    assert.ok(/ML\.srcFix\? sMV : \(dMV\+lhOf\(dst\)\)/.test(html) &&
-      /ML\.dstFix\? dMV : \(sMV\+lhOf\(src\)\)/.test(html), 'stack 上方块的抬高量算错/丢失');
+    /* v0.9.205：抬高量不再由预览自己算（行盒相邻），改为直接复用导出端的 assStackMV */
+    /* v0.9.205：抬高量 = 实测行盒高 + 导出端的墨迹间隙（按字号比例缩到预览） */
+    assert.ok(/ML\.srcFix\? sMV : \(dMV\+lhOf\(dst\)\+gap\)/.test(html) &&
+      /ML\.dstFix\? dMV : \(sMV\+lhOf\(src\)\+gap\)/.test(html),
+      'stack 上方块的抬高量算错/丢失（应为 行盒高 + 墨迹间隙）');
     /* ⚠️ inline 的 top:auto 必须显式写：.pv-split 的 CSS 有 top:22px，只改 bottom 会既 top 又 bottom，
        元素被拉长。 */
     assert.ok(/dst\.style\.top='auto'; src\.style\.top='auto'/.test(html),
@@ -4663,13 +4666,13 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       'syncExpPreview 没打 pv-plain 类');
     /* 反向断言：兜底值本身必须还是「一深一浅」——ASS 模式下 --pv-* 一定被写入，
        这里的兜底只用于 pv-plain 之外的极少数场景（脚本没跑完）。别为了这条把 ASS 的颜色串了。 */
-    assert.ok(/\.ep-dst\{bottom:calc\(9px \+ 12px\*var\(--pv-lh\)\);font-size:var\(--pv-dst,12px\);color:var\(--pv-dst-c,#fff\)\}/.test(html),
+    assert.ok(/\.ep-dst\{bottom:calc\(9px \+ 12px\*var\(--pv-lh\) \+ var\(--pv-gap\)\);font-size:var\(--pv-dst,12px\);color:var\(--pv-dst-c,#fff\)\}/.test(html),
       'ASS 的兜底样式被动过（.ep-dst）');
     assert.ok(/\.ep-src\{bottom:9px;font-size:var\(--pv-src,10\.5px\);color:var\(--pv-src-c,#C9B8FF\)\}/.test(html),
       'ASS 的兜底样式被动过（.ep-src）');
     /* 关键：pv-plain 只压颜色/字号，不能把「行序」也压掉——SRT 双语谁在上仍然是真的 */
     assert.ok(/\.exp-preview\.pv-rev \.ep-dst\{bottom:9px\}/.test(html) &&
-              /\.exp-preview\.pv-rev \.ep-src\{bottom:calc\(9px \+ 12px\*var\(--pv-lh\)\)\}/.test(html),
+              /\.exp-preview\.pv-rev \.ep-src\{bottom:calc\(9px \+ 12px\*var\(--pv-lh\) \+ var\(--pv-gap\)\)\}/.test(html),
       'pv-rev（原文在上）的行序被连带改掉了');
     assert.ok(/\.exp-preview\.pv-mono \.ep-dst\{bottom:9px\}/.test(html), '单语贴底被连带改掉了');
     /* 只对非 ASS 生效：ASS 的两种布局都不是 plain */
@@ -4901,19 +4904,24 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/#donateQr\{[^}]*background:#FFF9F0/.test(html), '展开的收款码没跟着换暖色系');
   });
 
-  t('v0.9.204 赞助入口只在「导出过至少一次」之后才露出', () => {
-    /* 还没拿到成果的人看到「充点 token」只会觉得在要钱；
-       导出过的人正处在「东西到手」的情绪点上——那一刻这个请求才成立。 */
+  t('v0.9.206 赞助入口常驻（撤掉 v0.9.204 的「导出过才露出」门槛）', () => {
+    /* v0.9.204 曾加门槛：还没拿到成果的人看到「充点 token」只会觉得在要钱。
+       v0.9.206 用户要求撤掉 → 恢复常驻。srtDonateV1 标记照写不误：
+       它不再决定显不显示，但将来要做「导出过的人换一句文案」时还能直接读。 */
     const init = html.slice(html.indexOf('/* v0.9.173：赞助入口'));
-    assert.ok(/localStorage\.setItem\('srtDonateV1','1'\)/.test(html), '导出成功后没记下「够格了」的标记');
-    assert.ok(/function eligible\(\)\{ try\{ return localStorage\.getItem\('srtDonateV1'\)==='1'; \}/.test(init),
-      '门槛判定函数不见了');
-    assert.ok(/if\(eligible\(\)\) box\.hidden=false/.test(init), '揭幕没经过门槛判定');
-    assert.ok(/if\(window\.__donateReveal\) window\.__donateReveal\(\);/.test(html), '导出成功后没有回调揭幕');
-    assert.ok(/window\.__donateReveal\(\);/.test(init), '回访老用户没在初始化时判一次');
+    assert.ok(/window\.__donateReveal=function\(\)\{ box\.hidden=false; \};/.test(init),
+      '揭幕函数还没改成常驻（仍带门槛判定）');
+    assert.ok(/^\s*box\.hidden=false;$/m.test(init), '初始化没有无条件显示（赞助入口应常驻）');
+    assert.ok(!/if\(eligible\(\)\)/.test(init) && !/function eligible\(\)/.test(init),
+      '「导出过才露出」的门槛还在');
+    assert.ok(/localStorage\.setItem\('srtDonateV1','1'\)/.test(html),
+      '导出标记仍应照写（留给将来按「导出过」换文案用）');
+    assert.ok(/if\(window\.__donateReveal\) window\.__donateReveal\(\);/.test(html), '导出成功后的回调没了');
     assert.ok(/给小站充点 token，让大家免费用/.test(html), '主文案丢了');
-    assert.ok(/小站每天都在烧 token/.test(html), '展开态的「每天在烧」那行丢了');
-    assert.ok(/充多充少都行，谢谢你/.test(html), '展开态的「充多充少」那行丢了');
+    assert.ok(/<div class="hint">图个快乐，多少随意<\/div>/.test(html), '展开态的「图个快乐，多少随意」丢了');
+    /* 收起态的按钮必须能原样回到主文案，否则点一次就回不来了 */
+    assert.ok(/图个快乐，多少随意/.test(html) && /给小站充点 token，让大家免费用/.test(html),
+      '赞助文案不全（展开态与主文案得都有）');
   });
 
   t('v0.9.204 字幕预览两行不再重叠（行盒高要「量」，不能按系数「猜」）', () => {
@@ -4929,8 +4937,18 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '.ep-line 没写 line-height —— 会继承 body 的 1.6，和 JS 的计算再次脱钩');
     assert.ok(/\.sc-line\{[^}]*line-height:var\(--pv-lh\)/.test(html),
       '首页橱窗 .sc-line 漏了（同一个病：写死 26px/8px 却按 1.6 行高渲染，叠 1.2px）');
-    /* ⚠️ 关键：行盒高不能再靠 fontSize×系数 估 —— 真值由 line-height 决定 */
-    assert.ok(/getBoundingClientRect\(\)\.height/.test(html), '行盒高没有实测');
+    /* ⚠️ 关键（v0.9.205）：两块之间还差一份「墨迹间隙」，光靠行盒相邻不够。
+       间隙值必须取自 srt-core.js 的 ASS_STACK_GAP（导出端同一个数），预览只做等比缩放。 */
+    assert.ok(/var gap=\(\+C\.ASS_STACK_GAP\|\|12\) \* k;/.test(html),
+      '墨迹间隙没有取自导出端的 ASS_STACK_GAP（又会变成两套数字）');
+    assert.ok(/var k=\(dPt>0 && dFs>0\)\?\(dFs\/dPt\):\(12\/56\);/.test(html),
+      '间隙没有按「预览字号 / 导出字号」等比缩到预览尺度');
+    /* ⚠️ 别拿 assStackMV 的结果整体乘 k 当抬高量：ASS 的墨迹公式（行框 1.18、baseline 到框底 0.22em）
+       与预览的行框（--pv-lh 1.2 + PingFang 自己的 metric）不是一回事，混着算两个方向会不一致
+       —— 实测 bi-src 变好、bi-dst 反而更紧。 */
+    assert.ok(!/upOf\(ML\.dstMV/.test(html) && !/upOf\(ML\.srcMV/.test(html),
+      '又在拿 assStackMV 的结果当抬高量（两个方向会不一致）');
+    assert.ok(/--pv-gap:2\.6px/.test(html), 'CSS 兜底缺了 --pv-gap（墨迹间隙）');
     assert.ok(!/\*1\.25/.test(html), '还在按 fontSize×1.25 估行盒高');
     assert.ok(!/, up=2;/.test(html) && !/lhOf\(dst\)\+up/.test(html),
       '那个 +2 补偿量还在 —— 它早被估错的行高吃掉了，看着像留了 2px、实际是叠 2px');

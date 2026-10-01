@@ -57,6 +57,11 @@
        所以 CSS 与 JS 之间不再存在第二份"行高是多少"的假设 —— 之前正是两份数字打架，
        上面那行被压低 0.35em 与下面那行叠住。 */
     --pv-lh:1.2;
+    /* v0.9.205：两行字幕之间「墨迹」要留的空隙（预览尺度）。
+       导出端（srt-core.js）在 1080p 下留的是 ASS_STACK_GAP = 12px，预览把字等比缩到 12/56 显示，
+       所以这里 = 12 x 12/56 ≈ 2.6px。只靠 line-height 自带的 leading 撑出来的空隙只有 ~1px，
+       两行看着是贴在一起的——必须显式加这一份。 */
+    --pv-gap:2.6px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -435,7 +440,7 @@
   .sc-mono .dst{bottom:10px}
   /* v0.9.204：双语两行同样按「一个行高」抬，不再写死 26px
      （26−8=18px，小于 12px 字号的行盒 19.2px → 两行叠 1.2px，和导出预览是同一个病） */
-  .sc-bi .src{bottom:8px;color:#fff;font-size:12px} .sc-bi .dst{bottom:calc(8px + 12px*var(--pv-lh))}
+  .sc-bi .src{bottom:8px;color:#fff;font-size:12px} .sc-bi .dst{bottom:calc(8px + 12px*var(--pv-lh) + var(--pv-gap))}
   .sc-split .src{top:8px} .sc-split .dst{bottom:10px}
   .sc-stack .dst{bottom:34px} .sc-stack .src{bottom:6px}
   .sc-item figcaption{text-align:center;font-size:11.5px;color:var(--sub);margin-top:7px}
@@ -693,9 +698,11 @@
     aspect-ratio:16/9;position:relative}
   .ep-line{position:absolute;left:0;right:0;text-align:center;padding:0 8px;white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis;line-height:var(--pv-lh)}
-  /* 相邻两行 = 贴底那行 bottom:9px，另一行再往上抬「一个行高」（12px 是预览基准号，pv-plain 也是它）。
-     以前是写死的 26px / 9px —— 相差 17px，小于 12px 字号的行盒 19.2px，本身就叠 2.2px。 */
-  .ep-dst{bottom:calc(9px + 12px*var(--pv-lh));font-size:var(--pv-dst,12px);color:var(--pv-dst-c,#fff)}
+  /* 相邻两行 = 贴底那行 bottom:9px，另一行再往上抬「一个行高 + 一个墨迹间隙」。
+     以前是写死的 26px / 9px —— 相差 17px，小于 12px 字号的行盒 19.2px，本身就叠 2.2px。
+     v0.9.205：光抬「一个行高」不够——行高自带的 leading 落在墨迹之外，两行墨迹实际只差 ~1px，
+     看着就是贴在一起的。显式补 --pv-gap（= 导出端 12px 等比缩到预览的值）。 */
+  .ep-dst{bottom:calc(9px + 12px*var(--pv-lh) + var(--pv-gap));font-size:var(--pv-dst,12px);color:var(--pv-dst-c,#fff)}
   .ep-src{bottom:9px;font-size:var(--pv-src,10.5px);color:var(--pv-src-c,#C9B8FF)}
   /* v0.9.196：预览跟随「导出字幕样式」。原来这四行是写死的——永远是「译文在上 + 原文在下」的两行双语，
      选单语（mono）或「原文在上」（bi-src）纹丝不动，用户看到的从来不是自己即将导出的样子。
@@ -703,7 +710,7 @@
      pv-split 是 ASS 分屏（原文贴顶 / 译文贴底），pv-split-rev 则译文贴顶。
      ⚠️ 字号只跟角色走（译文恒大于原文），位置变化不交换字号，与 ASS 导出规则一致。 */
   .exp-preview.pv-rev .ep-dst{bottom:9px}
-  .exp-preview.pv-rev .ep-src{bottom:calc(9px + 12px*var(--pv-lh))}
+  .exp-preview.pv-rev .ep-src{bottom:calc(9px + 12px*var(--pv-lh) + var(--pv-gap))}
   /* v0.9.197：下面这几条只是「syncExpPreview 还没跑 / 非 ASS」时的兜底示意位。
      ASS 模式下两行的真实纵向位置由 syncExpPreview 按「离底距离」现算并写成 inline style
      （inline 的 top:auto 会压掉这里的 top，所以不会打架）。 */
@@ -763,7 +770,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.204</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.206</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -923,7 +930,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.204</span>
+    <span class="ver-tag">v0.9.206</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -1292,7 +1299,7 @@
         </button>
         <div id="donateQr" hidden>
           <img id="donateImg" alt="支付宝收款码">
-          <div class="hint">小站每天都在烧 token<br>充多充少都行，谢谢你</div>
+          <div class="hint">图个快乐，多少随意</div>
         </div>
       </div>
     </aside>
@@ -1303,7 +1310,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.204"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.206"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -10305,16 +10312,27 @@ function syncExpPreview(){
       return (isFinite(fs)? fs*1.2 : 14); };
     var dMV=toPx(ML.dstMV), sMV=toPx(ML.srcMV);
     if(stacked){
-      /* 相邻两行：贴底那行用它自己的 mv，另一行再往上抬「一个实测行高」。
-         行距由 .ep-line 的 line-height 自带（与导出端 assLineHeight 同源），这里不再另加固定像素
-         —— 原来那个 +2 早就被估错的行高吃掉了，看着像留了 2px，实际是叠 2px。 */
-      if(srcFirst){                 /* 原文在上：译文 Bottom(distMV) 贴底 */
+      /* v0.9.205：两块之间要另外留一份「墨迹间隙」，光靠行盒相邻不够。
+         导出端（srt-core.js assStackMV）在 1080p 下留的是 ASS_STACK_GAP = 12px；
+         预览为了看得清，字号按 pt→px 等比放大到 12/56 ≈ 0.214（纵向位置却是按 1080→框高 缩的），
+         所以这个间隙也要按字号比例 k 缩到预览尺度，否则块内距离会比实际紧一档。
+         ⚠️ 别拿 assStackMV 的结果整体乘 k 当抬高量（我第一版就是这么写的，已回退）：
+            ASS 那套墨迹公式假设「行框 1.18、baseline 到框底 0.22em」，而预览的行框是
+            --pv-lh(1.2)、baseline 位置由 PingFang 自己的 metric 决定，两者不是一回事。
+            混着算的结果是方向不一致 —— 实测 bi-src 间隙 3.7→5.4 变好，bi-dst 却 4.0→0.7 更紧。
+            改成「实测行盒高 + 导出端的间隙 × k」，两个方向都只加同一份，观感才一致。 */
+      var S=assStyleOf();
+      var dPt=+S.dstSize||56;
+      var dFs=parseFloat(getComputedStyle(dst).fontSize)||12;
+      var k=(dPt>0 && dFs>0)?(dFs/dPt):(12/56);      /* 预览字号 / 导出字号 */
+      /* ASS_STACK_GAP 由 srt-core.js 导出（单测也读它），预览不另存一份数字 */
+      var gap=(+C.ASS_STACK_GAP||12) * k;
+      if(srcFirst){                 /* 原文在上：译文 Bottom(dstMV) 贴底 */
         dst.style.bottom=dMV+'px';
-        /* ⚠️ 别 Math.round：行高是分数（12px×1.2=14.4），圆整掉 0.4px 就是两行再叠 0.4px */
-        src.style.bottom=(ML.srcFix? sMV : (dMV+lhOf(dst)))+'px';
+        src.style.bottom=(ML.srcFix? sMV : (dMV+lhOf(dst)+gap))+'px';
       }else{                        /* 译文在上：原文 Sub(srcMV) 贴底 */
         src.style.bottom=sMV+'px';
-        dst.style.bottom=(ML.dstFix? dMV : (sMV+lhOf(src)))+'px';
+        dst.style.bottom=(ML.dstFix? dMV : (sMV+lhOf(src)+gap))+'px';
       }
     }else{
       dst.style.bottom=dMV+'px';
@@ -10645,17 +10663,17 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       img=document.getElementById('donateImg'), txt=document.getElementById('donateTxt');
   if(!btn||!qr||!img||!txt) return;
   var TXT_IDLE='给小站充点 token，让大家免费用';
-  /* v0.9.204：不再无条件显示。只有导出过至少一次的人（=真烧过 token、也真拿到了东西）才够得着；
-     对着一个还没用上的人要钱，只会反效果。btnDownload 导出成功后调 __donateReveal，
-     老用户回访则在下面这一次直接判定。 */
-  function eligible(){ try{ return localStorage.getItem('srtDonateV1')==='1'; }catch(e){ return false; } }
-  window.__donateReveal=function(){ if(eligible()) box.hidden=false; };
-  window.__donateReveal();
+    /* v0.9.206：常驻显示（v0.9.204 曾改成「导出过至少一次才露出」，理由是「还没拿到成果的人
+     看到只会在要钱」；用户要求撤掉，恢复常驻）。
+     srtDonateV1 标记照写不误——它不再决定显不显示，但将来要做
+     「导出过的人换一句文案」这类差别时还能直接读。 */
+  window.__donateReveal=function(){ box.hidden=false; };
+  box.hidden=false;
   var loaded=false;
   btn.addEventListener('click', function(){
     var opening=qr.hidden;
     qr.hidden=!opening;
-    if(opening&&!loaded){ img.src='donate-qr-square.png?v=0.9.204'; loaded=true; }
+    if(opening&&!loaded){ img.src='donate-qr-square.png?v=0.9.206'; loaded=true; }
     txt.textContent=opening?'收起':TXT_IDLE;
   });
 })();
