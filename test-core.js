@@ -4490,11 +4490,18 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/dst\.style\.bottom=dMV\+'px'/.test(html) && /src\.style\.bottom=sMV\+'px'/.test(html),
       '两块各用自己 mv 的落位逻辑没了');
     /* 双行(stack)的上方块：用户手动改过就用他自己的值，否则沿用导出端的抬高量 */
-    /* v0.9.205：抬高量不再由预览自己算（行盒相邻），改为直接复用导出端的 assStackMV */
     /* v0.9.205：抬高量 = 实测行盒高 + 导出端的墨迹间隙（按字号比例缩到预览） */
-    assert.ok(/ML\.srcFix\? sMV : \(dMV\+lhOf\(dst\)\+gap\)/.test(html) &&
-      /ML\.dstFix\? dMV : \(sMV\+lhOf\(src\)\+gap\)/.test(html),
-      'stack 上方块的抬高量算错/丢失（应为 行盒高 + 墨迹间隙）');
+    /* ⚠️ v0.9.207：固定过 mv 时那个值是「1080 画布」上的数，绝不能直接当预览框里的 bottom
+       —— 预览字号比画面尺度大 ~1.44 倍（k=0.214 vs 高比 0.149），直接套用会把上方块压低，
+       两行叠住（实测 bi-src + 推荐值 117：旧 17px / 叠 -3.4px；新 22.96px / +2.6px）。
+       正因为「固定过」这个标记会存在 srtTool 里、刷新后恢复，才只在「重新进页面」时复现。 */
+    assert.ok(/dMV\+lhOf\(dst\)\+gap\+upOff\('src',ML\.srcFix,ML\.srcMV\)/.test(html) &&
+      /sMV\+lhOf\(src\)\+gap\+upOff\('dst',ML\.dstFix,ML\.dstMV\)/.test(html),
+      'stack 上方块的抬高量算错/丢失（应为 行盒高 + 墨迹间隙 + 用户偏移）');
+    assert.ok(/\(rawMV-rec\)\*k/.test(html),
+      '固定值的尺度换算丢了（1080 的值没乘 k 就用了）');
+    assert.ok(!/ML\.srcFix\? sMV/.test(html) && !/ML\.dstFix\? dMV/.test(html),
+      '固定值又被直接当预览 bottom 用了（v0.9.207 已修，别回退）');
     /* ⚠️ inline 的 top:auto 必须显式写：.pv-split 的 CSS 有 top:22px，只改 bottom 会既 top 又 bottom，
        元素被拉长。 */
     assert.ok(/dst\.style\.top='auto'; src\.style\.top='auto'/.test(html),
@@ -4955,6 +4962,22 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* CSS 兜底也必须按「一个行高」抬：写死的 26px 与 9px 只差 17px，小于 12px 字号的行盒 19.2px */
     assert.ok(!/\.ep-src\{bottom:26px/.test(html) && !/\.sc-bi \.dst\{bottom:26px\}/.test(html),
       '兜底还在用写死的 26px（与锚点差不足一个行高，本身就重叠）');
+  });
+
+  t('v0.9.208 改完离底距离预览立刻跟着动（不用等下一次输入）', () => {
+    /* input 阶段就刷过一次预览，但那时「已固定」标记还是旧的 false（change 才置真）→
+       看到的仍是按「未固定」算出来的位置，要等下一次输入才重算。实测：敲完 200 纹丝不动，
+       改一下字号才忽然跳过去 —— 用户会以为这个输入框不起作用。 */
+    assert.ok(/UI\.assDstMVSet=true; else UI\.assSrcMVSet=true;[\s\S]{0,400}syncExpPreview\(\)/.test(html),
+      'change 里没补刷预览：改完离底距离要等下一次输入才动');
+    /* ⚠️ 反过来的坑别踩：点粉色「推荐 N」= 回到自动档（setT(false)），**不是**"用户自定义"。
+       我一度把这条语义弄反了（拿「手动敲数字」的模拟结论去安点推荐值），实测已澄清：
+       点完之后再把字号改回去，离底会自动跟着回到新的推荐值。 */
+    assert.ok(/f\.el\.value = f\.rec\(\); f\.setT\(false\);/.test(html),
+      '点推荐值必须回到自动档（setT(false)），不能被当成用户自定义');
+    /* 「解除自定义」的另一条通道：清空输入框 + blur（改回调字号还能继续联动） */
+    assert.ok(/if\(e\.value!==''\) return;[\s\S]{0,120}UI\.assSrcMVSet=false/.test(html),
+      '清空输入框后没能解除自定义（会永久锁死在旧值）');
   });
 }
 
