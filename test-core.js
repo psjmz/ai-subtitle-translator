@@ -3828,9 +3828,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   t('v0.9.173 赞助二维码懒加载：首次展开才赋 src', () => {
     const init = html.slice(html.indexOf('/* v0.9.173：赞助入口'));
     assert.ok(!/<img id="donateImg" alt="支付宝收款码" src=/i.test(html), 'img 不许带静态 src（收起态会偷跑请求）');
-    assert.ok(/donate-qr\.jpg\?v=/.test(init), '展开时没赋图片 src');
+    assert.ok(/donate-qr-square\.png\?v=/.test(init), '展开时没赋图片 src');
     assert.ok(/var opening=qr\.hidden;/.test(init), '展开/收起切换逻辑找不到');
-    assert.strictEqual((html.match(/工具很棒，赞助1元/g) || []).length, 2, '文案应恰好出现 2 次（按钮默认 + 收起态）');
+    assert.strictEqual((html.match(/给小站充点 token，让大家免费用/g) || []).length, 2,
+      '文案应恰好出现 2 次（按钮默认 + 收起态要还原的那份）');
   });
 
   t('v0.9.173 二维码图片实体存在且体积可控', () => {
@@ -3839,6 +3840,12 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const sz = fsD.statSync(p).size;
     /* 上限 200KB：v0.9.175 换高清裁剪版（1200×1440 q87 ≈ 118KB），清晰度优先 */
     assert.ok(sz > 5000 && sz < 200 * 1024, 'donate-qr.jpg 体积异常: ' + sz);
+    /* v0.9.204：页面改用方形裁切版。原图是一整张亮蓝底 + 大字宣传的海报，
+       贴进暖色卡片里会整块跳出来；方形裁切只留二维码本体，暖色卡片才包得住。 */
+    const q = pathD.join(__dirname, 'donate-qr-square.png');
+    assert.ok(fsD.existsSync(q), 'donate-qr-square.png 不在站点根目录');
+    const qz = fsD.statSync(q).size;
+    assert.ok(qz > 5000 && qz < 200 * 1024, 'donate-qr-square.png 体积异常: ' + qz);
   });
 
   t('v0.9.177 源语言默认「自动检测」：未手动选过不再默认 en', () => {
@@ -4483,8 +4490,8 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/dst\.style\.bottom=dMV\+'px'/.test(html) && /src\.style\.bottom=sMV\+'px'/.test(html),
       '两块各用自己 mv 的落位逻辑没了');
     /* 双行(stack)的上方块：用户手动改过就用他自己的值，否则沿用导出端的抬高量 */
-    assert.ok(/ML\.srcFix\? sMV : \(dMV\+lhOf\(dst\)\+up\)/.test(html) &&
-      /ML\.dstFix\? dMV : \(sMV\+lhOf\(src\)\+up\)/.test(html), 'stack 上方块的抬高量算错/丢失');
+    assert.ok(/ML\.srcFix\? sMV : \(dMV\+lhOf\(dst\)\)/.test(html) &&
+      /ML\.dstFix\? dMV : \(sMV\+lhOf\(src\)\)/.test(html), 'stack 上方块的抬高量算错/丢失');
     /* ⚠️ inline 的 top:auto 必须显式写：.pv-split 的 CSS 有 top:22px，只改 bottom 会既 top 又 bottom，
        元素被拉长。 */
     assert.ok(/dst\.style\.top='auto'; src\.style\.top='auto'/.test(html),
@@ -4589,12 +4596,14 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '参数块没有浅底色（层级仍全靠标题重量）');
     assert.ok(/\.blk-title\{font-size:11px;font-weight:600;color:var\(--sub\);letter-spacing:\.4px/.test(html),
       '块标题没有降重（11px / --sub）');
-    // 主 CTA 独占一行满宽，复制降为文字链
-    assert.ok(/\.exp-actions\{display:flex;flex-direction:column;gap:10px/.test(html), '导出按钮区没有改成竖排');
-    assert.ok(/\.exp-actions \.btn\.primary\{width:100%\}/.test(html), '主 CTA 没有满宽');
-    assert.ok(/\.btn\.link\{background:none;border:none;color:var\(--sub\)/.test(html), '复制没有降级为文字链');
-    // 赞助：可点击元素必须过 4.5:1，--mut(#A5A2A8) 实测只有 2.5:1，所以用 --sub 不用 --mut
-    assert.ok(/#btnDonate\{[^}]*color:var\(--sub\)/.test(html), '赞助按钮还在用 --mut（对比度 2.5:1 不过 AA）');
+    // v0.9.204：下载/复制回到同一行，主次改由「实心渐变 vs 白底描边」承担
+    assert.ok(/\.exp-actions\{display:flex;flex-direction:row;gap:8px/.test(html), '导出按钮区没有改成同一行');
+    assert.ok(/\.exp-actions \.btn\.primary\{flex:1 1 auto;min-width:0\}/.test(html),
+      '主 CTA 没有自适应吃掉剩余宽度');
+    assert.ok(/class="btn ghost" id="btnCopy"/.test(html), '复制没有降级为白底描边按钮');
+    // 赞助：可点击元素必须过 4.5:1；也绝不能上主色（会比下载按钮还重）
+    assert.ok(/#btnDonate\{[^}]*color:#633806/.test(html),
+      '赞助按钮字色不是 #633806（在 #FAEEDA 底上对比度 6.9:1）');
     assert.ok(!/#btnDonate\{[^}]*background:var\(--acc\)/.test(html), '赞助按钮还是实心主色（比下载还重）');
   });
 
@@ -4654,13 +4663,13 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       'syncExpPreview 没打 pv-plain 类');
     /* 反向断言：兜底值本身必须还是「一深一浅」——ASS 模式下 --pv-* 一定被写入，
        这里的兜底只用于 pv-plain 之外的极少数场景（脚本没跑完）。别为了这条把 ASS 的颜色串了。 */
-    assert.ok(/\.ep-dst\{bottom:26px;font-size:var\(--pv-dst,12px\);color:var\(--pv-dst-c,#fff\)\}/.test(html),
+    assert.ok(/\.ep-dst\{bottom:calc\(9px \+ 12px\*var\(--pv-lh\)\);font-size:var\(--pv-dst,12px\);color:var\(--pv-dst-c,#fff\)\}/.test(html),
       'ASS 的兜底样式被动过（.ep-dst）');
     assert.ok(/\.ep-src\{bottom:9px;font-size:var\(--pv-src,10\.5px\);color:var\(--pv-src-c,#C9B8FF\)\}/.test(html),
       'ASS 的兜底样式被动过（.ep-src）');
     /* 关键：pv-plain 只压颜色/字号，不能把「行序」也压掉——SRT 双语谁在上仍然是真的 */
     assert.ok(/\.exp-preview\.pv-rev \.ep-dst\{bottom:9px\}/.test(html) &&
-              /\.exp-preview\.pv-rev \.ep-src\{bottom:26px\}/.test(html),
+              /\.exp-preview\.pv-rev \.ep-src\{bottom:calc\(9px \+ 12px\*var\(--pv-lh\)\)\}/.test(html),
       'pv-rev（原文在上）的行序被连带改掉了');
     assert.ok(/\.exp-preview\.pv-mono \.ep-dst\{bottom:9px\}/.test(html), '单语贴底被连带改掉了');
     /* 只对非 ASS 生效：ASS 的两种布局都不是 plain */
@@ -4870,19 +4879,64 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(sh && !/[（(]/.test(sh[1]), '短名里还带着括号说明');
   });
 
-  t('v0.9.203 下载区：文字链不再挂静态下划线，且与主按钮同中轴', () => {
-    /* 满宽渐变按钮下面吊着一条带下划线的灰字，像没排版完的默认链接；
-       而且它左对齐、主按钮居中，中轴也不齐。 */
-    assert.ok(/\.btn\.link\{background:none;border:none;color:var\(--sub\);font-size:11\.5px;text-decoration:none;/.test(html),
-      '文字链还挂着静态下划线');
-    assert.ok(/\.btn\.link\{[^}]*align-self:center/.test(html), '文字链没跟主按钮同中轴');
-    assert.ok(/\.btn\.link:hover\{color:var\(--acc\);text-decoration:underline\}/.test(html),
-      '悬停时该给下划线提示可点');
-    /* 赞助入口同理 */
+  t('v0.9.204 下载区：下载/复制同一行，复制与主按钮等高', () => {
+    /* v0.9.203 曾把「复制到剪贴板」降成一条静止挂下划线的灰字（为了分主次）；
+       v0.9.204 用户拍板回到同一行 —— 主次交给「实心渐变 vs 白底描边」，不再靠「谁占满一行」。 */
+    assert.ok(/\.exp-actions\{display:flex;flex-direction:row;gap:8px;align-items:stretch/.test(html),
+      '下载与复制没有并排');
+    assert.ok(/\.exp-actions \.btn\{[^}]*height:34px/.test(html), '同行两个按钮没统一高度（会一高一矮）');
+    assert.ok(/\.exp-actions \.btn\.ghost\{[^}]*flex:none;white-space:nowrap/.test(html),
+      '复制按钮没锁宽度——荷兰语/乌克兰语的长文案会被挤变形，被挤的应该只有下载');
+    assert.ok(!/\.btn\.link\{/.test(html), '旧的白板文字链样式没删干净');
+    /* ⬇ 换成 CSS 伪元素画的 SVG：emoji 箭头跨平台粗细不一，默认行高还会把按钮撑高 */
+    assert.ok(/#btnDownload::before\{[^}]*mask:url\("data:image\/svg\+xml/.test(html),
+      '下载按钮的箭头没换成 SVG');
+    assert.strictEqual((html.match(/>⬇ 下载字幕</g) || []).length, 0, '按钮里还留着 ⬇ emoji 文本');
+    assert.strictEqual((html.match(/btnDownload:'⬇ /g) || []).length, 0, '还有语言词条带着 ⬇ 前缀');
+    /* 赞助入口：暖色胶囊自成一路——既不抢主 CTA，也不至于像文字链那样被忽略 */
+    assert.ok(/#btnDonate\{[^}]*background:#FAEEDA/.test(html), '赞助入口不是暖色胶囊底');
     assert.ok(/#btnDonate\{[^}]*text-decoration:none/.test(html), '赞助入口还挂着静态下划线');
     assert.ok(!/#btnDonate\{[^}]*text-decoration:underline/.test(html), '赞助入口的静态下划线没去掉');
-    assert.ok(/#donateBox\{text-align:center\}/.test(html), '赞助入口没居中');
-    assert.ok(/\.exp-actions\{display:flex;flex-direction:column;gap:10px/.test(html), '按钮间距没收成 10px');
+    assert.ok(/#donateBox\{text-align:center/.test(html), '赞助入口没居中');
+    assert.ok(/#donateQr\{[^}]*background:#FFF9F0/.test(html), '展开的收款码没跟着换暖色系');
+  });
+
+  t('v0.9.204 赞助入口只在「导出过至少一次」之后才露出', () => {
+    /* 还没拿到成果的人看到「充点 token」只会觉得在要钱；
+       导出过的人正处在「东西到手」的情绪点上——那一刻这个请求才成立。 */
+    const init = html.slice(html.indexOf('/* v0.9.173：赞助入口'));
+    assert.ok(/localStorage\.setItem\('srtDonateV1','1'\)/.test(html), '导出成功后没记下「够格了」的标记');
+    assert.ok(/function eligible\(\)\{ try\{ return localStorage\.getItem\('srtDonateV1'\)==='1'; \}/.test(init),
+      '门槛判定函数不见了');
+    assert.ok(/if\(eligible\(\)\) box\.hidden=false/.test(init), '揭幕没经过门槛判定');
+    assert.ok(/if\(window\.__donateReveal\) window\.__donateReveal\(\);/.test(html), '导出成功后没有回调揭幕');
+    assert.ok(/window\.__donateReveal\(\);/.test(init), '回访老用户没在初始化时判一次');
+    assert.ok(/给小站充点 token，让大家免费用/.test(html), '主文案丢了');
+    assert.ok(/小站每天都在烧 token/.test(html), '展开态的「每天在烧」那行丢了');
+    assert.ok(/充多充少都行，谢谢你/.test(html), '展开态的「充多充少」那行丢了');
+  });
+
+  t('v0.9.204 字幕预览两行不再重叠（行盒高要「量」，不能按系数「猜」）', () => {
+    /* 用户报：「推荐的『标准离底』参数下，双语预览里两行相互重叠」。
+       根因：.ep-line 从来没写 line-height，行高顺着 body 继承成 1.6；而 syncExpPreview() 里
+       按 fontSize×1.25 估算行盒高（导出端 assLineHeight 其实是 1.18）。估低 0.35em 的后果是
+       上面那行被放低 0.35×字号，与贴底那行叠住 —— 线上实测：12px 叠 2px、字号拉到 22px 叠 5px，
+       字号越大叠得越狠。
+       修法：行高只留一个来源（:root 的 --pv-lh），JS 直接读实测高 —— 两边不再各存一份假设，
+       也就不会再各自漂移。 */
+    assert.ok(/:root\{[\s\S]*?--pv-lh:1\.2;/.test(html), '缺 --pv-lh（预览行高没有唯一来源）');
+    assert.ok(/\.ep-line\{[^}]*line-height:var\(--pv-lh\)/.test(html),
+      '.ep-line 没写 line-height —— 会继承 body 的 1.6，和 JS 的计算再次脱钩');
+    assert.ok(/\.sc-line\{[^}]*line-height:var\(--pv-lh\)/.test(html),
+      '首页橱窗 .sc-line 漏了（同一个病：写死 26px/8px 却按 1.6 行高渲染，叠 1.2px）');
+    /* ⚠️ 关键：行盒高不能再靠 fontSize×系数 估 —— 真值由 line-height 决定 */
+    assert.ok(/getBoundingClientRect\(\)\.height/.test(html), '行盒高没有实测');
+    assert.ok(!/\*1\.25/.test(html), '还在按 fontSize×1.25 估行盒高');
+    assert.ok(!/, up=2;/.test(html) && !/lhOf\(dst\)\+up/.test(html),
+      '那个 +2 补偿量还在 —— 它早被估错的行高吃掉了，看着像留了 2px、实际是叠 2px');
+    /* CSS 兜底也必须按「一个行高」抬：写死的 26px 与 9px 只差 17px，小于 12px 字号的行盒 19.2px */
+    assert.ok(!/\.ep-src\{bottom:26px/.test(html) && !/\.sc-bi \.dst\{bottom:26px\}/.test(html),
+      '兜底还在用写死的 26px（与锚点差不足一个行高，本身就重叠）');
   });
 }
 
