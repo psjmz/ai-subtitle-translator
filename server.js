@@ -1234,6 +1234,15 @@ function tempRejected(e){
 }
 async function callModel(cfg, messages, maxTokens, opts){
   const url = String(cfg.base).replace(/\/+$/, '') + '/chat/completions';
+  /* v0.9.211：上游请求必须有超时 + 可被客户端断开中止。
+     ⚠️ 10/02 线上事故：fetch 无超时，前端 105 秒放弃后服务端仍挂着等上游——
+     上游跑完照样扣 token（结果没人收）、在途名额被占死 → 后续全部 why:'inflight' →
+     前端「排队超时」卡 0%。两个信号源：opts.timeoutMs（每次调用独立，回退链各拿各的预算）、
+     opts.signal（客户端断开，整个请求生命周期共享）。 */
+  const sigs = [];
+  if (opts && opts.timeoutMs) sigs.push(AbortSignal.timeout(opts.timeoutMs));
+  if (opts && opts.signal) sigs.push(opts.signal);
+  const abortSig = sigs.length === 1 ? sigs[0] : (sigs.length ? AbortSignal.any(sigs) : undefined);
   // v0.9.91：temperature 改为配置项（admin 可调）；旧配置无该字段时回退 0.2，并夹紧到 0-2
   let temp = Number(cfg.temperature);
   if (!Number.isFinite(temp)) temp = 0.2;
@@ -1250,7 +1259,8 @@ async function callModel(cfg, messages, maxTokens, opts){
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
-      body: JSON.stringify(withExtra(core, cfg.extraParams))
+      body: JSON.stringify(withExtra(core, cfg.extraParams)),
+      signal: abortSig   /* v0.9.211：超时/客户端断开 → fetch 立刻中止，不再傻等上游 */
     });
     /* v0.9.185：无论成败都要看额度头——成功时它告诉我们还剩多少，429 时它告诉我们何时能再试 */
     const rl = rateHeaders(r.headers);
@@ -1310,6 +1320,12 @@ const server = http.createServer(async (req, res) => {
 
     /* 公开：翻译代理 */
     if (req.method === 'POST' && u === '/api/translate') {
+      /* v0.9.211：前端一断开（105 秒预算放弃 / 关标签页），服务端的上游 fetch 立刻中止——
+         不再出现「客户端早走了、服务端还在傻等，上游跑完照样扣 token」。
+         res 'close' 且响应未写完 = 客户端提前断开；正常结束也会触发 close，须用 writableFinished 区分。 */
+      const cliAc = new AbortController();
+      res.on('close', () => { if (!res.writableFinished) cliAc.abort(); });
+      const CALL_BUDGET_MS = 90000;   /* 与前端「90 秒模型预算 + 15 秒排队冗余」对齐；回退链每级各拿一份 */
       const cfg = readConfig();
       if (!(cfg.base && cfg.model && cfg.key)) {
         return sendJson(res, 503, { error: { code: 'not_configured', message: 'Default model is not configured by the site admin. Use your own API instead.' } });
@@ -1420,7 +1436,7 @@ const server = http.createServer(async (req, res) => {
       /* v0.9.132：前端在 meta.json 里声明「本请求期望 JSON 输出」（非 JSON 请求不注入，否则上游会 400） */
       const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
       try {
-        const out = await callModel(pick.cfg, body.messages, undefined, jsonOpts);
+        const out = await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
         try { if (canPace) { noteQuota(pick.which, out && out._rl); if (out) delete out._rl; } } catch (e13) {}
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
         /* v0.9.183：按真实消耗修正预扣（只补正差额，实际比预估少的部分随滑窗自然滑出），
@@ -1469,7 +1485,7 @@ const server = http.createServer(async (req, res) => {
           for (const fb of fallbackChain(cfg, pick.which)) {
             try {
               const slotFb = slotCfg(cfg, fb);
-              const outF = await callModel(slotFb, body.messages, undefined, jsonOpts);
+              const outF = await callModel(slotFb, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
               try {
                 markEvent(ip, Object.assign({}, body.meta || {}, {
                   model: pick.cfg.model, usedModel: slotFb.model, msg: String(e.message || '').slice(0, 200)
@@ -1678,7 +1694,7 @@ const server = http.createServer(async (req, res) => {
         try {
           // v0.9.44：max_tokens 从 10 提到 256——Gemini 等思考型模型在 10 token 限额下 0 completion，
           //  message.content 字段直接缺失，前端拿到 undefined（误判"模型返回空"）。
-          const out = await callModel(slot, [{ role: 'user', content: 'Reply with exactly: OK' }], 256);
+          const out = await callModel(slot, [{ role: 'user', content: 'Reply with exactly: OK' }], 256, { timeoutMs: 30000 });
           const choice = out.choices && out.choices[0];
           const sample = choice && choice.message ? choice.message.content : '';
           const reason = choice ? choice.finish_reason : null;

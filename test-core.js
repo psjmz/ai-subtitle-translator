@@ -2671,10 +2671,10 @@ console.log('— response_format 默认注入（v0.9.132）—');
     /* v0.9.154：随降级链改成 plan.rf（初值即 withRf，语义不变；此处同步护栏写法） */
     assert.ok(/opts&&opts\.json&&plan\.rf\)\?\{json:1\}/.test(html), 'meta.json 未随 opts.json 传递');
     assert.ok(/const jsonOpts = \(body\.meta && body\.meta\.json\)/.test(srv), '服务端未读取 meta.json');
-    assert.ok(/callModel\(pick\.cfg, body\.messages, undefined, jsonOpts\)/.test(srv), '服务端主调用未传 jsonOpts');
+    assert.ok(/callModel\(pick\.cfg, body\.messages, undefined, Object\.assign\(\{\}, jsonOpts, \{ signal: cliAc\.signal, timeoutMs: CALL_BUDGET_MS \}\)\)/.test(srv), '服务端主调用未传 jsonOpts');
     /* v0.9.193：回退从「写死 B→A」改成 fallbackChain 逐级循环，调用点是 slotFb 而非 slotCfg(cfg,'A')。
        语义不变：每一级回退都必须同样带上 jsonOpts，否则术语抽取在回退链上会拿到非 JSON 正文。 */
-    assert.ok(/callModel\(slotFb, body\.messages, undefined, jsonOpts\)/.test(srv), '服务端回退调用未传 jsonOpts');
+    assert.ok(/callModel\(slotFb, body\.messages, undefined, Object\.assign\(\{\}, jsonOpts, \{ signal: cliAc\.signal, timeoutMs: CALL_BUDGET_MS \}\)\)/.test(srv), '服务端回退调用未传 jsonOpts');
   });
   t('优先级：用户在附加参数里显式给 response_format 时不注入默认值', () => {
     assert.ok(/ex\.response_format===undefined/.test(html) || /hasOwnProperty\.call\(ex,'response_format'\)/.test(html),
@@ -4091,6 +4091,24 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/if \(!\(seq > 0\)\) \{/.test(srvSrc), '序号没有对 NaN 免疫——以后再加槽位会重演死循环');
     assert.ok(/if \(!Number\.isFinite\(Q_SEQ\[pick\.which\]\)\) Q_SEQ\[pick\.which\] = 0;/.test(srvSrc),
       '计数器本身没有 NaN 修正');
+  });
+
+  t('v0.9.211 服务端：上游请求有超时 + 客户端断开即中止（10/02 token 空烧事故）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 事故链：前端 105 秒放弃 → 服务端 fetch 无超时仍挂着 → 上游跑完照样扣 token（结果没人收）
+       → 在途名额被占死 → 后续全部 why:'inflight' → 前端「排队超时」卡 0%。 */
+    assert.ok(/if \(opts && opts\.timeoutMs\) sigs\.push\(AbortSignal\.timeout\(opts\.timeoutMs\)\);/.test(srvSrc),
+      'callModel 没有按调用加超时——上游挂起会无限占用在途名额');
+    assert.ok(/AbortSignal\.any\(sigs\)/.test(srvSrc), '超时信号与客户端断开信号没有合并');
+    assert.ok(/signal: abortSig/.test(srvSrc), 'fetch 没接中止信号');
+    assert.ok(/const cliAc = new AbortController\(\);/.test(srvSrc), '路由没有建客户端断开控制器');
+    assert.ok(/res\.on\('close', \(\) => \{ if \(!res\.writableFinished\) cliAc\.abort\(\); \}\);/.test(srvSrc),
+      '没有监听客户端提前断开——前端放弃后服务端仍会傻等并烧 token');
+    assert.ok(/CALL_BUDGET_MS = 90000/.test(srvSrc), '单次调用预算不是 90 秒（与前端模型预算不一致）');
+    const nBudget = (srvSrc.match(/signal: cliAc\.signal, timeoutMs: CALL_BUDGET_MS \}\)/g) || []).length;
+    assert.ok(nBudget >= 2, '主调用与回退调用没有全部接上断开信号 + 超时（应出现 2 处，实际 ' + nBudget + ' 处）');
+    assert.ok(/'Reply with exactly: OK' \}\], 256, \{ timeoutMs: 30000 \}\)/.test(srvSrc),
+      '后台连通性探针没有超时');
   });
 
   t('v0.9.185 服务端：A 槽没被限流时整个闸门都不进（线上冒烟抓到的真 bug）', () => {
