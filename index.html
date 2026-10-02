@@ -58,9 +58,11 @@
        上面那行被压低 0.35em 与下面那行叠住。 */
     --pv-lh:1.2;
     /* v0.9.205：两行字幕之间「墨迹」要留的空隙（预览尺度）。
-       导出端（srt-core.js）在 1080p 下留的是 ASS_STACK_GAP = 12px，预览把字等比缩到 12/56 显示，
-       所以这里 = 12 x 12/56 ≈ 2.6px。只靠 line-height 自带的 leading 撑出来的空隙只有 ~1px，
-       两行看着是贴在一起的——必须显式加这一份。 */
+       导出端（srt-core.js）在 1080p 下留的是 ASS_STACK_GAP = 12px，预览全篇按 f = 框高/1080 等比缩
+       （v0.9.209），所以这里 ≈ 12 x f ≈ 2.6px。只靠 line-height 自带的 leading 撑出来的空隙只有 ~1px，
+       两行看着是贴在一起的——必须显式加这一份。
+       ⚠️ v0.9.209 起它只是「JS 还没跑」时的兜底示意位：正常路径下两块的 bottom 由 syncExpPreview
+          按导出端的 MarginV × f 写成 inline，墨迹间隙已经含在 MarginV 里，不再另加一份。 */
     --pv-gap:2.6px;
   }
   *{box-sizing:border-box}
@@ -770,7 +772,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.208</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.209</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -930,7 +932,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.208</span>
+    <span class="ver-tag">v0.9.209</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="spacer"></div>
@@ -1310,7 +1312,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.208"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.209"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -10281,79 +10283,42 @@ function syncExpPreview(){
      只有「行序」是真的（bi-src 原文在上），颜色/字号都得回到中性。 */
   box.classList.toggle('pv-plain', !isAss);
   src.style.display = mono ? 'none' : '';
-  if(isAss){
+  var pvH=box.clientHeight;
+  /* v0.9.209：预览 = 成片的等比缩略图，全篇只有这一个比例 f（预览框是 16:9，与成片同比例）。
+     用户填什么就画什么：填 42 就是成片的 42，填 900 就画到成片的 900（预览里被裁掉，
+     成片里也一样出画）。不放大、不取整、不夹取、不补偿。 */
+  var f = pvH>0 ? pvH/1080 : 0;
+  if(isAss && pvH>0){
     var col=function(id,def){ var v=String(($(id)||{}).value||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:def; };
-    var px=function(id,ratio,def){ var n=parseFloat(($(id)||{}).value); return (isFinite(n)?Math.max(8,Math.min(22,Math.round(n*ratio))):def)+'px'; };
+    /* v0.9.209：字号 = 成片字号 × f，与位置同源。
+       旧版译文、原文各用一套放大系数（比成片大 1.44 倍），还要再夹到 8~22px 并取整 ——
+       于是 ≤37pt 全是 8px、≥103pt 全是 22px，中间也要 ~4.7pt 才动 1px。 */
+    var fsOf=function(id,def){ var n=parseFloat(($(id)||{}).value);
+      return ((isFinite(n)? n : def) * f)+'px'; };
     box.style.setProperty('--pv-dst-c', col('assDstColor','#FFFFFF'));
     box.style.setProperty('--pv-src-c', col('assSrcColor','#FFD700'));
-    box.style.setProperty('--pv-dst', px('assDstSize', 12/56, 12));
-    box.style.setProperty('--pv-src', px('assSrcSize', 21/100, 10.5));
+    box.style.setProperty('--pv-dst', fsOf('assDstSize',56));
+    box.style.setProperty('--pv-src', fsOf('assSrcSize',48));
   }else{
     /* 回落 CSS 默认（白 + 淡紫）：SRT/VTT 播放器不读 ASS 那套自定义色 */
     ['--pv-dst-c','--pv-src-c','--pv-dst','--pv-src'].forEach(function(k){ box.style.removeProperty(k); });
   }
-  /* v0.9.197：纵向位置也跟着「离底距离」动。两个 mv 输入框的语义统一是「距底边像素」
-     —— 分屏时画面上方那块，UI 里给的就是「1080 − 离底 − 块高」那个大数 —— 所以统一按
-     1080 → 预览框高 的比例映射成 bottom 就行，不必再区分顶部/底部。
-     贴底那块用它自己的 mv；双行(stack)的上方块沿用导出端的抬高量（用户手动改过就用他自己的）。
+  /* v0.9.209：纵向位置 = 成片位置 × f，与字号同源。
+     两个 mv 输入框的语义本来就是「距底边像素」：分屏时画面上方那块，UI 里给的就是
+     「1080 − 离底 − 块高」那个大数；双行时上方块的推荐值由导出端 assStackMV 直接给出。
+     所以两块都用同一个 f 映射即可 —— 不必再区分顶部/底部，也不需要任何补偿项。
      ⚠️ 非 ASS 不套 mv（那两个输入框本来就隐藏，SRT/VTT 的位置由播放器定）→ 清掉 inline 回 CSS 示意位。 */
   dst.style.top='auto'; src.style.top='auto';
-  var pvH=box.clientHeight;
   if(isAss && pvH>0){
-    var toPx=function(v){ var n=parseFloat(v); if(!isFinite(n)) return null;
-      return Math.max(2, Math.min(pvH-12, Math.round(n/1080*pvH))); };
     var ML=assLH();
-    /* v0.9.204：行盒高必须「量」，不能「猜」。原来是 fontSize×1.25 的估算值，而 .ep-line 的行高
-       实际继承 body 的 1.6 → 上面那行被放低 0.35×字号，正好压住贴底那行（实测 12px 叠 2px、
-       22px 叠 5px，字号越大叠得越狠）。现在直接读实测高，CSS 那边也把行高写死成 --pv-lh。
-       兜底只在元素还没上屏（高=0）时用得上。 */
-    var lhOf=function(el){ var h=el.getBoundingClientRect().height; if(h>0) return h;
-      var fs=parseFloat(getComputedStyle(el).fontSize);
-      return (isFinite(fs)? fs*1.2 : 14); };
-    var dMV=toPx(ML.dstMV), sMV=toPx(ML.srcMV);
-    if(stacked){
-      /* v0.9.205：两块之间要另外留一份「墨迹间隙」，光靠行盒相邻不够。
-         导出端（srt-core.js assStackMV）在 1080p 下留的是 ASS_STACK_GAP = 12px；
-         预览为了看得清，字号按 pt→px 等比放大到 12/56 ≈ 0.214（纵向位置却是按 1080→框高 缩的），
-         所以这个间隙也要按字号比例 k 缩到预览尺度，否则块内距离会比实际紧一档。
-         ⚠️ 别拿 assStackMV 的结果整体乘 k 当抬高量（我第一版就是这么写的，已回退）：
-            ASS 那套墨迹公式假设「行框 1.18、baseline 到框底 0.22em」，而预览的行框是
-            --pv-lh(1.2)、baseline 位置由 PingFang 自己的 metric 决定，两者不是一回事。
-            混着算的结果是方向不一致 —— 实测 bi-src 间隙 3.7→5.4 变好，bi-dst 却 4.0→0.7 更紧。
-            改成「实测行盒高 + 导出端的间隙 × k」，两个方向都只加同一份，观感才一致。 */
-      var S=assStyleOf();
-      var dPt=+S.dstSize||56;
-      var dFs=parseFloat(getComputedStyle(dst).fontSize)||12;
-      var k=(dPt>0 && dFs>0)?(dFs/dPt):(12/56);      /* 预览字号 / 导出字号 */
-      /* ASS_STACK_GAP 由 srt-core.js 导出（单测也读它），预览不另存一份数字 */
-      var gap=(+C.ASS_STACK_GAP||12) * k;
-      /* v0.9.207：── 上方块的位置只能按「预览自己的尺度」算，不能拿 1080 的值直接顶替 ──
-         用户手动改过离底距离后 srcFix/dstFix 为真（存进 srtTool，刷新/重进页面会恢复），
-         旧代码这时直接把那个 **1080 画布上**的数拿去当预览框里的 bottom。可预览字号是被
-         放大的（12px 对 56pt → k=0.214，而画面高只缩到 161/1080=0.149，字号尺度大 1.44 倍），
-         于是「上方块的 bottom」被按画面尺度压扁 —— 两行贴住甚至叠上，且**清空过配置就正常**，
-         所以只在「重新进去」时复现。实测（286x161 预览框 / bi-src / srcMV=推荐值 117）：
-         旧值 src.bottom=17px，与译文行盒(6~20.4)叠 -3.4px；未固定时是 22.96px、+2.6px。
-         现在只取「它相对推荐值的偏移」再按 k 折进预览：用推荐值时与导出观感一致，
-         用户往上调多少预览就抬多少（调过头把两行叠起来，那也正是导出端的真实结果）。 */
-      /* ⚠️ 传进来的必须是 1080 尺度上的**原始** ML.xxxMV，不是已换算过的 dMV/sMV ——
-         差值要在导出尺度里算、再乘 k 一次，乘第二次就偏到十万八千里（实测差 21px）。 */
-      var upOff=function(role, fixed, rawMV){
-        if(!fixed) return 0;
-        var rec=assDefaultMV(role);
-        return isFinite(rec) ? (rawMV-rec)*k : 0;
-      };
-      if(srcFirst){                 /* 原文在上：译文 Bottom(dstMV) 贴底 */
-        dst.style.bottom=dMV+'px';
-        src.style.bottom=(dMV+lhOf(dst)+gap+upOff('src',ML.srcFix,ML.srcMV))+'px';
-      }else{                        /* 译文在上：原文 Sub(srcMV) 贴底 */
-        src.style.bottom=sMV+'px';
-        dst.style.bottom=(sMV+lhOf(src)+gap+upOff('dst',ML.dstFix,ML.dstMV))+'px';
-      }
-    }else{
-      dst.style.bottom=dMV+'px';
-      src.style.bottom=sMV+'px';
-    }
+    var toPx=function(v){ var n=parseFloat(v); return isFinite(n)? n*f : 0; };
+    /* v0.9.204~208 那套「实测行盒高 lhOf + 墨迹间隙 × k + 相对推荐值偏移 upOff」整体作废：
+       它存在的唯一理由是补偿「字号各用一套放大系数、位置却按画面缩」这处尺度错位。
+       现在字号与位置同源，块的 bottom 就是成片的 MarginV × f，
+       于是 207「固定值被压扁」、205「间隙要不要单独加」、204「行高该按多少估」全部自动消失；
+       也不再有 8~22px / 2~pvH-12 的夹取，改一点就动一点、改到出画就真的出画（与成片一致）。 */
+    dst.style.bottom=toPx(ML.dstMV)+'px';
+    src.style.bottom=toPx(ML.srcMV)+'px';
   }else{
     ['dst','src'].forEach(function(k){
       var el = k==='dst'? dst : src;

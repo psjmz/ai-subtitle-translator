@@ -4475,7 +4475,16 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* ASS 才跟颜色/字号；非 ASS 必须回落默认，否则拿 ASS 的自定义色误导（播放器不读那套） */
     assert.ok(/setProperty\('--pv-dst-c'/.test(html) && /removeProperty\(k\)/.test(html),
       'ASS 颜色/字号的跟随或回落不完整');
-    assert.ok(/Math\.max\(8,Math\.min\(22,Math\.round\(n\*ratio\)\)\)/.test(html), '预览字号没有夹在 8~22px（200pt 会撑破预览框）');
+    /* v0.9.209：字号改成「成片字号 × f」（f = 预览框高/1080），与位置同源。
+       旧版那种 8~22px 夹取 + 取整到整像素，正是「改了数字预览不动」的元凶：
+       ≤37pt 一律 8px、≥103pt 一律 22px，中间也要 ~4.7pt 才动 1px。 */
+    assert.ok(/var fsOf=function\(id,def\)/.test(html) && /\(isFinite\(n\)\? n : def\) \* f/.test(html),
+      '预览字号没有按「成片字号 × f」等比缩');
+    assert.ok(/setProperty\('--pv-dst', fsOf\('assDstSize',56\)\)/.test(html) &&
+      /setProperty\('--pv-src', fsOf\('assSrcSize',48\)\)/.test(html),
+      '译文/原文没有共用同一个 fsOf（又会变成两套系数）');
+    assert.ok(!/Math\.max\(8,Math\.min\(22/.test(html) && !/Math\.round\(n\*ratio\)/.test(html),
+      '预览字号又在取整/夹取了（会重新长出「改了数字不动」的死区）');
     /* 位置变、字号不变：译文恒大于原文，与 ASS 导出「字号跟角色走」一致 */
     assert.ok(!/pv-rev \.ep-dst\{[^}]*font-size:var\(--pv-src/.test(html), 'pv-rev 里把译文字号换成原文的了');
   });
@@ -4485,21 +4494,19 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        预览摆到画面正中会让人误解导出后的位置。 */
     /* ① 纵向位置按「1080 → 预览框实测高」的比例映射。两个 mv 的语义统一是「距底边像素」
        （分屏时画面上方那块，UI 里给的就是 1080−离底−块高 的大数），所以不用再分顶部/底部。 */
-    assert.ok(/n\/1080\*pvH/.test(html), '预览没按离底距离映射纵向位置');
+    /* v0.9.209：位置 = 成片的 MarginV × f，与字号共用同一个 f。两个 mv 的语义本来就是
+       「距底边像素」（分屏时上方那块 UI 里给的就是 1080−离底−块高 的大数），
+       所以不必再区分顶部/底部，也不需要任何补偿项。 */
+    assert.ok(/var f = pvH>0 \? pvH\/1080 : 0;/.test(html), '预览缺了唯一的等比系数 f（= 框高/1080）');
+    assert.ok(/var toPx=function\(v\)\{ var n=parseFloat\(v\); return isFinite\(n\)\? n\*f : 0; \}/.test(html),
+      '预览没按成片位置等比映射纵向位置（或又去取整/夹取了）');
     assert.ok(/var ML=assLH\(\)/.test(html), '预览没读 mv 值（assLH）');
-    assert.ok(/dst\.style\.bottom=dMV\+'px'/.test(html) && /src\.style\.bottom=sMV\+'px'/.test(html),
+    assert.ok(/dst\.style\.bottom=toPx\(ML\.dstMV\)\+'px'/.test(html) && /src\.style\.bottom=toPx\(ML\.srcMV\)\+'px'/.test(html),
       '两块各用自己 mv 的落位逻辑没了');
-    /* 双行(stack)的上方块：用户手动改过就用他自己的值，否则沿用导出端的抬高量 */
-    /* v0.9.205：抬高量 = 实测行盒高 + 导出端的墨迹间隙（按字号比例缩到预览） */
-    /* ⚠️ v0.9.207：固定过 mv 时那个值是「1080 画布」上的数，绝不能直接当预览框里的 bottom
-       —— 预览字号比画面尺度大 ~1.44 倍（k=0.214 vs 高比 0.149），直接套用会把上方块压低，
-       两行叠住（实测 bi-src + 推荐值 117：旧 17px / 叠 -3.4px；新 22.96px / +2.6px）。
-       正因为「固定过」这个标记会存在 srtTool 里、刷新后恢复，才只在「重新进页面」时复现。 */
-    assert.ok(/dMV\+lhOf\(dst\)\+gap\+upOff\('src',ML\.srcFix,ML\.srcMV\)/.test(html) &&
-      /sMV\+lhOf\(src\)\+gap\+upOff\('dst',ML\.dstFix,ML\.dstMV\)/.test(html),
-      'stack 上方块的抬高量算错/丢失（应为 行盒高 + 墨迹间隙 + 用户偏移）');
-    assert.ok(/\(rawMV-rec\)\*k/.test(html),
-      '固定值的尺度换算丢了（1080 的值没乘 k 就用了）');
+    /* v0.9.204~208 那套补偿（lhOf 实测行盒 / gap 墨迹间隙 / upOff 相对推荐值偏移 / k 字号比）
+       已随「字号不再放大」整体作废 —— 它们存在的唯一理由是弥补两套尺度打架，别再请回来。 */
+    assert.ok(!/lhOf\(/.test(html) && !/upOff\(/.test(html) && !/ASS_STACK_GAP\|\|12\) \* k/.test(html),
+      'v0.9.209 已作废的补偿项（lhOf / gap / upOff）又回来了');
     assert.ok(!/ML\.srcFix\? sMV/.test(html) && !/ML\.dstFix\? dMV/.test(html),
       '固定值又被直接当预览 bottom 用了（v0.9.207 已修，别回退）');
     /* ⚠️ inline 的 top:auto 必须显式写：.pv-split 的 CSS 有 top:22px，只改 bottom 会既 top 又 bottom，
@@ -4946,10 +4953,11 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '首页橱窗 .sc-line 漏了（同一个病：写死 26px/8px 却按 1.6 行高渲染，叠 1.2px）');
     /* ⚠️ 关键（v0.9.205）：两块之间还差一份「墨迹间隙」，光靠行盒相邻不够。
        间隙值必须取自 srt-core.js 的 ASS_STACK_GAP（导出端同一个数），预览只做等比缩放。 */
-    assert.ok(/var gap=\(\+C\.ASS_STACK_GAP\|\|12\) \* k;/.test(html),
-      '墨迹间隙没有取自导出端的 ASS_STACK_GAP（又会变成两套数字）');
-    assert.ok(/var k=\(dPt>0 && dFs>0\)\?\(dFs\/dPt\):\(12\/56\);/.test(html),
-      '间隙没有按「预览字号 / 导出字号」等比缩到预览尺度');
+    /* v0.9.209：两块的 bottom 直接用导出端的 MarginV × f，墨迹间隙本来就含在 MarginV 里
+       （assStackMV 已经按墨迹算过），预览再额外加 gap 就是第三套数字。 */
+    assert.ok(!/var gap=\(\+C\.ASS_STACK_GAP\|\|12\)/.test(html),
+      '预览又在自己算墨迹间隙（应由导出端的 MarginV 决定）');
+    assert.ok(/var f = pvH>0 \? pvH\/1080 : 0;/.test(html), '预览缺唯一的等比系数 f');
     /* ⚠️ 别拿 assStackMV 的结果整体乘 k 当抬高量：ASS 的墨迹公式（行框 1.18、baseline 到框底 0.22em）
        与预览的行框（--pv-lh 1.2 + PingFang 自己的 metric）不是一回事，混着算两个方向会不一致
        —— 实测 bi-src 变好、bi-dst 反而更紧。 */
@@ -4978,6 +4986,29 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 「解除自定义」的另一条通道：清空输入框 + blur（改回调字号还能继续联动） */
     assert.ok(/if\(e\.value!==''\) return;[\s\S]{0,120}UI\.assSrcMVSet=false/.test(html),
       '清空输入框后没能解除自定义（会永久锁死在旧值）');
+  });
+
+  t('v0.9.209 预览 = 成片等比缩略图（改什么显示什么，不留死区）', () => {
+    /* 用户反馈：「很多时候修改了数字后预览根本没有变化，多改几次后系统就完全不听使唤」。
+       根因不是事件没接上（实测 30 次连续改动事件链一直是活的），而是换算里有两处「吃掉改动」：
+         ① 字号 Math.round 到整像素 + 夹 8~22px → ≤37pt 全 8px、≥103pt 全 22px，
+            中间也要 ~4.7pt 才动 1px（56→58 看不出变化）；
+         ② 位置同样取整 + 夹 2~pvH-12 → 离底 0/5/10/13 全是 2px、≥1000 全是 149px，
+            46/48/50 都落在 7px（连改三次不动）；上方块离底 >~700 直接飞出框外被裁掉。
+       修法：全篇只有一个比例 f = 预览框高/1080，字号与位置都乘它，不放大、不取整、不夹取。
+       用户填 42 就画成片的 42，填 900 就出画（成片里也一样出画）—— 加任何夹取都是自作主张。 */
+    assert.ok(/var f = pvH>0 \? pvH\/1080 : 0;/.test(html), '缺少唯一的等比系数 f');
+    assert.ok(/box\.style\.setProperty\('--pv-dst', fsOf\('assDstSize',56\)\)/.test(html) &&
+      /box\.style\.setProperty\('--pv-src', fsOf\('assSrcSize',48\)\)/.test(html),
+      '字号没有按 f 等比缩（或又改回了两套系数）');
+    /* 死区不能复活：任何 Math.round / 夹取都会重新长出「改了不动」的区间 */
+    assert.ok(!/Math\.round\(n\/1080\*pvH/.test(html) && !/Math\.round\(n\*/.test(html),
+      '预览又在取整（亚像素级改动会被吃掉）');
+    assert.ok(!/Math\.min\(pvH-12/.test(html) && !/Math\.min\(40,/.test(html) && !/Math\.max\(4,/.test(html),
+      '预览又把数值夹在某个区间里（区间外改了不动）');
+    /* 两套尺度是万恶之源：字号一旦与位置不同源，就得靠 lhOf/gap/upOff 去补，补一次错一次 */
+    assert.ok(!/12\/56/.test(html) && !/21\/100/.test(html),
+      '又出现「字号单独放大」的系数（应与位置共用 f）');
   });
 }
 
