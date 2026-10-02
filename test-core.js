@@ -4080,6 +4080,19 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(!/return sendJson\(res, 200, \{ wait: 0/.test(seg), '出现「等太久就放行」的出口——那等于变相换道');
   });
 
+  t('v0.9.210 服务端：队列账本必须有 C 槽，且序号对 NaN 免疫（10/02 线上卡死实证）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* v0.9.193 加 C 槽时漏了 Q_SEQ/Q_WAIT：++Q_SEQ.C = NaN → NaN<=head 恒 false →
+       永远回 {wait, why:'fifo'}，前端无限重发、任务卡 0%。探针实测拿到 q="C:NaN:gm7mob"。 */
+    assert.ok(/const Q_SEQ   = \{ A: 0, B: 0, C: 0 \};/.test(srvSrc), 'Q_SEQ 缺 C——C 槽序号会是 NaN，永远进不了队首');
+    assert.ok(/const Q_WAIT  = \{ A: Object\.create\(null\), B: Object\.create\(null\), C: Object\.create\(null\) \};/.test(srvSrc),
+      'Q_WAIT 缺 C——C 槽 token 无法续期，每轮都重领号');
+    /* 防线：序号非正数（含 NaN/undefined）一律重领，且计数器本身也要先修正 */
+    assert.ok(/if \(!\(seq > 0\)\) \{/.test(srvSrc), '序号没有对 NaN 免疫——以后再加槽位会重演死循环');
+    assert.ok(/if \(!Number\.isFinite\(Q_SEQ\[pick\.which\]\)\) Q_SEQ\[pick\.which\] = 0;/.test(srvSrc),
+      '计数器本身没有 NaN 修正');
+  });
+
   t('v0.9.185 服务端：A 槽没被限流时整个闸门都不进（线上冒烟抓到的真 bug）', () => {
     const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
     /* 首次线上冒烟实测：zh-CN（A 槽）拿到 wait=5 / why=fifo。

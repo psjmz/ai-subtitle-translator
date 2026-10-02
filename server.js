@@ -929,13 +929,36 @@ function normParams(v){
     try { v = JSON.parse(t); } catch (e) { return {}; }
   }
   if (!v || typeof v !== 'object' || Array.isArray(v)) return {};
-  const out = {};
-  for (const k of Object.keys(v)) {
-    if (PARAM_RESERVED.indexOf(k) >= 0) continue;
-    const val = v[k];
-    if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') out[k] = val;
-  }
-  return out;
+  /* v0.9.210：允许嵌套对象 / 数组（递归清洗），不再只收平铺标量。
+     旧版只认 string/number/boolean —— 于是 OpenRouter 这类「值是对象」的参数
+     （例：{"provider":{"sort":"price","allow_fallbacks":true}}）会被整条静默丢掉，
+     后台保存后输入框回显为空，用户以为「没保存」，而请求里也真的没带上它。
+     ⚠️ 保留键（model/messages/stream/temperature/max_tokens）只在顶层拦截 ——
+        那是用来防止覆盖核心字段的；嵌套层里同名是人家自己的结构，不能拦。
+     深度封顶 4 层 + 只留标量叶子，避免把超大结构写进配置并被塞进每个请求体。 */
+  const MAX_DEPTH = 4;
+  const walk = (node, depth) => {
+    if (depth > MAX_DEPTH) return undefined;
+    if (node === null) return null;
+    const t = typeof node;
+    if (t === 'string' || t === 'number' || t === 'boolean') return node;
+    if (Array.isArray(node)) {
+      const arr = [];
+      for (const it of node) { const x = walk(it, depth + 1); if (x !== undefined) arr.push(x); }
+      return arr;
+    }
+    if (t === 'object') {
+      const o = {};
+      for (const k of Object.keys(node)) {
+        if (depth === 0 && PARAM_RESERVED.indexOf(k) >= 0) continue;
+        const x = walk(node[k], depth + 1);
+        if (x !== undefined) o[k] = x;
+      }
+      return o;
+    }
+    return undefined;
+  };
+  return walk(v, 0) || {};
 }
 /* 附加参数合并到请求体：附加项不覆盖核心字段（core 后写，始终胜出） */
 function withExtra(core, extra){
@@ -1129,8 +1152,10 @@ const sleepMs = (ms) => new Promise(r => setTimeout(r, ms));
    判定不只看额度——只要队里还有比我更早的号，就继续等。
    号只在客户端按服务端给的秒数回来重发时才续期，标签页关掉 90 秒后自动出队，
    不会让一个消失的请求把后面所有人堵死。 */
-const Q_SEQ   = { A: 0, B: 0 };
-const Q_WAIT  = { A: Object.create(null), B: Object.create(null) };  // token -> {seq, at}
+/* v0.9.210：补 C。v0.9.193 加 C 槽时漏了这两本账 → ++Q_SEQ.C = NaN → NaN 永远进不了队首
+   → 永远回 {wait, why:'fifo'}，前端无限重发、任务卡 0%（10/02 线上实证）。 */
+const Q_SEQ   = { A: 0, B: 0, C: 0 };
+const Q_WAIT  = { A: Object.create(null), B: Object.create(null), C: Object.create(null) };  // token -> {seq, at}
 const Q_TTL   = 90000;   // 续期窗口（> 服务端单次最长 60 秒的等待）
 const FIFO_POLL = 3;     // 不是队首时的回问间隔（秒）：队首一走要能立刻顶上
 function qSweep(which){
@@ -1330,7 +1355,11 @@ const server = http.createServer(async (req, res) => {
         /* 顺序号：客户端把上次的 q 带回来就沿用旧号（保持先来先出），否则新领一个 */
         let tok = (body.meta && typeof body.meta.q === 'string') ? body.meta.q : '';
         let seq = (tok && Q_WAIT[pick.which] && Q_WAIT[pick.which][tok]) ? Q_WAIT[pick.which][tok].seq : 0;
-        if (!seq) { seq = ++Q_SEQ[pick.which]; tok = qNewTok(pick.which, seq); }
+        /* v0.9.210：!(seq>0) 连 NaN 一起拦（旧账本里可能存着 NaN 序号），新槽位漏初始化也不再死循环 */
+        if (!(seq > 0)) {
+          if (!Number.isFinite(Q_SEQ[pick.which])) Q_SEQ[pick.which] = 0;
+          seq = ++Q_SEQ[pick.which]; tok = qNewTok(pick.which, seq);
+        }
 
         let admitted = false;
         /* 服务端静默等待**累计**封顶 HOLD_MAX_MS（不是每轮 15 秒 × 4 = 60 秒）。
