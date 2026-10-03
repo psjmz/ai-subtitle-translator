@@ -4427,8 +4427,17 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 控制逻辑一个字没改：仍由 syncAssStyleBox 判 ass 才显示 + 单语隐藏原文列 */
     assert.ok(/b\.style\.display=\(expFileFmt\(\)==='ass'\)\?'':'none'/.test(html), 'ASS 显示判定被改了');
     /* v0.9.195 起走统一的 tri 清单（原来按 id 逐个硬写两个变量，漏一组也看不出来） */
-    assert.ok(/var tri=\[\['assSrcSizeRow','assDstSizeRow'\],\['assSrcColorRow','assDstColorRow'\],\['assSrcMVRow','assDstMVRow'\]\]/.test(html),
-      '单语隐藏清单 tri 被改了（必须三组齐全：字号 / 颜色 / 离底）');
+    /* v0.9.217：tri 清单由 3 组扩到 6 组（新增描边/字体/不透明度），故不再写死组数与顺序，
+     改为断言「必备三组都在 + 每组都是 src/dst 成对」——加组不会假失败，漏 id 仍会失败。
+     漏 id 的后果：单语时那一列照样显示（用户对着一组不生效的输入调半天），v0.9.195 踩过。 */
+    (function(){
+      var m = html.match(/var tri=\[([\s\S]*?)\]\];/);
+      assert.ok(m, '找不到 tri 清单（单语隐藏原文列靠它）');
+      var triSrc = m[1];
+      ['assSrcSizeRow','assDstSizeRow','assSrcColorRow','assDstColorRow','assSrcMVRow','assDstMVRow',
+       'assSrcOutlineRow','assDstOutlineRow','assSrcFontRow','assDstFontRow','assSrcAlphaRow','assDstAlphaRow']
+        .forEach(function(id){ assert.ok(triSrc.indexOf(id)>=0, 'tri 清单缺 ' + id + '（单语时该列会变成假控件）'); });
+    })();
     assert.ok(/s\.style\.display = mono \? 'none' : ''/.test(html), '单语隐藏原文列的逻辑被改了');
   });
 
@@ -4438,7 +4447,14 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* v0.9.199：ASS 那三组从 .wrap-row（标签在上、两列并排）升级成 .wr-row3（行标签 + 两列），
        所以 wrap-row 只剩折行那 1 组；ASS 的三组改数 wr-row3。 */
     assert.strictEqual((html.match(/class="wrap-row solo"/g) || []).length, 1, 'wrap-row 现在只该剩折行那 1 组');
-    assert.strictEqual((html.match(/class="wr-row3"/g) || []).length, 3, 'ASS 三行参数表（字号/颜色/离底）缺失');
+    /* v0.9.217：参数表由 3 行扩到 6 行（加描边/字体/不透明度）。本意是「不许竖排撑出滚动条」，
+     故断言「行数 = tri 组数」而不是写死 3。 */
+    (function(){
+      var triN = (html.match(/\['ass[A-Za-z]+Row','ass[A-Za-z]+Row'\]/g)||[]).length;
+      assert.ok(triN >= 3, 'tri 组数异常');
+      assert.strictEqual((html.match(/class="wr-row3"/g) || []).length, triN,
+        'ASS 参数表行数与 tri 组数不一致（竖排会撑出滚动条）');
+    })();
     /* 三行的译文/原文必须同处一行内，而不是各占一行。
        v0.9.199：容器由 .wrap-row（标签在上、两列）换成 .wr-row3（行标签 + 两列）。 */
     const rows = html.match(/<div class="wr-row3">[\s\S]*?\n        <\/div>/g) || [];
@@ -4478,8 +4494,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 结构性防漏：ASS 组里 6 个格子必须个个有 id —— 再漏一组就是同一个 bug 重演 */
     const iA = html.indexOf('id="assStyleBox"'), iEnd = html.indexOf('data-i18n="secWrap"');
     assert.ok(iA > 0 && iEnd > iA, 'ASS 区块定位失败');
-    const cells = (html.slice(iA, iEnd).match(/<div class="wr-cell"[^>]*>/g) || []);
-    assert.strictEqual(cells.length, 6, 'ASS 组 wr-cell 应是 6 个（三组各两列）');
+    const cells = (html.slice(iA, iEnd).match(/<div class="wr-cell[^"]*"[^>]*>/g) || []);
+    /* v0.9.217：格子数 = tri 组数 × 2（译文 + 原文）。写死 6 会在加组时假失败。 */
+    assert.strictEqual(cells.length, (html.match(/\['ass[A-Za-z]+Row','ass[A-Za-z]+Row'\]/g)||[]).length * 2,
+      'ASS 组 wr-cell 数 = tri 组数 × 2 不符');
     assert.deepStrictEqual(cells.filter(c => !/ id="/.test(c)), [], 'ASS 组里还有 wr-cell 没 id（单语时会被漏掉）');
     /* 隐藏靠 display:none，不能去动 value：用户在双语下配的原文颜色，切单语再切回来必须还在 */
     assert.ok(/s\.style\.display = mono \? 'none' : ''/.test(html), '隐藏方式被改成非 display 了');
@@ -4660,7 +4678,11 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        （译文X号 / 原文X号 × 字号、颜色、离底），在 320px 的栏里就是一堵字段墙。 */
     assert.ok(/<div class="wr-head" id="assHead">/.test(html), '缺列头 wr-head');
     assert.ok(/id="assHeadDst"/.test(html) && /id="assHeadSrc"/.test(html), '列头缺译文/原文两列的 id');
-    assert.strictEqual((html.match(/class="wr-row3"/g) || []).length, 3, '参数表不是 3 行');
+    /* 行数随 tri 组数走（v0.9.217 起为 6 行），只断言「与 tri 一致」 */
+    (function(){
+      var triN = (html.match(/\['ass[A-Za-z]+Row','ass[A-Za-z]+Row'\]/g)||[]).length;
+      assert.strictEqual((html.match(/class="wr-row3"/g) || []).length, triN, '参数表行数与 tri 组数不一致');
+    })();
     /* 列头与三行必须共用同一套列宽，否则表头和数据列对不齐 */
     assert.ok(/\.wr-head\{display:grid;grid-template-columns:66px 1fr 1fr/.test(html), '列头列宽不对');
     assert.ok(/\.wr-row3\{display:grid;grid-template-columns:66px 1fr 1fr/.test(html), '三行列宽与列头不一致');
@@ -5153,7 +5175,47 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const noStem = tokVals.filter(v => !stem.test(v));
     assert.ok(noStem.length === 0, '这些语言的 Token 词条没写「Token」这个词：' + JSON.stringify(noStem));
   });
-}
 
-console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
-process.exit(fail ? 1 : 0);
+  t('v0.9.217 ASS 新增描边/字体/不透明度（译文原文各一套）+ 预览同步', () => {
+    const core = require('fs').readFileSync(require('path').join(__dirname, 'srt-core.js'), 'utf8');
+    /* ① 不传 assStyle 时必须与 v0.9.35 的写死值逐字节一致（老用户零影响） */
+    const C = require('./srt-core.js');
+    const evs = [{ start: 0, end: 2000, lines: [{ style: 'Bottom', text: 'x' }, { style: 'Sub', text: 'y' }] }];
+    const plain = C.formatAss(evs, {});
+    assert.ok(/^Style: Bottom,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1$/m.test(plain),
+      '不传 assStyle 时译文样式行与 v0.9.35 不一致（老用户会被改坏）');
+    assert.ok(/^Style: Sub,PingFang SC,50,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1$/m.test(plain),
+      '不传 assStyle 时原文样式行与 v0.9.35 不一致');
+    /* ② 传新参数：译文/原文各一套（Bottom+TopMain 译文套、Top+Sub 原文套） */
+    const cfg = C.formatAss(evs, { assStyle: {
+      dstOutline: 5, dstOutlineColor: '&H00202020', dstFont: 'Source Han Sans SC', dstAlpha: 60,
+      srcOutline: 1.5, srcOutlineColor: '&H00FF0000', srcFont: 'Source Han Serif SC', srcAlpha: 30 } });
+    const st = n => (cfg.split('\n').find(l => l.indexOf('Style: ' + n + ',') === 0) || '');
+    assert.ok(st('Bottom').indexOf(',Source Han Sans SC,56,&H66FFFFFF,&H000000FF,&H00202020,') > 0, '译文样式行没吃到新参数：' + st('Bottom'));
+    assert.ok(st('TopMain').indexOf(',Source Han Sans SC,') > 0, 'TopMain（译文）没吃到新参数');
+    assert.ok(st('Sub').indexOf(',Source Han Serif SC,50,&HB300D7FF,&H000000FF,&H00FF0000,') > 0, '原文样式行没吃到新参数：' + st('Sub'));
+    assert.ok(st('Top').indexOf(',Source Han Serif SC,') > 0, 'Top（原文）没吃到新参数');
+    /* ③ alpha 换算：ASS 的 AA 是「透明度」不是不透明度，且必须两位十六进制（00 = 全不透明） */
+    assert.ok(core.indexOf('const a = Math.round((100 - n) * 255 / 100);')>0, 'alpha 换算公式不对（应为 (100-不透明度)/100*255）');
+    assert.ok(core.indexOf("a <= 0 ? '00' : a.toString(16).toUpperCase().padStart(2, '0')")>0,
+      'alpha 没有补足两位十六进制（0 会写成"0"，颜色串长度不对，播放器会解析成畸形颜色）');
+    /* ④ UI：六个 id 都在，且成对（单语隐藏靠 tri 清单配对） */
+    ['assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor','assDstFont','assSrcFont','assDstAlpha','assSrcAlpha']
+      .forEach(function(id){ assert.ok(html.indexOf('id="' + id + '"') > 0, 'UI 缺 ' + id); });
+    assert.ok(/id="assDstAlphaOut"/.test(html) && /id="assSrcAlphaOut"/.test(html), '滑杆旁的百分比输出框缺失');
+    assert.ok(/function fillAssFonts()/.test(html) && /ASS_FONTS/.test(html), '字体下拉没有填充逻辑');
+    /* ⑤ 预览必须同步（调了参数看不到效果 = 白做） */
+    ['--pv-dst-ow','--pv-src-ow','--pv-dst-oc','--pv-src-oc','--pv-dst-o','--pv-src-o','--pv-dst-f','--pv-src-f']
+      .forEach(function(k){ assert.ok(html.indexOf("'" + k + "'") > 0, '预览没接 ' + k); });
+    assert.ok(html.indexOf('-webkit-text-stroke:var(--pv-dst-ow')>0 && html.indexOf('paint-order:stroke fill')>0,
+      '预览没模拟 ASS 描边（text-stroke + paint-order 是标准做法）');
+    /* ⚠️ 译文/原文两组选择器特指度必须相同，否则原文会吃到译文的描边色 */
+    const cssD = html.slice(html.indexOf('.ep-dst{-webkit-text-stroke'), html.indexOf('.ep-src{-webkit-text-stroke'));
+    assert.ok(!/.exp-preview .ep-line/.test(cssD), '描边写到了 .ep-line 上（那是给两层盒子用的，会让原文吃到译文的值）');
+    /* ⑥ 词条：6 × 27 语 */
+    ['lblOutlineShort','lblFontShort','lblAlphaShort','assOutlineTip','assFontTip','assAlphaTip'].forEach(function(k){
+      const n = (html.match(new RegExp(k + "\s*:\s*'", 'g')) || []).length;
+      assert.ok(n === 27, k + ' 只有 ' + n + ' 种语言，应为 27');
+    });
+  });
+}

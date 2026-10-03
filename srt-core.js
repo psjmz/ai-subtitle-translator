@@ -872,15 +872,48 @@
     const SRC_MV = Math.max(0, Math.min(1080, Math.round(numOr(AS.srcMV, MV))));
     const ML     = Math.max(0, Math.min(600, Math.round(numOr(AS.marginL, 60))));
     const OUTL   = Math.max(0, Math.min(10, numOr(AS.outline, 2.5)));
+    /* v0.9.217：描边 / 字体 / 不透明度改为可配，且**译文与原文各自一套**
+       （影院双语字幕里「中文粗 + 原文细」「原文描边更重」是常见做法；
+         ASS 的每个样式行本就各带这些字段，此前只是被写死成一套）。
+       ⚠️ 默认值必须与 v0.9.35 的写死值逐字相同（描边 2.5 / 黑 / 苹方 / 不透明），
+       否则不传 assStyle 的老调用会输出变样、既有单测与用户习惯被打乱。 */
+    const DST_OUTL = Math.max(0, Math.min(10, numOr(AS.dstOutline, OUTL)));
+    const SRC_OUTL = Math.max(0, Math.min(10, numOr(AS.srcOutline, OUTL)));
+    const DST_OC = RE_ASS_COLOR.test(String(AS.dstOutlineColor || '')) ? String(AS.dstOutlineColor) : '&H00000000';
+    const SRC_OC = RE_ASS_COLOR.test(String(AS.srcOutlineColor || '')) ? String(AS.srcOutlineColor) : '&H00000000';
+    /* 字体：逗号会让 ASS 的 Fontname 解析截断，故剥掉（v0.9.35 已有此处理，沿用） */
+    const pickFont = v => { const f = String(v == null ? '' : v).replace(/,/g, '').trim(); return f || FONT; };
+    const DST_FONT = pickFont(AS.dstFont || AS.font);
+    const SRC_FONT = pickFont(AS.srcFont || AS.font);
+    /* 不透明度 0~100 → ASS 颜色 alpha 位。
+       ASS 的 &HAABBGGRR 里 AA 是**透明度**不是不透明度：AA=00 完全不透明、FF 完全透明（与 CSS opacity 相反）。
+       所以 alpha = (100 − 不透明度)/100 × 255，且必须补足两位十六进制（0 → "00" 而非 "0"，
+       否则颜色串长度不对，播放器会解析成畸形颜色）。 */
+    const alphaOf = v => {
+      const n = Math.max(0, Math.min(100, numOr(v, 100)));
+      const a = Math.round((100 - n) * 255 / 100);
+      return a <= 0 ? '00' : a.toString(16).toUpperCase().padStart(2, '0');
+    };
+    const DST_A = alphaOf(AS.dstAlpha);
+    const SRC_A = alphaOf(AS.srcAlpha);
     const STYLE_FMT = 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding';
     // 样式行模板（v0.9.35 分工不变：字号跟角色走、位置跟模式走）
     // v0.9.102：贴底的两块各用各的离底距离（Bottom=译文 / Sub=原文）。
     // Top / TopMain 是顶部对齐（an8），MarginV 语义为「距顶边」，真实位置由每条 Dialogue
     // 的 mv 逐条覆盖，故样式值继续沿用 MV 兜底。
-    const styleLine = (name, size, color, align, bold, mv) =>
-      'Style: ' + name + ',' + FONT + ',' + size + ',' + color +
-      ',&H000000FF,&H00000000,&H64000000,' + bold + ',0,0,0,100,100,0,0,1,' + OUTL +
-      ',0,' + align + ',' + ML + ',' + ML + ',' + (mv == null ? MV : mv) + ',1';
+    /* v0.9.217：样式行生成。字体/描边/描边色/主色 alpha 都由调用方按「译文 or 原文」传入，
+       不再用写死的 FONT / OUTL —— 这是「译文原文各配一套」能落地的前提。
+       bold 传 -1/0（ASS 惯例 -1=粗体）；未传时沿用 v0.9.35 的原值。 */
+    const styleLine = (name, size, color, align, bold, mv, font, outline, outlineColor, alpha) => {
+      const f = font || FONT;
+      const ol = (outline == null) ? OUTL : outline;
+      /* 主色带不透明度：把 &H00BBGGRR 的「00」换成 alphaOf 算出的两位十六进制。
+         描边色同理（ASS 的 OutlineColour 也支持 alpha，这里保持不透明以免文字边缘发虚）。 */
+      const withAlpha = (col, a) => '&H' + a + String(col).slice(4);
+      return 'Style: ' + name + ',' + f + ',' + size + ',' + withAlpha(color, alpha || '00') +
+        ',&H000000FF,' + (outlineColor || '&H00000000') + ',&H64000000,' + bold + ',0,0,0,100,100,0,0,1,' + ol +
+        ',0,' + align + ',' + ML + ',' + ML + ',' + (mv == null ? MV : mv) + ',1';
+    };
     const header = [
       '[Script Info]',
       'Title: ' + (opts.title || 'Translated Subtitles'),
@@ -893,15 +926,15 @@
       '',
       '[V4+ Styles]',
       STYLE_FMT,
-      styleLine('Bottom', DST_SZ, DST_C, 2, -1, DST_MV),
-      styleLine('Top', SRC_SZ, SRC_C, 8, 0),
+      styleLine('Bottom', DST_SZ, DST_C, 2, -1, DST_MV, DST_FONT, DST_OUTL, DST_OC, DST_A),
+      styleLine('Top', SRC_SZ, SRC_C, 8, 0, null, SRC_FONT, SRC_OUTL, SRC_OC, SRC_A),
       // TopMain（v0.9.35）：主语言顶部样式——外观与 Bottom 一致（主字号/主色），仅对齐方式为顶部居中（an8）。
       // 「译文在上」分屏模式下译文用本样式，保证译文无论在哪都保持主阅读字号。
-      styleLine('TopMain', DST_SZ, DST_C, 8, -1),
+      styleLine('TopMain', DST_SZ, DST_C, 8, -1, null, DST_FONT, DST_OUTL, DST_OC, DST_A),
       // Sub：底部双行 / 副语言落底样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（副字号/副色）
       // 但对齐方式为底部居中，实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定；
       // mv=0 时回退样式默认 MarginV。
-      styleLine('Sub', SRC_SZ, SRC_C, 2, 0, SRC_MV),
+      styleLine('Sub', SRC_SZ, SRC_C, 2, 0, SRC_MV, SRC_FONT, SRC_OUTL, SRC_OC, SRC_A),
       '',
       '[Events]',
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
