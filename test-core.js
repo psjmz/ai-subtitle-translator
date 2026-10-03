@@ -5104,6 +5104,44 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(!/statAlign|statPrivacy/.test(band),
       '首页数字带还在显示「时间轴对齐 / 字幕上传服务器」（用户 10-03 要求去掉）');
   });
+
+  t('v0.9.214 工作台顶栏滚动播报：慢速长卷 + 悬停暂停 + 不挤按钮', () => {
+    assert.ok(/id="ticker"/.test(html) && /id="tkTrack"/.test(html), '顶栏缺少播报容器');
+    /* 滚动文字最烦人的就是停不下来 → 悬停必须能暂停 */
+    assert.ok(/\.ticker:hover \.tk-track,.ticker:focus-within \.tk-track\{animation-play-state:paused\}/.test(html),
+      '鼠标悬停不能暂停滚动');
+    assert.ok(/@keyframes tkScroll\{from\{transform:translateX\(0\)\}to\{transform:translateX\(-50%\)\}\}/.test(html),
+      '滚动动画不是 0 → -50%（两遍拼接时 -50% 正好对应一组宽度，接缝才对得上）');
+    /* 两遍拼接：只写一遍会在循环时看到空白 */
+    const tj = html.slice(html.indexOf('function buildTicker'), html.indexOf('function buildTicker') + 1400);
+    assert.ok(/<span class="tk-grp">/.test(tj) && /tk-grp.*tk-grp/s.test(tj), '播报内容没有生成两遍（循环会露出空白）');
+    /* 慢速 + 时长自适应：快了看不清 */
+    assert.ok(/w \/ 28/.test(tj) && /Math\.max\(24, Math\.min\(70/.test(tj),
+      '动画时长没有按内容宽度自适应（应 24~70 秒，慢到能读完）');
+    /* 顶栏是 nowrap 不换行：播报区必须能收缩，且窄屏整体隐藏，不能把右侧按钮挤出屏幕 */
+    assert.ok(/\.ticker\{flex:1 1 auto;min-width:0;overflow:hidden/.test(html), '播报区不能收缩，会挤掉右侧按钮');
+    assert.ok(/@media \(max-width:1000px\)\{ \.ticker\{display:none\} \}/.test(html), '窄屏没有隐藏播报');
+    /* 数字高亮不能用正则去猜数字形态：各语言千分位不同（de 2.464 / ru 窄空格 2 464 / en 2,464），
+       正则一猜就出错（实测俄语被拆成两段、尾随空格被包进标签）。必须按「格式化后的确切字符串」定位。 */
+    const tt = html.slice(html.indexOf('function tickerText'), html.indexOf('function buildTicker'));
+    assert.ok(tt.indexOf("t(key, val).split(val).join('<b>' + val + '</b>')") >= 0,
+      '数字高亮没用「按确切格式化结果 split」，会踩多语言千分位的坑');
+    assert.ok(!/\\d\[\\d\.,\]\*\\s\*\[万亿\]/.test(tt), '又用正则猜数字形态了');
+    /* 播报与首页数字带同源：一次请求、一份 statsRaw，不额外打接口 */
+    const psSeg = html.slice(html.indexOf('function paintStats'), html.indexOf('function paintStats') + 1800);
+    assert.ok(psSeg.indexOf("statsRaw = s;") >= 0, 'paintStats 没存 statsRaw');
+    assert.ok(psSeg.indexOf("if (typeof buildTicker === 'function') buildTicker();") >= 0,
+      'paintStats 没有顺带重建播报（两者应同源）');
+    assert.ok(html.indexOf("buildTicker();     /* 播报里的文案也要按新语言重排 */") >= 0,
+      '切语言后播报文案没重排');
+    assert.ok(/window\.addEventListener\('resize'/.test(html.slice(html.indexOf('function startStats'), html.indexOf('function startStats') + 700)),
+      '窗口尺寸变化没重算播报时长');
+    /* 词条：3 × 27 语 */
+    for (const k of ['tickServed', 'tickSubs', 'tickToken']) {
+      const n = (html.match(new RegExp(k + "\\s*:\\s*'", 'g')) || []).length;
+      assert.ok(n === 27, k + ' 只有 ' + n + ' 种语言，应为 27');
+    }
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
