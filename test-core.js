@@ -5143,6 +5143,15 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       const n = (html.match(new RegExp(k + "\\s*:\\s*'", 'g')) || []).length;
       assert.ok(n === 27, k + ' 只有 ' + n + ' 种语言，应为 27');
     }
+    /* 每种语言的 Token 词条都必须带「Token」这个词（用户 10-03：只写「累计消耗 8384万」看不出是什么）。
+       各语言说法不同：en/Token、zh/Token、ja/トークン、ko/토큰、ru/токен、hi/टोकन、th/โทเค็น、
+       ar/رمز、tr/jeton、he/טוקנים… 故按「有没有对应词干」逐条查。 */
+    const stem = /oken|トークン|토큰|токен|टोकन|โทเค็น|رمز|jeton|жетон|টোকন|jetó|טוקנים/i;
+    const tokVals = (html.match(/tickToken\s*:\s*'((?:[^'\\]|\\.)*)'/g) || [])
+      .map(s => s.replace(/^tickToken\s*:\s*'/, '').replace(/'$/, ''));
+    assert.ok(tokVals.length === 27, 'tickToken 取到 ' + tokVals.length + ' 条，应为 27');
+    const noStem = tokVals.filter(v => !stem.test(v));
+    assert.ok(noStem.length === 0, '这些语言的 Token 词条没写「Token」这个词：' + JSON.stringify(noStem));
   });
 }
 
