@@ -382,15 +382,32 @@
   }
 
   .section{max-width:1080px;margin:0 auto;padding:0 24px}
-  .stats-band{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:48px;text-align:center}
+  /* v0.9.213：数字带从 4 格变 5 格 —— 左 2 格是产品能力（静态、淡化），
+   细竖线分隔，右 3 格是真实使用量（实心、会涨）。社会证明放首页，工具顶栏不摆。 */
+.stats-band{display:grid;grid-template-columns:repeat(2,1fr) 1px repeat(3,minmax(0,1fr));gap:14px;margin-top:48px;text-align:center;align-items:center}
+  .sb-cap{opacity:.55}          /* 能力格：淡化，和真实数据拉开层次 */
+  .sb-live{opacity:1;min-width:0}   /* minmax(0,1fr)+min-width:0：不加会被长数字顶破、格子挤成 1px */
+  .sb-div{align-self:stretch;width:1px;background:var(--line);margin:6px 0}
   .stat-ic{width:32px;height:32px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:9px}
   .stat-ic svg{width:16px;height:16px}
   .stat-ic.c1{background:#FDEDF4;color:#EC4899}
   .stat-ic.c2{background:#F1EBFE;color:#8B5CF6}
   .stat-ic.c3{background:#FFF0E3;color:#F97316}
   .stat-ic.c4{background:#EDFBF4;color:#10B981}
-  .stat-num{font-size:33px;font-weight:900;color:var(--ink);font-family:var(--mono);line-height:1.1}
+  .stat-ic.c5{background:#E7F1FC;color:#1B5FA8}   /* 位用户 */
+  .stat-ic.c6{background:#E9F5E0;color:#3C6B1C}   /* 字幕数 */
+  .stat-ic.c7{background:#F4F3F1;color:#6F6C72}   /* Token：刻意低调，它是运营成本不是访客价值 */
+  .stat-num{font-size:33px;font-weight:900;color:var(--ink);font-family:var(--mono);line-height:1.1;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sb-tok .stat-num{font-size:29px}   /* 8,348万 比 2,444 长一号，降一档避免撑破格子 */
   .stat-lab{font-size:12.5px;color:var(--sub);margin-top:4px}
+  /* 数字变了闪一下（30 分钟刷新）。给数字加底色转场，不动图标与标签。 */
+  .sb-live .stat-num{transition:color .5s ease}
+  .sb-live .stat-num.bump{color:var(--acc)}
+  @media (max-width:900px){
+    .stats-band{grid-template-columns:repeat(2,1fr);gap:20px 12px}
+    .sb-div{display:none}
+  }
 
   .sec-head{text-align:center;margin-bottom:26px}
   .sec-head h2{font-size:25px;font-weight:900;letter-spacing:-.4px;margin:0}
@@ -470,25 +487,6 @@
   .back:hover{color:var(--acc);background:var(--acc-weak)}
   .back svg{width:11px;height:11px;vertical-align:-1px;margin-right:3px}
   .proj{font-size:12px;color:var(--sub);background:#F4F3F1;border-radius:99px;padding:5px 13px;display:flex;align-items:center;gap:7px;max-width:34%;overflow:hidden}
-  /* v0.9.212：顶栏三个累计指标（服务用户 / 字幕数 / Token）。
-     数据来自 /api/stats（服务端只读累计账本，不扫 events.json），每 30 分钟拉一次。
-     三色小卡与 .proj 胶囊同处一条视觉带；窄屏收起标签只留数字，绝不挤右侧按钮。 */
-  .stats{display:flex;align-items:center;gap:6px;flex:none}
-  .stats[hidden]{display:none}
-  .stat{border-radius:10px;padding:3px 10px;text-align:center;min-width:60px;
-        transition:background-color .5s ease}
-  .stat .st-v{display:block;font-family:var(--mono);font-size:13px;font-weight:600;line-height:1.25;letter-spacing:-.2px}
-  .stat .st-l{display:block;font-size:10.5px;color:var(--sub);line-height:1.3;white-space:nowrap}
-  .st-u{background:#E7F1FC} .st-u .st-v{color:#1B5FA8}
-  .st-s{background:#E9F5E0} .st-s .st-v{color:#3C6B1C}
-  .st-t{background:#F0EAFD} .st-t .st-v{color:#5B3FA8}
-  /* 30 分钟刷新后数字变了 → 闪一下，暗示这是活的统计 */
-  .stat.bump{background-color:var(--acc-weak)}
-  @media (max-width:1080px){
-    .stat{min-width:0;padding:3px 8px}
-    .stat .st-l{display:none}
-  }
-  @media (max-width:820px){ .stats{display:none} }
   .proj .live{width:6px;height:6px;border-radius:99px;background:#10B981;flex:none}
   .proj span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .appbar .spacer{flex:1}
@@ -791,7 +789,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.212</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.213</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -824,10 +822,12 @@
   <!-- 数字带 -->
   <div class="section">
     <div class="stats-band">
-      <div><div class="stat-ic c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg></div><div class="stat-num">75</div><div class="stat-lab" data-i18n="statLangs">语言互译</div></div>
-      <div><div class="stat-ic c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13.5 9 5 9-5"/></svg></div><div class="stat-num">14</div><div class="stat-lab" data-i18n="statStyles">种导出样式</div></div>
-      <div><div class="stat-ic c3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></div><div class="stat-num">100%</div><div class="stat-lab" data-i18n="statAlign">时间轴对齐</div></div>
-      <div><div class="stat-ic c4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><div class="stat-num">0</div><div class="stat-lab" data-i18n="statPrivacy">字幕上传服务器</div></div>
+      <div class="sb-cap"><div class="stat-ic c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg></div><div class="stat-num">75</div><div class="stat-lab" data-i18n="statLangs">语言互译</div></div>
+      <div class="sb-cap"><div class="stat-ic c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13.5 9 5 9-5"/></svg></div><div class="stat-num">14</div><div class="stat-lab" data-i18n="statStyles">种导出样式</div></div>
+      <div class="sb-div" aria-hidden="true"></div>
+      <div class="sb-live"><div class="stat-ic c5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M3.5 19.5c0-3.1 2.5-5.2 5.5-5.2s5.5 2.1 5.5 5.2"/><path d="M16.2 6.4a3.1 3.1 0 0 1 0 5.9"/><path d="M17.6 14.6c1.9.7 3 2.4 3 4.4"/></svg></div><div class="stat-num" id="ldUsers">—</div><div class="stat-lab" data-i18n="statUsers">服务用户</div></div>
+      <div class="sb-live"><div class="stat-ic c6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.6"/><path d="M7 10h4.5M7 14h7"/></svg></div><div class="stat-num" id="ldSubs">—</div><div class="stat-lab" data-i18n="statSubs">字幕数</div></div>
+      <div class="sb-live sb-tok"><div class="stat-ic c7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 2.5 4.5 14h7l-1 7.5 9-11.5h-7l1-7.5z"/></svg></div><div class="stat-num" id="ldTok">—</div><div class="stat-lab" data-i18n="statTokens">Token</div></div>
     </div>
   </div>
 
@@ -951,14 +951,9 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.212</span>
+    <span class="ver-tag">v0.9.213</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
-    <div class="stats" id="statsBar" hidden>
-      <div class="stat st-u"><span class="st-v" id="statUsers">—</span><span class="st-l" data-i18n="statUsers">服务用户</span></div>
-      <div class="stat st-s"><span class="st-v" id="statSubs">—</span><span class="st-l" data-i18n="statSubs">字幕数</span></div>
-      <div class="stat st-t"><span class="st-v" id="statTok">—</span><span class="st-l" data-i18n="statTokens">Token</span></div>
-    </div>
     <div class="spacer"></div>
     <button class="topbtn" id="btnUploadNew" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="wsUploadNew">上传新字幕</span></button>
     <button class="topbtn primary" id="btnGo" data-i18n="btnGo" type="button">▶ 开始翻译</button>
@@ -1336,7 +1331,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.212"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.213"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1375,12 +1370,14 @@ async function refreshBuiltinHint(){
     ? t('builtinOn', BUILTIN_INFO.label, BUILTIN_INFO.perIpDaily>0 ? BUILTIN_INFO.perIpDaily : '∞')
     : t('builtinOff');
 }
-/* ---------------- 顶栏累计统计（v0.9.212）----------------
+/* ---------------- 累计统计（v0.9.212 / v0.9.213）----------------
    口径（服务端账本，见 server.js bumpStats）：
    - 服务用户 = 去重 IP 数；字幕数 = 经服务端跑过的翻译任务数（同任务重发不重复加）
    - Token = 累计 tkIn + tkOut（含缓存命中）
    自带 Key 的翻译不经服务端，不计入。数据只读服务端账本，不在浏览器算统计。
-   每 30 分钟拉一次；数字变了给对应小卡闪一下。拉取失败保持上一次的值（不闪、不清零）。 */
+   v0.9.213：展示位置从工作台顶栏移到**首页数字带**（首页左 2 格是产品能力、细线分隔、
+   右 3 格是本组真实使用量）——社会证明属于营销页，工具界面不摆。
+   每 30 分钟拉一次；数字变了那格闪一下。拉取失败保持上一次的值（不闪、不清零）。 */
 const STATS_EVERY_MS = 30 * 60 * 1000;
 let statsTimer = null, statsLast = null, statsRaw = null;
 /* 中文用万/亿，英文用 K/M/B —— 跟随界面语言，避免 1284 写成 "1,284" 还是 "1.2千" 的观感问题 */
@@ -1397,23 +1394,22 @@ function fmtCount(n, lang){
   return (n/1000000000).toFixed(1).replace(/\.0$/,'') + 'B';
 }
 function paintStats(s){
-  const bar = $('statsBar'); if(!bar) return;
+  /* 位置：首页数字带右三格（v0.9.213 从顶栏搬下来）。数字带是首页既有的社会证明区，
+     工具顶栏摆「累计 Token」对访客无意义、抢主按钮的注意力。 */
   /* 顺手留一份原始值：切界面语言时要按新语言重排，重排不能重新请求接口。
      放在 paintStats 里（而不是只在 refreshStats 里）→ 任何调用路径都会同步到这份缓存。 */
   statsRaw = s;
   /* 用界面语言（UI.lang），不是目标字幕语言（curLang）——后者是译文语言，与数字排版无关 */
   const lang = (typeof UI !== 'undefined' && UI && UI.lang) ? UI.lang : 'zh-CN';
-  const vals = { statUsers: fmtCount(s.users, lang), statSubs: fmtCount(s.subs, lang), statTok: fmtCount(s.tokens, lang) };
-  bar.hidden = false;
+  const vals = { ldUsers: fmtCount(s.users, lang), ldSubs: fmtCount(s.subs, lang), ldTok: fmtCount(s.tokens, lang) };
   for (const id in vals){
     const el = $(id); if(!el) continue;
     const old = el.textContent;
     el.textContent = vals[id];
     /* 只有真变了才闪：初次填充（old 是占位符 —）不算「数字变了」 */
     if (statsLast && old !== vals[id]){
-      const card = el.parentNode;
-      card.classList.add('bump');
-      setTimeout(()=>{ try{ card.classList.remove('bump'); }catch(e){} }, 900);
+      el.classList.add('bump');
+      setTimeout(()=>{ try{ el.classList.remove('bump'); }catch(e){} }, 900);
     }
   }
   statsLast = vals;
@@ -1635,7 +1631,7 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   feat4T:'去水词 · 听写纠错', feat4D:'「嗯、啊、you know」自动清除，源字幕的听写错误一并修正——译文干净到可以直接压片。', feat5T:'双语字幕随心排', feat5D:'原文译文双行、堆叠、分屏随意切换，还能导出 TXT 对照稿，字幕组级的花样全都有。',
   feat6T:'隐私安全', feat6D:'字幕在你的浏览器里处理，默认不经任何第三方服务器；API Key 只存在本机。', expTag:'✦ EXPORT · 导出花样', aboutTitle:'关于随心字幕 AI',
   aboutBody:'随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 开源仓库', aboutLicense:'AGPL-3.0 开源', wsBackHome:'首页',
-  wsUploadNew:'上传新字幕', projEmpty:'未导入字幕', statUsers:'用户', statSubs:'字幕', statTokens:'Token', secImport:'导入字幕', secLang:'语言',
+  wsUploadNew:'上传新字幕', projEmpty:'未导入字幕', statUsers:'位用户', statSubs:'份字幕', statTokens:'Token', secImport:'导入字幕', secLang:'语言',
   secStyle:'翻译风格', secTerms:'术语与专名', secFilter:'内容过滤', secEngine:'翻译引擎', lblSrcShort:'原文语言',
   lblDstShort:'目标语言', lblKeepTermsShort:'专名处理', lblAutoTermsShort:'自动术语表', secWrap:'折行设置', splitWarn:'{0} 条字幕过长被切成 {1} 条，时间轴随之拆分。把单语行宽调到 {2} 以上即可保留原时间轴。', splitWarnBi:'{0} 条双语字幕过长被切成 {1} 条，时间轴随之拆分。把双语行宽调到 {2} 以上即可保留原时间轴。', wrapTip:'修改设置，无须重新翻译，可在编辑区查看单语字幕的折行效果。', wrapTipBi:'修改设置，无须重新翻译，可在编辑区查看双语字幕的折行效果。', lblMaxWShort:'单语行宽', lblBiMaxWShort:'双语行宽', wUnit:'字符', lblLyric:'歌词处理', lyricTrans:'翻译歌词', lyricKeep:'保留原文', lyricDrop:'删除歌词', lblMarks:'歌词标记', lblDropFillers:'去除水词',
   /* v0.9.70 两段式界面新增 */
@@ -1734,7 +1730,7 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   feat4T:'去贅詞 · 聽寫糾錯', feat4D:'「嗯、啊、you know」自動清除，來源字幕的聽寫錯誤一併修正——譯文乾淨到可以直接壓片。', feat5T:'雙語字幕隨心排', feat5D:'原文譯文雙行、堆疊、分割畫面隨意切換，還能匯出 TXT 對照稿，字幕組級的花樣全都有。',
   feat6T:'隱私安全', feat6D:'字幕在你的瀏覽器裡處理，預設不經任何第三方伺服器；API Key 只存在本機。', expTag:'✦ EXPORT · 匯出花樣', aboutTitle:'關於隨心字幕 AI',
   aboutBody:'隨心字幕 AI 是一款開源的 AI 字幕翻譯工具。我們相信好的字幕工具應該免費、乾淨、尊重隱私——不塞廣告、不要註冊、不動你的檔案。歡迎自部署、提需求、一起打磨。', aboutRepo:'GitHub 開源倉庫', aboutLicense:'AGPL-3.0 開源', wsBackHome:'首頁',
-  wsUploadNew:'上傳新字幕', projEmpty:'未匯入字幕', statUsers:'用戶', statSubs:'字幕', statTokens:'Token', secImport:'匯入字幕', secLang:'語言',
+  wsUploadNew:'上傳新字幕', projEmpty:'未匯入字幕', statUsers:'位用戶', statSubs:'份字幕', statTokens:'Token', secImport:'匯入字幕', secLang:'語言',
   secStyle:'翻譯風格', secTerms:'術語與專名', secFilter:'內容過濾', secEngine:'翻譯引擎', lblSrcShort:'原文語言',
   lblDstShort:'目標語言', lblKeepTermsShort:'專名處理', lblAutoTermsShort:'自動術語表', secWrap:'折行設定', splitWarn:'{0} 條字幕過長被切成 {1} 條，時間軸隨之拆分。把單語行寬調到 {2} 以上即可保留原時間軸。', splitWarnBi:'{0} 條雙語字幕過長被切成 {1} 條，時間軸隨之拆分。把雙語行寬調到 {2} 以上即可保留原時間軸。', wrapTip:'修改設定，無須重新翻譯，可在編輯區查看單語字幕的折行效果。', wrapTipBi:'修改設定，無須重新翻譯，可在編輯區查看雙語字幕的折行效果。', lblMaxWShort:'單語行寬', lblBiMaxWShort:'雙語行寬', wUnit:'字元', lblLyric:'歌詞處理', lyricTrans:'翻譯歌詞', lyricKeep:'保留原文', lyricDrop:'刪除歌詞', lblMarks:'歌詞標記', lblDropFillers:'去除贅詞',
   /* v0.9.70 两段式界面新增 */
@@ -1932,7 +1928,7 @@ userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了�
   feat4T:'フィラー除去・文字起こし修正', feat4D:'「えー、あの、you know」を自動削除し、ソースの聞き取りミスもまとめて修正。そのまま焼けるほどクリーンな訳文に。', feat5T:'二言語字幕も自由自在', feat5D:'二行・積み上げ・上下分割を自由に切り替え。TXT 対照稿の書き出しも可能。字幕組レベルの演出をすべて網羅。',
   feat6T:'プライバシー保護', feat6D:'字幕はブラウザ内で処理され、原則として第三者サーバーには送信されません。API Key も端末内に保存。', expTag:'✦ EXPORT · 書き出しスタイル', aboutTitle:'AI-SRTSub について',
   aboutBody:'AI-SRTSub はオープンソースの AI 字幕翻訳ツールです。良い字幕ツールは無料で、クリーンで、プライバシーを尊重すべき——広告なし、登録なし、ファイルに手を加えない。セルフホストも歓迎。', aboutRepo:'GitHub リポジトリ', aboutLicense:'AGPL-3.0 オープンソース', wsBackHome:'ホーム',
-  wsUploadNew:'新しい字幕', projEmpty:'字幕未読み込み', statUsers:'ユーザー', statSubs:'字幕', statTokens:'Token', secImport:'読み込み', secLang:'言語',
+  wsUploadNew:'新しい字幕', projEmpty:'字幕未読み込み', statUsers:'ユーザー', statSubs:'本の字幕', statTokens:'Token', secImport:'読み込み', secLang:'言語',
   secStyle:'翻訳スタイル', secTerms:'用語と固有名詞', secFilter:'内容のフィルタ', secEngine:'エンジン', lblSrcShort:'原文言語',
   lblDstShort:'目的言語', lblKeepTermsShort:'固有名詞', lblAutoTermsShort:'自動用語集', secWrap:'折り返し設定', splitWarn:'{0} 件の字幕が長すぎるため {1} 件に分割され、時間軸も分かれます。単一言語の行幅を {2} 以上にすると元の時間軸を保てます。', splitWarnBi:'{0} 件のバイリンガル字幕が長すぎるため {1} 件に分割され、時間軸も分かれます。バイリンガル行幅を {2} 以上にすると元の時間軸を保てます。', wrapTip:'変更しても再翻訳は不要です。編集エリアで単言語字幕の折り返しをすぐ確認できます。', wrapTipBi:'変更しても再翻訳は不要です。編集エリアでバイリンガル字幕の折り返しをすぐ確認できます。', lblMaxWShort:'単一言語の行幅', lblBiMaxWShort:'バイリンガル行幅', wUnit:'文字', lblLyric:'歌詞の処理', lyricTrans:'翻訳する', lyricKeep:'原文のまま', lyricDrop:'削除する', lblMarks:'歌詞マーク', lblDropFillers:'フィラーを削除',
   /* v0.9.70 两段式界面新增 */
@@ -2229,7 +2225,7 @@ userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제�
   feat4T:'군더더기 제거 · 받아쓰기 교정', feat4D:'「음, 어, you know」는 자동 삭제, 원본 자막의 받아쓰기 오류도 함께 수정——바로 넣을 수 있을 만큼 깔끔합니다.', feat5T:'이중언어 자막 자유 배치', feat5D:'두 줄·쌓기·상하 분할을 자유롭게 전환하고 TXT 대조본까지 내보낼 수 있는, 자막팀급 옵션을 모두 갖췄습니다.',
   feat6T:'프라이버시 보호', feat6D:'자막은 브라우저에서 처리되며 기본적으로 제3자 서버를 거치지 않습니다. API Key도 내 기기에만 저장됩니다.', expTag:'✦ EXPORT · 내보내기 스타일', aboutTitle:'AI-SRTSub 소개',
   aboutBody:'AI-SRTSub는 오픈소스 AI 자막 번역 도구입니다. 좋은 자막 도구는 무료·깔끔·프라이버시 존중이어야 한다고 믿습니다——광고 없음, 가입 없음, 파일 만지지 않음. 직접 설치하거나 요청을 남겨주세요.', aboutRepo:'GitHub 저장소', aboutLicense:'AGPL-3.0 오픈소스', wsBackHome:'홈',
-  wsUploadNew:'새 자막 올리기', projEmpty:'자막 없음', statUsers:'사용자', statSubs:'자막', statTokens:'Token', secImport:'가져오기', secLang:'언어',
+  wsUploadNew:'새 자막 올리기', projEmpty:'자막 없음', statUsers:'사용자', statSubs:'개의 자막', statTokens:'Token', secImport:'가져오기', secLang:'언어',
   secStyle:'번역 스타일', secTerms:'용어와 고유명사', secFilter:'내용 필터링', secEngine:'엔진', lblSrcShort:'원본 언어',
   lblDstShort:'대상 언어', lblKeepTermsShort:'고유명사', lblAutoTermsShort:'자동 용어집', secWrap:'줄바꿈 설정', splitWarn:'{0}개의 자막이 너무 길어 {1}개로 나뉘어 시간축도 쪼개졌습니다. 줄 너비를 {2} 이상으로 올리면 원래 시간축을 유지할 수 있습니다.', splitWarnBi:'{0}개의 이중 언어 자막이 너무 길어 {1}개로 나뉘어 시간축도 쪼개졌습니다. 이중 언어 줄 너비를 {2} 이상으로 올리면 원래 시간축을 유지할 수 있습니다.', wrapTip:'설정을 바꿔도 다시 번역할 필요 없이 편집 영역에서 단일 언어 자막의 줄바꿈을 바로 확인할 수 있습니다.', wrapTipBi:'설정을 바꿔도 다시 번역할 필요 없이 편집 영역에서 이중 언어 자막의 줄바꿈을 바로 확인할 수 있습니다.', lblMaxWShort:'단일 언어 너비', lblBiMaxWShort:'이중언어 너비', wUnit:'자', lblLyric:'Letras de música', lyricTrans:'Traduzir', lyricKeep:'Manter original', lyricDrop:'Remover', lblMarks:'Marcas de letra', lblDropFillers:'Remover vícios',
   /* v0.9.70 两段式界面新增 */

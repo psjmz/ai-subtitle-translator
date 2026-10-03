@@ -5086,8 +5086,23 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       const n = (html.match(new RegExp(k + "\\s*:\\s*'", 'g')) || []).length;
       assert.ok(n === 27, k + ' 只有 ' + n + ' 种语言，应为 27');
     }
-    assert.ok(/id="statsBar"/.test(html) && /id="statUsers"/.test(html) &&
-      /id="statSubs"/.test(html) && /id="statTok"/.test(html), '顶栏三个指标的元素缺失');
+    /* v0.9.213：展示位置从工作台顶栏搬到首页数字带（社会证明属于营销页，工具界面不摆） */
+    assert.ok(/id="statsBar"/.test(html) === false && !/\.stats\{display:flex;align-items:center;gap:6px;flex:none\}/.test(html),
+      '工作台顶栏的累计指标色块又回来了（应只在首页数字带显示）');
+    const band = html.slice(html.indexOf('class="stats-band"'), html.indexOf('class="stats-band"') + 2600);
+    assert.ok(band.length > 500, 'stats-band 段落定位失败（切片过短，断言会假通过）');
+    assert.ok(/id="ldUsers"/.test(band) && /id="ldSubs"/.test(band) && /id="ldTok"/.test(band),
+      '首页数字带里缺累计数据的三格');
+    assert.ok(/class="sb-div"/.test(band), '缺少能力格与真实使用量之间的分隔线');
+    assert.ok(/class="sb-cap"/.test(band) && /class="sb-live"/.test(band),
+      '没有区分「产品能力」（淡化）与「真实使用量」（实心）');
+    assert.ok(/ldUsers: fmtCount\(s\.users/.test(html) && /ldTok: fmtCount\(s\.tokens/.test(html),
+      'paintStats 没有把累计数字填进首页');
+    /* Token 刻意低调：它是运营成本，不是访客能感知的价值 */
+    assert.ok(/\.sb-tok \.stat-num\{font-size:29px\}/.test(html) && /\.stat-ic\.c7\{background:#F4F3F1/.test(html),
+      'Token 格没有做低调处理');
+    assert.ok(!/statAlign|statPrivacy/.test(band),
+      '首页数字带还在显示「时间轴对齐 / 字幕上传服务器」（用户 10-03 要求去掉）');
   });
 }
 
