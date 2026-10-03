@@ -88,7 +88,87 @@ function readUsage(){
 }
 function writeUsage(u){ fs.writeFileSync(USAGE_PATH, JSON.stringify(u), 'utf8'); }
 
-/* ---------------- 使用行为记录（仅元数据：文件名/语言/条数，不含字幕内容） ---------------- */
+/* ---------------- 累计统计账本（v0.9.212）----------------
+   为什么不能扫 events.json 算累计：日志只保留最近 EVENTS_MAX(3000) 条，超了裁掉最旧的。
+   扫它算出来的是「最近 3000 条任务的量」，数字会随旧记录被裁而**变小**，不是累计。
+   所以维护一个只增不减的独立账本 stats.json，在写事件的同一处顺带累加（O(1)，不重扫日志）。
+
+   口径（用户 2026-10-03 定案）：
+   - users   累计服务用户 = 去重 IP 数（同 IP 反复来只 +1；自带 Key 的记录不计入 users）
+   - subs    累计字幕数   = 经服务端跑过的翻译任务数（同任务的重试/重发不重复加；
+                            重译同一文件算新的一次）
+   - tkIn/tkOut/tkCache 累计 token（tkIn 含缓存命中部分）；在 recordTokens 处累加，天然不重复
+   自带 Key 用户（markEvent 造的 lite 记录）翻译不经服务端，不进本账本。 */
+const STATS_PATH = path.join(DATA_DIR, 'stats.json');
+const STATS_TTL_MS = 30 * 60 * 1000;   // 接口侧缓存 30 分钟：既满足刷新节奏，又不重复算/重复读盘
+function blankStats(){ return { v: 1, users: 0, subs: 0, tkIn: 0, tkOut: 0, tkCache: 0, ipN: 0, at: 0 }; }
+function readStatsRaw(){
+  try {
+    const s = JSON.parse(fs.readFileSync(STATS_PATH, 'utf8'));
+    if (s && typeof s === 'object' && Array.isArray(s.ips)) return s;
+  } catch (e) {}
+  return null;
+}
+/* 累加器。ip 集合只增不减（去重靠它），故单独存；用户数 = ipN（集合大小），不另存数字以免两者漂移。
+   整段 try/catch 静默：统计记账失败绝不能影响翻译主流程。 */
+let _statsCache = { at: 0, val: null };   // 声明必须在 bumpStats 之前（下面要用）
+function bumpStats(d){
+  try {
+    const cur = readStatsRaw() || (function(){ const b = blankStats(); b.ips = []; return b; })();
+    if (!Array.isArray(cur.ips)) cur.ips = [];
+    if (d && d.ip && cur.ips.indexOf(d.ip) < 0) cur.ips.push(d.ip);
+    if (d && d.subs) cur.subs = (Number(cur.subs) || 0) + d.subs;
+    if (d && d.tin)  cur.tkIn  = (Number(cur.tkIn)  || 0) + d.tin;
+    if (d && d.tout) cur.tkOut = (Number(cur.tkOut) || 0) + d.tout;
+    if (d && d.tch)  cur.tkCache = (Number(cur.tkCache) || 0) + d.tch;
+    cur.ipN = cur.ips.length;
+    cur.at = Date.now();
+    fs.writeFileSync(STATS_PATH, JSON.stringify(cur), 'utf8');
+    /* 写完立刻把内存缓存换成新值。这一步不是优化，是正确性：
+       若只靠 TTL 过期才重读，回填后的第一个访客会把 0 缓存住、接下来 30 分钟都看到 0。 */
+    _statsCache = { at: Date.now(), val: statsOf(cur) };
+  } catch (e) {}
+}
+function statsOf(raw){
+  return {
+    users:  raw ? (Number(raw.ipN) || (Array.isArray(raw.ips) ? raw.ips.length : 0) || 0) : 0,
+    subs:   raw ? (Number(raw.subs)  || 0) : 0,
+    tkIn:   raw ? (Number(raw.tkIn)  || 0) : 0,
+    tkOut:  raw ? (Number(raw.tkOut) || 0) : 0,
+    tokens: raw ? ((Number(raw.tkIn) || 0) + (Number(raw.tkOut) || 0)) : 0,
+    at:     raw ? (Number(raw.at)   || 0) : 0
+  };
+}
+/* 账本快照（给接口用）。带 30 分钟内存缓存：同一窗口内重复访问不读盘。
+   缓存由 bumpStats 写入时同步刷新，所以窗口内看到的一定是最新值。 */
+function publicStats(){
+  const now = Date.now();
+  if (_statsCache.val && now - _statsCache.at < STATS_TTL_MS) return _statsCache.val;
+  const val = statsOf(readStatsRaw());
+  _statsCache = { at: now, val };
+  return val;
+}
+/* 一次性回填：拿现有 events.json 里的历史算出初始值写进账本。
+   只在账本不存在时跑（部署脚本调一次）；已存在则原样返回，绝不覆盖已累计的数。 */
+function backfillStats(){
+  if (readStatsRaw()) return { skipped: true };
+  const db = readEvents();
+  const b = blankStats(); b.ips = [];
+  for (const e of db.events){
+    if (e && e.ip && b.ips.indexOf(e.ip) < 0) b.ips.push(e.ip);
+  }
+  b.ipN = b.ips.length;
+  b.subs = db.events.length;   /* 任务数口径：一条事件 = 一次翻译任务 */
+  b.tkIn  = db.events.reduce((a, e) => a + (Number(e.tkIn)  || 0), 0);
+  b.tkOut = db.events.reduce((a, e) => a + (Number(e.tkOut) || 0), 0);
+  b.tkCache = db.events.reduce((a, e) => a + (Number(e.tkCache) || 0), 0);
+  b.at = Date.now();
+  fs.writeFileSync(STATS_PATH, JSON.stringify(b), 'utf8');
+  _statsCache = { at: 0, val: null };
+  return { skipped: false, users: b.ipN, subs: b.subs, tokens: b.tkIn + b.tkOut };
+}
+
+/* ---------------- 使用行为记录（仅元数据：文件名/条数，不含字幕内容） ---------------- */
 const EVENTS_PATH = path.join(DATA_DIR, 'events.json');
 const EVENTS_MAX = 3000;             // 最多保留条数（防无限增长，超出裁掉最旧的）
 const EVENT_DEDUP_MS = 30 * 60 * 1000; // 同 IP 同文件同语言 30 分钟内视为同一会话（批次累加）
@@ -191,6 +271,10 @@ function appendEvent(ip, meta, model, extra){
   db.events.push(ev);
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
   fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+  /* v0.9.212：累计账本顺带累加。位置很关键——只在「新建事件」这一处加，
+     上面那个同会话去重分支（batches+1）提前 return，不会走到这里，
+     所以同一任务的第 2/3 批不会把字幕数重复计入。自带 Key 用户进不了本函数，不受影响。 */
+  bumpStats({ ip: ip, subs: 1 });
 }
 /* 前端生命周期上报：翻译完成（finish）/ 下载字幕（download）。
    匹配窗口放宽到 3 小时（大文件翻译+用户迟些下载都算同一次会话），取最新一条。
@@ -293,6 +377,9 @@ function recordTokens(ip, meta, usage){
     e.tkOut = (e.tkOut || 0) + tk.tout;
     if (tk.tch) e.tkCache = (e.tkCache || 0) + tk.tch;
     fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
+    /* v0.9.212：token 进累计账本。放在这里而不是扫日志——上游每次返回的 usage 都是本批新产生的，
+       累加一次不多一次不少；真没匹配到事件时（下面打 warn 那种）也不补，缺那一笔语义明确。 */
+    bumpStats({ tin: tk.tin, tout: tk.tout, tch: tk.tch });
     return true;
   }
   /* v0.9.161：账记不上就留痕。以前静默 return false，「这单怎么没 token」只能靠猜——
@@ -1303,6 +1390,11 @@ async function callModel(cfg, messages, maxTokens, opts){
 const server = http.createServer(async (req, res) => {
   const u = req.url.split('?')[0];
   try {
+    /* 公开：累计统计（顶栏三个数字）。只读账本，不扫 events.json，服务端 30 分钟内存缓存。 */
+    if (req.method === 'GET' && u === '/api/stats') {
+      return sendJson(res, 200, publicStats());
+    }
+
     /* 公开：默认模型状态（前端展示用，不泄露 Key） */
     if (req.method === 'GET' && u === '/api/model-info') {
       const cfg = readConfig();

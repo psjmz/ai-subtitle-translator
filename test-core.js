@@ -5041,6 +5041,54 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(!/12\/56/.test(html) && !/21\/100/.test(html),
       '又出现「字号单独放大」的系数（应与位置共用 f）');
   });
+
+  t('v0.9.212 顶栏累计统计：只读账本、绝不扫日志，口径按用户定案', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    /* 用户要三个数字：累计服务用户 / 累计字幕数 / 累计 Token，每 30 分钟刷一次。
+       最容易犯的错是「扫 events.json 求和」——日志只留最近 3000 条（EVENTS_MAX），
+       扫出来的是「最近 3000 条的量」，数字会随旧记录被裁而**变小**，根本不叫累计。 */
+    assert.ok(/const STATS_PATH = path\.join\(DATA_DIR, 'stats\.json'\)/.test(srvSrc), '缺少独立累计账本 stats.json');
+    assert.ok(!/publicStats\(\)\s*\{[^}]*readEvents\(/.test(srvSrc),
+      'publicStats 去读 events.json 了——那算出来的是最近 3000 条的量，不是累计');
+    assert.ok(!/function bumpStats[\s\S]{0,900}readEvents\(/.test(srvSrc),
+      'bumpStats 里去读日志了（应当只改账本，绝不重扫）');
+    /* 累加点：字幕数只在「新建事件」那一处加 —— 同会话的第 2/3 批提前 return，不会重复计入；
+       token 在 recordTokens 处加（上游每次返回的 usage 都是本批新产生的）。 */
+    assert.ok(/db\.events\.push\(ev\);[\s\S]{0,320}bumpStats\(\{ ip: ip, subs: 1 \}\)/.test(srvSrc),
+      'appendEvent 新建事件后没有累加字幕数（口径必须是「每任务一次」）');
+    assert.ok(/bumpStats\(\{ tin: tk\.tin, tout: tk\.tout, tch: tk\.tch \}\)/.test(srvSrc),
+      'recordTokens 处没有累加 token');
+    /* users 只能靠去重 IP；数字不另存，避免与集合大小两个来源漂移 */
+    assert.ok(/cur\.ips\.indexOf\(d\.ip\) < 0/.test(srvSrc) && /cur\.ipN = cur\.ips\.length/.test(srvSrc),
+      '服务用户没有按去重 IP 计数');
+    /* 写入时必须同步刷新内存缓存：只靠 TTL 过期才重读的话，回填后第一个访客会把 0 缓存 30 分钟 */
+    assert.ok(/_statsCache = \{ at: Date\.now\(\), val: statsOf\(cur\) \}/.test(srvSrc),
+      'bumpStats 写完没有同步刷新缓存（首访会看到 0 长达 30 分钟）');
+    assert.ok(/const STATS_TTL_MS = 30 \* 60 \* 1000/.test(srvSrc) && /now - _statsCache\.at < STATS_TTL_MS/.test(srvSrc),
+      '接口没有 30 分钟缓存（每访客都读一次盘）');
+    assert.ok(/req\.method === 'GET' && u === '\/api\/stats'/.test(srvSrc), '缺少 /api/stats 接口');
+    /* 回填只能做一次，且绝不覆盖已累计的账 */
+    assert.ok(/if \(readStatsRaw\(\)\) return \{ skipped: true \};/.test(srvSrc), '回填会覆盖已累计的账本');
+    /* 前端：30 分钟定时 + 语言切换后重排（数字排版跟界面语言，不是目标字幕语言） */
+    assert.ok(/const STATS_EVERY_MS = 30 \* 60 \* 1000/.test(html) &&
+      /setInterval\(refreshStats, STATS_EVERY_MS\)/.test(html), '前端没有 30 分钟刷新');
+    assert.ok(/repaintStats\(\);/.test(html) && /UI\.lang/.test(html),
+      '切界面语言后没有按新语言重排数字');
+    /* 数字排版必须用界面语言 UI.lang，不能用目标字幕语言 curLang（那是译文语言，与排版无关） */
+    const paintSeg = html.slice(html.indexOf('function paintStats'), html.indexOf('async function refreshStats'));
+    assert.ok(paintSeg.length > 50, 'paintStats 段落定位失败（切片为空，断言会假通过）');
+    /* 剔除注释再查：注释里为了说明「别用 curLang」会提到它，那是给人看的，不是代码 */
+    const paintCode = paintSeg.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    assert.ok(/UI\.lang/.test(paintCode), '数字排版没有用界面语言 UI.lang');
+    assert.ok(!/curLang/.test(paintCode), '数字排版用了目标字幕语言 curLang，应为界面语言 UI.lang');
+    /* 词条：27 种界面语言必须齐（漏一条就退回混合语言） */
+    for (const k of ['statUsers', 'statSubs', 'statTokens']) {
+      const n = (html.match(new RegExp(k + "\\s*:\\s*'", 'g')) || []).length;
+      assert.ok(n === 27, k + ' 只有 ' + n + ' 种语言，应为 27');
+    }
+    assert.ok(/id="statsBar"/.test(html) && /id="statUsers"/.test(html) &&
+      /id="statSubs"/.test(html) && /id="statTok"/.test(html), '顶栏三个指标的元素缺失');
+  });
 }
 
 console.log('\n结果: ' + pass + ' 通过, ' + fail + ' 失败');
