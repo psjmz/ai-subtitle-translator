@@ -487,26 +487,21 @@
   .back:hover{color:var(--acc);background:var(--acc-weak)}
   .back svg{width:11px;height:11px;vertical-align:-1px;margin-right:3px}
   .proj{font-size:12px;color:var(--sub);background:#F4F3F1;border-radius:99px;padding:5px 13px;display:flex;align-items:center;gap:7px;max-width:34%;overflow:hidden}
-  /* v0.9.214：工作台顶栏滚动播报（累计服务人数 / 字幕数 / Token）。
-     慢速长卷 + 悬停暂停 —— 滚动文字最烦人的就是没法停下来看清。
-     flex:1 + min-width:0：右侧「上传/开始翻译/语言」永远不被挤出屏幕（appbar 是 nowrap 不换行）。
-     内容由 JS 生成两遍，首尾严丝合缝 → 循环无缝；动画时长按内容长度算，慢到能读完。 */
-  .ticker{flex:1 1 auto;min-width:0;overflow:hidden;height:26px;position:relative;
-          display:flex;align-items:center;background:#F7F6F4;border-radius:99px;padding:0 2px;
-          -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%);
-          mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 14px),transparent 100%)}
+  /* v0.9.215：工作台顶栏累计播报 —— 静态一行（v0.9.214 曾是滚动长卷，2026-10-03 用户定案：
+   「信息不多，不用滚动，直接显示就行」）。
+   静态后随之简化：不再需要动画/两遍拼接/时长自适应/悬停暂停/渐隐 mask，也不再会因内容变长而跳动。
+   flex:1 + min-width:0：右侧「上传/开始翻译/语言」永不被挤（appbar 是 nowrap 不换行）；
+   文字过长时只截尾（ellipsis），不换行不撑高。 */
+  .ticker{flex:1 1 auto;min-width:0;overflow:hidden;height:26px;
+          display:flex;align-items:center;background:#F7F6F4;border-radius:99px;padding:0 15px}
   .ticker[hidden]{display:none}
-  .tk-track{display:flex;align-items:center;white-space:nowrap;will-change:transform;
-            animation:tkScroll linear infinite}
-  .ticker:hover .tk-track,.ticker:focus-within .tk-track{animation-play-state:paused}
-  @keyframes tkScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  .tk-item{font-size:11.5px;color:var(--sub);padding:0 26px;display:inline-flex;align-items:center;gap:5px}
+  .tk-track{display:flex;align-items:center;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .tk-item{font-size:11.5px;color:var(--sub);display:inline-flex;align-items:center;gap:5px;flex:none}
   .tk-item b{font-family:var(--mono);font-weight:600;color:var(--ink)}
-  .tk-grp{display:inline-flex;align-items:center}   /* 一整组；两组并排 → -50% 精确对应一组的宽 */
-  .tk-sep{font-size:11.5px;color:var(--mut);padding:0 2px}
-  /* 数字更新时闪一下（30 分钟刷新），只在有动画时才有意义 */
+  .tk-sep{font-size:11.5px;color:var(--mut);padding:0 9px;flex:none}
+  /* 数字更新时闪一下（30 分钟刷新一次），静态下也保留作为「数据是活的」提示 */
   .tk-item b.upd{color:var(--acc);transition:color .5s ease}
-  /* 窄屏隐藏：顶栏 52px 塞不下滚动文字，宁可不显示也不能挤压按钮 */
+  /* 窄屏隐藏：顶栏 52px 塞不下这串文字，宁可不显示也不能挤压按钮 */
   @media (max-width:1000px){ .ticker{display:none} }
   .proj .live{width:6px;height:6px;border-radius:99px;background:#10B981;flex:none}
   .proj span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -810,7 +805,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.214</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.215</span></div>
       <div class="spacer"></div>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="navRepo">开源仓库</span></a>
@@ -972,7 +967,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.214</span>
+    <span class="ver-tag">v0.9.215</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1355,7 +1350,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.214"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.215"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1394,7 +1389,7 @@ async function refreshBuiltinHint(){
     ? t('builtinOn', BUILTIN_INFO.label, BUILTIN_INFO.perIpDaily>0 ? BUILTIN_INFO.perIpDaily : '∞')
     : t('builtinOff');
 }
-/* ---------------- 累计统计（v0.9.212 / v0.9.213）----------------
+/* ---------------- 累计统计（v0.9.212 / v0.9.213 / v0.9.215）----------------
    口径（服务端账本，见 server.js bumpStats）：
    - 服务用户 = 去重 IP 数；字幕数 = 经服务端跑过的翻译任务数（同任务重发不重复加）
    - Token = 累计 tkIn + tkOut（含缓存命中）
@@ -1469,23 +1464,17 @@ function buildTicker(){
   const one = tickerText();
   if (!one){ box.hidden = true; return; }
   box.hidden = false;
-  /* 两遍拼接：数字用等宽字体，读起来更稳；变化时给数字上色闪一下 */
-  track.innerHTML = '<span class="tk-grp">' + one + '</span><span class="tk-grp">' + one + '</span>';
-  const first = track.firstElementChild;
-  if (first){
-    const marks = first.querySelectorAll('b');
-    for (let i = 0; i < marks.length; i++){
-      if (statsTickLast && statsTickLast[i] !== undefined && statsTickLast[i] !== marks[i].textContent){
-        marks[i].classList.add('upd');
-        (function(m){ setTimeout(()=>{ try{ m.classList.remove('upd'); }catch(e){} }, 900); })(marks[i]);
-      }
+  /* v0.9.215：静态一行（此前是滚动长卷）。随之简化——只写一遍、不算动画时长。
+     数字变化时给上色闪一下：静态下也保留，作为「数据是活的」提示（30 分钟刷新一次）。 */
+  track.innerHTML = one;
+  const marks = track.querySelectorAll('b');
+  for (let i = 0; i < marks.length; i++){
+    if (statsTickLast && statsTickLast[i] !== undefined && statsTickLast[i] !== marks[i].textContent){
+      marks[i].classList.add('upd');
+      (function(m){ setTimeout(()=>{ try{ m.classList.remove('upd'); }catch(e){} }, 900); })(marks[i]);
     }
-    statsTickLast = Array.prototype.map.call(marks, m => m.textContent);
   }
-  /* 时长 = 一组宽 / 28px每秒，至少 24 秒（太短看不清），最多 70 秒 */
-  const w = first ? first.getBoundingClientRect().width : 0;
-  const sec = w ? Math.max(24, Math.min(70, w / 28)) : 40;
-  track.style.animationDuration = sec + 's';
+  statsTickLast = Array.prototype.map.call(marks, m => m.textContent);
 }
 /* 切界面语言后重排：只换排版，不重新拉接口。
    数字从 DOM 现有文本反解不靠谱（万/亿 与 K/M/B 互推有损），所以以 statsRaw 为准；
@@ -1499,14 +1488,8 @@ function startStats(){
   if (statsTimer) return;
   refreshStats();
   statsTimer = setInterval(refreshStats, STATS_EVERY_MS);
-  /* v0.9.214：窗口尺寸变了要重算动画时长（内容在窄屏被裁，速度不变就会滚得太快看不清）。
-     rAF 节流，和页面里其它 resize 处理一致。 */
-  let q = false;
-  window.addEventListener('resize', function(){
-    if (q) return;
-    q = true;
-    requestAnimationFrame(function(){ q = false; try{ buildTicker(); }catch(e){} });
-  });
+  /* v0.9.215：播报改成静态后不再需要 resize 重算动画时长（CSS 截尾自适应），
+     此前为滚动长卷加的 rAF 节流重算已随之删除。 */
 }
 /* ---------------- 语言 / 风格配置 ---------------- */
 const LANGS = [

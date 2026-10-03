@@ -5105,22 +5105,26 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '首页数字带还在显示「时间轴对齐 / 字幕上传服务器」（用户 10-03 要求去掉）');
   });
 
-  t('v0.9.214 工作台顶栏滚动播报：慢速长卷 + 悬停暂停 + 不挤按钮', () => {
+  t('v0.9.215 顶栏播报改静态一行（信息不多，不必滚动）', () => {
     assert.ok(/id="ticker"/.test(html) && /id="tkTrack"/.test(html), '顶栏缺少播报容器');
-    /* 滚动文字最烦人的就是停不下来 → 悬停必须能暂停 */
-    assert.ok(/\.ticker:hover \.tk-track,.ticker:focus-within \.tk-track\{animation-play-state:paused\}/.test(html),
-      '鼠标悬停不能暂停滚动');
-    assert.ok(/@keyframes tkScroll\{from\{transform:translateX\(0\)\}to\{transform:translateX\(-50%\)\}\}/.test(html),
-      '滚动动画不是 0 → -50%（两遍拼接时 -50% 正好对应一组宽度，接缝才对得上）');
-    /* 两遍拼接：只写一遍会在循环时看到空白 */
-    const tj = html.slice(html.indexOf('function buildTicker'), html.indexOf('function buildTicker') + 1400);
-    assert.ok(/<span class="tk-grp">/.test(tj) && /tk-grp.*tk-grp/s.test(tj), '播报内容没有生成两遍（循环会露出空白）');
-    /* 慢速 + 时长自适应：快了看不清 */
-    assert.ok(/w \/ 28/.test(tj) && /Math\.max\(24, Math\.min\(70/.test(tj),
-      '动画时长没有按内容宽度自适应（应 24~70 秒，慢到能读完）');
-    /* 顶栏是 nowrap 不换行：播报区必须能收缩，且窄屏整体隐藏，不能把右侧按钮挤出屏幕 */
+    /* 用户 2026-10-03 定案：静态直接显示。滚动那套一律不许复活。 */
+    assert.ok(!/animation:tkScroll/.test(html), '播报又在滚动（用户已定案：信息不多，直接显示）');
+    assert.ok(!/@keyframes tkScroll/.test(html), '滚动动画关键帧没删干净');
+    assert.ok(!/tk-grp/.test(html), '还在生成两遍内容（静态只需一遍）');
+    assert.ok(!/animationDuration/.test(html), '还在算动画时长（静态用不上）');
+    assert.ok(!/animation-play-state:paused/.test(html), '悬停暂停是滚动才需要的（静态无需）');
+    /* 位移只查播报自己的 CSS/JS —— 页面里 data-tip / .info 气泡大量用 translateX(-50%) 定位，别误伤 */
+    const tkCss = html.slice(html.indexOf('.ticker{flex:1 1 auto'), html.indexOf('.proj .live'));
+    assert.ok(tkCss.indexOf('translateX') < 0, '播报 CSS 里还有位移（滚动残留）');
+    assert.ok(html.slice(html.indexOf('function buildTicker'), html.indexOf('function buildTicker') + 900).indexOf('translateX') < 0,
+      'buildTicker 里还有位移（滚动残留）');
+    assert.ok(!/window\.addEventListener\('resize'[\s\S]{0,200}buildTicker/.test(html),
+      '还在 resize 重算时长（静态靠 CSS 截尾自适应）');
+    /* 静态下真正要保证的：能收缩不挤按钮、文字过长只截尾、数字变化仍闪一下 */
     assert.ok(/\.ticker\{flex:1 1 auto;min-width:0;overflow:hidden/.test(html), '播报区不能收缩，会挤掉右侧按钮');
     assert.ok(/@media \(max-width:1000px\)\{ \.ticker\{display:none\} \}/.test(html), '窄屏没有隐藏播报');
+    assert.ok(/\.tk-track\{[^}]*text-overflow:ellipsis/.test(html), '文字过长没有截尾（会撑破 52px 顶栏）');
+    assert.ok(/\.tk-item b\.upd\{color:var\(--acc\)/.test(html), '数字变化时的闪烁提示丢了');
     /* 数字高亮不能用正则去猜数字形态：各语言千分位不同（de 2.464 / ru 窄空格 2 464 / en 2,464），
        正则一猜就出错（实测俄语被拆成两段、尾随空格被包进标签）。必须按「格式化后的确切字符串」定位。 */
     const tt = html.slice(html.indexOf('function tickerText'), html.indexOf('function buildTicker'));
@@ -5134,8 +5138,6 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       'paintStats 没有顺带重建播报（两者应同源）');
     assert.ok(html.indexOf("buildTicker();     /* 播报里的文案也要按新语言重排 */") >= 0,
       '切语言后播报文案没重排');
-    assert.ok(/window\.addEventListener\('resize'/.test(html.slice(html.indexOf('function startStats'), html.indexOf('function startStats') + 700)),
-      '窗口尺寸变化没重算播报时长');
     /* 词条：3 × 27 语 */
     for (const k of ['tickServed', 'tickSubs', 'tickToken']) {
       const n = (html.match(new RegExp(k + "\\s*:\\s*'", 'g')) || []).length;
