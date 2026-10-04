@@ -722,7 +722,8 @@
       if (en <= st) issues.push({ type: 'time', at: li + 1, msg: '结束时间早于开始时间', code: 'endLtStart' });
       if (st < prevEnd - 1) issues.push({ type: 'overlap', at: li + 1, msg: '与上一条时间轴重叠', code: 'overlap' });
       if (en > prevEnd) prevEnd = en;
-      items.push({ no: items.length + 1, start: st, end: en, text: body });
+      /* v0.9.222：style 保留到条目上（additive）——「调整双语字幕」模式要按样式名分原文/译文两路 */
+      items.push({ no: items.length + 1, start: st, end: en, text: body, style: col('style') });
     });
     if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
     return { items, issues };
@@ -2700,6 +2701,117 @@
     return out;
   }
 
+  // ================= 双语字幕拆分（v0.9.222「调整模式」，纯本地）=================
+  // 用途：用户手里已有一份双语字幕（别人压好的、软件导出的），扔进来拆成原文/译文两列，
+  // 之后走现有预览/偏移/体检/导出全链路——翻新老双语字幕（SRT 转 ASS、重新折行、换样式、修轴）。
+  // 三种形态：two-line（一条 cue 内原文一行+译文一行）/ folded（折过行，按语言聚类拆）/
+  // alternating+style（单行条目按时间配对；ASS 带 style 时按样式投票分边）。
+  function scriptProfile(s) {
+    let han = 0, kana = 0, hangul = 0, latin = 0;
+    const str = String(s == null ? '' : s);
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      if (c >= 0x4E00 && c <= 0x9FFF) han++;
+      else if (c >= 0x3040 && c <= 0x30FF) kana++;
+      else if (c >= 0xAC00 && c <= 0xD7A3) hangul++;
+      else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A)) latin++;
+    }
+    return { han, kana, hangul, latin };
+  }
+  function isCjkLine(s) {
+    const p = scriptProfile(s);
+    return (p.han + p.kana + p.hangul) > p.latin;
+  }
+  function splitBilingual(items, opts) {
+    const force = opts && (opts.mode === 'two-line' || opts.mode === 'alternating') ? opts.mode : 'auto';
+    const rep = { mode: 'auto', twoLine: 0, folded: 0, alternating: 0, stylePair: 0, uncertain: 0, singles: 0 };
+    const rows = [];
+    const its = (items || []).filter(it => it && String(it.text == null ? '' : it.text).trim());
+    if (!its.length) return { rows, report: rep };
+
+    const linesOf = (it) => String(it.text).split('\n').map(s => s.trim()).filter(Boolean);
+    let two = 0, one = 0, multi = 0;
+    const styles = new Set();
+    its.forEach(it => {
+      const n = linesOf(it).length;
+      if (n === 2) two++; else if (n === 1) one++; else multi++;
+      if (it.style) styles.add(it.style);
+    });
+    let mode = force;
+    if (mode === 'auto') {
+      if (multi > 0 && multi >= two) mode = 'folded';
+      else if (two > 0 && two >= one) mode = 'two-line';
+      else if (styles.size >= 2 && one >= 2) mode = 'style';
+      else mode = 'alternating';
+    }
+    rep.mode = mode;
+
+    if (mode === 'two-line' || mode === 'folded') {
+      its.forEach(it => {
+        const ls = linesOf(it);
+        if (ls.length === 2) {
+          rows.push({ start: it.start, end: it.end, en: ls[0], zh: ls[1], flag: '' }); rep.twoLine++;
+          // 两侧同文种（英法、日韩等 2 行 cue）：方向只能按行序猜，标 uncertain 让 UI 提醒核对
+          if (isCjkLine(ls[0]) === isCjkLine(ls[1])) rep.uncertain++;
+        }
+        else if (ls.length > 2) {
+          const cjk = [], lat = [];
+          ls.forEach(l => (isCjkLine(l) ? cjk : lat).push(l));
+          if (cjk.length && lat.length) {
+            rows.push({ start: it.start, end: it.end, en: lat.join('\n'), zh: cjk.join('\n'), flag: '' });
+          } else {
+            // 同文种双语（英法、日韩等）：上半=原文、下半=译文，标记 uncertain 让 UI 提醒核对
+            const h = Math.ceil(ls.length / 2);
+            rows.push({ start: it.start, end: it.end, en: ls.slice(0, h).join('\n'), zh: ls.slice(h).join('\n'), flag: '' });
+            rep.uncertain++;
+          }
+          rep.folded++;
+        } else {
+          rows.push({ start: it.start, end: it.end, en: ls[0] || '', zh: '', flag: 'drop' });
+          rep.singles++;
+        }
+      });
+    } else {
+      // alternating / style：单行条目按时间配对（overlapMs>0 才算一对）
+      const styleSides = {};
+      if (mode === 'style' && styles.size >= 2) {
+        const vote = {};
+        styles.forEach(st => { vote[st] = 0; });
+        its.forEach(it => { if (it.style && vote[it.style] !== undefined) vote[it.style] += isCjkLine(it.text) ? -1 : 1; });
+        // 拉丁占比高的样式 = 原文侧（英剧字幕最常见）；同级平票时第一个样式当原文
+        const arr = Array.from(styles).sort((a, b) => (vote[b] - vote[a]) || String(a).localeCompare(String(b)));
+        styleSides[arr[0]] = 'en';
+        styles.forEach(st => { if (st !== arr[0]) styleSides[st] = 'zh'; });
+      }
+      let i = 0;
+      while (i < its.length) {
+        const a = its[i], b = its[i + 1];
+        const la = linesOf(a).join(' ');
+        if (b) {
+          const lb = linesOf(b).join(' ');
+          if (overlapMs(a, b) > 0) {
+            let en = la, zh = lb;
+            if (mode === 'style') {
+              const sa = styleSides[a.style] || 'en';
+              en = sa === 'en' ? la : lb; zh = sa === 'en' ? lb : la;
+              rep.stylePair++;
+            } else {
+              if (isCjkLine(la) && !isCjkLine(lb)) { en = lb; zh = la; }   // latin 侧当原文
+              rep.alternating++;
+            }
+            rows.push({ start: Math.min(a.start, b.start), end: Math.max(a.end, b.end), en, zh, flag: '' });
+            i += 2;
+            continue;
+          }
+        }
+        rows.push({ start: a.start, end: a.end, en: la, zh: '', flag: 'drop' });
+        rep.singles++;
+        i += 1;
+      }
+    }
+    return { rows, report: rep };
+  }
+
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
@@ -2713,6 +2825,7 @@
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     alignRows, overlapMs, shiftTimeline, checkTimeline,   // v0.9.218 双文件合并（纯新增）
+    splitBilingual, scriptProfile,                        // v0.9.222 调整模式：双语字幕拆分
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
     validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,

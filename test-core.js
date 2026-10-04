@@ -5314,7 +5314,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.219/.test(mg), 'merge.html 未引用 v0.9.219 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.222/.test(mg), 'merge.html 未引用 v0.9.222 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5344,12 +5344,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/I18N\['en'\]\[k\] !== undefined \? I18N\['en'\]\[k\]/.test(mg), 't() 缺英文回退层');
   });
 
-  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.221 + merge 入口 + 描边色方块 id 配对', () => {
+  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.222 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.221</.test(html), '首页版本号未升 0.9.221');
-    assert.ok(/class="ver-tag">v0\.9\.221</.test(html), '工作台版本号未升 0.9.221');
-    assert.ok(/srt-core\.js\?v=0\.9\.221/.test(html), 'srt-core.js?v 未升 0.9.221');
+    assert.ok(/class="ver">v0\.9\.222</.test(html), '首页版本号未升 0.9.222');
+    assert.ok(/class="ver-tag">v0\.9\.222</.test(html), '工作台版本号未升 0.9.222');
+    assert.ok(/srt-core\.js\?v=0\.9\.222/.test(html), 'srt-core.js?v 未升 0.9.222');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5417,5 +5417,82 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     ['lblTpl','tplSrt','tplVtt','tplSplit','tplStack','tplCustom','lblLayout','layoutSplit','layoutStack','tplHintPlain','tplHintPreset','tplHintCustom','assReset','assResetDone']
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
+  });
+
+  /* ================= v0.9.222：双语调整模式 ================= */
+  t('merge-core：splitBilingual 三形态识别 + 折行聚类 + 同文种不确定标记', () => {
+    assert.strictEqual(typeof M.splitBilingual, 'function', '缺 splitBilingual');
+    /* A. 单条双行 */
+    let out = M.splitBilingual([
+      { start: 0, end: 1000, text: 'Hello there\n你好呀' },
+      { start: 2000, end: 3000, text: 'Bye now\n再见啦' },
+    ]);
+    assert.strictEqual(out.report.mode, 'two-line', '双行形态应识别 two-line');
+    assert.strictEqual(out.rows.length, 2);
+    assert.strictEqual(out.rows[0].en, 'Hello there');
+    assert.strictEqual(out.rows[0].zh, '你好呀');
+    assert.strictEqual(out.rows[1].zh, '再见啦');
+    /* B. 折行聚类：3 行里 2 行拉丁 1 行中文 → 拉丁并原文、中文归译文 */
+    out = M.splitBilingual([{ start: 0, end: 2000, text: 'This is a long line\nthat wrapped here\n这是一条中文译文' }]);
+    assert.strictEqual(out.report.mode, 'folded', '折行形态应识别 folded');
+    assert.strictEqual(out.rows[0].en, 'This is a long line\nthat wrapped here');
+    assert.strictEqual(out.rows[0].zh, '这是一条中文译文');
+    assert.strictEqual(out.report.folded, 1);
+    /* C. 同文种折行（英法）→ uncertain 计数 + 上/下半拆分 */
+    out = M.splitBilingual([{ start: 0, end: 2000, text: 'hello world\nbonjour le monde' }]);
+    assert.ok(out.report.uncertain >= 1, '同文种应标 uncertain');
+    assert.strictEqual(out.rows[0].en, 'hello world');
+    assert.strictEqual(out.rows[0].zh, 'bonjour le monde');
+    /* D. 交替成对 */
+    out = M.splitBilingual([
+      { start: 0, end: 900, text: 'Hi' },
+      { start: 0, end: 900, text: '嗨' },
+      { start: 1000, end: 1900, text: 'Bye' },
+      { start: 1000, end: 1900, text: '再见' },
+    ]);
+    assert.strictEqual(out.report.mode, 'alternating', '交替形态应识别 alternating');
+    assert.strictEqual(out.rows.length, 2);
+    assert.strictEqual(out.rows[1].en, 'Bye');
+    assert.strictEqual(out.rows[1].zh, '再见');
+    /* 强制指定模式：opts.mode */
+    out = M.splitBilingual([{ start: 0, end: 900, text: 'Hi\n嗨' }], { mode: 'two-line' });
+    assert.strictEqual(out.rows[0].zh, '嗨');
+    /* 空输入不炸 */
+    out = M.splitBilingual([]);
+    assert.strictEqual(out.rows.length, 0);
+  });
+
+  t('merge.html：模式切换 UI + 调整模式 JS 钩子 + 21 个新词条 ×4 语', () => {
+    /* mode-tabs：两个 radio */
+    assert.ok(/name="workMode" value="merge" checked/.test(mg), '缺 merge 默认 radio');
+    assert.ok(/name="workMode" value="adjust"/.test(mg), '缺 adjust radio');
+    /* 关键 id 群：逐字对照（v0.9.220 方块 id 错位教训） */
+    ['srcCard','dstCard','srcCardTitle','structLbl','structRow','structMode','btnSwap','formWarn','optTitle','alignRow','alignLbl','shiftHintEl']
+      .forEach(id => assert.ok(mg.indexOf('id="' + id + '"') > 0, 'merge.html 缺 id=' + id));
+    /* 结构识别下拉三选项 */
+    ['value="auto"','value="two-line"','value="alternating"'].forEach(v =>
+      assert.ok(mg.indexOf('<option ' + v) > 0, 'structMode 缺选项 ' + v));
+    /* JS 钩子 */
+    ['function syncMode()','function doAdjust()','function swapSides()','function setI18nKey(',
+     'function localeSrcItems()','function localeDstItems()']
+      .forEach(fn => assert.ok(mg.indexOf(fn) > 0, 'merge.html 缺 ' + fn));
+    /* 统一入口：doMerge 里 adjust 分流 */
+    assert.ok(/if \(S\.mode === 'adjust'\)\{ doAdjust\(\); return; \}/.test(mg), 'doMerge 未分流 adjust');
+    /* 调整模式语言口径：从 rows 取两列（S.src 是整份双语文件，直接猜必错） */
+    assert.ok(/S\.mode==='adjust' \? \(S\.rows\|\|\[\]\)\.map\(r=>\(\{text:r\.en\}\)\)/.test(mg), 'localeSrcItems 未按模式分流');
+    /* 切模式清旧结果 */
+    assert.ok(/if \(S\.rows\)\{ S\.rows = null/.test(mg), '切模式未清预览');
+    /* 事件绑定 */
+    assert.ok(/#modeTabs input\[name=workMode\]/.test(mg), 'mode-tabs 未绑定');
+    assert.ok(/\$\('btnSwap'\)\.addEventListener\('click', swapSides\)/.test(mg), 'btnSwap 未绑定');
+    /* 21 个新词条 ×4 语 */
+    ['modeMerge','modeAdjust','biCard','optTitleAdjust','lblStruct','structAuto','structTwo','structAlt',
+     'swapBtn','structHint','lblShiftAll','shiftHintAll','btnAdjust','formTwoLine','formAlt','formStyle',
+     'formFolded','foldedWarn','uncertainWarn','swapped','needSrc']
+      .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
+        assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
+    /* 版本与缓存参数 */
+    assert.ok(/class="ver">v0\.9\.222</.test(mg), 'merge.html 版本未升 0.9.222');
+    assert.ok(/merge-core\.js\?v=0\.9\.222/.test(mg), 'merge-core.js?v 未升 0.9.222');
   });
 }

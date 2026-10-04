@@ -44,6 +44,14 @@
 
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
   @media (max-width:760px){.grid2{grid-template-columns:1fr}}
+  /* v0.9.222：模式切换（合并两份 / 调整一份双语） */
+  .mode-tabs{display:flex;gap:8px;margin-top:20px}
+  .mtab{flex:1;cursor:pointer}
+  .mtab input{position:absolute;opacity:0;pointer-events:none}
+  .mtab span{display:block;text-align:center;padding:11px 12px;border-radius:12px;font-size:14px;font-weight:600;
+    background:var(--card);color:var(--sub);border:1px solid var(--line);transition:all .15s}
+  .mtab:hover span{border-color:var(--line-strong)}
+  .mtab.on span{background:var(--acc);color:#fff;border-color:var(--acc)}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px}
   .card h2{font-size:14px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
   .card h2 .n{width:22px;height:22px;border-radius:99px;background:var(--acc-weak);color:var(--acc);
@@ -137,7 +145,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.221</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.222</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -148,9 +156,15 @@
     <p data-i18n="heroSub">上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。</p>
   </div>
 
+  <!-- v0.9.222：模式切换——合并两份（原有）/ 调整一份现成双语字幕（拆分翻新） -->
+  <div class="mode-tabs" id="modeTabs">
+    <label class="mtab on"><input type="radio" name="workMode" value="merge" checked><span data-i18n="modeMerge">合并两份字幕</span></label>
+    <label class="mtab"><input type="radio" name="workMode" value="adjust"><span data-i18n="modeAdjust">调整双语字幕</span></label>
+  </div>
+
   <div class="grid2">
-    <div class="card">
-      <h2><span class="n">1</span><span data-i18n="srcCard">原文字幕</span></h2>
+    <div class="card" id="srcCard">
+      <h2><span class="n">1</span><span id="srcCardTitle" data-i18n="srcCard">原文字幕</span></h2>
       <div class="drop" id="srcDrop" role="button" tabindex="0">
         <b data-i18n="btnPick">📂 点这里选文件，或直接拖进来</b>
         <span data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
@@ -160,7 +174,7 @@
       <div class="parse-ok" id="srcOk"></div>
       <div class="parse-bad" id="srcBad"></div>
     </div>
-    <div class="card">
+    <div class="card" id="dstCard">
       <h2><span class="n">2</span><span data-i18n="dstCard">译文字幕</span></h2>
       <div class="drop" id="dstDrop" role="button" tabindex="0">
         <b data-i18n="btnPick">📂 点这里选文件，或直接拖进来</b>
@@ -174,10 +188,10 @@
   </div>
 
   <div class="card opts">
-    <h2><span class="n">3</span><span data-i18n="optTitle">合并设置</span></h2>
+    <h2><span class="n">3</span><span id="optTitle" data-i18n="optTitle">合并设置</span></h2>
     <div class="frow">
-      <div class="flbl" data-i18n="lblAlign">对齐方式</div>
-      <div>
+      <div class="flbl" data-i18n="lblAlign" id="alignLbl">对齐方式</div>
+      <div id="alignRow">
         <div class="radios">
           <label><input type="radio" name="alignMode" value="order"><span data-i18n="alignOrder">按顺序</span></label>
           <label><input type="radio" name="alignMode" value="time" checked><span data-i18n="alignTime">按时间轴</span></label>
@@ -185,10 +199,23 @@
         </div>
         <div class="hint" id="alignHint" data-i18n="alignHintTime">两份字幕来自同一片源（条数一致）用「按顺序」最准；条数不同或轴有漂移，用「按时间轴」按重叠自动配对；译文时间轴更可靠时用「时间轴跟译文」。</div>
       </div>
-      <div class="flbl" data-i18n="lblShift">译文整体偏移（毫秒）</div>
+      <!-- v0.9.222：调整模式专用——结构识别（自动猜可手动改）+ 原文/译文互换 -->
+      <div class="flbl" data-i18n="lblStruct" id="structLbl" style="display:none">结构识别</div>
+      <div id="structRow" style="display:none">
+        <div class="radios" style="align-items:center;gap:8px;flex-wrap:wrap">
+          <select id="structMode" style="max-width:200px">
+            <option value="auto" data-i18n="structAuto">自动识别</option>
+            <option value="two-line" data-i18n="structTwo">单条双行</option>
+            <option value="alternating" data-i18n="structAlt">交替成对</option>
+          </select>
+          <button type="button" class="btn ghost" id="btnSwap" data-i18n="swapBtn">⇅ 原文/译文互换</button>
+        </div>
+        <div class="hint" data-i18n="structHint">自动判断双语结构；识别错了可手动指定。原文/译文方向反了点「互换」。</div>
+      </div>
+      <div class="flbl" id="shiftLbl" data-i18n="lblShift">译文整体偏移（毫秒）</div>
       <div>
         <input type="number" id="dstShift" value="0" step="100" style="max-width:160px">
-        <div class="hint" data-i18n="shiftHint">译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。</div>
+        <div class="hint" id="shiftHintEl" data-i18n="shiftHint">译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。</div>
       </div>
       <div class="flbl" data-i18n="lblBiMaxW">双语行宽</div>
       <div>
@@ -259,6 +286,8 @@
 
   <div class="rep" id="rep">
     <div class="rep-band" id="repBand"></div>
+    <!-- v0.9.222：折行拆分/同文种拆分的提醒（琥珀色）——用户定案：聚类结果必须看得见 -->
+    <div class="rep-issues" id="formWarn" style="display:none"></div>
     <div class="rep-issues" id="repIssues"></div>
     <div class="rep-clean" id="repClean"></div>
     <div class="tbl-wrap">
@@ -290,7 +319,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.219"></script>
+<script src="merge-core.js?v=0.9.222"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -308,6 +337,17 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文本粘贴到这里…',
     parsedOk:'✓ 已解析 {0}：{1} 条', parseFail:'✗ 解析失败：内容不是有效的字幕格式',
     optTitle:'合并设置',
+    modeMerge:'合并两份字幕', modeAdjust:'调整双语字幕',
+    biCard:'双语字幕（原始文件）', optTitleAdjust:'调整设置',
+    lblStruct:'结构识别', structAuto:'自动识别', structTwo:'单条双行', structAlt:'交替成对',
+    swapBtn:'⇅ 原文/译文互换', structHint:'自动判断双语结构，识别错了可手动指定；原文/译文方向反了点「互换」。',
+    lblShiftAll:'整体偏移（毫秒）', shiftHintAll:'整份字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。',
+    btnAdjust:'🔧 调整预览',
+    formTwoLine:'单条双行', formAlt:'交替成对', formStyle:'样式配对', formFolded:'折行拆分',
+    foldedWarn:'检测到折行条目：多行内容已按语言聚类拆为原文/译文两侧，请核对结果。',
+    uncertainWarn:'{0} 条结构不确定（两侧语言相同，按上半/下半拆分），请人工核对。',
+    swapped:'已互换原文/译文', needSrc:'请先上传或粘贴双语字幕',
+
     lblAlign:'对齐方式', alignOrder:'按顺序', alignTime:'按时间轴', alignDstTime:'时间轴跟译文',
     alignHintOrder:'两份字幕条数一致、来自同一片源：第 1 条配第 1 条，最准。', 
     alignHintTime:'两份字幕来自同一片源（条数一致）用「按顺序」最准；条数不同或轴有漂移，用「按时间轴」按重叠自动配对；译文时间轴更可靠时用「时间轴跟译文」。',
@@ -333,7 +373,7 @@ const I18N = {
     tagDrop:'未配上·不出现在成片', tagMerged:'并入上一条',
     pvNote:'预览最多显示前 {0} 条，完整内容以导出文件为准。',
     expTitle:'导出', btnDownload:'⬇ 下载字幕', btnCopy:'复制内容',
-    needBoth:'请先在上方提供原文和译文字幕（文件或粘贴均可）', needMerge:'请先点「合并预览」',
+    needBoth:'请先在上方提供原文和译文字幕（文件或粘贴均可）', needMerge:'请先点预览按钮生成结果',
     copied:'已复制到剪贴板', downloaded:'已开始下载',
     issOverlap:'#{0} 与前一条重叠 {1}ms', issShort:'#{0} 时长不足（短于 0.5 秒）',
     issNoDst:'#{0} 缺译文', issNoSrc:'#{0} 缺原文', issEmpty:'#{0} 两侧都为空',
@@ -347,6 +387,17 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文字貼到這裡…',
     parsedOk:'✓ 已解析 {0}：{1} 條', parseFail:'✗ 解析失敗：內容不是有效的字幕格式',
     optTitle:'合併設定',
+    modeMerge:'合併兩份字幕', modeAdjust:'調整雙語字幕',
+    biCard:'雙語字幕（原始檔案）', optTitleAdjust:'調整設定',
+    lblStruct:'結構識別', structAuto:'自動識別', structTwo:'單條雙行', structAlt:'交替成對',
+    swapBtn:'⇅ 原文/譯文互換', structHint:'自動判斷雙語結構，識別錯了可手動指定；原文/譯文方向反了點「互換」。',
+    lblShiftAll:'整體偏移（毫秒）', shiftHintAll:'整份字幕整體提前（負數）或延後（正數）。例如字幕晚了半秒填 -500。',
+    btnAdjust:'🔧 調整預覽',
+    formTwoLine:'單條雙行', formAlt:'交替成對', formStyle:'樣式配對', formFolded:'折行拆分',
+    foldedWarn:'偵測到折行條目：多行內容已按語言聚類拆為原文/譯文兩側，請核對結果。',
+    uncertainWarn:'{0} 條結構不確定（兩側語言相同，按上半/下半拆分），請人工核對。',
+    swapped:'已互換原文/譯文', needSrc:'請先上傳或貼上雙語字幕',
+
     lblAlign:'對齊方式', alignOrder:'按順序', alignTime:'按時間軸', alignDstTime:'時間軸跟譯文',
     alignHintOrder:'兩份字幕條數一致、來自同一片源：第 1 條配第 1 條，最準。',
     alignHintTime:'兩份字幕來自同一片源（條數一致）用「按順序」最準；條數不同或軸有漂移，用「按時間軸」按重疊自動配對；譯文時間軸更可靠時用「時間軸跟譯文」。',
@@ -372,7 +423,7 @@ const I18N = {
     tagDrop:'未配上·不出現在成片', tagMerged:'併入上一條',
     pvNote:'預覽最多顯示前 {0} 條，完整內容以匯出檔案為準。',
     expTitle:'匯出', btnDownload:'⬇ 下載字幕', btnCopy:'複製內容',
-    needBoth:'請先在上方提供原文和譯文字幕（檔案或貼上均可）', needMerge:'請先點「合併預覽」',
+    needBoth:'請先在上方提供原文和譯文字幕（檔案或貼上均可）', needMerge:'請先點預覽按鈕產生結果',
     copied:'已複製到剪貼簿', downloaded:'已開始下載',
     issOverlap:'#{0} 與前一條重疊 {1}ms', issShort:'#{0} 時長不足（短於 0.5 秒）',
     issNoDst:'#{0} 缺譯文', issNoSrc:'#{0} 缺原文', issEmpty:'#{0} 兩側都為空',
@@ -386,6 +437,17 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'or paste subtitle text here…',
     parsedOk:'✓ Parsed {0}: {1} cues', parseFail:'✗ Parse failed: not a valid subtitle format',
     optTitle:'Merge settings',
+    modeMerge:'Merge two subtitle files', modeAdjust:'Adjust a bilingual subtitle',
+    biCard:'Bilingual subtitle (source file)', optTitleAdjust:'Adjust settings',
+    lblStruct:'Structure detection', structAuto:'Auto-detect', structTwo:'Two lines per cue', structAlt:'Alternating pairs',
+    swapBtn:'⇅ Swap original/translation', structHint:'The bilingual structure is detected automatically; pick manually if detected wrong. Use "Swap" if the two sides are reversed.',
+    lblShiftAll:'Global shift (ms)', shiftHintAll:'Move the whole file earlier (negative) or later (positive). E.g. -500 if it runs half a second late.',
+    btnAdjust:'🔧 Adjust & preview',
+    formTwoLine:'two-line cues', formAlt:'alternating pairs', formStyle:'style pairs', formFolded:'folded cues',
+    foldedWarn:'Folded cues detected: multi-line cues were split into original/translation sides by language clustering — please review.',
+    uncertainWarn:'{0} cues with uncertain structure (same language on both sides, split top/bottom) — please review.',
+    swapped:'Original and translation swapped', needSrc:'Provide a bilingual subtitle first (file or paste)',
+
     lblAlign:'Pairing mode', alignOrder:'By order', alignTime:'By timeline', alignDstTime:'Follow translation',
     alignHintOrder:'Both files have the same cue count from the same source: cue 1 pairs with cue 1 — the most accurate.',
     alignHintTime:'Use “By order” when both files come from the same source and cue counts match; use “By timeline” when counts differ or timings drift; use “Follow translation” when the translated timings are more reliable.',
@@ -411,7 +473,7 @@ const I18N = {
     tagDrop:'Unpaired·excluded from output', tagMerged:'Folded into previous',
     pvNote:'Preview shows the first {0} rows only; the exported file contains everything.',
     expTitle:'Export', btnDownload:'⬇ Download subtitles', btnCopy:'Copy content',
-    needBoth:'Provide both the original and the translated subtitles first (file or paste)', needMerge:'Click “Merge & preview” first',
+    needBoth:'Provide both the original and the translated subtitles first (file or paste)', needMerge:'Click the preview button first',
     copied:'Copied to clipboard', downloaded:'Download started',
     issOverlap:'#{0} overlaps the previous cue by {1}ms', issShort:'#{0} too short (under 0.5s)',
     issNoDst:'#{0} missing translation', issNoSrc:'#{0} missing original', issEmpty:'#{0} both sides empty',
@@ -425,6 +487,17 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'または字幕テキストをここに貼り付け…',
     parsedOk:'✓ 解析しました {0}：{1} 件', parseFail:'✗ 解析失敗：有効な字幕形式ではありません',
     optTitle:'マージ設定',
+    modeMerge:'2 つの字幕をマージ', modeAdjust:'二か国語字幕を調整',
+    biCard:'二か国語字幕（元ファイル）', optTitleAdjust:'調整設定',
+    lblStruct:'構造識別', structAuto:'自動識別', structTwo:'1 条 2 行', structAlt:'交互ペア',
+    swapBtn:'⇅ 原文/訳文を入れ替え', structHint:'二か国語の構造を自動判定します。誤認識時は手動で指定できます。方向が逆の場合は「入れ替え」を押してください。',
+    lblShiftAll:'全体シフト（ミリ秒）', shiftHintAll:'ファイル全体を早める（負）または遅らせる（正）。例：0.5 秒遅い場合は -500。',
+    btnAdjust:'🔧 調整してプレビュー',
+    formTwoLine:'1 条 2 行', formAlt:'交互ペア', formStyle:'スタイルペア', formFolded:'折り返し分割',
+    foldedWarn:'折り返し条を検出：複数行の条は言語クラスタリングで原文/訳文に分割しました。確認してください。',
+    uncertainWarn:'{0} 条の構造が不確実（両側が同言語のため上半/下半で分割）。確認してください。',
+    swapped:'原文と訳文を入れ替えました', needSrc:'まず二か国語字幕を用意してください（ファイルまたは貼り付け）',
+
     lblAlign:'整合方式', alignOrder:'順序で', alignTime:'タイムラインで', alignDstTime:'訳文の軸に合わせる',
     alignHintOrder:'両ファイルが同じソースで件数が一致：1 番目同士を対応させる、最も正確。',
     alignHintTime:'同じソースで件数が一致するなら「順序で」が最も正確。件数が違う・軸がずれる場合は「タイムラインで」重なりから自動対応。訳文の軸が正確なら「訳文の軸に合わせる」。',
@@ -450,7 +523,7 @@ const I18N = {
     tagDrop:'未対応·出力に含まれない', tagMerged:'前の条に統合',
     pvNote:'プレビューは先頭 {0} 行のみ。完全な内容はエクスポートファイルで確認してください。',
     expTitle:'エクスポート', btnDownload:'⬇ 字幕をダウンロード', btnCopy:'内容をコピー',
-    needBoth:'まず原文と訳文字幕を用意してください（ファイルまたは貼り付け）', needMerge:'先に「マージしてプレビュー」を押してください',
+    needBoth:'まず原文と訳文字幕を用意してください（ファイルまたは貼り付け）', needMerge:'先にプレビューボタンを押してください',
     copied:'クリップボードにコピーしました', downloaded:'ダウンロードを開始しました',
     issOverlap:'#{0} が前の字幕と {1}ms 重複', issShort:'#{0} が短すぎ（0.5 秒未満）',
     issNoDst:'#{0} 訳文なし', issNoSrc:'#{0} 原文なし', issEmpty:'#{0} 両側とも空',
@@ -549,8 +622,35 @@ function alignMode(){
   return el ? el.value : 'time';
 }
 
-/* ================= 合并 ================= */
+/* ================= 合并 / 调整 ================= */
+/* v0.9.222 模式切换：merge = 原有「两份字幕合并」；adjust = 「调整双语字幕」
+   （一份现成双语字幕 → 自动拆原文/译文两列 → 走同一套预览/体检/导出） */
+function syncMode(){
+  const adj = S.mode === 'adjust';
+  $('dstCard').style.display = adj ? 'none' : '';
+  $('alignLbl').style.display = adj ? 'none' : '';
+  $('alignRow').style.display = adj ? 'none' : '';
+  $('structLbl').style.display = adj ? '' : 'none';
+  $('structRow').style.display = adj ? '' : 'none';
+  /* 标签随模式换词：直接换 data-i18n 键，语言切换时 applyI18n 会按新键渲染 */
+  setI18nKey($('srcCardTitle'), adj ? 'biCard' : 'srcCard');
+  setI18nKey($('shiftLbl'), adj ? 'lblShiftAll' : 'lblShift');
+  setI18nKey($('shiftHintEl'), adj ? 'shiftHintAll' : 'shiftHint');
+  setI18nKey($('btnMerge'), adj ? 'btnAdjust' : 'btnMerge');
+  setI18nKey($('optTitle'), adj ? 'optTitleAdjust' : 'optTitle');
+  document.querySelectorAll('#modeTabs .mtab').forEach(el=>{
+    el.classList.toggle('on', el.querySelector('input').value === S.mode);
+  });
+  /* 切模式后旧结果失效（rows 属于某个模式的拆分口径），清掉预览区 */
+  if (S.rows){ S.rows = null; S.report = null; $('rep').style.display = 'none'; $('exp').style.display = 'none'; }
+}
+function setI18nKey(el, key){
+  if (!el) return;
+  el.setAttribute('data-i18n', key);
+  el.textContent = t(key);
+}
 function doMerge(){
+  if (S.mode === 'adjust'){ doAdjust(); return; }
   if (!S.src || !S.dst){ toast(t('needBoth')); return; }
   const shift = parseInt($('dstShift').value, 10) || 0;
   /* 译文整体偏移在配对**之前**落到条目上：两份轴先对齐，再进 alignRows。
@@ -563,6 +663,47 @@ function doMerge(){
   S.rows = out.rows; S.report = out.report;
   renderReport();
   $('exp').style.display = 'block';
+}
+/* v0.9.222 调整模式：拆分双语字幕。偏移对整份文件生效（不分两侧）。 */
+function doAdjust(){
+  if (!S.src){ toast(t('needSrc')); return; }
+  const shift = parseInt($('dstShift').value, 10) || 0;
+  let items = S.src;
+  if (shift) items = items.map(it=>({ no: it.no,
+    start: Math.max(0, (Number(it.start)||0) + shift),
+    end: Math.max(0, (Number(it.end)||0) + shift),
+    text: it.text, style: it.style }));
+  const struct = $('structMode') ? $('structMode').value : 'auto';
+  const out = C.splitBilingual(items, struct === 'auto' ? {} : { mode: struct });
+  S.rows = out.rows;
+  /* 适配 renderReport 的口径：pairs/onlySrc/onlyDst 由 rows 现算；形态统计挂 form */
+  const onlySrc = [], onlyDst = [];
+  let pairs = 0;
+  out.rows.forEach((r, i)=>{
+    const e = String(r.en == null ? '' : r.en).trim(), z = String(r.zh == null ? '' : r.zh).trim();
+    if (e && z) pairs++;
+    else if (e) onlySrc.push(i);
+    else if (z) onlyDst.push(i);
+  });
+  S.report = { pairs, onlySrc, onlyDst, form: out.report };
+  renderReport();
+  $('exp').style.display = 'block';
+}
+/* 原文/译文互换：整列对调（调整模式拆错方向时一键纠正） */
+function swapSides(){
+  if (!S.rows || !S.rows.length){ toast(t('needMerge')); return; }
+  S.rows.forEach(r=>{ const tmp = r.en; r.en = r.zh; r.zh = tmp; });
+  const onlySrc = [], onlyDst = [];
+  let pairs = 0;
+  S.rows.forEach((r, i)=>{
+    const e = String(r.en == null ? '' : r.en).trim(), z = String(r.zh == null ? '' : r.zh).trim();
+    if (e && z) pairs++;
+    else if (e) onlySrc.push(i);
+    else if (z) onlyDst.push(i);
+  });
+  if (S.report) S.report = { pairs, onlySrc, onlyDst, form: S.report.form || null };
+  renderReport();
+  toast(t('swapped'));
 }
 function fmtShort(ms){
   const s = Math.max(0, Number(ms)||0);
@@ -577,6 +718,21 @@ function renderReport(){
   let band = chip(rep.pairs ? 'ok' : 'bad', 'repPaired', rep.pairs);
   if (rep.onlySrc.length) band += chip('warn', 'repOnlySrc', rep.onlySrc.length);
   if (rep.onlyDst.length) band += chip('warn', 'repOnlyDst', rep.onlyDst.length);
+  /* v0.9.222 调整模式：形态统计 + 折行/同文种提醒（用户定案：聚类拆分要看得见，错了能发现） */
+  if (S.mode === 'adjust' && rep.form){
+    const f = rep.form;
+    if (f.twoLine) band += chip('', 'formTwoLine', f.twoLine);
+    if (f.alternating) band += chip('', 'formAlt', f.alternating);
+    if (f.stylePair) band += chip('', 'formStyle', f.stylePair);
+    if (f.folded) band += chip('warn', 'formFolded', f.folded);
+    const notes = [];
+    if (f.folded) notes.push(t('foldedWarn'));
+    if (f.uncertain) notes.push(t('uncertainWarn', f.uncertain));
+    if (notes.length){
+      const nw = $('formWarn');
+      if (nw){ nw.style.display = 'block'; nw.innerHTML = notes.map(x=>'<div>'+esc(x)+'</div>').join(''); }
+    } else { const nw = $('formWarn'); if (nw) nw.style.display = 'none'; }
+  } else { const nw = $('formWarn'); if (nw) nw.style.display = 'none'; }
   $('repBand').innerHTML = band;
 
   const issues = C.checkTimeline(S.rows);
@@ -698,6 +854,10 @@ function assStyleOf(){
 function assTopMV(bottomDist, nLines, lineH){
   return Math.max(42, Math.min(1080, Math.round(1080 - bottomDist - (nLines||1)*lineH)));
 }
+/* v0.9.222：导出折行的语言判断来源——合并模式用两份上传；调整模式用拆出来的两列
+   （S.src 是整份双语文件，直接拿它猜「原语言」会错） */
+function localeSrcItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text:r.en})) : (S.src||[]); }
+function localeDstItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text:r.zh})) : (S.dst||[]); }
 /* ASS 事件：与主站 buildAssEvents 同构（分屏/堆叠、行高按字号推导、堆叠抬高走 assStackMV） */
 function buildAssEvents(){
   const fmt = expFmtVal();
@@ -705,10 +865,10 @@ function buildAssEvents(){
   const dstFirst = orderVal() === 'dst-first';
   const parts = C.buildBilingualParts(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
-    srcLocale: guessLocale(S.src || []),
-    dstLocale: guessLocale(S.dst || [])
+    srcLocale: guessLocale(localeSrcItems()),
+    dstLocale: guessLocale(localeDstItems())
   });
-  const srcV = guessLocale(S.src || []), dstV = guessLocale(S.dst || []);
+  const srcV = guessLocale(localeSrcItems()), dstV = guessLocale(localeDstItems());
   return parts.map(p=>{
     const dstText = p.dstLines.join('\n'), srcText = p.srcLines.join('\n');
     const nLines = s => s ? s.split('\n').length : 0;
@@ -751,7 +911,7 @@ function buildExport(){
     return C.formatAss(buildAssEvents(), { title: baseName() || 'merged', assStyle: assStyleOf() });
   const items = C.buildBilingual(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
-    srcLocale: guessLocale(S.src || []), dstLocale: guessLocale(S.dst || []),
+    srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems()),
     order: orderVal()
   });
   return fmt === 'vtt' ? C.formatVtt(items) : C.formatSrt(items);
@@ -854,6 +1014,13 @@ function init(){
   $('btnMerge').addEventListener('click', doMerge);
   $('btnDownload').addEventListener('click', doDownload);
   $('btnCopy').addEventListener('click', doCopy);
+  /* v0.9.222：模式切换 + 原文/译文互换 */
+  document.querySelectorAll('#modeTabs input[name=workMode]').forEach(el=>{
+    el.addEventListener('change', ()=>{ S.mode = el.value; syncMode(); });
+  });
+  $('btnSwap').addEventListener('click', swapSides);
+  S.mode = 'merge';
+  syncMode();
   applyI18n();
 }
 init();
