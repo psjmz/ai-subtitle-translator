@@ -831,7 +831,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.219</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.220</span></div>
       <div class="spacer"></div>
       <a href="merge.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/><path d="M12 12h9"/><path d="m18.5 9.5 2.5 2.5-2.5 2.5"/></svg><span data-i18n="navMerge">双语合并</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
@@ -994,7 +994,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.219</span>
+    <span class="ver-tag">v0.9.220</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1320,14 +1320,14 @@
           <div class="wr-cell ass-2f" id="assDstOutlineRow">
             <input type="number" id="assDstOutline" value="2.5" min="0" max="10" step="0.5" aria-labelledby="assHeadDst assRowOutline">
             <span class="ass-color-row ass-inline">
-              <span class="csw" id="assDstOutlineSw" style="background:#000000"></span>
+              <span class="csw" id="assDstOutlineColorSw" style="background:#000000"></span>
               <input type="text" id="assDstOutlineColor" value="#000000" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#000000" aria-labelledby="assHeadDst assRowOutline">
             </span>
           </div>
           <div class="wr-cell ass-2f" id="assSrcOutlineRow">
             <input type="number" id="assSrcOutline" value="2.5" min="0" max="10" step="0.5" aria-labelledby="assHeadSrc assRowOutline">
             <span class="ass-color-row ass-inline">
-              <span class="csw" id="assSrcOutlineSw" style="background:#000000"></span>
+              <span class="csw" id="assSrcOutlineColorSw" style="background:#000000"></span>
               <input type="text" id="assSrcOutlineColor" value="#000000" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#000000" aria-labelledby="assHeadSrc assRowOutline">
             </span>
           </div>
@@ -1425,7 +1425,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.219"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.220"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -9668,16 +9668,22 @@ function bindAssNew(){
   ['assDstOutlineColor','assSrcOutlineColor'].forEach(function(id){
     var el=$(id); if(!el || el.dataset.bound==='1') return;
     el.addEventListener('input', function(){ syncColorSw(id); });
-    el.addEventListener('change', function(){ normColor(id); });
+    el.addEventListener('change', function(){ normColor(id); save(); });
     el.dataset.bound='1';
   });
   [['assDstAlpha','assDstAlphaOut'],['assSrcAlpha','assSrcAlphaOut']].forEach(function(pair){
     var r=$(pair[0]), o=$(pair[1]); if(!r || !o || r.dataset.bound==='1') return;
     var upd=function(){ o.textContent=r.value+'%'; };
     r.addEventListener('input', upd);
-    r.addEventListener('change', upd);
+    r.addEventListener('change', function(){ upd(); save(); });
     r.dataset.bound='1';
     upd();
+  });
+  /* v0.9.220：描边粗细也要落盘 */
+  ['assDstOutline','assSrcOutline'].forEach(function(id){
+    var el=$(id); if(!el || el.dataset.bound==='1') return;
+    el.addEventListener('change', function(){ save(); });
+    el.dataset.bound='1';
   });
 }
 /* 失焦/change 时把 #aabbcc 规范成 #AABBCC，方便用户核对（不影响导出，hexToAss 本身大小写无关） */
@@ -9903,6 +9909,12 @@ function save(){
     assSizeSet:(UI.assSizeTouched?'1':'0'), assCtxV:'1',
     assDstColor:($('assDstColor')||{}).value, assSrcColor:($('assSrcColor')||{}).value,
     assDstMV:$('assDstMV').value, assSrcMV:$('assSrcMV').value,
+    /* v0.9.220：v0.9.217 新增的描边/字体/不透明度也要落盘（当时漏了，刷新即丢）。
+       这些字段没有自动联动、默认值固定，不像字号需要 touched 标记防「误判锁定」，直接无条件存。 */
+    assDstOutline:$('assDstOutline').value, assSrcOutline:$('assSrcOutline').value,
+    assDstOutlineColor:($('assDstOutlineColor')||{}).value, assSrcOutlineColor:($('assSrcOutlineColor')||{}).value,
+    assDstFont:($('assDstFont')||{}).value, assSrcFont:($('assSrcFont')||{}).value,
+    assDstAlpha:($('assDstAlpha')||{}).value, assSrcAlpha:($('assSrcAlpha')||{}).value,
     assDstMVSet:(UI.assDstMVSet||sv.assDstMVSet==='1')?'1':'0',
     assSrcMVSet:(UI.assSrcMVSet||sv.assSrcMVSet==='1')?'1':'0'
   };
@@ -9958,6 +9970,13 @@ if(UI.assSizeTouched){
 }
 if(sv.assDstColor!=null && sv.assDstColor!=='') $('assDstColor').value=sv.assDstColor;
 if(sv.assSrcColor!=null && sv.assSrcColor!=='') $('assSrcColor').value=sv.assSrcColor;
+/* v0.9.220：描边/不透明度恢复（字体在下方 fillAssFonts 之后回填——select 的 value 得先有 option 才设得进去） */
+if(sv.assDstOutline!=null && sv.assDstOutline!=='') $('assDstOutline').value=sv.assDstOutline;
+if(sv.assSrcOutline!=null && sv.assSrcOutline!=='') $('assSrcOutline').value=sv.assSrcOutline;
+if(sv.assDstOutlineColor!=null && sv.assDstOutlineColor!=='') $('assDstOutlineColor').value=sv.assDstOutlineColor;
+if(sv.assSrcOutlineColor!=null && sv.assSrcOutlineColor!=='') $('assSrcOutlineColor').value=sv.assSrcOutlineColor;
+if(sv.assDstAlpha!=null && sv.assDstAlpha!=='') $('assDstAlpha').value=sv.assDstAlpha;
+if(sv.assSrcAlpha!=null && sv.assSrcAlpha!=='') $('assSrcAlpha').value=sv.assSrcAlpha;
 if(sv.assDstMV!=null && sv.assDstMV!=='') $('assDstMV').value=sv.assDstMV;
 if(sv.assSrcMV!=null && sv.assSrcMV!=='') $('assSrcMV').value=sv.assSrcMV;
 UI.assDstMVSet = (!assLegacy && sv.assDstMVSet==='1'); UI.assSrcMVSet = (!assLegacy && sv.assSrcMVSet==='1');
@@ -10700,6 +10719,15 @@ syncAssStyleBox(); syncAssMVBox(); syncExpPreview();
 /* v0.9.217：字体下拉填充 + 描边色/滑杆的事件绑定（各函数内部有 dataset 幂等标记，重复调用安全） */
 try{ fillAssFonts(); }catch(e){}
 try{ bindAssNew(); }catch(e){}
+/* v0.9.220：字体记忆回填。必须在 fillAssFonts 之后（select.value 需 option 已存在）；
+   只认列表内的值——列表升级删掉某字体时，老存档静默回默认，不留空 select。 */
+(function(){
+  function restoreFont(id, v){
+    var el=$(id); if(!el || !v) return;
+    for(var i=0;i<el.options.length;i++){ if(el.options[i].value===v){ el.value=v; break; } }
+  }
+  restoreFont('assDstFont', sv.assDstFont); restoreFont('assSrcFont', sv.assSrcFont);
+})();
 /* v0.9.110：页面初始化末尾记录当前上下文，之后用户的每一次切换都能被正确判定 */
 ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
 /* v0.9.100：ASS 外观改动即时记忆 */
@@ -10732,6 +10760,8 @@ ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
   e.addEventListener('change',function(){ normColor(id); save(); });
 });
 syncColorSw('assDstColor'); syncColorSw('assSrcColor');
+/* v0.9.220：描边色方块初始同步（回填的存档值也要显色；此前 id 写错导致这里压根没绑上） */
+syncColorSw('assDstOutlineColor'); syncColorSw('assSrcOutlineColor');
 $('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
 $('dstLang').addEventListener('change',()=>{ UI.dstManual=true; setColLabels(); save(); });
 

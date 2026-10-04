@@ -5344,13 +5344,28 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/I18N\['en'\]\[k\] !== undefined \? I18N\['en'\]\[k\]/.test(mg), 't() 缺英文回退层');
   });
 
-  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.219 + merge 入口', () => {
+  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.220 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.219</.test(html), '首页版本号未升 0.9.219');
-    assert.ok(/class="ver-tag">v0\.9\.219</.test(html), '工作台版本号未升 0.9.219');
-    assert.ok(/srt-core\.js\?v=0\.9\.219/.test(html), 'srt-core.js?v 未升 0.9.219');
+    assert.ok(/class="ver">v0\.9\.220</.test(html), '首页版本号未升 0.9.220');
+    assert.ok(/class="ver-tag">v0\.9\.220</.test(html), '工作台版本号未升 0.9.220');
+    assert.ok(/srt-core\.js\?v=0\.9\.220/.test(html), 'srt-core.js?v 未升 0.9.220');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
+    /* v0.9.220 回归：syncColorSw 找的是 id+'Sw'，描边色方块 id 必须是 assXxxOutlineColorSw
+       （v0.9.217 曾写成 assXxxOutlineSw → 方块永远不刷新，用户设色看不到反馈） */
+    assert.ok(/id="assDstOutlineColorSw"/.test(html) && /id="assSrcOutlineColorSw"/.test(html),
+      '描边色方块 id 必须是 assXxxOutlineColorSw（与 syncColorSw 的 id+Sw 规则配对）');
+    assert.ok(!/id="assDstOutlineSw"/.test(html) && !/id="assSrcOutlineSw"/.test(html), '旧错位 id 残留');
+    /* v0.9.220 回归：v0.9.217 新字段必须进 save()/恢复 双向清单 */
+    ['assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor','assDstFont','assSrcFont','assDstAlpha','assSrcAlpha']
+      .forEach(k => {
+        const isFont = k === 'assDstFont' || k === 'assSrcFont';
+        const saveDecl = new RegExp(k + ':\\(\\$\\(\'' + k + '\'\\)\\|\\|\\{\\}\\)\\.value');
+        assert.ok(saveDecl.test(html) || new RegExp(k + ':\\$\\(\'' + k + '\'\\)\\.value').test(html), 'save() 缺 ' + k);
+        /* 字体回填走 restoreFont(id, sv.x)（select.value 需 option 先存在），其余走 sv.x!=null 直填 */
+        if (isFont) assert.ok(new RegExp('restoreFont\\(\'' + k + '\',\\s*sv\\.' + k + '\\)').test(html), '字体恢复缺 ' + k);
+        else assert.ok(new RegExp('sv\\.' + k + '!=null').test(html), '恢复逻辑缺 sv.' + k);
+      });
   });
 
   /* v0.9.219 用户定案：双语合并与翻译处理完全分开——合并专用代码只许在 merge-core.js */
