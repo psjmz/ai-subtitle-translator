@@ -5264,13 +5264,31 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(lonely && lonely.flag==='drop', '落单原文应保留为 drop 行');
   });
 
-  t('alignRows·dstTime：原文多出并入上一条（merged 行为回归）', () => {
+  t('alignRows·dstTime：原文多出并入上一条（v0.9.223 起合并文字，不再单列 merged 行）', () => {
     const r = M.alignRows(mk([[0,1000,'a'],[1000,2000,'b'],[2000,3000,'c']]),
                           mk([[0,1500,'甲'],[1500,3000,'乙']]), 'dstTime');
-    const m = r.rows.find(x=>x.en==='c');
-    assert.ok(m && m.flag==='merged', '多出的原文应是 merged 行');
+    const m = r.rows.find(x=>/c/.test(x.en));
+    assert.ok(m && m.flag === '', '多出的原文应并入上一条，不再是落单 drop 行');
+    assert.ok(r.report.merged >= 1, 'merged 计数应 >=1');
     const bi = M.buildBilingual(r.rows, {order:'src-first'});
     assert.ok(/b\s*c/.test(bi[1].text), 'merged 原文应并入上一条：' + JSON.stringify(bi.map(x=>x.text)));
+  });
+
+  t('alignRows·v0.9.223：轴跟谁走，另一份重叠进来的条目就合并文字（内容不丢）', () => {
+    /* time：1 条原文跨 4 秒 vs 译文 2 条 → 两条译文合并进同一行，轴仍取原文 */
+    const r = M.alignRows(mk([[0,4000,'Hello there']]), mk([[0,2000,'你好'],[2000,4000,'世界']]), 'time');
+    assert.strictEqual(r.rows.length, 1);
+    assert.deepStrictEqual([r.rows[0].start, r.rows[0].end], [0, 4000], '轴应取原文');
+    assert.ok(/你好/.test(r.rows[0].zh) && /世界/.test(r.rows[0].zh), '两条译文都要在：' + r.rows[0].zh);
+    assert.strictEqual(r.report.merged, 1);
+    /* 未被任何原文覆盖的译文：并入时间最接近那条，绝不静默丢弃 */
+    const r2 = M.alignRows(mk([[0,1000,'a'],[5000,6000,'b']]),
+                           mk([[0,1000,'甲'],[5500,6000,'乙'],[9000,9500,'丙']]), 'time');
+    assert.strictEqual(r2.rows.filter(x=>/丙/.test(x.zh)).length, 1,
+      '没被覆盖的译文也要并进最近一条：' + JSON.stringify(r2.rows));
+    /* order：轴取原文，译文多出并入上一条 */
+    const r3 = M.alignRows(mk([[0,1000,'a']]), mk([[0,1000,'甲'],[1000,2000,'乙']]), 'order');
+    assert.ok(/乙/.test(r3.rows[0].zh), 'order 轴原文：多出的译文并入上一条：' + JSON.stringify(r3.rows));
   });
 
   t('shiftTimeline：负偏移夹到 0、正偏移整体平移', () => {
@@ -5314,7 +5332,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.222/.test(mg), 'merge.html 未引用 v0.9.222 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.223/.test(mg), 'merge.html 未引用 v0.9.223 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5344,12 +5362,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/I18N\['en'\]\[k\] !== undefined \? I18N\['en'\]\[k\]/.test(mg), 't() 缺英文回退层');
   });
 
-  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.222 + merge 入口 + 描边色方块 id 配对', () => {
+  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.222</.test(html), '首页版本号未升 0.9.222');
-    assert.ok(/class="ver-tag">v0\.9\.222</.test(html), '工作台版本号未升 0.9.222');
-    assert.ok(/srt-core\.js\?v=0\.9\.222/.test(html), 'srt-core.js?v 未升 0.9.222');
+    assert.ok(/class="ver">v0\.9\.223</.test(html), '首页版本号未升 0.9.223');
+    assert.ok(/class="ver-tag">v0\.9\.223</.test(html), '工作台版本号未升 0.9.223');
+    assert.ok(/srt-core\.js\?v=0\.9\.223/.test(html), 'srt-core.js?v 未升 0.9.223');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5492,7 +5510,56 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.222</.test(mg), 'merge.html 版本未升 0.9.222');
-    assert.ok(/merge-core\.js\?v=0\.9\.222/.test(mg), 'merge-core.js?v 未升 0.9.222');
+    assert.ok(/class="ver">v0\.9\.223</.test(mg), 'merge.html 版本未升 0.9.223');
+    assert.ok(/merge-core\.js\?v=0\.9\.223/.test(mg), 'merge-core.js?v 未升 0.9.223');
+  });
+
+  /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
+  t('v0.9.223：三种模板各有自己的默认参数（切模板真的套参数）', () => {
+    assert.ok(/const TPL_DEFAULTS = \{/.test(mg), '缺 TPL_DEFAULTS');
+    const blk = mg.slice(mg.indexOf('const TPL_DEFAULTS = {'), mg.indexOf('TPL_DEFAULTS.custom'));
+    const pick = (k, f) => { const m = new RegExp(k + ': \\{[\\s\\S]*?' + f + ":?'?([0-9A-Fa-f#]+)'?").exec(blk); return m && m[1]; };
+    /* v0.9.219 的病：三个模板共用一套参数 → 导出逐字节相同，等于模板没生效 */
+    assert.notStrictEqual(pick('split','assSrcSize'), pick('stack','assSrcSize'), '两个模板的原文字号必须不同');
+    assert.notStrictEqual(pick('split','assSrcColor'), pick('stack','assSrcColor'), '两个模板的原文颜色必须不同');
+    assert.ok(/if \(tpl !== 'srt' && tpl !== 'vtt' && !assDirty\) applyTplDefaults\(tpl\)/.test(mg), '切模板未套参数');
+    assert.ok(/function applyTplDefaults\(/.test(mg), '缺 applyTplDefaults');
+    assert.ok(/let assDirty = false/.test(mg) && /assDirty = true/.test(mg), '缺 assDirty 微调标记');
+  });
+
+  t('v0.9.223：guessLocale 认中文 —— 此前中文返回空串，堆叠间距少算 21px 导致两行重叠', () => {
+    assert.ok(/c >= 0x4E00 && c <= 0x9FFF\) han\+\+/.test(mg), 'guessLocale 未统计汉字');
+    assert.ok(/if \(han >= 2 && han >= latin\) return 'zh-CN'/.test(mg), 'guessLocale 不返回中文');
+    /* 几何回归：中文译文 56 贴底、英文原文 50 在上，上面那条必须抬够高 */
+    const bottomMV = 42, dstSize = 56, srcSize = 50;
+    const topMV = M.assStackMV({ bottomMV: bottomMV, bottomSize: dstSize, bottomLang: 'zh-CN', bottomLines: 1, topSize: srcSize, topLang: 'en' });
+    assert.ok(topMV >= bottomMV + M.assLineHeight(dstSize),
+      '上面那条离底距离不够，两行会重叠: ' + topMV + ' < ' + (bottomMV + M.assLineHeight(dstSize)));
+    assert.strictEqual(topMV, 117, '中文译文的正确堆叠距离应为 117（修复前按拉丁算成 96）');
+  });
+
+  t('v0.9.223：ASS 效果预览 + 1080p 基准标注', () => {
+    ['assPv','assPvScreen','assPvLine1','assPvLine2','assPvTag'].forEach(id =>
+      assert.ok(mg.indexOf('id="' + id + '"') > 0, '缺 id=' + id));
+    assert.ok(/function renderAssPv\(\)/.test(mg), '缺 renderAssPv');
+    assert.ok(/\(scr\.clientHeight \|\| 240\) \/ 1080/.test(mg), '预览未按 1080p 等比缩放');
+    ['assNote1080','pvAssTitle','repMerged'].forEach(k => {
+      const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
+    assert.ok(/1920×1080|1920x1080/.test(mg), '缺 1080p 基准标注');
+  });
+
+  t('v0.9.223：对齐措辞写明「时间轴取自哪份」，离底距离不再写死 42', () => {
+    assert.ok(mg.indexOf("alignDstTime:'时间轴跟译文'") === -1, '旧的歧义措辞还在');
+    ['alignOrder','alignTime','alignDstTime'].forEach(k => {
+      const m = new RegExp("\\b" + k + ":'([^']+)'").exec(mg);
+      assert.ok(m && /时间轴/.test(m[1]), k + ' 未写明时间轴取自谁: ' + (m && m[1]));
+    });
+    assert.ok(!/dstFirst \? 42 : m\.dst/.test(mg) && !/dstFirst \? m\.src : 42/.test(mg), '贴底距离仍写死 42');
+    /* 并入语义：report.merged 必须存在并计数 */
+    const r = M.alignRows(mk([[0,4000,'Hello']]), mk([[0,2000,'你好'],[2000,4000,'世界']]), 'time');
+    assert.strictEqual(r.report.merged, 1);
+    assert.ok(mg.indexOf('repMerged') > 0, 'UI 未展示并入条数');
   });
 }

@@ -2602,64 +2602,97 @@
        report= { mode, srcN, dstN, pairs, onlySrc, onlyDst, noOverlap }
                onlySrc/onlyDst 是没配上对的下标数组（UI 要能告诉用户「有 3 条原文没配上」）。
   */
+  /* 两份文件配对成 rows。
+     items 形态来自 parseSrt/parseVtt/parseSbv/parseAss：[{no, start, end, text}]
+     mode（v0.9.223：每个选项都写明「怎么配」+「时间轴取谁的」，此前措辞把两件事混在一起）:
+       'order'   —— 按顺序逐条配对，时间轴取原文。
+       'time'    —— 按时间重叠配对，时间轴取原文。
+       'dstTime' —— 按顺序逐条配对，时间轴取译文。
+     ⚠️ v0.9.223 用户定案：时间轴跟谁走，另一份落进同一时段的条目就**合并文字拼进去**，
+     不再静默丢弃——此前条数不等（或轴有漂移）时多出的一侧直接落单，内容白白丢掉。
+     返回 { rows, report }：
+       rows   = [{start,end,en,zh,flag}]，可直接喂 buildBilingual(rows, opts)。
+                flag='drop' 表示该侧无内容（不进成片，但保留便于报告）。
+       report = { mode, srcN, dstN, pairs, onlySrc, onlyDst, noOverlap, merged }
+                merged  = 被并进某条的条目数（UI 要能告诉用户「有 3 条已并入」）。
+                onlySrc/onlyDst = 缺某一侧的行下标（并入之后仍缺才算）。 */
   function alignRows(srcItems, dstItems, mode) {
     const src = (srcItems || []).filter((x) => x && String(x.text == null ? '' : x.text).trim());
     const dst = (dstItems || []).filter((x) => x && String(x.text == null ? '' : x.text).trim());
     const m = mode || 'order';
     const rows = [];
-    const report = { mode: m, srcN: src.length, dstN: dst.length, pairs: 0, onlySrc: [], onlyDst: [], noOverlap: 0 };
+    const report = { mode: m, srcN: src.length, dstN: dst.length, pairs: 0, onlySrc: [], onlyDst: [], noOverlap: 0, merged: 0 };
+    const txt = (x) => String((x && x.text) == null ? '' : x.text).trim();
+    /* 拼接走书写系统感知的 joinSrc：中英之间自动补空格，中文之间不加 */
+    const joinTxt = (a, b) => (a && b) ? joinSrc(a, b) : (a || b);
+    const appendTo = (row, side, t) => {
+      if (!row || !t) return false;
+      if (side === 'zh') row.zh = joinTxt(row.zh, t); else row.en = joinTxt(row.en, t);
+      if (row.flag === 'drop') row.flag = '';
+      report.merged++;
+      return true;
+    };
+    const recalc = () => {
+      report.pairs = rows.filter((r) => r.flag !== 'drop' && r.en && r.zh).length;
+      report.onlySrc = rows.map((r, i) => (r.zh ? -1 : i)).filter((i) => i >= 0);
+      report.onlyDst = rows.map((r, i) => (r.en ? -1 : i)).filter((i) => i >= 0);
+    };
 
     if (m === 'order' || m === 'dstTime') {
+      const axisDst = (m === 'dstTime');   /* 轴取译文 → 原文只供文字；否则轴取原文 */
       const n = Math.max(src.length, dst.length);
       for (let i = 0; i < n; i++) {
         const a = src[i], b = dst[i];
-        if (m === 'dstTime') {
-          // 时间跟译文走：原文多出的条目并进上一条（flag='merged'，buildBilingualParts 会把源文并入承载行）
-          if (!b) { if (a) rows.push({ start: a.start, end: a.end, en: String(a.text), zh: '', flag: 'merged' }); continue; }
-          rows.push({ start: b.start, end: b.end, en: a ? String(a.text) : '', zh: String(b.text), flag: a ? '' : 'drop' });
-          if (!a) report.onlyDst.push(i);
-        } else {
-          if (a && b) rows.push({ start: a.start, end: a.end, en: String(a.text), zh: String(b.text), flag: '' });
-          else if (a) { rows.push({ start: a.start, end: a.end, en: String(a.text), zh: '', flag: 'drop' }); report.onlySrc.push(i); }
-          else { rows.push({ start: b.start, end: b.end, en: '', zh: String(b.text), flag: 'drop' }); report.onlyDst.push(i); }
+        const axis = axisDst ? b : a;
+        const fill = axisDst ? a : b;
+        const fillSide = axisDst ? 'en' : 'zh';
+        if (axis) {
+          rows.push({ start: axis.start, end: axis.end, en: txt(a), zh: txt(b), flag: (txt(a) && txt(b)) ? '' : 'drop' });
+          continue;
         }
+        /* 轴那份没有这一条：把另一份的文字并进上一条，内容不丢 */
+        const last = rows[rows.length - 1];
+        if (last && appendTo(last, fillSide, txt(fill))) continue;
+        rows.push({ start: fill.start, end: fill.end, en: txt(a), zh: txt(b), flag: 'drop' });
+        if (axisDst) report.onlySrc.push(i); else report.onlyDst.push(i);
       }
-      report.pairs = rows.filter((r) => r.flag !== 'drop' && r.en && r.zh).length;
+      recalc();
       return { rows, report };
     }
 
-    // 'time'：双指针 + 回看窗口。贪心吃最大重叠，
-    // 但不能犯「先抢小的、大的反而落空」——故窗口内取全局最大重叠者（lookback=8 条）。
-    const LOOK = 8;
-    let si = 0, di = 0;
+    // 'time'：时间轴取原文。每条原文收集**所有**与它重叠的译文，文字合并。
     const usedDst = new Array(dst.length).fill(false);
-    while (si < src.length) {
-      let bestJ = -1, bestOv = 0;
-      const hi = Math.min(dst.length, di + LOOK);
-      for (let j = di; j < hi; j++) {
+    src.forEach((a, si) => {
+      const hits = [];
+      for (let j = 0; j < dst.length; j++) {
         if (usedDst[j]) continue;
-        const ov = overlapMs(src[si], dst[j]);
-        if (ov > bestOv) { bestOv = ov; bestJ = j; }
+        if (overlapMs(a, dst[j]) > 0) hits.push(j);
       }
-      if (bestJ < 0) {
-        // 窗口内无重叠。若译文已明显落后（起点还在当前原文之前），先放掉它重试同一条原文；
-        // 否则这条原文确实没有伙伴——保留为 drop 行 + 记入 onlySrc，绝不静默丢弃。
-        if (dst[di] && dst[di].start < src[si].start) { usedDst[di] = true; report.onlyDst.push(di); di++; continue; }
-        rows.push({ start: src[si].start, end: src[si].end, en: String(src[si].text), zh: '', flag: 'drop' });
-        report.onlySrc.push(si);
-        si++;
-        continue;
+      if (!hits.length) {
+        rows.push({ start: a.start, end: a.end, en: txt(a), zh: '', flag: 'drop' });
+        report.onlySrc.push(si); report.noOverlap++;
+        return;
       }
-      // 补齐被跳过的中间译文（它们与当前原文无重叠，记为多余）
-      for (let j = di; j < bestJ; j++) { if (!usedDst[j]) { usedDst[j] = true; report.onlyDst.push(j); } }
-      const b = dst[bestJ];
-      rows.push({ start: src[si].start, end: src[si].end, en: String(src[si].text), zh: String(b.text), flag: '' });
+      hits.forEach((j) => { usedDst[j] = true; });
+      let zh = txt(dst[hits[0]]);
+      for (let k = 1; k < hits.length; k++) { zh = joinTxt(zh, txt(dst[hits[k]])); report.merged++; }
+      rows.push({ start: a.start, end: a.end, en: txt(a), zh: zh, flag: '' });
       report.pairs++;
-      if (bestOv === 0) report.noOverlap++;
-      usedDst[bestJ] = true;
-      si++; di = bestJ + 1;
+    });
+    /* 没被任何原文覆盖的译文：并入时间上最接近的那条，同样不丢内容 */
+    for (let j = 0; j < dst.length; j++) {
+      if (usedDst[j]) continue;
+      const b = dst[j], mid = (Number(b.start) + Number(b.end)) / 2;
+      let best = null, bestD = Infinity;
+      rows.forEach((r) => {
+        if (r.flag === 'drop' && !r.en) return;
+        const d = Math.abs(((Number(r.start) + Number(r.end)) / 2) - mid);
+        if (d < bestD) { bestD = d; best = r; }
+      });
+      if (best && appendTo(best, 'zh', txt(b))) continue;
+      report.onlyDst.push(j);
     }
-    for (let j = di; j < dst.length; j++) if (!usedDst[j]) report.onlyDst.push(j);
+    recalc();
     return { rows, report };
   }
 

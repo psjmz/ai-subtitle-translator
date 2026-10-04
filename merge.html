@@ -111,6 +111,14 @@
   .rep-chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 14px;font-size:12.5px}
   .rep-chip b{font-size:15px;margin-right:4px}
   .rep-chip.ok b{color:var(--ok)} .rep-chip.warn b{color:var(--warn)} .rep-chip.bad b{color:var(--del)}
+  /* v0.9.223：ASS 效果预览（16:9 画布，按 1080p 等比） */
+  .ass-pv{margin-bottom:12px}
+  .ass-pv-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);margin-bottom:6px}
+  .ass-pv-tag{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:11.5px}
+  .ass-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#111;border-radius:10px;overflow:hidden}
+  .ass-pv-line{position:absolute;left:0;right:0;text-align:center;white-space:pre-wrap;padding:0 6%;
+    font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif;line-height:1.2}
+  .ass-note{margin-bottom:8px}
   .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:10px;padding:9px 14px;
     font-size:12.5px;color:#8A5A0B;display:none;line-height:1.8}
   .rep-clean{margin-top:10px;background:var(--ok-weak);border-radius:10px;padding:9px 14px;
@@ -145,7 +153,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.222</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.223</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -190,14 +198,14 @@
   <div class="card opts">
     <h2><span class="n">3</span><span id="optTitle" data-i18n="optTitle">合并设置</span></h2>
     <div class="frow">
-      <div class="flbl" data-i18n="lblAlign" id="alignLbl">对齐方式</div>
+      <div class="flbl" data-i18n="lblAlign" id="alignLbl">配对方式 · 时间轴取自</div>
       <div id="alignRow">
         <div class="radios">
-          <label><input type="radio" name="alignMode" value="order"><span data-i18n="alignOrder">按顺序</span></label>
-          <label><input type="radio" name="alignMode" value="time" checked><span data-i18n="alignTime">按时间轴</span></label>
-          <label><input type="radio" name="alignMode" value="dstTime"><span data-i18n="alignDstTime">时间轴跟译文</span></label>
+          <label><input type="radio" name="alignMode" value="order"><span data-i18n="alignOrder">按顺序配对 · 用原文时间轴</span></label>
+          <label><input type="radio" name="alignMode" value="time" checked><span data-i18n="alignTime">按时间轴配对 · 用原文时间轴</span></label>
+          <label><input type="radio" name="alignMode" value="dstTime"><span data-i18n="alignDstTime">按顺序配对 · 用译文时间轴</span></label>
         </div>
-        <div class="hint" id="alignHint" data-i18n="alignHintTime">两份字幕来自同一片源（条数一致）用「按顺序」最准；条数不同或轴有漂移，用「按时间轴」按重叠自动配对；译文时间轴更可靠时用「时间轴跟译文」。</div>
+        <div class="hint" id="alignHint" data-i18n="alignHintTime">条数不同或轴有漂移时用：按时间重叠配对，时间轴仍取原文；落在同一条原文时段内的多条译文会合并文字拼进去，内容不丢。</div>
       </div>
       <!-- v0.9.222：调整模式专用——结构识别（自动猜可手动改）+ 原文/译文互换 -->
       <div class="flbl" data-i18n="lblStruct" id="structLbl" style="display:none">结构识别</div>
@@ -243,6 +251,8 @@
     <details class="ass" id="assPanel">
       <summary data-i18n="assPanel">ASS 外观（导出 ASS 时生效）</summary>
       <div class="ass-body">
+        <!-- v0.9.223：参数基准必须写明，否则拿 720p 素材对不上数 -->
+        <div class="hint ass-note" data-i18n="assNote1080">以下参数以 1920×1080 视频为准；其他分辨率由播放器等比缩放。</div>
         <!-- v0.9.219：布局选择仅「ASS 自定义风格」时显示；分屏/堆叠模板布局锁定，参数可微调 -->
         <div class="af" id="layoutRow" style="display:none">
           <label data-i18n="lblLayout">布局</label>
@@ -306,6 +316,14 @@
 
   <div class="exp card" id="exp">
     <h2><span class="n">4</span><span data-i18n="expTitle">导出</span></h2>
+    <!-- v0.9.223：ASS 效果预览 —— 此前只有表格，看不到字号/颜色/位置到底什么样 -->
+    <div class="ass-pv" id="assPv" style="display:none">
+      <div class="ass-pv-hd"><span data-i18n="pvAssTitle">效果预览（按 1080p 等比缩放）</span><span class="ass-pv-tag" id="assPvTag"></span></div>
+      <div class="ass-pv-screen" id="assPvScreen">
+        <div class="ass-pv-line" id="assPvLine1"></div>
+        <div class="ass-pv-line" id="assPvLine2"></div>
+      </div>
+    </div>
     <div class="exp-row">
       <select id="expFmt2"></select>
       <button class="btn" id="btnDownload" data-i18n="btnDownload">⬇ 下载字幕</button>
@@ -319,7 +337,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.222"></script>
+<script src="merge-core.js?v=0.9.223"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -337,6 +355,8 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文本粘贴到这里…',
     parsedOk:'✓ 已解析 {0}：{1} 条', parseFail:'✗ 解析失败：内容不是有效的字幕格式',
     optTitle:'合并设置',
+    assNote1080:'以下参数以 1920×1080 视频为准；其他分辨率由播放器等比缩放。', pvAssTitle:'效果预览（按 1080p 等比缩放）',
+
     modeMerge:'合并两份字幕', modeAdjust:'调整双语字幕',
     biCard:'双语字幕（原始文件）', optTitleAdjust:'调整设置',
     lblStruct:'结构识别', structAuto:'自动识别', structTwo:'单条双行', structAlt:'交替成对',
@@ -348,10 +368,10 @@ const I18N = {
     uncertainWarn:'{0} 条结构不确定（两侧语言相同，按上半/下半拆分），请人工核对。',
     swapped:'已互换原文/译文', needSrc:'请先上传或粘贴双语字幕',
 
-    lblAlign:'对齐方式', alignOrder:'按顺序', alignTime:'按时间轴', alignDstTime:'时间轴跟译文',
-    alignHintOrder:'两份字幕条数一致、来自同一片源：第 1 条配第 1 条，最准。', 
-    alignHintTime:'两份字幕来自同一片源（条数一致）用「按顺序」最准；条数不同或轴有漂移，用「按时间轴」按重叠自动配对；译文时间轴更可靠时用「时间轴跟译文」。',
-    alignHintDst:'时间轴全部采用译文的，原文只提供文字；原文多出的条目会并入上一条。',
+    lblAlign:'配对方式 · 时间轴取自', alignOrder:'按顺序配对 · 用原文时间轴', alignTime:'按时间轴配对 · 用原文时间轴', alignDstTime:'按顺序配对 · 用译文时间轴',
+    alignHintOrder:'条数一致、来自同一片源时最准：第 1 条配第 1 条，时间轴一律取原文。多出来的译文会合并文字并进相邻那条，内容不丢。', 
+    alignHintTime:'条数不同或轴有漂移时用：按时间重叠自动配对，时间轴仍取原文；落在同一条原文时段内的多条译文会合并文字拼进去，内容不丢。',
+    alignHintDst:'时间轴全部取译文，原文只提供文字；落在同一条译文上的多条原文会合并文字拼进去，比译文多出的原文并入上一条。',
     lblShift:'译文整体偏移（毫秒）', shiftHint:'译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。',
     lblBiMaxW:'双语行宽', biMaxWHint:'每行最大显示宽度（1 个汉字 = 1）。超宽自动折行，1 汉字 ≈ 2.4 个西文字符。',
     lblOrder:'双语上下顺序', orderSrc:'原文在上', orderDst:'译文在上',
@@ -367,7 +387,7 @@ const I18N = {
     lblAlpha:'不透明度', lblMV:'离底距离',
     assFontTip:'字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。',
     btnMerge:'🔗 合并预览', mergeHint:'先看配对结果和体检报告，再下载。',
-    repPaired:'配对', repOnlySrc:'原文落单', repOnlyDst:'译文落单', repIssues:'时间轴体检',
+    repPaired:'配对', repOnlySrc:'缺译文', repOnlyDst:'缺原文', repMerged:'已并入', repIssues:'时间轴体检',
     repCleanTxt:'时间轴体检通过：没有重叠、过短或缺失。', repIssueHead:'时间轴体检：{0} 处需注意（前 20 条）',
     colNo:'#', colTime:'时间', colSrc:'原文', colDst:'译文',
     tagDrop:'未配上·不出现在成片', tagMerged:'并入上一条',
@@ -387,6 +407,8 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文字貼到這裡…',
     parsedOk:'✓ 已解析 {0}：{1} 條', parseFail:'✗ 解析失敗：內容不是有效的字幕格式',
     optTitle:'合併設定',
+    assNote1080:'以下參數以 1920×1080 影片為準；其他解析度由播放器等比縮放。', pvAssTitle:'效果預覽（按 1080p 等比縮放）',
+
     modeMerge:'合併兩份字幕', modeAdjust:'調整雙語字幕',
     biCard:'雙語字幕（原始檔案）', optTitleAdjust:'調整設定',
     lblStruct:'結構識別', structAuto:'自動識別', structTwo:'單條雙行', structAlt:'交替成對',
@@ -398,10 +420,10 @@ const I18N = {
     uncertainWarn:'{0} 條結構不確定（兩側語言相同，按上半/下半拆分），請人工核對。',
     swapped:'已互換原文/譯文', needSrc:'請先上傳或貼上雙語字幕',
 
-    lblAlign:'對齊方式', alignOrder:'按順序', alignTime:'按時間軸', alignDstTime:'時間軸跟譯文',
-    alignHintOrder:'兩份字幕條數一致、來自同一片源：第 1 條配第 1 條，最準。',
-    alignHintTime:'兩份字幕來自同一片源（條數一致）用「按順序」最準；條數不同或軸有漂移，用「按時間軸」按重疊自動配對；譯文時間軸更可靠時用「時間軸跟譯文」。',
-    alignHintDst:'時間軸全部採用譯文的，原文只提供文字；原文多出的條目會併入上一條。',
+    lblAlign:'配對方式 · 時間軸取自', alignOrder:'按順序配對 · 用原文時間軸', alignTime:'按時間軸配對 · 用原文時間軸', alignDstTime:'按順序配對 · 用譯文時間軸',
+    alignHintOrder:'條數一致、來自同一片源時最準：第 1 條配第 1 條，時間軸一律取原文。多出來的譯文會合併文字併進相鄰那條，內容不丟。',
+    alignHintTime:'條數不同或軸有漂移時用：按時間重疊自動配對，時間軸仍取原文；落在同一條原文時段內的多條譯文會合併文字拼進去，內容不丟。',
+    alignHintDst:'時間軸全部取譯文，原文只提供文字；落在同一條譯文上的多條原文會合併文字拼進去，比譯文多出的原文併入上一條。',
     lblShift:'譯文整體偏移（毫秒）', shiftHint:'譯文字幕整體提前（負數）或延後（正數）。例如字幕晚了半秒填 -500。',
     lblBiMaxW:'雙語行寬', biMaxWHint:'每行最大顯示寬度（1 個漢字 = 1）。超寬自動折行，1 漢字 ≈ 2.4 個西文字元。',
     lblOrder:'雙語上下順序', orderSrc:'原文在上', orderDst:'譯文在上',
@@ -417,7 +439,7 @@ const I18N = {
     lblAlpha:'不透明度', lblMV:'離底距離',
     assFontTip:'字體在播放端機器上解析，對方沒裝會自動回退；其餘參數與主站「ASS 樣式」一致。',
     btnMerge:'🔗 合併預覽', mergeHint:'先看配對結果和體檢報告，再下載。',
-    repPaired:'配對', repOnlySrc:'原文落單', repOnlyDst:'譯文落單', repIssues:'時間軸體檢',
+    repPaired:'配對', repOnlySrc:'缺譯文', repOnlyDst:'缺原文', repMerged:'已併入', repIssues:'時間軸體檢',
     repCleanTxt:'時間軸體檢通過：沒有重疊、過短或缺失。', repIssueHead:'時間軸體檢：{0} 處需注意（前 20 條）',
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'譯文',
     tagDrop:'未配上·不出現在成片', tagMerged:'併入上一條',
@@ -437,6 +459,8 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'or paste subtitle text here…',
     parsedOk:'✓ Parsed {0}: {1} cues', parseFail:'✗ Parse failed: not a valid subtitle format',
     optTitle:'Merge settings',
+    assNote1080:'All values below are tuned for 1920x1080 video; players scale them proportionally at other resolutions.', pvAssTitle:'Preview (scaled from 1080p)',
+
     modeMerge:'Merge two subtitle files', modeAdjust:'Adjust a bilingual subtitle',
     biCard:'Bilingual subtitle (source file)', optTitleAdjust:'Adjust settings',
     lblStruct:'Structure detection', structAuto:'Auto-detect', structTwo:'Two lines per cue', structAlt:'Alternating pairs',
@@ -448,10 +472,10 @@ const I18N = {
     uncertainWarn:'{0} cues with uncertain structure (same language on both sides, split top/bottom) — please review.',
     swapped:'Original and translation swapped', needSrc:'Provide a bilingual subtitle first (file or paste)',
 
-    lblAlign:'Pairing mode', alignOrder:'By order', alignTime:'By timeline', alignDstTime:'Follow translation',
-    alignHintOrder:'Both files have the same cue count from the same source: cue 1 pairs with cue 1 — the most accurate.',
-    alignHintTime:'Use “By order” when both files come from the same source and cue counts match; use “By timeline” when counts differ or timings drift; use “Follow translation” when the translated timings are more reliable.',
-    alignHintDst:'All timings come from the translated file; the original only provides text. Extra original cues are folded into the previous one.',
+    lblAlign:'Pairing · timing taken from', alignOrder:'Pair in order · original timing', alignTime:'Pair by overlap · original timing', alignDstTime:'Pair in order · translation timing',
+    alignHintOrder:'Most accurate when both files share the same source and cue count: cue 1 pairs with cue 1, and timing always comes from the original. Extra translated cues are merged into the neighbouring cue — nothing is dropped.',
+    alignHintTime:'Use when cue counts differ or timings drift: cues pair by time overlap, timing still comes from the original, and several translated cues inside one original cue merge into one line — nothing is dropped.',
+    alignHintDst:'All timing comes from the translated file; the original only supplies text. Several original cues inside one translated cue merge into one line, and extra original cues fold into the previous one.',
     lblShift:'Shift translation (ms)', shiftHint:'Move the translated file earlier (negative) or later (positive). E.g. -500 if it runs half a second late.',
     lblBiMaxW:'Line width', biMaxWHint:'Max display width per line (1 CJK char = 1). Longer lines wrap automatically; 1 CJK char ≈ 2.4 Latin characters.',
     lblOrder:'Stacking order', orderSrc:'Original on top', orderDst:'Translation on top',
@@ -467,7 +491,7 @@ const I18N = {
     lblAlpha:'Opacity', lblMV:'Bottom margin',
     assFontTip:'Fonts resolve on the viewer’s machine and fall back automatically if missing; other options match the main site’s ASS styles.',
     btnMerge:'🔗 Merge & preview', mergeHint:'Check the pairing result and sanity report before downloading.',
-    repPaired:'Paired', repOnlySrc:'Unmatched original', repOnlyDst:'Unmatched translation', repIssues:'Timeline check',
+    repPaired:'Paired', repOnlySrc:'Missing translation', repOnlyDst:'Missing original', repMerged:'merged in', repIssues:'Timeline check',
     repCleanTxt:'Timeline check passed: no overlaps, too-short or missing cues.', repIssueHead:'Timeline check: {0} items need attention (first 20)',
     colNo:'#', colTime:'Time', colSrc:'Original', colDst:'Translation',
     tagDrop:'Unpaired·excluded from output', tagMerged:'Folded into previous',
@@ -487,6 +511,8 @@ const I18N = {
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'または字幕テキストをここに貼り付け…',
     parsedOk:'✓ 解析しました {0}：{1} 件', parseFail:'✗ 解析失敗：有効な字幕形式ではありません',
     optTitle:'マージ設定',
+    assNote1080:'以下の値は 1920×1080 動画が基準です。他の解像度ではプレイヤーが等比拡大縮小します。', pvAssTitle:'プレビュー（1080p を等比縮小）',
+
     modeMerge:'2 つの字幕をマージ', modeAdjust:'二か国語字幕を調整',
     biCard:'二か国語字幕（元ファイル）', optTitleAdjust:'調整設定',
     lblStruct:'構造識別', structAuto:'自動識別', structTwo:'1 条 2 行', structAlt:'交互ペア',
@@ -498,10 +524,10 @@ const I18N = {
     uncertainWarn:'{0} 条の構造が不確実（両側が同言語のため上半/下半で分割）。確認してください。',
     swapped:'原文と訳文を入れ替えました', needSrc:'まず二か国語字幕を用意してください（ファイルまたは貼り付け）',
 
-    lblAlign:'整合方式', alignOrder:'順序で', alignTime:'タイムラインで', alignDstTime:'訳文の軸に合わせる',
-    alignHintOrder:'両ファイルが同じソースで件数が一致：1 番目同士を対応させる、最も正確。',
-    alignHintTime:'同じソースで件数が一致するなら「順序で」が最も正確。件数が違う・軸がずれる場合は「タイムラインで」重なりから自動対応。訳文の軸が正確なら「訳文の軸に合わせる」。',
-    alignHintDst:'タイムラインはすべて訳文のものを使用、原文は文字のみ提供。余った原文は前の条に統合されます。',
+    lblAlign:'ペア方式 · 軸の取得元', alignOrder:'順番にペア · 軸は原文', alignTime:'重なりでペア · 軸は原文', alignDstTime:'順番にペア · 軸は訳文',
+    alignHintOrder:'件数が一致し同一ソースなら最も正確：1 番目同士を対応させ、軸は常に原文。余った訳文は隣の条に文字ごと統合され、内容は失われません。',
+    alignHintTime:'件数が違う・軸がずれる場合に使用：重なりで自動対応し、軸は原文のまま。1 つの原文条に重なる複数の訳文は 1 行に統合され、内容は失われません。',
+    alignHintDst:'軸はすべて訳文から取得し、原文は文字のみ提供。1 つの訳文条に重なる複数の原文は 1 行に統合され、余った原文は前の条に統合されます。',
     lblShift:'訳文の全体シフト（ミリ秒）', shiftHint:'訳文字幕を早める（負）または遅らせる（正）。例：0.5 秒遅い場合は -500。',
     lblBiMaxW:'二か国語の行幅', biMaxWHint:'1 行の最大表示幅（漢字 1 = 1）。超過は自動折り返し、漢字 1 ≈ 欧文 2.4 文字。',
     lblOrder:'二か国語の上下順', orderSrc:'原文を上に', orderDst:'訳文を上に',
@@ -517,7 +543,7 @@ const I18N = {
     lblAlpha:'不透明度', lblMV:'下端からの距離',
     assFontTip:'フォントは再生側の端末で解決され、未インストールなら自動フォールバック。その他の設定は本サイトの ASS スタイルと同一です。',
     btnMerge:'🔗 マージしてプレビュー', mergeHint:'対応結果とチェックレポートを確認してからダウンロードしてください。',
-    repPaired:'対応', repOnlySrc:'未対応の原文', repOnlyDst:'未対応の訳文', repIssues:'タイムラインチェック',
+    repPaired:'対応', repOnlySrc:'訳文なし', repOnlyDst:'原文なし', repMerged:'統合済み', repIssues:'タイムラインチェック',
     repCleanTxt:'タイムラインチェック合格：重複・短すぎ・欠落なし。', repIssueHead:'タイムラインチェック：{0} 件要注意（先頭 20 件）',
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'訳文',
     tagDrop:'未対応·出力に含まれない', tagMerged:'前の条に統合',
@@ -663,6 +689,7 @@ function doMerge(){
   S.rows = out.rows; S.report = out.report;
   renderReport();
   $('exp').style.display = 'block';
+  renderAssPv();
 }
 /* v0.9.222 调整模式：拆分双语字幕。偏移对整份文件生效（不分两侧）。 */
 function doAdjust(){
@@ -718,6 +745,8 @@ function renderReport(){
   let band = chip(rep.pairs ? 'ok' : 'bad', 'repPaired', rep.pairs);
   if (rep.onlySrc.length) band += chip('warn', 'repOnlySrc', rep.onlySrc.length);
   if (rep.onlyDst.length) band += chip('warn', 'repOnlyDst', rep.onlyDst.length);
+  /* v0.9.223：并入条数必须看得见——用户要知道多出来的内容去哪了 */
+  if (rep.merged) band += chip('', 'repMerged', rep.merged);
   /* v0.9.222 调整模式：形态统计 + 折行/同文种提醒（用户定案：聚类拆分要看得见，错了能发现） */
   if (S.mode === 'adjust' && rep.form){
     const f = rep.form;
@@ -787,10 +816,38 @@ const ASS_DEFAULTS = [
   ['assDstAlpha','100'],['assSrcAlpha','100'],
   ['assDstMV','42'],['assSrcMV','42']
 ];
-function resetAssDefaults(){
-  ASS_DEFAULTS.forEach(pair=>{ const el=$(pair[0]); if(el) el.value=pair[1]; });
+/* v0.9.223：三种模板各自一套默认参数（1080p 基准，见 assNote1080）。
+   v0.9.219 只做了「布局映射」却没套参数，三个模板导出逐字节相同——等于模板没生效。
+   分屏：主 56 白 + 副 50 金（副字幕明显小一号、换个颜色，拉开主次）
+   底部双行：主 54 贴底 + 副 42 浅金 90%（副字幕更收敛，避免两行抢视线） */
+const TPL_DEFAULTS = {
+  split: {
+    assDstSize:'56', assSrcSize:'50', assDstColor:'#FFFFFF', assSrcColor:'#FFD700',
+    assDstOutline:'2.5', assSrcOutline:'2.5', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
+    assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'100',
+    assDstMV:'42', assSrcMV:'42'
+  },
+  stack: {
+    assDstSize:'54', assSrcSize:'42', assDstColor:'#FFFFFF', assSrcColor:'#E6C86A',
+    assDstOutline:'2.5', assSrcOutline:'2.0', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
+    assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'90',
+    assDstMV:'42', assSrcMV:'42'
+  }
+};
+TPL_DEFAULTS.custom = TPL_DEFAULTS.split;
+/* 用户手动微调过 ASS 参数后，切模板不再覆盖（否则一改模板就把微调冲掉） */
+let assDirty = false;
+function applyTplDefaults(tpl){
+  const d = TPL_DEFAULTS[tpl] || TPL_DEFAULTS.split;
+  Object.keys(d).forEach(k=>{ const el=$(k); if(el) el.value=d[k]; });
   ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor'].forEach(syncColorSw);
-  $('assDstAlphaOut').textContent='100%'; $('assSrcAlphaOut').textContent='100%';
+  const a1=$('assDstAlphaOut'), a2=$('assSrcAlphaOut');
+  if(a1) a1.textContent=d.assDstAlpha+'%';
+  if(a2) a2.textContent=d.assSrcAlpha+'%';
+}
+function resetAssDefaults(){
+  applyTplDefaults(tplVal());
+  assDirty = false;
   toast(t('assResetDone'));
 }
 /* ASS 外观面板显隐：无风格模板（srt/vtt）整个隐藏；custom 显示布局选择 */
@@ -798,6 +855,8 @@ function syncAssPanel(){
   const tpl = tplVal();
   $('assPanel').style.display = (tpl === 'srt' || tpl === 'vtt') ? 'none' : '';
   $('layoutRow').style.display = tpl === 'custom' ? 'flex' : 'none';
+  /* v0.9.223：切模板真的把该模板的默认参数套进输入框（此前只改提示文字，参数一个没动） */
+  if (tpl !== 'srt' && tpl !== 'vtt' && !assDirty) applyTplDefaults(tpl);
   const hint = $('tplHint');
   if (hint) hint.textContent = t(tpl==='srt'||tpl==='vtt' ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : 'tplHintPreset');
 }
@@ -807,14 +866,20 @@ function orderVal(){ const el=document.querySelector('input[name=biOrder]:checke
 function guessLocale(items){
   let s = '';
   for (let i=0; i<items.length && s.length<400; i++) s += String(items[i] && items[i].text || '') + ' ';
-  let kana=0, hang=0;
+  let kana=0, hang=0, han=0, latin=0;
   for (const ch of s){
     const c = ch.codePointAt(0);
     if (c >= 0x3040 && c <= 0x30FF) kana++;
     else if ((c >= 0xAC00 && c <= 0xD7A3) || (c >= 0x1100 && c <= 0x11FF)) hang++;
+    else if (c >= 0x4E00 && c <= 0x9FFF) han++;
+    else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A)) latin++;
   }
   if (kana >= 2) return 'ja';
   if (hang >= 2) return 'ko';
+  /* v0.9.223：中文必须能认出来。此前中文返回空串 → assStackMV 按拉丁字母估墨迹
+     （inkRatio 0.545/inkDesc 0.21 而非中文 0.915/0.08），底部双行的间距少算 21px
+     （96 vs 正确的 117），原文行框底压在译文行框顶上，两行实打实重叠。 */
+  if (han >= 2 && han >= latin) return 'zh-CN';
   return '';
 }
 /* ---- ASS 外观（与主站 assStyleOf 同字段同默认值）---- */
@@ -832,8 +897,9 @@ function assMVs(){
 }
 function assStyleOf(){
   const m=assMVs(), fmt=expFmtVal(), dstFirst = orderVal()==='dst-first';
-  const bottomMV = dstFirst ? 42 : m.dst;   /* 原文在上 → 译文贴底；译文在上 → 原文（Sub）贴底 */
-  const subMV    = dstFirst ? m.src : 42;
+  /* v0.9.223：贴底那侧用它自己的「离底距离」。此前写死 42，用户改输入框不生效。 */
+  const bottomMV = dstFirst ? m.src : m.dst;   /* 译文在上 → 原文(Sub)贴底；否则译文(Bottom)贴底 */
+  const subMV    = dstFirst ? m.dst : m.src;   /* 另一侧：堆叠时由 assStackMV 重算，此值只作兜底 */
   const alphaOf = id => { const n=parseInt(($(id)||{}).value,10); return (isFinite(n)&&n>=10&&n<=100)?n:100; };
   return {
     dstSize: +($('assDstSize')||{}).value || 56,
@@ -916,6 +982,65 @@ function buildExport(){
   });
   return fmt === 'vtt' ? C.formatVtt(items) : C.formatSrt(items);
 }
+/* ================= v0.9.223：ASS 效果预览 =================
+   此前只有配对表格，导出的字号/颜色/位置全靠想象——用户导出来才发现两行叠一起。
+   这里把同一套参数（1080p 基准）等比画在 16:9 画布上，改参数即时可见。 */
+function assPvSample(){
+  const r = (S.rows && S.rows.length) ? S.rows[0] : null;
+  return {
+    en: String(r && r.en || 'Hello there, this is a sample line'),
+    zh: String(r && r.zh || '你好，这是一条示例字幕')
+  };
+}
+function renderAssPv(){
+  const box = $('assPv'), scr = $('assPvScreen'), l1 = $('assPvLine1'), l2 = $('assPvLine2'), tag = $('assPvTag');
+  if (!box || !scr || !l1 || !l2) return;
+  const fmt = expFmtVal();
+  const isAss = (fmt === 'ass-split' || fmt === 'ass-stack');
+  if (!isAss || !S.rows || !S.rows.length){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const st = assStyleOf(), m = assMVs(), dstFirst = orderVal() === 'dst-first';
+  const stacked = fmt === 'ass-stack';
+  const k = (scr.clientHeight || 240) / 1080;      /* 1080p 基准 → 预览等比 */
+  const samp = assPvSample();
+  const srcV = guessLocale(localeSrcItems()), dstV = guessLocale(localeDstItems());
+  const colOf = id => assColorVal(id, id.indexOf('Outline') > 0 ? '#000000' : '#FFFFFF');
+
+  /* 贴底那侧的 MV、以及（堆叠时）上面那侧由 assStackMV 算出来的 MV */
+  const nDst = 1, nSrc = 1;
+  const bottomMV = dstFirst ? m.src : m.dst;
+  let topMV = dstFirst ? m.dst : m.src;
+  if (stacked) {
+    topMV = dstFirst
+      ? C.assStackMV({ bottomMV: bottomMV, bottomSize: st.srcSize, bottomLang: srcV, bottomLines: nSrc, topSize: st.dstSize, topLang: dstV })
+      : C.assStackMV({ bottomMV: bottomMV, bottomSize: st.dstSize, bottomLang: dstV, bottomLines: nDst, topSize: st.srcSize, topLang: srcV });
+  }
+  const paint = (el, text, size, colorId, outline, outlineColorId, alpha, mv, atTop) => {
+    el.textContent = text;
+    el.style.fontSize = (size * k).toFixed(1) + 'px';
+    el.style.color = colOf(colorId);
+    el.style.opacity = (alpha / 100).toFixed(2);
+    el.style.webkitTextStroke = (Number(outline) * k).toFixed(2) + 'px ' + colOf(outlineColorId);
+    el.style.paintOrder = 'stroke fill';
+    if (atTop) { el.style.top = (mv * k).toFixed(1) + 'px'; el.style.bottom = 'auto'; }
+    else { el.style.bottom = (mv * k).toFixed(1) + 'px'; el.style.top = 'auto'; }
+  };
+  /* 行 1 = 视觉上那条，行 2 = 下面那条 */
+  if (stacked) {
+    /* 底部双行：贴底的是 bottom 侧，另一条在其上方 */
+    if (dstFirst) { paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false);
+                    paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, false); }
+    else          { paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false);
+                    paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, false); }
+  } else {
+    /* 分屏：一条顶部一条底部 */
+    if (dstFirst) { paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, m.dst, true);
+                    paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, m.src, false); }
+    else          { paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, m.src, true);
+                    paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, m.dst, false); }
+  }
+  if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p';
+}
 function baseName(){
   const n = S.srcName || S.dstName || '';
   return n.replace(/\.[^.]+$/, '');
@@ -990,8 +1115,16 @@ function init(){
   const sync = (a,b)=>a.addEventListener('change', ()=>{ b.value = a.value; });
   sync(f1,f2); sync(f2,f1);
   f2.value = f1.value = 'srt';
-  f1.addEventListener('change', syncAssPanel);
-  f2.addEventListener('change', syncAssPanel);
+  f1.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
+  f2.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
+  /* v0.9.223：手动微调过 ASS 参数就记住（切模板不再覆盖），并即时重画预览 */
+  ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor',
+   'assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV'].forEach(id=>{
+    const el = $(id); if (!el) return;
+    ['input','change'].forEach(ev=>el.addEventListener(ev, ()=>{ assDirty = true; renderAssPv(); }));
+  });
+  document.querySelectorAll('input[name=biOrder]').forEach(el=>el.addEventListener('change', renderAssPv));
+  window.addEventListener('resize', renderAssPv);
   document.querySelectorAll('input[name=assLayout]').forEach(el=>el.addEventListener('change', syncAssPanel));
   $('btnAssReset').addEventListener('click', resetAssDefaults);
   syncAssPanel();
