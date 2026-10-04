@@ -140,7 +140,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.218</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.219</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -204,20 +204,30 @@
         <label><input type="radio" name="biOrder" value="src-first" checked><span data-i18n="orderSrc">原文在上</span></label>
         <label><input type="radio" name="biOrder" value="dst-first"><span data-i18n="orderDst">译文在上</span></label>
       </div>
-      <div class="flbl" data-i18n="lblFmt">导出格式</div>
+      <div class="flbl" data-i18n="lblTpl">导出模板</div>
       <div>
         <select id="expFmt">
-          <option value="srt">SRT (.srt)</option>
-          <option value="vtt">WebVTT (.vtt)</option>
-          <option value="ass-split" data-i18n="optAssSplit">ASS 分屏·上下分离 (.ass)</option>
-          <option value="ass-stack" data-i18n="optAssStack">ASS 堆叠·底部双行 (.ass)</option>
+          <option value="srt" data-i18n="tplSrt">SRT 无风格 (.srt)</option>
+          <option value="vtt" data-i18n="tplVtt">VTT 无风格 (.vtt)</option>
+          <option value="split" data-i18n="tplSplit">ASS 分屏 · 默认模板，可微调 (.ass)</option>
+          <option value="stack" data-i18n="tplStack">ASS 底部双行 · 默认模板，可微调 (.ass)</option>
+          <option value="custom" data-i18n="tplCustom">ASS 自定义风格 (.ass)</option>
         </select>
+        <div class="hint" id="tplHint"></div>
       </div>
     </div>
 
-    <details class="ass">
+    <details class="ass" id="assPanel">
       <summary data-i18n="assPanel">ASS 外观（导出 ASS 时生效）</summary>
       <div class="ass-body">
+        <!-- v0.9.219：布局选择仅「ASS 自定义风格」时显示；分屏/堆叠模板布局锁定，参数可微调 -->
+        <div class="af" id="layoutRow" style="display:none">
+          <label data-i18n="lblLayout">布局</label>
+          <div class="radios">
+            <label><input type="radio" name="assLayout" value="split" checked><span data-i18n="layoutSplit">分屏 · 上下分离</span></label>
+            <label><input type="radio" name="assLayout" value="stack"><span data-i18n="layoutStack">堆叠 · 底部双行</span></label>
+          </div>
+        </div>
         <div class="ass-cols">
           <div class="ass-col">
             <h4 data-i18n="lblDstCol">译文（主）</h4>
@@ -241,6 +251,7 @@
           </div>
         </div>
         <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
+        <div style="margin-top:8px"><button type="button" class="btn ghost" id="btnAssReset" data-i18n="assReset">↺ 恢复默认参数</button></div>
       </div>
     </details>
   </div>
@@ -283,11 +294,12 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="srt-core.js?v=0.9.218"></script>
+<script src="merge-core.js?v=0.9.219"></script>
 <script>
 'use strict';
-/* srt-core.js 在浏览器端暴露为 window.SrtCore（与主站同款别名） */
-const C = window.SrtCore;
+/* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
+   与主站翻译引擎完全分开——2026-10-04 用户定案，改翻译引擎不影响本工具） */
+const C = window.MergeCore;
 /* ================= i18n =================
    独立小词典：4 种完整语言，其余界面语言回退英文（回退链 lang → en → zh-CN）。 */
 const I18N = {
@@ -307,7 +319,13 @@ const I18N = {
     lblShift:'译文整体偏移（毫秒）', shiftHint:'译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。',
     lblBiMaxW:'双语行宽', biMaxWHint:'每行最大显示宽度（1 个汉字 = 1）。超宽自动折行，1 汉字 ≈ 2.4 个西文字符。',
     lblOrder:'双语上下顺序', orderSrc:'原文在上', orderDst:'译文在上',
-    lblFmt:'导出格式', optAssSplit:'ASS 分屏·上下分离 (.ass)', optAssStack:'ASS 堆叠·底部双行 (.ass)',
+    lblTpl:'导出模板', tplSrt:'SRT 无风格 (.srt)', tplVtt:'VTT 无风格 (.vtt)',
+    tplSplit:'ASS 分屏 · 默认模板，可微调 (.ass)', tplStack:'ASS 底部双行 · 默认模板，可微调 (.ass)', tplCustom:'ASS 自定义风格 (.ass)',
+    lblLayout:'布局', layoutSplit:'分屏 · 上下分离', layoutStack:'堆叠 · 底部双行',
+    tplHintPlain:'SRT / VTT 是纯文本格式，不含样式信息，无需设置外观。',
+    tplHintPreset:'已套用默认模板。想改字号、颜色、描边等，展开下方「ASS 外观」微调即可。',
+    tplHintCustom:'布局与外观全部由你定义：先选布局，再展开「ASS 外观」逐项调整。',
+    assReset:'↺ 恢复默认参数', assResetDone:'已恢复默认参数',
     assPanel:'ASS 外观（导出 ASS 时生效）', lblDstCol:'译文（主）', lblSrcCol:'原文（副）',
     lblSize:'字号', lblColor:'颜色', lblOutline:'描边', lblOutlineColor:'描边色', lblFont:'字体',
     lblAlpha:'不透明度', lblMV:'离底距离',
@@ -341,7 +359,13 @@ const I18N = {
     lblShift:'譯文整體偏移（毫秒）', shiftHint:'譯文字幕整體提前（負數）或延後（正數）。例如字幕晚了半秒填 -500。',
     lblBiMaxW:'雙語行寬', biMaxWHint:'每行最大顯示寬度（1 個漢字 = 1）。超寬自動折行，1 漢字 ≈ 2.4 個西文字元。',
     lblOrder:'雙語上下順序', orderSrc:'原文在上', orderDst:'譯文在上',
-    lblFmt:'匯出格式', optAssSplit:'ASS 分屏·上下分離 (.ass)', optAssStack:'ASS 堆疊·底部雙行 (.ass)',
+    lblTpl:'匯出範本', tplSrt:'SRT 無風格 (.srt)', tplVtt:'VTT 無風格 (.vtt)',
+    tplSplit:'ASS 分屏 · 預設範本，可微調 (.ass)', tplStack:'ASS 底部雙行 · 預設範本，可微調 (.ass)', tplCustom:'ASS 自訂風格 (.ass)',
+    lblLayout:'版面', layoutSplit:'分屏 · 上下分離', layoutStack:'堆疊 · 底部雙行',
+    tplHintPlain:'SRT / VTT 是純文字格式，不含樣式資訊，無需設定外觀。',
+    tplHintPreset:'已套用預設範本。想改字號、顏色、描邊等，展開下方「ASS 外觀」微調即可。',
+    tplHintCustom:'版面與外觀全部由你定義：先選版面，再展開「ASS 外觀」逐項調整。',
+    assReset:'↺ 恢復預設參數', assResetDone:'已恢復預設參數',
     assPanel:'ASS 外觀（匯出 ASS 時生效）', lblDstCol:'譯文（主）', lblSrcCol:'原文（副）',
     lblSize:'字號', lblColor:'顏色', lblOutline:'描邊', lblOutlineColor:'描邊色', lblFont:'字體',
     lblAlpha:'不透明度', lblMV:'離底距離',
@@ -375,7 +399,13 @@ const I18N = {
     lblShift:'Shift translation (ms)', shiftHint:'Move the translated file earlier (negative) or later (positive). E.g. -500 if it runs half a second late.',
     lblBiMaxW:'Line width', biMaxWHint:'Max display width per line (1 CJK char = 1). Longer lines wrap automatically; 1 CJK char ≈ 2.4 Latin characters.',
     lblOrder:'Stacking order', orderSrc:'Original on top', orderDst:'Translation on top',
-    lblFmt:'Export format', optAssSplit:'ASS split·top & bottom (.ass)', optAssStack:'ASS stacked·bottom block (.ass)',
+    lblTpl:'Export template', tplSrt:'Plain SRT (.srt)', tplVtt:'Plain WebVTT (.vtt)',
+    tplSplit:'ASS split · preset, tweakable (.ass)', tplStack:'ASS stacked · preset, tweakable (.ass)', tplCustom:'ASS custom style (.ass)',
+    lblLayout:'Layout', layoutSplit:'Split · top & bottom', layoutStack:'Stacked · bottom block',
+    tplHintPlain:'SRT / VTT are plain-text formats with no style information — no appearance to set.',
+    tplHintPreset:'Preset applied. To tweak size, colors, outline and more, open “ASS appearance” below.',
+    tplHintCustom:'Layout and appearance are fully yours: pick a layout first, then adjust every option under “ASS appearance”.',
+    assReset:'↺ Reset to defaults', assResetDone:'Defaults restored',
     assPanel:'ASS appearance (applies to ASS export)', lblDstCol:'Translation (primary)', lblSrcCol:'Original (secondary)',
     lblSize:'Font size', lblColor:'Color', lblOutline:'Outline', lblOutlineColor:'Outline color', lblFont:'Font',
     lblAlpha:'Opacity', lblMV:'Bottom margin',
@@ -409,7 +439,13 @@ const I18N = {
     lblShift:'訳文の全体シフト（ミリ秒）', shiftHint:'訳文字幕を早める（負）または遅らせる（正）。例：0.5 秒遅い場合は -500。',
     lblBiMaxW:'二か国語の行幅', biMaxWHint:'1 行の最大表示幅（漢字 1 = 1）。超過は自動折り返し、漢字 1 ≈ 欧文 2.4 文字。',
     lblOrder:'二か国語の上下順', orderSrc:'原文を上に', orderDst:'訳文を上に',
-    lblFmt:'エクスポート形式', optAssSplit:'ASS 分離·上下分離 (.ass)', optAssStack:'ASS 積み·下部 2 行 (.ass)',
+    lblTpl:'エクスポートテンプレート', tplSrt:'SRT スタイルなし (.srt)', tplVtt:'VTT スタイルなし (.vtt)',
+    tplSplit:'ASS 分離 · 既定テンプレート・調整可 (.ass)', tplStack:'ASS 下部 2 行 · 既定テンプレート・調整可 (.ass)', tplCustom:'ASS カスタムスタイル (.ass)',
+    lblLayout:'レイアウト', layoutSplit:'分離 · 上下分離', layoutStack:'積み · 下部 2 行',
+    tplHintPlain:'SRT / VTT はプレーンテキスト形式でスタイル情報を含みません。外観設定は不要です。',
+    tplHintPreset:'既定テンプレートを適用しました。サイズ・色・縁取り等を変えるには下の「ASS 外観」を開いて調整してください。',
+    tplHintCustom:'レイアウトも外観もすべて自分で定義：まずレイアウトを選び、「ASS 外観」で各項目を調整します。',
+    assReset:'↺ 既定値に戻す', assResetDone:'既定値に戻しました',
     assPanel:'ASS 外観（ASS エクスポート時に有効）', lblDstCol:'訳文（主）', lblSrcCol:'原文（副）',
     lblSize:'フォントサイズ', lblColor:'色', lblOutline:'縁取り', lblOutlineColor:'縁取り色', lblFont:'フォント',
     lblAlpha:'不透明度', lblMV:'下端からの距離',
@@ -579,7 +615,43 @@ function renderReport(){
 }
 
 /* ================= 导出 ================= */
-function expFmtVal(){ return $('expFmt2').value || $('expFmt').value || 'srt'; }
+/* v0.9.219 模板制：srt/vtt = 无风格（无样式信息）；split/stack = 默认模板（布局锁定、参数可微调）；
+   custom = 布局 + 参数全部自定义。返回值与 core 侧格式分支对应。 */
+function tplVal(){ return $('expFmt2').value || $('expFmt').value || 'srt'; }
+function assLayoutVal(){
+  const el = document.querySelector('input[name=assLayout]:checked');
+  return el && el.value === 'stack' ? 'ass-stack' : 'ass-split';
+}
+function expFmtVal(){
+  const tpl = tplVal();
+  if (tpl === 'custom') return assLayoutVal();
+  if (tpl === 'split') return 'ass-split';
+  if (tpl === 'stack') return 'ass-stack';
+  return tpl;   /* srt / vtt */
+}
+const ASS_DEFAULTS = [
+  ['assDstSize','56'],['assSrcSize','50'],
+  ['assDstColor','#FFFFFF'],['assSrcColor','#FFD700'],
+  ['assDstOutline','2.5'],['assSrcOutline','2.5'],
+  ['assDstOutlineColor','#000000'],['assSrcOutlineColor','#000000'],
+  ['assDstFont','PingFang SC'],['assSrcFont','PingFang SC'],
+  ['assDstAlpha','100'],['assSrcAlpha','100'],
+  ['assDstMV','42'],['assSrcMV','42']
+];
+function resetAssDefaults(){
+  ASS_DEFAULTS.forEach(pair=>{ const el=$(pair[0]); if(el) el.value=pair[1]; });
+  ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor'].forEach(syncColorSw);
+  $('assDstAlphaOut').textContent='100%'; $('assSrcAlphaOut').textContent='100%';
+  toast(t('assResetDone'));
+}
+/* ASS 外观面板显隐：无风格模板（srt/vtt）整个隐藏；custom 显示布局选择 */
+function syncAssPanel(){
+  const tpl = tplVal();
+  $('assPanel').style.display = (tpl === 'srt' || tpl === 'vtt') ? 'none' : '';
+  $('layoutRow').style.display = tpl === 'custom' ? 'flex' : 'none';
+  const hint = $('tplHint');
+  if (hint) hint.textContent = t(tpl==='srt'||tpl==='vtt' ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : 'tplHintPreset');
+}
 function biMaxWVal(){ return Math.max(10, Math.min(80, parseInt($('biMaxW').value,10) || 32)); }
 function orderVal(){ const el=document.querySelector('input[name=biOrder]:checked'); return el && el.value==='dst-first' ? 'dst-first' : 'src-first'; }
 /* 语言区域猜测（与主站 srcLocaleForExport 同思路）：假名→ja、谚文→ko，其余走默认分词 */
@@ -698,8 +770,7 @@ function baseName(){
 function expExt(){
   const f = expFmtVal();
   return f === 'vtt' ? 'vtt' : (f === 'srt' ? 'srt' : 'ass');
-}
-function doDownload(){
+}function doDownload(){
   if (!S.rows){ toast(t('needMerge')); return; }
   const text = buildExport();
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -760,12 +831,17 @@ function init(){
       if (hint) hint.textContent = t(m==='order' ? 'alignHintOrder' : m==='dstTime' ? 'alignHintDst' : 'alignHintTime');
     });
   });
-  /* 导出区第二份格式下拉（滚动到导出卡时就在手边）与设置区那份保持同步 */
+  /* 导出区第二份模板下拉（滚动到导出卡时就在手边）与设置区那份保持同步 */
   const f1 = $('expFmt'), f2 = $('expFmt2');
   f2.innerHTML = f1.innerHTML;
   const sync = (a,b)=>a.addEventListener('change', ()=>{ b.value = a.value; });
   sync(f1,f2); sync(f2,f1);
   f2.value = f1.value = 'srt';
+  f1.addEventListener('change', syncAssPanel);
+  f2.addEventListener('change', syncAssPanel);
+  document.querySelectorAll('input[name=assLayout]').forEach(el=>el.addEventListener('change', syncAssPanel));
+  $('btnAssReset').addEventListener('click', resetAssDefaults);
+  syncAssPanel();
   /* 颜色色板 + alpha 百分比输出 */
   ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor'].forEach(id=>{
     const el=$(id); if(!el) return;

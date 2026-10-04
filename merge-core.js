@@ -1,15 +1,19 @@
-/* srt-core.js — SRT 字幕规则引擎
+/* merge-core.js — 双语字幕合并工具的独立引擎
  * 浏览器 <script src> 与 Node (require) 通用。
  *
- * 编码的翻译规范（用户定稿）：
+ * ⚠️ 2026-10-04 用户定案：双语合并工具与字幕翻译工具的处理**完全分开，不共用**。
+ *    本文件从 srt-core.js v0.9.219 分叉而来，包含合并所需的全部函数
+ *    （解析/折行/双语组装/alignRows 配对系列），此后与 srt-core.js 各自独立演化——
+ *    改翻译引擎不影响合并工具，反之亦然。主站 index.html 不引用本文件，
+ *    merge.html 不引用 srt-core.js（单测有「互不引用」护栏）。
+ *
+ * 编码的折行规范（与 srt-core 分叉时一致）：
  *  - 字数口径：显示宽度折算。汉字/全角标点 = 1 字；半角非空白字符每 2 个 = 1 字。
- *  - 折行规则：整条文本等效宽度 > 20 时（默认阈值，可调），在同一时间轴内折成多行，每行等效宽度 <= 20。
- *    断点优先级：句末(。！？…) > 逗点类(，、；：) > 连接词前 > 介词/助词前 > 词边界硬切。
- *  - 水词识别：um/yeah/well 等纯填充独立条目、[音乐] 类纯提示词条目，供上层删除或合并。
+ *  - 折行：整条文本等效宽度超阈值时折成多行，断点优先级：句末 > 逗点类 > 连接词前 > 介词/助词前 > 词边界硬切。
  */
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) module.exports = factory();
-  else root.SrtCore = factory();
+  else root.MergeCore = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
@@ -2572,6 +2576,130 @@
 
   // ================= 双文件合并（v0.9.218，纯本地，不调模型）=================
   // 用途：用户手上已有一份原文 + 一份译文（自己翻的、别人翻的、软件导出的），
+  // 要合成双语字幕。此处只做「配对 + 时间轴处理」，文字组装交给已有的 buildBilingual*。
+  //
+  // ⚠️ 设计约束：以下三个函数都是**纯新增**，不修改任何既有函数，
+  // 因此主站的翻译流程完全不受影响（唯一共用的是 buildBilingual*，它读的行结构未变）。
+
+  // 两条字幕的时间重叠毫秒数。闭区间按「后一条 start < 前一条 end」算，
+  // 半开区间语义（首尾相接不算重叠）——字幕业通用后者：前一条 end == 后一条 start 视为不重叠。
+  function overlapMs(a, b) {
+    const s1 = Math.max(0, Number(a.start) || 0), e1 = Math.max(0, Number(a.end) || 0);
+    const s2 = Math.max(0, Number(b.start) || 0), e2 = Math.max(0, Number(b.end) || 0);
+    return Math.min(e1, e2) - Math.max(s1, s2);   // ≤0 即不重叠
+  }
+
+  /* 两份文件配对成 rows。
+     items 形态来自 parseSrt/parseVtt/parseSbv/parseAss：[{no, start, end, text}]
+     mode:
+       'order'   —— 按顺序逐条配对（第 i 条配第 i 条）。两份来自同源时最准。
+       'time'    —— 按时间重叠最大配对，条数不同也能用。
+       'dstTime' —— 原文只取文字，时间轴全跟译文走（原文条数不足也能出结果）。
+     返回 { rows, report }：
+       rows  = [{start,end,en,zh,flag}]，可直接喂 buildBilingual(rows, opts)。
+               flag='drop' 表示该侧无内容（不会进 buildBilingual 的输出，但保留便于报告）。
+       report= { mode, srcN, dstN, pairs, onlySrc, onlyDst, noOverlap }
+               onlySrc/onlyDst 是没配上对的下标数组（UI 要能告诉用户「有 3 条原文没配上」）。
+  */
+  function alignRows(srcItems, dstItems, mode) {
+    const src = (srcItems || []).filter((x) => x && String(x.text == null ? '' : x.text).trim());
+    const dst = (dstItems || []).filter((x) => x && String(x.text == null ? '' : x.text).trim());
+    const m = mode || 'order';
+    const rows = [];
+    const report = { mode: m, srcN: src.length, dstN: dst.length, pairs: 0, onlySrc: [], onlyDst: [], noOverlap: 0 };
+
+    if (m === 'order' || m === 'dstTime') {
+      const n = Math.max(src.length, dst.length);
+      for (let i = 0; i < n; i++) {
+        const a = src[i], b = dst[i];
+        if (m === 'dstTime') {
+          // 时间跟译文走：原文多出的条目并进上一条（flag='merged'，buildBilingualParts 会把源文并入承载行）
+          if (!b) { if (a) rows.push({ start: a.start, end: a.end, en: String(a.text), zh: '', flag: 'merged' }); continue; }
+          rows.push({ start: b.start, end: b.end, en: a ? String(a.text) : '', zh: String(b.text), flag: a ? '' : 'drop' });
+          if (!a) report.onlyDst.push(i);
+        } else {
+          if (a && b) rows.push({ start: a.start, end: a.end, en: String(a.text), zh: String(b.text), flag: '' });
+          else if (a) { rows.push({ start: a.start, end: a.end, en: String(a.text), zh: '', flag: 'drop' }); report.onlySrc.push(i); }
+          else { rows.push({ start: b.start, end: b.end, en: '', zh: String(b.text), flag: 'drop' }); report.onlyDst.push(i); }
+        }
+      }
+      report.pairs = rows.filter((r) => r.flag !== 'drop' && r.en && r.zh).length;
+      return { rows, report };
+    }
+
+    // 'time'：双指针 + 回看窗口。贪心吃最大重叠，
+    // 但不能犯「先抢小的、大的反而落空」——故窗口内取全局最大重叠者（lookback=8 条）。
+    const LOOK = 8;
+    let si = 0, di = 0;
+    const usedDst = new Array(dst.length).fill(false);
+    while (si < src.length) {
+      let bestJ = -1, bestOv = 0;
+      const hi = Math.min(dst.length, di + LOOK);
+      for (let j = di; j < hi; j++) {
+        if (usedDst[j]) continue;
+        const ov = overlapMs(src[si], dst[j]);
+        if (ov > bestOv) { bestOv = ov; bestJ = j; }
+      }
+      if (bestJ < 0) {
+        // 窗口内无重叠。若译文已明显落后（起点还在当前原文之前），先放掉它重试同一条原文；
+        // 否则这条原文确实没有伙伴——保留为 drop 行 + 记入 onlySrc，绝不静默丢弃。
+        if (dst[di] && dst[di].start < src[si].start) { usedDst[di] = true; report.onlyDst.push(di); di++; continue; }
+        rows.push({ start: src[si].start, end: src[si].end, en: String(src[si].text), zh: '', flag: 'drop' });
+        report.onlySrc.push(si);
+        si++;
+        continue;
+      }
+      // 补齐被跳过的中间译文（它们与当前原文无重叠，记为多余）
+      for (let j = di; j < bestJ; j++) { if (!usedDst[j]) { usedDst[j] = true; report.onlyDst.push(j); } }
+      const b = dst[bestJ];
+      rows.push({ start: src[si].start, end: src[si].end, en: String(src[si].text), zh: String(b.text), flag: '' });
+      report.pairs++;
+      if (bestOv === 0) report.noOverlap++;
+      usedDst[bestJ] = true;
+      si++; di = bestJ + 1;
+    }
+    for (let j = di; j < dst.length; j++) if (!usedDst[j]) report.onlyDst.push(j);
+    return { rows, report };
+  }
+
+  // 时间轴整体偏移（ms，可负）。夹到 >=0：字幕不能有负起点，播放器会当异常。
+  function shiftTimeline(rows, ms) {
+    const d = Number(ms) || 0;
+    if (!d) return rows;
+    return (rows || []).map((r) => ({
+      start: Math.max(0, (Number(r.start) || 0) + d),
+      end: Math.max(0, (Number(r.end) || 0) + d),
+      en: r.en, zh: r.zh, flag: r.flag
+    }));
+  }
+
+  // 时间轴体检。返回问题清单，UI 直接渲染（零 token，纯本地）。
+  // 阈值说明：MIN_DUR_MS 与核心引擎一致（太短闪一下看不清）；重叠 >200ms 视为真冲突。
+  // ⚠️ i 报的是**原始 rows 下标**（含 drop/merged 行）——UI 预览表格按原数组编号，
+  //    若按过滤后下标报「#N 重叠」会指错行。drop/merged 行不参与体检，
+  //    相邻重叠的「前一条」也跳过它们（对观众不可见的行不该参与冲突判断）。
+  function checkTimeline(rows) {
+    const out = [];
+    const rs = rows || [];
+    let prev = null;
+    for (let i = 0; i < rs.length; i++) {
+      const r = rs[i];
+      if (!r || r.flag === 'drop' || r.flag === 'merged') continue;
+      const en = String(r.en == null ? '' : r.en).trim(), zh = String(r.zh == null ? '' : r.zh).trim();
+      if (!en && !zh) { out.push({ i, kind: 'empty', msg: 'both-empty' }); prev = r; continue; }
+      if (!zh) out.push({ i, kind: 'no-dst', msg: 'missing-target' });
+      if (!en) out.push({ i, kind: 'no-src', msg: 'missing-source' });
+      const dur = (Number(r.end) || 0) - (Number(r.start) || 0);
+      if (dur < MIN_DUR_MS) out.push({ i, kind: 'too-short', msg: 'shorter-than-' + MIN_DUR_MS + 'ms' });
+      if (prev) {
+        const ov = (Number(prev.end) || 0) - (Number(r.start) || 0);
+        if (ov > 200) out.push({ i, kind: 'overlap', msg: 'overlap-' + ov + 'ms' });
+      }
+      prev = r;
+    }
+    return out;
+  }
+
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
@@ -2584,6 +2712,7 @@
     isFillerCue, hasWordChar, isSrcMeaningless, stripSoundTags, monoFit, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
+    alignRows, overlapMs, shiftTimeline, checkTimeline,   // v0.9.218 双文件合并（纯新增）
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
     validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,

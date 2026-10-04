@@ -5219,22 +5219,27 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     });
   });
 }
-/* v0.9.218：双语字幕合并工具页（merge.html）+ alignRows/shiftTimeline/checkTimeline 纯新增函数。
+/* v0.9.218→219：双语字幕合并工具页（merge.html）+ 独立引擎 merge-core.js。
+   v0.9.219 用户定案：双语合并与翻译处理**完全分开，不共用**——
+   alignRows/shiftTimeline/checkTimeline 只在 merge-core.js，srt-core.js 不得出现。
    三处历史 bug 在此钉死：① time 模式 si-- 导致同一原文配两次 ② time 模式落单原文被静默丢弃
    ③ dstTime 模式注释说并入上一条、实现却直接丢文本。 */
-console.log('— 双语合并工具（v0.9.218）—');
+console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 {
   const mk = arr => arr.map((x,i)=>({no:i+1,start:x[0],end:x[1],text:x[2]}));
+  const M = require('./merge-core.js');
   const vm = require('vm'), fsM = require('fs'), pathM = require('path');
+  const coreSrc = fsM.readFileSync(pathM.join(__dirname,'srt-core.js'),'utf8');
+  const mgcSrc  = fsM.readFileSync(pathM.join(__dirname,'merge-core.js'),'utf8');
   const html = fsM.existsSync(pathM.join(__dirname,'index.html')) ? fsM.readFileSync(pathM.join(__dirname,'index.html'),'utf8') : '';
   const mg = fsM.existsSync(pathM.join(__dirname,'merge.html')) ? fsM.readFileSync(pathM.join(__dirname,'merge.html'),'utf8') : '';
 
   t('alignRows·order：同条数逐条配对，多出侧记 onlySrc/onlyDst', () => {
-    const r = C.alignRows(mk([[0,1000,'a'],[2000,3000,'b']]), mk([[0,1000,'甲'],[2000,3000,'乙']]), 'order');
+    const r = M.alignRows(mk([[0,1000,'a'],[2000,3000,'b']]), mk([[0,1000,'甲'],[2000,3000,'乙']]), 'order');
     assert.strictEqual(r.report.pairs, 2);
     assert.deepStrictEqual(r.report.onlySrc, []);
     assert.deepStrictEqual(r.report.onlyDst, []);
-    const r2 = C.alignRows(mk([[0,1000,'a'],[1000,2000,'b']]), mk([[0,1500,'甲']]), 'order');
+    const r2 = M.alignRows(mk([[0,1000,'a'],[1000,2000,'b']]), mk([[0,1500,'甲']]), 'order');
     assert.strictEqual(r2.report.pairs, 1);
     assert.deepStrictEqual(r2.report.onlySrc, [1]);   // 第 2 条原文落单
     assert.strictEqual(r2.rows.filter(x=>x.flag==='drop').length, 1);
@@ -5244,7 +5249,7 @@ console.log('— 双语合并工具（v0.9.218）—');
     const src = mk([[0,1000,'s0'],[5000,6000,'s1']]);
     const dst = mk([[0,1000,'d0'],[100,200,'d1'],[150,250,'d2'],[160,260,'d3'],[170,270,'d4'],
                     [180,280,'d5'],[190,290,'d6'],[200,300,'d7'],[210,310,'d8'],[5000,6000,'d9']]);
-    const r = C.alignRows(src, dst, 'time');
+    const r = M.alignRows(src, dst, 'time');
     assert.strictEqual(r.report.pairs, 2, 'pairs 应等于原文条数');
     const s0rows = r.rows.filter(x=>x.en==='s0' && x.flag!=='drop');
     assert.strictEqual(s0rows.length, 1, 's0 被配了 ' + s0rows.length + ' 次');
@@ -5252,7 +5257,7 @@ console.log('— 双语合并工具（v0.9.218）—');
   });
 
   t('alignRows·time：落单原文保留 drop 行且 onlySrc 有记录（静默丢弃回归）', () => {
-    const r = C.alignRows(mk([[0,1000,'a'],[2000,3000,'b-孤独'],[8000,9000,'c']]),
+    const r = M.alignRows(mk([[0,1000,'a'],[2000,3000,'b-孤独'],[8000,9000,'c']]),
                           mk([[0,1000,'甲'],[8000,9000,'丙']]), 'time');
     assert.deepStrictEqual(r.report.onlySrc, [1]);
     const lonely = r.rows.find(x=>x.en==='b-孤独');
@@ -5260,20 +5265,20 @@ console.log('— 双语合并工具（v0.9.218）—');
   });
 
   t('alignRows·dstTime：原文多出并入上一条（merged 行为回归）', () => {
-    const r = C.alignRows(mk([[0,1000,'a'],[1000,2000,'b'],[2000,3000,'c']]),
+    const r = M.alignRows(mk([[0,1000,'a'],[1000,2000,'b'],[2000,3000,'c']]),
                           mk([[0,1500,'甲'],[1500,3000,'乙']]), 'dstTime');
     const m = r.rows.find(x=>x.en==='c');
     assert.ok(m && m.flag==='merged', '多出的原文应是 merged 行');
-    const bi = C.buildBilingual(r.rows, {order:'src-first'});
+    const bi = M.buildBilingual(r.rows, {order:'src-first'});
     assert.ok(/b\s*c/.test(bi[1].text), 'merged 原文应并入上一条：' + JSON.stringify(bi.map(x=>x.text)));
   });
 
   t('shiftTimeline：负偏移夹到 0、正偏移整体平移', () => {
     const rows = mk([[500,1500,'x'],[3000,4000,'y']]);
-    const down = C.shiftTimeline(rows, -800);
+    const down = M.shiftTimeline(rows, -800);
     assert.deepStrictEqual([down[0].start, down[0].end], [0, 700]);
     assert.deepStrictEqual([down[1].start, down[1].end], [2200, 3200]);
-    const up = C.shiftTimeline(rows, 100);
+    const up = M.shiftTimeline(rows, 100);
     assert.deepStrictEqual([up[0].start, up[0].end], [600, 1600]);
   });
 
@@ -5287,7 +5292,7 @@ console.log('— 双语合并工具（v0.9.218）—');
       {start:9000, end:9030, en:'d', zh:'丁', flag:''}          // too-short（< MIN_DUR_MS）
     ];
     rows[2].start = 600;                                        // 与第 1 条重叠 400ms
-    const iss = C.checkTimeline(rows);
+    const iss = M.checkTimeline(rows);
     const kinds = iss.map(x=>x.kind).sort();
     assert.ok(kinds.includes('overlap'), '应检出重叠');
     assert.ok(kinds.includes('too-short'), '应检出过短');
@@ -5299,17 +5304,17 @@ console.log('— 双语合并工具（v0.9.218）—');
     const s1 = '1\n00:00:00,000 --> 00:00:01,000\nhello\n\n2\n00:00:02,000 --> 00:00:03,000\nworld\n';
     const s2 = '1\n00:00:00,000 --> 00:00:01,000\n你好\n\n2\n00:00:02,000 --> 00:00:03,000\n世界\n';
     const a = C.parseSrt(s1).items, b = C.parseSrt(s2).items;
-    const r = C.alignRows(a, b, 'time');
-    const items = C.buildBilingual(r.rows, {maxW:32, biMaxW:32, order:'src-first'});
+    const r = M.alignRows(a, b, 'time');
+    const items = M.buildBilingual(r.rows, {maxW:32, biMaxW:32, order:'src-first'});
     const back = C.parseSrt(C.formatSrt(items)).items;
     assert.strictEqual(back.length, 2);
     assert.ok(back[0].text.indexOf('hello') >= 0 && back[0].text.indexOf('你好') >= 0);
     assert.ok(back[1].text.indexOf('world') >= 0 && back[1].text.indexOf('世界') >= 0);
   });
 
-  t('merge.html：存在、引对版本、内联脚本可解析、关键 id 齐全', () => {
+  t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/srt-core\.js\?v=0\.9\.218/.test(mg), 'merge.html 未引用 v0.9.218 的 srt-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.219/.test(mg), 'merge.html 未引用 v0.9.219 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5318,7 +5323,7 @@ console.log('— 双语合并工具（v0.9.218）—');
       checked++;
     }
     assert.strictEqual(checked, 1, '应恰好 1 段内联脚本');
-    ['srcDrop','dstDrop','srcFile','dstFile','srcText','dstText','btnMerge','repRows','expFmt','expFmt2','btnDownload','btnCopy','dstShift','biMaxW','uiLang']
+    ['srcDrop','dstDrop','srcFile','dstFile','srcText','dstText','btnMerge','repRows','expFmt','expFmt2','btnDownload','btnCopy','dstShift','biMaxW','uiLang','assPanel','layoutRow','btnAssReset']
       .forEach(id => assert.ok(mg.indexOf('id="' + id + '"') > 0, 'merge.html 缺 ' + id));
     /* ASS 外观字段与主站同名（v0.9.217 那套） */
     ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline',
@@ -5326,8 +5331,7 @@ console.log('— 双语合并工具（v0.9.218）—');
       .forEach(id => assert.ok(mg.indexOf('id="' + id + '"') > 0, 'merge.html 缺 ASS 字段 ' + id));
   });
 
-  t('merge.html：4 种界面语言词典齐全（其余语言回退英文）', () => {
-    for (const code of ['zh-CN','zh-TW','en','ja']) {
+  t('merge.html：4 种界面语言词典齐全（其余语言回退英文）', () => {    for (const code of ['zh-CN','zh-TW','en','ja']) {
       const m = mg.match(new RegExp("^\\s*'" + code + "':\\s*\\{", 'm'));
       assert.ok(m, '缺 ' + code + ' 词典');
       const i = mg.indexOf(m[0]);
@@ -5340,12 +5344,58 @@ console.log('— 双语合并工具（v0.9.218）—');
     assert.ok(/I18N\['en'\]\[k\] !== undefined \? I18N\['en'\]\[k\]/.test(mg), 't() 缺英文回退层');
   });
 
-  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.218 + merge 入口', () => {
+  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.219 + merge 入口', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.218</.test(html), '首页版本号未升 0.9.218');
-    assert.ok(/class="ver-tag">v0\.9\.218</.test(html), '工作台版本号未升 0.9.218');
-    assert.ok(/srt-core\.js\?v=0\.9\.218/.test(html), 'srt-core.js?v 未升 0.9.218');
+    assert.ok(/class="ver">v0\.9\.219</.test(html), '首页版本号未升 0.9.219');
+    assert.ok(/class="ver-tag">v0\.9\.219</.test(html), '工作台版本号未升 0.9.219');
+    assert.ok(/srt-core\.js\?v=0\.9\.219/.test(html), 'srt-core.js?v 未升 0.9.219');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
+  });
+
+  /* v0.9.219 用户定案：双语合并与翻译处理完全分开——合并专用代码只许在 merge-core.js */
+  t('引擎分离：srt-core 无合并专用函数，merge-core 有；两页互不引用对方引擎', () => {
+    ['function alignRows','function overlapMs','function shiftTimeline','function checkTimeline']
+      .forEach(fn => {
+        assert.ok(mgcSrc.indexOf(fn) > 0, 'merge-core.js 缺 ' + fn);
+        assert.strictEqual(coreSrc.indexOf(fn), -1, 'srt-core.js 不应再有 ' + fn + '（合并工具已独立）');
+      });
+    assert.ok(mgcSrc.indexOf('root.MergeCore = factory()') > 0, 'merge-core.js UMD 名应为 MergeCore');
+    assert.strictEqual(mgcSrc.indexOf('root.SrtCore'), -1, 'merge-core.js 不应暴露 SrtCore 名');
+    assert.ok(mg.indexOf('srt-core.js') === -1, 'merge.html 不得引用 srt-core.js');
+    assert.ok(/const C = window\.MergeCore/.test(mg), 'merge.html 应取 window.MergeCore');
+    assert.strictEqual(html.indexOf('merge-core.js'), -1, '主站 index.html 不得引用 merge-core.js');
+    /* 分叉完整性：合并引擎仍保有双语组装所需的全部函数 */
+    ['buildBilingual','buildBilingualParts','parseSrt','parseVtt','parseAss','parseSbv','detectFormat',
+     'formatSrt','formatVtt','formatAss','assLineHeight','assStackMV','wrapToWidth','isSpeakerText']
+      .forEach(fn => assert.ok(mgcSrc.indexOf('function ' + fn) > 0 || mgcSrc.indexOf(fn + ',') > 0 || mgcSrc.indexOf(fn + ':') > 0,
+        'merge-core.js 缺 ' + fn));
+    /* 两引擎对同一双语输入产出一致（分叉点行为基线） */
+    const rows = [{no:1,start:0,end:2000,en:'hello',zh:'你好',flag:''}];
+    assert.strictEqual(M.buildBilingual(rows, {maxW:24})[0].text, C.buildBilingual(rows, {maxW:24})[0].text);
+  });
+
+  t('merge.html：导出模板制（3 默认模板 + ASS 自定义，10-04 用户定案）', () => {
+    /* 五个模板选项齐全，值对应 core 分支 */
+    ['value="srt"','value="vtt"','value="split"','value="stack"','value="custom"']
+      .forEach(v => assert.ok(mg.indexOf(v) > 0, '缺模板选项 ' + v));
+    /* expFmtVal 映射：split/stack 直译，custom 跟随布局 radio */
+    assert.ok(/function tplVal\(\)/.test(mg), '缺 tplVal');
+    assert.ok(/if \(tpl === 'custom'\) return assLayoutVal\(\)/.test(mg), 'custom 未跟随布局选择');
+    /* 面板显隐：无风格模板隐藏 ASS 面板，custom 显示布局行 */
+    assert.ok(/syncAssPanel/.test(mg), '缺 syncAssPanel');
+    assert.ok(/\$\('assPanel'\)\.style\.display = \(tpl === 'srt' \|\| tpl === 'vtt'\) \? 'none' : ''/.test(mg), '无风格模板未隐藏 ASS 面板');
+    assert.ok(/\$\('layoutRow'\)\.style\.display = tpl === 'custom' \? 'flex' : 'none'/.test(mg), '布局行未只在 custom 显示');
+    /* 恢复默认：14 个外观字段逐一回默认值（⚠️ 只在 ASS_DEFAULTS 声明块内数，文件里还有同形态的绑定数组） */
+    assert.ok(/function resetAssDefaults\(\)/.test(mg), '缺 resetAssDefaults');
+    const declAt = mg.indexOf('const ASS_DEFAULTS = [');
+    assert.ok(declAt > 0, '缺 ASS_DEFAULTS 声明');
+    const declEnd = mg.indexOf('];', declAt);
+    const decl = mg.slice(declAt, declEnd);
+    assert.strictEqual((decl.match(/\['ass[A-Za-z]+','[^']+'\]/g) || []).length, 14, 'ASS_DEFAULTS 应覆盖 14 个字段');
+    /* 模板提示与词条（4 语） */
+    ['lblTpl','tplSrt','tplVtt','tplSplit','tplStack','tplCustom','lblLayout','layoutSplit','layoutStack','tplHintPlain','tplHintPreset','tplHintCustom','assReset','assResetDone']
+      .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
+        assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
   });
 }
