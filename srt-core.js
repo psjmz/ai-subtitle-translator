@@ -2569,9 +2569,6 @@
     return { ok: errs.length === 0, errs, texts, cpsWarns, wideWarns };
   }
 
-
-  // ================= 双文件合并（v0.9.218，纯本地，不调模型）=================
-  // 用途：用户手上已有一份原文 + 一份译文（自己翻的、别人翻的、软件导出的），
   return {
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
