@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双语字幕合并工具 - 随心字幕 AI (AI-SRTSub)</title>
+<meta name="description" content="免费在线双语字幕合并工具：上传原文字幕和译文字幕（SRT / VTT / ASS / SBV），自动按顺序或时间轴配对，一键合并成双语字幕。全程本地处理，不上传服务器。">
+<meta name="keywords" content="双语字幕合并,字幕合并,SRT合并,双语字幕制作,中英双语字幕,字幕配轴,VTT合并,ASS双语,免费字幕工具,merge bilingual subtitles">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#EC4899">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  /* 视觉系统与 index.html 同源：暖中性框架 + 粉紫渐变点缀 */
+  :root{
+    --bg:#F8F7F5; --card:#FFFFFF; --card-2:#F7F6F4;
+    --line:#E8E7E4; --line-strong:#D9D8D4;
+    --ink:#39363B; --sub:#6F6C72; --mut:#A5A2A8;
+    --acc:#EC4899; --acc2:#F070AE; --acc-weak:#FDEDF4; --acc-line:#F6C9DD;
+    --grad:linear-gradient(95deg,#FF6B9D,#A78BFA); --lav:#8B5CF6;
+    --ok:#10B981; --ok-weak:#E4F5EB;
+    --warn:#C77C0A; --warn-weak:#FFF4E5;
+    --del:#DC2626; --del-weak:#FEF2F2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
+  button{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .lnav{display:flex;align-items:center;gap:18px;padding:18px 0 8px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
+  .logo-mark{width:30px;height:30px;border-radius:9px;background:var(--grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+  .ver{font-size:11px;color:var(--mut);font-weight:500}
+  .lnav a{color:var(--sub);text-decoration:none;font-size:13px;display:inline-flex;align-items:center;gap:5px}
+  .lnav a:hover{color:var(--acc)}
+  .lnav .spacer{flex:1}
+  .lnav select{border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:8px;padding:5px 8px;font-size:12px}
+  .hero{padding:26px 0 10px;text-align:center}
+  .hero h1{font-size:30px;margin:0 0 8px;letter-spacing:-.5px}
+  .hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{color:var(--sub);margin:0;font-size:14px}
+  .pill{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:5px 13px;border-radius:99px;
+    background:var(--ok-weak);color:#0B7A5C;font-size:12px;font-weight:500}
+  .pill i{width:7px;height:7px;border-radius:99px;background:var(--ok);display:inline-block}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px}
+  .card h2{font-size:14px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .card h2 .n{width:22px;height:22px;border-radius:99px;background:var(--acc-weak);color:var(--acc);
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+  .drop{border:1.6px dashed var(--line-strong);border-radius:12px;padding:18px 14px;text-align:center;
+    cursor:pointer;transition:border-color .15s,background .15s}
+  .drop:hover,.drop.over{border-color:var(--acc);background:var(--acc-weak)}
+  .drop b{display:block;font-size:13.5px}
+  .drop span{display:block;color:var(--mut);font-size:12px;margin-top:3px}
+  .card textarea{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;
+    font:12px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;resize:vertical;min-height:64px;color:var(--ink)}
+  .card textarea:focus{outline:2px solid var(--acc-line);border-color:var(--acc-line)}
+  .parse-ok{margin-top:9px;font-size:12px;color:#0B7A5C;background:var(--ok-weak);
+    border-radius:8px;padding:6px 10px;display:none}
+  .parse-bad{margin-top:9px;font-size:12px;color:var(--del);background:var(--del-weak);
+    border-radius:8px;padding:6px 10px;display:none}
+
+  .opts{margin-top:16px}
+  .frow{display:grid;grid-template-columns:170px 1fr;gap:10px 14px;align-items:center}
+  @media (max-width:640px){.frow{grid-template-columns:1fr}}
+  .flbl{font-size:13px;color:var(--sub);font-weight:500}
+  .frow select,.frow input[type=number]{border:1px solid var(--line-strong);background:var(--card);
+    color:var(--ink);border-radius:8px;padding:7px 10px;font-size:13px;width:100%;max-width:340px}
+  .hint{font-size:11.5px;color:var(--mut);margin-top:4px;max-width:420px}
+  .radios{display:flex;flex-wrap:wrap;gap:14px}
+  .radios label{display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer}
+
+  details.ass{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--card-2)}
+  details.ass summary{cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:var(--sub);list-style:none}
+  details.ass summary::-webkit-details-marker{display:none}
+  details.ass summary::before{content:'▸';display:inline-block;margin-right:7px;transition:transform .15s;color:var(--acc)}
+  details.ass[open] summary::before{transform:rotate(90deg)}
+  .ass-body{padding:2px 14px 14px}
+  .ass-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:640px){.ass-cols{grid-template-columns:1fr}}
+  .ass-col h4{margin:0 0 8px;font-size:12.5px;color:var(--acc)}
+  .af{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+  .af label{font-size:12px;color:var(--sub);flex:none}
+  .af input[type=number],.af input[type=text]{width:74px;border:1px solid var(--line-strong);border-radius:7px;
+    padding:4px 7px;font-size:12px;text-align:right}
+  .af input[type=text]{text-align:left;width:110px}
+  .af select{border:1px solid var(--line-strong);border-radius:7px;padding:4px 6px;font-size:12px;max-width:130px}
+  .af input[type=range]{width:90px;accent-color:var(--acc)}
+  .af .pct{font-size:11px;color:var(--mut);width:36px;text-align:right;flex:none}
+  .af .sw{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--line-strong);flex:none}
+
+  .actions{margin:20px 0 6px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .btn{border:none;border-radius:11px;padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer;
+    background:var(--grad);color:#fff;box-shadow:0 6px 18px rgba(236,72,153,.25);transition:transform .12s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line-strong);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--acc);color:var(--acc)}
+
+  .rep{display:none;margin-top:16px}
+  .rep-band{display:flex;flex-wrap:wrap;gap:10px}
+  .rep-chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 14px;font-size:12.5px}
+  .rep-chip b{font-size:15px;margin-right:4px}
+  .rep-chip.ok b{color:var(--ok)} .rep-chip.warn b{color:var(--warn)} .rep-chip.bad b{color:var(--del)}
+  .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:10px;padding:9px 14px;
+    font-size:12.5px;color:#8A5A0B;display:none;line-height:1.8}
+  .rep-clean{margin-top:10px;background:var(--ok-weak);border-radius:10px;padding:9px 14px;
+    font-size:12.5px;color:#0B7A5C;display:none}
+  .tbl-wrap{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:420px;background:var(--card)}
+  table.tbl{border-collapse:collapse;width:100%;font-size:12.5px}
+  .tbl th{position:sticky;top:0;background:var(--card-2);color:var(--sub);font-weight:600;text-align:left;
+    padding:8px 10px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;z-index:2}
+  .tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl td.no{color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .tbl td.tm{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:11.5px}
+  .tbl tr.drop td{color:var(--mut);background:#FAFAF9}
+  .tbl tr.merged td{background:var(--warn-weak)}
+  .tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:1px}
+  .tag.drop{background:#EFEFED;color:var(--mut)}
+  .tag.merged{background:var(--warn-weak);color:var(--warn)}
+  .pv-note{margin-top:8px;font-size:11.5px;color:var(--mut)}
+
+  .exp{display:none;margin-top:18px}
+  .exp-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .exp-row select{border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:9px;padding:8px 12px;font-size:13px}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:#2F2D33;color:#F5F4F2;
+    padding:9px 18px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:all .2s;z-index:99}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  footer{padding:34px 0 26px;text-align:center;color:var(--mut);font-size:12px}
+  footer a{color:var(--sub);text-decoration:none}
+  footer a:hover{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="lnav">
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.218</span></div>
+    <div class="spacer"></div>
+    <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
+    <select id="uiLang" aria-label="UI language"></select>
+  </nav>
+
+  <div class="hero">
+    <h1 data-i18n-html="heroTitle">两份字幕，<em>合成一套双语</em></h1>
+    <p data-i18n="heroSub">上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。</p>
+    <span class="pill"><i></i><span data-i18n="localNote">全程本地处理，字幕不上传服务器</span></span>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2><span class="n">1</span><span data-i18n="srcCard">原文字幕</span></h2>
+      <div class="drop" id="srcDrop" role="button" tabindex="0">
+        <b data-i18n="btnPick">📂 点这里选文件，或直接拖进来</b>
+        <span data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
+      </div>
+      <input type="file" id="srcFile" accept=".srt,.vtt,.ass,.ssa,.sbv,.txt" hidden>
+      <textarea id="srcText" data-i18n-ph="pastePh" placeholder="或把字幕文本粘贴到这里…" spellcheck="false"></textarea>
+      <div class="parse-ok" id="srcOk"></div>
+      <div class="parse-bad" id="srcBad"></div>
+    </div>
+    <div class="card">
+      <h2><span class="n">2</span><span data-i18n="dstCard">译文字幕</span></h2>
+      <div class="drop" id="dstDrop" role="button" tabindex="0">
+        <b data-i18n="btnPick">📂 点这里选文件，或直接拖进来</b>
+        <span data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
+      </div>
+      <input type="file" id="dstFile" accept=".srt,.vtt,.ass,.ssa,.sbv,.txt" hidden>
+      <textarea id="dstText" data-i18n-ph="pastePh" placeholder="或把字幕文本粘贴到这里…" spellcheck="false"></textarea>
+      <div class="parse-ok" id="dstOk"></div>
+      <div class="parse-bad" id="dstBad"></div>
+    </div>
+  </div>
+
+  <div class="card opts">
+    <h2><span class="n">3</span><span data-i18n="optTitle">合并设置</span></h2>
+    <div class="frow">
+      <div class="flbl" data-i18n="lblAlign">对齐方式</div>
+      <div>
+        <div class="radios">
+          <label><input type="radio" name="alignMode" value="order"><span data-i18n="alignOrder">按顺序</span></label>
+          <label><input type="radio" name="alignMode" value="time" checked><span data-i18n="alignTime">按时间轴</span></label>
+          <label><input type="radio" name="alignMode" value="dstTime"><span data-i18n="alignDstTime">时间轴跟译文</span></label>
+        </div>
+        <div class="hint" id="alignHint" data-i18n="alignHintTime">两份字幕来自同一片源（条数一致）用「按顺序」最准；条数不同或轴有漂移，用「按时间轴」按重叠自动配对；译文时间轴更可靠时用「时间轴跟译文」。</div>
+      </div>
+      <div class="flbl" data-i18n="lblShift">译文整体偏移（毫秒）</div>
+      <div>
+        <input type="number" id="dstShift" value="0" step="100" style="max-width:160px">
+        <div class="hint" data-i18n="shiftHint">译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。</div>
+      </div>
+      <div class="flbl" data-i18n="lblBiMaxW">双语行宽</div>
+      <div>
+        <input type="number" id="biMaxW" value="32" min="10" max="80" step="1" style="max-width:160px">
+        <div class="hint" data-i18n="biMaxWHint">每行最大显示宽度（1 个汉字 = 1）。超宽自动折行，1 汉字 ≈ 2.4 个西文字符。</div>
+      </div>
+      <div class="flbl" data-i18n="lblOrder">双语上下顺序</div>
+      <div class="radios">
+        <label><input type="radio" name="biOrder" value="src-first" checked><span data-i18n="orderSrc">原文在上</span></label>
+        <label><input type="radio" name="biOrder" value="dst-first"><span data-i18n="orderDst">译文在上</span></label>
+      </div>
+      <div class="flbl" data-i18n="lblFmt">导出格式</div>
+      <div>
+        <select id="expFmt">
+          <option value="srt">SRT (.srt)</option>
+          <option value="vtt">WebVTT (.vtt)</option>
+          <option value="ass-split" data-i18n="optAssSplit">ASS 分屏·上下分离 (.ass)</option>
+          <option value="ass-stack" data-i18n="optAssStack">ASS 堆叠·底部双行 (.ass)</option>
+        </select>
+      </div>
+    </div>
+
+    <details class="ass">
+      <summary data-i18n="assPanel">ASS 外观（导出 ASS 时生效）</summary>
+      <div class="ass-body">
+        <div class="ass-cols">
+          <div class="ass-col">
+            <h4 data-i18n="lblDstCol">译文（主）</h4>
+            <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assDstSize" value="56" min="8" max="200"></div>
+            <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assDstColor" value="#FFFFFF"><span class="sw" id="assDstColorSw"></span></div>
+            <div class="af"><label data-i18n="lblOutline">描边</label><input type="number" id="assDstOutline" value="2.5" min="0" max="10" step="0.5"></div>
+            <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assDstOutlineColor" value="#000000"><span class="sw" id="assDstOutlineColorSw"></span></div>
+            <div class="af"><label data-i18n="lblFont">字体</label><select id="assDstFont"></select></div>
+            <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assDstAlpha" min="10" max="100" value="100"><span class="pct" id="assDstAlphaOut">100%</span></div>
+            <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assDstMV" value="42" min="0" max="1080"></div>
+          </div>
+          <div class="ass-col">
+            <h4 data-i18n="lblSrcCol">原文（副）</h4>
+            <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assSrcSize" value="50" min="8" max="200"></div>
+            <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assSrcColor" value="#FFD700"><span class="sw" id="assSrcColorSw"></span></div>
+            <div class="af"><label data-i18n="lblOutline">描边</label><input type="number" id="assSrcOutline" value="2.5" min="0" max="10" step="0.5"></div>
+            <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assSrcOutlineColor" value="#000000"><span class="sw" id="assSrcOutlineColorSw"></span></div>
+            <div class="af"><label data-i18n="lblFont">字体</label><select id="assSrcFont"></select></div>
+            <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assSrcAlpha" min="10" max="100" value="100"><span class="pct" id="assSrcAlphaOut">100%</span></div>
+            <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assSrcMV" value="42" min="0" max="1080"></div>
+          </div>
+        </div>
+        <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
+      </div>
+    </details>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="btnMerge" data-i18n="btnMerge">🔗 合并预览</button>
+    <span class="hint" data-i18n="mergeHint">先看配对结果和体检报告，再下载。</span>
+  </div>
+
+  <div class="rep" id="rep">
+    <div class="rep-band" id="repBand"></div>
+    <div class="rep-issues" id="repIssues"></div>
+    <div class="rep-clean" id="repClean"></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th data-i18n="colNo">#</th>
+          <th data-i18n="colTime">时间</th>
+          <th data-i18n="colSrc">原文</th>
+          <th data-i18n="colDst">译文</th>
+        </tr></thead>
+        <tbody id="repRows"></tbody>
+      </table>
+    </div>
+    <div class="pv-note" id="pvNote"></div>
+  </div>
+
+  <div class="exp card" id="exp">
+    <h2><span class="n">4</span><span data-i18n="expTitle">导出</span></h2>
+    <div class="exp-row">
+      <select id="expFmt2"></select>
+      <button class="btn" id="btnDownload" data-i18n="btnDownload">⬇ 下载字幕</button>
+      <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
+    </div>
+  </div>
+
+  <footer>
+    <span data-i18n="footNote">随心字幕 AI · 双语字幕合并工具</span> · <a href="/" data-i18n="footLink">去翻译字幕 →</a>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="srt-core.js?v=0.9.218"></script>
+<script>
+'use strict';
+/* srt-core.js 在浏览器端暴露为 window.SrtCore（与主站同款别名） */
+const C = window.SrtCore;
+/* ================= i18n =================
+   独立小词典：4 种完整语言，其余界面语言回退英文（回退链 lang → en → zh-CN）。 */
+const I18N = {
+  'zh-CN': {
+    brandName:'随心字幕 AI', navHome:'返回翻译工具',
+    heroTitle:'两份字幕，<em>合成一套双语</em>',
+    heroSub:'上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。',
+    localNote:'全程本地处理，字幕不上传服务器',
+    srcCard:'原文字幕', dstCard:'译文字幕', btnPick:'📂 点这里选文件，或直接拖进来',
+    dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文本粘贴到这里…',
+    parsedOk:'✓ 已解析 {0}：{1} 条', parseFail:'✗ 解析失败：内容不是有效的字幕格式',
+    optTitle:'合并设置',
+    lblAlign:'对齐方式', alignOrder:'按顺序', alignTime:'按时间轴', alignDstTime:'时间轴跟译文',
+    alignHintOrder:'两份字幕条数一致、来自同一片源：第 1 条配第 1 条，最准。', 
+    alignHintTime:'两份字幕来自同一片源（条数一致）用「按顺序」最准；条数不同或轴有漂移，用「按时间轴」按重叠自动配对；译文时间轴更可靠时用「时间轴跟译文」。',
+    alignHintDst:'时间轴全部采用译文的，原文只提供文字；原文多出的条目会并入上一条。',
+    lblShift:'译文整体偏移（毫秒）', shiftHint:'译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。',
+    lblBiMaxW:'双语行宽', biMaxWHint:'每行最大显示宽度（1 个汉字 = 1）。超宽自动折行，1 汉字 ≈ 2.4 个西文字符。',
+    lblOrder:'双语上下顺序', orderSrc:'原文在上', orderDst:'译文在上',
+    lblFmt:'导出格式', optAssSplit:'ASS 分屏·上下分离 (.ass)', optAssStack:'ASS 堆叠·底部双行 (.ass)',
+    assPanel:'ASS 外观（导出 ASS 时生效）', lblDstCol:'译文（主）', lblSrcCol:'原文（副）',
+    lblSize:'字号', lblColor:'颜色', lblOutline:'描边', lblOutlineColor:'描边色', lblFont:'字体',
+    lblAlpha:'不透明度', lblMV:'离底距离',
+    assFontTip:'字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。',
+    btnMerge:'🔗 合并预览', mergeHint:'先看配对结果和体检报告，再下载。',
+    repPaired:'配对', repOnlySrc:'原文落单', repOnlyDst:'译文落单', repIssues:'时间轴体检',
+    repCleanTxt:'时间轴体检通过：没有重叠、过短或缺失。', repIssueHead:'时间轴体检：{0} 处需注意（前 20 条）',
+    colNo:'#', colTime:'时间', colSrc:'原文', colDst:'译文',
+    tagDrop:'未配上·不出现在成片', tagMerged:'并入上一条',
+    pvNote:'预览最多显示前 {0} 条，完整内容以导出文件为准。',
+    expTitle:'导出', btnDownload:'⬇ 下载字幕', btnCopy:'复制内容',
+    needBoth:'请先在上方提供原文和译文字幕（文件或粘贴均可）', needMerge:'请先点「合并预览」',
+    copied:'已复制到剪贴板', downloaded:'已开始下载',
+    issOverlap:'#{0} 与前一条重叠 {1}ms', issShort:'#{0} 时长不足（短于 0.5 秒）',
+    issNoDst:'#{0} 缺译文', issNoSrc:'#{0} 缺原文', issEmpty:'#{0} 两侧都为空',
+    footNote:'随心字幕 AI · 双语字幕合并工具', footLink:'去翻译字幕 →'
+  },
+  'zh-TW': {
+    brandName:'隨心字幕 AI', navHome:'返回翻譯工具',
+    heroTitle:'兩份字幕，<em>合成一套雙語</em>',
+    heroSub:'上傳原文和譯文字幕（SRT / VTT / ASS / SBV），自動配對合併成雙語字幕——支援按順序或時間軸對齊、整體偏移、異常檢查。',
+    localNote:'全程本機處理，字幕不上傳伺服器',
+    srcCard:'原文字幕', dstCard:'譯文字幕', btnPick:'📂 點這裡選檔案，或直接拖進來',
+    dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文字貼到這裡…',
+    parsedOk:'✓ 已解析 {0}：{1} 條', parseFail:'✗ 解析失敗：內容不是有效的字幕格式',
+    optTitle:'合併設定',
+    lblAlign:'對齊方式', alignOrder:'按順序', alignTime:'按時間軸', alignDstTime:'時間軸跟譯文',
+    alignHintOrder:'兩份字幕條數一致、來自同一片源：第 1 條配第 1 條，最準。',
+    alignHintTime:'兩份字幕來自同一片源（條數一致）用「按順序」最準；條數不同或軸有漂移，用「按時間軸」按重疊自動配對；譯文時間軸更可靠時用「時間軸跟譯文」。',
+    alignHintDst:'時間軸全部採用譯文的，原文只提供文字；原文多出的條目會併入上一條。',
+    lblShift:'譯文整體偏移（毫秒）', shiftHint:'譯文字幕整體提前（負數）或延後（正數）。例如字幕晚了半秒填 -500。',
+    lblBiMaxW:'雙語行寬', biMaxWHint:'每行最大顯示寬度（1 個漢字 = 1）。超寬自動折行，1 漢字 ≈ 2.4 個西文字元。',
+    lblOrder:'雙語上下順序', orderSrc:'原文在上', orderDst:'譯文在上',
+    lblFmt:'匯出格式', optAssSplit:'ASS 分屏·上下分離 (.ass)', optAssStack:'ASS 堆疊·底部雙行 (.ass)',
+    assPanel:'ASS 外觀（匯出 ASS 時生效）', lblDstCol:'譯文（主）', lblSrcCol:'原文（副）',
+    lblSize:'字號', lblColor:'顏色', lblOutline:'描邊', lblOutlineColor:'描邊色', lblFont:'字體',
+    lblAlpha:'不透明度', lblMV:'離底距離',
+    assFontTip:'字體在播放端機器上解析，對方沒裝會自動回退；其餘參數與主站「ASS 樣式」一致。',
+    btnMerge:'🔗 合併預覽', mergeHint:'先看配對結果和體檢報告，再下載。',
+    repPaired:'配對', repOnlySrc:'原文落單', repOnlyDst:'譯文落單', repIssues:'時間軸體檢',
+    repCleanTxt:'時間軸體檢通過：沒有重疊、過短或缺失。', repIssueHead:'時間軸體檢：{0} 處需注意（前 20 條）',
+    colNo:'#', colTime:'時間', colSrc:'原文', colDst:'譯文',
+    tagDrop:'未配上·不出現在成片', tagMerged:'併入上一條',
+    pvNote:'預覽最多顯示前 {0} 條，完整內容以匯出檔案為準。',
+    expTitle:'匯出', btnDownload:'⬇ 下載字幕', btnCopy:'複製內容',
+    needBoth:'請先在上方提供原文和譯文字幕（檔案或貼上均可）', needMerge:'請先點「合併預覽」',
+    copied:'已複製到剪貼簿', downloaded:'已開始下載',
+    issOverlap:'#{0} 與前一條重疊 {1}ms', issShort:'#{0} 時長不足（短於 0.5 秒）',
+    issNoDst:'#{0} 缺譯文', issNoSrc:'#{0} 缺原文', issEmpty:'#{0} 兩側都為空',
+    footNote:'隨心字幕 AI · 雙語字幕合併工具', footLink:'去翻譯字幕 →'
+  },
+  'en': {
+    brandName:'AI-SRTSub', navHome:'Back to Translator',
+    heroTitle:'Two subtitle files, <em>one bilingual track</em>',
+    heroSub:'Upload the original and the translated subtitle (SRT / VTT / ASS / SBV) and merge them into a bilingual track — pairing by order or timeline, global shift, and sanity checks included.',
+    localNote:'Runs entirely in your browser — nothing is uploaded',
+    srcCard:'Original subtitles', dstCard:'Translated subtitles', btnPick:'📂 Click to choose a file, or drop one here',
+    dropSub:'SRT · VTT · ASS · SBV', pastePh:'or paste subtitle text here…',
+    parsedOk:'✓ Parsed {0}: {1} cues', parseFail:'✗ Parse failed: not a valid subtitle format',
+    optTitle:'Merge settings',
+    lblAlign:'Pairing mode', alignOrder:'By order', alignTime:'By timeline', alignDstTime:'Follow translation',
+    alignHintOrder:'Both files have the same cue count from the same source: cue 1 pairs with cue 1 — the most accurate.',
+    alignHintTime:'Use “By order” when both files come from the same source and cue counts match; use “By timeline” when counts differ or timings drift; use “Follow translation” when the translated timings are more reliable.',
+    alignHintDst:'All timings come from the translated file; the original only provides text. Extra original cues are folded into the previous one.',
+    lblShift:'Shift translation (ms)', shiftHint:'Move the translated file earlier (negative) or later (positive). E.g. -500 if it runs half a second late.',
+    lblBiMaxW:'Line width', biMaxWHint:'Max display width per line (1 CJK char = 1). Longer lines wrap automatically; 1 CJK char ≈ 2.4 Latin characters.',
+    lblOrder:'Stacking order', orderSrc:'Original on top', orderDst:'Translation on top',
+    lblFmt:'Export format', optAssSplit:'ASS split·top & bottom (.ass)', optAssStack:'ASS stacked·bottom block (.ass)',
+    assPanel:'ASS appearance (applies to ASS export)', lblDstCol:'Translation (primary)', lblSrcCol:'Original (secondary)',
+    lblSize:'Font size', lblColor:'Color', lblOutline:'Outline', lblOutlineColor:'Outline color', lblFont:'Font',
+    lblAlpha:'Opacity', lblMV:'Bottom margin',
+    assFontTip:'Fonts resolve on the viewer’s machine and fall back automatically if missing; other options match the main site’s ASS styles.',
+    btnMerge:'🔗 Merge & preview', mergeHint:'Check the pairing result and sanity report before downloading.',
+    repPaired:'Paired', repOnlySrc:'Unmatched original', repOnlyDst:'Unmatched translation', repIssues:'Timeline check',
+    repCleanTxt:'Timeline check passed: no overlaps, too-short or missing cues.', repIssueHead:'Timeline check: {0} items need attention (first 20)',
+    colNo:'#', colTime:'Time', colSrc:'Original', colDst:'Translation',
+    tagDrop:'Unpaired·excluded from output', tagMerged:'Folded into previous',
+    pvNote:'Preview shows the first {0} rows only; the exported file contains everything.',
+    expTitle:'Export', btnDownload:'⬇ Download subtitles', btnCopy:'Copy content',
+    needBoth:'Provide both the original and the translated subtitles first (file or paste)', needMerge:'Click “Merge & preview” first',
+    copied:'Copied to clipboard', downloaded:'Download started',
+    issOverlap:'#{0} overlaps the previous cue by {1}ms', issShort:'#{0} too short (under 0.5s)',
+    issNoDst:'#{0} missing translation', issNoSrc:'#{0} missing original', issEmpty:'#{0} both sides empty',
+    footNote:'AI-SRTSub · Bilingual Subtitle Merger', footLink:'Translate subtitles →'
+  },
+  'ja': {
+    brandName:'AI-SRTSub', navHome:'翻訳ツールへ戻る',
+    heroTitle:'2 つの字幕を、<em>1 つの二か国語に</em>',
+    heroSub:'原文字幕と訳文字幕（SRT / VTT / ASS / SBV）をアップロードして二か国語字幕に自動マージ——順序またはタイムラインによる整合、全体シフト、整合チェックに対応。',
+    localNote:'すべてブラウザ内で処理・字幕はサーバーに送信されません',
+    srcCard:'原文字幕', dstCard:'訳文字幕', btnPick:'📂 クリックしてファイルを選択、またはドロップ',
+    dropSub:'SRT · VTT · ASS · SBV', pastePh:'または字幕テキストをここに貼り付け…',
+    parsedOk:'✓ 解析しました {0}：{1} 件', parseFail:'✗ 解析失敗：有効な字幕形式ではありません',
+    optTitle:'マージ設定',
+    lblAlign:'整合方式', alignOrder:'順序で', alignTime:'タイムラインで', alignDstTime:'訳文の軸に合わせる',
+    alignHintOrder:'両ファイルが同じソースで件数が一致：1 番目同士を対応させる、最も正確。',
+    alignHintTime:'同じソースで件数が一致するなら「順序で」が最も正確。件数が違う・軸がずれる場合は「タイムラインで」重なりから自動対応。訳文の軸が正確なら「訳文の軸に合わせる」。',
+    alignHintDst:'タイムラインはすべて訳文のものを使用、原文は文字のみ提供。余った原文は前の条に統合されます。',
+    lblShift:'訳文の全体シフト（ミリ秒）', shiftHint:'訳文字幕を早める（負）または遅らせる（正）。例：0.5 秒遅い場合は -500。',
+    lblBiMaxW:'二か国語の行幅', biMaxWHint:'1 行の最大表示幅（漢字 1 = 1）。超過は自動折り返し、漢字 1 ≈ 欧文 2.4 文字。',
+    lblOrder:'二か国語の上下順', orderSrc:'原文を上に', orderDst:'訳文を上に',
+    lblFmt:'エクスポート形式', optAssSplit:'ASS 分離·上下分離 (.ass)', optAssStack:'ASS 積み·下部 2 行 (.ass)',
+    assPanel:'ASS 外観（ASS エクスポート時に有効）', lblDstCol:'訳文（主）', lblSrcCol:'原文（副）',
+    lblSize:'フォントサイズ', lblColor:'色', lblOutline:'縁取り', lblOutlineColor:'縁取り色', lblFont:'フォント',
+    lblAlpha:'不透明度', lblMV:'下端からの距離',
+    assFontTip:'フォントは再生側の端末で解決され、未インストールなら自動フォールバック。その他の設定は本サイトの ASS スタイルと同一です。',
+    btnMerge:'🔗 マージしてプレビュー', mergeHint:'対応結果とチェックレポートを確認してからダウンロードしてください。',
+    repPaired:'対応', repOnlySrc:'未対応の原文', repOnlyDst:'未対応の訳文', repIssues:'タイムラインチェック',
+    repCleanTxt:'タイムラインチェック合格：重複・短すぎ・欠落なし。', repIssueHead:'タイムラインチェック：{0} 件要注意（先頭 20 件）',
+    colNo:'#', colTime:'時間', colSrc:'原文', colDst:'訳文',
+    tagDrop:'未対応·出力に含まれない', tagMerged:'前の条に統合',
+    pvNote:'プレビューは先頭 {0} 行のみ。完全な内容はエクスポートファイルで確認してください。',
+    expTitle:'エクスポート', btnDownload:'⬇ 字幕をダウンロード', btnCopy:'内容をコピー',
+    needBoth:'まず原文と訳文字幕を用意してください（ファイルまたは貼り付け）', needMerge:'先に「マージしてプレビュー」を押してください',
+    copied:'クリップボードにコピーしました', downloaded:'ダウンロードを開始しました',
+    issOverlap:'#{0} が前の字幕と {1}ms 重複', issShort:'#{0} が短すぎ（0.5 秒未満）',
+    issNoDst:'#{0} 訳文なし', issNoSrc:'#{0} 原文なし', issEmpty:'#{0} 両側とも空',
+    footNote:'AI-SRTSub · 二か国語字幕マージツール', footLink:'字幕を翻訳する →'
+  }
+};
+const UI_LANGS = [ ['zh-CN','简体中文'], ['zh-TW','繁體中文'], ['en','English'], ['ja','日本語'], ['es','Español'], ['pt','Português'], ['ko','한국어'], ['de','Deutsch'], ['fr','Français'], ['id','Bahasa Indonesia'], ['hi','हिन्दी'], ['th','ไทย'], ['vi','Tiếng Việt'], ['ru','Русский'], ['it','Italiano'], ['ar','العربية'], ['tr','Türkçe'], ['nl','Nederlands'], ['pl','Polski'], ['sv','Svenska'], ['cs','Čeština'], ['uk','Українська'], ['da','Dansk'], ['fi','Suomi'], ['el','Ελληνικά'], ['he','עברית'], ['ro','Română'] ];
+const UI = { lang: 'zh-CN' };
+function t(k){
+  const d = I18N[UI.lang];
+  let s = (d && (k in d)) ? d[k] : (I18N['en'][k] !== undefined ? I18N['en'][k] : I18N['zh-CN'][k]);
+  if (s === undefined) s = k;
+  for (let i=1; i<arguments.length; i++) s = String(s).split('{'+(i-1)+'}').join(String(arguments[i]));
+  return s;
+}
+function detectUiLang(){
+  const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'zh-CN'];
+  for (const p of prefs){
+    const l = String(p).toLowerCase();
+    if (l==='zh-cn'||l==='zh-hans'||l==='zh-sg'||l==='zh'||l.startsWith('zh-hans')) return 'zh-CN';
+    if (l==='zh-tw'||l==='zh-hk'||l==='zh-mo'||l==='zh-hant'||l.startsWith('zh-hant')) return 'zh-TW';
+    for (const pair of UI_LANGS){ if (l.startsWith(pair[0].toLowerCase())) return pair[0]; }
+    if (l.startsWith('en')) return 'en';
+  }
+  return 'en';
+}
+function applyI18n(){
+  document.documentElement.lang = UI.lang;
+  document.documentElement.dir = (UI.lang==='ar'||UI.lang==='he') ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.getAttribute('data-i18n-html')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  const am = alignMode(); const hint = $('alignHint');
+  if (hint) hint.textContent = t(am==='order' ? 'alignHintOrder' : am==='dstTime' ? 'alignHintDst' : 'alignHintTime');
+}
+function toast(msg){
+  const el = $('toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+/* ================= 状态 ================= */
+const S = { src:null, dst:null, srcName:'', dstName:'', rows:null, report:null };
+function $(id){ return document.getElementById(id); }
+
+/* ================= 导入：解析两份字幕 ================= */
+function parseAny(text){
+  const fmt = C.detectFormat(text);
+  if (fmt === 'srt') return { fmt, r: C.parseSrt(text) };
+  if (fmt === 'vtt') return { fmt, r: C.parseVtt(text) };
+  if (fmt === 'ass') return { fmt, r: C.parseAss(text) };
+  if (fmt === 'sbv') return { fmt, r: C.parseSbv(text) };
+  return { fmt: null, r: null };
+}
+function loadSide(side, text, name){
+  const ok = $(side+'Ok'), bad = $(side+'Bad');
+  ok.style.display = 'none'; bad.style.display = 'none';
+  if (!text || !text.trim()){ S[side] = null; S[side+'Name'] = ''; return; }
+  const { fmt, r } = parseAny(text);
+  if (!fmt || !r || !r.items || !r.items.length){ S[side] = null; bad.style.display = 'block'; return; }
+  const items = r.items.filter(it => it && String(it.text==null?'':it.text).trim());
+  S[side] = items; S[side+'Name'] = name || '';
+  ok.textContent = t('parsedOk', fmt.toUpperCase(), items.length); ok.style.display = 'block';
+  autoAlignDefault();
+}
+function bindSide(side){
+  const drop = $(side+'Drop'), file = $(side+'File'), ta = $(side+'Text');
+  drop.addEventListener('click', ()=>file.click());
+  drop.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); file.click(); } });
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e=>{
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) f.text().then(tx=>loadSide(side, tx, f.name));
+  });
+  file.addEventListener('change', ()=>{
+    const f = file.files && file.files[0];
+    if (f) f.text().then(tx=>loadSide(side, tx, f.name));
+  });
+  let deb = null;
+  ta.addEventListener('input', ()=>{
+    clearTimeout(deb);
+    deb = setTimeout(()=>loadSide(side, ta.value, ''), 400);
+  });
+}
+/* 条数一致默认「按顺序」，否则「按时间轴」——用户手动选过就不再自动改 */
+function autoAlignDefault(){
+  if (S.alignTouched) return;
+  const mode = (S.src && S.dst && S.src.length === S.dst.length) ? 'order' : 'time';
+  const el = document.querySelector('input[name=alignMode][value="'+mode+'"]');
+  if (el) el.checked = true;
+  const hint = $('alignHint');
+  if (hint) hint.textContent = t(mode==='order' ? 'alignHintOrder' : 'alignHintTime');
+}
+function alignMode(){
+  const el = document.querySelector('input[name=alignMode]:checked');
+  return el ? el.value : 'time';
+}
+
+/* ================= 合并 ================= */
+function doMerge(){
+  if (!S.src || !S.dst){ toast(t('needBoth')); return; }
+  const shift = parseInt($('dstShift').value, 10) || 0;
+  /* 译文整体偏移在配对**之前**落到条目上：两份轴先对齐，再进 alignRows。
+     夹到 >=0（负起点播放器会当异常，与 shiftTimeline 同口径）。 */
+  const dstShifted = shift ? S.dst.map(it=>({ no:it.no,
+    start: Math.max(0, (Number(it.start)||0) + shift),
+    end: Math.max(0, (Number(it.end)||0) + shift), text: it.text })) : S.dst;
+  const mode = alignMode();
+  const out = C.alignRows(S.src, dstShifted, mode);
+  S.rows = out.rows; S.report = out.report;
+  renderReport();
+  $('exp').style.display = 'block';
+}
+function fmtShort(ms){
+  const s = Math.max(0, Number(ms)||0);
+  const m = Math.floor(s/60000), sec = Math.floor((s%60000)/1000);
+  return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderReport(){
+  const rep = S.report;
+  $('rep').style.display = 'block';
+  const chip = (cls, key, n) => '<div class="rep-chip '+cls+'"><b>'+n+'</b>'+t(key)+'</div>';
+  let band = chip(rep.pairs ? 'ok' : 'bad', 'repPaired', rep.pairs);
+  if (rep.onlySrc.length) band += chip('warn', 'repOnlySrc', rep.onlySrc.length);
+  if (rep.onlyDst.length) band += chip('warn', 'repOnlyDst', rep.onlyDst.length);
+  $('repBand').innerHTML = band;
+
+  const issues = C.checkTimeline(S.rows);
+  const iss = $('repIssues'), clean = $('repClean');
+  if (issues.length){
+    const KIND = { overlap:'issOverlap', 'too-short':'issShort', 'no-dst':'issNoDst', 'no-src':'issNoSrc', empty:'issEmpty' };
+    iss.style.display = 'block'; clean.style.display = 'none';
+    iss.innerHTML = '<b>' + t('repIssueHead', issues.length) + '</b><br>' +
+      issues.slice(0,20).map(x=>{
+        if (x.kind==='overlap'){ const m = String(x.msg).match(/overlap-(\d+)ms/); return t('issOverlap', x.i+1, m?m[1]:'?'); }
+        const k = KIND[x.kind] || 'issEmpty';
+        return t(k, x.i+1);
+      }).join('<br>');
+  } else {
+    iss.style.display = 'none'; clean.style.display = 'block'; clean.textContent = t('repCleanTxt');
+  }
+
+  const CAP = 300;
+  const rowsHtml = S.rows.slice(0, CAP).map((r,i)=>{
+    const cls = r.flag==='drop' ? ' class="drop"' : r.flag==='merged' ? ' class="merged"' : '';
+    const tag = r.flag==='drop' ? '<span class="tag drop">'+t('tagDrop')+'</span>'
+              : r.flag==='merged' ? '<span class="tag merged">'+t('tagMerged')+'</span>' : '';
+    const zh = r.flag==='merged' ? '' : esc(r.zh);
+    return '<tr'+cls+'><td class="no">'+(i+1)+'</td><td class="tm">'+fmtShort(r.start)+'</td>'+
+      '<td>'+esc(r.en)+tag+'</td><td>'+zh+'</td></tr>';
+  }).join('');
+  $('repRows').innerHTML = rowsHtml;
+  $('pvNote').textContent = S.rows.length > CAP ? t('pvNote', CAP) : '';
+}
+
+/* ================= 导出 ================= */
+function expFmtVal(){ return $('expFmt2').value || $('expFmt').value || 'srt'; }
+function biMaxWVal(){ return Math.max(10, Math.min(80, parseInt($('biMaxW').value,10) || 32)); }
+function orderVal(){ const el=document.querySelector('input[name=biOrder]:checked'); return el && el.value==='dst-first' ? 'dst-first' : 'src-first'; }
+/* 语言区域猜测（与主站 srcLocaleForExport 同思路）：假名→ja、谚文→ko，其余走默认分词 */
+function guessLocale(items){
+  let s = '';
+  for (let i=0; i<items.length && s.length<400; i++) s += String(items[i] && items[i].text || '') + ' ';
+  let kana=0, hang=0;
+  for (const ch of s){
+    const c = ch.codePointAt(0);
+    if (c >= 0x3040 && c <= 0x30FF) kana++;
+    else if ((c >= 0xAC00 && c <= 0xD7A3) || (c >= 0x1100 && c <= 0x11FF)) hang++;
+  }
+  if (kana >= 2) return 'ja';
+  if (hang >= 2) return 'ko';
+  return '';
+}
+/* ---- ASS 外观（与主站 assStyleOf 同字段同默认值）---- */
+function hexToAss(h){
+  const m=/^#?([0-9a-f]{6})$/i.exec(String(h||'').trim());
+  return m ? '&H00'+(m[1].slice(4,6)+m[1].slice(2,4)+m[1].slice(0,2)).toUpperCase() : '';
+}
+function assColorVal(id,dflt){
+  const v=String(($(id)||{}).value||'').trim();
+  return /^#?[0-9a-f]{6}$/i.test(v) ? v : (dflt||'');
+}
+function assMVs(){
+  const d=parseInt(($('assDstMV')||{}).value,10), s=parseInt(($('assSrcMV')||{}).value,10);
+  return { dst:(isFinite(d)&&d>=0)?d:42, src:(isFinite(s)&&s>=0)?s:42 };
+}
+function assStyleOf(){
+  const m=assMVs(), fmt=expFmtVal(), dstFirst = orderVal()==='dst-first';
+  const bottomMV = dstFirst ? 42 : m.dst;   /* 原文在上 → 译文贴底；译文在上 → 原文（Sub）贴底 */
+  const subMV    = dstFirst ? m.src : 42;
+  const alphaOf = id => { const n=parseInt(($(id)||{}).value,10); return (isFinite(n)&&n>=10&&n<=100)?n:100; };
+  return {
+    dstSize: +($('assDstSize')||{}).value || 56,
+    srcSize: +($('assSrcSize')||{}).value || 50,
+    dstColor: hexToAss(assColorVal('assDstColor','#FFFFFF')) || '&H00FFFFFF',
+    srcColor: hexToAss(assColorVal('assSrcColor','#FFD700')) || '&H0000D7FF',
+    dstOutline: parseFloat(($('assDstOutline')||{}).value),
+    srcOutline: parseFloat(($('assSrcOutline')||{}).value),
+    dstOutlineColor: hexToAss(assColorVal('assDstOutlineColor','#000000')) || '',
+    srcOutlineColor: hexToAss(assColorVal('assSrcOutlineColor','#000000')) || '',
+    dstFont: (($('assDstFont')||{}).value) || '',
+    srcFont: (($('assSrcFont')||{}).value) || '',
+    dstAlpha: alphaOf('assDstAlpha'),
+    srcAlpha: alphaOf('assSrcAlpha'),
+    marginV: 42, dstMV: bottomMV, srcMV: subMV
+  };
+}
+function assTopMV(bottomDist, nLines, lineH){
+  return Math.max(42, Math.min(1080, Math.round(1080 - bottomDist - (nLines||1)*lineH)));
+}
+/* ASS 事件：与主站 buildAssEvents 同构（分屏/堆叠、行高按字号推导、堆叠抬高走 assStackMV） */
+function buildAssEvents(){
+  const fmt = expFmtVal();
+  const stacked = fmt === 'ass-stack';
+  const dstFirst = orderVal() === 'dst-first';
+  const parts = C.buildBilingualParts(S.rows, {
+    maxW: biMaxWVal(), biMaxW: biMaxWVal(),
+    srcLocale: guessLocale(S.src || []),
+    dstLocale: guessLocale(S.dst || [])
+  });
+  const srcV = guessLocale(S.src || []), dstV = guessLocale(S.dst || []);
+  return parts.map(p=>{
+    const dstText = p.dstLines.join('\n'), srcText = p.srcLines.join('\n');
+    const nLines = s => s ? s.split('\n').length : 0;
+    const st = assStyleOf();
+    const mv = assMVs();
+    /* 行高（按字号推导）与离底距离分开存，别让同名键打架 */
+    const dstLH = C.assLineHeight(st.dstSize), srcLH = C.assLineHeight(st.srcSize);
+    if (stacked){
+      const lines = [];
+      const stackMV = (bMV,bSz,bLang,n,tSz,tLang) =>
+        (typeof C.assStackMV === 'function')
+          ? C.assStackMV({ bottomMV:bMV, bottomSize:bSz, bottomLang:bLang, bottomLines:n, topSize:tSz, topLang:tLang })
+          : (bMV + n*C.assLineHeight(bSz) + 8);
+      if (dstFirst){
+        // 译文在上：原文 Sub（副字号）贴底（srcMV），译文 Bottom（主字号）抬到其上方
+        const nSrc = nLines(srcText);
+        if (srcText) lines.push({ style:'Sub', text:srcText });
+        if (dstText) lines.push({ style:'Bottom', text:dstText,
+          mv: nSrc ? stackMV(mv.src, st.srcSize, srcV, nSrc, st.dstSize, dstV) : mv.src });
+      } else {
+        // 原文在上：译文 Bottom（主字号）贴底（dstMV），原文 Sub（副字号）紧贴其上方
+        const nDst = nLines(dstText);
+        if (srcText) lines.push({ style:'Sub', text:srcText,
+          mv: nDst ? stackMV(mv.dst, st.dstSize, dstV, nDst, st.srcSize, srcV) : mv.dst });
+        if (dstText) lines.push({ style:'Bottom', text:dstText });
+      }
+      return { start:p.start, end:p.end, lines };
+    }
+    const lines = [];
+    if (dstText) lines.push({ style: dstFirst?'TopMain':'Bottom', text:dstText,
+      mv: dstFirst ? assTopMV(mv.dst, nLines(dstText), dstLH) : undefined });
+    if (srcText) lines.push({ style: dstFirst?'Sub':'Top', text:srcText,
+      mv: !dstFirst ? assTopMV(mv.src, nLines(srcText), srcLH) : undefined });
+    return { start:p.start, end:p.end, lines };
+  });
+}
+function buildExport(){
+  const fmt = expFmtVal();
+  if (fmt === 'ass-split' || fmt === 'ass-stack')
+    return C.formatAss(buildAssEvents(), { title: baseName() || 'merged', assStyle: assStyleOf() });
+  const items = C.buildBilingual(S.rows, {
+    maxW: biMaxWVal(), biMaxW: biMaxWVal(),
+    srcLocale: guessLocale(S.src || []), dstLocale: guessLocale(S.dst || []),
+    order: orderVal()
+  });
+  return fmt === 'vtt' ? C.formatVtt(items) : C.formatSrt(items);
+}
+function baseName(){
+  const n = S.srcName || S.dstName || '';
+  return n.replace(/\.[^.]+$/, '');
+}
+function expExt(){
+  const f = expFmtVal();
+  return f === 'vtt' ? 'vtt' : (f === 'srt' ? 'srt' : 'ass');
+}
+function doDownload(){
+  if (!S.rows){ toast(t('needMerge')); return; }
+  const text = buildExport();
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (baseName() || 'merged') + '.bi.' + expExt();
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  toast(t('downloaded'));
+}
+function doCopy(){
+  if (!S.rows){ toast(t('needMerge')); return; }
+  const text = buildExport();
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+    .then(()=>toast(t('copied')))
+    .catch(()=>{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+      ta.select(); try{ document.execCommand('copy'); toast(t('copied')); }catch(e){} ta.remove(); });
+}
+
+/* ================= 初始化 ================= */
+function fillAssFonts(){
+  const FONTS = ['PingFang SC','Microsoft YaHei','SimHei','SimSun','Source Han Sans SC','Source Han Serif SC','Noto Sans CJK SC','Noto Serif CJK SC','Arial','Times New Roman'];
+  ['assDstFont','assSrcFont'].forEach(id=>{
+    const el = $(id); if (!el) return;
+    FONTS.forEach(f=>{ const o=document.createElement('option'); o.value=f; o.textContent=f; el.appendChild(o); });
+    el.value = 'PingFang SC';
+  });
+}
+function syncColorSw(id){
+  const el=$(id), sw=$(id+'Sw'); if(!el||!sw) return;
+  const v=String(el.value||'').trim(), ok=/^#?[0-9a-f]{6}$/i.test(v);
+  sw.style.background = ok ? ('#'+v.replace('#','').toUpperCase()) : 'transparent';
+  sw.style.borderStyle = ok ? 'solid' : 'dashed';
+}
+function initLang(){
+  const sel = $('uiLang');
+  UI_LANGS.forEach(pair=>{ const o=document.createElement('option'); o.value=pair[0]; o.textContent=pair[1]; sel.appendChild(o); });
+  let saved = null;
+  try { saved = localStorage.getItem('mergeUiLang'); } catch(e){}
+  UI.lang = (saved && UI_LANGS.some(x=>x[0]===saved)) ? saved : detectUiLang();
+  sel.value = UI.lang;
+  sel.addEventListener('change', ()=>{
+    UI.lang = sel.value;
+    try { localStorage.setItem('mergeUiLang', UI.lang); } catch(e){}
+    applyI18n();
+    if (S.rows) renderReport();   /* 表格标签随语言刷新 */
+  });
+}
+function init(){
+  initLang();
+  bindSide('src'); bindSide('dst');
+  fillAssFonts();
+  document.querySelectorAll('input[name=alignMode]').forEach(el=>{
+    el.addEventListener('change', ()=>{
+      S.alignTouched = true;
+      const hint = $('alignHint');
+      const m = alignMode();
+      if (hint) hint.textContent = t(m==='order' ? 'alignHintOrder' : m==='dstTime' ? 'alignHintDst' : 'alignHintTime');
+    });
+  });
+  /* 导出区第二份格式下拉（滚动到导出卡时就在手边）与设置区那份保持同步 */
+  const f1 = $('expFmt'), f2 = $('expFmt2');
+  f2.innerHTML = f1.innerHTML;
+  const sync = (a,b)=>a.addEventListener('change', ()=>{ b.value = a.value; });
+  sync(f1,f2); sync(f2,f1);
+  f2.value = f1.value = 'srt';
+  /* 颜色色板 + alpha 百分比输出 */
+  ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor'].forEach(id=>{
+    const el=$(id); if(!el) return;
+    el.addEventListener('input', ()=>syncColorSw(id));
+    el.addEventListener('change', ()=>{
+      const v=String(el.value||'').trim();
+      if (/^#?[0-9a-f]{6}$/i.test(v)) el.value='#'+v.replace('#','').toUpperCase();
+      syncColorSw(id);
+    });
+    syncColorSw(id);
+  });
+  [['assDstAlpha','assDstAlphaOut'],['assSrcAlpha','assSrcAlphaOut']].forEach(pair=>{
+    const r=$(pair[0]), o=$(pair[1]);
+    const upd=()=>{ o.textContent=r.value+'%'; };
+    r.addEventListener('input', upd); r.addEventListener('change', upd); upd();
+  });
+  $('btnMerge').addEventListener('click', doMerge);
+  $('btnDownload').addEventListener('click', doDownload);
+  $('btnCopy').addEventListener('click', doCopy);
+  applyI18n();
+}
+init();
+</script>
+</body>
+</html>

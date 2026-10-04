@@ -5219,3 +5219,133 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     });
   });
 }
+/* v0.9.218：双语字幕合并工具页（merge.html）+ alignRows/shiftTimeline/checkTimeline 纯新增函数。
+   三处历史 bug 在此钉死：① time 模式 si-- 导致同一原文配两次 ② time 模式落单原文被静默丢弃
+   ③ dstTime 模式注释说并入上一条、实现却直接丢文本。 */
+console.log('— 双语合并工具（v0.9.218）—');
+{
+  const mk = arr => arr.map((x,i)=>({no:i+1,start:x[0],end:x[1],text:x[2]}));
+  const vm = require('vm'), fsM = require('fs'), pathM = require('path');
+  const html = fsM.existsSync(pathM.join(__dirname,'index.html')) ? fsM.readFileSync(pathM.join(__dirname,'index.html'),'utf8') : '';
+  const mg = fsM.existsSync(pathM.join(__dirname,'merge.html')) ? fsM.readFileSync(pathM.join(__dirname,'merge.html'),'utf8') : '';
+
+  t('alignRows·order：同条数逐条配对，多出侧记 onlySrc/onlyDst', () => {
+    const r = C.alignRows(mk([[0,1000,'a'],[2000,3000,'b']]), mk([[0,1000,'甲'],[2000,3000,'乙']]), 'order');
+    assert.strictEqual(r.report.pairs, 2);
+    assert.deepStrictEqual(r.report.onlySrc, []);
+    assert.deepStrictEqual(r.report.onlyDst, []);
+    const r2 = C.alignRows(mk([[0,1000,'a'],[1000,2000,'b']]), mk([[0,1500,'甲']]), 'order');
+    assert.strictEqual(r2.report.pairs, 1);
+    assert.deepStrictEqual(r2.report.onlySrc, [1]);   // 第 2 条原文落单
+    assert.strictEqual(r2.rows.filter(x=>x.flag==='drop').length, 1);
+  });
+
+  t('alignRows·time：同一原文绝不配两次（si-- 回归）', () => {
+    const src = mk([[0,1000,'s0'],[5000,6000,'s1']]);
+    const dst = mk([[0,1000,'d0'],[100,200,'d1'],[150,250,'d2'],[160,260,'d3'],[170,270,'d4'],
+                    [180,280,'d5'],[190,290,'d6'],[200,300,'d7'],[210,310,'d8'],[5000,6000,'d9']]);
+    const r = C.alignRows(src, dst, 'time');
+    assert.strictEqual(r.report.pairs, 2, 'pairs 应等于原文条数');
+    const s0rows = r.rows.filter(x=>x.en==='s0' && x.flag!=='drop');
+    assert.strictEqual(s0rows.length, 1, 's0 被配了 ' + s0rows.length + ' 次');
+    assert.ok(r.rows.some(x=>x.en==='s1' && x.zh==='d9'));
+  });
+
+  t('alignRows·time：落单原文保留 drop 行且 onlySrc 有记录（静默丢弃回归）', () => {
+    const r = C.alignRows(mk([[0,1000,'a'],[2000,3000,'b-孤独'],[8000,9000,'c']]),
+                          mk([[0,1000,'甲'],[8000,9000,'丙']]), 'time');
+    assert.deepStrictEqual(r.report.onlySrc, [1]);
+    const lonely = r.rows.find(x=>x.en==='b-孤独');
+    assert.ok(lonely && lonely.flag==='drop', '落单原文应保留为 drop 行');
+  });
+
+  t('alignRows·dstTime：原文多出并入上一条（merged 行为回归）', () => {
+    const r = C.alignRows(mk([[0,1000,'a'],[1000,2000,'b'],[2000,3000,'c']]),
+                          mk([[0,1500,'甲'],[1500,3000,'乙']]), 'dstTime');
+    const m = r.rows.find(x=>x.en==='c');
+    assert.ok(m && m.flag==='merged', '多出的原文应是 merged 行');
+    const bi = C.buildBilingual(r.rows, {order:'src-first'});
+    assert.ok(/b\s*c/.test(bi[1].text), 'merged 原文应并入上一条：' + JSON.stringify(bi.map(x=>x.text)));
+  });
+
+  t('shiftTimeline：负偏移夹到 0、正偏移整体平移', () => {
+    const rows = mk([[500,1500,'x'],[3000,4000,'y']]);
+    const down = C.shiftTimeline(rows, -800);
+    assert.deepStrictEqual([down[0].start, down[0].end], [0, 700]);
+    assert.deepStrictEqual([down[1].start, down[1].end], [2200, 3200]);
+    const up = C.shiftTimeline(rows, 100);
+    assert.deepStrictEqual([up[0].start, up[0].end], [600, 1600]);
+  });
+
+  t('checkTimeline：跳过 drop/merged，检出 overlap / too-short / no-dst', () => {
+    const rows = [
+      {start:0, end:1000, en:'a', zh:'甲', flag:''},
+      {start:0, end:1000, en:'x', zh:'', flag:'drop'},          // 不参与体检
+      {start:900, end:2500, en:'b', zh:'乙', flag:''},          // 与第 1 条重叠 100ms？>200 才报 → 换 300
+      {start:0, end:200, en:'y', zh:'', flag:'merged'},         // 不参与体检
+      {start:5000, end:5200, en:'c', zh:'', flag:''},           // no-dst
+      {start:9000, end:9030, en:'d', zh:'丁', flag:''}          // too-short（< MIN_DUR_MS）
+    ];
+    rows[2].start = 600;                                        // 与第 1 条重叠 400ms
+    const iss = C.checkTimeline(rows);
+    const kinds = iss.map(x=>x.kind).sort();
+    assert.ok(kinds.includes('overlap'), '应检出重叠');
+    assert.ok(kinds.includes('too-short'), '应检出过短');
+    assert.ok(kinds.includes('no-dst'), '应检出缺译文');
+    assert.ok(!iss.some(x=>x.i===1) && !iss.some(x=>x.i===3), 'drop/merged 行不应进体检');
+  });
+
+  t('端到端：两份 SRT → time 配对 → 双语 SRT 回读一致', () => {
+    const s1 = '1\n00:00:00,000 --> 00:00:01,000\nhello\n\n2\n00:00:02,000 --> 00:00:03,000\nworld\n';
+    const s2 = '1\n00:00:00,000 --> 00:00:01,000\n你好\n\n2\n00:00:02,000 --> 00:00:03,000\n世界\n';
+    const a = C.parseSrt(s1).items, b = C.parseSrt(s2).items;
+    const r = C.alignRows(a, b, 'time');
+    const items = C.buildBilingual(r.rows, {maxW:32, biMaxW:32, order:'src-first'});
+    const back = C.parseSrt(C.formatSrt(items)).items;
+    assert.strictEqual(back.length, 2);
+    assert.ok(back[0].text.indexOf('hello') >= 0 && back[0].text.indexOf('你好') >= 0);
+    assert.ok(back[1].text.indexOf('world') >= 0 && back[1].text.indexOf('世界') >= 0);
+  });
+
+  t('merge.html：存在、引对版本、内联脚本可解析、关键 id 齐全', () => {
+    assert.ok(mg, 'merge.html 不存在');
+    assert.ok(/srt-core\.js\?v=0\.9\.218/.test(mg), 'merge.html 未引用 v0.9.218 的 srt-core');
+    const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
+    let checked = 0;
+    for (const b of blocks) {
+      const code = b.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');
+      try { new vm.Script(code); } catch (e) { assert.fail('merge.html 内联脚本语法错误: ' + e.message); }
+      checked++;
+    }
+    assert.strictEqual(checked, 1, '应恰好 1 段内联脚本');
+    ['srcDrop','dstDrop','srcFile','dstFile','srcText','dstText','btnMerge','repRows','expFmt','expFmt2','btnDownload','btnCopy','dstShift','biMaxW','uiLang']
+      .forEach(id => assert.ok(mg.indexOf('id="' + id + '"') > 0, 'merge.html 缺 ' + id));
+    /* ASS 外观字段与主站同名（v0.9.217 那套） */
+    ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline',
+     'assDstOutlineColor','assSrcOutlineColor','assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV']
+      .forEach(id => assert.ok(mg.indexOf('id="' + id + '"') > 0, 'merge.html 缺 ASS 字段 ' + id));
+  });
+
+  t('merge.html：4 种界面语言词典齐全（其余语言回退英文）', () => {
+    for (const code of ['zh-CN','zh-TW','en','ja']) {
+      const m = mg.match(new RegExp("^\\s*'" + code + "':\\s*\\{", 'm'));
+      assert.ok(m, '缺 ' + code + ' 词典');
+      const i = mg.indexOf(m[0]);
+      const seg = mg.slice(i, i + 8000);
+      ['btnMerge','repPaired','tagDrop','tagMerged','needBoth'].forEach(k=>{
+        assert.ok(seg.indexOf(k + ':') > 0, code + ' 缺词条 ' + k);
+      });
+    }
+    /* 回退链：lang → en → zh-CN（merge 独立 t()，别学主站只回退 zh-CN——俄语用户看中文等于没翻译） */
+    assert.ok(/I18N\['en'\]\[k\] !== undefined \? I18N\['en'\]\[k\]/.test(mg), 't() 缺英文回退层');
+  });
+
+  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.218 + merge 入口', () => {
+    const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
+    assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
+    assert.ok(/class="ver">v0\.9\.218</.test(html), '首页版本号未升 0.9.218');
+    assert.ok(/class="ver-tag">v0\.9\.218</.test(html), '工作台版本号未升 0.9.218');
+    assert.ok(/srt-core\.js\?v=0\.9\.218/.test(html), 'srt-core.js?v 未升 0.9.218');
+    assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
+  });
+}
