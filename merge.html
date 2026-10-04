@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>双语字幕合并工具 - 随心字幕 AI (AI-SRTSub)</title>
-<meta name="description" content="免费在线双语字幕合并工具：上传原文字幕和译文字幕（SRT / VTT / ASS / SBV），自动按顺序或时间轴配对，一键合并成双语字幕。全程本地处理，不上传服务器。">
+<meta name="description" content="免费在线双语字幕合并工具：上传原文字幕和译文字幕（SRT / VTT / ASS / SBV），自动按顺序或时间轴配对，一键合并成双语字幕。">
 <meta name="keywords" content="双语字幕合并,字幕合并,SRT合并,双语字幕制作,中英双语字幕,字幕配轴,VTT合并,ASS双语,免费字幕工具,merge bilingual subtitles">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#EC4899">
@@ -41,9 +41,6 @@
   .hero h1{font-size:30px;margin:0 0 8px;letter-spacing:-.5px}
   .hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .hero p{color:var(--sub);margin:0;font-size:14px}
-  .pill{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:5px 13px;border-radius:99px;
-    background:var(--ok-weak);color:#0B7A5C;font-size:12px;font-weight:500}
-  .pill i{width:7px;height:7px;border-radius:99px;background:var(--ok);display:inline-block}
 
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
   @media (max-width:760px){.grid2{grid-template-columns:1fr}}
@@ -140,7 +137,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.219</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.221</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -149,7 +146,6 @@
   <div class="hero">
     <h1 data-i18n-html="heroTitle">两份字幕，<em>合成一套双语</em></h1>
     <p data-i18n="heroSub">上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。</p>
-    <span class="pill"><i></i><span data-i18n="localNote">全程本地处理，字幕不上传服务器</span></span>
   </div>
 
   <div class="grid2">
@@ -307,7 +303,7 @@ const I18N = {
     brandName:'随心字幕 AI', navHome:'返回翻译工具',
     heroTitle:'两份字幕，<em>合成一套双语</em>',
     heroSub:'上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。',
-    localNote:'全程本地处理，字幕不上传服务器',
+
     srcCard:'原文字幕', dstCard:'译文字幕', btnPick:'📂 点这里选文件，或直接拖进来',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文本粘贴到这里…',
     parsedOk:'✓ 已解析 {0}：{1} 条', parseFail:'✗ 解析失败：内容不是有效的字幕格式',
@@ -347,7 +343,6 @@ const I18N = {
     brandName:'隨心字幕 AI', navHome:'返回翻譯工具',
     heroTitle:'兩份字幕，<em>合成一套雙語</em>',
     heroSub:'上傳原文和譯文字幕（SRT / VTT / ASS / SBV），自動配對合併成雙語字幕——支援按順序或時間軸對齊、整體偏移、異常檢查。',
-    localNote:'全程本機處理，字幕不上傳伺服器',
     srcCard:'原文字幕', dstCard:'譯文字幕', btnPick:'📂 點這裡選檔案，或直接拖進來',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文字貼到這裡…',
     parsedOk:'✓ 已解析 {0}：{1} 條', parseFail:'✗ 解析失敗：內容不是有效的字幕格式',
@@ -387,7 +382,6 @@ const I18N = {
     brandName:'AI-SRTSub', navHome:'Back to Translator',
     heroTitle:'Two subtitle files, <em>one bilingual track</em>',
     heroSub:'Upload the original and the translated subtitle (SRT / VTT / ASS / SBV) and merge them into a bilingual track — pairing by order or timeline, global shift, and sanity checks included.',
-    localNote:'Runs entirely in your browser — nothing is uploaded',
     srcCard:'Original subtitles', dstCard:'Translated subtitles', btnPick:'📂 Click to choose a file, or drop one here',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'or paste subtitle text here…',
     parsedOk:'✓ Parsed {0}: {1} cues', parseFail:'✗ Parse failed: not a valid subtitle format',
@@ -427,7 +421,6 @@ const I18N = {
     brandName:'AI-SRTSub', navHome:'翻訳ツールへ戻る',
     heroTitle:'2 つの字幕を、<em>1 つの二か国語に</em>',
     heroSub:'原文字幕と訳文字幕（SRT / VTT / ASS / SBV）をアップロードして二か国語字幕に自動マージ——順序またはタイムラインによる整合、全体シフト、整合チェックに対応。',
-    localNote:'すべてブラウザ内で処理・字幕はサーバーに送信されません',
     srcCard:'原文字幕', dstCard:'訳文字幕', btnPick:'📂 クリックしてファイルを選択、またはドロップ',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'または字幕テキストをここに貼り付け…',
     parsedOk:'✓ 解析しました {0}：{1} 件', parseFail:'✗ 解析失敗：有効な字幕形式ではありません',

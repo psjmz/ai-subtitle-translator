@@ -5344,13 +5344,18 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/I18N\['en'\]\[k\] !== undefined \? I18N\['en'\]\[k\]/.test(mg), 't() 缺英文回退层');
   });
 
-  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.220 + merge 入口 + 描边色方块 id 配对', () => {
+  t('index.html：navMerge ×27 语言 + 版本三处 v0.9.221 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.220</.test(html), '首页版本号未升 0.9.220');
-    assert.ok(/class="ver-tag">v0\.9\.220</.test(html), '工作台版本号未升 0.9.220');
-    assert.ok(/srt-core\.js\?v=0\.9\.220/.test(html), 'srt-core.js?v 未升 0.9.220');
+    assert.ok(/class="ver">v0\.9\.221</.test(html), '首页版本号未升 0.9.221');
+    assert.ok(/class="ver-tag">v0\.9\.221</.test(html), '工作台版本号未升 0.9.221');
+    assert.ok(/srt-core\.js\?v=0\.9\.221/.test(html), 'srt-core.js?v 未升 0.9.221');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
+    /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
+       （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
+    assert.ok(!/localNote/.test(mg), 'localNote 词条残留');
+    assert.ok(!/class="pill"/.test(mg), 'pill 徽标残留');
+    assert.ok(!/不上传服务器|不上傳伺服器|nothing is uploaded|サーバーに送信/.test(mg), '本地处理文案残留');
     /* v0.9.220 回归：syncColorSw 找的是 id+'Sw'，描边色方块 id 必须是 assXxxOutlineColorSw
        （v0.9.217 曾写成 assXxxOutlineSw → 方块永远不刷新，用户设色看不到反馈） */
     assert.ok(/id="assDstOutlineColorSw"/.test(html) && /id="assSrcOutlineColorSw"/.test(html),
