@@ -5332,7 +5332,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.223/.test(mg), 'merge.html 未引用 v0.9.223 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.224/.test(mg), 'merge.html 未引用 v0.9.224 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5365,9 +5365,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.223</.test(html), '首页版本号未升 0.9.223');
-    assert.ok(/class="ver-tag">v0\.9\.223</.test(html), '工作台版本号未升 0.9.223');
-    assert.ok(/srt-core\.js\?v=0\.9\.223/.test(html), 'srt-core.js?v 未升 0.9.223');
+    assert.ok(/class="ver">v0\.9\.224</.test(html), '首页版本号未升 0.9.224');
+    assert.ok(/class="ver-tag">v0\.9\.224</.test(html), '工作台版本号未升 0.9.224');
+    assert.ok(/srt-core\.js\?v=0\.9\.224/.test(html), 'srt-core.js?v 未升 0.9.224');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5510,8 +5510,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.223</.test(mg), 'merge.html 版本未升 0.9.223');
-    assert.ok(/merge-core\.js\?v=0\.9\.223/.test(mg), 'merge-core.js?v 未升 0.9.223');
+    assert.ok(/class="ver">v0\.9\.224</.test(mg), 'merge.html 版本未升 0.9.224');
+    assert.ok(/merge-core\.js\?v=0\.9\.224/.test(mg), 'merge-core.js?v 未升 0.9.224');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5522,9 +5522,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* v0.9.219 的病：三个模板共用一套参数 → 导出逐字节相同，等于模板没生效 */
     assert.notStrictEqual(pick('split','assSrcSize'), pick('stack','assSrcSize'), '两个模板的原文字号必须不同');
     assert.notStrictEqual(pick('split','assSrcColor'), pick('stack','assSrcColor'), '两个模板的原文颜色必须不同');
-    assert.ok(/if \(tpl !== 'srt' && tpl !== 'vtt' && !assDirty\) applyTplDefaults\(tpl\)/.test(mg), '切模板未套参数');
+    assert.ok(/^\s*applyTplDefaults\(tpl\);$/m.test(mg), '切模板未套参数');
     assert.ok(/function applyTplDefaults\(/.test(mg), '缺 applyTplDefaults');
-    assert.ok(/let assDirty = false/.test(mg) && /assDirty = true/.test(mg), '缺 assDirty 微调标记');
+    assert.ok(/function applyTplDefaults\(/.test(mg), '缺 applyTplDefaults');
   });
 
   t('v0.9.223：guessLocale 认中文 —— 此前中文返回空串，堆叠间距少算 21px 导致两行重叠', () => {
@@ -5561,5 +5561,61 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const r = M.alignRows(mk([[0,4000,'Hello']]), mk([[0,2000,'你好'],[2000,4000,'世界']]), 'time');
     assert.strictEqual(r.report.merged, 1);
     assert.ok(mg.indexOf('repMerged') > 0, 'UI 未展示并入条数');
+  });
+
+  /* ================= v0.9.224：预设必填 / 距离语义 / 分屏位置 ================= */
+  t('v0.9.224：切模板必定套预设 —— assDirty 门控必须彻底移除', () => {
+    /* v0.9.223 的病：assDirty 一旦为 true，切模板永远不再填预设（用户实测「模板值没填进去」） */
+    assert.ok(!/\bassDirty\b\s*=\s*(true|false)/.test(mg), '代码里仍有 assDirty 赋值（门控没删干净）');
+    assert.ok(!/!assDirty/.test(mg), '仍有 !assDirty 条件');
+    assert.ok(/^\s*applyTplDefaults\(tpl\);$/m.test(mg), 'syncAssPanel 未无条件套预设');
+    /* srt/vtt 时也要套一次（否则首次展开面板看到的是 HTML 写死的旧值） */
+    assert.ok(/function presetKeyOf\(tpl\)/.test(mg), '缺 presetKeyOf');
+    assert.ok(/if \(tpl === 'custom'\) return assLayoutVal\(\) === 'ass-stack' \? 'stack' : 'split'/.test(mg),
+      'custom 未跟随布局选预设');
+    /* resetAssDefaults 必须同时刷新标签与预览 */
+    assert.ok(/function resetAssDefaults\(\)\{[\s\S]{0,200}syncMvLabels\(tplVal\(\)\)/.test(mg), 'reset 未刷新标签');
+  });
+
+  t('v0.9.224：两个「距离」框语义分化 —— 分屏=离顶 / 双行=两行间距，默认值必须不同', () => {
+    const blk = mg.slice(mg.indexOf('const TPL_DEFAULTS = {'), mg.indexOf('TPL_DEFAULTS.custom'));
+    const mvOf = (tpl, key) => {
+      const seg = blk.slice(blk.indexOf(tpl + ': {'), blk.indexOf(tpl + ': {') + 700);
+      const m = new RegExp(key + ":\\s*'(\\d+)'").exec(seg);
+      return m && m[1];
+    };
+    assert.strictEqual(mvOf('split','assDstMV'), '42', '分屏译文离底应为 42');
+    assert.strictEqual(mvOf('split','assSrcMV'), '40', '分屏原文离顶应为 40');
+    assert.strictEqual(mvOf('stack','assDstMV'), '42', '双行贴底距离应为 42');
+    assert.strictEqual(mvOf('stack','assSrcMV'), '8', '双行两行间距应为 8');
+    assert.notStrictEqual(mvOf('split','assSrcMV'), mvOf('stack','assSrcMV'),
+      '两个模板的第二个距离框默认值必须不同（此前都是 42）');
+    /* 标签随模板切换 */
+    assert.ok(/id="assSrcMVLbl"/.test(mg), '第二个距离框的 label 缺 id');
+    assert.ok(/function syncMvLabels\(tpl\)/.test(mg), '缺 syncMvLabels');
+    assert.ok(/k = presetKeyOf\(tpl\) === 'stack' \? 'lblMVGap' : 'lblMVSrcTop'/.test(mg), '标签未随模板切换');
+    /* 双行：框2 真的参与计算（v0.9.223 前它不生效） */
+    assert.ok(/const baseMV = Math\.max\(0, mv\.dst\);/.test(mg), '缺 baseMV');
+    assert.ok(/const gap\s+= Math\.max\(0, mv\.src\);/.test(mg), '缺 gap');
+    assert.ok(/stackMV\(baseMV, st\.dstSize, dstV, nDst, st\.srcSize, srcV\) \+ gap/.test(mg), 'gap 未参与抬高计算');
+  });
+
+  t('v0.9.224：分屏顶部那条真的贴在顶部（旧公式把它算到了画面底部）', () => {
+    /* 旧式 1080 - dist - 行高 让 an8 的 MarginV 变成 ~981 → 原文落到译文上方 57px，不是分屏 */
+    assert.ok(/function assTopMV\(dist, nLines, lineH\)\{/.test(mg), 'assTopMV 签名未改');
+    assert.ok(!/1080 - bottomDist/.test(mg), '旧的「距顶当距底」公式还在');
+    assert.ok(/Math\.max\(0, Math\.min\(1080, Math\.round\(\+dist \|\| 0\)\)\)/.test(mg), 'assTopMV 未改为直接用 dist');
+    /* 预览与导出同口径：paint 调用必须传 topMV/bottomMV，不再直接用 m.dst/m.src */
+    assert.ok(!/paint\(l1, samp\.zh, st\.dstSize[^)]*, m\.dst, true\)/.test(mg), '预览分屏仍直接用 m.dst');
+    assert.ok(/paint\(l1, samp\.en, st\.srcSize, 'assSrcColor', st\.srcOutline, 'assSrcOutlineColor', st\.srcAlpha, topMV, true, st\.srcFont\)/.test(mg),
+      '预览分屏顶部那条未用 topMV');
+    /* 字体联动 */
+    assert.ok(/el\.style\.fontFamily = '/.test(mg), '预览未跟随字体设置');
+    /* 词条 */
+    ['lblMVSrcTop','lblMVGap'].forEach(k => {
+      const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
+    assert.ok(/lblMVSrcTop:'原文离顶'/.test(mg) && /lblMVGap:'两行间距'/.test(mg), '中文词条不对');
   });
 }

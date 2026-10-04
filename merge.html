@@ -153,7 +153,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.223</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.224</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -280,7 +280,7 @@
             <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assSrcOutlineColor" value="#000000"><span class="sw" id="assSrcOutlineColorSw"></span></div>
             <div class="af"><label data-i18n="lblFont">字体</label><select id="assSrcFont"></select></div>
             <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assSrcAlpha" min="10" max="100" value="100"><span class="pct" id="assSrcAlphaOut">100%</span></div>
-            <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assSrcMV" value="42" min="0" max="1080"></div>
+            <div class="af"><label data-i18n="lblMVSrcTop" id="assSrcMVLbl">原文离顶</label><input type="number" id="assSrcMV" value="40" min="0" max="1080"></div>
           </div>
         </div>
         <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
@@ -337,7 +337,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.223"></script>
+<script src="merge-core.js?v=0.9.224"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -384,7 +384,7 @@ const I18N = {
     assReset:'↺ 恢复默认参数', assResetDone:'已恢复默认参数',
     assPanel:'ASS 外观（导出 ASS 时生效）', lblDstCol:'译文（主）', lblSrcCol:'原文（副）',
     lblSize:'字号', lblColor:'颜色', lblOutline:'描边', lblOutlineColor:'描边色', lblFont:'字体',
-    lblAlpha:'不透明度', lblMV:'离底距离',
+    lblAlpha:'不透明度', lblMV:'离底距离', lblMVSrcTop:'原文离顶', lblMVGap:'两行间距',
     assFontTip:'字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。',
     btnMerge:'🔗 合并预览', mergeHint:'先看配对结果和体检报告，再下载。',
     repPaired:'配对', repOnlySrc:'缺译文', repOnlyDst:'缺原文', repMerged:'已并入', repIssues:'时间轴体检',
@@ -436,7 +436,7 @@ const I18N = {
     assReset:'↺ 恢復預設參數', assResetDone:'已恢復預設參數',
     assPanel:'ASS 外觀（匯出 ASS 時生效）', lblDstCol:'譯文（主）', lblSrcCol:'原文（副）',
     lblSize:'字號', lblColor:'顏色', lblOutline:'描邊', lblOutlineColor:'描邊色', lblFont:'字體',
-    lblAlpha:'不透明度', lblMV:'離底距離',
+    lblAlpha:'不透明度', lblMV:'離底距離', lblMVSrcTop:'原文離頂', lblMVGap:'兩行間距',
     assFontTip:'字體在播放端機器上解析，對方沒裝會自動回退；其餘參數與主站「ASS 樣式」一致。',
     btnMerge:'🔗 合併預覽', mergeHint:'先看配對結果和體檢報告，再下載。',
     repPaired:'配對', repOnlySrc:'缺譯文', repOnlyDst:'缺原文', repMerged:'已併入', repIssues:'時間軸體檢',
@@ -488,7 +488,7 @@ const I18N = {
     assReset:'↺ Reset to defaults', assResetDone:'Defaults restored',
     assPanel:'ASS appearance (applies to ASS export)', lblDstCol:'Translation (primary)', lblSrcCol:'Original (secondary)',
     lblSize:'Font size', lblColor:'Color', lblOutline:'Outline', lblOutlineColor:'Outline color', lblFont:'Font',
-    lblAlpha:'Opacity', lblMV:'Bottom margin',
+    lblAlpha:'Opacity', lblMV:'Bottom margin', lblMVSrcTop:'Original from top', lblMVGap:'Gap between lines',
     assFontTip:'Fonts resolve on the viewer’s machine and fall back automatically if missing; other options match the main site’s ASS styles.',
     btnMerge:'🔗 Merge & preview', mergeHint:'Check the pairing result and sanity report before downloading.',
     repPaired:'Paired', repOnlySrc:'Missing translation', repOnlyDst:'Missing original', repMerged:'merged in', repIssues:'Timeline check',
@@ -540,7 +540,7 @@ const I18N = {
     assReset:'↺ 既定値に戻す', assResetDone:'既定値に戻しました',
     assPanel:'ASS 外観（ASS エクスポート時に有効）', lblDstCol:'訳文（主）', lblSrcCol:'原文（副）',
     lblSize:'フォントサイズ', lblColor:'色', lblOutline:'縁取り', lblOutlineColor:'縁取り色', lblFont:'フォント',
-    lblAlpha:'不透明度', lblMV:'下端からの距離',
+    lblAlpha:'不透明度', lblMV:'下端からの距離', lblMVSrcTop:'原文の上余白', lblMVGap:'2 行の間隔',
     assFontTip:'フォントは再生側の端末で解決され、未インストールなら自動フォールバック。その他の設定は本サイトの ASS スタイルと同一です。',
     btnMerge:'🔗 マージしてプレビュー', mergeHint:'対応結果とチェックレポートを確認してからダウンロードしてください。',
     repPaired:'対応', repOnlySrc:'訳文なし', repOnlyDst:'原文なし', repMerged:'統合済み', repIssues:'タイムラインチェック',
@@ -814,7 +814,9 @@ const ASS_DEFAULTS = [
   ['assDstOutlineColor','#000000'],['assSrcOutlineColor','#000000'],
   ['assDstFont','PingFang SC'],['assSrcFont','PingFang SC'],
   ['assDstAlpha','100'],['assSrcAlpha','100'],
-  ['assDstMV','42'],['assSrcMV','42']
+  /* v0.9.224：两个距离框不再是同一个数（分屏 42 离底 / 40 离顶，双行 42 离底 / 8 间距）。
+     真正生效的是 TPL_DEFAULTS（syncAssPanel 每次切模板无条件套），这里是字段清单兜底。 */
+  ['assDstMV','42'],['assSrcMV','40']
 ];
 /* v0.9.223：三种模板各自一套默认参数（1080p 基准，见 assNote1080）。
    v0.9.219 只做了「布局映射」却没套参数，三个模板导出逐字节相同——等于模板没生效。
@@ -825,20 +827,38 @@ const TPL_DEFAULTS = {
     assDstSize:'56', assSrcSize:'50', assDstColor:'#FFFFFF', assSrcColor:'#FFD700',
     assDstOutline:'2.5', assSrcOutline:'2.5', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'100',
-    assDstMV:'42', assSrcMV:'42'
+    /* 分屏：译文贴底（42 = 离底），原文贴顶（40 = 离顶）。两个框量的是**两条不同的边**，
+       所以数值不同不是错误；标签会随模板切换写明「离底 / 离顶」。 */
+    assDstMV:'42', assSrcMV:'40'
   },
   stack: {
     assDstSize:'54', assSrcSize:'42', assDstColor:'#FFFFFF', assSrcColor:'#E6C86A',
     assDstOutline:'2.5', assSrcOutline:'2.0', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'90',
-    assDstMV:'42', assSrcMV:'42'
+    /* 双行：框1 = 贴底那条距屏幕底（42），框2 = 两行之间额外留白（8）。
+       v0.9.224 之前框2 也叫「离底距离」且被写死成同一个数——它在堆叠模式下**根本不生效**
+       （抬高量由 assStackMV 按字号算），用户改它没反应，故改名为「两行间距」并让它真正参与计算。 */
+    assDstMV:'42', assSrcMV:'8'
   }
 };
 TPL_DEFAULTS.custom = TPL_DEFAULTS.split;
-/* 用户手动微调过 ASS 参数后，切模板不再覆盖（否则一改模板就把微调冲掉） */
-let assDirty = false;
+/* v0.9.224：预设 = 切模板就套。
+   v0.9.223 用 assDirty 做「手动微调后不覆盖」，结果用户只要展开面板碰过任意一个参数，
+   之后切模板**永远不再填预设**（实测：改字号→切回分屏，界面上还是上一个模板的值）。
+   用户要的是「选模板 → 看到该模板的默认值」，微调只在当前模板内保留。 */
+function presetKeyOf(tpl){
+  if (tpl === 'custom') return assLayoutVal() === 'ass-stack' ? 'stack' : 'split';
+  return (tpl === 'split' || tpl === 'stack') ? tpl : 'split';
+}
+/* 第二个「距离」框的语义随模板变：分屏是离顶、双行是两行间距 */
+function syncMvLabels(tpl){
+  const el = $('assSrcMVLbl'); if (!el) return;
+  const k = presetKeyOf(tpl) === 'stack' ? 'lblMVGap' : 'lblMVSrcTop';
+  el.setAttribute('data-i18n', k);
+  el.textContent = t(k);
+}
 function applyTplDefaults(tpl){
-  const d = TPL_DEFAULTS[tpl] || TPL_DEFAULTS.split;
+  const d = TPL_DEFAULTS[presetKeyOf(tpl)] || TPL_DEFAULTS.split;
   Object.keys(d).forEach(k=>{ const el=$(k); if(el) el.value=d[k]; });
   ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor'].forEach(syncColorSw);
   const a1=$('assDstAlphaOut'), a2=$('assSrcAlphaOut');
@@ -847,7 +867,8 @@ function applyTplDefaults(tpl){
 }
 function resetAssDefaults(){
   applyTplDefaults(tplVal());
-  assDirty = false;
+  syncMvLabels(tplVal());
+  renderAssPv();
   toast(t('assResetDone'));
 }
 /* ASS 外观面板显隐：无风格模板（srt/vtt）整个隐藏；custom 显示布局选择 */
@@ -855,8 +876,10 @@ function syncAssPanel(){
   const tpl = tplVal();
   $('assPanel').style.display = (tpl === 'srt' || tpl === 'vtt') ? 'none' : '';
   $('layoutRow').style.display = tpl === 'custom' ? 'flex' : 'none';
-  /* v0.9.223：切模板真的把该模板的默认参数套进输入框（此前只改提示文字，参数一个没动） */
-  if (tpl !== 'srt' && tpl !== 'vtt' && !assDirty) applyTplDefaults(tpl);
+  /* v0.9.224：切模板 = 套该模板默认参数（去掉 assDirty 门控，见 presetKeyOf 上方注释）。
+     srt/vtt 时面板整体隐藏，但仍套一次分屏预设，保证用户第一次展开面板看到的就是预设值。 */
+  applyTplDefaults(tpl);
+  syncMvLabels(tpl);
   const hint = $('tplHint');
   if (hint) hint.textContent = t(tpl==='srt'||tpl==='vtt' ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : 'tplHintPreset');
 }
@@ -917,8 +940,13 @@ function assStyleOf(){
     marginV: 42, dstMV: bottomMV, srcMV: subMV
   };
 }
-function assTopMV(bottomDist, nLines, lineH){
-  return Math.max(42, Math.min(1080, Math.round(1080 - bottomDist - (nLines||1)*lineH)));
+function assTopMV(dist, nLines, lineH){
+  /* v0.9.224：分屏模式顶部那条的 MarginV 就是「距画面顶部的距离」，直接用用户填的值。
+     旧公式 1080 - dist - 行高 把「距顶」算成了「距底」——导出后原文落到画面底部，
+     与译文只差 57px，「分屏」名不副实，且与预览画的不一致（预览一直画距顶 dist）。
+     nLines / lineH 保留在签名里（调用点多），已不参与计算。 */
+  void nLines; void lineH;
+  return Math.max(0, Math.min(1080, Math.round(+dist || 0)));
 }
 /* v0.9.222：导出折行的语言判断来源——合并模式用两份上传；调整模式用拆出来的两列
    （S.src 是整份双语文件，直接拿它猜「原语言」会错） */
@@ -948,18 +976,23 @@ function buildAssEvents(){
         (typeof C.assStackMV === 'function')
           ? C.assStackMV({ bottomMV:bMV, bottomSize:bSz, bottomLang:bLang, bottomLines:n, topSize:tSz, topLang:tLang })
           : (bMV + n*C.assLineHeight(bSz) + 8);
+      /* v0.9.224：双行两个框的分工——框1（离底距离）= 贴底那条距屏幕底；
+         框2（两行间距）= 两行之间**额外**留白。此前框2 也叫「离底距离」且压根不参与抬高计算
+         （抬高量只由 assStackMV 按字号推定），用户改它没有任何反应。 */
+      const baseMV = Math.max(0, mv.dst);
+      const gap    = Math.max(0, mv.src);
       if (dstFirst){
-        // 译文在上：原文 Sub（副字号）贴底（srcMV），译文 Bottom（主字号）抬到其上方
+        // 译文在上：原文 Sub（副字号）贴底，译文 Bottom（主字号）抬到其上方
         const nSrc = nLines(srcText);
-        if (srcText) lines.push({ style:'Sub', text:srcText });
+        if (srcText) lines.push({ style:'Sub', text:srcText, mv: baseMV });
         if (dstText) lines.push({ style:'Bottom', text:dstText,
-          mv: nSrc ? stackMV(mv.src, st.srcSize, srcV, nSrc, st.dstSize, dstV) : mv.src });
+          mv: nSrc ? stackMV(baseMV, st.srcSize, srcV, nSrc, st.dstSize, dstV) + gap : baseMV });
       } else {
-        // 原文在上：译文 Bottom（主字号）贴底（dstMV），原文 Sub（副字号）紧贴其上方
+        // 原文在上：译文 Bottom（主字号）贴底，原文 Sub（副字号）紧贴其上方
         const nDst = nLines(dstText);
         if (srcText) lines.push({ style:'Sub', text:srcText,
-          mv: nDst ? stackMV(mv.dst, st.dstSize, dstV, nDst, st.srcSize, srcV) : mv.dst });
-        if (dstText) lines.push({ style:'Bottom', text:dstText });
+          mv: nDst ? stackMV(baseMV, st.dstSize, dstV, nDst, st.srcSize, srcV) + gap : baseMV });
+        if (dstText) lines.push({ style:'Bottom', text:dstText, mv: baseMV });
       }
       return { start:p.start, end:p.end, lines };
     }
@@ -1006,38 +1039,45 @@ function renderAssPv(){
   const srcV = guessLocale(localeSrcItems()), dstV = guessLocale(localeDstItems());
   const colOf = id => assColorVal(id, id.indexOf('Outline') > 0 ? '#000000' : '#FFFFFF');
 
-  /* 贴底那侧的 MV、以及（堆叠时）上面那侧由 assStackMV 算出来的 MV */
+  /* v0.9.224：预览与导出共用同一套口径——分屏：顶部那条=离顶、底部那条=离底；
+     双行：框1=贴底那条离底、框2=两行额外间距，抬高量同样走 assStackMV。 */
   const nDst = 1, nSrc = 1;
-  const bottomMV = dstFirst ? m.src : m.dst;
-  let topMV = dstFirst ? m.dst : m.src;
+  const baseMV = Math.max(0, m.dst);
+  const gap    = Math.max(0, m.src);
+  let topMV = baseMV, bottomMV = baseMV;
   if (stacked) {
-    topMV = dstFirst
-      ? C.assStackMV({ bottomMV: bottomMV, bottomSize: st.srcSize, bottomLang: srcV, bottomLines: nSrc, topSize: st.dstSize, topLang: dstV })
-      : C.assStackMV({ bottomMV: bottomMV, bottomSize: st.dstSize, bottomLang: dstV, bottomLines: nDst, topSize: st.srcSize, topLang: srcV });
+    topMV = (dstFirst
+      ? C.assStackMV({ bottomMV: baseMV, bottomSize: st.srcSize, bottomLang: srcV, bottomLines: nSrc, topSize: st.dstSize, topLang: dstV })
+      : C.assStackMV({ bottomMV: baseMV, bottomSize: st.dstSize, bottomLang: dstV, bottomLines: nDst, topSize: st.srcSize, topLang: srcV })) + gap;
+  } else {
+    topMV = dstFirst ? m.dst : m.src;
+    bottomMV = dstFirst ? m.src : m.dst;
   }
-  const paint = (el, text, size, colorId, outline, outlineColorId, alpha, mv, atTop) => {
+  const paint = (el, text, size, colorId, outline, outlineColorId, alpha, mv, atTop, fontVal) => {
     el.textContent = text;
     el.style.fontSize = (size * k).toFixed(1) + 'px';
     el.style.color = colOf(colorId);
     el.style.opacity = (alpha / 100).toFixed(2);
     el.style.webkitTextStroke = (Number(outline) * k).toFixed(2) + 'px ' + colOf(outlineColorId);
     el.style.paintOrder = 'stroke fill';
+    /* v0.9.224：字体也跟随设置（此前预览写死苹方，改字体看不出任何变化） */
+    el.style.fontFamily = '"' + String(fontVal || 'PingFang SC') + '", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
     if (atTop) { el.style.top = (mv * k).toFixed(1) + 'px'; el.style.bottom = 'auto'; }
     else { el.style.bottom = (mv * k).toFixed(1) + 'px'; el.style.top = 'auto'; }
   };
   /* 行 1 = 视觉上那条，行 2 = 下面那条 */
   if (stacked) {
     /* 底部双行：贴底的是 bottom 侧，另一条在其上方 */
-    if (dstFirst) { paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false);
-                    paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, false); }
-    else          { paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false);
-                    paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, false); }
+    if (dstFirst) { paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont);
+                    paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, false, st.dstFont); }
+    else          { paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont);
+                    paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, false, st.srcFont); }
   } else {
     /* 分屏：一条顶部一条底部 */
-    if (dstFirst) { paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, m.dst, true);
-                    paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, m.src, false); }
-    else          { paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, m.src, true);
-                    paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, m.dst, false); }
+    if (dstFirst) { paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, true, st.dstFont);
+                    paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont); }
+    else          { paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, true, st.srcFont);
+                    paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont); }
   }
   if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p';
 }
@@ -1117,11 +1157,11 @@ function init(){
   f2.value = f1.value = 'srt';
   f1.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
   f2.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
-  /* v0.9.223：手动微调过 ASS 参数就记住（切模板不再覆盖），并即时重画预览 */
+  /* v0.9.224：参数一改，预览即时重画（微调在当前模板内保留；切模板会被预设覆盖，这是预期行为） */
   ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor',
    'assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV'].forEach(id=>{
     const el = $(id); if (!el) return;
-    ['input','change'].forEach(ev=>el.addEventListener(ev, ()=>{ assDirty = true; renderAssPv(); }));
+    ['input','change'].forEach(ev=>el.addEventListener(ev, renderAssPv));
   });
   document.querySelectorAll('input[name=biOrder]').forEach(el=>el.addEventListener('change', renderAssPv));
   window.addEventListener('resize', renderAssPv);
