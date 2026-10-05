@@ -124,7 +124,11 @@
   .ass-pv-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);margin-bottom:6px}
   .ass-pv-tag{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:11.5px}
   .ass-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#111;border-radius:10px;overflow:hidden}
-  .ass-pv-line{position:absolute;left:0;right:0;text-align:center;white-space:pre-wrap;padding:0 6%;
+  /* v0.9.230：左右留白必须等于导出的 MarginL/R —— 导出 MarginL=R=60（1080p 下画面宽 1920），
+     即文本框宽 1800px；这里原来是 6%（=1690px），比导出窄 110px，于是预览会比导出**多折一行**，
+     顶部那条被多出来的一行顶出画面上边——用户看到的就是「预览里出界、播放器里没事」。
+     60/1920 = 3.125%，与导出同宽后，预览折出来的行数才等于导出折出来的行数。 */
+  .ass-pv-line{position:absolute;left:0;right:0;text-align:center;white-space:pre-wrap;padding:0 3.125%;
     font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif;line-height:1.2}
   .ass-note{margin-bottom:8px}
   .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:10px;padding:9px 14px;
@@ -161,7 +165,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.229</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.230</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -293,7 +297,7 @@
             <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assSrcOutlineColor" value="#000000"><span class="sw" id="assSrcOutlineColorSw"></span></div>
             <div class="af"><label data-i18n="lblFont">字体</label><select id="assSrcFont"></select></div>
             <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assSrcAlpha" min="10" max="100" value="100"><span class="pct" id="assSrcAlphaOut">100%</span></div>
-            <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assSrcMV" value="981" min="0" max="1080"></div>
+            <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assSrcMV" value="922" min="0" max="1080"></div>
           </div>
         </div>
         <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
@@ -351,7 +355,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.229"></script>
+<script src="merge-core.js?v=0.9.230"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -883,7 +887,7 @@ const ASS_DEFAULTS = [
   ['assDstAlpha','100'],['assSrcAlpha','100'],
   /* v0.9.224：两个距离框不再是同一个数（分屏 42 离底 / 40 离顶，双行 42 离底 / 8 间距）。
      真正生效的是 TPL_DEFAULTS（syncAssPanel 每次切模板无条件套），这里是字段清单兜底。 */
-  ['assDstMV','42'],['assSrcMV','981']
+  ['assDstMV','42'],['assSrcMV','922']
 ];
 /* v0.9.223：三种模板各自一套默认参数（1080p 基准，见 assNote1080）。
    v0.9.219 只做了「布局映射」却没套参数，三个模板导出逐字节相同——等于模板没生效。
@@ -894,10 +898,14 @@ const TPL_DEFAULTS = {
     assDstSize:'56', assSrcSize:'50', assDstColor:'#FFFFFF', assSrcColor:'#FFD700',
     assDstOutline:'2.5', assSrcOutline:'2.5', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'100',
-    /* v0.9.229：两个框统一是「这一行离画面底边多远」。分屏下译文离底 42、
-       原文离底 981 —— 981 是「距顶 40」的等价位置（1080 − 40 − 行高 59），
-       导出时两条都用底部对齐（an2）+ 各自的 MarginV，不再有「距顶」这一说。 */
-    assDstMV:'42', assSrcMV:'981'
+    /* v0.9.229：两个框统一是「这一行离画面底边多远」。分屏下译文离底 42、原文离底 922。
+       v0.9.230：默认值 981 → 922。981 是「原文只有 1 行、且顶部留 40」时的等价位置
+       （1080 − 40 − 行高 59）；但 an2 锚的是块的**下边**，块往上长，原文一旦折成 2 行
+       顶边就跑到 y = −19，直接被画面切掉一截——双语的原文折 2 行是常态，默认值必须按 2 行给。
+       922 = 1080 − 40 − 行高 59×2：2 行时顶边正好在 40，1 行时顶边在 99（偏低，想高自己调）。
+       ⚠️ 这里刻意**不做自动夹取**：用户填多少导出就是多少，填出界预览就如实画出来界，
+       不再偷偷把数值改掉（10-06 用户明确：不要潜规则，所见即所得）。 */
+    assDstMV:'42', assSrcMV:'922'
   },
   stack: {
     assDstSize:'54', assSrcSize:'42', assDstColor:'#FFFFFF', assSrcColor:'#E6C86A',
@@ -984,8 +992,8 @@ function assColorVal(id,dflt){
 }
 function assMVs(){
   const d=parseInt(($('assDstMV')||{}).value,10), s=parseInt(($('assSrcMV')||{}).value,10);
-  /* 兜底：译文 42 / 原文 981（与分屏预设一致，仅在输入框被清空等异常时生效） */
-  return { dst:(isFinite(d)&&d>=0)?d:42, src:(isFinite(s)&&s>=0)?s:981 };
+  /* 兜底：译文 42 / 原文 922（与分屏预设一致，仅在输入框被清空等异常时生效） */
+  return { dst:(isFinite(d)&&d>=0)?d:42, src:(isFinite(s)&&s>=0)?s:922 };
 }
 function assStyleOf(){
   const m=assMVs();
@@ -1176,9 +1184,12 @@ function importAssStyle(){
     /* 两份都贴底且离底距离接近 → 视作底部双行；否则分屏 */
     const stacked = !!(a && b && a.align !== 'top' && b.align !== 'top' && Math.abs(a.marginV - b.marginV) < 80);
     const resY = +((S.dstAss && S.dstAss.playResY) || (S.srcAss && S.srcAss.playResY) || 1080) || 1080;
-    /* v0.9.229：面板两个框统一是「离底距离」→ 顶部对齐（an8）那侧的 MarginV 是距顶，要换算 */
+    /* v0.9.229：面板两个框统一是「离底距离」→ 顶部对齐（an8）那侧的 MarginV 是距顶，要换算。
+       v0.9.230：换算按**2 行**给（与分屏默认 922 同口径）——an8 锚上边、行数无关，
+       换成 an2 必然要挑一个行数，双语原文折 2 行是常态，按 1 行换会直接顶出画面。
+       ⚠️ 这是换算不是修正：填进框后用户随便改，我们不碰。 */
     const mvOf = f => !f ? null : (f.align === 'top'
-      ? Math.max(0, Math.min(1080, Math.round(1080 - f.marginV - C.assLineHeight(f.size))))
+      ? Math.max(0, Math.min(1080, Math.round(1080 - f.marginV - 2 * C.assLineHeight(f.size))))
       : f.marginV);
     plan = {
       layout: stacked ? 'stack' : 'split',

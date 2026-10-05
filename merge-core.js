@@ -846,11 +846,14 @@
     const span = Math.abs(ya - yb);
     const layout = (span > 1080 * 0.35 || upper.align === 'top' || lower.align === 'top') ? 'split' : 'stack';
     /* v0.9.229：面板上两个框统一是「离底距离」，所以顶部对齐（an8）那条要把
-       MarginV 从「距顶」换算成「离底」：离底 = 1080 − 距顶 − 行高。
+       MarginV 从「距顶」换算成「离底」：离底 = 1080 − 距顶 − 行数×行高。
        字号/边距在上面已按 k 换到 1080p 基准，这里用换算后的值算行高。
-       （v0.9.224–228 的做法是「split 就各自量自己那条边」，与现在统一后的语义冲突。） */
+       （v0.9.224–228 的做法是「split 就各自量自己那条边」，与现在统一后的语义冲突。）
+       v0.9.230：行数取 **2**（原来按 1 行）。an8 锚的是上边、与行数无关，换成 an2 必然要
+       挑一个行数；双语原文折 2 行是常态，按 1 行换算会让顶边跑到 y<0 被画面切掉。
+       与分屏默认 922（= 1080 − 40 − 59×2）同口径。 */
     const mvOf = f => (f.align === 'top')
-      ? Math.max(0, Math.min(1080, Math.round(1080 - f.marginV - assLineHeight(f.size))))
+      ? Math.max(0, Math.min(1080, Math.round(1080 - f.marginV - 2 * assLineHeight(f.size))))
       : f.marginV;
     const dstMV = mvOf(dst), srcMV = mvOf(src);
     return {
