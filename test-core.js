@@ -5332,7 +5332,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.226/.test(mg), 'merge.html 未引用 v0.9.226 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.227/.test(mg), 'merge.html 未引用 v0.9.227 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5365,9 +5365,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.226</.test(html), '首页版本号未升 0.9.226');
-    assert.ok(/class="ver-tag">v0\.9\.226</.test(html), '工作台版本号未升 0.9.226');
-    assert.ok(/srt-core\.js\?v=0\.9\.226/.test(html), 'srt-core.js?v 未升 0.9.226');
+    assert.ok(/class="ver">v0\.9\.227</.test(html), '首页版本号未升 0.9.227');
+    assert.ok(/class="ver-tag">v0\.9\.227</.test(html), '工作台版本号未升 0.9.227');
+    assert.ok(/srt-core\.js\?v=0\.9\.227/.test(html), 'srt-core.js?v 未升 0.9.227');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5510,8 +5510,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.226</.test(mg), 'merge.html 版本未升 0.9.226');
-    assert.ok(/merge-core\.js\?v=0\.9\.226/.test(mg), 'merge-core.js?v 未升 0.9.226');
+    assert.ok(/class="ver">v0\.9\.227</.test(mg), 'merge.html 版本未升 0.9.227');
+    assert.ok(/merge-core\.js\?v=0\.9\.227/.test(mg), 'merge-core.js?v 未升 0.9.227');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5642,5 +5642,123 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/topMV = stackOf\(\{ bottomMV: baseMV, bottomSize: botSize,/.test(mg), '未按实测行数重算抬高量');
     assert.ok(/bottomLang: dstFirst \? srcV : dstV, bottomLines: botLines,/.test(mg), '重算未带语言/行数');
     assert.ok(/const nSrc = nLines\(srcText\);/.test(mg), '导出端 nSrc 被改动');
+  });
+
+  /* ================= v0.9.227：导入 ASS 必须把文件自带的样式带进来 =================
+     病根：parseAss 只留每条的 style 名字，[V4+ Styles] 定义（字体/字号/颜色/描边/对齐/边距）
+     整段丢弃 → 用户导入现成双语 ASS 后界面上还是工具自己的默认外观，原文件样式全丢。 */
+  const mkAss227 = (resY, styleLines, evLines) => [
+    '[Script Info]', 'ScriptType: v4.00+',
+    'PlayResX: ' + Math.round(resY * 16 / 9), 'PlayResY: ' + resY, '',
+    '[V4+ Styles]',
+    'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding'
+  ].concat(styleLines).concat(['', '[Events]',
+    'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
+  ]).concat(evLines).join('\n');
+  const S227_BOTTOM = 'Style: Bottom,PingFang SC,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,2,60,60,42,1';
+  const S227_TOP    = 'Style: Top,Arial,40,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2,0,8,60,60,40,1';
+  const S227_SUB    = 'Style: Sub,Arial,40,&H3300D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2,0,2,60,60,110,1';
+  const EV227_SPLIT = ['Dialogue: 0,0:00:01.00,0:00:04.00,Top,,0,0,0,,Companies respond to tariffs',
+                       'Dialogue: 0,0:00:01.00,0:00:04.00,Bottom,,0,0,0,,企业通常通过调整价格来应对'];
+  const EV227_STACK = ['Dialogue: 0,0:00:01.00,0:00:04.00,Sub,,0,0,0,,Companies respond to tariffs',
+                       'Dialogue: 0,0:00:01.00,0:00:04.00,Bottom,,0,0,0,,企业通常通过调整价格来应对'];
+
+  t('v0.9.227：parseAss 必须带回 [V4+ Styles] 与 PlayRes（此前整段丢弃）', () => {
+    const r = M.parseAss(mkAss227(1080, [S227_BOTTOM, S227_TOP], EV227_SPLIT));
+    assert.strictEqual(r.playResY, 1080, 'PlayResY 没解析出来');
+    assert.strictEqual(r.playResX, 1920);
+    assert.ok(r.styles && r.styles.Bottom && r.styles.Top, 'styles 缺失');
+    assert.strictEqual(r.styles.Bottom.font, 'PingFang SC');
+    assert.strictEqual(r.styles.Bottom.size, 56);
+    assert.strictEqual(r.styles.Bottom.alignment, 2);
+    assert.strictEqual(r.styles.Bottom.marginV, 42);
+    assert.strictEqual(r.styles.Top.alignment, 8);
+    assert.strictEqual(r.styles.Top.marginV, 40);
+    assert.strictEqual(r.items[0].style, 'Top', '条目仍要带 style 名（v0.9.222 的能力不能回退）');
+  });
+
+  t('v0.9.227：ASS 颜色 &HAABBGGRR → #RRGGBB + 不透明度', () => {
+    assert.deepStrictEqual(M.assColorHex('&H00FFFFFF'), { hex: '#FFFFFF', alpha: 100 });
+    assert.deepStrictEqual(M.assColorHex('&H0000D7FF'), { hex: '#FFD700', alpha: 100 });
+    assert.deepStrictEqual(M.assColorHex('&H3300D7FF'), { hex: '#FFD700', alpha: 80 });  // 0x33=51 → 80%
+    assert.strictEqual(M.assColorHex('&HFFFFFF').hex, '#FFFFFF');      // 只写 6 位的老文件
+    assert.strictEqual(M.assColorHex('乱七八糟'), null);
+  });
+
+  t('v0.9.227：分屏双语 ASS → 译文贴底 56 白 / 原文贴顶 40 金', () => {
+    const r = M.parseAss(mkAss227(1080, [S227_BOTTOM, S227_TOP], EV227_SPLIT));
+    const p = M.planAssImport(r.items, r.styles, r.playResY);
+    assert.strictEqual(p.layout, 'split', '一个贴顶一个贴底 → 分屏');
+    assert.strictEqual(p.order, 'src-first');
+    assert.strictEqual(p.dstName, 'Bottom'); assert.strictEqual(p.srcName, 'Top');
+    assert.strictEqual(p.dst.size, 56); assert.strictEqual(p.dst.color, '#FFFFFF');
+    assert.strictEqual(p.src.size, 40); assert.strictEqual(p.src.color, '#FFD700');
+    assert.strictEqual(p.src.font, 'Arial', '字体必须是文件里的字体');
+    assert.strictEqual(p.dst.outline, 2.5); assert.strictEqual(p.dst.outlineColor, '#000000');
+    assert.strictEqual(p.dstMV, 42); assert.strictEqual(p.srcMV, 40);
+    assert.strictEqual(p.scaled, false);
+  });
+
+  t('v0.9.227：底部双行 ASS → 译文贴底、原文在上，间距由两条的 MarginV 差算出', () => {
+    const r = M.parseAss(mkAss227(1080, [S227_BOTTOM, S227_SUB], EV227_STACK));
+    const p = M.planAssImport(r.items, r.styles, r.playResY);
+    assert.strictEqual(p.layout, 'stack', '两条都贴底 → 底部双行');
+    assert.strictEqual(p.dstName, 'Bottom'); assert.strictEqual(p.srcName, 'Sub');
+    assert.strictEqual(p.dstMV, 42, '贴底那条量离底');
+    /* 110 - 42 - 行高(56pt → 66) = 2 */
+    assert.strictEqual(p.srcMV, 2, '两行间距应为 110-42-66=2，实得 ' + p.srcMV);
+    assert.strictEqual(p.src.alpha, 80, '&H33 前缀的半透明要带过来');
+  });
+
+  t('v0.9.227：非 1080p 文件要等比换算（720p 的 56pt/42 → 84pt/63）', () => {
+    const r = M.parseAss(mkAss227(720, [S227_BOTTOM, S227_SUB], EV227_STACK));
+    const p = M.planAssImport(r.items, r.styles, r.playResY);
+    assert.strictEqual(p.scaled, true);
+    assert.strictEqual(p.resY, 720);
+    assert.strictEqual(p.dst.size, 84);
+    assert.strictEqual(p.dstMV, 63);
+    assert.strictEqual(p.dst.outline, 3.8);
+  });
+
+  t('v0.9.227：主语言在上时判出 dst-first（字号大的那条当译文）', () => {
+    /* 中文 56pt 贴顶、英文 40pt 贴底 —— 与常规相反，不能判反 */
+    const bigTop = 'Style: CN,Microsoft YaHei,56,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,2.5,0,8,60,60,40,1';
+    const smallBottom = 'Style: EN,Arial,40,&H0000D7FF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2,0,2,60,60,42,1';
+    const r = M.parseAss(mkAss227(1080, [bigTop, smallBottom],
+      ['Dialogue: 0,0:00:01.00,0:00:04.00,CN,,0,0,0,,企业应对关税',
+       'Dialogue: 0,0:00:01.00,0:00:04.00,EN,,0,0,0,,Companies respond']));
+    const p = M.planAssImport(r.items, r.styles, r.playResY);
+    assert.strictEqual(p.order, 'dst-first', '主语言（字号大）在上时应是 dst-first');
+    assert.strictEqual(p.dstName, 'CN'); assert.strictEqual(p.srcName, 'EN');
+    assert.strictEqual(p.dstMV, 40, '译文在上 → 距顶 40');
+    assert.strictEqual(p.srcMV, 42, '原文在下 → 离底 42');
+  });
+
+  t('v0.9.227：assDominantStyle 取用得最多的那条样式', () => {
+    const r = M.parseAss(mkAss227(1080, [S227_BOTTOM, S227_TOP],
+      EV227_SPLIT.concat(['Dialogue: 0,0:00:05.00,0:00:08.00,Bottom,,0,0,0,,再来一条译文'])));
+    const d = M.assDominantStyle(r.items, r.styles, r.playResY);
+    assert.strictEqual(d.name, 'Bottom', 'Bottom 用了 2 次、Top 1 次');
+    assert.strictEqual(d.size, 56);
+  });
+
+  t('v0.9.227：merge.html 接线（存样式 → 套用 → 提示来源）', () => {
+    assert.ok(/S\[side\+'Ass'\] = \(fmt === 'ass' && r\.styles/.test(mg), 'loadSide 未保存文件样式');
+    assert.ok(/autoAlignDefault\(\);\s*\n\s*importAssStyle\(\);/.test(mg), '导入后未调用 importAssStyle');
+    assert.ok(/function applyAssPlan\(plan\)\{/.test(mg), '缺 applyAssPlan');
+    assert.ok(/function ensureFontOption\(sel, name\)\{/.test(mg), '文件里的字体不在下拉里时未补选项');
+    assert.ok(/id="assImportNote"/.test(mg), '缺「样式来自哪个文件」的提示位');
+    /* 导入时只刷显隐/文案，绝不能顺带套预设把导入值冲掉 */
+    assert.ok(/function syncAssChrome\(\)\{/.test(mg), '缺 syncAssChrome');
+    assert.ok(/function syncAssPanel\(\)\{\s*\n\s*const tpl = tplVal\(\);\s*\n\s*syncAssChrome\(\);/.test(mg),
+      'syncAssPanel 未拆出 syncAssChrome');
+    assert.ok(!/function syncAssPanel\(\)\{[\s\S]{0,400}\$\('assPanel'\)\.style\.display/.test(mg),
+      'syncAssPanel 仍在自己管显隐');
+    assert.ok(/const pnl = \$\('assPanel'\); if \(pnl\) pnl\.open = true;/.test(mg), '导入后未展开面板');
+    assert.ok(/if \(!S\.srcAss\)\{ clearNote\(\); return false; \}/.test(mg), '换成非 ASS 后未清掉旧提示');
+    ['assImportedToast','assImportedNote','assImportedNoteShared','assImportedNoteOne','assImportedRes','assFontFromFile'].forEach(k => {
+      const c = (mg.match(new RegExp('\\b' + k + ':', 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
   });
 }

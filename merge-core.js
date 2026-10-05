@@ -689,6 +689,178 @@
     return Math.floor(t / 3600000) + ':' + p(Math.floor(t / 60000) % 60) + ':' +
            p(Math.floor(t / 1000) % 60) + '.' + p(Math.floor(t / 10) % 100);
   }
+  /* ---------------- v0.9.227：导入 ASS 时把文件自带的风格带回来 ----------------
+     此前导入一份现成的双语 ASS，只有「文本 + 时间轴」进来，[V4+ Styles] 里的
+     字体 / 字号 / 颜色 / 描边 / 对齐 / 边距整段丢弃——用户看到的永远是工具自己的
+     默认外观，等于把原文件的样式全丢了、只能从零重调。这里补齐解析与换算。 */
+  const ASS_STYLE_FMT = ['name','fontname','fontsize','primarycolour','secondarycolour','outlinecolour',
+    'backcolour','bold','italic','underline','strikeout','scalex','scaley','spacing','angle',
+    'borderstyle','outline','shadow','alignment','marginl','marginr','marginv','encoding'];
+  /* ASS 颜色 = &HAABBGGRR（alpha 0=不透明、255=全透明）。也有只写 6 位或直接写十进制的。 */
+  function assColorHex(v){
+    const s = String(v == null ? '' : v).trim();
+    let num = null;
+    if (/^&H[0-9a-f]{8}$/i.test(s)) num = parseInt(s.slice(2), 16);
+    else if (/^&H[0-9a-f]{6}$/i.test(s)) num = parseInt(s.slice(2), 16);
+    else if (/^H[0-9a-f]{6,8}$/i.test(s)) num = parseInt(s.slice(1), 16);
+    else if (/^\d{1,10}$/.test(s)) num = parseInt(s, 10) >>> 0;
+    if (num == null || !isFinite(num)) return null;
+    const r = num & 0xFF, g = (num >>> 8) & 0xFF, b = (num >>> 16) & 0xFF, a = (num >>> 24) & 0xFF;
+    const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+    /* 面板的不透明度最小 10%：全透明（alpha=255）也夹到 10，免得导出来看不见 */
+    return { hex: hex, alpha: Math.max(10, Math.min(100, Math.round((255 - a) / 255 * 100))) };
+  }
+  /* ASS 对齐（小键盘布局）：1-3 底、4-6 中、7-9 顶 */
+  function assAlignOf(n){
+    const a = parseInt(n, 10);
+    if (a >= 7 && a <= 9) return 'top';
+    if (a >= 4 && a <= 6) return 'mid';
+    return 'bottom';
+  }
+  function parseAssStyles(src){
+    const out = { playResX: 0, playResY: 0, order: [], styles: {} };
+    const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    let section = '', fmt = null;
+    text.split('\n').forEach(function(ln){
+      const s = ln.trim();
+      if (/^\[/.test(s)){ section = s.toLowerCase(); fmt = null; return; }
+      if (!s || s.charAt(0) === ';' || s.slice(0, 2) === '!:') return;
+      if (section === '[script info]'){
+        const mx = /^playresx\s*:\s*(\d+)/i.exec(s); if (mx) out.playResX = +mx[1];
+        const my = /^playresy\s*:\s*(\d+)/i.exec(s); if (my) out.playResY = +my[1];
+        return;
+      }
+      if (section !== '[v4+ styles]' && section !== '[v4 styles]' && section !== '[styles]') return;
+      if (/^format\s*:/i.test(s)){ fmt = s.slice(s.indexOf(':') + 1).split(',').map(function(x){ return x.trim().toLowerCase(); }); return; }
+      if (!/^style\s*:/i.test(s)) return;
+      const cols = (fmt && fmt.length) ? fmt : ASS_STYLE_FMT;
+      let parts = s.slice(s.indexOf(':') + 1).split(',').map(function(x){ return x.trim(); });
+      const fi = cols.indexOf('fontname');
+      /* 字体名里带逗号时（如 "Source Han Sans, Bold"）多出来的段并回字体名 */
+      if (fi >= 0 && parts.length > cols.length){
+        const extra = parts.length - cols.length;
+        parts = parts.slice(0, fi).concat([parts.slice(fi, fi + extra + 1).join(', ')], parts.slice(fi + extra + 1));
+      }
+      const get = function(name){
+        const i = cols.indexOf(name);
+        return (i >= 0 && i < parts.length) ? parts[i] : '';
+      };
+      const st = {
+        name: get('name'),
+        font: String(get('fontname') || '').replace(/^@/, '').trim(),   // @ 前缀 = 竖排字体
+        size: parseFloat(get('fontsize')) || 0,
+        primary: get('primarycolour'), outlineColor: get('outlinecolour'), back: get('backcolour'),
+        bold: parseInt(get('bold'), 10) || 0, italic: parseInt(get('italic'), 10) || 0,
+        outline: parseFloat(get('outline')), shadow: parseFloat(get('shadow')),
+        alignment: parseInt(get('alignment'), 10) || 2,
+        marginL: parseFloat(get('marginl')) || 0,
+        marginR: parseFloat(get('marginr')) || 0,
+        marginV: parseFloat(get('marginv')) || 0
+      };
+      if (!st.name) return;
+      out.styles[st.name] = st; out.order.push(st.name);
+    });
+    return out;
+  }
+  /* 样式名在 ASS 里大小写不敏感，找不到时退一步按小写匹配 */
+  function assStyleLookup(styles, name){
+    const map = styles || {};
+    if (!name) return null;
+    if (map[name]) return map[name];
+    const keys = Object.keys(map);
+    for (let i = 0; i < keys.length; i++){
+      if (String(keys[i]).toLowerCase() === String(name).toLowerCase()) return map[keys[i]];
+    }
+    return null;
+  }
+  /* 样式 → 面板字段。k = 1080 / PlayResY：本工具所有参数以 1080p 为基准，
+     文件若是 720p / 2160p 必须等比换算，否则字号和边距全错位。 */
+  function assStyleFields(st, k){
+    if (!st) return null;
+    const kk = (isFinite(k) && k > 0) ? k : 1;
+    const c  = assColorHex(st.primary) || { hex: '#FFFFFF', alpha: 100 };
+    const oc = assColorHex(st.outlineColor) || { hex: '#000000', alpha: 100 };
+    const ol = (isFinite(st.outline) ? st.outline : 2) * kk;
+    return {
+      name: st.name,
+      font: st.font || '',
+      size: Math.max(8, Math.min(200, Math.round((st.size || 56) * kk))),
+      color: c.hex, alpha: c.alpha,
+      outline: Math.max(0, Math.min(10, Math.round(ol * 10) / 10)),
+      outlineColor: oc.hex,
+      marginV: Math.max(0, Math.min(1080, Math.round((st.marginV || 0) * kk))),
+      align: assAlignOf(st.alignment)
+    };
+  }
+  /* 一份字幕里被用得最多的样式 = 它的主样式（合并模式两侧各取各的） */
+  function assDominantStyle(items, styles, playResY){
+    const map = styles || {};
+    const vote = {};
+    (items || []).forEach(function(it){
+      const n = String(it && it.style || '');
+      if (n) vote[n] = (vote[n] || 0) + 1;
+    });
+    let name = null, best = -1;
+    Object.keys(vote).forEach(function(n){ if (vote[n] > best){ best = vote[n]; name = n; } });
+    if (!name){ const ks = Object.keys(map); name = ks.length ? ks[0] : null; }
+    const st = assStyleLookup(map, name);
+    if (!st) return null;
+    return assStyleFields(st, (+playResY > 0) ? (1080 / +playResY) : 1);
+  }
+  /* 双语 ASS → 面板两套字段 + 布局 + 上下顺序 + 两个距离框。
+     判据只用「位置 + 字号」：位低的那条是主（译文），除非位高那条字号明显更大。 */
+  function planAssImport(items, styles, playResY){
+    const map = styles || {};
+    const resY = (+playResY > 0) ? +playResY : 1080;
+    const k = 1080 / resY;
+    const vote = {};
+    (items || []).forEach(function(it){
+      const n = String(it && it.style || '');
+      if (n) vote[n] = (vote[n] || 0) + 1;
+    });
+    const byUse = Object.keys(vote).sort(function(a, b){
+      return (vote[b] - vote[a]) || String(a).localeCompare(String(b));
+    });
+    const pool = byUse.length ? byUse : Object.keys(map);
+    if (!pool.length) return null;
+    let nA = pool[0], nB = pool.length > 1 ? pool[1] : pool[0];
+    let A = assStyleFields(assStyleLookup(map, nA), k);
+    let B = assStyleFields(assStyleLookup(map, nB), k);
+    if (!A && !B) return null;
+    if (!A){ A = B; nA = nB; }
+    if (!B){ B = A; nB = nA; }
+    /* 纵向位置（换算到 1080p 后的「距画面顶」） */
+    const yTop = function(f){
+      if (f.align === 'top') return f.marginV;
+      if (f.align === 'mid') return 540;
+      return 1080 - f.marginV;
+    };
+    const ya = yTop(A), yb = yTop(B);
+    let upper = ya <= yb ? A : B, lower = ya <= yb ? B : A;
+    let upperName = ya <= yb ? nA : nB, lowerName = ya <= yb ? nB : nA;
+    if (ya === yb && B.size > A.size){ upper = B; lower = A; upperName = nB; lowerName = nA; }
+    /* 位低的通常是译文（主字幕），除非位高那条字号明显更大（主语言在上） */
+    const dstIsUpper = (upper.size > lower.size * 1.05);
+    const dst = dstIsUpper ? upper : lower, src = dstIsUpper ? lower : upper;
+    const dstName = dstIsUpper ? upperName : lowerName, srcName = dstIsUpper ? lowerName : upperName;
+    const span = Math.abs(ya - yb);
+    const layout = (span > 1080 * 0.35 || upper.align === 'top' || lower.align === 'top') ? 'split' : 'stack';
+    let dstMV, srcMV;
+    if (layout === 'split'){
+      /* 分屏：两侧各量自己那条边（贴底的量离底、贴顶的量离顶），面板语义正是如此 */
+      dstMV = dst.marginV; srcMV = src.marginV;
+    } else {
+      /* 底部双行：贴底那条量离底；另一条与它的差减去行高 = 两行间距 */
+      dstMV = lower.marginV;
+      srcMV = Math.max(0, Math.round(upper.marginV - lower.marginV - assLineHeight(lower.size)));
+    }
+    return {
+      layout: layout,
+      order: dstIsUpper ? 'dst-first' : 'src-first',
+      dst: dst, src: src, dstName: dstName, srcName: srcName,
+      dstMV: dstMV, srcMV: srcMV, resY: resY, scaled: Math.abs(k - 1) > 0.01
+    };
+  }
   function parseAss(src) {
     const items = [], issues = [];
     const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
@@ -726,7 +898,11 @@
       items.push({ no: items.length + 1, start: st, end: en, text: body, style: col('style') });
     });
     if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
-    return { items, issues };
+    /* v0.9.227：把 [V4+ Styles] 定义与 PlayRes 一起带出去。
+       此前只留了每条的 style 名字，样式定义整段丢弃 → 导入现成双语 ASS 后
+       界面上还是工具自己的默认外观，原文件的字体/字号/颜色/位置全丢。 */
+    const meta = parseAssStyles(text);
+    return { items, issues, styles: meta.styles, playResX: meta.playResX, playResY: meta.playResY };
   }
 
   // ASS 行高（v0.9.100）：双行堆叠时「在上块」需按下方块实际行数抬高，抬高量依赖字号。
@@ -2859,6 +3035,7 @@
     splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     alignRows, overlapMs, shiftTimeline, checkTimeline,   // v0.9.218 双文件合并（纯新增）
     splitBilingual, scriptProfile,                        // v0.9.222 调整模式：双语字幕拆分
+    parseAssStyles, assColorHex, assAlignOf, assStyleLookup, assStyleFields, assDominantStyle, planAssImport,  // v0.9.227 导入自带样式
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
     validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,

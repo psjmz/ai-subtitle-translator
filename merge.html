@@ -153,7 +153,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.226</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.227</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -253,6 +253,8 @@
       <div class="ass-body">
         <!-- v0.9.223：参数基准必须写明，否则拿 720p 素材对不上数 -->
         <div class="hint ass-note" data-i18n="assNote1080">以下参数以 1920×1080 视频为准；其他分辨率由播放器等比缩放。</div>
+        <!-- v0.9.227：导入 ASS 后在此写明「样式来自哪个文件的哪个样式名」，否则用户不知道值是哪来的 -->
+        <div class="hint ass-note" id="assImportNote" style="display:none"></div>
         <!-- v0.9.219：布局选择仅「ASS 自定义风格」时显示；分屏/堆叠模板布局锁定，参数可微调 -->
         <div class="af" id="layoutRow" style="display:none">
           <label data-i18n="lblLayout">布局</label>
@@ -337,7 +339,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.226"></script>
+<script src="merge-core.js?v=0.9.227"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -382,6 +384,8 @@ const I18N = {
     tplHintPreset:'已套用默认模板。想改字号、颜色、描边等，展开下方「ASS 外观」微调即可。',
     tplHintCustom:'布局与外观全部由你定义：先选布局，再展开「ASS 外观」逐项调整。',
     assReset:'↺ 恢复默认参数', assResetDone:'已恢复默认参数',
+    assImportedToast:'已按导入文件的 ASS 样式填充外观', assImportedNoteShared:'样式来自导入文件：{0}（译文与原文共用同一样式）', assImportedNote:'样式来自导入文件：译文 ← {0} · 原文 ← {1}',
+    assImportedNoteOne:'样式来自导入文件：{0}', assImportedRes:'（原文件 {0}p，已等比换算到 1080p）', assFontFromFile:'来自文件',
     assPanel:'ASS 外观（导出 ASS 时生效）', lblDstCol:'译文（主）', lblSrcCol:'原文（副）',
     lblSize:'字号', lblColor:'颜色', lblOutline:'描边', lblOutlineColor:'描边色', lblFont:'字体',
     lblAlpha:'不透明度', lblMV:'离底距离', lblMVSrcTop:'原文离顶', lblMVGap:'两行间距',
@@ -434,6 +438,8 @@ const I18N = {
     tplHintPreset:'已套用預設範本。想改字號、顏色、描邊等，展開下方「ASS 外觀」微調即可。',
     tplHintCustom:'版面與外觀全部由你定義：先選版面，再展開「ASS 外觀」逐項調整。',
     assReset:'↺ 恢復預設參數', assResetDone:'已恢復預設參數',
+    assImportedToast:'已依匯入檔案的 ASS 樣式填入外觀', assImportedNoteShared:'樣式來自匯入檔案：{0}（譯文與原文共用同一樣式）', assImportedNote:'樣式來自匯入檔案：譯文 ← {0} · 原文 ← {1}',
+    assImportedNoteOne:'樣式來自匯入檔案：{0}', assImportedRes:'（原檔案 {0}p，已等比換算為 1080p）', assFontFromFile:'來自檔案',
     assPanel:'ASS 外觀（匯出 ASS 時生效）', lblDstCol:'譯文（主）', lblSrcCol:'原文（副）',
     lblSize:'字號', lblColor:'顏色', lblOutline:'描邊', lblOutlineColor:'描邊色', lblFont:'字體',
     lblAlpha:'不透明度', lblMV:'離底距離', lblMVSrcTop:'原文離頂', lblMVGap:'兩行間距',
@@ -486,6 +492,8 @@ const I18N = {
     tplHintPreset:'Preset applied. To tweak size, colors, outline and more, open “ASS appearance” below.',
     tplHintCustom:'Layout and appearance are fully yours: pick a layout first, then adjust every option under “ASS appearance”.',
     assReset:'↺ Reset to defaults', assResetDone:'Defaults restored',
+    assImportedToast:'Appearance filled from the imported file’s ASS styles', assImportedNoteShared:'Style taken from the imported file: {0} (both sides share it)', assImportedNote:'Styles taken from the imported file: translation ← {0} · original ← {1}',
+    assImportedNoteOne:'Style taken from the imported file: {0}', assImportedRes:'(file is {0}p — values scaled to 1080p)', assFontFromFile:'from file',
     assPanel:'ASS appearance (applies to ASS export)', lblDstCol:'Translation (primary)', lblSrcCol:'Original (secondary)',
     lblSize:'Font size', lblColor:'Color', lblOutline:'Outline', lblOutlineColor:'Outline color', lblFont:'Font',
     lblAlpha:'Opacity', lblMV:'Bottom margin', lblMVSrcTop:'Original from top', lblMVGap:'Gap between lines',
@@ -538,6 +546,8 @@ const I18N = {
     tplHintPreset:'既定テンプレートを適用しました。サイズ・色・縁取り等を変えるには下の「ASS 外観」を開いて調整してください。',
     tplHintCustom:'レイアウトも外観もすべて自分で定義：まずレイアウトを選び、「ASS 外観」で各項目を調整します。',
     assReset:'↺ 既定値に戻す', assResetDone:'既定値に戻しました',
+    assImportedToast:'読み込んだファイルの ASS スタイルを外観に反映しました', assImportedNoteShared:'ファイルから読み込んだスタイル：{0}（訳文・原文で共通）', assImportedNote:'ファイルから読み込んだスタイル：訳文 ← {0} · 原文 ← {1}',
+    assImportedNoteOne:'ファイルから読み込んだスタイル：{0}', assImportedRes:'（ファイル基準 {0}p を 1080p に等比換算）', assFontFromFile:'ファイル由来',
     assPanel:'ASS 外観（ASS エクスポート時に有効）', lblDstCol:'訳文（主）', lblSrcCol:'原文（副）',
     lblSize:'フォントサイズ', lblColor:'色', lblOutline:'縁取り', lblOutlineColor:'縁取り色', lblFont:'フォント',
     lblAlpha:'不透明度', lblMV:'下端からの距離', lblMVSrcTop:'原文の上余白', lblMVGap:'2 行の間隔',
@@ -606,13 +616,17 @@ function parseAny(text){
 function loadSide(side, text, name){
   const ok = $(side+'Ok'), bad = $(side+'Bad');
   ok.style.display = 'none'; bad.style.display = 'none';
-  if (!text || !text.trim()){ S[side] = null; S[side+'Name'] = ''; return; }
+  if (!text || !text.trim()){ S[side] = null; S[side+'Name'] = ''; S[side+'Ass'] = null; return; }
   const { fmt, r } = parseAny(text);
-  if (!fmt || !r || !r.items || !r.items.length){ S[side] = null; bad.style.display = 'block'; return; }
+  if (!fmt || !r || !r.items || !r.items.length){ S[side] = null; S[side+'Ass'] = null; bad.style.display = 'block'; return; }
   const items = r.items.filter(it => it && String(it.text==null?'':it.text).trim());
   S[side] = items; S[side+'Name'] = name || '';
+  /* v0.9.227：ASS 的 [V4+ Styles] 定义留着，导入后填进外观面板（此前整段丢弃） */
+  S[side+'Ass'] = (fmt === 'ass' && r.styles && Object.keys(r.styles).length)
+    ? { styles: r.styles, playResY: r.playResY } : null;
   ok.textContent = t('parsedOk', fmt.toUpperCase(), items.length); ok.style.display = 'block';
   autoAlignDefault();
+  importAssStyle();
 }
 function bindSide(side){
   const drop = $(side+'Drop'), file = $(side+'File'), ta = $(side+'Text');
@@ -869,19 +883,26 @@ function resetAssDefaults(){
   applyTplDefaults(tplVal());
   syncMvLabels(tplVal());
   renderAssPv();
+  const note = $('assImportNote'); if (note) note.style.display = 'none';
   toast(t('assResetDone'));
 }
 /* ASS 外观面板显隐：无风格模板（srt/vtt）整个隐藏；custom 显示布局选择 */
-function syncAssPanel(){
+/* 只管显隐与说明文案（v0.9.227：导入样式时要复用它，但绝不能顺带套预设把导入值冲掉） */
+function syncAssChrome(){
   const tpl = tplVal();
   $('assPanel').style.display = (tpl === 'srt' || tpl === 'vtt') ? 'none' : '';
   $('layoutRow').style.display = tpl === 'custom' ? 'flex' : 'none';
+  const hint = $('tplHint');
+  if (hint) hint.textContent = t(tpl==='srt'||tpl==='vtt' ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : 'tplHintPreset');
+  const note = $('assImportNote'); if (note) note.style.display = 'none';   /* 切模板 = 回到预设，提示作废 */
+}
+function syncAssPanel(){
+  const tpl = tplVal();
+  syncAssChrome();
   /* v0.9.224：切模板 = 套该模板默认参数（去掉 assDirty 门控，见 presetKeyOf 上方注释）。
      srt/vtt 时面板整体隐藏，但仍套一次分屏预设，保证用户第一次展开面板看到的就是预设值。 */
   applyTplDefaults(tpl);
   syncMvLabels(tpl);
-  const hint = $('tplHint');
-  if (hint) hint.textContent = t(tpl==='srt'||tpl==='vtt' ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : 'tplHintPreset');
 }
 function biMaxWVal(){ return Math.max(10, Math.min(80, parseInt($('biMaxW').value,10) || 32)); }
 function orderVal(){ const el=document.querySelector('input[name=biOrder]:checked'); return el && el.value==='dst-first' ? 'dst-first' : 'src-first'; }
@@ -1155,6 +1176,93 @@ function fillAssFonts(){
     el.value = 'PingFang SC';
   });
 }
+/* ================= v0.9.227：导入 ASS 时把文件自己的样式带进界面 =================
+   此前导入一份现成双语 ASS，只有文本和时间轴进来，[V4+ Styles] 里的字体/字号/颜色/
+   描边/位置整段丢弃 → 界面上永远是工具自己的默认外观，用户等于从零重调，原文件样式全丢。
+   现在：解析出样式 → 判出「哪套是译文、哪套是原文、分屏还是底部双行」→ 填进面板 → 提示来源。
+   ⚠️ 只认「位置 + 字号」：位低的那条当主（译文），除非位高那条字号明显更大（主语言在上）。
+   判错了用户点「⇅ 原文/译文互换」即可，比猜语言可靠（中译英时两边都可能含中文）。 */
+function importAssStyle(){
+  let plan = null;
+  /* 这一侧没有 ASS 样式可导入时，必须把上一次的「样式来自…」提示清掉，否则会留着陈旧信息 */
+  const clearNote = () => { const el = $('assImportNote'); if (el) el.style.display = 'none'; };
+  if (S.mode === 'adjust'){
+    if (!S.srcAss){ clearNote(); return false; }
+    plan = C.planAssImport(S.src, S.srcAss.styles, S.srcAss.playResY);
+  } else {
+    /* 合并模式：两份文件各取自己的主样式，只改有样式的那一侧 */
+    const a = S.srcAss ? C.assDominantStyle(S.src, S.srcAss.styles, S.srcAss.playResY) : null;
+    const b = S.dstAss ? C.assDominantStyle(S.dst, S.dstAss.styles, S.dstAss.playResY) : null;
+    if (!a && !b){ clearNote(); return false; }
+    /* 两份都贴底且离底距离接近 → 视作底部双行；否则分屏 */
+    const stacked = !!(a && b && a.align !== 'top' && b.align !== 'top' && Math.abs(a.marginV - b.marginV) < 80);
+    const resY = +((S.dstAss && S.dstAss.playResY) || (S.srcAss && S.srcAss.playResY) || 1080) || 1080;
+    plan = {
+      layout: stacked ? 'stack' : 'split',
+      order: 'src-first',
+      dst: b, src: a, dstName: b ? b.name : '', srcName: a ? a.name : '',
+      dstMV: b ? b.marginV : null,
+      /* 双行时第二个框是「两行间距」：原文原来的离底 - 译文离底 - 译文行高，算出来通常就是 0
+         （抬高量本身由 assStackMV 按字号给，另含 12px 墨迹间隙） */
+      srcMV: a ? (stacked ? Math.max(0, Math.round(a.marginV - b.marginV - C.assLineHeight(b.size))) : a.marginV) : null,
+      resY: resY, scaled: Math.abs(resY - 1080) > 1
+    };
+  }
+  return applyAssPlan(plan);
+}
+function ensureFontOption(sel, name){
+  for (let i = 0; i < sel.options.length; i++){ if (sel.options[i].value === name) return; }
+  const o = document.createElement('option');
+  o.value = name; o.textContent = name + ' · ' + t('assFontFromFile');
+  sel.insertBefore(o, sel.firstChild);
+}
+function setAssFields(pfx, f){
+  const setv = (id, v) => { const el = $(id); if (el && v != null && v !== '') el.value = v; };
+  setv(pfx + 'Size', f.size);
+  setv(pfx + 'Color', f.color);
+  setv(pfx + 'Outline', f.outline);
+  setv(pfx + 'OutlineColor', f.outlineColor);
+  if (f.font){ const el = $(pfx + 'Font'); if (el){ ensureFontOption(el, f.font); el.value = f.font; } }
+  setv(pfx + 'Alpha', f.alpha);
+  syncColorSw(pfx + 'Color'); syncColorSw(pfx + 'OutlineColor');
+  const out = $(pfx + 'AlphaOut'); if (out && f.alpha != null) out.textContent = f.alpha + '%';
+}
+function noteAssImport(plan){
+  const el = $('assImportNote'); if (!el) return;
+  const dn = plan.dstName || '', sn = plan.srcName || '';
+  const txt = (dn && sn && dn !== sn) ? t('assImportedNote', dn, sn)
+            : (dn && sn) ? t('assImportedNoteShared', dn)      /* 文件里就一套样式，两侧共用 */
+            : t('assImportedNoteOne', (dn || sn));             /* 只有一侧是 ASS */
+  el.textContent = txt + (plan.scaled ? ' ' + t('assImportedRes', plan.resY) : '');
+  el.style.display = '';
+}
+function applyAssPlan(plan){
+  if (!plan) return false;
+  const tpl = plan.layout === 'stack' ? 'stack' : 'split';
+  const cur = tplVal();
+  /* 自定义模板保留「自定义」，只同步它的布局单选 */
+  const setTpl = (cur === 'custom') ? cur : tpl;
+  const f1 = $('expFmt'), f2 = $('expFmt2');
+  if (f1) f1.value = setTpl;
+  if (f2) f2.value = setTpl;
+  const radio = document.querySelector('input[name=assLayout][value="' + (tpl === 'stack' ? 'stack' : 'split') + '"]');
+  if (radio) radio.checked = true;
+  const ord = document.querySelector('input[name=biOrder][value="' + (plan.order === 'dst-first' ? 'dst-first' : 'src-first') + '"]');
+  if (ord) ord.checked = true;
+  if (plan.dst) setAssFields('assDst', plan.dst);
+  if (plan.src) setAssFields('assSrc', plan.src);
+  const dm = $('assDstMV'), sm = $('assSrcMV');
+  if (dm && plan.dstMV != null) dm.value = plan.dstMV;
+  if (sm && plan.srcMV != null) sm.value = plan.srcMV;
+  syncAssChrome();
+  syncMvLabels(setTpl);
+  noteAssImport(plan);
+  renderAssPv();
+  const pnl = $('assPanel'); if (pnl) pnl.open = true;   /* 让用户看见「样式是从文件来的」 */
+  toast(t('assImportedToast'));
+  return true;
+}
+
 function syncColorSw(id){
   const el=$(id), sw=$(id+'Sw'); if(!el||!sw) return;
   const v=String(el.value||'').trim(), ok=/^#?[0-9a-f]{6}$/i.test(v);
