@@ -153,7 +153,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.227</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.228</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -339,7 +339,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.227"></script>
+<script src="merge-core.js?v=0.9.228"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -682,7 +682,11 @@ function syncMode(){
     el.classList.toggle('on', el.querySelector('input').value === S.mode);
   });
   /* 切模式后旧结果失效（rows 属于某个模式的拆分口径），清掉预览区 */
-  if (S.rows){ S.rows = null; S.report = null; $('rep').style.display = 'none'; $('exp').style.display = 'none'; }
+  if (S.rows){
+    S.rows = null; S.report = null;
+    $('rep').style.display = 'none'; $('exp').style.display = 'none';
+    renderAssPv();   /* v0.9.228：顺手把效果预览收起来，别留着上一个模式的画面 */
+  }
 }
 function setI18nKey(el, key){
   if (!el) return;
@@ -729,6 +733,10 @@ function doAdjust(){
   S.report = { pairs, onlySrc, onlyDst, form: out.report };
   renderReport();
   $('exp').style.display = 'block';
+  /* v0.9.228：这里漏了 renderAssPv() —— 合并模式有、调整模式没有，
+     于是「调整双语字幕」点完拆分只有表格，ASS 效果预览整块不出现（用户看到的就是空的）。
+     必须在 #exp 显示之后调用，否则量不到画布高度。 */
+  renderAssPv();
 }
 /* 原文/译文互换：整列对调（调整模式拆错方向时一键纠正） */
 function swapSides(){
@@ -744,6 +752,8 @@ function swapSides(){
   });
   if (S.report) S.report = { pairs, onlySrc, onlyDst, form: S.report.form || null };
   renderReport();
+  /* v0.9.228：对调后预览的上下两条也要跟着换，否则预览停在旧的内容上 */
+  renderAssPv();
   toast(t('swapped'));
 }
 function fmtShort(ms){
@@ -1054,8 +1064,11 @@ function assPvSample(){
       (parts || []).forEach(p => {
         if (!p || !p.dstLines || !p.srcLines) return;
         const n = p.dstLines.length + p.srcLines.length;
-        const len = p.dstLines.join('').length + p.srcLines.join('').length;
-        if (!best || n > best.n || (n === best.n && len > best.len)) best = { n: n, len: len, p: p };
+        /* v0.9.228：只按「行数」挑最挤的那条，不再用长度做二级判据——
+           超容量切分把一句长台词切成两条后，长度判据会挑中**后半句**，
+           预览里就成了「usually respond to tariffs…」这种没头没尾的半句。
+           行数相同就保留先出现的那条（句子开头）。 */
+        if (!best || n > best.n) best = { n: n, p: p };
       });
     } catch(e){ /* 折行失败就退回原始文本，预览不该因此白屏 */ }
   }
@@ -1310,6 +1323,9 @@ function init(){
     ['input','change'].forEach(ev=>el.addEventListener(ev, renderAssPv));
   });
   document.querySelectorAll('input[name=biOrder]').forEach(el=>el.addEventListener('change', renderAssPv));
+  /* v0.9.228：调整模式换「拆分结构」后必须重新拆一遍，否则选了没反应（要用户自己再点一次按钮） */
+  const smEl = $('structMode');
+  if (smEl) smEl.addEventListener('change', ()=>{ if (S.mode === 'adjust' && S.rows) doAdjust(); });
   window.addEventListener('resize', renderAssPv);
   document.querySelectorAll('input[name=assLayout]').forEach(el=>el.addEventListener('change', syncAssPanel));
   $('btnAssReset').addEventListener('click', resetAssDefaults);

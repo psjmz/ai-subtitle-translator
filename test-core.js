@@ -5332,7 +5332,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.227/.test(mg), 'merge.html 未引用 v0.9.227 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.228/.test(mg), 'merge.html 未引用 v0.9.228 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5365,9 +5365,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.227</.test(html), '首页版本号未升 0.9.227');
-    assert.ok(/class="ver-tag">v0\.9\.227</.test(html), '工作台版本号未升 0.9.227');
-    assert.ok(/srt-core\.js\?v=0\.9\.227/.test(html), 'srt-core.js?v 未升 0.9.227');
+    assert.ok(/class="ver">v0\.9\.228</.test(html), '首页版本号未升 0.9.228');
+    assert.ok(/class="ver-tag">v0\.9\.228</.test(html), '工作台版本号未升 0.9.228');
+    assert.ok(/srt-core\.js\?v=0\.9\.228/.test(html), 'srt-core.js?v 未升 0.9.228');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5499,7 +5499,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 调整模式语言口径：从 rows 取两列（S.src 是整份双语文件，直接猜必错） */
     assert.ok(/S\.mode==='adjust' \? \(S\.rows\|\|\[\]\)\.map\(r=>\(\{text:r\.en\}\)\)/.test(mg), 'localeSrcItems 未按模式分流');
     /* 切模式清旧结果 */
-    assert.ok(/if \(S\.rows\)\{ S\.rows = null/.test(mg), '切模式未清预览');
+    assert.ok(/if \(S\.rows\)\{\s*\n\s*S\.rows = null;/.test(mg), '切模式未清预览');
     /* 事件绑定 */
     assert.ok(/#modeTabs input\[name=workMode\]/.test(mg), 'mode-tabs 未绑定');
     assert.ok(/\$\('btnSwap'\)\.addEventListener\('click', swapSides\)/.test(mg), 'btnSwap 未绑定');
@@ -5510,8 +5510,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.227</.test(mg), 'merge.html 版本未升 0.9.227');
-    assert.ok(/merge-core\.js\?v=0\.9\.227/.test(mg), 'merge-core.js?v 未升 0.9.227');
+    assert.ok(/class="ver">v0\.9\.228</.test(mg), 'merge.html 版本未升 0.9.228');
+    assert.ok(/merge-core\.js\?v=0\.9\.228/.test(mg), 'merge-core.js?v 未升 0.9.228');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5627,7 +5627,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       '预览样例未走导出的折行管线');
     /* 样例取「折行后最挤的那条」，预览要暴露最坏情况而不是最松的一条 */
     assert.ok(/S\.rows\.slice\(0, 20\)/.test(mg), '样例未在前 20 条里挑');
-    assert.ok(/if \(!best \|\| n > best\.n \|\| \(n === best\.n && len > best\.len\)\)/.test(mg), '未按行数挑最挤的一条');
+    assert.ok(/if \(!best \|\| n > best\.n\) best = \{ n: n, p: p \};/.test(mg), '未按行数挑最挤的一条');
+    assert.ok(!/len > best\.len/.test(mg), 'v0.9.228：长度二级判据还在（会挑中后半句）');
     assert.ok(/nEn: en\.split\('\\n'\)\.length, nZh: zh\.split\('\\n'\)\.length/.test(mg),
       'assPvSample 未带回真实行数');
     assert.ok(/const nDst = samp\.nZh \|\| 1, nSrc = samp\.nEn \|\| 1;/.test(mg),
@@ -5642,6 +5643,27 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/topMV = stackOf\(\{ bottomMV: baseMV, bottomSize: botSize,/.test(mg), '未按实测行数重算抬高量');
     assert.ok(/bottomLang: dstFirst \? srcV : dstV, bottomLines: botLines,/.test(mg), '重算未带语言/行数');
     assert.ok(/const nSrc = nLines\(srcText\);/.test(mg), '导出端 nSrc 被改动');
+  });
+
+  /* ================= v0.9.228：预览必须在所有「产生 rows」的路径上重画 =================
+     病根：doMerge 里画了预览，doAdjust 里漏了 →「调整双语字幕」导入现成 ASS、
+     点「拆分」后只有表格和导出区，ASS 效果预览整块不出现（用户看到的就是没有预览图）。
+     这类「一份逻辑写两遍、只改了一处」的漏，靠 CDP 跑合并模式永远照不到。 */
+  t('v0.9.228：调整模式拆完也要画效果预览', () => {
+    const iAdj = mg.indexOf('function doAdjust(){');
+    assert.ok(iAdj > 0, '找不到 doAdjust');
+    const adjBody = mg.slice(iAdj, mg.indexOf('function swapSides('));
+    assert.ok(/renderAssPv\(\);/.test(adjBody), 'doAdjust 里没有 renderAssPv()');
+    /* 必须先显示 #exp 再画，否则画布高度是 0，位置全错 */
+    assert.ok(adjBody.indexOf("$('exp').style.display = 'block';") < adjBody.indexOf('renderAssPv();'),
+      'doAdjust 里 renderAssPv 早于 #exp 显示');
+    const swBody = mg.slice(mg.indexOf('function swapSides(){'), mg.indexOf('function fmtShort('));
+    assert.ok(/renderAssPv\(\);/.test(swBody), 'swapSides 后未重画预览（上下两条会停在旧内容）');
+    const smBody = mg.slice(mg.indexOf('function syncMode(){'), mg.indexOf('function setI18nKey('));
+    assert.ok(/renderAssPv\(\);/.test(smBody), 'syncMode 清 rows 后未收起预览');
+    /* 调整模式换「拆分结构」要立刻重拆，不能等用户再点一次按钮 */
+    assert.ok(/smEl\.addEventListener\('change', \(\)=>\{ if \(S\.mode === 'adjust' && S\.rows\) doAdjust\(\); \}\)/.test(mg),
+      '拆分结构变了不会重拆');
   });
 
   /* ================= v0.9.227：导入 ASS 必须把文件自带的样式带进来 =================
