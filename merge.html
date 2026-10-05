@@ -153,7 +153,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.224</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.226</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -337,7 +337,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.224"></script>
+<script src="merge-core.js?v=0.9.226"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1018,12 +1018,32 @@ function buildExport(){
 /* ================= v0.9.223：ASS 效果预览 =================
    此前只有配对表格，导出的字号/颜色/位置全靠想象——用户导出来才发现两行叠一起。
    这里把同一套参数（1080p 基准）等比画在 16:9 画布上，改参数即时可见。 */
+/* v0.9.224b：样例必须走**与导出同一条折行管线**（buildBilingualParts + biMaxW），
+   并带回真实行数——此前预览把两侧都写死 1 行算抬高量，导出却按折行后的真实行数算，
+   于是底部双行预览里原文直接压在译文上（看着像 bug，其实导出是对的）。 */
 function assPvSample(){
-  const r = (S.rows && S.rows.length) ? S.rows[0] : null;
-  return {
-    en: String(r && r.en || 'Hello there, this is a sample line'),
-    zh: String(r && r.zh || '你好，这是一条示例字幕')
-  };
+  const rows = (S.rows && S.rows.length) ? S.rows.slice(0, 20) : null;
+  let best = null;
+  if (rows && C && typeof C.buildBilingualParts === 'function'){
+    try {
+      const parts = C.buildBilingualParts(rows, {
+        maxW: biMaxWVal(), biMaxW: biMaxWVal(),
+        srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems())
+      });
+      (parts || []).forEach(p => {
+        if (!p || !p.dstLines || !p.srcLines) return;
+        const n = p.dstLines.length + p.srcLines.length;
+        const len = p.dstLines.join('').length + p.srcLines.join('').length;
+        if (!best || n > best.n || (n === best.n && len > best.len)) best = { n: n, len: len, p: p };
+      });
+    } catch(e){ /* 折行失败就退回原始文本，预览不该因此白屏 */ }
+  }
+  const r = best ? null : ((S.rows && S.rows.length) ? S.rows[0] : null);
+  let en = best ? String(best.p.srcLines.join('\n') || '') : '';
+  let zh = best ? String(best.p.dstLines.join('\n') || '') : '';
+  if (!en) en = String(r && r.en || 'Hello there, this is a sample line');
+  if (!zh) zh = String(r && r.zh || '你好，这是一条示例字幕');
+  return { en: en, zh: zh, nEn: en.split('\n').length, nZh: zh.split('\n').length };
 }
 function renderAssPv(){
   const box = $('assPv'), scr = $('assPvScreen'), l1 = $('assPvLine1'), l2 = $('assPvLine2'), tag = $('assPvTag');
@@ -1041,7 +1061,7 @@ function renderAssPv(){
 
   /* v0.9.224：预览与导出共用同一套口径——分屏：顶部那条=离顶、底部那条=离底；
      双行：框1=贴底那条离底、框2=两行额外间距，抬高量同样走 assStackMV。 */
-  const nDst = 1, nSrc = 1;
+  const nDst = samp.nZh || 1, nSrc = samp.nEn || 1;
   const baseMV = Math.max(0, m.dst);
   const gap    = Math.max(0, m.src);
   let topMV = baseMV, bottomMV = baseMV;
@@ -1066,18 +1086,36 @@ function renderAssPv(){
     else { el.style.bottom = (mv * k).toFixed(1) + 'px'; el.style.top = 'auto'; }
   };
   /* 行 1 = 视觉上那条，行 2 = 下面那条 */
+  const render = (topMV, bottomMV) => {
+    if (stacked) {
+      /* 底部双行：贴底的是 bottom 侧，另一条在其上方 */
+      if (dstFirst) { paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont);
+                      paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, false, st.dstFont); }
+      else          { paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont);
+                      paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, false, st.srcFont); }
+    } else {
+      /* 分屏：一条顶部一条底部 */
+      if (dstFirst) { paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, true, st.dstFont);
+                      paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont); }
+      else          { paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, true, st.srcFont);
+                      paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont); }
+    }
+  };
+  render(topMV, bottomMV);
+  /* v0.9.225：预览的换行由浏览器按预览宽度自动完成，与导出的「按字符宽度折行」不保证逐字一致。
+     先渲染一遍量出**实际行盒数**，再用与导出同一个 assStackMV 公式重算抬高量——
+     否则预览里原文会压在译文上（导出其实是对的，但用户看到的预览是错的）。 */
   if (stacked) {
-    /* 底部双行：贴底的是 bottom 侧，另一条在其上方 */
-    if (dstFirst) { paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont);
-                    paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, false, st.dstFont); }
-    else          { paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont);
-                    paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, false, st.srcFont); }
-  } else {
-    /* 分屏：一条顶部一条底部 */
-    if (dstFirst) { paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, true, st.dstFont);
-                    paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont); }
-    else          { paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, true, st.srcFont);
-                    paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont); }
+    const botSize = dstFirst ? st.srcSize : st.dstSize;
+    const unit = Math.max(1, botSize * k * 1.2);
+    const botLines = Math.max(1, Math.round((l2.getBoundingClientRect().height || unit) / unit));
+    const stackOf = o => (C && typeof C.assStackMV === 'function')
+      ? C.assStackMV(o)
+      : (o.bottomMV + o.bottomLines * C.assLineHeight(o.bottomSize) + 8);
+    topMV = stackOf({ bottomMV: baseMV, bottomSize: botSize,
+      bottomLang: dstFirst ? srcV : dstV, bottomLines: botLines,
+      topSize: dstFirst ? st.dstSize : st.srcSize }) + gap;
+    render(topMV, bottomMV);
   }
   if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p';
 }

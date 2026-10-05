@@ -5332,7 +5332,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.224/.test(mg), 'merge.html 未引用 v0.9.224 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.226/.test(mg), 'merge.html 未引用 v0.9.226 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5365,9 +5365,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.224</.test(html), '首页版本号未升 0.9.224');
-    assert.ok(/class="ver-tag">v0\.9\.224</.test(html), '工作台版本号未升 0.9.224');
-    assert.ok(/srt-core\.js\?v=0\.9\.224/.test(html), 'srt-core.js?v 未升 0.9.224');
+    assert.ok(/class="ver">v0\.9\.226</.test(html), '首页版本号未升 0.9.226');
+    assert.ok(/class="ver-tag">v0\.9\.226</.test(html), '工作台版本号未升 0.9.226');
+    assert.ok(/srt-core\.js\?v=0\.9\.226/.test(html), 'srt-core.js?v 未升 0.9.226');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5510,8 +5510,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.224</.test(mg), 'merge.html 版本未升 0.9.224');
-    assert.ok(/merge-core\.js\?v=0\.9\.224/.test(mg), 'merge-core.js?v 未升 0.9.224');
+    assert.ok(/class="ver">v0\.9\.226</.test(mg), 'merge.html 版本未升 0.9.226');
+    assert.ok(/merge-core\.js\?v=0\.9\.226/.test(mg), 'merge-core.js?v 未升 0.9.226');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5617,5 +5617,30 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
     });
     assert.ok(/lblMVSrcTop:'原文离顶'/.test(mg) && /lblMVGap:'两行间距'/.test(mg), '中文词条不对');
+  });
+
+  /* ================= v0.9.225：预览行数必须来自导出折行管线 ================= */
+  t('v0.9.225：双行预览按真实折行数算抬高量（此前写死 1 行 → 原文压在译文上）', () => {
+    /* 病根：renderAssPv 里 const nDst = 1, nSrc = 1; 而导出端用 nLines(dstText)/nLines(srcText) */
+    assert.ok(!/const nDst = 1, nSrc = 1;/.test(mg), '预览仍把两侧写死成 1 行');
+    assert.ok(/function assPvSample\(\)\{[\s\S]{0,1200}buildBilingualParts\(rows,/.test(mg),
+      '预览样例未走导出的折行管线');
+    /* 样例取「折行后最挤的那条」，预览要暴露最坏情况而不是最松的一条 */
+    assert.ok(/S\.rows\.slice\(0, 20\)/.test(mg), '样例未在前 20 条里挑');
+    assert.ok(/if \(!best \|\| n > best\.n \|\| \(n === best\.n && len > best\.len\)\)/.test(mg), '未按行数挑最挤的一条');
+    assert.ok(/nEn: en\.split\('\\n'\)\.length, nZh: zh\.split\('\\n'\)\.length/.test(mg),
+      'assPvSample 未带回真实行数');
+    assert.ok(/const nDst = samp\.nZh \|\| 1, nSrc = samp\.nEn \|\| 1;/.test(mg),
+      'renderAssPv 未用样例真实行数');
+    /* 导出端仍按实际行数（这一侧从来是对的，别被一起改坏） */
+    assert.ok(/const nDst = nLines\(dstText\);/.test(mg), '导出端 nDst 被改动');
+    /* v0.9.226：预览的自动折行与导出的按字数折行不保证一致 →
+       以「实测底行行盒数」重算抬高量，保证预览里两行永不叠在一起 */
+    assert.ok(/const render = \(topMV, bottomMV\) => \{/.test(mg), '缺 render 两次绘制');
+    assert.ok(/const botLines = Math\.max\(1, Math\.round\(\(l2\.getBoundingClientRect\(\)\.height \|\| unit\) \/ unit\)\)/.test(mg),
+      '预览未实测底行行数');
+    assert.ok(/topMV = stackOf\(\{ bottomMV: baseMV, bottomSize: botSize,/.test(mg), '未按实测行数重算抬高量');
+    assert.ok(/bottomLang: dstFirst \? srcV : dstV, bottomLines: botLines,/.test(mg), '重算未带语言/行数');
+    assert.ok(/const nSrc = nLines\(srcText\);/.test(mg), '导出端 nSrc 被改动');
   });
 }
