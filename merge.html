@@ -106,6 +106,14 @@
   .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line-strong);box-shadow:none}
   .btn.ghost:hover{border-color:var(--acc);color:var(--acc)}
 
+  /* v0.9.229：导出模板由下拉改为分段按钮（用户要求「按钮按键样式」） */
+  .seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+  .segbtn{border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;line-height:1.35;cursor:pointer;
+    transition:border-color .12s,color .12s,background .12s,box-shadow .12s}
+  .segbtn:hover{border-color:var(--acc);color:var(--acc)}
+  .segbtn.on{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(236,72,153,.22)}
+
   .rep{display:none;margin-top:16px}
   .rep-band{display:flex;flex-wrap:wrap;gap:10px}
   .rep-chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 14px;font-size:12.5px}
@@ -153,7 +161,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.228</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.229</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -237,7 +245,9 @@
       </div>
       <div class="flbl" data-i18n="lblTpl">导出模板</div>
       <div>
-        <select id="expFmt">
+        <!-- v0.9.229：分段按钮驱动（select 保留作状态源，供既有逻辑读 .value） -->
+        <div class="seg" id="tplSeg"></div>
+        <select id="expFmt" style="display:none">
           <option value="srt" data-i18n="tplSrt">SRT 无风格 (.srt)</option>
           <option value="vtt" data-i18n="tplVtt">VTT 无风格 (.vtt)</option>
           <option value="split" data-i18n="tplSplit">ASS 分屏 · 默认模板，可微调 (.ass)</option>
@@ -273,6 +283,7 @@
             <div class="af"><label data-i18n="lblFont">字体</label><select id="assDstFont"></select></div>
             <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assDstAlpha" min="10" max="100" value="100"><span class="pct" id="assDstAlphaOut">100%</span></div>
             <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assDstMV" value="42" min="0" max="1080"></div>
+            <!-- v0.9.229：译文/原文两个框语义完全一致——都是「这一行离画面底边多远」。 -->
           </div>
           <div class="ass-col">
             <h4 data-i18n="lblSrcCol">原文（副）</h4>
@@ -282,7 +293,7 @@
             <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assSrcOutlineColor" value="#000000"><span class="sw" id="assSrcOutlineColorSw"></span></div>
             <div class="af"><label data-i18n="lblFont">字体</label><select id="assSrcFont"></select></div>
             <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assSrcAlpha" min="10" max="100" value="100"><span class="pct" id="assSrcAlphaOut">100%</span></div>
-            <div class="af"><label data-i18n="lblMVSrcTop" id="assSrcMVLbl">原文离顶</label><input type="number" id="assSrcMV" value="40" min="0" max="1080"></div>
+            <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assSrcMV" value="981" min="0" max="1080"></div>
           </div>
         </div>
         <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
@@ -327,7 +338,8 @@
       </div>
     </div>
     <div class="exp-row">
-      <select id="expFmt2"></select>
+      <div class="seg" id="tplSeg2"></div>
+      <select id="expFmt2" style="display:none"></select>
       <button class="btn" id="btnDownload" data-i18n="btnDownload">⬇ 下载字幕</button>
       <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
     </div>
@@ -339,7 +351,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.228"></script>
+<script src="merge-core.js?v=0.9.229"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -383,12 +395,13 @@ const I18N = {
     tplHintPlain:'SRT / VTT 是纯文本格式，不含样式信息，无需设置外观。',
     tplHintPreset:'已套用默认模板。想改字号、颜色、描边等，展开下方「ASS 外观」微调即可。',
     tplHintCustom:'布局与外观全部由你定义：先选布局，再展开「ASS 外观」逐项调整。',
+    tplSegSrt:'SRT', tplSegVtt:'VTT', tplSegSplit:'ASS 分屏', tplSegStack:'ASS 底部双行', tplSegCustom:'ASS 自定义',
     assReset:'↺ 恢复默认参数', assResetDone:'已恢复默认参数',
     assImportedToast:'已按导入文件的 ASS 样式填充外观', assImportedNoteShared:'样式来自导入文件：{0}（译文与原文共用同一样式）', assImportedNote:'样式来自导入文件：译文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'样式来自导入文件：{0}', assImportedRes:'（原文件 {0}p，已等比换算到 1080p）', assFontFromFile:'来自文件',
     assPanel:'ASS 外观（导出 ASS 时生效）', lblDstCol:'译文（主）', lblSrcCol:'原文（副）',
     lblSize:'字号', lblColor:'颜色', lblOutline:'描边', lblOutlineColor:'描边色', lblFont:'字体',
-    lblAlpha:'不透明度', lblMV:'离底距离', lblMVSrcTop:'原文离顶', lblMVGap:'两行间距',
+    lblAlpha:'不透明度', lblMV:'离底距离',
     assFontTip:'字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。',
     btnMerge:'🔗 合并预览', mergeHint:'先看配对结果和体检报告，再下载。',
     repPaired:'配对', repOnlySrc:'缺译文', repOnlyDst:'缺原文', repMerged:'已并入', repIssues:'时间轴体检',
@@ -437,12 +450,13 @@ const I18N = {
     tplHintPlain:'SRT / VTT 是純文字格式，不含樣式資訊，無需設定外觀。',
     tplHintPreset:'已套用預設範本。想改字號、顏色、描邊等，展開下方「ASS 外觀」微調即可。',
     tplHintCustom:'版面與外觀全部由你定義：先選版面，再展開「ASS 外觀」逐項調整。',
+    tplSegSrt:'SRT', tplSegVtt:'VTT', tplSegSplit:'ASS 分屏', tplSegStack:'ASS 底部雙行', tplSegCustom:'ASS 自訂',
     assReset:'↺ 恢復預設參數', assResetDone:'已恢復預設參數',
     assImportedToast:'已依匯入檔案的 ASS 樣式填入外觀', assImportedNoteShared:'樣式來自匯入檔案：{0}（譯文與原文共用同一樣式）', assImportedNote:'樣式來自匯入檔案：譯文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'樣式來自匯入檔案：{0}', assImportedRes:'（原檔案 {0}p，已等比換算為 1080p）', assFontFromFile:'來自檔案',
     assPanel:'ASS 外觀（匯出 ASS 時生效）', lblDstCol:'譯文（主）', lblSrcCol:'原文（副）',
     lblSize:'字號', lblColor:'顏色', lblOutline:'描邊', lblOutlineColor:'描邊色', lblFont:'字體',
-    lblAlpha:'不透明度', lblMV:'離底距離', lblMVSrcTop:'原文離頂', lblMVGap:'兩行間距',
+    lblAlpha:'不透明度', lblMV:'離底距離',
     assFontTip:'字體在播放端機器上解析，對方沒裝會自動回退；其餘參數與主站「ASS 樣式」一致。',
     btnMerge:'🔗 合併預覽', mergeHint:'先看配對結果和體檢報告，再下載。',
     repPaired:'配對', repOnlySrc:'缺譯文', repOnlyDst:'缺原文', repMerged:'已併入', repIssues:'時間軸體檢',
@@ -491,12 +505,13 @@ const I18N = {
     tplHintPlain:'SRT / VTT are plain-text formats with no style information — no appearance to set.',
     tplHintPreset:'Preset applied. To tweak size, colors, outline and more, open “ASS appearance” below.',
     tplHintCustom:'Layout and appearance are fully yours: pick a layout first, then adjust every option under “ASS appearance”.',
+    tplSegSrt:'SRT', tplSegVtt:'VTT', tplSegSplit:'ASS split', tplSegStack:'ASS stacked', tplSegCustom:'ASS custom',
     assReset:'↺ Reset to defaults', assResetDone:'Defaults restored',
     assImportedToast:'Appearance filled from the imported file’s ASS styles', assImportedNoteShared:'Style taken from the imported file: {0} (both sides share it)', assImportedNote:'Styles taken from the imported file: translation ← {0} · original ← {1}',
     assImportedNoteOne:'Style taken from the imported file: {0}', assImportedRes:'(file is {0}p — values scaled to 1080p)', assFontFromFile:'from file',
     assPanel:'ASS appearance (applies to ASS export)', lblDstCol:'Translation (primary)', lblSrcCol:'Original (secondary)',
     lblSize:'Font size', lblColor:'Color', lblOutline:'Outline', lblOutlineColor:'Outline color', lblFont:'Font',
-    lblAlpha:'Opacity', lblMV:'Bottom margin', lblMVSrcTop:'Original from top', lblMVGap:'Gap between lines',
+    lblAlpha:'Opacity', lblMV:'Bottom margin',
     assFontTip:'Fonts resolve on the viewer’s machine and fall back automatically if missing; other options match the main site’s ASS styles.',
     btnMerge:'🔗 Merge & preview', mergeHint:'Check the pairing result and sanity report before downloading.',
     repPaired:'Paired', repOnlySrc:'Missing translation', repOnlyDst:'Missing original', repMerged:'merged in', repIssues:'Timeline check',
@@ -545,12 +560,13 @@ const I18N = {
     tplHintPlain:'SRT / VTT はプレーンテキスト形式でスタイル情報を含みません。外観設定は不要です。',
     tplHintPreset:'既定テンプレートを適用しました。サイズ・色・縁取り等を変えるには下の「ASS 外観」を開いて調整してください。',
     tplHintCustom:'レイアウトも外観もすべて自分で定義：まずレイアウトを選び、「ASS 外観」で各項目を調整します。',
+    tplSegSrt:'SRT', tplSegVtt:'VTT', tplSegSplit:'ASS 上下分離', tplSegStack:'ASS 下部 2 行', tplSegCustom:'ASS カスタム',
     assReset:'↺ 既定値に戻す', assResetDone:'既定値に戻しました',
     assImportedToast:'読み込んだファイルの ASS スタイルを外観に反映しました', assImportedNoteShared:'ファイルから読み込んだスタイル：{0}（訳文・原文で共通）', assImportedNote:'ファイルから読み込んだスタイル：訳文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'ファイルから読み込んだスタイル：{0}', assImportedRes:'（ファイル基準 {0}p を 1080p に等比換算）', assFontFromFile:'ファイル由来',
     assPanel:'ASS 外観（ASS エクスポート時に有効）', lblDstCol:'訳文（主）', lblSrcCol:'原文（副）',
     lblSize:'フォントサイズ', lblColor:'色', lblOutline:'縁取り', lblOutlineColor:'縁取り色', lblFont:'フォント',
-    lblAlpha:'不透明度', lblMV:'下端からの距離', lblMVSrcTop:'原文の上余白', lblMVGap:'2 行の間隔',
+    lblAlpha:'不透明度', lblMV:'下端からの距離',
     assFontTip:'フォントは再生側の端末で解決され、未インストールなら自動フォールバック。その他の設定は本サイトの ASS スタイルと同一です。',
     btnMerge:'🔗 マージしてプレビュー', mergeHint:'対応結果とチェックレポートを確認してからダウンロードしてください。',
     repPaired:'対応', repOnlySrc:'訳文なし', repOnlyDst:'原文なし', repMerged:'統合済み', repIssues:'タイムラインチェック',
@@ -831,6 +847,33 @@ function expFmtVal(){
   if (tpl === 'stack') return 'ass-stack';
   return tpl;   /* srt / vtt */
 }
+/* v0.9.229：导出模板由下拉改成分段按钮。select 仍是唯一的「状态源」（既有逻辑全都读它的
+   value：tplVal / expFmtVal / 两份 select 互相同步），按钮只负责改 select.value 并派发 change，
+   于是面板重算与预览重画全部沿用旧路径，不用在按钮里复制一遍逻辑。 */
+const TPL_SEGS = [['srt','tplSegSrt'],['vtt','tplSegVtt'],['split','tplSegSplit'],['stack','tplSegStack'],['custom','tplSegCustom']];
+function tplSegPairs(){ return [['tplSeg','expFmt'],['tplSeg2','expFmt2']]; }
+function syncTplSegs(){
+  tplSegPairs().forEach(pair=>{
+    const seg = $(pair[0]), sel = $(pair[1]); if (!seg || !sel) return;
+    seg.querySelectorAll('.segbtn').forEach(b=>b.classList.toggle('on', b.getAttribute('data-v') === sel.value));
+  });
+}
+function renderTplSegs(){
+  tplSegPairs().forEach(pair=>{
+    const seg = $(pair[0]), sel = $(pair[1]); if (!seg || !sel) return;
+    seg.innerHTML = TPL_SEGS.map(x=>'<button type="button" class="segbtn" data-v="'+x[0]+'" data-i18n="'+x[1]+'">'+t(x[1])+'</button>').join('');
+    seg.querySelectorAll('.segbtn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const v = b.getAttribute('data-v');
+        if (sel.value === v) return;
+        sel.value = v;
+        sel.dispatchEvent(new Event('change',{bubbles:true}));
+        syncTplSegs();
+      });
+    });
+  });
+  syncTplSegs();
+}
 const ASS_DEFAULTS = [
   ['assDstSize','56'],['assSrcSize','50'],
   ['assDstColor','#FFFFFF'],['assSrcColor','#FFD700'],
@@ -840,7 +883,7 @@ const ASS_DEFAULTS = [
   ['assDstAlpha','100'],['assSrcAlpha','100'],
   /* v0.9.224：两个距离框不再是同一个数（分屏 42 离底 / 40 离顶，双行 42 离底 / 8 间距）。
      真正生效的是 TPL_DEFAULTS（syncAssPanel 每次切模板无条件套），这里是字段清单兜底。 */
-  ['assDstMV','42'],['assSrcMV','40']
+  ['assDstMV','42'],['assSrcMV','981']
 ];
 /* v0.9.223：三种模板各自一套默认参数（1080p 基准，见 assNote1080）。
    v0.9.219 只做了「布局映射」却没套参数，三个模板导出逐字节相同——等于模板没生效。
@@ -851,18 +894,18 @@ const TPL_DEFAULTS = {
     assDstSize:'56', assSrcSize:'50', assDstColor:'#FFFFFF', assSrcColor:'#FFD700',
     assDstOutline:'2.5', assSrcOutline:'2.5', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'100',
-    /* 分屏：译文贴底（42 = 离底），原文贴顶（40 = 离顶）。两个框量的是**两条不同的边**，
-       所以数值不同不是错误；标签会随模板切换写明「离底 / 离顶」。 */
-    assDstMV:'42', assSrcMV:'40'
+    /* v0.9.229：两个框统一是「这一行离画面底边多远」。分屏下译文离底 42、
+       原文离底 981 —— 981 是「距顶 40」的等价位置（1080 − 40 − 行高 59），
+       导出时两条都用底部对齐（an2）+ 各自的 MarginV，不再有「距顶」这一说。 */
+    assDstMV:'42', assSrcMV:'981'
   },
   stack: {
     assDstSize:'54', assSrcSize:'42', assDstColor:'#FFFFFF', assSrcColor:'#E6C86A',
     assDstOutline:'2.5', assSrcOutline:'2.0', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'90',
-    /* 双行：框1 = 贴底那条距屏幕底（42），框2 = 两行之间额外留白（8）。
-       v0.9.224 之前框2 也叫「离底距离」且被写死成同一个数——它在堆叠模式下**根本不生效**
-       （抬高量由 assStackMV 按字号算），用户改它没反应，故改名为「两行间距」并让它真正参与计算。 */
-    assDstMV:'42', assSrcMV:'8'
+    /* 双行：译文离底 42、原文离底 117（= 旧「贴底 42 + 行高 + 墨迹间隙 8」的位置，
+       视觉与之前一致，但现在是可直接改的绝对数值）。 */
+    assDstMV:'42', assSrcMV:'117'
   }
 };
 TPL_DEFAULTS.custom = TPL_DEFAULTS.split;
@@ -874,13 +917,6 @@ function presetKeyOf(tpl){
   if (tpl === 'custom') return assLayoutVal() === 'ass-stack' ? 'stack' : 'split';
   return (tpl === 'split' || tpl === 'stack') ? tpl : 'split';
 }
-/* 第二个「距离」框的语义随模板变：分屏是离顶、双行是两行间距 */
-function syncMvLabels(tpl){
-  const el = $('assSrcMVLbl'); if (!el) return;
-  const k = presetKeyOf(tpl) === 'stack' ? 'lblMVGap' : 'lblMVSrcTop';
-  el.setAttribute('data-i18n', k);
-  el.textContent = t(k);
-}
 function applyTplDefaults(tpl){
   const d = TPL_DEFAULTS[presetKeyOf(tpl)] || TPL_DEFAULTS.split;
   Object.keys(d).forEach(k=>{ const el=$(k); if(el) el.value=d[k]; });
@@ -891,7 +927,6 @@ function applyTplDefaults(tpl){
 }
 function resetAssDefaults(){
   applyTplDefaults(tplVal());
-  syncMvLabels(tplVal());
   renderAssPv();
   const note = $('assImportNote'); if (note) note.style.display = 'none';
   toast(t('assResetDone'));
@@ -905,6 +940,9 @@ function syncAssChrome(){
   const hint = $('tplHint');
   if (hint) hint.textContent = t(tpl==='srt'||tpl==='vtt' ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : 'tplHintPreset');
   const note = $('assImportNote'); if (note) note.style.display = 'none';   /* 切模板 = 回到预设，提示作废 */
+  /* v0.9.229：导入样式是**直接写 select.value**（不能派发 change，否则会走 syncAssPanel 套预设把导入值冲掉），
+     所以按钮组的高亮必须在这里补一次，否则 import 后按钮停在旧模板上。 */
+  syncTplSegs();
 }
 function syncAssPanel(){
   const tpl = tplVal();
@@ -912,7 +950,6 @@ function syncAssPanel(){
   /* v0.9.224：切模板 = 套该模板默认参数（去掉 assDirty 门控，见 presetKeyOf 上方注释）。
      srt/vtt 时面板整体隐藏，但仍套一次分屏预设，保证用户第一次展开面板看到的就是预设值。 */
   applyTplDefaults(tpl);
-  syncMvLabels(tpl);
 }
 function biMaxWVal(){ return Math.max(10, Math.min(80, parseInt($('biMaxW').value,10) || 32)); }
 function orderVal(){ const el=document.querySelector('input[name=biOrder]:checked'); return el && el.value==='dst-first' ? 'dst-first' : 'src-first'; }
@@ -947,13 +984,12 @@ function assColorVal(id,dflt){
 }
 function assMVs(){
   const d=parseInt(($('assDstMV')||{}).value,10), s=parseInt(($('assSrcMV')||{}).value,10);
-  return { dst:(isFinite(d)&&d>=0)?d:42, src:(isFinite(s)&&s>=0)?s:42 };
+  /* 兜底：译文 42 / 原文 981（与分屏预设一致，仅在输入框被清空等异常时生效） */
+  return { dst:(isFinite(d)&&d>=0)?d:42, src:(isFinite(s)&&s>=0)?s:981 };
 }
 function assStyleOf(){
-  const m=assMVs(), fmt=expFmtVal(), dstFirst = orderVal()==='dst-first';
-  /* v0.9.223：贴底那侧用它自己的「离底距离」。此前写死 42，用户改输入框不生效。 */
-  const bottomMV = dstFirst ? m.src : m.dst;   /* 译文在上 → 原文(Sub)贴底；否则译文(Bottom)贴底 */
-  const subMV    = dstFirst ? m.dst : m.src;   /* 另一侧：堆叠时由 assStackMV 重算，此值只作兜底 */
+  const m=assMVs();
+  /* v0.9.229：两个框都是「离底距离」，各归各的角色，不再分「哪侧贴底」。 */
   const alphaOf = id => { const n=parseInt(($(id)||{}).value,10); return (isFinite(n)&&n>=10&&n<=100)?n:100; };
   return {
     dstSize: +($('assDstSize')||{}).value || 56,
@@ -968,22 +1004,12 @@ function assStyleOf(){
     srcFont: (($('assSrcFont')||{}).value) || '',
     dstAlpha: alphaOf('assDstAlpha'),
     srcAlpha: alphaOf('assSrcAlpha'),
-    marginV: 42, dstMV: bottomMV, srcMV: subMV
+    marginV: 42, dstMV: Math.max(0, m.dst), srcMV: Math.max(0, m.src)
   };
 }
-function assTopMV(dist, nLines, lineH){
-  /* v0.9.224：分屏模式顶部那条的 MarginV 就是「距画面顶部的距离」，直接用用户填的值。
-     旧公式 1080 - dist - 行高 把「距顶」算成了「距底」——导出后原文落到画面底部，
-     与译文只差 57px，「分屏」名不副实，且与预览画的不一致（预览一直画距顶 dist）。
-     nLines / lineH 保留在签名里（调用点多），已不参与计算。 */
-  void nLines; void lineH;
-  return Math.max(0, Math.min(1080, Math.round(+dist || 0)));
-}
-/* v0.9.222：导出折行的语言判断来源——合并模式用两份上传；调整模式用拆出来的两列
-   （S.src 是整份双语文件，直接拿它猜「原语言」会错） */
 function localeSrcItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text:r.en})) : (S.src||[]); }
 function localeDstItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text:r.zh})) : (S.dst||[]); }
-/* ASS 事件：与主站 buildAssEvents 同构（分屏/堆叠、行高按字号推导、堆叠抬高走 assStackMV） */
+/* ASS 事件：译文/原文各占一条 Dialogue，位置 = 各自的「离底距离」（v0.9.229 起两条同义） */
 function buildAssEvents(){
   const fmt = expFmtVal();
   const stacked = fmt === 'ass-stack';
@@ -993,45 +1019,24 @@ function buildAssEvents(){
     srcLocale: guessLocale(localeSrcItems()),
     dstLocale: guessLocale(localeDstItems())
   });
-  const srcV = guessLocale(localeSrcItems()), dstV = guessLocale(localeDstItems());
+  const mv = assMVs();
+  /* v0.9.229：译文与原文的「离底距离」语义完全一致——都是这一行离画面底边多远，
+     直接写进各自的 MarginV，不再按字号/行高推算抬高量（assStackMV 那条路径已弃用）。
+     ⚠️ 代价：两行之间不再自动防重叠，数值挨太近就会叠——与手写 ASS 的行为一致。 */
+  const dstMV = Math.max(0, mv.dst);
+  const srcMV = Math.max(0, mv.src);
   return parts.map(p=>{
     const dstText = p.dstLines.join('\n'), srcText = p.srcLines.join('\n');
-    const nLines = s => s ? s.split('\n').length : 0;
-    const st = assStyleOf();
-    const mv = assMVs();
-    /* 行高（按字号推导）与离底距离分开存，别让同名键打架 */
-    const dstLH = C.assLineHeight(st.dstSize), srcLH = C.assLineHeight(st.srcSize);
-    if (stacked){
-      const lines = [];
-      const stackMV = (bMV,bSz,bLang,n,tSz,tLang) =>
-        (typeof C.assStackMV === 'function')
-          ? C.assStackMV({ bottomMV:bMV, bottomSize:bSz, bottomLang:bLang, bottomLines:n, topSize:tSz, topLang:tLang })
-          : (bMV + n*C.assLineHeight(bSz) + 8);
-      /* v0.9.224：双行两个框的分工——框1（离底距离）= 贴底那条距屏幕底；
-         框2（两行间距）= 两行之间**额外**留白。此前框2 也叫「离底距离」且压根不参与抬高计算
-         （抬高量只由 assStackMV 按字号推定），用户改它没有任何反应。 */
-      const baseMV = Math.max(0, mv.dst);
-      const gap    = Math.max(0, mv.src);
-      if (dstFirst){
-        // 译文在上：原文 Sub（副字号）贴底，译文 Bottom（主字号）抬到其上方
-        const nSrc = nLines(srcText);
-        if (srcText) lines.push({ style:'Sub', text:srcText, mv: baseMV });
-        if (dstText) lines.push({ style:'Bottom', text:dstText,
-          mv: nSrc ? stackMV(baseMV, st.srcSize, srcV, nSrc, st.dstSize, dstV) + gap : baseMV });
-      } else {
-        // 原文在上：译文 Bottom（主字号）贴底，原文 Sub（副字号）紧贴其上方
-        const nDst = nLines(dstText);
-        if (srcText) lines.push({ style:'Sub', text:srcText,
-          mv: nDst ? stackMV(baseMV, st.dstSize, dstV, nDst, st.srcSize, srcV) + gap : baseMV });
-        if (dstText) lines.push({ style:'Bottom', text:dstText, mv: baseMV });
-      }
-      return { start:p.start, end:p.end, lines };
-    }
     const lines = [];
-    if (dstText) lines.push({ style: dstFirst?'TopMain':'Bottom', text:dstText,
-      mv: dstFirst ? assTopMV(mv.dst, nLines(dstText), dstLH) : undefined });
-    if (srcText) lines.push({ style: dstFirst?'Sub':'Top', text:srcText,
-      mv: !dstFirst ? assTopMV(mv.src, nLines(srcText), srcLH) : undefined });
+    /* 样式只管「角色」（字号/颜色/描边），位置一律由各自的 MarginV 决定 */
+    if (stacked){
+      if (srcText) lines.push({ style:'Sub', text:srcText, mv: srcMV });
+      if (dstText) lines.push({ style:'Bottom', text:dstText, mv: dstMV });
+    } else {
+      /* 分屏：译文在上时用 TopMain（保持主字号主色），位置仍是它自己的离底值 */
+      if (dstText) lines.push({ style: dstFirst ? 'TopMain' : 'Bottom', text:dstText, mv: dstMV });
+      if (srcText) lines.push({ style: dstFirst ? 'Sub' : 'Top', text:srcText, mv: srcMV });
+    }
     return { start:p.start, end:p.end, lines };
   });
 }
@@ -1087,69 +1092,30 @@ function renderAssPv(){
   if (!isAss || !S.rows || !S.rows.length){ box.style.display = 'none'; return; }
   box.style.display = 'block';
   const st = assStyleOf(), m = assMVs(), dstFirst = orderVal() === 'dst-first';
-  const stacked = fmt === 'ass-stack';
   const k = (scr.clientHeight || 240) / 1080;      /* 1080p 基准 → 预览等比 */
   const samp = assPvSample();
-  const srcV = guessLocale(localeSrcItems()), dstV = guessLocale(localeDstItems());
   const colOf = id => assColorVal(id, id.indexOf('Outline') > 0 ? '#000000' : '#FFFFFF');
-
-  /* v0.9.224：预览与导出共用同一套口径——分屏：顶部那条=离顶、底部那条=离底；
-     双行：框1=贴底那条离底、框2=两行额外间距，抬高量同样走 assStackMV。 */
-  const nDst = samp.nZh || 1, nSrc = samp.nEn || 1;
-  const baseMV = Math.max(0, m.dst);
-  const gap    = Math.max(0, m.src);
-  let topMV = baseMV, bottomMV = baseMV;
-  if (stacked) {
-    topMV = (dstFirst
-      ? C.assStackMV({ bottomMV: baseMV, bottomSize: st.srcSize, bottomLang: srcV, bottomLines: nSrc, topSize: st.dstSize, topLang: dstV })
-      : C.assStackMV({ bottomMV: baseMV, bottomSize: st.dstSize, bottomLang: dstV, bottomLines: nDst, topSize: st.srcSize, topLang: srcV })) + gap;
-  } else {
-    topMV = dstFirst ? m.dst : m.src;
-    bottomMV = dstFirst ? m.src : m.dst;
-  }
-  const paint = (el, text, size, colorId, outline, outlineColorId, alpha, mv, atTop, fontVal) => {
+  /* v0.9.229：两个框都是「距画面底边多远」，一条字幕算一个绝对位置。
+     预览与导出同一口径，不需要再按实测行数重算抬高量。 */
+  const dstMV = Math.max(0, m.dst), srcMV = Math.max(0, m.src);
+  const paint = (el, text, size, colorId, outline, outlineColorId, alpha, mv, fontVal) => {
     el.textContent = text;
     el.style.fontSize = (size * k).toFixed(1) + 'px';
     el.style.color = colOf(colorId);
     el.style.opacity = (alpha / 100).toFixed(2);
     el.style.webkitTextStroke = (Number(outline) * k).toFixed(2) + 'px ' + colOf(outlineColorId);
     el.style.paintOrder = 'stroke fill';
-    /* v0.9.224：字体也跟随设置（此前预览写死苹方，改字体看不出任何变化） */
     el.style.fontFamily = '"' + String(fontVal || 'PingFang SC') + '", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
-    if (atTop) { el.style.top = (mv * k).toFixed(1) + 'px'; el.style.bottom = 'auto'; }
-    else { el.style.bottom = (mv * k).toFixed(1) + 'px'; el.style.top = 'auto'; }
+    el.style.top = 'auto';
+    el.style.bottom = (mv * k).toFixed(1) + 'px';
   };
-  /* 行 1 = 视觉上那条，行 2 = 下面那条 */
-  const render = (topMV, bottomMV) => {
-    if (stacked) {
-      /* 底部双行：贴底的是 bottom 侧，另一条在其上方 */
-      if (dstFirst) { paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont);
-                      paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, false, st.dstFont); }
-      else          { paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont);
-                      paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, false, st.srcFont); }
-    } else {
-      /* 分屏：一条顶部一条底部 */
-      if (dstFirst) { paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, topMV, true, st.dstFont);
-                      paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, bottomMV, false, st.srcFont); }
-      else          { paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, topMV, true, st.srcFont);
-                      paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, bottomMV, false, st.dstFont); }
-    }
-  };
-  render(topMV, bottomMV);
-  /* v0.9.225：预览的换行由浏览器按预览宽度自动完成，与导出的「按字符宽度折行」不保证逐字一致。
-     先渲染一遍量出**实际行盒数**，再用与导出同一个 assStackMV 公式重算抬高量——
-     否则预览里原文会压在译文上（导出其实是对的，但用户看到的预览是错的）。 */
-  if (stacked) {
-    const botSize = dstFirst ? st.srcSize : st.dstSize;
-    const unit = Math.max(1, botSize * k * 1.2);
-    const botLines = Math.max(1, Math.round((l2.getBoundingClientRect().height || unit) / unit));
-    const stackOf = o => (C && typeof C.assStackMV === 'function')
-      ? C.assStackMV(o)
-      : (o.bottomMV + o.bottomLines * C.assLineHeight(o.bottomSize) + 8);
-    topMV = stackOf({ bottomMV: baseMV, bottomSize: botSize,
-      bottomLang: dstFirst ? srcV : dstV, bottomLines: botLines,
-      topSize: dstFirst ? st.dstSize : st.srcSize }) + gap;
-    render(topMV, bottomMV);
+  /* 行 1 = 视觉上那条，行 2 = 下面那条；两条都按各自的离底距离定位 */
+  if (dstFirst){
+    paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, dstMV, st.dstFont);
+    paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, srcMV, st.srcFont);
+  } else {
+    paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, srcMV, st.srcFont);
+    paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, dstMV, st.dstFont);
   }
   if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p';
 }
@@ -1210,14 +1176,15 @@ function importAssStyle(){
     /* 两份都贴底且离底距离接近 → 视作底部双行；否则分屏 */
     const stacked = !!(a && b && a.align !== 'top' && b.align !== 'top' && Math.abs(a.marginV - b.marginV) < 80);
     const resY = +((S.dstAss && S.dstAss.playResY) || (S.srcAss && S.srcAss.playResY) || 1080) || 1080;
+    /* v0.9.229：面板两个框统一是「离底距离」→ 顶部对齐（an8）那侧的 MarginV 是距顶，要换算 */
+    const mvOf = f => !f ? null : (f.align === 'top'
+      ? Math.max(0, Math.min(1080, Math.round(1080 - f.marginV - C.assLineHeight(f.size))))
+      : f.marginV);
     plan = {
       layout: stacked ? 'stack' : 'split',
       order: 'src-first',
       dst: b, src: a, dstName: b ? b.name : '', srcName: a ? a.name : '',
-      dstMV: b ? b.marginV : null,
-      /* 双行时第二个框是「两行间距」：原文原来的离底 - 译文离底 - 译文行高，算出来通常就是 0
-         （抬高量本身由 assStackMV 按字号给，另含 12px 墨迹间隙） */
-      srcMV: a ? (stacked ? Math.max(0, Math.round(a.marginV - b.marginV - C.assLineHeight(b.size))) : a.marginV) : null,
+      dstMV: mvOf(b), srcMV: mvOf(a),
       resY: resY, scaled: Math.abs(resY - 1080) > 1
     };
   }
@@ -1252,9 +1219,9 @@ function noteAssImport(plan){
 function applyAssPlan(plan){
   if (!plan) return false;
   const tpl = plan.layout === 'stack' ? 'stack' : 'split';
-  const cur = tplVal();
-  /* 自定义模板保留「自定义」，只同步它的布局单选 */
-  const setTpl = (cur === 'custom') ? cur : tpl;
+  /* v0.9.229：导入的文件自带样式 → 一律切到「ASS 自定义风格」。
+     用户要求：默认继承文件的格式与风格，不要瞎套用网站预设把导入值覆盖掉。 */
+  const setTpl = 'custom';
   const f1 = $('expFmt'), f2 = $('expFmt2');
   if (f1) f1.value = setTpl;
   if (f2) f2.value = setTpl;
@@ -1268,7 +1235,6 @@ function applyAssPlan(plan){
   if (dm && plan.dstMV != null) dm.value = plan.dstMV;
   if (sm && plan.srcMV != null) sm.value = plan.srcMV;
   syncAssChrome();
-  syncMvLabels(setTpl);
   noteAssImport(plan);
   renderAssPv();
   const pnl = $('assPanel'); if (pnl) pnl.open = true;   /* 让用户看见「样式是从文件来的」 */
@@ -1311,9 +1277,10 @@ function init(){
   /* 导出区第二份模板下拉（滚动到导出卡时就在手边）与设置区那份保持同步 */
   const f1 = $('expFmt'), f2 = $('expFmt2');
   f2.innerHTML = f1.innerHTML;
-  const sync = (a,b)=>a.addEventListener('change', ()=>{ b.value = a.value; });
+  const sync = (a,b)=>a.addEventListener('change', ()=>{ b.value = a.value; syncTplSegs(); });
   sync(f1,f2); sync(f2,f1);
   f2.value = f1.value = 'srt';
+  renderTplSegs();   /* v0.9.229：分段按钮（两份 select 都隐藏，只当状态源） */
   f1.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
   f2.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
   /* v0.9.224：参数一改，预览即时重画（微调在当前模板内保留；切模板会被预设覆盖，这是预期行为） */
@@ -1322,7 +1289,14 @@ function init(){
     const el = $(id); if (!el) return;
     ['input','change'].forEach(ev=>el.addEventListener(ev, renderAssPv));
   });
-  document.querySelectorAll('input[name=biOrder]').forEach(el=>el.addEventListener('change', renderAssPv));
+  /* v0.9.229：位置改由两个「离底距离」决定之后，只换样式名是看不出任何变化的
+     （Bottom 与 TopMain 外观相同、都底部对齐）——「上下顺序」必须真的把两条对调，
+     否则这个选项成了摆设。交换两个数值即可，再点一次就换回来，信息不会丢。 */
+  document.querySelectorAll('input[name=biOrder]').forEach(el=>el.addEventListener('change', ()=>{
+    const d = $('assDstMV'), s = $('assSrcMV');
+    if (d && s){ const tmp = d.value; d.value = s.value; s.value = tmp; }
+    renderAssPv();
+  }));
   /* v0.9.228：调整模式换「拆分结构」后必须重新拆一遍，否则选了没反应（要用户自己再点一次按钮） */
   const smEl = $('structMode');
   if (smEl) smEl.addEventListener('change', ()=>{ if (S.mode === 'adjust' && S.rows) doAdjust(); });

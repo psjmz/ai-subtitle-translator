@@ -5332,7 +5332,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.228/.test(mg), 'merge.html 未引用 v0.9.228 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.229/.test(mg), 'merge.html 未引用 v0.9.229 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5365,9 +5365,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.228</.test(html), '首页版本号未升 0.9.228');
-    assert.ok(/class="ver-tag">v0\.9\.228</.test(html), '工作台版本号未升 0.9.228');
-    assert.ok(/srt-core\.js\?v=0\.9\.228/.test(html), 'srt-core.js?v 未升 0.9.228');
+    assert.ok(/class="ver">v0\.9\.229</.test(html), '首页版本号未升 0.9.229');
+    assert.ok(/class="ver-tag">v0\.9\.229</.test(html), '工作台版本号未升 0.9.229');
+    assert.ok(/srt-core\.js\?v=0\.9\.229/.test(html), 'srt-core.js?v 未升 0.9.229');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5510,8 +5510,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.228</.test(mg), 'merge.html 版本未升 0.9.228');
-    assert.ok(/merge-core\.js\?v=0\.9\.228/.test(mg), 'merge-core.js?v 未升 0.9.228');
+    assert.ok(/class="ver">v0\.9\.229</.test(mg), 'merge.html 版本未升 0.9.229');
+    assert.ok(/merge-core\.js\?v=0\.9\.229/.test(mg), 'merge-core.js?v 未升 0.9.229');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5573,11 +5573,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/function presetKeyOf\(tpl\)/.test(mg), '缺 presetKeyOf');
     assert.ok(/if \(tpl === 'custom'\) return assLayoutVal\(\) === 'ass-stack' \? 'stack' : 'split'/.test(mg),
       'custom 未跟随布局选预设');
-    /* resetAssDefaults 必须同时刷新标签与预览 */
-    assert.ok(/function resetAssDefaults\(\)\{[\s\S]{0,200}syncMvLabels\(tplVal\(\)\)/.test(mg), 'reset 未刷新标签');
+    /* resetAssDefaults 必须重刷预览（v0.9.229：标签不再随模板切换，两个框都叫「离底距离」） */
+    assert.ok(/function resetAssDefaults\(\)\{[\s\S]{0,200}renderAssPv\(\)/.test(mg), 'reset 未刷新预览');
   });
 
-  t('v0.9.224：两个「距离」框语义分化 —— 分屏=离顶 / 双行=两行间距，默认值必须不同', () => {
+  t('v0.9.229：两个「距离」框统一成「离底距离」（此前一个离顶、一个叫两行间距）', () => {
     const blk = mg.slice(mg.indexOf('const TPL_DEFAULTS = {'), mg.indexOf('TPL_DEFAULTS.custom'));
     const mvOf = (tpl, key) => {
       const seg = blk.slice(blk.indexOf(tpl + ': {'), blk.indexOf(tpl + ': {') + 700);
@@ -5585,64 +5585,96 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       return m && m[1];
     };
     assert.strictEqual(mvOf('split','assDstMV'), '42', '分屏译文离底应为 42');
-    assert.strictEqual(mvOf('split','assSrcMV'), '40', '分屏原文离顶应为 40');
-    assert.strictEqual(mvOf('stack','assDstMV'), '42', '双行贴底距离应为 42');
-    assert.strictEqual(mvOf('stack','assSrcMV'), '8', '双行两行间距应为 8');
-    assert.notStrictEqual(mvOf('split','assSrcMV'), mvOf('stack','assSrcMV'),
-      '两个模板的第二个距离框默认值必须不同（此前都是 42）');
-    /* 标签随模板切换 */
-    assert.ok(/id="assSrcMVLbl"/.test(mg), '第二个距离框的 label 缺 id');
-    assert.ok(/function syncMvLabels\(tpl\)/.test(mg), '缺 syncMvLabels');
-    assert.ok(/k = presetKeyOf\(tpl\) === 'stack' \? 'lblMVGap' : 'lblMVSrcTop'/.test(mg), '标签未随模板切换');
-    /* 双行：框2 真的参与计算（v0.9.223 前它不生效） */
-    assert.ok(/const baseMV = Math\.max\(0, mv\.dst\);/.test(mg), '缺 baseMV');
-    assert.ok(/const gap\s+= Math\.max\(0, mv\.src\);/.test(mg), '缺 gap');
-    assert.ok(/stackMV\(baseMV, st\.dstSize, dstV, nDst, st\.srcSize, srcV\) \+ gap/.test(mg), 'gap 未参与抬高计算');
+    /* 981 = 1080 − 40（原「距顶」）− 行高 59，位置与旧版完全一致，只是语义换成离底 */
+    assert.strictEqual(mvOf('split','assSrcMV'), '981', '分屏原文离底应为 981');
+    assert.strictEqual(mvOf('stack','assDstMV'), '42', '双行译文离底应为 42');
+    assert.strictEqual(mvOf('stack','assSrcMV'), '117', '双行原文离底应为 117');
+    /* 语义统一：界面上两个框一个叫法，标签不再随模板切换 */
+    assert.ok(!/lblMVSrcTop/.test(mg) && !/lblMVGap/.test(mg), '旧的「原文离顶 / 两行间距」词条还在');
+    assert.ok(!/syncMvLabels/.test(mg), '标签仍在随模板切换');
+    assert.strictEqual((mg.match(/data-i18n="lblMV"/g) || []).length, 2, '两个距离框应都标 lblMV');
+    /* 导出端：两条各拿各自的绝对离底值，不再推算抬高量 */
+    assert.ok(/const dstMV = Math\.max\(0, mv\.dst\);/.test(mg) && /const srcMV = Math\.max\(0, mv\.src\);/.test(mg),
+      '导出未给两条各自的离底值');
+    assert.ok(!/stackMV\(/.test(mg) && !/C\.assStackMV\(/.test(mg), '导出仍在用 assStackMV 推算抬高量');
   });
 
-  t('v0.9.224：分屏顶部那条真的贴在顶部（旧公式把它算到了画面底部）', () => {
-    /* 旧式 1080 - dist - 行高 让 an8 的 MarginV 变成 ~981 → 原文落到译文上方 57px，不是分屏 */
-    assert.ok(/function assTopMV\(dist, nLines, lineH\)\{/.test(mg), 'assTopMV 签名未改');
-    assert.ok(!/1080 - bottomDist/.test(mg), '旧的「距顶当距底」公式还在');
-    assert.ok(/Math\.max\(0, Math\.min\(1080, Math\.round\(\+dist \|\| 0\)\)\)/.test(mg), 'assTopMV 未改为直接用 dist');
-    /* 预览与导出同口径：paint 调用必须传 topMV/bottomMV，不再直接用 m.dst/m.src */
-    assert.ok(!/paint\(l1, samp\.zh, st\.dstSize[^)]*, m\.dst, true\)/.test(mg), '预览分屏仍直接用 m.dst');
-    assert.ok(/paint\(l1, samp\.en, st\.srcSize, 'assSrcColor', st\.srcOutline, 'assSrcOutlineColor', st\.srcAlpha, topMV, true, st\.srcFont\)/.test(mg),
-      '预览分屏顶部那条未用 topMV');
-    /* 字体联动 */
-    assert.ok(/el\.style\.fontFamily = '/.test(mg), '预览未跟随字体设置');
-    /* 词条 */
-    ['lblMVSrcTop','lblMVGap'].forEach(k => {
-      const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
-      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+  t('v0.9.229：导出四个样式一律底部对齐（an2），两个距离框同义', () => {
+    assert.ok(!/function assTopMV\(/.test(mg), 'assTopMV 还在（旧「距顶」路径没删干净）');
+    const evs = [
+      { start:0, end:1000, lines:[{ style:'Sub', text:'来源行', mv:117 }, { style:'Bottom', text:'译文行', mv:42 }] },
+      { start:1000, end:2000, lines:[{ style:'TopMain', text:'译文在上', mv:981 }, { style:'Top', text:'原文在上', mv:981 }] }
+    ];
+    const out = M.formatAss(evs, { title:'t', assStyle:{ dstSize:56, srcSize:50, dstMV:42, srcMV:981 } });
+    const styles = out.split('\n').filter(x => x.startsWith('Style: '));
+    assert.strictEqual(styles.length, 4, '应有四个样式');
+    styles.forEach(line => {
+      const c = line.split(',');
+      assert.strictEqual(c[0].replace('Style: ',''), ['Bottom','Top','TopMain','Sub'].includes(c[0].replace('Style: ',''))
+        ? c[0].replace('Style: ','') : c[0], '样式名异常');
+      assert.strictEqual(c[18], '2', c[0] + ' 不是底部对齐(an2)');
     });
-    assert.ok(/lblMVSrcTop:'原文离顶'/.test(mg) && /lblMVGap:'两行间距'/.test(mg), '中文词条不对');
+    const mvOf = n => { const l = styles.find(x => x.startsWith('Style: ' + n + ',')); return l.split(',')[21]; };
+    assert.strictEqual(mvOf('Bottom'), '42', 'Bottom 的 MarginV 应是译文离底 42');
+    assert.strictEqual(mvOf('TopMain'), '42', 'TopMain 的 MarginV 也应取译文离底');
+    assert.strictEqual(mvOf('Top'), '981', 'Top 的 MarginV 应是原文离底 981');
+    assert.strictEqual(mvOf('Sub'), '981', 'Sub 的 MarginV 也应取原文离底');
+    /* Dialogue 行逐条带自己的离底值，别退回样式默认 */
+    assert.ok(/Dialogue: \d,0:00:00\.00,0:00:01\.00,Sub,,0,0,117,/.test(out), 'Sub 的 mv 未逐条下发');
+    assert.ok(/Dialogue: \d,0:00:00\.00,0:00:01\.00,Bottom,,0,0,42,/.test(out), 'Bottom 的 mv 未逐条下发');
+    assert.ok(/Dialogue: \d,0:00:01\.00,0:00:02\.00,TopMain,,0,0,981,/.test(out), 'TopMain 的 mv 未逐条下发');
+    assert.ok(/Dialogue: \d,0:00:01\.00,0:00:02\.00,Top,,0,0,981,/.test(out), 'Top 的 mv 未逐条下发');
+    /* 预览：两条都按 bottom 定位，不再有「贴顶」分支 */
+    assert.ok(/el\.style\.bottom = \(mv \* k\)\.toFixed\(1\) \+ 'px';/.test(mg), '预览未按离底距离定位');
+    assert.ok(!/atTop/.test(mg), '预览仍有「贴顶」定位分支');
+    assert.ok(/el\.style\.fontFamily = '/.test(mg), '预览未跟随字体设置');
+    /* 两个距离框的默认值不同，但语义同一个 */
+    assert.ok(/lblMV:'离底距离'/.test(mg), '中文词条应只有「离底距离」');
   });
 
-  /* ================= v0.9.225：预览行数必须来自导出折行管线 ================= */
-  t('v0.9.225：双行预览按真实折行数算抬高量（此前写死 1 行 → 原文压在译文上）', () => {
-    /* 病根：renderAssPv 里 const nDst = 1, nSrc = 1; 而导出端用 nLines(dstText)/nLines(srcText) */
+  /* ================= v0.9.229：预览样例仍走折行管线，但定位改为绝对离底 =================
+     为什么删掉 v0.9.225/226 那套「按实测行数重算抬高量」：两个框统一成绝对离底之后，
+     一条字幕的位置只由它自己的数值决定，不再有「另一条有多高」这个依赖。 */
+  t('v0.9.229：预览按绝对离底定位，不再按实测行数重算抬高量', () => {
     assert.ok(!/const nDst = 1, nSrc = 1;/.test(mg), '预览仍把两侧写死成 1 行');
     assert.ok(/function assPvSample\(\)\{[\s\S]{0,1200}buildBilingualParts\(rows,/.test(mg),
       '预览样例未走导出的折行管线');
-    /* 样例取「折行后最挤的那条」，预览要暴露最坏情况而不是最松的一条 */
     assert.ok(/S\.rows\.slice\(0, 20\)/.test(mg), '样例未在前 20 条里挑');
     assert.ok(/if \(!best \|\| n > best\.n\) best = \{ n: n, p: p \};/.test(mg), '未按行数挑最挤的一条');
     assert.ok(!/len > best\.len/.test(mg), 'v0.9.228：长度二级判据还在（会挑中后半句）');
-    assert.ok(/nEn: en\.split\('\\n'\)\.length, nZh: zh\.split\('\\n'\)\.length/.test(mg),
-      'assPvSample 未带回真实行数');
-    assert.ok(/const nDst = samp\.nZh \|\| 1, nSrc = samp\.nEn \|\| 1;/.test(mg),
-      'renderAssPv 未用样例真实行数');
-    /* 导出端仍按实际行数（这一侧从来是对的，别被一起改坏） */
-    assert.ok(/const nDst = nLines\(dstText\);/.test(mg), '导出端 nDst 被改动');
-    /* v0.9.226：预览的自动折行与导出的按字数折行不保证一致 →
-       以「实测底行行盒数」重算抬高量，保证预览里两行永不叠在一起 */
-    assert.ok(/const render = \(topMV, bottomMV\) => \{/.test(mg), '缺 render 两次绘制');
-    assert.ok(/const botLines = Math\.max\(1, Math\.round\(\(l2\.getBoundingClientRect\(\)\.height \|\| unit\) \/ unit\)\)/.test(mg),
-      '预览未实测底行行数');
-    assert.ok(/topMV = stackOf\(\{ bottomMV: baseMV, bottomSize: botSize,/.test(mg), '未按实测行数重算抬高量');
-    assert.ok(/bottomLang: dstFirst \? srcV : dstV, bottomLines: botLines,/.test(mg), '重算未带语言/行数');
-    assert.ok(/const nSrc = nLines\(srcText\);/.test(mg), '导出端 nSrc 被改动');
+    /* 旧的抬高量推算必须删干净 */
+    assert.ok(!/botLines/.test(mg) && !/stackOf/.test(mg), 'v0.9.225/226 的行数重算路径还在');
+    assert.ok(!/C\.assStackMV\(/.test(mg) && !/C\.assTopMV\(/.test(mg), '仍在调用旧的抬高量函数');
+    assert.ok(/const dstMV = Math\.max\(0, m\.dst\), srcMV = Math\.max\(0, m\.src\);/.test(mg), '预览未取两个离底值');
+    /* 预览与导出必须同口径：同一对数值 */
+    assert.ok(/mv: srcMV \}/.test(mg) && /mv: dstMV \}/.test(mg), '导出的 mv 与预览取值不同源');
+  });
+
+  /* ================= v0.9.229：位置由数值决定后，「上下顺序」必须真的对调 ================= */
+  t('v0.9.229：「上下顺序」不能只换样式名（那样界面上毫无变化）', () => {
+    assert.ok(/const d = \$\('assDstMV'\), s = \$\('assSrcMV'\);/.test(mg), 'biOrder 变化时未取两个离底值');
+    assert.ok(/const tmp = d\.value; d\.value = s\.value; s\.value = tmp;/.test(mg), '未真正交换两个离底值');
+    /* 译文在上 → 译文的 mv 必须是大的那个 */
+    const evs = [{ start:0, end:1000, lines:[{ style:'TopMain', text:'译文在上', mv:981 }, { style:'Sub', text:'原文在下', mv:42 }] }];
+    const out = M.formatAss(evs, { title:'t', assStyle:{ dstMV:981, srcMV:42 } });
+    assert.ok(/TopMain,,0,0,981,/.test(out), '译文在上时位置不对');
+    assert.ok(/Sub,,0,0,42,/.test(out), '原文在下时位置不对');
+  });
+
+  t('v0.9.229：导出的 ASS 能被自己解析回来（往返一致）', () => {
+    const evs = [{ start:0, end:1000, lines:[{ style:'Sub', text:'EN line', mv:117 }, { style:'Bottom', text:'中文字幕', mv:42 }] }];
+    const out = M.formatAss(evs, { title:'t', assStyle:{ dstSize:54, srcSize:42, dstMV:42, srcMV:117 } });
+    const rt = M.parseAss(out);
+    assert.strictEqual(rt.items.length, 2, '往返后条数不对：' + rt.items.length);
+    assert.strictEqual(rt.playResY, 1080);
+    assert.ok(rt.styles.Bottom && rt.styles.Sub, '往返后样式定义丢失');
+    assert.strictEqual(rt.styles.Bottom.marginV, 42);
+    assert.strictEqual(rt.styles.Sub.marginV, 117);
+    /* 再喂给 planAssImport，应判回「底部双行 + 译文 42 / 原文 117」 */
+    const plan = M.planAssImport(rt.items, rt.styles, rt.playResY);
+    assert.strictEqual(plan.layout, 'stack', '往返后布局判错');
+    assert.strictEqual(plan.dstMV, 42, '往返后译文离底不对');
+    assert.strictEqual(plan.srcMV, 117, '往返后原文离底不对');
   });
 
   /* ================= v0.9.228：预览必须在所有「产生 rows」的路径上重画 =================
@@ -5717,7 +5749,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.strictEqual(p.src.size, 40); assert.strictEqual(p.src.color, '#FFD700');
     assert.strictEqual(p.src.font, 'Arial', '字体必须是文件里的字体');
     assert.strictEqual(p.dst.outline, 2.5); assert.strictEqual(p.dst.outlineColor, '#000000');
-    assert.strictEqual(p.dstMV, 42); assert.strictEqual(p.srcMV, 40);
+    /* v0.9.229：原文那条是 an8（MarginV=距顶 40）→ 换算成离底 = 1080−40−行高 */
+    assert.strictEqual(p.dstMV, 42);
+    assert.strictEqual(p.srcMV, Math.round(1080 - 40 - M.assLineHeight(40)), '原文离底应换算成 ' + Math.round(1080 - 40 - M.assLineHeight(40)));
     assert.strictEqual(p.scaled, false);
   });
 
@@ -5726,9 +5760,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const p = M.planAssImport(r.items, r.styles, r.playResY);
     assert.strictEqual(p.layout, 'stack', '两条都贴底 → 底部双行');
     assert.strictEqual(p.dstName, 'Bottom'); assert.strictEqual(p.srcName, 'Sub');
-    assert.strictEqual(p.dstMV, 42, '贴底那条量离底');
-    /* 110 - 42 - 行高(56pt → 66) = 2 */
-    assert.strictEqual(p.srcMV, 2, '两行间距应为 110-42-66=2，实得 ' + p.srcMV);
+    assert.strictEqual(p.dstMV, 42, '译文那条量离底');
+    /* v0.9.229：两条都 an2，各自给绝对离底值，不再做「差 − 行高」的换算 */
+    assert.strictEqual(p.srcMV, 110, '原文离底应直接取 110，实得 ' + p.srcMV);
     assert.strictEqual(p.src.alpha, 80, '&H33 前缀的半透明要带过来');
   });
 
@@ -5752,7 +5786,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const p = M.planAssImport(r.items, r.styles, r.playResY);
     assert.strictEqual(p.order, 'dst-first', '主语言（字号大）在上时应是 dst-first');
     assert.strictEqual(p.dstName, 'CN'); assert.strictEqual(p.srcName, 'EN');
-    assert.strictEqual(p.dstMV, 40, '译文在上 → 距顶 40');
+    /* v0.9.229：译文在上时它的 MarginV 是 an8 的「距顶 40」→ 换算成离底 */
+    assert.strictEqual(p.dstMV, Math.round(1080 - 40 - M.assLineHeight(56)), '译文离底应换算');
     assert.strictEqual(p.srcMV, 42, '原文在下 → 离底 42');
   });
 

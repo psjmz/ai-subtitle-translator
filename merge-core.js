@@ -845,15 +845,14 @@
     const dstName = dstIsUpper ? upperName : lowerName, srcName = dstIsUpper ? lowerName : upperName;
     const span = Math.abs(ya - yb);
     const layout = (span > 1080 * 0.35 || upper.align === 'top' || lower.align === 'top') ? 'split' : 'stack';
-    let dstMV, srcMV;
-    if (layout === 'split'){
-      /* 分屏：两侧各量自己那条边（贴底的量离底、贴顶的量离顶），面板语义正是如此 */
-      dstMV = dst.marginV; srcMV = src.marginV;
-    } else {
-      /* 底部双行：贴底那条量离底；另一条与它的差减去行高 = 两行间距 */
-      dstMV = lower.marginV;
-      srcMV = Math.max(0, Math.round(upper.marginV - lower.marginV - assLineHeight(lower.size)));
-    }
+    /* v0.9.229：面板上两个框统一是「离底距离」，所以顶部对齐（an8）那条要把
+       MarginV 从「距顶」换算成「离底」：离底 = 1080 − 距顶 − 行高。
+       字号/边距在上面已按 k 换到 1080p 基准，这里用换算后的值算行高。
+       （v0.9.224–228 的做法是「split 就各自量自己那条边」，与现在统一后的语义冲突。） */
+    const mvOf = f => (f.align === 'top')
+      ? Math.max(0, Math.min(1080, Math.round(1080 - f.marginV - assLineHeight(f.size))))
+      : f.marginV;
+    const dstMV = mvOf(dst), srcMV = mvOf(src);
     return {
       layout: layout,
       order: dstIsUpper ? 'dst-first' : 'src-first',
@@ -1030,9 +1029,12 @@
 
   // 生成带样式分层的 ASS 文件（1080p 基准，可直压视频 / 进 Aegisub 二次编辑）。
   // events：[{start,end,lines:[{style,text,mv?}]}]
-  // 样式按「角色 × 位置」正交（v0.9.35：字号跟角色走，位置跟模式走——译文恒为主阅读样式）：
-  //   主语言（译文）：白色 56pt —— Bottom（底部居中 an2，主阅读位）/ TopMain（顶部居中 an8，译文在上时用）
-  //   副语言（原文）：金黄 50pt —— Top（顶部居中 an8）/ Sub（底部居中 an2，MarginV 可逐条动态指定）
+  // 样式按「角色」分工（字号/颜色跟角色走，位置由每条 Dialogue 的 MarginV 给）：
+  //   主语言（译文）：白色 56pt —— Bottom / TopMain（译文在上时用）
+  //   副语言（原文）：金黄 50pt —— Sub / Top
+  // v0.9.229：四个样式**一律底部对齐（an2）**，MarginV 的语义统一为「这一行离画面底边多远」。
+  //   此前 Top/TopMain 是 an8（MarginV = 距顶），于是界面上两个框一个量离底、一个量离顶，
+  //   语义割裂；现在译文/原文两个框完全同义，「分屏」只是原文那个数大（= 1080−距顶−行高）。
   // 双语时源/译各占一条 Dialogue（时间相同、位置分离），不挤在两行里。
   function formatAss(events, opts) {
     opts = opts || {};
@@ -1079,9 +1081,8 @@
     const SRC_A = alphaOf(AS.srcAlpha);
     const STYLE_FMT = 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding';
     // 样式行模板（v0.9.35 分工不变：字号跟角色走、位置跟模式走）
-    // v0.9.102：贴底的两块各用各的离底距离（Bottom=译文 / Sub=原文）。
-    // Top / TopMain 是顶部对齐（an8），MarginV 语义为「距顶边」，真实位置由每条 Dialogue
-    // 的 mv 逐条覆盖，故样式值继续沿用 MV 兜底。
+    // v0.9.102 / v0.9.229：译文、原文各用各的「离底距离」（Bottom·TopMain=译文 / Sub·Top=原文）；
+    // 四个样式都是底部对齐（an2），样式里的 MarginV 与逐条 Dialogue 的 mv 同义，可直接互换。
     /* v0.9.217：样式行生成。字体/描边/描边色/主色 alpha 都由调用方按「译文 or 原文」传入，
        不再用写死的 FONT / OUTL —— 这是「译文原文各配一套」能落地的前提。
        bold 传 -1/0（ASS 惯例 -1=粗体）；未传时沿用 v0.9.35 的原值。 */
@@ -1108,13 +1109,12 @@
       '[V4+ Styles]',
       STYLE_FMT,
       styleLine('Bottom', DST_SZ, DST_C, 2, -1, DST_MV, DST_FONT, DST_OUTL, DST_OC, DST_A),
-      styleLine('Top', SRC_SZ, SRC_C, 8, 0, null, SRC_FONT, SRC_OUTL, SRC_OC, SRC_A),
-      // TopMain（v0.9.35）：主语言顶部样式——外观与 Bottom 一致（主字号/主色），仅对齐方式为顶部居中（an8）。
-      // 「译文在上」分屏模式下译文用本样式，保证译文无论在哪都保持主阅读字号。
-      styleLine('TopMain', DST_SZ, DST_C, 8, -1, null, DST_FONT, DST_OUTL, DST_OC, DST_A),
-      // Sub：底部双行 / 副语言落底样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（副字号/副色）
-      // 但对齐方式为底部居中，实际纵向位置由每条 Dialogue 的 MarginV（ln.mv）动态指定；
-      // mv=0 时回退样式默认 MarginV。
+      styleLine('Top', SRC_SZ, SRC_C, 2, 0, SRC_MV, SRC_FONT, SRC_OUTL, SRC_OC, SRC_A),
+      // TopMain（v0.9.35）：主语言样式——外观与 Bottom 一致（主字号/主色），
+      // 「译文在上」分屏模式下译文用它，保证译文无论在哪都保持主阅读字号。
+      styleLine('TopMain', DST_SZ, DST_C, 2, -1, DST_MV, DST_FONT, DST_OUTL, DST_OC, DST_A),
+      // Sub：副语言样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（副字号/副色），
+      // 纵向位置由每条 Dialogue 的 MarginV（ln.mv）指定；mv=0 时回退样式默认 MarginV。
       styleLine('Sub', SRC_SZ, SRC_C, 2, 0, SRC_MV, SRC_FONT, SRC_OUTL, SRC_OC, SRC_A),
       '',
       '[Events]',
