@@ -105,6 +105,12 @@
   .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
   .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line-strong);box-shadow:none}
   .btn.ghost:hover{border-color:var(--acc);color:var(--acc)}
+  /* v0.9.231：方案区一排小按钮，不能用 .btn 的大尺寸，否则一排塞不下 */
+  .btn-sm{padding:6px 13px !important;font-size:12.5px !important;border-radius:9px !important;line-height:1.4}
+  .scheme-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+  .scheme-row select{border:1px solid var(--line-strong);border-radius:8px;padding:5px 8px;font-size:12.5px;
+    min-width:130px;max-width:220px;background:var(--card);color:var(--ink)}
+  .af input[type=checkbox]{width:16px;height:16px;accent-color:var(--acc);flex:none}
 
   /* v0.9.229：导出模板由下拉改为分段按钮（用户要求「按钮按键样式」） */
   .seg{display:inline-flex;flex-wrap:wrap;gap:6px}
@@ -130,6 +136,10 @@
      60/1920 = 3.125%，与导出同宽后，预览折出来的行数才等于导出折出来的行数。 */
   .ass-pv-line{position:absolute;left:0;right:0;text-align:center;white-space:pre-wrap;padding:0 3.125%;
     font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif;line-height:1.2}
+  /* v0.9.231：底衬（ASS BorderStyle=3）的框是**紧贴文字包围盒**的，不是整行通栏，
+     所以文字要包一层 inline-block，background/padding 加在它身上才与播放器一致。
+     ⚠️ 别把背景加在 .ass-pv-line 上——那会画出一条整屏宽的黑带，与导出完全不符。 */
+  .ass-pv-line .pv-in{display:inline-block}
   .ass-note{margin-bottom:8px}
   .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:10px;padding:9px 14px;
     font-size:12.5px;color:#8A5A0B;display:none;line-height:1.8}
@@ -165,7 +175,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.230</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.231</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -282,10 +292,26 @@
             <h4 data-i18n="lblDstCol">译文（主）</h4>
             <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assDstSize" value="56" min="8" max="200"></div>
             <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assDstColor" value="#FFFFFF"><span class="sw" id="assDstColorSw"></span></div>
+            <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assDstAlpha" min="10" max="100" value="100"><span class="pct" id="assDstAlphaOut">100%</span></div>
+            <div class="af"><label data-i18n="lblFont">字体</label><select id="assDstFont"></select></div>
+            <!-- v0.9.231：粗体 / 字间距 / 阴影·底衬 / 水平对齐 以前写死在导出端，界面上根本没有 -->
+            <div class="af"><label data-i18n="lblBold">粗体</label><input type="checkbox" id="assDstBold" checked></div>
+            <div class="af"><label data-i18n="lblSpacing">字间距</label><input type="number" id="assDstSpacing" value="0" min="-10" max="20" step="0.5"></div>
             <div class="af"><label data-i18n="lblOutline">描边</label><input type="number" id="assDstOutline" value="2.5" min="0" max="10" step="0.5"></div>
             <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assDstOutlineColor" value="#000000"><span class="sw" id="assDstOutlineColorSw"></span></div>
-            <div class="af"><label data-i18n="lblFont">字体</label><select id="assDstFont"></select></div>
-            <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assDstAlpha" min="10" max="100" value="100"><span class="pct" id="assDstAlphaOut">100%</span></div>
+            <div class="af"><label data-i18n="lblEdge">阴影/底衬</label><select id="assDstEdge">
+              <option value="none" data-i18n="edgeNone" selected>无</option>
+              <option value="shadow" data-i18n="edgeShadow">阴影</option>
+              <option value="box" data-i18n="edgeBox">底衬</option>
+            </select></div>
+            <div class="af"><label data-i18n="lblEdgeSize">深度</label><input type="number" id="assDstEdgeSize" value="0" min="0" max="20" step="0.5"></div>
+            <div class="af"><label data-i18n="lblEdgeColor">边色</label><input type="text" id="assDstEdgeColor" value="#000000"><span class="sw" id="assDstEdgeColorSw"></span></div>
+            <div class="af"><label data-i18n="lblEdgeAlpha">边色不透明</label><input type="range" id="assDstEdgeAlpha" min="10" max="100" value="60"><span class="pct" id="assDstEdgeAlphaOut">60%</span></div>
+            <div class="af"><label data-i18n="lblHAlign">水平对齐</label><select id="assDstAlign">
+              <option value="1" data-i18n="alignL">底·左</option>
+              <option value="2" data-i18n="alignC" selected>底·中</option>
+              <option value="3" data-i18n="alignR">底·右</option>
+            </select></div>
             <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assDstMV" value="42" min="0" max="1080"></div>
             <!-- v0.9.229：译文/原文两个框语义完全一致——都是「这一行离画面底边多远」。 -->
           </div>
@@ -293,15 +319,47 @@
             <h4 data-i18n="lblSrcCol">原文（副）</h4>
             <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assSrcSize" value="50" min="8" max="200"></div>
             <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assSrcColor" value="#FFD700"><span class="sw" id="assSrcColorSw"></span></div>
+            <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assSrcAlpha" min="10" max="100" value="100"><span class="pct" id="assSrcAlphaOut">100%</span></div>
+            <div class="af"><label data-i18n="lblFont">字体</label><select id="assSrcFont"></select></div>
+            <div class="af"><label data-i18n="lblBold">粗体</label><input type="checkbox" id="assSrcBold"></div>
+            <div class="af"><label data-i18n="lblSpacing">字间距</label><input type="number" id="assSrcSpacing" value="0" min="-10" max="20" step="0.5"></div>
             <div class="af"><label data-i18n="lblOutline">描边</label><input type="number" id="assSrcOutline" value="2.5" min="0" max="10" step="0.5"></div>
             <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assSrcOutlineColor" value="#000000"><span class="sw" id="assSrcOutlineColorSw"></span></div>
-            <div class="af"><label data-i18n="lblFont">字体</label><select id="assSrcFont"></select></div>
-            <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assSrcAlpha" min="10" max="100" value="100"><span class="pct" id="assSrcAlphaOut">100%</span></div>
+            <div class="af"><label data-i18n="lblEdge">阴影/底衬</label><select id="assSrcEdge">
+              <option value="none" data-i18n="edgeNone" selected>无</option>
+              <option value="shadow" data-i18n="edgeShadow">阴影</option>
+              <option value="box" data-i18n="edgeBox">底衬</option>
+            </select></div>
+            <div class="af"><label data-i18n="lblEdgeSize">深度</label><input type="number" id="assSrcEdgeSize" value="0" min="0" max="20" step="0.5"></div>
+            <div class="af"><label data-i18n="lblEdgeColor">边色</label><input type="text" id="assSrcEdgeColor" value="#000000"><span class="sw" id="assSrcEdgeColorSw"></span></div>
+            <div class="af"><label data-i18n="lblEdgeAlpha">边色不透明</label><input type="range" id="assSrcEdgeAlpha" min="10" max="100" value="60"><span class="pct" id="assSrcEdgeAlphaOut">60%</span></div>
+            <div class="af"><label data-i18n="lblHAlign">水平对齐</label><select id="assSrcAlign">
+              <option value="1" data-i18n="alignL">底·左</option>
+              <option value="2" data-i18n="alignC" selected>底·中</option>
+              <option value="3" data-i18n="alignR">底·右</option>
+            </select></div>
             <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assSrcMV" value="922" min="0" max="1080"></div>
           </div>
         </div>
+        <!-- v0.9.231：左右边距此前恒写死 60（= 折行宽度 1800px）。它决定折行宽度，
+             两侧必须同一个值，否则预览与导出的行数会不一致，故做成全局一对而不是每侧一套。 -->
+        <div class="af" style="margin-top:10px"><label data-i18n="lblMarginL">左边距</label><input type="number" id="assMarginL" value="60" min="0" max="600"></div>
+        <div class="af"><label data-i18n="lblMarginR">右边距</label><input type="number" id="assMarginR" value="60" min="0" max="600"></div>
         <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
-        <div style="margin-top:8px"><button type="button" class="btn ghost" id="btnAssReset" data-i18n="assReset">↺ 恢复默认参数</button></div>
+        <div class="hint" data-i18n="edgeTip">「底衬」用的是 ASS 的 BorderStyle=3，它的外扩量就是「描边」那个值，「深度」在底衬模式下不生效（播放器如此）。</div>
+        <div class="scheme-row">
+          <button type="button" class="btn ghost btn-sm" id="btnAssReset" data-i18n="assReset">↺ 恢复默认参数</button>
+          <button type="button" class="btn ghost btn-sm" id="btnSchemeSave" data-i18n="schemeSave">☆ 存为方案</button>
+        </div>
+        <div class="scheme-row">
+          <select id="schemeList"></select>
+          <button type="button" class="btn ghost btn-sm" id="btnSchemeApply" data-i18n="schemeApply">应用</button>
+          <button type="button" class="btn ghost btn-sm" id="btnSchemeDel" data-i18n="schemeDel">删除</button>
+          <button type="button" class="btn ghost btn-sm" id="btnSchemeExport" data-i18n="schemeExport">导出</button>
+          <button type="button" class="btn ghost btn-sm" id="btnSchemeImport" data-i18n="schemeImport">导入</button>
+          <input type="file" id="schemeFile" accept=".json,application/json" style="display:none">
+        </div>
+        <div class="hint" data-i18n="schemeHint">方案存在本机浏览器里（换设备或清缓存会丢），要备份就用「导出」存成 JSON。</div>
       </div>
     </details>
   </div>
@@ -337,8 +395,8 @@
     <div class="ass-pv" id="assPv" style="display:none">
       <div class="ass-pv-hd"><span data-i18n="pvAssTitle">效果预览（按 1080p 等比缩放）</span><span class="ass-pv-tag" id="assPvTag"></span></div>
       <div class="ass-pv-screen" id="assPvScreen">
-        <div class="ass-pv-line" id="assPvLine1"></div>
-        <div class="ass-pv-line" id="assPvLine2"></div>
+        <div class="ass-pv-line" id="assPvLine1"><span class="pv-in"></span></div>
+        <div class="ass-pv-line" id="assPvLine2"><span class="pv-in"></span></div>
       </div>
     </div>
     <div class="exp-row">
@@ -355,7 +413,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.230"></script>
+<script src="merge-core.js?v=0.9.231"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -407,6 +465,12 @@ const I18N = {
     lblSize:'字号', lblColor:'颜色', lblOutline:'描边', lblOutlineColor:'描边色', lblFont:'字体',
     lblAlpha:'不透明度', lblMV:'离底距离',
     assFontTip:'字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。',
+    lblBold:'粗体', lblSpacing:'字间距', lblEdge:'阴影/底衬', lblEdgeSize:'深度', lblEdgeColor:'边色', lblEdgeAlpha:'边色不透明', lblHAlign:'水平对齐', lblMarginL:'左边距', lblMarginR:'右边距',
+    edgeNone:'无', edgeShadow:'阴影', edgeBox:'底衬', alignL:'底·左', alignC:'底·中', alignR:'底·右',
+    edgeTip:'「底衬」用的是 ASS 的 BorderStyle=3，它的外扩量就是「描边」那个值，「深度」在底衬模式下不生效（播放器如此）。',
+    schemeSave:'☆ 存为方案', schemeApply:'应用', schemeDel:'删除', schemeExport:'导出', schemeImport:'导入',
+    schemeHint:'方案存在本机浏览器里（换设备或清缓存会丢），要备份就用「导出」存成 JSON。',
+    schemeNone:'（还没有保存过方案）', schemeAskName:'给这套样式起个名字：', schemeSaved:'已保存方案「{0}」', schemeApplyNone:'先选一个方案', schemeApplied:'已应用方案「{0}」', schemeDelAsk:'删除方案「{0}」？', schemeDeleted:'已删除方案「{0}」', schemeBadJson:'不是有效的方案文件', schemeImported:'已导入 {0} 个方案', schemeNoFile:'没读到文件',
     btnMerge:'🔗 合并预览', mergeHint:'先看配对结果和体检报告，再下载。',
     repPaired:'配对', repOnlySrc:'缺译文', repOnlyDst:'缺原文', repMerged:'已并入', repIssues:'时间轴体检',
     repCleanTxt:'时间轴体检通过：没有重叠、过短或缺失。', repIssueHead:'时间轴体检：{0} 处需注意（前 20 条）',
@@ -462,6 +526,12 @@ const I18N = {
     lblSize:'字號', lblColor:'顏色', lblOutline:'描邊', lblOutlineColor:'描邊色', lblFont:'字體',
     lblAlpha:'不透明度', lblMV:'離底距離',
     assFontTip:'字體在播放端機器上解析，對方沒裝會自動回退；其餘參數與主站「ASS 樣式」一致。',
+    lblBold:'粗體', lblSpacing:'字間距', lblEdge:'陰影/底襯', lblEdgeSize:'深度', lblEdgeColor:'邊色', lblEdgeAlpha:'邊色不透明', lblHAlign:'水平對齊', lblMarginL:'左邊距', lblMarginR:'右邊距',
+    edgeNone:'無', edgeShadow:'陰影', edgeBox:'底襯', alignL:'底·左', alignC:'底·中', alignR:'底·右',
+    edgeTip:'「底襯」用的是 ASS 的 BorderStyle=3，它的外擴量就是「描邊」那個值，「深度」在底襯模式下不生效（播放器如此）。',
+    schemeSave:'☆ 存為方案', schemeApply:'套用', schemeDel:'刪除', schemeExport:'匯出', schemeImport:'匯入',
+    schemeHint:'方案存在本機瀏覽器裡（換裝置或清快取會丟），要備份就用「匯出」存成 JSON。',
+    schemeNone:'（還沒有儲存過方案）', schemeAskName:'給這套樣式取個名字：', schemeSaved:'已儲存方案「{0}」', schemeApplyNone:'先選一個方案', schemeApplied:'已套用方案「{0}」', schemeDelAsk:'刪除方案「{0}」？', schemeDeleted:'已刪除方案「{0}」', schemeBadJson:'不是有效的方案檔案', schemeImported:'已匯入 {0} 個方案', schemeNoFile:'沒讀到檔案',
     btnMerge:'🔗 合併預覽', mergeHint:'先看配對結果和體檢報告，再下載。',
     repPaired:'配對', repOnlySrc:'缺譯文', repOnlyDst:'缺原文', repMerged:'已併入', repIssues:'時間軸體檢',
     repCleanTxt:'時間軸體檢通過：沒有重疊、過短或缺失。', repIssueHead:'時間軸體檢：{0} 處需注意（前 20 條）',
@@ -517,6 +587,12 @@ const I18N = {
     lblSize:'Font size', lblColor:'Color', lblOutline:'Outline', lblOutlineColor:'Outline color', lblFont:'Font',
     lblAlpha:'Opacity', lblMV:'Bottom margin',
     assFontTip:'Fonts resolve on the viewer’s machine and fall back automatically if missing; other options match the main site’s ASS styles.',
+    lblBold:'Bold', lblSpacing:'Letter spacing', lblEdge:'Shadow / Box', lblEdgeSize:'Depth', lblEdgeColor:'Edge color', lblEdgeAlpha:'Edge opacity', lblHAlign:'Align', lblMarginL:'Left margin', lblMarginR:'Right margin',
+    edgeNone:'None', edgeShadow:'Shadow', edgeBox:'Box', alignL:'Bottom · left', alignC:'Bottom · center', alignR:'Bottom · right',
+    edgeTip:'“Box” uses ASS BorderStyle=3 — its padding is the Outline value, and Depth has no effect in box mode (that is how players behave).',
+    schemeSave:'☆ Save as scheme', schemeApply:'Apply', schemeDel:'Delete', schemeExport:'Export', schemeImport:'Import',
+    schemeHint:'Schemes live in this browser only (lost on another device or after clearing the cache) — use Export to keep a JSON backup.',
+    schemeNone:'(no scheme saved yet)', schemeAskName:'Name this style set:', schemeSaved:'Scheme “{0}” saved', schemeApplyNone:'Pick a scheme first', schemeApplied:'Scheme “{0}” applied', schemeDelAsk:'Delete scheme “{0}”?', schemeDeleted:'Scheme “{0}” deleted', schemeBadJson:'Not a valid scheme file', schemeImported:'Imported {0} scheme(s)', schemeNoFile:'No file read',
     btnMerge:'🔗 Merge & preview', mergeHint:'Check the pairing result and sanity report before downloading.',
     repPaired:'Paired', repOnlySrc:'Missing translation', repOnlyDst:'Missing original', repMerged:'merged in', repIssues:'Timeline check',
     repCleanTxt:'Timeline check passed: no overlaps, too-short or missing cues.', repIssueHead:'Timeline check: {0} items need attention (first 20)',
@@ -572,6 +648,12 @@ const I18N = {
     lblSize:'フォントサイズ', lblColor:'色', lblOutline:'縁取り', lblOutlineColor:'縁取り色', lblFont:'フォント',
     lblAlpha:'不透明度', lblMV:'下端からの距離',
     assFontTip:'フォントは再生側の端末で解決され、未インストールなら自動フォールバック。その他の設定は本サイトの ASS スタイルと同一です。',
+    lblBold:'太字', lblSpacing:'字間', lblEdge:'影/ボックス', lblEdgeSize:'深さ', lblEdgeColor:'縁の色', lblEdgeAlpha:'縁の不透明度', lblHAlign:'水平位置', lblMarginL:'左余白', lblMarginR:'右余白',
+    edgeNone:'なし', edgeShadow:'影', edgeBox:'ボックス', alignL:'下・左', alignC:'下・中央', alignR:'下・右',
+    edgeTip:'「ボックス」は ASS の BorderStyle=3 です。外側の余白は「縁取り」の値で、「深さ」はボックス時には効きません（プレイヤーの仕様）。',
+    schemeSave:'☆ プリセット保存', schemeApply:'適用', schemeDel:'削除', schemeExport:'書き出し', schemeImport:'読み込み',
+    schemeHint:'プリセットはこのブラウザに保存されます（別端末やキャッシュ消去で消えます）。バックアップは「書き出し」で JSON に。',
+    schemeNone:'（まだ保存されていません）', schemeAskName:'このスタイルの名前を入力：', schemeSaved:'プリセット「{0}」を保存しました', schemeApplyNone:'先にプリセットを選んでください', schemeApplied:'プリセット「{0}」を適用しました', schemeDelAsk:'プリセット「{0}」を削除しますか？', schemeDeleted:'プリセット「{0}」を削除しました', schemeBadJson:'プリセットファイルとして読み込めません', schemeImported:'{0} 件のプリセットを読み込みました', schemeNoFile:'ファイルを読み取れませんでした',
     btnMerge:'🔗 マージしてプレビュー', mergeHint:'対応結果とチェックレポートを確認してからダウンロードしてください。',
     repPaired:'対応', repOnlySrc:'訳文なし', repOnlyDst:'原文なし', repMerged:'統合済み', repIssues:'タイムラインチェック',
     repCleanTxt:'タイムラインチェック合格：重複・短すぎ・欠落なし。', repIssueHead:'タイムラインチェック：{0} 件要注意（先頭 20 件）',
@@ -614,6 +696,9 @@ function applyI18n(){
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
   const am = alignMode(); const hint = $('alignHint');
   if (hint) hint.textContent = t(am==='order' ? 'alignHintOrder' : am==='dstTime' ? 'alignHintDst' : 'alignHintTime');
+  /* v0.9.231：方案下拉的「（还没有保存过方案）」是运行时生成的，不在 data-i18n 里，
+     换界面语言时必须重画一遍，否则它会一直停在首次渲染时的语言上。 */
+  renderSchemeList();
 }
 function toast(msg){
   const el = $('toast'); el.textContent = msg; el.classList.add('show');
@@ -885,6 +970,17 @@ const ASS_DEFAULTS = [
   ['assDstOutlineColor','#000000'],['assSrcOutlineColor','#000000'],
   ['assDstFont','PingFang SC'],['assSrcFont','PingFang SC'],
   ['assDstAlpha','100'],['assSrcAlpha','100'],
+  /* ---------- v0.9.231 新增：此前这些字段写死在导出端，界面上根本没有 ----------
+     粗体 checkbox 用 true/false（value 对 checkbox 无效，见 setAssVal）。
+     默认值必须与旧写死值一致：译文粗 / 原文不粗、字间距 0、无阴影无底衬、水平居中、左右边距 60。 */
+  ['assDstBold',true],['assSrcBold',false],
+  ['assDstSpacing','0'],['assSrcSpacing','0'],
+  ['assDstEdge','none'],['assSrcEdge','none'],
+  ['assDstEdgeSize','0'],['assSrcEdgeSize','0'],
+  ['assDstEdgeColor','#000000'],['assSrcEdgeColor','#000000'],
+  ['assDstEdgeAlpha','60'],['assSrcEdgeAlpha','60'],
+  ['assDstAlign','2'],['assSrcAlign','2'],
+  ['assMarginL','60'],['assMarginR','60'],
   /* v0.9.224：两个距离框不再是同一个数（分屏 42 离底 / 40 离顶，双行 42 离底 / 8 间距）。
      真正生效的是 TPL_DEFAULTS（syncAssPanel 每次切模板无条件套），这里是字段清单兜底。 */
   ['assDstMV','42'],['assSrcMV','922']
@@ -898,6 +994,12 @@ const TPL_DEFAULTS = {
     assDstSize:'56', assSrcSize:'50', assDstColor:'#FFFFFF', assSrcColor:'#FFD700',
     assDstOutline:'2.5', assSrcOutline:'2.5', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'100',
+    /* v0.9.231：新旧字段都要在预设里出现，否则切模板时新字段残留上一次的值（等于预设没生效）。
+       两个模板在这批新字段上同值——默认值即旧写死值，不擅自替用户选风格。 */
+    assDstBold:true, assSrcBold:false, assDstSpacing:'0', assSrcSpacing:'0',
+    assDstEdge:'none', assSrcEdge:'none', assDstEdgeSize:'0', assSrcEdgeSize:'0',
+    assDstEdgeColor:'#000000', assSrcEdgeColor:'#000000', assDstEdgeAlpha:'60', assSrcEdgeAlpha:'60',
+    assDstAlign:'2', assSrcAlign:'2', assMarginL:'60', assMarginR:'60',
     /* v0.9.229：两个框统一是「这一行离画面底边多远」。分屏下译文离底 42、原文离底 922。
        v0.9.230：默认值 981 → 922。981 是「原文只有 1 行、且顶部留 40」时的等价位置
        （1080 − 40 − 行高 59）；但 an2 锚的是块的**下边**，块往上长，原文一旦折成 2 行
@@ -911,6 +1013,10 @@ const TPL_DEFAULTS = {
     assDstSize:'54', assSrcSize:'42', assDstColor:'#FFFFFF', assSrcColor:'#E6C86A',
     assDstOutline:'2.5', assSrcOutline:'2.0', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'90',
+    assDstBold:true, assSrcBold:false, assDstSpacing:'0', assSrcSpacing:'0',
+    assDstEdge:'none', assSrcEdge:'none', assDstEdgeSize:'0', assSrcEdgeSize:'0',
+    assDstEdgeColor:'#000000', assSrcEdgeColor:'#000000', assDstEdgeAlpha:'60', assSrcEdgeAlpha:'60',
+    assDstAlign:'2', assSrcAlign:'2', assMarginL:'60', assMarginR:'60',
     /* 双行：译文离底 42、原文离底 117（= 旧「贴底 42 + 行高 + 墨迹间隙 8」的位置，
        视觉与之前一致，但现在是可直接改的绝对数值）。 */
     assDstMV:'42', assSrcMV:'117'
@@ -925,19 +1031,116 @@ function presetKeyOf(tpl){
   if (tpl === 'custom') return assLayoutVal() === 'ass-stack' ? 'stack' : 'split';
   return (tpl === 'split' || tpl === 'stack') ? tpl : 'split';
 }
+/* v0.9.231：checkbox 的 value 恒为 'on'，`el.value = v` 对它完全无效 →
+   「粗体」这类开关会永远重置不回去。统一走这里，按控件类型分别赋值。 */
+function setAssVal(id, v){
+  const el = $(id); if (!el) return;
+  if (el.type === 'checkbox'){ el.checked = !!(v === true || v === '1' || v === 'true' || v === 'on'); return; }
+  el.value = (v == null ? '' : v);
+}
+/* v0.9.231：底衬（BorderStyle=3）下播放器忽略 Shadow，「深度」就成了填了没反应的框。
+   与其在导出时偷偷忽略，不如界面上直接禁用——用户看得见，不是潜规则。 */
+function syncAssEdge(){
+  ['Dst','Src'].forEach(function(p){
+    const sel = $('ass'+p+'Edge'), sz = $('ass'+p+'EdgeSize');
+    if (sel && sz) sz.disabled = (sel.value === 'box');
+  });
+}
+const ALPHA_PAIRS = [['assDstAlpha','assDstAlphaOut'],['assSrcAlpha','assSrcAlphaOut'],
+                     ['assDstEdgeAlpha','assDstEdgeAlphaOut'],['assSrcEdgeAlpha','assSrcEdgeAlphaOut']];
 function applyTplDefaults(tpl){
   const d = TPL_DEFAULTS[presetKeyOf(tpl)] || TPL_DEFAULTS.split;
-  Object.keys(d).forEach(k=>{ const el=$(k); if(el) el.value=d[k]; });
-  ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor'].forEach(syncColorSw);
-  const a1=$('assDstAlphaOut'), a2=$('assSrcAlphaOut');
-  if(a1) a1.textContent=d.assDstAlpha+'%';
-  if(a2) a2.textContent=d.assSrcAlpha+'%';
+  Object.keys(d).forEach(k=>setAssVal(k, d[k]));
+  ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor','assDstEdgeColor','assSrcEdgeColor'].forEach(syncColorSw);
+  ALPHA_PAIRS.forEach(pair=>{ const o=$(pair[1]); if(o) o.textContent=$(pair[0]).value+'%'; });
+  syncAssEdge();
 }
 function resetAssDefaults(){
   applyTplDefaults(tplVal());
   renderAssPv();
   const note = $('assImportNote'); if (note) note.style.display = 'none';
   toast(t('assResetDone'));
+}
+/* ================= v0.9.231：自定义样式方案 =================
+   调好一套参数后存下来复用。存 localStorage（换设备/清缓存会丢）→ 另给 JSON 导出/导入做备份。
+   ⚠️ 方案 = 全部样式字段 + 布局 + 上下顺序。少了后两者，套上去位置还是不对，等于半套方案。
+   ⚠️ 应用方案**只能**走 setAssVal + syncAssChrome，绝不能走 syncAssPanel——
+      那会触发 applyTplDefaults 把刚应用的值整套覆盖成模板预设（与导入 ASS 同一个坑）。 */
+const SCHEME_KEY = 'srt_merge_ass_schemes_v1';
+const SCHEME_COLOR_IDS = ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor','assDstEdgeColor','assSrcEdgeColor'];
+function schemeFields(){
+  const o = { __v: 1, __layout: (function(){ const r=document.querySelector('input[name=assLayout]:checked'); return r ? r.value : 'split'; })(), __order: orderVal() };
+  ASS_DEFAULTS.forEach(function(pair){ const id = pair[0], el = $(id); if (!el) return;
+    o[id] = (el.type === 'checkbox') ? !!el.checked : el.value; });
+  ['assMarginL','assMarginR'].forEach(function(id){ const el=$(id); if (el) o[id] = el.value; });
+  return o;
+}
+function schemeLoad(){ try { return JSON.parse(localStorage.getItem(SCHEME_KEY) || '{}') || {}; } catch(e){ return {}; } }
+function schemeStore(o){ try { localStorage.setItem(SCHEME_KEY, JSON.stringify(o)); } catch(e){} }
+function renderSchemeList(){
+  const sel = $('schemeList'), all = schemeLoad();
+  if (!sel) return;
+  const names = Object.keys(all).sort(function(a,b){ return a.localeCompare(b, 'zh'); });
+  sel.innerHTML = '';
+  if (!names.length){
+    const o = document.createElement('option'); o.value = ''; o.textContent = t('schemeNone');
+    sel.appendChild(o); sel.disabled = true;
+  } else {
+    names.forEach(function(n){ const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o); });
+    sel.disabled = false;
+  }
+}
+function schemeDoSave(){
+  const name = String(window.prompt(t('schemeAskName')) || '').trim();
+  if (!name) return;
+  const all = schemeLoad(); all[name] = schemeFields(); schemeStore(all);
+  renderSchemeList(); const sel = $('schemeList'); if (sel) sel.value = name;
+  toast(t('schemeSaved', name));
+}
+function schemeApplyObj(s, label){
+  Object.keys(s).forEach(function(k){ if (k.slice(0,2) === '__') return; setAssVal(k, s[k]); });
+  const lay = document.querySelector('input[name=assLayout][value="' + (s.__layout === 'stack' ? 'stack' : 'split') + '"]');
+  if (lay) lay.checked = true;
+  const ord = document.querySelector('input[name=biOrder][value="' + (s.__order === 'dst-first' ? 'dst-first' : 'src-first') + '"]');
+  if (ord) ord.checked = true;
+  SCHEME_COLOR_IDS.forEach(syncColorSw);
+  ALPHA_PAIRS.forEach(function(pair){ const o = $(pair[1]); if (o) o.textContent = $(pair[0]).value + '%'; });
+  syncAssEdge(); syncAssChrome(); renderAssPv();
+  if (label) toast(t('schemeApplied', label));
+}
+function schemeDoApply(){
+  const sel = $('schemeList'); if (!sel || !sel.value){ toast(t('schemeApplyNone')); return; }
+  const s = schemeLoad()[sel.value];
+  if (!s){ toast(t('schemeApplyNone')); return; }
+  schemeApplyObj(s, sel.value);
+}
+function schemeDoDel(){
+  const sel = $('schemeList'); if (!sel || !sel.value){ toast(t('schemeApplyNone')); return; }
+  const name = sel.value;
+  if (!window.confirm(t('schemeDelAsk', name))) return;
+  const all = schemeLoad(); delete all[name]; schemeStore(all); renderSchemeList();
+  toast(t('schemeDeleted', name));
+}
+function schemeDoExport(){
+  const blob = new Blob([JSON.stringify(schemeLoad(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'ass-schemes.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+}
+function schemeDoImport(file){
+  const r = new FileReader();
+  r.onload = function(){
+    let obj = null;
+    try { obj = JSON.parse(String(r.result || '')); } catch(e){ obj = null; }
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)){ toast(t('schemeBadJson')); return; }
+    const all = schemeLoad(); let n = 0;
+    Object.keys(obj).forEach(function(k){ const v = obj[k]; if (v && typeof v === 'object'){ all[k] = v; n++; } });
+    schemeStore(all); renderSchemeList();
+    toast(t('schemeImported', n));
+  };
+  r.onerror = function(){ toast(t('schemeNoFile')); };
+  r.readAsText(file);
 }
 /* ASS 外观面板显隐：无风格模板（srt/vtt）整个隐藏；custom 显示布局选择 */
 /* 只管显隐与说明文案（v0.9.227：导入样式时要复用它，但绝不能顺带套预设把导入值冲掉） */
@@ -990,6 +1193,14 @@ function assColorVal(id,dflt){
   const v=String(($(id)||{}).value||'').trim();
   return /^#?[0-9a-f]{6}$/i.test(v) ? v : (dflt||'');
 }
+/* ---- v0.9.231 新字段的读数工具 ----
+   ⚠️ 这些函数只做「越界/非法值 → 回落默认」这一件事，**不做任何按内容自动修正**
+   （10-06 用户拍板：不要潜规则，用户填什么就是什么，预览必须等于导出的字面结果）。 */
+function spOf(id){ const n=parseFloat(($(id)||{}).value); return isFinite(n) ? Math.max(-20, Math.min(20, n)) : 0; }
+function szOf(id){ const n=parseFloat(($(id)||{}).value); return isFinite(n) ? Math.max(0, Math.min(20, n)) : 0; }
+function edgeOf(id){ const v=String(($(id)||{}).value||'none'); return (v==='shadow'||v==='box') ? v : 'none'; }
+function alOf(id){ const n=parseInt(($(id)||{}).value,10); return (n===1||n===3) ? n : 2; }
+function mgOf(id){ const n=parseInt(($(id)||{}).value,10); return (isFinite(n)&&n>=0) ? Math.min(600,n) : 60; }
 function assMVs(){
   const d=parseInt(($('assDstMV')||{}).value,10), s=parseInt(($('assSrcMV')||{}).value,10);
   /* 兜底：译文 42 / 原文 922（与分屏预设一致，仅在输入框被清空等异常时生效） */
@@ -1012,6 +1223,22 @@ function assStyleOf(){
     srcFont: (($('assSrcFont')||{}).value) || '',
     dstAlpha: alphaOf('assDstAlpha'),
     srcAlpha: alphaOf('assSrcAlpha'),
+    /* ---------- v0.9.231 新增字段：值与界面一一对应，不做任何加工 ---------- */
+    dstBold: !!($('assDstBold')||{}).checked,
+    srcBold: !!($('assSrcBold')||{}).checked,
+    dstSpacing: spOf('assDstSpacing'), srcSpacing: spOf('assSrcSpacing'),
+    /* 「阴影/底衬」三选一 → ASS 的 BorderStyle + Shadow。底衬模式下 Shadow 恒 0
+       （播放器就是这么处理的，界面上那个框此时是禁用的，不是我们偷偷改）。 */
+    dstBox: edgeOf('assDstEdge') === 'box', srcBox: edgeOf('assSrcEdge') === 'box',
+    dstShadow: edgeOf('assDstEdge') === 'shadow' ? szOf('assDstEdgeSize') : 0,
+    srcShadow: edgeOf('assSrcEdge') === 'shadow' ? szOf('assSrcEdgeSize') : 0,
+    /* BackColour 一个字段两用：BorderStyle=1 时是阴影色，=3 时是底衬色（ASS 本就如此） */
+    dstBackColor: hexToAss(assColorVal('assDstEdgeColor','#000000')) || '&H00000000',
+    srcBackColor: hexToAss(assColorVal('assSrcEdgeColor','#000000')) || '&H00000000',
+    dstBackAlpha: alphaOf('assDstEdgeAlpha'), srcBackAlpha: alphaOf('assSrcEdgeAlpha'),
+    /* 只开放 1/2/3（底左/中/右）：两条都用「离底距离」定位，再放开 4-9 会与离底语义打架 */
+    dstAlign: alOf('assDstAlign'), srcAlign: alOf('assSrcAlign'),
+    marginL: mgOf('assMarginL'), marginR: mgOf('assMarginR'),
     marginV: 42, dstMV: Math.max(0, m.dst), srcMV: Math.max(0, m.src)
   };
 }
@@ -1106,24 +1333,65 @@ function renderAssPv(){
   /* v0.9.229：两个框都是「距画面底边多远」，一条字幕算一个绝对位置。
      预览与导出同一口径，不需要再按实测行数重算抬高量。 */
   const dstMV = Math.max(0, m.dst), srcMV = Math.max(0, m.src);
-  const paint = (el, text, size, colorId, outline, outlineColorId, alpha, mv, fontVal) => {
-    el.textContent = text;
-    el.style.fontSize = (size * k).toFixed(1) + 'px';
-    el.style.color = colOf(colorId);
-    el.style.opacity = (alpha / 100).toFixed(2);
-    el.style.webkitTextStroke = (Number(outline) * k).toFixed(2) + 'px ' + colOf(outlineColorId);
-    el.style.paintOrder = 'stroke fill';
-    el.style.fontFamily = '"' + String(fontVal || 'PingFang SC') + '", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
-    el.style.top = 'auto';
-    el.style.bottom = (mv * k).toFixed(1) + 'px';
+  /* hex → rgba：阴影与底衬都要按各自的不透明度混合，不能整行用 opacity 一起打折
+     （ASS 里 PrimaryColour 的 alpha 只作用于文字填充，BackColour 的 alpha 只作用于阴影/底衬）。 */
+  const rgbaOf = (hex, aPct) => {
+    const mm = /^#?([0-9a-f]{6})$/i.exec(String(hex||'').trim());
+    if (!mm) return 'rgba(0,0,0,' + (aPct/100).toFixed(2) + ')';
+    const h = mm[1];
+    return 'rgba(' + parseInt(h.slice(0,2),16) + ',' + parseInt(h.slice(2,4),16) + ',' +
+           parseInt(h.slice(4,6),16) + ',' + (aPct/100).toFixed(2) + ')';
+  };
+  /* 左右边距 = 导出的 MarginL/R，决定折行宽度（v0.9.230 起预览与导出同宽，这里跟随数值） */
+  const MLP = (mgOf('assMarginL') / 1920 * 100).toFixed(4) + '%';
+  const MRP = (mgOf('assMarginR') / 1920 * 100).toFixed(4) + '%';
+  const paint = (el, text, o) => {
+    const inner = el.firstElementChild || el;
+    inner.textContent = text;
+    const css = el.style;
+    css.fontSize = (o.size * k).toFixed(1) + 'px';
+    css.color = rgbaOf(colOf(o.colorId), o.alpha);
+    css.webkitTextStroke = (Number(o.outline) * k).toFixed(2) + 'px ' + colOf(o.outlineColorId);
+    css.paintOrder = 'stroke fill';
+    css.fontFamily = '"' + String(o.font || 'PingFang SC') + '", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
+    css.fontWeight = o.bold ? '700' : '400';
+    css.letterSpacing = (o.spacing * k).toFixed(2) + 'px';
+    css.textAlign = o.align === 1 ? 'left' : (o.align === 3 ? 'right' : 'center');
+    css.paddingLeft = MLP; css.paddingRight = MRP;
+    css.top = 'auto';
+    css.bottom = (o.mv * k).toFixed(1) + 'px';
+    /* 阴影 / 底衬都作用在 span 上：底衬必须紧贴文字包围盒，加在整行会画成通栏黑带，
+       与播放器里的 BorderStyle=3 完全不符。 */
+    const ic = inner.style;
+    ic.background = 'transparent'; ic.padding = '0'; ic.textShadow = 'none';
+    if (o.edge === 'shadow'){
+      const d = (Number(o.edgeSize) * k).toFixed(2);
+      ic.textShadow = d + 'px ' + d + 'px 0 ' + rgbaOf(colOf(o.edgeColorId), o.edgeAlpha);
+    } else if (o.edge === 'box'){
+      /* 底衬的外扩量就是 ASS 的 Outline（界面上「深度」此时禁用，不是我们偷偷忽略） */
+      const pad = (Number(o.outline) * k).toFixed(2);
+      ic.background = rgbaOf(colOf(o.edgeColorId), o.edgeAlpha);
+      ic.padding = pad + 'px ' + pad + 'px';
+    }
+  };
+  const sideOf = p => {
+    const P = p === 'dst' ? 'Dst' : 'Src';
+    return {
+      size: st[p+'Size'], colorId: 'ass'+P+'Color', outline: st[p+'Outline'],
+      outlineColorId: 'ass'+P+'OutlineColor', alpha: st[p+'Alpha'],
+      mv: (p === 'dst') ? dstMV : srcMV, font: st[p+'Font'],
+      bold: st[p+'Bold'], spacing: st[p+'Spacing'], align: st[p+'Align'],
+      edge: st[p+'Box'] ? 'box' : (st[p+'Shadow'] > 0 ? 'shadow' : 'none'),
+      edgeSize: st[p+'Shadow'], edgeColorId: 'ass'+P+'EdgeColor', edgeAlpha: st[p+'BackAlpha']
+    };
   };
   /* 行 1 = 视觉上那条，行 2 = 下面那条；两条都按各自的离底距离定位 */
   if (dstFirst){
-    paint(l1, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, dstMV, st.dstFont);
-    paint(l2, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, srcMV, st.srcFont);
+    paint(l1, samp.zh, sideOf('dst'));
+    paint(l2, samp.en, sideOf('src'));
   } else {
-    paint(l1, samp.en, st.srcSize, 'assSrcColor', st.srcOutline, 'assSrcOutlineColor', st.srcAlpha, srcMV, st.srcFont);
-    paint(l2, samp.zh, st.dstSize, 'assDstColor', st.dstOutline, 'assDstOutlineColor', st.dstAlpha, dstMV, st.dstFont);
+    paint(l1, samp.en, sideOf('src'));
+    paint(l2, samp.zh, sideOf('dst'));
   }
   if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p';
 }
@@ -1208,15 +1476,27 @@ function ensureFontOption(sel, name){
   sel.insertBefore(o, sel.firstChild);
 }
 function setAssFields(pfx, f){
-  const setv = (id, v) => { const el = $(id); if (el && v != null && v !== '') el.value = v; };
+  const setv = (id, v) => { if (v != null && v !== '') setAssVal(id, v); };
   setv(pfx + 'Size', f.size);
   setv(pfx + 'Color', f.color);
   setv(pfx + 'Outline', f.outline);
   setv(pfx + 'OutlineColor', f.outlineColor);
   if (f.font){ const el = $(pfx + 'Font'); if (el){ ensureFontOption(el, f.font); el.value = f.font; } }
   setv(pfx + 'Alpha', f.alpha);
-  syncColorSw(pfx + 'Color'); syncColorSw(pfx + 'OutlineColor');
+  /* v0.9.231：粗体 / 字间距 / 阴影·底衬 / 边色 / 水平对齐 一并继承。
+     这些字段 parseAssStyles 早就读出来了，不在这里回填的话「导入继承样式」是假的
+     （导一份带底衬的字幕进来，界面上会显示成「无」）。 */
+  setv(pfx + 'Bold', f.bold ? true : false);
+  setv(pfx + 'Spacing', f.spacing != null ? f.spacing : 0);
+  setv(pfx + 'Edge', f.edge || 'none');
+  setv(pfx + 'EdgeSize', f.edgeSize != null ? f.edgeSize : 0);
+  setv(pfx + 'EdgeColor', f.edgeColor || '#000000');
+  setv(pfx + 'EdgeAlpha', f.edgeAlpha != null ? f.edgeAlpha : 60);
+  setv(pfx + 'Align', f.alignNum || 2);
+  ['Color','OutlineColor','EdgeColor'].forEach(s=>syncColorSw(pfx + s));
   const out = $(pfx + 'AlphaOut'); if (out && f.alpha != null) out.textContent = f.alpha + '%';
+  const eo = $(pfx + 'EdgeAlphaOut'); if (eo) eo.textContent = (($(pfx+'EdgeAlpha')||{}).value || 60) + '%';
+  syncAssEdge();
 }
 function noteAssImport(plan){
   const el = $('assImportNote'); if (!el) return;
@@ -1245,6 +1525,11 @@ function applyAssPlan(plan){
   const dm = $('assDstMV'), sm = $('assSrcMV');
   if (dm && plan.dstMV != null) dm.value = plan.dstMV;
   if (sm && plan.srcMV != null) sm.value = plan.srcMV;
+  /* v0.9.231：左右边距是全局一对（它决定折行宽度，两侧必须同一个值），
+     取主（译文）那侧。文件里写 0 就继承 0——继承优先，不擅自替用户改成 60。 */
+  const mg = plan.dst || plan.src;
+  if (mg && mg.marginL != null){ const el = $('assMarginL'); if (el) el.value = mg.marginL; }
+  if (mg && mg.marginR != null){ const el = $('assMarginR'); if (el) el.value = mg.marginR; }
   syncAssChrome();
   noteAssImport(plan);
   renderAssPv();
@@ -1296,9 +1581,18 @@ function init(){
   f2.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
   /* v0.9.224：参数一改，预览即时重画（微调在当前模板内保留；切模板会被预设覆盖，这是预期行为） */
   ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor',
-   'assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV'].forEach(id=>{
+   'assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV',
+   /* v0.9.231 新增：粗体 / 字间距 / 阴影·底衬 / 深度 / 边色 / 边色不透明 / 水平对齐 / 左右边距 */
+   'assDstBold','assSrcBold','assDstSpacing','assSrcSpacing','assDstEdge','assSrcEdge','assDstEdgeSize','assSrcEdgeSize',
+   'assDstEdgeColor','assSrcEdgeColor','assDstEdgeAlpha','assSrcEdgeAlpha','assDstAlign','assSrcAlign',
+   'assMarginL','assMarginR'].forEach(id=>{
     const el = $(id); if (!el) return;
     ['input','change'].forEach(ev=>el.addEventListener(ev, renderAssPv));
+  });
+  /* 「阴影/底衬」切到「底衬」时「深度」要禁用（播放器会忽略它，留着就是填了没反应的框） */
+  ['assDstEdge','assSrcEdge'].forEach(id=>{
+    const el = $(id); if (!el) return;
+    el.addEventListener('change', syncAssEdge);
   });
   /* v0.9.229：位置改由两个「离底距离」决定之后，只换样式名是看不出任何变化的
      （Bottom 与 TopMain 外观相同、都底部对齐）——「上下顺序」必须真的把两条对调，
@@ -1315,8 +1609,20 @@ function init(){
   document.querySelectorAll('input[name=assLayout]').forEach(el=>el.addEventListener('change', syncAssPanel));
   $('btnAssReset').addEventListener('click', resetAssDefaults);
   syncAssPanel();
+  /* ---------- v0.9.231：自定义样式方案 ---------- */
+  $('btnSchemeSave').addEventListener('click', schemeDoSave);
+  $('btnSchemeApply').addEventListener('click', schemeDoApply);
+  $('btnSchemeDel').addEventListener('click', schemeDoDel);
+  $('btnSchemeExport').addEventListener('click', schemeDoExport);
+  $('btnSchemeImport').addEventListener('click', ()=>{ const f=$('schemeFile'); if (f) f.click(); });
+  $('schemeFile').addEventListener('change', e=>{
+    const f = e.target.files && e.target.files[0];
+    if (f) schemeDoImport(f);
+    e.target.value = '';
+  });
+  renderSchemeList();
   /* 颜色色板 + alpha 百分比输出 */
-  ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor'].forEach(id=>{
+  SCHEME_COLOR_IDS.forEach(id=>{
     const el=$(id); if(!el) return;
     el.addEventListener('input', ()=>syncColorSw(id));
     el.addEventListener('change', ()=>{
@@ -1326,8 +1632,8 @@ function init(){
     });
     syncColorSw(id);
   });
-  [['assDstAlpha','assDstAlphaOut'],['assSrcAlpha','assSrcAlphaOut']].forEach(pair=>{
-    const r=$(pair[0]), o=$(pair[1]);
+  ALPHA_PAIRS.forEach(pair=>{
+    const r=$(pair[0]), o=$(pair[1]); if(!r||!o) return;
     const upd=()=>{ o.textContent=r.value+'%'; };
     r.addEventListener('input', upd); r.addEventListener('change', upd); upd();
   });

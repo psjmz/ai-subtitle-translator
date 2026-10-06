@@ -752,6 +752,9 @@
         primary: get('primarycolour'), outlineColor: get('outlinecolour'), back: get('backcolour'),
         bold: parseInt(get('bold'), 10) || 0, italic: parseInt(get('italic'), 10) || 0,
         outline: parseFloat(get('outline')), shadow: parseFloat(get('shadow')),
+        /* v0.9.231：BorderStyle（1=描边+阴影 / 3=不透明底衬）此前没读 → 导入底衬字幕会退化成描边 */
+        borderStyle: parseInt(get('borderstyle'), 10) || 1,
+        spacing: parseFloat(get('spacing')) || 0,
         alignment: parseInt(get('alignment'), 10) || 2,
         marginL: parseFloat(get('marginl')) || 0,
         marginR: parseFloat(get('marginr')) || 0,
@@ -781,6 +784,12 @@
     const c  = assColorHex(st.primary) || { hex: '#FFFFFF', alpha: 100 };
     const oc = assColorHex(st.outlineColor) || { hex: '#000000', alpha: 100 };
     const ol = (isFinite(st.outline) ? st.outline : 2) * kk;
+    /* v0.9.231：粗体 / 字间距 / 阴影·底衬 / 边色 / 水平对齐 以前解析了却不往外传 →
+       导入一份带阴影或底衬的字幕，界面上全变成「无」，等于样式继承是假的。
+       ⚠️ BackColour 在 ASS 里既是阴影色（BorderStyle=1）也是底衬色（=3），同一个字段，别拆成两个。 */
+    const bc = assColorHex(st.back) || { hex: '#000000', alpha: 60 };
+    const sh = (isFinite(st.shadow) ? st.shadow : 0) * kk;
+    const box = (st.borderStyle === 3);
     return {
       name: st.name,
       font: st.font || '',
@@ -788,8 +797,17 @@
       color: c.hex, alpha: c.alpha,
       outline: Math.max(0, Math.min(10, Math.round(ol * 10) / 10)),
       outlineColor: oc.hex,
+      /* Bold 在 ASS 里 -1/0（也有写 1 的），不等于 0 就算粗 */
+      bold: (st.bold !== 0),
+      spacing: Math.max(-20, Math.min(20, (isFinite(st.spacing) ? st.spacing : 0) * kk)),
+      edge: box ? 'box' : (sh > 0.05 ? 'shadow' : 'none'),
+      edgeSize: Math.max(0, Math.min(20, Math.round(sh * 10) / 10)),
+      edgeColor: bc.hex, edgeAlpha: bc.alpha,
+      marginL: Math.max(0, Math.min(600, Math.round((st.marginL || 0) * kk))),
+      marginR: Math.max(0, Math.min(600, Math.round((st.marginR || 0) * kk))),
       marginV: Math.max(0, Math.min(1080, Math.round((st.marginV || 0) * kk))),
-      align: assAlignOf(st.alignment)
+      align: assAlignOf(st.alignment),
+      alignNum: (function(){ const n = parseInt(st.alignment, 10); return (n === 1 || n === 3) ? n : (n >= 7 ? (n - 6) : 2); })()
     };
   }
   /* 一份字幕里被用得最多的样式 = 它的主样式（合并模式两侧各取各的） */
@@ -1082,6 +1100,33 @@
     };
     const DST_A = alphaOf(AS.dstAlpha);
     const SRC_A = alphaOf(AS.srcAlpha);
+    /* ---------- v0.9.231：以下字段此前全部写死，现在开放给 UI ----------
+       ⚠️ 一律「未传 → 沿用旧写死值」，否则不传 assStyle 的老调用输出会变，
+       既有单测与用户已导出的文件全部被打乱（v0.9.100 定的兼容约定，别破）。 */
+    /* Bold：ASS 惯例 -1=粗 / 0=不粗。旧值译文 -1、原文 0（中文粗英文细）。 */
+    const boldOf = (v, dflt) => { if (v == null || v === '') return dflt; return (v === true || v === -1 || v === 'true' || +v > 0) ? -1 : 0; };
+    const DST_BOLD = boldOf(AS.dstBold, -1), SRC_BOLD = boldOf(AS.srcBold, 0);
+    /* Spacing：字间距（px，1080p 基准），可负 */
+    const spOf = v => Math.max(-20, Math.min(20, numOr(v, 0)));
+    const DST_SP = spOf(AS.dstSpacing), SRC_SP = spOf(AS.srcSpacing);
+    /* BorderStyle：1=描边+阴影，3=不透明底衬（框）。libass/VSFilter 在 3 下忽略 Shadow，
+       所以「阴影」与「底衬」在界面上是互斥的一个三选一（无/阴影/底衬），不是潜规则。 */
+    const bsOf = v => (v === 3 || v === '3' || v === 'box' || v === true) ? 3 : 1;
+    const DST_BS = bsOf(AS.dstBox), SRC_BS = bsOf(AS.srcBox);
+    const shOf = v => Math.max(0, Math.min(20, numOr(v, 0)));
+    const DST_SH = shOf(AS.dstShadow), SRC_SH = shOf(AS.srcShadow);
+    /* Alignment：只开放 1/2/3（底左/底中/底右）。两条都用「离底距离」定位，
+       再开放 4-9 会与离底语义打架（an8 的 MarginV 是距顶），故一律夹回底部三档。 */
+    const alOf = v => { const n = parseInt(v, 10); return (n === 1 || n === 3) ? n : 2; };
+    const DST_AL = alOf(AS.dstAlign), SRC_AL = alOf(AS.srcAlign);
+    /* BackColour：BorderStyle=1 时是阴影色，=3 时是底衬色（ASS 里本来就是同一个字段）。
+       旧值 &H64000000（约 60% 黑）——未传时逐字节沿用，传了才按 UI 的色+不透明度拼。 */
+    const RE_BACK = /^&H[0-9A-Fa-f]{8}$/;
+    const backOf = (col, a) => RE_BACK.test(String(col || ''))
+      ? ('&H' + alphaOf(a) + String(col).slice(4).toUpperCase()) : '&H64000000';
+    const DST_BC = backOf(AS.dstBackColor, AS.dstBackAlpha), SRC_BC = backOf(AS.srcBackColor, AS.srcBackAlpha);
+    /* MarginL / MarginR：此前两侧都取同一个 ML，现在分开（影响折行宽度，故界面上是全局共用一对） */
+    const MR = Math.max(0, Math.min(600, Math.round(numOr(AS.marginR, ML))));
     const STYLE_FMT = 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding';
     // 样式行模板（v0.9.35 分工不变：字号跟角色走、位置跟模式走）
     // v0.9.102 / v0.9.229：译文、原文各用各的「离底距离」（Bottom·TopMain=译文 / Sub·Top=原文）；
@@ -1089,15 +1134,20 @@
     /* v0.9.217：样式行生成。字体/描边/描边色/主色 alpha 都由调用方按「译文 or 原文」传入，
        不再用写死的 FONT / OUTL —— 这是「译文原文各配一套」能落地的前提。
        bold 传 -1/0（ASS 惯例 -1=粗体）；未传时沿用 v0.9.35 的原值。 */
-    const styleLine = (name, size, color, align, bold, mv, font, outline, outlineColor, alpha) => {
-      const f = font || FONT;
-      const ol = (outline == null) ? OUTL : outline;
+    const styleLine = (name, o) => {
+      const f = o.font || FONT;
+      const ol = (o.outline == null) ? OUTL : o.outline;
       /* 主色带不透明度：把 &H00BBGGRR 的「00」换成 alphaOf 算出的两位十六进制。
          描边色同理（ASS 的 OutlineColour 也支持 alpha，这里保持不透明以免文字边缘发虚）。 */
       const withAlpha = (col, a) => '&H' + a + String(col).slice(4);
-      return 'Style: ' + name + ',' + f + ',' + size + ',' + withAlpha(color, alpha || '00') +
-        ',&H000000FF,' + (outlineColor || '&H00000000') + ',&H64000000,' + bold + ',0,0,0,100,100,0,0,1,' + ol +
-        ',0,' + align + ',' + ML + ',' + ML + ',' + (mv == null ? MV : mv) + ',1';
+      const sp = (o.spacing == null) ? 0 : o.spacing;
+      /* v0.9.231：粗体/字间距/描边样式/阴影/底衬色/对齐/左右边距全部来自调用方，
+         未给的分项沿用各自的旧默认值（见上方常量），不传 assStyle 时输出与 v0.9.230 逐字节一致。 */
+      return 'Style: ' + name + ',' + f + ',' + o.size + ',' + withAlpha(o.color, o.alpha || '00') +
+        ',&H000000FF,' + (o.outlineColor || '&H00000000') + ',' + (o.back || '&H64000000') + ',' +
+        (o.bold == null ? -1 : o.bold) + ',0,0,0,100,100,' + sp + ',0,' +
+        (o.borderStyle || 1) + ',' + ol + ',' + (o.shadow || 0) + ',' + (o.align || 2) + ',' +
+        ML + ',' + MR + ',' + (o.mv == null ? MV : o.mv) + ',1';
     };
     const header = [
       '[Script Info]',
@@ -1111,14 +1161,22 @@
       '',
       '[V4+ Styles]',
       STYLE_FMT,
-      styleLine('Bottom', DST_SZ, DST_C, 2, -1, DST_MV, DST_FONT, DST_OUTL, DST_OC, DST_A),
-      styleLine('Top', SRC_SZ, SRC_C, 2, 0, SRC_MV, SRC_FONT, SRC_OUTL, SRC_OC, SRC_A),
+      styleLine('Bottom', { size:DST_SZ, color:DST_C, align:DST_AL, bold:DST_BOLD, mv:DST_MV,
+        font:DST_FONT, outline:DST_OUTL, outlineColor:DST_OC, alpha:DST_A,
+        spacing:DST_SP, borderStyle:DST_BS, shadow:DST_SH, back:DST_BC }),
+      styleLine('Top', { size:SRC_SZ, color:SRC_C, align:SRC_AL, bold:SRC_BOLD, mv:SRC_MV,
+        font:SRC_FONT, outline:SRC_OUTL, outlineColor:SRC_OC, alpha:SRC_A,
+        spacing:SRC_SP, borderStyle:SRC_BS, shadow:SRC_SH, back:SRC_BC }),
       // TopMain（v0.9.35）：主语言样式——外观与 Bottom 一致（主字号/主色），
       // 「译文在上」分屏模式下译文用它，保证译文无论在哪都保持主阅读字号。
-      styleLine('TopMain', DST_SZ, DST_C, 2, -1, DST_MV, DST_FONT, DST_OUTL, DST_OC, DST_A),
+      styleLine('TopMain', { size:DST_SZ, color:DST_C, align:DST_AL, bold:DST_BOLD, mv:DST_MV,
+        font:DST_FONT, outline:DST_OUTL, outlineColor:DST_OC, alpha:DST_A,
+        spacing:DST_SP, borderStyle:DST_BS, shadow:DST_SH, back:DST_BC }),
       // Sub：副语言样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（副字号/副色），
       // 纵向位置由每条 Dialogue 的 MarginV（ln.mv）指定；mv=0 时回退样式默认 MarginV。
-      styleLine('Sub', SRC_SZ, SRC_C, 2, 0, SRC_MV, SRC_FONT, SRC_OUTL, SRC_OC, SRC_A),
+      styleLine('Sub', { size:SRC_SZ, color:SRC_C, align:SRC_AL, bold:SRC_BOLD, mv:SRC_MV,
+        font:SRC_FONT, outline:SRC_OUTL, outlineColor:SRC_OC, alpha:SRC_A,
+        spacing:SRC_SP, borderStyle:SRC_BS, shadow:SRC_SH, back:SRC_BC }),
       '',
       '[Events]',
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'

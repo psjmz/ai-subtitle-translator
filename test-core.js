@@ -5332,7 +5332,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.230/.test(mg), 'merge.html 未引用 v0.9.230 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.231/.test(mg), 'merge.html 未引用 v0.9.231 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5365,9 +5365,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.230</.test(html), '首页版本号未升 0.9.230');
-    assert.ok(/class="ver-tag">v0\.9\.230</.test(html), '工作台版本号未升 0.9.230');
-    assert.ok(/srt-core\.js\?v=0\.9\.230/.test(html), 'srt-core.js?v 未升 0.9.230');
+    assert.ok(/class="ver">v0\.9\.231</.test(html), '首页版本号未升 0.9.231');
+    assert.ok(/class="ver-tag">v0\.9\.231</.test(html), '工作台版本号未升 0.9.231');
+    assert.ok(/srt-core\.js\?v=0\.9\.231/.test(html), 'srt-core.js?v 未升 0.9.231');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5430,7 +5430,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(declAt > 0, '缺 ASS_DEFAULTS 声明');
     const declEnd = mg.indexOf('];', declAt);
     const decl = mg.slice(declAt, declEnd);
-    assert.strictEqual((decl.match(/\['ass[A-Za-z]+','[^']+'\]/g) || []).length, 14, 'ASS_DEFAULTS 应覆盖 14 个字段');
+    /* v0.9.231：14 → 28（新增粗体/字间距/阴影·底衬/深度/边色/边色不透明/水平对齐/左右边距） */
+    assert.strictEqual((decl.match(/\['ass[A-Za-z]+',(?:'[^']+'|true|false)\]/g) || []).length, 30, 'ASS_DEFAULTS 应覆盖 30 个字段');
     /* 模板提示与词条（4 语） */
     ['lblTpl','tplSrt','tplVtt','tplSplit','tplStack','tplCustom','lblLayout','layoutSplit','layoutStack','tplHintPlain','tplHintPreset','tplHintCustom','assReset','assResetDone']
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
@@ -5510,8 +5511,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.230</.test(mg), 'merge.html 版本未升 0.9.230');
-    assert.ok(/merge-core\.js\?v=0\.9\.230/.test(mg), 'merge-core.js?v 未升 0.9.230');
+    assert.ok(/class="ver">v0\.9\.231</.test(mg), 'merge.html 版本未升 0.9.231');
+    assert.ok(/merge-core\.js\?v=0\.9\.231/.test(mg), 'merge-core.js?v 未升 0.9.231');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5628,9 +5629,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/Dialogue: \d,0:00:01\.00,0:00:02\.00,TopMain,,0,0,981,/.test(out), 'TopMain 的 mv 未逐条下发');
     assert.ok(/Dialogue: \d,0:00:01\.00,0:00:02\.00,Top,,0,0,981,/.test(out), 'Top 的 mv 未逐条下发');
     /* 预览：两条都按 bottom 定位，不再有「贴顶」分支 */
-    assert.ok(/el\.style\.bottom = \(mv \* k\)\.toFixed\(1\) \+ 'px';/.test(mg), '预览未按离底距离定位');
+    assert.ok(/css\.bottom = \(o\.mv \* k\)\.toFixed\(1\) \+ 'px';/.test(mg), '预览未按离底距离定位');
     assert.ok(!/atTop/.test(mg), '预览仍有「贴顶」定位分支');
-    assert.ok(/el\.style\.fontFamily = '/.test(mg), '预览未跟随字体设置');
+    assert.ok(/css\.fontFamily = '/.test(mg), '预览未跟随字体设置');
     /* 两个距离框的默认值不同，但语义同一个 */
     assert.ok(/lblMV:'离底距离'/.test(mg), '中文词条应只有「离底距离」');
   });
@@ -5690,6 +5691,133 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.strictEqual(1080 - 922 - 1 * lh, 99, '922 在 1 行时顶边在 99（偏低，由用户自己调）');
     assert.ok(/assDstMV:'42', assSrcMV:'922'/.test(mg), '分屏预设未改成 922');
     assert.ok(!/assSrcMV:'981'/.test(mg), '还有按 1 行给的 981 默认值');
+  });
+
+  /* ================= v0.9.231：ASS 样式扩展（粗体/字间距/阴影·底衬/水平对齐/左右边距）=================
+     此前这些字段全部写死在 formatAss 的样式行里，界面上根本没有（10-06 盘点发现）。
+     两条硬约束：①不传 assStyle 的老调用必须与 v0.9.230 逐字节一致（v0.9.100 定的兼容约定，别破）
+     ②传了就必须原样落到样式行，不许按内容加工。 */
+  const FMT231 = ('Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, ' +
+    'Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding').split(', ');
+  const C231 = FMT231.reduce((o, k, i) => { o[k] = i; return o; }, {});   /* 'Style: Name' 是第 0 项 */
+  const col231 = (out, name) => {
+    const ln = out.split('\n').find(x => x.indexOf('Style: ' + name + ',') === 0);
+    return ln ? ln.split(',') : null;
+  };
+  t('v0.9.231：不传 assStyle 时输出与 v0.9.230 逐字节一致（老调用兼容，别破）', () => {
+    const evs = [{ start:0, end:1000, lines:[{ style:'Bottom', text:'译文' }, { style:'Top', text:'原文' }] }];
+    const out = M.formatAss(evs, { title:'t' });
+    const b = col231(out, 'Bottom'), tp = col231(out, 'Top');
+    assert.strictEqual(b[C231.Bold], '-1', '译文默认粗体应仍是 -1');
+    assert.strictEqual(tp[C231.Bold], '0', '原文默认不粗应仍是 0');
+    assert.strictEqual(b[C231.Spacing], '0', '字间距默认应为 0');
+    assert.strictEqual(b[C231.BorderStyle], '1', '默认应为 BorderStyle=1');
+    assert.strictEqual(b[C231.Shadow], '0', '默认应无阴影');
+    assert.strictEqual(b[C231.Alignment], '2', '默认应底部居中');
+    assert.strictEqual(b[C231.BackColour], '&H64000000', '默认 BackColour 变了');
+    assert.strictEqual(b[C231.MarginL], '60');
+    assert.strictEqual(b[C231.MarginR], '60');
+    assert.strictEqual(col231(out, 'TopMain')[C231.Bold], '-1', 'TopMain 应跟译文外观');
+    assert.strictEqual(col231(out, 'Sub')[C231.Bold], '0', 'Sub 应跟原文外观');
+  });
+
+  t('v0.9.231：新字段传进去就原样落到样式行（不许加工）', () => {
+    const evs = [{ start:0, end:1000, lines:[{ style:'Bottom', text:'译文' }, { style:'Top', text:'原文' }] }];
+    const out = M.formatAss(evs, { title:'t', assStyle:{
+      dstSize:56, srcSize:50, dstMV:42, srcMV:922,
+      dstBold:true, srcBold:false, dstSpacing:1.5, srcSpacing:-1,
+      dstBox:false, srcBox:true, dstShadow:3, srcShadow:0,
+      dstBackColor:'&H00112233', dstBackAlpha:50, srcBackColor:'&H00445566', srcBackAlpha:80,
+      dstAlign:1, srcAlign:3, marginL:120, marginR:30
+    }});
+    const b = col231(out, 'Bottom'), tp = col231(out, 'Top');
+    assert.strictEqual(b[C231.Bold], '-1', 'dstBold:true 应写成 -1');
+    assert.strictEqual(tp[C231.Bold], '0', 'srcBold:false 应写成 0');
+    assert.strictEqual(b[C231.Spacing], '1.5');
+    assert.strictEqual(tp[C231.Spacing], '-1', '负字间距不该被夹成 0');
+    assert.strictEqual(b[C231.BorderStyle], '1');
+    assert.strictEqual(tp[C231.BorderStyle], '3', 'srcBox 应触发 BorderStyle=3');
+    assert.strictEqual(b[C231.Shadow], '3');
+    assert.strictEqual(tp[C231.Shadow], '0', '底衬模式下 Shadow 应为 0');
+    assert.strictEqual(b[C231.Alignment], '1');
+    assert.strictEqual(tp[C231.Alignment], '3');
+    /* BackColour = &H + alpha + BBGGRR，alpha = (100−不透明度)/100×255 */
+    const a50 = Math.round((100 - 50) * 255 / 100).toString(16).toUpperCase().padStart(2, '0');
+    const a80 = Math.round((100 - 80) * 255 / 100).toString(16).toUpperCase().padStart(2, '0');
+    assert.strictEqual(b[C231.BackColour], '&H' + a50 + '112233');
+    assert.strictEqual(tp[C231.BackColour], '&H' + a80 + '445566');
+    assert.strictEqual(b[C231.MarginL], '120');
+    assert.strictEqual(b[C231.MarginR], '30');
+    assert.strictEqual(tp[C231.MarginL], '120', '左右边距两侧必须同值（否则折行宽度不一致）');
+    assert.strictEqual(tp[C231.MarginR], '30');
+  });
+
+  t('v0.9.231：底衬/阴影/粗体/字间距/对齐 能从 ASS 解析回来（导入继承不能是假的）', () => {
+    const evs = [{ start:0, end:1000, lines:[{ style:'Bottom', text:'译文' }, { style:'Top', text:'原文' }] }];
+    const out = M.formatAss(evs, { title:'t', assStyle:{
+      dstSize:56, srcSize:50, dstMV:42, srcMV:922,
+      dstBox:true, srcBox:false, srcShadow:4, dstSpacing:0, srcSpacing:2,
+      dstBold:true, srcBold:false, dstBackColor:'&H00000000', dstBackAlpha:70,
+      srcBackColor:'&H00112233', srcBackAlpha:100, dstAlign:3, srcAlign:1,
+      marginL:100, marginR:100
+    }});
+    const p = M.parseAss(out);
+    assert.strictEqual(p.styles.Bottom.borderStyle, 3, 'BorderStyle 没被解析出来');
+    assert.strictEqual(p.styles.Top.shadow, 4, 'Shadow 没被解析出来');
+    const plan = M.planAssImport(p.items, p.styles, p.playResY);
+    /* 位低的是译文（Bottom=42），位高的是原文（Top=922） */
+    assert.strictEqual(plan.dst.name, 'Bottom', '主（译文）判错了');
+    assert.strictEqual(plan.src.name, 'Top', '副（原文）判错了');
+    assert.strictEqual(plan.dst.edge, 'box', '底衬没继承回来');
+    assert.strictEqual(plan.src.edge, 'shadow', '阴影没继承回来');
+    assert.strictEqual(plan.src.edgeSize, 4, '阴影深度没继承回来');
+    assert.strictEqual(plan.src.spacing, 2, '字间距没继承回来');
+    assert.strictEqual(plan.dst.bold, true, '粗体没继承回来');
+    assert.strictEqual(plan.src.bold, false, '「不粗」没继承回来');
+    assert.strictEqual(plan.dst.alignNum, 3, '水平对齐没继承回来');
+    assert.strictEqual(plan.src.alignNum, 1);
+    assert.strictEqual(plan.dst.marginL, 100, '左右边距没继承回来');
+    /* BackColour 一个字段两用（阴影色 / 底衬色），继承回来必须是同一个值 */
+    assert.strictEqual(plan.dst.edgeColor, '#000000', '底衬色没继承回来');
+    assert.strictEqual(plan.src.edgeColor, '#332211', '阴影色没继承回来（注意 &HAABBGGRR 是反的）');
+  });
+
+  t('v0.9.231：预览如实渲染新字段（底衬紧贴文字，不是整行通栏）', () => {
+    const pv = mg.slice(mg.indexOf('function renderAssPv(){'), mg.indexOf('function baseName(){'));
+    assert.ok(/css\.fontWeight = o\.bold \? '700' : '400';/.test(pv), '预览未渲染粗体');
+    assert.ok(/css\.letterSpacing = \(o\.spacing \* k\)/.test(pv), '预览未渲染字间距');
+    assert.ok(/css\.textAlign = o\.align === 1 \? 'left'/.test(pv), '预览未渲染水平对齐');
+    assert.ok(/ic\.textShadow = d \+ 'px ' \+ d \+ 'px 0 '/.test(pv), '预览未渲染阴影');
+    assert.ok(/ic\.background = rgbaOf\(colOf\(o\.edgeColorId\), o\.edgeAlpha\);/.test(pv), '预览未渲染底衬');
+    /* 底衬画在内层 span（紧贴文字）上，绝不能画在整行 div 上——那是通栏黑带，与播放器不符 */
+    assert.ok(/const inner = el\.firstElementChild \|\| el;/.test(pv), '预览未取内层 span');
+    assert.ok(/\.ass-pv-line \.pv-in\{display:inline-block\}/.test(mg), '缺 pv-in 的 inline-block');
+    /* 左右边距跟随数值，不再写死 3.125% */
+    assert.ok(/const MLP = \(mgOf\('assMarginL'\) \/ 1920 \* 100\)/.test(pv), '预览留白未跟随左右边距');
+    /* 文字 alpha 只作用于文字，底衬 alpha 只作用于底衬（不能整行用 opacity 一起打折） */
+    assert.ok(/css\.color = rgbaOf\(colOf\(o\.colorId\), o\.alpha\);/.test(pv), '文字不透明度未独立');
+  });
+
+  t('v0.9.231：自定义方案（保存/应用/删除/导入导出）', () => {
+    assert.ok(/const SCHEME_KEY = 'srt_merge_ass_schemes_v1';/.test(mg), '缺方案存储键');
+    /* 方案必须含布局与上下顺序，否则套上去位置不对 = 半套方案 */
+    assert.ok(/__layout:/.test(mg) && /__order: orderVal\(\)/.test(mg), '方案未保存布局/上下顺序');
+    /* 应用方案绝不能走 syncAssPanel —— 那会套模板预设把刚应用的值整套冲掉 */
+    const fn = mg.slice(mg.indexOf('function schemeApplyObj('), mg.indexOf('function schemeDoApply('));
+    assert.ok(!/syncAssPanel\(\)/.test(fn), '应用方案走了 syncAssPanel（会被预设覆盖）');
+    assert.ok(/syncAssChrome\(\)/.test(fn), '应用方案未同步按钮/面板');
+    /* checkbox 必须用 checked 赋值：el.value 对它完全无效，粗体会永远重置不回去 */
+    assert.ok(/function setAssVal\(id, v\)\{/.test(mg) && /el\.checked = /.test(mg), '缺 setAssVal');
+    /* 底衬模式下「深度」要禁用，不能留一个填了没反应的框（不是偷偷忽略） */
+    assert.ok(/sz\.disabled = \(sel\.value === 'box'\);/.test(mg), '底衬模式未禁用「深度」');
+    /* 每个模板预设都要覆盖全部新字段，否则切模板时新字段残留上一次的值 */
+    ['split','stack'].forEach(tpl => {
+      const blk = mg.slice(mg.indexOf(tpl + ': {'), mg.indexOf(tpl + ': {') + 1400);
+      ['assDstBold','assSrcBold','assDstSpacing','assDstEdge','assDstEdgeColor','assDstEdgeAlpha',
+       'assDstAlign','assSrcAlign','assMarginL','assMarginR'].forEach(k => {
+        assert.ok(blk.indexOf(k + ':') >= 0, tpl + ' 预设缺 ' + k);
+      });
+    });
   });
 
   /* ================= v0.9.229：预览样例仍走折行管线，但定位改为绝对离底 =================
@@ -5879,4 +6007,129 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
     });
   });
+  /* v0.9.231 自查抓到的真 bug：新词条 lblAlign 与既有的「配对方式 · 时间轴取自」同名 →
+     同一个对象字面量里重复键，后者静默覆盖前者 → 配对方式那个标签被显示成「水平对齐」。
+     这条护栏一次管两件事：①四语字典内不许有重复键 ②页面里 data-i18n 用到的 key 四语都必须有。
+     ⚠️ 取键只认「{ 或 , 之后、紧跟 :' 」——否则会把英文文案里的 "file: {0}" 当成词条（误报）。 */
+  t('v0.9.231：merge.html 四语字典无重复键，且页面用到的 key 四语齐全', () => {
+    const dictBlock = (code) => {
+      const re = new RegExp("(?:'|\")?" + code.replace('-', '\\-') + "(?:'|\")?\\s*:\\s*\\{");
+      const m = re.exec(mg);
+      assert.ok(m, '找不到 ' + code + ' 字典');
+      let i = m.index + m[0].length - 1, depth = 0, j = i;
+      for (; j < mg.length; j++) {
+        if (mg[j] === '{') depth++;
+        else if (mg[j] === '}') { depth--; if (depth === 0) break; }
+      }
+      return mg.slice(i, j + 1);
+    };
+    const keysOf = (block) => {
+      const out = [];
+      const re = /[{,]\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*'/g;
+      let m;
+      while ((m = re.exec(block))) out.push(m[1]);
+      return out;
+    };
+    const used = [];
+    const reU = /data-i18n(?:-ph|-html|-title)?="([A-Za-z0-9_]+)"/g;
+    let mu;
+    while ((mu = reU.exec(mg))) used.push(mu[1]);
+    assert.ok(used.length > 50, '页面里几乎没用到 i18n？只找到 ' + used.length);
+    ['zh-CN', 'zh-TW', 'en', 'ja'].forEach(code => {
+      const ks = keysOf(dictBlock(code));
+      const seen = Object.create(null), dup = [];
+      ks.forEach(k => { if (seen[k]) dup.push(k); seen[k] = 1; });
+      assert.deepStrictEqual(dup, [], code + ' 字典里有重复键（后者会静默覆盖前者）：' + dup.join(','));
+      const miss = [...new Set(used)].filter(k => !seen[k]);
+      assert.deepStrictEqual(miss, [], code + ' 字典缺少页面用到的词条：' + miss.join(','));
+    });
+    /* 本版新增词条：四语各一份，不多不少 */
+    ['lblBold','lblSpacing','lblEdge','lblEdgeSize','lblEdgeColor','lblEdgeAlpha','lblHAlign','lblMarginL','lblMarginR',
+     'edgeNone','edgeShadow','edgeBox','alignL','alignC','alignR','edgeTip',
+     'schemeSave','schemeApply','schemeDel','schemeExport','schemeImport','schemeHint','schemeNone',
+     'schemeAskName','schemeSaved','schemeApplyNone','schemeApplied','schemeDelAsk','schemeDeleted',
+     'schemeBadJson','schemeImported','schemeNoFile'].forEach(k => {
+      const c = (mg.match(new RegExp('\\b' + k + ':', 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
+    /* 改名后的护栏：旧的 lblAlign（配对方式）不该被新字段抢走 */
+    assert.ok(/lblAlign:'配对方式 · 时间轴取自'/.test(mg), 'lblAlign 被覆盖成别的含义了');
+    assert.ok(/data-i18n="lblHAlign"/.test(mg), '「水平对齐」未用独立词条 lblHAlign');
+  });
+
+  t('v0.9.231：新字段全部接进导出端（老调用不传 assStyle 时逐字节不变）', () => {
+    /* 老调用：不传 assStyle → 样式行必须与 v0.9.230 完全一致（粗体/间距/对齐/边距都是旧写死值） */
+    const old = M.formatAss([
+      { start: 1000, end: 4000, lines: [{ style: 'Bottom', text: '中文', mv: 42 }, { style: 'Top', text: 'EN', mv: 922 }] }
+    ], { title: 'old' });
+    const st = {};
+    old.split('\n').forEach(x => { if (x.indexOf('Style: ') === 0) { const c = x.split(','); st[c[0].slice(7)] = c; } });
+    ['Bottom','Top','TopMain','Sub'].forEach(n => {
+      assert.ok(st[n], '缺样式 ' + n);
+      assert.strictEqual(st[n][18], '2', n + ' 老调用应仍底部居中');
+      assert.strictEqual(st[n][13], '0', n + ' 老调用字间距应仍 0');
+      assert.strictEqual(st[n][15], '1', n + ' 老调用 BorderStyle 应仍 1');
+      assert.strictEqual(st[n][17], '0', n + ' 老调用 Shadow 应仍 0');
+      assert.strictEqual(st[n][19], '60', n + ' 老调用 MarginL 应仍 60');
+      assert.strictEqual(st[n][20], '60', n + ' 老调用 MarginR 应仍 60');
+    });
+    assert.strictEqual(st.Bottom[7], '-1', '老调用译文应仍粗体');
+    assert.strictEqual(st.Top[7], '0', '老调用原文应仍不粗体');
+  });
+
+  t('v0.9.231：新字段传进去后逐列落到 ASS 样式行', () => {
+    const out = M.formatAss([
+      { start: 1000, end: 4000, lines: [{ style: 'Bottom', text: '中文', mv: 42 }, { style: 'Top', text: 'EN', mv: 922 }] }
+    ], { title: 'new', assStyle: {
+      dstSize: 56, srcSize: 50,
+      dstColor: '&H00FFFFFF', srcColor: '&H0000D7FF',
+      dstOutline: 2.5, srcOutline: 2.5,
+      dstOutlineColor: '&H00000000', srcOutlineColor: '&H00000000',
+      dstFont: 'PingFang SC', srcFont: 'Arial',
+      dstAlpha: 100, srcAlpha: 100,
+      dstBold: false, srcBold: true,
+      dstSpacing: 2, srcSpacing: 0,
+      dstBox: true, srcBox: false,
+      dstShadow: 0, srcShadow: 5,
+      dstBackColor: '&H00000000', srcBackColor: '&H00000000',
+      dstBackAlpha: 80, srcBackAlpha: 60,
+      dstAlign: 1, srcAlign: 3,
+      marginL: 120, marginR: 90,
+      dstMV: 42, srcMV: 922
+    } });
+    const st = {};
+    out.split('\n').forEach(x => { if (x.indexOf('Style: ') === 0) { const c = x.split(','); st[c[0].slice(7)] = c; } });
+    assert.strictEqual(st.Bottom[7], '0', '译文粗体关掉 → Bold=0');
+    assert.strictEqual(st.Top[7], '-1', '原文粗体打开 → Bold=-1');
+    assert.strictEqual(st.Bottom[13], '2', '译文字间距 2');
+    assert.strictEqual(st.Bottom[15], '3', '译文底衬 → BorderStyle=3');
+    assert.strictEqual(st.Bottom[17], '0', '底衬模式下 Shadow 恒 0');
+    assert.strictEqual(st.Top[15], '1', '原文无底衬 → BorderStyle=1');
+    assert.strictEqual(st.Top[17], '5', '原文阴影 5');
+    assert.strictEqual(st.Bottom[18], '1', '译文底·左');
+    assert.strictEqual(st.Top[18], '3', '原文底·右');
+    assert.strictEqual(st.Bottom[19], '120', 'MarginL=120');
+    assert.strictEqual(st.Bottom[20], '90', 'MarginR=90');
+    /* BackColour 的 alpha：80% 不透明 → 20% 透明 → &H33 */
+    assert.strictEqual(st.Bottom[6], '&H33000000', '底衬色 alpha 应为 33（80% 不透明）');
+  });
+
+  t('v0.9.231：ASS_DEFAULTS 覆盖到每个新字段，且方案保存全部带上', () => {
+    ['assDstBold','assSrcBold','assDstSpacing','assSrcSpacing','assDstEdge','assSrcEdge',
+     'assDstEdgeSize','assSrcEdgeSize','assDstEdgeColor','assSrcEdgeColor',
+     'assDstEdgeAlpha','assSrcEdgeAlpha','assDstAlign','assSrcAlign',
+     'assMarginL','assMarginR'].forEach(id => {
+      assert.ok(new RegExp("\\['" + id + "',").test(mg), 'ASS_DEFAULTS 缺 ' + id);
+    });
+    /* 方案 = 全部字段 + 布局 + 上下顺序，少一样就是半套 */
+    assert.ok(/function schemeFields\(\)\{[\s\S]{0,400}__layout/.test(mg), '方案没存布局');
+    assert.ok(/__order: orderVal\(\)/.test(mg), '方案没存上下顺序');
+    assert.ok(/ASS_DEFAULTS\.forEach\(function\(pair\)\{ const id = pair\[0\]/.test(mg), '方案没遍历 ASS_DEFAULTS');
+    assert.ok(/el\.type === 'checkbox'\) \? !!el\.checked : el\.value/.test(mg), '方案存 checkbox 用了 value（无效）');
+    /* 应用方案绝不能走 syncAssPanel —— 那会触发 applyTplDefaults 把值整套覆盖 */
+    assert.ok(!/function schemeApplyObj[\s\S]{0,600}syncAssPanel/.test(mg), '套用方案走了 syncAssPanel，值会被预设冲掉');
+    assert.ok(/function schemeApplyObj[\s\S]{0,800}syncAssEdge\(\); syncAssChrome\(\); renderAssPv\(\);/.test(mg),
+      '套用方案后未同步边色控件/显隐/预览');
+  });
+
 }
