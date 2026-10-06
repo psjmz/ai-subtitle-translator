@@ -5338,7 +5338,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.232/.test(mg), 'merge.html 未引用 v0.9.232 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.233/.test(mg), 'merge.html 未引用 v0.9.233 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5371,9 +5371,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.232</.test(html), '首页版本号未升 0.9.232');
-    assert.ok(/class="ver-tag">v0\.9\.232</.test(html), '工作台版本号未升 0.9.232');
-    assert.ok(/srt-core\.js\?v=0\.9\.232/.test(html), 'srt-core.js?v 未升 0.9.232');
+    assert.ok(/class="ver">v0\.9\.233</.test(html), '首页版本号未升 0.9.233');
+    assert.ok(/class="ver-tag">v0\.9\.233</.test(html), '工作台版本号未升 0.9.233');
+    assert.ok(/srt-core\.js\?v=0\.9\.233/.test(html), 'srt-core.js?v 未升 0.9.233');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5517,8 +5517,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.232</.test(mg), 'merge.html 版本未升 0.9.232');
-    assert.ok(/merge-core\.js\?v=0\.9\.232/.test(mg), 'merge-core.js?v 未升 0.9.232');
+    assert.ok(/class="ver">v0\.9\.233</.test(mg), 'merge.html 版本未升 0.9.233');
+    assert.ok(/merge-core\.js\?v=0\.9\.233/.test(mg), 'merge-core.js?v 未升 0.9.233');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6241,6 +6241,27 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 页面元素真的引用了它们 */
     assert.ok(/data-i18n="lblViaSrv"/.test(html) && /data-tip-i18n="viaSrvTip"/.test(html), '转发开关没接 i18n');
     assert.ok(/data-i18n="lblTemp"/.test(html) && /data-tip-i18n="tempTip"/.test(html), '温度没接 i18n');
+  });
+
+
+  /* ============ v0.9.233：主站 ASS 也去掉自动夹取（与双语合成 v0.9.230 同口径） ============
+     双语合成工具在 v0.9.230 已经确认「用户填什么就是什么，不许偷偷夹」，但主站 index.html
+     还留着 v0.9.130 加的 ASS_TOP_SAFE=42 兜底下限，同一个原则下这是个漏网的潜规则。 */
+  t('v0.9.233：主站 assTopMV 不再偷偷夹取（所见即所得）', () => {
+    assert.ok(!/var ASS_TOP_SAFE/.test(html), 'ASS_TOP_SAFE 常量还在');
+    const src = html.match(/function assTopMV\(bottomDist, nLines, lineH\)\{[\s\S]*?\n\}/);
+    assert.ok(src, '取不到 assTopMV 源码');
+    assert.ok(!/Math\.max/.test(src[0]), 'assTopMV 里还有 Math.max（仍在兜底下限）');
+    const f = new Function(src[0] + '; return assTopMV;')();
+    /* 纯算式：距顶 = 1080 − 离底 − 行数×行高，负值就让它负（顶部块贴边/出画是用户自己的设定） */
+    assert.strictEqual(f(40, 1, 59), 981, '1 行@40 → 981');
+    assert.strictEqual(f(922, 2, 59), 40, '2 行@922 → 40');
+    assert.strictEqual(f(981, 2, 59), -19, '2 行@981 → −19（如实溢出，不夹）');
+    assert.strictEqual(f(981, 3, 59), -78, '3 行@981 → −78（如实溢出，不夹）');
+    assert.strictEqual(f(42, 1, 59), 979, '默认 42/1 行 → 979');
+    /* 只有手改过（dstFix/srcFix）才逐条指定 mv，所以默认值不受这次改动影响 */
+    assert.ok(/dstFirst && L\.dstFix/.test(html) && /!dstFirst && L\.srcFix/.test(html),
+      '顶部 mv 的写入条件变了（默认值也可能被波及）');
   });
 
 }
