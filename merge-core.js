@@ -630,10 +630,239 @@
     if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
     return { items, issues };
   }
-  function formatVtt(items) {
-    return 'WEBVTT\n\n' + items.map((it) =>
-      it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + '\n' + it.text
-    ).join('\n\n') + '\n';
+  /* v0.9.238：opt 可选。不传 → 输出与 v0.9.237 及以前**逐字节一致**（有单测锁）。
+     opt.style = VTT 样式对象，opt.srcLine = 第几行是原文（0 基，-1 = 无原文行）。 */
+  function formatVtt(items, opt) {
+    const st = (opt && opt.style) || null;
+    const srcIdx = (opt && opt.srcLine != null) ? +opt.srcLine : -1;
+    const ts = vttCueSettings(st);
+    const body = (items || []).map((it) => {
+      let tx = String(it.text == null ? '' : it.text);
+      /* srcDiff 关掉 = 连 class 都不标：写了却没有对应 ::cue(.src) 规则，是纯粹的噪音 */
+      if (srcIdx >= 0 && (!st || st.srcDiff !== false)) {
+        const lines = tx.split('\n');
+        if (lines.length > 1 && srcIdx < lines.length && lines[srcIdx].trim()) {
+          lines[srcIdx] = '<c.' + VTT_SRC_CLASS + '>' + lines[srcIdx] + '</c.' + VTT_SRC_CLASS + '>';
+          tx = lines.join('\n');
+        }
+      }
+      return it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + ts + '\n' + tx;
+    }).join('\n\n');
+    const sb = vttStyleBlock(st);
+    return 'WEBVTT' + (sb ? '\n\n' + sb : '') + '\n\n' + body + '\n';
+  }
+
+  // ---------------- VTT 样式（v0.9.238） ----------------
+  /* ⚠️ 这一整套是**复制自 srt-core.js 的独立副本**，与主翻译流程彻底隔离：
+       - merge.html 不加载 srt-core.js（既有护栏）；本文件也不引用它的任何函数/常量
+       - 样式「当前值」存 merge 自己的 localStorage key（srt_merge_vtt_style_v1），不碰主站的 srt_vtt_style_v1
+       - 部署后两页互不影响：在一页改样式、存方案、导文件，另一页一个字节都不会动
+     ⚠️ 代价 = 两边逻辑必须手工保持同源。用单测锁住「参数集合一致」（见 test-core.js 的 238 组），
+       漂移会在测试里立刻炸响，而不是等到用户导出才发现两页长得不一样。
+     ⚠️ 数值一律原样写入（与 srt-core v0.9.234/235 同口径）：填 150% 就写 150%，不夹取、不补偿。 */
+  const VTT_CSS_WHITE = ['background-color', 'color', 'font-family', 'font-size', 'font-style',
+    'font-weight', 'line-height', 'opacity', 'text-decoration', 'text-shadow', 'white-space'];
+  const VTT_SRC_CLASS = 'src';    // 原文行：文本里 <c.src>…</c.src>，STYLE 里 ::cue(.src)
+
+  function vttFontStack(v) {
+    const k = String(v == null ? '' : v).trim();
+    if (!k || k === 'sans') return '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+    if (k === 'serif') return '"Songti SC","SimSun","Noto Serif CJK SC",serif';
+    if (k === 'mono') return '"Menlo","Consolas",monospace';
+    return (/["',]/.test(k) ? k : '"' + k.replace(/"/g, '') + '",sans-serif');
+  }
+  function vttRgba(hex, aPct) {
+    const h = /^#([0-9a-fA-F]{6})$/.exec(String(hex == null ? '' : hex).trim());
+    if (!h) return null;
+    const r = parseInt(h[1].slice(0, 2), 16), g = parseInt(h[1].slice(2, 4), 16), b = parseInt(h[1].slice(4, 6), 16);
+    let a = (aPct == null ? 100 : +aPct);
+    if (!isFinite(a)) a = 100;
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (+((a / 100).toFixed(3))) + ')';
+  }
+  /* 描边：VTT 没有 ASS 的 Outline；outline 画的是**方框**不是字描边，只能 text-shadow 八向模拟。 */
+  function vttShadowCss(st) {
+    if (!st || st.shadowOn === false) return '';
+    const w = (st.shadowW != null && isFinite(+st.shadowW)) ? +st.shadowW : 2;
+    if (!(w > 0)) return '';
+    const c = (st && /^#[0-9a-fA-F]{6}$/.test(String(st.shadowColor || '').trim())) ? String(st.shadowColor).trim() : '#000000';
+    return [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]]
+      .map((p) => (p[0] * w) + 'px ' + (p[1] * w) + 'px 0 ' + c).join(', ');
+  }
+  function vttStyleBlock(st) {
+    if (!st) return '';
+    const d = [];
+    const col = /^#[0-9a-fA-F]{6}$/.test(String(st.color || '').trim()) ? String(st.color).trim() : null;
+    if (col) d.push('  color: ' + col + ';');
+    if (st.size != null && String(st.size).trim() !== '' && isFinite(+st.size)) d.push('  font-size: ' + (+st.size) + '%;');
+    if (String(st.font || '').trim()) d.push('  font-family: ' + vttFontStack(st.font) + ';');
+    if (st.bold) d.push('  font-weight: bold;');
+    if (st.italic) d.push('  font-style: italic;');
+    if (st.lineHeight != null && String(st.lineHeight).trim() !== '' && isFinite(+st.lineHeight)) d.push('  line-height: ' + (+st.lineHeight) + ';');
+    const sh = vttShadowCss(st);
+    if (sh) d.push('  text-shadow: ' + sh + ';');
+    if (st.bgOn !== false) {
+      const bg = vttRgba(st.bgColor || '#000000', st.bgAlpha == null ? 55 : st.bgAlpha);
+      if (bg) d.push('  background-color: ' + bg + ';');
+    }
+    const rules = [];
+    if (d.length) rules.push('::cue {\n' + d.join('\n') + '\n}');
+    /* 原文行：双语 + 用户开了区分才输出。Firefox 忽略带参 ::cue(.src) → 整片同色（已知，界面如实提示）。 */
+    if (st.srcDiff !== false) {
+      const sd = [];
+      const sc = /^#[0-9a-fA-F]{6}$/.test(String(st.srcColor || '').trim()) ? String(st.srcColor).trim() : null;
+      if (sc) sd.push('  color: ' + sc + ';');
+      if (st.srcSize != null && String(st.srcSize).trim() !== '' && isFinite(+st.srcSize)) sd.push('  font-size: ' + (+st.srcSize) + '%;');
+      if (sd.length) rules.push('::cue(.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
+    }
+    if (!rules.length) return '';
+    return 'STYLE\n' + rules.join('\n');
+  }
+  function vttCueSettings(st) {
+    if (!st) return '';
+    const out = [];
+    const num = (v) => { const s = String(v == null ? '' : v).trim(); if (!s) return null; return isFinite(+s) ? s : null; };
+    const line = num(st.line);
+    if (line != null) {
+      const la = (st.lineAlign === 'start' || st.lineAlign === 'center' || st.lineAlign === 'end') ? ',' + st.lineAlign : '';
+      out.push('line:' + line + '%' + la);
+    }
+    const pos = num(st.position);
+    if (pos != null) out.push('position:' + pos + '%');
+    const sz = num(st.width);
+    if (sz != null) out.push('size:' + sz + '%');
+    if (st.align === 'start' || st.align === 'end' || st.align === 'center') out.push('align:' + st.align);
+    return out.length ? ' ' + out.join(' ') : '';
+  }
+  /* ---------------- VTT 样式反向解析（导入继承，v0.9.238） ----------------
+     导入一份带样式的 VTT 时把样式读回面板。⚠️ 与主站同口径：
+       只认白名单内属性与 ::cue / ::cue(.src)；REGION、别的选择器、非法值一律忽略不猜；
+       line 的序列号形式（line:3）无法与百分比互转 → 记进 notes 由界面提示，绝不换算。 */
+  function vttUnRgba(v) {
+    const s = String(v == null ? '' : v).trim();
+    let m = /^#([0-9a-fA-F]{6})$/.exec(s);
+    if (m) return { hex: ('#' + m[1]).toUpperCase(), alpha: 100 };
+    m = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/i.exec(s);
+    if (!m) return null;
+    const hx = (x) => Math.max(0, Math.min(255, Math.round(+x))).toString(16).padStart(2, '0');
+    const a = (m[4] == null) ? 1 : Math.max(0, Math.min(1, +m[4]));
+    return { hex: ('#' + hx(m[1]) + hx(m[2]) + hx(m[3])).toUpperCase(), alpha: Math.round(a * 100) };
+  }
+  function vttFontKeyOf(v) {
+    const s = String(v == null ? '' : v);
+    const first = (s.split(',')[0] || '').trim().replace(/^["']|["']$/g, '');
+    const generic = ['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-sans-serif', 'ui-serif', 'ui-monospace'];
+    if (first && generic.indexOf(first.toLowerCase()) < 0) {
+      if (/^pingfang sc$/i.test(first) && /microsoft yahei/i.test(s)) return 'sans';
+      if (/^songti sc$/i.test(first) && /simsun/i.test(s)) return 'serif';
+      if (/^menlo$/i.test(first) && /consolas/i.test(s)) return 'mono';
+      return first;
+    }
+    if (/monospace/i.test(s)) return 'mono';
+    if (/sans-serif/i.test(s)) return 'sans';
+    if (/serif/i.test(s)) return 'serif';
+    return '';
+  }
+  function vttParseDecls(css) {
+    const out = {};
+    String(css == null ? '' : css).split(';').forEach((d) => {
+      const i = d.indexOf(':');
+      if (i < 0) return;
+      const k = d.slice(0, i).trim().toLowerCase(), v = d.slice(i + 1).trim();
+      if (k && v && !(k in out)) out[k] = v;
+    });
+    return out;
+  }
+  function vttShadowOf(v) {
+    const s = String(v == null ? '' : v).trim();
+    if (!s || /^none$/i.test(s)) return null;
+    const seg = s.split(',')[0].trim();
+    const m = /^(-?[\d.]+)px\s+(-?[\d.]+)px(?:\s+(-?[\d.]+)px)?/.exec(seg);
+    if (!m) return null;
+    const c = (/#[0-9a-fA-F]{6}|rgba?\([^)]*\)/.exec(seg) || [])[0];
+    const un = c ? vttUnRgba(c) : null;
+    return { w: Math.max(Math.abs(+m[1]), Math.abs(+m[2])), color: un ? un.hex : '#000000' };
+  }
+  function parseVttStyle(src) {
+    const res = { found: false, style: {}, srcLine: null, notes: [] };
+    const raw = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    const blocks = raw.split(/\n\s*\n/);
+    const st = res.style;
+    let css = '';
+    for (let i = 0; i < blocks.length; i++) {
+      const b = blocks[i].replace(/^\s+/, '');
+      if (/^STYLE(\s|$|[\r\n])/i.test(b)) { css = b.replace(/^STYLE[^\n]*\n?/i, ''); break; }
+    }
+    if (css) {
+      const mSrc = /::cue\s*\(\s*\.src\s*\)\s*\{([^}]*)\}/i.exec(css);
+      const mMain = /(?:^|[\s}])::cue\s*\{([^}]*)\}/i.exec(css);
+      if (mMain) {
+        const d = vttParseDecls(mMain[1]);
+        const col = d['color'] ? vttUnRgba(d['color']) : null;
+        if (col && col.alpha === 100) st.color = col.hex;
+        const fs = /^([\d.]+)\s*%$/.exec(d['font-size'] || '');
+        if (fs) st.size = fs[1];
+        if (d['font-family']) { const k = vttFontKeyOf(d['font-family']); if (k) st.font = k; }
+        if (d['font-weight']) st.bold = /^(bold|bolder|[6-9]00)$/i.test(d['font-weight'].trim());
+        if (d['font-style']) st.italic = /^(italic|oblique)$/i.test(d['font-style'].trim());
+        const lh = (d['line-height'] || '').trim();
+        if (/^[\d.]+$/.test(lh)) st.lineHeight = lh;
+        if (d['background-color']) {
+          const bg = vttUnRgba(d['background-color']);
+          if (bg) { st.bgColor = bg.hex; st.bgAlpha = String(bg.alpha); st.bgOn = bg.alpha > 0; }
+        }
+        if (d['text-shadow']) {
+          const sh = vttShadowOf(d['text-shadow']);
+          if (sh) { st.shadowOn = true; st.shadowW = String(sh.w); st.shadowColor = sh.color; }
+          else if (/^none$/i.test(d['text-shadow'].trim())) st.shadowOn = false;
+        }
+        res.found = true;
+      }
+      if (mSrc) {
+        const d = vttParseDecls(mSrc[1]);
+        const c = d['color'] ? vttUnRgba(d['color']) : null;
+        if (c) st.srcColor = c.hex;
+        const fs = /^([\d.]+)\s*%$/.exec(d['font-size'] || '');
+        if (fs) st.srcSize = fs[1];
+        st.srcDiff = true;
+        res.found = true;
+      }
+    }
+    const cm = /-->[^\n]*/.exec(raw);
+    if (cm) {
+      const toks = cm[0].replace(/^-->/, '').trim().split(/\s+/);
+      toks.shift();
+      toks.forEach((tk) => {
+        const i = tk.indexOf(':');
+        if (i < 0) return;
+        const k = tk.slice(0, i).toLowerCase(), v = tk.slice(i + 1);
+        if (k === 'line') {
+          const parts = v.split(',');
+          const mm = /^([\d.]+)%$/.exec(parts[0]);
+          if (mm) {
+            st.line = mm[1];
+            if (/^(start|center|end)$/.test(parts[1] || '')) st.lineAlign = parts[1];
+            res.found = true;
+          } else if (/^[\d.]+$/.test(parts[0])) res.notes.push('lineNumber');
+        } else if (k === 'position') {
+          const mm = /^([\d.]+)%/.exec(v);
+          if (mm) { st.position = mm[1]; res.found = true; }
+        } else if (k === 'size') {
+          const mm = /^([\d.]+)%$/.exec(v);
+          if (mm) { st.width = mm[1]; res.found = true; }
+        } else if (k === 'align') {
+          if (/^(start|center|end)$/.test(v)) { st.align = v; res.found = true; }
+        }
+      });
+    }
+    /* 原文是第几行：找带 <c.src> 的那行（0 基） */
+    const firstCue = /-->[^\n]*\n([\s\S]*?)(?=\n\s*\n|$)/.exec(raw);
+    if (firstCue) {
+      const ls = firstCue[1].split('\n');
+      for (let i = 0; i < ls.length; i++) {
+        if (new RegExp('<c\\.' + VTT_SRC_CLASS + '>', 'i').test(ls[i])) { res.srcLine = i; break; }
+      }
+    }
+    return res;
   }
 
   // ---------------- SBV (YouTube 字幕) 解析 / 格式化 ----------------
@@ -3098,6 +3327,8 @@
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
+    VTT_CSS_WHITE, VTT_SRC_CLASS, vttStyleBlock, vttCueSettings, vttShadowCss, vttFontStack, vttRgba,
+    vttUnRgba, vttFontKeyOf, parseVttStyle,   // v0.9.238 VTT 样式（merge 独立副本）
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,

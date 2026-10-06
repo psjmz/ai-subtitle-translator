@@ -141,6 +141,26 @@
      ⚠️ 别把背景加在 .ass-pv-line 上——那会画出一条整屏宽的黑带，与导出完全不符。 */
   .ass-pv-line .pv-in{display:inline-block}
   .ass-note{margin-bottom:8px}
+  /* v0.9.238：WebVTT 预览。与 ASS 预览同一张 16:9 画布，但**定位口径完全不同**：
+     ASS = 像素离底（两条绝对定位的 Dialogue），VTT = 百分比（line/position/size，单个 cue 盒内两行）。
+     两套各画各的，不许互相换算。 */
+  .vtt-pv{margin-bottom:12px}
+  .vtt-pv-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);margin-bottom:6px}
+  .vtt-pv-tag{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:11.5px}
+  .vtt-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#111;border-radius:10px;overflow:hidden}
+  /* cue 盒：宽度 = size%，横向 = position + align，纵向 = line + 锚点；两行文字都在盒里 */
+  .vtt-pv-cue{position:absolute;box-sizing:border-box;text-align:center;padding:2px 5px;line-height:1.2}
+  .vtt-pv-line{white-space:pre-wrap}
+  /* 底衬必须紧贴文字包围盒（与导出 ::cue 的 background 逐条生效一致），加在整行会画成通栏色带 */
+  .vtt-pv-line .pv-in{display:inline-block;padding:0}
+  details.vtt{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--card-2)}
+  details.vtt summary{cursor:pointer;padding:10px 14px;font-size:13px;font-weight:600;color:var(--sub);list-style:none}
+  details.vtt summary::-webkit-details-marker{display:none}
+  details.vtt summary::before{content:'▸';display:inline-block;margin-right:7px;transition:transform .15s;color:var(--acc)}
+  details.vtt[open] summary::before{transform:rotate(90deg)}
+  .vtt-body{padding:2px 14px 14px}
+  .vtt-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:640px){.vtt-cols{grid-template-columns:1fr}}
   .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:10px;padding:9px 14px;
     font-size:12.5px;color:#8A5A0B;display:none;line-height:1.8}
   .rep-clean{margin-top:10px;background:var(--ok-weak);border-radius:10px;padding:9px 14px;
@@ -175,7 +195,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.237</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.238</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -264,6 +284,7 @@
         <select id="expFmt" style="display:none">
           <option value="srt" data-i18n="tplSrt">SRT 无风格 (.srt)</option>
           <option value="vtt" data-i18n="tplVtt">VTT 无风格 (.vtt)</option>
+          <option value="vttStyle" data-i18n="tplVttStyle">VTT 双语样式 · 默认模板，可微调 (.vtt)</option>
           <option value="split" data-i18n="tplSplit">ASS 分屏 · 默认模板，可微调 (.ass)</option>
           <option value="stack" data-i18n="tplStack">ASS 底部双行 · 默认模板，可微调 (.ass)</option>
           <option value="custom" data-i18n="tplCustom">ASS 自定义风格 (.ass)</option>
@@ -362,6 +383,74 @@
         <div class="hint" data-i18n="schemeHint">方案存在本机浏览器里（换设备或清缓存会丢），要备份就用「导出」存成 JSON。</div>
       </div>
     </details>
+
+    <!-- v0.9.238：WebVTT 样式面板。
+         ⚠️ 与主站翻译页的 VTT 面板「参数同名、互不相干」：本页用自己的一套 id（mVtt*）、
+            自己的 core 副本（merge-core.js 里的独立实现）和自己的 localStorage key，
+            改一边不会影响另一边 —— 用户明确要求双语处理样式与翻译流程完全分开。
+         ⚠️ 单位是 VTT 原生的百分比（line / position / size / 字号），与 ASS 的「像素离底」
+            根本不是一套：两套面板不共用字段、不互相换算。 -->
+    <details class="vtt" id="mVttPanel" style="display:none">
+      <summary data-i18n="vttPanelTitle">WebVTT 样式（导出 VTT 双语样式时生效）</summary>
+      <div class="vtt-body">
+        <div class="hint ass-note" data-i18n="vttStyleTip">样式写在文件头的 STYLE 块里，由播放器渲染；位置是百分比，随分辨率自适应。</div>
+        <!-- 导入继承后在此写明「样式来自哪个文件」，否则用户不知道这些值是哪来的 -->
+        <div class="hint ass-note" id="mVttImportNote" style="display:none"></div>
+        <div class="af">
+          <label data-i18n="lblVttPreset">样式模板</label>
+          <select id="mVttPresetSel">
+            <option value="std" data-i18n="vttPresetStd">标准 · 底部双语</option>
+            <option value="compact" data-i18n="vttPresetCompact">紧凑 · 小字窄幅</option>
+            <option value="cinema" data-i18n="vttPresetCinema">电影感 · 大字描边</option>
+            <option value="custom" data-i18n="vttPresetCustom">自定义</option>
+          </select>
+        </div>
+        <div class="hint" id="mVttPresetHint"></div>
+        <div class="vtt-cols">
+          <div class="ass-col">
+            <h4 data-i18n="vttGrpPos">位置（百分比）</h4>
+            <div class="af"><label data-i18n="lblVttLine">垂直 line</label><input type="number" id="mVttLine" value="90" step="1"></div>
+            <div class="af"><label data-i18n="lblVttAnchor">锚点</label><select id="mVttLineAlign">
+              <option value="end" data-i18n="vttAnchorEnd" selected>贴底</option>
+              <option value="start" data-i18n="vttAnchorStart">贴顶</option>
+              <option value="center" data-i18n="vttAnchorMid">居中</option>
+            </select></div>
+            <div class="af"><label data-i18n="lblVttPos">水平 position</label><input type="number" id="mVttPos" value="50" step="1"></div>
+            <div class="af"><label data-i18n="lblVttWidth">宽度 size</label><input type="number" id="mVttWidth" value="80" step="1"></div>
+            <div class="af"><label data-i18n="lblVttAlign">对齐 align</label><select id="mVttAlign">
+              <option value="center" data-i18n="vttAlignCenter" selected>居中</option>
+              <option value="start" data-i18n="vttAlignStart">左</option>
+              <option value="end" data-i18n="vttAlignEnd">右</option>
+            </select></div>
+            <h4 data-i18n="vttGrpText">文字</h4>
+            <div class="af"><label data-i18n="lblVttSize">字号</label><input type="number" id="mVttSize" value="100" step="5"></div>
+            <div class="af"><label data-i18n="lblVttColor">颜色</label><input type="text" id="mVttColor" value="#FFFFFF"><span class="sw" id="mVttColorSw"></span></div>
+            <div class="af"><label data-i18n="lblVttFont">字体</label><select id="mVttFont"></select></div>
+            <div class="af"><label data-i18n="lblVttLH">行高</label><input type="number" id="mVttLH" value="1.4" step="0.1"></div>
+            <div class="af"><label data-i18n="lblVttWeight">粗体</label><input type="checkbox" id="mVttBold" checked></div>
+            <div class="af"><label data-i18n="lblVttItalic">斜体</label><input type="checkbox" id="mVttItalic"></div>
+          </div>
+          <div class="ass-col">
+            <h4 data-i18n="vttGrpSrc">原文行</h4>
+            <div class="af"><label data-i18n="lblVttSrcDiff">区分原文</label><input type="checkbox" id="mVttSrcDiff" checked></div>
+            <div class="af"><label data-i18n="lblVttSrcColor">颜色</label><input type="text" id="mVttSrcColor" value="#FFD700"><span class="sw" id="mVttSrcColorSw"></span></div>
+            <div class="af"><label data-i18n="lblVttSrcSize">字号</label><input type="number" id="mVttSrcSize" value="85" step="5"></div>
+            <h4 data-i18n="vttGrpFx">底衬 / 描边</h4>
+            <div class="af"><label data-i18n="lblVttBg">底衬</label><input type="checkbox" id="mVttBgOn" checked></div>
+            <div class="af"><label data-i18n="lblVttBgColor">底衬色</label><input type="text" id="mVttBgColor" value="#000000"><span class="sw" id="mVttBgColorSw"></span></div>
+            <div class="af"><label data-i18n="lblVttBgAlpha">底衬不透明</label><input type="range" id="mVttBgAlpha" min="0" max="100" value="55"><span class="pct" id="mVttBgAlphaOut">55%</span></div>
+            <div class="af"><label data-i18n="lblVttShadow">描边</label><input type="checkbox" id="mVttShadowOn" checked></div>
+            <div class="af"><label data-i18n="lblVttShadowW">粗细</label><input type="number" id="mVttShadowW" value="2" step="0.5"></div>
+            <div class="af"><label data-i18n="lblVttShadowColor">描边色</label><input type="text" id="mVttShadowColor" value="#000000"><span class="sw" id="mVttShadowColorSw"></span></div>
+          </div>
+        </div>
+        <!-- 描边在 VTT 里没有真 PyOutline：::cue 的 outline 画的是整个方框，只能用 text-shadow 八向模拟 -->
+        <div class="hint" data-i18n="vttFxTip">VTT 没有真正的字描边，这里用八向 text-shadow 模拟；字间距、行内旋转等浏览器原生不支持，不会写出来。</div>
+        <div class="scheme-row">
+          <button type="button" class="btn ghost btn-sm" id="btnVttReset" data-i18n="vttReset">↺ 恢复模板默认</button>
+        </div>
+      </div>
+    </details>
   </div>
 
   <div class="actions">
@@ -399,6 +488,16 @@
         <div class="ass-pv-line" id="assPvLine2"><span class="pv-in"></span></div>
       </div>
     </div>
+    <!-- v0.9.238：VTT 预览。与 ASS 预览互斥显示：ASS 画两条像素定位的行，VTT 画一个百分比定位的 cue 盒。 -->
+    <div class="vtt-pv" id="mVttPv" style="display:none">
+      <div class="vtt-pv-hd"><span data-i18n="pvVttTitle">效果预览（百分比定位，随分辨率自适应）</span><span class="vtt-pv-tag" id="mVttPvTag"></span></div>
+      <div class="vtt-pv-screen" id="mVttPvScreen">
+        <div class="vtt-pv-cue" id="mVttPvCue">
+          <div class="vtt-pv-line" id="mVttPvLine1"><span class="pv-in"></span></div>
+          <div class="vtt-pv-line" id="mVttPvLine2"><span class="pv-in"></span></div>
+        </div>
+      </div>
+    </div>
     <div class="exp-row">
       <div class="seg" id="tplSeg2"></div>
       <select id="expFmt2" style="display:none"></select>
@@ -413,7 +512,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.237"></script>
+<script src="merge-core.js?v=0.9.238"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -462,6 +561,25 @@ const I18N = {
     assImportedToast:'已按导入文件的 ASS 样式填充外观', assImportedNoteShared:'样式来自导入文件：{0}（译文与原文共用同一样式）', assImportedNote:'样式来自导入文件：译文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'样式来自导入文件：{0}', assImportedRes:'（原文件 {0}p，已等比换算到 1080p）', assFontFromFile:'来自文件',
     assPanel:'ASS 外观（导出 ASS 时生效）', lblDstCol:'译文（主）', lblSrcCol:'原文（副）',
+    tplVttStyle:'VTT 双语样式 · 默认模板，可微调 (.vtt)', tplSegVttStyle:'VTT 样式',   /* v0.9.238：WebVTT 样式（与主站翻译页参数同名，但这里是一套独立的控件与存储） */
+    tplHintVttStyle:'已套用默认模板。想改位置、字号、颜色等，展开下方「WebVTT 样式」微调即可。',
+    vttPanelTitle:'WebVTT 样式（导出 VTT 双语样式时生效）',
+    vttStyleTip:'样式写在文件头的 STYLE 块里，由播放器渲染；位置是百分比，随分辨率自适应。',
+    lblVttPreset:'样式模板', vttPresetStd:'标准 · 底部双语', vttPresetCompact:'紧凑 · 小字窄幅',
+    vttPresetCinema:'电影感 · 大字描边', vttPresetCustom:'自定义',
+    vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底衬 / 描边',
+    lblVttLine:'垂直 line', lblVttAnchor:'锚点', vttAnchorEnd:'贴底', vttAnchorStart:'贴顶', vttAnchorMid:'居中',
+    lblVttPos:'水平 position', lblVttWidth:'宽度 size', lblVttAlign:'对齐 align',
+    vttAlignCenter:'居中', vttAlignStart:'左', vttAlignEnd:'右',
+    lblVttSize:'字号', lblVttColor:'颜色', lblVttFont:'字体', lblVttLH:'行高', lblVttWeight:'粗体', lblVttItalic:'斜体',
+    lblVttSrcDiff:'区分原文', lblVttSrcColor:'原文颜色', lblVttSrcSize:'原文字号',
+    lblVttBg:'底衬', lblVttBgColor:'底衬色', lblVttBgAlpha:'底衬不透明',
+    lblVttShadow:'描边', lblVttShadowW:'粗细', lblVttShadowColor:'描边色',
+    vttFxTip:'VTT 没有真正的字描边，这里用八向 text-shadow 模拟；字间距、旋转等浏览器原生不支持，不会写出来。',
+    vttReset:'↺ 恢复模板默认', vttResetDone:'已恢复该模板的默认参数',
+    vttImportedNote:'样式来自导入文件：{0}。导出模板选「VTT 双语样式」即生效。',
+    vttLineNumNote:'文件里的 line 写成了行号（如 line:3），无法换算成百分比，已忽略。',
+    pvVttTitle:'效果预览（百分比定位，随分辨率自适应）',
     lblSize:'字号', lblColor:'颜色', lblOutline:'描边', lblOutlineColor:'描边色', lblFont:'字体',
     lblAlpha:'不透明度', lblMV:'离底距离',
     assFontTip:'字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。',
@@ -523,6 +641,25 @@ const I18N = {
     assImportedToast:'已依匯入檔案的 ASS 樣式填入外觀', assImportedNoteShared:'樣式來自匯入檔案：{0}（譯文與原文共用同一樣式）', assImportedNote:'樣式來自匯入檔案：譯文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'樣式來自匯入檔案：{0}', assImportedRes:'（原檔案 {0}p，已等比換算為 1080p）', assFontFromFile:'來自檔案',
     assPanel:'ASS 外觀（匯出 ASS 時生效）', lblDstCol:'譯文（主）', lblSrcCol:'原文（副）',
+    tplVttStyle:'VTT 雙語樣式 · 預設範本，可微調 (.vtt)', tplSegVttStyle:'VTT 樣式',   /* v0.9.238：WebVTT 樣式 */
+    tplHintVttStyle:'已套用預設範本。想改位置、字號、顏色等，展開下方「WebVTT 樣式」微調即可。',
+    vttPanelTitle:'WebVTT 樣式（匯出 VTT 雙語樣式時生效）',
+    vttStyleTip:'樣式寫在檔頭的 STYLE 區塊裡，由播放器渲染；位置是百分比，隨解析度自適應。',
+    lblVttPreset:'樣式範本', vttPresetStd:'標準 · 底部雙語', vttPresetCompact:'緊湊 · 小字窄幅',
+    vttPresetCinema:'電影感 · 大字描邊', vttPresetCustom:'自訂',
+    vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 描邊',
+    lblVttLine:'垂直 line', lblVttAnchor:'錨點', vttAnchorEnd:'貼底', vttAnchorStart:'貼頂', vttAnchorMid:'置中',
+    lblVttPos:'水平 position', lblVttWidth:'寬度 size', lblVttAlign:'對齊 align',
+    vttAlignCenter:'置中', vttAlignStart:'左', vttAlignEnd:'右',
+    lblVttSize:'字號', lblVttColor:'顏色', lblVttFont:'字體', lblVttLH:'行高', lblVttWeight:'粗體', lblVttItalic:'斜體',
+    lblVttSrcDiff:'區分原文', lblVttSrcColor:'原文顏色', lblVttSrcSize:'原文字號',
+    lblVttBg:'底襯', lblVttBgColor:'底襯色', lblVttBgAlpha:'底襯不透明',
+    lblVttShadow:'描邊', lblVttShadowW:'粗細', lblVttShadowColor:'描邊色',
+    vttFxTip:'VTT 沒有真正的字描邊，這裡用八向 text-shadow 模擬；字距、旋轉等瀏覽器原生不支援，不會寫出來。',
+    vttReset:'↺ 恢復範本預設', vttResetDone:'已恢復該範本的預設參數',
+    vttImportedNote:'樣式來自匯入檔案：{0}。匯出範本選「VTT 雙語樣式」即生效。',
+    vttLineNumNote:'檔案裡的 line 寫成行號（如 line:3），無法換算成百分比，已忽略。',
+    pvVttTitle:'效果預覽（百分比定位，隨解析度自適應）',
     lblSize:'字號', lblColor:'顏色', lblOutline:'描邊', lblOutlineColor:'描邊色', lblFont:'字體',
     lblAlpha:'不透明度', lblMV:'離底距離',
     assFontTip:'字體在播放端機器上解析，對方沒裝會自動回退；其餘參數與主站「ASS 樣式」一致。',
@@ -584,6 +721,25 @@ const I18N = {
     assImportedToast:'Appearance filled from the imported file’s ASS styles', assImportedNoteShared:'Style taken from the imported file: {0} (both sides share it)', assImportedNote:'Styles taken from the imported file: translation ← {0} · original ← {1}',
     assImportedNoteOne:'Style taken from the imported file: {0}', assImportedRes:'(file is {0}p — values scaled to 1080p)', assFontFromFile:'from file',
     assPanel:'ASS appearance (applies to ASS export)', lblDstCol:'Translation (primary)', lblSrcCol:'Original (secondary)',
+    tplVttStyle:'VTT bilingual style · preset, tweakable (.vtt)', tplSegVttStyle:'VTT style',   /* v0.9.238: WebVTT style */
+    tplHintVttStyle:'Preset applied. To tweak position, size, colors and more, open “WebVTT style” below.',
+    vttPanelTitle:'WebVTT style (applies when exporting VTT bilingual style)',
+    vttStyleTip:'The style is written into the STYLE block at the top of the file and rendered by the player; positions are percentages and scale with resolution.',
+    lblVttPreset:'Style preset', vttPresetStd:'Standard · bottom bilingual', vttPresetCompact:'Compact · smaller, narrower',
+    vttPresetCinema:'Cinematic · large with outline', vttPresetCustom:'Custom',
+    vttGrpPos:'Position (percent)', vttGrpText:'Text', vttGrpSrc:'Original line', vttGrpFx:'Box / outline',
+    lblVttLine:'Vertical line', lblVttAnchor:'Anchor', vttAnchorEnd:'Bottom', vttAnchorStart:'Top', vttAnchorMid:'Middle',
+    lblVttPos:'Horizontal position', lblVttWidth:'Width size', lblVttAlign:'Align',
+    vttAlignCenter:'Center', vttAlignStart:'Left', vttAlignEnd:'Right',
+    lblVttSize:'Font size', lblVttColor:'Color', lblVttFont:'Font', lblVttLH:'Line height', lblVttWeight:'Bold', lblVttItalic:'Italic',
+    lblVttSrcDiff:'Differentiate original', lblVttSrcColor:'Original color', lblVttSrcSize:'Original size',
+    lblVttBg:'Box', lblVttBgColor:'Box color', lblVttBgAlpha:'Box opacity',
+    lblVttShadow:'Outline', lblVttShadowW:'Width', lblVttShadowColor:'Outline color',
+    vttFxTip:'WebVTT has no real text outline — an eight-direction text-shadow is used instead. Letter spacing, rotation and similar are not supported by browsers and are never written.',
+    vttReset:'↺ Reset to preset', vttResetDone:'Preset defaults restored',
+    vttImportedNote:'Style inherited from the imported file: {0}. Pick the “VTT bilingual style” template to export it.',
+    vttLineNumNote:'The file uses a line NUMBER (e.g. line:3); it cannot be converted to a percentage, so it was ignored.',
+    pvVttTitle:'Preview (percentage based, scales with resolution)',
     lblSize:'Font size', lblColor:'Color', lblOutline:'Outline', lblOutlineColor:'Outline color', lblFont:'Font',
     lblAlpha:'Opacity', lblMV:'Bottom margin',
     assFontTip:'Fonts resolve on the viewer’s machine and fall back automatically if missing; other options match the main site’s ASS styles.',
@@ -645,6 +801,25 @@ const I18N = {
     assImportedToast:'読み込んだファイルの ASS スタイルを外観に反映しました', assImportedNoteShared:'ファイルから読み込んだスタイル：{0}（訳文・原文で共通）', assImportedNote:'ファイルから読み込んだスタイル：訳文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'ファイルから読み込んだスタイル：{0}', assImportedRes:'（ファイル基準 {0}p を 1080p に等比換算）', assFontFromFile:'ファイル由来',
     assPanel:'ASS 外観（ASS エクスポート時に有効）', lblDstCol:'訳文（主）', lblSrcCol:'原文（副）',
+    tplVttStyle:'VTT 二か国語スタイル · 既定テンプレート・調整可 (.vtt)', tplSegVttStyle:'VTT スタイル',   /* v0.9.238: WebVTT スタイル */
+    tplHintVttStyle:'既定テンプレートを適用しました。位置・サイズ・色などを変えるには下の「WebVTT スタイル」を開いて調整してください。',
+    vttPanelTitle:'WebVTT スタイル（VTT 二か国語スタイル書き出し時に有効）',
+    vttStyleTip:'スタイルはファイル先頭の STYLE ブロックに書き込まれ、プレイヤーが描画します。位置はパーセントで、解像度に応じて拡縮します。',
+    lblVttPreset:'スタイルテンプレート', vttPresetStd:'標準 · 下部二か国語', vttPresetCompact:'コンパクト · 小さめ',
+    vttPresetCinema:'シネマ · 大きめ＋縁取り', vttPresetCustom:'カスタム',
+    vttGrpPos:'位置（パーセント）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 縁取り',
+    lblVttLine:'垂直 line', lblVttAnchor:'基準', vttAnchorEnd:'下寄せ', vttAnchorStart:'上寄せ', vttAnchorMid:'中央',
+    lblVttPos:'水平 position', lblVttWidth:'幅 size', lblVttAlign:'揃え align',
+    vttAlignCenter:'中央', vttAlignStart:'左', vttAlignEnd:'右',
+    lblVttSize:'文字サイズ', lblVttColor:'色', lblVttFont:'フォント', lblVttLH:'行間', lblVttWeight:'太字', lblVttItalic:'斜体',
+    lblVttSrcDiff:'原文を区別', lblVttSrcColor:'原文の色', lblVttSrcSize:'原文のサイズ',
+    lblVttBg:'底襯', lblVttBgColor:'底襯の色', lblVttBgAlpha:'底襯の不透明度',
+    lblVttShadow:'縁取り', lblVttShadowW:'太さ', lblVttShadowColor:'縁取りの色',
+    vttFxTip:'VTT に本物の文字縁取りはありません。八方向の text-shadow で代用しています。字間・回転などはブラウザが対応しないため書き出しません。',
+    vttReset:'↺ テンプレート既定値に戻す', vttResetDone:'テンプレートの既定値に戻しました',
+    vttImportedNote:'読み込んだファイルのスタイルを継承しました：{0}。書き出しテンプレートで「VTT 二か国語スタイル」を選ぶと有効になります。',
+    vttLineNumNote:'ファイルの line は行番号形式（例 line:3）です。パーセントに換算できないため無視しました。',
+    pvVttTitle:'プレビュー（パーセント指定・解像度に応じて拡縮）',
     lblSize:'フォントサイズ', lblColor:'色', lblOutline:'縁取り', lblOutlineColor:'縁取り色', lblFont:'フォント',
     lblAlpha:'不透明度', lblMV:'下端からの距離',
     assFontTip:'フォントは再生側の端末で解決され、未インストールなら自動フォールバック。その他の設定は本サイトの ASS スタイルと同一です。',
@@ -732,6 +907,7 @@ function loadSide(side, text, name){
   ok.textContent = t('parsedOk', fmt.toUpperCase(), items.length); ok.style.display = 'block';
   autoAlignDefault();
   importAssStyle();
+  importVttStyle(side, (fmt === 'vtt') ? String(text) : '', name);
 }
 function bindSide(side){
   const drop = $(side+'Drop'), file = $(side+'File'), ta = $(side+'Text');
@@ -791,6 +967,7 @@ function syncMode(){
     S.rows = null; S.report = null;
     $('rep').style.display = 'none'; $('exp').style.display = 'none';
     renderAssPv();   /* v0.9.228：顺手把效果预览收起来，别留着上一个模式的画面 */
+    renderVttPv();   /* v0.9.238：VTT 预览同理，切模式后不该留着旧画面 */
   }
 }
 function setI18nKey(el, key){
@@ -813,6 +990,7 @@ function doMerge(){
   renderReport();
   $('exp').style.display = 'block';
   renderAssPv();
+  renderVttPv();   /* v0.9.238：VTT 预览与 ASS 预览共用一次合并结果 */
 }
 /* v0.9.222 调整模式：拆分双语字幕。偏移对整份文件生效（不分两侧）。 */
 function doAdjust(){
@@ -842,6 +1020,7 @@ function doAdjust(){
      于是「调整双语字幕」点完拆分只有表格，ASS 效果预览整块不出现（用户看到的就是空的）。
      必须在 #exp 显示之后调用，否则量不到画布高度。 */
   renderAssPv();
+  renderVttPv();   /* v0.9.238：同上，调整模式也要给 VTT 预览 */
 }
 /* 原文/译文互换：整列对调（调整模式拆错方向时一键纠正） */
 function swapSides(){
@@ -859,6 +1038,7 @@ function swapSides(){
   renderReport();
   /* v0.9.228：对调后预览的上下两条也要跟着换，否则预览停在旧的内容上 */
   renderAssPv();
+  renderVttPv();
   toast(t('swapped'));
 }
 function fmtShort(ms){
@@ -934,12 +1114,15 @@ function expFmtVal(){
   if (tpl === 'custom') return assLayoutVal();
   if (tpl === 'split') return 'ass-split';
   if (tpl === 'stack') return 'ass-stack';
+  /* v0.9.238：vttStyle = 带 STYLE 块的 VTT（合并页自己的一套，与主站的 VTT 面板互不相干） */
+  if (tpl === 'vttStyle') return 'vtt-styled';
   return tpl;   /* srt / vtt */
 }
 /* v0.9.229：导出模板由下拉改成分段按钮。select 仍是唯一的「状态源」（既有逻辑全都读它的
    value：tplVal / expFmtVal / 两份 select 互相同步），按钮只负责改 select.value 并派发 change，
    于是面板重算与预览重画全部沿用旧路径，不用在按钮里复制一遍逻辑。 */
-const TPL_SEGS = [['srt','tplSegSrt'],['vtt','tplSegVtt'],['split','tplSegSplit'],['stack','tplSegStack'],['custom','tplSegCustom']];
+const TPL_SEGS = [['srt','tplSegSrt'],['vtt','tplSegVtt'],['vttStyle','tplSegVttStyle'],
+  ['split','tplSegSplit'],['stack','tplSegStack'],['custom','tplSegCustom']];
 function tplSegPairs(){ return [['tplSeg','expFmt'],['tplSeg2','expFmt2']]; }
 function syncTplSegs(){
   tplSegPairs().forEach(pair=>{
@@ -1146,11 +1329,15 @@ function schemeDoImport(file){
 /* 只管显隐与说明文案（v0.9.227：导入样式时要复用它，但绝不能顺带套预设把导入值冲掉） */
 function syncAssChrome(){
   const tpl = tplVal();
-  $('assPanel').style.display = (tpl === 'srt' || tpl === 'vtt') ? 'none' : '';
+  const plain = (tpl === 'srt' || tpl === 'vtt');
+  $('assPanel').style.display = (plain || tpl === 'vttStyle') ? 'none' : '';
   $('layoutRow').style.display = tpl === 'custom' ? 'flex' : 'none';
   const hint = $('tplHint');
-  if (hint) hint.textContent = t(tpl==='srt'||tpl==='vtt' ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : 'tplHintPreset');
+  if (hint) hint.textContent = t(plain ? 'tplHintPlain' : tpl==='custom' ? 'tplHintCustom' : tpl==='vttStyle' ? 'tplHintVttStyle' : 'tplHintPreset');
   const note = $('assImportNote'); if (note) note.style.display = 'none';   /* 切模板 = 回到预设，提示作废 */
+  /* v0.9.238：WebVTT 样式面板只在「VTT 双语样式」时出现；ASS 面板与它互斥（两套单位不同） */
+  const vp = $('mVttPanel'); if (vp) vp.style.display = (tpl === 'vttStyle') ? '' : 'none';
+  const vnote = $('mVttImportNote'); if (vnote && tpl !== 'vttStyle') vnote.style.display = 'none';
   /* v0.9.229：导入样式是**直接写 select.value**（不能派发 change，否则会走 syncAssPanel 套预设把导入值冲掉），
      所以按钮组的高亮必须在这里补一次，否则 import 后按钮停在旧模板上。 */
   syncTplSegs();
@@ -1280,6 +1467,7 @@ function buildExport(){
   const fmt = expFmtVal();
   if (fmt === 'ass-split' || fmt === 'ass-stack')
     return C.formatAss(buildAssEvents(), { title: baseName() || 'merged', assStyle: assStyleOf() });
+  if (fmt === 'vtt-styled') return buildVttExport();   /* v0.9.238：带 STYLE 块的双语 VTT */
   const items = C.buildBilingual(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
     srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems()),
@@ -1396,13 +1584,236 @@ function renderAssPv(){
   }
   if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p';
 }
+/* ================= v0.9.238：合并页自己的 WebVTT 样式 =================
+   ⚠️ 与主站翻译页的 VTT 面板只保持「参数同名、语义同义」，实现上完全独立：
+      · 本页用的是自己的引擎副本（merge-core.js 内的 VTT_* 系列），不用主站翻译引擎
+      · VTT 面板的当前值不落盘（与 ASS 面板同口径：只有用户显式存的「方案」才持久化），
+        所以两页之间没有任何共享状态，谁也改不到谁
+      · DOM id 一律 mVtt* 前缀，与主站 vtt* 前缀不重叠
+      → 哪一页改都不会动到另一页。
+   ⚠️ 数值一律原样写进文件：用户填 150% 就写 150%，不夹取、不换算（10-06 用户定的原则）。
+   ⚠️ VTT 与 ASS 两套参数不许互相换算：ASS 是像素离底，VTT 是百分比随分辨率自适应。 */
+const MVTT_POS_IDS  = ['mVttLine','mVttLineAlign','mVttPos','mVttWidth','mVttAlign'];
+const MVTT_MAIN_IDS = ['mVttSize','mVttColor','mVttFont','mVttLH','mVttBold','mVttItalic',
+  'mVttBgOn','mVttBgColor','mVttBgAlpha','mVttShadowOn','mVttShadowW','mVttShadowColor'];
+const MVTT_SRC_IDS  = ['mVttSrcDiff','mVttSrcColor','mVttSrcSize'];
+const MVTT_COLOR_IDS = ['mVttColor','mVttSrcColor','mVttBgColor','mVttShadowColor'];
+const MVTT_PRESETS = {
+  /* 标准 · 底部双语：与旧「无风格」观感接近（白字 + 金色原文 + 半透明底衬 + 细描边） */
+  std: { mVttLine:'90', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'80', mVttAlign:'center',
+    mVttSize:'100', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.4', mVttBold:true, mVttItalic:false,
+    mVttSrcDiff:true, mVttSrcColor:'#FFD700', mVttSrcSize:'85',
+    mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'55',
+    mVttShadowOn:true, mVttShadowW:'2', mVttShadowColor:'#000000' },
+  /* 紧凑 · 小字窄幅：不抢画面，纪录片/长对白用 */
+  compact: { mVttLine:'93', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'70', mVttAlign:'center',
+    mVttSize:'88', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.35', mVttBold:false, mVttItalic:false,
+    mVttSrcDiff:true, mVttSrcColor:'#C9D1D9', mVttSrcSize:'78',
+    mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'40',
+    mVttShadowOn:true, mVttShadowW:'1.5', mVttShadowColor:'#000000' },
+  /* 电影感 · 大字描边：不要底衬，靠描边压住亮画面 */
+  cinema: { mVttLine:'88', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'84', mVttAlign:'center',
+    mVttSize:'115', mVttColor:'#FFF6E5', mVttFont:'PingFang SC', mVttLH:'1.45', mVttBold:false, mVttItalic:false,
+    mVttSrcDiff:true, mVttSrcColor:'#B9C8DA', mVttSrcSize:'80',
+    mVttBgOn:false, mVttBgColor:'#000000', mVttBgAlpha:'55',
+    mVttShadowOn:true, mVttShadowW:'3', mVttShadowColor:'#000000' }
+};
+/* 导入继承的区域门控：哪一区被手改过，后续导入就不再覆盖那一区
+   （用户定案：继承之后仍可手改，手改过的区域不能被下一次导入悄悄改写）。 */
+const VTT_INH = { active:false, dirty:{ main:false, src:false, pos:false } };
+function regionOfId(id){
+  if (MVTT_POS_IDS.indexOf(id) >= 0) return 'pos';
+  if (MVTT_SRC_IDS.indexOf(id) >= 0) return 'src';
+  return 'main';
+}
+function vttSetVal(id, v){
+  const el = $(id); if (!el) return;
+  if (el.type === 'checkbox') el.checked = !!(v === true || v === '1' || v === 'true' || v === 'on');
+  else if (v != null) el.value = v;
+}
+function vttPresetKey(){ const s = $('mVttPresetSel'); return s ? (s.value || 'std') : 'std'; }
+function vttAlphaOut(){
+  const r = $('mVttBgAlpha'), o = $('mVttBgAlphaOut');
+  if (r && o) o.textContent = String(r.value) + '%';
+}
+function vttAfterFill(){
+  MVTT_COLOR_IDS.forEach(syncColorSw);
+  vttAlphaOut();
+  renderVttPv();
+}
+/* 套标准模板：显式交回标准 ⟶ 清掉「继承 / 手改」门控（用户主动选了模板，就是要模板的值） */
+function applyVttPreset(k){
+  const d = MVTT_PRESETS[k] || MVTT_PRESETS.std;
+  Object.keys(d).forEach(id=>vttSetVal(id, d[id]));
+  const sel = $('mVttPresetSel'); if (sel) sel.value = MVTT_PRESETS[k] ? k : 'std';
+  VTT_INH.active = false;
+  VTT_INH.dirty = { main:false, src:false, pos:false };
+  vttAfterFill();
+}
+function vttStyleOf(){
+  const g = id => String(($(id)||{}).value == null ? '' : $(id).value).trim();
+  const ck = id => !!($(id)||{}).checked;
+  return {
+    line:g('mVttLine'), lineAlign:($('mVttLineAlign')||{}).value || 'end',
+    position:g('mVttPos'), width:g('mVttWidth'), align:($('mVttAlign')||{}).value || 'center',
+    size:g('mVttSize'), color:g('mVttColor'), font:($('mVttFont')||{}).value || '', lineHeight:g('mVttLH'),
+    bold:ck('mVttBold'), italic:ck('mVttItalic'),
+    srcDiff:ck('mVttSrcDiff'), srcColor:g('mVttSrcColor'), srcSize:g('mVttSrcSize'),
+    bgOn:ck('mVttBgOn'), bgColor:g('mVttBgColor'), bgAlpha:g('mVttBgAlpha'),
+    shadowOn:ck('mVttShadowOn'), shadowW:g('mVttShadowW'), shadowColor:g('mVttShadowColor')
+  };
+}
+/* ⚠️ 导出与预览共用这一份「逐行文本」：谁在上面、哪几行是原文，两个画面完全一致。
+   此前预览自己写死两行、导出按折行结果给 N 行 → 预览与导出行数不一致（v0.9.224b 的教训）。 */
+function vttCueParts(){
+  const parts = C.buildBilingualParts(S.rows, {
+    maxW: biMaxWVal(), biMaxW: biMaxWVal(),
+    srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems())
+  });
+  const dstFirst = orderVal() === 'dst-first';
+  return (parts || []).map((p, i) => {
+    const d = (p.dstLines || []).map(x=>({ text:x, isSrc:false }));
+    const s = (p.srcLines || []).map(x=>({ text:x, isSrc:true }));
+    return { no:i+1, start:p.start, end:p.end, lines: dstFirst ? d.concat(s) : s.concat(d) };
+  });
+}
+function buildVttExport(){
+  const st = vttStyleOf();
+  const mark = s => '<c.' + C.VTT_SRC_CLASS + '>' + s + '</c.' + C.VTT_SRC_CLASS + '>';
+  const items = vttCueParts().map(p=>({ no:p.no, start:p.start, end:p.end,
+    /* srcDiff 关 = 连 class 都不标：写了却没有对应 ::cue(.src) 规则，是纯粹的噪音 */
+    text: p.lines.map(L => (L.isSrc && st.srcDiff) ? mark(L.text) : L.text).join('\n') }));
+  return C.formatVtt(items, { style: st });
+}
+function renderVttPv(){
+  const box = $('mVttPv'), scr = $('mVttPvScreen'), cue = $('mVttPvCue'), tag = $('mVttPvTag');
+  if (!box || !scr || !cue) return;
+  const isVtt = (expFmtVal() === 'vtt-styled');
+  if (!isVtt || !S.rows || !S.rows.length){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const parts = vttCueParts();
+  if (!parts.length){ box.style.display = 'none'; return; }
+  const st = vttStyleOf();
+  const H = scr.clientHeight || 240, k = H / 1080;      /* 1080p 基准 → 预览等比 */
+  const num = (v,d) => { const n = parseFloat(v); return (v !== '' && isFinite(n)) ? n : d; };
+  const col = (v,d) => (/^#[0-9a-fA-F]{6}$/.test(String(v||'').trim()) ? String(v).trim() : d);
+  /* 位置：line + 锚点定纵向，position + align 定横向 —— 全部是界面上的原值，
+     越界（如 150%）也照画不误：用户填什么就是什么，不许偷偷改回范围内。 */
+  const ln = num(st.line, 0), w = num(st.width, 100), pos = num(st.position, 0);
+  cue.style.width = w + '%';
+  cue.style.left = (st.align === 'start' ? pos : (st.align === 'end' ? (pos - w) : (pos - w/2))) + '%';
+  cue.style.textAlign = st.align === 'start' ? 'left' : (st.align === 'end' ? 'right' : 'center');
+  if (st.lineAlign === 'start'){ cue.style.bottom = 'auto'; cue.style.top = ln + '%'; cue.style.transform = ''; }
+  else if (st.lineAlign === 'center'){ cue.style.bottom = 'auto'; cue.style.top = ln + '%'; cue.style.transform = 'translateY(-50%)'; }
+  else { cue.style.top = 'auto'; cue.style.transform = ''; cue.style.bottom = (100 - ln) + '%'; }
+  const fam = C.vttFontStack(st.font) || '';
+  /* 底衬与描边都向导出的 core 取值：只有 core 真写得出来，预览才画（不会出现「预览有、导出没有」） */
+  const bgRgba = (st.bgOn !== false) ? C.vttRgba(st.bgColor, st.bgAlpha) : null;
+  const shStr = C.vttShadowCss(st);
+  cue.innerHTML = '';
+  parts[0].lines.forEach(L => {
+    const dv = document.createElement('div'); dv.className = 'vtt-pv-line';
+    const sp = document.createElement('span'); sp.className = 'pv-in'; sp.textContent = L.text;
+    dv.appendChild(sp); cue.appendChild(dv);
+    const pct = num(L.isSrc ? st.srcSize : st.size, L.isSrc ? 85 : 100);
+    dv.style.fontSize = (H * 0.05 * (pct / 100)).toFixed(2) + 'px';   /* 播放器默认 cue 字号 ≈ 画面高 5% */
+    dv.style.lineHeight = String(num(st.lineHeight, 1.4));
+    dv.style.color = (L.isSrc && st.srcDiff) ? col(st.srcColor, '#FFD700') : col(st.color, '#FFFFFF');
+    dv.style.fontFamily = fam;
+    dv.style.fontWeight = st.bold ? '700' : '400';
+    dv.style.fontStyle = st.italic ? 'italic' : 'normal';
+    /* 同一个 text-shadow 串 Scaling 到预览尺寸，保证「看到的就是文件里那串值」 */
+    if (shStr) sp.style.textShadow = shStr.replace(/(-?[\d.]+)px/g, function(m, n){ return (parseFloat(n) * k).toFixed(2) + 'px'; });
+    /* 底衬紧贴文字包围盒（::cue 的 background 是逐行生效），加在整行会画成通栏色带 */
+    if (bgRgba) sp.style.background = bgRgba;
+  });
+  if (tag) tag.textContent = vttPresetLabel() + ' · VTT';
+}
+function vttPresetLabel(){
+  const k0 = vttPresetKey();
+  return k0 === 'compact' ? t('vttPresetCompact') : k0 === 'cinema' ? t('vttPresetCinema')
+       : k0 === 'custom' ? t('vttPresetCustom') : t('vttPresetStd');
+}
+/* 切模板时的 VTT 侧：进「VTT 双语样式」就套默认模板，除非当前是继承来的
+   （继承值必须留给用户看，不能被切模板顺手覆盖掉）。 */
+function syncVttPanel(){
+  const key = vttPresetKey();
+  if (!VTT_INH.active) applyVttPreset(key === 'std' || MVTT_PRESETS[key] ? key : 'std');
+  else renderVttPv();
+}
+/* ================= v0.9.238：导入 VTT 时继承它自己的样式 =================
+   与 ASS 那套（planAssImport）同一条思路：文件自带的外观不该被丢掉，要回到界面上让用户接着改。
+   ⚠️ 只读自己认得的东西（::cue / ::cue(.src) / cue settings），REGION 与白名单外的属性一律忽略，不猜。
+   ⚠️ 区域门控：手改过的区域不会被下一次导入悄悄改写。
+   ⚠️ 不强行改用户的导出模板：只有在用户本来就在导出 VTT（无风格/双语样式）时才切到「双语样式」，
+      否则只填充面板并提示 —— 拿 ASS 模板导出却被改成 VTT，那是替用户做决定。 */
+function importVttStyle(side, text, name){
+  const note = $('mVttImportNote');
+  const parsed = (typeof C.parseVttStyle === 'function') ? C.parseVttStyle(text || '') : null;
+  if (!parsed || !parsed.found){
+    if (note && VTT_INH.active === false) note.style.display = 'none';
+    return false;
+  }
+  const s = parsed.style || {}, filled = { main:0, src:0, pos:0 };
+  const put = (id, v) => { vttSetVal(id, v); return 1; };
+  if (!VTT_INH.dirty.pos){
+    if (s.line != null) filled.pos += put('mVttLine', s.line);
+    if (s.lineAlign) filled.pos += put('mVttLineAlign', s.lineAlign);
+    if (s.position != null) filled.pos += put('mVttPos', s.position);
+    if (s.width != null) filled.pos += put('mVttWidth', s.width);
+    if (s.align) filled.pos += put('mVttAlign', s.align);
+  }
+  if (!VTT_INH.dirty.main){
+    if (s.size != null) filled.main += put('mVttSize', s.size);
+    if (s.color) filled.main += put('mVttColor', s.color);
+    if (s.font){ const sel = $('mVttFont'); if (sel){ if (!Array.prototype.some.call(sel.options, o=>o.value===s.font)){
+        const o = document.createElement('option'); o.value = s.font; o.textContent = s.font + ' · ' + t('assFontFromFile');
+        sel.insertBefore(o, sel.firstChild); } filled.main += put('mVttFont', s.font); } }
+    if (s.lineHeight != null) filled.main += put('mVttLH', s.lineHeight);
+    if (s.bold != null) filled.main += put('mVttBold', !!s.bold);
+    if (s.italic != null) filled.main += put('mVttItalic', !!s.italic);
+    if (s.bgOn != null) filled.main += put('mVttBgOn', !!s.bgOn);
+    if (s.bgColor) filled.main += put('mVttBgColor', s.bgColor);
+    if (s.bgAlpha != null) filled.main += put('mVttBgAlpha', s.bgAlpha);
+    if (s.shadowOn != null) filled.main += put('mVttShadowOn', !!s.shadowOn);
+    if (s.shadowW != null) filled.main += put('mVttShadowW', s.shadowW);
+    if (s.shadowColor) filled.main += put('mVttShadowColor', s.shadowColor);
+  }
+  if (!VTT_INH.dirty.src){
+    if (s.srcDiff != null || s.srcColor || s.srcSize != null){
+      if (s.srcDiff != null) filled.src += put('mVttSrcDiff', !!s.srcDiff);
+      if (s.srcColor) filled.src += put('mVttSrcColor', s.srcColor);
+      if (s.srcSize != null) filled.src += put('mVttSrcSize', s.srcSize);
+    }
+  }
+  const n = filled.main + filled.src + filled.pos;
+  if (!n) return false;
+  VTT_INH.active = true;
+  const sel = $('mVttPresetSel'); if (sel) sel.value = 'custom';   /* 继承值不等于任何一套标准模板 */
+  const tpl = tplVal();
+  if (tpl === 'vtt' || tpl === 'vttStyle'){
+    const f1 = $('expFmt'), f2 = $('expFmt2');
+    if (f1 && f1.value !== 'vttStyle') f1.value = 'vttStyle';
+    if (f2 && f2.value !== 'vttStyle') f2.value = 'vttStyle';
+    syncTplSegs();
+  }
+  vttAfterFill();
+  if (note){
+    const nm = name || (side === 'src' ? S.srcName : S.dstName) || '';
+    note.textContent = t('vttImportedNote', nm) + (parsed.notes && parsed.notes.indexOf('lineNumber') >= 0 ? ' ' + t('vttLineNumNote') : '');
+    note.style.display = '';
+  }
+  const pnl = $('mVttPanel'); if (pnl) pnl.open = true;   /* 让用户看见「样式是从文件来的」 */
+  return true;
+}
 function baseName(){
   const n = S.srcName || S.dstName || '';
   return n.replace(/\.[^.]+$/, '');
 }
 function expExt(){
   const f = expFmtVal();
-  return f === 'vtt' ? 'vtt' : (f === 'srt' ? 'srt' : 'ass');
+  /* v0.9.238：vtt-styled 也是 .vtt 文件（只是多了 STYLE 块） */
+  return (f === 'vtt' || f === 'vtt-styled') ? 'vtt' : (f === 'srt' ? 'srt' : 'ass');
 }function doDownload(){
   if (!S.rows){ toast(t('needMerge')); return; }
   const text = buildExport();
@@ -1426,7 +1837,7 @@ function doCopy(){
 /* ================= 初始化 ================= */
 function fillAssFonts(){
   const FONTS = ['PingFang SC','Microsoft YaHei','SimHei','SimSun','Source Han Sans SC','Source Han Serif SC','Noto Sans CJK SC','Noto Serif CJK SC','Arial','Times New Roman'];
-  ['assDstFont','assSrcFont'].forEach(id=>{
+  ['assDstFont','assSrcFont','mVttFont'].forEach(id=>{
     const el = $(id); if (!el) return;
     FONTS.forEach(f=>{ const o=document.createElement('option'); o.value=f; o.textContent=f; el.appendChild(o); });
     el.value = 'PingFang SC';
@@ -1580,8 +1991,9 @@ function init(){
   sync(f1,f2); sync(f2,f1);
   f2.value = f1.value = 'srt';
   renderTplSegs();   /* v0.9.229：分段按钮（两份 select 都隐藏，只当状态源） */
-  f1.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
-  f2.addEventListener('change', ()=>{ syncAssPanel(); renderAssPv(); });
+  /* v0.9.238：切模板时 ASS / VTT 两套面板各走各的同步，预览各画各的 */
+  f1.addEventListener('change', ()=>{ syncAssPanel(); syncVttPanel(); renderAssPv(); renderVttPv(); });
+  f2.addEventListener('change', ()=>{ syncAssPanel(); syncVttPanel(); renderAssPv(); renderVttPv(); });
   /* v0.9.224：参数一改，预览即时重画（微调在当前模板内保留；切模板会被预设覆盖，这是预期行为） */
   ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor',
    'assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV',
@@ -1604,6 +2016,7 @@ function init(){
     const d = $('assDstMV'), s = $('assSrcMV');
     if (d && s){ const tmp = d.value; d.value = s.value; s.value = tmp; }
     renderAssPv();
+  renderVttPv();   /* v0.9.238：上下顺序对 VTT 决定哪一行是原文（<c.src> 标在哪行） */
   }));
   /* v0.9.228：调整模式换「拆分结构」后必须重新拆一遍，否则选了没反应（要用户自己再点一次按钮） */
   const smEl = $('structMode');
@@ -1611,7 +2024,40 @@ function init(){
   window.addEventListener('resize', renderAssPv);
   document.querySelectorAll('input[name=assLayout]').forEach(el=>el.addEventListener('change', syncAssPanel));
   $('btnAssReset').addEventListener('click', resetAssDefaults);
+  /* ---------- v0.9.238：WebVTT 样式（与 ASS 完全独立的一套 id / 参数 / 预览） ----------
+     改任一字段 = 该区域标记为「手改过」→ 后续导入不再覆盖它，模板下拉同步变成「自定义」。 */
+  MVTT_POS_IDS.concat(MVTT_MAIN_IDS, MVTT_SRC_IDS).forEach(id=>{
+    const el = $(id); if (!el) return;
+    const onEdit = ()=>{
+      VTT_INH.dirty[regionOfId(id)] = true;
+      const sel = $('mVttPresetSel'); if (sel) sel.value = 'custom';
+      renderVttPv();
+    };
+    ['input','change'].forEach(ev=>el.addEventListener(ev, onEdit));
+  });
+  const psel = $('mVttPresetSel');
+  if (psel) psel.addEventListener('change', ()=>{ if (psel.value === 'custom') renderVttPv(); else applyVttPreset(psel.value); });
+  const vreset = $('btnVttReset');
+  if (vreset) vreset.addEventListener('click', ()=>{
+    const k0 = vttPresetKey();
+    applyVttPreset(MVTT_PRESETS[k0] ? k0 : 'std');
+    toast(t('vttResetDone'));
+  });
+  MVTT_COLOR_IDS.forEach(id=>{
+    const el = $(id); if (!el) return;
+    el.addEventListener('input', ()=>syncColorSw(id));
+    el.addEventListener('change', ()=>{
+      const v = String(el.value||'').trim();
+      if (/^#?[0-9a-f]{6}$/i.test(v)) el.value = '#' + v.replace('#','').toUpperCase();
+      syncColorSw(id);
+    });
+    syncColorSw(id);
+  });
+  const vr = $('mVttBgAlpha'), vo = $('mVttBgAlphaOut');
+  if (vr && vo){ const upd=()=>{ vo.textContent = String(vr.value) + '%'; }; vr.addEventListener('input', upd); vr.addEventListener('change', upd); upd(); }
+  window.addEventListener('resize', renderVttPv);
   syncAssPanel();
+  syncVttPanel();
   /* ---------- v0.9.231：自定义样式方案 ---------- */
   $('btnSchemeSave').addEventListener('click', schemeDoSave);
   $('btnSchemeApply').addEventListener('click', schemeDoApply);

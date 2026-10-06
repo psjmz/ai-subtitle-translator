@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.237/.test(mg), 'merge.html 未引用 v0.9.237 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.238/.test(mg), 'merge.html 未引用 v0.9.238 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5361,7 +5361,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       const m = mg.match(new RegExp("^\\s*'" + code + "':\\s*\\{", 'm'));
       assert.ok(m, '缺 ' + code + ' 词典');
       const i = mg.indexOf(m[0]);
-      const seg = mg.slice(i, i + 8000);
+      /* ⚠️ v0.9.238：别用固定字符窗口切字典 —— 往词典里加一批词条后，尾巴上的键会被窗口切掉，
+         于是测试报「缺词条 btnMerge」，其实页面一点问题没有（加 VTT 样式词条时真踩到了）。 */
+      let d0 = 0, jEnd = mg.indexOf('{', i);
+      for (let q = jEnd; q < mg.length; q++){
+        if (mg[q] === '{') d0++;
+        else if (mg[q] === '}'){ d0--; if (d0 === 0){ jEnd = q; break; } }
+      }
+      const seg = mg.slice(i, jEnd + 1);
       ['btnMerge','repPaired','tagDrop','tagMerged','needBoth'].forEach(k=>{
         assert.ok(seg.indexOf(k + ':') > 0, code + ' 缺词条 ' + k);
       });
@@ -5373,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.237</.test(html), '首页版本号未升 0.9.237');
-    assert.ok(/class="ver-tag">v0\.9\.237</.test(html), '工作台版本号未升 0.9.237');
-    assert.ok(/srt-core\.js\?v=0\.9\.237/.test(html), 'srt-core.js?v 未升 0.9.237');
+    assert.ok(/class="ver">v0\.9\.238</.test(html), '首页版本号未升 0.9.238');
+    assert.ok(/class="ver-tag">v0\.9\.238</.test(html), '工作台版本号未升 0.9.238');
+    assert.ok(/srt-core\.js\?v=0\.9\.238/.test(html), 'srt-core.js?v 未升 0.9.238');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5430,7 +5437,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/if \(tpl === 'custom'\) return assLayoutVal\(\)/.test(mg), 'custom 未跟随布局选择');
     /* 面板显隐：无风格模板隐藏 ASS 面板，custom 显示布局行 */
     assert.ok(/syncAssPanel/.test(mg), '缺 syncAssPanel');
-    assert.ok(/\$\('assPanel'\)\.style\.display = \(tpl === 'srt' \|\| tpl === 'vtt'\) \? 'none' : ''/.test(mg), '无风格模板未隐藏 ASS 面板');
+    /* v0.9.238：无风格模板（srt/vtt）与「VTT 双语样式」都要把 ASS 面板收起来（两套单位不同，不能同时摆着） */
+    assert.ok(/const plain = \(tpl === 'srt' \|\| tpl === 'vtt'\);/.test(mg), '缺 plain 判定');
+    assert.ok(/\$\('assPanel'\)\.style\.display = \(plain \|\| tpl === 'vttStyle'\) \? 'none' : ''/.test(mg), '无风格 / VTT 模板未隐藏 ASS 面板');
+    assert.ok(/\$\('mVttPanel'\)\.style\.display = \(tpl === 'vttStyle'\) \? '' : 'none'/.test(mg) ||
+      /const vp = \$\('mVttPanel'\); if \(vp\) vp\.style\.display = \(tpl === 'vttStyle'\) \? '' : 'none'/.test(mg), 'VTT 面板未随模板显隐');
     assert.ok(/\$\('layoutRow'\)\.style\.display = tpl === 'custom' \? 'flex' : 'none'/.test(mg), '布局行未只在 custom 显示');
     /* 恢复默认：14 个外观字段逐一回默认值（⚠️ 只在 ASS_DEFAULTS 声明块内数，文件里还有同形态的绑定数组） */
     assert.ok(/function resetAssDefaults\(\)/.test(mg), '缺 resetAssDefaults');
@@ -5519,8 +5530,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.237</.test(mg), 'merge.html 版本未升 0.9.237');
-    assert.ok(/merge-core\.js\?v=0\.9\.237/.test(mg), 'merge-core.js?v 未升 0.9.237');
+    assert.ok(/class="ver">v0\.9\.238</.test(mg), 'merge.html 版本未升 0.9.238');
+    assert.ok(/merge-core\.js\?v=0\.9\.238/.test(mg), 'merge-core.js?v 未升 0.9.238');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6682,5 +6693,210 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
   });
 
+
+
+  console.log('— v0.9.238：双语页自己的 WebVTT 样式（与主站隔离、参数同源） —');
+
+  const V238_ITEMS = [{ no:1, start:1000, end:3200, text:'我们应该谈谈这件事。\nWe should talk about this.' }];
+  const V238_ST = { line:'90', lineAlign:'end', position:'50', width:'80', align:'center',
+    size:'100', color:'#FFFFFF', font:'PingFang SC', lineHeight:'1.4', bold:true, italic:false,
+    srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+    bgOn:true, bgColor:'#000000', bgAlpha:'55', shadowOn:true, shadowW:'2', shadowColor:'#000000' };
+
+  t('v0.9.238：两套引擎的 VTT 产物逐字节一致（参数同源，哪边漂移都会在这里炸）', () => {
+    const variants = [
+      V238_ST,
+      { line:'150', position:'-20', width:'12.5', size:'150', srcDiff:false, bgOn:false, shadowOn:false, shadowW:'0' },
+      { srcDiff:true, srcColor:'#C9D1D9', srcSize:'78' },
+      {}
+    ];
+    variants.forEach((st, i) => {
+      assert.strictEqual(M.vttStyleBlock(st), C.vttStyleBlock(st), 'STYLE 块与主站不一致 #' + i);
+      assert.strictEqual(M.vttCueSettings(st), C.vttCueSettings(st), 'cue settings 与主站不一致 #' + i);
+      [0, 1].forEach(sl => assert.strictEqual(
+        M.formatVtt(V238_ITEMS, { style:st, srcLine:sl }),
+        C.formatVtt(V238_ITEMS, { style:st, srcLine:sl }), '整份 VTT 与主站不一致 #' + i));
+    });
+    const out = M.formatVtt(V238_ITEMS, { style:V238_ST, srcLine:1 });
+    assert.deepStrictEqual(M.parseVttStyle(out), C.parseVttStyle(out), '样式回读与主站结果不一致');
+    const p = M.parseVttStyle(out);
+    assert.strictEqual(p.found, true, '自己写出去的样式读不回来');
+    assert.strictEqual(p.srcLine, 1, '没认出原文是第 2 行');
+    assert.strictEqual(p.style.width, '80', 'cue settings 的 size 没回读成 width');
+    assert.strictEqual(p.style.bgAlpha, '55', '底衬不透明度没回读');
+  });
+
+  t('v0.9.238：不传样式时 merge 的 VTT 与 v0.9.237 及以前逐字节一致（老调用不许变）', () => {
+    const items = [{ no:1, start:1000, end:3200, text:'甲\n乙' }];
+    const old = 'WEBVTT\n\n1\n00:00:01.000 --> 00:00:03.200\n甲\n乙\n';
+    assert.strictEqual(M.formatVtt(items), old, '不传第二参时输出变了');
+    assert.strictEqual(M.formatVtt(items, {}), old, '传空 opt 时输出变了');
+    assert.strictEqual(M.formatVtt(items, { srcLine:-1 }), old, 'srcLine=-1（无原文行）时输出变了');
+  });
+
+  t('v0.9.238：用户填什么就写什么（越界 / 负数 / 小数都不夹、不换算）', () => {
+    const out = M.formatVtt([{ no:1, start:0, end:1000, text:'x' }],
+      { style:{ line:'150', lineAlign:'start', position:'-20', width:'12.5', size:'150' } });
+    assert.ok(out.indexOf('line:150%,start') >= 0, 'line=150% 应原样写出（不许夹回 100）');
+    assert.ok(out.indexOf('position:-20%') >= 0, 'position=-20% 应原样写出');
+    assert.ok(out.indexOf('size:12.5%') >= 0, 'size=12.5% 应原样写出（不许取整）');
+    assert.ok(M.vttStyleBlock({ size:'150' }).indexOf('font-size: 150%;') >= 0, '字号 150% 应原样写出');
+    /* 反向：认不出来的值不写，也绝不猜一个数 */
+    assert.strictEqual(M.vttStyleBlock({ size:'abc' }).indexOf('font-size'), -1, '非法字号不该硬写一个猜的值');
+    assert.strictEqual(M.vttCueSettings({ line:'abc', position:'', width:'x' }), '', '认不出来的 cue setting 不该写');
+    assert.ok(M.vttCueSettings({ width:'0' }).indexOf('size:0%') >= 0, '0 是合法值，不许被当成「没填」');
+  });
+
+  t('v0.9.238：merge 的 VTT 与主站彻底隔离（不共用引擎、不共用 DOM、不共用存储）', () => {
+    assert.ok(mg.indexOf('srt-core.js') === -1, 'merge.html 又去引主站引擎了');
+    assert.ok(!/SrtCore|require\(|\bimport\s/.test(mgcSrc), 'merge-core 引用了主站引擎的东西');
+    const mainIds = ['vttLine','vttLineAlign','vttPos','vttWidth','vttAlign','vttSize','vttColor','vttFont','vttLH',
+      'vttBold','vttItalic','vttSrcDiff','vttSrcColor','vttSrcSize','vttBgOn','vttBgColor','vttBgAlpha',
+      'vttShadowOn','vttShadowW','vttShadowColor'];
+    mainIds.forEach(id => assert.ok(mg.indexOf('id="' + id + '"') === -1, 'merge.html 用了主站的 id ' + id));
+    const mineIds = mainIds.map(id => 'm' + id.charAt(0).toUpperCase() + id.slice(1));
+    mineIds.forEach(id => assert.ok(mg.indexOf('id="' + id + '"') > 0, 'merge.html 缺控件 ' + id));
+    /* 反向：主站也不该出现 merge 的 id（防复制粘贴串台） */
+    mineIds.forEach(id => assert.ok(html.indexOf("'" + id + "'") === -1, '主站出现了 merge 的 id ' + id));
+    assert.ok(mg.indexOf('srt_vtt_style_v1') === -1, 'merge 不该读写主站的方案键');
+    assert.ok(mg.indexOf('srt_merge_vtt_style_v1') === -1, '注释不该再声称一个没实现的存储键');
+    /* 反过来主站那边也不能动：它的面板 id 一个都没少 */
+    mainIds.forEach(id => assert.ok(html.indexOf('id="' + id + '"') > 0, '主站丢了控件 ' + id));
+  });
+
+  t('v0.9.238：三套标准模板覆盖面板全部字段（漏一个就不是那套样式）', () => {
+    const grab = (name, re) => {
+      const m = re.exec(mg); assert.ok(m, '取不到 ' + name);
+      return new Function('return ' + m[1])();
+    };
+    const pos  = grab('MVTT_POS_IDS',  /const MVTT_POS_IDS\s*=\s*(\[[\s\S]*?\]);/);
+    const main = grab('MVTT_MAIN_IDS', /const MVTT_MAIN_IDS\s*=\s*(\[[\s\S]*?\]);/);
+    const src  = grab('MVTT_SRC_IDS',  /const MVTT_SRC_IDS\s*=\s*(\[[\s\S]*?\]);/);
+    const pres = grab('MVTT_PRESETS',  /const MVTT_PRESETS\s*=\s*(\{[\s\S]*?\n\});/);
+    const all = pos.concat(main, src);
+    assert.ok(all.length >= 20, '字段清单太短（' + all.length + '）');
+    ['std','compact','cinema'].forEach(k => {
+      assert.ok(pres[k], '缺模板 ' + k);
+      all.forEach(id => assert.ok(id in pres[k], k + ' 漏了字段 ' + id));
+    });
+    all.forEach(id => assert.ok(mg.indexOf('id="' + id + '"') > 0, 'HTML 里没有控件 ' + id));
+    /* 三套必须真的不一样，否则「选了没变化」 */
+    assert.notStrictEqual(JSON.stringify(pres.std), JSON.stringify(pres.compact), '标准与紧凑一模一样');
+    assert.notStrictEqual(JSON.stringify(pres.compact), JSON.stringify(pres.cinema), '紧凑与电影感一模一样');
+    assert.notStrictEqual(pres.std.mVttBgOn, pres.cinema.mVttBgOn, '「电影感」应该关掉底衬（否则靠什么压亮画面）');
+    /* 切模板 = 显式选模板 → 清掉继承/手改门控；继承值不许被顺手冲掉 */
+    const ap = mg.slice(mg.indexOf('function applyVttPreset('), mg.indexOf('function vttStyleOf('));
+    assert.ok(/VTT_INH\.active = false;/.test(ap) && /VTT_INH\.dirty = \{ main:false, src:false, pos:false \};/.test(ap),
+      '显式套模板没清掉继承/手改门控');
+    const sp = mg.slice(mg.indexOf('function syncVttPanel('), mg.indexOf('function importVttStyle('));
+    assert.ok(/if \(!VTT_INH\.active\) applyVttPreset/.test(sp), '继承来的值被切模板冲掉了');
+  });
+
+  t('v0.9.238：「VTT 双语样式」是真模板：分段按钮、导出分支、扩展名都接上了', () => {
+    assert.ok(/<option value="vttStyle"/.test(mg), '缺 vttStyle 模板选项');
+    assert.ok(/\['vttStyle','tplSegVttStyle'\]/.test(mg), '分段按钮没有这一档');
+    assert.ok(/if \(fmt === 'vtt-styled'\) return buildVttExport\(\);/.test(mg), '导出没接上 VTT 样式分支');
+    assert.ok(/return \(f === 'vtt' \|\| f === 'vtt-styled'\) \? 'vtt'/.test(mg), 'vtt-styled 的扩展名不是 .vtt');
+    /* ASS 面板与 VTT 面板互斥（两套单位不同，不能同时摆着） */
+    assert.ok(/\$\('assPanel'\)\.style\.display = \(plain \|\| tpl === 'vttStyle'\) \? 'none' : ''/.test(mg),
+      '选了 VTT 样式却还把 ASS 面板摆着');
+  });
+
+  t('v0.9.238：预览与导出取同一份行（不是各画一套），且不偷偷夹取', () => {
+    const pv = mg.slice(mg.indexOf('function renderVttPv(){'), mg.indexOf('function vttPresetLabel(){'));
+    const ex = mg.slice(mg.indexOf('function buildVttExport(){'), mg.indexOf('function renderVttPv(){'));
+    assert.ok(pv.length > 0 && ex.length > 0, '抠不到预览/导出函数');
+    assert.ok(/const parts = vttCueParts\(\);/.test(pv), '预览不是从 vttCueParts 取行');
+    assert.ok(/vttCueParts\(\)\.map/.test(ex), '导出不是从 vttCueParts 取行');
+    assert.ok(/parts\[0\]\.lines\.forEach/.test(pv), '预览没按导出的逐行渲染（行数会对不上）');
+    /* 底衬/描边必须问 core 要：只有 core 真写得出来，预览才画（否则「预览有、导出没有」） */
+    assert.ok(/C\.vttRgba\(st\.bgColor, st\.bgAlpha\)/.test(pv), '预览自己另算底衬');
+    assert.ok(/C\.vttShadowCss\(st\)/.test(pv), '预览自己另算描边');
+    /* 没内容 / 不是这个模板 → 整块收起来，不能留着旧画面 */
+    assert.ok(/if \(!isVtt \|\| !S\.rows \|\| !S\.rows\.length\)\{ box\.style\.display = 'none'; return; \}/.test(pv),
+      '没内容时预览没收起来');
+    /* 位置是界面上的原值：越界也照画 */
+    assert.ok(/cue\.style\.width = w \+ '%';/.test(pv), '宽度不是原值');
+    assert.ok(!/Math\.min\(100,/.test(pv) && !/Math\.max\(0,/.test(pv), '预览在偷偷把位置/宽度夹回范围内');
+    /* ⚠️ 凡重新生成 S.rows 的地方都要重画 VTT 预览（v0.9.228「预览又不见了」的教训）。
+       反过来，只动 ASS 参数的三处（恢复 ASS 默认 / 套 ASS 方案 / 导入 ASS 样式）不需要，
+       它们碰不到 VTT 面板 —— 所以这里点名，不用「所有 renderAssPv 都要配对」这种粗规则。 */
+    const fnHas = (name, needle) => {
+      const i = mg.indexOf('function ' + name + '(');
+      assert.ok(i > 0, '找不到函数 ' + name);
+      const j = mg.indexOf('\nfunction ', i + 10);
+      return mg.slice(i, j > 0 ? j : mg.length).indexOf(needle) >= 0;
+    };
+    ['doMerge','doAdjust','syncMode'].forEach(fn =>
+      assert.ok(fnHas(fn, 'renderVttPv();'), fn + ' 重算了合并结果却没重画 VTT 预览'));
+    /* 上下顺序（哪一行是原文）变了也要重画：它决定 <c.src> 标在哪一行 */
+    const bi = mg.slice(mg.indexOf("input[name=biOrder]"), mg.indexOf("/* v0.9.228：调整模式换"));
+    assert.ok(bi.indexOf('renderVttPv();') >= 0, '换上下顺序没重画 VTT 预览');
+  });
+
+  t('v0.9.238：手改过的区域不会被下一次导入悄悄覆盖（改了就打脏标记）', () => {
+    const bind = mg.slice(mg.indexOf('MVTT_POS_IDS.concat('), mg.indexOf('const psel = '));
+    assert.ok(bind.length > 0, '抠不到字段绑定');
+    assert.ok(/VTT_INH\.dirty\[regionOfId\(id\)\] = true/.test(bind), '改了字段没标记所属区域');
+    assert.ok(/sel\.value = 'custom'/.test(bind), '手改后模板下拉没变成「自定义」');
+    assert.ok(/function regionOfId\(/.test(mg) && /MVTT_POS_IDS\.indexOf\(id\) >= 0\) return 'pos';/.test(mg),
+      '缺「字段属于哪个区域」的判定');
+  });
+
+  t('v0.9.238：导入继承 —— 只读认得的、不替用户改导出格式、说清样式来源', () => {
+    const fn = mg.slice(mg.indexOf('function importVttStyle('), mg.indexOf('function baseName('));
+    assert.ok(fn.length > 0, '抠不到 importVttStyle');
+    assert.ok(/C\.parseVttStyle/.test(fn), '导入没走 core 的回读');
+    assert.ok(/if \(!VTT_INH\.dirty\.pos\)\{/.test(fn) && /if \(!VTT_INH\.dirty\.main\)\{/.test(fn) &&
+      /if \(!VTT_INH\.dirty\.src\)\{/.test(fn), '三个区域缺了门控');
+    assert.ok(/sel\.value = 'custom'/.test(fn), '继承值不等于任何标准模板，必须标成「自定义」');
+    /* ⚠️ 只有用户本来就在导 VTT 才切到「双语样式」；拿 ASS 模板导出却被改成 VTT = 替用户做决定 */
+    const seg = fn.slice(fn.indexOf('const tpl = tplVal();'), fn.indexOf('vttAfterFill();'));
+    assert.ok(/if \(tpl === 'vtt' \|\| tpl === 'vttStyle'\)/.test(seg), '不该无条件替用户改导出格式');
+    assert.ok(seg.indexOf('expStyle') < 0, '导入不该顺手改用户的导出格式选择');
+    /* 让用户看见「这些值是文件里来的」 */
+    assert.ok(/pnl\.open = true/.test(fn), '导入后面板没展开（用户看不见样式来源）');
+    assert.ok(/note\.textContent = t\('vttImportedNote'/.test(fn), '没写明样式来自哪个文件');
+    assert.ok(/parsed\.notes && parsed\.notes\.indexOf\('lineNumber'\) >= 0/.test(fn), '行号写法没提示用户');
+    /* 导入点：只有 VTT 才需要继承样式 */
+    assert.ok(/importVttStyle\(side, \(fmt === 'vtt'\) \? String\(text\) : '', name\);/.test(mg), 'loadSide 没接上导入继承');
+  });
+
+  t('v0.9.238：STYLE 块只写白名单内的属性（白名单外的写了浏览器也不认）', () => {
+    const white = M.VTT_CSS_WHITE;
+    assert.ok(Array.isArray(white) && white.length > 5, '缺 CSS 白名单');
+    ['color','font-size','background-color','text-shadow','font-family'].forEach(p =>
+      assert.ok(white.indexOf(p) >= 0, '白名单缺 ' + p));
+    const blk = M.vttStyleBlock(V238_ST);
+    assert.strictEqual(blk.indexOf('STYLE'), 0, 'STYLE 块位置不对');
+    const props = (blk.match(/^\s{2}([a-z-]+):/gm) || []).map(x => x.trim().replace(/:$/, ''));
+    assert.ok(props.length >= 6, '属性太少（' + props.length + '）');
+    props.forEach(p => assert.ok(white.indexOf(p) >= 0, '写了白名单外的属性 ' + p));
+  });
+
+  t('v0.9.238：VTT 面板与预览的新词条四语齐全', () => {
+    const keys = ['tplVttStyle','tplSegVttStyle','tplHintVttStyle','vttPanelTitle','vttStyleTip','lblVttPreset',
+      'vttPresetStd','vttPresetCompact','vttPresetCinema','vttPresetCustom','vttGrpPos','vttGrpText','vttGrpSrc','vttGrpFx',
+      'lblVttLine','lblVttAnchor','lblVttPos','lblVttWidth','lblVttAlign','lblVttSize','lblVttColor','lblVttFont','lblVttLH',
+      'lblVttWeight','lblVttItalic','lblVttSrcDiff','lblVttSrcColor','lblVttSrcSize','lblVttBg','lblVttBgColor','lblVttBgAlpha',
+      'lblVttShadow','lblVttShadowW','lblVttShadowColor','vttAnchorEnd','vttAnchorStart','vttAnchorMid',
+      'vttAlignCenter','vttAlignStart','vttAlignEnd','vttFxTip','vttReset','vttResetDone','vttImportedNote',
+      'vttLineNumNote','pvVttTitle'];
+    const dictOf = (code) => {
+      const m = new RegExp("^\\s*'" + code + "':\\s*\\{", 'm').exec(mg);
+      assert.ok(m, '找不到语言块 ' + code);
+      const i = mg.indexOf(m[0]);
+      let d = 0, jEnd = mg.indexOf('{', i);
+      for (let q = jEnd; q < mg.length; q++){
+        if (mg[q] === '{') d++;
+        else if (mg[q] === '}'){ d--; if (d === 0){ jEnd = q; break; } }
+      }
+      return mg.slice(i, jEnd + 1);
+    };
+    ['zh-CN','zh-TW','en','ja'].forEach(code => {
+      const d = dictOf(code);
+      keys.forEach(k => assert.ok(d.indexOf(k + ':') > 0, code + ' 缺词条 ' + k));
+    });
+  });
 
 }
