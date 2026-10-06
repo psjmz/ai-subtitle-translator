@@ -3303,7 +3303,13 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       const m = html.match(new RegExp("^\\s*'" + code + "':\\s*\\{[^\\n]*pureMTMode", 'm'));
       assert.ok(m, '未找到 ' + code + ' 字典');
       const i = html.indexOf(m[0]);
-      const v = html.slice(i, i + 9000).match(/termsPh3\s*:\s*'((?:[^'\\]|\\.)*)'/);
+      /* v0.9.232：别用固定长度窗口切字典——往字典里加词条会把后面的词推出窗口，
+         于是「本来在、只是变远了」会被误判成缺失（本次给 4 个字典各加了 6 条就踩到了）。
+         改成截到下一个语言字典起点为止：既不漏、也不会借下一个字典凑数。 */
+      const rest = html.slice(i + m[0].length);
+      const nx = rest.search(/\n\s*'[a-zA-Z-]{2,}':\s*\{/);
+      const seg = nx > 0 ? m[0] + rest.slice(0, nx) : html.slice(i, i + 60000);
+      const v = seg.match(/termsPh3\s*:\s*'((?:[^'\\]|\\.)*)'/);
       assert.ok(v, code + ' 缺少 termsPh3');
       assert.ok(/\\n/.test(v[1]), code + ' 示例不是多行（起不到示范作用）');
       assert.ok(!/每行一条|表示保留|表示指定|如何|怎么/.test(v[1]), code + ' placeholder 里仍混着说明文字');
@@ -5332,7 +5338,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.231/.test(mg), 'merge.html 未引用 v0.9.231 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.232/.test(mg), 'merge.html 未引用 v0.9.232 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5365,9 +5371,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.231</.test(html), '首页版本号未升 0.9.231');
-    assert.ok(/class="ver-tag">v0\.9\.231</.test(html), '工作台版本号未升 0.9.231');
-    assert.ok(/srt-core\.js\?v=0\.9\.231/.test(html), 'srt-core.js?v 未升 0.9.231');
+    assert.ok(/class="ver">v0\.9\.232</.test(html), '首页版本号未升 0.9.232');
+    assert.ok(/class="ver-tag">v0\.9\.232</.test(html), '工作台版本号未升 0.9.232');
+    assert.ok(/srt-core\.js\?v=0\.9\.232/.test(html), 'srt-core.js?v 未升 0.9.232');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5511,8 +5517,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.231</.test(mg), 'merge.html 版本未升 0.9.231');
-    assert.ok(/merge-core\.js\?v=0\.9\.231/.test(mg), 'merge-core.js?v 未升 0.9.231');
+    assert.ok(/class="ver">v0\.9\.232</.test(mg), 'merge.html 版本未升 0.9.232');
+    assert.ok(/merge-core\.js\?v=0\.9\.232/.test(mg), 'merge-core.js?v 未升 0.9.232');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6130,6 +6136,111 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/function schemeApplyObj[\s\S]{0,600}syncAssPanel/.test(mg), '套用方案走了 syncAssPanel，值会被预设冲掉');
     assert.ok(/function schemeApplyObj[\s\S]{0,800}syncAssEdge\(\); syncAssChrome\(\); renderAssPv\(\);/.test(mg),
       '套用方案后未同步边色控件/显隐/预览');
+  });
+
+
+  /* ================= v0.9.232：自定义 API 的「服务端转发」通道 =================
+     起因：api.z.ai 这类端点的网关不放行 CORS 预检（OPTIONS 只回 200、不带
+     Access-Control-Allow-*），浏览器直连必抛 Failed to fetch——跟 Key、模型名、
+     参数全无关。只能用服务端代发，且这条链路必须与后台 B 槽同一套 callModel。 */
+  const fsR = require('fs'), paR = require('path');
+  const srvR = fsR.readFileSync(paR.join(__dirname, 'server.js'), 'utf8');
+
+  t('v0.9.232：转发端点接进服务端，且走的是同一套 callModel', () => {
+    assert.ok(/u === '\/api\/proxy'/.test(srvR), 'server.js 没有 /api/proxy 路由');
+    assert.ok(/await callModel\(relayCfg, pbody\.messages/.test(srvR), '转发没复用 callModel（会与后台行为分叉）');
+    assert.ok(/normParams\(pbody && pbody\.extra\)/.test(srvR), '转发没走附加参数清洗');
+    /* 客户端断开必须中止上游——否则服务端还在替一个已经关掉标签页的用户烧 token */
+    assert.ok(/res\.on\('close', \(\) => \{ if \(!res\.writableFinished\) cliAc\.abort\(\); \}\)/.test(srvR), '转发没接客户端断开中止');
+    assert.ok(/timeoutMs: budget/.test(srvR), '转发没有超时预算');
+    assert.ok(/delete pOut\._rl/.test(srvR), '额度头不该外泄给前端');
+  });
+
+  t('v0.9.232：转发是开放代理，必须有目的地白名单与限流', () => {
+    assert.ok(/function targetAllowed\(/.test(srvR) && /function proxyAllow\(/.test(srvR), '缺白名单或限流');
+    assert.ok(/u\.protocol !== 'https:'/.test(srvR), '没有强制 https（Key 会在链路上裸奔）');
+    assert.ok(/if \(isIp\) return isPrivateIp\(host\)/.test(srvR), 'IP 形式没查内网');
+    assert.ok(/dns\.promises\.lookup\(host, \{ all: true \}\)/.test(srvR), '域名没做解析后复查（DNS 指向内网会漏）');
+    assert.ok(/PROXY_CAP/.test(srvR) && /Too many relay requests/.test(srvR), '没有按 IP 限流');
+    /* 不能把用户 Key 写进配置或埋点 */
+    assert.ok(!/cfg\.key\s*=\s*relayCfg|writeFileSync\([^)]*relayCfg/.test(srvR), '转发的 Key 不该落盘');
+  });
+
+  t('v0.9.232：内网/本机/云元数据地址一律拒绝转发', () => {
+    const src = srvR.match(/function isPrivateIp\(ip\)\{[\s\S]*?\n\}/);
+    assert.ok(src, 'isPrivateIp 不存在');
+    const f = new Function(src[0] + '; return isPrivateIp;')();
+    ['127.0.0.1', '127.1.2.3', '10.0.0.1', '192.168.1.1', '172.16.0.1', '172.31.255.255',
+     '169.254.169.254', '0.0.0.0', '::1', '::', 'fe80::1', 'fd00::1', '::ffff:127.0.0.1',
+     '100.64.0.1'].forEach(ip => assert.strictEqual(f(ip), true, ip + ' 应判为内网'));
+    ['8.8.8.8', '1.1.1.1', '47.236.70.2', '104.16.0.1'].forEach(ip => assert.strictEqual(f(ip), false, ip + ' 不该判为内网'));
+    /* 172.15 / 172.32 是公网段，别误杀 */
+    assert.strictEqual(f('172.15.0.1'), false, '172.15 是公网');
+    assert.strictEqual(f('172.32.0.1'), false, '172.32 是公网');
+  });
+
+  t('v0.9.232：前端转发开关接进 chatOnce（请求体/请求头/重试都要跟着变）', () => {
+    assert.ok(/const RELAY_API = '\/api\/proxy'/.test(html), '缺转发端点常量');
+    assert.ok(/const relay = !builtin && relayOn\(\);/.test(html), 'chatOnce 没判转发');
+    assert.ok(/relay \? RELAY_API : base\.replace/.test(html), '转发时 URL 没切到本站');
+    /* 转发还带 Authorization 跨域头 → 第三方端点的预检照样先失败一次 */
+    assert.ok(/if\(!builtin && !relay && key\) headers\.Authorization/.test(html), '转发时不该再发 Authorization 头');
+    assert.ok(/relay\?mkRelayBody\(plan\):mkBody\(plan\)/.test(html), '转发没用转发体');
+    assert.ok(/const b=\{ base:base, key:key, model:model, messages:msgs \}/.test(html), '转发体缺端点三件套/正文');
+    assert.ok(/if\(opts && opts\.json\) b\.json=1;/.test(html), '转发体没带 JSON 意图（服务端无从注入 response_format）');
+    assert.ok(/b\.timeoutMs=Math\.max\(5000, Math\.min\(300000, ms-5000\)\)/.test(html), '转发体没带超时预算');
+    /* 服务端已做完四轮降级，前端再按错误文案重试 = 同一个请求白跑几遍 */
+    assert.ok(/if\(relay\) throw e;/.test(html), '转发时前端仍在重试');
+    /* 失败体是本站的 {error:{message}}，要取出来给人话 */
+    assert.ok(/const ej=JSON\.parse\(tx\); em=\(ej&&ej\.error&&ej\.error\.message\)/.test(html), '转发失败没取 error.message');
+  });
+
+  t('v0.9.232：温度与附加参数对齐后台（不再写死 0.2 / 不再丢嵌套对象）', () => {
+    assert.ok(/function tempFront\(\)/.test(html), '缺温度读取');
+    assert.ok(/temperature:\(tp===null\?0\.2:tp\)/.test(html), '直连仍写死 temperature（与后台 cfg.temperature 不一致）');
+    assert.ok(/b\.temperature=tp/.test(html), '转发体没带温度');
+    /* 后台 v0.9.210 已支持嵌套（OpenRouter 的 {"provider":{...}}），前端此前整条丢弃 */
+    assert.ok(/function cleanParamVal\(node, depth\)/.test(html), '附加参数没有递归清洗');
+    assert.ok(/const top = cleanParamVal\(o,0\)/.test(html), '附加参数没走清洗');
+    assert.ok(/EXTRA_MAX_DEPTH = 4/.test(html), '清洗没有深度封顶');
+    const csrc = html.match(/function cleanParamVal\(node, depth\)\{[\s\S]*?\n\}/);
+    assert.ok(csrc, '取不到 cleanParamVal 源码');
+    /* 源码里引用了 EXTRA_MAX_DEPTH，单拿出来求值时要显式注入（否则 ReferenceError） */
+    const cf = new Function('EXTRA_MAX_DEPTH', csrc[0] + '; return cleanParamVal;')(4);
+    /* 嵌套对象要原样保留（此前会被静默丢掉） */
+    assert.deepStrictEqual(cf({ provider: { sort: 'price', allow_fallbacks: true } }, 0),
+      { provider: { sort: 'price', allow_fallbacks: true } }, '嵌套对象被丢了');
+    assert.deepStrictEqual(cf({ a: [1, 'x', true] }, 0), { a: [1, 'x', true] }, '数组被丢了');
+    assert.deepStrictEqual(cf({ fn: function () {}, good: 1 }, 0), { good: 1 }, '函数值应被剔除');
+  });
+
+  t('v0.9.232：转发开关与温度要能存下来，且默认关', () => {
+    assert.ok(html.indexOf("temp:($('temp')||{}).value||''") > 0, 'save() 没存温度');
+    assert.ok(html.indexOf("viaSrv:(($('viaSrv')||{}).checked)?'1':'0'") > 0, 'save() 没存转发开关');
+    assert.ok(/if\(sv\.temp\) \$\('temp'\)\.value=sv\.temp;/.test(html), '加载没回填温度');
+    assert.ok(/if\(sv\.viaSrv==='1'\) \$\('viaSrv'\)\.checked=true;/.test(html), '加载没回填转发开关');
+    assert.ok(/'extra','temp','viaSrv','terms'/.test(html), 'temp/viaSrv 没接进 change 自动保存');
+    /* 默认必须是关：原有承诺是「自定义 API 不经本站」 */
+    assert.ok(/<input type="checkbox" id="viaSrv">/.test(html), '转发开关默认是勾选的（改变了隐私承诺）');
+    assert.ok(/<input type="number" id="temp" value="0\.2"/.test(html), '温度默认值不是 0.2（与后台不一致）');
+  });
+
+  t('v0.9.232：测试连接要在直连失败时说人话，而不是只抛 Failed to fetch', () => {
+    assert.ok(/\{maxTokens:256\}/.test(html), '测试连接没给 max_tokens（思考型模型会返回空正文）');
+    assert.ok(/if\(\/Failed to fetch\|NetworkError\|Load failed\|net::ERR_FAILED\/i\.test\(m\)\)/.test(html), '没识别直连失败');
+    assert.ok(/m = relaying \? t\('errRelay', m\) : t\('errCors'\);/.test(html), '没区分「直连失败」与「转发也失败」');
+  });
+
+  t('v0.9.232：新增词条四语齐全，且没撞已有键', () => {
+    ['lblTemp', 'tempTip', 'lblViaSrv', 'viaSrvTip', 'errCors', 'errRelay'].forEach(k => {
+      const n = (html.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:", 'g')) || []).length;
+      assert.strictEqual(n, 4, k + ' 出现 ' + n + ' 次（应为 4：zh-CN/zh-TW/en/ja）');
+      const dup = (html.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:", 'g')) || []).length;
+      assert.ok(dup <= 4, k + ' 在同一字典里重复定义（后者会静默覆盖前者）');
+    });
+    /* 页面元素真的引用了它们 */
+    assert.ok(/data-i18n="lblViaSrv"/.test(html) && /data-tip-i18n="viaSrvTip"/.test(html), '转发开关没接 i18n');
+    assert.ok(/data-i18n="lblTemp"/.test(html) && /data-tip-i18n="tempTip"/.test(html), '温度没接 i18n');
   });
 
 }

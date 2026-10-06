@@ -831,7 +831,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.231</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.232</span></div>
       <div class="spacer"></div>
       <a href="merge.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/><path d="M12 12h9"/><path d="m18.5 9.5 2.5 2.5-2.5 2.5"/></svg><span data-i18n="navMerge">双语合并</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
@@ -994,7 +994,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.231</span>
+    <span class="ver-tag">v0.9.232</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1161,6 +1161,13 @@
         <!-- v0.9.124：附加请求参数——透传到自定义 API 的请求体（关闭思考 / 强制 JSON 输出等） -->
         <label class="flbl" for="extra"><span data-i18n="lblExtra">附加请求参数（JSON，可选）</span><i class="info" tabindex="0" data-tip-i18n="extraTip">i</i></label>
         <input type="text" id="extra" spellcheck="false" placeholder='{"enable_thinking":false,"max_tokens":8192}'>
+        <!-- v0.9.232：温度——与后台 B 槽的 cfg.temperature 同一语义（0–2，越小越稳，默认 0.2）。
+             此前前端直连把它写死 0.2，后台可调，两边不一致。 -->
+        <label class="flbl" for="temp"><span data-i18n="lblTemp">温度（0–2，默认 0.2）</span><i class="info" tabindex="0" data-tip-i18n="tempTip">i</i></label>
+        <input type="number" id="temp" value="0.2" min="0" max="2" step="0.1">
+        <!-- v0.9.232：转发开关——默认关（保持「不经本站」的原有承诺）；
+             端点不放行浏览器跨域（如 api.z.ai 的预检被网关吞）或本机网络不通时勾选。 -->
+        <label class="tgl-row"><span class="l"><span data-i18n="lblViaSrv">由本站服务器转发</span><i class="info" tabindex="0" data-tip-i18n="viaSrvTip">i</i></span><input type="checkbox" id="viaSrv"><span class="tgl"></span></label>
         <div class="btns">
           <button class="btn" id="btnTest" type="button" data-i18n="btnTest">⚡ 测试连接</button>
           <span class="hint" id="testOut" style="align-self:center"></span>
@@ -1425,7 +1432,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.231"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.232"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1441,6 +1448,10 @@ const PROVIDERS = [
   { id:'deepseek',   name:'DeepSeek', zhName:'DeepSeek（推荐）', note:'noteDeepSeek',   base:'https://api.deepseek.com',                                        keyUrl:'https://platform.deepseek.com/api_keys' },
   { id:'qwen',       name:'Qwen (Alibaba)', zhName:'阿里通义千问',       base:'https://dashscope.aliyuncs.com/compatible-mode/v1',              keyUrl:'https://bailian.console.aliyun.com/?apiKey=1' },
   { id:'glm',        name:'Zhipu GLM', zhName:'智谱 GLM',          base:'https://open.bigmodel.cn/api/paas/v4',                            keyUrl:'https://open.bigmodel.cn/usercenter/apikeys' },
+  /* v0.9.232：Z.AI 是智谱的海外站（同为 GLM 系）。⚠️ 它的网关不放行 CORS 预检
+     （OPTIONS 不返回 Access-Control-Allow-*），浏览器直连必抛 Failed to fetch
+     ——选它时必须勾选「由本站服务器转发」。 */
+  { id:'zai',        name:'Z.AI (GLM Overseas)', zhName:'Z.AI（智谱 GLM 海外版）', base:'https://api.z.ai/api/paas/v4',                         keyUrl:'' },
   { id:'kimi',       name:'Moonshot Kimi', zhName:'月之暗面 Kimi',      base:'https://api.moonshot.cn/v1',                                      keyUrl:'https://platform.moonshot.cn/console/api-keys' },
   { id:'doubao',     name:'Doubao (Volcengine Ark)', zhName:'字节豆包（火山方舟）', base:'https://ark.cn-beijing.volces.com/api/v3',                      keyUrl:'https://console.volcengine.com/ark', note:'noteDoubao' },
   { id:'siliconflow',name:'SiliconFlow', zhName:'硅基流动 SiliconFlow', base:'https://api.siliconflow.cn/v1',                                keyUrl:'https://cloud.siliconflow.cn/account/ak' },
@@ -1449,6 +1460,10 @@ const PROVIDERS = [
 /* 站点内置免费模型（后台配置）：免 Key、OpenAI 兼容；匿名有速率限制 */
 /* 默认模型（站点后端 /api/translate 代理，管理员在 admin.html 配置） */
 const BUILTIN_API = '/api/translate';
+/* v0.9.232：自定义 API 的「服务端转发」端点。勾选「由本站服务器转发」后，
+   请求不再由浏览器直连第三方端点，而是发到本站、由 server.js 用与内置通道同一套
+   callModel 代发（解决端点不放行 CORS 预检 / 用户网络不通两类死局）。 */
+const RELAY_API = '/api/proxy';
 let BUILTIN_INFO = { configured: false, label: '', perIpDaily: 0, globalDaily: 0, usedToday: 0 };
 async function refreshBuiltinHint(){
   const el=$('builtinHint'); if(!el) return;
@@ -1696,6 +1711,9 @@ const I18N = {
   optCustom:"自定义…", btnTest:"⚡ 测试连接", testRun:"测试中…", testOk:"✓ 连接成功", testFail:"✗ 失败：{0}", getKey:"获取 API Key ↗", noteDoubao:"豆包需在火山方舟控制台开通模型服务；「模型」填 doubao-seed-… 或接入点 ID（ep- 开头）", noteOpenRouter:"模型名格式为 厂商/模型（如 anthropic/claude-sonnet-4.6）；一个 Key 可调用数百款模型",
   lblProvider:'服务商', lblBase:'Base URL（自动拼接 /chat/completions）', lblModel:'模型', lblBatch:'单批字符预算', batchTip:'每次请求送模型的字幕字符数。按长度自动分批——短句多装、长句少装，每批输出量稳定。越大总耗时略短，但过大可能降低翻译质量；默认 3000 适合大多数视频。',
   lblKey:'API Key（仅保存在本机浏览器）',
+  lblTemp:'温度（0–2，默认 0.2）', tempTip:'与后台模型设置的「温度」同一含义：越小越稳定、越大越发散；字幕翻译建议 0.2 或更低。留空则按 0.2。',
+  lblViaSrv:'由本站服务器转发', viaSrvTip:'默认关闭：浏览器直连你填的服务商，字幕与 Key 不经本站。部分端点（如 api.z.ai）不放行浏览器跨域，直连必然报 Failed to fetch——勾选后改由本站服务器代发即可连通，此时请求会经过本站（不保存、不记录）。',
+  errCors:'浏览器直连被拒绝（该端点多半不允许跨域，或本机网络不通）。可勾选「由本站服务器转发」再试。', errRelay:'经本站转发仍失败：{0}',
   chkKeepTerms:'专有名词（人名/机构/产品/术语）保留原文，不翻译',
   termsHintOn:'人名/机构/品牌一律保留原文写法，不翻译。术语表中指定的词条仍以术语表为准。',
   termsHintOff:'人名/机构/品牌一律译成目标语言译名。术语表中指定的词条仍以术语表为准。', pnKeep:'保留原文', pnTrans:'全部译出', btnGlossFile:'📂 上传术语表', glossHit:'术语表 {0} 条：本片命中 {1} 条，{2} 行无法识别', wsRkSub:'支持 YouTube / B站 / 抖音等 1750+ 站点，下载到本地', rkTx:'需要下载视频？试试 <b>RiseKol 视频下载器</b>', rkGo:'去看看 →', glossHelpTitle:'格式说明', glossHelp1:'只写来源 → 保留原文', glossHelp2:'指定译法，也认 -> => =', glossHelp3:'逗号或 Tab 分隔，第三列是备注', glossHelp4:'尾部括号是注释，不进译法', glossHelp5:'形变（如复数 Whoppers）需单独写一条', glossHelp6:'上传支持 .txt/.csv/.tsv/.json：追加 = 并入现有，替换 = 清空后写入', btnGlossAppend:'📥 追加', btnGlossReplace:'🔄 替换', btnGlossTpl:'📄 CSV 模板', glossHelp7:'字段含逗号时用双引号包裹（Excel 会自动加）', glossHelpLead:'让同一个专名从片头到片尾只用一种译法。这里的条目<b>优先于上方的「专名处理」</b>——写进来的按这里走，没写到的才按全局设置。', glossHelpFmt:'写法 · 一行一条', glossHelpS1:'只写原文，表示保留原文不译', glossHelpS2:'原文 → 译法', glossHelpS3:'逗号 / Tab / 箭头都认', glossHelpS4:'行尾括号是备注，不进译法', glossHelpArrow:'箭头也认 ->  =>  =', glossHelpMatch:'怎么匹配', glossHelpM1:'忽略大小写', glossHelpM2:'整个词匹配，不误伤相近词', glossHelpM3:'中日韩按片段匹配', glossHelpM4:'变形要另写一行', glossHelpUp:'上传', glossHelpU1:'支持 .txt / .csv / .tsv / .json，需 UTF-8', glossHelpU2:'追加 = 并入现有（同名以文件为准）；替换 = 清空后写入', glossHelpU3:'首行可以是表头，自动跳过', glossHelpU4:'字段含逗号时用双引号包住（Excel 会自动加）', autoTermsKeepNote:'当前为「保留原文」，抽出的专名会保持原文；要指定译法请手动改，或切成「全部译出」。', btnGlossAI:'✨ AI 抽取', glossAiRun:'正在抽取…', glossAiDone:'AI 抽出 {0} 条已填入下方，可直接修改', glossAiNone:'没抽出新条目，可能都已在你的表里', glossAiNeedFile:'先上传字幕，再点抽取', glossMiss:'未命中 {0} 条：{1}（改这些不生效）', glossAiCleared:'已清除上一份字幕 AI 抽取的 {0} 条（你手写的已保留）', glossVariant:'拼写变体', glossVerifyOk:'术语表核对通过：指定的译法都在成片译文里出现了', glossVerifyMiss:'术语表核对：{0} 条的指定译法没出现在成片译文里（模型没照做）：{1}', glossHelpS5:'几种拼写用 | 并排，共用一个译法', glossUseTitle:'这个表怎么用', glossWhy:'AI 是分批翻译的，同一个名字在不同批次里可能译成两种写法。写进这里的「原文 → 必须译成什么」，每批翻译前会先在这一批字幕里找一遍：找得到就交给 AI 照译，找不到这条就不提交——改它不会影响结果。没写进来的，按上面「专名处理」走。', glossHelpSep:'箭头 -> => = 、逗号、Tab 都认', glossNoEffT:'改了没生效？', glossNoEffB:'只有一种可能：你写的原文在字幕里没逐字出现过（多一个标点、少个 s 都配不上）。这时下方那行提示会变橙色，并点名是哪几条。', glossUpOne:'上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。', btnGlossDemo:'📝 填入示例', glossDemoOk:'已填入 {0} 条示例，可直接修改', glossDemoNone:'示例里的写法都已经有了', termsPh3:'SpaceX\nBurger King → 汉堡王\nWhopper|Whoppers → 华堡', glossClearedAll:'换了新字幕，已清空术语表 {0} 条',
@@ -1796,6 +1814,9 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   optCustom:"自訂…", btnTest:"⚡ 測試連線", testRun:"測試中…", testOk:"✓ 連線成功", testFail:"✗ 失敗：{0}", getKey:"取得 API Key ↗", noteDoubao:"豆包需在火山方舟控制台開通模型服務；「模型」填 doubao-seed-… 或接入點 ID（ep- 開頭）", noteOpenRouter:"模型名格式為 廠商/模型（如 anthropic/claude-sonnet-4.6）；一個 Key 可呼叫數百款模型",
   lblProvider:'服務商', lblBase:'Base URL（自動拼接 /chat/completions）', lblModel:'模型', lblBatch:'單批字元預算', batchTip:'每次請求送模型的字幕字元數。按長度自動分批——短句多裝、長句少裝，每批輸出量穩定。越大總耗時略短，但過大可能降低翻譯品質；預設 3000 適合大多數影片。',
   lblKey:'API Key（僅儲存在本機瀏覽器）',
+  lblTemp:'溫度（0–2，預設 0.2）', tempTip:'與後台模型設定的「溫度」同義：越小越穩定、越大越發散；字幕翻譯建議 0.2 或更低，留空則用 0.2。',
+  lblViaSrv:'由本站伺服器轉發', viaSrvTip:'預設關閉：瀏覽器直連你填的服務商，字幕與 Key 都不經本站。部分端點（如 api.z.ai）不允許瀏覽器跨域，直連必然回報 Failed to fetch——勾選後改由本站伺服器代發（不保存、不記錄）。',
+  errCors:'瀏覽器直連被拒絕（該端點多半不允許跨域，或本機網路不通）。可勾選「由本站伺服器轉發」再試。', errRelay:'經本站轉發仍失敗：{0}',
   chkKeepTerms:'專有名詞（人名/機構/產品/術語）保留原文，不翻譯',
   termsHintOn:'人名/機構/品牌一律保留原文寫法，不翻譯。術語表中指定的詞條仍以術語表為準。',
   termsHintOff:'人名/機構/品牌一律譯成目標語言譯名。術語表中指定的詞條仍以術語表為準。', pnKeep:'保留原文', pnTrans:'全部譯出', btnGlossFile:'📂 上傳術語表', glossHit:'術語表 {0} 條：本片命中 {1} 條，{2} 行無法辨識', wsRkSub:'支援 YouTube / B站 / 抖音等 1750+ 網站，下載到本機', rkTx:'需要下載影片？試試 <b>RiseKol 影片下載器</b>', rkGo:'去看看 →', glossHelpTitle:'格式說明', glossHelp1:'只寫來源 → 保留原文', glossHelp2:'指定譯法，也認 -> => =', glossHelp3:'逗號或 Tab 分隔，第三欄是備註', glossHelp4:'尾部括號是註釋，不進譯法', glossHelp5:'詞形變化（如複數 Whoppers）需單獨寫一條', glossHelp6:'上傳支援 .txt/.csv/.tsv/.json：追加 = 併入現有，替換 = 清空後寫入', btnGlossAppend:'📥 追加', btnGlossReplace:'🔄 替換', btnGlossTpl:'📄 CSV 範本', glossHelp7:'欄位含逗號時用雙引號包住（Excel 會自動加）', glossHelpLead:'讓同一個專名從片頭到片尾只用一種譯法。這裡的條目<b>優先於上方的「專名處理」</b>——寫進來的按這裡走，沒寫到的才按全域設定。', glossHelpFmt:'寫法 · 一行一條', glossHelpS1:'只寫原文，表示保留原文不譯', glossHelpS2:'原文 → 譯法', glossHelpS3:'逗號 / Tab / 箭頭都認', glossHelpS4:'行尾括號是備註，不進譯法', glossHelpArrow:'箭頭也認 ->  =>  =', glossHelpMatch:'怎麼比對', glossHelpM1:'忽略大小寫', glossHelpM2:'整個詞比對，不誤傷相近詞', glossHelpM3:'中日韓按片段比對', glossHelpM4:'詞形變化要另寫一行', glossHelpUp:'上傳', glossHelpU1:'支援 .txt / .csv / .tsv / .json，需 UTF-8', glossHelpU2:'追加 = 併入現有（同名以檔案為準）；替換 = 清空後寫入', glossHelpU3:'首行可以是表頭，自動跳過', glossHelpU4:'欄位含逗號時用雙引號包住（Excel 會自動加）', autoTermsKeepNote:'目前為「保留原文」，抽出的專名會保持原文；要指定譯法請手動改，或切成「全部譯出」。', btnGlossAI:'✨ AI 抽取', glossAiRun:'正在抽取…', glossAiDone:'AI 抽出 {0} 條已填入下方，可直接修改', glossAiNone:'沒抽出新條目，可能都已在你的表裡', glossAiNeedFile:'先上傳字幕，再點抽取', glossMiss:'未命中 {0} 條：{1}（改這些不生效）', glossAiCleared:'已清除上一份字幕 AI 抽取的 {0} 條（你手寫的已保留）', glossVariant:'拼寫變體', glossVerifyOk:'術語表核對通過：指定的譯法都出現在成片譯文中', glossVerifyMiss:'術語表核對：{0} 條的指定譯法沒出現在成片譯文裡（模型沒照做）：{1}', glossHelpS5:'幾種拼寫用 | 並排，共用一個譯法', glossUseTitle:'這個表怎麼用', glossWhy:'AI 是分批翻譯的，同一個名字在不同批次裡可能譯成兩種寫法。寫進這裡的「原文 → 必須譯成什麼」，每批翻譯前會先在該批字幕裡找一遍：找得到就交給 AI 照譯，找不到這條就不送出——改它不會影響結果。沒寫進來的，按上面「專名處理」走。', glossHelpSep:'箭頭 -> => = 、逗號、Tab 都認', glossNoEffT:'改了沒生效？', glossNoEffB:'只有一種可能：你寫的原文在字幕裡沒有逐字出現過（多一個標點、少一個 s 都配不上）。這時下方那行提示會變成橘色，並點名是哪幾條。', glossUpOne:'上傳支援 .txt / .csv / .tsv / .json（UTF-8）；追加 = 併入現有，替換 = 清空後寫入；首行是表頭會自動跳過。', btnGlossDemo:'📝 填入範例', glossDemoOk:'已填入 {0} 條範例，可直接修改', glossDemoNone:'範例裡的寫法都已經有了', termsPh3:'SpaceX\nBurger King → 漢堡王\nWhopper|Whoppers → 華堡', glossClearedAll:'換了新字幕，已清空術語表 {0} 條',
@@ -1896,6 +1917,9 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   optCustom:"Custom…", btnTest:"⚡ Test connection", testRun:"Testing…", testOk:"✓ Connected", testFail:"✗ Failed: {0}", getKey:"Get API Key ↗", noteDoubao:"Doubao requires enabling model service in the Volcano Ark console; Model = doubao-seed-… or endpoint ID (ep-…)", noteOpenRouter:"Model names use vendor/model format (e.g. anthropic/claude-sonnet-4.6); one key unlocks hundreds of models",
   lblProvider:'Provider', lblBase:'Base URL (/chat/completions appended automatically)', lblModel:'Model', lblBatch:'Chars per batch', batchTip:'Characters of subtitles sent to the model per request. Batches are cut by length automatically: short lines fill more, long lines fewer, keeping each output stable. Larger values finish slightly faster, but too large may reduce quality; the default 3000 suits most videos.',
   lblKey:'API Key (stored only in this browser)',
+  lblTemp:'Temperature (0–2, default 0.2)', tempTip:'Same field as Temperature in the admin model settings: lower is steadier, higher is more varied. For subtitles 0.2 or lower is recommended; leave empty for 0.2.',
+  lblViaSrv:'Relay through this site', viaSrvTip:'Off by default: your browser talks directly to the endpoint you entered, so subtitles and your key never pass through this site. Some endpoints (e.g. api.z.ai) refuse browser cross-origin requests and always fail with "Failed to fetch" — tick this to let the site server send requests instead. They then pass through this site (never stored or logged).',
+  errCors:'Direct browser connection refused (the endpoint usually disallows cross-origin calls, or your network cannot reach it). Tick "Relay through this site" and retry.', errRelay:'Relay still failed: {0}',
   chkKeepTerms:'Keep proper nouns (names/brands/products/terms) untranslated',
   termsHintOn:'Names, organizations and brands keep their original spelling and are not translated. Entries in the glossary below still take precedence.',
   termsHintOff:'Names, organizations and brands are all translated into the target language. Entries in the glossary below still take precedence.', pnKeep:'Keep original', pnTrans:'Translate all', btnGlossFile:'📂 Upload glossary', glossHit:'Glossary: {0} entries, {1} matched in this file, {2} lines unrecognized', wsRkSub:'YouTube, Bilibili, Douyin and 1750+ more sites — all downloads stay local', rkTx:'Need to download videos? Try <b>RiseKol Video Downloader</b>', rkGo:'Take a look →', glossHelpTitle:'Format guide', glossHelp1:'Source only → keep original', glossHelp2:'Set a translation; also accepts -> => =', glossHelp3:'Comma or tab separated; third column is a note', glossHelp4:'Trailing brackets are a comment, not the translation', glossHelp5:'Inflected forms (e.g. plural Whoppers) need their own line', glossHelp6:'Upload accepts .txt/.csv/.tsv/.json: append = merge, replace = clear then write', btnGlossAppend:'📥 Append', btnGlossReplace:'🔄 Replace', btnGlossTpl:'📄 CSV template', glossHelp7:'Wrap fields containing commas in double quotes (Excel does it automatically)', glossHelpLead:'Keep one rendering for a term from start to finish. Entries here <b>override the Proper nouns setting above</b> — listed terms follow this table, everything else follows the global choice.', glossHelpFmt:'Format · one per line', glossHelpS1:'Source only — keeps the original untranslated', glossHelpS2:'Source → rendering', glossHelpS3:'Comma / tab / arrow all work', glossHelpS4:'Trailing brackets are a note, not part of the rendering', glossHelpArrow:'Arrows also accept ->  =>  =', glossHelpMatch:'How matching works', glossHelpM1:'Case-insensitive', glossHelpM2:'Whole word — similar words are not affected', glossHelpM3:'CJK matches by substring', glossHelpM4:'Inflected forms need their own line', glossHelpUp:'Upload', glossHelpU1:'Accepts .txt / .csv / .tsv / .json, must be UTF-8', glossHelpU2:'Append = merge into existing (same name uses the file); Replace = clear then write', glossHelpU3:'First line may be a header, skipped automatically', glossHelpU4:'Wrap fields containing commas in double quotes (Excel does it automatically)', autoTermsKeepNote:'Proper nouns are set to keep original, so extracted ones stay in the source spelling. Edit them here for a specific rendering, or switch to translate all.', btnGlossAI:'✨ Extract with AI', glossAiRun:'Extracting…', glossAiDone:'{0} terms added below — edit them before you translate', glossAiNone:'No new terms found; they may already be in your list', glossAiNeedFile:'Upload a subtitle file first, then extract', glossMiss:'{0} not matched: {1} (editing these has no effect)', glossAiCleared:'Removed {0} AI-extracted entries from the previous file (your own entries kept)', glossVariant:'spelling variant', glossVerifyOk:'Glossary check passed: every specified rendering appears in the finished subtitles', glossVerifyMiss:'Glossary check: {0} entries never appear with the specified rendering in the finished subtitles (the model did not follow them): {1}', glossHelpS5:'Several spellings side by side with | share one rendering', glossUseTitle:'How to use this table', glossWhy:'AI translates in batches, so the same name can end up with two different renderings. What you write here ("source → must be rendered as") is looked up inside each batch before that batch is translated: found → the AI is told to use your rendering; not found → the entry is not submitted, so editing it changes nothing. Anything you leave out follows the "Proper nouns" setting above.', glossHelpSep:'Arrows -> => = , commas and tabs all work as separators', glossNoEffT:'Edited it and nothing changed?', glossNoEffB:'There is only one reason: the source term you wrote does not appear verbatim in the subtitles (one extra punctuation mark or a missing s is enough). The hint below turns orange and names the entries affected.', glossUpOne:'Upload accepts .txt / .csv / .tsv / .json (UTF-8); append = merge into what you have, replace = clear and write; a header row is skipped automatically.', btnGlossDemo:'📝 Fill in examples', glossDemoOk:'Filled in {0} example entries, edit them as you like', glossDemoNone:'These example forms are already in the table', termsPh3:'SpaceX\nOutlaw 1 → Renegade 1\nSt. Paul|St Paul → Saint Paul', glossClearedAll:'New subtitle loaded — cleared {0} glossary entries',
@@ -1996,6 +2020,9 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   optCustom:"カスタム…", btnTest:"⚡ 接続テスト", testRun:"テスト中…", testOk:"✓ 接続成功", testFail:"✗ 失敗：{0}", getKey:"APIキーを取得 ↗", noteDoubao:"doubao は火山方舟（Volcano Ark）コンソールでモデルサービスの有効化が必要。「モデル」は doubao-seed-… またはエンドポイント ID（ep- 始まり）", noteOpenRouter:"モデル名は ベンダー/モデル 形式（例: anthropic/claude-sonnet-4.6）。1 つのキーで数百のモデルを利用可能",
   lblProvider:'プロバイダー', lblBase:'Base URL（/chat/completions は自動付加）', lblModel:'モデル', lblBatch:'1回あたりの文字数', batchTip:'1リクエストでモデルに送る字幕の文字数。長さに応じて自動で分割され、短い行は多く、長い行は少なく入り、各バッチの出力量が安定します。大きいほど総時間はやや短くなりますが、大きすぎると品質が落ちることがあります。デフォルトの3000はほとんどの動画に適しています。',
   lblKey:'API Key（このブラウザにのみ保存）',
+  lblTemp:'温度（0–2、既定 0.2）', tempTip:'管理画面のモデル設定にある「温度」と同じ意味です。低いほど安定し、高いほど多様になります。字幕翻訳は 0.2 以下を推奨。空欄なら 0.2。',
+  lblViaSrv:'本站サーバー経由で転送', viaSrvTip:'既定はオフ：ブラウザが入力した事業者へ直接接続し、字幕もキーも本站を経由しません。一部の端点（例 api.z.ai）はブラウザからのクロスオリジンを許可せず、直結は必ず Failed to fetch になります——オンにすると本站のサーバーが代わりに送信します（保存・記録はしません）。',
+  errCors:'ブラウザからの直接接続が拒否されました（端点がクロスオリジンを許可していない、またはネット不通）。「本站サーバー経由で転送」をオンにして再試行してください。', errRelay:'転送でも失敗：{0}',
   chkKeepTerms:'固有名詞（人名/組織/製品/用語）は原文のまま翻訳しない',
   termsHintOn:'人名・組織・ブランドは原文のまま訳しません。下の用語集に指定した語は用語集が優先されます。',
   termsHintOff:'人名・組織・ブランドはすべて対象言語の訳語にします。下の用語集に指定した語は用語集が優先されます。', pnKeep:'原文のまま', pnTrans:'すべて訳す', btnGlossFile:'📂 用語集をアップロード', glossHit:'用語集 {0} 語：このファイルで {1} 語が一致、{2} 行は判別できませんでした', wsRkSub:'YouTube・B站・抖音など1750以上のサイトに対応、ダウンロードはすべてローカル', rkTx:'動画をダウンロードしたい？<b>RiseKol 動画ダウンローダー</b> を試してみて', rkGo:'見てみる →', glossHelpTitle:'書式ガイド', glossHelp1:'原文のみ → 原文を保持', glossHelp2:'訳語を指定（-> => = も可）', glossHelp3:'カンマまたはタブ区切り、3列目はメモ', glossHelp4:'末尾の括弧はコメントで、訳語には含まれません', glossHelp5:'活用形（複数形 Whoppers など）は別の行に書きます', glossHelp6:'アップロードは .txt/.csv/.tsv/.json に対応：追加 = 既存に統合、置換 = 消してから書き込み', btnGlossAppend:'📥 追加', btnGlossReplace:'🔄 置換', btnGlossTpl:'📄 CSV テンプレート', glossHelp7:'カンマを含む項目は二重引用符で囲みます（Excel は自動で囲みます）', glossHelpLead:'同じ固有名詞を作品の最初から最後まで同じ訳で統一します。ここに書いた項目は<b>上部の「固有名詞」設定より優先</b>され、書かれていない語だけが全体設定に従います。', glossHelpFmt:'書式 · 1行に1件', glossHelpS1:'原文だけ書くと、原文を保持して訳しません', glossHelpS2:'原文 → 訳語', glossHelpS3:'カンマ / タブ / 矢印 すべて可', glossHelpS4:'行末の括弧はメモで、訳語には含まれません', glossHelpArrow:'矢印は ->  =>  = でも可', glossHelpMatch:'一致の判定', glossHelpM1:'大文字・小文字を区別しません', glossHelpM2:'単語全体で一致 — 似た語は誤爆しません', glossHelpM3:'中日韓は部分一致', glossHelpM4:'活用形は別の行に書きます', glossHelpUp:'アップロード', glossHelpU1:'.txt / .csv / .tsv / .json に対応、UTF-8 必須', glossHelpU2:'追加 = 既存に統合（同名はファイル優先）；置換 = 消してから書き込み', glossHelpU3:'先頭行はヘッダーにでき、自動でスキップされます', glossHelpU4:'カンマを含む項目はダブルクォートで囲みます（Excel が自動で囲みます）', autoTermsKeepNote:'現在は「原文のまま」設定のため、抽出した固有名詞は原文のままになります。訳語を指定する場合はここで手動編集するか、「すべて翻訳」に切り替えてください。', btnGlossAI:'✨ AI 抽出', glossAiRun:'抽出中…', glossAiDone:'{0} 件を下に追加しました。翻訳前に編集できます', glossAiNone:'新しい項目はありません。すでに一覧にある可能性があります', glossAiNeedFile:'先に字幕をアップロードしてから抽出してください', glossMiss:'{0} 件が不一致：{1}（これらを編集しても反映されません）', glossAiCleared:'前の字幕の AI 抽出 {0} 件を削除しました（手入力の項目は保持）', glossVariant:'スペル違い', glossVerifyOk:'用語チェック：指定した訳語はすべて字幕に反映されています', glossVerifyMiss:'用語チェック：{0} 件の指定訳語が字幕に現れていません（モデルが従っていません）：{1}', glossHelpS5:'複数のつづりを | で並べると同じ訳語を共有します', glossUseTitle:'この表の使い方', glossWhy:'AI は分割して翻訳するため、同じ名前が前後で異なる訳になることがあります。ここに書いた「原文 → 必ずこの訳」は、各バッチの翻訳前にそのバッチ内で検索されます。見つかれば AI にその訳を指示し、見つからなければその行は送信されません（書き換えても結果は変わりません）。書いていない語は上の「固有名詞の処理」に従います。', glossHelpSep:'矢印 -> => = 、カンマ、タブも区切りとして認識します', glossNoEffT:'書き換えても反映されない場合', glossNoEffB:'理由はひとつだけです。書いた原文が字幕に一字一句そのまま出てこないこと（句読点が一つ違う、s が抜ける、でも一致しません）。その場合、下のヒントがオレンジになり、該当する行を指名します。', glossUpOne:'アップロードは .txt / .csv / .tsv / .json（UTF-8）に対応。追加＝既存に合流、置換＝消してから書き込み。先頭行がヘッダーなら自動で読み飛ばします。', btnGlossDemo:'📝 例を入力', glossDemoOk:'{0} 件の例を入力しました。そのまま書き換えてください', glossDemoNone:'同じ例がすでに表にあります', termsPh3:'SpaceX\nBurger King → バーガーキング\nWhopper|Whoppers → ワッパー', glossClearedAll:'新しい字幕を読み込んだため、用語集 {0} 件をクリアしました',
@@ -7422,6 +7449,31 @@ function parseLlmJson(raw){
    v0.9.125：max_tokens 从保留键里移除——它直接关系到输出是否被截断，
    平台默认值不够时必须允许用户自行上调（见 ENGINE_DEFAULTS 说明） */
 const EXTRA_RESERVED={model:1,messages:1,temperature:1,stream:1};
+/* v0.9.232：递归清洗——与服务端 normParams（v0.9.210）同一套口径。
+   此前前端只收「平铺标量」，值是对象的一律被静默丢弃：OpenRouter 这类
+   {"provider":{"sort":"price","allow_fallbacks":true}} 保存后界面回显有值、
+   请求里却什么都没有，用户只能判定「参数没生效」。服务端早已修好，前端没跟上。
+   深度封顶 4 层、叶子只留标量；保留键只在顶层拦截（嵌套里的同名是人家自己的结构）。 */
+const EXTRA_MAX_DEPTH = 4;
+function cleanParamVal(node, depth){
+  if(depth > EXTRA_MAX_DEPTH) return undefined;
+  if(node === null) return null;
+  const ty = typeof node;
+  if(ty === 'string' || ty === 'number' || ty === 'boolean') return node;
+  if(Array.isArray(node)){
+    const arr = [];
+    for(let i=0;i<node.length;i++){ const x = cleanParamVal(node[i], depth+1); if(x !== undefined) arr.push(x); }
+    return arr;
+  }
+  if(ty === 'object'){
+    const o = {};
+    for(const k in node){ if(!Object.prototype.hasOwnProperty.call(node,k)) continue;
+      const x = cleanParamVal(node[k], depth+1); if(x !== undefined) o[k]=x;
+    }
+    return o;
+  }
+  return undefined;   /* function / undefined / symbol 一律不要 */
+}
 function extraParamsFront(){
   try{
     const el=document.getElementById('extra');
@@ -7429,13 +7481,28 @@ function extraParamsFront(){
     if(!v) return {};
     const o=JSON.parse(v);
     if(!o||typeof o!=='object'||Array.isArray(o)) return {};
+    const top = cleanParamVal(o,0) || {};
     const keep={};
-    for(const k in o){ if(!Object.prototype.hasOwnProperty.call(o,k)) continue;
+    for(const k in top){ if(!Object.prototype.hasOwnProperty.call(top,k)) continue;
       if(EXTRA_RESERVED[k]) continue;
-      keep[k]=o[k];
+      keep[k]=top[k];
     }
     return keep;
   }catch(e){ return {}; }   /* 非法 JSON → 静默忽略（保存时另有校验提示） */
+}
+/* v0.9.232：温度——后台 B 槽一直是配置项（cfg.temperature，admin 可调，默认 0.2），
+   前端直连却把它写死成 0.2，两边不一致。这里读 UI，空/非法 → null（沿用 0.2）。 */
+function tempFront(){
+  try{
+    const el=document.getElementById('temp'); if(!el) return null;
+    const raw=String(el.value||'').trim(); if(!raw) return null;
+    const v=parseFloat(raw); if(!Number.isFinite(v)) return null;
+    return Math.min(2, Math.max(0, v));
+  }catch(e){ return null; }
+}
+/* v0.9.232：是否走「经本站服务器转发」（用户勾选，默认关 = 保持直连与原有隐私承诺） */
+function relayOn(){
+  try{ const el=document.getElementById('viaSrv'); return !!(el && el.checked); }catch(e){ return false; }
 }
 /* v0.9.125：按平台/模型的默认请求参数——各家 OpenAI 兼容端的「服务端默认值」差异极大，
    其中输出上限是最致命的一个：我们直连时从不发送 max_tokens，平台侧就用自己的默认值。
@@ -7542,6 +7609,11 @@ const PACE_BUDGET_MS = 90000;
 async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
   const ctl=new AbortController();
   const builtin = (base===BUILTIN_API);
+  /* v0.9.232：relay = 自定义 API 经本站服务端代发（用户在引擎面板勾选）。
+     直连有两类死局：①端点网关不放行 CORS 预检——实测 api.z.ai 的 OPTIONS 只回 200
+     且不带 Access-Control-Allow-*，浏览器一律抛 "Failed to fetch"（它的 POST 反而带 CORS 头）；
+     ②用户所在网络到不了该端点。两者服务端代发都能通，且错误可见（401 / 模型不存在 / 超时）。 */
+  const relay = !builtin && relayOn();
   /* v0.9.123：浏览器直连（自定义 API）没有服务端排队，但第三方中转/思考型模型慢得多——
      恒定 90s 会让大批次必然 abort（实测表象："signal is aborted without reason"，换任何慢模型都一样）。
      直连默认放宽到 300s；内置通道仍 90s；显式传值（测试连接 20s、术语提取 240s）优先。 */
@@ -7578,9 +7650,11 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
     hbI=setInterval(()=>{ try{ if(!pacing) log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){} }, 60000);
   }, 30000);
   try{
-    const url = builtin ? BUILTIN_API : base.replace(/\/+$/,'')+'/chat/completions';
+    const url = builtin ? BUILTIN_API : (relay ? RELAY_API : base.replace(/\/+$/,'')+'/chat/completions');
     const headers={'Content-Type':'application/json'};
-    if(!builtin && key) headers.Authorization='Bearer '+key;
+    /* v0.9.232：转发时 Key 走请求体给本站（HTTPS 加密、服务端用完即弃），不再作为跨域请求头
+       发出去——否则第三方端点的 CORS 预检还是会因为 Authorization 头而先失败一次。 */
+    if(!builtin && !relay && key) headers.Authorization='Bearer '+key;
     /* Anthropic OpenAI 兼容层：浏览器直连必须带此 header（否则 CORS 拒绝） */
     if(!builtin && /anthropic\.com/.test(url)) headers['anthropic-dangerous-direct-browser-access']='true';
     /* v0.9.132：请求体构造抽成函数——withRf 决定本次是否带 response_format。
@@ -7618,7 +7692,23 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
       const rf=(plan.rf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
-      return applyDegrade(Object.assign(engineDefaults(base,model), rf, ex, {model,messages:msgs,temperature:0.2,stream:false}), plan);
+      /* v0.9.232：temperature 由 UI 决定（未填 → 0.2，与后台 cfg.temperature 默认一致） */
+      const tp=tempFront();
+      return applyDegrade(Object.assign(engineDefaults(base,model), rf, ex, {model,messages:msgs,temperature:(tp===null?0.2:tp),stream:false}), plan);
+    };
+    /* v0.9.232：转发体——端点三件套 + 正文 + 温度 + 附加参数交给服务端，
+       由服务端用与内置通道同一套 callModel 组装（含 response_format、max_tokens 改名、
+       temperature 降级、超时）。这里不再自己做平台默认值与降级裁定。 */
+    const mkRelayBody=(plan)=>{
+      const b={ base:base, key:key, model:model, messages:msgs };
+      const tp=tempFront(); if(tp!==null) b.temperature=tp;
+      const exo=extraParamsFront(); if(Object.keys(exo).length) b.extra=exo;
+      if(opts && opts.json) b.json=1;
+      /* 服务端预算留出 5 秒给网络往返：让确切的上游错误先于前端超时到达 */
+      b.timeoutMs=Math.max(5000, Math.min(300000, ms-5000));
+      const mt=(opts&&opts.maxTokens)||plan.maxTokens;
+      if(mt) b.maxTokens=mt;
+      return b;
     };
     /* v0.9.183：once 自带排队重发。服务端额度不够时回 200 {wait:N}——这不是错误，
        等 N 秒后把同一批原样重发：既不降级换模型（一集里前后两个模型会让语气不一致），
@@ -7631,10 +7721,19 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
           headers,
         /* v0.9.125：自定义链路的请求体 = 平台默认参数 < 用户附加参数 < 核心字段（模型/正文……）。
            此前核心字段之外只有用户附加参数，max_tokens 从未被发送——平台侧按自己的默认值截断输出。 */
-          body:JSON.stringify(mkBody(plan)),
+          body:JSON.stringify(relay?mkRelayBody(plan):mkBody(plan)),
           signal:ctl.signal
         });
-        if(!r.ok){ const tx=await r.text().catch(()=>''); throw new Error('HTTP '+r.status+' '+tx.slice(0,200)); }
+        if(!r.ok){
+          const tx=await r.text().catch(()=>'');
+          /* v0.9.232：转发通道的失败体是本站的 {error:{message}}——取出来给人话，
+             而不是把一整段 JSON 塞进「✗ 失败：HTTP 502 {"error":…}」。 */
+          if(relay){
+            let em=''; try{ const ej=JSON.parse(tx); em=(ej&&ej.error&&ej.error.message)||''; }catch(e){}
+            if(em) throw new Error(em.slice(0,200));
+          }
+          throw new Error('HTTP '+r.status+' '+tx.slice(0,200));
+        }
         const j=await r.json();
         /* v0.9.183：服务端算出来「额度不够，等 N 秒再来」。只有内置通道会有（直连没有服务端）。 */
         if(builtin && j && +(j.wait||0)>0){
@@ -7699,6 +7798,9 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
           lastErr=e;
           if(e&&e.name==='AbortError') throw e;
           if(ctl.signal.aborted) throw e;
+          /* v0.9.232：转发时降级已在服务端做完（同一套 callModel 四轮裁定），
+             前端再按错误文案重试只会把同一个请求白跑几遍。 */
+          if(relay) throw e;
           if(!plan.newTok && isTokNameReject(e)){ plan={rf:false,newTok:true,temp:plan.temp}; continue; }
           if(plan.temp && isTempReject(e)){ plan={rf:false,newTok:plan.newTok,temp:false}; continue; }
           /* v0.9.132：平台拒收 response_format（白名单错判 / 平台侧变更 / 该模型不支持）。
@@ -9892,6 +9994,8 @@ function save(){
   const o = {
     base:$('base').value.trim(), model:$('model').value.trim(), key:$('apikey').value.trim(),
     extra:($('extra')||{}).value||'',   /* v0.9.124：附加请求参数原样记忆（保存时不校验，仅测试连接时提示） */
+    /* v0.9.232：温度（与后台 cfg.temperature 对齐）+ 是否经本站转发 */
+    temp:($('temp')||{}).value||'', viaSrv:(($('viaSrv')||{}).checked)?'1':'0',
     provider:(document.getElementById('provider')||{}).value||'',
     /* v0.9.134：术语表内容按用户所见保存，但设 2 万字上限——
        术语表跟着片子走，存下一张几千条的表既没意义又占 localStorage（历史上这台机器存满过）。 */
@@ -9938,6 +10042,9 @@ if(sv.base) $('base').value=sv.base;
 if(sv.model) $('model').value=sv.model;
 if(sv.key) $('apikey').value=sv.key;
 if(sv.extra) $('extra').value=sv.extra;   /* v0.9.124：附加请求参数（自定义引擎透传，可能为嵌套对象如 response_format） */
+/* v0.9.232：温度与转发开关（旧存档没有这两个键 → 保持 HTML 默认值 0.2 / 未勾选） */
+if(sv.temp) $('temp').value=sv.temp;
+if(sv.viaSrv==='1') $('viaSrv').checked=true;
 /* v0.9.134：旧的逗号分隔列表 → 现在的每行一条。旧值里不含换行但含逗号，据此判断；
    不含逗号的旧值（如单个 "SpaceX"）在新语法下等价于「保留原文」，原样保留即可。 */
 if(sv.terms){
@@ -10766,7 +10873,8 @@ $('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
 $('dstLang').addEventListener('change',()=>{ UI.dstManual=true; setColLabels(); save(); });
 
 /* 其余字段自动保存 */
-['base','model','apikey','extra','terms','mode','maxW'].forEach(id=>$(id).addEventListener('change',save));
+/* v0.9.232：温度与转发开关也要跟着存档（此前只有 base/model/key/extra/terms/mode/maxW） */
+['base','model','apikey','extra','temp','viaSrv','terms','mode','maxW'].forEach(id=>$(id).addEventListener('change',save));
 
 /* ---------------- 服务商预设（v0.9.30 分组：海外/国内/其他，模型自填） ---------------- */
 const sel=$('provider');
@@ -10824,14 +10932,24 @@ $('btnTest').addEventListener('click', async ()=>{
     if(!okObj){ out.style.color='#dc2626'; out.textContent=t('errBadJson'); return; }
   }
   btn.disabled=true; out.style.color=''; out.textContent=t('testRun');
+  const relaying = relayOn();
   try{
-    const r=await chatOnce(base,key,model,[{role:'user',content:'Reply with exactly: OK'}],20000);
+    /* v0.9.232：max_tokens 256 与后台「测试连接」一致（v0.9.44）——思考型模型在极小上限下
+       会把 token 全花在 thinking 上，content 直接缺失，会被误判成「模型返回空」。 */
+    const r=await chatOnce(base,key,model,[{role:'user',content:'Reply with exactly: OK'}],20000,undefined,{maxTokens:256});
     out.style.color='#059669';
     const echo=String(r||'').trim().replace(/\s+/g,' ').slice(0,24);
     out.textContent=t('testOk')+(echo?' · '+echo:'');
   }catch(e){
     out.style.color='#dc2626';
-    out.textContent=t('testFail', String(e&&e.message||e).slice(0,140));
+    let m=String((e&&e.message)||e).slice(0,140);
+    /* v0.9.232：直连最常见的死因是端点不放行浏览器跨域（CORS 预检被网关吞掉，
+       实测 api.z.ai 即如此），而浏览器只给一句 Failed to fetch，用户无从判断。
+       点明原因 + 给出可执行的下一步；转发也失败时则说明是本站代发同样不通。 */
+    if(/Failed to fetch|NetworkError|Load failed|net::ERR_FAILED/i.test(m)){
+      m = relaying ? t('errRelay', m) : t('errCors');
+    }
+    out.textContent=t('testFail', m);
   }finally{ btn.disabled=false; }
 });
 

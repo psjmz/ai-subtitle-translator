@@ -1319,6 +1319,59 @@ function tempRejected(e){
   if (!/HTTP (400|404|415|422)/.test(s)) return false;
   return /temperature/i.test(s) && /(does not support|not supported|only the default)/i.test(s);
 }
+/* ---------------- v0.9.232：转发通道的安全边界 ----------------
+   /api/proxy 会替用户把请求发到他填的任意地址，等于一个开放代理，故必须设边界：
+   ① 只允许 https（明文 http 会在链路上裸奔 Key）
+   ② 禁止内网 / 本机 / 云元数据地址（含域名解析后指向内网的情形，防 DNS 指向 127.0.0.1）
+   ③ 按 IP 限流，避免被当成免费代理池刷
+   ⚠️ 这里只做「目的地合法性」判断，不碰用户 Key 与正文内容。 */
+const PROXY_RATE = new Map();    /* ip -> { n, t }，滑动窗口按分钟计数 */
+const PROXY_CAP = 600;           /* 每分钟每 IP 上限：长字幕一集上百个批次也够用，同时挡住刷量 */
+function proxyAllow(ip){
+  try{
+    const now = Date.now(), win = 60000;
+    const r = PROXY_RATE.get(ip);
+    if (!r || now - r.t > win){ PROXY_RATE.set(ip, { n: 1, t: now }); return true; }
+    if (r.n >= PROXY_CAP) return false;
+    r.n++; return true;
+  }catch(e){ return true; }
+}
+/* 计数表清理：不清理会随访问 IP 数无限增长（每个访客一条） */
+(function(){
+  const h = setInterval(function(){
+    try{ const now = Date.now(); for (const k of Array.from(PROXY_RATE.keys())){ const v = PROXY_RATE.get(k); if (!v || now - v.t > 600000) PROXY_RATE.delete(k); } }catch(e){}
+  }, 300000);
+  if (h && typeof h.unref === 'function') h.unref();
+})();
+function isPrivateIp(ip){
+  const s = String(ip || '').trim().toLowerCase();
+  if (!s) return true;
+  if (s === '::1' || s === '::' || s === '0.0.0.0') return true;
+  if (/^::ffff:/.test(s)) return isPrivateIp(s.slice(7));           /* IPv4-mapped IPv6 */
+  if (/^f[cd]/.test(s) || /^fe80/.test(s)) return true;             /* ULA / link-local */
+  if (/^10\./.test(s) || /^127\./.test(s) || /^169\.254\./.test(s) || /^0\./.test(s)) return true;
+  if (/^192\.168\./.test(s)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(s)) return true;
+  if (/^100\.(6[4-9]|[7-9]\d|1\d\d)\./.test(s)) return true;        /* CGNAT 100.64/10 */
+  return false;
+}
+async function targetAllowed(base){
+  let u;
+  try { u = new URL(String(base)); } catch (e) { return { ok: false, reason: 'Base URL is not a valid URL' }; }
+  if (u.protocol !== 'https:') return { ok: false, reason: 'Only https:// endpoints are allowed for relay' };
+  if (u.username || u.password) return { ok: false, reason: 'Base URL must not contain credentials' };
+  const host = String(u.hostname || '').replace(/^\[|\]$/g, '');
+  if (!host) return { ok: false, reason: 'Base URL has no host' };
+  const isIp = /^(\d{1,3}\.){3}\d{1,3}$/.test(host) || host.indexOf(':') >= 0;
+  if (isIp) return isPrivateIp(host) ? { ok: false, reason: 'Relay to private or local addresses is not allowed' } : { ok: true };
+  try {
+    const dns = require('dns');
+    const addrs = await dns.promises.lookup(host, { all: true });
+    if (!addrs || !addrs.length) return { ok: false, reason: 'DNS lookup failed for ' + host };
+    for (const a of addrs) if (isPrivateIp(a.address)) return { ok: false, reason: 'Relay to private or local addresses is not allowed' };
+  } catch (e) { return { ok: false, reason: 'DNS lookup failed for ' + host }; }
+  return { ok: true };
+}
 async function callModel(cfg, messages, maxTokens, opts){
   const url = String(cfg.base).replace(/\/+$/, '') + '/chat/completions';
   /* v0.9.211：上游请求必须有超时 + 可被客户端断开中止。
@@ -1408,6 +1461,56 @@ const server = http.createServer(async (req, res) => {
         globalDaily: cfg.globalDaily,
         usedToday: usage.global
       });
+    }
+
+    /* 公开：自定义引擎的「服务端转发」通道（v0.9.232）
+       存在理由：部分 OpenAI 兼容端点的网关不放行 CORS 预检——OPTIONS 只回 200 且不带
+       Access-Control-Allow-*，浏览器直连必抛 "Failed to fetch"（实测 api.z.ai 即如此：
+       它的 POST 反而带 CORS 头，唯独预检被网关吞掉）。这类端点只能由服务端代发。
+       ⚠️ 勾选后请求体与 Key 会经过本站：只在内存里用一次，不落盘、不进埋点、不写日志。
+       ⚠️ 它本质上是一个受限的开放代理，故三重约束：只放行 https、禁内网与云元数据地址、
+          按 IP 限流（见 targetAllowed / proxyAllow）。
+       转发链路与内置通道完全同一套 callModel：附加参数、temperature、response_format、
+       max_tokens↔max_completion_tokens 改名、temperature 降级、超时与客户端断开中止。 */
+    if (req.method === 'POST' && u === '/api/proxy') {
+      /* v0.9.211 同款：前端一断开（放弃/关标签页）立刻中止上游，不留下没人收的结果 */
+      const cliAc = new AbortController();
+      res.on('close', () => { if (!res.writableFinished) cliAc.abort(); });
+      let pbody;
+      try { pbody = JSON.parse(await readBody(req, 4 * 1024 * 1024)); } catch (e) {
+        return sendJson(res, 400, { error: { code: 'bad_json', message: 'Request body is not valid JSON' } });
+      }
+      const pIp = clientIp(req);
+      if (!proxyAllow(pIp)) return sendJson(res, 429, { error: { code: 'relay_rate', message: 'Too many relay requests from this IP. Please slow down.' } });
+      const pBase = String((pbody && pbody.base) || '').trim();
+      const pModel = String((pbody && pbody.model) || '').trim();
+      const pKey = String((pbody && pbody.key) || '');
+      if (!pBase || !pModel) return sendJson(res, 400, { error: { code: 'missing', message: 'Missing Base URL or model' } });
+      const chk = await targetAllowed(pBase);
+      if (!chk.ok) return sendJson(res, 400, { error: { code: 'blocked', message: chk.reason } });
+      if (!Array.isArray(pbody.messages) || !pbody.messages.length) {
+        return sendJson(res, 400, { error: { code: 'missing_messages', message: 'Missing messages' } });
+      }
+      const pTemp = Number(pbody && pbody.temperature);
+      const relayCfg = {
+        base: pBase, model: pModel, key: pKey,
+        temperature: Number.isFinite(pTemp) ? Math.min(2, Math.max(0, pTemp)) : 0.2,
+        extraParams: normParams(pbody && pbody.extra)
+      };
+      /* 服务端预算比前端的放弃时间稍短——让「确切的上游错误」先于「前端超时」到达，
+         用户看到的是 HTTP 401 / 模型不存在，而不是一句 Failed to fetch。 */
+      const pMs = Number(pbody && pbody.timeoutMs);
+      const budget = Math.min(300000, Math.max(5000, Number.isFinite(pMs) && pMs > 0 ? pMs : 120000));
+      const pTok = Number(pbody && pbody.maxTokens);
+      try {
+        const pOut = await callModel(relayCfg, pbody.messages,
+          Number.isFinite(pTok) && pTok > 0 ? pTok : undefined,
+          { json: !!(pbody && pbody.json), timeoutMs: budget, signal: cliAc.signal });
+        if (pOut && typeof pOut === 'object') delete pOut._rl;   /* 额度头是本站内部用的，不外泄 */
+        return sendJson(res, 200, pOut || {});
+      } catch (e) {
+        return sendJson(res, 502, { error: { code: 'upstream', message: String((e && e.message) || e).slice(0, 300) } });
+      }
     }
 
     /* 公开：翻译代理 */
