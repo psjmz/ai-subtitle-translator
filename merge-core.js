@@ -870,8 +870,10 @@
        v0.9.230：行数取 **2**（原来按 1 行）。an8 锚的是上边、与行数无关，换成 an2 必然要
        挑一个行数；双语原文折 2 行是常态，按 1 行换算会让顶边跑到 y<0 被画面切掉。
        与分屏默认 922（= 1080 − 40 − 59×2）同口径。 */
+    /* v0.9.235：换算结果不再夹到 [0,1080]。源文件顶部那条本来就出画时（距顶太大／字号太大），
+       如实换算出的负值会让用户第一眼就看到「这份文件是这么排的」，比悄悄夹成 0 更有用。 */
     const mvOf = f => (f.align === 'top')
-      ? Math.max(0, Math.min(1080, Math.round(1080 - f.marginV - 2 * assLineHeight(f.size))))
+      ? Math.round(1080 - f.marginV - 2 * assLineHeight(f.size))
       : f.marginV;
     const dstMV = mvOf(dst), srcMV = mvOf(src);
     return {
@@ -1069,11 +1071,15 @@
     const SRC_SZ = Math.max(8, Math.min(200, Math.round(numOr(AS.srcSize, 50))));
     const DST_C  = RE_ASS_COLOR.test(String(AS.dstColor || '')) ? String(AS.dstColor) : '&H00FFFFFF';
     const SRC_C  = RE_ASS_COLOR.test(String(AS.srcColor || '')) ? String(AS.srcColor) : '&H0000D7FF';
-    const MV     = Math.max(0, Math.min(400, Math.round(numOr(AS.marginV, 42))));
+    /* v0.9.235：位置值不再有隐藏区间（与 srt-core v0.9.234 同口径）。
+       MV（样式兜底）去掉 [0,400]、DST_MV/SRC_MV 去掉 [0,1080]：用户填多少就是多少，
+       填到画面外是他自己在预览里能看到的错，不该由导出端悄悄拉回安全区。
+       注：UI 输入框本来就有 min=0 max=1080 的原生约束，改后只影响越界手输与程序调用。 */
+    const MV     = Math.round(numOr(AS.marginV, 42));
     // v0.9.102：译文 / 原文各自的「离底边距离」（1080p 基准）。未给时沿用单一 marginV，
     // 因此只传 marginV 的老调用输出不变。
-    const DST_MV = Math.max(0, Math.min(1080, Math.round(numOr(AS.dstMV, MV))));
-    const SRC_MV = Math.max(0, Math.min(1080, Math.round(numOr(AS.srcMV, MV))));
+    const DST_MV = Math.round(numOr(AS.dstMV, MV));
+    const SRC_MV = Math.round(numOr(AS.srcMV, MV));
     const ML     = Math.max(0, Math.min(600, Math.round(numOr(AS.marginL, 60))));
     const OUTL   = Math.max(0, Math.min(10, numOr(AS.outline, 2.5)));
     /* v0.9.217：描边 / 字体 / 不透明度改为可配，且**译文与原文各自一套**
@@ -1191,8 +1197,14 @@
         // v0.9.41 歌词斜体：含 ♪/♫ 的行按行业惯例（Netflix TTSG：italicize lyrics）加内联斜体标记，
         // 不新增样式（{\i1}/{\i0} 内联覆盖对所有现有样式生效；SRT/VTT/TXT 纯文本路径不受影响）。
         const musicLine = musicRe().test(tx);
-        const mvNum = Math.round(numOr(ln.mv, 0));
-        const mvOut = mvNum > 0 ? Math.max(1, Math.min(1080, mvNum)) : 0;
+        /* v0.9.235：逐条 mv 原样写出，不再夹到 [1,1080]、负值也不再被改成 0。
+           背景：Dialogue 的 MarginV = 0 在 ASS 里表示「回退样式值」，所以旧代码把负值
+           （两行挤在一起、或用户刻意填大）写成 0 → 实际套用样式默认 42，
+           等于偷偷替用户把位置改回去了。
+           现在区分「有没有给 mv」：给了就照写（含负值、允许跑到画面外──那是用户自己填的），
+           没给才写 0 走样式兜底。 */
+        const mvSpecified = (ln.mv != null && String(ln.mv).trim() !== '');
+        const mvOut = mvSpecified ? Math.round(numOr(ln.mv, 0)) : 0;
         evLines.push('Dialogue: ' + i + ',' + fmtTimeAss(ev.start) + ',' + fmtTimeAss(ev.end) + ',' +
           st + ',,0,0,' + mvOut + ',,' + (musicLine ? '{\\i1}' + tx + '{\\i0}' : tx));
       });

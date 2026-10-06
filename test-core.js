@@ -5338,7 +5338,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.234/.test(mg), 'merge.html 未引用 v0.9.234 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.235/.test(mg), 'merge.html 未引用 v0.9.235 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5371,9 +5371,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.234</.test(html), '首页版本号未升 0.9.234');
-    assert.ok(/class="ver-tag">v0\.9\.234</.test(html), '工作台版本号未升 0.9.234');
-    assert.ok(/srt-core\.js\?v=0\.9\.234/.test(html), 'srt-core.js?v 未升 0.9.234');
+    assert.ok(/class="ver">v0\.9\.235</.test(html), '首页版本号未升 0.9.235');
+    assert.ok(/class="ver-tag">v0\.9\.235</.test(html), '工作台版本号未升 0.9.235');
+    assert.ok(/srt-core\.js\?v=0\.9\.235/.test(html), 'srt-core.js?v 未升 0.9.235');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5517,8 +5517,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.234</.test(mg), 'merge.html 版本未升 0.9.234');
-    assert.ok(/merge-core\.js\?v=0\.9\.234/.test(mg), 'merge-core.js?v 未升 0.9.234');
+    assert.ok(/class="ver">v0\.9\.235</.test(mg), 'merge.html 版本未升 0.9.235');
+    assert.ok(/merge-core\.js\?v=0\.9\.235/.test(mg), 'merge-core.js?v 未升 0.9.235');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5604,8 +5604,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/syncMvLabels/.test(mg), '标签仍在随模板切换');
     assert.strictEqual((mg.match(/data-i18n="lblMV"/g) || []).length, 2, '两个距离框应都标 lblMV');
     /* 导出端：两条各拿各自的绝对离底值，不再推算抬高量 */
-    assert.ok(/const dstMV = Math\.max\(0, mv\.dst\);/.test(mg) && /const srcMV = Math\.max\(0, mv\.src\);/.test(mg),
-      '导出未给两条各自的离底值');
+    /* v0.9.235：原样取两个离底值（此前是 Math.max(0, mv.dst)，负值与超界会被偷偷改写） */
+    assert.ok(/const dstMV = mv\.dst, srcMV = mv\.src;/.test(mg), '导出未给两条各自的离底值');
+    assert.ok(!/Math\.max\(0, m(?:v)?\.(?:dst|src)\)/.test(mg), 'v0.9.235：导出/预览仍在把离底值夹到 0');
     assert.ok(!/stackMV\(/.test(mg) && !/C\.assStackMV\(/.test(mg), '导出仍在用 assStackMV 推算抬高量');
   });
 
@@ -5651,10 +5652,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* ① 预览与导出都只读 assMVs()（= 两个输入框），且除了 Math.max(0,…) 没有别的加工 */
     assert.ok(/const st = assStyleOf\(\), m = assMVs\(\)/.test(pv), '预览没读 assMVs()');
     assert.ok(/const mv = assMVs\(\);/.test(ev), '导出没读 assMVs()');
-    assert.ok(/const dstMV = Math\.max\(0, m\.dst\), srcMV = Math\.max\(0, m\.src\);/.test(pv),
-      '预览对离底值做了额外加工');
-    assert.ok(/const dstMV = Math\.max\(0, mv\.dst\);/.test(ev) && /const srcMV = Math\.max\(0, mv\.src\);/.test(ev),
-      '导出对离底值做了额外加工');
+    /* v0.9.235：预览里也改成原样取值（与导出的 mv.dst / mv.src 同一数字） */
+    assert.ok(/const dstMV = m\.dst, srcMV = m\.src;/.test(pv),
+      '预览对离底值做了额外加工（应与导出同一个原样取值）');
+    /* v0.9.235：导出也改成原样取值（不再 Math.max(0, …)） */
+    assert.ok(/const dstMV = mv\.dst, srcMV = mv\.src;/.test(ev),
+      '导出对离底值做了额外加工（应与预览同一个原样取值）');
     /* 不许按行数/字号推算位置（assStackMV / assTopMV 那套"抬高量"已废） */
     assert.ok(!/assStackMV\(/.test(ev) && !/assTopMV\(/.test(ev), '导出仍在推算位置');
     assert.ok(!/assStackMV\(/.test(pv) && !/assTopMV\(/.test(pv), '预览仍在推算位置');
@@ -5839,7 +5842,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 旧的抬高量推算必须删干净 */
     assert.ok(!/botLines/.test(mg) && !/stackOf/.test(mg), 'v0.9.225/226 的行数重算路径还在');
     assert.ok(!/C\.assStackMV\(/.test(mg) && !/C\.assTopMV\(/.test(mg), '仍在调用旧的抬高量函数');
-    assert.ok(/const dstMV = Math\.max\(0, m\.dst\), srcMV = Math\.max\(0, m\.src\);/.test(mg), '预览未取两个离底值');
+    assert.ok(/const dstMV = m\.dst, srcMV = m\.src;/.test(mg), '预览未取两个离底值');
     /* 预览与导出必须同口径：同一对数值 */
     assert.ok(/mv: srcMV \}/.test(mg) && /mv: dstMV \}/.test(mg), '导出的 mv 与预览取值不同源');
   });
@@ -6309,6 +6312,88 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/Math\.min\(1080, Math\.round\(numOr\(AS\.srcMV/.test(core), '原文离底又有了 [0,1080] 夹取');
     assert.ok(!/mvNum > 0 \? Math\.max\(1, Math\.min\(1080/.test(core), 'Dialogue 的 MarginV 又有了 [1,1080] 夹取');
     assert.ok(/mvSpecified \? Math\.round/.test(core), '「是否显式给过 mv」的判定丢了');
+  });
+
+
+
+  /* ===== v0.9.235：双语合成页也清掉偷偷夹取（与 srt-core v0.9.234 同一口径） =====
+     主站在 v0.9.233/234 清干净了，双语页用的是独立引擎 merge-core.js，同款防御还留着：
+       ① 样式行 MV 夹 [0,400]、译文/原文离底夹 [0,1080]
+       ② 每条 Dialogue 的 MarginV 夹 [1,1080]，负值改成 0（= 回退样式默认 42）
+       ③ merge.html 里 assMVs()/导出/预览/导入换算各自还有一次 Math.max(0,…) 或 [0,1080]
+     用户 10-06 定案的原则是全站通用的：用户填什么就是什么，不许偷偷改。 */
+  const fsE = require('fs'), pathE = require('path');
+  const ME  = require('./merge-core.js');
+  const mgE = fsE.readFileSync(pathE.join(__dirname, 'merge.html'), 'utf8');
+  const mcE = fsE.readFileSync(pathE.join(__dirname, 'merge-core.js'), 'utf8');
+  const mStyleMV = (out, name) => {
+    const l = out.split('\n').filter(x => x.indexOf('Style: ') === 0)
+                 .find(x => x.split(',')[0] === 'Style: ' + name);
+    return l ? l.split(',')[21] : 'NA';   /* 0=Style 名 … 21=MarginV */
+  };
+  const mDlgMV = (out, style) => {
+    const l = out.split('\n').filter(x => x.indexOf('Dialogue: ') === 0)
+                 .find(x => x.split(',')[3] === style);
+    return l ? l.split(',')[7] : 'NA';
+  };
+  const mMk = mv => ME.formatAss([{ start:0, end:1000, lines:[{ style:'TopMain', text:'顶部', mv:mv }] }], {});
+
+  t('v0.9.235：双语样式行的离底距离不再被夹到 400 / 1080', () => {
+    const out = ME.formatAss([{ start:0, end:1000, lines:[{ text:'x' }] }], { assStyle:{ dstMV:2000, srcMV:-50 } });
+    assert.strictEqual(mStyleMV(out,'Bottom'), '2000', '用户填 2000 应原样输出（旧版夹到 1080）');
+    assert.strictEqual(mStyleMV(out,'Sub'), '-50', '用户填 −50 应原样输出（旧版夹到 0）');
+    assert.strictEqual(mStyleMV(ME.formatAss([{start:0,end:1000,lines:[{text:'x'}]}],{assStyle:{marginV:500}}),'Bottom'), '500',
+      '只传 marginV 的老口径也要跟着走（旧版夹到 400）');
+    /* 旧调用（不传）必须逐字节不变 */
+    const def = ME.formatAss([{ start:0, end:1000, lines:[{ text:'x' }] }], {});
+    ['Bottom','Top','TopMain','Sub'].forEach(n => assert.strictEqual(mStyleMV(def,n), '42', n + ' 默认值应保持 42'));
+  });
+
+  t('v0.9.235：双语 Dialogue 的 MarginV 如实写出（含负值），未指定才写 0', () => {
+    assert.strictEqual(mDlgMV(mMk(-36), 'TopMain'), '-36', '负值应如实写出（旧版改成 0 → 回退样式默认 42）');
+    assert.strictEqual(mDlgMV(mMk(33), 'TopMain'), '33', '33 应保留（旧版夹到下限 1）');
+    assert.strictEqual(mDlgMV(mMk(981), 'TopMain'), '981', '常规值不受影响');
+    assert.strictEqual(mDlgMV(mMk(1200), 'TopMain'), '1200', '超过 1080 也如实写出（用户自己在预览里看得到）');
+    /* 没给 mv → 写 0，语义仍是「回退样式默认值」 */
+    assert.strictEqual(mDlgMV(ME.formatAss([{start:0,end:1000,lines:[{style:'TopMain',text:'顶部'}]}],{}), 'TopMain'), '0');
+  });
+
+  t('v0.9.235：assMVs() 如实传出负数与超界，只在「框里没数字」时兜底', () => {
+    const aSrc = mgE.match(/function assMVs\(\)\{[\s\S]*?\n\}/);
+    assert.ok(aSrc, '取不到 assMVs 源码');
+    const STORE = {};
+    const aFn = new Function('$', aSrc[0] + '; return assMVs;')(id => ({ value: STORE[id] }));
+    STORE.assDstMV = '-36'; STORE.assSrcMV = '1200';
+    assert.deepStrictEqual(aFn(), { dst:-36, src:1200 }, '负数/超界应如实传出（旧版负数会回退 42/922）');
+    STORE.assDstMV = '42';  STORE.assSrcMV = '922';
+    assert.deepStrictEqual(aFn(), { dst:42, src:922 }, '常规值不变');
+    STORE.assDstMV = '';    STORE.assSrcMV = '';
+    assert.deepStrictEqual(aFn(), { dst:42, src:922 }, '框里没数字时仍兜底默认值（这条不能丢）');
+  });
+
+  t('v0.9.235：预览与导出取同一个原样值，两处都不许再夹', () => {
+    const pv = mgE.slice(mgE.indexOf('function renderAssPv(){'), mgE.indexOf('function baseName(){'));
+    const ev = mgE.slice(mgE.indexOf('function buildAssEvents(){'), mgE.indexOf('function buildExport(){'));
+    assert.ok(/const st = assStyleOf\(\), m = assMVs\(\)/.test(pv), '预览没读 assMVs()');
+    assert.ok(/const mv = assMVs\(\);/.test(ev), '导出没读 assMVs()');
+    assert.ok(/const dstMV = m\.dst, srcMV = m\.src;/.test(pv), '预览不是原样取值');
+    assert.ok(/const dstMV = mv\.dst, srcMV = mv\.src;/.test(ev), '导出不是原样取值');
+    /* 样式层与导入换算也不许再有 Math.max(0,…) / [0,1080] */
+    assert.ok(!/Math\.max\(0, m\.(?:dst|src)\)/.test(mgE), 'merge.html 仍有 Math.max(0, m.*)');
+    assert.ok(!/dstMV: Math\.max\(0, m\.dst\)/.test(mgE), '样式层仍在把离底值夹到 0');
+  });
+
+  t('v0.9.235：防回归 —— 双语链路不再有偷偷夹取整段距离的写法', () => {
+    assert.ok(!/Math\.min\(400, Math\.round\(numOr\(AS\.marginV/.test(mcE), '样式 MV 又有了 [0,400] 夹取');
+    assert.ok(!/Math\.min\(1080, Math\.round\(numOr\(AS\.dstMV/.test(mcE), '译文离底又有了 [0,1080] 夹取');
+    assert.ok(!/Math\.min\(1080, Math\.round\(numOr\(AS\.srcMV/.test(mcE), '原文离底又有了 [0,1080] 夹取');
+    assert.ok(!/mvNum > 0 \? Math\.max\(1, Math\.min\(1080/.test(mcE), 'Dialogue 的 MarginV 又有了 [1,1080] 夹取');
+    assert.ok(/mvSpecified \? Math\.round/.test(mcE), '「是否显式给过 mv」的判定丢了');
+    /* 导入换算（an8 距顶 → 离底）也不许夹：源文件本来就出画时，要让用户第一眼看见 */
+    assert.ok(!/Math\.max\(0, Math\.min\(1080, Math\.round\(1080 - f\.marginV/.test(mcE), 'merge-core 导入换算仍在夹');
+    assert.ok(!/Math\.max\(0, Math\.min\(1080, Math\.round\(1080 - f\.marginV/.test(mgE), 'merge.html 导入换算仍在夹');
+    /* assStackMV 是「推荐值」计算器（单测锁了 1~1080），不是用户设置值，不动 */
+    assert.ok(/function assStackMV\(o\) \{/.test(mcE), 'assStackMV 不该被删（主站推荐值仍在用）');
   });
 
 }
