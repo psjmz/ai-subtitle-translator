@@ -626,10 +626,110 @@
     if (!items.length) issues.push({ type: 'empty', at: 0, msg: '没有解析到任何字幕块', code: 'noBlocks' });
     return { items, issues };
   }
-  function formatVtt(items) {
-    return 'WEBVTT\n\n' + items.map((it) =>
-      it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + '\n' + it.text
-    ).join('\n\n') + '\n';
+  function formatVtt(items, opt) {
+    /* v0.9.236：opt 可选。不传 → 输出与 v0.9.235 及以前**逐字节一致**（有单测锁）。 */
+    const st = (opt && opt.style) || null;
+    const srcIdx = (opt && opt.srcLine != null) ? +opt.srcLine : -1;   // 第几行是原文（0 基），-1 = 无原文行
+    const ts = vttCueSettings(st);
+    const body = (items || []).map((it) => {
+      let tx = String(it.text == null ? '' : it.text);
+      /* srcDiff 关掉 = 连 class 都不标：写了却没有对应 ::cue(.src) 规则，是纯粹的噪音 */
+      if (srcIdx >= 0 && (!st || st.srcDiff !== false)) {
+        const lines = tx.split('\n');
+        if (lines.length > 1 && srcIdx < lines.length && lines[srcIdx].trim()) {
+          lines[srcIdx] = '<c.' + VTT_SRC_CLASS + '>' + lines[srcIdx] + '</c.' + VTT_SRC_CLASS + '>';
+          tx = lines.join('\n');
+        }
+      }
+      return it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + ts + '\n' + tx;
+    }).join('\n\n');
+    const sb = vttStyleBlock(st);
+    return 'WEBVTT' + (sb ? '\n\n' + sb : '') + '\n\n' + body + '\n';
+  }
+
+  // ---------------- VTT 样式（v0.9.236） ----------------
+  /* WebVTT 的样式只有三条路，都不是 ASS 那套「像素 + 完整排版」：
+     ① 文件级 STYLE 块：::cue 选择器，**属性受规范白名单限制**（白名单外一律被播放器忽略）
+     ② 每条 cue 尾的 cue settings：line / position / size / align —— 百分比，随分辨率自适应
+     ③ 行内标签：<b> <i> <u> <c.class> <v 说话人>
+     ⚠️ 做不了（别硬做，也别偷偷补偿）：字间距（letter-spacing 不在白名单）、真描边（只有 text-shadow 可模拟）、
+        REGION 分区（Chrome/Edge 完全不支持）、旋转/缩放、字体嵌入（只能给族名，缺字体回退系统默认）。
+     ⚠️ Firefox 不支持带参 ::cue(.src)，双语「原文区分色」在 Firefox 会整片变同色 —— 规范/浏览器限制，
+        不是 bug；界面如实提示，不偷偷降级（与「用户填什么就是什么」同一条原则）。
+     ⚠️ 数值一律原样写入：用户填 150% 就写 150%，填 -10% 就写 -10%，不做区间夹取（v0.9.234/235 定的原则）。 */
+  const VTT_CSS_WHITE = ['background-color', 'color', 'font-family', 'font-size', 'font-style',
+    'font-weight', 'line-height', 'opacity', 'text-decoration', 'text-shadow', 'white-space'];
+  const VTT_SRC_CLASS = 'src';    // 原文行：文本里 <c.src>…</c.src>，STYLE 里 ::cue(.src)
+
+  function vttFontStack(v) {
+    const k = String(v == null ? '' : v).trim();
+    if (!k || k === 'sans') return '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif';
+    if (k === 'serif') return '"Songti SC","SimSun","Noto Serif CJK SC",serif';
+    if (k === 'mono') return '"Menlo","Consolas",monospace';
+    return (/["',]/.test(k) ? k : '"' + k.replace(/"/g, '') + '",sans-serif');
+  }
+  function vttRgba(hex, aPct) {
+    const h = /^#([0-9a-fA-F]{6})$/.exec(String(hex == null ? '' : hex).trim());
+    if (!h) return null;
+    const r = parseInt(h[1].slice(0, 2), 16), g = parseInt(h[1].slice(2, 4), 16), b = parseInt(h[1].slice(4, 6), 16);
+    let a = (aPct == null ? 100 : +aPct);
+    if (!isFinite(a)) a = 100;
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (+((a / 100).toFixed(3))) + ')';
+  }
+  /* 描边：VTT 没有 ASS 的 Outline；outline 属性画的是**方框**不是字描边，只能用 text-shadow 八向模拟。
+     模糊半径取 0（描边观感），偏移量 = 用户填的粗细（px）。 */
+  function vttShadowCss(st) {
+    if (!st || st.shadowOn === false) return '';
+    const w = (st.shadowW != null && isFinite(+st.shadowW)) ? +st.shadowW : 2;
+    if (!(w > 0)) return '';
+    const c = (st && /^#[0-9a-fA-F]{6}$/.test(String(st.shadowColor || '').trim())) ? String(st.shadowColor).trim() : '#000000';
+    return [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]]
+      .map((p) => (p[0] * w) + 'px ' + (p[1] * w) + 'px 0 ' + c).join(', ');
+  }
+  function vttStyleBlock(st) {
+    if (!st) return '';
+    const d = [];
+    const col = /^#[0-9a-fA-F]{6}$/.test(String(st.color || '').trim()) ? String(st.color).trim() : null;
+    if (col) d.push('  color: ' + col + ';');
+    if (st.size != null && String(st.size).trim() !== '' && isFinite(+st.size)) d.push('  font-size: ' + (+st.size) + '%;');
+    if (String(st.font || '').trim()) d.push('  font-family: ' + vttFontStack(st.font) + ';');
+    if (st.bold) d.push('  font-weight: bold;');
+    if (st.italic) d.push('  font-style: italic;');
+    if (st.lineHeight != null && String(st.lineHeight).trim() !== '' && isFinite(+st.lineHeight)) d.push('  line-height: ' + (+st.lineHeight) + ';');
+    const sh = vttShadowCss(st);
+    if (sh) d.push('  text-shadow: ' + sh + ';');
+    if (st.bgOn !== false) {
+      const bg = vttRgba(st.bgColor || '#000000', st.bgAlpha == null ? 55 : st.bgAlpha);
+      if (bg) d.push('  background-color: ' + bg + ';');
+    }
+    const rules = [];
+    if (d.length) rules.push('::cue {\n' + d.join('\n') + '\n}');
+    /* 原文行：只有双语 + 用户开了区分才输出。Firefox 忽略带参 ::cue(.src) → 整片同色（已知，界面有提示）。 */
+    if (st.srcDiff !== false) {
+      const sd = [];
+      const sc = /^#[0-9a-fA-F]{6}$/.test(String(st.srcColor || '').trim()) ? String(st.srcColor).trim() : null;
+      if (sc) sd.push('  color: ' + sc + ';');
+      if (st.srcSize != null && String(st.srcSize).trim() !== '' && isFinite(+st.srcSize)) sd.push('  font-size: ' + (+st.srcSize) + '%;');
+      if (sd.length) rules.push('::cue(.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
+    }
+    if (!rules.length) return '';
+    return 'STYLE\n' + rules.join('\n');
+  }
+  function vttCueSettings(st) {
+    if (!st) return '';
+    const out = [];
+    const num = (v) => { const s = String(v == null ? '' : v).trim(); if (!s) return null; return isFinite(+s) ? s : null; };
+    const line = num(st.line);
+    if (line != null) {
+      const la = (st.lineAlign === 'start' || st.lineAlign === 'center' || st.lineAlign === 'end') ? ',' + st.lineAlign : '';
+      out.push('line:' + line + '%' + la);
+    }
+    const pos = num(st.position);
+    if (pos != null) out.push('position:' + pos + '%');
+    const sz = num(st.width);
+    if (sz != null) out.push('size:' + sz + '%');
+    if (st.align === 'start' || st.align === 'end' || st.align === 'center') out.push('align:' + st.align);
+    return out.length ? ' ' + out.join(' ') : '';
   }
 
   // ---------------- SBV (YouTube 字幕) 解析 / 格式化 ----------------
@@ -2582,6 +2682,7 @@
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
+    vttStyleBlock, vttCueSettings, vttShadowCss, vttFontStack, vttRgba, VTT_CSS_WHITE, VTT_SRC_CLASS,   // v0.9.236 VTT 样式
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,

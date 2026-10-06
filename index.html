@@ -646,6 +646,20 @@
   /* v0.9.101：颜色改为直接输入 #RRGGBB，取消预设色板 */
   .ass-color-row{display:flex;align-items:center;gap:8px}
   .ass-color-row .csw{width:16px;height:16px;border-radius:4px;margin-right:0;flex:0 0 16px;box-sizing:border-box}
+  /* v0.9.236：VTT 样式面板。右栏只有 ~300px，用「标签 88px + 值区 1fr」两列网格，
+     一行一个字段；值区内多个控件（数值+单位、色块+色值、勾选+色值）横向排，不换行堆叠。 */
+  .vtt-grid{display:grid;grid-template-columns:88px minmax(0,1fr);align-items:center;gap:6px 8px}
+  .vtt-l{font-size:12px;color:var(--sub);line-height:1.35}
+  .vtt-c{display:flex;align-items:center;gap:5px;min-width:0}
+  .vtt-c input[type=number]{width:56px;flex:none}
+  .vtt-c input[type=text]{flex:1 1 auto;min-width:40px}
+  .vtt-c select{flex:1 1 auto;min-width:0}
+  .vtt-u{font-size:11px;color:var(--mut);flex:none}
+  .vtt-chk{flex-wrap:wrap;gap:8px}
+  .vtt-chk input[type=checkbox]{flex:none}
+  .vtt-chk label{font-size:12px;color:var(--sub);margin:0}
+  .vtt-sub{font-size:12px;color:var(--sub);margin:10px 0 6px;padding-top:8px;border-top:1px solid var(--line)}
+  .vtt-grid + .vtt-sub{margin-top:12px}
   .ass-color-row input[type=text]{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.5px}
 
   /* 开关行（原生 checkbox 隐藏） */
@@ -788,6 +802,14 @@
      ⚠️ .pv-rev / .pv-mono 只管纵向位置，与这里不冲突。 */
   .exp-preview.pv-plain .ep-dst,
   .exp-preview.pv-plain .ep-src{color:#fff;font-size:12px;font-weight:400}
+  /* v0.9.236：VTT 预览独占一层。ASS 是「两条绝对定位的像素行」，VTT 是「一个按百分比定位、
+     自带底衬的 cue 盒子」——结构上对不上，硬塞进 .ep-dst/.ep-src 会把两边都改坏，
+     所以单独一层，两套互不影响：.pv-vtt 时隐藏 .ep-line，其余时候这一层 display:none。 */
+  .ep-vtt{display:none;position:absolute;left:0;right:0;top:0;bottom:0}
+  .exp-preview.pv-vtt .ep-line{display:none}
+  .exp-preview.pv-vtt .ep-vtt{display:block}
+  .ep-vtt-cue{position:absolute;display:inline-block;box-sizing:border-box;text-align:center;padding:2px 5px;line-height:var(--pv-lh)}
+  .ep-vtt-cue>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   /* SEO 区（保留原版排版，仅换皮变量） */
   .seo{max-width:1080px;margin:32px auto 0;padding:20px 24px 0;color:var(--sub);font-size:13px;line-height:1.8}
@@ -831,7 +853,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.235</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.236</span></div>
       <div class="spacer"></div>
       <a href="merge.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/><path d="M12 12h9"/><path d="m18.5 9.5 2.5 2.5-2.5 2.5"/></svg><span data-i18n="navMerge">双语合并</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
@@ -994,7 +1016,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.235</span>
+    <span class="ver-tag">v0.9.236</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1242,6 +1264,9 @@
       <div class="exp-preview">
         <div class="ep-line ep-dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</div>
         <div class="ep-line ep-src">♪ Love is in the air ♪</div>
+        <!-- v0.9.236：VTT 预览层（导出 WebVTT 时显示，其余时候整层隐藏）。
+             两行文本由 syncExpPreview 从上面 .ep-dst / .ep-src 现取（同一份样例文案，不另写一套）。 -->
+        <div class="ep-vtt"><div class="ep-vtt-cue"><div class="ep-vtt-dst"></div><div class="ep-vtt-src"></div></div></div>
       </div>
       <label class="flbl" for="expStyle" data-i18n="lblExpStyle">导出字幕样式</label>
       <select id="expStyle"></select>
@@ -1365,6 +1390,73 @@
         </div>
         </div>
       </div>
+      <!-- v0.9.236：WebVTT 样式面板。与 ASS 面板同位置（「导出字幕样式」正下方），选了 VTT 才冒出来。
+           ⚠️ 单位全是 VTT 原生的：定位是百分比（line / position / size），字号是相对播放器默认的 %。
+              ASS 那套「像素离底」在 VTT 里根本不存在，两套面板不许混用字段，也不许互相换算。
+           ⚠️ 数值一律原样写进文件，不夹取区间（v0.9.234/235 定的原则在这里同样适用）。 -->
+      <div id="vttStyleBox" style="display:none">
+        <div class="param-blk">
+          <div class="blk-title"><span data-i18n="secVttStyle">WebVTT 字幕样式</span></div>
+          <div class="hint wtip" data-i18n="vttStyleTip">样式写在文件头的 STYLE 块里，由播放器按 WebVTT 规范渲染。</div>
+          <div class="vtt-sub" data-i18n="vttGrpPos">位置（百分比，随分辨率自适应）</div>
+          <div class="vtt-grid">
+            <label class="vtt-l" for="vttLine"><span data-i18n="lblVttLine">垂直 line</span></label>
+            <div class="vtt-c">
+              <input type="number" id="vttLine" value="90" step="1">
+              <select id="vttLineAlign" aria-label="line anchor">
+                <option value="end" data-i18n="vttAnchorBottom">贴底</option>
+                <option value="start" data-i18n="vttAnchorTop">贴顶</option>
+                <option value="center" data-i18n="vttAnchorMid">居中</option>
+              </select>
+            </div>
+            <label class="vtt-l" for="vttPos"><span data-i18n="lblVttPos">水平 position</span></label>
+            <div class="vtt-c"><input type="number" id="vttPos" value="50" step="1"><span class="vtt-u">%</span></div>
+            <label class="vtt-l" for="vttWidth"><span data-i18n="lblVttWidth">宽度 size</span></label>
+            <div class="vtt-c"><input type="number" id="vttWidth" value="80" step="1"><span class="vtt-u">%</span></div>
+            <label class="vtt-l" for="vttAlign"><span data-i18n="lblVttAlign">对齐 align</span></label>
+            <div class="vtt-c">
+              <select id="vttAlign">
+                <option value="center" data-i18n="vttAlignCenter">居中</option>
+                <option value="start" data-i18n="vttAlignStart">左</option>
+                <option value="end" data-i18n="vttAlignEnd">右</option>
+              </select>
+            </div>
+          </div>
+          <div class="vtt-sub" data-i18n="vttGrpText">文字</div>
+          <div class="vtt-grid">
+            <label class="vtt-l" for="vttSize"><span data-i18n="lblVttSize">字号</span><i class="info" tabindex="0" data-tip-i18n="vttSizeTip">i</i></label>
+            <div class="vtt-c"><input type="number" id="vttSize" value="100" step="5"><span class="vtt-u">%</span></div>
+            <label class="vtt-l" for="vttColor"><span data-i18n="lblVttColor">颜色</span></label>
+            <div class="vtt-c"><span class="csw" id="vttColorSw" style="background:#FFFFFF"></span><input type="text" id="vttColor" value="#FFFFFF" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFFFFF"></div>
+            <label class="vtt-l" for="vttFont"><span data-i18n="lblVttFont">字体</span></label>
+            <div class="vtt-c"><select id="vttFont"></select></div>
+            <label class="vtt-l" for="vttLH"><span data-i18n="lblVttLH">行高</span></label>
+            <div class="vtt-c"><input type="number" id="vttLH" value="1.4" step="0.1"></div>
+            <div class="vtt-l"><span data-i18n="lblVttWeight">字形</span></div>
+            <div class="vtt-c vtt-chk"><input type="checkbox" id="vttBold"><label for="vttBold" data-i18n="vttBold">粗体</label><input type="checkbox" id="vttItalic"><label for="vttItalic" data-i18n="vttItalic">斜体</label></div>
+          </div>
+          <!-- 原文行只在双语导出时出现（单语没有原文行，整块隐藏） -->
+          <div id="vttSrcBox">
+            <div class="vtt-sub" data-i18n="vttGrpSrc">原文行</div>
+            <div class="vtt-grid">
+              <div class="vtt-l"><span data-i18n="lblVttSrcDiff">区分原文</span><i class="info" tabindex="0" data-tip-i18n="vttSrcDiffTip">i</i></div>
+              <div class="vtt-c vtt-chk"><input type="checkbox" id="vttSrcDiff" checked></div>
+              <label class="vtt-l" for="vttSrcColor"><span data-i18n="lblVttSrcColor">颜色</span></label>
+              <div class="vtt-c"><span class="csw" id="vttSrcColorSw" style="background:#FFD700"></span><input type="text" id="vttSrcColor" value="#FFD700" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#FFD700"></div>
+              <label class="vtt-l" for="vttSrcSize"><span data-i18n="lblVttSrcSize">字号</span></label>
+              <div class="vtt-c"><input type="number" id="vttSrcSize" value="85" step="5"><span class="vtt-u">%</span></div>
+            </div>
+          </div>
+          <div class="vtt-sub" data-i18n="vttGrpDeco">底衬与描边</div>
+          <div class="vtt-grid">
+            <div class="vtt-l"><span data-i18n="lblVttBg">底衬</span></div>
+            <div class="vtt-c vtt-chk"><input type="checkbox" id="vttBgOn" checked><span class="csw" id="vttBgColorSw" style="background:#000000"></span><input type="text" id="vttBgColor" value="#000000" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#000000"><input type="number" id="vttBgAlpha" value="55" min="0" max="100" step="5"><span class="vtt-u">%</span></div>
+            <div class="vtt-l"><span data-i18n="lblVttShadow">描边</span><i class="info" tabindex="0" data-tip-i18n="vttShadowTip">i</i></div>
+            <div class="vtt-c vtt-chk"><input type="checkbox" id="vttShadowOn" checked><input type="number" id="vttShadowW" value="2" step="0.5"><span class="vtt-u">px</span><span class="csw" id="vttShadowColorSw" style="background:#000000"></span><input type="text" id="vttShadowColor" value="#000000" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#000000"></div>
+          </div>
+          <div class="hint wtip" id="vttFxTip" data-i18n="vttFxTip">原文区分色用 ::cue(.src)，Firefox 不支持带参选择器，会整片同色。</div>
+        </div>
+      </div>
       <!-- v0.9.190：删掉「导出文件名」输入框 —— 文件名本来就按「源文件名 + 目标语言 + 样式」自动生成，
            让用户手改属于伪需求（改完还得自己保证后缀正确），label 里的括号说明也纯属解释文案。
            导出时直接用 autoOutNameStr() 现算（见 btnDownload）。 -->
@@ -1432,7 +1524,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.235"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.236"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1725,7 +1817,7 @@ const I18N = {
   btnPost:'↻ 仅后处理（折行/清提示词）',
   hintPrivacy:'默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。',
   stepExport:'导出译文',  
-  btnDownload:'下载字幕', btnCopy:'复制到剪贴板', lblExpStyle:'导出字幕样式', assSplit:'分屏', assStack:'双行', lblFileFmt:'文件格式', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', secAssStyle:'ASS 字幕样式', lblSizeShort:'字号',lblColorShort:'颜色',lblMVShort:'离底',colDstShort:'译文',colSrcShort:'原文',lblAssDstSize:'译文字号', lblAssSrcSize:'原文字号', lblAssDstColor:'译文颜色', lblAssSrcColor:'原文颜色', lblAssDstMarginV:'译文离底距离', lblAssSrcMarginV:'原文离底距离', assDstMVTip:'译文行距画面底边的距离（像素，1080p 基准）。默认值随「分屏/双行」和「谁在上」自动变化；手动修改后固定不变。', assSrcMVTip:'原文行距画面底边的距离（像素，1080p 基准）。分屏模式下原文在画面上方时，同样按距底边计算；手动修改后固定不变。', assSizeRec:'推荐 ', assApply:'应用', assUndo:'撤销', assKept:'你的', assAutoReset:'已按新布局重置', assMVRec:'推荐 ',assSizeFollow:'按行业推荐值自动填充，可任意修改',assSizeLocked:'已用你的设置；上方为行业推荐值，仅供参考', assColorTip:'填 #RRGGBB 十六进制色值，例如 #FFFFFF 白、#FFD700 金黄。', lblOutlineShort:'描边', lblFontShort:'字体', lblAlphaShort:'不透明', assOutlineTip:'文字轮廓的粗细与颜色。设为 0 可得到无描边字幕。', assFontTip:'字体名称在对方设备上解析，缺字体会自动回退。', assAlphaTip:'数值越小字幕越透明，常用于纪录片或访谈类字幕。',
+  btnDownload:'下载字幕', btnCopy:'复制到剪贴板', lblExpStyle:'导出字幕样式', assSplit:'分屏', assStack:'双行', lblFileFmt:'文件格式', lblExpFmt:'导出格式', fmtMono:'仅译文（单语）', secAssStyle:'ASS 字幕样式', lblSizeShort:'字号',lblColorShort:'颜色',lblMVShort:'离底',colDstShort:'译文',colSrcShort:'原文',lblAssDstSize:'译文字号', lblAssSrcSize:'原文字号', lblAssDstColor:'译文颜色', lblAssSrcColor:'原文颜色', lblAssDstMarginV:'译文离底距离', lblAssSrcMarginV:'原文离底距离', assDstMVTip:'译文行距画面底边的距离（像素，1080p 基准）。默认值随「分屏/双行」和「谁在上」自动变化；手动修改后固定不变。', assSrcMVTip:'原文行距画面底边的距离（像素，1080p 基准）。分屏模式下原文在画面上方时，同样按距底边计算；手动修改后固定不变。', assSizeRec:'推荐 ', assApply:'应用', assUndo:'撤销', assKept:'你的', assAutoReset:'已按新布局重置', assMVRec:'推荐 ',assSizeFollow:'按行业推荐值自动填充，可任意修改',assSizeLocked:'已用你的设置；上方为行业推荐值，仅供参考', assColorTip:'填 #RRGGBB 十六进制色值，例如 #FFFFFF 白、#FFD700 金黄。', lblOutlineShort:'描边', lblFontShort:'字体', lblAlphaShort:'不透明', assOutlineTip:'文字轮廓的粗细与颜色。设为 0 可得到无描边字幕。', assFontTip:'字体名称在对方设备上解析，缺字体会自动回退。', assAlphaTip:'数值越小字幕越透明，常用于纪录片或访谈类字幕。', secVttStyle:'WebVTT 字幕样式', vttStyleTip:'样式写在文件头的 STYLE 块里，由播放器按 WebVTT 规范渲染。', vttGrpPos:'位置（百分比，随分辨率自适应）', lblVttLine:'垂直 line', vttAnchorBottom:'贴底', vttAnchorTop:'贴顶', vttAnchorMid:'居中', lblVttPos:'水平 position', lblVttWidth:'宽度 size', lblVttAlign:'对齐 align', vttAlignCenter:'居中', vttAlignStart:'左', vttAlignEnd:'右', vttGrpText:'文字', lblVttSize:'字号', vttSizeTip:'相对播放器默认字号（100% 即默认大小）。VTT 没有像素单位，用百分比才不受分辨率影响。', lblVttColor:'颜色', lblVttFont:'字体', vttFontSans:'默认无衬线', vttFontSerif:'衬线', vttFontMono:'等宽', lblVttLH:'行高', lblVttWeight:'字形', vttBold:'粗体', vttItalic:'斜体', vttGrpSrc:'原文行', lblVttSrcDiff:'区分原文', vttSrcDiffTip:'用 ::cue(.src) 给原文单独上色。Firefox 不支持带参选择器，会整片同色。', lblVttSrcColor:'颜色', lblVttSrcSize:'字号', vttGrpDeco:'底衬与描边', lblVttBg:'底衬', lblVttShadow:'描边', vttShadowTip:'VTT 没有真正的描边属性，这里用 text-shadow 八向模拟。', vttFxTip:'原文区分色用 ::cue(.src)，Firefox 不支持带参选择器，会整片同色。',
   showTitle:'一个字幕文件，导出花样这么多', showSub:'译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式', showMono:'仅译文', showBi:'双语双行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'双语双行 · ASS · 样式可控', showNote:'原文在上 / 译文在上自由切换，还能导出 TXT 对照稿', showLineDst:'♪ 爱在空中飘荡 ♪', fmtBiSrc:'双语 · 原文在上', fmtBiDst:'双语 · 译文在上', 
   logTitle:'运行日志', logReady:'就绪。导入字幕或载入示例开始。',
   stTotal:'条数', stDone:'已译', stDrop:'水词清空', stMerge:'跨条句组', stWrap:'折行', stIssues:'待处理',
@@ -1828,7 +1920,7 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   btnPost:'↻ 僅後處理（折行/清提示詞）',
   hintPrivacy:'預設模型：字幕會經本站伺服器轉發給管理員配置的服務商；自訂 API：由你填入的服務商直接處理，不經本站。',
   stepExport:'匯出譯文',  
-  btnDownload:'下載字幕', btnCopy:'複製到剪貼簿', lblExpStyle:'匯出字幕樣式', assSplit:'分割畫面', assStack:'雙行', lblFileFmt:'檔案格式', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', secAssStyle:'ASS 字幕樣式', lblSizeShort:'字號',lblColorShort:'顏色',lblMVShort:'離底',colDstShort:'譯文',colSrcShort:'原文',lblAssDstSize:'譯文字號', lblAssSrcSize:'原文字號', lblAssDstColor:'譯文顏色', lblAssSrcColor:'原文顏色', lblAssDstMarginV:'譯文離底距離', lblAssSrcMarginV:'原文離底距離', assDstMVTip:'譯文行距畫面底邊的距離（像素，1080p 基準）。預設值隨「分割畫面／兩行」與「誰在上」自動變化；手動修改後固定不變。', assSrcMVTip:'原文行距畫面底邊的距離（像素，1080p 基準）。分割模式下原文在畫面上方時，同樣按距底邊計算；手動修改後固定不變。', assSizeRec:'推薦 ', assApply:'套用', assUndo:'撤銷', assKept:'你的', assAutoReset:'已依新版面重設', assMVRec:'推薦 ',assSizeFollow:'依產業建議值自動帶入，可自由修改',assSizeLocked:'已使用你的設定；上方為產業建議值，僅供參考', assColorTip:'填 #RRGGBB 十六進位色值，例如 #FFFFFF 白、#FFD700 金黃。', lblOutlineShort:'描邊', lblFontShort:'字體', lblAlphaShort:'不透明', assOutlineTip:'文字輪廓的粗細與顏色。設為 0 可得到無描邊字幕。', assFontTip:'字體名稱在對方裝置上解析，缺字體會自動回退。', assAlphaTip:'數值越小字幕越透明，常用於紀錄片或訪談類字幕。',
+  btnDownload:'下載字幕', btnCopy:'複製到剪貼簿', lblExpStyle:'匯出字幕樣式', assSplit:'分割畫面', assStack:'雙行', lblFileFmt:'檔案格式', lblExpFmt:'匯出格式', fmtMono:'僅譯文（單語）', secAssStyle:'ASS 字幕樣式', lblSizeShort:'字號',lblColorShort:'顏色',lblMVShort:'離底',colDstShort:'譯文',colSrcShort:'原文',lblAssDstSize:'譯文字號', lblAssSrcSize:'原文字號', lblAssDstColor:'譯文顏色', lblAssSrcColor:'原文顏色', lblAssDstMarginV:'譯文離底距離', lblAssSrcMarginV:'原文離底距離', assDstMVTip:'譯文行距畫面底邊的距離（像素，1080p 基準）。預設值隨「分割畫面／兩行」與「誰在上」自動變化；手動修改後固定不變。', assSrcMVTip:'原文行距畫面底邊的距離（像素，1080p 基準）。分割模式下原文在畫面上方時，同樣按距底邊計算；手動修改後固定不變。', assSizeRec:'推薦 ', assApply:'套用', assUndo:'撤銷', assKept:'你的', assAutoReset:'已依新版面重設', assMVRec:'推薦 ',assSizeFollow:'依產業建議值自動帶入，可自由修改',assSizeLocked:'已使用你的設定；上方為產業建議值，僅供參考', assColorTip:'填 #RRGGBB 十六進位色值，例如 #FFFFFF 白、#FFD700 金黃。', lblOutlineShort:'描邊', lblFontShort:'字體', lblAlphaShort:'不透明', assOutlineTip:'文字輪廓的粗細與顏色。設為 0 可得到無描邊字幕。', assFontTip:'字體名稱在對方裝置上解析，缺字體會自動回退。', assAlphaTip:'數值越小字幕越透明，常用於紀錄片或訪談類字幕。', secVttStyle:'WebVTT 字幕樣式', vttStyleTip:'樣式寫在檔頭的 STYLE 區塊，由播放器依 WebVTT 規範渲染。', vttGrpPos:'位置（百分比，隨解析度自適應）', lblVttLine:'垂直 line', vttAnchorBottom:'貼底', vttAnchorTop:'貼頂', vttAnchorMid:'置中', lblVttPos:'水平 position', lblVttWidth:'寬度 size', lblVttAlign:'對齊 align', vttAlignCenter:'置中', vttAlignStart:'左', vttAlignEnd:'右', vttGrpText:'文字', lblVttSize:'字級', vttSizeTip:'相對播放器預設字級（100% 即預設大小）。VTT 沒有像素單位，用百分比才不受解析度影響。', lblVttColor:'顏色', lblVttFont:'字型', vttFontSans:'預設無襯線', vttFontSerif:'襯線', vttFontMono:'等寬', lblVttLH:'行高', lblVttWeight:'字形', vttBold:'粗體', vttItalic:'斜體', vttGrpSrc:'原文行', lblVttSrcDiff:'區分原文', vttSrcDiffTip:'用 ::cue(.src) 讓原文單獨上色。Firefox 不支援帶參數的選擇器，會整片同色。', lblVttSrcColor:'顏色', lblVttSrcSize:'字級', vttGrpDeco:'底襯與描邊', lblVttBg:'底襯', lblVttShadow:'描邊', vttShadowTip:'VTT 沒有真正的描邊屬性，這裡用 text-shadow 八向模擬。', vttFxTip:'原文區分色用 ::cue(.src)，Firefox 不支援帶參數的選擇器，會整片同色。',
   showTitle:'一個字幕檔案，匯出花樣這麼多', showSub:'譯文 + 原文隨心排版：4 種格式 × 5 種排版，共 14 種匯出樣式', showMono:'僅譯文', showBi:'雙語雙行 · SRT/VTT', showSplit:'上下分屏 · ASS', showStack:'雙語雙行 · ASS · 樣式可控', showNote:'原文在上 / 譯文在上自由切換，還能匯出 TXT 對照稿', showLineDst:'♪ 愛在空中飄蕩 ♪', fmtBiSrc:'雙語 · 原文在上', fmtBiDst:'雙語 · 譯文在上', 
   logTitle:'執行日誌', logReady:'就緒。匯入字幕或載入範例開始。',
   stTotal:'條數', stDone:'已譯', stDrop:'水詞清空', stMerge:'跨條句組', stWrap:'折行', stIssues:'待處理',
@@ -1931,7 +2023,7 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   btnPost:'↻ Post-process only (wrap/clean tags)',
   hintPrivacy:'Default model: subtitles are relayed through this site\'s server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.',
   stepExport:'Export translation',  
-  btnDownload:'Download subtitles', btnCopy:'Copy to clipboard', lblExpStyle:'Export style', assSplit:'split screen', assStack:'stacked', lblFileFmt:'File format', lblExpFmt:'Export format', fmtMono:'Translated only', secAssStyle:'ASS style', lblSizeShort:'Size',lblColorShort:'Colour',lblMVShort:'Bottom',colDstShort:'Translation',colSrcShort:'Original',lblAssDstSize:'Translation size', lblAssSrcSize:'Original size', lblAssDstColor:'Translation colour', lblAssSrcColor:'Original colour', lblAssDstMarginV:'Translation bottom margin', lblAssSrcMarginV:'Original bottom margin', assDstMVTip:'Distance from the translation line to the bottom edge (px, 1080p). The default follows the split/stacked mode and which line is on top; once you edit it, the value is kept.', assSrcMVTip:'Distance from the original line to the bottom edge (px, 1080p). In split mode, when the original sits at the top it is still measured from the bottom edge; once you edit it, the value is kept.', assSizeRec:'Recommended ', assApply:'Apply', assUndo:'Undo', assKept:'yours', assAutoReset:'Reset for new layout', assMVRec:'Recommended ',assSizeFollow:'Prefilled from industry reference values — edit freely',assSizeLocked:'Using your value — the industry reference above is only a guide', assColorTip:'Enter a hex colour #RRGGBB, e.g. #FFFFFF (white) or #FFD700 (gold).', lblOutlineShort:'Outline', lblFontShort:'Font', lblAlphaShort:'Opacity', assOutlineTip:'Thickness and colour of the text outline. Set 0 for no outline.', assFontTip:'The font is resolved on the viewer device; missing fonts fall back automatically.', assAlphaTip:'Lower values make subtitles more transparent — common in documentaries and interviews.',
+  btnDownload:'Download subtitles', btnCopy:'Copy to clipboard', lblExpStyle:'Export style', assSplit:'split screen', assStack:'stacked', lblFileFmt:'File format', lblExpFmt:'Export format', fmtMono:'Translated only', secAssStyle:'ASS style', lblSizeShort:'Size',lblColorShort:'Colour',lblMVShort:'Bottom',colDstShort:'Translation',colSrcShort:'Original',lblAssDstSize:'Translation size', lblAssSrcSize:'Original size', lblAssDstColor:'Translation colour', lblAssSrcColor:'Original colour', lblAssDstMarginV:'Translation bottom margin', lblAssSrcMarginV:'Original bottom margin', assDstMVTip:'Distance from the translation line to the bottom edge (px, 1080p). The default follows the split/stacked mode and which line is on top; once you edit it, the value is kept.', assSrcMVTip:'Distance from the original line to the bottom edge (px, 1080p). In split mode, when the original sits at the top it is still measured from the bottom edge; once you edit it, the value is kept.', assSizeRec:'Recommended ', assApply:'Apply', assUndo:'Undo', assKept:'yours', assAutoReset:'Reset for new layout', assMVRec:'Recommended ',assSizeFollow:'Prefilled from industry reference values — edit freely',assSizeLocked:'Using your value — the industry reference above is only a guide', assColorTip:'Enter a hex colour #RRGGBB, e.g. #FFFFFF (white) or #FFD700 (gold).', lblOutlineShort:'Outline', lblFontShort:'Font', lblAlphaShort:'Opacity', assOutlineTip:'Thickness and colour of the text outline. Set 0 for no outline.', assFontTip:'The font is resolved on the viewer device; missing fonts fall back automatically.', assAlphaTip:'Lower values make subtitles more transparent — common in documentaries and interviews.', secVttStyle:'WebVTT subtitle style', vttStyleTip:'Styles are written into the STYLE block at the top of the file and rendered by the player per the WebVTT spec.', vttGrpPos:'Position (percent, scales with resolution)', lblVttLine:'Vertical line', vttAnchorBottom:'Bottom', vttAnchorTop:'Top', vttAnchorMid:'Middle', lblVttPos:'Horizontal position', lblVttWidth:'Width size', lblVttAlign:'Align', vttAlignCenter:'Center', vttAlignStart:'Left', vttAlignEnd:'Right', vttGrpText:'Text', lblVttSize:'Font size', vttSizeTip:'Relative to the player default (100% = default). WebVTT has no pixel unit — percentages survive any resolution.', lblVttColor:'Color', lblVttFont:'Font', vttFontSans:'Default sans-serif', vttFontSerif:'Serif', vttFontMono:'Monospace', lblVttLH:'Line height', lblVttWeight:'Weight', vttBold:'Bold', vttItalic:'Italic', vttGrpSrc:'Source line', lblVttSrcDiff:'Differentiate source', vttSrcDiffTip:'Uses ::cue(.src) to color the source line. Firefox does not support parameterized selectors, so the whole cue turns one color.', lblVttSrcColor:'Color', lblVttSrcSize:'Font size', vttGrpDeco:'Background and outline', lblVttBg:'Background', lblVttShadow:'Outline', vttShadowTip:'WebVTT has no real outline property — this fakes one with an eight-direction text-shadow.', vttFxTip:'The source line color uses ::cue(.src); Firefox ignores parameterized selectors, so all text turns one color.',
   showTitle:'One subtitle file, so many ways to export', showSub:'Mix translation and original freely: 4 formats × 5 layouts, 14 export styles', showMono:'Translation only', showBi:'Bilingual lines · SRT/VTT', showSplit:'Split screen · ASS', showStack:'Stacked lines · ASS · styled', showNote:'Original on top or translation on top, plus TXT transcript export', showLineDst:'♪ Love is in the air ♪', fmtBiSrc:'Bilingual · source on top', fmtBiDst:'Bilingual · translation on top', 
   logTitle:'Log', logReady:'Ready. Import subtitles or load the sample.',
   stTotal:'Cues', stDone:'Done', stDrop:'Fillers cleared', stMerge:'Multi-cue groups', stWrap:'Wrapped', stIssues:'Pending',
@@ -2034,7 +2126,7 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   btnPost:'↻ 後処理のみ（改行/タグ除去）',
   hintPrivacy:'デフォルトモデル：字幕は本サイトのサーバー経由で管理者が設定したプロバイダーへ転送されます。カスタム API：入力したプロバイダーが直接処理し、本サイトは経由しません。',
   stepExport:'翻訳を書き出す',  
-  btnDownload:'字幕をダウンロード', btnCopy:'クリップボードにコピー', lblExpStyle:'エクスポート形式', assSplit:'上下分割', assStack:'上下二行', lblFileFmt:'ファイル形式', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', secAssStyle:'ASS 字幕スタイル', lblSizeShort:'サイズ',lblColorShort:'色',lblMVShort:'下端',colDstShort:'訳文',colSrcShort:'原文',lblAssDstSize:'訳文の文字サイズ', lblAssSrcSize:'原文の文字サイズ', lblAssDstColor:'訳文の色', lblAssSrcColor:'原文の色', lblAssDstMarginV:'訳文の下端からの距離', lblAssSrcMarginV:'原文の下端からの距離', assDstMVTip:'訳文行の画面下端からの距離（px、1080p 基準）。既定値は「上下分割／二行」と上下の組み合わせで変わります。手動で変更すると固定されます。', assSrcMVTip:'原文行の画面下端からの距離（px、1080p 基準）。上下分割で原文が上にある場合も下端からの距離で指定します。手動で変更すると固定されます。', assSizeRec:'推奨 ', assApply:'適用', assUndo:'元に戻す', assKept:'現在', assAutoReset:'新しいレイアウトで再設定', assMVRec:'推奨 ',assSizeFollow:'業界の推奨値を自動入力しています。自由に変更できます',assSizeLocked:'あなたの設定を使用中。上の推奨値は参考です', assColorTip:'16 進カラーコード（#RRGGBB）を入力。例：#FFFFFF（白）、#FFD700（金色）。', lblOutlineShort:'枠線', lblFontShort:'フォント', lblAlphaShort:'不透明度', assOutlineTip:'文字の輪郭線の太さと色。0 にすると枠線なしになります。', assFontTip:'フォント名は再生側の端末で解決され、なければ自動的に代替されます。', assAlphaTip:'値が小さいほど字幕が透けます。ドキュメンタリーやインタビューでよく使われます。',
+  btnDownload:'字幕をダウンロード', btnCopy:'クリップボードにコピー', lblExpStyle:'エクスポート形式', assSplit:'上下分割', assStack:'上下二行', lblFileFmt:'ファイル形式', lblExpFmt:'出力形式', fmtMono:'翻訳のみ', secAssStyle:'ASS 字幕スタイル', lblSizeShort:'サイズ',lblColorShort:'色',lblMVShort:'下端',colDstShort:'訳文',colSrcShort:'原文',lblAssDstSize:'訳文の文字サイズ', lblAssSrcSize:'原文の文字サイズ', lblAssDstColor:'訳文の色', lblAssSrcColor:'原文の色', lblAssDstMarginV:'訳文の下端からの距離', lblAssSrcMarginV:'原文の下端からの距離', assDstMVTip:'訳文行の画面下端からの距離（px、1080p 基準）。既定値は「上下分割／二行」と上下の組み合わせで変わります。手動で変更すると固定されます。', assSrcMVTip:'原文行の画面下端からの距離（px、1080p 基準）。上下分割で原文が上にある場合も下端からの距離で指定します。手動で変更すると固定されます。', assSizeRec:'推奨 ', assApply:'適用', assUndo:'元に戻す', assKept:'現在', assAutoReset:'新しいレイアウトで再設定', assMVRec:'推奨 ',assSizeFollow:'業界の推奨値を自動入力しています。自由に変更できます',assSizeLocked:'あなたの設定を使用中。上の推奨値は参考です', assColorTip:'16 進カラーコード（#RRGGBB）を入力。例：#FFFFFF（白）、#FFD700（金色）。', lblOutlineShort:'枠線', lblFontShort:'フォント', lblAlphaShort:'不透明度', assOutlineTip:'文字の輪郭線の太さと色。0 にすると枠線なしになります。', assFontTip:'フォント名は再生側の端末で解決され、なければ自動的に代替されます。', assAlphaTip:'値が小さいほど字幕が透けます。ドキュメンタリーやインタビューでよく使われます。', secVttStyle:'WebVTT 字幕スタイル', vttStyleTip:'スタイルはファイル先頭の STYLE ブロックに書き込まれ、プレイヤーが WebVTT 仕様に従って描画します。', vttGrpPos:'位置（パーセント、解像度に追従）', lblVttLine:'垂直 line', vttAnchorBottom:'下端', vttAnchorTop:'上端', vttAnchorMid:'中央', lblVttPos:'水平 position', lblVttWidth:'幅 size', lblVttAlign:'揃え align', vttAlignCenter:'中央', vttAlignStart:'左', vttAlignEnd:'右', vttGrpText:'文字', lblVttSize:'文字サイズ', vttSizeTip:'プレイヤーの既定サイズに対する相対値（100% = 既定）。VTT にピクセル単位はなく、パーセントなら解像度に影響されません。', lblVttColor:'色', lblVttFont:'フォント', vttFontSans:'既定サンセリフ', vttFontSerif:'セリフ', vttFontMono:'等幅', lblVttLH:'行間', lblVttWeight:'字形', vttBold:'太字', vttItalic:'斜体', vttGrpSrc:'原文行', lblVttSrcDiff:'原文を区別', vttSrcDiffTip:'::cue(.src) で原文行だけ色を変えます。Firefox は引数付きセレクタに対応していないため、全体が同じ色になります。', lblVttSrcColor:'色', lblVttSrcSize:'文字サイズ', vttGrpDeco:'背景と縁取り', lblVttBg:'背景', lblVttShadow:'縁取り', vttShadowTip:'VTT には本来の縁取りプロパティがありません。ここでは text-shadow を八方に敷いて疑似的に再現します。', vttFxTip:'原文の色分けは ::cue(.src) を使います。Firefox は引数付きセレクタを解釈しないため、全体が同じ色になります。',
   showTitle:'1つの字幕ファイル、書き出しはこんなに多彩', showSub:'訳文 + 原文を自由にレイアウト：4形式 × 5レイアウト、全14種の書き出しスタイル', showMono:'訳文のみ', showBi:'バイリンガル2行 · SRT/VTT', showSplit:'上下分割 · ASS', showStack:'上下二行 · ASS · スタイル指定可', showNote:'原文上・訳文上を自由に切替、TXT対訳稿も書き出せます', showLineDst:'♪ 愛が空に満ちて ♪', fmtBiSrc:'二か国語 · 原文が上', fmtBiDst:'二か国語 · 翻訳が上', 
   logTitle:'ログ', logReady:'準備完了。字幕を読み込むかサンプルを開始してください。',
   stTotal:'件数', stDone:'翻訳済', stDrop:'フィラー消去', stMerge:'複数跨ぎ文', stWrap:'改行', stIssues:'未処理',
@@ -9711,7 +9803,8 @@ function buildStyleOptions(){
 buildStyleOptions();
 function buildExport(){
   const ff=expFileFmt();
-  if(ff==='vtt') return C.formatVtt(buildExportItems());
+  /* v0.9.236：VTT 带样式导出。不传 style 时 core 的输出与旧版逐字节一致。 */
+  if(ff==='vtt') return C.formatVtt(buildExportItems(), { style: vttStyle(), srcLine: vttSrcLine() });
   if(ff==='txt') return C.formatTxt(buildExportItems());
   if(ff==='sbv') return C.formatSbv(buildExportItems());
   if(ff==='ass') return C.formatAss(buildAssEvents(), {title:S.fileBase||'translated', assStyle:assStyleOf()}); /* v0.9.100：外观设置 */
@@ -10008,6 +10101,18 @@ function save(){
     autoTerms: sv.autoTerms || '0',
     autoTermsSet:(UI.autoTermsSet||sv.autoTermsSet==='1')?'1':'0',
     expStyle:expStyle(),
+    /* v0.9.236：VTT 样式（新键；老存档没有 → 保持 HTML 默认值）。
+       与 ASS 那套完全独立：两套单位不同（百分比 vs 像素），不能共用字段也不能互相换算。 */
+    vttLine:($('vttLine')||{}).value, vttLineAlign:($('vttLineAlign')||{}).value,
+    vttPos:($('vttPos')||{}).value, vttWidth:($('vttWidth')||{}).value, vttAlign:($('vttAlign')||{}).value,
+    vttSize:($('vttSize')||{}).value, vttColor:($('vttColor')||{}).value, vttFont:($('vttFont')||{}).value,
+    vttLH:($('vttLH')||{}).value,
+    vttBold:(($('vttBold')||{}).checked?'1':'0'), vttItalic:(($('vttItalic')||{}).checked?'1':'0'),
+    vttSrcDiff:(($('vttSrcDiff')||{}).checked?'1':'0'),
+    vttSrcColor:($('vttSrcColor')||{}).value, vttSrcSize:($('vttSrcSize')||{}).value,
+    vttBgOn:(($('vttBgOn')||{}).checked?'1':'0'), vttBgColor:($('vttBgColor')||{}).value, vttBgAlpha:($('vttBgAlpha')||{}).value,
+    vttShadowOn:(($('vttShadowOn')||{}).checked?'1':'0'), vttShadowW:($('vttShadowW')||{}).value,
+    vttShadowColor:($('vttShadowColor')||{}).value,
     /* v0.9.100：ASS 外观（新键；老用户 localStorage 无这些字段 → 恢复时用 HTML 默认值） */
     assSizeSet:(UI.assSizeTouched?'1':'0'), assCtxV:'1',
     assDstColor:($('assDstColor')||{}).value, assSrcColor:($('assSrcColor')||{}).value,
@@ -10672,6 +10777,106 @@ function syncAssStyleBox(){
      而且列头一旦留下「原文」两个字、下面却没有任何原文字段，反而更让人困惑。 */
   var hd=$('assHead'); if(hd) hd.style.display = mono ? 'none' : '';
 }
+/* ---------- v0.9.236：WebVTT 样式 ----------
+   VTT 的样式和 ASS 不是一套东西，别互相换算：
+     ASS = 像素（离底 MarginV）+ 完整排版；VTT = 百分比（line/position/size）+ CSS 白名单属性。
+   ⚠️ 收集函数只做「取值」，不做修正：空就是空、负数就是负数、超过 100 就是超过 100，
+      原样交给 core 写进文件（v0.9.234/235 定的「用户填什么就是什么」在这里同样适用）。 */
+function vttStyle(){
+  var g=function(id){ var e=$(id); return e?String(e.value==null?'':e.value).trim():''; };
+  var ck=function(id){ var e=$(id); return !!(e&&e.checked); };
+  /* 单语导出没有原文行（vttSrcBox 整块隐藏），此时「区分原文」必须按关闭处理：
+     否则 STYLE 块里会留下一条永远匹配不到元素的 ::cue(.src) 规则（纯噪音）。 */
+  var mono=(typeof expFmtOf==='function')?(expFmtOf()==='mono'):false;
+  return {
+    line:g('vttLine'), lineAlign:g('vttLineAlign'),
+    position:g('vttPos'), width:g('vttWidth'), align:g('vttAlign'),
+    size:g('vttSize'), color:g('vttColor'), font:g('vttFont'), lineHeight:g('vttLH'),
+    bold:ck('vttBold'), italic:ck('vttItalic'),
+    srcDiff: mono ? false : ck('vttSrcDiff'), srcColor:g('vttSrcColor'), srcSize:g('vttSrcSize'),
+    bgOn:ck('vttBgOn'), bgColor:g('vttBgColor'), bgAlpha:g('vttBgAlpha'),
+    shadowOn:ck('vttShadowOn'), shadowW:g('vttShadowW'), shadowColor:g('vttShadowColor')
+  };
+}
+/* 原文行是文本里的第几行（0 基）：mono 没有原文行 → -1；bi-src 原文在前 → 0；bi-dst 原文在后 → 1 */
+function vttSrcLine(){
+  var f=(typeof expFmtOf==='function')?expFmtOf():'mono';
+  return f==='bi-src' ? 0 : (f==='bi-dst' ? 1 : -1);
+}
+const VTT_FONTS = [['sans','vttFontSans'],['serif','vttFontSerif'],['mono','vttFontMono'],
+  ['PingFang SC',''],['Microsoft YaHei',''],['SimHei',''],['SimSun',''],['Noto Sans CJK SC',''],['Arial',''],['Times New Roman','']];
+function fillVttFonts(){
+  var el=$('vttFont'); if(!el || el.dataset.filled==='1') return;
+  VTT_FONTS.forEach(function(p){
+    var o=document.createElement('option'); o.value=p[0];
+    if(p[1]) o.setAttribute('data-i18n', p[1]);
+    o.textContent=p[1]?t(p[1]):p[0];
+    el.appendChild(o);
+  });
+  el.value='sans'; el.dataset.filled='1';
+}
+/* 显隐：只有导出 WebVTT 时才有意义；单语时没有原文行 → 原文那一组整块收起 */
+function syncVttStyleBox(){
+  var b=$('vttStyleBox'); if(b) b.style.display=(expFileFmt()==='vtt')?'':'none';
+  var mono=(typeof expFmtOf==='function')?(expFmtOf()==='mono'):false;
+  var sb=$('vttSrcBox'), fx=$('vttFxTip');
+  if(sb) sb.style.display=mono?'none':'';
+  if(fx) fx.style.display=mono?'none':'';
+  ['vttColor','vttSrcColor','vttBgColor','vttShadowColor'].forEach(function(id){ try{ syncColorSw(id); }catch(e){} });
+}
+/* VTT 预览：所有数值都按「百分比 → 预览框百分比」直译，字号按播放器默认基准（≈画面高 5%）× f 缩放。
+   与导出的关系是「同一个样式对象的两种渲染」——core 写进文件，这里画到 DOM，
+   两边读同一份 vttStyle()，不做第二套计算。 */
+function syncVttPreview(box, pvH, f){
+  var layer=box.querySelector('.ep-vtt'); if(!layer) return;
+  var cue=layer.querySelector('.ep-vtt-cue'), d=layer.querySelector('.ep-vtt-dst'), s=layer.querySelector('.ep-vtt-src');
+  if(!cue||!d||!s) return;
+  var st=vttStyle(), mono=(expFmtOf()==='mono'), srcFirst=(expFmtOf()==='bi-src');
+  var dstEl=box.querySelector('.ep-dst'), srcEl=box.querySelector('.ep-src');
+  d.textContent = dstEl ? dstEl.textContent : '';
+  s.textContent = srcEl ? srcEl.textContent : '';
+  d.style.display='';
+  s.style.display = mono ? 'none' : '';
+  /* 行序与导出一致：bi-src 原文在前，bi-dst 译文在前 */
+  if(srcFirst){ if(cue.firstChild!==s) cue.insertBefore(s, cue.firstChild); }
+  else { if(cue.lastChild!==s) cue.appendChild(s); }
+  var num=function(v,dflt){ var n=parseFloat(v); return (v!=='' && isFinite(n))?n:dflt; };
+  var col=function(v,dflt){ return /^#[0-9a-fA-F]{6}$/i.test(String(v||'').trim())?String(v).trim():dflt; };
+  /* 位置：line 的三种锚定（贴底 / 贴顶 / 居中）与 cue settings 的 line:xx%,end|start|center 一一对应 */
+  var ln=num(st.line,0), la=st.lineAlign||'end';
+  if(la==='start'){ cue.style.bottom='auto'; cue.style.top=ln+'%'; cue.style.transform=''; }
+  else if(la==='center'){ cue.style.bottom='auto'; cue.style.top=ln+'%'; cue.style.transform='translateY(-50%)'; }
+  else { cue.style.top='auto'; cue.style.transform=''; cue.style.bottom=(100-ln)+'%'; }
+  var pos=num(st.position,0), w=num(st.width,100), al=st.align||'center';
+  cue.style.width=w+'%';
+  cue.style.left=(al==='start'?pos:(al==='end'?(pos-w):(pos-w/2)))+'%';
+  /* 字号：100% = 播放器默认 cue 字号（≈画面高的 5%），预览再乘等比系数 f。
+     与 ASS 那条路径同源：成片 1080 高时 100% ≈ 54px，预览里就是 54×f。 */
+  var base=pvH*0.05;
+  d.style.fontSize=(base*(num(st.size,100)/100)).toFixed(2)+'px';
+  s.style.fontSize=(base*(num(st.srcSize,100)/100)).toFixed(2)+'px';
+  d.style.color=col(st.color,'#FFFFFF');
+  s.style.color=col(st.srcColor,'#FFD700');
+  if(st.srcDiff===false) s.style.color=d.style.color;
+  var fam=(typeof C!=='undefined' && C.vttFontStack)?C.vttFontStack(st.font):'';
+  cue.style.fontFamily=fam||'inherit';
+  cue.style.fontWeight=st.bold?'700':'400';
+  cue.style.fontStyle=st.italic?'italic':'normal';
+  cue.style.lineHeight=String(num(st.lineHeight,1.4));
+  /* 底衬：background 在 ::cue 里是逐条生效的（规范特意保留），画在 cue 盒上正好对应 */
+  if(st.bgOn!==false){
+    var a=num(st.bgAlpha,55), m=/^#([0-9a-fA-F]{6})$/.exec(col(st.bgColor,'#000000'));
+    var r=m?parseInt(m[1].slice(0,2),16):0, g=m?parseInt(m[1].slice(2,4),16):0, b=m?parseInt(m[1].slice(4,6),16):0;
+    cue.style.backgroundColor='rgba('+r+','+g+','+b+','+(a/100)+')';
+  }else cue.style.backgroundColor='transparent';
+  /* 描边：VTT 没有真描边，core 用 text-shadow 八向模拟 → 预览必须用同一串值（f 等比缩放） */
+  var sh=(typeof C!=='undefined' && C.vttShadowCss)?C.vttShadowCss(st):'';
+  if(sh){
+    var sw=num(st.shadowW,2), sc=col(st.shadowColor,'#000000');
+    cue.style.textShadow=[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]]
+      .map(function(p){ return (p[0]*sw*f).toFixed(2)+'px '+(p[1]*sw*f).toFixed(2)+'px 0 '+sc; }).join(', ');
+  }else cue.style.textShadow='none';
+}
 /* v0.9.196：导出预览跟随「导出字幕样式」。此前 .exp-preview 里两行是写死的双语排布，
    选 mono / bi-src / 换文件格式都不动——预览等于没用。
    规则（与 srt-core.js 的 ASS 生成、以及 SRT/VTT 双行导出保持一致）：
@@ -10698,13 +10903,17 @@ function syncExpPreview(){
   box.classList.toggle('pv-rev', !split && !mono && srcFirst);
   /* v0.9.200：SRT / VTT 无样式可谈 → 打 pv-plain，把两行统一成播放器默认的白 + 同号。
      只有「行序」是真的（bi-src 原文在上），颜色/字号都得回到中性。 */
-  box.classList.toggle('pv-plain', !isAss);
+  var isVtt=(expFileFmt()==='vtt');
+  /* v0.9.236：VTT 有自己的样式层，不再走 pv-plain（那是「播放器默认白字」的兜底）。 */
+  box.classList.toggle('pv-plain', !isAss && !isVtt);
+  box.classList.toggle('pv-vtt', isVtt);
   src.style.display = mono ? 'none' : '';
   var pvH=box.clientHeight;
   /* v0.9.209：预览 = 成片的等比缩略图，全篇只有这一个比例 f（预览框是 16:9，与成片同比例）。
      用户填什么就画什么：填 42 就是成片的 42，填 900 就画到成片的 900（预览里被裁掉，
      成片里也一样出画）。不放大、不取整、不夹取、不补偿。 */
   var f = pvH>0 ? pvH/1080 : 0;
+  if(isVtt && pvH>0){ try{ syncVttPreview(box, pvH, f); }catch(e){} }
   if(isAss && pvH>0){
     var col=function(id,def){ var v=String(($(id)||{}).value||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:def; };
     /* v0.9.209：字号 = 成片字号 × f，与位置同源。
@@ -10820,10 +11029,38 @@ ASS_F.dmv={el:$('assDstMV'),hint:$('assDstMVHint'),rec:function(){return assDefa
            isT:function(){return !!UI.assDstMVSet;},setT:function(v){UI.assDstMVSet=v;},after:function(){syncAssMVBox();}};
 ASS_F.smv={el:$('assSrcMV'),hint:$('assSrcMVHint'),rec:function(){return assDefaultMV('src');},
            isT:function(){return !!UI.assSrcMVSet;},setT:function(v){UI.assSrcMVSet=v;},after:function(){syncAssMVBox();}};
-$('expStyle').addEventListener('change',function(){ syncAssStyleBox(); assCtxSync(); syncExpPreview(); syncWrapField(); save(); });
-syncAssStyleBox(); syncAssMVBox(); syncExpPreview();
+$('expStyle').addEventListener('change',function(){ syncAssStyleBox(); syncVttStyleBox(); assCtxSync(); syncExpPreview(); syncWrapField(); save(); });
+syncAssStyleBox(); syncVttStyleBox(); syncAssMVBox(); syncExpPreview();
 /* v0.9.217：字体下拉填充 + 描边色/滑杆的事件绑定（各函数内部有 dataset 幂等标记，重复调用安全） */
 try{ fillAssFonts(); }catch(e){}
+/* v0.9.236：VTT 字体下拉 + 面板改动即时重画预览（VTT 预览读的就是面板当前值，不重画等于改了没反应） */
+try{ fillVttFonts(); }catch(e){}
+/* v0.9.236：VTT 样式记忆回填。必须在 fillVttFonts 之后（select.value 要求 option 已存在）；
+   select 只认列表内的值——列表升级删掉某项时老存档静默回默认，不留空 select。 */
+(function(){
+  function put(id, v){
+    var e=$(id); if(!e || v==null || v==='') return;
+    if(e.type==='checkbox'){ e.checked=(v==='1'); return; }
+    if(e.tagName==='SELECT'){
+      for(var i=0;i<e.options.length;i++){ if(e.options[i].value===v){ e.value=v; break; } }
+      return;
+    }
+    e.value=v;
+  }
+  put('vttLine',sv.vttLine); put('vttLineAlign',sv.vttLineAlign); put('vttPos',sv.vttPos);
+  put('vttWidth',sv.vttWidth); put('vttAlign',sv.vttAlign); put('vttSize',sv.vttSize);
+  put('vttColor',sv.vttColor); put('vttFont',sv.vttFont); put('vttLH',sv.vttLH);
+  put('vttBold',sv.vttBold); put('vttItalic',sv.vttItalic); put('vttSrcDiff',sv.vttSrcDiff);
+  put('vttSrcColor',sv.vttSrcColor); put('vttSrcSize',sv.vttSrcSize);
+  put('vttBgOn',sv.vttBgOn); put('vttBgColor',sv.vttBgColor); put('vttBgAlpha',sv.vttBgAlpha);
+  put('vttShadowOn',sv.vttShadowOn); put('vttShadowW',sv.vttShadowW); put('vttShadowColor',sv.vttShadowColor);
+  try{ syncVttStyleBox(); }catch(e){}
+})();
+(function(){
+  var b=$('vttStyleBox'); if(!b) return;
+  b.addEventListener('input', function(){ syncVttStyleBox(); syncExpPreview(); save(); });
+  b.addEventListener('change', function(){ syncVttStyleBox(); syncExpPreview(); save(); });
+})();
 try{ bindAssNew(); }catch(e){}
 /* v0.9.220：字体记忆回填。必须在 fillAssFonts 之后（select.value 需 option 已存在）；
    只认列表内的值——列表升级删掉某字体时，老存档静默回默认，不留空 select。 */

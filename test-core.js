@@ -4524,9 +4524,9 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 单语：原文那一行必须藏掉（否则预览里还是"双语句式"） */
     assert.ok(/src\.style\.display = mono \? 'none' : ''/.test(html), '单语时预览的原文行没隐藏');
     /* 接线：下拉框变化 + 初始化都要刷，漏了就是白做 */
-    assert.ok(/\$\('expStyle'\)\.addEventListener\('change',function\(\)\{ syncAssStyleBox\(\); assCtxSync\(\); syncExpPreview\(\); syncWrapField\(\); save\(\); \}\)/.test(html),
+    assert.ok(/\$\('expStyle'\)\.addEventListener\('change',function\(\)\{ syncAssStyleBox\(\); syncVttStyleBox\(\); assCtxSync\(\); syncExpPreview\(\); syncWrapField\(\); save\(\); \}\)/.test(html),
       'expStyle change 里没调 syncExpPreview');
-    assert.ok(/syncAssStyleBox\(\); syncAssMVBox\(\); syncExpPreview\(\);/.test(html), '初始化没调 syncExpPreview');
+    assert.ok(/syncAssStyleBox\(\); syncVttStyleBox\(\); syncAssMVBox\(\); syncExpPreview\(\);/.test(html), '初始化没调 syncExpPreview');
     /* ASS 才跟颜色/字号；非 ASS 必须回落默认，否则拿 ASS 的自定义色误导（播放器不读那套） */
     assert.ok(/setProperty\('--pv-dst-c'/.test(html) && /removeProperty\(k\)/.test(html),
       'ASS 颜色/字号的跟随或回落不完整');
@@ -4735,8 +4735,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        等于给一个根本没有样式的格式画了样式，用户会以为导出后原文就是淡紫小字。 */
     assert.ok(/\.exp-preview\.pv-plain \.ep-dst,\n  \.exp-preview\.pv-plain \.ep-src\{color:#fff;font-size:12px;font-weight:400\}/.test(html),
       '缺 .pv-plain 规则（非 ASS 两行没被拉回中性）');
-    assert.ok(/box\.classList\.toggle\('pv-plain', !isAss\);/.test(html),
-      'syncExpPreview 没打 pv-plain 类');
+    /* v0.9.236：VTT 有了自己的样式层（STYLE 块 + cue settings），不再是「无样式可谈」的纯文本格式，
+       所以 pv-plain 只留给 SRT / SBV / TXT —— 那几个才是真的没有样式。 */
+    assert.ok(/box\.classList\.toggle\('pv-plain', !isAss && !isVtt\);/.test(html),
+      'syncExpPreview 没打 pv-plain 类（SRT/TXT 仍要拉回中性）');
     /* 反向断言：兜底值本身必须还是「一深一浅」——ASS 模式下 --pv-* 一定被写入，
        这里的兜底只用于 pv-plain 之外的极少数场景（脚本没跑完）。别为了这条把 ASS 的颜色串了。 */
     assert.ok(/\.ep-dst\{bottom:calc\(9px \+ 12px\*var\(--pv-lh\) \+ var\(--pv-gap\)\);font-size:var\(--pv-dst,12px\);color:var\(--pv-dst-c,#fff\)\}/.test(html),
@@ -5338,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.235/.test(mg), 'merge.html 未引用 v0.9.235 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.236/.test(mg), 'merge.html 未引用 v0.9.236 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5371,9 +5373,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.235</.test(html), '首页版本号未升 0.9.235');
-    assert.ok(/class="ver-tag">v0\.9\.235</.test(html), '工作台版本号未升 0.9.235');
-    assert.ok(/srt-core\.js\?v=0\.9\.235/.test(html), 'srt-core.js?v 未升 0.9.235');
+    assert.ok(/class="ver">v0\.9\.236</.test(html), '首页版本号未升 0.9.236');
+    assert.ok(/class="ver-tag">v0\.9\.236</.test(html), '工作台版本号未升 0.9.236');
+    assert.ok(/srt-core\.js\?v=0\.9\.236/.test(html), 'srt-core.js?v 未升 0.9.236');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5517,8 +5519,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.235</.test(mg), 'merge.html 版本未升 0.9.235');
-    assert.ok(/merge-core\.js\?v=0\.9\.235/.test(mg), 'merge-core.js?v 未升 0.9.235');
+    assert.ok(/class="ver">v0\.9\.236</.test(mg), 'merge.html 版本未升 0.9.236');
+    assert.ok(/merge-core\.js\?v=0\.9\.236/.test(mg), 'merge-core.js?v 未升 0.9.236');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6395,5 +6397,132 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* assStackMV 是「推荐值」计算器（单测锁了 1~1080），不是用户设置值，不动 */
     assert.ok(/function assStackMV\(o\) \{/.test(mcE), 'assStackMV 不该被删（主站推荐值仍在用）');
   });
+
+
+  console.log('— v0.9.236：WebVTT 样式（STYLE 块 + cue settings） —');
+
+  const VTT_ITEMS = [{ no:1, start:1000, end:3200, text:'我们应该谈谈这件事。\nWe should talk about this.' }];
+
+  t('v0.9.236：不传样式时 VTT 输出与旧版逐字节一致（老调用不许变）', () => {
+    const old = 'WEBVTT\n\n' + VTT_ITEMS.map(it => it.no + '\n' + C.fmtTimeVtt(it.start) + ' --> ' + C.fmtTimeVtt(it.end) + '\n' + it.text).join('\n\n') + '\n';
+    assert.strictEqual(C.formatVtt(VTT_ITEMS), old, '不传第二参时输出变了');
+    assert.strictEqual(C.formatVtt(VTT_ITEMS, {}), old, '传空 opt 时输出变了');
+  });
+
+  t('v0.9.236：样式写进文件头的 STYLE 块，且必须排在第一条 cue 之前', () => {
+    const out = C.formatVtt(VTT_ITEMS, { style:{ color:'#FFFFFF', size:100, bgOn:true, bgColor:'#000000', bgAlpha:55 }, srcLine:1 });
+    assert.ok(out.startsWith('WEBVTT\n\nSTYLE\n'), '缺 STYLE 块（或位置不对）');
+    const iStyle = out.indexOf('STYLE'), iCue = out.indexOf('00:00:01.000');
+    assert.ok(iStyle > 0 && iStyle < iCue, 'STYLE 块必须在第一条 cue 之前，否则整块被当成无效样式');
+    assert.ok(/::cue \{/.test(out), '缺 ::cue 规则');
+    assert.ok(/  color: #FFFFFF;/.test(out), '主色没写进去');
+    assert.ok(/  font-size: 100%;/.test(out), '字号没写进去');
+    assert.ok(/  background-color: rgba\(0, 0, 0, 0\.55\);/.test(out), '底衬没写进去');
+    /* 规范：STYLE 块内不允许空行，否则整条样式表作废 */
+    const blk = out.slice(iStyle, out.indexOf('\n\n', iStyle));
+    assert.ok(!/\n\s*\n/.test(blk), 'STYLE 块里有空行（整条样式表会被判作废）');
+  });
+
+  t('v0.9.236：cue settings 原样写入，百分比不许夹取', () => {
+    const out = C.formatVtt(VTT_ITEMS, { style:{ line:'150', position:'-10', width:'120', align:'start' } });
+    assert.ok(/line:150% position:-10% size:120% align:start/.test(out), 'cue settings 拼接不对：' + out.slice(0, 200));
+    assert.ok(out.indexOf('line:150%') > 0, '超界 line 被改写');
+    assert.ok(out.indexOf('position:-10%') > 0, '负 position 被改写');
+    assert.ok(out.indexOf('size:120%') > 0, '超界 size 被改写');
+    /* line 的三种锚定要能原样出去 */
+    assert.ok(C.formatVtt(VTT_ITEMS, { style:{ line:'90', lineAlign:'end' } }).indexOf('line:90%,end') > 0, '缺 line 锚定');
+    assert.ok(C.formatVtt(VTT_ITEMS, { style:{ line:'0', lineAlign:'start' } }).indexOf('line:0%,start') > 0);
+  });
+
+  t('v0.9.236：只写规范白名单里的 CSS 属性（白名单外会被播放器忽略）', () => {
+    const out = C.formatVtt(VTT_ITEMS, { style:{ color:'#FFFFFF', size:100, font:'sans', bold:true, italic:true,
+      lineHeight:1.4, shadowOn:true, shadowW:2, shadowColor:'#000000', bgOn:true, bgColor:'#000000', bgAlpha:55 }, srcLine:1 });
+    const decl = out.slice(out.indexOf('::cue {'), out.indexOf('\n}'));
+    const props = [...decl.matchAll(/^\s*([a-z-]+):/gm)].map(m => m[1]);
+    assert.ok(props.length > 0, '没解析到任何声明');
+    props.forEach(p => assert.ok(C.VTT_CSS_WHITE.indexOf(p) >= 0, '写了白名单外的属性: ' + p));
+    assert.ok(!/letter-spacing/.test(out), 'VTT 不支持字间距（ASS 有，VTT 没有，别平移）');
+    assert.ok(!/text-align/.test(out), 'text-align 不在 ::cue 白名单里');
+    assert.ok(!/transform/.test(out));
+    assert.ok(/  font-weight: bold;/.test(out), '粗体没写进去');
+    assert.ok(/  font-style: italic;/.test(out), '斜体没写进去');
+  });
+
+  t('v0.9.236：描边用 text-shadow 八向模拟（VTT 没有真描边，outline 画的是方框）', () => {
+    const sh = C.vttShadowCss({ shadowOn:true, shadowW:2, shadowColor:'#000000' });
+    const parts = sh.split(', ');
+    assert.strictEqual(parts.length, 8, 'text-shadow 应为八向，实际 ' + parts.length);
+    assert.ok(parts.every(p => /^-?[\d.]+px -?[\d.]+px 0 #000000$/.test(p)), 'text-shadow 格式不对: ' + sh);
+    assert.strictEqual(C.vttShadowCss({ shadowOn:false, shadowW:2 }), '', '关掉描边就不该输出');
+    assert.ok(!/outline/.test(C.formatVtt(VTT_ITEMS, { style:{ shadowOn:true, shadowW:2 } })), 'outline 画的是方框不是字描边');
+  });
+
+  t('v0.9.236：双语原文行包进 <c.src>，位置跟着 bi-src / bi-dst 走', () => {
+    const a = C.formatVtt(VTT_ITEMS, { style:{ srcDiff:true, srcColor:'#FFD700' }, srcLine:0 });
+    assert.ok(/<c\.src>我们应该谈谈这件事。<\/c\.src>\nWe should talk about this\./.test(a), 'bi-src 应把第一行当原文');
+    const b = C.formatVtt(VTT_ITEMS, { style:{ srcDiff:true, srcColor:'#FFD700', srcSize:85 }, srcLine:1 });
+    assert.ok(/我们应该谈谈这件事。\n<c\.src>We should talk about this\.<\/c\.src>/.test(b), 'bi-dst 应把第二行当原文');
+    assert.ok(/::cue\(\.src\) \{\n  color: #FFD700;\n  font-size: 85%;\n\}/.test(b), '缺 ::cue(.src) 规则');
+    const c = C.formatVtt(VTT_ITEMS, { style:{ srcDiff:false }, srcLine:1 });
+    assert.ok(!/<c\.src>/.test(c), '关掉区分就不该写 class');
+    assert.ok(!/::cue\(\.src\)/.test(c), '关掉区分就不该输出 ::cue(.src)');
+    const d = C.formatVtt([{ no:1, start:0, end:1000, text:'只有一行' }], { style:{ srcDiff:true }, srcLine:0 });
+    assert.ok(!/<c\.src>/.test(d), '单语（只有一行）不该包 class');
+  });
+
+  t('v0.9.236：导出的 VTT 能被自己解析回来（条数与时间轴不变）', () => {
+    const out = C.formatVtt(VTT_ITEMS, { style:{ color:'#FFFFFF', bgOn:true, srcDiff:true }, srcLine:1 });
+    const r = C.parseVtt(out);
+    assert.strictEqual(r.items.length, 1, 'STYLE 块被当成 cue 了（或 cue 丢了）');
+    assert.strictEqual(r.items[0].start, 1000, '时间轴被样式块带偏');
+    assert.strictEqual(r.items[0].end, 3200);
+    assert.ok(r.items[0].text.indexOf('我们应该谈谈这件事。') >= 0, '正文丢了');
+    assert.strictEqual(C.detectFormat(out), 'vtt', '带 STYLE 块也要能被识别成 vtt');
+  });
+
+  t('v0.9.236：主站 VTT 面板接进导出与预览（改了要真的生效）', () => {
+    assert.ok(/id="vttStyleBox"/.test(html), '缺 VTT 样式面板');
+    assert.ok(/function vttStyle\(\)\{/.test(html), '缺样式收集函数');
+    assert.ok(/function syncVttStyleBox\(\)\{/.test(html), '缺面板显隐');
+    assert.ok(/C\.formatVtt\(buildExportItems\(\), \{ style: vttStyle\(\), srcLine: vttSrcLine\(\) \}\)/.test(html), '导出没带上 VTT 样式');
+    assert.ok(/function vttSrcLine\(\)\{/.test(html), '缺「原文行是第几行」的判定');
+    assert.ok(/b\.style\.display=\(expFileFmt\(\)==='vtt'\)\?'':'none'/.test(html), '面板没按导出格式显隐');
+    assert.ok(/isVtt && pvH>0\)\{ try\{ syncVttPreview\(/.test(html), '预览没画 VTT 样式');
+    /* 面板一动就要重画预览 + 落盘，否则又是「改了没反应」的假控件 */
+    assert.ok(/b\.addEventListener\('input', function\(\)\{ syncVttStyleBox\(\); syncExpPreview\(\); save\(\); \}\)/.test(html), '面板改动没接进预览');
+    /* 单语没有原文行 → 原文那一组整块收起 */
+    assert.ok(/var sb=\$\('vttSrcBox'\)/.test(html), '缺原文行的显隐');
+  });
+
+  t('v0.9.236：VTT 预览与导出读同一份样式，不另算一套', () => {
+    const pv = html.slice(html.indexOf('function syncVttPreview('), html.indexOf('/* v0.9.196：导出预览跟随'));
+    assert.ok(pv.length > 0, '没抠到 syncVttPreview');
+    assert.ok(/var st=vttStyle\(\)/.test(pv), '预览没读 vttStyle()（会和导出分家）');
+    assert.ok(/cue\.style\.bottom=\(100-ln\)\+'%'/.test(pv), '预览的 line 没按百分比落位');
+    assert.ok(/cue\.style\.width=w\+'%'/.test(pv), '预览的宽度没用 size%');
+    assert.ok(!/Math\.max\(0,/.test(pv) && !/Math\.min\(100,/.test(pv), '预览不许夹取位置（用户填什么就画什么）');
+  });
+
+  t('v0.9.236：新增词条四语齐全（其余界面语言回退中文）', () => {
+    const keys = ['secVttStyle','vttStyleTip','vttGrpPos','lblVttLine','vttAnchorBottom','vttAnchorTop','vttAnchorMid',
+      'lblVttPos','lblVttWidth','lblVttAlign','vttAlignCenter','vttAlignStart','vttAlignEnd','vttGrpText','lblVttSize',
+      'vttSizeTip','lblVttColor','lblVttFont','vttFontSans','vttFontSerif','vttFontMono','lblVttLH','lblVttWeight',
+      'vttBold','vttItalic','vttGrpSrc','lblVttSrcDiff','vttSrcDiffTip','lblVttSrcColor','lblVttSrcSize','vttGrpDeco',
+      'lblVttBg','lblVttShadow','vttShadowTip','vttFxTip'];
+    const dictOf = (code) => {
+      const m = new RegExp("'" + code + "'\\s*:\\s*\\{").exec(html);
+      assert.ok(m, '找不到语言块 ' + code);
+      const start = m.index + m[0].length;
+      const nx = /'[a-zA-Z][a-zA-Z-]*'\s*:\s*\{/.exec(html.slice(start));
+      return html.slice(start, start + (nx ? nx.index : html.length));
+    };
+    ['zh-CN','zh-TW','en','ja'].forEach(code => {
+      const d = dictOf(code);
+      keys.forEach(k => assert.ok(new RegExp("[,\\s]" + k + ":").test(d), code + ' 缺词条 ' + k));
+    });
+    /* 主站 27 语块没法逐个配齐，靠 t() 的 zh-CN 回退层兜底 —— 这层必须还在 */
+    assert.ok(/I18N\['zh-CN'\]\[k\] !== undefined \? I18N\['zh-CN'\]\[k\] : k/.test(html), 't() 缺 zh-CN 回退层');
+  });
+
 
 }

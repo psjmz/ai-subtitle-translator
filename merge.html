@@ -175,7 +175,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.235</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.236</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -413,7 +413,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.235"></script>
+<script src="merge-core.js?v=0.9.236"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1204,7 +1204,7 @@ function mgOf(id){ const n=parseInt(($(id)||{}).value,10); return (isFinite(n)&&
 function assMVs(){
   const d=parseInt(($('assDstMV')||{}).value,10), s=parseInt(($('assSrcMV')||{}).value,10);
   /* 兜底只在「框里没有有效数字」时生效（译文 42 / 原文 922，与分屏预设一致）。
-     v0.9.235：不再把负数也当成无效值——用户手输 −36 就是要那条出画，如实传下去。 */
+     v0.9.236：不再把负数也当成无效值——用户手输 −36 就是要那条出画，如实传下去。 */
   return { dst:isFinite(d)?d:42, src:isFinite(s)?s:922 };
 }
 function assStyleOf(){
@@ -1240,7 +1240,7 @@ function assStyleOf(){
     /* 只开放 1/2/3（底左/中/右）：两条都用「离底距离」定位，再放开 4-9 会与离底语义打架 */
     dstAlign: alOf('assDstAlign'), srcAlign: alOf('assSrcAlign'),
     marginL: mgOf('assMarginL'), marginR: mgOf('assMarginR'),
-    /* v0.9.235：离底距离原样传出（不再 Math.max(0, …)）——用户填什么就是什么 */
+    /* v0.9.236：离底距离原样传出（不再 Math.max(0, …)）——用户填什么就是什么 */
     marginV: 42, dstMV: m.dst, srcMV: m.src
   };
 }
@@ -1260,7 +1260,7 @@ function buildAssEvents(){
   /* v0.9.229：译文与原文的「离底距离」语义完全一致——都是这一行离画面底边多远，
      直接写进各自的 MarginV，不再按字号/行高推算抬高量（assStackMV 那条路径已弃用）。
      ⚠️ 代价：两行之间不再自动防重叠，数值挨太近就会叠——与手写 ASS 的行为一致。 */
-  const dstMV = mv.dst, srcMV = mv.src;   /* v0.9.235：原样，不再夹到 0 */
+  const dstMV = mv.dst, srcMV = mv.src;   /* v0.9.236：原样，不再夹到 0 */
   return parts.map(p=>{
     const dstText = p.dstLines.join('\n'), srcText = p.srcLines.join('\n');
     const lines = [];
@@ -1333,7 +1333,7 @@ function renderAssPv(){
   const colOf = id => assColorVal(id, id.indexOf('Outline') > 0 ? '#000000' : '#FFFFFF');
   /* v0.9.229：两个框都是「距画面底边多远」，一条字幕算一个绝对位置。
      预览与导出同一口径，不需要再按实测行数重算抬高量。 */
-  const dstMV = m.dst, srcMV = m.src;   /* v0.9.235：预览与导出同一数字，不再夹到 0 */
+  const dstMV = m.dst, srcMV = m.src;   /* v0.9.236：预览与导出同一数字，不再夹到 0 */
   /* hex → rgba：阴影与底衬都要按各自的不透明度混合，不能整行用 opacity 一起打折
      （ASS 里 PrimaryColour 的 alpha 只作用于文字填充，BackColour 的 alpha 只作用于阴影/底衬）。 */
   const rgbaOf = (hex, aPct) => {
@@ -1457,7 +1457,7 @@ function importAssStyle(){
        v0.9.230：换算按**2 行**给（与分屏默认 922 同口径）——an8 锚上边、行数无关，
        换成 an2 必然要挑一个行数，双语原文折 2 行是常态，按 1 行换会直接顶出画面。
        ⚠️ 这是换算不是修正：填进框后用户随便改，我们不碰。 */
-    /* v0.9.235：与 merge-core 的 planAssImport 同口径——换算结果不再夹到 [0,1080]，
+    /* v0.9.236：与 merge-core 的 planAssImport 同口径——换算结果不再夹到 [0,1080]，
        源文件顶部那条本来就出画时，如实给负数，让用户一眼看出是文件这么排的。 */
     const mvOf = f => !f ? null : (f.align === 'top'
       ? Math.round(1080 - f.marginV - 2 * C.assLineHeight(f.size))
