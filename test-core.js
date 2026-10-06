@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.236/.test(mg), 'merge.html 未引用 v0.9.236 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.237/.test(mg), 'merge.html 未引用 v0.9.237 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5373,9 +5373,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.236</.test(html), '首页版本号未升 0.9.236');
-    assert.ok(/class="ver-tag">v0\.9\.236</.test(html), '工作台版本号未升 0.9.236');
-    assert.ok(/srt-core\.js\?v=0\.9\.236/.test(html), 'srt-core.js?v 未升 0.9.236');
+    assert.ok(/class="ver">v0\.9\.237</.test(html), '首页版本号未升 0.9.237');
+    assert.ok(/class="ver-tag">v0\.9\.237</.test(html), '工作台版本号未升 0.9.237');
+    assert.ok(/srt-core\.js\?v=0\.9\.237/.test(html), 'srt-core.js?v 未升 0.9.237');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5519,8 +5519,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.236</.test(mg), 'merge.html 版本未升 0.9.236');
-    assert.ok(/merge-core\.js\?v=0\.9\.236/.test(mg), 'merge-core.js?v 未升 0.9.236');
+    assert.ok(/class="ver">v0\.9\.237</.test(mg), 'merge.html 版本未升 0.9.237');
+    assert.ok(/merge-core\.js\?v=0\.9\.237/.test(mg), 'merge-core.js?v 未升 0.9.237');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6522,6 +6522,164 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
     /* 主站 27 语块没法逐个配齐，靠 t() 的 zh-CN 回退层兜底 —— 这层必须还在 */
     assert.ok(/I18N\['zh-CN'\]\[k\] !== undefined \? I18N\['zh-CN'\]\[k\] : k/.test(html), 't() 缺 zh-CN 回退层');
+  });
+
+
+
+  console.log('— v0.9.237：VTT 样式回读 / 方案 / 原生对照预览 —');
+
+  const V237_ITEMS = [{ no:1, start:1000, end:3200, text:'我们应该谈谈这件事。\nWe should talk about this.' }];
+  const V237_ST = { line:'90', lineAlign:'end', position:'50', width:'80', align:'center', size:100, color:'#FFFFFF',
+    font:'sans', lineHeight:1.4, bold:false, italic:false, srcDiff:true, srcColor:'#FFD700', srcSize:85,
+    bgOn:true, bgColor:'#000000', bgAlpha:55, shadowOn:true, shadowW:2, shadowColor:'#000000' };
+
+  t('v0.9.237：自己写出去的样式能原样读回来（往返一致）', () => {
+    const p = C.parseVttStyle(C.formatVtt(V237_ITEMS, { style:V237_ST, srcLine:1 }));
+    assert.strictEqual(p.found, true, '没读到样式');
+    const s = p.style;
+    assert.strictEqual(s.line, '90'); assert.strictEqual(s.lineAlign, 'end');
+    assert.strictEqual(s.position, '50'); assert.strictEqual(s.width, '80'); assert.strictEqual(s.align, 'center');
+    assert.strictEqual(s.size, '100'); assert.strictEqual(s.color, '#FFFFFF'); assert.strictEqual(s.font, 'sans');
+    assert.strictEqual(s.lineHeight, '1.4');
+    assert.strictEqual(s.bgColor, '#000000'); assert.strictEqual(s.bgAlpha, '55');
+    assert.strictEqual(s.shadowW, '2'); assert.strictEqual(s.shadowColor, '#000000');
+    assert.strictEqual(s.srcColor, '#FFD700'); assert.strictEqual(s.srcSize, '85'); assert.strictEqual(s.srcDiff, true);
+    assert.strictEqual(p.srcLine, 1, '原文行位置读错');
+  });
+
+  t('v0.9.237：没样式的 VTT 不假装有样式（found=false，面板一律不动）', () => {
+    const p = C.parseVttStyle('WEBVTT\n\n1\n00:00:01.000 --> 00:00:02.000\nhi\n');
+    assert.strictEqual(p.found, false);
+    assert.strictEqual(Object.keys(p.style).length, 0);
+    assert.strictEqual(p.srcLine, null);
+    assert.deepStrictEqual(C.parseVttStyle('').notes, []);
+  });
+
+  t('v0.9.237：只读自己认得的东西（REGION / 白名单外属性 / 别的选择器 / 非法值一律忽略）', () => {
+    const vtt = ['WEBVTT','','REGION','id:r1','width:40%','','STYLE',
+      '::cue { color: #FF0000; letter-spacing: 1px; }','::cue(.other) { color: #00FF00; }','::cue(.src) { color: #FFD700; }','',
+      '1','00:00:01.000 --> 00:00:02.000 line:3 align:left','<c.other>hi</c.other>'].join('\n');
+    const p = C.parseVttStyle(vtt);
+    assert.strictEqual(p.style.color, '#FF0000', '主色应读到');
+    assert.strictEqual(p.style.srcColor, '#FFD700', '::cue(.src) 应读到');
+    assert.ok(!('letterSpacing' in p.style), '白名单外的属性不该被读回来（面板根本没这个字段）');
+    assert.strictEqual(p.style.align, undefined, 'align:left 不在面板取值范围内 → 不填');
+    assert.strictEqual(p.style.line, undefined, 'line:3 是行号不是百分比 → 不换算、不填');
+    assert.ok(p.notes.indexOf('lineNumber') >= 0, '行号写法要提示用户');
+    assert.strictEqual(p.srcLine, null, '<c.other> 不是原文行标记');
+  });
+
+  t('v0.9.237：字体反查 —— 预设还原成 sans/serif/mono，第三方族名原样带回去', () => {
+    assert.strictEqual(C.vttFontKeyOf(C.vttFontStack('sans')), 'sans');
+    assert.strictEqual(C.vttFontKeyOf(C.vttFontStack('serif')), 'serif');
+    assert.strictEqual(C.vttFontKeyOf(C.vttFontStack('mono')), 'mono');
+    assert.strictEqual(C.vttFontKeyOf('"Helvetica",sans-serif'), 'Helvetica', '第三方族名不能被吞成默认值');
+    assert.strictEqual(C.vttFontKeyOf('sans-serif'), 'sans');
+    assert.strictEqual(C.vttFontKeyOf('monospace'), 'mono');
+    assert.strictEqual(C.vttFontKeyOf(''), '');
+    /* 顺序陷阱：sans-serif 里含 serif */
+    assert.notStrictEqual(C.vttFontKeyOf('"Times New Roman",sans-serif'), 'serif');
+  });
+
+  t('v0.9.237：颜色 / 描边还原（rgba → #RRGGBB + 百分比；没写就不造值）', () => {
+    const a = C.vttUnRgba('rgba(255, 215, 0, 0.55)');
+    assert.strictEqual(a.hex, '#FFD700'); assert.strictEqual(a.alpha, 55);
+    assert.strictEqual(C.vttUnRgba('#abcdef').hex, '#ABCDEF');
+    assert.strictEqual(C.vttUnRgba('#abcdef').alpha, 100);
+    assert.strictEqual(C.vttUnRgba('hsl(1,2,3)'), null);
+    const p = C.parseVttStyle(C.formatVtt(V237_ITEMS, { style:{ shadowOn:true, shadowW:3, shadowColor:'#123456' } }));
+    assert.strictEqual(p.style.shadowW, '3', '描边粗细没还原');
+    assert.strictEqual(p.style.shadowColor, '#123456', '描边颜色没还原');
+    const q = C.parseVttStyle(C.formatVtt(V237_ITEMS, { style:{ shadowOn:false, bgOn:false, bold:false, italic:false } }));
+    assert.strictEqual(q.style.shadowOn, undefined, '没写 text-shadow 就不该造出 shadowOn');
+    assert.strictEqual(q.style.bgOn, undefined, '没写 background-color 就不该造出 bgOn');
+    assert.strictEqual(q.style.bold, undefined, '没写 font-weight 就不该造出 bold=false（会冲掉面板值）');
+  });
+
+  t('v0.9.237：导入回填只填读到的字段，且绝不改用户的导出格式', () => {
+    assert.ok(/function applyVttStyle\(p\)\{/.test(html), '缺回填函数');
+    assert.ok(/if\(!p \|\| !p\.found\) return 0;/.test(html), 'found=false 时不该动面板');
+    assert.ok(/if\(s\.bold!=null\) put\('vttBold',s\.bold\);/.test(html), 'bold 读不到时会把面板值冲成 false');
+    assert.ok(/if\(s\.italic!=null\) put\('vttItalic',s\.italic\);/.test(html), 'italic 同上');
+    assert.ok(/var o=document\.createElement\('option'\); o\.value=v; o\.textContent=v; e\.appendChild\(o\);/.test(html), '第三方字体没补 option（会被静默丢成默认）');
+    assert.ok(/const vp=C\.parseVttStyle\(text\);/.test(html) && /applyVttStyle\(vp\)/.test(html), '导入没接回填');
+    const i = html.indexOf("if(inFmt==='vtt'){");
+    const seg = html.slice(i, html.indexOf("log(t('imported'", i));
+    assert.ok(seg.length > 0 && seg.indexOf("expStyle") < 0, '导入不该顺手改用户的导出格式选择');
+    assert.ok(/vp\.notes\.indexOf\('lineNumber'\)>=0/.test(seg), '行号写法没有提示用户');
+  });
+
+  t('v0.9.237：样式方案覆盖面板全部字段（漏一个就不是那套样式）', () => {
+    assert.ok(/const VTT_SCHEME_KEY='srt_vtt_style_v1';/.test(html), '缺方案存储键');
+    const ids = ['vttLine','vttLineAlign','vttPos','vttWidth','vttAlign','vttSize','vttColor','vttFont','vttLH',
+      'vttBold','vttItalic','vttSrcDiff','vttSrcColor','vttSrcSize','vttBgOn','vttBgColor','vttBgAlpha',
+      'vttShadowOn','vttShadowW','vttShadowColor'];
+    const m = /const VTT_SCHEME_IDS=\[([\s\S]*?)\];/.exec(html);
+    assert.ok(m, '缺字段白名单');
+    ids.forEach(id => assert.ok(m[1].indexOf("'"+id+"'") >= 0, '方案漏了字段 ' + id));
+    /* 反向：面板上真实存在的控件必须全在方案里（防「新加字段忘了进方案」） */
+    ids.forEach(id => assert.ok(html.indexOf('id="'+id+'"') >= 0, 'HTML 里没有控件 ' + id));
+    assert.ok(/function vttSchemeDoSave\(\)\{/.test(html));
+    assert.ok(/function vttSchemeDoApply\(\)\{/.test(html));
+    assert.ok(/function vttSchemeDoDel\(\)\{/.test(html));
+    assert.ok(/JSON\.parse\(localStorage\.getItem\(VTT_SCHEME_KEY\)\|\|'\{\}'\)/.test(html), '方案读取没有坏数据兜底');
+    /* 套用后必须重画预览 + 落盘，否则「点了没反应」 */
+    const ap = html.slice(html.indexOf('function vttSchemeDoApply(){'), html.indexOf('function vttSchemeDoDel(){'));
+    assert.ok(/syncExpPreview\(\)/.test(ap) && /save\(\)/.test(ap), '套用方案后没刷新预览/没落盘');
+  });
+
+  t('v0.9.237：原生对照预览喂的是真实导出产物（不是另造一套）', () => {
+    assert.ok(/id="vttNatVid"/.test(html), '缺原生预览 video');
+    assert.ok(/id="vttNatCv"/.test(html), '缺提供时间轴的 canvas');
+    assert.ok(/VTT_NAT\.stream=cv\.captureStream\(8\);/.test(html), 'video 没有时间轴来源（没有媒体源，轨道不会被渲染）');
+    assert.ok(/if\(!cv\.captureStream\) return false;/.test(html), '不支持 captureStream 时该直接放弃，别给假画面');
+    const tx = html.slice(html.indexOf('function vttNatText(){'), html.indexOf('function vttNatSync(){'));
+    /* 文本必须与自绘预览同源（都读导出预览里那两个示例行），否则两个画面对不上 */
+    assert.ok(/querySelector\('\.ep-dst'\)/.test(tx) && /querySelector\('\.ep-src'\)/.test(tx), '原生预览没读预览里的示例文本');
+    assert.ok(tx.indexOf('buildExport()') < 0, '原生预览不该另取 S.rows 的内容（会和自绘预览说两件事）');
+    assert.ok(/C\.formatVtt\(\[\{no:1,start:800,end:4800,text:text\}\], \{style:vttStyle\(\), srcLine:vttSrcLine\(\)\}\)/.test(tx), '原生预览没用同一份样式与原文行判定');
+    const now = html.slice(html.indexOf('function vttNatSyncNow(){'), html.indexOf('function vttNatShow('));
+    assert.ok(/new Blob\(\[vttNatText\(\)\], \{type:'text\/vtt'\}\)/.test(now), '没把产物塞进 track');
+    assert.ok(/URL\.revokeObjectURL\(VTT_NAT\.url\)/.test(now), '旧 Blob URL 没释放（改样式会持续泄漏）');
+    /* ⚠️ 整只 video 重建：只换 track（甚至先 disabled 再 removeChild）都清不掉上一轮字幕的渲染，
+       MediaStream 源 + 复用 video 会留下"新旧双影"（实测彩色像素 9086 两层 vs 5649 一层）。 */
+    const bd = html.slice(html.indexOf('function vttNatBuild('), html.indexOf('function vttNatPause(){'));
+    assert.ok(bd.length > 0, '抠不到 vttNatBuild');
+    assert.ok(/tr\.src=url/.test(bd), 'track 没换源');
+    assert.ok(/nv\.id='vttNatVid'/.test(bd), '重建的 video 没保留 id（后面 $() 就取不到了）');
+    assert.ok(/old\.parentNode\.replaceChild\(nv, old\)/.test(bd), '必须整只换掉 video：只换 track 会残留上一轮字幕（双影）');
+    assert.ok(/vttNatBuild\(VTT_NAT\.url\)/.test(now), '换样式时没走重建');
+    /* 时间轴必须归零：MediaStream 不可 seek，不重建就永远停在过期时间点 */
+    assert.ok(/function vttNatRestart\(\)/.test(html) && /vttNatRestart\(\);/.test(html), '缺时间轴归零');
+    /* 样式 / 格式一变就要重刷（否则预览是死的） */
+    assert.ok(/if\(isVtt\)\{ try\{ vttNatSync\(\); \}catch\(e\)\{\} \}/.test(html), '导出预览没带动原生预览');
+    assert.ok(/syncColorSw\(id\); \}catch\(e\)\{\}\s*\}\);\s*try\{ vttNatSync\(\); \}/.test(html), 'syncVttStyleBox 没带动原生预览');
+    assert.ok(/id="vttNatReplay"/.test(html), '缺重播按钮（定格后没法再看一眼）');
+    /* ⚠️ VTTCue 的时间属性是 startTime/endTime；写成 c.start 会拿到 undefined → hold=NaN →
+       setTimeout(fn,NaN) 立刻暂停 → play() 抛 AbortError → 定格在 0 秒（整块预览全黑） */
+    const ph = html.slice(html.indexOf('function vttNatPlayHold(){'), html.indexOf('function vttNatText(){'));
+    assert.ok(ph.length > 0, '抠不到 vttNatPlayHold');
+    assert.ok(/\.startTime/.test(ph) && /\.endTime/.test(ph), 'VTTCue 要用 startTime/endTime');
+    /* 反例要先去注释再判 —— 上面这段注释本身就写了 c.start 这几个字 */
+    const phCode = ph.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    assert.ok(!/\.start\b/.test(phCode) && !/\.end\b/.test(phCode), '.start / .end 在 VTTCue 上是 undefined，会把播放掐死在 0 秒');
+  });
+
+  t('v0.9.237：方案与原生预览的词条四语齐全', () => {
+    const keys = ['vttGrpScheme','vttSchemeApply','vttSchemeSave','vttSchemeDel','vttSchemeNone','vttSchemeAskName',
+      'vttSchemeSaved','vttSchemeApplied','vttSchemePick','vttSchemeDelAsk','vttSchemeDeleted','vttStyleImported',
+      'vttLineNumNote','vttNativeT','vttNativeReplay','vttNativeTip'];
+    const dictOf = (code) => {
+      const m = new RegExp("'" + code + "'\\s*:\\s*\\{").exec(html);
+      assert.ok(m, '找不到语言块 ' + code);
+      const start = m.index + m[0].length;
+      const nx = /'[a-zA-Z][a-zA-Z-]*'\s*:\s*\{/.exec(html.slice(start));
+      return html.slice(start, start + (nx ? nx.index : html.length));
+    };
+    ['zh-CN','zh-TW','en','ja'].forEach(code => {
+      const d = dictOf(code);
+      keys.forEach(k => assert.ok(new RegExp("[,\\s]" + k + ":").test(d), code + ' 缺词条 ' + k));
+    });
   });
 
 

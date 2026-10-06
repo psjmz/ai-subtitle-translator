@@ -732,6 +732,154 @@
     return out.length ? ' ' + out.join(' ') : '';
   }
 
+  /* ---------------- VTT 样式反向解析（v0.9.237） ----------------
+     用途：用户导入一份带样式的 VTT 时，把样式读回面板（「导入即继承」，不用重设一遍）。
+     ⚠️ 只认我们自己写得出去的那几样，读不出来的一概不猜：
+        REGION 块、行内 <c.xxx> 自定义类、白名单之外的属性一律忽略 —— 宁可留面板默认值，
+        也不"智能还原"成用户根本没设过的样子（与「不夹取」同一条原则：不替用户脑补）。
+     ⚠️ line 只认百分比：VTT 规范里 line:3 是「第 3 行」（写死的行号），与我们的百分比不是一套，
+        换算成 % 会随分辨率漂移 → 不换算、不填、记进 notes 由界面提示。 */
+  function vttUnRgba(v) {
+    const s = String(v == null ? '' : v).trim();
+    let m = /^#([0-9a-fA-F]{6})$/.exec(s);
+    if (m) return { hex: ('#' + m[1]).toUpperCase(), alpha: 100 };
+    m = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/i.exec(s);
+    if (!m) return null;
+    const hx = (x) => Math.max(0, Math.min(255, Math.round(+x))).toString(16).padStart(2, '0');
+    const a = (m[4] == null) ? 1 : Math.max(0, Math.min(1, +m[4]));
+    return { hex: ('#' + hx(m[1]) + hx(m[2]) + hx(m[3])).toUpperCase(), alpha: Math.round(a * 100) };
+  }
+  /* 字体栈反查下拉值：预设栈按「首个族名 + 特征族名」还原成 sans/serif/mono（面板上选的就是它）；
+     第三方自造族名原样返回，交给界面补一个 option（不能静默回默认，那就把用户的字体丢了）。
+     判序不能反：sans-serif 里含 serif。 */
+  function vttFontKeyOf(v) {
+    const s = String(v == null ? '' : v);
+    const first = (s.split(',')[0] || '').trim().replace(/^["']|["']$/g, '');
+    const generic = ['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-sans-serif', 'ui-serif', 'ui-monospace'];
+    if (first && generic.indexOf(first.toLowerCase()) < 0) {
+      if (/^pingfang sc$/i.test(first) && /microsoft yahei/i.test(s)) return 'sans';
+      if (/^songti sc$/i.test(first) && /simsun/i.test(s)) return 'serif';
+      if (/^menlo$/i.test(first) && /consolas/i.test(s)) return 'mono';
+      return first;
+    }
+    if (/monospace/i.test(s)) return 'mono';
+    if (/sans-serif/i.test(s)) return 'sans';
+    if (/serif/i.test(s)) return 'serif';
+    return '';
+  }
+  function vttParseDecls(css) {
+    const out = {};
+    String(css == null ? '' : css).split(';').forEach((d) => {
+      const i = d.indexOf(':');
+      if (i < 0) return;
+      const k = d.slice(0, i).trim().toLowerCase(), v = d.slice(i + 1).trim();
+      if (k && v && !(k in out)) out[k] = v;    // 同属性出现多次时以第一条为准（与 CSS 层叠无关，只求可解释）
+    });
+    return out;
+  }
+  /* text-shadow → 面板的「粗细 + 颜色」。八向是我们自己写出去的，取第一段的偏移绝对值即可还原粗细。 */
+  function vttShadowOf(v) {
+    const s = String(v == null ? '' : v).trim();
+    if (!s || /^none$/i.test(s)) return null;
+    const seg = s.split(',')[0].trim();
+    const m = /^(-?[\d.]+)px\s+(-?[\d.]+)px(?:\s+(-?[\d.]+)px)?/.exec(seg);
+    if (!m) return null;
+    const c = (/#[0-9a-fA-F]{6}|rgba?\([^)]*\)/.exec(seg) || [])[0];
+    const un = c ? vttUnRgba(c) : null;
+    return { w: Math.max(Math.abs(+m[1]), Math.abs(+m[2])), color: un ? un.hex : '#000000' };
+  }
+  function parseVttStyle(src) {
+    const res = { found: false, style: {}, srcLine: null, notes: [] };
+    const raw = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    const blocks = raw.split(/\n\s*\n/);
+    const st = res.style;
+
+    // ① STYLE 块里的 ::cue / ::cue(.src)
+    let css = '';
+    for (let i = 0; i < blocks.length; i++) {
+      const b = blocks[i].replace(/^\s+/, '');
+      if (/^STYLE(\s|$|[\r\n])/i.test(b)) { css = b.replace(/^STYLE[^\n]*\n?/i, ''); break; }
+    }
+    if (css) {
+      const mSrc = /::cue\s*\(\s*\.src\s*\)\s*\{([^}]*)\}/i.exec(css);
+      const mMain = /(?:^|[\s}])::cue\s*\{([^}]*)\}/i.exec(css);
+      if (mMain) {
+        const d = vttParseDecls(mMain[1]);
+        const col = d['color'] ? vttUnRgba(d['color']) : null;
+        if (col && col.alpha === 100) st.color = col.hex;          // 带透明度的文字色：面板没有 alpha 通道 → 不填
+        const fs = /^([\d.]+)\s*%$/.exec(d['font-size'] || '');
+        if (fs) st.size = fs[1];
+        if (d['font-family']) { const k = vttFontKeyOf(d['font-family']); if (k) st.font = k; }
+        if (d['font-weight']) st.bold = /^(bold|bolder|[6-9]00)$/i.test(d['font-weight'].trim());
+        if (d['font-style']) st.italic = /^(italic|oblique)$/i.test(d['font-style'].trim());
+        const lh = (d['line-height'] || '').trim();
+        if (/^[\d.]+$/.test(lh)) st.lineHeight = lh;
+        if (d['background-color']) {
+          const bg = vttUnRgba(d['background-color']);
+          if (bg) { st.bgColor = bg.hex; st.bgAlpha = String(bg.alpha); st.bgOn = bg.alpha > 0; }
+        }
+        if (d['text-shadow']) {
+          const sh = vttShadowOf(d['text-shadow']);
+          if (sh) { st.shadowOn = true; st.shadowW = String(sh.w); st.shadowColor = sh.color; }
+          else if (/^none$/i.test(d['text-shadow'].trim())) st.shadowOn = false;
+        }
+        /* opacity / text-decoration / white-space：白名单里有，但面板没有对应控件 → 不猜、不填 */
+        res.found = true;
+      }
+      if (mSrc) {
+        const d = vttParseDecls(mSrc[1]);
+        const c = d['color'] ? vttUnRgba(d['color']) : null;
+        if (c) st.srcColor = c.hex;
+        const fs = /^([\d.]+)\s*%$/.exec(d['font-size'] || '');
+        if (fs) st.srcSize = fs[1];
+        st.srcDiff = true;
+        res.found = true;
+      }
+    }
+
+    // ② 第一条 cue 的 cue settings（我们导出时每条都一样，读第一条即可）
+    const cm = /-->[^\n]*/.exec(raw);
+    if (cm) {
+      const toks = cm[0].replace(/^-->/, '').trim().split(/\s+/);
+      toks.shift();                                   // 结束时间
+      toks.forEach((tk) => {
+        const i = tk.indexOf(':');
+        if (i < 0) return;
+        const k = tk.slice(0, i).toLowerCase(), v = tk.slice(i + 1);
+        if (k === 'line') {
+          const parts = v.split(',');
+          const mm = /^([\d.]+)%$/.exec(parts[0]);
+          if (mm) {
+            st.line = mm[1];
+            if (/^(start|center|end)$/.test(parts[1] || '')) st.lineAlign = parts[1];
+            res.found = true;
+          } else if (/^[\d.]+$/.test(parts[0])) {
+            res.notes.push('lineNumber');
+          }
+        } else if (k === 'position') {
+          const mm = /^([\d.]+)%/.exec(v);
+          if (mm) { st.position = mm[1]; res.found = true; }
+        } else if (k === 'size') {
+          const mm = /^([\d.]+)%$/.exec(v);
+          if (mm) { st.width = mm[1]; res.found = true; }
+        } else if (k === 'align') {
+          if (/^(start|center|end)$/.test(v)) { st.align = v; res.found = true; }
+        }
+      });
+    }
+
+    // ③ 原文行在第几行（<c.src> 的位置）
+    for (let i = 0; i < blocks.length; i++) {
+      const ls = blocks[i].split('\n');
+      const ti = ls.findIndex((l) => l.indexOf('-->') >= 0);
+      if (ti < 0) continue;
+      const si = ls.slice(ti + 1).findIndex((l) => /<c\.src>/i.test(l));
+      if (si >= 0) { res.srcLine = si; st.srcDiff = true; res.found = true; }
+      break;                                        // 只看第一条 cue
+    }
+    return res;
+  }
+
   // ---------------- SBV (YouTube 字幕) 解析 / 格式化 ----------------
   // SBV 时间：H:MM:SS.mmm,H:MM:SS.mmm（起始/结束用逗号分隔、毫秒用小数点、无编号行；小时 1~2 位）。
   // 块结构 = 时间轴行 + 若干行文本，块间空行分隔；空文本块跳过；编号按顺序重排（与 VTT 同策略）。
@@ -2683,6 +2831,7 @@
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
     vttStyleBlock, vttCueSettings, vttShadowCss, vttFontStack, vttRgba, VTT_CSS_WHITE, VTT_SRC_CLASS,   // v0.9.236 VTT 样式
+    parseVttStyle, vttFontKeyOf, vttUnRgba,                                                              // v0.9.237 VTT 样式回读
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,
