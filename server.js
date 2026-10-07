@@ -458,8 +458,9 @@ const MERGE_TPL = {
   'ass-split': 'ass-split', 'ass-stack': 'ass-stack', 'ass-custom': 'ass-custom',
   'vtt-std': 'vtt-std', 'vtt-compact': 'vtt-compact', 'vtt-cinema': 'vtt-cinema', 'vtt-custom': 'vtt-custom'
 };
-/* 合并页两种模式（v0.9.222）：merge=两份字幕合并；adjust=一份双语字幕拆原文/译文 */
-const MERGE_MODE = { merge: 'merge', adjust: 'adjust' };
+/* 合并页三种模式：merge=两份字幕合并；adjust=一份双语字幕拆原文/译文；
+   mono=单语字幕直接加特效（v0.9.245 新增，不配对不拆分） */
+const MERGE_MODE = { merge: 'merge', adjust: 'adjust', mono: 'mono' };
 function readMEvents(){
   try {
     const j = JSON.parse(fs.readFileSync(MEVENTS_PATH, 'utf8'));

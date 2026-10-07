@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.244/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.245/.test(mg), 'merge.html 未引用 v0.9.245 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.244</.test(html), '首页版本号未升 0.9.241');
-    assert.ok(/class="ver-tag">v0\.9\.244</.test(html), '工作台版本号未升 0.9.241');
-    assert.ok(/srt-core\.js\?v=0\.9\.244/.test(html), 'srt-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.245</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.245</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.245/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5459,7 +5459,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const declEnd = mg.indexOf('];', declAt);
     const decl = mg.slice(declAt, declEnd);
     /* v0.9.231：14 → 28（新增粗体/字间距/阴影·底衬/深度/边色/边色不透明/水平对齐/左右边距） */
-    assert.strictEqual((decl.match(/\['ass[A-Za-z]+',(?:'[^']+'|true|false)\]/g) || []).length, 30, 'ASS_DEFAULTS 应覆盖 30 个字段');
+    /* v0.9.245：斜体两个字段进来后是 32 —— 写成 >=30 而不是写死，
+       以后再加字段不该逼着改测试（真要防的是字段**变少**：漏一个就等于那项切模板时残留旧值） */
+    assert.ok((decl.match(/\['ass[A-Za-z]+',(?:'[^']+'|true|false)\]/g) || []).length >= 30, 'ASS_DEFAULTS 字段变少了（漏字段 = 切模板时残留旧值）');
     /* 模板提示与词条（4 语） */
     ['lblTpl','tplSrt','tplVtt','tplSplit','tplStack','tplCustom','lblLayout','layoutSplit','layoutStack','tplHintPlain','tplHintPreset','tplHintCustom','assReset','assResetDone']
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
@@ -5539,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.244</.test(mg), 'merge.html 版本未升 0.9.241');
-    assert.ok(/merge-core\.js\?v=0\.9\.244/.test(mg), 'merge-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.245</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.245/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5866,7 +5868,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/C\.assStackMV\(/.test(mg) && !/C\.assTopMV\(/.test(mg), '仍在调用旧的抬高量函数');
     assert.ok(/const dstMV = m\.dst, srcMV = m\.src;/.test(mg), '预览未取两个离底值');
     /* 预览与导出必须同口径：同一对数值 */
-    assert.ok(/mv: srcMV \}/.test(mg) && /mv: dstMV \}/.test(mg), '导出的 mv 与预览取值不同源');
+    assert.ok(/mv: srcMV \+ sOff \}/.test(mg) && /mv: dstMV \+ dOff \}/.test(mg), '导出的 mv 与预览取值不同源');
   });
 
   /* ================= v0.9.229：位置由数值决定后，「上下顺序」必须真的对调 ================= */
@@ -7356,14 +7358,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const MVTT_SEGS = \[\['std'[\s\S]*'custom','vttTplCustom'\]\]/.test(mg), 'VTT 四档定义丢了');
   });
 
-  t('v0.9.242：版号两页同步升到 242（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.244/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.244/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.244/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.244/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.244/.test(html), 'index.html 缓存 bust 未升');
+  t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
+    assert.ok(/class="ver">v0\.9\.245/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.245/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.245/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.245/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.245/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
-    assert.ok(!/class="ver">v0\.9\.242/.test(mg) && !/class="ver">v0\.9\.242/.test(html), '还留着上一版的显示版号');
+    assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
 
   /* ================= v0.9.244：后台补两块数据统计 =================
@@ -7420,11 +7422,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/function reportMerge\(kind\)\{/.test(mg), 'merge.html 缺 reportMerge');
     assert.ok(/reportMerge\('export'\);/.test(mg), '导出时没上报（后台将看不到格式/模板）');
     /* 两条合并路径都要报：调整双语走的是 doAdjust，漏了就整块不可见 */
-    assert.strictEqual((mg.match(/reportMerge\('merge'\);/g) || []).length, 2,
-      'doMerge / doAdjust 各要有一处上报（合并与调整是两条独立路径）');
+    assert.strictEqual((mg.match(/reportMerge\('merge'\);/g) || []).length, 3,
+      'doMerge / doAdjust / doMono 各要有一处上报（三条独立路径，v0.9.245 起多一条单语）');
     assert.ok(/kind: k,/.test(mg) && /fmt: k === 'export' \? expExt\(\) : ''/.test(mg), '上报体缺 kind/fmt');
-    assert.ok(/src: S\.srcName \|\| '', dst: adj \? '' : \(S\.dstName \|\| ''\)/.test(mg), '上报体缺上传的两个文件名');
-    assert.ok(/mode: adj \? 'adjust' : 'merge'/.test(mg), '上报体缺模式');
+    assert.ok(/src: S\.srcName \|\| '', dst: \(adj \|\| mono\) \? '' : \(S\.dstName \|\| ''\)/.test(mg), '上报体缺上传的两个文件名');
+    assert.ok(/mode: mono \? 'mono' : \(adj \? 'adjust' : 'merge'\)/.test(mg), '上报体缺模式');
     /* ⚠️ 「调整双语」只有一个输入（src 侧）；切模式不清 S.dstName，
        照直报会把上一次合并残留的译文名当成这次的输入 → 后台显示的「上传字幕」是错的。 */
     assert.ok(/const adj = S\.mode === 'adjust';/.test(mg), 'adjust 模式没特殊处理（会带上残留的 dstName）');
@@ -7479,5 +7481,291 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/renderPager\(j\);/.test(adm244), '还有调用点在用写死 evPager 的旧签名');
   });
 
+
+  /* ================= v0.9.245：特效字幕处理（单语模式 + 样式槽 + 筛选器） =================
+     用户原话：①「双语合并，我想改成特效字幕处理，同时增加对单语字幕加特效的支持」
+               ②「我想支持用户针对不同的字幕行做不同的字幕样式处理」
+     已拍板（10-07）：只做 merge 页、主站一个字节不动；出厂槽按行业最佳实践；
+                     SRT 没有样式能力，不在范围内。
+     下面每一条都是「看起来能做对、实际极容易做错」的地方，钉死在测试里：
+       · 槽必须**稀疏**：不套任何槽时导出与旧版逐字节相同，否则既有用户的导出全变样。
+       · 槽要穿过折行：一条超宽台词被切成多条 part，切出来的每条都得跟着承载行走。
+       · 音效**不能斜体**（Netflix 明文 Never italicize sound effects）—— 这条与直觉相反。
+       · 垂直偏移只能落在**逐条 Dialogue 的 MarginV** 上，写进 Style 会被覆盖，等于没写。 */
+  console.log('— v0.9.245：特效字幕处理（单语模式 + 样式槽 + 筛选器）—');
+  const fs245 = require('fs'), pa245 = require('path');
+  const srv245 = fs245.readFileSync(pa245.join(__dirname, 'server.js'), 'utf8');
+
+  t('v0.9.245：槽穿过折行 —— 一条被切成多条 part，每条都跟着承载行走', () => {
+    const rows = [
+      { start: 0, end: 3000, slot: 'narration',
+        en: 'Hello there, this is a very long line that will certainly be wrapped into pieces',
+        zh: '你好这是一条足够长所以一定会被折成好几段的字幕台词内容需要超出容量才能触发切分' },
+      { start: 3000, end: 6000, slot: 'sfx', en: 'Short', zh: '短句' }
+    ];
+    const parts = M.buildBilingualParts(rows, { maxW: 21, biMaxW: 16 });
+    assert.ok(parts.length >= 2, '没产出 part');
+    /* 第一条超宽被切成多条 —— 切出来的每条都得跟着它那条承载行走 */
+    const mine = parts.filter(p => p.start < 3000);
+    assert.ok(mine.length >= 1, '第一条没被切分，这条用例就没验证到透传');
+    assert.ok(mine.every(p => p.slot === 'narration'),
+      '折行后槽丢了：' + JSON.stringify(mine.map(p => p.slot)));
+    const other = parts.filter(p => p.start >= 3000);
+    assert.ok(other.every(p => p.slot === 'sfx'), '第二条没跟自己的槽：' + JSON.stringify(other.map(p => p.slot)));
+    /* 边界：没有任何 part 的 slot 是 undefined（引擎只写 '' 或槽名，不写 undefined） */
+    assert.ok(parts.every(p => typeof p.slot === 'string'), 'part.slot 不该是 undefined');
+  });
+
+  t('v0.9.245：没套槽时 part.slot 是空串（不是 undefined，也不是乱入的槽名）', () => {
+    const parts = M.buildBilingualParts([{ start: 0, end: 1000, en: 'A', zh: '甲' }], { maxW: 21, biMaxW: 32 });
+    assert.strictEqual(parts[0].slot, '', '未套槽的 part.slot 应为空串');
+  });
+
+  t('v0.9.245：不套任何槽 → ASS 与旧版一致（内置四套样式，一个 Slot 样式都不多）', () => {
+    const ev = [{ start: 0, end: 1000, lines: [{ style: 'Bottom', text: '你好', mv: 42 }] }];
+    const a = M.formatAss(ev, { title: 'x', assStyle: {} });
+    const b = M.formatAss(ev, { title: 'x', assStyle: {}, extraStyles: [] });
+    assert.strictEqual(a, b, '传了空 extraStyles 输出就变了');
+    assert.strictEqual((a.match(/^Style: /gm) || []).length, 4, '内置样式必须正好四套');
+    assert.ok(!/Slot[DS]_/.test(a), '没套槽却生成了槽样式');
+  });
+
+  t('v0.9.245：套了槽 → ASS 多出对应 Style 行，且 Dialogue 指到它', () => {
+    const ev = [{ start: 0, end: 1000, lines: [{ style: 'SlotD_sfx', text: '[电话铃声]', mv: 42 }] }];
+    const out = M.formatAss(ev, { title: 'x', assStyle: { dstSize: 56, dstColor: '&H00FFFFFF' },
+      extraStyles: [{ name: 'SlotD_sfx', spec: { size: 50, color: '&H00B0B0B0' } }] });
+    assert.ok(/^Style: SlotD_sfx,/m.test(out), '槽样式没写进 [V4+ Styles]');
+    assert.ok(/Dialogue: 0,[^,]*,[^,]*,SlotD_sfx,/.test(out), 'Dialogue 没指到槽样式');
+    assert.strictEqual((out.match(/^Style: /gm) || []).length, 5, '应为四套内置 + 一套槽');
+  });
+
+  t('v0.9.245：未注册的样式名回落 Bottom —— 不许导出引用不存在 Style 的畸形文件', () => {
+    const out = M.formatAss([{ start: 0, end: 1000, lines: [{ style: 'SlotD_ghost', text: 'x', mv: 42 }] }], { title: 'x' });
+    assert.ok(/,Bottom,/.test(out), '未注册的样式名没回落');
+    assert.ok(!/,SlotD_ghost,/.test(out), '引用了不存在的 Style');
+  });
+
+  t('v0.9.245：含逗号/换行的槽名被丢弃（否则会破坏 ASS 的 CSV 结构）', () => {
+    const out = M.formatAss([{ start: 0, end: 1000, lines: [{ style: 'Bottom', text: 'x', mv: 42 }] }],
+      { title: 'x', extraStyles: [{ name: 'Bad,Name', spec: {} }, { name: 'Bad\nName', spec: {} }] });
+    assert.ok(!/Style: Bad,Name/.test(out), '含逗号的样式名被原样写进去了（会破坏 CSV）');
+    assert.ok(/Style: BadName/.test(out), '清洗后的名字没落上');
+  });
+
+  t('v0.9.245：ASS Italic 开放 —— 默认正体（旧值），传了才是斜体', () => {
+    const ev = [{ start: 0, end: 1000, lines: [{ style: 'Bottom', text: 'x', mv: 42 }] }];
+    const off = M.formatAss(ev, { title: 'x', assStyle: {} });
+    const offCols = (off.match(/^Style: Bottom,.*$/m) || [''])[0].split(',');
+    assert.strictEqual(offCols[8], '0', '默认必须是正体（ASS Italic 位 = 第 9 列）');
+    const on = M.formatAss(ev, { title: 'x', assStyle: { dstItalic: true } });
+    const onCols = (on.match(/^Style: Bottom,.*$/m) || [''])[0].split(',');
+    assert.strictEqual(onCols[8], '-1', 'dstItalic 没生效');
+    const on2 = M.formatAss(ev, { title: 'x', extraStyles: [{ name: 'SlotD_narration', spec: { italic: true } }] });
+    assert.ok(/^Style: SlotD_narration,(?:[^,]*,){7}-1,/m.test(on2), '槽的斜体没生效');
+  });
+
+  t('v0.9.245：VTT 不传 extraRules 时逐字节不变', () => {
+    const items = [{ no: 1, start: 0, end: 1000, text: '你好' }];
+    const st = { color: '#FFFFFF', size: '100', bold: false, italic: false, line: '88', lineAlign: 'end', align: 'center' };
+    const a = M.formatVtt(items, { style: st });
+    const b = M.formatVtt(items, { style: st, extraRules: [] });
+    assert.strictEqual(a, b, '传了空 extraRules 输出就变了');
+    assert.ok(!/sg-/.test(a), '没套槽却出现了槽规则');
+  });
+
+  t('v0.9.245：VTT 槽规则拼进同一个 STYLE 块；类名里的空格/点被剥掉', () => {
+    const items = [{ no: 1, start: 0, end: 1000, text: '<c.sg-sfx>[电话铃声]</c.sg-sfx>' }];
+    const st = { color: '#FFFFFF', size: '100', line: '88', lineAlign: 'end', align: 'center' };
+    const rule = M.vttSlotRule('sg-sfx', { color: '#B0B0B0', size: '90', italic: false });
+    assert.ok(/::cue\(\.sg-sfx\)/.test(rule), '槽规则的选择器不对');
+    assert.ok(/color: #B0B0B0;/.test(rule) && /font-size: 90%;/.test(rule), '槽规则缺声明');
+    const out = M.formatVtt(items, { style: st, extraRules: [rule] });
+    assert.ok(/^STYLE$/m.test(out), 'STYLE 块丢了');
+    assert.ok(out.indexOf('::cue(.sg-sfx)') > 0, '槽规则没进 STYLE 块');
+    /* 类名里出现空格或点会变成后代选择器（等于写错规则），必须剥掉 */
+    const cleaned = M.vttSlotRule('a b.c', { color: '#B0B0B0' });
+    assert.ok(cleaned.indexOf('::cue(.abc)') === 0, '类名没剥成合法形式（空格/点会变成后代选择器）');
+    assert.strictEqual(M.vttSlotRule('.', { color: '#B0B0B0' }), '', '剥完为空不该产出规则');
+  });
+
+  t('v0.9.245：VTT 槽规则与主样式同一判据（值非法就一条声明都不写）', () => {
+    assert.strictEqual(M.vttSlotRule('sg-x', { color: 'not-a-color', size: 'abc', shadowOn: false, bgOn: false }), '',
+      '值全非法时不该产出空规则壳子');
+    assert.ok(M.vttSlotRule('sg-x', { color: '#B0B0B0' }).length > 0, '合法值反而没产出');
+  });
+
+  t('v0.9.245：VTT 每条 cue 可自带 settings（垂直位置是整条级，CSS 改不了）', () => {
+    const st = { line: '88', lineAlign: 'end', align: 'center' };
+    const a = M.formatVtt([{ no: 1, start: 0, end: 1000, text: '甲' }], { style: st });
+    const b = M.formatVtt([{ no: 1, start: 0, end: 1000, text: '甲', settings: ' line:80%,end align:center' }], { style: st });
+    assert.ok(/line:88%,end/.test(a), '全局 settings 丢了');
+    assert.ok(/line:80%,end/.test(b), '逐条 settings 没生效');
+    assert.ok(!/line:88%/.test(b), '给了逐条 settings 还写全局的');
+  });
+
+  t('v0.9.245：五个出厂槽 —— 音效不开斜体（Netflix 明文，与直觉相反）', () => {
+    const f0 = mg.indexOf('const SLOT_FACTORY = [');
+    const decl = mg.slice(f0, mg.indexOf('];', f0));
+    assert.ok(f0 > 0, '缺 SLOT_FACTORY');
+    ['default', 'narration', 'lyric', 'sfx', 'emphasis'].forEach(id => {
+      assert.ok(decl.indexOf("id:'" + id + "'") > 0, '缺出厂槽 ' + id);
+    });
+    /* 旁白 / 歌词 = 斜体（画外音与歌词的行业惯例） */
+    assert.ok(/id:'narration'[\s\S]{0,80}italic:true/.test(decl), '旁白槽应为斜体');
+    assert.ok(/id:'lyric'[\s\S]{0,120}italic:true/.test(decl), '歌词槽应为斜体');
+    /* ⚠️ 音效**不能**斜体：Netflix Timed Text Style Guide 明文
+       "Never italicize speaker IDs or sound effects"，改用淡色区分 */
+    const sfx = decl.slice(decl.indexOf("id:'sfx'"), decl.indexOf("id:'emphasis'"));
+    assert.ok(/color:'#B0B0B0'/.test(sfx), '音效槽应用淡色区分');
+    assert.ok(!/italic/.test(sfx), '音效槽不该斜体（Netflix 规范明文禁止）');
+  });
+
+  t('v0.9.245：单语模式 —— 第三个 tab、doMono、文本落在 zh 侧', () => {
+    assert.ok(/value="mono"/.test(mg), '缺单语模式 tab');
+    assert.ok(/function doMono\(\)\{/.test(mg), '缺 doMono');
+    assert.ok(/if \(S\.mode === 'mono'\)\{ doMono\(\); return; \}/.test(mg), 'doMerge 没分派单语');
+    /* 引擎以 r.zh 为「必须有内容」的一侧，单语把文本放 zh → 天然只出主样式那一行 */
+    assert.ok(/en: '', zh: String\(it\.text/.test(mg), '单语 rows 文本没落在 zh 侧');
+    /* 单语下双语体检的「缺原文/缺译文」整片误报，必须过滤 */
+    assert.ok(/if \(monoMode\(\)\) issues = issues\.filter/.test(mg), '单语下没过滤双语体检误报');
+  });
+
+  t('v0.9.245：槽是稀疏的 —— 默认槽不进 assign，套了槽才记', () => {
+    assert.ok(/function slotOfRow\(i\)\{[\s\S]{0,120}assign\[i\] \|\| 'default'/.test(mg), '行→槽取值不对');
+    assert.ok(/if \(!id \|\| id === 'default'\) delete S\.style\.assign\[i\];/.test(mg),
+      '默认槽不该进 assign（否则清样式会留下无数 default 键）');
+  });
+
+  t('v0.9.245：垂直偏移落在逐条 Dialogue 的 MarginV，不落在 Style 上', () => {
+    assert.ok(/mv: dstMV \+ dOff/.test(mg) && /mv: srcMV \+ sOff/.test(mg), 'dMV 没加到 Dialogue 的 MarginV');
+    /* 反例：Dialogue 的 MarginV 非 0 时会覆盖 Style 的 MarginV，加在 Style 上等于没加 */
+    assert.ok(!/if \(d\.dMV\) spec\.mv/.test(mg), 'dMV 加在 Style 的 MarginV 上会被逐条值覆盖（等于没加）');
+  });
+
+  t('v0.9.245：筛选器是度量 + 内容两类，都不存成规则', () => {
+    assert.ok(/function rowMatches\(r\)\{/.test(mg), '缺筛选判据');
+    /* 度量类：纯数值测量，完全不受「字幕格式不标准」影响 */
+    assert.ok(/case 'short':\s*return \(\(Number\(r\.end\) \|\| 0\) - \(Number\(r\.start\) \|\| 0\)\) < 1000;/.test(mg), '缺时长判据');
+    assert.ok(/n \/ dur > 20/.test(mg), '缺阅读速度判据（Netflix：成人 ≤20 字符/秒）');
+    /* 筛选只影响显示，不改数据 */
+    assert.ok(/if \(!rowMatches\(r\)\) return '';/.test(mg), '筛选没作用在渲染上');
+    assert.ok(!/localStorage[\s\S]{0,40}filter/.test(mg), '筛选结果不该持久化（它不是规则）');
+  });
+
+  t('v0.9.245：SRT 不在样式方案内 —— 导出 SRT 的路径不碰槽', () => {
+    const b0 = mg.indexOf('function buildExport(){');
+    const body = mg.slice(b0, mg.indexOf('\n}', b0));
+    const srtLine = body.slice(body.indexOf("return fmt === 'vtt' ? C.formatVtt"));
+    assert.ok(srtLine.length > 0, '取不到 SRT 分支');
+    assert.ok(!/slot/.test(srtLine), 'SRT 分支不该碰槽');
+  });
+
+  t('v0.9.245：切模式清掉行→槽映射（行号变了，旧的映射会套到不相干的行上）', () => {
+    assert.ok(/S\.style\.assign = \{\};/.test(mg), '切模式没清行→槽映射');
+    const sm = mg.slice(mg.indexOf('function syncMode(){'), mg.indexOf('function setI18nKey'));
+    assert.ok(/assign = \{\}/.test(sm), '清理不在 syncMode 里');
+    assert.ok(/S\.sel\.clear\(\)/.test(sm), '切模式没清勾选');
+  });
+
+  t('v0.9.245：服务端认识 mono 模式（只认白名单，不认的一律不写）', () => {
+    assert.ok(/const MERGE_MODE = \{ merge: 'merge', adjust: 'adjust', mono: 'mono' \}/.test(srv245),
+      '服务端不认单语模式（后台会整块看不到它）');
+  });
+
+  t('v0.9.245：主站一个字节不动 —— 槽/筛选的 id 只出现在 merge 页', () => {
+    ['slotBar', 'mApplySlot', 'mFilterText', 'slotEdit', 'filterBar'].forEach(id => {
+      assert.ok(mg.indexOf(id) > 0, 'merge.html 缺 ' + id);
+      assert.ok(html.indexOf(id) < 0, '主站 index.html 出现了 ' + id + '（说好主站不动）');
+    });
+  });
+
+  t('v0.9.245：行→槽必须刷进 rows —— 引擎读的是 row.slot，不是 assign', () => {
+    /* ⚠️ 真 bug（E2E 抓到）：套完槽只更新了 S.style.assign，导出端一个槽都没生效。
+       buildBilingualParts 只看行上的 slot 字段，assign 是页面侧的稀疏表，两者不打通等于白套。 */
+    assert.ok(/function syncSlotsToRows\(\)\{/.test(mg), '缺 syncSlotsToRows');
+    assert.ok(/S\.rows\[i\]\.slot = slotOfRow\(i\);/.test(mg), '没把槽写进 row.slot');
+    /* 每条产生 parts 的路径都要刷，漏一条就是「预览变了导出没变」 */
+    const ae = mg.slice(mg.indexOf('function buildAssEvents(){'), mg.indexOf('function buildExport(){'));
+    assert.ok(/syncSlotsToRows\(\);/.test(ae), 'buildAssEvents 没刷（ASS 导出读不到槽）');
+    const vc = mg.slice(mg.indexOf('function vttCueParts(){'), mg.indexOf('function buildVttExport(){'));
+    assert.ok(/syncSlotsToRows\(\);/.test(vc), 'vttCueParts 没刷（VTT 导出读不到槽）');
+    const pv = mg.slice(mg.indexOf('function assPvSample(){'), mg.indexOf('function renderAssPv(){'));
+    assert.ok(/syncSlotsToRows\(\);/.test(pv), '预览样例没刷（预览与导出会不是同一条）');
+  });
+
+  t('v0.9.245：ASS 的 alpha 必须是两位十六进制（传十进制会拼出 9 位畸形颜色）', () => {
+    /* ⚠️ 真 bug（E2E 抓到）：spec.alpha 传了 '100'（十进制），
+       引擎的 withAlpha 是 '&H' + a + col.slice(4) → 拼出 &H100B0B0B0（9 位），播放器直接解析废。 */
+    assert.ok(/function assAlphaHex\(pct\)\{/.test(mg), '缺 assAlphaHex');
+    assert.ok(/alpha: assAlphaHex\(src \? A\.srcAlpha : A\.dstAlpha\)/.test(mg), '槽 spec 的 alpha 还在传十进制');
+    assert.ok(/toString\(16\)\.toUpperCase\(\)\.padStart\(2, '0'\)/.test(mg), 'alpha 没补成两位十六进制');
+  });
+
+  t('v0.9.245：i18n 新词条四语齐全（漏一个语块界面就整块空白）', () => {
+    const i0 = mg.indexOf('const I18N = {');
+    let d = 0, j = mg.indexOf('{', i0), end = -1;
+    for (let k = j; k < mg.length; k++) {
+      const c = mg[k];
+      if (c === '{') d++;
+      else if (c === '}') { d--; if (d === 0) { end = k; break; } }
+    }
+    const I = eval('(' + mg.slice(j, end + 1) + ')');
+    ['zh-CN', 'zh-TW', 'en', 'ja'].forEach(lang => {
+      const D = I[lang];
+      ['modeMono', 'slotTitle', 'slotViewDiff', 'slotViewAll', 'slotAddParam', 'slotInherit',
+       'slotOverride', 'slotCancel', 'slotModified', 'slotRestore', 'slotNarration', 'slotLyric',
+       'slotSfx', 'slotEmphasis', 'filterPh', 'filterShort', 'filterFast', 'filterHint',
+       'applyBar', 'applyAll', 'lblAssItalic', 'monoCol', 'filterSelRow'].forEach(k => {
+        assert.ok(D[k] != null && D[k] !== '', lang + ' 缺 ' + k);
+      });
+    });
+  });
+
+  /* ---------- 以下三条是第二批 E2E（_e2e245b.js）抓出来的真 bug，钉死防回退 ---------- */
+
+  t('v0.9.245：选中行数单独一条词条（不从 applyBar 里正则抠数字）', () => {
+    /* ⚠️ 真 bug：统计条里 '<b>n</b>' 后面又跟了一个从 applyBar 抠出来的 n → 显示成「2 2」。
+       选中行数是这一行自己的说法，得有独立词条，四语都得有（上面那条已查）。 */
+    const rf = mg.slice(mg.indexOf('function renderFilterStat(){'), mg.indexOf('function applySlotToSelected('));
+    assert.ok(/t\('filterSelRow', '<b>' \+ n \+ '<\/b>'\)/.test(rf), '统计条没用 filterSelRow');
+    assert.ok(!/applyBar[\s\S]{0,80}replace\(\/\\^/.test(rf), '统计条还在正则抠数字（会印出重复数字）');
+  });
+
+  t('v0.9.245：预览按这条 cue 的槽画（预览 = 导出，不许各画一套）', () => {
+    /* ⚠️ 真 bug：renderVttPv 只认 vttStyleOf()，套了槽的行在导出里是灰的、预览里还是白的。 */
+    const pv = mg.slice(mg.indexOf('function renderVttPv(){'), mg.indexOf('function vttPresetLabel(){'));
+    assert.ok(/const sid0 = parts\[0\]\.slot \|\| 'default';/.test(pv), '预览没读这条 cue 的槽');
+    assert.ok(/const stBase = slotOn \? slotVttStyle\(sid0, 'dst'\) : vttStyleOf\(\);/.test(pv), '预览没按槽取样式');
+    assert.ok(/slotVttSettings\(sid0\)/.test(pv), '预览的纵向位置没跟导出同一条 cue settings');
+    /* ⚠️ 沿用/三态的判据必须留在循环里的 st 上 —— 238/239/241 三批单测按 st. 扫函数体，别改名 */
+    assert.ok(/const st = \(isS && srcOn\) \? stSrc : stBase;/.test(pv), '行内样式变量不叫 st（旧单测会扫不到）');
+  });
+
+  t('v0.9.245：槽的原文行覆盖写进 srcXxx 字段，且只写一条 ::cue(.槽.src)', () => {
+    /* ⚠️ 真 bug ①：slotVttStyle 的 src 那一半照 dst 那样写 st.color / st.size，
+       而 vttSrcDecls 读的是 srcColor / srcSize → 界面上「覆盖了」，导出里一个字没变。 */
+    const sv = mg.slice(mg.indexOf('function slotVttStyle(id, role){'), mg.indexOf('function slotVttSettings('));
+    assert.ok(/if \(d\.color\)\{ st\.srcColorInh = false; st\.srcColor = d\.color; \}/.test(sv), '原文行颜色没写进 srcColor');
+    assert.ok(/st\.srcSizeInh = false; st\.srcSize =/.test(sv), '原文行字号没写进 srcSize');
+    assert.ok(/if \(d\.bold != null\) st\.srcBold = d\.bold \? 'on' : 'off';/.test(sv), '原文行粗体没写进 srcBold');
+    assert.ok(/if \(d\.italic != null\) st\.srcItalic = d\.italic \? 'on' : 'off';/.test(sv), '原文行斜体没写进 srcItalic');
+    /* ⚠️ 真 bug ②：整块调 C.vttSlotRule 会顺手用「译文行那套」再写一条 ::cue(.槽.src)，
+       同一个选择器在文件里出现两次（前一条是基础值）。CSS 后写的赢，但那是条脏规则。 */
+    const sr = mg.slice(mg.indexOf('function slotVttRules(){'), mg.indexOf('/* ================= 导出'));
+    /* ⚠️ 带左括号才算「调用」：注释里也提到了这个名字，光查字符串会误报 */
+    assert.ok(sr.indexOf('C.vttSlotRule(') < 0, 'slotVttRules 还在整块调 vttSlotRule（会写出重复的 .src 规则）');
+    assert.ok(/C\.vttMainDecls\(slotVttStyle\(id, 'dst'\)\)/.test(sr), '槽的主规则没自己拼');
+    assert.ok(/C\.vttSrcDecls\(slotVttStyle\(id, 'src'\)\)/.test(sr), '槽的原文行规则没自己拼');
+  });
+
+  t('v0.9.245：没有 rows 时结果区不许崩（切模式会把 rows 置空）', () => {
+    /* syncMode() 里 S.rows = null，但筛选框与槽栏还在 DOM 里 —— 任何一次重画都会撞上 null.slice。 */
+    /* ⚠️ fmtShort 定义在 renderReport **之前**，拿它当右边界会切出空串 —— 用「下一个顶层函数」 */
+    const ri = mg.indexOf('function renderReport(){');
+    const rj = mg.indexOf('\nfunction ', ri + 10);
+    const rr = mg.slice(ri, rj > 0 ? rj : mg.length);
+    assert.ok(/if \(!rep \|\| !S\.rows\)\{ \$\('rep'\)\.style\.display = 'none'; return; \}/.test(rr),
+      'renderReport 没有 rows 守卫');
+  });
 
 }

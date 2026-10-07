@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>双语字幕合并工具 - 随心字幕 AI (AI-SRTSub)</title>
-<meta name="description" content="免费在线双语字幕合并工具：上传原文字幕和译文字幕（SRT / VTT / ASS / SBV），自动按顺序或时间轴配对，一键合并成双语字幕。">
-<meta name="keywords" content="双语字幕合并,字幕合并,SRT合并,双语字幕制作,中英双语字幕,字幕配轴,VTT合并,ASS双语,免费字幕工具,merge bilingual subtitles">
+<title>特效字幕处理工具 - 随心字幕 AI (AI-SRTSub)</title>
+<meta name="description" content="免费在线特效字幕处理工具：合并两份字幕成双语、调整现成双语字幕，或给单语字幕直接加样式特效（SRT / VTT / ASS / SBV）。">
+<meta name="keywords" content="字幕合并,特效字幕,双语字幕,ASS字幕样式,VTT字幕样式,单语字幕加特效,字幕配轴,中英双语字幕,免费字幕工具,subtitle styling">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#EC4899">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -247,12 +247,60 @@
   footer{padding:34px 0 26px;text-align:center;color:var(--mut);font-size:12px}
   footer a{color:var(--sub);text-decoration:none}
   footer a:hover{color:var(--acc)}
+
+  /* ---------- v0.9.245：样式槽 + 筛选器 ---------- */
+  .slot-wrap{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px 14px}
+  .slot-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .slot-hd>span:first-child{font-weight:600;font-size:13px}
+  .slot-hd .hint{margin-top:0}
+  .slot-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .slot-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);font-size:12.5px;cursor:pointer;white-space:nowrap}
+  .slot-chip:hover{border-color:var(--acc)}
+  .slot-chip.on{border-color:var(--acc);background:var(--acc-weak);color:var(--acc);font-weight:600}
+  .slot-dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .slot-chip .mod{font-size:10.5px;color:var(--mut)}
+  .slot-edit{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+  .slot-edit>summary{cursor:pointer;font-size:12.5px;color:var(--sub);font-weight:600}
+  .slot-edit-body{padding-top:10px}
+  .slot-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+  .slot-views{display:flex;gap:6px;margin:10px 0 6px}
+  .slot-views .btn-sm.on{border-color:var(--acc);color:var(--acc);background:var(--acc-weak)}
+  .slot-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+  .slot-row:last-child{border-bottom:none}
+  .slot-row .pk{width:92px;color:var(--sub);flex:none}
+  .slot-row .pv{flex:1;min-width:0}
+  .slot-row .pa{font-size:11.5px;color:var(--acc);cursor:pointer;flex:none}
+  .slot-row .pa.mut{color:var(--mut)}
+  .slot-row.inh .pv{color:var(--mut)}
+  .slot-empty{font-size:12px;color:var(--mut);padding:8px 0}
+  .slot-grp{font-size:11.5px;color:var(--mut);margin:10px 0 2px}
+  .filter-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+  .filter-bar input{flex:1 1 220px;min-width:180px;border:1px solid var(--line-strong);border-radius:9px;
+    padding:7px 10px;font-size:12.5px;background:var(--card);color:var(--ink)}
+  .filter-bar .btn-sm.on{border-color:var(--acc);color:var(--acc);background:var(--acc-weak)}
+  .filter-stat{font-size:11.5px;color:var(--mut);margin-top:6px}
+  .filter-stat b{color:var(--acc);font-weight:600}
+  /* 单语模式：没有「原文」这一列（.tbl 的第 4 列 = 原文），整列收起 */
+  .tbl.mono th:nth-child(4),.tbl.mono td:nth-child(4){display:none}
+  .tbl th.ck,.tbl td.ck{width:34px;text-align:center;padding-left:8px;padding-right:0}
+  .tbl td.ck input{width:15px;height:15px;accent-color:var(--acc)}
+  .tbl tr.sel td{background:var(--acc-weak)}
+  .slot-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--sub);white-space:nowrap}
+  .apply-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px;padding-top:12px;
+    border-top:1px solid var(--line)}
+  .apply-bar select{border:1px solid var(--line-strong);border-radius:8px;padding:5px 8px;font-size:12.5px;
+    background:var(--card);color:var(--ink);min-width:120px}
+  @media (max-width:640px){
+    .slot-row .pk{width:72px}
+    .filter-bar input{flex:1 1 100%}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.244</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.245</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -263,10 +311,13 @@
     <p data-i18n="heroSub">上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。</p>
   </div>
 
-  <!-- v0.9.222：模式切换——合并两份（原有）/ 调整一份现成双语字幕（拆分翻新） -->
+  <!-- v0.9.222：模式切换——合并两份（原有）/ 调整一份现成双语字幕（拆分翻新）
+       v0.9.245：新增「单语字幕」——只传一份，直接给它加样式特效（不合并、不拆分）。
+       ⚠️ 这是**输入模式**（决定要不要两两配对），与导出格式、样式槽都是正交的三件事。 -->
   <div class="mode-tabs" id="modeTabs">
     <label class="mtab on"><input type="radio" name="workMode" value="merge" checked><span data-i18n="modeMerge">合并两份字幕</span></label>
     <label class="mtab"><input type="radio" name="workMode" value="adjust"><span data-i18n="modeAdjust">调整双语字幕</span></label>
+    <label class="mtab"><input type="radio" name="workMode" value="mono"><span data-i18n="modeMono">单语字幕</span></label>
   </div>
 
   <div class="grid2">
@@ -320,17 +371,17 @@
         <div class="hint" data-i18n="structHint">自动判断双语结构；识别错了可手动指定。原文/译文方向反了点「互换」。</div>
       </div>
       <div class="flbl" id="shiftLbl" data-i18n="lblShift">译文整体偏移（毫秒）</div>
-      <div>
+      <div id="shiftRow">
         <input type="number" id="dstShift" value="0" step="100" style="max-width:160px">
         <div class="hint" id="shiftHintEl" data-i18n="shiftHint">译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。</div>
       </div>
-      <div class="flbl" data-i18n="lblBiMaxW">双语行宽</div>
-      <div>
+      <div class="flbl" id="biMaxWLbl" data-i18n="lblBiMaxW">双语行宽</div>
+      <div id="biMaxWRow">
         <input type="number" id="biMaxW" value="32" min="10" max="80" step="1" style="max-width:160px">
         <div class="hint" data-i18n="biMaxWHint">每行最大显示宽度（1 个汉字 = 1）。超宽自动折行，1 汉字 ≈ 2.4 个西文字符。</div>
       </div>
-      <div class="flbl" data-i18n="lblOrder">双语上下顺序</div>
-      <div class="radios">
+      <div class="flbl" id="orderLbl" data-i18n="lblOrder">双语上下顺序</div>
+      <div class="radios" id="orderRow">
         <label><input type="radio" name="biOrder" value="src-first" checked><span data-i18n="orderSrc">原文在上</span></label>
         <label><input type="radio" name="biOrder" value="dst-first"><span data-i18n="orderDst">译文在上</span></label>
       </div>
@@ -392,6 +443,8 @@
             <div class="af"><label data-i18n="lblFont">字体</label><select id="assDstFont"></select></div>
             <!-- v0.9.231：粗体 / 字间距 / 阴影·底衬 / 水平对齐 以前写死在导出端，界面上根本没有 -->
             <div class="af"><label data-i18n="lblBold">粗体</label><input type="checkbox" id="assDstBold" checked></div>
+            <!-- v0.9.245：斜体 —— 此前 ASS 的 Italic 恒为 0，旁白/歌词槽没法表达「斜体」这条行业惯例 -->
+            <div class="af"><label data-i18n="lblAssItalic">斜体</label><input type="checkbox" id="assDstItalic"></div>
             <div class="af"><label data-i18n="lblSpacing">字间距</label><input type="number" id="assDstSpacing" value="0" min="-10" max="20" step="0.5"></div>
             <div class="ass-sub" data-i18n="assGrpFx">效果</div>
             <div class="af"><label data-i18n="lblOutline">描边</label><input type="number" id="assDstOutline" value="2.5" min="0" max="10" step="0.5"></div>
@@ -421,6 +474,7 @@
             <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assSrcAlpha" min="10" max="100" value="100"><span class="pct" id="assSrcAlphaOut">100%</span></div>
             <div class="af"><label data-i18n="lblFont">字体</label><select id="assSrcFont"></select></div>
             <div class="af"><label data-i18n="lblBold">粗体</label><input type="checkbox" id="assSrcBold"></div>
+            <div class="af"><label data-i18n="lblAssItalic">斜体</label><input type="checkbox" id="assSrcItalic"></div>
             <div class="af"><label data-i18n="lblSpacing">字间距</label><input type="number" id="assSrcSpacing" value="0" min="-10" max="20" step="0.5"></div>
             <div class="ass-sub" data-i18n="assGrpFx">效果</div>
             <div class="af"><label data-i18n="lblOutline">描边</label><input type="number" id="assSrcOutline" value="2.5" min="0" max="10" step="0.5"></div>
@@ -590,7 +644,7 @@
 
   <div class="actions">
     <button class="btn" id="btnMerge" data-i18n="btnMerge">🔗 合并预览</button>
-    <span class="hint" data-i18n="mergeHint">先看配对结果和体检报告，再下载。</span>
+    <span class="hint" id="mergeHintEl" data-i18n="mergeHint">先看配对结果和体检报告，再下载。</span>
   </div>
 
   <div class="rep" id="rep">
@@ -599,18 +653,67 @@
     <div class="rep-issues" id="formWarn" style="display:none"></div>
     <div class="rep-issues" id="repIssues"></div>
     <div class="rep-clean" id="repClean"></div>
+
+    <!-- v0.9.245：样式槽 —— 一行色点胶囊，点一下选中「接下来要套到哪些行上」的那个槽。
+         槽只存「和基础样式不一样的那几项」，所以新建一个槽的代价是改 3~4 个字段，不是填 30 个。 -->
+    <div class="slot-wrap" id="slotWrap">
+      <div class="slot-hd">
+        <span data-i18n="slotTitle">样式槽</span>
+        <span class="hint" data-i18n="slotHint">改一个槽，用到它的行全部跟着变</span>
+      </div>
+      <div class="slot-bar" id="slotBar"></div>
+      <details class="slot-edit" id="slotEdit">
+        <summary><span id="slotEditName">—</span></summary>
+        <div class="slot-edit-body">
+          <div class="slot-meta">
+            <span id="slotCover"></span>
+            <button type="button" class="btn ghost btn-sm" id="slotUncoverAll" data-i18n="slotUncoverAll">解除全部覆盖</button>
+            <button type="button" class="btn ghost btn-sm" id="slotRestore" data-i18n="slotRestore" style="display:none">恢复预设</button>
+          </div>
+          <div class="slot-views">
+            <button type="button" class="btn ghost sm on" id="slotViewDiff" data-i18n="slotViewDiff">只显示差异</button>
+            <button type="button" class="btn ghost btn-sm" id="slotViewAll" data-i18n="slotViewAll">显示全部参数</button>
+          </div>
+          <div id="slotParams"></div>
+        </div>
+      </details>
+    </div>
+
+    <!-- v0.9.245：筛选器 —— 不做「自动匹配规则」，只做「当场挑行」。
+         字幕格式不标准是常态（音效 [xxx] / (xxx) / ♪…♪），任何自动识别都会有漏判，
+         而用户看不见哪里判错了。筛选器把结果摊在眼前，漏的两行手动补选就行。 -->
+    <div class="filter-bar" id="filterBar">
+      <input type="search" id="mFilterText" data-i18n-ph="filterPh" placeholder="筛选行：输入 [  ♪  关键词">
+      <button type="button" class="btn ghost btn-sm" data-flt="sfx" data-i18n="filterSfx">含音效</button>
+      <button type="button" class="btn ghost btn-sm" data-flt="speaker" data-i18n="filterSpeaker">有说话人前缀</button>
+      <button type="button" class="btn ghost btn-sm" data-flt="short" data-i18n="filterShort">时长 &lt; 1 秒</button>
+      <button type="button" class="btn ghost btn-sm" data-flt="long" data-i18n="filterLong">两行以上</button>
+      <button type="button" class="btn ghost btn-sm" data-flt="fast" data-i18n="filterFast">阅读速度超标</button>
+    </div>
+    <div class="filter-stat" id="filterStat"></div>
+
     <div class="tbl-wrap">
       <table class="tbl">
         <thead><tr>
+          <th class="ck"><input type="checkbox" id="mSelAll" aria-label="select all"></th>
           <th data-i18n="colNo">#</th>
           <th data-i18n="colTime">时间</th>
-          <th data-i18n="colSrc">原文</th>
-          <th data-i18n="colDst">译文</th>
+          <th id="thSrc" data-i18n="colSrc">原文</th>
+          <th id="thDst" data-i18n="colDst">译文</th>
+          <th data-i18n="colSlot">样式</th>
         </tr></thead>
         <tbody id="repRows"></tbody>
       </table>
     </div>
     <div class="pv-note" id="pvNote"></div>
+
+    <!-- v0.9.245：应用条 —— 对「选中的行」或「整篇」套用当前槽 -->
+    <div class="apply-bar" id="applyBar">
+      <span id="applyLabel"></span>
+      <select id="mApplySlot"></select>
+      <button type="button" class="btn btn-sm" id="mApplyBtn" data-i18n="applyBtn">应用</button>
+      <button type="button" class="btn ghost btn-sm" id="mApplyAll" data-i18n="applyAll">整篇套用</button>
+    </div>
   </div>
 
   <div class="exp card" id="exp">
@@ -648,7 +751,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.244"></script>
+<script src="merge-core.js?v=0.9.245"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -660,7 +763,7 @@ const I18N = {
   'zh-CN': {
     brandName:'随心字幕 AI', navHome:'返回翻译工具',
     heroTitle:'两份字幕，<em>合成一套双语</em>',
-    heroSub:'上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。',
+    heroSub:'合并两份字幕成双语、调整现成双语字幕，或给单语字幕加样式特效（SRT / VTT / ASS / SBV）——支持时间轴对齐、整体偏移、异常检查，还能按行套用不同的样式槽。',
 
     srcCard:'原文字幕', dstCard:'译文字幕', btnPick:'📂 点这里选文件，或直接拖进来',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文本粘贴到这里…',
@@ -755,12 +858,30 @@ const I18N = {
     copied:'已复制到剪贴板', downloaded:'已开始下载',
     issOverlap:'#{0} 与前一条重叠 {1}ms', issShort:'#{0} 时长不足（短于 0.5 秒）',
     issNoDst:'#{0} 缺译文', issNoSrc:'#{0} 缺原文', issEmpty:'#{0} 两侧都为空',
-    footNote:'随心字幕 AI · 双语字幕合并工具', footLink:'去翻译字幕 →'
+    footNote:'随心字幕 AI · 特效字幕处理工具', footLink:'去翻译字幕 →',
+    modeMono:'单语字幕', monoCol:'字幕', monoCard:'字幕文件', btnMono:'生成预览', optTitleMono:'特效设置',
+    monoHint:'只传一份字幕，直接给它加样式特效。',
+    slotTitle:'样式槽', slotHint:'改一个槽，用到它的行全部跟着变', slotNew:'+ 新建槽',
+    slotEdit:'编辑槽', slotCover:'已覆盖 {0} / {1} 项', slotUncoverAll:'解除全部覆盖',
+    slotViewDiff:'只显示差异', slotViewAll:'显示全部参数', slotAddParam:'+ 添加参数…',
+    slotInherit:'沿用', slotOverride:'覆盖', slotCancel:'取消覆盖', slotModified:'已修改', slotRestore:'恢复预设',
+    slotDefault:'默认', slotNarration:'旁白', slotLyric:'歌词', slotSfx:'音效', slotEmphasis:'强调',
+    slotPrmSize:'字号', slotPrmColor:'颜色', slotPrmBold:'粗体', slotPrmItalic:'斜体', slotPrmDMV:'垂直偏移',
+    slotPrmUnit:'（相对基础样式）', slotEmpty:'还没有覆盖任何一项 —— 与基础样式完全一样',
+    slotTipDefault:'没有差异，等于基础样式', slotTipNarration:'画外音 · 斜体（行业惯例）',
+    slotTipLyric:'歌词 · 斜体 + 上移一行', slotTipSfx:'音效 · 淡色、保持正体（Netflix 规范：音效不斜体）',
+    slotTipEmphasis:'强调 · 加粗',
+    filterPh:'筛选行：输入 [  ♪  关键词', filterSfx:'含音效', filterSpeaker:'有说话人前缀',
+    filterShort:'时长 < 1 秒', filterLong:'两行以上', filterFast:'阅读速度超标',
+    filterHint:'筛选只是帮你挑行，不会存成规则', filterHit:'已命中 {0} 条', filterNone:'没有命中的行',
+    filterSelRow:'已选 {0} 行', filterSelAll:'全选', filterSelInv:'反选', filterClear:'清除',
+    applyBar:'对选中的 {0} 行应用', applyBtn:'应用', applyAll:'整篇套用', applyDone:'已把 {0} 行套用「{1}」',
+    lblAssItalic:'斜体', colSlot:'样式',
   },
   'zh-TW': {
     brandName:'隨心字幕 AI', navHome:'返回翻譯工具',
     heroTitle:'兩份字幕，<em>合成一套雙語</em>',
-    heroSub:'上傳原文和譯文字幕（SRT / VTT / ASS / SBV），自動配對合併成雙語字幕——支援按順序或時間軸對齊、整體偏移、異常檢查。',
+    heroSub:'上傳原文和譯文字幕（SRT / VTT / ASS / SBV），自動配對合併成雙語字幕，或幫單語字幕加樣式特效——支援時間軸對齊、整體偏移、異常檢查，還能逐行套用不同的樣式槽。',
     srcCard:'原文字幕', dstCard:'譯文字幕', btnPick:'📂 點這裡選檔案，或直接拖進來',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文字貼到這裡…',
     parsedOk:'✓ 已解析 {0}：{1} 條', parseFail:'✗ 解析失敗：內容不是有效的字幕格式',
@@ -854,7 +975,25 @@ const I18N = {
     copied:'已複製到剪貼簿', downloaded:'已開始下載',
     issOverlap:'#{0} 與前一條重疊 {1}ms', issShort:'#{0} 時長不足（短於 0.5 秒）',
     issNoDst:'#{0} 缺譯文', issNoSrc:'#{0} 缺原文', issEmpty:'#{0} 兩側都為空',
-    footNote:'隨心字幕 AI · 雙語字幕合併工具', footLink:'去翻譯字幕 →'
+    footNote:'隨心字幕 AI · 特效字幕處理工具', footLink:'去翻譯字幕 →',
+    modeMono:'單語字幕', monoCol:'字幕', monoCard:'字幕檔案', btnMono:'產生預覽', optTitleMono:'特效設定',
+    monoHint:'只傳一份字幕，直接幫它加樣式特效。',
+    slotTitle:'樣式槽', slotHint:'改一個槽，用到它的行全部跟著變', slotNew:'+ 新增槽',
+    slotEdit:'編輯槽', slotCover:'已覆蓋 {0} / {1} 項', slotUncoverAll:'解除全部覆蓋',
+    slotViewDiff:'只顯示差異', slotViewAll:'顯示全部參數', slotAddParam:'+ 新增參數…',
+    slotInherit:'沿用', slotOverride:'覆蓋', slotCancel:'取消覆蓋', slotModified:'已修改', slotRestore:'恢復預設',
+    slotDefault:'預設', slotNarration:'旁白', slotLyric:'歌詞', slotSfx:'音效', slotEmphasis:'強調',
+    slotPrmSize:'字級', slotPrmColor:'顏色', slotPrmBold:'粗體', slotPrmItalic:'斜體', slotPrmDMV:'垂直偏移',
+    slotPrmUnit:'（相對基礎樣式）', slotEmpty:'還沒有覆蓋任何一項 —— 與基礎樣式完全一樣',
+    slotTipDefault:'沒有差異，等於基礎樣式', slotTipNarration:'畫外音 · 斜體（業界慣例）',
+    slotTipLyric:'歌詞 · 斜體 + 上移一行', slotTipSfx:'音效 · 淡色、保持正體（Netflix 規範：音效不斜體）',
+    slotTipEmphasis:'強調 · 加粗',
+    filterPh:'篩選行：輸入 [  ♪  關鍵字', filterSfx:'含音效', filterSpeaker:'有說話人前綴',
+    filterShort:'時長 < 1 秒', filterLong:'兩行以上', filterFast:'閱讀速度超標',
+    filterHint:'篩選只是幫你挑行，不會存成規則', filterHit:'已命中 {0} 條', filterNone:'沒有命中的行',
+    filterSelRow:'已選 {0} 行', filterSelAll:'全選', filterSelInv:'反選', filterClear:'清除',
+    applyBar:'對選中的 {0} 行套用', applyBtn:'套用', applyAll:'整篇套用', applyDone:'已把 {0} 行套用「{1}」',
+    lblAssItalic:'斜體', colSlot:'樣式',
   },
   'en': {
     brandName:'AI-SRTSub', navHome:'Back to Translator',
@@ -953,7 +1092,25 @@ const I18N = {
     copied:'Copied to clipboard', downloaded:'Download started',
     issOverlap:'#{0} overlaps the previous cue by {1}ms', issShort:'#{0} too short (under 0.5s)',
     issNoDst:'#{0} missing translation', issNoSrc:'#{0} missing original', issEmpty:'#{0} both sides empty',
-    footNote:'AI-SRTSub · Bilingual Subtitle Merger', footLink:'Translate subtitles →'
+    footNote:'AI-SRTSub · Subtitle Styling Tool', footLink:'Translate subtitles →',
+    modeMono:'Single language', monoCol:'Subtitle', monoCard:'Subtitle file', btnMono:'Preview', optTitleMono:'Styling',
+    monoHint:'Upload one subtitle file and style it directly.',
+    slotTitle:'Style slots', slotHint:'Edit a slot and every line using it follows', slotNew:'+ New slot',
+    slotEdit:'Edit slot', slotCover:'{0} of {1} overridden', slotUncoverAll:'Clear all overrides',
+    slotViewDiff:'Diff only', slotViewAll:'All parameters', slotAddParam:'+ Add parameter…',
+    slotInherit:'Inherit', slotOverride:'Override', slotCancel:'Remove override', slotModified:'Modified', slotRestore:'Restore preset',
+    slotDefault:'Default', slotNarration:'Narration', slotLyric:'Lyrics', slotSfx:'Sound fx', slotEmphasis:'Emphasis',
+    slotPrmSize:'Size', slotPrmColor:'Color', slotPrmBold:'Bold', slotPrmItalic:'Italic', slotPrmDMV:'Vertical offset',
+    slotPrmUnit:'(relative to base)', slotEmpty:'Nothing overridden yet — identical to the base style',
+    slotTipDefault:'No diff, same as the base style', slotTipNarration:'Off-screen voice · italic (industry convention)',
+    slotTipLyric:'Lyrics · italic + one line up', slotTipSfx:'Sound fx · dimmed, upright (Netflix: never italicize sound effects)',
+    slotTipEmphasis:'Emphasis · bold',
+    filterPh:'Filter lines: [  ♪  or a keyword', filterSfx:'Has sound fx', filterSpeaker:'Has speaker prefix',
+    filterShort:'Shorter than 1s', filterLong:'More than 2 lines', filterFast:'Reading speed too high',
+    filterHint:'Filtering only selects lines, it is never saved as a rule', filterHit:'{0} lines matched', filterNone:'No line matched',
+    filterSelRow:'{0} lines selected', filterSelAll:'Select all', filterSelInv:'Invert', filterClear:'Clear',
+    applyBar:'Apply to the {0} selected lines', applyBtn:'Apply', applyAll:'Apply to all', applyDone:'Applied "{1}" to {0} lines',
+    lblAssItalic:'Italic', colSlot:'Style',
   },
   'ja': {
     brandName:'AI-SRTSub', navHome:'翻訳ツールへ戻る',
@@ -1052,7 +1209,25 @@ const I18N = {
     copied:'クリップボードにコピーしました', downloaded:'ダウンロードを開始しました',
     issOverlap:'#{0} が前の字幕と {1}ms 重複', issShort:'#{0} が短すぎ（0.5 秒未満）',
     issNoDst:'#{0} 訳文なし', issNoSrc:'#{0} 原文なし', issEmpty:'#{0} 両側とも空',
-    footNote:'AI-SRTSub · 二か国語字幕マージツール', footLink:'字幕を翻訳する →'
+    footNote:'AI-SRTSub · 字幕スタイル処理ツール', footLink:'字幕を翻訳する →',
+    modeMono:'単一言語', monoCol:'字幕', monoCard:'字幕ファイル', btnMono:'プレビュー', optTitleMono:'スタイル設定',
+    monoHint:'字幕を 1 本だけアップロードして、直接スタイルを付けます。',
+    slotTitle:'スタイルスロット', slotHint:'スロットを編集すると、それを使う行すべてに反映されます', slotNew:'+ 新規スロット',
+    slotEdit:'スロットを編集', slotCover:'{0} / {1} 項目を上書き中', slotUncoverAll:'上書きをすべて解除',
+    slotViewDiff:'差分のみ', slotViewAll:'全パラメータ', slotAddParam:'+ パラメータを追加…',
+    slotInherit:'継承', slotOverride:'上書き', slotCancel:'上書きを解除', slotModified:'変更済み', slotRestore:'プリセットに戻す',
+    slotDefault:'デフォルト', slotNarration:'ナレーション', slotLyric:'歌詞', slotSfx:'効果音', slotEmphasis:'強調',
+    slotPrmSize:'サイズ', slotPrmColor:'色', slotPrmBold:'太字', slotPrmItalic:'斜体', slotPrmDMV:'垂直オフセット',
+    slotPrmUnit:'（基準スタイルからの相対値）', slotEmpty:'まだ何も上書きしていません — 基準スタイルと同じです',
+    slotTipDefault:'差分なし。基準スタイルと同じ', slotTipNarration:'画面外の声 · 斜体（業界慣例）',
+    slotTipLyric:'歌詞 · 斜体 + 1 行上へ', slotTipSfx:'効果音 · 淡い色・正体（Netflix 規約：効果音は斜体にしない）',
+    slotTipEmphasis:'強調 · 太字',
+    filterPh:'行を絞り込み：[  ♪  キーワード', filterSfx:'効果音を含む', filterSpeaker:'話者プレフィックス',
+    filterShort:'1 秒未満', filterLong:'3 行以上', filterFast:'読み速度超過',
+    filterHint:'絞り込みは行を選ぶだけで、ルールとして保存されません', filterHit:'{0} 行が一致', filterNone:'一致する行なし',
+    filterSelRow:'{0} 行を選択中', filterSelAll:'すべて選択', filterSelInv:'反転', filterClear:'クリア',
+    applyBar:'選択した {0} 行に適用', applyBtn:'適用', applyAll:'全体に適用', applyDone:'{0} 行に「{1}」を適用しました',
+    lblAssItalic:'斜体', colSlot:'スタイル',
   }
 };
 const UI_LANGS = [ ['zh-CN','简体中文'], ['zh-TW','繁體中文'], ['en','English'], ['ja','日本語'], ['es','Español'], ['pt','Português'], ['ko','한국어'], ['de','Deutsch'], ['fr','Français'], ['id','Bahasa Indonesia'], ['hi','हिन्दी'], ['th','ไทย'], ['vi','Tiếng Việt'], ['ru','Русский'], ['it','Italiano'], ['ar','العربية'], ['tr','Türkçe'], ['nl','Nederlands'], ['pl','Polski'], ['sv','Svenska'], ['cs','Čeština'], ['uk','Українська'], ['da','Dansk'], ['fi','Suomi'], ['el','Ελληνικά'], ['he','עברית'], ['ro','Română'] ];
@@ -1163,23 +1338,39 @@ function alignMode(){
    （一份现成双语字幕 → 自动拆原文/译文两列 → 走同一套预览/体检/导出） */
 function syncMode(){
   const adj = S.mode === 'adjust';
-  $('dstCard').style.display = adj ? 'none' : '';
-  $('alignLbl').style.display = adj ? 'none' : '';
-  $('alignRow').style.display = adj ? 'none' : '';
+  const mono = S.mode === 'mono';
+  const isMerge = S.mode === 'merge';
+  $('dstCard').style.display = isMerge ? '' : 'none';
+  $('alignLbl').style.display = isMerge ? '' : 'none';
+  $('alignRow').style.display = isMerge ? '' : 'none';
   $('structLbl').style.display = adj ? '' : 'none';
   $('structRow').style.display = adj ? '' : 'none';
+  /* v0.9.245：单语模式 —— 只有一份输入，配对/偏移/行宽/上下顺序全是双语概念，整块收起。
+     留着它们不但没用，还会让人以为「单语也要设这些」。 */
+  ['shiftRow','biMaxWLbl','biMaxWRow','orderLbl','orderRow'].forEach(id=>{
+    const el = $(id); if (el) el.style.display = mono ? 'none' : '';
+  });
   /* 标签随模式换词：直接换 data-i18n 键，语言切换时 applyI18n 会按新键渲染 */
-  setI18nKey($('srcCardTitle'), adj ? 'biCard' : 'srcCard');
+  setI18nKey($('srcCardTitle'), mono ? 'monoCard' : (adj ? 'biCard' : 'srcCard'));
   setI18nKey($('shiftLbl'), adj ? 'lblShiftAll' : 'lblShift');
   setI18nKey($('shiftHintEl'), adj ? 'shiftHintAll' : 'shiftHint');
-  setI18nKey($('btnMerge'), adj ? 'btnAdjust' : 'btnMerge');
-  setI18nKey($('optTitle'), adj ? 'optTitleAdjust' : 'optTitle');
+  setI18nKey($('btnMerge'), mono ? 'btnMono' : (adj ? 'btnAdjust' : 'btnMerge'));
+  setI18nKey($('optTitle'), mono ? 'optTitleMono' : (adj ? 'optTitleAdjust' : 'optTitle'));
+  setI18nKey($('mergeHintEl'), 'mergeHint');
+  /* 单语：表格没有「原文」列，剩下的那一列标题改叫「字幕」 */
+  setI18nKey($('thDst'), mono ? 'monoCol' : 'colDst');
+  const tbl = document.querySelector('table.tbl');
+  if (tbl) tbl.classList.toggle('mono', mono);
   document.querySelectorAll('#modeTabs .mtab').forEach(el=>{
     el.classList.toggle('on', el.querySelector('input').value === S.mode);
   });
   /* 切模式后旧结果失效（rows 属于某个模式的拆分口径），清掉预览区 */
   if (S.rows){
     S.rows = null; S.report = null;
+    /* v0.9.245：行号变了 → 旧的「行 → 槽」映射与勾选全部作废，否则会把样式套到不相干的行上 */
+    ensureStyle();
+    S.style.assign = {};
+    if (S.sel) S.sel.clear();
     $('rep').style.display = 'none'; $('exp').style.display = 'none';
     renderAssPv();   /* v0.9.228：顺手把效果预览收起来，别留着上一个模式的画面 */
     renderVttPv();   /* v0.9.238：VTT 预览同理，切模式后不该留着旧画面 */
@@ -1192,6 +1383,7 @@ function setI18nKey(el, key){
 }
 function doMerge(){
   if (S.mode === 'adjust'){ doAdjust(); return; }
+  if (S.mode === 'mono'){ doMono(); return; }   /* v0.9.245：单语 → 不配对，直接进 rows */
   if (!S.src || !S.dst){ toast(t('needBoth')); return; }
   const shift = parseInt($('dstShift').value, 10) || 0;
   /* 译文整体偏移在配对**之前**落到条目上：两份轴先对齐，再进 alignRows。
@@ -1258,6 +1450,24 @@ function swapSides(){
   renderVttPv();
   toast(t('swapped'));
 }
+/* v0.9.245：单语模式 —— 一份字幕进来，不配对、不拆分，直接进 rows 走同一套预览/特效/导出。
+   ⚠️ 文本统一放 zh 侧：引擎的 buildBilingualParts 以 r.zh 为「必须有内容」的一侧
+      （r.en 为空 → 只输出译文行），所以单语天然就是「只有主样式那一行」。
+   ⚠️ report 不能沿用双语口径：两侧齐全才算配对，单语下 en 恒空会被整片算成「缺原文」。 */
+function doMono(){
+  if (!S.src){ toast(t('needSrc')); return; }
+  const shift = parseInt($('dstShift').value, 10) || 0;
+  const items = shift ? S.src.map(it=>({ no: it.no,
+    start: Math.max(0, (Number(it.start)||0) + shift),
+    end: Math.max(0, (Number(it.end)||0) + shift), text: it.text, style: it.style })) : S.src;
+  S.rows = items.map(it=>({ start: it.start, end: it.end, en: '', zh: String(it.text == null ? '' : it.text) }));
+  S.report = { pairs: S.rows.length, onlySrc: [], onlyDst: [], form: null };
+  renderReport();
+  $('exp').style.display = 'block';
+  renderAssPv();
+  renderVttPv();
+  reportMerge('merge');
+}
 function fmtShort(ms){
   const s = Math.max(0, Number(ms)||0);
   const m = Math.floor(s/60000), sec = Math.floor((s%60000)/1000);
@@ -1266,6 +1476,9 @@ function fmtShort(ms){
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function renderReport(){
   const rep = S.report;
+  /* v0.9.245：切模式会把 S.rows 置空（旧结果按新口径失效），但筛选框与槽栏还在 DOM 里，
+     这时任何一次重画都会撞上 null.slice / null.length → 直接返回，别把结果区点亮。 */
+  if (!rep || !S.rows){ $('rep').style.display = 'none'; return; }
   $('rep').style.display = 'block';
   const chip = (cls, key, n) => '<div class="rep-chip '+cls+'"><b>'+n+'</b>'+t(key)+'</div>';
   let band = chip(rep.pairs ? 'ok' : 'bad', 'repPaired', rep.pairs);
@@ -1290,7 +1503,9 @@ function renderReport(){
   } else { const nw = $('formWarn'); if (nw) nw.style.display = 'none'; }
   $('repBand').innerHTML = band;
 
-  const issues = C.checkTimeline(S.rows);
+  /* v0.9.245：单语模式下 en 恒空，双语体检的「缺原文 / 缺译文」整片误报 → 只留时间轴类问题 */
+  let issues = C.checkTimeline(S.rows);
+  if (monoMode()) issues = issues.filter(x => x.kind !== 'no-src' && x.kind !== 'no-dst' && x.kind !== 'empty');
   const iss = $('repIssues'), clean = $('repClean');
   if (issues.length){
     const KIND = { overlap:'issOverlap', 'too-short':'issShort', 'no-dst':'issNoDst', 'no-src':'issNoSrc', empty:'issEmpty' };
@@ -1306,16 +1521,389 @@ function renderReport(){
   }
 
   const CAP = 300;
+  ensureStyle();
   const rowsHtml = S.rows.slice(0, CAP).map((r,i)=>{
-    const cls = r.flag==='drop' ? ' class="drop"' : r.flag==='merged' ? ' class="merged"' : '';
+    /* v0.9.245：筛选只决定这一行**显不显示**，不改数据、不存成规则 */
+    if (!rowMatches(r)) return '';
+    const cls0 = r.flag==='drop' ? 'drop' : r.flag==='merged' ? 'merged' : '';
+    const sel = S.sel.has(i) ? ' sel' : '';
+    const cls = (cls0 || sel) ? ' class="' + (cls0 + sel).trim() + '"' : '';
     const tag = r.flag==='drop' ? '<span class="tag drop">'+t('tagDrop')+'</span>'
               : r.flag==='merged' ? '<span class="tag merged">'+t('tagMerged')+'</span>' : '';
     const zh = r.flag==='merged' ? '' : esc(r.zh);
-    return '<tr'+cls+'><td class="no">'+(i+1)+'</td><td class="tm">'+fmtShort(r.start)+'</td>'+
-      '<td>'+esc(r.en)+tag+'</td><td>'+zh+'</td></tr>';
+    const sid = slotOfRow(i);
+    const stag = sid === 'default' ? '' :
+      '<span class="slot-tag"><span class="slot-dot" style="background:'+esc(slotColor(sid))+'"></span>'+esc(slotLabel(sid))+'</span>';
+    return '<tr'+cls+'><td class="ck"><input type="checkbox" data-ri="'+i+'"'+(S.sel.has(i)?' checked':'')+'></td>'+
+      '<td class="no">'+(i+1)+'</td><td class="tm">'+fmtShort(r.start)+'</td>'+
+      '<td>'+esc(r.en)+tag+'</td><td>'+zh+'</td><td>'+stag+'</td></tr>';
   }).join('');
   $('repRows').innerHTML = rowsHtml;
   $('pvNote').textContent = S.rows.length > CAP ? t('pvNote', CAP) : '';
+  renderSlots();
+  renderFilterStat();
+}
+
+/* ================= v0.9.245：样式槽 + 筛选器 =================
+   两件事：
+   ① 样式槽 = 打在「基础样式」上的一组补丁。槽是**稀疏对象**，没覆盖的键根本不存在，
+      所以「出厂的轻槽（只改 2 项）」和「用户定死 30 项的重槽」是同一种东西的两个阶段，
+      不存在「这个槽不能改那一项」这种困惑。
+   ② 筛选器 ≠ 匹配规则。规则是存下来的、以后自动生效的、程序说了算；
+      筛选器是一次性的、当场看得见命中结果的、用户说了算。字幕格式不标准是常态，
+      对规则是致命伤（漏判用户发现不了），对筛选器不是问题。
+   ⚠️ SRT 没有样式能力，槽对它无意义——导出 SRT / 无样式 VTT 时槽被整体忽略。 */
+
+/* 逻辑参数（与导出格式无关，导出时再映射到 ASS / VTT 各自的字段）。
+   ⚠️ size 存**比例**不是绝对值：ASS 单位是 px、VTT 是 %，只有比例能一套值吃两种格式。
+   ⚠️ dMV = 垂直偏移（像素 @1080，正数 = 上移）。ASS 直接加到 MarginV；
+      VTT 的 line 从顶部往下算、ASS 的 MarginV 从底部往上算 —— 方向相反，换算见 slotVttSettings。 */
+const SLOT_PARAMS = ['size', 'color', 'bold', 'italic', 'dMV'];
+const SLOT_LBL = { size:'slotPrmSize', color:'slotPrmColor', bold:'slotPrmBold', italic:'slotPrmItalic', dMV:'slotPrmDMV' };
+
+/* 出厂槽：依据 Netflix Timed Text Style Guide / BBC SDH 规范的通行做法。
+   ⚠️ 音效**不开斜体** —— Netflix 明文「Never italicize speaker IDs or sound effects」，
+      音效改用淡色区分（这条与直觉相反，别改回去）。 */
+const SLOT_FACTORY = [
+  { id:'default',   color:'#888780', dst:{} },
+  { id:'narration', color:'#BA7517', dst:{ italic:true } },
+  { id:'lyric',     color:'#7F77DD', dst:{ italic:true, dMV:70 } },
+  { id:'sfx',       color:'#378ADD', dst:{ color:'#B0B0B0' } },
+  { id:'emphasis',  color:'#E24B4A', dst:{ bold:true } }
+];
+const SLOT_NAME_KEY = { default:'slotDefault', narration:'slotNarration', lyric:'slotLyric', sfx:'slotSfx', emphasis:'slotEmphasis' };
+const SLOT_TIP_KEY  = { default:'slotTipDefault', narration:'slotTipNarration', lyric:'slotTipLyric', sfx:'slotTipSfx', emphasis:'slotTipEmphasis' };
+
+function slotFactoryMap(){
+  const o = {};
+  SLOT_FACTORY.forEach(f=>{ o[f.id] = { color:f.color, dst:Object.assign({}, f.dst), src:{}, custom:false, modified:false }; });
+  return o;
+}
+function ensureStyle(){
+  if (S.style) return S.style;
+  S.style = { slots: slotFactoryMap(), order: SLOT_FACTORY.map(f=>f.id), cur:'default', assign:{}, view:'diff' };
+  if (!S.filter) S.filter = { text:'', kind:'' };
+  if (!S.sel) S.sel = new Set();
+  return S.style;
+}
+function slotObj(id){ ensureStyle(); return S.style.slots[id] || null; }
+function slotLabel(id){
+  const s = slotObj(id); if (!s) return id;
+  if (s.custom) return s.name || id;
+  const k = SLOT_NAME_KEY[id];
+  return k ? t(k) : id;
+}
+function slotColor(id){ const s = slotObj(id); return (s && s.color) || '#888780'; }
+/* 行 → 槽。⚠️ 默认槽不进 assign（保持稀疏），否则「清掉一条的样式」会留下无数 default 键 */
+function slotOfRow(i){ ensureStyle(); return S.style.assign[i] || 'default'; }
+function setRowSlot(i, id){
+  ensureStyle();
+  if (!id || id === 'default') delete S.style.assign[i];
+  else S.style.assign[i] = id;
+}
+function slotCount(id){
+  const s = slotObj(id); if (!s) return 0;
+  return Object.keys(s.dst || {}).length + Object.keys(s.src || {}).length;
+}
+/* 槽改了 → 用到它的行全部跟着变，所以标 modified（预设槽才有「恢复预设」的意义） */
+function markSlotModified(id){
+  const s = slotObj(id); if (!s) return;
+  if (!s.custom) s.modified = true;
+}
+
+/* ---------- 槽栏 ---------- */
+function renderSlots(){
+  const bar = $('slotBar'); if (!bar) return;
+  ensureStyle();
+  bar.innerHTML = S.style.order.map(id=>{
+    const s = S.style.slots[id]; if (!s) return '';
+    const n = slotCount(id);
+    const mod = s.modified ? ' <span class="mod">· ' + esc(t('slotModified')) + '</span>' : '';
+    return '<span class="slot-chip' + (id === S.style.cur ? ' on' : '') + '" data-slot="' + esc(id) + '" role="button" tabindex="0">' +
+      '<span class="slot-dot" style="background:' + esc(s.color) + '"></span>' + esc(slotLabel(id)) +
+      (n ? ' <span class="mod">' + n + '</span>' : '') + mod + '</span>';
+  }).join('') + '<span class="slot-chip" data-slot-new="1" role="button" tabindex="0">+ ' + esc(t('slotNew')) + '</span>';
+  /* 应用条里的下拉：与槽栏同源，改一处两边一起变 */
+  const ap = $('mApplySlot');
+  if (ap){
+    const keep = ap.value;
+    ap.innerHTML = S.style.order.map(id=>'<option value="' + esc(id) + '">' + esc(slotLabel(id)) + '</option>').join('');
+    ap.value = S.style.slots[keep] ? keep : S.style.cur;
+  }
+  renderSlotEdit();
+}
+function renderSlotEdit(){
+  const box = $('slotParams'), cov = $('slotCover'), nm = $('slotEditName');
+  if (!box) return;
+  ensureStyle();
+  const id = S.style.cur, s = S.style.slots[id];
+  if (!s){ box.innerHTML = ''; return; }
+  if (nm) nm.textContent = t('slotEdit') + ' · ' + slotLabel(id);
+  const total = SLOT_PARAMS.length * (monoMode() ? 1 : 2);
+  if (cov) cov.textContent = t('slotCover', slotCount(id), total);
+  const rst = $('slotRestore');
+  if (rst) rst.style.display = (s.modified && !s.custom) ? '' : 'none';
+  const diff = (S.style.view !== 'all');
+  const groups = monoMode() ? [['dst', null]] : [['dst', 'lblDstCol'], ['src', 'lblSrcCol']];
+  let html = '';
+  groups.forEach(g=>{
+    const role = g[0];
+    const d = s[role] || (s[role] = {});
+    if (g[1]) html += '<div class="slot-grp">' + esc(t(g[1])) + '</div>';
+    let rows = '';
+    SLOT_PARAMS.forEach(k=>{
+      const on = Object.prototype.hasOwnProperty.call(d, k);
+      if (diff && !on) return;
+      const baseTxt = baseParamText(role, k);
+      let valHtml;
+      if (!on){
+        valHtml = '<span>' + esc(t('slotInherit')) + ' · ' + esc(baseTxt) + '</span>';
+      } else if (k === 'color'){
+        valHtml = '<input type="color" data-sp="' + role + '.' + k + '" value="' + esc(d[k]) + '" style="width:52px;height:26px;padding:0;border:1px solid var(--line-strong);border-radius:6px">';
+      } else if (k === 'bold' || k === 'italic'){
+        valHtml = '<select data-sp="' + role + '.' + k + '"><option value="1"' + (d[k] ? ' selected' : '') + '>' + esc(t('vttOptOn')) + '</option>' +
+          '<option value="0"' + (!d[k] ? ' selected' : '') + '>' + esc(t('vttOptOff')) + '</option></select>';
+      } else if (k === 'size'){
+        valHtml = '<input type="number" data-sp="' + role + '.' + k + '" value="' + Math.round(d[k] * 100) + '" min="20" max="300" step="5" style="max-width:96px"> %';
+      } else {
+        valHtml = '<input type="number" data-sp="' + role + '.' + k + '" value="' + d[k] + '" step="10" style="max-width:96px"> px';
+      }
+      rows += '<div class="slot-row' + (on ? '' : ' inh') + '"><span class="pk">' + esc(t(SLOT_LBL[k])) + '</span>' +
+        '<span class="pv">' + valHtml + '</span>' +
+        '<span class="pa' + (on ? ' mut' : '') + '" data-sp-act="' + (on ? 'unset' : 'set') + '" data-sp-k="' + role + '.' + k + '">' +
+        esc(on ? t('slotCancel') : t('slotOverride')) + '</span></div>';
+    });
+    if (!rows) rows = '<div class="slot-empty">' + esc(t('slotEmpty')) + '</div>';
+    else if (diff) rows += '<div class="slot-row"><select data-sp-add="' + role + '"><option value="">' + esc(t('slotAddParam')) + '</option>' +
+      SLOT_PARAMS.filter(k=>!Object.prototype.hasOwnProperty.call(d, k))
+        .map(k=>'<option value="' + k + '">' + esc(t(SLOT_LBL[k])) + '</option>').join('') + '</select></div>';
+    html += rows;
+  });
+  box.innerHTML = html;
+  const vd = $('slotViewDiff'), va = $('slotViewAll');
+  if (vd) vd.classList.toggle('on', diff);
+  if (va) va.classList.toggle('on', !diff);
+}
+function monoMode(){ return S.mode === 'mono'; }
+/* 基础样式当前值（用来显示「沿用 · xxx」）。ASS / VTT 两套字段不同，这里做一次归一。 */
+function baseParamText(role, k){
+  const src = role === 'src';
+  if (k === 'size') return '100%';
+  if (k === 'dMV') return '0px';
+  if (expFmtVal() === 'vtt-styled'){
+    const st = vttStyleOf();
+    if (k === 'color') return (src ? (st.srcColor || st.color) : st.color) || '#FFFFFF';
+    if (k === 'bold') return st.bold ? t('vttOptOn') : t('vttOptOff');
+    if (k === 'italic') return st.italic ? t('vttOptOn') : t('vttOptOff');
+  }
+  const A = assStyleOf();
+  if (k === 'color'){
+    const c = src ? A.srcColor : A.dstColor;
+    return assHexToCss(c) || '#FFFFFF';
+  }
+  if (k === 'bold') return (src ? A.srcBold : A.dstBold) ? t('vttOptOn') : t('vttOptOff');
+  if (k === 'italic') return (src ? A.srcItalic : A.dstItalic) ? t('vttOptOn') : t('vttOptOff');
+  return '';
+}
+function assHexToCss(v){
+  const m = /^&H([0-9A-Fa-f]{2})?([0-9A-Fa-f]{6})$/.exec(String(v || ''));
+  if (!m) return '';
+  const h = m[2];
+  return '#' + h.slice(4, 6) + h.slice(2, 4) + h.slice(0, 2).toUpperCase();
+}
+
+/* ---------- 筛选器（挑行，不存规则） ---------- */
+const RE_SOUND = /[\[【(（][^\]】)）]{1,24}[\]】)）]|♪|♫/;
+const RE_SPEAKER = /^\s*[-–—]?\s*[^\n:：]{1,16}\s*[:：]/m;
+function rowText(r){ return String(r.en == null ? '' : r.en) + '\n' + String(r.zh == null ? '' : r.zh); }
+function rowTooFast(r){
+  const dur = ((Number(r.end) || 0) - (Number(r.start) || 0)) / 1000;
+  if (!(dur > 0)) return false;
+  const n = rowText(r).replace(/\s/g, '').length;
+  return n / dur > 20;   /* Netflix：成人 ≤ 20 字符/秒 */
+}
+function rowMatches(r){
+  ensureStyle();
+  const f = S.filter;
+  const tx = rowText(r);
+  if (f.text && tx.toLowerCase().indexOf(String(f.text).toLowerCase()) < 0) return false;
+  switch (f.kind){
+    case 'sfx':     return RE_SOUND.test(tx);
+    case 'speaker': return RE_SPEAKER.test(tx);
+    case 'short':   return ((Number(r.end) || 0) - (Number(r.start) || 0)) < 1000;
+    case 'long':    return (String(r.zh || '').split('\n').length > 2) || (String(r.en || '').split('\n').length > 2);
+    case 'fast':    return rowTooFast(r);
+  }
+  return true;
+}
+function renderFilterStat(){
+  const el = $('filterStat'); if (!el) return;
+  ensureStyle();
+  const rows = S.rows || [];
+  const f = S.filter;
+  const active = !!(f.text || f.kind);
+  const hits = active ? rows.filter(rowMatches).length : rows.length;
+  const n = S.sel ? S.sel.size : 0;
+  const links = '<span style="color:var(--acc);cursor:pointer" data-fsel="all">' + esc(t('filterSelAll')) + '</span> · ' +
+    '<span style="color:var(--acc);cursor:pointer" data-fsel="inv">' + esc(t('filterSelInv')) + '</span> · ' +
+    '<span style="color:var(--acc);cursor:pointer" data-fsel="clear">' + esc(t('filterClear')) + '</span>';
+  /* ⚠️ 别再从 applyBar 里正则抠数字拼回来 —— 那会印出「<b>2</b> 2」这种重复数字。
+     选中行数是这一行自己的说法，单独一条词条，四语都齐。 */
+  el.innerHTML = (active ? t('filterHit', hits) + ' · ' : '') + t('filterSelRow', '<b>' + n + '</b>') +
+    ' · ' + links + (active ? ' · <span style="color:var(--mut)">' + esc(t('filterHint')) + '</span>' : '');
+  const lbl = $('applyLabel');
+  if (lbl) lbl.textContent = t('applyBar', n);
+}
+
+/* ---------- 应用 ---------- */
+function applySlotToSelected(id){
+  if (!S.rows){ toast(t('needMerge')); return; }
+  const idxs = S.sel && S.sel.size ? Array.from(S.sel) : [];
+  if (!idxs.length){ toast(t('filterNone')); return; }
+  idxs.forEach(i=>setRowSlot(i, id));
+  S.sel.clear();
+  renderReport(); renderAssPv(); renderVttPv();
+  toast(t('applyDone', idxs.length, slotLabel(id)));
+}
+function applySlotToAll(id){
+  if (!S.rows){ toast(t('needMerge')); return; }
+  ensureStyle();
+  for (let i = 0; i < S.rows.length; i++) setRowSlot(i, id);
+  renderReport(); renderAssPv(); renderVttPv();
+  toast(t('applyDone', S.rows.length, slotLabel(id)));
+}
+
+/* ⚠️ 引擎读的是 **row.slot**，不是 assign（buildBilingualParts 只看行上的字段）。
+   assign 是「行号 → 槽」的稀疏表（默认槽不记），导出前必须刷进 rows，否则槽根本到不了导出端。
+   ⚠️ 每条路径都要刷：ASS 事件、VTT cue、ASS 预览样例 —— 漏一条就是「预览变了导出没变」。 */
+function syncSlotsToRows(){
+  ensureStyle();
+  if (!S.rows) return;
+  for (let i = 0; i < S.rows.length; i++) S.rows[i].slot = slotOfRow(i);
+}
+
+/* ---------- 导出映射：槽 → ASS 样式 / VTT 类 ---------- */
+/* ASS：每个「用到的槽 × 角色」生成一条 Style 行。名字用 ASCII（中文 Style 名在部分播放器会乱）。
+   ⚠️ 只有真的被用到的槽才生成（默认槽且没人改 → 一个额外样式都不加 → 导出与旧版逐字节相同）。 */
+const SLOT_ASS_PREFIX = { dst:'SlotD_', src:'SlotS_' };
+function slotAssName(id, role){ return SLOT_ASS_PREFIX[role] + String(id).replace(/[^A-Za-z0-9_]/g, ''); }
+function usedSlotIds(){
+  const set = new Set();
+  const rows = S.rows || [];
+  for (let i = 0; i < rows.length; i++){
+    const id = slotOfRow(i);
+    if (id !== 'default') set.add(id);
+  }
+  return Array.from(set);
+}
+/* ASS 的 alpha 位：&HAABBGGRR 里 AA 是**透明度**（00=不透明、FF=全透明，与 CSS 相反）。
+   ⚠️ 引擎的 withAlpha 是 `'&H' + a + col.slice(4)` —— a 必须是**两位十六进制**，
+      传十进制 '100' 会拼出 9 位的畸形颜色串（&H100B0B0B0），播放器解析就废了。 */
+function assAlphaHex(pct){
+  let a = parseInt(pct, 10);
+  if (!isFinite(a)) a = 100;
+  a = Math.max(0, Math.min(100, a));
+  const n = Math.round((100 - a) * 255 / 100);
+  return n <= 0 ? '00' : n.toString(16).toUpperCase().padStart(2, '0');
+}
+function assBackWithAlpha(colHex, alphaPct){
+  const h = assAlphaHex(alphaPct);
+  const c = /^&H[0-9A-Fa-f]{6,8}$/.test(String(colHex || '')) ? String(colHex) : '&H00000000';
+  return '&H' + h + c.slice(-6).toUpperCase();
+}
+function slotAssSpec(id, role){
+  const A = assStyleOf(), src = role === 'src';
+  const d = (slotObj(id) || {})[role] || {};
+  const spec = {
+    size: src ? A.srcSize : A.dstSize,
+    color: src ? A.srcColor : A.dstColor,
+    align: src ? A.srcAlign : A.dstAlign,
+    bold: (src ? A.srcBold : A.dstBold) ? -1 : 0,
+    italic: (src ? A.srcItalic : A.dstItalic) ? -1 : 0,
+    mv: src ? A.srcMV : A.dstMV,
+    font: (src ? A.srcFont : A.dstFont) || undefined,
+    outline: src ? A.srcOutline : A.dstOutline,
+    outlineColor: src ? A.srcOutlineColor : A.dstOutlineColor,
+    alpha: assAlphaHex(src ? A.srcAlpha : A.dstAlpha),
+    spacing: src ? A.srcSpacing : A.dstSpacing,
+    borderStyle: (src ? A.srcBox : A.dstBox) ? 3 : 1,
+    shadow: src ? A.srcShadow : A.dstShadow,
+    back: assBackWithAlpha(src ? A.srcBackColor : A.dstBackColor, src ? A.srcBackAlpha : A.dstBackAlpha)
+  };
+  if (d.size != null) spec.size = Math.max(8, Math.round(spec.size * d.size));
+  if (d.color) spec.color = hexToAss(d.color) || spec.color;
+  if (d.bold != null) spec.bold = d.bold ? -1 : 0;
+  if (d.italic != null) spec.italic = !!d.italic;
+  /* ⚠️ dMV **不在这里加**：Dialogue 行自己的 MarginV 非 0 时会覆盖 Style 里的 MarginV，
+     加在 Style 上等于没加。垂直偏移在 buildAssEvents 里加到每条 Dialogue 的 ln.mv。 */
+  return spec;
+}
+function slotAssExtraStyles(){
+  const ids = usedSlotIds();
+  if (!ids.length) return [];
+  const out = [];
+  ids.forEach(id=>{
+    if (!slotObj(id)) return;
+    out.push({ name: slotAssName(id, 'dst'), spec: slotAssSpec(id, 'dst') });
+    out.push({ name: slotAssName(id, 'src'), spec: slotAssSpec(id, 'src') });
+  });
+  return out;
+}
+/* VTT：槽 → 一组 ::cue(.类名) 规则 + 每条 cue 自己的类名与 cue settings。
+   ⚠️ 槽的 dMV 只能落在 cue settings 的 line 上（垂直位置是整条级参数，CSS 里改不了），
+      换算：VTT 的 line 从画面顶部往下算，上移 = line 变小。 */
+function slotVttClass(id){ return 'sg-' + String(id).replace(/[^A-Za-z0-9_-]/g, ''); }
+function slotVttStyle(id, role){
+  const base = vttStyleOf();
+  const st = Object.assign({}, base);
+  const d = (slotObj(id) || {})[role] || {};
+  /* ⚠️ 原文行那一半必须写进 srcXxx 字段：vttSrcDecls 读的是 srcColor / srcSize / srcBold / srcItalic，
+     照着译文行那样写 st.color / st.size 会被整条丢掉 —— 界面上「覆盖了」，导出里一个字没变。
+     ⚠️ 覆盖 = 显式关掉「沿用」（srcXxxInh = false），否则写了值也照样不输出。 */
+  if (role === 'src'){
+    const sz0 = parseFloat(st.srcSizeInh ? st.size : st.srcSize);
+    const b0 = isFinite(sz0) ? sz0 : 100;
+    if (d.size != null){ st.srcSizeInh = false; st.srcSize = String(Math.max(10, Math.round(b0 * d.size))); }
+    if (d.color){ st.srcColorInh = false; st.srcColor = d.color; }
+    if (d.bold != null) st.srcBold = d.bold ? 'on' : 'off';
+    if (d.italic != null) st.srcItalic = d.italic ? 'on' : 'off';
+    return st;   /* dMV 是整条级参数，原文行那一半没有它 */
+  }
+  if (d.size != null) st.size = String(Math.max(10, Math.round((parseFloat(base.size) || 100) * d.size)));
+  if (d.color) st.color = d.color;
+  if (d.bold != null) st.bold = !!d.bold;
+  if (d.italic != null) st.italic = !!d.italic;
+  return st;
+}
+function slotVttSettings(id){
+  const d = (slotObj(id) || {}).dst || {};
+  if (!d.dMV) return '';
+  const base = vttStyleOf();
+  const bl = parseFloat(base.line);
+  if (!isFinite(bl)) return '';
+  const nl = Math.max(0, Math.min(100, bl - d.dMV / 1080 * 100));
+  return C.vttCueSettings(Object.assign({}, base, { line: String(Math.round(nl * 10) / 10) }));
+}
+function slotVttRules(){
+  const ids = usedSlotIds();
+  if (!ids.length) return [];
+  const out = [];
+  ids.forEach(id=>{
+    if (!slotObj(id)) return;
+    const cls = slotVttClass(id);
+    /* ⚠️ 两条规则分开自己拼，不要整块调 C.vttSlotRule：它内部会用**译文行**那套去写
+       ::cue(.槽.src)，于是同一个选择器在文件里出现两次（前一条是基础原文行值、后一条才是对的）。
+       CSS 里后写的赢，看着没错，但文件里留了一条永远不该出现的脏规则。 */
+    const dm = C.vttMainDecls(slotVttStyle(id, 'dst'));
+    if (dm.length) out.push('::cue(.' + cls + ') {\n' + dm.join('\n') + '\n}');
+    /* 原文行那条：只有槽的 src 那半真有覆盖时才写，否则 .sg-x.src 与全局 ::cue(.src) 重复 */
+    const sd = (slotObj(id) || {}).src || {};
+    if (Object.keys(sd).length){
+      const decls = C.vttSrcDecls(slotVttStyle(id, 'src'));
+      if (decls.length) out.push('::cue(.' + cls + '.' + C.VTT_SRC_CLASS + ') {\n' + decls.join('\n') + '\n}');
+    }
+  });
+  return out;
 }
 
 /* ================= 导出 ================= */
@@ -1439,6 +2027,8 @@ const ASS_DEFAULTS = [
      粗体 checkbox 用 true/false（value 对 checkbox 无效，见 setAssVal）。
      默认值必须与旧写死值一致：译文粗 / 原文不粗、字间距 0、无阴影无底衬、水平居中、左右边距 60。 */
   ['assDstBold',true],['assSrcBold',false],
+  /* v0.9.245：斜体默认关（旧写死值就是正体） */
+  ['assDstItalic',false],['assSrcItalic',false],
   ['assDstSpacing','0'],['assSrcSpacing','0'],
   ['assDstEdge','none'],['assSrcEdge','none'],
   ['assDstEdgeSize','0'],['assSrcEdgeSize','0'],
@@ -1461,7 +2051,7 @@ const TPL_DEFAULTS = {
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'100',
     /* v0.9.231：新旧字段都要在预设里出现，否则切模板时新字段残留上一次的值（等于预设没生效）。
        两个模板在这批新字段上同值——默认值即旧写死值，不擅自替用户选风格。 */
-    assDstBold:true, assSrcBold:false, assDstSpacing:'0', assSrcSpacing:'0',
+    assDstBold:true, assSrcBold:false, assDstItalic:false, assSrcItalic:false, assDstSpacing:'0', assSrcSpacing:'0',
     assDstEdge:'none', assSrcEdge:'none', assDstEdgeSize:'0', assSrcEdgeSize:'0',
     assDstEdgeColor:'#000000', assSrcEdgeColor:'#000000', assDstEdgeAlpha:'60', assSrcEdgeAlpha:'60',
     assDstAlign:'2', assSrcAlign:'2', assMarginL:'60', assMarginR:'60',
@@ -1478,7 +2068,7 @@ const TPL_DEFAULTS = {
     assDstSize:'54', assSrcSize:'42', assDstColor:'#FFFFFF', assSrcColor:'#E6C86A',
     assDstOutline:'2.5', assSrcOutline:'2.0', assDstOutlineColor:'#000000', assSrcOutlineColor:'#000000',
     assDstFont:'PingFang SC', assSrcFont:'PingFang SC', assDstAlpha:'100', assSrcAlpha:'90',
-    assDstBold:true, assSrcBold:false, assDstSpacing:'0', assSrcSpacing:'0',
+    assDstBold:true, assSrcBold:false, assDstItalic:false, assSrcItalic:false, assDstSpacing:'0', assSrcSpacing:'0',
     assDstEdge:'none', assSrcEdge:'none', assDstEdgeSize:'0', assSrcEdgeSize:'0',
     assDstEdgeColor:'#000000', assSrcEdgeColor:'#000000', assDstEdgeAlpha:'60', assSrcEdgeAlpha:'60',
     assDstAlign:'2', assSrcAlign:'2', assMarginL:'60', assMarginR:'60',
@@ -1722,6 +2312,9 @@ function assStyleOf(){
     /* ---------- v0.9.231 新增字段：值与界面一一对应，不做任何加工 ---------- */
     dstBold: !!($('assDstBold')||{}).checked,
     srcBold: !!($('assSrcBold')||{}).checked,
+    /* v0.9.245：斜体（此前 ASS 的 Italic 恒 0，旁白/歌词槽无处表达） */
+    dstItalic: !!($('assDstItalic')||{}).checked,
+    srcItalic: !!($('assSrcItalic')||{}).checked,
     dstSpacing: spOf('assDstSpacing'), srcSpacing: spOf('assSrcSpacing'),
     /* 「阴影/底衬」三选一 → ASS 的 BorderStyle + Shadow。底衬模式下 Shadow 恒 0
        （播放器就是这么处理的，界面上那个框此时是禁用的，不是我们偷偷改）。 */
@@ -1743,6 +2336,7 @@ function localeSrcItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text
 function localeDstItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text:r.zh})) : (S.dst||[]); }
 /* ASS 事件：译文/原文各占一条 Dialogue，位置 = 各自的「离底距离」（v0.9.229 起两条同义） */
 function buildAssEvents(){
+  syncSlotsToRows();   /* v0.9.245：行→槽刷进 rows，否则导出端读不到 */
   const fmt = expFmtVal();
   const stacked = fmt === 'ass-stack';
   const dstFirst = orderVal() === 'dst-first';
@@ -1759,14 +2353,23 @@ function buildAssEvents(){
   return parts.map(p=>{
     const dstText = p.dstLines.join('\n'), srcText = p.srcLines.join('\n');
     const lines = [];
+    /* v0.9.245：这一 part 用哪个槽？part.slot 由引擎从承载行透传过来
+       （超宽被切成多条、被 merged 行并入 —— 切出来的每条都跟着承载行走，样式不会因为折行而丢）。
+       ⚠️ 默认槽走原来的四个内置样式名，一个额外 Style 都不生成 → 导出与旧版逐字节相同。
+       ⚠️ 槽的垂直偏移（dMV）只能落在**逐条 Dialogue 的 MarginV** 上：
+          Dialogue 的 MarginV 非 0 时会覆盖 Style 里的 MarginV，写在 Style 里等于没写。 */
+    const sid = p.slot || 'default';
+    const useSlot = sid !== 'default' && !!slotObj(sid);
+    const dOff = useSlot ? ((slotObj(sid).dst || {}).dMV || 0) : 0;
+    const sOff = useSlot ? ((slotObj(sid).src || {}).dMV || 0) : 0;
     /* 样式只管「角色」（字号/颜色/描边），位置一律由各自的 MarginV 决定 */
     if (stacked){
-      if (srcText) lines.push({ style:'Sub', text:srcText, mv: srcMV });
-      if (dstText) lines.push({ style:'Bottom', text:dstText, mv: dstMV });
+      if (srcText) lines.push({ style: useSlot ? slotAssName(sid,'src') : 'Sub', text:srcText, mv: srcMV + sOff });
+      if (dstText) lines.push({ style: useSlot ? slotAssName(sid,'dst') : 'Bottom', text:dstText, mv: dstMV + dOff });
     } else {
       /* 分屏：译文在上时用 TopMain（保持主字号主色），位置仍是它自己的离底值 */
-      if (dstText) lines.push({ style: dstFirst ? 'TopMain' : 'Bottom', text:dstText, mv: dstMV });
-      if (srcText) lines.push({ style: dstFirst ? 'Sub' : 'Top', text:srcText, mv: srcMV });
+      if (dstText) lines.push({ style: useSlot ? slotAssName(sid,'dst') : (dstFirst ? 'TopMain' : 'Bottom'), text:dstText, mv: dstMV + dOff });
+      if (srcText) lines.push({ style: useSlot ? slotAssName(sid,'src') : (dstFirst ? 'Sub' : 'Top'), text:srcText, mv: srcMV + sOff });
     }
     return { start:p.start, end:p.end, lines };
   });
@@ -1774,7 +2377,7 @@ function buildAssEvents(){
 function buildExport(){
   const fmt = expFmtVal();
   if (fmt === 'ass-split' || fmt === 'ass-stack')
-    return C.formatAss(buildAssEvents(), { title: baseName() || 'merged', assStyle: assStyleOf() });
+    return C.formatAss(buildAssEvents(), { title: baseName() || 'merged', assStyle: assStyleOf(), extraStyles: slotAssExtraStyles() });
   if (fmt === 'vtt-styled') return buildVttExport();   /* v0.9.238：带 STYLE 块的双语 VTT */
   const items = C.buildBilingual(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
@@ -1792,6 +2395,7 @@ function buildExport(){
 function assPvSample(){
   const rows = (S.rows && S.rows.length) ? S.rows.slice(0, 20) : null;
   let best = null;
+  syncSlotsToRows();   /* v0.9.245：预览也要按槽挑样例，否则预览与导出不是同一条 */
   if (rows && C && typeof C.buildBilingualParts === 'function'){
     try {
       const parts = C.buildBilingualParts(rows, {
@@ -2021,6 +2625,7 @@ function vttStyleOf(){
 /* ⚠️ 导出与预览共用这一份「逐行文本」：谁在上面、哪几行是原文，两个画面完全一致。
    此前预览自己写死两行、导出按折行结果给 N 行 → 预览与导出行数不一致（v0.9.224b 的教训）。 */
 function vttCueParts(){
+  syncSlotsToRows();   /* v0.9.245：同上，预览与导出共用这一份 */
   const parts = C.buildBilingualParts(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
     srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems())
@@ -2029,7 +2634,8 @@ function vttCueParts(){
   return (parts || []).map((p, i) => {
     const d = (p.dstLines || []).map(x=>({ text:x, isSrc:false }));
     const s = (p.srcLines || []).map(x=>({ text:x, isSrc:true }));
-    return { no:i+1, start:p.start, end:p.end, lines: dstFirst ? d.concat(s) : s.concat(d) };
+    /* v0.9.245：slot 由引擎从承载行透传（折行切出来的多条跟着同一条走） */
+    return { no:i+1, start:p.start, end:p.end, slot: p.slot || 'default', lines: dstFirst ? d.concat(s) : s.concat(d) };
   });
 }
 function buildVttExport(){
@@ -2038,9 +2644,18 @@ function buildVttExport(){
   /* v0.9.241：原文行要不要打标记，跟引擎同一判据（写得出声明才打）——
      不会出现「打了标记却没有 ::cue(.src) 规则」的死噪音；全部沿用则两边都不做。 */
   const srcOn = C.vttSrcDecls(st).length > 0;
-  const items = vttCueParts().map(p=>({ no:p.no, start:p.start, end:p.end,
-    text: p.lines.map(L => (L.isSrc && srcOn) ? mark(L.text) : L.text).join('\n') }));
-  return C.formatVtt(items, { style: st });
+  const items = vttCueParts().map(p=>{
+    let text = p.lines.map(L => (L.isSrc && srcOn) ? mark(L.text) : L.text).join('\n');
+    /* v0.9.245：整条套一层槽的类名。垂直偏移走 cue settings（CSS 改不了位置），
+       其余（颜色/字号/粗斜体）走 ::cue(.槽名) 规则。默认槽不打标记、不加规则。 */
+    const sid = p.slot || 'default';
+    if (sid !== 'default' && slotObj(sid)){
+      const cls = slotVttClass(sid);
+      text = '<c.' + cls + '>' + text + '</c.' + cls + '>';
+    }
+    return { no:p.no, start:p.start, end:p.end, text: text, settings: slotVttSettings(sid) };
+  });
+  return C.formatVtt(items, { style: st, extraRules: slotVttRules() });
 }
 function renderVttPv(){
   const box = $('mVttPv'), scr = $('mVttPvScreen'), cue = $('mVttPvCue'), tag = $('mVttPvTag');
@@ -2050,31 +2665,47 @@ function renderVttPv(){
   box.style.display = 'block';
   const parts = vttCueParts();
   if (!parts.length){ box.style.display = 'none'; return; }
-  const st = vttStyleOf();
+  /* ⚠️ v0.9.245：预览这条 cue 是哪个槽的，就得按那个槽画 —— 导出里它带 <c.sg-x> 与
+     ::cue(.sg-x) 规则，预览却照基础样式画，就成了「导出是灰的、预览是白的」。
+     层级跟 CSS 一致：基础 ::cue → 槽的译文行覆盖 → 原文行那条再叠 ::cue(.src) / ::cue(.槽.src)。 */
+  const sid0 = parts[0].slot || 'default';
+  const slotOn = (sid0 !== 'default' && !!slotObj(sid0));
+  /* ⚠️ stBase = 整条 cue 那一层（= 导出里 ::cue 与 ::cue(.槽) 叠完的结果）；
+        循环里的 st = 该行那一层（原文行可能被 ::cue(.槽.src) 再叠一次）。
+        沿用/三态的判据全部写在循环里，变量名保持 st —— 别改，单测按这个扫函数体。 */
+  const stBase = slotOn ? slotVttStyle(sid0, 'dst') : vttStyleOf();
+  const sd0 = slotOn ? ((slotObj(sid0) || {}).src || {}) : {};
+  const srcOn = Object.keys(sd0).length > 0;            /* 槽真覆盖了原文行 → 原文行另取一套 */
+  const stSrc = srcOn ? slotVttStyle(sid0, 'src') : stBase;
   const H = scr.clientHeight || 240, k = H / 1080;      /* 1080p 基准 → 预览等比 */
   const num = (v,d) => { const n = parseFloat(v); return (v !== '' && isFinite(n)) ? n : d; };
   const col = (v,d) => (/^#[0-9a-fA-F]{6}$/.test(String(v||'').trim()) ? String(v).trim() : d);
   /* 位置：line + 锚点定纵向，position + align 定横向 —— 全部是界面上的原值，
-     越界（如 150%）也照画不误：用户填什么就是什么，不许偷偷改回范围内。 */
-  const ln = num(st.line, 0), w = num(st.width, 100), pos = num(st.position, 0);
+     越界（如 150%）也照画不误：用户填什么就是什么，不许偷偷改回范围内。
+     ⚠️ 槽的「垂直偏移」落在逐条 cue settings 的 line 上（CSS 改不了位置），
+        所以预览的纵向位置直接读导出会写的那条 settings，两边同源。 */
+  const mLn = /line:([\d.]+)%/.exec(slotVttSettings(sid0) || '');
+  const ln = num(mLn ? mLn[1] : stBase.line, 0), w = num(stBase.width, 100), pos = num(stBase.position, 0);
   cue.style.width = w + '%';
-  cue.style.left = (st.align === 'start' ? pos : (st.align === 'end' ? (pos - w) : (pos - w/2))) + '%';
-  cue.style.textAlign = st.align === 'start' ? 'left' : (st.align === 'end' ? 'right' : 'center');
-  if (st.lineAlign === 'start'){ cue.style.bottom = 'auto'; cue.style.top = ln + '%'; cue.style.transform = ''; }
-  else if (st.lineAlign === 'center'){ cue.style.bottom = 'auto'; cue.style.top = ln + '%'; cue.style.transform = 'translateY(-50%)'; }
+  cue.style.left = (stBase.align === 'start' ? pos : (stBase.align === 'end' ? (pos - w) : (pos - w/2))) + '%';
+  cue.style.textAlign = stBase.align === 'start' ? 'left' : (stBase.align === 'end' ? 'right' : 'center');
+  if (stBase.lineAlign === 'start'){ cue.style.bottom = 'auto'; cue.style.top = ln + '%'; cue.style.transform = ''; }
+  else if (stBase.lineAlign === 'center'){ cue.style.bottom = 'auto'; cue.style.top = ln + '%'; cue.style.transform = 'translateY(-50%)'; }
   else { cue.style.top = 'auto'; cue.style.transform = ''; cue.style.bottom = (100 - ln) + '%'; }
-  const fam = C.vttFontStack(st.font) || '';
   /* ⚠️ 三态取值：'' = 沿用主样式，此时必须取「主样式那份」，不能取原文行的输入框
      （输入框里还留着上次手改的值，沿用时不该生效 —— 否则预览与导出会不一致）。 */
   const inh = v => (v === '' || v === null || v === undefined);
   cue.innerHTML = '';
   parts[0].lines.forEach(L => {
+    const isS = !!L.isSrc;
+    /* 原文行：槽真覆盖了它那一半就取槽的 src 套，否则与译文行同一套（对应「没写 ::cue(.槽.src)」） */
+    const st = (isS && srcOn) ? stSrc : stBase;
+    const fam = C.vttFontStack(st.font) || '';
     const dv = document.createElement('div'); dv.className = 'vtt-pv-line';
     const sp = document.createElement('span'); sp.className = 'pv-in'; sp.textContent = L.text;
     dv.appendChild(sp); cue.appendChild(dv);
     /* v0.9.241：原文行按「项」决定是否沿用 —— 字号、颜色各有一个 mode，其余五项各自三态。
        全部沿用 = 这一行跟译文行长得一模一样（导出里也一样：既不打标记也不写规则）。 */
-    const isS = !!L.isSrc;
     const useSz = isS && !st.srcSizeInh, useCol = isS && !st.srcColorInh;
     const pct = num(useSz ? st.srcSize : st.size, useSz ? 85 : 100);
     dv.style.fontSize = (H * 0.05 * (pct / 100)).toFixed(2) + 'px';   /* 播放器默认 cue 字号 ≈ 画面高 5% */
@@ -2265,12 +2896,13 @@ function reportMerge(kind){
     /* ⚠️ 「调整双语」只有一个输入文件（放 src 侧），dst 侧在界面上整个隐藏。
        而 syncMode() 切模式时并不清 S.dstName —— 直接报上去会把上一次合并残留的译文文件名
        当成这次的输入，后台看到的「上传字幕」就是错的（两个文件名，其实只传了一个）。 */
-    const adj = S.mode === 'adjust';
+    /* v0.9.245：单语模式同样只有一个输入文件，dst 侧必须留空（否则后台看到两个文件名） */
+    const adj = S.mode === 'adjust', mono = S.mode === 'mono';
     const body = JSON.stringify({
       kind: k,
-      src: S.srcName || '', dst: adj ? '' : (S.dstName || ''),
+      src: S.srcName || '', dst: (adj || mono) ? '' : (S.dstName || ''),
       cues: (S.rows && S.rows.length) || 0,
-      mode: adj ? 'adjust' : 'merge',
+      mode: mono ? 'mono' : (adj ? 'adjust' : 'merge'),
       fmt: k === 'export' ? expExt() : '',
       tpl: k === 'export' ? expTplKey() : ''
     });
@@ -2302,6 +2934,148 @@ function doCopy(){
     .then(()=>toast(t('copied')))
     .catch(()=>{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
       ta.select(); try{ document.execCommand('copy'); toast(t('copied')); }catch(e){} ta.remove(); });
+}
+
+/* ================= v0.9.245：样式槽 / 筛选器 的事件绑定 =================
+   ⚠️ 全部走事件委托：renderSlots / renderReport 会整块重建 DOM，绑在子节点上的监听会随重建丢失。 */
+function restoreSlot(id){
+  const f = null;
+  for (const x of SLOT_FACTORY){ if (x.id === id){ S.style.slots[id] = { color:x.color, dst:Object.assign({}, x.dst), src:{}, custom:false, modified:false }; break; } }
+  renderSlots(); renderAssPv(); renderVttPv();
+}
+function newSlot(){
+  ensureStyle();
+  let n = S.style.order.length + 1, id = 'slot' + n;
+  while (S.style.slots[id]){ n++; id = 'slot' + n; }
+  S.style.slots[id] = { color:'#8B5CF6', dst:{}, src:{}, custom:true, name:'', modified:false };
+  S.style.order.push(id);
+  S.style.cur = id;
+  S.style.view = 'all';   /* 新槽是空的，差异视图会一片空白 → 直接给全量视图，用户挑要覆盖哪项 */
+  renderSlots();
+}
+function slotDefaultVal(role, k){
+  if (k === 'color') return baseParamText(role, k);
+  if (k === 'bold' || k === 'italic') return true;
+  if (k === 'size') return 1;
+  return 0;
+}
+function bindSlotUI(){
+  const bar = $('slotBar');
+  if (bar) bar.addEventListener('click', e=>{
+    if (e.target.closest('[data-slot-new]')){ newSlot(); return; }
+    const chip = e.target.closest('[data-slot]');
+    if (!chip) return;
+    const id = chip.getAttribute('data-slot');
+    ensureStyle();
+    if (!S.style.slots[id]) return;
+    S.style.cur = id;
+    renderSlots();
+  });
+  const box = $('slotParams');
+  if (box){
+    box.addEventListener('click', e=>{
+      const act = e.target.getAttribute && e.target.getAttribute('data-sp-act');
+      if (!act) return;
+      const p = String(e.target.getAttribute('data-sp-k') || '').split('.');
+      const role = p[0], k = p[1];
+      const s = slotObj(S.style.cur); if (!s) return;
+      const d = s[role] || (s[role] = {});
+      if (act === 'set') d[k] = slotDefaultVal(role, k);
+      else delete d[k];
+      markSlotModified(S.style.cur);
+      renderSlots(); renderAssPv(); renderVttPv();
+    });
+    box.addEventListener('change', e=>{
+      const el = e.target;
+      const addRole = el.getAttribute && el.getAttribute('data-sp-add');
+      if (addRole){
+        const k = el.value; if (!k) return;
+        const s = slotObj(S.style.cur); if (!s) return;
+        const d = s[addRole] || (s[addRole] = {});
+        if (!Object.prototype.hasOwnProperty.call(d, k)) d[k] = slotDefaultVal(addRole, k);
+        markSlotModified(S.style.cur);
+        renderSlots(); renderAssPv(); renderVttPv();
+        return;
+      }
+      const key = el.getAttribute && el.getAttribute('data-sp');
+      if (!key) return;
+      const p = String(key).split('.'); const role = p[0], k = p[1];
+      const s = slotObj(S.style.cur); if (!s) return;
+      const d = s[role] || (s[role] = {});
+      if (k === 'bold' || k === 'italic') d[k] = el.value === '1';
+      else if (k === 'size') d[k] = Math.max(0.2, Math.min(3, (parseFloat(el.value) || 100) / 100));
+      else if (k === 'dMV') d[k] = Math.round(parseFloat(el.value) || 0);
+      else d[k] = el.value;
+      markSlotModified(S.style.cur);
+      renderSlots(); renderAssPv(); renderVttPv();
+    });
+  }
+  const vd = $('slotViewDiff'), va = $('slotViewAll');
+  if (vd) vd.addEventListener('click', ()=>{ ensureStyle(); S.style.view = 'diff'; renderSlotEdit(); });
+  if (va) va.addEventListener('click', ()=>{ ensureStyle(); S.style.view = 'all'; renderSlotEdit(); });
+  const ua = $('slotUncoverAll');
+  if (ua) ua.addEventListener('click', ()=>{
+    const s = slotObj(S.style.cur); if (!s) return;
+    s.dst = {}; s.src = {}; markSlotModified(S.style.cur);
+    renderSlots(); renderAssPv(); renderVttPv();
+  });
+  const rs = $('slotRestore');
+  if (rs) rs.addEventListener('click', ()=>{ ensureStyle(); restoreSlot(S.style.cur); });
+
+  /* ---------- 筛选器 ---------- */
+  const ft = $('mFilterText');
+  if (ft) ft.addEventListener('input', ()=>{ ensureStyle(); S.filter.text = ft.value; renderReport(); });
+  document.querySelectorAll('#filterBar .btn-sm').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      ensureStyle();
+      const k = b.getAttribute('data-flt') || '';
+      S.filter.kind = (S.filter.kind === k) ? '' : k;
+      document.querySelectorAll('#filterBar .btn-sm').forEach(x=>{
+        x.classList.toggle('on', (x.getAttribute('data-flt') || '') === S.filter.kind);
+      });
+      renderReport();
+    });
+  });
+  const tb = $('repRows');
+  if (tb) tb.addEventListener('change', e=>{
+    const cb = e.target;
+    if (!cb || cb.getAttribute('data-ri') == null) return;
+    const i = parseInt(cb.getAttribute('data-ri'), 10);
+    ensureStyle();
+    if (cb.checked) S.sel.add(i); else S.sel.delete(i);
+    renderReport();
+  });
+  const sa = $('mSelAll');
+  if (sa) sa.addEventListener('change', ()=>{
+    ensureStyle();
+    if (!S.rows) return;
+    if (sa.checked) S.rows.forEach((r, i)=>{ if (rowMatches(r)) S.sel.add(i); });
+    else S.sel.clear();
+    renderReport();
+  });
+  const fs = $('filterStat');
+  if (fs) fs.addEventListener('click', e=>{
+    const a = e.target.getAttribute && e.target.getAttribute('data-fsel');
+    if (!a) return;
+    ensureStyle();
+    if (!S.rows) return;
+    if (a === 'all') S.rows.forEach((r, i)=>{ if (rowMatches(r)) S.sel.add(i); });
+    else if (a === 'inv'){
+      const nx = new Set();
+      S.rows.forEach((r, i)=>{ if (rowMatches(r) && !S.sel.has(i)) nx.add(i); });
+      S.sel = nx;
+    } else S.sel.clear();
+    renderReport();
+  });
+  const ab = $('mApplyBtn'), aa = $('mApplyAll');
+  if (ab) ab.addEventListener('click', ()=>{
+    ensureStyle();
+    applySlotToSelected((($('mApplySlot') || {}).value) || S.style.cur);
+  });
+  if (aa) aa.addEventListener('click', ()=>{
+    ensureStyle();
+    applySlotToAll((($('mApplySlot') || {}).value) || S.style.cur);
+  });
 }
 
 /* ================= 初始化 ================= */
@@ -2481,7 +3255,7 @@ function init(){
   ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor',
    'assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV',
    /* v0.9.231 新增：粗体 / 字间距 / 阴影·底衬 / 深度 / 边色 / 边色不透明 / 水平对齐 / 左右边距 */
-   'assDstBold','assSrcBold','assDstSpacing','assSrcSpacing','assDstEdge','assSrcEdge','assDstEdgeSize','assSrcEdgeSize',
+   'assDstBold','assSrcBold','assDstItalic','assSrcItalic','assDstSpacing','assSrcSpacing','assDstEdge','assSrcEdge','assDstEdgeSize','assSrcEdgeSize',
    'assDstEdgeColor','assSrcEdgeColor','assDstEdgeAlpha','assSrcEdgeAlpha','assDstAlign','assSrcAlign',
    'assMarginL','assMarginR'].forEach(id=>{
     const el = $(id); if (!el) return;
@@ -2592,6 +3366,10 @@ function init(){
     el.addEventListener('change', ()=>{ S.mode = el.value; syncMode(); });
   });
   $('btnSwap').addEventListener('click', swapSides);
+  /* v0.9.245：样式槽 + 筛选器（DOM 已就绪，可以直接绑） */
+  ensureStyle();
+  bindSlotUI();
+  renderSlots();
   S.mode = 'merge';
   syncMode();
   applyI18n();

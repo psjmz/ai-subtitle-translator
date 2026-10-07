@@ -635,8 +635,11 @@
   function formatVtt(items, opt) {
     const st = (opt && opt.style) || null;
     const srcIdx = (opt && opt.srcLine != null) ? +opt.srcLine : -1;
-    const ts = vttCueSettings(st);
+    const ts0 = vttCueSettings(st);
+    /* v0.9.245：样式槽 —— 每条 cue 可以自带一份 cue settings（line / position / size / align）。
+       这些是**整条级**参数，写不进 ::cue()，只能落在 cue 行尾；不传 it.settings 时沿用全局那份。 */
     const body = (items || []).map((it) => {
+      const ts = (it != null && it.settings != null && String(it.settings).trim() !== '') ? String(it.settings) : ts0;
       let tx = String(it.text == null ? '' : it.text);
       /* v0.9.241：标记与否跟 ::cue(.src) 规则**同进同出**（都由 vttSrcDecls 算定）。
          原文行全部「沿用」→ 一个字都不写、也不打标记（原文行与译文行完全一样）。 */
@@ -649,7 +652,11 @@
       }
       return it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + ts + '\n' + tx;
     }).join('\n\n');
-    const sb = vttStyleBlock(st);
+    /* v0.9.245：样式槽 —— 额外的 ::cue(.槽名) 规则拼进同一个 STYLE 块。
+       不传 extraRules 时与旧版逐字节一致（sb 就是 vttStyleBlock 的原样输出）。 */
+    let sb = vttStyleBlock(st);
+    const exRules = (opt && Array.isArray(opt.extraRules)) ? opt.extraRules.filter((x) => typeof x === 'string' && x.trim()) : [];
+    if (exRules.length) sb = sb ? (sb + '\n' + exRules.join('\n')) : ('STYLE\n' + exRules.join('\n'));
     return 'WEBVTT' + (sb ? '\n\n' + sb : '') + '\n\n' + body + '\n';
   }
 
@@ -728,8 +735,10 @@
     } else if (st.srcBgOn === 'off') sd.push('  background-color: transparent;');
     return sd;
   }
-  function vttStyleBlock(st) {
-    if (!st) return '';
+  /* v0.9.245：把「主样式的声明」从 vttStyleBlock 里抽出来。
+     样式槽要为某个槽生成 `::cue(.槽名)` 规则，判据必须和主样式**完全一致**
+     （值非法/留空就写不出声明，就不写规则）——各写一份必然漂移，所以共用这一个。 */
+  function vttMainDecls(st) {
     const d = [];
     const col = /^#[0-9a-fA-F]{6}$/.test(String(st.color || '').trim()) ? String(st.color).trim() : null;
     if (col) d.push('  color: ' + col + ';');
@@ -744,6 +753,24 @@
       const bg = vttRgba(st.bgColor || '#000000', st.bgAlpha == null ? 55 : st.bgAlpha);
       if (bg) d.push('  background-color: ' + bg + ';');
     }
+    return d;
+  }
+  /* v0.9.245：给一个样式槽生成它自己的两条规则（主行 + 原文行）。
+     类名只留 [A-Za-z0-9_-]，其余字符一律剥掉（CSS 类名里出现空格/点会变成后代选择器，等于写错规则）；
+     剥完为空 → 返回空串（宁可不写，也不写出匹配不到的死规则）。 */
+  function vttSlotRule(cls, st) {
+    const c = String(cls == null ? '' : cls).replace(/[^A-Za-z0-9_-]/g, '').trim();
+    if (!c || !st) return '';
+    const rules = [];
+    const d = vttMainDecls(st);
+    if (d.length) rules.push('::cue(.' + c + ') {\n' + d.join('\n') + '\n}');
+    const sd = vttSrcDecls(st);
+    if (sd.length) rules.push('::cue(.' + c + '.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
+    return rules.join('\n');
+  }
+  function vttStyleBlock(st) {
+    if (!st) return '';
+    const d = vttMainDecls(st);
     const rules = [];
     if (d.length) rules.push('::cue {\n' + d.join('\n') + '\n}');
     /* 原文行：Firefox 忽略带参 ::cue(.src) → 整片同色（已知，界面如实提示）。
@@ -1399,6 +1426,10 @@
     /* Bold：ASS 惯例 -1=粗 / 0=不粗。旧值译文 -1、原文 0（中文粗英文细）。 */
     const boldOf = (v, dflt) => { if (v == null || v === '') return dflt; return (v === true || v === -1 || v === 'true' || +v > 0) ? -1 : 0; };
     const DST_BOLD = boldOf(AS.dstBold, -1), SRC_BOLD = boldOf(AS.srcBold, 0);
+    /* v0.9.245：Italic —— 惯例与 Bold 相同（-1=斜体 / 0=正体）。
+       样式槽要靠它表达「旁白 / 歌词 = 斜体」这条行业惯例；旧写死值两侧都是正体，故默认 0。 */
+    const italOf = (v, dflt) => { if (v == null || v === '') return dflt; return (v === true || v === -1 || v === 'true' || +v > 0) ? -1 : 0; };
+    const DST_ITAL = italOf(AS.dstItalic, 0), SRC_ITAL = italOf(AS.srcItalic, 0);
     /* Spacing：字间距（px，1080p 基准），可负 */
     const spOf = v => Math.max(-20, Math.min(20, numOr(v, 0)));
     const DST_SP = spOf(AS.dstSpacing), SRC_SP = spOf(AS.srcSpacing);
@@ -1436,12 +1467,35 @@
       const sp = (o.spacing == null) ? 0 : o.spacing;
       /* v0.9.231：粗体/字间距/描边样式/阴影/底衬色/对齐/左右边距全部来自调用方，
          未给的分项沿用各自的旧默认值（见上方常量），不传 assStyle 时输出与 v0.9.230 逐字节一致。 */
+      /* v0.9.245：Italic 开放给调用方（此前写死 0）。
+         样式槽要靠它表达「旁白 / 歌词 = 斜体」这条行业惯例；
+         未传时恒为 0 → 不传 assStyle 的老调用输出与旧版逐字节一致。
+         ASS 惯例与 Bold 相同：-1 = 斜体，0 = 正体。 */
+      const ital = (o.italic == null || o.italic === '') ? 0
+                 : ((o.italic === true || o.italic === -1 || o.italic === 'true' || +o.italic > 0) ? -1 : 0);
       return 'Style: ' + name + ',' + f + ',' + o.size + ',' + withAlpha(o.color, o.alpha || '00') +
         ',&H000000FF,' + (o.outlineColor || '&H00000000') + ',' + (o.back || '&H64000000') + ',' +
-        (o.bold == null ? -1 : o.bold) + ',0,0,0,100,100,' + sp + ',0,' +
+        (o.bold == null ? -1 : o.bold) + ',' + ital + ',0,0,100,100,' + sp + ',0,' +
         (o.borderStyle || 1) + ',' + ol + ',' + (o.shadow || 0) + ',' + (o.align || 2) + ',' +
         ML + ',' + MR + ',' + (o.mv == null ? MV : o.mv) + ',1';
     };
+    /* v0.9.245：额外的 [V4+ Styles] 行——样式槽用。
+       每个样式槽在导出里就是一组独立的 ASS Style（译文行一套 + 原文行一套），
+       行级「用哪个槽」= Dialogue 的 Style 名指到哪一组。
+       ⚠️ 不传 opts.extraStyles 时 extraStyleLines 为空数组 → header 与旧版逐字节一致。 */
+    const EXTRA_NAMES = Object.create(null);
+    const extraStyleLines = [];
+    /* ⚠️ Style 名与 Dialogue 引用的名字必须**用同一把清洗器**，否则两边对不上
+       （Style 写成 BadName、Dialogue 仍引用 Bad,Name → 回落 Bottom，样式悄悄失效）。
+       逗号/换行会破坏 ASS 的 CSV 结构，一律剥掉；剥完为空才丢弃。 */
+    const cleanAssName = (v) => String(v == null ? '' : v).replace(/[\r\n,]/g, '').trim();
+    (Array.isArray(opts.extraStyles) ? opts.extraStyles : []).forEach(function (x) {
+      if (!x || !x.name) return;
+      const nm = cleanAssName(x.name);
+      if (!nm) return;
+      EXTRA_NAMES[nm] = true;
+      extraStyleLines.push(styleLine(nm, x.spec || {}));
+    });
     const header = [
       '[Script Info]',
       'Title: ' + (opts.title || 'Translated Subtitles'),
@@ -1454,33 +1508,38 @@
       '',
       '[V4+ Styles]',
       STYLE_FMT,
-      styleLine('Bottom', { size:DST_SZ, color:DST_C, align:DST_AL, bold:DST_BOLD, mv:DST_MV,
+      styleLine('Bottom', { size:DST_SZ, color:DST_C, align:DST_AL, bold:DST_BOLD, italic:DST_ITAL, mv:DST_MV,
         font:DST_FONT, outline:DST_OUTL, outlineColor:DST_OC, alpha:DST_A,
         spacing:DST_SP, borderStyle:DST_BS, shadow:DST_SH, back:DST_BC }),
-      styleLine('Top', { size:SRC_SZ, color:SRC_C, align:SRC_AL, bold:SRC_BOLD, mv:SRC_MV,
+      styleLine('Top', { size:SRC_SZ, color:SRC_C, align:SRC_AL, bold:SRC_BOLD, italic:SRC_ITAL, mv:SRC_MV,
         font:SRC_FONT, outline:SRC_OUTL, outlineColor:SRC_OC, alpha:SRC_A,
         spacing:SRC_SP, borderStyle:SRC_BS, shadow:SRC_SH, back:SRC_BC }),
       // TopMain（v0.9.35）：主语言样式——外观与 Bottom 一致（主字号/主色），
       // 「译文在上」分屏模式下译文用它，保证译文无论在哪都保持主阅读字号。
-      styleLine('TopMain', { size:DST_SZ, color:DST_C, align:DST_AL, bold:DST_BOLD, mv:DST_MV,
+      styleLine('TopMain', { size:DST_SZ, color:DST_C, align:DST_AL, bold:DST_BOLD, italic:DST_ITAL, mv:DST_MV,
         font:DST_FONT, outline:DST_OUTL, outlineColor:DST_OC, alpha:DST_A,
         spacing:DST_SP, borderStyle:DST_BS, shadow:DST_SH, back:DST_BC }),
       // Sub：副语言样式（v0.9.17，v0.9.35 提号到 50pt）——外观与 Top 一致（副字号/副色），
       // 纵向位置由每条 Dialogue 的 MarginV（ln.mv）指定；mv=0 时回退样式默认 MarginV。
-      styleLine('Sub', { size:SRC_SZ, color:SRC_C, align:SRC_AL, bold:SRC_BOLD, mv:SRC_MV,
+      styleLine('Sub', { size:SRC_SZ, color:SRC_C, align:SRC_AL, bold:SRC_BOLD, italic:SRC_ITAL, mv:SRC_MV,
         font:SRC_FONT, outline:SRC_OUTL, outlineColor:SRC_OC, alpha:SRC_A,
-        spacing:SRC_SP, borderStyle:SRC_BS, shadow:SRC_SH, back:SRC_BC }),
+        spacing:SRC_SP, borderStyle:SRC_BS, shadow:SRC_SH, back:SRC_BC })
+    ].concat(extraStyleLines).concat([
       '',
       '[Events]',
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
-    ];
+    ]);
     const evLines = [];
     for (const ev of (events || [])) {
       if (!ev) continue;
       (ev.lines || []).forEach((ln, i) => {
         if (!ln || !ln.text || !String(ln.text).trim()) return;
         const tx = String(ln.text).replace(/\r/g, '').replace(/\n/g, '\\N');
-        const st = ['Top', 'TopMain', 'Sub'].includes(ln.style) ? ln.style : 'Bottom';
+        /* v0.9.245：样式名白名单 = 四个内置 + 本次注册的槽样式（未在 extraStyles 里注册过的一律回落 Bottom，
+           绝不会出现「Dialogue 引用了不存在的 Style」这种畸形文件）。 */
+        const rawSt = cleanAssName(ln.style);
+        let st = EXTRA_NAMES[rawSt] ? rawSt
+               : (['Top', 'TopMain', 'Sub'].includes(rawSt) ? rawSt : 'Bottom');
         // v0.9.41 歌词斜体：含 ♪/♫ 的行按行业惯例（Netflix TTSG：italicize lyrics）加内联斜体标记，
         // 不新增样式（{\i1}/{\i0} 内联覆盖对所有现有样式生效；SRT/VTT/TXT 纯文本路径不受影响）。
         const musicLine = musicRe().test(tx);
@@ -2613,6 +2672,7 @@
                  times: [{ start: r.start || 0, end: r.end || 0 }],
                  srcParts: srcOne ? [String(r.en == null ? '' : r.en).replace(/\r/g, '').trim()] : [],
                  srcRawLines: rawLines.slice(),
+                 slot: r.slot || '',      /* v0.9.245：样式槽透传（见下） */
                  dst: String(r.zh).replace(/\r/g, '').trim() };
         entries.push(last);
         continue;
@@ -2621,6 +2681,7 @@
                times: [{ start: r.start || 0, end: r.end || 0 }],
                srcParts: srcOne ? [srcOne] : [],
                srcRawLines: rawLines.slice(),
+               slot: r.slot || '',      /* v0.9.245：样式槽透传（见下） */
                dst: squashLines(String(r.zh)) };
       entries.push(last);
     }
@@ -2631,8 +2692,12 @@
       for (const p of e.srcParts) srcText = srcText ? joinSrc(srcText, p) : p;
       const dstText = e.dst;
       if (!dstText) continue;
+      /* v0.9.245：样式槽透传。一条 row 可能因超宽被切成多条 part（切分路径见下），
+         也可能被 merged 行并入 —— 无论哪条路径，切出来的 part 都继承**承载行**的槽，
+         所以「第 N 行套了旁白槽」在导出里不会因为折行而丢。
+         ⚠️ 只在 part 上多挂一个 slot 字段，不传槽时恒为空串，既有调用逐字节不变。 */
       const pushItem = (st, en, sLines, dLines) => {
-        out.push({ no: out.length + 1, start: st, end: en, srcLines: sLines, dstLines: dLines });
+        out.push({ no: out.length + 1, start: st, end: en, srcLines: sLines, dstLines: dLines, slot: e.slot || '' });
       };
       // 每段是否都装得下：双语下译文段用 biMaxW（唯一硬约束），源文段用宽松的 srcCapW（仅防超屏）
       const fitsSeg = (segs, cap) => segs.every((x) => !x || textWidth(x) <= cap + 1e-9);
@@ -3386,6 +3451,7 @@
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
     VTT_CSS_WHITE, VTT_SRC_CLASS, vttStyleBlock, vttSrcDecls, vttCueSettings, vttShadowCss, vttFontStack, vttRgba,
+    vttMainDecls, vttSlotRule,   // v0.9.245 样式槽：为某个槽生成 ::cue(.槽名) / ::cue(.槽名.src) 规则
     vttUnRgba, vttFontKeyOf, parseVttStyle,   // v0.9.238 VTT 样式（merge 独立副本）；v0.9.241 原文行逐项沿用
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
