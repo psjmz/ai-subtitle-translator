@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.240/.test(mg), 'merge.html 未引用 v0.9.240 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.241/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.240</.test(html), '首页版本号未升 0.9.240');
-    assert.ok(/class="ver-tag">v0\.9\.240</.test(html), '工作台版本号未升 0.9.240');
-    assert.ok(/srt-core\.js\?v=0\.9\.240/.test(html), 'srt-core.js?v 未升 0.9.240');
+    assert.ok(/class="ver">v0\.9\.241</.test(html), '首页版本号未升 0.9.241');
+    assert.ok(/class="ver-tag">v0\.9\.241</.test(html), '工作台版本号未升 0.9.241');
+    assert.ok(/srt-core\.js\?v=0\.9\.241/.test(html), 'srt-core.js?v 未升 0.9.241');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5532,8 +5532,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.240</.test(mg), 'merge.html 版本未升 0.9.240');
-    assert.ok(/merge-core\.js\?v=0\.9\.240/.test(mg), 'merge-core.js?v 未升 0.9.240');
+    assert.ok(/class="ver">v0\.9\.241</.test(mg), 'merge.html 版本未升 0.9.241');
+    assert.ok(/merge-core\.js\?v=0\.9\.241/.test(mg), 'merge-core.js?v 未升 0.9.241');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6470,21 +6470,38 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/outline/.test(C.formatVtt(VTT_ITEMS, { style:{ shadowOn:true, shadowW:2 } })), 'outline 画的是方框不是字描边');
   });
 
-  t('v0.9.236：双语原文行包进 <c.src>，位置跟着 bi-src / bi-dst 走', () => {
-    const a = C.formatVtt(VTT_ITEMS, { style:{ srcDiff:true, srcColor:'#FFD700' }, srcLine:0 });
+  t('v0.9.236/241：双语原文行包进 <c.src>，位置跟着 bi-src / bi-dst 走；要不要区分由「写不写得出声明」定', () => {
+    const a = C.formatVtt(VTT_ITEMS, { style:{ srcColor:'#FFD700' }, srcLine:0 });
     assert.ok(/<c\.src>我们应该谈谈这件事。<\/c\.src>\nWe should talk about this\./.test(a), 'bi-src 应把第一行当原文');
-    const b = C.formatVtt(VTT_ITEMS, { style:{ srcDiff:true, srcColor:'#FFD700', srcSize:85 }, srcLine:1 });
+    const b = C.formatVtt(VTT_ITEMS, { style:{ srcColor:'#FFD700', srcSize:85 }, srcLine:1 });
     assert.ok(/我们应该谈谈这件事。\n<c\.src>We should talk about this\.<\/c\.src>/.test(b), 'bi-dst 应把第二行当原文');
     assert.ok(/::cue\(\.src\) \{\n  color: #FFD700;\n  font-size: 85%;\n\}/.test(b), '缺 ::cue(.src) 规则');
-    const c = C.formatVtt(VTT_ITEMS, { style:{ srcDiff:false }, srcLine:1 });
-    assert.ok(!/<c\.src>/.test(c), '关掉区分就不该写 class');
-    assert.ok(!/::cue\(\.src\)/.test(c), '关掉区分就不该输出 ::cue(.src)');
-    const d = C.formatVtt([{ no:1, start:0, end:1000, text:'只有一行' }], { style:{ srcDiff:true }, srcLine:0 });
+    /* v0.9.241：原文行全部「沿用」= 不打标记、不写规则（原文行与译文行完全一样），
+       改由「写不写得出声明」判定，不再看有没有勾某个总闸 */
+    const c = C.formatVtt(VTT_ITEMS, { style:{ srcColorInh:true, srcSizeInh:true, srcColor:'#FFD700', srcSize:85 }, srcLine:1 });
+    assert.ok(!/<c\.src>/.test(c), '全部沿用就不该写 class（哪怕输入框里还留着值）');
+    assert.ok(!/::cue\(\.src\)/.test(c), '全部沿用就不该输出 ::cue(.src)');
+    const d = C.formatVtt([{ no:1, start:0, end:1000, text:'只有一行' }], { style:{ srcColor:'#FFD700' }, srcLine:0 });
     assert.ok(!/<c\.src>/.test(d), '单语（只有一行）不该包 class');
+    /* 写不出声明（颜色非法、字号空）→ 两边都不做：不许留下匹配不到元素的死规则 */
+    const e = C.formatVtt(VTT_ITEMS, { style:{ srcColor:'not-a-color', srcSize:'' }, srcLine:1 });
+    assert.ok(!/<c\.src>/.test(e) && !/::cue\(\.src\)/.test(e), '写不出声明时不许留下死规则/死标记');
+    /* 逐项生效：只开原文行粗体 → 只写那一项，不夹带字号颜色。
+       ⚠️ 三态五项只有双语页那份引擎有（主站原文行只有字号、颜色两项），所以这里用 M。 */
+    const M = require('./merge-core.js');
+    const f = M.formatVtt(VTT_ITEMS, { style:{ srcBold:'on' }, srcLine:1 });
+    assert.ok(/<c\.src>/.test(f) && /::cue\(\.src\) \{\n  font-weight: bold;\n\}/.test(f),
+      '只开一项就该只写那一项：' + (f.match(/::cue\(\.src\) \{[^}]*\}/) || [''])[0]);
+    /* 「单独关」必须显式写 normal，否则 ::cue 的值会漏下来 */
+    const g = M.formatVtt(VTT_ITEMS, { style:{ srcBold:'off' }, srcLine:1 });
+    assert.ok(/::cue\(\.src\) \{\n  font-weight: normal;\n\}/.test(g), '「关」必须显式写 normal');
+    /* 主站那一份不带三态：只给 srcBold 不产生任何声明（不会伪造出主站没有的能力） */
+    const h = C.formatVtt(VTT_ITEMS, { style:{ srcBold:'on' }, srcLine:1 });
+    assert.ok(!/<c\.src>/.test(h) && !/::cue\(\.src\)/.test(h), '主站不该凭空支持原文行三态');
   });
 
   t('v0.9.236：导出的 VTT 能被自己解析回来（条数与时间轴不变）', () => {
-    const out = C.formatVtt(VTT_ITEMS, { style:{ color:'#FFFFFF', bgOn:true, srcDiff:true }, srcLine:1 });
+    const out = C.formatVtt(VTT_ITEMS, { style:{ color:'#FFFFFF', bgOn:true }, srcLine:1 });
     const r = C.parseVtt(out);
     assert.strictEqual(r.items.length, 1, 'STYLE 块被当成 cue 了（或 cue 丢了）');
     assert.strictEqual(r.items[0].start, 1000, '时间轴被样式块带偏');
@@ -6520,7 +6537,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const keys = ['secVttStyle','vttStyleTip','vttGrpPos','lblVttLine','vttAnchorBottom','vttAnchorTop','vttAnchorMid',
       'lblVttPos','lblVttWidth','lblVttAlign','vttAlignCenter','vttAlignStart','vttAlignEnd','vttGrpText','lblVttSize',
       'vttSizeTip','lblVttColor','lblVttFont','vttFontSans','vttFontSerif','vttFontMono','lblVttLH','lblVttWeight',
-      'vttBold','vttItalic','vttGrpSrc','lblVttSrcDiff','vttSrcDiffTip','lblVttSrcColor','lblVttSrcSize','vttGrpDeco',
+      'vttBold','vttItalic','vttGrpSrc','vttSrcDiffTip','vttInherit','vttOptSet','lblVttSrcColor','lblVttSrcSize','vttGrpDeco',
       'lblVttBg','lblVttShadow','vttShadowTip','vttFxTip'];
     const dictOf = (code) => {
       const m = new RegExp("'" + code + "'\\s*:\\s*\\{").exec(html);
@@ -6543,7 +6560,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   const V237_ITEMS = [{ no:1, start:1000, end:3200, text:'我们应该谈谈这件事。\nWe should talk about this.' }];
   const V237_ST = { line:'90', lineAlign:'end', position:'50', width:'80', align:'center', size:100, color:'#FFFFFF',
-    font:'sans', lineHeight:1.4, bold:false, italic:false, srcDiff:true, srcColor:'#FFD700', srcSize:85,
+    font:'sans', lineHeight:1.4, bold:false, italic:false, srcColor:'#FFD700', srcSize:85,
     bgOn:true, bgColor:'#000000', bgAlpha:55, shadowOn:true, shadowW:2, shadowColor:'#000000' };
 
   t('v0.9.237：自己写出去的样式能原样读回来（往返一致）', () => {
@@ -6556,7 +6573,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.strictEqual(s.lineHeight, '1.4');
     assert.strictEqual(s.bgColor, '#000000'); assert.strictEqual(s.bgAlpha, '55');
     assert.strictEqual(s.shadowW, '2'); assert.strictEqual(s.shadowColor, '#000000');
-    assert.strictEqual(s.srcColor, '#FFD700'); assert.strictEqual(s.srcSize, '85'); assert.strictEqual(s.srcDiff, true);
+    assert.strictEqual(s.srcColor, '#FFD700'); assert.strictEqual(s.srcSize, '85');
+    /* v0.9.241：原文行「单独设 / 沿用」从文件里读回 —— 这块里写了才是「单独设」 */
+    assert.strictEqual(s.srcColorInh, false); assert.strictEqual(s.srcSizeInh, false);
     assert.strictEqual(p.srcLine, 1, '原文行位置读错');
   });
 
@@ -6625,7 +6644,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('v0.9.237：样式方案覆盖面板全部字段（漏一个就不是那套样式）', () => {
     assert.ok(/const VTT_SCHEME_KEY='srt_vtt_style_v1';/.test(html), '缺方案存储键');
     const ids = ['vttLine','vttLineAlign','vttPos','vttWidth','vttAlign','vttSize','vttColor','vttFont','vttLH',
-      'vttBold','vttItalic','vttSrcDiff','vttSrcColor','vttSrcSize','vttBgOn','vttBgColor','vttBgAlpha',
+      'vttBold','vttItalic','vttSrcSizeMode','vttSrcColorMode','vttSrcColor','vttSrcSize','vttBgOn','vttBgColor','vttBgAlpha',
       'vttShadowOn','vttShadowW','vttShadowColor'];
     const m = /const VTT_SCHEME_IDS=\[([\s\S]*?)\];/.exec(html);
     assert.ok(m, '缺字段白名单');
@@ -6666,7 +6685,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/function vttNatRestart\(\)/.test(html) && /vttNatRestart\(\);/.test(html), '缺时间轴归零');
     /* 样式 / 格式一变就要重刷（否则预览是死的） */
     assert.ok(/if\(isVtt\)\{ try\{ vttNatSync\(\); \}catch\(e\)\{\} \}/.test(html), '导出预览没带动原生预览');
-    assert.ok(/syncColorSw\(id\); \}catch\(e\)\{\}\s*\}\);\s*try\{ vttNatSync\(\); \}/.test(html), 'syncVttStyleBox 没带动原生预览');
+    assert.ok(/forEach\(function\(id\)\{ try\{ syncColorSw\(id\); \}catch\(e\)\{\} \}\);[\s\S]{0,220}?vttNatSync\(\);/.test(html),
+      'syncVttStyleBox 没带动原生预览');
     assert.ok(/id="vttNatReplay"/.test(html), '缺重播按钮（定格后没法再看一眼）');
     /* ⚠️ VTTCue 的时间属性是 startTime/endTime；写成 c.start 会拿到 undefined → hold=NaN →
        setTimeout(fn,NaN) 立刻暂停 → play() 抛 AbortError → 定格在 0 秒（整块预览全黑） */
@@ -6702,14 +6722,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   const V238_ITEMS = [{ no:1, start:1000, end:3200, text:'我们应该谈谈这件事。\nWe should talk about this.' }];
   const V238_ST = { line:'90', lineAlign:'end', position:'50', width:'80', align:'center',
     size:'100', color:'#FFFFFF', font:'PingFang SC', lineHeight:'1.4', bold:true, italic:false,
-    srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+    srcColor:'#FFD700', srcSize:'85',
     bgOn:true, bgColor:'#000000', bgAlpha:'55', shadowOn:true, shadowW:'2', shadowColor:'#000000' };
 
   t('v0.9.238：两套引擎的 VTT 产物逐字节一致（参数同源，哪边漂移都会在这里炸）', () => {
     const variants = [
       V238_ST,
-      { line:'150', position:'-20', width:'12.5', size:'150', srcDiff:false, bgOn:false, shadowOn:false, shadowW:'0' },
-      { srcDiff:true, srcColor:'#C9D1D9', srcSize:'78' },
+      { line:'150', position:'-20', width:'12.5', size:'150', srcColorInh:true, srcSizeInh:true, bgOn:false, shadowOn:false, shadowW:'0' },
+      { srcColor:'#C9D1D9', srcSize:'78' },
       {}
     ];
     variants.forEach((st, i) => {
@@ -6753,7 +6773,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(mg.indexOf('srt-core.js') === -1, 'merge.html 又去引主站引擎了');
     assert.ok(!/SrtCore|require\(|\bimport\s/.test(mgcSrc), 'merge-core 引用了主站引擎的东西');
     const mainIds = ['vttLine','vttLineAlign','vttPos','vttWidth','vttAlign','vttSize','vttColor','vttFont','vttLH',
-      'vttBold','vttItalic','vttSrcDiff','vttSrcColor','vttSrcSize','vttBgOn','vttBgColor','vttBgAlpha',
+      'vttBold','vttItalic','vttSrcSizeMode','vttSrcColorMode','vttSrcColor','vttSrcSize','vttBgOn','vttBgColor','vttBgAlpha',
       'vttShadowOn','vttShadowW','vttShadowColor'];
     mainIds.forEach(id => assert.ok(mg.indexOf('id="' + id + '"') === -1, 'merge.html 用了主站的 id ' + id));
     const mineIds = mainIds.map(id => 'm' + id.charAt(0).toUpperCase() + id.slice(1));
@@ -6883,7 +6903,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const keys = ['tplVttStyle','tplSegVttStyle','tplHintVttStyle','vttPanelTitle','vttStyleTip','lblVttPreset',
       'vttPresetStd','vttPresetCompact','vttPresetCinema','vttPresetCustom','vttGrpPos','vttGrpText','vttGrpSrc','vttGrpFx',
       'lblVttLine','lblVttAnchor','lblVttPos','lblVttWidth','lblVttAlign','lblVttSize','lblVttColor','lblVttFont','lblVttLH',
-      'lblVttWeight','lblVttItalic','lblVttSrcDiff','lblVttSrcColor','lblVttSrcSize','lblVttBg','lblVttBgColor','lblVttBgAlpha',
+      'lblVttWeight','lblVttItalic','vttInherit','vttOptSet','lblVttSrcColor','lblVttSrcSize','lblVttBg','lblVttBgColor','lblVttBgAlpha',
       'lblVttShadow','lblVttShadowW','lblVttShadowColor','vttAnchorEnd','vttAnchorStart','vttAnchorMid',
       'vttAlignCenter','vttAlignStart','vttAlignEnd','vttFxTip','vttReset','vttResetDone','vttImportedNote',
       'vttLineNumNote','pvVttTitle'];
@@ -6913,7 +6933,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const M = require('./merge-core.js');
     const base = { size:'100', color:'#FFFFFF', font:'PingFang SC', bold:true, italic:false, lineHeight:'1.4',
       shadowOn:true, shadowW:'2', shadowColor:'#000000', bgOn:true, bgColor:'#000000', bgAlpha:55,
-      srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+      srcColor:'#FFD700', srcSize:'85',
       srcFont:'', srcBold:'', srcItalic:'', srcBgOn:'', srcBgColor:'#000000', srcBgAlpha:'55',
       srcShadowOn:'', srcShadowW:'2', srcShadowColor:'#000000' };
     const b = M.vttStyleBlock(base);
@@ -6925,7 +6945,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.239：三态「开」写得出 —— 字体/粗体/斜体/描边/底衬都能单独设', () => {
     const M = require('./merge-core.js');
-    const b = M.vttStyleBlock({ size:'100', color:'#FFFFFF', srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+    const b = M.vttStyleBlock({ size:'100', color:'#FFFFFF', srcColor:'#FFD700', srcSize:'85',
       srcFont:'serif', srcBold:'on', srcItalic:'on', srcShadowOn:'on', srcShadowW:'3', srcShadowColor:'#FF0000',
       srcBgOn:'on', srcBgColor:'#123456', srcBgAlpha:'80' });
     const sb = b.slice(b.indexOf('::cue(.src)'));
@@ -6936,7 +6956,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.239：三态「关」要显式写 normal / none / transparent', () => {
     const M = require('./merge-core.js');
-    const b = M.vttStyleBlock({ size:'100', color:'#FFFFFF', srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+    const b = M.vttStyleBlock({ size:'100', color:'#FFFFFF', srcColor:'#FFD700', srcSize:'85',
       srcBold:'off', srcItalic:'off', srcShadowOn:'off', srcBgOn:'off' });
     const sb = b.slice(b.indexOf('::cue(.src)'));
     /* 只「不写」是不够的：::cue 的值会漏下来，用户看到的就是「设了关还开着」 */
@@ -7076,5 +7096,154 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 导出档位的说明必须分「无样式 VTT」和「有样式 VTT」两句 —— 以前共用一句「纯文本无需设置」 */
     assert.ok(/tpl==='vtt' \? 'tplHintVttPlain'/.test(mg), '无样式 VTT 的说明与 SRT 混用了');
   });
+
+  /* ================= v0.9.241：删掉「区分原文」总闸，原文行改成「逐项沿用」 =================
+     用户诉求：「VTT 字幕下面的原文行勾选框是不是没有意义了」。
+     事实核查：它不是空按钮，而是**整组的总闸** —— 一关连字号、颜色都不生效，可提示里却写着
+     「字号与颜色始终单独设置」，文案与行为打架；而 239 之后字体/粗体/斜体/底衬/描边已经各自
+     有「沿用」，同一件事被两层开关表达，口径还相反。
+     定案（用户选）：删掉总闸，字号、颜色各补一个「沿用」，两页一起改。
+     规则：原文行**任一**项不是「沿用」→ 写 ::cue(.src) 并给原文行打 <c.src>；
+           全部沿用 → 一个字都不写（原文行与译文行完全一样）。 */
+  console.log('— v0.9.241：原文行逐项沿用（总闸删除） —');
+
+  t('v0.9.241：引擎只有一个判据 —— 原文行的声明在 vttSrcDecls 一处算定', () => {
+    const fs = require('fs');
+    const mc = fs.readFileSync('merge-core.js', 'utf8');
+    const sc = fs.readFileSync('srt-core.js', 'utf8');
+    [['merge', mc], ['主站', sc]].forEach(([n, src]) => {
+      assert.ok(/function vttSrcDecls\(st\)/.test(src), n + ' 引擎缺 vttSrcDecls');
+      assert.ok(/if \(srcIdx >= 0 && vttSrcDecls\(st\)\.length\)/.test(src), n + ' formatVtt 没走同一判据');
+      assert.ok(/const sd = vttSrcDecls\(st\);\s*\n\s*if \(sd\.length\) rules\.push\('::cue\(\.' \+ VTT_SRC_CLASS/.test(src),
+        n + ' vttStyleBlock 没走同一判据');
+      assert.strictEqual(src.indexOf('srcDiff'), -1, n + ' 引擎里还有 srcDiff 残留');
+    });
+    /* 标记与规则同进同出：不存在「打了 <c.src> 却没有 ::cue(.src)」的文件 */
+    const M = require('./merge-core.js');
+    const items = [{ no:1, start:0, end:1000, text:'甲\n乙' }];
+    const cases = [
+      [{}, false], [{ srcColorInh:true, srcSizeInh:true }, false],
+      [{ srcColor:'#FFD700' }, true], [{ srcSize:85 }, true],
+      [{ srcColor:'非法', srcSize:'' }, false],           /* 写不出来 → 两边都不做 */
+      [{ srcBold:'on' }, true], [{ srcBgOn:'off' }, true]
+    ];
+    cases.forEach(([st, want], i) => {
+      const out = M.formatVtt(items, { style:st, srcLine:1 });
+      const marked = /<c\.src>/.test(out), ruled = /::cue\(\.src\)/.test(out);
+      assert.strictEqual(marked, ruled, '用例 ' + i + '：「打了标记」与「写了规则」不一致');
+      assert.strictEqual(marked, want, '用例 ' + i + ' 的区分判定不对');
+      assert.ok(M.vttSrcDecls(st).length > 0 === want, 'vttSrcDecls 与产物不一致（用例 ' + i + '）');
+    });
+  });
+
+  t('v0.9.241：默认导出与 v0.9.239 逐字节相同（能力换了表示法，结果没变）', () => {
+    const M = require('./merge-core.js');
+    const base = { line:'90', size:'100', color:'#FFFFFF', font:'PingFang SC', lineHeight:'1.4',
+      bold:true, italic:false, bgOn:true, bgColor:'#000000', bgAlpha:'55',
+      shadowOn:true, shadowW:'2', shadowColor:'#000000' };
+    /* 239 走的是「总闸 + 字号颜色」，241 走「两个 mode」——同一套面板默认值必须产出同一份文件 */
+    const legacy = Object.assign({}, base, { srcDiff:true, srcColor:'#FFD700', srcSize:'85' });
+    const now    = Object.assign({}, base, { srcColorInh:false, srcSizeInh:false, srcColor:'#FFD700', srcSize:'85' });
+    const items = [{ no:1, start:1000, end:3200, text:'我们应该谈谈这件事。\nWe should talk about this.' }];
+    assert.strictEqual(M.vttStyleBlock(now), M.vttStyleBlock(legacy), 'STYLE 块与 239 不一致');
+    assert.strictEqual(M.formatVtt(items, { style:now, srcLine:1 }), M.formatVtt(items, { style:legacy, srcLine:1 }),
+      '整份 VTT 与 239 不一致');
+    /* 三套标准模板的原文行默认值必须落在「单独设」上（否则默认导出就变样了） */
+    const pres = new Function('return ' + /const MVTT_PRESETS\s*=\s*(\{[\s\S]*?\n\});/.exec(mg)[1])();
+    ['std', 'compact', 'cinema'].forEach(k => {
+      assert.strictEqual(pres[k].mVttSrcSizeMode, 'set', k + ' 模板的原文行字号默认不是「单独设」');
+      assert.strictEqual(pres[k].mVttSrcColorMode, 'set', k + ' 模板的原文行颜色默认不是「单独设」');
+    });
+  });
+
+  t('v0.9.241：「区分原文」总闸两页都删干净了，替换成两个「沿用」下拉', () => {
+    /* 双语页 */
+    assert.strictEqual((mg.match(/id="mVttSrcDiff"/g) || []).length, 0, 'merge.html 还留着区分原文勾选框');
+    assert.strictEqual((mg.match(/lblVttSrcDiff/g) || []).length, 0, 'merge.html 还留着「区分原文」的词条/控件');
+    assert.ok(/id="mVttSrcSizeMode"/.test(mg) && /id="mVttSrcColorMode"/.test(mg), 'merge.html 缺原文行的沿用下拉');
+    /* 主站 */
+    assert.ok(html.indexOf('id="vttSrcDiff"') === -1, 'index.html 还留着区分原文勾选框');
+    assert.strictEqual((html.match(/lblVttSrcDiff/g) || []).length, 0, 'index.html 还留着「区分原文」的词条/控件');
+    assert.ok(/id="vttSrcSizeMode"/.test(html) && /id="vttSrcColorMode"/.test(html), 'index.html 缺原文行的沿用下拉');
+    /* 两个下拉的选项必须是「沿用 / 单独设」，且默认落在「单独设」（与旧行为等价） */
+    [mg, html].forEach((src, i) => {
+      const n = i ? 'index.html' : 'merge.html';
+      const m = /<select id="[^"]*SrcSizeMode"[\s\S]{0,320}?<\/select>/.exec(src);
+      assert.ok(m, n + ' 取不到字号模式下拉');
+      assert.ok(/value=""[^>]*data-i18n="vttInherit"/.test(m[0]), n + ' 字号模式下拉缺「沿用」项');
+      assert.ok(/value="set"[^>]*data-i18n="vttOptSet"/.test(m[0]), n + ' 字号模式下拉缺「单独设」项');
+      assert.ok(/value="set"[^>]*selected/.test(m[0]), n + ' 字号模式默认不是「单独设」');
+    });
+    /* 面板上不再有「把整组一刀切掉」的东西 */
+    assert.ok(/srcColorInh:\(sel\('mVttSrcColorMode'\) === ''\)/.test(mg), 'merge 的取值没接上沿用下拉');
+    assert.ok(/srcColorInh: mono \|\| \(g\('vttSrcColorMode'\) === ''\)/.test(html), '主站取值没接上沿用下拉（单语要按沿用处理）');
+  });
+
+  t('v0.9.241：沿用只影响「写不写」，绝不动用户填的值', () => {
+    const M = require('./merge-core.js');
+    /* 「沿用」= 不写这一项，但不写别的项；值本身还在（面板靠 mode 决定生不生效） */
+    const onlySize = M.vttSrcDecls({ srcColorInh:true, srcColor:'#FFD700', srcSize:'85', srcSizeInh:false });
+    assert.deepStrictEqual(onlySize, ['  font-size: 85%;'], '颜色沿用却把字号也带上了/丢掉：' + JSON.stringify(onlySize));
+    const onlyColor = M.vttSrcDecls({ srcColorInh:false, srcColor:'#FFD700', srcSize:'85', srcSizeInh:true });
+    assert.deepStrictEqual(onlyColor, ['  color: #FFD700;'], '字号沿用却把颜色也带上了/丢掉：' + JSON.stringify(onlyColor));
+    assert.deepStrictEqual(M.vttSrcDecls({ srcColorInh:true, srcSizeInh:true }), [], '全沿用应一条都不写');
+    /* 面板侧：沿用用 CSS 变暗表示，不许 disable、更不许清空输入框 */
+    assert.ok(/\.af>input\.inh,\.af \.sw\.inh\{opacity:\.4\}/.test(mg), 'merge 的沿用态没有可见标记');
+    assert.ok(/\.vtt-c \.inh,\.vtt-c \.csw\.inh\{opacity:\.4\}/.test(html), '主站的沿用态没有可见标记');
+    assert.ok(/function syncSrcInh\(\)/.test(mg) && /function syncVttSrcInh\(\)/.test(html), '缺沿用态联动函数');
+    [mg, html].forEach((src, i) => {
+      const n = i ? 'index.html' : 'merge.html';
+      const fn = i ? src.slice(src.indexOf('function syncVttSrcInh()'), src.indexOf('function syncVttStyleBox()'))
+                   : src.slice(src.indexOf('function syncSrcInh()'), src.indexOf('function vttAfterFill()'));
+      assert.ok(fn.length > 0 && fn.indexOf('disabled') < 0, n + ' 沿用态把输入框 disable 了（用户就没法改值）');
+      assert.ok(/classList\.toggle\('inh'/.test(fn), n + ' 沿用态没切到 .inh');
+    });
+  });
+
+  t('v0.9.241：预览、导入、方案、快照都跟着逐项沿用走', () => {
+    /* 预览：字号、颜色各自判沿用（不能一律用原文行的值） */
+    const pv = mg.slice(mg.indexOf('function renderVttPv(){'), mg.indexOf('function vttPresetLabel(){'));
+    assert.ok(/const useSz = isS && !st\.srcSizeInh, useCol = isS && !st\.srcColorInh;/.test(pv), '预览没按项判沿用');
+    assert.ok(/num\(useSz \? st\.srcSize : st\.size/.test(pv), '预览的字号没按沿用回退到译文行');
+    assert.ok(/useCol \? col\(st\.srcColor/.test(pv), '预览的颜色没按沿用回退到译文行');
+    /* 导入继承：文件里 ::cue(.src) 写了哪项，哪项才是「单独设」 */
+    /* ⚠️ importVttStyle 在 syncVttChrome 之后定义，切片必须用「函数体内」的锚点 */
+    const im = mg.slice(mg.indexOf('function importVttStyle('), mg.indexOf('const n = filled.main + filled.src + filled.pos;'));
+    assert.ok(/put\('mVttSrcColorMode', s\.srcColorInh \? '' : 'set'\)/.test(im), '导入没回填颜色的沿用状态');
+    assert.ok(/put\('mVttSrcSizeMode', s\.srcSizeInh \? '' : 'set'\)/.test(im), '导入没回填字号的沿用状态');
+    assert.ok(im.indexOf('mVttSrcDiff') < 0, '导入还在写已删除的勾选框');
+    /* 方案：白名单要包含两个新控件（否则套用后模式丢了） */
+    assert.ok(/const VTT_SCHEME_IDS=\[[\s\S]*?'vttSrcSizeMode','vttSrcColorMode'/.test(html), '方案白名单漏了沿用下拉');
+    /* 快照：老存档的 vttSrcDiff='0'（不区分）必须还原成「两项都沿用」，不能因为键换了就恢复错 */
+    assert.ok(/sv\.vttSrcDiff === '0'/.test(html), '快照没兼容老存档的 vttSrcDiff');
+    /* ⚠️ 空串 = 沿用 是合法取值，两处 put 都会把空串当「没值」跳过，必须走专用分支 */
+    assert.ok(/putMode=function\(id,inh\)\{ var e=\$\(id\); if\(!e\) return; e\.value = inh \? '' : 'set'; n\+\+; \}/.test(html),
+      '导入回读没绕过「空串被跳过」这个坑');
+    assert.ok(/var m=function\(id,v\)\{ var e=\$\(id\); if\(!e \|\| v==null\) return; e\.value=v; \}/.test(html),
+      '快照恢复没绕过「空串被跳过」这个坑');
+  });
+
+  t('v0.9.241：新词条四语齐全', () => {
+    const dictOf = (src, code) => {
+      const m = new RegExp("'" + code + "'\\s*:\\s*\\{").exec(src);
+      assert.ok(m, '找不到语言块 ' + code);
+      const start = m.index + m[0].length;
+      const nx = /'[a-zA-Z][a-zA-Z-]*'\s*:\s*\{/.exec(src.slice(start));
+      return src.slice(start, start + (nx ? nx.index : src.length));
+    };
+    ['zh-CN', 'zh-TW', 'en', 'ja'].forEach(code => {
+      const dm = dictOf(mg, code);
+      assert.ok(new RegExp("[,\\s]vttOptSet:").test(dm), 'merge ' + code + ' 缺 vttOptSet');
+      assert.ok(new RegExp("[,\\s]vttInherit:").test(dm), 'merge ' + code + ' 缺 vttInherit');
+      const dh = dictOf(html, code);
+      assert.ok(new RegExp("[,\\s]vttInherit:").test(dh), 'index ' + code + ' 缺 vttInherit');
+      assert.ok(new RegExp("[,\\s]vttOptSet:").test(dh), 'index ' + code + ' 缺 vttOptSet');
+    });
+    /* 旧提示词条必须真的没了（留着就会有人照着它实现旧行为） */
+    assert.strictEqual((mg.match(/lblVttSrcDiff/g) || []).length, 0, 'merge 还留着已废弃的 lblVttSrcDiff');
+    assert.strictEqual((html.match(/lblVttSrcDiff/g) || []).length, 0, 'index 还留着已废弃的 lblVttSrcDiff');
+    assert.strictEqual((mg.match(/字号与颜色始终单独设置/g) || []).length, 0, 'merge 还留着与行为打架的旧说明');
+  });
+
 
 }

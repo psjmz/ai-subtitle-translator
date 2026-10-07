@@ -638,8 +638,9 @@
     const ts = vttCueSettings(st);
     const body = (items || []).map((it) => {
       let tx = String(it.text == null ? '' : it.text);
-      /* srcDiff 关掉 = 连 class 都不标：写了却没有对应 ::cue(.src) 规则，是纯粹的噪音 */
-      if (srcIdx >= 0 && (!st || st.srcDiff !== false)) {
+      /* v0.9.241：标记与否跟 ::cue(.src) 规则**同进同出**（都由 vttSrcDecls 算定）。
+         原文行全部「沿用」→ 一个字都不写、也不打标记（原文行与译文行完全一样）。 */
+      if (srcIdx >= 0 && vttSrcDecls(st).length) {
         const lines = tx.split('\n');
         if (lines.length > 1 && srcIdx < lines.length && lines[srcIdx].trim()) {
           lines[srcIdx] = '<c.' + VTT_SRC_CLASS + '>' + lines[srcIdx] + '</c.' + VTT_SRC_CLASS + '>';
@@ -691,6 +692,42 @@
     return [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]]
       .map((p) => (p[0] * w) + 'px ' + (p[1] * w) + 'px 0 ' + c).join(', ');
   }
+  /* v0.9.241：原文行的样式声明**在这一处算定**，别处不再各自判断。
+     判据是「真的写得出声明」，不是「有没有勾某个开关」——
+     于是导出里有没有 ::cue(.src) 规则、文本里有没有 <c.src> 标记永远同进同出。
+     值留空 / 非法（比如颜色不是 #RRGGBB）→ 写不出声明 → 两边都不做，
+     既不会留下匹配不到元素的死规则，也不会出现「打了标记却没规则」的噪音。
+
+     原文行每一项都能「沿用」（= 跟译文行一样，一个字都不写）：
+       · 字号、颜色 → srcSizeInh / srcColorInh（true = 沿用）
+       · 字体、粗体、斜体、底衬、描边 → 三态 ''（沿用）/ 'on' / 'off'
+     全部沿用 = 原文行与译文行完全一样。这就是原来那个「区分原文」总闸表达的意思，
+     区别是现在**逐项生效**：设了哪项就写哪项，不会一关废掉一片。 */
+  function vttSrcDecls(st) {
+    if (!st) return [];
+    const sd = [];
+    if (!st.srcColorInh) {
+      const sc = /^#[0-9a-fA-F]{6}$/.test(String(st.srcColor || '').trim()) ? String(st.srcColor).trim() : null;
+      if (sc) sd.push('  color: ' + sc + ';');
+    }
+    if (!st.srcSizeInh && st.srcSize != null && String(st.srcSize).trim() !== '' && isFinite(+st.srcSize)) {
+      sd.push('  font-size: ' + (+st.srcSize) + '%;');
+    }
+    /* v0.9.239 的三态：'on' / 'off' 才写，「沿用」一个字都不写。
+       「关」要显式写 normal / none / transparent（光不写会让 ::cue 的值漏下来）。 */
+    if (String(st.srcFont || '').trim()) sd.push('  font-family: ' + vttFontStack(st.srcFont) + ';');
+    if (st.srcBold === 'on') sd.push('  font-weight: bold;');
+    else if (st.srcBold === 'off') sd.push('  font-weight: normal;');
+    if (st.srcItalic === 'on') sd.push('  font-style: italic;');
+    else if (st.srcItalic === 'off') sd.push('  font-style: normal;');
+    if (st.srcShadowOn === 'on') { const ssh = vttShadowCss(st, 'src'); if (ssh) sd.push('  text-shadow: ' + ssh + ';'); }
+    else if (st.srcShadowOn === 'off') sd.push('  text-shadow: none;');
+    if (st.srcBgOn === 'on') {
+      const sbg = vttRgba(st.srcBgColor || '#000000', st.srcBgAlpha == null ? 55 : st.srcBgAlpha);
+      if (sbg) sd.push('  background-color: ' + sbg + ';');
+    } else if (st.srcBgOn === 'off') sd.push('  background-color: transparent;');
+    return sd;
+  }
   function vttStyleBlock(st) {
     if (!st) return '';
     const d = [];
@@ -709,28 +746,10 @@
     }
     const rules = [];
     if (d.length) rules.push('::cue {\n' + d.join('\n') + '\n}');
-    /* 原文行：双语 + 用户开了区分才输出。Firefox 忽略带参 ::cue(.src) → 整片同色（已知，界面如实提示）。 */
-    if (st.srcDiff !== false) {
-      const sd = [];
-      const sc = /^#[0-9a-fA-F]{6}$/.test(String(st.srcColor || '').trim()) ? String(st.srcColor).trim() : null;
-      if (sc) sd.push('  color: ' + sc + ';');
-      if (st.srcSize != null && String(st.srcSize).trim() !== '' && isFinite(+st.srcSize)) sd.push('  font-size: ' + (+st.srcSize) + '%;');
-      /* v0.9.239：原文行的字体/粗体/斜体/底衬/描边是三态（沿用 / 开 / 关）。
-         「沿用」= 一个字都不写 —— 默认值就是沿用，所以 238 的导出逐字节不变；
-         「关」要显式写 normal / none / transparent（光不写会让 ::cue 的值漏下来）。 */
-      if (String(st.srcFont || '').trim()) sd.push('  font-family: ' + vttFontStack(st.srcFont) + ';');
-      if (st.srcBold === 'on') sd.push('  font-weight: bold;');
-      else if (st.srcBold === 'off') sd.push('  font-weight: normal;');
-      if (st.srcItalic === 'on') sd.push('  font-style: italic;');
-      else if (st.srcItalic === 'off') sd.push('  font-style: normal;');
-      if (st.srcShadowOn === 'on') { const ssh = vttShadowCss(st, 'src'); if (ssh) sd.push('  text-shadow: ' + ssh + ';'); }
-      else if (st.srcShadowOn === 'off') sd.push('  text-shadow: none;');
-      if (st.srcBgOn === 'on') {
-        const sbg = vttRgba(st.srcBgColor || '#000000', st.srcBgAlpha == null ? 55 : st.srcBgAlpha);
-        if (sbg) sd.push('  background-color: ' + sbg + ';');
-      } else if (st.srcBgOn === 'off') sd.push('  background-color: transparent;');
-      if (sd.length) rules.push('::cue(.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
-    }
+    /* 原文行：Firefox 忽略带参 ::cue(.src) → 整片同色（已知，界面如实提示）。
+       写不写由 vttSrcDecls 一处算定：声明数为 0 就连规则都不出现（不留死规则）。 */
+    const sd = vttSrcDecls(st);
+    if (sd.length) rules.push('::cue(.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
     if (!rules.length) return '';
     return 'STYLE\n' + rules.join('\n');
   }
@@ -857,7 +876,12 @@
           if (ssh) { st.srcShadowOn = 'on'; st.srcShadowW = String(ssh.w); st.srcShadowColor = ssh.color; }
           else if (/^none$/i.test(d['text-shadow'].trim())) st.srcShadowOn = 'off';
         }
-        st.srcDiff = true;
+        /* v0.9.241：原文行每一项的「沿用」从文件里读回来 ——
+           这块里写了的项就是「单独设」，没写的项就是「沿用」。
+           ⚠️ 整块 ::cue(.src) 都不存在时不碰面板现值：导入只填读到的字段，
+              不拿「文件里没有」去冲掉用户自己已经调好的原文行设置。 */
+        st.srcColorInh = !st.srcColor;
+        st.srcSizeInh = (st.srcSize == null);
         res.found = true;
       }
     }
@@ -3361,8 +3385,8 @@
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
-    VTT_CSS_WHITE, VTT_SRC_CLASS, vttStyleBlock, vttCueSettings, vttShadowCss, vttFontStack, vttRgba,
-    vttUnRgba, vttFontKeyOf, parseVttStyle,   // v0.9.238 VTT 样式（merge 独立副本）
+    VTT_CSS_WHITE, VTT_SRC_CLASS, vttStyleBlock, vttSrcDecls, vttCueSettings, vttShadowCss, vttFontStack, vttRgba,
+    vttUnRgba, vttFontKeyOf, parseVttStyle,   // v0.9.238 VTT 样式（merge 独立副本）；v0.9.241 原文行逐项沿用
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,

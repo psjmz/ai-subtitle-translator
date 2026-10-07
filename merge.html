@@ -129,6 +129,10 @@
   .af>input[type=text]{flex:0 0 116px}
   .af>select{flex:0 1 168px}
   .af>input[type=range]{flex:0 0 120px;accent-color:var(--acc)}
+  /* v0.9.241：原文行「沿用 / 单独设」的窄下拉（跟字号、颜色的值控件并排一行） */
+  .af>select.me{flex:0 0 76px}
+  /* 选「沿用」时值控件变暗：看得见这一项此刻不生效（值本身保留，切回来即恢复） */
+  .af>input.inh,.af .sw.inh{opacity:.4}
   .af .pct{font-size:11px;color:var(--mut);width:38px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
   .af .sw{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--line-strong);flex:none}
   .af .radios{flex:1 1 auto}
@@ -248,7 +252,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.240</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.241</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -532,10 +536,15 @@
           </div>
           <div class="ass-col">
             <h4 data-i18n="vttGrpSrc">原文行</h4>
-            <div class="hint ass-note" data-i18n="vttSrcTip">字号与颜色始终单独设置；字体、粗体、斜体、底衬、描边默认「沿用」= 跟译文行一样，改了才写进 ::cue(.src)。</div>
-            <div class="af"><label data-i18n="lblVttSrcDiff">区分原文</label><input type="checkbox" id="mVttSrcDiff" checked></div>
-            <div class="af"><label data-i18n="lblVttSrcSize">字号</label><input type="number" id="mVttSrcSize" value="85" step="5"></div>
-            <div class="af"><label data-i18n="lblVttSrcColor">颜色</label><input type="text" id="mVttSrcColor" value="#FFD700"><span class="sw" id="mVttSrcColorSw"></span></div>
+            <div class="hint ass-note" data-i18n="vttSrcTip">每一项都能「沿用」译文行 —— 沿用就不写进 ::cue(.src)。全部沿用 = 原文行与译文行完全一样（不打标记、不写规则）。</div>
+            <div class="af"><label data-i18n="lblVttSrcSize">字号</label><select id="mVttSrcSizeMode" class="me">
+              <option value="" data-i18n="vttInherit">沿用</option>
+              <option value="set" data-i18n="vttOptSet" selected>单独设</option>
+            </select><input type="number" id="mVttSrcSize" value="85" step="5"></div>
+            <div class="af"><label data-i18n="lblVttSrcColor">颜色</label><select id="mVttSrcColorMode" class="me">
+              <option value="" data-i18n="vttInherit">沿用</option>
+              <option value="set" data-i18n="vttOptSet" selected>单独设</option>
+            </select><input type="text" id="mVttSrcColor" value="#FFD700"><span class="sw" id="mVttSrcColorSw"></span></div>
             <div class="af"><label data-i18n="lblVttSrcFont">字体</label><select id="mVttSrcFont"></select></div>
             <div class="af"><label data-i18n="lblVttSrcBold">粗体</label><select id="mVttSrcBold">
               <option value="" data-i18n="vttInherit" selected>沿用</option>
@@ -633,7 +642,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.240"></script>
+<script src="merge-core.js?v=0.9.241"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -703,8 +712,8 @@ const I18N = {
     vttPresetCinema:'电影感 · 大字描边', vttPresetCustom:'自定义',
     vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底衬 / 描边',
     vttGrpAll:'整条字幕（两层共用）', vttGrpDst:'译文行（主样式）',
-    vttSrcTip:'字号与颜色始终单独设置；字体、粗体、斜体、底衬、描边默认「沿用」= 跟译文行一样，改了才写进 ::cue(.src)。',
-    vttInherit:'沿用', vttOptNormal:'常规', vttOptOn:'开', vttOptOff:'关',
+    vttSrcTip:'原文行每一项都能「沿用」译文行 —— 沿用就不写进 ::cue(.src)。全部沿用 = 原文行与译文行完全一样（不打标记、不写规则）。',
+    vttInherit:'沿用', vttOptSet:'单独设', vttOptNormal:'常规', vttOptOn:'开', vttOptOff:'关',
     lblVttSrcFont:'字体', lblVttSrcBold:'粗体', lblVttSrcItalic:'斜体',
     lblVttSrcBg:'底衬', lblVttSrcBgColor:'底衬色', lblVttSrcBgAlpha:'底衬不透明',
     lblVttSrcShadow:'描边', lblVttSrcShadowW:'粗细', lblVttSrcShadowColor:'描边色',
@@ -712,7 +721,7 @@ const I18N = {
     lblVttPos:'水平 position', lblVttWidth:'宽度 size', lblVttAlign:'对齐 align',
     vttAlignCenter:'居中', vttAlignStart:'左', vttAlignEnd:'右',
     lblVttSize:'字号', lblVttColor:'颜色', lblVttFont:'字体', lblVttLH:'行高', lblVttWeight:'粗体', lblVttItalic:'斜体',
-    lblVttSrcDiff:'区分原文', lblVttSrcColor:'原文颜色', lblVttSrcSize:'原文字号',
+    lblVttSrcColor:'原文颜色', lblVttSrcSize:'原文字号',
     lblVttBg:'底衬', lblVttBgColor:'底衬色', lblVttBgAlpha:'底衬不透明',
     lblVttShadow:'描边', lblVttShadowW:'粗细', lblVttShadowColor:'描边色',
     vttFxTip:'VTT 没有真正的字描边，这里用八向 text-shadow 模拟；字间距、旋转等浏览器原生不支持，不会写出来。',
@@ -802,8 +811,8 @@ const I18N = {
     vttPresetCinema:'電影感 · 大字描邊', vttPresetCustom:'自訂',
     vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 描邊',
     vttGrpAll:'整條字幕（兩層共用）', vttGrpDst:'譯文行（主樣式）',
-    vttSrcTip:'字號與顏色一律單獨設定；字體、粗體、斜體、底襯、描邊預設「沿用」＝跟譯文行一樣，改了才寫進 ::cue(.src)。',
-    vttInherit:'沿用', vttOptNormal:'常規', vttOptOn:'開', vttOptOff:'關',
+    vttSrcTip:'原文行每一項都能「沿用」譯文行 —— 沿用就不寫進 ::cue(.src)。全部沿用 = 原文行與譯文行完全一樣（不打標記、不寫規則）。',
+    vttInherit:'沿用', vttOptSet:'單獨設', vttOptNormal:'常規', vttOptOn:'開', vttOptOff:'關',
     lblVttSrcFont:'字體', lblVttSrcBold:'粗體', lblVttSrcItalic:'斜體',
     lblVttSrcBg:'底襯', lblVttSrcBgColor:'底襯色', lblVttSrcBgAlpha:'底襯不透明',
     lblVttSrcShadow:'描邊', lblVttSrcShadowW:'粗細', lblVttSrcShadowColor:'描邊色',
@@ -811,7 +820,7 @@ const I18N = {
     lblVttPos:'水平 position', lblVttWidth:'寬度 size', lblVttAlign:'對齊 align',
     vttAlignCenter:'置中', vttAlignStart:'左', vttAlignEnd:'右',
     lblVttSize:'字號', lblVttColor:'顏色', lblVttFont:'字體', lblVttLH:'行高', lblVttWeight:'粗體', lblVttItalic:'斜體',
-    lblVttSrcDiff:'區分原文', lblVttSrcColor:'原文顏色', lblVttSrcSize:'原文字號',
+    lblVttSrcColor:'原文顏色', lblVttSrcSize:'原文字號',
     lblVttBg:'底襯', lblVttBgColor:'底襯色', lblVttBgAlpha:'底襯不透明',
     lblVttShadow:'描邊', lblVttShadowW:'粗細', lblVttShadowColor:'描邊色',
     vttFxTip:'VTT 沒有真正的字描邊，這裡用八向 text-shadow 模擬；字距、旋轉等瀏覽器原生不支援，不會寫出來。',
@@ -901,8 +910,8 @@ const I18N = {
     vttPresetCinema:'Cinematic · large with outline', vttPresetCustom:'Custom',
     vttGrpPos:'Position (percent)', vttGrpText:'Text', vttGrpSrc:'Original line', vttGrpFx:'Box / outline',
     vttGrpAll:'Whole cue (both lines)', vttGrpDst:'Translation (base style)',
-    vttSrcTip:'Size and colour are always set separately. Font, weight, italic, box and outline default to Inherit = same as the translation line; only what you change gets written to ::cue(.src).',
-    vttInherit:'Inherit', vttOptNormal:'Normal', vttOptOn:'On', vttOptOff:'Off',
+    vttSrcTip:'Every item on the original line can “inherit” the translation line — inherited items are never written into ::cue(.src). Inherit everything and the two lines look exactly the same (no markup, no rule).',
+    vttInherit:'Inherit', vttOptSet:'Custom', vttOptNormal:'Normal', vttOptOn:'On', vttOptOff:'Off',
     lblVttSrcFont:'Font', lblVttSrcBold:'Bold', lblVttSrcItalic:'Italic',
     lblVttSrcBg:'Box', lblVttSrcBgColor:'Box colour', lblVttSrcBgAlpha:'Box opacity',
     lblVttSrcShadow:'Outline', lblVttSrcShadowW:'Width', lblVttSrcShadowColor:'Outline colour',
@@ -910,7 +919,7 @@ const I18N = {
     lblVttPos:'Horizontal position', lblVttWidth:'Width size', lblVttAlign:'Align',
     vttAlignCenter:'Center', vttAlignStart:'Left', vttAlignEnd:'Right',
     lblVttSize:'Font size', lblVttColor:'Color', lblVttFont:'Font', lblVttLH:'Line height', lblVttWeight:'Bold', lblVttItalic:'Italic',
-    lblVttSrcDiff:'Differentiate original', lblVttSrcColor:'Original color', lblVttSrcSize:'Original size',
+    lblVttSrcColor:'Original color', lblVttSrcSize:'Original size',
     lblVttBg:'Box', lblVttBgColor:'Box color', lblVttBgAlpha:'Box opacity',
     lblVttShadow:'Outline', lblVttShadowW:'Width', lblVttShadowColor:'Outline color',
     vttFxTip:'WebVTT has no real text outline — an eight-direction text-shadow is used instead. Letter spacing, rotation and similar are not supported by browsers and are never written.',
@@ -1000,8 +1009,8 @@ const I18N = {
     vttPresetCinema:'シネマ · 大きめ＋縁取り', vttPresetCustom:'カスタム',
     vttGrpPos:'位置（パーセント）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 縁取り',
     vttGrpAll:'字幕全体（両方の行）', vttGrpDst:'訳文行（基本スタイル）',
-    vttSrcTip:'サイズと色は常に個別設定。フォント・太字・斜体・底襯・縁取りは既定で「沿用」＝訳文行と同じ。変更した項目だけ ::cue(.src) に書き出されます。',
-    vttInherit:'沿用', vttOptNormal:'標準', vttOptOn:'オン', vttOptOff:'オフ',
+    vttSrcTip:'原文行の各項目は「沿用」＝訳文行と同じにできます（沿用にした項目は ::cue(.src) に書き出されません）。すべて沿用にすると原文行と訳文行は完全に同じになります（マークも規則もなし）。',
+    vttInherit:'沿用', vttOptSet:'個別設定', vttOptNormal:'標準', vttOptOn:'オン', vttOptOff:'オフ',
     lblVttSrcFont:'フォント', lblVttSrcBold:'太字', lblVttSrcItalic:'斜体',
     lblVttSrcBg:'底襯', lblVttSrcBgColor:'底襯の色', lblVttSrcBgAlpha:'底襯の不透明度',
     lblVttSrcShadow:'縁取り', lblVttSrcShadowW:'太さ', lblVttSrcShadowColor:'縁取りの色',
@@ -1009,7 +1018,7 @@ const I18N = {
     lblVttPos:'水平 position', lblVttWidth:'幅 size', lblVttAlign:'揃え align',
     vttAlignCenter:'中央', vttAlignStart:'左', vttAlignEnd:'右',
     lblVttSize:'文字サイズ', lblVttColor:'色', lblVttFont:'フォント', lblVttLH:'行間', lblVttWeight:'太字', lblVttItalic:'斜体',
-    lblVttSrcDiff:'原文を区別', lblVttSrcColor:'原文の色', lblVttSrcSize:'原文のサイズ',
+    lblVttSrcColor:'原文の色', lblVttSrcSize:'原文のサイズ',
     lblVttBg:'底襯', lblVttBgColor:'底襯の色', lblVttBgAlpha:'底襯の不透明度',
     lblVttShadow:'縁取り', lblVttShadowW:'太さ', lblVttShadowColor:'縁取りの色',
     vttFxTip:'VTT に本物の文字縁取りはありません。八方向の text-shadow で代用しています。字間・回転などはブラウザが対応しないため書き出しません。',
@@ -1853,17 +1862,19 @@ function renderAssPv(){
 const MVTT_POS_IDS  = ['mVttLine','mVttLineAlign','mVttPos','mVttWidth','mVttAlign'];
 const MVTT_MAIN_IDS = ['mVttSize','mVttColor','mVttFont','mVttLH','mVttBold','mVttItalic',
   'mVttBgOn','mVttBgColor','mVttBgAlpha','mVttShadowOn','mVttShadowW','mVttShadowColor'];
-const MVTT_SRC_IDS  = ['mVttSrcDiff','mVttSrcColor','mVttSrcSize','mVttSrcFont','mVttSrcBold','mVttSrcItalic',
+const MVTT_SRC_IDS  = ['mVttSrcSizeMode','mVttSrcColorMode','mVttSrcColor','mVttSrcSize','mVttSrcFont','mVttSrcBold','mVttSrcItalic',
   'mVttSrcBgOn','mVttSrcBgColor','mVttSrcBgAlpha','mVttSrcShadowOn','mVttSrcShadowW','mVttSrcShadowColor'];
 const MVTT_COLOR_IDS = ['mVttColor','mVttSrcColor','mVttBgColor','mVttShadowColor','mVttSrcBgColor','mVttSrcShadowColor'];
 /* v0.9.239：原文行新开的五项（字体 / 粗体 / 斜体 / 底衬 / 描边）一律三态 ——
    '' = 沿用主样式（一个字都不写）、'on' = 单独开、'off' = 单独关。
-   默认全「沿用」，所以套任何标准模板后的导出与 v0.9.238 逐字节相同：能力放开了，既有结果没变。 */
+   v0.9.241：字号、颜色也补上「沿用」（`mVttSrcSizeMode` / `mVttSrcColorMode`：'' = 沿用，'set' = 单独设），
+   原来那个「区分原文」总闸删掉 —— 全部沿用就等于「不区分」，不用再有一层开关把它一刀切掉。
+   默认全沿用/单独设的取值与 v0.9.239 等价，所以套任何标准模板后的导出逐字节不变。 */
 const MVTT_PRESETS = {
   /* 标准 · 底部双语：与旧「无风格」观感接近（白字 + 金色原文 + 半透明底衬 + 细描边） */
   std: { mVttLine:'90', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'80', mVttAlign:'center',
     mVttSize:'100', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.4', mVttBold:true, mVttItalic:false,
-    mVttSrcDiff:true, mVttSrcColor:'#FFD700', mVttSrcSize:'85',
+    mVttSrcSizeMode:'set', mVttSrcColorMode:'set', mVttSrcColor:'#FFD700', mVttSrcSize:'85',
     mVttSrcFont:'', mVttSrcBold:'', mVttSrcItalic:'', mVttSrcBgOn:'', mVttSrcBgColor:'#000000', mVttSrcBgAlpha:'55',
     mVttSrcShadowOn:'', mVttSrcShadowW:'2', mVttSrcShadowColor:'#000000',
     mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'55',
@@ -1871,7 +1882,7 @@ const MVTT_PRESETS = {
   /* 紧凑 · 小字窄幅：不抢画面，纪录片/长对白用 */
   compact: { mVttLine:'93', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'70', mVttAlign:'center',
     mVttSize:'88', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.35', mVttBold:false, mVttItalic:false,
-    mVttSrcDiff:true, mVttSrcColor:'#C9D1D9', mVttSrcSize:'78',
+    mVttSrcSizeMode:'set', mVttSrcColorMode:'set', mVttSrcColor:'#C9D1D9', mVttSrcSize:'78',
     mVttSrcFont:'', mVttSrcBold:'', mVttSrcItalic:'', mVttSrcBgOn:'', mVttSrcBgColor:'#000000', mVttSrcBgAlpha:'55',
     mVttSrcShadowOn:'', mVttSrcShadowW:'2', mVttSrcShadowColor:'#000000',
     mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'40',
@@ -1879,7 +1890,7 @@ const MVTT_PRESETS = {
   /* 电影感 · 大字描边：不要底衬，靠描边压住亮画面 */
   cinema: { mVttLine:'88', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'84', mVttAlign:'center',
     mVttSize:'115', mVttColor:'#FFF6E5', mVttFont:'PingFang SC', mVttLH:'1.45', mVttBold:false, mVttItalic:false,
-    mVttSrcDiff:true, mVttSrcColor:'#B9C8DA', mVttSrcSize:'80',
+    mVttSrcSizeMode:'set', mVttSrcColorMode:'set', mVttSrcColor:'#B9C8DA', mVttSrcSize:'80',
     mVttSrcFont:'', mVttSrcBold:'', mVttSrcItalic:'', mVttSrcBgOn:'', mVttSrcBgColor:'#000000', mVttSrcBgAlpha:'55',
     mVttSrcShadowOn:'', mVttSrcShadowW:'2', mVttSrcShadowColor:'#000000',
     mVttBgOn:false, mVttBgColor:'#000000', mVttBgAlpha:'55',
@@ -1905,7 +1916,18 @@ function vttAlphaOut(){
     if (r && o) o.textContent = String(r.value) + '%';
   });
 }
+/* v0.9.241：原文行的字号、颜色选「沿用」时把值控件变暗 —— 值本身保留（切回「单独设」即恢复），
+   只是看得见这一项此刻不生效。不做「沿用就把输入框清空」那种事：用户填过的东西不许被抹掉。 */
+function syncSrcInh(){
+  [['mVttSrcSizeMode','mVttSrcSize',null],['mVttSrcColorMode','mVttSrcColor','mVttSrcColorSw']].forEach(function(p){
+    const m = $(p[0]), v = $(p[1]); if (!m || !v) return;
+    const inh = (m.value === '');
+    v.classList.toggle('inh', inh);
+    const sw = p[2] ? $(p[2]) : null; if (sw) sw.classList.toggle('inh', inh);
+  });
+}
 function vttAfterFill(){
+  syncSrcInh();
   MVTT_COLOR_IDS.forEach(syncColorSw);
   vttAlphaOut();
   renderVttPv();
@@ -1930,7 +1952,8 @@ function vttStyleOf(){
     position:g('mVttPos'), width:g('mVttWidth'), align:($('mVttAlign')||{}).value || 'center',
     size:g('mVttSize'), color:g('mVttColor'), font:($('mVttFont')||{}).value || '', lineHeight:g('mVttLH'),
     bold:ck('mVttBold'), italic:ck('mVttItalic'),
-    srcDiff:ck('mVttSrcDiff'), srcColor:g('mVttSrcColor'), srcSize:g('mVttSrcSize'),
+    srcColorInh:(sel('mVttSrcColorMode') === ''), srcSizeInh:(sel('mVttSrcSizeMode') === ''),
+    srcColor:g('mVttSrcColor'), srcSize:g('mVttSrcSize'),
     /* 三态：'' = 沿用（不写）、'on' = 单独开、'off' = 单独关 */
     srcFont:sel('mVttSrcFont'), srcBold:sel('mVttSrcBold'), srcItalic:sel('mVttSrcItalic'),
     srcBgOn:sel('mVttSrcBgOn'), srcBgColor:g('mVttSrcBgColor'), srcBgAlpha:g('mVttSrcBgAlpha'),
@@ -1956,9 +1979,11 @@ function vttCueParts(){
 function buildVttExport(){
   const st = vttStyleOf();
   const mark = s => '<c.' + C.VTT_SRC_CLASS + '>' + s + '</c.' + C.VTT_SRC_CLASS + '>';
+  /* v0.9.241：原文行要不要打标记，跟引擎同一判据（写得出声明才打）——
+     不会出现「打了标记却没有 ::cue(.src) 规则」的死噪音；全部沿用则两边都不做。 */
+  const srcOn = C.vttSrcDecls(st).length > 0;
   const items = vttCueParts().map(p=>({ no:p.no, start:p.start, end:p.end,
-    /* srcDiff 关 = 连 class 都不标：写了却没有对应 ::cue(.src) 规则，是纯粹的噪音 */
-    text: p.lines.map(L => (L.isSrc && st.srcDiff) ? mark(L.text) : L.text).join('\n') }));
+    text: p.lines.map(L => (L.isSrc && srcOn) ? mark(L.text) : L.text).join('\n') }));
   return C.formatVtt(items, { style: st });
 }
 function renderVttPv(){
@@ -1991,11 +2016,14 @@ function renderVttPv(){
     const dv = document.createElement('div'); dv.className = 'vtt-pv-line';
     const sp = document.createElement('span'); sp.className = 'pv-in'; sp.textContent = L.text;
     dv.appendChild(sp); cue.appendChild(dv);
-    const isS = !!(L.isSrc && st.srcDiff);
-    const pct = num(isS ? st.srcSize : st.size, isS ? 85 : 100);
+    /* v0.9.241：原文行按「项」决定是否沿用 —— 字号、颜色各有一个 mode，其余五项各自三态。
+       全部沿用 = 这一行跟译文行长得一模一样（导出里也一样：既不打标记也不写规则）。 */
+    const isS = !!L.isSrc;
+    const useSz = isS && !st.srcSizeInh, useCol = isS && !st.srcColorInh;
+    const pct = num(useSz ? st.srcSize : st.size, useSz ? 85 : 100);
     dv.style.fontSize = (H * 0.05 * (pct / 100)).toFixed(2) + 'px';   /* 播放器默认 cue 字号 ≈ 画面高 5% */
     dv.style.lineHeight = String(num(st.lineHeight, 1.4));
-    dv.style.color = isS ? col(st.srcColor, '#FFD700') : col(st.color, '#FFFFFF');
+    dv.style.color = useCol ? col(st.srcColor, '#FFD700') : col(st.color, '#FFFFFF');
     dv.style.fontFamily = (isS && !inh(st.srcFont)) ? (C.vttFontStack(st.srcFont) || fam) : fam;
     const bold = isS ? (inh(st.srcBold) ? st.bold : st.srcBold === 'on') : st.bold;
     const ital = isS ? (inh(st.srcItalic) ? st.italic : st.srcItalic === 'on') : st.italic;
@@ -2095,8 +2123,11 @@ function importVttStyle(side, text, name){
     if (s.shadowColor) filled.main += put('mVttShadowColor', s.shadowColor);
   }
   if (!VTT_INH.dirty.src){
-    if (s.srcDiff != null || s.srcColor || s.srcSize != null || s.srcFont || s.srcBold || s.srcItalic || s.srcBgOn || s.srcShadowOn){
-      if (s.srcDiff != null) filled.src += put('mVttSrcDiff', !!s.srcDiff);
+    if (s.srcColor || s.srcSize != null || s.srcFont || s.srcBold || s.srcItalic || s.srcBgOn || s.srcShadowOn){
+      /* v0.9.241：字号、颜色也有「沿用」了 —— 文件里的 ::cue(.src) 写了哪项，那项才是「单独设」。
+         （整块 ::cue(.src) 都不存在时 parseVttStyle 不给这两个字段，面板现值原样保留。） */
+      if (s.srcColorInh != null) filled.src += put('mVttSrcColorMode', s.srcColorInh ? '' : 'set');
+      if (s.srcSizeInh != null) filled.src += put('mVttSrcSizeMode', s.srcSizeInh ? '' : 'set');
       if (s.srcColor) filled.src += put('mVttSrcColor', s.srcColor);
       if (s.srcSize != null) filled.src += put('mVttSrcSize', s.srcSize);
       /* 三态：文件里写了就是 on/off，没写就保持「沿用」 */
@@ -2369,6 +2400,7 @@ function init(){
     const onEdit = ()=>{
       VTT_INH.dirty[regionOfId(id)] = true;
       const sel = $('mVttPresetSel'); if (sel) sel.value = 'custom';
+      syncSrcInh();    /* 原文行「沿用 / 单独设」切换 → 值控件的明暗跟着走 */
       renderVttPv();
       syncTplSegs();   /* v0.9.240：手改 = 落到「自定义」，按钮组要跟着换高亮、并显出「自定义」键 */
     };

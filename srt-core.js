@@ -633,8 +633,9 @@
     const ts = vttCueSettings(st);
     const body = (items || []).map((it) => {
       let tx = String(it.text == null ? '' : it.text);
-      /* srcDiff 关掉 = 连 class 都不标：写了却没有对应 ::cue(.src) 规则，是纯粹的噪音 */
-      if (srcIdx >= 0 && (!st || st.srcDiff !== false)) {
+      /* v0.9.241：标记与否跟 ::cue(.src) 规则**同进同出**（都由 vttSrcDecls 算定）。
+         原文行全部「沿用」→ 一个字都不写、也不打标记（原文行与译文行完全一样）。 */
+      if (srcIdx >= 0 && vttSrcDecls(st).length) {
         const lines = tx.split('\n');
         if (lines.length > 1 && srcIdx < lines.length && lines[srcIdx].trim()) {
           lines[srcIdx] = '<c.' + VTT_SRC_CLASS + '>' + lines[srcIdx] + '</c.' + VTT_SRC_CLASS + '>';
@@ -686,6 +687,27 @@
     return [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]]
       .map((p) => (p[0] * w) + 'px ' + (p[1] * w) + 'px 0 ' + c).join(', ');
   }
+  /* v0.9.241：原文行的样式声明**在这一处算定**，别处不再各自判断。
+     判据是「真的写得出声明」，不是「有没有勾某个开关」——
+     于是导出里有没有 ::cue(.src) 规则、文本里有没有 <c.src> 标记永远同进同出。
+     值留空 / 非法（比如颜色不是 #RRGGBB）→ 写不出声明 → 两边都不做，
+     既不会留下匹配不到元素的死规则，也不会出现「打了标记却没规则」的噪音。
+
+     ⚠️ 主站的原文行只有字号、颜色两项（双语页那边还多五项三态，见 merge-core.js）：
+        两项都能「沿用」（= 跟译文行一样，一个字都不写），全部沿用 = 原文行与译文行完全一样。
+        这就是原来那个「区分原文」总闸表达的意思，区别是现在**逐项生效**。 */
+  function vttSrcDecls(st) {
+    if (!st) return [];
+    const sd = [];
+    if (!st.srcColorInh) {
+      const sc = /^#[0-9a-fA-F]{6}$/.test(String(st.srcColor || '').trim()) ? String(st.srcColor).trim() : null;
+      if (sc) sd.push('  color: ' + sc + ';');
+    }
+    if (!st.srcSizeInh && st.srcSize != null && String(st.srcSize).trim() !== '' && isFinite(+st.srcSize)) {
+      sd.push('  font-size: ' + (+st.srcSize) + '%;');
+    }
+    return sd;
+  }
   function vttStyleBlock(st) {
     if (!st) return '';
     const d = [];
@@ -704,14 +726,10 @@
     }
     const rules = [];
     if (d.length) rules.push('::cue {\n' + d.join('\n') + '\n}');
-    /* 原文行：只有双语 + 用户开了区分才输出。Firefox 忽略带参 ::cue(.src) → 整片同色（已知，界面有提示）。 */
-    if (st.srcDiff !== false) {
-      const sd = [];
-      const sc = /^#[0-9a-fA-F]{6}$/.test(String(st.srcColor || '').trim()) ? String(st.srcColor).trim() : null;
-      if (sc) sd.push('  color: ' + sc + ';');
-      if (st.srcSize != null && String(st.srcSize).trim() !== '' && isFinite(+st.srcSize)) sd.push('  font-size: ' + (+st.srcSize) + '%;');
-      if (sd.length) rules.push('::cue(.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
-    }
+    /* 原文行：只有双语 + 原文行真的设了东西才输出。Firefox 忽略带参 ::cue(.src) → 整片同色（界面有提示）。
+       写不写由 vttSrcDecls 一处算定：声明数为 0 就连规则都不出现（不留死规则）。 */
+    const sd = vttSrcDecls(st);
+    if (sd.length) rules.push('::cue(.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
     if (!rules.length) return '';
     return 'STYLE\n' + rules.join('\n');
   }
@@ -832,7 +850,11 @@
         if (c) st.srcColor = c.hex;
         const fs = /^([\d.]+)\s*%$/.exec(d['font-size'] || '');
         if (fs) st.srcSize = fs[1];
-        st.srcDiff = true;
+        /* v0.9.241：原文行每一项的「沿用」从文件里读回来 ——
+           这块里写了的项就是「单独设」，没写的项就是「沿用」。
+           ⚠️ 整块 ::cue(.src) 都不存在时不碰面板现值：导入只填读到的字段。 */
+        st.srcColorInh = !st.srcColor;
+        st.srcSizeInh = (st.srcSize == null);
         res.found = true;
       }
     }
@@ -874,7 +896,7 @@
       const ti = ls.findIndex((l) => l.indexOf('-->') >= 0);
       if (ti < 0) continue;
       const si = ls.slice(ti + 1).findIndex((l) => /<c\.src>/i.test(l));
-      if (si >= 0) { res.srcLine = si; st.srcDiff = true; res.found = true; }
+      if (si >= 0) { res.srcLine = si; res.found = true; }   /* 原文行在第几行；单独样式由 ::cue(.src) 读回 */
       break;                                        // 只看第一条 cue
     }
     return res;
@@ -2830,7 +2852,7 @@
     isFull, textWidth, wrapToWidth, atomicRanges, wordBounds,
     parseSrt, formatSrt, fmtTime, parseTime, renumber,
     parseVtt, formatVtt, fmtTimeVtt,
-    vttStyleBlock, vttCueSettings, vttShadowCss, vttFontStack, vttRgba, VTT_CSS_WHITE, VTT_SRC_CLASS,   // v0.9.236 VTT 样式
+    vttStyleBlock, vttSrcDecls, vttCueSettings, vttShadowCss, vttFontStack, vttRgba, VTT_CSS_WHITE, VTT_SRC_CLASS,   // v0.9.236 VTT 样式；v0.9.241 原文行逐项沿用
     parseVttStyle, vttFontKeyOf, vttUnRgba,                                                              // v0.9.237 VTT 样式回读
     parseSbv, formatSbv, fmtTimeSbv,
     parseAss, formatAss, fmtTimeAss, parseAssTime, assLineHeight, assStackMV,
