@@ -252,7 +252,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.242</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.243</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -648,7 +648,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.242"></script>
+<script src="merge-core.js?v=0.9.243"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1402,7 +1402,7 @@ function renderTplSegs(){
       (x[0] === 'custom' ? ' data-custom="1"' : '')+' data-i18n="'+x[1]+'">'+t(x[1])+'</button>').join('');
     vs.querySelectorAll('.segbtn').forEach(b=>b.addEventListener('click', ()=>{
       const v = b.getAttribute('data-v');
-      if (v === 'custom') return;            /* 「自定义」只是状态显示，点它不重置任何值 */
+      if (v === 'custom'){ vttUseCustom(); return; }
       setVttStyled(true);                    /* 点模板 = 明确要样式：顺手把 STYLE 块打开 */
       applyVttPreset(v);
     }));
@@ -1983,6 +1983,20 @@ function applyVttPreset(k){
   vttAfterFill();
   syncTplSegs();   /* v0.9.240：按钮高亮 + 「自定义」键的显隐都跟着 preset 走 */
 }
+/* v0.9.243：点「自定义」键 —— 与 ASS 那颗「自定义」同义，是一档，不是装饰。
+     标准 / 紧凑 / 电影感 = 起点：点了才把那套预设值铺进来；
+     自定义        = 这是我的：面板上现在这组值就是我要的，一个都不动。
+   ⚠️ 不套任何预设、不清空、不禁用任何输入框 —— 只换档位标记 + 高亮 + 说明文案。
+   ⚠️ 不碰 VTT_INH.dirty：那是「哪些区域手改过、别让下次导入悄悄盖掉」的判据，
+      点一下按钮不等于手改参数，别把继承门控顺手锁上。
+   ⚠️ 落 custom 之后 syncVttPanel 也不再重套预设（见该函数注释），
+      所以点完再切别的导出格式、再切回来，这组值还在。 */
+function vttUseCustom(){
+  const sel = $('mVttPresetSel'); if (sel) sel.value = 'custom';
+  /* 点样式模板 = 要样式：与其它三档一致把 STYLE 块打开。
+     它内部会跑 syncVttChrome（含 vttPresetTip）/ syncTplSegs（换高亮）/ renderVttPv —— 都不改参数值。 */
+  setVttStyled(true);
+}
 function vttStyleOf(){
   const g = id => String(($(id)||{}).value == null ? '' : $(id).value).trim();
   const ck = id => !!($(id)||{}).checked;
@@ -2086,12 +2100,18 @@ function vttPresetLabel(){
   return k0 === 'compact' ? t('vttPresetCompact') : k0 === 'cinema' ? t('vttPresetCinema')
        : k0 === 'custom' ? t('vttPresetCustom') : t('vttPresetStd');
 }
-/* 切模板时的 VTT 侧：进「VTT 双语样式」就套默认模板，除非当前是继承来的
-   （继承值必须留给用户看，不能被切模板顺手覆盖掉）。 */
+/* 切模板时的 VTT 侧：进「VTT 双语样式」就套默认模板，除非当前已经是「自定义」。
+   v0.9.243：custom 档 = 「下面这组值是我的」，三条来路都**不得**被切一次导出格式就冲回预设 ——
+     · 手改过任一参数（自动落 custom）
+     · 导入 VTT 继承来的样式（本来就在 custom）
+     · 用户点了「自定义」键（v0.9.243 起可点）
+   以前只有「继承来的」受保护（看 VTT_INH.active），手改的值切到 ASS 再切回来就没了 —— 这是丢数据，
+   而且和 ASS 那边已经不一致（ASS 的 syncAssPanel 在 custom 档直接 return）。
+   ⚠️ 标准三档仍然是「回到起点」：显式点了 std/compact/cinema，切回来就该是那套模板的值。 */
 function syncVttPanel(){
   const key = vttPresetKey();
-  if (!VTT_INH.active) applyVttPreset(key === 'std' || MVTT_PRESETS[key] ? key : 'std');
-  else renderVttPv();
+  if (key === 'custom'){ renderVttPv(); return; }
+  applyVttPreset(MVTT_PRESETS[key] ? key : 'std');
 }
 /* v0.9.240：VTT 面板自己的联动 —— 顶部「写入样式」开关 ↔ 导出档位（vttStyle / vtt），
    关掉时把下面参数区整块变灰（参数此刻不生效，看得见比偷偷忽略强）。

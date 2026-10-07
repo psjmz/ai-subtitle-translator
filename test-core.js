@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.242/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.243/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.242</.test(html), '首页版本号未升 0.9.241');
-    assert.ok(/class="ver-tag">v0\.9\.242</.test(html), '工作台版本号未升 0.9.241');
-    assert.ok(/srt-core\.js\?v=0\.9\.242/.test(html), 'srt-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.243</.test(html), '首页版本号未升 0.9.241');
+    assert.ok(/class="ver-tag">v0\.9\.243</.test(html), '工作台版本号未升 0.9.241');
+    assert.ok(/srt-core\.js\?v=0\.9\.243/.test(html), 'srt-core.js?v 未升 0.9.241');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5539,8 +5539,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.242</.test(mg), 'merge.html 版本未升 0.9.241');
-    assert.ok(/merge-core\.js\?v=0\.9\.242/.test(mg), 'merge-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.243</.test(mg), 'merge.html 版本未升 0.9.241');
+    assert.ok(/merge-core\.js\?v=0\.9\.243/.test(mg), 'merge-core.js?v 未升 0.9.241');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6818,7 +6818,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/VTT_INH\.active = false;/.test(ap) && /VTT_INH\.dirty = \{ main:false, src:false, pos:false \};/.test(ap),
       '显式套模板没清掉继承/手改门控');
     const sp = mg.slice(mg.indexOf('function syncVttPanel('), mg.indexOf('function importVttStyle('));
-    assert.ok(/if \(!VTT_INH\.active\) applyVttPreset/.test(sp), '继承来的值被切模板冲掉了');
+    /* v0.9.243：判据从「是不是继承来的」改成「是不是 custom 档」—— 继承值本来就落在 custom，
+       而**手改过**的值同样落在 custom，以前它被切一次导出格式就冲回预设，那是丢数据
+       （ASS 那边 v0.9.242 起 custom 档已经不重套预设，两边必须一致）。 */
+    assert.ok(/if \(key === 'custom'\)\{ renderVttPv\(\); return; \}/.test(sp),
+      'custom 档（继承来的 / 手改过的 / 点了「自定义」键的）不该被切模板冲掉');
+    assert.ok(/applyVttPreset\(MVTT_PRESETS\[key\] \? key : 'std'\)/.test(sp),
+      '三套标准档切回来仍要重套各自预设（它们是"起点"）');
   });
 
   t('v0.9.238：「VTT 双语样式」是真模板：分段按钮、导出分支、扩展名都接上了', () => {
@@ -7289,7 +7295,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/applyTplDefaults\(tpl\)/.test(sp), '其他档位仍要套各自预设');
     /* 切进 custom 前先把布局记成跳转前那个档位 */
     const st = mg.slice(mg.indexOf('function setAssTpl(v){'), mg.indexOf('function renderTplSegs(){'));
-    assert.ok(/if \(v === 'custom'\) setAssLayoutRadio\(/.test(st), '切进自定义前没记下当前布局');
+    /* v0.9.243：两个预设档也必须同步 —— 方案 schemeFields 的 __layout 直接读这个 radio，
+       「点分屏 → 存方案」不同步就会把布局记成上一次的（套回去位置就错）。 */
+    assert.ok(/setAssLayoutRadio\(v === 'custom' \? \(sel\.value === 'stack' \? 'stack' : 'split'\) : v\)/.test(st),
+      '切模板必须同步布局：custom 沿用跳转前那个，两个预设档直接定');
   });
 
   t('v0.9.242：手改任一 ASS 参数 → 落「自定义」，布局沿用且值不动', () => {
@@ -7330,21 +7339,29 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/data-custom="1"/.test(mg), '缺 data-custom 标记');
     assert.ok(!/data-custom="1" hidden/.test(mg), '「自定义」不该再默认隐藏');
     assert.ok(!/b\.hidden\s*=/.test(mg), '还有代码在切换按钮显隐');
-    /* 点它仍然什么都不做（不重置任何值） */
-    /* ⚠️ 结束锚点必须从起点之后找 —— syncTplSegs 自己的结尾在这段之前，
-       用全局 indexOf 会得到 end < start 的空串（假失败） */
+    /* v0.9.243：它是一档，点得动 —— 但不套预设、不重置任何值
+       ⚠️ 结束锚点必须从起点之后找：syncTplSegs 自己的结尾在这段之前，
+          用全局 indexOf 会得到 end < start 的空串（假失败） */
     const r0 = mg.indexOf('const vs = $(\'mVttPresetSeg\');');
     const rs = mg.slice(r0, mg.indexOf('syncTplSegs();\n}', r0));
-    assert.ok(/if \(v === 'custom'\) return;/.test(rs), '点「自定义」不该有动作（它是"别动我的"，不是预设）');
+    assert.ok(rs.length > 0, '取不到 mVttPresetSeg 的渲染片段');
+    assert.ok(/if \(v === 'custom'\)\{ vttUseCustom\(\); return; \}/.test(rs),
+      '「自定义」必须有点击行为（v0.9.242 只是显示出来，点了没反应）');
+    const u0 = mg.indexOf('function vttUseCustom(){');
+    const uc = mg.slice(u0, mg.indexOf('\nfunction ', u0 + 10));
+    assert.ok(uc.length > 0, '缺 vttUseCustom');
+    assert.ok(/sel\.value = 'custom'/.test(uc), '点「自定义」没把档位切过去');
+    assert.ok(!/applyVttPreset/.test(uc), '点「自定义」不能套任何预设（它是"别动我的"）');
+    assert.ok(!/VTT_INH\.dirty/.test(uc), '点按钮不是手改，不该动继承门控');
     assert.ok(/const MVTT_SEGS = \[\['std'[\s\S]*'custom','vttTplCustom'\]\]/.test(mg), 'VTT 四档定义丢了');
   });
 
   t('v0.9.242：版号两页同步升到 242（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.242/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.242/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.242/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.242/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.242/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.243/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.243/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.243/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.243/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.243/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.241/.test(mg) && !/class="ver">v0\.9\.241/.test(html), '还留着上一版的显示版号');
   });
