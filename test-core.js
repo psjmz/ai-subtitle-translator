@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.243/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.244/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.243</.test(html), '首页版本号未升 0.9.241');
-    assert.ok(/class="ver-tag">v0\.9\.243</.test(html), '工作台版本号未升 0.9.241');
-    assert.ok(/srt-core\.js\?v=0\.9\.243/.test(html), 'srt-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.244</.test(html), '首页版本号未升 0.9.241');
+    assert.ok(/class="ver-tag">v0\.9\.244</.test(html), '工作台版本号未升 0.9.241');
+    assert.ok(/srt-core\.js\?v=0\.9\.244/.test(html), 'srt-core.js?v 未升 0.9.241');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5539,8 +5539,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.243</.test(mg), 'merge.html 版本未升 0.9.241');
-    assert.ok(/merge-core\.js\?v=0\.9\.243/.test(mg), 'merge-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.244</.test(mg), 'merge.html 版本未升 0.9.241');
+    assert.ok(/merge-core\.js\?v=0\.9\.244/.test(mg), 'merge-core.js?v 未升 0.9.241');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7357,13 +7357,126 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.242：版号两页同步升到 242（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.243/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.243/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.243/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.243/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.243/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.244/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.244/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.244/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.244/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.244/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
-    assert.ok(!/class="ver">v0\.9\.241/.test(mg) && !/class="ver">v0\.9\.241/.test(html), '还留着上一版的显示版号');
+    assert.ok(!/class="ver">v0\.9\.242/.test(mg) && !/class="ver">v0\.9\.242/.test(html), '还留着上一版的显示版号');
+  });
+
+  /* ================= v0.9.244：后台补两块数据统计 =================
+     用户原话：①「在原有的使用记录中，增加用户下载的字幕格式，比如是 srt 还是 ass」
+               ②「增加对双语合并模块的使用记录：哪些 IP 上传了什么字幕，
+                   他们最终导出了什么字幕格式，用了哪些模版」
+     此前的事实：翻译事件只记「下载了几次」，格式一个字没有；
+                 双语合并页是纯前端工具、请求根本不过服务端 → **零埋点**，完全不可见。
+     设计要点（写在这里是因为它们都是「看起来能做对、实际容易做错」的地方）：
+       · 格式分布绝不能 cnt(dlFmt) —— dlFmt 只是「最后一次」，同一任务先下 SRT 再下 ASS
+         会被覆盖成一条，必须另配一组累计计数（dlSrt/dlVtt/…）。
+       · 合并记录单独一个文件（merge-events.json），不与翻译事件混：两者口径完全不同
+         （翻译按任务去重累加，合并页一次合并 / 一次导出本身就是一条完整记录）。
+       · 一切外来值走白名单（pickWL），认不出的一律不写，绝不按前端字符串动态建字段。 */
+  console.log('— v0.9.244：导出格式统计 + 双语合并页使用记录 —');
+  const fs244 = require('fs'), pa244 = require('path');
+  const srv244 = fs244.readFileSync(pa244.join(__dirname, 'server.js'), 'utf8');
+  const adm244 = fs244.readFileSync(pa244.join(__dirname, 'admin.html'), 'utf8');
+
+  t('v0.9.244：主站下载上报带导出格式，服务端只认白名单', () => {
+    assert.ok(/function reportEvent\(ev, extra, fmt\)\{/.test(html), 'reportEvent 没接 fmt 参数');
+    assert.ok(/fmt:fmt\|\|''/.test(html), '上报体没带 fmt');
+    assert.ok(/reportEvent\('download', '', expFileFmt\(\)\)/.test(html),
+      '下载时没传 expFileFmt()（后台将永远看不到格式）');
+    assert.ok(/const DL_FMT = \{ srt: 'srt', vtt: 'vtt', sbv: 'sbv', ass: 'ass', txt: 'txt' \}/.test(srv244),
+      '服务端缺导出格式白名单');
+    assert.ok(/const DL_FMT_FIELD = \{ srt: 'dlSrt'/.test(srv244), '服务端缺格式计数字段表');
+    /* 白名单取值必须 hasOwnProperty：DL_FMT['__proto__'] 会命中原型链 */
+    assert.ok(/function pickWL\(map, v\)\{[\s\S]{0,200}hasOwnProperty\.call\(map, k\)/.test(srv244),
+      'pickWL 没用 hasOwnProperty（原型链会漏进来）');
+    /* 两处 download 记账（匹配到的会话 / 自带 Key 新建的 lite 记录）都要写 */
+    const dl = srv244.slice(srv244.indexOf("} else if (ev === 'download') {"), srv244.indexOf("} else if (ev === 'fail') {"));
+    assert.ok(/e\.dlFmt = df; e\[DL_FMT_FIELD\[df\]\] = \(e\[DL_FMT_FIELD\[df\]\] \|\| 0\) \+ 1;/.test(dl),
+      '匹配到的会话没记格式');
+    /* ⚠️ 锚点必须落在 lite 记录上：markEvent 里同名的 download 分支在上面，
+       用 indexOf('else if...') 取到的是那一处（已复发一次，别再用分支名当锚点） */
+    const lp = srv244.indexOf('lite.downloads = 1');
+    const lite = srv244.slice(lp, lp + 260);
+    assert.ok(lp > 0 && /lite\.dlFmt = lf; lite\[DL_FMT_FIELD\[lf\]\] = 1;/.test(lite), '自带 Key 用户没记格式');
+  });
+
+  t('v0.9.244：格式分布读累计计数，不是「最后一次」（否则先下 SRT 再下 ASS 只算一条）', () => {
+    assert.ok(/dlFmts: Object\.keys\(DL_FMT\)/.test(srv244), '后台汇总缺 dlFmts');
+    assert.ok(/Number\(e\[DL_FMT_FIELD\[k\]\]\)/.test(srv244), '格式汇总读的是单值字段而非累计计数');
+    assert.ok(!/cnt\(all\.filter\(e => e\.dlFmt\), 'dlFmt'\)/.test(srv244), '不能对「最后一次」的 dlFmt 做分布统计');
+    /* 后台表格同样要显示各格式的次数，而不只是最后一次 */
+    assert.ok(/const DL_FMT_KEYS = \[\['srt','dlSrt'\]/.test(adm244), '后台表格缺格式计数字段表');
+    assert.ok(/e\[x\[1\]\] > 1 \? ' ×' \+ e\[x\[1\]\] : ''/.test(adm244), '后台没显示各格式次数');
+    assert.ok(/<th>导出格式<\/th>/.test(adm244), '后台表格缺「导出格式」列');
+    assert.ok(/colspan="11"/.test(adm244), '表格加了列但 colspan 没跟着加');
+  });
+
+  t('v0.9.244：双语合并页上报接进「合并」与「导出」两条路径', () => {
+    assert.ok(/function reportMerge\(kind\)\{/.test(mg), 'merge.html 缺 reportMerge');
+    assert.ok(/reportMerge\('export'\);/.test(mg), '导出时没上报（后台将看不到格式/模板）');
+    /* 两条合并路径都要报：调整双语走的是 doAdjust，漏了就整块不可见 */
+    assert.strictEqual((mg.match(/reportMerge\('merge'\);/g) || []).length, 2,
+      'doMerge / doAdjust 各要有一处上报（合并与调整是两条独立路径）');
+    assert.ok(/kind: k,/.test(mg) && /fmt: k === 'export' \? expExt\(\) : ''/.test(mg), '上报体缺 kind/fmt');
+    assert.ok(/src: S\.srcName \|\| '', dst: adj \? '' : \(S\.dstName \|\| ''\)/.test(mg), '上报体缺上传的两个文件名');
+    assert.ok(/mode: adj \? 'adjust' : 'merge'/.test(mg), '上报体缺模式');
+    /* ⚠️ 「调整双语」只有一个输入（src 侧）；切模式不清 S.dstName，
+       照直报会把上一次合并残留的译文名当成这次的输入 → 后台显示的「上传字幕」是错的。 */
+    assert.ok(/const adj = S\.mode === 'adjust';/.test(mg), 'adjust 模式没特殊处理（会带上残留的 dstName）');
+    /* 只报元数据，绝不报字幕内容 */
+    assert.ok(!/text:[\s\S]{0,40}merge-event/.test(mg), '上报里带了字幕内容（越界）');
+  });
+
+  t('v0.9.244：模板键与服务端白名单一一对齐（ASS 三档 + VTT 四档 + 两档无模板）', () => {
+    assert.ok(/function expTplKey\(\)\{/.test(mg), '缺 expTplKey');
+    const kt = mg.slice(mg.indexOf('function expTplKey(){'), mg.indexOf('/* v0.9.244：双语合并页使用记录上报'));
+    ['srt', 'vtt', 'ass-split', 'ass-stack', 'ass-custom'].forEach(k => {
+      assert.ok(kt.indexOf("'" + k + "'") >= 0, 'expTplKey 缺 ' + k);
+    });
+    assert.ok(/'vtt-' \+ vttPresetKey\(\)/.test(kt), 'VTT 模板键没带上预设档位');
+    /* 服务端那份白名单必须包含同样的键，否则上报的值会被静默丢弃 */
+    const tp = srv244.slice(srv244.indexOf('const MERGE_TPL = {'), srv244.indexOf('};', srv244.indexOf('const MERGE_TPL = {')));
+    ['srt', 'vtt', 'ass-split', 'ass-stack', 'ass-custom', 'vtt-std', 'vtt-compact', 'vtt-cinema', 'vtt-custom'].forEach(k => {
+      assert.ok(tp.indexOf("'" + k + "':") >= 0, 'MERGE_TPL 缺 ' + k);
+    });
+  });
+
+  t('v0.9.244：合并记录单独存储 + 独立接口，不混进翻译事件', () => {
+    assert.ok(/const MEVENTS_PATH = path\.join\(DATA_DIR, 'merge-events\.json'\)/.test(srv244), '缺独立存储文件');
+    assert.ok(/u === '\/api\/merge-event'/.test(srv244), '缺公开上报接口');
+    assert.ok(/u === '\/api\/admin\/merge-events'/.test(srv244), '缺后台读取接口');
+    /* 不能复用 appendEvent：翻译事件按任务去重累加，合并页没有任务概念，混进去口径就乱了 */
+    assert.ok(!/appendMEvent[\s\S]{0,400}appendEvent\(/.test(srv244), '合并记录不该复用翻译事件的记账');
+    assert.ok(/if \(!src && !dst\) return;/.test(srv244), '空请求（连文件名都没有）不该落库');
+    assert.ok(/cues: Math\.max\(0, Math\.min\(1000000, Math\.floor\(\+b\.cues \|\| 0\)\)\)/.test(srv244), '条数没夹取');
+    assert.ok(/if \(db\.events\.length > MEVENTS_MAX\)/.test(srv244), '合并记录没有条数封顶');
+  });
+
+  t('v0.9.244：客户端去重（改「结构」下拉会自动重跑 doAdjust，不去重就刷屏）', () => {
+    assert.ok(/const MG_DEDUP_MS = \{ merge: 30 \* 60 \* 1000, export: 60 \* 1000 \}/.test(mg), '缺去重窗口');
+    assert.ok(/if \(body === _mgLast\.body && now - _mgLast\.t < \(MG_DEDUP_MS\[k\] \|\| 0\)\) return;/.test(mg),
+      '去重没生效');
+    /* 上报失败绝不能影响导出本身 */
+    assert.ok(/fetch\('\/api\/merge-event'[\s\S]{0,200}\}\)\.catch\(\(\)=>\{\}\);/.test(mg), '上报没兜住异常');
+  });
+
+  t('v0.9.244：后台新增「双语合并记录」卡片，且两张表分页互不干扰', () => {
+    assert.ok(/id="mergeCard"/.test(adm244), '后台缺双语合并记录卡片');
+    assert.ok(/id="mgRows"/.test(adm244), '后台缺合并记录表体');
+    assert.ok(/<th>上传字幕<\/th>/.test(adm244) && /<th>模板<\/th>/.test(adm244), '合并记录缺关键列');
+    assert.ok(/loadMergeEvents\(\);/.test(adm244), '进入后台没有加载合并记录');
+    /* 模板码要翻成中文，别把 ass-split 这种码直接甩给站长 */
+    assert.ok(/'ass-split': 'ASS 分屏'/.test(adm244) && /'vtt-cinema': 'VTT 电影感'/.test(adm244), '模板名没做中文映射');
+    /* 分页条原来写死 evPager + 全局 evPage，第二张表会把第一张的页码冲掉 */
+    assert.ok(/function renderPager\(j, elId, cur\)\{/.test(adm244), '分页条没参数化');
+    assert.ok(/renderPager\(j, 'evPager', evPage\);/.test(adm244), '翻译记录没传自己的页码');
+    assert.ok(/renderPager\(j, 'mgPager', mgPage\);/.test(adm244), '合并记录没传自己的页码');
+    assert.ok(!/renderPager\(j\);/.test(adm244), '还有调用点在用写死 evPager 的旧签名');
   });
 
 

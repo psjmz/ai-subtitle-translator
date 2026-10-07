@@ -252,7 +252,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.243</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.244</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -648,7 +648,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.243"></script>
+<script src="merge-core.js?v=0.9.244"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1206,6 +1206,7 @@ function doMerge(){
   $('exp').style.display = 'block';
   renderAssPv();
   renderVttPv();   /* v0.9.238：VTT 预览与 ASS 预览共用一次合并结果 */
+  reportMerge('merge');   /* v0.9.244：传了什么字幕上来（后台「双语合并记录」） */
 }
 /* v0.9.222 调整模式：拆分双语字幕。偏移对整份文件生效（不分两侧）。 */
 function doAdjust(){
@@ -1236,6 +1237,7 @@ function doAdjust(){
      必须在 #exp 显示之后调用，否则量不到画布高度。 */
   renderAssPv();
   renderVttPv();   /* v0.9.238：同上，调整模式也要给 VTT 预览 */
+  reportMerge('merge');   /* v0.9.244：同上，调整模式也要上报 */
 }
 /* 原文/译文互换：整列对调（调整模式拆错方向时一键纠正） */
 function swapSides(){
@@ -2236,7 +2238,52 @@ function expExt(){
   const f = expFmtVal();
   /* v0.9.238：vtt-styled 也是 .vtt 文件（只是多了 STYLE 块） */
   return (f === 'vtt' || f === 'vtt-styled') ? 'vtt' : (f === 'srt' ? 'srt' : 'ass');
-}function doDownload(){
+}
+/* v0.9.244：上报用的模板键 —— 与服务端 MERGE_TPL 白名单一一对应。
+   ASS 三档（分屏/底部双行/自定义）+ VTT 四档（标准/紧凑/电影感/自定义）+ 两档「无模板」（SRT、无样式 VTT）。
+   ⚠️ 别拿界面文案当值（四语会变），一律用档位码。 */
+function expTplKey(){
+  const tpl = tplVal();
+  if (tpl === 'srt') return 'srt';
+  if (tpl === 'vtt') return 'vtt';
+  if (tpl === 'vttStyle') return 'vtt-' + vttPresetKey();
+  if (tpl === 'split') return 'ass-split';
+  if (tpl === 'stack') return 'ass-stack';
+  return 'ass-custom';    /* custom */
+}
+/* v0.9.244：双语合并页使用记录上报（fire-and-forget，失败静默，绝不影响导出）。
+   合并页是纯前端工具、请求不过服务端，此前后台完全看不到这个模块谁在用、导成什么格式、套的哪个模板。
+   只报元数据（两个上传文件名 / 条数 / 模式 / 导出格式 / 模板），**绝不报字幕内容**。
+   ⚠️ 客户端去重的必要性：改「结构」下拉会自动重跑 doAdjust（v0.9.222），
+      不去重的话用户每切一次就多一条记录，后台立刻被刷屏。
+      窗口按 kind 分开：merge 30 分钟（同一批文件反复调算一次），export 60 秒（防连点）。 */
+const MG_DEDUP_MS = { merge: 30 * 60 * 1000, export: 60 * 1000 };
+let _mgLast = { key: '', t: 0 };
+function reportMerge(kind){
+  try{
+    const k = (kind === 'export') ? 'export' : 'merge';
+    /* ⚠️ 「调整双语」只有一个输入文件（放 src 侧），dst 侧在界面上整个隐藏。
+       而 syncMode() 切模式时并不清 S.dstName —— 直接报上去会把上一次合并残留的译文文件名
+       当成这次的输入，后台看到的「上传字幕」就是错的（两个文件名，其实只传了一个）。 */
+    const adj = S.mode === 'adjust';
+    const body = JSON.stringify({
+      kind: k,
+      src: S.srcName || '', dst: adj ? '' : (S.dstName || ''),
+      cues: (S.rows && S.rows.length) || 0,
+      mode: adj ? 'adjust' : 'merge',
+      fmt: k === 'export' ? expExt() : '',
+      tpl: k === 'export' ? expTplKey() : ''
+    });
+    const now = Date.now();
+    if (body === _mgLast.body && now - _mgLast.t < (MG_DEDUP_MS[k] || 0)) return;
+    _mgLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function'){
+      try{ if (navigator.sendBeacon('/api/merge-event', new Blob([body], {type:'application/json'}))) return; }catch(e){}
+    }
+    fetch('/api/merge-event', { method:'POST', headers:{'Content-Type':'application/json'}, body: body }).catch(()=>{});
+  }catch(e){}
+}
+function doDownload(){
   if (!S.rows){ toast(t('needMerge')); return; }
   const text = buildExport();
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -2246,6 +2293,7 @@ function expExt(){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   toast(t('downloaded'));
+  reportMerge('export');   /* v0.9.244：导出格式 + 模板上报（后台「双语合并记录」） */
 }
 function doCopy(){
   if (!S.rows){ toast(t('needMerge')); return; }

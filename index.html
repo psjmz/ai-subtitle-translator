@@ -870,7 +870,7 @@
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.243</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.244</span></div>
       <div class="spacer"></div>
       <a href="merge.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-3"/><path d="M12 12h9"/><path d="m18.5 9.5 2.5 2.5-2.5 2.5"/></svg><span data-i18n="navMerge">双语合并</span></a>
       <a href="https://github.com/psjmz/ai-subtitle-translator#readme" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg><span data-i18n="navGuide">使用指南</span></a>
@@ -1033,7 +1033,7 @@
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.243</span>
+    <span class="ver-tag">v0.9.244</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1560,7 +1560,7 @@
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.243"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.244"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -8613,15 +8613,18 @@ async function extractGlossary(base,key,model,cfg,srcText){
 
 /* ---------------- 主流程 ---------------- */
 /* 会话生命周期上报（fire-and-forget 不阻塞不报错；云端与自带 Key 模式都上报）
-   ev: 'finish' 翻译完成 | 'download' 下载字幕；model：自带 Key 模式带用户填的模型名 */
-function reportEvent(ev, extra){
+   ev: 'finish' 翻译完成 | 'download' 下载字幕；model：自带 Key 模式带用户填的模型名
+   v0.9.244：fmt = 本次导出（下载）的字幕文件格式（srt/vtt/sbv/ass/txt），仅 download 时传。
+     后台此前只有「下载了几次」，看不出用户到底把字幕导成什么格式；只传格式码，
+     不带文件名以外的任何内容，认不出的值由服务端白名单丢弃。 */
+function reportEvent(ev, extra, fmt){
   if(!S.trMeta) return;
   try{
     // v0.9.86：捎带丢弃遥测——dropN 被删总行数、subDrop 其中「源文仍有实义」的行数（纯统计，不影响任何行为）
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0});
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
     if(navigator.sendBeacon && typeof Blob==='function'){
       try{ if(navigator.sendBeacon('/api/event', new Blob([body],{type:'application/json'}))) return; }catch(_){}
@@ -10079,7 +10082,8 @@ $('btnDownload').addEventListener('click', ()=>{
   a.download=name;
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
-  reportEvent('download');   // 下载成功上报（仅云端模式有效）
+  /* v0.9.244：连导出格式一起上报（expFileFmt() 已把 ass-stack 归一为 ass，与服务端白名单一致） */
+  reportEvent('download', '', expFileFmt());   // 下载成功上报（仅云端模式有效）
   /* v0.9.204：导出成功 = 用户真的拿到了成果（也真的烧过 token）。到这一刻才解锁赞助入口。 */
   try{ localStorage.setItem('srtDonateV1','1'); }catch(e){}
   if(window.__donateReveal) window.__donateReveal();

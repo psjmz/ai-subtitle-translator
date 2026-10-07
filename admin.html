@@ -217,13 +217,29 @@
       <div class="stats" id="evStats"></div>
       <div style="overflow-x:auto">
         <table class="tbl">
-          <thead><tr><th>开始时间</th><th>结束时间</th><th>时长</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th><th>模型</th><th>下载</th></tr></thead>
+          <thead><tr><th>开始时间</th><th>结束时间</th><th>时长</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th><th>模型</th><th>下载</th><th>导出格式</th></tr></thead>
           <tbody id="evRows"></tbody>
         </table>
       </div>
       <div class="pager" id="evPager"></div>
-      <div class="note">记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数、所用模型、完成/下载状态；不记录字幕内容。自带 API Key 的翻译直连服务商，仅在完成/下载时上报轻量记录（模型/语言/下载状态可统计，批次与时长不适用）。同 IP 同文件同语言 30 分钟内算一次会话。</div>
+      <div class="note">记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数、所用模型、完成/下载状态；不记录字幕内容。自带 API Key 的翻译直连服务商，仅在完成/下载时上报轻量记录（模型/语言/下载状态可统计，批次与时长不适用）。同 IP 同文件同语言 30 分钟内算一次会话。「导出格式」读的是各格式的累计次数（同一任务先下 SRT 再下 ASS 会记两次）。</div>
       <div class="btns"><button id="btnRefreshEvents">刷新</button></div>
+    </div>
+
+    <!-- v0.9.244：双语合并页（merge.html）此前完全没有埋点——它是纯前端工具，请求不过服务端，
+         谁在用、上传的什么字幕、导成什么格式、套的哪个模板，后台一概看不见。 -->
+    <div class="card" id="mergeCard" style="display:none">
+      <h2>🔗 双语合并记录（合并 / 调整双语模块）</h2>
+      <div class="stats" id="mgStats"></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>IP</th><th>上传字幕</th><th>条数</th><th>模式</th><th>动作</th><th>导出格式</th><th>模板</th></tr></thead>
+          <tbody id="mgRows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="mgPager"></div>
+      <div class="note">双语合并页是纯前端工具（不调模型、不翻译），只在使用时上报元数据：上传的两个字幕文件名、结果条数、模式（两份合并 / 调整双语）、导出文件格式与所用模板；<b>不记录任何字幕内容</b>。「合并」= 合并/拆分完成，「导出」= 真的下载了文件——只合并没导出的会停在前一种，多半是中途卡住了。</div>
+      <div class="btns"><button id="btnRefreshMerge">刷新</button></div>
     </div>
 
     <div class="card">
@@ -468,6 +484,7 @@ async function enterAdmin(){
   try { await loadConfig(); }
   catch (e) { msg('cfgMsg', '读取配置失败：' + e.message, 'err'); }
   loadEvents();
+  loadMergeEvents();   /* v0.9.244：双语合并记录（加载失败自己静默，不影响主配置） */
 }
 
 /* 使用行为记录（v0.9.42 分页：20 条/页，最新在第 1 页） */
@@ -493,6 +510,8 @@ async function loadEvents(){
     if (j.topLangs && j.topLangs[0]) chips.push('最热目标语：<b>' + esc(j.topLangs[0].name) + '</b> ×' + j.topLangs[0].n);
     if (j.topModels && j.topModels[0]) chips.push('最常用模型：<b>' + esc(j.topModels[0].name) + '</b> ×' + j.topModels[0].n);
     if (j.topFails && j.topFails[0]) chips.push('<span style="color:#c00">失败原因：<b>' + esc(j.topFails[0].name) + '</b> ×' + j.topFails[0].n + '</span>');
+    /* v0.9.244：导出格式分布（读累计计数，不是「最后一次」） */
+    if (j.dlFmts && j.dlFmts.length) chips.push('导出格式：<b>' + esc(j.dlFmts.slice(0, 3).map(x => x.name.toUpperCase() + '×' + x.n).join(' ')) + '</b>');
     chips.push('累计 <b>' + j.total + '</b> 条');
     $('evStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
     const fmtDur = ms => {
@@ -514,33 +533,46 @@ async function loadEvents(){
         : '';
       return '<tr><td>' + evTime(e.t) + lastTd + '</td><td>' + endTd + '</td><td>' + durTd + '</td><td>' + esc(e.ip) +
         '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
-        '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + dlTd + '</td></tr>';
-    }).join('') || '<tr><td colspan="10" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
-    renderPager(j);
+        '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + dlTd + '</td><td>' + dlFmtCell(e) + '</td></tr>';
+    }).join('') || '<tr><td colspan="11" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
+    renderPager(j, 'evPager', evPage);
   }
   catch (e) { /* 记录区加载失败不影响主配置页 */ }
 }
-/* 分页条：上一页/下一页 + 窗口化页码（首末页 + 当前页前后各 1，超过间隔用 …） */
-function renderPager(j){
-  const el = $('evPager');
+/* v0.9.244：导出格式列。⚠️ 不能只显示 dlFmt —— 它只是「最后一次」，
+   同一任务先下 SRT 再下 ASS 会被覆盖成一条；这里读各格式的累计计数（dlSrt/dlVtt/…），
+   一眼看出这单到底导了几种格式、各几次。 */
+const DL_FMT_KEYS = [['srt','dlSrt'],['vtt','dlVtt'],['sbv','dlSbv'],['ass','dlAss'],['txt','dlTxt']];
+function dlFmtCell(e){
+  const parts = DL_FMT_KEYS
+    .filter(x => (Number(e[x[1]]) || 0) > 0)
+    .map(x => x[0].toUpperCase() + (e[x[1]] > 1 ? ' ×' + e[x[1]] : ''));
+  if (!parts.length) return '<span style="color:var(--mut)">-</span>';
+  return '<span title="本任务各格式的导出次数">' + esc(parts.join('，')) + '</span>';
+}
+/* 分页条：上一页/下一页 + 窗口化页码（首末页 + 当前页前后各 1，超过间隔用 …）
+   v0.9.244：加 elId / cur 两个参数 —— 翻译记录与双语合并记录是两张表各翻各的页，
+   写死 evPager + 全局 evPage 的话第二张表会把第一张的页码冲掉。 */
+function renderPager(j, elId, cur){
+  const el = $(elId);
   const pages = j.pages || 1;
   if (pages <= 1) { el.innerHTML = j.total ? '<span class="pinfo">共 ' + j.total + ' 条</span>' : ''; return; }
-  const btn = (p, label, cur, dis) =>
-    '<button' + (cur ? ' class="cur"' : '') + (dis ? ' disabled' : '') + ' data-p="' + p + '">' + (label || p) + '</button>';
+  const btn = (p, label, on, dis) =>
+    '<button' + (on ? ' class="cur"' : '') + (dis ? ' disabled' : '') + ' data-p="' + p + '">' + (label || p) + '</button>';
   const win = [];
   const add = p => { if (p >= 1 && p <= pages && !win.includes(p)) win.push(p); };
   add(1); add(pages);
-  for (let p = evPage - 1; p <= evPage + 1; p++) add(p);
+  for (let p = cur - 1; p <= cur + 1; p++) add(p);
   win.sort((a, b) => a - b);
-  let html = btn(evPage - 1, '‹ 上一页', false, evPage <= 1);
+  let html = btn(cur - 1, '‹ 上一页', false, cur <= 1);
   let prev = 0;
   for (const p of win) {
     if (p - prev > 1) html += '<span class="pinfo">…</span>';
-    html += btn(p, p, p === evPage, false);
+    html += btn(p, p, p === cur, false);
     prev = p;
   }
-  html += btn(evPage + 1, '下一页 ›', false, evPage >= pages);
-  html += '<span class="pinfo">第 ' + evPage + ' / ' + pages + ' 页 · 共 ' + j.total + ' 条</span>';
+  html += btn(cur + 1, '下一页 ›', false, cur >= pages);
+  html += '<span class="pinfo">第 ' + cur + ' / ' + pages + ' 页 · 共 ' + j.total + ' 条</span>';
   el.innerHTML = html;
 }
 $('evPager').addEventListener('click', e => {
@@ -552,6 +584,57 @@ $('evPager').addEventListener('click', e => {
   loadEvents();
 });
 $('btnRefreshEvents').addEventListener('click', loadEvents);
+
+/* v0.9.244：双语合并页使用记录（独立卡片、独立分页，与上面的翻译记录互不干扰） */
+let mgPage = 1;
+const MG_FMT_TXT = { srt: 'SRT', vtt: 'VTT', ass: 'ASS' };
+/* 模板码 → 中文名。⚠️ 后台是中文界面，别把前端的档位码直接甩给站长看 */
+const MG_TPL_TXT = {
+  'srt': '—', 'vtt': '无样式 VTT',
+  'ass-split': 'ASS 分屏', 'ass-stack': 'ASS 底部双行', 'ass-custom': 'ASS 自定义',
+  'vtt-std': 'VTT 标准', 'vtt-compact': 'VTT 紧凑', 'vtt-cinema': 'VTT 电影感', 'vtt-custom': 'VTT 自定义'
+};
+const MG_MODE_TXT = { merge: '两份合并', adjust: '调整双语' };
+async function loadMergeEvents(){
+  try {
+    const j = await api('/api/admin/merge-events?page=' + mgPage + '&size=20');
+    show('mergeCard', true);
+    const chips = [];
+    chips.push('今日 <b>' + j.today.count + '</b> 条');
+    if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
+    if (j.today.merged !== undefined) chips.push('合并 <b>' + j.today.merged + '</b> 次');
+    if (j.today.exported !== undefined) chips.push('导出 <b>' + j.today.exported + '</b> 次');
+    if (j.topFmts && j.topFmts[0]) chips.push('导出格式：<b>' + esc(j.topFmts.slice(0, 3).map(x => (MG_FMT_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topTpls && j.topTpls[0]) chips.push('最常用模板：<b>' + esc(j.topTpls.slice(0, 3).map(x => (MG_TPL_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topFiles && j.topFiles[0]) chips.push('最常处理：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
+    chips.push('累计 <b>' + j.total + '</b> 条');
+    $('mgStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+    $('mgRows').innerHTML = (j.events || []).map(e => {
+      const files = [e.src, e.dst].filter(Boolean);
+      const joined = files.join(' ＋ ');
+      const fileTd = files.length ? esc(joined) : '<span style="color:var(--mut)">-</span>';
+      /* 「导出」才是真正拿到了文件；只停在「合并」说明用户上传后没下载（多半是卡住或结果不满意） */
+      const kindTd = (e.kind === 'export') ? '<b>导出</b>' : '<span style="color:var(--mut)">合并</span>';
+      const fmtTd = e.fmt ? '<b>' + esc(MG_FMT_TXT[e.fmt] || e.fmt) + '</b>' : '<span style="color:var(--mut)">-</span>';
+      const tplTd = e.tpl ? esc(MG_TPL_TXT[e.tpl] || e.tpl) : '<span style="color:var(--mut)">-</span>';
+      return '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) +
+        '</td><td title="' + esc(files.join('\n')) + '">' + fileTd + '</td><td>' + (e.cues || '-') +
+        '</td><td>' + esc(MG_MODE_TXT[e.mode] || e.mode || '-') + '</td><td>' + kindTd +
+        '</td><td>' + fmtTd + '</td><td>' + tplTd + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" style="color:var(--mut)">暂无记录（用户在双语合并页点「合并」或「下载」后会出现在这里）</td></tr>';
+    renderPager(j, 'mgPager', mgPage);
+  }
+  catch (e) { /* 记录区加载失败不影响主配置页 */ }
+}
+$('mgPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === mgPage) return;
+  mgPage = p;
+  loadMergeEvents();
+});
+$('btnRefreshMerge').addEventListener('click', loadMergeEvents);
 
 /* 初始化：有 token 直接进，否则显示登录 */
 (async function init(){

@@ -222,6 +222,20 @@ function evHit(e, ip, f){
   if (e.ip !== ip) return false;
   return f.task ? (e.taskId === f.task) : (e.file === f.file && e.lang === f.lang);
 }
+/* v0.9.244：用户导出（下载）的字幕格式。此前后台只有「下载了几次」，
+   看不出用户到底把字幕导成什么格式——ASS 样式、VTT 样式做了那么多版，
+   却没有任何数据说明有没有人真的在用、主流的到底是 srt 还是 ass。
+   取值与主站 expFileFmt() 一一对应（ass-stack 在前端已归一为 ass）。
+   ⚠️ dlFmt 只记「最后一次」，同一任务先下 srt 再下 ass 会被覆盖；
+      故另配一组累计计数（dlSrt/dlVtt/…），分布统计一律读累计值。 */
+const DL_FMT = { srt: 'srt', vtt: 'vtt', sbv: 'sbv', ass: 'ass', txt: 'txt' };
+const DL_FMT_FIELD = { srt: 'dlSrt', vtt: 'dlVtt', sbv: 'dlSbv', ass: 'dlAss', txt: 'dlTxt' };
+/* 白名单取值（与上面 FAIL_FIELD 同口径：必须 hasOwnProperty，否则 '__proto__' 会命中原型链）。
+   不在表里一律返回 '' —— 宁可这一笔不记，也绝不按前端字符串动态建字段。 */
+function pickWL(map, v){
+  const k = String(v == null ? '' : v);
+  return Object.prototype.hasOwnProperty.call(map, k) ? map[k] : '';
+}
 function appendEvent(ip, meta, model, extra){
   if (!meta || typeof meta !== 'object') return;
   const now = Date.now();
@@ -309,6 +323,9 @@ function markEvent(ip, meta, ev){
       } else if (ev === 'download') {
         e.downloads = (e.downloads || 0) + 1;
         e.downloadedAt = now;
+        /* v0.9.244：导出格式。只在白名单内记账，认不出就不写（绝不信前端字符串）。 */
+        const df = pickWL(DL_FMT, meta.fmt);
+        if (df) { e.dlFmt = df; e[DL_FMT_FIELD[df]] = (e[DL_FMT_FIELD[df]] || 0) + 1; }
       } else if (ev === 'fail') {
         e.failedAt = now;                      // v0.9.80：客户端异常（含错误消息）上报
         e.failMsg = cleanMsg(meta.msg);
@@ -329,8 +346,17 @@ function markEvent(ip, meta, ev){
   if (!mdl) return false;
   const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
   if (src) lite.src = src;              // v0.9.179
+  /* v0.9.244：自带 Key 用户的轻量记录也必须存任务号。此前没存 → 同一任务的第二次上报
+     （典型是「完成」之后「下载」）匹配不到自己那条，又新建一条：后台看到两条同任务的记录、
+     下载次数恒为 1，v0.9.244 新加的导出格式计数也被拆到两条里（同一单导了 SRT 又导 ASS 看不出来）。 */
+  if (f.task) lite.taskId = f.task;
   if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta)); }
-  else if (ev === 'download') { lite.downloads = 1; lite.downloadedAt = now; }
+  /* v0.9.244：自带 Key 用户同样记导出格式（这条记录是本次上报新建的，计数从 1 起） */
+  else if (ev === 'download') {
+    lite.downloads = 1; lite.downloadedAt = now;
+    const lf = pickWL(DL_FMT, meta.fmt);
+    if (lf) { lite.dlFmt = lf; lite[DL_FMT_FIELD[lf]] = 1; }
+  }
   else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
   else return false;
   db.events.push(lite);
@@ -413,6 +439,66 @@ function cueErrFields(meta){
 function dateOfTs(ts){
   const d = new Date(ts);
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* ---------------- 双语合并页使用记录（v0.9.244）----------------
+   合并页是纯前端工具（不调模型、不翻译、请求根本不过服务端），此前**零埋点**：
+   谁在用、上传的什么字幕、最终导成什么格式、套的哪个模板，后台一概看不见。
+   ⚠️ 单独一个文件，不与翻译事件混在 events.json 里：两者口径完全不同——
+     翻译事件按「任务」去重累加（同 IP 同文件 30 分钟内的批次并成一条），
+     合并页没有任务概念，一次「合并」和一次「导出」各自就是一条完整记录。
+   只记元数据（文件名/条数/格式/模板），绝不记字幕内容。 */
+const MEVENTS_PATH = path.join(DATA_DIR, 'merge-events.json');
+const MEVENTS_MAX = 2000;
+/* 导出格式白名单：与 merge.html 的 expExt() 一致（vtt-styled 已归一为 vtt） */
+const MERGE_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass' };
+/* 模板白名单：ASS 三档 + VTT 四档 + 两档「无模板」（SRT、无样式 VTT） */
+const MERGE_TPL = {
+  'srt': 'srt', 'vtt': 'vtt',
+  'ass-split': 'ass-split', 'ass-stack': 'ass-stack', 'ass-custom': 'ass-custom',
+  'vtt-std': 'vtt-std', 'vtt-compact': 'vtt-compact', 'vtt-cinema': 'vtt-cinema', 'vtt-custom': 'vtt-custom'
+};
+/* 合并页两种模式（v0.9.222）：merge=两份字幕合并；adjust=一份双语字幕拆原文/译文 */
+const MERGE_MODE = { merge: 'merge', adjust: 'adjust' };
+function readMEvents(){
+  try {
+    const j = JSON.parse(fs.readFileSync(MEVENTS_PATH, 'utf8'));
+    if (Array.isArray(j.events)) return j;
+  } catch (e) {}
+  return { events: [] };
+}
+/* kind: 'merge'（合并/拆分完成）| 'export'（导出成文件）。两条都写：
+   merge 那条能看出「有人上传了却没导出」（多半是中途卡住），export 那条带格式与模板。 */
+function appendMEvent(ip, body){
+  const b = (body && typeof body === 'object') ? body : {};
+  const kind = (b.kind === 'export') ? 'export' : 'merge';
+  const src = cleanName(b.src), dst = cleanName(b.dst);
+  if (!src && !dst) return;    // 连文件名都没有（异常/空请求）不记
+  const ev = {
+    t: Date.now(), ip: String(ip || ''), kind: kind,
+    src: src, dst: dst,
+    cues: Math.max(0, Math.min(1000000, Math.floor(+b.cues || 0))),
+    mode: pickWL(MERGE_MODE, b.mode) || 'merge'
+  };
+  if (kind === 'export') {
+    ev.fmt = pickWL(MERGE_FMT, b.fmt);
+    ev.tpl = pickWL(MERGE_TPL, b.tpl);
+  }
+  try {
+    const db = readMEvents();
+    db.events.push(ev);
+    if (db.events.length > MEVENTS_MAX) db.events = db.events.slice(-MEVENTS_MAX);
+    fs.writeFileSync(MEVENTS_PATH, JSON.stringify(db), 'utf8');
+  } catch (e) {}
+}
+function cleanName(s){ return String(s || '').replace(/[\x00-\x1f]/g, '').slice(0, 120); }
+/* 按字段做 TOP 计数（空值归到「(空)」，取前 n 个）。
+   ⚠️ 必须提到模块层：/api/admin/events 里的 cnt 是那个 if 块内的局部变量，
+      合并记录接口照着写会直接 ReferenceError（v0.9.244 首次联调就炸在这里）。 */
+function countTop(arr, key, n){
+  const m = new Map();
+  for (const e of arr) { const k = e[key] || '(空)'; m.set(k, (m.get(k) || 0) + 1); }
+  return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n || 10).map(([name, n2]) => ({ name, n: n2 }));
 }
 
 /* ---------------- 管理会话（内存 token） ---------------- */
@@ -1725,6 +1811,18 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { ok: true });
     }
 
+    /* v0.9.244：双语合并页使用记录上报（公开轻接口，与 /api/event 同规格：fire-and-forget）。
+       body: {kind:'merge'|'export', src, dst, cues, mode, fmt?, tpl?}
+       只收元数据，不收字幕内容；任何字段不认识的一律丢弃，不建脏字段。 */
+    if (req.method === 'POST' && u === '/api/merge-event') {
+      let mbody;
+      try { mbody = JSON.parse(await readBody(req, 4 * 1024)); } catch (e) {
+        return sendJson(res, 400, { error: { message: 'Request body is not valid JSON' } });
+      }
+      try { appendMEvent(clientIp(req), mbody); } catch (e) {}
+      return sendJson(res, 200, { ok: true });
+    }
+
     /* 管理登录 */
     if (req.method === 'POST' && u === '/api/admin/login') {
       let body;
@@ -1807,9 +1905,57 @@ const server = http.createServer(async (req, res) => {
           topLangs: cnt(all, 'lang'),
           topSrcs: cnt(all.filter(e => e.src), 'src'),   // v0.9.179: auto vs manually-picked source language
           topModels: cnt(all.filter(e => e.model), 'model'),
-          topFails: cnt(all.filter(e => e.failMsg), 'failMsg')
+          topFails: cnt(all.filter(e => e.failMsg), 'failMsg'),
+          /* v0.9.244：导出格式分布。⚠️ 不能对 dlFmt 做 cnt —— dlFmt 只是「最后一次」，
+             同一任务先下 srt 再下 ass 会被覆盖成一条；分布必须读累计计数（dlSrt/dlVtt/…）。 */
+          dlFmts: Object.keys(DL_FMT)
+            .map(k => ({ name: k, n: all.reduce((s, e) => s + (Number(e[DL_FMT_FIELD[k]]) || 0), 0) }))
+            .filter(x => x.n > 0).sort((a, b) => b.n - a.n)
         };
         const newest = all.slice().reverse(); // 最新在前（倒序拷贝，不动存储的追加序数组）
+        if (q.page !== undefined) {
+          const size = Math.min(100, Math.max(1, parseInt(q.size, 10) || 20));
+          const pages = Math.max(1, Math.ceil(all.length / size));
+          const page = Math.min(pages, Math.max(1, parseInt(q.page, 10) || 1));
+          return sendJson(res, 200, Object.assign(base, {
+            page, size, pages,
+            events: newest.slice((page - 1) * size, page * size)
+          }));
+        }
+        const qLimit = Math.min(500, Math.max(1, parseInt(q.limit, 10) || 100));
+        return sendJson(res, 200, Object.assign(base, { events: newest.slice(0, qLimit) }));
+      }
+
+      /* v0.9.244：双语合并页使用记录（独立卡片，与翻译事件分开统计）
+         ?page=N&size=20 → 分页；汇总只认 kind='export' 的记录（只有导出才有格式与模板） */
+      if (req.method === 'GET' && u === '/api/admin/merge-events') {
+        let q = {};
+        try { q = Object.fromEntries(new URL('http://x' + req.url).searchParams); } catch (e) {}
+        const all = readMEvents().events;
+        const today = todayStr();
+        const todays = all.filter(e => dateOfTs(e.t) === today);
+        const exp = all.filter(e => e.kind === 'export');
+        /* 文件名分布：一份合并涉及原文/译文两个文件，两个都算（看的是「哪些字幕在被处理」） */
+        const m = new Map();
+        for (const e of all) {
+          for (const k of ['src', 'dst']) {
+            const n = e[k]; if (!n) continue;
+            m.set(n, (m.get(n) || 0) + 1);
+          }
+        }
+        const base = {
+          total: all.length,
+          today: {
+            count: todays.length,
+            ips: new Set(todays.map(e => e.ip)).size,
+            merged: todays.filter(e => e.kind === 'merge').length,
+            exported: todays.filter(e => e.kind === 'export').length
+          },
+          topFiles: [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n })),
+          topFmts: countTop(exp.filter(e => e.fmt), 'fmt'),
+          topTpls: countTop(exp.filter(e => e.tpl), 'tpl')
+        };
+        const newest = all.slice().reverse();
         if (q.page !== undefined) {
           const size = Math.min(100, Math.max(1, parseInt(q.size, 10) || 20));
           const pages = Math.max(1, Math.ceil(all.length / size));
