@@ -252,7 +252,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.241</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.242</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -368,8 +368,14 @@
           <div class="seg" id="assTplSeg"></div>
         </div>
         <div class="hint" data-i18n="assTplTip">「分屏」「底部双行」会套用各自的默认参数；选「自定义」后布局与每一项都由你定。</div>
-        <!-- v0.9.219：布局选择仅「自定义」时显示；分屏/双行模板布局锁定，参数可微调 -->
-        <div class="af" id="layoutRow" style="display:none">
+        <!-- v0.9.242：这一行**不再显示** —— 布局本来就是「分屏 / 底部双行」两个模板键各自带的，
+             在「自定义」下面再选一遍纯属重复（custom+分屏 与 分屏 导出的 ASS 逐字节相同）。
+             更要命的是切模板是无条件套预设，点「自定义」反而按这里的 radio 把用户调好的值冲掉。
+             现在：布局跟着模板键走（点哪个键 = 哪个布局 + 那套默认参数），
+             手改参数或从文件导入 → 落到「自定义」，布局沿用跳转前那个，一个值都不动。
+             ⚠️ 这两个 radio 留着当**隐藏的状态源**（与 mVttPresetSel 同一个套路）：
+                「自定义」档自己不带布局，导出时 expFmtVal() 要读它，删了就没处取了。 -->
+        <div class="af" id="layoutRow" style="display:none" aria-hidden="true">
           <label data-i18n="lblLayout">布局</label>
           <div class="radios">
             <label><input type="radio" name="assLayout" value="split" checked><span data-i18n="layoutSplit">分屏 · 上下分离</span></label>
@@ -642,7 +648,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.241"></script>
+<script src="merge-core.js?v=0.9.242"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1356,9 +1362,21 @@ function setFmtGroup(g){
   sel.dispatchEvent(new Event('change',{bubbles:true}));
   syncTplSegs();
 }
+/* v0.9.242：布局写回隐藏的 assLayout radio（它是 custom 档唯一的布局来源）。
+   手改参数、切到自定义、导入 ASS、套方案 —— 四条路径都得经过这里，别各自去 querySelector。 */
+function setAssLayoutRadio(v){
+  const r = document.querySelector('input[name=assLayout][value="' + (v === 'stack' ? 'stack' : 'split') + '"]');
+  if (r) r.checked = true;
+}
 /* ASS 面板里的模板按钮（分屏 / 底部双行 / 自定义）：与过去的 expFmt 值一一对应 */
 function setAssTpl(v){
   const sel = $('expFmt'); if (!sel || sel.value === v) return;
+  /* 布局始终跟着档位走（隐藏的 radio 是唯一状态源）：
+       · 分屏 / 底部双行 → 直接就是那个布局；
+       · 自定义 → 自己不带布局，沿用跳转前那个（点「底部双行」再进自定义，布局仍是双行，参数一个不动）。
+     ⚠️ 两个预设档也必须同步：方案（schemeFields 的 __layout）直接读这个 radio，
+        不同步的话「点分屏 → 存方案」会把布局记成上一次的，套回去位置就错了。 */
+  setAssLayoutRadio(v === 'custom' ? (sel.value === 'stack' ? 'stack' : 'split') : v);
   sel.value = v;
   sel.dispatchEvent(new Event('change',{bubbles:true}));
   syncTplSegs();
@@ -1378,8 +1396,10 @@ function renderTplSegs(){
   }
   const vs = $('mVttPresetSeg');
   if (vs){
+    /* v0.9.242：「自定义」常驻 —— 它是一档，不是一个"手改过才冒出来"的状态提示
+       （ASS 那边三个键一直都在，两边得一致；藏起来用户会以为只有三种模板）。 */
     vs.innerHTML = MVTT_SEGS.map(x=>'<button type="button" class="segbtn" data-v="'+x[0]+'"'+
-      (x[0] === 'custom' ? ' data-custom="1" hidden' : '')+' data-i18n="'+x[1]+'">'+t(x[1])+'</button>').join('');
+      (x[0] === 'custom' ? ' data-custom="1"' : '')+' data-i18n="'+x[1]+'">'+t(x[1])+'</button>').join('');
     vs.querySelectorAll('.segbtn').forEach(b=>b.addEventListener('click', ()=>{
       const v = b.getAttribute('data-v');
       if (v === 'custom') return;            /* 「自定义」只是状态显示，点它不重置任何值 */
@@ -1400,9 +1420,8 @@ function syncTplSegs(){
   const vs = $('mVttPresetSeg');
   if (vs){
     const k = vttPresetKey();
+    /* v0.9.242：「自定义」不再隐藏 —— 四档常驻，当前是哪档就高亮哪一档。 */
     vs.querySelectorAll('.segbtn').forEach(b=>{
-      const isCustom = b.getAttribute('data-custom') === '1';
-      b.hidden = isCustom && k !== 'custom';   /* 没手改就不显示「自定义」，平时只三个键 */
       b.classList.toggle('on', b.getAttribute('data-v') === k);
     });
   }
@@ -1493,11 +1512,28 @@ function syncAssEdge(){
 const ALPHA_PAIRS = [['assDstAlpha','assDstAlphaOut'],['assSrcAlpha','assSrcAlphaOut'],
                      ['assDstEdgeAlpha','assDstEdgeAlphaOut'],['assSrcEdgeAlpha','assSrcEdgeAlphaOut']];
 function applyTplDefaults(tpl){
-  const d = TPL_DEFAULTS[presetKeyOf(tpl)] || TPL_DEFAULTS.split;
-  Object.keys(d).forEach(k=>setAssVal(k, d[k]));
-  ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor','assDstEdgeColor','assSrcEdgeColor'].forEach(syncColorSw);
-  ALPHA_PAIRS.forEach(pair=>{ const o=$(pair[1]); if(o) o.textContent=$(pair[0]).value+'%'; });
-  syncAssEdge();
+  ASS_FILL.active = true;    /* v0.9.242：套预设是程序写值，不算用户手改 */
+  try {
+    const d = TPL_DEFAULTS[presetKeyOf(tpl)] || TPL_DEFAULTS.split;
+    Object.keys(d).forEach(k=>setAssVal(k, d[k]));
+    ['assDstColor','assSrcColor','assDstOutlineColor','assSrcOutlineColor','assDstEdgeColor','assSrcEdgeColor'].forEach(syncColorSw);
+    ALPHA_PAIRS.forEach(pair=>{ const o=$(pair[1]); if(o) o.textContent=$(pair[0]).value+'%'; });
+    syncAssEdge();
+  } finally { ASS_FILL.active = false; }
+}
+/* v0.9.242：手改任一 ASS 参数 = 这套参数是我的（或改过的）→ 落到「自定义」，
+   布局沿用当前档位，**一个值都不动**（旧行为：一直停在 split/stack 档，
+   而点「自定义」又会按 layoutRow 的 radio 整套重置，等于没有保住参数的入口）。 */
+function markAssEdited(){
+  if (ASS_FILL.active) return;
+  const sel = $('expFmt'); if (!sel) return;
+  if (sel.value !== 'custom'){
+    setAssLayoutRadio(sel.value === 'stack' ? 'stack' : 'split');   /* 布局 = 跳转前那个档位 */
+    sel.value = 'custom';
+    const f2 = $('expFmt2'); if (f2) f2.value = 'custom';
+    syncAssChrome();   /* 只换显隐与按钮高亮；syncAssPanel 在 custom 档已不套预设，这里干脆不碰它 */
+    syncTplSegs();
+  }
 }
 function resetAssDefaults(){
   applyTplDefaults(tplVal());
@@ -1543,8 +1579,7 @@ function schemeDoSave(){
 }
 function schemeApplyObj(s, label){
   Object.keys(s).forEach(function(k){ if (k.slice(0,2) === '__') return; setAssVal(k, s[k]); });
-  const lay = document.querySelector('input[name=assLayout][value="' + (s.__layout === 'stack' ? 'stack' : 'split') + '"]');
-  if (lay) lay.checked = true;
+  setAssLayoutRadio(s.__layout);   /* v0.9.242：走同一处写回 */
   const ord = document.querySelector('input[name=biOrder][value="' + (s.__order === 'dst-first' ? 'dst-first' : 'src-first') + '"]');
   if (ord) ord.checked = true;
   SCHEME_COLOR_IDS.forEach(syncColorSw);
@@ -1592,7 +1627,7 @@ function syncAssChrome(){
   const tpl = tplVal();
   const plain = (tpl === 'srt' || tpl === 'vtt');
   $('assPanel').style.display = (plain || tpl === 'vttStyle') ? 'none' : '';
-  $('layoutRow').style.display = tpl === 'custom' ? 'flex' : 'none';
+  /* v0.9.242：布局行不再显示（整行常驻 display:none），布局由模板键决定 —— 见 HTML 里 layoutRow 的注释 */
   const hint = $('tplHint');
   if (hint) hint.textContent = t(tpl==='srt' ? 'tplHintPlain' : tpl==='vtt' ? 'tplHintVttPlain'
     : tpl==='custom' ? 'tplHintCustom' : tpl==='vttStyle' ? 'tplHintVttStyle' : 'tplHintPreset');
@@ -1611,6 +1646,11 @@ function syncAssChrome(){
 function syncAssPanel(){
   const tpl = tplVal();
   syncAssChrome();
+  /* v0.9.242：「自定义」= 这是我改过 / 从文件继承的一套，**别动我的值** ——
+     切到它不套预设。旧行为是按 layoutRow 的 radio 套一次分屏或双行的默认值，
+     等于用户想「保住参数」点它、反而被整套重置（TPL_DEFAULTS.custom = TPL_DEFAULTS.split）。
+     只有「分屏 / 底部双行」两个键才是「起点」，点了才套各自的默认参数。 */
+  if (tpl === 'custom') return;
   /* v0.9.224：切模板 = 套该模板默认参数（去掉 assDirty 门控，见 presetKeyOf 上方注释）。
      srt/vtt 时面板整体隐藏，但仍套一次分屏预设，保证用户第一次展开面板看到的就是预设值。 */
   applyTplDefaults(tpl);
@@ -2258,7 +2298,14 @@ function ensureFontOption(sel, name){
   o.value = name; o.textContent = name + ' · ' + t('assFontFromFile');
   sel.insertBefore(o, sel.firstChild);
 }
+/* v0.9.242：程序写值 ≠ 用户手改。套预设、导入 ASS、套样式方案都会往控件里写值，
+   这些绝不能被下面的「手改 → 跳自定义」当成用户动作（否则一导入就跳档、一初始化就跳档）。 */
+const ASS_FILL = { active: false };
 function setAssFields(pfx, f){
+  ASS_FILL.active = true;
+  try { setAssFieldsRaw(pfx, f); } finally { ASS_FILL.active = false; }
+}
+function setAssFieldsRaw(pfx, f){
   const setv = (id, v) => { if (v != null && v !== '') setAssVal(id, v); };
   setv(pfx + 'Size', f.size);
   setv(pfx + 'Color', f.color);
@@ -2299,8 +2346,7 @@ function applyAssPlan(plan){
   const f1 = $('expFmt'), f2 = $('expFmt2');
   if (f1) f1.value = setTpl;
   if (f2) f2.value = setTpl;
-  const radio = document.querySelector('input[name=assLayout][value="' + (tpl === 'stack' ? 'stack' : 'split') + '"]');
-  if (radio) radio.checked = true;
+  setAssLayoutRadio(tpl);   /* v0.9.242：走同一处写回，别自己 querySelector */
   const ord = document.querySelector('input[name=biOrder][value="' + (plan.order === 'dst-first' ? 'dst-first' : 'src-first') + '"]');
   if (ord) ord.checked = true;
   if (plan.dst) setAssFields('assDst', plan.dst);
@@ -2391,7 +2437,15 @@ function init(){
   const smEl = $('structMode');
   if (smEl) smEl.addEventListener('change', ()=>{ if (S.mode === 'adjust' && S.rows) doAdjust(); });
   window.addEventListener('resize', renderAssPv);
-  document.querySelectorAll('input[name=assLayout]').forEach(el=>el.addEventListener('change', syncAssPanel));
+  /* v0.9.242：布局 radio 已隐藏（布局跟着模板键走，见 layoutRow 注释），它不再需要 change 监听。
+     改成监听**每一个** ASS 字段：手改任意一个 = 这套参数是我的 → 落到「自定义」，
+     且一个值都不动（旧行为一直停在 split/stack 档，而点「自定义」又会把值整套重置）。
+     ⚠️ 程序写值（套预设 / 导入 / 套方案）由 ASS_FILL 挡掉，不会被误判成手改。 */
+  ASS_DEFAULTS.forEach(pair=>{
+    const el = $(pair[0]); if (!el) return;
+    const onEdit = ()=>{ markAssEdited(); renderAssPv(); };
+    ['input','change'].forEach(ev=>el.addEventListener(ev, onEdit));
+  });
   $('btnAssReset').addEventListener('click', resetAssDefaults);
   /* ---------- v0.9.238：WebVTT 样式（与 ASS 完全独立的一套 id / 参数 / 预览） ----------
      改任一字段 = 该区域标记为「手改过」→ 后续导入不再覆盖它，模板下拉同步变成「自定义」。 */

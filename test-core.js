@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.241/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.242/.test(mg), 'merge.html 未引用 v0.9.241 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.241</.test(html), '首页版本号未升 0.9.241');
-    assert.ok(/class="ver-tag">v0\.9\.241</.test(html), '工作台版本号未升 0.9.241');
-    assert.ok(/srt-core\.js\?v=0\.9\.241/.test(html), 'srt-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.242</.test(html), '首页版本号未升 0.9.241');
+    assert.ok(/class="ver-tag">v0\.9\.242</.test(html), '工作台版本号未升 0.9.241');
+    assert.ok(/srt-core\.js\?v=0\.9\.242/.test(html), 'srt-core.js?v 未升 0.9.241');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5444,7 +5444,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
        「写入样式」开关就住在面板里，藏掉面板用户就没法把样式再打开。 */
     assert.ok(/const vp = \$\('mVttPanel'\); if \(vp\) vp\.style\.display = \(tpl === 'vttStyle' \|\| tpl === 'vtt'\) \? '' : 'none'/.test(mg),
       'VTT 面板未随模板显隐');
-    assert.ok(/\$\('layoutRow'\)\.style\.display = tpl === 'custom' \? 'flex' : 'none'/.test(mg), '布局行未只在 custom 显示');
+    /* v0.9.242：布局行**整行不再显示**（在「自定义」下再选一遍布局是重复 ——
+       custom+分屏 与 分屏 导出的 ASS 逐字节相同；更糟的是切模板无条件套预设，
+       点「自定义」反而按那个 radio 把用户调好的值冲掉）。
+       判据：① HTML 里 layoutRow 常驻 display:none；② 没有任何代码再去改它的 display。 */
+    assert.ok(/<div class="af" id="layoutRow" style="display:none" aria-hidden="true">/.test(mg),
+      '布局行必须常驻隐藏（v0.9.242 起界面上不再有这一行）');
+    assert.ok(!/layoutRow'\)\.style\.display\s*=/.test(mg), '还有代码在切换布局行的显隐');
+    assert.ok(/function setAssLayoutRadio\(/.test(mg), '缺 setAssLayoutRadio（布局写回隐藏 radio 的唯一入口）');
     /* 恢复默认：14 个外观字段逐一回默认值（⚠️ 只在 ASS_DEFAULTS 声明块内数，文件里还有同形态的绑定数组） */
     assert.ok(/function resetAssDefaults\(\)/.test(mg), '缺 resetAssDefaults');
     const declAt = mg.indexOf('const ASS_DEFAULTS = [');
@@ -5532,8 +5539,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.241</.test(mg), 'merge.html 版本未升 0.9.241');
-    assert.ok(/merge-core\.js\?v=0\.9\.241/.test(mg), 'merge-core.js?v 未升 0.9.241');
+    assert.ok(/class="ver">v0\.9\.242</.test(mg), 'merge.html 版本未升 0.9.241');
+    assert.ok(/merge-core\.js\?v=0\.9\.242/.test(mg), 'merge-core.js?v 未升 0.9.241');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7040,7 +7047,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* VTT 面板的三个模板按钮 = 三套预设（「自定义」单独标记成状态键） */
     assert.ok(/const MVTT_SEGS = \[\['std','vttTplStd'\],\['compact','vttTplCompact'\],\['cinema','vttTplCinema'\],\['custom','vttTplCustom'\]\]/.test(mg),
       'WebVTT 面板缺模板按钮定义');
-    assert.ok(/data-custom="1" hidden/.test(mg), '「自定义」应默认隐藏，手改后才出现');
+    /* v0.9.242：「自定义」改成**常驻**的一档（ASS 那边三个键一直都在，两边得一致；
+       藏起来用户会以为只有三种模板，而且它是能点的：点了不重置任何值）。
+       判据：① 渲染时带 data-custom="1" 但**不带** hidden；② 没有任何代码再去改它的 hidden。 */
+    assert.ok(/data-custom="1"/.test(mg), '「自定义」键缺 data-custom 标记');
+    assert.ok(!/data-custom="1" hidden/.test(mg), '「自定义」不该再默认隐藏');
+    assert.ok(!/b\.hidden\s*=/.test(mg), '还有代码在切换「自定义」键的显隐');
     /* 六个档位一个都不能丢：老逻辑全读 expFmt.value */
     ['value="srt"','value="vtt"','value="vttStyle"','value="split"','value="stack"','value="custom"']
       .forEach(v => assert.ok(mg.indexOf(v) > 0, 'expFmt 少了档位 ' + v));
@@ -7243,6 +7255,98 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.strictEqual((mg.match(/lblVttSrcDiff/g) || []).length, 0, 'merge 还留着已废弃的 lblVttSrcDiff');
     assert.strictEqual((html.match(/lblVttSrcDiff/g) || []).length, 0, 'index 还留着已废弃的 lblVttSrcDiff');
     assert.strictEqual((mg.match(/字号与颜色始终单独设置/g) || []).length, 0, 'merge 还留着与行为打架的旧说明');
+  });
+
+  /* ================= v0.9.242：布局跟着模板走，「自定义」不再是个坑 =================
+     用户原话：「ASS 模版 → 自定义 → 下面有两个『布局』，这个布局没有意义，你说是不是不？」
+     是。三条事实：
+       ① custom + 布局=分屏 与 直接选「分屏」，expFmtVal() 都返回 'ass-split' → 导出逐字节相同；
+       ② 唯一区别（点了重不重套预设）界面上一个字都没写；
+       ③ 更糟：TPL_DEFAULTS.custom = TPL_DEFAULTS.split 且切模板无条件套预设 →
+          用户想「保住参数」点「自定义」，反而按那个 radio 整套重置。
+     改后：布局行整行不显示（radio 留作隐藏状态源）；「分屏/底部双行」= 起点，点了才套预设；
+           手改任一参数 / 导入 ASS → 落「自定义」，布局沿用、一个值都不动。
+     顺带：VTT 的「自定义」从「手改了才冒出来的状态提示」改成常驻可点的一档（与 ASS 对齐）。 */
+  console.log('— v0.9.242：布局跟着模板走 + 「自定义」常驻 —');
+
+  t('v0.9.242：布局行不再显示，radio 只作隐藏状态源', () => {
+    assert.ok(/<div class="af" id="layoutRow" style="display:none" aria-hidden="true">/.test(mg),
+      'layoutRow 必须整行常驻隐藏');
+    assert.ok(!/layoutRow'\)\.style\.display\s*=/.test(mg), '还有代码在切换布局行的显隐');
+    /* radio 必须还在 —— custom 档自己不带布局，expFmtVal() 要从它取值 */
+    assert.ok(/name="assLayout" value="split"/.test(mg) && /name="assLayout" value="stack"/.test(mg),
+      '两个布局 radio 要留着当状态源（custom 的布局就靠它）');
+    assert.ok(/function setAssLayoutRadio\(/.test(mg), '缺 setAssLayoutRadio');
+    /* 写回 radio 只准走一个入口（以前 import 那条路径自己 querySelector，容易漏同步） */
+    const hits = (mg.match(/name=assLayout\]\[value=/g) || []).length;
+    assert.strictEqual(hits, 1, '写回布局 radio 的地方应只有 setAssLayoutRadio 一处，实际 ' + hits);
+  });
+
+  t('v0.9.242：切到「自定义」不套预设（它是"别动我的"，不是另一个起点）', () => {
+    const sp = mg.slice(mg.indexOf('function syncAssPanel(){'), mg.indexOf('function biMaxWVal(){'));
+    assert.ok(sp.length > 0, '没取到 syncAssPanel');
+    assert.ok(/if \(tpl === 'custom'\) return;/.test(sp), 'syncAssPanel 在 custom 档必须直接返回（不套预设）');
+    assert.ok(/applyTplDefaults\(tpl\)/.test(sp), '其他档位仍要套各自预设');
+    /* 切进 custom 前先把布局记成跳转前那个档位 */
+    const st = mg.slice(mg.indexOf('function setAssTpl(v){'), mg.indexOf('function renderTplSegs(){'));
+    assert.ok(/if \(v === 'custom'\) setAssLayoutRadio\(/.test(st), '切进自定义前没记下当前布局');
+  });
+
+  t('v0.9.242：手改任一 ASS 参数 → 落「自定义」，布局沿用且值不动', () => {
+    assert.ok(/function markAssEdited\(\)/.test(mg), '缺 markAssEdited');
+    /* 只取 markAssEdited 函数体本身：到下一个顶层 function 为止
+       （切到 syncColorSw 会把 resetAssDefaults 夹进来，它里面当然有 applyTplDefaults） */
+    const m0 = mg.indexOf('function markAssEdited(){');
+    const mk = mg.slice(m0, mg.indexOf('\nfunction ', m0 + 10));
+    assert.ok(/if \(ASS_FILL\.active\) return;/.test(mk), '程序写值必须被 ASS_FILL 挡掉');
+    assert.ok(!/applyTplDefaults/.test(mk), '手改绝不能顺带套预设（那会冲掉用户的值）');
+    assert.ok(!/dispatchEvent/.test(mk), '手改只换档位标记，不该再派发 change 走一遍切模板流程');
+    assert.ok(!/applyTplDefaults/.test(mk), '（紧邻校验）手改函数体内绝不能出现套预设');
+    assert.ok(/setAssLayoutRadio\(sel\.value === 'stack' \? 'stack' : 'split'\)/.test(mk),
+      '跳自定义时布局没沿用当前档位');
+    /* 每个 ASS 字段都得挂上监听，漏一个就是「改了某项却不进自定义」 */
+    assert.ok(/ASS_DEFAULTS\.forEach\(pair=>\{[\s\S]{0,200}markAssEdited\(\)/.test(mg),
+      'ASS 字段没接上「手改 → 跳自定义」的监听');
+  });
+
+  t('v0.9.242：套预设 / 导入 / 套方案 的写值不会被误判成手改', () => {
+    assert.ok(/const ASS_FILL = \{ active: false \}/.test(mg), '缺 ASS_FILL 守卫');
+    const ap = mg.slice(mg.indexOf('function applyTplDefaults(tpl){'), mg.indexOf('function markAssEdited(){'));
+    assert.ok(/ASS_FILL\.active = true/.test(ap) && /finally \{ ASS_FILL\.active = false/.test(ap),
+      'applyTplDefaults 没用 ASS_FILL 包住（try/finally）');
+    assert.ok(/function setAssFields\(pfx, f\)\{[\s\S]{0,200}function setAssFieldsRaw/.test(mg),
+      'setAssFields 没用 ASS_FILL 包住');
+  });
+
+  t('v0.9.242：custom + 布局=分屏 与 分屏 导出同一个格式（这就是"布局重复"的凭据）', () => {
+    const ef = mg.slice(mg.indexOf('function expFmtVal(){'), mg.indexOf('/* v0.9.240：导出改成'));
+    assert.ok(/if \(tpl === 'custom'\) return assLayoutVal\(\);/.test(ef), "custom 未跟随布局");
+    assert.ok(/if \(tpl === 'split'\) return 'ass-split';/.test(ef), 'split 档位丢了');
+    assert.ok(/if \(tpl === 'stack'\) return 'ass-stack';/.test(ef), 'stack 档位丢了');
+    assert.ok(/function assLayoutVal\(\)\{[\s\S]{0,200}ass-split' : /.test(mg) === false, '');
+  });
+
+  t('v0.9.242：VTT「自定义」常驻 —— 与 ASS 三键一致，不再是"手改才冒出来"', () => {
+    assert.ok(/data-custom="1"/.test(mg), '缺 data-custom 标记');
+    assert.ok(!/data-custom="1" hidden/.test(mg), '「自定义」不该再默认隐藏');
+    assert.ok(!/b\.hidden\s*=/.test(mg), '还有代码在切换按钮显隐');
+    /* 点它仍然什么都不做（不重置任何值） */
+    /* ⚠️ 结束锚点必须从起点之后找 —— syncTplSegs 自己的结尾在这段之前，
+       用全局 indexOf 会得到 end < start 的空串（假失败） */
+    const r0 = mg.indexOf('const vs = $(\'mVttPresetSeg\');');
+    const rs = mg.slice(r0, mg.indexOf('syncTplSegs();\n}', r0));
+    assert.ok(/if \(v === 'custom'\) return;/.test(rs), '点「自定义」不该有动作（它是"别动我的"，不是预设）');
+    assert.ok(/const MVTT_SEGS = \[\['std'[\s\S]*'custom','vttTplCustom'\]\]/.test(mg), 'VTT 四档定义丢了');
+  });
+
+  t('v0.9.242：版号两页同步升到 242（merge 2 处 + index 3 处）', () => {
+    assert.ok(/class="ver">v0\.9\.242/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.242/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.242/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.242/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.242/.test(html), 'index.html 缓存 bust 未升');
+    /* 上一版的版号不许还挂在显示位上 */
+    assert.ok(!/class="ver">v0\.9\.241/.test(mg) && !/class="ver">v0\.9\.241/.test(html), '还留着上一版的显示版号');
   });
 
 
