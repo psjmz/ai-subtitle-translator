@@ -680,11 +680,14 @@
     return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (+((a / 100).toFixed(3))) + ')';
   }
   /* 描边：VTT 没有 ASS 的 Outline；outline 画的是**方框**不是字描边，只能 text-shadow 八向模拟。 */
-  function vttShadowCss(st) {
-    if (!st || st.shadowOn === false) return '';
-    const w = (st.shadowW != null && isFinite(+st.shadowW)) ? +st.shadowW : 2;
+  function vttShadowCss(st, pfx) {
+    if (!st) return '';
+    const P = !!pfx;
+    const wRaw = P ? st.srcShadowW : st.shadowW;
+    const w = (wRaw != null && String(wRaw).trim() !== '' && isFinite(+wRaw)) ? +wRaw : 2;
     if (!(w > 0)) return '';
-    const c = (st && /^#[0-9a-fA-F]{6}$/.test(String(st.shadowColor || '').trim())) ? String(st.shadowColor).trim() : '#000000';
+    const cRaw = P ? st.srcShadowColor : st.shadowColor;
+    const c = /^#[0-9a-fA-F]{6}$/.test(String(cRaw || '').trim()) ? String(cRaw).trim() : '#000000';
     return [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]]
       .map((p) => (p[0] * w) + 'px ' + (p[1] * w) + 'px 0 ' + c).join(', ');
   }
@@ -698,7 +701,7 @@
     if (st.bold) d.push('  font-weight: bold;');
     if (st.italic) d.push('  font-style: italic;');
     if (st.lineHeight != null && String(st.lineHeight).trim() !== '' && isFinite(+st.lineHeight)) d.push('  line-height: ' + (+st.lineHeight) + ';');
-    const sh = vttShadowCss(st);
+    const sh = (st.shadowOn === false) ? '' : vttShadowCss(st, '');
     if (sh) d.push('  text-shadow: ' + sh + ';');
     if (st.bgOn !== false) {
       const bg = vttRgba(st.bgColor || '#000000', st.bgAlpha == null ? 55 : st.bgAlpha);
@@ -712,6 +715,20 @@
       const sc = /^#[0-9a-fA-F]{6}$/.test(String(st.srcColor || '').trim()) ? String(st.srcColor).trim() : null;
       if (sc) sd.push('  color: ' + sc + ';');
       if (st.srcSize != null && String(st.srcSize).trim() !== '' && isFinite(+st.srcSize)) sd.push('  font-size: ' + (+st.srcSize) + '%;');
+      /* v0.9.239：原文行的字体/粗体/斜体/底衬/描边是三态（沿用 / 开 / 关）。
+         「沿用」= 一个字都不写 —— 默认值就是沿用，所以 238 的导出逐字节不变；
+         「关」要显式写 normal / none / transparent（光不写会让 ::cue 的值漏下来）。 */
+      if (String(st.srcFont || '').trim()) sd.push('  font-family: ' + vttFontStack(st.srcFont) + ';');
+      if (st.srcBold === 'on') sd.push('  font-weight: bold;');
+      else if (st.srcBold === 'off') sd.push('  font-weight: normal;');
+      if (st.srcItalic === 'on') sd.push('  font-style: italic;');
+      else if (st.srcItalic === 'off') sd.push('  font-style: normal;');
+      if (st.srcShadowOn === 'on') { const ssh = vttShadowCss(st, 'src'); if (ssh) sd.push('  text-shadow: ' + ssh + ';'); }
+      else if (st.srcShadowOn === 'off') sd.push('  text-shadow: none;');
+      if (st.srcBgOn === 'on') {
+        const sbg = vttRgba(st.srcBgColor || '#000000', st.srcBgAlpha == null ? 55 : st.srcBgAlpha);
+        if (sbg) sd.push('  background-color: ' + sbg + ';');
+      } else if (st.srcBgOn === 'off') sd.push('  background-color: transparent;');
       if (sd.length) rules.push('::cue(.' + VTT_SRC_CLASS + ') {\n' + sd.join('\n') + '\n}');
     }
     if (!rules.length) return '';
@@ -823,6 +840,23 @@
         if (c) st.srcColor = c.hex;
         const fs = /^([\d.]+)\s*%$/.exec(d['font-size'] || '');
         if (fs) st.srcSize = fs[1];
+        /* 三态读回：写了才是 on/off，没写就是「沿用」。transparent / normal / none 认成「关」。 */
+        if (d['font-family']) { const k = vttFontKeyOf(d['font-family']); if (k) st.srcFont = k; }
+        if (d['font-weight']) st.srcBold = /^(bold|bolder|[6-9]00)$/i.test(d['font-weight'].trim()) ? 'on' : 'off';
+        if (d['font-style']) st.srcItalic = /^(italic|oblique)$/i.test(d['font-style'].trim()) ? 'on' : 'off';
+        if (d['background-color']) {
+          const bt = d['background-color'].trim();
+          if (/^transparent$/i.test(bt)) st.srcBgOn = 'off';
+          else {
+            const sb = vttUnRgba(bt);
+            if (sb) { st.srcBgColor = sb.hex; st.srcBgAlpha = String(sb.alpha); st.srcBgOn = 'on'; }
+          }
+        }
+        if (d['text-shadow']) {
+          const ssh = vttShadowOf(d['text-shadow']);
+          if (ssh) { st.srcShadowOn = 'on'; st.srcShadowW = String(ssh.w); st.srcShadowColor = ssh.color; }
+          else if (/^none$/i.test(d['text-shadow'].trim())) st.srcShadowOn = 'off';
+        }
         st.srcDiff = true;
         res.found = true;
       }

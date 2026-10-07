@@ -195,7 +195,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.238</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.239</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -406,9 +406,12 @@
           </select>
         </div>
         <div class="hint" id="mVttPresetHint"></div>
+        <!-- v0.9.239：按「层」重排 —— 整条 / 译文行 / 原文行。
+             原文行是覆盖层：字号与颜色始终单独设；字体、粗体、斜体、底衬、描边是三态
+             （沿用 / 开 / 关），默认「沿用」= 一个字都不写，所以默认导出与 238 逐字节相同。 -->
+        <h4 data-i18n="vttGrpAll">整条字幕（两层共用）</h4>
         <div class="vtt-cols">
           <div class="ass-col">
-            <h4 data-i18n="vttGrpPos">位置（百分比）</h4>
             <div class="af"><label data-i18n="lblVttLine">垂直 line</label><input type="number" id="mVttLine" value="90" step="1"></div>
             <div class="af"><label data-i18n="lblVttAnchor">锚点</label><select id="mVttLineAlign">
               <option value="end" data-i18n="vttAnchorEnd" selected>贴底</option>
@@ -416,32 +419,63 @@
               <option value="center" data-i18n="vttAnchorMid">居中</option>
             </select></div>
             <div class="af"><label data-i18n="lblVttPos">水平 position</label><input type="number" id="mVttPos" value="50" step="1"></div>
+          </div>
+          <div class="ass-col">
             <div class="af"><label data-i18n="lblVttWidth">宽度 size</label><input type="number" id="mVttWidth" value="80" step="1"></div>
             <div class="af"><label data-i18n="lblVttAlign">对齐 align</label><select id="mVttAlign">
               <option value="center" data-i18n="vttAlignCenter" selected>居中</option>
               <option value="start" data-i18n="vttAlignStart">左</option>
               <option value="end" data-i18n="vttAlignEnd">右</option>
             </select></div>
-            <h4 data-i18n="vttGrpText">文字</h4>
+            <div class="af"><label data-i18n="lblVttLH">行高</label><input type="number" id="mVttLH" value="1.4" step="0.1"></div>
+          </div>
+        </div>
+        <div class="vtt-cols">
+          <div class="ass-col">
+            <h4 data-i18n="vttGrpDst">译文行（主样式）</h4>
             <div class="af"><label data-i18n="lblVttSize">字号</label><input type="number" id="mVttSize" value="100" step="5"></div>
             <div class="af"><label data-i18n="lblVttColor">颜色</label><input type="text" id="mVttColor" value="#FFFFFF"><span class="sw" id="mVttColorSw"></span></div>
             <div class="af"><label data-i18n="lblVttFont">字体</label><select id="mVttFont"></select></div>
-            <div class="af"><label data-i18n="lblVttLH">行高</label><input type="number" id="mVttLH" value="1.4" step="0.1"></div>
             <div class="af"><label data-i18n="lblVttWeight">粗体</label><input type="checkbox" id="mVttBold" checked></div>
             <div class="af"><label data-i18n="lblVttItalic">斜体</label><input type="checkbox" id="mVttItalic"></div>
-          </div>
-          <div class="ass-col">
-            <h4 data-i18n="vttGrpSrc">原文行</h4>
-            <div class="af"><label data-i18n="lblVttSrcDiff">区分原文</label><input type="checkbox" id="mVttSrcDiff" checked></div>
-            <div class="af"><label data-i18n="lblVttSrcColor">颜色</label><input type="text" id="mVttSrcColor" value="#FFD700"><span class="sw" id="mVttSrcColorSw"></span></div>
-            <div class="af"><label data-i18n="lblVttSrcSize">字号</label><input type="number" id="mVttSrcSize" value="85" step="5"></div>
-            <h4 data-i18n="vttGrpFx">底衬 / 描边</h4>
             <div class="af"><label data-i18n="lblVttBg">底衬</label><input type="checkbox" id="mVttBgOn" checked></div>
             <div class="af"><label data-i18n="lblVttBgColor">底衬色</label><input type="text" id="mVttBgColor" value="#000000"><span class="sw" id="mVttBgColorSw"></span></div>
             <div class="af"><label data-i18n="lblVttBgAlpha">底衬不透明</label><input type="range" id="mVttBgAlpha" min="0" max="100" value="55"><span class="pct" id="mVttBgAlphaOut">55%</span></div>
             <div class="af"><label data-i18n="lblVttShadow">描边</label><input type="checkbox" id="mVttShadowOn" checked></div>
             <div class="af"><label data-i18n="lblVttShadowW">粗细</label><input type="number" id="mVttShadowW" value="2" step="0.5"></div>
             <div class="af"><label data-i18n="lblVttShadowColor">描边色</label><input type="text" id="mVttShadowColor" value="#000000"><span class="sw" id="mVttShadowColorSw"></span></div>
+          </div>
+          <div class="ass-col">
+            <h4 data-i18n="vttGrpSrc">原文行</h4>
+            <div class="hint ass-note" data-i18n="vttSrcTip">字号与颜色始终单独设置；字体、粗体、斜体、底衬、描边默认「沿用」= 跟译文行一样，改了才写进 ::cue(.src)。</div>
+            <div class="af"><label data-i18n="lblVttSrcDiff">区分原文</label><input type="checkbox" id="mVttSrcDiff" checked></div>
+            <div class="af"><label data-i18n="lblVttSrcSize">字号</label><input type="number" id="mVttSrcSize" value="85" step="5"></div>
+            <div class="af"><label data-i18n="lblVttSrcColor">颜色</label><input type="text" id="mVttSrcColor" value="#FFD700"><span class="sw" id="mVttSrcColorSw"></span></div>
+            <div class="af"><label data-i18n="lblVttSrcFont">字体</label><select id="mVttSrcFont"></select></div>
+            <div class="af"><label data-i18n="lblVttSrcBold">粗体</label><select id="mVttSrcBold">
+              <option value="" data-i18n="vttInherit" selected>沿用</option>
+              <option value="off" data-i18n="vttOptNormal">常规</option>
+              <option value="on" data-i18n="lblVttWeight">粗体</option>
+            </select></div>
+            <div class="af"><label data-i18n="lblVttSrcItalic">斜体</label><select id="mVttSrcItalic">
+              <option value="" data-i18n="vttInherit" selected>沿用</option>
+              <option value="off" data-i18n="vttOptNormal">常规</option>
+              <option value="on" data-i18n="lblVttItalic">斜体</option>
+            </select></div>
+            <div class="af"><label data-i18n="lblVttSrcBg">底衬</label><select id="mVttSrcBgOn">
+              <option value="" data-i18n="vttInherit" selected>沿用</option>
+              <option value="on" data-i18n="vttOptOn">开</option>
+              <option value="off" data-i18n="vttOptOff">关</option>
+            </select></div>
+            <div class="af"><label data-i18n="lblVttSrcBgColor">底衬色</label><input type="text" id="mVttSrcBgColor" value="#000000"><span class="sw" id="mVttSrcBgColorSw"></span></div>
+            <div class="af"><label data-i18n="lblVttSrcBgAlpha">底衬不透明</label><input type="range" id="mVttSrcBgAlpha" min="0" max="100" value="55"><span class="pct" id="mVttSrcBgAlphaOut">55%</span></div>
+            <div class="af"><label data-i18n="lblVttSrcShadow">描边</label><select id="mVttSrcShadowOn">
+              <option value="" data-i18n="vttInherit" selected>沿用</option>
+              <option value="on" data-i18n="vttOptOn">开</option>
+              <option value="off" data-i18n="vttOptOff">关</option>
+            </select></div>
+            <div class="af"><label data-i18n="lblVttSrcShadowW">粗细</label><input type="number" id="mVttSrcShadowW" value="2" step="0.5"></div>
+            <div class="af"><label data-i18n="lblVttSrcShadowColor">描边色</label><input type="text" id="mVttSrcShadowColor" value="#000000"><span class="sw" id="mVttSrcShadowColorSw"></span></div>
           </div>
         </div>
         <!-- 描边在 VTT 里没有真 PyOutline：::cue 的 outline 画的是整个方框，只能用 text-shadow 八向模拟 -->
@@ -512,7 +546,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.238"></script>
+<script src="merge-core.js?v=0.9.239"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -568,6 +602,12 @@ const I18N = {
     lblVttPreset:'样式模板', vttPresetStd:'标准 · 底部双语', vttPresetCompact:'紧凑 · 小字窄幅',
     vttPresetCinema:'电影感 · 大字描边', vttPresetCustom:'自定义',
     vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底衬 / 描边',
+    vttGrpAll:'整条字幕（两层共用）', vttGrpDst:'译文行（主样式）',
+    vttSrcTip:'字号与颜色始终单独设置；字体、粗体、斜体、底衬、描边默认「沿用」= 跟译文行一样，改了才写进 ::cue(.src)。',
+    vttInherit:'沿用', vttOptNormal:'常规', vttOptOn:'开', vttOptOff:'关',
+    lblVttSrcFont:'字体', lblVttSrcBold:'粗体', lblVttSrcItalic:'斜体',
+    lblVttSrcBg:'底衬', lblVttSrcBgColor:'底衬色', lblVttSrcBgAlpha:'底衬不透明',
+    lblVttSrcShadow:'描边', lblVttSrcShadowW:'粗细', lblVttSrcShadowColor:'描边色',
     lblVttLine:'垂直 line', lblVttAnchor:'锚点', vttAnchorEnd:'贴底', vttAnchorStart:'贴顶', vttAnchorMid:'居中',
     lblVttPos:'水平 position', lblVttWidth:'宽度 size', lblVttAlign:'对齐 align',
     vttAlignCenter:'居中', vttAlignStart:'左', vttAlignEnd:'右',
@@ -648,6 +688,12 @@ const I18N = {
     lblVttPreset:'樣式範本', vttPresetStd:'標準 · 底部雙語', vttPresetCompact:'緊湊 · 小字窄幅',
     vttPresetCinema:'電影感 · 大字描邊', vttPresetCustom:'自訂',
     vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 描邊',
+    vttGrpAll:'整條字幕（兩層共用）', vttGrpDst:'譯文行（主樣式）',
+    vttSrcTip:'字號與顏色一律單獨設定；字體、粗體、斜體、底襯、描邊預設「沿用」＝跟譯文行一樣，改了才寫進 ::cue(.src)。',
+    vttInherit:'沿用', vttOptNormal:'常規', vttOptOn:'開', vttOptOff:'關',
+    lblVttSrcFont:'字體', lblVttSrcBold:'粗體', lblVttSrcItalic:'斜體',
+    lblVttSrcBg:'底襯', lblVttSrcBgColor:'底襯色', lblVttSrcBgAlpha:'底襯不透明',
+    lblVttSrcShadow:'描邊', lblVttSrcShadowW:'粗細', lblVttSrcShadowColor:'描邊色',
     lblVttLine:'垂直 line', lblVttAnchor:'錨點', vttAnchorEnd:'貼底', vttAnchorStart:'貼頂', vttAnchorMid:'置中',
     lblVttPos:'水平 position', lblVttWidth:'寬度 size', lblVttAlign:'對齊 align',
     vttAlignCenter:'置中', vttAlignStart:'左', vttAlignEnd:'右',
@@ -728,6 +774,12 @@ const I18N = {
     lblVttPreset:'Style preset', vttPresetStd:'Standard · bottom bilingual', vttPresetCompact:'Compact · smaller, narrower',
     vttPresetCinema:'Cinematic · large with outline', vttPresetCustom:'Custom',
     vttGrpPos:'Position (percent)', vttGrpText:'Text', vttGrpSrc:'Original line', vttGrpFx:'Box / outline',
+    vttGrpAll:'Whole cue (both lines)', vttGrpDst:'Translation (base style)',
+    vttSrcTip:'Size and colour are always set separately. Font, weight, italic, box and outline default to Inherit = same as the translation line; only what you change gets written to ::cue(.src).',
+    vttInherit:'Inherit', vttOptNormal:'Normal', vttOptOn:'On', vttOptOff:'Off',
+    lblVttSrcFont:'Font', lblVttSrcBold:'Bold', lblVttSrcItalic:'Italic',
+    lblVttSrcBg:'Box', lblVttSrcBgColor:'Box colour', lblVttSrcBgAlpha:'Box opacity',
+    lblVttSrcShadow:'Outline', lblVttSrcShadowW:'Width', lblVttSrcShadowColor:'Outline colour',
     lblVttLine:'Vertical line', lblVttAnchor:'Anchor', vttAnchorEnd:'Bottom', vttAnchorStart:'Top', vttAnchorMid:'Middle',
     lblVttPos:'Horizontal position', lblVttWidth:'Width size', lblVttAlign:'Align',
     vttAlignCenter:'Center', vttAlignStart:'Left', vttAlignEnd:'Right',
@@ -808,6 +860,12 @@ const I18N = {
     lblVttPreset:'スタイルテンプレート', vttPresetStd:'標準 · 下部二か国語', vttPresetCompact:'コンパクト · 小さめ',
     vttPresetCinema:'シネマ · 大きめ＋縁取り', vttPresetCustom:'カスタム',
     vttGrpPos:'位置（パーセント）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 縁取り',
+    vttGrpAll:'字幕全体（両方の行）', vttGrpDst:'訳文行（基本スタイル）',
+    vttSrcTip:'サイズと色は常に個別設定。フォント・太字・斜体・底襯・縁取りは既定で「沿用」＝訳文行と同じ。変更した項目だけ ::cue(.src) に書き出されます。',
+    vttInherit:'沿用', vttOptNormal:'標準', vttOptOn:'オン', vttOptOff:'オフ',
+    lblVttSrcFont:'フォント', lblVttSrcBold:'太字', lblVttSrcItalic:'斜体',
+    lblVttSrcBg:'底襯', lblVttSrcBgColor:'底襯の色', lblVttSrcBgAlpha:'底襯の不透明度',
+    lblVttSrcShadow:'縁取り', lblVttSrcShadowW:'太さ', lblVttSrcShadowColor:'縁取りの色',
     lblVttLine:'垂直 line', lblVttAnchor:'基準', vttAnchorEnd:'下寄せ', vttAnchorStart:'上寄せ', vttAnchorMid:'中央',
     lblVttPos:'水平 position', lblVttWidth:'幅 size', lblVttAlign:'揃え align',
     vttAlignCenter:'中央', vttAlignStart:'左', vttAlignEnd:'右',
@@ -1596,25 +1654,35 @@ function renderAssPv(){
 const MVTT_POS_IDS  = ['mVttLine','mVttLineAlign','mVttPos','mVttWidth','mVttAlign'];
 const MVTT_MAIN_IDS = ['mVttSize','mVttColor','mVttFont','mVttLH','mVttBold','mVttItalic',
   'mVttBgOn','mVttBgColor','mVttBgAlpha','mVttShadowOn','mVttShadowW','mVttShadowColor'];
-const MVTT_SRC_IDS  = ['mVttSrcDiff','mVttSrcColor','mVttSrcSize'];
-const MVTT_COLOR_IDS = ['mVttColor','mVttSrcColor','mVttBgColor','mVttShadowColor'];
+const MVTT_SRC_IDS  = ['mVttSrcDiff','mVttSrcColor','mVttSrcSize','mVttSrcFont','mVttSrcBold','mVttSrcItalic',
+  'mVttSrcBgOn','mVttSrcBgColor','mVttSrcBgAlpha','mVttSrcShadowOn','mVttSrcShadowW','mVttSrcShadowColor'];
+const MVTT_COLOR_IDS = ['mVttColor','mVttSrcColor','mVttBgColor','mVttShadowColor','mVttSrcBgColor','mVttSrcShadowColor'];
+/* v0.9.239：原文行新开的五项（字体 / 粗体 / 斜体 / 底衬 / 描边）一律三态 ——
+   '' = 沿用主样式（一个字都不写）、'on' = 单独开、'off' = 单独关。
+   默认全「沿用」，所以套任何标准模板后的导出与 v0.9.238 逐字节相同：能力放开了，既有结果没变。 */
 const MVTT_PRESETS = {
   /* 标准 · 底部双语：与旧「无风格」观感接近（白字 + 金色原文 + 半透明底衬 + 细描边） */
   std: { mVttLine:'90', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'80', mVttAlign:'center',
     mVttSize:'100', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.4', mVttBold:true, mVttItalic:false,
     mVttSrcDiff:true, mVttSrcColor:'#FFD700', mVttSrcSize:'85',
+    mVttSrcFont:'', mVttSrcBold:'', mVttSrcItalic:'', mVttSrcBgOn:'', mVttSrcBgColor:'#000000', mVttSrcBgAlpha:'55',
+    mVttSrcShadowOn:'', mVttSrcShadowW:'2', mVttSrcShadowColor:'#000000',
     mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'55',
     mVttShadowOn:true, mVttShadowW:'2', mVttShadowColor:'#000000' },
   /* 紧凑 · 小字窄幅：不抢画面，纪录片/长对白用 */
   compact: { mVttLine:'93', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'70', mVttAlign:'center',
     mVttSize:'88', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.35', mVttBold:false, mVttItalic:false,
     mVttSrcDiff:true, mVttSrcColor:'#C9D1D9', mVttSrcSize:'78',
+    mVttSrcFont:'', mVttSrcBold:'', mVttSrcItalic:'', mVttSrcBgOn:'', mVttSrcBgColor:'#000000', mVttSrcBgAlpha:'55',
+    mVttSrcShadowOn:'', mVttSrcShadowW:'2', mVttSrcShadowColor:'#000000',
     mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'40',
     mVttShadowOn:true, mVttShadowW:'1.5', mVttShadowColor:'#000000' },
   /* 电影感 · 大字描边：不要底衬，靠描边压住亮画面 */
   cinema: { mVttLine:'88', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'84', mVttAlign:'center',
     mVttSize:'115', mVttColor:'#FFF6E5', mVttFont:'PingFang SC', mVttLH:'1.45', mVttBold:false, mVttItalic:false,
     mVttSrcDiff:true, mVttSrcColor:'#B9C8DA', mVttSrcSize:'80',
+    mVttSrcFont:'', mVttSrcBold:'', mVttSrcItalic:'', mVttSrcBgOn:'', mVttSrcBgColor:'#000000', mVttSrcBgAlpha:'55',
+    mVttSrcShadowOn:'', mVttSrcShadowW:'2', mVttSrcShadowColor:'#000000',
     mVttBgOn:false, mVttBgColor:'#000000', mVttBgAlpha:'55',
     mVttShadowOn:true, mVttShadowW:'3', mVttShadowColor:'#000000' }
 };
@@ -1633,8 +1701,10 @@ function vttSetVal(id, v){
 }
 function vttPresetKey(){ const s = $('mVttPresetSel'); return s ? (s.value || 'std') : 'std'; }
 function vttAlphaOut(){
-  const r = $('mVttBgAlpha'), o = $('mVttBgAlphaOut');
-  if (r && o) o.textContent = String(r.value) + '%';
+  [['mVttBgAlpha','mVttBgAlphaOut'], ['mVttSrcBgAlpha','mVttSrcBgAlphaOut']].forEach(function(p){
+    const r = $(p[0]), o = $(p[1]);
+    if (r && o) o.textContent = String(r.value) + '%';
+  });
 }
 function vttAfterFill(){
   MVTT_COLOR_IDS.forEach(syncColorSw);
@@ -1653,12 +1723,17 @@ function applyVttPreset(k){
 function vttStyleOf(){
   const g = id => String(($(id)||{}).value == null ? '' : $(id).value).trim();
   const ck = id => !!($(id)||{}).checked;
+  const sel = id => ($(id)||{}).value || '';
   return {
     line:g('mVttLine'), lineAlign:($('mVttLineAlign')||{}).value || 'end',
     position:g('mVttPos'), width:g('mVttWidth'), align:($('mVttAlign')||{}).value || 'center',
     size:g('mVttSize'), color:g('mVttColor'), font:($('mVttFont')||{}).value || '', lineHeight:g('mVttLH'),
     bold:ck('mVttBold'), italic:ck('mVttItalic'),
     srcDiff:ck('mVttSrcDiff'), srcColor:g('mVttSrcColor'), srcSize:g('mVttSrcSize'),
+    /* 三态：'' = 沿用（不写）、'on' = 单独开、'off' = 单独关 */
+    srcFont:sel('mVttSrcFont'), srcBold:sel('mVttSrcBold'), srcItalic:sel('mVttSrcItalic'),
+    srcBgOn:sel('mVttSrcBgOn'), srcBgColor:g('mVttSrcBgColor'), srcBgAlpha:g('mVttSrcBgAlpha'),
+    srcShadowOn:sel('mVttSrcShadowOn'), srcShadowW:g('mVttSrcShadowW'), srcShadowColor:g('mVttSrcShadowColor'),
     bgOn:ck('mVttBgOn'), bgColor:g('mVttBgColor'), bgAlpha:g('mVttBgAlpha'),
     shadowOn:ck('mVttShadowOn'), shadowW:g('mVttShadowW'), shadowColor:g('mVttShadowColor')
   };
@@ -1707,24 +1782,32 @@ function renderVttPv(){
   else if (st.lineAlign === 'center'){ cue.style.bottom = 'auto'; cue.style.top = ln + '%'; cue.style.transform = 'translateY(-50%)'; }
   else { cue.style.top = 'auto'; cue.style.transform = ''; cue.style.bottom = (100 - ln) + '%'; }
   const fam = C.vttFontStack(st.font) || '';
-  /* 底衬与描边都向导出的 core 取值：只有 core 真写得出来，预览才画（不会出现「预览有、导出没有」） */
-  const bgRgba = (st.bgOn !== false) ? C.vttRgba(st.bgColor, st.bgAlpha) : null;
-  const shStr = C.vttShadowCss(st);
+  /* ⚠️ 三态取值：'' = 沿用主样式，此时必须取「主样式那份」，不能取原文行的输入框
+     （输入框里还留着上次手改的值，沿用时不该生效 —— 否则预览与导出会不一致）。 */
+  const inh = v => (v === '' || v === null || v === undefined);
   cue.innerHTML = '';
   parts[0].lines.forEach(L => {
     const dv = document.createElement('div'); dv.className = 'vtt-pv-line';
     const sp = document.createElement('span'); sp.className = 'pv-in'; sp.textContent = L.text;
     dv.appendChild(sp); cue.appendChild(dv);
-    const pct = num(L.isSrc ? st.srcSize : st.size, L.isSrc ? 85 : 100);
+    const isS = !!(L.isSrc && st.srcDiff);
+    const pct = num(isS ? st.srcSize : st.size, isS ? 85 : 100);
     dv.style.fontSize = (H * 0.05 * (pct / 100)).toFixed(2) + 'px';   /* 播放器默认 cue 字号 ≈ 画面高 5% */
     dv.style.lineHeight = String(num(st.lineHeight, 1.4));
-    dv.style.color = (L.isSrc && st.srcDiff) ? col(st.srcColor, '#FFD700') : col(st.color, '#FFFFFF');
-    dv.style.fontFamily = fam;
-    dv.style.fontWeight = st.bold ? '700' : '400';
-    dv.style.fontStyle = st.italic ? 'italic' : 'normal';
-    /* 同一个 text-shadow 串 Scaling 到预览尺寸，保证「看到的就是文件里那串值」 */
+    dv.style.color = isS ? col(st.srcColor, '#FFD700') : col(st.color, '#FFFFFF');
+    dv.style.fontFamily = (isS && !inh(st.srcFont)) ? (C.vttFontStack(st.srcFont) || fam) : fam;
+    const bold = isS ? (inh(st.srcBold) ? st.bold : st.srcBold === 'on') : st.bold;
+    const ital = isS ? (inh(st.srcItalic) ? st.italic : st.srcItalic === 'on') : st.italic;
+    dv.style.fontWeight = bold ? '700' : '400';
+    dv.style.fontStyle = ital ? 'italic' : 'normal';
+    /* 描边与底衬都向导出的 core 取值：只有 core 真写得出来，预览才画（不会出现「预览有、导出没有」） */
+    const shOn = isS ? (inh(st.srcShadowOn) ? (st.shadowOn !== false) : st.srcShadowOn === 'on') : (st.shadowOn !== false);
+    const shStr = shOn ? C.vttShadowCss(st, (isS && !inh(st.srcShadowOn)) ? 'src' : '') : '';
     if (shStr) sp.style.textShadow = shStr.replace(/(-?[\d.]+)px/g, function(m, n){ return (parseFloat(n) * k).toFixed(2) + 'px'; });
     /* 底衬紧贴文字包围盒（::cue 的 background 是逐行生效），加在整行会画成通栏色带 */
+    const bgOwn = isS && !inh(st.srcBgOn);
+    const bgOn = bgOwn ? (st.srcBgOn === 'on') : (st.bgOn !== false);
+    const bgRgba = bgOn ? (bgOwn ? C.vttRgba(st.srcBgColor, st.srcBgAlpha) : C.vttRgba(st.bgColor, st.bgAlpha)) : null;
     if (bgRgba) sp.style.background = bgRgba;
   });
   if (tag) tag.textContent = vttPresetLabel() + ' · VTT';
@@ -1780,10 +1863,24 @@ function importVttStyle(side, text, name){
     if (s.shadowColor) filled.main += put('mVttShadowColor', s.shadowColor);
   }
   if (!VTT_INH.dirty.src){
-    if (s.srcDiff != null || s.srcColor || s.srcSize != null){
+    if (s.srcDiff != null || s.srcColor || s.srcSize != null || s.srcFont || s.srcBold || s.srcItalic || s.srcBgOn || s.srcShadowOn){
       if (s.srcDiff != null) filled.src += put('mVttSrcDiff', !!s.srcDiff);
       if (s.srcColor) filled.src += put('mVttSrcColor', s.srcColor);
       if (s.srcSize != null) filled.src += put('mVttSrcSize', s.srcSize);
+      /* 三态：文件里写了就是 on/off，没写就保持「沿用」 */
+      if (s.srcFont){ const sel = $('mVttSrcFont'); if (sel){
+          if (!Array.prototype.some.call(sel.options, o=>o.value===s.srcFont)){
+            const o = document.createElement('option'); o.value = s.srcFont; o.textContent = s.srcFont + ' · ' + t('assFontFromFile');
+            sel.appendChild(o); }
+          filled.src += put('mVttSrcFont', s.srcFont); } }
+      if (s.srcBold) filled.src += put('mVttSrcBold', s.srcBold);
+      if (s.srcItalic) filled.src += put('mVttSrcItalic', s.srcItalic);
+      if (s.srcBgOn) filled.src += put('mVttSrcBgOn', s.srcBgOn);
+      if (s.srcBgColor) filled.src += put('mVttSrcBgColor', s.srcBgColor);
+      if (s.srcBgAlpha != null) filled.src += put('mVttSrcBgAlpha', s.srcBgAlpha);
+      if (s.srcShadowOn) filled.src += put('mVttSrcShadowOn', s.srcShadowOn);
+      if (s.srcShadowW != null) filled.src += put('mVttSrcShadowW', s.srcShadowW);
+      if (s.srcShadowColor) filled.src += put('mVttSrcShadowColor', s.srcShadowColor);
     }
   }
   const n = filled.main + filled.src + filled.pos;
@@ -1842,6 +1939,13 @@ function fillAssFonts(){
     FONTS.forEach(f=>{ const o=document.createElement('option'); o.value=f; o.textContent=f; el.appendChild(o); });
     el.value = 'PingFang SC';
   });
+  /* 原文行字体：多一项「沿用主样式」，默认就停在沿用（v0.9.239） */
+  (function(){
+    const el = $('mVttSrcFont'); if (!el) return;
+    const o0 = document.createElement('option'); o0.value = ''; o0.textContent = t('vttInherit'); el.appendChild(o0);
+    FONTS.forEach(f=>{ const o=document.createElement('option'); o.value=f; o.textContent=f; el.appendChild(o); });
+    el.value = '';
+  })();
 }
 /* ================= v0.9.227：导入 ASS 时把文件自己的样式带进界面 =================
    此前导入一份现成双语 ASS，只有文本和时间轴进来，[V4+ Styles] 里的字体/字号/颜色/
@@ -2053,8 +2157,10 @@ function init(){
     });
     syncColorSw(id);
   });
-  const vr = $('mVttBgAlpha'), vo = $('mVttBgAlphaOut');
-  if (vr && vo){ const upd=()=>{ vo.textContent = String(vr.value) + '%'; }; vr.addEventListener('input', upd); vr.addEventListener('change', upd); upd(); }
+  [['mVttBgAlpha','mVttBgAlphaOut'], ['mVttSrcBgAlpha','mVttSrcBgAlphaOut']].forEach(function(q){
+    const vr = $(q[0]), vo = $(q[1]);
+    if (vr && vo){ const upd=()=>{ vo.textContent = String(vr.value) + '%'; }; vr.addEventListener('input', upd); vr.addEventListener('change', upd); upd(); }
+  });
   window.addEventListener('resize', renderVttPv);
   syncAssPanel();
   syncVttPanel();

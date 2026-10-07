@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.238/.test(mg), 'merge.html 未引用 v0.9.238 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.239/.test(mg), 'merge.html 未引用 v0.9.239 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.238</.test(html), '首页版本号未升 0.9.238');
-    assert.ok(/class="ver-tag">v0\.9\.238</.test(html), '工作台版本号未升 0.9.238');
-    assert.ok(/srt-core\.js\?v=0\.9\.238/.test(html), 'srt-core.js?v 未升 0.9.238');
+    assert.ok(/class="ver">v0\.9\.239</.test(html), '首页版本号未升 0.9.239');
+    assert.ok(/class="ver-tag">v0\.9\.239</.test(html), '工作台版本号未升 0.9.239');
+    assert.ok(/srt-core\.js\?v=0\.9\.239/.test(html), 'srt-core.js?v 未升 0.9.239');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5530,8 +5530,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.238</.test(mg), 'merge.html 版本未升 0.9.238');
-    assert.ok(/merge-core\.js\?v=0\.9\.238/.test(mg), 'merge-core.js?v 未升 0.9.238');
+    assert.ok(/class="ver">v0\.9\.239</.test(mg), 'merge.html 版本未升 0.9.239');
+    assert.ok(/merge-core\.js\?v=0\.9\.239/.test(mg), 'merge-core.js?v 未升 0.9.239');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6811,7 +6811,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/parts\[0\]\.lines\.forEach/.test(pv), '预览没按导出的逐行渲染（行数会对不上）');
     /* 底衬/描边必须问 core 要：只有 core 真写得出来，预览才画（否则「预览有、导出没有」） */
     assert.ok(/C\.vttRgba\(st\.bgColor, st\.bgAlpha\)/.test(pv), '预览自己另算底衬');
-    assert.ok(/C\.vttShadowCss\(st\)/.test(pv), '预览自己另算描边');
+    /* v0.9.239：多一个「哪一层」的参数，但仍然必须是问 core 要 —— 不能预览自己拼字符串 */
+    assert.ok(/C\.vttShadowCss\(st, /.test(pv), '预览自己另算描边');
     /* 没内容 / 不是这个模板 → 整块收起来，不能留着旧画面 */
     assert.ok(/if \(!isVtt \|\| !S\.rows \|\| !S\.rows\.length\)\{ box\.style\.display = 'none'; return; \}/.test(pv),
       '没内容时预览没收起来');
@@ -6896,6 +6897,106 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     ['zh-CN','zh-TW','en','ja'].forEach(code => {
       const d = dictOf(code);
       keys.forEach(k => assert.ok(d.indexOf(k + ':') > 0, code + ' 缺词条 ' + k));
+    });
+  });
+
+
+  /* ================= v0.9.239：原文行三态（沿用 / 开 / 关）+ 面板按层重排 =================
+     用户诉求：「VTT 样式模块，原文行和译文行设置不是特别分明」→ 选 B（按层重排）+ 放开原文行能力。
+     设计：原文行不是独立样式层，是在 ::cue 之上覆盖。字体/粗体/斜体/底衬/描边做成三态，
+     '' = 沿用（一个字不写）、'on' = 单独开、'off' = 单独关（必须显式写 normal/none/transparent）。 */
+  t('v0.9.239：原文行「沿用」时一个字都不写（默认导出与 238 逐字节相同）', () => {
+    const M = require('./merge-core.js');
+    const base = { size:'100', color:'#FFFFFF', font:'PingFang SC', bold:true, italic:false, lineHeight:'1.4',
+      shadowOn:true, shadowW:'2', shadowColor:'#000000', bgOn:true, bgColor:'#000000', bgAlpha:55,
+      srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+      srcFont:'', srcBold:'', srcItalic:'', srcBgOn:'', srcBgColor:'#000000', srcBgAlpha:'55',
+      srcShadowOn:'', srcShadowW:'2', srcShadowColor:'#000000' };
+    const b = M.vttStyleBlock(base);
+    assert.ok(b.indexOf('::cue(.src) {\n  color: #FFD700;\n  font-size: 85%;\n}') >= 0,
+      '沿用态写出了多余属性（默认结果就不该变）：\n' + b);
+    ['font-weight','font-style','text-shadow','background-color','font-family'].forEach(k =>
+      assert.ok(b.slice(b.indexOf('::cue(.src)')).indexOf(k) === -1, '沿用态不该出现 ' + k));
+  });
+
+  t('v0.9.239：三态「开」写得出 —— 字体/粗体/斜体/描边/底衬都能单独设', () => {
+    const M = require('./merge-core.js');
+    const b = M.vttStyleBlock({ size:'100', color:'#FFFFFF', srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+      srcFont:'serif', srcBold:'on', srcItalic:'on', srcShadowOn:'on', srcShadowW:'3', srcShadowColor:'#FF0000',
+      srcBgOn:'on', srcBgColor:'#123456', srcBgAlpha:'80' });
+    const sb = b.slice(b.indexOf('::cue(.src)'));
+    [['font-family:','字体'], ['font-weight: bold;','粗体'], ['font-style: italic;','斜体'],
+     ['text-shadow:','描边'], ['#FF0000','描边色'], ['background-color: rgba(18, 52, 86, 0.8);','底衬']]
+      .forEach(([needle,label]) => assert.ok(sb.indexOf(needle) >= 0, '原文行「开」少写了' + label + '：\n' + sb));
+  });
+
+  t('v0.9.239：三态「关」要显式写 normal / none / transparent', () => {
+    const M = require('./merge-core.js');
+    const b = M.vttStyleBlock({ size:'100', color:'#FFFFFF', srcDiff:true, srcColor:'#FFD700', srcSize:'85',
+      srcBold:'off', srcItalic:'off', srcShadowOn:'off', srcBgOn:'off' });
+    const sb = b.slice(b.indexOf('::cue(.src)'));
+    /* 只「不写」是不够的：::cue 的值会漏下来，用户看到的就是「设了关还开着」 */
+    ['font-weight: normal;','font-style: normal;','text-shadow: none;','background-color: transparent;']
+      .forEach(needle => assert.ok(sb.indexOf(needle) >= 0, '「关」少写了 ' + needle + '：\n' + sb));
+  });
+
+  t('v0.9.239：三态能原样读回（写了才是 on/off，没写就是沿用）', () => {
+    const M = require('./merge-core.js');
+    const mk = (css) => M.parseVttStyle('WEBVTT\n\nSTYLE\n::cue {\n  color: #FFFFFF;\n}\n::cue(.src) {\n' + css +
+      '\n}\n\n1\n00:00:01.000 --> 00:00:02.000\n<c.src>x</c.src>\ny\n').style;
+    let s = mk('  color: #FFD700;\n  font-weight: normal;\n  font-style: italic;\n  text-shadow: none;\n  background-color: transparent;');
+    assert.strictEqual(s.srcBold, 'off', 'normal 应读成「关」');
+    assert.strictEqual(s.srcItalic, 'on', 'italic 应读成「开」');
+    assert.strictEqual(s.srcShadowOn, 'off', 'none 应读成「关」');
+    assert.strictEqual(s.srcBgOn, 'off', 'transparent 应读成「关」');
+    s = mk('  color: #FFD700;\n  text-shadow: -3px 0px 0 #FF0000, 3px 0px 0 #FF0000;');
+    assert.strictEqual(s.srcShadowOn, 'on');
+    assert.strictEqual(s.srcShadowW, '3');
+    assert.strictEqual(s.srcShadowColor, '#FF0000');
+    s = mk('  color: #FFD700;');
+    /* 没写 = 沿用，绝不能瞎猜成 on/off */
+    ['srcBold','srcItalic','srcBgOn','srcShadowOn','srcFont'].forEach(k =>
+      assert.ok(s[k] == null, '没写的一项不该被猜出值：' + k + '=' + s[k]));
+  });
+
+  t('v0.9.239：面板按层重排成三块，原文行与译文行对称', () => {
+    const pos  = /const MVTT_POS_IDS\s*=\s*(\[[\s\S]*?\]);/.exec(mg)[1];
+    const src  = /const MVTT_SRC_IDS\s*=\s*(\[[\s\S]*?\]);/.exec(mg)[1];
+    ['mVttSrcFont','mVttSrcBold','mVttSrcItalic','mVttSrcBgOn','mVttSrcBgColor','mVttSrcBgAlpha',
+     'mVttSrcShadowOn','mVttSrcShadowW','mVttSrcShadowColor'].forEach(id => {
+      assert.ok(src.indexOf("'" + id + "'") >= 0, 'MVTT_SRC_IDS 少了 ' + id);
+      assert.ok(mg.indexOf('id="' + id + '"') > 0, 'HTML 里没有控件 ' + id);
+    });
+    /* 三块的标题词条都得在，否则「哪一块管哪一层」又糊了 */
+    ['vttGrpAll','vttGrpDst','vttGrpSrc','vttSrcTip'].forEach(k =>
+      assert.ok(mg.indexOf('data-i18n="' + k + '"') > 0, '面板缺分组标题 ' + k));
+    /* 三态下拉的「沿用」必须真的存在，否则用户回不到继承态 */
+    assert.ok((mg.match(/data-i18n="vttInherit"/g) || []).length >= 4,
+      '三态下拉里的「沿用」选项不足 4 个');
+    assert.ok(mg.indexOf("vttGrpAll:'") > 0, '位置/行高该归到「整条字幕」，不能再叫「位置（百分比）」一块孤零零');
+  });
+
+  t('v0.9.239：预览在「沿用」时取主样式那份，不取输入框残留值', () => {
+    const pv = mg.slice(mg.indexOf('function renderVttPv(){'), mg.indexOf('function vttPresetLabel(){'));
+    assert.ok(/inh\(st\.srcShadowOn\)/.test(pv), '描边沿用时没判断，会拿输入框里的残留值去画');
+    assert.ok(/inh\(st\.srcBgOn\)/.test(pv), '底衬沿用时没判断');
+    assert.ok(/inh\(st\.srcBold\)/.test(pv) && /inh\(st\.srcItalic\)/.test(pv), '粗体/斜体沿用时没判断');
+    assert.ok(/C\.vttShadowCss\(st, /.test(pv), '预览自己拼描边而不是问 core 要');
+  });
+
+  t('v0.9.239：主站引擎没被牵连（改的是双语页那一份）', () => {
+    const srtCore = require('fs').readFileSync(require('path').join(__dirname, 'srt-core.js'), 'utf8');
+    assert.ok(srtCore.indexOf('srcBold') === -1, 'srt-core.js 不该出现 srcBold（主站没有「原文行三态」这个概念）');
+    assert.ok(srtCore.indexOf('srcShadowOn') === -1, 'srt-core.js 不该出现 srcShadowOn');
+    assert.ok(/function vttShadowCss\(st\)/.test(srtCore), '主站的 vttShadowCss 签名不该被改（它没有「层」的概念）');
+  });
+
+  t('v0.9.239：新增词条四语齐全', () => {
+    ['vttGrpAll','vttGrpDst','vttSrcTip','vttInherit','vttOptNormal','vttOptOn','vttOptOff',
+     'lblVttSrcFont','lblVttSrcBold','lblVttSrcItalic','lblVttSrcBg','lblVttSrcBgColor','lblVttSrcBgAlpha',
+     'lblVttSrcShadow','lblVttSrcShadowW','lblVttSrcShadowColor'].forEach(k => {
+      const c = (mg.match(new RegExp('[,{\\s]' + k + ':', 'g')) || []).length;
+      assert.ok(c >= 4, '词条 ' + k + ' 不到 4 种语言（' + c + '）');
     });
   });
 
