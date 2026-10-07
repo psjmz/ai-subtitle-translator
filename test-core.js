@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.239/.test(mg), 'merge.html 未引用 v0.9.239 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.240/.test(mg), 'merge.html 未引用 v0.9.240 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.239</.test(html), '首页版本号未升 0.9.239');
-    assert.ok(/class="ver-tag">v0\.9\.239</.test(html), '工作台版本号未升 0.9.239');
-    assert.ok(/srt-core\.js\?v=0\.9\.239/.test(html), 'srt-core.js?v 未升 0.9.239');
+    assert.ok(/class="ver">v0\.9\.240</.test(html), '首页版本号未升 0.9.240');
+    assert.ok(/class="ver-tag">v0\.9\.240</.test(html), '工作台版本号未升 0.9.240');
+    assert.ok(/srt-core\.js\?v=0\.9\.240/.test(html), 'srt-core.js?v 未升 0.9.240');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5440,8 +5440,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* v0.9.238：无风格模板（srt/vtt）与「VTT 双语样式」都要把 ASS 面板收起来（两套单位不同，不能同时摆着） */
     assert.ok(/const plain = \(tpl === 'srt' \|\| tpl === 'vtt'\);/.test(mg), '缺 plain 判定');
     assert.ok(/\$\('assPanel'\)\.style\.display = \(plain \|\| tpl === 'vttStyle'\) \? 'none' : ''/.test(mg), '无风格 / VTT 模板未隐藏 ASS 面板');
-    assert.ok(/\$\('mVttPanel'\)\.style\.display = \(tpl === 'vttStyle'\) \? '' : 'none'/.test(mg) ||
-      /const vp = \$\('mVttPanel'\); if \(vp\) vp\.style\.display = \(tpl === 'vttStyle'\) \? '' : 'none'/.test(mg), 'VTT 面板未随模板显隐');
+    /* v0.9.240：VTT 面板在「带样式」与「无样式」两个 VTT 档位都要出现 ——
+       「写入样式」开关就住在面板里，藏掉面板用户就没法把样式再打开。 */
+    assert.ok(/const vp = \$\('mVttPanel'\); if \(vp\) vp\.style\.display = \(tpl === 'vttStyle' \|\| tpl === 'vtt'\) \? '' : 'none'/.test(mg),
+      'VTT 面板未随模板显隐');
     assert.ok(/\$\('layoutRow'\)\.style\.display = tpl === 'custom' \? 'flex' : 'none'/.test(mg), '布局行未只在 custom 显示');
     /* 恢复默认：14 个外观字段逐一回默认值（⚠️ 只在 ASS_DEFAULTS 声明块内数，文件里还有同形态的绑定数组） */
     assert.ok(/function resetAssDefaults\(\)/.test(mg), '缺 resetAssDefaults');
@@ -5530,8 +5532,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.239</.test(mg), 'merge.html 版本未升 0.9.239');
-    assert.ok(/merge-core\.js\?v=0\.9\.239/.test(mg), 'merge-core.js?v 未升 0.9.239');
+    assert.ok(/class="ver">v0\.9\.240</.test(mg), 'merge.html 版本未升 0.9.240');
+    assert.ok(/merge-core\.js\?v=0\.9\.240/.test(mg), 'merge-core.js?v 未升 0.9.240');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6794,7 +6796,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.238：「VTT 双语样式」是真模板：分段按钮、导出分支、扩展名都接上了', () => {
     assert.ok(/<option value="vttStyle"/.test(mg), '缺 vttStyle 模板选项');
-    assert.ok(/\['vttStyle','tplSegVttStyle'\]/.test(mg), '分段按钮没有这一档');
+    /* v0.9.240：VTT 从顶层的并列档位改成「VTT 格式 + 格式卡」，模板按钮在 WebVTT 面板里 */
+    assert.ok(/\['vtt','fmtVtt','fmtVttSub'\]/.test(mg), '顶层格式卡没有 VTT 这一档');
+    assert.ok(/\['std','vttTplStd'\]/.test(mg), 'WebVTT 面板缺样式模板按钮');
     assert.ok(/if \(fmt === 'vtt-styled'\) return buildVttExport\(\);/.test(mg), '导出没接上 VTT 样式分支');
     assert.ok(/return \(f === 'vtt' \|\| f === 'vtt-styled'\) \? 'vtt'/.test(mg), 'vtt-styled 的扩展名不是 .vtt');
     /* ASS 面板与 VTT 面板互斥（两套单位不同，不能同时摆着） */
@@ -6998,6 +7002,79 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       const c = (mg.match(new RegExp('[,{\\s]' + k + ':', 'g')) || []).length;
       assert.ok(c >= 4, '词条 ' + k + ' 不到 4 种语言（' + c + '）');
     });
+  });
+
+  /* ================= v0.9.240：导出改两级（格式 / 模板），双语页重新排版 ================= */
+  t('v0.9.240：顶层只三张格式卡（SRT / VTT / ASS），模板挪进各自面板', () => {
+    const fmt = /const FMT_SEGS = (\[[\s\S]*?\]);/.exec(mg);
+    assert.ok(fmt, '缺 FMT_SEGS');
+    const list = fmt[1];
+    ['srt','vtt','ass'].forEach(g => assert.ok(list.indexOf("['" + g + "'") >= 0, '顶层缺格式 ' + g));
+    /* ⚠️ 这条是本次改版的核心：split / stack / custom / vttStyle 不许再出现在顶层格式卡里
+       （它们现在归各自的样式面板），否则用户又看到一排分不清层级的按钮。 */
+    ['split','stack','custom','vttStyle'].forEach(g =>
+      assert.ok(list.indexOf("['" + g + "'") < 0, '顶层格式卡混进了模板档位 ' + g));
+    /* ASS 面板的三个模板按钮 = 原来的三档，一个不少 */
+    assert.ok(/const ASS_SEGS = \[\['split','assTplSplit'\],\['stack','assTplStack'\],\['custom','assTplCustom'\]\]/.test(mg),
+      'ASS 面板缺模板按钮定义');
+    /* VTT 面板的三个模板按钮 = 三套预设（「自定义」单独标记成状态键） */
+    assert.ok(/const MVTT_SEGS = \[\['std','vttTplStd'\],\['compact','vttTplCompact'\],\['cinema','vttTplCinema'\],\['custom','vttTplCustom'\]\]/.test(mg),
+      'WebVTT 面板缺模板按钮定义');
+    assert.ok(/data-custom="1" hidden/.test(mg), '「自定义」应默认隐藏，手改后才出现');
+    /* 六个档位一个都不能丢：老逻辑全读 expFmt.value */
+    ['value="srt"','value="vtt"','value="vttStyle"','value="split"','value="stack"','value="custom"']
+      .forEach(v => assert.ok(mg.indexOf(v) > 0, 'expFmt 少了档位 ' + v));
+  });
+
+  t('v0.9.240：点模板 = 换档位并派发 change；点「已选中的」不重套预设', () => {
+    const setFmt = mg.slice(mg.indexOf('function setFmtGroup('), mg.indexOf('function renderTplSegs('));
+    assert.ok(setFmt.length > 0, '抠不到 setFmtGroup');
+    assert.ok(/sel\.value = v;[\s\S]{0,80}dispatchEvent\(new Event\('change'/.test(setFmt), '格式卡没把值写回状态源');
+    assert.ok(/if \(v === sel\.value\)\{ syncTplSegs\(\); return; \}/.test(setFmt),
+      '点已选中的格式也会重套预设 —— 会把用户刚调好的参数冲掉');
+    /* ASS 侧同理：值没变就 return */
+    const setAss = mg.slice(mg.indexOf('function setAssTpl('), mg.indexOf('function renderTplSegs('));
+    assert.ok(/if \(!sel \|\| sel\.value === v\) return;/.test(setAss), 'ASS 模板按钮会把已选中的再套一遍预设');
+    /* 模板按钮点击 → applyVttPreset（走同一条套模板路径，不另写一套） */
+    assert.ok(/\['std','vttTplStd'\]/.test(mg) && /applyVttPreset\(v\)/.test(mg),
+      'VTT 模板按钮没接 applyVttPreset');
+  });
+
+  t('v0.9.240：「写入样式」开关 = 无样式 VTT 的唯一入口，且不冲掉用户参数', () => {
+    assert.ok(/id="mVttWriteStyle"/.test(mg), '缺「写入样式」开关');
+    const fn = mg.slice(mg.indexOf('function setVttStyled('), mg.indexOf('function syncVttChrome('));
+    assert.ok(/vwrite\.addEventListener\('change', \(\)=>setVttStyled\(vwrite\.checked\)\)/.test(mg),
+      '开关没接上 setVttStyled');
+    assert.ok(/f1\.value = want/.test(fn) && /f2\.value = want/.test(fn), '开关没写回两份状态源');
+    /* ⚠️ 关键：绝不能派发 change —— 那会走到 syncVttPanel → applyVttPreset，把参数冲回预设 */
+    assert.ok(fn.indexOf('dispatchEvent') < 0, '开关派发了 change，会把用户调好的参数冲掉');
+    /* 关掉时参数区要看得见地「不生效」 */
+    assert.ok(/box\.classList\.toggle\('off', !styled\)/.test(mg), '关掉写入样式后参数区没有灰化');
+    assert.ok(/\.stylebox\.off\{[^}]*pointer-events:none/.test(mg), '灰化样式缺 pointer-events:none');
+    assert.ok(/id="mVttStyleBox"/.test(mg), '缺参数区容器 mVttStyleBox');
+    /* 模板说明随模板与语言重算（不是静态 data-i18n） */
+    assert.ok(/function vttPresetTip\(\)/.test(mg) && /vttTipStd/.test(mg), '缺模板说明（mVttPresetHint）');
+    assert.ok(/syncAssChrome\(\);\s*\n\}/.test(mg.slice(mg.indexOf('function applyI18n()'), mg.indexOf('function toast('))),
+      '换界面语言后没重刷导出格式 / 模板说明');
+  });
+
+  t('v0.9.240：新版式与文案接上（面板卡片化 / 格式卡 / 组装标题）', () => {
+    assert.ok(/\.fmtbtn\.on\{/.test(mg), '缺格式卡的选中样式');
+    assert.ok(/\.fmt-seg\.sm/.test(mg), '导出区没有紧凑版格式卡');
+    assert.ok(/details\.ass summary,details\.vtt summary/.test(mg), '两套面板没共用卡片式标题条');
+    assert.ok(/\.ass-sub\{/.test(mg), '缺列内小分组标题样式');
+    assert.ok(/id="assTplSeg"/.test(mg) && /class="tplrow"/.test(mg), 'ASS 面板缺模板按钮行');
+    assert.ok(/id="mVttPresetSeg"/.test(mg), 'WebVTT 面板缺模板按钮');
+    /* 新词条四语齐全 */
+    ['fmtSrt','fmtSrtSub','fmtVtt','fmtVttSub','fmtAss','fmtAssSub','lblAssTpl','assTplSplit','assTplStack',
+     'assTplCustom','assTplTip','assGrpText','assGrpFx','assGrpPos','assGrpMargin','vttTplStd','vttTplCompact',
+     'vttTplCinema','vttTplCustom','vttTipStd','vttTipCompact','vttTipCinema','vttTipCustom','lblVttWriteStyle',
+     'vttNoStyleTip','tplHintVttPlain'].forEach(k => {
+      const c = (mg.match(new RegExp('[,{\\s]' + k + ':', 'g')) || []).length;
+      assert.strictEqual(c, 4, '词条 ' + k + ' 应有 4 种语言，实际 ' + c);
+    });
+    /* 导出档位的说明必须分「无样式 VTT」和「有样式 VTT」两句 —— 以前共用一句「纯文本无需设置」 */
+    assert.ok(/tpl==='vtt' \? 'tplHintVttPlain'/.test(mg), '无样式 VTT 的说明与 SRT 混用了');
   });
 
 }
