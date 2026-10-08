@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.245/.test(mg), 'merge.html 未引用 v0.9.245 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.246/.test(mg), 'merge.html 未引用 v0.9.245 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.245</.test(html), '首页版本号未升 0.9.245');
-    assert.ok(/class="ver-tag">v0\.9\.245</.test(html), '工作台版本号未升 0.9.245');
-    assert.ok(/srt-core\.js\?v=0\.9\.245/.test(html), 'srt-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.246</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.246</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.246/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.245</.test(mg), 'merge.html 版本未升 0.9.245');
-    assert.ok(/merge-core\.js\?v=0\.9\.245/.test(mg), 'merge-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.246</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.246/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7359,11 +7359,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.245/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.245/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.245/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.245/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.245/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.246/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.246/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.246/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.246/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.246/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
@@ -7745,10 +7745,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* ⚠️ 真 bug ①：slotVttStyle 的 src 那一半照 dst 那样写 st.color / st.size，
        而 vttSrcDecls 读的是 srcColor / srcSize → 界面上「覆盖了」，导出里一个字没变。 */
     const sv = mg.slice(mg.indexOf('function slotVttStyle(id, role){'), mg.indexOf('function slotVttSettings('));
-    assert.ok(/if \(d\.color\)\{ st\.srcColorInh = false; st\.srcColor = d\.color; \}/.test(sv), '原文行颜色没写进 srcColor');
-    assert.ok(/st\.srcSizeInh = false; st\.srcSize =/.test(sv), '原文行字号没写进 srcSize');
-    assert.ok(/if \(d\.bold != null\) st\.srcBold = d\.bold \? 'on' : 'off';/.test(sv), '原文行粗体没写进 srcBold');
-    assert.ok(/if \(d\.italic != null\) st\.srcItalic = d\.italic \? 'on' : 'off';/.test(sv), '原文行斜体没写进 srcItalic');
+    /* ⚠️ v0.9.246 起 src/dst 两半合成一段（用 isS 分支），别再按整行字符串匹配 ——
+       那会一改写法就假红。按「有没有写给 srcXxx 字段」这个语义来判。 */
+    assert.ok(/st\.srcColor\s*=\s*d\.color/.test(sv) && /srcColorInh\s*=\s*false/.test(sv), '原文行颜色没写进 srcColor');
+    assert.ok(/st\.srcSize\s*=/.test(sv) && /srcSizeInh\s*=\s*false/.test(sv), '原文行字号没写进 srcSize');
+    assert.ok(/st\.srcBold\s*=\s*d\.bold\s*\?\s*'on'\s*:\s*'off'/.test(sv), '原文行粗体没写进 srcBold');
+    assert.ok(/st\.srcItalic\s*=\s*d\.italic\s*\?\s*'on'\s*:\s*'off'/.test(sv), '原文行斜体没写进 srcItalic');
     /* ⚠️ 真 bug ②：整块调 C.vttSlotRule 会顺手用「译文行那套」再写一条 ::cue(.槽.src)，
        同一个选择器在文件里出现两次（前一条是基础值）。CSS 后写的赢，但那是条脏规则。 */
     const sr = mg.slice(mg.indexOf('function slotVttRules(){'), mg.indexOf('/* ================= 导出'));
@@ -7767,5 +7769,117 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/if \(!rep \|\| !S\.rows\)\{ \$\('rep'\)\.style\.display = 'none'; return; \}/.test(rr),
       'renderReport 没有 rows 守卫');
   });
+
+  /* ================= v0.9.246：槽参数开全 + 从已存方案导入 ================= */
+
+  t('v0.9.246：槽参数表不再是 5 项（245 的口子太窄，等于只够改个颜色）', () => {
+    const si = mg.indexOf('const SLOT_SPEC = [');
+    const sj = mg.indexOf('];', si);
+    const body = mg.slice(si, sj);
+    assert.ok(si > 0 && sj > si, 'SLOT_SPEC 不存在');
+    ['size','color','font','bold','italic','alpha','spacing','outlineW','outlineColor',
+     'edgeMode','edgeSize','edgeColor','edgeAlpha','align','dMV','marginL','marginR'
+    ].forEach(k => {
+      assert.ok(new RegExp("\\{ k:'" + k + "'").test(body), 'SLOT_SPEC 缺 ' + k);
+    });
+    /* ⚠️ 键不许重复：重复键在 SLOT_MAP 里静默覆盖，界面上少一项还查不出原因 */
+    const ks = (body.match(/\{ k:'([a-zA-Z]+)'/g) || []).map(x => x.slice(5, -1));
+    assert.strictEqual(new Set(ks).size, ks.length, 'SLOT_SPEC 有重复键：' + ks.join(','));
+    assert.ok(ks.length >= 17, 'SLOT_SPEC 少于 17 项：' + ks.length);
+    assert.ok(!/const SLOT_PARAMS\s*=/.test(mg), '老的 5 项硬编码数组还在');
+  });
+
+  t('v0.9.246：做不到的项要标出来，不许静默忽略', () => {
+    const si = mg.indexOf('const SLOT_SPEC = [');
+    const body = mg.slice(si, mg.indexOf('];', si));
+    /* VTT 没有「原文行不透明度」这一说 → 原文行那半不许出现它（否则选了没生效） */
+    assert.ok(/\{ k:'alpha'[\s\S]{0,200}noSrc:true/.test(body), 'alpha 没标 noSrc');
+    /* ASS 独有的三项：字间距 / 左右边距。VTT 表达不了 → 界面上必须写明 */
+    ['spacing','marginL','marginR'].forEach(k => {
+      assert.ok(new RegExp("\\{ k:'" + k + "'[\\s\\S]{0,200}fmt:'ass'").test(body), k + ' 没标 fmt:ass');
+    });
+    /* 界面上要有「仅 ASS」这个标记词条 */
+    assert.ok(/slotOnlyAss:/.test(mg), '缺 slotOnlyAss 词条');
+    assert.ok(/class="fmt-tag"/.test(mg), '列表里没把「仅 ASS」标记渲染出来');
+    /* 垂直位移是整条级：没有「只把原文行上移」这回事 → 必须在 src 那半整块跳过 */
+    assert.ok(/\{ k:'dMV'[\s\S]{0,200}level:'cue'/.test(body), 'dMV 没标 level:cue');
+  });
+
+  t('v0.9.246：ASS 的左右边距开放给调用方（此前 Style 行里写死 60）', () => {
+    /* ⚠️ 走**行为**断言而不是扫源码字符串：改写法就假红的那类断言已经踩过好几次 */
+    const ev = [{ start: 0, end: 1000, lines: [{ style: 'Bottom', text: 'x', mv: 42 }] }];
+    /* 不传 extraStyles → 四套内置样式的 MarginL/R 必须仍是旧写死的 60，否则老导出全变 */
+    const bc = (M.formatAss(ev, { title: 'x', assStyle: {} }).match(/^Style: Bottom,.*$/m) || [''])[0].split(',');
+    assert.strictEqual(bc[19], '60', '未传边距时 MarginL 变了（会改坏老导出）');
+    assert.strictEqual(bc[20], '60', '未传边距时 MarginR 变了');
+    /* 传了 → 必须生效（ASS Style 列序：…Alignment,MarginL,MarginR,MarginV…） */
+    const xc = (M.formatAss(ev, { title: 'x', extraStyles: [{ name: 'SlotD_x', spec: { marginL: 200, marginR: 30 } }] })
+      .match(/^Style: SlotD_x,.*$/m) || [''])[0].split(',');
+    assert.strictEqual(xc[19], '200', '槽的 marginL 没生效');
+    assert.strictEqual(xc[20], '30', '槽的 marginR 没生效');
+
+    /* 前端侧：槽的覆盖要写进 spec（这里是源码扫描，因为 slotAssSpec 在 html 里没导出） */
+    const ai = mg.indexOf('function slotAssSpec(');
+    const ab = mg.slice(ai, mg.indexOf('\nfunction ', ai + 10));
+    assert.ok(/if \(d\.marginL != null\) spec\.marginL/.test(ab), '槽的 marginL 没写进 spec');
+    assert.ok(/if \(d\.marginR != null\) spec\.marginR/.test(ab), '槽的 marginR 没写进 spec');
+    ['size','color','font','bold','italic','alpha','spacing','outlineW','outlineColor'].forEach(k => {
+      assert.ok(new RegExp('d\\.' + k + ' != null|d\\.' + k + '\\)').test(ab), 'slotAssSpec 没处理 ' + k);
+    });
+  });
+
+  t('v0.9.246：导入方案时颜色的口径要统一（ASS 格式 vs HEX，直接比永远不相等）', () => {
+    /* 真 bug：方案里存的是控件值 #RRGGBB，assStyleOf() 给的是 &HAABBGGRR，
+       两边直接比 → 三项颜色全被误判成差异写成覆盖（导入完平白多出三项）。 */
+    const bi = mg.indexOf('function slotBaseVal(');
+    const bb = mg.slice(bi, mg.indexOf('\nfunction ', bi + 10));
+    assert.ok(/SLOT_COLOR_SUF\[k\]/.test(bb), 'slotBaseVal 没按颜色键走单独分支');
+    assert.ok(/slotHex\(el \? el\.value/.test(bb), '颜色基础值没读控件原值（与方案同源）');
+    assert.ok(/function slotHex\(/.test(mg), '缺 slotHex 归一函数');
+    /* &HAABBGGRR → #RRGGBB 的反序换算必须写对，否则又是「看起来一样其实不等」 */
+    const hi = mg.indexOf('function slotHex(');
+    const hb = mg.slice(hi, mg.indexOf('\n}', hi));
+    assert.ok(/a\[3\] \+ a\[2\] \+ a\[1\]/.test(hb), 'ASS → HEX 的通道顺序不对（应是 BGR 反序）');
+  });
+
+  t('v0.9.246：从方案导入 = 只写差异，且 dMV 不许搬（绝对位置 vs 偏移）', () => {
+    const ii = mg.indexOf('function slotImportScheme(');
+    const ib = mg.slice(ii, mg.indexOf('\nfunction ', ii + 10));
+    /* 与基础相同 → 删掉这一项覆盖（补丁只存差异） */
+    assert.ok(/slotSame\(nv, bv\)\)\{ delete d\[p\.k\]/.test(ib), '相同的项没被删掉（会存成快照）');
+    /* size 是百分比：方案存绝对字号，必须除以基础字号换算 */
+    assert.ok(/nv \/ bv \* 100/.test(ib), 'size 没做绝对→百分比换算');
+    assert.ok(/nv === 100\)\{ delete d\[p\.k\]/.test(ib), 'size 换算后与基础同号时没清掉');
+    /* ⚠️ dMV：方案存「离底多远」，槽存「挪多少」，硬搬会让每行位移量变成整屏高度级别 */
+    assert.ok(/p\.k === 'dMV'\) return;/.test(ib), 'dMV 没被排除（导入后字幕会整屏飞）');
+    /* 导入完要标「已修改」 */
+    assert.ok(/if \(n\) markSlotModified\(id\);/.test(ib), '导入后没标已修改');
+    /* 空名 / 不存在的方案 → 返回 0，不炸 */
+    assert.ok(/if \(!sc \|\| !s\) return 0;/.test(ib), '没有空值守卫');
+  });
+
+  t('v0.9.246：i18n 新词条四语齐全', () => {
+    /* ⚠️ 切语块必须用**花括号配平扫描**：固定字符窗口会因字典变大而截断（误报缺词条） */
+    const langs = ['zh-CN', 'zh-TW', 'en', 'ja'];
+    const dict = {};
+    langs.forEach(L => {
+      const m = new RegExp("['\"]?" + L.replace('-', '\\-') + "['\"]?\\s*:\\s*\\{").exec(mg);
+      assert.ok(m, '找不到语块 ' + L);
+      let d = 1, j = m.index + m[0].length;
+      while (d > 0 && j < mg.length) { if (mg[j] === '{') d++; else if (mg[j] === '}') d--; j++; }
+      dict[L] = mg.slice(m.index, j);
+    });
+    ['slotPrmFont','slotPrmAlpha','slotPrmSpacing','slotPrmOutlineW','slotPrmOutlineColor',
+     'slotPrmEdgeMode','slotPrmEdgeSize','slotPrmEdgeColor','slotPrmEdgeAlpha','slotPrmAlign',
+     'slotPrmMarginL','slotPrmMarginR','slotGrpCue','slotGrpText','slotGrpEdge','slotGrpFx','slotGrpPos',
+     'slotEdgeNone','slotEdgeShadow','slotEdgeBox','slotAlignLeft','slotAlignCenter','slotAlignRight',
+     'slotOnlyAss','slotImpFrom','slotImpBtn','slotImpNone','slotImpDone','slotImpSame'
+    ].forEach(k => {
+      langs.forEach(L => {
+        assert.ok(new RegExp('[,{\\s]' + k + ":\\s*'").test(dict[L]), L + ' 缺 ' + k);
+      });
+    });
+  });
+
 
 }

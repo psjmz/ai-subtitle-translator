@@ -275,6 +275,17 @@
   .slot-row.inh .pv{color:var(--mut)}
   .slot-empty{font-size:12px;color:var(--mut);padding:8px 0}
   .slot-grp{font-size:11.5px;color:var(--mut);margin:10px 0 2px}
+  /* v0.9.246：17 项按「整条 / 文字 / 描边 / 阴影底衬 / 位置」分组 */
+  .slot-subgrp{font-size:11px;color:var(--mut);margin:10px 0 0;padding-left:2px;letter-spacing:.02em}
+  .slot-subgrp+.slot-row{border-top:none}
+  /* 「仅 ASS」小标签：这一项在 VTT 里表达不了，必须让用户当场看见，不能等导出了才发现 */
+  .fmt-tag{display:inline-block;margin-left:4px;padding:0 5px;border-radius:4px;font-size:10px;line-height:15px;
+    color:var(--mut);border:1px solid var(--line-strong);vertical-align:1px}
+  .slot-row .inh-txt{color:var(--mut);font-size:12px}
+  .slot-imp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0;padding:8px 10px;
+    border:1px dashed var(--line-strong);border-radius:8px;background:var(--bg-weak)}
+  .slot-imp .hint{margin-top:0}
+  .slot-imp select{max-width:180px}
   .filter-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
   .filter-bar input{flex:1 1 220px;min-width:180px;border:1px solid var(--line-strong);border-radius:9px;
     padding:7px 10px;font-size:12.5px;background:var(--card);color:var(--ink)}
@@ -300,7 +311,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.245</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.246</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -670,6 +681,13 @@
             <button type="button" class="btn ghost btn-sm" id="slotUncoverAll" data-i18n="slotUncoverAll">解除全部覆盖</button>
             <button type="button" class="btn ghost btn-sm" id="slotRestore" data-i18n="slotRestore" style="display:none">恢复预设</button>
           </div>
+          <!-- v0.9.246：从已存的样式方案导入 —— 一键拿到一整套，不用一项一项加。
+               导入 = 逐项与当前基础样式比对，只把**不一样**的写成覆盖项（槽仍是补丁）。 -->
+          <div class="slot-imp">
+            <span class="hint" data-i18n="slotImpFrom">从已存方案</span>
+            <select id="slotSchemeSel"></select>
+            <button type="button" class="btn ghost btn-sm" id="slotSchemeImp" data-i18n="slotImpBtn">导入</button>
+          </div>
           <div class="slot-views">
             <button type="button" class="btn ghost sm on" id="slotViewDiff" data-i18n="slotViewDiff">只显示差异</button>
             <button type="button" class="btn ghost btn-sm" id="slotViewAll" data-i18n="slotViewAll">显示全部参数</button>
@@ -751,7 +769,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.245"></script>
+<script src="merge-core.js?v=0.9.246"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -877,7 +895,37 @@ const I18N = {
     filterSelRow:'已选 {0} 行', filterSelAll:'全选', filterSelInv:'反选', filterClear:'清除',
     applyBar:'对选中的 {0} 行应用', applyBtn:'应用', applyAll:'整篇套用', applyDone:'已把 {0} 行套用「{1}」',
     lblAssItalic:'斜体', colSlot:'样式',
-  },
+    slotPrmFont:'字体',
+    slotPrmAlpha:'不透明度',
+    slotPrmSpacing:'字间距',
+    slotPrmOutlineW:'描边粗细',
+    slotPrmOutlineColor:'描边颜色',
+    slotPrmEdgeMode:'阴影 / 底衬',
+    slotPrmEdgeSize:'阴影大小',
+    slotPrmEdgeColor:'阴影 / 底衬色',
+    slotPrmEdgeAlpha:'底衬透明度',
+    slotPrmAlign:'水平对齐',
+    slotPrmMarginL:'左边距',
+    slotPrmMarginR:'右边距',
+    slotGrpCue:'整条字幕',
+    slotGrpText:'文字',
+    slotGrpEdge:'描边',
+    slotGrpFx:'阴影 / 底衬',
+    slotGrpPos:'位置 / 边距',
+    slotEdgeNone:'无',
+    slotEdgeShadow:'阴影',
+    slotEdgeBox:'底衬',
+    slotAlignLeft:'左',
+    slotAlignCenter:'居中',
+    slotAlignRight:'右',
+    slotOnlyAss:'仅 ASS',
+    slotNaVtt:'VTT 无此项',
+    slotImpFrom:'从已存方案',
+    slotImpBtn:'导入',
+    slotImpNone:'（还没存过方案）',
+    slotImpDone:'已从「{1}」导入 {0} 项差异',
+    slotImpSame:'「{0}」与当前基础样式完全一样，没有可导入的差异'
+},
   'zh-TW': {
     brandName:'隨心字幕 AI', navHome:'返回翻譯工具',
     heroTitle:'兩份字幕，<em>合成一套雙語</em>',
@@ -994,7 +1042,37 @@ const I18N = {
     filterSelRow:'已選 {0} 行', filterSelAll:'全選', filterSelInv:'反選', filterClear:'清除',
     applyBar:'對選中的 {0} 行套用', applyBtn:'套用', applyAll:'整篇套用', applyDone:'已把 {0} 行套用「{1}」',
     lblAssItalic:'斜體', colSlot:'樣式',
-  },
+    slotPrmFont:'字體',
+    slotPrmAlpha:'不透明度',
+    slotPrmSpacing:'字間距',
+    slotPrmOutlineW:'描邊粗細',
+    slotPrmOutlineColor:'描邊顏色',
+    slotPrmEdgeMode:'陰影 / 底襯',
+    slotPrmEdgeSize:'陰影大小',
+    slotPrmEdgeColor:'陰影 / 底襯色',
+    slotPrmEdgeAlpha:'底襯透明度',
+    slotPrmAlign:'水平對齊',
+    slotPrmMarginL:'左邊距',
+    slotPrmMarginR:'右邊距',
+    slotGrpCue:'整條字幕',
+    slotGrpText:'文字',
+    slotGrpEdge:'描邊',
+    slotGrpFx:'陰影 / 底襯',
+    slotGrpPos:'位置 / 邊距',
+    slotEdgeNone:'無',
+    slotEdgeShadow:'陰影',
+    slotEdgeBox:'底襯',
+    slotAlignLeft:'左',
+    slotAlignCenter:'置中',
+    slotAlignRight:'右',
+    slotOnlyAss:'僅 ASS',
+    slotNaVtt:'VTT 無此項',
+    slotImpFrom:'從已存方案',
+    slotImpBtn:'匯入',
+    slotImpNone:'（還沒存過方案）',
+    slotImpDone:'已從「{1}」匯入 {0} 項差異',
+    slotImpSame:'「{0}」與目前基礎樣式完全一樣，沒有可匯入的差異'
+},
   'en': {
     brandName:'AI-SRTSub', navHome:'Back to Translator',
     heroTitle:'Two subtitle files, <em>one bilingual track</em>',
@@ -1111,7 +1189,37 @@ const I18N = {
     filterSelRow:'{0} lines selected', filterSelAll:'Select all', filterSelInv:'Invert', filterClear:'Clear',
     applyBar:'Apply to the {0} selected lines', applyBtn:'Apply', applyAll:'Apply to all', applyDone:'Applied "{1}" to {0} lines',
     lblAssItalic:'Italic', colSlot:'Style',
-  },
+    slotPrmFont:'Font',
+    slotPrmAlpha:'Opacity',
+    slotPrmSpacing:'Letter spacing',
+    slotPrmOutlineW:'Outline width',
+    slotPrmOutlineColor:'Outline color',
+    slotPrmEdgeMode:'Shadow / Box',
+    slotPrmEdgeSize:'Shadow size',
+    slotPrmEdgeColor:'Shadow / Box color',
+    slotPrmEdgeAlpha:'Box opacity',
+    slotPrmAlign:'Horizontal align',
+    slotPrmMarginL:'Left margin',
+    slotPrmMarginR:'Right margin',
+    slotGrpCue:'Whole line',
+    slotGrpText:'Text',
+    slotGrpEdge:'Outline',
+    slotGrpFx:'Shadow / Box',
+    slotGrpPos:'Position / Margin',
+    slotEdgeNone:'None',
+    slotEdgeShadow:'Shadow',
+    slotEdgeBox:'Box',
+    slotAlignLeft:'Left',
+    slotAlignCenter:'Center',
+    slotAlignRight:'Right',
+    slotOnlyAss:'ASS only',
+    slotNaVtt:'N/A in VTT',
+    slotImpFrom:'From saved scheme',
+    slotImpBtn:'Import',
+    slotImpNone:'(no saved scheme yet)',
+    slotImpDone:'Imported {0} differences from "{1}"',
+    slotImpSame:'"{0}" matches the current base style — nothing to import'
+},
   'ja': {
     brandName:'AI-SRTSub', navHome:'翻訳ツールへ戻る',
     heroTitle:'2 つの字幕を、<em>1 つの二か国語に</em>',
@@ -1228,7 +1336,37 @@ const I18N = {
     filterSelRow:'{0} 行を選択中', filterSelAll:'すべて選択', filterSelInv:'反転', filterClear:'クリア',
     applyBar:'選択した {0} 行に適用', applyBtn:'適用', applyAll:'全体に適用', applyDone:'{0} 行に「{1}」を適用しました',
     lblAssItalic:'斜体', colSlot:'スタイル',
-  }
+    slotPrmFont:'フォント',
+    slotPrmAlpha:'不透明度',
+    slotPrmSpacing:'字間',
+    slotPrmOutlineW:'縁取りの太さ',
+    slotPrmOutlineColor:'縁取りの色',
+    slotPrmEdgeMode:'影 / 下地',
+    slotPrmEdgeSize:'影の大きさ',
+    slotPrmEdgeColor:'影 / 下地の色',
+    slotPrmEdgeAlpha:'下地の不透明度',
+    slotPrmAlign:'水平位置',
+    slotPrmMarginL:'左余白',
+    slotPrmMarginR:'右余白',
+    slotGrpCue:'行全体',
+    slotGrpText:'文字',
+    slotGrpEdge:'縁取り',
+    slotGrpFx:'影 / 下地',
+    slotGrpPos:'位置 / 余白',
+    slotEdgeNone:'なし',
+    slotEdgeShadow:'影',
+    slotEdgeBox:'下地',
+    slotAlignLeft:'左',
+    slotAlignCenter:'中央',
+    slotAlignRight:'右',
+    slotOnlyAss:'ASS のみ',
+    slotNaVtt:'VTT では不可',
+    slotImpFrom:'保存済みスタイルから',
+    slotImpBtn:'取り込み',
+    slotImpNone:'（保存済みスタイルなし）',
+    slotImpDone:'「{1}」から {0} 項目を取り込みました',
+    slotImpSame:'「{0}」は現在の基本スタイルと同じため、取り込む差分がありません'
+}
 };
 const UI_LANGS = [ ['zh-CN','简体中文'], ['zh-TW','繁體中文'], ['en','English'], ['ja','日本語'], ['es','Español'], ['pt','Português'], ['ko','한국어'], ['de','Deutsch'], ['fr','Français'], ['id','Bahasa Indonesia'], ['hi','हिन्दी'], ['th','ไทย'], ['vi','Tiếng Việt'], ['ru','Русский'], ['it','Italiano'], ['ar','العربية'], ['tr','Türkçe'], ['nl','Nederlands'], ['pl','Polski'], ['sv','Svenska'], ['cs','Čeština'], ['uk','Українська'], ['da','Dansk'], ['fi','Suomi'], ['el','Ελληνικά'], ['he','עברית'], ['ro','Română'] ];
 const UI = { lang: 'zh-CN' };
@@ -1558,8 +1696,46 @@ function renderReport(){
    ⚠️ size 存**比例**不是绝对值：ASS 单位是 px、VTT 是 %，只有比例能一套值吃两种格式。
    ⚠️ dMV = 垂直偏移（像素 @1080，正数 = 上移）。ASS 直接加到 MarginV；
       VTT 的 line 从顶部往下算、ASS 的 MarginV 从底部往上算 —— 方向相反，换算见 slotVttSettings。 */
-const SLOT_PARAMS = ['size', 'color', 'bold', 'italic', 'dMV'];
-const SLOT_LBL = { size:'slotPrmSize', color:'slotPrmColor', bold:'slotPrmBold', italic:'slotPrmItalic', dMV:'slotPrmDMV' };
+/* v0.9.246：槽可覆盖的全部参数 —— **格式无关的语义键**（导出时各格式自己翻译）。
+   ⚠️ 值的口径必须两格式统一，否则同一个槽换个格式就变样：
+     · size / alpha / edgeAlpha = 百分比（相对基础样式 / 0~100）
+     · 其余数值                = 1080p 像素（VTT 侧按预览同一个 k 换算，与预览同源）
+     · color                   = #RRGGBB
+   ⚠️ fmt:'ass' = 只有一个格式表达得了（字间距：VTT 的 CSS 白名单里没有 letter-spacing；
+      左右边距：VTT 只有 cue 的 width/position，没有 MarginL/R）。
+      界面上必须标出来，不许静默忽略 —— 用户选了才发现没生效，等于骗人。
+   ⚠️ 245 的 size 存的是比例（1.2），246 起改存百分比（120）。槽只存在内存里、不落盘，
+      且出厂槽一个都没用 size，所以没有数据要迁移。 */
+const SLOT_SPEC = [
+  { k:'size',         grp:'text', type:'pct',   lbl:'slotPrmSize' },
+  { k:'color',        grp:'text', type:'color', lbl:'slotPrmColor' },
+  { k:'font',         grp:'text', type:'font',  lbl:'slotPrmFont' },
+  { k:'bold',         grp:'text', type:'bool',  lbl:'slotPrmBold' },
+  { k:'italic',       grp:'text', type:'bool',  lbl:'slotPrmItalic' },
+  /* ⚠️ noSrc：VTT 的 opacity 没有「原文行那半」的说法（ASS 有 srcAlpha，VTT 没有），
+     两边不一致就按最窄的那个来，宁可少一项也不许「选了没生效」。 */
+  { k:'alpha',        grp:'text', type:'pct0',  lbl:'slotPrmAlpha', noSrc:true },
+  { k:'spacing',      grp:'text', type:'num',   lbl:'slotPrmSpacing', fmt:'ass' },
+  { k:'outlineW',     grp:'edge', type:'num',   lbl:'slotPrmOutlineW' },
+  { k:'outlineColor', grp:'edge', type:'color', lbl:'slotPrmOutlineColor' },
+  { k:'edgeMode',     grp:'fx',   type:'enum',  lbl:'slotPrmEdgeMode',
+    opts:[['none','slotEdgeNone'],['shadow','slotEdgeShadow'],['box','slotEdgeBox']] },
+  { k:'edgeSize',     grp:'fx',   type:'num',   lbl:'slotPrmEdgeSize' },
+  { k:'edgeColor',    grp:'fx',   type:'color', lbl:'slotPrmEdgeColor' },
+  { k:'edgeAlpha',    grp:'fx',   type:'pct0',  lbl:'slotPrmEdgeAlpha' },
+  { k:'align',        grp:'pos',  type:'enum',  lbl:'slotPrmAlign',
+    opts:[['left','slotAlignLeft'],['center','slotAlignCenter'],['right','slotAlignRight']] },
+  /* ⚠️ level:'cue' = 整条级（不分译文原文）：垂直位移在 ASS 是逐条 Dialogue 的 MarginV、
+     在 VTT 是逐条 cue settings 的 line，两边都是「整条」的，没有「只挪原文行」这回事。
+     值仍存在 dst 那半（= 作用在承载行上），但 UI 归到「整条字幕」一组并写明作用范围。 */
+  { k:'dMV',          grp:'cue',  type:'num',   lbl:'slotPrmDMV', level:'cue' },
+  { k:'marginL',      grp:'pos',  type:'num',   lbl:'slotPrmMarginL', fmt:'ass' },
+  { k:'marginR',      grp:'pos',  type:'num',   lbl:'slotPrmMarginR', fmt:'ass' }
+];
+const SLOT_KEYS = SLOT_SPEC.map(x => x.k);
+const SLOT_MAP  = {}; SLOT_SPEC.forEach(x => { SLOT_MAP[x.k] = x; });
+const SLOT_GRPS = [['cue','slotGrpCue'], ['text','slotGrpText'], ['edge','slotGrpEdge'], ['fx','slotGrpFx'], ['pos','slotGrpPos']];
+const slotSpec = k => SLOT_MAP[k] || null;
 
 /* 出厂槽：依据 Netflix Timed Text Style Guide / BBC SDH 规范的通行做法。
    ⚠️ 音效**不开斜体** —— Netflix 明文「Never italicize speaker IDs or sound effects」，
@@ -1639,7 +1815,12 @@ function renderSlotEdit(){
   const id = S.style.cur, s = S.style.slots[id];
   if (!s){ box.innerHTML = ''; return; }
   if (nm) nm.textContent = t('slotEdit') + ' · ' + slotLabel(id);
-  const total = SLOT_PARAMS.length * (monoMode() ? 1 : 2);
+  /* ⚠️ 总数必须是「这个模式下真的能覆盖的项数」，不能拿 17×2 硬算 ——
+     双语下 src 那半少了 alpha（noSrc）与 dMV（整条级），界面上有 32 项却写「/ 34 项」，
+     用户会以为漏了两项没渲染出来。 */
+  const slotTotal = () => SLOT_SPEC.reduce((n, p) =>
+    n + (monoMode() ? 1 : (p.noSrc || p.level === 'cue' ? 1 : 2)), 0);
+  const total = slotTotal();
   if (cov) cov.textContent = t('slotCover', slotCount(id), total);
   const rst = $('slotRestore');
   if (rst) rst.style.display = (s.modified && !s.custom) ? '' : 'none';
@@ -1651,38 +1832,78 @@ function renderSlotEdit(){
     const d = s[role] || (s[role] = {});
     if (g[1]) html += '<div class="slot-grp">' + esc(t(g[1])) + '</div>';
     let rows = '';
-    SLOT_PARAMS.forEach(k=>{
-      const on = Object.prototype.hasOwnProperty.call(d, k);
-      if (diff && !on) return;
-      const baseTxt = baseParamText(role, k);
-      let valHtml;
-      if (!on){
-        valHtml = '<span>' + esc(t('slotInherit')) + ' · ' + esc(baseTxt) + '</span>';
-      } else if (k === 'color'){
-        valHtml = '<input type="color" data-sp="' + role + '.' + k + '" value="' + esc(d[k]) + '" style="width:52px;height:26px;padding:0;border:1px solid var(--line-strong);border-radius:6px">';
-      } else if (k === 'bold' || k === 'italic'){
-        valHtml = '<select data-sp="' + role + '.' + k + '"><option value="1"' + (d[k] ? ' selected' : '') + '>' + esc(t('vttOptOn')) + '</option>' +
-          '<option value="0"' + (!d[k] ? ' selected' : '') + '>' + esc(t('vttOptOff')) + '</option></select>';
-      } else if (k === 'size'){
-        valHtml = '<input type="number" data-sp="' + role + '.' + k + '" value="' + Math.round(d[k] * 100) + '" min="20" max="300" step="5" style="max-width:96px"> %';
-      } else {
-        valHtml = '<input type="number" data-sp="' + role + '.' + k + '" value="' + d[k] + '" step="10" style="max-width:96px"> px';
-      }
-      rows += '<div class="slot-row' + (on ? '' : ' inh') + '"><span class="pk">' + esc(t(SLOT_LBL[k])) + '</span>' +
-        '<span class="pv">' + valHtml + '</span>' +
-        '<span class="pa' + (on ? ' mut' : '') + '" data-sp-act="' + (on ? 'unset' : 'set') + '" data-sp-k="' + role + '.' + k + '">' +
-        esc(on ? t('slotCancel') : t('slotOverride')) + '</span></div>';
+    /* v0.9.246：17 项铺平会很长 —— 按「整条 / 文字 / 描边 / 阴影底衬 / 位置」分组，
+       差异视图下空组整组不出现（不占地方）。
+       ⚠️ 「整条」一组只出现在译文行那一半（它是唯一入口），原文行那半不重复给。 */
+    const isCueHalf = (role !== 'src');
+    SLOT_GRPS.forEach(gg=>{
+      if (gg[0] === 'cue' && !isCueHalf) return;
+      const sub = SLOT_SPEC.filter(p => {
+        if (p.grp !== gg[0]) return false;
+        if (role === 'src' && (p.noSrc || p.level === 'cue')) return false;
+        return true;
+      }).map(p=>{
+        const on = Object.prototype.hasOwnProperty.call(d, p.k);
+        if (diff && !on) return '';
+        return slotParamRow(role, p, d, on);
+      }).join('');
+      if (sub) rows += '<div class="slot-subgrp">' + esc(t(gg[1])) + '</div>' + sub;
     });
     if (!rows) rows = '<div class="slot-empty">' + esc(t('slotEmpty')) + '</div>';
-    else if (diff) rows += '<div class="slot-row"><select data-sp-add="' + role + '"><option value="">' + esc(t('slotAddParam')) + '</option>' +
-      SLOT_PARAMS.filter(k=>!Object.prototype.hasOwnProperty.call(d, k))
-        .map(k=>'<option value="' + k + '">' + esc(t(SLOT_LBL[k])) + '</option>').join('') + '</select></div>';
+    else if (diff){
+      /* v0.9.246：17 项平铺太长 —— 下拉按分组走 <optgroup>，只列出这一半还加得上的项 */
+      const canAdd = SLOT_SPEC.filter(p=>{
+        if (Object.prototype.hasOwnProperty.call(d, p.k)) return false;
+        if (role === 'src' && (p.noSrc || p.level === 'cue')) return false;
+        return true;
+      });
+      if (canAdd.length) rows += '<div class="slot-row"><select data-sp-add="' + role + '"><option value="">' + esc(t('slotAddParam')) + '</option>' +
+        SLOT_GRPS.map(gg=>{
+          const items = canAdd.filter(p => p.grp === gg[0]);
+          if (!items.length) return '';
+          return '<optgroup label="' + esc(t(gg[1])) + '">' + items.map(p =>
+            '<option value="' + p.k + '">' + esc(t(p.lbl)) + (p.fmt === 'ass' ? '（' + esc(t('slotOnlyAss')) + '）' : '') + '</option>'
+          ).join('') + '</optgroup>';
+        }).join('') + '</select></div>';
+    }
     html += rows;
   });
   box.innerHTML = html;
   const vd = $('slotViewDiff'), va = $('slotViewAll');
   if (vd) vd.classList.toggle('on', diff);
   if (va) va.classList.toggle('on', !diff);
+  renderSlotSchemeSel();
+}
+/* v0.9.246：单行参数 —— 按 type 出控件。
+   ⚠️ 只在一个格式表达得了的项（fmt:'ass'）挂一个小标签，不许静默：
+      用户选了才发现没生效，是这个模块最不该有的坑。 */
+function slotParamRow(role, p, d, on){
+  const k = p.k, key = role + '.' + k;
+  const lbl = esc(t(p.lbl)) + (p.fmt === 'ass' ? ' <span class="fmt-tag">' + esc(t('slotOnlyAss')) + '</span>' : '');
+  let valHtml;
+  if (!on){
+    valHtml = '<span class="inh-txt">' + esc(t('slotInherit')) + ' · ' + esc(baseParamText(role, k)) + '</span>';
+  } else if (p.type === 'color'){
+    valHtml = '<input type="color" data-sp="' + key + '" value="' + esc(d[k]) + '" style="width:52px;height:26px;padding:0;border:1px solid var(--line-strong);border-radius:6px">';
+  } else if (p.type === 'bool'){
+    valHtml = '<select data-sp="' + key + '"><option value="1"' + (d[k] ? ' selected' : '') + '>' + esc(t('vttOptOn')) + '</option>' +
+      '<option value="0"' + (!d[k] ? ' selected' : '') + '>' + esc(t('vttOptOff')) + '</option></select>';
+  } else if (p.type === 'enum'){
+    valHtml = '<select data-sp="' + key + '">' + p.opts.map(o =>
+      '<option value="' + o[0] + '"' + (d[k] === o[0] ? ' selected' : '') + '>' + esc(t(o[1])) + '</option>').join('') + '</select>';
+  } else if (p.type === 'font'){
+    valHtml = '<input type="text" data-sp="' + key + '" value="' + esc(d[k]) + '" list="slotFontList" style="max-width:150px">';
+  } else if (p.type === 'pct'){
+    valHtml = '<input type="number" data-sp="' + key + '" value="' + Math.round(d[k]) + '" min="20" max="300" step="5" style="max-width:96px"> %';
+  } else if (p.type === 'pct0'){
+    valHtml = '<input type="number" data-sp="' + key + '" value="' + Math.round(d[k]) + '" min="0" max="100" step="5" style="max-width:96px"> %';
+  } else {
+    valHtml = '<input type="number" data-sp="' + key + '" value="' + (+d[k] || 0) + '" step="1" style="max-width:96px"> px';
+  }
+  return '<div class="slot-row' + (on ? '' : ' inh') + '"><span class="pk">' + lbl + '</span>' +
+    '<span class="pv">' + valHtml + '</span>' +
+    '<span class="pa' + (on ? ' mut' : '') + '" data-sp-act="' + (on ? 'unset' : 'set') + '" data-sp-k="' + key + '">' +
+    esc(on ? t('slotCancel') : t('slotOverride')) + '</span></div>';
 }
 function monoMode(){ return S.mode === 'mono'; }
 /* 基础样式当前值（用来显示「沿用 · xxx」）。ASS / VTT 两套字段不同，这里做一次归一。 */
@@ -1695,6 +1916,15 @@ function baseParamText(role, k){
     if (k === 'color') return (src ? (st.srcColor || st.color) : st.color) || '#FFFFFF';
     if (k === 'bold') return st.bold ? t('vttOptOn') : t('vttOptOff');
     if (k === 'italic') return st.italic ? t('vttOptOn') : t('vttOptOff');
+    if (k === 'alpha') return (src ? '100' : '100') + '%';
+    if (k === 'font') return (src ? st.srcFont : st.font) || t('slotInherit');
+    if (k === 'edgeMode') return st.bgOn ? t('slotEdgeBox') : (st.shadowOn ? t('slotEdgeShadow') : t('slotEdgeNone'));
+    if (k === 'edgeSize') return String(st.shadowW || 0) + 'px';
+    if (k === 'edgeColor') return (st.bgOn ? st.bgColor : st.shadowColor) || '#000000';
+    if (k === 'edgeAlpha') return String(st.bgOn ? st.bgAlpha : '60') + '%';
+    if (k === 'align') return t(st.align === 'start' ? 'slotAlignLeft' : (st.align === 'end' ? 'slotAlignRight' : 'slotAlignCenter'));
+    if (k === 'spacing' || k === 'marginL' || k === 'marginR') return t('slotNaVtt');
+    if (k === 'outlineW' || k === 'outlineColor') return st.shadowOn ? String(st.shadowW || 0) + 'px' : t('vttOptOff');
   }
   const A = assStyleOf();
   if (k === 'color'){
@@ -1703,6 +1933,21 @@ function baseParamText(role, k){
   }
   if (k === 'bold') return (src ? A.srcBold : A.dstBold) ? t('vttOptOn') : t('vttOptOff');
   if (k === 'italic') return (src ? A.srcItalic : A.dstItalic) ? t('vttOptOn') : t('vttOptOff');
+  /* v0.9.246：其余项把基础值原样显示出来（「沿用 · 56px」比空白有用得多） */
+  if (k === 'alpha') return String(src ? A.srcAlpha : A.dstAlpha) + '%';
+  if (k === 'font') return (src ? A.srcFont : A.dstFont) || t('slotInherit');
+  if (k === 'spacing') return String(src ? A.srcSpacing : A.dstSpacing) + 'px';
+  if (k === 'outlineW') return String(src ? A.srcOutline : A.dstOutline) + 'px';
+  if (k === 'outlineColor') return assHexToCss(src ? A.srcOutlineColor : A.dstOutlineColor) || '#000000';
+  if (k === 'edgeMode') return t((src ? A.srcBox : A.dstBox) ? 'slotEdgeBox' : ((src ? A.srcShadow : A.dstShadow) > 0 ? 'slotEdgeShadow' : 'slotEdgeNone'));
+  if (k === 'edgeSize') return String(src ? A.srcShadow : A.dstShadow) + 'px';
+  if (k === 'edgeColor') return assHexToCss(src ? A.srcBackColor : A.dstBackColor) || '#000000';
+  if (k === 'edgeAlpha') return String(src ? A.srcBackAlpha : A.dstBackAlpha) + '%';
+  if (k === 'align') return t((src ? A.srcAlign : A.dstAlign) === 1 ? 'slotAlignLeft' : ((src ? A.srcAlign : A.dstAlign) === 3 ? 'slotAlignRight' : 'slotAlignCenter'));
+  if (k === 'marginL' || k === 'marginR'){
+    const el = $('ass' + k.charAt(0).toUpperCase() + k.slice(1));
+    return String((el && el.value != null) ? el.value : '') + 'px';
+  }
   return '';
 }
 function assHexToCss(v){
@@ -1830,10 +2075,31 @@ function slotAssSpec(id, role){
     shadow: src ? A.srcShadow : A.dstShadow,
     back: assBackWithAlpha(src ? A.srcBackColor : A.dstBackColor, src ? A.srcBackAlpha : A.dstBackAlpha)
   };
-  if (d.size != null) spec.size = Math.max(8, Math.round(spec.size * d.size));
+  /* v0.9.246：全部可覆盖项。⚠️ 只动「槽真覆盖了」的键 —— 没覆盖的原样用基础样式（补丁语义）。
+     ⚠️ size 是**百分比**（相对基础字号），不是比例：界面上写 120 就是基础字号的 120%。 */
+  if (d.size != null) spec.size = Math.max(8, Math.round(spec.size * (+d.size / 100)));
   if (d.color) spec.color = hexToAss(d.color) || spec.color;
+  if (d.font) spec.font = String(d.font);
   if (d.bold != null) spec.bold = d.bold ? -1 : 0;
-  if (d.italic != null) spec.italic = !!d.italic;
+  if (d.italic != null) spec.italic = d.italic ? -1 : 0;
+  if (d.alpha != null) spec.alpha = assAlphaHex(d.alpha);
+  if (d.spacing != null) spec.spacing = +d.spacing || 0;
+  if (d.outlineW != null) spec.outline = +d.outlineW || 0;
+  if (d.outlineColor) spec.outlineColor = hexToAss(d.outlineColor) || spec.outlineColor;
+  /* 阴影 / 底衬：一个语义开关（none/shadow/box）→ ASS 的 BorderStyle + Shadow 两个字段。
+     ⚠️ 只覆盖 edgeMode 而不覆盖 edgeSize 时，大小沿用基础值（不能擅自归零）。 */
+  const em = d.edgeMode || ((src ? A.srcBox : A.dstBox) ? 'box' : ((src ? A.srcShadow : A.dstShadow) > 0 ? 'shadow' : 'none'));
+  const esz = (d.edgeSize != null) ? (+d.edgeSize || 0) : (src ? A.srcShadow : A.dstShadow);
+  spec.borderStyle = (em === 'box') ? 3 : 1;
+  spec.shadow = (em === 'shadow') ? esz : 0;
+  if (d.edgeColor || d.edgeAlpha != null){
+    const bc = d.edgeColor ? (hexToAss(d.edgeColor) || (src ? A.srcBackColor : A.dstBackColor)) : (src ? A.srcBackColor : A.dstBackColor);
+    const ba = (d.edgeAlpha != null) ? d.edgeAlpha : (src ? A.srcBackAlpha : A.dstBackAlpha);
+    spec.back = assBackWithAlpha(bc, ba);
+  }
+  if (d.align) spec.align = (d.align === 'left' ? 1 : (d.align === 'right' ? 3 : 2));
+  if (d.marginL != null) spec.marginL = +d.marginL || 0;
+  if (d.marginR != null) spec.marginR = +d.marginR || 0;
   /* ⚠️ dMV **不在这里加**：Dialogue 行自己的 MarginV 非 0 时会覆盖 Style 里的 MarginV，
      加在 Style 上等于没加。垂直偏移在 buildAssEvents 里加到每条 Dialogue 的 ln.mv。 */
   return spec;
@@ -1860,29 +2126,66 @@ function slotVttStyle(id, role){
   /* ⚠️ 原文行那一半必须写进 srcXxx 字段：vttSrcDecls 读的是 srcColor / srcSize / srcBold / srcItalic，
      照着译文行那样写 st.color / st.size 会被整条丢掉 —— 界面上「覆盖了」，导出里一个字没变。
      ⚠️ 覆盖 = 显式关掉「沿用」（srcXxxInh = false），否则写了值也照样不输出。 */
-  if (role === 'src'){
-    const sz0 = parseFloat(st.srcSizeInh ? st.size : st.srcSize);
-    const b0 = isFinite(sz0) ? sz0 : 100;
-    if (d.size != null){ st.srcSizeInh = false; st.srcSize = String(Math.max(10, Math.round(b0 * d.size))); }
-    if (d.color){ st.srcColorInh = false; st.srcColor = d.color; }
-    if (d.bold != null) st.srcBold = d.bold ? 'on' : 'off';
-    if (d.italic != null) st.srcItalic = d.italic ? 'on' : 'off';
-    return st;   /* dMV 是整条级参数，原文行那一半没有它 */
+  const isS = role === 'src';
+  const pctOf = (v, def) => { const n = parseFloat(v); return isFinite(n) ? n : def; };
+  /* 字号：百分比（相对基础）。原文行那半的基准是「当前生效的原文行字号」。 */
+  if (d.size != null){
+    const b0 = isS ? pctOf(st.srcSizeInh ? st.size : st.srcSize, 100) : pctOf(base.size, 100);
+    const nv = String(Math.max(10, Math.round(b0 * (+d.size / 100))));
+    if (isS){ st.srcSizeInh = false; st.srcSize = nv; } else st.size = nv;
   }
-  if (d.size != null) st.size = String(Math.max(10, Math.round((parseFloat(base.size) || 100) * d.size)));
-  if (d.color) st.color = d.color;
-  if (d.bold != null) st.bold = !!d.bold;
-  if (d.italic != null) st.italic = !!d.italic;
+  if (d.color){ if (isS){ st.srcColorInh = false; st.srcColor = d.color; } else st.color = d.color; }
+  if (d.font){ if (isS) st.srcFont = String(d.font); else st.font = String(d.font); }
+  if (d.bold != null){ if (isS) st.srcBold = d.bold ? 'on' : 'off'; else st.bold = !!d.bold; }
+  if (d.italic != null){ if (isS) st.srcItalic = d.italic ? 'on' : 'off'; else st.italic = !!d.italic; }
+  /* 不透明度：VTT 只有整条 cue 的 opacity，没有「原文行那半」，所以 alpha 只对主行生效 */
+  if (d.alpha != null && !isS) st.opacity = String(Math.max(0, Math.min(100, +d.alpha)) / 100);
+  /* 描边 / 阴影 / 底衬：VTT 只有 text-shadow（八向模拟描边）与 background-color。
+     ⚠️ outlineW 优先于 edgeSize —— 描边是更具体的语义，两个都给了听描边的（不许打架后各写一半）。 */
+  const shW = (d.outlineW != null) ? d.outlineW : (d.edgeSize != null ? d.edgeSize : null);
+  const shC = d.outlineColor || d.edgeColor || null;
+  const em  = d.edgeMode || (st.bgOn ? 'box' : ((st.shadowOn !== false) ? 'shadow' : 'none'));
+  if (em === 'box'){
+    if (isS){ st.srcBgOn = 'on'; st.srcShadowOn = 'off'; } else { st.bgOn = true; st.shadowOn = false; }
+    if (d.edgeColor){ if (isS) st.srcBgColor = d.edgeColor; else st.bgColor = d.edgeColor; }
+    if (d.edgeAlpha != null){ if (isS) st.srcBgAlpha = String(d.edgeAlpha); else st.bgAlpha = String(d.edgeAlpha); }
+  } else if (em === 'shadow'){
+    if (isS){ st.srcShadowOn = 'on'; st.srcBgOn = 'off'; } else { st.shadowOn = true; st.bgOn = false; }
+  } else {
+    if (isS){ st.srcShadowOn = 'off'; st.srcBgOn = 'off'; } else { st.shadowOn = false; st.bgOn = false; }
+  }
+  if (shW != null || shC){
+    const w = (shW != null) ? String(Math.max(0, +shW || 0)) : (isS ? st.srcShadowW : st.shadowW);
+    if (isS){ st.srcShadowW = w; if (shC) st.srcShadowColor = shC; }
+    else { st.shadowW = w; if (shC) st.shadowColor = shC; }
+  }
+  /* ⚠️ 这四项不在这里落地：
+       dMV / align = 整条级（cue settings，见 slotVttSettings）；
+       spacing / marginL / marginR = ASS 专属（VTT 的 CSS 白名单里没有 letter-spacing，
+       也没有 MarginL/R，只有 cue 的 width/position）—— 界面上标了「仅 ASS」，不许静默忽略。 */
   return st;
 }
 function slotVttSettings(id){
   const d = (slotObj(id) || {}).dst || {};
-  if (!d.dMV) return '';
+  /* v0.9.246：整条级参数 = 垂直偏移（dMV）+ 水平对齐（align）。
+     ⚠️ 这两项在 VTT 只能落在逐条 cue settings 上（CSS 改不了位置），
+        所以单独在这里拼，不进 ::cue 规则。 */
   const base = vttStyleOf();
-  const bl = parseFloat(base.line);
-  if (!isFinite(bl)) return '';
-  const nl = Math.max(0, Math.min(100, bl - d.dMV / 1080 * 100));
-  return C.vttCueSettings(Object.assign({}, base, { line: String(Math.round(nl * 10) / 10) }));
+  const ov = Object.assign({}, base);
+  let touched = false;
+  if (d.dMV){
+    const bl = parseFloat(base.line);
+    if (isFinite(bl)){
+      ov.line = String(Math.round(Math.max(0, Math.min(100, bl - d.dMV / 1080 * 100)) * 10) / 10);
+      touched = true;
+    }
+  }
+  if (d.align){
+    ov.align = (d.align === 'left' ? 'start' : (d.align === 'right' ? 'end' : 'center'));
+    touched = true;
+  }
+  if (!touched) return '';
+  return C.vttCueSettings(ov);
 }
 function slotVttRules(){
   const ids = usedSlotIds();
@@ -2953,10 +3256,152 @@ function newSlot(){
   S.style.view = 'all';   /* 新槽是空的，差异视图会一片空白 → 直接给全量视图，用户挑要覆盖哪项 */
   renderSlots();
 }
+/* ================= v0.9.246：从已存的样式方案导入 =================
+   用户拍板走 A 案：导入 = 逐项与当前基础样式比对，**只把不一样的写成覆盖项**。
+   ⚠️ 为什么不是「整个槽 = 那个方案」：那样槽就变成快照，改基础样式它纹丝不动，
+      与「槽是打在基础样式上的补丁」这条语义冲突（E2E 里有测试钉着它）。
+      导入完的效力和快照一样（所有不同的项都覆盖了），但保留了补丁的后续行为。
+   方案存的是 ASS 控件值（`assDstSize` 等），这里翻成槽的语义键 + 语义单位。 */
+const SLOT_SCHEME_SUF = {
+  size:'Size', color:'Color', font:'Font', bold:'Bold', italic:'Italic', alpha:'Alpha',
+  spacing:'Spacing', outlineW:'Outline', outlineColor:'OutlineColor',
+  edgeMode:'Edge', edgeSize:'EdgeSize', edgeColor:'EdgeColor', edgeAlpha:'EdgeAlpha', align:'Align'
+};
+/* 基础样式当前值，单位与槽的语义一致（用来算「一不一样」）。
+   ⚠️ 颜色的口径必须统一 —— 246 实测抓到的 bug：方案里存的是**控件值** #RRGGBB，
+      而 assStyleOf() 给的是** ASS 格式** &HAABBGGRR，两边直接比永远不相等，
+      结果三项颜色全被误判成「有差异」写成覆盖（等于导入完平白多出三项）。
+      这里读控件原值，与方案同源，不用再转一次格式。 */
+const SLOT_COLOR_SUF = { color:'Color', outlineColor:'OutlineColor', edgeColor:'EdgeColor' };
+function slotHex(v){
+  const s = String(v == null ? '' : v).trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(s)) return s.toUpperCase();
+  const a = /^&H[0-9a-fA-F]{2}([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/.exec(s);
+  return a ? ('#' + a[3] + a[2] + a[1]).toUpperCase() : '';   /* AABBGGRR → #RRGGBB */
+}
+function slotBaseVal(role, k){
+  const src = role === 'src';
+  if (SLOT_COLOR_SUF[k]){
+    const el = $('ass' + (src ? 'Src' : 'Dst') + SLOT_COLOR_SUF[k]);
+    const v = slotHex(el ? el.value : '');
+    if (v) return v;
+    /* 控件不在时退回 assStyleOf（可能已是 ASS 格式），也不许比出不差、悄悄吃掉这一项 */
+    const A = assStyleOf();
+    return slotHex(src ? (k === 'color' ? A.srcColor : k === 'outlineColor' ? A.srcOutlineColor : A.srcEdgeColor)
+                       : (k === 'color' ? A.dstColor : k === 'outlineColor' ? A.dstOutlineColor : A.dstEdgeColor));
+  }
+  if (k === 'marginL' || k === 'marginR'){
+    const el = $('ass' + k.charAt(0).toUpperCase() + k.slice(1));
+    return +((el && el.value) || 0);
+  }
+  const A = assStyleOf();
+  switch (k){
+    case 'size':      return src ? +A.srcSize : +A.dstSize;
+    case 'alpha':     return src ? +A.srcAlpha : +A.dstAlpha;
+    case 'spacing':   return src ? +A.srcSpacing : +A.dstSpacing;
+    case 'outlineW':  return src ? +A.srcOutline : +A.dstOutline;
+    case 'edgeSize':  return src ? +A.srcShadow : +A.dstShadow;
+    case 'edgeAlpha': return src ? +A.srcBackAlpha : +A.dstBackAlpha;
+    case 'font':      return String(src ? A.srcFont : A.dstFont || '');
+    case 'bold':      return !!(src ? A.srcBold : A.dstBold);
+    case 'italic':    return !!(src ? A.srcItalic : A.dstItalic);
+    case 'outlineColor': return String(src ? A.srcOutlineColor : A.dstOutlineColor || '');
+    case 'edgeColor': return String(src ? A.srcBackColor : A.dstBackColor || '');
+    case 'edgeMode':  return (src ? A.srcBox : A.dstBox) ? 'box' : ((src ? A.srcShadow : A.dstShadow) > 0 ? 'shadow' : 'none');
+    case 'align':     { const a = +(src ? A.srcAlign : A.dstAlign); return a === 1 ? 'left' : (a === 3 ? 'right' : 'center'); }
+    default:          return '';
+  }
+}
+/* 方案里的 ASS 控件值 → 槽的语义值（归一化单位，好跟基础值比） */
+function slotValFromScheme(k, sv){
+  if (sv == null) return null;
+  if (k === 'bold' || k === 'italic') return !!sv;
+  if (k === 'size'){
+    /* 方案存的是绝对字号；槽存的是相对基础字号的百分比 → 必须换算，
+       否则「导入后字号正确」只是碰巧基础字号没变过。 */
+    const n = parseFloat(sv); return isFinite(n) ? n : null;   /* 绝对值，调用方再除基础值 */
+  }
+  if (k === 'alpha' || k === 'edgeAlpha' || k === 'spacing' || k === 'outlineW' ||
+      k === 'edgeSize' || k === 'marginL' || k === 'marginR'){
+    const n = parseFloat(sv); return isFinite(n) ? n : null;
+  }
+  if (k === 'align'){
+    const a = parseInt(sv, 10); return a === 1 ? 'left' : (a === 3 ? 'right' : 'center');
+  }
+  if (k === 'edgeMode'){ const v = String(sv); return (v === 'box' || v === 'shadow') ? v : 'none'; }
+  if (k === 'color' || k === 'outlineColor' || k === 'edgeColor'){
+    const v = String(sv).trim();
+    return /^#[0-9a-fA-F]{6}$/.test(v) ? v.toUpperCase() : null;
+  }
+  return String(sv).trim() || null;
+}
+function slotSame(a, b){
+  if (a == null || b == null) return false;
+  if (typeof a === 'number' || typeof b === 'number') return Math.abs((+a) - (+b)) < 0.01;
+  return String(a) === String(b);
+}
+/* 导入：返回写进去了几项（0 = 方案与基础样式完全一样，或一个都没对上） */
+function slotImportScheme(id, name){
+  const sc = (schemeLoad() || {})[name];
+  const s = slotObj(id);
+  if (!sc || !s) return 0;
+  let n = 0;
+  (monoMode() ? ['dst'] : ['dst', 'src']).forEach(role=>{
+    const P = role === 'dst' ? 'Dst' : 'Src';
+    const d = s[role] || (s[role] = {});
+    SLOT_SPEC.forEach(p=>{
+      /* ⚠️ dMV 不导入：方案存的是「离底多远」（绝对位置），槽存的是「挪多少」（偏移），
+         硬搬会让每一行的位移量变成整屏高度级别的数字。 */
+      if (p.k === 'dMV') return;
+      if (role === 'src' && p.noSrc) return;
+      const cid = (p.k === 'marginL' || p.k === 'marginR')
+        ? ('ass' + p.k.charAt(0).toUpperCase() + p.k.slice(1))
+        : ('ass' + P + (SLOT_SCHEME_SUF[p.k] || ''));
+      if (!Object.prototype.hasOwnProperty.call(sc, cid)) return;   /* 方案里没这项 → 不动 */
+      let nv = slotValFromScheme(p.k, sc[cid]);
+      if (nv == null) return;
+      const bv = slotBaseVal(role, p.k);
+      if (p.k === 'size'){
+        if (!(bv > 0)) return;
+        nv = Math.max(20, Math.min(300, Math.round(nv / bv * 100)));   /* 绝对 → 百分比 */
+        if (nv === 100){ delete d[p.k]; return; }                      /* 与基础同号 = 不覆盖 */
+      } else if (slotSame(nv, bv)){ delete d[p.k]; return; }           /* 一样 → 不覆盖 */
+      d[p.k] = nv; n++;
+    });
+  });
+  if (n) markSlotModified(id);
+  return n;
+}
+function renderSlotSchemeSel(){
+  const sel = $('slotSchemeSel'); if (!sel) return;
+  const all = schemeLoad() || {};
+  const names = Object.keys(all).sort((a,b)=>a.localeCompare(b, 'zh'));
+  const keep = sel.value;
+  if (!names.length){
+    sel.innerHTML = '<option value="">' + esc(t('slotImpNone')) + '</option>';
+    sel.disabled = true;
+    const b = $('slotSchemeImp'); if (b) b.disabled = true;
+    return;
+  }
+  sel.innerHTML = names.map(n=>'<option value="' + esc(n) + '">' + esc(n) + '</option>').join('');
+  sel.value = (keep && all[keep]) ? keep : names[0];
+  sel.disabled = false;
+  const b = $('slotSchemeImp'); if (b) b.disabled = false;
+}
+
+/* 新覆盖一项时的初值：⚠️ 一律取「基础样式当前值」，不是 0 ——
+   用户点「覆盖」是想改它，不是想把它清零（清零会让字幕凭空变透明/变小）。 */
 function slotDefaultVal(role, k){
-  if (k === 'color') return baseParamText(role, k);
-  if (k === 'bold' || k === 'italic') return true;
-  if (k === 'size') return 1;
+  const sp = slotSpec(k);
+  const tp = sp ? sp.type : '';
+  if (tp === 'color') return baseParamText(role, k);
+  if (tp === 'bool') return true;
+  if (tp === 'pct') return 100;                    /* 100% = 与基础同号 */
+  if (tp === 'pct0') return (k === 'alpha') ? 100 : 60;
+  if (tp === 'enum') return (sp.opts && sp.opts[0]) ? sp.opts[0][0] : '';
+  if (tp === 'font') return '';
+  if (k === 'dMV' || k === 'spacing') return 0;
+  if (k === 'marginL' || k === 'marginR') return 60;
   return 0;
 }
 function bindSlotUI(){
@@ -3002,10 +3447,14 @@ function bindSlotUI(){
       const p = String(key).split('.'); const role = p[0], k = p[1];
       const s = slotObj(S.style.cur); if (!s) return;
       const d = s[role] || (s[role] = {});
-      if (k === 'bold' || k === 'italic') d[k] = el.value === '1';
-      else if (k === 'size') d[k] = Math.max(0.2, Math.min(3, (parseFloat(el.value) || 100) / 100));
-      else if (k === 'dMV') d[k] = Math.round(parseFloat(el.value) || 0);
-      else d[k] = el.value;
+      /* v0.9.246：按 type 解析 —— 老代码只认 5 个键，剩下的会原样存成字符串，
+         导出时 +'abc' = NaN，等于「界面改了、导出没变」。 */
+      const sp = slotSpec(k), tp = sp ? sp.type : '';
+      if (tp === 'bool') d[k] = el.value === '1';
+      else if (tp === 'pct') d[k] = Math.max(20, Math.min(300, Math.round(parseFloat(el.value) || 100)));
+      else if (tp === 'pct0') d[k] = Math.max(0, Math.min(100, Math.round(parseFloat(el.value) || 0)));
+      else if (tp === 'num') d[k] = Math.round(parseFloat(el.value) || 0);
+      else d[k] = el.value;   /* color / font / enum 原样存字符串 */
       markSlotModified(S.style.cur);
       renderSlots(); renderAssPv(); renderVttPv();
     });
@@ -3013,6 +3462,15 @@ function bindSlotUI(){
   const vd = $('slotViewDiff'), va = $('slotViewAll');
   if (vd) vd.addEventListener('click', ()=>{ ensureStyle(); S.style.view = 'diff'; renderSlotEdit(); });
   if (va) va.addEventListener('click', ()=>{ ensureStyle(); S.style.view = 'all'; renderSlotEdit(); });
+  /* v0.9.246：从已存方案导入 */
+  const sim = $('slotSchemeImp');
+  if (sim) sim.addEventListener('click', ()=>{
+    const sel = $('slotSchemeSel'), name = sel && sel.value;
+    if (!name) return;
+    const n = slotImportScheme(S.style.cur, name);
+    toast(n ? t('slotImpDone', n, name) : t('slotImpSame', name));
+    renderSlots(); renderAssPv(); renderVttPv();
+  });
   const ua = $('slotUncoverAll');
   if (ua) ua.addEventListener('click', ()=>{
     const s = slotObj(S.style.cur); if (!s) return;

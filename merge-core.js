@@ -753,6 +753,12 @@
       const bg = vttRgba(st.bgColor || '#000000', st.bgAlpha == null ? 55 : st.bgAlpha);
       if (bg) d.push('  background-color: ' + bg + ';');
     }
+    /* v0.9.246：不透明度（样式槽的 alpha）。opacity 在白名单内，
+       ⚠️ 未给时一个字都不写 —— 旧调用输出与 v0.9.245 逐字节一致。 */
+    if (st.opacity != null && String(st.opacity).trim() !== '' && isFinite(+st.opacity)) {
+      const op = Math.max(0, Math.min(1, +st.opacity));
+      if (op < 1) d.push('  opacity: ' + op + ';');
+    }
     return d;
   }
   /* v0.9.245：给一个样式槽生成它自己的两条规则（主行 + 原文行）。
@@ -1477,7 +1483,11 @@
         ',&H000000FF,' + (o.outlineColor || '&H00000000') + ',' + (o.back || '&H64000000') + ',' +
         (o.bold == null ? -1 : o.bold) + ',' + ital + ',0,0,100,100,' + sp + ',0,' +
         (o.borderStyle || 1) + ',' + ol + ',' + (o.shadow || 0) + ',' + (o.align || 2) + ',' +
-        ML + ',' + MR + ',' + (o.mv == null ? MV : o.mv) + ',1';
+        /* v0.9.246：左右边距开放给调用方（样式槽要能只改边距）。
+           ⚠️ 未传时仍用模块级 ML / MR —— 不传的老调用（四套内置样式）输出逐字节不变。 */
+        (o.marginL == null ? ML : Math.max(0, Math.min(600, Math.round(numOr(o.marginL, 60))))) + ',' +
+        (o.marginR == null ? MR : Math.max(0, Math.min(600, Math.round(numOr(o.marginR, 60))))) + ',' +
+        (o.mv == null ? MV : o.mv) + ',1';
     };
     /* v0.9.245：额外的 [V4+ Styles] 行——样式槽用。
        每个样式槽在导出里就是一组独立的 ASS Style（译文行一套 + 原文行一套），
