@@ -76,6 +76,20 @@
   .drop{border:1.6px dashed var(--line-strong);border-radius:12px;padding:18px 14px;text-align:center;
     cursor:pointer;transition:border-color .15s,background .15s}
   .drop:hover,.drop.over{border-color:var(--acc);background:var(--acc-weak)}
+/* v0.9.248：上传区瘦身 —— 大虚线块（82px）压成一行紧凑条，粘贴框默认收起。
+   两卡从 233px 收到约 130px，把第一屏还给「合并设置」。
+   ⚠️ .drop 是重载类名（表格里「被丢弃的行」也用 .drop），新规则一律挂在 .drop-zone 上，别污染表格。 */
+.up-card{padding:14px 14px 12px}
+.up-card h2{margin-bottom:10px}
+.drop-zone{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:9px;text-align:left}
+.drop-zone .dz-ico{font-size:14px;flex:none;line-height:1}
+.drop-zone .dz-txt{font-size:12.5px}
+.drop-zone .dz-fmt{display:inline;color:var(--mut);font-size:11.5px;margin:0 0 0 auto}
+.drop-zone.has{border-style:solid;border-color:var(--acc);background:var(--acc-weak)}
+.drop-zone.has .dz-txt{color:var(--acc)}
+.up-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.up-row .dz-file{font-size:11.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+textarea.paste-box{margin-top:8px;min-height:96px}
   .drop b{display:block;font-size:13.5px}
   .drop span{display:block;color:var(--mut);font-size:12px;margin-top:3px}
   .card textarea{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;
@@ -245,6 +259,11 @@
   .rep-clean{margin-top:10px;background:var(--ok-weak);border-radius:10px;padding:9px 14px;
     font-size:12.5px;color:#0B7A5C;display:none}
   .tbl-wrap{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:420px;background:var(--card)}
+.sel-dock{position:sticky;bottom:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    padding:8px 10px;background:var(--acc-weak);border-top:1px solid var(--acc)}
+.sel-dock .sd-n{font-size:12.5px;font-weight:600;color:var(--acc);white-space:nowrap}
+.sel-dock .slot-chip{padding:4px 10px;font-size:12px;background:var(--card)}
+.sel-dock .sd-clr{margin-left:auto}
   table.tbl{border-collapse:collapse;width:100%;font-size:12.5px}
   .tbl th{position:sticky;top:0;background:var(--card-2);color:var(--sub);font-weight:600;text-align:left;
     padding:8px 10px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;z-index:2}
@@ -279,6 +298,10 @@
   .slot-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;
     border:1px solid var(--line-strong);background:var(--card);font-size:12.5px;cursor:pointer;white-space:nowrap}
   .slot-chip:hover{border-color:var(--acc)}
+.slot-chip.filt{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-weak)}
+.slot-chip.filt .mod{color:var(--acc)}
+.slot-edit-btn{margin-left:2px;padding:0 3px;border-radius:5px;color:var(--mut);font-size:12px;line-height:1}
+.slot-edit-btn:hover{color:var(--acc);background:var(--acc-weak)}
   .slot-chip.on{border-color:var(--acc);background:var(--acc-weak);color:var(--acc);font-weight:600}
   .slot-dot{width:9px;height:9px;border-radius:50%;flex:none}
   .slot-chip .mod{font-size:10.5px;color:var(--mut)}
@@ -333,7 +356,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.247</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.248</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -354,25 +377,35 @@
   </div>
 
   <div class="grid2">
-    <div class="card" id="srcCard">
+    <div class="card up-card" id="srcCard">
       <h2><span class="n">1</span><span id="srcCardTitle" data-i18n="srcCard">原文字幕</span></h2>
-      <div class="drop" id="srcDrop" role="button" tabindex="0">
-        <b data-i18n="btnPick">📂 点这里选文件，或直接拖进来</b>
-        <span data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
+      <div class="drop drop-zone" id="srcDrop" role="button" tabindex="0">
+        <span class="dz-ico">📂</span>
+        <span class="dz-txt" data-i18n="btnPick">选文件 / 拖进来</span>
+        <span class="dz-fmt" data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
       </div>
       <input type="file" id="srcFile" accept=".srt,.vtt,.ass,.ssa,.sbv,.txt" hidden>
-      <textarea id="srcText" data-i18n-ph="pastePh" placeholder="或把字幕文本粘贴到这里…" spellcheck="false"></textarea>
+      <div class="up-row">
+        <button type="button" class="btn ghost btn-sm" data-paste="src" data-i18n="btnPaste">粘贴文本</button>
+        <span class="dz-file" id="srcFName"></span>
+      </div>
+      <textarea id="srcText" class="paste-box" data-i18n-ph="pastePh" placeholder="或把字幕文本粘贴到这里…" spellcheck="false" style="display:none"></textarea>
       <div class="parse-ok" id="srcOk"></div>
       <div class="parse-bad" id="srcBad"></div>
     </div>
-    <div class="card" id="dstCard">
+    <div class="card up-card" id="dstCard">
       <h2><span class="n">2</span><span data-i18n="dstCard">译文字幕</span></h2>
-      <div class="drop" id="dstDrop" role="button" tabindex="0">
-        <b data-i18n="btnPick">📂 点这里选文件，或直接拖进来</b>
-        <span data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
+      <div class="drop drop-zone" id="dstDrop" role="button" tabindex="0">
+        <span class="dz-ico">📂</span>
+        <span class="dz-txt" data-i18n="btnPick">选文件 / 拖进来</span>
+        <span class="dz-fmt" data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
       </div>
       <input type="file" id="dstFile" accept=".srt,.vtt,.ass,.ssa,.sbv,.txt" hidden>
-      <textarea id="dstText" data-i18n-ph="pastePh" placeholder="或把字幕文本粘贴到这里…" spellcheck="false"></textarea>
+      <div class="up-row">
+        <button type="button" class="btn ghost btn-sm" data-paste="dst" data-i18n="btnPaste">粘贴文本</button>
+        <span class="dz-file" id="dstFName"></span>
+      </div>
+      <textarea id="dstText" class="paste-box" data-i18n-ph="pastePh" placeholder="或把字幕文本粘贴到这里…" spellcheck="false" style="display:none"></textarea>
       <div class="parse-ok" id="dstOk"></div>
       <div class="parse-bad" id="dstBad"></div>
     </div>
@@ -698,7 +731,7 @@
     <div class="slot-wrap" id="slotWrap">
       <div class="slot-hd">
         <span data-i18n="slotTitle">样式槽</span>
-        <span class="hint" data-i18n="slotHint">改一个槽，用到它的行全部跟着变</span>
+        <span class="hint" data-i18n="slotHint">点胶囊只看这个槽用在哪几行，✎ 改这个槽的样式</span>
       </div>
       <div class="slot-bar" id="slotBar"></div>
       <details class="slot-edit" id="slotEdit">
@@ -750,6 +783,10 @@
         </tr></thead>
         <tbody id="repRows"></tbody>
       </table>
+      <!-- v0.9.248：选择工具条 —— 勾选任意行后贴在表格底部常驻。
+           ⚠️ 必须放在 tbody **外面**：每勾一行都会 renderReport() 重画整个 tbody，
+              放进里面会在第一次点击时被自己刷掉。sticky bottom 让它跟着表格滚动走。 -->
+      <div class="sel-dock" id="selDock" style="display:none"></div>
     </div>
     <div class="pv-note" id="pvNote"></div>
 
@@ -798,7 +835,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.247"></script>
+<script src="merge-core.js?v=0.9.248"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -812,7 +849,7 @@ const I18N = {
     heroTitle:'两份字幕，<em>合成一套双语</em>',
     heroSub:'合并两份字幕成双语、调整现成双语字幕，或给单语字幕加样式特效（SRT / VTT / ASS / SBV）——支持时间轴对齐、整体偏移、异常检查，还能按行套用不同的样式槽。',
 
-    srcCard:'原文字幕', dstCard:'译文字幕', btnPick:'📂 点这里选文件，或直接拖进来',
+    srcCard:'原文字幕', dstCard:'译文字幕', btnPick:'选文件 / 拖进来', btnPaste:'粘贴文本',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文本粘贴到这里…',
     parsedOk:'✓ 已解析 {0}：{1} 条', parseFail:'✗ 解析失败：内容不是有效的字幕格式',
     optTitle:'合并设置',
@@ -909,7 +946,7 @@ const I18N = {
     footNote:'随心字幕 AI · 特效字幕处理工具', footLink:'去翻译字幕 →',
     modeMono:'单语字幕', monoCol:'字幕', monoCard:'字幕文件', btnMono:'生成预览', optTitleMono:'特效设置',
     monoHint:'只传一份字幕，直接给它加样式特效。',
-    slotTitle:'样式槽', slotHint:'改一个槽，用到它的行全部跟着变', slotNew:'+ 新建槽',
+    slotTitle:'样式槽', slotHint:'点胶囊只看这个槽用在哪几行，✎ 改这个槽的样式', slotEditTip:'编辑这个槽的样式', filterSlot:'槽：{0} · {1} 行', selDockN:'已选 {0} 行 · 套用', selDockClear:'清除选择', slotNew:'+ 新建槽',
     slotEdit:'编辑槽', slotCover:'已覆盖 {0} / {1} 项', slotUncoverAll:'解除全部覆盖',
     slotViewDiff:'只显示差异', slotViewAll:'显示全部参数', slotAddParam:'+ 添加参数…',
     slotInherit:'沿用', slotOverride:'覆盖', slotCancel:'取消覆盖', slotModified:'已修改', slotRestore:'恢复预设',
@@ -960,7 +997,7 @@ const I18N = {
     brandName:'隨心字幕 AI', navHome:'返回翻譯工具',
     heroTitle:'兩份字幕，<em>合成一套雙語</em>',
     heroSub:'上傳原文和譯文字幕（SRT / VTT / ASS / SBV），自動配對合併成雙語字幕，或幫單語字幕加樣式特效——支援時間軸對齊、整體偏移、異常檢查，還能逐行套用不同的樣式槽。',
-    srcCard:'原文字幕', dstCard:'譯文字幕', btnPick:'📂 點這裡選檔案，或直接拖進來',
+    srcCard:'原文字幕', dstCard:'譯文字幕', btnPick:'選檔案 / 拖進來', btnPaste:'貼上文字',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文字貼到這裡…',
     parsedOk:'✓ 已解析 {0}：{1} 條', parseFail:'✗ 解析失敗：內容不是有效的字幕格式',
     optTitle:'合併設定',
@@ -1057,7 +1094,7 @@ const I18N = {
     footNote:'隨心字幕 AI · 特效字幕處理工具', footLink:'去翻譯字幕 →',
     modeMono:'單語字幕', monoCol:'字幕', monoCard:'字幕檔案', btnMono:'產生預覽', optTitleMono:'特效設定',
     monoHint:'只傳一份字幕，直接幫它加樣式特效。',
-    slotTitle:'樣式槽', slotHint:'改一個槽，用到它的行全部跟著變', slotNew:'+ 新增槽',
+    slotTitle:'樣式槽', slotHint:'點膠囊只看這個槽用在哪幾行，✎ 改這個槽的樣式', slotEditTip:'編輯這個槽的樣式', filterSlot:'槽：{0} · {1} 行', selDockN:'已選 {0} 行 · 套用', selDockClear:'清除選取', slotNew:'+ 新增槽',
     slotEdit:'編輯槽', slotCover:'已覆蓋 {0} / {1} 項', slotUncoverAll:'解除全部覆蓋',
     slotViewDiff:'只顯示差異', slotViewAll:'顯示全部參數', slotAddParam:'+ 新增參數…',
     slotInherit:'沿用', slotOverride:'覆蓋', slotCancel:'取消覆蓋', slotModified:'已修改', slotRestore:'恢復預設',
@@ -1108,7 +1145,7 @@ const I18N = {
     brandName:'AI-SRTSub', navHome:'Back to Translator',
     heroTitle:'Two subtitle files, <em>one bilingual track</em>',
     heroSub:'Upload the original and the translated subtitle (SRT / VTT / ASS / SBV) and merge them into a bilingual track — pairing by order or timeline, global shift, and sanity checks included.',
-    srcCard:'Original subtitles', dstCard:'Translated subtitles', btnPick:'📂 Click to choose a file, or drop one here',
+    srcCard:'Original subtitles', dstCard:'Translated subtitles', btnPick:'Choose file / drop here', btnPaste:'Paste text',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'or paste subtitle text here…',
     parsedOk:'✓ Parsed {0}: {1} cues', parseFail:'✗ Parse failed: not a valid subtitle format',
     optTitle:'Merge settings',
@@ -1205,7 +1242,7 @@ const I18N = {
     footNote:'AI-SRTSub · Subtitle Styling Tool', footLink:'Translate subtitles →',
     modeMono:'Single language', monoCol:'Subtitle', monoCard:'Subtitle file', btnMono:'Preview', optTitleMono:'Styling',
     monoHint:'Upload one subtitle file and style it directly.',
-    slotTitle:'Style slots', slotHint:'Edit a slot and every line using it follows', slotNew:'+ New slot',
+    slotTitle:'Style slots', slotHint:'Click a chip to list only the lines using that slot, ✎ edits it', slotEditTip:'Edit this slot', filterSlot:'Slot: {0} · {1} lines', selDockN:'{0} selected · apply', selDockClear:'Clear', slotNew:'+ New slot',
     slotEdit:'Edit slot', slotCover:'{0} of {1} overridden', slotUncoverAll:'Clear all overrides',
     slotViewDiff:'Diff only', slotViewAll:'All parameters', slotAddParam:'+ Add parameter…',
     slotInherit:'Inherit', slotOverride:'Override', slotCancel:'Remove override', slotModified:'Modified', slotRestore:'Restore preset',
@@ -1256,7 +1293,7 @@ const I18N = {
     brandName:'AI-SRTSub', navHome:'翻訳ツールへ戻る',
     heroTitle:'2 つの字幕を、<em>1 つの二か国語に</em>',
     heroSub:'原文字幕と訳文字幕（SRT / VTT / ASS / SBV）をアップロードして二か国語字幕に自動マージ——順序またはタイムラインによる整合、全体シフト、整合チェックに対応。',
-    srcCard:'原文字幕', dstCard:'訳文字幕', btnPick:'📂 クリックしてファイルを選択、またはドロップ',
+    srcCard:'原文字幕', dstCard:'訳文字幕', btnPick:'ファイル選択 / ドロップ', btnPaste:'テキスト貼付',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'または字幕テキストをここに貼り付け…',
     parsedOk:'✓ 解析しました {0}：{1} 件', parseFail:'✗ 解析失敗：有効な字幕形式ではありません',
     optTitle:'マージ設定',
@@ -1353,7 +1390,7 @@ const I18N = {
     footNote:'AI-SRTSub · 字幕スタイル処理ツール', footLink:'字幕を翻訳する →',
     modeMono:'単一言語', monoCol:'字幕', monoCard:'字幕ファイル', btnMono:'プレビュー', optTitleMono:'スタイル設定',
     monoHint:'字幕を 1 本だけアップロードして、直接スタイルを付けます。',
-    slotTitle:'スタイルスロット', slotHint:'スロットを編集すると、それを使う行すべてに反映されます', slotNew:'+ 新規スロット',
+    slotTitle:'スタイルスロット', slotHint:'カプセルを押すとそのスロットの行だけ表示、✎ でスタイル編集', slotEditTip:'このスロットを編集', filterSlot:'スロット：{0} · {1} 行', selDockN:'{0} 行選択中 · 適用', selDockClear:'選択解除', slotNew:'+ 新規スロット',
     slotEdit:'スロットを編集', slotCover:'{0} / {1} 項目を上書き中', slotUncoverAll:'上書きをすべて解除',
     slotViewDiff:'差分のみ', slotViewAll:'全パラメータ', slotAddParam:'+ パラメータを追加…',
     slotInherit:'継承', slotOverride:'上書き', slotCancel:'上書きを解除', slotModified:'変更済み', slotRestore:'プリセットに戻す',
@@ -1454,18 +1491,26 @@ function parseAny(text){
   if (fmt === 'sbv') return { fmt, r: C.parseSbv(text) };
   return { fmt: null, r: null };
 }
+/* v0.9.248：上传区瘦身后的状态同步 —— 紧凑条变成实线 + 文件名落在「粘贴文本」右边。
+   文件已选中时一眼看得出是哪一份；清空/解析失败要把这两处一起收掉，否则会留个假状态。 */
+function syncUpSide(side, name){
+  const dz = $(side+'Drop'), fn = $(side+'FName');
+  if (dz) dz.classList.toggle('has', !!name);
+  if (fn) fn.textContent = name || '';
+}
 function loadSide(side, text, name){
   const ok = $(side+'Ok'), bad = $(side+'Bad');
   ok.style.display = 'none'; bad.style.display = 'none';
-  if (!text || !text.trim()){ S[side] = null; S[side+'Name'] = ''; S[side+'Ass'] = null; return; }
+  if (!text || !text.trim()){ S[side] = null; S[side+'Name'] = ''; S[side+'Ass'] = null; syncUpSide(side, ''); return; }
   const { fmt, r } = parseAny(text);
-  if (!fmt || !r || !r.items || !r.items.length){ S[side] = null; S[side+'Ass'] = null; bad.style.display = 'block'; return; }
+  if (!fmt || !r || !r.items || !r.items.length){ S[side] = null; S[side+'Ass'] = null; bad.style.display = 'block'; syncUpSide(side, ''); return; }
   const items = r.items.filter(it => it && String(it.text==null?'':it.text).trim());
   S[side] = items; S[side+'Name'] = name || '';
   /* v0.9.227：ASS 的 [V4+ Styles] 定义留着，导入后填进外观面板（此前整段丢弃） */
   S[side+'Ass'] = (fmt === 'ass' && r.styles && Object.keys(r.styles).length)
     ? { styles: r.styles, playResY: r.playResY } : null;
   ok.textContent = t('parsedOk', fmt.toUpperCase(), items.length); ok.style.display = 'block';
+  syncUpSide(side, S[side+'Name']);   /* v0.9.248：紧凑条显示文件名 */
   autoAlignDefault();
   importAssStyle();
   importVttStyle(side, (fmt === 'vtt') ? String(text) : '', name);
@@ -1484,6 +1529,16 @@ function bindSide(side){
     const f = file.files && file.files[0];
     if (f) f.text().then(tx=>loadSide(side, tx, f.name));
   });
+  /* v0.9.248：粘贴框默认收起 —— 点「粘贴文本」展开并聚焦；框里已经有内容时自动展开，
+     否则用户粘过一次、刷新后看不见自己粘的东西。 */
+  const pb = document.querySelector('[data-paste="' + side + '"]');
+  const setPaste = on => {
+    ta.style.display = on ? 'block' : 'none';
+    if (pb) pb.classList.toggle('on', on);
+    if (on) ta.focus();
+  };
+  if (pb) pb.addEventListener('click', ()=>setPaste(ta.style.display === 'none'));
+  if (ta.value && ta.value.trim()) setPaste(true);
   let deb = null;
   ta.addEventListener('input', ()=>{
     clearTimeout(deb);
@@ -1698,7 +1753,7 @@ function renderReport(){
   ensureStyle();
   const rowsHtml = S.rows.slice(0, CAP).map((r,i)=>{
     /* v0.9.245：筛选只决定这一行**显不显示**，不改数据、不存成规则 */
-    if (!rowMatches(r)) return '';
+    if (!rowMatches(r, i)) return '';
     const cls0 = r.flag==='drop' ? 'drop' : r.flag==='merged' ? 'merged' : '';
     const sel = S.sel.has(i) ? ' sel' : '';
     const cls = (cls0 || sel) ? ' class="' + (cls0 + sel).trim() + '"' : '';
@@ -1716,6 +1771,24 @@ function renderReport(){
   $('pvNote').textContent = S.rows.length > CAP ? t('pvNote', CAP) : '';
   renderSlots();
   renderFilterStat();
+  renderSelDock();
+}
+/* v0.9.248：勾选行之后，槽就在眼皮底下 —— 这条贴在表格底部，滚表格也跟着走。
+   以前「应用条」在表格下方 305px 处、根本不在视口里，勾完行得先滚下去才能套样式。
+   ⚠️ 点槽 = 直接应用（少一次「选下拉 → 点应用」），和 applyBar 走同一个 applySlotToSelected。 */
+function renderSelDock(){
+  const d = $('selDock'); if (!d) return;
+  ensureStyle();
+  const n = S.sel ? S.sel.size : 0;
+  if (!n || !S.rows){ d.style.display = 'none'; d.innerHTML = ''; return; }
+  const chips = S.style.order.map(id=>{
+    const sl = S.style.slots[id]; if (!sl) return '';
+    return '<span class="slot-chip' + (id === S.style.cur ? ' on' : '') + '" data-dock-slot="' + esc(id) + '" role="button" tabindex="0">' +
+      '<span class="slot-dot" style="background:' + esc(sl.color) + '"></span>' + esc(slotLabel(id)) + '</span>';
+  }).join('');
+  d.style.display = 'flex';
+  d.innerHTML = '<span class="sd-n">' + esc(t('selDockN', n)) + '</span>' + chips +
+    '<button type="button" class="btn ghost btn-sm sd-clr" data-dock-clr="1">' + esc(t('selDockClear')) + '</button>';
 }
 
 /* ================= v0.9.245：样式槽 + 筛选器 =================
@@ -1795,6 +1868,7 @@ function ensureStyle(){
   if (S.style) return S.style;
   S.style = { slots: slotFactoryMap(), order: SLOT_FACTORY.map(f=>f.id), cur:'default', assign:{}, view:'diff' };
   if (!S.filter) S.filter = { text:'', kind:'' };
+  if (S.filter.slot == null) S.filter.slot = '';   /* v0.9.248：按样式槽筛选（点槽胶囊切换） */
   if (!S.sel) S.sel = new Set();
   return S.style;
 }
@@ -1831,9 +1905,14 @@ function renderSlots(){
     const s = S.style.slots[id]; if (!s) return '';
     const n = slotCount(id);
     const mod = s.modified ? ' <span class="mod">· ' + esc(t('slotModified')) + '</span>' : '';
-    return '<span class="slot-chip' + (id === S.style.cur ? ' on' : '') + '" data-slot="' + esc(id) + '" role="button" tabindex="0">' +
+    /* v0.9.248：胶囊是**筛选器** —— 点一下只列出用了这个槽的行（filt），再点取消。
+       编辑样式走右边的小铅笔（✎），两者分开：以前点胶囊只是「设为当前槽」，
+       而用户真正想要的是「这个槽都用在哪几行」。 */
+    const filt = (S.filter && S.filter.slot === id) ? ' filt' : '';
+    return '<span class="slot-chip' + (id === S.style.cur ? ' on' : '') + filt + '" data-slot="' + esc(id) + '" role="button" tabindex="0">' +
       '<span class="slot-dot" style="background:' + esc(s.color) + '"></span>' + esc(slotLabel(id)) +
-      (n ? ' <span class="mod">' + n + '</span>' : '') + mod + '</span>';
+      (n ? ' <span class="mod">' + n + '</span>' : '') + mod +
+      '<span class="slot-edit-btn" data-slot-edit="' + esc(id) + '" role="button" tabindex="0" title="' + esc(t('slotEditTip')) + '">✎</span></span>';
   }).join('') + '<span class="slot-chip" data-slot-new="1" role="button" tabindex="0">+ ' + esc(t('slotNew')) + '</span>';
   /* 应用条里的下拉：与槽栏同源，改一处两边一起变 */
   const ap = $('mApplySlot');
@@ -2003,9 +2082,13 @@ function rowTooFast(r){
   const n = rowText(r).replace(/\s/g, '').length;
   return n / dur > 20;   /* Netflix：成人 ≤ 20 字符/秒 */
 }
-function rowMatches(r){
+/* v0.9.248：多了一个「按槽筛选」维度，必须知道行号（assign 是按行号存的稀疏表），
+   所以签名从 (r) 改成 (r, i)。⚠️ rows.filter(rowMatches) 天然会带 index，但手写调用点要显式传 i。 */
+function rowMatches(r, i){
   ensureStyle();
   const f = S.filter;
+  /* 槽筛选：默认槽不进 assign，slotOfRow 会把它兜成 'default'，所以「筛默认槽」= 没被任何槽覆盖的行 */
+  if (f.slot && i != null && slotOfRow(i) !== f.slot) return false;
   const tx = rowText(r);
   if (f.text && tx.toLowerCase().indexOf(String(f.text).toLowerCase()) < 0) return false;
   switch (f.kind){
@@ -2022,7 +2105,7 @@ function renderFilterStat(){
   ensureStyle();
   const rows = S.rows || [];
   const f = S.filter;
-  const active = !!(f.text || f.kind);
+  const active = !!(f.text || f.kind || f.slot);
   const hits = active ? rows.filter(rowMatches).length : rows.length;
   const n = S.sel ? S.sel.size : 0;
   const links = '<span style="color:var(--acc);cursor:pointer" data-fsel="all">' + esc(t('filterSelAll')) + '</span> · ' +
@@ -2030,7 +2113,11 @@ function renderFilterStat(){
     '<span style="color:var(--acc);cursor:pointer" data-fsel="clear">' + esc(t('filterClear')) + '</span>';
   /* ⚠️ 别再从 applyBar 里正则抠数字拼回来 —— 那会印出「<b>2</b> 2」这种重复数字。
      选中行数是这一行自己的说法，单独一条词条，四语都齐。 */
-  el.innerHTML = (active ? t('filterHit', hits) + ' · ' : '') + t('filterSelRow', '<b>' + n + '</b>') +
+  /* v0.9.248：槽筛选要单独说一句「槽：旁白 · 4 行」，并给一个点一下就取消的出口 ——
+     胶囊在表格上方，用户滚到下面看结果时不该还要滚回去才能取消筛选。 */
+  const slotTip = f.slot ? '<span style="color:var(--acc);cursor:pointer" data-fslot-clr="1">' +
+    esc(t('filterSlot', slotLabel(f.slot), hits)) + ' ✕</span> · ' : '';
+  el.innerHTML = slotTip + (active ? t('filterHit', hits) + ' · ' : '') + t('filterSelRow', '<b>' + n + '</b>') +
     ' · ' + links + (active ? ' · <span style="color:var(--mut)">' + esc(t('filterHint')) + '</span>' : '');
   const lbl = $('applyLabel');
   if (lbl) lbl.textContent = t('applyBar', n);
@@ -3514,13 +3601,34 @@ function bindSlotUI(){
   const bar = $('slotBar');
   if (bar) bar.addEventListener('click', e=>{
     if (e.target.closest('[data-slot-new]')){ newSlot(); return; }
+    /* 小铅笔 = 设为当前槽 + 展开样式编辑（不碰筛选） */
+    const ed = e.target.closest('[data-slot-edit]');
+    if (ed){
+      const eid = ed.getAttribute('data-slot-edit');
+      ensureStyle();
+      if (!S.style.slots[eid]) return;
+      S.style.cur = eid;
+      const det = $('slotEdit'); if (det) det.open = true;
+      renderSlots();
+      return;
+    }
     const chip = e.target.closest('[data-slot]');
     if (!chip) return;
     const id = chip.getAttribute('data-slot');
     ensureStyle();
     if (!S.style.slots[id]) return;
-    S.style.cur = id;
-    renderSlots();
+    S.filter.slot = (S.filter.slot === id) ? '' : id;
+    renderReport();   /* 表格 + 状态条 + 胶囊态一起重画 */
+    const tb = $('.tbl-wrap'); if (tb && S.filter.slot) tb.scrollTop = 0;
+  });
+  /* v0.9.248：贴底选择条 —— 点槽即应用，点「清除」把选择放掉 */
+  const dk = $('selDock');
+  if (dk) dk.addEventListener('click', e=>{
+    if (e.target.closest('[data-dock-clr]')){ ensureStyle(); S.sel.clear(); renderReport(); return; }
+    const c = e.target.closest('[data-dock-slot]');
+    if (!c) return;
+    ensureStyle();
+    applySlotToSelected(c.getAttribute('data-dock-slot'));
   });
   const box = $('slotParams');
   if (box){
@@ -3613,20 +3721,23 @@ function bindSlotUI(){
   if (sa) sa.addEventListener('change', ()=>{
     ensureStyle();
     if (!S.rows) return;
-    if (sa.checked) S.rows.forEach((r, i)=>{ if (rowMatches(r)) S.sel.add(i); });
+    if (sa.checked) S.rows.forEach((r, i)=>{ if (rowMatches(r, i)) S.sel.add(i); });
     else S.sel.clear();
     renderReport();
   });
   const fs = $('filterStat');
   if (fs) fs.addEventListener('click', e=>{
+    if (e.target.getAttribute && e.target.getAttribute('data-fslot-clr')){
+      ensureStyle(); S.filter.slot = ''; renderReport(); return;
+    }
     const a = e.target.getAttribute && e.target.getAttribute('data-fsel');
     if (!a) return;
     ensureStyle();
     if (!S.rows) return;
-    if (a === 'all') S.rows.forEach((r, i)=>{ if (rowMatches(r)) S.sel.add(i); });
+    if (a === 'all') S.rows.forEach((r, i)=>{ if (rowMatches(r, i)) S.sel.add(i); });
     else if (a === 'inv'){
       const nx = new Set();
-      S.rows.forEach((r, i)=>{ if (rowMatches(r) && !S.sel.has(i)) nx.add(i); });
+      S.rows.forEach((r, i)=>{ if (rowMatches(r, i) && !S.sel.has(i)) nx.add(i); });
       S.sel = nx;
     } else S.sel.clear();
     renderReport();
