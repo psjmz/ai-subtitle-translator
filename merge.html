@@ -26,7 +26,24 @@
   body{background:var(--bg);color:var(--ink);
     font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
   button{font-family:inherit}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .wrap{max-width:1400px;margin:0 auto;padding:0 24px}
+  /* v0.9.247：工作台布局 —— 左列「设置 + 结果」，右列「预览 + 导出」常驻右侧。
+     此前整页单列、预览排在最末一张卡：改完参数要滚 2317px 才看得见效果（1440×900 实测）。
+     ⚠️ 只加容器与栅格：**不搬任何控件、不改任何 id、不动任何 JS**。
+        #exp 整张卡（预览 + 导出一行）原样进右列，JS 的 display 开关照旧生效；
+        右列用 auto 宽 —— #exp 隐藏时轨道自动收成 0，不会在合并前留一条空列。 */
+  .work{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start;margin-top:16px}
+  .work>.opts{grid-column:1;margin-top:0}
+  .work>.actions{grid-column:1}
+  .work>.rep{grid-column:1;margin-top:0}
+  .work>.exp{grid-column:2;grid-row:1/span 3;width:396px;margin-top:0;position:sticky;top:14px}
+  @media (max-width:1180px){
+    .work{grid-template-columns:minmax(0,1fr)}
+    .work>.exp{grid-column:1;grid-row:auto;width:auto;position:static}
+    /* 回单列时预览会跟着整宽撑到 1000+px（16:9 → 570px 高），白占一屏。
+       限宽 560 居中：与右栏那档尺寸手感一致，也不再出现「一大块黑框」。 */
+    .ass-pv-screen,.vtt-pv-screen{max-width:560px;margin:0 auto}
+  }
   .lnav{display:flex;align-items:center;gap:18px;padding:18px 0 8px;flex-wrap:wrap}
   .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
   .logo-mark{width:30px;height:30px;border-radius:9px;background:var(--grad);color:#fff;
@@ -183,6 +200,11 @@
   .tplrow-l{font-size:12px;color:var(--sub);flex:none}
 
   .rep{display:none;margin-top:16px}
+  /* v0.9.247：示例态提示条 —— 蓝底虚线框，与「体检告警 / 通过」的实色块区分开 */
+  .demo-tip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--acc-weak);
+    border:1px dashed var(--acc-line);border-radius:10px;padding:8px 12px;margin-bottom:10px;
+    font-size:12.5px;color:var(--acc);line-height:1.5}
+  .demo-tip b{font-weight:700}
   .rep-band{display:flex;flex-wrap:wrap;gap:10px}
   .rep-chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 14px;font-size:12.5px}
   .rep-chip b{font-size:15px;margin-right:4px}
@@ -311,7 +333,7 @@
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.246</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.247</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -356,6 +378,8 @@
     </div>
   </div>
 
+  <!-- v0.9.247：左列（设置 + 结果）/ 右列（预览 + 导出）的栅格容器，规则见 CSS 的 .work -->
+  <div class="work">
   <div class="card opts">
     <h2><span class="n">3</span><span id="optTitle" data-i18n="optTitle">合并设置</span></h2>
     <div class="frow">
@@ -659,6 +683,10 @@
   </div>
 
   <div class="rep" id="rep">
+    <!-- v0.9.247：未上传字幕时的「示例」提示条 —— 空状态不再是一整页空白，
+         用样本数据把工作台（结果表 + 右侧预览）铺出来，用户先看见成品长什么样。
+         ⚠️ 示例可看不可导出：下载/复制在 demo 态直接拦掉（见 doDownload / doCopy）。 -->
+    <div class="demo-tip" id="demoTip" style="display:none"></div>
     <div class="rep-band" id="repBand"></div>
     <!-- v0.9.222：折行拆分/同文种拆分的提醒（琥珀色）——用户定案：聚类结果必须看得见 -->
     <div class="rep-issues" id="formWarn" style="display:none"></div>
@@ -762,6 +790,7 @@
       <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
     </div>
   </div>
+  </div><!-- /.work -->
 
   <footer>
     <span data-i18n="footNote">随心字幕 AI · 双语字幕合并工具</span> · <a href="/" data-i18n="footLink">去翻译字幕 →</a>
@@ -769,7 +798,7 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.246"></script>
+<script src="merge-core.js?v=0.9.247"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -871,7 +900,8 @@ const I18N = {
     colNo:'#', colTime:'时间', colSrc:'原文', colDst:'译文',
     tagDrop:'未配上·不出现在成片', tagMerged:'并入上一条',
     pvNote:'预览最多显示前 {0} 条，完整内容以导出文件为准。',
-    expTitle:'导出', btnDownload:'⬇ 下载字幕', btnCopy:'复制内容',
+    demoTipTitle:'示例', demoTipBody:'：下面是 6 行样本，先看合并后的样子；上传你自己的字幕、点「合并预览」后自动替换。示例不可导出。', demoNoExport:'示例数据不能导出，先上传你自己的字幕',
+  expTitle:'导出', btnDownload:'⬇ 下载字幕', btnCopy:'复制内容',
     needBoth:'请先在上方提供原文和译文字幕（文件或粘贴均可）', needMerge:'请先点预览按钮生成结果',
     copied:'已复制到剪贴板', downloaded:'已开始下载',
     issOverlap:'#{0} 与前一条重叠 {1}ms', issShort:'#{0} 时长不足（短于 0.5 秒）',
@@ -1018,7 +1048,8 @@ const I18N = {
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'譯文',
     tagDrop:'未配上·不出現在成片', tagMerged:'併入上一條',
     pvNote:'預覽最多顯示前 {0} 條，完整內容以匯出檔案為準。',
-    expTitle:'匯出', btnDownload:'⬇ 下載字幕', btnCopy:'複製內容',
+    demoTipTitle:'範例', demoTipBody:'：下面是 6 行樣本，先看合併後的樣子；上傳你自己的字幕、點「合併預覽」後自動取代。範例不可匯出。', demoNoExport:'範例資料不能匯出，請先上傳你自己的字幕',
+  expTitle:'匯出', btnDownload:'⬇ 下載字幕', btnCopy:'複製內容',
     needBoth:'請先在上方提供原文和譯文字幕（檔案或貼上均可）', needMerge:'請先點預覽按鈕產生結果',
     copied:'已複製到剪貼簿', downloaded:'已開始下載',
     issOverlap:'#{0} 與前一條重疊 {1}ms', issShort:'#{0} 時長不足（短於 0.5 秒）',
@@ -1165,7 +1196,8 @@ const I18N = {
     colNo:'#', colTime:'Time', colSrc:'Original', colDst:'Translation',
     tagDrop:'Unpaired·excluded from output', tagMerged:'Folded into previous',
     pvNote:'Preview shows the first {0} rows only; the exported file contains everything.',
-    expTitle:'Export', btnDownload:'⬇ Download subtitles', btnCopy:'Copy content',
+    demoTipTitle:'Sample', demoTipBody:': six sample rows below, so you can see the result first. Upload your own subtitles and hit Merge to replace them. Sample data cannot be exported.', demoNoExport:'Sample data cannot be exported - upload your own subtitles first',
+  expTitle:'Export', btnDownload:'⬇ Download subtitles', btnCopy:'Copy content',
     needBoth:'Provide both the original and the translated subtitles first (file or paste)', needMerge:'Click the preview button first',
     copied:'Copied to clipboard', downloaded:'Download started',
     issOverlap:'#{0} overlaps the previous cue by {1}ms', issShort:'#{0} too short (under 0.5s)',
@@ -1312,7 +1344,8 @@ const I18N = {
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'訳文',
     tagDrop:'未対応·出力に含まれない', tagMerged:'前の条に統合',
     pvNote:'プレビューは先頭 {0} 行のみ。完全な内容はエクスポートファイルで確認してください。',
-    expTitle:'エクスポート', btnDownload:'⬇ 字幕をダウンロード', btnCopy:'内容をコピー',
+    demoTipTitle:'サンプル', demoTipBody:'：以下の 6 行はサンプルです。字幕をアップロードして「結合プレビュー」を押すと実際のデータに置き換わります。サンプルは書き出せません。', demoNoExport:'サンプルデータは書き出せません。先に字幕をアップロードしてください',
+  expTitle:'エクスポート', btnDownload:'⬇ 字幕をダウンロード', btnCopy:'内容をコピー',
     needBoth:'まず原文と訳文字幕を用意してください（ファイルまたは貼り付け）', needMerge:'先にプレビューボタンを押してください',
     copied:'クリップボードにコピーしました', downloaded:'ダウンロードを開始しました',
     issOverlap:'#{0} が前の字幕と {1}ms 重複', issShort:'#{0} が短すぎ（0.5 秒未満）',
@@ -1409,7 +1442,7 @@ function toast(msg){
 }
 
 /* ================= 状态 ================= */
-const S = { src:null, dst:null, srcName:'', dstName:'', rows:null, report:null };
+const S = { src:null, dst:null, srcName:'', dstName:'', rows:null, report:null, demo:false };
 function $(id){ return document.getElementById(id); }
 
 /* ================= 导入：解析两份字幕 ================= */
@@ -1475,6 +1508,7 @@ function alignMode(){
 /* v0.9.222 模式切换：merge = 原有「两份字幕合并」；adjust = 「调整双语字幕」
    （一份现成双语字幕 → 自动拆原文/译文两列 → 走同一套预览/体检/导出） */
 function syncMode(){
+  endDemo();   /* v0.9.247：切模式就把示例态收掉，别把样本留在新的输入口径里 */
   const adj = S.mode === 'adjust';
   const mono = S.mode === 'mono';
   const isMerge = S.mode === 'merge';
@@ -1520,6 +1554,7 @@ function setI18nKey(el, key){
   el.textContent = t(key);
 }
 function doMerge(){
+  endDemo();   /* v0.9.247：真实合并开始，示例态退场 */
   if (S.mode === 'adjust'){ doAdjust(); return; }
   if (S.mode === 'mono'){ doMono(); return; }   /* v0.9.245：单语 → 不配对，直接进 rows */
   if (!S.src || !S.dst){ toast(t('needBoth')); return; }
@@ -1618,6 +1653,7 @@ function renderReport(){
      这时任何一次重画都会撞上 null.slice / null.length → 直接返回，别把结果区点亮。 */
   if (!rep || !S.rows){ $('rep').style.display = 'none'; return; }
   $('rep').style.display = 'block';
+  syncDemoTip();   /* v0.9.247：示例态提示条跟着结果区一起显隐 */
   const chip = (cls, key, n) => '<div class="rep-chip '+cls+'"><b>'+n+'</b>'+t(key)+'</div>';
   let band = chip(rep.pairs ? 'ok' : 'bad', 'repPaired', rep.pairs);
   if (rep.onlySrc.length) band += chip('warn', 'repOnlySrc', rep.onlySrc.length);
@@ -2021,6 +2057,63 @@ function applySlotToAll(id){
 /* ⚠️ 引擎读的是 **row.slot**，不是 assign（buildBilingualParts 只看行上的字段）。
    assign 是「行号 → 槽」的稀疏表（默认槽不记），导出前必须刷进 rows，否则槽根本到不了导出端。
    ⚠️ 每条路径都要刷：ASS 事件、VTT cue、ASS 预览样例 —— 漏一条就是「预览变了导出没变」。 */
+/* ================= v0.9.247：空状态示例 =================
+   没上传字幕时整页只有「上传卡 + 参数」，右栏预览是空的，用户看不出这个工具做出来的东西长什么样。
+   现在：默认铺一份**样本**（6 行，含一条音效、一条歌词，槽也是真的），结果表与右侧预览都点亮，
+   用户进来先看见成品；只要他自己上传/粘贴并点了合并，示例立刻被真实数据顶掉。
+   ⚠️ 示例可看不可导出：doDownload / doCopy 在 demo 态直接拦掉，不做任何文件落地。 */
+const DEMO_ROWS = [
+  { en:"All right, let's begin.",                 zh:"好的，我们开始吧。" },
+  { en:"This is the part that actually matters.",  zh:"这才是真正关键的部分。" },
+  { en:"[ phone ringing ]",                        zh:"[ 电话铃声 ]" },
+  { en:"♪ the road we walked together ♪",          zh:"♪ 我们一起走过的那条路 ♪" },
+  { en:"Give me three more days.",                 zh:"再给我三天时间，我会把这件事做完。" },
+  { en:"That is why the outcome was different.",   zh:"所以最终的结果完全不同。" }
+];
+function demoRows(){
+  return DEMO_ROWS.map((r, i) => ({
+    start: i * 3.2, end: i * 3.2 + 2.4,
+    en: r.en, zh: r.zh, flag: ''
+  }));
+}
+function syncDemoTip(){
+  const el = $('demoTip'); if (!el) return;
+  if (!S.demo){ el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = '<b>' + esc(t('demoTipTitle')) + '</b>' + esc(t('demoTipBody'));
+}
+/* 只在「用户还没合并过」时装一次；重复进入不覆盖真实数据 */
+function loadDemo(){
+  if (S.rows && S.rows.length) return;
+  ensureStyle();
+  S.demo = true;
+  S.rows = demoRows();
+  S.report = { pairs: S.rows.length, onlySrc: [], onlyDst: [], merged: 0 };
+  /* 默认导出格式是 SRT（没有样式、也没有预览）——示例就只剩一张表，看不出效果。
+     这里临时切到「ASS 底部双行」把预览点亮；用户自己动过格式就再也不还原。 */
+  const cur0 = tplVal();
+  if (fmtGroupOf(cur0) !== 'ass' && cur0 !== 'vttStyle'){
+    S.demoFmtPrev = cur0;
+    setFmtSilently('stack');
+    S.fmtTouched = false;   /* 这次是我们自己派的，不算用户改过 */
+  }
+  /* 示例里也挂上真实槽（音效 / 歌词），让「槽是干什么的」当场看得见 */
+  S.style.assign = { 2:'sfx', 3:'lyric' };
+  syncSlotsToRows();
+  renderReport();
+  $('exp').style.display = 'block';
+  renderAssPv();
+  renderVttPv();
+}
+/* 任何一次真实合并/拆分/单语导入，以及切模式，都把示例态收掉 */
+function endDemo(){
+  if (!S.demo) return;
+  S.demo = false;
+  syncDemoTip();
+  /* 用户没手动改过格式 → 还给示例之前的那一档（示例不该偷偷改掉他的导出格式） */
+  if (S.demoFmtPrev && !S.fmtTouched){ setFmtSilently(S.demoFmtPrev); S.demoFmtPrev = null; }
+}
+
 function syncSlotsToRows(){
   ensureStyle();
   if (!S.rows) return;
@@ -2244,6 +2337,16 @@ function fmtGroupOf(tpl){
 /* 顶层格式卡：点一下就切到该格式（ASS 保留上次选的模板，VTT 保留样式开/关）
    ⚠️ select.value 没变就不派发 change —— 否则「点一下已经选中的格式」也会重套一遍预设，
      把用户刚调好的参数冲掉。 */
+/* v0.9.247：示例态专用 —— 与 setFmtGroup 同路径（两份 select + 一次 change），
+   但不经过按钮，也就不会触发「点已选中的格式」那套分支。 */
+function setFmtSilently(v){
+  const a = $('expFmt'), b = $('expFmt2');
+  if (!a) return;
+  if (b) b.value = v;
+  a.value = v;
+  a.dispatchEvent(new Event('change',{bubbles:true}));
+  syncTplSegs();
+}
 function setFmtGroup(g){
   const sel = $('expFmt'); if (!sel) return;
   let v = sel.value;
@@ -3219,6 +3322,8 @@ function reportMerge(kind){
   }catch(e){}
 }
 function doDownload(){
+  /* v0.9.247：示例数据不许落盘 —— 看得见拦得住，比偷偷导出一份假字幕强 */
+  if (S.demo){ toast(t('demoNoExport')); return; }
   if (!S.rows){ toast(t('needMerge')); return; }
   const text = buildExport();
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -3231,6 +3336,7 @@ function doDownload(){
   reportMerge('export');   /* v0.9.244：导出格式 + 模板上报（后台「双语合并记录」） */
 }
 function doCopy(){
+  if (S.demo){ toast(t('demoNoExport')); return; }   /* v0.9.247：同上 */
   if (!S.rows){ toast(t('needMerge')); return; }
   const text = buildExport();
   (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
@@ -3831,6 +3937,7 @@ function init(){
   S.mode = 'merge';
   syncMode();
   applyI18n();
+  loadDemo();   /* v0.9.247：空状态示例（用户一进来就看见工作台长什么样） */
 }
 init();
 </script>

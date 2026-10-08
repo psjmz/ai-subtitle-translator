@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.246/.test(mg), 'merge.html 未引用 v0.9.245 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.247/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.246</.test(html), '首页版本号未升 0.9.245');
-    assert.ok(/class="ver-tag">v0\.9\.246</.test(html), '工作台版本号未升 0.9.245');
-    assert.ok(/srt-core\.js\?v=0\.9\.246/.test(html), 'srt-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.247</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.247</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.247/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.246</.test(mg), 'merge.html 版本未升 0.9.245');
-    assert.ok(/merge-core\.js\?v=0\.9\.246/.test(mg), 'merge-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.247</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.247/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7359,11 +7359,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.246/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.246/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.246/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.246/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.246/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.247/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.247/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.247/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.247/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.247/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
@@ -7881,5 +7881,41 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
   });
 
+  /* ================= v0.9.247：工作台布局 + 空状态示例 ================= */
+  t('v0.9.247：左列参数/结果、右列预览导出的栅格容器（预览不再排在最末）', () => {
+    assert.ok(/\.work\{display:grid/.test(mg), '缺 .work 栅格容器');
+    assert.ok(/\.work>\.exp\{[^}]*grid-column:2/.test(mg), '导出卡没进右列');
+    assert.ok(/\.work>\.exp\{[^}]*position:sticky/.test(mg), '右栏没有常驻（sticky）');
+    assert.ok(/\.work>\.opts\{grid-column:1/.test(mg) && /\.work>\.rep\{grid-column:1/.test(mg), '左列没归位');
+    /* ⚠️ 窄屏必须回单列，否则 820px 下右栏会压在左栏上面 */
+    assert.ok(/@media \(max-width:1180px\)\s*\{[\s\S]{0,300}\.work>\.exp\{grid-column:1/.test(mg), '窄屏没回单列');
+  });
+
+  t('v0.9.247：示例态 —— 有样本、有提示条、不许导出', () => {
+    assert.ok(/const DEMO_ROWS = \[/.test(mg), '缺示例数据');
+    assert.ok(/function loadDemo\(\)/.test(mg) && /loadDemo\(\);/.test(mg), '示例没在初始化时装载');
+    assert.ok(/S\.demo = true/.test(mg), '缺 demo 标记');
+    /* ⚠️ 示例数据落盘 = 用户下载到一份假字幕，两条出口都必须拦 */
+    assert.ok(/function doDownload\(\)\{[\s\S]{0,220}S\.demo\)\s*\{/.test(mg), '下载没拦示例态');
+    assert.ok(/function doCopy\(\)\{[\s\S]{0,220}S\.demo\)\s*\{/.test(mg), '复制没拦示例态');
+    assert.ok(/function endDemo\(\)/.test(mg) && /endDemo\(\);/.test(mg), '示例态退不了场');
+  });
+
+  t('v0.9.247：i18n 新词条四语齐全', () => {
+    const langs = ['zh-CN', 'zh-TW', 'en', 'ja'];
+    const dict = {};
+    langs.forEach(L => {
+      const m = new RegExp("['\"]?" + L.replace('-', '\\-') + "['\"]?\\s*:\\s*\\{").exec(mg);
+      assert.ok(m, '找不到语块 ' + L);
+      let d = 1, j = m.index + m[0].length;
+      while (d > 0 && j < mg.length) { if (mg[j] === '{') d++; else if (mg[j] === '}') d--; j++; }
+      dict[L] = mg.slice(m.index, j);
+    });
+    ['demoTipTitle','demoTipBody','demoNoExport'].forEach(k => {
+      langs.forEach(L => {
+        assert.ok(new RegExp('[,{\\s]' + k + ":\\s*'").test(dict[L]), L + ' 缺 ' + k);
+      });
+    });
+  });
 
 }
