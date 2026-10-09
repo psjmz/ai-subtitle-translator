@@ -497,14 +497,14 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.256</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.257</span></div>
     <div class="spacer"></div>
-    <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
+    <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
   </nav>
 
   <div class="hero">
-    <h1 data-i18n-html="heroTitle">两份字幕，<em>合成一套双语</em></h1>
+    <h1 data-i18n-html="heroTitle">字幕<em>加特效、合双语</em></h1>
     <p data-i18n="heroSub">上传原文和译文字幕（SRT / VTT / ASS / SBV），自动配对合并成双语字幕——支持按顺序或时间轴对齐、整体偏移、异常检查。</p>
   </div>
 
@@ -981,12 +981,12 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   </div><!-- /.work -->
 
   <footer>
-    <span data-i18n="footNote">随心字幕 AI · 双语字幕合并工具</span> · <a href="/" data-i18n="footLink">去翻译字幕 →</a>
+    <span data-i18n="footNote">随心字幕 AI · 特效字幕处理工具</span> · <a href="/" data-i18n="footLink">去翻译字幕 →</a>
   </footer>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.256"></script>
+<script src="merge-core.js?v=0.9.257"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -997,7 +997,7 @@ const C = window.MergeCore;
 const I18N = {
   'zh-CN': {
     brandName:'随心字幕 AI', navHome:'返回翻译工具',
-    heroTitle:'两份字幕，<em>合成一套双语</em>',
+    heroTitle:'字幕<em>加特效、合双语</em>',
     heroSub:'合并两份字幕成双语、调整现成双语字幕，或给单语字幕加样式特效（SRT / VTT / ASS / SBV）——支持时间轴对齐、整体偏移、异常检查，还能按行套用不同的样式槽。',
 
     srcCard:'原文字幕', dstCard:'译文字幕', btnPick:'选文件 / 拖进来', btnPaste:'粘贴文本',
@@ -1150,7 +1150,7 @@ const I18N = {
 },
   'zh-TW': {
     brandName:'隨心字幕 AI', navHome:'返回翻譯工具',
-    heroTitle:'兩份字幕，<em>合成一套雙語</em>',
+    heroTitle:'字幕<em>加特效、合雙語</em>',
     heroSub:'上傳原文和譯文字幕（SRT / VTT / ASS / SBV），自動配對合併成雙語字幕，或幫單語字幕加樣式特效——支援時間軸對齊、整體偏移、異常檢查，還能逐行套用不同的樣式槽。',
     srcCard:'原文字幕', dstCard:'譯文字幕', btnPick:'選檔案 / 拖進來', btnPaste:'貼上文字',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'或把字幕文字貼到這裡…',
@@ -1302,8 +1302,8 @@ const I18N = {
 },
   'en': {
     brandName:'AI-SRTSub', navHome:'Back to Translator',
-    heroTitle:'Two subtitle files, <em>one bilingual track</em>',
-    heroSub:'Upload the original and the translated subtitle (SRT / VTT / ASS / SBV) and merge them into a bilingual track — pairing by order or timeline, global shift, and sanity checks included.',
+    heroTitle:'Style effects and <em>bilingual merge</em>',
+    heroSub:'Merge two files into a bilingual track, retune an existing one, or add style effects to a single-language file (SRT / VTT / ASS / SBV) — timeline pairing, global shift, sanity checks and per-row style slots.',
     srcCard:'Original subtitles', dstCard:'Translated subtitles', btnPick:'Choose file / drop here', btnPaste:'Paste text',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'or paste subtitle text here…',
     parsedOk:'✓ Parsed {0}: {1} cues', parseFail:'✗ Parse failed: not a valid subtitle format',
@@ -1454,8 +1454,8 @@ const I18N = {
 },
   'ja': {
     brandName:'AI-SRTSub', navHome:'翻訳ツールへ戻る',
-    heroTitle:'2 つの字幕を、<em>1 つの二か国語に</em>',
-    heroSub:'原文字幕と訳文字幕（SRT / VTT / ASS / SBV）をアップロードして二か国語字幕に自動マージ——順序またはタイムラインによる整合、全体シフト、整合チェックに対応。',
+    heroTitle:'字幕に<em>エフェクトと二か国語</em>',
+    heroSub:'2 つの字幕を二か国語にマージ、既存の二か国語字幕を調整、または単言語字幕に装飾を追加（SRT / VTT / ASS / SBV）——タイムライン整合、全体シフト、チェック、行ごとのスタイルスロットに対応。',
     srcCard:'原文字幕', dstCard:'訳文字幕', btnPick:'ファイル選択 / ドロップ', btnPaste:'テキスト貼付',
     dropSub:'SRT · VTT · ASS · SBV', pastePh:'または字幕テキストをここに貼り付け…',
     parsedOk:'✓ 解析しました {0}：{1} 件', parseFail:'✗ 解析失敗：有効な字幕形式ではありません',
@@ -4552,5 +4552,6 @@ function init(){
 }
 init();
 </script>
+<script src="site-nav.js" data-tool="fx"></script>
 </body>
 </html>

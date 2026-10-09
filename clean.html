@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>字幕清洗器 - 随心字幕 AI (AI-SRTSub)</title>
+<meta name="description" content="免费在线字幕清洗工具：去掉 HTML 标签、ASS 特效、听障提示、说话人标签、字幕组水印与广告，修复全大写和乱码，导出干净的字幕。纯本地处理，不上传服务器。">
+<meta name="keywords" content="字幕清洗,srt清洗,去字幕水印,去听障字幕,SDH字幕,去说话人,字幕去广告,字幕乱码修复,subtitle cleaner">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#E12D6E">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  /* ================= 视觉系统沿用 v0.9.249「收敛精修」 =================
+     ⚠️ 与 merge.html 同源：冷中性灰阶 + 品牌粉实色 + 禁渐变 + 禁 emoji 图标。
+        清洗器是第三个独立页面，视觉必须和双语页一致，不能另起一套。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#E12D6E; --acc-weak:#FDF1F6; --acc-line:#F6CADC; --acc-ink:#C02159;
+    --grad:#E12D6E; --acc2:#E12D6E;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(225,45,110,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    padding:18px 20px 16px;box-shadow:var(--sh-card);margin-top:16px}
+  .card h2{font-size:13.5px;font-weight:650;letter-spacing:-.1px;margin:0 0 14px;display:flex;align-items:center;gap:9px}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:none}
+  .card h2 .cnt{margin-left:auto;font-size:11.5px;font-weight:500;color:var(--mut)}
+
+  .drop-zone{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--r-ctl);text-align:left;
+    border:1px dashed var(--line-strong);background:var(--card-2);cursor:pointer;
+    transition:border-color .14s,background .14s}
+  .drop-zone .dz-ico{flex:none;color:var(--acc-ink);width:16px;height:16px;
+    -webkit-mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 16V4'/%3E%3Cpath d='M7 9l5-5 5 5'/%3E%3Cpath d='M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 16V4'/%3E%3Cpath d='M7 9l5-5 5 5'/%3E%3Cpath d='M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2'/%3E%3C/svg%3E");
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain;
+    background:currentColor}
+  .drop-zone .dz-txt{font-size:12.5px;font-weight:500;color:var(--body)}
+  .drop-zone .dz-fmt{margin:0 0 0 auto;color:var(--mut);font-size:11.5px}
+  .drop-zone:hover{border-color:var(--acc);background:var(--acc-weak)}
+  .drop-zone.has{border-style:solid;border-color:var(--acc);background:var(--acc-weak)}
+  .drop-zone.has .dz-txt{color:var(--acc-ink)}
+  .up-row{display:flex;align-items:center;gap:8px;margin-top:9px}
+  .up-row .dz-file{font-size:11.5px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+  textarea.paste-box{width:100%;margin-top:9px;min-height:82px;border:1px solid var(--line-strong);
+    border-radius:var(--r-ctl);padding:9px 11px;font:12px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    resize:vertical;color:var(--ink);background:var(--card)}
+  textarea.paste-box:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-weak)}
+  .parse-ok{margin-top:9px;font-size:12px;color:var(--ok-ink);background:var(--ok-weak);
+    border-radius:8px;padding:6px 10px;display:none}
+  .parse-bad{margin-top:9px;font-size:12px;color:var(--del);background:var(--del-weak);
+    border-radius:8px;padding:6px 10px;display:none;white-space:pre-wrap}
+
+  .cgrp{margin-top:2px}
+  .cgrp-t{font-size:11.5px;color:var(--mut);margin:12px 0 6px;padding-left:2px}
+  .cgrp:first-child .cgrp-t{margin-top:0}
+  .cbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px 18px}
+  .chk-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;color:var(--body);cursor:pointer;min-width:0}
+  .chk-row input{width:15px;height:15px;accent-color:var(--acc);flex:none;margin:0}
+  .chk-row span{min-width:0}
+  .chk-row:hover{color:var(--ink)}
+  .chk-row.off{color:var(--mut)}
+
+  /* ⓘ 悬停说明：与双语页同口径，说明不列在界面上 */
+  .info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;flex:none;
+    margin-left:4px;border-radius:50%;border:1px solid var(--line-strong);color:var(--mut);
+    font-size:9.5px;font-style:normal;line-height:1;cursor:help;transition:color .14s,border-color .14s}
+  .info:hover,.info.pin{color:var(--acc-ink);border-color:var(--acc)}
+  .info.note{color:var(--warn);border-color:var(--warn)}
+  #tipLayer{position:fixed;z-index:120;max-width:330px;display:none;background:#15151A;color:#F5F5F7;
+    font-size:12px;line-height:1.65;padding:9px 12px;border-radius:9px;box-shadow:0 8px 24px -8px rgba(18,18,24,.5)}
+  #tipLayer.show{display:block}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:var(--ctl-h);
+    padding:0 15px;border-radius:var(--r-btn);border:1px solid var(--acc);background:var(--acc);color:#fff;
+    font-size:13px;font-weight:600;cursor:pointer;box-shadow:var(--sh-btn);transition:filter .14s}
+  .btn:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;filter:none}
+  .btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line-strong);box-shadow:none;font-weight:550}
+  .btn.ghost:hover{border-color:var(--acc-line);color:var(--acc-ink);filter:none}
+  .btn.sm{height:30px;padding:0 11px;font-size:12px}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12.5px;color:var(--body)}
+  .pill{background:var(--card-2);border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:12px;color:var(--sub)}
+  .pill b{color:var(--acc-ink);font-weight:650}
+  .pill.del b{color:var(--del)}
+  .pill.ok b{color:var(--ok-ink)}
+
+  .tbl-wrap{margin-top:12px;border:1px solid var(--line);border-radius:var(--r-card);overflow:auto;
+    max-height:430px;background:var(--card)}
+  table.tbl{border-collapse:collapse;width:100%;font-size:12.5px}
+  .tbl th{position:sticky;top:0;background:var(--card-2);color:var(--sub);font-weight:600;text-align:left;
+    padding:9px 10px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;z-index:2}
+  .tbl td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--body)}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl tbody tr:hover{background:var(--card-2)}
+  .tbl td.no{color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums;width:44px}
+  .tbl td.tm{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:11.5px;width:96px}
+  .tbl td.old{color:var(--mut);text-decoration:line-through;text-decoration-color:var(--line-strong)}
+  .tbl td.old i{font-style:normal;text-decoration:none;font-size:11.5px;color:var(--mut)}
+  .tbl td.new{color:var(--ink)}
+  .tbl tr.undone td{opacity:.5}
+  .tbl td.act{width:74px;text-align:right;white-space:nowrap}
+  .tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:6px;margin-left:6px;vertical-align:1px;
+    background:var(--card-2);border:1px solid var(--line);color:var(--mut)}
+  .tag.del{background:var(--del-weak);border-color:transparent;color:var(--del)}
+  .empty-note{padding:26px 12px;text-align:center;color:var(--mut);font-size:12.5px}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:#15151A;color:#F5F5F7;
+    padding:9px 18px;border-radius:99px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .2s;z-index:99;
+    box-shadow:0 8px 24px -8px rgba(18,18,24,.5)}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  footer{padding:34px 0 26px;text-align:center;color:var(--mut);font-size:12px}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+  footer a:hover{color:var(--acc-ink)}
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .cbox{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <div class="brand"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></div>
+    <div class="lnav">
+      <span id="siteNav"></span>
+      <select id="langSel" aria-label="界面语言"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1>字幕<em>清洗器</em></h1>
+    <p>去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。全程在你浏览器里完成，文件不上传服务器。</p>
+  </div>
+
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">上传字幕</span></h2>
+    <div class="drop-zone" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-txt" data-i18n="dzTxt">拖到这里，或点击选择文件</span>
+      <span class="dz-fmt">.srt / .vtt</span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.txt" hidden>
+    <div class="up-row">
+      <span class="dz-file" id="fname"></span>
+      <button class="btn ghost sm" id="btnClear" style="display:none" data-i18n="btnClear">清除</button>
+    </div>
+    <textarea class="paste-box" id="paste" data-i18n-ph="pastePh" placeholder="也可以直接把字幕内容粘贴到这里"></textarea>
+    <div class="parse-ok" id="ok"></div>
+    <div class="parse-bad" id="bad"></div>
+  </div>
+
+  <div class="card" id="optCard">
+    <h2><span class="n">2</span><span data-i18n="optTitle">清洗项</span><span class="cnt" id="optCnt"></span></h2>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpTag">标签与格式</div>
+      <div class="cbox" id="grpTag-box"></div>
+    </div>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpSdh">听障与音效</div>
+      <div class="cbox" id="grpSdh-box"></div>
+    </div>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpJunk">水印与废条目</div>
+      <div class="cbox" id="grpJunk-box"></div>
+    </div>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpText">文字修正</div>
+      <div class="cbox" id="grpText-box"></div>
+    </div>
+  </div>
+
+  <div class="card" id="repCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="repTitle">结果与导出</span></h2>
+    <div class="stat-row" id="statRow"></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th class="no">#</th>
+          <th class="tm" data-i18n="thTime">时间</th>
+          <th data-i18n="thOld">原文</th>
+          <th data-i18n="thNew">清洗后</th>
+          <th class="act"></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty-note" id="emptyNote" style="display:none" data-i18n="noChange">没有需要清洗的地方，这份字幕已经是干净的。</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btnDownload"><span data-i18n="btnDownload">下载字幕</span><span class="dl-ext" id="dlExt">.srt</span></button>
+      <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
+      <button class="btn ghost" id="btnTxt" data-i18n="btnTxt">导出纯文本</button>
+      <button class="btn ghost" id="btnUndoAll" data-i18n="btnUndoAll">全部还原</button>
+    </div>
+  </div>
+
+  <footer>
+    <span>随心字幕 AI · 字幕清洗工具</span> ·
+    <a href="/" data-i18n="footHome">去翻译字幕 →</a>
+    <a href="/merge.html" data-i18n="footMerge">去特效字幕 →</a>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+<div id="tipLayer"></div>
+
+<script src="clean-core.js?v=0.9.257"></script>
+<script>
+'use strict';
+/* =====================================================================
+   字幕清洗器 clean.html（v0.9.257 新增的第三个独立页面）
+   ⚠️ 与主站 index.html（翻译）、merge.html（双语/特效）三页硬隔离：
+      解析与清洗规则全部走 clean-core.js（从 srt-core.js **复制后另写**的一份），
+      既不引用也不修改共用引擎 —— 改清洗不会影响翻译与双语的任何行为。
+   ⚠️ 全部处理在本地完成，不向服务器发送任何字幕内容。
+   ===================================================================== */
+const C = window.CleanCore;
+const $ = function (s) { return document.querySelector(s); };
+
+/* ---------------- 状态 ---------------- */
+const S = {
+  raw: [],            // 解析后的原始条目 [{no,start,end,text}]
+  fmt: 'srt',
+  fname: '',
+  changes: [],        // 每条 = {i, before, after, tags:[], del:bool}
+  off: new Set()      // 被用户「还原」的 change 下标
+};
+
+/* ---------------- 清洗项定义 ----------------
+   ⚠️ grp 决定落在哪个分组；def = 默认是否勾选。
+      默认口径：只勾「无损且确定」的，可能丢内容的（歌词行、大写修复、合并短句）默认关。 */
+const OPT = [
+  { id:'assFx',    grp:'Tag',  def:true,  i18n:'oAssFx' },
+  { id:'html',     grp:'Tag',  def:true,  i18n:'oHtml' },
+  { id:'ctrl',     grp:'Tag',  def:true,  i18n:'oCtrl' },
+  { id:'sort',     grp:'Tag',  def:true,  i18n:'oSort' },
+  { id:'sdh',      grp:'Sdh',  def:true,  i18n:'oSdh' },
+  { id:'speaker',  grp:'Sdh',  def:false, i18n:'oSpeaker' },
+  { id:'music',    grp:'Sdh',  def:false, i18n:'oMusic' },
+  { id:'wm',       grp:'Junk', def:true,  i18n:'oWm' },
+  { id:'dup',      grp:'Junk', def:true,  i18n:'oDup' },
+  { id:'empty',    grp:'Junk', def:true,  i18n:'oEmpty' },
+  { id:'punct',    grp:'Text', def:true,  i18n:'oPunct' },
+  { id:'upper',    grp:'Text', def:false, i18n:'oUpper' },
+  { id:'merge',    grp:'Text', def:false, i18n:'oMerge' }
+];
+
+const TAG_LABEL = {
+  assFx:'ASS特效', html:'HTML标签', ctrl:'控制符', sort:'排序', sdh:'听障提示',
+  speaker:'说话人', music:'歌词', wm:'水印', dup:'重复', empty:'空条目',
+  punct:'标点', upper:'大写', merge:'合并'
+};
+
+/* =====================================================================
+   清洗主流程
+   ⚠️ 规则一条都不在这里：全部在 clean-core.js（隔离出来的那份）。
+      页面只负责把选项传进去、把返回的 changes 渲染出来。
+   ===================================================================== */
+function runClean() {
+  S.off.clear();
+  if (!S.raw.length) { S.changes = []; S.order = []; return; }
+  const r = C.clean(S.raw, optVal());
+  S.changes = r.changes;
+  S.order = r.order;
+}
+
+/* ---------------- 导出：把未被还原的 change 应用到原文 ---------------- */
+function resolve() {
+  const map = new Map();
+  S.changes.forEach(function (ch, ci) {
+    if (!S.off.has(ci)) map.set(ch.i, ch);
+  });
+  const out = [];
+  S.order.forEach(function (i) {
+    const it = S.raw[i];
+    const ch = map.get(i);
+    if (ch && ch.del) return;
+    out.push({ no: 0, start: it.start, end: it.end, text: ch ? ch.after : String(it.text) });
+  });
+  return out;
+}
+function outSrt() {
+  const items = resolve();
+  C.renumber(items);
+  return C.formatSrt(items);
+}
+function outTxt() {
+  return resolve().map(function (it) { return it.text; }).join('\n') + '\n';
+}
+
+/* ---------------- 渲染 ---------------- */
+function optVal() {
+  const o = {};
+  OPT.forEach(function (d) {
+    const el = $('#o_' + d.id);
+    o[d.id] = el ? el.checked : d.def;
+  });
+  return o;
+}
+function buildOpts() {
+  ['Tag', 'Sdh', 'Junk', 'Text'].forEach(function (g) {
+    const box = $('#grp' + g + '-box');
+    box.innerHTML = '';
+    OPT.filter(function (d) { return d.grp === g; }).forEach(function (d) {
+      const lab = document.createElement('label');
+      lab.className = 'chk-row';
+      lab.innerHTML = '<input type="checkbox" id="o_' + d.id + '"' + (d.def ? ' checked' : '') + '>' +
+        '<span data-i18n="' + d.i18n + '"></span>' +
+        '<i class="info" tabindex="0" data-tip-i18n="tip_' + d.id + '">i</i>';
+      box.appendChild(lab);
+    });
+  });
+  OPT.forEach(function (d) {
+    $('#o_' + d.id).addEventListener('change', function () {
+      if (S.raw.length) { runClean(); render(); }
+      syncOptCnt();
+    });
+  });
+}
+function syncOptCnt() {
+  const n = OPT.filter(function (d) { const el = $('#o_' + d.id); return el && el.checked; }).length;
+  $('#optCnt').textContent = t('optOn').replace('{n}', n).replace('{t}', OPT.length);
+}
+
+function render() {
+  const card = $('#repCard');
+  if (!S.raw.length) { card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  const delN = S.changes.filter(function (c, i) { return c.del && !S.off.has(i); }).length;
+  const modN = S.changes.filter(function (c, i) { return !c.del && !S.off.has(i); }).length;
+  const offN = S.off.size;
+  const outN = resolve().length;
+
+  $('#statRow').innerHTML =
+    '<span class="pill">' + t('stRaw') + ' <b>' + S.raw.length + '</b></span>' +
+    '<span class="pill">' + t('stOut') + ' <b>' + outN + '</b></span>' +
+    '<span class="pill del">' + t('stDel') + ' <b>' + delN + '</b></span>' +
+    '<span class="pill ok">' + t('stMod') + ' <b>' + modN + '</b></span>' +
+    (offN ? '<span class="pill">' + t('stOff') + ' <b>' + offN + '</b></span>' : '');
+
+  const tb = $('#tbody');
+  tb.innerHTML = '';
+  const rows = [];
+  S.changes.forEach(function (ch, ci) { rows.push({ ch: ch, ci: ci }); });
+  /* ⚠️ 按条目号排：changes 是按「规则产生的先后」攒的，直接列会出现 1、2、3、6、7、5、9
+     这种跳号 —— 原文里的顺序被打乱了，用户对着字幕找不着北。 */
+  rows.sort(function (a, b) { return a.ch.i - b.ch.i; });
+  $('#emptyNote').style.display = rows.length ? 'none' : '';
+
+  rows.forEach(function (r) {
+    const ch = r.ch, ci = r.ci;
+    const it = S.raw[ch.i];
+    const undone = S.off.has(ci);
+    const tr = document.createElement('tr');
+    if (undone) tr.className = 'undone';
+    const tags = ch.tags.map(function (k) {
+      const lab = TAG_LABEL[k] || k;
+      return '<span class="tag' + (ch.del ? ' del' : '') + '">' + lab + '</span>';
+    }).join('');
+    tr.innerHTML =
+      '<td class="no">' + it.no + '</td>' +
+      '<td class="tm">' + C.fmtTime(it.start).replace(/,\d+$/, '') + '</td>' +
+      '<td class="old">' + (ch.before.replace(/\s/g, '') ? esc(ch.before) : '<i class="mut">' + t('emptyRow') + '</i>') + '</td>' +
+      '<td class="new">' + (ch.del ? '<span class="tag del">' + t('removed') + '</span>' : esc(ch.after)) + tags + '</td>' +
+      '<td class="act"><button class="btn ghost sm" data-undo="' + ci + '">' + (undone ? t('btnAdopt') : t('btnUndo')) + '</button></td>';
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('[data-undo]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      const ci = +b.getAttribute('data-undo');
+      if (S.off.has(ci)) S.off.delete(ci); else S.off.add(ci);
+      render();
+    });
+  });
+}
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
+/* ---------------- 解析 ---------------- */
+function setSource(text, name, enc) {
+  const src = String(text || '').replace(/^\uFEFF/, '').replace(/\r/g, '');
+  if (!src.trim()) { toast(t('errEmpty')); return; }
+  let res = null, fmt = 'srt';
+  if (/^\s*(WEBVTT|1\s*\n\s*00:)/i.test(src) || /^WEBVTT/i.test(src)) {
+    const v = C.parseVtt(src);
+    if (v.items && v.items.length) { res = v; fmt = 'vtt'; }
+  }
+  if (!res && /\[Script Info\]|\n\s*Dialogue:/i.test(src)) {
+    /* ASS 自带样式与定位，清洗没有意义 —— 明确告诉用户先转成 SRT，
+       不静默按 SRT 解析（那样会解析出一堆空条目，用户根本看不出错在哪）。 */
+    $('#bad').style.display = '';
+    $('#bad').textContent = t('errAss');
+    $('#ok').style.display = 'none';
+    return;
+  }
+  if (!res) res = C.parseSrt(src);
+  if (!res.items || !res.items.length) {
+    $('#bad').style.display = '';
+    $('#bad').textContent = t('errParse');
+    $('#ok').style.display = 'none';
+    return;
+  }
+  S.raw = res.items;
+  S.fmt = fmt;
+  S.fname = name || '';
+  $('#bad').style.display = 'none';
+  $('#ok').style.display = '';
+  $('#ok').textContent = t('okParse').replace('{n}', res.items.length).replace('{f}', fmt.toUpperCase()) +
+    (enc && enc !== 'utf-8' ? ' · ' + t('okEnc').replace('{e}', enc) : '');
+  $('#fname').textContent = name || t('pasteSrc');
+  $('#dlExt').textContent = '.srt';
+  runClean();
+  render();
+}
+
+/* ---------------- 交互 ---------------- */
+let toastT = 0;
+function toast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(function () { el.classList.remove('show'); }, 2200);
+}
+function download(name, text) {
+  const blob = new Blob(['\uFEFF' + text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+}
+function baseName() {
+  let n = (S.fname || 'subtitle').replace(/\.[^.]+$/, '');
+  return n + '.clean';
+}
+
+function bind() {
+  const dz = $('#dz'), fi = $('#file');
+  dz.addEventListener('click', function () { fi.click(); });
+  fi.addEventListener('change', function () {
+    const f = fi.files && fi.files[0];
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = function () {
+      const d = C.decodeBuf(fr.result);
+      $('#paste').value = '';
+      dz.classList.add('has');
+      $('#btnClear').style.display = '';
+      setSource(d.text, f.name, d.enc);
+    };
+    fr.readAsArrayBuffer(f);
+  });
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('has'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    dz.addEventListener(ev, function (e) { e.preventDefault(); if (!S.fname) dz.classList.remove('has'); });
+  });
+  dz.addEventListener('drop', function (e) {
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = function () {
+      const d = C.decodeBuf(fr.result);
+      $('#paste').value = '';
+      setSource(d.text, f.name, d.enc);
+    };
+    fr.readAsArrayBuffer(f);
+  });
+
+  $('#paste').addEventListener('input', debounce(function () {
+    const v = $('#paste').value;
+    if (v.trim().length > 10) setSource(v, '', '');
+  }, 500));
+
+  $('#btnClear').addEventListener('click', function () {
+    S.raw = []; S.changes = []; S.off.clear(); S.fname = '';
+    $('#file').value = '';
+    $('#paste').value = '';
+    $('#fname').textContent = '';
+    $('#ok').style.display = 'none';
+    $('#bad').style.display = 'none';
+    dz.classList.remove('has');
+    $('#btnClear').style.display = 'none';
+    render();
+  });
+
+  $('#btnDownload').addEventListener('click', function () {
+    if (!S.raw.length) return toast(t('noFile'));
+    download(baseName() + '.srt', outSrt());
+    toast(t('okDl'));
+  });
+  $('#btnTxt').addEventListener('click', function () {
+    if (!S.raw.length) return toast(t('noFile'));
+    download(baseName() + '.txt', outTxt());
+    toast(t('okDl'));
+  });
+  $('#btnCopy').addEventListener('click', function () {
+    if (!S.raw.length) return toast(t('noFile'));
+    const s = outSrt();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(s).then(function () { toast(t('okCopy')); }, function () { fallbackCopy(s); });
+    } else fallbackCopy(s);
+  });
+  $('#btnUndoAll').addEventListener('click', function () {
+    if (!S.changes.length) return;
+    if (S.off.size === S.changes.length) {
+      S.off.clear();
+    } else {
+      S.changes.forEach(function (c, i) { S.off.add(i); });
+    }
+    render();
+  });
+}
+function fallbackCopy(s) {
+  const ta = document.createElement('textarea');
+  ta.value = s;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast(t('okCopy')); } catch (e) { toast(t('errCopy')); }
+  ta.remove();
+}
+function debounce(fn, ms) {
+  let tid = 0;
+  return function () {
+    const args = arguments, self = this;
+    clearTimeout(tid);
+    tid = setTimeout(function () { fn.apply(self, args); }, ms);
+  };
+}
+
+/* ---------------- i18n ----------------
+   ⚠️ 与双语页同口径：一个词条必须在**每个语块里都写一遍**，
+      漏一个的词条会静默回退到英文，而且没有任何报错。 */
+const I18N = {
+  'zh-CN': {
+    brandName: '随心字幕 AI', upTitle: '上传字幕', dzTxt: '拖到这里，或点击选择文件', pastePh: '也可以直接把字幕内容粘贴到这里',
+    btnClear: '清除', optTitle: '清洗项', repTitle: '结果与导出',
+    grpTag: '标签与格式', grpSdh: '听障与音效', grpJunk: '水印与废条目', grpText: '文字修正',
+    oAssFx: '去掉 ASS 特效', oHtml: '去掉 HTML 标签', oCtrl: '去掉控制符', oSort: '按时间排序并重编号',
+    oSdh: '去掉听障提示', oSpeaker: '去掉说话人标签', oMusic: '删除纯歌词行',
+    oWm: '去掉水印与广告', oDup: '去掉重复条目', oEmpty: '去掉空条目',
+    oPunct: '标点与空白规范化', oUpper: '全大写转正常大小写', oMerge: '合并过短的相邻条目',
+    tip_assFx: '去掉 {\\an8}、{\\f4} 这类 SubStation 特效标记。这些标记在 SRT 里不生效，播放器会把它们当字显示出来。',
+    tip_html: '去掉 <i>、<b>、<font> 这类标签，只保留里面的文字。很多播放器不支持这些标签，会原样显示成一串乱码。',
+    tip_ctrl: '去掉看不见的控制字符、零宽字符和软连字符。它们不影响显示，但会破坏搜索和字数统计。',
+    tip_sort: '按开始时间重新排序并重编号。不改变任何文字，只调整顺序。',
+    tip_sdh: '去掉 [脚步声]、[音乐]、(咳嗽) 这类给听障观众看的音效描述。只去掉提示部分，对白原文保留。',
+    tip_speaker: '去掉行首的「GEORGE:」这类说话人名字。注意：正片里出现「注意：」这种中文提示不会被误删。',
+    tip_music: '删掉整条都是 ♪…♪ 的歌词行。带歌词的对白不受影响。开之前先想清楚：有些片子靠歌词传达信息。',
+    tip_wm: '去掉字幕组水印、网址、邮箱、求关注和「仅供学习交流」这类广告。短条目里才判定，长台词不会被误伤。',
+    tip_dup: '去掉时间轴和文字完全相同的重复条目，只保留第一条。',
+    tip_empty: '去掉没有任何文字的空条目。',
+    tip_punct: '清理多余空格、行尾空格和连续句点，不改动全角半角，也不重排引号。',
+    tip_upper: '把整条全大写的字幕转成正常大小写，句首会自动大写。人名地名这类专有名词恢复不了，导出的英文片建议人工过一遍。',
+    tip_merge: '把时长不足 1.2 秒、且间隔不到 0.4 秒的相邻两条合并成一条。字幕跳得太快时用它。',
+    thTime: '时间', thOld: '原文', thNew: '清洗后',
+    stRaw: '原始', stOut: '清洗后', stDel: '删除', stMod: '修改', stOff: '已还原',
+    removed: '已删除', emptyRow: '（源文件里的空行）', btnUndo: '还原', btnAdopt: '采纳',
+    btnDownload: '下载字幕', btnCopy: '复制内容', btnTxt: '导出纯文本', btnUndoAll: '全部还原',
+    noChange: '没有需要清洗的地方，这份字幕已经是干净的。',
+    okParse: '解析到 {n} 条 · 源格式 {f}', okEnc: '编码已按 {e} 修复',
+    errParse: '没能解析出字幕内容。请确认是 SRT 或 VTT 文件；如果是 ASS，请先导出成 SRT。',
+    errAss: '这是一份 ASS 字幕。ASS 自带样式和定位，清洗没有意义 —— 请先用别的工具导出成 SRT，再拿过来清洗。',
+    errEmpty: '文件是空的', noFile: '先上传一份字幕',
+    okDl: '已下载', okCopy: '已复制', errCopy: '复制失败，请手动选中复制',
+    optOn: '已开启 {n} / {t} 项', pasteSrc: '粘贴的内容',
+    footHome: '去翻译字幕 →', footMerge: '去特效字幕 →'
+  },
+  'en': {
+    brandName: 'AI-SRTSub', upTitle: 'Upload subtitles', dzTxt: 'Drop a file here, or click to choose', pastePh: 'Or paste your subtitle text here',
+    btnClear: 'Clear', optTitle: 'Cleaning rules', repTitle: 'Result and export',
+    grpTag: 'Tags and formatting', grpSdh: 'Hearing impaired', grpJunk: 'Watermarks and junk', grpText: 'Text fixes',
+    oAssFx: 'Strip ASS effect tags', oHtml: 'Strip HTML tags', oCtrl: 'Strip control characters', oSort: 'Sort by time and renumber',
+    oSdh: 'Remove hearing-impaired cues', oSpeaker: 'Remove speaker labels', oMusic: 'Delete lyric-only lines',
+    oWm: 'Remove watermarks and ads', oDup: 'Remove duplicate cues', oEmpty: 'Remove empty cues',
+    oPunct: 'Normalize punctuation', oUpper: 'Fix ALL CAPS lines', oMerge: 'Merge very short neighbours',
+    tip_assFx: 'Removes SubStation effect markers like {\\an8}. They do nothing in SRT and show up as literal text.',
+    tip_html: 'Removes <i>, <b>, <font> and keeps the text inside. Most players do not support them.',
+    tip_ctrl: 'Removes invisible control, zero-width and soft-hyphen characters that break search and counting.',
+    tip_sort: 'Re-sorts by start time and renumbers. Text is untouched.',
+    tip_sdh: 'Removes sound descriptions for deaf viewers, such as [footsteps] or (coughs). Dialogue is kept.',
+    tip_speaker: 'Removes leading speaker names like GEORGE:. Normal lines are not affected.',
+    tip_music: 'Deletes cues that are nothing but ♪ lyrics ♪. Dialogue that quotes a lyric is kept.',
+    tip_wm: 'Removes release-group watermarks, URLs, emails and ads. Only short cues are judged, so long dialogue is safe.',
+    tip_dup: 'Removes cues with identical timing and text, keeping the first one.',
+    tip_empty: 'Removes cues that contain no text at all.',
+    tip_punct: 'Trims extra spaces and repeated dots. Never changes quotes or full-width forms.',
+    tip_upper: 'Turns fully upper-case cues into normal case. Proper nouns cannot be restored, so proofread names.',
+    tip_merge: 'Joins neighbours shorter than 1.2s with a gap under 0.4s. Useful when subtitles flicker.',
+    thTime: 'Time', thOld: 'Before', thNew: 'After',
+    stRaw: 'Original', stOut: 'Cleaned', stDel: 'Deleted', stMod: 'Modified', stOff: 'Reverted',
+    removed: 'removed', emptyRow: 'empty cue in the source', btnUndo: 'Revert', btnAdopt: 'Apply',
+    btnDownload: 'Download', btnCopy: 'Copy', btnTxt: 'Plain text', btnUndoAll: 'Revert all',
+    noChange: 'Nothing to clean. This file is already tidy.',
+    okParse: '{n} cues parsed · source {f}', okEnc: 'encoding fixed as {e}',
+    errParse: 'Could not parse any cues. Make sure it is an SRT or VTT file.',
+    errAss: 'This is an ASS file. ASS carries its own styling and positioning, so cleaning makes no sense. Export it to SRT first.',
+    errEmpty: 'That file is empty', noFile: 'Upload a subtitle file first',
+    okDl: 'Downloaded', okCopy: 'Copied', errCopy: 'Copy failed, please select and copy manually',
+    optOn: '{n} of {t} rules on', pasteSrc: 'pasted content',
+    footHome: 'Translate subtitles', footMerge: 'Merge subtitles'
+  }
+};
+let LANG = 'zh-CN';
+function t(k) {
+  const d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    const k = el.getAttribute('data-i18n');
+    const v = t(k);
+    if (v !== k || LANG === 'zh-CN') el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  document.querySelectorAll('[data-tip-i18n]').forEach(function (el) {
+    el.setAttribute('data-tip', t(el.getAttribute('data-tip-i18n')));
+  });
+  document.documentElement.lang = LANG;
+  if ($('#fname').textContent && S.fname) $('#fname').textContent = S.fname;
+  syncOptCnt();
+}
+
+/* ---------------- ⓘ 浮层 ----------------
+   ⚠️ 挂在 body 上、position:fixed —— 气泡不能放卡片里，会被 overflow 裁掉。 */
+const TIP = { el: null, pin: false };
+function initTips() {
+  const layer = $('#tipLayer');
+  document.addEventListener('mouseover', function (e) {
+    const i = e.target.closest && e.target.closest('.info');
+    if (!i) return;
+    showTip(i);
+  });
+  document.addEventListener('mouseout', function (e) {
+    const i = e.target.closest && e.target.closest('.info');
+    if (!i || TIP.pin) return;
+    hideTip();
+  });
+  document.addEventListener('click', function (e) {
+    const i = e.target.closest && e.target.closest('.info');
+    if (i) {
+      e.preventDefault();
+      if (TIP.el === i && TIP.pin) { TIP.pin = false; hideTip(); }
+      else { TIP.pin = true; showTip(i); }
+      return;
+    }
+    if (TIP.pin) { TIP.pin = false; hideTip(); }
+  });
+  window.addEventListener('scroll', function () { if (!TIP.pin) hideTip(); }, true);
+}
+function showTip(i) {
+  const layer = $('#tipLayer');
+  const txt = i.getAttribute('data-tip') || '';
+  if (!txt) return;
+  layer.textContent = txt;
+  layer.classList.add('show');
+  const r = i.getBoundingClientRect();
+  const w = layer.offsetWidth, h = layer.offsetHeight;
+  let x = r.left + r.width / 2 - w / 2;
+  let y = r.bottom + 7;
+  if (y + h > window.innerHeight - 8) y = r.top - h - 7;
+  x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+  layer.style.left = x + 'px';
+  layer.style.top = y + 'px';
+  TIP.el = i;
+}
+function hideTip() {
+  $('#tipLayer').classList.remove('show');
+  TIP.el = null;
+}
+
+/* ---------------- 启动 ---------------- */
+function initLang() {
+  const sel = $('#langSel');
+  sel.innerHTML = '<option value="zh-CN">简体中文</option><option value="en">English</option>';
+  let saved = 'zh-CN';
+  try { saved = localStorage.getItem('srt_clean_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
+  if (!I18N[saved]) saved = 'zh-CN';
+  LANG = saved;
+  sel.value = saved;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    try { localStorage.setItem('srt_clean_lang', LANG); } catch (e) { /* 隐私模式下写不了，忽略 */ }
+    applyI18n();
+    render();
+  });
+}
+(function main() {
+  buildOpts();
+  initLang();
+  applyI18n();
+  initTips();
+  bind();
+  render();
+})();
+</script>
+<script src="site-nav.js" data-tool="clean"></script>
+</body>
+</html>
