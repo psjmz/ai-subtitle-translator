@@ -5345,7 +5345,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.258/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.260/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5385,9 +5385,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.258</.test(html), '首页版本号未升 0.9.256');
-    assert.ok(/class="ver-tag">v0\.9\.258</.test(html), '工作台版本号未升 0.9.256');
-    assert.ok(/srt-core\.js\?v=0\.9\.258/.test(html), 'srt-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.260</.test(html), '首页版本号未升 0.9.256');
+    assert.ok(/class="ver-tag">v0\.9\.260</.test(html), '工作台版本号未升 0.9.256');
+    assert.ok(/srt-core\.js\?v=0\.9\.260/.test(html), 'srt-core.js?v 未升 0.9.256');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5564,8 +5564,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.258</.test(mg), 'merge.html 版本未升 0.9.256');
-    assert.ok(/merge-core\.js\?v=0\.9\.258/.test(mg), 'merge-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.260</.test(mg), 'merge.html 版本未升 0.9.256');
+    assert.ok(/merge-core\.js\?v=0\.9\.260/.test(mg), 'merge-core.js?v 未升 0.9.256');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6283,12 +6283,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/m = relaying \? t\('errRelay', m\) : t\('errCors'\);/.test(html), '没区分「直连失败」与「转发也失败」');
   });
 
-  t('v0.9.232：新增词条四语齐全，且没撞已有键', () => {
+  t('v0.9.232：新增词条四语齐全，且没撞已有键（v0.9.259 起补齐全部 27 语）', () => {
     ['lblTemp', 'tempTip', 'lblViaSrv', 'viaSrvTip', 'errCors', 'errRelay'].forEach(k => {
+      /* v0.9.259：6 词条从主 4 语补齐到全部 27 语 —— 每语言恰好 1 次，共 27 次 */
       const n = (html.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:", 'g')) || []).length;
-      assert.strictEqual(n, 4, k + ' 出现 ' + n + ' 次（应为 4：zh-CN/zh-TW/en/ja）');
-      const dup = (html.match(new RegExp("(?<![A-Za-z0-9_])" + k + "\\s*:", 'g')) || []).length;
-      assert.ok(dup <= 4, k + ' 在同一字典里重复定义（后者会静默覆盖前者）');
+      assert.strictEqual(n, 27, k + ' 出现 ' + n + ' 次（应为 27：I18N 全部语言各 1 次）');
     });
     /* 页面元素真的引用了它们 */
     assert.ok(/data-i18n="lblViaSrv"/.test(html) && /data-tip-i18n="viaSrvTip"/.test(html), '转发开关没接 i18n');
@@ -7394,11 +7393,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.258/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.258/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.258/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.258/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.258/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.260/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.260/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.260/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.260/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.260/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });

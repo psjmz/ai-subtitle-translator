@@ -55,6 +55,62 @@ const SEED = `(function(){S.rows=[
   ok(await ev("[...document.querySelectorAll('#fmtRowKind .fmt-btn')].map(b=>b.textContent).join('|')") === '仅译文（单语）|双语 · 原文在上|双语 · 译文在上',
     '内容按钮文案', await ev("[...document.querySelectorAll('#fmtRowKind .fmt-btn')].map(b=>b.textContent).join('|')"));
 
+  console.log('\n— ①b v0.9.260 重设计：分组分段 + 两行式标签 + 选中态分级 + focus 接管 —');
+  const rd = JSON.parse(await ev(`(function(){
+    setFmt('bi-src','ass');
+    var rows=document.querySelectorAll('.fmt-row'), kr=document.getElementById('fmtRowKind'), fr=document.getElementById('fmtRowFile');
+    var krS=getComputedStyle(kr), frS=getComputedStyle(fr);
+    /* 等分：每排按钮宽度极差 */
+    function spread(sel){var ws=[...document.querySelectorAll(sel)].map(function(b){return b.getBoundingClientRect().width});return Math.max.apply(null,ws)-Math.min.apply(null,ws);}
+    /* 文件按钮两行式结构 + 小注文案 */
+    var subs={};
+    fr.querySelectorAll('.fmt-btn').forEach(function(b){
+      var f=b.getAttribute('data-file'), nm=b.querySelector('.nm'), sub=b.querySelector('.sub');
+      subs[f]={nm:nm?nm.textContent:'', sub:sub?sub.textContent:'', twoLine:!!(nm&&sub)};
+    });
+    /* 选中态分级：内容选中 = 白底 + 粉边 + 阴影；文件选中 = 浅粉底 */
+    var kon=kr.querySelector('.fmt-btn.on'), fon=fr.querySelector('.fmt-btn.on');
+    var konS=getComputedStyle(kon), fonS=getComputedStyle(fon);
+    /* focus 接管：样式表里存在 .fmt-btn:focus-visible 规则 */
+    var hasFv=false;
+    for(var i=0;i<document.styleSheets.length;i++){var sh=document.styleSheets[i],rs;try{rs=sh.cssRules}catch(e){continue}
+      for(var j2=0;j2<rs.length;j2++){if(rs[j2].selectorText&&rs[j2].selectorText.indexOf('.fmt-btn:focus-visible')>=0){hasFv=true;break}}}
+    return JSON.stringify({
+      grp:{krGrid:krS.display, krBg:krS.backgroundColor, krRad:krS.borderRadius, frGrid:frS.display, frBg:frS.backgroundColor},
+      spreadKind:spread('#fmtRowKind .fmt-btn'), spreadFile:spread('#fmtRowFile .fmt-btn:not([hidden])'),
+      subs:subs,
+      tier:{konBg:konS.backgroundColor, konBorder:konS.borderColor, konShadow:konS.boxShadow!=='none',
+            fonBg:fonS.backgroundColor, fonBorder:fonS.borderColor},
+      hasFv:hasFv
+    });
+  })()`));
+  ok(rd.grp.krGrid === 'grid' && rd.grp.frGrid === 'grid', '两组都是 grid 等分容器', rd.grp.krGrid + '/' + rd.grp.frGrid);
+  ok(rd.grp.krBg !== 'rgba(0, 0, 0, 0)' && rd.grp.frBg !== 'rgba(0, 0, 0, 0)', '两组都有灰底（分组可见）', JSON.stringify(rd.grp));
+  ok(rd.spreadKind < 2, '内容排 3 格等宽（极差 <2px）', rd.spreadKind);
+  ok(rd.spreadFile < 2, '文件排格子等宽（极差 <2px）', rd.spreadFile);
+  ok(rd.subs.ass.nm === 'ASS' && rd.subs['ass-stack'].nm === 'ASS', '两颗 ASS 主名都是 ASS');
+  ok(rd.subs.ass.sub === '上下双屏' && rd.subs['ass-stack'].sub === '底部双行', 'ASS 小注 = 上下双屏 / 底部双行', rd.subs.ass.sub + ' / ' + rd.subs['ass-stack'].sub);
+  ok(rd.subs.srt.sub === '最通用' && rd.subs.vtt.sub === '网页播放' && rd.subs.sbv.sub === 'YouTube' && rd.subs.txt.sub === '纯文本',
+    'SRT/VTT/SBV/TXT 小注各就位', JSON.stringify({s:rd.subs.srt.sub, v:rd.subs.vtt.sub, b:rd.subs.sbv.sub, t:rd.subs.txt.sub}));
+  ok(Object.keys(rd.subs).every(function(f){return rd.subs[f].twoLine}), '6 个文件按钮全部两行式（.nm + .sub）');
+  ok(rd.tier.konBg !== rd.tier.fonBg, '选中态分级：内容选中 ≠ 文件选中 的底色', JSON.stringify(rd.tier));
+  ok(rd.tier.konShadow, '内容选中有浮起阴影');
+  ok(rd.hasFv, 'focus-visible 样式接管存在（粉色 focus 环）');
+  /* 语言切换：小注跟着走，结构不塌 */
+  const enSub = await ev(`(function(){
+    var sel=document.getElementById('uiLang2')||document.getElementById('uiLang');
+    sel.value='en'; sel.dispatchEvent(new Event('change'));
+    var b=document.querySelector('#fmtRowFile .fmt-btn[data-file=ass] .sub');
+    var s2=document.querySelector('#fmtRowFile .fmt-btn[data-file=ass-stack] .sub');
+    var nm=document.querySelector('#fmtRowFile .fmt-btn[data-file=ass] .nm');
+    var back=(b?b.textContent:'')+'|'+(s2?s2.textContent:'')+'|'+(nm?nm.textContent:'');
+    sel.value='zh-CN'; sel.dispatchEvent(new Event('change'));
+    return back;
+  })()`);
+  ok(/Top \+ bottom\|Two lines, bottom\|ASS/.test(enSub), '切英语小注跟随（Top + bottom / Two lines, bottom），主名仍是 ASS', enSub);
+  const zhBack = await ev("(function(){return document.querySelector('#fmtRowFile .fmt-btn[data-file=ass] .sub').textContent})()");
+  ok(zhBack === '上下双屏', '切回中文小注复原', zhBack);
+
   console.log('\n— ② 17 种组合：点得到、值对得上、高亮跟着走 —');
   const combos = JSON.parse(await ev(`(function(){
     var kinds=['mono','bi-src','bi-dst'], files=['srt','vtt','sbv','ass','ass-stack','txt'], out=[];
@@ -121,10 +177,13 @@ const SEED = `(function(){S.rows=[
   await wait(400);
   ok(await ev('fxHasZh()') === false, '没有译文时 fxHasZh() 为假');
   ok(await ev('buildFxPayload()') === null, '此时不生成载荷（不会被带过去）');
+  /* ⚠️ v0.9.212 起 URL 跟随界面语言（zh-CN → '/'，①b 切过语言后路径已不是 /index.html），
+     所以「没跳走」的判据 = 点前后路径不变 + 仍在本页（不是去比对某个写死的路径） */
+  const pathBefore = await ev('location.pathname');
   await ev("document.getElementById('btnFxGoto').click()");
   await wait(600);
   ok(await ev("sessionStorage.getItem('srt_fx_in')") === null, '点了也不写暂存');
-  ok(await ev("location.pathname") === '/index.html', '没有跳走', await ev('location.pathname'));
+  ok((await ev('location.pathname')) === pathBefore && await ev("typeof S !== 'undefined' && !!document.getElementById('btnFxGoto')"), '没有跳走（路径未变、仍在翻译页）', pathBefore + ' → ' + await ev('location.pathname'));
   ok(/译文/.test(await ev("document.getElementById('log').textContent.slice(-200)")), '给了「先完成翻译」的提示');
 
   console.log('\n— ⑧ 真点一下：跳过去并且自动出结果 —');
