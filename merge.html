@@ -273,10 +273,12 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .fmtbtn.on{border-color:var(--acc);background:var(--acc-weak)}
   .fmtbtn.on b{color:var(--acc-ink)}
   .fmtbtn.on span{color:var(--acc-ink);opacity:.8}
-  /* 导出区那一排只需认得出格式，省掉副标题、压扁一点，别把下载按钮挤下去 */
-  .fmt-seg.sm{max-width:none;grid-template-columns:repeat(3,minmax(0,108px))}
-  .fmt-seg.sm .fmtbtn{flex-direction:row;align-items:center;justify-content:center;padding:8px 11px}
-  .fmt-seg.sm .fmtbtn span{display:none}
+  /* v0.9.252：`.fmt-seg.sm`（导出区那一排紧凑格式键）整块删除。
+     它和设置区的三张格式卡是**同一个状态的两组控件**（都读 tplVal()），只是省掉了副标题；
+     用户看到两处 SRT/VTT/ASS，第一反应是「这俩是不是两个设置」——这种不确定比省一行更贵。
+     现在格式只在设置区选，导出区靠下载按钮上的扩展名说明「将导出什么」。
+     ⚠️ 别再把它加回来：多一组就要在 syncTplSegs 里多同步一处。 */
+  .dl-ext{opacity:.7;font-weight:600;font-size:11.5px;letter-spacing:.2px}
   /* 模板选择行：左边一个小标签，右边一组分段按钮 */
   .tplrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 6px}
   .tplrow-l{font-size:12px;color:var(--sub);flex:none}
@@ -476,7 +478,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.251</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.253</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -851,7 +853,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     <div class="slot-wrap" id="slotWrap">
       <div class="slot-hd">
         <span data-i18n="slotTitle">样式槽</span>
-        <span class="hint" data-i18n="slotHint">点胶囊只看这个槽用在哪几行，点胶囊右侧的铅笔改样式</span>
+        <span class="hint" data-i18n="slotHint">点胶囊选中这个槽（只列它用在哪几行），右侧铅笔展开样式编辑</span>
       </div>
       <div class="slot-bar" id="slotBar"></div>
       <details class="slot-edit" id="slotEdit">
@@ -953,10 +955,13 @@ textarea.paste-box{margin-top:8px;min-height:96px}
       </div>
     </div>
     <div class="exp-row">
-      <!-- v0.9.240：导出区这一排与设置区同一套三张格式卡（紧凑版，只留格式名） -->
-      <div class="fmt-seg sm" id="tplSeg2"></div>
+      <!-- v0.9.252：原来这里是第二组 SRT/VTT/ASS 键（#tplSeg2），与设置区那三张格式卡重复 ——
+           同一个状态挂两组控件，用户会以为「这俩是不是两个设置」。整块删掉，格式只在设置区选。
+           ⚠️ #expFmt2 留着：它是 tplVal() 优先读的**状态源**（不是 UI），删了要动 6 处引用。 -->
       <select id="expFmt2" style="display:none"></select>
-      <button class="btn" id="btnDownload" data-i18n="btnDownload">下载字幕</button>
+      <!-- ⚠️ 扩展名是**单独一个 span**：applyI18n 是 textContent 赋值，
+           把 '.ass' 并进 data-i18n 词条里会在切界面语言时被冲掉（「++ 新建槽」同款坑）。 -->
+      <button class="btn" id="btnDownload"><span data-i18n="btnDownload">下载字幕</span><span class="dl-ext" id="dlExt"></span></button>
       <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
     </div>
   </div>
@@ -968,7 +973,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.251"></script>
+<script src="merge-core.js?v=0.9.253"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1079,7 +1084,7 @@ const I18N = {
     footNote:'随心字幕 AI · 特效字幕处理工具', footLink:'去翻译字幕 →',
     modeMono:'单语字幕', monoCol:'字幕', monoCard:'字幕文件', btnMono:'生成预览', optTitleMono:'特效设置',
     monoHint:'只传一份字幕，直接给它加样式特效。',
-    slotTitle:'样式槽', slotHint:'点胶囊只看这个槽用在哪几行，点胶囊右侧的铅笔改样式', slotEditTip:'编辑这个槽的样式', filterSlot:'槽：{0} · {1} 行', selDockN:'已选 {0} 行 · 套用', selDockClear:'清除选择', slotNew:'+ 新建槽',
+    slotTitle:'样式槽', slotHint:'点胶囊选中这个槽（只列它用在哪几行），右侧铅笔展开样式编辑', slotEditTip:'编辑这个槽的样式', filterSlot:'槽：{0} · {1} 行', selDockN:'已选 {0} 行 · 套用', selDockClear:'清除选择', slotNew:'+ 新建槽',
     slotEdit:'编辑槽', slotCover:'已覆盖 {0} / {1} 项', slotUncoverAll:'解除全部覆盖',
     slotPvTitle:'效果预览', slotPvOn:'套用这个槽', slotPvBase:'基础样式',
     slotPvNone:'该导出格式不带样式信息（SRT / 无样式 VTT），槽对它无效',
@@ -1230,7 +1235,7 @@ const I18N = {
     footNote:'隨心字幕 AI · 特效字幕處理工具', footLink:'去翻譯字幕 →',
     modeMono:'單語字幕', monoCol:'字幕', monoCard:'字幕檔案', btnMono:'產生預覽', optTitleMono:'特效設定',
     monoHint:'只傳一份字幕，直接幫它加樣式特效。',
-    slotTitle:'樣式槽', slotHint:'點膠囊只看這個槽用在哪幾行，點膠囊右側的鉛筆改樣式', slotEditTip:'編輯這個槽的樣式', filterSlot:'槽：{0} · {1} 行', selDockN:'已選 {0} 行 · 套用', selDockClear:'清除選取', slotNew:'+ 新增槽',
+    slotTitle:'樣式槽', slotHint:'點膠囊選中這個槽（只列它用在哪幾行），右側鉛筆展開樣式編輯', slotEditTip:'編輯這個槽的樣式', filterSlot:'槽：{0} · {1} 行', selDockN:'已選 {0} 行 · 套用', selDockClear:'清除選取', slotNew:'+ 新增槽',
     slotEdit:'編輯槽', slotCover:'已覆蓋 {0} / {1} 項', slotUncoverAll:'解除全部覆蓋',
     slotPvTitle:'效果預覽', slotPvOn:'套用這個槽', slotPvBase:'基礎樣式',
     slotPvNone:'該匯出格式不帶樣式資訊（SRT / 無樣式 VTT），槽對它無效',
@@ -1381,7 +1386,7 @@ const I18N = {
     footNote:'AI-SRTSub · Subtitle Styling Tool', footLink:'Translate subtitles →',
     modeMono:'Single language', monoCol:'Subtitle', monoCard:'Subtitle file', btnMono:'Preview', optTitleMono:'Styling',
     monoHint:'Upload one subtitle file and style it directly.',
-    slotTitle:'Style slots', slotHint:'Click a chip to list only the lines using that slot; the pencil on the right edits it', slotEditTip:'Edit this slot', filterSlot:'Slot: {0} · {1} lines', selDockN:'{0} selected · apply', selDockClear:'Clear', slotNew:'+ New slot',
+    slotTitle:'Style slots', slotHint:'Click a chip to select that slot (lists just its lines); the pencil opens its style editor', slotEditTip:'Edit this slot', filterSlot:'Slot: {0} · {1} lines', selDockN:'{0} selected · apply', selDockClear:'Clear', slotNew:'+ New slot',
     slotEdit:'Edit slot', slotCover:'{0} of {1} overridden', slotUncoverAll:'Clear all overrides',
     slotPvTitle:'Preview', slotPvOn:'With this slot', slotPvBase:'Base style',
     slotPvNone:'This export format carries no style info (SRT / plain VTT), so slots do nothing',
@@ -1532,7 +1537,7 @@ const I18N = {
     footNote:'AI-SRTSub · 字幕スタイル処理ツール', footLink:'字幕を翻訳する →',
     modeMono:'単一言語', monoCol:'字幕', monoCard:'字幕ファイル', btnMono:'プレビュー', optTitleMono:'スタイル設定',
     monoHint:'字幕を 1 本だけアップロードして、直接スタイルを付けます。',
-    slotTitle:'スタイルスロット', slotHint:'カプセルでそのスロットの行だけ表示、右側の鉛筆でスタイル編集', slotEditTip:'このスロットを編集', filterSlot:'スロット：{0} · {1} 行', selDockN:'{0} 行選択中 · 適用', selDockClear:'選択解除', slotNew:'+ 新規スロット',
+    slotTitle:'スタイルスロット', slotHint:'カプセルでスロットを選択（その行のみ表示）、右側の鉛筆でスタイル編集', slotEditTip:'このスロットを編集', filterSlot:'スロット：{0} · {1} 行', selDockN:'{0} 行選択中 · 適用', selDockClear:'選択解除', slotNew:'+ 新規スロット',
     slotEdit:'スロットを編集', slotCover:'{0} / {1} 項目を上書き中', slotUncoverAll:'上書きをすべて解除',
     slotPvTitle:'プレビュー', slotPvOn:'このスロットを適用', slotPvBase:'基本スタイル',
     slotPvNone:'この書き出し形式はスタイル情報を持ちません（SRT / スタイルなし VTT）',
@@ -2610,6 +2615,13 @@ function fmtGroupOf(tpl){
   if (tpl === 'vtt' || tpl === 'vttStyle') return 'vtt';
   return 'ass';
 }
+/* v0.9.252：下载按钮后缀 —— 导出区删掉了第二组格式键，
+   「我会拿到什么文件」就靠这个扩展名在**动作点**说明。
+   fmtGroupOf 的返回值（srt / vtt / ass）恰好就是扩展名：6 档归一成 3 个后缀。 */
+function syncDlExt(){
+  const el = $('dlExt'); if (!el) return;
+  el.textContent = '.' + fmtGroupOf(tplVal());
+}
 /* 顶层格式卡：点一下就切到该格式（ASS 保留上次选的模板，VTT 保留样式开/关）
    ⚠️ select.value 没变就不派发 change —— 否则「点一下已经选中的格式」也会重套一遍预设，
      把用户刚调好的参数冲掉。 */
@@ -2656,7 +2668,7 @@ function setAssTpl(v){
 function renderTplSegs(){
   const cards = FMT_SEGS.map(x=>'<button type="button" class="fmtbtn" data-g="'+x[0]+'">'+
     '<b data-i18n="'+x[1]+'">'+t(x[1])+'</b><span data-i18n="'+x[2]+'">'+t(x[2])+'</span></button>').join('');
-  ['tplSeg','tplSeg2'].forEach(function(id){
+  ['tplSeg'].forEach(function(id){
     const seg = $(id); if (!seg) return;
     seg.innerHTML = cards;
     seg.querySelectorAll('.fmtbtn').forEach(b=>b.addEventListener('click', ()=>setFmtGroup(b.getAttribute('data-g'))));
@@ -2683,7 +2695,7 @@ function renderTplSegs(){
 }
 function syncTplSegs(){
   const g = fmtGroupOf(tplVal());
-  ['tplSeg','tplSeg2'].forEach(function(id){
+  ['tplSeg'].forEach(function(id){
     const seg = $(id); if (!seg) return;
     seg.querySelectorAll('.fmtbtn').forEach(b=>b.classList.toggle('on', b.getAttribute('data-g') === g));
   });
@@ -2697,6 +2709,9 @@ function syncTplSegs(){
       b.classList.toggle('on', b.getAttribute('data-v') === k);
     });
   }
+  /* v0.9.252：下载按钮的扩展名也在这里刷 —— 本函数是「格式变了」的唯一汇合点
+     （格式卡点击 / ASS·VTT 模板键 / 手动改 select / 换语言重绘 都汇到这儿），漏了它后缀会停在上一次的格式。 */
+  syncDlExt();
 }
 const ASS_DEFAULTS = [
   ['assDstSize','56'],['assSrcSize','50'],
@@ -3918,7 +3933,13 @@ function bindSlotUI(){
     ensureStyle();
     if (!S.style.slots[id]) return;
     S.filter.slot = (S.filter.slot === id) ? '' : id;
-    renderReport();   /* 表格 + 状态条 + 胶囊态一起重画 */
+    /* v0.9.253：点胶囊 = 同时把「正在编辑的槽」切过去。
+       ⚠️ 改前只有小铅笔会改 cur —— 于是上面点「默认」、下面还写着「编辑槽 · 强调」，
+          用户看到的是一句话里两个答案（外网实测反馈：选择和编辑不联动，体验很糟）。
+          筛选与编辑是同一个「选中」的两面，点胶囊就是选中它。
+       ⚠️ 面板的展开状态**不动**（没展开就不展开），只切目标。 */
+    S.style.cur = id;
+    renderReport();   /* 表格 + 状态条 + 胶囊态 + 编辑面板一起重画 */
     const tb = $('.tbl-wrap'); if (tb && S.filter.slot) tb.scrollTop = 0;
   });
   /* v0.9.248：贴底选择条 —— 点槽即应用，点「清除」把选择放掉 */

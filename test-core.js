@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.251/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.253/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.251</.test(html), '首页版本号未升 0.9.245');
-    assert.ok(/class="ver-tag">v0\.9\.251</.test(html), '工作台版本号未升 0.9.245');
-    assert.ok(/srt-core\.js\?v=0\.9\.251/.test(html), 'srt-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.253</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.253</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.253/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.251</.test(mg), 'merge.html 版本未升 0.9.245');
-    assert.ok(/merge-core\.js\?v=0\.9\.251/.test(mg), 'merge-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.253</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.253/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7102,7 +7102,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.240：新版式与文案接上（面板卡片化 / 格式卡 / 组装标题）', () => {
     assert.ok(/\.fmtbtn\.on\{/.test(mg), '缺格式卡的选中样式');
-    assert.ok(/\.fmt-seg\.sm/.test(mg), '导出区没有紧凑版格式卡');
+    /* ⚠️ v0.9.252：导出区那组紧凑格式卡已删（与设置区重复）。原来这条断的是「有 .fmt-seg.sm」，
+       现在反过来断「它不许回来」—— 加回来就等于同一个状态又挂了两组控件。
+       ⚠️ 按**规则块**（`{`）匹配，别按裸类名：源文件里的注释正解释着这件事，裸类名会被注释命中。 */
+    assert.ok(!/\.fmt-seg\.sm\s*\{/.test(mg), '导出区又冒出紧凑版格式卡（与设置区重复）');
     assert.ok(/details\.ass summary,details\.vtt summary/.test(mg), '两套面板没共用卡片式标题条');
     assert.ok(/\.ass-sub\{/.test(mg), '缺列内小分组标题样式');
     assert.ok(/id="assTplSeg"/.test(mg) && /class="tplrow"/.test(mg), 'ASS 面板缺模板按钮行');
@@ -7361,11 +7364,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.251/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.251/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.251/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.251/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.251/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.253/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.253/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.253/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.253/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.253/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
@@ -8162,6 +8165,95 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       assert.ok(m, L + ' 缺 slotTipLyric');
       assert.ok(!/一行|1 行|one line/.test(m[1]),
         L + ' 还写着「上移一行」，但实际只上移 36px（≈半行）—— 界面不许骗人：' + m[1]);
+    });
+  });
+
+  /* ================= v0.9.252：导出区不再重复一组格式键，格式名落到下载按钮 ================= */
+  t('v0.9.252：导出区的第二组 SRT/VTT/ASS 键整块删除', () => {
+    /* 背景：设置区三张格式卡（带副标题「纯文本·无样式 / 网页字幕·可带样式 / 特效字幕·分屏/双行」）
+       与导出区那一排（同一份 FMT_SEGS，只是 .sm 把副标题藏了）读的是同一个 tplVal()。
+       用户在两处看到 SRT/VTT/ASS，第一反应是「这俩是不是两个设置」——删掉信息量少的右边那份。 */
+    assert.ok(!/id="tplSeg2"/.test(mg), '导出区的 #tplSeg2 还在（与设置区重复）');
+    /* ⚠️ 按规则块匹配（`{`）：注释里正解释着去掉它的原因，裸类名会把注释也算命中 */
+    assert.ok(!/\.fmt-seg\.sm\s*\{/.test(mg), '紧凑格式卡的样式还在（死代码）');
+    assert.ok(/id="tplSeg"/.test(mg), '设置区的格式卡被误删了（它才是唯一入口）');
+    /* ⚠️ 隐藏的 #expFmt2 是**状态源**不是 UI：tplVal() 优先读它，删了要动 6 处引用 */
+    assert.ok(/id="expFmt2"/.test(mg) && /return \$\('expFmt2'\)\.value \|\| \$\('expFmt'\)\.value/.test(mg),
+      '把状态源 #expFmt2 一起删了（tplVal 优先读它）');
+    assert.ok(!/\['tplSeg','tplSeg2'\]/.test(mg), '渲染循环还在遍历 tplSeg2');
+  });
+
+  t('v0.9.252：下载按钮带扩展名（导出区唯一的「我会拿到什么」说明）', () => {
+    /* 第二组格式键删掉后，导出区在动作点必须还能看出当前格式 —— 落在下载按钮的后缀上 */
+    assert.ok(/id="btnDownload"><span data-i18n="btnDownload">/.test(mg),
+      '下载按钮的文案被并进按钮本身了（applyI18n 会把后缀一起冲掉）');
+    assert.ok(/<span class="dl-ext" id="dlExt"><\/span>/.test(mg), '缺扩展名 span');
+    assert.ok(/function syncDlExt\(\)/.test(mg) && /\$\('dlExt'\)/.test(mg), '缺 syncDlExt');
+    assert.ok(/\.dl-ext\{/.test(mg), '缺扩展名的样式');
+    /* ⚠️ 必须挂在 syncTplSegs 末尾：格式卡点击 / ASS·VTT 模板键 / 手动改 select / 换语言重绘
+       全汇到那儿；漏了的话后缀会停在上一次的格式上（预览变了、按钮还写着旧的） */
+    const fn = mg.slice(mg.indexOf('function syncTplSegs()'));
+    assert.ok(/syncDlExt\(\);\s*\n\}/.test(fn.slice(0, 1600)), 'syncDlExt 没挂在 syncTplSegs 末尾');
+    /* 6 档 → 3 个后缀：ASS 的三档（分屏/双行/自定义）必须都给 .ass */
+    assert.ok(/el\.textContent = '\.' \+ fmtGroupOf\(tplVal\(\)\)/.test(mg), '后缀不是从 fmtGroupOf 推的');
+    const grp = mg.slice(mg.indexOf('function fmtGroupOf('), mg.indexOf('function syncDlExt('));
+    assert.ok(/return 'ass';/.test(grp), 'fmtGroupOf 不再把 ASS 三档归一');
+  });
+
+  t('v0.9.252：扩展名不许进 data-i18n 词条（会被 applyI18n 冲掉）', () => {
+    assert.ok(/querySelectorAll\('\[data-i18n\]'\)\.forEach\(el => \{ el\.textContent = t\(/.test(mg),
+      'applyI18n 的实现变了，这条前提要重看');
+    assert.ok(!/btnDownload:'[^']*\.(srt|vtt|ass)[^']*'/.test(mg), '扩展名被写进词条了（切语言会消失）');
+    ['下载字幕', '下載字幕', 'Download subtitles', '字幕をダウンロード'].forEach(lbl => {
+      assert.ok(mg.indexOf("btnDownload:'" + lbl + "'") >= 0, '下载文案被动过了：' + lbl);
+    });
+  });
+
+  /* ================= v0.9.253：槽胶囊的「选中」与「编辑」联动 ================= */
+  t('v0.9.253：点槽胶囊要把「正在编辑的槽」一起切过去', () => {
+    /* 背景（外网实测反馈）：点胶囊原本只设 S.filter.slot，S.style.cur 不动 ——
+       上面高亮的是「默认」，下面还写着「编辑槽 · 强调」，同一句话里两个答案，
+       用户以为点错了。筛选与编辑是同一个「选中」的两面，点胶囊就是选中它。 */
+    const i0 = mg.indexOf('const chip = e.target.closest(');
+    const i1 = mg.indexOf('/* v0.9.248：贴底选择条');
+    assert.ok(i0 > 0 && i1 > i0, '槽胶囊的点击分支找不到了（锚点被改）');
+    const fn = mg.slice(i0, i1);
+    assert.ok(/S\.filter\.slot = \(S\.filter\.slot === id\) \? '' : id;/.test(fn), '筛选 toggle 被动过');
+    assert.ok(/S\.style\.cur = id;/.test(fn), '点胶囊没切编辑目标（选择与编辑不联动）');
+    /* ⚠️ 顺序：先 toggle 筛选 → 再切 cur → 最后重画（重画里带着编辑面板） */
+    const iF = fn.indexOf('S.filter.slot ='), iC = fn.indexOf('S.style.cur = id;'), iR = fn.indexOf('renderReport();');
+    assert.ok(iF >= 0 && iC > iF, '设 cur 排在筛选之前（顺序反了）');
+    assert.ok(iR > iC, '切了编辑目标却没重画，面板还停在上一个槽');
+    /* 只切目标，不许顺手把面板展开（没展开的就不该展开） */
+    assert.ok(!/det\.open = true;/.test(fn), '点胶囊把编辑面板也展开了（只该切目标）');
+    /* 小铅笔仍是「切目标 + 展开」，且不碰筛选（_e2e248 第 7 节依赖这条） */
+    const ed = mg.slice(mg.indexOf('const ed = e.target.closest('), i0);
+    assert.ok(/S\.style\.cur = eid;/.test(ed) && /det\.open = true;/.test(ed), '小铅笔不再展开面板');
+    assert.ok(!/S\.filter\.slot/.test(ed), '小铅笔开始改筛选态了');
+    /* 联动能不能被看见，全靠这条链：renderReport → renderSlots → renderSlotEdit */
+    const rr = mg.slice(mg.indexOf('function renderReport()'), mg.indexOf('function renderSelDock()'));
+    assert.ok(/renderSlots\(\);/.test(rr), 'renderReport 不再重画槽栏');
+    const rs = mg.slice(mg.indexOf('function renderSlots()'), mg.indexOf('function slotParamRow('));
+    assert.ok(/renderSlotEdit\(\);/.test(rs), 'renderSlots 不再重画编辑面板');
+    assert.ok(/if \(nm\) nm\.textContent = t\('slotEdit'\) \+ ' · ' \+ slotLabel\(id\);/.test(mg),
+      '面板标题不是跟着当前槽走的（联动的落点）');
+  });
+
+  t('v0.9.253：槽提示文案改成「选中」（四语齐全）', () => {
+    /* 老文案「点胶囊只看这个槽用在哪几行」只讲了筛选这一半，
+       点胶囊现在还会切编辑目标，提示必须跟着说清楚，否则用户还是不敢点。 */
+    assert.ok(/data-i18n="slotHint"/.test(mg), '槽提示的挂载点丢了');
+    const langs = ['zh-CN', 'zh-TW', 'en', 'ja'];
+    langs.forEach(L => {
+      const m = new RegExp("['\"]?" + L.replace('-', '\\-') + "['\"]?\\s*:\\s*\\{").exec(mg);
+      assert.ok(m, '找不到语块 ' + L);
+      let d = 1, j = m.index + m[0].length;
+      while (d > 0 && j < mg.length) { if (mg[j] === '{') d++; else if (mg[j] === '}') d--; j++; }
+      const dict = mg.slice(m.index, j);
+      const hit = /slotHint:'([^']*)'/.exec(dict);
+      assert.ok(hit, L + ' 缺 slotHint');
+      assert.ok(/选中|選中|select|選択/.test(hit[1]), L + ' 的槽提示没讲「选中」：' + hit[1]);
+      assert.ok(!/只看|only lists|だけ表示/.test(hit[1]), L + ' 的槽提示还停在「只看」的旧说法');
     });
   });
 
