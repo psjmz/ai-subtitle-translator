@@ -340,7 +340,10 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     box-shadow:0 -4px 14px -8px rgba(18,18,24,.18)}
 .sel-dock .sd-n{font-size:12.5px;font-weight:650;color:var(--acc-ink);white-space:nowrap}
 .sel-dock .slot-chip{height:28px;padding:0 10px;font-size:11.5px;background:var(--card)}
-.sel-dock .sd-clr{margin-left:auto}
+/* v0.9.250：右端两个按钮 —— 「整篇套用」靠 margin-left:auto 顶到最右，「清除选择」跟在它后面。
+   ⚠️ auto 只能给第一个，两个都给就等于各占一半、中间拉出个大缝。 */
+.sel-dock .sd-all{margin-left:auto}
+.sel-dock .sd-clr{margin-left:0}
   table.tbl{border-collapse:collapse;width:100%;font-size:12.5px}
   .tbl th{position:sticky;top:0;background:var(--card-2);color:var(--sub);font-weight:600;text-align:left;
     padding:9px 10px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;z-index:2}
@@ -380,7 +383,16 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     border:1px solid var(--line-strong);background:var(--card);font-size:12.5px;color:var(--body);
     cursor:pointer;white-space:nowrap;transition:border-color .14s,background .14s,color .14s}
   .slot-chip:hover{border-color:var(--acc-line)}
-.slot-edit-btn{margin-left:2px;padding:0 3px;border-radius:5px;color:var(--mut);font-size:12px;line-height:1}
+.slot-edit-btn{margin-left:2px;padding:0 3px;border-radius:5px;color:var(--mut);line-height:0;
+  display:inline-flex;align-items:center;justify-content:center;width:18px;height:16px}
+/* v0.9.250：铅笔从字符 ✎ 换成 CSS mask 图标 —— 那个字符落在系统兜底字体上，
+   在 1x 下糊成一团看不出是铅笔（与 249 起「按钮禁 emoji、图标走 mask SVG」同一条口径）。 */
+.slot-edit-btn::before{content:'';width:11px;height:11px;background:currentColor;
+  -webkit-mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 19.5h4L20 8a2.1 2.1 0 0 0-3-3L5.5 16.5v3z'/%3E%3Cpath d='M15.5 6.5l3 3'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 19.5h4L20 8a2.1 2.1 0 0 0-3-3L5.5 16.5v3z'/%3E%3Cpath d='M15.5 6.5l3 3'/%3E%3C/svg%3E");
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain}
 .slot-edit-btn:hover{color:var(--acc-ink);background:var(--acc-weak)}
   .slot-chip.on{border-color:var(--acc);background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
   /* ⚠️ 「正在筛选」必须与「当前编辑的槽」(.on，浅粉底) 一眼区分开：
@@ -392,6 +404,12 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .slot-chip.filt,.slot-chip.on.filt{border-color:var(--acc);background:var(--acc);color:#fff;font-weight:600}
   .slot-chip.filt .mod{color:rgba(255,255,255,.82)}
   .slot-chip.filt .slot-dot{box-shadow:0 0 0 1.5px rgba(255,255,255,.9)}
+  /* v0.9.250：胶囊里的「效果字」——用槽自己的参数画的 Aa（颜色/斜体/粗体都对得上），
+     底色用近黑与成片同底，否则「音效 #B0B0B0」在浅底上看着像禁用、不像效果。 */
+  .slot-aa{width:23px;height:18px;border-radius:5px;flex:none;display:inline-flex;align-items:center;
+    justify-content:center;font-size:11.5px;line-height:1;border:1.5px solid var(--line-strong)}
+  .slot-aa-up{font-style:normal;font-size:11px;color:var(--mut);margin-left:-1px}
+  .slot-chip.filt .slot-aa{box-shadow:0 0 0 1.5px rgba(255,255,255,.9)}
   .slot-chip.filt .slot-edit-btn{color:rgba(255,255,255,.85)}
   .slot-chip.filt .slot-edit-btn:hover{color:#fff;background:rgba(255,255,255,.18)}
   .slot-dot{width:8px;height:8px;border-radius:50%;flex:none}
@@ -399,6 +417,17 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .slot-edit{margin-top:11px;border-top:1px solid var(--line);padding-top:8px}
   .slot-edit>summary{cursor:pointer;font-size:12.5px;color:var(--sub);font-weight:600}
   .slot-edit-body{padding-top:10px}
+  /* v0.9.250：✎ 面板内的对照预览 —— 与右侧主预览共用同一段绘制代码，只是画到另一块画布上 */
+  .slot-pv{margin:0 0 12px}
+  .slot-pv-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px}
+  .slot-pv-t{font-size:12px;font-weight:650;color:var(--sub)}
+  .slot-pv-hd .btn-sm.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
+  .slot-pv-tag{margin-left:auto;font-size:11px;color:var(--mut);white-space:nowrap}
+  /* ⚠️ 420 → 560：范围里最要紧的是「上移 70」这类位置变化，而位置差是**按比例**缩的
+     （k = 画布高 / 1080）。420 宽时 70px 只剩 15px，两行的差别几乎看不出来；
+     560 宽 → 315 高 → 70px = 20px，同时字号也回到 15px 上下，读得清。
+     仍然严格等比、不做放大：预览 = 成片缩略图这条不能破。 */
+  .slot-pv-screen{max-width:560px;margin:0 auto}
   .slot-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
   .slot-views{display:flex;gap:6px;margin:10px 0 6px}
   .slot-views .btn-sm.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
@@ -438,10 +467,6 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .tbl tr.sel td{background:var(--acc-weak)}
   .tbl tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
   .slot-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--sub);white-space:nowrap}
-  .apply-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px;padding-top:12px;
-    border-top:1px solid var(--line)}
-  .apply-bar select{height:var(--ctl-h);border:1px solid var(--line-strong);border-radius:var(--r-ctl);
-    padding:0 10px;font-size:12.5px;background:var(--card);color:var(--ink);min-width:120px}
   @media (max-width:640px){
     .slot-row .pk{width:72px}
     .filter-bar input{flex:1 1 100%}
@@ -451,7 +476,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.249</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.250</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -826,12 +851,29 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     <div class="slot-wrap" id="slotWrap">
       <div class="slot-hd">
         <span data-i18n="slotTitle">样式槽</span>
-        <span class="hint" data-i18n="slotHint">点胶囊只看这个槽用在哪几行，✎ 改这个槽的样式</span>
+        <span class="hint" data-i18n="slotHint">点胶囊只看这个槽用在哪几行，点胶囊右侧的铅笔改样式</span>
       </div>
       <div class="slot-bar" id="slotBar"></div>
       <details class="slot-edit" id="slotEdit">
         <summary><span id="slotEditName">—</span></summary>
         <div class="slot-edit-body">
+          <!-- v0.9.250：效果预览 —— 槽以前完全没有画面，用户不知道「上移 70 / 淡色 / 粗体」到底是什么样。
+               ⚠️ 这块**不自己画**：调的是 renderAssPv / renderVttPv 同一段代码，切换只是换渲染目标，
+                  所以「预览 = 导出」这条不变（另写一套渲染器一定会漂移）。 -->
+          <div class="slot-pv" id="slotPv">
+            <div class="slot-pv-hd" id="slotPvHead">
+              <span class="slot-pv-t" data-i18n="slotPvTitle">效果预览</span>
+              <button type="button" class="btn ghost btn-sm on" id="slotPvOn" data-i18n="slotPvOn">套用这个槽</button>
+              <button type="button" class="btn ghost btn-sm" id="slotPvBaseBtn" data-i18n="slotPvBase">基础样式</button>
+              <span class="slot-pv-tag" id="slotPvTag"></span>
+            </div>
+            <div class="ass-pv-screen slot-pv-screen" id="slotPvScreen">
+              <div class="ass-pv-line" id="slotPvLine1"><span class="pv-in"></span></div>
+              <div class="ass-pv-line" id="slotPvLine2"><span class="pv-in"></span></div>
+              <div class="vtt-pv-cue" id="slotPvCue" style="display:none"></div>
+            </div>
+            <p class="hint" id="slotPvNone" style="display:none"></p>
+          </div>
           <div class="slot-meta">
             <span id="slotCover"></span>
             <button type="button" class="btn ghost btn-sm" id="slotUncoverAll" data-i18n="slotUncoverAll">解除全部覆盖</button>
@@ -884,14 +926,10 @@ textarea.paste-box{margin-top:8px;min-height:96px}
       <div class="sel-dock" id="selDock" style="display:none"></div>
     </div>
     <div class="pv-note" id="pvNote"></div>
-
-    <!-- v0.9.245：应用条 —— 对「选中的行」或「整篇」套用当前槽 -->
-    <div class="apply-bar" id="applyBar">
-      <span id="applyLabel"></span>
-      <select id="mApplySlot"></select>
-      <button type="button" class="btn btn-sm" id="mApplyBtn" data-i18n="applyBtn">应用</button>
-      <button type="button" class="btn ghost btn-sm" id="mApplyAll" data-i18n="applyAll">整篇套用</button>
-    </div>
+    <!-- v0.9.250：旧「应用条」整块删除 ——
+         贴底条（#selDock）已经是「勾一行 → 点胶囊」一步到位，而旧条子要「选下拉 → 点应用」两步；
+         它唯一独有的能力是「整篇套用」，已挪进贴底条右端（那里还顺带看得见当前槽名）。
+         ⚠️ 别再把它加回来：多一份下拉就要在 renderSlots 里多维护一处同步，且两个入口语义重叠。 -->
   </div>
 
   <div class="exp card" id="exp">
@@ -930,7 +968,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.249"></script>
+<script src="merge-core.js?v=0.9.250"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1041,8 +1079,11 @@ const I18N = {
     footNote:'随心字幕 AI · 特效字幕处理工具', footLink:'去翻译字幕 →',
     modeMono:'单语字幕', monoCol:'字幕', monoCard:'字幕文件', btnMono:'生成预览', optTitleMono:'特效设置',
     monoHint:'只传一份字幕，直接给它加样式特效。',
-    slotTitle:'样式槽', slotHint:'点胶囊只看这个槽用在哪几行，✎ 改这个槽的样式', slotEditTip:'编辑这个槽的样式', filterSlot:'槽：{0} · {1} 行', selDockN:'已选 {0} 行 · 套用', selDockClear:'清除选择', slotNew:'+ 新建槽',
+    slotTitle:'样式槽', slotHint:'点胶囊只看这个槽用在哪几行，点胶囊右侧的铅笔改样式', slotEditTip:'编辑这个槽的样式', filterSlot:'槽：{0} · {1} 行', selDockN:'已选 {0} 行 · 套用', selDockClear:'清除选择', slotNew:'+ 新建槽',
     slotEdit:'编辑槽', slotCover:'已覆盖 {0} / {1} 项', slotUncoverAll:'解除全部覆盖',
+    slotPvTitle:'效果预览', slotPvOn:'套用这个槽', slotPvBase:'基础样式',
+    slotPvNone:'该导出格式不带样式信息（SRT / 无样式 VTT），槽对它无效',
+    selDockAllTip:'把当前编辑的槽套用到全部行（不只是选中的）',
     slotViewDiff:'只显示差异', slotViewAll:'显示全部参数', slotAddParam:'+ 添加参数…',
     slotInherit:'沿用', slotOverride:'覆盖', slotCancel:'取消覆盖', slotModified:'已修改', slotRestore:'恢复预设',
     slotDefault:'默认', slotNarration:'旁白', slotLyric:'歌词', slotSfx:'音效', slotEmphasis:'强调',
@@ -1055,7 +1096,7 @@ const I18N = {
     filterShort:'时长 < 1 秒', filterLong:'两行以上', filterFast:'阅读速度超标',
     filterHint:'筛选只是帮你挑行，不会存成规则', filterHit:'已命中 {0} 条', filterNone:'没有命中的行',
     filterSelRow:'已选 {0} 行', filterSelAll:'全选', filterSelInv:'反选', filterClear:'清除',
-    applyBar:'对选中的 {0} 行应用', applyBtn:'应用', applyAll:'整篇套用', applyDone:'已把 {0} 行套用「{1}」',
+    applyAll:'整篇套用「{0}」', applyDone:'已把 {0} 行套用「{1}」',
     lblAssItalic:'斜体', colSlot:'样式',
     slotPrmFont:'字体',
     slotPrmAlpha:'不透明度',
@@ -1189,8 +1230,11 @@ const I18N = {
     footNote:'隨心字幕 AI · 特效字幕處理工具', footLink:'去翻譯字幕 →',
     modeMono:'單語字幕', monoCol:'字幕', monoCard:'字幕檔案', btnMono:'產生預覽', optTitleMono:'特效設定',
     monoHint:'只傳一份字幕，直接幫它加樣式特效。',
-    slotTitle:'樣式槽', slotHint:'點膠囊只看這個槽用在哪幾行，✎ 改這個槽的樣式', slotEditTip:'編輯這個槽的樣式', filterSlot:'槽：{0} · {1} 行', selDockN:'已選 {0} 行 · 套用', selDockClear:'清除選取', slotNew:'+ 新增槽',
+    slotTitle:'樣式槽', slotHint:'點膠囊只看這個槽用在哪幾行，點膠囊右側的鉛筆改樣式', slotEditTip:'編輯這個槽的樣式', filterSlot:'槽：{0} · {1} 行', selDockN:'已選 {0} 行 · 套用', selDockClear:'清除選取', slotNew:'+ 新增槽',
     slotEdit:'編輯槽', slotCover:'已覆蓋 {0} / {1} 項', slotUncoverAll:'解除全部覆蓋',
+    slotPvTitle:'效果預覽', slotPvOn:'套用這個槽', slotPvBase:'基礎樣式',
+    slotPvNone:'該匯出格式不帶樣式資訊（SRT / 無樣式 VTT），槽對它無效',
+    selDockAllTip:'把目前編輯的槽套用到全部行（不只是選取的）',
     slotViewDiff:'只顯示差異', slotViewAll:'顯示全部參數', slotAddParam:'+ 新增參數…',
     slotInherit:'沿用', slotOverride:'覆蓋', slotCancel:'取消覆蓋', slotModified:'已修改', slotRestore:'恢復預設',
     slotDefault:'預設', slotNarration:'旁白', slotLyric:'歌詞', slotSfx:'音效', slotEmphasis:'強調',
@@ -1203,7 +1247,7 @@ const I18N = {
     filterShort:'時長 < 1 秒', filterLong:'兩行以上', filterFast:'閱讀速度超標',
     filterHint:'篩選只是幫你挑行，不會存成規則', filterHit:'已命中 {0} 條', filterNone:'沒有命中的行',
     filterSelRow:'已選 {0} 行', filterSelAll:'全選', filterSelInv:'反選', filterClear:'清除',
-    applyBar:'對選中的 {0} 行套用', applyBtn:'套用', applyAll:'整篇套用', applyDone:'已把 {0} 行套用「{1}」',
+    applyAll:'整篇套用「{0}」', applyDone:'已把 {0} 行套用「{1}」',
     lblAssItalic:'斜體', colSlot:'樣式',
     slotPrmFont:'字體',
     slotPrmAlpha:'不透明度',
@@ -1337,8 +1381,11 @@ const I18N = {
     footNote:'AI-SRTSub · Subtitle Styling Tool', footLink:'Translate subtitles →',
     modeMono:'Single language', monoCol:'Subtitle', monoCard:'Subtitle file', btnMono:'Preview', optTitleMono:'Styling',
     monoHint:'Upload one subtitle file and style it directly.',
-    slotTitle:'Style slots', slotHint:'Click a chip to list only the lines using that slot, ✎ edits it', slotEditTip:'Edit this slot', filterSlot:'Slot: {0} · {1} lines', selDockN:'{0} selected · apply', selDockClear:'Clear', slotNew:'+ New slot',
+    slotTitle:'Style slots', slotHint:'Click a chip to list only the lines using that slot; the pencil on the right edits it', slotEditTip:'Edit this slot', filterSlot:'Slot: {0} · {1} lines', selDockN:'{0} selected · apply', selDockClear:'Clear', slotNew:'+ New slot',
     slotEdit:'Edit slot', slotCover:'{0} of {1} overridden', slotUncoverAll:'Clear all overrides',
+    slotPvTitle:'Preview', slotPvOn:'With this slot', slotPvBase:'Base style',
+    slotPvNone:'This export format carries no style info (SRT / plain VTT), so slots do nothing',
+    selDockAllTip:'Apply the slot being edited to every line, not just the selected ones',
     slotViewDiff:'Diff only', slotViewAll:'All parameters', slotAddParam:'+ Add parameter…',
     slotInherit:'Inherit', slotOverride:'Override', slotCancel:'Remove override', slotModified:'Modified', slotRestore:'Restore preset',
     slotDefault:'Default', slotNarration:'Narration', slotLyric:'Lyrics', slotSfx:'Sound fx', slotEmphasis:'Emphasis',
@@ -1351,7 +1398,7 @@ const I18N = {
     filterShort:'Shorter than 1s', filterLong:'More than 2 lines', filterFast:'Reading speed too high',
     filterHint:'Filtering only selects lines, it is never saved as a rule', filterHit:'{0} lines matched', filterNone:'No line matched',
     filterSelRow:'{0} lines selected', filterSelAll:'Select all', filterSelInv:'Invert', filterClear:'Clear',
-    applyBar:'Apply to the {0} selected lines', applyBtn:'Apply', applyAll:'Apply to all', applyDone:'Applied "{1}" to {0} lines',
+    applyAll:'Apply "{0}" to all lines', applyDone:'Applied "{1}" to {0} lines',
     lblAssItalic:'Italic', colSlot:'Style',
     slotPrmFont:'Font',
     slotPrmAlpha:'Opacity',
@@ -1485,8 +1532,11 @@ const I18N = {
     footNote:'AI-SRTSub · 字幕スタイル処理ツール', footLink:'字幕を翻訳する →',
     modeMono:'単一言語', monoCol:'字幕', monoCard:'字幕ファイル', btnMono:'プレビュー', optTitleMono:'スタイル設定',
     monoHint:'字幕を 1 本だけアップロードして、直接スタイルを付けます。',
-    slotTitle:'スタイルスロット', slotHint:'カプセルを押すとそのスロットの行だけ表示、✎ でスタイル編集', slotEditTip:'このスロットを編集', filterSlot:'スロット：{0} · {1} 行', selDockN:'{0} 行選択中 · 適用', selDockClear:'選択解除', slotNew:'+ 新規スロット',
+    slotTitle:'スタイルスロット', slotHint:'カプセルでそのスロットの行だけ表示、右側の鉛筆でスタイル編集', slotEditTip:'このスロットを編集', filterSlot:'スロット：{0} · {1} 行', selDockN:'{0} 行選択中 · 適用', selDockClear:'選択解除', slotNew:'+ 新規スロット',
     slotEdit:'スロットを編集', slotCover:'{0} / {1} 項目を上書き中', slotUncoverAll:'上書きをすべて解除',
+    slotPvTitle:'プレビュー', slotPvOn:'このスロットを適用', slotPvBase:'基本スタイル',
+    slotPvNone:'この書き出し形式はスタイル情報を持ちません（SRT / スタイルなし VTT）',
+    selDockAllTip:'編集中のスロットを選択行だけでなく全行に適用します',
     slotViewDiff:'差分のみ', slotViewAll:'全パラメータ', slotAddParam:'+ パラメータを追加…',
     slotInherit:'継承', slotOverride:'上書き', slotCancel:'上書きを解除', slotModified:'変更済み', slotRestore:'プリセットに戻す',
     slotDefault:'デフォルト', slotNarration:'ナレーション', slotLyric:'歌詞', slotSfx:'効果音', slotEmphasis:'強調',
@@ -1499,7 +1549,7 @@ const I18N = {
     filterShort:'1 秒未満', filterLong:'3 行以上', filterFast:'読み速度超過',
     filterHint:'絞り込みは行を選ぶだけで、ルールとして保存されません', filterHit:'{0} 行が一致', filterNone:'一致する行なし',
     filterSelRow:'{0} 行を選択中', filterSelAll:'すべて選択', filterSelInv:'反転', filterClear:'クリア',
-    applyBar:'選択した {0} 行に適用', applyBtn:'適用', applyAll:'全体に適用', applyDone:'{0} 行に「{1}」を適用しました',
+    applyAll:'全体に「{0}」を適用', applyDone:'{0} 行に「{1}」を適用しました',
     lblAssItalic:'斜体', colSlot:'スタイル',
     slotPrmFont:'フォント',
     slotPrmAlpha:'不透明度',
@@ -1883,13 +1933,20 @@ function renderSelDock(){
   const n = S.sel ? S.sel.size : 0;
   if (!n || !S.rows){ d.style.display = 'none'; d.innerHTML = ''; return; }
   const chips = S.style.order.map(id=>{
-    const sl = S.style.slots[id]; if (!sl) return '';
+    if (!S.style.slots[id]) return '';
     return '<span class="slot-chip' + (id === S.style.cur ? ' on' : '') + '" data-dock-slot="' + esc(id) + '" role="button" tabindex="0">' +
-      '<span class="slot-dot" style="background:' + esc(sl.color) + '"></span>' + esc(slotLabel(id)) + '</span>';
+      slotAaHtml(id) + esc(slotLabel(id)) + '</span>';
   }).join('');
   d.style.display = 'flex';
+  /* v0.9.250：旧「应用条」删掉后，「整篇套用」挪到这里 ——
+     ⚠️ 它套的是**当前编辑的槽**，所以按钮文案里带上槽名（旧版是个看不出选中值的下拉，
+        用户得先读懂下拉里是什么才敢点）。 */
+  /* ⚠️ 顺序：主操作（整篇套用）在**最右**端，次要的「清除选择」排在它左边 ——
+     反过来的话，用户伸手点最右会点到「清除」，一下把选中的行全丢了。 */
   d.innerHTML = '<span class="sd-n">' + esc(t('selDockN', n)) + '</span>' + chips +
-    '<button type="button" class="btn ghost btn-sm sd-clr" data-dock-clr="1">' + esc(t('selDockClear')) + '</button>';
+    '<button type="button" class="btn ghost btn-sm sd-clr" data-dock-clr="1">' + esc(t('selDockClear')) + '</button>' +
+    '<button type="button" class="btn btn-sm sd-all" data-dock-all="1" title="' + esc(t('selDockAllTip')) + '">' +
+      esc(t('applyAll', slotLabel(S.style.cur))) + '</button>';
 }
 
 /* ================= v0.9.245：样式槽 + 筛选器 =================
@@ -1998,6 +2055,22 @@ function markSlotModified(id){
   if (!s.custom) s.modified = true;
 }
 
+/* v0.9.250：胶囊里的「效果字」—— 用这个槽**自己的**补丁画一个 Aa：
+   颜色、斜体、粗体都对得上真实效果，带垂直偏移的再标个 ↑。
+   用户不用点开任何东西，就能看出「音效是淡的、歌词是斜的、强调是粗的」——
+   此前只有一个纯色圆点，颜色是「槽的标识色」，跟实际效果没有任何关系。
+   ⚠️ 底色用近黑与成片同底：把 #B0B0B0 画在白底上会像禁用态，看不出「它是淡的」。 */
+function slotAaHtml(id){
+  const s = slotObj(id); if (!s) return '';
+  const d = s.dst || {};
+  const col = d.color || s.color || '#888780';
+  const st = 'background:#0A0A0E;color:' + esc(col) + ';border-color:' + esc(s.color || '#888780') + ';' +
+    (d.italic ? 'font-style:italic;' : '') + (d.bold ? 'font-weight:700;' : '');
+  const up = (d.dMV != null && +d.dMV !== 0)
+    ? '<i class="slot-aa-up" title="' + esc(t('slotPrmDMV')) + '">↑</i>' : '';
+  return '<span class="slot-aa" style="' + st + '">Aa</span>' + up;
+}
+
 /* ---------- 槽栏 ---------- */
 function renderSlots(){
   const bar = $('slotBar'); if (!bar) return;
@@ -2011,17 +2084,11 @@ function renderSlots(){
        而用户真正想要的是「这个槽都用在哪几行」。 */
     const filt = (S.filter && S.filter.slot === id) ? ' filt' : '';
     return '<span class="slot-chip' + (id === S.style.cur ? ' on' : '') + filt + '" data-slot="' + esc(id) + '" role="button" tabindex="0">' +
-      '<span class="slot-dot" style="background:' + esc(s.color) + '"></span>' + esc(slotLabel(id)) +
+      slotAaHtml(id) + esc(slotLabel(id)) +
       (n ? ' <span class="mod">' + n + '</span>' : '') + mod +
-      '<span class="slot-edit-btn" data-slot-edit="' + esc(id) + '" role="button" tabindex="0" title="' + esc(t('slotEditTip')) + '">✎</span></span>';
-  }).join('') + '<span class="slot-chip" data-slot-new="1" role="button" tabindex="0">+ ' + esc(t('slotNew')) + '</span>';
-  /* 应用条里的下拉：与槽栏同源，改一处两边一起变 */
-  const ap = $('mApplySlot');
-  if (ap){
-    const keep = ap.value;
-    ap.innerHTML = S.style.order.map(id=>'<option value="' + esc(id) + '">' + esc(slotLabel(id)) + '</option>').join('');
-    ap.value = S.style.slots[keep] ? keep : S.style.cur;
-  }
+      '<span class="slot-edit-btn" data-slot-edit="' + esc(id) + '" role="button" tabindex="0" title="' + esc(t('slotEditTip')) + '"></span></span>';
+  }).join('') + '<span class="slot-chip" data-slot-new="1" role="button" tabindex="0">' + esc(t('slotNew')) + '</span>';
+  /* ⚠️ 别在这里再补 '+ '：slotNew 四语文案里本来就带 '+'，再拼一个就成了「++ 新建槽」（250 截图抓到）。 */
   renderSlotEdit();
 }
 function renderSlotEdit(){
@@ -2089,6 +2156,7 @@ function renderSlotEdit(){
   if (vd) vd.classList.toggle('on', diff);
   if (va) va.classList.toggle('on', !diff);
   renderSlotSchemeSel();
+  renderSlotPvMini();          /* v0.9.250：编辑谁就预览谁 */
 }
 /* v0.9.246：单行参数 —— 按 type 出控件。
    ⚠️ 只在一个格式表达得了的项（fmt:'ass'）挂一个小标签，不许静默：
@@ -2220,8 +2288,6 @@ function renderFilterStat(){
     esc(t('filterSlot', slotLabel(f.slot), hits)) + ' ✕</span> · ' : '';
   el.innerHTML = slotTip + (active ? t('filterHit', hits) + ' · ' : '') + t('filterSelRow', '<b>' + n + '</b>') +
     ' · ' + links + (active ? ' · <span style="color:var(--mut)">' + esc(t('filterHint')) + '</span>' : '');
-  const lbl = $('applyLabel');
-  if (lbl) lbl.textContent = t('applyBar', n);
 }
 
 /* ---------- 应用 ---------- */
@@ -2336,6 +2402,22 @@ function assBackWithAlpha(colHex, alphaPct){
   const h = assAlphaHex(alphaPct);
   const c = /^&H[0-9A-Fa-f]{6,8}$/.test(String(colHex || '')) ? String(colHex) : '&H00000000';
   return '&H' + h + c.slice(-6).toUpperCase();
+}
+/* v0.9.250：槽 → 预览的两个逆运算。
+   ⚠️ assAlphaHex / hexToAss 是「面板值 → ASS」，这两个是「ASS → 预览 CSS」，
+      必须严格互逆，否则「导出是灰的、预览是白的」这种经典假象又回来了。
+      · ASS 的颜色是 &HAABBGGRR（BGR 倒着存），别直接当 RGB 用
+      · ASS 的 alpha 是 00=不透明、FF=全透明，与 CSS 的 opacity 语义相反 */
+function assAlphaPct(h){
+  const n = parseInt(String(h == null ? '00' : h), 16);
+  if (!isFinite(n)) return 100;
+  return Math.max(0, Math.min(100, 100 - Math.round(n * 100 / 255)));
+}
+function assColHex(v){
+  const m = /^&H([0-9A-Fa-f]{6,8})$/.exec(String(v || '').trim());
+  if (!m) return '';
+  const b = m[1].slice(-6);
+  return '#' + (b.slice(4, 6) + b.slice(2, 4) + b.slice(0, 2)).toUpperCase();
 }
 function slotAssSpec(id, role){
   const A = assStyleOf(), src = role === 'src';
@@ -3012,22 +3094,46 @@ function assPvSample(){
   let zh = best ? String(best.p.dstLines.join('\n') || '') : '';
   if (!en) en = String(r && r.en || 'Hello there, this is a sample line');
   if (!zh) zh = String(r && r.zh || '你好，这是一条示例字幕');
-  return { en: en, zh: zh, nEn: en.split('\n').length, nZh: zh.split('\n').length };
+  /* v0.9.250：样例是**哪一行**就必须带出那一行的槽 ——
+     导出会把这条 cue 的槽写进 Style/Dialogue（歌词斜体上移、音效淡色），
+     预览若还照基础样式画，就成了「预览白字、导出灰字」。 */
+  const slot = best ? (best.p.slot || 'default') : (r && r.slot) || 'default';
+  return { en: en, zh: zh, nEn: en.split('\n').length, nZh: zh.split('\n').length, slot: slot };
 }
 function renderAssPv(){
-  const box = $('assPv'), scr = $('assPvScreen'), l1 = $('assPvLine1'), l2 = $('assPvLine2'), tag = $('assPvTag');
+  /* v0.9.250：预览目标可切换 —— 右侧主预览 或 ✎ 面板里的对照预览，
+     两处共用这**同一段绘制代码**（另写一套渲染器必然漂移，就违反「预览 = 导出」了）。 */
+  const T = pvTarget('ass');
+  const box = T.box, scr = T.scr, l1 = T.l1, l2 = T.l2, tag = T.tag;
   if (!box || !scr || !l1 || !l2) return;
   const fmt = expFmtVal();
   const isAss = (fmt === 'ass-split' || fmt === 'ass-stack');
   if (!isAss || !S.rows || !S.rows.length){ box.style.display = 'none'; return; }
   box.style.display = 'block';
+  /* v0.9.250：面板里 ASS 两行与 VTT 的 cue 共用一块画布 —— 生效的那个负责把对方收起来 */
+  if (l1) l1.style.display = ''; if (l2) l2.style.display = '';
+  if (T.cue) T.cue.style.display = 'none';
   const st = assStyleOf(), m = assMVs(), dstFirst = orderVal() === 'dst-first';
   const k = (scr.clientHeight || 240) / 1080;      /* 1080p 基准 → 预览等比 */
   const samp = assPvSample();
-  const colOf = id => assColorVal(id, id.indexOf('Outline') > 0 ? '#000000' : '#FFFFFF');
+  /* v0.9.250：这条预览画的是**哪个槽** ——
+     主预览 = 样例那一行自己的槽（此前完全没有这一步：导出把歌词画成斜体上移、预览还是基础样式）；
+     面板内的对照预览 = 用户当场点选的那个槽，或强制基础样式。 */
+  const sid = (T.slotOverride != null) ? T.slotOverride : (samp.slot || 'default');
+  const sp  = (sid !== 'default') ? slotObj(sid) : null;
+  const dDst = (sp && sp.dst && Object.keys(sp.dst).length) ? sp.dst : null;
+  const dSrc = (sp && sp.src && Object.keys(sp.src).length) ? sp.src : null;
+  /* 槽的垂直偏移是**整条级**参数，导出把它加在逐条 Dialogue 的 MarginV 上（`mv: dstMV + dOff`）。
+     预览必须用同样两个名字、同样的加法 —— 于是「填了 dMV 的槽」在预览里也真的会往上挪。 */
+  const dOff = (dDst && dDst.dMV != null) ? (+dDst.dMV || 0) : 0;
+  const sOff = (dSrc && dSrc.dMV != null) ? (+dSrc.dMV || 0) : 0;
+  /* 槽的颜色不在面板输入框里 → 用「伪造的面板 id」喂给同一个 colOf，
+     这样颜色解析只有一条路径（另开分支就会出现「导出是灰的、预览是白的」）。 */
+  const ovr = {};
+  const colOf = id => (ovr[id] != null ? ovr[id] : assColorVal(id, id.indexOf('Outline') > 0 ? '#000000' : '#FFFFFF'));
   /* v0.9.229：两个框都是「距画面底边多远」，一条字幕算一个绝对位置。
      预览与导出同一口径，不需要再按实测行数重算抬高量。 */
-  const dstMV = m.dst, srcMV = m.src;   /* v0.9.236：预览与导出同一数字，不再夹到 0 */
+  const dstMV = m.dst + dOff, srcMV = m.src + sOff;   /* v0.9.236：不再夹到 0；250：加上槽的偏移 */
   /* hex → rgba：阴影与底衬都要按各自的不透明度混合，不能整行用 opacity 一起打折
      （ASS 里 PrimaryColour 的 alpha 只作用于文字填充，BackColour 的 alpha 只作用于阴影/底衬）。 */
   const rgbaOf = (hex, aPct) => {
@@ -3050,6 +3156,9 @@ function renderAssPv(){
     css.paintOrder = 'stroke fill';
     css.fontFamily = '"' + String(o.font || 'PingFang SC') + '", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
     css.fontWeight = o.bold ? '700' : '400';
+    /* v0.9.250：斜体此前只在 VTT 那半画、ASS 完全不画 —— 而导出的 Style 里 Italic 是写了的，
+       于是「预览是正的、导出是斜的」。两边都按 o.italic 画（基础样式与槽走同一条路径）。 */
+    css.fontStyle = o.italic ? 'italic' : 'normal';
     css.letterSpacing = (o.spacing * k).toFixed(2) + 'px';
     css.textAlign = o.align === 1 ? 'left' : (o.align === 3 ? 'right' : 'center');
     css.paddingLeft = MLP; css.paddingRight = MRP;
@@ -3071,11 +3180,28 @@ function renderAssPv(){
   };
   const sideOf = p => {
     const P = p === 'dst' ? 'Dst' : 'Src';
+    const dP = (p === 'dst') ? dDst : dSrc;
+    if (dP){
+      /* ⚠️ 读的是 slotAssSpec —— 就是 formatAss 的 extraStyles 用的那一个函数，
+         所以「预览画的」与「导出写的」是同一份 spec，不是两套算法对出来的近似值。 */
+      const spec = slotAssSpec(sid, p);
+      const ck = 'slot' + P + 'Color', ok = 'slot' + P + 'OutlineColor', ek = 'slot' + P + 'EdgeColor';
+      ovr[ck] = assColHex(spec.color)         || assColorVal('ass'+P+'Color', '#FFFFFF');
+      ovr[ok] = assColHex(spec.outlineColor)  || assColorVal('ass'+P+'OutlineColor', '#000000');
+      ovr[ek] = assColHex(spec.back)          || assColorVal('ass'+P+'EdgeColor', '#000000');
+      return {
+        size: spec.size, colorId: ck, outline: spec.outline, outlineColorId: ok,
+        alpha: assAlphaPct(spec.alpha), mv: (p === 'dst') ? dstMV : srcMV, font: spec.font,
+        bold: (spec.bold === -1), italic: (spec.italic === -1), spacing: (spec.spacing || 0), align: spec.align,
+        edge: (spec.borderStyle === 3) ? 'box' : ((spec.shadow > 0) ? 'shadow' : 'none'),
+        edgeSize: spec.shadow, edgeColorId: ek, edgeAlpha: assAlphaPct(spec.back)
+      };
+    }
     return {
       size: st[p+'Size'], colorId: 'ass'+P+'Color', outline: st[p+'Outline'],
       outlineColorId: 'ass'+P+'OutlineColor', alpha: st[p+'Alpha'],
       mv: (p === 'dst') ? dstMV : srcMV, font: st[p+'Font'],
-      bold: st[p+'Bold'], spacing: st[p+'Spacing'], align: st[p+'Align'],
+      bold: st[p+'Bold'], italic: !!st[p+'Italic'], spacing: st[p+'Spacing'], align: st[p+'Align'],
       edge: st[p+'Box'] ? 'box' : (st[p+'Shadow'] > 0 ? 'shadow' : 'none'),
       edgeSize: st[p+'Shadow'], edgeColorId: 'ass'+P+'EdgeColor', edgeAlpha: st[p+'BackAlpha']
     };
@@ -3088,7 +3214,10 @@ function renderAssPv(){
     paint(l1, samp.en, sideOf('src'));
     paint(l2, samp.zh, sideOf('dst'));
   }
-  if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p';
+  if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p' +
+    (sp ? ' · ' + slotLabel(sid) : '');
+  /* 顺手把 ✎ 面板里的对照预览也刷一遍（PV_MINI 里会挡住重入，不会递归） */
+  renderSlotPvMini();
 }
 /* ================= v0.9.238：合并页自己的 WebVTT 样式 =================
    ⚠️ 与主站翻译页的 VTT 面板只保持「参数同名、语义同义」，实现上完全独立：
@@ -3252,17 +3381,22 @@ function buildVttExport(){
   return C.formatVtt(items, { style: st, extraRules: slotVttRules() });
 }
 function renderVttPv(){
-  const box = $('mVttPv'), scr = $('mVttPvScreen'), cue = $('mVttPvCue'), tag = $('mVttPvTag');
+  /* v0.9.250：与 renderAssPv 同一套「目标可切换」——面板内对照预览复用这段代码 */
+  const T = pvTarget('vtt');
+  const box = T.box, scr = T.scr, cue = T.cue, tag = T.tag;
   if (!box || !scr || !cue) return;
   const isVtt = (expFmtVal() === 'vtt-styled');
   if (!isVtt || !S.rows || !S.rows.length){ box.style.display = 'none'; return; }
   box.style.display = 'block';
+  if (cue) cue.style.display = '';                                    /* v0.9.250：同上，接管画布 */
+  if (T.l1) T.l1.style.display = 'none'; if (T.l2) T.l2.style.display = 'none';
   const parts = vttCueParts();
   if (!parts.length){ box.style.display = 'none'; return; }
   /* ⚠️ v0.9.245：预览这条 cue 是哪个槽的，就得按那个槽画 —— 导出里它带 <c.sg-x> 与
      ::cue(.sg-x) 规则，预览却照基础样式画，就成了「导出是灰的、预览是白的」。
      层级跟 CSS 一致：基础 ::cue → 槽的译文行覆盖 → 原文行那条再叠 ::cue(.src) / ::cue(.槽.src)。 */
-  const sid0 = parts[0].slot || 'default';
+  /* 面板内的对照预览可以指定画哪个槽（'' = 强制基础样式） */
+  const sid0 = (T.slotOverride != null) ? (T.slotOverride || 'default') : (parts[0].slot || 'default');
   const slotOn = (sid0 !== 'default' && !!slotObj(sid0));
   /* ⚠️ stBase = 整条 cue 那一层（= 导出里 ::cue 与 ::cue(.槽) 叠完的结果）；
         循环里的 st = 该行那一层（原文行可能被 ::cue(.槽.src) 再叠一次）。
@@ -3320,7 +3454,8 @@ function renderVttPv(){
     const bgRgba = bgOn ? (bgOwn ? C.vttRgba(st.srcBgColor, st.srcBgAlpha) : C.vttRgba(st.bgColor, st.bgAlpha)) : null;
     if (bgRgba) sp.style.background = bgRgba;
   });
-  if (tag) tag.textContent = vttPresetLabel() + ' · VTT';
+  if (tag) tag.textContent = vttPresetLabel() + ' · VTT' + (slotOn ? ' · ' + slotLabel(sid0) : '');
+  renderSlotPvMini();
 }
 function vttPresetLabel(){
   const k0 = vttPresetKey();
@@ -3458,6 +3593,63 @@ function importVttStyle(side, text, name){
 function baseName(){
   const n = S.srcName || S.dstName || '';
   return n.replace(/\.[^.]+$/, '');
+}
+/* ================= v0.9.250：预览目标（右侧主预览 / ✎ 面板内的对照预览） =================
+   为什么要这一层：样式槽的效果此前在 ASS 侧**完全看不到**（renderAssPv 只读面板参数，
+   导出却按槽写 Style/Dialogue），用户根本不知道槽能干出什么。
+   而「另写一套面板内预览」必然与真预览漂移 —— 那是「预览≠导出」换个地方复发。
+   所以不写第二套渲染器，改成「同一段绘制代码 + 可切换目标」：面板里那块就是主预览的实现，
+   只是画到了另一个 <div> 上。
+   ⚠️ PV_MINI 是重入闸：mini 渲染中 renderAssPv 结尾还会再叫一次 renderSlotPvMini，必须挡住。 */
+var PV_MINI = false;
+function slotPvBase(){ return !!(S.pv && S.pv.base); }
+function mainPvEls(role){
+  return (role === 'ass')
+    ? { box:$('assPv'), scr:$('assPvScreen'), l1:$('assPvLine1'), l2:$('assPvLine2'), tag:$('assPvTag'), slotOverride:null }
+    : { box:$('mVttPv'), scr:$('mVttPvScreen'), cue:$('mVttPvCue'), tag:$('mVttPvTag'), slotOverride:null };
+}
+function miniPvEls(role){
+  /* 面板内的对照预览：槽 = 用户当场点选的那个；点了「基础样式」就强制 default（只画基础样式）。 */
+  const ov = slotPvBase() ? 'default' : ((S.style && S.style.cur) || 'default');
+  /* ⚠️ box 用**丢弃对象**：两个渲染器都会写 box.style.display，
+       共用同一块画布时后跑的那个会把前一个刚显示的又隐藏掉（VTT 跑完 ASS 的画面就没了）。
+       真正的显示/隐藏由 renderSlotPvMini 统一决定；tag 也由它统一写（两个渲染器各写一半会打架）。 */
+  const sink = { style: {} };
+  /* ⚠️ 两个渲染器都拿到**全套**元素：ASS 画的两行与 VTT 画的 cue 挤在同一块 .slot-pv-screen 里，
+       谁生效就得由谁把对方收起来 —— 只给自己的话，切到 VTT 时 cue 一直停在 display:none（250 实测）。 */
+  return { box:sink, scr:$('slotPvScreen'), l1:$('slotPvLine1'), l2:$('slotPvLine2'), cue:$('slotPvCue'), tag:null, slotOverride:ov };
+}
+function pvTarget(role){ return PV_MINI ? miniPvEls(role) : mainPvEls(role); }
+/* ✎ 展开时把对照预览刷一遍；收起 / 当前格式不带样式时整块收起来（不留旧画面）。 */
+function renderSlotPvMini(){
+  if (PV_MINI) return;
+  const det = $('slotEdit'), wrap = $('slotPv');
+  if (!wrap) return;
+  if (!det || !det.open){ wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  const fmt = expFmtVal();
+  const styled = (fmt === 'ass-split' || fmt === 'ass-stack' || fmt === 'vtt-styled');
+  const usable = styled && !!(S.rows && S.rows.length);
+  const head = $('slotPvHead'), screen = $('slotPvScreen'), none = $('slotPvNone');
+  if (head)   head.style.display   = usable ? '' : 'none';
+  if (screen) screen.style.display = usable ? '' : 'none';
+  if (none){
+    none.style.display = usable ? 'none' : 'block';
+    none.textContent = t('slotPvNone');
+  }
+  if (!usable) return;
+  PV_MINI = true;
+  try { renderAssPv(); renderVttPv(); } finally { PV_MINI = false; }
+  const tag = $('slotPvTag');
+  if (tag){
+    /* 面板里那块只有巴掌大：一级工作区标题就够了 —— 主预览的完整标签搬过来会占掉半行。
+       tplStack = "ASS 底部双行 · 默认模板，可微调 (.ass)" → 取第一段 = "ASS 底部双行"。 */
+    const first = s => String(s || '').split(' · ')[0].replace(/ \(.*$/, '');
+    const base = (fmt === 'vtt-styled')
+      ? (first(vttPresetLabel()) + ' · VTT')
+      : (first(tplVal() === 'stack' ? t('tplStack') : t('tplSplit')) + ' · 1080p');
+    tag.textContent = base + ' · ' + (slotPvBase() ? t('slotPvBase') : slotLabel((S.style && S.style.cur) || 'default'));
+  }
 }
 function expExt(){
   const f = expFmtVal();
@@ -3711,6 +3903,7 @@ function bindSlotUI(){
       S.style.cur = eid;
       const det = $('slotEdit'); if (det) det.open = true;
       renderSlots();
+      renderSlotPvMini();      /* 面板里的对照预览跟着切到这个槽 */
       return;
     }
     const chip = e.target.closest('[data-slot]');
@@ -3726,6 +3919,8 @@ function bindSlotUI(){
   const dk = $('selDock');
   if (dk) dk.addEventListener('click', e=>{
     if (e.target.closest('[data-dock-clr]')){ ensureStyle(); S.sel.clear(); renderReport(); return; }
+    /* v0.9.250：整篇套用 —— 套的是「当前编辑的槽」（按钮上就写着槽名，不会套错） */
+    if (e.target.closest('[data-dock-all]')){ ensureStyle(); applySlotToAll(S.style.cur); return; }
     const c = e.target.closest('[data-dock-slot]');
     if (!c) return;
     ensureStyle();
@@ -3843,15 +4038,21 @@ function bindSlotUI(){
     } else S.sel.clear();
     renderReport();
   });
-  const ab = $('mApplyBtn'), aa = $('mApplyAll');
-  if (ab) ab.addEventListener('click', ()=>{
-    ensureStyle();
-    applySlotToSelected((($('mApplySlot') || {}).value) || S.style.cur);
-  });
-  if (aa) aa.addEventListener('click', ()=>{
-    ensureStyle();
-    applySlotToAll((($('mApplySlot') || {}).value) || S.style.cur);
-  });
+  /* v0.9.250：旧应用条的绑定整块删除（DOM 已不存在）。
+     现在的入口只有两个：贴底条的槽胶囊（套到选中行）、贴底条的「整篇套用「X」」（套到全篇）。 */
+  /* v0.9.250：✎ 面板里的对照预览 —— 切换「套用这个槽 / 基础样式」，并跟随 details 展开状态 */
+  const pvOn = $('slotPvOn'), pvBase = $('slotPvBaseBtn');
+  const setPvBase = v => {
+    if (!S.pv) S.pv = { base: false };
+    S.pv.base = !!v;
+    if (pvOn) pvOn.classList.toggle('on', !S.pv.base);
+    if (pvBase) pvBase.classList.toggle('on', S.pv.base);
+    renderSlotPvMini();
+  };
+  if (pvOn) pvOn.addEventListener('click', ()=>setPvBase(false));
+  if (pvBase) pvBase.addEventListener('click', ()=>setPvBase(true));
+  const det = $('slotEdit');
+  if (det) det.addEventListener('toggle', ()=>renderSlotPvMini());
 }
 
 /* ================= 初始化 ================= */

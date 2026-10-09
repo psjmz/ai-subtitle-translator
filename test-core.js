@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.249/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.250/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.249</.test(html), '首页版本号未升 0.9.245');
-    assert.ok(/class="ver-tag">v0\.9\.249</.test(html), '工作台版本号未升 0.9.245');
-    assert.ok(/srt-core\.js\?v=0\.9\.249/.test(html), 'srt-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.250</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.250</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.250/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.249</.test(mg), 'merge.html 版本未升 0.9.245');
-    assert.ok(/merge-core\.js\?v=0\.9\.249/.test(mg), 'merge-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.250</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.250/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5677,8 +5677,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const st = assStyleOf\(\), m = assMVs\(\)/.test(pv), '预览没读 assMVs()');
     assert.ok(/const mv = assMVs\(\);/.test(ev), '导出没读 assMVs()');
     /* v0.9.235：预览里也改成原样取值（与导出的 mv.dst / mv.src 同一数字） */
-    assert.ok(/const dstMV = m\.dst, srcMV = m\.src;/.test(pv),
-      '预览对离底值做了额外加工（应与导出同一个原样取值）');
+    /* v0.9.250：预览的离底值 = 面板原值 + 槽的整条级偏移。
+       ⚠️ 名字必须与导出那两处一致（dOff/sOff），否则又是「预览挪了、导出没挪」。 */
+    assert.ok(/const dstMV = m\.dst \+ dOff, srcMV = m\.src \+ sOff;/.test(pv),
+      '预览对离底值做了额外加工（应与导出同一个原样取值 + 槽偏移）');
     /* v0.9.235：导出也改成原样取值（不再 Math.max(0, …)） */
     assert.ok(/const dstMV = mv\.dst, srcMV = mv\.src;/.test(ev),
       '导出对离底值做了额外加工（应与预览同一个原样取值）');
@@ -5866,7 +5868,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 旧的抬高量推算必须删干净 */
     assert.ok(!/botLines/.test(mg) && !/stackOf/.test(mg), 'v0.9.225/226 的行数重算路径还在');
     assert.ok(!/C\.assStackMV\(/.test(mg) && !/C\.assTopMV\(/.test(mg), '仍在调用旧的抬高量函数');
-    assert.ok(/const dstMV = m\.dst, srcMV = m\.src;/.test(mg), '预览未取两个离底值');
+    assert.ok(/const dstMV = m\.dst \+ dOff, srcMV = m\.src \+ sOff;/.test(mg), '预览未取两个离底值');
     /* 预览与导出必须同口径：同一对数值 */
     assert.ok(/mv: srcMV \+ sOff \}/.test(mg) && /mv: dstMV \+ dOff \}/.test(mg), '导出的 mv 与预览取值不同源');
   });
@@ -6400,7 +6402,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const ev = mgE.slice(mgE.indexOf('function buildAssEvents(){'), mgE.indexOf('function buildExport(){'));
     assert.ok(/const st = assStyleOf\(\), m = assMVs\(\)/.test(pv), '预览没读 assMVs()');
     assert.ok(/const mv = assMVs\(\);/.test(ev), '导出没读 assMVs()');
-    assert.ok(/const dstMV = m\.dst, srcMV = m\.src;/.test(pv), '预览不是原样取值');
+    assert.ok(/const dstMV = m\.dst \+ dOff, srcMV = m\.src \+ sOff;/.test(pv), '预览不是原样取值');
     assert.ok(/const dstMV = mv\.dst, srcMV = mv\.src;/.test(ev), '导出不是原样取值');
     /* 样式层与导入换算也不许再有 Math.max(0,…) / [0,1080] */
     assert.ok(!/Math\.max\(0, m\.(?:dst|src)\)/.test(mgE), 'merge.html 仍有 Math.max(0, m.*)');
@@ -7359,11 +7361,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.249/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.249/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.249/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.249/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.249/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.250/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.250/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.250/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.250/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.250/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
@@ -7673,7 +7675,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：主站一个字节不动 —— 槽/筛选的 id 只出现在 merge 页', () => {
-    ['slotBar', 'mApplySlot', 'mFilterText', 'slotEdit', 'filterBar'].forEach(id => {
+    ['slotBar', 'mFilterText', 'slotEdit', 'filterBar', 'selDock'].forEach(id => {
       assert.ok(mg.indexOf(id) > 0, 'merge.html 缺 ' + id);
       assert.ok(html.indexOf(id) < 0, '主站 index.html 出现了 ' + id + '（说好主站不动）');
     });
@@ -7715,7 +7717,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       ['modeMono', 'slotTitle', 'slotViewDiff', 'slotViewAll', 'slotAddParam', 'slotInherit',
        'slotOverride', 'slotCancel', 'slotModified', 'slotRestore', 'slotNarration', 'slotLyric',
        'slotSfx', 'slotEmphasis', 'filterPh', 'filterShort', 'filterFast', 'filterHint',
-       'applyBar', 'applyAll', 'lblAssItalic', 'monoCol', 'filterSelRow'].forEach(k => {
+       'applyAll', 'lblAssItalic', 'monoCol', 'filterSelRow',
+       'slotPvTitle', 'slotPvOn', 'slotPvBase', 'slotPvNone', 'selDockAllTip'].forEach(k => {
         assert.ok(D[k] != null && D[k] !== '', lang + ' 缺 ' + k);
       });
     });
@@ -7734,7 +7737,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('v0.9.245：预览按这条 cue 的槽画（预览 = 导出，不许各画一套）', () => {
     /* ⚠️ 真 bug：renderVttPv 只认 vttStyleOf()，套了槽的行在导出里是灰的、预览里还是白的。 */
     const pv = mg.slice(mg.indexOf('function renderVttPv(){'), mg.indexOf('function vttPresetLabel(){'));
-    assert.ok(/const sid0 = parts\[0\]\.slot \|\| 'default';/.test(pv), '预览没读这条 cue 的槽');
+    /* v0.9.250：加了「面板内对照预览」的目标覆盖，取值形式变了，但仍然是「这条 cue 的槽」 */
+    assert.ok(/const sid0 = \(T\.slotOverride != null\) \? \(T\.slotOverride \|\| 'default'\) : \(parts\[0\]\.slot \|\| 'default'\);/.test(pv),
+      '预览没读这条 cue 的槽');
     assert.ok(/const stBase = slotOn \? slotVttStyle\(sid0, 'dst'\) : vttStyleOf\(\);/.test(pv), '预览没按槽取样式');
     assert.ok(/slotVttSettings\(sid0\)/.test(pv), '预览的纵向位置没跟导出同一条 cue settings');
     /* ⚠️ 沿用/三态的判据必须留在循环里的 st 上 —— 238/239/241 三批单测按 st. 扫函数体，别改名 */
@@ -7918,7 +7923,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/data-dock-slot="' \+ esc\(id\)/.test(mg), 'dock 里没有槽胶囊');
     assert.ok(/applySlotToSelected\(c\.getAttribute\('data-dock-slot'\)\)/.test(mg), '点槽没走同一个应用函数');
     /* 老的应用条不能丢（功能不减） */
-    assert.ok(/id="applyBar"/.test(mg) && /id="mApplyBtn"/.test(mg), '原应用条被删了');
+    /* v0.9.250：应用条**是有意删掉的**（贴底条已经是「勾行 → 点胶囊」一步到位），
+       能力不许缺：「套到选中行」在贴底条的胶囊上，「整篇套用」在贴底条右端。 */
+    assert.ok(!/id="applyBar"/.test(mg) && !/id="mApplySlot"/.test(mg), '旧应用条又回来了（与贴底条语义重叠）');
+    assert.ok(/data-dock-slot="/.test(mg), '贴底条缺「套到选中行」的胶囊');
+    assert.ok(/data-dock-all="1"/.test(mg), '贴底条缺「整篇套用」');
   });
 
   t('v0.9.248：i18n 新词条四语齐全', () => {
@@ -7986,6 +7995,139 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const iOn = mg.indexOf('.slot-chip.on{'), iFilt = mg.indexOf('.slot-chip.filt');
     assert.ok(iOn > 0 && iFilt > iOn, '⚠️ 筛选态规则必须排在 .slot-chip.on 之后（同特异性，后被覆盖）');
     assert.ok(/\.slot-chip\.filt,\.slot-chip\.on\.filt\{/.test(mg), '缺 .on.filt 提权兜底');
+  });
+
+  /* ================= v0.9.250：应用条合并 + 槽能看见效果 =================
+     用户 10-09 提的两点：
+     ① 贴底条上线后，旧的「对选中的 N 行应用 / 下拉 / 应用 / 整篇套用」重复了；
+     ② 样式槽看不到效果，用户不知道一个槽能干什么。 */
+  t('v0.9.250：旧应用条删除，能力全部落在贴底条上', () => {
+    assert.ok(!/id="applyBar"/.test(mg), '旧应用条又回来了（与贴底条语义重叠）');
+    /* 「整篇套用」是旧条子唯一独有的能力 → 必须挪到贴底条右端，且文案里带槽名 */
+    assert.ok(/<button type="button" class="btn btn-sm sd-all" data-dock-all="1"/.test(mg), '贴底条缺「整篇套用」按钮');
+    assert.ok(/t\('applyAll', slotLabel\(S\.style\.cur\)\)/.test(mg), '「整篇套用」没写清套的是哪个槽');
+    assert.ok(/applySlotToAll\(S\.style\.cur\)/.test(mg), '贴底条的整篇套用没接 applySlotToAll');
+    /* ⚠️ .sd-all 拿走 margin-left:auto，.sd-clr 不能再要 —— 两个都要等于各占一半、中间裂开 */
+    assert.ok(/\.sel-dock \.sd-all\{margin-left:auto\}/.test(mg), '整篇套用没顶到右端');
+    assert.ok(/\.sel-dock \.sd-clr\{margin-left:0\}/.test(mg), '两个右端按钮都抢 auto（中间会裂开）');
+    /* 删除要彻底：下拉与它的同步代码一起走，不许留孤立的 DOM 引用 */
+    assert.ok(!/mApplySlot|mApplyBtn|mApplyAll|applyLabel/.test(mg), '还留着应用条的残骸');
+  });
+
+  t('v0.9.250：ASS 预览按这条 cue 的槽画（此前 ASS 侧完全看不到槽）', () => {
+    /* ⚠️ 真缺口：renderVttPv 早就按槽画了，ASS 预览却只读面板参数 ——
+       同一个槽，VTT 预览能看出淡色、ASS 预览还是白字，等于「导出是灰的、预览是白的」。 */
+    const pv = mg.slice(mg.indexOf('function renderAssPv(){'), mg.indexOf('function baseName(){'));
+    assert.ok(/const sid = \(T\.slotOverride != null\) \? T\.slotOverride : \(samp\.slot \|\| 'default'\);/.test(pv),
+      'ASS 预览没取槽');
+    /* 必须读 slotAssSpec（= formatAss 的 extraStyles 用的那一个），不许预览自己拼一份 */
+    assert.ok(/const spec = slotAssSpec\(sid, p\);/.test(pv), 'ASS 预览没走导出同一份 spec');
+    assert.ok(/const dOff = \(dDst && dDst\.dMV != null\)/.test(pv) && /mv: \(p === 'dst'\) \? dstMV : srcMV/.test(pv),
+      '槽的垂直偏移没进预览');
+    /* 样例必须带出它是哪一行的槽 */
+    const sm = mg.slice(mg.indexOf('function assPvSample(){'), mg.indexOf('function renderAssPv(){'));
+    assert.ok(/slot: slot \}/.test(sm) || /slot:/.test(sm), 'assPvSample 没带出槽');
+    /* ⚠️ 斜体：VTT 那半一直在画、ASS 那半从来不画（paint 里根本没有 fontStyle）——
+       导出的 Style 里 Italic 是写了的，于是「预览是正的、导出是斜的」。两条分支都要带 italic。 */
+    assert.ok(/css\.fontStyle = o\.italic \? 'italic' : 'normal';/.test(pv), 'ASS 预览根本不画斜体');
+    assert.ok(/italic: \(spec\.italic === -1\)/.test(pv), '槽那条分支没带出 italic');
+    assert.ok(/italic: !!st\[p\+'Italic'\]/.test(pv), '基础样式那条分支没带出 italic');
+  });
+
+  t('v0.9.250：贴底条 —— 主操作在最右，别把「清除」放在伸手就点到的位置', () => {
+    /* 实测（外网）抓到：清除排在整篇套用右边，用户点最右会一下把选中的行全丢了。 */
+    const i0 = mg.indexOf("d.innerHTML = '<span class=\"sd-n\"");
+    const dk = i0 < 0 ? '' : mg.slice(i0, i0 + 1400);
+    assert.ok(dk.indexOf('sd-clr') > 0 && dk.indexOf('sd-all') > dk.indexOf('sd-clr'), '「清除」排在主操作右边了');
+  });
+
+  t('v0.9.250：槽 → 预览的取色换算必须与导出严格互逆', () => {
+    /* ⚠️ ASS 的颜色是 &HAABBGGRR（BGR 倒着存）、alpha 是 00=不透明，
+       换算写错就是「导出灰、预览白」这类最难查的假象。这里直接跑一遍往返。 */
+    const src = mg.slice(mg.indexOf('function assAlphaHex(pct){'), mg.indexOf('function slotAssSpec('));
+    /* hexToAss 定义在后面，单独抠出来一起跑（往返测试两边都要有） */
+    const h2a = /function hexToAss\(h\)\{[\s\S]*?\n\}/.exec(mg);
+    assert.ok(src.length > 200 && h2a, '抠不到换算函数');
+    const F = eval('(function(){' + src + h2a[0] + ' return { ah: assAlphaHex, ap: assAlphaPct, ch: assColHex, ha: hexToAss }; })()');
+    assert.ok(F.ap('00') === 100 && F.ap('FF') === 0, 'ASS alpha 的 00/FF 语义反了');
+    [0, 30, 70, 100].forEach(p => assert.ok(Math.abs(F.ap(F.ah(p)) - p) <= 1, p + '% 往返漂了'));
+    assert.strictEqual(F.ch('&H00FFFFFF'), '#FFFFFF');
+    assert.strictEqual(F.ch('&H0000FF'), '#FF0000');           /* BGR 倒着装：别当 RGB 读 */
+    assert.strictEqual(F.ch('&H80000000'), '#000000');
+    ['#378ADD', '#B0B0B0', '#FFFFFF'].forEach(c =>
+      assert.strictEqual(F.ch(F.ha(c)), c, c + ' 往返不一致'));
+  });
+
+  t('v0.9.250：胶囊里的「Aa」用槽自己的参数画', () => {
+    assert.ok(/function slotAaHtml\(id\)\{/.test(mg), '缺效果字生成器');
+    const fn = mg.slice(mg.indexOf('function slotAaHtml(id){'), mg.indexOf('/* ---------- 槽栏 ---------- */'));
+    assert.ok(/const col = d\.color \|\| s\.color/.test(fn), 'Aa 没优先用槽覆盖的文字色（音效的淡色就这么来的）');
+    assert.ok(/d\.italic \? 'font-style:italic;'/.test(fn) && /d\.bold \? 'font-weight:700;'/.test(fn),
+      'Aa 没跟着槽的斜体/粗体走');
+    assert.ok(/d\.dMV != null/.test(fn), '带垂直偏移的槽没有标记');
+    /* ⚠️ 白底上画 #B0B0B0 会像「禁用」，必须用近黑底（与成片同底）才看得出「它是淡的」 */
+    assert.ok(/background:#0A0A0E/.test(fn), 'Aa 底色不是成片那种近黑（淡色槽会看着像禁用）');
+    /* 槽栏与贴底条两处都要用 */
+    const slots = mg.slice(mg.indexOf('function renderSlots(){'), mg.indexOf('function renderSlotEdit(){'));
+    const dock = mg.slice(mg.indexOf('function renderSelDock(){'), mg.indexOf('/* ================= v0.9.245'));
+    assert.ok(/slotAaHtml\(id\)/.test(slots), '槽栏胶囊没换效果字');
+    assert.ok(/slotAaHtml\(id\)/.test(dock), '贴底条胶囊没换效果字');
+  });
+
+  t('v0.9.250：✎ 面板里的对照预览 —— 复用主预览的代码，不另写渲染器', () => {
+    assert.ok(/id="slotPv"/.test(mg) && /id="slotPvScreen"/.test(mg), '缺面板内预览的容器');
+    assert.ok(/id="slotPvOn"/.test(mg) && /id="slotPvBaseBtn"/.test(mg), '缺「套用这个槽 / 基础样式」切换');
+    /* ⚠️ 关键：同一段绘制代码 + 可切换目标。写第二套渲染器必然漂移，那就是「预览≠导出」复发。 */
+    assert.ok(/function pvTarget\(role\)\{ return PV_MINI \? miniPvEls\(role\) : mainPvEls\(role\); \}/.test(mg),
+      '预览没有「可切换目标」这一层');
+    assert.ok(/const T = pvTarget\('ass'\);\n  const box = T\.box, scr = T\.scr, l1 = T\.l1/.test(mg), 'renderAssPv 没走目标切换');
+    assert.ok(/const T = pvTarget\('vtt'\);\n  const box = T\.box, scr = T\.scr, cue = T\.cue/.test(mg), 'renderVttPv 没走目标切换');
+    /* 重入闸：mini 渲染里 renderAssPv 结尾还会再叫一次 renderSlotPvMini */
+    assert.ok(/^var PV_MINI = false;$/m.test(mg), '缺 PV_MINI');
+    assert.ok(/function renderSlotPvMini\(\)\{\n  if \(PV_MINI\) return;/.test(mg), '缺重入闸（会无限递归）');
+    /* ⚠️ 共用一块画布时，两个渲染器都会写 box.style.display ——
+       必须给 mini 一个丢弃对象，否则后跑的那个会把前一个刚画的画面又隐藏掉 */
+    assert.ok(/const sink = \{ style: \{\} \};/.test(mg), 'mini 的 box 不是丢弃对象（画面会被另一个渲染器隐藏）');
+    /* 主预览结尾顺手刷面板预览，参数一改两处一起动 */
+    assert.ok((mg.match(/renderSlotPvMini\(\);/g) || []).length >= 3, 'renderSlotPvMini 没有接进渲染链路');
+    /* 无样式的格式（SRT / 无样式 VTT）要说清楚，不能留一块黑屏 */
+    assert.ok(/slotPvNone/.test(mg) && /t\('slotPvNone'\)/.test(mg), 'SRT 等格式没有提示');
+  });
+
+  t('v0.9.250：面板预览的两半必须互相让位（实测：切到 VTT 时 cue 一直不亮）', () => {
+    /* ⚠️ 面板里 ASS 画的两行与 VTT 画的 cue 挤在**同一块** .slot-pv-screen 上，
+       谁生效谁负责把对方收起来。只把「自己那套元素」交给渲染器的话，
+       另一半点不亮 —— 250 实测就是这么挂的：切到 VTT 后 #slotPvCue 一直停在 HTML 里那个 display:none。 */
+    assert.ok(/return \{ box:sink, scr:\$\('slotPvScreen'\), l1:\$\('slotPvLine1'\), l2:\$\('slotPvLine2'\), cue:\$\('slotPvCue'\), tag:null, slotOverride:ov \};/.test(mg),
+      'mini 目标没把两套元素都交出去（另一半点不亮）');
+    assert.ok(/if \(T\.cue\) T\.cue\.style\.display = 'none';/.test(mg), 'ASS 生效时没把 VTT 的 cue 收起来');
+    assert.ok(/if \(cue\) cue\.style\.display = '';/.test(mg), 'VTT 生效时没把 cue 打开（它会一直是隐藏的）');
+    assert.ok(/if \(T\.l1\) T\.l1\.style\.display = 'none'; if \(T\.l2\) T\.l2\.style\.display = 'none';/.test(mg),
+      'VTT 生效时没把 ASS 两行收起来（两块画面会叠在一起）');
+    /* 前提：cue 在 HTML 里是 display:none，所以「打开」这步只能由渲染器做 */
+    assert.ok(/id="slotPvCue" style="display:none"/.test(mg), '前提变了：cue 的初始隐藏方式');
+  });
+
+  t('v0.9.250：新建槽胶囊不许拼出两个加号（四语文案本来就自带 +）', () => {
+    /* 实测抓到：「+ ' + t('slotNew')」× slotNew='+ 新建槽' = 「++ 新建槽」。
+       约定改为：加号归 i18n 文案管，渲染处一个字都不补。 */
+    assert.ok(/data-slot-new="1" role="button" tabindex="0">' \+ esc\(t\('slotNew'\)\)/.test(mg),
+      'renderSlots 又手工拼了前缀');
+    assert.ok(!/'\+ ' \+ esc\(t\('slotNew'\)\)/.test(mg), '会渲染成「++ 新建槽」');
+    const langs = ['zh-CN', 'zh-TW', 'en', 'ja'];
+    const dict = {};
+    langs.forEach(L => {
+      const m = new RegExp("['\"]?" + L.replace('-', '\\-') + "['\"]?\\s*:\\s*\\{").exec(mg);
+      assert.ok(m, '找不到语块 ' + L);
+      let d = 1, j = m.index + m[0].length;
+      while (d > 0 && j < mg.length) { if (mg[j] === '{') d++; else if (mg[j] === '}') d--; j++; }
+      dict[L] = mg.slice(m.index, j);
+    });
+    langs.forEach(L => {
+      const m = /slotNew:\s*'([^']*)'/.exec(dict[L]);
+      assert.ok(m, L + ' 缺 slotNew');
+      assert.ok(/^\+/.test(m[1]), L + ' 的 slotNew 没自带 + → 渲染处不补就丢了加号：' + m[1]);
+    });
   });
 
   /* ================= v0.9.247：工作台布局 + 空状态示例 ================= */

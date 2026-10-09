@@ -1,5 +1,5 @@
 const WebSocket=require('/Users/jp/.workbuddy/binaries/node/workspace/node_modules/ws'),http=require('http');
-const PORT=9333,PAGE='http://127.0.0.1:8899/merge.html';
+const PORT=9333,PAGE='http://127.0.0.1:3098/merge.html';
 function httpJson(p){return new Promise((res,rej)=>{const r=http.request({host:'127.0.0.1',port:PORT,path:p,method:'PUT'},x=>{let d='';x.on('data',c=>d+=c);x.on('end',()=>{try{res(JSON.parse(d))}catch(e){rej(new Error(d.slice(0,200)))}})});r.on('error',rej);r.end();});}
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{
@@ -43,7 +43,8 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
     槽栏高: ${H('#slotBar')},
     筛选栏y: Math.round(document.getElementById('filterBar').getBoundingClientRect().top+window.scrollY),
     表格wrap高: ${H('.tbl-wrap')},
-    应用条y: Math.round(document.getElementById('applyBar').getBoundingClientRect().top+window.scrollY),
+    应用条y: (function(){var a=document.getElementById('applyBar');return a?Math.round(a.getBoundingClientRect().top+window.scrollY):'(已删)';})(),
+    贴底条y: (function(){var d=document.getElementById('selDock');return getComputedStyle(d).display==='none'?'(未勾选-隐藏)':Math.round(d.getBoundingClientRect().top+window.scrollY);})(),
     结果区总高: ${H('#rep')}
   })`));
   // 勾选前 3 行，量「勾选处 → 应用条」的距离
@@ -56,16 +57,17 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   console.log(await ev(`(function(){
     var cb=document.querySelectorAll('#repRows input[type=checkbox]')[2];
     var r=cb.getBoundingClientRect();
-    var ab=document.getElementById('applyBar').getBoundingClientRect();
+    var ab=document.getElementById('selDock').getBoundingClientRect();
     var sb=document.getElementById('slotBar').getBoundingClientRect();
     return JSON.stringify({
       第3行勾选框视口y: Math.round(r.top),
-      应用条视口y: Math.round(ab.top),
+      贴底条视口y: Math.round(ab.top),
       槽栏视口y: Math.round(sb.top),
-      勾选到应用条距离: Math.round(ab.top-r.top),
+      勾选到贴底条距离: Math.round(ab.top-r.top),
       勾选到槽栏距离: Math.round(sb.top-r.top),
-      应用条在视口内: ab.top>0&&ab.top<window.innerHeight,
-      应用条文案: document.getElementById('applyLabel').textContent
+      贴底条在视口内: ab.top>0&&ab.top<window.innerHeight,
+      应用条: document.getElementById('applyBar')?'(仍在)':'(已删)',
+      贴底条文案: document.getElementById('selDock').textContent.slice(0,40)
     });})()`));
   process.exit(0);
 })().catch(e=>{console.error('ERR',e.message);process.exit(1)});

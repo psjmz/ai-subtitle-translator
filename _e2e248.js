@@ -1,6 +1,6 @@
 /* v0.9.248 真浏览器验证：上传区瘦身 / 槽胶囊筛选 / 贴底选择条 */
 const WebSocket=require('/Users/jp/.workbuddy/binaries/node/workspace/node_modules/ws'),http=require('http');
-const PORT=9333,PAGE='http://127.0.0.1:8899/merge.html';
+const PORT=9333,PAGE='http://127.0.0.1:3098/merge.html';
 function httpJson(p){return new Promise((res,rej)=>{const r=http.request({host:'127.0.0.1',port:PORT,path:p,method:'PUT'},x=>{let d='';x.on('data',c=>d+=c);x.on('end',()=>{try{res(JSON.parse(d))}catch(e){rej(new Error(d.slice(0,200)))}})});r.on('error',rej);r.end();});}
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 let pass=0,fail=0;
@@ -116,8 +116,18 @@ const ok=(c,m)=>{ if(c){pass++;console.log('  ✓ '+m);} else {fail++;console.lo
   ok(e7.cur==='sfx' && e7.open,'cur 切到 sfx 且编辑面板展开');
   ok(e7.filter==='','小铅笔不触发筛选');
 
-  console.log('\n— 8. 老功能还在 —');
-  ok(await ev(`!!document.getElementById('applyBar') && !!document.getElementById('mApplyBtn')`)===true,'原应用条仍在');
+  console.log('\n— 8. v0.9.250：旧应用条已删，「整篇套用」挪进贴底条 —');
+  ok(await ev(`!document.getElementById('applyBar') && !document.getElementById('mApplySlot') && !document.getElementById('mApplyBtn')`)===true,'旧应用条已整块删除');
+  /* dock 只在有勾选时出现 —— 先勾一行再找按钮 */
+  await ev(`(function(){var cb=document.querySelector('#repRows input[data-ri]');cb.click();return 1})()`); await wait(500);
+  ok(await ev(`!!document.querySelector('#selDock [data-dock-all="1"]')`)===true,'贴底条里有「整篇套用」按钮');
+  const rowN=await ev(`S.rows.length`);
+  /* 按钮套的是「当前编辑的槽」→ 先把 cur 切到旁白，文案必须跟着变（这正是它比旧下拉强的地方） */
+  await ev(`(function(){ensureStyle();S.style.cur='sfx';renderSelDock();return 1})()`); await wait(200);
+  const lbl0=await ev(`document.querySelector('#selDock [data-dock-all="1"]').textContent`);
+  ok(/音效|sfx/i.test(String(lbl0)),'按钮文案跟着 cur 走（参考值：'+lbl0+'）');
+  await ev(`(function(){ensureStyle();S.style.cur='narration';renderSelDock();document.querySelector('#selDock [data-dock-all="1"]').click();return 1})()`); await wait(500);
+  ok(await ev(`(S.rows||[]).every(function(r,i){return slotOfRow(i)==='narration';})`)===true,'点它 → 全篇都是旁白槽（'+rowN+' 行）');
   ok(await ev(`!!document.getElementById('mSelAll')`)===true,'全选仍可用');
 
   console.log('\n— 9. JS 异常 —');
