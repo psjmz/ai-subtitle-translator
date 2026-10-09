@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.248/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.249/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.248</.test(html), '首页版本号未升 0.9.245');
-    assert.ok(/class="ver-tag">v0\.9\.248</.test(html), '工作台版本号未升 0.9.245');
-    assert.ok(/srt-core\.js\?v=0\.9\.248/.test(html), 'srt-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.249</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.249</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.249/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.248</.test(mg), 'merge.html 版本未升 0.9.245');
-    assert.ok(/merge-core\.js\?v=0\.9\.248/.test(mg), 'merge-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.249</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.249/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7359,11 +7359,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.248/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.248/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.248/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.248/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.248/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.249/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.249/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.249/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.249/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.249/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
@@ -7899,7 +7899,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/if \(f\.slot && i != null && slotOfRow\(i\) !== f\.slot\) return false;/.test(mg), '缺槽筛选判据');
     assert.ok(/S\.filter\.slot == null/.test(mg), 'filter 没加 slot 字段');
     assert.ok(/const filt = \(S\.filter && S\.filter\.slot === id\)/.test(mg), '胶囊没有筛选态');
-    assert.ok(/\.slot-chip\.filt\{/.test(mg), '筛选态没有样式');
+    /* v0.9.249 起这条规则写成 `.slot-chip.filt,.slot-chip.on.filt{`（提权兜底），别写死单个花括号 */
+    assert.ok(/\.slot-chip\.filt[^{]*\{/.test(mg), '筛选态没有样式');
     /* ⚠️ 「设为当前槽 / 编辑槽」不能被筛掉：小铅笔是独立入口 */
     assert.ok(/data-slot-edit="' \+ esc\(id\)/.test(mg), '缺编辑槽的小铅笔入口');
     assert.ok(/S\.filter\.slot = \(S\.filter\.slot === id\) \? '' : id;/.test(mg), '点胶囊不是 toggle 筛选');
@@ -7935,6 +7936,56 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         assert.ok(new RegExp('[,{\\s]' + k + ":\\s*'").test(dict[L]), L + ' 缺 ' + k);
       });
     });
+  });
+
+  /* ================= v0.9.249：视觉重设计（收敛精修）=================
+     用户原话：「双语处理页面不是一般的难看，整体都需要重新设计一下」。
+     病根是四件事：暖脏灰底没有层级、粉紫渐变到处铺、圆角一律 16px 无主次、卡片没投影只能靠边框。
+     这一版只动外观层（CSS + 按钮图标），不改 id、不改类名、不动业务逻辑。 */
+  t('v0.9.249：设计令牌 —— 灰阶层级 + 品牌粉压深 + 三档圆角', () => {
+    assert.ok(/--acc:#E12D6E/.test(mg), '品牌粉没压深（#E12D6E）');
+    assert.ok(/--acc-ink:#C02159/.test(mg), '缺深粉（浅底上的文字/图标用它，纯 #E12D6E 偏亮）');
+    assert.ok(/--card-2:#FAFAFC/.test(mg) && /--line:#E9E9EF/.test(mg), '灰阶没换成冷中性（旧的是暖灰 #F8F7F5）');
+    assert.ok(/--r-card:14px; --r-ctl:9px; --r-btn:10px/.test(mg), '圆角没分成卡片/控件/按钮三档');
+    assert.ok(/--ctl-h:34px/.test(mg), '控件高度没有统一令牌');
+    assert.ok(/--sh-card:/.test(mg) && /--sh-btn:/.test(mg), '缺卡片/按钮投影令牌（层级只能靠边框撑）');
+    /* ⚠️ 旧版 4 处背景用 95° 粉紫渐变（logo / 主按钮 / 格式卡选中 / 标题渐变字），
+       是「廉价感」的头号来源。--grad 仍被 4 处引用，所以保留变量名、但必须收敛成实色。 */
+    assert.strictEqual((mg.match(/linear-gradient\(/g) || []).length, 0, '还有渐变没撤掉');
+    assert.ok(/--grad:#E12D6E/.test(mg), '--grad 没收敛成实色（4 处引用会画回渐变）');
+  });
+
+  t('v0.9.249：按钮 emoji 全换成 CSS 伪元素图标（与主站 v0.9.204 同款做法）', () => {
+    /* emoji 在 Mac/Windows/Android 上字形、字重、行高都不同，和字重体系打架 */
+    assert.strictEqual((mg.match(/[🔗🔧⬇☆↺⇅]/g) || []).length, 0, '按钮或词条里还留着 emoji');
+    assert.ok(/#btnDownload::before\{[\s\S]{0,400}mask-image:url\("data:image\/svg\+xml/.test(mg),
+      '下载按钮的箭头没换成 SVG');
+    assert.ok(/#btnMerge::before\{/.test(mg), '「合并预览」缺图标（三种模式共用，图形必须中性）');
+    assert.ok(/#btnSwap::before\{/.test(mg), '「原文/译文互换」缺图标（去掉就只剩一句话）');
+    /* ⚠️ 图标只能画在伪元素上：data-i18n 是 textContent 赋值，写进词条会被冲掉 */
+    assert.ok(/btnDownload:'下载字幕'/.test(mg), '下载文案里还有图标字符');
+  });
+
+  t('v0.9.249：单语模式的两处布局错位（视觉改版时实测发现）', () => {
+    /* ⚠️ .frow 是两列栅格。隐藏了「译文整体偏移」的内容却留下标签，
+       后面的「导出格式」标签会被顶到第 2 格、格式卡退进 170px 的窄列里挤成竖排文字。 */
+    assert.ok(/'shiftLbl','shiftRow','biMaxWLbl','biMaxWRow','orderLbl','orderRow'/.test(mg),
+      '单语模式漏收「译文整体偏移」标签（格式卡会被挤扁）');
+    /* 调整 / 单语模式只有一份输入，输入区收回单列，别留半边空白 */
+    assert.ok(/\.grid2\.single\{grid-template-columns:1fr\}/.test(mg), '缺「单列」栅格类');
+    assert.ok(/classList\.toggle\('single', !isMerge\)/.test(mg), '切模式没同步单列类');
+  });
+
+  t('v0.9.249：筛选态与当前槽必须一眼区分', () => {
+    /* 旧版两者都是浅粉底粉字，用户看不出「屏上这些行是被筛过的」 */
+    assert.ok(/\.slot-chip\.filt[^{]*\{[^}]*background:var\(--acc\)/.test(mg), '筛选态没做成实心（与 .on 撞脸）');
+    assert.ok(/\.slot-chip\.on\{[^}]*background:var\(--acc-weak\)/.test(mg), '当前槽不是浅粉底');
+    /* ⚠️ 特异性陷阱：`.slot-chip.filt` 与 `.slot-chip.on` 都是 (0,2,0)，谁写在后面谁生效。
+       249 首发把 filt 写在 on 前面 → 点的若是「当前槽」那个胶囊，会被 .on 的浅粉底盖回去，
+       筛选态当场消失（外网实测撞到）。这条断言钉死顺序，并允许用 .on.filt 提权兜底。 */
+    const iOn = mg.indexOf('.slot-chip.on{'), iFilt = mg.indexOf('.slot-chip.filt');
+    assert.ok(iOn > 0 && iFilt > iOn, '⚠️ 筛选态规则必须排在 .slot-chip.on 之后（同特异性，后被覆盖）');
+    assert.ok(/\.slot-chip\.filt,\.slot-chip\.on\.filt\{/.test(mg), '缺 .on.filt 提权兜底');
   });
 
   /* ================= v0.9.247：工作台布局 + 空状态示例 ================= */

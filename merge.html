@@ -10,22 +10,39 @@
 <meta name="theme-color" content="#EC4899">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
-  /* 视觉系统与 index.html 同源：暖中性框架 + 粉紫渐变点缀 */
+  /* ================= v0.9.249：视觉系统「收敛精修」 =================
+     旧系统的问题：暖脏灰底（#F8F7F5）没有灰阶层级、粉紫渐变到处铺
+     （logo / 主按钮 / 格式卡选中态 / 标题渐变字），圆角一律 16px 无主次，
+     卡片无阴影靠边框撑层次 → 整页看起来「糊、平、花」。
+     这一版只改设计令牌与外观层：
+       ① 换成冷中性灰阶，建立 bg / card / card-2 / stage 四级
+       ② 品牌粉压深到 #E12D6E（实色），大面积渐变全部撤掉，只在强调点保留
+       ③ 圆角分三档：卡片 14 / 控件 9 / 按钮 10，控件统一 34px 高
+       ④ 卡片给极淡投影，层级靠投影 + 底色而不是靠渐变
+     ⚠️ 只动 CSS：不改任何 id、不改任何类名、不动任何 JS 逻辑。
+        （.drop-zone 的 padding、.sel-dock 的 sticky/bottom 等被单测断言，原样保留） */
   :root{
-    --bg:#F8F7F5; --card:#FFFFFF; --card-2:#F7F6F4;
-    --line:#E8E7E4; --line-strong:#D9D8D4;
-    --ink:#39363B; --sub:#6F6C72; --mut:#A5A2A8;
-    --acc:#EC4899; --acc2:#F070AE; --acc-weak:#FDEDF4; --acc-line:#F6C9DD;
-    --grad:linear-gradient(95deg,#FF6B9D,#A78BFA); --lav:#8B5CF6;
-    --ok:#10B981; --ok-weak:#E4F5EB;
-    --warn:#C77C0A; --warn-weak:#FFF4E5;
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3; --bg-weak:#FAFAFC;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#E12D6E; --acc-weak:#FDF1F6; --acc-line:#F6CADC; --acc-ink:#C02159;
+    /* ⚠️ --grad 保留变量名（4 处引用），但收敛成实色：不再出现粉紫渐变 */
+    --grad:#E12D6E; --acc2:#E12D6E; --lav:#8B5CF6;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
     --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(225,45,110,.20);
+    --ctl-h:34px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);
-    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
-  button{font-family:inherit}
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  svg{display:block}
   .wrap{max-width:1400px;margin:0 auto;padding:0 24px}
   /* v0.9.247：工作台布局 —— 左列「设置 + 结果」，右列「预览 + 导出」常驻右侧。
      此前整页单列、预览排在最末一张卡：改完参数要滚 2317px 才看得见效果（1440×900 实测）。
@@ -44,57 +61,70 @@
        限宽 560 居中：与右栏那档尺寸手感一致，也不再出现「一大块黑框」。 */
     .ass-pv-screen,.vtt-pv-screen{max-width:560px;margin:0 auto}
   }
-  .lnav{display:flex;align-items:center;gap:18px;padding:18px 0 8px;flex-wrap:wrap}
-  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px}
-  .logo-mark{width:30px;height:30px;border-radius:9px;background:var(--grad);color:#fff;
+  .lnav{display:flex;align-items:center;gap:18px;padding:16px 0 6px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;letter-spacing:-.2px}
+  .logo-mark{width:30px;height:30px;border-radius:9px;background:var(--acc);color:#fff;
     display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
-  .ver{font-size:11px;color:var(--mut);font-weight:500}
-  .lnav a{color:var(--sub);text-decoration:none;font-size:13px;display:inline-flex;align-items:center;gap:5px}
-  .lnav a:hover{color:var(--acc)}
+  .ver{font-size:11px;color:var(--mut);font-weight:500;border:1px solid var(--line);
+    border-radius:99px;padding:1px 7px}
+  .lnav a{color:var(--sub);text-decoration:none;font-size:12.5px;display:inline-flex;align-items:center;gap:5px}
+  .lnav a:hover{color:var(--acc-ink)}
   .lnav .spacer{flex:1}
-  .lnav select{border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
-    border-radius:8px;padding:5px 8px;font-size:12px}
-  .hero{padding:26px 0 10px;text-align:center}
-  .hero h1{font-size:30px;margin:0 0 8px;letter-spacing:-.5px}
-  .hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .hero p{color:var(--sub);margin:0;font-size:14px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  .hero{padding:24px 0 0;text-align:center}
+  .hero h1{font-size:30px;line-height:1.25;margin:0 0 10px;letter-spacing:-.9px;font-weight:700}
+  /* 渐变字在浅底上会「发虚」，且与主按钮的实色不是一个重量级 —— 换成实色强调 */
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  /* balance 让两行长度接近，避免「整 / 体偏移」这种把词拆到两地读不顺的断点 */
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:820px;line-height:1.7;text-wrap:balance}
 
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+  /* 调整 / 单语模式只有一份输入（#dstCard 被隐藏），左半边空着像掉了块 —— 收回单列 */
+  .grid2.single{grid-template-columns:1fr}
   @media (max-width:760px){.grid2{grid-template-columns:1fr}}
   /* v0.9.222：模式切换（合并两份 / 调整一份双语） */
-  .mode-tabs{display:flex;gap:8px;margin-top:20px}
+  .mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
   .mtab{flex:1;cursor:pointer}
   .mtab input{position:absolute;opacity:0;pointer-events:none}
-  .mtab span{display:block;text-align:center;padding:11px 12px;border-radius:12px;font-size:14px;font-weight:600;
-    background:var(--card);color:var(--sub);border:1px solid var(--line);transition:all .15s}
-  .mtab:hover span{border-color:var(--line-strong)}
-  .mtab.on span{background:var(--acc);color:#fff;border-color:var(--acc)}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px}
-  .card h2{font-size:14px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
-  .card h2 .n{width:22px;height:22px;border-radius:99px;background:var(--acc-weak);color:var(--acc);
-    display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
-  .drop{border:1.6px dashed var(--line-strong);border-radius:12px;padding:18px 14px;text-align:center;
-    cursor:pointer;transition:border-color .15s,background .15s}
+  .mtab span{display:flex;align-items:center;justify-content:center;min-height:46px;padding:8px 12px;
+    border-radius:var(--r-btn);font-size:13.5px;font-weight:600;
+    background:var(--card);color:var(--body);border:1px solid var(--line-strong);
+    transition:border-color .14s,background .14s,color .14s}
+  .mtab:hover span{border-color:var(--acc-line)}
+  /* 选中态：浅粉底 + 深粉字（旧版是整块实色粉 + 白字，三条并排时太吵） */
+  .mtab.on span{background:var(--acc-weak);color:var(--acc-ink);border-color:var(--acc);font-weight:650}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    padding:18px 20px 16px;box-shadow:var(--sh-card)}
+  .card h2{font-size:13.5px;font-weight:650;letter-spacing:-.1px;margin:0 0 14px;display:flex;align-items:center;gap:9px}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:none}
+  .drop{border:1px dashed var(--line-strong);border-radius:var(--r-ctl);padding:18px 14px;text-align:center;
+    cursor:pointer;transition:border-color .14s,background .14s}
   .drop:hover,.drop.over{border-color:var(--acc);background:var(--acc-weak)}
 /* v0.9.248：上传区瘦身 —— 大虚线块（82px）压成一行紧凑条，粘贴框默认收起。
    两卡从 233px 收到约 130px，把第一屏还给「合并设置」。
    ⚠️ .drop 是重载类名（表格里「被丢弃的行」也用 .drop），新规则一律挂在 .drop-zone 上，别污染表格。 */
-.up-card{padding:14px 14px 12px}
-.up-card h2{margin-bottom:10px}
-.drop-zone{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:9px;text-align:left}
-.drop-zone .dz-ico{font-size:14px;flex:none;line-height:1}
-.drop-zone .dz-txt{font-size:12.5px}
+.up-card{padding:16px 16px 14px}
+.up-card h2{margin-bottom:11px}
+/* ⚠️ padding:9px 11px 被单测断言（上传区瘦身），改视觉别动这个值 */
+.drop-zone{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--r-ctl);text-align:left;
+  background:var(--card-2)}
+.drop-zone .dz-ico{display:flex;flex:none;color:var(--acc-ink)}
+.drop-zone .dz-txt{font-size:12.5px;font-weight:500;color:var(--body)}
 .drop-zone .dz-fmt{display:inline;color:var(--mut);font-size:11.5px;margin:0 0 0 auto}
+.drop-zone:hover{border-color:var(--acc);background:var(--acc-weak)}
 .drop-zone.has{border-style:solid;border-color:var(--acc);background:var(--acc-weak)}
-.drop-zone.has .dz-txt{color:var(--acc)}
-.up-row{display:flex;align-items:center;gap:8px;margin-top:8px}
-.up-row .dz-file{font-size:11.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.drop-zone.has .dz-txt{color:var(--acc-ink)}
+.up-row{display:flex;align-items:center;gap:8px;margin-top:9px}
+.up-row .dz-file{font-size:11.5px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 textarea.paste-box{margin-top:8px;min-height:96px}
   .drop b{display:block;font-size:13.5px}
   .drop span{display:block;color:var(--mut);font-size:12px;margin-top:3px}
-  .card textarea{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;
-    font:12px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;resize:vertical;min-height:64px;color:var(--ink)}
-  .card textarea:focus{outline:2px solid var(--acc-line);border-color:var(--acc-line)}
+  .card textarea{width:100%;margin-top:10px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:9px 11px;font:12px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    resize:vertical;min-height:64px;color:var(--ink);background:var(--card)}
+  .card textarea:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-weak)}
   .parse-ok{margin-top:9px;font-size:12px;color:#0B7A5C;background:var(--ok-weak);
     border-radius:8px;padding:6px 10px;display:none}
   .parse-bad{margin-top:9px;font-size:12px;color:var(--del);background:var(--del-weak);
@@ -103,46 +133,49 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .opts{margin-top:16px}
   .frow{display:grid;grid-template-columns:170px 1fr;gap:10px 14px;align-items:center}
   @media (max-width:640px){.frow{grid-template-columns:1fr}}
-  .flbl{font-size:12.5px;color:var(--sub);font-weight:600}
-  .frow select,.frow input[type=number]{border:1px solid var(--line-strong);background:var(--card);
-    color:var(--ink);border-radius:8px;padding:7px 10px;font-size:13px;width:100%;max-width:340px}
-  .hint{font-size:11.5px;color:var(--mut);margin-top:4px;max-width:420px;line-height:1.55}
+  .flbl{font-size:12.5px;color:var(--body);font-weight:600}
+  .frow select,.frow input[type=number]{height:var(--ctl-h);border:1px solid var(--line-strong);background:var(--card);
+    color:var(--ink);border-radius:var(--r-ctl);padding:0 10px;font-size:13px;width:100%;max-width:340px;
+    transition:border-color .14s,box-shadow .14s}
+  .frow select:focus,.frow input[type=number]:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-weak)}
+  .hint{font-size:11.5px;color:var(--mut);margin-top:5px;max-width:440px;line-height:1.6}
   /* v0.9.240：单选改成「胶囊选项」——原生小圆点 + 长文案在设置区里像一堆没收拾的勾选，
      改成整块可点的胶囊，选中态一眼看得见（配对方式 / 上下顺序 / 布局三处共用） */
-  .radios{display:flex;flex-wrap:wrap;gap:7px}
+  .radios{display:flex;flex-wrap:wrap;gap:8px}
   .radios label{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;cursor:pointer;
-    padding:5px 12px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--sub);
-    white-space:nowrap;transition:border-color .15s,color .15s,background .15s}
-  .radios label:hover{border-color:var(--acc-line);color:var(--acc)}
-  .radios label:has(input:checked){border-color:var(--acc);background:var(--acc-weak);color:var(--acc);font-weight:600}
+    height:32px;padding:0 13px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--body);
+    white-space:nowrap;transition:border-color .14s,color .14s,background .14s}
+  .radios label:hover{border-color:var(--acc-line);color:var(--acc-ink)}
+  .radios label:has(input:checked){border-color:var(--acc);background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
   /* 原生小圆点在胶囊里像粒灰芝麻，且尺寸不受控；隐藏它，自绘一个跟随主题的圆点。
      input 仍留在 DOM 里（键盘 Tab / 方向键照常可用），只是视觉上让位给 ::before。 */
   .radios input{position:absolute;width:0;height:0;opacity:0;margin:0;pointer-events:none}
-  .radios label::before{content:'';width:9px;height:9px;border-radius:99px;flex:none;
-    border:1.5px solid var(--line-strong);background:var(--card);transition:border-color .15s,background .15s,box-shadow .15s}
-  .radios label:has(input:checked)::before{background:var(--acc);border-color:var(--acc);
-    box-shadow:0 0 0 3px rgba(236,72,153,.16)}
+  .radios label::before{content:'';width:7px;height:7px;border-radius:99px;flex:none;
+    border:1.5px solid currentColor;background:transparent;opacity:.55;
+    transition:border-color .14s,background .14s,box-shadow .14s}
+  .radios label:has(input:checked)::before{background:currentColor;opacity:1}
   .radios label:has(input:focus-visible){box-shadow:0 0 0 3px var(--acc-weak)}
 
   /* ============ v0.9.240：ASS / VTT 两套面板统一成「卡片式折叠面板」 ============
      此前是灰底裸折叠块：标题条没层次，正文把一堆控件两端对齐摊开，中间留一条几百 px 的空白，
      两列看起来像散架。现在：标题条有底色与方向指示，正文按「分组标题 + 字段行」排版。 */
-  details.ass,details.vtt{margin-top:14px;border:1px solid var(--line);border-radius:14px;background:var(--card);
-    box-shadow:0 1px 2px rgba(24,18,28,.04),0 12px 30px -26px rgba(24,18,28,.5);overflow:hidden}
+  details.ass,details.vtt{margin-top:14px;border:1px solid var(--line);border-radius:var(--r-card);
+    background:var(--card);box-shadow:var(--sh-card);overflow:hidden}
   details.ass summary,details.vtt summary{cursor:pointer;display:flex;align-items:center;gap:9px;
-    padding:12px 16px;font-size:13.5px;font-weight:650;color:var(--ink);list-style:none;
-    background:linear-gradient(180deg,var(--card),var(--card-2))}
-  details.ass summary:hover,details.vtt summary:hover{color:var(--acc)}
+    padding:12px 16px;font-size:13px;font-weight:650;color:var(--ink);list-style:none;
+    background:var(--card-2)}
+  details.ass summary:hover,details.vtt summary:hover{color:var(--acc-ink)}
   details.ass summary::-webkit-details-marker,details.vtt summary::-webkit-details-marker{display:none}
-  details.ass summary::before,details.vtt summary::before{content:'';width:7px;height:7px;flex:none;margin-left:1px;
-    border-right:2px solid var(--acc);border-bottom:2px solid var(--acc);transform:rotate(-45deg);transition:transform .18s}
+  details.ass summary::before,details.vtt summary::before{content:'';width:6px;height:6px;flex:none;margin-left:1px;
+    border-right:2px solid var(--acc-ink);border-bottom:2px solid var(--acc-ink);transform:rotate(-45deg);transition:transform .18s}
   details.ass[open] summary::before,details.vtt[open] summary::before{transform:rotate(45deg)}
-  .ass-body,.vtt-body{padding:12px 16px 15px;border-top:1px solid var(--line)}
+  .ass-body,.vtt-body{padding:14px 16px 16px;border-top:1px solid var(--line);background:var(--card)}
   .ass-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
   @media (max-width:640px){.ass-cols{grid-template-columns:1fr}}
-  .ass-col h4,.grp-t{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--acc);letter-spacing:.3px;
-    display:flex;align-items:center;gap:6px}
-  .ass-col h4::before,.grp-t::before{content:'';width:5px;height:5px;border-radius:99px;background:var(--acc);flex:none}
+  .ass-col h4,.grp-t{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--acc-ink);letter-spacing:.3px;
+    display:flex;align-items:center;gap:7px}
+  .ass-col h4::before,.grp-t::before{content:'';width:4px;height:12px;border-radius:2px;background:var(--acc);flex:none}
   .grp-t{margin:15px 0 7px;padding-top:12px;border-top:1px dashed var(--line)}
   /* 左右边距是全局一对，并排两行（与上面两列同宽，视觉上对齐） */
   .mg-row{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
@@ -154,8 +187,10 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .af{display:flex;align-items:center;gap:9px;margin-bottom:5px;padding:2px 6px;border-radius:8px}
   .af:hover{background:var(--card-2)}
   .af label{font-size:12px;color:var(--sub);flex:0 0 88px;line-height:1.3}
-  .af>input[type=number],.af>input[type=text],.af>select{border:1px solid var(--line-strong);border-radius:8px;
-    padding:5px 8px;font-size:12px;background:var(--card);color:var(--ink);min-width:0}
+  .af>input[type=number],.af>input[type=text],.af>select{height:30px;border:1px solid var(--line-strong);
+    border-radius:8px;padding:0 8px;font-size:12px;background:var(--card);color:var(--ink);min-width:0}
+  .af>input[type=number]:focus,.af>input[type=text]:focus,.af>select:focus{outline:none;border-color:var(--acc);
+    box-shadow:0 0 0 3px var(--acc-weak)}
   .af>input[type=number]{flex:0 0 84px;text-align:right;font-variant-numeric:tabular-nums}
   .af>input[type=text]{flex:0 0 116px}
   .af>select{flex:0 1 168px}
@@ -170,17 +205,49 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   /* 「写入样式」关掉时，下面的参数整块变灰且不可点（用户看得见「现在不生效」，不是潜规则） */
   .stylebox.off{opacity:.4;pointer-events:none;filter:grayscale(.35)}
 
-  .actions{margin:20px 0 6px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .btn{border:none;border-radius:11px;padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer;
-    background:var(--grad);color:#fff;box-shadow:0 6px 18px rgba(236,72,153,.25);transition:transform .12s}
-  .btn:hover{transform:translateY(-1px)}
-  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
-  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line-strong);box-shadow:none}
-  .btn.ghost:hover{border-color:var(--acc);color:var(--acc)}
+  .actions{margin:18px 0 6px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  /* 主按钮：实色品牌粉（旧版是 95° 粉紫渐变 + 大范围粉色外发光，整页最吵的一块） */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    height:38px;padding:0 20px;border:1px solid transparent;border-radius:var(--r-btn);
+    font-size:13px;font-weight:600;cursor:pointer;color:#fff;background:var(--acc);
+    box-shadow:var(--sh-btn);transition:filter .14s,background .14s,border-color .14s,color .14s}
+  .btn:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;filter:none}
+  .btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line-strong);box-shadow:none;font-weight:550}
+  .btn.ghost:hover{border-color:var(--acc-line);color:var(--acc-ink);filter:none}
   /* v0.9.231：方案区一排小按钮，不能用 .btn 的大尺寸，否则一排塞不下 */
-  .btn-sm{padding:6px 13px !important;font-size:12.5px !important;border-radius:9px !important;line-height:1.4}
-  .scheme-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
-  .scheme-row select{border:1px solid var(--line-strong);border-radius:8px;padding:5px 8px;font-size:12.5px;
+  .btn-sm{height:30px !important;padding:0 12px !important;font-size:12.5px !important;
+    border-radius:8px !important;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  /* ================= v0.9.249：按钮图标 =================
+     ⚠️ 本页此前是全站唯一还在按钮里塞 emoji 的页面（链接/扳手/箭头/星/回退/互换 六个符号）。
+        emoji 在不同系统上字形/字重/行高都不同，和「收敛精修」的字重体系完全打架；
+        主站 index.html 早在 v0.9.204 就把下载箭头换成了 CSS 伪元素 SVG（mask + currentColor）。
+        这里按同一套做法补齐三个真正需要图标的按钮，其余一律纯文字。
+        ⚠️ 图标用 mask 画，不写进 data-i18n 词条 —— 词条是 textContent 赋值，会被冲掉。 */
+  /* ⚠️ 只给下面点名的 5 个按钮生成伪元素：写 `.btn::before` 会给所有按钮留 14px 空隙 */
+  #btnMerge::before,#btnDownload::before,#btnSwap::before,#btnAssReset::before,#btnVttReset::before{
+    content:'';width:14px;height:14px;flex:none;background:currentColor;
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    -webkit-mask-position:center;mask-position:center;
+    -webkit-mask-size:contain;mask-size:contain}
+  /* 合并预览 = 眼睛（三种模式共用这一个按钮：合并 / 调整 / 单语，文案会变，图标得中性） */
+  #btnMerge::before{
+    -webkit-mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E")}
+  /* 下载 = 下箭头（与主站 #btnDownload::before 同款图形，两页同源） */
+  #btnDownload::before{
+    -webkit-mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v11m0 0 4.5-4.5M12 14l-4.5-4.5M4 19h16'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v11m0 0 4.5-4.5M12 14l-4.5-4.5M4 19h16'/%3E%3C/svg%3E")}
+  /* 原文/译文互换 = 上下双向箭头（这个语义去掉图标就只剩一句话，容易看漏） */
+  #btnSwap::before{
+    -webkit-mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4v13m0 0-3.5-3.5M8 17l3.5-3.5M16 20V7m0 0 3.5 3.5M16 7l-3.5 3.5'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4v13m0 0-3.5-3.5M8 17l3.5-3.5M16 20V7m0 0 3.5 3.5M16 7l-3.5 3.5'/%3E%3C/svg%3E")}
+  /* 两个「恢复默认」按钮原本带一个回退箭头符号 —— 这里只补图标，文字保持原样 */
+  #btnAssReset::before,#btnVttReset::before{
+    -webkit-mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3.5 4.5V10h5.5'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3.5 4.5V10h5.5'/%3E%3C/svg%3E")}
+  .scheme-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .scheme-row select{height:30px;border:1px solid var(--line-strong);border-radius:8px;padding:0 8px;font-size:12.5px;
     min-width:130px;max-width:220px;background:var(--card);color:var(--ink)}
   .af input[type=checkbox]{width:16px;height:16px;accent-color:var(--acc);flex:none}
 
@@ -190,21 +257,22 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     border-radius:11px;background:var(--card-2);flex-wrap:wrap}
   .segbtn{border:none;background:transparent;color:var(--sub);border-radius:8px;padding:6px 13px;
     font-size:12.5px;font-weight:600;line-height:1.4;cursor:pointer;white-space:nowrap;
-    transition:background .15s,color .15s,box-shadow .15s}
-  .segbtn:hover{color:var(--acc)}
-  .segbtn.on{background:var(--card);color:var(--acc);box-shadow:0 1px 4px rgba(24,18,28,.12),0 0 0 1px var(--acc-line)}
+    transition:background .14s,color .14s,box-shadow .14s}
+  .segbtn:hover{color:var(--acc-ink)}
+  .segbtn.on{background:var(--card);color:var(--acc-ink);box-shadow:0 1px 3px rgba(18,18,24,.10),0 0 0 1px var(--acc-line)}
   .segbtn[hidden]{display:none}
   /* v0.9.240：导出格式 = 三张格式卡（顶层只有 SRT / VTT / ASS 三档） */
   .fmt-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:520px}
-  .fmtbtn{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;cursor:pointer;
-    border:1px solid var(--line-strong);background:var(--card);border-radius:12px;padding:9px 12px;
-    transition:border-color .15s,background .15s,box-shadow .15s}
-  .fmtbtn b{font-size:13.5px;font-weight:700;letter-spacing:.3px;color:var(--ink)}
-  .fmtbtn span{font-size:11px;color:var(--mut);line-height:1.35}
-  .fmtbtn:hover{border-color:var(--acc-line);background:var(--acc-weak)}
-  .fmtbtn.on{border-color:transparent;background:var(--grad);box-shadow:0 8px 18px -8px rgba(236,72,153,.6)}
-  .fmtbtn.on b,.fmtbtn.on span{color:#fff}
-  .fmtbtn.on span{opacity:.88}
+  .fmtbtn{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;text-align:left;cursor:pointer;
+    min-height:54px;border:1px solid var(--line-strong);background:var(--card);border-radius:var(--r-ctl);padding:9px 12px;
+    transition:border-color .14s,background .14s}
+  .fmtbtn b{font-size:13px;font-weight:700;letter-spacing:.2px;color:var(--ink)}
+  .fmtbtn span{font-size:10.5px;color:var(--mut);line-height:1.35}
+  .fmtbtn:hover{border-color:var(--acc-line);background:var(--card-2)}
+  /* 选中态：浅粉底 + 深粉字 + 粉边（旧版整块渐变 + 白字 + 大外发光，三张卡一起亮太扎眼） */
+  .fmtbtn.on{border-color:var(--acc);background:var(--acc-weak)}
+  .fmtbtn.on b{color:var(--acc-ink)}
+  .fmtbtn.on span{color:var(--acc-ink);opacity:.8}
   /* 导出区那一排只需认得出格式，省掉副标题、压扁一点，别把下载按钮挤下去 */
   .fmt-seg.sm{max-width:none;grid-template-columns:repeat(3,minmax(0,108px))}
   .fmt-seg.sm .fmtbtn{flex-direction:row;align-items:center;justify-content:center;padding:8px 11px}
@@ -216,18 +284,22 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .rep{display:none;margin-top:16px}
   /* v0.9.247：示例态提示条 —— 蓝底虚线框，与「体检告警 / 通过」的实色块区分开 */
   .demo-tip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--acc-weak);
-    border:1px dashed var(--acc-line);border-radius:10px;padding:8px 12px;margin-bottom:10px;
-    font-size:12.5px;color:var(--acc);line-height:1.5}
+    border:1px dashed var(--acc-line);border-radius:var(--r-ctl);padding:9px 12px;margin-bottom:10px;
+    font-size:12.5px;color:var(--acc-ink);line-height:1.5}
   .demo-tip b{font-weight:700}
-  .rep-band{display:flex;flex-wrap:wrap;gap:10px}
-  .rep-chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 14px;font-size:12.5px}
-  .rep-chip b{font-size:15px;margin-right:4px}
+  .rep-band{display:flex;flex-wrap:wrap;gap:8px}
+  .rep-chip{background:var(--card);border:1px solid var(--line);border-radius:var(--r-ctl);
+    padding:7px 13px;font-size:12.5px;box-shadow:var(--sh-card)}
+  .rep-chip b{font-size:15px;margin-right:5px;font-variant-numeric:tabular-nums}
   .rep-chip.ok b{color:var(--ok)} .rep-chip.warn b{color:var(--warn)} .rep-chip.bad b{color:var(--del)}
   /* v0.9.223：ASS 效果预览（16:9 画布，按 1080p 等比） */
   .ass-pv{margin-bottom:12px}
-  .ass-pv-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);margin-bottom:6px}
-  .ass-pv-tag{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:11.5px}
-  .ass-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#111;border-radius:10px;overflow:hidden}
+  .ass-pv-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--sub);margin-bottom:7px}
+  .ass-pv-tag{background:var(--card-2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;
+    font-size:11px;color:var(--sub);margin-left:auto;white-space:nowrap}
+  /* 预览画布：底色压到近黑 + 1px 内描边，与页面浅底拉开层次（旧版 #111 无描边，像贴了块补丁） */
+  .ass-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#0A0A0E;border-radius:9px;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
   /* v0.9.230：左右留白必须等于导出的 MarginL/R —— 导出 MarginL=R=60（1080p 下画面宽 1920），
      即文本框宽 1800px；这里原来是 6%（=1690px），比导出窄 110px，于是预览会比导出**多折一行**，
      顶部那条被多出来的一行顶出画面上边——用户看到的就是「预览里出界、播放器里没事」。
@@ -243,9 +315,11 @@ textarea.paste-box{margin-top:8px;min-height:96px}
      ASS = 像素离底（两条绝对定位的 Dialogue），VTT = 百分比（line/position/size，单个 cue 盒内两行）。
      两套各画各的，不许互相换算。 */
   .vtt-pv{margin-bottom:12px}
-  .vtt-pv-hd{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--sub);margin-bottom:6px}
-  .vtt-pv-tag{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:11.5px}
-  .vtt-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#111;border-radius:10px;overflow:hidden}
+  .vtt-pv-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--sub);margin-bottom:7px}
+  .vtt-pv-tag{background:var(--card-2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;
+    font-size:11px;color:var(--sub);margin-left:auto;white-space:nowrap}
+  .vtt-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#0A0A0E;border-radius:9px;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
   /* cue 盒：宽度 = size%，横向 = position + align，纵向 = line + 锚点；两行文字都在盒里 */
   .vtt-pv-cue{position:absolute;box-sizing:border-box;text-align:center;padding:2px 5px;line-height:1.2}
   .vtt-pv-line{white-space:pre-wrap}
@@ -254,68 +328,85 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   /* v0.9.240：details.vtt 的样式已与 details.ass 合并到一处（同一个卡片式面板外观） */
   .vtt-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
   @media (max-width:640px){.vtt-cols{grid-template-columns:1fr}}
-  .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:10px;padding:9px 14px;
-    font-size:12.5px;color:#8A5A0B;display:none;line-height:1.8}
-  .rep-clean{margin-top:10px;background:var(--ok-weak);border-radius:10px;padding:9px 14px;
+  .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:var(--r-ctl);padding:9px 14px;
+    font-size:12.5px;color:var(--warn);display:none;line-height:1.8}
+  .rep-clean{margin-top:10px;background:var(--ok-weak);border-radius:var(--r-ctl);padding:9px 14px;
     font-size:12.5px;color:#0B7A5C;display:none}
-  .tbl-wrap{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:420px;background:var(--card)}
+  .tbl-wrap{margin-top:12px;border:1px solid var(--line);border-radius:var(--r-card);overflow:auto;
+    max-height:420px;background:var(--card);box-shadow:var(--sh-card)}
+/* ⚠️ position:sticky + bottom:0 被单测断言（贴底工具条），改视觉别动这两条 */
 .sel-dock{position:sticky;bottom:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
-    padding:8px 10px;background:var(--acc-weak);border-top:1px solid var(--acc)}
-.sel-dock .sd-n{font-size:12.5px;font-weight:600;color:var(--acc);white-space:nowrap}
-.sel-dock .slot-chip{padding:4px 10px;font-size:12px;background:var(--card)}
+    padding:10px 12px;background:var(--card);border-top:1px solid var(--acc-line);
+    box-shadow:0 -4px 14px -8px rgba(18,18,24,.18)}
+.sel-dock .sd-n{font-size:12.5px;font-weight:650;color:var(--acc-ink);white-space:nowrap}
+.sel-dock .slot-chip{height:28px;padding:0 10px;font-size:11.5px;background:var(--card)}
 .sel-dock .sd-clr{margin-left:auto}
   table.tbl{border-collapse:collapse;width:100%;font-size:12.5px}
   .tbl th{position:sticky;top:0;background:var(--card-2);color:var(--sub);font-weight:600;text-align:left;
-    padding:8px 10px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;z-index:2}
-  .tbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+    padding:9px 10px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;z-index:2}
+  .tbl td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--body)}
   .tbl tr:last-child td{border-bottom:none}
+  .tbl tbody tr:hover{background:var(--card-2)}
   .tbl td.no{color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
   .tbl td.tm{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:11.5px}
-  .tbl tr.drop td{color:var(--mut);background:#FAFAF9}
+  .tbl tr.drop td{color:var(--mut);background:var(--card-2)}
   .tbl tr.merged td{background:var(--warn-weak)}
-  .tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:1px}
-  .tag.drop{background:#EFEFED;color:var(--mut)}
+  .tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:6px;margin-left:6px;vertical-align:1px}
+  .tag.drop{background:var(--card-2);border:1px solid var(--line);color:var(--mut)}
   .tag.merged{background:var(--warn-weak);color:var(--warn)}
-  .pv-note{margin-top:8px;font-size:11.5px;color:var(--mut)}
+  .pv-note{margin-top:8px;font-size:11px;color:var(--mut)}
 
   .exp{display:none;margin-top:18px}
-  .exp-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .exp-row select{border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
-    border-radius:9px;padding:8px 12px;font-size:13px}
-  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:#2F2D33;color:#F5F4F2;
-    padding:9px 18px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:all .2s;z-index:99}
+  .exp-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .exp-row select{height:var(--ctl-h);border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 10px;font-size:12.5px}
+  .exp-row select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-weak)}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:#15151A;color:#F5F5F7;
+    padding:9px 18px;border-radius:99px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .2s;z-index:99;
+    box-shadow:0 8px 24px -8px rgba(18,18,24,.5)}
   .toast.show{opacity:1;transform:translateX(-50%)}
   footer{padding:34px 0 26px;text-align:center;color:var(--mut);font-size:12px}
   footer a{color:var(--sub);text-decoration:none}
-  footer a:hover{color:var(--acc)}
+  footer a:hover{color:var(--acc-ink)}
 
   /* ---------- v0.9.245：样式槽 + 筛选器 ---------- */
-  .slot-wrap{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px 14px}
+  .slot-wrap{margin-top:14px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--card);
+    padding:13px 15px;box-shadow:var(--sh-card)}
   .slot-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .slot-hd>span:first-child{font-weight:600;font-size:13px}
+  .slot-hd>span:first-child{font-weight:650;font-size:13px;letter-spacing:-.1px}
   .slot-hd .hint{margin-top:0}
-  .slot-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  .slot-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;
-    border:1px solid var(--line-strong);background:var(--card);font-size:12.5px;cursor:pointer;white-space:nowrap}
-  .slot-chip:hover{border-color:var(--acc)}
-.slot-chip.filt{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-weak)}
-.slot-chip.filt .mod{color:var(--acc)}
+  .slot-bar{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+  .slot-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:8px;
+    border:1px solid var(--line-strong);background:var(--card);font-size:12.5px;color:var(--body);
+    cursor:pointer;white-space:nowrap;transition:border-color .14s,background .14s,color .14s}
+  .slot-chip:hover{border-color:var(--acc-line)}
 .slot-edit-btn{margin-left:2px;padding:0 3px;border-radius:5px;color:var(--mut);font-size:12px;line-height:1}
-.slot-edit-btn:hover{color:var(--acc);background:var(--acc-weak)}
-  .slot-chip.on{border-color:var(--acc);background:var(--acc-weak);color:var(--acc);font-weight:600}
-  .slot-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.slot-edit-btn:hover{color:var(--acc-ink);background:var(--acc-weak)}
+  .slot-chip.on{border-color:var(--acc);background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
+  /* ⚠️ 「正在筛选」必须与「当前编辑的槽」(.on，浅粉底) 一眼区分开：
+     旧版两者都是浅粉底粉字，用户看不出「现在屏幕上的行是被筛过的」。
+     筛选态用实心粉，配色与主按钮同源，是场上最强的状态标识。
+     ⚠️ 这两块必须排在 .slot-chip.on **之后**：两者特异性完全相同（都是 0,2,0），
+     谁在后面谁生效。放在前面时，点的若是「当前槽」那个胶囊，会被 .on 的浅粉底盖掉，
+     筛选态当场消失 —— 等于白改（v0.9.249 上线外网实测撞到，已改）。 */
+  .slot-chip.filt,.slot-chip.on.filt{border-color:var(--acc);background:var(--acc);color:#fff;font-weight:600}
+  .slot-chip.filt .mod{color:rgba(255,255,255,.82)}
+  .slot-chip.filt .slot-dot{box-shadow:0 0 0 1.5px rgba(255,255,255,.9)}
+  .slot-chip.filt .slot-edit-btn{color:rgba(255,255,255,.85)}
+  .slot-chip.filt .slot-edit-btn:hover{color:#fff;background:rgba(255,255,255,.18)}
+  .slot-dot{width:8px;height:8px;border-radius:50%;flex:none}
   .slot-chip .mod{font-size:10.5px;color:var(--mut)}
-  .slot-edit{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+  .slot-edit{margin-top:11px;border-top:1px solid var(--line);padding-top:8px}
   .slot-edit>summary{cursor:pointer;font-size:12.5px;color:var(--sub);font-weight:600}
   .slot-edit-body{padding-top:10px}
   .slot-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
   .slot-views{display:flex;gap:6px;margin:10px 0 6px}
-  .slot-views .btn-sm.on{border-color:var(--acc);color:var(--acc);background:var(--acc-weak)}
+  .slot-views .btn-sm.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
   .slot-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
   .slot-row:last-child{border-bottom:none}
   .slot-row .pk{width:92px;color:var(--sub);flex:none}
   .slot-row .pv{flex:1;min-width:0}
-  .slot-row .pa{font-size:11.5px;color:var(--acc);cursor:pointer;flex:none}
+  .slot-row .pa{font-size:11.5px;color:var(--acc-ink);cursor:pointer;flex:none}
   .slot-row .pa.mut{color:var(--mut)}
   .slot-row.inh .pv{color:var(--mut)}
   .slot-empty{font-size:12px;color:var(--mut);padding:8px 0}
@@ -328,25 +419,29 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     color:var(--mut);border:1px solid var(--line-strong);vertical-align:1px}
   .slot-row .inh-txt{color:var(--mut);font-size:12px}
   .slot-imp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0;padding:8px 10px;
-    border:1px dashed var(--line-strong);border-radius:8px;background:var(--bg-weak)}
+    border:1px dashed var(--line-strong);border-radius:8px;background:var(--card-2)}
   .slot-imp .hint{margin-top:0}
-  .slot-imp select{max-width:180px}
-  .filter-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
-  .filter-bar input{flex:1 1 220px;min-width:180px;border:1px solid var(--line-strong);border-radius:9px;
-    padding:7px 10px;font-size:12.5px;background:var(--card);color:var(--ink)}
-  .filter-bar .btn-sm.on{border-color:var(--acc);color:var(--acc);background:var(--acc-weak)}
-  .filter-stat{font-size:11.5px;color:var(--mut);margin-top:6px}
-  .filter-stat b{color:var(--acc);font-weight:600}
+  .slot-imp select{height:30px;max-width:180px;border:1px solid var(--line-strong);border-radius:8px;
+    padding:0 8px;font-size:12px;background:var(--card);color:var(--ink)}
+  .filter-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+  .filter-bar input{flex:1 1 220px;min-width:180px;height:var(--ctl-h);border:1px solid var(--line-strong);
+    border-radius:var(--r-ctl);padding:0 10px;font-size:12.5px;background:var(--card);color:var(--ink)}
+  .filter-bar input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-weak)}
+  .filter-bar .btn-sm.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
+  .filter-stat{font-size:11.5px;color:var(--mut);margin-top:7px}
+  .filter-stat b{color:var(--acc-ink);font-weight:600}
   /* 单语模式：没有「原文」这一列（.tbl 的第 4 列 = 原文），整列收起 */
   .tbl.mono th:nth-child(4),.tbl.mono td:nth-child(4){display:none}
   .tbl th.ck,.tbl td.ck{width:34px;text-align:center;padding-left:8px;padding-right:0}
   .tbl td.ck input{width:15px;height:15px;accent-color:var(--acc)}
+  /* 选中行：浅粉底 + 左侧 3px 粉条 —— 只有底色时，勾与不勾在滚动中很难一眼分辨 */
   .tbl tr.sel td{background:var(--acc-weak)}
+  .tbl tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
   .slot-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--sub);white-space:nowrap}
   .apply-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px;padding-top:12px;
     border-top:1px solid var(--line)}
-  .apply-bar select{border:1px solid var(--line-strong);border-radius:8px;padding:5px 8px;font-size:12.5px;
-    background:var(--card);color:var(--ink);min-width:120px}
+  .apply-bar select{height:var(--ctl-h);border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:0 10px;font-size:12.5px;background:var(--card);color:var(--ink);min-width:120px}
   @media (max-width:640px){
     .slot-row .pk{width:72px}
     .filter-bar input{flex:1 1 100%}
@@ -356,7 +451,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.248</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.249</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -380,7 +475,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     <div class="card up-card" id="srcCard">
       <h2><span class="n">1</span><span id="srcCardTitle" data-i18n="srcCard">原文字幕</span></h2>
       <div class="drop drop-zone" id="srcDrop" role="button" tabindex="0">
-        <span class="dz-ico">📂</span>
+        <span class="dz-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a1 1 0 001-1V8a1 1 0 00-1-1h-7.5L10 4.5H5a1 1 0 00-1 1V19a1 1 0 001 1z"/></svg></span>
         <span class="dz-txt" data-i18n="btnPick">选文件 / 拖进来</span>
         <span class="dz-fmt" data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
       </div>
@@ -396,7 +491,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     <div class="card up-card" id="dstCard">
       <h2><span class="n">2</span><span data-i18n="dstCard">译文字幕</span></h2>
       <div class="drop drop-zone" id="dstDrop" role="button" tabindex="0">
-        <span class="dz-ico">📂</span>
+        <span class="dz-ico"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a1 1 0 001-1V8a1 1 0 00-1-1h-7.5L10 4.5H5a1 1 0 00-1 1V19a1 1 0 001 1z"/></svg></span>
         <span class="dz-txt" data-i18n="btnPick">选文件 / 拖进来</span>
         <span class="dz-fmt" data-i18n="dropSub">SRT · VTT · ASS · SBV</span>
       </div>
@@ -434,7 +529,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
             <option value="two-line" data-i18n="structTwo">单条双行</option>
             <option value="alternating" data-i18n="structAlt">交替成对</option>
           </select>
-          <button type="button" class="btn ghost" id="btnSwap" data-i18n="swapBtn">⇅ 原文/译文互换</button>
+          <button type="button" class="btn ghost" id="btnSwap" data-i18n="swapBtn">原文/译文互换</button>
         </div>
         <div class="hint" data-i18n="structHint">自动判断双语结构；识别错了可手动指定。原文/译文方向反了点「互换」。</div>
       </div>
@@ -574,8 +669,8 @@ textarea.paste-box{margin-top:8px;min-height:96px}
         <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
         <div class="hint" data-i18n="edgeTip">「底衬」用的是 ASS 的 BorderStyle=3，它的外扩量就是「描边」那个值，「深度」在底衬模式下不生效（播放器如此）。</div>
         <div class="scheme-row">
-          <button type="button" class="btn ghost btn-sm" id="btnAssReset" data-i18n="assReset">↺ 恢复默认参数</button>
-          <button type="button" class="btn ghost btn-sm" id="btnSchemeSave" data-i18n="schemeSave">☆ 存为方案</button>
+          <button type="button" class="btn ghost btn-sm" id="btnAssReset" data-i18n="assReset">恢复默认参数</button>
+          <button type="button" class="btn ghost btn-sm" id="btnSchemeSave" data-i18n="schemeSave">存为方案</button>
         </div>
         <div class="scheme-row">
           <select id="schemeList"></select>
@@ -703,7 +798,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
         <!-- 描边在 VTT 里没有真 PyOutline：::cue 的 outline 画的是整个方框，只能用 text-shadow 八向模拟 -->
         <div class="hint" data-i18n="vttFxTip">VTT 没有真正的字描边，这里用八向 text-shadow 模拟；字间距、行内旋转等浏览器原生不支持，不会写出来。</div>
         <div class="scheme-row">
-          <button type="button" class="btn ghost btn-sm" id="btnVttReset" data-i18n="vttReset">↺ 恢复模板默认</button>
+          <button type="button" class="btn ghost btn-sm" id="btnVttReset" data-i18n="vttReset">恢复模板默认</button>
         </div>
         </div><!-- /#mVttStyleBox -->
       </div>
@@ -711,7 +806,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   </div>
 
   <div class="actions">
-    <button class="btn" id="btnMerge" data-i18n="btnMerge">🔗 合并预览</button>
+    <button class="btn" id="btnMerge" data-i18n="btnMerge">合并预览</button>
     <span class="hint" id="mergeHintEl" data-i18n="mergeHint">先看配对结果和体检报告，再下载。</span>
   </div>
 
@@ -823,7 +918,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
       <!-- v0.9.240：导出区这一排与设置区同一套三张格式卡（紧凑版，只留格式名） -->
       <div class="fmt-seg sm" id="tplSeg2"></div>
       <select id="expFmt2" style="display:none"></select>
-      <button class="btn" id="btnDownload" data-i18n="btnDownload">⬇ 下载字幕</button>
+      <button class="btn" id="btnDownload" data-i18n="btnDownload">下载字幕</button>
       <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
     </div>
   </div>
@@ -835,7 +930,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.248"></script>
+<script src="merge-core.js?v=0.9.249"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -858,9 +953,9 @@ const I18N = {
     modeMerge:'合并两份字幕', modeAdjust:'调整双语字幕',
     biCard:'双语字幕（原始文件）', optTitleAdjust:'调整设置',
     lblStruct:'结构识别', structAuto:'自动识别', structTwo:'单条双行', structAlt:'交替成对',
-    swapBtn:'⇅ 原文/译文互换', structHint:'自动判断双语结构，识别错了可手动指定；原文/译文方向反了点「互换」。',
+    swapBtn:'原文/译文互换', structHint:'自动判断双语结构，识别错了可手动指定；原文/译文方向反了点「互换」。',
     lblShiftAll:'整体偏移（毫秒）', shiftHintAll:'整份字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。',
-    btnAdjust:'🔧 调整预览',
+    btnAdjust:'调整预览',
     formTwoLine:'单条双行', formAlt:'交替成对', formStyle:'样式配对', formFolded:'折行拆分',
     foldedWarn:'检测到折行条目：多行内容已按语言聚类拆为原文/译文两侧，请核对结果。',
     uncertainWarn:'{0} 条结构不确定（两侧语言相同，按上半/下半拆分），请人工核对。',
@@ -893,7 +988,7 @@ const I18N = {
     vttTipCustom:'自定义：下面每一项都由你定（改动任一参数就会落到这里，值不会丢）。',
     lblVttWriteStyle:'写入样式', vttNoStyleTip:'已关闭：当前导出的是无样式 VTT（不含 STYLE 块，播放器用默认外观）。',
     tplHintVttPlain:'当前导出无样式 VTT：不含 STYLE 块。想加样式，打开下方「WebVTT 样式」并勾选「写入样式」。',
-    assReset:'↺ 恢复默认参数', assResetDone:'已恢复默认参数',
+    assReset:'恢复默认参数', assResetDone:'已恢复默认参数',
     assImportedToast:'已按导入文件的 ASS 样式填充外观', assImportedNoteShared:'样式来自导入文件：{0}（译文与原文共用同一样式）', assImportedNote:'样式来自导入文件：译文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'样式来自导入文件：{0}', assImportedRes:'（原文件 {0}p，已等比换算到 1080p）', assFontFromFile:'来自文件',
     assPanel:'ASS 外观（导出 ASS 时生效）', lblDstCol:'译文（主）', lblSrcCol:'原文（副）',
@@ -918,7 +1013,7 @@ const I18N = {
     lblVttBg:'底衬', lblVttBgColor:'底衬色', lblVttBgAlpha:'底衬不透明',
     lblVttShadow:'描边', lblVttShadowW:'粗细', lblVttShadowColor:'描边色',
     vttFxTip:'VTT 没有真正的字描边，这里用八向 text-shadow 模拟；字间距、旋转等浏览器原生不支持，不会写出来。',
-    vttReset:'↺ 恢复模板默认', vttResetDone:'已恢复该模板的默认参数',
+    vttReset:'恢复模板默认', vttResetDone:'已恢复该模板的默认参数',
     vttImportedNote:'样式来自导入文件：{0}。导出模板选「VTT 双语样式」即生效。',
     vttLineNumNote:'文件里的 line 写成了行号（如 line:3），无法换算成百分比，已忽略。',
     pvVttTitle:'效果预览（百分比定位，随分辨率自适应）',
@@ -928,17 +1023,17 @@ const I18N = {
     lblBold:'粗体', lblSpacing:'字间距', lblEdge:'阴影/底衬', lblEdgeSize:'深度', lblEdgeColor:'边色', lblEdgeAlpha:'边色不透明', lblHAlign:'水平对齐', lblMarginL:'左边距', lblMarginR:'右边距',
     edgeNone:'无', edgeShadow:'阴影', edgeBox:'底衬', alignL:'底·左', alignC:'底·中', alignR:'底·右',
     edgeTip:'「底衬」用的是 ASS 的 BorderStyle=3，它的外扩量就是「描边」那个值，「深度」在底衬模式下不生效（播放器如此）。',
-    schemeSave:'☆ 存为方案', schemeApply:'应用', schemeDel:'删除', schemeExport:'导出', schemeImport:'导入',
+    schemeSave:'存为方案', schemeApply:'应用', schemeDel:'删除', schemeExport:'导出', schemeImport:'导入',
     schemeHint:'方案存在本机浏览器里（换设备或清缓存会丢），要备份就用「导出」存成 JSON。',
     schemeNone:'（还没有保存过方案）', schemeAskName:'给这套样式起个名字：', schemeSaved:'已保存方案「{0}」', schemeApplyNone:'先选一个方案', schemeApplied:'已应用方案「{0}」', schemeDelAsk:'删除方案「{0}」？', schemeDeleted:'已删除方案「{0}」', schemeBadJson:'不是有效的方案文件', schemeImported:'已导入 {0} 个方案', schemeNoFile:'没读到文件',
-    btnMerge:'🔗 合并预览', mergeHint:'先看配对结果和体检报告，再下载。',
+    btnMerge:'合并预览', mergeHint:'先看配对结果和体检报告，再下载。',
     repPaired:'配对', repOnlySrc:'缺译文', repOnlyDst:'缺原文', repMerged:'已并入', repIssues:'时间轴体检',
     repCleanTxt:'时间轴体检通过：没有重叠、过短或缺失。', repIssueHead:'时间轴体检：{0} 处需注意（前 20 条）',
     colNo:'#', colTime:'时间', colSrc:'原文', colDst:'译文',
     tagDrop:'未配上·不出现在成片', tagMerged:'并入上一条',
     pvNote:'预览最多显示前 {0} 条，完整内容以导出文件为准。',
     demoTipTitle:'示例', demoTipBody:'：下面是 6 行样本，先看合并后的样子；上传你自己的字幕、点「合并预览」后自动替换。示例不可导出。', demoNoExport:'示例数据不能导出，先上传你自己的字幕',
-  expTitle:'导出', btnDownload:'⬇ 下载字幕', btnCopy:'复制内容',
+  expTitle:'导出', btnDownload:'下载字幕', btnCopy:'复制内容',
     needBoth:'请先在上方提供原文和译文字幕（文件或粘贴均可）', needMerge:'请先点预览按钮生成结果',
     copied:'已复制到剪贴板', downloaded:'已开始下载',
     issOverlap:'#{0} 与前一条重叠 {1}ms', issShort:'#{0} 时长不足（短于 0.5 秒）',
@@ -1006,9 +1101,9 @@ const I18N = {
     modeMerge:'合併兩份字幕', modeAdjust:'調整雙語字幕',
     biCard:'雙語字幕（原始檔案）', optTitleAdjust:'調整設定',
     lblStruct:'結構識別', structAuto:'自動識別', structTwo:'單條雙行', structAlt:'交替成對',
-    swapBtn:'⇅ 原文/譯文互換', structHint:'自動判斷雙語結構，識別錯了可手動指定；原文/譯文方向反了點「互換」。',
+    swapBtn:'原文/譯文互換', structHint:'自動判斷雙語結構，識別錯了可手動指定；原文/譯文方向反了點「互換」。',
     lblShiftAll:'整體偏移（毫秒）', shiftHintAll:'整份字幕整體提前（負數）或延後（正數）。例如字幕晚了半秒填 -500。',
-    btnAdjust:'🔧 調整預覽',
+    btnAdjust:'調整預覽',
     formTwoLine:'單條雙行', formAlt:'交替成對', formStyle:'樣式配對', formFolded:'折行拆分',
     foldedWarn:'偵測到折行條目：多行內容已按語言聚類拆為原文/譯文兩側，請核對結果。',
     uncertainWarn:'{0} 條結構不確定（兩側語言相同，按上半/下半拆分），請人工核對。',
@@ -1041,7 +1136,7 @@ const I18N = {
     vttTipCustom:'自訂：下面每一項都由你定（改動任一參數就會落到這裡，值不會丟）。',
     lblVttWriteStyle:'寫入樣式', vttNoStyleTip:'已關閉：目前匯出的是無樣式 VTT（不含 STYLE 區塊，播放器用預設外觀）。',
     tplHintVttPlain:'目前匯出無樣式 VTT：不含 STYLE 區塊。想加樣式，打開下方「WebVTT 樣式」並勾選「寫入樣式」。',
-    assReset:'↺ 恢復預設參數', assResetDone:'已恢復預設參數',
+    assReset:'恢復預設參數', assResetDone:'已恢復預設參數',
     assImportedToast:'已依匯入檔案的 ASS 樣式填入外觀', assImportedNoteShared:'樣式來自匯入檔案：{0}（譯文與原文共用同一樣式）', assImportedNote:'樣式來自匯入檔案：譯文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'樣式來自匯入檔案：{0}', assImportedRes:'（原檔案 {0}p，已等比換算為 1080p）', assFontFromFile:'來自檔案',
     assPanel:'ASS 外觀（匯出 ASS 時生效）', lblDstCol:'譯文（主）', lblSrcCol:'原文（副）',
@@ -1066,7 +1161,7 @@ const I18N = {
     lblVttBg:'底襯', lblVttBgColor:'底襯色', lblVttBgAlpha:'底襯不透明',
     lblVttShadow:'描邊', lblVttShadowW:'粗細', lblVttShadowColor:'描邊色',
     vttFxTip:'VTT 沒有真正的字描邊，這裡用八向 text-shadow 模擬；字距、旋轉等瀏覽器原生不支援，不會寫出來。',
-    vttReset:'↺ 恢復範本預設', vttResetDone:'已恢復該範本的預設參數',
+    vttReset:'恢復範本預設', vttResetDone:'已恢復該範本的預設參數',
     vttImportedNote:'樣式來自匯入檔案：{0}。匯出範本選「VTT 雙語樣式」即生效。',
     vttLineNumNote:'檔案裡的 line 寫成行號（如 line:3），無法換算成百分比，已忽略。',
     pvVttTitle:'效果預覽（百分比定位，隨解析度自適應）',
@@ -1076,17 +1171,17 @@ const I18N = {
     lblBold:'粗體', lblSpacing:'字間距', lblEdge:'陰影/底襯', lblEdgeSize:'深度', lblEdgeColor:'邊色', lblEdgeAlpha:'邊色不透明', lblHAlign:'水平對齊', lblMarginL:'左邊距', lblMarginR:'右邊距',
     edgeNone:'無', edgeShadow:'陰影', edgeBox:'底襯', alignL:'底·左', alignC:'底·中', alignR:'底·右',
     edgeTip:'「底襯」用的是 ASS 的 BorderStyle=3，它的外擴量就是「描邊」那個值，「深度」在底襯模式下不生效（播放器如此）。',
-    schemeSave:'☆ 存為方案', schemeApply:'套用', schemeDel:'刪除', schemeExport:'匯出', schemeImport:'匯入',
+    schemeSave:'存為方案', schemeApply:'套用', schemeDel:'刪除', schemeExport:'匯出', schemeImport:'匯入',
     schemeHint:'方案存在本機瀏覽器裡（換裝置或清快取會丟），要備份就用「匯出」存成 JSON。',
     schemeNone:'（還沒有儲存過方案）', schemeAskName:'給這套樣式取個名字：', schemeSaved:'已儲存方案「{0}」', schemeApplyNone:'先選一個方案', schemeApplied:'已套用方案「{0}」', schemeDelAsk:'刪除方案「{0}」？', schemeDeleted:'已刪除方案「{0}」', schemeBadJson:'不是有效的方案檔案', schemeImported:'已匯入 {0} 個方案', schemeNoFile:'沒讀到檔案',
-    btnMerge:'🔗 合併預覽', mergeHint:'先看配對結果和體檢報告，再下載。',
+    btnMerge:'合併預覽', mergeHint:'先看配對結果和體檢報告，再下載。',
     repPaired:'配對', repOnlySrc:'缺譯文', repOnlyDst:'缺原文', repMerged:'已併入', repIssues:'時間軸體檢',
     repCleanTxt:'時間軸體檢通過：沒有重疊、過短或缺失。', repIssueHead:'時間軸體檢：{0} 處需注意（前 20 條）',
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'譯文',
     tagDrop:'未配上·不出現在成片', tagMerged:'併入上一條',
     pvNote:'預覽最多顯示前 {0} 條，完整內容以匯出檔案為準。',
     demoTipTitle:'範例', demoTipBody:'：下面是 6 行樣本，先看合併後的樣子；上傳你自己的字幕、點「合併預覽」後自動取代。範例不可匯出。', demoNoExport:'範例資料不能匯出，請先上傳你自己的字幕',
-  expTitle:'匯出', btnDownload:'⬇ 下載字幕', btnCopy:'複製內容',
+  expTitle:'匯出', btnDownload:'下載字幕', btnCopy:'複製內容',
     needBoth:'請先在上方提供原文和譯文字幕（檔案或貼上均可）', needMerge:'請先點預覽按鈕產生結果',
     copied:'已複製到剪貼簿', downloaded:'已開始下載',
     issOverlap:'#{0} 與前一條重疊 {1}ms', issShort:'#{0} 時長不足（短於 0.5 秒）',
@@ -1154,9 +1249,9 @@ const I18N = {
     modeMerge:'Merge two subtitle files', modeAdjust:'Adjust a bilingual subtitle',
     biCard:'Bilingual subtitle (source file)', optTitleAdjust:'Adjust settings',
     lblStruct:'Structure detection', structAuto:'Auto-detect', structTwo:'Two lines per cue', structAlt:'Alternating pairs',
-    swapBtn:'⇅ Swap original/translation', structHint:'The bilingual structure is detected automatically; pick manually if detected wrong. Use "Swap" if the two sides are reversed.',
+    swapBtn:'Swap original/translation', structHint:'The bilingual structure is detected automatically; pick manually if detected wrong. Use "Swap" if the two sides are reversed.',
     lblShiftAll:'Global shift (ms)', shiftHintAll:'Move the whole file earlier (negative) or later (positive). E.g. -500 if it runs half a second late.',
-    btnAdjust:'🔧 Adjust & preview',
+    btnAdjust:'Adjust & preview',
     formTwoLine:'two-line cues', formAlt:'alternating pairs', formStyle:'style pairs', formFolded:'folded cues',
     foldedWarn:'Folded cues detected: multi-line cues were split into original/translation sides by language clustering — please review.',
     uncertainWarn:'{0} cues with uncertain structure (same language on both sides, split top/bottom) — please review.',
@@ -1189,7 +1284,7 @@ const I18N = {
     vttTipCustom:'Custom: every option below is yours (editing any value lands here; nothing is lost).',
     lblVttWriteStyle:'Write styles', vttNoStyleTip:'Off: exports plain WebVTT (no STYLE block) — players use their default look.',
     tplHintVttPlain:'Exports plain WebVTT with no STYLE block. To add styling, open “WebVTT style” below and tick “Write styles”.',
-    assReset:'↺ Reset to defaults', assResetDone:'Defaults restored',
+    assReset:'Reset to defaults', assResetDone:'Defaults restored',
     assImportedToast:'Appearance filled from the imported file’s ASS styles', assImportedNoteShared:'Style taken from the imported file: {0} (both sides share it)', assImportedNote:'Styles taken from the imported file: translation ← {0} · original ← {1}',
     assImportedNoteOne:'Style taken from the imported file: {0}', assImportedRes:'(file is {0}p — values scaled to 1080p)', assFontFromFile:'from file',
     assPanel:'ASS appearance (applies to ASS export)', lblDstCol:'Translation (primary)', lblSrcCol:'Original (secondary)',
@@ -1214,7 +1309,7 @@ const I18N = {
     lblVttBg:'Box', lblVttBgColor:'Box color', lblVttBgAlpha:'Box opacity',
     lblVttShadow:'Outline', lblVttShadowW:'Width', lblVttShadowColor:'Outline color',
     vttFxTip:'WebVTT has no real text outline — an eight-direction text-shadow is used instead. Letter spacing, rotation and similar are not supported by browsers and are never written.',
-    vttReset:'↺ Reset to preset', vttResetDone:'Preset defaults restored',
+    vttReset:'Reset to preset', vttResetDone:'Preset defaults restored',
     vttImportedNote:'Style inherited from the imported file: {0}. Pick the “VTT bilingual style” template to export it.',
     vttLineNumNote:'The file uses a line NUMBER (e.g. line:3); it cannot be converted to a percentage, so it was ignored.',
     pvVttTitle:'Preview (percentage based, scales with resolution)',
@@ -1224,17 +1319,17 @@ const I18N = {
     lblBold:'Bold', lblSpacing:'Letter spacing', lblEdge:'Shadow / Box', lblEdgeSize:'Depth', lblEdgeColor:'Edge color', lblEdgeAlpha:'Edge opacity', lblHAlign:'Align', lblMarginL:'Left margin', lblMarginR:'Right margin',
     edgeNone:'None', edgeShadow:'Shadow', edgeBox:'Box', alignL:'Bottom · left', alignC:'Bottom · center', alignR:'Bottom · right',
     edgeTip:'“Box” uses ASS BorderStyle=3 — its padding is the Outline value, and Depth has no effect in box mode (that is how players behave).',
-    schemeSave:'☆ Save as scheme', schemeApply:'Apply', schemeDel:'Delete', schemeExport:'Export', schemeImport:'Import',
+    schemeSave:'Save as scheme', schemeApply:'Apply', schemeDel:'Delete', schemeExport:'Export', schemeImport:'Import',
     schemeHint:'Schemes live in this browser only (lost on another device or after clearing the cache) — use Export to keep a JSON backup.',
     schemeNone:'(no scheme saved yet)', schemeAskName:'Name this style set:', schemeSaved:'Scheme “{0}” saved', schemeApplyNone:'Pick a scheme first', schemeApplied:'Scheme “{0}” applied', schemeDelAsk:'Delete scheme “{0}”?', schemeDeleted:'Scheme “{0}” deleted', schemeBadJson:'Not a valid scheme file', schemeImported:'Imported {0} scheme(s)', schemeNoFile:'No file read',
-    btnMerge:'🔗 Merge & preview', mergeHint:'Check the pairing result and sanity report before downloading.',
+    btnMerge:'Merge & preview', mergeHint:'Check the pairing result and sanity report before downloading.',
     repPaired:'Paired', repOnlySrc:'Missing translation', repOnlyDst:'Missing original', repMerged:'merged in', repIssues:'Timeline check',
     repCleanTxt:'Timeline check passed: no overlaps, too-short or missing cues.', repIssueHead:'Timeline check: {0} items need attention (first 20)',
     colNo:'#', colTime:'Time', colSrc:'Original', colDst:'Translation',
     tagDrop:'Unpaired·excluded from output', tagMerged:'Folded into previous',
     pvNote:'Preview shows the first {0} rows only; the exported file contains everything.',
     demoTipTitle:'Sample', demoTipBody:': six sample rows below, so you can see the result first. Upload your own subtitles and hit Merge to replace them. Sample data cannot be exported.', demoNoExport:'Sample data cannot be exported - upload your own subtitles first',
-  expTitle:'Export', btnDownload:'⬇ Download subtitles', btnCopy:'Copy content',
+  expTitle:'Export', btnDownload:'Download subtitles', btnCopy:'Copy content',
     needBoth:'Provide both the original and the translated subtitles first (file or paste)', needMerge:'Click the preview button first',
     copied:'Copied to clipboard', downloaded:'Download started',
     issOverlap:'#{0} overlaps the previous cue by {1}ms', issShort:'#{0} too short (under 0.5s)',
@@ -1302,9 +1397,9 @@ const I18N = {
     modeMerge:'2 つの字幕をマージ', modeAdjust:'二か国語字幕を調整',
     biCard:'二か国語字幕（元ファイル）', optTitleAdjust:'調整設定',
     lblStruct:'構造識別', structAuto:'自動識別', structTwo:'1 条 2 行', structAlt:'交互ペア',
-    swapBtn:'⇅ 原文/訳文を入れ替え', structHint:'二か国語の構造を自動判定します。誤認識時は手動で指定できます。方向が逆の場合は「入れ替え」を押してください。',
+    swapBtn:'原文/訳文を入れ替え', structHint:'二か国語の構造を自動判定します。誤認識時は手動で指定できます。方向が逆の場合は「入れ替え」を押してください。',
     lblShiftAll:'全体シフト（ミリ秒）', shiftHintAll:'ファイル全体を早める（負）または遅らせる（正）。例：0.5 秒遅い場合は -500。',
-    btnAdjust:'🔧 調整してプレビュー',
+    btnAdjust:'調整してプレビュー',
     formTwoLine:'1 条 2 行', formAlt:'交互ペア', formStyle:'スタイルペア', formFolded:'折り返し分割',
     foldedWarn:'折り返し条を検出：複数行の条は言語クラスタリングで原文/訳文に分割しました。確認してください。',
     uncertainWarn:'{0} 条の構造が不確実（両側が同言語のため上半/下半で分割）。確認してください。',
@@ -1337,7 +1432,7 @@ const I18N = {
     vttTipCustom:'カスタム：下の各項目はすべて自由（どれかを変えるとここに移ります。値は失われません）。',
     lblVttWriteStyle:'スタイルを書き出す', vttNoStyleTip:'オフ：スタイルなしの WebVTT（STYLE ブロックなし）を書き出します。再生側は既定の見た目になります。',
     tplHintVttPlain:'現在はスタイルなし WebVTT（STYLE ブロックなし）を書き出します。スタイルを付けるには下の「WebVTT スタイル」で「スタイルを書き出す」をオンにしてください。',
-    assReset:'↺ 既定値に戻す', assResetDone:'既定値に戻しました',
+    assReset:'既定値に戻す', assResetDone:'既定値に戻しました',
     assImportedToast:'読み込んだファイルの ASS スタイルを外観に反映しました', assImportedNoteShared:'ファイルから読み込んだスタイル：{0}（訳文・原文で共通）', assImportedNote:'ファイルから読み込んだスタイル：訳文 ← {0} · 原文 ← {1}',
     assImportedNoteOne:'ファイルから読み込んだスタイル：{0}', assImportedRes:'（ファイル基準 {0}p を 1080p に等比換算）', assFontFromFile:'ファイル由来',
     assPanel:'ASS 外観（ASS エクスポート時に有効）', lblDstCol:'訳文（主）', lblSrcCol:'原文（副）',
@@ -1362,7 +1457,7 @@ const I18N = {
     lblVttBg:'底襯', lblVttBgColor:'底襯の色', lblVttBgAlpha:'底襯の不透明度',
     lblVttShadow:'縁取り', lblVttShadowW:'太さ', lblVttShadowColor:'縁取りの色',
     vttFxTip:'VTT に本物の文字縁取りはありません。八方向の text-shadow で代用しています。字間・回転などはブラウザが対応しないため書き出しません。',
-    vttReset:'↺ テンプレート既定値に戻す', vttResetDone:'テンプレートの既定値に戻しました',
+    vttReset:'テンプレート既定値に戻す', vttResetDone:'テンプレートの既定値に戻しました',
     vttImportedNote:'読み込んだファイルのスタイルを継承しました：{0}。書き出しテンプレートで「VTT 二か国語スタイル」を選ぶと有効になります。',
     vttLineNumNote:'ファイルの line は行番号形式（例 line:3）です。パーセントに換算できないため無視しました。',
     pvVttTitle:'プレビュー（パーセント指定・解像度に応じて拡縮）',
@@ -1372,17 +1467,17 @@ const I18N = {
     lblBold:'太字', lblSpacing:'字間', lblEdge:'影/ボックス', lblEdgeSize:'深さ', lblEdgeColor:'縁の色', lblEdgeAlpha:'縁の不透明度', lblHAlign:'水平位置', lblMarginL:'左余白', lblMarginR:'右余白',
     edgeNone:'なし', edgeShadow:'影', edgeBox:'ボックス', alignL:'下・左', alignC:'下・中央', alignR:'下・右',
     edgeTip:'「ボックス」は ASS の BorderStyle=3 です。外側の余白は「縁取り」の値で、「深さ」はボックス時には効きません（プレイヤーの仕様）。',
-    schemeSave:'☆ プリセット保存', schemeApply:'適用', schemeDel:'削除', schemeExport:'書き出し', schemeImport:'読み込み',
+    schemeSave:'プリセット保存', schemeApply:'適用', schemeDel:'削除', schemeExport:'書き出し', schemeImport:'読み込み',
     schemeHint:'プリセットはこのブラウザに保存されます（別端末やキャッシュ消去で消えます）。バックアップは「書き出し」で JSON に。',
     schemeNone:'（まだ保存されていません）', schemeAskName:'このスタイルの名前を入力：', schemeSaved:'プリセット「{0}」を保存しました', schemeApplyNone:'先にプリセットを選んでください', schemeApplied:'プリセット「{0}」を適用しました', schemeDelAsk:'プリセット「{0}」を削除しますか？', schemeDeleted:'プリセット「{0}」を削除しました', schemeBadJson:'プリセットファイルとして読み込めません', schemeImported:'{0} 件のプリセットを読み込みました', schemeNoFile:'ファイルを読み取れませんでした',
-    btnMerge:'🔗 マージしてプレビュー', mergeHint:'対応結果とチェックレポートを確認してからダウンロードしてください。',
+    btnMerge:'マージしてプレビュー', mergeHint:'対応結果とチェックレポートを確認してからダウンロードしてください。',
     repPaired:'対応', repOnlySrc:'訳文なし', repOnlyDst:'原文なし', repMerged:'統合済み', repIssues:'タイムラインチェック',
     repCleanTxt:'タイムラインチェック合格：重複・短すぎ・欠落なし。', repIssueHead:'タイムラインチェック：{0} 件要注意（先頭 20 件）',
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'訳文',
     tagDrop:'未対応·出力に含まれない', tagMerged:'前の条に統合',
     pvNote:'プレビューは先頭 {0} 行のみ。完全な内容はエクスポートファイルで確認してください。',
     demoTipTitle:'サンプル', demoTipBody:'：以下の 6 行はサンプルです。字幕をアップロードして「結合プレビュー」を押すと実際のデータに置き換わります。サンプルは書き出せません。', demoNoExport:'サンプルデータは書き出せません。先に字幕をアップロードしてください',
-  expTitle:'エクスポート', btnDownload:'⬇ 字幕をダウンロード', btnCopy:'内容をコピー',
+  expTitle:'エクスポート', btnDownload:'字幕をダウンロード', btnCopy:'内容をコピー',
     needBoth:'まず原文と訳文字幕を用意してください（ファイルまたは貼り付け）', needMerge:'先にプレビューボタンを押してください',
     copied:'クリップボードにコピーしました', downloaded:'ダウンロードを開始しました',
     issOverlap:'#{0} が前の字幕と {1}ms 重複', issShort:'#{0} が短すぎ（0.5 秒未満）',
@@ -1568,13 +1663,19 @@ function syncMode(){
   const mono = S.mode === 'mono';
   const isMerge = S.mode === 'merge';
   $('dstCard').style.display = isMerge ? '' : 'none';
+  /* 只剩一份输入时输入区收回单列（CSS 见 .grid2.single） */
+  const srcUp = $('srcCard').closest('.grid2');
+  if (srcUp) srcUp.classList.toggle('single', !isMerge);
   $('alignLbl').style.display = isMerge ? '' : 'none';
   $('alignRow').style.display = isMerge ? '' : 'none';
   $('structLbl').style.display = adj ? '' : 'none';
   $('structRow').style.display = adj ? '' : 'none';
   /* v0.9.245：单语模式 —— 只有一份输入，配对/偏移/行宽/上下顺序全是双语概念，整块收起。
      留着它们不但没用，还会让人以为「单语也要设这些」。 */
-  ['shiftRow','biMaxWLbl','biMaxWRow','orderLbl','orderRow'].forEach(id=>{
+  /* ⚠️ shiftLbl 必须一起收起：.frow 是两列栅格，隐藏了内容却留下标签，会让后面的
+     「导出格式」标签被顶到第 2 格、格式卡退到第 1 格（170px 宽）里挤成竖排文字。
+     2026-10-09 发现（v0.9.249 视觉改版时实测单语模式）。 */
+  ['shiftLbl','shiftRow','biMaxWLbl','biMaxWRow','orderLbl','orderRow'].forEach(id=>{
     const el = $(id); if (el) el.style.display = mono ? 'none' : '';
   });
   /* 标签随模式换词：直接换 data-i18n 键，语言切换时 applyI18n 会按新键渲染 */
@@ -3774,7 +3875,7 @@ function fillAssFonts(){
    描边/位置整段丢弃 → 界面上永远是工具自己的默认外观，用户等于从零重调，原文件样式全丢。
    现在：解析出样式 → 判出「哪套是译文、哪套是原文、分屏还是底部双行」→ 填进面板 → 提示来源。
    ⚠️ 只认「位置 + 字号」：位低的那条当主（译文），除非位高那条字号明显更大（主语言在上）。
-   判错了用户点「⇅ 原文/译文互换」即可，比猜语言可靠（中译英时两边都可能含中文）。 */
+   判错了用户点「原文/译文互换」即可，比猜语言可靠（中译英时两边都可能含中文）。 */
 function importAssStyle(){
   let plan = null;
   /* 这一侧没有 ASS 样式可导入时，必须把上一次的「样式来自…」提示清掉，否则会留着陈旧信息 */
