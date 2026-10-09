@@ -56,9 +56,10 @@ const ok = (c, m, extra) => { c ? P++ : F++; console.log((c ? '  ✓ ' : '  ✗ 
   const dstRow = rows.find(r => /SlotD_lyric/.test(r.style)) || rows.find(r => /Bottom|TopMain|Sub/.test(r.style));
   const srcRow = rows.find(r => r !== dstRow);
   ok(!!dstRow && dstRow.mv === 42 + F1.lyric.dMV, '译文行 MarginV = 42 + ' + F1.lyric.dMV + ' = 78', dstRow && dstRow.mv);
-  ok(!!srcRow && srcRow.mv === 117, '原文行 MarginV 仍是 117（槽只挪承载行）', srcRow && srcRow.mv);
-  const gap = 117 - (42 + F1.lyric.dMV);
-  ok(gap >= 20, '两行间隙 ' + gap + 'px（旧值 70 时只有 5px，几乎贴住）', gap);
+  /* v0.9.254：dMV 改为**整条级** —— 原文行加同一个偏移（此前只挪译文行，两行行盒会压在一起） */
+  ok(!!srcRow && srcRow.mv === 117 + F1.lyric.dMV, '原文行也上移：117 + ' + F1.lyric.dMV + ' = 153', srcRow && srcRow.mv);
+  const gap = (117 + F1.lyric.dMV) - (42 + F1.lyric.dMV);
+  ok(gap >= 60, '两行距离仍是 ' + gap + 'px（行间关系不变，译文行不会被推到原文行盒里）', gap);
 
   console.log('\n— ③ 主预览实测像素（预览 = 等比缩略图，量的是相对位置）—');
   const geo = await ev(`(function(){var e1=document.getElementById('assPvLine1'),e2=document.getElementById('assPvLine2');

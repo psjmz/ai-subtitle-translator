@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.253/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.254/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.253</.test(html), '首页版本号未升 0.9.245');
-    assert.ok(/class="ver-tag">v0\.9\.253</.test(html), '工作台版本号未升 0.9.245');
-    assert.ok(/srt-core\.js\?v=0\.9\.253/.test(html), 'srt-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.254</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.254</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.254/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.253</.test(mg), 'merge.html 版本未升 0.9.245');
-    assert.ok(/merge-core\.js\?v=0\.9\.253/.test(mg), 'merge-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.254</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.254/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5677,10 +5677,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const st = assStyleOf\(\), m = assMVs\(\)/.test(pv), '预览没读 assMVs()');
     assert.ok(/const mv = assMVs\(\);/.test(ev), '导出没读 assMVs()');
     /* v0.9.235：预览里也改成原样取值（与导出的 mv.dst / mv.src 同一数字） */
-    /* v0.9.250：预览的离底值 = 面板原值 + 槽的整条级偏移。
-       ⚠️ 名字必须与导出那两处一致（dOff/sOff），否则又是「预览挪了、导出没挪」。 */
-    assert.ok(/const dstMV = m\.dst \+ dOff, srcMV = m\.src \+ sOff;/.test(pv),
-      '预览对离底值做了额外加工（应与导出同一个原样取值 + 槽偏移）');
+    /* v0.9.250：预览的离底值 = 面板原值 + 槽的整条级偏移（v0.9.254：两行同一个 cueOff）。
+       ⚠️ 取值口径必须与导出那两处一致（cueOff），否则又是「预览挪了、导出没挪」。 */
+    assert.ok(/const dstMV = m\.dst \+ cueOff, srcMV = m\.src \+ cueOff;/.test(pv),
+      '预览对离底值做了额外加工（应与导出同一个原样取值 + 同一个槽偏移）');
     /* v0.9.235：导出也改成原样取值（不再 Math.max(0, …)） */
     assert.ok(/const dstMV = mv\.dst, srcMV = mv\.src;/.test(ev),
       '导出对离底值做了额外加工（应与预览同一个原样取值）');
@@ -5868,9 +5868,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 旧的抬高量推算必须删干净 */
     assert.ok(!/botLines/.test(mg) && !/stackOf/.test(mg), 'v0.9.225/226 的行数重算路径还在');
     assert.ok(!/C\.assStackMV\(/.test(mg) && !/C\.assTopMV\(/.test(mg), '仍在调用旧的抬高量函数');
-    assert.ok(/const dstMV = m\.dst \+ dOff, srcMV = m\.src \+ sOff;/.test(mg), '预览未取两个离底值');
-    /* 预览与导出必须同口径：同一对数值 */
-    assert.ok(/mv: srcMV \+ sOff \}/.test(mg) && /mv: dstMV \+ dOff \}/.test(mg), '导出的 mv 与预览取值不同源');
+    assert.ok(/const dstMV = m\.dst \+ cueOff, srcMV = m\.src \+ cueOff;/.test(mg), '预览未取两个离底值');
+    /* 预览与导出必须同口径：同一对数值 + 同一个整条级偏移（v0.9.254） */
+    assert.ok(/mv: srcMV \+ off \}/.test(mg) && /mv: dstMV \+ off \}/.test(mg), '导出的 mv 与预览取值不同源');
   });
 
   /* ================= v0.9.229：位置由数值决定后，「上下顺序」必须真的对调 ================= */
@@ -6402,7 +6402,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const ev = mgE.slice(mgE.indexOf('function buildAssEvents(){'), mgE.indexOf('function buildExport(){'));
     assert.ok(/const st = assStyleOf\(\), m = assMVs\(\)/.test(pv), '预览没读 assMVs()');
     assert.ok(/const mv = assMVs\(\);/.test(ev), '导出没读 assMVs()');
-    assert.ok(/const dstMV = m\.dst \+ dOff, srcMV = m\.src \+ sOff;/.test(pv), '预览不是原样取值');
+    assert.ok(/const dstMV = m\.dst \+ cueOff, srcMV = m\.src \+ cueOff;/.test(pv), '预览不是原样取值');
     assert.ok(/const dstMV = mv\.dst, srcMV = mv\.src;/.test(ev), '导出不是原样取值');
     /* 样式层与导入换算也不许再有 Math.max(0,…) / [0,1080] */
     assert.ok(!/Math\.max\(0, m\.(?:dst|src)\)/.test(mgE), 'merge.html 仍有 Math.max(0, m.*)');
@@ -7364,11 +7364,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.253/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.253/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.253/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.253/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.253/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.254/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.254/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.254/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.254/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.254/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
@@ -7642,7 +7642,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：垂直偏移落在逐条 Dialogue 的 MarginV，不落在 Style 上', () => {
-    assert.ok(/mv: dstMV \+ dOff/.test(mg) && /mv: srcMV \+ sOff/.test(mg), 'dMV 没加到 Dialogue 的 MarginV');
+    /* v0.9.254：两个角色加**同一个**偏移（整条级）—— 见下方 254 那组 */
+    assert.ok(/mv: srcMV \+ off/.test(mg) && /mv: dstMV \+ off/.test(mg), 'dMV 没加到 Dialogue 的 MarginV');
     /* 反例：Dialogue 的 MarginV 非 0 时会覆盖 Style 的 MarginV，加在 Style 上等于没加 */
     assert.ok(!/if \(d\.dMV\) spec\.mv/.test(mg), 'dMV 加在 Style 的 MarginV 上会被逐条值覆盖（等于没加）');
   });
@@ -8025,7 +8026,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       'ASS 预览没取槽');
     /* 必须读 slotAssSpec（= formatAss 的 extraStyles 用的那一个），不许预览自己拼一份 */
     assert.ok(/const spec = slotAssSpec\(sid, p\);/.test(pv), 'ASS 预览没走导出同一份 spec');
-    assert.ok(/const dOff = \(dDst && dDst\.dMV != null\)/.test(pv) && /mv: \(p === 'dst'\) \? dstMV : srcMV/.test(pv),
+    assert.ok(/const cueOff = slotCueOffset\(sp\);/.test(pv) && /mv: \(p === 'dst'\) \? dstMV : srcMV/.test(pv),
       '槽的垂直偏移没进预览');
     /* 样例必须带出它是哪一行的槽 */
     const sm = mg.slice(mg.indexOf('function assPvSample(){'), mg.indexOf('function renderAssPv(){'));
@@ -8134,20 +8135,26 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   /* ================= v0.9.251：出厂「歌词」槽的位移降到 36（用户拍板 30~40） ================= */
-  t('v0.9.251：出厂歌词槽 dMV 落在 30~40（70 在双行模板下会撞到原文行）', () => {
+  t('v0.9.251/254：出厂歌词槽 dMV 落在 30~40，且偏移是**整条级**的', () => {
     /* 背景：dMV=70 是按**分屏**模板想出来的（分屏原文行在 922，上移 70 很安全）；
-       但默认模板是**底部双行**（dst 42 / src 117，两行只隔 75px），
-       42+70=112 ≈ 贴在原文行 117 上 —— 加了预览之后一眼就能看见。用户拍板区间 30~40。 */
+       默认模板是**底部双行**（dst 42 / src 117，行盒高 ≈63px、两行间隙只有 12px）。
+       ⚠️ v0.9.254 修掉的真 bug：此前 dMV 只加到**译文行**上 —— 42+36=78 的译文行盒
+          [78,141] 直接压进原文行盒 [117,180]，用户报的就是「译文和原文重合」。
+          现在两个角色加同一个偏移（slotCueOffset），行间关系恒定，整条一起抬起。 */
     const m = /id:\s*'lyric'[^}]*dMV:\s*(\d+)/.exec(mg);
     assert.ok(m, '出厂 lyric 槽没带 dMV（前提变了）');
     const v = +m[1];
     assert.ok(v >= 30 && v <= 40, '歌词槽 dMV 不在用户拍板的 30~40 内：' + v);
-    assert.ok(v !== 70, '又退回 70 了（那会在双行模板下压住原文行）');
-    /* ⚠️ 与真实的双行预设联动：预设值变了这条要跟着复核，别写成死数字 */
+    assert.ok(v !== 70, '又退回 70 了（那是分屏口径，双行下整条抬 70 会顶到画面中部）');
+    /* 整条级取值：dst 那半优先（界面上 dMV 只出现在译文半），src 作后备 */
+    const i0 = mg.indexOf('function slotCueOffset(');
+    const fn = i0 < 0 ? '' : mg.slice(i0, i0 + 340);
+    assert.ok(/const d = \(s\.dst \|\| \{\}\)\.dMV, r = \(s\.src \|\| \{\}\)\.dMV;/.test(fn), 'slotCueOffset 取值来源不对');
+    assert.ok(/const v = \(d != null\) \? d : r;/.test(fn), 'slotCueOffset 没按「dst 优先」取值');
+    /* 底部双行的两个预设值都在（对照用），且两行离底差距要容得下两行行盒 */
     const st = /assDstMV:\s*'(\d+)'[^\n]*assSrcMV:\s*'(\d+)'/.exec(mg);
     assert.ok(st, '读不到底部双行预设（42/117）');
-    const gap = +st[2] - (+st[1] + v);
-    assert.ok(gap >= 20, '译文行上移后离原文行只剩 ' + gap + 'px（<20 会看着像贴在一起）');
+    assert.ok(+st[2] - +st[1] >= 60, '双行上下两行离底只差 ' + (+st[2] - +st[1]) + 'px，装不下一个行盒');
   });
 
   t('v0.9.251：歌词槽四语提示不再说「上移一行」（36 已经不是一行了）', () => {
@@ -8255,6 +8262,90 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       assert.ok(/选中|選中|select|選択/.test(hit[1]), L + ' 的槽提示没讲「选中」：' + hit[1]);
       assert.ok(!/只看|only lists|だけ表示/.test(hit[1]), L + ' 的槽提示还停在「只看」的旧说法');
     });
+  });
+
+  /* ================= v0.9.254：胶囊数字 = 行数；示例覆盖全部出厂槽；dMV 整条级 ================= */
+  t('v0.9.254：胶囊后面的数字是「用这个槽的行数」，不是补丁项数', () => {
+    /* 用户反馈（附截图）：示例态下「默认」后面一个数字都没有，可它明明占了大半行 ——
+       数字挂的是 slotCount（样式补丁有几项），而默认槽的补丁是空的。
+       胶囊自己是筛选器（点它只列它用在哪几行），数字就该是这个条数。 */
+    assert.ok(/function slotRowCount\(id\)\{/.test(mg), '缺 slotRowCount');
+    const i0 = mg.indexOf('function slotRowCount(');
+    const fn = mg.slice(i0, i0 + 380);
+    assert.ok(/if \(slotOfRow\(i\) === id\) n\+\+;/.test(fn), 'slotRowCount 没按行统计');
+    const rs = mg.slice(mg.indexOf('function renderSlots(){'), mg.indexOf('function renderSlotEdit(){'));
+    assert.ok(/const n = slotRowCount\(id\);/.test(rs), '胶囊还在用补丁项数');
+    assert.ok(!/const n = slotCount\(id\);/.test(rs), '胶囊数字没换过来');
+    /* ⚠️ 数字必须**无条件**渲染：0 也有信息量（这个槽现在没被任何行用），
+       此前写成 n ? '…' : ''，默认槽就是被这一行藏掉的 */
+    assert.ok(/' <span class="mod">' \+ n \+ '<\/span>'/.test(rs), '数字仍被三元条件藏起来');
+    /* ⚠️ 编辑面板里的「覆盖 N / M 项」仍是补丁项数 —— 那是另一回事，不许一起改掉 */
+    assert.ok(/t\('slotCover', slotCount\(id\), total\)/.test(mg), '面板覆盖率被误改成行数');
+  });
+
+  t('v0.9.254：空状态示例覆盖全部五个出厂槽', () => {
+    /* 示例的作用是「让用户先看见效果」。只挂两条槽时，旁白/强调的胶囊永远显示 0，
+       用户点它们只看到一张空表 —— 像是坏了。五个出厂槽每样来一条。 */
+    const dm = mg.slice(mg.indexOf('const DEMO_ROWS = ['), mg.indexOf('function demoRows(){'));
+    ['narration', 'sfx', 'lyric', 'emphasis'].forEach(id => {
+      assert.ok(dm.indexOf("slot:'" + id + "'") >= 0, '示例里没有 ' + id + ' 这一槽');
+    });
+    /* ⚠️ 示例的槽必须落成**常量**再挂进 assign：装载过程中 setFmtSilently('stack') 会派发
+       change → renderAssPv → assPvSample → syncSlotsToRows()，那时 assign 还空着的话
+       每行都被刷成 default，之后再读 r.slot 就什么都读不到（v0.9.254 实测踩过）。 */
+    assert.ok(/const DEMO_SLOTS = \{\};/.test(mg) && /S\.style\.assign = Object\.assign\(\{\}, DEMO_SLOTS\);/.test(mg),
+      '示例的槽没落成常量 / 没进 assign');
+    const ld = mg.slice(mg.indexOf('function loadDemo(){'), mg.indexOf('function endDemo('));
+    assert.ok(ld.indexOf('S.style.assign = Object.assign({}, DEMO_SLOTS);') < ld.indexOf("setFmtSilently('stack')"),
+      'assign 挂在切格式之后了（示例槽会被那条链刷成 default）');
+    /* ⚠️ 示例退场必须把行号槽一起收掉：真实字幕的前几行不该继承示例的槽 */
+    const ed = mg.slice(mg.indexOf('function endDemo('), mg.indexOf('function syncSlotsToRows('));
+    assert.ok(/S\.style\.assign = \{\};/.test(ed), '示例退场没清 assign（真实行会继承示例的槽）');
+    /* 提示文案里的行数要跟上示例的真实行数 */
+    assert.ok(!/demoTipBody:'：下面是 6 行样本/.test(mg) && !/demoTipBody:': six sample rows/.test(mg),
+      '提示文案还写着 6 行');
+  });
+
+  t('v0.9.254：歌词槽的垂直偏移是整条级 —— 译文行与原文行同一个偏移', () => {
+    /* 用户报「歌词槽译文和原文重合」：底部双行 dst 42 / src 117，行盒高 ≈63px、间隙仅 12px。
+       改前只挪译文行 → 42+36=78 的行盒 [78,141] 压进原文行盒 [117,180]。 */
+    const b = mg.slice(mg.indexOf('function buildAssEvents()'), mg.indexOf('function buildExport('));
+    assert.ok(/const off = useSlot \? slotCueOffset\(slotObj\(sid\)\) : 0;/.test(b), 'buildAssEvents 没取整条级偏移');
+    assert.ok(/mv: srcMV \+ off/.test(b) && /mv: dstMV \+ off/.test(b), '两行没加同一个偏移');
+    assert.ok(!/dOff|sOff/.test(b), '还留着「只挪一行」的旧变量');
+    /* 预览必须同口径 —— 否则又是「预览不重合、导出重合」 */
+    const pv = mg.slice(mg.indexOf('function renderAssPv(){'), mg.indexOf('function baseName(){'));
+    assert.ok(/const cueOff = slotCueOffset\(sp\);/.test(pv), '预览没取整条级偏移');
+    assert.ok(/const dstMV = m\.dst \+ cueOff, srcMV = m\.src \+ cueOff;/.test(pv), '预览两行没加同一个偏移');
+  });
+
+  t('v0.9.254：面板对照预览画「这个槽自己的示意内容」（歌词带 ♪、音效带方括号）', () => {
+    /* 用户要求：套用样式预览里的字幕内容要随槽区分 —— 预览里出现一句普通对白，
+       看不出这个槽是给什么用的；歌词得有 ♪、音效得是方括号。 */
+    const fac = mg.slice(mg.indexOf('const SLOT_FACTORY = ['), mg.indexOf('function slotSampleText('));
+    [['lyric', '♪'], ['sfx', '['], ['narration', 'Narrator'], ['emphasis', 'NOW']].forEach(pair => {
+      const id = pair[0], mark = pair[1];
+      const i = fac.indexOf("id:'" + id + "'");
+      assert.ok(i >= 0, '找不到出厂槽 ' + id);
+      const seg = fac.slice(i, i + 320);
+      assert.ok(seg.indexOf('sample:') >= 0, id + ' 没有示意文本');
+      assert.ok(seg.indexOf(mark) >= 0, id + ' 的示意文本里没有 ' + mark);
+    });
+    /* ⚠️ 取「正在编辑的槽」而不是 slotOverride：基础样式那半的 override 是空串，
+       两半要用同一段文本才是有效对照 */
+    const pv = mg.slice(mg.indexOf('function renderAssPv(){'), mg.indexOf('function baseName(){'));
+    assert.ok(/const smp = \(T\.slotOverride != null\) \? slotSampleText\(S\.style\.cur\) : null;/.test(pv),
+      'ASS 面板预览没按当前槽取示意文本');
+    assert.ok(/const enT = smp \? smp\.en : samp\.en, zhT = smp \? smp\.zh : samp\.zh;/.test(pv), '示意文本没接上');
+    assert.ok(/paint\(l1, enT, sideOf\('src'\)\);/.test(pv) && /paint\(l2, zhT, sideOf\('dst'\)\);/.test(pv),
+      '画的还是样例原文，没换成示意文本');
+    const vp = mg.slice(mg.indexOf('function renderVttPv(){'), mg.indexOf('function vttPresetLabel('));
+    assert.ok(/sp\.textContent = smp \? \(isS \? smp\.en : smp\.zh\) : L\.text;/.test(vp), 'VTT 面板预览没换文本');
+    /* ⚠️ 主预览（slotOverride == null）画的是用户自己的字幕，一个字都不许换 */
+    assert.ok(/const smp = \(T\.slotOverride != null\) \? slotSampleText/.test(pv) && /: null;/.test(pv),
+      '示意文本没有被限制在面板预览里');
+    /* 用户自建的槽没有示意文本 → 退回真实样例，不许编内容 */
+    assert.ok(/return \(f && f\.sample\) \? f\.sample : null;/.test(mg), '找不到槽的示意文本时没有安全回落');
   });
 
   /* ================= v0.9.247：工作台布局 + 空状态示例 ================= */

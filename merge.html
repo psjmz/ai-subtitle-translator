@@ -478,7 +478,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.253</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.254</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -973,7 +973,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.253"></script>
+<script src="merge-core.js?v=0.9.254"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1075,7 +1075,7 @@ const I18N = {
     colNo:'#', colTime:'时间', colSrc:'原文', colDst:'译文',
     tagDrop:'未配上·不出现在成片', tagMerged:'并入上一条',
     pvNote:'预览最多显示前 {0} 条，完整内容以导出文件为准。',
-    demoTipTitle:'示例', demoTipBody:'：下面是 6 行样本，先看合并后的样子；上传你自己的字幕、点「合并预览」后自动替换。示例不可导出。', demoNoExport:'示例数据不能导出，先上传你自己的字幕',
+    demoTipTitle:'示例', demoTipBody:'：下面是 7 行样本，先看合并后的样子；上传你自己的字幕、点「合并预览」后自动替换。示例不可导出。', demoNoExport:'示例数据不能导出，先上传你自己的字幕',
   expTitle:'导出', btnDownload:'下载字幕', btnCopy:'复制内容',
     needBoth:'请先在上方提供原文和译文字幕（文件或粘贴均可）', needMerge:'请先点预览按钮生成结果',
     copied:'已复制到剪贴板', downloaded:'已开始下载',
@@ -1226,7 +1226,7 @@ const I18N = {
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'譯文',
     tagDrop:'未配上·不出現在成片', tagMerged:'併入上一條',
     pvNote:'預覽最多顯示前 {0} 條，完整內容以匯出檔案為準。',
-    demoTipTitle:'範例', demoTipBody:'：下面是 6 行樣本，先看合併後的樣子；上傳你自己的字幕、點「合併預覽」後自動取代。範例不可匯出。', demoNoExport:'範例資料不能匯出，請先上傳你自己的字幕',
+    demoTipTitle:'範例', demoTipBody:'：下面是 7 行樣本，先看合併後的樣子；上傳你自己的字幕、點「合併預覽」後自動取代。範例不可匯出。', demoNoExport:'範例資料不能匯出，請先上傳你自己的字幕',
   expTitle:'匯出', btnDownload:'下載字幕', btnCopy:'複製內容',
     needBoth:'請先在上方提供原文和譯文字幕（檔案或貼上均可）', needMerge:'請先點預覽按鈕產生結果',
     copied:'已複製到剪貼簿', downloaded:'已開始下載',
@@ -1377,7 +1377,7 @@ const I18N = {
     colNo:'#', colTime:'Time', colSrc:'Original', colDst:'Translation',
     tagDrop:'Unpaired·excluded from output', tagMerged:'Folded into previous',
     pvNote:'Preview shows the first {0} rows only; the exported file contains everything.',
-    demoTipTitle:'Sample', demoTipBody:': six sample rows below, so you can see the result first. Upload your own subtitles and hit Merge to replace them. Sample data cannot be exported.', demoNoExport:'Sample data cannot be exported - upload your own subtitles first',
+    demoTipTitle:'Sample', demoTipBody:': seven sample rows below, so you can see the result first. Upload your own subtitles and hit Merge to replace them. Sample data cannot be exported.', demoNoExport:'Sample data cannot be exported - upload your own subtitles first',
   expTitle:'Export', btnDownload:'Download subtitles', btnCopy:'Copy content',
     needBoth:'Provide both the original and the translated subtitles first (file or paste)', needMerge:'Click the preview button first',
     copied:'Copied to clipboard', downloaded:'Download started',
@@ -1528,7 +1528,7 @@ const I18N = {
     colNo:'#', colTime:'時間', colSrc:'原文', colDst:'訳文',
     tagDrop:'未対応·出力に含まれない', tagMerged:'前の条に統合',
     pvNote:'プレビューは先頭 {0} 行のみ。完全な内容はエクスポートファイルで確認してください。',
-    demoTipTitle:'サンプル', demoTipBody:'：以下の 6 行はサンプルです。字幕をアップロードして「結合プレビュー」を押すと実際のデータに置き換わります。サンプルは書き出せません。', demoNoExport:'サンプルデータは書き出せません。先に字幕をアップロードしてください',
+    demoTipTitle:'サンプル', demoTipBody:'：以下の 7 行はサンプルです。字幕をアップロードして「結合プレビュー」を押すと実際のデータに置き換わります。サンプルは書き出せません。', demoNoExport:'サンプルデータは書き出せません。先に字幕をアップロードしてください',
   expTitle:'エクスポート', btnDownload:'字幕をダウンロード', btnCopy:'内容をコピー',
     needBoth:'まず原文と訳文字幕を用意してください（ファイルまたは貼り付け）', needMerge:'先にプレビューボタンを押してください',
     copied:'クリップボードにコピーしました', downloaded:'ダウンロードを開始しました',
@@ -2013,18 +2013,33 @@ const slotSpec = k => SLOT_MAP[k] || null;
    ⚠️ 音效**不开斜体** —— Netflix 明文「Never italicize speaker IDs or sound effects」，
       音效改用淡色区分（这条与直觉相反，别改回去）。 */
 const SLOT_FACTORY = [
-  { id:'default',   color:'#888780', dst:{} },
-  { id:'narration', color:'#BA7517', dst:{ italic:true } },
-  /* ⚠️ v0.9.251：lyric 的 dMV 由 70 降到 **36**（用户拍板 30~40）。
+  { id:'default',   color:'#888780', dst:{},
+    sample:{ en:"All right, let's begin.",       zh:"好的，我们开始吧。" } },
+  { id:'narration', color:'#BA7517', dst:{ italic:true },
+    sample:{ en:"Narrator: three years had passed.", zh:"旁白：三年就这样过去了。" } },
+  /* ⚠️ v0.9.251 定值 36、v0.9.254 修语义：lyric 的 dMV = 36（用户拍板 30~40），**整条级**上移。
      70 是按「分屏模板」想出来的（分屏下原文行在 922，上移 70 很安全）；
-     但**默认的「底部双行」是 dst 42 / src 117**，两行只隔 75px —— 上移 70 会把译文行推到 112，
-     几乎压在原文行 117 上。36 ≈ 75 的一半，译文行正好落在两行的正中间（78），
-     上下各留 ~39px，肉眼看得出来「抬起来了」又不贴住原文行。
-     ⚠️ 别再往回加到 70：那是分屏口径，双行下必撞车。 */
-  { id:'lyric',     color:'#7F77DD', dst:{ italic:true, dMV:36 } },
-  { id:'sfx',       color:'#378ADD', dst:{ color:'#B0B0B0' } },
-  { id:'emphasis',  color:'#E24B4A', dst:{ bold:true } }
+     但**默认的「底部双行」是 dst 42 / src 117**，行盒高 ≈63px、两行间隙只剩 12px。
+     ⚠️ v0.9.254 修掉的真 bug：此前 dMV 只加到**译文行**上 —— 42+36=78 的译文行盒
+        [78,141] 直接压进原文行盒 [117,180]，用户报的就是「译文和原文重合」。
+        现在译文行与原文行加**同一个**偏移（slotCueOffset）：42/117 → 78/153，
+        两行关系完全不变（间隙仍是 12px），效果 = 歌词这一整条抬起半行，与普通对白分开。
+     ⚠️ 别再往回加到 70：那是分屏口径，双行下整条抬 70 会顶到画面中部。 */
+  { id:'lyric',     color:'#7F77DD', dst:{ italic:true, dMV:36 },
+    sample:{ en:"♪ the road we walked together ♪", zh:"♪ 我们一起走过的那条路 ♪" } },
+  { id:'sfx',       color:'#378ADD', dst:{ color:'#B0B0B0' },
+    sample:{ en:"[ phone ringing ]",              zh:"[ 电话铃声 ]" } },
+  { id:'emphasis',  color:'#E24B4A', dst:{ bold:true },
+    sample:{ en:"You have to stop this. NOW.",     zh:"你必须停下来了。就现在。" } }
 ];
+/* v0.9.254：面板里的「套用样式预览」要画**这个槽自己的示意内容**，不是碰巧选中的那行样例 ——
+   歌词槽预览里得出现 ♪、音效槽得是方括号，用户一眼就知道这个槽是给什么用的。
+   ⚠️ 只作用于 ✎ 面板的对照预览；右侧主预览画的是用户自己的字幕，一个字都不许换。
+   ⚠️ 找不到示意文本（用户自建的槽）就退回真实样例，不许编内容。 */
+function slotSampleText(id){
+  const f = SLOT_FACTORY.find(x => x.id === id);
+  return (f && f.sample) ? f.sample : null;
+}
 const SLOT_NAME_KEY = { default:'slotDefault', narration:'slotNarration', lyric:'slotLyric', sfx:'slotSfx', emphasis:'slotEmphasis' };
 const SLOT_TIP_KEY  = { default:'slotTipDefault', narration:'slotTipNarration', lyric:'slotTipLyric', sfx:'slotTipSfx', emphasis:'slotTipEmphasis' };
 
@@ -2060,6 +2075,30 @@ function slotCount(id){
   const s = slotObj(id); if (!s) return 0;
   return Object.keys(s.dst || {}).length + Object.keys(s.src || {}).length;
 }
+/* v0.9.254：胶囊后面的数字 = **用这个槽的行数**。
+   ⚠️ 此前挂的是 slotCount（样式补丁有几项）—— 与胶囊自己的语义对不上：
+      胶囊是筛选器（「点它只列它用在哪几行」），而默认槽补丁是空的 → 一个数字都不显示，
+      可它明明占了示例里的绝大多数行。用户按「条数」理解，就按条数给。 */
+function slotRowCount(id){
+  ensureStyle();
+  const rows = S.rows || [];
+  let n = 0;
+  for (let i = 0; i < rows.length; i++) if (slotOfRow(i) === id) n++;
+  return n;
+}
+/* v0.9.254：槽的垂直偏移（dMV）是**整条级**参数 —— 一条 cue 的译文行与原文行加同一个偏移。
+   ⚠️ 此前只把 dMV 加到译文行（`dstMV + dOff`）、原文行不动，于是歌词槽在默认的
+      「底部双行」（dst 42 / src 117，行盒高 ≈63px，间隙仅 12px）下把译文行推到 78，
+      译文行盒 [78,141] 直接压进原文行盒 [117,180] —— 用户看到的就是「译文和原文重合」。
+      整条一起挪则行间关系完全不变（42/117 → 78/153，间隙仍是 12px），
+      这也与 VTT 侧一致：那边 dMV 落在 cue settings 的 line 上，本来就是整条级。
+   ⚠️ 取值优先级：dst 那半（界面上 dMV 只出现在译文半）> src 那半 > 0。 */
+function slotCueOffset(s){
+  if (!s) return 0;
+  const d = (s.dst || {}).dMV, r = (s.src || {}).dMV;
+  const v = (d != null) ? d : r;
+  return (v == null) ? 0 : (+v || 0);
+}
 /* 槽改了 → 用到它的行全部跟着变，所以标 modified（预设槽才有「恢复预设」的意义） */
 function markSlotModified(id){
   const s = slotObj(id); if (!s) return;
@@ -2088,15 +2127,15 @@ function renderSlots(){
   ensureStyle();
   bar.innerHTML = S.style.order.map(id=>{
     const s = S.style.slots[id]; if (!s) return '';
-    const n = slotCount(id);
+    /* v0.9.254：数字 = 用这个槽的**行数**（此前是样式补丁项数，与「筛选器」语义对不上） */
+    const n = slotRowCount(id);
     const mod = s.modified ? ' <span class="mod">· ' + esc(t('slotModified')) + '</span>' : '';
     /* v0.9.248：胶囊是**筛选器** —— 点一下只列出用了这个槽的行（filt），再点取消。
-       编辑样式走右边的小铅笔（✎），两者分开：以前点胶囊只是「设为当前槽」，
-       而用户真正想要的是「这个槽都用在哪几行」。 */
+       编辑样式走右边的小铅笔（✎）；v0.9.253 起点胶囊同时把编辑目标切过去（见 bindSlotUI）。 */
     const filt = (S.filter && S.filter.slot === id) ? ' filt' : '';
     return '<span class="slot-chip' + (id === S.style.cur ? ' on' : '') + filt + '" data-slot="' + esc(id) + '" role="button" tabindex="0">' +
       slotAaHtml(id) + esc(slotLabel(id)) +
-      (n ? ' <span class="mod">' + n + '</span>' : '') + mod +
+      ' <span class="mod">' + n + '</span>' + mod +
       '<span class="slot-edit-btn" data-slot-edit="' + esc(id) + '" role="button" tabindex="0" title="' + esc(t('slotEditTip')) + '"></span></span>';
   }).join('') + '<span class="slot-chip" data-slot-new="1" role="button" tabindex="0">' + esc(t('slotNew')) + '</span>';
   /* ⚠️ 别在这里再补 '+ '：slotNew 四语文案里本来就带 '+'，再拼一个就成了「++ 新建槽」（250 截图抓到）。 */
@@ -2327,20 +2366,30 @@ function applySlotToAll(id){
    现在：默认铺一份**样本**（6 行，含一条音效、一条歌词，槽也是真的），结果表与右侧预览都点亮，
    用户进来先看见成品；只要他自己上传/粘贴并点了合并，示例立刻被真实数据顶掉。
    ⚠️ 示例可看不可导出：doDownload / doCopy 在 demo 态直接拦掉，不做任何文件落地。 */
+/* ⚠️ 示例要**覆盖全部五个出厂槽** —— 只放一条音效 + 一条歌词时，旁白/强调的胶囊
+   永远显示 0 行，用户点它们只看到空表，反而以为功能坏了（v0.9.254）。
+   每行的 slot 就是它出厂挂在哪个槽上，loadDemo 会据此建 assign。 */
 const DEMO_ROWS = [
-  { en:"All right, let's begin.",                 zh:"好的，我们开始吧。" },
-  { en:"This is the part that actually matters.",  zh:"这才是真正关键的部分。" },
-  { en:"[ phone ringing ]",                        zh:"[ 电话铃声 ]" },
-  { en:"♪ the road we walked together ♪",          zh:"♪ 我们一起走过的那条路 ♪" },
-  { en:"Give me three more days.",                 zh:"再给我三天时间，我会把这件事做完。" },
-  { en:"That is why the outcome was different.",   zh:"所以最终的结果完全不同。" }
+  { slot:'',          en:"All right, let's begin.",                zh:"好的，我们开始吧。" },
+  { slot:'narration', en:"Narrator: three years had passed.",      zh:"旁白：三年就这样过去了。" },
+  { slot:'sfx',       en:"[ phone ringing ]",                      zh:"[ 电话铃声 ]" },
+  { slot:'lyric',     en:"♪ the road we walked together ♪",        zh:"♪ 我们一起走过的那条路 ♪" },
+  { slot:'emphasis',  en:"You have to stop this. NOW.",            zh:"你必须停下来了。就现在。" },
+  { slot:'',          en:"This is the part that actually matters.", zh:"这才是真正关键的部分。" },
+  { slot:'',          en:"That is why the outcome was different.",  zh:"所以最终的结果完全不同。" }
 ];
 function demoRows(){
   return DEMO_ROWS.map((r, i) => ({
     start: i * 3.2, end: i * 3.2 + 2.4,
-    en: r.en, zh: r.zh, flag: ''
+    en: r.en, zh: r.zh, flag: '', slot: r.slot || ''
   }));
 }
+/* ⚠️ v0.9.254：示例的槽单独落成常量，**不许**在 loadDemo 里现读行上的 slot ——
+   示例装载过程中会 setFmtSilently('stack') 派发 change，一路走到
+   renderAssPv → assPvSample → syncSlotsToRows()，那时 assign 还是空的，
+   于是每行都被刷成 default，再读 r.slot 就什么都读不到（五个槽全丢，胶囊数字全是 0）。 */
+const DEMO_SLOTS = {};
+DEMO_ROWS.forEach((r, i) => { if (r.slot && r.slot !== 'default') DEMO_SLOTS[i] = r.slot; });
 function syncDemoTip(){
   const el = $('demoTip'); if (!el) return;
   if (!S.demo){ el.style.display = 'none'; return; }
@@ -2354,6 +2403,11 @@ function loadDemo(){
   S.demo = true;
   S.rows = demoRows();
   S.report = { pairs: S.rows.length, onlySrc: [], onlyDst: [], merged: 0 };
+  /* ⚠️ 示例的槽要在**切格式之前**挂好：setFmtSilently 会派发 change，
+     中间那条链（renderAssPv → assPvSample → syncSlotsToRows）会按 assign 刷行上的 slot，
+     assign 还空着的话就把示例槽全刷成 default（v0.9.254 踩过：胶囊数字全变 0）。 */
+  S.style.assign = Object.assign({}, DEMO_SLOTS);
+  syncSlotsToRows();
   /* 默认导出格式是 SRT（没有样式、也没有预览）——示例就只剩一张表，看不出效果。
      这里临时切到「ASS 底部双行」把预览点亮；用户自己动过格式就再也不还原。 */
   const cur0 = tplVal();
@@ -2362,9 +2416,6 @@ function loadDemo(){
     setFmtSilently('stack');
     S.fmtTouched = false;   /* 这次是我们自己派的，不算用户改过 */
   }
-  /* 示例里也挂上真实槽（音效 / 歌词），让「槽是干什么的」当场看得见 */
-  S.style.assign = { 2:'sfx', 3:'lyric' };
-  syncSlotsToRows();
   renderReport();
   $('exp').style.display = 'block';
   renderAssPv();
@@ -2374,6 +2425,11 @@ function loadDemo(){
 function endDemo(){
   if (!S.demo) return;
   S.demo = false;
+  /* v0.9.254：示例塞进 assign 的**行号槽**必须一起收掉 ——
+     行的槽是按行号存的（assign），真实字幕的前几行不该继承示例的槽。
+     ⚠️ 只在示例退场的这一跳清（此时新 rows 还没生成）；用户自己配的槽不受影响
+        （真实数据下 S.demo 已是 false，直接 return）。 */
+  if (S.style) S.style.assign = {};
   syncDemoTip();
   /* 用户没手动改过格式 → 还给示例之前的那一档（示例不该偷偷改掉他的导出格式） */
   if (S.demoFmtPrev && !S.fmtTouched){ setFmtSilently(S.demoFmtPrev); S.demoFmtPrev = null; }
@@ -3057,16 +3113,17 @@ function buildAssEvents(){
           Dialogue 的 MarginV 非 0 时会覆盖 Style 里的 MarginV，写在 Style 里等于没写。 */
     const sid = p.slot || 'default';
     const useSlot = sid !== 'default' && !!slotObj(sid);
-    const dOff = useSlot ? ((slotObj(sid).dst || {}).dMV || 0) : 0;
-    const sOff = useSlot ? ((slotObj(sid).src || {}).dMV || 0) : 0;
+    /* v0.9.254：dMV 是**整条级**（译文行 + 原文行同一偏移）—— 此前只挪译文行，
+       歌词槽在底部双行下会把译文行压进原文行盒（见 slotCueOffset 上方注释）。 */
+    const off = useSlot ? slotCueOffset(slotObj(sid)) : 0;
     /* 样式只管「角色」（字号/颜色/描边），位置一律由各自的 MarginV 决定 */
     if (stacked){
-      if (srcText) lines.push({ style: useSlot ? slotAssName(sid,'src') : 'Sub', text:srcText, mv: srcMV + sOff });
-      if (dstText) lines.push({ style: useSlot ? slotAssName(sid,'dst') : 'Bottom', text:dstText, mv: dstMV + dOff });
+      if (srcText) lines.push({ style: useSlot ? slotAssName(sid,'src') : 'Sub', text:srcText, mv: srcMV + off });
+      if (dstText) lines.push({ style: useSlot ? slotAssName(sid,'dst') : 'Bottom', text:dstText, mv: dstMV + off });
     } else {
       /* 分屏：译文在上时用 TopMain（保持主字号主色），位置仍是它自己的离底值 */
-      if (dstText) lines.push({ style: useSlot ? slotAssName(sid,'dst') : (dstFirst ? 'TopMain' : 'Bottom'), text:dstText, mv: dstMV + dOff });
-      if (srcText) lines.push({ style: useSlot ? slotAssName(sid,'src') : (dstFirst ? 'Sub' : 'Top'), text:srcText, mv: srcMV + sOff });
+      if (dstText) lines.push({ style: useSlot ? slotAssName(sid,'dst') : (dstFirst ? 'TopMain' : 'Bottom'), text:dstText, mv: dstMV + off });
+      if (srcText) lines.push({ style: useSlot ? slotAssName(sid,'src') : (dstFirst ? 'Sub' : 'Top'), text:srcText, mv: srcMV + off });
     }
     return { start:p.start, end:p.end, lines };
   });
@@ -3142,19 +3199,26 @@ function renderAssPv(){
      面板内的对照预览 = 用户当场点选的那个槽，或强制基础样式。 */
   const sid = (T.slotOverride != null) ? T.slotOverride : (samp.slot || 'default');
   const sp  = (sid !== 'default') ? slotObj(sid) : null;
+  /* v0.9.254：面板对照预览画的是「这个槽长什么样」—— 文本换成**正在编辑那个槽的示意内容**
+     （歌词带 ♪、音效是方括号），用户一眼就知道这个槽是给什么用的。
+     ⚠️ 「套用这个槽」与「基础样式」两半必须用**同一段文本**才是有效对照，
+        所以判据取「正在编辑的槽」（S.style.cur），而不是 slotOverride（基础样式那半是空串）。
+     ⚠️ 右侧主预览（slotOverride == null）画的是用户自己的字幕，一个字都不许换。 */
+  const smp = (T.slotOverride != null) ? slotSampleText(S.style.cur) : null;
+  const enT = smp ? smp.en : samp.en, zhT = smp ? smp.zh : samp.zh;
   const dDst = (sp && sp.dst && Object.keys(sp.dst).length) ? sp.dst : null;
   const dSrc = (sp && sp.src && Object.keys(sp.src).length) ? sp.src : null;
-  /* 槽的垂直偏移是**整条级**参数，导出把它加在逐条 Dialogue 的 MarginV 上（`mv: dstMV + dOff`）。
-     预览必须用同样两个名字、同样的加法 —— 于是「填了 dMV 的槽」在预览里也真的会往上挪。 */
-  const dOff = (dDst && dDst.dMV != null) ? (+dDst.dMV || 0) : 0;
-  const sOff = (dSrc && dSrc.dMV != null) ? (+dSrc.dMV || 0) : 0;
+  /* 槽的垂直偏移是**整条级**参数（v0.9.254 起），导出把它加在逐条 Dialogue 的 MarginV 上
+     （`mv: dstMV + off` / `srcMV + off`，两行同一个偏移）。
+     预览必须用同样的加法 —— 于是「填了 dMV 的槽」在预览里也真的会**整条**往上挪。 */
+  const cueOff = slotCueOffset(sp);
   /* 槽的颜色不在面板输入框里 → 用「伪造的面板 id」喂给同一个 colOf，
      这样颜色解析只有一条路径（另开分支就会出现「导出是灰的、预览是白的」）。 */
   const ovr = {};
   const colOf = id => (ovr[id] != null ? ovr[id] : assColorVal(id, id.indexOf('Outline') > 0 ? '#000000' : '#FFFFFF'));
   /* v0.9.229：两个框都是「距画面底边多远」，一条字幕算一个绝对位置。
      预览与导出同一口径，不需要再按实测行数重算抬高量。 */
-  const dstMV = m.dst + dOff, srcMV = m.src + sOff;   /* v0.9.236：不再夹到 0；250：加上槽的偏移 */
+  const dstMV = m.dst + cueOff, srcMV = m.src + cueOff;   /* v0.9.236：不再夹到 0；250：加上槽的偏移；254：整条级 */
   /* hex → rgba：阴影与底衬都要按各自的不透明度混合，不能整行用 opacity 一起打折
      （ASS 里 PrimaryColour 的 alpha 只作用于文字填充，BackColour 的 alpha 只作用于阴影/底衬）。 */
   const rgbaOf = (hex, aPct) => {
@@ -3229,11 +3293,11 @@ function renderAssPv(){
   };
   /* 行 1 = 视觉上那条，行 2 = 下面那条；两条都按各自的离底距离定位 */
   if (dstFirst){
-    paint(l1, samp.zh, sideOf('dst'));
-    paint(l2, samp.en, sideOf('src'));
+    paint(l1, zhT, sideOf('dst'));
+    paint(l2, enT, sideOf('src'));
   } else {
-    paint(l1, samp.en, sideOf('src'));
-    paint(l2, samp.zh, sideOf('dst'));
+    paint(l1, enT, sideOf('src'));
+    paint(l2, zhT, sideOf('dst'));
   }
   if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p' +
     (sp ? ' · ' + slotLabel(sid) : '');
@@ -3445,13 +3509,18 @@ function renderVttPv(){
      （输入框里还留着上次手改的值，沿用时不该生效 —— 否则预览与导出会不一致）。 */
   const inh = v => (v === '' || v === null || v === undefined);
   cue.innerHTML = '';
+  /* v0.9.254：面板对照预览的文本换成**正在编辑那个槽的示意内容**（与 ASS 侧同一判据）：
+     歌词带 ♪、音效是方括号 ——「套用 vs 基础样式」两半用同一段字才是有效对照。
+     ⚠️ 右侧主预览（slotOverride == null）仍画用户自己的字幕。 */
+  const smp = (T.slotOverride != null) ? slotSampleText(S.style.cur) : null;
   parts[0].lines.forEach(L => {
     const isS = !!L.isSrc;
     /* 原文行：槽真覆盖了它那一半就取槽的 src 套，否则与译文行同一套（对应「没写 ::cue(.槽.src)」） */
     const st = (isS && srcOn) ? stSrc : stBase;
     const fam = C.vttFontStack(st.font) || '';
     const dv = document.createElement('div'); dv.className = 'vtt-pv-line';
-    const sp = document.createElement('span'); sp.className = 'pv-in'; sp.textContent = L.text;
+    const sp = document.createElement('span'); sp.className = 'pv-in';
+    sp.textContent = smp ? (isS ? smp.en : smp.zh) : L.text;
     dv.appendChild(sp); cue.appendChild(dv);
     /* v0.9.241：原文行按「项」决定是否沿用 —— 字号、颜色各有一个 mode，其余五项各自三态。
        全部沿用 = 这一行跟译文行长得一模一样（导出里也一样：既不打标记也不写规则）。 */
