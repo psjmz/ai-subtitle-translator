@@ -53,10 +53,23 @@
   .work>.opts{grid-column:1;margin-top:0}
   .work>.actions{grid-column:1}
   .work>.rep{grid-column:1;margin-top:0}
-  .work>.exp{grid-column:2;grid-row:1/span 3;width:396px;margin-top:0;position:sticky;top:14px}
+  /* v0.9.255（方案 A）：右栏改成一个 sticky 容器，里面是「预览卡 + 导出卡」。
+     ⚠️ 收放走 .on 类（原来是直接 toggle #exp 的 display）—— 整栏一起收，
+        否则 #exp 藏了、预览卡还在，右栏会留一块空的 480px。 */
+  .rail{display:none;flex-direction:column;gap:14px;
+    grid-column:2;grid-row:1/span 3;width:480px;margin-top:0;position:sticky;top:14px}
+  .rail.on{display:flex}
+  .pvcard{padding:14px 15px 13px}
+  .pv-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+  .pv-t{font-size:12px;font-weight:650;color:var(--sub)}
+  .pv-tag{margin-left:auto;font-size:11px;color:var(--mut);white-space:nowrap}
+  .pv-seg .segbtn{padding:5px 10px;font-size:12px}
+  .pv-none{margin:0}
+  .exp-sum{font-size:12px;color:var(--sub);margin:0 0 11px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+  .slot-pv-link{margin:0 0 12px}
   @media (max-width:1180px){
     .work{grid-template-columns:minmax(0,1fr)}
-    .work>.exp{grid-column:1;grid-row:auto;width:auto;position:static}
+    .work>.rail{grid-column:1;grid-row:auto;width:auto;position:static}
     /* 回单列时预览会跟着整宽撑到 1000+px（16:9 → 570px 高），白占一屏。
        限宽 560 居中：与右栏那档尺寸手感一致，也不再出现「一大块黑框」。 */
     .ass-pv-screen,.vtt-pv-screen{max-width:560px;margin:0 auto}
@@ -361,7 +374,8 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .tag.merged{background:var(--warn-weak);color:var(--warn)}
   .pv-note{margin-top:8px;font-size:11px;color:var(--mut)}
 
-  .exp{display:none;margin-top:18px}
+  /* v0.9.255：显隐整块交给 .rail（见上）；#exp 自己不再 display:none，否则它会永远藏着 */
+  .exp{margin-top:0}
   .exp-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .exp-row select{height:var(--ctl-h);border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
     border-radius:var(--r-ctl);padding:0 10px;font-size:12.5px}
@@ -419,17 +433,6 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .slot-edit{margin-top:11px;border-top:1px solid var(--line);padding-top:8px}
   .slot-edit>summary{cursor:pointer;font-size:12.5px;color:var(--sub);font-weight:600}
   .slot-edit-body{padding-top:10px}
-  /* v0.9.250：✎ 面板内的对照预览 —— 与右侧主预览共用同一段绘制代码，只是画到另一块画布上 */
-  .slot-pv{margin:0 0 12px}
-  .slot-pv-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px}
-  .slot-pv-t{font-size:12px;font-weight:650;color:var(--sub)}
-  .slot-pv-hd .btn-sm.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
-  .slot-pv-tag{margin-left:auto;font-size:11px;color:var(--mut);white-space:nowrap}
-  /* ⚠️ 420 → 560：范围里最要紧的是「上移 70」这类位置变化，而位置差是**按比例**缩的
-     （k = 画布高 / 1080）。420 宽时 70px 只剩 15px，两行的差别几乎看不出来；
-     560 宽 → 315 高 → 70px = 20px，同时字号也回到 15px 上下，读得清。
-     仍然严格等比、不做放大：预览 = 成片缩略图这条不能破。 */
-  .slot-pv-screen{max-width:560px;margin:0 auto}
   .slot-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
   .slot-views{display:flex;gap:6px;margin:10px 0 6px}
   .slot-views .btn-sm.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
@@ -473,12 +476,28 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     .slot-row .pk{width:72px}
     .filter-bar input{flex:1 1 100%}
   }
+  /* ===== v0.9.255：设置项的说明收进 ⓘ 悬停浮层 =====
+     与主站 index.html 同一套观感（14px 圆 + 深色气泡），但**不用**纯 CSS 伪元素气泡：
+     ASS / VTT 面板是 overflow:hidden（圆角需要），伪元素气泡会被直接裁掉 ——
+     主站 v0.9.198 就为此返工过一轮。这里统一用挂在 body 上的 JS 浮层，一处生效全站。 */
+  .info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:99px;
+    border:1px solid var(--line-strong);color:var(--mut);background:var(--card);
+    font-size:9px;font-style:normal;line-height:1;flex:none;margin-left:5px;vertical-align:1px;
+    cursor:help;user-select:none;transition:color .15s,border-color .15s,background .15s}
+  .info:hover,.info:focus-visible,.info.pin{border-color:var(--acc);color:var(--acc);background:var(--acc-weak);outline:none}
+  /* ⚠️ .note = 这条说明「跟着你当前的选择变了」（出厂默认档不点亮），提醒再看一眼 */
+  .info.note{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  #tipLayer{position:fixed;z-index:600;max-width:330px;padding:9px 11px;border-radius:9px;
+    background:#2B2A31;color:#F4F3F6;font-size:12px;line-height:1.65;text-align:left;white-space:normal;
+    box-shadow:0 10px 30px -14px rgba(20,20,28,.55);pointer-events:none;
+    opacity:0;transform:translateY(4px);transition:opacity .16s ease,transform .16s ease;display:none}
+  #tipLayer.on{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.254</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.255</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -538,17 +557,16 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   <div class="card opts">
     <h2><span class="n">3</span><span id="optTitle" data-i18n="optTitle">合并设置</span></h2>
     <div class="frow">
-      <div class="flbl" data-i18n="lblAlign" id="alignLbl">配对方式 · 时间轴取自</div>
+      <div class="flbl" id="alignLbl"><span data-i18n="lblAlign">配对方式 · 时间轴取自</span><i class="info" tabindex="0" id="alignHint" data-tip-i18n="alignHintTime" data-tip-dyn="1">i</i></div>
       <div id="alignRow">
         <div class="radios">
           <label><input type="radio" name="alignMode" value="order"><span data-i18n="alignOrder">按顺序配对 · 用原文时间轴</span></label>
           <label><input type="radio" name="alignMode" value="time" checked><span data-i18n="alignTime">按时间轴配对 · 用原文时间轴</span></label>
           <label><input type="radio" name="alignMode" value="dstTime"><span data-i18n="alignDstTime">按顺序配对 · 用译文时间轴</span></label>
         </div>
-        <div class="hint" id="alignHint" data-i18n="alignHintTime">条数不同或轴有漂移时用：按时间重叠配对，时间轴仍取原文；落在同一条原文时段内的多条译文会合并文字拼进去，内容不丢。</div>
       </div>
       <!-- v0.9.222：调整模式专用——结构识别（自动猜可手动改）+ 原文/译文互换 -->
-      <div class="flbl" data-i18n="lblStruct" id="structLbl" style="display:none">结构识别</div>
+      <div class="flbl" id="structLbl" style="display:none"><span data-i18n="lblStruct">结构识别</span><i class="info" tabindex="0" data-tip-i18n="structHint">i</i></div>
       <div id="structRow" style="display:none">
         <div class="radios" style="align-items:center;gap:8px;flex-wrap:wrap">
           <select id="structMode" style="max-width:200px">
@@ -558,24 +576,21 @@ textarea.paste-box{margin-top:8px;min-height:96px}
           </select>
           <button type="button" class="btn ghost" id="btnSwap" data-i18n="swapBtn">原文/译文互换</button>
         </div>
-        <div class="hint" data-i18n="structHint">自动判断双语结构；识别错了可手动指定。原文/译文方向反了点「互换」。</div>
       </div>
-      <div class="flbl" id="shiftLbl" data-i18n="lblShift">译文整体偏移（毫秒）</div>
+      <div class="flbl" id="shiftLbl"><span data-i18n="lblShift">译文整体偏移（毫秒）</span><i class="info" tabindex="0" data-tip-i18n="shiftHint">i</i></div>
       <div id="shiftRow">
         <input type="number" id="dstShift" value="0" step="100" style="max-width:160px">
-        <div class="hint" id="shiftHintEl" data-i18n="shiftHint">译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。</div>
       </div>
-      <div class="flbl" id="biMaxWLbl" data-i18n="lblBiMaxW">双语行宽</div>
+      <div class="flbl" id="biMaxWLbl"><span data-i18n="lblBiMaxW">双语行宽</span><i class="info" tabindex="0" data-tip-i18n="biMaxWHint">i</i></div>
       <div id="biMaxWRow">
         <input type="number" id="biMaxW" value="32" min="10" max="80" step="1" style="max-width:160px">
-        <div class="hint" data-i18n="biMaxWHint">每行最大显示宽度（1 个汉字 = 1）。超宽自动折行，1 汉字 ≈ 2.4 个西文字符。</div>
       </div>
       <div class="flbl" id="orderLbl" data-i18n="lblOrder">双语上下顺序</div>
       <div class="radios" id="orderRow">
         <label><input type="radio" name="biOrder" value="src-first" checked><span data-i18n="orderSrc">原文在上</span></label>
         <label><input type="radio" name="biOrder" value="dst-first"><span data-i18n="orderDst">译文在上</span></label>
       </div>
-      <div class="flbl" data-i18n="lblTpl">导出格式</div>
+      <div class="flbl" id="tplLbl"><span data-i18n="lblTpl">导出格式</span><i class="info" tabindex="0" id="tplHint" data-tip-i18n="tplHintPlain" data-tip-dyn="1">i</i></div>
       <div>
         <!-- v0.9.240：顶层只选「格式」——SRT / VTT / ASS 三张卡（用户要求：导出模板这里只放这三个）。
              具体模板挪进各自的样式面板：ASS 的 分屏/底部双行/自定义 → 「ASS 外观」；
@@ -591,24 +606,21 @@ textarea.paste-box{margin-top:8px;min-height:96px}
           <option value="stack" data-i18n="tplStack">ASS 底部双行 · 默认模板，可微调 (.ass)</option>
           <option value="custom" data-i18n="tplCustom">ASS 自定义风格 (.ass)</option>
         </select>
-        <div class="hint" id="tplHint"></div>
       </div>
     </div>
 
     <details class="ass" id="assPanel">
-      <summary data-i18n="assPanel">ASS 外观（导出 ASS 时生效）</summary>
+      <summary><span data-i18n="assPanel">ASS 外观（导出 ASS 时生效）</span><i class="info" tabindex="0" data-tip-i18n="assNote1080">i</i></summary>
       <div class="ass-body">
         <!-- v0.9.223：参数基准必须写明，否则拿 720p 素材对不上数 -->
-        <div class="hint ass-note" data-i18n="assNote1080">以下参数以 1920×1080 视频为准；其他分辨率由播放器等比缩放。</div>
         <!-- v0.9.227：导入 ASS 后在此写明「样式来自哪个文件的哪个样式名」，否则用户不知道值是哪来的 -->
         <div class="hint ass-note" id="assImportNote" style="display:none"></div>
         <!-- v0.9.240：ASS 的三个模板从「导出模板」挪到这里（分屏 / 底部双行 / 自定义）——
              前两个会套各自的默认参数，选「自定义」才放开布局与全部参数。 -->
         <div class="tplrow">
-          <span class="tplrow-l" data-i18n="lblAssTpl">ASS 模板</span>
+          <span class="tplrow-l"><span data-i18n="lblAssTpl">ASS 模板</span><i class="info" tabindex="0" data-tip-i18n="assTplTip">i</i></span>
           <div class="seg" id="assTplSeg"></div>
         </div>
-        <div class="hint" data-i18n="assTplTip">「分屏」「底部双行」会套用各自的默认参数；选「自定义」后布局与每一项都由你定。</div>
         <!-- v0.9.242：这一行**不再显示** —— 布局本来就是「分屏 / 底部双行」两个模板键各自带的，
              在「自定义」下面再选一遍纯属重复（custom+分屏 与 分屏 导出的 ASS 逐字节相同）。
              更要命的是切模板是无条件套预设，点「自定义」反而按这里的 radio 把用户调好的值冲掉。
@@ -630,7 +642,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
             <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assDstSize" value="56" min="8" max="200"></div>
             <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assDstColor" value="#FFFFFF"><span class="sw" id="assDstColorSw"></span></div>
             <div class="af"><label data-i18n="lblAlpha">不透明度</label><input type="range" id="assDstAlpha" min="10" max="100" value="100"><span class="pct" id="assDstAlphaOut">100%</span></div>
-            <div class="af"><label data-i18n="lblFont">字体</label><select id="assDstFont"></select></div>
+            <div class="af"><label><span data-i18n="lblFont">字体</span><i class="info" tabindex="0" data-tip-i18n="assFontTip">i</i></label><select id="assDstFont"></select></div>
             <!-- v0.9.231：粗体 / 字间距 / 阴影·底衬 / 水平对齐 以前写死在导出端，界面上根本没有 -->
             <div class="af"><label data-i18n="lblBold">粗体</label><input type="checkbox" id="assDstBold" checked></div>
             <!-- v0.9.245：斜体 —— 此前 ASS 的 Italic 恒为 0，旁白/歌词槽没法表达「斜体」这条行业惯例 -->
@@ -639,7 +651,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
             <div class="ass-sub" data-i18n="assGrpFx">效果</div>
             <div class="af"><label data-i18n="lblOutline">描边</label><input type="number" id="assDstOutline" value="2.5" min="0" max="10" step="0.5"></div>
             <div class="af"><label data-i18n="lblOutlineColor">描边色</label><input type="text" id="assDstOutlineColor" value="#000000"><span class="sw" id="assDstOutlineColorSw"></span></div>
-            <div class="af"><label data-i18n="lblEdge">阴影/底衬</label><select id="assDstEdge">
+            <div class="af"><label><span data-i18n="lblEdge">阴影/底衬</span><i class="info" tabindex="0" data-tip-i18n="edgeTip">i</i></label><select id="assDstEdge">
               <option value="none" data-i18n="edgeNone" selected>无</option>
               <option value="shadow" data-i18n="edgeShadow">阴影</option>
               <option value="box" data-i18n="edgeBox">底衬</option>
@@ -693,11 +705,9 @@ textarea.paste-box{margin-top:8px;min-height:96px}
           <div class="af"><label data-i18n="lblMarginL">左边距</label><input type="number" id="assMarginL" value="60" min="0" max="600"></div>
           <div class="af"><label data-i18n="lblMarginR">右边距</label><input type="number" id="assMarginR" value="60" min="0" max="600"></div>
         </div>
-        <div class="hint" data-i18n="assFontTip">字体在播放端机器上解析，对方没装会自动回退；其余参数与主站「ASS 样式」一致。</div>
-        <div class="hint" data-i18n="edgeTip">「底衬」用的是 ASS 的 BorderStyle=3，它的外扩量就是「描边」那个值，「深度」在底衬模式下不生效（播放器如此）。</div>
         <div class="scheme-row">
           <button type="button" class="btn ghost btn-sm" id="btnAssReset" data-i18n="assReset">恢复默认参数</button>
-          <button type="button" class="btn ghost btn-sm" id="btnSchemeSave" data-i18n="schemeSave">存为方案</button>
+          <button type="button" class="btn ghost btn-sm" id="btnSchemeSave" data-i18n="schemeSave">存为方案</button><i class="info" tabindex="0" data-tip-i18n="schemeHint">i</i>
         </div>
         <div class="scheme-row">
           <select id="schemeList"></select>
@@ -707,7 +717,6 @@ textarea.paste-box{margin-top:8px;min-height:96px}
           <button type="button" class="btn ghost btn-sm" id="btnSchemeImport" data-i18n="schemeImport">导入</button>
           <input type="file" id="schemeFile" accept=".json,application/json" style="display:none">
         </div>
-        <div class="hint" data-i18n="schemeHint">方案存在本机浏览器里（换设备或清缓存会丢），要备份就用「导出」存成 JSON。</div>
       </div>
     </details>
 
@@ -718,9 +727,8 @@ textarea.paste-box{margin-top:8px;min-height:96px}
          ⚠️ 单位是 VTT 原生的百分比（line / position / size / 字号），与 ASS 的「像素离底」
             根本不是一套：两套面板不共用字段、不互相换算。 -->
     <details class="vtt" id="mVttPanel" style="display:none">
-      <summary data-i18n="vttPanelTitle">WebVTT 样式（导出 VTT 双语样式时生效）</summary>
+      <summary><span data-i18n="vttPanelTitle">WebVTT 样式（导出 VTT 双语样式时生效）</span><i class="info" tabindex="0" data-tip-i18n="vttStyleTip">i</i></summary>
       <div class="vtt-body">
-        <div class="hint ass-note" data-i18n="vttStyleTip">样式写在文件头的 STYLE 块里，由播放器渲染；位置是百分比，随分辨率自适应。</div>
         <!-- 导入继承后在此写明「样式来自哪个文件」，否则用户不知道这些值是哪来的 -->
         <div class="hint ass-note" id="mVttImportNote" style="display:none"></div>
         <!-- v0.9.240：「写入样式」是这一页的总开关 —— 关掉就是无样式 VTT（纯文本，不含 STYLE 块）。
@@ -733,7 +741,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
         <!-- v0.9.240：样式模板改成分段按钮（用户要求：三个模板做成按键选项）；
              手改任一参数会自动落到「自定义」——那时才多出一个「自定义」按钮，平时不占位置。 -->
         <div class="tplrow">
-          <span class="tplrow-l" data-i18n="lblVttPreset">样式模板</span>
+          <span class="tplrow-l"><span data-i18n="lblVttPreset">样式模板</span><i class="info" tabindex="0" id="mVttPresetHint" data-tip-i18n="vttTipStd" data-tip-dyn="1">i</i></span>
           <div class="seg" id="mVttPresetSeg"></div>
           <select id="mVttPresetSel" style="display:none">
             <option value="std" data-i18n="vttPresetStd">标准 · 底部双语</option>
@@ -742,7 +750,6 @@ textarea.paste-box{margin-top:8px;min-height:96px}
             <option value="custom" data-i18n="vttPresetCustom">自定义</option>
           </select>
         </div>
-        <div class="hint" id="mVttPresetHint"></div>
         <!-- 「写入样式」关闭时整块变灰且不可点：参数此刻不生效，看得见比偷偷忽略强 -->
         <div class="stylebox" id="mVttStyleBox">
         <!-- v0.9.239：按「层」重排 —— 整条 / 译文行 / 原文行。
@@ -780,13 +787,12 @@ textarea.paste-box{margin-top:8px;min-height:96px}
             <div class="af"><label data-i18n="lblVttBg">底衬</label><input type="checkbox" id="mVttBgOn" checked></div>
             <div class="af"><label data-i18n="lblVttBgColor">底衬色</label><input type="text" id="mVttBgColor" value="#000000"><span class="sw" id="mVttBgColorSw"></span></div>
             <div class="af"><label data-i18n="lblVttBgAlpha">底衬不透明</label><input type="range" id="mVttBgAlpha" min="0" max="100" value="55"><span class="pct" id="mVttBgAlphaOut">55%</span></div>
-            <div class="af"><label data-i18n="lblVttShadow">描边</label><input type="checkbox" id="mVttShadowOn" checked></div>
+            <div class="af"><label><span data-i18n="lblVttShadow">描边</span><i class="info" tabindex="0" data-tip-i18n="vttFxTip">i</i></label><input type="checkbox" id="mVttShadowOn" checked></div>
             <div class="af"><label data-i18n="lblVttShadowW">粗细</label><input type="number" id="mVttShadowW" value="2" step="0.5"></div>
             <div class="af"><label data-i18n="lblVttShadowColor">描边色</label><input type="text" id="mVttShadowColor" value="#000000"><span class="sw" id="mVttShadowColorSw"></span></div>
           </div>
           <div class="ass-col">
-            <h4 data-i18n="vttGrpSrc">原文行</h4>
-            <div class="hint ass-note" data-i18n="vttSrcTip">每一项都能「沿用」译文行 —— 沿用就不写进 ::cue(.src)。全部沿用 = 原文行与译文行完全一样（不打标记、不写规则）。</div>
+            <h4><span data-i18n="vttGrpSrc">原文行</span><i class="info" tabindex="0" data-tip-i18n="vttSrcTip">i</i></h4>
             <div class="af"><label data-i18n="lblVttSrcSize">字号</label><select id="mVttSrcSizeMode" class="me">
               <option value="" data-i18n="vttInherit">沿用</option>
               <option value="set" data-i18n="vttOptSet" selected>单独设</option>
@@ -823,7 +829,6 @@ textarea.paste-box{margin-top:8px;min-height:96px}
           </div>
         </div>
         <!-- 描边在 VTT 里没有真 PyOutline：::cue 的 outline 画的是整个方框，只能用 text-shadow 八向模拟 -->
-        <div class="hint" data-i18n="vttFxTip">VTT 没有真正的字描边，这里用八向 text-shadow 模拟；字间距、行内旋转等浏览器原生不支持，不会写出来。</div>
         <div class="scheme-row">
           <button type="button" class="btn ghost btn-sm" id="btnVttReset" data-i18n="vttReset">恢复模板默认</button>
         </div>
@@ -834,7 +839,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 
   <div class="actions">
     <button class="btn" id="btnMerge" data-i18n="btnMerge">合并预览</button>
-    <span class="hint" id="mergeHintEl" data-i18n="mergeHint">先看配对结果和体检报告，再下载。</span>
+<i class="info" tabindex="0" data-tip-i18n="mergeHint">i</i>
   </div>
 
   <div class="rep" id="rep">
@@ -862,19 +867,10 @@ textarea.paste-box{margin-top:8px;min-height:96px}
           <!-- v0.9.250：效果预览 —— 槽以前完全没有画面，用户不知道「上移 70 / 淡色 / 粗体」到底是什么样。
                ⚠️ 这块**不自己画**：调的是 renderAssPv / renderVttPv 同一段代码，切换只是换渲染目标，
                   所以「预览 = 导出」这条不变（另写一套渲染器一定会漂移）。 -->
-          <div class="slot-pv" id="slotPv">
-            <div class="slot-pv-hd" id="slotPvHead">
-              <span class="slot-pv-t" data-i18n="slotPvTitle">效果预览</span>
-              <button type="button" class="btn ghost btn-sm on" id="slotPvOn" data-i18n="slotPvOn">套用这个槽</button>
-              <button type="button" class="btn ghost btn-sm" id="slotPvBaseBtn" data-i18n="slotPvBase">基础样式</button>
-              <span class="slot-pv-tag" id="slotPvTag"></span>
-            </div>
-            <div class="ass-pv-screen slot-pv-screen" id="slotPvScreen">
-              <div class="ass-pv-line" id="slotPvLine1"><span class="pv-in"></span></div>
-              <div class="ass-pv-line" id="slotPvLine2"><span class="pv-in"></span></div>
-              <div class="vtt-pv-cue" id="slotPvCue" style="display:none"></div>
-            </div>
-            <p class="hint" id="slotPvNone" style="display:none"></p>
+          <!-- v0.9.255（方案 A）：这块对照预览删了 —— 画面搬到右栏，全页只有一处。
+               这里只留一个入口：点了把右栏预览切到「这个槽」视角。 -->
+          <div class="slot-pv-link">
+            <button type="button" class="btn ghost btn-sm" id="slotPvGoto" data-i18n="slotPvGoto">在预览里看这个槽</button>
           </div>
           <div class="slot-meta">
             <span id="slotCover"></span>
@@ -934,35 +930,52 @@ textarea.paste-box{margin-top:8px;min-height:96px}
          ⚠️ 别再把它加回来：多一份下拉就要在 renderSlots 里多维护一处同步，且两个入口语义重叠。 -->
   </div>
 
-  <div class="exp card" id="exp">
-    <h2><span class="n">4</span><span data-i18n="expTitle">导出</span></h2>
-    <!-- v0.9.223：ASS 效果预览 —— 此前只有表格，看不到字号/颜色/位置到底什么样 -->
-    <div class="ass-pv" id="assPv" style="display:none">
-      <div class="ass-pv-hd"><span data-i18n="pvAssTitle">效果预览（按 1080p 等比缩放）</span><span class="ass-pv-tag" id="assPvTag"></span></div>
-      <div class="ass-pv-screen" id="assPvScreen">
-        <div class="ass-pv-line" id="assPvLine1"><span class="pv-in"></span></div>
-        <div class="ass-pv-line" id="assPvLine2"><span class="pv-in"></span></div>
+  <!-- v0.9.255（方案 A）：右栏 = 「预览卡 + 导出卡」，整栏 sticky 常驻。
+       预览**只有这一块**了 —— 此前 ✎ 面板里还并着一块（同一套 1080p 几何画第二遍：
+       小那块在 396 栏里只有拇指大，大那块一收起面板就没了）。合成一块后视角切三档：
+       成片 / 这个槽 / 基础样式。渲染器一个字没改，只是渲染目标与「画谁」变了。 -->
+  <div class="rail" id="rail">
+    <div class="pvcard card" id="pvCard">
+      <div class="pv-hd">
+        <span class="pv-t" data-i18n="slotPvTitle">效果预览</span>
+        <div class="seg pv-seg" id="pvSeg">
+          <button type="button" class="segbtn on" data-pv="movie" data-i18n="pvViewMovie">成片</button>
+          <button type="button" class="segbtn" data-pv="slot" data-i18n="pvViewSlot">这个槽</button>
+          <button type="button" class="segbtn" data-pv="base" data-i18n="slotPvBase">基础样式</button>
+        </div>
+        <span class="pv-tag" id="pvTag"></span>
       </div>
-    </div>
-    <!-- v0.9.238：VTT 预览。与 ASS 预览互斥显示：ASS 画两条像素定位的行，VTT 画一个百分比定位的 cue 盒。 -->
-    <div class="vtt-pv" id="mVttPv" style="display:none">
-      <div class="vtt-pv-hd"><span data-i18n="pvVttTitle">效果预览（百分比定位，随分辨率自适应）</span><span class="vtt-pv-tag" id="mVttPvTag"></span></div>
-      <div class="vtt-pv-screen" id="mVttPvScreen">
-        <div class="vtt-pv-cue" id="mVttPvCue">
-          <div class="vtt-pv-line" id="mVttPvLine1"><span class="pv-in"></span></div>
-          <div class="vtt-pv-line" id="mVttPvLine2"><span class="pv-in"></span></div>
+      <!-- ASS 与 VTT 互斥显示：ASS 画两条像素定位的行，VTT 画一个百分比定位的 cue 盒 -->
+      <div class="ass-pv" id="assPv" style="display:none">
+        <div class="ass-pv-screen" id="assPvScreen">
+          <div class="ass-pv-line" id="assPvLine1"><span class="pv-in"></span></div>
+          <div class="ass-pv-line" id="assPvLine2"><span class="pv-in"></span></div>
         </div>
       </div>
+      <div class="vtt-pv" id="mVttPv" style="display:none">
+        <div class="vtt-pv-screen" id="mVttPvScreen">
+          <div class="vtt-pv-cue" id="mVttPvCue">
+            <div class="vtt-pv-line" id="mVttPvLine1"><span class="pv-in"></span></div>
+            <div class="vtt-pv-line" id="mVttPvLine2"><span class="pv-in"></span></div>
+          </div>
+        </div>
+      </div>
+      <p class="hint pv-none" id="pvNone" style="display:none"></p>
     </div>
-    <div class="exp-row">
-      <!-- v0.9.252：原来这里是第二组 SRT/VTT/ASS 键（#tplSeg2），与设置区那三张格式卡重复 ——
-           同一个状态挂两组控件，用户会以为「这俩是不是两个设置」。整块删掉，格式只在设置区选。
-           ⚠️ #expFmt2 留着：它是 tplVal() 优先读的**状态源**（不是 UI），删了要动 6 处引用。 -->
-      <select id="expFmt2" style="display:none"></select>
-      <!-- ⚠️ 扩展名是**单独一个 span**：applyI18n 是 textContent 赋值，
-           把 '.ass' 并进 data-i18n 词条里会在切界面语言时被冲掉（「++ 新建槽」同款坑）。 -->
-      <button class="btn" id="btnDownload"><span data-i18n="btnDownload">下载字幕</span><span class="dl-ext" id="dlExt"></span></button>
-      <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
+
+    <div class="exp card" id="exp">
+      <h2><span class="n">4</span><span data-i18n="expTitle">导出</span></h2>
+      <div class="exp-sum" id="expSum"></div>
+      <div class="exp-row">
+        <!-- v0.9.252：原来这里是第二组 SRT/VTT/ASS 键（#tplSeg2），与设置区那三张格式卡重复 ——
+             同一个状态挂两组控件，用户会以为「这俩是不是两个设置」。整块删掉，格式只在设置区选。
+             ⚠️ #expFmt2 留着：它是 tplVal() 优先读的**状态源**（不是 UI），删了要动 6 处引用。 -->
+        <select id="expFmt2" style="display:none"></select>
+        <!-- ⚠️ 扩展名是**单独一个 span**：applyI18n 是 textContent 赋值，
+             把 '.ass' 并进 data-i18n 词条里会在切界面语言时被冲掉（「++ 新建槽」同款坑）。 -->
+        <button class="btn" id="btnDownload"><span data-i18n="btnDownload">下载字幕</span><span class="dl-ext" id="dlExt"></span></button>
+        <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
+      </div>
     </div>
   </div>
   </div><!-- /.work -->
@@ -973,7 +986,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.254"></script>
+<script src="merge-core.js?v=0.9.255"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1086,7 +1099,8 @@ const I18N = {
     monoHint:'只传一份字幕，直接给它加样式特效。',
     slotTitle:'样式槽', slotHint:'点胶囊选中这个槽（只列它用在哪几行），右侧铅笔展开样式编辑', slotEditTip:'编辑这个槽的样式', filterSlot:'槽：{0} · {1} 行', selDockN:'已选 {0} 行 · 套用', selDockClear:'清除选择', slotNew:'+ 新建槽',
     slotEdit:'编辑槽', slotCover:'已覆盖 {0} / {1} 项', slotUncoverAll:'解除全部覆盖',
-    slotPvTitle:'效果预览', slotPvOn:'套用这个槽', slotPvBase:'基础样式',
+    slotPvTitle:'效果预览', slotPvBase:'基础样式',
+    pvViewMovie:'成片', pvViewSlot:'这个槽', slotPvGoto:'在预览里看这个槽',
     slotPvNone:'该导出格式不带样式信息（SRT / 无样式 VTT），槽对它无效',
     selDockAllTip:'把当前编辑的槽套用到全部行（不只是选中的）',
     slotViewDiff:'只显示差异', slotViewAll:'显示全部参数', slotAddParam:'+ 添加参数…',
@@ -1237,7 +1251,8 @@ const I18N = {
     monoHint:'只傳一份字幕，直接幫它加樣式特效。',
     slotTitle:'樣式槽', slotHint:'點膠囊選中這個槽（只列它用在哪幾行），右側鉛筆展開樣式編輯', slotEditTip:'編輯這個槽的樣式', filterSlot:'槽：{0} · {1} 行', selDockN:'已選 {0} 行 · 套用', selDockClear:'清除選取', slotNew:'+ 新增槽',
     slotEdit:'編輯槽', slotCover:'已覆蓋 {0} / {1} 項', slotUncoverAll:'解除全部覆蓋',
-    slotPvTitle:'效果預覽', slotPvOn:'套用這個槽', slotPvBase:'基礎樣式',
+    slotPvTitle:'效果預覽', slotPvBase:'基礎樣式',
+    pvViewMovie:'成片', pvViewSlot:'這個槽', slotPvGoto:'在預覽裡看這個槽',
     slotPvNone:'該匯出格式不帶樣式資訊（SRT / 無樣式 VTT），槽對它無效',
     selDockAllTip:'把目前編輯的槽套用到全部行（不只是選取的）',
     slotViewDiff:'只顯示差異', slotViewAll:'顯示全部參數', slotAddParam:'+ 新增參數…',
@@ -1388,7 +1403,8 @@ const I18N = {
     monoHint:'Upload one subtitle file and style it directly.',
     slotTitle:'Style slots', slotHint:'Click a chip to select that slot (lists just its lines); the pencil opens its style editor', slotEditTip:'Edit this slot', filterSlot:'Slot: {0} · {1} lines', selDockN:'{0} selected · apply', selDockClear:'Clear', slotNew:'+ New slot',
     slotEdit:'Edit slot', slotCover:'{0} of {1} overridden', slotUncoverAll:'Clear all overrides',
-    slotPvTitle:'Preview', slotPvOn:'With this slot', slotPvBase:'Base style',
+    slotPvTitle:'Preview', slotPvBase:'Base style',
+    pvViewMovie:'Final', pvViewSlot:'This slot', slotPvGoto:'Show in preview',
     slotPvNone:'This export format carries no style info (SRT / plain VTT), so slots do nothing',
     selDockAllTip:'Apply the slot being edited to every line, not just the selected ones',
     slotViewDiff:'Diff only', slotViewAll:'All parameters', slotAddParam:'+ Add parameter…',
@@ -1539,7 +1555,8 @@ const I18N = {
     monoHint:'字幕を 1 本だけアップロードして、直接スタイルを付けます。',
     slotTitle:'スタイルスロット', slotHint:'カプセルでスロットを選択（その行のみ表示）、右側の鉛筆でスタイル編集', slotEditTip:'このスロットを編集', filterSlot:'スロット：{0} · {1} 行', selDockN:'{0} 行選択中 · 適用', selDockClear:'選択解除', slotNew:'+ 新規スロット',
     slotEdit:'スロットを編集', slotCover:'{0} / {1} 項目を上書き中', slotUncoverAll:'上書きをすべて解除',
-    slotPvTitle:'プレビュー', slotPvOn:'このスロットを適用', slotPvBase:'基本スタイル',
+    slotPvTitle:'プレビュー', slotPvBase:'基本スタイル',
+    pvViewMovie:'完成形', pvViewSlot:'このスロット', slotPvGoto:'プレビューで確認',
     slotPvNone:'この書き出し形式はスタイル情報を持ちません（SRT / スタイルなし VTT）',
     selDockAllTip:'編集中のスロットを選択行だけでなく全行に適用します',
     slotViewDiff:'差分のみ', slotViewAll:'全パラメータ', slotAddParam:'+ パラメータを追加…',
@@ -1614,19 +1631,101 @@ function applyI18n(){
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
   document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.getAttribute('data-i18n-html')); });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
-  const am = alignMode(); const hint = $('alignHint');
-  if (hint) hint.textContent = t(am==='order' ? 'alignHintOrder' : am==='dstTime' ? 'alignHintDst' : 'alignHintTime');
   /* v0.9.231：方案下拉的「（还没有保存过方案）」是运行时生成的，不在 data-i18n 里，
      换界面语言时必须重画一遍，否则它会一直停在首次渲染时的语言上。 */
   renderSchemeList();
   /* v0.9.240：导出格式的说明（tplHint）与 VTT 模板说明（mVttPresetHint）也是运行时算出来的，
      同上，换语言要重画一次。syncAssChrome 本身不动参数，只刷显隐与文案。 */
   syncAssChrome();
+  /* v0.9.255：ⓘ 的说明文案也要跟界面语言走（applyI18n 不认识 data-tip-i18n）；
+     带 data-tip-dyn 的三条由各自 setter 负责，这里只管静态那些。 */
+  document.querySelectorAll('[data-tip-i18n]').forEach(function(el){
+    el.setAttribute('data-tip', t(el.getAttribute('data-tip-i18n')));
+  });
+  alignHintTip(); tplHintTip(); vttPresetTip();
+  syncPvChrome();
 }
 function toast(msg){
   const el = $('toast'); el.textContent = msg; el.classList.add('show');
   clearTimeout(toast._t); toast._t = setTimeout(()=>el.classList.remove('show'), 2200);
 }
+
+/* ================= v0.9.255：ⓘ 悬停解释（挂 body 的浮层） =================
+   为什么要浮层而不是纯 CSS 伪元素：ASS / VTT 面板是 overflow:hidden，气泡会被裁掉（主站踩过）。
+   行为：悬停 / Tab 聚焦 → 250ms 后出；移开即收；点一下**固定**（触屏没有 hover）；
+        再点一次、点别处、按 Esc 都收起。长按或点开面板时不会互相打架。 */
+function setTip(id, text, isDefault){
+  const el = $(id); if (!el) return;
+  el.setAttribute('data-tip', text || '');
+  el.classList.toggle('note', !!text && !isDefault);
+}
+(function(){
+  var timer = null, pinned = null;
+  function layer(){
+    var el = document.getElementById('tipLayer');
+    if (!el){ el = document.createElement('div'); el.id = 'tipLayer'; el.setAttribute('role', 'tooltip'); document.body.appendChild(el); }
+    return el;
+  }
+  function put(el, on){
+    var L = document.getElementById('tipLayer'); if (!L) return;
+    L.classList.toggle('on', !!on);
+    if (!on) L.style.display = 'none';
+  }
+  function hide(){
+    clearTimeout(timer);
+    put(null, false);
+    if (pinned){ pinned.classList.remove('pin'); pinned = null; }
+  }
+  function show(el){
+    var txt = el.getAttribute('data-tip') || '';
+    if (!txt) return;
+    var L = layer();
+    L.textContent = txt; L.style.display = 'block'; L.style.left = '0px'; L.style.top = '0px';
+    var w = L.offsetWidth, h = L.offsetHeight, r = el.getBoundingClientRect();
+    var left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), Math.max(8, window.innerWidth - w - 8));
+    var top = r.top - h - 9;
+    if (top < 8) top = r.bottom + 9;          /* 上方放不下就翻到下面 */
+    L.style.left = Math.round(left) + 'px'; L.style.top = Math.round(top) + 'px';
+    put(null, true);
+  }
+  function hit(e){ return (e.target && e.target.closest) ? e.target.closest('.info') : null; }
+  document.addEventListener('mouseover', function(e){
+    var el = hit(e); if (!el || pinned) return;
+    clearTimeout(timer); timer = setTimeout(function(){ show(el); }, 250);
+  });
+  document.addEventListener('mouseout', function(e){
+    var el = hit(e); if (!el || pinned) return;
+    clearTimeout(timer); put(null, false);
+  });
+  document.addEventListener('focusin', function(e){ var el = hit(e); if (el && !pinned) show(el); });
+  document.addEventListener('focusout', function(e){ var el = hit(e); if (el && !pinned) hide(); });
+  /* 触屏没有 hover：点 ⓘ 固定显示。⚠️ 必须 preventDefault ——
+     ⓘ 常驻在 <label> / <summary> 里，否则点一下会顺带激活控件或开合面板。 */
+  document.addEventListener('click', function(e){
+    var el = hit(e);
+    if (el){
+      e.preventDefault();
+      if (pinned === el){ hide(); return; }
+      hide(); pinned = el; el.classList.add('pin'); show(el); return;
+    }
+    if (pinned) hide();
+  });
+  window.addEventListener('scroll', function(){ if (pinned) show(pinned); else put(null, false); }, true);
+  window.addEventListener('resize', hide);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') hide(); });
+  window.__tipHide = hide;
+})();
+/* 三条「跟着选择变」的说明：第二参 = 是否出厂默认档（不是就点亮 ⓘ，提示已经跟着你改过了）。 */
+function alignHintTip(){
+  const m = alignMode();
+  setTip('alignHint', t(m==='order' ? 'alignHintOrder' : m==='dstTime' ? 'alignHintDst' : 'alignHintTime'), m==='time');
+}
+function tplHintTip(){
+  const v = tplVal();
+  setTip('tplHint', t(v==='srt' ? 'tplHintPlain' : v==='vtt' ? 'tplHintVttPlain'
+    : v==='custom' ? 'tplHintCustom' : v==='vttStyle' ? 'tplHintVttStyle' : 'tplHintPreset'), v==='srt');
+}
+
 
 /* ================= 状态 ================= */
 const S = { src:null, dst:null, srcName:'', dstName:'', rows:null, report:null, demo:false };
@@ -1701,8 +1800,7 @@ function autoAlignDefault(){
   const mode = (S.src && S.dst && S.src.length === S.dst.length) ? 'order' : 'time';
   const el = document.querySelector('input[name=alignMode][value="'+mode+'"]');
   if (el) el.checked = true;
-  const hint = $('alignHint');
-  if (hint) hint.textContent = t(mode==='order' ? 'alignHintOrder' : 'alignHintTime');
+  alignHintTip();
 }
 function alignMode(){
   const el = document.querySelector('input[name=alignMode]:checked');
@@ -1754,7 +1852,7 @@ function syncMode(){
     ensureStyle();
     S.style.assign = {};
     if (S.sel) S.sel.clear();
-    $('rep').style.display = 'none'; $('exp').style.display = 'none';
+    $('rep').style.display = 'none'; railOn(false);
     renderAssPv();   /* v0.9.228：顺手把效果预览收起来，别留着上一个模式的画面 */
     renderVttPv();   /* v0.9.238：VTT 预览同理，切模式后不该留着旧画面 */
   }
@@ -1779,7 +1877,7 @@ function doMerge(){
   const out = C.alignRows(S.src, dstShifted, mode);
   S.rows = out.rows; S.report = out.report;
   renderReport();
-  $('exp').style.display = 'block';
+  railOn(true);
   renderAssPv();
   renderVttPv();   /* v0.9.238：VTT 预览与 ASS 预览共用一次合并结果 */
   reportMerge('merge');   /* v0.9.244：传了什么字幕上来（后台「双语合并记录」） */
@@ -1807,10 +1905,10 @@ function doAdjust(){
   });
   S.report = { pairs, onlySrc, onlyDst, form: out.report };
   renderReport();
-  $('exp').style.display = 'block';
+  railOn(true);
   /* v0.9.228：这里漏了 renderAssPv() —— 合并模式有、调整模式没有，
      于是「调整双语字幕」点完拆分只有表格，ASS 效果预览整块不出现（用户看到的就是空的）。
-     必须在 #exp 显示之后调用，否则量不到画布高度。 */
+     必须在右栏展开之后调用，否则量不到画布高度。 */
   renderAssPv();
   renderVttPv();   /* v0.9.238：同上，调整模式也要给 VTT 预览 */
   reportMerge('merge');   /* v0.9.244：同上，调整模式也要上报 */
@@ -1847,7 +1945,7 @@ function doMono(){
   S.rows = items.map(it=>({ start: it.start, end: it.end, en: '', zh: String(it.text == null ? '' : it.text) }));
   S.report = { pairs: S.rows.length, onlySrc: [], onlyDst: [], form: null };
   renderReport();
-  $('exp').style.display = 'block';
+  railOn(true);
   renderAssPv();
   renderVttPv();
   reportMerge('merge');
@@ -2206,7 +2304,7 @@ function renderSlotEdit(){
   if (vd) vd.classList.toggle('on', diff);
   if (va) va.classList.toggle('on', !diff);
   renderSlotSchemeSel();
-  renderSlotPvMini();          /* v0.9.250：编辑谁就预览谁 */
+  renderPv();                  /* v0.9.255：编辑谁就预览谁（视角「这个槽」时立刻跟着换） */
 }
 /* v0.9.246：单行参数 —— 按 type 出控件。
    ⚠️ 只在一个格式表达得了的项（fmt:'ass'）挂一个小标签，不许静默：
@@ -2417,7 +2515,7 @@ function loadDemo(){
     S.fmtTouched = false;   /* 这次是我们自己派的，不算用户改过 */
   }
   renderReport();
-  $('exp').style.display = 'block';
+  railOn(true);
   renderAssPv();
   renderVttPv();
 }
@@ -2973,9 +3071,7 @@ function syncAssChrome(){
   const plain = (tpl === 'srt' || tpl === 'vtt');
   $('assPanel').style.display = (plain || tpl === 'vttStyle') ? 'none' : '';
   /* v0.9.242：布局行不再显示（整行常驻 display:none），布局由模板键决定 —— 见 HTML 里 layoutRow 的注释 */
-  const hint = $('tplHint');
-  if (hint) hint.textContent = t(tpl==='srt' ? 'tplHintPlain' : tpl==='vtt' ? 'tplHintVttPlain'
-    : tpl==='custom' ? 'tplHintCustom' : tpl==='vttStyle' ? 'tplHintVttStyle' : 'tplHintPreset');
+  tplHintTip();
   const note = $('assImportNote'); if (note) note.style.display = 'none';   /* 切模板 = 回到预设，提示作废 */
   /* v0.9.238：WebVTT 样式面板只在 VTT 档位出现；ASS 面板与它互斥（两套单位不同）。
      v0.9.240：无样式 VTT（tpl === 'vtt'）也要显示 —— 面板顶部的「写入样式」开关就住在这里，
@@ -3179,9 +3275,9 @@ function assPvSample(){
   return { en: en, zh: zh, nEn: en.split('\n').length, nZh: zh.split('\n').length, slot: slot };
 }
 function renderAssPv(){
-  /* v0.9.250：预览目标可切换 —— 右侧主预览 或 ✎ 面板里的对照预览，
-     两处共用这**同一段绘制代码**（另写一套渲染器必然漂移，就违反「预览 = 导出」了）。 */
-  const T = pvTarget('ass');
+  /* v0.9.255：只有一块画布了（右栏预览卡）——「画谁」由视角决定（成片 / 这个槽 / 基础样式）。 */
+  const T = mainPvEls('ass');
+  syncPvChrome();
   const box = T.box, scr = T.scr, l1 = T.l1, l2 = T.l2, tag = T.tag;
   if (!box || !scr || !l1 || !l2) return;
   const fmt = expFmtVal();
@@ -3299,10 +3395,12 @@ function renderAssPv(){
     paint(l1, enT, sideOf('src'));
     paint(l2, zhT, sideOf('dst'));
   }
-  if (tag) tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p' +
-    (sp ? ' · ' + slotLabel(sid) : '');
-  /* 顺手把 ✎ 面板里的对照预览也刷一遍（PV_MINI 里会挡住重入，不会递归） */
-  renderSlotPvMini();
+  /* 标签要说清「这块画面画的是谁」：成片视角不标槽名，另两档标出槽名或「基础样式」 */
+  if (tag){
+    const v = pvView();
+    tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p' +
+      (v === 'movie' ? '' : ' · ' + (v === 'base' ? t('slotPvBase') : slotLabel(sid)));
+  }
 }
 /* ================= v0.9.238：合并页自己的 WebVTT 样式 =================
    ⚠️ 与主站翻译页的 VTT 面板只保持「参数同名、语义同义」，实现上完全独立：
@@ -3466,8 +3564,7 @@ function buildVttExport(){
   return C.formatVtt(items, { style: st, extraRules: slotVttRules() });
 }
 function renderVttPv(){
-  /* v0.9.250：与 renderAssPv 同一套「目标可切换」——面板内对照预览复用这段代码 */
-  const T = pvTarget('vtt');
+  const T = mainPvEls('vtt');
   const box = T.box, scr = T.scr, cue = T.cue, tag = T.tag;
   if (!box || !scr || !cue) return;
   const isVtt = (expFmtVal() === 'vtt-styled');
@@ -3545,7 +3642,6 @@ function renderVttPv(){
     if (bgRgba) sp.style.background = bgRgba;
   });
   if (tag) tag.textContent = vttPresetLabel() + ' · VTT' + (slotOn ? ' · ' + slotLabel(sid0) : '');
-  renderSlotPvMini();
 }
 function vttPresetLabel(){
   const k0 = vttPresetKey();
@@ -3591,10 +3687,9 @@ function syncVttChrome(){
 }
 /* 当前模板的一句话说明：模板换了、界面语言换了都要重算（它不是 data-i18n 能覆盖的静态文案） */
 function vttPresetTip(){
-  const el = $('mVttPresetHint'); if (!el) return;
   const k = vttPresetKey();
-  el.textContent = t(k === 'compact' ? 'vttTipCompact' : k === 'cinema' ? 'vttTipCinema'
-      : k === 'custom' ? 'vttTipCustom' : 'vttTipStd');
+  setTip('mVttPresetHint', t(k === 'compact' ? 'vttTipCompact' : k === 'cinema' ? 'vttTipCinema'
+      : k === 'custom' ? 'vttTipCustom' : 'vttTipStd'), k === 'std');
 }
 /* ================= v0.9.238：导入 VTT 时继承它自己的样式 =================
    与 ASS 那套（planAssImport）同一条思路：文件自带的外观不该被丢掉，要回到界面上让用户接着改。
@@ -3684,62 +3779,62 @@ function baseName(){
   const n = S.srcName || S.dstName || '';
   return n.replace(/\.[^.]+$/, '');
 }
-/* ================= v0.9.250：预览目标（右侧主预览 / ✎ 面板内的对照预览） =================
-   为什么要这一层：样式槽的效果此前在 ASS 侧**完全看不到**（renderAssPv 只读面板参数，
-   导出却按槽写 Style/Dialogue），用户根本不知道槽能干出什么。
-   而「另写一套面板内预览」必然与真预览漂移 —— 那是「预览≠导出」换个地方复发。
-   所以不写第二套渲染器，改成「同一段绘制代码 + 可切换目标」：面板里那块就是主预览的实现，
-   只是画到了另一个 <div> 上。
-   ⚠️ PV_MINI 是重入闸：mini 渲染中 renderAssPv 结尾还会再叫一次 renderSlotPvMini，必须挡住。 */
-var PV_MINI = false;
-function slotPvBase(){ return !!(S.pv && S.pv.base); }
+/* ================= v0.9.255：唯一预览 + 视角切换（方案 A） =================
+   原本两处各画一遍（右栏主预览 + ✎ 面板里的对照预览），同一套 1080p 几何：
+   小那块在 396 栏里只有拇指大，大那块一收面板就没了。现在只有**一块**画布
+   （在右栏 .rail 里的预览卡上，整栏 sticky 常驻），视角切三档：
+     成片 = 用户自己的字幕（默认）｜这个槽 = 示意文本 + 套这个槽｜基础样式 = 示意文本 + 不套槽。
+   ⚠️ 渲染器不新增、不改：renderAssPv / renderVttPv 原样复用，
+      只有「渲染目标」和「画谁」交给下面这几个函数决定 —— 「预览 = 导出」这条不变。
+   ⚠️ 别再写第二块画布：共用同一套元素，后跑的那个会把前一个刚画的收掉（250 踩过）。 */
+function pvView(){ return (S.pv && S.pv.view) || 'movie'; }
+function pvCtxSlot(){
+  const v = pvView();
+  if (v === 'movie') return null;                 /* null = 画用户自己的字幕 */
+  if (v === 'base')  return 'default';            /* 示意文本 + 不套槽（跟「这个槽」对照） */
+  return (S.style && S.style.cur) || 'default';   /* 示意文本 + 套这个槽 */
+}
 function mainPvEls(role){
+  const ov = pvCtxSlot();
   return (role === 'ass')
-    ? { box:$('assPv'), scr:$('assPvScreen'), l1:$('assPvLine1'), l2:$('assPvLine2'), tag:$('assPvTag'), slotOverride:null }
-    : { box:$('mVttPv'), scr:$('mVttPvScreen'), cue:$('mVttPvCue'), tag:$('mVttPvTag'), slotOverride:null };
+    ? { box:$('assPv'), scr:$('assPvScreen'), l1:$('assPvLine1'), l2:$('assPvLine2'), tag:$('pvTag'), slotOverride:ov }
+    : { box:$('mVttPv'), scr:$('mVttPvScreen'), cue:$('mVttPvCue'), tag:$('pvTag'), slotOverride:ov };
 }
-function miniPvEls(role){
-  /* 面板内的对照预览：槽 = 用户当场点选的那个；点了「基础样式」就强制 default（只画基础样式）。 */
-  const ov = slotPvBase() ? 'default' : ((S.style && S.style.cur) || 'default');
-  /* ⚠️ box 用**丢弃对象**：两个渲染器都会写 box.style.display，
-       共用同一块画布时后跑的那个会把前一个刚显示的又隐藏掉（VTT 跑完 ASS 的画面就没了）。
-       真正的显示/隐藏由 renderSlotPvMini 统一决定；tag 也由它统一写（两个渲染器各写一半会打架）。 */
-  const sink = { style: {} };
-  /* ⚠️ 两个渲染器都拿到**全套**元素：ASS 画的两行与 VTT 画的 cue 挤在同一块 .slot-pv-screen 里，
-       谁生效就得由谁把对方收起来 —— 只给自己的话，切到 VTT 时 cue 一直停在 display:none（250 实测）。 */
-  return { box:sink, scr:$('slotPvScreen'), l1:$('slotPvLine1'), l2:$('slotPvLine2'), cue:$('slotPvCue'), tag:null, slotOverride:ov };
+function renderPv(){ renderAssPv(); renderVttPv(); }
+/* 「这个格式有没有画面可画」——SRT / 无样式 VTT 不带样式信息，槽对它们无效 */
+function pvUsable(){
+  const f = expFmtVal();
+  return (f === 'ass-split' || f === 'ass-stack' || f === 'vtt-styled') && !!(S.rows && S.rows.length);
 }
-function pvTarget(role){ return PV_MINI ? miniPvEls(role) : mainPvEls(role); }
-/* ✎ 展开时把对照预览刷一遍；收起 / 当前格式不带样式时整块收起来（不留旧画面）。 */
-function renderSlotPvMini(){
-  if (PV_MINI) return;
-  const det = $('slotEdit'), wrap = $('slotPv');
-  if (!wrap) return;
-  if (!det || !det.open){ wrap.style.display = 'none'; return; }
-  wrap.style.display = 'block';
-  const fmt = expFmtVal();
-  const styled = (fmt === 'ass-split' || fmt === 'ass-stack' || fmt === 'vtt-styled');
-  const usable = styled && !!(S.rows && S.rows.length);
-  const head = $('slotPvHead'), screen = $('slotPvScreen'), none = $('slotPvNone');
-  if (head)   head.style.display   = usable ? '' : 'none';
-  if (screen) screen.style.display = usable ? '' : 'none';
-  if (none){
-    none.style.display = usable ? 'none' : 'block';
-    none.textContent = t('slotPvNone');
+/* 视角按钮 + 「没有画面」的说明 —— 只跟导出格式有关，跟 ASS/VTT 哪个角色无关 */
+function syncPvChrome(){
+  syncExpSum();
+  const ok = pvUsable();
+  const seg = $('pvSeg');
+  if (seg){
+    seg.style.display = ok ? '' : 'none';
+    seg.querySelectorAll('.segbtn').forEach(b => b.classList.toggle('on', b.getAttribute('data-pv') === pvView()));
   }
-  if (!usable) return;
-  PV_MINI = true;
-  try { renderAssPv(); renderVttPv(); } finally { PV_MINI = false; }
-  const tag = $('slotPvTag');
-  if (tag){
-    /* 面板里那块只有巴掌大：一级工作区标题就够了 —— 主预览的完整标签搬过来会占掉半行。
-       tplStack = "ASS 底部双行 · 默认模板，可微调 (.ass)" → 取第一段 = "ASS 底部双行"。 */
-    const first = s => String(s || '').split(' · ')[0].replace(/ \(.*$/, '');
-    const base = (fmt === 'vtt-styled')
-      ? (first(vttPresetLabel()) + ' · VTT')
-      : (first(tplVal() === 'stack' ? t('tplStack') : t('tplSplit')) + ' · 1080p');
-    tag.textContent = base + ' · ' + (slotPvBase() ? t('slotPvBase') : slotLabel((S.style && S.style.cur) || 'default'));
-  }
+  const none = $('pvNone');
+  if (none){ none.style.display = ok ? 'none' : 'block'; none.textContent = t('slotPvNone'); }
+}
+function setPvView(v){
+  if (!S.pv) S.pv = {};
+  S.pv.view = v;
+  syncPvChrome();
+  renderPv();
+}
+/* 整栏（预览 + 导出）的收放。⚠️ 原来是直接 toggle #exp 的 display ——
+   现在两张卡共用一个 sticky 容器，必须整栏一起收，否则会留一块空的 480px。 */
+function railOn(on){ const r = $('rail'); if (r) r.classList.toggle('on', !!on); }
+/* 导出卡那一行「将导出什么」：画面搬走了，摘要补回来（扩展名已在下载按钮上，这里去掉括号段） */
+function syncExpSum(){
+  const el = $('expSum'); if (!el) return;
+  const f = expFmtVal();
+  const raw = f === 'srt' ? t('tplSrt') : f === 'vtt' ? t('tplVtt')
+    : f === 'vtt-styled' ? (vttPresetLabel() + ' · VTT')
+    : (tplVal() === 'stack' ? t('tplStack') : tplVal() === 'split' ? t('tplSplit') : t('tplCustom'));
+  el.textContent = String(raw).replace(/ \(.*$/, '');
 }
 function expExt(){
   const f = expFmtVal();
@@ -3993,7 +4088,6 @@ function bindSlotUI(){
       S.style.cur = eid;
       const det = $('slotEdit'); if (det) det.open = true;
       renderSlots();
-      renderSlotPvMini();      /* 面板里的对照预览跟着切到这个槽 */
       return;
     }
     const chip = e.target.closest('[data-slot]');
@@ -4136,19 +4230,22 @@ function bindSlotUI(){
   });
   /* v0.9.250：旧应用条的绑定整块删除（DOM 已不存在）。
      现在的入口只有两个：贴底条的槽胶囊（套到选中行）、贴底条的「整篇套用「X」」（套到全篇）。 */
-  /* v0.9.250：✎ 面板里的对照预览 —— 切换「套用这个槽 / 基础样式」，并跟随 details 展开状态 */
-  const pvOn = $('slotPvOn'), pvBase = $('slotPvBaseBtn');
-  const setPvBase = v => {
-    if (!S.pv) S.pv = { base: false };
-    S.pv.base = !!v;
-    if (pvOn) pvOn.classList.toggle('on', !S.pv.base);
-    if (pvBase) pvBase.classList.toggle('on', S.pv.base);
-    renderSlotPvMini();
-  };
-  if (pvOn) pvOn.addEventListener('click', ()=>setPvBase(false));
-  if (pvBase) pvBase.addEventListener('click', ()=>setPvBase(true));
-  const det = $('slotEdit');
-  if (det) det.addEventListener('toggle', ()=>renderSlotPvMini());
+  /* v0.9.255（方案 A）：预览视角三档（成片 / 这个槽 / 基础样式）—— 切换即重画。
+     ⚠️ 视角与「面板有没有展开」彻底解耦：以前预览活在 ✎ 面板里，收起面板画面就没了；
+        现在它是右栏一块常驻画布，收起面板照样看得见。 */
+  const pvSeg = $('pvSeg');
+  if (pvSeg) pvSeg.addEventListener('click', e => {
+    const b = e.target.closest('[data-pv]');
+    if (b) setPvView(b.getAttribute('data-pv'));
+  });
+  /* ✎ 面板里那个入口：点了把右栏预览切到「这个槽」；窄屏（右栏落到页底）顺手滚过去 */
+  const pvGoto = $('slotPvGoto');
+  if (pvGoto) pvGoto.addEventListener('click', () => {
+    setPvView('slot');
+    if (window.matchMedia && window.matchMedia('(max-width:1180px)').matches){
+      const r = $('rail'); if (r && r.scrollIntoView) r.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
 }
 
 /* ================= 初始化 ================= */
@@ -4309,9 +4406,7 @@ function init(){
   document.querySelectorAll('input[name=alignMode]').forEach(el=>{
     el.addEventListener('change', ()=>{
       S.alignTouched = true;
-      const hint = $('alignHint');
-      const m = alignMode();
-      if (hint) hint.textContent = t(m==='order' ? 'alignHintOrder' : m==='dstTime' ? 'alignHintDst' : 'alignHintTime');
+      alignHintTip();
     });
   });
   /* 导出区第二份模板下拉（滚动到导出卡时就在手边）与设置区那份保持同步 */
