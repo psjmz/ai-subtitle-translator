@@ -147,6 +147,8 @@
     .cbox{grid-template-columns:1fr}
   }
 </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="wrap">
@@ -168,9 +170,9 @@
     <div class="drop-zone" id="dz">
       <span class="dz-ico"></span>
       <span class="dz-txt" data-i18n="dzTxt">拖到这里，或点击选择文件</span>
-      <span class="dz-fmt">.srt / .vtt</span>
+      <span class="dz-fmt">.srt / .vtt / .ass</span>
     </div>
-    <input type="file" id="file" accept=".srt,.vtt,.txt" hidden>
+    <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.txt" hidden>
     <div class="up-row">
       <span class="dz-file" id="fname"></span>
       <button class="btn ghost sm" id="btnClear" style="display:none" data-i18n="btnClear">清除</button>
@@ -233,7 +235,7 @@
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.257"></script>
+<script src="clean-core.js?v=0.9.258"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -250,6 +252,7 @@ const $ = function (s) { return document.querySelector(s); };
 const S = {
   raw: [],            // 解析后的原始条目 [{no,start,end,text}]
   fmt: 'srt',
+  outFmt: 'srt',      // v0.9.258：导出格式（vtt 源 → 'vtt'，其余 → 'srt'）
   fname: '',
   changes: [],        // 每条 = {i, before, after, tags:[], del:bool}
   off: new Set()      // 被用户「还原」的 change 下标
@@ -316,6 +319,15 @@ function outSrt() {
 function outTxt() {
   return resolve().map(function (it) { return it.text; }).join('\n') + '\n';
 }
+/* v0.9.258：导出跟随源格式 —— VTT 进来就 VTT 出去（否则用户拿不回自己的格式，
+   观感上等于「不支持 VTT」）。ASS 进来仍导出 SRT：清洗会把 ASS 的样式全部剥掉，
+   产不出有意义的 ASS，这一点在解析成功的提示里明说。 */
+function outMain() {
+  const items = resolve();
+  C.renumber(items);
+  return (S.outFmt === 'vtt') ? C.formatVtt(items) : C.formatSrt(items);
+}
+function outExt() { return S.outFmt === 'vtt' ? '.vtt' : '.srt'; }
 
 /* ---------------- 渲染 ---------------- */
 function optVal() {
@@ -414,17 +426,17 @@ function setSource(text, name, enc) {
   const src = String(text || '').replace(/^\uFEFF/, '').replace(/\r/g, '');
   if (!src.trim()) { toast(t('errEmpty')); return; }
   let res = null, fmt = 'srt';
-  if (/^\s*(WEBVTT|1\s*\n\s*00:)/i.test(src) || /^WEBVTT/i.test(src)) {
+  if (/^\s*(WEBVTT|1\s*\n\s*00:)/i.test(src)) {
     const v = C.parseVtt(src);
     if (v.items && v.items.length) { res = v; fmt = 'vtt'; }
   }
-  if (!res && /\[Script Info\]|\n\s*Dialogue:/i.test(src)) {
-    /* ASS 自带样式与定位，清洗没有意义 —— 明确告诉用户先转成 SRT，
-       不静默按 SRT 解析（那样会解析出一堆空条目，用户根本看不出错在哪）。 */
-    $('#bad').style.display = '';
-    $('#bad').textContent = t('errAss');
-    $('#ok').style.display = 'none';
-    return;
+  /* v0.9.258：ASS / SSA 直接解析。此前这里是一道「明确拒绝 + 让用户先转成 SRT」的拦截，
+     理由是「ASS 自带样式，清洗没意义」——但清洗要的本就是「把样式扒掉只留文本」，
+     拒收反而让用户白跑一趟。现在照收：样式交给「去 ASS 特效」那条规则处理，
+     导出统一成 SRT（清洗产不出有意义的 ASS，这一点在提示里明说）。 */
+  if (!res && /\[Script Info\]|\[V4\+ Styles\]|^\s*Dialogue\s*:/im.test(src)) {
+    const a = C.parseAss(src);
+    if (a.items && a.items.length) { res = a; fmt = 'ass'; }
   }
   if (!res) res = C.parseSrt(src);
   if (!res.items || !res.items.length) {
@@ -435,13 +447,17 @@ function setSource(text, name, enc) {
   }
   S.raw = res.items;
   S.fmt = fmt;
+  /* v0.9.258：导出格式跟随源文件 —— VTT 进来 VTT 出去；其余（含 ASS）导出 SRT。
+     SRT/SBV/TXT 这些本来就以 SRT 为交换格式，没必要为它们再造一种输出。 */
+  S.outFmt = (fmt === 'vtt') ? 'vtt' : 'srt';
   S.fname = name || '';
   $('#bad').style.display = 'none';
   $('#ok').style.display = '';
   $('#ok').textContent = t('okParse').replace('{n}', res.items.length).replace('{f}', fmt.toUpperCase()) +
+    (fmt === 'ass' ? ' · ' + t('assNote') : '') +
     (enc && enc !== 'utf-8' ? ' · ' + t('okEnc').replace('{e}', enc) : '');
   $('#fname').textContent = name || t('pasteSrc');
-  $('#dlExt').textContent = '.srt';
+  $('#dlExt').textContent = outExt();
   runClean();
   render();
 }
@@ -510,6 +526,7 @@ function bind() {
 
   $('#btnClear').addEventListener('click', function () {
     S.raw = []; S.changes = []; S.off.clear(); S.fname = '';
+    S.fmt = 'srt'; S.outFmt = 'srt'; $('#dlExt').textContent = '.srt';
     $('#file').value = '';
     $('#paste').value = '';
     $('#fname').textContent = '';
@@ -522,7 +539,7 @@ function bind() {
 
   $('#btnDownload').addEventListener('click', function () {
     if (!S.raw.length) return toast(t('noFile'));
-    download(baseName() + '.srt', outSrt());
+    download(baseName() + outExt(), outMain());
     toast(t('okDl'));
   });
   $('#btnTxt').addEventListener('click', function () {
@@ -532,7 +549,7 @@ function bind() {
   });
   $('#btnCopy').addEventListener('click', function () {
     if (!S.raw.length) return toast(t('noFile'));
-    const s = outSrt();
+    const s = outMain();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(s).then(function () { toast(t('okCopy')); }, function () { fallbackCopy(s); });
     } else fallbackCopy(s);
@@ -597,8 +614,8 @@ const I18N = {
     btnDownload: '下载字幕', btnCopy: '复制内容', btnTxt: '导出纯文本', btnUndoAll: '全部还原',
     noChange: '没有需要清洗的地方，这份字幕已经是干净的。',
     okParse: '解析到 {n} 条 · 源格式 {f}', okEnc: '编码已按 {e} 修复',
-    errParse: '没能解析出字幕内容。请确认是 SRT 或 VTT 文件；如果是 ASS，请先导出成 SRT。',
-    errAss: '这是一份 ASS 字幕。ASS 自带样式和定位，清洗没有意义 —— 请先用别的工具导出成 SRT，再拿过来清洗。',
+    assNote: 'ASS 样式按内容处理，导出为 SRT',
+    errParse: '没能解析出字幕内容。支持 SRT / VTT / ASS（含 SSA）。',
     errEmpty: '文件是空的', noFile: '先上传一份字幕',
     okDl: '已下载', okCopy: '已复制', errCopy: '复制失败，请手动选中复制',
     optOn: '已开启 {n} / {t} 项', pasteSrc: '粘贴的内容',
@@ -631,8 +648,8 @@ const I18N = {
     btnDownload: 'Download', btnCopy: 'Copy', btnTxt: 'Plain text', btnUndoAll: 'Revert all',
     noChange: 'Nothing to clean. This file is already tidy.',
     okParse: '{n} cues parsed · source {f}', okEnc: 'encoding fixed as {e}',
-    errParse: 'Could not parse any cues. Make sure it is an SRT or VTT file.',
-    errAss: 'This is an ASS file. ASS carries its own styling and positioning, so cleaning makes no sense. Export it to SRT first.',
+    assNote: 'ASS styling is treated as content; exports as SRT',
+    errParse: 'Could not parse any cues. Supported: SRT, VTT, ASS (and SSA).',
     errEmpty: 'That file is empty', noFile: 'Upload a subtitle file first',
     okDl: 'Downloaded', okCopy: 'Copied', errCopy: 'Copy failed, please select and copy manually',
     optOn: '{n} of {t} rules on', pasteSrc: 'pasted content',

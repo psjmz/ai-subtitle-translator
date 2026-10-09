@@ -100,8 +100,59 @@
     });
     return { items: items, issues: items.length ? [] : [{ type: 'empty', at: 0, code: 'noBlocks' }] };
   }
+  /* ---------------- ASS / SSA 解析（v0.9.258 新增）
+     ⚠️ 与 srt-core.js 的 parseAss 有一处**有意的差别**：那边把 {\an8} 这类特效标签直接剥掉，
+        这里**保留**，交给「去 ASS 特效」这条清洗规则去处理 —— 否则那条规则永远无事可做，
+        用户关掉它也没有任何区别（清洗器是一个「给你看每条规则干了什么」的工具）。
+     只做解析层面必须的事：\N 还原成换行、\h 还原成空格，坐标与样式一概不管（清洗不产出 ASS）。 */
+  const ASS_TIME_RE = /^(\d+):(\d{1,2}):(\d{1,2})[.:](\d{1,2})/;
+  function parseAssTime(str) {
+    const m = ASS_TIME_RE.exec(String(str || '').trim());
+    if (!m) return null;
+    return (+m[1] * 3600 + +m[2] * 60 + +m[3]) * 1000 + (+m[4].padEnd(2, '0')) * 10;
+  }
+  function parseAss(src) {
+    const items = [];
+    const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+    const DEF_FMT = ['layer', 'start', 'end', 'style', 'name', 'marginl', 'marginr', 'marginv', 'effect', 'text'];
+    let inEvents = false, fmt = null;
+    text.split('\n').forEach(function (ln) {
+      const s = ln.trim();
+      if (/^\[/.test(s)) { inEvents = /^\[events\]/i.test(s); return; }
+      if (!inEvents || !s) return;
+      if (/^format\s*:/i.test(s)) {
+        fmt = s.slice(s.indexOf(':') + 1).split(',').map(function (x) { return x.trim().toLowerCase(); });
+        return;
+      }
+      if (!/^dialogue\s*:/i.test(s)) return;          /* Comment 行等一律跳过 */
+      const cols = fmt || DEF_FMT;
+      const raw = s.slice(s.indexOf(':') + 1).trim().split(',');
+      const head = raw.slice(0, cols.length - 1);
+      const textField = raw.slice(cols.length - 1).join(',');   /* Text 列可含逗号 */
+      const col = function (name) {
+        const idx = cols.indexOf(name);
+        return (idx >= 0 && idx < head.length) ? head[idx].trim() : '';
+      };
+      const st = parseAssTime(col('start')), en = parseAssTime(col('end'));
+      if (st == null || en == null) return;
+      const body = textField
+        .replace(/\\N/gi, '\n').replace(/\\h/gi, ' ')
+        .replace(/[ \t]+\n/g, '\n').trim();
+      if (!body) return;
+      items.push({ no: items.length + 1, start: st, end: en, text: body });
+    });
+    return { items: items, issues: items.length ? [] : [{ type: 'empty', at: 0, code: 'noBlocks' }] };
+  }
+
   function formatTxt(items) {
     return (items || []).map(function (it) { return it.text; }).join('\n') + '\n';
+  }
+  /* v0.9.258：VTT 导出。清洗不产出样式（STYLE 块 / cue settings 一概不写）——
+     样式是特效页的活，这边只把干净的文本按 WebVTT 骨架吐出来。 */
+  function formatVtt(items) {
+    return 'WEBVTT\n\n' + (items || []).map(function (it) {
+      return it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + '\n' + it.text;
+    }).join('\n\n') + '\n';
   }
 
   /* =====================================================================
@@ -369,7 +420,7 @@
 
   return {
     parseTime, fmtTime, fmtTimeVtt, renumber,
-    parseSrt, formatSrt, parseVtt, formatTxt,
+    parseSrt, formatSrt, parseVtt, formatVtt, parseAss, formatTxt,
     stripAssFx, stripHtml, stripCtrl, stripSdh, stripSpeaker,
     isMusicCue, isWmCue, stripWmLines, tidyPunct, fixUpper,
     clean, decodeBuf,

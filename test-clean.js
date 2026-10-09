@@ -165,5 +165,46 @@ console.log('\n— 默认开启的规则确实生效 —');
   ok(i[5] && i[5].del && i[5].tags.indexOf('dup') >= 0, '默认去重复');
 }
 
+console.log('\n— VTT 解析 / 导出（v0.9.258）—');
+{
+  const vtt = ['WEBVTT', '', 'NOTE 说明行', '', 'STYLE', '::cue { color: yellow }', '',
+    '1', '00:00:01.000 --> 00:00:03.000 align:middle', '<i>Hello</i> there', '',
+    '00:00:04.500 --> 00:00:06.000', '[脚步声] GEORGE: 你好', ''].join('\n');
+  const r = C.parseVtt(vtt);
+  ok(r.items.length === 2, 'NOTE / STYLE 块被跳过，解析出 2 条', r.items.length);
+  ok(r.items[0].start === 1000 && r.items[0].end === 3000, '时间轴毫秒正确');
+  ok(/<i>Hello<\/i> there/.test(r.items[0].text), '<i> 行内标签保留（交给去 HTML 规则）', r.items[0].text);
+  const out = C.formatVtt(r.items);
+  ok(/^WEBVTT\n\n1\n00:00:01\.000 --> 00:00:03\.000\n/.test(out), '导出带 WEBVTT 头与点号毫秒', out.slice(0, 44));
+  const back = C.parseVtt(out);
+  ok(back.items.length === 2 && C.formatVtt(back.items) === out, '解析 → 导出 → 再解析是幂等的');
+  const noHead = ['1', '00:00:01.000 --> 00:00:02.000', '没有 WEBVTT 头的 VTT', ''].join('\n');
+  ok(C.parseVtt(noHead).items.length === 1, '没有 WEBVTT 头也能解析');
+}
+
+console.log('\n— ASS / SSA 解析（v0.9.258 新增）—');
+{
+  const ass = ['[Script Info]', 'ScriptType: v4.00+', 'PlayResY: 1080', '',
+    '[V4+ Styles]', 'Format: Name, Fontname, Fontsize', 'Style: Default,Arial,56', '',
+    '[Events]', 'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
+    'Comment: 0,0:00:00.00,0:00:00.50,Default,,0,0,0,,这是注释行不是字幕',
+    'Dialogue: 0,0:00:01.00,0:00:03.50,Default,,0,0,0,,{\\an8}Hello world',
+    'Dialogue: 0,0:00:04.00,0:00:06.00,Default,,0,0,0,,第一行\\N第二行',
+    'Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,带,逗号的台词', ''].join('\n');
+  const r = C.parseAss(ass);
+  ok(r.items.length === 3, 'Comment 行跳过，Dialogue 解析出 3 条', r.items.length);
+  ok(r.items[0].start === 1000 && r.items[0].end === 3500, '厘秒时间轴换算正确（3.50s → 3500ms）',
+    r.items[0].start + '/' + r.items[0].end);
+  ok(/^\{\\an8\}Hello world$/.test(r.items[0].text), '{\\an8} 保留给清洗规则（与翻译引擎有意不同）', r.items[0].text);
+  ok(/第一行\n第二行/.test(r.items[1].text), '\\N 还原成换行');
+  ok(/带,逗号的台词/.test(r.items[2].text), 'Text 列里的逗号不被当列分隔符');
+  const ch = C.clean(r.items, DEF_ON).changes;
+  const c0 = ch.filter(c => c.i === 0)[0];
+  ok(c0 && c0.after === 'Hello world' && c0.tags.indexOf('assFx') >= 0,
+    '默认规则把 ASS 特效标签清掉', c0 && (c0.after + ' / ' + c0.tags.join(',')));
+  ok(/^1\n00:00:01,000 --> 00:00:03,500\n/.test(C.formatSrt(r.items)), 'ASS 条目走 SRT 导出通道');
+  ok(C.parseAss('[Script Info]\n[Events]\n') .items.length === 0, '没有 Dialogue 时返回空（不抛错）');
+}
+
 console.log('\n' + (F ? '✗ 失败 ' + F + ' / 通过 ' + P : '✓ 全部通过 ' + P) + '\n');
 process.exit(F ? 1 : 0);

@@ -493,11 +493,13 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     opacity:0;transform:translateY(4px);transition:opacity .16s ease,transform .16s ease;display:none}
   #tipLayer.on{opacity:1;transform:translateY(0)}
 </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.257</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.258</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -986,7 +988,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.257"></script>
+<script src="merge-core.js?v=0.9.258"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1097,6 +1099,7 @@ const I18N = {
     footNote:'随心字幕 AI · 特效字幕处理工具', footLink:'去翻译字幕 →',
     modeMono:'单语字幕', monoCol:'字幕', monoCard:'字幕文件', btnMono:'生成预览', optTitleMono:'特效设置',
     monoHint:'只传一份字幕，直接给它加样式特效。',
+    fxImported:'已从翻译页带入 {0}，接着挑样式就行', fxFailed:'带过来的字幕解析不出条目，请回翻译页重新导出',
     slotTitle:'样式槽', slotHint:'点胶囊选中这个槽（只列它用在哪几行），右侧铅笔展开样式编辑', slotEditTip:'编辑这个槽的样式', filterSlot:'槽：{0} · {1} 行', selDockN:'已选 {0} 行 · 套用', selDockClear:'清除选择', slotNew:'+ 新建槽',
     slotEdit:'编辑槽', slotCover:'已覆盖 {0} / {1} 项', slotUncoverAll:'解除全部覆盖',
     slotPvTitle:'效果预览', slotPvBase:'基础样式',
@@ -1249,6 +1252,7 @@ const I18N = {
     footNote:'隨心字幕 AI · 特效字幕處理工具', footLink:'去翻譯字幕 →',
     modeMono:'單語字幕', monoCol:'字幕', monoCard:'字幕檔案', btnMono:'產生預覽', optTitleMono:'特效設定',
     monoHint:'只傳一份字幕，直接幫它加樣式特效。',
+    fxImported:'已從翻譯頁帶入 {0}，接著挑樣式就行', fxFailed:'帶過來的字幕解析不出條目，請回翻譯頁重新匯出',
     slotTitle:'樣式槽', slotHint:'點膠囊選中這個槽（只列它用在哪幾行），右側鉛筆展開樣式編輯', slotEditTip:'編輯這個槽的樣式', filterSlot:'槽：{0} · {1} 行', selDockN:'已選 {0} 行 · 套用', selDockClear:'清除選取', slotNew:'+ 新增槽',
     slotEdit:'編輯槽', slotCover:'已覆蓋 {0} / {1} 項', slotUncoverAll:'解除全部覆蓋',
     slotPvTitle:'效果預覽', slotPvBase:'基礎樣式',
@@ -1401,6 +1405,7 @@ const I18N = {
     footNote:'AI-SRTSub · Subtitle Styling Tool', footLink:'Translate subtitles →',
     modeMono:'Single language', monoCol:'Subtitle', monoCard:'Subtitle file', btnMono:'Preview', optTitleMono:'Styling',
     monoHint:'Upload one subtitle file and style it directly.',
+    fxImported:'Imported {0} from the translate page — now pick a style', fxFailed:'Could not parse the imported subtitle, please export again from the translate page',
     slotTitle:'Style slots', slotHint:'Click a chip to select that slot (lists just its lines); the pencil opens its style editor', slotEditTip:'Edit this slot', filterSlot:'Slot: {0} · {1} lines', selDockN:'{0} selected · apply', selDockClear:'Clear', slotNew:'+ New slot',
     slotEdit:'Edit slot', slotCover:'{0} of {1} overridden', slotUncoverAll:'Clear all overrides',
     slotPvTitle:'Preview', slotPvBase:'Base style',
@@ -1553,6 +1558,7 @@ const I18N = {
     footNote:'AI-SRTSub · 字幕スタイル処理ツール', footLink:'字幕を翻訳する →',
     modeMono:'単一言語', monoCol:'字幕', monoCard:'字幕ファイル', btnMono:'プレビュー', optTitleMono:'スタイル設定',
     monoHint:'字幕を 1 本だけアップロードして、直接スタイルを付けます。',
+    fxImported:'翻訳ページから {0} を取り込みました。続けてスタイルを選んでください', fxFailed:'取り込んだ字幕を解析できませんでした。翻訳ページで再度エクスポートしてください',
     slotTitle:'スタイルスロット', slotHint:'カプセルでスロットを選択（その行のみ表示）、右側の鉛筆でスタイル編集', slotEditTip:'このスロットを編集', filterSlot:'スロット：{0} · {1} 行', selDockN:'{0} 行選択中 · 適用', selDockClear:'選択解除', slotNew:'+ 新規スロット',
     slotEdit:'スロットを編集', slotCover:'{0} / {1} 項目を上書き中', slotUncoverAll:'上書きをすべて解除',
     slotPvTitle:'プレビュー', slotPvBase:'基本スタイル',
@@ -4551,6 +4557,26 @@ function init(){
   loadDemo();   /* v0.9.247：空状态示例（用户一进来就看见工作台长什么样） */
 }
 init();
+/* v0.9.258：接住从翻译页带过来的译文（那边导出卡的「去特效字幕处理」）。
+   ⚠️ 必须放在 init() 之后 —— 依赖 modeTabs 已绑好的 change 监听、loadSide 要找的输入框、
+      以及已就位的 applyI18n。放早了模式切不动、输入框也抓不到。
+   ⚠️ 落点按内容分：双语 → 「调整双语」（自动拆成原文/译文两列）；
+      单语 → 「单语字幕」（不配对，直接进表）。取完立即删掉暂存，刷新不该再灌一次。 */
+(function(){
+  let raw=null;
+  try{ raw=sessionStorage.getItem('srt_fx_in'); }catch(e){}
+  if(!raw) return;
+  try{ sessionStorage.removeItem('srt_fx_in'); }catch(e){}
+  let d=null; try{ d=JSON.parse(raw); }catch(e){}
+  if(!d || !d.text) return;
+  const mode = (d.mode==='mono') ? 'mono' : 'adjust';
+  const r = document.querySelector('#modeTabs input[name=workMode][value="'+mode+'"]');
+  if(r && !r.checked){ r.checked=true; r.dispatchEvent(new Event('change',{bubbles:true})); }
+  loadSide('src', d.text, d.name || '');
+  if(!S.src || !S.src.length){ toast(t('fxFailed')); return; }
+  doMerge();
+  toast(t('fxImported', mode==='mono' ? t('modeMono') : t('modeAdjust')));
+})();
 </script>
 <script src="site-nav.js" data-tool="fx"></script>
 </body>

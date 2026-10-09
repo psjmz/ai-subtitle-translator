@@ -4416,7 +4416,9 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 它本来就由右边的「导出字幕样式」控制（选 ASS 才出现），却摆在左栏翻译设置里，
        用户会以为它影响翻译结果。搬运只动位置：id 与 data-i18n 全保留、控制逻辑不变。 */
     const iExport = html.indexOf('data-i18n="stepExport"');   // 右栏「导出译文」标题
-    const iExpSel = html.indexOf('<select id="expStyle"></select>');
+    /* v0.9.258：格式选择由下拉改成按钮面板，定位锚点换成面板本身
+       （`<select id="expStyle">` 仍在，但已退居隐藏的状态源，不再是这一区的视觉起点）。 */
+    const iExpSel = html.indexOf('id="fmtPanel"');
     const iAss    = html.indexOf('id="assStyleBox"');
     const iWrap   = html.indexOf('data-i18n="secWrap"');      // 折行设置
     assert.ok(iExport > 0 && iExpSel > iExport, '右栏导出区定位失败');
@@ -4635,9 +4637,12 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     // ① .flbl 必须绑到某个控件：例外只有两个 radiogroup 的组标题（它们靠 aria-labelledby 反向引用）
     const flbls = html.match(/<label[^>]*class="[^"]*\bflbl\b[^"]*"[^>]*>/g) || [];
     assert.ok(flbls.length >= 14, '.flbl 数量异常: ' + flbls.length);
+    /* v0.9.258：多一个例外 —— 右栏「导出字幕样式」现在的 label 是一组按钮的标题，
+       不是某个控件的标签，同样靠 aria-labelledby 反向引用（见 #fmtPanel）。 */
     assert.deepStrictEqual(flbls.filter(l => !/\sfor="/.test(l)),
-      ['<label class="flbl" id="lblPnModeLbl">', '<label class="flbl" id="lblLyricLbl">'],
-      '不该有没有 for= 的 .flbl（例外只允许两个 radiogroup 组标题）');
+      ['<label class="flbl" id="lblPnModeLbl">', '<label class="flbl" id="lblLyricLbl">',
+       '<label class="flbl" id="lblExpFmt" data-i18n="lblExpStyle">'],
+      '不该有没有 for= 的 .flbl（例外只允许三处组标题）');
     // ② 没有可见标签的两个自由文本框 → 用 placeholder 词条当 aria-label（有可见标签的别加，会重复播报）
     assert.ok(/<textarea id="paste"[^>]*data-i18n-aria="pastePh"/.test(html), 'paste 缺 aria-label');
     assert.ok(/id="styleCustom"[^>]*data-i18n-aria="styleCustomPh"/.test(html), 'styleCustom 缺 aria-label');
@@ -5340,7 +5345,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.257/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.258/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5385,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.257</.test(html), '首页版本号未升 0.9.256');
-    assert.ok(/class="ver-tag">v0\.9\.257</.test(html), '工作台版本号未升 0.9.256');
-    assert.ok(/srt-core\.js\?v=0\.9\.257/.test(html), 'srt-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.258</.test(html), '首页版本号未升 0.9.256');
+    assert.ok(/class="ver-tag">v0\.9\.258</.test(html), '工作台版本号未升 0.9.256');
+    assert.ok(/srt-core\.js\?v=0\.9\.258/.test(html), 'srt-core.js?v 未升 0.9.256');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5559,8 +5564,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.257</.test(mg), 'merge.html 版本未升 0.9.256');
-    assert.ok(/merge-core\.js\?v=0\.9\.257/.test(mg), 'merge-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.258</.test(mg), 'merge.html 版本未升 0.9.256');
+    assert.ok(/merge-core\.js\?v=0\.9\.258/.test(mg), 'merge-core.js?v 未升 0.9.256');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6713,7 +6718,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 时间轴必须归零：MediaStream 不可 seek，不重建就永远停在过期时间点 */
     assert.ok(/function vttNatRestart\(\)/.test(html) && /vttNatRestart\(\);/.test(html), '缺时间轴归零');
     /* 样式 / 格式一变就要重刷（否则预览是死的） */
-    assert.ok(/if\(isVtt\)\{ try\{ vttNatSync\(\); \}catch\(e\)\{\} \}/.test(html), '导出预览没带动原生预览');
+    /* v0.9.258：右栏不再提供 VTT 面板，原生对照预览改为受 ADV_EXPORT 门控 ——
+       面板藏起来还让 canvas 转就是白烧 CPU。开关本身也要钉住，别被顺手删了。 */
+    assert.ok(/if\(isVtt && ADV_EXPORT\)\{ try\{ vttNatSync\(\); \}catch\(e\)\{\} \}/.test(html),
+      '导出预览没带动原生预览（v0.9.258 起须同时受 ADV_EXPORT 门控）');
+    assert.ok(/const ADV_EXPORT = false;/.test(html), 'ADV_EXPORT 开关丢了（面板会重新冒出来）');
     assert.ok(/forEach\(function\(id\)\{ try\{ syncColorSw\(id\); \}catch\(e\)\{\} \}\);[\s\S]{0,220}?vttNatSync\(\);/.test(html),
       'syncVttStyleBox 没带动原生预览');
     assert.ok(/id="vttNatReplay"/.test(html), '缺重播按钮（定格后没法再看一眼）');
@@ -7385,11 +7394,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.257/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.257/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.257/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.257/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.257/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.258/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.258/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.258/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.258/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.258/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
