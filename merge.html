@@ -497,7 +497,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.255</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.256</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -986,7 +986,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.255"></script>
+<script src="merge-core.js?v=0.9.256"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -4086,6 +4086,9 @@ function bindSlotUI(){
       ensureStyle();
       if (!S.style.slots[eid]) return;
       S.style.cur = eid;
+      /* v0.9.256：铅笔 = 选中这个槽 → 右侧画面跟着切过去（用户拍板）
+         ⚠️ 铅笔不碰筛选，所以这里恒切「这个槽」，没有「取消」这回事。 */
+      setPvView('slot');
       const det = $('slotEdit'); if (det) det.open = true;
       renderSlots();
       return;
@@ -4102,6 +4105,10 @@ function bindSlotUI(){
           筛选与编辑是同一个「选中」的两面，点胶囊就是选中它。
        ⚠️ 面板的展开状态**不动**（没展开就不展开），只切目标。 */
     S.style.cur = id;
+    /* v0.9.256：点了槽 = 想看它 → 右侧画面跟着切「这个槽」；再点一次取消选中 → 回「成片」
+       （用户拍板：取消选中就等于不看了，画面该还回用户自己的字幕）。
+       ⚠️ 判据用 S.filter.slot 而不是 cur：cur 永不回退，取消时它仍是这个槽。 */
+    setPvView(S.filter.slot ? 'slot' : 'movie');
     renderReport();   /* 表格 + 状态条 + 胶囊态 + 编辑面板一起重画 */
     const tb = $('.tbl-wrap'); if (tb && S.filter.slot) tb.scrollTop = 0;
   });

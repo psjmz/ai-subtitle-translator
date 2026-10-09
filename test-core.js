@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.255/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.256/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.255</.test(html), '首页版本号未升 0.9.255');
-    assert.ok(/class="ver-tag">v0\.9\.255</.test(html), '工作台版本号未升 0.9.255');
-    assert.ok(/srt-core\.js\?v=0\.9\.255/.test(html), 'srt-core.js?v 未升 0.9.255');
+    assert.ok(/class="ver">v0\.9\.256</.test(html), '首页版本号未升 0.9.256');
+    assert.ok(/class="ver-tag">v0\.9\.256</.test(html), '工作台版本号未升 0.9.256');
+    assert.ok(/srt-core\.js\?v=0\.9\.256/.test(html), 'srt-core.js?v 未升 0.9.256');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.255</.test(mg), 'merge.html 版本未升 0.9.255');
-    assert.ok(/merge-core\.js\?v=0\.9\.255/.test(mg), 'merge-core.js?v 未升 0.9.255');
+    assert.ok(/class="ver">v0\.9\.256</.test(mg), 'merge.html 版本未升 0.9.256');
+    assert.ok(/merge-core\.js\?v=0\.9\.256/.test(mg), 'merge-core.js?v 未升 0.9.256');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7366,12 +7366,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const MVTT_SEGS = \[\['std'[\s\S]*'custom','vttTplCustom'\]\]/.test(mg), 'VTT 四档定义丢了');
   });
 
-  t('v0.9.245：版号两页同步升到 255（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.255/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.255/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.255/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.255/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.255/.test(html), 'index.html 缓存 bust 未升');
+  t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
+    assert.ok(/class="ver">v0\.9\.256/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.256/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.256/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.256/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.256/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8444,6 +8444,29 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         assert.ok(new RegExp('[,{\\s]' + k + ":\\s*'").test(dict[L]), L + ' 缺 ' + k);
       });
     });
+  });
+
+  t('v0.9.256：点了槽就把右侧画面切过去（胶囊 + 小铅笔）；取消选中回「成片」', () => {
+    /* 用户拍板：① 触发点 = 槽胶囊 + 小铅笔 ② 再点一次取消选中 → 回「成片」 */
+    const i = mg.indexOf("const chip = e.target.closest('[data-slot]')");
+    assert.ok(i > 0, '找不到点胶囊那段');
+    const blk = mg.slice(i, i + 1500);
+    /* ⚠️ 判据必须是 S.filter.slot（选中状态），不是 cur —— 取消选中时 cur 仍是这个槽 */
+    assert.ok(/setPvView\(S\.filter\.slot \? 'slot' : 'movie'\);/.test(blk),
+      '点胶囊没把右侧画面跟着切（选中→这个槽 / 取消→成片）');
+    assert.ok(blk.indexOf('S.style.cur = id;') > 0, '点胶囊没切编辑目标（253 的联动丢了）');
+    assert.ok(/renderReport\(\);/.test(blk), '点胶囊后没重画整条链');
+
+    const j = mg.indexOf("const ed = e.target.closest('[data-slot-edit]')");
+    assert.ok(j > 0, '找不到点小铅笔那段');
+    /* ⚠️ 别用固定长度切片（分支一变长就越界到胶囊那段 → 把「不许碰筛选」误判成红）；
+       ⚠️ 也别切到最近的 return;（分支开头那个 `if (!S.style.slots[eid]) return;` 会先中招）——
+       以分支里那句 det.open 为终点。 */
+    const jEnd = mg.indexOf('renderSlots();', j);
+    const blk2 = jEnd > j ? mg.slice(j, jEnd + 15) : mg.slice(j, j + 700);
+    assert.ok(/setPvView\('slot'\);/.test(blk2), '小铅笔没把右侧画面切到这个槽');
+    assert.ok(/det\.open = true;/.test(blk2), '小铅笔不再展开编辑面板了');
+    assert.ok(blk2.indexOf('S.filter') === -1, '小铅笔语义变了（不许碰筛选）');
   });
 
 }
