@@ -5340,7 +5340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.250/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.251/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5380,9 +5380,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.250</.test(html), '首页版本号未升 0.9.245');
-    assert.ok(/class="ver-tag">v0\.9\.250</.test(html), '工作台版本号未升 0.9.245');
-    assert.ok(/srt-core\.js\?v=0\.9\.250/.test(html), 'srt-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.251</.test(html), '首页版本号未升 0.9.245');
+    assert.ok(/class="ver-tag">v0\.9\.251</.test(html), '工作台版本号未升 0.9.245');
+    assert.ok(/srt-core\.js\?v=0\.9\.251/.test(html), 'srt-core.js?v 未升 0.9.245');
     assert.ok(/href="merge\.html"/.test(html), '首页缺 merge.html 入口链接');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
@@ -5541,8 +5541,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.250</.test(mg), 'merge.html 版本未升 0.9.245');
-    assert.ok(/merge-core\.js\?v=0\.9\.250/.test(mg), 'merge-core.js?v 未升 0.9.245');
+    assert.ok(/class="ver">v0\.9\.251</.test(mg), 'merge.html 版本未升 0.9.245');
+    assert.ok(/merge-core\.js\?v=0\.9\.251/.test(mg), 'merge-core.js?v 未升 0.9.245');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7361,11 +7361,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 245（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.250/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.250/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.250/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.250/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.250/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.251/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.251/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.251/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.251/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.251/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.244/.test(mg) && !/class="ver">v0\.9\.244/.test(html), '还留着上一版的显示版号');
   });
@@ -8127,6 +8127,41 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       const m = /slotNew:\s*'([^']*)'/.exec(dict[L]);
       assert.ok(m, L + ' 缺 slotNew');
       assert.ok(/^\+/.test(m[1]), L + ' 的 slotNew 没自带 + → 渲染处不补就丢了加号：' + m[1]);
+    });
+  });
+
+  /* ================= v0.9.251：出厂「歌词」槽的位移降到 36（用户拍板 30~40） ================= */
+  t('v0.9.251：出厂歌词槽 dMV 落在 30~40（70 在双行模板下会撞到原文行）', () => {
+    /* 背景：dMV=70 是按**分屏**模板想出来的（分屏原文行在 922，上移 70 很安全）；
+       但默认模板是**底部双行**（dst 42 / src 117，两行只隔 75px），
+       42+70=112 ≈ 贴在原文行 117 上 —— 加了预览之后一眼就能看见。用户拍板区间 30~40。 */
+    const m = /id:\s*'lyric'[^}]*dMV:\s*(\d+)/.exec(mg);
+    assert.ok(m, '出厂 lyric 槽没带 dMV（前提变了）');
+    const v = +m[1];
+    assert.ok(v >= 30 && v <= 40, '歌词槽 dMV 不在用户拍板的 30~40 内：' + v);
+    assert.ok(v !== 70, '又退回 70 了（那会在双行模板下压住原文行）');
+    /* ⚠️ 与真实的双行预设联动：预设值变了这条要跟着复核，别写成死数字 */
+    const st = /assDstMV:\s*'(\d+)'[^\n]*assSrcMV:\s*'(\d+)'/.exec(mg);
+    assert.ok(st, '读不到底部双行预设（42/117）');
+    const gap = +st[2] - (+st[1] + v);
+    assert.ok(gap >= 20, '译文行上移后离原文行只剩 ' + gap + 'px（<20 会看着像贴在一起）');
+  });
+
+  t('v0.9.251：歌词槽四语提示不再说「上移一行」（36 已经不是一行了）', () => {
+    const langs = ['zh-CN', 'zh-TW', 'en', 'ja'];
+    const dict = {};
+    langs.forEach(L => {
+      const m = new RegExp("['\"]?" + L.replace('-', '\\-') + "['\"]?\\s*:\\s*\\{").exec(mg);
+      assert.ok(m, '找不到语块 ' + L);
+      let d = 1, j = m.index + m[0].length;
+      while (d > 0 && j < mg.length) { if (mg[j] === '{') d++; else if (mg[j] === '}') d--; j++; }
+      dict[L] = mg.slice(m.index, j);
+    });
+    langs.forEach(L => {
+      const m = /slotTipLyric:\s*'([^']*)'/.exec(dict[L]);
+      assert.ok(m, L + ' 缺 slotTipLyric');
+      assert.ok(!/一行|1 行|one line/.test(m[1]),
+        L + ' 还写着「上移一行」，但实际只上移 36px（≈半行）—— 界面不许骗人：' + m[1]);
     });
   });
 

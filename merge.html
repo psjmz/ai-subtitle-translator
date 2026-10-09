@@ -476,7 +476,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.250</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.251</span></div>
     <div class="spacer"></div>
     <a href="/"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="navHome">返回翻译工具</span></a>
     <select id="uiLang" aria-label="UI language"></select>
@@ -968,7 +968,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.250"></script>
+<script src="merge-core.js?v=0.9.251"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1090,7 +1090,7 @@ const I18N = {
     slotPrmSize:'字号', slotPrmColor:'颜色', slotPrmBold:'粗体', slotPrmItalic:'斜体', slotPrmDMV:'垂直偏移',
     slotPrmUnit:'（相对基础样式）', slotEmpty:'还没有覆盖任何一项 —— 与基础样式完全一样',
     slotTipDefault:'没有差异，等于基础样式', slotTipNarration:'画外音 · 斜体（行业惯例）',
-    slotTipLyric:'歌词 · 斜体 + 上移一行', slotTipSfx:'音效 · 淡色、保持正体（Netflix 规范：音效不斜体）',
+    slotTipLyric:'歌词 · 斜体 + 上移半行', slotTipSfx:'音效 · 淡色、保持正体（Netflix 规范：音效不斜体）',
     slotTipEmphasis:'强调 · 加粗',
     filterPh:'筛选行：输入 [  ♪  关键词', filterSfx:'含音效', filterSpeaker:'有说话人前缀',
     filterShort:'时长 < 1 秒', filterLong:'两行以上', filterFast:'阅读速度超标',
@@ -1241,7 +1241,7 @@ const I18N = {
     slotPrmSize:'字級', slotPrmColor:'顏色', slotPrmBold:'粗體', slotPrmItalic:'斜體', slotPrmDMV:'垂直偏移',
     slotPrmUnit:'（相對基礎樣式）', slotEmpty:'還沒有覆蓋任何一項 —— 與基礎樣式完全一樣',
     slotTipDefault:'沒有差異，等於基礎樣式', slotTipNarration:'畫外音 · 斜體（業界慣例）',
-    slotTipLyric:'歌詞 · 斜體 + 上移一行', slotTipSfx:'音效 · 淡色、保持正體（Netflix 規範：音效不斜體）',
+    slotTipLyric:'歌詞 · 斜體 + 上移半行', slotTipSfx:'音效 · 淡色、保持正體（Netflix 規範：音效不斜體）',
     slotTipEmphasis:'強調 · 加粗',
     filterPh:'篩選行：輸入 [  ♪  關鍵字', filterSfx:'含音效', filterSpeaker:'有說話人前綴',
     filterShort:'時長 < 1 秒', filterLong:'兩行以上', filterFast:'閱讀速度超標',
@@ -1392,7 +1392,7 @@ const I18N = {
     slotPrmSize:'Size', slotPrmColor:'Color', slotPrmBold:'Bold', slotPrmItalic:'Italic', slotPrmDMV:'Vertical offset',
     slotPrmUnit:'(relative to base)', slotEmpty:'Nothing overridden yet — identical to the base style',
     slotTipDefault:'No diff, same as the base style', slotTipNarration:'Off-screen voice · italic (industry convention)',
-    slotTipLyric:'Lyrics · italic + one line up', slotTipSfx:'Sound fx · dimmed, upright (Netflix: never italicize sound effects)',
+    slotTipLyric:'Lyrics · italic + half a line up', slotTipSfx:'Sound fx · dimmed, upright (Netflix: never italicize sound effects)',
     slotTipEmphasis:'Emphasis · bold',
     filterPh:'Filter lines: [  ♪  or a keyword', filterSfx:'Has sound fx', filterSpeaker:'Has speaker prefix',
     filterShort:'Shorter than 1s', filterLong:'More than 2 lines', filterFast:'Reading speed too high',
@@ -1543,7 +1543,7 @@ const I18N = {
     slotPrmSize:'サイズ', slotPrmColor:'色', slotPrmBold:'太字', slotPrmItalic:'斜体', slotPrmDMV:'垂直オフセット',
     slotPrmUnit:'（基準スタイルからの相対値）', slotEmpty:'まだ何も上書きしていません — 基準スタイルと同じです',
     slotTipDefault:'差分なし。基準スタイルと同じ', slotTipNarration:'画面外の声 · 斜体（業界慣例）',
-    slotTipLyric:'歌詞 · 斜体 + 1 行上へ', slotTipSfx:'効果音 · 淡い色・正体（Netflix 規約：効果音は斜体にしない）',
+    slotTipLyric:'歌詞 · 斜体 + 半行上へ', slotTipSfx:'効果音 · 淡い色・正体（Netflix 規約：効果音は斜体にしない）',
     slotTipEmphasis:'強調 · 太字',
     filterPh:'行を絞り込み：[  ♪  キーワード', filterSfx:'効果音を含む', filterSpeaker:'話者プレフィックス',
     filterShort:'1 秒未満', filterLong:'3 行以上', filterFast:'読み速度超過',
@@ -2010,7 +2010,13 @@ const slotSpec = k => SLOT_MAP[k] || null;
 const SLOT_FACTORY = [
   { id:'default',   color:'#888780', dst:{} },
   { id:'narration', color:'#BA7517', dst:{ italic:true } },
-  { id:'lyric',     color:'#7F77DD', dst:{ italic:true, dMV:70 } },
+  /* ⚠️ v0.9.251：lyric 的 dMV 由 70 降到 **36**（用户拍板 30~40）。
+     70 是按「分屏模板」想出来的（分屏下原文行在 922，上移 70 很安全）；
+     但**默认的「底部双行」是 dst 42 / src 117**，两行只隔 75px —— 上移 70 会把译文行推到 112，
+     几乎压在原文行 117 上。36 ≈ 75 的一半，译文行正好落在两行的正中间（78），
+     上下各留 ~39px，肉眼看得出来「抬起来了」又不贴住原文行。
+     ⚠️ 别再往回加到 70：那是分屏口径，双行下必撞车。 */
+  { id:'lyric',     color:'#7F77DD', dst:{ italic:true, dMV:36 } },
   { id:'sfx',       color:'#378ADD', dst:{ color:'#B0B0B0' } },
   { id:'emphasis',  color:'#E24B4A', dst:{ bold:true } }
 ];
