@@ -499,7 +499,7 @@ crossorigin="anonymous"></script>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.260</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.261</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -988,7 +988,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.260"></script>
+<script src="merge-core.js?v=0.9.261"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -3781,9 +3781,23 @@ function importVttStyle(side, text, name){
   const pnl = $('mVttPanel'); if (pnl) pnl.open = true;   /* 让用户看见「样式是从文件来的」 */
   return true;
 }
+/* v0.9.261：命名不再跨侧回退 —— 单语 / 调整双语都只有一个输入文件（dst 侧整个隐藏），
+   而 syncMode() 切模式时并不清 S.dstName，原本 `srcName || dstName` 会在没文件名时
+   拿上一次合并残留的译文名去命名这次的导出（实测：粘贴文本导出成 movie.en.bi.ass）。
+   ⚠️ 语义与 reportMerge() 保持一致：mono/adjust 只认 src，merge 才允许回退到 dst。 */
 function baseName(){
-  const n = S.srcName || S.dstName || '';
+  const adj = S.mode === 'adjust', mono = S.mode === 'mono';
+  const n = (adj || mono) ? (S.srcName || '') : (S.srcName || S.dstName || '');
   return n.replace(/\.[^.]+$/, '');
+}
+/* v0.9.261：导出文件名唯一生成处（下载按钮与复制共用同一份判据）。
+   ⚠️ .bi 只在真的双语时挂（单语模式导出的就是单语，挂着双语标记名不副实）；
+   ⚠️ 原名已经以 .bi 结尾时不再叠一层 —— 用户把导出的「电影.bi.ass」再传回来加工，
+      原本会越导越长成 电影.bi.bi.ass。 */
+function outName(){
+  const base = baseName() || 'merged';
+  const bi = (S.mode !== 'mono') && !/\.bi$/.test(base);
+  return base + (bi ? '.bi' : '') + '.' + expExt();
 }
 /* ================= v0.9.255：唯一预览 + 视角切换（方案 A） =================
    原本两处各画一遍（右栏主预览 + ✎ 面板里的对照预览），同一套 1080p 几何：
@@ -3900,7 +3914,7 @@ function doDownload(){
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = (baseName() || 'merged') + '.bi.' + expExt();
+  a.download = outName();   /* v0.9.261：单语不挂 .bi、二次加工不叠 .bi（见 outName） */
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   toast(t('downloaded'));
