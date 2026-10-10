@@ -7245,10 +7245,11 @@ function applyPost(){
   let wrapN=0;
   S.rows.forEach(r=>{
     if (r.flag==='drop' || r.flag==='merged' || !r.zh) return;
-    /* v0.9.270：手工编辑过的行一律不重排，与 reflowRows 同一口径（此前只有 reflowRows 跳过，
+    /* v0.9.270：译文被手工改过的行一律不重排（此前只有 reflowRows 跳过，
        点「仅后处理」会把用户手敲的折行、音效标记、故意留的空行一起抹掉）。
-       编辑进来的行（restoreEdits 恢复的）同样带 edited，刷新后不会被二次折行改动。 */
-    if (r.edited) return;
+       ⚠️ 判据是 zhHand 不是 edited —— 只改了原文/时间轴、或只是从快照恢复过来的行，
+       它那一条译文仍是新翻的，必须照常折行，否则长句会一直不换行。 */
+    if (r.zhHand) return;
     const o = reflowOne(r);
     if (o.changed) wrapN++;
     r.zh = o.text;
@@ -7272,10 +7273,21 @@ function applyPost(){
        原文若也等那时才回读，重跑翻译时 rows 已经重建，改动就蒸发了。 */
     if(r){
       if(el.classList.contains('en')){
+        /* 原文当场回读并写回 S.srcItems——等 collectEn 就晚了：重跑翻译时 rows 已经重建，
+           改动就蒸发了。 */
         const v=el.innerText.replace(/\u00a0/g,' ').trim();
         if(v!==r.en){ r.en=v; syncToSrc(r); }
+        markEdited(r);          // 只改原文：译文仍是新翻的，照常允许折行
+      }else{
+        /* 译文同样当场回读（v0.9.270 hotfix）：「改完译文立刻刷新」这条路径上，
+           快照是唯一的数据来源。原文有 syncToSrc 兜底（重跑不丢），译文如果也等到
+           collectZh 才回读，落进快照的就是上上版的旧译文，「刷新不丢」成了空话。 */
+        el.classList.remove('placeholder');
+        const v=el.innerText.replace(/\u00a0/g,' ').trim();
+        if(v!==r.zh){ r.zh=v; }
+        markZhEdited(r);        // 改了译文：连折行一起豁免
       }
-      markEdited(r); saveEdits(); renderEdBar();
+      saveEdits(); renderEdBar();
     }
   });
 })();
@@ -7293,7 +7305,7 @@ function reflowRows(){
   let n=0, skip=0;
   S.rows.forEach(r=>{
     if (!r || r.flag==='drop' || r.flag==='merged' || !r.zh) return;
-    if (r.edited) { skip++; return; }
+    if (r.zhHand) { skip++; return; }   // v0.9.270：判据收敛为 zhHand（同 applyPost）
     const o = reflowOne(r);
     if (o.text !== r.zh) n++;
     r.zh = o.text;
@@ -7318,6 +7330,12 @@ function canEdit(){ return !S.translating; }
 function editFp(){ return [S.fileBase||'', (S.rows||[]).length, S.srcFp0||''].join('|'); }
 function editedCount(){ return (S.rows||[]).filter(function(r){ return r.edited; }).length; }
 function markEdited(r){ if(!r.__o) r.__o={en:r.en,zh:r.zh,start:r.start,end:r.end}; r.edited=true; }
+/* 译文被手工改过：除 edited 之外再打一个 zhHand，专门用来豁免「自动折行」——
+   用户手敲的折行 / 音效标记 / 故意留的空行不能被 monoFit 压平。
+   ⚠️ 只改了原文或时间轴的行**不**打这个标记：那行的译文仍是引擎新翻的，必须照常折行。
+   （v0.9.270 之前豁免判据直接是 r.edited；时间轴与原文开放编辑后，edited 的覆盖面变大了，
+     再拿它当「别碰这行译文」的判据会把新译文也一起放过，所以收敛成独立标记。） */
+function markZhEdited(r){ markEdited(r); r.zhHand=true; }
 function syncToSrc(r){
   const it=(S.srcItems||[])[r.no-1];
   if(it){ it.start=r.start; it.end=r.end; it.text=r.en; }
@@ -7354,14 +7372,23 @@ function saveEdits(){
     }catch(e){}   // 写满 / 隐私模式：只降级「不再存」，绝不影响编辑本身
   },150);
 }
-function restoreEdits(){
+/* keepZh=true：跳过译文恢复——翻译刚产出的一轮，译文永远是最新的，
+   拿快照里的旧值盖回去等于把刚翻好的译文抹掉（v0.9.270 线上事故，见下注释）。 */
+function restoreEdits(keepZh){
   try{
     const raw=localStorage.getItem(EDIT_KEY); if(!raw) return 0;
     const o=JSON.parse(raw); if(!o||o.fp!==editFp()) return 0;
     let n=0;
     (o.rows||[]).forEach(function(a){
       const r=(S.rows||[]).find(function(x){ return x.id===a[0]; }); if(!r) return;
-      markEdited(r); r.en=a[1]; r.zh=a[2]; r.start=a[3]; r.end=a[4]; syncToSrc(r); n++;
+      /* ⚠️⚠️ 空译文绝不许回写。快照是在「翻译之前」落的（用户改时间轴 / 改原文 / 体检时），
+         那一刻译文还没产出，存下来的 zh 就是空的。无条件 `r.zh=a[2]` 会把模型刚翻好的
+         译文清成 null —— 编辑区只显示「待翻译…」，导出也跟着是空的（v0.9.270 线上事故）。
+         两条防线：① 翻译完成这条路径整体跳过译文（keepZh）；② 任何路径都不写空值。 */
+      const take = !keepZh && a[2]!=null && String(a[2])!=='';
+      take ? markZhEdited(r) : markEdited(r);   // ⚠️ markEdited 必须在赋值之前
+      r.en=a[1]; if(take) r.zh=String(a[2]); r.start=a[3]; r.end=a[4];
+      syncToSrc(r); n++;
     });
     return n;
   }catch(e){ return 0; }
@@ -7370,7 +7397,7 @@ function clearEdits(){
   (S.rows||[]).forEach(function(r){
     if(!r.edited) return;
     if(r.__o){ r.en=r.__o.en; r.zh=r.__o.zh; r.start=r.__o.start; r.end=r.__o.end; }
-    r.edited=false; delete r.__o; syncToSrc(r);
+    r.edited=false; r.zhHand=false; delete r.__o; syncToSrc(r);
   });
   OV_ROW=null; ISS={};
   try{ localStorage.removeItem(EDIT_KEY); }catch(e){}
@@ -9925,9 +9952,11 @@ async function runTranslate(){
     log(t('mergeInfo', gMulti, mG, gMulti-mG));
 
     setProg(99,true); // v0.9.59：进入渲染/折行阶段
-    /* v0.9.270：译完再把上次的手工编辑套回来（时间轴 / 原文 / 译文）。
-       放在 renderRows 之前，恢复的译文能当次就显示；applyPost 会跳过 edited 行，不会二次折行。 */
-    { const ne=restoreEdits(); if(ne) log(t('edRestored',ne),'okc'); }
+    /* v0.9.270：译完只把上次改过的**时间轴与原文**套回来，不碰译文——
+       译文刚刚由模型产出，永远是最新的；快照是翻译「之前」落的，里面那份 zh 多半还是空的，
+       拿它盖回来就是把刚翻好的译文抹掉（编辑区不显示 + 导出为空）。
+       重跑翻译会覆盖上一次的手工译改，这是翻译本身的语义，入口日志里已明说一句。 */
+    { const ne=restoreEdits(true); if(ne) log(t('edRestored',ne),'okc'); }
     renderRows();        // 先渲染译文，避免后处理误读旧 DOM
     applyPost();         // 清提示词 + 折行（超阈值自动分行）
     finalRenumberAndStats();

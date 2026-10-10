@@ -4247,11 +4247,15 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const iExport = lines.findIndex((l) => /stepExport/.test(l));
     const iMaxW = lines.findIndex((l) => /id="maxW"/.test(l));
     assert.ok(iExport >= 0 && iMaxW > iExport, '折行阈值没落在右侧导出面板里');
-    // ③ 即时重排三件套：共用单行函数、跳过 edited、change 触发（不是 input，避免逐字重排）
+    // ③ 即时重排三件套：共用单行函数、跳过手改译文、change 触发（不是 input，避免逐字重排）
     assert.ok(/function reflowOne\(/.test(html), '缺少单行重排函数 reflowOne');
     assert.ok(/function reflowRows\(/.test(html), '缺少即时重排入口 reflowRows');
     assert.ok(/const o = reflowOne\(r\)/.test(html), 'applyPost 没有复用 reflowOne（两处逻辑会漂移）');
-    assert.ok(/if \(r\.edited\) \{ skip\+\+; return; \}/.test(html), 'reflowRows 没有跳过手工编辑过的行');
+    /* v0.9.270 hotfix：判据从 r.edited 收敛成 r.zhHand。
+       原文与时间轴开放编辑后 edited 的覆盖面变大（改原文也算），再拿它当
+       「别碰这行译文」的判据，会让只改了原文的行连新译文都不折行了。 */
+    assert.ok(/if \(r\.zhHand\) \{ skip\+\+; return; \}/.test(html), 'reflowRows 没有按 zhHand 跳过手工改过译文的行');
+    assert.ok(!/if \(r\.edited\) \{ skip\+\+; return; \}/.test(html), 'reflowRows 还在用 r.edited 当豁免判据（覆盖面已经变大）');
     assert.ok(/r\.edited=true/.test(html), '没有给手工编辑的行打标记');
     assert.ok(/mw\.addEventListener\('change'/.test(html), 'maxW 没有绑 change 触发重排');
     assert.ok(/if \(S\.translating\) return;/.test(html), 'reflowRows 没有排除翻译进行中的情况');
@@ -8919,7 +8923,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/collectZh\(\);\s*\n\s*collectEn\(\);/.test(html), '导出前没回读原文');
     const ap = html.slice(html.indexOf('function applyPost(){'), html.indexOf('/* v0.9.189：改折行阈值'));
     assert.ok(/collectEn\(\);/.test(ap), '后处理前没回读原文');
-    assert.ok(/if \(r\.edited\) return;/.test(ap), '后处理会重排手工编辑过的行（手敲的折行会被抹）');
+    /* v0.9.270 hotfix：豁免判据收敛为 zhHand。用 r.edited 的话，只改了原文/时间轴的行
+       也会被豁免，那一行的新译文就永远不折行了。 */
+    assert.ok(/if \(r\.zhHand\) return;/.test(ap), '后处理的豁免判据不是 zhHand（会把新译文一起放过 / 或抹掉手敲折行）');
+    assert.ok(!/if \(r\.edited\) return;/.test(ap), '后处理仍在用 r.edited 当豁免判据（覆盖面已经变大）');
+    assert.ok(/if \(r\.zhHand\) \{ skip\+\+; return; \}/.test(html), 'reflowRows 没同步改成 zhHand');
+    assert.ok(/function markZhEdited\(r\)\{/.test(html), '缺 markZhEdited（改译文 vs 改原文要走不同标记）');
     /* 时间码：绝对 + 相对两种写法都要认 */
     assert.ok(/function parseTc\(v, base\)\{/.test(html), '缺 parseTc');
     const pc = html.slice(html.indexOf('function parseTc(v, base){'), html.indexOf('/* ---------- 存盘'));
@@ -8933,8 +8942,30 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/S\.srcFp0\|\|''/.test(html), '指纹没用 srcFp0（现算会漂移）');
     /* ⚠️ 顺序：文件名先落、再恢复。反了就永远认不回来——实测挂过一次（fileBase 还是上一次的值） */
     const iFb = html.indexOf('S.fileBase=fileName.replace');
-    const iRe = html.indexOf('const ne=restoreEdits();', iFb);   /* 导入处那一次（翻译完成处还有一次，在它前面） */
+    const iRe = html.indexOf('const ne=restoreEdits();', iFb);   /* 导入处那一次（不传参，译文要恢复） */
     assert.ok(iFb > 0 && iRe > iFb, 'restoreEdits 排在 fileBase 赋值之前（指纹永远对不上）');
+  });
+
+  t('v0.9.270 hotfix：翻译后译文不许被快照抹掉（线上事故，不许重现）', () => {
+    /* 事故经过：快照是「翻译之前」落的（改时间轴/原文/体检时都会写），里面 zh 还是空的；
+       翻译完成后无条件 r.zh=a[2] 把刚翻好的译文清成 null → 编辑区只剩「待翻译…」、导出也是空的。 */
+    assert.ok(/function restoreEdits\(keepZh\)\{/.test(html), 'restoreEdits 没带 keepZh 参数');
+    const rs = html.slice(html.indexOf('function restoreEdits(keepZh){'), html.indexOf('function clearEdits(){'));
+    /* 双保险：① 翻译那次整体跳过译文；② 任何路径都不写空值 */
+    assert.ok(/const take = !keepZh && a\[2\]!=null && String\(a\[2\]\)!=='';/.test(rs),
+      '缺少「空译文不许回写」的判断（这是抹掉译文的直接凶手）');
+    assert.ok(/if\(take\) r\.zh=String\(a\[2\]\);/.test(rs), '译文回写没走 take 开关');
+    assert.ok(!/r\.zh=a\[2\];/.test(rs), '还留着无条件的 r.zh=a[2]（会把新译文清成空）');
+    /* 翻译完成那一次必须传 true：译文刚刚由模型产出，永远是最新的 */
+    assert.ok(/const ne=restoreEdits\(true\);/.test(html), '翻译完成处的 restoreEdits 没传 true');
+    assert.ok(!/const ne=restoreEdits\(\);[\s\S]{0,120}renderRows\(\);        \/\/ 先渲染译文/.test(html),
+      '翻译完成处在读译文',
+    );
+    /* 第二个同源问题：译文也要当场回读，否则「改完译文立刻刷新」存的是旧译文 */
+    const inp = html.slice(html.indexOf("ev.target.closest('.zh, .en.ed')"), html.indexOf('/* v0.9.189：改折行阈值'));
+    assert.ok(/r\.zh=v;/.test(inp), '译文没当场回读（快照里存的是上上版的旧译文）');
+    assert.ok(/el\.classList\.remove\('placeholder'\)/.test(inp), '改译文时没摘掉 placeholder 类');
+    assert.ok(/markZhEdited\(r\);[\s\S]{0,40}saveEdits\(\)/.test(inp), '改译文没打 zhHand');
   });
 
   t('v0.9.270：时间轴四件套（精修 / 吸附 / 批量 / 体检）', () => {
