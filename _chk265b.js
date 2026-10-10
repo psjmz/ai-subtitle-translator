@@ -75,11 +75,15 @@ const b64 = s => Buffer.from(s, 'utf8').toString('base64');
   ok(vtttxt.indexOf('原文行') < 0, 'VTT 面板可见文案里没有「原文行」了', (vtttxt.match(/[^|]*原文[^|]*/g)||[]).slice(0,3).join(' / '));
 
   /* ============ ③ 模板名三处 ============ */
-  console.log('【单语 · 模板名「底部双行」】');
-  ok(String(await ev(`vttPresetLabel()`)) === '标准 · 底部双行', 'vttPresetLabel() = 标准 · 底部双行', await ev(`vttPresetLabel()`));
-  ok(String(await ev(txt('mVttOptStd'))) === '标准 · 底部双行', '下拉选项文案同步改成「底部双行」', await ev(txt('mVttOptStd')));
-  ok(String(await ev(txt('expSum'))).indexOf('底部双行') >= 0, '导出摘要写「底部双行」', await ev(txt('expSum')));
-  ok(String(await ev(txt('expSum'))).indexOf('双语') < 0, '导出摘要里没有「双语」了', await ev(txt('expSum')));
+  /* ③ 模板名：v0.9.267 起单语那排换成四套样式模板（流媒体 / 无障碍 / 影院 / 社媒），
+       不再显示「标准 · 底部双行」—— 它和「标准 · 底部双语」的唯一差别是原文行那一层，单语没有。
+       ⚠️ 「下拉选项文案」那条没动：隐藏 select 的 option 仍叫「标准 · 底部双行」（它是状态源，不是展示项）。 */
+  console.log('【单语 · 模板名改为业界四套】');
+  ok(String(await ev(`vttPresetLabel()`)) === '流媒体标准', 'vttPresetLabel() = 流媒体标准（前身「标准 · 底部双行」）', await ev(`vttPresetLabel()`));
+  ok(String(await ev(txt('mVttOptStd'))) === '标准 · 底部双行', '隐藏下拉的选项文案仍是「底部双行」（状态源不变）', await ev(txt('mVttOptStd')));
+  ok(String(await ev(txt('expSum'))).indexOf('流媒体标准') >= 0, '导出摘要写当档的模板名', await ev(txt('expSum')));
+  ok(String(await ev(txt('expSum'))).indexOf('双语') < 0 && String(await ev(txt('expSum'))).indexOf('双行') < 0,
+    '导出摘要里没有「双语 / 双行」了', await ev(txt('expSum')));
   ok(String(await ev(`document.getElementById('mVttPresetHint').getAttribute('data-tip')`)).indexOf('金色原文') < 0,
     'ⓘ 说明里那句「金色原文」换掉了（单语没有原文行）', await ev(`document.getElementById('mVttPresetHint').getAttribute('data-tip')`));
 
@@ -88,7 +92,7 @@ const b64 = s => Buffer.from(s, 'utf8').toString('base64');
   ok(String(await ev(txt('assDstColTitle'))) === 'Subtitle', '换英文后 ASS 栏标题仍是单语那套词（没被按回「译文」）', await ev(txt('assDstColTitle')));
   ok(String(await ev(txt('mVttGrpDstTitle'))) === 'Subtitle line', '换英文后 VTT 组标题仍是单语那套词', await ev(txt('mVttGrpDstTitle')));
   ok(String(await ev(txt('mVttPanelTitle'))).indexOf('bilingual') < 0, '换英文后面板标题仍不写 bilingual', await ev(txt('mVttPanelTitle')));
-  ok(String(await ev(`vttPresetLabel()`)) === 'Standard · bottom two-line', '换英文后模板名仍是单语那套词', await ev(`vttPresetLabel()`));
+  ok(String(await ev(`vttPresetLabel()`)) === 'Streaming standard', '换英文后模板名仍是单语那套词', await ev(`vttPresetLabel()`));
   await go('切回中文', [`document.getElementById('uiLang').value='zh-CN'; document.getElementById('uiLang').dispatchEvent(new Event('change',{bubbles:true}));`]);
   ok(String(await ev(txt('assDstColTitle'))) === '字幕', '切回中文：ASS 栏标题 = 字幕', await ev(txt('assDstColTitle')));
 

@@ -188,6 +188,95 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   @media (max-width:640px){.ass-cols{grid-template-columns:1fr}}
   /* v0.9.265：单语模式收掉原文那栏后，剩下的那栏别缩在左半边 —— 收成单列 */
   .ass-cols.mono{grid-template-columns:1fr}
+  /* ================= v0.9.267：单语面板重排（方案 A） =================
+     演进两步：
+     265 收掉原文那栏 → 栏宽 339 变 700，但字段仍一列竖着堆，一行只用掉
+         「标签 88 + 间距 9 + 控件 84 = 181px」，右侧 3/4 纯空白。
+     266 第一版把空白从「控件右侧」挪到了「标签与控件之间」—— 右边界是齐了，
+         但每行中间仍隔着一大片死区（眼睛要横跨半个面板才把标签和值对上），
+         而且控件宽度五马八门（number 84 / text 116 / select 168 / range 120 / checkbox 20），
+         左边界参差不齐；复选框尤其像渲染 bug：一颗小方块孤零零飘在最右边。
+     267 这一版：**标签提到控件正上方**，控件一律铺满整格。
+         视线竖直走不会串行；所有控件同宽，纵向自然成两条边；不再有中间那片死区。
+         依据：表单设计的通行做法 —— 一行一个字段、标签紧贴它自己的控件、控件宽度一致。
+         用户 2026-10-10 在 266 之后仍说「超级难看」，指的是这三点。
+     ⚠️ 只认 .mono 标记（= 单语），双语那两栏一个像素都不动。
+     ⚠️ 单语下 VTT 只有「字幕行」那组带 .mono，「整条字幕」保持原排布。 */
+  .ass-cols.mono .ass-col,
+  .vtt-cols.mono .ass-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px 26px;align-content:start}
+  /* 栏标题与小分组标题（文字 · 效果 · 位置）不属于任何一列，占满整行 */
+  .ass-cols.mono .ass-col > h4,
+  .vtt-cols.mono .ass-col > h4,
+  .ass-cols.mono .ass-col > .ass-sub{grid-column:1/-1;margin:0}
+  .ass-cols.mono .ass-col > .ass-sub{margin:8px 0 0}
+  /* 字段卡片：第 1 行标签，第 2 行控件 */
+  /* ⚠️ column-gap 必须是 0，第二列的间距改由附加件自己吃 margin-left。
+     用 column-gap 时：**只有第二列真的有东西才拉出间距**，碰上没有色块/百分比的纯控件行，
+     那条 8px 的空槽照样占位 → 纯控件行的控件右端比带色块行的色块右端少 8px，
+     同一条纵线上两种收尾，看过去就是锯齿。改成 margin-left 后所有行一律贴到同一条右边界。 */
+  .ass-cols.mono .ass-col .af,
+  .vtt-cols.mono .ass-col .af,
+  .ass-cols.mono ~ .mg-row .af{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;gap:5px 0;margin:0;padding:7px 9px;
+    border:1px solid var(--line);border-radius:9px;background:var(--card-2)
+  }
+  .ass-cols.mono .ass-col .af:hover,
+  .vtt-cols.mono .ass-col .af:hover,
+  .ass-cols.mono ~ .mg-row .af:hover{background:var(--card);border-color:var(--line-strong)}
+  .ass-cols.mono .ass-col .af > label,
+  .vtt-cols.mono .ass-col .af > label,
+  .ass-cols.mono ~ .mg-row .af > label{grid-column:1/-1;grid-row:1;flex:none;font-size:11.5px;line-height:1.2}
+  /* 第二行：主控件占第 1 列并铺满；附加件（色块 / 百分比）占第 2 列，按自身宽度 */
+  .ass-cols.mono .ass-col .af > input[type=number],
+  .ass-cols.mono .ass-col .af > input[type=text],
+  .ass-cols.mono .ass-col .af > select,
+  .ass-cols.mono .ass-col .af > input[type=range],
+  .vtt-cols.mono .ass-col .af > input[type=number],
+  .vtt-cols.mono .ass-col .af > input[type=text],
+  .vtt-cols.mono .ass-col .af > select,
+  .vtt-cols.mono .ass-col .af > input[type=range],
+  .ass-cols.mono ~ .mg-row .af > input[type=number]{grid-column:1;grid-row:2;width:100%;flex:none;
+    margin:0}   /* ⚠️ Chrome 给 input[type=range] 留了 2px UA margin，不抹掉它会比别的控件左偏 2px */
+  .ass-cols.mono .ass-col .af > .sw,
+  .ass-cols.mono .ass-col .af > .pct,
+  .vtt-cols.mono .ass-col .af > .sw,
+  .vtt-cols.mono .ass-col .af > .pct{grid-column:2;grid-row:2;margin-left:8px}
+  /* 数值框在双语下是 84px 窄框、右对齐好比较；单语下框宽 300+，右对齐等于把数字甩到
+     离标签最远的那一头（视线要横穿整格）。单语一律左对齐 —— 值紧跟标签往下读。 */
+  .ass-cols.mono .ass-col .af > input[type=number],
+  .vtt-cols.mono .ass-col .af > input[type=number],
+  .ass-cols.mono ~ .mg-row .af > input[type=number]{text-align:left}
+  /* 色块跟着输入框等高：16px 的小方块配 30px 高的输入框，看上去像没对齐的噪点，
+     而第一颗常常是白底白块，压根看不出颜色 —— 放大并加上原有描边即可辨认。 */
+  .ass-cols.mono .ass-col .af > .sw,
+  .vtt-cols.mono .ass-col .af > .sw{width:26px;height:26px;border-radius:6px}
+  /* 复选框 → 整格可点的开关。原来那颗方块飘在边上像 bug，现在是明确的开/关视觉。 */
+  .ass-cols.mono .ass-col .af > input[type=checkbox],
+  .vtt-cols.mono .ass-col .af > input[type=checkbox]{
+    grid-column:1;grid-row:2;justify-self:start;
+    -webkit-appearance:none;appearance:none;
+    position:relative;width:44px;height:24px;flex:none;margin:0;cursor:pointer;
+    border:1px solid var(--line-strong);border-radius:999px;background:var(--card);
+    transition:background .15s,border-color .15s
+  }
+  .ass-cols.mono .ass-col .af > input[type=checkbox]::after,
+  .vtt-cols.mono .ass-col .af > input[type=checkbox]::after{
+    content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:var(--line-strong);transition:transform .15s,background .15s
+  }
+  .ass-cols.mono .ass-col .af > input[type=checkbox]:checked,
+  .vtt-cols.mono .ass-col .af > input[type=checkbox]:checked{background:var(--acc-weak);border-color:var(--acc)}
+  .ass-cols.mono .ass-col .af > input[type=checkbox]:checked::after,
+  .vtt-cols.mono .ass-col .af > input[type=checkbox]:checked::after{transform:translateX(20px);background:var(--acc)}
+  /* 折行边距那对（左右边距）不在 .ass-col 里，是 .ass-cols 的兄弟行 ——
+     跟上同一套版式，否则面板最后两格突然退回旧样子 */
+  .ass-cols.mono ~ .mg-row{gap:10px 26px}
+  @media (max-width:640px){
+    .ass-cols.mono .ass-col,
+    .vtt-cols.mono .ass-col{grid-template-columns:1fr}
+  }
   .ass-col h4,.grp-t{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--acc-ink);letter-spacing:.3px;
     display:flex;align-items:center;gap:7px}
   .ass-col h4::before,.grp-t::before{content:'';width:4px;height:12px;border-radius:2px;background:var(--acc);flex:none}
@@ -521,7 +610,7 @@ crossorigin="anonymous"></script>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.265</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.267</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -774,6 +863,13 @@ crossorigin="anonymous"></script>
             <option value="compact" data-i18n="vttPresetCompact">紧凑 · 小字窄幅</option>
             <option value="cinema" data-i18n="vttPresetCinema">电影感 · 大字描边</option>
             <option value="custom" data-i18n="vttPresetCustom">自定义</option>
+            <!-- v0.9.267：单语的四套样式模板（与 ASS 那一排同名同义）。
+                 双语照样只认上面四档 —— 按钮排里没有它们，选不到；留在这里是让 select 能存值
+                 （它是唯一的状态源，与 mVttPresetSel 一贯的套路一致）。 -->
+            <option value="m-stream" data-i18n="monoTplStream">流媒体标准</option>
+            <option value="m-a11y" data-i18n="monoTplA11y">无障碍高对比</option>
+            <option value="m-cinema" data-i18n="monoTplCinema">影院质感</option>
+            <option value="m-social" data-i18n="monoTplSocial">社媒竖屏</option>
           </select>
         </div>
         <!-- 「写入样式」关闭时整块变灰且不可点：参数此刻不生效，看得见比偷偷忽略强 -->
@@ -1028,7 +1124,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.265"></script>
+<script src="merge-core.js?v=0.9.267"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1103,6 +1199,11 @@ const I18N = {
     lblOneCol:'字幕', vttGrpAllMono:'整条字幕', vttGrpOne:'字幕行',
     vttPanelTitleMono:'WebVTT 样式（导出 VTT 样式时生效）',
     vttPresetStdMono:'标准 · 底部双行', vttTipStdMono:'标准 · 底部双行：白字 + 半透明底衬，通用场合最稳。',
+    monoTplStream:'流媒体标准', monoTplA11y:'无障碍高对比', monoTplCinema:'影院质感', monoTplSocial:'社媒竖屏',
+    vttTipStreamMono:'Netflix / BBC 口径：白字黑描边。每行 42 字符（拉丁）、中文 16 字、日文 13 字。',
+    vttTipA11yMono:'WCAG AAA：白字 + 黑底衬 85%，对比度 21:1。亮画面、听障与老年观众用。',
+    vttTipCinemaMono:'影院惯例：不铺底衬，暖白小一号更贴底，靠描边压住亮画面。',
+    vttTipSocialMono:'社媒平台：底部 20~35% 被 UI 遮住，字幕整体上移让位，并加粗加大。',
     vttSrcTip:'原文行每一项都能「沿用」译文行 —— 沿用就不写进 ::cue(.src)。全部沿用 = 原文行与译文行完全一样（不打标记、不写规则）。',
     vttInherit:'沿用', vttOptSet:'单独设', vttOptNormal:'常规', vttOptOn:'开', vttOptOff:'关',
     lblVttSrcFont:'字体', lblVttSrcBold:'粗体', lblVttSrcItalic:'斜体',
@@ -1263,6 +1364,11 @@ const I18N = {
     lblOneCol:'字幕', vttGrpAllMono:'整條字幕', vttGrpOne:'字幕行',
     vttPanelTitleMono:'WebVTT 樣式（匯出 VTT 樣式時生效）',
     vttPresetStdMono:'標準 · 底部雙行', vttTipStdMono:'標準 · 底部雙行：白字 + 半透明底襯，通用場合最穩。',
+    monoTplStream:'串流標準', monoTplA11y:'高對比無障礙', monoTplCinema:'影院質感', monoTplSocial:'社群直式',
+    vttTipStreamMono:'Netflix / BBC 口徑：白字黑邊。每行 42 字元（拉丁）、中文 16 字、日文 13 字。',
+    vttTipA11yMono:'WCAG AAA：白字 + 黑底襯 85%，對比度 21:1。亮畫面、聽障與年長觀眾用。',
+    vttTipCinemaMono:'影院慣例：不鋪底襯，暖白小一號更貼底，靠黑邊壓住亮畫面。',
+    vttTipSocialMono:'社群平台：底部 20~35% 被 UI 遮住，字幕整體上移讓位，並加粗加大。',
     vttSrcTip:'原文行每一項都能「沿用」譯文行 —— 沿用就不寫進 ::cue(.src)。全部沿用 = 原文行與譯文行完全一樣（不打標記、不寫規則）。',
     vttInherit:'沿用', vttOptSet:'單獨設', vttOptNormal:'常規', vttOptOn:'開', vttOptOff:'關',
     lblVttSrcFont:'字體', lblVttSrcBold:'粗體', lblVttSrcItalic:'斜體',
@@ -1423,6 +1529,11 @@ const I18N = {
     lblOneCol:'Subtitle', vttGrpAllMono:'Whole cue', vttGrpOne:'Subtitle line',
     vttPanelTitleMono:'WebVTT style (applies when exporting VTT style)',
     vttPresetStdMono:'Standard · bottom two-line', vttTipStdMono:'Standard · bottom two-line: white text + translucent backing — the safest all-rounder.',
+    monoTplStream:'Streaming standard', monoTplA11y:'High contrast', monoTplCinema:'Cinema', monoTplSocial:'Social vertical',
+    vttTipStreamMono:'Netflix / BBC baseline: white text with black outline. Max 42 characters per line (Latin), 16 for Chinese, 13 for Japanese.',
+    vttTipA11yMono:'WCAG AAA: white on 85% black backing = 21:1. For bright scenes, hard-of-hearing and older viewers.',
+    vttTipCinemaMono:'Cinema convention: no backing, warm white one size smaller, sitting closer to the bottom edge.',
+    vttTipSocialMono:'Social platforms: the bottom 20-35% is covered by UI, so captions move up and go larger.',
     vttSrcTip:'Every item on the original line can “inherit” the translation line — inherited items are never written into ::cue(.src). Inherit everything and the two lines look exactly the same (no markup, no rule).',
     vttInherit:'Inherit', vttOptSet:'Custom', vttOptNormal:'Normal', vttOptOn:'On', vttOptOff:'Off',
     lblVttSrcFont:'Font', lblVttSrcBold:'Bold', lblVttSrcItalic:'Italic',
@@ -1583,6 +1694,11 @@ const I18N = {
     lblOneCol:'字幕', vttGrpAllMono:'字幕全体', vttGrpOne:'字幕行',
     vttPanelTitleMono:'WebVTT スタイル（VTT スタイル書き出し時に有効）',
     vttPresetStdMono:'標準 · 下部二行', vttTipStdMono:'標準 · 下部二行：白文字＋半透明の下地。汎用で最も無難です。',
+    monoTplStream:'ストリーミング標準', monoTplA11y:'高コントラスト', monoTplCinema:'シネマ', monoTplSocial:'ソーシャル縦型',
+    vttTipStreamMono:'Netflix / BBC 基準：白文字＋黒縁取り。1 行 42 文字（ラテン語）、中国語 16 文字、日本語 13 文字。',
+    vttTipA11yMono:'WCAG AAA：白文字＋黒下地 85% でコントラスト比 21:1。明るい画面・聴覚サポート向け。',
+    vttTipCinemaMono:'映画館の慣例：下地なし、温かみのある白で一段小さく、画面下ぎわに寄せる。',
+    vttTipSocialMono:'SNS プラットフォーム：下部 20〜35% は UI に隠れるため、字幕を上へ逃がして大きくする。',
     vttSrcTip:'原文行の各項目は「沿用」＝訳文行と同じにできます（沿用にした項目は ::cue(.src) に書き出されません）。すべて沿用にすると原文行と訳文行は完全に同じになります（マークも規則もなし）。',
     vttInherit:'沿用', vttOptSet:'個別設定', vttOptNormal:'標準', vttOptOn:'オン', vttOptOff:'オフ',
     lblVttSrcFont:'フォント', lblVttSrcBold:'太字', lblVttSrcItalic:'斜体',
@@ -1962,14 +2078,28 @@ function syncMonoChrome(){
   const sc = $('assSrcCol'); if (sc) sc.style.display = mono ? 'none' : '';
   const ac = $('assCols');   if (ac) ac.classList.toggle('mono', mono);
   setI18nKey($('assDstColTitle'), mono ? 'lblOneCol' : 'lblDstCol');
-  /* ② VTT 面板：原文行整组收起，两个组标题与面板标题改词，栅格收成单列 */
+  /* ② VTT 面板：原文行整组收起，两个组标题与面板标题改词，栅格收成单列
+     ⚠️ 「整条字幕」那组也得一起标 mono：它和「字幕行」同处一个面板、单语下并排显示，
+        只改一组 = 上面老式的标签贴左、下面新式的卡片满格，同一屏里两种风格打架。 */
   const sg = $('mVttSrcGrp'); if (sg) sg.style.display = mono ? 'none' : '';
-  const vc = $('mVttCols2');  if (vc) vc.classList.toggle('mono', mono);
+  document.querySelectorAll('#mVttPanel .vtt-cols').forEach(function(x){ x.classList.toggle('mono', mono); });
   setI18nKey($('mVttGrpAllTitle'), mono ? 'vttGrpAllMono' : 'vttGrpAll');
   setI18nKey($('mVttGrpDstTitle'), mono ? 'vttGrpOne' : 'vttGrpDst');
   setI18nKey($('mVttPanelTitle'), mono ? 'vttPanelTitleMono' : 'vttPanelTitle');
   /* ③ 模板显示名：「标准 · 底部双语」→「标准 · 底部双行」（双语那半没了，名字得跟着改） */
   setI18nKey($('mVttOptStd'), mono ? 'vttPresetStdMono' : 'vttPresetStd');
+  /* ③b v0.9.267：VTT 模板档位的**跨模式折算**（写回 select，它有 m-* 那几个 option 但双语按钮排没有）。
+       切进单语：记住来路。切回双语：按等价物还回去，还不了的落「自定义」。 */
+  const msel = $('mVttPresetSel');
+  if (msel && !mono){
+    const k0 = String(msel.value || '');
+    if (k0.indexOf('m-') === 0) msel.value = biVttKeyOf(k0);
+  }
+  /* ④ v0.9.267：模板**按钮排**也要跟着换 ——
+       单语 = 四套样式模板（流媒体 / 无障碍 / 影院 / 社媒 / 自定义）
+       双语 = 分屏 / 底部双行 / 自定义（ASS）与 标准 / 紧凑 / 电影感 / 自定义（VTT）
+     漏了这一步，切模式后按钮还是上一个模式那几个（点错会套到不存在的模板上）。 */
+  renderTplSegs();
   vttPresetTip();     /* ⓘ 说明里那句「金色原文」同理，单语下没有原文行 */
   syncExpSum();       /* 导出卡那句「将导出什么」用的是 vttPresetLabel()，要跟着重算 */
 }
@@ -2938,14 +3068,28 @@ function renderTplSegs(){
   });
   const as = $('assTplSeg');
   if (as){
-    as.innerHTML = ASS_SEGS.map(x=>'<button type="button" class="segbtn" data-v="'+x[0]+'" data-i18n="'+x[1]+'">'+t(x[1])+'</button>').join('');
-    as.querySelectorAll('.segbtn').forEach(b=>b.addEventListener('click', ()=>setAssTpl(b.getAttribute('data-v'))));
+    /* v0.9.267：单语下这一排换成**样式模板**（流媒体 / 无障碍 / 影院 / 社媒 / 自定义）。
+       「分屏 · 上下分离 / 堆叠 · 底部双行」在单语里没有排版含义
+       （详见 MONO_TPL_DEFAULTS 上的实测说明），留着只会误导。 */
+    const segs = monoMode() ? MONO_ASS_SEGS : ASS_SEGS;
+    as.innerHTML = segs.map(x=>'<button type="button" class="segbtn" data-v="'+x[0]+'" data-i18n="'+x[1]+'">'+t(x[1])+'</button>').join('');
+    as.querySelectorAll('.segbtn').forEach(b=>b.addEventListener('click', ()=>{
+      const v = b.getAttribute('data-v');
+      /* 单语的模板键只套参数、不改 expFmt（那是双语六档的状态源，别混进来） */
+      if (monoMode() && v !== 'custom'){
+        if (applyMonoAssTpl(v)){ renderPv(); syncAssChrome(); syncTplSegs(); }
+        return;
+      }
+      setAssTpl(v);
+    }));
   }
   const vs = $('mVttPresetSeg');
   if (vs){
+    /* v0.9.267：单语下换成与 ASS 同名的四套样式模板 + 自定义（双语一字不改） */
+    const segs = monoMode() ? MONO_MVTT_SEGS : MVTT_SEGS;
     /* v0.9.242：「自定义」常驻 —— 它是一档，不是一个"手改过才冒出来"的状态提示
        （ASS 那边三个键一直都在，两边得一致；藏起来用户会以为只有三种模板）。 */
-    vs.innerHTML = MVTT_SEGS.map(x=>'<button type="button" class="segbtn" data-v="'+x[0]+'"'+
+    vs.innerHTML = segs.map(x=>'<button type="button" class="segbtn" data-v="'+x[0]+'"'+
       (x[0] === 'custom' ? ' data-custom="1"' : '')+' data-i18n="'+x[1]+'">'+t(x[1])+'</button>').join('');
     vs.querySelectorAll('.segbtn').forEach(b=>b.addEventListener('click', ()=>{
       const v = b.getAttribute('data-v');
@@ -2963,7 +3107,11 @@ function syncTplSegs(){
     seg.querySelectorAll('.fmtbtn').forEach(b=>b.classList.toggle('on', b.getAttribute('data-g') === g));
   });
   const as = $('assTplSeg');
-  if (as){ const v = tplVal(); as.querySelectorAll('.segbtn').forEach(b=>b.classList.toggle('on', b.getAttribute('data-v') === v)); }
+  if (as){
+    /* v0.9.267：单语下高亮跟着「当前模板档」走，而不是 expFmt（那一排已换成一排, 值与它无关） */
+    const v = monoMode() ? monoAssTplKey() : tplVal();
+    as.querySelectorAll('.segbtn').forEach(b=>b.classList.toggle('on', b.getAttribute('data-v') === v));
+  }
   const vs = $('mVttPresetSeg');
   if (vs){
     const k = vttPresetKey();
@@ -3038,6 +3186,80 @@ const TPL_DEFAULTS = {
   }
 };
 TPL_DEFAULTS.custom = TPL_DEFAULTS.split;
+/* ================= v0.9.267：单语样式模板 =================
+   单语只有一行，原来的「分屏 / 底部双行」在这里**没有排版含义** ——
+   实测（`_probeSplit267.js`）：两侧导出的 Dialogue 都是 2 条、style 全是 Bottom，
+   布局逐字节相同；所谓差别只剩下被随之套上的默认字号（split 主 56 / stack 主 54）。
+   等于用户点了一下，字幕被悄悄改小两号，还以为自己换了版式。
+   → 单语改成「按业界规范的样式模板」：选的就是长相（字号 / 配色 / 描边 / 底衬 / 位置），所见即所得。
+   数值出处（不是拍脑袋）：
+     · Netflix Timed Text Style Guide：每行 42 字符（拉丁）、中文 16 / 日文 13 / 韩文 16，
+       最多 2 行；水平安全区 90%；白字 + 黑描边 ≈ 12:1
+     · BBC Subtitle Guidelines：行宽取 16:9 宽度的 68%（≈38 字符），中央 75% 安全区
+     · WCAG 2.1：正文对比度 AA 4.5:1 / AAA 7:1（白底黑字 21:1）
+   ⚠️ 预设**只写 dst 那半**：src 那一栏在单语下是收起的，不去动它的值 ——
+      用户从双语切过来时调好的原文样式不会被单语模板冲掉。
+   ⚠️ 默认档 = stream，它的参数与 TPL_DEFAULTS.split 的主行逐字相同
+      （56 / 白 / 2.5 描边 / 无底衬 / MV42），所以不点模板时行为与旧版一致，零迁移成本。 */
+const MONO_ASS_SEGS = [['stream','monoTplStream'], ['a11y','monoTplA11y'],
+                       ['cinema','monoTplCinema'], ['social','monoTplSocial'],
+                       ['custom','assTplCustom']];
+const MONO_TPL_DEFAULTS = {
+  /* 流媒体标准 · Netflix/BBC 通用口径：白字 + 中描边，不抢画面也不糊 */
+  stream: {
+    assDstSize:'56', assDstColor:'#FFFFFF', assDstBold:true, assDstItalic:false,
+    assDstOutline:'2.5', assDstOutlineColor:'#000000', assDstAlpha:'100',
+    assDstFont:'PingFang SC', assDstSpacing:'0',
+    assDstEdge:'none', assDstEdgeSize:'0', assDstEdgeColor:'#000000', assDstEdgeAlpha:'60',
+    assDstAlign:'2', assMarginL:'60', assMarginR:'60', assDstMV:'42'
+  },
+  /* 无障碍高对比 · WCAG AAA：白字 + 黑底衬 85% = 21:1，亮画面 / 听障 / 老年观众 */
+  a11y: {
+    assDstSize:'60', assDstColor:'#FFFFFF', assDstBold:true, assDstItalic:false,
+    assDstOutline:'3', assDstOutlineColor:'#000000', assDstAlpha:'100',
+    assDstFont:'PingFang SC', assDstSpacing:'0.5',
+    assDstEdge:'box', assDstEdgeSize:'0', assDstEdgeColor:'#000000', assDstEdgeAlpha:'85',
+    assDstAlign:'2', assMarginL:'60', assMarginR:'60', assDstMV:'50'
+  },
+  /* 影院质感 · DCP 惯例：不要底衬，暖白小一号、更贴底，靠描边压住亮画面 */
+  cinema: {
+    assDstSize:'48', assDstColor:'#FFF6E5', assDstBold:false, assDstItalic:false,
+    assDstOutline:'2', assDstOutlineColor:'#000000', assDstAlpha:'100',
+    assDstFont:'PingFang SC', assDstSpacing:'0',
+    assDstEdge:'none', assDstEdgeSize:'0', assDstEdgeColor:'#000000', assDstEdgeAlpha:'60',
+    assDstAlign:'2', assMarginL:'80', assMarginR:'80', assDstMV:'30'
+  },
+  /* 社媒竖屏 · 平台安全区：底部 20~35% 被 UI 遮住，字幕上移让位，同时加大加粗 */
+  social: {
+    assDstSize:'64', assDstColor:'#FFFFFF', assDstBold:true, assDstItalic:false,
+    assDstOutline:'3.5', assDstOutlineColor:'#000000', assDstAlpha:'100',
+    assDstFont:'PingFang SC', assDstSpacing:'0',
+    assDstEdge:'box', assDstEdgeSize:'0', assDstEdgeColor:'#000000', assDstEdgeAlpha:'45',
+    assDstAlign:'2', assMarginL:'60', assMarginR:'60', assDstMV:'240'
+  }
+};
+/* 当前单语模板档。'custom' = 用户手改过参数，这套是我的。
+   ⚠️ 与 ASS 面板其它参数同口径：不落盘，刷新回到默认 stream。 */
+let MONO_ASS_TPL = 'stream';
+function monoAssTplKey(){ return (MONO_TPL_DEFAULTS[MONO_ASS_TPL] || MONO_ASS_TPL === 'custom') ? MONO_ASS_TPL : 'stream'; }
+/* 套单语模板：只写预设里出现过的字段（即 dst 那半），src 一个不动 */
+function applyMonoAssTpl(k){
+  const d = MONO_TPL_DEFAULTS[k];
+  if (!d) return false;
+  ASS_FILL.active = true;    /* v0.9.242：套预设是程序写值，不算用户手改 */
+  try {
+    Object.keys(d).forEach(id=>setAssVal(id, d[id]));
+    ['assDstColor','assDstOutlineColor','assDstEdgeColor'].forEach(syncColorSw);
+    ALPHA_PAIRS.forEach(pair=>{ const o=$(pair[1]); if(o) o.textContent=$(pair[0]).value+'%'; });
+    syncAssEdge();
+  } finally { ASS_FILL.active = false; }
+  MONO_ASS_TPL = k;
+  return true;
+}
+function monoAssTplLabel(){
+  const k = monoAssTplKey();
+  return k === 'custom' ? t('assTplCustom') : t(MONO_ASS_SEGS.filter(x=>x[0]===k)[0][1]);
+}
 /* v0.9.224：预设 = 切模板就套。
    v0.9.223 用 assDirty 做「手动微调后不覆盖」，结果用户只要展开面板碰过任意一个参数，
    之后切模板**永远不再填预设**（实测：改字号→切回分屏，界面上还是上一个模板的值）。
@@ -3078,6 +3300,13 @@ function applyTplDefaults(tpl){
    而点「自定义」又会按 layoutRow 的 radio 整套重置，等于没有保住参数的入口）。 */
 function markAssEdited(){
   if (ASS_FILL.active) return;
+  /* v0.9.267：单语下不动 expFmt —— 那一排已经换成「样式模板」，
+     它不再是双语六档的状态源。手改参数 = 这套参数是我的 → 落到「自定义」，
+     值一个都不动（与双语落到 custom 档同义）。 */
+  if (monoMode()){
+    if (monoAssTplKey() !== 'custom'){ MONO_ASS_TPL = 'custom'; syncTplSegs(); }
+    return;
+  }
   const sel = $('expFmt'); if (!sel) return;
   if (sel.value !== 'custom'){
     setAssLayoutRadio(sel.value === 'stack' ? 'stack' : 'split');   /* 布局 = 跳转前那个档位 */
@@ -3458,8 +3687,17 @@ function assPvSample(){
   const r = best ? null : ((S.rows && S.rows.length) ? S.rows[0] : null);
   let en = best ? String(best.p.srcLines.join('\n') || '') : '';
   let zh = best ? String(best.p.dstLines.join('\n') || '') : '';
-  if (!en) en = String(r && r.en || 'Hello there, this is a sample line');
-  if (!zh) zh = String(r && r.zh || '你好，这是一条示例字幕');
+  /* v0.9.267：单语只有一行，**没有原文行** —— 绝不能拿「示例英文」给它兜底。
+     此前单语下 srcLines 恒空 → en 落到兜底串 → 预览凭空画出一条导出里根本不存在的
+     原文行（10-10 实测：单语预览的 l1 挂着 "Hello there, this is a sample line"，
+     真字幕被挤到 l2）。预览 = 导出，多画一行就是骗人。 */
+  if (monoMode()){
+    en = '';
+    if (!zh) zh = String((r && (r.zh || r.en)) || '你好，这是一条示例字幕');
+  } else {
+    if (!en) en = String(r && r.en || 'Hello there, this is a sample line');
+    if (!zh) zh = String(r && r.zh || '你好，这是一条示例字幕');
+  }
   /* v0.9.250：样例是**哪一行**就必须带出那一行的槽 ——
      导出会把这条 cue 的槽写进 Style/Dialogue（歌词斜体上移、音效淡色），
      预览若还照基础样式画，就成了「预览白字、导出灰字」。 */
@@ -3493,7 +3731,8 @@ function renderAssPv(){
         所以判据取「正在编辑的槽」（S.style.cur），而不是 slotOverride（基础样式那半是空串）。
      ⚠️ 右侧主预览（slotOverride == null）画的是用户自己的字幕，一个字都不许换。 */
   const smp = (T.slotOverride != null) ? slotSampleText(S.style.cur) : null;
-  const enT = smp ? smp.en : samp.en, zhT = smp ? smp.zh : samp.zh;
+  /* v0.9.267：同理，单语下没有原文行 —— 槽示意文本的英文那半也不许参与（l2 已收起，这里只是同口径） */
+  const enT = smp ? (monoMode() ? '' : smp.en) : samp.en, zhT = smp ? smp.zh : samp.zh;
   const dDst = (sp && sp.dst && Object.keys(sp.dst).length) ? sp.dst : null;
   const dSrc = (sp && sp.src && Object.keys(sp.src).length) ? sp.src : null;
   /* 槽的垂直偏移是**整条级**参数（v0.9.254 起），导出把它加在逐条 Dialogue 的 MarginV 上
@@ -3580,7 +3819,13 @@ function renderAssPv(){
     };
   };
   /* 行 1 = 视觉上那条，行 2 = 下面那条；两条都按各自的离底距离定位 */
-  if (dstFirst){
+  if (monoMode()){
+    /* v0.9.267：单语只有一行 —— 画在 l1（它的纵向位置由 MarginV 决定，容器只是载体），
+       第 2 个行容器收起。此前单语会把唯一那行画到 l2、而 l1 留着示例英文残留，
+       预览里凭空多出一条「原文行」（与上面的兜底修复是同一个 bug 的两半）。 */
+    paint(l1, zhT, sideOf('dst'));
+    if (l2) l2.style.display = 'none';
+  } else if (dstFirst){
     paint(l1, zhT, sideOf('dst'));
     paint(l2, enT, sideOf('src'));
   } else {
@@ -3590,7 +3835,11 @@ function renderAssPv(){
   /* 标签要说清「这块画面画的是谁」：成片视角不标槽名，另两档标出槽名或「基础样式」 */
   if (tag){
     const v = pvView();
-    tag.textContent = (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '') + ' · 1080p' +
+    /* v0.9.267：单语下画面左上角标的是**模板名**（影院质感 / 无障碍…），
+       再写「分屏」那就是把双语的说法硬套在没有第二行的场景上。 */
+    const nm = monoMode() ? monoAssTplLabel()
+      : (fmt === 'ass-stack' ? t('tplStack') : t('tplSplit')).replace(/ \(.*$/, '');
+    tag.textContent = nm + ' · 1080p' +
       (v === 'movie' ? '' : ' · ' + (v === 'base' ? t('slotPvBase') : slotLabel(sid)));
   }
 }
@@ -3638,8 +3887,51 @@ const MVTT_PRESETS = {
     mVttSrcFont:'', mVttSrcBold:'', mVttSrcItalic:'', mVttSrcBgOn:'', mVttSrcBgColor:'#000000', mVttSrcBgAlpha:'55',
     mVttSrcShadowOn:'', mVttSrcShadowW:'2', mVttSrcShadowColor:'#000000',
     mVttBgOn:false, mVttBgColor:'#000000', mVttBgAlpha:'55',
+    mVttShadowOn:true, mVttShadowW:'3', mVttShadowColor:'#000000' },
+  /* v0.9.267 单语四套（与 MONO_TPL_DEFAULTS 同名同义，出处见那里的注释）。
+     ⚠️ 只写主样式那半 —— 单语没有原文行，`mVttSrc*` 一个都不碰，
+        用户从双语切过来时调好的原文行不会被单语模板冲掉。
+     ⚠️ m-stream 的参数与 std 的主行逐字相同 → 不点模板时行为与旧版一致。 */
+  'm-stream': { mVttLine:'90', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'80', mVttAlign:'center',
+    mVttSize:'100', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.4', mVttBold:true, mVttItalic:false,
+    mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'55',
+    mVttShadowOn:true, mVttShadowW:'2', mVttShadowColor:'#000000' },
+  'm-a11y': { mVttLine:'88', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'78', mVttAlign:'center',
+    mVttSize:'108', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.45', mVttBold:true, mVttItalic:false,
+    mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'85',
+    mVttShadowOn:false, mVttShadowW:'2', mVttShadowColor:'#000000' },
+  'm-cinema': { mVttLine:'88', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'84', mVttAlign:'center',
+    mVttSize:'92', mVttColor:'#FFF6E5', mVttFont:'PingFang SC', mVttLH:'1.4', mVttBold:false, mVttItalic:false,
+    mVttBgOn:false, mVttBgColor:'#000000', mVttBgAlpha:'55',
+    mVttShadowOn:true, mVttShadowW:'3', mVttShadowColor:'#000000' },
+  'm-social': { mVttLine:'72', mVttLineAlign:'end', mVttPos:'50', mVttWidth:'72', mVttAlign:'center',
+    mVttSize:'115', mVttColor:'#FFFFFF', mVttFont:'PingFang SC', mVttLH:'1.3', mVttBold:true, mVttItalic:false,
+    mVttBgOn:true, mVttBgColor:'#000000', mVttBgAlpha:'45',
     mVttShadowOn:true, mVttShadowW:'3', mVttShadowColor:'#000000' }
 };
+/* v0.9.267：单语下 VTT 按钮排 = 那四套模板 + 自定义（与 ASS 那一排对齐）。
+   双语仍是 标准 / 紧凑 / 电影感 / 自定义，一个字不改。 */
+const MONO_MVTT_SEGS = [['m-stream','monoTplStream'], ['m-a11y','monoTplA11y'],
+                        ['m-cinema','monoTplCinema'], ['m-social','monoTplSocial'],
+                        ['custom','vttTplCustom']];
+const MONO_VTT_TIPS = {'m-stream':'vttTipStreamMono', 'm-a11y':'vttTipA11yMono',
+                       'm-cinema':'vttTipCinemaMono', 'm-social':'vttTipSocialMono'};
+/* 跨模式折算：单语那四套跟双语四套共用同一个 select（它是唯一状态源），
+   切回双语时必须把 m-* 折算回双语认得的档，否则双语那边会拿到一个它压根没有的档：
+     实测症状 —— 模板名显示「流媒体标准」、四个按钮没有一个高亮、导出摘要跟着串。
+   ⚠️ m-a11y / m-social 在双语里没有等价物（双语每个标准档都为「原文行」预留了值，
+      而单语这两套专门为没有原文行的场景设计）→ 落到「自定义」最诚实：
+      面板里此刻的参数确实是你自己调出来的，不该冒充某个标准档。 */
+const VTT_MONO_TO_BI = {'m-stream':'std', 'm-cinema':'cinema'};
+const VTT_BI_KEYS = ['std', 'compact', 'cinema', 'custom'];
+function biVttKeyOf(k){
+  if (String(k).indexOf('m-') !== 0) return k;
+  /* ⚠️ 不做「记住来路、原样还回去」：一旦点了单语模板，面板里的值就已经被那套参数填过了，
+     再挂回原来的双语档名等于指鹿为马（显示「标准」，实际是 108% + 85% 衬底）。
+     custom 的本义就是「当前值不属于任何标准档」，这才是实话。 */
+  const v = VTT_MONO_TO_BI[k] || 'custom';
+  return VTT_BI_KEYS.indexOf(v) >= 0 ? v : 'std';
+}
 /* 导入继承的区域门控：哪一区被手改过，后续导入就不再覆盖那一区
    （用户定案：继承之后仍可手改，手改过的区域不能被下一次导入悄悄改写）。 */
 const VTT_INH = { active:false, dirty:{ main:false, src:false, pos:false } };
@@ -3653,7 +3945,21 @@ function vttSetVal(id, v){
   if (el.type === 'checkbox') el.checked = !!(v === true || v === '1' || v === 'true' || v === 'on');
   else if (v != null) el.value = v;
 }
-function vttPresetKey(){ const s = $('mVttPresetSel'); return s ? (s.value || 'std') : 'std'; }
+function vttPresetKey(){
+  const s = $('mVttPresetSel');
+  let k = s ? (s.value || 'std') : 'std';
+  /* v0.9.267：单语下 VTT 也用那四套模板。双语的档位在单语里没有语义
+     （它们都为「原文行」那一层预留了值，而单语根本没有原文行），按等价物归一：
+       标准 → 流媒体标准（主行参数逐字相同）／电影感 → 影院质感／紧凑、自定义 → 自定义。
+     ⚠️ 归一只影响「显示与高亮」，**不去改 select 的 value** —— 切回双语要能原样认出来。 */
+  if (monoMode() && String(k).indexOf('m-') !== 0){
+    k = (k === 'std') ? 'm-stream' : (k === 'cinema' ? 'm-cinema' : 'custom');
+  }
+  /* 兜底：万一哪条路径没走 syncMonoChrome 就切了模式，双语下不许吐 m-* 给外部（那里没有这几档） */
+  if (!monoMode() && String(k).indexOf('m-') === 0) k = biVttKeyOf(k);
+  return k;
+}
+const mvttSegName = k => { const h = MONO_MVTT_SEGS.filter(x=>x[0]===k)[0]; return h ? t(h[1]) : t('vttPresetCustom'); };
 function vttAlphaOut(){
   [['mVttBgAlpha','mVttBgAlphaOut'], ['mVttSrcBgAlpha','mVttSrcBgAlphaOut']].forEach(function(p){
     const r = $(p[0]), o = $(p[1]);
@@ -3837,7 +4143,9 @@ function renderVttPv(){
 }
 function vttPresetLabel(){
   const k0 = vttPresetKey();
-  /* v0.9.265：单语下没有原文行，模板名里的「双语」要换成「双行」 */
+  /* v0.9.267：单语下报的是那四套模板的名字（与 ASS 那一排同名） */
+  if (String(k0).indexOf('m-') === 0) return mvttSegName(k0);
+  /* v0.9.265：单语时找不到原文行，模板名里的「双语」要换成「双行」 */
   const stdKey = monoMode() ? 'vttPresetStdMono' : 'vttPresetStd';
   return k0 === 'compact' ? t('vttPresetCompact') : k0 === 'cinema' ? t('vttPresetCinema')
        : k0 === 'custom' ? t('vttPresetCustom') : t(stdKey);
@@ -3882,6 +4190,12 @@ function syncVttChrome(){
 /* 当前模板的一句话说明：模板换了、界面语言换了都要重算（它不是 data-i18n 能覆盖的静态文案） */
 function vttPresetTip(){
   const k = vttPresetKey();
+  /* v0.9.267：单语下的 ⓘ 说的是「这套模板按什么规范设的」——
+     既然数值有出处，就直接把出处写给用户看，别让他猜。 */
+  if (String(k).indexOf('m-') === 0){
+    setTip('mVttPresetHint', t(MONO_VTT_TIPS[k] || 'vttTipStreamMono'), true);
+    return;
+  }
   /* v0.9.265：标准档的说明里写着「金色原文」，单语没有原文行 —— 换成单语那一句 */
   const stdTip = monoMode() ? 'vttTipStdMono' : 'vttTipStd';
   setTip('mVttPresetHint', t(k === 'compact' ? 'vttTipCompact' : k === 'cinema' ? 'vttTipCinema'

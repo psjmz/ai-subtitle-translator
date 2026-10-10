@@ -41,7 +41,7 @@ function J(p){ return new Promise((res, rej) => { const r = http.request({ host:
 
   console.log('\n— ① 版号与「全页只有一处预览」—');
   const ver = await ev("document.querySelector('.ver').textContent");
-  ok(/v0\.9\.264/.test(String(ver)), '页眉版号已到 v0.9.264', ver);
+  ok(/v0\.9\.267/.test(String(ver)), '页眉版号已到 v0.9.265', ver);
   const struct = await ev(`JSON.stringify({
     预览卡:document.querySelectorAll('#pvCard').length,
     旧面板画布:document.querySelectorAll('#slotPv').length,
@@ -150,18 +150,21 @@ function J(p){ return new Promise((res, rej) => { const r = http.request({ host:
   ok(DY.SRT点亮 === false, '出厂默认档不点亮（只在被改过时提示）', DY.SRT点亮);
   ok(DY.自定义点亮 === true, '「自定义」档点亮 ⓘ（已经不是默认说法了）', DY.自定义点亮);
 
-  console.log('\n— ⑥ 没有画面可看时：视角收起 + 说明顶上 —');
+  console.log('\n— ⑥ SRT 档位：视角收起 + 文本预览顶上（v0.9.265）—');
   await ev("(function(){var s=document.getElementById('expFmt');s.value='srt';s.dispatchEvent(new Event('change',{bubbles:true}));})()"); await wait(500);
   const none = await ev(`JSON.stringify({视角:getComputedStyle(document.getElementById('pvSeg')).display,
     说明:getComputedStyle(document.getElementById('pvNone')).display,
     说明文字:(document.getElementById('pvNone').textContent||'').slice(0,20),
     ass:getComputedStyle(document.getElementById('assPv')).display,
     vtt:getComputedStyle(document.getElementById('mVttPv')).display,
+    srt预览:getComputedStyle(document.getElementById('srtPv')).display,
     摘要:document.getElementById('expSum').textContent, 后缀:document.getElementById('dlExt').textContent})`);
   console.log('   ', none);
   const NN = JSON.parse(none);
   ok(NN.视角 === 'none', 'SRT 下视角按钮收起（无可比较的东西）', NN.视角);
-  ok(NN.说明 === 'block' && NN.说明文字.length > 5, 'SRT 下给出「这个格式没有画面」的说明', NN.说明文字);
+  /* v0.9.265：SRT 不再「没有画面」—— 改成画播放器默认外观 + 文件里真正的文本两块，
+     所以那行「这个格式没有画面」的说明要收掉，改由 #srtPv 顶上。 */
+  ok(NN.说明 === 'none' && NN.srt预览 === 'block', 'SRT 下给出文本预览（不再是一行空提示）', NN.说明 + '/' + NN.srt预览);
   ok(NN.ass === 'none' && NN.vtt === 'none', '两块画布都收着', NN.ass + '/' + NN.vtt);
   ok(/SRT/.test(NN.摘要), '导出卡摘要写清当前格式', NN.摘要);
   ok(NN.后缀 === '.srt', '下载按钮后缀仍是 .srt', NN.后缀);

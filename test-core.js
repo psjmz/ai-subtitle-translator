@@ -5345,7 +5345,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.265/.test(mg), 'merge.html 未引用 v0.9.265 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.267/.test(mg), 'merge.html 未引用 v0.9.267 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5385,9 +5385,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.265</.test(html), '首页版本号未升 0.9.265');
-    assert.ok(/class="ver-tag">v0\.9\.265</.test(html), '工作台版本号未升 0.9.265');
-    assert.ok(/srt-core\.js\?v=0\.9\.265/.test(html), 'srt-core.js?v 未升 0.9.265');
+    assert.ok(/class="ver">v0\.9\.267</.test(html), '首页版本号未升 0.9.267');
+    assert.ok(/class="ver-tag">v0\.9\.267</.test(html), '工作台版本号未升 0.9.267');
+    assert.ok(/srt-core\.js\?v=0\.9\.267/.test(html), 'srt-core.js?v 未升 0.9.267');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5564,8 +5564,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.265</.test(mg), 'merge.html 版本未升 0.9.265');
-    assert.ok(/merge-core\.js\?v=0\.9\.265/.test(mg), 'merge-core.js?v 未升 0.9.265');
+    assert.ok(/class="ver">v0\.9\.267</.test(mg), 'merge.html 版本未升 0.9.267');
+    assert.ok(/merge-core\.js\?v=0\.9\.267/.test(mg), 'merge-core.js?v 未升 0.9.267');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7393,11 +7393,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.265/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.265/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.265/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.265/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.265/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.267/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.267/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.267/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.267/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.267/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8178,7 +8178,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
        默认视角是成片 —— 那里一个字都不许换成示意文本，否则用户进来看见的第一眼就是假画面。 */
     assert.ok(/const smp = \(T\.slotOverride != null\) \? slotSampleText\(S\.style\.cur\) : null;/.test(mg),
       '示意文本必须只在两档对照视角里出现');
-    assert.ok(/const enT = smp \? smp\.en : samp\.en, zhT = smp \? smp\.zh : samp\.zh;/.test(mg),
+    /* v0.9.267：enT 多了单语分支（单语没有原文行，不许用示意文本的英文那半），
+       语义不变 —— smp 为空（成片视角）时永远取 samp。 */
+    assert.ok(/const enT = smp \? \(monoMode\(\) \? '' : smp\.en\) : samp\.en, zhT = smp \? smp\.zh : samp\.zh;/.test(mg),
       '成片视角的字被示意文本顶掉了');
     /* 全页只有一处画面：两块容器是「ASS 的画法 / VTT 的画法」，不是两个预览窗口 */
     assert.ok(/id="rail">\s*<div class="pvcard card" id="pvCard">/.test(mg), '预览卡不在右栏容器里');
@@ -8420,7 +8422,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const pv = mg.slice(mg.indexOf('function renderAssPv(){'), mg.indexOf('function baseName(){'));
     assert.ok(/const smp = \(T\.slotOverride != null\) \? slotSampleText\(S\.style\.cur\) : null;/.test(pv),
       'ASS 面板预览没按当前槽取示意文本');
-    assert.ok(/const enT = smp \? smp\.en : samp\.en, zhT = smp \? smp\.zh : samp\.zh;/.test(pv), '示意文本没接上');
+    assert.ok(/const enT = smp \? \(monoMode\(\) \? '' : smp\.en\) : samp\.en, zhT = smp \? smp\.zh : samp\.zh;/.test(pv), '示意文本没接上');
     assert.ok(/paint\(l1, enT, sideOf\('src'\)\);/.test(pv) && /paint\(l2, zhT, sideOf\('dst'\)\);/.test(pv),
       '画的还是样例原文，没换成示意文本');
     const vp = mg.slice(mg.indexOf('function renderVttPv(){'), mg.indexOf('function vttPresetLabel('));
@@ -8556,7 +8558,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/\$\('assDstColTitle'\), mono \? 'lblOneCol'/.test(mg), 'ASS 那一栏标题在单语下仍叫「译文（主）」');
     /* ② VTT 面板：原文行整组收起 + 两个组标题与面板标题改词 + 栅格收成单列 */
     assert.ok(/id="mVttSrcGrp"/.test(mg) && /\$\('mVttSrcGrp'\)[\s\S]{0,60}display = mono/.test(mg), 'VTT 原文行整组在单语下没收掉');
-    assert.ok(/id="mVttCols2"/.test(mg) && /\$\('mVttCols2'\)[\s\S]{0,60}classList\.toggle\('mono', mono\)/.test(mg), 'VTT 收掉一组后没收成单列');
+    /* v0.9.267：改用 querySelectorAll —— 「整条字幕」那组没有 id（它是第一个 .vtt-cols），
+       而它和「字幕行」同屏并排，单语下必须一起重排，否则同一屏里两种风格打架。 */
+    assert.ok(/id="mVttCols2"/.test(mg) && /querySelectorAll\('#mVttPanel \.vtt-cols'\)[\s\S]{0,120}classList\.toggle\('mono', mono\)/.test(mg),
+      'VTT 那两组栅格在单语下没收成单列（漏了没 id 的第一组）');
     assert.ok(/\$\('mVttGrpAllTitle'\), mono \? 'vttGrpAllMono'/.test(mg), '「整条字幕（两层共用）」在单语下没换词');
     assert.ok(/\$\('mVttGrpDstTitle'\), mono \? 'vttGrpOne'/.test(mg), '「译文行（主样式）」在单语下没换词');
     assert.ok(/\$\('mVttPanelTitle'\), mono \? 'vttPanelTitleMono'/.test(mg), 'VTT 面板标题在单语下仍写「双语样式」');
@@ -8582,4 +8587,163 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
   });
 
+  t('v0.9.267：单语面板重排（方案 A）—— 标签在上、控件铺满整格', () => {
+    /* 266 只把空白从「控件右侧」挪到「标签与控件之间」：右边界是齐了，但每行中间
+       仍隔着一大片死区，控件宽度五马八门（84/116/168/120/20），左边界参差不齐。
+       267 = 标签提到控件正上方 + 控件一律铺满整格 —— 视线竖直走，不串行。 */
+    const css = mg.slice(mg.indexOf('.ass-cols.mono .ass-col,'), mg.indexOf('@media (max-width:640px){\n    .ass-cols.mono'));
+    assert.ok(css.length > 400, '找不到 v0.9.267 的单语排布规则块');
+    /* ① 栏内两列网格（每列 = 双语时的单栏宽度，密度观感一致） */
+    assert.ok(/\.ass-cols\.mono \.ass-col,\s*\n\s*\.vtt-cols\.mono \.ass-col\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/.test(mg),
+      '单语栏不是 2 列网格（字段会挤在左边一条线上）');
+    /* ② 栏标题 / 小分组标题占满整行 —— 漏了会把「文字 / 效果 / 位置」挤进某一列 */
+    assert.ok(/\.ass-cols\.mono \.ass-col > h4,\s*\n\s*\.vtt-cols\.mono \.ass-col > h4,\s*\n\s*\.ass-cols\.mono \.ass-col > \.ass-sub\{grid-column:1\/-1/.test(mg),
+      '栏标题/小分组标题没占满整行');
+    /* ③ 字段是「第 1 行标签 + 第 2 行控件」的两行网格 —— 方案 A 的核心 */
+    assert.ok(/\.ass-cols\.mono \.ass-col \.af,\s*\n\s*\.vtt-cols\.mono \.ass-col \.af,\s*\n\s*\.ass-cols\.mono ~ \.mg-row \.af\{\s*\n\s*display:grid;grid-template-columns:minmax\(0,1fr\) auto;/.test(mg),
+      '字段不是「标签一行 + 控件一行」的网格（会退回标签贴左 / 控件贴右的旧样子）');
+    assert.ok(/\.ass-cols\.mono \.ass-col \.af > label,[\s\S]{0,240}grid-column:1\/-1;grid-row:1/.test(mg),
+      '标签没独占第 1 行');
+    /* ④ 输入类控件一律落到第 2 行第 1 列并铺满 —— 不再是五马八门的固定宽度
+       ⚠️ margin:0 是必需的：Chrome 给 input[type=range] 留了 2px UA margin，不抹掉它整列会左偏 */
+    assert.ok(/\.ass-cols\.mono ~ \.mg-row \.af > input\[type=number\]\{grid-column:1;grid-row:2;width:100%;flex:none;\s*\n\s*margin:0\}/.test(mg),
+      '输入类控件没铺满整格 / 没抹掉 UA margin（宽度会退回各自不同的固定值，range 还会左偏 2px）');
+    /* ⑤ 附加件（色块 / 百分比）紧贴控件右侧的第 2 列 */
+    assert.ok(/\.ass-cols\.mono \.ass-col \.af > \.sw,\s*\n\s*\.ass-cols\.mono \.ass-col \.af > \.pct,[\s\S]{0,260}grid-column:2;grid-row:2;margin-left:8px\}/.test(mg),
+      '色块 / 百分比没落在第 2 列（或没自己吃那 8px 间距）');
+    /* ⑤b ⚠️ 字段内的 column-gap 必须是 0：只有第二列真的有东西时才拉出 column-gap，
+         纯控件行的那条 8px 空槽照样占位 → 它的控件右端比带色块行的色块右端少 8px，
+         同一条纵线上两种收尾（实测 399-381=18 vs 762-752=10）。间距改由附加件的 margin-left 承担。 */
+    assert.ok(/align-items:center;gap:5px 0;margin:0;padding:7px 9px;/.test(mg),
+      '字段内的 column-gap 不是 0 —— 纯控件行会比带色块行短 8px，右边界参差');
+    /* ⑥ 复选框 → 整格可点的开关（原来那颗方块孤零零飘在边上，看着像 bug） */
+    assert.ok(/input\[type=checkbox\]\{[\s\S]{0,300}-webkit-appearance:none;appearance:none;/.test(css),
+      '复选框没做成开关');
+    assert.ok(/:checked::after,\s*\n\s*\.vtt-cols\.mono \.ass-col \.af > input\[type=checkbox\]:checked::after\{transform:translateX\(20px\)/.test(mg),
+      '开关的滑块没有位移动画（看不出开/关状态）');
+    /* ⑦ 色块跟着输入框等高 —— 16px 的小方块配 30px 输入框，看着像没对齐的噪点 */
+    assert.ok(/\.ass-cols\.mono \.ass-col \.af > \.sw,\s*\n\s*\.vtt-cols\.mono \.ass-col \.af > \.sw\{width:26px;height:26px/.test(mg),
+      '色块仍是那个看不清颜色的小方块');
+    /* ⑧ 折行边距那对是 .ass-cols 的兄弟行，用 ~ 一并纳入 */
+    assert.ok(/\.ass-cols\.mono ~ \.mg-row\{gap:10px 26px\}/.test(mg), '折行边距那对没跟上新版式（面板最后两格会退回旧样子）');
+    /* ⑨ 窄屏回落单列 */
+    assert.ok(/@media \(max-width:640px\)\{\s*\n?\s*\.ass-cols\.mono \.ass-col,\s*\n\s*\.vtt-cols\.mono \.ass-col\{grid-template-columns:1fr\}/.test(mg),
+      '窄屏没回落单列（2 列会把控件挤没）');
+    /* ⑩ 双语零影响：规则块里每条规则都必须带 .mono 限定 */
+    const rules = css.match(/^\s{2}[.#][^\n]*\{[^\n]*$/gm) || [];
+    assert.ok(rules.length >= 5, '规则块抓不到（' + rules.length + '）');
+    rules.forEach(r => {
+      assert.ok(/\.mono/.test(r), '有无 .mono 限定的裸规则（会改到双语）：' + r.trim().slice(0, 70));
+    });
+  });
+
+  t('v0.9.267：单语四套样式模板（ASS 侧：4 档预设 + 面板那排换成模板键）', () => {
+    /* 单语没有第二行，「分屏 / 底部双行」在这里没有排版含义 ——
+       实测（`_probeSplit267.js`）：两侧 Dialogue 都是 2 条、style 全是 Bottom、布局逐字节相同，
+       所谓差别只剩被随之套上的默认字号（split 主 56 / stack 主 54）。
+       → 换成按业界规范的四套样式模板，选的就是长相。 */
+    const head = 'const MONO_TPL_DEFAULTS = {';
+    assert.ok(mg.indexOf(head) >= 0, '找不到单语模板预设');
+    const mb = mg.slice(mg.indexOf(head), mg.indexOf('function monoAssTplLabel('));
+    const DST = ['assDstSize','assDstColor','assDstBold','assDstItalic','assDstOutline','assDstOutlineColor',
+      'assDstAlpha','assDstFont','assDstSpacing','assDstEdge','assDstEdgeSize','assDstEdgeColor','assDstEdgeAlpha',
+      'assDstAlign','assMarginL','assMarginR','assDstMV'];
+    const per = mb.split(/\n  [a-z0-9]+: \{/).slice(1);   /* a11y 带数字，别写成 [a-z]+ */
+    assert.strictEqual(per.length, 4, '应正好 4 套单语预设，实际 ' + per.length);
+    per.forEach((blk, i) => {
+      const miss = DST.filter(f => blk.indexOf(f + ':') < 0);
+      assert.deepStrictEqual(miss, [], '第 ' + (i + 1) + ' 套缺主行字段（漏了就残留上一套的值）：' + miss.join(','));
+      /* ⚠️ 不许写 assSrc* —— 单语下那一栏是收起的，写了会把用户在双语下调好的原文参数冲掉 */
+      assert.ok(blk.indexOf('assSrc') < 0, '第 ' + (i + 1) + ' 套写了 assSrc 字段');
+    });
+    /* 默认档 = stream，参数必须与 TPL_DEFAULTS.split 的主行逐字相同 ——
+       否则用户「不点任何模板」时的导出结果会悄悄改变 */
+    const sp = mg.slice(mg.indexOf('  split: {'), mg.indexOf('  stack: {'));
+    const st = mb.slice(mb.indexOf('stream: {'), mb.indexOf('a11y: {'));
+    DST.forEach(f => {
+      const a = new RegExp(f + ":\\s*'?([^,\\n}]*)").exec(sp);
+      const b = new RegExp(f + ":\\s*'?([^,\\n}]*)").exec(st);
+      assert.ok(a && b, '取不到字段 ' + f);
+      assert.strictEqual(b[1].trim(), a[1].trim(),
+        f + ' 默认档与双语 split 不一致（「不点模板」的行为会变）：split=' + a[1] + ' stream=' + b[1]);
+    });
+    /* 面板那一排单语要换成模板键，且点它不动 expFmt（那是双语六档的状态源） */
+    assert.ok(/const segs = monoMode\(\) \? MONO_ASS_SEGS : ASS_SEGS;/.test(mg), 'ASS 模板按钮排没跟着单语切换');
+    assert.ok(/const v = monoMode\(\) \? monoAssTplKey\(\) : tplVal\(\);/.test(mg), '模板按钮高亮仍跟着 expFmt 走');
+    assert.ok(/if \(monoMode\(\) && v !== 'custom'\)\{[\s\S]{0,160}applyMonoAssTpl\(v\)/.test(mg), '点单语模板没走 applyMonoAssTpl');
+    /* 手改任一参数 → 落到「自定义」，且一个值都不许被改（不能滑回滑动前的模板预设） */
+    assert.ok(/if \(monoMode\(\)\)\{\s*\n\s*if \(monoAssTplKey\(\) !== 'custom'\)\{ MONO_ASS_TPL = 'custom'; syncTplSegs\(\); \}\s*\n\s*return;\s*\n\s*\}/.test(mg),
+      '单语下手改参数没落到「自定义」（改完还会被模板预设盖回去）');
+    /* 预览左上角在单语下报模板名，不再说「分屏」—— 没有第二行就没有分屏 */
+    assert.ok(/const nm = monoMode\(\) \? monoAssTplLabel\(\)/.test(mg), '单语预览角标仍写着分屏 / 底部双行');
+  });
+
+  t('v0.9.267：单语预览只画一行（此前凭空多出一条「原文行」）', () => {
+    /* 真 bug（2026-10-10 实测）：单语下 srcLines 恒空 → assPvSample 拿示例英文兜底，
+       于是预览第一行是 "Hello there, this is a sample line"、真字幕被挤到第二行。
+       预览 = 导出，多画一行就是骗人。 */
+    const sp = mg.slice(mg.indexOf('function assPvSample(){'), mg.indexOf('function renderAssPv(){'));
+    assert.ok(/if \(monoMode\(\)\)\{\s*\n\s*en = '';/.test(sp),
+      '单语下 en 没被清空（会拿示例英文兜底，画出一条导出里不存在的原文行）');
+    /* 双语的兜底串要留着 —— 双侧都没内容时预览不能是空白 */
+    assert.ok(/Hello there, this is a sample line/.test(sp), '双语的示例兜底串被删了');
+    assert.ok(!/monoMode\(\)\)\{\s*\n\s*en = String/.test(sp), '单语不许走示例兜底');
+    const pv = mg.slice(mg.indexOf('function renderAssPv(){'), mg.indexOf('function baseName(){'));
+    assert.ok(/if \(monoMode\(\)\)\{[\s\S]{0,240}paint\(l1, zhT, sideOf\('dst'\)\);[\s\S]{0,120}l2\.style\.display = 'none';/.test(pv),
+      '单语没把第 2 个行容器收起（画的还是两行）');
+    /* 双语的分支一个字都不能动 */
+    assert.ok(/if \(dstFirst\)\{\s*\n\s*paint\(l1, zhT, sideOf\('dst'\)\);\s*\n\s*paint\(l2, enT, sideOf\('src'\)\);/.test(pv),
+      '双语的 dst-first 分支被改坏了');
+  });
+
+  t('v0.9.267：单语四套模板也接进 VTT（select 有档位 + 双语三套一个不许少）', () => {
+    ['m-stream','m-a11y','m-cinema','m-social'].forEach(k => {
+      assert.ok(mg.indexOf('value="' + k + '"') >= 0, 'select 里缺单语档 ' + k + '（vttPresetKey 设不进去）');
+      assert.ok(mg.indexOf("'" + k + "': { mVttLine") >= 0, 'MVTT_PRESETS 里缺 ' + k);
+    });
+    /* ⚠️ 双语那三套必须还在 —— 一个都不许被替换掉 */
+    ['std: { mVttLine','compact: { mVttLine','cinema: { mVttLine'].forEach(k => {
+      assert.ok(mg.indexOf('  ' + k) >= 0, '双语模板 ' + k.slice(0, 7) + ' 被删了');
+    });
+    /* 单语预设不许写 mVttSrc*（单语没有原文行，写了会冲掉双语的原文参数） */
+    const mp = mg.slice(mg.indexOf("'m-stream': { mVttLine"), mg.indexOf('/* v0.9.267：单语下 VTT 按钮排'));
+    assert.ok(mp.indexOf('mVttSrc') < 0, '单语 VTT 预设里出现了 mVttSrc 字段');
+    assert.ok(/const segs = monoMode\(\) \? MONO_MVTT_SEGS : MVTT_SEGS;/.test(mg), 'VTT 模板按钮排没跟着单语切换');
+    /* 双语档位在单语下归一显示（但不改 select 的值 —— 切回双语要能原样认出来） */
+    assert.ok(/if \(monoMode\(\) && String\(k\)\.indexOf\('m-'\) !== 0\)\{\s*\n\s*k = \(k === 'std'\) \? 'm-stream' : /.test(mg),
+      '双语档位在单语下没归一');
+    assert.ok(/if \(String\(k0\)\.indexOf\('m-'\) === 0\) return mvttSegName\(k0\);/.test(mg), '模板名没跟着单语档走');
+    /* 切模式必须重绘两排按钮，否则点的是上一个模式那几个 */
+    assert.ok(/④ v0\.9\.267[\s\S]{0,320}renderTplSegs\(\);/.test(mg), 'syncMonoChrome 里没重绘模板按钮排');
+    /* 四语齐全 */
+    ['monoTplStream','monoTplA11y','monoTplCinema','monoTplSocial',
+     'vttTipStreamMono','vttTipA11yMono','vttTipCinemaMono','vttTipSocialMono'].forEach(k => {
+      const c = (mg.match(new RegExp("[,{\\s]" + k + ":\\s*'", 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
+  });
+
+  t('v0.9.267：VTT 模板档的跨模式折算（m-* 不许泄漏到双语）', () => {
+    /* 真 bug（2026-10-10 实测，`_chk265b.js` 抓到）：
+       单语四套与双语四套共用同一个 select，而 select 是唯一状态源 —— 在单语点过 m-* 后切回双语，
+       select.value 停在 'm-stream' 上，双语这边根本没有这一档，于是
+         ① 模板名显示「流媒体标准」（双语该显示「标准 · 底部双语」）
+         ② 四个分段按钮一个都不高亮
+         ③ 导出摘要跟着串成「流媒体标准 · VTT」
+       更隐蔽的一条：mVttSrc* 是双语原文行的值，m-* 预设一个都不写 ——
+       双语下若按 'm-stream' 套模板，原文行样式会被静默落到「沿用」。 */
+    assert.ok(/const VTT_MONO_TO_BI = \{'m-stream':'std', 'm-cinema':'cinema'\};/.test(mg),
+      '缺等价折算表（m-stream → std / m-cinema → cinema）');
+    /* m-a11y / m-social 在双语里没有等价物（双语每档都为原文行预留了值）→ 落「自定义」，不许冒充标准档。
+       ⚠️ 刻意不做「记住来路、原样还回去」：点了单语模板后值就已经被填过，挂回原档名等于指鹿为马。 */
+    assert.ok(/const VTT_BI_KEYS = \['std', 'compact', 'cinema', 'custom'\];/.test(mg), '缺双语合法档位清单');
+    assert.ok(/function biVttKeyOf\(k\)\{[\s\S]{0,400}return VTT_BI_KEYS\.indexOf\(v\) >= 0 \? v : 'std';/.test(mg),
+      '折算函数没有兜底（可能写出 select 里不存在的档位）');
+    /* 切模式时真正写回 select（不只是显示层折算） */
+    assert.ok(/const msel = \$\('mVttPresetSel'\);\s*\n\s*if \(msel && !mono\)\{[\s\S]{0,240}if \(k0\.indexOf\('m-'\) === 0\) msel\.value = biVttKeyOf\(k0\);/.test(mg),
+      '切回双语时没把 select 的值折算回去（模板名 / 高亮 / 导出摘要会一起串）');
+    /* vttPresetKey 的兜底：不走 syncMonoChrome 的路径也不许吐 m-* */
+    assert.ok(/if \(!monoMode\(\) && String\(k\)\.indexOf\('m-'\) === 0\) k = biVttKeyOf\(k\);/.test(mg),
+      'vttPresetKey() 在非单语下仍可能返回 m-* 档（双语拿不到这一档）');
+  });
 }

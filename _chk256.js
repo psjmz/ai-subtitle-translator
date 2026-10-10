@@ -50,7 +50,7 @@ function J(p){ return new Promise((res, rej) => { const r = http.request({ host:
 
   console.log('\n— ① 版号与起点 —');
   const ver = await ev("document.querySelector('.ver').textContent");
-  ok(/v0\.9\.264/.test(String(ver)), '页眉版号已到 v0.9.264', ver);
+  ok(/v0\.9\.267/.test(String(ver)), '页眉版号已到 v0.9.265', ver);
   const v0 = JSON.parse(await view());
   console.log('   ', JSON.stringify(v0));
   ok(v0.视角 === 'movie', '起点是「成片」视角', v0.视角);
@@ -126,7 +126,8 @@ function J(p){ return new Promise((res, rej) => { const r = http.request({ host:
     说明:getComputedStyle(document.getElementById('pvNone')).display})`));
   console.log('   ', JSON.stringify(s1));
   ok(s1.视角 === 'slot', '视角状态照样记成这个槽', s1.视角);
-  ok(s1.视角条 === 'none' && s1.说明 === 'block', '但没画面可画 → 视角条收起、改成一行说明', s1.视角条 + '/' + s1.说明);
+  /* v0.9.265：SRT 档位现在有文本预览，那行「没有画面」的说明不再出现 */
+  ok(s1.视角条 === 'none' && s1.说明 === 'none', '但没画面可画 → 视角条收起（265 起由文本预览顶上）', s1.视角条 + '/' + s1.说明);
   await ev(`(function(){var s=document.getElementById('expFmt');s.value='stack';s.dispatchEvent(new Event('change',{bubbles:true}));return 1})()`);
   await wait(700);
   const s2 = JSON.parse(await ev(`JSON.stringify({视角条:getComputedStyle(document.getElementById('pvSeg')).display, 视角:pvView()})`));
