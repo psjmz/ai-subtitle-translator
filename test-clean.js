@@ -21,7 +21,8 @@ console.log('\n— 解析与格式化 —');
   const r = C.parseSrt('1\n00:00:01,000 --> 00:00:03,000\n你好\n\n2\n00:00:04,500 --> 00:00:06,000\n再见\n');
   ok(r.items.length === 2, 'SRT 解析出 2 条', r.items.length);
   ok(r.items[0].start === 1000 && r.items[0].end === 3000, '时间轴毫秒正确');
-  ok(/^1\n00:00:01,000 --> 00:00:03,000\n你好/.test(C.formatSrt(r.items)), '格式化往返一致');
+  /* v0.9.271：SRT 改用 CRLF（SubRip 规范行尾），断言跟着改 */
+  ok(/^1\r\n00:00:01,000 --> 00:00:03,000\r\n你好/.test(C.formatSrt(r.items)), '格式化往返一致');
   const back = C.parseSrt(C.formatSrt(r.items));
   ok(C.formatSrt(back.items) === C.formatSrt(r.items), '解析 → 格式化 → 再解析是幂等的');
 }
@@ -175,7 +176,7 @@ console.log('\n— VTT 解析 / 导出（v0.9.258）—');
   ok(r.items[0].start === 1000 && r.items[0].end === 3000, '时间轴毫秒正确');
   ok(/<i>Hello<\/i> there/.test(r.items[0].text), '<i> 行内标签保留（交给去 HTML 规则）', r.items[0].text);
   const out = C.formatVtt(r.items);
-  ok(/^WEBVTT\n\n1\n00:00:01\.000 --> 00:00:03\.000\n/.test(out), '导出带 WEBVTT 头与点号毫秒', out.slice(0, 44));
+  ok(/^WEBVTT\r\n\r\n1\r\n00:00:01\.000 --> 00:00:03\.000\r\n/.test(out), '导出带 WEBVTT 头与点号毫秒', out.slice(0, 44));
   const back = C.parseVtt(out);
   ok(back.items.length === 2 && C.formatVtt(back.items) === out, '解析 → 导出 → 再解析是幂等的');
   const noHead = ['1', '00:00:01.000 --> 00:00:02.000', '没有 WEBVTT 头的 VTT', ''].join('\n');
@@ -202,8 +203,136 @@ console.log('\n— ASS / SSA 解析（v0.9.258 新增）—');
   const c0 = ch.filter(c => c.i === 0)[0];
   ok(c0 && c0.after === 'Hello world' && c0.tags.indexOf('assFx') >= 0,
     '默认规则把 ASS 特效标签清掉', c0 && (c0.after + ' / ' + c0.tags.join(',')));
-  ok(/^1\n00:00:01,000 --> 00:00:03,500\n/.test(C.formatSrt(r.items)), 'ASS 条目走 SRT 导出通道');
+  ok(/^1\r\n00:00:01,000 --> 00:00:03,500\r\n/.test(C.formatSrt(r.items)), 'ASS 条目走 SRT 导出通道');
   ok(C.parseAss('[Script Info]\n[Events]\n') .items.length === 0, '没有 Dialogue 时返回空（不抛错）');
+}
+
+/* =====================================================================
+   v0.9.271：ASS 双轨双语 + 导出格式
+   ---------------------------------------------------------------------
+   这几条是**线上事故级别**的契约，不许悄悄退化：
+   ASS 双语最常见的排法是两条 Dialogue 时间轴相同、靠 Style 区分，
+   不并回一条就直接导出，用户拿到的是「两条叠在一起 / 只剩单语」的废文件。
+   ===================================================================== */
+console.log('\n— v0.9.271：双轨双语 —');
+{
+  const head = ['[Script Info]', 'ScriptType: v4.00+', '', '[V4+ Styles]',
+    'Style: Default,Arial,54,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,60,1',
+    'Style: CN,Microsoft YaHei,44,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,30,1',
+    '', '[Events]',
+    'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'].join('\n');
+  const src = head + '\n' + [
+    'Dialogue: 0,0:00:01.30,0:00:03.30,Default,,0,0,0,,Hello there',
+    'Dialogue: 0,0:00:01.30,0:00:03.30,CN,,0,0,0,,你好啊',
+    'Dialogue: 0,0:00:04.00,0:00:06.50,Default,,0,0,0,,I am fine',
+    'Dialogue: 0,0:00:04.00,0:00:06.50,CN,,0,0,0,,我很好',
+    'Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,What time',
+    'Dialogue: 0,0:00:07.00,0:00:09.00,CN,,0,0,0,,几点了'
+  ].join('\n');
+  const r = C.parseAss(src);
+  ok(r.items[0].style === 'Default' && r.items[1].style === 'CN', '解析保留 Style 列（判断谁是谁的依据）');
+  ok(r.items[0].srcIdx != null, '解析保留源行号（ASS 写回的前提）');
+
+  const d = C.detectBilingual(r.items);
+  ok(d.bi === true && d.pairs.size === 3, '识别出 3 组双轨双语', d.bi && d.pairs.size);
+  const m = C.mergeBilingual(r.items, d.pairs, false);
+  ok(m.length === 3, '合并后 3 条（不是 6 条）', m.length);
+  ok(m[0].text === 'Hello there\n你好啊', '合并成「原文在上 + 译文在下」', JSON.stringify(m[0].text));
+  ok(m[0].srcIdxB === r.items[1].srcIdx, '记住第二条轨道的行号（它要整行移除）');
+  const fl = C.mergeBilingual(r.items, d.pairs, true);
+  /* ⚠️ flip 只换文本顺序，行号不动：ASS 的位置由行自己的 MarginV 决定，
+     换行号会把译文又送回下面去。字体靠 flip 标记后续换 Style 解决。 */
+  ok(fl[0].srcIdx === r.items[0].srcIdx && fl[0].srcIdxB === r.items[1].srcIdx,
+     'flip 不换行号（位置跟着轨道走，否则译文又回下面）');
+  ok(fl[0].flip === true, 'flip 标记带上（ASS 通道靠它把字体跟着语言换）');
+
+  /* 不误判：判据宁可漏也不能错并 */
+  ok(C.detectBilingual([{ start: 1, end: 2, text: 'Hello' }, { start: 1, end: 2, text: '你好' },
+                        { start: 3, end: 4, text: 'World' }]).bi === false,
+     '只出现 1 组同时间轴 → 不判双语（可能是注释轨）');
+  const cjk4 = [];
+  for (let i = 0; i < 4; i++) {
+    cjk4.push({ start: i * 2000, end: i * 2000 + 1000, text: '中文一行' });
+    cjk4.push({ start: i * 2000, end: i * 2000 + 1000, text: '另一行中文' });
+  }
+  ok(C.detectBilingual(cjk4).bi === false, '同时间轴但语种相同 → 不判双语');
+  ok(C.langOf('2024') === '', '纯数字判不出语种时不硬判');
+}
+
+console.log('\n— v0.9.271：双语安全（水印 / 去重）—');
+{
+  const o = { assFx: true, html: true, ctrl: true, sort: true, sdh: true, speaker: false,
+              music: false, wm: true, dup: true, empty: true, punct: true, upper: false,
+              merge: false, bi: true };
+  /* ⚠️ 旧实现：整条命中水印就清空 → 双语里译文那行带个署名，正片对白跟着一起没 */
+  const c1 = C.clean([{ start: 1, end: 2, text: 'What time is it?\n本字幕由XX字幕组提供' }], o).changes[0];
+  ok(c1 && c1.after === 'What time is it?', '一行是水印 → 只删那一行，对白保住', c1 && JSON.stringify(c1.after));
+  const c2 = C.clean([{ start: 1, end: 2, text: 'www.example.com' }], o).changes[0];
+  ok(c2 && c2.del, '整条就是水印 → 仍然整条删');
+
+  /* ⚠️ 旧实现：原文与译文恰好都是「2024」→ 译文被当重复项删掉 */
+  const pair = [{ start: 1300, end: 3300, text: '2024' }, { start: 1300, end: 3300, text: '2024' },
+                { start: 5000, end: 7000, text: 'OK' }, { start: 5000, end: 7000, text: 'OK' }];
+  ok(C.clean(pair, o).changes.filter(c => c.del).length === 0, '双语模式：时间轴相同的两条不是重复');
+  const oNoBi = Object.assign({}, o); oNoBi.bi = false;
+  ok(C.clean(pair, oNoBi).changes.filter(c => c.del).length === 2, '非双语模式：真重复照删（规则没被改废）');
+}
+
+console.log('\n— v0.9.271：合并短句的时间轴 —');
+{
+  const o = { assFx: false, html: false, ctrl: false, sort: true, sdh: false, speaker: false,
+              music: false, wm: false, dup: false, empty: false, punct: false, upper: false, merge: true };
+  const ch = C.clean([{ start: 1000, end: 1800, text: 'Hello there' },
+                      { start: 1900, end: 2600, text: 'how are you' }], o).changes[0];
+  ok(ch && ch.end === 2600, 'change 带上合并后的结束时间（旧实现导出会把尾巴截掉）', ch && ch.end);
+}
+
+console.log('\n— v0.9.271：ASS 写回与行尾 —');
+{
+  const head = ['[Script Info]', 'PlayResX: 1920', '', '[V4+ Styles]',
+    'Style: Default,Arial,54,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,60,1',
+    '', '[Events]',
+    'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'].join('\n');
+  const src = head + '\n' + [
+    'Dialogue: 0,0:00:01.30,0:00:03.30,Default,,0,0,0,,Hello\\N你好',
+    'Dialogue: 0,0:00:04.00,0:00:06.50,Default,,0,0,0,,www.spam.com'
+  ].join('\n');
+  const r = C.parseAss(src);
+  const items = [{ no: 1, start: 1000, end: 3000, srcIdx: r.items[0].srcIdx, text: 'Hello\n你好' }];
+  const out = C.rewriteAss(src, items, new Set([r.items[1].srcIdx]));
+  ok(out.indexOf('PlayResX: 1920') > 0 && out.indexOf('Style: Default,Arial,54') > 0,
+     'Script Info 与 Styles 段原样保留（用户拿回自己的文件）');
+  ok(out.indexOf('www.spam.com') < 0, '被清洗删掉的条目整行移除');
+  const dl = out.split('\r\n').filter(l => /^Dialogue:/i.test(l));
+  ok(dl.length === 1 && dl[0].indexOf('Hello\\N你好') > 0, '换行还原成 \\N（ASS 的换行记号）', dl[0]);
+  ok(/\r\n/.test(out) && !/[^\r]\n/.test(out), 'ASS 输出全 CRLF、无游离 LF');
+
+  const srt = C.formatSrt([{ no: 1, start: 1000, end: 2000, text: 'a\nb' }]);
+  ok(srt === '1\r\n00:00:01,000 --> 00:00:02,000\r\na\r\nb\r\n', 'SRT 用 CRLF（规范行尾），条目内换行也是',
+    JSON.stringify(srt));
+}
+
+console.log('\n— v0.9.271：页面契约 —');
+{
+  const fs = require('fs');
+  const html = fs.readFileSync(__dirname + '/clean.html', 'utf8');
+  ok(/clean-core\.js\?v=0\.9\.271/.test(html), 'clean.html 版号已升 271');
+  ['biBar', 'biTxt', 'biFlip', 'outSeg', 'outNote'].forEach(function (id) {
+    ok(html.indexOf('id="' + id + '"') > 0, '页面有 #' + id);
+  });
+  ok(/function renderBiBar\(/.test(html) && /function renderOutSeg\(/.test(html) &&
+     /function reMerge\(/.test(html) && /function expandForAss\(/.test(html) &&
+     /function outAss\(/.test(html), '五个新函数齐备');
+  ok(/rawSrc/.test(html), '原始条目单独存一份（翻转双轨顺序要能从原件重来）');
+  ok(/S\.outFmt === 'ass'/.test(html) && /rewriteAss\(/.test(html), 'ASS 通道接上了 rewriteAss');
+  ok(/o\.bi = !!\(S\.bi && S\.bi\.bi\)/.test(html), '双语标记传给引擎（去重规则靠它避让）');
+  ok(/new Blob\(\[text\]/.test(html), '下载不再写 BOM（BOM 会让首条序号读不出来）');
+  /* 双语词条：清洗页只有中英两语，但漏一个照样静默回退 */
+  ['outFmt', 'outAssOff', 'outAssNote', 'biFound', 'biOrderSrc', 'biOrderTgt', 'biFlipSrc', 'biFlipTgt']
+    .forEach(function (k) {
+      const n = (html.match(new RegExp(k + ":\\s*'", 'g')) || []).length;
+      ok(n >= 2, '词条 ' + k + ' 中英两语都写了', n);
+    });
 }
 
 console.log('\n' + (F ? '✗ 失败 ' + F + ' / 通过 ' + P : '✓ 全部通过 ' + P) + '\n');

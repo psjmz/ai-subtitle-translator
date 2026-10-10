@@ -70,10 +70,14 @@
     if (!items.length) issues.push({ type: 'empty', at: 0, code: 'noBlocks' });
     return { items: items, issues: issues };
   }
+  /* v0.9.271：SRT 用 CRLF。SubRip 的规范行尾就是 \r\n，
+     Premiere、剪映、ArcTime 这类桌面软件对纯 LF 的字幕很敏感（轻则时间轴错位，
+     重则直接判成无法解析）。浏览器端一直没出问题，是因为它们宽容。 */
   function formatSrt(items) {
-    return items.map(function (it) {
-      return it.no + '\n' + fmtTime(it.start) + ' --> ' + fmtTime(it.end) + '\n' + it.text;
-    }).join('\n\n') + '\n';
+    return (items || []).map(function (it) {
+      const body = String(it.text == null ? '' : it.text).replace(/\r\n/g, '\n').replace(/\n/g, '\r\n');
+      return it.no + '\r\n' + fmtTime(it.start) + ' --> ' + fmtTime(it.end) + '\r\n' + body;
+    }).join('\r\n\r\n') + '\r\n';
   }
 
   // ---------------- VTT 解析（复制 + 简化：清洗器不需要保留 cue 样式） ----------------
@@ -116,7 +120,12 @@
     const text = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '');
     const DEF_FMT = ['layer', 'start', 'end', 'style', 'name', 'marginl', 'marginr', 'marginv', 'effect', 'text'];
     let inEvents = false, fmt = null;
-    text.split('\n').forEach(function (ln) {
+    /* v0.9.271：额外记下行号与 Style。
+       ⚠️ 行号是「导出 ASS」能原样写回的前提（Script Info / Styles 整段不动，
+          只替换 Dialogue 的 Text 列，被删的条目整行移除）。
+       ⚠️ Style 是判断双轨双语谁是谁的辅助信号（原文轨 / 译文轨通常 Style 不同）。 */
+    const srcLines = text.split('\n');
+    srcLines.forEach(function (ln, li) {
       const s = ln.trim();
       if (/^\[/.test(s)) { inEvents = /^\[events\]/i.test(s); return; }
       if (!inEvents || !s) return;
@@ -139,9 +148,89 @@
         .replace(/\\N/gi, '\n').replace(/\\h/gi, ' ')
         .replace(/[ \t]+\n/g, '\n').trim();
       if (!body) return;
-      items.push({ no: items.length + 1, start: st, end: en, text: body });
+      items.push({ no: items.length + 1, start: st, end: en, text: body,
+                   style: col('style'), srcIdx: li });
     });
     return { items: items, issues: items.length ? [] : [{ type: 'empty', at: 0, code: 'noBlocks' }] };
+  }
+
+  /* =====================================================================
+     v0.9.271：双轨双语识别
+     ---------------------------------------------------------------------
+     ASS 双语最常见的排法不是「一条里面用 \N 换行」，而是**两条 Dialogue**，
+     时间轴完全相同、靠 Style 区分（Default / CN 之类）。直接导出 SRT 会变成
+     两条时间轴一模一样的独立字幕 —— 播放器要么叠字，要么只认第一条，
+     双语直接变单语。所以必须在解析之后、清洗之前把它们并回一条。
+
+     ⚠️ 判据刻意保守，宁可漏也不能错并：
+        · 时间轴**完全相同**（不设容差 —— 相邻对白也可能只差几十毫秒）
+        · 且两条的语种不同（一条拉丁为主、一条 CJK 为主）
+        · 全文件统计：确认对 ≥3 对，或占同时间轴对的半数以上，才判定「这是双语文件」
+          （只出现一两对可能是注释轨或误排，不值得为此重构整份文件）
+     ===================================================================== */
+  function langOf(s) {
+    const str = String(s == null ? '' : s);
+    const cjk = (str.match(/[\u3400-\u4DBF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]/g) || []).length;
+    const lat = (str.match(/[A-Za-z]/g) || []).length;
+    if (!cjk && !lat) return '';          /* 纯数字 / 纯标点，判不出语种 */
+    if (cjk > lat) return 'cjk';
+    if (lat > cjk * 2) return 'lat';
+    return '';                            /* 混排且难分主次，不趟这浑水 */
+  }
+  function detectBilingual(items) {
+    const pairs = new Map();              /* firstIdx -> secondIdx */
+    const cand = [];
+    for (let i = 0; i < items.length - 1; i++) {
+      const a = items[i], b = items[i + 1];
+      if (a.start === b.start && a.end === b.end) cand.push(i);
+    }
+    let confirmed = 0;
+    cand.forEach(function (i) {
+      const la = langOf(items[i].text), lb = langOf(items[i + 1].text);
+      if (la && lb && la !== lb) confirmed++;
+    });
+    /* ⚠️ 一对都不放过会把「注释轨」「误排的两条」也并掉，所以门槛是：
+       确认对 ≥3 对，或「≥2 对且同时间轴的对**全部**都是双语」。
+       只出现 1 对时一律不并 —— 那更可能是注释而不是双语。 */
+    const bi = confirmed >= 3 || (confirmed >= 2 && confirmed === cand.length);
+    if (bi) {
+      cand.forEach(function (i) {
+        if (!pairs.has(i) && !pairs.has(i - 1)) pairs.set(i, i + 1);
+      });
+    }
+    /* 默认顺序：看第一条是译文还是原文。多数双语 ASS 是「原文在上」，
+       但也有先中后英的排法 —— 探测出来后照原样呈现，用户可一键翻转。 */
+    let firstIsCjk = 0, n = 0;
+    pairs.forEach(function (j, i) {
+      if (langOf(items[i].text) === 'cjk') firstIsCjk++;
+      n++;
+    });
+    return { bi: bi, pairs: pairs, confirmed: confirmed, total: cand.length,
+             tgtFirst: n > 0 && firstIsCjk / n >= 0.5 };
+  }
+  /* 把双轨合并成单条双语。flip = 把两条的顺序倒过来。
+     ⚠️ 按原顺序遍历，不能「先输出合并对、再输出其余」——那样整份字幕的顺序会乱。 */
+  function mergeBilingual(items, pairs, flip) {
+    if (!pairs || !pairs.size) return items;
+    const out = [], used = new Set();
+    for (let i = 0; i < items.length; i++) {
+      if (used.has(i)) continue;
+      const j = pairs.get(i);
+      if (j === undefined) { out.push(items[i]); continue; }
+      const a = items[i], b = items[j];
+      /* ⚠️ flip 只换文本的上下顺序，**不换两条轨道的行号**。
+         理由：ASS 里一条 Dialogue 的显示位置由它自己的 MarginV 决定（Style 管不了位置），
+         翻转的语义是「让译文出现在上面」—— 那就得把译文写进**位置在上的那条轨道**。
+         行号一动，译文又回到下面去了，flip 等于白点。
+         字体跟着语言走，靠 setStyle 解决（见 expandForAss / rewriteAss）。 */
+      out.push({
+        no: 0, start: a.start, end: a.end,
+        text: flip ? (b.text + '\n' + a.text) : (a.text + '\n' + b.text),
+        bi: true, flip: !!flip, srcIdx: a.srcIdx, srcIdxB: b.srcIdx
+      });
+      used.add(i); used.add(j);
+    }
+    return out;
   }
 
   function formatTxt(items) {
@@ -150,9 +239,52 @@
   /* v0.9.258：VTT 导出。清洗不产出样式（STYLE 块 / cue settings 一概不写）——
      样式是特效页的活，这边只把干净的文本按 WebVTT 骨架吐出来。 */
   function formatVtt(items) {
-    return 'WEBVTT\n\n' + (items || []).map(function (it) {
-      return it.no + '\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + '\n' + it.text;
-    }).join('\n\n') + '\n';
+    return 'WEBVTT\r\n\r\n' + (items || []).map(function (it) {
+      const body = String(it.text == null ? '' : it.text).replace(/\r\n/g, '\n').replace(/\n/g, '\r\n');
+      return it.no + '\r\n' + fmtTimeVtt(it.start) + ' --> ' + fmtTimeVtt(it.end) + '\r\n' + body;
+    }).join('\r\n\r\n') + '\r\n';
+  }
+
+  /* v0.9.271：ASS 输出 —— 把清洗后的文本写回原来的 Dialogue 行，
+     其余段落（Script Info / V4+ Styles / Format）一字不动。
+     ⚠️ 这样用户拿回的是**自己的文件**：分辨率、字体、样式、位置全在，只有文本被换掉。
+        此前 ASS 进来一律降级成 SRT，样式全丢，等于换了个文件给他。
+     ⚠️ 换行必须转回 \N（ASS 的换行记号）。直接写 \n 会把一条 Dialogue 拆成两行，
+        ASS 解析器会把第二行当成垃圾，整条字幕错位。
+     ⚠️ items 里的 srcIdx 指向源文件里那条 Dialogue 的行号；dropIdx 里的行号整行移除
+        （被清洗规则删掉的条目、以及被合并掉的第二条轨道）。 */
+  function rewriteAss(src, items, dropIdx) {
+    const lines = String(src == null ? '' : src).replace(/^\uFEFF/, '').replace(/\r/g, '').split('\n');
+    const DEF_FMT = ['layer', 'start', 'end', 'style', 'name', 'marginl', 'marginr', 'marginv', 'effect', 'text'];
+    const keep = new Map();
+    (items || []).forEach(function (it) { if (it.srcIdx != null) keep.set(it.srcIdx, it); });
+    const drop = dropIdx || new Set();
+    const out = [];
+    let inEvents = false, fmt = null;
+    lines.forEach(function (ln, li) {
+      const s = ln.trim();
+      if (/^\[/.test(s)) { inEvents = /^\[events\]/i.test(s); out.push(ln); return; }
+      if (inEvents && /^format\s*:/i.test(s)) {
+        fmt = s.slice(s.indexOf(':') + 1).split(',').map(function (x) { return x.trim().toLowerCase(); });
+        out.push(ln); return;
+      }
+      if (!(inEvents && /^dialogue\s*:/i.test(s))) { out.push(ln); return; }
+      if (drop.has(li)) return;                    /* 被清洗掉 / 被合并掉的：整行不输出 */
+      const it = keep.get(li);
+      if (!it) { out.push(ln); return; }           /* 没被任何规则改到：原样保留 */
+      const cols = fmt || DEF_FMT;
+      const raw = s.slice(s.indexOf(':') + 1).trim().split(',');
+      const head = raw.slice(0, cols.length - 1);
+      /* ⚠️ 这里**不改 Style 列**。翻转双轨时只换文本、不换样式，是刻意的选择：
+         ASS 里一条 Dialogue 显示在上面还是下面，由它 Style 的 MarginV 决定
+         （行内 MarginV 为 0 时样式说了算）。把 Style 也换掉，MarginV 跟着走，
+         译文又被送回下面去了 —— 用户点了「译文在上」却什么都没变。
+         代价是译文可能用英文字体渲染（系统会回退到默认中文字体，不乱码），
+         换位置正确来换字体正确，值。 */
+      const txt = String(it.text == null ? '' : it.text).replace(/\r/g, '').replace(/\n/g, '\\N');
+      out.push(ln.slice(0, ln.indexOf(':') + 1) + ' ' + head.join(',') + ',' + txt);
+    });
+    return out.join('\r\n') + '\r\n';
   }
 
   /* =====================================================================
@@ -297,8 +429,13 @@
       if (o.sdh)     t = stripSdh(t);
       if (o.speaker) t = stripSpeaker(t);
       if (o.wm) {
-        if (isWmCue(t)) t = '';
-        else { const n = stripWmLines(t); if (n !== t) t = n; }
+        /* v0.9.271：改成「先按行剥，剥完还有水印痕迹才整条删」。
+           旧逻辑是整条命中就清空 —— 双语条目里只要译文那行带个署名，
+           整条连正片对白一起没了（实测 "What time is it?\N本字幕由XX提供" → 空）。
+           按行剥之后：对白那行留下，只有署名行被删。 */
+        const n = stripWmLines(t);
+        if (n !== t) t = n;
+        if (t.replace(/\s/g, '') && isWmCue(t)) t = '';
       }
       if (o.punct) t = tidyPunct(t);
       if (o.upper) t = fixUpper(t);
@@ -321,7 +458,11 @@
         const n = steps[k][1](probe);
         if (n !== probe) { tags.push(steps[k][0]); probe = n; }
       }
-      if (o.wm && (isWmCue(probe) || stripWmLines(probe) !== probe)) tags.push('wm');
+      if (o.wm) {
+        const n = stripWmLines(probe);
+        if (n !== probe) { tags.push('wm'); probe = n; }
+        else if (isWmCue(probe)) tags.push('wm');
+      }
       if (o.punct) { const n = tidyPunct(probe); if (n !== probe) { tags.push('punct'); probe = n; } }
       if (o.upper) { const n = fixUpper(probe); if (n !== probe) { tags.push('upper'); probe = n; } }
       ch.tags = tags.length ? tags : ['punct'];
@@ -353,7 +494,12 @@
       for (let i = 0; i < cur.length; i++) {
         if (cur[i].del) continue;
         const key = cur[i].start + '|' + cur[i].end + '|' + cur[i].text;
-        if (seen.has(key)) {
+        const prev = seen.get(key);
+        if (prev !== undefined) {
+          /* v0.9.271：双语文件里，时间轴相同的两条是**两条轨道**，不是重复。
+             原文与译文恰好都是「2024」「OK」这类纯数字 / 纯字母时，
+             旧逻辑会把译文当重复项删掉 —— 实测 2024/2024 第二条直接消失。 */
+          if (o.bi && cur[i].start === cur[prev].start && cur[i].end === cur[prev].end) continue;
           const ch = chFor(i);
           ch.del = true;
           if (ch.tags.indexOf('dup') < 0) ch.tags.push('dup');
@@ -372,6 +518,11 @@
         const joined = a.text.trim() + '\n' + b.text.trim();
         const ca = chFor(i);
         ca.after = joined;
+        /* v0.9.271：change 必须带上合并后的时间轴。此前只改了内部副本 a.end，
+           change 里没有这个字段，页面 resolve() 读的是 S.raw[i].end（合并前的旧值）
+           → 导出那条字幕的尾巴被生生截掉一截。 */
+        ca.start = a.start;
+        ca.end = Math.max(a.end, b.end);
         if (ca.tags.indexOf('merge') < 0) ca.tags.push('merge');
         const cb = chFor(i + 1);
         cb.del = true;
@@ -420,10 +571,11 @@
 
   return {
     parseTime, fmtTime, fmtTimeVtt, renumber,
-    parseSrt, formatSrt, parseVtt, formatVtt, parseAss, formatTxt,
+    parseSrt, formatSrt, parseVtt, formatVtt, parseAss, formatTxt, rewriteAss,
     stripAssFx, stripHtml, stripCtrl, stripSdh, stripSpeaker,
     isMusicCue, isWmCue, stripWmLines, tidyPunct, fixUpper,
     clean, decodeBuf,
+    langOf, detectBilingual, mergeBilingual,
     SOUND_HINTS
   };
 });
