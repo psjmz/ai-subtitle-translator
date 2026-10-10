@@ -316,7 +316,7 @@ console.log('\n— v0.9.271：页面契约 —');
 {
   const fs = require('fs');
   const html = fs.readFileSync(__dirname + '/clean.html', 'utf8');
-  ok(/clean-core\.js\?v=0\.9\.271/.test(html), 'clean.html 版号已升 271');
+  ok(/clean-core\.js\?v=0\.9\.272/.test(html), 'clean.html 版号已升 272');
   ['biBar', 'biTxt', 'biFlip', 'outSeg', 'outNote'].forEach(function (id) {
     ok(html.indexOf('id="' + id + '"') > 0, '页面有 #' + id);
   });

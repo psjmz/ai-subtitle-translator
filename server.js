@@ -452,11 +452,17 @@ const MEVENTS_PATH = path.join(DATA_DIR, 'merge-events.json');
 const MEVENTS_MAX = 2000;
 /* 导出格式白名单：与 merge.html 的 expExt() 一致（vtt-styled 已归一为 vtt） */
 const MERGE_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass' };
-/* 模板白名单：ASS 三档 + VTT 四档 + 两档「无模板」（SRT、无样式 VTT） */
+/* 模板白名单：ASS 六档 + VTT 七档 + 单语四档 + 两档「无模板」（SRT、无样式 VTT）
+   ⚠️ v0.9.272：双语各补三套后，新档不在名单里的话后台会记成空值（等于「用户用了新模板但看不见」），
+      加模板时必须同步这里。 */
 const MERGE_TPL = {
   'srt': 'srt', 'vtt': 'vtt',
   'ass-split': 'ass-split', 'ass-stack': 'ass-stack', 'ass-custom': 'ass-custom',
-  'vtt-std': 'vtt-std', 'vtt-compact': 'vtt-compact', 'vtt-cinema': 'vtt-cinema', 'vtt-custom': 'vtt-custom'
+  'ass-cinema': 'ass-cinema', 'ass-a11y': 'ass-a11y', 'ass-social': 'ass-social',
+  'vtt-std': 'vtt-std', 'vtt-compact': 'vtt-compact', 'vtt-cinema': 'vtt-cinema', 'vtt-custom': 'vtt-custom',
+  'vtt-top': 'vtt-top', 'vtt-a11y': 'vtt-a11y', 'vtt-social': 'vtt-social',
+  'vtt-m-stream': 'vtt-m-stream', 'vtt-m-a11y': 'vtt-m-a11y',
+  'vtt-m-cinema': 'vtt-m-cinema', 'vtt-m-social': 'vtt-m-social'
 };
 /* 合并页三种模式：merge=两份字幕合并；adjust=一份双语字幕拆原文/译文；
    mono=单语字幕直接加特效（v0.9.245 新增，不配对不拆分） */

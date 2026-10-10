@@ -5349,7 +5349,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.271/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.272/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5389,9 +5389,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.271</.test(html), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.271</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.271/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.272</.test(html), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.272</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.272/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5568,8 +5568,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.271</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.271/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.272</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.272/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7084,12 +7084,20 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
        （它们现在归各自的样式面板），否则用户又看到一排分不清层级的按钮。 */
     ['split','stack','custom','vttStyle'].forEach(g =>
       assert.ok(list.indexOf("['" + g + "'") < 0, '顶层格式卡混进了模板档位 ' + g));
-    /* ASS 面板的三个模板按钮 = 原来的三档，一个不少 */
-    assert.ok(/const ASS_SEGS = \[\['split','assTplSplit'\],\['stack','assTplStack'\],\['custom','assTplCustom'\]\]/.test(mg),
-      'ASS 面板缺模板按钮定义');
-    /* VTT 面板的三个模板按钮 = 三套预设（「自定义」单独标记成状态键） */
-    assert.ok(/const MVTT_SEGS = \[\['std','vttTplStd'\],\['compact','vttTplCompact'\],\['cinema','vttTplCinema'\],\['custom','vttTplCustom'\]\]/.test(mg),
-      'WebVTT 面板缺模板按钮定义');
+    /* ASS 面板的模板按钮 = 全部档位，一个不少
+       （v0.9.272：双语 ASS 从 3 档扩到 6 档，逐个列举会漏，改成查表） */
+    const asg = /const ASS_SEGS = (\[[\s\S]*?\]);/.exec(mg);
+    assert.ok(asg, '缺 ASS_SEGS');
+    [['split','assTplSplit'],['stack','assTplStack'],['cinema','assTplCinema'],
+     ['a11y','assTplA11y'],['social','assTplSocial'],['custom','assTplCustom']].forEach(p =>
+      assert.ok(asg[1].indexOf("['" + p[0] + "','" + p[1] + "']") >= 0, 'ASS 面板缺模板按钮 ' + p[0]));
+    /* VTT 面板的模板按钮 = 六套预设 + 自定义（「自定义」单独标记成状态键） */
+    const vsg = /const MVTT_SEGS = (\[[\s\S]*?\]);/.exec(mg);
+    assert.ok(vsg, '缺 MVTT_SEGS');
+    [['std','vttTplStd'],['compact','vttTplCompact'],['cinema','vttTplCinema'],
+     ['top','vttTplTop'],['a11y','vttTplA11y'],['social','vttTplSocial'],
+     ['custom','vttTplCustom']].forEach(p =>
+      assert.ok(vsg[1].indexOf("['" + p[0] + "','" + p[1] + "']") >= 0, 'WebVTT 面板缺模板按钮 ' + p[0]));
     /* v0.9.242：「自定义」改成**常驻**的一档（ASS 那边三个键一直都在，两边得一致；
        藏起来用户会以为只有三种模板，而且它是能点的：点了不重置任何值）。
        判据：① 渲染时带 data-custom="1" 但**不带** hidden；② 没有任何代码再去改它的 hidden。 */
@@ -7338,8 +7346,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const st = mg.slice(mg.indexOf('function setAssTpl(v){'), mg.indexOf('function renderTplSegs(){'));
     /* v0.9.243：两个预设档也必须同步 —— 方案 schemeFields 的 __layout 直接读这个 radio，
        「点分屏 → 存方案」不同步就会把布局记成上一次的（套回去位置就错）。 */
-    assert.ok(/setAssLayoutRadio\(v === 'custom' \? \(sel\.value === 'stack' \? 'stack' : 'split'\) : v\)/.test(st),
-      '切模板必须同步布局：custom 沿用跳转前那个，两个预设档直接定');
+    /* v0.9.272：档位从 2 个预设扩到 5 个，不能再写死 `: v` 之外的逐个列举 ——
+       新加的 cinema / a11y / social 布局都是「双行」，靠 ASS_STACK_TPLS 一张表判。 */
+    assert.ok(/setAssLayoutRadio\(v === 'custom' \? \(sel\.value === 'stack' \? 'stack' : 'split'\)[\s\S]{0,120}ASS_STACK_TPLS\.indexOf\(v\) >= 0 \? 'stack' : 'split'/.test(st),
+      '切模板必须同步布局：custom 沿用跳转前那个，其余档按 ASS_STACK_TPLS 定');
+    assert.ok(/const ASS_STACK_TPLS = \['stack', 'cinema', 'a11y', 'social'\]/.test(mg),
+      '缺「哪几档是双行布局」的登记表（漏登记的新档会被当成分屏）');
   });
 
   t('v0.9.242：手改任一 ASS 参数 → 落「自定义」，布局沿用且值不动', () => {
@@ -7352,8 +7364,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/applyTplDefaults/.test(mk), '手改绝不能顺带套预设（那会冲掉用户的值）');
     assert.ok(!/dispatchEvent/.test(mk), '手改只换档位标记，不该再派发 change 走一遍切模板流程');
     assert.ok(!/applyTplDefaults/.test(mk), '（紧邻校验）手改函数体内绝不能出现套预设');
-    assert.ok(/setAssLayoutRadio\(sel\.value === 'stack' \? 'stack' : 'split'\)/.test(mk),
-      '跳自定义时布局没沿用当前档位');
+    assert.ok(/setAssLayoutRadio\(ASS_STACK_TPLS\.indexOf\(sel\.value\) >= 0 \? 'stack' : 'split'\)/.test(mk),
+      '跳自定义时布局没沿用当前档位（v0.9.272：三套双行皮肤也得沿用 stack）');
     /* 每个 ASS 字段都得挂上监听，漏一个就是「改了某项却不进自定义」 */
     assert.ok(/ASS_DEFAULTS\.forEach\(pair=>\{[\s\S]{0,200}markAssEdited\(\)/.test(mg),
       'ASS 字段没接上「手改 → 跳自定义」的监听');
@@ -7398,11 +7410,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.271/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.271/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.271/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.271/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.271/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.272/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.272/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.272/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.272/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.272/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8136,8 +8148,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/setPvView\('slot'\);\n    if \(window\.matchMedia && window\.matchMedia\('\(max-width:1180px\)'\)\.matches\)\{/.test(mg),
       '窄屏点了「在预览里看这个槽」没滚到画面');
     /* SRT / 无样式 VTT 不带样式信息 —— 必须说清楚，不能给用户留一块黑屏 */
-    assert.ok(/function pvUsable\(\)\{[\s\S]{0,120}return \(f === 'ass-split' \|\| f === 'ass-stack' \|\| f === 'vtt-styled'\)/.test(mg),
-      '判「有没有画面可画」只认带样式的三种格式');
+    /* v0.9.272：ASS 档位从 3 个扩到 6 个，判据收进 isAssOut(f)，不许再逐个列举 */
+    assert.ok(/function pvUsable\(\)\{[\s\S]{0,120}return \(isAssOut\(f\) \|\| f === 'vtt-styled'\)/.test(mg),
+      '判「有没有画面可画」只认带样式的格式（ASS 走 isAssOut）');
     assert.ok(/id="pvNone"/.test(mg) && /t\('slotPvNone'\)/.test(mg), '无画面的格式没有说明');
     /* 整栏一起收：还按老办法只 toggle #exp，预览卡会留一块空的 480px */
     assert.ok(/function railOn\(on\)\{ const r = \$\('rail'\); if \(r\) r\.classList\.toggle\('on', !!on\); \}/.test(mg), '缺整栏收放');
@@ -8572,8 +8585,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/\$\('mVttPanelTitle'\), mono \? 'vttPanelTitleMono'/.test(mg), 'VTT 面板标题在单语下仍写「双语样式」');
     /* ③ 模板显示名：预览角标 / 导出摘要都读 vttPresetLabel()，单语下要把「双语」换成「双行」 */
     assert.ok(/\$\('mVttOptStd'\), mono \? 'vttPresetStdMono'/.test(mg), '模板下拉里的「底部双语」没跟着换');
-    assert.ok(/const stdKey = monoMode\(\) \? 'vttPresetStdMono'/.test(mg), 'vttPresetLabel 不认单语（角标与导出摘要会继续写「双语」）');
-    assert.ok(/const stdTip = monoMode\(\) \? 'vttTipStdMono'/.test(mg), 'ⓘ 说明里那句「金色原文」在单语下没换');
+    assert.ok(/if \(k0 === 'std'\) return t\(monoMode\(\) \? 'vttPresetStdMono' : 'vttPresetStd'\);/.test(mg), 'vttPresetLabel 不认单语（角标与导出摘要会继续写「双语」）');
+    assert.ok(/if \(k === 'std' && monoMode\(\)\)\{ setTip\('mVttPresetHint', t\('vttTipStdMono'\), true\); return; \}/.test(mg), 'ⓘ 说明里那句「金色原文」在单语下没换');
     /* 只收起不删除：一律 display:none / 换键，不删 DOM、不动值 —— 切回双语原样回来 */
     const fn0 = mg.indexOf('function syncMonoChrome(){');
     const fn1 = mg.indexOf('\nfunction ', fn0 + 10);
@@ -8706,8 +8719,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       assert.ok(mg.indexOf('value="' + k + '"') >= 0, 'select 里缺单语档 ' + k + '（vttPresetKey 设不进去）');
       assert.ok(mg.indexOf("'" + k + "': { mVttLine") >= 0, 'MVTT_PRESETS 里缺 ' + k);
     });
-    /* ⚠️ 双语那三套必须还在 —— 一个都不许被替换掉 */
-    ['std: { mVttLine','compact: { mVttLine','cinema: { mVttLine'].forEach(k => {
+    /* ⚠️ 双语那几套必须还在 —— 一个都不许被替换掉（v0.9.272 起是 6 套） */
+    ['std: { mVttLine','compact: { mVttLine','cinema: { mVttLine',
+     'top: { mVttLine','a11y: { mVttLine','social: { mVttLine'].forEach(k => {
       assert.ok(mg.indexOf('  ' + k) >= 0, '双语模板 ' + k.slice(0, 7) + ' 被删了');
     });
     /* 单语预设不许写 mVttSrc*（单语没有原文行，写了会冲掉双语的原文参数） */
@@ -8715,7 +8729,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(mp.indexOf('mVttSrc') < 0, '单语 VTT 预设里出现了 mVttSrc 字段');
     assert.ok(/const segs = monoMode\(\) \? MONO_MVTT_SEGS : MVTT_SEGS;/.test(mg), 'VTT 模板按钮排没跟着单语切换');
     /* 双语档位在单语下归一显示（但不改 select 的值 —— 切回双语要能原样认出来） */
-    assert.ok(/if \(monoMode\(\) && String\(k\)\.indexOf\('m-'\) !== 0\)\{\s*\n\s*k = \(k === 'std'\) \? 'm-stream' : /.test(mg),
+    assert.ok(/if \(monoMode\(\) && String\(k\)\.indexOf\('m-'\) !== 0\)\{[\s\S]{0,180}k = \(k === 'std'\) \? 'm-stream' : /.test(mg),
       '双语档位在单语下没归一');
     assert.ok(/if \(String\(k0\)\.indexOf\('m-'\) === 0\) return mvttSegName\(k0\);/.test(mg), '模板名没跟着单语档走');
     /* 切模式必须重绘两排按钮，否则点的是上一个模式那几个 */
@@ -8737,11 +8751,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
          ③ 导出摘要跟着串成「流媒体标准 · VTT」
        更隐蔽的一条：mVttSrc* 是双语原文行的值，m-* 预设一个都不写 ——
        双语下若按 'm-stream' 套模板，原文行样式会被静默落到「沿用」。 */
-    assert.ok(/const VTT_MONO_TO_BI = \{'m-stream':'std', 'm-cinema':'cinema'\};/.test(mg),
-      '缺等价折算表（m-stream → std / m-cinema → cinema）');
-    /* m-a11y / m-social 在双语里没有等价物（双语每档都为原文行预留了值）→ 落「自定义」，不许冒充标准档。
+    /* v0.9.272：双语补出 a11y / social 后，它们与 m-a11y / m-social 主行参数逐字相同 → 有等价物了 */
+    assert.ok(/const VTT_MONO_TO_BI = \{'m-stream':'std', 'm-cinema':'cinema', 'm-a11y':'a11y', 'm-social':'social'\};/.test(mg),
+      '缺等价折算表（m-stream → std / m-cinema → cinema / m-a11y → a11y / m-social → social）');
+    /* 「紧凑」在单语那四套里没有等价物 → 落「自定义」，不许冒充标准档。
        ⚠️ 刻意不做「记住来路、原样还回去」：点了单语模板后值就已经被填过，挂回原档名等于指鹿为马。 */
-    assert.ok(/const VTT_BI_KEYS = \['std', 'compact', 'cinema', 'custom'\];/.test(mg), '缺双语合法档位清单');
+    assert.ok(/const VTT_BI_KEYS = \['std', 'compact', 'cinema', 'top', 'a11y', 'social', 'custom'\];/.test(mg), '缺双语合法档位清单');
     assert.ok(/function biVttKeyOf\(k\)\{[\s\S]{0,400}return VTT_BI_KEYS\.indexOf\(v\) >= 0 \? v : 'std';/.test(mg),
       '折算函数没有兜底（可能写出 select 里不存在的档位）');
     /* 切模式时真正写回 select（不只是显示层折算） */
@@ -8839,7 +8854,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/function msToStr\(ms\)\{/.test(mg) && /function strToMs\(str\)\{/.test(mg), '缺时间互转函数');
     assert.ok(/padStart\(3, '0'\)/.test(mg), '毫秒没补成 3 位（会拼出 00:00:01,5 这种）');
     const cm = mg.slice(mg.indexOf('function commitEdit(td, i, f){'), mg.indexOf('function cancelEdit('));
-    assert.ok(/const ms = strToMs\(v\);\s*\n\s*if \(ms == null\)\{ bad = true; return; \}/.test(cm),
+    /* v0.9.272：改成 fxParseTc(v, r[key])（多认 +1.5s / -500 这类相对值），
+       但「认不出来就整格拒绝」这条底线没变。 */
+    assert.ok(/const ms = fxParseTc\(v, r\[key\]\);\s*\n\s*if \(ms == null\)\{ bad = true; return; \}/.test(cm),
       '非法时间没被拒绝（会把 NaN 写进 rows，导出就废了）');
     assert.ok(/toast\(t\('edBadTime'\)\)/.test(cm), '非法时间没给提示');
     /* 文本格：回车保存 / Shift+回车换行 */
@@ -8897,14 +8914,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.271/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.271/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.272/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.272/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.271/.test(html), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.271/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.271/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.272/.test(html), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.272/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.272/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.271/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.272/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9021,13 +9038,124 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
   });
 
-  t('v0.9.270：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.271/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.271/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.271/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.271/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.271/.test(mg), 'merge.html 缓存 bust 没跟上');
+  t('v0.9.272：双语 ASS 模板 2 → 5 套（+ 影院 / 无障碍 / 竖屏）', () => {
+    /* 由来：双语这边只有「分屏 / 底部双行」两套，比单语的四套还少 ——
+       做竖屏、做无障碍、做影院质感的用户在双语页没有落点，只能手调十几个参数。 */
+    ['cinema', 'a11y', 'social'].forEach(k => {
+      assert.ok(mg.indexOf('  ' + k + ': {') >= 0 && mg.indexOf("assDstSize:'") > 0, 'TPL_DEFAULTS 缺 ' + k);
+      assert.ok(mg.indexOf('<option value="' + k + '"') >= 0, '导出模板 select 缺 ' + k);
+      assert.ok(mg.indexOf("if (tpl === '" + k + "') return 'ass-" + k + "';") >= 0, 'expFmtVal 没给 ' + k + ' 单独档位码');
+      assert.ok(mg.indexOf("if (tpl === '" + k + "') return 'ass-" + k + "';") >= 0, 'expTplKey 没给 ' + k + ' 单独键（后台分不清谁在用）');
+    });
+    /* ⚠️ 关键：新档必须在「双行布局」名单里登记，漏一个原文行就跑到画面顶上去了 */
+    assert.ok(/const ASS_STACK_TPLS = \['stack', 'cinema', 'a11y', 'social'\];/.test(mg), '缺双行布局登记表');
+    /* 判断「是不是 ASS 输出 / 是不是双行」收成函数，不许再逐个列举档位 */
+    assert.ok(/function isAssOut\(f\)\{/.test(mg), '缺 isAssOut');
+    assert.ok(/function assStackedOut\(f\)\{/.test(mg), '缺 assStackedOut');
+    ['ass-cinema', 'ass-a11y', 'ass-social'].forEach(k =>
+      assert.ok(mg.indexOf("f === '" + k + "'") >= 0 || mg.indexOf("'" + k + "'") >= 0, 'isAssOut 没认 ' + k));
+    /* 导出判断全走 isAssOut（留一处写死 `f === 'ass-stack'` 就是新模板整块失效）
+       ⚠️ 不能只搜 `'ass-stack'` —— isAssOut 自己的函数体里也有，那是唯一该写死的地方。 */
+    assert.ok(/if \(isAssOut\(fmt\)\)/.test(mg), '导出分支没走 isAssOut');
+    assert.ok(/const isAss = isAssOut\(fmt\);/.test(mg), 'isAss 判断没走 isAssOut');
+    assert.ok(/return \(isAssOut\(f\) \|\| f === 'vtt-styled'\)/.test(mg), 'pvUsable 没走 isAssOut');
+    assert.ok(/const stacked = assStackedOut\(fmt\);/.test(mg), '双行布局判断没走 assStackedOut');
+    /* 预览角标用短名（长名是整句「ASS 影院双行 · 默认模板，可微调 (.ass)」，当标签太长） */
+    assert.ok(/const ASS_OUT_NAME = \{/.test(mg) && /function biAssTplName\(f\)\{/.test(mg), '预览角标没走短名表');
+    /* 四语齐全：漏一种语言，那一档按钮就是空格 */
+    ['assTplCinema', 'assTplA11y', 'assTplSocial', 'tplCinema', 'tplA11y', 'tplSocial'].forEach(k => {
+      const c = (mg.match(new RegExp('\\b' + k + ':', 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
+  });
+
+  t('v0.9.272：双语 VTT 模板 3 → 6 套（+ 顶部 / 无障碍 / 竖屏）', () => {
+    ['top', 'a11y', 'social'].forEach(k => {
+      assert.ok(mg.indexOf('  ' + k + ': { mVttLine') >= 0, 'MVTT_PRESETS 缺 ' + k);
+      assert.ok(mg.indexOf('value="' + k + '"') >= 0, 'select 里缺档位 ' + k);
+      assert.ok(mg.indexOf("['" + k + "','vttTpl") >= 0, 'MVTT_SEGS 缺按钮 ' + k);
+    });
+    /* 双语预设必须写原文行那一层（mVttSrc*）—— 单语那四套才不写 */
+    const bip = mg.slice(mg.indexOf('  top: { mVttLine'), mg.indexOf("  'm-stream': { mVttLine"));
+    assert.ok(bip.indexOf('mVttSrcColorMode') >= 0, '双语 VTT 预设没写原文行那一层');
+    /* 档位多了，说明与显示名改查表（逐个三元判断会漏） */
+    assert.ok(/const BI_VTT_TIPS = \{/.test(mg) && /const BI_VTT_NAMES = \{/.test(mg), 'VTT 说明 / 显示名没改成查表');
+    /* 单语 ↔ 双语折算：补出 a11y / social 后这两档有等价物了，不该再掉进「自定义」 */
+    assert.ok(mg.indexOf("'m-a11y':'a11y', 'm-social':'social'") >= 0, 'm-a11y / m-social 没折算回双语档');
+    ['vttTplTop', 'vttTplA11y', 'vttTplSocial', 'vttPresetTop', 'vttPresetA11y', 'vttPresetSocial',
+     'vttTipTop', 'vttTipA11y', 'vttTipSocial'].forEach(k => {
+      const c = (mg.match(new RegExp('\\b' + k + ':', 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
+    /* 后台白名单也要同步：不在名单里 → 上报值被静默丢弃（等于「用了新模板但看不见」） */
+    const srv = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    ['ass-cinema', 'ass-a11y', 'ass-social', 'vtt-top', 'vtt-a11y', 'vtt-social'].forEach(k =>
+      assert.ok(srv.indexOf("'" + k + "':") >= 0, 'server.js 的 MERGE_TPL 缺 ' + k));
+  });
+
+  t('v0.9.272：特效页时间轴四件套（精修 / 吸附 / 批量 / 体检）', () => {
+    /* ⚠️ 另写一份，不去复用首页那套：首页绑 .cuegrid + S.srcItems + C.validateItems，
+       本页是 <table> + S.rows（下标定位）+ C.checkTimeline，硬凑会把首页一起牵动。 */
+    ['function fxParseTc(', 'function fxOvOf(', 'function fxOvHtml(', 'function fxOvFix(',
+     'function fxShift(', 'function fxScale(', 'function fxIssues(', 'function fxFix(',
+     'function fxAsk(', 'function fxBindTc('].forEach(f =>
+      assert.ok(mg.indexOf(f) >= 0, '缺 ' + f));
+    assert.ok(/id="fxTcBar"/.test(mg), '缺时间轴工具条');
+    ['fxTcShiftAll', 'fxTcShiftFrom', 'fxTcScale', 'fxTcCheck'].forEach(id =>
+      assert.ok(mg.indexOf('id="' + id + '"') >= 0, '缺按钮 ' + id));
+    assert.ok(/fxBindTc\(\);/.test(mg), '时间轴事件委托没绑（renderReport 每次重建 tbody，逐个绑会泄漏）');
+    /* ① 精修：相对值 —— 这是本版新认的写法，行为直接跑一遍（只查源码看不出对错） */
+    const fxSrc = mg.slice(mg.indexOf('function fxParseTc(v, base){'), mg.indexOf('function fxTcBarShow()'));
+    const strSrc = mg.slice(mg.indexOf('function strToMs(str){'), mg.indexOf('function editedCount()'));
+    const strToMs = new Function(strSrc + '\nreturn strToMs;')();
+    const fxParseTc = new Function('strToMs', fxSrc + '\nreturn fxParseTc;')(strToMs);
+    assert.strictEqual(fxParseTc('+1.5s', 1000), 2500, '+1.5s 没被认成 +1500ms');
+    assert.strictEqual(fxParseTc('-500', 2000), 1500, '-500 没被认成 -500ms');
+    assert.strictEqual(fxParseTc('+2m', 0), 120000, '+2m 没被认成 +120000ms');
+    assert.strictEqual(fxParseTc('00:00:02,500', 999), 2500, '绝对写法没沿用 strToMs');
+    assert.strictEqual(fxParseTc('乱写', 0), null, '认不出来必须返回 null（否则 NaN 进 rows，导出就废了）');
+    /* ② 吸附：改完时间轴当场查邻居，三选摊在这一行下面 */
+    assert.ok(/FX_OV = \(f === 'tm'\) \? fxOvOf\(i\) : -1;/.test(mg), '改完时间没查邻居');
+    assert.ok(/data-ov="snap"/.test(mg) && /data-ov="push"/.test(mg) && /data-ov="keep"/.test(mg), '三选缺一项');
+    assert.ok(/\+ \(FX_OV === i \? fxOvHtml\(i\) : ''\)/.test(mg), '三选条没跟着行渲染');
+    /* ③ 批量：缩放必须连时长一起缩（只挪起点会让每条悄悄变短 / 变长） */
+    const scSrc = mg.slice(mg.indexOf('function fxScale(t1, t2){'), mg.indexOf('/* ---------- ④'));
+    assert.ok(/const d = Math\.max\(1, Math\.round\(\(\(Number\(r\.end\) \|\| 0\) - \(Number\(r\.start\) \|\| 0\)\) \* k\)\);/.test(scSrc),
+      '缩放没连时长一起缩');
+    assert.ok(/r\.end = r\.start \+ d;/.test(scSrc), '缩放没按新时长重算结束时间');
+    /* ④ 体检：只动「轴本身站不住」的三类，顺序不能换（先解重叠再补时长），补完要顺推 */
+    const fxSrc2 = mg.slice(mg.indexOf('function fxFix(){'), mg.indexOf('/* 带输入框的小弹窗'));
+    assert.ok(fxSrc2.indexOf('rows[i].start < 0') >= 0, '一键修没处理负起点');
+    assert.ok(fxSrc2.indexOf('r.start < pv.end - 1') >= 0, '一键修没解重叠');
+    assert.ok(fxSrc2.indexOf('(r.end - r.start) < FX_MIN_DUR') >= 0, '一键修没补最短时长');
+    assert.ok(fxSrc2.indexOf('if (nx && r.end > nx.start){ pushFrom(i + 1, r.end - nx.start); n++; }') >= 0,
+      '补完时长没顺推后续（改完立刻又是一条新的重叠）');
+    assert.ok(fxSrc2.indexOf('CPS') < 0, '一键修不许碰 CPS（那要改的是文案，不是轴）');
+    /* 单语口径与 renderReport 一致：不许把「缺原文 / 缺译文」报出来 */
+    assert.ok(/if \(monoMode\(\)\) iss = iss\.filter\(x => x\.kind !== 'no-src' && x\.kind !== 'no-dst' && x\.kind !== 'empty'\);/.test(mg),
+      '体检在单语下会整片误报');
+    /* 四语齐全 */
+    ['tcTitle', 'tcShiftAll', 'tcShiftFrom', 'tcScale', 'tcCheck', 'tcAskMs', 'tcAskFrom', 'tcAskCur',
+     'tcScaleHint', 'tcOk', 'tcFix', 'tcFixed', 'tcOvTitle', 'tcSnapPrev', 'tcSnapNext', 'tcPushNext',
+     'tcKeepOv', 'tcCancel', 'tcApply', 'tcRelHint'].forEach(k => {
+      const c = (mg.match(new RegExp('\\b' + k + ':', 'g')) || []).length;
+      assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c);
+    });
+    /* 带条数的必须有 {0} 占位 */
+    ['tcFixed', 'tcAskCur', 'tcOvTitle'].forEach(k => {
+      (mg.match(new RegExp('\\b' + k + ":\\s*'([^']*)'", 'g')) || []).forEach(s => {
+        assert.ok(s.indexOf('{0}') >= 0, k + ' 这一份没带 {0} 占位：' + s);
+      });
+    });
+  });
+
+  t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
+    assert.ok(/class="ver">v0\.9\.272/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.272/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.272/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.272/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.272/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.271/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.272/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 }
