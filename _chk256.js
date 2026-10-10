@@ -50,7 +50,7 @@ function J(p){ return new Promise((res, rej) => { const r = http.request({ host:
 
   console.log('\n— ① 版号与起点 —');
   const ver = await ev("document.querySelector('.ver').textContent");
-  ok(/v0\.9\.267/.test(String(ver)), '页眉版号已到 v0.9.265', ver);
+  ok(/v0\.9\.268/.test(String(ver)), '页眉版号已到 v0.9.265', ver);
   const v0 = JSON.parse(await view());
   console.log('   ', JSON.stringify(v0));
   ok(v0.视角 === 'movie', '起点是「成片」视角', v0.视角);

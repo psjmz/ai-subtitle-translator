@@ -41,7 +41,7 @@ function J(p){ return new Promise((res, rej) => { const r = http.request({ host:
 
   console.log('\n— ① 版号与「全页只有一处预览」—');
   const ver = await ev("document.querySelector('.ver').textContent");
-  ok(/v0\.9\.267/.test(String(ver)), '页眉版号已到 v0.9.265', ver);
+  ok(/v0\.9\.268/.test(String(ver)), '页眉版号已到 v0.9.265', ver);
   const struct = await ev(`JSON.stringify({
     预览卡:document.querySelectorAll('#pvCard').length,
     旧面板画布:document.querySelectorAll('#slotPv').length,

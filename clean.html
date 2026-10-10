@@ -134,6 +134,35 @@
   .tag.del{background:var(--del-weak);border-color:transparent;color:var(--del)}
   .empty-note{padding:26px 12px;text-align:center;color:var(--mut);font-size:12.5px}
 
+  /* v0.9.268：清洗后字幕全文预览（此前结果区只列「改了哪几条」，整篇字幕必须下载才看得到） */
+  .pv-wrap{margin-top:12px;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;background:var(--card)}
+  .pv-head{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--card-2);
+    border-bottom:1px solid var(--line)}
+  .pv-t{font-size:11.5px;font-weight:600;color:var(--sub)}
+  .pv-t b{color:var(--acc-ink);font-weight:650}
+  .pv-seg{margin-left:auto;display:flex;gap:2px;background:var(--card);border:1px solid var(--line);
+    border-radius:99px;padding:2px;flex:none}
+  .pv-seg button{height:24px;padding:0 11px;border:none;background:none;border-radius:99px;
+    font-size:11.5px;color:var(--sub);cursor:pointer;transition:background .14s,color .14s}
+  .pv-seg button:hover{color:var(--ink)}
+  .pv-seg button.on{background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
+  .pv-box{max-height:340px;overflow:auto;padding:5px 0;
+    font:12px/1.65 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .pv-line{display:grid;grid-template-columns:46px 88px minmax(0,1fr);gap:10px;padding:4px 12px;color:var(--body)}
+  .pv-line:hover{background:var(--card-2)}
+  .pv-line .n{color:var(--mut);font-variant-numeric:tabular-nums;text-align:right}
+  .pv-line .t{color:var(--sub);font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pv-line .x{color:var(--ink);word-break:break-word;white-space:pre-wrap}
+  .pv-line.gone{opacity:.5}
+  .pv-line.gone .x{text-decoration:line-through;text-decoration-color:var(--line-strong)}
+  .pv-line.gone .x em{font-style:normal;text-decoration:none;color:var(--del);font-size:11px;margin-left:6px}
+  .pv-line .x i{font-style:normal;color:var(--mut);font-size:11px}
+  .pv-more{padding:9px 12px;text-align:center;color:var(--mut);font-size:11.5px;
+    border-top:1px solid var(--line);background:var(--card-2)}
+  @media (max-width:640px){
+    .pv-line{grid-template-columns:38px 74px minmax(0,1fr);gap:8px;padding:4px 9px}
+  }
+
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:#15151A;color:#F5F5F7;
     padding:9px 18px;border-radius:99px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .2s;z-index:99;
     box-shadow:0 8px 24px -8px rgba(18,18,24,.5)}
@@ -218,6 +247,17 @@ crossorigin="anonymous"></script>
       </table>
       <div class="empty-note" id="emptyNote" style="display:none" data-i18n="noChange">没有需要清洗的地方，这份字幕已经是干净的。</div>
     </div>
+    <!-- v0.9.268：清洗后字幕全文预览 -->
+    <div class="pv-wrap">
+      <div class="pv-head">
+        <span class="pv-t" id="pvTitle"></span>
+        <div class="pv-seg" id="pvSeg">
+          <button type="button" data-v="out" class="on" data-i18n="pvOut">清洗后</button>
+          <button type="button" data-v="raw" data-i18n="pvRaw">原文</button>
+        </div>
+      </div>
+      <div class="pv-box" id="pvBox"></div>
+    </div>
     <div class="btn-row">
       <button class="btn" id="btnDownload"><span data-i18n="btnDownload">下载字幕</span><span class="dl-ext" id="dlExt">.srt</span></button>
       <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
@@ -235,7 +275,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.267"></script>
+<script src="clean-core.js?v=0.9.268"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -257,6 +297,12 @@ const S = {
   changes: [],        // 每条 = {i, before, after, tags:[], del:bool}
   off: new Set()      // 被用户「还原」的 change 下标
 };
+
+/* v0.9.268：结果区那块全文预览看的是「清洗后」还是「原文」 */
+let PV_VIEW = 'out';
+/* ⚠️ 大文件不能整篇渲染进 DOM —— 几千条会把页面拖死。
+      只画前 500 条，剩下的用一行提示交代清楚（完整内容本来就该走下载）。 */
+const PV_CAP = 500;
 
 /* ---------------- 清洗项定义 ----------------
    ⚠️ grp 决定落在哪个分组；def = 默认是否勾选。
@@ -414,11 +460,75 @@ function render() {
       render();
     });
   });
+  renderPv();   /* v0.9.268：整篇字幕预览（跟着改动/还原一起重画） */
 }
 function esc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/\n/g, '<br>');
+}
+
+/* ---------------- v0.9.268：清洗后字幕全文预览 ----------------
+   此前结果区只有一张「改了哪几条」的对照表 —— 字幕本来就干净时连一行都没有，
+   用户只能先下载才看得见整篇。现在把整篇直接摊在这里。
+   ⚠️ 「清洗后」视图的数据源就是 resolve()（下载按钮用的同一份）→ 所见即所得，不会跟导出不一致。
+   ⚠️ 「原文」视图保留被删掉的条目并划掉、标「已移除」，方便核对到底删了什么。 */
+function pvItems() {
+  const map = new Map();
+  S.changes.forEach(function (ch, ci) { if (!S.off.has(ci)) map.set(ch.i, ch); });
+  const raw = [];
+  S.order.forEach(function (i) {
+    const it = S.raw[i], ch = map.get(i);
+    raw.push({ no: it.no, start: it.start, end: it.end, text: String(it.text), gone: !!(ch && ch.del) });
+  });
+  const out = resolve();
+  C.renumber(out);
+  return { raw: raw, out: out };
+}
+function renderPv() {
+  const box = $('#pvBox');
+  if (!box) return;
+  box.innerHTML = '';
+  const all = pvItems();
+  const isRaw = (PV_VIEW === 'raw');
+  const list = isRaw ? all.raw : all.out;
+  const ttl = $('#pvTitle');
+  if (ttl) ttl.innerHTML = t(isRaw ? 'pvTitleRaw' : 'pvTitle') + ' <b>' + list.length + '</b> ' + t('pvUnit');
+  if (!list.length) {
+    box.innerHTML = '<div class="pv-more">' + t('pvNone') + '</div>';
+    return;
+  }
+  const n = Math.min(list.length, PV_CAP);
+  const frag = document.createDocumentFragment();
+  for (let k = 0; k < n; k++) {
+    const it = list[k];
+    const d = document.createElement('div');
+    d.className = 'pv-line' + (it.gone ? ' gone' : '');
+    const txt = String(it.text || '').replace(/\s/g, '') ? esc(it.text) : '<i>' + t('emptyRow') + '</i>';
+    d.innerHTML =
+      '<span class="n">' + it.no + '</span>' +
+      '<span class="t">' + C.fmtTime(it.start).replace(/,\d+$/, '') + '</span>' +
+      '<span class="x">' + txt + (it.gone ? '<em>' + t('removed') + '</em>' : '') + '</span>';
+    frag.appendChild(d);
+  }
+  box.appendChild(frag);
+  if (list.length > n) {
+    const m = document.createElement('div');
+    m.className = 'pv-more';
+    m.textContent = t('pvMore').replace('{n}', n).replace('{t}', list.length);
+    box.appendChild(m);
+  }
+}
+function bindPv() {
+  const seg = $('#pvSeg');
+  if (!seg) return;
+  seg.querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      PV_VIEW = b.getAttribute('data-v');
+      seg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      renderPv();
+    });
+  });
 }
 
 /* ---------------- 解析 ---------------- */
@@ -613,6 +723,10 @@ const I18N = {
     removed: '已删除', emptyRow: '（源文件里的空行）', btnUndo: '还原', btnAdopt: '采纳',
     btnDownload: '下载字幕', btnCopy: '复制内容', btnTxt: '导出纯文本', btnUndoAll: '全部还原',
     noChange: '没有需要清洗的地方，这份字幕已经是干净的。',
+    /* v0.9.268：结果区的整篇预览 */
+    pvTitle: '清洗后字幕', pvTitleRaw: '原始字幕', pvUnit: '条',
+    pvOut: '清洗后', pvRaw: '原文', pvNone: '这份字幕没有内容',
+    pvMore: '只显示前 {n} 条，共 {t} 条 —— 完整内容请点「下载字幕」',
     okParse: '解析到 {n} 条 · 源格式 {f}', okEnc: '编码已按 {e} 修复',
     assNote: 'ASS 样式按内容处理，导出为 SRT',
     errParse: '没能解析出字幕内容。支持 SRT / VTT / ASS（含 SSA）。',
@@ -647,6 +761,9 @@ const I18N = {
     removed: 'removed', emptyRow: 'empty cue in the source', btnUndo: 'Revert', btnAdopt: 'Apply',
     btnDownload: 'Download', btnCopy: 'Copy', btnTxt: 'Plain text', btnUndoAll: 'Revert all',
     noChange: 'Nothing to clean. This file is already tidy.',
+    pvTitle: 'Cleaned subtitles', pvTitleRaw: 'Original subtitles', pvUnit: 'lines',
+    pvOut: 'Cleaned', pvRaw: 'Original', pvNone: 'No content in this file',
+    pvMore: 'Showing first {n} of {t} lines — download for the full file',
     okParse: '{n} cues parsed · source {f}', okEnc: 'encoding fixed as {e}',
     assNote: 'ASS styling is treated as content; exports as SRT',
     errParse: 'Could not parse any cues. Supported: SRT, VTT, ASS (and SSA).',
@@ -748,6 +865,7 @@ function initLang() {
   applyI18n();
   initTips();
   bind();
+  bindPv();     /* v0.9.268：预览的「清洗后 / 原文」切换 */
   render();
 })();
 </script>
