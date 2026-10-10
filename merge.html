@@ -186,6 +186,8 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .ass-body,.vtt-body{padding:14px 16px 16px;border-top:1px solid var(--line);background:var(--card)}
   .ass-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
   @media (max-width:640px){.ass-cols{grid-template-columns:1fr}}
+  /* v0.9.265：单语模式收掉原文那栏后，剩下的那栏别缩在左半边 —— 收成单列 */
+  .ass-cols.mono{grid-template-columns:1fr}
   .ass-col h4,.grp-t{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--acc-ink);letter-spacing:.3px;
     display:flex;align-items:center;gap:7px}
   .ass-col h4::before,.grp-t::before{content:'';width:4px;height:12px;border-radius:2px;background:var(--acc);flex:none}
@@ -340,9 +342,29 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .vtt-pv-line{white-space:pre-wrap}
   /* 底衬必须紧贴文字包围盒（与导出 ::cue 的 background 逐条生效一致），加在整行会画成通栏色带 */
   .vtt-pv-line .pv-in{display:inline-block;padding:0}
+  /* v0.9.265：SRT / 无样式 VTT 的预览 —— 这两档不带任何样式信息，
+     画面这边只能画「播放器的默认外观」（白字黑描边，各家播放器不一样），
+     所以必须再并排给出文件里真正写进去的内容（序号 + 时间轴 + 折行后的文本）。
+     ⚠️ 两块不许合并：混在一起会让人以为 SRT 里真的存了白字黑边，
+        回头又去改样式槽，等于把「改了没反应」这个坑换个地方再踩一遍。 */
+  .srt-pv{margin-bottom:12px}
+  .srt-pv-screen{position:relative;width:100%;aspect-ratio:16/9;background:#0A0A0E;border-radius:9px;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+  .srt-pv-line{position:absolute;left:0;right:0;text-align:center;white-space:pre-wrap;padding:0 5%;
+    font-family:"PingFang SC","Helvetica Neue",Arial,sans-serif;line-height:1.2}
+  .srt-pv-line .pv-in{display:inline-block}
+  .srt-pv-raw{margin-top:9px;background:var(--card-2);border:1px solid var(--line);border-radius:8px;
+    padding:9px 11px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.5px;line-height:1.7;color:var(--body);white-space:pre-wrap;word-break:break-word}
+  .srt-pv-note{margin-top:7px;font-size:12px;color:var(--mut);line-height:1.6}
+  /* 样式槽在无样式格式下整块收起后的说明 —— 只收起不删除，切回 ASS / 带样式 VTT 原样回来 */
+  .slot-plain-note{margin:0 0 12px;border:1px dashed var(--line-strong);border-radius:8px;
+    padding:9px 12px;background:var(--card-2);font-size:12px;color:var(--sub);line-height:1.6}
   /* v0.9.240：details.vtt 的样式已与 details.ass 合并到一处（同一个卡片式面板外观） */
   .vtt-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
   @media (max-width:640px){.vtt-cols{grid-template-columns:1fr}}
+  /* v0.9.265：同上，单语收掉「原文行」整组后收成单列 */
+  .vtt-cols.mono{grid-template-columns:1fr}
   .rep-issues{margin-top:10px;background:var(--warn-weak);border-radius:var(--r-ctl);padding:9px 14px;
     font-size:12.5px;color:var(--warn);display:none;line-height:1.8}
   .rep-clean{margin-top:10px;background:var(--ok-weak);border-radius:var(--r-ctl);padding:9px 14px;
@@ -499,7 +521,7 @@ crossorigin="anonymous"></script>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.264</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.265</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -637,9 +659,11 @@ crossorigin="anonymous"></script>
             <label><input type="radio" name="assLayout" value="stack"><span data-i18n="layoutStack">堆叠 · 底部双行</span></label>
           </div>
         </div>
-        <div class="ass-cols">
-          <div class="ass-col">
-            <h4 data-i18n="lblDstCol">译文（主）</h4>
+        <!-- v0.9.265：id 是给 syncMonoChrome 用的 —— 单语下整栏收掉「原文（副）」，
+             只剩的那一栏标题改叫「字幕」，两栏栅格收成单列（CSS 见 .ass-cols.mono）。 -->
+        <div class="ass-cols" id="assCols">
+          <div class="ass-col" id="assDstCol">
+            <h4 id="assDstColTitle" data-i18n="lblDstCol">译文（主）</h4>
             <div class="ass-sub" data-i18n="assGrpText">文字</div>
             <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assDstSize" value="56" min="8" max="200"></div>
             <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assDstColor" value="#FFFFFF"><span class="sw" id="assDstColorSw"></span></div>
@@ -670,7 +694,7 @@ crossorigin="anonymous"></script>
             <div class="af"><label data-i18n="lblMV">离底距离</label><input type="number" id="assDstMV" value="42" min="0" max="1080"></div>
             <!-- v0.9.229：译文/原文两个框语义完全一致——都是「这一行离画面底边多远」。 -->
           </div>
-          <div class="ass-col">
+          <div class="ass-col" id="assSrcCol">
             <h4 data-i18n="lblSrcCol">原文（副）</h4>
             <div class="ass-sub" data-i18n="assGrpText">文字</div>
             <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assSrcSize" value="50" min="8" max="200"></div>
@@ -729,7 +753,7 @@ crossorigin="anonymous"></script>
          ⚠️ 单位是 VTT 原生的百分比（line / position / size / 字号），与 ASS 的「像素离底」
             根本不是一套：两套面板不共用字段、不互相换算。 -->
     <details class="vtt" id="mVttPanel" style="display:none">
-      <summary><span data-i18n="vttPanelTitle">WebVTT 样式（导出 VTT 双语样式时生效）</span><i class="info" tabindex="0" data-tip-i18n="vttStyleTip">i</i></summary>
+      <summary><span id="mVttPanelTitle" data-i18n="vttPanelTitle">WebVTT 样式（导出 VTT 双语样式时生效）</span><i class="info" tabindex="0" data-tip-i18n="vttStyleTip">i</i></summary>
       <div class="vtt-body">
         <!-- 导入继承后在此写明「样式来自哪个文件」，否则用户不知道这些值是哪来的 -->
         <div class="hint ass-note" id="mVttImportNote" style="display:none"></div>
@@ -746,7 +770,7 @@ crossorigin="anonymous"></script>
           <span class="tplrow-l"><span data-i18n="lblVttPreset">样式模板</span><i class="info" tabindex="0" id="mVttPresetHint" data-tip-i18n="vttTipStd" data-tip-dyn="1">i</i></span>
           <div class="seg" id="mVttPresetSeg"></div>
           <select id="mVttPresetSel" style="display:none">
-            <option value="std" data-i18n="vttPresetStd">标准 · 底部双语</option>
+            <option value="std" id="mVttOptStd" data-i18n="vttPresetStd">标准 · 底部双语</option>
             <option value="compact" data-i18n="vttPresetCompact">紧凑 · 小字窄幅</option>
             <option value="cinema" data-i18n="vttPresetCinema">电影感 · 大字描边</option>
             <option value="custom" data-i18n="vttPresetCustom">自定义</option>
@@ -757,7 +781,7 @@ crossorigin="anonymous"></script>
         <!-- v0.9.239：按「层」重排 —— 整条 / 译文行 / 原文行。
              原文行是覆盖层：字号与颜色始终单独设；字体、粗体、斜体、底衬、描边是三态
              （沿用 / 开 / 关），默认「沿用」= 一个字都不写，所以默认导出与 238 逐字节相同。 -->
-        <h4 data-i18n="vttGrpAll">整条字幕（两层共用）</h4>
+        <h4 id="mVttGrpAllTitle" data-i18n="vttGrpAll">整条字幕（两层共用）</h4>
         <div class="vtt-cols">
           <div class="ass-col">
             <div class="af"><label data-i18n="lblVttLine">垂直 line</label><input type="number" id="mVttLine" value="90" step="1"></div>
@@ -778,9 +802,9 @@ crossorigin="anonymous"></script>
             <div class="af"><label data-i18n="lblVttLH">行高</label><input type="number" id="mVttLH" value="1.4" step="0.1"></div>
           </div>
         </div>
-        <div class="vtt-cols">
+        <div class="vtt-cols" id="mVttCols2">
           <div class="ass-col">
-            <h4 data-i18n="vttGrpDst">译文行（主样式）</h4>
+            <h4 id="mVttGrpDstTitle" data-i18n="vttGrpDst">译文行（主样式）</h4>
             <div class="af"><label data-i18n="lblVttSize">字号</label><input type="number" id="mVttSize" value="100" step="5"></div>
             <div class="af"><label data-i18n="lblVttColor">颜色</label><input type="text" id="mVttColor" value="#FFFFFF"><span class="sw" id="mVttColorSw"></span></div>
             <div class="af"><label data-i18n="lblVttFont">字体</label><select id="mVttFont"></select></div>
@@ -793,7 +817,7 @@ crossorigin="anonymous"></script>
             <div class="af"><label data-i18n="lblVttShadowW">粗细</label><input type="number" id="mVttShadowW" value="2" step="0.5"></div>
             <div class="af"><label data-i18n="lblVttShadowColor">描边色</label><input type="text" id="mVttShadowColor" value="#000000"><span class="sw" id="mVttShadowColorSw"></span></div>
           </div>
-          <div class="ass-col">
+          <div class="ass-col" id="mVttSrcGrp">
             <h4><span data-i18n="vttGrpSrc">原文行</span><i class="info" tabindex="0" data-tip-i18n="vttSrcTip">i</i></h4>
             <div class="af"><label data-i18n="lblVttSrcSize">字号</label><select id="mVttSrcSizeMode" class="me">
               <option value="" data-i18n="vttInherit">沿用</option>
@@ -857,6 +881,11 @@ crossorigin="anonymous"></script>
 
     <!-- v0.9.245：样式槽 —— 一行色点胶囊，点一下选中「接下来要套到哪些行上」的那个槽。
          槽只存「和基础样式不一样的那几项」，所以新建一个槽的代价是改 3~4 个字段，不是填 30 个。 -->
+    <!-- v0.9.265：无样式格式（SRT / 无样式 VTT）下 #slotWrap 整块收起 ——
+         槽对这两档一个字节都影响不到，摆在那儿就是「改了没反应」的假控件。
+         收起时这行说明顶上，免得老用户以为功能被砍了、也不知道怎么让它回来。
+         ⚠️ 只 display:none：DOM 与已分配到各行的槽数据一个不动，切回 ASS / 带样式 VTT 原样回来。 -->
+    <div class="slot-plain-note" id="slotPlainNote" style="display:none" data-i18n="slotPlainNote"></div>
     <div class="slot-wrap" id="slotWrap">
       <div class="slot-hd">
         <span data-i18n="slotTitle">样式槽</span>
@@ -962,6 +991,17 @@ crossorigin="anonymous"></script>
           </div>
         </div>
       </div>
+      <!-- v0.9.265：SRT / 无样式 VTT 的预览 —— 此前这两档只有一行「槽对它无效」的空提示，
+           预览卡等于空着。现在画两块：上=播放器默认外观（示意，非文件内容），下=文件里真正的文本。
+           ⚠️ 与 assPv / mVttPv 并列，三者互斥显示，由各自的 render* 负责收放。 -->
+      <div class="srt-pv" id="srtPv" style="display:none">
+        <div class="srt-pv-screen" id="srtPvScreen">
+          <div class="srt-pv-line" id="srtPvLine1"><span class="pv-in"></span></div>
+          <div class="srt-pv-line" id="srtPvLine2"><span class="pv-in"></span></div>
+        </div>
+        <div class="srt-pv-raw" id="srtPvRaw"></div>
+        <p class="srt-pv-note" id="srtPvNote"></p>
+      </div>
       <p class="hint pv-none" id="pvNone" style="display:none"></p>
     </div>
 
@@ -988,7 +1028,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.264"></script>
+<script src="merge-core.js?v=0.9.265"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1025,6 +1065,7 @@ const I18N = {
     alignHintDst:'时间轴全部取译文，原文只提供文字；落在同一条译文上的多条原文会合并文字拼进去，比译文多出的原文并入上一条。',
     lblShift:'译文整体偏移（毫秒）', shiftHint:'译文字幕整体提前（负数）或延后（正数）。例如字幕晚了半秒填 -500。',
     lblBiMaxW:'双语行宽', biMaxWHint:'每行最大显示宽度（1 个汉字 = 1）。超宽自动折行，1 汉字 ≈ 2.4 个西文字符。',
+    lblMonoMaxW:'行宽',
     lblOrder:'双语上下顺序', orderSrc:'原文在上', orderDst:'译文在上',
     lblTpl:'导出格式', tplSrt:'SRT 无风格 (.srt)', tplVtt:'VTT 无风格 (.vtt)',
     tplSplit:'ASS 分屏 · 默认模板，可微调 (.ass)', tplStack:'ASS 底部双行 · 默认模板，可微调 (.ass)', tplCustom:'ASS 自定义风格 (.ass)',
@@ -1058,6 +1099,10 @@ const I18N = {
     vttPresetCinema:'电影感 · 大字描边', vttPresetCustom:'自定义',
     vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底衬 / 描边',
     vttGrpAll:'整条字幕（两层共用）', vttGrpDst:'译文行（主样式）',
+    /* v0.9.265：单语模式下的替身文案 —— 没有原文行，就不能再叫「译文（主）」「双语」 */
+    lblOneCol:'字幕', vttGrpAllMono:'整条字幕', vttGrpOne:'字幕行',
+    vttPanelTitleMono:'WebVTT 样式（导出 VTT 样式时生效）',
+    vttPresetStdMono:'标准 · 底部双行', vttTipStdMono:'标准 · 底部双行：白字 + 半透明底衬，通用场合最稳。',
     vttSrcTip:'原文行每一项都能「沿用」译文行 —— 沿用就不写进 ::cue(.src)。全部沿用 = 原文行与译文行完全一样（不打标记、不写规则）。',
     vttInherit:'沿用', vttOptSet:'单独设', vttOptNormal:'常规', vttOptOn:'开', vttOptOff:'关',
     lblVttSrcFont:'字体', lblVttSrcBold:'粗体', lblVttSrcItalic:'斜体',
@@ -1105,6 +1150,9 @@ const I18N = {
     slotPvTitle:'效果预览', slotPvBase:'基础样式',
     pvViewMovie:'成片', pvViewSlot:'这个槽', slotPvGoto:'在预览里看这个槽',
     slotPvNone:'该导出格式不带样式信息（SRT / 无样式 VTT），槽对它无效',
+    slotPlainNote:'SRT / 无样式 VTT 只存文字和时间轴，样式槽对它不起作用，所以先收起来了。切到 ASS 或「带样式 VTT」，样式槽原样回来。',
+    srtPvNote:'上面是播放器自己加的默认外观（各家播放器不一样），下面是文件里真正写进去的内容 —— SRT 只存文字和时间轴。',
+    pvRowNo:'第 {0} 条',
     selDockAllTip:'把当前编辑的槽套用到全部行（不只是选中的）',
     slotViewDiff:'只显示差异', slotViewAll:'显示全部参数', slotAddParam:'+ 添加参数…',
     slotInherit:'沿用', slotOverride:'覆盖', slotCancel:'取消覆盖', slotModified:'已修改', slotRestore:'恢复预设',
@@ -1178,6 +1226,7 @@ const I18N = {
     alignHintDst:'時間軸全部取譯文，原文只提供文字；落在同一條譯文上的多條原文會合併文字拼進去，比譯文多出的原文併入上一條。',
     lblShift:'譯文整體偏移（毫秒）', shiftHint:'譯文字幕整體提前（負數）或延後（正數）。例如字幕晚了半秒填 -500。',
     lblBiMaxW:'雙語行寬', biMaxWHint:'每行最大顯示寬度（1 個漢字 = 1）。超寬自動折行，1 漢字 ≈ 2.4 個西文字元。',
+    lblMonoMaxW:'行寬',
     lblOrder:'雙語上下順序', orderSrc:'原文在上', orderDst:'譯文在上',
     lblTpl:'匯出格式', tplSrt:'SRT 無風格 (.srt)', tplVtt:'VTT 無風格 (.vtt)',
     tplSplit:'ASS 分屏 · 預設範本，可微調 (.ass)', tplStack:'ASS 底部雙行 · 預設範本，可微調 (.ass)', tplCustom:'ASS 自訂風格 (.ass)',
@@ -1211,6 +1260,9 @@ const I18N = {
     vttPresetCinema:'電影感 · 大字描邊', vttPresetCustom:'自訂',
     vttGrpPos:'位置（百分比）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 描邊',
     vttGrpAll:'整條字幕（兩層共用）', vttGrpDst:'譯文行（主樣式）',
+    lblOneCol:'字幕', vttGrpAllMono:'整條字幕', vttGrpOne:'字幕行',
+    vttPanelTitleMono:'WebVTT 樣式（匯出 VTT 樣式時生效）',
+    vttPresetStdMono:'標準 · 底部雙行', vttTipStdMono:'標準 · 底部雙行：白字 + 半透明底襯，通用場合最穩。',
     vttSrcTip:'原文行每一項都能「沿用」譯文行 —— 沿用就不寫進 ::cue(.src)。全部沿用 = 原文行與譯文行完全一樣（不打標記、不寫規則）。',
     vttInherit:'沿用', vttOptSet:'單獨設', vttOptNormal:'常規', vttOptOn:'開', vttOptOff:'關',
     lblVttSrcFont:'字體', lblVttSrcBold:'粗體', lblVttSrcItalic:'斜體',
@@ -1258,6 +1310,9 @@ const I18N = {
     slotPvTitle:'效果預覽', slotPvBase:'基礎樣式',
     pvViewMovie:'成片', pvViewSlot:'這個槽', slotPvGoto:'在預覽裡看這個槽',
     slotPvNone:'該匯出格式不帶樣式資訊（SRT / 無樣式 VTT），槽對它無效',
+    slotPlainNote:'SRT / 無樣式 VTT 只存文字與時間軸，樣式槽對它不起作用，所以先收起來了。切到 ASS 或「帶樣式 VTT」，樣式槽原樣回來。',
+    srtPvNote:'上面是播放器自己加的預設外觀（各家播放器不一樣），下面是檔案裡真正寫進去的內容 —— SRT 只存文字與時間軸。',
+    pvRowNo:'第 {0} 條',
     selDockAllTip:'把目前編輯的槽套用到全部行（不只是選取的）',
     slotViewDiff:'只顯示差異', slotViewAll:'顯示全部參數', slotAddParam:'+ 新增參數…',
     slotInherit:'沿用', slotOverride:'覆蓋', slotCancel:'取消覆蓋', slotModified:'已修改', slotRestore:'恢復預設',
@@ -1331,6 +1386,7 @@ const I18N = {
     alignHintDst:'All timing comes from the translated file; the original only supplies text. Several original cues inside one translated cue merge into one line, and extra original cues fold into the previous one.',
     lblShift:'Shift translation (ms)', shiftHint:'Move the translated file earlier (negative) or later (positive). E.g. -500 if it runs half a second late.',
     lblBiMaxW:'Line width', biMaxWHint:'Max display width per line (1 CJK char = 1). Longer lines wrap automatically; 1 CJK char ≈ 2.4 Latin characters.',
+    lblMonoMaxW:'Line width',
     lblOrder:'Stacking order', orderSrc:'Original on top', orderDst:'Translation on top',
     lblTpl:'Export format', tplSrt:'Plain SRT (.srt)', tplVtt:'Plain WebVTT (.vtt)',
     tplSplit:'ASS split · preset, tweakable (.ass)', tplStack:'ASS stacked · preset, tweakable (.ass)', tplCustom:'ASS custom style (.ass)',
@@ -1364,6 +1420,9 @@ const I18N = {
     vttPresetCinema:'Cinematic · large with outline', vttPresetCustom:'Custom',
     vttGrpPos:'Position (percent)', vttGrpText:'Text', vttGrpSrc:'Original line', vttGrpFx:'Box / outline',
     vttGrpAll:'Whole cue (both lines)', vttGrpDst:'Translation (base style)',
+    lblOneCol:'Subtitle', vttGrpAllMono:'Whole cue', vttGrpOne:'Subtitle line',
+    vttPanelTitleMono:'WebVTT style (applies when exporting VTT style)',
+    vttPresetStdMono:'Standard · bottom two-line', vttTipStdMono:'Standard · bottom two-line: white text + translucent backing — the safest all-rounder.',
     vttSrcTip:'Every item on the original line can “inherit” the translation line — inherited items are never written into ::cue(.src). Inherit everything and the two lines look exactly the same (no markup, no rule).',
     vttInherit:'Inherit', vttOptSet:'Custom', vttOptNormal:'Normal', vttOptOn:'On', vttOptOff:'Off',
     lblVttSrcFont:'Font', lblVttSrcBold:'Bold', lblVttSrcItalic:'Italic',
@@ -1411,6 +1470,9 @@ const I18N = {
     slotPvTitle:'Preview', slotPvBase:'Base style',
     pvViewMovie:'Final', pvViewSlot:'This slot', slotPvGoto:'Show in preview',
     slotPvNone:'This export format carries no style info (SRT / plain VTT), so slots do nothing',
+    slotPlainNote:'SRT / plain VTT stores text and timing only, so style slots have no effect here and are hidden. Switch to ASS or styled VTT and they come back exactly as they were.',
+    srtPvNote:'Top: the default look your player adds (it varies by player). Bottom: what actually goes into the file — SRT stores text and timing only.',
+    pvRowNo:'Line {0}',
     selDockAllTip:'Apply the slot being edited to every line, not just the selected ones',
     slotViewDiff:'Diff only', slotViewAll:'All parameters', slotAddParam:'+ Add parameter…',
     slotInherit:'Inherit', slotOverride:'Override', slotCancel:'Remove override', slotModified:'Modified', slotRestore:'Restore preset',
@@ -1484,6 +1546,7 @@ const I18N = {
     alignHintDst:'軸はすべて訳文から取得し、原文は文字のみ提供。1 つの訳文条に重なる複数の原文は 1 行に統合され、余った原文は前の条に統合されます。',
     lblShift:'訳文の全体シフト（ミリ秒）', shiftHint:'訳文字幕を早める（負）または遅らせる（正）。例：0.5 秒遅い場合は -500。',
     lblBiMaxW:'二か国語の行幅', biMaxWHint:'1 行の最大表示幅（漢字 1 = 1）。超過は自動折り返し、漢字 1 ≈ 欧文 2.4 文字。',
+    lblMonoMaxW:'行幅',
     lblOrder:'二か国語の上下順', orderSrc:'原文を上に', orderDst:'訳文を上に',
     lblTpl:'書き出し形式', tplSrt:'SRT スタイルなし (.srt)', tplVtt:'VTT スタイルなし (.vtt)',
     tplSplit:'ASS 分離 · 既定テンプレート・調整可 (.ass)', tplStack:'ASS 下部 2 行 · 既定テンプレート・調整可 (.ass)', tplCustom:'ASS カスタムスタイル (.ass)',
@@ -1517,6 +1580,9 @@ const I18N = {
     vttPresetCinema:'シネマ · 大きめ＋縁取り', vttPresetCustom:'カスタム',
     vttGrpPos:'位置（パーセント）', vttGrpText:'文字', vttGrpSrc:'原文行', vttGrpFx:'底襯 / 縁取り',
     vttGrpAll:'字幕全体（両方の行）', vttGrpDst:'訳文行（基本スタイル）',
+    lblOneCol:'字幕', vttGrpAllMono:'字幕全体', vttGrpOne:'字幕行',
+    vttPanelTitleMono:'WebVTT スタイル（VTT スタイル書き出し時に有効）',
+    vttPresetStdMono:'標準 · 下部二行', vttTipStdMono:'標準 · 下部二行：白文字＋半透明の下地。汎用で最も無難です。',
     vttSrcTip:'原文行の各項目は「沿用」＝訳文行と同じにできます（沿用にした項目は ::cue(.src) に書き出されません）。すべて沿用にすると原文行と訳文行は完全に同じになります（マークも規則もなし）。',
     vttInherit:'沿用', vttOptSet:'個別設定', vttOptNormal:'標準', vttOptOn:'オン', vttOptOff:'オフ',
     lblVttSrcFont:'フォント', lblVttSrcBold:'太字', lblVttSrcItalic:'斜体',
@@ -1564,6 +1630,9 @@ const I18N = {
     slotPvTitle:'プレビュー', slotPvBase:'基本スタイル',
     pvViewMovie:'完成形', pvViewSlot:'このスロット', slotPvGoto:'プレビューで確認',
     slotPvNone:'この書き出し形式はスタイル情報を持ちません（SRT / スタイルなし VTT）',
+    slotPlainNote:'SRT / スタイルなし VTT はテキストとタイミングしか保存しないため、スタイルスロットは効果がなく、ここでは隠しています。ASS または「スタイル付き VTT」に切り替えれば、そのまま戻ります。',
+    srtPvNote:'上はプレイヤーが付ける既定の見た目です（プレイヤーによって異なります）。下がファイルに実際に書き込まれる内容です —— SRT はテキストとタイミングしか保存しません。',
+    pvRowNo:'{0} 行目',
     selDockAllTip:'編集中のスロットを選択行だけでなく全行に適用します',
     slotViewDiff:'差分のみ', slotViewAll:'全パラメータ', slotAddParam:'+ パラメータを追加…',
     slotInherit:'継承', slotOverride:'上書き', slotCancel:'上書きを解除', slotModified:'変更済み', slotRestore:'プリセットに戻す',
@@ -1829,18 +1898,29 @@ function syncMode(){
   $('alignRow').style.display = isMerge ? '' : 'none';
   $('structLbl').style.display = adj ? '' : 'none';
   $('structRow').style.display = adj ? '' : 'none';
-  /* v0.9.245：单语模式 —— 只有一份输入，配对/偏移/行宽/上下顺序全是双语概念，整块收起。
-     留着它们不但没用，还会让人以为「单语也要设这些」。 */
-  /* ⚠️ shiftLbl 必须一起收起：.frow 是两列栅格，隐藏了内容却留下标签，会让后面的
-     「导出格式」标签被顶到第 2 格、格式卡退到第 1 格（170px 宽）里挤成竖排文字。
-     2026-10-09 发现（v0.9.249 视觉改版时实测单语模式）。 */
-  ['shiftLbl','shiftRow','biMaxWLbl','biMaxWRow','orderLbl','orderRow'].forEach(id=>{
+  /* v0.9.265：整体偏移与行宽在单语下**要显示** ——
+       · doMono 一直在读 dstShift（代码本来就是通的），只是输入框被藏了 → 用户看不见也设不了；
+       · 单语也有自己的折行口径（中 16 / 日 13 / 英 21），v0.9.245 却顺手把它一起收了，
+         结果单语一直按双语行宽 32 折行（2026-10-10 用户实测发现）。
+     ⚠️ 只有「双语上下顺序」是纯双语概念，单语下继续收起。
+     ⚠️ 标签与输入必须**成对**收放：.frow 是两列栅格，只收一个会让后面的
+        「导出格式」标签被顶到第 2 格、格式卡退到第 1 格挤成竖排（v0.9.249 实测）。 */
+  ['orderLbl','orderRow'].forEach(id=>{
     const el = $(id); if (el) el.style.display = mono ? 'none' : '';
   });
+  ['shiftLbl','shiftRow','biMaxWLbl','biMaxWRow'].forEach(id=>{
+    const el = $(id); if (el) el.style.display = '';
+  });
+  syncMaxWInput();   /* 行宽：单语与双语各记各的值，切模式时交换（不是重置） */
   /* 标签随模式换词：直接换 data-i18n 键，语言切换时 applyI18n 会按新键渲染 */
   setI18nKey($('srcCardTitle'), mono ? 'monoCard' : (adj ? 'biCard' : 'srcCard'));
-  setI18nKey($('shiftLbl'), adj ? 'lblShiftAll' : 'lblShift');
-  setI18nKey($('shiftHintEl'), adj ? 'shiftHintAll' : 'shiftHint');
+  /* ⚠️ 只换 .flbl 里面那个 span：setI18nKey 是 textContent 赋值，
+     直接作用在外层 .flbl 上会把 ⓘ 一起冲掉 —— 而且它给外壳加了 data-i18n，
+     之后每次 applyI18n 都会再重写一遍，ⓘ 就永久消失了。 */
+  const lblSpan = id => { const el = $(id); return el ? el.querySelector('span[data-i18n]') : null; };
+  setI18nKey(lblSpan('shiftLbl'), (adj || mono) ? 'lblShiftAll' : 'lblShift');
+  setI18nKey(lblSpan('biMaxWLbl'), mono ? 'lblMonoMaxW' : 'lblBiMaxW');
+  setI18nKey($('shiftHintEl'), (adj || mono) ? 'shiftHintAll' : 'shiftHint');
   setI18nKey($('btnMerge'), mono ? 'btnMono' : (adj ? 'btnAdjust' : 'btnMerge'));
   setI18nKey($('optTitle'), mono ? 'optTitleMono' : (adj ? 'optTitleAdjust' : 'optTitle'));
   setI18nKey($('mergeHintEl'), 'mergeHint');
@@ -1859,14 +1939,39 @@ function syncMode(){
     S.style.assign = {};
     if (S.sel) S.sel.clear();
     $('rep').style.display = 'none'; railOn(false);
-    renderAssPv();   /* v0.9.228：顺手把效果预览收起来，别留着上一个模式的画面 */
-    renderVttPv();   /* v0.9.238：VTT 预览同理，切模式后不该留着旧画面 */
+    renderPv();      /* v0.9.228 / v0.9.238：三块画布一起收，别留着上一个模式的画面 */
   }
+  syncMonoChrome();   /* v0.9.265：单语 / 双语的「原文·译文」两套字眼随模式一起收放 */
 }
 function setI18nKey(el, key){
   if (!el) return;
   el.setAttribute('data-i18n', key);
   el.textContent = t(key);
+}
+/* ================= v0.9.265：单语模式下「原文 / 译文」这两套字眼与控件全部收掉 =================
+   单语就一条字幕，没有原文行 —— 但 ASS 面板右栏、VTT 面板「原文行」整组、模板名里的「双语」
+   都是从双语那儿沿用的，单语下它们一个字节都影响不到导出，摆着就是「改了半天没反应」的假控件
+   （2026-10-10 用户实测：单语字幕里还能看到「原文（副）」那一整栏）。
+   ⚠️ 一律只 display:none / 换标题键，DOM 与值一个都不动：切回双语原样回来，不吞用户参数。
+   ⚠️ 标题换词必须走 setI18nKey（改 data-i18n 键）—— 直接写 textContent 的话，
+      换一次界面语言就被 applyI18n 按回旧键了。
+   ⚠️ 三个入口都要过这里：切模式（syncMode）、切导出格式 / 导入样式 / 换语言（syncAssChrome）。 */
+function syncMonoChrome(){
+  const mono = monoMode();
+  /* ① ASS 面板：原文（副）整栏收起，剩下的那栏改叫「字幕」，两栏栅格收成单列 */
+  const sc = $('assSrcCol'); if (sc) sc.style.display = mono ? 'none' : '';
+  const ac = $('assCols');   if (ac) ac.classList.toggle('mono', mono);
+  setI18nKey($('assDstColTitle'), mono ? 'lblOneCol' : 'lblDstCol');
+  /* ② VTT 面板：原文行整组收起，两个组标题与面板标题改词，栅格收成单列 */
+  const sg = $('mVttSrcGrp'); if (sg) sg.style.display = mono ? 'none' : '';
+  const vc = $('mVttCols2');  if (vc) vc.classList.toggle('mono', mono);
+  setI18nKey($('mVttGrpAllTitle'), mono ? 'vttGrpAllMono' : 'vttGrpAll');
+  setI18nKey($('mVttGrpDstTitle'), mono ? 'vttGrpOne' : 'vttGrpDst');
+  setI18nKey($('mVttPanelTitle'), mono ? 'vttPanelTitleMono' : 'vttPanelTitle');
+  /* ③ 模板显示名：「标准 · 底部双语」→「标准 · 底部双行」（双语那半没了，名字得跟着改） */
+  setI18nKey($('mVttOptStd'), mono ? 'vttPresetStdMono' : 'vttPresetStd');
+  vttPresetTip();     /* ⓘ 说明里那句「金色原文」同理，单语下没有原文行 */
+  syncExpSum();       /* 导出卡那句「将导出什么」用的是 vttPresetLabel()，要跟着重算 */
 }
 function doMerge(){
   endDemo();   /* v0.9.247：真实合并开始，示例态退场 */
@@ -1884,8 +1989,7 @@ function doMerge(){
   S.rows = out.rows; S.report = out.report;
   renderReport();
   railOn(true);
-  renderAssPv();
-  renderVttPv();   /* v0.9.238：VTT 预览与 ASS 预览共用一次合并结果 */
+  renderPv();      /* v0.9.265：ASS / VTT / SRT 三块画布共用一次合并结果 */
   reportMerge('merge');   /* v0.9.244：传了什么字幕上来（后台「双语合并记录」） */
 }
 /* v0.9.222 调整模式：拆分双语字幕。偏移对整份文件生效（不分两侧）。 */
@@ -1915,8 +2019,7 @@ function doAdjust(){
   /* v0.9.228：这里漏了 renderAssPv() —— 合并模式有、调整模式没有，
      于是「调整双语字幕」点完拆分只有表格，ASS 效果预览整块不出现（用户看到的就是空的）。
      必须在右栏展开之后调用，否则量不到画布高度。 */
-  renderAssPv();
-  renderVttPv();   /* v0.9.238：同上，调整模式也要给 VTT 预览 */
+  renderPv();      /* v0.9.265：同上，调整模式也要给三块画布 */
   reportMerge('merge');   /* v0.9.244：同上，调整模式也要上报 */
 }
 /* 原文/译文互换：整列对调（调整模式拆错方向时一键纠正） */
@@ -1934,8 +2037,7 @@ function swapSides(){
   if (S.report) S.report = { pairs, onlySrc, onlyDst, form: S.report.form || null };
   renderReport();
   /* v0.9.228：对调后预览的上下两条也要跟着换，否则预览停在旧的内容上 */
-  renderAssPv();
-  renderVttPv();
+  renderPv();
   toast(t('swapped'));
 }
 /* v0.9.245：单语模式 —— 一份字幕进来，不配对、不拆分，直接进 rows 走同一套预览/特效/导出。
@@ -1949,11 +2051,13 @@ function doMono(){
     start: Math.max(0, (Number(it.start)||0) + shift),
     end: Math.max(0, (Number(it.end)||0) + shift), text: it.text, style: it.style })) : S.src;
   S.rows = items.map(it=>({ start: it.start, end: it.end, en: '', zh: String(it.text == null ? '' : it.text) }));
+  /* v0.9.265：rows 出来了才算得准语言 → 行宽默认值这时再定一次。
+     ⚠️ 只有用户没手动改过才更新（S.maxWMono == null 才写），改过的一律不动。 */
+  syncMaxWInput();
   S.report = { pairs: S.rows.length, onlySrc: [], onlyDst: [], form: null };
   renderReport();
   railOn(true);
-  renderAssPv();
-  renderVttPv();
+  renderPv();
   reportMerge('merge');
 }
 function fmtShort(ms){
@@ -2451,14 +2555,14 @@ function applySlotToSelected(id){
   if (!idxs.length){ toast(t('filterNone')); return; }
   idxs.forEach(i=>setRowSlot(i, id));
   S.sel.clear();
-  renderReport(); renderAssPv(); renderVttPv();
+  renderReport(); renderPv();
   toast(t('applyDone', idxs.length, slotLabel(id)));
 }
 function applySlotToAll(id){
   if (!S.rows){ toast(t('needMerge')); return; }
   ensureStyle();
   for (let i = 0; i < S.rows.length; i++) setRowSlot(i, id);
-  renderReport(); renderAssPv(); renderVttPv();
+  renderReport(); renderPv();
   toast(t('applyDone', S.rows.length, slotLabel(id)));
 }
 
@@ -2522,8 +2626,7 @@ function loadDemo(){
   }
   renderReport();
   railOn(true);
-  renderAssPv();
-  renderVttPv();
+  renderPv();
 }
 /* 任何一次真实合并/拆分/单语导入，以及切模式，都把示例态收掉 */
 function endDemo(){
@@ -2986,7 +3089,7 @@ function markAssEdited(){
 }
 function resetAssDefaults(){
   applyTplDefaults(tplVal());
-  renderAssPv();
+  renderPv();
   const note = $('assImportNote'); if (note) note.style.display = 'none';
   toast(t('assResetDone'));
 }
@@ -3033,7 +3136,7 @@ function schemeApplyObj(s, label){
   if (ord) ord.checked = true;
   SCHEME_COLOR_IDS.forEach(syncColorSw);
   ALPHA_PAIRS.forEach(function(pair){ const o = $(pair[1]); if (o) o.textContent = $(pair[0]).value + '%'; });
-  syncAssEdge(); syncAssChrome(); renderAssPv();
+  syncAssEdge(); syncAssChrome(); renderPv();
   if (label) toast(t('schemeApplied', label));
 }
 function schemeDoApply(){
@@ -3086,9 +3189,22 @@ function syncAssChrome(){
   const vnote = $('mVttImportNote'); if (vnote && tpl !== 'vttStyle' && tpl !== 'vtt') vnote.style.display = 'none';
   /* v0.9.240：写入样式开关 / 参数区灰化 / 模板说明文案 */
   syncVttChrome();
+  /* v0.9.265：样式槽在无样式格式（SRT / 无样式 VTT）下整块收起 ——
+     槽对这两档一个字节都影响不到，摆在那儿就是「改了半天没反应」的假控件。
+     ⚠️ 只 display:none，DOM 与已分配到各行的槽数据一个都不动：
+        切回 ASS / 带样式 VTT，槽栏连同选中状态原样回来（与 ASS 面板同款做法）。
+     收起时由 #slotPlainNote 顶上一句「它去哪了、怎么让它回来」，免得老用户以为功能被砍。 */
+  const sw = $('slotWrap'); if (sw) sw.style.display = plain ? 'none' : '';
+  const sn = $('slotPlainNote'); if (sn) sn.style.display = plain ? 'block' : 'none';
   /* v0.9.229：导入样式是**直接写 select.value**（不能派发 change，否则会走 syncAssPanel 套预设把导入值冲掉），
      所以按钮组的高亮必须在这里补一次，否则 import 后按钮停在旧模板上。 */
   syncTplSegs();
+  /* v0.9.265：切格式 / 切模板 / 导入样式 / 换界面语言全都要经过 syncAssChrome，
+     所以 SRT 那一块预览挂在这里重画 —— 它是唯一必经之路，不必在每个按钮回调里各补一次。 */
+  renderSrtPv();
+  /* v0.9.265：换界面语言也走这条路（applyI18n → syncAssChrome），
+     单语下那几处「原文 / 译文」的词要跟着新语言再渲染一遍。 */
+  syncMonoChrome();
 }
 function syncAssPanel(){
   const tpl = tplVal();
@@ -3103,6 +3219,35 @@ function syncAssPanel(){
   applyTplDefaults(tpl);
 }
 function biMaxWVal(){ return Math.max(10, Math.min(80, parseInt($('biMaxW').value,10) || 32)); }
+/* v0.9.265：单语行宽的推荐值 —— 与翻译页 MAXW_BY_LANG 同口径（中 16 / 日 13 / 韩 16 / 其余 21）。
+   ⚠️ 双语行宽 32 是「两行都要塞进画面」的口径，单语沿用它就会折出超宽行
+      （实测一行能塞 32 个全角字，播放器里直接顶到边）。 */
+const MONO_MAXW_BY_LANG = { 'zh-CN':16, 'zh-TW':16, 'ja':13, 'ko':16, 'th':16 };
+function monoMaxWDefault(){
+  return MONO_MAXW_BY_LANG[guessLocale(localeDstItems())] || 21;
+}
+/* 切模式时**交换** biMaxW 输入框的值：单语与双语各记各的（S.maxWMono / S.maxWBi）。
+   ⚠️ 不是「切回单语就重置成默认」—— 用户把单语调成 20，切去双语再切回来还得是 20
+      （v0.9.242 那个坑：切一次模板就把用户调好的值整套冲掉）。 */
+function syncMaxWInput(){
+  const el = $('biMaxW'); if (!el) return;
+  const cur = parseInt(el.value, 10) || 0;
+  if (monoMode()){
+    if (S.maxWBi == null) S.maxWBi = cur || 32;
+    if (S.maxWMono == null) S.maxWMono = monoMaxWDefault();
+    el.value = S.maxWMono;
+  } else {
+    /* ⚠️ 这里只准记双语那份 —— 顺手把 S.maxWMono 也记成 32 的话，
+       第一次切进单语时 S.maxWMono 已经不是 null，就不会再按语言算默认值了（32 而不是中文 16）。 */
+    if (S.maxWBi == null) S.maxWBi = cur || 32;
+    el.value = S.maxWBi;
+  }
+}
+function saveMaxWInput(){
+  const el = $('biMaxW'); if (!el) return;
+  const v = parseInt(el.value, 10) || (monoMode() ? monoMaxWDefault() : 32);
+  if (monoMode()) S.maxWMono = v; else S.maxWBi = v;
+}
 function orderVal(){ const el=document.querySelector('input[name=biOrder]:checked'); return el && el.value==='dst-first' ? 'dst-first' : 'src-first'; }
 /* 语言区域猜测（与主站 srcLocaleForExport 同思路）：假名→ja、谚文→ko，其余走默认分词 */
 function guessLocale(items){
@@ -3188,14 +3333,48 @@ function assStyleOf(){
   };
 }
 function localeSrcItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text:r.en})) : (S.src||[]); }
-function localeDstItems(){ return S.mode==='adjust' ? (S.rows||[]).map(r=>({text:r.zh})) : (S.dst||[]); }
+/* v0.9.265：单语模式下「译文侧」就是 S.rows 的 zh —— 此前它返回 S.dst（单语下这份永远是空的），
+   于是 guessLocale 一个字都拿不到，单语行宽一律按「其他语言」给 21（中文该是 16）。
+   还没点合并时 rows 是空的，用 S.src 兜底：单语的文本本来就来自那一份。 */
+function localeDstItems(){
+  if (S.mode === 'adjust' || S.mode === 'mono'){
+    if (S.rows && S.rows.length) return S.rows.map(r=>({text:r.zh}));
+    return (S.mode === 'mono') ? (S.src || []) : [];
+  }
+  return (S.dst || []);
+}
+/* v0.9.265：单语折行的**唯一入口** —— 导出（SRT / VTT）、ASS 事件、三块预览全走它，
+   否则又变成「预览画一套、导出另一套」（v0.9.224b 的教训）。
+   ⚠️ C.buildMonoParts 是引擎里早就写好的单语管线（R0~R3 四层规则 + 按语言行宽），
+      此前全项目只有单元测试在调它，页面一直拿 buildBilingualParts + 双语行宽 32 顶替。
+   ⚠️ 返回结构对齐 buildBilingualParts（srcLines / dstLines / slot）：
+      单语 = 只有译文侧有行、源文侧恒空（与 mono「文本统一存 zh」的口径一致），
+      于是 buildAssEvents / assPvSample 里的取数代码一行都不用改。 */
+function monoParts(){
+  const ps = C.buildMonoParts(S.rows || [], {
+    maxW: biMaxWVal(),
+    dstLocale: guessLocale(localeDstItems())
+  });
+  return (ps || []).map((p, i) => ({
+    no: p.no || (i + 1),
+    start: p.start, end: p.end,
+    slot: p.slot || monoSlotOfStart(p.start),
+    srcLines: [],
+    dstLines: String(p.text == null ? '' : p.text).split('\n')
+  }));
+}
+/* buildMonoParts 不吐 slot，按时间轴回查 rows 上已经刷好的槽（syncSlotsToRows 写进去的） */
+function monoSlotOfStart(st){
+  const r = (S.rows || []).find(x => Math.abs(Number(x.start || 0) - Number(st || 0)) < 1);
+  return (r && r.slot) || 'default';
+}
 /* ASS 事件：译文/原文各占一条 Dialogue，位置 = 各自的「离底距离」（v0.9.229 起两条同义） */
 function buildAssEvents(){
   syncSlotsToRows();   /* v0.9.245：行→槽刷进 rows，否则导出端读不到 */
   const fmt = expFmtVal();
   const stacked = fmt === 'ass-stack';
   const dstFirst = orderVal() === 'dst-first';
-  const parts = C.buildBilingualParts(S.rows, {
+  const parts = monoMode() ? monoParts() : C.buildBilingualParts(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
     srcLocale: guessLocale(localeSrcItems()),
     dstLocale: guessLocale(localeDstItems())
@@ -3235,6 +3414,13 @@ function buildExport(){
   if (fmt === 'ass-split' || fmt === 'ass-stack')
     return C.formatAss(buildAssEvents(), { title: baseName() || 'merged', assStyle: assStyleOf(), extraStyles: slotAssExtraStyles() });
   if (fmt === 'vtt-styled') return buildVttExport();   /* v0.9.238：带 STYLE 块的双语 VTT */
+  /* v0.9.265：单语走单语管线 —— 此前不管什么模式都走 buildBilingual，且 maxW = biMaxW = 32，
+     单语等于一直按双语行宽折行（实测一行能塞 32 个全角字，播放器里直接顶边）。
+     ⚠️ 与预览共用同一个 monoParts()：预览看到几行、导出就是几行。 */
+  if (monoMode()){
+    const items = monoParts().map(p => ({ no: p.no, start: p.start, end: p.end, text: p.dstLines.join('\n') }));
+    return fmt === 'vtt' ? C.formatVtt(items) : C.formatSrt(items);
+  }
   const items = C.buildBilingual(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
     srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems()),
@@ -3254,7 +3440,7 @@ function assPvSample(){
   syncSlotsToRows();   /* v0.9.245：预览也要按槽挑样例，否则预览与导出不是同一条 */
   if (rows && C && typeof C.buildBilingualParts === 'function'){
     try {
-      const parts = C.buildBilingualParts(rows, {
+      const parts = monoMode() ? monoParts() : C.buildBilingualParts(rows, {
         maxW: biMaxWVal(), biMaxW: biMaxWVal(),
         srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems())
       });
@@ -3488,7 +3674,7 @@ function vttAfterFill(){
   syncSrcInh();
   MVTT_COLOR_IDS.forEach(syncColorSw);
   vttAlphaOut();
-  renderVttPv();
+  renderPv();
   vttPresetTip();
 }
 /* 套标准模板：显式交回标准 ⟶ 清掉「继承 / 手改」门控（用户主动选了模板，就是要模板的值） */
@@ -3538,7 +3724,7 @@ function vttStyleOf(){
    此前预览自己写死两行、导出按折行结果给 N 行 → 预览与导出行数不一致（v0.9.224b 的教训）。 */
 function vttCueParts(){
   syncSlotsToRows();   /* v0.9.245：同上，预览与导出共用这一份 */
-  const parts = C.buildBilingualParts(S.rows, {
+  const parts = monoMode() ? monoParts() : C.buildBilingualParts(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
     srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems())
   });
@@ -3651,8 +3837,10 @@ function renderVttPv(){
 }
 function vttPresetLabel(){
   const k0 = vttPresetKey();
+  /* v0.9.265：单语下没有原文行，模板名里的「双语」要换成「双行」 */
+  const stdKey = monoMode() ? 'vttPresetStdMono' : 'vttPresetStd';
   return k0 === 'compact' ? t('vttPresetCompact') : k0 === 'cinema' ? t('vttPresetCinema')
-       : k0 === 'custom' ? t('vttPresetCustom') : t('vttPresetStd');
+       : k0 === 'custom' ? t('vttPresetCustom') : t(stdKey);
 }
 /* 切模板时的 VTT 侧：进「VTT 双语样式」就套默认模板，除非当前已经是「自定义」。
    v0.9.243：custom 档 = 「下面这组值是我的」，三条来路都**不得**被切一次导出格式就冲回预设 ——
@@ -3664,7 +3852,7 @@ function vttPresetLabel(){
    ⚠️ 标准三档仍然是「回到起点」：显式点了 std/compact/cinema，切回来就该是那套模板的值。 */
 function syncVttPanel(){
   const key = vttPresetKey();
-  if (key === 'custom'){ renderVttPv(); return; }
+  if (key === 'custom'){ renderPv(); return; }
   applyVttPreset(MVTT_PRESETS[key] ? key : 'std');
 }
 /* v0.9.240：VTT 面板自己的联动 —— 顶部「写入样式」开关 ↔ 导出档位（vttStyle / vtt），
@@ -3678,7 +3866,7 @@ function setVttStyled(on){
   if (f2 && f2.value !== want) f2.value = want;
   syncVttChrome();
   syncTplSegs();
-  renderVttPv();
+  renderPv();
 }
 function syncVttChrome(){
   const tpl = tplVal();
@@ -3694,8 +3882,10 @@ function syncVttChrome(){
 /* 当前模板的一句话说明：模板换了、界面语言换了都要重算（它不是 data-i18n 能覆盖的静态文案） */
 function vttPresetTip(){
   const k = vttPresetKey();
+  /* v0.9.265：标准档的说明里写着「金色原文」，单语没有原文行 —— 换成单语那一句 */
+  const stdTip = monoMode() ? 'vttTipStdMono' : 'vttTipStd';
   setTip('mVttPresetHint', t(k === 'compact' ? 'vttTipCompact' : k === 'cinema' ? 'vttTipCinema'
-      : k === 'custom' ? 'vttTipCustom' : 'vttTipStd'), k === 'std');
+      : k === 'custom' ? 'vttTipCustom' : stdTip), k === 'std');
 }
 /* ================= v0.9.238：导入 VTT 时继承它自己的样式 =================
    与 ASS 那套（planAssImport）同一条思路：文件自带的外观不该被丢掉，要回到界面上让用户接着改。
@@ -3820,11 +4010,96 @@ function mainPvEls(role){
     ? { box:$('assPv'), scr:$('assPvScreen'), l1:$('assPvLine1'), l2:$('assPvLine2'), tag:$('pvTag'), slotOverride:ov }
     : { box:$('mVttPv'), scr:$('mVttPvScreen'), cue:$('mVttPvCue'), tag:$('pvTag'), slotOverride:ov };
 }
-function renderPv(){ renderAssPv(); renderVttPv(); }
+/* v0.9.265：三块画布互斥（ASS / VTT / SRT+无样式VTT），各自的 render* 自己收放，
+   全量重画一律走这里 —— 别再写 `renderAssPv(); renderVttPv();` 这种成对调用，会漏掉第三个。 */
+function renderPv(){ renderAssPv(); renderVttPv(); renderSrtPv(); }
 /* 「这个格式有没有画面可画」——SRT / 无样式 VTT 不带样式信息，槽对它们无效 */
 function pvUsable(){
   const f = expFmtVal();
   return (f === 'ass-split' || f === 'ass-stack' || f === 'vtt-styled') && !!(S.rows && S.rows.length);
+}
+/* v0.9.265：SRT / 无样式 VTT 有没有内容可画（画的是**文本**，不是样式） */
+function pvPlainUsable(){
+  const f = expFmtVal();
+  return (f === 'srt' || f === 'vtt') && !!(S.rows && S.rows.length);
+}
+/* ================= v0.9.265：SRT / 无样式 VTT 预览 =================
+   这两档此前只有一行「槽对它无效」的空提示，预览卡等于空着。现在画两块：
+     ① 画面：播放器默认外观（白字 + 黑描边，居中靠底）—— ⚠️ 这是**播放器加的**，不是文件里存的；
+     ② 文本块：文件里真正写进去的内容（序号 + 时间轴 + 折行后的文本）。
+   ⚠️ 两块不许合并：合成一块会让人以为 SRT 里真的存了白字黑边，
+      回头又去改样式槽 —— 等于把「改了没反应」这个坑换个地方再踩一遍。
+   ⚠️ 文本走 vttCueParts()（与导出同一条 buildBilingualParts 管线 + 同一个 order），
+      所以这里看到几行、导出就是几行，不另写一套折行。 */
+/* 画哪一条：跟随表格里选中的行（与 ASS/VTT 预览「成片」视角一个路子），没选就第一条 */
+function srtPvRowIdx(){
+  if (!S.rows || !S.rows.length) return -1;
+  if (S.sel && S.sel.size){
+    const a = Array.from(S.sel).sort((x,y) => x-y);
+    for (let n = 0; n < a.length; n++){ if (S.rows[a[n]]) return a[n]; }
+  }
+  return 0;
+}
+/* ms → SRT 时间戳（00:00:01,000）—— 与导出端同一格式（逗号分隔毫秒，VTT 才是点号） */
+function srtTs(ms){
+  const s = Math.max(0, Number(ms) || 0);
+  const h = Math.floor(s/3600000), m = Math.floor((s%3600000)/60000), sec = Math.floor((s%60000)/1000);
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' +
+         String(sec).padStart(2,'0') + ',' + String(s%1000).padStart(3,'0');
+}
+/* 取这一条对应的 part —— ⚠️ parts 可能比 rows 多（超容量切分会把一句长台词切成两条），
+   所以按**时间轴**回定位，不能拿 rows 下标直接取 parts。 */
+function srtPvPart(idx){
+  const parts = vttCueParts();
+  if (!parts || !parts.length) return null;
+  const row = (S.rows || [])[idx];
+  if (row){
+    const hit = parts.filter(p => Math.abs(Number(p.start || 0) - Number(row.start || 0)) < 1);
+    if (hit.length) return hit[0];
+  }
+  return parts[Math.min(idx, parts.length - 1)] || null;
+}
+function renderSrtPv(){
+  const box = $('srtPv'), scr = $('srtPvScreen'), l1 = $('srtPvLine1'), l2 = $('srtPvLine2');
+  const raw = $('srtPvRaw'), note = $('srtPvNote'), tag = $('pvTag');
+  if (!box || !scr || !l1 || !l2) return;
+  if (!pvPlainUsable()){ box.style.display = 'none'; return; }
+  const idx = srtPvRowIdx();
+  if (idx < 0){ box.style.display = 'none'; return; }
+  const row = S.rows[idx] || {};
+  let p = null;
+  try { p = srtPvPart(idx); } catch(e){ p = null; }   /* 折行失败也不该让预览白屏 */
+  let txt = (p && p.lines) ? p.lines.map(x => String((x && x.text != null) ? x.text : '')).filter(s => s.trim() !== '') : [];
+  if (!txt.length){
+    /* 退回原始文本：mono 模式的文本存在 zh（en 恒空），别照搬双语那套顺序把空行画上去 */
+    const en = String(row.en == null ? '' : row.en), zh = String(row.zh == null ? '' : row.zh);
+    const arr = monoMode() ? [zh || en] : (orderVal() === 'dst-first' ? [zh, en] : [en, zh]);
+    txt = arr.filter(s => s.trim() !== '');
+  }
+  if (!txt.length){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const k = (scr.clientHeight || 240) / 1080;
+  const fs = 46 * k, base = 58 * k;
+  const setLine = (el, s, bottom) => {
+    const inner = el.firstElementChild || el;
+    inner.textContent = s;
+    el.style.display = '';
+    el.style.fontSize = fs.toFixed(1) + 'px';
+    el.style.color = '#FFFFFF';
+    el.style.webkitTextStroke = Math.max(1, 2.5 * k).toFixed(2) + 'px #000000';
+    el.style.paintOrder = 'stroke fill';
+    el.style.bottom = bottom.toFixed(1) + 'px';
+    el.style.textAlign = 'center';
+    el.style.fontWeight = '400';
+  };
+  /* 只画前两行：SRT 的 cue 在播放器里也是同一时刻显示，超出的行由播放器自己折 */
+  if (txt.length === 1){ l1.style.display = 'none'; setLine(l2, txt[0], base); }
+  else { setLine(l1, txt[0], base + fs * 1.2 + 6 * k); setLine(l2, txt[1], base); }
+  const no = (p && p.no) ? p.no : (idx + 1);
+  /* ⚠️ 用 textContent 而不是 innerHTML：字幕文本里带 < 会被当标签吃掉，这里也不是富文本 */
+  if (raw) raw.textContent = no + '\n' + srtTs(row.start) + ' --> ' + srtTs(row.end) + '\n' + txt.join('\n');
+  if (note) note.textContent = t('srtPvNote');
+  if (tag) tag.textContent = t('pvRowNo', no);
 }
 /* 视角按钮 + 「没有画面」的说明 —— 只跟导出格式有关，跟 ASS/VTT 哪个角色无关 */
 function syncPvChrome(){
@@ -3835,8 +4110,9 @@ function syncPvChrome(){
     seg.style.display = ok ? '' : 'none';
     seg.querySelectorAll('.segbtn').forEach(b => b.classList.toggle('on', b.getAttribute('data-pv') === pvView()));
   }
+  /* v0.9.265：SRT / 无样式 VTT 现在**有画面**（文本预览），只有「真没内容可画」时才留那行提示 */
   const none = $('pvNone');
-  if (none){ none.style.display = ok ? 'none' : 'block'; none.textContent = t('slotPvNone'); }
+  if (none){ none.style.display = (ok || pvPlainUsable()) ? 'none' : 'block'; none.textContent = t('slotPvNone'); }
 }
 function setPvView(v){
   if (!S.pv) S.pv = {};
@@ -3935,7 +4211,7 @@ function doCopy(){
 function restoreSlot(id){
   const f = null;
   for (const x of SLOT_FACTORY){ if (x.id === id){ S.style.slots[id] = { color:x.color, dst:Object.assign({}, x.dst), src:{}, custom:false, modified:false }; break; } }
-  renderSlots(); renderAssPv(); renderVttPv();
+  renderSlots(); renderPv();
 }
 function newSlot(){
   ensureStyle();
@@ -4155,7 +4431,7 @@ function bindSlotUI(){
       if (act === 'set') d[k] = slotDefaultVal(role, k);
       else delete d[k];
       markSlotModified(S.style.cur);
-      renderSlots(); renderAssPv(); renderVttPv();
+      renderSlots(); renderPv();
     });
     box.addEventListener('change', e=>{
       const el = e.target;
@@ -4166,7 +4442,7 @@ function bindSlotUI(){
         const d = s[addRole] || (s[addRole] = {});
         if (!Object.prototype.hasOwnProperty.call(d, k)) d[k] = slotDefaultVal(addRole, k);
         markSlotModified(S.style.cur);
-        renderSlots(); renderAssPv(); renderVttPv();
+        renderSlots(); renderPv();
         return;
       }
       const key = el.getAttribute && el.getAttribute('data-sp');
@@ -4183,7 +4459,7 @@ function bindSlotUI(){
       else if (tp === 'num') d[k] = Math.round(parseFloat(el.value) || 0);
       else d[k] = el.value;   /* color / font / enum 原样存字符串 */
       markSlotModified(S.style.cur);
-      renderSlots(); renderAssPv(); renderVttPv();
+      renderSlots(); renderPv();
     });
   }
   const vd = $('slotViewDiff'), va = $('slotViewAll');
@@ -4196,13 +4472,13 @@ function bindSlotUI(){
     if (!name) return;
     const n = slotImportScheme(S.style.cur, name);
     toast(n ? t('slotImpDone', n, name) : t('slotImpSame', name));
-    renderSlots(); renderAssPv(); renderVttPv();
+    renderSlots(); renderPv();
   });
   const ua = $('slotUncoverAll');
   if (ua) ua.addEventListener('click', ()=>{
     const s = slotObj(S.style.cur); if (!s) return;
     s.dst = {}; s.src = {}; markSlotModified(S.style.cur);
-    renderSlots(); renderAssPv(); renderVttPv();
+    renderSlots(); renderPv();
   });
   const rs = $('slotRestore');
   if (rs) rs.addEventListener('click', ()=>{ ensureStyle(); restoreSlot(S.style.cur); });
@@ -4400,7 +4676,7 @@ function applyAssPlan(plan){
   if (mg && mg.marginR != null){ const el = $('assMarginR'); if (el) el.value = mg.marginR; }
   syncAssChrome();
   noteAssImport(plan);
-  renderAssPv();
+  renderPv();
   const pnl = $('assPanel'); if (pnl) pnl.open = true;   /* 让用户看见「样式是从文件来的」 */
   toast(t('assImportedToast'));
   return true;
@@ -4444,8 +4720,8 @@ function init(){
   f2.value = f1.value = 'srt';
   renderTplSegs();   /* v0.9.229：分段按钮（两份 select 都隐藏，只当状态源） */
   /* v0.9.238：切模板时 ASS / VTT 两套面板各走各的同步，预览各画各的 */
-  f1.addEventListener('change', ()=>{ syncAssPanel(); syncVttPanel(); renderAssPv(); renderVttPv(); });
-  f2.addEventListener('change', ()=>{ syncAssPanel(); syncVttPanel(); renderAssPv(); renderVttPv(); });
+  f1.addEventListener('change', ()=>{ syncAssPanel(); syncVttPanel(); renderPv(); });
+  f2.addEventListener('change', ()=>{ syncAssPanel(); syncVttPanel(); renderPv(); });
   /* v0.9.224：参数一改，预览即时重画（微调在当前模板内保留；切模板会被预设覆盖，这是预期行为） */
   ['assDstSize','assSrcSize','assDstColor','assSrcColor','assDstOutline','assSrcOutline','assDstOutlineColor','assSrcOutlineColor',
    'assDstFont','assSrcFont','assDstAlpha','assSrcAlpha','assDstMV','assSrcMV',
@@ -4454,7 +4730,7 @@ function init(){
    'assDstEdgeColor','assSrcEdgeColor','assDstEdgeAlpha','assSrcEdgeAlpha','assDstAlign','assSrcAlign',
    'assMarginL','assMarginR'].forEach(id=>{
     const el = $(id); if (!el) return;
-    ['input','change'].forEach(ev=>el.addEventListener(ev, renderAssPv));
+    ['input','change'].forEach(ev=>el.addEventListener(ev, renderPv));
   });
   /* 「阴影/底衬」切到「底衬」时「深度」要禁用（播放器会忽略它，留着就是填了没反应的框） */
   ['assDstEdge','assSrcEdge'].forEach(id=>{
@@ -4467,20 +4743,23 @@ function init(){
   document.querySelectorAll('input[name=biOrder]').forEach(el=>el.addEventListener('change', ()=>{
     const d = $('assDstMV'), s = $('assSrcMV');
     if (d && s){ const tmp = d.value; d.value = s.value; s.value = tmp; }
-    renderAssPv();
-  renderVttPv();   /* v0.9.238：上下顺序对 VTT 决定哪一行是原文（<c.src> 标在哪行） */
+    renderPv();   /* v0.9.238：上下顺序对 VTT 决定哪一行是原文（<c.src> 标在哪行） */
   }));
+  /* v0.9.265：行宽输入框 —— 单语与双语各存各的值（切模式时交换，见 syncMaxWInput）。
+     改了必须重画：折行结果变了，预览与导出都得跟着变（此前这个框在单语下根本不显示）。 */
+  const bmEl = $('biMaxW');
+  if (bmEl) bmEl.addEventListener('input', ()=>{ saveMaxWInput(); renderPv(); });
   /* v0.9.228：调整模式换「拆分结构」后必须重新拆一遍，否则选了没反应（要用户自己再点一次按钮） */
   const smEl = $('structMode');
   if (smEl) smEl.addEventListener('change', ()=>{ if (S.mode === 'adjust' && S.rows) doAdjust(); });
-  window.addEventListener('resize', renderAssPv);
+  window.addEventListener('resize', renderPv);
   /* v0.9.242：布局 radio 已隐藏（布局跟着模板键走，见 layoutRow 注释），它不再需要 change 监听。
      改成监听**每一个** ASS 字段：手改任意一个 = 这套参数是我的 → 落到「自定义」，
      且一个值都不动（旧行为一直停在 split/stack 档，而点「自定义」又会把值整套重置）。
      ⚠️ 程序写值（套预设 / 导入 / 套方案）由 ASS_FILL 挡掉，不会被误判成手改。 */
   ASS_DEFAULTS.forEach(pair=>{
     const el = $(pair[0]); if (!el) return;
-    const onEdit = ()=>{ markAssEdited(); renderAssPv(); };
+    const onEdit = ()=>{ markAssEdited(); renderPv(); };
     ['input','change'].forEach(ev=>el.addEventListener(ev, onEdit));
   });
   $('btnAssReset').addEventListener('click', resetAssDefaults);
@@ -4492,13 +4771,13 @@ function init(){
       VTT_INH.dirty[regionOfId(id)] = true;
       const sel = $('mVttPresetSel'); if (sel) sel.value = 'custom';
       syncSrcInh();    /* 原文行「沿用 / 单独设」切换 → 值控件的明暗跟着走 */
-      renderVttPv();
+      renderPv();
       syncTplSegs();   /* v0.9.240：手改 = 落到「自定义」，按钮组要跟着换高亮、并显出「自定义」键 */
     };
     ['input','change'].forEach(ev=>el.addEventListener(ev, onEdit));
   });
   const psel = $('mVttPresetSel');
-  if (psel) psel.addEventListener('change', ()=>{ if (psel.value === 'custom') renderVttPv(); else applyVttPreset(psel.value); });
+  if (psel) psel.addEventListener('change', ()=>{ if (psel.value === 'custom') renderPv(); else applyVttPreset(psel.value); });
   /* v0.9.240：「写入样式」开关 —— 关掉 = 导出无样式 VTT（不含 STYLE 块） */
   const vwrite = $('mVttWriteStyle');
   if (vwrite) vwrite.addEventListener('change', ()=>setVttStyled(vwrite.checked));
@@ -4522,7 +4801,7 @@ function init(){
     const vr = $(q[0]), vo = $(q[1]);
     if (vr && vo){ const upd=()=>{ vo.textContent = String(vr.value) + '%'; }; vr.addEventListener('input', upd); vr.addEventListener('change', upd); upd(); }
   });
-  window.addEventListener('resize', renderVttPv);
+  window.addEventListener('resize', renderPv);
   syncAssPanel();
   syncVttPanel();
   /* ---------- v0.9.231：自定义样式方案 ---------- */

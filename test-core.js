@@ -5345,7 +5345,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.264/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.265/.test(mg), 'merge.html 未引用 v0.9.265 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5385,9 +5385,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.264</.test(html), '首页版本号未升 0.9.256');
-    assert.ok(/class="ver-tag">v0\.9\.264</.test(html), '工作台版本号未升 0.9.256');
-    assert.ok(/srt-core\.js\?v=0\.9\.264/.test(html), 'srt-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.265</.test(html), '首页版本号未升 0.9.265');
+    assert.ok(/class="ver-tag">v0\.9\.265</.test(html), '工作台版本号未升 0.9.265');
+    assert.ok(/srt-core\.js\?v=0\.9\.265/.test(html), 'srt-core.js?v 未升 0.9.265');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5564,8 +5564,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.264</.test(mg), 'merge.html 版本未升 0.9.256');
-    assert.ok(/merge-core\.js\?v=0\.9\.264/.test(mg), 'merge-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.265</.test(mg), 'merge.html 版本未升 0.9.265');
+    assert.ok(/merge-core\.js\?v=0\.9\.265/.test(mg), 'merge-core.js?v 未升 0.9.265');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5628,7 +5628,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/if \(tpl === 'custom'\) return assLayoutVal\(\) === 'ass-stack' \? 'stack' : 'split'/.test(mg),
       'custom 未跟随布局选预设');
     /* resetAssDefaults 必须重刷预览（v0.9.229：标签不再随模板切换，两个框都叫「离底距离」） */
-    assert.ok(/function resetAssDefaults\(\)\{[\s\S]{0,200}renderAssPv\(\)/.test(mg), 'reset 未刷新预览');
+    assert.ok(/function resetAssDefaults\(\)\{[\s\S]{0,200}renderPv\(\)/.test(mg), 'reset 未刷新预览');
   });
 
   t('v0.9.229：两个「距离」框统一成「离底距离」（此前一个离顶、一个叫两行间距）', () => {
@@ -5931,14 +5931,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const iAdj = mg.indexOf('function doAdjust(){');
     assert.ok(iAdj > 0, '找不到 doAdjust');
     const adjBody = mg.slice(iAdj, mg.indexOf('function swapSides('));
-    assert.ok(/renderAssPv\(\);/.test(adjBody), 'doAdjust 里没有 renderAssPv()');
+    assert.ok(/renderPv\(\);/.test(adjBody), 'doAdjust 里没有 renderPv()');
     /* 必须先显示 #exp 再画，否则画布高度是 0，位置全错 */
-    assert.ok(adjBody.indexOf("$('exp').style.display = 'block';") < adjBody.indexOf('renderAssPv();'),
-      'doAdjust 里 renderAssPv 早于 #exp 显示');
+    assert.ok(adjBody.indexOf("$('exp').style.display = 'block';") < adjBody.indexOf('renderPv();'),
+      'doAdjust 里 renderPv 早于 #exp 显示');
     const swBody = mg.slice(mg.indexOf('function swapSides(){'), mg.indexOf('function fmtShort('));
-    assert.ok(/renderAssPv\(\);/.test(swBody), 'swapSides 后未重画预览（上下两条会停在旧内容）');
+    assert.ok(/renderPv\(\);/.test(swBody), 'swapSides 后未重画预览（上下两条会停在旧内容）');
     const smBody = mg.slice(mg.indexOf('function syncMode(){'), mg.indexOf('function setI18nKey('));
-    assert.ok(/renderAssPv\(\);/.test(smBody), 'syncMode 清 rows 后未收起预览');
+    assert.ok(/renderPv\(\);/.test(smBody), 'syncMode 清 rows 后未收起预览');
     /* 调整模式换「拆分结构」要立刻重拆，不能等用户再点一次按钮 */
     assert.ok(/smEl\.addEventListener\('change', \(\)=>\{ if \(S\.mode === 'adjust' && S\.rows\) doAdjust\(\); \}\)/.test(mg),
       '拆分结构变了不会重拆');
@@ -6186,7 +6186,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/el\.type === 'checkbox'\) \? !!el\.checked : el\.value/.test(mg), '方案存 checkbox 用了 value（无效）');
     /* 应用方案绝不能走 syncAssPanel —— 那会触发 applyTplDefaults 把值整套覆盖 */
     assert.ok(!/function schemeApplyObj[\s\S]{0,600}syncAssPanel/.test(mg), '套用方案走了 syncAssPanel，值会被预设冲掉');
-    assert.ok(/function schemeApplyObj[\s\S]{0,800}syncAssEdge\(\); syncAssChrome\(\); renderAssPv\(\);/.test(mg),
+    assert.ok(/function schemeApplyObj[\s\S]{0,800}syncAssEdge\(\); syncAssChrome\(\); renderPv\(\);/.test(mg),
       '套用方案后未同步边色控件/显隐/预览');
   });
 
@@ -6851,7 +6851,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* v0.9.243：判据从「是不是继承来的」改成「是不是 custom 档」—— 继承值本来就落在 custom，
        而**手改过**的值同样落在 custom，以前它被切一次导出格式就冲回预设，那是丢数据
        （ASS 那边 v0.9.242 起 custom 档已经不重套预设，两边必须一致）。 */
-    assert.ok(/if \(key === 'custom'\)\{ renderVttPv\(\); return; \}/.test(sp),
+    assert.ok(/if \(key === 'custom'\)\{ renderPv\(\); return; \}/.test(sp),
       'custom 档（继承来的 / 手改过的 / 点了「自定义」键的）不该被切模板冲掉');
     assert.ok(/applyVttPreset\(MVTT_PRESETS\[key\] \? key : 'std'\)/.test(sp),
       '三套标准档切回来仍要重套各自预设（它们是"起点"）');
@@ -6896,10 +6896,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       return mg.slice(i, j > 0 ? j : mg.length).indexOf(needle) >= 0;
     };
     ['doMerge','doAdjust','syncMode'].forEach(fn =>
-      assert.ok(fnHas(fn, 'renderVttPv();'), fn + ' 重算了合并结果却没重画 VTT 预览'));
+      assert.ok(fnHas(fn, 'renderPv();'), fn + ' 重算了合并结果却没重画预览'));
     /* 上下顺序（哪一行是原文）变了也要重画：它决定 <c.src> 标在哪一行 */
     const bi = mg.slice(mg.indexOf("input[name=biOrder]"), mg.indexOf("/* v0.9.228：调整模式换"));
-    assert.ok(bi.indexOf('renderVttPv();') >= 0, '换上下顺序没重画 VTT 预览');
+    assert.ok(bi.indexOf('renderPv();') >= 0, '换上下顺序没重画预览');
   });
 
   t('v0.9.238：手改过的区域不会被下一次导入悄悄覆盖（改了就打脏标记）', () => {
@@ -7393,11 +7393,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.264/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.264/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.264/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.264/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.264/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.265/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.265/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.265/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.265/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.265/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8008,14 +8008,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/btnDownload:'下载字幕'/.test(mg), '下载文案里还有图标字符');
   });
 
-  t('v0.9.249：单语模式的两处布局错位（视觉改版时实测发现）', () => {
-    /* ⚠️ .frow 是两列栅格。隐藏了「译文整体偏移」的内容却留下标签，
-       后面的「导出格式」标签会被顶到第 2 格、格式卡退进 170px 的窄列里挤成竖排文字。 */
-    assert.ok(/'shiftLbl','shiftRow','biMaxWLbl','biMaxWRow','orderLbl','orderRow'/.test(mg),
-      '单语模式漏收「译文整体偏移」标签（格式卡会被挤扁）');
-    /* 调整 / 单语模式只有一份输入，输入区收回单列，别留半边空白 */
+  t('v0.9.249：只剩一份输入时输入区收回单列（别留半边空白）', () => {
     assert.ok(/\.grid2\.single\{grid-template-columns:1fr\}/.test(mg), '缺「单列」栅格类');
     assert.ok(/classList\.toggle\('single', !isMerge\)/.test(mg), '切模式没同步单列类');
+    /* ⚠️ .frow 是两列栅格：隐藏了内容却留下标签，后面的「导出格式」标签会被顶到第 2 格、
+       格式卡退进 170px 窄列里挤成竖排文字 —— 所以标签与输入必须**成对**收放。
+       （v0.9.265 起偏移 / 行宽在单语下不再收起，这条规则落到「双语上下顺序」上。） */
+    assert.ok(/\['orderLbl','orderRow'\]\.forEach/.test(mg), '「双语上下顺序」的标签与输入没收成对（栅格会错位）');
   });
 
   t('v0.9.249：筛选态与当前槽必须一眼区分', () => {
@@ -8124,7 +8123,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     ['id="slotPv"','PV_MINI','pvTarget(','miniPvEls','renderSlotPvMini'].forEach(k =>
       assert.ok(mg.indexOf(k) < 0, '还留着第二块画布的痕迹：' + k));
     /* 切视角 = 重画同一套渲染器 */
-    assert.ok(/function renderPv\(\)\{ renderAssPv\(\); renderVttPv\(\); \}/.test(mg), '缺统一重画入口');
+    assert.ok(/function renderPv\(\)\{ renderAssPv\(\); renderVttPv\(\); renderSrtPv\(\); \}/.test(mg), '缺统一重画入口');
     assert.ok(/function setPvView\(v\)\{[\s\S]{0,220}renderPv\(\);\s*\}/.test(mg), '切视角没触发重画');
     assert.ok(/b\.classList\.toggle\('on', b\.getAttribute\('data-pv'\) === pvView\(\)\)/.test(mg), '视角按钮没跟着当前视角亮');
     /* ✎ 面板里的小入口：点了把右栏预览切到「这个槽」；窄屏（右栏落到页底）顺手滚过去 */
@@ -8187,7 +8186,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       '✎ 面板里那块旧画布（连同它的 CSS）没删干净');
     /* 「有没有画面可画」→ 视角按钮与说明二选一，不能同时缺也不能同时给 */
     assert.ok(/seg\.style\.display = ok \? '' : 'none';/.test(mg), '不可预览时没把视角按钮收起来');
-    assert.ok(/none\.style\.display = ok \? 'none' : 'block';/.test(mg), '可预览时「没有画面」的提示没收掉');
+    assert.ok(/none\.style\.display = \(ok \|\| pvPlainUsable\(\)\) \? 'none' : 'block';/.test(mg), '可预览时「没有画面」的提示没收掉');
     /* 每次合并/调整/切换模式之后，整栏一起亮出来 */
     assert.ok((mg.match(/railOn\(true\);/g) || []).length >= 4, '还有地方没把右栏亮出来');
     /* 三档视角 + 面板入口的四语文案 */
@@ -8493,6 +8492,94 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/setPvView\('slot'\);/.test(blk2), '小铅笔没把右侧画面切到这个槽');
     assert.ok(/det\.open = true;/.test(blk2), '小铅笔不再展开编辑面板了');
     assert.ok(blk2.indexOf('S.filter') === -1, '小铅笔语义变了（不许碰筛选）');
+  });
+
+
+  t('v0.9.265：单语模式必须留着「整体偏移」与「行宽」（用户实测：这两个被藏了）', () => {
+    /* v0.9.245 把偏移 / 行宽 / 上下顺序当「双语概念」整块收起，结果：
+       ① doMono 一直在读 dstShift，用户却设不了（代码是通的，只是框没了）；
+       ② 单语一直按双语行宽 32 折行，一行能塞 32 个全角字。 */
+    assert.ok(/\['orderLbl','orderRow'\]\.forEach/.test(mg), '单语下没把「双语上下顺序」收起来');
+    assert.ok(/\['shiftLbl','shiftRow','biMaxWLbl','biMaxWRow'\]\.forEach[\s\S]{0,200}style\.display = ''/.test(mg),
+      '单语下把偏移 / 行宽也收了（用户就设不了偏移、也看不到行宽）');
+    /* 标签换词只能换内部那个 span：给 .flbl 外壳赋 textContent 会把 ⓘ 一起冲掉，
+       而且 setI18nKey 给外壳加了 data-i18n，之后每次 applyI18n 都会重写一遍。 */
+    assert.ok(/lblSpan\('shiftLbl'\)/.test(mg) && /lblSpan\('biMaxWLbl'\)/.test(mg),
+      '标签换词直接作用在外壳上了（ⓘ 会被冲掉）');
+    /* 切模式时**交换**行宽值，不是重置：用户把单语调成 20，切去双语再回来还得是 20 */
+    assert.ok(/function syncMaxWInput\(\)/.test(mg) && /function saveMaxWInput\(\)/.test(mg), '缺行宽的双份记忆');
+  });
+
+  t('v0.9.265：单语折行走 buildMonoParts（此前一直拿双语管线 32 顶替）', () => {
+    /* 引擎里 C.buildMonoParts 是专门给单语写的（R0~R3 四层规则 + 按语言行宽），
+       此前全项目只有单元测试在调它，页面一律走 buildBilingual + maxW = biMaxW = 32。 */
+    assert.ok(/function monoParts\(\)\{[\s\S]{0,400}C\.buildMonoParts\(/.test(mg), '缺单语折行的唯一入口 monoParts()');
+    const n = (mg.match(/monoMode\(\) \? monoParts\(\)/g) || []).length;
+    assert.ok(n >= 3, '只有 ' + n + ' 处接了单语管线（ASS 事件 / ASS 样例 / VTT 预览都得走同一份）');
+    const bi0 = mg.indexOf('function buildExport(){');
+    const bi1 = mg.indexOf('\nfunction ', bi0 + 10);
+    const be = mg.slice(bi0, bi1 > 0 ? bi1 : mg.length);
+    assert.ok(/monoMode\(\)\)\{[\s\S]{0,300}monoParts\(\)/.test(be), '单语导出还在走 buildBilingual');
+    /* 语言判定：单语下 S.dst 恒空，必须读 S.rows，否则中文也按「其他语言 21」折 */
+    assert.ok(/S\.mode === 'mono'[\s\S]{0,220}S\.src \|\| \[\]/.test(mg), '单语的语言判定没兜底（拿不到文本 → 行宽永远 21）');
+    assert.ok(/monoMaxWDefault/.test(mg) && /MONO_MAXW_BY_LANG/.test(mg), '单语行宽没按语言给（中文该 16）');
+    assert.ok(/'zh-CN':16/.test(mg) && /'ja':13/.test(mg), '单语行宽表不对（中 16 / 日 13）');
+  });
+
+  t('v0.9.265：SRT / 无样式 VTT 也有预览（播放器画面 + 文件文本，两块分开）', () => {
+    assert.ok(/id="srtPv"/.test(mg) && /id="srtPvRaw"/.test(mg), '缺 SRT 预览容器');
+    assert.ok(/function renderSrtPv\(\)/.test(mg), '缺 renderSrtPv');
+    assert.ok(/function pvPlainUsable\(\)/.test(mg), '缺「无样式格式也有内容可画」的判据');
+    /* ⚠️ 画面是播放器加的默认外观，不是文件里存的 —— 两块必须分开，
+       否则用户看完画面又去改样式槽，「改了没反应」换个地方再踩一遍。 */
+    assert.ok(/note\.textContent = t\('srtPvNote'\)/.test(mg), 'SRT 预览没说明「上面是播放器的默认外观」');
+    assert.ok(/raw\.textContent = no/.test(mg), '文件内容要用 textContent（字幕里带 < 会被当标签吃掉）');
+    /* 无样式格式下样式槽整块收起，但要留一句「它去哪了、怎么让它回来」 */
+    assert.ok(/sw\.style\.display = plain \? 'none' : ''/.test(mg), '样式槽在 SRT / 无样式 VTT 下没收起来（改了没反应的假控件）');
+    assert.ok(/id="slotPlainNote"/.test(mg), '样式槽收起后没有说明（老用户会以为功能被砍）');
+    /* 只收起不删除：DOM 与已分配的槽数据一个不动，切回 ASS / 带样式 VTT 原样回来 */
+    assert.ok(/function renderPv\(\)\{ renderAssPv\(\); renderVttPv\(\); renderSrtPv\(\); \}/.test(mg), '缺三块画布的统一重画入口');
+    ['slotPlainNote','srtPvNote','pvRowNo','lblMonoMaxW'].forEach(k => {
+      const c = mg.split(k + ':').length - 1;
+      assert.ok(c >= 4, k + ' 词条不齐（只有 ' + c + ' 处，四语各要一份）');
+    });
+  });
+
+  t('v0.9.265：单语模式下不许再出现「原文 / 译文」这两套字眼与控件', () => {
+    /* 用户实测（2026-10-10）：单语字幕里还能看到 ASS 面板的「原文（副）」一整栏、
+       VTT 面板的「原文行」整组、模板名里的「底部双语」—— 这些在单语下一个字节都影响不到导出，
+       摆着就是「改了半天没反应」的假控件。 */
+    assert.ok(/function syncMonoChrome\(\)/.test(mg), '缺单语显隐收口 syncMonoChrome');
+    /* ① ASS 面板：原文（副）整栏收起 + 剩下的那栏改叫「字幕」+ 两栏栅格收成单列 */
+    assert.ok(/id="assSrcCol"/.test(mg) && /\$\('assSrcCol'\)[\s\S]{0,60}display = mono/.test(mg), 'ASS 原文栏在单语下没收掉');
+    assert.ok(/id="assCols"/.test(mg) && /\$\('assCols'\)[\s\S]{0,60}classList\.toggle\('mono', mono\)/.test(mg), 'ASS 收掉一栏后没收成单列（会留半边空白）');
+    assert.ok(/\$\('assDstColTitle'\), mono \? 'lblOneCol'/.test(mg), 'ASS 那一栏标题在单语下仍叫「译文（主）」');
+    /* ② VTT 面板：原文行整组收起 + 两个组标题与面板标题改词 + 栅格收成单列 */
+    assert.ok(/id="mVttSrcGrp"/.test(mg) && /\$\('mVttSrcGrp'\)[\s\S]{0,60}display = mono/.test(mg), 'VTT 原文行整组在单语下没收掉');
+    assert.ok(/id="mVttCols2"/.test(mg) && /\$\('mVttCols2'\)[\s\S]{0,60}classList\.toggle\('mono', mono\)/.test(mg), 'VTT 收掉一组后没收成单列');
+    assert.ok(/\$\('mVttGrpAllTitle'\), mono \? 'vttGrpAllMono'/.test(mg), '「整条字幕（两层共用）」在单语下没换词');
+    assert.ok(/\$\('mVttGrpDstTitle'\), mono \? 'vttGrpOne'/.test(mg), '「译文行（主样式）」在单语下没换词');
+    assert.ok(/\$\('mVttPanelTitle'\), mono \? 'vttPanelTitleMono'/.test(mg), 'VTT 面板标题在单语下仍写「双语样式」');
+    /* ③ 模板显示名：预览角标 / 导出摘要都读 vttPresetLabel()，单语下要把「双语」换成「双行」 */
+    assert.ok(/\$\('mVttOptStd'\), mono \? 'vttPresetStdMono'/.test(mg), '模板下拉里的「底部双语」没跟着换');
+    assert.ok(/const stdKey = monoMode\(\) \? 'vttPresetStdMono'/.test(mg), 'vttPresetLabel 不认单语（角标与导出摘要会继续写「双语」）');
+    assert.ok(/const stdTip = monoMode\(\) \? 'vttTipStdMono'/.test(mg), 'ⓘ 说明里那句「金色原文」在单语下没换');
+    /* 只收起不删除：一律 display:none / 换键，不删 DOM、不动值 —— 切回双语原样回来 */
+    const fn0 = mg.indexOf('function syncMonoChrome(){');
+    const fn1 = mg.indexOf('\nfunction ', fn0 + 10);
+    const body = mg.slice(fn0, fn1 > 0 ? fn1 : mg.length);
+    assert.ok(!/remove\(\)/.test(body) && !/innerHTML = ''/.test(body), 'syncMonoChrome 删了 DOM（切回双语就回不来了）');
+    assert.ok(/vttPresetTip\(\);/.test(body) && /syncExpSum\(\);/.test(body), '换词后没重算 ⓘ 与导出摘要（会停在旧文案上）');
+    /* 三个入口：切模式、切格式 / 导入样式、换界面语言 */
+    assert.ok(/syncMonoChrome\(\);[\s\S]{0,80}v0\.9\.265/.test(mg), 'syncMode 里没调用 syncMonoChrome');
+    assert.ok(/renderSrtPv\(\);[\s\S]{0,320}syncMonoChrome\(\);/.test(mg), 'syncAssChrome 里没调用 syncMonoChrome（换语言会漏）');
+    /* 槽编辑的原文参数组 —— 246 起就按单语走了，别被后续改动带回去 */
+    assert.ok(/monoMode\(\) \? \[\['dst', null\]\]/.test(mg), '槽编辑在单语下又给出原文那半参数组');
+    /* 四语齐全：漏一种语言，界面上那一档就是空格 */
+    ['lblOneCol','vttGrpAllMono','vttGrpOne','vttPanelTitleMono','vttPresetStdMono','vttTipStdMono'].forEach(k => {
+      const c = mg.split(k + ':').length - 1;
+      assert.ok(c >= 4, k + ' 词条不齐（只有 ' + c + ' 处，四语各要一份）');
+    });
   });
 
 }
