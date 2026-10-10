@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/merge.html 与 /en/merge.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
 <title>特效字幕处理工具 - 随心字幕 AI (AI-SRTSub)</title>
 <meta name="description" content="免费在线特效字幕处理工具：合并两份字幕成双语、调整现成双语字幕，或给单语字幕直接加样式特效（SRT / VTT / ASS / SBV）。">
 <meta name="keywords" content="字幕合并,特效字幕,双语字幕,ASS字幕样式,VTT字幕样式,单语字幕加特效,字幕配轴,中英双语字幕,免费字幕工具,subtitle styling">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#EC4899">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
 <style>
   /* ================= v0.9.249：视觉系统「收敛精修」 =================
      旧系统的问题：暖脏灰底（#F8F7F5）没有灰阶层级、粉紫渐变到处铺
@@ -652,7 +655,7 @@ crossorigin="anonymous"></script>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.272</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.273</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -1190,7 +1193,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.272"></script>
+<script src="merge-core.js?v=0.9.273"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -5742,12 +5745,20 @@ function syncColorSw(id){
   sw.style.background = ok ? ('#'+v.replace('#','').toUpperCase()) : 'transparent';
   sw.style.borderStyle = ok ? 'solid' : 'dashed';
 }
+/* v0.9.272：URL 语言优先（/en/merge.html 就该是英文界面，不能让人进来再手动切一次）。
+   顺序：URL > 上次手动选的 > 浏览器语言。 */
+function pathUiLang(){
+  const m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:merge|clean)\.html/);
+  if (m && UI_LANGS.some(x=>x[0]===m[1])) return m[1];
+  return null;
+}
 function initLang(){
   const sel = $('uiLang');
   UI_LANGS.forEach(pair=>{ const o=document.createElement('option'); o.value=pair[0]; o.textContent=pair[1]; sel.appendChild(o); });
   let saved = null;
   try { saved = localStorage.getItem('mergeUiLang'); } catch(e){}
-  UI.lang = (saved && UI_LANGS.some(x=>x[0]===saved)) ? saved : detectUiLang();
+  const pLang = pathUiLang();
+  UI.lang = pLang || ((saved && UI_LANGS.some(x=>x[0]===saved)) ? saved : detectUiLang());
   sel.value = UI.lang;
   sel.addEventListener('change', ()=>{
     UI.lang = sel.value;
@@ -5927,5 +5938,16 @@ init();
 })();
 </script>
 <script src="site-nav.js" data-tool="fx"></script>
+
+<!-- v0.9.272：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
+     server.js 按语言路由替换成对应语言，直接开文件时显示下面的简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">特效字幕处理工具 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>把两份字幕合并成双语，或给字幕直接上样式：字体、颜色、描边、位置所见即所得。</strong></p>
+    <p style="margin-top:8px;">双语合并与双语调整、ASS / VTT 样式模板、样式槽逐项微调、时间轴就地精修与批量校正、实时预览等于导出结果。</p>
+    <p style="margin-top:8px;">要做双语或特效字幕的创作者、压制组、需要无障碍字幕的团队。</p>
+  </section>
+<!--SEO-COPY-END-->
 </body>
 </html>

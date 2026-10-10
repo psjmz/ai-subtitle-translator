@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/clean.html 与 /en/clean.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
 <title>字幕清洗器 - 随心字幕 AI (AI-SRTSub)</title>
 <meta name="description" content="免费在线字幕清洗工具：去掉 HTML 标签、ASS 特效、听障提示、说话人标签、字幕组水印与广告，修复全大写和乱码，导出干净的字幕。纯本地处理，不上传服务器。">
 <meta name="keywords" content="字幕清洗,srt清洗,去字幕水印,去听障字幕,SDH字幕,去说话人,字幕去广告,字幕乱码修复,subtitle cleaner">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#E12D6E">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
 <style>
   /* ================= 视觉系统沿用 v0.9.249「收敛精修」 =================
      ⚠️ 与 merge.html 同源：冷中性灰阶 + 品牌粉实色 + 禁渐变 + 禁 emoji 图标。
@@ -207,8 +210,8 @@ crossorigin="anonymous"></script>
   </header>
 
   <div class="hero">
-    <h1>字幕<em>清洗器</em></h1>
-    <p>去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。全程在你浏览器里完成，文件不上传服务器。</p>
+    <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">清洗器</em></h1>
+    <p data-i18n="heroSub">去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。全程在你浏览器里完成，文件不上传服务器。</p>
   </div>
 
   <div class="card" id="upCard">
@@ -299,7 +302,7 @@ crossorigin="anonymous"></script>
   </div>
 
   <footer>
-    <span>随心字幕 AI · 字幕清洗工具</span> ·
+    <span data-i18n="footBrand">随心字幕 AI · 字幕清洗工具</span> ·
     <a href="/" data-i18n="footHome">去翻译字幕 →</a>
     <a href="/merge.html" data-i18n="footMerge">去特效字幕 →</a>
   </footer>
@@ -307,7 +310,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.272"></script>
+<script src="clean-core.js?v=0.9.273"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -886,7 +889,10 @@ const I18N = {
     errEmpty: '文件是空的', noFile: '先上传一份字幕',
     okDl: '已下载', okCopy: '已复制', errCopy: '复制失败，请手动选中复制',
     optOn: '已开启 {n} / {t} 项', pasteSrc: '粘贴的内容',
-    footHome: '去翻译字幕 →', footMerge: '去特效字幕 →'
+    footHome: '去翻译字幕 →', footMerge: '去特效字幕 →',
+    heroA: '字幕', heroEm: '清洗器',
+    heroSub: '去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。全程在你浏览器里完成，文件不上传服务器。',
+    footBrand: '随心字幕 AI · 字幕清洗工具'
   },
   'en': {
     brandName: 'AI-SRTSub', upTitle: 'Upload subtitles', dzTxt: 'Drop a file here, or click to choose', pastePh: 'Or paste your subtitle text here',
@@ -928,7 +934,10 @@ const I18N = {
     errEmpty: 'That file is empty', noFile: 'Upload a subtitle file first',
     okDl: 'Downloaded', okCopy: 'Copied', errCopy: 'Copy failed, please select and copy manually',
     optOn: '{n} of {t} rules on', pasteSrc: 'pasted content',
-    footHome: 'Translate subtitles', footMerge: 'Merge subtitles'
+    footHome: 'Translate subtitles', footMerge: 'Merge subtitles',
+    heroA: 'Subtitle', heroEm: 'Cleaner',
+    heroSub: 'Strip HTML tags, ASS effects, SDH cues, speaker labels and group watermarks, then fix all-caps and mojibake. Everything runs in your browser - the file is never uploaded.',
+    footBrand: 'AI-SRTSub · Subtitle Cleaner',
   }
 };
 let LANG = 'zh-CN';
@@ -1001,15 +1010,28 @@ function hideTip() {
   TIP.el = null;
 }
 
-/* ---------------- 启动 ---------------- */
+/* ---------------- 启动 ----------------
+   v0.9.273：界面语言从 2 语扩到与全站同口径的 27 语。
+   ⚠️ 词典目前只有 zh-CN / en 两份 —— t() 的回退链会在缺词时给英文，
+   所以放出来不会白屏，但也不会是「德语界面」。先把语言通道打通，
+   词条再按语言逐个补，比一次塞进 25 份没校对过的机器翻译诚实。 */
+const CLEAN_UI_LANGS = [['zh-CN', '简体中文'], ['zh-TW', '繁體中文'], ['en', 'English'], ['ja', '日本語'], ['es', 'Español'], ['pt', 'Português'], ['ko', '한국어'], ['de', 'Deutsch'], ['fr', 'Français'], ['id', 'Bahasa Indonesia'], ['hi', 'हिन्दी'], ['th', 'ไทย'], ['vi', 'Tiếng Việt'], ['ru', 'Русский'], ['it', 'Italiano'], ['ar', 'العربية'], ['tr', 'Türkçe'], ['nl', 'Nederlands'], ['pl', 'Polski'], ['sv', 'Svenska'], ['cs', 'Čeština'], ['uk', 'Українська'], ['da', 'Dansk'], ['fi', 'Suomi'], ['el', 'Ελληνικά'], ['he', 'עברית'], ['ro', 'Română']];
+/* URL 语言优先（/en/clean.html 就该是英文界面），其次上次手动选的，最后浏览器语言 */
+function pathUiLang() {
+  const m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:merge|clean)\.html/);
+  if (m && CLEAN_UI_LANGS.some(function (x) { return x[0] === m[1]; })) return m[1];
+  return null;
+}
 function initLang() {
   const sel = $('#langSel');
-  sel.innerHTML = '<option value="zh-CN">简体中文</option><option value="en">English</option>';
+  sel.innerHTML = CLEAN_UI_LANGS.map(function (p) {
+    return '<option value="' + p[0] + '">' + p[1] + '</option>';
+  }).join('');
   let saved = 'zh-CN';
   try { saved = localStorage.getItem('srt_clean_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
-  if (!I18N[saved]) saved = 'zh-CN';
-  LANG = saved;
-  sel.value = saved;
+  if (!CLEAN_UI_LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
+  LANG = pathUiLang() || saved;
+  sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
     try { localStorage.setItem('srt_clean_lang', LANG); } catch (e) { /* 隐私模式下写不了，忽略 */ }
@@ -1028,5 +1050,15 @@ function initLang() {
 })();
 </script>
 <script src="site-nav.js" data-tool="clean"></script>
+
+<!-- v0.9.273：SEO 静态文案（同上，按语言路由替换；直接开文件时显示简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕清洗器 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>下载来的字幕先过一遍：水印、广告、听障提示、HTML 标签一次剔干净。</strong></p>
+    <p style="margin-top:8px;">13 条规则分四类（默认开 9 条）、去水印广告与听障提示、修全大写与乱码、逐条列出改了什么并可单独还原、时间轴一律不动。</p>
+    <p style="margin-top:8px;">拿到现成字幕想直接用的人、要批量整理素材的字幕组。</p>
+  </section>
+<!--SEO-COPY-END-->
 </body>
 </html>

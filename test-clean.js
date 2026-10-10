@@ -316,7 +316,7 @@ console.log('\n— v0.9.271：页面契约 —');
 {
   const fs = require('fs');
   const html = fs.readFileSync(__dirname + '/clean.html', 'utf8');
-  ok(/clean-core\.js\?v=0\.9\.272/.test(html), 'clean.html 版号已升 272');
+  ok(/clean-core\.js\?v=0\.9\.273/.test(html), 'clean.html 版号已升 272');
   ['biBar', 'biTxt', 'biFlip', 'outSeg', 'outNote'].forEach(function (id) {
     ok(html.indexOf('id="' + id + '"') > 0, '页面有 #' + id);
   });
@@ -333,6 +333,29 @@ console.log('\n— v0.9.271：页面契约 —');
       const n = (html.match(new RegExp(k + ":\\s*'", 'g')) || []).length;
       ok(n >= 2, '词条 ' + k + ' 中英两语都写了', n);
     });
+}
+
+console.log('\n— v0.9.273：清洗页多语言与 SEO —');
+{
+  const fs = require('fs');
+  const html = fs.readFileSync(__dirname + '/clean.html', 'utf8');
+  /* 界面语言 2 语 → 27 语：漏一个语种 = 那 25 种语言的访客只能看英文 */
+  const m = html.match(/const CLEAN_UI_LANGS = \[([\s\S]*?)\];/);
+  ok(!!m, '有 CLEAN_UI_LANGS');
+  ok(m && (m[1].match(/\['/g) || []).length === 27, '界面语言 27 项',
+    m ? (m[1].match(/\['/g) || []).length : 0);
+  ok(/function pathUiLang\(\)/.test(html) && /LANG = pathUiLang\(\) \|\| saved/.test(html),
+    'URL 语言优先（/en/clean.html 就该是英文界面）');
+  /* 头部 / 页脚原本写死中文，英文界面下会露出中文标题 */
+  ['heroA', 'heroEm', 'heroSub', 'footBrand'].forEach(function (k) {
+    const n = (html.match(new RegExp(k + ":\\s*'", 'g')) || []).length;
+    ok(n >= 2, '词条 ' + k + ' 中英两语都写了', n);
+  });
+  ok(/<h1><span data-i18n="heroA">/.test(html), '大标题交给词条（不是写死在 HTML 里）');
+  ok(/<span data-i18n="footBrand">/.test(html), '页脚品牌也跟着界面语言');
+  /* SEO 占位：没有它服务端替换无处下手，页面照出、title 照旧 */
+  ok(/<!--SEO-HEAD-START-->/.test(html), 'head 有 SEO 占位');
+  ok(/<!--SEO-COPY-START-->/.test(html), 'body 有静态文案占位');
 }
 
 console.log('\n' + (F ? '✗ 失败 ' + F + ' / 通过 ' + P : '✓ 全部通过 ' + P) + '\n');

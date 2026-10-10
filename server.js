@@ -556,8 +556,17 @@ function serveStatic(req, res, urlPath){
   }
   // SEO 多语言路由：/ = 简中（默认），/en/ /zh-TW/ /ja/ 各自输出对应语言的完整 head
   const lang = SEO_ROUTE[p];
-  if (lang) { serveIndexLang(req, res, lang); return; }
-  if (p === '/') { serveIndexLang(req, res, 'zh-CN'); return; }
+  if (lang) { serveIndexLang(req, res, lang, 'index'); return; }
+  if (p === '/') { serveIndexLang(req, res, 'zh-CN', 'index'); return; }
+  /* v0.9.273：特效页 / 清洗页的多语言路由。
+     ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
+     会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean)\.html$/);
+  if (pm && SEO_ROUTE['/' + pm[1]]) {
+    serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
+  }
+  pm = p.match(/^\/(merge|clean)\.html$/);
+  if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
   const lm = p.match(/^\/([a-zA-Z][a-zA-Z-]*)\/(.+)$/);
@@ -961,29 +970,528 @@ const SEO = {
   }
 };
 
-function seoHead(lang, base){
-  const s = SEO[lang];
-  const selfUrl = base + SEO_PATH[lang];
-  const alternates = SEO_LANGS.map(l =>
-    '<link rel="alternate" hreflang="' + l + '" href="' + base + SEO_PATH[l] + '">'
-  ).join('\n') + '\n<link rel="alternate" hreflang="x-default" href="' + base + '/">';
+/* ---------------- 三页 SEO 表（v0.9.273） ----------------
+ * 以前只有首页有 27 语版本，特效页 / 清洗页是「一份中文 + 一份英文 meta」，
+ * 搜索引擎只能抓到 zh-CN，其它语言的搜索流量全部丢掉。
+ * 现在三页共用一套语言表：每页 27 语各一份 title / desc / kw / 静态文案块。
+ * 字段约定：ogTitle 缺省用 title、ogDesc 与 jsonldDesc 缺省用 desc——
+ * 少写三遍同样的句子，也就少三处改漏的机会。 */
+/* og:locale 只跟界面语言走，与页面无关：特效页 / 清洗页的表里不必各写一遍 */
+const OG_LOCALE = {
+  'zh-CN': 'zh_CN', 'zh-TW': 'zh_TW', 'en': 'en_US', 'ja': 'ja_JP', 'es': 'es_ES', 'pt': 'pt_BR',
+  'ko': 'ko_KR', 'de': 'de_DE', 'fr': 'fr_FR', 'id': 'id_ID', 'hi': 'hi_IN', 'th': 'th_TH',
+  'vi': 'vi_VN', 'ru': 'ru_RU', 'it': 'it_IT', 'ar': 'ar_AR', 'tr': 'tr_TR', 'nl': 'nl_NL',
+  'pl': 'pl_PL', 'sv': 'sv_SE', 'cs': 'cs_CZ', 'uk': 'uk_UA', 'da': 'da_DK', 'fi': 'fi_FI',
+  'el': 'el_GR', 'he': 'he_IL', 'ro': 'ro_RO'
+};
+const SEO_MERGE = {
+  'zh-CN': {
+    title: '特效字幕工具 - 双语合并 · 样式模板 · ASS/VTT 特效 | 随心字幕 AI',
+    desc: '免费在线特效字幕工具：两份字幕合并成双语、调整已有双语的顺序与样式、给单语字幕加特效。ASS 5 套 / VTT 6 套行业模板，实时预览所见即所得，导出 SRT / VTT / ASS。',
+    kw: '字幕合并,双语字幕合并,特效字幕,ASS字幕样式,VTT字幕样式,双语字幕制作,字幕配轴,中英双语字幕,ASS特效,字幕模板,免费字幕工具,merge subtitles,bilingual subtitles',
+    intro: '把两份字幕合并成双语，或给字幕直接上样式：字体、颜色、描边、位置所见即所得。',
+    feat: '双语合并与双语调整、ASS / VTT 样式模板、样式槽逐项微调、时间轴就地精修与批量校正、实时预览等于导出结果。',
+    who: '要做双语或特效字幕的创作者、压制组、需要无障碍字幕的团队。',
+    /* 中文站点的品牌名跟着首页走中文，缺省的 AI-SRTSub 只在其它语言下用 */
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'AI-SRTSub'
+  },
+  'en': {
+    title: 'Styled Subtitle Maker - Merge Bilingual, ASS & VTT Effects | AI-SRTSub',
+    desc: 'Free online tool for styled subtitles: merge two files into bilingual, reorder or restyle an existing bilingual track, or add effects to a single-language track. 5 ASS and 6 VTT industry presets with live WYSIWYG preview. Export SRT / VTT / ASS.',
+    kw: 'merge subtitles, bilingual subtitles, combine subtitle files, styled subtitles, ASS subtitle styles, VTT subtitle styles, subtitle effects, dual subtitle maker, ASS presets, subtitle template, free subtitle tool',
+    intro: 'Merge two subtitle files into bilingual, or style a track: font, colour, outline and position, all WYSIWYG.',
+    feat: 'Bilingual merge and adjust, ASS / VTT style presets, per-value style slots, in-place and bulk timeline fixes, and a live preview that is literally the exported file.',
+    who: 'Creators making bilingual or styled subtitles, encoding groups, and teams that need accessible captions.'
+  }
+,
+  'zh-TW': {
+    title: "特效字幕工具 - 雙語合併 · 樣式範本 · ASS/VTT 特效 | 隨心字幕 AI",
+    desc: "免費線上特效字幕工具：兩份字幕合併成雙語、調整既有雙語的順序與樣式、替單語字幕加特效。ASS 5 套 / VTT 6 套業界範本，即時預覽所見即所得，匯出 SRT / VTT / ASS。",
+    kw: "字幕合併,雙語字幕合併,特效字幕,ASS字幕樣式,VTT字幕樣式,雙語字幕製作,字幕配軸,中英雙語字幕,ASS特效,字幕範本,免費字幕工具,merge subtitles,bilingual subtitles",
+    intro: "把兩份字幕合併成雙語，或直接替字幕上樣式：字體、顏色、描邊、位置所見即所得。",
+    feat: "雙語合併與雙語調整、ASS / VTT 樣式範本、樣式槽逐項微調、時間軸就地精修與批量校正、即時預覽等於匯出結果。",
+    who: "要做雙語或特效字幕的創作者、壓製組、需要無障礙字幕的團隊。",
+    siteName: "隨心字幕 AI", jsonldName: "隨心字幕 AI", jsonldAlt: "AI-SRTSub"
+  },
+  'ja': {
+    title: "装飾字幕ツール - 二か国語結合 · スタイルテンプレート · ASS/VTT 装飾 | AI-SRTSub",
+    desc: "無料のオンライン装飾字幕ツール：2本の字幕を二か国語に統合、既存の二か国語字幕の順序とスタイルを調整、単一言語の字幕に装飾を追加。ASS 5種 / VTT 6種の業界テンプレート、ライブプレビューは書き出し結果と同じです。SRT / VTT / ASS で書き出し。",
+    kw: "字幕結合,二か国語字幕 作成,装飾字幕,ASS字幕スタイル,VTT字幕スタイル,字幕統合,字幕タイミング調整,日英字幕,ASS装飾,字幕テンプレート,無料字幕ツール,merge subtitles",
+    intro: "2本の字幕を二か国語に統合、あるいは字幕に直接スタイルを適用：フォント・色・縁取り・位置を見たまま調整できます。",
+    feat: "二か国語の結合と調整、ASS / VTT スタイルテンプレート、スタイルスロットでの項目別微調整、タイムラインの個別修正と一括補正、ライブプレビュー＝書き出し結果。",
+    who: "二か国語・装飾字幕を作るクリエイター、エンコード担当、バリアフリー字幕が必要なチーム。"
+  },
+  'ko': {
+    title: "스타일 자막 도구 - 두 언어 합치기 · 스타일 템플릿 · ASS/VTT 효과 | AI-SRTSub",
+    desc: "무료 온라인 스타일 자막 도구: 자막 두 개를 두 언어로 합치고, 기존 두 언어 자막의 순서와 스타일을 조정하고, 단일 언어 자막에 효과를 더합니다. ASS 5종 / VTT 6종 업계 프리셋, 실시간 미리보기는 내보낸 결과와 같습니다. SRT / VTT / ASS로 내보내기.",
+    kw: "자막 합치기,두 언어 자막 만들기,스타일 자막,ASS 자막 스타일,VTT 자막 스타일,자막 싱크,영한 자막,ASS 효과,자막 템플릿,무료 자막 도구,merge subtitles",
+    intro: "자막 두 개를 두 언어로 합치거나, 자막에 바로 스타일을 입힙니다. 글꼴·색·외곽선·위치를 그대로 보며 조정하세요.",
+    feat: "두 언어 합치기와 조정, ASS / VTT 스타일 프리셋, 스타일 슬롯 항목별 미세 조정, 타임라인 개별 수정과 일괄 보정, 실시간 미리보기 = 내보낸 파일.",
+    who: "두 언어·스타일 자막을 만드는 크리에이터, 인코딩 팀, 접근성 자막이 필요한 팀."
+  },
+  'es': {
+    title: "Herramienta de subtítulos con estilo - unir bilingües · plantillas · efectos ASS/VTT | AI-SRTSub",
+    desc: "Herramienta online gratuita de subtítulos con estilo: une dos archivos en bilingüe, reordena y reestiliza una pista bilingüe o añade efectos a una pista de un solo idioma. 5 plantillas ASS y 6 VTT con vista previa WYSIWYG. Exporta SRT / VTT / ASS.",
+    kw: "unir subtitulos, subtitulos bilingües, combinar subtitulos, subtitulos con estilo, estilos ASS, estilos VTT, efectos subtitulos, plantilla subtitulos, herramienta subtitulos gratis, merge subtitles",
+    intro: "Une dos archivos de subtítulos en uno bilingüe o aplícales estilo: tipografía, color, contorno y posición, todo en WYSIWYG.",
+    feat: "Unión y ajuste bilingüe, plantillas de estilo ASS / VTT, ranuras de estilo para afinar cada valor, corrección de la línea de tiempo al detalle o en bloque, y una vista previa que es literalmente el archivo exportado.",
+    who: "Creadores de subtítulos bilingües o con estilo, grupos de codificación y equipos que necesitan subtítulos accesibles."
+  },
+  'pt': {
+    title: "Ferramenta de legendas com estilo - unir bilíngues · modelos · efeitos ASS/VTT | AI-SRTSub",
+    desc: "Ferramenta online grátis de legendas com estilo: una dois arquivos em bilíngue, reordene e reestilize uma faixa bilíngue ou aplique efeitos a uma faixa de um idioma só. 5 modelos ASS e 6 VTT com pré-visualização WYSIWYG. Exporte SRT / VTT / ASS.",
+    kw: "unir legendas, legendas bilíngues, combinar legendas, legendas com estilo, estilos ASS, estilos VTT, efeitos em legendas, modelo de legenda, ferramenta de legenda grátis, merge subtitles",
+    intro: "Una dois arquivos de legenda em bilíngue ou aplique estilo: fonte, cor, contorno e posição, tudo em WYSIWYG.",
+    feat: "União e ajuste bilíngue, modelos de estilo ASS / VTT, slots de estilo para ajustar cada valor, correção da timeline no detalhe ou em bloco, e uma prévia que é literalmente o arquivo exportado.",
+    who: "Criadores de legendas bilíngues ou estilizadas, grupos de encoding e times que precisam de legendas acessíveis."
+  },
+
+  'de': {
+    title: "Untertitel mit Stil - zweisprachig zusammenführen · Vorlagen · ASS/VTT-Effekte | AI-SRTSub",
+    desc: "Kostenloses Online-Tool für gestaltete Untertitel: zwei Dateien zu zweisprachig zusammenführen, eine bestehende zweisprachige Spur umordnen und umgestalten oder Effekte auf eine einsprachige Spur anwenden. 5 ASS- und 6 VTT-Vorlagen mit WYSIWYG-Vorschau. Export als SRT / VTT / ASS.",
+    kw: "untertitel zusammenführen, zweisprachige untertitel, untertitel kombinieren, untertitel mit stil, ASS stile, VTT stile, untertitel effekte, untertitel vorlage, kostenloses untertitel tool",
+    intro: "Zwei Untertitel-Dateien zu zweisprachig zusammenführen oder direkt gestalten: Schrift, Farbe, Kontur und Position — WYSIWYG.",
+    feat: "Zweisprachiges Zusammenführen und Anpassen, ASS- / VTT-Stilvorlagen, Stil-Slots für jeden Wert, Zeitleisten-Korrektur im Detail oder im Block, und eine Vorschau, die buchstäblich die exportierte Datei ist.",
+    who: "Creator für zweisprachige oder gestaltete Untertitel, Encoding-Gruppen und Teams mit Bedarf an barrierefreien Untertiteln."
+  },
+  'fr': {
+    title: "Outil de sous-titres stylisés - fusion bilingue · modèles · effets ASS/VTT | AI-SRTSub",
+    desc: "Outil en ligne gratuit pour sous-titres stylisés : fusionnez deux fichiers en bilingue, réordonnez et restituez une piste bilingue ou ajoutez des effets à une piste monolingue. 5 modèles ASS et 6 VTT avec aperçu WYSIWYG. Export SRT / VTT / ASS.",
+    kw: "fusionner sous-titres, sous-titres bilingues, combiner sous-titres, sous-titres stylisés, styles ASS, styles VTT, effets sous-titres, modèle sous-titres, outil sous-titres gratuit",
+    intro: "Fusionnez deux fichiers de sous-titres en bilingue ou stylisez-les : police, couleur, contour et position, en WYSIWYG.",
+    feat: "Fusion et ajustement bilingues, modèles de style ASS / VTT, emplacements de style pour régler chaque valeur, correction de la timeline au détail ou en bloc, et un aperçu qui est littéralement le fichier exporté.",
+    who: "Créateurs de sous-titres bilingues ou stylisés, groupes d’encodage et équipes qui ont besoin de sous-titres accessibles."
+  },
+  'id': {
+    title: "Alat subtitle berestet - gabung dwibahasa · template · efek ASS/VTT | AI-SRTSub",
+    desc: "Alat subtitle berestet online gratis: gabung dua file jadi dwibahasa, susun ulang dan ubah gaya subtitle dwibahasa yang sudah ada, atau tambahkan efek ke subtitle satu bahasa. 5 template ASS dan 6 VTT dengan pratinjau WYSIWYG. Ekspor SRT / VTT / ASS.",
+    kw: "gabung subtitle, subtitle dwibahasa, menggabungkan subtitle, subtitle bergaya, gaya ASS, gaya VTT, efek subtitle, template subtitle, alat subtitle gratis",
+    intro: "Gabung dua file subtitle jadi dwibahasa, atau beri gaya langsung: fon, warna, outline, dan posisi — semuanya WYSIWYG.",
+    feat: "Penggabungan dan penyesuaian dwibahasa, template gaya ASS / VTT, slot gaya untuk menyetel tiap nilai, koreksi timeline per titik atau sekaligus, dan pratinjau yang sama persis dengan hasil ekspor.",
+    who: "Kreator subtitle dwibahasa atau bergaya, tim encoding, dan tim yang butuh subtitle aksesibel."
+  },
+  'hi': {
+    title: "स्टाइल सबटाइटल टूल - द्विभाषी मर्ज · टेम्पलेट · ASS/VTT इफ़ेक्ट | AI-SRTSub",
+    desc: "मुफ़्त ऑनलाइन स्टाइल सबटाइटल टूल: दो फ़ाइलों को द्विभाषी बनाएँ, मौजूदा द्विभाषी ट्रैक को दोबारा क्रमबद्ध और स्टाइल करें, या एक भाषा के ट्रैक में इफ़ेक्ट जोड़ें। 5 ASS और 6 VTT टेम्पलेट, WYSIWYG प्रीव्यू के साथ। SRT / VTT / ASS निर्यात।",
+    kw: "सबटाइटल मर्ज, द्विभाषी सबटाइटल, सबटाइटल जोड़ें, स्टाइलिश सबटाइटल, ASS स्टाइल, VTT स्टाइल, सबटाइटल इफ़ेक्ट, सबटाइटल टेम्पलेट, मुफ़्त सबटाइटल टूल",
+    intro: "दो सबटाइटल फ़ाइलों को द्विभाषी बनाएँ या सीधे स्टाइल दें: फ़ॉन्ट, रंग, आउटलाइन और जगह — WYSIWYG में।",
+    feat: "द्विभाषी मर्ज और समायोजन, ASS / VTT स्टाइल टेम्पलेट, हर वैल्यू के लिए स्टाइल स्लॉट, टाइमलाइन की बिंदुवत या सामूहिक सुधार, और प्रीव्यू जो वही फ़ाइल है जो निर्यात होगी।",
+    who: "द्विभाषी या स्टाइलिश सबटाइटल बनाने वाले क्रिएटर, एन्कोडिंग टीम, और सुलभ सबटाइटल चाहने वाली टीमें।"
+  },
+  'th': {
+    title: "เครื่องมือซับไตเติลใส่สไตล์ - รวมสองภาษา · แม่แบบ · เอฟเฟกต์ ASS/VTT | AI-SRTSub",
+    desc: "เครื่องมือซับใส่สไตล์ออนไลน์ฟรี: รวมสองไฟล์เป็นสองภาษา จัดลำดับและปรับสไตล์ซับสองภาษาที่มีอยู่ หรือเพิ่มเอฟเฟกต์ให้ซับภาษาเดียว แม่แบบ ASS 5 แบบ / VTT 6 แบบ พร้อมพรีวิว WYSIWYG ส่งออก SRT / VTT / ASS",
+    kw: "รวมซับไตเติล, ซับสองภาษา, รวมไฟล์ซับ, ซับใส่สไตล์, สไตล์ ASS, สไตล์ VTT, เอฟเฟกต์ซับ, แม่แบบซับ, เครื่องมือซับฟรี",
+    intro: "รวมซับสองไฟล์เป็นสองภาษา หรือแต่งสไตล์ได้เลย: ฟอนต์ สี ขอบ และตำแหน่ง — WYSIWYG ทั้งหมด",
+    feat: "รวมและปรับสองภาษา, แม่แบบสไตล์ ASS / VTT, ช่องสไตล์ปรับทีละค่า, แก้ไทม์ไลน์ทีละจุดหรือทั้งชุด, และพรีวิวที่ตรงกับไฟล์ที่ส่งออกทุกประการ",
+    who: "ครีเอเตอร์ที่ทำซับสองภาษาหรือซับแต่ง ทีมเข้ารหัส และทีมที่ต้องการซับสำหรับผู้บกพร่องทางการได้ยิน"
+  },
+  'vi': {
+    title: "Công cụ phụ đề tạo kiểu - gộp song ngữ · mẫu · hiệu ứng ASS/VTT | AI-SRTSub",
+    desc: "Công cụ phụ đề tạo kiểu online miễn phí: gộp hai file thành song ngữ, sắp xếp lại và đổi kiểu phụ đề song ngữ có sẵn, hoặc thêm hiệu ứng cho phụ đề một ngôn ngữ. 5 mẫu ASS và 6 VTT với xem trước WYSIWYG. Xuất SRT / VTT / ASS.",
+    kw: "gộp phụ đề, phụ đề song ngữ, kết hợp phụ đề, phụ đề tạo kiểu, kiểu ASS, kiểu VTT, hiệu ứng phụ đề, mẫu phụ đề, công cụ phụ đề miễn phí",
+    intro: "Gộp hai file phụ đề thành song ngữ hoặc tạo kiểu trực tiếp: phông, màu, viền và vị trí — tất cả WYSIWYG.",
+    feat: "Gộp và điều chỉnh song ngữ, mẫu kiểu ASS / VTT, slot kiểu cho từng giá trị, sửa timeline từng điểm hoặc hàng loạt, và bản xem trước chính là file được xuất.",
+    who: "Creator làm phụ đề song ngữ hoặc tạo kiểu, nhóm encode, đội cần phụ đề hỗ trợ tiếp cận."
+  },
+
+  'ru': {
+    title: "Инструмент оформленных субтитров - слияние двуязычных · шаблоны · эффекты ASS/VTT | AI-SRTSub",
+    desc: "Бесплатный онлайн-инструмент для оформленных субтитров: объедините два файла в двуязычные, поменяйте порядок и стиль готовой двуязычной дорожки или добавьте эффекты к одному языку. 5 шаблонов ASS и 6 VTT с предпросмотром WYSIWYG. Экспорт в SRT / VTT / ASS.",
+    kw: "объединить субтитры, двуязычные субтитры, соединить субтитры, оформленные субтитры, стили ASS, стили VTT, эффекты субтитров, шаблон субтитров, бесплатный инструмент субтитров",
+    intro: "Объедините два файла субтитров в двуязычные или сразу оформите их: шрифт, цвет, контур и положение — всё в WYSIWYG.",
+    feat: "Двуязычное слияние и настройка, шаблоны стилей ASS / VTT, слоты стиля для каждой величины, точечная или пакетная правка таймлайна и предпросмотр, буквально равный экспортированному файлу.",
+    who: "Авторы двуязычных и оформленных субтитров, группы кодирования и команды, которым нужны доступные субтитры."
+  },
+  'it': {
+    title: "Strumento sottotitoli con stile - unione bilingue · modelli · effetti ASS/VTT | AI-SRTSub",
+    desc: "Strumento online gratuito per sottotitoli con stile: unisci due file in bilingue, riordina e ristilizza una traccia bilingue esistente oppure aggiungi effetti a una traccia in una sola lingua. 5 modelli ASS e 6 VTT con anteprima WYSIWYG. Esporta SRT / VTT / ASS.",
+    kw: "unire sottotitoli, sottotitoli bilingue, combinare sottotitoli, sottotitoli con stile, stili ASS, stili VTT, effetti sottotitoli, modello sottotitoli, strumento sottotitoli gratis",
+    intro: "Unisci due file di sottotitoli in bilingue o applicali uno stile: font, colore, contorno e posizione — tutto WYSIWYG.",
+    feat: "Unione e regolazione bilingue, modelli di stile ASS / VTT, slot di stile per ogni valore, correzione della timeline nel dettaglio o in blocco, e un’anteprima che è letteralmente il file esportato.",
+    who: "Creator di sottotitoli bilingue o stilizzati, gruppi di encoding e team che hanno bisogno di sottotitoli accessibili."
+  },
+  'ar': {
+    title: "أداة الترجمة بتنسيق - دمج بلغتين · قوالب · تأثيرات ASS/VTT | AI-SRTSub",
+    desc: "أداة مجانية على الإنترنت للترجمات المنسّقة: ادمج ملفين في ترجمة بلغتين، أعد ترتيب وتنسيق ترجمة بلغتين موجودة، أو أضف تأثيرات إلى ترجمة بلغة واحدة. 5 قوالب ASS و6 قوالب VTT مع معاينة WYSIWYG. تصدير SRT / VTT / ASS.",
+    kw: "دمج الترجمة, ترجمة بلغتين, دمج ملفات الترجمة, ترجمة بتنسيق, أنماط ASS, أنماط VTT, تأثيرات الترجمة, قالب ترجمة, أداة ترجمة مجانية",
+    intro: "ادمج ملفي ترجمة في واحد بلغتين، أو أعطهما تنسيقاً مباشرة: الخط واللون والإطار والموضع — كما تراه تماماً.",
+    feat: "الدمج والضبط بلغتين، قوالب أنماط ASS / VTT، خانات نمط لضبط كل قيمة، تصحيح التوقيتات نقطة بنقطة أو دفعة واحدة، ومعاينة هي نفسها الملف المُصدَّر.",
+    who: "صنّاع الترجمات بلغتين أو المنسّقة، فرق الترميز، والفرق التي تحتاج ترجمات متاحة للجميع."
+  },
+  'tr': {
+    title: "Stil altyazı aracı - iki dilli birleştirme · şablonlar · ASS/VTT efektleri | AI-SRTSub",
+    desc: "Ücretsiz online stil altyazı aracı: iki dosyayı iki dilli hale getirin, mevcut iki dilli altyazıyı yeniden sıralayıp biçimlendirin ya da tek dilli bir altyazıya efekt ekleyin. WYSIWYG önizlemeli 5 ASS ve 6 VTT şablonu. SRT / VTT / ASS dışa aktarın.",
+    kw: "altyazı birleştirme, iki dilli altyazı, altyazıları birleştir, stilli altyazı, ASS stilleri, VTT stilleri, altyazı efektleri, altyazı şablonu, ücretsiz altyazı aracı",
+    intro: "İki altyazı dosyasını iki dilli yapın ya da doğrudan stil verin: yazı tipi, renk, kontur ve konum — hepsi WYSIWYG.",
+    feat: "İki dilli birleştirme ve ayar, ASS / VTT stil şablonları, her değer için stil yuvası, zaman çizelgesinin noktasal veya toplu düzeltilmesi ve düpedüz dışa aktarılan dosyanın kendisi olan önizleme.",
+    who: "İki dilli veya stilli altyazı yapan içerik üreticileri, encode ekipleri ve erişilebilir altyazıya ihtiyaç duyan ekipler."
+  },
+  'nl': {
+    title: "Tool voor ondertitels met stijl - tweetalig samenvoegen · sjablonen · ASS/VTT-effecten | AI-SRTSub",
+    desc: "Gratis online tool voor ondertitels met stijl: voeg twee bestanden samen tot tweetalig, herschik en herstijl een bestaand tweetalig spoor of voeg effecten toe aan een eentalig spoor. 5 ASS- en 6 VTT-sjablonen met WYSIWYG-voorbeeld. Exporteer SRT / VTT / ASS.",
+    kw: "ondertitels samenvoegen, tweetalige ondertitels, ondertitels combineren, ondertitels met stijl, ASS stijlen, VTT stijlen, ondertitel effecten, ondertitel sjabloon, gratis ondertitel tool",
+    intro: "Voeg twee ondertitelbestanden samen tot tweetalig of geef ze direct stijl: lettertype, kleur, contour en positie — allemaal WYSIWYG.",
+    feat: "Tweetalig samenvoegen en aanpassen, ASS- / VTT-stijlsjablonen, stijlsleuven voor elke waarde, tijdlijncorrectie per punt of in bulk, en een voorbeeld dat letterlijk het geëxporteerde bestand is.",
+    who: "Creators van tweetalige of gestijlde ondertitels, encode-teams en teams die toegankelijke ondertitels nodig hebben."
+  },
+  'pl': {
+    title: "Narzędzie napisów ze stylem - łączenie dwujęzyczne · szablony · efekty ASS/VTT | AI-SRTSub",
+    desc: "Darmowe narzędzie online do napisów ze stylem: połącz dwa pliki w dwujęzyczne, zmień kolejność i styl istniejącej dwujęzycznej ścieżki albo dodaj efekty do napisów w jednym języku. 5 szablonów ASS i 6 VTT z podglądem WYSIWYG. Eksport SRT / VTT / ASS.",
+    kw: "łączenie napisów, napisy dwujęzyczne, łączenie plików napisów, napisy ze stylem, style ASS, style VTT, efekty napisów, szablon napisów, darmowe narzędzie napisów",
+    intro: "Połącz dwa pliki napisów w dwujęzyczne albo od razu nadaj im styl: font, kolor, kontur i położenie — wszystko WYSIWYG.",
+    feat: "Łączenie i dopasowanie dwujęzyczne, szablony stylów ASS / VTT, gniazda stylu dla każdej wartości, korekta osi czasu punktowo lub hurtem oraz podgląd, który jest dosłownie eksportowanym plikiem.",
+    who: "Twórcy napisów dwujęzycznych i stylowych, grupy encodingowe i zespoły potrzebujące napisów dostępnych."
+  },
+
+  'sv': {
+    title: "Verktyg för undertexter med stil - slå ihop tvåspråkigt · mallar · ASS/VTT-effekter | AI-SRTSub",
+    desc: "Gratis onlineverktyg för undertexter med stil: slå ihop två filer till tvåspråkig, ordna om och forma om ett befintligt tvåspråkigt spår eller lägg till effekter på ett enspråkigt spår. 5 ASS- och 6 VTT-mallar med WYSIWYG-förhandsvisning. Exportera SRT / VTT / ASS.",
+    kw: "slå ihop undertexter, tvåspråkiga undertexter, kombinera undertexter, undertexter med stil, ASS-stilar, VTT-stilar, undertexteffekter, undertextmall, gratis undertextverktyg",
+    intro: "Slå ihop två undertextfiler till tvåspråkig eller ge dem stil direkt: typsnitt, färg, kontur och placering — allt WYSIWYG.",
+    feat: "Tvåspråkig sammanslagning och justering, ASS- / VTT-stilmallar, stilplatser för varje värde, tidslinjekorrigering punktvis eller i block, och en förhandsvisning som är exakt den exporterade filen.",
+    who: "Kreatörer som gör tvåspråkiga eller stilade undertexter, encodegrupper och team som behöver tillgängliga undertexter."
+  },
+  'cs': {
+    title: "Nástroj pro titulky se stylem - sloučení dvojjazyčných · šablony · efekty ASS/VTT | AI-SRTSub",
+    desc: "Bezplatný online nástroj pro titulky se stylem: spojte dva soubory do dvojjazyčných, přeuspořádejte a přestylujte existující dvojjazyčnou stopu nebo přidejte efekty k jednojazyčné stopě. 5 šablon ASS a 6 VTT s náhledem WYSIWYG. Export SRT / VTT / ASS.",
+    kw: "sloučit titulky, dvojjazyčné titulky, spojit titulky, titulky se stylem, styly ASS, styly VTT, efekty titulků, šablona titulků, bezplatný nástroj titulky",
+    intro: "Spojte dva soubory titulků do dvojjazyčných nebo jim rovnou dejte styl: písmo, barva, obrys a pozice — vše WYSIWYG.",
+    feat: "Dvojjazyčné sloučení a úprava, šablony stylů ASS / VTT, sloty stylu pro každou hodnotu, oprava časové osy po bodech nebo hromadně a náhled, který je doslova exportovaný soubor.",
+    who: "Tvůrci dvojjazyčných a stylovaných titulků, encode skupiny a týmy, které potřebují přístupné titulky."
+  },
+  'uk': {
+    title: "Інструмент оформлених субтитрів - злиття двомовних · шаблони · ефекти ASS/VTT | AI-SRTSub",
+    desc: "Безплатний онлайн-інструмент для оформлених субтитрів: об’єднайте два файли в двомовні, переставте й переоформіть наявну двомовну доріжку або додайте ефекти до одномовної. 5 шаблонів ASS і 6 VTT з попереднім переглядом WYSIWYG. Експорт у SRT / VTT / ASS.",
+    kw: "об’єднати субтитри, двомовні субтитри, поєднати субтитри, оформлені субтитри, стилі ASS, стилі VTT, ефекти субтитрів, шаблон субтитрів, безплатний інструмент субтитрів",
+    intro: "Об’єднайте два файли субтитрів у двомовні або відразу оформіть їх: шрифт, колір, контур і позиція — усе в WYSIWYG.",
+    feat: "Двомовне злиття і налаштування, шаблони стилів ASS / VTT, слоти стилю для кожного значення, точкове або пакетне виправлення таймлайну і попередній перегляд, що буквально дорівнює експортованому файлу.",
+    who: "Автори двомовних і оформлених субтитрів, групи кодування та команди, яким потрібні доступні субтитри."
+  },
+  'da': {
+    title: "Værktøj til undertekster med stil - slå tosproget sammen · skabeloner · ASS/VTT-effekter | AI-SRTSub",
+    desc: "Gratis online værktøj til undertekster med stil: sæt to filer sammen til tosproget, omrokér og omstil et eksisterende tosproget spor, eller tilføj effekter til et etsproget spor. 5 ASS- og 6 VTT-skabeloner med WYSIWYG-forhåndsvisning. Eksporter SRT / VTT / ASS.",
+    kw: "slå undertekster sammen, tosprogede undertekster, kombiner undertekster, undertekster med stil, ASS-stile, VTT-stile, underteksteffekter, undertekstskabelon, gratis undertekstværktøj",
+    intro: "Sæt to undertekstfiler sammen til tosproget, eller giv dem stil med det samme: skrifttype, farve, kontur og placering — det hele i WYSIWYG.",
+    feat: "Tosproget sammenlægning og justering, ASS- / VTT-stilskabeloner, stil-pladser til hver værdi, rettelse af tidslinjen punktvist eller i blok, og en forhåndsvisning der bogstaveligt er den eksporterede fil.",
+    who: "Kreative der laver tosprogede eller stilede undertekster, encode-grupper og teams der har brug for tilgængelige undertekster."
+  },
+  'fi': {
+    title: "Tyyliteltyjen tekstitysten työkalu - kaksikielisten yhdistäminen · mallit · ASS/VTT-tehosteet | AI-SRTSub",
+    desc: "Ilmainen verkkotyökalu tyylitellyille tekstityksille: yhdistä kaksi tiedostoa kaksikieliseksi, järjestä ja muotoile uudelleen olemassa oleva kaksikielinen raita tai lisää tehosteita yksikieliseen raitaan. 5 ASS- ja 6 VTT-mallia WYSIWYG-esikatselulla. Vie SRT / VTT / ASS.",
+    kw: "yhdistä tekstitykset, kaksikieliset tekstitykset, yhdistä tekstitystiedostot, tyylitellyt tekstitykset, ASS-tyylit, VTT-tyylit, tekstitystehosteet, tekstitysmalli, ilmainen tekstitystyökalu",
+    intro: "Yhdistä kaksi tekstitystiedostoa kaksikieliseksi tai anna niille tyyli suoraan: fontti, väri, ääriviiva ja sijainti — kaikki WYSIWYG.",
+    feat: "Kaksikielinen yhdistäminen ja säätö, ASS- / VTT-tyylimallit, tyylipaikat jokaiselle arvolle, aikajanan korjaus kohdittain tai erissä ja esikatselu, joka on kirjaimellisesti viety tiedosto.",
+    who: "Kaksikielisiä tai tyyliteltyjä tekstityksiä tekevät tekijät, encode-ryhmät ja tiimit, jotka tarvitsevat saavutettavia tekstityksiä."
+  },
+  'el': {
+    title: "Εργαλείο υποτίτλων με στυλ - συγχώνευση δίγλωσσων · πρότυπα · εφέ ASS/VTT | AI-SRTSub",
+    desc: "Δωρεάν διαδικτυακό εργαλείο για υπότιτλους με στυλ: ενώστε δύο αρχεία σε δίγλωσσο, αναδιατάξτε και αλλάξτε το στυλ ενός υπάρχοντος δίγλωσσου κομματιού ή προσθέστε εφέ σε μονόγλωσσο. 5 πρότυπα ASS και 6 VTT με προεπισκόπηση WYSIWYG. Εξαγωγή SRT / VTT / ASS.",
+    kw: "συγχώνευση υποτίτλων, δίγλωσσοι υπότιτλοι, ένωση υποτίτλων, υπότιτλοι με στυλ, στυλ ASS, στυλ VTT, εφέ υποτίτλων, πρότυπο υποτίτλων, δωρεάν εργαλείο υποτίτλων",
+    intro: "Ενώστε δύο αρχεία υποτίτλων σε δίγλωσσο ή δώστε τους στυλ απευθείας: γραμματοσειρά, χρώμα, περίγραμμα και θέση — όλα WYSIWYG.",
+    feat: "Δίγλωσση συγχώνευση και προσαρμογή, πρότυπα στυλ ASS / VTT, υποδοχές στυλ για κάθε τιμή, διόρθωση χρονικής γραμμής σημειακά ή μαζικά, και προεπισκόπηση που είναι κυριολεκτικά το εξαγόμενο αρχείο.",
+    who: "Δημιουργοί δίγλωσσων ή στυλιζαρισμένων υποτίτλων, ομάδες encoding και ομάδες που χρειάζονται προσβάσιμους υπότιτλους."
+  },
+  'he': {
+    title: "כלי כתוביות עם סגנון - מיזוג דו-לשוני · תבניות · אפקטים ASS/VTT | AI-SRTSub",
+    desc: "כלי מקוון חינם לכתוביות עם סגנון: חברו שני קבצים לדו-לשוני, סדרו מחדש ועצבו מחדש רצועה דו-לשונית קיימת, או הוסיפו אפקטים לרצועה בשפה אחת. 5 תבניות ASS ו-6 VTT עם תצוגה מקדימה WYSIWYG. ייצוא SRT / VTT / ASS.",
+    kw: "מיזוג כתוביות, כתוביות דו-לשוניות, שילוב כתוביות, כתוביות עם סגנון, סגנונות ASS, סגנונות VTT, אפקטים לכתוביות, תבנית כתוביות, כלי כתוביות חינם",
+    intro: "חברו שני קבצי כתוביות לדו-לשוני או תנו להן סגנון ישר: גופן, צבע, מסגרת ומיקום — הכל WYSIWYG.",
+    feat: "מיזוג וכוונון דו-לשוני, תבניות סגנון ASS / VTT, חריצי סגנון לכל ערך, תיקון ציר הזמן נקודתית או בקבוצות, ותצוגה מקדימה שהיא פשוט הקובץ שייצא.",
+    who: "יוצרים של כתוביות דו-לשוניות או מעוצבות, צוותי קידוד, וצוותים שצריכים כתוביות נגישות."
+  },
+  'ro': {
+    title: "Instrument pentru subtitrări cu stil - îmbinare bilingvă · șabloane · efecte ASS/VTT | AI-SRTSub",
+    desc: "Instrument online gratuit pentru subtitrări cu stil: îmbină două fișiere într-unul bilingv, reordonează și restituie o pistă bilingvă existentă sau adaugă efecte pe o pistă într-o singură limbă. 5 șabloane ASS și 6 VTT cu previzualizare WYSIWYG. Export SRT / VTT / ASS.",
+    kw: "îmbinare subtitrări, subtitrări bilingve, combinare subtitrări, subtitrări cu stil, stiluri ASS, stiluri VTT, efecte subtitrări, șablon subtitrări, instrument subtitrări gratuit",
+    intro: "Îmbină două fișiere de subtitrări într-unul bilingv sau dă-le stil direct: font, culoare, contur și poziție — totul WYSIWYG.",
+    feat: "Îmbinare și ajustare bilingvă, șabloane de stil ASS / VTT, sloturi de stil pentru fiecare valoare, corecția timeline-ului punctual sau în bloc, și o previzualizare care este chiar fișierul exportat.",
+    who: "Creators de subtitrări bilingve sau stilizate, echipe de encoding și echipe care au nevoie de subtitrări accesibile."
+  },
+};
+const SEO_CLEAN = {
+  'zh-CN': {
+    title: '字幕清洗器 - 去水印广告 · 听障提示 · 修乱码 | 随心字幕 AI',
+    desc: '免费在线字幕清洗工具：去掉字幕组水印与广告、听障提示、HTML 标签、ASS 特效，修复全大写与乱码，13 条规则随手开关，每条改动可单独还原，不动时间轴。',
+    kw: '字幕清洗,srt清洗,去字幕水印,去听障字幕,SDH字幕,去说话人,字幕去广告,字幕乱码修复,字幕去标签,ASS去特效,subtitle cleaner,clean srt',
+    intro: '下载来的字幕先过一遍：水印、广告、听障提示、HTML 标签一次剔干净。',
+    feat: '13 条规则分四类（默认开 9 条）、去水印广告与听障提示、修全大写与乱码、逐条列出改了什么并可单独还原、时间轴一律不动。',
+    who: '拿到现成字幕想直接用的人、要批量整理素材的字幕组。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'AI-SRTSub'
+  },
+  'en': {
+    title: 'Subtitle Cleaner - Strip Watermarks, SDH Cues & HTML Tags | AI-SRTSub',
+    desc: 'Free online subtitle cleaner: strip group watermarks, ads, SDH cues, HTML tags and ASS effects, fix all-caps and mojibake. 13 rules in four groups, every change listed and revertible, timing never moves.',
+    kw: 'subtitle cleaner, clean srt file, remove subtitle watermark, remove SDH subtitles, remove HTML tags from subtitles, fix all caps subtitles, fix mojibake, remove hearing impaired subtitles, strip ASS effects',
+    intro: 'Run a downloaded subtitle through here first: watermarks, ads, SDH cues and HTML tags, gone in one pass.',
+    feat: '13 rules in four groups (9 on by default), watermark and SDH removal, all-caps and mojibake fixes, per-cue change list with individual revert, and the timing is never touched.',
+    who: 'Anyone who grabbed an existing subtitle and just wants it usable, and groups batch-cleaning material.'
+  }
+,
+  'zh-TW': {
+    title: "字幕清洗器 - 去浮水印廣告 · 聽障提示 · 修亂碼 | 隨心字幕 AI",
+    desc: "免費線上字幕清洗工具：去掉字幕組浮水印與廣告、聽障提示、HTML 標籤、ASS 特效，修復全大寫與亂碼。13 條規則隨手開關，每條改動可單獨還原，不改時間軸。",
+    kw: "字幕清洗,srt清洗,去字幕浮水印,去聽障字幕,SDH字幕,去說話人,字幕去廣告,字幕亂碼修復,字幕去標籤,ASS去特效,subtitle cleaner,clean srt",
+    intro: "下載來的字幕先過一遍：浮水印、廣告、聽障提示、HTML 標籤一次剔乾淨。",
+    feat: "13 條規則分四類（預設開 9 條）、去浮水印廣告與聽障提示、修全大寫與亂碼、逐條列出改了什麼並可單獨還原、時間軸一律不改。",
+    who: "拿到現成字幕想直接用的人、要批量整理素材的字幕組。",
+    siteName: "隨心字幕 AI", jsonldName: "隨心字幕 AI", jsonldAlt: "AI-SRTSub"
+  },
+  'ja': {
+    title: "字幕クリーニング - ウォーターマーク広告・聴覚障害者向け表記・文字化けを一括除去 | AI-SRTSub",
+    desc: "無料のオンライン字幕クリーニングツール：字幕組のウォーターマークと広告、聴覚障害者向け表記、HTMLタグ、ASS装飾を除去し、全角大文字と文字化けを修復。13項目のルールを個別に切替、変更は一件ずつ取り消し可能、時間軸は不変更。",
+    kw: "字幕クリーニング,srt クリーニング,字幕 ウォーターマーク 除去,SDH 字幕 削除,字幕 広告 除去,字幕 文字化け 修正,字幕 タグ 除去,ASS 装飾 除去,subtitle cleaner",
+    intro: "落としてきた字幕はまずここに通しましょう。ウォーターマーク、広告、聴覚障害者向け表記、HTMLタグを一度に除去します。",
+    feat: "13項目のルールを4グループに分類（既定で9項目ON）、ウォーターマークと広告・SDHの除去、全角大文字と文字化けの修復、変更点を一件ずつ表示して個別に取り消し、時間軸は一切変更しません。",
+    who: "入手した字幕をそのまま使いたい人、素材をまとめて整えたい字幕チーム。"
+  },
+  'ko': {
+    title: "자막 정리 도구 - 워터마크 광고 · 청각 장애인용 표기 · 깨진 글자 제거 | AI-SRTSub",
+    desc: "무료 온라인 자막 정리 도구: 자막팀 워터마크와 광고, 청각 장애인용 표기, HTML 태그, ASS 효과를 제거하고 전체 대문자와 깨진 글자를 고칩니다. 13개 규칙을 자유롭게 켜고 끌 수 있고, 바뀐 내용은 하나씩 되돌릴 수 있으며 시간축은 그대로입니다.",
+    kw: "자막 정리,srt 정리,자막 워터마크 제거,SDH 자막 제거,자막 광고 제거,자막 깨짐 복구,자막 태그 제거,ASS 효과 제거,subtitle cleaner",
+    intro: "다운받은 자막은 먼저 여기 한 번 통과시키세요. 워터마크, 광고, 청각 장애인용 표기, HTML 태그를 한 번에 걷어냅니다.",
+    feat: "13개 규칙을 4개 그룹으로 구성(기본 9개 켜짐), 워터마크·광고·SDH 제거, 전체 대문자와 깨진 글자 수정, 바뀐 내용을 자막별로 표시하고 개별 복원, 시간축은 절대 건드리지 않습니다.",
+    who: "받은 자막을 바로 쓰고 싶은 사람, 자료를 한꺼번에 정리하는 자막팀."
+  },
+  'es': {
+    title: "Limpiador de subtítulos - quita marcas de agua, avisos SDH y caracteres corruptos | AI-SRTSub",
+    desc: "Limpiador de subtítulos online gratuito: elimina marcas de agua de grupos, anuncios, avisos SDH, etiquetas HTML y efectos ASS; corrige el texto en mayúsculas y los caracteres corruptos. 13 reglas que activas a tu gusto, cada cambio es reversible y los tiempos no se mueven.",
+    kw: "limpiar subtitulos, limpiar srt, quitar marca de agua subtitulos, quitar subtitulos SDH, quitar anuncios subtitulos, arreglar caracteres corruptos, quitar etiquetas html subtitulos",
+    intro: "Pasa primero los subtítulos descargados por aquí: marcas de agua, anuncios, avisos SDH y etiquetas HTML, fuera en una pasada.",
+    feat: "13 reglas en cuatro grupos (9 activas por defecto), eliminación de marcas de agua, anuncios y SDH, corrección de mayúsculas y caracteres corruptos, lista de cambios por rótulo con reversión individual y tiempos intactos.",
+    who: "Quien tiene subtítulos hechos y quiere usarlos ya, y los grupos que limpian material por lotes."
+  },
+  'pt': {
+    title: "Limpador de legendas - remove marcas d’água, avisos SDH e caracteres corrompidos | AI-SRTSub",
+    desc: "Limpador de legendas online grátis: remove marcas d’água de grupos, anúncios, avisos SDH, tags HTML e efeitos ASS; corrige texto em maiúsculas e caracteres corrompidos. 13 regras que você liga e desliga, cada mudança reversível e os tempos não se movem.",
+    kw: "limpar legendas, limpar srt, remover marca d’água legenda, remover SDH legenda, remover anúncios legenda, corrigir caracteres corrompidos, remover tags html legenda",
+    intro: "Passe as legendas baixadas primeiro por aqui: marcas d’água, anúncios, avisos SDH e tags HTML saem de uma vez.",
+    feat: "13 regras em quatro grupos (9 ativas por padrão), remoção de marcas d’água, anúncios e SDH, correção de maiúsculas e caracteres corrompidos, lista de mudanças por legenda com reversão individual e tempos intactos.",
+    who: "Quem tem legendas prontas e quer usar agora, e os grupos que limpam material em lote."
+  },
+
+  'de': {
+    title: "Untertitel-Reiniger - entfernt Wasserzeichen, SDH-Hinweise und Zeichensalat | AI-SRTSub",
+    desc: "Kostenloser Online-Reiniger für Untertitel: entfernt Gruppen-Wasserzeichen, Werbung, SDH-Hinweise, HTML-Tags und ASS-Effekte; korrigiert Großbuchstaben und Zeichensalat. 13 Regeln nach Wahl, jede Änderung rückgängig machbar, die Zeiten bleiben unangetastet.",
+    kw: "untertitel reinigen, srt reinigen, wasserzeichen aus untertiteln entfernen, SDH untertitel entfernen, werbung aus untertiteln entfernen, zeichensalat reparieren, html tags untertitel entfernen",
+    intro: "Heruntergeladene Untertitel zuerst hier durchlaufen lassen: Wasserzeichen, Werbung, SDH-Hinweise und HTML-Tags sind in einem Durchgang weg.",
+    feat: "13 Regeln in vier Gruppen (9 standardmäßig aktiv), Wasserzeichen-, Werbe- und SDH-Entfernung, Korrektur von Großbuchstaben und Zeichensalat, Änderungsliste pro Titel mit einzelnem Rückgängig und unangetastete Zeiten.",
+    who: "Alle, die fertige Untertitel einfach nutzen wollen, und Gruppen, die Material im Batch reinigen."
+  },
+  'fr': {
+    title: "Nettoyeur de sous-titres - supprime filigranes, indications SDH et caractères corrompus | AI-SRTSub",
+    desc: "Nettoyeur de sous-titres en ligne gratuit : supprime les filigranes de groupes, les pubs, les indications SDH, les balises HTML et les effets ASS ; corrige le tout-en-majuscules et les caractères corrompus. 13 règles à activer à volonté, chaque modification annulable, les temps ne bougent pas.",
+    kw: "nettoyer sous-titres, nettoyer srt, retirer filigrane sous-titres, retirer sous-titres SDH, retirer publicités sous-titres, réparer caractères corrompus, retirer balises html sous-titres",
+    intro: "Faites d’abord passer les sous-titres téléchargés ici : filigranes, pubs, indications SDH et balises HTML disparaissent en une passe.",
+    feat: "13 règles en quatre groupes (9 actives par défaut), suppression des filigranes, pubs et SDH, correction des majuscules et caractères corrompus, liste des modifications par sous-titre avec annulation individuelle et temps intacts.",
+    who: "Quiconque a des sous-titres prêts et veut les utiliser tout de suite, et les groupes qui nettoient du matériel par lots."
+  },
+  'id': {
+    title: "Pembersih subtitle - hapus watermark, penanda SDH dan karakter rusak | AI-SRTSub",
+    desc: "Pembersih subtitle online gratis: hapus watermark grup, iklan, penanda SDH, tag HTML dan efek ASS; perbaiki teks huruf kapital semua dan karakter rusak. 13 aturan bisa diaktifkan sesukanya, setiap perubahan bisa dibatalkan, dan waktu tidak pernah bergeser.",
+    kw: "bersihkan subtitle, bersihkan srt, hapus watermark subtitle, hapus subtitle SDH, hapus iklan subtitle, perbaiki karakter rusak, hapus tag html subtitle",
+    intro: "Lewatkan subtitle yang sudah diunduh ke sini dulu: watermark, iklan, penanda SDH, dan tag HTML hilang dalam satu kali jalan.",
+    feat: "13 aturan dalam empat kelompok (9 aktif bawaan), penghapusan watermark, iklan dan SDH, perbaikan huruf kapital dan karakter rusak, daftar perubahan per subtitle dengan pembatalan satuan, serta waktu yang tetap utuh.",
+    who: "Siapa pun yang punya subtitle jadi dan ingin langsung memakainya, serta tim yang membersihkan materi sekaligus."
+  },
+  'hi': {
+    title: "सबटाइटल क्लीनर - वॉटरमार्क, SDH संकेत और गड़बड़ अक्षर हटाएँ | AI-SRTSub",
+    desc: "मुफ़्त ऑनलाइन सबटाइटल क्लीनर: ग्रुप वॉटरमार्क, विज्ञापन, SDH संकेत, HTML टैग और ASS इफ़ेक्ट हटाता है; ऑल-कैप्स और गड़बड़ अक्षर ठीक करता है। 13 नियम अपनी मर्ज़ी से चालू करें, हर बदलाव वापस किया जा सकता है, समय बिलकुल नहीं हिलता।",
+    kw: "सबटाइटल साफ़ करें, srt साफ़ करें, सबटाइटल वॉटरमार्क हटाएँ, SDH सबटाइटल हटाएँ, सबटाइटल विज्ञापन हटाएँ, गड़बड़ अक्षर ठीक करें, html टैग हटाएँ",
+    intro: "डाउनलोड किए सबटाइटल पहले यहाँ से गुज़ारें: वॉटरमार्क, विज्ञापन, SDH संकेत और HTML टैग एक ही पास में हट जाते हैं।",
+    feat: "चार समूहों में 13 नियम (डिफ़ॉल्ट 9 चालू), वॉटरमार्क·विज्ञापन·SDH हटाना, बड़े अक्षरों और गड़बड़ अक्षरों की मरम्मत, हर सबटाइटल के बदलाव की सूची और अलग से वापसी, और समय बिलकुल सुरक्षित।",
+    who: "जिनके पास तैयार सबटाइटल हैं और उन्हें तुरंत इस्तेमाल करना है, और जो टीमें सामग्री बैच में साफ़ करती हैं।"
+  },
+  'th': {
+    title: "เครื่องมือล้างซับไตเติล - ลบลายน้ำ โฆษณา ป้าย SDH และตัวอักษรเพี้ยน | AI-SRTSub",
+    desc: "เครื่องมือล้างซับออนไลน์ฟรี: ลบลายน้ำของทีมซับ โฆษณา ป้าย SDH แท็ก HTML และเอฟเฟกต์ ASS แก้ตัวพิมพ์ใหญ่ทั้งหมดและตัวอักษรเพี้ยน 13 กฎเปิดปิดได้ตามใจ ทุกการเปลี่ยนแปลงย้อนกลับได้ และไทม์ไลน์ไม่ขยับ",
+    kw: "ล้างซับไตเติล, ล้าง srt, ลบลายน้ำซับ, ลบซับ SDH, ลบโฆษณาซับ, ซ่อมตัวอักษรเพี้ยน, ลบแท็ก html ซับ",
+    intro: "เอาซับที่โหลดมากรองผ่านที่นี่ก่อน: ลายน้ำ โฆษณา ป้าย SDH และแท็ก HTML หายในรอบเดียว",
+    feat: "13 กฎใน 4 กลุ่ม (เปิดมา 9 ข้อ), ลบลายน้ำ โฆษณา และ SDH, แก้ตัวพิมพ์ใหญ่และตัวอักษรเพี้ยน, รายการเปลี่ยนแปลงรายซับพร้อมย้อนกลับรายการ และไทม์ไลน์คงเดิม",
+    who: "ใครก็ตามที่มีซับพร้อมแล้วและอยากใช้เลย รวมถึงทีมที่ล้าง素材เป็นชุด"
+  },
+  'vi': {
+    title: "Công cụ làm sạch phụ đề - xóa watermark, ký hiệu SDH và ký tự lỗi | AI-SRTSub",
+    desc: "Công cụ làm sạch phụ đề online miễn phí: xóa watermark nhóm, quảng cáo, ký hiệu SDH, thẻ HTML và hiệu ứng ASS; sửa chữ toàn viết hoa và ký tự lỗi. 13 quy tắc bật tắt tùy ý, mỗi thay đổi đều hoàn tác được, thời gian không hề thay đổi.",
+    kw: "làm sạch phụ đề, làm sạch srt, xóa watermark phụ đề, xóa phụ đề SDH, xóa quảng cáo phụ đề, sửa ký tự lỗi, xóa thẻ html phụ đề",
+    intro: "Cho phụ đề đã tải qua đây trước: watermark, quảng cáo, ký hiệu SDH và thẻ HTML biến mất trong một lượt.",
+    feat: "13 quy tắc trong bốn nhóm (9 bật sẵn), xóa watermark, quảng cáo và SDH, sửa viết hoa và ký tự lỗi, danh sách thay đổi theo từng phụ đề với hoàn tác riêng, và thời gian giữ nguyên.",
+    who: "Ai có phụ đề có sẵn và muốn dùng ngay, cùng các nhóm làm sạch tài liệu theo lô."
+  },
+
+  'ru': {
+    title: "Очиститель субтитров - удаляет водяные знаки, пометки SDH и кракозябры | AI-SRTSub",
+    desc: "Бесплатный онлайн-очиститель субтитров: удаляет водяные знаки групп, рекламу, пометки SDH, HTML-теги и эффекты ASS; исправляет ЗАГЛАВНЫЕ БУКВЫ и кракозябры. 13 правил включаются по желанию, каждое изменение отменяется, таймкоды не двигаются.",
+    kw: "очистить субтитры, очистить srt, удалить водяной знак субтитров, удалить субтитры SDH, удалить рекламу из субтитров, исправить кракозябры, удалить html теги субтитров",
+    intro: "Сначала прогоните скачанные субтитры здесь: водяные знаки, реклама, пометки SDH и HTML-теги исчезают за один проход.",
+    feat: "13 правил в четырёх группах (9 включены по умолчанию), удаление водяных знаков, рекламы и SDH, исправление заглавных букв и кракозябр, список изменений по титрам с отменой каждого и нетронутые таймкоды.",
+    who: "Те, у кого уже есть субтитры и нужно их просто использовать, и команды, чистящие материал пакетами."
+  },
+  'it': {
+    title: "Pulitore di sottotitoli - rimuove filigrane, indicazioni SDH e caratteri corrotti | AI-SRTSub",
+    desc: "Pulitore di sottotitoli online gratuito: rimuove filigrane dei gruppi, pubblicità, indicazioni SDH, tag HTML ed effetti ASS; sistema il tutto maiuscolo e i caratteri corrotti. 13 regole attivabili a piacere, ogni modifica annullabile, i tempi non si muovono.",
+    kw: "pulire sottotitoli, pulire srt, rimuovere filigrana sottotitoli, rimuovere sottotitoli SDH, rimuovere pubblicità sottotitoli, riparare caratteri corrotti, rimuovere tag html sottotitoli",
+    intro: "Fai passare prima i sottotitoli scaricati da qui: filigrane, pubblicità, indicazioni SDH e tag HTML spariscono in una passata.",
+    feat: "13 regole in quattro gruppi (9 attive di default), rimozione di filigrane, pubblicità e SDH, correzione di maiuscole e caratteri corrotti, elenco delle modifiche per sottotitolo con annullamento singolo e tempi intatti.",
+    who: "Chi ha già dei sottotitoli e vuole usarli subito, e i gruppi che puliscono materiale in blocco."
+  },
+  'ar': {
+    title: "منظّف الترجمة - يزيل العلامات المائية وإشارات SDH والأحرف التالفة | AI-SRTSub",
+    desc: "منظّف ترجمة مجاني على الإنترنت: يزيل علامات الفرق المائية والإعلانات وإشارات SDH ووسوم HTML وتأثيرات ASS؛ ويصلح الكتابة بأحرف كبيرة والأحرف التالفة. 13 قاعدة تُفعّل كما تشاء، وكل تغيير قابل للتراجع، والتوقيتات لا تتغيّر.",
+    kw: "تنظيف الترجمة, تنظيف srt, إزالة العلامة المائية من الترجمة, إزالة ترجمة SDH, إزالة الإعلانات من الترجمة, إصلاح الأحرف التالفة, إزالة وسوم html من الترجمة",
+    intro: "مرّر الترجمة التي حمّلتها من هنا أولاً: العلامات المائية والإعلانات وإشارات SDH ووسوم HTML تختفي بمرور واحد.",
+    feat: "13 قاعدة في أربع مجموعات (9 مفعّلة افتراضياً)، إزالة العلامات المائية والإعلانات وSDH، إصلاح الأحرف الكبيرة والتالفة، قائمة بالتغييرات لكل ترجمة مع تراجع منفرد، والتوقيتات سليمة تماماً.",
+    who: "من لديه ترجمة جاهزة ويريد استخدامها فوراً، والفرق التي تنظّف المواد على دفعات."
+  },
+  'tr': {
+    title: "Altyazı temizleyici - filigranları, SDH işaretlerini ve bozuk karakterleri siler | AI-SRTSub",
+    desc: "Ücretsiz online altyazı temizleyici: ekip filigranlarını, reklamları, SDH işaretlerini, HTML etiketlerini ve ASS efektlerini siler; tamamı büyük harf ve bozuk karakterleri düzeltir. 13 kural istediğiniz gibi açılıp kapanır, her değişiklik geri alınabilir, zamanlar asla kaymaz.",
+    kw: "altyazı temizleme, srt temizleme, altyazıdan filigran kaldırma, SDH altyazı kaldırma, altyazıdan reklam kaldırma, bozuk karakter onarma, html etiketlerini kaldırma",
+    intro: "İndirdiğiniz altyazıyı önce buradan geçirin: filigranlar, reklamlar, SDH işaretleri ve HTML etiketleri tek geçişte silinir.",
+    feat: "Dört grupta 13 kural (9’u varsayılan açık), filigran · reklam · SDH silme, büyük harf ve bozuk karakter düzeltme, altyazı başına değişiklik listesi ve tek tek geri alma, zamanlar ise hiç dokunulmadan kalır.",
+    who: "Hazır altyazısı olup hemen kullanmak isteyenler ve malzemeyi toplu temizleyen ekipler."
+  },
+  'nl': {
+    title: "Ondertitel-schoonmaker - verwijdert watermerken, SDH-markeringen en corrupte tekens | AI-SRTSub",
+    desc: "Gratis online ondertitel-schoonmaker: verwijdert groepswatermerken, reclame, SDH-markeringen, HTML-tags en ASS-effecten; herstelt hoofdletters en corrupte tekens. 13 regels naar keuze aan te zetten, elke wijziging is terug te draaien en de tijden blijven onaangeroerd.",
+    kw: "ondertitels schoonmaken, srt schoonmaken, watermerk uit ondertitels verwijderen, SDH ondertitels verwijderen, reclame uit ondertitels verwijderen, corrupte tekens herstellen, html tags verwijderen",
+    intro: "Haal gedownloade ondertitels eerst hier doorheen: watermerken, reclame, SDH-markeringen en HTML-tags verdwijnen in één keer.",
+    feat: "13 regels in vier groepen (9 standaard aan), verwijdering van watermerken, reclame en SDH, herstel van hoofdletters en corrupte tekens, wijzigingenlijst per ondertitel met individuele terugdraai en intacte tijden.",
+    who: "Wie kant-en-klare ondertitels heeft en ze meteen wil gebruiken, en teams die materiaal in bulk schoonmaken."
+  },
+  'pl': {
+    title: "Czyścik napisów - usuwa znaki wodne, oznaczenia SDH i krzaki | AI-SRTSub",
+    desc: "Darmowy czyścik napisów online: usuwa znaki wodne grup, reklamy, oznaczenia SDH, tagi HTML i efekty ASS; naprawia WIELKIE LITERY i krzaki. 13 reguł włączasz według uznania, każdą zmianę można cofnąć, a czasy nie ruszają się ani o milisekundę.",
+    kw: "czyszczenie napisów, czyszczenie srt, usuwanie znaku wodnego z napisów, usuwanie napisów SDH, usuwanie reklam z napisów, naprawa krzaków, usuwanie tagów html",
+    intro: "Przepuść pobrane napisy najpierw tutaj: znaki wodne, reklamy, oznaczenia SDH i tagi HTML znikają w jednym przebiegu.",
+    feat: "13 reguł w czterech grupach (9 domyślnie włączonych), usuwanie znaków wodnych, reklam i SDH, naprawa wielkich liter i krzaków, lista zmian per napis z osobnym cofnięciem i nienaruszalne czasy.",
+    who: "Ktoś, kto ma gotowe napisy i chce ich zaraz użyć, oraz grupy czyszczące materiał hurtowo."
+  },
+
+  'sv': {
+    title: "Rensare för undertexter - tar bort vattenmärken, SDH-markeringar och trasiga tecken | AI-SRTSub",
+    desc: "Gratis onlineverktyg som rensar undertexter: tar bort grupp-vattenmärken, reklam, SDH-markeringar, HTML-taggar och ASS-effekter; åtgärdar VERSALER och trasiga tecken. 13 regler du slår på som du vill, varje ändring kan ångras och tiderna rör sig aldrig.",
+    kw: "rensa undertexter, rensa srt, ta bort vattenmärke undertexter, ta bort SDH-undertexter, ta bort reklam undertexter, reparera trasiga tecken, ta bort html-taggar",
+    intro: "Kör nedladdade undertexter hit först: vattenmärken, reklam, SDH-markeringar och HTML-taggar försvinner i ett svep.",
+    feat: "13 regler i fyra grupper (9 på som standard), borttagning av vattenmärken, reklam och SDH, åtgärd av versaler och trasiga tecken, ändringslista per undertext med enskild ångra och intakta tider.",
+    who: "Den som har färdiga undertexter och vill använda dem direkt, och grupper som rensar material i batch."
+  },
+  'cs': {
+    title: "Čistič titulků - odstraní vodoznaky, SDH značky a rozbité znaky | AI-SRTSub",
+    desc: "Bezplatný online čistič titulků: odstraní vodoznaky skupin, reklamu, SDH značky, HTML tagy a ASS efekty; opraví VELKÁ PÍSMENA a rozbité znaky. 13 pravidel zapnete podle sebe, každou změnu lze vrátit a časy se nikdy nehnou.",
+    kw: "vyčistit titulky, vyčistit srt, odstranit vodoznak titulků, odstranit SDH titulky, odstranit reklamu z titulků, opravit rozbité znaky, odstranit html tagy",
+    intro: "Stažené titulky nejdřív prožeňte tudy: vodoznaky, reklama, SDH značky a HTML tagy zmizí v jednom průchodu.",
+    feat: "13 pravidel ve čtyřech skupinách (9 ve výchozím stavu zapnuto), odstranění vodoznaků, reklamy a SDH, oprava velkých písmen a rozbitých znaků, seznam změn po titulcích s jednotlivým vrácením a netknuté časy.",
+    who: "Kdo má hotové titulky a chce je hned použít, a týmy, které čistí materiál po dávkách."
+  },
+  'uk': {
+    title: "Очищувач субтитрів - видаляє водяні знаки, позначки SDH і кракозябри | AI-SRTSub",
+    desc: "Безплатний онлайн-очищувач субтитрів: видаляє водяні знаки груп, рекламу, позначки SDH, HTML-теги й ефекти ASS; виправляє ВЕЛИКІ ЛІТЕРИ та кракозябри. 13 правил вмикаєте на свій розсуд, кожну зміну можна скасувати, а таймкоди не рухаються.",
+    kw: "очистити субтитри, очистити srt, видалити водяний знак субтитрів, видалити субтитри SDH, видалити рекламу з субтитрів, виправити кракозябри, видалити html теги",
+    intro: "Спершу проженіть завантажені субтитри тут: водяні знаки, реклама, позначки SDH і HTML-теги зникають за один прохід.",
+    feat: "13 правил у чотирьох групах (9 увімкнено за замовчуванням), видалення водяних знаків, реклами і SDH, виправлення великих літер і кракозябрів, перелік змін по титрах з окремим скасуванням і недоторкані таймкоди.",
+    who: "Ті, хто має готові субтитри й хоче просто ними користуватися, та команди, що чистять матеріал пакетами."
+  },
+  'da': {
+    title: "Renser til undertekster - fjerner vandmærker, SDH-markeringer og ødelagte tegn | AI-SRTSub",
+    desc: "Gratis online renser til undertekster: fjerner gruppe-vandmærker, reklamer, SDH-markeringer, HTML-tags og ASS-effekter; retter VERSALER og ødelagte tegn. 13 regler du tænder som du vil, hver ændring kan fortrydes, og tiderne flytter sig aldrig.",
+    kw: "rense undertekster, rense srt, fjerne vandmærke undertekster, fjerne SDH undertekster, fjerne reklamer undertekster, reparere ødelagte tegn, fjerne html tags",
+    intro: "Kør downloadede undertekster igennem her først: vandmærker, reklamer, SDH-markeringer og HTML-tags forsvinder på én gang.",
+    feat: "13 regler i fire grupper (9 slået til som standard), fjernelse af vandmærker, reklamer og SDH, rettelse af versaler og ødelagte tegn, ændringsliste per undertekst med individuel fortryd og intakte tider.",
+    who: "Alle der har færdige undertekster og vil bruge dem med det samme, og grupper der renser materiale i bundter."
+  },
+  'fi': {
+    title: "Tekstitysten puhdistaja - poistaa vesileimat, SDH-merkinnät ja rikkinäiset merkit | AI-SRTSub",
+    desc: "Ilmainen verkkotyökalu tekstitysten puhdistukseen: poistaa ryhmien vesileimat, mainokset, SDH-merkinnät, HTML-tagit ja ASS-tehosteet; korjaa ISOILLA KIRJAIMILLA kirjoitetun tekstin ja rikkinäiset merkit. 13 sääntöä kytketään halutessa, jokainen muutos voi perua, eivätkä ajat siirry.",
+    kw: "puhdista tekstitykset, puhdista srt, poista vesileima tekstityksistä, poista SDH-tekstitykset, poista mainokset tekstityksistä, korjaa rikkinäiset merkit, poista html-tagit",
+    intro: "Aja ladatut tekstitykset ensin tämän kautta: vesileimat, mainokset, SDH-merkinnät ja HTML-tagit poistuvat yhdellä kertaa.",
+    feat: "13 sääntöä neljässä ryhmässä (9 oletuksena päällä), vesileimojen, mainosten ja SDH:n poisto, isojen kirjainten ja rikkinäisten merkkien korjaus, muutoslista per tekstitys yksittäisellä peruutuksella ja koskemattomat ajat.",
+    who: "Kaikki joilla on valmiit tekstitykset ja jotka haluavat käyttää niitä heti, sekä ryhmät jotka puhdistavat materiaalia erissä."
+  },
+  'el': {
+    title: "Καθαριστής υποτίτλων - αφαιρεί υδατογραφήματα, σημάνσεις SDH και χαλασμένα σύμβολα | AI-SRTSub",
+    desc: "Δωρεάν διαδικτυακός καθαριστής υποτίτλων: αφαιρεί υδατογραφήματα ομάδων, διαφημίσεις, σημάνσεις SDH, ετικέτες HTML και εφέ ASS· διορθώνει τα ΚΕΦΑΛΑΙΑ και τα χαλασμένα σύμβολα. 13 κανόνες ενεργοποιούνται κατά βούληση, κάθε αλλαγή αναστρέφεται και οι χρόνοι δεν μετακινούνται.",
+    kw: "καθαρισμός υποτίτλων, καθαρισμός srt, αφαίρεση υδατογραφήματος υποτίτλων, αφαίρεση SDH υποτίτλων, αφαίρεση διαφημίσεων υποτίτλων, επιδιόρθωση χαλασμένων συμβόλων, αφαίρεση ετικετών html",
+    intro: "Περάστε πρώτα τους κατεβασμένους υπότιτλους από εδώ: υδατογραφήματα, διαφημίσεις, σημάνσεις SDH και ετικέτες HTML εξαφανίζονται με μία.",
+    feat: "13 κανόνες σε τέσσερις ομάδες (9 ενεργοί εξ ορισμού), αφαίρεση υδατογραφημάτων, διαφημίσεων και SDH, διόρθωση κεφαλαίων και χαλασμένων συμβόλων, λίστα αλλαγών ανά υπότιτλο με μεμονωμένη αναίρεση και άθικτοι χρόνοι.",
+    who: "Όποιος έχει έτοιμους υπότιτλους και θέλει να τους χρησιμοποιήσει αμέσως, και οι ομάδες που καθαρίζουν υλικό σε παρτίδες."
+  },
+  'he': {
+    title: "מנקה כתוביות - מסיר סימני מים, סימוני SDH ותווים שבורים | AI-SRTSub",
+    desc: "מנקה כתוביות מקוון חינם: מסיר סימני מים של קבוצות, פרסומות, סימוני SDH, תגי HTML ואפקטים של ASS; מתקן אותיות גדולות ותווים שבורים. 13 כללים אפשר להפעיל כרצונכם, כל שינוי ניתן לביטול, והזמנים לא זזים.",
+    kw: "ניקוי כתוביות, ניקוי srt, הסרת סימן מים מכתוביות, הסרת כתוביות SDH, הסרת פרסומות מכתוביות, תיקון תווים שבורים, הסרת תגי html",
+    intro: "העבירו קודם את הכתוביות שהורדתם דרך כאן: סימני מים, פרסומות, סימוני SDH ותגי HTML נעלמים במעבר אחד.",
+    feat: "13 כללים בארבע קבוצות (9 פעילים כברירת מחדל), הסרת סימני מים, פרסומות ו-SDH, תיקון אותיות גדולות ותווים שבורים, רשימת שינויים לכל כתובית עם ביטול נפרד, וזמנים שנשארים שלמים.",
+    who: "מי שיש לו כתוביות מוכנות ורוצה להשתמש בהן מיד, וצוותים שמנקים חומר בקבוצות."
+  },
+  'ro': {
+    title: "Curățător de subtitrări - elimină filigranele, marcajele SDH și caracterele stricate | AI-SRTSub",
+    desc: "Curățător de subtitrări online gratuit: elimină filigranele echipelor, reclamele, marcajele SDH, tagurile HTML și efectele ASS; corectează MAJUSCULELE și caracterele stricate. 13 reguli pe care le activezi cum vrei, fiecare modificare se poate anula, iar timpii nu se mișcă.",
+    kw: "curățare subtitrări, curățare srt, eliminare filigran subtitrări, eliminare subtitrări SDH, eliminare reclame subtitrări, reparare caractere stricate, eliminare taguri html",
+    intro: "Treci mai întâi subtitrările descărcate pe aici: filigranele, reclamele, marcajele SDH și tagurile HTML dispar dintr-o singură trecere.",
+    feat: "13 reguli în patru grupe (9 active implicit), eliminarea filigranelor, reclamelor și SDH, corectarea majusculelor și caracterelor stricate, lista modificărilor per subtitrare cu anulare individuală și timpi intacte.",
+    who: "Oricine are subtitrări gata făcute și vrea să le folosească imediat, plus echipele care curăță material pe loturi."
+  },
+};
+/* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
+const MERGE_PATH = {}, CLEAN_PATH = {};
+SEO_LANGS.forEach(function (l) {
+  MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
+  CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
+});
+const SEO_PAGES = {
+  index: { file: 'index.html', table: SEO, path: SEO_PATH, jsonldType: 'WebApplication' },
+  merge: { file: 'merge.html', table: SEO_MERGE, path: MERGE_PATH, jsonldType: 'WebApplication' },
+  clean: { file: 'clean.html', table: SEO_CLEAN, path: CLEAN_PATH, jsonldType: 'WebApplication' }
+};
+/* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
+function seoCopy(page, lang){
+  const s = SEO_PAGES[page].table[lang];
+  if (!s || !s.intro) return '';
+  return '<section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;' +
+    'border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">\n' +
+    '    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">' + (s.h || s.title) + '</h2>\n' +
+    '    <p><strong>' + s.intro + '</strong></p>\n' +
+    '    <p style="margin-top:8px;">' + s.feat + '</p>\n' +
+    '    <p style="margin-top:8px;">' + s.who + '</p>\n' +
+    '  </section>';
+}
+
+function seoHead(lang, base, page){
+  page = page || 'index';
+  const P = SEO_PAGES[page];
+  const s = P.table[lang] || P.table['en'] || P.table['zh-CN'];
+  const selfUrl = base + P.path[lang];
+  const alternates = SEO_LANGS.filter(function (l) { return P.table[l]; }).map(function (l) {
+    return '<link rel="alternate" hreflang="' + l + '" href="' + base + P.path[l] + '">';
+  }).join('\n') + '\n<link rel="alternate" hreflang="x-default" href="' + base + P.path['zh-CN'] + '">';
+  /* 首页那张表字段最全（jsonldName / ogLocale / currency 都有）；
+     特效页与清洗页只写 title / desc / kw / 三段文案，其余一律走这里的缺省值。 */
+  const ogTitle = s.ogTitle || s.title;
+  const ogDesc = s.ogDesc || s.desc;
+  const siteName = s.siteName || 'AI-SRTSub';
+  const jsonldName = s.jsonldName || siteName;
+  const jsonldAlt = s.jsonldAlt || (page === 'merge' ? 'Subtitle Effects' : page === 'clean' ? 'Subtitle Cleaner' : 'AI-SRTSub');
+  const jsonldDesc = s.jsonldDesc || s.desc;
+  const ogLocale = s.ogLocale || OG_LOCALE[lang] || 'en_US';
+  const currency = s.currency || 'USD';
   const jsonld = '{\n'
     + '  "@context": "https://schema.org",\n'
-    + '  "@type": "WebApplication",\n'
-    + '  "name": ' + JSON.stringify(s.jsonldName) + ',\n'
-    + '  "alternateName": ' + JSON.stringify(s.jsonldAlt) + ',\n'
+    + '  "@type": "' + P.jsonldType + '",\n'
+    + '  "name": ' + JSON.stringify(jsonldName) + ',\n'
+    + '  "alternateName": ' + JSON.stringify(jsonldAlt) + ',\n'
     + '  "url": ' + JSON.stringify(selfUrl) + ',\n'
-    + '  "description": ' + JSON.stringify(s.jsonldDesc) + ',\n'
+    + '  "description": ' + JSON.stringify(jsonldDesc) + ',\n'
     + '  "applicationCategory": "UtilitiesApplication",\n'
     + '  "operatingSystem": "Web",\n'
     + '  "browserRequirements": "Requires JavaScript",\n'
     + '  "inLanguage": ' + JSON.stringify(SEO_LANGS) + ',\n'
-    + '  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "' + s.currency + '" }\n'
+    + '  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "' + currency + '" }\n'
     + '}';
   return [
     '<title>' + s.title + '</title>',
     '<meta name="description" content="' + s.desc + '">',
-    '<meta name="keywords" content="' + s.kw + '">',
+    '<meta name="keywords" content="' + (s.kw || '') + '">',
     '<meta name="robots" content="index, follow">',
     '<meta name="theme-color" content="#0E9488">',
     '<link rel="icon" type="image/svg+xml" href="/favicon.svg">',
@@ -991,32 +1499,39 @@ function seoHead(lang, base){
     alternates,
     '<!-- Open Graph / 社交分享卡片 -->',
     '<meta property="og:type" content="website">',
-    '<meta property="og:title" content="' + s.ogTitle + '">',
-    '<meta property="og:description" content="' + s.ogDesc + '">',
+    '<meta property="og:title" content="' + ogTitle + '">',
+    '<meta property="og:description" content="' + ogDesc + '">',
     '<meta property="og:image" content="' + base + '/og-image.png">',
-    '<meta property="og:site_name" content="' + s.siteName + '">',
-    '<meta property="og:locale" content="' + s.ogLocale + '">',
+    '<meta property="og:site_name" content="' + siteName + '">',
+    '<meta property="og:locale" content="' + ogLocale + '">',
     '<meta property="og:url" content="' + selfUrl + '">',
     '<meta name="twitter:card" content="summary_large_image">',
-    '<meta name="twitter:title" content="' + s.ogTitle + '">',
-    '<meta name="twitter:description" content="' + s.ogDesc + '">',
+    '<meta name="twitter:title" content="' + ogTitle + '">',
+    '<meta name="twitter:description" content="' + ogDesc + '">',
     '<meta name="twitter:image" content="' + base + '/og-image.png">',
     '<!-- 结构化数据（搜索引擎富摘要） -->',
     '<script type="application/ld+json">\n' + jsonld + '\n</script>'
   ].join('\n');
 }
 
-/* 按语言服务 index.html：替换 SEO head 与静态文案块 */
-function serveIndexLang(req, res, lang){
-  fs.readFile(path.join(ROOT, 'index.html'), 'utf8', (err, html) => {
-    if (err) { res.writeHead(500, {'Content-Type':'text/plain; charset=utf-8'}); res.end('index.html missing'); return; }
+/* 按语言服务某一页（index / merge / clean）：替换 SEO head 与静态文案块 */
+function serveIndexLang(req, res, lang, page){
+  page = page || 'index';
+  const P = SEO_PAGES[page];
+  fs.readFile(path.join(ROOT, P.file), 'utf8', (err, html) => {
+    if (err) { res.writeHead(500, {'Content-Type':'text/plain; charset=utf-8'}); res.end(P.file + ' missing'); return; }
     const base = publicBase(req) || '';
-    const head = seoHead(lang, base);
+    const head = seoHead(lang, base, page);
     html = html.replace(/<!--SEO-HEAD-START-->[\s\S]*?<!--SEO-HEAD-END-->/,
       '<!--SEO-HEAD-START-->\n' + head + '\n<!--SEO-HEAD-END-->');
-    html = html.replace(/<!--SEO-COPY-START-->[\s\S]*?<!--SEO-COPY-END-->/,
-      '<!--SEO-COPY-START-->\n  ' + SEO[lang].copy + '\n  <!--SEO-COPY-END-->');
-    html = html.replace('<html lang="zh-CN"', '<html lang="' + SEO[lang].htmlLang + '"' + ((SEO[lang].htmlLang === 'ar' || SEO[lang].htmlLang === 'he') ? ' dir="rtl"' : ''));
+    /* 首页那张表自带整段 copy；另两页由 seoCopy() 现拼（没有就跳过，页面照常出） */
+    const copy = (page === 'index') ? (SEO[lang] && SEO[lang].copy) : seoCopy(page, lang);
+    if (copy) {
+      html = html.replace(/<!--SEO-COPY-START-->[\s\S]*?<!--SEO-COPY-END-->/,
+        '<!--SEO-COPY-START-->\n  ' + copy + '\n  <!--SEO-COPY-END-->');
+    }
+    const htmlLang = (page === 'index' && SEO[lang]) ? SEO[lang].htmlLang : lang;
+    html = html.replace('<html lang="zh-CN"', '<html lang="' + htmlLang + '"' + ((htmlLang === 'ar' || htmlLang === 'he') ? ' dir="rtl"' : ''));
     /* GA4 统计：配置了 analyticsId 才注入（fork 部署者用自己的 ID，避免统计进原作者账号） */
     const ga = (readConfig().analyticsId || '').trim();
     const gaTag = /^G-[A-Z0-9]+$/.test(ga)
@@ -1029,19 +1544,27 @@ function serveIndexLang(req, res, lang){
   });
 }
 
-/* sitemap：27 语言 URL + hreflang alternates（v0.9.114） */
+/* sitemap：三页 × 27 语言 = 81 条 URL，每条带本页的 hreflang alternates。
+   v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。 */
 function sitemapXml(base){
-  const alts = SEO_LANGS.map(l =>
-    '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + SEO_PATH[l] + '"/>'
-  ).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + '/"/>';
-  const urls = SEO_LANGS.map(l =>
-    '  <url>\n    <loc>' + base + SEO_PATH[l] + '</loc>\n' + alts
-    + '\n    <changefreq>weekly</changefreq>\n    <priority>' + (l === 'zh-CN' ? '1.0' : '0.9') + '</priority>\n  </url>'
-  ).join('\n');
+  const urls = [];
+  Object.keys(SEO_PAGES).forEach(function (page) {
+    const P = SEO_PAGES[page];
+    const langs = SEO_LANGS.filter(function (l) { return P.table[l]; });
+    const alts = langs.map(function (l) {
+      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + P.path[l] + '"/>';
+    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + P.path['zh-CN'] + '"/>';
+    langs.forEach(function (l) {
+      /* 首页权重最高，两个工具页低一档 */
+      const pr = (page === 'index') ? (l === 'zh-CN' ? '1.0' : '0.9') : (l === 'zh-CN' ? '0.8' : '0.7');
+      urls.push('  <url>\n    <loc>' + base + P.path[l] + '</loc>\n' + alts
+        + '\n    <changefreq>weekly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+    });
+  });
   return '<?xml version="1.0" encoding="UTF-8"?>\n'
     + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
     + '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
-    + urls + '\n</urlset>\n';
+    + urls.join('\n') + '\n</urlset>\n';
 }
 
 function proto(req){
