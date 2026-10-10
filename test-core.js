@@ -3836,7 +3836,7 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(!/<img id="donateImg" alt="支付宝收款码" src=/i.test(html), 'img 不许带静态 src（收起态会偷跑请求）');
     assert.ok(/donate-qr-square\.png\?v=/.test(init), '展开时没赋图片 src');
     assert.ok(/var opening=qr\.hidden;/.test(init), '展开/收起切换逻辑找不到');
-    assert.strictEqual((html.match(/给小站充点 token，让大家免费用/g) || []).length, 2,
+    assert.strictEqual((html.match(/AI算力紧张，给网站支持点 Token费/g) || []).length, 2,
       '文案应恰好出现 2 次（按钮默认 + 收起态要还原的那份）');
   });
 
@@ -4997,10 +4997,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/localStorage\.setItem\('srtDonateV1','1'\)/.test(html),
       '导出标记仍应照写（留给将来按「导出过」换文案用）');
     assert.ok(/if\(window\.__donateReveal\) window\.__donateReveal\(\);/.test(html), '导出成功后的回调没了');
-    assert.ok(/给小站充点 token，让大家免费用/.test(html), '主文案丢了');
+    assert.ok(/AI算力紧张，给网站支持点 Token费/.test(html), '主文案丢了');
     assert.ok(/<div class="hint">图个快乐，多少随意<\/div>/.test(html), '展开态的「图个快乐，多少随意」丢了');
     /* 收起态的按钮必须能原样回到主文案，否则点一次就回不来了 */
-    assert.ok(/图个快乐，多少随意/.test(html) && /给小站充点 token，让大家免费用/.test(html),
+    assert.ok(/图个快乐，多少随意/.test(html) && /AI算力紧张，给网站支持点 Token费/.test(html),
       '赞助文案不全（展开态与主文案得都有）');
   });
 
@@ -5345,7 +5345,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.263/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.264/.test(mg), 'merge.html 未引用 v0.9.247 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5385,9 +5385,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.263</.test(html), '首页版本号未升 0.9.256');
-    assert.ok(/class="ver-tag">v0\.9\.263</.test(html), '工作台版本号未升 0.9.256');
-    assert.ok(/srt-core\.js\?v=0\.9\.263/.test(html), 'srt-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.264</.test(html), '首页版本号未升 0.9.256');
+    assert.ok(/class="ver-tag">v0\.9\.264</.test(html), '工作台版本号未升 0.9.256');
+    assert.ok(/srt-core\.js\?v=0\.9\.264/.test(html), 'srt-core.js?v 未升 0.9.256');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5564,8 +5564,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.263</.test(mg), 'merge.html 版本未升 0.9.256');
-    assert.ok(/merge-core\.js\?v=0\.9\.263/.test(mg), 'merge-core.js?v 未升 0.9.256');
+    assert.ok(/class="ver">v0\.9\.264</.test(mg), 'merge.html 版本未升 0.9.256');
+    assert.ok(/merge-core\.js\?v=0\.9\.264/.test(mg), 'merge-core.js?v 未升 0.9.256');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7393,11 +7393,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.263/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.263/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.263/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.263/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.263/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.264/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.264/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.264/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.264/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.264/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
