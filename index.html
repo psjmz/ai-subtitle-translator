@@ -792,6 +792,30 @@
   .empty{padding:30px;text-align:center;color:var(--mut);font-size:13px}
   .drop-note{color:var(--del);font-size:12px;font-style:italic}
 
+  /* v0.9.270 字幕区就地编辑：时间轴 / 原文 / 译文 —— 改完直接进导出 */
+  .cuegrid.ed{background:#FDF7F9}
+  .ed-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc,#E12D6E);margin-left:5px;vertical-align:1px;flex:none}
+  .tc{display:block;cursor:text;border:1px dashed transparent;border-radius:6px;padding:2px 5px;outline:none}
+  .tc:hover{border-color:var(--line-strong,#D9D8D4)}
+  .tc-in{display:flex;flex-direction:column;gap:3px}
+  .tc-in input{width:100%;font-family:var(--mono,ui-monospace,monospace);font-size:11px;padding:2px 5px;
+    border:1px solid var(--acc,#E12D6E);border-radius:5px;background:var(--card-2,#FAFAFC);color:var(--ink,#1F2430);outline:none}
+  .tc-hint{font-size:10px;color:var(--mut,#9C9AA0);margin-top:1px}
+  .en.ed{cursor:text;border:1px dashed transparent;border-radius:6px;padding:3px 7px;outline:none}
+  .en.ed:hover{border-color:var(--line-strong,#D9D8D4)}
+  .en.ed:focus{border-color:var(--acc,#E12D6E);background:var(--card-2,#FAFAFC);box-shadow:0 0 0 2px var(--acc-weak,#FBE7EF)}
+  .tc-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 10px;margin-bottom:8px;
+    background:var(--card-2,#FAFAFC);border:1px solid var(--line,#ECEBE8);border-radius:10px;font-size:12px}
+  .tc-bar .btn{font-size:12px;padding:3px 10px}
+  .tc-bar .sep{width:1px;height:16px;background:var(--line,#ECEBE8)}
+  .tc-bar .n{color:var(--warn,#8A5A00)}
+  .ov-bar{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;padding:6px 8px;
+    border-radius:8px;background:var(--warn-weak,#FDF4E3);border:1px solid #F1DFB4;font-size:11.5px;color:var(--warn,#8A5A00)}
+  .ov-bar .btn{font-size:11.5px;padding:2px 8px}
+  .b-time{background:var(--del-weak,#FCEBEB);color:var(--del,#A32D2D);border:1px solid #F5C6C6}
+  .ed-bar{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--sub,#6B6B70)}
+  .ed-bar .btn{font-size:12px;padding:2px 10px}
+
   details.report{margin-top:10px;font-size:12px}
   details.report summary{cursor:pointer;color:var(--sub)}
   .issue{color:var(--warn);margin:2px 0}
@@ -926,7 +950,7 @@ crossorigin="anonymous"></script>
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.269</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.270</span></div>
       <div class="spacer"></div>
       <span id="siteNav"></span>
       <select id="uiLang2" aria-label="UI language"></select>
@@ -1090,7 +1114,7 @@ crossorigin="anonymous"></script>
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.269</span>
+    <span class="ver-tag">v0.9.270</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1322,12 +1346,23 @@ crossorigin="anonymous"></script>
           <option value="flag" data-i18n="fFlag">仅特殊处理</option>
         </select>
       </div>
+      <!-- v0.9.270：时间轴工具栏。整片不同步靠这里修，单行精修在表格里点时间码 -->
+      <div class="tc-bar" id="tcBar" style="display:none">
+        <span data-i18n="tcTitle">时间轴</span>
+        <button type="button" class="btn" id="tcShiftAll" data-i18n="tcShiftAll">整体偏移</button>
+        <button type="button" class="btn" id="tcShiftFrom" data-i18n="tcShiftFrom">从某条起</button>
+        <button type="button" class="btn" id="tcScale" data-i18n="tcScale">比例缩放</button>
+        <span class="sep"></span>
+        <button type="button" class="btn" id="tcCheck" data-i18n="tcCheck">时长体检</button>
+        <span class="n" id="tcIssN"></span>
+      </div>
       <div class="lst">
         <div class="cuegrid head">
           <span>#</span><span data-i18n="colTc">时间轴</span><span id="hSrc">英文原文</span><span id="hDst">中文译文（可点击编辑）</span>
         </div>
         <div class="inner" id="rows"></div>
       </div>
+      <div class="ed-bar" id="edBar" style="display:none"></div>
       <details class="report" id="reportBox" style="display:none">
         <summary data-i18n="reportSummary">导出前校验报告</summary>
         <div id="report"></div>
@@ -1648,7 +1683,7 @@ crossorigin="anonymous"></script>
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.269"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.270"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1950,6 +1985,7 @@ const I18N = {
   colSrc:'{0}原文', colDst:'{0}译文（可点击编辑）',
   pending:'待翻译…', dropNote:'（已删除：纯水词/提示词条目）', emptyNote:'（空字幕：无需翻译）',
   emptyRows:'还没有字幕。左侧「导入」→ 选文件 / 粘贴 / 载入示例。', emptyFilter:'当前筛选无内容', filterAria:'筛选字幕',
+  tcFix:"一键修", tcSnapNext:"收到下一条开始", edEdited:"手工改过", edHintEdit:"点击可编辑", edStart:"开始", edEnd:"结束", edTmHint:"也认 +1.5s / -500", edBadTime:"时间格式认不出来，已保留原值", edBarCount:"已手工改 {0} 处", edBarKeep:"刷新页面不会丢", edClear:"全部还原", edCleared:"已还原 {0} 处", edRestored:"已恢复上次 {0} 处编辑", tcTitle:"时间轴", tcShiftAll:"整体偏移", tcShiftFrom:"从某条起", tcScale:"比例缩放", tcScaleHint:"首尾各对一次，中间按比例校准", tcCheck:"时长体检", tcFixed:"已修 {0} 处", tcOk:"时间轴没问题", tcSnapPrev:"吸到上一条结束", tcPushNext:"把后面顺推", tcKeepOv:"保持重叠", tcAskMs:"偏移多少毫秒（负号=提前）", tcAskFrom:"从第几条开始", tcAskCur:"现在 {0}", tcAskShould:"应为", tcEditTip:"改完自动进导出",
   reportSummary:'导出前校验报告',
   footer:'随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你',
   bDrop:'水词·已删', bMerge:'并入下行', bLong:'超长',
@@ -2054,6 +2090,7 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   colSrc:'{0}原文', colDst:'{0}譯文（可點擊編輯）',
   pending:'待翻譯…', dropNote:'（已刪除：純水詞/提示詞條目）', emptyNote:'（空字幕：無需翻譯）',
   emptyRows:'還沒有字幕。左側「匯入」→ 選檔案 / 貼上 / 載入範例。', emptyFilter:'目前篩選無內容', filterAria:'篩選字幕',
+  tcFix:"一鍵修", tcSnapNext:"收到下一條開始", edEdited:"手動改過", edHintEdit:"點擊可編輯", edStart:"開始", edEnd:"結束", edTmHint:"也認 +1.5s / -500", edBadTime:"時間格式認不出來，已保留原值", edBarCount:"已手動改 {0} 處", edBarKeep:"重新整理不會丟", edClear:"全部還原", edCleared:"已還原 {0} 處", edRestored:"已回復上次 {0} 處編輯", tcTitle:"時間軸", tcShiftAll:"整體偏移", tcShiftFrom:"從某條起", tcScale:"比例縮放", tcScaleHint:"首尾各對一次，中間按比例校準", tcCheck:"時長體檢", tcFixed:"已修 {0} 處", tcOk:"時間軸沒問題", tcSnapPrev:"吸到上一條結束", tcPushNext:"把後面順推", tcKeepOv:"保持重疊", tcAskMs:"偏移多少毫秒（負號=提前）", tcAskFrom:"從第幾條開始", tcAskCur:"現在 {0}", tcAskShould:"應為", tcEditTip:"改完自動進匯出",
   reportSummary:'匯出前校驗報告',
   footer:'隨心字幕 AI · 開源 AGPL-3.0 · 你的字幕永遠屬於你',
   bDrop:'水詞·已刪', bMerge:'併入下行', bLong:'超長',
@@ -2158,6 +2195,7 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   colSrc:'{0} source', colDst:'{0} translation (click to edit)',
   pending:'Pending…', dropNote:'(removed: pure filler/sound cue)', emptyNote:'(empty cue: no translation needed)',
   emptyRows:'No subtitles yet. Import on the left → choose a file / paste / load sample.', emptyFilter:'Nothing under this filter', filterAria:'Filter subtitles',
+  tcFix:"Fix all", tcSnapNext:"Pull back to next start", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   reportSummary:'Pre-export validation report',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Your subtitles always belong to you',
   bDrop:'filler·removed', bMerge:'merged', bLong:'long',
@@ -2262,6 +2300,7 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   colSrc:'{0}原文', colDst:'{0}訳文（クリックで編集）',
   pending:'未翻訳…', dropNote:'（削除済：フィラー/効果音表記）', emptyNote:'（空字幕：翻訳不要）',
   emptyRows:'字幕がありません。左の「読み込み」→ ファイル選択 / 貼り付け / サンプル。', emptyFilter:'このフィルターでは該当なし', filterAria:'字幕の絞り込み',
+  tcFix:"まとめて修正", tcSnapNext:"次の行の開始に合わせる", edEdited:"手動で編集", edHintEdit:"クリックして編集", edStart:"開始", edEnd:"終了", edTmHint:"+1.5s / -500 も可", edBadTime:"時刻の書式を判別できません。元の値を保持します", edBarCount:"{0} 行を手動で編集", edBarKeep:"再読み込みしても失われません", edClear:"すべて元に戻す", edCleared:"{0} 行を元に戻しました", edRestored:"前回の {0} 件の編集を復元しました", tcTitle:"タイミング", tcShiftAll:"全体をずらす", tcShiftFrom:"指定行以降をずらす", tcScale:"比率で伸縮", tcScaleHint:"最初と最後を合わせると、間は比率で補正されます", tcCheck:"表示時間チェック", tcFixed:"{0} 件を修正しました", tcOk:"タイミングに問題はありません", tcSnapPrev:"前の行の終わりに合わせる", tcPushNext:"後続をまとめてずらす", tcKeepOv:"重なりを残す", tcAskMs:"ずらすミリ秒（負数＝前に）", tcAskFrom:"何行目から", tcAskCur:"現在 {0}", tcAskShould:"あるべき時刻", tcEditTip:"編集はそのまま書き出しに反映されます",
   reportSummary:'書き出し前チェック結果',
   footer:'AI-SRTSub · オープンソース AGPL-3.0 · あなたの字幕はあなたのもの',
   bDrop:'フィラー·削除', bMerge:'統合', bLong:'超過',
@@ -2363,6 +2402,7 @@ userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了�
   colSrc:'{0} origen', colDst:'{0} traducción (clic para editar)',
   pending:'Pendiente…', dropNote:'(eliminado: puro relleno/sonido)', emptyNote:'(subtítulo vacío: no requiere traducción)',
   emptyRows:'Aún no hay subtítulos. Importa a la izquierda → elegir archivo / pegar / cargar ejemplo.', emptyFilter:'Nada bajo este filtro', filterAria:'Filtrar subtítulos',
+  tcFix:"Corregir todo", tcSnapNext:"Ajustar al inicio de la siguiente", edEdited:"Editado a mano", edHintEdit:"Haz clic para editar", edStart:"Inicio", edEnd:"Fin", edTmHint:"También acepta +1.5s / -500", edBadTime:"Formato de tiempo no reconocido; se mantuvo el valor anterior", edBarCount:"{0} líneas editadas a mano", edBarKeep:"No se pierde al recargar", edClear:"Revertir todo", edCleared:"Se revirtieron {0} líneas", edRestored:"Se restauraron {0} ediciones anteriores", tcTitle:"Tiempos", tcShiftAll:"Desplazar todo", tcShiftFrom:"Desplazar desde la línea", tcScale:"Reescalar", tcScaleHint:"Ajusta la primera y la última; el resto se corrige proporcionalmente", tcCheck:"Comprobar duración", tcFixed:"Se corrigieron {0} problemas", tcOk:"Sin problemas de tiempo", tcSnapPrev:"Ajustar al final de la anterior", tcPushNext:"Empujar las siguientes", tcKeepOv:"Mantener el solapamiento", tcAskMs:"Cuántos milisegundos desplazar (negativo = antes)", tcAskFrom:"Desde qué línea", tcAskCur:"Ahora {0}", tcAskShould:"Debería ser", tcEditTip:"Los cambios van directos a la exportación",
   reportSummary:'Informe de validación pre-exportación',
   footer:'AI-SRTSub · Código abierto AGPL-3.0 · Tus subtítulos siempre son tuyos',
   bDrop:'relleno·quitado', bMerge:'fusionado', bLong:'largo',
@@ -2464,6 +2504,7 @@ userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando l
   colSrc:'{0} origem', colDst:'{0} tradução (clique para editar)',
   pending:'Pendente…', dropNote:'(removida: puro preenchimento/efeito sonoro)', emptyNote:'(legenda vazia: não requer tradução)',
   emptyRows:'Ainda não há legendas. Importe à esquerda → escolher arquivo / colar / carregar exemplo.', emptyFilter:'Nada neste filtro', filterAria:'Filtrar legendas',
+  tcFix:"Corrigir tudo", tcSnapNext:"Encostar ao início da seguinte", edEdited:"Editado manualmente", edHintEdit:"Clique para editar", edStart:"Início", edEnd:"Fim", edTmHint:"Também aceita +1.5s / -500", edBadTime:"Formato de tempo não reconhecido; mantido o valor anterior", edBarCount:"{0} linhas editadas manualmente", edBarKeep:"Não se perde ao recarregar", edClear:"Reverter tudo", edCleared:"{0} linhas revertidas", edRestored:"{0} edições anteriores restauradas", tcTitle:"Tempos", tcShiftAll:"Deslocar tudo", tcShiftFrom:"Deslocar a partir da linha", tcScale:"Reescalar", tcScaleHint:"Ajuste a primeira e a última; o resto corrige-se proporcionalmente", tcCheck:"Verificar duração", tcFixed:"{0} problemas corrigidos", tcOk:"Sem problemas de tempo", tcSnapPrev:"Encostar ao fim da anterior", tcPushNext:"Empurrar as seguintes", tcKeepOv:"Manter a sobreposição", tcAskMs:"Quantos milissegundos deslocar (negativo = antes)", tcAskFrom:"A partir de qual linha", tcAskCur:"Agora {0}", tcAskShould:"Deveria ser", tcEditTip:"As edições vão direto para a exportação",
   reportSummary:'Relatório de validação pré-exportação',
   footer:'AI-SRTSub · Código aberto AGPL-3.0 · Suas legendas sempre são suas',
   bDrop:'preenchimento·removido', bMerge:'fundida', bLong:'longa',
@@ -2565,6 +2606,7 @@ userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicand
   colSrc:'{0} 원문', colDst:'{0} 번역(클릭하여 편집)',
   pending:'대기 중…', dropNote:'(삭제됨: 순수 필러/음향 표기)', emptyNote:'(빈 자막: 번역 불필요)',
   emptyRows:'자막이 없습니다. 왼쪽 "불러오기" → 파일 선택 / 붙여넣기 / 샘플.', emptyFilter:'이 필터에는 해당 항목이 없습니다', filterAria:'자막 필터',
+  tcFix:"모두 수정", tcSnapNext:"다음 줄 시작에 맞추기", edEdited:"수동 편집", edHintEdit:"클릭하여 편집", edStart:"시작", edEnd:"종료", edTmHint:"+1.5s / -500 도 가능", edBadTime:"시간 형식을 인식할 수 없어 이전 값을 유지했습니다", edBarCount:"{0}줄을 수동으로 편집", edBarKeep:"새로 고쳐도 사라지지 않음", edClear:"모두 되돌리기", edCleared:"{0}줄을 되돌렸습니다", edRestored:"지난번 편집 {0}건을 복원했습니다", tcTitle:"시간축", tcShiftAll:"전체 이동", tcShiftFrom:"해당 줄부터 이동", tcScale:"비율 조정", tcScaleHint:"첫 줄과 마지막 줄만 맞추면 나머지는 비율대로 보정됩니다", tcCheck:"길이 점검", tcFixed:"{0}건을 수정했습니다", tcOk:"시간축에 문제가 없습니다", tcSnapPrev:"이전 줄 끝에 맞추기", tcPushNext:"뒤 줄들 밀기", tcKeepOv:"겹침 유지", tcAskMs:"몇 밀리초 이동할까요 (음수 = 앞으로)", tcAskFrom:"몇 번째 줄부터", tcAskCur:"현재 {0}", tcAskShould:"이렇게", tcEditTip:"편집은 바로 내보내기에 반영됩니다",
   reportSummary:'내보내기 전 검증 보고서',
   footer:'AI-SRTSub · 오픈소스 AGPL-3.0 · 당신의 자막은 언제나 당신 것',
   bDrop:'필러·삭제', bMerge:'병합됨', bLong:'긴 항목',
@@ -2666,6 +2708,7 @@ userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제�
   colSrc:'{0} Original', colDst:'{0} Übersetzung (zum Bearbeiten klicken)',
   pending:'Offen…', dropNote:'(entfernt: reines Füllwort/Geräusch)', emptyNote:'(leerer Untertitel: keine Übersetzung nötig)',
   emptyRows:'Noch keine Untertitel. Links "Importieren" → Datei wählen / einfügen / Beispiel laden.', emptyFilter:'Nichts unter diesem Filter', filterAria:'Untertitel filtern',
+  tcFix:"Alle beheben", tcSnapNext:"An den Anfang der nächsten anpassen", edEdited:"Von Hand bearbeitet", edHintEdit:"Zum Bearbeiten klicken", edStart:"Start", edEnd:"Ende", edTmHint:"Auch +1.5s / -500 möglich", edBadTime:"Zeitformat nicht erkannt, alter Wert bleibt", edBarCount:"{0} Zeilen von Hand bearbeitet", edBarKeep:"Bleibt nach dem Neuladen erhalten", edClear:"Alles zurücksetzen", edCleared:"{0} Zeilen zurückgesetzt", edRestored:"{0} Bearbeitungen wiederhergestellt", tcTitle:"Timing", tcShiftAll:"Alles verschieben", tcShiftFrom:"Ab Zeile verschieben", tcScale:"Skalieren", tcScaleHint:"Erste und letzte Zeile setzen, der Rest wird proportional angepasst", tcCheck:"Dauer prüfen", tcFixed:"{0} Probleme behoben", tcOk:"Keine Timing-Probleme", tcSnapPrev:"An das Ende der vorherigen anpassen", tcPushNext:"Folgende Zeilen verschieben", tcKeepOv:"Überlappung behalten", tcAskMs:"Um wie viele Millisekunden (negativ = früher)", tcAskFrom:"Ab welcher Zeile", tcAskCur:"Jetzt {0}", tcAskShould:"Soll sein", tcEditTip:"Änderungen gehen direkt in den Export",
   reportSummary:'Validierungsbericht vor dem Export',
   footer:'AI-SRTSub · Open Source AGPL-3.0 · Deine Untertitel gehören immer dir',
   bDrop:'Füllwort·entfernt', bMerge:'zusammengeführt', bLong:'lang',
@@ -2767,6 +2810,7 @@ userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende F�
   colSrc:'{0} source', colDst:'{0} traduction (cliquer pour modifier)',
   pending:'En attente…', dropNote:'(supprimé : pur remplissage/bruitage)', emptyNote:'(sous-titre vide : aucune traduction requise)',
   emptyRows:'Pas encore de sous-titres. À gauche « Importer » → choisir fichier / coller / exemple.', emptyFilter:'Rien sous ce filtre', filterAria:'Filtrer les sous-titres',
+  tcFix:"Tout corriger", tcSnapNext:"Ramener au début de la suivante", edEdited:"Modifié à la main", edHintEdit:"Cliquez pour modifier", edStart:"Début", edEnd:"Fin", edTmHint:"Accepte aussi +1.5s / -500", edBadTime:"Format d'horodatage non reconnu, ancienne valeur conservée", edBarCount:"{0} lignes modifiées à la main", edBarKeep:"Conservé après un rechargement", edClear:"Tout rétablir", edCleared:"{0} lignes rétablies", edRestored:"{0} modifications restaurées", tcTitle:"Timing", tcShiftAll:"Décaler tout", tcShiftFrom:"Décaler à partir de la ligne", tcScale:"Redimensionner", tcScaleHint:"Réglez la première et la dernière, le reste suit proportionnellement", tcCheck:"Vérifier la durée", tcFixed:"{0} problèmes corrigés", tcOk:"Aucun problème de timing", tcSnapPrev:"Coller à la fin de la précédente", tcPushNext:"Pousser les suivantes", tcKeepOv:"Garder le chevauchement", tcAskMs:"Décaler de combien de millisecondes (négatif = plus tôt)", tcAskFrom:"À partir de quelle ligne", tcAskCur:"Actuellement {0}", tcAskShould:"Devrait être", tcEditTip:"Les modifications passent directement à l’export",
   reportSummary:'Rapport de validation avant export',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Vos sous-titres vous appartiennent toujours',
   bDrop:'remplissage·supprimé', bMerge:'fusionné', bLong:'long',
@@ -2868,6 +2912,7 @@ userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, appl
   colSrc:'{0} asli', colDst:'{0} terjemahan (klik untuk edit)',
   pending:'Tertunda…', dropNote:'(dihapus: murni pengisi/efek suara)', emptyNote:'(takarir kosong: tidak perlu diterjemahkan)',
   emptyRows:'Belum ada subtitle. Impor di kiri → pilih file / tempel / muat contoh.', emptyFilter:'Tidak ada hasil pada filter ini', filterAria:'Filter subtitle',
+  tcFix:"Perbaiki semua", tcSnapNext:"Sesuaikan ke awal baris berikut", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   reportSummary:'Laporan validasi sebelum ekspor',
   footer:'AI-SRTSub · Sumber terbuka AGPL-3.0 · Subtitelmu selalu milikmu',
   bDrop:'pengisi·dihapus', bMerge:'digabung', bLong:'panjang',
@@ -2969,6 +3014,7 @@ userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghap
   colSrc:'{0} मूल', colDst:'{0} अनुवाद (संपादन हेतु क्लिक करें)',
   pending:'प्रतीक्षारत…', dropNote:'(हटाया: शुद्ध फिलर/ध्वनि)', emptyNote:'(खाली उपशीर्षक: अनुवाद आवश्यक नहीं)',
   emptyRows:'अभी कोई सबटाइटल नहीं। बाईं ओर "आयात" → फ़ाइल चुनें / पेस्ट करें / नमूना लोड करें।', emptyFilter:'इस फ़िल्टर में कुछ नहीं', filterAria:'सबटाइटल फ़िल्टर',
+  tcFix:"सभी ठीक करें", tcSnapNext:"अगली की शुरुआत तक", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   reportSummary:'निर्यात-पूर्व सत्यापन रिपोर्ट',
   footer:'AI-SRTSub · ओपन सोर्स AGPL-3.0 · आपके सबटाइटल हमेशा आपके हैं',
   bDrop:'फिलर·हटाया', bMerge:'विलय', bLong:'लंबा',
@@ -3070,6 +3116,7 @@ userStop:'उपयोगकर्ता ने रोका।', postEnd:'अ�
   colSrc:'{0} ต้นฉบับ', colDst:'{0} คำแปล (คลิกเพื่อแก้ไข)',
   pending:'รอแปล…', dropNote:'(ลบแล้ว: คำเสียบ/เสียงเอฟเฟกต์ล้วน)', emptyNote:'(ซับว่างเปล่า: ไม่ต้องแปล)',
   emptyRows:'ยังไม่มีซับไตเติล นำเข้าทางซ้าย → เลือกไฟล์ / วาง / โหลดตัวอย่าง', emptyFilter:'ไม่มีรายการภายใต้ตัวกรองนี้', filterAria:'กรองซับไตเติล',
+  tcFix:"แก้ทั้งหมด", tcSnapNext:"ดึงกลับมาที่จุดเริ่มของบรรทัดถัดไป", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   reportSummary:'รายงานตรวจสอบก่อนส่งออก',
   footer:'AI-SRTSub · โอเพนซอร์ส AGPL-3.0 · ซับของคุณเป็นของคุณเสมอ',
   bDrop:'คำเสียบ·ลบแล้ว', bMerge:'รวมแล้ว', bLong:'ยาว',
@@ -3171,6 +3218,7 @@ userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร�
   colSrc:'{0} gốc', colDst:'{0} bản dịch (bấm để sửa)',
   pending:'Đang chờ…', dropNote:'(đã xóa: thuần từ đệm/âm thanh)', emptyNote:'(phụ đề trống: không cần dịch)',
   emptyRows:'Chưa có phụ đề. Nhập bên trái → chọn file / dán / tải mẫu.', emptyFilter:'Không có gì dưới bộ lọc này', filterAria:'Lọc phụ đề',
+  tcFix:"Sửa tất cả", tcSnapNext:"Lùi về đầu dòng sau", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   reportSummary:'Báo cáo kiểm tra trước khi xuất',
   footer:'AI-SRTSub · Mã nguồn mở AGPL-3.0 · Phụ đề của bạn luôn là của bạn',
   bDrop:'đệm·đã xóa', bMerge:'gộp', bLong:'dài',
@@ -3272,6 +3320,7 @@ userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn 
   colSrc:'{0} оригинал', colDst:'{0} перевод (нажмите для правки)',
   pending:'Ожидает…', dropNote:'(удалено: чистый заполнитель/звук)', emptyNote:'(пустой субтитр: перевод не требуется)',
   emptyRows:'Субтитров пока нет. Импорт слева → выбрать файл / вставить / пример.', emptyFilter:'Под этим фильтром пусто', filterAria:'Фильтр субтитров',
+  tcFix:"Исправить всё", tcSnapNext:"Подтянуть к началу следующей", edEdited:"Изменено вручную", edHintEdit:"Нажмите, чтобы изменить", edStart:"Начало", edEnd:"Конец", edTmHint:"Также принимает +1.5s / -500", edBadTime:"Формат времени не распознан, оставлено прежнее значение", edBarCount:"Изменено вручную: {0}", edBarKeep:"Не теряется при перезагрузке", edClear:"Вернуть всё", edCleared:"Возвращено строк: {0}", edRestored:"Восстановлено правок: {0}", tcTitle:"Тайминг", tcShiftAll:"Сдвинуть всё", tcShiftFrom:"Сдвинуть с строки", tcScale:"Масштабировать", tcScaleHint:"Задайте первую и последнюю строки, остальное корректируется пропорционально", tcCheck:"Проверить длительность", tcFixed:"Исправлено замечаний: {0}", tcOk:"Проблем с таймингом нет", tcSnapPrev:"Прижать к концу предыдущей", tcPushNext:"Сдвинуть последующие", tcKeepOv:"Оставить перекрытие", tcAskMs:"На сколько миллисекунд сдвинуть (минус = раньше)", tcAskFrom:"С какой строки", tcAskCur:"Сейчас {0}", tcAskShould:"Должно быть", tcEditTip:"Правки сразу попадают в экспорт",
   reportSummary:'Отчёт проверки перед экспортом',
   footer:'AI-SRTSub · Открытый код AGPL-3.0 · Ваши субтитры всегда ваши',
   bDrop:'заполнитель·убран', bMerge:'объединено', bLong:'длинный',
@@ -3373,6 +3422,7 @@ userStop:'Остановлено пользователем.', postEnd:'Пере
   colSrc:'{0} origine', colDst:'{0} traduzione (clicca per modificare)',
   pending:'In attesa…', dropNote:'(rimosso: puro riempitivo/indicazione sonora)', emptyNote:'(sottotitolo vuoto: nessuna traduzione richiesta)',
   emptyRows:'Nessun sottotitolo. Importa a sinistra → scegli un file / incolla / carica l\'esempio.', emptyFilter:'Nessun risultato con questo filtro', filterAria:'Filtra i sottotitoli',
+  tcFix:"Correggi tutto", tcSnapNext:"Allinea all’inizio della successiva", edEdited:"Modificato a mano", edHintEdit:"Clicca per modificare", edStart:"Inizio", edEnd:"Fine", edTmHint:"Accetta anche +1.5s / -500", edBadTime:"Formato orario non riconosciuto, mantenuto il valore precedente", edBarCount:"{0} righe modificate a mano", edBarKeep:"Non si perde ricaricando", edClear:"Ripristina tutto", edCleared:"Ripristinate {0} righe", edRestored:"Ripristinate {0} modifiche precedenti", tcTitle:"Tempi", tcShiftAll:"Sposta tutto", tcShiftFrom:"Sposta dalla riga", tcScale:"Riscala", tcScaleHint:"Imposta prima e ultima, il resto si adatta in proporzione", tcCheck:"Controlla durata", tcFixed:"Corretti {0} problemi", tcOk:"Nessun problema di tempi", tcSnapPrev:"Allinea alla fine della precedente", tcPushNext:"Sposta le successive", tcKeepOv:"Mantieni la sovrapposizione", tcAskMs:"Di quanti millisecondi (negativo = prima)", tcAskFrom:"Da quale riga", tcAskCur:"Ora {0}", tcAskShould:"Dovrebbe essere", tcEditTip:"Le modifiche vanno subito nell’esportazione",
   reportSummary:'Report di validazione pre-esportazione',
   footer:'AI-SRTSub · Open source AGPL-3.0 · I tuoi sottotitoli restano sempre tuoi',
   bDrop:'riempitivo·rimosso', bMerge:'unito', bLong:'lungo',
@@ -3474,6 +3524,7 @@ userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozi
   colSrc:'{0} المصدر', colDst:'{0} الترجمة (انقر للتحرير)',
   pending:'معلّق…', dropNote:'(أزيل: حشو/إشارة صوتية فقط)', emptyNote:'(نص فارغ: لا حاجة للترجمة)',
   emptyRows:'لا ترجمات بعد. استورد من اليسار ← اختر ملفًا / الصق / حمّل المثال.', emptyFilter:'لا شيء تحت هذا الفلتر', filterAria:'تصفية الترجمات',
+  tcFix:"إصلاح الكل", tcSnapNext:"اسحب إلى بداية التالية", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   reportSummary:'تقرير التحقق قبل التصدير',
   footer:'AI-SRTSub · مفتوح المصدر AGPL-3.0 · ترجماتك تبقى دائمًا ملكك',
   bDrop:'حشو·أزيل', bMerge:'مدمج', bLong:'طويل',
@@ -3575,6 +3626,7 @@ userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، ت
   colSrc:'{0} kaynak', colDst:'{0} çeviri (düzenlemek için tıkla)',
   pending:'Bekliyor…', dropNote:'(kaldırıldı: salt dolgu/ses bildirimi)', emptyNote:'(boş altyazı: çeviri gerekmez)',
   emptyRows:'Henüz altyazı yok. Soldan içe aktar → dosya seç / yapıştır / örnek yükle.', emptyFilter:'Bu filtrede bir şey yok', filterAria:'Altyazıları filtrele',
+  tcFix:"Tümünü düzelt", tcSnapNext:"Sonrakinin başına çek", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   reportSummary:'Dışa aktarma öncesi doğrulama raporu',
   footer:'AI-SRTSub · Açık kaynak AGPL-3.0 · Altyazıların her zaman senin',
   bDrop:'dolgu·kaldırıldı', bMerge:'birleştirildi', bLong:'uzun',
@@ -3762,6 +3814,7 @@ userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu te
   dropNote:'(verwijderd: puur stopwoord/geluidscue)',
   emptyNote:'(lege cue: geen vertaling nodig)',
   emptyRows:'Nog geen ondertitels. Importeer links → kies een bestand / plak tekst / laad het voorbeeld.',
+  tcFix:"Alles herstellen", tcSnapNext:"Terug naar het begin van de volgende", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'Niets onder dit filter', filterAria:'Ondertitels filteren',
   reportSummary:'Validatierapport vóór export',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Jouw ondertitels blijven altijd van jou',
@@ -4054,6 +4107,7 @@ rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   dropNote:'(usunięto: czysty wypełniacz/oznaczenie dźwięku)',
   emptyNote:'(pusta linia: tłumaczenie niepotrzebne)',
   emptyRows:'Brak napisów. Zaimportuj po lewej → wybierz plik / wklej / wczytaj przykład.',
+  tcFix:"Napraw wszystko", tcSnapNext:"Cofnij do początku następnej", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'Nic w tym filtrze', filterAria:'Filtruj napisy',
   reportSummary:'Raport walidacji przed eksportem',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Twoje napisy zawsze należą do Ciebie',
@@ -4346,6 +4400,7 @@ rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   dropNote:'(borttagen: ren utfyllnad/ljudmarkering)',
   emptyNote:'(tom replik: ingen översättning behövs)',
   emptyRows:'Inga undertexter än. Importera till vänster → välj fil / klistra in / ladda exempel.',
+  tcFix:"Åtgärda alla", tcSnapNext:"Dra tillbaka till nästa start", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'Inget under detta filter', filterAria:'Filtrera undertexter',
   reportSummary:'Valideringsrapport före export',
   footer:'AI-SRTSub · Öppen källkod AGPL-3.0 · Dina undertexter förblir alltid dina',
@@ -4638,6 +4693,7 @@ rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   dropNote:'(odstraněno: čistá výplň/zvuková značka)',
   emptyNote:'(prázdný titulek: překlad není potřeba)',
   emptyRows:'Zatím žádné titulky. Importujte vlevo → vyberte soubor / vložte / načtěte ukázku.',
+  tcFix:"Opravit vše", tcSnapNext:"Stáhnout na začátek další", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'V tomto filtru nic není', filterAria:'Filtrovat titulky',
   reportSummary:'Validační zpráva před exportem',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Vaše titulky jsou vždy vaše',
@@ -4930,6 +4986,7 @@ rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   dropNote:'(вилучено: суцільний заповнювач/звукова позначка)',
   emptyNote:'(порожня репліка: переклад не потрібен)',
   emptyRows:'Субтитрів ще немає. Імпортуйте ліворуч → виберіть файл / вставте / завантажте приклад.',
+  tcFix:"Виправити все", tcSnapNext:"Підтягнути до початку наступної", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'У цьому фільтрі нічого немає', filterAria:'Фільтр субтитрів',
   reportSummary:'Звіт перевірки перед експортом',
   footer:'AI-SRTSub · Відкритий код AGPL-3.0 · Ваші субтитри завжди належать вам',
@@ -5222,6 +5279,7 @@ rateWait:'Перевищено ліміт (429), очікування 20 с пе
   dropNote:'(fjernet: ren fyld/lydmarkering)',
   emptyNote:'(tom replik: ingen oversættelse nødvendig)',
   emptyRows:'Ingen undertekster endnu. Importér til venstre → vælg fil / indsæt / indlæs eksempel.',
+  tcFix:"Ret alle", tcSnapNext:"Træk tilbage til næste start", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'Intet under dette filter', filterAria:'Filtrér undertekster',
   reportSummary:'Valideringsrapport før eksport',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Dine undertekster er altid dine egne',
@@ -5514,6 +5572,7 @@ rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   dropNote:'(poistettu: pelkkä täyte/äänimerkintä)',
   emptyNote:'(tyhjä tekstitys: käännöstä ei tarvita)',
   emptyRows:'Ei vielä tekstityksiä. Tuo vasemmalta → valitse tiedosto / liitä / lataa esimerkki.',
+  tcFix:"Korjaa kaikki", tcSnapNext:"Vedä seuraavan alkuun", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'Tällä suodattimella ei ole mitään', filterAria:'Suodata tekstityksiä',
   reportSummary:'Vahvistusraportti ennen vientiä',
   footer:'AI-SRTSub · Avoimen lähdekoodin AGPL-3.0 · Tekstityksesi ovat aina sinun',
@@ -5806,6 +5865,7 @@ rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   dropNote:'(αφαιρέθηκε: αμιγές πληρωτικό/ηχητική σήμανση)',
   emptyNote:'(κενός υπότιτλος: δεν χρειάζεται μετάφραση)',
   emptyRows:'Δεν υπάρχουν ακόμη υπότιτλοι. Εισάγετε αριστερά → επιλέξτε αρχείο / επικολλήστε / φορτώστε δείγμα.',
+  tcFix:"Διόρθωση όλων", tcSnapNext:"Φέρ’ το στην αρχή της επόμενης", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'Τίποτα σε αυτό το φίλτρο', filterAria:'Φιλτράρισμα υποτίτλων',
   reportSummary:'Αναφορά επικύρωσης πριν την εξαγωγή',
   footer:'AI-SRTSub · Ανοιχτός κώδικας AGPL-3.0 · Οι υπότιτλοί σας σας ανήκουν πάντα',
@@ -6098,6 +6158,7 @@ rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επ
   dropNote:'(הוסר: מילוי/סימון קולי בלבד)',
   emptyNote:'(כתובית ריקה: אין צורך בתרגום)',
   emptyRows:'עוד אין כתוביות. ייבאו משמאל → בחרו קובץ / הדביקו / טענו דוגמה.',
+  tcFix:"תקן הכל", tcSnapNext:"משוך להתחלה של הבאה", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'אין כלום תחת הסינון הזה', filterAria:'סינון כתוביות',
   reportSummary:'דוח בדיקה לפני ייצוא',
   footer:'AI-SRTSub · קוד פתוח AGPL-3.0 · הכתוביות שלכם תמיד שלכם',
@@ -6390,6 +6451,7 @@ rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניס�
   dropNote:'(eliminat: umplutură pură/marcaj sonor)',
   emptyNote:'(replică goală: nu e nevoie de traducere)',
   emptyRows:'Nicio subtitrare încă. Importă în stânga → alege un fișier / lipește / încarcă exemplul.',
+  tcFix:"Corectează tot", tcSnapNext:"Trage la începutul următoarei", edEdited:"Edited by hand", edHintEdit:"Click to edit", edStart:"Start", edEnd:"End", edTmHint:"Also accepts +1.5s / -500", edBadTime:"Time format not recognised, kept the old value", edBarCount:"Edited {0} lines by hand", edBarKeep:"Safe after a page refresh", edClear:"Revert all", edCleared:"Reverted {0} lines", edRestored:"Restored {0} edits from last time", tcTitle:"Timing", tcShiftAll:"Shift all", tcShiftFrom:"Shift from line", tcScale:"Rescale", tcScaleHint:"Set the first and last line, the rest adjusts proportionally", tcCheck:"Duration check", tcFixed:"Fixed {0} issues", tcOk:"No timing problems found", tcSnapPrev:"Snap to previous end", tcPushNext:"Push the following lines", tcKeepOv:"Keep the overlap", tcAskMs:"Shift by how many milliseconds (negative = earlier)", tcAskFrom:"Start from which line", tcAskCur:"Now {0}", tcAskShould:"Should be", tcEditTip:"Edits flow straight into the export",
   emptyFilter:'Nimic sub acest filtru', filterAria:'Filtrează subtitrările',
   reportSummary:'Raport de validare înainte de export',
   footer:'AI-SRTSub · Open source AGPL-3.0 · Subtitrările tale îți aparțin întotdeauna',
@@ -6750,7 +6812,8 @@ if (!window.__errModalEsc){
   });
 }
 function fmtTC(s,e){ return C.fmtTime(s)+' --> '+C.fmtTime(e); }
-function tcHtml(it){ return '<span class="cue">'+esc(C.fmtTime(it.start))+'<br>'+esc(C.fmtTime(it.end))+'</span>'; }
+/* v0.9.270：时间码格可点开编辑（canEdit 为 false 时不挂 title，免得点了没反应） */
+function tcHtml(it){ return '<span class="cue tc"'+(canEdit()?' title="'+esc(t('edHintEdit'))+'"':'')+'>'+esc(C.fmtTime(it.start))+'<br>'+esc(C.fmtTime(it.end))+'</span>'; }
 /* v0.9.28 进度仪表卡：sticky 可见 + 大号百分比 + ETA（EMA 平滑）+ 标签页标题进度 + 完成态 */
 const BASE_TITLE = document.title;
 const PG = { t0:0, tAll:0, durs:[], ok:false };
@@ -7113,26 +7176,33 @@ function renderRows(){
     if (f==='flag') return !!r.flag;
     return true;
   });
-  if (!S.rows.length){ box.innerHTML='<div class="empty">'+t('emptyRows')+'</div>'; updateStats(); return; }
-  if (!list.length){ box.innerHTML='<div class="empty">'+t('emptyFilter')+'</div>'; updateStats(); return; }
+  if (!S.rows.length){ box.innerHTML='<div class="empty">'+t('emptyRows')+'</div>'; updateStats(); renderEdBar(); renderTcBar(); return; }
+  if (!list.length){ box.innerHTML='<div class="empty">'+t('emptyFilter')+'</div>'; updateStats(); renderEdBar(); renderTcBar(); return; }
   let html='';
   list.forEach(r=>{
     const zh = (r.zh!=null&&r.zh!=='') ? esc(r.zh) : '';
-    html += '<div class="cuegrid" data-id="'+r.id+'">'
-      + '<span class="cue">'+(r.id+1)+'</span>'
+    const dot = r.edited ? '<i class="ed-dot" title="'+esc(t('edEdited'))+'"></i>' : '';
+    /* v0.9.270：体检标红。ISS 只在点了「时长体检」之后才有内容，平时零开销 */
+    const iss = ISS[r.id];
+    const issB = (iss && iss.length) ? '<span class="badge b-time">'+esc(iss.map(issTxt).join(' · '))+'</span>' : '';
+    html += '<div class="cuegrid'+(r.edited?' ed':'')+'" data-id="'+r.id+'">'
+      + '<span class="cue">'+(r.id+1)+dot+'</span>'
       + tcHtml(r)
-      + '<div class="en">'+esc(r.en)+'</div>'
+      + '<div class="en'+(canEdit()?' ed':'')+'"'+(canEdit()?' contenteditable="true"':'')+' spellcheck="false">'+esc(r.en)+'</div>'
       + (r.flag==='drop'
           ? '<div class="drop-note">'+t('dropNote')+'</div>'
           : r.flag==='merged'
             ? '<div class="drop-note">'+t('mergedNote')+'</div>'
             : r.noText
               ? '<div class="drop-note">'+t('emptyNote')+'</div>'
-              : '<div class="zh'+(zh?'':' placeholder')+'" contenteditable="true" spellcheck="false">'+(zh||t('pending'))+'</div>'+zhBadge(r))
+              : '<div class="zh'+(zh?'':' placeholder')+'" contenteditable="true" spellcheck="false">'+(zh||t('pending'))+'</div>'+zhBadge(r)+issB)
+      + (OV_ROW===r.id ? ovHtml(r) : '')
       + '</div>';
   });
   box.innerHTML=html;
   updateStats();
+  renderEdBar();
+  renderTcBar();
 }
 
 // 从 DOM 读回人工编辑的译文
@@ -7171,9 +7241,14 @@ function reflowOne(r){
 }
 function applyPost(){
   collectZh();
+  collectEn();   /* v0.9.270：手工改过的原文要回读，否则后处理会把旧原文写回去 */
   let wrapN=0;
   S.rows.forEach(r=>{
     if (r.flag==='drop' || r.flag==='merged' || !r.zh) return;
+    /* v0.9.270：手工编辑过的行一律不重排，与 reflowRows 同一口径（此前只有 reflowRows 跳过，
+       点「仅后处理」会把用户手敲的折行、音效标记、故意留的空行一起抹掉）。
+       编辑进来的行（restoreEdits 恢复的）同样带 edited，刷新后不会被二次折行改动。 */
+    if (r.edited) return;
     const o = reflowOne(r);
     if (o.changed) wrapN++;
     r.zh = o.text;
@@ -7188,11 +7263,20 @@ function applyPost(){
 (function(){
   const box=$('rows'); if(!box) return;
   box.addEventListener('input', function(ev){
-    const el=ev.target && ev.target.closest ? ev.target.closest('.zh') : null;
+    const el=ev.target && ev.target.closest ? ev.target.closest('.zh, .en.ed') : null;
     if(!el) return;
     const grid=el.closest('.cuegrid'); if(!grid) return;
     const r=(S.rows||[]).find(x=>x.id===+grid.dataset.id);
-    if(r) r.edited=true;
+    /* v0.9.270：改过就记原始值（供「全部还原」真还原）+ 立刻落快照（刷新不丢）。
+       原文要当场回读并写回 S.srcItems——译文有 collectZh 在导出/后处理前统一回读，
+       原文若也等那时才回读，重跑翻译时 rows 已经重建，改动就蒸发了。 */
+    if(r){
+      if(el.classList.contains('en')){
+        const v=el.innerText.replace(/\u00a0/g,' ').trim();
+        if(v!==r.en){ r.en=v; syncToSrc(r); }
+      }
+      markEdited(r); saveEdits(); renderEdBar();
+    }
   });
 })();
 
@@ -7218,6 +7302,331 @@ function reflowRows(){
   renderRows();
   if (n) log(t('postDone',S.maxW), 'okc');
 }
+
+/* ============ v0.9.270 字幕区就地编辑（时间轴 / 原文 / 译文） ============
+   改这块之前先读三条：
+   ① 主站导出的条目与 S.rows 不是一一对应（超容量会切成多条、合并句组会并入承载行、
+      丢弃行会跳过），所以编辑一律直接改 S.rows —— 导出是派生的，自动跟着变。
+      绝不要试图去改导出结果，那是无解的（切出来的子条目是引擎按宽度现算的）。
+   ② 时间轴与原文必须同步写回 S.srcItems：重跑翻译时 S.rows 由它重建，
+      不写回 = 用户改完再点一次「翻译」，改动全没。
+   ③ 指纹用导入时就固定的 S.srcFp0，不能现算 srcFingerprint(S.srcItems)：
+      改了原文会让指纹漂移，同一份字幕的快照就再也认不出来。 */
+const EDIT_KEY='srt_edit_v1';
+let editT=0, OV_ROW=null, ISS={};
+function canEdit(){ return !S.translating; }
+function editFp(){ return [S.fileBase||'', (S.rows||[]).length, S.srcFp0||''].join('|'); }
+function editedCount(){ return (S.rows||[]).filter(function(r){ return r.edited; }).length; }
+function markEdited(r){ if(!r.__o) r.__o={en:r.en,zh:r.zh,start:r.start,end:r.end}; r.edited=true; }
+function syncToSrc(r){
+  const it=(S.srcItems||[])[r.no-1];
+  if(it){ it.start=r.start; it.end=r.end; it.text=r.en; }
+}
+/* 时间码解析：绝对 00:01:23,456 / 1:23,4；相对 +1.5s / -500 / +2m；纯数字按毫秒。
+   base 是相对值的基准（开始框用原 start、结束框用原 end）。认不出来返回 null。 */
+function parseTc(v, base){
+  const s=String(v==null?'':v).trim(); if(!s) return null;
+  let m=s.match(/^([+-])(\d+(?:\.\d+)?)\s*(ms|s|m)?$/i);
+  if(m){
+    const n=parseFloat(m[2]); if(!isFinite(n)) return null;
+    const u=String(m[3]||'ms').toLowerCase();
+    const d=(u==='s'?n*1000:u==='m'?n*60000:n);
+    return Math.max(0, Math.round((base||0)+(m[1]==='-'?-d:d)));
+  }
+  m=s.match(/^(?:(\d+):)?(\d{1,2}):(\d{1,2})[,.](\d{1,3})$/);
+  if(m){
+    const h=+(m[1]||0), mi=+m[2], se=+m[3], ms=+m[4];
+    if(mi>59||se>59) return null;
+    return (h*3600+mi*60+se)*1000+(m[4].length===1?ms*100:m[4].length===2?ms*10:ms);
+  }
+  if(/^\d+(?:\.\d+)?$/.test(s)) return Math.max(0, Math.round(parseFloat(s)));
+  return null;
+}
+/* ---------- 存盘：只存改过的行（整篇存会爆 5MB 配额） ---------- */
+function saveEdits(){
+  clearTimeout(editT);
+  editT=setTimeout(function(){
+    try{
+      const rows=(S.rows||[]).filter(function(r){ return r.edited; });
+      if(!rows.length){ localStorage.removeItem(EDIT_KEY); return; }
+      localStorage.setItem(EDIT_KEY, JSON.stringify({v:1, fp:editFp(),
+        rows:rows.map(function(r){ return [r.id,r.en,r.zh,r.start,r.end]; })}));
+    }catch(e){}   // 写满 / 隐私模式：只降级「不再存」，绝不影响编辑本身
+  },150);
+}
+function restoreEdits(){
+  try{
+    const raw=localStorage.getItem(EDIT_KEY); if(!raw) return 0;
+    const o=JSON.parse(raw); if(!o||o.fp!==editFp()) return 0;
+    let n=0;
+    (o.rows||[]).forEach(function(a){
+      const r=(S.rows||[]).find(function(x){ return x.id===a[0]; }); if(!r) return;
+      markEdited(r); r.en=a[1]; r.zh=a[2]; r.start=a[3]; r.end=a[4]; syncToSrc(r); n++;
+    });
+    return n;
+  }catch(e){ return 0; }
+}
+function clearEdits(){
+  (S.rows||[]).forEach(function(r){
+    if(!r.edited) return;
+    if(r.__o){ r.en=r.__o.en; r.zh=r.__o.zh; r.start=r.__o.start; r.end=r.__o.end; }
+    r.edited=false; delete r.__o; syncToSrc(r);
+  });
+  OV_ROW=null; ISS={};
+  try{ localStorage.removeItem(EDIT_KEY); }catch(e){}
+}
+/* ---------- 渲染 ---------- */
+function renderTcBar(){ const b=$('tcBar'); if(b) b.style.display=(S.rows||[]).length?'flex':'none'; }
+function renderEdBar(){
+  const b=$('edBar'); if(!b) return;
+  const n=editedCount();
+  if(!n){ b.style.display='none'; return; }
+  b.style.display='flex';
+  b.innerHTML='<i class="ed-dot"></i><span>'+esc(t('edBarCount',n))+'</span>'
+    +'<span>'+esc(t('edBarKeep'))+'</span>';
+  const btn=document.createElement('button');
+  btn.type='button'; btn.className='btn'; btn.textContent=t('edClear');
+  btn.onclick=function(){ const k=editedCount(); clearEdits(); renderRows(); log(t('edCleared',k),'okc'); };
+  b.appendChild(btn);
+}
+/* 原文回读（译文的回读是 collectZh，两个都要在导出/重排前跑） */
+function collectEn(){
+  document.querySelectorAll('#rows .en.ed').forEach(function(el){
+    const grid=el.closest('.cuegrid'); if(!grid) return;
+    const r=S.rows.find(function(x){ return x.id===+grid.dataset.id; }); if(!r) return;
+    const v=el.innerText.replace(/\u00a0/g,' ').trim();
+    if(v!==r.en){ markEdited(r); r.en=v; syncToSrc(r); saveEdits(); }
+  });
+}
+/* ---------- 时间轴：单行精修 ---------- */
+function beginTc(span){
+  if(!canEdit()) return;
+  const grid=span.closest?span.closest('.cuegrid'):null; if(!grid) return;
+  const r=S.rows.find(function(x){ return x.id===+grid.dataset.id; }); if(!r) return;
+  const box=document.createElement('div'); box.className='tc-in';
+  const a=document.createElement('input'); a.type='text'; a.value=C.fmtTime(r.start); a.title=t('edStart');
+  const b=document.createElement('input'); b.type='text'; b.value=C.fmtTime(r.end); b.title=t('edEnd');
+  const hint=document.createElement('div'); hint.className='tc-hint'; hint.textContent=t('edTmHint');
+  box.appendChild(a); box.appendChild(b); box.appendChild(hint);
+  span.replaceWith(box);
+  a.focus(); a.select();
+  let done=false;
+  function finish(save){
+    if(done) return; done=true;
+    if(save){
+      const s=parseTc(a.value,r.start), e=parseTc(b.value,r.end);
+      if(s==null||e==null||e<=s){ log(t('edBadTime'),'err'); }
+      else { markEdited(r); r.start=s; r.end=e; syncToSrc(r); saveEdits(); OV_ROW=ovOf(r); }
+    }
+    renderRows();
+  }
+  [a,b].forEach(function(inp){
+    inp.addEventListener('keydown',function(ev){
+      if(ev.key==='Enter'){ ev.preventDefault(); finish(true); }
+      else if(ev.key==='Escape'){ ev.preventDefault(); finish(false); }
+    });
+    inp.addEventListener('blur',function(){
+      setTimeout(function(){ if(box.contains(document.activeElement)) return; finish(true); },150);
+    });
+  });
+}
+/* ---------- 时间轴：与邻居重叠时的三选 ---------- */
+function ovOf(r){
+  const i=S.rows.indexOf(r), p=S.rows[i-1], n=S.rows[i+1];
+  if(p && r.start<p.end-1) return r.id;
+  if(n && r.end>n.start+1) return r.id;
+  return null;
+}
+function ovHtml(r){
+  const i=S.rows.indexOf(r), p=S.rows[i-1], n=S.rows[i+1];
+  const withPrev=!!(p&&r.start<p.end-1);
+  const no=withPrev?(p?p.no:0):(n?n.no:0);
+  return '<div class="ov-bar"><span>'+esc(t('issOverlap'))+' · #'+no+'</span>'
+    /* 与上一条重叠 → 把开始往后吸；与下一条重叠 → 把结束往回收。文案跟着分支走 */
+    +'<button type="button" class="btn" data-ov="snap">'+esc(withPrev?t('tcSnapPrev'):t('tcSnapNext'))+'</button>'
+    +'<button type="button" class="btn" data-ov="push">'+esc(t('tcPushNext'))+'</button>'
+    +'<button type="button" class="btn" data-ov="keep">'+esc(t('tcKeepOv'))+'</button></div>';
+}
+function ovFix(kind){
+  const r=S.rows.find(function(x){ return x.id===OV_ROW; });
+  if(!r){ OV_ROW=null; renderRows(); return; }
+  const i=S.rows.indexOf(r), p=S.rows[i-1], n=S.rows[i+1];
+  const withPrev=!!(p&&r.start<p.end-1), withNext=!!(n&&r.end>n.start+1);
+  if(kind==='snap'){
+    if(withPrev){ markEdited(r); r.start=p.end; if(r.end<=r.start) r.end=r.start+1; }
+    else if(withNext){ markEdited(r); r.end=n.start; if(r.start>=r.end) r.start=Math.max(0,r.end-1); }
+    syncToSrc(r); saveEdits();
+  }else if(kind==='push'&&withNext){
+    const d=r.end-n.start;
+    for(let k=i+1;k<S.rows.length;k++){
+      const x=S.rows[k]; markEdited(x);
+      x.start=Math.max(0,x.start+d); x.end=Math.max(x.start+1,x.end+d); syncToSrc(x);
+    }
+    saveEdits();
+  }
+  OV_ROW=null; renderRows();
+}
+/* ---------- 时间轴：批量校正 ---------- */
+function shiftTimes(fromNo, ms){
+  let n=0;
+  (S.rows||[]).forEach(function(r){
+    if(fromNo && r.no<fromNo) return;
+    markEdited(r); r.start=Math.max(0,r.start+ms); r.end=Math.max(r.start+1,r.end+ms); syncToSrc(r); n++;
+  });
+  saveEdits(); OV_ROW=null; renderRows();
+  return n;
+}
+function scaleTimes(t1,t2){
+  const rows=S.rows||[]; if(rows.length<2) return 0;
+  const a0=rows[0].start, a1=rows[rows.length-1].start;
+  if(a1<=a0) return 0;
+  const k=(t2-t1)/(a1-a0);
+  rows.forEach(function(r){
+    markEdited(r);
+    const d=Math.max(1,Math.round((r.end-r.start)*k));
+    r.start=Math.max(0,Math.round(t1+(r.start-a0)*k)); r.end=r.start+d; syncToSrc(r);
+  });
+  saveEdits(); OV_ROW=null; renderRows();
+  return rows.length;
+}
+/* ---------- 时间轴：时长体检 ---------- */
+function timeIssues(){
+  const rows=(S.rows||[]).filter(function(r){ return r.flag!=='drop'&&r.flag!=='merged'; });
+  const items=rows.map(function(r){ return {no:r.no,start:r.start,end:r.end,text:String(r.zh||r.en||'')}; });
+  const dst=(($('dstLang')||{}).value)||'';
+  return C.validateItems(items).concat(C.readingSpeedIssues(items,dst));
+}
+function paintIssues(){
+  ISS={};
+  const iss=timeIssues();
+  iss.forEach(function(i){
+    const r=(S.rows||[]).find(function(x){ return x.no===i.at; }); if(!r) return;
+    (ISS[r.id]=ISS[r.id]||[]).push(i);
+  });
+  return iss.length;
+}
+/* 一键修：只动「时间轴本身站不住」的两类——前后重叠、显示时长不足 0.83 秒。
+   CPS 过快要改的是文案，字幕过长的多半是有意为之（长对白、歌词），都不动，只在体检里报出来。
+   ⚠️ 两趟顺序不能换：先解重叠再补时长。补时长可能重新越过下一条，
+      所以补完要顺推后续——只补不推，改完立刻又是一条新的重叠。 */
+function fixTimeIssues(){
+  const rows=(S.rows||[]).filter(function(r){ return r.flag!=='drop'&&r.flag!=='merged'; });
+  const min=C.MIN_DUR_MS||833; let n=0;
+  const pushFrom=function(i,d){
+    for(let k=i;k<rows.length;k++){ const x=rows[k]; markEdited(x); x.start+=d; x.end+=d; syncToSrc(x); }
+  };
+  for(let i=0;i<rows.length;i++){
+    if(rows[i].start<0){ pushFrom(i,-rows[i].start); n++; }
+  }
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i], pv=rows[i-1];
+    if(r.start<pv.end-1){ pushFrom(i, pv.end-r.start); n++; }
+  }
+  for(let i=0;i<rows.length;i++){
+    const r=rows[i], nx=rows[i+1];
+    if(r.end-r.start<min){
+      markEdited(r); r.end=r.start+min; syncToSrc(r); n++;
+      if(nx && r.end>nx.start){ pushFrom(i+1, r.end-nx.start); n++; }
+    }
+  }
+  saveEdits(); OV_ROW=null; renderRows();
+  return n;
+}
+/* 带输入框的小弹窗：沿用 askReuse 的样式与「点遮罩 = 取消」约定 */
+function askFields(title, fields, okTxt){
+  return new Promise(function(resolve){
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+    const h=document.createElement('div');
+    h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:12px;';
+    h.textContent=title; box.appendChild(h);
+    const ins=[];
+    fields.forEach(function(f){
+      const row=document.createElement('div'); row.style.cssText='margin-bottom:12px;';
+      const lb=document.createElement('div');
+      lb.style.cssText='font-size:12.5px;color:var(--sub);margin-bottom:4px;'; lb.textContent=f.label;
+      const ip=document.createElement('input'); ip.type='text'; ip.value=f.value||'';
+      ip.style.cssText='width:100%;box-sizing:border-box;font-family:var(--mono,ui-monospace,monospace);font-size:13px;padding:6px 8px;border:1px solid var(--line-strong);border-radius:8px;background:var(--card-2,#FAFAFC);color:var(--ink,#1F2430);';
+      row.appendChild(lb); row.appendChild(ip); box.appendChild(row); ins.push(ip);
+    });
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px;';
+    function mk(txt,primary,val){
+      const b=document.createElement('button');
+      b.type='button'; b.className='btn'; b.textContent=txt;
+      if(primary) b.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+      b.onclick=function(){
+        const vs=ins.map(function(i){ return i.value; });
+        ov.remove(); resolve(val?vs:null);
+      };
+      btns.appendChild(b);
+    }
+    mk(t('reuseCancel'),false,null);
+    mk(okTxt,true,'ok');
+    box.appendChild(btns); ov.appendChild(box);
+    ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve(null); } });
+    document.body.appendChild(ov);
+    if(ins[0]) ins[0].focus();
+  });
+}
+/* 事件委托：renderRows 每次重建 DOM，逐个绑会泄漏 */
+function bindEdit(){
+  const box=$('rows'); if(!box) return;
+  box.addEventListener('click', function(ev){
+    if(!ev.target || !ev.target.closest) return;
+    const tc=ev.target.closest('.tc');
+    if(tc){ beginTc(tc); return; }
+    const ob=ev.target.closest('[data-ov]');
+    if(ob){ ovFix(ob.dataset.ov); return; }
+  });
+  const sa=$('tcShiftAll'), sf=$('tcShiftFrom'), sc=$('tcScale'), ck=$('tcCheck');
+  if(sa) sa.addEventListener('click', async function(){
+    const v=await askFields(t('tcShiftAll'), [{label:t('tcAskMs'), value:'500'}], t('assApply'));
+    if(!v) return;
+    const ms=parseInt(String(v[0]).trim(),10);
+    if(!isFinite(ms)){ log(t('edBadTime'),'err'); return; }
+    shiftTimes(0, ms);
+  });
+  if(sf) sf.addEventListener('click', async function(){
+    const v=await askFields(t('tcShiftFrom'),
+      [{label:t('tcAskFrom'), value:'1'}, {label:t('tcAskMs'), value:'500'}], t('assApply'));
+    if(!v) return;
+    const no=parseInt(String(v[0]).trim(),10), ms=parseInt(String(v[1]).trim(),10);
+    if(!isFinite(no)||!isFinite(ms)){ log(t('edBadTime'),'err'); return; }
+    shiftTimes(no, ms);
+  });
+  if(sc) sc.addEventListener('click', async function(){
+    const rows=S.rows||[]; if(rows.length<2){ log(t('edBadTime'),'err'); return; }
+    const a=rows[0], b=rows[rows.length-1];
+    const v=await askFields(t('tcScale'), [
+      {label:t('tcAskCur',C.fmtTime(a.start)), value:C.fmtTime(a.start)},
+      {label:t('tcAskCur',C.fmtTime(b.start)), value:C.fmtTime(b.start)},
+      {label:t('tcScaleHint'), value:''}
+    ], t('assApply'));
+    if(!v) return;
+    const s1=parseTc(v[0],a.start), s2=parseTc(v[1],b.start);
+    if(s1==null||s2==null||s2<=s1){ log(t('edBadTime'),'err'); return; }
+    scaleTimes(s1,s2);
+  });
+  if(ck) ck.addEventListener('click', function(){
+    collectEn(); collectZh();
+    if(Object.keys(ISS).length){ ISS={}; renderRows(); $('tcIssN').textContent=''; return; }
+    const n=paintIssues();
+    renderRows();
+    const el=$('tcIssN');
+    if(!n){ el.textContent=t('tcOk'); log(t('tcOk'),'okc'); return; }
+    el.innerHTML='';
+    el.appendChild(document.createTextNode(n+' · '));
+    const fx=document.createElement('button');
+    fx.type='button'; fx.className='btn'; fx.textContent=t('tcFix');
+    fx.onclick=function(){ const k=fixTimeIssues(); paintIssues(); renderRows(); log(t('tcFixed',k),'okc'); };
+    el.appendChild(fx);
+  });
+}
+
+bindEdit();   /* v0.9.270：事件委托只绑一次（renderRows 每次重建 DOM，逐个绑会泄漏） */
 
 /* ---------------- 翻译（API / 演练） ---------------- */
 // 把句组各行合并为一条：首行承载完整译文并把 end 延长到末条；其余标记 merged（导出时跳过）。
@@ -8884,6 +9293,10 @@ async function runTranslate(){
 
   // 初始化工作行（深拷贝源）。v0.9.84：空文本 cue（歌曲间隙等）不会进任何句组、永不被翻译，
   // 标记 noText 让界面显示「无需翻译」而非误导性的「待翻译…」，统计计入已处理
+  /* v0.9.270：重跑 = 整张表重建，先说一句手工编辑的处境——
+     时间轴与原文在编辑时已同步写回 S.srcItems（上面这行 map 会带上，真不丢）；
+     译文会被重新翻译覆盖，那是翻译本来的语义，但不该让人猜。 */
+  { const ne=editedCount(); if(ne) log(t('edBarCount',ne)+' · '+t('edBarKeep'),'warn'); }
   S.rows = S.srcItems.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null, noText:!String(it.text||'').trim()}));
 
     // 句子级分组：跨多条字幕的句子合并为句组，译文将按各条时长比例切分回填
@@ -9512,6 +9925,9 @@ async function runTranslate(){
     log(t('mergeInfo', gMulti, mG, gMulti-mG));
 
     setProg(99,true); // v0.9.59：进入渲染/折行阶段
+    /* v0.9.270：译完再把上次的手工编辑套回来（时间轴 / 原文 / 译文）。
+       放在 renderRows 之前，恢复的译文能当次就显示；applyPost 会跳过 edited 行，不会二次折行。 */
+    { const ne=restoreEdits(); if(ne) log(t('edRestored',ne),'okc'); }
     renderRows();        // 先渲染译文，避免后处理误读旧 DOM
     applyPost();         // 清提示词 + 折行（超阈值自动分行）
     finalRenumberAndStats();
@@ -9791,6 +10207,9 @@ function setSrc(text, fileName){
      ⚠️ 框里已有内容时函数会自行跳过——那是当前这部片在用的表，覆盖它比不补更糟。 */
   try{ const p=glossLibRestore(); if(p && p.catch) p.catch(function(){}); }catch(e){}
   S.srcItems=items;
+  /* v0.9.270：指纹在导入这一刻固定。之后改原文不会让它漂移，同一份字幕的手工编辑
+     才能在刷新后认回来；改时间轴更不该动指纹（srcFingerprint 只按原文算）。 */
+  try{ S.srcFp0=srcFingerprint(items); }catch(e){ S.srcFp0=''; }
   // 导入后立即构建工作行，右侧对照区才能显示内容（runTranslate 时会重建为深拷贝）
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
@@ -9798,6 +10217,10 @@ function setSrc(text, fileName){
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }
+  /* v0.9.270：同一份字幕上次改过的行，导入后立刻认回来（此时译文还没翻，恢复的是时间轴与原文）。
+     ⚠️ 必须排在 S.fileBase 赋值之后——文件名是编辑指纹的一部分，
+     放在前面会拿上一次（或空）的文件名去比对，永远认不回来。 */
+  { const ne=restoreEdits(); if(ne) log(t('edRestored',ne),'okc'); }
   const w=issues.length;
   $('parseInfo').innerHTML= w
     ? '<span style="color:var(--warn)">'+t('parseWarn',items.length,w)+'</span><br>'+issues.slice(0,6).map(i=>'#'+i.at+' '+issTxt(i)).join('<br>')+(issues.length>6?'<br>…':'')
@@ -9935,6 +10358,7 @@ function srcLocaleForExport(){
 // 按导出格式生成条目：mono=仅译文（原逻辑）；bi-*=双语（源文/译文叠放，严格 1+1，长 cue 自动切时间轴）
 function buildExportItems(){
   collectZh();
+  collectEn();   /* v0.9.270：原文也能改了，导出前同样要把 DOM 里的原文读回 */
   const fmt=expFmtOf();
   if(fmt==='mono'){
     // v0.9.23：单语导出走 buildMonoParts 四层规则（R0 尊重已有折行 / R1 微超宽单行 / R2 常态折行 /

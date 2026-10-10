@@ -5345,7 +5345,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge.html 未引用 v0.9.267 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.270/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5385,9 +5385,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.269</.test(html), '首页版本号未升 0.9.267');
-    assert.ok(/class="ver-tag">v0\.9\.269</.test(html), '工作台版本号未升 0.9.267');
-    assert.ok(/srt-core\.js\?v=0\.9\.269/.test(html), 'srt-core.js?v 未升 0.9.267');
+    assert.ok(/class="ver">v0\.9\.270</.test(html), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.270</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.270/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5564,8 +5564,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.269</.test(mg), 'merge.html 版本未升 0.9.267');
-    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge-core.js?v 未升 0.9.267');
+    assert.ok(/class="ver">v0\.9\.270</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.270/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7393,12 +7393,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const MVTT_SEGS = \[\['std'[\s\S]*'custom','vttTplCustom'\]\]/.test(mg), 'VTT 四档定义丢了');
   });
 
-  t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.269/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.269/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.269/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.269/.test(html), 'index.html 缓存 bust 未升');
+  t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
+    assert.ok(/class="ver">v0\.9\.270/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.270/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.270/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.270/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.270/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8892,14 +8892,111 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
   });
 
-  t('v0.9.269：版号升到 269（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.269/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge.html 缓存 bust 未升');
+  t('v0.9.269：版号升到 270（只改显示版号与缓存 bust 两处）', () => {
+    assert.ok(/class="ver">v0\.9\.270/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.270/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.269/.test(html), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.269/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.269/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.270/.test(html), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.270/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.270/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.269/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.270/.test(cln), 'clean.html 缓存 bust 没跟上');
+  });
+
+  t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
+    /* 原文格这次才补上可编辑；译文 v0.9.189 起就能改 */
+    assert.ok(/class="cue tc"/.test(html), '时间码格没挂 .tc（点不开时间轴）');
+    assert.ok(/' contenteditable="true"'/.test(html) && /\.en\.ed/.test(html), '原文格不可编辑');
+    assert.ok(/function canEdit\(\)\{ return !S\.translating; \}/.test(html), '缺 canEdit（翻译中会误改）');
+    /* ⚠️ 主站导出的条目与 S.rows 不是一一对应（超容量会切、合并句组会并），
+       所以编辑只能落在 rows 上，绝没有「改导出结果」这条路可走。 */
+    assert.ok(/function syncToSrc\(r\)\{/.test(html), '缺 syncToSrc（时间轴/原文写不回源条目，重跑就丢）');
+    const sy = html.slice(html.indexOf('function syncToSrc(r){'), html.indexOf('/* 时间码解析'));
+    [/it\.start=r\.start;/, /it\.end=r\.end;/, /it\.text=r\.en;/].forEach(function (re) {
+      assert.ok(re.test(sy), 'syncToSrc 漏写字段：' + re);
+    });
+    /* 导出与后处理都要回读原文，否则手改的原文出不去 */
+    assert.ok(/collectZh\(\);\s*\n\s*collectEn\(\);/.test(html), '导出前没回读原文');
+    const ap = html.slice(html.indexOf('function applyPost(){'), html.indexOf('/* v0.9.189：改折行阈值'));
+    assert.ok(/collectEn\(\);/.test(ap), '后处理前没回读原文');
+    assert.ok(/if \(r\.edited\) return;/.test(ap), '后处理会重排手工编辑过的行（手敲的折行会被抹）');
+    /* 时间码：绝对 + 相对两种写法都要认 */
+    assert.ok(/function parseTc\(v, base\)\{/.test(html), '缺 parseTc');
+    const pc = html.slice(html.indexOf('function parseTc(v, base){'), html.indexOf('/* ---------- 存盘'));
+    assert.ok(/ms\|s\|m/.test(pc), '时间码不认相对值 +1.5s / -500');
+    assert.ok(/return null;/.test(pc), '认不出来的格式没返回 null（会把垃圾时间写进 rows）');
+  });
+
+  t('v0.9.270：编辑指纹用导入时固定的 srcFp0（现算会让改过的原文认不回来）', () => {
+    assert.ok(/S\.srcFp0\s*=\s*srcFingerprint\(items\)/.test(html), '导入时没固定 srcFp0');
+    assert.ok(/function editFp\(\)\{ return \[S\.fileBase/.test(html), '指纹口径变了（必须含文件名）');
+    assert.ok(/S\.srcFp0\|\|''/.test(html), '指纹没用 srcFp0（现算会漂移）');
+    /* ⚠️ 顺序：文件名先落、再恢复。反了就永远认不回来——实测挂过一次（fileBase 还是上一次的值） */
+    const iFb = html.indexOf('S.fileBase=fileName.replace');
+    const iRe = html.indexOf('const ne=restoreEdits();', iFb);   /* 导入处那一次（翻译完成处还有一次，在它前面） */
+    assert.ok(iFb > 0 && iRe > iFb, 'restoreEdits 排在 fileBase 赋值之前（指纹永远对不上）');
+  });
+
+  t('v0.9.270：时间轴四件套（精修 / 吸附 / 批量 / 体检）', () => {
+    ['function shiftTimes(fromNo, ms){', 'function scaleTimes(t1,t2){',
+     'function fixTimeIssues(){', 'function paintIssues(){', 'function timeIssues(){',
+     'function ovFix(kind){', 'function beginTc(span){'].forEach(function (s) {
+      assert.ok(html.indexOf(s) > 0, '缺 ' + s);
+    });
+    /* 比例缩放必须连时长一起缩，只挪起点会把整片节奏压扁 */
+    const sc = html.slice(html.indexOf('function scaleTimes(t1,t2){'), html.indexOf('/* ---------- 时间轴：时长体检'));
+    assert.ok(/const d=Math\.max\(1,Math\.round\(\(r\.end-r\.start\)\*k\)\);/.test(sc), '比例缩放没缩时长');
+    /* 一键修只修「时间轴本身站不住」的两类：前后重叠、显示时长不足。
+       CPS 过快要改的是文案，字幕过长多半是有意为之（长对白、歌词），都不动。 */
+    const fx = html.slice(html.indexOf('function fixTimeIssues(){'), html.indexOf('/* 带输入框的小弹窗'));
+    assert.ok(fx.indexOf('cps') < 0, '一键修去动 CPS 了（那要改的是文案，不是时间轴）');
+    assert.ok(/C\.MIN_DUR_MS/.test(fx), '最短时长没用引擎常量（会与体检口径对不上）');
+    /* 两趟顺序：先解重叠再补时长。反了的话补时长很容易越过下一条，改完立刻又是一条新重叠 */
+    const iOv = fx.indexOf('r.start<pv.end-1');
+    const iDu = fx.indexOf('r.end-r.start<min');
+    assert.ok(iOv > 0 && iDu > iOv, '先补时长再解重叠（补完又造出新重叠）');
+    assert.ok(/pushFrom\(i\+1, r\.end-nx\.start\)/.test(fx), '补时长越过下一条后没顺推');
+  });
+
+  t('v0.9.270：27 个语块新词条齐全（主站界面 27 语，漏一个界面就整块空白）', () => {
+    const i0 = html.indexOf('const I18N = {');
+    let d = 0, j = html.indexOf('{', i0), end = -1;
+    for (let k = j; k < html.length; k++) {
+      const c = html[k];
+      if (c === '{') d++; else if (c === '}') { d--; if (d === 0) { end = k; break; } }
+    }
+    const I = eval('(' + html.slice(j, end + 1) + ')');
+    const KEYS = ['edEdited','edHintEdit','edStart','edEnd','edTmHint','edBadTime','edBarCount',
+      'edBarKeep','edClear','edCleared','edRestored','tcTitle','tcShiftAll','tcShiftFrom','tcScale',
+      'tcScaleHint','tcCheck','tcFixed','tcOk','tcSnapPrev','tcSnapNext','tcFix','tcPushNext','tcKeepOv',
+      'tcAskMs','tcAskFrom','tcAskCur','tcAskShould','tcEditTip'];
+    assert.strictEqual(Object.keys(I).length, 27, '语块数不对：' + Object.keys(I).length);
+    Object.keys(I).forEach(function (lang) {
+      KEYS.forEach(function (k) {
+        assert.ok(I[lang][k] != null && I[lang][k] !== '', lang + ' 缺 ' + k);
+      });
+    });
+    /* 带条数的必须有 {0} 占位，否则会印出「已手工改 {0} 处」 */
+    ['edBarCount','edCleared','edRestored','tcFixed','tcAskCur'].forEach(function (k) {
+      Object.keys(I).forEach(function (lang) {
+        assert.ok(String(I[lang][k]).indexOf('{0}') >= 0, lang + ' 的 ' + k + ' 没带 {0} 占位');
+      });
+    });
+    /* 复制粘贴忘了翻译，单测照绿但用户看到的是英文 */
+    const en = I['en'];
+    ['zh-CN','zh-TW','ja','ko','de','fr','ru'].forEach(function (lang) {
+      const same = KEYS.filter(function (k) { return I[lang][k] === en[k]; });
+      assert.ok(same.length <= 2, lang + ' 这些词条和英文一模一样：' + same.join(','));
+    });
+  });
+
+  t('v0.9.270：版号升到 270（三页共用一个版号，漏一处线上就显示两个版本）', () => {
+    assert.ok(/class="ver">v0\.9\.270/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.270/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.270/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.270/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.270/.test(mg), 'merge.html 缓存 bust 没跟上');
+    const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
+    assert.ok(/clean-core\.js\?v=0\.9\.270/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 }
