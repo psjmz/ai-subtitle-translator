@@ -603,6 +603,27 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     box-shadow:0 10px 30px -14px rgba(20,20,28,.55);pointer-events:none;
     opacity:0;transform:translateY(4px);transition:opacity .16s ease,transform .16s ease;display:none}
   #tipLayer.on{opacity:1;transform:translateY(0)}
+
+  /* ===== v0.9.269：字幕区就地编辑 =====
+     点一下单元格就变输入框，改完写回 S.rows。原来是纯只读，改个字都得回去改源文件再传一遍。 */
+  .tbl td.ed{cursor:text}
+  .tbl td.ed:hover{box-shadow:inset 0 0 0 1px var(--acc-line)}
+  .tbl td.ed.on{box-shadow:inset 0 0 0 2px var(--acc);background:var(--card)}
+  .ed-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--acc);
+    margin-left:5px;vertical-align:2px;flex:none}
+  .ed-in{display:block;width:100%;min-height:54px;border:1px solid var(--acc);border-radius:8px;
+    padding:6px 8px;font:inherit;font-size:12.5px;line-height:1.55;color:var(--ink);
+    background:var(--card);resize:vertical;outline:none}
+  .ed-in:focus{border-color:var(--acc)}
+  .ed-tm{display:flex;flex-direction:column;gap:4px}
+  .ed-tm .ed-in{min-height:0;height:28px;padding:2px 7px;font-size:11.5px;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .ed-hint{margin-top:4px;font-size:10.5px;color:var(--mut);line-height:1.5;white-space:nowrap}
+  .ed-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--sub)}
+  .ed-bar .n{color:var(--acc-ink);font-weight:650}
+  .ed-bar button{height:28px;padding:0 11px;font-size:12px;border:1px solid var(--line-strong);
+    border-radius:8px;background:var(--card);color:var(--body);cursor:pointer}
+  .ed-bar button:hover{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
@@ -610,7 +631,7 @@ crossorigin="anonymous"></script>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.268</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.269</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -1050,6 +1071,8 @@ crossorigin="anonymous"></script>
               放进里面会在第一次点击时被自己刷掉。sticky bottom 让它跟着表格滚动走。 -->
       <div class="sel-dock" id="selDock" style="display:none"></div>
     </div>
+    <!-- v0.9.269：手工编辑的状态条 —— 改了几处、能不能撤、会不会刷新还在，都摊在这里说清楚 -->
+    <div class="ed-bar" id="edBar" style="display:none"></div>
     <div class="pv-note" id="pvNote"></div>
     <!-- v0.9.250：旧「应用条」整块删除 ——
          贴底条（#selDock）已经是「勾一行 → 点胶囊」一步到位，而旧条子要「选下拉 → 点应用」两步；
@@ -1124,7 +1147,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.268"></script>
+<script src="merge-core.js?v=0.9.269"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -1154,6 +1177,12 @@ const I18N = {
     foldedWarn:'检测到折行条目：多行内容已按语言聚类拆为原文/译文两侧，请核对结果。',
     uncertainWarn:'{0} 条结构不确定（两侧语言相同，按上半/下半拆分），请人工核对。',
     swapped:'已互换原文/译文', needSrc:'请先上传或粘贴双语字幕',
+    edEdited:'这一条改过', edStart:'开始', edEnd:'结束',
+    edHint:'回车保存 · Shift+回车换行 · Esc 取消', edHintTm:'时:分:秒,毫秒',
+    edSaved:'已保存', edBadTime:'时间格式认不出来，这一格没动',
+    edBarCount:'已手工改 {0} 处', edBarKeep:'刷新页面不会丢', edClear:'全部还原',
+    edCleared:'已还原 {0} 处', edRestored:'已恢复上次 {0} 处编辑', edNone:'没有手工编辑',
+    edOverwriteAsk:'已有 {0} 处手工编辑。重新合并会重算整张表，这些改动会被覆盖。确定继续吗？',
 
     lblAlign:'配对方式 · 时间轴取自', alignOrder:'按顺序配对 · 用原文时间轴', alignTime:'按时间轴配对 · 用原文时间轴', alignDstTime:'按顺序配对 · 用译文时间轴',
     alignHintOrder:'条数一致、来自同一片源时最准：第 1 条配第 1 条，时间轴一律取原文。多出来的译文会合并文字并进相邻那条，内容不丢。', 
@@ -1320,6 +1349,12 @@ const I18N = {
     foldedWarn:'偵測到折行條目：多行內容已按語言聚類拆為原文/譯文兩側，請核對結果。',
     uncertainWarn:'{0} 條結構不確定（兩側語言相同，按上半/下半拆分），請人工核對。',
     swapped:'已互換原文/譯文', needSrc:'請先上傳或貼上雙語字幕',
+    edEdited:'這一條改過', edStart:'開始', edEnd:'結束',
+    edHint:'Enter 儲存 · Shift+Enter 換行 · Esc 取消', edHintTm:'時:分:秒,毫秒',
+    edSaved:'已儲存', edBadTime:'時間格式看不懂，這一格沒動',
+    edBarCount:'已手動改 {0} 處', edBarKeep:'重新整理不會丟', edClear:'全部還原',
+    edCleared:'已還原 {0} 處', edRestored:'已回復上次 {0} 處編輯', edNone:'沒有手動編輯',
+    edOverwriteAsk:'已有 {0} 處手動編輯。重新合併會重算整張表，這些改動會被覆蓋。確定繼續嗎？',
 
     lblAlign:'配對方式 · 時間軸取自', alignOrder:'按順序配對 · 用原文時間軸', alignTime:'按時間軸配對 · 用原文時間軸', alignDstTime:'按順序配對 · 用譯文時間軸',
     alignHintOrder:'條數一致、來自同一片源時最準：第 1 條配第 1 條，時間軸一律取原文。多出來的譯文會合併文字併進相鄰那條，內容不丟。',
@@ -1485,6 +1520,12 @@ const I18N = {
     foldedWarn:'Folded cues detected: multi-line cues were split into original/translation sides by language clustering — please review.',
     uncertainWarn:'{0} cues with uncertain structure (same language on both sides, split top/bottom) — please review.',
     swapped:'Original and translation swapped', needSrc:'Provide a bilingual subtitle first (file or paste)',
+    edEdited:'Edited by hand', edStart:'Start', edEnd:'End',
+    edHint:'Enter to save · Shift+Enter for a new line · Esc to cancel', edHintTm:'h:mm:ss,mmm',
+    edSaved:'Saved', edBadTime:'Could not read that timestamp, this cell was left alone',
+    edBarCount:'{0} lines edited by hand', edBarKeep:'kept across page reloads', edClear:'Revert all',
+    edCleared:'Reverted {0} lines', edRestored:'Restored {0} edits from last time', edNone:'Nothing edited by hand',
+    edOverwriteAsk:'You have {0} hand-edited lines. Re-merging rebuilds the whole table and will overwrite them. Continue?',
 
     lblAlign:'Pairing · timing taken from', alignOrder:'Pair in order · original timing', alignTime:'Pair by overlap · original timing', alignDstTime:'Pair in order · translation timing',
     alignHintOrder:'Most accurate when both files share the same source and cue count: cue 1 pairs with cue 1, and timing always comes from the original. Extra translated cues are merged into the neighbouring cue — nothing is dropped.',
@@ -1650,6 +1691,12 @@ const I18N = {
     foldedWarn:'折り返し条を検出：複数行の条は言語クラスタリングで原文/訳文に分割しました。確認してください。',
     uncertainWarn:'{0} 条の構造が不確実（両側が同言語のため上半/下半で分割）。確認してください。',
     swapped:'原文と訳文を入れ替えました', needSrc:'まず二か国語字幕を用意してください（ファイルまたは貼り付け）',
+    edEdited:'手動で編集済み', edStart:'開始', edEnd:'終了',
+    edHint:'Enter で保存 · Shift+Enter で改行 · Esc で取り消し', edHintTm:'時:分:秒,ミリ秒',
+    edSaved:'保存しました', edBadTime:'時刻の書式を解釈できません。この欄は変更していません',
+    edBarCount:'{0} 行を手動で編集', edBarKeep:'再読み込みしても残ります', edClear:'すべて元に戻す',
+    edCleared:'{0} 行を元に戻しました', edRestored:'前回の {0} 件の編集を復元しました', edNone:'手動編集はありません',
+    edOverwriteAsk:'手動編集が {0} 件あります。再マージすると表が作り直され、これらの変更は上書きされます。続けますか？',
 
     lblAlign:'ペア方式 · 軸の取得元', alignOrder:'順番にペア · 軸は原文', alignTime:'重なりでペア · 軸は原文', alignDstTime:'順番にペア · 軸は訳文',
     alignHintOrder:'件数が一致し同一ソースなら最も正確：1 番目同士を対応させ、軸は常に原文。余った訳文は隣の条に文字ごと統合され、内容は失われません。',
@@ -2104,6 +2151,7 @@ function syncMonoChrome(){
   syncExpSum();       /* 导出卡那句「将导出什么」用的是 vttPresetLabel()，要跟着重算 */
 }
 function doMerge(){
+  if (!guardEdits()) return;   /* v0.9.269：有手工改动时先问一句，别无声覆盖 */
   endDemo();   /* v0.9.247：真实合并开始，示例态退场 */
   if (S.mode === 'adjust'){ doAdjust(); return; }
   if (S.mode === 'mono'){ doMono(); return; }   /* v0.9.245：单语 → 不配对，直接进 rows */
@@ -2117,6 +2165,7 @@ function doMerge(){
   const mode = alignMode();
   const out = C.alignRows(S.src, dstShifted, mode);
   S.rows = out.rows; S.report = out.report;
+  S.editFp = calcEditFp(); restoreEdits();   /* v0.9.269：指纹先落（此刻还没被编辑），再把上次的编辑套回来 */
   renderReport();
   railOn(true);
   renderPv();      /* v0.9.265：ASS / VTT / SRT 三块画布共用一次合并结果 */
@@ -2144,6 +2193,7 @@ function doAdjust(){
     else if (z) onlyDst.push(i);
   });
   S.report = { pairs, onlySrc, onlyDst, form: out.report };
+  S.editFp = calcEditFp(); restoreEdits();   /* v0.9.269：指纹先落（此刻还没被编辑），再把上次的编辑套回来 */
   renderReport();
   railOn(true);
   /* v0.9.228：这里漏了 renderAssPv() —— 合并模式有、调整模式没有，
@@ -2155,7 +2205,9 @@ function doAdjust(){
 /* 原文/译文互换：整列对调（调整模式拆错方向时一键纠正） */
 function swapSides(){
   if (!S.rows || !S.rows.length){ toast(t('needMerge')); return; }
-  S.rows.forEach(r=>{ const tmp = r.en; r.en = r.zh; r.zh = tmp; });
+  S.rows.forEach(r=>{ const tmp = r.en; r.en = r.zh; r.zh = tmp;
+    if (r.__o){ const o = r.__o.en; r.__o.en = r.__o.zh; r.__o.zh = o; } });
+  saveEdits();   /* v0.9.269：对调也是一次编辑，得落进快照 */
   const onlySrc = [], onlyDst = [];
   let pairs = 0;
   S.rows.forEach((r, i)=>{
@@ -2185,6 +2237,7 @@ function doMono(){
      ⚠️ 只有用户没手动改过才更新（S.maxWMono == null 才写），改过的一律不动。 */
   syncMaxWInput();
   S.report = { pairs: S.rows.length, onlySrc: [], onlyDst: [], form: null };
+  S.editFp = calcEditFp(); restoreEdits();   /* v0.9.269：指纹先落（此刻还没被编辑），再把上次的编辑套回来 */
   renderReport();
   railOn(true);
   renderPv();
@@ -2250,22 +2303,224 @@ function renderReport(){
     if (!rowMatches(r, i)) return '';
     const cls0 = r.flag==='drop' ? 'drop' : r.flag==='merged' ? 'merged' : '';
     const sel = S.sel.has(i) ? ' sel' : '';
-    const cls = (cls0 || sel) ? ' class="' + (cls0 + sel).trim() + '"' : '';
+    /* v0.9.269：改过的行标出来（粉点），让用户一眼看出自己动过哪些 */
+    const edt = r.edited ? ' edited' : '';
+    const cls = (cls0 || sel || edt) ? ' class="' + (cls0 + sel + edt).trim() + '"' : '';
     const tag = r.flag==='drop' ? '<span class="tag drop">'+t('tagDrop')+'</span>'
               : r.flag==='merged' ? '<span class="tag merged">'+t('tagMerged')+'</span>' : '';
     const zh = r.flag==='merged' ? '' : esc(r.zh);
     const sid = slotOfRow(i);
     const stag = sid === 'default' ? '' :
       '<span class="slot-tag"><span class="slot-dot" style="background:'+esc(slotColor(sid))+'"></span>'+esc(slotLabel(sid))+'</span>';
+    /* v0.9.269：可编辑单元格挂 data-ed —— 单语只有译文那半有意义，原文列不给编辑入口 */
+    const dot = r.edited ? '<i class="ed-dot" title="'+esc(t('edEdited'))+'"></i>' : '';
+    const srcEd = monoMode() ? '' : ' class="ed" data-ed="src" data-ri="'+i+'"';
     return '<tr'+cls+'><td class="ck"><input type="checkbox" data-ri="'+i+'"'+(S.sel.has(i)?' checked':'')+'></td>'+
-      '<td class="no">'+(i+1)+'</td><td class="tm">'+fmtShort(r.start)+'</td>'+
-      '<td>'+esc(r.en)+tag+'</td><td>'+zh+'</td><td>'+stag+'</td></tr>';
+      '<td class="no">'+(i+1)+dot+'</td>'+
+      '<td class="tm ed" data-ed="tm" data-ri="'+i+'">'+fmtShort(r.start)+'</td>'+
+      '<td'+srcEd+'>'+esc(r.en)+tag+'</td>'+
+      '<td class="ed" data-ed="dst" data-ri="'+i+'">'+zh+'</td><td>'+stag+'</td></tr>';
   }).join('');
   $('repRows').innerHTML = rowsHtml;
   $('pvNote').textContent = S.rows.length > CAP ? t('pvNote', CAP) : '';
   renderSlots();
   renderFilterStat();
   renderSelDock();
+  renderEdBar();      /* v0.9.269：改了几处、能不能撤 */
+}
+
+/* =====================================================================
+   v0.9.269：字幕区就地编辑（原文 / 译文 / 时间轴）+ 刷新不丢
+   由来：表格原来是纯只读（esc() 直接渲染文本），改一个字都得回去改源文件再重新传。
+   ⚠️ 三层约束：
+     ① 不动 merge-core.js 一个字 —— 改的只是 S.rows 上的值，引擎照旧跑
+     ② 折行是引擎做的（buildBilingualParts / buildMonoParts 按行宽折），
+        它会把手改的换行重排掉 → 编辑过的行导出前要原样换回来（applyEdits）
+     ③ 快照只存「改过的行」的增量（整篇存会爆 5MB），且靠指纹认是不是同一份字幕
+   ===================================================================== */
+const EDIT_KEY = 'srt_fx_edit_v1';
+let editT = 0;
+
+function pad2(n){ return String(n).padStart(2, '0'); }
+function msToStr(ms){
+  const s = Math.max(0, Math.round(Number(ms) || 0));
+  const msec = s % 1000, tot = Math.floor(s / 1000);
+  return pad2(Math.floor(tot / 3600)) + ':' + pad2(Math.floor((tot % 3600) / 60)) + ':' + pad2(tot % 60) + ',' + String(msec).padStart(3, '0');
+}
+/* 认 0:01:23,456 / 01:23.4 / 83 这几种写法；认不出来返回 null（调用方据此拒绝这一格） */
+function strToMs(str){
+  const s = String(str == null ? '' : str).trim();
+  if (!s) return null;
+  const frac = m => (m ? Number(m) * Math.pow(10, 3 - m.length) : 0);
+  let m = s.match(/^(\d{1,3}):([0-5]?\d):([0-5]?\d)(?:[.,](\d{1,3}))?$/);
+  if (m) return ((+m[1]) * 3600 + (+m[2]) * 60 + (+m[3])) * 1000 + frac(m[4]);
+  m = s.match(/^([0-5]?\d):([0-5]?\d)(?:[.,](\d{1,3}))?$/);
+  if (m) return ((+m[1]) * 60 + (+m[2])) * 1000 + frac(m[3]);
+  return null;
+}
+function editedCount(){ return (S.rows || []).filter(r => r.edited).length; }
+/* ⚠️ 指纹必须在 rows 刚生成（还没被编辑）时算一次存进 S.editFp ——
+      若每次保存时现算，改了第一条就把指纹挪走了，下次刷新永远对不上。 */
+function calcEditFp(){
+  const rows = S.rows || [];
+  return [S.mode || '', rows.length, S.srcName || '', S.dstName || ''].join('|');
+}
+function markEdited(r){
+  if (!r.__o) r.__o = { en: r.en, zh: r.zh, start: r.start, end: r.end };
+  r.edited = true;
+}
+
+/* ---------- 打开 / 保存 / 取消 ---------- */
+function beginEdit(td){
+  if (!td || !S.rows || td.classList.contains('on')) return;
+  const i = parseInt(td.getAttribute('data-ri'), 10);
+  const f = td.getAttribute('data-ed');
+  const r = S.rows[i];
+  if (!r || isNaN(i)) return;
+  td.classList.add('on');
+  td.setAttribute('data-old', td.innerHTML);
+  if (f === 'tm'){
+    td.innerHTML = '<div class="ed-tm">' +
+      '<input class="ed-in" data-k="start" value="' + esc(msToStr(r.start)) + '" aria-label="' + esc(t('edStart')) + '">' +
+      '<input class="ed-in" data-k="end" value="' + esc(msToStr(r.end)) + '" aria-label="' + esc(t('edEnd')) + '">' +
+      '</div><div class="ed-hint">' + esc(t('edHintTm')) + '</div>';
+  } else {
+    const v = (f === 'src' ? r.en : r.zh) || '';
+    td.innerHTML = '<textarea class="ed-in" data-k="' + esc(f) + '" rows="2">' + esc(v) + '</textarea>' +
+      '<div class="ed-hint">' + esc(t('edHint')) + '</div>';
+  }
+  const el = td.querySelector('.ed-in');
+  if (el){ el.focus(); if (el.select) el.select(); }
+
+  let done = false;
+  const finish = save => { if (done) return; done = true; save ? commitEdit(td, i, f) : cancelEdit(td); };
+  td._finish = finish;
+  td.querySelectorAll('.ed-in').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Escape'){ e.preventDefault(); finish(false); }
+      /* 文本框：回车保存、Shift+回车换行（否则手改的折行没法敲） */
+      else if (e.key === 'Enter' && (f === 'tm' || !e.shiftKey)){ e.preventDefault(); finish(true); }
+      e.stopPropagation();
+    });
+    inp.addEventListener('blur', () => { setTimeout(() => finish(true), 0); });
+  });
+}
+function commitEdit(td, i, f){
+  const r = S.rows && S.rows[i];
+  if (!r){ td.classList.remove('on'); return; }
+  let bad = false, changed = false;
+  td.querySelectorAll('.ed-in').forEach(inp => {
+    const k = inp.getAttribute('data-k'), v = inp.value;
+    if (f === 'tm'){
+      const ms = strToMs(v);
+      if (ms == null){ bad = true; return; }
+      const key = (k === 'end') ? 'end' : 'start';
+      if (Number(r[key] || 0) !== ms){ markEdited(r); r[key] = ms; changed = true; }
+    } else {
+      const key = (f === 'src') ? 'en' : 'zh';
+      if (String(r[key] == null ? '' : r[key]) !== v){ markEdited(r); r[key] = v; changed = true; }
+    }
+  });
+  td.classList.remove('on');
+  if (changed){ saveEdits(); afterEdit(); toast(t('edSaved')); }
+  else { renderReport(); if (bad) toast(t('edBadTime')); }
+}
+function cancelEdit(td){
+  const old = td.getAttribute('data-old');
+  if (old != null) td.innerHTML = old;
+  td.classList.remove('on');
+}
+function afterEdit(){
+  renderReport();
+  renderPv();
+}
+
+/* ---------- 重新合并的保护 ----------
+   合并 / 拆分 / 单语导入都会**重算整张 S.rows**，手改过的地方会被无声抹掉。
+   所以入口先问一句；用户点「确定」= 接受覆盖，这时快照必须一起清掉 ——
+   同一份字幕、同一模式、条数没变 → 指纹一模一样，restoreEdits() 会把刚放弃的
+   编辑又原样套回来，等于覆盖了个寂寞。
+   ⚠️ clearTimeout(editT) 也别漏：saveEdits 是 150ms 防抖，点了合并但定时器还没跑，
+      晚一步就会把快照重新写回去。 */
+function guardEdits(){
+  const n = editedCount();
+  if (!n) return true;
+  if (!window.confirm(t('edOverwriteAsk', n))) return false;
+  clearTimeout(editT);
+  try { localStorage.removeItem(EDIT_KEY); } catch (e) {}
+  return true;
+}
+
+/* ---------- 折行豁免：编辑过的行按原样出去 ----------
+   ⚠️ parts 与 S.rows 严格一一对应（实测过：长度 / start / 顺序全一致），所以按索引取。 */
+function applyEdits(parts){
+  const rows = S.rows || [];
+  if (!parts || !rows.length) return parts;
+  parts.forEach((p, i) => {
+    const r = rows[i];
+    if (!r || !r.edited) return;
+    p.start = r.start; p.end = r.end;
+    if (monoMode()){
+      p.dstLines = String(r.zh == null ? '' : r.zh).split('\n');
+    } else {
+      p.srcLines = String(r.en == null ? '' : r.en).split('\n');
+      p.dstLines = String(r.zh == null ? '' : r.zh).split('\n');
+    }
+  });
+  return parts;
+}
+
+/* ---------- 快照：刷新不丢 ---------- */
+function saveEdits(){
+  clearTimeout(editT);
+  editT = setTimeout(() => {
+    const items = [];
+    (S.rows || []).forEach((r, i) => { if (r.edited) items.push([i, r.en, r.zh, r.start, r.end]); });
+    try {
+      if (!items.length || !S.editFp) localStorage.removeItem(EDIT_KEY);
+      else localStorage.setItem(EDIT_KEY, JSON.stringify({ fp: S.editFp, items: items, ts: Date.now() }));
+    } catch (e) { /* 超配额就放弃快照，不影响编辑本身 */ }
+  }, 150);
+}
+function restoreEdits(){
+  const rows = S.rows;
+  if (!rows || !rows.length) return;
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(EDIT_KEY) || 'null'); } catch (e) {}
+  if (!d || !d.fp || !S.editFp || d.fp !== S.editFp) return;
+  let n = 0;
+  (d.items || []).forEach(it => {
+    const r = rows[it[0]];
+    if (!r) return;
+    markEdited(r);
+    r.en = it[1]; r.zh = it[2]; r.start = it[3]; r.end = it[4];
+    n++;
+  });
+  if (n) toast(t('edRestored', n));
+}
+/* 「清除」= 真还原成原始值（不是只摘掉标记），所以编辑时留了 __o */
+function clearEdits(){
+  let n = 0;
+  (S.rows || []).forEach(r => {
+    if (!r.edited) return;
+    if (r.__o){ r.en = r.__o.en; r.zh = r.__o.zh; r.start = r.__o.start; r.end = r.__o.end; }
+    delete r.edited; delete r.__o; n++;
+  });
+  try { localStorage.removeItem(EDIT_KEY); } catch (e) {}
+  renderReport(); renderPv();
+  toast(n ? t('edCleared', n) : t('edNone'));
+}
+function renderEdBar(){
+  const bar = $('edBar');
+  if (!bar) return;
+  const n = editedCount();
+  if (!S.rows || !S.rows.length || !n){ bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = '<span>' + t('edBarCount', n) + '</span>' +
+    '<span>' + t('edBarKeep') + '</span>' +
+    '<button type="button" id="btnEdClear">' + esc(t('edClear')) + '</button>';
+  const b = $('btnEdClear');
+  if (b) b.addEventListener('click', clearEdits);
 }
 /* v0.9.248：勾选行之后，槽就在眼皮底下 —— 这条贴在表格底部，滚表格也跟着走。
    以前「应用条」在表格下方 305px 处、根本不在视口里，勾完行得先滚下去才能套样式。
@@ -3584,13 +3839,14 @@ function monoParts(){
     maxW: biMaxWVal(),
     dstLocale: guessLocale(localeDstItems())
   });
-  return (ps || []).map((p, i) => ({
+  /* v0.9.269：手改过的行不再被折行重排（applyEdits 是幂等的，外层再调一次无害） */
+  return applyEdits((ps || []).map((p, i) => ({
     no: p.no || (i + 1),
     start: p.start, end: p.end,
     slot: p.slot || monoSlotOfStart(p.start),
     srcLines: [],
     dstLines: String(p.text == null ? '' : p.text).split('\n')
-  }));
+  })));
 }
 /* buildMonoParts 不吐 slot，按时间轴回查 rows 上已经刷好的槽（syncSlotsToRows 写进去的） */
 function monoSlotOfStart(st){
@@ -3603,11 +3859,11 @@ function buildAssEvents(){
   const fmt = expFmtVal();
   const stacked = fmt === 'ass-stack';
   const dstFirst = orderVal() === 'dst-first';
-  const parts = monoMode() ? monoParts() : C.buildBilingualParts(S.rows, {
+  const parts = applyEdits(monoMode() ? monoParts() : C.buildBilingualParts(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
     srcLocale: guessLocale(localeSrcItems()),
     dstLocale: guessLocale(localeDstItems())
-  });
+  }));
   const mv = assMVs();
   /* v0.9.229：译文与原文的「离底距离」语义完全一致——都是这一行离画面底边多远，
      直接写进各自的 MarginV，不再按字号/行高推算抬高量（assStackMV 那条路径已弃用）。
@@ -3669,10 +3925,10 @@ function assPvSample(){
   syncSlotsToRows();   /* v0.9.245：预览也要按槽挑样例，否则预览与导出不是同一条 */
   if (rows && C && typeof C.buildBilingualParts === 'function'){
     try {
-      const parts = monoMode() ? monoParts() : C.buildBilingualParts(rows, {
+      const parts = applyEdits(monoMode() ? monoParts() : C.buildBilingualParts(rows, {
         maxW: biMaxWVal(), biMaxW: biMaxWVal(),
         srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems())
-      });
+      }));
       (parts || []).forEach(p => {
         if (!p || !p.dstLines || !p.srcLines) return;
         const n = p.dstLines.length + p.srcLines.length;
@@ -4030,10 +4286,10 @@ function vttStyleOf(){
    此前预览自己写死两行、导出按折行结果给 N 行 → 预览与导出行数不一致（v0.9.224b 的教训）。 */
 function vttCueParts(){
   syncSlotsToRows();   /* v0.9.245：同上，预览与导出共用这一份 */
-  const parts = monoMode() ? monoParts() : C.buildBilingualParts(S.rows, {
+  const parts = applyEdits(monoMode() ? monoParts() : C.buildBilingualParts(S.rows, {
     maxW: biMaxWVal(), biMaxW: biMaxWVal(),
     srcLocale: guessLocale(localeSrcItems()), dstLocale: guessLocale(localeDstItems())
-  });
+  }));
   const dstFirst = orderVal() === 'dst-first';
   return (parts || []).map((p, i) => {
     const d = (p.dstLines || []).map(x=>({ text:x, isSrc:false }));
@@ -4820,6 +5076,19 @@ function bindSlotUI(){
     if (cb.checked) S.sel.add(i); else S.sel.delete(i);
     renderReport();
   });
+  /* v0.9.269：点单元格就地编辑。
+     ⚠️ 点复选框 / 点输入框内部不算「开始编辑」；开新格子前先把上一个格子收掉（存掉）。 */
+  if (tb) tb.addEventListener('click', e=>{
+    if (!S.rows || !S.rows.length) return;
+    if (e.target.closest && e.target.closest('.ed-in')) return;
+    if (e.target.closest && e.target.closest('.ck')) return;
+    const td = e.target.closest ? e.target.closest('td.ed') : null;
+    if (!td) return;
+    if (td.classList.contains('on')) return;
+    const prev = tb.querySelector('td.ed.on');
+    if (prev && prev !== td && prev._finish) prev._finish(true);
+    beginEdit(td);
+  });
   const sa = $('mSelAll');
   if (sa) sa.addEventListener('change', ()=>{
     ensureStyle();
@@ -5065,7 +5334,8 @@ function init(){
   if (bmEl) bmEl.addEventListener('input', ()=>{ saveMaxWInput(); renderPv(); });
   /* v0.9.228：调整模式换「拆分结构」后必须重新拆一遍，否则选了没反应（要用户自己再点一次按钮） */
   const smEl = $('structMode');
-  if (smEl) smEl.addEventListener('change', ()=>{ if (S.mode === 'adjust' && S.rows) doAdjust(); });
+  /* v0.9.269：换「拆分结构」也是重算整张表，同样要过 guardEdits —— 否则手改的东西被静默抹掉 */
+  if (smEl) smEl.addEventListener('change', ()=>{ if (S.mode === 'adjust' && S.rows && guardEdits()) doAdjust(); });
   window.addEventListener('resize', renderPv);
   /* v0.9.242：布局 radio 已隐藏（布局跟着模板键走，见 layoutRow 注释），它不再需要 change 监听。
      改成监听**每一个** ASS 字段：手改任意一个 = 这套参数是我的 → 落到「自定义」，

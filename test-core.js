@@ -5345,7 +5345,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.268/.test(mg), 'merge.html 未引用 v0.9.267 的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge.html 未引用 v0.9.267 的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5385,9 +5385,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.268</.test(html), '首页版本号未升 0.9.267');
-    assert.ok(/class="ver-tag">v0\.9\.268</.test(html), '工作台版本号未升 0.9.267');
-    assert.ok(/srt-core\.js\?v=0\.9\.268/.test(html), 'srt-core.js?v 未升 0.9.267');
+    assert.ok(/class="ver">v0\.9\.269</.test(html), '首页版本号未升 0.9.267');
+    assert.ok(/class="ver-tag">v0\.9\.269</.test(html), '工作台版本号未升 0.9.267');
+    assert.ok(/srt-core\.js\?v=0\.9\.269/.test(html), 'srt-core.js?v 未升 0.9.267');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5564,8 +5564,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.268</.test(mg), 'merge.html 版本未升 0.9.267');
-    assert.ok(/merge-core\.js\?v=0\.9\.268/.test(mg), 'merge-core.js?v 未升 0.9.267');
+    assert.ok(/class="ver">v0\.9\.269</.test(mg), 'merge.html 版本未升 0.9.267');
+    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge-core.js?v 未升 0.9.267');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -5940,7 +5940,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const smBody = mg.slice(mg.indexOf('function syncMode(){'), mg.indexOf('function setI18nKey('));
     assert.ok(/renderPv\(\);/.test(smBody), 'syncMode 清 rows 后未收起预览');
     /* 调整模式换「拆分结构」要立刻重拆，不能等用户再点一次按钮 */
-    assert.ok(/smEl\.addEventListener\('change', \(\)=>\{ if \(S\.mode === 'adjust' && S\.rows\) doAdjust\(\); \}\)/.test(mg),
+    /* ⚠️ v0.9.269：这里多了 guardEdits() —— 换结构也是重算整张表，先问一句再拆 */
+    assert.ok(/smEl\.addEventListener\('change', \(\)=>\{ if \(S\.mode === 'adjust' && S\.rows && guardEdits\(\)\) doAdjust\(\); \}\)/.test(mg),
       '拆分结构变了不会重拆');
   });
 
@@ -7393,11 +7394,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到 256（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.268/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.268/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.268/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.268/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.268/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.269/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.269/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.269/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.269/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8745,5 +8746,160 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* vttPresetKey 的兜底：不走 syncMonoChrome 的路径也不许吐 m-* */
     assert.ok(/if \(!monoMode\(\) && String\(k\)\.indexOf\('m-'\) === 0\) k = biVttKeyOf\(k\);/.test(mg),
       'vttPresetKey() 在非单语下仍可能返回 m-* 档（双语拿不到这一档）');
+  });
+
+  /* ================= v0.9.269：字幕区就地编辑（原文 / 译文 / 时间轴）=================
+     用户原话：「希望用户可以支持对原文/译文进行编辑，如果用户发现有错误，
+                可以方便他进行修改，修改后能存盘，下载导出」
+     用户拍板三条口径：存盘 = 写回数据 + 刷新不丢 / 编辑方式 = 表格就地编辑 / 范围 = 文本 + 时间轴。
+     ⚠️ 三条「看起来能做对、实际必错」的约束，钉死防回退：
+       ① 折行是引擎做的（buildBilingualParts / buildMonoParts 按行宽折），它会把手改的
+          换行重排掉 → 每条产出 parts 的路径都要过 applyEdits，漏一条就是
+          「表格里改对了、导出出去还是被折回去」。
+       ② 指纹必须在 rows 刚生成、还没被编辑时落一次（S.editFp = calcEditFp()）。
+          放在保存时现算的话，改了第一条指纹就挪走了，下次刷新永远对不上。
+       ③ 重新合并会重算整张 rows → 必须 guardEdits 先问一句；点了「确定」还得把快照一起清掉，
+          否则同一份字幕指纹一模一样，restoreEdits 会把刚放弃的编辑又原样套回来。 */
+
+  t('v0.9.269：三处 rows 生成点都落指纹（且落完立刻恢复编辑）', () => {
+    /* doMerge / doAdjust / doMono 各一处。少一处 = 那个模式下刷新就丢编辑。 */
+    const n = (mg.match(/S\.editFp = calcEditFp\(\); restoreEdits\(\);/g) || []).length;
+    assert.strictEqual(n, 3, 'S.editFp = calcEditFp(); restoreEdits(); 应出现 3 次，实际 ' + n);
+    assert.ok(/function calcEditFp\(\)\{/.test(mg), '缺 calcEditFp');
+    /* ⚠️ 指纹里必须带条数与文件名：只带模式的话，换一份同条数的字幕会被误认成同一份 */
+    assert.ok(/return \[S\.mode \|\| '', rows\.length, S\.srcName \|\| '', S\.dstName \|\| ''\]\.join\('\|'\);/.test(mg),
+      '指纹口径变了（必须含 mode / 条数 / 两份文件名）');
+  });
+
+  t('v0.9.269：每条产出 parts 的路径都过 applyEdits（漏一条＝导出被折回去）', () => {
+    const calls = (mg.match(/applyEdits\(/g) || []).length;
+    assert.ok(calls >= 5, 'applyEdits 调用点少于 4 处（含定义共 ' + calls + ' 处出现）');
+    assert.ok(/function applyEdits\(parts\)\{/.test(mg), '缺 applyEdits');
+    /* 三处导出/预览入口：monoParts 内部 + 两处 buildBilingualParts */
+    assert.ok(/const parts = applyEdits\(monoMode\(\) \? monoParts\(\) : C\.buildBilingualParts\(S\.rows, \{/.test(mg),
+      '预览路径没过 applyEdits');
+    assert.ok(/const parts = applyEdits\(monoMode\(\) \? monoParts\(\) : C\.buildBilingualParts\(rows, \{/.test(mg),
+      '导出路径没过 applyEdits');
+    assert.ok(/return applyEdits\(\(ps \|\| \[\]\)\.map\(\(p, i\) => \(\{/.test(mg), 'monoParts 内部没过 applyEdits');
+    /* 只按索引换回编辑过的行，没改的行一律走引擎折行 */
+    assert.ok(/if \(!r \|\| !r\.edited\) return;/.test(mg), 'applyEdits 会去动没编辑过的行');
+    /* ⚠️ 单语没有原文行：单语分支里只许写 dstLines，写了 srcLines 会凭空多出一条 */
+    const ae = mg.slice(mg.indexOf('function applyEdits(parts){'), mg.indexOf('/* ---------- 快照'));
+    const m0 = ae.indexOf('if (monoMode()){');
+    const m1 = ae.indexOf('} else {', m0);
+    const monoBlk = ae.slice(m0, m1);
+    assert.ok(m0 > 0 && m1 > m0, 'applyEdits 没有单语分支');
+    assert.ok(/p\.dstLines = String\(r\.zh == null \? '' : r\.zh\)\.split\('\\n'\);/.test(monoBlk), '单语分支没写 dstLines');
+    assert.ok(monoBlk.indexOf('srcLines') < 0, '单语分支还在写 srcLines（会多出一条原文行）');
+    /* 双语分支两侧都要写，且有时间轴 */
+    const biBlk = ae.slice(m1, ae.indexOf('\n  });', m1));
+    assert.ok(/p\.srcLines = String\(r\.en == null \? '' : r\.en\)\.split\('\\n'\);/.test(biBlk), '双语分支没写 srcLines');
+    assert.ok(/p\.start = r\.start; p\.end = r\.end;/.test(ae), '改过的时间轴没换回去');
+  });
+
+  t('v0.9.269：__o 留原始值，且必须在赋值之前留（「全部还原」靠它）', () => {
+    assert.ok(/function markEdited\(r\)\{\s*\n\s*if \(!r\.__o\) r\.__o = \{ en: r\.en, zh: r\.zh, start: r\.start, end: r\.end \};\s*\n\s*r\.edited = true;\s*\n\}/.test(mg),
+      'markEdited 写法变了（__o 必须是「第一次编辑时的值」，不是最后一次）');
+    /* restoreEdits 里也要先 markEdited 再赋值，否则 __o 存的是编辑后的值，还原等于没还原 */
+    const re = mg.slice(mg.indexOf('function restoreEdits(){'), mg.indexOf('/* 「清除」'));
+    assert.ok(/markEdited\(r\);\s*\n\s*r\.en = it\[1\]; r\.zh = it\[2\]; r\.start = it\[3\]; r\.end = it\[4\];/.test(re),
+      'restoreEdits 里 markEdited 不在赋值之前（__o 会存成编辑后的值）');
+    /* clearEdits = 真还原，不是只摘标记 */
+    const ce = mg.slice(mg.indexOf('function clearEdits(){'), mg.indexOf('function renderEdBar(){'));
+    assert.ok(/r\.en = r\.__o\.en; r\.zh = r\.__o\.zh; r\.start = r\.__o\.start; r\.end = r\.__o\.end;/.test(ce),
+      'clearEdits 没从 __o 还原成原始值');
+    assert.ok(/delete r\.edited; delete r\.__o;/.test(ce), 'clearEdits 没清标记');
+    assert.ok(/localStorage\.removeItem\(EDIT_KEY\)/.test(ce), 'clearEdits 没清快照');
+  });
+
+  t('v0.9.269：重新合并会先问一句（guardEdits），且接受覆盖时清掉快照', () => {
+    assert.ok(/function guardEdits\(\)\{/.test(mg), '缺 guardEdits');
+    /* 入口：合并按钮走的 doMerge，第一条语句就是守卫
+       ⚠️ 别用 indexOf('endDemo();') 当右边界 —— 那会在函数定义之外先命中，切出空串 */
+    const d0 = mg.indexOf('function doMerge(){');
+    const dm = mg.slice(d0, d0 + 400);
+    assert.ok(/function doMerge\(\)\{\s*\n\s*if \(!guardEdits\(\)\) return;/.test(dm),
+      'doMerge 第一条语句不是守卫（手改的东西会被无声覆盖）');
+    /* 换「拆分结构」也是重算整张表 */
+    assert.ok(/if \(S\.mode === 'adjust' && S\.rows && guardEdits\(\)\) doAdjust\(\);/.test(mg),
+      'structMode 变更没守卫');
+    /* 没编辑时不许弹窗烦人 */
+    assert.ok(/const n = editedCount\(\);\s*\n\s*if \(!n\) return true;/.test(mg), 'guardEdits 在零编辑时也弹窗');
+    /* ⚠️ 关键：点了「确定」必须连快照一起清 —— 指纹相同的话 restoreEdits 会把它又套回来 */
+    const gd = mg.slice(mg.indexOf('function guardEdits(){'), mg.indexOf('function applyEdits('));
+    assert.ok(/clearTimeout\(editT\);/.test(gd), '没清 saveEdits 的防抖定时器（晚一步会把快照写回去）');
+    assert.ok(/localStorage\.removeItem\(EDIT_KEY\)/.test(gd), '接受覆盖时没清快照');
+  });
+
+  t('v0.9.269：时间轴编辑认 时:分:秒,毫秒，认不出来不动这一格', () => {
+    assert.ok(/function msToStr\(ms\)\{/.test(mg) && /function strToMs\(str\)\{/.test(mg), '缺时间互转函数');
+    assert.ok(/padStart\(3, '0'\)/.test(mg), '毫秒没补成 3 位（会拼出 00:00:01,5 这种）');
+    const cm = mg.slice(mg.indexOf('function commitEdit(td, i, f){'), mg.indexOf('function cancelEdit('));
+    assert.ok(/const ms = strToMs\(v\);\s*\n\s*if \(ms == null\)\{ bad = true; return; \}/.test(cm),
+      '非法时间没被拒绝（会把 NaN 写进 rows，导出就废了）');
+    assert.ok(/toast\(t\('edBadTime'\)\)/.test(cm), '非法时间没给提示');
+    /* 文本格：回车保存 / Shift+回车换行 */
+    assert.ok(/else if \(e\.key === 'Enter' && \(f === 'tm' \|\| !e\.shiftKey\)\)\{ e\.preventDefault\(\); finish\(true\); \}/.test(mg),
+      '回车 / Shift+回车的判据变了（手改折行会敲不出来）');
+    assert.ok(/e\.key === 'Escape'\)\{ e\.preventDefault\(\); finish\(false\); \}/.test(mg), 'Esc 取消没了');
+  });
+
+  t('v0.9.269：单语下不给原文编辑格（没有原文就没有那一格）', () => {
+    assert.ok(/const srcEd = monoMode\(\) \? '' : ' class="ed" data-ed="src" data-ri="'\+i\+'"';/.test(mg),
+      '单语下仍在给原文列挂 data-ed="src"（点进去改的是一个不存在的字段）');
+    /* 时间轴与译文三种模式都可编辑 */
+    assert.ok(/<td class="tm ed" data-ed="tm" data-ri="'\+i\+'">/.test(mg), '时间格不可编辑');
+    assert.ok(/<td class="ed" data-ed="dst" data-ri="'\+i\+'">/.test(mg), '译文格不可编辑');
+    /* 编辑过的行要有看得见的标记 */
+    assert.ok(/const dot = r\.edited \? '<i class="ed-dot" title="'\+esc\(t\('edEdited'\)\)\+\'"><\/i>' : '';/.test(mg),
+      '编辑过的行没有标记（用户看不出哪条改过）');
+  });
+
+  t('v0.9.269：快照只存改过的行（整篇存会爆 5MB），且有配额兜底', () => {
+    const sv = mg.slice(mg.indexOf('function saveEdits(){'), mg.indexOf('function restoreEdits(){'));
+    assert.ok(/if \(r\.edited\) items\.push\(\[i, r\.en, r\.zh, r\.start, r\.end\]\);/.test(sv), '快照存了整篇');
+    assert.ok(/if \(!items\.length \|\| !S\.editFp\) localStorage\.removeItem\(EDIT_KEY\);/.test(sv),
+      '没编辑时没把快照清掉（下次刷新会凭空多出编辑）');
+    assert.ok(/catch \(e\) \{ \/\* 超配额就放弃快照，不影响编辑本身 \*\/ \}/.test(sv), 'localStorage 没兜底 try/catch');
+    assert.ok(/const EDIT_KEY = 'srt_fx_edit_v1';/.test(mg), '快照键名变了（旧快照会变成孤儿数据）');
+  });
+
+  t('v0.9.269：14 条新词条四语齐全（漏一个语块界面就整块空白）', () => {
+    const i0 = mg.indexOf('const I18N = {');
+    let d = 0, j = mg.indexOf('{', i0), end = -1;
+    for (let k = j; k < mg.length; k++) {
+      const c = mg[k];
+      if (c === '{') d++;
+      else if (c === '}') { d--; if (d === 0) { end = k; break; } }
+    }
+    const I = eval('(' + mg.slice(j, end + 1) + ')');
+    const KEYS = ['edEdited', 'edStart', 'edEnd', 'edHint', 'edHintTm', 'edSaved', 'edBadTime',
+                  'edBarCount', 'edBarKeep', 'edClear', 'edCleared', 'edRestored', 'edNone', 'edOverwriteAsk'];
+    ['zh-CN', 'zh-TW', 'en', 'ja'].forEach(lang => {
+      KEYS.forEach(k => {
+        assert.ok(I[lang] && I[lang][k] != null && I[lang][k] !== '', lang + ' 缺 ' + k);
+      });
+      /* 带条数的三条必须有 {0} 占位，否则会印出「已手工改 {0} 处」 */
+      ['edBarCount', 'edCleared', 'edRestored', 'edOverwriteAsk'].forEach(k => {
+        assert.ok(String(I[lang][k]).indexOf('{0}') >= 0, lang + ' 的 ' + k + ' 没带 {0} 占位');
+      });
+    });
+    /* 四语不能是同一套词（复制粘贴忘了翻译，单测照绿但用户看的是英文） */
+    const en = I['en'];
+    ['zh-CN', 'zh-TW', 'ja'].forEach(lang => {
+      const same = KEYS.filter(k => I[lang][k] === en[k]);
+      assert.strictEqual(same.length, 0, lang + ' 这些词条和英文一模一样：' + same.join(','));
+    });
+  });
+
+  t('v0.9.269：版号升到 269（只改显示版号与缓存 bust 两处）', () => {
+    assert.ok(/class="ver">v0\.9\.269/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.269/.test(mg), 'merge.html 缓存 bust 未升');
+    /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
+    assert.ok(/class="ver">v0\.9\.269/.test(html), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.269/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.269/.test(html), 'index.html 缓存 bust 没跟上');
+    const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
+    assert.ok(/clean-core\.js\?v=0\.9\.269/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 }
