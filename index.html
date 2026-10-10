@@ -753,7 +753,9 @@
      data-ad-status="unfilled"（无广告可投）时整体收起，不留空白高度。 */
   .adbox{display:none;margin:0}
   .adbox.show{display:block}
-  .adbox ins.adsbygoogle{display:block}
+  /* v0.9.263：上间距挂在 ins 上而不是容器上——ins 被 unfilled 收起时 display:none，
+     间距一并消失，未投放时不留空档；真投上时才与任务条拉开 10px。 */
+  .adbox ins.adsbygoogle{display:block;margin-top:10px}
   .adbox ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important}
 
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 8px}
@@ -924,7 +926,7 @@ crossorigin="anonymous"></script>
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.262</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.263</span></div>
       <div class="spacer"></div>
       <span id="siteNav"></span>
       <select id="uiLang2" aria-label="UI language"></select>
@@ -1088,7 +1090,7 @@ crossorigin="anonymous"></script>
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.262</span>
+    <span class="ver-tag">v0.9.263</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1298,13 +1300,16 @@ crossorigin="anonymous"></script>
         </div>
       </div>
       <!-- v0.9.262：任务条下方广告位。懒加载——首次随任务条（#progWrap.show）出现才 push，
-           之后常驻。加载器脚本已在 <head>（v0.9.258 接入），此处不重复引入。 -->
+           之后常驻。加载器脚本已在 <head>（v0.9.258 接入），此处不重复引入。
+           v0.9.263：data-ad-format 由 auto 改 horizontal——auto 由 Google 自由决定形状，
+           桌面端常见 90~280px 高，不一定是细横条；horizontal 固定水平横幅（728x90 一族），
+           配合 full-width-responsive 撑满内容宽度，高度稳定，正是要的「横屏广告」。 -->
       <div class="adbox" id="adBox">
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-client="ca-pub-8352564748755277"
              data-ad-slot="2593336254"
-             data-ad-format="auto"
+             data-ad-format="horizontal"
              data-full-width-responsive="true"></ins>
       </div>
       <div class="toolbar">
@@ -1643,7 +1648,7 @@ crossorigin="anonymous"></script>
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.262"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.263"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6774,7 +6779,8 @@ function setProg(p, show){
   const w=$('progWrap'); if(!w) return;
   if(!show){ w.classList.remove('show','done'); $('prog').classList.remove('run'); document.title=BASE_TITLE; return; }
   w.classList.add('show');
-  showAd();                              /* v0.9.262：任务条出现即唤起广告位（内部幂等） */
+  showAd();   /* v0.9.262：任务条出现即唤起广告位（内部幂等）
+                 v0.9.263：任务条本身提前到 pgStart（点翻译那一刻）出现，广告随之提前 */
   $('pgPct').textContent=p+'%';
   $('prog').firstChild.style.width=p+'%';
   document.title = (p>0 && p<100) ? (p+'% · '+BASE_TITLE) : BASE_TITLE;
@@ -6787,6 +6793,11 @@ function pgStart(){
   const st=$('pgState'); if(st) st.textContent=t('pgRun');
   $('pgEta').textContent='';
   try{ setPrText(''); }catch(e){}   // v0.9.184：清掉上一轮完成态留下的消耗行，否则新一轮开头还挂着旧数字
+  /* v0.9.263：任务条开局即显（0% + 流动动画），不等第一批返回。
+     此前要等第一批落地（中途还有分组/歌词预处理），短任务也要十几秒，长任务更久——
+     这段时间用户只见按钮变灰，不知道有没有开始；广告位也跟着晚出场。
+     顺带保证广告位置固定：任务条先出现、广告挂它下面，之后不再位移（避免布局跳动）。 */
+  try{ setProg(0, true); }catch(e){}
 }
 function pgBatch(bi, totalB, skip){
   const now=Date.now();
