@@ -316,7 +316,12 @@ console.log('\n— v0.9.271：页面契约 —');
 {
   const fs = require('fs');
   const html = fs.readFileSync(__dirname + '/clean.html', 'utf8');
-  ok(/clean-core\.js\?v=0\.9\.278/.test(html), 'clean.html 版号已升 278');
+  ok(/clean-core\.js\?v=0\.9\.280/.test(html), 'clean.html 版号已升 280');
+  /* v0.9.280：左上 logo 整块可点回首页（清洗页这条也核一遍，别只靠主站那条） */
+  ok(/<a class="brand" id="logoHome" href="\/">/.test(html), '左上 logo 是指向首页的链接');
+  ok(/function syncLogoHome\s*\(/.test(html) && /'\s*\+\s*LANG\s*\+\s*'\/'/.test(html),
+    '回首页地址跟着界面语言走（/en/clean.html 不掉回中文）');
+  ok(!/<a class="brand" id="logoHome"[^>]*>\s*<div/.test(html), 'logo 链接里没套 <div>');
   ['biBar', 'biTxt', 'biFlip', 'outSeg', 'outNote'].forEach(function (id) {
     ok(html.indexOf('id="' + id + '"') > 0, '页面有 #' + id);
   });

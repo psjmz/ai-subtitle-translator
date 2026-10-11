@@ -558,6 +558,10 @@
   .appbar{position:sticky;top:0;z-index:40;background:var(--card);border-bottom:1.5px solid var(--line);color:var(--ink);display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;flex:none;flex-wrap:nowrap}
   .logo-sm{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14.5px;color:var(--ink);white-space:nowrap}
   .logo-sm .mark{width:28px;height:28px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;box-shadow:0 3px 10px rgba(236,72,153,.3)}
+  /* v0.9.280：logo 整块可点回首页 —— 布局沿用上面两条，只补链接态 */
+  a.logo-sm{text-decoration:none;cursor:pointer;border-radius:9px}
+  a.logo-sm:hover .mark{filter:brightness(1.08)}
+  a.logo-sm:focus-visible{outline:2px solid var(--acc,#D4206A);outline-offset:2px}
   .ver-tag{font-size:10.5px;color:var(--mut);font-family:var(--mono);white-space:nowrap}
   .back{font-size:12.5px;color:var(--mut);background:none;border:none;cursor:pointer;padding:5px 9px;border-radius:9px;transition:.15s;white-space:nowrap}
   .back:hover{color:var(--acc);background:var(--acc-weak)}
@@ -1022,6 +1026,10 @@
   /* v0.9.277：本页只有工作台，没有首页那一半 —— 默认就展开。
      原来的 #viewWorkspace{display:none} 是给「上传后自动进工作台」留的初始态。 */
   #viewWorkspace{display:flex}
+  /* v0.9.279：工作台没有 hero 区，h1 用「只给读屏和爬虫」的方式补一个 ——
+     工具型页面不该为了 SEO 往顶栏里塞一行标题，视觉保持不变。 */
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
@@ -1035,9 +1043,13 @@ crossorigin="anonymous"></script>
      ⚠️ 引擎（srt-core.js）与下面的内联脚本一字未改，只是少了首页那半边 DOM。
      ================================================================ -->
 <div id="viewWorkspace">
+  <!-- v0.9.279：另三页各有 1 个 h1，只有工作台是 0 —— 用视觉隐藏的 h1 补上，
+       文案直接复用本页文档标题的词条（27 语齐全），不另造词。 -->
+  <h1 class="sr-only" data-i18n="tcTrN">字幕翻译</h1>
   <div class="appbar">
-    <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.278</span>
+    <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
+    <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <span class="ver-tag">v0.9.280</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1619,8 +1631,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.278"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.278"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.280"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.280"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1953,7 +1965,17 @@ function applyI18n(){
      重构后两者解耦，必须显式重绘，否则切界面语言后提示行仍是旧语言。 */
   if (typeof syncAssMVBox==='function') syncAssMVBox();
   if (typeof syncFxCard==='function') syncFxCard(); // v0.9.278：去特效页那张卡的标题与说明行也跟界面语言走
+  if (typeof syncLogoHome==='function') syncLogoHome(); // v0.9.280：左上 logo 的回首页地址跟着界面语言走
 }
+
+/* v0.9.280：左上 logo 整块可点，回「当前界面语言的首页」（/ja/translate.html → /ja/，不掉语言）。
+   ⚠️ 工作台页内切语言不会重建 DOM，所以挂在 applyI18n 末尾每次重算，别只在首屏设一次。 */
+function syncLogoHome(){
+  const el = document.getElementById('logoHome');
+  if (!el) return;
+  el.href = (UI.lang==='zh-CN' ? '/' : '/'+UI.lang+'/');
+}
+syncLogoHome();
 
 const S = {
   srcItems: [],        // 解析出的原始字幕 {no,start,end,text}
