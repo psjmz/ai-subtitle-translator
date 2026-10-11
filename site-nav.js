@@ -25,7 +25,8 @@
   var TOOLS = [
     {
       id: 'tr',
-      href: '/',
+      /* v0.9.277：首页改成落地页了，翻译工作台搬到 /translate.html */
+      href: '/translate.html',
       icon: '<path d="M3 7h18M3 12h18M3 17h11"/>',
       c: { bg: '#FDF1F6', fg: '#C02159' },
       name: { 'zh-CN': '字幕翻译', 'zh-TW': '字幕翻譯', 'en': 'Translate', 'ja': '字幕翻訳' },
@@ -59,15 +60,17 @@
       href: '/merge.html',
       icon: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10M7 11.5h10"/>',
       c: { bg: '#EEEDFE', fg: '#534AB7' },
+      /* v0.9.277：定位从「双语合并」改成「特效字幕制作」—— 单语、双语都能做出特效，
+         双语合并只是三种模式之一，不再是主打。 */
       name: { 'zh-CN': '特效字幕', 'zh-TW': '特效字幕', 'en': 'Styled Subtitles', 'ja': '装飾字幕' },
       desc: {
-        'zh-CN': '双语合并、样式槽、ASS / VTT 特效，实时预览所见即所得。',
-        'zh-TW': '雙語合併、樣式槽、ASS / VTT 特效，即時預覽所見即所得。',
-        'en': 'Merge bilingual tracks, apply style slots and ASS / VTT effects with live preview.',
-        'ja': '二か国語字幕の結合、スタイルスロット、ASS / VTT の装飾をライブプレビューで。'
+        'zh-CN': '单语双语都能定型：样式槽、ASS / VTT 特效，实时预览所见即所得。',
+        'zh-TW': '單語雙語都能定型：樣式槽、ASS / VTT 特效，即時預覽所見即所得。',
+        'en': 'Style a single track or a bilingual one: style slots, ASS / VTT effects with live preview.',
+        'ja': '単語でも二か国語でも仕上げ可能。スタイルスロット、ASS / VTT の装飾をライブプレビューで。'
       },
       tags: [
-        { 'zh-CN': '双语', 'zh-TW': '雙語', 'en': 'Bilingual', 'ja': '二か国語' },
+        { 'zh-CN': '单语 / 双语', 'zh-TW': '單語 / 雙語', 'en': 'Mono / Bilingual', 'ja': '単語 / 二か国語' },
         { 'zh-CN': '样式槽', 'zh-TW': '樣式槽', 'en': 'Style slots', 'ja': 'スタイルスロット' }
       ]
     }

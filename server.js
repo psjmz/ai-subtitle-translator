@@ -622,11 +622,11 @@ function serveStatic(req, res, urlPath){
   /* v0.9.273：特效页 / 清洗页的多语言路由。
      ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
      会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
-  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean)\.html$/);
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate)\.html$/);
   if (pm && SEO_ROUTE['/' + pm[1]]) {
     serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
   }
-  pm = p.match(/^\/(merge|clean)\.html$/);
+  pm = p.match(/^\/(merge|clean|translate)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
@@ -1495,15 +1495,51 @@ const SEO_CLEAN = {
   },
 };
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {};
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
   CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
+  TRANSLATE_PATH[l] = (l === 'zh-CN') ? '/translate.html' : '/' + l + '/translate.html';
 });
+/* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
+   ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
+     两个 URL 若共用一套 title/description，搜索引擎会当成重复内容收录，所以这里另写一套。
+     kw 不重复造：关键词一致不容易出错，直接取首页那张表的同语言值。 */
+const SEO_TRANSLATE = {
+  'zh-CN': { title: "字幕翻译 - SRT / VTT / ASS 在线翻译成母语 | 随心字幕 AI", desc: "把 SRT / VTT / ASS 字幕丢进来，选好目标语言即可翻成母语字幕：自动配轴对齐、句级智能合并、术语全片统一、按标点智能折行。支持 75 种语言，免费免注册。" },
+  'zh-TW': { title: "字幕翻譯 - SRT / VTT / ASS 線上翻譯成母語 | 隨心字幕 AI", desc: "把 SRT / VTT / ASS 字幕丟進來，選好目標語言即可翻成母語字幕：自動對軸對齊、句級智慧合併、術語全片一致、依標點智慧折行。支援 75 種語言，免費免註冊。" },
+  'en': { title: "Subtitle Translator — Turn SRT / VTT / ASS into Your Language", desc: "Drop in an SRT / VTT / ASS file, pick a target language, and get subtitles in your own language: timeline-locked translation, sentence-level merging, glossary consistency and punctuation-aware wrapping. 75 languages, free, no sign-up." },
+  'ja': { title: "字幕翻訳 - SRT / VTT / ASS を母語へ | 随心字幕 AI", desc: "SRT / VTT / ASS の字幕を入れて翻訳先を選ぶだけ。時間軸に沿った訳文、文単位の結合、用語の統一、句読点を考慮した折り返しまで自動。75 言語対応、無料・登録不要。" },
+  'es': { title: "Traductor de subtítulos — Traduce SRT / VTT / ASS a tu idioma", desc: "Carga tu subtítulo SRT / VTT / ASS, elige el idioma de destino y obtén subtítulos en tu idioma: sincronización automática, fusión por frases, glosario coherente y saltos de línea inteligentes. 75 idiomas, gratis y sin registro." },
+  'pt': { title: "Tradutor de legendas — Traduza SRT / VTT / ASS para o seu idioma", desc: "Envie um arquivo SRT / VTT / ASS, escolha o idioma de destino e receba legendas no seu idioma: sincronia automática, fusão por frases, glossário consistente e quebra de linha inteligente. 75 idiomas, grátis e sem cadastro." },
+  'ko': { title: "자막 번역 - SRT / VTT / ASS 를 내 언어로 | AI-SRTSub", desc: "SRT / VTT / ASS 자막을 넣고 대상 언어만 고르면 내 언어 자막이 됩니다. 타임라인 자동 정렬, 문장 단위 병합, 용어 통일, 문장부호 기준 줄바꿈까지 자동. 75개 언어, 무료·가입 없음." },
+  'de': { title: "Untertitel übersetzen — SRT / VTT / ASS in deine Sprache", desc: "Lade SRT / VTT / ASS hoch, wähle die Zielsprache und erhalte Untertitel in deiner Sprache: exakte Zeitachse, satzweises Zusammenführen, einheitliche Fachbegriffe und intelligenter Zeilenumbruch. 75 Sprachen, kostenlos, ohne Anmeldung." },
+  'fr': { title: "Traducteur de sous-titres — SRT / VTT / ASS dans votre langue", desc: "Déposez un fichier SRT / VTT / ASS, choisissez la langue cible et obtenez des sous-titres dans votre langue : synchronisation automatique, fusion par phrases, glossaire cohérent et retours à la ligne intelligents. 75 langues, gratuit, sans inscription." },
+  'id': { title: "Penerjemah Subtitle — Terjemahkan SRT / VTT / ASS ke Bahasamu", desc: "Unggah subtitle SRT / VTT / ASS, pilih bahasa tujuan, dan dapatkan subtitle dalam bahasamu: sinkronisasi otomatis, penggabungan per kalimat, glosarium konsisten, dan pemotongan baris cerdas. 75 bahasa, gratis, tanpa daftar." },
+  'hi': { title: "सबटाइटल अनुवादक - SRT / VTT / ASS को अपनी भाषा में", desc: "SRT / VTT / ASS सबटाइटल अपलोड करें, लक्ष्य भाषा चुनें और अपनी भाषा में सबटाइटल पाएं: स्वचालित समय-रेखा मिलान, वाक्य-स्तरीय विलय, शब्दावली एकरूपता और बुद्धिमान पंक्ति-विभाजन। 75 भाषाएं, मुफ़्त, बिना साइन-अप।" },
+  'th': { title: "แปลซับไตเติล - แปล SRT / VTT / ASS เป็นภาษาของคุณ", desc: "อัปโหลดซับไตเติล SRT / VTT / ASS เลือกภาษาปลายทาง แล้วรับซับไตเติลในภาษาของคุณ: จัดแนวไทม์ไลน์อัตโนมัติ รวมประโยคอัตโนมัติ ศัพท์สม่ำเสมอทั้งเรื่อง และขึ้นบรรทัดใหม่ตามเครื่องหมายวรรคตอน 75 ภาษา ฟรี ไม่ต้องสมัคร" },
+  'vi': { title: "Dịch phụ đề - Dịch SRT / VTT / ASS sang ngôn ngữ của bạn", desc: "Tải lên phụ đề SRT / VTT / ASS, chọn ngôn ngữ đích và nhận phụ đề bằng ngôn ngữ của bạn: căn chỉnh thời gian tự động, gộp theo câu, thuật ngữ nhất quán và xuống dòng thông minh. 75 ngôn ngữ, miễn phí, không cần đăng ký." },
+  'ru': { title: "Перевод субтитров — SRT / VTT / ASS на ваш язык", desc: "Загрузите субтитры SRT / VTT / ASS, выберите язык перевода и получите субтитры на своём языке: точная привязка к таймкодам, объединение по предложениям, единый глоссарий и умный перенос строк. 75 языков, бесплатно, без регистрации." },
+  'it': { title: "Traduttore di sottotitoli — SRT / VTT / ASS nella tua lingua", desc: "Carica un file SRT / VTT / ASS, scegli la lingua di destinazione e ottieni i sottotitoli nella tua lingua: sincronizzazione automatica, unione per frasi, glossario coerente e a capo intelligente. 75 lingue, gratis e senza registrazione." },
+  'ar': { title: "مترجم الترجمات المصاحبة — ترجمة SRT / VTT / ASS إلى لغتك", desc: "ارفع ملف SRT / VTT / ASS، اختر اللغة الهدف، واحصل على ترجمة بلغتك: محاذاة زمنية تلقائية، دمج على مستوى الجملة، مصطلحات موحّدة في الملف كله، وتقسيم أسطر ذكي. 75 لغة، مجاناً وبدون تسجيل." },
+  'tr': { title: "Altyazı Çevirici - SRT / VTT / ASS'i Kendi Dilinize Çevirin", desc: "SRT / VTT / ASS altyazınızı yükleyin, hedef dili seçin ve kendi dilinizde altyazı alın: otomatik zaman çizelgesi hizalama, cümle bazlı birleştirme, tutarlı terimler ve akıllı satır bölme. 75 dil, ücretsiz, kayıt gerekmez." },
+  'nl': { title: "Ondertitels vertalen — SRT / VTT / ASS naar jouw taal", desc: "Upload een SRT / VTT / ASS-bestand, kies de doeltaal en krijg ondertitels in je eigen taal: automatische tijdlijnuitlijning, samenvoegen per zin, consistente terminologie en slimme regeleinden. 75 talen, gratis, zonder registratie." },
+  'pl': { title: "Tłumacz napisów — Przetłumacz SRT / VTT / ASS na swój język", desc: "Wgraj napisy SRT / VTT / ASS, wybierz język docelowy i otrzymaj napisy w swoim języku: automatyczne dopasowanie czasu, łączenie zdań, spójna terminologia i inteligentne łamanie wierszy. 75 języków, za darmo, bez rejestracji." },
+  'sv': { title: "Översätt undertexter — SRT / VTT / ASS till ditt språk", desc: "Ladda upp en SRT / VTT / ASS-fil, välj målspråk och få undertexter på ditt eget språk: automatisk tidslinjejustering, sammanslagning per mening, konsekvent ordlista och smart radbrytning. 75 språk, gratis, ingen registrering." },
+  'cs': { title: "Překladač titulků — Přeložte SRT / VTT / ASS do svého jazyka", desc: "Nahrajte titulky SRT / VTT / ASS, zvolte cílový jazyk a získejte titulky ve svém jazyce: automatické zarovnání časové osy, slučování vět, jednotná terminologie a chytré zalomení řádků. 75 jazyků, zdarma, bez registrace." },
+  'uk': { title: "Переклад субтитрів — SRT / VTT / ASS вашою мовою", desc: "Завантажте субтитри SRT / VTT / ASS, виберіть мову перекладу й отримайте субтитри своєю мовою: автоматичне вирівнювання таймкодів, об'єднання речень, єдина термінологія та розумний перенос рядків. 75 мов, безкоштовно, без реєстрації." },
+  'da': { title: "Oversæt undertekster — SRT / VTT / ASS til dit sprog", desc: "Upload en SRT / VTT / ASS-fil, vælg målsproget og få undertekster på dit eget sprog: automatisk tidslinjejustering, sætningsvis sammenlægning, ensartet terminologi og intelligent linjeskift. 75 sprog, gratis, ingen tilmelding." },
+  'fi': { title: "Tekstitysten kääntäjä — Käännä SRT / VTT / ASS omalle kielellesi", desc: "Lataa SRT / VTT / ASS -tekstitys, valitse kohdekieli ja saa tekstitys omalla kielelläsi: automaattinen aikajanan kohdistus, lauseittainen yhdistäminen, yhtenäinen sanasto ja älykäs rivinvaihto. 75 kieltä, ilmainen, ei rekisteröitymistä." },
+  'el': { title: "Μεταφραστής υποτίτλων — SRT / VTT / ASS στη γλώσσα σας", desc: "Ανεβάστε ένα αρχείο SRT / VTT / ASS, επιλέξτε γλώσσα στόχου και λάβετε υπότιτλους στη γλώσσα σας: αυτόματη ευθυγράμμιση χρονολογίου, συγχώνευση ανά πρόταση, συνεπής ορολογία και έξυπνο σπάσιμο γραμμών. 75 γλώσσες, δωρεάν, χωρίς εγγραφή." },
+  'he': { title: "מתרגם כתוביות - תרגום SRT / VTT / ASS לשפה שלך", desc: "העלה קובץ SRT / VTT / ASS, בחר שפת יעד וקבל כתוביות בשפה שלך: יישור ציר זמן אוטומטי, מיזוג לפי משפטים, מונחים עקביים לאורך הקובץ וחלוקת שורות חכמה. 75 שפות, חינם, בלי הרשמה." },
+  'ro': { title: "Traducător de subtitrări — SRT / VTT / ASS în limba ta", desc: "Încarcă un fișier SRT / VTT / ASS, alege limba țintă și primește subtitrări în limba ta: aliniere automată pe axa timpului, îmbinare pe propoziții, terminologie consecventă și împărțire inteligentă a liniilor. 75 de limbi, gratuit, fără cont." }
+};
+
 const SEO_PAGES = {
   index: { file: 'index.html', table: SEO, path: SEO_PATH, jsonldType: 'WebApplication' },
   merge: { file: 'merge.html', table: SEO_MERGE, path: MERGE_PATH, jsonldType: 'WebApplication' },
-  clean: { file: 'clean.html', table: SEO_CLEAN, path: CLEAN_PATH, jsonldType: 'WebApplication' }
+  clean: { file: 'clean.html', table: SEO_CLEAN, path: CLEAN_PATH, jsonldType: 'WebApplication' },
+  translate: { file: 'translate.html', table: SEO_TRANSLATE, path: TRANSLATE_PATH, jsonldType: 'WebApplication' }
 };
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
@@ -1522,6 +1558,8 @@ function seoHead(lang, base, page){
   page = page || 'index';
   const P = SEO_PAGES[page];
   const s = P.table[lang] || P.table['en'] || P.table['zh-CN'];
+  /* v0.9.277：translate 表只写了 title / desc，关键词沿用首页那张表的同语言值 */
+  const kw = s.kw || ((SEO[lang] || SEO['zh-CN']).kw) || '';
   const selfUrl = base + P.path[lang];
   const alternates = SEO_LANGS.filter(function (l) { return P.table[l]; }).map(function (l) {
     return '<link rel="alternate" hreflang="' + l + '" href="' + base + P.path[l] + '">';
@@ -1552,7 +1590,7 @@ function seoHead(lang, base, page){
   return [
     '<title>' + s.title + '</title>',
     '<meta name="description" content="' + s.desc + '">',
-    '<meta name="keywords" content="' + (s.kw || '') + '">',
+    '<meta name="keywords" content="' + kw + '">',
     '<meta name="robots" content="index, follow">',
     '<meta name="theme-color" content="#0E9488">',
     '<link rel="icon" type="image/svg+xml" href="/favicon.svg">',
@@ -1586,7 +1624,11 @@ function serveIndexLang(req, res, lang, page){
     html = html.replace(/<!--SEO-HEAD-START-->[\s\S]*?<!--SEO-HEAD-END-->/,
       '<!--SEO-HEAD-START-->\n' + head + '\n<!--SEO-HEAD-END-->');
     /* 首页那张表自带整段 copy；另两页由 seoCopy() 现拼（没有就跳过，页面照常出） */
-    const copy = (page === 'index') ? (SEO[lang] && SEO[lang].copy) : seoCopy(page, lang);
+    /* v0.9.277：那段 copy 通篇讲的是字幕翻译引擎，正好属于 /translate.html；
+       首页现在是四工具落地页，正文本身就是静态 HTML，不再需要这段注入。 */
+    const copy = (page === 'index') ? (SEO[lang] && SEO[lang].copy)
+               : (page === 'translate') ? (SEO[lang] && SEO[lang].copy)
+               : seoCopy(page, lang);
     if (copy) {
       html = html.replace(/<!--SEO-COPY-START-->[\s\S]*?<!--SEO-COPY-END-->/,
         '<!--SEO-COPY-START-->\n  ' + copy + '\n  <!--SEO-COPY-END-->');
@@ -1605,8 +1647,9 @@ function serveIndexLang(req, res, lang, page){
   });
 }
 
-/* sitemap：三页 × 27 语言 = 81 条 URL，每条带本页的 hreflang alternates。
-   v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。 */
+/* sitemap：四页 × 27 语言 = 108 条 URL，每条带本页的 hreflang alternates。
+   v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。
+   v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。 */
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {
