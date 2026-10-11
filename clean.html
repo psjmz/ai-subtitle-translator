@@ -310,7 +310,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.274"></script>
+<script src="clean-core.js?v=0.9.275"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -660,6 +660,7 @@ function setSource(text, name, enc) {
   $('#dlExt').textContent = outExt();
   runClean();
   render();
+  reportClean('clean');   /* v0.9.275：清洗使用记录（后台「字幕清洗记录」） */
 }
 
 /* ---------------- v0.9.271：双语提示条 ---------------- */
@@ -711,6 +712,58 @@ function toast(msg) {
   clearTimeout(toastT);
   toastT = setTimeout(function () { el.classList.remove('show'); }, 2200);
 }
+/* ---------------- v0.9.275：清洗页使用记录上报 ----------------
+   清洗页是纯前端工具，请求不过服务端，此前后台看不到这个模块谁在用、
+   清洗出多少改动、命中哪几条规则、最终导成什么格式。
+   只报元数据，**绝不报字幕内容**（不带上 before/after 任何一个字）。
+
+   ⚠️ 客户端去重的必要性：勾一个复选框就重跑一次 runClean，不去重的话
+      同一份字幕会在后台刷出几十条一模一样的记录。
+      窗口按 kind 分开：clean 30 分钟（同一份文件的反复调整算一次），
+      export 60 秒（防连点下载）。 */
+const CL_DEDUP_MS = { clean: 30 * 60 * 1000, export: 60 * 1000 };
+let _clLast = { body: '', t: 0 };
+/* 改动条数：del=true 是整条删掉（这类单独看，因为它意味着条目数会变少） */
+function chgN(del) {
+  var n = 0;
+  S.changes.forEach(function (c, i) {
+    if (S.off.has(i)) return;                  /* 被用户「还原」的不算 */
+    if (del ? c.del : !c.del) n++;
+  });
+  return n;
+}
+/* 命中了哪几条规则：tags 是逐次-patch 的反查结果（见 clean-core.js），非空才算命中 */
+function hitRules() {
+  var set = [];
+  S.changes.forEach(function (c, i) {
+    if (S.off.has(i)) return;
+    (c.tags || []).forEach(function (g) { if (set.indexOf(g) < 0) set.push(g); });
+  });
+  return set;
+}
+function reportClean(kind) {
+  try {
+    var k = (kind === 'export') ? 'export' : 'clean';
+    var body = JSON.stringify({
+      kind: k,
+      src: S.fname || '',
+      cues: S.raw.length,
+      mod: chgN(false),
+      del: chgN(true),
+      rules: hitRules(),
+      fmt: k === 'export' ? S.outFmt : ''
+    });
+    var now = Date.now();
+    if (body === _clLast.body && now - _clLast.t < (CL_DEDUP_MS[k] || 0)) return;
+    _clLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/clean-event', new Blob([body], { type: 'application/json' }))) return; } catch (e) {}
+    }
+    fetch('/api/clean-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () {});
+  } catch (e) {}
+}
+
 /* v0.9.271：不再写 BOM。此前给每个文件都加了 \uFEFF，本意是帮 Windows 认出 UTF-8，
    代价是第一个序号变成了「\uFEFF1」—— 不少字幕解析器（含部分播放器与剪辑软件）
    认不出这个序号，整份字幕直接判为无效。UTF-8 已经是事实标准，不值得为极少数
@@ -800,6 +853,7 @@ function bind() {
   $('#btnDownload').addEventListener('click', function () {
     if (!S.raw.length) return toast(t('noFile'));
     download(baseName() + outExt(), outMain());
+    reportClean('export');   /* v0.9.275：导出格式上报（后台「字幕清洗记录」） */
     toast(t('okDl'));
   });
   $('#btnTxt').addEventListener('click', function () {

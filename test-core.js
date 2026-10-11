@@ -5349,7 +5349,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.274/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5389,9 +5389,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.274</.test(html), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.274</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.274/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.275</.test(html), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.275</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5568,8 +5568,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.274</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.274/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.275</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7410,11 +7410,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.274/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.274/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.274/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.274/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.274/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.275/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.275/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.275/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8914,14 +8914,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.274/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.274/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.275/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.274/.test(html), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.274/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.274/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.275/.test(html), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.275/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.274/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.275/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9240,13 +9240,62 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/LANG = pathUiLang\(\) \|\| saved/.test(cln), 'clean.html 没按 URL 语言定界面语言');
   });
 
-  t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.274/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.274/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.274/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.274/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.274/.test(mg), 'merge.html 缓存 bust 没跟上');
+  t('v0.9.275：清洗页使用埋点 + 后台「字幕清洗记录」卡片（第三个纯前端模块终于看得见）', () => {
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.274/.test(cln), 'clean.html 缓存 bust 没跟上');
+    const adm = require('fs').readFileSync(require('path').join(__dirname, 'admin.html'), 'utf8');
+    const sv = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+
+    /* ① 清洗页必须真的上报：它是纯前端工具，请求不过服务端，不埋点后台永远是空的 */
+    assert.ok(/function reportClean\(kind\)/.test(cln), 'clean.html 没有 reportClean');
+    assert.ok(/'\/api\/clean-event'/.test(cln), 'clean.html 没往 /api/clean-event 发');
+    const reportBody = (cln.match(/var body = JSON\.stringify\(\{([\s\S]*?)\}\);/) || ['', ''])[1];
+    assert.ok(/src: S\.fname \|\| ''/.test(reportBody), '上报体没带文件名');
+    assert.ok(/cues: S\.raw\.length/.test(reportBody), '上报体没带条目数');
+    assert.ok(/mod: chgN\(false\)/.test(reportBody) && /del: chgN\(true\)/.test(reportBody), '没报改动数 / 删除数');
+    assert.ok(/rules: hitRules\(\)/.test(reportBody), '没报命中规则');
+    /* ⚠️ 上报体里绝不能出现字幕正文 —— before/after 一个字都不许带上服务器 */
+    assert.ok(!/\b(before|after)\s*:/.test(reportBody), '上报体混进了字幕正文（before/after）');
+    /* 两个调用点：解析清洗完成一次、真的下载了一次 */
+    const calls = cln.match(/reportClean\('(?:clean|export)'\)/g) || [];
+    assert.ok(calls.indexOf("reportClean('clean')") >= 0, '缺「清洗完成」上报点');
+    assert.ok(calls.indexOf("reportClean('export')") >= 0, '缺「导出」上报点');
+    /* 去重：勾一个复选框就重跑一次清洗，不去重后台会被同一份字幕刷屏 */
+    assert.ok(/const CL_DEDUP_MS = \{ clean: 30 \* 60 \* 1000/.test(cln), '缺客户端去重窗口');
+
+    /* ② 服务端：公开上报口 + 后台读取口 + 独立账本 */
+    assert.ok(/u === '\/api\/clean-event'/.test(sv), 'server.js 没开 /api/clean-event');
+    assert.ok(/u === '\/api\/admin\/clean-events'/.test(sv), 'server.js 没开 /api/admin/clean-events');
+    assert.ok(/const CEVENTS_PATH = path\.join\(DATA_DIR, 'clean-events\.json'\)/.test(sv), '没用独立的 clean-events.json');
+    assert.ok(/kind: 'clean'（解析并清洗完成）/ .test(sv) || /kind === 'export' \? 'export' : 'clean'/.test(sv), '服务端没区分 clean / export');
+    /* 粘贴进来的字幕没有文件名，不能按「没文件名就丢弃」处理（那等于整类粘贴用户不入库） */
+    assert.ok(/if \(!src && cues <= 0\) return;/.test(sv), '空请求判据不对（会把粘贴用户整类丢掉）');
+
+    /* ③ 词表三处同步：清洗页加规则后，服务端白名单与后台中文名必须跟着动，
+         漏一处 = 新规则「用户在用但站长看不见」，统计直接失真。 */
+    const optIds = [...cln.matchAll(/\{ id:'(\w+)',\s+grp:/g)].map(m => m[1]);
+    assert.ok(optIds.length >= 13, '没从 clean.html 读到 13 条清洗规则', optIds.length);
+    const wl = (sv.match(/const CLEAN_RULE = \{([\s\S]*?)\};/) || [])[1] || '';
+    optIds.forEach(id => assert.ok(new RegExp('\\b' + id + ':').test(wl), 'server.js 规则白名单缺 ' + id));
+    const cn = (adm.match(/const CL_RULE_TXT = \{([\s\S]*?)\};/) || [])[1] || '';
+    optIds.forEach(id => assert.ok(new RegExp('\\b' + id + ':').test(cn), '后台中文名表缺 ' + id));
+
+    /* ④ 后台卡片 */
+    assert.ok(/id="cleanCard"/.test(adm), 'admin.html 缺 cleanCard');
+    assert.ok(/loadCleanEvents\(\);/.test(adm), '登录后没自动加载清洗记录');
+    assert.ok(/\/api\/admin\/clean-events\?page=/.test(adm), '后台没调 clean-events 接口');
+    const heads = (adm.match(/id="cleanCard"[\s\S]*?<thead>([\s\S]*?)<\/thead>/) || ['', ''])[1];
+    assert.strictEqual((heads.match(/<th>/g) || []).length, 8, '清洗记录表格不是 8 列');
+    /* 分页必须独立：写死 evPager / 全局 evPage 会把翻译记录的页码冲掉（244 踩过） */
+    assert.ok(/renderPager\(j, 'clPager', clPage\)/.test(adm), '缺独立分页');
+  });
+
+  t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
+    assert.ok(/class="ver">v0\.9\.275/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.275/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.275/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 缓存 bust 没跟上');
+    const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
+    assert.ok(/clean-core\.js\?v=0\.9\.275/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 }

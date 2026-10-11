@@ -508,6 +508,67 @@ function countTop(arr, key, n){
   return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n || 10).map(([name, n2]) => ({ name, n: n2 }));
 }
 
+/* ---------------- 字幕清洗页使用记录（v0.9.275）----------------
+   清洗页（clean.html）同样是纯前端工具：解析、清洗、导出全在浏览器里做，
+   请求根本不过服务端，此前后台对这个模块的使用情况完全看不见。
+   ⚠️ 照例单独一个文件 clean-events.json，不混进 events / merge-events：
+      三者口径不同——翻译按「任务」去重累加，合并一次一记，清洗也是一次一记但字段完全不同。
+   只记元数据（文件名 / 条数 / 改动数 / 删除数 / 命中规则 / 导出格式），绝不记字幕内容。 */
+const CEVENTS_PATH = path.join(DATA_DIR, 'clean-events.json');
+const CEVENTS_MAX = 2000;
+const CLEAN_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass' };
+/* 清洗规则白名单：与 clean.html 的 OPT[].id 一一对应（13 条）。
+   ⚠️ 加减规则必须同步这里，否则新规则命中了后台却记成空值——
+      等于「用户在用这条规则，但站长看不见」，统计直接失真。 */
+const CLEAN_RULE = {
+  assFx: 'assFx', html: 'html', ctrl: 'ctrl', sort: 'sort', sdh: 'sdh',
+  speaker: 'speaker', music: 'music', wm: 'wm', dup: 'dup', empty: 'empty',
+  punct: 'punct', upper: 'upper', merge: 'merge'
+};
+/* tags 是数组（一条改动可能同时命中多条规则），逐条过白名单去重 */
+function cleanRulesOf(v){
+  const out = [];
+  for (const r of (Array.isArray(v) ? v : [])) {
+    const k = pickWL(CLEAN_RULE, r);
+    if (k && out.indexOf(k) < 0) out.push(k);
+  }
+  return out.slice(0, 13);
+}
+function readCEvents(){
+  try {
+    const j = JSON.parse(fs.readFileSync(CEVENTS_PATH, 'utf8'));
+    if (Array.isArray(j.events)) return j;
+  } catch (e) {}
+  return { events: [] };
+}
+/* kind: 'clean'（解析并清洗完成）| 'export'（真的下载了文件）。两条都写：
+   clean 那条能看出「有人上传了却没导出」（多半是结果不满意或中途放弃），
+   export 那条带最终生效的改动数、删除数与导出格式。 */
+function appendCEvent(ip, body){
+  const b = (body && typeof body === 'object') ? body : {};
+  const kind = (b.kind === 'export') ? 'export' : 'clean';
+  const src = cleanName(b.src);
+  const cues = Math.max(0, Math.min(1000000, Math.floor(+b.cues || 0)));
+  /* ⚠️ 粘贴进来的字幕没有文件名。此时不能按「没有文件名就丢弃」处理——
+     那等于把粘贴用户整类排除在外，后台看到的量会被系统性低估。
+     判据放宽到「有文件名 或 有条目」。 */
+  if (!src && cues <= 0) return;
+  const num = v => Math.max(0, Math.min(1000000, Math.floor(+v || 0)));
+  const ev = {
+    t: Date.now(), ip: String(ip || ''), kind: kind,
+    src: src, cues: cues,
+    mod: num(b.mod), del: num(b.del),
+    rules: cleanRulesOf(b.rules)
+  };
+  if (kind === 'export') ev.fmt = pickWL(CLEAN_FMT, b.fmt);
+  try {
+    const db = readCEvents();
+    db.events.push(ev);
+    if (db.events.length > CEVENTS_MAX) db.events = db.events.slice(-CEVENTS_MAX);
+    fs.writeFileSync(CEVENTS_PATH, JSON.stringify(db), 'utf8');
+  } catch (e) {}
+}
+
 /* ---------------- 管理会话（内存 token） ---------------- */
 const TOKENS = new Set();
 function newToken(){ const tk = crypto.randomBytes(24).toString('hex'); TOKENS.add(tk); return tk; }
@@ -2353,6 +2414,18 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { ok: true });
     }
 
+    /* v0.9.275：字幕清洗页使用记录上报（公开轻接口，与 /api/merge-event 同规格：fire-and-forget）。
+       body: {kind:'clean'|'export', src, cues, mod, del, rules[], fmt?}
+       只收元数据，不收字幕内容；任何不认识的字段一律丢弃，不留脏字段。 */
+    if (req.method === 'POST' && u === '/api/clean-event') {
+      let cbody;
+      try { cbody = JSON.parse(await readBody(req, 4 * 1024)); } catch (e) {
+        return sendJson(res, 400, { error: { message: 'Request body is not valid JSON' } });
+      }
+      try { appendCEvent(clientIp(req), cbody); } catch (e) {}
+      return sendJson(res, 200, { ok: true });
+    }
+
     /* 管理登录 */
     if (req.method === 'POST' && u === '/api/admin/login') {
       let body;
@@ -2484,6 +2557,45 @@ const server = http.createServer(async (req, res) => {
           topFiles: [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n })),
           topFmts: countTop(exp.filter(e => e.fmt), 'fmt'),
           topTpls: countTop(exp.filter(e => e.tpl), 'tpl')
+        };
+        const newest = all.slice().reverse();
+        if (q.page !== undefined) {
+          const size = Math.min(100, Math.max(1, parseInt(q.size, 10) || 20));
+          const pages = Math.max(1, Math.ceil(all.length / size));
+          const page = Math.min(pages, Math.max(1, parseInt(q.page, 10) || 1));
+          return sendJson(res, 200, Object.assign(base, {
+            page, size, pages,
+            events: newest.slice((page - 1) * size, page * size)
+          }));
+        }
+        const qLimit = Math.min(500, Math.max(1, parseInt(q.limit, 10) || 100));
+        return sendJson(res, 200, Object.assign(base, { events: newest.slice(0, qLimit) }));
+      }
+
+      /* v0.9.275：字幕清洗页使用记录（独立于上面两块，字段是清洗页独有的一套） */
+      if (req.method === 'GET' && u === '/api/admin/clean-events') {
+        let q = {};
+        try { q = Object.fromEntries(new URL('http://x' + req.url).searchParams); } catch (e) {}
+        const all = readCEvents().events;
+        const today = todayStr();
+        const todays = all.filter(e => dateOfTs(e.t) === today);
+        const exp = all.filter(e => e.kind === 'export');
+        /* 规则 TOP：一条改动可能同时命中多条规则（tags 是数组），每条规则各计一次 */
+        const rm = new Map();
+        for (const e of all) {
+          for (const r of (e.rules || [])) rm.set(r, (rm.get(r) || 0) + 1);
+        }
+        const base = {
+          total: all.length,
+          today: {
+            count: todays.length,
+            ips: new Set(todays.map(e => e.ip)).size,
+            cleaned: todays.filter(e => e.kind === 'clean').length,
+            exported: todays.filter(e => e.kind === 'export').length
+          },
+          topFiles: countTop(all.filter(e => e.src), 'src'),
+          topRules: [...rm.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n })),
+          topFmts: countTop(exp.filter(e => e.fmt), 'fmt')
         };
         const newest = all.slice().reverse();
         if (q.page !== undefined) {

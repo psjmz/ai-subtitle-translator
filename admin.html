@@ -242,6 +242,22 @@
       <div class="btns"><button id="btnRefreshMerge">刷新</button></div>
     </div>
 
+    <!-- v0.9.275：字幕清洗页（clean.html）同样是纯前端工具，此前零埋点——
+         谁在用、一份字幕被改动了多少条、哪几条清洗规则最常命中、导成什么格式，后台一概看不见。 -->
+    <div class="card" id="cleanCard" style="display:none">
+      <h2>🧹 字幕清洗记录（清洗 / 整理模块）</h2>
+      <div class="stats" id="clStats"></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>IP</th><th>上传字幕</th><th>条数</th><th>改动</th><th>删除</th><th>命中规则</th><th>导出格式</th></tr></thead>
+          <tbody id="clRows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="clPager"></div>
+      <div class="note">清洗页是纯前端工具（解析、清洗、导出全在浏览器里做），只在使用时上报元数据：文件名、条目数、改动条数、删除条数、命中的清洗规则、导出格式；<b>不记录任何字幕内容</b>。「清洗」= 上传解析完成，「导出」= 真的下载了文件——只清洗没导出的会停在前一种，多半是结果不满意。<b>改动</b>是最终生效的条数（用户在界面上「还原」过的不算）。</div>
+      <div class="btns"><button id="btnRefreshClean">刷新</button></div>
+    </div>
+
     <div class="card">
       <h2>修改管理密码</h2>
       <div class="row">
@@ -485,6 +501,7 @@ async function enterAdmin(){
   catch (e) { msg('cfgMsg', '读取配置失败：' + e.message, 'err'); }
   loadEvents();
   loadMergeEvents();   /* v0.9.244：双语合并记录（加载失败自己静默，不影响主配置） */
+  loadCleanEvents();   /* v0.9.275：字幕清洗记录（同上，独立一张卡） */
 }
 
 /* 使用行为记录（v0.9.42 分页：20 条/页，最新在第 1 页） */
@@ -635,6 +652,60 @@ $('mgPager').addEventListener('click', e => {
   loadMergeEvents();
 });
 $('btnRefreshMerge').addEventListener('click', loadMergeEvents);
+
+/* v0.9.275：字幕清洗页使用记录（第三张独立卡片，与前两张互不干扰） */
+let clPage = 1;
+const CL_FMT_TXT = { srt: 'SRT', vtt: 'VTT', ass: 'ASS' };
+/* 规则码 → 中文名。后台是中文界面，别把 assFx / sdh 这种内部 id 直接甩给站长看。
+   ⚠️ 与 clean.html 的 OPT[].id 一一对应，加规则时必须同步这里和 server.js 的 CLEAN_RULE。 */
+const CL_RULE_TXT = {
+  assFx: 'ASS 特效', html: 'HTML 标签', ctrl: '控制符', sort: '排序', sdh: '听障提示',
+  speaker: '说话人', music: '歌词行', wm: '水印', dup: '重复条目', empty: '空条目',
+  punct: '标点', upper: '全大写', merge: '合并短句'
+};
+async function loadCleanEvents(){
+  try {
+    const j = await api('/api/admin/clean-events?page=' + clPage + '&size=20');
+    show('cleanCard', true);
+    const chips = [];
+    chips.push('今日 <b>' + j.today.count + '</b> 条');
+    if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
+    if (j.today.cleaned !== undefined) chips.push('清洗 <b>' + j.today.cleaned + '</b> 次');
+    if (j.today.exported !== undefined) chips.push('导出 <b>' + j.today.exported + '</b> 次');
+    if (j.topRules && j.topRules[0]) chips.push('最常命中规则：<b>' + esc(j.topRules.slice(0, 3).map(x => (CL_RULE_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topFmts && j.topFmts[0]) chips.push('导出格式：<b>' + esc(j.topFmts.slice(0, 3).map(x => (CL_FMT_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topFiles && j.topFiles[0]) chips.push('最常处理：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
+    chips.push('累计 <b>' + j.total + '</b> 条');
+    $('clStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+    $('clRows').innerHTML = (j.events || []).map(e => {
+      const fileTd = e.src ? esc(e.src) : '<span style="color:var(--mut)">粘贴输入</span>';
+      /* 「导出」才是真正拿到了文件；只停在「清洗」说明用户没下载（多半是结果不满意） */
+      const kindTd = (e.kind === 'export') ? '<b>导出</b>' : '<span style="color:var(--mut)">清洗</span>';
+      const fmtTd = e.fmt ? '<b>' + esc(CL_FMT_TXT[e.fmt] || e.fmt) + '</b>' : '<span style="color:var(--mut)">-</span>';
+      const ruleTd = (e.rules && e.rules.length)
+        ? esc(e.rules.map(r => CL_RULE_TXT[r] || r).join('、'))
+        : '<span style="color:var(--mut)">无改动</span>';
+      /* 0 条保持灰色，避免整列全是高亮数字反而看不出重点 */
+      const modTd = e.mod ? '<b>' + e.mod + '</b>' : '<span style="color:var(--mut)">0</span>';
+      const delTd = e.del ? '<b style="color:#c00">' + e.del + '</b>' : '<span style="color:var(--mut)">0</span>';
+      return '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) +
+        '</td><td title="' + esc(e.src || '') + '">' + fileTd + '</td><td>' + (e.cues || '-') +
+        '</td><td>' + modTd + '</td><td>' + delTd + '</td><td class="rulecell">' + ruleTd +
+        '</td><td>' + kindTd + ' ' + fmtTd + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" style="color:var(--mut)">暂无记录（用户在清洗页上传字幕或下载结果后会出现在这里）</td></tr>';
+    renderPager(j, 'clPager', clPage);
+  }
+  catch (e) { /* 记录区加载失败不影响主配置页 */ }
+}
+$('clPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === clPage) return;
+  clPage = p;
+  loadCleanEvents();
+});
+$('btnRefreshClean').addEventListener('click', loadCleanEvents);
 
 /* 初始化：有 token 直接进，否则显示登录 */
 (async function init(){
