@@ -3868,8 +3868,9 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(!/<img id="donateImg" alt="支付宝收款码" src=/i.test(html), 'img 不许带静态 src（收起态会偷跑请求）');
     assert.ok(/donate-qr-square\.png\?v=/.test(init), '展开时没赋图片 src');
     assert.ok(/var opening=qr\.hidden;/.test(init), '展开/收起切换逻辑找不到');
-    assert.strictEqual((html.match(/AI算力紧张，给网站支持点 Token费/g) || []).length, 2,
+    assert.strictEqual((html.match(/如果这个工具有帮到你，欢迎赞助几块钱算力费/g) || []).length, 2,
       '文案应恰好出现 2 次（按钮默认 + 收起态要还原的那份）');
+    assert.ok(html.indexOf('AI算力紧张') < 0, '旧文案「AI算力紧张…Token费」还残留');
   });
 
   t('v0.9.173 二维码图片实体存在且体积可控', () => {
@@ -5033,10 +5034,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/localStorage\.setItem\('srtDonateV1','1'\)/.test(html),
       '导出标记仍应照写（留给将来按「导出过」换文案用）');
     assert.ok(/if\(window\.__donateReveal\) window\.__donateReveal\(\);/.test(html), '导出成功后的回调没了');
-    assert.ok(/AI算力紧张，给网站支持点 Token费/.test(html), '主文案丢了');
+    assert.ok(/如果这个工具有帮到你，欢迎赞助几块钱算力费/.test(html), '主文案丢了');
     assert.ok(/<div class="hint">图个快乐，多少随意<\/div>/.test(html), '展开态的「图个快乐，多少随意」丢了');
     /* 收起态的按钮必须能原样回到主文案，否则点一次就回不来了 */
-    assert.ok(/图个快乐，多少随意/.test(html) && /AI算力紧张，给网站支持点 Token费/.test(html),
+    assert.ok(/图个快乐，多少随意/.test(html) && /如果这个工具有帮到你，欢迎赞助几块钱算力费/.test(html),
       '赞助文案不全（展开态与主文案得都有）');
   });
 
@@ -5383,7 +5384,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.280/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.281/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5424,9 +5425,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.280</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.280</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.280/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.281</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.281</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.281/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5612,8 +5613,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.280</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.280/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.281</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.281/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7454,11 +7455,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.280/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.280/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.280/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.280/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.280/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.281/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.281/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.281/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.281/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.281/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8963,14 +8964,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.280/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.280/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.281/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.281/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.280/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.280/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.280/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.281/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.281/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.281/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.280/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.281/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9441,13 +9442,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.280/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.280/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.280/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.280/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.280/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.281/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.281/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.281/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.281/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.281/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.280/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.281/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9469,7 +9470,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0\.9\.280">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0\.9\.281">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9480,7 +9481,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.280') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.281') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -9714,6 +9715,23 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       assert.ok(/\.(?:logo|logo-sm|brand)\{[^}]*display:(?:flex|inline-flex)/.test(src),
         name + ' 的 logo 原有 flex 布局不见了');
     });
+  });
+
+  t('v0.9.281：赞助文案换成长句（右栏 320px 放不下，得能折行且不溢出）', () => {
+    const TXT = '如果这个工具有帮到你，欢迎赞助几块钱算力费';
+    /* ① 新文案恰好 2 处：按钮里的默认文字 + TXT_IDLE（点开再收起要还原的那份）。
+          ⚠️ 注释里别抄整句 —— 抄了计数就成 3，这条会红（实测踩过）。 */
+    assert.strictEqual((WS_SRC.match(new RegExp(TXT, 'g')) || []).length, 2,
+      '新文案不是恰好 2 次（按钮一份 + TXT_IDLE 一份）');
+    assert.ok(WS_SRC.indexOf('AI算力紧张') < 0, '旧文案「AI算力紧张…Token费」还残留');
+    assert.ok(WS_SRC.indexOf("var TXT_IDLE='" + TXT + "'") > 0,
+      'TXT_IDLE 没跟着改：点开二维码再收起会跳回旧文案');
+    /* ② 这句 22 个字，右栏只有 320px（实测按钮可用宽 286px）→ 必然折两行。
+          默认 line-height:1 是为单行胶囊设的，折行时两行会紧贴成一块，必须放宽。 */
+    assert.ok(/#btnDonate\{[^}]*max-width:100%/.test(WS_SRC), '按钮没限宽（折行时会撑破右栏）');
+    assert.ok(/#btnDonate\{[^}]*line-height:1\.4/.test(WS_SRC), '按钮行距还是 1，折行会贴成一块');
+    assert.ok(/#btnDonate #donateTxt\{[^}]*text-wrap:balance/.test(WS_SRC),
+      '两行长度没均分（会一行长、一行只剩俩字）');
   });
 
   });
