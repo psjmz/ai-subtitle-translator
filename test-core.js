@@ -2853,7 +2853,9 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/ai-srtsub\\\.com\$\/i\.test\(host\)/.test(html), '缺少官方域名判断');
     assert.ok(/sessionStorage\.setItem\('rkForce','1'\)/.test(html), '调试标记未落 sessionStorage');
     assert.ok(/sessionStorage\.getItem\('rkForce'\)==='1'/.test(html), '调试标记未回读');
-    assert.ok(/hero\.classList\.toggle\('has-rk'/.test(html), '未切换 hero class');
+    /* v0.9.278：hero 上的 emoji 装饰整块撤了，给装饰让位的 has-rk 也一并删掉。
+       ⚠️ 判据只能查**代码形态**：改动说明那段注释里就写着 has-rk，查全串永远红。 */
+    assert.ok(!/classList\.toggle\('has-rk'/.test(html), '工作台还留着给 hero 装饰让位的空转分支');
   });
   t('引流条（工作台卡片）的链接与文案走 i18n', () => {
     /* v0.9.277：首页那条横条升级成了「视频下载工具」卡片（id=dlCard），
@@ -2863,7 +2865,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/data-i18n-html="rkTx"/.test(html), '文案未走 i18n（html）');
     assert.ok(/data-i18n="rkGo"/.test(html), 'CTA 未走 i18n');
     /* 首页那条 hero 装饰让位规则要跟着首页落地页走 */
-    assert.ok(/\.hero\.has-rk \.spark\.s3\{display:none\}/.test(HOME_SRC), '首页底部装饰未让位');
+    /* v0.9.278：hero 上那三个 emoji 装饰（✨🎬💜）全撤了 —— 全站规矩「不用 emoji」，
+       而且 💜 会压住副标题的「免注册」。这里反过来断言「不许再挂回来」。 */
+    assert.ok(!/class="spark/.test(HOME_SRC), '首页又挂回了 hero 的 emoji 装饰');
+    assert.ok(!/\.hero \.spark/.test(HOME_SRC), '首页又留了 spark 的样式');
   });
 
   /* 从 index.html 抠出真实的 detectUiLang 来跑，避免测试与实现各写一套而漂移 */
@@ -5378,7 +5383,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.277/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.278/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5419,15 +5424,16 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.277</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.277</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.277/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.278</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.278</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.278/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
     const nv = require('fs').readFileSync(require('path').join(__dirname, 'site-nav.js'), 'utf8');
     /* v0.9.277：首页落地页改由「四张工具卡」承担导航 —— 顶部再挂一排胶囊是重复，
-       所以 index.html 里两种占位都不该有；三个工具页 + 工作台照旧挂 siteNav。 */
+       所以 index.html 里两种占位都不该有。
+       v0.9.278：工作台也撤了 —— 胶囊只在特效页 / 清洗页出现（见下方断言）。 */
     assert.ok(!/<span id="siteNav">/.test(HOME_SRC), '首页又挂回了 siteNav 胶囊（跟工具卡重复）');
     assert.ok(!/<div id="toolCards">/.test(HOME_SRC), '首页又挂回了 #toolCards（v0.9.276 已撤）');
     assert.ok(!/href="merge\.html"/.test(HOME_SRC), '首页仍写死 merge.html 入口（应交给 site-nav.js）');
@@ -5437,13 +5443,18 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/href: '\/translate\.html'/.test(nv), 'site-nav.js 的翻译入口没指向 /translate.html');
     assert.ok(/href: '\/merge\.html'/.test(nv), 'site-nav.js 缺 merge.html 入口');
     assert.ok(/href: '\/clean\.html'/.test(nv), 'site-nav.js 缺 clean.html 入口');
-    /* 三个工具页 + 工作台都要挂，且 data-tool 必须各不相同（挂错 = 高亮错页） */
-    [['translate.html', 'tr'], ['merge.html', 'fx'], ['clean.html', 'clean']].forEach(pr => {
+    /* v0.9.278：工具胶囊只留在特效页 / 清洗页 —— 用户定案「工作台顶栏不需要增加导航」
+       （顶栏已有 项目名 + 播报 + 上传/开始翻译/语言，再塞三个胶囊会折行）。
+       所以 data-tool 必须各不相同（挂错 = 高亮错页），且工作台反过来要断言「一个都没有」。 */
+    [['merge.html', 'fx'], ['clean.html', 'clean']].forEach(pr => {
       const src = require('fs').readFileSync(require('path').join(__dirname, pr[0]), 'utf8');
       assert.ok(src.indexOf('<script src="site-nav.js" data-tool="' + pr[1] + '"></script>') > 0,
         pr[0] + ' 未以 data-tool=' + pr[1] + ' 引入 site-nav.js');
       assert.ok(/<span id="siteNav"><\/span>/.test(src), pr[0] + ' 缺 #siteNav 占位');
     });
+    /* 工作台：既不许有胶囊占位，也不许引 site-nav.js（页面里没占位，引了纯属白注入一段样式） */
+    assert.ok(!/<span id="siteNav">/.test(html), '工作台又挂回了顶栏胶囊导航');
+    assert.ok(html.indexOf('<script src="site-nav.js"') < 0, '工作台又引回了 site-nav.js');
     /* v0.9.221 用户定案：「全程本地处理，字幕不上传服务器」这句没意义，删干净不许回来
        （含 4 语词条 localNote、hero 里的 pill 徽标、CSS、meta description 尾巴） */
     assert.ok(!/localNote/.test(mg), 'localNote 词条残留');
@@ -5601,8 +5612,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.277</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.277/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.278</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.278/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7443,11 +7454,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.277/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.277/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.277/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.277/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.277/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.278/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.278/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.278/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.278/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.278/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8952,14 +8963,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.277/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.277/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.278/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.278/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.277/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.277/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.277/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.278/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.278/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.278/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.277/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.278/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9430,13 +9441,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.277/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.277/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.277/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.277/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.277/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.278/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.278/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.278/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.278/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.278/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.277/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.278/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9458,7 +9469,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0\.9\.277">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0\.9\.278">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9469,7 +9480,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.277') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.278') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');

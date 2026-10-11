@@ -658,7 +658,7 @@ crossorigin="anonymous"></script>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.277</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.278</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -1196,7 +1196,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.277"></script>
+<script src="merge-core.js?v=0.9.278"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -5927,11 +5927,19 @@ init();
       单语 → 「单语字幕」（不配对，直接进表）。取完立即删掉暂存，刷新不该再灌一次。 */
 (function(){
   let raw=null;
-  try{ raw=sessionStorage.getItem('srt_fx_in'); }catch(e){}
-  if(!raw) return;
+  /* v0.9.278：翻译页改成「新标签页」打开了。跨标签页 sessionStorage 取不取得到要看浏览器，
+     所以那边同时往 localStorage 落一份 —— 这里先读 localStorage，再回退 sessionStorage
+     （老流程/老书签照旧走 sessionStorage，两处读完都删）。 */
+  try{ raw=localStorage.getItem('srt_fx_in'); }catch(e){}
+  if(!raw){ try{ raw=sessionStorage.getItem('srt_fx_in'); }catch(e){} }
+  try{ localStorage.removeItem('srt_fx_in'); }catch(e){}
   try{ sessionStorage.removeItem('srt_fx_in'); }catch(e){}
+  if(!raw) return;
   let d=null; try{ d=JSON.parse(raw); }catch(e){}
   if(!d || !d.text) return;
+  /* 新标签页被弹窗拦下时那份会一直躺在 localStorage 里，不设过期的话，
+     用户下次手点进特效页会被一份陈年字幕灌进去（TTL 与翻译页的 FX_TTL 保持一致）。 */
+  if(d.at && Date.now()-d.at > 120000) return;
   const mode = (d.mode==='mono') ? 'mono' : 'adjust';
   const r = document.querySelector('#modeTabs input[name=workMode][value="'+mode+'"]');
   if(r && !r.checked){ r.checked=true; r.dispatchEvent(new Event('change',{bubbles:true})); }

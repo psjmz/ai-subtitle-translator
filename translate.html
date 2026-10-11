@@ -273,11 +273,29 @@
   .fmt-btn:focus{outline:none}
   .fmt-btn:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
   /* v0.9.258：去特效字幕的入口。放在导出按钮下面 —— 用户拿到字幕的那一刻，
-     才是「还想再调细一点」这个念头最强的时候。 */
-  .fx-goto{margin-top:10px;border:1px solid var(--acc-line);border-radius:10px;
-    background:var(--acc-weak);padding:9px 10px}
-  .fx-goto .btn{width:100%;height:32px;justify-content:center;font-size:12.5px;gap:5px}
-  .fx-goto .hint{margin-top:6px;color:var(--sub);font-size:11px;line-height:1.5}
+     才是「还想再调细一点」这个念头最强的时候。
+     v0.9.278：从「外粉框 + 内按钮」改成一张紫色引导卡 —— 两层边框套在一起太吵，
+     箭头也紧贴文字。现在跟首页四张工具卡同构，整卡可点、新标签页打开。
+     紫 = 特效页的色线（--fx* 本来就是为它准备的）。没译文时整卡置灰（见 .fx-card.dis）。 */
+  .fx-card{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 11px;
+    border:1px solid var(--fx-line);border-radius:10px;background:var(--fx-weak);
+    text-decoration:none;transition:border-color .15s}
+  .fx-card:hover{border-color:var(--fx)}
+  .fx-card:focus-visible{outline:2px solid var(--fx);outline-offset:1px}
+  .fx-card .fx-ic{width:28px;height:28px;flex:none;border-radius:8px;background:var(--fx);color:#fff;
+    display:flex;align-items:center;justify-content:center}
+  .fx-card .fx-ic svg{width:15px;height:15px}
+  .fx-card .fx-tx{flex:1;min-width:0}
+  .fx-card .fx-n{display:block;font-size:13px;line-height:1.35;color:var(--fx-ink)}
+  .fx-card .fx-d{display:block;margin-top:2px;font-size:11px;line-height:1.4;color:var(--sub)}
+  .fx-card .fx-ar{flex:none;color:var(--fx);display:flex}
+  .fx-card .fx-ar svg{width:14px;height:14px}
+  /* 没有译文：整卡变灰、说明行换成「先翻译」的提示，点一下只在日志里提醒（不跳页） */
+  .fx-card.dis{border-color:var(--line);background:var(--card);cursor:not-allowed}
+  .fx-card.dis:hover{border-color:var(--line)}
+  .fx-card.dis .fx-ic{background:#C9C7D4}
+  .fx-card.dis .fx-n{color:var(--mut)}
+  .fx-card.dis .fx-ar{color:var(--mut)}
   /* v0.9.204：⬇ 这个 emoji 换成 SVG。emoji 箭头在 Mac / Windows / Android 上粗细和位置
      都不一样，而且它的默认行高比汉字高（.btn.sm 那个 32px 的坑就是它撑出来的）。
      用 mask + currentColor：跟文字同色同粗细，也不参与行高计算。 */
@@ -393,9 +411,6 @@
   .enter-hint{margin-top:13px;text-align:center;font-size:12.5px;color:var(--mut)}
   .enter-hint b{color:var(--acc);font-weight:600}
 
-  /* v0.9.135：💜 装饰原本锚在 hero 底部（bottom:-4px），加了引流条后正好压在条上——
-     条显示时让装饰让位，避免两种视觉元素叠在一起。 */
-  .hero.has-rk .spark.s3{display:none}
 
   /* v0.9.135：risekol.com 引流条。默认 display:none，只有官方域名才由 rkBanner() 放开 */
   .rk-banner{display:none;align-items:center;gap:12px;margin-top:12px;padding:12px 16px;border-radius:16px;background:var(--acc-weak);border:1px solid var(--acc-line);text-decoration:none;transition:.2s}
@@ -1022,14 +1037,15 @@ crossorigin="anonymous"></script>
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.277</span>
+    <span class="ver-tag">v0.9.278</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
       <div class="tk-track" id="tkTrack"></div>
     </div>
-    <!-- v0.9.277：三个工具之间的导航。原先它长在首页那一半，工作台独立后这边一直空着 -->
-    <span id="siteNav"></span>
+    <!-- v0.9.278：撤掉顶栏的工具胶囊导航（用户定案「这里不需要增加导航」）。
+         工作台顶栏本来就满（项目名 + 播报 + 上传/开始翻译/语言），再塞三个胶囊会折行；
+         跨工具入口交给落地页的四张工具卡，本页保留「首页」返回键即可。 -->
     <div class="spacer"></div>
     <button class="topbtn" id="btnUploadNew" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="wsUploadNew">上传新字幕</span></button>
     <button class="topbtn primary" id="btnGo" data-i18n="btnGo" type="button">▶ 开始翻译</button>
@@ -1565,11 +1581,20 @@ crossorigin="anonymous"></script>
       </div>
       <!-- v0.9.258：精细样式从这里搬去特效页（本页不再提供 ASS / VTT 外观面板）。
            点一下带着当前译文过去：双语进「调整双语」、单语进「单语字幕」。
-           ⚠️ 箭头单独一个 span，不能并进 data-i18n —— applyI18n 是 textContent 赋值，会把它冲掉。 -->
-      <div class="fx-goto">
-        <button class="btn ghost" id="btnFxGoto" type="button"><span data-i18n="fxGoto">去特效字幕处理</span><span>→</span></button>
-        <div class="hint" data-i18n="fxGotoHint">需要字体、颜色、样式槽或 ASS / VTT 精细样式？把这份字幕带过去继续调。</div>
-      </div>
+           v0.9.278：从「按钮 + 说明」改成一张引导卡，整卡可点、新标签页打开
+           （用户定案：新开一个标签页，工作台这边不丢，两边能对着调）。
+           ⚠️ 图标与箭头走 SVG（全站禁 emoji）；标题 / 说明各占一个独立 span ——
+              applyI18n 是 textContent 赋值，任何一个里混进子元素都会被整段冲掉。
+           ⚠️ 说明行 #fxGotoSub 故意不带 data-i18n：它在「能力清单」和「先翻译」之间来回切，
+              由 syncFxCard() 赋值（applyI18n 末尾也会调一次，切语言时跟着换）。 -->
+      <a class="fx-card dis" id="btnFxGoto" href="/merge.html?from=translate" target="_blank" rel="noopener" aria-disabled="true">
+        <span class="fx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10M7 11.5h10"/></svg></span>
+        <span class="fx-tx">
+          <span class="fx-n" data-i18n="fxGoto">去特效字幕处理</span>
+          <span class="fx-d" id="fxGotoSub">还没有译文可以带过去，先完成翻译。</span>
+        </span>
+        <span class="fx-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg></span>
+      </a>
       <!-- v0.9.173：赞助入口。默认 hidden；JS 确认界面语言是 zh-CN、**且用户导出过至少一次**才露出
            （其他语言整个从 DOM 移除）。v0.9.204：加「导出过」这个门槛 —— 还没拿到成果的人看到它
            只会觉得在要钱，导出过的人正处在「东西到手」的情绪点上。
@@ -1594,8 +1619,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.277"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.277"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.278"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.278"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -1898,8 +1923,8 @@ function rkBanner(){
   /* 两处各自判空再设——原先首页那条不存在就 return，加上工作台这条后会连带把它也吞掉 */
   const el=$('rkBanner');   if (el) el.style.display = on ? 'flex' : 'none';
   const ws=$('rkBannerWs'); if (ws) ws.style.display = on ? 'flex' : 'none';
-  const hero = document.querySelector('.hero');
-  if (hero) hero.classList.toggle('has-rk', !!on); // 让底部 💜 装饰让位
+  /* v0.9.278：原来这里还给 .hero 切 has-rk、让底部 💜 装饰让位 —— hero 上的三个 emoji
+     装饰已整块撤掉（落地页那侧），这条分支成了空转，一并删掉。 */
 }
 
 function applyI18n(){
@@ -1927,6 +1952,7 @@ function applyI18n(){
   /* v0.9.110：离底距离提示同样要跟随界面语言——旧版靠「字号 apply 顺带调用 syncAssMVBox」实现，
      重构后两者解耦，必须显式重绘，否则切界面语言后提示行仍是旧语言。 */
   if (typeof syncAssMVBox==='function') syncAssMVBox();
+  if (typeof syncFxCard==='function') syncFxCard(); // v0.9.278：去特效页那张卡的标题与说明行也跟界面语言走
 }
 
 const S = {
@@ -2360,6 +2386,9 @@ function zhBadge(r){
 }
 
 function renderRows(){
+  /* v0.9.278：去特效页那张卡的可用状态 = 「有没有译文」，而译文只在 renderRows 之后才成立，
+     所以挂在这里（翻译完成、导入、手动编辑、筛选都会经过它）。 */
+  if (typeof syncFxCard==='function') syncFxCard();
   setColLabels();
   const box=$('rows'), f=$('filter').value;
   const list = S.rows.filter(r=>{
@@ -5970,13 +5999,44 @@ function buildFxPayload(){
   if(!text || !text.trim()) return null;
   return { mode: bi?'bi':'mono', text:text, name:(S.fileBase||'translated')+'.srt' };
 }
-$('btnFxGoto').addEventListener('click', function(){
+/* v0.9.278：改成新标签页打开（用户定案：工作台这边不丢，两边对着调）。
+   ⚠️ 跨标签页 sessionStorage 取不取得到，各浏览器实现不一致（有的复制一份、有的不给），
+      所以 localStorage 落一份、sessionStorage 照旧落一份，特效页两处都读、读完都删。
+   ⚠️ 顺带记时间戳：万一新标签页被弹窗拦下，localStorage 里会躺着一份没人取的旧字幕 ——
+      不设过期，用户下周打开特效页会被一份陈年字幕灌进去（FX_TTL 与特效页的判据要一致）。 */
+const FX_TTL = 120000;
+/* 跟着界面语言走：日语界面点过去也该是日语的特效页。
+   原来写死 /merge.html，英/日界面会被掉回中文页。 */
+function fxHref(){
+  let l='zh-CN';
+  try{ l = UI.lang || 'zh-CN'; }catch(e){}   /* UI 还没初始化时别炸 */
+  return (l==='zh-CN' ? '/' : '/'+l+'/') + 'merge.html?from=translate';
+}
+/* 置灰态（用户定案）：没有译文时整卡变灰、说明行换成「先翻译」，
+   点了只在本页日志里提醒，不再换页 —— 旧版是点了才报红字，用户不知道自己哪步没做。 */
+function syncFxCard(){
+  const el=$('btnFxGoto');
+  if(!el) return;
+  let ok=false;
+  try{ ok = fxHasZh(); }catch(e){ ok=false; }   /* 早于 S 初始化被调到时别炸 */
+  el.classList.toggle('dis', !ok);
+  if(ok){ el.removeAttribute('aria-disabled'); el.href=fxHref(); }
+  else { el.setAttribute('aria-disabled','true'); }
+  const sub=$('fxGotoSub');
+  if(sub) sub.textContent = ok ? t('fxGotoSub') : t('fxNoZh');
+}
+$('btnFxGoto').addEventListener('click', function(e){
+  if(!fxHasZh()){ e.preventDefault(); log(t('fxNoZh'),'err'); return; }
   const p=buildFxPayload();
-  if(!p){ log(fxHasZh() ? t('fxFail') : t('fxNoZh'), 'err'); return; }
-  try{ sessionStorage.setItem(FX_KEY, JSON.stringify(p)); }
-  catch(e){ log(t('fxFail'),'err'); return; }   /* 容量超限 / 隐私模式禁写，同一句兜底 */
-  location.href='/merge.html?from=translate';
+  if(!p){ e.preventDefault(); log(t('fxFail'),'err'); return; }
+  const raw=JSON.stringify({ mode:p.mode, text:p.text, name:p.name, at:Date.now() });
+  let wrote=false;
+  try{ localStorage.setItem(FX_KEY, raw); wrote=true; }catch(e){}
+  try{ sessionStorage.setItem(FX_KEY, raw); wrote=true; }catch(e){}
+  if(!wrote){ e.preventDefault(); log(t('fxFail'),'err'); return; }   /* 容量超限 / 隐私模式禁写 */
+  this.href=fxHref();   /* 剩下的交给默认行为：target=_blank 开新标签页 */
 });
+syncFxCard();   /* 首屏先定一次态（没译文 = 置灰） */
 
 /* ---------------- 本地记忆 ---------------- */
 let sv={};
@@ -7599,6 +7659,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
   });
 })();
 </script>
-<script src="site-nav.js" data-tool="tr"></script>
+<!-- v0.9.278：本页不再引 site-nav.js —— 页面里已无 #siteNav / #toolCards 占位，
+     引进来只会白注入一段没人用的样式。特效页 / 清洗页照旧引。 -->
 </body>
 </html>
