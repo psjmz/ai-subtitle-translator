@@ -5349,7 +5349,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.276/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5389,9 +5389,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('index.html：navMerge ×27 语言 + 版本三处 v0.9.223 + merge 入口 + 描边色方块 id 配对', () => {
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
-    assert.ok(/class="ver">v0\.9\.275</.test(html), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.275</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.276</.test(html), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.276</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.276/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5568,8 +5568,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 4, k + ' 应有 4 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.275</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.276</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.276/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7410,11 +7410,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.275/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.275/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.275/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.276/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.276/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.276/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.276/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.276/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8001,9 +8001,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
      用户原话：「双语处理页面不是一般的难看，整体都需要重新设计一下」。
      病根是四件事：暖脏灰底没有层级、粉紫渐变到处铺、圆角一律 16px 无主次、卡片没投影只能靠边框。
      这一版只动外观层（CSS + 按钮图标），不改 id、不改类名、不动业务逻辑。 */
-  t('v0.9.249：设计令牌 —— 灰阶层级 + 品牌粉压深 + 三档圆角', () => {
-    assert.ok(/--acc:#E12D6E/.test(mg), '品牌粉没压深（#E12D6E）');
-    assert.ok(/--acc-ink:#C02159/.test(mg), '缺深粉（浅底上的文字/图标用它，纯 #E12D6E 偏亮）');
+  t('v0.9.249：设计令牌 —— 灰阶层级 + 品牌色四档 + 三档圆角', () => {
+    /* v0.9.276 起品牌色不再是「全场一个粉」：三个模块各一条色线，每页认领一条
+       （首页=粉 / 清洗页=绿 / 特效页=紫）。具体认领哪个色交给 v0.9.276 那条断言盯，
+       这里只盯「四档齐备」—— 少一档就会出现「图标有色、描边还是灰」的半套效果。 */
+    assert.ok(/--acc:#[0-9A-Fa-f]{6}/.test(mg), '缺 --acc（实心底 / 主按钮）');
+    assert.ok(/--acc-ink:#[0-9A-Fa-f]{6}/.test(mg), '缺 --acc-ink（浅底上的文字 / 图标）');
+    assert.ok(/--acc-weak:#[0-9A-Fa-f]{6}/.test(mg), '缺 --acc-weak（浅底）');
+    assert.ok(/--acc-line:#[0-9A-Fa-f]{6}/.test(mg), '缺 --acc-line（描边）');
     assert.ok(/--card-2:#FAFAFC/.test(mg) && /--line:#E9E9EF/.test(mg), '灰阶没换成冷中性（旧的是暖灰 #F8F7F5）');
     assert.ok(/--r-card:14px; --r-ctl:9px; --r-btn:10px/.test(mg), '圆角没分成卡片/控件/按钮三档');
     assert.ok(/--ctl-h:34px/.test(mg), '控件高度没有统一令牌');
@@ -8011,7 +8016,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* ⚠️ 旧版 4 处背景用 95° 粉紫渐变（logo / 主按钮 / 格式卡选中 / 标题渐变字），
        是「廉价感」的头号来源。--grad 仍被 4 处引用，所以保留变量名、但必须收敛成实色。 */
     assert.strictEqual((mg.match(/linear-gradient\(/g) || []).length, 0, '还有渐变没撤掉');
-    assert.ok(/--grad:#E12D6E/.test(mg), '--grad 没收敛成实色（4 处引用会画回渐变）');
+    assert.ok(/--grad:#[0-9A-Fa-f]{6}/.test(mg), '--grad 没收敛成实色（4 处引用会画回渐变）');
   });
 
   t('v0.9.249：按钮 emoji 全换成 CSS 伪元素图标（与主站 v0.9.204 同款做法）', () => {
@@ -8914,14 +8919,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.275/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.276/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.276/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.275/.test(html), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.275/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.276/.test(html), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.276/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.276/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.275/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.276/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9162,10 +9167,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       const c = (html.match(new RegExp('(^|[^A-Za-z0-9_])' + k + '\\s*:', 'g')) || []).length;
       assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c);
     });
-    /* 三张卡的入口必须各自指向正确页面（指错一个等于给用户一条死路） */
-    assert.ok(/<a class="mod-go" href="\/"/.test(html), '翻译模块入口没指向首页');
-    assert.ok(/<a class="mod-go" href="\/clean\.html"/.test(html), '清洗模块入口没指向 clean.html');
-    assert.ok(/<a class="mod-go" href="\/merge\.html"/.test(html), '特效模块入口没指向 merge.html');
+    /* 三张卡的入口必须各自指向正确页面（指错一个等于给用户一条死路）。
+       ⚠️ v0.9.276：整张卡变成了链接（点击目标更大），href 挂在 .mod-card 上，
+          不再是卡里那个小 <a class="mod-go"> —— mod-go 现在是右上角的「进入」提示字。 */
+    assert.ok(/<a class="mod-card tr cur" href="\/"/.test(html), '翻译模块入口没指向首页');
+    assert.ok(/<a class="mod-card cl" href="\/clean\.html"/.test(html), '清洗模块入口没指向 clean.html');
+    assert.ok(/<a class="mod-card fx" href="\/merge\.html"/.test(html), '特效模块入口没指向 merge.html');
     /* v0.9.274：这一块只介绍三个工具，不许再编「三步走 / 一条龙」的流程叙事。
        三个工具本来各自独立（用户可以只用清洗从不翻译），串成流水线是编的。 */
     [['一条龙', 'zh'], ['一條龍', 'tw'], ['字幕这件事分三步', 'zh'], ['three steps', 'en'],
@@ -9289,13 +9296,79 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/renderPager\(j, 'clPager', clPage\)/.test(adm), '缺独立分页');
   });
 
-  t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.275/.test(html), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.275/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.275/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.275/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.275/.test(mg), 'merge.html 缓存 bust 没跟上');
+  t('v0.9.276：一个颜色 = 一个模块（首页分区介绍 + 三页各认领一条色线）', () => {
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.275/.test(cln), 'clean.html 缓存 bust 没跟上');
+    const nav = require('fs').readFileSync(require('path').join(__dirname, 'site-nav.js'), 'utf8');
+
+    /* ① 三条色线，每色四档：solid 实心 / ink 文字 / weak 浅底 / line 描边。
+       原来只有「图标底 + 小标签」两个值在用色线，其余全吃页面主色 ——
+       结果就是三张卡一片粉，跟各自的图标打架。 */
+    [['翻译·粉', 'tr', ['#D4206A', '#C02159', '#FDF1F6', '#F6CADC']],
+     ['清洗·绿', 'cl', ['#0B7A5C', '#0B7A5C', '#E6F6EF', '#BFE6D7']],
+     ['特效·紫', 'fx', ['#6D5BD0', '#534AB7', '#EEEDFE', '#D9D4F8']]
+    ].forEach(function (ln) {
+      const re = new RegExp('--' + ln[1] + ':' + ln[2][0] + '; --' + ln[1] + '-ink:' + ln[2][1] +
+        '; --' + ln[1] + '-weak:' + ln[2][2] + '; --' + ln[1] + '-line:' + ln[2][3] + ';');
+      assert.ok(re.test(html), ln[0] + ' 色线四档不齐（首页 :root 里的 --' + ln[1] + '*）');
+    });
+
+    /* ② 每页认领一条：--acc 必须等于自己那条线的 solid 档 */
+    assert.ok(/--acc:#D4206A\b/.test(html), '首页（翻译）没认领粉色线');
+    assert.ok(/--acc:#0B7A5C\b/.test(cln), '清洗页没认领绿色线');
+    assert.ok(/--acc:#6D5BD0\b/.test(mg), '特效页没认领紫色线');
+
+    /* ③ 色值三处同步：首页 :root 的三条线 ↔ site-nav.js 的导览卡配色。
+       漏一处 = 首页卡片一个色、点进去又一个色，用户会以为进了另一个站。 */
+    assert.ok(nav.indexOf("bg: '#FDF1F6', fg: '#C02159'") >= 0, 'site-nav.js 翻译卡配色跟色线不一致');
+    assert.ok(nav.indexOf("bg: '#E6F6EF', fg: '#0B7A5C'") >= 0, 'site-nav.js 清洗卡配色跟色线不一致');
+    assert.ok(nav.indexOf("bg: '#EEEDFE', fg: '#534AB7'") >= 0, 'site-nav.js 特效卡配色跟色线不一致');
+
+    /* ④ 底色统一：三页同一套冷中性灰（原先首页是暖白 #F8F7F5）。
+       三条色线都是冷调，暖白底跟它们放一起发闷。 */
+    [['index.html', html], ['clean.html', cln], ['merge.html', mg]].forEach(function (p) {
+      assert.ok(/--bg:#F6F6F8/.test(p[1]), p[0] + ' 底色没统一成 #F6F6F8');
+      assert.ok(/--line:#E9E9EF/.test(p[1]), p[0] + ' 描边灰没统一成 #E9E9EF');
+    });
+
+    /* ⑤ 首页分区介绍：整卡可点，三张卡各指各的页面；「进入」挪到右上角 */
+    assert.ok(/<div class="mod-top">[\s\S]{0,420}?<span class="mod-go"/.test(html), '「进入」没放进卡片顶部');
+    assert.ok(/class="mod-tags"/.test(html), '卡片底部缺标签行');
+    /* ⚠️ v0.9.276 实测抓到的坑：applyI18n 是 el.textContent = t(...) 赋值的 ——
+       把 data-i18n 挂在 <h3> 上会把里面的「当前页」标记整个抹掉。
+       从 v0.9.273 起这个 pill 就一直没显示过，源码断言看不出来（DOM 里明明写着），
+       只有真浏览器量一次才知道。i18n 节点里不许再套 i18n 节点。 */
+    /* 判据要认「i18n 节点里套了子元素」这个形态，不能简单地「有 <h3 data-i18n 就红」——
+       清洗卡 / 特效卡 / 关于段落的 h3 都挂着 data-i18n，但它们里面没有子元素，是安全的。 */
+    assert.ok(!/<h3 data-i18n="[^"]*">[^<]*<(?!\/h3>)/.test(html),
+      '带 data-i18n 的标题里套了子元素 —— applyI18n 用 textContent 赋值会把子元素整个抹掉');
+    assert.ok(/<h3><span data-i18n="modTrName">/.test(html), '翻译卡的名字没单独包一层 span');
+
+    /* ⑥ 当前页不再用虚线框：虚线读起来像「占位 / 禁用」，跟「你在这里」是反的 */
+    assert.ok(!/\.mod-card\.cur\{border-style:dashed\}/.test(html), '当前页还在用虚线框');
+    /* ⑦ 「解决什么 / 适合谁」已从卡片撤掉（三张卡各塞五段文字没人看）。
+       词条保留在字典里没删 —— 要恢复直接把 DOM 加回去就行。 */
+    assert.ok(!/class="mod-k"/.test(html), '卡片里的「解决什么 / 适合谁」没撤干净');
+
+    /* ⑧ 新增的标签词条必须 27 语齐全：漏一个语块，那张卡在这一门语言下就是空的 */
+    ['modTrTag1', 'modTrTag2', 'modClTag1', 'modClTag2', 'modFxTag1', 'modFxTag2'].forEach(function (k) {
+      const c = (html.match(new RegExp('(^|[^A-Za-z0-9_])' + k + '\\s*:', 'g')) || []).length;
+      assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c);
+    });
+
+    /* ⑨ 全站禁渐变：--grad 必须收敛成实色（v0.9.70 那版的粉紫渐变会跟特效页的紫混淆） */
+    [['index.html', html], ['merge.html', mg]].forEach(function (p) {
+      assert.ok(/--grad:#[0-9A-Fa-f]{6}/.test(p[1]), p[0] + ' 的 --grad 不是实色');
+      assert.ok(!/--grad:linear-gradient/.test(p[1]), p[0] + ' 的 --grad 又变回渐变了');
+    });
+  });
+
+  t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
+    assert.ok(/class="ver">v0\.9\.276/.test(html), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.276/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.276/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.276/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.276/.test(mg), 'merge.html 缓存 bust 没跟上');
+    const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
+    assert.ok(/clean-core\.js\?v=0\.9\.276/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 }

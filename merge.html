@@ -9,7 +9,7 @@
 <meta name="description" content="免费在线特效字幕处理工具：合并两份字幕成双语、调整现成双语字幕，或给单语字幕直接加样式特效（SRT / VTT / ASS / SBV）。">
 <meta name="keywords" content="字幕合并,特效字幕,双语字幕,ASS字幕样式,VTT字幕样式,单语字幕加特效,字幕配轴,中英双语字幕,免费字幕工具,subtitle styling">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#EC4899">
+<meta name="theme-color" content="#6D5BD0">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!--SEO-HEAD-END-->
 <style>
@@ -28,15 +28,18 @@
     --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3; --bg-weak:#FAFAFC;
     --line:#E9E9EF; --line-strong:#DEDEE5;
     --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
-    --acc:#E12D6E; --acc-weak:#FDF1F6; --acc-line:#F6CADC; --acc-ink:#C02159;
+    /* v0.9.276：特效页认领「紫」这条色线（首页=粉、清洗页=绿）。
+       ⚠️ --lav（原本给「当前选中」用的点缀紫 #8B5CF6）并进了这条色线 ——
+          留着它就是一页里两种紫，看得出但说不清为什么。 */
+    --acc:#6D5BD0; --acc-weak:#EEEDFE; --acc-line:#D9D4F8; --acc-ink:#534AB7;
     /* ⚠️ --grad 保留变量名（4 处引用），但收敛成实色：不再出现粉紫渐变 */
-    --grad:#E12D6E; --acc2:#E12D6E; --lav:#8B5CF6;
+    --grad:#6D5BD0; --acc2:#6D5BD0; --lav:#534AB7;
     --ok:#0E9F6E; --ok-weak:#E6F6EF;
     --warn:#B4700A; --warn-weak:#FEF6E7;
     --del:#DC2626; --del-weak:#FEF2F2;
     --r-card:14px; --r-ctl:9px; --r-btn:10px;
     --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
-    --sh-btn:0 2px 8px rgba(225,45,110,.20);
+    --sh-btn:0 2px 8px rgba(83,74,183,.20);
     --ctl-h:34px;
   }
   *{box-sizing:border-box}
@@ -641,7 +644,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     display:flex;align-items:center;justify-content:center;padding:20px}
   .fx-ask{background:var(--card,#fff);border:1px solid var(--line-strong,#DCDCE2);border-radius:14px;
     max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22)}
-  .fx-ask h4{font-weight:700;font-size:16px;color:var(--acc,#E12D6E);margin:0 0 12px}
+  .fx-ask h4{font-weight:700;font-size:16px;color:var(--acc,#534AB7);margin:0 0 12px}
   .fx-ask .f{margin-bottom:12px}
   .fx-ask .f label{display:block;font-size:12.5px;color:var(--sub,#666);margin-bottom:4px}
   .fx-ask .f input{width:100%;box-sizing:border-box;font-family:var(--mono,ui-monospace,monospace);
@@ -655,7 +658,7 @@ crossorigin="anonymous"></script>
 <body>
 <div class="wrap">
   <nav class="lnav">
-    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.275</span></div>
+    <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.276</span></div>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -1193,7 +1196,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.275"></script>
+<script src="merge-core.js?v=0.9.276"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -5260,7 +5263,8 @@ function newSlot(){
   ensureStyle();
   let n = S.style.order.length + 1, id = 'slot' + n;
   while (S.style.slots[id]){ n++; id = 'slot' + n; }
-  S.style.slots[id] = { color:'#8B5CF6', dst:{}, src:{}, custom:true, name:'', modified:false };
+  /* v0.9.276：新建槽的默认色跟紫色线走（原 #8B5CF6 是 --lav 那支，已并进色线） */
+  S.style.slots[id] = { color:'#6D5BD0', dst:{}, src:{}, custom:true, name:'', modified:false };
   S.style.order.push(id);
   S.style.cur = id;
   S.style.view = 'all';   /* 新槽是空的，差异视图会一片空白 → 直接给全量视图，用户挑要覆盖哪项 */

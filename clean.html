@@ -9,7 +9,7 @@
 <meta name="description" content="免费在线字幕清洗工具：去掉 HTML 标签、ASS 特效、听障提示、说话人标签、字幕组水印与广告，修复全大写和乱码，导出干净的字幕。纯本地处理，不上传服务器。">
 <meta name="keywords" content="字幕清洗,srt清洗,去字幕水印,去听障字幕,SDH字幕,去说话人,字幕去广告,字幕乱码修复,subtitle cleaner">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#E12D6E">
+<meta name="theme-color" content="#0B7A5C">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!--SEO-HEAD-END-->
 <style>
@@ -20,14 +20,18 @@
     --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
     --line:#E9E9EF; --line-strong:#DEDEE5;
     --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
-    --acc:#E12D6E; --acc-weak:#FDF1F6; --acc-line:#F6CADC; --acc-ink:#C02159;
-    --grad:#E12D6E; --acc2:#E12D6E;
+    /* v0.9.276：清洗页认领「绿」这条色线（首页=粉、特效页=紫）。
+       品牌用深墨绿 #0B7A5C（白字 5.31:1），成功态 --ok 是亮翠绿 #0E9F6E ——
+       两者同族但一深一亮，加上形态不同（品牌是实心底白字、成功是浅底彩字）能分开。
+       ⚠️ 别把 --ok 并进 --acc：那样「修好了」和「品牌色」就彻底分不清了。 */
+    --acc:#0B7A5C; --acc-weak:#E6F6EF; --acc-line:#BFE6D7; --acc-ink:#0B7A5C;
+    --grad:#0B7A5C; --acc2:#0B7A5C;
     --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
     --warn:#B4700A; --warn-weak:#FEF6E7;
     --del:#DC2626; --del-weak:#FEF2F2;
     --r-card:14px; --r-ctl:9px; --r-btn:10px;
     --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
-    --sh-btn:0 2px 8px rgba(225,45,110,.20);
+    --sh-btn:0 2px 8px rgba(11,122,92,.20);
     --ctl-h:34px;
   }
   *{box-sizing:border-box}
@@ -310,7 +314,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.275"></script>
+<script src="clean-core.js?v=0.9.276"></script>
 <script>
 'use strict';
 /* =====================================================================

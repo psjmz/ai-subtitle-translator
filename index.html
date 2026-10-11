@@ -11,7 +11,7 @@
 <meta name="description" content="ai-srtsub.com 是专为影迷打造的免费 AI 字幕翻译工具。支持海外电影、美剧英剧、纪录片一键生成精准母语字幕，自动配轴对齐，无需注册，轻松告别啃生肉，让全球好内容无语言障碍随心畅享。">
 <meta name="keywords" content="AI字幕翻译,字幕翻译,SRT翻译,VTT翻译,ASS翻译,免费字幕翻译,电影字幕翻译,美剧英剧字幕,纪录片字幕,母语字幕,双语字幕,韩剧字幕,日剧字幕,泰剧字幕,动漫字幕,Netflix字幕翻译,追剧字幕,生肉字幕,海外剧字幕,字幕在线翻译,大模型翻译,视频字幕翻译,translate subtitles,免费翻译字幕工具,免费AI字幕翻译,免费在线字幕翻译">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#EC4899">
+<meta name="theme-color" content="#D4206A">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!-- Open Graph / 社交分享卡片 -->
 <meta property="og:type" content="website">
@@ -41,13 +41,27 @@
 </script>
 <!--SEO-HEAD-END-->
 <style>
-  /* ============ v0.9.70 视觉系统：暖中性框架 + 粉紫渐变点缀（按钮/图标/交互态） ============ */
+  /* ============ 视觉系统：冷中性框架 + 模块色点缀（按钮/图标/交互态） ============
+     v0.9.276：三个模块各一条色线 —— 翻译=粉、清洗=绿、特效=紫，每页认领一条。
+     首页领粉（下面这条），clean.html 领绿、merge.html 领紫，中性底三页完全一致。
+     ⚠️ 中性底从暖灰（#F8F7F5 / #E8E7E4）改成冷灰（#F6F6F8 / #E9E9EF）：
+        三条色线都是冷调，暖白底跟它们放一起发闷。
+     ⚠️ --acc-ink 以前压根没定义，.mod-cur / .mod-go 却用了 var(--acc-ink) —— 取不到值
+        只能静默继承成别的颜色。现在补上（#C02159）。 */
   :root{
-    --bg:#F8F7F5; --card:#FFFFFF; --card-2:#F7F6F4;
-    --line:#E8E7E4; --line-strong:#D9D8D4;
-    --ink:#39363B; --sub:#6F6C72; --mut:#A5A2A8;
-    --acc:#EC4899; --acc2:#F070AE; --acc-weak:#FDEDF4; --acc-line:#F6C9DD;
-    --grad:linear-gradient(95deg,#FF6B9D,#A78BFA); --lav:#8B5CF6;
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --sub:#767680; --mut:#A3A3AD;
+    --acc:#D4206A; --acc2:#E24E8C; --acc-weak:#FDF1F6; --acc-line:#F6CADC; --acc-ink:#C02159;
+    /* 三条模块色线：首页分区介绍同屏要用到三条，所以三条都在这里定义；
+       每页再认领一条装进 --acc*（首页=tr 粉、clean.html=cl 绿、merge.html=fx 紫）。
+       每色 4 档：solid 实心按钮 / ink 文字图标 / weak 浅底 / line 描边。
+       ⚠️ 改动这里的色值要同步 site-nav.js 的 TOOLS[].c，否则导览卡和分区介绍两个色对不上。 */
+    --tr:#D4206A; --tr-ink:#C02159; --tr-weak:#FDF1F6; --tr-line:#F6CADC;
+    --cl:#0B7A5C; --cl-ink:#0B7A5C; --cl-weak:#E6F6EF; --cl-line:#BFE6D7;
+    --fx:#6D5BD0; --fx-ink:#534AB7; --fx-weak:#EEEDFE; --fx-line:#D9D4F8;
+    /* ⚠️ --grad 保留变量名（多处引用），但收敛成实色：全站禁渐变（v0.9.70 那版是粉紫渐变） */
+    --grad:#D4206A; --lav:#8B5CF6;
     --ok:#10B981; --ok-weak:#E4F5EB;
     --warn:#C77C0A; --warn-weak:#FFF4E5;
     --del:#DC2626; --del-weak:#FEF2F2;
@@ -334,10 +348,14 @@
   /* ============ 第一段：首页（营销落地页） ============ */
   #viewLanding{position:relative;overflow:hidden;animation:fadein .3s ease}
   .blob{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
-  .blob.b1{width:480px;height:480px;background:#E9E3FB;top:-160px;right:-120px;opacity:.5}
-  .blob.b2{width:420px;height:420px;background:#E8DBFF;bottom:-140px;left:-140px;opacity:.5}
-  .blob.b3{width:320px;height:320px;background:#FFE9D6;top:38%;left:58%;opacity:.4}
-  #viewLanding > .wrap, #viewLanding > .section{position:relative;z-index:1}
+  /* v0.9.276：光斑原本是紫 + 橙。紫已经是「特效页」的色线、橙跟三条色线都没关系，
+     首页出现这两种颜色会让人以为它们代表什么 —— 改成只有「粉雾 + 中性灰雾」。 */
+  .blob.b1{width:480px;height:480px;background:#F6E4EC;top:-160px;right:-120px;opacity:.5}
+  .blob.b2{width:420px;height:420px;background:#EDEDF2;bottom:-140px;left:-140px;opacity:.5}
+  .blob.b3{width:320px;height:320px;background:#F2EEF4;top:38%;left:58%;opacity:.4}
+  /* v0.9.276：.mod-sec 也搬到 .wrap 外面了（见下面 .mod-sec 那段注释），
+     同样要抬到光斑之上，否则被 .blob 盖住。 */
+  #viewLanding > .wrap, #viewLanding > .section, #viewLanding > .mod-sec{position:relative;z-index:1}
   .wrap{max-width:780px;margin:0 auto;padding:36px 24px 36px}
   .lnav{display:flex;align-items:center;gap:10px;margin-bottom:36px}
   .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:16.5px;letter-spacing:.3px}
@@ -431,7 +449,7 @@
   .sb-div{align-self:stretch;width:1px;background:var(--line);margin:6px 0}
   .stat-ic{width:32px;height:32px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:9px}
   .stat-ic svg{width:16px;height:16px}
-  .stat-ic.c1{background:#FDEDF4;color:#EC4899}
+  .stat-ic.c1{background:#FDF1F6;color:#C02159}
   .stat-ic.c2{background:#F1EBFE;color:#8B5CF6}
   .stat-ic.c3{background:#FFF0E3;color:#F97316}
   .stat-ic.c4{background:#EDFBF4;color:#10B981}
@@ -625,7 +643,7 @@
   .sec-ic{width:20px;height:20px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;flex:none}
   .sec-ic svg{width:12px;height:12px;opacity:1}
   /* 语义固色：导入=粉 / 语言=紫 / 风格=橙 / 术语与专名=绿 / 内容过滤=青 / 引擎=靛 */
-  .sec-ic.c1{background:#FDEDF4;color:#EC4899}
+  .sec-ic.c1{background:#FDF1F6;color:#C02159}
   .sec-ic.c2{background:#F1EBFE;color:#8B5CF6}
   .sec-ic.c3{background:#FFF0E3;color:#F97316}
   .sec-ic.c4{background:#EDFBF4;color:#10B981}
@@ -794,16 +812,16 @@
 
   /* v0.9.270 字幕区就地编辑：时间轴 / 原文 / 译文 —— 改完直接进导出 */
   .cuegrid.ed{background:#FDF7F9}
-  .ed-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc,#E12D6E);margin-left:5px;vertical-align:1px;flex:none}
+  .ed-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc,#D4206A);margin-left:5px;vertical-align:1px;flex:none}
   .tc{display:block;cursor:text;border:1px dashed transparent;border-radius:6px;padding:2px 5px;outline:none}
   .tc:hover{border-color:var(--line-strong,#D9D8D4)}
   .tc-in{display:flex;flex-direction:column;gap:3px}
   .tc-in input{width:100%;font-family:var(--mono,ui-monospace,monospace);font-size:11px;padding:2px 5px;
-    border:1px solid var(--acc,#E12D6E);border-radius:5px;background:var(--card-2,#FAFAFC);color:var(--ink,#1F2430);outline:none}
+    border:1px solid var(--acc,#D4206A);border-radius:5px;background:var(--card-2,#FAFAFC);color:var(--ink,#1F2430);outline:none}
   .tc-hint{font-size:10px;color:var(--mut,#9C9AA0);margin-top:1px}
   .en.ed{cursor:text;border:1px dashed transparent;border-radius:6px;padding:3px 7px;outline:none}
   .en.ed:hover{border-color:var(--line-strong,#D9D8D4)}
-  .en.ed:focus{border-color:var(--acc,#E12D6E);background:var(--card-2,#FAFAFC);box-shadow:0 0 0 2px var(--acc-weak,#FBE7EF)}
+  .en.ed:focus{border-color:var(--acc,#D4206A);background:var(--card-2,#FAFAFC);box-shadow:0 0 0 2px var(--acc-weak,#FDF1F6)}
   .tc-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 10px;margin-bottom:8px;
     background:var(--card-2,#FAFAFC);border:1px solid var(--line,#ECEBE8);border-radius:10px;font-size:12px}
   .tc-bar .btn{font-size:12px;padding:3px 10px}
@@ -914,31 +932,52 @@
   .footer-oss a:hover{color:var(--acc)}
   .footer-oss svg{width:13px;height:13px;fill:currentColor;flex:none}
 
-  /* v0.9.273：三大模块分区介绍（工具导航三卡讲「是什么」，这一块讲「能做什么 / 解决什么 / 适合谁」） */
-  .mod-sec{max-width:1080px;margin:64px auto 0;padding:0 24px}
+  /* v0.9.276：三大模块分区介绍。一张卡 = 一个模块，卡片认领自己的色线
+     （粉=翻译 / 绿=清洗 / 紫=特效），与 site-nav.js 的三张导览卡同源同色。
+     顶部胶囊负责跳转，这一块负责讲清每个工具干什么。 */
+  /* ⚠️ 这一块故意放在 .wrap（780px 主容器）外面，跟下面的 .section 一样用 1080px。
+     塞在 780px 里的时候三列各只有 240px，「把一整份外文字幕翻成你的语言」要折成三行。
+     .wrap 自带 padding-bottom 36px，所以这里 margin-top 只要补 8px。 */
+  .mod-sec{max-width:1080px;margin:8px auto 0;padding:0 24px}
   .mod-sec h2{font-size:22px;font-weight:800;letter-spacing:-.3px;margin:0;color:var(--ink)}
   .mod-sub{margin:9px 0 0;font-size:13.5px;line-height:1.8;color:var(--sub);max-width:760px}
   .mod-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
-  .mod-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;
-    padding:20px 19px 18px;box-shadow:0 1px 2px rgba(18,18,24,.04)}
-  .mod-card.cur{border-style:dashed}
-  .mod-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:13px}
+  .mod-card{position:relative;display:flex;flex-direction:column;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;padding:20px 19px 18px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(18,18,24,.04);text-decoration:none;color:inherit;
+    transition:border-color .15s,box-shadow .15s,transform .15s}
+  .mod-card.tr{--k:var(--tr);--kw:var(--tr-weak);--ki:var(--tr-ink);--kl:var(--tr-line)}
+  .mod-card.cl{--k:var(--cl);--kw:var(--cl-weak);--ki:var(--cl-ink);--kl:var(--cl-line)}
+  .mod-card.fx{--k:var(--fx);--kw:var(--fx-weak);--ki:var(--fx-ink);--kl:var(--fx-line)}
+  .mod-card:hover{border-color:var(--kl);box-shadow:0 8px 22px -16px rgba(18,18,24,.42);transform:translateY(-1px)}
+  /* 左侧 3px 色条：只在 hover 或当前页出现，平时不抢戏 */
+  .mod-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:var(--k);opacity:0;transition:opacity .15s}
+  .mod-card:hover::before,.mod-card.cur::before{opacity:1}
+  /* 当前页不再用虚线框（虚线读起来像「占位 / 禁用」），改成彩色描边 + 一圈很浅的同色光晕 */
+  .mod-card.cur{border-color:var(--kl);box-shadow:0 0 0 3px var(--kw)}
+  .mod-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:13px}
+  .mod-ic{width:38px;height:38px;border-radius:11px;background:var(--kw);color:var(--ki);
+    display:flex;align-items:center;justify-content:center;flex:none}
   .mod-ic svg{width:19px;height:19px}
   .mod-card h3{margin:0;font-size:16px;font-weight:700;letter-spacing:-.2px;color:var(--ink);display:flex;align-items:center;gap:8px}
-  .mod-cur{font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;background:var(--acc-weak);color:var(--acc-ink)}
+  .mod-cur{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--kw);color:var(--ki)}
   .mod-lead{margin:8px 0 0;font-size:13px;line-height:1.75;color:var(--sub)}
-  .mod-do{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
-  .mod-do li{position:relative;padding-left:18px;font-size:12.8px;line-height:1.7;color:var(--ink-2,var(--sub))}
-  .mod-do li::before{content:'';position:absolute;left:0;top:.52em;width:9px;height:5px;
-    border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);opacity:.55}
-  .mod-k{margin-top:14px;font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--mut);text-transform:none}
-  .mod-k+p{margin:4px 0 0;font-size:12.6px;line-height:1.75;color:var(--sub)}
-  .mod-go{margin-top:auto;padding-top:16px;display:inline-flex;align-items:center;gap:6px;
-    font-size:13px;font-weight:600;color:var(--acc-ink);text-decoration:none}
-  .mod-go:hover{text-decoration:underline}
-  .mod-go svg{width:14px;height:14px}
+  /* ⚠️ 标签行要贴卡片底部：三张卡的要点行数不一样（1 行 / 2 行混着），
+     不给 margin-top:auto 的话标签各停各的高度，一眼就看出参差。 */
+  .mod-do{list-style:none;margin:13px 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
+  .mod-do li{position:relative;padding-left:18px;font-size:12.8px;line-height:1.7;color:var(--sub)}
+  .mod-do li::before{content:'';position:absolute;left:0;top:.55em;width:8px;height:4.5px;
+    border-left:2px solid var(--k);border-bottom:2px solid var(--k);transform:rotate(-45deg);opacity:.75}
+  .mod-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}
+  .mod-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;
+    color:var(--ki);background:var(--kw);border:1px solid var(--kl)}
+  .mod-go{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;
+    color:var(--mut);white-space:nowrap;transition:color .15s}
+  .mod-card:hover .mod-go{color:var(--ki)}
+  .mod-go svg{width:12px;height:12px}
   @media (max-width:900px){.mod-grid{grid-template-columns:1fr}}
-  @media (max-width:640px){.mod-sec{margin-top:44px;padding:0 18px}.mod-sec h2{font-size:19px}}
+  @media (max-width:640px){.mod-sec{margin-top:36px;padding:0 18px}.mod-sec h2{font-size:19px}}
 
   /* 响应式 */
   @media (max-width:1080px){
@@ -976,7 +1015,7 @@ crossorigin="anonymous"></script>
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
   <div class="wrap">
     <nav class="lnav">
-      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.275</span></div>
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.276</span></div>
       <div class="spacer"></div>
       <span id="siteNav"></span>
       <select id="uiLang2" aria-label="UI language"></select>
@@ -1004,66 +1043,75 @@ crossorigin="anonymous"></script>
       </a>
     </div>
 
-    <!-- v0.9.257：三大工具导览（由 site-nav.js 渲染，与顶部胶囊同源） -->
-    <div id="toolCards"></div>
-
-    <!-- v0.9.273：三大模块分区介绍。上面三张导览卡回答「有哪几个工具」，
-         这一块回答「每个工具能做什么、解决什么问题、适合谁」——文案走 I18N 27 语。 -->
-    <section class="mod-sec" aria-labelledby="modSecTitle">
-      <h2 id="modSecTitle" data-i18n="modSecTitle">三个工具</h2>
-      <p class="mod-sub" data-i18n="modSecSub">三个各自独立的字幕工具，各做各的事。用哪一个、什么时候用，看手上的活儿。</p>
-
-      <div class="mod-grid">
-        <article class="mod-card cur">
-          <div class="mod-ic" style="background:#FDF1F6;color:#C02159"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h11"/></svg></div>
-          <h3 data-i18n="modTrName">字幕翻译<span class="mod-cur" data-i18n="modCur">当前页</span></h3>
-          <p class="mod-lead" data-i18n="modTrLead">把一整份外文字幕翻成你的语言，顺手把时间轴和折行一起收拾好。</p>
-          <ul class="mod-do">
-            <li data-i18n="modTrDo1">75 种语言互译，句级合并翻译后按时长回填</li>
-            <li data-i18n="modTrDo2">自动折行、去口语水词、统一专名与术语</li>
-            <li data-i18n="modTrDo3">导出单语 / 双语，SRT / VTT / ASS / SBV / TXT</li>
-          </ul>
-          <div class="mod-k" data-i18n="modFix">解决什么</div>
-          <p data-i18n="modTrFix">一整句话被切成好几条、翻出来对不上画面；译文字数爆掉一行放不下；同一个人名前后三种译法。</p>
-          <div class="mod-k" data-i18n="modWho">适合谁</div>
-          <p data-i18n="modTrWho">追剧的人、字幕组、自媒体与本地化团队、外语学习者。</p>
-          <a class="mod-go" href="/" data-i18n="modGo">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></a>
-        </article>
-
-        <article class="mod-card">
-          <div class="mod-ic" style="background:#E6F6EF;color:#0B7A5C"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-7 8v6l-4-2v-4z"/></svg></div>
-          <h3 data-i18n="modClName">字幕清洗</h3>
-          <p class="mod-lead" data-i18n="modClLead">字幕拿到手先过一遍：广告、水印、听障提示这些脏东西一次剔干净。</p>
-          <ul class="mod-do">
-            <li data-i18n="modClDo1">13 条规则分四类，默认开 9 条，随手开关</li>
-            <li data-i18n="modClDo2">去水印广告、听障提示、HTML 标签，修全大写与乱码</li>
-            <li data-i18n="modClDo3">逐条列出改了什么，可一条条还原，不动时间轴</li>
-          </ul>
-          <div class="mod-k" data-i18n="modFix">解决什么</div>
-          <p data-i18n="modClFix">下载来的字幕夹着「本字幕由 XX 字幕组提供」；整份全大写看得累；编码错乱一片方块字。</p>
-          <div class="mod-k" data-i18n="modWho">适合谁</div>
-          <p data-i18n="modClWho">拿到现成字幕想直接用的人、要批量整理素材的字幕组。</p>
-          <a class="mod-go" href="/clean.html" data-i18n="modGo">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></a>
-        </article>
-
-        <article class="mod-card">
-          <div class="mod-ic" style="background:#EEEDFE;color:#534AB7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10M7 11.5h10"/></svg></div>
-          <h3 data-i18n="modFxName">特效字幕</h3>
-          <p class="mod-lead" data-i18n="modFxLead">双语合并 + 上样式：字体、颜色、描边、位置所见即所得，导出就能压片。</p>
-          <ul class="mod-do">
-            <li data-i18n="modFxDo1">两份字幕合并成双语，或调整已有双语的顺序与样式</li>
-            <li data-i18n="modFxDo2">ASS 5 套 / VTT 6 套行业模板，样式槽逐项微调</li>
-            <li data-i18n="modFxDo3">实时预览 = 导出结果，时间轴也能就地精修与批量校正</li>
-          </ul>
-          <div class="mod-k" data-i18n="modFix">解决什么</div>
-          <p data-i18n="modFxFix">想做双语字幕却要手工对轨；ASS 参数改完看不到效果；导出来和预览对不上。</p>
-          <div class="mod-k" data-i18n="modWho">适合谁</div>
-          <p data-i18n="modFxWho">要做双语或特效字幕的创作者、压制组、需要无障碍字幕的团队。</p>
-          <a class="mod-go" href="/merge.html" data-i18n="modGo">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></a>
-        </article>
-      </div>
-    </section>
   </div>
+
+  <!-- v0.9.276：三大工具分区介绍。首页讲「有哪几个工具、各自干什么」的只有这一块。
+       原先这里上下叠了两套三卡（site-nav.js 的导览卡 + v0.9.273 的介绍卡），说的是同一件事，
+       合并成一块：顶部胶囊负责跳转，这一块负责讲清。
+       ⚠️ #toolCards 已停用：site-nav.js 找不到挂载点会自动跳过，只渲染顶部胶囊（data-tool="tr"）。
+          要恢复就把 <div id="toolCards"></div> 加回来，它自己会渲染。 -->
+  <section class="mod-sec" aria-labelledby="modSecTitle">
+    <h2 id="modSecTitle" data-i18n="modSecTitle">三个工具</h2>
+    <p class="mod-sub" data-i18n="modSecSub">三个各自独立的字幕工具，各做各的事。用哪一个、什么时候用，看手上的活儿。</p>
+
+    <div class="mod-grid">
+      <a class="mod-card tr cur" href="/" aria-current="page">
+        <div class="mod-top">
+          <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h11"/></svg></div>
+          <span class="mod-go" data-i18n="modGo">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></span>
+        </div>
+        <!-- ⚠️ 名字必须单独包一层 span：applyI18n 是 el.textContent = t(...) 赋值的，
+             把 data-i18n 挂在 <h3> 上会把里面的「当前页」标记整个抹掉（v0.9.273 起就一直没显示过）。 -->
+        <h3><span data-i18n="modTrName">字幕翻译</span><span class="mod-cur" data-i18n="modCur">当前页</span></h3>
+        <p class="mod-lead" data-i18n="modTrLead">把一整份外文字幕翻成你的语言，顺手把时间轴和折行一起收拾好。</p>
+        <ul class="mod-do">
+          <li data-i18n="modTrDo1">75 种语言互译，句级合并翻译后按时长回填</li>
+          <li data-i18n="modTrDo2">自动折行、去口语水词、统一专名与术语</li>
+          <li data-i18n="modTrDo3">导出单语 / 双语，SRT / VTT / ASS / SBV / TXT</li>
+        </ul>
+        <div class="mod-tags">
+          <span class="mod-tag" data-i18n="modTrTag1">75 种语言</span>
+          <span class="mod-tag" data-i18n="modTrTag2">SRT / VTT / ASS</span>
+        </div>
+      </a>
+
+      <a class="mod-card cl" href="/clean.html">
+        <div class="mod-top">
+          <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-7 8v6l-4-2v-4z"/></svg></div>
+          <span class="mod-go" data-i18n="modGo">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></span>
+        </div>
+        <h3 data-i18n="modClName">字幕清洗</h3>
+        <p class="mod-lead" data-i18n="modClLead">字幕拿到手先过一遍：广告、水印、听障提示这些脏东西一次剔干净。</p>
+        <ul class="mod-do">
+          <li data-i18n="modClDo1">13 条规则分四类，默认开 9 条，随手开关</li>
+          <li data-i18n="modClDo2">去水印广告、听障提示、HTML 标签，修全大写与乱码</li>
+          <li data-i18n="modClDo3">逐条列出改了什么，可一条条还原，不动时间轴</li>
+        </ul>
+        <div class="mod-tags">
+          <span class="mod-tag" data-i18n="modClTag1">13 条规则</span>
+          <span class="mod-tag" data-i18n="modClTag2">不改时间轴</span>
+        </div>
+      </a>
+
+      <a class="mod-card fx" href="/merge.html">
+        <div class="mod-top">
+          <div class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10M7 11.5h10"/></svg></div>
+          <span class="mod-go" data-i18n="modGo">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></span>
+        </div>
+        <h3 data-i18n="modFxName">特效字幕</h3>
+        <p class="mod-lead" data-i18n="modFxLead">双语合并 + 上样式：字体、颜色、描边、位置所见即所得，导出就能压片。</p>
+        <ul class="mod-do">
+          <li data-i18n="modFxDo1">两份字幕合并成双语，或调整已有双语的顺序与样式</li>
+          <li data-i18n="modFxDo2">ASS 5 套 / VTT 6 套行业模板，样式槽逐项微调</li>
+          <li data-i18n="modFxDo3">实时预览 = 导出结果，时间轴也能就地精修与批量校正</li>
+        </ul>
+        <div class="mod-tags">
+          <span class="mod-tag" data-i18n="modFxTag1">双语合并</span>
+          <span class="mod-tag" data-i18n="modFxTag2">样式槽</span>
+        </div>
+      </a>
+    </div>
+  </section>
 
   <!-- 数字带 -->
   <div class="section">
@@ -1197,7 +1245,7 @@ crossorigin="anonymous"></script>
 <div id="viewWorkspace">
   <div class="appbar">
     <div class="logo-sm"><div class="mark">字</div><span data-i18n="brandName">随心字幕 AI</span></div>
-    <span class="ver-tag">v0.9.275</span>
+    <span class="ver-tag">v0.9.276</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1766,7 +1814,7 @@ crossorigin="anonymous"></script>
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
-<script src="srt-core.js?v=0.9.275"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
+<script src="srt-core.js?v=0.9.276"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存（配合 server.js no-cache 协调验证） -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2153,6 +2201,7 @@ userStop:'已由用户停止。', postEnd:'翻译结束，应用 去水词 / 折
   modFxDo3:'实时预览 = 导出结果，时间轴也能就地精修与批量校正',
   modFxFix:'想做双语字幕却要手工对轨；ASS 参数改完看不到效果；导出来和预览对不上。',
   modFxWho:'要做双语或特效字幕的创作者、压制组、需要无障碍字幕的团队。',
+  modTrTag1:'75 种语言', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 条规则', modClTag2:'不改时间轴', modFxTag1:'双语合并', modFxTag2:'样式槽',
   /* v0.9.70 两段式界面新增 */
 },
 'zh-TW': {pureMTMode:'偵測到純翻譯模型（{0}）：改用逐組直譯（共 {1} 組，並行 4 路，成功的組有快取）…',pureMTDone:'逐組直譯完成：成功 {0}/{1} 組',gotClick:'已收到「開始翻譯」的請求，正在準備…',reqSent:'第 {0} 批請求已送出（{1} 個句組），正在等待模型回應…',waitSec:'已等待 {0} 秒，仍在等待模型的回應…',errTimeout:'等待 {0} 秒仍無回應，已放棄本次請求（逾時）。建議：把「每批字元」調小以縮小批次，或換一個回應更快的模型；若所用模型會先思考再回答（Qwen3 / GLM 等），在「附加請求參數」裡填 {"enable_thinking":false}',alreadyRunning:'上一輪翻譯尚未結束（可能仍在等待某次請求的回應），已請求停止——請等目前批次收尾後再重新開始',modeMismatch:'注意：下方已填寫自訂 API（{0}），但目前是「預設模型」模式，本次不會用到它——要使用請先在上方切換到「自訂 API」',errTruncOut:'模型輸出被長度上限截斷（還沒生成完就結束）——請在「附加請求參數」裡加大 max_tokens，例如 {"max_tokens":8192}',lblExtra:'附加請求參數（JSON，可選）',extraTip:'隨每次自訂 API 請求一併送出。例：{"enable_thinking":false} 關閉模型思考；{"response_format":{"type":"json_object"}} 強制 JSON 輸出。model / messages / temperature / stream 不可覆寫。',fbRoute:'注意：模型 B（{0}）呼叫失敗，本次已改用模型 A（{1}）。原因：{2}',
@@ -2285,6 +2334,7 @@ userStop:'已由使用者停止。', postEnd:'翻譯結束，套用 去水詞 / 
   modFxDo3:'即時預覽 = 匯出結果，時間軸也能就地精修與批量校正',
   modFxFix:'想做雙語字幕卻要手工對軌；ASS 參數改完看不到效果；匯出來和預覽對不上。',
   modFxWho:'要做雙語或特效字幕的創作者、壓製組、需要無障礙字幕的團隊。',
+  modTrTag1:'75 種語言', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 條規則', modClTag2:'不改時間軸', modFxTag1:'雙語合併', modFxTag2:'樣式槽',
   /* v0.9.70 两段式界面新增 */
 },
 'en': {pureMTMode:'Pure translation model detected ({0}): switching to per-group direct translation ({1} groups, 4 in parallel, successful groups are cached)…',pureMTDone:'Per-group translation finished: {0}/{1} groups succeeded',gotClick:'Received “start translation” — preparing…',reqSent:'Batch {0} request sent ({1} groups) — waiting for the model…',waitSec:'Waited {0} s — still no reply from the model…',errTimeout:'No response after {0} s — request abandoned (timeout). Try lowering the per-batch character budget, or switch to a faster model; if the model reasons before answering (Qwen3, GLM…), put {"enable_thinking":false} in Extra request parameters',alreadyRunning:'The previous run has not finished yet — a stop has been requested. Please wait for the current batch to wrap up before starting again',modeMismatch:'Heads up: custom API fields are filled in below ({0}), but the mode above is “Default model”, so none of them will be used. Switch the mode to “Custom API” to actually use it',errTruncOut:'Model output hit the token limit and was cut off before finishing — raise max_tokens in Extra request parameters, e.g. {"max_tokens":8192}',lblExtra:'Extra request parameters (JSON, optional)',extraTip:'Merged into every custom-API request body. Examples: {"enable_thinking":false} to turn off reasoning; {"response_format":{"type":"json_object"}} to force JSON output. model / messages / temperature / stream cannot be overridden.',fbRoute:'Note: model B ({0}) failed, so this batch was translated by model A ({1}). Reason: {2}',
@@ -2417,6 +2467,7 @@ userStop:'Stopped by user.', postEnd:'Translation finished, applying filler remo
   modFxDo3:'Live preview equals the exported file; the timeline can be tweaked in place or fixed in bulk',
   modFxFix:'Bilingual subs that have to be aligned by hand; ASS values whose effect you cannot see; exports that do not match the preview.',
   modFxWho:'Creators making bilingual or styled subtitles, encoding groups, teams that need accessible captions.',
+  modTrTag1:'75 languages', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 rules', modClTag2:'Timing untouched', modFxTag1:'Bilingual merge', modFxTag2:'Style slots',
   /* v0.9.70 两段式界面新增 */
 },
 'ja': {pureMTMode:'純翻訳モデル（{0}）を検出：グループごとの直接翻訳に切り替えます（全 {1} グループ、4 並列、成功分はキャッシュ）…',pureMTDone:'グループごとの翻訳が完了：{1} グループ中 {0} 件成功',gotClick:'「翻訳開始」を受け付けました—準備中…',reqSent:'第 {0} 批のリクエストを送信しました（{1} グループ）——モデルの応答を待っています…',waitSec:'{0} 秒待機中——まだモデルの応答がありません…',errTimeout:'{0} 秒応答がなく、このリクエストを打ち切りました（タイムアウト）。「1 バッチの文字数」を小さくするか、より速いモデルに変更してください。Qwen3 / GLM など思考してから答えるモデルの場合は「追加リクエストパラメータ」に {"enable_thinking":false} を指定してください',alreadyRunning:'前回の翻訳がまだ終了していません（いずれかのリクエストの応答待ちの可能性があります）——停止を要求しました。現在のバッチが終わるまでお待ちください',modeMismatch:'注意：下欄にカスタム API（{0}）が入力されていますが、現在のモードは「既定モデル」のため使用されません。使うには上のモードを「カスタム API」に切り替えてください',errTruncOut:'モデルの出力が長さ上限で打ち切られました（最後まで生成されていません）——「追加リクエストパラメータ」で max_tokens を増やしてください。例：{"max_tokens":8192}',lblExtra:'追加リクエストパラメータ（JSON、任意）',extraTip:'カスタム API の各リクエスト本文にマージされます。例：{"enable_thinking":false}（思考を無効化）、{"response_format":{"type":"json_object"}}（JSON 出力を強制）。model / messages / temperature / stream は上書きできません。',fbRoute:'注意：モデル B（{0}）の呼び出しに失敗したため、今回はモデル A（{1}）で翻訳しました。理由：{2}',
@@ -2549,6 +2600,7 @@ userStop:'ユーザーにより停止されました。', postEnd:'翻訳終了�
   modFxDo3:'ライブプレビュー＝書き出し結果。時間軸の個別修正や一括補正も可能',
   modFxFix:'二か国語字幕のタイミングを手作業で合わせる手間、ASSの数値を変えても見た目が分からない、書き出しがプレビューと違う。',
   modFxWho:'二か国語・装飾字幕を作るクリエイター、エンコード担当、バリアフリー字幕が必要なチーム。',
+  modTrTag1:'75 言語', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 ルール', modClTag2:'時間軸は不変更', modFxTag1:'二か国語結合', modFxTag2:'スタイルスロット',
   /* v0.9.70 两段式界面新增 */
 },
 'es': {pureMTMode:'Modelo de traducción pura detectado ({0}): se cambia a traducción directa por grupo ({1} grupos, 4 en paralelo, los grupos con éxito se guardan en caché)…',pureMTDone:'Traducción por grupo terminada: {0}/{1} grupos con éxito',gotClick:'Recibida la solicitud de iniciar traducción — preparando…',reqSent:'Solicitud del lote {0} enviada ({1} grupos): esperando la respuesta del modelo…',waitSec:'Esperando desde hace {0} s — todavía sin respuesta del modelo…',errTimeout:'Sin respuesta tras {0} s — se abandonó la solicitud (tiempo de espera agotado). Prueba a reducir el presupuesto de caracteres por lote o a usar un modelo más rápido; si el modelo razona antes de responder (Qwen3, GLM…), pon {"enable_thinking":false} en los parámetros adicionales',alreadyRunning:'La ejecución anterior aún no ha terminado — se ha solicitado la detención. Espera a que cierre el lote actual antes de volver a empezar',modeMismatch:'Atención: hay una API personalizada configurada abajo ({0}), pero el modo actual es “Modelo predeterminado”, así que no se usará. Cambia el modo a “API personalizada” para usarla',errTruncOut:'La salida del modelo alcanzó el límite de tokens y se truncó antes de terminar — aumenta max_tokens en Parámetros adicionales, p. ej. {"max_tokens":8192}',lblExtra:'Parámetros adicionales (JSON, opcional)',extraTip:'Se fusiona en el cuerpo de cada solicitud de API personalizada. Ej.: {"enable_thinking":false} para desactivar el razonamiento; {"response_format":{"type":"json_object"}} para forzar JSON. model / messages / temperature / stream no se pueden sobrescribir.',fbRoute:'Aviso: la llamada al modelo B ({0}) falló; este lote se tradujo con el modelo A ({1}). Motivo: {2}',
@@ -2678,6 +2730,7 @@ userStop:'Detenido por el usuario.', postEnd:'Traducción terminada, aplicando l
   modFxDo3:'La vista previa es el archivo exportado; la línea de tiempo se ajusta al momento o en bloque',
   modFxFix:'Subtítulos bilingües que hay que cuadrar a mano; valores ASS cuyo efecto no ves; exportaciones que no coinciden con la vista previa.',
   modFxWho:'Creadores de subtítulos bilingües o con estilo, grupos de codificación, equipos que necesitan subtítulos accesibles.',
+  modTrTag1:'75 idiomas', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 reglas', modClTag2:'Sin tocar los tiempos', modFxTag1:'Fusión bilingüe', modFxTag2:'Ranuras de estilo',
   /* v0.9.70 两段式界面新增 */
 },
 'pt': {pureMTMode:'Modelo de tradução pura detectado ({0}): mudando para tradução direta por grupo ({1} grupos, 4 em paralelo, grupos bem-sucedidos ficam em cache)…',pureMTDone:'Tradução por grupo concluída: {0}/{1} grupos com sucesso',gotClick:'Pedido para iniciar a tradução recebido — a preparar…',reqSent:'Pedido do lote {0} enviado ({1} grupos) — aguardando a resposta do modelo…',waitSec:'Aguardando há {0} s — ainda sem resposta do modelo…',errTimeout:'Sem resposta após {0} s — pedido abandonado (tempo esgotado). Tente reduzir o orçamento de caracteres por lote ou usar um modelo mais rápido; se o modelo raciocina antes de responder (Qwen3, GLM…), coloque {"enable_thinking":false} nos parâmetros adicionais',alreadyRunning:'A execução anterior ainda não terminou — foi pedida a paragem. Aguarda que o lote atual conclua antes de recomeçar',modeMismatch:'Atenção: tens uma API personalizada preenchida abaixo ({0}), mas o modo atual é “Modelo predefinido”, por isso não será usada. Muda o modo para “API personalizada” para a utilizar',errTruncOut:'A saída do modelo atingiu o limite de tokens e foi truncada antes de terminar — aumente max_tokens em Parâmetros adicionais, p. ex. {"max_tokens":8192}',lblExtra:'Parâmetros adicionais (JSON, opcional)',extraTip:'É mesclado ao corpo de cada requisição de API personalizada. Ex.: {"enable_thinking":false} para desativar o raciocínio; {"response_format":{"type":"json_object"}} para forçar JSON. model / messages / temperature / stream não podem ser sobrescritos.',fbRoute:'Aviso: a chamada ao modelo B ({0}) falhou; este lote foi traduzido pelo modelo A ({1}). Motivo: {2}',
@@ -2807,6 +2860,7 @@ userStop:'Interrompido pelo usuário.', postEnd:'Tradução concluída, aplicand
   modFxDo3:'A prévia é o arquivo exportado; a timeline pode ser ajustada no ponto ou em bloco',
   modFxFix:'Legendas bilíngues que precisam ser alinhadas à mão; valores ASS cujo efeito você não vê; exportações diferentes da prévia.',
   modFxWho:'Criadores de legendas bilíngues ou estilizadas, grupos de encoding, times que precisam de legendas acessíveis.',
+  modTrTag1:'75 idiomas', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 regras', modClTag2:'Tempos intactos', modFxTag1:'Mesclagem bilíngue', modFxTag2:'Slots de estilo',
   /* v0.9.70 两段式界面新增 */
 },
 'ko': {pureMTMode:'순수 번역 모델 감지됨({0}): 그룹별 직접 번역으로 전환합니다(총 {1}개 그룹, 4개 동시 처리, 성공한 그룹은 캐시)…',pureMTDone:'그룹별 번역 완료: {1}개 중 {0}개 성공',gotClick:'“번역 시작” 요청을 받았습니다 — 준비 중…',reqSent:'{0}번째 배치 요청 전송 완료({1}개 그룹) — 모델 응답 대기 중…',waitSec:'{0}초 대기 중 — 아직 모델 응답이 없습니다…',errTimeout:'{0}초 동안 응답이 없어 이번 요청을 포기했습니다(시간 초과). 「배치당 문자 수」를 줄이거나 더 빠른 모델로 바꿔 보세요. Qwen3 / GLM 처럼 먼저 추론하는 모델이라면 추가 요청 파라미터에 {"enable_thinking":false} 를 넣으세요',alreadyRunning:'이전 실행이 아직 끝나지 않았습니다 — 정지를 요청했습니다. 현재 배치가 마무리된 후 다시 시작하세요',modeMismatch:'주의: 아래에 사용자 지정 API({0})가 입력되어 있지만 현재 모드는 “기본 모델”이므로 사용되지 않습니다. 사용하려면 모드를 “사용자 지정 API”로 바꾸세요',errTruncOut:'모델 출력이 토큰 한도에 걸려 완성되지 못하고 잘렸습니다 — 추가 요청 파라미터에서 max_tokens를 늘리세요. 예: {"max_tokens":8192}',lblExtra:'추가 요청 파라미터 (JSON, 선택)',extraTip:'커스텀 API 요청 본문에 함께 전송됩니다. 예: {"enable_thinking":false}(추론 비활성화), {"response_format":{"type":"json_object"}}(JSON 출력 강제). model / messages / temperature / stream 는 덮어쓸 수 없습니다.',fbRoute:'안내: 모델 B({0}) 호출이 실패해 이번에는 모델 A({1})로 번역했습니다. 이유: {2}',
@@ -2936,6 +2990,7 @@ userStop:'사용자가 중지했습니다.', postEnd:'번역 종료, 필러 제�
   modFxDo3:'실시간 미리보기 = 내보낸 파일. 타임라인도 개별 수정과 일괄 보정 가능',
   modFxFix:'두 언어 자막의 싱크를 손으로 맞춰야 하는 번거로움, 수치를 바꿔도 결과를 볼 수 없는 ASS, 미리보기와 다른 내보내기 결과.',
   modFxWho:'두 언어·스타일 자막을 만드는 크리에이터, 인코딩 팀, 접근성 자막이 필요한 팀.',
+  modTrTag1:'75개 언어', modTrTag2:'SRT / VTT / ASS', modClTag1:'13개 규칙', modClTag2:'타임라인 유지', modFxTag1:'이중 언어 병합', modFxTag2:'스타일 슬롯',
   /* v0.9.70 两段式界面新增 */
 },
 'de': {pureMTMode:'Reines Übersetzungsmodell erkannt ({0}): Wechsel zur direkten Übersetzung pro Gruppe ({1} Gruppen, 4 parallel, erfolgreiche Gruppen werden zwischengespeichert)…',pureMTDone:'Gruppenweise Übersetzung abgeschlossen: {0}/{1} Gruppen erfolgreich',gotClick:'Anfrage zum Start der Übersetzung erhalten — wird vorbereitet…',reqSent:'Anfrage für Batch {0} gesendet ({1} Gruppen) — warte auf die Antwort des Modells…',waitSec:'Seit {0} s gewartet — weiterhin keine Antwort des Modells…',errTimeout:'Nach {0} s keine Antwort — Anfrage abgebrochen (Zeitüberschreitung). Verringere das Zeichenbudget pro Batch oder wechsle zu einem schnelleren Modell; wenn das Modell vor der Antwort nachdenkt (Qwen3, GLM…), trage {"enable_thinking":false} bei den zusätzlichen Anfrageparametern ein',alreadyRunning:'Der vorherige Lauf ist noch nicht beendet — der Stopp wurde angefordert. Warte, bis der aktuelle Batch abgeschlossen ist, bevor du neu startest',modeMismatch:'Achtung: Unten ist eine benutzerdefinierte API eingetragen ({0}), der Modus ist aber „Standardmodell“ — sie wird nicht verwendet. Wechsle oben auf „Benutzerdefinierte API“, um sie zu nutzen',errTruncOut:'Die Modellausgabe erreichte das Token-Limit und wurde vorzeitig abgeschnitten — erhöhe max_tokens in den zusätzlichen Anfrageparametern, z. B. {"max_tokens":8192}',lblExtra:'Zusätzliche Anfrageparameter (JSON, optional)',extraTip:'Wird in jeden Anfragetext der benutzerdefinierten API eingefügt. Z. B. {"enable_thinking":false} zum Abschalten des Nachdenkens; {"response_format":{"type":"json_object"}} erzwingt JSON. model / messages / temperature / stream sind nicht überschreibbar.',fbRoute:'Hinweis: Der Aufruf von Modell B ({0}) ist fehlgeschlagen; dieser Durchgang wurde mit Modell A ({1}) übersetzt. Grund: {2}',
@@ -3065,6 +3120,7 @@ userStop:'Vom Benutzer gestoppt.', postEnd:'Übersetzung abgeschlossen, wende F�
   modFxDo3:'Die Vorschau ist die exportierte Datei; die Zeitleiste lässt sich einzeln oder in Blöcken korrigieren',
   modFxFix:'Zweisprachige Untertitel, die von Hand synchronisiert werden müssen; ASS-Werte ohne sichtbare Wirkung; Exporte, die nicht der Vorschau entsprechen.',
   modFxWho:'Creator für zwei- oder gestaltete Untertitel, Encoding-Gruppen, Teams mit Bedarf an barrierefreien Untertiteln.',
+  modTrTag1:'75 Sprachen', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 Regeln', modClTag2:'Zeiten bleiben', modFxTag1:'Zweisprachig zusammenführen', modFxTag2:'Stil-Slots',
   /* v0.9.70 两段式界面新增 */
 },
 'fr': {pureMTMode:'Modèle de traduction pure détecté ({0}) : passage à la traduction directe par groupe ({1} groupes, 4 en parallèle, les groupes réussis sont mis en cache)…',pureMTDone:'Traduction par groupe terminée : {0}/{1} groupes réussis',gotClick:'Demande de démarrage de la traduction reçue — préparation…',reqSent:'Requête du lot {0} envoyée ({1} groupes) — en attente de la réponse du modèle…',waitSec:'{0} s d’attente — toujours aucune réponse du modèle…',errTimeout:'Aucune réponse après {0} s — requête abandonnée (délai dépassé). Réduisez le budget de caractères par lot ou choisissez un modèle plus rapide ; si le modèle réfléchit avant de répondre (Qwen3, GLM…), mettez {"enable_thinking":false} dans les paramètres supplémentaires',alreadyRunning:'L’exécution précédente n’est pas encore terminée — l’arrêt a été demandé. Attendez la fin du lot en cours avant de relancer',modeMismatch:'Attention : une API personnalisée est renseignée ci-dessous ({0}), mais le mode est « Modèle par défaut » — elle ne sera donc pas utilisée. Passez le mode sur « API personnalisée » pour l’utiliser',errTruncOut:'La sortie du modèle a atteint la limite de jetons et a été tronquée avant la fin — augmentez max_tokens dans les paramètres supplémentaires, p. ex. {"max_tokens":8192}',lblExtra:'Paramètres de requête supplémentaires (JSON, optionnel)',extraTip:'Fusionné dans le corps de chaque requête d\'API personnalisée. Ex. : {"enable_thinking":false} pour désactiver le raisonnement ; {"response_format":{"type":"json_object"}} pour forcer le JSON. model / messages / temperature / stream ne peuvent pas être remplacés.',fbRoute:'Note : l’appel au modèle B ({0}) a échoué ; ce lot a été traduit par le modèle A ({1}). Raison : {2}',
@@ -3194,6 +3250,7 @@ userStop:'Arrêté par l\u2019utilisateur.', postEnd:'Traduction terminée, appl
   modFxDo3:'L’aperçu correspond au fichier exporté ; la timeline se corrige au détail ou en bloc',
   modFxFix:'Des sous-titres bilingues à synchroniser à la main ; des valeurs ASS dont on ne voit pas l’effet ; des exports différents de l’aperçu.',
   modFxWho:'Les créateurs de sous-titres bilingues ou stylisés, les groupes d’encodage, les équipes qui ont besoin de sous-titres accessibles.',
+  modTrTag1:'75 langues', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 règles', modClTag2:'Timing inchangé', modFxTag1:'Fusion bilingue', modFxTag2:'Emplacements de style',
   /* v0.9.70 两段式界面新增 */
 },
 'id': {pureMTMode:'Model terjemahan murni terdeteksi ({0}): beralih ke terjemahan langsung per grup ({1} grup, 4 paralel, grup yang berhasil disimpan dalam cache)…',pureMTDone:'Terjemahan per grup selesai: {0}/{1} grup berhasil',gotClick:'Permintaan mulai terjemahan diterima — menyiapkan…',reqSent:'Permintaan batch {0} terkirim ({1} grup) — menunggu respons model…',waitSec:'Menunggu {0} dtk — model masih belum merespons…',errTimeout:'Tidak ada respons setelah {0} dtk — permintaan dibatalkan (waktu habis). Coba kecilkan anggaran karakter per batch atau ganti ke model yang lebih cepat; jika model berpikir sebelum menjawab (Qwen3, GLM…), isi {"enable_thinking":false} di parameter permintaan tambahan',alreadyRunning:'Eksekusi sebelumnya belum selesai — penghentian diminta. Tunggu batch saat ini selesai sebelum mulai lagi',modeMismatch:'Perhatian: API kustom sudah terisi di bawah ({0}), tetapi mode saat ini adalah “Model bawaan”, jadi tidak akan dipakai. Ganti mode ke “API kustom” untuk menggunakannya',errTruncOut:'Keluaran model mencapai batas token dan terpotong sebelum selesai — naikkan max_tokens di Parameter permintaan tambahan, mis. {"max_tokens":8192}',lblExtra:'Parameter permintaan tambahan (JSON, opsional)',extraTip:'Digabungkan ke setiap body permintaan API kustom. Contoh: {"enable_thinking":false} untuk mematikan penalaran; {"response_format":{"type":"json_object"}} untuk memaksa JSON. model / messages / temperature / stream tidak dapat ditimpa.',fbRoute:'Catatan: panggilan model B ({0}) gagal; batch ini diterjemahkan oleh model A ({1}). Alasan: {2}',
@@ -3323,6 +3380,7 @@ userStop:'Dihentikan pengguna.', postEnd:'Terjemahan selesai, menerapkan penghap
   modFxDo3:'Pratinjau sama dengan hasil ekspor; timeline bisa dirapi per baris atau sekaligus',
   modFxFix:'Subtitle dwibahasa yang harus disinkronkan manual; nilai ASS yang efeknya tidak terlihat; hasil ekspor beda dari pratinjau.',
   modFxWho:'Kreator subtitle dwibahasa atau bergaya, tim encoding, tim yang butuh subtitle aksesibel.',
+  modTrTag1:'75 bahasa', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 aturan', modClTag2:'Waktu tidak diubah', modFxTag1:'Gabung dwibahasa', modFxTag2:'Slot gaya',
   /* v0.9.70 两段式界面新增 */
 },
 'hi': {pureMTMode:'शुद्ध अनुवाद मॉडल पाया गया ({0}): प्रति-समूह सीधे अनुवाद पर जा रहे हैं ({1} समूह, 4 समानांतर, सफल समूह कैश होंगे)…',pureMTDone:'प्रति-समूह अनुवाद पूरा: {1} में {0} समूह सफल',gotClick:'“अनुवाद शुरू करें” अनुरोध मिला — तैयार किया जा रहा है…',reqSent:'बैच {0} का अनुरोध भेजा गया ({1} समूह) — मॉडल की प्रतिक्रिया की प्रतीक्षा…',waitSec:'{0} सेकंड हो गए — अभी भी मॉडल से कोई प्रतिक्रिया नहीं…',errTimeout:'{0} सेकंड तक कोई प्रतिक्रिया नहीं — अनुरोध छोड़ दिया गया (समय समाप्त)। प्रति बैच अक्षर बजट घटाएँ या तेज़ मॉडल अपनाएँ; यदि मॉडल उत्तर से पहले तर्क करता है (Qwen3, GLM…), तो अतिरिक्त अनुरोध पैरामीटर में {"enable_thinking":false} डालें',alreadyRunning:'पिछला रन अभी समाप्त नहीं हुआ है — रोकने का अनुरोध भेज दिया गया। फिर से शुरू करने से पहले वर्तमान बैच के पूरा होने तक प्रतीक्षा करें',modeMismatch:'ध्यान दें: नीचे कस्टम API ({0}) भरी हुई है, लेकिन ऊपर का मोड “डिफ़ॉल्ट मॉडल” है, इसलिए इसका उपयोग नहीं होगा। उपयोग करने के लिए मोड को “कस्टम API” पर बदलें',errTruncOut:'मॉडल का आउटपुट टोकन सीमा पर पहुँचकर अधूरा कट गया — अतिरिक्त अनुरोध पैरामीटर में max_tokens बढ़ाएँ, जैसे {"max_tokens":8192}',lblExtra:'अतिरिक्त अनुरोध पैरामीटर (JSON, वैकल्पिक)',extraTip:'हर कस्टम API अनुरोध के body में जोड़ा जाता है। उदा. {"enable_thinking":false} तर्क बंद करने के लिए; {"response_format":{"type":"json_object"}} JSON लागू करने के लिए। model / messages / temperature / stream ओवरराइड नहीं किए जा सकते।',fbRoute:'सूचना: मॉडल B ({0}) का कॉल विफल रहा; यह बैच मॉडल A ({1}) से अनूदित किया गया। कारण: {2}',
@@ -3452,6 +3510,7 @@ userStop:'उपयोगकर्ता ने रोका।', postEnd:'अ�
   modFxDo3:'प्रीव्यू = निर्यात की गई फ़ाइल; टाइमलाइन एक-एक करके या एक साथ सुधारें',
   modFxFix:'द्विभाषी सबटाइटल को हाथ से सिंक करना; ASS वैल्यू जिनका असर नहीं दिखता; निर्यात जो प्रीव्यू से मेल न खाए।',
   modFxWho:'द्विभाषी या स्टाइलिश सबटाइटल बनाने वाले क्रिएटर, एन्कोडिंग टीम, सुलभ सबटाइटल चाहने वाली टीमें।',
+  modTrTag1:'75 भाषाएँ', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 नियम', modClTag2:'समय-रेखा बदली नहीं', modFxTag1:'द्विभाषीय मर्ज', modFxTag2:'स्टाइल स्लॉट',
   /* v0.9.70 两段式界面新增 */
 },
 'th': {pureMTMode:'ตรวจพบโมเดลแปลภาษาล้วน ({0}): เปลี่ยนไปแปลตรงรายกลุ่ม ({1} กลุ่ม, ขนาน 4 งาน, กลุ่มที่สำเร็จจะถูกแคช)…',pureMTDone:'แปลรายกลุ่มเสร็จ: สำเร็จ {0}/{1} กลุ่ม',gotClick:'ได้รับคำขอ “เริ่มแปล” — กำลังเตรียม…',reqSent:'ส่งคำขอชุดที่ {0} แล้ว ({1} กลุ่ม) — กำลังรอการตอบสนองจากโมเดล…',waitSec:'รอมา {0} วินาทีแล้ว — ยังไม่ได้รับการตอบสนองจากโมเดล…',errTimeout:'ไม่มีการตอบสนองหลังจาก {0} วินาที — ยกเลิกคำขอนี้ (หมดเวลา) แนะนำให้ลดงบประมาณตัวอักษรต่อชุด หรือเปลี่ยนไปใช้โมเดลที่เร็วกว่า หากโมเดลคิดก่อนตอบ (Qwen3, GLM ฯลฯ) ให้ใส่ {"enable_thinking":false} ในพารามิเตอร์เพิ่มเติม',alreadyRunning:'รอบก่อนหน้ายังไม่จบ — ได้ส่งคำขอหยุดแล้ว รอชุดปัจจุบันจบก่อนแล้วค่อยเริ่มใหม่',modeMismatch:'หมายเหตุ: มีการกรอก API แบบกำหนดเองด้านล่าง ({0}) แต่โหมดด้านบนคือ “โมเดลเริ่มต้น” จึงไม่ถูกนำมาใช้ เปลี่ยนโหมดเป็น “API แบบกำหนดเอง” เพื่อใช้งาน',errTruncOut:'ผลลัพธ์ของโมเดลถูกลิมิต token ตัดก่อนจบ — เพิ่ม max_tokens ในพารามิเตอร์เพิ่มเติม เช่น {"max_tokens":8192}',lblExtra:'พารามิเตอร์เพิ่มเติม (JSON, ไม่บังคับ)',extraTip:'รวมเข้าใน body ของทุกคำขอแบบกำหนดเอง เช่น {"enable_thinking":false} ปิดการคิดของโมเดล, {"response_format":{"type":"json_object"}} บังคับผลลัพธ์เป็น JSON model / messages / temperature / stream แทนที่ไม่ได้',fbRoute:'หมายเหตุ: การเรียกโมเดล B ({0}) ล้มเหลว ชุดนี้จึงแปลด้วยโมเดล A ({1}) สาเหตุ: {2}',
@@ -3581,6 +3640,7 @@ userStop:'หยุดโดยผู้ใช้', postEnd:'แปลเสร�
   modFxDo3:'พรีวิว = ไฟล์ที่ส่งออก แก้ไทม์ไลน์ทีละจุดหรือทั้งชุดก็ได้',
   modFxFix:'ซับสองภาษาต้องซิงก์มือ ค่า ASS ที่ไม่เห็นผล หรือส่งออกแล้วไม่เหมือนพรีวิว',
   modFxWho:'ครีเอเตอร์ซับสองภาษาหรือซับแต่ง ทีมเข้ารหัส ทีมที่ต้องการซับสำหรับผู้บกพร่องทางการได้ยิน',
+  modTrTag1:'75 ภาษา', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 กฎ', modClTag2:'ไม่แตะเวลา', modFxTag1:'รวมสองภาษา', modFxTag2:'ช่องสไตล์',
   /* v0.9.70 两段式界面新增 */
 },
 'vi': {pureMTMode:'Phát hiện mô hình dịch thuần ({0}): chuyển sang dịch trực tiếp từng nhóm ({1} nhóm, 4 song song, nhóm thành công sẽ được lưu cache)…',pureMTDone:'Dịch từng nhóm hoàn tất: thành công {0}/{1} nhóm',gotClick:'Đã nhận yêu cầu “bắt đầu dịch” — đang chuẩn bị…',reqSent:'Đã gửi yêu cầu lô {0} ({1} nhóm) — đang chờ phản hồi của mô hình…',waitSec:'Đã chờ {0} giây — vẫn chưa có phản hồi từ mô hình…',errTimeout:'Không có phản hồi sau {0} giây — đã bỏ yêu cầu này (hết thời gian chờ). Hãy giảm ngân sách ký tự mỗi lô hoặc đổi sang mô hình nhanh hơn; nếu mô hình suy luận trước khi trả lời (Qwen3, GLM…), hãy điền {"enable_thinking":false} vào tham số yêu cầu bổ sung',alreadyRunning:'Lần chạy trước vẫn chưa kết thúc — đã yêu cầu dừng. Hãy đợi lô hiện tại hoàn tất rồi mới bắt đầu lại',modeMismatch:'Lưu ý: đã điền API tùy chỉnh ở dưới ({0}), nhưng chế độ hiện tại là “Mô hình mặc định” nên sẽ không được dùng. Hãy chuyển sang “API tùy chỉnh” để sử dụng',errTruncOut:'Kết quả của mô hình bị giới hạn token cắt ngắn trước khi hoàn tất — hãy tăng max_tokens trong Tham số yêu cầu bổ sung, ví dụ {"max_tokens":8192}',lblExtra:'Tham số yêu cầu bổ sung (JSON, tùy chọn)',extraTip:'Được gộp vào body của mỗi yêu cầu API tùy chỉnh. Ví dụ: {"enable_thinking":false} tắt suy luận; {"response_format":{"type":"json_object"}} ép xuất JSON. Không thể ghi đè model / messages / temperature / stream.',fbRoute:'Lưu ý: lệnh gọi mô hình B ({0}) thất bại; lô này được dịch bằng mô hình A ({1}). Lý do: {2}',
@@ -3710,6 +3770,7 @@ userStop:'Đã dừng bởi người dùng.', postEnd:'Dịch xong, đang dọn 
   modFxDo3:'Xem trước chính là file xuất ra; timeline chỉnh được từng chỗ hoặc hàng loạt',
   modFxFix:'Phụ đề song ngữ phải căn tay; giá trị ASS không thấy tác dụng; file xuất khác bản xem trước.',
   modFxWho:'Creator làm phụ đề song ngữ hoặc tạo kiểu, nhóm encode, đội cần phụ đề hỗ trợ tiếp cận.',
+  modTrTag1:'75 ngôn ngữ', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 quy tắc', modClTag2:'Không đổi thời gian', modFxTag1:'Gộp song ngữ', modFxTag2:'Khe kiểu dáng',
   /* v0.9.70 两段式界面新增 */
 },
 'ru': {pureMTMode:'Обнаружена чистая переводческая модель ({0}): переход на прямой перевод по группам ({1} групп, 4 параллельно, успешные группы кэшируются)…',pureMTDone:'Погрупповой перевод завершён: успешно {0}/{1}',gotClick:'Получен запрос на начало перевода — подготовка…',reqSent:'Запрос пакета {0} отправлен ({1} групп) — ждём ответа модели…',waitSec:'Ожидание {0} с — ответа от модели всё ещё нет…',errTimeout:'За {0} с ответа не получено — запрос отменён (тайм-аут). Уменьшите лимит символов на пакет или выберите более быструю модель; если модель рассуждает перед ответом (Qwen3, GLM…), укажите {"enable_thinking":false} в дополнительных параметрах',alreadyRunning:'Предыдущий запуск ещё не завершён — запрошена остановка. Дождитесь завершения текущего пакета, прежде чем начинать заново',modeMismatch:'Внимание: ниже заполнены поля пользовательского API ({0}), но выбран режим «Модель по умолчанию», поэтому они не будут использованы. Переключите режим на «Свой API»',errTruncOut:'Вывод модели достиг лимита токенов и оборвался, не закончив генерацию — увеличьте max_tokens в дополнительных параметрах, например {"max_tokens":8192}',lblExtra:'Дополнительные параметры запроса (JSON, необязательно)',extraTip:'Добавляется в тело каждого запроса к пользовательскому API. Например {"enable_thinking":false} отключает рассуждения; {"response_format":{"type":"json_object"}} принудительно включает JSON. model / messages / temperature / stream переопределить нельзя.',fbRoute:'Внимание: вызов модели B ({0}) не удался; этот пакет переведён моделью A ({1}). Причина: {2}',
@@ -3839,6 +3900,7 @@ userStop:'Остановлено пользователем.', postEnd:'Пере
   modFxDo3:'Предпросмотр равен экспорту; таймлайн правится точечно или пакетом',
   modFxFix:'Двуязычные субтитры, которые нужно синхронить вручную; значения ASS без видимого эффекта; экспорт не совпадает с предпросмотром.',
   modFxWho:'Авторы двуязычных и оформленных субтитров, группы кодирования, команды, которым нужны доступные субтитры.',
+  modTrTag1:'75 языков', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 правил', modClTag2:'Тайминг не трогаем', modFxTag1:'Двуязычное объединение', modFxTag2:'Слоты стилей',
   /* v0.9.70 两段式界面新增 */
 },
 'it': {pureMTMode:'Modello di traduzione pura rilevato ({0}): si passa alla traduzione diretta per gruppo ({1} gruppi, 4 in parallelo, i gruppi riusciti vengono messi in cache)…',pureMTDone:'Traduzione per gruppo completata: {0}/{1} gruppi riusciti',gotClick:'Ricevuta la richiesta di avvio traduzione — preparazione…',reqSent:'Richiesta del lotto {0} inviata ({1} gruppi) — in attesa della risposta del modello…',waitSec:'Attesa di {0} s — ancora nessuna risposta dal modello…',errTimeout:'Nessuna risposta dopo {0} s — richiesta abbandonata (timeout). Riduci il budget di caratteri per lotto oppure passa a un modello più veloce; se il modello ragiona prima di rispondere (Qwen3, GLM…), inserisci {"enable_thinking":false} nei parametri aggiuntivi',alreadyRunning:'L’esecuzione precedente non è ancora finita — è stato richiesto l’arresto. Attendi la fine del lotto corrente prima di riavviare',modeMismatch:'Attenzione: i campi API personalizzata sono compilati qui sotto ({0}), ma la modalità è «Modello predefinito», quindi non verranno usati. Passa alla modalità «API personalizzata» per usarli',errTruncOut:'L\'output del modello ha raggiunto il limite di token ed è stato troncato prima della fine — aumenta max_tokens nei parametri aggiuntivi, es. {"max_tokens":8192}',lblExtra:'Parametri di richiesta aggiuntivi (JSON, opzionale)',extraTip:'Unito al corpo di ogni richiesta API personalizzata. Es.: {"enable_thinking":false} per disattivare il ragionamento; {"response_format":{"type":"json_object"}} per forzare il JSON. model / messages / temperature / stream non sono sovrascrivibili.',fbRoute:'Nota: la chiamata al modello B ({0}) non è riuscita; questo lotto è stato tradotto dal modello A ({1}). Motivo: {2}',
@@ -3968,6 +4030,7 @@ userStop:'Fermato dall\'utente.', postEnd:'Traduzione completata, applico rimozi
   modFxDo3:'L’anteprima è il file esportato; la timeline si corregge al dettaglio o in blocco',
   modFxFix:'Sottotitoli bilingue da sincronizzare a mano; valori ASS di cui non si vede l’effetto; esportazioni diverse dall’anteprima.',
   modFxWho:'Creator di sottotitoli bilingue o stilizzati, gruppi di encoding, team che hanno bisogno di sottotitoli accessibili.',
+  modTrTag1:'75 lingue', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 regole', modClTag2:'Tempi intatti', modFxTag1:'Unione bilingue', modFxTag2:'Slot di stile',
   /* v0.9.70 两段式界面新增 */
 },
 'ar': {pureMTMode:'تم اكتشاف نموذج ترجمة خالص ({0}): التحويل إلى الترجمة المباشرة لكل مجموعة ({1} مجموعات، 4 بالتوازي، تُخزَّن المجموعات الناجحة مؤقتًا)…',pureMTDone:'اكتملت الترجمة لكل مجموعة: نجحت {0} من {1}',gotClick:'تم استلام طلب بدء الترجمة — جارٍ التحضير…',reqSent:'تم إرسال طلب الدفعة {0} ({1} مجموعة) — في انتظار رد النموذج…',waitSec:'انتظار {0} ثانية — لا تزال الاستجابة من النموذج غير واردة…',errTimeout:'لا استجابة بعد {0} ثانية — تم إلغاء الطلب (انتهت المهلة). جرّب تقليل ميزانية الأحرف لكل دفعة أو استخدم نموذجاً أسرع؛ وإذا كان النموذج يفكر قبل الإجابة (Qwen3، GLM…)، ضع {"enable_thinking":false} في معاملات الطلب الإضافية',alreadyRunning:'التشغيل السابق لم ينتهِ بعد — تم طلب الإيقاف. انتظر انتهاء الدفعة الحالية قبل البدء من جديد',modeMismatch:'تنبيه: تم تعبئة حقول API مخصصة أدناه ({0})، لكن الوضع الحالي هو «النموذج الافتراضي»، لذا لن تُستخدم. غيّر الوضع إلى «API مخصصة» لاستخدامها',errTruncOut:'تم قطع إخراج النموذج عند حد الرموز قبل اكتماله — ارفع max_tokens في معاملات الطلب الإضافية، مثل {"max_tokens":8192}',lblExtra:'معاملات طلب إضافية (JSON، اختياري)',extraTip:'تُدمَج في جسم كل طلب لواجهة API المخصصة. مثل {"enable_thinking":false} لإيقاف التفكير، و{"response_format":{"type":"json_object"}} لإجبار JSON. لا يمكن تجاوز model / messages / temperature / stream.',fbRoute:'تنبيه: تعذّر استدعاء النموذج B ({0})؛ تمت ترجمة هذه الدفعة بالنموذج A ({1}). السبب: {2}',
@@ -4097,6 +4160,7 @@ userStop:'أوقفه المستخدم.', postEnd:'انتهت الترجمة، ت
   modFxDo3:'المعاينة هي الملف المُصدَّر؛ يمكن ضبط التوقيتات واحدة واحدة أو دفعة واحدة',
   modFxFix:'ترجمات بلغتين تحتاج مزامنة يدوية؛ قيم ASS لا ترى أثرها؛ تصدير لا يطابق المعاينة.',
   modFxWho:'صنّاع ترجمات بلغتين أو منسّقة، فرق الترميز، الفرق التي تحتاج ترجمات متاحة للجميع.',
+  modTrTag1:'75 لغة', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 قاعدة', modClTag2:'التوقيت كما هو', modFxTag1:'دمج ثنائي اللغة', modFxTag2:'خانات الأنماط',
   /* v0.9.70 两段式界面新增 */
 },
 'tr': {pureMTMode:'Saf çeviri modeli algılandı ({0}): grup başına doğrudan çeviriye geçiliyor ({1} grup, 4 paralel, başarılı gruplar önbelleğe alınıyor)…',pureMTDone:'Grup çevirisi tamamlandı: {0}/{1} grup başarılı',gotClick:'“Çeviriyi başlat” isteği alındı — hazırlanıyor…',reqSent:'{0}. parti isteği gönderildi ({1} grup) — model yanıtı bekleniyor…',waitSec:'{0} saniye geçti — modelden hâlâ yanıt yok…',errTimeout:'{0} saniye sonra yanıt yok — istek iptal edildi (zaman aşımı). Parti başına karakter bütçesini küçültmeyi veya daha hızlı bir modele geçmeyi deneyin; model yanıt vermeden önce düşünüyorsa (Qwen3, GLM…), ek istek parametrelerine {"enable_thinking":false} yazın',alreadyRunning:'Önceki çalıştırma henüz bitmedi — durdurma istendi. Yeniden başlamadan önce mevcut partinin tamamlanmasını bekleyin',modeMismatch:'Dikkat: aşağıda özel API alanları doldurulmuş ({0}), ancak mod “Varsayılan model” olduğu için kullanılmayacak. Kullanmak için modu “Özel API” olarak değiştirin',errTruncOut:'Model çıktısı token sınırına takılıp tamamlanmadan kesildi — Ek istek parametrelerinde max_tokens değerini artırın, örn. {"max_tokens":8192}',lblExtra:'Ek istek parametreleri (JSON, isteğe bağlı)',extraTip:'Her özel API isteğinin gövdesine eklenir. Örn. {"enable_thinking":false} akıl yürütmeyi kapatır; {"response_format":{"type":"json_object"}} JSON çıktısını zorlar. model / messages / temperature / stream üzerine yazılamaz.',fbRoute:'Not: model B ({0}) çağrısı başarısız oldu; bu parti model A ({1}) ile çevrildi. Sebep: {2}',
@@ -4226,6 +4290,7 @@ userStop:'Kullanıcı tarafından durduruldu.', postEnd:'Çeviri bitti, dolgu te
   modFxDo3:'Önizleme, dışa aktarılan dosyanın aynısı; zaman çizgisi tek tek veya toplu düzeltilebilir',
   modFxFix:'Elle senkronize edilmesi gereken iki dilli altyazılar; etkisi görünmeyen ASS değerleri; önizlemeyle uyuşmayan çıktı.',
   modFxWho:'İki dilli veya biçimli altyazı yapan içerik üreticileri, encode ekipleri, erişilebilir altyazıya ihtiyaç duyan ekipler.',
+  modTrTag1:'75 dil', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 kural', modClTag2:'Zamanlama bozulmaz', modFxTag1:'İki dilli birleştirme', modFxTag2:'Stil yuvaları',
   /* v0.9.70 两段式界面新增 */
 },
 'nl': {pureMTMode:'Pure vertaalmodel gedetecteerd ({0}): overschakelen naar directe vertaling per groep ({1} groepen, 4 parallel, geslaagde groepen worden gecacht)…',pureMTDone:'Per groep vertalen voltooid: {0}/{1} groepen geslaagd',gotClick:'Verzoek om te starten met vertalen ontvangen — aan het voorbereiden…',reqSent:'Verzoek voor batch {0} verzonden ({1} groepen) — wachten op antwoord van het model…',waitSec:'{0} s gewacht — nog steeds geen antwoord van het model…',errTimeout:'Geen antwoord na {0} s — verzoek afgebroken (time-out). Verlaag het tekensbudget per batch of kies een sneller model; als het model eerst redeneert voordat het antwoordt (Qwen3, GLM…), zet {"enable_thinking":false} bij Extra verzoekparameters',alreadyRunning:'De vorige run is nog niet klaar — stop is aangevraagd. Wacht tot de huidige batch is afgerond voordat je opnieuw start',modeMismatch:'Let op: hieronder is een aangepaste API ingevuld ({0}), maar de modus is “Standaardmodel”, dus wordt die niet gebruikt. Zet de modus op “Aangepaste API” om hem te gebruiken',errTruncOut:'De modeluitvoer bereikte de tokenlimiet en werd voortijdig afgebroken — verhoog max_tokens bij Extra verzoekparameters, bijv. {"max_tokens":8192}',lblExtra:'Extra verzoekparameters (JSON, optioneel)',extraTip:'Wordt samengevoegd met de body van elke aangepaste API-aanvraag. Bijv. {"enable_thinking":false} om redeneren uit te schakelen; {"response_format":{"type":"json_object"}} dwingt JSON af. model / messages / temperature / stream kunnen niet worden overschreven.',fbRoute:'Let op: de aanroep van model B ({0}) is mislukt; deze batch is vertaald door model A ({1}). Reden: {2}',
@@ -4546,6 +4611,7 @@ rateWait:'Snelheidslimiet (429), 20 s wachten voor een nieuwe poging…',
   modFxDo3:'Het voorbeeld is het geëxporteerde bestand; de tijdlijn is per stuk of in bulk bij te stellen',
   modFxFix:'Tweetalige ondertitels die je met de hand moet synchroniseren; ASS-waarden waarvan je het effect niet ziet; exports die niet op het voorbeeld lijken.',
   modFxWho:'Creators van tweetalige of gestijlde ondertitels, encode-teams, teams die toegankelijke ondertitels nodig hebben.',
+  modTrTag1:'75 talen', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 regels', modClTag2:'Timing onaangetast', modFxTag1:'Tweetalig samenvoegen', modFxTag2:'Stijlsleuven',
   lblDropFillers:'Stopwoorden verwijderen'
 },
 'pl': {pureMTMode:'Wykryto czysty model tłumaczenia ({0}): przejście na bezpośrednie tłumaczenie per grupa ({1} grup, 4 równolegle, udane grupy trafiają do cache)…',pureMTDone:'Tłumaczenie per grupa zakończone: {0}/{1} grup udało się',gotClick:'Otrzymano żądanie rozpoczęcia tłumaczenia — przygotowywanie…',reqSent:'Wysłano żądanie partii {0} ({1} grup) — oczekiwanie na odpowiedź modelu…',waitSec:'Czekamy {0} s — odpowiedź modelu nadal brak…',errTimeout:'Brak odpowiedzi po {0} s — żądanie porzucone (przekroczenie czasu). Zmniejsz limit znaków na partię albo wybierz szybszy model; jeśli model rozumuje przed odpowiedzią (Qwen3, GLM…), wpisz {"enable_thinking":false} w dodatkowych parametrach żądania',alreadyRunning:'Poprzednie uruchomienie jeszcze się nie zakończyło — zażądano zatrzymania. Poczekaj na zakończenie bieżącej partii, zanim zaczniesz ponownie',modeMismatch:'Uwaga: poniżej wypełniono pola własnego API ({0}), ale tryb to „Model domyślny”, więc nie zostaną użyte. Przełącz tryb na „Własne API”, aby z nich skorzystać',errTruncOut:'Wyjście modelu osiągnęło limit tokenów i zostało ucięte przed końcem — zwiększ max_tokens w dodatkowych parametrach żądania, np. {"max_tokens":8192}',lblExtra:'Dodatkowe parametry żądania (JSON, opcjonalnie)',extraTip:'Dodawane do treści każdego żądania API niestandardowego. Np. {"enable_thinking":false} wyłącza rozumowanie; {"response_format":{"type":"json_object"}} wymusza JSON. Nie można nadpisać: model / messages / temperature / stream.',fbRoute:'Uwaga: wywołanie modelu B ({0}) nie powiodło się; ta partia została przetłumaczona przez model A ({1}). Przyczyna: {2}',
@@ -4866,6 +4932,7 @@ rateWait:'Przekroczono limit (429), czekanie 20 s przed ponowieniem…',
   modFxDo3:'Podgląd to eksportowany plik; oś czasu poprawisz punktowo lub hurtem',
   modFxFix:'Dwujęzyczne napisy, które trzeba synchronizować ręcznie; wartości ASS bez widocznego efektu; eksport inny niż podgląd.',
   modFxWho:'Twórcy napisów dwujęzycznych i stylowych, grupy encodingowe, zespoły potrzebujące napisów dostępnych.',
+  modTrTag1:'75 języków', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 reguł', modClTag2:'Czasy bez zmian', modFxTag1:'Łączenie dwujęzyczne', modFxTag2:'Gniazda stylów',
   lblDropFillers:'Usuń wypełniacze'
 },
 'sv': {pureMTMode:'Ren översättningsmodell upptäckt ({0}): växlar till direkt översättning per grupp ({1} grupper, 4 parallella, lyckade grupper cachas)…',pureMTDone:'Gruppvis översättning klar: {0}/{1} grupper lyckades',gotClick:'Begäran om att starta översättning mottagen — förbereder…',reqSent:'Förfrågan för batch {0} skickad ({1} grupper) — väntar på svar från modellen…',waitSec:'{0} s har gått — fortfarande inget svar från modellen…',errTimeout:'Inget svar efter {0} s — förfrågan avbruten (tidsgräns). Sänk teckenbudgeten per batch eller byt till en snabbare modell; om modellen tänker innan den svarar (Qwen3, GLM…), ange {"enable_thinking":false} under Extra förfrågningsparametrar',alreadyRunning:'Föregående körning är inte klar ännu — stopp har begärts. Vänta tills aktuell batch är klar innan du startar om',modeMismatch:'Observera: ett anpassat API är ifyllt nedan ({0}), men läget är “Standardmodell”, så det används inte. Byt läge till “Anpassat API” för att använda det',errTruncOut:'Modellens utdata nådde token-gränsen och avbröts i förtid — öka max_tokens under Extra förfrågningsparametrar, t.ex. {"max_tokens":8192}',lblExtra:'Extra förfrågningsparametrar (JSON, valfritt)',extraTip:'Slås samman med varje anrop till anpassat API. T.ex. {"enable_thinking":false} för att stänga av resonemang; {"response_format":{"type":"json_object"}} tvingar JSON. model / messages / temperature / stream kan inte åsidosättas.',fbRoute:'Observera: anropet till modell B ({0}) misslyckades; denna batch översattes av modell A ({1}). Orsak: {2}',
@@ -5186,6 +5253,7 @@ rateWait:'Begränsad (429), väntar 20 s innan nytt försök…',
   modFxDo3:'Förhandsvisningen är den exporterade filen; tidslinjen justeras punktvis eller i block',
   modFxFix:'Tvåspråkiga undertexter som måste synkas för hand; ASS-värden vars effekt du inte ser; exporter som inte matchar förhandsvisningen.',
   modFxWho:'Kreatörer som gör tvåspråkiga eller stilade undertexter, encodegrupper, team som behöver tillgängliga undertexter.',
+  modTrTag1:'75 språk', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 regler', modClTag2:'Tider orörda', modFxTag1:'Tvåspråkig sammanslagning', modFxTag2:'Stilplatser',
   lblDropFillers:'Ta bort utfyllnad'
 },
 'cs': {pureMTMode:'Zjištěn čistý překladový model ({0}): přechází se na přímý překlad po skupinách ({1} skupin, 4 paralelně, úspěšné skupiny se ukládají do mezipaměti)…',pureMTDone:'Překlad po skupinách dokončen: úspěšných {0}/{1} skupin',gotClick:'Požadavek na zahájení překladu přijat — připravujeme…',reqSent:'Požadavek dávky {0} odeslán ({1} skupin) — čekáme na odpověď modelu…',waitSec:'Čekáme {0} s — odpověď modelu stále nedorazila…',errTimeout:'Po {0} s bez odpovědi — požadavek opuštěn (vypršel čas). Snižte znakový rozpočet na dávku nebo přejděte na rychlejší model; pokud model před odpovědí uvažuje (Qwen3, GLM…), uveďte {"enable_thinking":false} v dalších parametrech požadavku',alreadyRunning:'Předchozí běh ještě neskončil — bylo vyžádáno zastavení. Počkejte na dokončení aktuální dávky, než začnete znovu',modeMismatch:'Pozor: níže je vyplněno vlastní API ({0}), ale režim je „Výchozí model“, takže se nepoužije. Přepněte režim na „Vlastní API“, chcete-li ho využít',errTruncOut:'Výstup modelu narazil na limit tokenů a byl před koncem zkrácen — zvyšte max_tokens v dalších parametrech požadavku, např. {"max_tokens":8192}',lblExtra:'Další parametry požadavku (JSON, volitelné)',extraTip:'Přidává se do těla každého požadavku na vlastní API. Např. {"enable_thinking":false} vypne přemýšlení; {"response_format":{"type":"json_object"}} vynutí JSON. model / messages / temperature / stream nelze přepsat.',fbRoute:'Upozornění: volání modelu B ({0}) selhalo; tato dávka byla přeložena modelem A ({1}). Důvod: {2}',
@@ -5506,6 +5574,7 @@ rateWait:'Překročen limit (429), čekám 20 s před dalším pokusem…',
   modFxDo3:'Náhled je exportovaný soubor; časová osa se opraví po bodech nebo hromadně',
   modFxFix:'Dvojjazyčné titulky, které musíš synchronizovat ručně; ASS hodnoty, jejichž efekt nevidíš; export, který nesouhlasí s náhledem.',
   modFxWho:'Tvůrci dvojjazyčných a stylovaných titulků, encode skupiny, týmy, které potřebují přístupné titulky.',
+  modTrTag1:'75 jazyků', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 pravidel', modClTag2:'Časy beze změny', modFxTag1:'Dvojjazyčné sloučení', modFxTag2:'Sloty stylů',
   lblDropFillers:'Odstranit výplně'
 },
 'uk': {pureMTMode:'Виявлено чисту перекладацьку модель ({0}): перехід на прямий переклад за групами ({1} груп, 4 паралельно, успішні групи кешуються)…',pureMTDone:'Погруповий переклад завершено: успішно {0}/{1}',gotClick:'Отримано запит на початок перекладу — підготовка…',reqSent:'Запит пакета {0} надіслано ({1} груп) — чекаємо на відповідь моделі…',waitSec:'Очікування {0} с — відповіді від моделі досі немає…',errTimeout:'За {0} с відповіді не отримано — запит скасовано (тайм-аут). Зменшіть ліміт символів на пакет або виберіть швидшу модель; якщо модель розмірковує перед відповіддю (Qwen3, GLM…), вкажіть {"enable_thinking":false} у додаткових параметрах',alreadyRunning:'Попередній запуск ще не завершено — запрошено зупинку. Дочекайтеся завершення поточного пакета, перш ніж починати знову',modeMismatch:'Увага: нижче заповнено поля власного API ({0}), але вибрано режим «Модель за замовчуванням», тому вони не використовуватимуться. Перемкніть режим на «Власний API»',errTruncOut:'Вивід моделі досяг ліміту токенів і обірвався незавершеним — збільште max_tokens у додаткових параметрах, наприклад {"max_tokens":8192}',lblExtra:'Додаткові параметри запиту (JSON, необов’язково)',extraTip:'Додається до тіла кожного запиту власного API. Напр. {"enable_thinking":false} вимикає міркування; {"response_format":{"type":"json_object"}} примусово вмикає JSON. Неможливо перевизначити model / messages / temperature / stream.',fbRoute:'Увага: виклик моделі B ({0}) не вдався; цей пакет перекладено моделлю A ({1}). Причина: {2}',
@@ -5826,6 +5895,7 @@ rateWait:'Перевищено ліміт (429), очікування 20 с пе
   modFxDo3:'Попередній перегляд дорівнює експорту; таймлайн правиться точково або пакетом',
   modFxFix:'Двомовні субтитри, які треба синхронізувати вручну; значення ASS без видимого ефекту; експорт, що не збігається з попереднім переглядом.',
   modFxWho:'Автори двомовних і оформлених субтитрів, групи кодування, команди, яким потрібні доступні субтитри.',
+  modTrTag1:'75 мов', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 правил', modClTag2:'Таймінг не чіпаємо', modFxTag1:'Двомовне обʼєднання', modFxTag2:'Слоти стилів',
   lblDropFillers:'Вилучити заповнювачі'
 },
 'da': {pureMTMode:'Ren oversættelsesmodel fundet ({0}): skifter til direkte oversættelse pr. gruppe ({1} grupper, 4 parallelt, succesfulde grupper caches)…',pureMTDone:'Gruppvis oversættelse færdig: {0}/{1} grupper lykkedes',gotClick:'Anmodning om at starte oversættelse modtaget — forbereder…',reqSent:'Anmodning for batch {0} sendt ({1} grupper) — venter på svar fra modellen…',waitSec:'{0} s ventet — stadig intet svar fra modellen…',errTimeout:'Intet svar efter {0} s — anmodning opgivet (tidsgrænse). Sænk tegnbudgettet pr. batch eller skift til en hurtigere model; hvis modellen tænker, før den svarer (Qwen3, GLM…), så angiv {"enable_thinking":false} under Ekstra anmodningsparametre',alreadyRunning:'Det forrige kørsel er ikke færdigt endnu — stop er anmodet. Vent til den aktuelle batch er afsluttet, før du starter igen',modeMismatch:'Bemærk: der er udfyldt et brugerdefineret API nedenfor ({0}), men tilstanden er “Standardmodel”, så det bliver ikke brugt. Skift til “Brugerdefineret API” for at bruge det',errTruncOut:'Modellens output ramte token-grænsen og blev afbrudt før det var færdigt — forhøj max_tokens under Ekstra anmodningsparametre, f.eks. {"max_tokens":8192}',lblExtra:'Ekstra anmodningsparametre (JSON, valgfrit)',extraTip:'Føjes til body på hvert brugerdefineret API-kald. F.eks. {"enable_thinking":false} til at slå ræsonnering fra; {"response_format":{"type":"json_object"}} tvinger JSON. model / messages / temperature / stream kan ikke overskrives.',fbRoute:'Bemærk: kaldet til model B ({0}) mislykkedes; dette batch blev oversat af model A ({1}). Årsag: {2}',
@@ -6146,6 +6216,7 @@ rateWait:'Begrænset (429), venter 20 s før nyt forsøg…',
   modFxDo3:'Forhåndsvisningen er den eksporterede fil; tidslinjen rettes punktvist eller i blok',
   modFxFix:'Tosprogede undertekster der skal synkroniseres i hånden; ASS-værdier hvor du ikke ser effekten; eksporter der ikke matcher forhåndsvisningen.',
   modFxWho:'Kreative der laver tosprogede eller stilede undertekster, encode-grupper, teams der har brug for tilgængelige undertekster.',
+  modTrTag1:'75 sprog', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 regler', modClTag2:'Timing urørt', modFxTag1:'Tosproget sammenlægning', modFxTag2:'Stil-pladser',
   lblDropFillers:'Fjern fyld'
 },
 'fi': {pureMTMode:'Puhdas käännösmalli havaittu ({0}): siirrytään suoraan käännökseen ryhmittäin ({1} ryhmää, 4 rinnakkain, onnistuneet ryhmät tallennetaan välimuistiin)…',pureMTDone:'Ryhmittäinen käännös valmis: onnistui {0}/{1} ryhmää',gotClick:'Pyyntö käännöksen aloittamisesta vastaanotettu — valmistellaan…',reqSent:'Erän {0} pyyntö lähetetty ({1} ryhmää) — odotetaan mallin vastausta…',waitSec:'Odotettu {0} s — mallilta ei vielä vastausta…',errTimeout:'Ei vastausta {0} s kohdalla — pyyntö hylättiin (aikakatkaisu). Pienennä erän merkkimäärää tai vaihda nopeampaan malliin; jos malli päättelee ennen vastausta (Qwen3, GLM…), lisää {"enable_thinking":false} kohtaan Lisäpyyntöparametrit',alreadyRunning:'Edellinen ajo ei ole vielä valmis — pysäytys on pyydetty. Odota nykyisen erän valmistumista ennen uudelleen aloittamista',modeMismatch:'Huomio: mukautettu API on täytetty alla ({0}), mutta tila on “Oletusmalli”, joten sitä ei käytetä. Vaihda tilaksi “Mukautettu API” käyttääksesi sitä',lblExtra:'Lisäpyyntöparametrit (JSON, valinnainen)',extraTip:'Yhdistetään jokaisen mukautetun API-pyynnön runkoon. Esim. {"enable_thinking":false} poistaa päättelyn käytöstä; {"max_tokens":8192} nostaa tulosteen enimmäispituutta; {"response_format":{"type":"json_object"}} pakottaa JSON-tulosteen. model / messages / temperature / stream -kenttiä ei voi ylikirjoittaa.',errTruncOut:'Mallin tuloste saavutti token-rajan ja katkesi ennen loppua — nosta max_tokens-arvoa kohdassa Lisäpyyntöparametrit, esim. {"max_tokens":8192}',fbRoute:'Huomio: mallin B ({0}) kutsu epäonnistui; tämä erä käännettiin mallilla A ({1}). Syy: {2}',
@@ -6466,6 +6537,7 @@ rateWait:'Nopeusrajoitus (429), odotetaan 20 s ennen uutta yritystä…',
   modFxDo3:'Esikatselu on viety tiedosto; aikajanaa voi korjata kohdittain tai erissä',
   modFxFix:'Kaksikieliset tekstitykset jotka pitää tahdistaa käsin; ASS-arvot joiden vaikutusta ei näe; vienti joka ei vastaa esikatselua.',
   modFxWho:'Kaksikielisiä tai tyyliteltyjä tekstityksiä tekevät tekijät, encode-ryhmät, tiimit jotka tarvitsevat saavutettavia tekstityksiä.',
+  modTrTag1:'75 kieltä', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 sääntöä', modClTag2:'Ajoitus muuttumaton', modFxTag1:'Kaksikielinen yhdistäminen', modFxTag2:'Tyylipaikat',
   lblDropFillers:'Poista täytteet'
 },
 'el': {pureMTMode:'Εντοπίστηκε μοντέλο καθαρής μετάφρασης ({0}): μετάβαση σε άμεση μετάφραση ανά ομάδα ({1} ομάδες, 4 παράλληλα, οι επιτυχημένες ομάδες αποθηκεύονται στη μνήμη cache)…',pureMTDone:'Η μετάφραση ανά ομάδα ολοκληρώθηκε: επιτυχίες {0}/{1}',gotClick:'Ελήφθη το αίτημα έναρξης μετάφρασης — προετοιμασία…',reqSent:'Το αίτημα της παρτίδας {0} στάλθηκε ({1} ομάδες) — αναμονή για την απάντηση του μοντέλου…',waitSec:'Αναμονή {0} δλτ — ακόμη καμία απάντηση από το μοντέλο…',errTimeout:'Καμία απάντηση μετά από {0} δλτ — το αίτημα εγκαταλείφθηκε (λήξη χρόνου). Μειώστε το όριο χαρακτήρων ανά παρτίδα ή επιλέξτε ταχύτερο μοντέλο· αν το μοντέλο σκέφτεται πριν απαντήσει (Qwen3, GLM…), βάλτε {"enable_thinking":false} στις Πρόσθετες παραμέτρους αιτήματος',alreadyRunning:'Η προηγούμενη εκτέλεση δεν έχει ολοκληρωθεί — ζητήθηκε διακοπή. Περιμένετε να ολοκληρωθεί η τρέχουσα παρτίδα πριν ξεκινήσετε ξανά',modeMismatch:'Προσοχή: τα πεδία προσαρμοσμένου API είναι συμπληρωμένα παρακάτω ({0}), αλλά η λειτουργία είναι «Προεπιλεγμένο μοντέλο», οπότε δεν θα χρησιμοποιηθούν. Αλλάξτε τη λειτουργία σε «Προσαρμοσμένο API»',lblExtra:'Πρόσθετες παράμετροι αιτήματος (JSON, προαιρετικό)',extraTip:'Ενσωματώνεται στο σώμα κάθε αιτήματος προσαρμοσμένου API. Π.χ. {"enable_thinking":false} απενεργοποιεί τη συλλογιστική, {"max_tokens":8192} αυξάνει το μέγιστο μήκος εξόδου, {"response_format":{"type":"json_object"}} επιβάλλει JSON. Τα model / messages / temperature / stream δεν μπορούν να αντικατασταθούν.',errTruncOut:'Η έξοδος του μοντέλου έφτασε στο όριο token και διακόπηκε πριν ολοκληρωθεί — αυξήστε το max_tokens στις Πρόσθετες παραμέτρους αιτήματος, π.χ. {"max_tokens":8192}',fbRoute:'Σημείωση: η κλήση του μοντέλου B ({0}) απέτυχε· αυτή η παρτίδα μεταφράστηκε από το μοντέλο A ({1}). Αιτία: {2}',
@@ -6786,6 +6858,7 @@ rateWait:'Όριο ρυθμού (429), αναμονή 20 δ πριν την επ
   modFxDo3:'Η προεπισκόπηση είναι το εξαγόμενο αρχείο· η χρονική γραμμή διορθώνεται σημειακά ή μαζικά',
   modFxFix:'Δίγλωσσοι υπότιτλοι που πρέπει να συγχρονιστούν στο χέρι· τιμές ASS που δεν βλέπεις το αποτέλεσμα· εξαγωγές διαφορετικές από την προεπισκόπηση.',
   modFxWho:'Δημιουργοί δίγλωσσων ή στυλιζαρισμένων υποτίτλων, ομάδες encoding, ομάδες που χρειάζονται προσβάσιμους υπότιτλους.',
+  modTrTag1:'75 γλώσσες', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 κανόνες', modClTag2:'Χρόνοι ανέγγιχτοι', modFxTag1:'Δίγλωσση συγχώνευση', modFxTag2:'Υποδοχές στυλ',
   lblDropFillers:'Αφαίρεση πληρωτικών'
 },
 'he': {pureMTMode:'זוהה מודל תרגום טהור ({0}): מעבר לתרגום ישיר לכל קבוצה ({1} קבוצות, 4 במקביל, קבוצות שהצליחו נשמרות במטמון)…',pureMTDone:'תרגום לכל קבוצה הסתיים: {0}/{1} קבוצות הצליחו',gotClick:'התקבלה בקשה להתחיל תרגום — מכין…',reqSent:'בקשת אצווה {0} נשלחה ({1} קבוצות) — ממתין לתשובת המודל…',waitSec:'המתנה של {0} שניות — עדיין אין תשובה מהמודל…',errTimeout:'אין תשובה אחרי {0} שניות — הבקשה בוטלה (פסק זמן). נסה להקטין את תקציב התווים לאצווה או לעבור למודל מהיר יותר; אם המודל מהרהר לפני התשובה (Qwen3, GLM…), הוסף {"enable_thinking":false} בפרמטרי בקשה נוספים',alreadyRunning:'ההרצה הקודמת טרם הסתיימה — התבקשה עצירה. המתן לסיום האצווה הנוכחית לפני שמתחילים מחדש',modeMismatch:'שימו לב: פרטי API מותאם מולאו למטה ({0}), אך המצב הוא «מודל ברירת מחדל» ולכן הם לא ישמשו. עברו למצב «API מותאם» כדי להשתמש בהם',lblExtra:'פרמטרי בקשה נוספים (JSON, אופציונלי)',extraTip:'מאוחד לגוף של כל בקשת API מותאמת. לדוגמה {"enable_thinking":false} מכבה חשיבה, {"max_tokens":8192} מגדיל את אורך הפלט המרבי, {"response_format":{"type":"json_object"}} מאלץ JSON. לא ניתן לדרוס את model / messages / temperature / stream.',errTruncOut:'פלט המודל נחתך במגבלת הטוקנים לפני שהסתיים — הגדל את max_tokens בפרמטרי בקשה נוספים, למשל {"max_tokens":8192}',fbRoute:'שימו לב: הקריאה למודל B ({0}) נכשלה; אצווה זו תורגמה על ידי מודל A ({1}). סיבה: {2}',
@@ -7106,6 +7179,7 @@ rateWait:'הגבלת קצב (429), ממתינים 20 שניות לפני ניס�
   modFxDo3:'התצוגה המקדימה היא הקובץ שייצא; ציר הזמן ניתן לתיקון נקודתי או בקבוצות',
   modFxFix:'כתוביות דו-לשוניות שצריך לסנכרן ידנית; ערכי ASS שלא רואים את ההשפעה שלהם; ייצוא שלא תואם לתצוגה המקדימה.',
   modFxWho:'יוצרים של כתוביות דו-לשוניות או מעוצבות, צוותי קידוד, צוותים שצריכים כתוביות נגישות.',
+  modTrTag1:'75 שפות', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 כללים', modClTag2:'תזמון לא נוגע', modFxTag1:'מיזוג דו-לשוני', modFxTag2:'חריצי סגנון',
   lblDropFillers:'הסרת מילוי'
 },
 'ro': {pureMTMode:'S-a detectat un model de traducere pură ({0}): se trece la traducere directă pe grup ({1} grupuri, 4 în paralel, grupurile reușite se salvează în cache)…',pureMTDone:'Traducerea pe grupuri s-a încheiat: {0}/{1} grupuri reușite',gotClick:'Am primit cererea de începere a traducerii — se pregătește…',reqSent:'Cererea lotului {0} a fost trimisă ({1} grupuri) — se așteaptă răspunsul modelului…',waitSec:'Am așteptat {0} s — încă niciun răspuns de la model…',errTimeout:'Niciun răspuns după {0} s — cerere abandonată (expirare). Încearcă să reduci bugetul de caractere per lot sau treci la un model mai rapid; dacă modelul raționează înainte de a răspunde (Qwen3, GLM…), pune {"enable_thinking":false} la Parametri suplimentari de cerere',alreadyRunning:'Rularea anterioară nu s-a terminat încă — s-a cerut oprirea. Așteaptă finalizarea lotului curent înainte de a reîncepe',modeMismatch:'Atenție: câmpurile pentru API personalizat sunt completate mai jos ({0}), dar modul este „Model implicit”, deci nu vor fi folosite. Comutați modul la „API personalizat” pentru a le folosi',lblExtra:'Parametri suplimentari de cerere (JSON, opțional)',extraTip:'Se îmbină în corpul fiecărei cereri API personalizate. Ex.: {"enable_thinking":false} dezactivează raționamentul, {"max_tokens":8192} mărește lungimea maximă a ieșirii, {"response_format":{"type":"json_object"}} forțează JSON. model / messages / temperature / stream nu pot fi suprascrise.',errTruncOut:'Ieșirea modelului a atins limita de tokeni și a fost trunchiată înainte de final — mărește max_tokens în Parametri suplimentari de cerere, de ex. {"max_tokens":8192}',fbRoute:'Notă: apelul către modelul B ({0}) a eșuat; acest lot a fost tradus de modelul A ({1}). Motiv: {2}',
@@ -7426,6 +7500,7 @@ rateWait:'Limită de rată atinsă (429), aștept 20 s înainte de reîncercare�
   modFxDo3:'Previzualizarea este fișierul exportat; timeline-ul se corectează punctual sau în bloc',
   modFxFix:'Subtitrări bilingve care trebuie sincronizate manual; valori ASS ale căror efect nu-l vezi; exporturi care nu seamănă cu previzualizarea.',
   modFxWho:'Creators de subtitrări bilingve sau stilizate, echipe de encoding, echipe care au nevoie de subtitrări accesibile.',
+  modTrTag1:'75 limbi', modTrTag2:'SRT / VTT / ASS', modClTag1:'13 reguli', modClTag2:'Timingul rămâne', modFxTag1:'Îmbinare bilingvă', modFxTag2:'Sloturi de stil',
   lblDropFillers:'Elimină umpluturile'
 }
 
