@@ -574,6 +574,50 @@ const TOKENS = new Set();
 function newToken(){ const tk = crypto.randomBytes(24).toString('hex'); TOKENS.add(tk); return tk; }
 function authed(req){ const tk = req.headers['x-admin-token']; return tk && TOKENS.has(tk); }
 
+/* ---------------- v0.9.285：后台登录限流 ----------------
+   规则：连续输错 3 次 → 账户与来源 IP 同时锁定 24 小时。
+
+   两条计数各自独立、任一触线即拒绝：
+   - 账户维度（全局单例，本后台只有一个管理员）：挡「换 IP 分布式爆破」
+   - IP 维度：挡单机连打
+   ⚠️ 锁定期内即使密码正确也拒绝（回 429 而非 401）—— 否则等于只是「3 次内随便试」，
+      攻击者换个正确密码就能重置计数，限流形同虚设。
+
+   ⚠️ 计数只存内存，重启服务即全部解锁 —— 这是刻意留的紧急出口：
+      自己连错 3 次被锁时 `systemctl restart srt-translator` 即可恢复，不必改代码。
+      代价是重启后攻击者也能重来一轮，所以账户维度必须同步存在。
+
+   ⚠️ IP 取自 X-Forwarded-For 首段（沿用既有 clientIp 行为，本次不改）：站前若无可信代理，
+      该头可被伪造，因此不能只依赖 IP 这一条。当前部署在 Cloudflare 之后，CF 会重写该头。 */
+const LOGIN_MAX_FAIL = 3;
+const LOGIN_LOCK_MS = 24 * 60 * 60 * 1000;
+const loginIp = new Map();              // ip -> { n, until }
+let loginAcct = { n: 0, until: 0 };     // 账户维度（单例）
+let loginSweepAt = 0;
+function loginSweep(now){
+  if (now - loginSweepAt < 10 * 60 * 1000) return;  // 最多 10 分钟清理一次，防 Map 无限增长
+  loginSweepAt = now;
+  for (const [k, v] of loginIp) if (!v.until || v.until <= now) loginIp.delete(k);
+}
+/** 已锁定 → 返回剩余毫秒；未锁 → null */
+function loginLocked(now, ip){
+  loginSweep(now);
+  const a = (loginAcct.until && loginAcct.until > now) ? loginAcct.until - now : 0;
+  const v = loginIp.get(ip);
+  const b = (v && v.until && v.until > now) ? v.until - now : 0;
+  const m = Math.max(a, b);
+  return m > 0 ? m : null;
+}
+function loginReset(ip){ loginAcct = { n: 0, until: 0 }; loginIp.delete(ip); }
+function loginBump(now, ip){
+  loginAcct = { n: loginAcct.n + 1, until: loginAcct.until };
+  if (loginAcct.n >= LOGIN_MAX_FAIL) loginAcct.until = now + LOGIN_LOCK_MS;
+  const v = loginIp.get(ip) || { n: 0, until: 0 };
+  v.n += 1;
+  if (v.n >= LOGIN_MAX_FAIL) v.until = now + LOGIN_LOCK_MS;
+  loginIp.set(ip, v);
+}
+
 /* ---------------- 工具 ---------------- */
 function readBody(req, limitBytes){
   return new Promise((resolve, reject) => {
@@ -2503,6 +2547,21 @@ const server = http.createServer(async (req, res) => {
       }
       const pw = String(body.password || '');
       if (!pw) return sendJson(res, 400, { error: { message: '请输入密码' } });
+      const now = Date.now();
+      const ip = clientIp(req);
+      /* v0.9.285：先看是否已被锁。锁定期内不校验密码，直接 429 */
+      const left = loginLocked(now, ip);
+      if (left !== null) {
+        const hours = Math.max(1, Math.ceil(left / (60 * 60 * 1000)));
+        const body2 = JSON.stringify({
+          error: { message: '密码连续输错 3 次，已锁定 24 小时（约 ' + hours + ' 小时后自动解锁）' }
+        });
+        res.writeHead(429, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Retry-After': String(Math.ceil(left / 1000))
+        });
+        return res.end(body2);
+      }
       const cfg = readConfig();
       if (!cfg.adminHash) {
         // 首次部署：以本次登录密码初始化为管理密码（部署后请尽快登录一次）
@@ -2511,9 +2570,14 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { token: newToken(), firstRun: true });
       }
       if (sha256(pw) === cfg.adminHash) {
+        loginReset(ip);
         return sendJson(res, 200, { token: newToken() });
       }
-      return sendJson(res, 401, { error: { message: '密码错误' } });
+      loginBump(now, ip);
+      const tryLeft = Math.max(0, LOGIN_MAX_FAIL - loginIp.get(ip).n);
+      return sendJson(res, 401, {
+        error: { message: '密码错误，还可尝试 ' + tryLeft + ' 次（连续 3 次输错将锁定 24 小时）' }
+      });
     }
 
     /* 以下管理接口需 token */

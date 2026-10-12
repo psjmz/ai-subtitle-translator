@@ -5384,7 +5384,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.284/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.285/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5425,9 +5425,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.284</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.284</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.284/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.285</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.285</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.285/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5613,8 +5613,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.284</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.284/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.285</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.285/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7455,11 +7455,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.284/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.284/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.284/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.284/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.284/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.285/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.285/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.285/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.285/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.285/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8964,14 +8964,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.284/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.284/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.285/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.285/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.284/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.284/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.284/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.285/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.285/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.285/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.284/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.285/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9442,13 +9442,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.284/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.284/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.284/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.284/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.284/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.285/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.285/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.285/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.285/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.285/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.284/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.285/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9470,7 +9470,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0\.9\.284">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0\.9\.285">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9481,7 +9481,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.284') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.285') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -9860,6 +9860,77 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* favicon 本身得存在 */
     const fsx = require('fs'), pax = require('path');
     assert.ok(fsx.existsSync(pax.join(__dirname, 'favicon.svg')), 'favicon.svg 文件不存在');
+  });
+
+  /* ==========================================================================
+     v0.9.285：后台登录限流 —— 连续输错 3 次，锁账户 + 锁 IP 各 24 小时
+     --------------------------------------------------------------------------
+     后台密码此前已被公网泄漏过（283 体检发现），裸 sha256 无加盐，
+     离线爆破可行 → 必须把「在线试密码」这条路也堵死。
+
+     设计要点（改动时别破坏）：
+       · 账户（全局单例）+ IP 双计数，任一触线即拒绝
+       · 锁定期内不校验密码，直接 429 —— 否则「输对一次就重置计数」，限流形同虚设
+       · 只有「密码正确」才清零，空密码 / JSON 解析失败不计数（不消耗尝试次数）
+       · 计数仅存内存 → 重启即解锁，这是刻意留的紧急出口
+     ========================================================================== */
+
+  /** 截出 /api/admin/login 这一个 handler 的源码，避免断言命中别处的同名字符串 */
+  function loginHandlerSrc(){
+    const sv = readT('server.js');
+    const from = sv.indexOf("u === '/api/admin/login'");
+    assert.ok(from > 0, 'server.js 里找不到 /api/admin/login 分支');
+    const to = sv.indexOf('/* 以下管理接口需 token */', from);
+    assert.ok(to > from, '登录分支后面找不到「以下管理接口需 token」，结构变了');
+    return sv.slice(from, to);
+  }
+
+  t('v0.9.285：限流门槛 = 连续 3 次、锁 24 小时', () => {
+    const sv = readT('server.js');
+    assert.ok(/const LOGIN_MAX_FAIL = 3;/.test(sv), 'LOGIN_MAX_FAIL 不是 3');
+    assert.ok(/const LOGIN_LOCK_MS = 24 \* 60 \* 60 \* 1000;/.test(sv), 'LOGIN_LOCK_MS 不是 24 小时');
+  });
+
+  t('v0.9.285：账户与 IP 两条计数独立存在', () => {
+    const sv = readT('server.js');
+    assert.ok(/const loginIp = new Map\(\);/.test(sv), '缺 IP 维度计数（loginIp）');
+    assert.ok(/let loginAcct = \{ n: 0, until: 0 \};/.test(sv), '缺账户维度计数（loginAcct）');
+    /* 两条都得能单独触线拒绝 */
+    const h = loginHandlerSrc();
+    assert.ok(/loginLocked\(now, ip\)/.test(h), '登录分支里没先查锁定状态');
+  });
+
+  t('v0.9.285：锁定检查必须排在密码校验之前', () => {
+    const h = loginHandlerSrc();
+    const iLock = h.indexOf('loginLocked(now, ip)');
+    const iPass = h.indexOf("sha256(pw) === cfg.adminHash");
+    assert.ok(iLock > 0 && iPass > 0, '登录分支结构变了（锁定检查或密码校验不见了）');
+    assert.ok(iLock < iPass,
+      '锁定检查排在密码校验之后 —— 锁定期内输对密码就能绕过，限流形同虚设');
+  });
+
+  t('v0.9.285：锁定返回 429 + Retry-After，不是 401', () => {
+    const h = loginHandlerSrc();
+    assert.ok(/429/.test(h), '锁定后没返回 429');
+    assert.ok(/Retry-After/.test(h), '锁定响应缺 Retry-After 头');
+    /* 文案里要带解锁时间，别让人干等 */
+    assert.ok(/自动解锁/.test(h), '锁定文案没说明多久后解锁');
+  });
+
+  t('v0.9.285：登录成功清零、失败累加', () => {
+    const h = loginHandlerSrc();
+    assert.ok(/loginReset\(ip\)/.test(h), '登录成功后没清零计数');
+    assert.ok(/loginBump\(now, ip\)/.test(h), '登录失败后没累加计数');
+    /* 空密码 / 坏 JSON 不该消耗尝试次数 —— 否则别人随手一刷就能把你锁 24 小时 */
+    const iBad = h.indexOf("'请输入密码'");
+    const iBump = h.indexOf('loginBump(now, ip)');
+    assert.ok(iBad > 0 && iBad < iBump, '空密码分支应该直接返回，不落到计数');
+  });
+
+  t('v0.9.285：过期计数会被清理（防 Map 无限增长）', () => {
+    const sv = readT('server.js');
+    assert.ok(/function loginSweep\(/.test(sv), '缺过期计数清理逻辑');
+    assert.ok(/loginIp\.delete\(k\)/.test(sv), '清理逻辑没有真正删除过期项');
   });
 
   });
