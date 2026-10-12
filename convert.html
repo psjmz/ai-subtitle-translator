@@ -152,6 +152,13 @@ crossorigin="anonymous"></script>
       <select class="fmt" id="outFmt"></select>
       <button class="pri" id="btnGo" type="button" data-i18n="btnGo">转换</button>
     </div>
+    <!-- v0.9.289：双语处理。默认「保留双语」，与 288 的行为完全一致；
+         只有用户主动选了才动字幕内容。 -->
+    <div class="row">
+      <span class="lb" data-i18n="lblBi">双语处理</span>
+      <select class="fmt" id="biMode"></select>
+      <span class="chip mut" id="biHint" style="display:none" data-i18n="biHint">检测到双语字幕</span>
+    </div>
     <div class="note" data-i18n="noteLocal">文件只在你的浏览器里处理，不上传服务器</div>
   </div>
 
@@ -175,12 +182,12 @@ crossorigin="anonymous"></script>
 </div>
 
 <script src="convert-i18n.js"></script>
-<script src="convert-core.js?v=0.9.288"></script>
+<script src="convert-core.js?v=0.9.289"></script>
 <script>
 'use strict';
 var I18N = window.CONVERT_I18N.DICT, LANGS = window.CONVERT_I18N.LANGS;
 var LANG = 'zh-CN';
-var S = { fname: '', src: '', fmt: null, cues: [], out: '', outFmt: 'vtt' };
+var S = { fname: '', src: '', fmt: null, cues: [], out: '', outFmt: 'vtt', bi: 'keep' };
 function $(s) { return document.querySelector(s); }
 function t(k) {
   var d = I18N[LANG] || I18N['en'];
@@ -220,6 +227,7 @@ function applyI18n() {
   renderNav();
   syncLogoHome();
   renderOutFmtOptions();
+  renderBiOptions();
 }
 function syncLogoHome() {
   var el = document.getElementById('logoHome');
@@ -235,6 +243,27 @@ function renderOutFmtOptions() {
   }).join('');
   sel.value = cur;
   S.outFmt = sel.value;
+}
+
+/* 双语处理下拉：默认保留双语，不动字幕内容 */
+function renderBiOptions() {
+  var sel = $('#biMode');
+  var cur = sel.value || S.bi;
+  sel.innerHTML = window.ConvertCore.BI_MODES.map(function (m) {
+    return '<option value="' + m.id + '">' + t(m.key) + '</option>';
+  }).join('');
+  sel.value = cur;
+  S.bi = sel.value;
+}
+/* 只做提示，不改内容：解析一遍看这批字幕里有没有两种文字 */
+function refreshBiHint() {
+  var el = $('#biHint');
+  if (!el) return;
+  var yes = false;
+  try {
+    if (S.src.trim() && S.fmt) yes = window.ConvertCore.hasBilingual(window.ConvertCore.parse(S.src, S.fmt));
+  } catch (e) { yes = false; }
+  el.style.display = yes ? '' : 'none';
 }
 
 function pathUiLang() {
@@ -267,6 +296,7 @@ function setSrc(text, fname) {
   if ($('#paste') && $('#paste').value !== S.src) $('#paste').value = S.src;
   $('#fname').textContent = S.fname;
   renderSrcFmt();
+  refreshBiHint();
   hideMsg();
 }
 function renderSrcFmt() {
@@ -283,13 +313,14 @@ function readFile(f) {
   r.readAsText(f, 'utf-8');
 }
 function clearAll() {
-  S = { fname: '', src: '', fmt: null, cues: [], out: '', outFmt: S.outFmt };
+  S = { fname: '', src: '', fmt: null, cues: [], out: '', outFmt: S.outFmt, bi: S.bi };
   $('#paste').value = '';
   $('#fname').textContent = '';
   $('#out').value = '';
   $('#file').value = '';
   $('#repCard').style.display = 'none';
   renderSrcFmt();
+  refreshBiHint();
   hideMsg();
 }
 
@@ -326,6 +357,10 @@ function convert() {
   var cues = C.parse(S.src, fmt);
   if (!cues || !cues.length) { showMsg(t('errFmt'), 'err'); return; }
   S.fmt = fmt;
+  S.bi = $('#biMode').value || 'keep';
+  /* 双语处理：默认 keep 原样不动，选了别的才过滤 / 合并 */
+  cues = C.applyBilingual(cues, S.bi);
+  if (!cues.length) { showMsg(t('errFmt'), 'err'); return; }
   S.cues = cues;
   S.outFmt = $('#outFmt').value;
   S.out = C.dump(cues, S.outFmt);
@@ -373,6 +408,7 @@ function bind() {
   $('#paste').addEventListener('input', function (e) { setSrc(e.target.value, S.fname); });
   $('#btnClear').addEventListener('click', clearAll);
   $('#outFmt').addEventListener('change', function () { S.outFmt = $('#outFmt').value; if (S.cues.length) convert(); });
+  $('#biMode').addEventListener('change', function () { S.bi = $('#biMode').value; if (S.src.trim()) convert(); });
   $('#btnGo').addEventListener('click', convert);
   $('#btnDl').addEventListener('click', download);
   $('#btnCopy').addEventListener('click', copyOut);

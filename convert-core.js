@@ -1,6 +1,8 @@
-/* convert-core.js —— 字幕格式转换页的独立引擎（v0.9.288）
+/* convert-core.js —— 字幕格式转换页的独立引擎（v0.9.289）
    与 srt-core.js / merge-core.js / clean-core.js 完全隔离：本文件只被 convert.html 加载，
    不引入、不修改任何现有引擎。解析与导出都在浏览器里跑完，不上传、不调模型。
+   v0.9.289：新增双语处理（保留双语 / 只留原文 / 只留中文 / 合并成一条两行），
+   顺带修掉「两条同轴的双语 ASS 转成 SRT 后叠字」这个 bug。
 
    支持读取：SRT / VTT / ASS / SSA / SBV / LRC / TXT
    支持导出：SRT / VTT / ASS / SBV / LRC / TXT
@@ -210,6 +212,89 @@
     return null;
   }
 
+  /* ---------------- 双语处理（v0.9.289） ---------------- */
+  /* 双语字幕有两种长相，之前对它们一视同仁，所以形态 B 必然出错：
+       形态 A：一条字幕里两行（原文一行、译文一行）—— 转出来一直是正常的
+       形态 B：两条独立字幕、时间轴完全相同（双语 ASS 最常见的做法）—— 转 SRT 变成
+               两条同轴的独立字幕，播放器叠字闪一下
+     所以这里按「时间轴相同」把相邻条目归成一组，再决定留哪一行。 */
+  var RE_HAN = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/;
+  var RE_KANA = /[\u3040-\u30FF\u31F0-\u31FF]/;
+  /* 只按字符形态分轨，不猜语种：带汉字且没有假名 = 中文那一轨；其余（拉丁 / 西里尔 / 假名…）= 原文那一轨。
+     ⚠️ 猜语种一旦猜错会静默删掉整条字幕，形态判断比语种判断稳得多。 */
+  function lineTrack(s) {
+    var t = String(s || '');
+    if (RE_HAN.test(t) && !RE_KANA.test(t)) return 'zh';
+    return 'src';
+  }
+  function tracksOf(text) {
+    var src = [], zh = [];
+    plain(text).split('\n').forEach(function (ln) {
+      var s = ln.trim();
+      if (!s) return;
+      (lineTrack(s) === 'zh' ? zh : src).push(s);
+    });
+    return { src: src, zh: zh };
+  }
+  var BI_MODES = [
+    { id: 'keep', key: 'biKeep' },
+    { id: 'src', key: 'biSrc' },
+    { id: 'zh', key: 'biZh' },
+    { id: 'merge', key: 'biMerge' }
+  ];
+  /* 相邻且时间轴完全相同的条目归为一组（形态 B 的双轨） */
+  function groupByTime(cues) {
+    var groups = [];
+    (cues || []).forEach(function (c) {
+      var last = groups[groups.length - 1];
+      if (last && last[0].start === c.start && last[0].end === c.end) last.push(c);
+      else groups.push([c]);
+    });
+    return groups;
+  }
+  function applyBilingual(cues, mode) {
+    var list = (cues || []).map(function (c) {
+      return { start: c.start, end: c.end, text: String(c.text == null ? '' : c.text) };
+    });
+    if (!mode || mode === 'keep') return list;
+    var out = [];
+    groupByTime(list).forEach(function (g) {
+      var src = [], zh = [], i;
+      for (i = 0; i < g.length; i++) {
+        var tr = tracksOf(g[i].text);
+        src = src.concat(tr.src);
+        zh = zh.concat(tr.zh);
+      }
+      var end = g[g.length - 1].end;
+      if (mode === 'merge') {
+        /* 确实两种都有才合并成两行；单语条目原样保留，不凭空造第二行 */
+        var txt;
+        if (src.length && zh.length) txt = src.join(' ') + '\n' + zh.join(' ');
+        else txt = g.map(function (c) { return plain(c.text).trim(); }).join('\n');
+        out.push({ start: g[0].start, end: end, text: txt });
+        return;
+      }
+      var keep = (mode === 'zh') ? zh : src;
+      if (!keep.length) return;   /* 这一组里没有目标那一轨，整组丢掉 */
+      out.push({ start: g[0].start, end: end, text: keep.join('\n') });
+    });
+    return out;
+  }
+  /* 页面用它决定要不要提示「检测到双语」 */
+  function hasBilingual(cues) {
+    var n = 0;
+    groupByTime(cues || []).forEach(function (g) {
+      var src = 0, zh = 0, i;
+      for (i = 0; i < g.length; i++) {
+        var tr = tracksOf(g[i].text);
+        src += tr.src.length;
+        zh += tr.zh.length;
+      }
+      if (src && zh) n++;
+    });
+    return n > 0;
+  }
+
   /* ---------------- 导出 ---------------- */
   function dumpSrt(cues) {
     return cues.map(function (c, i) {
@@ -289,6 +374,9 @@
   root.ConvertCore = {
     FORMATS: FORMATS,
     READABLE: READABLE,
+    BI_MODES: BI_MODES,
+    applyBilingual: applyBilingual,
+    hasBilingual: hasBilingual,
     detect: detect,
     parse: parse,
     dump: dump,

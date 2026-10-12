@@ -17,7 +17,8 @@
       btnClear: '清除', lblSrc: '识别到的格式', lblOut: '输出格式', btnGo: '转换',
       repTitle: '转换结果', btnDl: '下载', btnCopy: '复制', statCues: '{0} 条', statDur: '总时长 {0}',
       msgDone: '转换完成', errEmpty: '先放入字幕内容', errFmt: '没能识别出字幕格式',
-      noteLocal: '文件只在你的浏览器里处理，不上传服务器', footBrand: '随心字幕 AI · 字幕格式转换'
+      noteLocal: '文件只在你的浏览器里处理，不上传服务器', footBrand: '随心字幕 AI · 字幕格式转换',
+      lblBi: '双语处理', biKeep: '保留双语', biSrc: '只留原文', biZh: '只留中文', biMerge: '合并成一条两行', biHint: '检测到双语字幕'
     },
     'zh-TW': {
       brandName: '隨心字幕 AI', navHome: '首頁', navTr: '字幕翻譯', navFx: '特效字幕', navCl: '字幕清洗',
@@ -27,7 +28,8 @@
       btnClear: '清除', lblSrc: '辨識到的格式', lblOut: '輸出格式', btnGo: '轉換',
       repTitle: '轉換結果', btnDl: '下載', btnCopy: '複製', statCues: '{0} 條', statDur: '總長度 {0}',
       msgDone: '轉換完成', errEmpty: '請先放入字幕內容', errFmt: '辨識不出字幕格式',
-      noteLocal: '檔案只在你的瀏覽器裡處理，不會上傳伺服器', footBrand: '隨心字幕 AI · 字幕格式轉換'
+      noteLocal: '檔案只在你的瀏覽器裡處理，不會上傳伺服器', footBrand: '隨心字幕 AI · 字幕格式轉換',
+      lblBi: '雙語處理', biKeep: '保留雙語', biSrc: '只留原文', biZh: '只留中文', biMerge: '合併成一條兩行', biHint: '偵測到雙語字幕'
     },
     'en': {
       brandName: 'AI-SRTSub', navHome: 'Home', navTr: 'Translate', navFx: 'Effects', navCl: 'Cleaner',
@@ -37,7 +39,8 @@
       btnClear: 'Clear', lblSrc: 'Detected format', lblOut: 'Output format', btnGo: 'Convert',
       repTitle: 'Result', btnDl: 'Download', btnCopy: 'Copy', statCues: '{0} cues', statDur: 'Length {0}',
       msgDone: 'Done', errEmpty: 'Add some subtitle text first', errFmt: 'Could not recognise the subtitle format',
-      noteLocal: 'Your file is processed in the browser only - it is never uploaded', footBrand: 'AI-SRTSub · Subtitle Converter'
+      noteLocal: 'Your file is processed in the browser only - it is never uploaded', footBrand: 'AI-SRTSub · Subtitle Converter',
+      lblBi: 'Bilingual handling', biKeep: 'Keep both languages', biSrc: 'Keep original only', biZh: 'Keep translation only', biMerge: 'Merge into one two-line cue', biHint: 'Bilingual subtitles detected'
     },
     'ja': {
       brandName: 'AI-SRTSub', navHome: 'ホーム', navTr: '字幕翻訳', navFx: '字幕エフェクト', navCl: '字幕クリーナー',
@@ -47,7 +50,8 @@
       btnClear: 'クリア', lblSrc: '検出された形式', lblOut: '出力形式', btnGo: '変換',
       repTitle: '変換結果', btnDl: 'ダウンロード', btnCopy: 'コピー', statCues: '{0} 件', statDur: '長さ {0}',
       msgDone: '変換が完了しました', errEmpty: '先に字幕の内容を入力してください', errFmt: '字幕形式を判別できませんでした',
-      noteLocal: 'ファイルはブラウザ内だけで処理され、アップロードされません', footBrand: 'AI-SRTSub · 字幕フォーマット変換'
+      noteLocal: 'ファイルはブラウザ内だけで処理され、アップロードされません', footBrand: 'AI-SRTSub · 字幕フォーマット変換',
+      lblBi: 'バイリンガル処理', biKeep: '両方の言語を保持', biSrc: '原文のみ残す', biZh: '訳文のみ残す', biMerge: '2 行の 1 件にまとめる', biHint: 'バイリンガル字幕を検出'
     },
     'es': {
       brandName: 'AI-SRTSub', navHome: 'Inicio', navTr: 'Traducir', navFx: 'Efectos', navCl: 'Limpiador',
@@ -57,7 +61,8 @@
       btnClear: 'Limpiar', lblSrc: 'Formato detectado', lblOut: 'Formato de salida', btnGo: 'Convertir',
       repTitle: 'Resultado', btnDl: 'Descargar', btnCopy: 'Copiar', statCues: '{0} líneas', statDur: 'Duración {0}',
       msgDone: 'Listo', errEmpty: 'Añade primero el texto de los subtítulos', errFmt: 'No se pudo reconocer el formato de subtítulos',
-      noteLocal: 'El archivo se procesa solo en tu navegador y nunca se sube', footBrand: 'AI-SRTSub · Conversor de subtítulos'
+      noteLocal: 'El archivo se procesa solo en tu navegador y nunca se sube', footBrand: 'AI-SRTSub · Conversor de subtítulos',
+      lblBi: 'Texto bilingüe', biKeep: 'Mantener ambos idiomas', biSrc: 'Solo el original', biZh: 'Solo la traducción', biMerge: 'Unir en una entrada de dos líneas', biHint: 'Subtítulos bilingües detectados'
     },
     'pt': {
       brandName: 'AI-SRTSub', navHome: 'Início', navTr: 'Traduzir', navFx: 'Efeitos', navCl: 'Limpeza',
@@ -67,7 +72,8 @@
       btnClear: 'Limpar', lblSrc: 'Formato detectado', lblOut: 'Formato de saída', btnGo: 'Converter',
       repTitle: 'Resultado', btnDl: 'Baixar', btnCopy: 'Copiar', statCues: '{0} linhas', statDur: 'Duração {0}',
       msgDone: 'Concluído', errEmpty: 'Adicione primeiro o texto das legendas', errFmt: 'Não foi possível reconhecer o formato das legendas',
-      noteLocal: 'O arquivo é processado apenas no seu navegador e nunca é enviado', footBrand: 'AI-SRTSub · Conversor de legendas'
+      noteLocal: 'O arquivo é processado apenas no seu navegador e nunca é enviado', footBrand: 'AI-SRTSub · Conversor de legendas',
+      lblBi: 'Texto bilíngue', biKeep: 'Manter os dois idiomas', biSrc: 'Só o original', biZh: 'Só a tradução', biMerge: 'Unir numa entrada de duas linhas', biHint: 'Legendas bilíngues detectadas'
     },
     'ko': {
       brandName: 'AI-SRTSub', navHome: '홈', navTr: '자막 번역', navFx: '자막 효과', navCl: '자막 정리',
@@ -77,7 +83,8 @@
       btnClear: '지우기', lblSrc: '감지된 형식', lblOut: '출력 형식', btnGo: '변환',
       repTitle: '변환 결과', btnDl: '다운로드', btnCopy: '복사', statCues: '{0}개', statDur: '길이 {0}',
       msgDone: '완료', errEmpty: '먼저 자막 내용을 넣어 주세요', errFmt: '자막 형식을 인식할 수 없습니다',
-      noteLocal: '파일은 브라우저에서만 처리되며 업로드되지 않습니다', footBrand: 'AI-SRTSub · 자막 포맷 변환'
+      noteLocal: '파일은 브라우저에서만 처리되며 업로드되지 않습니다', footBrand: 'AI-SRTSub · 자막 포맷 변환',
+      lblBi: '이중 언어 처리', biKeep: '두 언어 모두 유지', biSrc: '원문만 남기기', biZh: '번역문만 남기기', biMerge: '두 줄 한 개로 합치기', biHint: '이중 언어 자막이 감지됨'
     },
     'de': {
       brandName: 'AI-SRTSub', navHome: 'Start', navTr: 'Übersetzen', navFx: 'Effekte', navCl: 'Reinigung',
@@ -87,7 +94,8 @@
       btnClear: 'Leeren', lblSrc: 'Erkanntes Format', lblOut: 'Ausgabeformat', btnGo: 'Konvertieren',
       repTitle: 'Ergebnis', btnDl: 'Herunterladen', btnCopy: 'Kopieren', statCues: '{0} Zeilen', statDur: 'Länge {0}',
       msgDone: 'Fertig', errEmpty: 'Füge zuerst Untertiteltext ein', errFmt: 'Das Untertitelformat konnte nicht erkannt werden',
-      noteLocal: 'Die Datei wird nur in deinem Browser verarbeitet und nie hochgeladen', footBrand: 'AI-SRTSub · Untertitel-Konverter'
+      noteLocal: 'Die Datei wird nur in deinem Browser verarbeitet und nie hochgeladen', footBrand: 'AI-SRTSub · Untertitel-Konverter',
+      lblBi: 'Zweisprachiger Text', biKeep: 'Beide Sprachen behalten', biSrc: 'Nur Original', biZh: 'Nur Übersetzung', biMerge: 'Zu einer zweizeiligen Zeile zusammenfassen', biHint: 'Zweisprachige Untertitel erkannt'
     },
     'fr': {
       brandName: 'AI-SRTSub', navHome: 'Accueil', navTr: 'Traduire', navFx: 'Effets', navCl: 'Nettoyage',
@@ -97,7 +105,8 @@
       btnClear: 'Effacer', lblSrc: 'Format détecté', lblOut: 'Format de sortie', btnGo: 'Convertir',
       repTitle: 'Résultat', btnDl: 'Télécharger', btnCopy: 'Copier', statCues: '{0} lignes', statDur: 'Durée {0}',
       msgDone: 'Terminé', errEmpty: 'Ajoutez d\'abord le texte des sous-titres', errFmt: 'Format de sous-titres non reconnu',
-      noteLocal: 'Le fichier est traité uniquement dans votre navigateur et n\'est jamais envoyé', footBrand: 'AI-SRTSub · Convertisseur de sous-titres'
+      noteLocal: 'Le fichier est traité uniquement dans votre navigateur et n\'est jamais envoyé', footBrand: 'AI-SRTSub · Convertisseur de sous-titres',
+      lblBi: 'Texte bilingue', biKeep: 'Garder les deux langues', biSrc: 'Original seulement', biZh: 'Traduction seulement', biMerge: 'Fusionner en une entrée de deux lignes', biHint: 'Sous-titres bilingues détectés'
     },
     'id': {
       brandName: 'AI-SRTSub', navHome: 'Beranda', navTr: 'Terjemahan', navFx: 'Efek', navCl: 'Pembersih',
@@ -107,7 +116,8 @@
       btnClear: 'Bersihkan', lblSrc: 'Format terdeteksi', lblOut: 'Format keluaran', btnGo: 'Konversi',
       repTitle: 'Hasil', btnDl: 'Unduh', btnCopy: 'Salin', statCues: '{0} baris', statDur: 'Durasi {0}',
       msgDone: 'Selesai', errEmpty: 'Masukkan teks subtitle terlebih dahulu', errFmt: 'Format subtitle tidak dikenali',
-      noteLocal: 'File diproses hanya di browser Anda dan tidak pernah diunggah', footBrand: 'AI-SRTSub · Konverter Subtitle'
+      noteLocal: 'File diproses hanya di browser Anda dan tidak pernah diunggah', footBrand: 'AI-SRTSub · Konverter Subtitle',
+      lblBi: 'Teks dwibahasa', biKeep: 'Pertahankan kedua bahasa', biSrc: 'Hanya teks asli', biZh: 'Hanya terjemahan', biMerge: 'Gabung jadi satu entri dua baris', biHint: 'Subtitle dwibahasa terdeteksi'
     },
     'hi': {
       brandName: 'AI-SRTSub', navHome: 'होम', navTr: 'अनुवाद', navFx: 'इफ़ेक्ट', navCl: 'क्लीनर',
@@ -117,7 +127,8 @@
       btnClear: 'साफ़ करें', lblSrc: 'पहचाना गया फ़ॉर्मैट', lblOut: 'आउटपुट फ़ॉर्मैट', btnGo: 'कनवर्ट करें',
       repTitle: 'परिणाम', btnDl: 'डाउनलोड', btnCopy: 'कॉपी', statCues: '{0} पंक्तियाँ', statDur: 'लंबाई {0}',
       msgDone: 'हो गया', errEmpty: 'पहले सबटाइटल का टेक्स्ट डालें', errFmt: 'सबटाइटल फ़ॉर्मैट पहचाना नहीं जा सका',
-      noteLocal: 'फ़ाइल केवल आपके ब्राउज़र में संसाधित होती है, अपलोड नहीं होती', footBrand: 'AI-SRTSub · सबटाइटल कनवर्टर'
+      noteLocal: 'फ़ाइल केवल आपके ब्राउज़र में संसाधित होती है, अपलोड नहीं होती', footBrand: 'AI-SRTSub · सबटाइटल कनवर्टर',
+      lblBi: 'द्विभाषी टेक्स्ट', biKeep: 'दोनों भाषाएँ रखें', biSrc: 'केवल मूल', biZh: 'केवल अनुवाद', biMerge: 'एक दो-पंक्ति प्रविष्टि में मिलाएँ', biHint: 'द्विभाषी सबटाइटल मिलीं'
     },
     'th': {
       brandName: 'AI-SRTSub', navHome: 'หน้าแรก', navTr: 'แปล subtitle', navFx: 'เอฟเฟกต์', navCl: 'คลีนเนอร์',
@@ -127,7 +138,8 @@
       btnClear: 'ล้าง', lblSrc: 'รูปแบบที่ตรวจพบ', lblOut: 'รูปแบบเอาต์พุต', btnGo: 'แปลง',
       repTitle: 'ผลลัพธ์', btnDl: 'ดาวน์โหลด', btnCopy: 'คัดลอก', statCues: '{0} บรรทัด', statDur: 'ความยาว {0}',
       msgDone: 'เสร็จแล้ว', errEmpty: 'ใส่ข้อความซับไตเติลก่อน', errFmt: 'ไม่สามารถรู้จักรูปแบบซับไตเติลได้',
-      noteLocal: 'ไฟล์ถูกประมวลผลในเบราว์เซอร์ของคุณเท่านั้น และไม่ถูกอัปโหลด', footBrand: 'AI-SRTSub · ตัวแปลงซับไตเติล'
+      noteLocal: 'ไฟล์ถูกประมวลผลในเบราว์เซอร์ของคุณเท่านั้น และไม่ถูกอัปโหลด', footBrand: 'AI-SRTSub · ตัวแปลงซับไตเติล',
+      lblBi: 'ข้อความสองภาษา', biKeep: 'เก็บทั้งสองภาษา', biSrc: 'เหลือเฉพาะต้นฉบับ', biZh: 'เหลือเฉพาะคำแปล', biMerge: 'รวมเป็นรายการเดียวสองบรรทัด', biHint: 'พบซับไตเติลสองภาษา'
     },
     'vi': {
       brandName: 'AI-SRTSub', navHome: 'Trang chủ', navTr: 'Dịch', navFx: 'Hiệu ứng', navCl: 'Làm sạch',
@@ -137,7 +149,8 @@
       btnClear: 'Xóa', lblSrc: 'Định dạng phát hiện', lblOut: 'Định dạng đầu ra', btnGo: 'Chuyển đổi',
       repTitle: 'Kết quả', btnDl: 'Tải xuống', btnCopy: 'Sao chép', statCues: '{0} dòng', statDur: 'Độ dài {0}',
       msgDone: 'Xong', errEmpty: 'Hãy thêm nội dung phụ đề trước', errFmt: 'Không nhận ra định dạng phụ đề',
-      noteLocal: 'Tệp chỉ được xử lý trong trình duyệt của bạn, không tải lên', footBrand: 'AI-SRTSub · Bộ chuyển đổi phụ đề'
+      noteLocal: 'Tệp chỉ được xử lý trong trình duyệt của bạn, không tải lên', footBrand: 'AI-SRTSub · Bộ chuyển đổi phụ đề',
+      lblBi: 'Văn bản song ngữ', biKeep: 'Giữ cả hai ngôn ngữ', biSrc: 'Chỉ giữ bản gốc', biZh: 'Chỉ giữ bản dịch', biMerge: 'Gộp thành một mục hai dòng', biHint: 'Phát hiện phụ đề song ngữ'
     },
     'ru': {
       brandName: 'AI-SRTSub', navHome: 'Главная', navTr: 'Перевод', navFx: 'Эффекты', navCl: 'Очистка',
@@ -147,7 +160,8 @@
       btnClear: 'Очистить', lblSrc: 'Определённый формат', lblOut: 'Формат вывода', btnGo: 'Конвертировать',
       repTitle: 'Результат', btnDl: 'Скачать', btnCopy: 'Копировать', statCues: '{0} строк', statDur: 'Длина {0}',
       msgDone: 'Готово', errEmpty: 'Сначала добавьте текст субтитров', errFmt: 'Не удалось распознать формат субтитров',
-      noteLocal: 'Файл обрабатывается только в вашем браузере и никогда не загружается', footBrand: 'AI-SRTSub · Конвертер субтитров'
+      noteLocal: 'Файл обрабатывается только в вашем браузере и никогда не загружается', footBrand: 'AI-SRTSub · Конвертер субтитров',
+      lblBi: 'Двуязычный текст', biKeep: 'Оставить оба языка', biSrc: 'Только оригинал', biZh: 'Только перевод', biMerge: 'Объединить в одну запись из двух строк', biHint: 'Обнаружены двуязычные субтитры'
     },
     'it': {
       brandName: 'AI-SRTSub', navHome: 'Home', navTr: 'Traduci', navFx: 'Effetti', navCl: 'Pulizia',
@@ -157,7 +171,8 @@
       btnClear: 'Svuota', lblSrc: 'Formato rilevato', lblOut: 'Formato di output', btnGo: 'Converti',
       repTitle: 'Risultato', btnDl: 'Scarica', btnCopy: 'Copia', statCues: '{0} righe', statDur: 'Durata {0}',
       msgDone: 'Fatto', errEmpty: 'Aggiungi prima il testo dei sottotitoli', errFmt: 'Formato dei sottotitoli non riconosciuto',
-      noteLocal: 'Il file viene elaborato solo nel tuo browser e non viene mai caricato', footBrand: 'AI-SRTSub · Convertitore di sottotitoli'
+      noteLocal: 'Il file viene elaborato solo nel tuo browser e non viene mai caricato', footBrand: 'AI-SRTSub · Convertitore di sottotitoli',
+      lblBi: 'Testo bilingue', biKeep: 'Mantieni entrambe le lingue', biSrc: 'Solo originale', biZh: 'Solo traduzione', biMerge: 'Unisci in una voce di due righe', biHint: 'Rilevati sottotitoli bilingue'
     },
     'ar': {
       brandName: 'AI-SRTSub', navHome: 'الرئيسية', navTr: 'ترجمة', navFx: 'تأثيرات', navCl: 'تنظيف',
@@ -167,7 +182,8 @@
       btnClear: 'مسح', lblSrc: 'الصيغة المكتشفة', lblOut: 'صيغة الإخراج', btnGo: 'تحويل',
       repTitle: 'النتيجة', btnDl: 'تنزيل', btnCopy: 'نسخ', statCues: '{0} سطراً', statDur: 'المدة {0}',
       msgDone: 'تم', errEmpty: 'أضف نص الترجمة أولاً', errFmt: 'تعذّر التعرف على صيغة الترجمة',
-      noteLocal: 'تتم معالجة الملف داخل متصفحك فقط ولا يتم رفعه أبداً', footBrand: 'AI-SRTSub · محوّل الترجمة النصية'
+      noteLocal: 'تتم معالجة الملف داخل متصفحك فقط ولا يتم رفعه أبداً', footBrand: 'AI-SRTSub · محوّل الترجمة النصية',
+      lblBi: 'نص بلغتين', biKeep: 'الإبقاء على اللغتين', biSrc: 'النص الأصلي فقط', biZh: 'الترجمة فقط', biMerge: 'دمج في مدخل من سطرين', biHint: 'تم اكتشاف ترجمة بلغتين'
     },
     'tr': {
       brandName: 'AI-SRTSub', navHome: 'Ana sayfa', navTr: 'Çeviri', navFx: 'Efektler', navCl: 'Temizleyici',
@@ -177,7 +193,8 @@
       btnClear: 'Temizle', lblSrc: 'Algılanan biçim', lblOut: 'Çıktı biçimi', btnGo: 'Dönüştür',
       repTitle: 'Sonuç', btnDl: 'İndir', btnCopy: 'Kopyala', statCues: '{0} satır', statDur: 'Süre {0}',
       msgDone: 'Tamam', errEmpty: 'Önce altyazı metnini ekleyin', errFmt: 'Altyazı biçimi tanınamadı',
-      noteLocal: 'Dosya yalnızca tarayıcınızda işlenir, asla yüklenmez', footBrand: 'AI-SRTSub · Altyazı Dönüştürücü'
+      noteLocal: 'Dosya yalnızca tarayıcınızda işlenir, asla yüklenmez', footBrand: 'AI-SRTSub · Altyazı Dönüştürücü',
+      lblBi: 'İki dilli metin', biKeep: 'İki dili de koru', biSrc: 'Yalnızca orijinal', biZh: 'Yalnızca çeviri', biMerge: 'Tek iki satırlık girdiye birleştir', biHint: 'İki dilli altyazı algılandı'
     },
     'nl': {
       brandName: 'AI-SRTSub', navHome: 'Home', navTr: 'Vertalen', navFx: 'Effecten', navCl: 'Opschonen',
@@ -187,7 +204,8 @@
       btnClear: 'Wissen', lblSrc: 'Gedetecteerd formaat', lblOut: 'Uitvoerformaat', btnGo: 'Converteren',
       repTitle: 'Resultaat', btnDl: 'Downloaden', btnCopy: 'Kopiëren', statCues: '{0} regels', statDur: 'Lengte {0}',
       msgDone: 'Klaar', errEmpty: 'Voeg eerst ondertiteltekst toe', errFmt: 'Kon het ondertitelformaat niet herkennen',
-      noteLocal: 'Het bestand wordt alleen in je browser verwerkt en nooit geüpload', footBrand: 'AI-SRTSub · Ondertitelconverter'
+      noteLocal: 'Het bestand wordt alleen in je browser verwerkt en nooit geüpload', footBrand: 'AI-SRTSub · Ondertitelconverter',
+      lblBi: 'Tweetalige tekst', biKeep: 'Beide talen behouden', biSrc: 'Alleen origineel', biZh: 'Alleen vertaling', biMerge: 'Samenvoegen tot één invoer van twee regels', biHint: 'Tweetalige ondertiteling gevonden'
     },
     'pl': {
       brandName: 'AI-SRTSub', navHome: 'Główna', navTr: 'Tłumaczenie', navFx: 'Efekty', navCl: 'Czyszczenie',
@@ -197,7 +215,8 @@
       btnClear: 'Wyczyść', lblSrc: 'Wykryty format', lblOut: 'Format wyjściowy', btnGo: 'Konwertuj',
       repTitle: 'Wynik', btnDl: 'Pobierz', btnCopy: 'Kopiuj', statCues: '{0} linii', statDur: 'Długość {0}',
       msgDone: 'Gotowe', errEmpty: 'Najpierw dodaj tekst napisów', errFmt: 'Nie rozpoznano formatu napisów',
-      noteLocal: 'Plik jest przetwarzany tylko w twojej przeglądarce i nigdy nie jest wysyłany', footBrand: 'AI-SRTSub · Konwerter napisów'
+      noteLocal: 'Plik jest przetwarzany tylko w twojej przeglądarce i nigdy nie jest wysyłany', footBrand: 'AI-SRTSub · Konwerter napisów',
+      lblBi: 'Tekst dwujęzyczny', biKeep: 'Zachowaj oba języki', biSrc: 'Tylko oryginał', biZh: 'Tylko tłumaczenie', biMerge: 'Połącz w jedną dwuwierszową pozycję', biHint: 'Wykryto napisy dwujęzyczne'
     },
     'sv': {
       brandName: 'AI-SRTSub', navHome: 'Start', navTr: 'Översätt', navFx: 'Effekter', navCl: 'Städning',
@@ -207,7 +226,8 @@
       btnClear: 'Rensa', lblSrc: 'Identifierat format', lblOut: 'Utdataformat', btnGo: 'Konvertera',
       repTitle: 'Resultat', btnDl: 'Ladda ner', btnCopy: 'Kopiera', statCues: '{0} rader', statDur: 'Längd {0}',
       msgDone: 'Klart', errEmpty: 'Lägg först till undertexten', errFmt: 'Kunde inte känna igen undertextformatet',
-      noteLocal: 'Filen behandlas bara i din webbläsare och laddas aldrig upp', footBrand: 'AI-SRTSub · Undertextkonverterare'
+      noteLocal: 'Filen behandlas bara i din webbläsare och laddas aldrig upp', footBrand: 'AI-SRTSub · Undertextkonverterare',
+      lblBi: 'Tvåspråkig text', biKeep: 'Behåll båda språken', biSrc: 'Bara originalet', biZh: 'Bara översättningen', biMerge: 'Slå ihop till en post med två rader', biHint: 'Tvåspråkig undertext hittades'
     },
     'cs': {
       brandName: 'AI-SRTSub', navHome: 'Domů', navTr: 'Překlad', navFx: 'Efekty', navCl: 'Čištění',
@@ -217,7 +237,8 @@
       btnClear: 'Vymazat', lblSrc: 'Rozpoznaný formát', lblOut: 'Výstupní formát', btnGo: 'Převést',
       repTitle: 'Výsledek', btnDl: 'Stáhnout', btnCopy: 'Kopírovat', statCues: '{0} řádků', statDur: 'Délka {0}',
       msgDone: 'Hotovo', errEmpty: 'Nejprve vlož text titulků', errFmt: 'Formát titulků nebyl rozpoznán',
-      noteLocal: 'Soubor se zpracovává jen ve tvém prohlížeči a nikdy se nenahrává', footBrand: 'AI-SRTSub · Převod titulků'
+      noteLocal: 'Soubor se zpracovává jen ve tvém prohlížeči a nikdy se nenahrává', footBrand: 'AI-SRTSub · Převod titulků',
+      lblBi: 'Dvojjazyčný text', biKeep: 'Ponechat oba jazyky', biSrc: 'Jen originál', biZh: 'Jen překlad', biMerge: 'Sloučit do jedné položky o dvou řádcích', biHint: 'Zjištěny dvojjazyčné titulky'
     },
     'uk': {
       brandName: 'AI-SRTSub', navHome: 'Головна', navTr: 'Переклад', navFx: 'Ефекти', navCl: 'Очищення',
@@ -227,7 +248,8 @@
       btnClear: 'Очистити', lblSrc: 'Визначений формат', lblOut: 'Формат виводу', btnGo: 'Конвертувати',
       repTitle: 'Результат', btnDl: 'Завантажити', btnCopy: 'Копіювати', statCues: '{0} рядків', statDur: 'Тривалість {0}',
       msgDone: 'Готово', errEmpty: 'Спочатку додайте текст субтитрів', errFmt: 'Не вдалося розпізнати формат субтитрів',
-      noteLocal: 'Файл обробляється лише у вашому браузері і ніколи не завантажується', footBrand: 'AI-SRTSub · Конвертер субтитрів'
+      noteLocal: 'Файл обробляється лише у вашому браузері і ніколи не завантажується', footBrand: 'AI-SRTSub · Конвертер субтитрів',
+      lblBi: 'Двомовний текст', biKeep: 'Залишити обидві мови', biSrc: 'Лише оригінал', biZh: 'Лише переклад', biMerge: 'Об’єднати в один запис із двох рядків', biHint: 'Виявлено двомовні субтитри'
     },
     'da': {
       brandName: 'AI-SRTSub', navHome: 'Forside', navTr: 'Oversæt', navFx: 'Effekter', navCl: 'Rensning',
@@ -237,7 +259,8 @@
       btnClear: 'Ryd', lblSrc: 'Registreret format', lblOut: 'Outputformat', btnGo: 'Konverter',
       repTitle: 'Resultat', btnDl: 'Download', btnCopy: 'Kopier', statCues: '{0} linjer', statDur: 'Længde {0}',
       msgDone: 'Færdig', errEmpty: 'Tilføj undertekstteksten først', errFmt: 'Kunne ikke genkende undertekstformatet',
-      noteLocal: 'Filen behandles kun i din browser og uploades aldrig', footBrand: 'AI-SRTSub · Undertekstkonverter'
+      noteLocal: 'Filen behandles kun i din browser og uploades aldrig', footBrand: 'AI-SRTSub · Undertekstkonverter',
+      lblBi: 'Tosproget tekst', biKeep: 'Behold begge sprog', biSrc: 'Kun original', biZh: 'Kun oversættelse', biMerge: 'Slå sammen til én post på to linjer', biHint: 'Tosprogede undertekster fundet'
     },
     'fi': {
       brandName: 'AI-SRTSub', navHome: 'Etusivu', navTr: 'Käännä', navFx: 'Tehosteet', navCl: 'Siivous',
@@ -247,7 +270,8 @@
       btnClear: 'Tyhjennä', lblSrc: 'Tunnistettu muoto', lblOut: 'Tulostusmuoto', btnGo: 'Muunna',
       repTitle: 'Tulos', btnDl: 'Lataa', btnCopy: 'Kopioi', statCues: '{0} riviä', statDur: 'Kesto {0}',
       msgDone: 'Valmis', errEmpty: 'Lisää ensin tekstityksen teksti', errFmt: 'Tekstitysmuotoa ei tunnistettu',
-      noteLocal: 'Tiedosto käsitellään vain selaimessasi, eikä sitä koskaan ladata palvelimelle', footBrand: 'AI-SRTSub · Tekstitysmuunnin'
+      noteLocal: 'Tiedosto käsitellään vain selaimessasi, eikä sitä koskaan ladata palvelimelle', footBrand: 'AI-SRTSub · Tekstitysmuunnin',
+      lblBi: 'Kaksikielinen teksti', biKeep: 'Säilytä molemmat kielet', biSrc: 'Vain alkuperäinen', biZh: 'Vain käännös', biMerge: 'Yhdistä yhdeksi kaksiriviseksi merkinnäksi', biHint: 'Kaksikieliset tekstitykset havaittu'
     },
     'el': {
       brandName: 'AI-SRTSub', navHome: 'Αρχική', navTr: 'Μετάφραση', navFx: 'Εφέ', navCl: 'Καθαρισμός',
@@ -257,7 +281,8 @@
       btnClear: 'Εκκαθάριση', lblSrc: 'Μορφή που εντοπίστηκε', lblOut: 'Μορφή εξόδου', btnGo: 'Μετατροπή',
       repTitle: 'Αποτέλεσμα', btnDl: 'Λήψη', btnCopy: 'Αντιγραφή', statCues: '{0} γραμμές', statDur: 'Διάρκεια {0}',
       msgDone: 'Έτοιμο', errEmpty: 'Προσθέστε πρώτα το κείμενο των υποτίτλων', errFmt: 'Δεν ήταν δυνατή η αναγνώριση της μορφής υποτίτλων',
-      noteLocal: 'Το αρχείο επεξεργάζεται μόνο στον περιηγητή σας και δεν ανεβαίνει ποτέ', footBrand: 'AI-SRTSub · Μετατροπέας υποτίτλων'
+      noteLocal: 'Το αρχείο επεξεργάζεται μόνο στον περιηγητή σας και δεν ανεβαίνει ποτέ', footBrand: 'AI-SRTSub · Μετατροπέας υποτίτλων',
+      lblBi: 'Δίγλωσσο κείμενο', biKeep: 'Κράτησε και τις δύο γλώσσες', biSrc: 'Μόνο το πρωτότυπο', biZh: 'Μόνο τη μετάφραση', biMerge: 'Ενοποίησε σε μία καταχώρηση δύο γραμμών', biHint: 'Εντοπίστηκαν δίγλωσσοι υπότιτλοι'
     },
     'he': {
       brandName: 'AI-SRTSub', navHome: 'בית', navTr: 'תרגום', navFx: 'אפקטים', navCl: 'ניקוי',
@@ -267,7 +292,8 @@
       btnClear: 'נקה', lblSrc: 'פורמט שזוהה', lblOut: 'פורמט פלט', btnGo: 'המר',
       repTitle: 'תוצאה', btnDl: 'הורדה', btnCopy: 'העתקה', statCues: '{0} שורות', statDur: 'אורך {0}',
       msgDone: 'בוצע', errEmpty: 'קודם הוסף את טקסט הכתוביות', errFmt: 'לא ניתן לזהות את פורמט הכתוביות',
-      noteLocal: 'הקובץ מעובד רק בדפדפן שלך ולעולם לא מועלה', footBrand: 'AI-SRTSub · ממיר כתוביות'
+      noteLocal: 'הקובץ מעובד רק בדפדפן שלך ולעולם לא מועלה', footBrand: 'AI-SRTSub · ממיר כתוביות',
+      lblBi: 'טקסט דו-לשוני', biKeep: 'שמור את שתי השפות', biSrc: 'רק המקור', biZh: 'רק התרגום', biMerge: 'מזג לרשומה אחת של שתי שורות', biHint: 'זוהו כתוביות דו-לשוניות'
     },
     'ro': {
       brandName: 'AI-SRTSub', navHome: 'Acasă', navTr: 'Traducere', navFx: 'Efecte', navCl: 'Curățare',
@@ -277,7 +303,8 @@
       btnClear: 'Șterge', lblSrc: 'Format detectat', lblOut: 'Format de ieșire', btnGo: 'Convertește',
       repTitle: 'Rezultat', btnDl: 'Descarcă', btnCopy: 'Copiază', statCues: '{0} linii', statDur: 'Durată {0}',
       msgDone: 'Gata', errEmpty: 'Adaugă mai întâi textul subtitrărilor', errFmt: 'Nu s-a putut recunoaște formatul subtitrărilor',
-      noteLocal: 'Fișierul este procesat doar în browserul tău și nu este încărcat niciodată', footBrand: 'AI-SRTSub · Convertor de subtitrări'
+      noteLocal: 'Fișierul este procesat doar în browserul tău și nu este încărcat niciodată', footBrand: 'AI-SRTSub · Convertor de subtitrări',
+      lblBi: 'Text bilingv', biKeep: 'Păstrează ambele limbi', biSrc: 'Doar originalul', biZh: 'Doar traducerea', biMerge: 'Unește într-o singură intrare cu două rânduri', biHint: 'Detectate subtitrări bilingve'
     }
   };
 
