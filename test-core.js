@@ -5384,7 +5384,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.282/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.283/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5425,9 +5425,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.282</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.282</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.282/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.283</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.283</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.283/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5613,8 +5613,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.282</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.282/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.283</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.283/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7455,11 +7455,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.282/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.282/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.282/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.282/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.282/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.283/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.283/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.283/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.283/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.283/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8964,14 +8964,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.282/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.282/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.283/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.283/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.282/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.282/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.282/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.283/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.283/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.283/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.282/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.283/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9442,13 +9442,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.282/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.282/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.282/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.282/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.282/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.283/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.283/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.283/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.283/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.283/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.282/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.283/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9470,7 +9470,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0\.9\.282">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0\.9\.283">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9481,7 +9481,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.282') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.283') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -9766,6 +9766,60 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       langs.forEach(L => { if (String(I18N[L][k] || '').indexOf('{0}') < 0) lost.push(L + '.' + k); });
     });
     assert.strictEqual(lost.length, 0, '占位符 {0} 丢了 — ' + lost.slice(0, 6).join(', '));
+  });
+
+  /* ==========================================================================
+     v0.9.283 安全加固：/data 目录不许被当静态资源吐出去
+     --------------------------------------------------------------------------
+     2026-10-12 体检发现：GET /data/config.json 直接 200，明文 API Key +
+     adminHash 公网可读。根因是 serveStatic 只挡了「点文件」，data/ 是普通
+     路径就放行了 —— 而 /api/admin/config 那条链路其实是鉴权过的、密钥也只回
+     掩码（keyMask 只露首尾各 4 位），等于前门锁好、后窗大开。
+
+     下面这组用例做三件事：
+       ① 拦截必须存在（不能有人手一抖删了）
+       ② 拦截必须排在 path.join 之前（顺序错了等于没拦）
+       ③ 判据必须是精确前缀，不能用 p.indexOf('data') 这种宽匹配
+          —— 否则将来任何名字里带 data 的正常资源都会被误 404
+     ⚠️ 顺带钉死：前端源码里不许出现 sk- 开头的密钥。
+     ========================================================================== */
+  t('v0.9.283：/data 目录被静态层拦住（明文 API Key 不再公网可读）', () => {
+    const sv = readT('server.js');
+    const fn = sv.match(/function serveStatic\(req, res, urlPath\)\{[\s\S]*?\n\}/);
+    assert.ok(fn, '没找到 serveStatic 函数');
+
+    const body = fn[0];
+    /* ① 拦截存在 */
+    assert.ok(/p === '\/data' \|\| p\.startsWith\('\/data\/'\)/.test(body),
+      'serveStatic 里没有 /data 的拦截（config.json 会被公网读到）');
+    assert.ok(/\/data\.bak/.test(body),
+      'data.bak 备份目录没一起挡（里面躺着同样的 config.json）');
+
+    /* ② 顺序：拦截必须早于 path.join(ROOT, p) —— 晚一步文件就读出去了 */
+    const iGuard = body.indexOf("p.startsWith('/data/')");
+    const iJoin = body.indexOf('path.normalize(path.join(ROOT, p))');
+    assert.ok(iGuard > 0 && iJoin > 0 && iGuard < iJoin,
+      '拦截位置不对：必须在 path.join 之前（现在 guard@' + iGuard + ' join@' + iJoin + '）');
+
+    /* ③ 判据精确：不许退化成 indexOf 宽匹配 */
+    assert.ok(!/indexOf\(\s*['"]data['"]\s*\)/.test(body),
+      '用了 indexOf("data") 这类宽匹配，会误伤名字里带 data 的正常资源');
+
+    /* ④ 反向钉住：正常静态资源路径不含 data 字样被拦的规则覆盖 */
+    ['/translate.html', '/srt-core.js', '/site-i18n.js', '/favicon.svg'].forEach(pp => {
+      assert.ok(!pp.startsWith('/data/'), '误判：' + pp + ' 不该被 data 规则命中');
+    });
+  });
+
+  t('v0.9.283：前端源码里不许出现明文密钥', () => {
+    /* 页面/引擎/词典全是下载到浏览器的，任何一处带 sk- 就等于把钥匙挂门口。
+       服务端 server.js 读 data/config.json 是另一回事（它不上网传输），故不检查它。 */
+    ['index.html', 'translate.html', 'merge.html', 'clean.html',
+      'srt-core.js', 'merge-core.js', 'clean-core.js', 'site-i18n.js'].forEach(f => {
+        const src = readT(f);
+        const hit = src.match(/sk-[A-Za-z0-9]{16,}/g);
+        assert.strictEqual(hit, null, f + ' 里疑似有明文 API Key — ' + (hit || []).length + ' 处');
+      });
   });
 
   });

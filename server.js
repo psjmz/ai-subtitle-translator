@@ -639,6 +639,15 @@ function serveStatic(req, res, urlPath){
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Not Found'); return;
   }
+  /* v0.9.283 安全加固：data/ 整目录（含 data.bak 备份）一律 404。
+     2026-10-12 体检发现：/api/admin/config 本身是鉴权的、密钥也只回 keyMask 掩码，
+     但 data/config.json 是「点文件」之外的普通路径，被上面的静态分支原样吐了出去，
+     等于给那条鉴权开了一扇后门——明文 API Key、adminHash、analyticsId 公网可读。
+     ⚠️ data/data.bak/ 是本地备份副本，含同样的 config.json，必须一起挡。 */
+  if (p === '/data' || p.startsWith('/data/') || p === '/data.bak' || p.startsWith('/data.bak/')) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Not Found'); return;
+  }
   const file = path.normalize(path.join(ROOT, p));
   if (!file.startsWith(ROOT)) { res.writeHead(403); res.end('Forbidden'); return; }
   /* v0.9.75 缓存修复：此前响应无 Cache-Control/Last-Modified，浏览器启发式缓存且无法
