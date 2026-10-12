@@ -606,7 +606,10 @@ function serveStatic(req, res, urlPath){
   // SEO：robots.txt / sitemap.xml 按当前访问域名动态生成（换域名/部署环境自动适配）
   const baseUrl = publicBase(req);
   if (p === '/robots.txt' && baseUrl) {
-    const body = 'User-agent: *\nAllow: /\nDisallow: /admin.html\n\nSitemap: ' + baseUrl + '/sitemap.xml\n';
+    /* v0.9.284：/data/ 一并声明不抓取。
+       ⚠️ 别把 robots 当安全手段 —— 它只挡守规矩的爬虫，挡不住直接 curl。
+          真正的防线是上面 serveStatic 里那条 404（v0.9.283）。 */
+    const body = 'User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /data/\n\nSitemap: ' + baseUrl + '/sitemap.xml\n';
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end(body); return;
   }
@@ -2170,6 +2173,20 @@ async function callModel(cfg, messages, maxTokens, opts){
 
 /* ---------------- 路由 ---------------- */
 const server = http.createServer(async (req, res) => {
+  /* v0.9.284：基础安全响应头，对所有响应统一生效。
+     ⚠️ 有意**不上 CSP** —— 四页引擎逻辑大量内联 <script>（translate.html 单页 540KB），
+        一旦上 CSP 又没放行 'unsafe-inline'，整站当场瘫痪。
+        真要上，得先把内联脚本梳理成白名单/外链，是个独立小工程。
+     下面这三个都是「只加约束、不改行为」的，不会破坏现有功能：
+       nosniff      → 不让浏览器猜 MIME（防止 .txt 被当 HTML 执行）
+       Referrer     → 跨站只带来源，不带完整 URL（字幕相关路径不泄漏给第三方）
+       XFO SAMEORIGIN → 只许自己嵌自己，挡掉基本的点击劫持 */
+  try {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  } catch (e) { }
+
   const u = req.url.split('?')[0];
   try {
     /* 公开：累计统计（顶栏三个数字）。只读账本，不扫 events.json，服务端 30 分钟内存缓存。 */
