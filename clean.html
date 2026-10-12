@@ -6,7 +6,7 @@
 <!-- 以下 SEO head 区块由 server.js 按语言路由（/clean.html 与 /en/clean.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
 <!--SEO-HEAD-START-->
 <title>字幕清洗器 - 随心字幕 AI (AI-SRTSub)</title>
-<meta name="description" content="免费在线字幕清洗工具：去掉 HTML 标签、ASS 特效、听障提示、说话人标签、字幕组水印与广告，修复全大写和乱码，导出干净的字幕。纯本地处理，不上传服务器。">
+<meta name="description" content="免费在线字幕清洗工具：去掉 HTML 标签、ASS 特效、听障提示、说话人标签、字幕组水印与广告，修复全大写和乱码，导出干净的字幕。">
 <meta name="keywords" content="字幕清洗,srt清洗,去字幕水印,去听障字幕,SDH字幕,去说话人,字幕去广告,字幕乱码修复,subtitle cleaner">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#0B7A5C">
@@ -220,7 +220,7 @@ crossorigin="anonymous"></script>
 
   <div class="hero">
     <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">清洗器</em></h1>
-    <p data-i18n="heroSub">去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。全程在你浏览器里完成，文件不上传服务器。</p>
+    <p data-i18n="heroSub">去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。</p>
   </div>
 
   <div class="card" id="upCard">
@@ -319,7 +319,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.292"></script>
+<script src="clean-core.js?v=0.9.293"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -954,7 +954,7 @@ const I18N = {
     optOn: '已开启 {n} / {t} 项', pasteSrc: '粘贴的内容',
     footHome: '去翻译字幕 →', footMerge: '去特效字幕 →',
     heroA: '字幕', heroEm: '清洗器',
-    heroSub: '去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。全程在你浏览器里完成，文件不上传服务器。',
+    heroSub: '去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。',
     footBrand: '随心字幕 AI · 字幕清洗工具'
   },
   'en': {
@@ -999,7 +999,7 @@ const I18N = {
     optOn: '{n} of {t} rules on', pasteSrc: 'pasted content',
     footHome: 'Translate subtitles', footMerge: 'Merge subtitles',
     heroA: 'Subtitle', heroEm: 'Cleaner',
-    heroSub: 'Strip HTML tags, ASS effects, SDH cues, speaker labels and group watermarks, then fix all-caps and mojibake. Everything runs in your browser - the file is never uploaded.',
+    heroSub: 'Strip HTML tags, ASS effects, SDH cues, speaker labels and group watermarks, then fix all-caps and mojibake.',
     footBrand: 'AI-SRTSub · Subtitle Cleaner',
   },
   'zh-TW': {
@@ -1087,7 +1087,7 @@ const I18N = {
     footMerge: '去特效字幕 →',
     heroA: '字幕',
     heroEm: '清洗器',
-    heroSub: '去除 HTML 標籤、ASS 特效、聽障提示、說話人標籤和字幕組浮水印，並修正全大寫與亂碼。全程在你的瀏覽器完成，檔案不會上傳伺服器。',
+    heroSub: '去除 HTML 標籤、ASS 特效、聽障提示、說話人標籤和字幕組浮水印，並修正全大寫與亂碼。',
     footBrand: 'AI-SRTSub · 字幕清洗工具'
   },
   'ja': {
@@ -1175,7 +1175,7 @@ const I18N = {
     footMerge: '字幕を合成 →',
     heroA: '字幕',
     heroEm: 'クリーナー',
-    heroSub: 'HTMLタグ、ASSエフェクト、SDH字幕、話者ラベル、グループのウォーターマークを除去し、全大文字と文字化けを修正します。すべてブラウザ内で完結し、ファイルはアップロードされません。',
+    heroSub: 'HTMLタグ、ASSエフェクト、SDH字幕、話者ラベル、グループのウォーターマークを除去し、全大文字と文字化けを修正します。',
     footBrand: 'AI-SRTSub · 字幕クリーナー'
   },
   'es': {
@@ -1263,7 +1263,7 @@ const I18N = {
     footMerge: 'Combinar subtítulos',
     heroA: 'Subtítulo',
     heroEm: 'Limpiador',
-    heroSub: 'Elimina etiquetas HTML, efectos ASS, subtítulos SDH, etiquetas de hablante y marcas de agua de grupos, y luego corrige mayúsculas y caracteres corruptos. Todo se ejecuta en tu navegador: el archivo nunca se sube.',
+    heroSub: 'Elimina etiquetas HTML, efectos ASS, subtítulos SDH, etiquetas de hablante y marcas de agua de grupos, y luego corrige mayúsculas y caracteres corruptos.',
     footBrand: 'AI-SRTSub · Limpiador de subtítulos'
   },
   'pt': {
@@ -1351,7 +1351,7 @@ const I18N = {
     footMerge: 'Mesclar legendas',
     heroA: 'Limpeza de',
     heroEm: 'legendas',
-    heroSub: 'Remova tags HTML, efeitos ASS, legendas SDH, identificadores de falante e marcas d\'água de grupos, e corrija CAIXA ALTA e caracteres corrompidos. Tudo roda no seu navegador - o arquivo nunca é enviado.',
+    heroSub: 'Remova tags HTML, efeitos ASS, legendas SDH, identificadores de falante e marcas d\'água de grupos, e corrija CAIXA ALTA e caracteres corrompidos.',
     footBrand: 'AI-SRTSub · Limpador de Legendas'
   },
   'ko': {
@@ -1439,7 +1439,7 @@ const I18N = {
     footMerge: '자막 병합하기 →',
     heroA: '자막',
     heroEm: '클리너',
-    heroSub: 'HTML 태그, ASS 효과, SDH 자막, 화자 라벨, 자막팀 워터마크를 제거하고 전부 대문자와 깨진 문자를 수정합니다. 모든 작업은 브라우저에서 실행되며 파일은 서버에 업로드되지 않습니다.',
+    heroSub: 'HTML 태그, ASS 효과, SDH 자막, 화자 라벨, 자막팀 워터마크를 제거하고 전부 대문자와 깨진 문자를 수정합니다.',
     footBrand: 'AI-SRTSub · 자막 클리너'
   },
   'de': {
@@ -1527,7 +1527,7 @@ const I18N = {
     footMerge: 'Untertitel zusammenführen',
     heroA: 'Untertitel',
     heroEm: 'Reiniger',
-    heroSub: 'HTML-Tags, ASS-Effekte, SDH-Hinweise, Sprecherangaben und Gruppen-Wasserzeichen entfernen, dann Großschreibung und Mojibake korrigieren. Alles läuft in deinem Browser – die Datei wird nie hochgeladen.',
+    heroSub: 'HTML-Tags, ASS-Effekte, SDH-Hinweise, Sprecherangaben und Gruppen-Wasserzeichen entfernen, dann Großschreibung und Mojibake korrigieren.',
     footBrand: 'AI-SRTSub · Untertitel-Reiniger'
   },
   'fr': {
@@ -1615,7 +1615,7 @@ const I18N = {
     footMerge: 'Fusionner les sous-titres',
     heroA: 'Sous-titre',
     heroEm: 'Nettoyeur',
-    heroSub: 'Supprimez les balises HTML, les effets ASS, les indications SDH, les mentions de locuteur et les filigranes de teams, puis corrigez les majuscules et les caractères mal encodés. Tout s\'exécute dans votre navigateur : le fichier n\'est jamais envoyé.',
+    heroSub: 'Supprimez les balises HTML, les effets ASS, les indications SDH, les mentions de locuteur et les filigranes de teams, puis corrigez les majuscules et les caractères mal encodés.',
     footBrand: 'AI-SRTSub · Nettoyeur de sous-titres'
   },
   'id': {
@@ -1703,7 +1703,7 @@ const I18N = {
     footMerge: 'Gabungkan subtitle',
     heroA: 'Subjudul',
     heroEm: 'Pembersih',
-    heroSub: 'Hapus tag HTML, efek ASS, cue SDH, label pembicara, dan watermark grup, lalu perbaiki huruf kapital semua dan mojibake. Semuanya berjalan di browser Anda - file tidak pernah diunggah.',
+    heroSub: 'Hapus tag HTML, efek ASS, cue SDH, label pembicara, dan watermark grup, lalu perbaiki huruf kapital semua dan mojibake.',
     footBrand: 'AI-SRTSub · Pembersih Subtitle'
   },
   'hi': {
@@ -1791,7 +1791,7 @@ const I18N = {
     footMerge: 'उपशीर्षक मर्ज करें →',
     heroA: 'उपशीर्षक',
     heroEm: 'क्लीनर',
-    heroSub: 'HTML टैग, ASS इफ़ेक्ट, SDH क्यू, वक्ता लेबल और ग्रुप वॉटरमार्क हटाएँ, फिर ऑल-कैप्स और मोजीबेक ठीक करें। सब कुछ आपके ब्राउज़र में चलता है - फ़ाइल कभी अपलोड नहीं होती।',
+    heroSub: '',
     footBrand: 'AI-SRTSub · उपशीर्षक क्लीनर'
   },
   'th': {
@@ -1879,7 +1879,7 @@ const I18N = {
     footMerge: 'รวมซับไทเทิล',
     heroA: 'ซับไทเทิล',
     heroEm: 'คลีนเนอร์',
-    heroSub: 'ลบแท็ก HTML, เอฟเฟกต์ ASS, คำบรรยาย SDH, ป้ายชื่อผู้พูด และลายน้ำของกลุ่มแฟนซับ แล้วแก้ตัวพิมพ์ใหญ่ทั้งหมดและตัวอักษรเพี้ยน ทั้งหมดทำงานในเบราว์เซอร์ของคุณ - ไฟล์จะไม่ถูกอัปโหลด',
+    heroSub: '',
     footBrand: 'AI-SRTSub · ซับไทเทิลคลีนเนอร์'
   },
   'vi': {
@@ -1967,7 +1967,7 @@ const I18N = {
     footMerge: 'Gộp phụ đề',
     heroA: 'Phụ đề',
     heroEm: 'Làm sạch',
-    heroSub: 'Loại bỏ thẻ HTML, hiệu ứng ASS, phụ đề SDH, nhãn người nói và watermark nhóm dịch, sau đó sửa chữ in hoa toàn bộ và lỗi mã hóa. Mọi thứ chạy trong trình duyệt của bạn - tệp không bao giờ được tải lên.',
+    heroSub: 'Loại bỏ thẻ HTML, hiệu ứng ASS, phụ đề SDH, nhãn người nói và watermark nhóm dịch, sau đó sửa chữ in hoa toàn bộ và lỗi mã hóa.',
     footBrand: 'AI-SRTSub · Trình làm sạch phụ đề'
   },
   'ru': {
@@ -2055,7 +2055,7 @@ const I18N = {
     footMerge: 'Объединить субтитры →',
     heroA: 'Субтитры',
     heroEm: 'Очистка',
-    heroSub: 'Убирает HTML-теги, ASS-эффекты, пометки SDH, метки говорящих и водяные знаки релиз-групп, исправляет капс и кракозябры. Всё работает в браузере — файл не загружается на сервер.',
+    heroSub: 'Убирает HTML-теги, ASS-эффекты, пометки SDH, метки говорящих и водяные знаки релиз-групп, исправляет капс и кракозябры.',
     footBrand: 'AI-SRTSub · Очистка субтитров'
   },
   'it': {
@@ -2143,7 +2143,7 @@ const I18N = {
     footMerge: 'Unisci sottotitoli →',
     heroA: 'Pulizia',
     heroEm: 'sottotitoli',
-    heroSub: 'Rimuovi tag HTML, effetti ASS, didascalie SDH, etichette del parlante e watermark di gruppo, poi correggi il testo tutto in maiuscolo e i caratteri corrotti. Tutto nel tuo browser - il file non viene mai caricato.',
+    heroSub: 'Rimuovi tag HTML, effetti ASS, didascalie SDH, etichette del parlante e watermark di gruppo, poi correggi il testo tutto in maiuscolo e i caratteri corrotti.',
     footBrand: 'AI-SRTSub · Pulizia sottotitoli'
   },
   'ar': {
@@ -2231,7 +2231,7 @@ const I18N = {
     footMerge: 'دمج الترجمات →',
     heroA: 'ترجمة',
     heroEm: 'منظّف',
-    heroSub: 'أزِل وسوم HTML وتأثيرات ASS وإشارات الصم وضعاف السمع وتسميات المتحدثين والعلامات المائية لفرق الترجمة، ثم صحّح الكتابة بالأحرف الكبيرة والنص المشوّه. كل شيء يعمل في متصفحك - لا يُرفع الملف إلى الخادم.',
+    heroSub: 'أزِل وسوم HTML وتأثيرات ASS وإشارات الصم وضعاف السمع وتسميات المتحدثين والعلامات المائية لفرق الترجمة، ثم صحّح الكتابة بالأحرف الكبيرة والنص المشوّه.',
     footBrand: 'AI-SRTSub · منظّف الترجمة'
   },
   'tr': {
@@ -2319,7 +2319,7 @@ const I18N = {
     footMerge: 'Altyazıları birleştir',
     heroA: 'Altyazı',
     heroEm: 'Temizleyici',
-    heroSub: 'HTML etiketlerini, ASS efektlerini, SDH altyazılarını, konuşmacı etiketlerini ve grup filigranlarını kaldırın, ardından tümü büyük harf ve bozuk karakterleri düzeltin. Her şey tarayıcınızda çalışır - dosya asla sunucuya yüklenmez.',
+    heroSub: 'HTML etiketlerini, ASS efektlerini, SDH altyazılarını, konuşmacı etiketlerini ve grup filigranlarını kaldırın, ardından tümü büyük harf ve bozuk karakterleri düzeltin.',
     footBrand: 'AI-SRTSub · Altyazı Temizleyici'
   },
   'nl': {
@@ -2407,7 +2407,7 @@ const I18N = {
     footMerge: 'Ondertitels samenvoegen',
     heroA: 'Ondertitel',
     heroEm: 'Schoonmaker',
-    heroSub: 'Verwijder HTML-tags, ASS-effecten, SDH-cues, sprekerlabels en groepswatermerken, en corrigeer alles-in-hoofdletters en mojibake. Alles gebeurt in je browser - het bestand wordt nooit geüpload.',
+    heroSub: 'Verwijder HTML-tags, ASS-effecten, SDH-cues, sprekerlabels en groepswatermerken, en corrigeer alles-in-hoofdletters en mojibake.',
     footBrand: 'AI-SRTSub · Ondertitel Schoonmaker'
   },
   'pl': {
@@ -2495,7 +2495,7 @@ const I18N = {
     footMerge: 'Scal napisy',
     heroA: 'Napisy',
     heroEm: 'Czyszczenie',
-    heroSub: 'Usuwa tagi HTML, efekty ASS, napisy SDH, oznaczenia mówców i znaki wodne grup, a potem naprawia WIELKIE LITERY i zniekształcone znaki. Wszystko działa w Twojej przeglądarce - plik nie jest nigdzie wysyłany.',
+    heroSub: 'Usuwa tagi HTML, efekty ASS, napisy SDH, oznaczenia mówców i znaki wodne grup, a potem naprawia WIELKIE LITERY i zniekształcone znaki.',
     footBrand: 'AI-SRTSub · Czyszczenie napisów'
   },
   'sv': {
@@ -2583,7 +2583,7 @@ const I18N = {
     footMerge: 'Slå samman undertexter',
     heroA: 'Undertext',
     heroEm: 'Rengörare',
-    heroSub: 'Ta bort HTML-taggar, ASS-effekter, SDH-cues, talar-etiketter och gruppvatttenstämplar, fixa sedan VERSALER och teckenfel. Allt körs i din webbläsare – filen laddas aldrig upp.',
+    heroSub: 'Ta bort HTML-taggar, ASS-effekter, SDH-cues, talar-etiketter och gruppvatttenstämplar, fixa sedan VERSALER och teckenfel.',
     footBrand: 'AI-SRTSub · Undertextrengörare'
   },
   'cs': {
@@ -2671,7 +2671,7 @@ const I18N = {
     footMerge: 'Sloučit titulky',
     heroA: 'Titulky',
     heroEm: 'Čistič',
-    heroSub: 'Odstraní HTML značky, ASS efekty, SDH stopy, označení mluvčích a vodoznaky skupin, poté opraví velká písmena a mojibake. Vše běží ve vašem prohlížeči – soubor se nikdy nenahrává.',
+    heroSub: 'Odstraní HTML značky, ASS efekty, SDH stopy, označení mluvčích a vodoznaky skupin, poté opraví velká písmena a mojibake.',
     footBrand: 'AI-SRTSub · Čistič titulků'
   },
   'uk': {
@@ -2759,7 +2759,7 @@ const I18N = {
     footMerge: 'Об’єднати субтитри',
     heroA: 'Субтитри',
     heroEm: 'Очищувач',
-    heroSub: 'Видаляє HTML-теги, ASS-ефекти, SDH-репліки, позначки мовців і водяні знаки груп, а потім виправляє суцільний верхній регістр і кракозябри. Усе працює у вашому браузері — файл ніколи не завантажується на сервер.',
+    heroSub: 'Видаляє HTML-теги, ASS-ефекти, SDH-репліки, позначки мовців і водяні знаки груп, а потім виправляє суцільний верхній регістр і кракозябри.',
     footBrand: 'AI-SRTSub · Очищувач субтитрів'
   },
   'da': {
@@ -2847,7 +2847,7 @@ const I18N = {
     footMerge: 'Flet undertekster',
     heroA: 'Undertekst',
     heroEm: 'Renser',
-    heroSub: 'Fjern HTML-tags, ASS-effekter, SDH-undertekster, taleretiketter og gruppe-vandmærker, og ret derefter VERSALER og mojibake. Alt kører i din browser - filen uploades aldrig.',
+    heroSub: 'Fjern HTML-tags, ASS-effekter, SDH-undertekster, taleretiketter og gruppe-vandmærker, og ret derefter VERSALER og mojibake.',
     footBrand: 'AI-SRTSub · Undertekstrenser'
   },
   'fi': {
@@ -2935,7 +2935,7 @@ const I18N = {
     footMerge: 'Yhdistä tekstitykset',
     heroA: 'Tekstitys',
     heroEm: 'Puhdistin',
-    heroSub: 'Poista HTML-tagit, ASS-tehosteet, SDH-tekstitykset, puhujamerkinnät ja ryhmävesileimat, ja korjaa sitten versaalit ja mojibake. Kaikki tapahtuu selaimessasi - tiedostoa ei koskaan lähetetä palvelimelle.',
+    heroSub: 'Poista HTML-tagit, ASS-tehosteet, SDH-tekstitykset, puhujamerkinnät ja ryhmävesileimat, ja korjaa sitten versaalit ja mojibake.',
     footBrand: 'AI-SRTSub · Tekstitysten puhdistin'
   },
   'el': {
@@ -3023,7 +3023,7 @@ const I18N = {
     footMerge: 'Συγχώνευση υποτίτλων',
     heroA: 'Υπότιτλοι',
     heroEm: 'Καθαρισμός',
-    heroSub: 'Αφαιρέστε ετικέτες HTML, εφέ ASS, ενδείξεις SDH, ονόματα ομιλητών και υδατογραφήματα ομάδων και διορθώστε τα κεφαλαία και τα λάθη κωδικοποίησης. Όλα εκτελούνται στον browser σας - το αρχείο δεν ανεβαίνει ποτέ.',
+    heroSub: 'Αφαιρέστε ετικέτες HTML, εφέ ASS, ενδείξεις SDH, ονόματα ομιλητών και υδατογραφήματα ομάδων και διορθώστε τα κεφαλαία και τα λάθη κωδικοποίησης.',
     footBrand: 'AI-SRTSub · Καθαρισμός υποτίτλων'
   },
   'he': {
@@ -3111,7 +3111,7 @@ const I18N = {
     footMerge: 'מיזוג כתוביות',
     heroA: 'כתוביות',
     heroEm: 'מנקה',
-    heroSub: 'הסרת תגי HTML, אפקטי ASS, רמזי SDH, תוויות דובר וסימני מים של קבוצות, ותיקון אותיות גדולות ותווים משובשים. הכול רץ בדפדפן שלך — הקובץ לא נשלח לשרת.',
+    heroSub: 'הסרת תגי HTML, אפקטי ASS, רמזי SDH, תוויות דובר וסימני מים של קבוצות, ותיקון אותיות גדולות ותווים משובשים.',
     footBrand: 'AI-SRTSub · מנקה כתוביות'
   },
   'ro': {
@@ -3199,7 +3199,7 @@ const I18N = {
     footMerge: 'Combină subtitrările',
     heroA: 'Curățare',
     heroEm: 'subtitrări',
-    heroSub: 'Elimină etichetele HTML, efectele ASS, replicile SDH, etichetele de vorbitor și watermark-urile de grup, apoi corectează majusculele și caracterele corupte. Totul rulează în browserul tău - fișierul nu este niciodată încărcat.',
+    heroSub: 'Elimină etichetele HTML, efectele ASS, replicile SDH, etichetele de vorbitor și watermark-urile de grup, apoi corectează majusculele și caracterele corupte.',
     footBrand: 'AI-SRTSub · Curățare subtitrări'
   }
 };

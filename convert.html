@@ -6,7 +6,7 @@
 <!-- 以下 SEO head 区块由 server.js 按语言路由（/convert.html 与 /en/convert.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
 <!--SEO-HEAD-START-->
 <title>字幕格式转换 - SRT / VTT / ASS / SBV / LRC / TXT 互转 | 随心字幕 AI</title>
-<meta name="description" content="免费在线字幕格式转换：SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留，ASS 特效标记自动清理。纯浏览器本地处理，文件不上传服务器。">
+<meta name="description" content="免费在线字幕格式转换：SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留，ASS 特效标记自动清理。">
 <meta name="keywords" content="字幕格式转换,srt转vtt,vtt转srt,ass转srt,sbv转srt,srt转lrc,字幕转txt,subtitle converter,srt to vtt,vtt to srt">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#185FA5">
@@ -129,7 +129,7 @@ crossorigin="anonymous"></script>
 
   <div class="hero">
     <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">格式转换</em></h1>
-    <p data-i18n="heroSub">SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留。全程在你浏览器里完成，文件不上传服务器。</p>
+    <p data-i18n="heroSub">SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留。</p>
   </div>
 
   <div class="card" id="upCard">
@@ -165,7 +165,6 @@ crossorigin="anonymous"></script>
       <select class="fmt" id="biMode"></select>
       <span class="chip mut" id="biHint" style="display:none" data-i18n="biHint">检测到双语字幕</span>
     </div>
-    <div class="note" data-i18n="noteLocal">文件只在你的浏览器里处理，不上传服务器</div>
   </div>
 
   <div class="card" id="repCard" style="display:none">
@@ -187,8 +186,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="convert-i18n.js?v=0.9.292"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
-<script src="convert-core.js?v=0.9.292"></script>
+<script src="convert-i18n.js?v=0.9.293"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="convert-core.js?v=0.9.293"></script>
 <script>
 'use strict';
 var I18N = window.CONVERT_I18N.DICT, LANGS = window.CONVERT_I18N.LANGS;

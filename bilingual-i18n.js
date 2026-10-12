@@ -12,7 +12,7 @@
     'zh-CN': {
       brandName: '随心字幕 AI', navHome: '首页', navTr: '字幕翻译', navFx: '特效字幕', navCl: '字幕清洗', navCv: '格式转换',
       heroA: '双语字幕', heroEm: '剥离',
-      heroSub: '把中英双语字幕拆成原文一份、中文一份，或者只留其中一种。全程在你浏览器里完成，文件不上传服务器。',
+      heroSub: '把双语字幕拆成原文一份、译文一份，或者只留其中一种。',
       upTitle: '放入字幕', dzTxt: '把文件拖到这里，或点击选择文件', pastePh: '也可以直接把字幕内容粘贴到这里',
       btnClear: '清除', lblSrc: '识别到的格式', lblMode: '要哪一种',
       mSrc: '只留原文', mDst: '只留译文', mSplit: '拆成两份', mMerge: '合成一条两行',
@@ -20,13 +20,12 @@
       repTitle: '结果', btnDl: '下载', btnCopy: '复制', statCues: '{0} 条', statDur: '总时长 {0}',
       partSrc: '原文', partDst: '译文', partMerged: '双语合并',
       msgDone: '完成', errEmpty: '先放入字幕内容', errFmt: '没能识别出字幕格式',
-      errNoBi: '没检测到双语内容，换一份双语字幕试试', mNone: '未检测到双语字幕', mOk: '检测到双语字幕',
-      noteLocal: '文件只在你的浏览器里处理，不上传服务器', footBrand: '随心字幕 AI · 双语字幕剥离'
+      errNoBi: '没检测到双语内容，换一份双语字幕试试', mNone: '未检测到双语字幕', mOk: '检测到双语字幕', footBrand: '随心字幕 AI · 双语字幕剥离'
     },
     'zh-TW': {
       brandName: '隨心字幕 AI', navHome: '首頁', navTr: '字幕翻譯', navFx: '特效字幕', navCl: '字幕清洗', navCv: '格式轉換',
       heroA: '雙語字幕', heroEm: '剝離',
-      heroSub: '把中英雙語字幕拆成原文一份、中文一份，或者只留其中一種。全程在你的瀏覽器裡完成，檔案不會上傳伺服器。',
+      heroSub: '把雙語字幕拆成原文一份、譯文一份，或者只留其中一種。',
       upTitle: '放入字幕', dzTxt: '把檔案拖到這裡，或點擊選擇檔案', pastePh: '也可以直接把字幕內容貼到這裡',
       btnClear: '清除', lblSrc: '辨識到的格式', lblMode: '要哪一種',
       mSrc: '只留原文', mDst: '只留譯文', mSplit: '拆成兩份', mMerge: '合成一條兩行',
@@ -34,13 +33,12 @@
       repTitle: '結果', btnDl: '下載', btnCopy: '複製', statCues: '{0} 條', statDur: '總長度 {0}',
       partSrc: '原文', partDst: '譯文', partMerged: '雙語合併',
       msgDone: '完成', errEmpty: '請先放入字幕內容', errFmt: '辨識不出字幕格式',
-      errNoBi: '沒有偵測到雙語內容，換一份雙語字幕試試', mNone: '未偵測到雙語字幕', mOk: '偵測到雙語字幕',
-      noteLocal: '檔案只在你的瀏覽器裡處理，不會上傳伺服器', footBrand: '隨心字幕 AI · 雙語字幕剝離'
+      errNoBi: '沒有偵測到雙語內容，換一份雙語字幕試試', mNone: '未偵測到雙語字幕', mOk: '偵測到雙語字幕', footBrand: '隨心字幕 AI · 雙語字幕剝離'
     },
     'en': {
       brandName: 'AI-SRTSub', navHome: 'Home', navTr: 'Translate', navFx: 'Effects', navCl: 'Cleaner', navCv: 'Converter',
       heroA: 'Bilingual', heroEm: 'Subtitle Splitter',
-      heroSub: 'Split a bilingual subtitle file into an original track and a translated track, or keep just one of them. Everything runs in your browser - the file is never uploaded.',
+      heroSub: 'Split a bilingual subtitle file into an original track and a translated track, or keep just one of them.',
       upTitle: 'Add subtitles', dzTxt: 'Drop a file here, or click to choose', pastePh: 'Or paste your subtitle text here',
       btnClear: 'Clear', lblSrc: 'Detected format', lblMode: 'What you need',
       mSrc: 'Keep original only', mDst: 'Keep translation only', mSplit: 'Split into two files', mMerge: 'Merge into one two-line cue',
@@ -48,13 +46,12 @@
       repTitle: 'Result', btnDl: 'Download', btnCopy: 'Copy', statCues: '{0} cues', statDur: 'Length {0}',
       partSrc: 'Original', partDst: 'Translation', partMerged: 'Both lines',
       msgDone: 'Done', errEmpty: 'Add some subtitle text first', errFmt: 'Could not recognise the subtitle format',
-      errNoBi: 'No bilingual content detected - try a file that carries two languages', mNone: 'No bilingual subtitles detected', mOk: 'Bilingual subtitles detected',
-      noteLocal: 'Your file is processed in the browser only - it is never uploaded', footBrand: 'AI-SRTSub · Bilingual Subtitle Splitter'
+      errNoBi: 'No bilingual content detected - try a file that carries two languages', mNone: 'No bilingual subtitles detected', mOk: 'Bilingual subtitles detected', footBrand: 'AI-SRTSub · Bilingual Subtitle Splitter'
     },
     'ja': {
       brandName: 'AI-SRTSub', navHome: 'ホーム', navTr: '字幕翻訳', navFx: '字幕エフェクト', navCl: '字幕クリーナー', navCv: 'フォーマット変換',
       heroA: 'バイリンガル', heroEm: '字幕の分離',
-      heroSub: '二か国語の字幕を「原文」「訳文」に分けます。どちらか一方だけを残すこともできます。すべてブラウザ内で完結し、ファイルはアップロードされません。',
+      heroSub: '二か国語の字幕を「原文」「訳文」に分けます。どちらか一方だけを残すこともできます。',
       upTitle: '字幕を読み込む', dzTxt: 'ここにファイルをドロップ、またはクリックして選択', pastePh: '字幕のテキストをここに貼り付けても構いません',
       btnClear: 'クリア', lblSrc: '検出された形式', lblMode: 'ほしい形',
       mSrc: '原文だけ残す', mDst: '訳文だけ残す', mSplit: '二つのファイルに分ける', mMerge: '1 件の 2 行にまとめる',
@@ -62,13 +59,12 @@
       repTitle: '結果', btnDl: 'ダウンロード', btnCopy: 'コピー', statCues: '{0} 件', statDur: '長さ {0}',
       partSrc: '原文', partDst: '訳文', partMerged: '両方の行',
       msgDone: '完了しました', errEmpty: '先に字幕の内容を入力してください', errFmt: '字幕形式を判別できませんでした',
-      errNoBi: '二か国語の内容が見つかりません。二言語入りの字幕でお試しください', mNone: '二言語字幕が見つかりません', mOk: 'バイリンガル字幕を検出',
-      noteLocal: 'ファイルはブラウザ内だけで処理され、アップロードされません', footBrand: 'AI-SRTSub · バイリンガル字幕の分離'
+      errNoBi: '二か国語の内容が見つかりません。二言語入りの字幕でお試しください', mNone: '二言語字幕が見つかりません', mOk: 'バイリンガル字幕を検出', footBrand: 'AI-SRTSub · バイリンガル字幕の分離'
     },
     'es': {
       brandName: 'AI-SRTSub', navHome: 'Inicio', navTr: 'Traducir', navFx: 'Efectos', navCl: 'Limpiador', navCv: 'Conversor',
       heroA: 'Subtítulos', heroEm: 'bilingües',
-      heroSub: 'Separa unos subtítulos bilingües en una pista original y una traducida, o quédate solo con una de las dos. Todo ocurre en tu navegador: el archivo nunca se sube.',
+      heroSub: 'Separa unos subtítulos bilingües en una pista original y una traducida, o quédate solo con una de las dos.',
       upTitle: 'Añadir subtítulos', dzTxt: 'Suelta un archivo aquí o haz clic para elegir', pastePh: 'O pega aquí el texto de los subtítulos',
       btnClear: 'Limpiar', lblSrc: 'Formato detectado', lblMode: 'Qué necesitas',
       mSrc: 'Solo el original', mDst: 'Solo la traducción', mSplit: 'Separar en dos archivos', mMerge: 'Unir en una entrada de dos líneas',
@@ -76,13 +72,12 @@
       repTitle: 'Resultado', btnDl: 'Descargar', btnCopy: 'Copiar', statCues: '{0} líneas', statDur: 'Duración {0}',
       partSrc: 'Original', partDst: 'Traducción', partMerged: 'Ambas líneas',
       msgDone: 'Listo', errEmpty: 'Añade primero el texto de los subtítulos', errFmt: 'No se pudo reconocer el formato de subtítulos',
-      errNoBi: 'No se detectó contenido bilingüe: prueba con un archivo que tenga dos idiomas', mNone: 'No se detectaron subtítulos bilingües', mOk: 'Subtítulos bilingües detectados',
-      noteLocal: 'El archivo se procesa solo en tu navegador y nunca se sube', footBrand: 'AI-SRTSub · Separador de subtítulos bilingües'
+      errNoBi: 'No se detectó contenido bilingüe: prueba con un archivo que tenga dos idiomas', mNone: 'No se detectaron subtítulos bilingües', mOk: 'Subtítulos bilingües detectados', footBrand: 'AI-SRTSub · Separador de subtítulos bilingües'
     },
     'pt': {
       brandName: 'AI-SRTSub', navHome: 'Início', navTr: 'Traduzir', navFx: 'Efeitos', navCl: 'Limpeza', navCv: 'Conversor',
       heroA: 'Legendas', heroEm: 'bilíngues',
-      heroSub: 'Separe legendas bilíngues em uma faixa original e uma traduzida, ou fique só com uma delas. Tudo acontece no seu navegador: o arquivo nunca é enviado.',
+      heroSub: 'Separe legendas bilíngues em uma faixa original e uma traduzida, ou fique só com uma delas.',
       upTitle: 'Adicionar legendas', dzTxt: 'Solte um arquivo aqui ou clique para escolher', pastePh: 'Ou cole aqui o texto das legendas',
       btnClear: 'Limpar', lblSrc: 'Formato detectado', lblMode: 'O que você quer',
       mSrc: 'Só o original', mDst: 'Só a tradução', mSplit: 'Separar em dois arquivos', mMerge: 'Unir numa entrada de duas linhas',
@@ -90,13 +85,12 @@
       repTitle: 'Resultado', btnDl: 'Baixar', btnCopy: 'Copiar', statCues: '{0} linhas', statDur: 'Duração {0}',
       partSrc: 'Original', partDst: 'Tradução', partMerged: 'As duas linhas',
       msgDone: 'Concluído', errEmpty: 'Adicione primeiro o texto das legendas', errFmt: 'Não foi possível reconhecer o formato das legendas',
-      errNoBi: 'Nenhum conteúdo bilíngue detectado: tente um arquivo com dois idiomas', mNone: 'Nenhuma legenda bilíngue detectada', mOk: 'Legendas bilíngues detectadas',
-      noteLocal: 'O arquivo é processado apenas no seu navegador e nunca é enviado', footBrand: 'AI-SRTSub · Separador de legendas bilíngues'
+      errNoBi: 'Nenhum conteúdo bilíngue detectado: tente um arquivo com dois idiomas', mNone: 'Nenhuma legenda bilíngue detectada', mOk: 'Legendas bilíngues detectadas', footBrand: 'AI-SRTSub · Separador de legendas bilíngues'
     },
     'ko': {
       brandName: 'AI-SRTSub', navHome: '홈', navTr: '자막 번역', navFx: '자막 효과', navCl: '자막 정리', navCv: '포맷 변환',
       heroA: '이중 언어', heroEm: '자막 분리',
-      heroSub: '두 언어가 섞인 자막을 원문과 번역문으로 나누거나, 둘 중 하나만 남길 수 있습니다. 모든 작업은 브라우저에서 처리되며 파일은 업로드되지 않습니다.',
+      heroSub: '두 언어가 섞인 자막을 원문과 번역문으로 나누거나, 둘 중 하나만 남길 수 있습니다.',
       upTitle: '자막 넣기', dzTxt: '파일을 여기에 끌어다 놓거나 클릭해서 선택', pastePh: '자막 내용을 여기에 붙여넣어도 됩니다',
       btnClear: '지우기', lblSrc: '감지된 형식', lblMode: '원하는 결과',
       mSrc: '원문만 남기기', mDst: '번역문만 남기기', mSplit: '두 파일로 나누기', mMerge: '두 줄 한 개로 합치기',
@@ -104,13 +98,12 @@
       repTitle: '결과', btnDl: '다운로드', btnCopy: '복사', statCues: '{0}개', statDur: '길이 {0}',
       partSrc: '원문', partDst: '번역문', partMerged: '두 줄 모두',
       msgDone: '완료', errEmpty: '먼저 자막 내용을 넣어 주세요', errFmt: '자막 형식을 인식할 수 없습니다',
-      errNoBi: '이중 언어 내용이 없습니다. 두 언어가 들어 있는 자막으로 시도해 보세요', mNone: '이중 언어 자막이 없습니다', mOk: '이중 언어 자막이 감지됨',
-      noteLocal: '파일은 브라우저에서만 처리되며 업로드되지 않습니다', footBrand: 'AI-SRTSub · 이중 언어 자막 분리'
+      errNoBi: '이중 언어 내용이 없습니다. 두 언어가 들어 있는 자막으로 시도해 보세요', mNone: '이중 언어 자막이 없습니다', mOk: '이중 언어 자막이 감지됨', footBrand: 'AI-SRTSub · 이중 언어 자막 분리'
     },
     'de': {
       brandName: 'AI-SRTSub', navHome: 'Start', navTr: 'Übersetzen', navFx: 'Effekte', navCl: 'Reinigen', navCv: 'Konverter',
       heroA: 'Zweisprachige', heroEm: 'Untertitel trennen',
-      heroSub: 'Zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen - oder nur eine von beiden behalten. Läuft nur im Browser: die Datei wird nie hochgeladen.',
+      heroSub: 'Zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen - oder nur eine von beiden behalten.',
       upTitle: 'Untertitel laden', dzTxt: 'Datei hier ablegen oder klicken zum Auswählen', pastePh: 'Oder füge den Untertiteltext hier ein',
       btnClear: 'Leeren', lblSrc: 'Erkanntes Format', lblMode: 'Was brauchst du',
       mSrc: 'Nur Original', mDst: 'Nur Übersetzung', mSplit: 'In zwei Dateien teilen', mMerge: 'Zu einer zweizeiligen Zeile zusammenfassen',
@@ -118,13 +111,12 @@
       repTitle: 'Ergebnis', btnDl: 'Herunterladen', btnCopy: 'Kopieren', statCues: '{0} Zeilen', statDur: 'Länge {0}',
       partSrc: 'Original', partDst: 'Übersetzung', partMerged: 'Beide Zeilen',
       msgDone: 'Fertig', errEmpty: 'Füge zuerst Untertiteltext ein', errFmt: 'Das Untertitelformat wurde nicht erkannt',
-      errNoBi: 'Kein zweisprachiger Inhalt gefunden - versuche eine Datei mit zwei Sprachen', mNone: 'Keine zweisprachigen Untertitel erkannt', mOk: 'Zweisprachige Untertitel erkannt',
-      noteLocal: 'Die Datei wird nur im Browser verarbeitet und nie hochgeladen', footBrand: 'AI-SRTSub · Zweisprachige Untertitel trennen'
+      errNoBi: 'Kein zweisprachiger Inhalt gefunden - versuche eine Datei mit zwei Sprachen', mNone: 'Keine zweisprachigen Untertitel erkannt', mOk: 'Zweisprachige Untertitel erkannt', footBrand: 'AI-SRTSub · Zweisprachige Untertitel trennen'
     },
     'fr': {
       brandName: 'AI-SRTSub', navHome: 'Accueil', navTr: 'Traduire', navFx: 'Effets', navCl: 'Nettoyage', navCv: 'Convertisseur',
       heroA: 'Sous-titres', heroEm: 'bilingues',
-      heroSub: 'Séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez que l\'une des deux. Tout se passe dans le navigateur : le fichier n\'est jamais envoyé.',
+      heroSub: 'Séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez que l\'une des deux.',
       upTitle: 'Ajouter les sous-titres', dzTxt: 'Déposez un fichier ici ou cliquez pour choisir', pastePh: 'Ou collez ici le texte des sous-titres',
       btnClear: 'Effacer', lblSrc: 'Format détecté', lblMode: 'Ce qu\'il vous faut',
       mSrc: 'Original seulement', mDst: 'Traduction seulement', mSplit: 'Séparer en deux fichiers', mMerge: 'Fusionner en une entrée de deux lignes',
@@ -132,13 +124,12 @@
       repTitle: 'Résultat', btnDl: 'Télécharger', btnCopy: 'Copier', statCues: '{0} lignes', statDur: 'Durée {0}',
       partSrc: 'Original', partDst: 'Traduction', partMerged: 'Les deux lignes',
       msgDone: 'Terminé', errEmpty: 'Ajoutez d\'abord le texte des sous-titres', errFmt: 'Format de sous-titres non reconnu',
-      errNoBi: 'Aucun contenu bilingue détecté : essayez un fichier qui contient deux langues', mNone: 'Aucun sous-titre bilingue détecté', mOk: 'Sous-titres bilingues détectés',
-      noteLocal: 'Le fichier est traité uniquement dans votre navigateur et n\'est jamais envoyé', footBrand: 'AI-SRTSub · Séparateur de sous-titres bilingues'
+      errNoBi: 'Aucun contenu bilingue détecté : essayez un fichier qui contient deux langues', mNone: 'Aucun sous-titre bilingue détecté', mOk: 'Sous-titres bilingues détectés', footBrand: 'AI-SRTSub · Séparateur de sous-titres bilingues'
     },
     'id': {
       brandName: 'AI-SRTSub', navHome: 'Beranda', navTr: 'Terjemahkan', navFx: 'Efek', navCl: 'Pembersih', navCv: 'Konverter',
       heroA: 'Subtitle', heroEm: 'dwibahasa',
-      heroSub: 'Pisahkan subtitle dwibahasa menjadi satu berkas teks asli dan satu berkas terjemahan, atau simpan salah satunya saja. Semua berjalan di browser: berkas tidak pernah diunggah.',
+      heroSub: 'Pisahkan subtitle dwibahasa menjadi satu berkas teks asli dan satu berkas terjemahan, atau simpan salah satunya saja.',
       upTitle: 'Masukkan subtitle', dzTxt: 'Letakkan berkas di sini, atau klik untuk memilih', pastePh: 'Atau tempel teks subtitle di sini',
       btnClear: 'Bersihkan', lblSrc: 'Format terdeteksi', lblMode: 'Yang kamu butuh',
       mSrc: 'Hanya teks asli', mDst: 'Hanya terjemahan', mSplit: 'Pisah jadi dua berkas', mMerge: 'Gabung jadi satu entri dua baris',
@@ -146,13 +137,12 @@
       repTitle: 'Hasil', btnDl: 'Unduh', btnCopy: 'Salin', statCues: '{0} baris', statDur: 'Durasi {0}',
       partSrc: 'Teks asli', partDst: 'Terjemahan', partMerged: 'Kedua baris',
       msgDone: 'Selesai', errEmpty: 'Masukkan teks subtitle dulu', errFmt: 'Format subtitle tidak dikenali',
-      errNoBi: 'Tidak ada konten dwibahasa: coba berkas yang berisi dua bahasa', mNone: 'Tidak ada subtitle dua bahasa', mOk: 'Subtitle dwibahasa terdeteksi',
-      noteLocal: 'Berkas diproses hanya di browser kamu dan tidak pernah diunggah', footBrand: 'AI-SRTSub · Pemisah subtitle dwibahasa'
+      errNoBi: 'Tidak ada konten dwibahasa: coba berkas yang berisi dua bahasa', mNone: 'Tidak ada subtitle dua bahasa', mOk: 'Subtitle dwibahasa terdeteksi', footBrand: 'AI-SRTSub · Pemisah subtitle dwibahasa'
     },
     'hi': {
       brandName: 'AI-SRTSub', navHome: 'होम', navTr: 'अनुवाद', navFx: 'इफ़ेक्ट', navCl: 'सफ़ाई', navCv: 'कन्वर्टर',
       heroA: 'द्विभाषी', heroEm: 'सबटाइटल अलग करें',
-      heroSub: 'द्विभाषी सबटाइटल को मूल और अनूदित दो हिस्सों में बाँटें, या केवल एक रखें। सब कुछ आपके ब्राउज़र में होता है — फ़ाइल अपलोड नहीं होती।',
+      heroSub: '',
       upTitle: 'सबटाइटल डालें', dzTxt: 'फ़ाइल यहाँ छोड़ें, या चुनने के लिए क्लिक करें', pastePh: 'या सबटाइटल का पाठ यहाँ पेस्ट करें',
       btnClear: 'साफ़ करें', lblSrc: 'पहचानी गई फ़ॉर्मैट', lblMode: 'आपको क्या चाहिए',
       mSrc: 'केवल मूल', mDst: 'केवल अनुवाद', mSplit: 'दो फ़ाइलों में बाँटें', mMerge: 'एक दो-पंक्ति प्रविष्टि में मिलाएँ',
@@ -160,13 +150,12 @@
       repTitle: 'परिणाम', btnDl: 'डाउनलोड', btnCopy: 'कॉपी', statCues: '{0} पंक्तियाँ', statDur: 'लंबाई {0}',
       partSrc: 'मूल', partDst: 'अनुवाद', partMerged: 'दोनों पंक्तियाँ',
       msgDone: 'हो गया', errEmpty: 'पहले सबटाइटल का पाठ डालें', errFmt: 'सबटाइटल फ़ॉर्मैट पहचाना नहीं गया',
-      errNoBi: 'द्विभाषी सामग्री नहीं मिली — दो भाषाओं वाली फ़ाइल से कोशिश करें', mNone: 'द्विभाषी सबटाइटल नहीं मिले', mOk: 'द्विभाषी सबटाइटल मिलीं',
-      noteLocal: 'फ़ाइल केवल आपके ब्राउज़र में संसाधित होती है, अपलोड नहीं होती', footBrand: 'AI-SRTSub · द्विभाषी सबटाइटल विभाजक'
+      errNoBi: 'द्विभाषी सामग्री नहीं मिली — दो भाषाओं वाली फ़ाइल से कोशिश करें', mNone: 'द्विभाषी सबटाइटल नहीं मिले', mOk: 'द्विभाषी सबटाइटल मिलीं', footBrand: 'AI-SRTSub · द्विभाषी सबटाइटल विभाजक'
     },
     'th': {
       brandName: 'AI-SRTSub', navHome: 'หน้าแรก', navTr: 'แปล', navFx: 'เอฟเฟกต์', navCl: 'ทำความสะอาด', navCv: 'แปลงรูปแบบ',
       heroA: 'ซับไตเติล', heroEm: 'สองภาษา',
-      heroSub: 'แยกซับไตเติลสองภาษาออกเป็นต้นฉบับกับคำแปลคนละชุด หรือจะเก็บไว้แค่ชุดเดียวก็ได้ ทุกอย่างทำงานในเบราว์เซอร์ — ไฟล์ไม่ถูกอัปโหลด',
+      heroSub: '',
       upTitle: 'ใส่ซับไตเติล', dzTxt: 'วางไฟล์ที่นี่ หรือคลิกเพื่อเลือก', pastePh: 'หรือวางข้อความซับไตเติลที่นี่',
       btnClear: 'ล้าง', lblSrc: 'รูปแบบที่ตรวจพบ', lblMode: 'ต้องการแบบไหน',
       mSrc: 'เหลือเฉพาะต้นฉบับ', mDst: 'เหลือเฉพาะคำแปล', mSplit: 'แยกเป็นสองไฟล์', mMerge: 'รวมเป็นหนึ่งรายการสองบรรทัด',
@@ -174,13 +163,12 @@
       repTitle: 'ผลลัพธ์', btnDl: 'ดาวน์โหลด', btnCopy: 'คัดลอก', statCues: '{0} รายการ', statDur: 'ความยาว {0}',
       partSrc: 'ต้นฉบับ', partDst: 'คำแปล', partMerged: 'ทั้งสองบรรทัด',
       msgDone: 'เสร็จแล้ว', errEmpty: 'ใส่ข้อความซับไตเติลก่อน', errFmt: 'จำแนกรูปแบบซับไตเติลไม่ได้',
-      errNoBi: 'ไม่พบเนื้อหาสองภาษา — ลองไฟล์ที่มีสองภาษา', mNone: 'ไม่พบคำบรรยายสองภาษา', mOk: 'พบซับไตเติลสองภาษา',
-      noteLocal: 'ไฟล์ถูกประมวลผลในเบราว์เซอร์เท่านั้น และไม่ถูกอัปโหลด', footBrand: 'AI-SRTSub · ตัวแยกซับไตเติลสองภาษา'
+      errNoBi: 'ไม่พบเนื้อหาสองภาษา — ลองไฟล์ที่มีสองภาษา', mNone: 'ไม่พบคำบรรยายสองภาษา', mOk: 'พบซับไตเติลสองภาษา', footBrand: 'AI-SRTSub · ตัวแยกซับไตเติลสองภาษา'
     },
     'vi': {
       brandName: 'AI-SRTSub', navHome: 'Trang chủ', navTr: 'Dịch', navFx: 'Hiệu ứng', navCl: 'Làm sạch', navCv: 'Chuyển đổi',
       heroA: 'Phụ đề', heroEm: 'song ngữ',
-      heroSub: 'Tách phụ đề song ngữ thành một bản gốc và một bản dịch, hoặc chỉ giữ lại một trong hai. Mọi thứ chạy trong trình duyệt — tệp không bao giờ được tải lên.',
+      heroSub: 'Tách phụ đề song ngữ thành một bản gốc và một bản dịch, hoặc chỉ giữ lại một trong hai.',
       upTitle: 'Thêm phụ đề', dzTxt: 'Thả tệp vào đây, hoặc nhấp để chọn', pastePh: 'Hoặc dán nội dung phụ đề vào đây',
       btnClear: 'Xóa', lblSrc: 'Định dạng phát hiện', lblMode: 'Bạn cần gì',
       mSrc: 'Chỉ giữ bản gốc', mDst: 'Chỉ giữ bản dịch', mSplit: 'Tách thành hai tệp', mMerge: 'Gộp thành một mục hai dòng',
@@ -188,13 +176,12 @@
       repTitle: 'Kết quả', btnDl: 'Tải xuống', btnCopy: 'Sao chép', statCues: '{0} dòng', statDur: 'Độ dài {0}',
       partSrc: 'Bản gốc', partDst: 'Bản dịch', partMerged: 'Cả hai dòng',
       msgDone: 'Xong', errEmpty: 'Hãy thêm nội dung phụ đề trước', errFmt: 'Không nhận ra định dạng phụ đề',
-      errNoBi: 'Không phát hiện nội dung song ngữ — hãy thử tệp có hai ngôn ngữ', mNone: 'Không tìm thấy phụ đề song ngữ', mOk: 'Phát hiện phụ đề song ngữ',
-      noteLocal: 'Tệp chỉ được xử lý trong trình duyệt của bạn và không bao giờ được tải lên', footBrand: 'AI-SRTSub · Tách phụ đề song ngữ'
+      errNoBi: 'Không phát hiện nội dung song ngữ — hãy thử tệp có hai ngôn ngữ', mNone: 'Không tìm thấy phụ đề song ngữ', mOk: 'Phát hiện phụ đề song ngữ', footBrand: 'AI-SRTSub · Tách phụ đề song ngữ'
     },
     'ru': {
       brandName: 'AI-SRTSub', navHome: 'Главная', navTr: 'Перевод', navFx: 'Эффекты', navCl: 'Очистка', navCv: 'Конвертер',
       heroA: 'Двуязычные', heroEm: 'субтитры',
-      heroSub: 'Разделите двуязычные субтитры на оригинал и перевод — или оставьте только что-то одно. Всё работает в браузере: файл никогда не загружается на сервер.',
+      heroSub: 'Разделите двуязычные субтитры на оригинал и перевод — или оставьте только что-то одно.',
       upTitle: 'Добавить субтитры', dzTxt: 'Перетащите файл сюда или нажмите для выбора', pastePh: 'Или вставьте текст субтитров сюда',
       btnClear: 'Очистить', lblSrc: 'Определённый формат', lblMode: 'Что вам нужно',
       mSrc: 'Только оригинал', mDst: 'Только перевод', mSplit: 'Разделить на два файла', mMerge: 'Объединить в одну запись из двух строк',
@@ -202,13 +189,12 @@
       repTitle: 'Результат', btnDl: 'Скачать', btnCopy: 'Копировать', statCues: '{0} строк', statDur: 'Длина {0}',
       partSrc: 'Оригинал', partDst: 'Перевод', partMerged: 'Обе строки',
       msgDone: 'Готово', errEmpty: 'Сначала добавьте текст субтитров', errFmt: 'Формат субтитров не распознан',
-      errNoBi: 'Двуязычного текста не найдено — попробуйте файл с двумя языками', mNone: 'Двуязычные субтитры не найдены', mOk: 'Обнаружены двуязычные субтитры',
-      noteLocal: 'Файл обрабатывается только в вашем браузере и никогда не загружается', footBrand: 'AI-SRTSub · Разделение двуязычных субтитров'
+      errNoBi: 'Двуязычного текста не найдено — попробуйте файл с двумя языками', mNone: 'Двуязычные субтитры не найдены', mOk: 'Обнаружены двуязычные субтитры', footBrand: 'AI-SRTSub · Разделение двуязычных субтитров'
     },
     'it': {
       brandName: 'AI-SRTSub', navHome: 'Home', navTr: 'Traduci', navFx: 'Effetti', navCl: 'Pulizia', navCv: 'Convertitore',
       heroA: 'Sottotitoli', heroEm: 'bilingui',
-      heroSub: 'Separa i sottotitoli bilingui in una traccia originale e una tradotta, oppure tienine solo una. Tutto avviene nel browser: il file non viene mai caricato.',
+      heroSub: 'Separa i sottotitoli bilingui in una traccia originale e una tradotta, oppure tienine solo una.',
       upTitle: 'Aggiungi sottotitoli', dzTxt: 'Trascina un file qui o fai clic per scegliere', pastePh: 'Oppure incolla qui il testo dei sottotitoli',
       btnClear: 'Cancella', lblSrc: 'Formato rilevato', lblMode: 'Cosa ti serve',
       mSrc: 'Solo originale', mDst: 'Solo traduzione', mSplit: 'Separa in due file', mMerge: 'Unisci in una voce di due righe',
@@ -216,13 +202,12 @@
       repTitle: 'Risultato', btnDl: 'Scarica', btnCopy: 'Copia', statCues: '{0} righe', statDur: 'Durata {0}',
       partSrc: 'Originale', partDst: 'Traduzione', partMerged: 'Entrambe le righe',
       msgDone: 'Fatto', errEmpty: 'Aggiungi prima il testo dei sottotitoli', errFmt: 'Formato dei sottotitoli non riconosciuto',
-      errNoBi: 'Nessun contenuto bilingue rilevato: prova un file con due lingue', mNone: 'Nessun sottotitolo bilingue rilevato', mOk: 'Rilevati sottotitoli bilingue',
-      noteLocal: 'Il file viene elaborato solo nel tuo browser e non viene mai caricato', footBrand: 'AI-SRTSub · Separatore di sottotitoli bilingui'
+      errNoBi: 'Nessun contenuto bilingue rilevato: prova un file con due lingue', mNone: 'Nessun sottotitolo bilingue rilevato', mOk: 'Rilevati sottotitoli bilingue', footBrand: 'AI-SRTSub · Separatore di sottotitoli bilingui'
     },
     'ar': {
       brandName: 'AI-SRTSub', navHome: 'الرئيسية', navTr: 'ترجمة', navFx: 'تأثيرات', navCl: 'تنظيف', navCv: 'تحويل',
       heroA: 'ترجمة', heroEm: 'بلغتين',
-      heroSub: 'افصل الترجمة ثنائية اللغة إلى مسار أصلي ومسار مترجم، أو احتفظ بواحد فقط. كل شيء يحدث في المتصفح — الملف لا يُرفع أبدًا.',
+      heroSub: 'افصل الترجمة ثنائية اللغة إلى مسار أصلي ومسار مترجم، أو احتفظ بواحد فقط.',
       upTitle: 'أضف الترجمة', dzTxt: 'أفلت الملف هنا، أو اضغط للاختيار', pastePh: 'أو الصق نص الترجمة هنا',
       btnClear: 'مسح', lblSrc: 'الصيغة المكتشفة', lblMode: 'ماذا تريد',
       mSrc: 'النص الأصلي فقط', mDst: 'الترجمة فقط', mSplit: 'فصل إلى ملفين', mMerge: 'دمج في مدخل من سطرين',
@@ -230,13 +215,12 @@
       repTitle: 'النتيجة', btnDl: 'تنزيل', btnCopy: 'نسخ', statCues: '{0} سطرًا', statDur: 'المدة {0}',
       partSrc: 'الأصلي', partDst: 'الترجمة', partMerged: 'السطران',
       msgDone: 'تم', errEmpty: 'أضف نص الترجمة أولًا', errFmt: 'تعذّر التعرف على صيغة الترجمة',
-      errNoBi: 'لم يتم العثور على محتوى بلغتين — جرّب ملفًا يحتوي لغتين', mNone: 'لم يتم العثور على ترجمات ثنائية اللغة', mOk: 'تم اكتشاف ترجمة بلغتين',
-      noteLocal: 'تتم معالجة الملف في متصفحك فقط ولا يُرفع أبدًا', footBrand: 'AI-SRTSub · فاصل الترجمة ثنائية اللغة'
+      errNoBi: 'لم يتم العثور على محتوى بلغتين — جرّب ملفًا يحتوي لغتين', mNone: 'لم يتم العثور على ترجمات ثنائية اللغة', mOk: 'تم اكتشاف ترجمة بلغتين', footBrand: 'AI-SRTSub · فاصل الترجمة ثنائية اللغة'
     },
     'tr': {
       brandName: 'AI-SRTSub', navHome: 'Ana sayfa', navTr: 'Çevir', navFx: 'Efektler', navCl: 'Temizleme', navCv: 'Dönüştürücü',
       heroA: 'İki dilli', heroEm: 'altyazı ayırma',
-      heroSub: 'İki dilli altyazıyı orijinal ve çeviri olmak üzere ikiye ayırın ya da yalnızca birini saklayın. Her şey tarayıcıda olur - dosya asla yüklenmez.',
+      heroSub: 'İki dilli altyazıyı orijinal ve çeviri olmak üzere ikiye ayırın ya da yalnızca birini saklayın.',
       upTitle: 'Altyazı ekle', dzTxt: 'Dosyayı buraya bırakın veya seçmek için tıklayın', pastePh: 'Ya da altyazı metnini buraya yapıştırın',
       btnClear: 'Temizle', lblSrc: 'Algılanan biçim', lblMode: 'Ne istiyorsun',
       mSrc: 'Yalnızca orijinal', mDst: 'Yalnızca çeviri', mSplit: 'İki dosyaya ayır', mMerge: 'Tek iki satırlık girdiye birleştir',
@@ -244,13 +228,12 @@
       repTitle: 'Sonuç', btnDl: 'İndir', btnCopy: 'Kopyala', statCues: '{0} satır', statDur: 'Süre {0}',
       partSrc: 'Orijinal', partDst: 'Çeviri', partMerged: 'İki satır da',
       msgDone: 'Tamam', errEmpty: 'Önce altyazı metnini ekleyin', errFmt: 'Altyazı biçimi tanınamadı',
-      errNoBi: 'İki dilli içerik bulunamadı - iki dil içeren bir dosya deneyin', mNone: 'İki dilli altyazı bulunamadı', mOk: 'İki dilli altyazı algılandı',
-      noteLocal: 'Dosya yalnızca tarayıcınızda işlenir ve asla yüklenmez', footBrand: 'AI-SRTSub · İki dilli altyazı ayırıcı'
+      errNoBi: 'İki dilli içerik bulunamadı - iki dil içeren bir dosya deneyin', mNone: 'İki dilli altyazı bulunamadı', mOk: 'İki dilli altyazı algılandı', footBrand: 'AI-SRTSub · İki dilli altyazı ayırıcı'
     },
     'nl': {
       brandName: 'AI-SRTSub', navHome: 'Home', navTr: 'Vertalen', navFx: 'Effecten', navCl: 'Opschonen', navCv: 'Converter',
       heroA: 'Tweetalige', heroEm: 'ondertiteling splitsen',
-      heroSub: 'Splits tweetalige ondertiteling in een originele en een vertaalde versie, of houd er maar één van over. Alles gebeurt in je browser - het bestand wordt nooit geüpload.',
+      heroSub: 'Splits tweetalige ondertiteling in een originele en een vertaalde versie, of houd er maar één van over.',
       upTitle: 'Ondertiteling toevoegen', dzTxt: 'Sleep een bestand hierheen of klik om te kiezen', pastePh: 'Of plak de ondertiteltekst hier',
       btnClear: 'Wissen', lblSrc: 'Herkenbare indeling', lblMode: 'Wat heb je nodig',
       mSrc: 'Alleen origineel', mDst: 'Alleen vertaling', mSplit: 'Splitsen in twee bestanden', mMerge: 'Samenvoegen tot één invoer van twee regels',
@@ -258,13 +241,12 @@
       repTitle: 'Resultaat', btnDl: 'Downloaden', btnCopy: 'Kopiëren', statCues: '{0} regels', statDur: 'Lengte {0}',
       partSrc: 'Origineel', partDst: 'Vertaling', partMerged: 'Beide regels',
       msgDone: 'Klaar', errEmpty: 'Voeg eerst ondertiteltekst toe', errFmt: 'De ondertitelindeling werd niet herkend',
-      errNoBi: 'Geen tweetalige inhoud gevonden - probeer een bestand met twee talen', mNone: 'Geen tweetalige ondertitels gevonden', mOk: 'Tweetalige ondertiteling gevonden',
-      noteLocal: 'Het bestand wordt alleen in je browser verwerkt en nooit geüpload', footBrand: 'AI-SRTSub · Tweetalige ondertiteling splitsen'
+      errNoBi: 'Geen tweetalige inhoud gevonden - probeer een bestand met twee talen', mNone: 'Geen tweetalige ondertitels gevonden', mOk: 'Tweetalige ondertiteling gevonden', footBrand: 'AI-SRTSub · Tweetalige ondertiteling splitsen'
     },
     'pl': {
       brandName: 'AI-SRTSub', navHome: 'Start', navTr: 'Tłumacz', navFx: 'Efekty', navCl: 'Czyszczenie', navCv: 'Konwerter',
       heroA: 'Napisy', heroEm: 'dwujęzyczne',
-      heroSub: 'Podziel dwujęzyczne napisy na wersję oryginalną i przetłumaczoną albo zostaw tylko jedną z nich. Wszystko dzieje się w przeglądarce - plik nigdy nie jest wysyłany.',
+      heroSub: 'Podziel dwujęzyczne napisy na wersję oryginalną i przetłumaczoną albo zostaw tylko jedną z nich.',
       upTitle: 'Dodaj napisy', dzTxt: 'Przeciągnij plik tutaj lub kliknij, aby wybrać', pastePh: 'Albo wklej tutaj tekst napisów',
       btnClear: 'Wyczyść', lblSrc: 'Wykryty format', lblMode: 'Czego potrzebujesz',
       mSrc: 'Tylko oryginał', mDst: 'Tylko tłumaczenie', mSplit: 'Podziel na dwa pliki', mMerge: 'Połącz w jedną pozycję o dwóch wierszach',
@@ -272,13 +254,12 @@
       repTitle: 'Wynik', btnDl: 'Pobierz', btnCopy: 'Kopiuj', statCues: '{0} wierszy', statDur: 'Długość {0}',
       partSrc: 'Oryginał', partDst: 'Tłumaczenie', partMerged: 'Oba wiersze',
       msgDone: 'Gotowe', errEmpty: 'Najpierw dodaj tekst napisów', errFmt: 'Nie rozpoznano formatu napisów',
-      errNoBi: 'Nie wykryto treści dwujęzycznej - spróbuj pliku z dwoma językami', mNone: 'Nie wykryto napisów dwujęzycznych', mOk: 'Wykryto napisy dwujęzyczne',
-      noteLocal: 'Plik jest przetwarzany tylko w twojej przeglądarce i nigdy nie jest wysyłany', footBrand: 'AI-SRTSub · Podział napisów dwujęzycznych'
+      errNoBi: 'Nie wykryto treści dwujęzycznej - spróbuj pliku z dwoma językami', mNone: 'Nie wykryto napisów dwujęzycznych', mOk: 'Wykryto napisy dwujęzyczne', footBrand: 'AI-SRTSub · Podział napisów dwujęzycznych'
     },
     'sv': {
       brandName: 'AI-SRTSub', navHome: 'Start', navTr: 'Översätt', navFx: 'Effekter', navCl: 'Städa', navCv: 'Konverterare',
       heroA: 'Tvåspråkig', heroEm: 'undertext',
-      heroSub: 'Dela tvåspråkig undertext i en original- och en översättningsdel, eller behåll bara en av dem. Allt sker i din webbläsare - filen laddas aldrig upp.',
+      heroSub: 'Dela tvåspråkig undertext i en original- och en översättningsdel, eller behåll bara en av dem.',
       upTitle: 'Lägg in undertext', dzTxt: 'Släpp en fil här eller klicka för att välja', pastePh: 'Eller klistra in undertexten här',
       btnClear: 'Rensa', lblSrc: 'Format som hittades', lblMode: 'Vad behöver du',
       mSrc: 'Bara originalet', mDst: 'Bara översättningen', mSplit: 'Dela i två filer', mMerge: 'Slå ihop till en post med två rader',
@@ -286,13 +267,12 @@
       repTitle: 'Resultat', btnDl: 'Ladda ner', btnCopy: 'Kopiera', statCues: '{0} rader', statDur: 'Längd {0}',
       partSrc: 'Original', partDst: 'Översättning', partMerged: 'Båda raderna',
       msgDone: 'Klart', errEmpty: 'Lägg in undertexten först', errFmt: 'Undertextens format kändes inte igen',
-      errNoBi: 'Ingen tvåspråkig text hittades - prova en fil med två språk', mNone: 'Inga tvåspråkiga undertexter hittades', mOk: 'Tvåspråkig undertext hittades',
-      noteLocal: 'Filen behandlas bara i din webbläsare och laddas aldrig upp', footBrand: 'AI-SRTSub · Dela tvåspråkig undertext'
+      errNoBi: 'Ingen tvåspråkig text hittades - prova en fil med två språk', mNone: 'Inga tvåspråkiga undertexter hittades', mOk: 'Tvåspråkig undertext hittades', footBrand: 'AI-SRTSub · Dela tvåspråkig undertext'
     },
     'cs': {
       brandName: 'AI-SRTSub', navHome: 'Domů', navTr: 'Přeložit', navFx: 'Efekty', navCl: 'Čištění', navCv: 'Převodník',
       heroA: 'Dvojjazyčné', heroEm: 'titulky',
-      heroSub: 'Rozděl dvojjazyčné titulky na originál a překlad, nebo si nech jen jednu z těch dvou částí. Vše běží v prohlížeči - soubor se nikdy nenahrává.',
+      heroSub: 'Rozděl dvojjazyčné titulky na originál a překlad, nebo si nech jen jednu z těch dvou částí.',
       upTitle: 'Vložit titulky', dzTxt: 'Přetáhni soubor sem nebo klikni pro výběr', pastePh: 'Nebo sem vlož text titulků',
       btnClear: 'Vymazat', lblSrc: 'Zjištěný formát', lblMode: 'Co potřebuješ',
       mSrc: 'Jen originál', mDst: 'Jen překlad', mSplit: 'Rozdělit do dvou souborů', mMerge: 'Sloučit do jedné položky o dvou řádcích',
@@ -300,13 +280,12 @@
       repTitle: 'Výsledek', btnDl: 'Stáhnout', btnCopy: 'Kopírovat', statCues: '{0} řádků', statDur: 'Délka {0}',
       partSrc: 'Originál', partDst: 'Překlad', partMerged: 'Obě řádky',
       msgDone: 'Hotovo', errEmpty: 'Nejprve vlož text titulků', errFmt: 'Formát titulků nebyl rozpoznán',
-      errNoBi: 'Nebyl nalezen dvojjazyčný obsah - zkus soubor se dvěma jazyky', mNone: 'Nebyly nalezeny dvojjazyčné titulky', mOk: 'Zjištěny dvojjazyčné titulky',
-      noteLocal: 'Soubor se zpracovává jen v tvém prohlížeči a nikdy se nenahrává', footBrand: 'AI-SRTSub · Dělení dvojjazyčných titulků'
+      errNoBi: 'Nebyl nalezen dvojjazyčný obsah - zkus soubor se dvěma jazyky', mNone: 'Nebyly nalezeny dvojjazyčné titulky', mOk: 'Zjištěny dvojjazyčné titulky', footBrand: 'AI-SRTSub · Dělení dvojjazyčných titulků'
     },
     'uk': {
       brandName: 'AI-SRTSub', navHome: 'Головна', navTr: 'Переклад', navFx: 'Ефекти', navCl: 'Очищення', navCv: 'Конвертер',
       heroA: 'Двомовні', heroEm: 'субтитри',
-      heroSub: 'Розділіть двомовні субтитри на оригінал і переклад — або залиште лише щось одне. Усе відбувається у браузері: файл ніколи не завантажується.',
+      heroSub: 'Розділіть двомовні субтитри на оригінал і переклад — або залиште лише щось одне.',
       upTitle: 'Додати субтитри', dzTxt: 'Перетягніть файл сюди або натисніть для вибору', pastePh: 'Або вставте текст субтитрів сюди',
       btnClear: 'Очистити', lblSrc: 'Визначений формат', lblMode: 'Що вам потрібно',
       mSrc: 'Лише оригінал', mDst: 'Лише переклад', mSplit: 'Розділити на два файли', mMerge: 'Об’єднати в один запис із двох рядків',
@@ -314,13 +293,12 @@
       repTitle: 'Результат', btnDl: 'Завантажити', btnCopy: 'Копіювати', statCues: '{0} рядків', statDur: 'Тривалість {0}',
       partSrc: 'Оригінал', partDst: 'Переклад', partMerged: 'Обидва рядки',
       msgDone: 'Готово', errEmpty: 'Спочатку додайте текст субтитрів', errFmt: 'Формат субтитрів не розпізнано',
-      errNoBi: 'Двомовного вмісту не знайдено — спробуйте файл із двома мовами', mNone: 'Двомовних субтитрів не знайдено', mOk: 'Виявлено двомовні субтитри',
-      noteLocal: 'Файл обробляється лише у вашому браузері й ніколи не завантажується', footBrand: 'AI-SRTSub · Розділення двомовних субтитрів'
+      errNoBi: 'Двомовного вмісту не знайдено — спробуйте файл із двома мовами', mNone: 'Двомовних субтитрів не знайдено', mOk: 'Виявлено двомовні субтитри', footBrand: 'AI-SRTSub · Розділення двомовних субтитрів'
     },
     'da': {
       brandName: 'AI-SRTSub', navHome: 'Forside', navTr: 'Oversæt', navFx: 'Effekter', navCl: 'Rens', navCv: 'Konverter',
       heroA: 'Tosprogede', heroEm: 'undertekster',
-      heroSub: 'Del tosprogede undertekster op i en original og en oversat udgave, eller behold kun den ene. Det hele foregår i din browser - filen bliver aldrig uploadet.',
+      heroSub: 'Del tosprogede undertekster op i en original og en oversat udgave, eller behold kun den ene.',
       upTitle: 'Tilføj undertekster', dzTxt: 'Slip en fil her, eller klik for at vælge', pastePh: 'Eller indsæt undertekstteksten her',
       btnClear: 'Ryd', lblSrc: 'Registreret format', lblMode: 'Hvad skal du bruge',
       mSrc: 'Kun original', mDst: 'Kun oversættelse', mSplit: 'Del i to filer', mMerge: 'Slå sammen til én post på to linjer',
@@ -328,13 +306,12 @@
       repTitle: 'Resultat', btnDl: 'Download', btnCopy: 'Kopier', statCues: '{0} linjer', statDur: 'Længde {0}',
       partSrc: 'Original', partDst: 'Oversættelse', partMerged: 'Begge linjer',
       msgDone: 'Færdig', errEmpty: 'Tilføj undertekstteksten først', errFmt: 'Undertekstformatet blev ikke genkendt',
-      errNoBi: 'Intet tosproget indhold fundet - prøv en fil med to sprog', mNone: 'Ingen tosprogede undertekster fundet', mOk: 'Tosprogede undertekster fundet',
-      noteLocal: 'Filen behandles kun i din browser og bliver aldrig uploadet', footBrand: 'AI-SRTSub · Opdeling af tosprogede undertekster'
+      errNoBi: 'Intet tosproget indhold fundet - prøv en fil med to sprog', mNone: 'Ingen tosprogede undertekster fundet', mOk: 'Tosprogede undertekster fundet', footBrand: 'AI-SRTSub · Opdeling af tosprogede undertekster'
     },
     'fi': {
       brandName: 'AI-SRTSub', navHome: 'Etusivu', navTr: 'Käännä', navFx: 'Tehosteet', navCl: 'Siivoa', navCv: 'Muunnin',
       heroA: 'Kaksikieliset', heroEm: 'tekstitykset',
-      heroSub: 'Jaa kaksikieliset tekstitykset alkuperäiseen ja käännettyyn osaan — tai pidä vain toinen niistä. Kaikki tapahtuu selaimessa: tiedostoa ei koskaan ladata palvelimelle.',
+      heroSub: 'Jaa kaksikieliset tekstitykset alkuperäiseen ja käännettyyn osaan — tai pidä vain toinen niistä.',
       upTitle: 'Lisää tekstitys', dzTxt: 'Pudota tiedosto tähän tai klikkaa valitaksesi', pastePh: 'Tai liitä tekstityksen teksti tähän',
       btnClear: 'Tyhjennä', lblSrc: 'Tunnistettu muoto', lblMode: 'Mitä tarvitset',
       mSrc: 'Vain alkuperäinen', mDst: 'Vain käännös', mSplit: 'Jaa kahteen tiedostoon', mMerge: 'Yhdistä yhdeksi kaksiriviseksi merkinnäksi',
@@ -342,13 +319,12 @@
       repTitle: 'Tulos', btnDl: 'Lataa', btnCopy: 'Kopioi', statCues: '{0} riviä', statDur: 'Kesto {0}',
       partSrc: 'Alkuperäinen', partDst: 'Käännös', partMerged: 'Molemmat rivit',
       msgDone: 'Valmis', errEmpty: 'Lisää ensin tekstityksen teksti', errFmt: 'Tekstityksen muotoa ei tunnistettu',
-      errNoBi: 'Kaksikielistä sisältöä ei löytynyt — kokeile tiedostoa, jossa on kaksi kieltä', mNone: 'Kaksikielisiä tekstityksiä ei löytynyt', mOk: 'Kaksikieliset tekstitykset havaittu',
-      noteLocal: 'Tiedosto käsitellään vain selaimessasi eikä sitä koskaan ladata palvelimelle', footBrand: 'AI-SRTSub · Kaksikielisten tekstitysten jako'
+      errNoBi: 'Kaksikielistä sisältöä ei löytynyt — kokeile tiedostoa, jossa on kaksi kieltä', mNone: 'Kaksikielisiä tekstityksiä ei löytynyt', mOk: 'Kaksikieliset tekstitykset havaittu', footBrand: 'AI-SRTSub · Kaksikielisten tekstitysten jako'
     },
     'el': {
       brandName: 'AI-SRTSub', navHome: 'Αρχική', navTr: 'Μετάφραση', navFx: 'Εφέ', navCl: 'Καθαρισμός', navCv: 'Μετατροπέας',
       heroA: 'Δίγλωσσοι', heroEm: 'υπότιτλοι',
-      heroSub: 'Χώρισε δίγλωσσους υπότιτλους σε πρωτότυπο και μετάφραση, ή κράτα μόνο ένα από τα δύο. Όλα γίνονται στον περιηγητή — το αρχείο δεν ανεβαίνει ποτέ.',
+      heroSub: 'Χώρισε δίγλωσσους υπότιτλους σε πρωτότυπο και μετάφραση, ή κράτα μόνο ένα από τα δύο.',
       upTitle: 'Πρόσθεσε υπότιτλους', dzTxt: 'Άφησε ένα αρχείο εδώ ή κάνε κλικ για επιλογή', pastePh: 'Ή επικόλλησε εδώ το κείμενο των υποτίτλων',
       btnClear: 'Καθαρισμός', lblSrc: 'Μορφή που εντοπίστηκε', lblMode: 'Τι χρειάζεσαι',
       mSrc: 'Μόνο το πρωτότυπο', mDst: 'Μόνο η μετάφραση', mSplit: 'Χωρισμός σε δύο αρχεία', mMerge: 'Ενοποίηση σε μία καταχώρηση δύο γραμμών',
@@ -356,13 +332,12 @@
       repTitle: 'Αποτέλεσμα', btnDl: 'Λήψη', btnCopy: 'Αντιγραφή', statCues: '{0} γραμμές', statDur: 'Διάρκεια {0}',
       partSrc: 'Πρωτότυπο', partDst: 'Μετάφραση', partMerged: 'Και οι δύο γραμμές',
       msgDone: 'Έγινε', errEmpty: 'Πρόσθεσε πρώτα το κείμενο των υποτίτλων', errFmt: 'Η μορφή υποτίτλων δεν αναγνωρίστηκε',
-      errNoBi: 'Δεν βρέθηκε δίγλωσσο περιεχόμενο — δοκίμασε ένα αρχείο με δύο γλώσσες', mNone: 'Δεν βρέθηκαν δίγλωσσοι υπότιτλοι', mOk: 'Εντοπίστηκαν δίγλωσσοι υπότιτλοι',
-      noteLocal: 'Το αρχείο επεξεργάζεται μόνο στον περιηγητή σου και δεν ανεβαίνει ποτέ', footBrand: 'AI-SRTSub · Διαχωρισμός δίγλωσσων υποτίτλων'
+      errNoBi: 'Δεν βρέθηκε δίγλωσσο περιεχόμενο — δοκίμασε ένα αρχείο με δύο γλώσσες', mNone: 'Δεν βρέθηκαν δίγλωσσοι υπότιτλοι', mOk: 'Εντοπίστηκαν δίγλωσσοι υπότιτλοι', footBrand: 'AI-SRTSub · Διαχωρισμός δίγλωσσων υποτίτλων'
     },
     'he': {
       brandName: 'AI-SRTSub', navHome: 'בית', navTr: 'תרגום', navFx: 'אפקטים', navCl: 'ניקוי', navCv: 'ממיר',
       heroA: 'כתוביות', heroEm: 'דו-לשוניות',
-      heroSub: 'פצל כתוביות דו-לשוניות למקור ולתרגום, או השאר רק אחד מהם. הכול קורה בדפדפן — הקובץ אינו מועלה לעולם.',
+      heroSub: 'פצל כתוביות דו-לשוניות למקור ולתרגום, או השאר רק אחד מהם.',
       upTitle: 'הוסף כתוביות', dzTxt: 'גרור קובץ לכאן או לחץ לבחירה', pastePh: 'או הדבק כאן את טקסט הכתוביות',
       btnClear: 'נקה', lblSrc: 'הפורמט שזוהה', lblMode: 'מה אתה צריך',
       mSrc: 'רק המקור', mDst: 'רק התרגום', mSplit: 'פצל לשני קבצים', mMerge: 'מזג לרשומה אחת של שתי שורות',
@@ -370,13 +345,12 @@
       repTitle: 'תוצאה', btnDl: 'הורדה', btnCopy: 'העתקה', statCues: '{0} שורות', statDur: 'אורך {0}',
       partSrc: 'מקור', partDst: 'תרגום', partMerged: 'שתי השורות',
       msgDone: 'הסתיים', errEmpty: 'קודם הוסף את טקסט הכתוביות', errFmt: 'לא זוהה פורמט הכתוביות',
-      errNoBi: 'לא נמצא תוכן דו-לשוני — נסה קובץ שמכיל שתי שפות', mNone: 'לא נמצאו כתוביות דו-לשוניות', mOk: 'זוהו כתוביות דו-לשוניות',
-      noteLocal: 'הקובץ מעובד רק בדפדפן שלך ואינו מועלה לעולם', footBrand: 'AI-SRTSub · פיצול כתוביות דו-לשוניות'
+      errNoBi: 'לא נמצא תוכן דו-לשוני — נסה קובץ שמכיל שתי שפות', mNone: 'לא נמצאו כתוביות דו-לשוניות', mOk: 'זוהו כתוביות דו-לשוניות', footBrand: 'AI-SRTSub · פיצול כתוביות דו-לשוניות'
     },
     'ro': {
       brandName: 'AI-SRTSub', navHome: 'Acasă', navTr: 'Traduce', navFx: 'Efecte', navCl: 'Curățare', navCv: 'Convertor',
       heroA: 'Subtitrări', heroEm: 'bilingve',
-      heroSub: 'Împarte subtitrările bilingve într-o versiune originală și una tradusă sau păstrează doar una dintre ele. Totul se întâmplă în browser - fișierul nu este încărcat niciodată.',
+      heroSub: 'Împarte subtitrările bilingve într-o versiune originală și una tradusă sau păstrează doar una dintre ele.',
       upTitle: 'Adaugă subtitrări', dzTxt: 'Trage un fișier aici sau fă clic pentru a alege', pastePh: 'Sau lipește aici textul subtitrărilor',
       btnClear: 'Șterge', lblSrc: 'Format detectat', lblMode: 'De ce ai nevoie',
       mSrc: 'Doar originalul', mDst: 'Doar traducerea', mSplit: 'Împarte în două fișiere', mMerge: 'Unește într-o singură intrare cu două rânduri',
@@ -384,8 +358,7 @@
       repTitle: 'Rezultat', btnDl: 'Descarcă', btnCopy: 'Copiază', statCues: '{0} rânduri', statDur: 'Durată {0}',
       partSrc: 'Original', partDst: 'Traducere', partMerged: 'Ambele rânduri',
       msgDone: 'Gata', errEmpty: 'Adaugă mai întâi textul subtitrărilor', errFmt: 'Formatul subtitrărilor nu a fost recunoscut',
-      errNoBi: 'Nu s-a detectat conținut bilingv - încearcă un fișier cu două limbi', mNone: 'Nu s-au găsit subtitrări bilingve', mOk: 'Detectate subtitrări bilingve',
-      noteLocal: 'Fișierul este procesat doar în browserul tău și nu este încărcat niciodată', footBrand: 'AI-SRTSub · Împărțirea subtitrărilor bilingve'
+      errNoBi: 'Nu s-a detectat conținut bilingv - încearcă un fișier cu două limbi', mNone: 'Nu s-au găsit subtitrări bilingve', mOk: 'Detectate subtitrări bilingve', footBrand: 'AI-SRTSub · Împărțirea subtitrărilor bilingve'
     }
   };
 

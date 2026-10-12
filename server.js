@@ -1603,7 +1603,7 @@ const SEO_TRANSLATE = {
 const SEO_CONVERT = {
   'zh-CN': {
     title: '字幕格式转换 - SRT / VTT / ASS / SBV / LRC / TXT 互转 | 随心字幕 AI',
-    desc: '免费在线字幕格式转换：SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留，ASS 特效标记自动清理。纯浏览器本地处理，文件不上传服务器。',
+    desc: '免费在线字幕格式转换：SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留，ASS 特效标记自动清理。',
     kw: '字幕格式转换,srt转vtt,vtt转srt,ass转srt,sbv转srt,srt转lrc,字幕转txt,字幕转换工具,subtitle converter,srt to vtt,vtt to srt',
     intro: 'SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留。',
     feat: '自动识别输入格式，导出时按目标格式重排时间码；ASS 特效标记与强制换行在导出成普通字幕时还原成可读文本；歌词文件没有小时位，超过一小时按分钟累计。',
@@ -1612,7 +1612,7 @@ const SEO_CONVERT = {
   },
   'zh-TW': {
     title: '字幕格式轉換 - SRT / VTT / ASS / SBV / LRC / TXT 互轉 | 隨心字幕 AI',
-    desc: '免費線上字幕格式轉換：SRT、VTT、ASS、SBV、LRC、TXT 互相轉換，時間軸原樣保留，ASS 特效標記自動清理。純瀏覽器本地處理，檔案不上傳伺服器。',
+    desc: '免費線上字幕格式轉換：SRT、VTT、ASS、SBV、LRC、TXT 互相轉換，時間軸原樣保留，ASS 特效標記自動清理。',
     kw: '字幕格式轉換,srt轉vtt,vtt轉srt,ass轉srt,sbv轉srt,srt轉lrc,字幕轉txt,字幕轉換工具,subtitle converter,srt to vtt,vtt to srt',
     intro: 'SRT、VTT、ASS、SBV、LRC、TXT 互相轉換，時間軸原樣保留。',
     feat: '自動辨識輸入格式，匯出時按目標格式重排時間碼；ASS 特效標記與強制換行在匯出成普通字幕時還原成可讀文字；歌詞檔案沒有小時位，超過一小時按分鐘累計。',
@@ -1621,7 +1621,7 @@ const SEO_CONVERT = {
   },
   'en': {
     title: 'Subtitle Converter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Free online subtitle converter: convert between SRT, VTT, ASS, SBV, LRC and TXT with the timeline kept intact, ASS effect tags cleaned up automatically. Runs entirely in your browser - the file is never uploaded.',
+    desc: 'Free online subtitle converter: convert between SRT, VTT, ASS, SBV, LRC and TXT with the timeline kept intact, ASS effect tags cleaned up automatically.',
     kw: 'subtitle converter,srt to vtt,vtt to srt,ass to srt,sbv to srt,srt to lrc,subtitle to txt,convert subtitles,srt converter,vtt converter',
     intro: 'Convert between SRT, VTT, ASS, SBV, LRC and TXT with the timeline kept intact.',
     feat: 'The input format is detected automatically and timestamps are rewritten for the target format; ASS effect tags and forced line breaks become readable text when you export to a plain format; lyrics files have no hour field, so anything past one hour is counted in minutes.',
@@ -1630,7 +1630,7 @@ const SEO_CONVERT = {
   },
   'ja': {
     title: '字幕フォーマット変換 - SRT / VTT / ASS / SBV / LRC / TXT 相互変換 | AI-SRTSub',
-    desc: '無料のオンライン字幕変換ツール：SRT、VTT、ASS、SBV、LRC、TXT を相互に変換し、タイムラインはそのまま保持、ASS のエフェクトタグは自動的に整理されます。すべてブラウザ内で処理され、ファイルはアップロードされません。',
+    desc: '無料のオンライン字幕変換ツール：SRT、VTT、ASS、SBV、LRC、TXT を相互に変換し、タイムラインはそのまま保持、ASS のエフェクトタグは自動的に整理されます。',
     kw: '字幕変換,srt vtt 変換,字幕フォーマット変換,ass srt 変換,sbv 変換,字幕 テキスト変換,subtitle converter,srt to vtt',
     intro: 'SRT、VTT、ASS、SBV、LRC、TXT を相互に変換し、タイムラインはそのまま保持されます。',
     feat: '入力形式を自動判別し、出力形式に合わせてタイムコードを書き直します。ASS のエフェクトタグと強制改行は、通常の字幕へ書き出すときに読めるテキストへ戻します。歌詞ファイルには時間の桁がないため、1 時間を超える分は分単位で累計します。',
@@ -1639,7 +1639,7 @@ const SEO_CONVERT = {
   },
   'es': {
     title: 'Conversor de subtítulos - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Conversor de subtítulos online gratis: convierte entre SRT, VTT, ASS, SBV, LRC y TXT conservando la línea de tiempo y limpiando las etiquetas de efectos ASS. Funciona solo en tu navegador: el archivo nunca se sube.',
+    desc: 'Conversor de subtítulos online gratis: convierte entre SRT, VTT, ASS, SBV, LRC y TXT conservando la línea de tiempo y limpiando las etiquetas de efectos ASS.',
     kw: 'convertir subtítulos,srt a vtt,vtt a srt,ass a srt,sbv a srt,srt a lrc,subtítulos a txt,conversor srt,subtitle converter',
     intro: 'Convierte entre SRT, VTT, ASS, SBV, LRC y TXT conservando la línea de tiempo.',
     feat: 'El formato de entrada se detecta automáticamente y los códigos de tiempo se reescriben para el formato de salida; las etiquetas de efectos y los saltos forzados de ASS vuelven a ser texto legible al exportar a un formato simple; los archivos de letras no tienen campo de horas, así que lo que pasa de una hora se acumula en minutos.',
@@ -1648,7 +1648,7 @@ const SEO_CONVERT = {
   },
   'pt': {
     title: 'Conversor de legendas - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Conversor de legendas online grátis: converta entre SRT, VTT, ASS, SBV, LRC e TXT mantendo a linha do tempo e limpando as tags de efeito do ASS. Roda só no seu navegador: o arquivo nunca é enviado.',
+    desc: 'Conversor de legendas online grátis: converta entre SRT, VTT, ASS, SBV, LRC e TXT mantendo a linha do tempo e limpando as tags de efeito do ASS.',
     kw: 'converter legendas,srt para vtt,vtt para srt,ass para srt,sbv para srt,srt para lrc,legenda para txt,conversor srt,subtitle converter',
     intro: 'Converta entre SRT, VTT, ASS, SBV, LRC e TXT mantendo a linha do tempo.',
     feat: 'O formato de entrada é detectado automaticamente e os códigos de tempo são reescritos para o formato de saída; tags de efeito e quebras forçadas do ASS voltam a ser texto legível ao exportar para um formato simples; arquivos de letra não têm campo de horas, então o que passa de uma hora é acumulado em minutos.',
@@ -1657,7 +1657,7 @@ const SEO_CONVERT = {
   },
   'ko': {
     title: '자막 포맷 변환 - SRT / VTT / ASS / SBV / LRC / TXT 상호 변환 | AI-SRTSub',
-    desc: '무료 온라인 자막 변환기: SRT, VTT, ASS, SBV, LRC, TXT 를 서로 변환하고 타임라인은 그대로 유지하며 ASS 효과 태그는 자동으로 정리됩니다. 모두 브라우저에서 처리되며 파일은 업로드되지 않습니다.',
+    desc: '무료 온라인 자막 변환기: SRT, VTT, ASS, SBV, LRC, TXT 를 서로 변환하고 타임라인은 그대로 유지하며 ASS 효과 태그는 자동으로 정리됩니다.',
     kw: '자막 변환,srt vtt 변환,자막 포맷 변환,ass srt 변환,sbv 변환,자막 텍스트 변환,subtitle converter,srt to vtt',
     intro: 'SRT, VTT, ASS, SBV, LRC, TXT 를 서로 변환하고 타임라인은 그대로 유지합니다.',
     feat: '입력 형식을 자동으로 감지하고 출력 형식에 맞춰 타임코드를 다시 씁니다. ASS 효과 태그와 강제 줄바꿈은 일반 자막으로 내보낼 때 읽을 수 있는 텍스트로 되돌립니다. 가사 파일에는 시간 단위가 없어 1시간을 넘는 분은 분 단위로 누적합니다.',
@@ -1666,7 +1666,7 @@ const SEO_CONVERT = {
   },
   'de': {
     title: 'Untertitel-Konverter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Kostenloser Online-Konverter für Untertitel: zwischen SRT, VTT, ASS, SBV, LRC und TXT konvertieren, Zeitachse bleibt erhalten, ASS-Effekt-Tags werden automatisch entfernt. Läuft nur im Browser - die Datei wird nie hochgeladen.',
+    desc: 'Kostenloser Online-Konverter für Untertitel: zwischen SRT, VTT, ASS, SBV, LRC und TXT konvertieren, Zeitachse bleibt erhalten, ASS-Effekt-Tags werden automatisch entfernt.',
     kw: 'untertitel konvertieren,srt in vtt,vtt in srt,ass in srt,sbv in srt,srt in lrc,untertitel in txt,srt konverter,subtitle converter',
     intro: 'Konvertiere zwischen SRT, VTT, ASS, SBV, LRC und TXT - die Zeitachse bleibt erhalten.',
     feat: 'Das Eingabeformat wird automatisch erkannt und die Zeitcodes werden für das Ausgabeformat neu geschrieben; ASS-Effekt-Tags und erzwungene Zeilenumbrüche werden beim Export in ein einfaches Format wieder zu lesbarem Text; Liedtextdateien haben kein Stunden Feld, alles über eine Stunde wird in Minuten gezählt.',
@@ -1675,7 +1675,7 @@ const SEO_CONVERT = {
   },
   'fr': {
     title: 'Convertisseur de sous-titres - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Convertisseur de sous-titres en ligne gratuit : convertissez entre SRT, VTT, ASS, SBV, LRC et TXT en conservant la ligne de temps, les balises d\'effet ASS sont nettoyées automatiquement. Tout se passe dans le navigateur : le fichier n\'est jamais envoyé.',
+    desc: 'Convertisseur de sous-titres en ligne gratuit : convertissez entre SRT, VTT, ASS, SBV, LRC et TXT en conservant la ligne de temps, les balises d\'effet ASS sont nettoyées automatiquement.',
     kw: 'convertir sous-titres,srt vers vtt,vtt vers srt,ass vers srt,sbv vers srt,srt vers lrc,sous-titres vers txt,convertisseur srt,subtitle converter',
     intro: 'Convertissez entre SRT, VTT, ASS, SBV, LRC et TXT en conservant la ligne de temps.',
     feat: 'Le format d\'entrée est détecté automatiquement et les codes temporels sont réécrits pour le format de sortie ; les balises d\'effet et les sauts de ligne forcés de l\'ASS redeviennent du texte lisible à l\'export vers un format simple ; les fichiers de paroles n\'ont pas de champ heures, donc ce qui dépasse une heure est cumulé en minutes.',
@@ -1684,7 +1684,7 @@ const SEO_CONVERT = {
   },
   'id': {
     title: 'Konverter Subtitle - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Konverter subtitle online gratis: konversi antara SRT, VTT, ASS, SBV, LRC, dan TXT dengan timeline tetap utuh, tag efek ASS dibersihkan otomatis. Berjalan hanya di browser - file tidak pernah diunggah.',
+    desc: 'Konverter subtitle online gratis: konversi antara SRT, VTT, ASS, SBV, LRC, dan TXT dengan timeline tetap utuh, tag efek ASS dibersihkan otomatis.',
     kw: 'konversi subtitle,srt ke vtt,vtt ke srt,ass ke srt,sbv ke srt,srt ke lrc,subtitle ke txt,konverter srt,subtitle converter',
     intro: 'Konversi antara SRT, VTT, ASS, SBV, LRC, dan TXT dengan timeline tetap utuh.',
     feat: 'Format input dideteksi otomatis dan kode waktu ditulis ulang sesuai format output; tag efek ASS dan pemaksaan baris baru dikembalikan menjadi teks yang terbaca saat diekspor ke format biasa; file lirik tidak memiliki kolom jam, jadi yang lebih dari satu jam dihitung dalam menit.',
@@ -1693,7 +1693,7 @@ const SEO_CONVERT = {
   },
   'hi': {
     title: 'सबटाइटल कनवर्टर - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'मुफ़्त ऑनलाइन सबटाइटल कनवर्टर: SRT, VTT, ASS, SBV, LRC और TXT के बीच बदलें, टाइमलाइन ज्यों की त्यों रहेगी, ASS इफ़ेक्ट टैग अपने आप साफ़ हो जाते हैं। सब कुछ आपके ब्राउज़र में होता है - फ़ाइल अपलोड नहीं होती।',
+    desc: '',
     kw: 'सबटाइटल कनवर्टर,srt to vtt,vtt to srt,ass to srt,sbv to srt,सबटाइटल टेक्स्ट,subtitle converter,srt converter',
     intro: 'SRT, VTT, ASS, SBV, LRC और TXT के बीच बदलें, टाइमलाइन ज्यों की त्यों रहती है।',
     feat: 'इनपुट फ़ॉर्मैट अपने आप पहचाना जाता है और टाइमकोड आउटपुट फ़ॉर्मैट के अनुसार दोबारा लिखे जाते हैं; ASS इफ़ेक्ट टैग और ज़बरदस्ती की लाइन ब्रेक आम फ़ॉर्मैट में निर्यात करते समय पढ़े जा सकने वाले टेक्स्ट बन जाते हैं; लिरिक्स फ़ाइल में घंटे का फ़ील्ड नहीं होता, इसलिए एक घंटे से अधिक को मिनट में जोड़ा जाता है।',
@@ -1702,7 +1702,7 @@ const SEO_CONVERT = {
   },
   'th': {
     title: 'ตัวแปลงซับไตเติล - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'เครื่องมือแปลงซับไตเติลออนไลน์ฟรี: แปลงระหว่าง SRT, VTT, ASS, SBV, LRC และ TXT โดยไทม์ไลน์คงเดิม และแท็กเอฟเฟกต์ของ ASS ถูกจัดการอัตโนมัติ ทำงานในเบราว์เซอร์ของคุณเท่านั้น - ไฟล์ไม่ถูกอัปโหลด',
+    desc: '',
     kw: 'แปลงซับไตเติล,srt เป็น vtt,vtt เป็น srt,ass เป็น srt,sbv เป็น srt,ซับไตเติลเป็นข้อความ,subtitle converter,srt converter',
     intro: 'แปลงระหว่าง SRT, VTT, ASS, SBV, LRC และ TXT โดยไทม์ไลน์คงเดิม',
     feat: 'ตรวจจับรูปแบบอินพุตอัตโนมัติและเขียนไทม์โค้ดใหม่ให้ตรงกับรูปแบบเอาต์พุต แท็กเอฟเฟกต์และการขึ้นบรรทัดใหม่แบบบังคับของ ASS จะกลับเป็นข้อความที่อ่านได้เมื่อส่งออกเป็นรูปแบบธรรมดา ไฟล์เนื้อเพลงไม่มีฟิลด์ชั่วโมง จึงนับเป็นนาทีเมื่อเกินหนึ่งชั่วโมง',
@@ -1711,7 +1711,7 @@ const SEO_CONVERT = {
   },
   'vi': {
     title: 'Bộ chuyển đổi phụ đề - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Công cụ chuyển đổi phụ đề trực tuyến miễn phí: chuyển giữa SRT, VTT, ASS, SBV, LRC và TXT, giữ nguyên trục thời gian, tự động dọn thẻ hiệu ứng ASS. Chỉ chạy trong trình duyệt của bạn - tệp không bao giờ được tải lên.',
+    desc: 'Công cụ chuyển đổi phụ đề trực tuyến miễn phí: chuyển giữa SRT, VTT, ASS, SBV, LRC và TXT, giữ nguyên trục thời gian, tự động dọn thẻ hiệu ứng ASS.',
     kw: 'chuyển đổi phụ đề,srt sang vtt,vtt sang srt,ass sang srt,sbv sang srt,srt sang lrc,phụ đề thành văn bản,subtitle converter',
     intro: 'Chuyển đổi giữa SRT, VTT, ASS, SBV, LRC và TXT, giữ nguyên trục thời gian.',
     feat: 'Tự động nhận dạng định dạng đầu vào và viết lại mã thời gian theo định dạng đầu ra; thẻ hiệu ứng ASS và ngắt dòng ép buộc trở lại thành văn bản đọc được khi xuất sang định dạng thường; tệp lời bài hát không có trường giờ, nên phần vượt quá một giờ được tính bằng phút.',
@@ -1720,7 +1720,7 @@ const SEO_CONVERT = {
   },
   'ru': {
     title: 'Конвертер субтитров - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Бесплатный онлайн-конвертер субтитров: преобразуйте SRT, VTT, ASS, SBV, LRC и TXT друг в друга, таймлайн сохраняется, теги эффектов ASS очищаются автоматически. Всё работает в вашем браузере - файл никогда не загружается.',
+    desc: 'Бесплатный онлайн-конвертер субтитров: преобразуйте SRT, VTT, ASS, SBV, LRC и TXT друг в друга, таймлайн сохраняется, теги эффектов ASS очищаются автоматически.',
     kw: 'конвертер субтитров,srt в vtt,vtt в srt,ass в srt,sbv в srt,srt в lrc,субтитры в текст,subtitle converter,srt converter',
     intro: 'Преобразуйте SRT, VTT, ASS, SBV, LRC и TXT друг в друга, таймлайн сохраняется.',
     feat: 'Формат ввода определяется автоматически, а таймкоды переписываются под формат вывода; теги эффектов ASS и принудительные переносы строк при экспорте в обычный формат снова становятся читаемым текстом; в файлах текстов песен нет поля часов, поэтому всё, что больше часа, считается в минутах.',
@@ -1729,7 +1729,7 @@ const SEO_CONVERT = {
   },
   'it': {
     title: 'Convertitore di sottotitoli - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Convertitore di sottotitoli online gratuito: converti tra SRT, VTT, ASS, SBV, LRC e TXT mantenendo la linea temporale, i tag di effetto ASS vengono puliti automaticamente. Tutto avviene nel browser: il file non viene mai caricato.',
+    desc: 'Convertitore di sottotitoli online gratuito: converti tra SRT, VTT, ASS, SBV, LRC e TXT mantenendo la linea temporale, i tag di effetto ASS vengono puliti automaticamente.',
     kw: 'convertire sottotitoli,srt in vtt,vtt in srt,ass in srt,sbv in srt,srt in lrc,sottotitoli in testo,convertitore srt,subtitle converter',
     intro: 'Converti tra SRT, VTT, ASS, SBV, LRC e TXT mantenendo la linea temporale.',
     feat: 'Il formato di ingresso viene rilevato automaticamente e i codici di tempo riscritti per il formato di uscita; i tag di effetto ASS e le interruzioni di riga forzate tornano testo leggibile esportando in un formato semplice; i file dei testi non hanno il campo ore, quindi ciò che supera un\'ora viene conteggiato in minuti.',
@@ -1738,7 +1738,7 @@ const SEO_CONVERT = {
   },
   'ar': {
     title: 'محوّل الترجمة النصية - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'محوّل ترجمة نصية مجاني عبر الإنترنت: حوّل بين SRT و VTT و ASS و SBV و LRC و TXT مع الحفاظ على الخط الزمني وتنظيف وسوم تأثيرات ASS تلقائياً. يعمل داخل المتصفح فقط - لا يتم رفع الملف أبداً.',
+    desc: 'محوّل ترجمة نصية مجاني عبر الإنترنت: حوّل بين SRT و VTT و ASS و SBV و LRC و TXT مع الحفاظ على الخط الزمني وتنظيف وسوم تأثيرات ASS تلقائياً.',
     kw: 'تحويل الترجمة,srt إلى vtt,vtt إلى srt,ass إلى srt,sbv إلى srt,ترجمة إلى نص,subtitle converter,srt converter',
     intro: 'حوّل بين SRT و VTT و ASS و SBV و LRC و TXT مع الحفاظ على الخط الزمني.',
     feat: 'يتم التعرف على صيغة الإدخال تلقائياً وإعادة كتابة الأكواد الزمنية بما يناسب صيغة الإخراج؛ وسوم تأثيرات ASS وفواصل الأسطر القسرية تعود نصاً مقروءاً عند التصدير إلى صيغة بسيطة؛ ملفات الكلمات لا تحتوي حقل ساعات، لذا يُحسب ما يتجاوز ساعة بالدقائق.',
@@ -1747,7 +1747,7 @@ const SEO_CONVERT = {
   },
   'tr': {
     title: 'Altyazı Dönüştürücü - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Ücretsiz çevrimiçi altyazı dönüştürücü: SRT, VTT, ASS, SBV, LRC ve TXT arasında dönüştürün, zaman çizgisi korunur, ASS efekt etiketleri otomatik temizlenir. Tamamen tarayıcınızda çalışır - dosya asla yüklenmez.',
+    desc: 'Ücretsiz çevrimiçi altyazı dönüştürücü: SRT, VTT, ASS, SBV, LRC ve TXT arasında dönüştürün, zaman çizgisi korunur, ASS efekt etiketleri otomatik temizlenir.',
     kw: 'altyazı dönüştürme,srt vtt dönüştürme,vtt srt dönüştürme,ass srt dönüştürme,altyazı metin,subtitle converter,srt converter',
     intro: 'SRT, VTT, ASS, SBV, LRC ve TXT arasında dönüştürün, zaman çizgisi korunur.',
     feat: 'Girdi biçimi otomatik algılanır ve zaman kodları çıktı biçimine göre yeniden yazılır; ASS efekt etiketleri ve zorunlu satır sonları sade bir biçime aktarılırken okunabilir metne döner; şarkı sözü dosyalarında saat alanı yoktur, bir saati aşan kısım dakika olarak toplanır.',
@@ -1756,7 +1756,7 @@ const SEO_CONVERT = {
   },
   'nl': {
     title: 'Ondertitelconverter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Gratis online ondertitelconverter: converteer tussen SRT, VTT, ASS, SBV, LRC en TXT met behoud van de tijdlijn, ASS-effecttags worden automatisch opgeschoond. Draait alleen in je browser - het bestand wordt nooit geüpload.',
+    desc: 'Gratis online ondertitelconverter: converteer tussen SRT, VTT, ASS, SBV, LRC en TXT met behoud van de tijdlijn, ASS-effecttags worden automatisch opgeschoond.',
     kw: 'ondertitel converteren,srt naar vtt,vtt naar srt,ass naar srt,sbv naar srt,ondertitel naar tekst,subtitle converter,srt converter',
     intro: 'Converteer tussen SRT, VTT, ASS, SBV, LRC en TXT met behoud van de tijdlijn.',
     feat: 'Het invoerformaat wordt automatisch herkend en de tijdscodes worden herschreven voor het uitvoerformaat; ASS-effecttags en gedwongen regeleinden worden bij export naar een gewoon formaat weer leesbare tekst; liedtekstbestanden hebben geen ure-veld, dus alles boven een uur wordt in minuten geteld.',
@@ -1765,7 +1765,7 @@ const SEO_CONVERT = {
   },
   'pl': {
     title: 'Konwerter napisów - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Darmowy internetowy konwerter napisów: konwertuj między SRT, VTT, ASS, SBV, LRC i TXT, zachowując oś czasu, znaczniki efektów ASS są czyszczone automatycznie. Wszystko działa w przeglądarce - plik nigdy nie jest wysyłany.',
+    desc: 'Darmowy internetowy konwerter napisów: konwertuj między SRT, VTT, ASS, SBV, LRC i TXT, zachowując oś czasu, znaczniki efektów ASS są czyszczone automatycznie.',
     kw: 'konwersja napisów,srt na vtt,vtt na srt,ass na srt,sbv na srt,napisy do tekstu,subtitle converter,srt converter',
     intro: 'Konwertuj między SRT, VTT, ASS, SBV, LRC i TXT, zachowując oś czasu.',
     feat: 'Format wejściowy jest rozpoznawany automatycznie, a kody czasowe przepisywane na format wyjściowy; znaczniki efektów ASS i wymuszone łamania wierszy przy eksporcie do zwykłego formatu znów stają się czytelnym tekstem; pliki z tekstami piosenek nie mają pola godzin, więc wszystko powyżej godziny liczone jest w minutach.',
@@ -1774,7 +1774,7 @@ const SEO_CONVERT = {
   },
   'sv': {
     title: 'Undertextkonverterare - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Gratis undertextkonverterare online: konvertera mellan SRT, VTT, ASS, SBV, LRC och TXT med tidslinjen intakt, ASS-effekttaggar städas automatiskt. Allt körs i webbläsaren - filen laddas aldrig upp.',
+    desc: 'Gratis undertextkonverterare online: konvertera mellan SRT, VTT, ASS, SBV, LRC och TXT med tidslinjen intakt, ASS-effekttaggar städas automatiskt.',
     kw: 'konvertera undertexter,srt till vtt,vtt till srt,ass till srt,sbv till srt,undertext till text,subtitle converter,srt converter',
     intro: 'Konvertera mellan SRT, VTT, ASS, SBV, LRC och TXT med tidslinjen intakt.',
     feat: 'Inmatningsformatet känns igen automatiskt och tidskoderna skrivs om för utdataformatet; ASS-effekttaggar och tvingade radbrytningar blir läsbar text igen vid export till ett enkelt format; sångtextfiler saknar timfält, så allt över en timme räknas i minuter.',
@@ -1783,7 +1783,7 @@ const SEO_CONVERT = {
   },
   'cs': {
     title: 'Převod titulků - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Bezplatný online převod titulků: převáděj mezi SRT, VTT, ASS, SBV, LRC a TXT se zachovanou časovou osou, značky efektů ASS se vyčistí automaticky. Vše běží v prohlížeči - soubor se nikdy nenahrává.',
+    desc: 'Bezplatný online převod titulků: převáděj mezi SRT, VTT, ASS, SBV, LRC a TXT se zachovanou časovou osou, značky efektů ASS se vyčistí automaticky.',
     kw: 'převod titulků,srt na vtt,vtt na srt,ass na srt,sbv na srt,titulky na text,subtitle converter,srt converter',
     intro: 'Převáděj mezi SRT, VTT, ASS, SBV, LRC a TXT se zachovanou časovou osou.',
     feat: 'Vstupní formát je rozpoznán automaticky a časové kódy jsou přepsány pro výstupní formát; značky efektů ASS a vynucené zalomení řádků se při exportu do běžného formátu vrací na čitelný text; soubory s texty písní nemají pole hodin, takže vše nad hodinu se počítá v minutách.',
@@ -1792,7 +1792,7 @@ const SEO_CONVERT = {
   },
   'uk': {
     title: 'Конвертер субтитрів - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Безкоштовний онлайн-конвертер субтитрів: перетворюйте SRT, VTT, ASS, SBV, LRC і TXT один в одного, таймлайн зберігається, теги ефектів ASS очищаються автоматично. Все працює у браузері - файл ніколи не завантажується.',
+    desc: 'Безкоштовний онлайн-конвертер субтитрів: перетворюйте SRT, VTT, ASS, SBV, LRC і TXT один в одного, таймлайн зберігається, теги ефектів ASS очищаються автоматично.',
     kw: 'конвертер субтитрів,srt в vtt,vtt в srt,ass в srt,sbv в srt,субтитри в текст,subtitle converter,srt converter',
     intro: 'Перетворюйте SRT, VTT, ASS, SBV, LRC і TXT один в одного, таймлайн зберігається.',
     feat: 'Формат вводу визначається автоматично, а таймкоди переписуються під формат виводу; теги ефектів ASS і примусові перенесення рядків при експорті у звичайний формат знову стають читабельним текстом; у файлах текстів пісень немає поля годин, тому все, що більше години, рахується у хвилинах.',
@@ -1801,7 +1801,7 @@ const SEO_CONVERT = {
   },
   'da': {
     title: 'Undertekstkonverter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Gratis online undertekstkonverter: konverter mellem SRT, VTT, ASS, SBV, LRC og TXT med tidslinjen intakt, ASS-effektmærker ryddes op automatisk. Det hele kører i browseren - filen uploades aldrig.',
+    desc: 'Gratis online undertekstkonverter: konverter mellem SRT, VTT, ASS, SBV, LRC og TXT med tidslinjen intakt, ASS-effektmærker ryddes op automatisk.',
     kw: 'konverter undertekster,srt til vtt,vtt til srt,ass til srt,sbv til srt,undertekst til tekst,subtitle converter,srt converter',
     intro: 'Konverter mellem SRT, VTT, ASS, SBV, LRC og TXT med tidslinjen intakt.',
     feat: 'Inputformatet registreres automatisk, og tidskoderne omskrives til outputformatet; ASS-effektmærker og tvungne linjeskift bliver til læsbar tekst igen ved eksport til et almindeligt format; sangtekstfiler har ikke et timefelt, så alt over en time tælles i minutter.',
@@ -1810,7 +1810,7 @@ const SEO_CONVERT = {
   },
   'fi': {
     title: 'Tekstitysmuunnin - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Ilmainen verkkotyökalu tekstitysten muuntamiseen: muunna SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-muotojen välillä aikajanan säilyessä, ASS-tehostemerkinnät siivotaan automaattisesti. Kaikki tapahtuu selaimessa - tiedostoa ei koskaan ladata palvelimelle.',
+    desc: 'Ilmainen verkkotyökalu tekstitysten muuntamiseen: muunna SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-muotojen välillä aikajanan säilyessä, ASS-tehostemerkinnät siivotaan automaattisesti.',
     kw: 'muunna tekstitys,srt vtt muunnos,vtt srt muunnos,ass srt muunnos,tekstitys tekstiksi,subtitle converter,srt converter',
     intro: 'Muunna SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-muotojen välillä aikajanan säilyessä.',
     feat: 'Syötemuoto tunnistetaan automaattisesti ja aikakoodit kirjoitetaan uudelleen tulostusmuotoon; ASS-tehostemerkinnät ja pakotetut rivinvaihdot muuttuvat luettavaksi tekstiksi vietäessä tavalliseen muotoon; sanoitustiedostoissa ei ole tuntikenttää, joten yli tunnin menevä osuus lasketaan minuutteina.',
@@ -1819,7 +1819,7 @@ const SEO_CONVERT = {
   },
   'el': {
     title: 'Μετατροπέας υποτίτλων - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Δωρεάν διαδικτυακός μετατροπέας υποτίτλων: μετατρέψτε μεταξύ SRT, VTT, ASS, SBV, LRC και TXT διατηρώντας τη χρονική γραμμή, οι ετικέτες εφέ ASS καθαρίζονται αυτόματα. Όλα γίνονται στον περιηγητή - το αρχείο δεν ανεβαίνει ποτέ.',
+    desc: 'Δωρεάν διαδικτυακός μετατροπέας υποτίτλων: μετατρέψτε μεταξύ SRT, VTT, ASS, SBV, LRC και TXT διατηρώντας τη χρονική γραμμή, οι ετικέτες εφέ ASS καθαρίζονται αυτόματα.',
     kw: 'μετατροπή υποτίτλων,srt σε vtt,vtt σε srt,ass σε srt,sbv σε srt,υπότιτλοι σε κείμενο,subtitle converter,srt converter',
     intro: 'Μετατρέψτε μεταξύ SRT, VTT, ASS, SBV, LRC και TXT διατηρώντας τη χρονική γραμμή.',
     feat: 'Η μορφή εισόδου αναγνωρίζεται αυτόματα και οι χρονικοί κώδικες ξαναγράφονται για τη μορφή εξόδου· οι ετικέτες εφέ ASS και οι αναγκαστικές αλλαγές γραμμής γίνονται ξανά αναγνώσιμο κείμενο κατά την εξαγωγή σε απλή μορφή· τα αρχεία στίχων δεν έχουν πεδίο ώρας, οπότε ό,τι ξεπερνά τη μία ώρα μετριέται σε λεπτά.',
@@ -1828,7 +1828,7 @@ const SEO_CONVERT = {
   },
   'he': {
     title: 'ממיר כתוביות - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'ממיר כתוביות חינמי באינטרנט: המרה בין SRT, VTT, ASS, SBV, LRC ו־TXT תוך שמירה על ציר הזמן, ותגיות האפקטים של ASS מנוקות אוטומטית. הכול מתבצע בדפדפן - הקובץ לעולם לא מועלה.',
+    desc: 'ממיר כתוביות חינמי באינטרנט: המרה בין SRT, VTT, ASS, SBV, LRC ו־TXT תוך שמירה על ציר הזמן, ותגיות האפקטים של ASS מנוקות אוטומטית.',
     kw: 'המרת כתוביות,srt ל vtt,vtt ל srt,ass ל srt,sbv ל srt,כתוביות לטקסט,subtitle converter,srt converter',
     intro: 'המרה בין SRT, VTT, ASS, SBV, LRC ו־TXT תוך שמירה על ציר הזמן.',
     feat: 'פורמט הקלט מזוהה אוטומטית וקודי הזמן נכתבים מחדש לפי פורמט הפלט; תגיות האפקטים של ASS ושבירת השורה הכפויה חוזרות להיות טקסט קריא בייצוא לפורמט פשוט; בקובצי מילים אין שדה שעות, ולכן מה שמעל שעה נספר בדקות.',
@@ -1837,7 +1837,7 @@ const SEO_CONVERT = {
   },
   'ro': {
     title: 'Convertor de subtitrări - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
-    desc: 'Convertor de subtitrări online gratuit: convertește între SRT, VTT, ASS, SBV, LRC și TXT păstrând linia de timp, etichetele de efecte ASS sunt curățate automat. Totul rulează în browser - fișierul nu este încărcat niciodată.',
+    desc: 'Convertor de subtitrări online gratuit: convertește între SRT, VTT, ASS, SBV, LRC și TXT păstrând linia de timp, etichetele de efecte ASS sunt curățate automat.',
     kw: 'conversie subtitrări,srt în vtt,vtt în srt,ass în srt,sbv în srt,subtitrări în text,subtitle converter,srt converter',
     intro: 'Convertește între SRT, VTT, ASS, SBV, LRC și TXT păstrând linia de timp.',
     feat: 'Formatul de intrare este detectat automat, iar codurile de timp sunt rescrise pentru formatul de ieșire; etichetele de efecte ASS și trecerile forțate la linie nouă redevin text lizibil la exportul într-un format simplu; fișierele cu versuri nu au câmp pentru ore, așa că ce depășește o oră se adună în minute.',
@@ -1854,7 +1854,7 @@ const SEO_BILINGUAL = {
     /* ⚠️ v0.9.290：文案不再写死「中文」—— 译文可能是英文 / 日文 / 法文。
        kw 里那两条「只留中文」是真实搜索词，留着拉流量；但标题与正文说「译文」。 */
     title: '双语字幕剥离 - 只留译文 / 只留原文 / 拆成两份 | 随心字幕 AI',
-    desc: '免费在线双语字幕剥离：把双语字幕拆成原文一份、译文一份，或者只留其中一种。时间轴原样保留，纯浏览器本地处理，文件不上传服务器。',
+    desc: '免费在线双语字幕剥离：把双语字幕拆成原文一份、译文一份，或者只留其中一种。',
     kw: '双语字幕剥离,双语字幕只留译文,双语字幕只留中文,双语字幕只保留一种语言,双语字幕提取原文,双语字幕拆分,srt双语分离,ass双语字幕拆分,bilingual subtitle splitter',
     intro: '把双语字幕拆成原文一份、译文一份，或者只留其中一种。',
     feat: '支持「一条字幕两行」和「两条字幕同一时间轴」两种双语写法；按先后与文字系统分轨，译文是英文、日文还是法文都成立；时间轴原样保留；整片只有一种语言的字幕会给出提示，不会悄悄删内容。',
@@ -1863,7 +1863,7 @@ const SEO_BILINGUAL = {
   },
   'zh-TW': {
     title: '雙語字幕剝離 - 只留譯文 / 只留原文 / 拆成兩份 | 隨心字幕 AI',
-    desc: '免費線上雙語字幕剝離：把雙語字幕拆成原文一份、譯文一份，或者只留其中一種。時間軸原樣保留，純瀏覽器本地處理，檔案不上傳伺服器。',
+    desc: '免費線上雙語字幕剝離：把雙語字幕拆成原文一份、譯文一份，或者只留其中一種。',
     kw: '雙語字幕剝離,雙語字幕只留譯文,雙語字幕只留中文,雙語字幕只保留一種語言,雙語字幕提取原文,雙語字幕拆分,srt雙語分離,ass雙語字幕拆分,bilingual subtitle splitter',
     intro: '把雙語字幕拆成原文一份、譯文一份，或者只留其中一種。',
     feat: '支援「一條字幕兩行」和「兩條字幕同一時間軸」兩種雙語寫法；依先後與文字系統分軌，譯文是英文、日文還是法文都成立；時間軸原樣保留；整片只有一種語言的字幕會給出提示，不會悄悄刪內容。',
@@ -1872,7 +1872,7 @@ const SEO_BILINGUAL = {
   },
   'en': {
     title: 'Bilingual Subtitle Splitter - Keep Just One Language | AI-SRTSub',
-    desc: 'Free online bilingual subtitle splitter: split a bilingual subtitle file into an original track and a translated track, or keep just one. The timeline is preserved and everything runs in your browser - the file is never uploaded.',
+    desc: 'Free online bilingual subtitle splitter: split a bilingual subtitle file into an original track and a translated track, or keep just one.',
     kw: 'bilingual subtitle splitter,split bilingual srt,remove second language subtitle,keep only english subtitle,extract translated subtitle,srt bilingual split,ass bilingual split',
     intro: 'Split a bilingual subtitle file into an original track and a translated track, or keep just one of them.',
     feat: 'Handles both common layouts - one cue carrying two lines, and two cues sharing the same timeline. Tracks are split by order and script type, the timeline is kept exactly as it is, and a single-language file is flagged instead of being silently emptied.',
@@ -1881,7 +1881,7 @@ const SEO_BILINGUAL = {
   },
   'ja': {
     title: 'バイリンガル字幕の分離 - 原文だけ / 訳文だけ / 二つに分ける | AI-SRTSub',
-    desc: '無料のオンラインツール：二か国語の字幕を原文と訳文に分けます。どちらか一方だけを残すこともできます。タイムラインはそのまま保持され、すべてブラウザ内で処理されます。',
+    desc: '無料のオンラインツール：二か国語の字幕を原文と訳文に分けます。どちらか一方だけを残すこともできます。',
     kw: '字幕 二か国語 分離,字幕 原文だけ,字幕 訳文だけ,バイリンガル字幕 分割,srt 二言語 分離,ass 二言語 字幕',
     intro: '二か国語の字幕を原文と訳文に分け、どちらか一方だけを残すこともできます。',
     feat: '「1 件に 2 行」と「2 件が同じ時間軸」という二つの形式に対応します。文字の種類で仕分けし、時間軸はそのまま保持します。単一言語の字幕はこっそり消さずに警告を出します。',
@@ -1890,7 +1890,7 @@ const SEO_BILINGUAL = {
   },
   'es': {
     title: 'Separar subtítulos bilingües - dejar solo un idioma | AI-SRTSub',
-    desc: 'Herramienta online gratis para separar subtítulos bilingües: divide el archivo en una pista original y una traducida, o quédate solo con una. La línea de tiempo se conserva y todo ocurre en tu navegador.',
+    desc: 'Herramienta online gratis para separar subtítulos bilingües: divide el archivo en una pista original y una traducida, o quédate solo con una.',
     kw: 'separar subtítulos bilingües,dejar solo un idioma subtítulos,quitar segundo idioma subtítulos,srt bilingüe separar,extraer subtítulos traducidos',
     intro: 'Divide unos subtítulos bilingües en una pista original y una traducida, o quédate solo con una de las dos.',
     feat: 'Admite las dos formas habituales: una entrada con dos líneas y dos entradas que comparten la misma línea de tiempo. La separación se hace por tipo de escritura, la línea de tiempo se conserva tal cual y un archivo de un solo idioma avisa en lugar de vaciarse en silencio.',
@@ -1899,7 +1899,7 @@ const SEO_BILINGUAL = {
   },
   'pt': {
     title: 'Separar legendas bilíngues - manter só um idioma | AI-SRTSub',
-    desc: 'Ferramenta online grátis para separar legendas bilíngues: divida o arquivo em uma faixa original e uma traduzida, ou fique só com uma. A linha do tempo é conservada e tudo acontece no seu navegador.',
+    desc: 'Ferramenta online grátis para separar legendas bilíngues: divida o arquivo em uma faixa original e uma traduzida, ou fique só com uma.',
     kw: 'separar legendas bilíngues,manter só um idioma legenda,remover segunda língua legenda,srt bilíngue separar,extrair legenda traduzida',
     intro: 'Divida legendas bilíngues em uma faixa original e uma traduzida, ou fique só com uma das duas.',
     feat: 'Aceita os dois formatos comuns: uma entrada com duas linhas e duas entradas na mesma linha do tempo. A separação é feita pelo tipo de escrita, a linha do tempo fica exatamente igual e um arquivo de um só idioma avisa em vez de esvaziar em silêncio.',
@@ -1908,7 +1908,7 @@ const SEO_BILINGUAL = {
   },
   'ko': {
     title: '이중 언어 자막 분리 - 원문만 / 번역문만 / 두 파일로 | AI-SRTSub',
-    desc: '무료 온라인 이중 언어 자막 분리: 두 언어가 섞인 자막을 원문과 번역문으로 나누거나 둘 중 하나만 남길 수 있습니다. 타임라인은 그대로 유지되고 모든 작업은 브라우저에서 처리됩니다.',
+    desc: '무료 온라인 이중 언어 자막 분리: 두 언어가 섞인 자막을 원문과 번역문으로 나누거나 둘 중 하나만 남길 수 있습니다.',
     kw: '이중 언어 자막 분리,자막 한 언어만 남기기,자막 원문만 추출,자막 번역문만 추출,srt 이중 언어 분리,ass 자막 분리',
     intro: '두 언어가 섞인 자막을 원문과 번역문으로 나누거나, 둘 중 하나만 남길 수 있습니다.',
     feat: '한 항목에 두 줄이 있는 경우와 두 항목이 같은 시간축을 쓰는 경우를 모두 처리합니다. 문자 형태로 분리하며 타임라인은 그대로 유지합니다. 한 언어로만 된 자막은 조용히 지우지 않고 알려 줍니다.',
@@ -1917,7 +1917,7 @@ const SEO_BILINGUAL = {
   },
   'de': {
     title: 'Zweisprachige Untertitel trennen - nur eine Sprache behalten | AI-SRTSub',
-    desc: 'Kostenloses Online-Werkzeug: zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen oder nur eine behalten. Die Zeitachse bleibt erhalten, alles läuft im Browser.',
+    desc: 'Kostenloses Online-Werkzeug: zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen oder nur eine behalten.',
     kw: 'zweisprachige untertitel trennen,nur eine sprache untertitel,zweite sprache entfernen untertitel,srt zweisprachig trennen,untertitel übersetzung extrahieren',
     intro: 'Zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen - oder nur eine von beiden behalten.',
     feat: 'Beide üblichen Varianten werden erkannt: eine Zeile mit zwei Textzeilen und zwei Zeilen mit identischer Zeitachse. Getrennt wird nach Reihenfolge und Schriftart, die Zeitachse bleibt unverändert, und eine einsprachige Datei meldet sich statt stillschweigend leer zu bleiben.',
@@ -1926,7 +1926,7 @@ const SEO_BILINGUAL = {
   },
   'fr': {
     title: 'Séparer les sous-titres bilingues - ne garder qu\'une langue | AI-SRTSub',
-    desc: 'Outil en ligne gratuit : séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez qu\'une seule. La ligne de temps est conservée et tout se passe dans le navigateur.',
+    desc: 'Outil en ligne gratuit : séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez qu\'une seule.',
     kw: 'séparer sous-titres bilingues,garder une seule langue sous-titres,retirer deuxième langue sous-titres,srt bilingue séparer,extraire sous-titres traduits',
     intro: 'Séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez que l\'une des deux.',
     feat: 'Les deux présentations courantes sont gérées : une entrée à deux lignes et deux entrées partageant la même ligne de temps. Le tri se fait selon l\'ordre et le type d\'écriture, la ligne de temps reste intacte, et un fichier monolingue prévient au lieu de se vider en silence.',
@@ -1935,7 +1935,7 @@ const SEO_BILINGUAL = {
   },
   'id': {
     title: 'Pemisah subtitle dwibahasa - simpan satu bahasa saja | AI-SRTSub',
-    desc: 'Alat online gratis untuk memisahkan subtitle dwibahasa: pisahkan menjadi berkas teks asli dan terjemahan, atau simpan salah satunya. Garis waktu tetap utuh dan semuanya berjalan di browser.',
+    desc: 'Alat online gratis untuk memisahkan subtitle dwibahasa: pisahkan menjadi berkas teks asli dan terjemahan, atau simpan salah satunya.',
     kw: 'pisah subtitle dwibahasa,subtitle satu bahasa saja,hapus bahasa kedua subtitle,srt dwibahasa pisah,ekstrak subtitle terjemahan',
     intro: 'Pisahkan subtitle dwibahasa menjadi teks asli dan terjemahan, atau simpan salah satunya saja.',
     feat: 'Mendukung dua bentuk umum: satu entri berisi dua baris, dan dua entri dengan garis waktu yang sama. Pemilahan dilakukan berdasarkan jenis tulisan, garis waktu tetap utuh, dan berkas satu bahasa akan diberi peringatan alih-alih dikosongkan diam-diam.',
@@ -1944,7 +1944,7 @@ const SEO_BILINGUAL = {
   },
   'hi': {
     title: 'द्विभाषी सबटाइटल अलग करें - केवल एक भाषा रखें | AI-SRTSub',
-    desc: 'मुफ़्त ऑनलाइन टूल: द्विभाषी सबटाइटल को मूल और अनूदित हिस्सों में बाँटें, या केवल एक रखें। समयरेखा बनी रहती है और सब कुछ ब्राउज़र में होता है।',
+    desc: '',
     kw: 'द्विभाषी सबटाइटल अलग,सबटाइटल एक भाषा,दूसरी भाषा हटाएं सबटाइटल,srt द्विभाषी अलग करें,अनूदित सबटाइटल निकालें',
     intro: 'द्विभाषी सबटाइटल को मूल और अनूदित हिस्सों में बाँटें, या केवल एक रखें।',
     feat: 'दोनों सामान्य रूप संभाले जाते हैं: एक प्रविष्टि में दो पंक्तियाँ, और दो प्रविष्टियाँ जिनकी समयरेखा एक ही है। बँटवारा लिपि के आधार पर होता है, समयरेखा वैसी ही रहती है, और एकभाषी फ़ाइल चुपचाप खाली होने के बजाय संकेत देती है।',
@@ -1953,7 +1953,7 @@ const SEO_BILINGUAL = {
   },
   'th': {
     title: 'แยกซับไตเติลสองภาษา - เก็บไว้ภาษาเดียว | AI-SRTSub',
-    desc: 'เครื่องมือออนไลน์ฟรีสำหรับแยกซับไตเติลสองภาษา: แยกเป็นต้นฉบับกับคำแปล หรือเก็บไว้เพียงชุดเดียว เส้นเวลายังคงเดิมและทุกอย่างทำงานในเบราว์เซอร์',
+    desc: '',
     kw: 'แยกซับไตเติลสองภาษา,ซับไตเติลภาษาเดียว,ลบภาษาที่สองออกจากซับไตเติล,แยก srt สองภาษา,ดึงซับไตเติลที่แปลแล้ว',
     intro: 'แยกซับไตเติลสองภาษาเป็นต้นฉบับกับคำแปล หรือเก็บไว้เพียงชุดเดียว',
     feat: 'รองรับทั้งสองรูปแบบที่พบบ่อย: หนึ่งรายการที่มีสองบรรทัด และสองรายการที่ใช้เส้นเวลาเดียวกัน แยกตามลักษณะตัวอักษร เส้นเวลาคงเดิมทุกประการ และไฟล์ภาษาเดียวจะแจ้งเตือนแทนที่จะถูกลบเงียบ ๆ',
@@ -1962,7 +1962,7 @@ const SEO_BILINGUAL = {
   },
   'vi': {
     title: 'Tách phụ đề song ngữ - chỉ giữ một ngôn ngữ | AI-SRTSub',
-    desc: 'Công cụ online miễn phí để tách phụ đề song ngữ: chia thành bản gốc và bản dịch, hoặc chỉ giữ một trong hai. Dòng thời gian được giữ nguyên và mọi thứ chạy trong trình duyệt.',
+    desc: 'Công cụ online miễn phí để tách phụ đề song ngữ: chia thành bản gốc và bản dịch, hoặc chỉ giữ một trong hai.',
     kw: 'tách phụ đề song ngữ,phụ đề một ngôn ngữ,bỏ ngôn ngữ thứ hai trong phụ đề,tách srt song ngữ,trích phụ đề đã dịch',
     intro: 'Tách phụ đề song ngữ thành bản gốc và bản dịch, hoặc chỉ giữ một trong hai.',
     feat: 'Xử lý cả hai dạng thường gặp: một mục gồm hai dòng, và hai mục dùng chung một dòng thời gian. Phân loại theo dạng chữ viết, dòng thời gian giữ nguyên, và tệp chỉ có một ngôn ngữ sẽ được cảnh báo thay vì bị xóa âm thầm.',
@@ -1971,7 +1971,7 @@ const SEO_BILINGUAL = {
   },
   'ru': {
     title: 'Разделить двуязычные субтитры - оставить один язык | AI-SRTSub',
-    desc: 'Бесплатный онлайн-инструмент: разделите двуязычные субтитры на оригинал и перевод или оставьте только что-то одно. Временная шкала сохраняется, всё работает в браузере.',
+    desc: 'Бесплатный онлайн-инструмент: разделите двуязычные субтитры на оригинал и перевод или оставьте только что-то одно.',
     kw: 'разделить двуязычные субтитры,оставить один язык субтитры,убрать второй язык субтитры,srt двуязычный разделить,извлечь переведённые субтитры',
     intro: 'Разделите двуязычные субтитры на оригинал и перевод или оставьте только одну из двух частей.',
     feat: 'Поддерживаются оба распространённых вида: одна запись с двумя строками и две записи с одинаковой временной шкалой. Разделение идёт по типу письменности, шкала остаётся без изменений, а одноязычный файл получит предупреждение вместо тихого удаления содержимого.',
@@ -1980,7 +1980,7 @@ const SEO_BILINGUAL = {
   },
   'it': {
     title: 'Separare sottotitoli bilingui - tenere una sola lingua | AI-SRTSub',
-    desc: 'Strumento online gratuito per separare i sottotitoli bilingui: dividili in una traccia originale e una tradotta, oppure tieni solo una delle due. La linea del tempo resta invariata e tutto avviene nel browser.',
+    desc: 'Strumento online gratuito per separare i sottotitoli bilingui: dividili in una traccia originale e una tradotta, oppure tieni solo una delle due.',
     kw: 'separare sottotitoli bilingui,sottotitoli una sola lingua,rimuovere seconda lingua sottotitoli,srt bilingue separare,estrarre sottotitoli tradotti',
     intro: 'Dividi i sottotitoli bilingui in una traccia originale e una tradotta, oppure tieni solo una delle due.',
     feat: 'Gestisce entrambe le forme più comuni: una voce con due righe e due voci che condividono la stessa linea del tempo. La separazione avviene per ordine e tipo di scrittura, la linea del tempo resta identica e un file monolingue avvisa invece di svuotarsi in silenzio.',
@@ -1989,7 +1989,7 @@ const SEO_BILINGUAL = {
   },
   'ar': {
     title: 'فصل الترجمة ثنائية اللغة - الإبقاء على لغة واحدة | AI-SRTSub',
-    desc: 'أداة مجانية على الإنترنت: افصل الترجمة ثنائية اللغة إلى مسار أصلي ومسار مترجم، أو احتفظ بواحد فقط. يبقى الخط الزمني كما هو وكل شيء يعمل في المتصفح.',
+    desc: 'أداة مجانية على الإنترنت: افصل الترجمة ثنائية اللغة إلى مسار أصلي ومسار مترجم، أو احتفظ بواحد فقط.',
     kw: 'فصل الترجمة ثنائية اللغة,ترجمة بلغة واحدة,إزالة اللغة الثانية من الترجمة,فصل srt ثنائي اللغة,استخراج الترجمة المترجمة',
     intro: 'افصل الترجمة ثنائية اللغة إلى مسار أصلي ومسار مترجم، أو احتفظ بواحد فقط منهما.',
     feat: 'يتعامل مع الشكلين الشائعين: مدخل بسطرين، ومدخلان يتشاركان نفس الخط الزمني. يتم الفصل حسب نوع الكتابة، ويبقى الخط الزمني كما هو، والملف بلغة واحدة يُنبّه بدل أن يُفرغ بصمت.',
@@ -1998,7 +1998,7 @@ const SEO_BILINGUAL = {
   },
   'tr': {
     title: 'İki dilli altyazıyı ayır - tek dil bırak | AI-SRTSub',
-    desc: 'Ücretsiz online araç: iki dilli altyazıyı orijinal ve çeviri olarak ayırın ya da sadece birini bırakın. Zaman çizgisi korunur, her şey tarayıcıda olur.',
+    desc: 'Ücretsiz online araç: iki dilli altyazıyı orijinal ve çeviri olarak ayırın ya da sadece birini bırakın.',
     kw: 'iki dilli altyazı ayırma,altyazı tek dil,altyazıdan ikinci dili kaldırma,srt iki dili ayırma,çevrilmiş altyazıyı çıkarma',
     intro: 'İki dilli altyazıyı orijinal ve çeviri olarak ayırın ya da sadece birini bırakın.',
     feat: 'Yaygın iki düzen de desteklenir: iki satırlı tek giriş ve aynı zaman çizgisini paylaşan iki giriş. Ayırma yazı türüne göre yapılır, zaman çizgisi aynı kalır ve tek dilli dosya sessizce boşaltılmak yerine uyarı verir.',
@@ -2007,7 +2007,7 @@ const SEO_BILINGUAL = {
   },
   'nl': {
     title: 'Tweetalige ondertiteling splitsen - één taal houden | AI-SRTSub',
-    desc: 'Gratis online tool: splits tweetalige ondertiteling in een originele en een vertaalde versie, of houd er maar één over. De tijdlijn blijft behouden en alles draait in de browser.',
+    desc: 'Gratis online tool: splits tweetalige ondertiteling in een originele en een vertaalde versie, of houd er maar één over.',
     kw: 'tweetalige ondertiteling splitsen,ondertiteling één taal,tweede taal verwijderen ondertiteling,srt tweetalig splitsen,vertaalde ondertiteling extraheren',
     intro: 'Splits tweetalige ondertiteling in een originele en een vertaalde versie, of houd er maar één over.',
     feat: 'Beide gangbare vormen worden herkend: één item met twee regels en twee items die dezelfde tijdlijn delen. Scheiden gebeurt op volgorde en schrifttype, de tijdlijn blijft gelijk en een eentalig bestand geeft een melding in plaats van stilletjes leeg te raken.',
@@ -2016,7 +2016,7 @@ const SEO_BILINGUAL = {
   },
   'pl': {
     title: 'Podział napisów dwujęzycznych - zostaw jeden język | AI-SRTSub',
-    desc: 'Darmowe narzędzie online: podziel dwujęzyczne napisy na wersję oryginalną i przetłumaczoną albo zostaw tylko jedną. Oś czasu zostaje zachowana, wszystko działa w przeglądarce.',
+    desc: 'Darmowe narzędzie online: podziel dwujęzyczne napisy na wersję oryginalną i przetłumaczoną albo zostaw tylko jedną.',
     kw: 'podział napisów dwujęzycznych,napisy tylko w jednym języku,usuń drugi język z napisów,podział srt dwujęzyczny,wyodrębnij przetłumaczone napisy',
     intro: 'Podziel dwujęzyczne napisy na wersję oryginalną i przetłumaczoną albo zostaw tylko jedną z nich.',
     feat: 'Obsługuje obie popularne postacie: jedną pozycję z dwoma wierszami oraz dwie pozycje na tej samej osi czasu. Podział idzie po rodzaju pisma, oś czasu zostaje bez zmian, a plik jednojęzyczny dostaje ostrzeżenie zamiast zostać po cichu opróżniony.',
@@ -2025,7 +2025,7 @@ const SEO_BILINGUAL = {
   },
   'sv': {
     title: 'Dela tvåspråkig undertext - behåll ett språk | AI-SRTSub',
-    desc: 'Gratis online-verktyg: dela tvåspråkig undertext i en original- och en översättningsdel, eller behåll bara en. Tidslinjen bevaras och allt sker i webbläsaren.',
+    desc: 'Gratis online-verktyg: dela tvåspråkig undertext i en original- och en översättningsdel, eller behåll bara en.',
     kw: 'dela tvåspråkig undertext,undertext ett språk,ta bort andra språket undertext,dela srt tvåspråkig,extrahera översatt undertext',
     intro: 'Dela tvåspråkig undertext i en original- och en översättningsdel, eller behåll bara en av dem.',
     feat: 'Båda vanliga varianterna hanteras: en post med två rader och två poster som delar samma tidslinje. Uppdelningen sker efter ordning och skrifttyp, tidslinjen lämnas orörd och en enspråkig fil varnar i stället för att tömmas i tysthet.',
@@ -2034,7 +2034,7 @@ const SEO_BILINGUAL = {
   },
   'cs': {
     title: 'Rozdělit dvojjazyčné titulky - ponechat jeden jazyk | AI-SRTSub',
-    desc: 'Zdarma online nástroj: rozděl dvojjazyčné titulky na originál a překlad, nebo ponech jen jednu část. Časová osa zůstává zachována a vše běží v prohlížeči.',
+    desc: 'Zdarma online nástroj: rozděl dvojjazyčné titulky na originál a překlad, nebo ponech jen jednu část.',
     kw: 'rozdělit dvojjazyčné titulky,titulky jen jeden jazyk,odstranit druhý jazyk titulek,rozdělit srt dvojjazyčné,extrahovat přeložené titulky',
     intro: 'Rozděl dvojjazyčné titulky na originál a překlad, nebo ponech jen jednu z obou částí.',
     feat: 'Zvládá obě běžné podoby: jednu položku se dvěma řádky a dvě položky sdílející stejnou časovou osu. Dělení probíhá podle typu písma, časová osa zůstává beze změny a jednojazyčný soubor upozorní místo aby se potichu vyprázdnil.',
@@ -2043,7 +2043,7 @@ const SEO_BILINGUAL = {
   },
   'uk': {
     title: 'Розділити двомовні субтитри - залишити одну мову | AI-SRTSub',
-    desc: 'Безкоштовний онлайн-інструмент: розділіть двомовні субтитри на оригінал і переклад або залиште лише щось одне. Часова шкала зберігається, усе працює у браузері.',
+    desc: 'Безкоштовний онлайн-інструмент: розділіть двомовні субтитри на оригінал і переклад або залиште лише щось одне.',
     kw: 'розділити двомовні субтитри,субтитри однією мовою,прибрати другу мову з субтитрів,розділити srt двомовний,витягти перекладені субтитри',
     intro: 'Розділіть двомовні субтитри на оригінал і переклад або залиште лише одну з двох частин.',
     feat: 'Підтримуються обидва поширені варіанти: один запис із двома рядками та два записи з однаковою часовою шкалою. Розділення йде за типом письма, шкала лишається незмінною, а одномовний файл попередить замість тихого спорожнення.',
@@ -2052,7 +2052,7 @@ const SEO_BILINGUAL = {
   },
   'da': {
     title: 'Del tosprogede undertekster - behold ét sprog | AI-SRTSub',
-    desc: 'Gratis online værktøj: del tosprogede undertekster op i en original og en oversat udgave, eller behold kun den ene. Tidslinjen bevares, og det hele foregår i browseren.',
+    desc: 'Gratis online værktøj: del tosprogede undertekster op i en original og en oversat udgave, eller behold kun den ene.',
     kw: 'del tosprogede undertekster,undertekster ét sprog,fjern andet sprog undertekster,del srt tosproget,udtræk oversatte undertekster',
     intro: 'Del tosprogede undertekster op i en original og en oversat udgave, eller behold kun den ene af dem.',
     feat: 'Begge almindelige varianter håndteres: én post med to linjer og to poster der deler samme tidslinje. Opdelingen sker efter rækkefølge og skrifttype, tidslinjen forbliver uændret, og en etsproget fil giver besked i stedet for at blive tømt i stilhed.',
@@ -2061,7 +2061,7 @@ const SEO_BILINGUAL = {
   },
   'fi': {
     title: 'Jaa kaksikieliset tekstitykset - jätä vain yksi kieli | AI-SRTSub',
-    desc: 'Ilmainen verkkotyökalu: jaa kaksikieliset tekstitykset alkuperäiseen ja käännettyyn osaan tai jätä vain toinen. Aikajana säilyy ja kaikki tapahtuu selaimessa.',
+    desc: 'Ilmainen verkkotyökalu: jaa kaksikieliset tekstitykset alkuperäiseen ja käännettyyn osaan tai jätä vain toinen.',
     kw: 'jaa kaksikieliset tekstitykset,tekstitykset yhdellä kielellä,poista toinen kieli tekstityksistä,jaa srt kaksikielinen,poimi käännetyt tekstitykset',
     intro: 'Jaa kaksikieliset tekstitykset alkuperäiseen ja käännettyyn osaan tai jätä vain toinen niistä.',
     feat: 'Molemmat yleiset muodot tunnistetaan: yksi merkintä, jossa on kaksi riviä, ja kaksi merkintää samalla aikajanalla. Jako tehdään kirjoitusmerkkien perusteella, aikajana pysyy muuttumattomana, ja yksikielinen tiedosto varoittaa sen sijaan että tyhjenisi hiljaa.',
@@ -2070,7 +2070,7 @@ const SEO_BILINGUAL = {
   },
   'el': {
     title: 'Διαχωρισμός δίγλωσσων υποτίτλων - κράτα μία γλώσσα | AI-SRTSub',
-    desc: 'Δωρεάν εργαλείο στο διαδίκτυο: χώρισε δίγλωσσους υπότιτλους σε πρωτότυπο και μετάφραση ή κράτα μόνο το ένα. Η γραμμή χρόνου διατηρείται και όλα γίνονται στον περιηγητή.',
+    desc: 'Δωρεάν εργαλείο στο διαδίκτυο: χώρισε δίγλωσσους υπότιτλους σε πρωτότυπο και μετάφραση ή κράτα μόνο το ένα.',
     kw: 'διαχωρισμός δίγλωσσων υποτίτλων,υπότιτλοι μία γλώσσα,αφαίρεση δεύτερης γλώσσας υποτίτλων,διαχωρισμός srt δίγλωσσο,εξαγωγή μεταφρασμένων υποτίτλων',
     intro: 'Χώρισε δίγλωσσους υπότιτλους σε πρωτότυπο και μετάφραση ή κράτα μόνο το ένα από τα δύο.',
     feat: 'Υποστηρίζονται και οι δύο συνηθισμένες μορφές: μία καταχώρηση με δύο γραμμές και δύο καταχωρήσεις που μοιράζονται την ίδια γραμμή χρόνου. Ο διαχωρισμός γίνεται με βάση το είδος γραφής, η γραμμή χρόνου μένει ακριβώς ίδια και ένα μονόγλωσσο αρχείο ειδοποιεί αντί να αδειάσει σιωπηλά.',
@@ -2079,7 +2079,7 @@ const SEO_BILINGUAL = {
   },
   'he': {
     title: 'פיצול כתוביות דו-לשוניות - להשאיר שפה אחת | AI-SRTSub',
-    desc: 'כלי מקוון חינמי: פצל כתוביות דו-לשוניות למקור ולתרגום או השאר רק אחד מהם. ציר הזמן נשמר והכול מתבצע בדפדפן.',
+    desc: 'כלי מקוון חינמי: פצל כתוביות דו-לשוניות למקור ולתרגום או השאר רק אחד מהם.',
     kw: 'פיצול כתוביות דו לשוניות,כתוביות בשפה אחת,הסרת השפה השנייה מכתוביות,פיצול srt דו לשוני,חילוץ כתוביות מתורגמות',
     intro: 'פצל כתוביות דו-לשוניות למקור ולתרגום או השאר רק אחד מהם.',
     feat: 'שתי הצורות הנפוצות נתמכות: רשומה אחת עם שתי שורות ושתי רשומות שחולקות את אותו ציר זמן. ההפרדה נעשית לפי סוג הכתב, ציר הזמן נשאר כמו שהוא, וקובץ חד-לשוני יתריע במקום להתרוקן בשקט.',
@@ -2088,7 +2088,7 @@ const SEO_BILINGUAL = {
   },
   'ro': {
     title: 'Împărțirea subtitrărilor bilingve - păstrează o singură limbă | AI-SRTSub',
-    desc: 'Instrument online gratuit: împarte subtitrările bilingve într-o versiune originală și una tradusă sau păstrează doar una. Linia de timp rămâne intactă și totul se întâmplă în browser.',
+    desc: 'Instrument online gratuit: împarte subtitrările bilingve într-o versiune originală și una tradusă sau păstrează doar una.',
     kw: 'împărțire subtitrări bilingve,subtitrări o singură limbă,elimină a doua limbă subtitrări,împarte srt bilingv,extrage subtitrări traduse',
     intro: 'Împarte subtitrările bilingve într-o versiune originală și una tradusă sau păstrează doar una dintre ele.',
     feat: 'Sunt tratate ambele forme uzuale: o intrare cu două rânduri și două intrări care împart aceeași linie de timp. Separarea se face după tipul de scriere, linia de timp rămâne neschimbată, iar un fișier într-o singură limbă avertizează în loc să se golească pe tăcute.',
@@ -2101,7 +2101,7 @@ const SEO_BILINGUAL = {
 const SEO_SHIFT = {
   'zh-CN': {
     title: '字幕时间轴调整 - 整体平移 / 倍率缩放 / 两点校正 / 合并与拆分 | 随心字幕 AI',
-    desc: '免费在线字幕时间轴调整：整体提前或延后、按倍率缩放、两点校正一次对上。支持 SRT、VTT、ASS、SBV、LRC、TXT，纯浏览器本地处理，文件不上传服务器。',
+    desc: '免费在线字幕时间轴调整：整体提前或延后、按倍率缩放、两点校正一次对上。',
     kw: '字幕时间轴调整,字幕时间轴平移,字幕延迟调整,srt时间轴校正,字幕对不上,字幕快慢调整,ass时间轴调整,字幕时间轴缩放,subtitle timing shift,字幕合并,字幕拆分,srt字幕合并,字幕太长拆分,双语字幕合并',
     intro: '字幕和画面对不上时，把时间轴整体提前或延后、按倍率缩放，或者用两点校正一次对上。还能合并碎片、拆分长句。',
     feat: '平移只改位置、不动每条字幕的时长；倍率缩放会把时长同步缩放，适合 24 帧与 25 帧互转这类场景；两点校正针对既有偏移又有速率差的字幕。算出来是负数的时间会截断到 0，并告诉你有几条受影响。 进来什么格式就出去什么格式，不做格式转换；ASS 的样式表和每条的样式、特效标记都原样保留。双语字幕合并时保持原文一行、译文一行，拆分时整条跳过。',
@@ -2110,7 +2110,7 @@ const SEO_SHIFT = {
   },
   'zh-TW': {
     title: '字幕時間軸調整 - 整體平移 / 倍率縮放 / 兩點校正 / 合併與拆分 | 隨心字幕 AI',
-    desc: '免費線上字幕時間軸調整：整體提前或延後、依倍率縮放、兩點校正一次對上。支援 SRT、VTT、ASS、SBV、LRC、TXT，純瀏覽器本地處理，檔案不上傳伺服器。',
+    desc: '免費線上字幕時間軸調整：整體提前或延後、依倍率縮放、兩點校正一次對上。',
     kw: '字幕時間軸調整,字幕時間軸平移,字幕延遲調整,srt時間軸校正,字幕對不上,字幕快慢調整,ass時間軸調整,字幕時間軸縮放,subtitle timing shift,字幕合併,字幕拆分,srt字幕合併,字幕太長拆分,雙語字幕合併',
     intro: '字幕和畫面對不上時，把時間軸整體提前或延後、依倍率縮放，或用兩點校正一次對上。還能合併碎片、拆分長句。',
     feat: '平移只改位置、不動每條字幕的長度；倍率縮放會讓長度同步縮放，適合 24 幀與 25 幀互轉這類情境；兩點校正針對既有偏移又有速率差的字幕。算出來的時間若為負數會截到 0，並告訴你有幾條受影響。 進來什麼格式就出去什麼格式，不做格式轉換；ASS 的樣式表和每條的樣式、特效標記都原樣保留。雙語字幕合併時保持原文一行、譯文一行，拆分時整條跳過。',
@@ -2119,7 +2119,7 @@ const SEO_SHIFT = {
   },
   'en': {
     title: 'Subtitle Timeline Shift - Move, Rescale or Fix Drift / Merge and split | AI-SRTSub',
-    desc: 'Free online subtitle timing tool: shift everything at once, rescale by a ratio, or fix drift with two anchor points. Works with SRT, VTT, ASS, SBV, LRC and TXT. Runs in your browser - the file is never uploaded.',
+    desc: 'Free online subtitle timing tool: shift everything at once, rescale by a ratio, or fix drift with two anchor points. Works with SRT, VTT, ASS, SBV, LRC and TXT.',
     kw: 'subtitle timing shift,shift srt timing,subtitle sync adjust,rescale subtitle timing,fix subtitle delay,srt time offset,subtitle drift fix,merge subtitles,split subtitles,combine srt,split long subtitle',
     intro: 'When subtitles are out of sync, move the whole timeline, rescale it by a ratio, or fix it with two anchor points. It can also merge lines that were split apart, and split ones that run too long.',
     feat: 'Shifting moves every cue without changing how long each one stays on screen. Rescaling multiplies both ends, so cue length changes with it - handy between 24 and 25 fps. The two-point fix handles files that are both offset and running at the wrong speed. Times that come out negative are clamped to zero, and the tool tells you how many were affected. Same format in, same format out - no conversion, and ASS styles, per-line styling and effect tags are kept exactly as they were. Bilingual cues stay on two lines when merged and are skipped when splitting.',
@@ -2128,7 +2128,7 @@ const SEO_SHIFT = {
   },
   'ja': {
     title: '字幕タイムライン調整 - 一括移動 / 倍率伸縮 / 2 点補正 / 結合と分割 | AI-SRTSub',
-    desc: '無料のオンラインツール：字幕のタイムラインを一括でずらす、倍率で伸縮する、2 点で補正できます。SRT、VTT、ASS、SBV、LRC、TXT に対応し、ブラウザ内だけで処理されます。',
+    desc: '無料のオンラインツール：字幕のタイムラインを一括でずらす、倍率で伸縮する、2 点で補正できます。',
     kw: '字幕 タイムライン 調整,字幕 ずらす,srt 時間 調整,字幕 遅れ 修正,字幕 早い 遅い,ass タイムライン,subtitle timing shift,字幕結合,字幕分割,srt結合,長い字幕分割',
     intro: '字幕が映像とずれるとき、タイムラインを一括で動かす、倍率で伸縮する、2 点で補正できます。 細切れになった行をまとめたり、長すぎる行を分割したりもできます。',
     feat: '一括移動は各字幕の表示時間を変えずに位置だけ動かします。倍率は開始と終了の両方にかかるため表示時間も変わります（24fps と 25fps の違いに最適）。2 点補正はずれと速度差が両方ある字幕に対応します。負の時間になった行は 0 に丸められ、件数が表示されます。 入れた形式のまま出力します。変換は行わず、ASS のスタイルや各行のスタイル、タグもそのまま残ります。二言語の字幕は結合しても二行のまま、分割時は対象から外れます。',
@@ -2137,7 +2137,7 @@ const SEO_SHIFT = {
   },
   'es': {
     title: 'Ajuste de tiempos de subtítulos - desplazar, escalar o corregir / Unir y dividir | AI-SRTSub',
-    desc: 'Herramienta online gratis: desplaza todos los tiempos, reescala con un factor o corrige con dos puntos. Funciona con SRT, VTT, ASS, SBV, LRC y TXT. Se ejecuta en tu navegador: el archivo nunca se sube.',
+    desc: 'Herramienta online gratis: desplaza todos los tiempos, reescala con un factor o corrige con dos puntos. Funciona con SRT, VTT, ASS, SBV, LRC y TXT.',
     kw: 'ajustar tiempo subtítulos,desplazar subtítulos srt,sincronizar subtítulos,corregir retraso subtítulos,reescalar subtítulos,srt tiempo desfase,unir subtítulos,dividir subtítulos,combinar srt,subtítulo largo dividir',
     intro: 'Cuando los subtítulos no van sincronizados, desplaza toda la línea de tiempo, reescala con un factor o corrígela con dos puntos. También une las líneas partidas y divide las demasiado largas.',
     feat: 'Desplazar mueve cada línea sin cambiar cuánto tiempo se muestra. Reescalar multiplica el inicio y el fin, así que la duración cambia: útil entre 24 y 25 fps. La corrección de dos puntos sirve para archivos con desfase y velocidad distinta. Los tiempos negativos se fijan en cero y se indica cuántas líneas se vieron afectadas. Entra y sale en el mismo formato: no hay conversión y se conservan los estilos, el formato de cada línea y las etiquetas del ASS. Los subtítulos bilingües siguen en dos líneas al unirse y se omiten al dividir.',
@@ -2146,7 +2146,7 @@ const SEO_SHIFT = {
   },
   'pt': {
     title: 'Ajuste de tempo das legendas - mover, escalar ou corrigir / Unir e dividir | AI-SRTSub',
-    desc: 'Ferramenta online grátis: desloque tudo de uma vez, reescale com um fator ou corrija com dois pontos. Funciona com SRT, VTT, ASS, SBV, LRC e TXT. Roda no seu navegador: o arquivo nunca é enviado.',
+    desc: 'Ferramenta online grátis: desloque tudo de uma vez, reescale com um fator ou corrija com dois pontos. Funciona com SRT, VTT, ASS, SBV, LRC e TXT.',
     kw: 'ajustar tempo legendas,deslocar legenda srt,sincronizar legendas,corrigir atraso legenda,reescalar legenda,srt tempo deslocado,unir legendas,dividir legendas,combinar srt,legenda longa dividir',
     intro: 'Quando as legendas estão fora de sincronia, mova toda a linha do tempo, reescale com um fator ou corrija com dois pontos. Também une as linhas partidas e divide as longas demais.',
     feat: 'Deslocar move cada linha sem mudar quanto tempo ela fica na tela. Reescalar multiplica o início e o fim, então a duração muda: útil entre 24 e 25 fps. A correção de dois pontos atende arquivos com deslocamento e velocidade diferente. Tempos negativos vão a zero e a ferramenta informa quantas linhas foram afetadas. Entra e sai no mesmo formato: não há conversão e os estilos, a formatação de cada linha e as tags do ASS são mantidos. As legendas bilíngues continuam em duas linhas ao unir e são ignoradas ao dividir.',
@@ -2155,7 +2155,7 @@ const SEO_SHIFT = {
   },
   'ko': {
     title: '자막 타임라인 조정 - 이동 / 배율 / 두 지점 보정 / 병합과 분할 | AI-SRTSub',
-    desc: '무료 온라인 자막 시간 조정 도구: 한꺼번에 이동, 배율 조정, 두 지점 보정을 지원합니다. SRT, VTT, ASS, SBV, LRC, TXT 를 처리하며 브라우저에서만 실행됩니다.',
+    desc: '무료 온라인 자막 시간 조정 도구: 한꺼번에 이동, 배율 조정, 두 지점 보정을 지원합니다.',
     kw: '자막 시간 조정,자막 싱크 맞추기,srt 시간 조정,자막 밀림 수정,자막 빠르게 느리게,ass 타임라인,subtitle timing shift,자막 병합,자막 분할,srt 병합,긴 자막 분할',
     intro: '자막이 영상과 맞지 않을 때 타임라인을 한꺼번에 옮기거나 배율로 조정하거나 두 지점으로 보정하세요. 잘게 나뉜 줄을 합치고, 너무 긴 줄을 나눌 수도 있습니다.',
     feat: '이동은 각 자막의 표시 시간을 바꾸지 않고 위치만 옮깁니다. 배율은 시작과 끝을 모두 곱하므로 길이도 함께 바뀝니다(24fps와 25fps 사이에 유용). 두 지점 보정은 밀림과 속도 차이가 모두 있는 파일에 적합합니다. 음수가 된 시간은 0으로 처리되고 몇 줄이 영향을 받았는지 알려 줍니다. 들어온 형식 그대로 나갑니다. 변환하지 않으며 ASS 스타일과 각 줄의 서식, 태그가 그대로 유지됩니다. 이중 언어 자막은 합쳐도 두 줄을 유지하고 분할할 때는 건너뜁니다.',
@@ -2164,7 +2164,7 @@ const SEO_SHIFT = {
   },
   'de': {
     title: 'Zeitachse der Untertitel anpassen - verschieben, skalieren, korrigieren / Zusammenfuhren und Teilen | AI-SRTSub',
-    desc: 'Kostenloses Online-Werkzeug: alles gemeinsam verschieben, mit einem Faktor skalieren oder mit zwei Punkten korrigieren. Für SRT, VTT, ASS, SBV, LRC und TXT. Läuft im Browser - die Datei wird nie hochgeladen.',
+    desc: 'Kostenloses Online-Werkzeug: alles gemeinsam verschieben, mit einem Faktor skalieren oder mit zwei Punkten korrigieren. Für SRT, VTT, ASS, SBV, LRC und TXT.',
     kw: 'Untertitel Zeitachse anpassen,Untertitel verschieben,srt Zeit korrigieren,Untertitel Versatz,Untertitel zu schnell,ass Zeitachse,Untertitel zusammenführen,Untertitel teilen,srt zusammenfügen,lange Untertitel teilen',
     intro: 'Wenn die Untertitel nicht passen: ganze Zeitachse verschieben, mit einem Faktor skalieren oder mit zwei Punkten korrigieren. Es führt auch zerschnittene Zeilen zusammen und teilt zu lange.',
     feat: 'Verschieben bewegt jede Zeile, ohne ihre Anzeigedauer zu ändern. Skalieren multipliziert Anfang und Ende, also ändert sich die Dauer - praktisch zwischen 24 und 25 fps. Die Zwei-Punkt-Korrektur greift bei Versatz und falscher Geschwindigkeit. Negative Zeiten werden auf 0 gesetzt, und es wird angezeigt, wie viele Zeilen betroffen sind. Gleiches Format rein, gleiches Format raus - es wird nichts konvertiert, und ASS-Stile, Zeilenformatierung und Effekt-Tags bleiben unverändert. Zweisprachige Zeilen bleiben beim Zusammenführen zweizeilig und werden beim Teilen übersprungen.',
@@ -2173,7 +2173,7 @@ const SEO_SHIFT = {
   },
   'fr': {
     title: 'Décalage des sous-titres - déplacer, mettre à l\'échelle ou corriger | AI-SRTSub',
-    desc: 'Outil en ligne gratuit : décalez tout d\'un coup, redimensionnez avec un facteur ou corrigez avec deux points. Fonctionne avec SRT, VTT, ASS, SBV, LRC et TXT. Tout se passe dans le navigateur : le fichier n\'est jamais envoyé.',
+    desc: 'Outil en ligne gratuit : décalez tout d\'un coup, redimensionnez avec un facteur ou corrigez avec deux points. Fonctionne avec SRT, VTT, ASS, SBV, LRC et TXT.',
     kw: 'décaler sous-titres,ajuster temps sous-titres,synchroniser sous-titres,corriger retard sous-titres,srt décalage horaire,sous-titres décalés,fusionner sous-titres,diviser sous-titres,combinaison srt,sous-titre long diviser',
     intro: 'Quand les sous-titres ne sont pas synchronisés, déplacez toute la ligne de temps, redimensionnez avec un facteur ou corrigez avec deux points. Il peut aussi fusionner les lignes morcelées et diviser les trop longues.',
     feat: 'Le décalage déplace chaque ligne sans changer sa durée d\'affichage. La mise à l\'échelle multiplie le début et la fin, la durée change donc aussi - pratique entre 24 et 25 i/s. La correction à deux points traite les fichiers à la fois décalés et à la mauvaise vitesse. Les temps négatifs sont ramenés à zéro, avec le nombre de lignes concernées. Même format en entrée et en sortie : aucune conversion, et les styles ASS, la mise en forme de chaque ligne et les balises restent intactes. Les sous-titres bilingues gardent deux lignes à la fusion et sont ignorés à la division.',
@@ -2182,7 +2182,7 @@ const SEO_SHIFT = {
   },
   'id': {
     title: 'Penyesuaian waktu subtitle - geser, skala, atau koreksi / Fusionner et diviser / Gabung dan pisah | AI-SRTSub',
-    desc: 'Alat online gratis: geser semuanya sekaligus, ubah skala dengan faktor, atau koreksi dengan dua titik. Mendukung SRT, VTT, ASS, SBV, LRC, dan TXT. Berjalan di browser Anda - file tidak pernah diunggah.',
+    desc: 'Alat online gratis: geser semuanya sekaligus, ubah skala dengan faktor, atau koreksi dengan dua titik. Mendukung SRT, VTT, ASS, SBV, LRC, dan TXT.',
     kw: 'sesuaikan waktu subtitle,geser subtitle srt,sinkronkan subtitle,perbaiki subtitle telat,ubah skala subtitle,srt waktu bergeser,gabung subtitle,pisah subtitle,gabung srt,subtitle panjang dipisah',
     intro: 'Saat subtitle tidak sinkron, geser seluruh timeline, ubah skalanya dengan faktor, atau koreksi dengan dua titik. Juga bisa menggabungkan baris yang terpecah dan memisahkan yang terlalu panjang.',
     feat: 'Menggeser memindahkan setiap baris tanpa mengubah durasi tayangnya. Mengubah skala mengalikan awal dan akhir, jadi durasinya ikut berubah - berguna antara 24 dan 25 fps. Koreksi dua titik menangani file yang bergeser sekaligus meleset kecepatannya. Waktu yang menjadi negatif dikembalikan ke 0 dan jumlah baris yang terdampak diberitahukan. Format yang masuk sama dengan yang keluar, tanpa konversi; gaya ASS, format tiap baris, dan tag tetap dipertahankan. Subtitle dwibahasa tetap dua baris saat digabung dan dilewati saat dipisah.',
@@ -2191,7 +2191,7 @@ const SEO_SHIFT = {
   },
   'hi': {
     title: 'सबटाइटल समय समायोजन - खिसकाएँ, स्केल करें या ठीक करें / मिलाना और बाँटना | AI-SRTSub',
-    desc: 'मुफ़्त ऑनलाइन टूल: सब कुछ एक साथ खिसकाएँ, किसी गुणक से स्केल करें, या दो बिंदुओं से ठीक करें। SRT, VTT, ASS, SBV, LRC और TXT चलता है। आपके ब्राउज़र में चलता है - फ़ाइल अपलोड नहीं होती।',
+    desc: '',
     kw: 'सबटाइटल समय समायोजन,सबटाइटल सिंक,srt समय सुधार,सबटाइटल देरी,सबटाइटल स्केल,ass टाइमलाइन,सबटाइटल मिलाना,सबटाइटल बाँटना,srt मिलाना,लंबी सबटाइटल बाँटें',
     intro: 'जब सबटाइटल मेल न खाएँ, पूरी समय रेखा खिसकाएँ, गुणक से स्केल करें, या दो बिंदुओं से ठीक करें। छोटी-छोटी पंक्तियों को मिलाया और बहुत लंबी पंक्तियों को बाँटा भी जा सकता है।',
     feat: 'खिसकाने से हर पंक्ति की प्रदर्शन अवधि बदले बिना समय बदलता है। स्केलिंग से शुरू और अंत दोनों गुणा होते हैं, इसलिए अवधि भी बदलती है - 24 और 25 fps के बीच काम का। दो-बिंदु सुधार उन फ़ाइलों के लिए है जिनमें खिसकाव और गलत गति दोनों हैं। ऋणात्मक समय 0 कर दिया जाता है और बताया जाता है कि कितनी पंक्तियाँ प्रभावित हुईं। जैसा फ़ॉर्मैट अंदर जाता है, वैसा ही बाहर आता है — कोई रूपांतरण नहीं, और ASS की स्टाइल, हर पंक्ति की फ़ॉर्मैटिंग और टैग ज्यों के त्यों रहते हैं। द्विभाषी सबटाइटल मिलाने पर दो पंक्तियों में रहते हैं और बाँटते समय छोड़ दिए जाते हैं।',
@@ -2200,7 +2200,7 @@ const SEO_SHIFT = {
   },
   'th': {
     title: 'ปรับไทม์ไลน์ซับไตเติล - เลื่อน, ปรับสัดส่วน หรือแก้ด้วยสองจุด / รวมและแบ่ง | AI-SRTSub',
-    desc: 'เครื่องมือออนไลน์ฟรี: เลื่อนทั้งหมดพร้อมกัน ปรับสัดส่วนด้วยอัตรา หรือแก้ด้วยจุดอ้างอิงสองจุด รองรับ SRT, VTT, ASS, SBV, LRC และ TXT ทำงานในเบราว์เซอร์ของคุณ - ไฟล์ไม่ถูกอัปโหลด',
+    desc: '',
     kw: 'ปรับเวลาซับไตเติล,เลื่อนซับไตเติล,ซิงค์ซับไตเติล,แก้ซับไตเติลช้า,ปรับสัดส่วนซับไตเติล,srt เวลาเพี้ยน,รวมซับไตเติล,แบ่งซับไตเติล,รวม srt,แบ่งซับไตเติลยาว',
     intro: 'เมื่อซับไตเติลไม่ตรงกับภาพ ให้เลื่อนทั้งไทม์ไลน์ ปรับสัดส่วนด้วยอัตรา หรือแก้ด้วยจุดอ้างอิงสองจุด ยังรวมบรรทัดที่แตกเป็นชิ้นเล็กชิ้นน้อยและแบ่งบรรทัดที่ยาวเกินไปได้',
     feat: 'การเลื่อนจะขยับทุกบรรทัดโดยไม่เปลี่ยนระยะเวลาที่แสดง การปรับสัดส่วนคูณทั้งเวลาเริ่มและจบ จึงเปลี่ยนความยาวด้วย - เหมาะระหว่าง 24 กับ 25 fps การแก้สองจุดจัดการไฟล์ที่ทั้งเพี้ยนและความเร็วไม่ตรง เวลาที่ติดลบจะถูกตั้งเป็น 0 และแจ้งจำนวนบรรทัดที่ได้รับผล ฟอร์แมตที่เข้าและออกเหมือนกัน ไม่มีการแปลงรูปแบบ สไตล์ ASS การจัดรูปแบบของแต่ละบรรทัดและแท็กยังคงเดิม คำบรรยายสองภาษาเมื่อรวมจะอยู่สองบรรทัด และข้ามเมื่อแบ่ง',
@@ -2209,7 +2209,7 @@ const SEO_SHIFT = {
   },
   'vi': {
     title: 'Chỉnh thời gian phụ đề - dời, đổi tỷ lệ hoặc sửa hai điểm / Gộp và tách | AI-SRTSub',
-    desc: 'Công cụ online miễn phí: dời tất cả cùng lúc, đổi tỷ lệ theo hệ số, hoặc sửa bằng hai điểm. Hỗ trợ SRT, VTT, ASS, SBV, LRC và TXT. Chạy trong trình duyệt của bạn - tệp không bao giờ được tải lên.',
+    desc: 'Công cụ online miễn phí: dời tất cả cùng lúc, đổi tỷ lệ theo hệ số, hoặc sửa bằng hai điểm. Hỗ trợ SRT, VTT, ASS, SBV, LRC và TXT.',
     kw: 'chinh thoi gian phu de,dời phụ đề srt,đồng bộ phụ đề,sửa phụ đề trễ,đổi tỷ lệ phụ đề,srt lệch thời gian,gộp phụ đề,tách phụ đề,gộp srt,tách phụ đề dài',
     intro: 'Khi phụ đề không khớp hình, hãy dời toàn bộ trục thời gian, đổi tỷ lệ theo hệ số hoặc sửa bằng hai điểm. Cũng có thể gộp các dòng bị vụn và tách những dòng quá dài.',
     feat: 'Dời chuyển từng dòng mà không đổi thời lượng hiển thị. Đổi tỷ lệ nhân cả thời điểm bắt đầu và kết thúc, nên thời lượng cũng đổi - hữu ích giữa 24 và 25 fps. Sửa hai điểm xử lý tệp vừa lệch vừa sai tốc độ. Thời gian âm được đưa về 0 và công cụ cho biết có bao nhiêu dòng bị ảnh hưởng. Định dạng đầu ra giống đầu vào, không chuyển đổi; style ASS, định dạng từng dòng và thẻ đều giữ nguyên. Phụ đề song ngữ khi gộp vẫn giữ hai dòng và được bỏ qua khi tách.',
@@ -2218,7 +2218,7 @@ const SEO_SHIFT = {
   },
   'ru': {
     title: 'Сдвиг времени субтитров - сдвинуть, масштабировать или исправить / Объединение и разбиение | AI-SRTSub',
-    desc: 'Бесплатный онлайн-инструмент: сдвиньте всё сразу, измените масштаб коэффициентом или исправьте по двум точкам. Работает с SRT, VTT, ASS, SBV, LRC и TXT. Всё в вашем браузере - файл никогда не загружается.',
+    desc: 'Бесплатный онлайн-инструмент: сдвиньте всё сразу, измените масштаб коэффициентом или исправьте по двум точкам. Работает с SRT, VTT, ASS, SBV, LRC и TXT.',
     kw: 'сдвиг субтитров,синхронизация субтитров,srt сдвиг времени,субтитры отстают,субтитры спешат,масштаб субтитров,объединить субтитры,разбить субтитры,склеить srt,длинные субтитры разбить',
     intro: 'Когда субтитры не совпадают с видео, сдвиньте всю временную шкалу, измените её коэффициентом или исправьте по двум точкам. А ещё объединяет раздробленные строки и разбивает слишком длинные.',
     feat: 'Сдвиг перемещает каждую строку, не меняя, сколько она остаётся на экране. Масштабирование умножает и начало, и конец, поэтому меняется и длительность - удобно между 24 и 25 кадр/с. Коррекция по двум точкам подходит для файлов с одновременным сдвигом и неверной скоростью. Отрицательное время обнуляется, и показывается, сколько строк затронуто. Формат на выходе тот же, что на входе: преобразования нет, стили ASS, оформление каждой строки и теги сохраняются. Двуязычные строки при объединении остаются в две строки, а при разбиении пропускаются.',
@@ -2227,7 +2227,7 @@ const SEO_SHIFT = {
   },
   'it': {
     title: 'Regolazione dei tempi dei sottotitoli - sposta, riscala o correggi / Unisci e dividi | AI-SRTSub',
-    desc: 'Strumento online gratuito: sposta tutto insieme, riscala con un fattore o correggi con due punti. Funziona con SRT, VTT, ASS, SBV, LRC e TXT. Gira nel tuo browser: il file non viene mai caricato.',
+    desc: 'Strumento online gratuito: sposta tutto insieme, riscala con un fattore o correggi con due punti. Funziona con SRT, VTT, ASS, SBV, LRC e TXT.',
     kw: 'regolare tempi sottotitoli,spostare sottotitoli srt,sincronizzare sottotitoli,correggere ritardo sottotitoli,riscalare sottotitoli,srt tempo sfalsato,unire sottotitoli,dividere sottotitoli,unire srt,sottotitolo lungo dividere',
     intro: 'Quando i sottotitoli non sono sincronizzati, sposta tutta la linea temporale, riscala con un fattore o correggi con due punti. Può anche unire le righe spezzate e dividere quelle troppo lunghe.',
     feat: 'Lo spostamento muove ogni riga senza cambiare per quanto resta sullo schermo. Il riscalamento moltiplica inizio e fine, quindi cambia anche la durata: utile tra 24 e 25 fps. La correzione a due punti gestisce i file con sia sfalsamento sia velocità errata. I tempi negativi vengono portati a zero, con l\'indicazione di quante righe sono interessate. Stesso formato in ingresso e in uscita: nessuna conversione, e stili ASS, formattazione di ogni riga e tag restano identici. I sottotitoli bilingue restano su due righe quando uniti e vengono saltati quando divisi.',
@@ -2236,7 +2236,7 @@ const SEO_SHIFT = {
   },
   'ar': {
     title: 'ضبط توقيت الترجمة - إزاحة أو تغيير المقياس أو تصحيح بنقطتين / الدمج والتقسيم | AI-SRTSub',
-    desc: 'أداة مجانية عبر الإنترنت: انقل كل شيء دفعة واحدة، غيّر المقياس بمعامل، أو صحّح بنقطتين. تعمل مع SRT و VTT و ASS و SBV و LRC و TXT. تعمل داخل متصفحك - لا يتم رفع الملف أبداً.',
+    desc: 'أداة مجانية عبر الإنترنت: انقل كل شيء دفعة واحدة، غيّر المقياس بمعامل، أو صحّح بنقطتين. تعمل مع SRT و VTT و ASS و SBV و LRC و TXT.',
     kw: 'ضبط توقيت الترجمة,إزاحة الترجمة,مزامنة الترجمة,تصحيح تأخير الترجمة,تغيير مقياس الترجمة,srt إزاحة الوقت,دمج الترجمة,تقسيم الترجمة,دمج srt,تقسيم الترجمة الطويلة',
     intro: 'عندما لا تتطابق الترجمة مع الصورة، انقل الخط الزمني كله، أو غيّر مقياسه بمعامل، أو صحّحه بنقطتين. كما يمكنه دمج الأسطر المجزأة وتقسيم الأسطر الطويلة جداً.',
     feat: 'الإزاحة تنقل كل سطر دون تغيير مدة ظهوره. تغيير المقياس يضرب البداية والنهاية معاً فتتغير المدة أيضاً - مفيد بين 24 و25 إطاراً في الثانية. التصحيح بنقطتين يتعامل مع الملفات التي فيها إزاحة وسرعة خاطئة معاً. الأوقات السالبة تُصفَّر، ويُذكر عدد الأسطر المتأثرة. الصيغة نفسها في الدخول والخروج، بلا أي تحويل، مع الحفاظ على أنماط ASS وتنسيق كل سطر والوسوم كما هي. التراجم ثنائية اللغة تبقى على سطرين عند الدمج ويتم تخطيها عند التقسيم.',
@@ -2245,7 +2245,7 @@ const SEO_SHIFT = {
   },
   'tr': {
     title: 'Altyazı zaman ayarı - kaydır, ölçekle veya iki noktayla düzelt / Birleştir ve böl | AI-SRTSub',
-    desc: 'Ücretsiz çevrimiçi araç: hepsini birlikte kaydırın, bir katsayıyla ölçekleyin veya iki noktayla düzeltin. SRT, VTT, ASS, SBV, LRC ve TXT ile çalışır. Tarayıcınızda çalışır - dosya asla yüklenmez.',
+    desc: 'Ücretsiz çevrimiçi araç: hepsini birlikte kaydırın, bir katsayıyla ölçekleyin veya iki noktayla düzeltin. SRT, VTT, ASS, SBV, LRC ve TXT ile çalışır.',
     kw: 'altyazı zaman ayarı,altyazı kaydırma,altyazı senkron,srt zaman düzeltme,altyazı gecikme,altyazı ölçekleme,altyazı birleştirme,altyazı bölme,srt birleştirme,uzun altyazı bölme',
     intro: 'Altyazılar görüntüyle uymadığında tüm zaman çizgisini kaydırın, bir katsayıyla ölçekleyin veya iki noktayla düzeltin. Ayrıca parçalanmış satırları birleştirir, çok uzun olanları böler.',
     feat: 'Kaydırma her satırı ekranda kalma süresini değiştirmeden taşır. Ölçekleme başlangıcı ve bitişi birlikte çarpar, bu yüzden süre de değişir - 24 ile 25 fps arasında kullanışlı. İki noktayla düzeltme, hem kaymış hem de hızı yanlış dosyaları ele alır. Negatif çıkan süreler 0 yapılır ve kaç satırın etkilendiği belirtilir. Giriş ve çıkış biçimi aynıdır, dönüştürme yapılmaz; ASS stilleri, her satırın biçimi ve etiketler olduğu gibi korunur. İki dilli satırlar birleştirilirken iki satır olarak kalır, bölmede atlanır.',
@@ -2254,7 +2254,7 @@ const SEO_SHIFT = {
   },
   'nl': {
     title: 'Ondertiteltijden bijstellen - verschuiven, schalen of corrigeren / Samenvoegen en splitsen | AI-SRTSub',
-    desc: 'Gratis online tool: verschuif alles tegelijk, schaal met een factor of corrigeer met twee punten. Werkt met SRT, VTT, ASS, SBV, LRC en TXT. Draait in je browser - het bestand wordt nooit geüpload.',
+    desc: 'Gratis online tool: verschuif alles tegelijk, schaal met een factor of corrigeer met twee punten. Werkt met SRT, VTT, ASS, SBV, LRC en TXT.',
     kw: 'ondertitels timen,ondertitel verschuiven,srt tijd corrigeren,ondertitels synchroniseren,ondertitels schalen,srt tijdverschil,ondertiteling samenvoegen,ondertiteling splitsen,srt samenvoegen,lange ondertitel splitsen',
     intro: 'Als de ondertitels niet synchroon lopen: verschuif de hele tijdlijn, schaal met een factor of corrigeer met twee punten. Ook kunnen versnipperde regels worden samengevoegd en te lange gesplitst.',
     feat: 'Verschuiven verplaatst elke regel zonder de weergaveduur te wijzigen. Schalen vermenigvuldigt begin en eind, dus de duur verandert mee - handig tussen 24 en 25 fps. De correctie met twee punten is voor bestanden die zowel verschoven zijn als een verkeerde snelheid hebben. Negatieve tijden worden op 0 gezet, met het aantal getroffen regels. Hetzelfde formaat erin en eruit, zonder conversie; ASS-stijlen, de opmaak van elke regel en tags blijven behouden. Tweetalige regels blijven bij samenvoegen twee regels en worden bij splitsen overgeslagen.',
@@ -2263,7 +2263,7 @@ const SEO_SHIFT = {
   },
   'pl': {
     title: 'Korekta czasu napisów - przesuń, przeskaluj lub popraw dwoma punktami / Łączenie i dzielenie | AI-SRTSub',
-    desc: 'Darmowe narzędzie online: przesuń wszystko naraz, przeskaluj współczynnikiem albo popraw dwoma punktami. Działa z SRT, VTT, ASS, SBV, LRC i TXT. Wszystko w twojej przeglądarce - plik nigdy nie jest wysyłany.',
+    desc: 'Darmowe narzędzie online: przesuń wszystko naraz, przeskaluj współczynnikiem albo popraw dwoma punktami. Działa z SRT, VTT, ASS, SBV, LRC i TXT.',
     kw: 'korekta czasu napisów,przesuwanie napisów,srt czas poprawka,synchronizacja napisów,skalowanie napisów,napisy opóźnione,łączenie napisów,dzielenie napisów,łączenie srt,długie napisy podzielić',
     intro: 'Gdy napisy nie pasują do obrazu, przesuń całą oś czasu, przeskaluj współczynnikiem lub popraw dwoma punktami. Może też łączyć poszatkowane linie i dzielić zbyt długie.',
     feat: 'Przesuwanie przesuwa każdą linię bez zmiany czasu jej wyświetlania. Skalowanie mnoży początek i koniec, więc zmienia się też czas trwania - przydatne między 24 a 25 kl./s. Poprawka dwupunktowa radzi sobie z plikami, które są jednocześnie przesunięte i mają złe tempo. Czasy ujemne są zerowane, z informacją ile linii to dotyczy. Ten sam format na wejściu i wyjściu, bez konwersji; style ASS, formatowanie każdej linii i tagi zostają zachowane. Dwujęzyczne linie po połączeniu zostają dwiema liniami, a przy dzieleniu są pomijane.',
@@ -2272,7 +2272,7 @@ const SEO_SHIFT = {
   },
   'sv': {
     title: 'Justera undertextens tidslinje - flytta, skala eller korrigera / Slå ihop och dela | AI-SRTSub',
-    desc: 'Gratis onlineverktyg: flytta allt på en gång, skala med en faktor eller korrigera med två punkter. Fungerar med SRT, VTT, ASS, SBV, LRC och TXT. Körs i din webbläsare - filen laddas aldrig upp.',
+    desc: 'Gratis onlineverktyg: flytta allt på en gång, skala med en faktor eller korrigera med två punkter. Fungerar med SRT, VTT, ASS, SBV, LRC och TXT.',
     kw: 'justera undertextens tid,flytta undertext,srt tidsjustering,synkronisera undertext,skala undertext,undertext fördröjning,slå ihop undertexter,dela undertexter,slå ihop srt,lång undertext dela',
     intro: 'När undertexten inte stämmer med bilden: flytta hela tidslinjen, skala med en faktor eller korrigera med två punkter. Den kan också slå ihop sönderdelade rader och dela för långa.',
     feat: 'Att flytta ändrar varje rad utan att ändra hur länge den visas. Skalning multiplicerar både start och slut, så längden ändras också - praktiskt mellan 24 och 25 fps. Tvåpunktskorrigeringen hanterar filer som både är förskjutna och har fel hastighet. Negativa tider sätts till 0 och det framgår hur många rader som påverkades. Samma format in och ut, ingen konvertering; ASS-stilar, varje rads formatering och taggar bevaras. Tvåspråkiga rader förblir två rader vid sammanslagning och hoppas över vid delning.',
@@ -2281,7 +2281,7 @@ const SEO_SHIFT = {
   },
   'cs': {
     title: 'Úprava časové osy titulků - posunout, škálovat nebo opravit dvěma body / Spojování a dělení | AI-SRTSub',
-    desc: 'Zdarma online nástroj: posuňte vše najednou, přeškálujte koeficientem nebo opravte dvěma body. Funguje se SRT, VTT, ASS, SBV, LRC a TXT. Běží v prohlížeči - soubor se nikdy nenahrává.',
+    desc: 'Zdarma online nástroj: posuňte vše najednou, přeškálujte koeficientem nebo opravte dvěma body. Funguje se SRT, VTT, ASS, SBV, LRC a TXT.',
     kw: 'úprava času titulků,posunout titulky,srt oprava času,synchronizace titulků,škálování titulků,titulky zpoždění,spojování titulků,dělení titulků,spojení srt,dlouhé titulky rozdělit',
     intro: 'Když titulky nesedí s obrazem, posuňte celou časovou osu, přeškálujte koeficientem nebo opravte dvěma body. Umí také spojit rozdělené řádky a rozdělit příliš dlouhé.',
     feat: 'Posun přesune každý řádek, aniž by změnil dobu jeho zobrazení. Škálování násobí začátek i konec, takže se změní i délka - hodí se mezi 24 a 25 fps. Oprava dvěma body zvládne soubory, které jsou zároveň posunuté a běží jinou rychlostí. Záporné časy se nastaví na 0 a nástroj oznámí, kolika řádků se to týká. Stejný formát na vstupu i výstupu, bez převodu; styly ASS, formátování každého řádku a značky zůstanou zachovány. Dvojjazyčné řádky zůstanou při spojení dva a při dělení se přeskočí.',
@@ -2290,7 +2290,7 @@ const SEO_SHIFT = {
   },
   'uk': {
     title: 'Зсув часу субтитрів - зсунути, масштабувати або виправити двома точками / Об\'єднання і розбиття | AI-SRTSub',
-    desc: 'Безкоштовний онлайн-інструмент: зсуньте все разом, масштабуйте коефіцієнтом або виправте за двома точками. Працює з SRT, VTT, ASS, SBV, LRC і TXT. Усе у вашому браузері - файл ніколи не завантажується.',
+    desc: 'Безкоштовний онлайн-інструмент: зсуньте все разом, масштабуйте коефіцієнтом або виправте за двома точками. Працює з SRT, VTT, ASS, SBV, LRC і TXT.',
     kw: 'зсув субтитрів,синхронізація субтитрів,srt зсув часу,субтитри відстають,субтитри поспішають,масштаб субтитрів,об\'єднати субтитри,розбити субтитри,склеїти srt,довгі субтитри розбити',
     intro: 'Коли субтитри не збігаються з відео, зсуньте всю часову шкалу, масштабуйте коефіцієнтом або виправте за двома точками. А ще об\'єднує роздрібнені рядки та розбиває занадто довгі.',
     feat: 'Зсув переміщує кожен рядок, не змінюючи тривалість його показу. Масштабування множить і початок, і кінець, тому змінюється й тривалість - зручно між 24 і 25 кадр/с. Виправлення за двома точками підходить для файлів з одночасним зсувом і неправильною швидкістю. Від\'ємний час обнуляється й показується, скільки рядків зачеплено. Формат на виході той самий, що на вході, без перетворення; стилі ASS, форматування кожного рядка і теги зберігаються. Двомовні рядки при об’єднанні лишаються двома рядками, а при розбитті пропускаються.',
@@ -2299,7 +2299,7 @@ const SEO_SHIFT = {
   },
   'da': {
     title: 'Justering af underteksternes tidslinje - flyt, skaler eller ret / Flet og del | AI-SRTSub',
-    desc: 'Gratis online værktøj: flyt det hele på én gang, skaler med en faktor, eller ret det med to punkter. Virker med SRT, VTT, ASS, SBV, LRC og TXT. Kører i din browser - filen uploades aldrig.',
+    desc: 'Gratis online værktøj: flyt det hele på én gang, skaler med en faktor, eller ret det med to punkter. Virker med SRT, VTT, ASS, SBV, LRC og TXT.',
     kw: 'justere undertekster,flytte undertekster,srt tidsjustering,synkronisere undertekster,skalere undertekster,undertekster forskudt,flet undertekster,del undertekster,flet srt,lang undertekst del',
     intro: 'Når underteksterne ikke passer til billedet: flyt hele tidslinjen, skaler med en faktor, eller ret den med to punkter. Den kan også flette opsplittede linjer og dele for lange.',
     feat: 'Flytning rykker hver linje uden at ændre, hvor længe den vises. Skalering ganger både start og slut, så længden også ændres - nyttigt mellem 24 og 25 fps. Retning med to punkter klarer filer, der både er forskudt og har forkert hastighed. Negative tider sættes til 0, og det oplyses hvor mange linjer der er berørt. Samme format ind og ud, ingen konvertering; ASS-stile, formateringen af hver linje og tags bevares. Tosprogede linjer forbliver to linjer ved sammenfletning og springes over ved deling.',
@@ -2308,7 +2308,7 @@ const SEO_SHIFT = {
   },
   'fi': {
     title: 'Tekstityksen aikajanan säätö - siirrä, skaalaa tai korjaa kahdella pisteellä / Yhdistä ja jaa | AI-SRTSub',
-    desc: 'Ilmainen verkkotyökalu: siirrä kaikki kerralla, skaalaa kertoimella tai korjaa kahdella pisteellä. Toimii SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-tiedostoille. Kaikki tapahtuu selaimessa - tiedostoa ei koskaan ladata palvelimelle.',
+    desc: 'Ilmainen verkkotyökalu: siirrä kaikki kerralla, skaalaa kertoimella tai korjaa kahdella pisteellä. Toimii SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-tiedostoille.',
     kw: 'tekstityksen ajan säätö,tekstityksen siirto,srt ajan korjaus,tekstityksen synkronointi,tekstityksen skaalaus,tekstitys jäljessä,yhdistä tekstitykset,jaa tekstitykset,yhdistä srt,pitkä tekstitys jaa',
     intro: 'Kun tekstitys ei täsmää kuvaan, siirrä koko aikajanaa, skaalaa kertoimella tai korjaa kahdella pisteellä. Se voi myös yhdistää pirstaleiset rivit ja jakaa liian pitkät.',
     feat: 'Siirtäminen siirtää jokaisen rivin muuttamatta sen näyttöaikaa. Skaalaus kertoo sekä alun että lopun, joten myös kesto muuttuu - kätevä 24 ja 25 fps välillä. Kahden pisteen korjaus hoitaa tiedostot, joissa on sekä siirtymä että väärä nopeus. Negatiiviset ajat asetetaan nollaan ja kerrotaan, kuinka monta riviä muutettiin. Sama muoto sisään ja ulos, ei muunnosta; ASS-tyylit, jokaisen rivin muotoilu ja tagit säilyvät. Kaksikieliset rivit pysyvät kahtena rivinä yhdistettäessä ja ohitetaan jaettaessa.',
@@ -2317,7 +2317,7 @@ const SEO_SHIFT = {
   },
   'el': {
     title: 'Ρύθμιση χρονικής γραμμής υποτίτλων - μετακίνηση, κλιμάκωση ή διόρθωση / Συγχώνευση και διαχωρισμός | AI-SRTSub',
-    desc: 'Δωρεάν εργαλείο στο διαδίκτυο: μετακινήστε τα όλα μαζί, κλιμακώστε με συντελεστή ή διορθώστε με δύο σημεία. Λειτουργεί με SRT, VTT, ASS, SBV, LRC και TXT. Τρέχει στον περιηγητή σας - το αρχείο δεν ανεβαίνει ποτέ.',
+    desc: 'Δωρεάν εργαλείο στο διαδίκτυο: μετακινήστε τα όλα μαζί, κλιμακώστε με συντελεστή ή διορθώστε με δύο σημεία. Λειτουργεί με SRT, VTT, ASS, SBV, LRC και TXT.',
     kw: 'ρύθμιση χρόνου υποτίτλων,μετακίνηση υποτίτλων,srt διόρθωση χρόνου,συγχρονισμός υποτίτλων,κλιμάκωση υποτίτλων,υπότιτλοι καθυστέρηση,συγχώνευση υποτίτλων,διαχωρισμός υποτίτλων,ένωση srt,μακροσκελής υπότιτλος',
     intro: 'Όταν οι υπότιτλοι δεν ταιριάζουν με την εικόνα, μετακινήστε όλη τη χρονική γραμμή, κλιμακώστε με συντελεστή ή διορθώστε με δύο σημεία. Μπορεί επίσης να ενώνει κομματιασμένες γραμμές και να χωρίζει τις πολύ μεγάλες.',
     feat: 'Η μετακίνηση μεταφέρει κάθε γραμμή χωρίς να αλλάζει πόσο μένει στην οθόνη. Η κλιμάκωση πολλαπλασιάζει αρχή και τέλος, οπότε αλλάζει και η διάρκεια - χρήσιμο μεταξύ 24 και 25 fps. Η διόρθωση με δύο σημεία χειρίζεται αρχεία με μετατόπιση και λάθος ταχύτητα. Οι αρνητικοί χρόνοι μηδενίζονται και εμφανίζεται πόσες γραμμές επηρεάστηκαν. Ίδια μορφή στην είσοδο και στην έξοδο, χωρίς μετατροπή· τα στυλ ASS, η μορφοποίηση κάθε γραμμής και τα tags διατηρούνται. Οι δίγλωσσες γραμμές παραμένουν δύο κατά τη συγχώνευση και παραλείπονται στον διαχωρισμό.',
@@ -2326,7 +2326,7 @@ const SEO_SHIFT = {
   },
   'he': {
     title: 'הזזת ציר הזמן של הכתוביות - הזזה, שינוי קנה מידה או תיקון בשתי נקודות / מיזוג ופיצול | AI-SRTSub',
-    desc: 'כלי חינמי ברשת: הזיזו הכול יחד, שנו קנה מידה לפי מקדם, או תקנו בעזרת שתי נקודות. עובד עם SRT, VTT, ASS, SBV, LRC ו־TXT. הכול מתבצע בדפדפן - הקובץ לא מועלה לעולם.',
+    desc: 'כלי חינמי ברשת: הזיזו הכול יחד, שנו קנה מידה לפי מקדם, או תקנו בעזרת שתי נקודות. עובד עם SRT, VTT, ASS, SBV, LRC ו־TXT.',
     kw: 'הזזת כתוביות,סנכרון כתוביות,srt תיקון זמן,כתוביות מאחרות,שינוי קנה מידה כתוביות,כתוביות פיגור,מיזוג כתוביות,פיצול כתוביות,מיזוג srt,פיצול כתוביות ארוכות',
     intro: 'כשהכתוביות לא תואמות לתמונה, הזיזו את כל ציר הזמן, שנו קנה מידה לפי מקדם או תקנו בעזרת שתי נקודות. יכול גם לאחד שורות מפוצלות ולפצל שורות ארוכות מדי.',
     feat: 'ההזזה מזיזה כל שורה בלי לשנות את משך ההצגה שלה. שינוי קנה המידה מכפיל גם התחלה וגם סוף, ולכן גם המשך משתנה - שימושי בין 24 ל־25 fps. התיקון בשתי נקודות מטפל בקבצים שיש בהם גם הזזה וגם מהירות שגויה. זמנים שליליים מאופסים ל־0 ומצוין כמה שורות הושפעו. אותו פורמט בכניסה וביציאה, ללא המרה; סגנונות ASS, העיצוב של כל שורה והתגיות נשמרים. שורות דו-לשוניות נשארות שתי שורות במיזוג ומדולגות בפיצול.',
@@ -2335,7 +2335,7 @@ const SEO_SHIFT = {
   },
   'ro': {
     title: 'Reglajul liniei de timp a subtitrărilor - mută, scalează sau corectează / Îmbinare și împărțire | AI-SRTSub',
-    desc: 'Instrument online gratuit: mută totul deodată, scalează cu un factor sau corectează cu două puncte. Funcționează cu SRT, VTT, ASS, SBV, LRC și TXT. Rulează în browserul tău - fișierul nu este încărcat niciodată.',
+    desc: 'Instrument online gratuit: mută totul deodată, scalează cu un factor sau corectează cu două puncte. Funcționează cu SRT, VTT, ASS, SBV, LRC și TXT.',
     kw: 'reglaj timp subtitrări,mutare subtitrări,srt corecție timp,sincronizare subtitrări,scalare subtitrări,subtitrări decalate,îmbinare subtitrări,împărțire subtitrări,îmbinare srt,subtitrare lungă împărți',
     intro: 'Când subtitrările nu se potrivesc cu imaginea, mută toată linia de timp, scalează cu un factor sau corectează cu două puncte. Poate de asemenea îmbina rândurile fragmentate și împărți cele prea lungi.',
     feat: 'Mutarea deplasează fiecare linie fără să schimbe cât timp rămâne pe ecran. Scalarea înmulțește și începutul, și sfârșitul, deci se schimbă și durata - util între 24 și 25 fps. Corecția cu două puncte rezolvă fișierele care sunt și decalate, și cu viteză greșită. Timpii negativi sunt aduși la 0 și se arată câte linii au fost afectate. Același format la intrare și ieșire, fără conversie; stilurile ASS, formatarea fiecărui rând și tagurile sunt păstrate. Rândurile bilingve rămân două la îmbinare și sunt omise la împărțire.',

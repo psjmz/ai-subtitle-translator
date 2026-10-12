@@ -7,7 +7,7 @@
 <!--SEO-HEAD-START-->
 <!-- v0.9.290：文案不再写死「中文」—— 译文可能是英文 / 日文 / 法文；kw 里保留「只留中文」这条真实搜索词 -->
 <title>双语字幕剥离 - 只留译文 / 只留原文 / 拆成两份 | 随心字幕 AI</title>
-<meta name="description" content="免费在线双语字幕剥离：把双语字幕拆成原文一份、译文一份，或者只留其中一种。时间轴原样保留，纯浏览器本地处理，文件不上传服务器。">
+<meta name="description" content="免费在线双语字幕剥离：把双语字幕拆成原文一份、译文一份，或者只留其中一种。">
 <meta name="keywords" content="双语字幕剥离,双语字幕只留译文,双语字幕只留中文,双语字幕只保留一种语言,双语字幕提取原文,双语字幕拆分,srt双语分离,ass双语字幕拆分,bilingual subtitle splitter,remove second language subtitle">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#0E7490">
@@ -133,7 +133,7 @@ crossorigin="anonymous"></script>
 
   <div class="hero">
     <h1><span data-i18n="heroA">双语字幕</span><em data-i18n="heroEm">剥离</em></h1>
-    <p data-i18n="heroSub">把中英双语字幕拆成原文一份、中文一份，或者只留其中一种。全程在你浏览器里完成，文件不上传服务器。</p>
+    <p data-i18n="heroSub">把双语字幕拆成原文一份、译文一份，或者只留其中一种。</p>
   </div>
 
   <div class="card" id="upCard">
@@ -167,7 +167,6 @@ crossorigin="anonymous"></script>
       <select class="fmt" id="outFmt" style="min-width:170px"></select>
       <button class="pri" id="btnGo" type="button" data-i18n="btnGo">开始</button>
     </div>
-    <div class="note" data-i18n="noteLocal">文件只在你的浏览器里处理，不上传服务器</div>
   </div>
 
   <div class="card" id="repCard" style="display:none">
@@ -181,8 +180,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="bilingual-i18n.js?v=0.9.292"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
-<script src="bilingual-core.js?v=0.9.292"></script>
+<script src="bilingual-i18n.js?v=0.9.293"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="bilingual-core.js?v=0.9.293"></script>
 <script>
 'use strict';
 var I18N = window.BILINGUAL_I18N.DICT, LANGS = window.BILINGUAL_I18N.LANGS;
