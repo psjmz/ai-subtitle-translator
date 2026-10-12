@@ -669,11 +669,12 @@ function serveStatic(req, res, urlPath){
   /* v0.9.273：特效页 / 清洗页的多语言路由。
      ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
      会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
-  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate)\.html$/);
+  /* v0.9.288：转换页 /convert.html 与 /en/convert.html */
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert)\.html$/);
   if (pm && SEO_ROUTE['/' + pm[1]]) {
     serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
   }
-  pm = p.match(/^\/(merge|clean|translate)\.html$/);
+  pm = p.match(/^\/(merge|clean|translate|convert)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
@@ -1551,11 +1552,13 @@ const SEO_CLEAN = {
   },
 };
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {};
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
   CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
   TRANSLATE_PATH[l] = (l === 'zh-CN') ? '/translate.html' : '/' + l + '/translate.html';
+  /* v0.9.288：字幕格式转换页 */
+  CONVERT_PATH[l] = (l === 'zh-CN') ? '/convert.html' : '/' + l + '/convert.html';
 });
 /* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
    ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
@@ -1591,11 +1594,261 @@ const SEO_TRANSLATE = {
   'ro': { title: "Traducător de subtitrări — SRT / VTT / ASS în limba ta", desc: "Încarcă SRT/VTT/ASS, alege limba țintă și primești subtitrări cu aliniere automată pe axa timpului. 75 de limbi, gratuit, fără cont." }
 };
 
+/* v0.9.288：字幕格式转换页（/convert.html）的 27 语 SEO 表。
+   与前三页同规格：title / desc / kw / 三段静态文案（intro / feat / who）。 */
+const SEO_CONVERT = {
+  'zh-CN': {
+    title: '字幕格式转换 - SRT / VTT / ASS / SBV / LRC / TXT 互转 | 随心字幕 AI',
+    desc: '免费在线字幕格式转换：SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留，ASS 特效标记自动清理。纯浏览器本地处理，文件不上传服务器。',
+    kw: '字幕格式转换,srt转vtt,vtt转srt,ass转srt,sbv转srt,srt转lrc,字幕转txt,字幕转换工具,subtitle converter,srt to vtt,vtt to srt',
+    intro: 'SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留。',
+    feat: '自动识别输入格式，导出时按目标格式重排时间码；ASS 特效标记与强制换行在导出成普通字幕时还原成可读文本；歌词文件没有小时位，超过一小时按分钟累计。',
+    who: '拿到字幕但播放器不认的人、要在剪辑软件与网页播放器之间来回倒素材的人。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'AI-SRTSub'
+  },
+  'zh-TW': {
+    title: '字幕格式轉換 - SRT / VTT / ASS / SBV / LRC / TXT 互轉 | 隨心字幕 AI',
+    desc: '免費線上字幕格式轉換：SRT、VTT、ASS、SBV、LRC、TXT 互相轉換，時間軸原樣保留，ASS 特效標記自動清理。純瀏覽器本地處理，檔案不上傳伺服器。',
+    kw: '字幕格式轉換,srt轉vtt,vtt轉srt,ass轉srt,sbv轉srt,srt轉lrc,字幕轉txt,字幕轉換工具,subtitle converter,srt to vtt,vtt to srt',
+    intro: 'SRT、VTT、ASS、SBV、LRC、TXT 互相轉換，時間軸原樣保留。',
+    feat: '自動辨識輸入格式，匯出時按目標格式重排時間碼；ASS 特效標記與強制換行在匯出成普通字幕時還原成可讀文字；歌詞檔案沒有小時位，超過一小時按分鐘累計。',
+    who: '拿到字幕但播放器不認的人、要在剪輯軟體與網頁播放器之間來回倒素材的人。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'AI-SRTSub'
+  },
+  'en': {
+    title: 'Subtitle Converter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Free online subtitle converter: convert between SRT, VTT, ASS, SBV, LRC and TXT with the timeline kept intact, ASS effect tags cleaned up automatically. Runs entirely in your browser - the file is never uploaded.',
+    kw: 'subtitle converter,srt to vtt,vtt to srt,ass to srt,sbv to srt,srt to lrc,subtitle to txt,convert subtitles,srt converter,vtt converter',
+    intro: 'Convert between SRT, VTT, ASS, SBV, LRC and TXT with the timeline kept intact.',
+    feat: 'The input format is detected automatically and timestamps are rewritten for the target format; ASS effect tags and forced line breaks become readable text when you export to a plain format; lyrics files have no hour field, so anything past one hour is counted in minutes.',
+    who: 'Anyone whose player refuses a subtitle file, and anyone moving material between an editor and a web player.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'ja': {
+    title: '字幕フォーマット変換 - SRT / VTT / ASS / SBV / LRC / TXT 相互変換 | AI-SRTSub',
+    desc: '無料のオンライン字幕変換ツール：SRT、VTT、ASS、SBV、LRC、TXT を相互に変換し、タイムラインはそのまま保持、ASS のエフェクトタグは自動的に整理されます。すべてブラウザ内で処理され、ファイルはアップロードされません。',
+    kw: '字幕変換,srt vtt 変換,字幕フォーマット変換,ass srt 変換,sbv 変換,字幕 テキスト変換,subtitle converter,srt to vtt',
+    intro: 'SRT、VTT、ASS、SBV、LRC、TXT を相互に変換し、タイムラインはそのまま保持されます。',
+    feat: '入力形式を自動判別し、出力形式に合わせてタイムコードを書き直します。ASS のエフェクトタグと強制改行は、通常の字幕へ書き出すときに読めるテキストへ戻します。歌詞ファイルには時間の桁がないため、1 時間を超える分は分単位で累計します。',
+    who: '字幕ファイルをプレイヤーが読み込まない人、編集ソフトとウェブプレイヤーの間で素材を行き来させている人。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'es': {
+    title: 'Conversor de subtítulos - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Conversor de subtítulos online gratis: convierte entre SRT, VTT, ASS, SBV, LRC y TXT conservando la línea de tiempo y limpiando las etiquetas de efectos ASS. Funciona solo en tu navegador: el archivo nunca se sube.',
+    kw: 'convertir subtítulos,srt a vtt,vtt a srt,ass a srt,sbv a srt,srt a lrc,subtítulos a txt,conversor srt,subtitle converter',
+    intro: 'Convierte entre SRT, VTT, ASS, SBV, LRC y TXT conservando la línea de tiempo.',
+    feat: 'El formato de entrada se detecta automáticamente y los códigos de tiempo se reescriben para el formato de salida; las etiquetas de efectos y los saltos forzados de ASS vuelven a ser texto legible al exportar a un formato simple; los archivos de letras no tienen campo de horas, así que lo que pasa de una hora se acumula en minutos.',
+    who: 'Quien tiene subtítulos que su reproductor no acepta, y quien mueve material entre un editor y un reproductor web.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'pt': {
+    title: 'Conversor de legendas - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Conversor de legendas online grátis: converta entre SRT, VTT, ASS, SBV, LRC e TXT mantendo a linha do tempo e limpando as tags de efeito do ASS. Roda só no seu navegador: o arquivo nunca é enviado.',
+    kw: 'converter legendas,srt para vtt,vtt para srt,ass para srt,sbv para srt,srt para lrc,legenda para txt,conversor srt,subtitle converter',
+    intro: 'Converta entre SRT, VTT, ASS, SBV, LRC e TXT mantendo a linha do tempo.',
+    feat: 'O formato de entrada é detectado automaticamente e os códigos de tempo são reescritos para o formato de saída; tags de efeito e quebras forçadas do ASS voltam a ser texto legível ao exportar para um formato simples; arquivos de letra não têm campo de horas, então o que passa de uma hora é acumulado em minutos.',
+    who: 'Quem tem legendas que o player não aceita, e quem move material entre um editor e um player web.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'ko': {
+    title: '자막 포맷 변환 - SRT / VTT / ASS / SBV / LRC / TXT 상호 변환 | AI-SRTSub',
+    desc: '무료 온라인 자막 변환기: SRT, VTT, ASS, SBV, LRC, TXT 를 서로 변환하고 타임라인은 그대로 유지하며 ASS 효과 태그는 자동으로 정리됩니다. 모두 브라우저에서 처리되며 파일은 업로드되지 않습니다.',
+    kw: '자막 변환,srt vtt 변환,자막 포맷 변환,ass srt 변환,sbv 변환,자막 텍스트 변환,subtitle converter,srt to vtt',
+    intro: 'SRT, VTT, ASS, SBV, LRC, TXT 를 서로 변환하고 타임라인은 그대로 유지합니다.',
+    feat: '입력 형식을 자동으로 감지하고 출력 형식에 맞춰 타임코드를 다시 씁니다. ASS 효과 태그와 강제 줄바꿈은 일반 자막으로 내보낼 때 읽을 수 있는 텍스트로 되돌립니다. 가사 파일에는 시간 단위가 없어 1시간을 넘는 분은 분 단위로 누적합니다.',
+    who: '플레이어가 자막 파일을 읽지 못하는 사람, 편집 프로그램과 웹 플레이어 사이에서 자료를 옮기는 사람.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'de': {
+    title: 'Untertitel-Konverter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Kostenloser Online-Konverter für Untertitel: zwischen SRT, VTT, ASS, SBV, LRC und TXT konvertieren, Zeitachse bleibt erhalten, ASS-Effekt-Tags werden automatisch entfernt. Läuft nur im Browser - die Datei wird nie hochgeladen.',
+    kw: 'untertitel konvertieren,srt in vtt,vtt in srt,ass in srt,sbv in srt,srt in lrc,untertitel in txt,srt konverter,subtitle converter',
+    intro: 'Konvertiere zwischen SRT, VTT, ASS, SBV, LRC und TXT - die Zeitachse bleibt erhalten.',
+    feat: 'Das Eingabeformat wird automatisch erkannt und die Zeitcodes werden für das Ausgabeformat neu geschrieben; ASS-Effekt-Tags und erzwungene Zeilenumbrüche werden beim Export in ein einfaches Format wieder zu lesbarem Text; Liedtextdateien haben kein Stunden Feld, alles über eine Stunde wird in Minuten gezählt.',
+    who: 'Wessen Player eine Untertiteldatei nicht annimmt, und wer Material zwischen einem Schnittprogramm und einem Webplayer hin und her schiebt.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'fr': {
+    title: 'Convertisseur de sous-titres - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Convertisseur de sous-titres en ligne gratuit : convertissez entre SRT, VTT, ASS, SBV, LRC et TXT en conservant la ligne de temps, les balises d\'effet ASS sont nettoyées automatiquement. Tout se passe dans le navigateur : le fichier n\'est jamais envoyé.',
+    kw: 'convertir sous-titres,srt vers vtt,vtt vers srt,ass vers srt,sbv vers srt,srt vers lrc,sous-titres vers txt,convertisseur srt,subtitle converter',
+    intro: 'Convertissez entre SRT, VTT, ASS, SBV, LRC et TXT en conservant la ligne de temps.',
+    feat: 'Le format d\'entrée est détecté automatiquement et les codes temporels sont réécrits pour le format de sortie ; les balises d\'effet et les sauts de ligne forcés de l\'ASS redeviennent du texte lisible à l\'export vers un format simple ; les fichiers de paroles n\'ont pas de champ heures, donc ce qui dépasse une heure est cumulé en minutes.',
+    who: 'Ceux dont le lecteur refuse un fichier de sous-titres, et ceux qui font circuler du matériel entre un éditeur et un lecteur web.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'id': {
+    title: 'Konverter Subtitle - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Konverter subtitle online gratis: konversi antara SRT, VTT, ASS, SBV, LRC, dan TXT dengan timeline tetap utuh, tag efek ASS dibersihkan otomatis. Berjalan hanya di browser - file tidak pernah diunggah.',
+    kw: 'konversi subtitle,srt ke vtt,vtt ke srt,ass ke srt,sbv ke srt,srt ke lrc,subtitle ke txt,konverter srt,subtitle converter',
+    intro: 'Konversi antara SRT, VTT, ASS, SBV, LRC, dan TXT dengan timeline tetap utuh.',
+    feat: 'Format input dideteksi otomatis dan kode waktu ditulis ulang sesuai format output; tag efek ASS dan pemaksaan baris baru dikembalikan menjadi teks yang terbaca saat diekspor ke format biasa; file lirik tidak memiliki kolom jam, jadi yang lebih dari satu jam dihitung dalam menit.',
+    who: 'Orang yang pemutarnya menolak file subtitle, dan orang yang memindahkan materi antara editor dan pemutar web.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'hi': {
+    title: 'सबटाइटल कनवर्टर - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'मुफ़्त ऑनलाइन सबटाइटल कनवर्टर: SRT, VTT, ASS, SBV, LRC और TXT के बीच बदलें, टाइमलाइन ज्यों की त्यों रहेगी, ASS इफ़ेक्ट टैग अपने आप साफ़ हो जाते हैं। सब कुछ आपके ब्राउज़र में होता है - फ़ाइल अपलोड नहीं होती।',
+    kw: 'सबटाइटल कनवर्टर,srt to vtt,vtt to srt,ass to srt,sbv to srt,सबटाइटल टेक्स्ट,subtitle converter,srt converter',
+    intro: 'SRT, VTT, ASS, SBV, LRC और TXT के बीच बदलें, टाइमलाइन ज्यों की त्यों रहती है।',
+    feat: 'इनपुट फ़ॉर्मैट अपने आप पहचाना जाता है और टाइमकोड आउटपुट फ़ॉर्मैट के अनुसार दोबारा लिखे जाते हैं; ASS इफ़ेक्ट टैग और ज़बरदस्ती की लाइन ब्रेक आम फ़ॉर्मैट में निर्यात करते समय पढ़े जा सकने वाले टेक्स्ट बन जाते हैं; लिरिक्स फ़ाइल में घंटे का फ़ील्ड नहीं होता, इसलिए एक घंटे से अधिक को मिनट में जोड़ा जाता है।',
+    who: 'जिनका प्लेयर सबटाइटल फ़ाइल नहीं पढ़ता, और जो एडिटर और वेब प्लेयर के बीच सामग्री ले जाते हैं।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'th': {
+    title: 'ตัวแปลงซับไตเติล - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'เครื่องมือแปลงซับไตเติลออนไลน์ฟรี: แปลงระหว่าง SRT, VTT, ASS, SBV, LRC และ TXT โดยไทม์ไลน์คงเดิม และแท็กเอฟเฟกต์ของ ASS ถูกจัดการอัตโนมัติ ทำงานในเบราว์เซอร์ของคุณเท่านั้น - ไฟล์ไม่ถูกอัปโหลด',
+    kw: 'แปลงซับไตเติล,srt เป็น vtt,vtt เป็น srt,ass เป็น srt,sbv เป็น srt,ซับไตเติลเป็นข้อความ,subtitle converter,srt converter',
+    intro: 'แปลงระหว่าง SRT, VTT, ASS, SBV, LRC และ TXT โดยไทม์ไลน์คงเดิม',
+    feat: 'ตรวจจับรูปแบบอินพุตอัตโนมัติและเขียนไทม์โค้ดใหม่ให้ตรงกับรูปแบบเอาต์พุต แท็กเอฟเฟกต์และการขึ้นบรรทัดใหม่แบบบังคับของ ASS จะกลับเป็นข้อความที่อ่านได้เมื่อส่งออกเป็นรูปแบบธรรมดา ไฟล์เนื้อเพลงไม่มีฟิลด์ชั่วโมง จึงนับเป็นนาทีเมื่อเกินหนึ่งชั่วโมง',
+    who: 'คนที่เครื่องเล่นไม่ยอมอ่านไฟล์ซับไตเติล และคนที่ย้ายสื่อระหว่างโปรแกรมตัดต่อกับเว็บเพลเยอร์',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'vi': {
+    title: 'Bộ chuyển đổi phụ đề - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Công cụ chuyển đổi phụ đề trực tuyến miễn phí: chuyển giữa SRT, VTT, ASS, SBV, LRC và TXT, giữ nguyên trục thời gian, tự động dọn thẻ hiệu ứng ASS. Chỉ chạy trong trình duyệt của bạn - tệp không bao giờ được tải lên.',
+    kw: 'chuyển đổi phụ đề,srt sang vtt,vtt sang srt,ass sang srt,sbv sang srt,srt sang lrc,phụ đề thành văn bản,subtitle converter',
+    intro: 'Chuyển đổi giữa SRT, VTT, ASS, SBV, LRC và TXT, giữ nguyên trục thời gian.',
+    feat: 'Tự động nhận dạng định dạng đầu vào và viết lại mã thời gian theo định dạng đầu ra; thẻ hiệu ứng ASS và ngắt dòng ép buộc trở lại thành văn bản đọc được khi xuất sang định dạng thường; tệp lời bài hát không có trường giờ, nên phần vượt quá một giờ được tính bằng phút.',
+    who: 'Người có trình phát không chịu đọc tệp phụ đề, và người chuyển tài liệu qua lại giữa phần mềm dựng và trình phát web.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'ru': {
+    title: 'Конвертер субтитров - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Бесплатный онлайн-конвертер субтитров: преобразуйте SRT, VTT, ASS, SBV, LRC и TXT друг в друга, таймлайн сохраняется, теги эффектов ASS очищаются автоматически. Всё работает в вашем браузере - файл никогда не загружается.',
+    kw: 'конвертер субтитров,srt в vtt,vtt в srt,ass в srt,sbv в srt,srt в lrc,субтитры в текст,subtitle converter,srt converter',
+    intro: 'Преобразуйте SRT, VTT, ASS, SBV, LRC и TXT друг в друга, таймлайн сохраняется.',
+    feat: 'Формат ввода определяется автоматически, а таймкоды переписываются под формат вывода; теги эффектов ASS и принудительные переносы строк при экспорте в обычный формат снова становятся читаемым текстом; в файлах текстов песен нет поля часов, поэтому всё, что больше часа, считается в минутах.',
+    who: 'Те, чей плеер не принимает файл субтитров, и те, кто переносит материал между редактором и веб-плеером.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'it': {
+    title: 'Convertitore di sottotitoli - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Convertitore di sottotitoli online gratuito: converti tra SRT, VTT, ASS, SBV, LRC e TXT mantenendo la linea temporale, i tag di effetto ASS vengono puliti automaticamente. Tutto avviene nel browser: il file non viene mai caricato.',
+    kw: 'convertire sottotitoli,srt in vtt,vtt in srt,ass in srt,sbv in srt,srt in lrc,sottotitoli in testo,convertitore srt,subtitle converter',
+    intro: 'Converti tra SRT, VTT, ASS, SBV, LRC e TXT mantenendo la linea temporale.',
+    feat: 'Il formato di ingresso viene rilevato automaticamente e i codici di tempo riscritti per il formato di uscita; i tag di effetto ASS e le interruzioni di riga forzate tornano testo leggibile esportando in un formato semplice; i file dei testi non hanno il campo ore, quindi ciò che supera un\'ora viene conteggiato in minuti.',
+    who: 'Chi ha un lettore che non accetta il file dei sottotitoli, e chi sposta materiale fra un editor e un lettore web.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'ar': {
+    title: 'محوّل الترجمة النصية - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'محوّل ترجمة نصية مجاني عبر الإنترنت: حوّل بين SRT و VTT و ASS و SBV و LRC و TXT مع الحفاظ على الخط الزمني وتنظيف وسوم تأثيرات ASS تلقائياً. يعمل داخل المتصفح فقط - لا يتم رفع الملف أبداً.',
+    kw: 'تحويل الترجمة,srt إلى vtt,vtt إلى srt,ass إلى srt,sbv إلى srt,ترجمة إلى نص,subtitle converter,srt converter',
+    intro: 'حوّل بين SRT و VTT و ASS و SBV و LRC و TXT مع الحفاظ على الخط الزمني.',
+    feat: 'يتم التعرف على صيغة الإدخال تلقائياً وإعادة كتابة الأكواد الزمنية بما يناسب صيغة الإخراج؛ وسوم تأثيرات ASS وفواصل الأسطر القسرية تعود نصاً مقروءاً عند التصدير إلى صيغة بسيطة؛ ملفات الكلمات لا تحتوي حقل ساعات، لذا يُحسب ما يتجاوز ساعة بالدقائق.',
+    who: 'من يرفض مشغّله قراءة ملف الترجمة، ومن ينقل المواد بين برنامج مونتاج ومشغّل ويب.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'tr': {
+    title: 'Altyazı Dönüştürücü - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Ücretsiz çevrimiçi altyazı dönüştürücü: SRT, VTT, ASS, SBV, LRC ve TXT arasında dönüştürün, zaman çizgisi korunur, ASS efekt etiketleri otomatik temizlenir. Tamamen tarayıcınızda çalışır - dosya asla yüklenmez.',
+    kw: 'altyazı dönüştürme,srt vtt dönüştürme,vtt srt dönüştürme,ass srt dönüştürme,altyazı metin,subtitle converter,srt converter',
+    intro: 'SRT, VTT, ASS, SBV, LRC ve TXT arasında dönüştürün, zaman çizgisi korunur.',
+    feat: 'Girdi biçimi otomatik algılanır ve zaman kodları çıktı biçimine göre yeniden yazılır; ASS efekt etiketleri ve zorunlu satır sonları sade bir biçime aktarılırken okunabilir metne döner; şarkı sözü dosyalarında saat alanı yoktur, bir saati aşan kısım dakika olarak toplanır.',
+    who: 'Oynatıcısı altyazı dosyasını okumayanlar ve malzemeyi kurgu programı ile web oynatıcı arasında taşıyanlar.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'nl': {
+    title: 'Ondertitelconverter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Gratis online ondertitelconverter: converteer tussen SRT, VTT, ASS, SBV, LRC en TXT met behoud van de tijdlijn, ASS-effecttags worden automatisch opgeschoond. Draait alleen in je browser - het bestand wordt nooit geüpload.',
+    kw: 'ondertitel converteren,srt naar vtt,vtt naar srt,ass naar srt,sbv naar srt,ondertitel naar tekst,subtitle converter,srt converter',
+    intro: 'Converteer tussen SRT, VTT, ASS, SBV, LRC en TXT met behoud van de tijdlijn.',
+    feat: 'Het invoerformaat wordt automatisch herkend en de tijdscodes worden herschreven voor het uitvoerformaat; ASS-effecttags en gedwongen regeleinden worden bij export naar een gewoon formaat weer leesbare tekst; liedtekstbestanden hebben geen ure-veld, dus alles boven een uur wordt in minuten geteld.',
+    who: 'Wie een speler heeft die het ondertitelbestand weigert, en wie materiaal heen en weer schuift tussen een editor en een webspeler.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'pl': {
+    title: 'Konwerter napisów - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Darmowy internetowy konwerter napisów: konwertuj między SRT, VTT, ASS, SBV, LRC i TXT, zachowując oś czasu, znaczniki efektów ASS są czyszczone automatycznie. Wszystko działa w przeglądarce - plik nigdy nie jest wysyłany.',
+    kw: 'konwersja napisów,srt na vtt,vtt na srt,ass na srt,sbv na srt,napisy do tekstu,subtitle converter,srt converter',
+    intro: 'Konwertuj między SRT, VTT, ASS, SBV, LRC i TXT, zachowując oś czasu.',
+    feat: 'Format wejściowy jest rozpoznawany automatycznie, a kody czasowe przepisywane na format wyjściowy; znaczniki efektów ASS i wymuszone łamania wierszy przy eksporcie do zwykłego formatu znów stają się czytelnym tekstem; pliki z tekstami piosenek nie mają pola godzin, więc wszystko powyżej godziny liczone jest w minutach.',
+    who: 'Osoby, których odtwarzacz nie przyjmuje pliku napisów, i osoby przenoszące materiał między edytorem a odtwarzaczem w przeglądarce.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'sv': {
+    title: 'Undertextkonverterare - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Gratis undertextkonverterare online: konvertera mellan SRT, VTT, ASS, SBV, LRC och TXT med tidslinjen intakt, ASS-effekttaggar städas automatiskt. Allt körs i webbläsaren - filen laddas aldrig upp.',
+    kw: 'konvertera undertexter,srt till vtt,vtt till srt,ass till srt,sbv till srt,undertext till text,subtitle converter,srt converter',
+    intro: 'Konvertera mellan SRT, VTT, ASS, SBV, LRC och TXT med tidslinjen intakt.',
+    feat: 'Inmatningsformatet känns igen automatiskt och tidskoderna skrivs om för utdataformatet; ASS-effekttaggar och tvingade radbrytningar blir läsbar text igen vid export till ett enkelt format; sångtextfiler saknar timfält, så allt över en timme räknas i minuter.',
+    who: 'Den vars spelare vägrar läsa undertextfilen, och den som flyttar material mellan ett redigeringsprogram och en webbspelare.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'cs': {
+    title: 'Převod titulků - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Bezplatný online převod titulků: převáděj mezi SRT, VTT, ASS, SBV, LRC a TXT se zachovanou časovou osou, značky efektů ASS se vyčistí automaticky. Vše běží v prohlížeči - soubor se nikdy nenahrává.',
+    kw: 'převod titulků,srt na vtt,vtt na srt,ass na srt,sbv na srt,titulky na text,subtitle converter,srt converter',
+    intro: 'Převáděj mezi SRT, VTT, ASS, SBV, LRC a TXT se zachovanou časovou osou.',
+    feat: 'Vstupní formát je rozpoznán automaticky a časové kódy jsou přepsány pro výstupní formát; značky efektů ASS a vynucené zalomení řádků se při exportu do běžného formátu vrací na čitelný text; soubory s texty písní nemají pole hodin, takže vše nad hodinu se počítá v minutách.',
+    who: 'Kdo má přehrávač, který soubor s titulky nevezme, a kdo přenáší materiál mezi střižnou a webovým přehrávačem.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'uk': {
+    title: 'Конвертер субтитрів - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Безкоштовний онлайн-конвертер субтитрів: перетворюйте SRT, VTT, ASS, SBV, LRC і TXT один в одного, таймлайн зберігається, теги ефектів ASS очищаються автоматично. Все працює у браузері - файл ніколи не завантажується.',
+    kw: 'конвертер субтитрів,srt в vtt,vtt в srt,ass в srt,sbv в srt,субтитри в текст,subtitle converter,srt converter',
+    intro: 'Перетворюйте SRT, VTT, ASS, SBV, LRC і TXT один в одного, таймлайн зберігається.',
+    feat: 'Формат вводу визначається автоматично, а таймкоди переписуються під формат виводу; теги ефектів ASS і примусові перенесення рядків при експорті у звичайний формат знову стають читабельним текстом; у файлах текстів пісень немає поля годин, тому все, що більше години, рахується у хвилинах.',
+    who: 'Ті, чий програвач не приймає файл субтитрів, і ті, хто переносить матеріал між редактором і веб-програвачем.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'da': {
+    title: 'Undertekstkonverter - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Gratis online undertekstkonverter: konverter mellem SRT, VTT, ASS, SBV, LRC og TXT med tidslinjen intakt, ASS-effektmærker ryddes op automatisk. Det hele kører i browseren - filen uploades aldrig.',
+    kw: 'konverter undertekster,srt til vtt,vtt til srt,ass til srt,sbv til srt,undertekst til tekst,subtitle converter,srt converter',
+    intro: 'Konverter mellem SRT, VTT, ASS, SBV, LRC og TXT med tidslinjen intakt.',
+    feat: 'Inputformatet registreres automatisk, og tidskoderne omskrives til outputformatet; ASS-effektmærker og tvungne linjeskift bliver til læsbar tekst igen ved eksport til et almindeligt format; sangtekstfiler har ikke et timefelt, så alt over en time tælles i minutter.',
+    who: 'Dem hvis afspiller ikke vil læse undertekstfilen, og dem der flytter materiale mellem et redigeringsprogram og en webafspiller.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'fi': {
+    title: 'Tekstitysmuunnin - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Ilmainen verkkotyökalu tekstitysten muuntamiseen: muunna SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-muotojen välillä aikajanan säilyessä, ASS-tehostemerkinnät siivotaan automaattisesti. Kaikki tapahtuu selaimessa - tiedostoa ei koskaan ladata palvelimelle.',
+    kw: 'muunna tekstitys,srt vtt muunnos,vtt srt muunnos,ass srt muunnos,tekstitys tekstiksi,subtitle converter,srt converter',
+    intro: 'Muunna SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-muotojen välillä aikajanan säilyessä.',
+    feat: 'Syötemuoto tunnistetaan automaattisesti ja aikakoodit kirjoitetaan uudelleen tulostusmuotoon; ASS-tehostemerkinnät ja pakotetut rivinvaihdot muuttuvat luettavaksi tekstiksi vietäessä tavalliseen muotoon; sanoitustiedostoissa ei ole tuntikenttää, joten yli tunnin menevä osuus lasketaan minuutteina.',
+    who: 'Ne, joiden soitin ei suostu lukemaan tekstitystiedostoa, ja ne, jotka siirtävät aineistoa editorin ja verkkosoittimen välillä.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'el': {
+    title: 'Μετατροπέας υποτίτλων - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Δωρεάν διαδικτυακός μετατροπέας υποτίτλων: μετατρέψτε μεταξύ SRT, VTT, ASS, SBV, LRC και TXT διατηρώντας τη χρονική γραμμή, οι ετικέτες εφέ ASS καθαρίζονται αυτόματα. Όλα γίνονται στον περιηγητή - το αρχείο δεν ανεβαίνει ποτέ.',
+    kw: 'μετατροπή υποτίτλων,srt σε vtt,vtt σε srt,ass σε srt,sbv σε srt,υπότιτλοι σε κείμενο,subtitle converter,srt converter',
+    intro: 'Μετατρέψτε μεταξύ SRT, VTT, ASS, SBV, LRC και TXT διατηρώντας τη χρονική γραμμή.',
+    feat: 'Η μορφή εισόδου αναγνωρίζεται αυτόματα και οι χρονικοί κώδικες ξαναγράφονται για τη μορφή εξόδου· οι ετικέτες εφέ ASS και οι αναγκαστικές αλλαγές γραμμής γίνονται ξανά αναγνώσιμο κείμενο κατά την εξαγωγή σε απλή μορφή· τα αρχεία στίχων δεν έχουν πεδίο ώρας, οπότε ό,τι ξεπερνά τη μία ώρα μετριέται σε λεπτά.',
+    who: 'Όσων ο player δεν διαβάζει το αρχείο υποτίτλων, και όσων μεταφέρουν υλικό ανάμεσα σε ένα πρόγραμμα μοντάζ και έναν web player.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'he': {
+    title: 'ממיר כתוביות - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'ממיר כתוביות חינמי באינטרנט: המרה בין SRT, VTT, ASS, SBV, LRC ו־TXT תוך שמירה על ציר הזמן, ותגיות האפקטים של ASS מנוקות אוטומטית. הכול מתבצע בדפדפן - הקובץ לעולם לא מועלה.',
+    kw: 'המרת כתוביות,srt ל vtt,vtt ל srt,ass ל srt,sbv ל srt,כתוביות לטקסט,subtitle converter,srt converter',
+    intro: 'המרה בין SRT, VTT, ASS, SBV, LRC ו־TXT תוך שמירה על ציר הזמן.',
+    feat: 'פורמט הקלט מזוהה אוטומטית וקודי הזמן נכתבים מחדש לפי פורמט הפלט; תגיות האפקטים של ASS ושבירת השורה הכפויה חוזרות להיות טקסט קריא בייצוא לפורמט פשוט; בקובצי מילים אין שדה שעות, ולכן מה שמעל שעה נספר בדקות.',
+    who: 'מי שהנגן שלו מסרב לקרוא את קובץ הכתוביות, ומי שמעביר חומר בין תוכנת עריכה לנגן ווב.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  },
+  'ro': {
+    title: 'Convertor de subtitrări - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    desc: 'Convertor de subtitrări online gratuit: convertește între SRT, VTT, ASS, SBV, LRC și TXT păstrând linia de timp, etichetele de efecte ASS sunt curățate automat. Totul rulează în browser - fișierul nu este încărcat niciodată.',
+    kw: 'conversie subtitrări,srt în vtt,vtt în srt,ass în srt,sbv în srt,subtitrări în text,subtitle converter,srt converter',
+    intro: 'Convertește între SRT, VTT, ASS, SBV, LRC și TXT păstrând linia de timp.',
+    feat: 'Formatul de intrare este detectat automat, iar codurile de timp sunt rescrise pentru formatul de ieșire; etichetele de efecte ASS și trecerile forțate la linie nouă redevin text lizibil la exportul într-un format simplu; fișierele cu versuri nu au câmp pentru ore, așa că ce depășește o oră se adună în minute.',
+    who: 'Cei al căror player nu vrea să citească fișierul de subtitrări, și cei care mută material între un editor și un player web.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
+  }
+};
+
 const SEO_PAGES = {
   index: { file: 'index.html', table: SEO, path: SEO_PATH, jsonldType: 'WebApplication' },
   merge: { file: 'merge.html', table: SEO_MERGE, path: MERGE_PATH, jsonldType: 'WebApplication' },
   clean: { file: 'clean.html', table: SEO_CLEAN, path: CLEAN_PATH, jsonldType: 'WebApplication' },
-  translate: { file: 'translate.html', table: SEO_TRANSLATE, path: TRANSLATE_PATH, jsonldType: 'WebApplication' }
+  translate: { file: 'translate.html', table: SEO_TRANSLATE, path: TRANSLATE_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.288：第五个页面 —— 字幕格式转换 */
+  convert: { file: 'convert.html', table: SEO_CONVERT, path: CONVERT_PATH, jsonldType: 'WebApplication' }
 };
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
@@ -1703,9 +1956,10 @@ function serveIndexLang(req, res, lang, page){
   });
 }
 
-/* sitemap：四页 × 27 语言 = 108 条 URL，每条带本页的 hreflang alternates。
+/* sitemap：五页 × 27 语言 = 135 条 URL，每条带本页的 hreflang alternates。
    v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。
-   v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。 */
+   v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。
+   v0.9.288 起字幕格式转换独立成 /convert.html，第五个页面进表。 */
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {
