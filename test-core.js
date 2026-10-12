@@ -5384,7 +5384,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.290/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.291/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5425,9 +5425,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.290</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.290</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.290/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.291</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.291</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.291/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5613,8 +5613,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.290</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.290/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.291</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.291/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7455,11 +7455,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.290/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.290/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.290/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.290/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.290/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.291/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.291/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.291/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.291/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.291/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8964,14 +8964,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.290/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.290/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.291/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.291/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.290/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.290/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.290/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.291/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.291/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.291/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.290/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.291/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9446,13 +9446,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.290/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.290/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.290/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.290/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.290/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.291/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.291/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.291/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.291/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.291/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.290/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.291/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9474,7 +9474,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0\.9\.290">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0\.9\.291">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9485,7 +9485,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.290') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.291') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -10144,7 +10144,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/<script[^>]+site-nav\.js/.test(h), '转换页不许引入 site-nav.js（那是另外三页共用的导航）');
     assert.ok(!/<script[^>]+site-i18n\.js/.test(h), '转换页不许引入 site-i18n.js（那是另外三页共用的词典）');
     assert.ok(/convert-i18n\.js/.test(h), '转换页应加载自己的词典');
-    assert.ok(/convert-core\.js\?v=0\.9\.290/.test(h), '转换页引擎没带版本号');
+    assert.ok(/convert-core\.js\?v=0\.9\.291/.test(h), '转换页引擎没带版本号');
     assert.strictEqual((h.match(/<h1/g) || []).length, 1, '转换页只应有一个 h1');
     assert.ok(/<!--SEO-HEAD-START-->/.test(h) && /<!--SEO-COPY-START-->/.test(h),
       '缺 SEO 占位块，服务端按语言注入会失效');
@@ -10321,7 +10321,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const SEO_BILINGUAL\s*=/.test(s), '缺 SEO_BILINGUAL 表');
     assert.ok(/BILINGUAL_PATH\[l\]\s*=/.test(s), '缺 BILINGUAL_PATH 路径表');
     assert.ok(/bilingual:\s*\{ file: 'bilingual\.html'/.test(s), 'SEO_PAGES 里没登记剥离页');
-    assert.ok(/\(merge\|clean\|translate\|convert\|bilingual\)\\\.html/.test(s), '语言路由正则没带上 bilingual');
+    /* ⚠️ 正则里的页名会随新页继续加（291 加了 shift），判据只要求「带得上 bilingual」，
+       别把整条正则写死 —— 否则每加一页这条就得改一次 */
+    assert.ok(/\(merge\|clean\|translate\|convert\|bilingual[^)]*\)\\\.html/.test(s), '语言路由正则没带上 bilingual');
     const block = s.match(/const SEO_BILINGUAL = \{[\s\S]*?\n\};/);
     assert.ok(block, '抠不出 SEO_BILINGUAL 整块');
     const codes = (block[0].match(/^\s{2}'[a-zA-Z-]{2,5}':\s*\{/gm) || []).length;
@@ -10454,6 +10456,175 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/convert-i18n\.js\?v=0\.9\.\d+/.test(readT('convert.html')), 'convert-i18n.js 没带 ?v=');
     assert.ok(/bilingual-i18n\.js\?v=0\.9\.\d+/.test(readT('bilingual.html')), 'bilingual-i18n.js 没带 ?v=');
   });
+
+  /* ==========================================================================
+     v0.9.291：第七个页面 —— 字幕时间轴调整（/shift.html）
+     同样是三件套硬隔离（shift.html + shift-core.js + shift-i18n.js）。
+     这里钉死三件事：三种调整方式算得对、负时间不静默、新页没碰任何老文件。
+     ========================================================================== */
+  let SH = null;
+  try {
+    const vm = require('vm');
+    const sandbox = { window: {}, console: console };
+    sandbox.global = sandbox;
+    vm.createContext(sandbox);
+    vm.runInContext(readT('shift-core.js'), sandbox, { filename: 'shift-core.js' });
+    SH = sandbox.window.ShiftCore;
+  } catch (e) { SH = null; }
+
+  const SH_SRT = '1\n00:00:01,000 --> 00:00:03,200\nHello\n\n'
+    + '2\n00:00:05,000 --> 00:00:07,000\nWorld\n';
+
+  t('v0.9.291：时间轴引擎能独立加载，三种调整方式都在', () => {
+    assert.ok(SH, 'shift-core.js 加载失败');
+    assert.deepStrictEqual(HOST(SH.MODES.map(m => m.id)), ['shift', 'rate', 'two'], '三种调整方式变了');
+    assert.strictEqual(SH.FORMATS.length, 6, '输出格式数量变了，SEO 文案要跟着改');
+    assert.strictEqual(SH.READABLE.length, 7, '读入格式数量变了');
+  });
+
+  t('v0.9.291：整体平移只改位置，每条时长一毫秒都不动', () => {
+    const g = SH.parse(SH_SRT, 'srt');
+    assert.strictEqual(g.length, 2, '样例没解析出 2 条');
+    const r = SH.apply(g, 'shift', { ms: 2000 });
+    assert.strictEqual(r.ok, true, '平移被当成非法参数');
+    assert.strictEqual(r.clamped, 0, '不该有条目被截断');
+    assert.deepStrictEqual(HOST(r.cues.map(c => c.start)), [3000, 7000], '平移后起点不对');
+    assert.deepStrictEqual(HOST(r.cues.map(c => c.end)), [5200, 9000], '平移后终点不对');
+    /* 时长必须逐条相等 —— 平移的定义就是「不动时长」 */
+    assert.deepStrictEqual(HOST(r.cues.map((c, i) => c.end - c.start)),
+      HOST(g.map(c => c.end - c.start)), '平移把某条字幕的时长改了');
+    assert.deepStrictEqual(HOST(r.cues.map(c => c.text)), ['Hello', 'World'], '平移不该动字幕内容');
+  });
+
+  t('v0.9.291：提前过头的时间截断到 0，并如实报出条数', () => {
+    const g = SH.parse(SH_SRT, 'srt');
+    const r = SH.apply(g, 'shift', { ms: -6000 });
+    assert.deepStrictEqual(HOST(r.cues.map(c => c.start)), [0, 0], '负数时间没被压到 0');
+    assert.strictEqual(r.clamped, 2, '截断条数不对（页面要拿这个数提示用户）');
+    /* 压到 0 之后，end 不能跑到 start 前面去 */
+    r.cues.forEach(c => { assert.ok(c.end > c.start, '截断后出现了 end 不晚于 start 的条目'); });
+    /* 只压掉一部分时，另一部分照常平移 */
+    const half = SH.apply(g, 'shift', { ms: -2000 });
+    assert.deepStrictEqual(HOST(half.cues.map(c => c.start)), [0, 3000], '部分截断的结果不对');
+    assert.strictEqual(half.clamped, 1, '只该报 1 条被截断');
+  });
+
+  t('v0.9.291：倍率缩放把时长同步缩放（24/25 帧互转那条路）', () => {
+    const g = SH.parse(SH_SRT, 'srt');
+    const r = SH.apply(g, 'rate', { rate: 1.5 });
+    assert.deepStrictEqual(HOST(r.cues.map(c => c.start)), [1500, 7500], '缩放后起点不对');
+    assert.deepStrictEqual(HOST(r.cues.map(c => c.end)), [4800, 10500], '缩放后终点不对');
+    assert.deepStrictEqual(HOST(r.cues.map((c, i) => c.end - c.start)), [3300, 3000],
+      '缩放后时长没跟着变（2200/2000 × 1.5 = 3300/3000）');
+    /* 缩小到 0 以下的时间同样要压住 */
+    const back = SH.apply(g, 'rate', { rate: -1 });
+    assert.strictEqual(back.ok, false, '负倍率必须被当成非法参数，不能倒着算');
+  });
+
+  t('v0.9.291：两点校正让首末条正好落在目标时间上', () => {
+    const g = SH.parse(SH_SRT, 'srt');
+    const opt = { fromStart: 1000, fromEnd: 7000, toStart: 2000, toEnd: 9000 };
+    const r = SH.apply(g, 'two', opt);
+    assert.strictEqual(r.cues[0].start, 2000, '首条没对上目标时间');
+    assert.strictEqual(r.cues[r.cues.length - 1].end, 9000, '末条没对上目标时间');
+    assert.strictEqual(r.clamped, 0, '两点校正不该有截断');
+    /* 中间按比例：k = (9000-2000)/(7000-1000) = 7/6 */
+    assert.strictEqual(r.cues[0].end, 2000 + Math.round(2200 * 7 / 6), '中间条目的映射不对');
+    /* 当前两点重合时退化成平移，不许除出 NaN / Infinity */
+    const flat = SH.apply(g, 'two', { fromStart: 1000, fromEnd: 1000, toStart: 3000, toEnd: 3000 });
+    assert.ok(flat.cues.every(c => isFinite(c.start) && isFinite(c.end)), '两点重合算出 NaN 了');
+    assert.strictEqual(flat.cues[0].start, 3000, '两点重合时应退化为整体平移');
+  });
+
+  t('v0.9.291：参数填错不许跑出一份错字幕', () => {
+    const g = SH.parse(SH_SRT, 'srt');
+    assert.strictEqual(SH.valid('shift', { ms: NaN }), false, '空偏移被当成合法');
+    assert.strictEqual(SH.valid('rate', { rate: 0 }), false, '倍率 0 被当成合法');
+    assert.strictEqual(SH.valid('rate', { rate: -1 }), false, '负倍率被当成合法');
+    assert.strictEqual(SH.valid('two', { fromStart: 0, fromEnd: 0, toStart: 0, toEnd: null }), false,
+      '两点校正缺一个时间还被当成合法');
+    /* valid 说不行，apply 就必须拒绝（页面靠这两个一起拦） */
+    assert.strictEqual(SH.apply(g, 'rate', { rate: 0 }).ok, false, '非法参数还是跑出了结果');
+  });
+
+  t('v0.9.291：时间输入框认三种写法', () => {
+    assert.strictEqual(SH.parseUserTime('1:02:03,400'), 3723400, '「时:分:秒,毫」读错');
+    assert.strictEqual(SH.parseUserTime('02:03.4'), 123400, '「分:秒.厘」读错');
+    assert.strictEqual(SH.parseUserTime('90'), 90000, '纯秒数读错');
+    assert.strictEqual(SH.parseUserTime('00:00:00,000'), 0, '全零读错');
+    assert.strictEqual(SH.parseUserTime('这不是时间'), null, '乱填的内容应该判为无效');
+    assert.strictEqual(SH.parseUserTime(''), null, '空值应该判为无效');
+  });
+
+  t('v0.9.291：时间轴页三件套硬隔离，没碰任何共用模块', () => {
+    const sh = readT('shift.html'), sc = readT('shift-core.js'), si = readT('shift-i18n.js');
+    /* 不引共用导航 / 共用词典 / 另外两页的引擎 */
+    ['site-nav.js', 'site-i18n.js', 'convert-core.js', 'convert-i18n.js',
+     'bilingual-core.js', 'bilingual-i18n.js', 'srt-core.js'].forEach(f => {
+      assert.ok(!new RegExp('(src|require\\()[\\s\\S]{0,40}' + f.replace('.', '\\.')).test(sh),
+        'shift.html 引了共用模块 ' + f);
+    });
+    assert.ok(/shift-core\.js/.test(sh) && /shift-i18n\.js/.test(sh), 'shift.html 没引自己的三件套');
+    assert.ok(/SHIFT_I18N/.test(sh) && /ShiftCore/.test(sh), 'shift.html 没用自己的全局出口');
+    /* 引擎与词典独立成篇，不依赖别人 */
+    assert.ok(!/ConvertCore|BilingualCore|require\(/.test(sc), 'shift-core.js 依赖了别的引擎');
+    assert.ok(/ShiftCore/.test(sc), 'shift-core.js 没导出 ShiftCore');
+    assert.ok(/SHIFT_I18N/.test(si) && !/CONVERT_I18N|BILINGUAL_I18N/.test(si), 'shift-i18n.js 的出口不对');
+    /* 老页面不许出现指向新页的链接 —— 首页卡片与老页导航本轮都不动 */
+    ['index.html', 'translate.html', 'merge.html', 'clean.html', 'convert.html', 'bilingual.html'].forEach(f => {
+      assert.ok(!/shift\.html/.test(readT(f)), f + ' 里出现了 /shift.html（本轮不该动老页）');
+    });
+  });
+
+  t('v0.9.291：时间轴页词典 27 语齐全且不混汉字', () => {
+    const vmS = require('vm');
+    const sb = { window: {}, console: console }; sb.global = sb; vmS.createContext(sb);
+    vmS.runInContext(readT('shift-i18n.js'), sb, { filename: 'shift-i18n.js' });
+    const I = sb.window.SHIFT_I18N;
+    assert.strictEqual(I.LANGS.length, 27, '语言数不是 27');
+    const keys = Object.keys(I.DICT['zh-CN']);
+    const bad = [];
+    I.LANGS.forEach(([code]) => {
+      const d = I.DICT[code];
+      if (!d) { bad.push(code + ':缺整块'); return; }
+      keys.forEach(k => {
+        const v = d[k];
+        if (v === undefined) { bad.push(code + ':' + k + ':缺'); return; }
+        /* ⚠️ 中日韩三版本来就该是汉字，别一起判（290 踩过） */
+        if (/^(zh|ja|ko)/.test(code)) return;
+        if (/[一-鿿]/.test(v)) bad.push(code + ':' + k + ':混汉字');
+      });
+    });
+    assert.deepStrictEqual(bad, [], '词典问题：' + bad.join(' / '));
+    /* 带占位符的词条，27 语都得留着 {0} */
+    ['statCues', 'statRange', 'msgClamp'].forEach(k => {
+      I.LANGS.forEach(([code]) => {
+        assert.ok(String(I.DICT[code][k]).indexOf('{0}') >= 0, code + ' 的 ' + k + ' 丢了占位符');
+      });
+    });
+  });
+
+  t('v0.9.291：服务端为时间轴页接了 SEO、路由与 sitemap', () => {
+    const sv = readT('server.js');
+    const blk = (sv.match(/const SEO_SHIFT = \{[\s\S]*?\n\};/) || [''])[0];
+    assert.ok(blk, 'server.js 里没有 SEO_SHIFT 表');
+    const codes = (blk.match(/^\s{2}'[a-zA-Z-]+':\s*\{/gm) || []).length;
+    assert.strictEqual(codes, 27, 'SEO_SHIFT 语言块数不是 27（实际 ' + codes + '）');
+    ['title', 'desc', 'kw', 'intro', 'feat', 'who'].forEach(k => {
+      const n = (blk.match(new RegExp('\\s' + k + ':', 'g')) || []).length;
+      assert.strictEqual(n, 27, 'SEO_SHIFT 的 ' + k + ' 不是 27 条（实际 ' + n + '）');
+    });
+    assert.ok(/SHIFT_PATH\[l\] = /.test(sv), 'server 没建 SHIFT_PATH');
+    assert.ok(/shift: \{ file: 'shift\.html', table: SEO_SHIFT, path: SHIFT_PATH/.test(sv),
+      'SEO_PAGES 里没登记 shift 页');
+    /* 路由正则：语言目录 + zh-CN 直连，两处都得带上 shift */
+    assert.ok(/\/\(\[a-zA-Z\]\[a-zA-Z\\-\]\*\)\\\/\([^)]*bilingual[^)]*shift[^)]*\)\\\.html\$/.test(sv),
+      '语言目录路由没带上 shift');
+    assert.ok(/\^\\\/\(merge\|clean\|translate\|convert\|bilingual\|shift\)\\\.html\$/.test(sv),
+      'zh-CN 直连路由没带上 shift');
+    assert.ok(/七页 × 27 语言 = 189/.test(sv), 'sitemap 注释没改成七页 189 条');
+  });
+
 
   });
 }
