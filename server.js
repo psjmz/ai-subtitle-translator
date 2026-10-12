@@ -1849,20 +1849,22 @@ const SEO_CONVERT = {
      共用 title/description 会被搜索引擎当成重复内容收录。 */
 const SEO_BILINGUAL = {
   'zh-CN': {
-    title: '双语字幕剥离 - 只留中文 / 只留原文 / 拆成两份 | 随心字幕 AI',
-    desc: '免费在线双语字幕剥离：把中英双语字幕拆成原文一份、中文一份，或者只留其中一种。时间轴原样保留，纯浏览器本地处理，文件不上传服务器。',
-    kw: '双语字幕剥离,双语字幕只留中文,双语字幕提取英文,双语字幕拆分,srt双语分离,ass双语字幕拆分,字幕只留一种语言,bilingual subtitle splitter',
-    intro: '把中英双语字幕拆成原文一份、中文一份，或者只留其中一种。',
-    feat: '支持「一条字幕两行」和「两条字幕同一时间轴」两种双语写法；按字符形态分轨，时间轴原样保留；整片只有一种语言的字幕会给出提示，不会悄悄删内容。',
+    /* ⚠️ v0.9.290：文案不再写死「中文」—— 译文可能是英文 / 日文 / 法文。
+       kw 里那两条「只留中文」是真实搜索词，留着拉流量；但标题与正文说「译文」。 */
+    title: '双语字幕剥离 - 只留译文 / 只留原文 / 拆成两份 | 随心字幕 AI',
+    desc: '免费在线双语字幕剥离：把双语字幕拆成原文一份、译文一份，或者只留其中一种。时间轴原样保留，纯浏览器本地处理，文件不上传服务器。',
+    kw: '双语字幕剥离,双语字幕只留译文,双语字幕只留中文,双语字幕只保留一种语言,双语字幕提取原文,双语字幕拆分,srt双语分离,ass双语字幕拆分,bilingual subtitle splitter',
+    intro: '把双语字幕拆成原文一份、译文一份，或者只留其中一种。',
+    feat: '支持「一条字幕两行」和「两条字幕同一时间轴」两种双语写法；按先后与文字系统分轨，译文是英文、日文还是法文都成立；时间轴原样保留；整片只有一种语言的字幕会给出提示，不会悄悄删内容。',
     who: '拿到别人做好的双语字幕、只想留一种语言的人，以及要把原文与译文分开存档的字幕组。',
     siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'AI-SRTSub'
   },
   'zh-TW': {
-    title: '雙語字幕剝離 - 只留中文 / 只留原文 / 拆成兩份 | 隨心字幕 AI',
-    desc: '免費線上雙語字幕剝離：把中英雙語字幕拆成原文一份、中文一份，或者只留其中一種。時間軸原樣保留，純瀏覽器本地處理，檔案不上傳伺服器。',
-    kw: '雙語字幕剝離,雙語字幕只留中文,雙語字幕提取英文,雙語字幕拆分,srt雙語分離,ass雙語字幕拆分,字幕只留一種語言,bilingual subtitle splitter',
-    intro: '把中英雙語字幕拆成原文一份、中文一份，或者只留其中一種。',
-    feat: '支援「一條字幕兩行」和「兩條字幕同一時間軸」兩種雙語寫法；依字元形態分軌，時間軸原樣保留；整片只有一種語言的字幕會給出提示，不會悄悄刪內容。',
+    title: '雙語字幕剝離 - 只留譯文 / 只留原文 / 拆成兩份 | 隨心字幕 AI',
+    desc: '免費線上雙語字幕剝離：把雙語字幕拆成原文一份、譯文一份，或者只留其中一種。時間軸原樣保留，純瀏覽器本地處理，檔案不上傳伺服器。',
+    kw: '雙語字幕剝離,雙語字幕只留譯文,雙語字幕只留中文,雙語字幕只保留一種語言,雙語字幕提取原文,雙語字幕拆分,srt雙語分離,ass雙語字幕拆分,bilingual subtitle splitter',
+    intro: '把雙語字幕拆成原文一份、譯文一份，或者只留其中一種。',
+    feat: '支援「一條字幕兩行」和「兩條字幕同一時間軸」兩種雙語寫法；依先後與文字系統分軌，譯文是英文、日文還是法文都成立；時間軸原樣保留；整片只有一種語言的字幕會給出提示，不會悄悄刪內容。',
     who: '拿到別人做好的雙語字幕、只想留一種語言的人，以及要把原文與譯文分開存檔的字幕組。',
     siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'AI-SRTSub'
   },
@@ -1871,7 +1873,7 @@ const SEO_BILINGUAL = {
     desc: 'Free online bilingual subtitle splitter: split a bilingual subtitle file into an original track and a translated track, or keep just one. The timeline is preserved and everything runs in your browser - the file is never uploaded.',
     kw: 'bilingual subtitle splitter,split bilingual srt,remove second language subtitle,keep only english subtitle,extract translated subtitle,srt bilingual split,ass bilingual split',
     intro: 'Split a bilingual subtitle file into an original track and a translated track, or keep just one of them.',
-    feat: 'Handles both common layouts - one cue carrying two lines, and two cues sharing the same timeline. Tracks are separated by script, the timeline is kept exactly as it is, and a single-language file is flagged instead of being silently emptied.',
+    feat: 'Handles both common layouts - one cue carrying two lines, and two cues sharing the same timeline. Tracks are split by order and script type, the timeline is kept exactly as it is, and a single-language file is flagged instead of being silently emptied.',
     who: 'Anyone handed a ready-made bilingual file who wants only one language, and subtitle teams who archive the original and the translation separately.',
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
@@ -1916,7 +1918,7 @@ const SEO_BILINGUAL = {
     desc: 'Kostenloses Online-Werkzeug: zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen oder nur eine behalten. Die Zeitachse bleibt erhalten, alles läuft im Browser.',
     kw: 'zweisprachige untertitel trennen,nur eine sprache untertitel,zweite sprache entfernen untertitel,srt zweisprachig trennen,untertitel übersetzung extrahieren',
     intro: 'Zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen - oder nur eine von beiden behalten.',
-    feat: 'Beide üblichen Varianten werden erkannt: eine Zeile mit zwei Textzeilen und zwei Zeilen mit identischer Zeitachse. Getrennt wird nach Schriftzeichen, die Zeitachse bleibt unverändert, und eine einsprachige Datei meldet sich statt stillschweigend leer zu bleiben.',
+    feat: 'Beide üblichen Varianten werden erkannt: eine Zeile mit zwei Textzeilen und zwei Zeilen mit identischer Zeitachse. Getrennt wird nach Reihenfolge und Schriftart, die Zeitachse bleibt unverändert, und eine einsprachige Datei meldet sich statt stillschweigend leer zu bleiben.',
     who: 'Wer fertige zweisprachige Untertitel bekommt und nur eine Sprache braucht, und Teams, die Original und Übersetzung getrennt archivieren.',
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
@@ -1925,7 +1927,7 @@ const SEO_BILINGUAL = {
     desc: 'Outil en ligne gratuit : séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez qu\'une seule. La ligne de temps est conservée et tout se passe dans le navigateur.',
     kw: 'séparer sous-titres bilingues,garder une seule langue sous-titres,retirer deuxième langue sous-titres,srt bilingue séparer,extraire sous-titres traduits',
     intro: 'Séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez que l\'une des deux.',
-    feat: 'Les deux présentations courantes sont gérées : une entrée à deux lignes et deux entrées partageant la même ligne de temps. Le tri se fait par type d\'écriture, la ligne de temps reste intacte, et un fichier monolingue prévient au lieu de se vider en silence.',
+    feat: 'Les deux présentations courantes sont gérées : une entrée à deux lignes et deux entrées partageant la même ligne de temps. Le tri se fait selon l\'ordre et le type d\'écriture, la ligne de temps reste intacte, et un fichier monolingue prévient au lieu de se vider en silence.',
     who: 'Ceux qui reçoivent des sous-titres bilingues tout faits et ne veulent qu\'une langue, et les équipes qui archivent original et traduction séparément.',
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
@@ -1979,7 +1981,7 @@ const SEO_BILINGUAL = {
     desc: 'Strumento online gratuito per separare i sottotitoli bilingui: dividili in una traccia originale e una tradotta, oppure tieni solo una delle due. La linea del tempo resta invariata e tutto avviene nel browser.',
     kw: 'separare sottotitoli bilingui,sottotitoli una sola lingua,rimuovere seconda lingua sottotitoli,srt bilingue separare,estrarre sottotitoli tradotti',
     intro: 'Dividi i sottotitoli bilingui in una traccia originale e una tradotta, oppure tieni solo una delle due.',
-    feat: 'Gestisce entrambe le forme più comuni: una voce con due righe e due voci che condividono la stessa linea del tempo. La separazione avviene per tipo di scrittura, la linea del tempo resta identica e un file monolingue avvisa invece di svuotarsi in silenzio.',
+    feat: 'Gestisce entrambe le forme più comuni: una voce con due righe e due voci che condividono la stessa linea del tempo. La separazione avviene per ordine e tipo di scrittura, la linea del tempo resta identica e un file monolingue avvisa invece di svuotarsi in silenzio.',
     who: 'Chi riceve sottotitoli bilingui già pronti e vuole una sola lingua, e i team che archiviano originale e traduzione separatamente.',
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
@@ -2006,7 +2008,7 @@ const SEO_BILINGUAL = {
     desc: 'Gratis online tool: splits tweetalige ondertiteling in een originele en een vertaalde versie, of houd er maar één over. De tijdlijn blijft behouden en alles draait in de browser.',
     kw: 'tweetalige ondertiteling splitsen,ondertiteling één taal,tweede taal verwijderen ondertiteling,srt tweetalig splitsen,vertaalde ondertiteling extraheren',
     intro: 'Splits tweetalige ondertiteling in een originele en een vertaalde versie, of houd er maar één over.',
-    feat: 'Beide gangbare vormen worden herkend: één item met twee regels en twee items die dezelfde tijdlijn delen. Scheiden gebeurt op schrifttype, de tijdlijn blijft gelijk en een eentalig bestand geeft een melding in plaats van stilletjes leeg te raken.',
+    feat: 'Beide gangbare vormen worden herkend: één item met twee regels en twee items die dezelfde tijdlijn delen. Scheiden gebeurt op volgorde en schrifttype, de tijdlijn blijft gelijk en een eentalig bestand geeft een melding in plaats van stilletjes leeg te raken.',
     who: 'Wie kant-en-klare tweetalige ondertiteling krijgt en maar één taal nodig heeft, en teams die origineel en vertaling apart archiveren.',
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
@@ -2024,7 +2026,7 @@ const SEO_BILINGUAL = {
     desc: 'Gratis online-verktyg: dela tvåspråkig undertext i en original- och en översättningsdel, eller behåll bara en. Tidslinjen bevaras och allt sker i webbläsaren.',
     kw: 'dela tvåspråkig undertext,undertext ett språk,ta bort andra språket undertext,dela srt tvåspråkig,extrahera översatt undertext',
     intro: 'Dela tvåspråkig undertext i en original- och en översättningsdel, eller behåll bara en av dem.',
-    feat: 'Båda vanliga varianterna hanteras: en post med två rader och två poster som delar samma tidslinje. Uppdelningen sker efter skrifttyp, tidslinjen lämnas orörd och en enspråkig fil varnar i stället för att tömmas i tysthet.',
+    feat: 'Båda vanliga varianterna hanteras: en post med två rader och två poster som delar samma tidslinje. Uppdelningen sker efter ordning och skrifttyp, tidslinjen lämnas orörd och en enspråkig fil varnar i stället för att tömmas i tysthet.',
     who: 'Den som fått färdig tvåspråkig undertext och bara vill ha ett språk, och team som arkiverar original och översättning separat.',
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
@@ -2051,7 +2053,7 @@ const SEO_BILINGUAL = {
     desc: 'Gratis online værktøj: del tosprogede undertekster op i en original og en oversat udgave, eller behold kun den ene. Tidslinjen bevares, og det hele foregår i browseren.',
     kw: 'del tosprogede undertekster,undertekster ét sprog,fjern andet sprog undertekster,del srt tosproget,udtræk oversatte undertekster',
     intro: 'Del tosprogede undertekster op i en original og en oversat udgave, eller behold kun den ene af dem.',
-    feat: 'Begge almindelige varianter håndteres: én post med to linjer og to poster der deler samme tidslinje. Opdelingen sker efter skrifttype, tidslinjen forbliver uændret, og en etsproget fil giver besked i stedet for at blive tømt i stilhed.',
+    feat: 'Begge almindelige varianter håndteres: én post med to linjer og to poster der deler samme tidslinje. Opdelingen sker efter rækkefølge og skrifttype, tidslinjen forbliver uændret, og en etsproget fil giver besked i stedet for at blive tømt i stilhed.',
     who: 'Dem der har fået færdige tosprogede undertekster og kun vil have ét sprog, og teams der arkiverer original og oversættelse hver for sig.',
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },

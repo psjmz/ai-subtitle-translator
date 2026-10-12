@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- 以下 SEO head 区块由 server.js 按语言路由（/bilingual.html 与 /en/bilingual.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
 <!--SEO-HEAD-START-->
-<title>双语字幕剥离 - 只留中文 / 只留原文 / 拆成两份 | 随心字幕 AI</title>
-<meta name="description" content="免费在线双语字幕剥离：把中英双语字幕拆成原文一份、中文一份，或者只留其中一种。时间轴原样保留，纯浏览器本地处理，文件不上传服务器。">
-<meta name="keywords" content="双语字幕剥离,双语字幕只留中文,双语字幕提取英文,双语字幕拆分,srt双语分离,ass双语字幕拆分,bilingual subtitle splitter,remove second language subtitle">
+<!-- v0.9.290：文案不再写死「中文」—— 译文可能是英文 / 日文 / 法文；kw 里保留「只留中文」这条真实搜索词 -->
+<title>双语字幕剥离 - 只留译文 / 只留原文 / 拆成两份 | 随心字幕 AI</title>
+<meta name="description" content="免费在线双语字幕剥离：把双语字幕拆成原文一份、译文一份，或者只留其中一种。时间轴原样保留，纯浏览器本地处理，文件不上传服务器。">
+<meta name="keywords" content="双语字幕剥离,双语字幕只留译文,双语字幕只留中文,双语字幕只保留一种语言,双语字幕提取原文,双语字幕拆分,srt双语分离,ass双语字幕拆分,bilingual subtitle splitter,remove second language subtitle">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#0E7490">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -86,6 +87,10 @@
   .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
     background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
   .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+  /* v0.9.290：没检测到双语时置灰的样子 */
+  .chip.warn{background:var(--stage);color:var(--sub);font-weight:400}
+  select.fmt:disabled{opacity:.45;cursor:not-allowed;background:var(--card-2);color:var(--sub)}
+  button.pri:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 
   button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
     background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
@@ -151,8 +156,13 @@ crossorigin="anonymous"></script>
 
   <div class="card" id="optCard">
     <h2><span class="n">2</span><span data-i18n="lblMode">要哪一种</span></h2>
-    <div class="row">
+    <!-- v0.9.290：没检测到双语时，模式下拉与「开始」一起置灰，并给出说明 ——
+         免得用户选了半天其实这份字幕没有双语可剥。 -->
+    <div class="row" id="modeRow">
       <select class="fmt" id="mode"></select>
+      <span class="chip mut" id="biState" style="display:none" data-i18n="mNone">未检测到双语字幕</span>
+    </div>
+    <div class="row">
       <span class="lb" data-i18n="lblOut">输出格式</span>
       <select class="fmt" id="outFmt" style="min-width:170px"></select>
       <button class="pri" id="btnGo" type="button" data-i18n="btnGo">开始</button>
@@ -171,8 +181,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="bilingual-i18n.js"></script>
-<script src="bilingual-core.js?v=0.9.289"></script>
+<script src="bilingual-i18n.js?v=0.9.290"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="bilingual-core.js?v=0.9.290"></script>
 <script>
 'use strict';
 var I18N = window.BILINGUAL_I18N.DICT, LANGS = window.BILINGUAL_I18N.LANGS;
@@ -231,6 +241,7 @@ function renderOptions() {
   var os = $('#outFmt'), curO = os.value || S.outFmt;
   os.innerHTML = C.FORMATS.map(function (f) { return '<option value="' + f.id + '">' + f.name + ' · ' + f.note + '</option>'; }).join('');
   os.value = curO; S.outFmt = os.value;
+  refreshBiState();   /* 首次进页面：没内容时控件就该是锁着的 */
 }
 
 function pathUiLang() {
@@ -263,7 +274,28 @@ function setSrc(text, fname) {
   if ($('#paste') && $('#paste').value !== S.src) $('#paste').value = S.src;
   $('#fname').textContent = S.fname;
   renderSrcFmt();
+  refreshBiState();
   hideMsg();
+}
+/* 这份字幕里有没有双语：没有就把模式下拉和「开始」一起置灰 + 说明。
+   空输入时什么都不说（还没得判），但控件一样锁着，免得空点。 */
+function refreshBiState() {
+  var ms = $('#mode'), go = $('#btnGo'), chip = $('#biState');
+  if (!ms) return;
+  var has = !!S.src.trim(), yes = false;
+  if (has && S.fmt) {
+    try { yes = window.BilingualCore.hasBilingual(window.BilingualCore.parse(S.src, S.fmt)); } catch (e) { yes = false; }
+  }
+  ms.disabled = !yes;
+  if (go) go.disabled = !yes;
+  if (!yes) { ms.value = 'src'; S.mode = 'src'; }
+  if (chip) {
+    if (!has) { chip.style.display = 'none'; return; }
+    chip.className = 'chip ' + (yes ? 'mut' : 'warn');
+    chip.setAttribute('data-i18n', yes ? 'mOk' : 'mNone');
+    chip.textContent = t(yes ? 'mOk' : 'mNone');
+    chip.style.display = '';
+  }
 }
 function renderSrcFmt() {
   var el = $('#srcFmt');
@@ -286,6 +318,7 @@ function clearAll() {
   $('#parts').innerHTML = '';
   $('#repCard').style.display = 'none';
   renderSrcFmt();
+  refreshBiState();
   hideMsg();
 }
 
@@ -306,7 +339,7 @@ function hideMsg() { $('#msg').style.display = 'none'; }
 /* 拆成两份时文件名加标记，免得两份同名互相覆盖 */
 function tagOf(key) {
   if (key === 'partSrc') return 'orig';
-  if (key === 'partZh') return 'zh';
+  if (key === 'partDst') return 'dst';
   return '';
 }
 function render() {
@@ -417,8 +450,8 @@ function bind() {
 <!--SEO-COPY-START-->
   <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
     <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">双语字幕剥离 - 随心字幕 AI (AI-SRTSub)</h2>
-    <p><strong>把中英双语字幕拆成原文一份、中文一份，或者只留其中一种。</strong></p>
-    <p style="margin-top:8px;">支持「一条字幕两行」和「两条字幕同一时间轴」两种双语写法；按字符形态分轨，时间轴原样保留；整片只有一种语言的字幕会给出提示，不会悄悄删内容。</p>
+    <p><strong>把双语字幕拆成原文一份、译文一份，或者只留其中一种。</strong></p>
+    <p style="margin-top:8px;">支持「一条字幕两行」和「两条字幕同一时间轴」两种双语写法；按先后与文字系统分轨，译文是英文、日文还是法文都成立；时间轴原样保留；整片只有一种语言的字幕会给出提示，不会悄悄删内容。</p>
     <p style="margin-top:8px;">拿到别人做的双语字幕、只想留一种语言的人，以及要把原文和译文分开存档的字幕组。</p>
   </section>
 <!--SEO-COPY-END-->

@@ -86,6 +86,10 @@
   .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
     background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
   .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+  /* v0.9.290：没检测到双语时「双语处理」整行置灰 —— 下拉禁用、标签也跟着淡下去 */
+  .chip.warn{background:var(--stage);color:var(--sub);font-weight:400}
+  .row .lb.off{opacity:.5}
+  select.fmt:disabled{opacity:.45;cursor:not-allowed;background:var(--card-2);color:var(--sub)}
 
   button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
     background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
@@ -153,9 +157,11 @@ crossorigin="anonymous"></script>
       <button class="pri" id="btnGo" type="button" data-i18n="btnGo">转换</button>
     </div>
     <!-- v0.9.289：双语处理。默认「保留双语」，与 288 的行为完全一致；
-         只有用户主动选了才动字幕内容。 -->
-    <div class="row">
-      <span class="lb" data-i18n="lblBi">双语处理</span>
+         只有用户主动选了才动字幕内容。
+         v0.9.290：没检测到双语时整行置灰（下拉禁用 + 标签变淡 + 说明文字），
+         免得用户在那儿选半天其实这功能用不上。 -->
+    <div class="row" id="biRow">
+      <span class="lb" id="biLb" data-i18n="lblBi">双语处理</span>
       <select class="fmt" id="biMode"></select>
       <span class="chip mut" id="biHint" style="display:none" data-i18n="biHint">检测到双语字幕</span>
     </div>
@@ -181,8 +187,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="convert-i18n.js"></script>
-<script src="convert-core.js?v=0.9.289"></script>
+<script src="convert-i18n.js?v=0.9.290"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="convert-core.js?v=0.9.290"></script>
 <script>
 'use strict';
 var I18N = window.CONVERT_I18N.DICT, LANGS = window.CONVERT_I18N.LANGS;
@@ -228,6 +234,7 @@ function applyI18n() {
   syncLogoHome();
   renderOutFmtOptions();
   renderBiOptions();
+  refreshBiHint();   /* v0.9.290：刚进页面没内容，双语处理就该是锁着的 */
 }
 function syncLogoHome() {
   var el = document.getElementById('logoHome');
@@ -255,15 +262,29 @@ function renderBiOptions() {
   sel.value = cur;
   S.bi = sel.value;
 }
-/* 只做提示，不改内容：解析一遍看这批字幕里有没有两种文字 */
+/* 检测这批字幕有没有双语：检测到才放开下拉，没检测到就置灰 + 说明。
+   空输入时什么都不说（那时候还没得判）。 */
 function refreshBiHint() {
-  var el = $('#biHint');
-  if (!el) return;
-  var yes = false;
-  try {
-    if (S.src.trim() && S.fmt) yes = window.ConvertCore.hasBilingual(window.ConvertCore.parse(S.src, S.fmt));
-  } catch (e) { yes = false; }
-  el.style.display = yes ? '' : 'none';
+  var sel = $('#biMode'), el = $('#biHint'), lb = $('#biLb');
+  if (!sel) return;
+  var has = !!S.src.trim(), yes = false;
+  if (has && S.fmt) {
+    try { yes = window.ConvertCore.hasBilingual(window.ConvertCore.parse(S.src, S.fmt)); } catch (e) { yes = false; }
+  }
+  sel.disabled = !yes;
+  if (lb) lb.className = yes ? 'lb' : 'lb off';
+  if (!yes) {
+    /* 置灰期间一律按「保留双语」走：别用上一个文件留下的选择去改新文件的内容 */
+    sel.value = 'keep';
+    S.bi = 'keep';
+  }
+  if (el) {
+    if (!has) { el.style.display = 'none'; return; }
+    el.setAttribute('data-i18n', yes ? 'biHint' : 'biNone');
+    el.textContent = t(yes ? 'biHint' : 'biNone');
+    el.className = 'chip ' + (yes ? 'mut' : 'warn');
+    el.style.display = '';
+  }
 }
 
 function pathUiLang() {

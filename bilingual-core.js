@@ -1,4 +1,4 @@
-/* bilingual-core.js —— 双语字幕剥离页的独立引擎（v0.9.289）
+/* bilingual-core.js —— 双语字幕剥离页的独立引擎（v0.9.289 建 / v0.9.290 改分轨）
    与 srt-core.js / merge-core.js / clean-core.js / convert-core.js 完全隔离：
    本文件只被 bilingual.html 加载，不引入、不修改任何现有引擎。
    解析与导出都在浏览器里跑完，不上传、不调模型 —— 这个页面一分钱调用费都不烧。
@@ -6,6 +6,8 @@
    双语字幕有两种长相，两种都要能处理：
      形态 A：一条字幕里两行（原文一行、译文一行）
      形态 B：两条独立字幕、时间轴完全相同（双语 ASS 最常见的做法）
+   ⚠️ 谁算原文、谁算译文**不靠语种猜**：同轴多条按先后（先=原文），一条多行按文字系统。
+      译文是英文 / 日文 / 法文都成立，不写死中文。
 
    支持读取：SRT / VTT / ASS / SSA / SBV / LRC / TXT
    支持导出：SRT / VTT / ASS / TXT
@@ -188,23 +190,54 @@
   }
 
   /* ---------------- 双语分轨 ---------------- */
-  var RE_HAN = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/;
-  var RE_KANA = /[\u3040-\u30FF\u31F0-\u31FF]/;
-  /* 只按字符形态分轨，不猜语种：带汉字且没有假名 = 译文那一轨；其余（拉丁 / 西里尔 / 假名…）= 原文那一轨。
-     ⚠️ 猜语种一旦猜错会静默删掉整条字幕，形态判断比语种判断稳得多。 */
-  function lineTrack(s) {
-    var t = String(s || '');
-    if (RE_HAN.test(t) && !RE_KANA.test(t)) return 'zh';
-    return 'src';
+  /* v0.9.290：不再假设「译文就是中文」，改成按「位置 + 文字系统」分轨。
+       ① 同一时间轴上有 ≥2 条独立字幕（双语 ASS 最常见的做法）→ 就是双轨：
+          **先出现的那条算原文轨，其余算译文轨**。不猜语种 —— 英法、英德这种
+          两条都用拉丁字母的字幕也分得开。
+       ② 一条里有多行（两种语言写在同一句里）→ 看文字系统：出现 2 种以上才算双语，
+          先出现的系统算原文轨；只有 1 种（英文长句折行 / 中文长句折行）→ 视为单语，原样不动。
+     ⚠️ 两种长相必须分开判：折行也是「一条里两行」，只看行数会把折行劈成两轨。
+     ⚠️ 不做语种识别：猜错会静默删掉整条字幕，位置 + 文字系统稳得多。 */
+  var SCRIPTS = [
+    ['kana', /[\u3040-\u30FF\u31F0-\u31FF]/],        /* ⚠️ 必须排在 han 前：日文里也带汉字 */
+    ['hangul', /[\u1100-\u11FF\uAC00-\uD7AF]/],      /* 韩文同理 */
+    ['cyrillic', /[\u0400-\u04FF]/],
+    ['greek', /[\u0370-\u03FF]/],
+    ['hebrew', /[\u0590-\u05FF]/],
+    ['arabic', /[\u0600-\u06FF\u0750-\u077F]/],
+    ['thai', /[\u0E00-\u0E7F]/],
+    ['devanagari', /[\u0900-\u097F]/],
+    ['han', /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/],
+    ['latin', /[A-Za-z]/]
+  ];
+  function scriptOf(s) {
+    var t = String(s || ''), i;
+    for (i = 0; i < SCRIPTS.length; i++) if (SCRIPTS[i][1].test(t)) return SCRIPTS[i][0];
+    return '';
   }
-  function tracksOf(text) {
-    var src = [], zh = [];
-    plain(text).split('\n').forEach(function (ln) {
-      var s = ln.trim();
-      if (!s) return;
-      (lineTrack(s) === 'zh' ? zh : src).push(s);
+  /* 一组（同时间轴的若干条）→ 两轨；bi=false 表示这组没看出双语，内容原样保留 */
+  function groupTracks(g) {
+    var i, a = [], b = [];
+    if (g.length >= 2) {
+      for (i = 0; i < g.length; i++) {
+        var tx = plain(g[i].text).trim();
+        if (!tx) continue;
+        (i === 0 ? a : b).push(tx);
+      }
+      if (!a.length || !b.length) return { src: a.concat(b), dst: [], bi: false };
+      return { src: a, dst: b, bi: true };
+    }
+    var rows = plain(g[0].text).split('\n').map(function (x) { return x.trim(); })
+      .filter(function (x) { return !!x; });
+    var sys = [];
+    rows.forEach(function (ln) {
+      var sc = scriptOf(ln);
+      if (sc && sys.indexOf(sc) < 0) sys.push(sc);
     });
-    return { src: src, zh: zh };
+    if (sys.length < 2) return { src: rows, dst: [], bi: false };
+    var s = [], d = [];
+    rows.forEach(function (ln) { (scriptOf(ln) === sys[0] ? s : d).push(ln); });
+    return { src: s, dst: d, bi: true };
   }
   /* 相邻且时间轴完全相同的条目归为一组（形态 B 的双轨） */
   function groupByTime(cues) {
@@ -216,54 +249,41 @@
     });
     return groups;
   }
-  /* 拆成两轨：返回 { src: [...], zh: [...], merged: [...] }，时间轴与分组保持一致 */
+  /* 拆成两轨：返回 { src: [...], dst: [...], merged: [...] }，时间轴与分组保持一致 */
   function split(cues) {
-    var src = [], zh = [], merged = [];
+    var src = [], dst = [], merged = [];
     groupByTime(cues).forEach(function (g) {
-      var s = [], z = [], i;
-      for (i = 0; i < g.length; i++) {
-        var tr = tracksOf(g[i].text);
-        s = s.concat(tr.src);
-        z = z.concat(tr.zh);
-      }
-      var end = g[g.length - 1].end;
-      if (s.length) src.push({ start: g[0].start, end: end, text: s.join('\n') });
-      if (z.length) zh.push({ start: g[0].start, end: end, text: z.join('\n') });
+      var tr = groupTracks(g);
+      var start = g[0].start, end = g[g.length - 1].end;
+      if (tr.src.length) src.push({ start: start, end: end, text: tr.src.join('\n') });
+      if (tr.dst.length) dst.push({ start: start, end: end, text: tr.dst.join('\n') });
       /* 合并档：两种都有就合成「原文一行 / 译文一行」；只有一种就原样保留，不凭空造第二行 */
       var txt;
-      if (s.length && z.length) txt = s.join(' ') + '\n' + z.join(' ');
+      if (tr.bi && tr.src.length && tr.dst.length) txt = tr.src.join(' ') + '\n' + tr.dst.join(' ');
       else txt = g.map(function (c) { return plain(c.text).trim(); }).join('\n');
-      merged.push({ start: g[0].start, end: end, text: txt });
+      merged.push({ start: start, end: end, text: txt });
     });
-    return { src: src, zh: zh, merged: merged };
+    return { src: src, dst: dst, merged: merged };
   }
-  /* 页面用它决定要不要提示「没检测到双语」 —— 免得用户以为工具坏了 */
+  /* 页面用它决定「模式」下拉是可用还是置灰 —— 免得用户以为工具坏了 */
   function hasBilingual(cues) {
     var n = 0;
-    groupByTime(cues || []).forEach(function (g) {
-      var s = 0, z = 0, i;
-      for (i = 0; i < g.length; i++) {
-        var tr = tracksOf(g[i].text);
-        s += tr.src.length;
-        z += tr.zh.length;
-      }
-      if (s && z) n++;
-    });
+    groupByTime(cues || []).forEach(function (g) { if (groupTracks(g).bi) n++; });
     return n > 0;
   }
   /* 一次算完交给页面：拆成几份由 mode 决定 */
   var MODES = [
     { id: 'src', key: 'mSrc' },
-    { id: 'zh', key: 'mZh' },
+    { id: 'dst', key: 'mDst' },
     { id: 'split', key: 'mSplit' },
     { id: 'merge', key: 'mMerge' }
   ];
   function transform(cues, mode) {
     var r = split(cues || []);
     if (mode === 'src') return [{ key: 'partSrc', cues: r.src }];
-    if (mode === 'zh') return [{ key: 'partZh', cues: r.zh }];
+    if (mode === 'dst') return [{ key: 'partDst', cues: r.dst }];
     if (mode === 'merge') return [{ key: 'partMerged', cues: r.merged }];
-    return [{ key: 'partSrc', cues: r.src }, { key: 'partZh', cues: r.zh }];
+    return [{ key: 'partSrc', cues: r.src }, { key: 'partDst', cues: r.dst }];
   }
 
   /* ---------------- 导出 ---------------- */
