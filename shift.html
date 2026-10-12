@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- 以下 SEO head 区块由 server.js 按语言路由（/shift.html 与 /en/shift.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
 <!--SEO-HEAD-START-->
-<title>字幕时间轴调整 - 整体平移 / 倍率缩放 / 两点校正 | 随心字幕 AI</title>
-<meta name="description" content="免费在线字幕时间轴调整：整体提前或延后、按倍率缩放、两点校正一次对上。支持 SRT、VTT、ASS、SBV、LRC、TXT，纯浏览器本地处理，文件不上传服务器。">
-<meta name="keywords" content="字幕时间轴调整,字幕时间轴平移,字幕延迟调整,srt时间轴校正,字幕对不上,字幕快慢调整,ass时间轴调整,字幕时间轴缩放,subtitle timing shift,subtitle sync adjust">
+<title>字幕时间轴调整 - 平移 / 缩放 / 两点校正 / 合并拆分 | 随心字幕 AI</title>
+<meta name="description" content="免费在线字幕时间轴调整：整体提前或延后、按倍率缩放、两点校正一次对上，还能合并碎片、拆分长句。支持 SRT、VTT、ASS、SBV、LRC、TXT，进来什么格式就出去什么格式，ASS 样式不丢。">
+<meta name="keywords" content="字幕时间轴调整,字幕时间轴平移,字幕延迟调整,srt时间轴校正,字幕对不上,字幕快慢调整,ass时间轴调整,字幕时间轴缩放,字幕合并,字幕拆分,subtitle timing shift,subtitle sync adjust">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#4F46E5">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -95,7 +95,6 @@
   .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
     background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
   .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
-  .chip.warn{background:var(--stage);color:var(--sub);font-weight:400}
   select.fmt:disabled{opacity:.45;cursor:not-allowed;background:var(--card-2);color:var(--sub)}
   button.pri:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 
@@ -116,6 +115,22 @@
   pre.cmp{margin:0;background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl);
     padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
     line-height:1.75;color:var(--body);overflow-x:auto;white-space:pre}
+
+  /* v0.9.292：逐条微调列表。字幕动辄上千条，一次只渲染一部分，靠「显示更多」往下加 */
+  .list{margin-top:10px;border:1px solid var(--line);border-radius:var(--r-ctl);overflow:hidden;
+    max-height:420px;overflow-y:auto}
+  .li{display:flex;align-items:center;gap:8px;padding:7px 10px;border-top:1px solid var(--line);
+    font-size:12.5px;background:var(--card)}
+  .li:first-child{border-top:0}
+  .li .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
+  .li input.tm{width:104px;height:28px;flex:none}
+  .li .arw{color:var(--mut);flex:none}
+  .li .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .li .op{display:flex;gap:6px;flex:none}
+  .li .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+  .li.bi .tx::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--acc);margin-right:7px;vertical-align:1px}
+
   .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
   .msg.err{color:var(--del)}
   .msg.warn{color:var(--warn)}
@@ -129,6 +144,7 @@
     .hero h1{font-size:24px}
     .navpills{display:none}
     input.tm{width:104px}
+    .li .tx{white-space:normal}
   }
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
@@ -198,16 +214,40 @@ crossorigin="anonymous"></script>
     </div>
     <div class="hint" id="hintTwo" style="display:none" data-i18n="hintTwo">同时有偏移和速率差时用这个：填当前首末条与目标首末条，中间按比例排</div>
 
+    <!-- v0.9.292：合并与拆分。与「调整方式」是两个独立步骤，可以叠加 -->
+    <div class="part">
+      <h2><span class="n">3</span><span data-i18n="lblTools">合并与拆分</span></h2>
+      <div class="row">
+        <select class="fmt" id="tool"></select>
+        <input class="num" id="toolVal" type="text" inputmode="decimal" data-i18n-ph="phGap" placeholder="毫秒" value="200">
+      </div>
+      <div class="hint" id="hintTool" data-i18n="hintGap">两条之间空档小于这个值就并成一条</div>
+    </div>
+
     <div class="row">
-      <span class="lb" data-i18n="lblOut">输出格式</span>
-      <select class="fmt" id="outFmt" style="min-width:170px"></select>
+      <span class="lb" data-i18n="lblOutKeep">输出格式</span>
+      <span class="chip" id="outKeep">—</span>
       <button class="pri" id="btnGo" type="button" data-i18n="btnGo">开始</button>
     </div>
     <div class="note" data-i18n="noteLocal">文件只在你的浏览器里处理，不上传服务器</div>
   </div>
 
+  <!-- v0.9.292：逐条微调。操作记成一组步骤，每次重算从头依次重放 -->
+  <div class="card" id="listCard" style="display:none">
+    <h2><span class="n">4</span><span data-i18n="lblList">逐条微调</span></h2>
+    <div class="hint" data-i18n="hintList">可以合并相邻两条、切分某一条，或者直接改它的起止时间</div>
+    <div class="row">
+      <span class="chip mut" id="editStat"></span>
+      <button id="btnUndo" type="button" data-i18n="btnUndo">撤销</button>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="row" id="rowMore" style="display:none">
+      <button id="btnMore" type="button" data-i18n="btnMore">显示更多</button>
+    </div>
+  </div>
+
   <div class="card" id="repCard" style="display:none">
-    <h2><span class="n">3</span><span data-i18n="repTitle">结果</span></h2>
+    <h2><span class="n">5</span><span data-i18n="repTitle">结果</span></h2>
     <div id="parts"></div>
     <div class="msg" id="msg" style="display:none"></div>
   </div>
@@ -217,19 +257,29 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.291"></script>
-<script src="shift-core.js?v=0.9.291"></script>
+<script src="shift-i18n.js?v=0.9.292"></script>
+<script src="shift-core.js?v=0.9.292"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
 var LANG = 'zh-CN';
-var S = { fname: '', src: '', fmt: null, cues: [], out: null, text: '', outFmt: 'srt', mode: 'shift', clamped: 0 };
+/* v0.9.292：流水线 = 原始条目(base) → 时间轴调整 → 合并/拆分 → 手动步骤(ops) → 输出文本。
+   每次改任何一环都从 base 重算，手动步骤作为最后一段重放，这样前后顺序永远一致。 */
+var S = {
+  fname: '', src: '', fmt: null, base: [], work: null, text: '',
+  mode: 'shift', tool: 'none', ops: [], limit: 60,
+  clamped: 0, merged: 0, split: 0
+};
 function $(s) { return document.querySelector(s); }
 function t(k) {
   var d = I18N[LANG] || I18N['en'];
   return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
 }
 function tpl(k, a) { return String(t(k)).replace('{0}', a); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 /* 顶部胶囊：本页自带一份，不引入 site-nav.js */
 var NAV = [
@@ -262,6 +312,8 @@ function applyI18n() {
   renderNav();
   syncLogoHome();
   renderOptions();
+  /* 「输出与原文件一致（SRT）」这行是拼出来的，不走 data-i18n —— 换语言时要自己重画 */
+  renderSrcFmt();
 }
 function syncLogoHome() {
   var el = document.getElementById('logoHome');
@@ -275,12 +327,12 @@ function renderOptions() {
   ms.innerHTML = C.MODES.map(function (m) { return '<option value="' + m.id + '">' + t(m.key) + '</option>'; }).join('');
   ms.value = curM; S.mode = ms.value;
 
-  var os = $('#outFmt'), curO = os.value || S.outFmt;
-  os.innerHTML = C.FORMATS.map(function (f) { return '<option value="' + f.id + '">' + f.name + ' · ' + f.note + '</option>'; }).join('');
-  os.value = curO; S.outFmt = os.value;
+  var ts = $('#tool'), curT = ts.value || S.tool;
+  ts.innerHTML = C.TOOLS.map(function (m) { return '<option value="' + m.id + '">' + t(m.key) + '</option>'; }).join('');
+  ts.value = curT; S.tool = ts.value;
   renderParams();
 }
-/* 只显示当前模式要用的那一行参数，别把三个模式的输入框全摊开 */
+/* 只显示当前模式 / 当前工具要用的那一行参数，别把输入框全摊开 */
 function renderParams() {
   var m = $('#mode').value || S.mode;
   S.mode = m;
@@ -290,6 +342,16 @@ function renderParams() {
   $('#hintRate').style.display = (m === 'rate') ? '' : 'none';
   $('#rowTwo').style.display = (m === 'two') ? '' : 'none';
   $('#hintTwo').style.display = (m === 'two') ? '' : 'none';
+
+  var tl = $('#tool').value || S.tool;
+  S.tool = tl;
+  var showVal = (tl !== 'none');
+  $('#toolVal').style.display = showVal ? '' : 'none';
+  $('#hintTool').style.display = showVal ? '' : 'none';
+  var phKey = (tl === 'gap') ? 'phGap' : (tl === 'dur' ? 'phDur' : (tl === 'char' ? 'phChar' : 'phGap'));
+  var hintKey = (tl === 'gap') ? 'hintGap' : (tl === 'dur' ? 'hintDur' : (tl === 'char' ? 'hintChar' : 'hintGap'));
+  $('#toolVal').setAttribute('placeholder', t(phKey));
+  $('#hintTool').textContent = t(hintKey);
 }
 
 function pathUiLang() {
@@ -309,7 +371,7 @@ function initLang() {
     LANG = sel.value;
     try { localStorage.setItem('srt_shift_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
     applyI18n();
-    render();
+    renderAll();
   });
 }
 
@@ -322,25 +384,38 @@ function setSrc(text, fname) {
   S.fmt = C.detect(S.src, S.fname);
   if ($('#paste') && $('#paste').value !== S.src) $('#paste').value = S.src;
   $('#fname').textContent = S.fname;
+  /* 换了文件就把手动步骤清空 —— 旧步骤的索引对着旧列表，留着会改错条目 */
+  S.ops = [];
+  S.limit = 60;
+  S.work = null; S.text = '';
+  S.base = S.src.trim() && S.fmt ? (C.parse(S.src, S.fmt) || []) : [];
   renderSrcFmt();
   fillCurrentTimes();
   hideMsg();
+  renderAll();
 }
 function renderSrcFmt() {
-  var el = $('#srcFmt');
-  if (!S.src.trim()) { el.className = 'chip mut'; el.textContent = '—'; return; }
-  if (!S.fmt) { el.className = 'chip mut'; el.textContent = t('errFmt'); return; }
-  el.className = 'chip';
-  el.textContent = S.fmt.toUpperCase();
+  var el = $('#srcFmt'), keep = $('#outKeep');
+  if (!S.src.trim()) {
+    el.className = 'chip mut'; el.textContent = '—';
+    keep.className = 'chip mut'; keep.textContent = '—';
+    return;
+  }
+  if (!S.fmt) {
+    el.className = 'chip mut'; el.textContent = t('errFmt');
+    keep.className = 'chip mut'; keep.textContent = '—';
+    return;
+  }
+  var nm = S.fmt.toUpperCase();
+  el.className = 'chip'; el.textContent = nm;
+  /* v0.9.292：本页不做格式转换 —— 进来什么格式出去就是什么格式，直接把这件事写明白 */
+  keep.className = 'chip'; keep.textContent = tpl('outSame', nm);
 }
 /* 两点校正的「当前」两栏自动填首末条时间，用户只需要填「目标」 */
 function fillCurrentTimes() {
   var C = window.ShiftCore;
-  if (!S.src.trim() || !S.fmt) return;
-  var cues;
-  try { cues = C.parse(S.src, S.fmt); } catch (e) { return; }
-  if (!cues || !cues.length) return;
-  var inf = C.info(cues);
+  if (!S.base.length) return;
+  var inf = C.info(S.base);
   $('#curA').value = C.time.srt(inf.first);
   $('#curB').value = C.time.srt(inf.last);
 }
@@ -351,15 +426,137 @@ function readFile(f) {
   r.readAsText(f, 'utf-8');
 }
 function clearAll() {
-  S = { fname: '', src: '', fmt: null, cues: [], out: null, text: '', outFmt: S.outFmt, mode: S.mode, clamped: 0 };
+  S.fname = ''; S.src = ''; S.fmt = null; S.base = [];
+  S.work = null; S.text = ''; S.ops = []; S.limit = 60;
+  S.clamped = 0; S.merged = 0; S.split = 0;
   $('#paste').value = '';
   $('#fname').textContent = '';
   $('#file').value = '';
   $('#curA').value = ''; $('#curB').value = '';
   $('#parts').innerHTML = '';
+  $('#list').innerHTML = '';
+  $('#listCard').style.display = 'none';
   $('#repCard').style.display = 'none';
   renderSrcFmt();
   hideMsg();
+}
+
+/* ---------------- 流水线 ---------------- */
+function optOf() {
+  var C = window.ShiftCore, m = $('#mode').value || S.mode;
+  if (m === 'rate') return { rate: Number(String($('#rateVal').value).trim()) };
+  if (m === 'two') {
+    return {
+      fromStart: C.parseUserTime($('#curA').value),
+      fromEnd: C.parseUserTime($('#curB').value),
+      toStart: C.parseUserTime($('#tgtA').value),
+      toEnd: C.parseUserTime($('#tgtB').value)
+    };
+  }
+  return { ms: Math.round(Number(String($('#msVal').value).trim()) * 1000) };
+}
+function toolVal() {
+  var v = String($('#toolVal').value).trim();
+  return v === '' ? NaN : Number(v);
+}
+/* 从原始条目重算一遍：时间轴 → 合并/拆分 → 手动步骤 */
+function recompute() {
+  var C = window.ShiftCore;
+  var m = $('#mode').value || S.mode;
+  var tl = $('#tool').value || S.tool;
+  var opt = optOf();
+  if (!C.valid(m, opt)) return false;
+
+  var r = C.apply(S.base, m, opt);
+  if (!r.ok) return false;
+  var list = r.cues;
+  S.clamped = r.clamped;
+  S.merged = 0; S.split = 0;
+
+  if (tl === 'gap') { var a = C.mergeGap(list, toolVal()); list = a.cues; S.merged = a.merged; }
+  else if (tl === 'dur') { var b = C.splitByDur(list, toolVal()); list = b.cues; S.split = b.split; }
+  else if (tl === 'char') { var c = C.splitByChars(list, toolVal()); list = c.cues; S.split = c.split; }
+
+  if (S.ops.length) list = C.applyOps(list, S.ops);
+  S.work = list;
+  /* 条目数没变就走保真改写（只动时间那几个字符），变了才重新生成整份文件 */
+  S.text = C.render(S.src, S.fmt, list);
+  return true;
+}
+function run() {
+  var C = window.ShiftCore;
+  if (!S.src.trim()) { showMsg(t('errEmpty'), 'err'); return; }
+  if (!S.fmt) { showMsg(t('errFmt'), 'err'); return; }
+  if (!S.base.length) { showMsg(t('errFmt'), 'err'); return; }
+  if (!recompute()) { showMsg(t('errParam'), 'err'); return; }
+  renderAll();
+  if (S.clamped > 0) showMsg(tpl('msgClamp', S.clamped), 'warn');
+  else if (S.merged > 0) showMsg(tpl('msgMerged', S.merged), '');
+  else if (S.split > 0) showMsg(tpl('msgSplit', S.split), '');
+  else showMsg(t('msgDone'), '');
+}
+
+/* ---------------- 逐条微调 ---------------- */
+function pushOp(o) {
+  S.ops.push(o);
+  if (!recompute()) { S.ops.pop(); return; }
+  renderAll();
+}
+function undo() {
+  if (!S.ops.length) { showMsg(t('msgNoEdit'), 'warn'); return; }
+  S.ops.pop();
+  recompute();
+  renderAll();
+  showMsg(t('msgUndo'), '');
+}
+function renderList() {
+  var C = window.ShiftCore, box = $('#list');
+  if (!S.work || !S.work.length) { box.innerHTML = ''; $('#listCard').style.display = 'none'; return; }
+  $('#listCard').style.display = '';
+  var n = Math.min(S.limit, S.work.length), i, html = '';
+  for (i = 0; i < n; i++) {
+    var c = S.work[i];
+    var bi = C.isBilingualCue(c);
+    html += '<div class="li' + (bi ? ' bi' : '') + '">'
+      + '<span class="idx">' + (i + 1) + '</span>'
+      + '<input class="tm" type="text" data-s="' + i + '" value="' + C.time.srt(c.start) + '">'
+      + '<span class="arw">→</span>'
+      + '<input class="tm" type="text" data-e="' + i + '" value="' + C.time.srt(c.end) + '">'
+      + '<span class="tx" title="' + esc(c.text) + '">' + esc(c.text.replace(/\n/g, ' ⏎ ')) + '</span>'
+      + '<span class="op">'
+      + '<button type="button" data-merge="' + i + '">' + esc(t('btnMergeNext')) + '</button>'
+      + '<button type="button" data-split="' + i + '">' + esc(t('btnSplit')) + '</button>'
+      + '</span></div>';
+  }
+  box.innerHTML = html;
+  $('#rowMore').style.display = (n < S.work.length) ? '' : 'none';
+  $('#editStat').textContent = tpl('statEdit', S.ops.length);
+  box.querySelectorAll('[data-merge]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      pushOp({ op: 'merge', i: Number(b.getAttribute('data-merge')) });
+    });
+  });
+  box.querySelectorAll('[data-split]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      pushOp({ op: 'split', i: Number(b.getAttribute('data-split')) });
+    });
+  });
+  box.querySelectorAll('[data-s]').forEach(function (b) {
+    b.addEventListener('change', function () {
+      var i = Number(b.getAttribute('data-s'));
+      var v = C.parseUserTime(b.value);
+      if (v == null) { renderList(); return; }
+      pushOp({ op: 'set', i: i, s: v, e: S.work[i].end });
+    });
+  });
+  box.querySelectorAll('[data-e]').forEach(function (b) {
+    b.addEventListener('change', function () {
+      var i = Number(b.getAttribute('data-e'));
+      var v = C.parseUserTime(b.value);
+      if (v == null) { renderList(); return; }
+      pushOp({ op: 'set', i: i, s: S.work[i].start, e: v });
+    });
+  });
 }
 
 /* ---------------- 结果 ---------------- */
@@ -385,10 +582,10 @@ function cmpText(before, after) {
   }
   return out.join('\n');
 }
-function render() {
+function renderResult() {
   var box = $('#parts');
   box.innerHTML = '';
-  if (!S.out) { $('#repCard').style.display = 'none'; return; }
+  if (!S.work) { $('#repCard').style.display = 'none'; return; }
   var C = window.ShiftCore;
 
   var div = document.createElement('div');
@@ -398,13 +595,13 @@ function render() {
   head.className = 'part-hd';
   var b = document.createElement('b'); b.textContent = t('repTitle');
   var c = document.createElement('span'); c.className = 'cnt';
-  var inf = C.info(S.out);
-  c.textContent = tpl('statCues', S.out.length) + ' · ' + tpl('statRange', fmtDur(inf.last - inf.first));
+  var inf = C.info(S.work);
+  c.textContent = tpl('statCues', S.work.length) + ' · ' + tpl('statRange', fmtDur(inf.last - inf.first));
   head.appendChild(b); head.appendChild(c);
 
   var pre = document.createElement('pre');
   pre.className = 'cmp';
-  pre.textContent = cmpText(S.cues, S.out);
+  pre.textContent = cmpText(S.base, S.work);
 
   var ta = document.createElement('textarea');
   ta.readOnly = true; ta.value = S.text;
@@ -421,44 +618,14 @@ function render() {
   box.appendChild(div);
   $('#repCard').style.display = '';
 }
-function optOf() {
-  var C = window.ShiftCore, m = $('#mode').value || S.mode;
-  if (m === 'rate') return { rate: Number(String($('#rateVal').value).trim()) };
-  if (m === 'two') {
-    return {
-      fromStart: C.parseUserTime($('#curA').value),
-      fromEnd: C.parseUserTime($('#curB').value),
-      toStart: C.parseUserTime($('#tgtA').value),
-      toEnd: C.parseUserTime($('#tgtB').value)
-    };
-  }
-  return { ms: Math.round(Number(String($('#msVal').value).trim()) * 1000) };
-}
-function run() {
-  var C = window.ShiftCore;
-  if (!S.src.trim()) { showMsg(t('errEmpty'), 'err'); return; }
-  var fmt = S.fmt || C.detect(S.src, S.fname);
-  if (!fmt) { showMsg(t('errFmt'), 'err'); return; }
-  var cues = C.parse(S.src, fmt);
-  if (!cues || !cues.length) { showMsg(t('errFmt'), 'err'); return; }
-  S.fmt = fmt; S.cues = cues;
-  S.mode = $('#mode').value || 'shift';
-  S.outFmt = $('#outFmt').value;
-
-  var opt = optOf();
-  if (!C.valid(S.mode, opt)) { showMsg(t('errParam'), 'err'); return; }
-  var r = C.apply(cues, S.mode, opt);
-  if (!r.ok) { showMsg(t('errParam'), 'err'); return; }
-  S.out = r.cues;
-  S.clamped = r.clamped;
-  S.text = C.dump(S.out, S.outFmt);
-  render();
-  if (S.clamped > 0) showMsg(tpl('msgClamp', S.clamped), 'warn');
-  else showMsg(t('msgDone'), '');
+function renderAll() {
+  renderList();
+  renderResult();
 }
 function download() {
-  if (!S.out) return;
-  var name = window.ShiftCore.outName(S.fname || 'subtitle', S.outFmt);
+  if (!S.work) return;
+  /* v0.9.292：不做格式转换，文件名沿用原文件（后缀也是） */
+  var name = window.ShiftCore.outName(S.fname || 'subtitle', S.fmt);
   var blob = new Blob([S.text], { type: 'text/plain;charset=utf-8' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -468,7 +635,7 @@ function download() {
   setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
 function copyText() {
-  if (!S.out) return;
+  if (!S.work) return;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(S.text).then(function () { showMsg(t('msgDone'), ''); }, function () { });
     return;
@@ -495,9 +662,12 @@ function bind() {
   });
   $('#paste').addEventListener('input', function (e) { setSrc(e.target.value, S.fname); });
   $('#btnClear').addEventListener('click', clearAll);
-  $('#mode').addEventListener('change', function () { renderParams(); if (S.src.trim()) run(); });
-  $('#outFmt').addEventListener('change', function () { S.outFmt = $('#outFmt').value; if (S.cues.length) run(); });
+  $('#mode').addEventListener('change', function () { renderParams(); if (S.base.length) run(); });
+  $('#tool').addEventListener('change', function () { renderParams(); if (S.base.length) run(); });
+  $('#toolVal').addEventListener('change', function () { if (S.base.length) run(); });
   $('#btnGo').addEventListener('click', run);
+  $('#btnUndo').addEventListener('click', undo);
+  $('#btnMore').addEventListener('click', function () { S.limit += 60; renderList(); });
 }
 
 (function main() {
@@ -505,18 +675,19 @@ function bind() {
   renderOptions();
   applyI18n();
   bind();
-  render();
+  renderAll();
   window.setSrc = setSrc;   /* 自动化冒烟用的文本入口 */
+  window.runShift = run;
 })();
 </script>
 
-<!-- v0.9.291：SEO 静态文案（按语言路由替换；直接开文件时显示简体中文默认版） -->
+<!-- v0.9.292：SEO 静态文案（按语言路由替换；直接开文件时显示简体中文默认版） -->
 <!--SEO-COPY-START-->
   <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
     <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕时间轴调整 - 随心字幕 AI (AI-SRTSub)</h2>
-    <p><strong>字幕和画面对不上时，把时间轴整体提前或延后、按倍率缩放，或者用两点校正一次对上。</strong></p>
-    <p style="margin-top:8px;">支持 SRT、VTT、ASS、SBV、LRC、TXT；平移只改位置、不动每条字幕的时长，倍率缩放会把时长同步缩放（24 帧与 25 帧互转这类场景常用），两点校正适合既有偏移又有速率差的字幕。算出来是负数的时间会截断到 0，并告诉你有几条受影响。</p>
-    <p style="margin-top:8px;">需要把字幕对齐画面的人：换了片源、字幕整体快了慢了、或者拿到的是别人按不同帧率做的字幕。</p>
+    <p><strong>字幕和画面对不上时，把时间轴整体提前或延后、按倍率缩放，或者用两点校正一次对上；还能把碎片并成一条、把长句拆成几条。</strong></p>
+    <p style="margin-top:8px;">支持 SRT、VTT、ASS、SBV、LRC、TXT，进来什么格式就出去什么格式 —— 不做格式转换，ASS 的样式表和每条的样式、特效标记都原样保留。平移只改位置、不动每条字幕的时长，倍率缩放会把时长同步缩放（24 帧与 25 帧互转这类场景常用），两点校正适合既有偏移又有速率差的字幕。双语字幕合并时保持「原文一行 / 译文一行」，拆分时会整条跳过，不会把原文和译文切坏。算出来是负数的时间会截断到 0，并告诉你有几条受影响。</p>
+    <p style="margin-top:8px;">需要把字幕对齐画面的人：换了片源、字幕整体快了慢了、拿到的是别人按不同帧率做的字幕，或者一句话被切得太碎、一条字幕在屏幕上停太久。</p>
   </section>
 <!--SEO-COPY-END-->
 </body>

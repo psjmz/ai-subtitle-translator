@@ -1,16 +1,27 @@
-/* shift-core.js —— 时间轴调整页的独立引擎（v0.9.291）
+/* shift-core.js —— 时间轴调整页的独立引擎（v0.9.292）
    与 convert-core.js / bilingual-core.js 完全隔离：本文件只被 shift.html 加载，
    不引入、不修改任何现有引擎。解析与导出都在浏览器里跑完，不上传、不调模型。
 
-   支持读取：SRT / VTT / ASS / SSA / SBV / LRC / TXT
-   支持导出：SRT / VTT / ASS / SBV / LRC / TXT
-   中间结构统一为 { start, end, text }（毫秒）。
+   ⚠️ v0.9.292 的两条硬规矩：
+     ① 进来什么格式，出去就是什么格式。本页不做格式转换 —— 那是 /convert.html 的事。
+        而且不只是「换后缀」：ASS 的 Script Info、样式表、每条的 Layer / Style / 边距 / Effect
+        一列都不能丢，VTT 的 NOTE / STYLE 块和 cue 设置也不能丢。
+        所以条目数没变时走 rewriteTimes —— 只改时间那几个字符，其余一字不动。
+     ② 双语字幕（原文一行 + 译文一行）不能被合并或拆分压坏。
+        同轴 / 同条的两行一旦识别为双语，合并时保持两行、拆分时整条跳过。
 
-   三种调整方式，一次只用一种：
+   支持读取：SRT / VTT / ASS / SSA / SBV / LRC / TXT
+   中间结构统一为 { start, end, text }（毫秒），_x 里挂着该格式自己的样式信息。
+
+   时间轴三种调整，一次只用一种：
      ① 平移   shift：整体提前 / 延后 N 秒（时长不变）
      ② 倍速   rate ：整体 ×N（时长同步缩放）—— 24fps ↔ 25fps、片源与字幕速率不一致时用
      ③ 两点校正 two ：给「当前首条→目标」「当前末条→目标」两对时间，中间线性映射
-                     —— 既有偏移又有速率差时，只有这个能一次对上
+   合并与拆分（可选，一次只用一种）：
+     gap  合并间隙小于 N 毫秒的相邻两条
+     dur  把时长超过 N 秒的长条按字数比例切成几条
+     char 把字数超过 N 的长条切成几条
+   逐条微调：把「合并 / 切分 / 改时间」记成一组操作，重算时从头依次重放。
    ⚠️ 时间被压到负数会截断到 0，并把受影响条数回报给页面（不许静默改时间）。 */
 (function (root) {
   'use strict';
@@ -49,6 +60,52 @@
     var m = s.match(/^(?:(\d{1,3}):)?(\d{1,3}):(\d{1,3})(?:[.,](\d{1,3}))?$/);
     if (!m) return null;
     return parseHMS(m[1] || '0', m[2], m[3], m[4]);
+  }
+
+  /* ---------------- 文字系统（判断双语用） ---------------- */
+  /* 只按字符形态判断，不猜语种：猜错会静默删掉整条字幕，形态判断稳得多。 */
+  var RE_HAN = /[㐀-䶿一-鿿豈-﫿]/;
+  var RE_KANA = /[぀-ヿㇰ-ㇿ]/;
+  var RE_HANGUL = /[가-힯ᄀ-ᇿ]/;
+  var RE_ARAB = /[؀-ۿ]/;
+  var RE_CYR = /[Ѐ-ӿ]/;
+  var RE_THAI = /[฀-๿]/;
+  var RE_DEV = /[ऀ-ॿ]/;
+  var RE_HEB = /[֐-׿]/;
+  var RE_GREEK = /[Ͱ-Ͽ]/;
+  var RE_LATIN = /[A-Za-zÀ-ÿĀ-ſ]/;
+  /* 一行文字属于哪套书写系统：返回 'han' / 'kana' / 'latin' …，认不出给 'other' */
+  function scriptOf(s) {
+    var t = String(s || '');
+    if (!t.replace(/[0-9\s\p{P}\p{S}]/gu, '')) return 'other';
+    if (RE_HAN.test(t)) return 'han';
+    if (RE_KANA.test(t)) return 'kana';
+    if (RE_HANGUL.test(t)) return 'hangul';
+    if (RE_THAI.test(t)) return 'thai';
+    if (RE_DEV.test(t)) return 'devanagari';
+    if (RE_ARAB.test(t)) return 'arabic';
+    if (RE_HEB.test(t)) return 'hebrew';
+    if (RE_CYR.test(t)) return 'cyrillic';
+    if (RE_GREEK.test(t)) return 'greek';
+    if (RE_LATIN.test(t)) return 'latin';
+    return 'other';
+  }
+  /* 一条字幕里出现了两套以上书写系统 = 双语。
+     纯英文长句折行成两行只有一套，不会被误判（合并/拆分时靠这条保命）。 */
+  function trackScripts(text) {
+    var set = {}, n = 0;
+    plain(text).split('\n').forEach(function (ln) {
+      var s = ln.trim();
+      if (!s) return;
+      var k = scriptOf(s);
+      if (k !== 'other' && !set[k]) { set[k] = 1; n++; }
+    });
+    return { n: n, keys: Object.keys(set) };
+  }
+  function isBilingualCue(cue) {
+    var lines = plain(cue && cue.text).split('\n').filter(function (x) { return x.trim(); });
+    if (lines.length < 2) return false;
+    return trackScripts(cue.text).n >= 2;
   }
 
   /* ---------------- 文本清洗 ---------------- */
@@ -110,7 +167,6 @@
     for (i = 0; i < lines.length; i++) {
       var line = lines[i];
       if (/^WEBVTT/i.test(line) || /^(NOTE|STYLE|REGION)\b/.test(line)) { flush(); cur = null; }
-      /* 跳过块头后面的内容，直到出现空行 */
       if (/^(NOTE|STYLE|REGION)\b/.test(line)) {
         while (i + 1 < lines.length && lines[i + 1].trim() !== '') i++;
         continue;
@@ -119,8 +175,7 @@
       if (m) {
         flush();
         var tm = [parseHMS(m[1], m[2], m[3], m[4]), parseHMS(m[5], m[6], m[7], m[8])];
-        cur = { start: tm[0], end: tm[1], text: '' };
-        /* 时间行尾部的 cue 设置属于样式，不是字幕正文 */
+        cur = { start: tm[0], end: tm[1], text: '', _x: { settings: settingsOf(line, m) } };
         continue;
       }
       if (cur === null) continue;
@@ -129,6 +184,11 @@
     }
     flush();
     return out;
+  }
+  /* 时间行尾部 align:middle 这类设置属于样式，不是字幕正文 —— 摘出来原样带回。
+     ⚠️ 首尾空白在这里就抹掉：导出时固定补一个空格，不然会拼出两个空格。 */
+  function settingsOf(line, m) {
+    return line.slice(m[0].length).replace(/^\s+/, '').replace(/\s+$/, '');
   }
 
   /* ---------------- 读取：ASS / SSA ---------------- */
@@ -151,7 +211,11 @@
       /* ASS 的时间是厘秒，前面补成毫秒 */
       var s = parseHMS(sm[1], sm[2], sm[3], (sm[4] + '00').slice(0, 3));
       var e = parseHMS(em[1], em[2], em[3], (em[4] + '00').slice(0, 3));
-      out.push({ start: s, end: e, text: p.slice(9).join(',') });
+      out.push({
+        start: s, end: e, text: p.slice(9).join(','),
+        /* 除时间外每一列都原样带回来，导出时一字不差地写回去 */
+        _x: { layer: p[0].trim(), style: p[3], name: p[4], ml: p[5], mr: p[6], mv: p[7], effect: p[8] }
+      });
     }
     return out;
   }
@@ -183,8 +247,7 @@
   }
 
   /* ---------------- 读取：纯文本 ---------------- */
-  /* 纯文本没有时间轴。按行切成条目，顺序排轴：每行 3 秒。
-     这样「文本 → 字幕」才有意义，而不是导出一个空壳。 */
+  /* 纯文本没有时间轴。按行切成条目，顺序排轴：每行 3 秒。 */
   function parseTxt(text) {
     var lines = String(text).replace(/\r\n?/g, '\n').split('\n');
     var out = [], t = 0;
@@ -195,6 +258,36 @@
       t += 3000;
     }
     return out;
+  }
+
+  /* ---------------- 文件头（样式表 / NOTE 块）—— 导出时原样带回 ---------------- */
+  /* 条目数不变时用不上（走 rewriteTimes），但一旦合并 / 拆分就得重新生成整份文件，
+     这时候 Script Info、样式表、VTT 的 NOTE 块都必须还在，否则等于把用户的样式删了。 */
+  function headOf(src, fmt) {
+    var lines = String(src || '').replace(/\r\n?/g, '\n').split('\n');
+    var out = [], i;
+    if (fmt === 'ass' || fmt === 'ssa') {
+      var inEvents = false;
+      for (i = 0; i < lines.length; i++) {
+        var ln = lines[i];
+        if (/^\[/i.test(ln.trim())) inEvents = /^\[events\]/i.test(ln.trim());
+        out.push(ln);
+        /* Format 行是 Events 段的最后一行头信息，带上它就算收尾 */
+        if (inEvents && /^Format:/i.test(ln.trim())) break;
+      }
+      return out.join('\n').replace(/\n+$/, '') + '\n';
+    }
+    if (fmt === 'vtt') {
+      for (i = 0; i < lines.length; i++) {
+        if (RE_SRT.test(lines[i])) break;
+        out.push(lines[i]);
+      }
+      /* 最后一个 cue 的序号混在头部里（SRT 序号写法），别把它带到导出结果里 */
+      while (out.length && /^\s*\d+\s*$/.test(out[out.length - 1])) out.pop();
+      var h = out.join('\n').replace(/\s+$/, '');
+      return h ? h + '\n\n' : 'WEBVTT\n\n';
+    }
+    return '';
   }
 
   /* ---------------- 格式识别 ---------------- */
@@ -215,7 +308,6 @@
     if (/^\s*\d{1,3}:\d{2}:\d{2}\.\d{1,3}\s*,/m.test(s)) return 'sbv';
     if (/^\s*\[\d{1,3}:\d{2}[.:]\d{1,3}\]/m.test(s)) return 'lrc';
     if (/\d{1,3}:\d{2}:\d{2}[,.]\d{1,3}\s*-->/.test(s)) return 'srt';
-    /* SRT 也可能用点号分隔毫秒，或时间行前面的序号被去掉了 */
     if (/\d{1,3}:\d{2}:\d{2}\s*-->/.test(s)) return 'srt';
     if (s.trim()) return 'txt';
     return null;
@@ -226,6 +318,12 @@
     { id: 'shift', key: 'mShift' },
     { id: 'rate', key: 'mRate' },
     { id: 'two', key: 'mTwo' }
+  ];
+  var TOOLS = [
+    { id: 'none', key: 'toolNone' },
+    { id: 'gap', key: 'toolGap' },
+    { id: 'dur', key: 'toolDur' },
+    { id: 'char', key: 'toolChar' }
   ];
 
   function info(cues) {
@@ -265,9 +363,7 @@
   /* 返回 { cues, clamped }：
      clamped = 被从负数截断到 0 的条数（页面据此提示，不许静默改时间） */
   function apply(cues, mode, opt) {
-    var list = (cues || []).map(function (c) {
-      return { start: Number(c.start) || 0, end: Number(c.end) || 0, text: String(c.text == null ? '' : c.text) };
-    });
+    var list = clone(cues);
     var f = makeMapper(mode, opt);
     if (!f) return { cues: list, clamped: 0, ok: false };
     var clamped = 0;
@@ -280,13 +376,194 @@
       if (hit) clamped++;
       /* 缩放 / 映射后不能让 end 跑到 start 前面，至少留 1ms */
       if (e <= s) e = s + 1;
-      return { start: s, end: e, text: c.text };
+      return { start: s, end: e, text: c.text, _x: c._x };
     });
     return { cues: out, clamped: clamped, ok: true };
   }
   /* 页面用它判断参数填没填对（空参数不许跑出一份错字幕） */
   function valid(mode, opt) {
     return !!makeMapper(mode, opt);
+  }
+  function clone(cues) {
+    return (cues || []).map(function (c) {
+      return {
+        start: Number(c.start) || 0,
+        end: Number(c.end) || 0,
+        text: String(c.text == null ? '' : c.text),
+        _x: c._x || null
+      };
+    });
+  }
+
+  /* ---------------- 合并与拆分 ---------------- */
+  /* 合并：相邻两条之间的空档 ≤ gap 就并成一条，起止取首尾，文本接在后面。
+     双语保护：两条内容分属两套书写系统时，合并后仍是「原文一行 / 译文一行」，
+     不会挤成一行 —— 挤成一行在播放器里就是叠字。 */
+  function mergeGap(cues, gapMs) {
+    var gap = Number(gapMs);
+    if (!isFinite(gap) || gap < 0) return { cues: clone(cues), merged: 0 };
+    var list = clone(cues), out = [], merged = 0, i;
+    for (i = 0; i < list.length; i++) {
+      var cur = list[i];
+      while (i + 1 < list.length) {
+        var nx = list[i + 1];
+        if (nx.start - cur.end > gap) break;
+        var two = (scriptOf(cur.text) !== scriptOf(nx.text))
+          && scriptOf(cur.text) !== 'other' && scriptOf(nx.text) !== 'other';
+        cur = {
+          start: cur.start,
+          end: Math.max(cur.end, nx.end),
+          text: two ? (cur.text + '\n' + nx.text) : joinText(cur.text, nx.text),
+          _x: cur._x || nx._x
+        };
+        merged++;
+        i++;
+      }
+      out.push(cur);
+    }
+    return { cues: out, merged: merged };
+  }
+  function joinText(a, b) {
+    var x = String(a == null ? '' : a).replace(/\s+$/, '');
+    var y = String(b == null ? '' : b).replace(/^\s+/, '');
+    if (!x) return y;
+    if (!y) return x;
+    return x + '\n' + y;
+  }
+
+  /* 拆分：把一条按文本切成 n 段，时间按各段字数比例分。
+     段怎么切：优先按现有行数分组（保留原折行），行数不够再按字符切（尽量落在空格 / 标点后）。 */
+  function splitCue(cue, n) {
+    var lines = plain(cue.text).split('\n').filter(function (x) { return x.trim(); });
+    var segs;
+    if (lines.length >= n) {
+      segs = groupLines(lines, n);
+    } else {
+      segs = splitWords(plain(cue.text).replace(/\n/g, ' '), n);
+    }
+    if (!segs || segs.length <= 1) return null;
+    var total = 0, w = segs.map(function (s) { var v = Math.max(1, lenOf(s)); total += v; return v; });
+    var dur = Math.max(1, cue.end - cue.start), t = cue.start, out = [];
+    for (var i = 0; i < segs.length; i++) {
+      var d = Math.round(dur * w[i] / total);
+      var e = (i === segs.length - 1) ? cue.end : t + d;
+      if (e <= t) e = t + 1;
+      out.push({ start: t, end: e, text: segs[i], _x: cue._x || null });
+      t = e;
+    }
+    return out;
+  }
+  function lenOf(s) { return String(s).replace(/\s/g, '').length || 1; }
+  /* 把 n 行尽量均分成 k 组（每组至少一行） */
+  function groupLines(lines, k) {
+    var per = Math.ceil(lines.length / k), out = [], i;
+    for (i = 0; i < lines.length; i += per) out.push(lines.slice(i, i + per).join('\n'));
+    return out;
+  }
+  /* 单行文本切 k 段：优先在空格或标点后落刀。
+     ⚠️ 拉丁语系没有词边界就硬切会把单词劈成 "Hel" / "lo"，这种字幕没人能用 —— 切不动就少切几段，
+     实在一段都切不出来就返回 null（调用方据此整条不拆）。中文 / 日文没有词边界问题，允许按字数切。 */
+  var RE_CJK = /[㐀-䶿一-鿿぀-ヿ가-힯]/;
+  function splitWords(text, k) {
+    var s = String(text).trim();
+    if (!s) return null;
+    var per = Math.ceil(lenOf(s) / k);
+    if (per <= 0) return null;
+    var cjk = RE_CJK.test(s);
+    var out = [], i = 0;
+    while (i < s.length && out.length < k - 1) {
+      var want = Math.min(s.length, i + per), cut = -1, j;
+      /* 断点搜索范围往后多给一段（want + per）：只卡在 want 以内的话，
+         像 "Hello there my friend" 这种词比平均段长稍长的句子会一段都切不出来。 */
+      for (j = Math.min(s.length, want + per); j > i; j--) {
+        if (/[\s，。！？、,.!?;；:：]/.test(s.charAt(j - 1))) { cut = j; break; }
+      }
+      if (cut < 0) {
+        if (!cjk) break;                 /* 找不到断点就到此为止，剩下的当最后一段 */
+        cut = want;
+      }
+      out.push(s.slice(i, cut).trim());
+      i = cut;
+    }
+    var tail = s.slice(i).trim();
+    if (tail) out.push(tail);
+    out = out.filter(function (x) { return x; });
+    return out.length >= 2 ? out : null;
+  }
+  /* 按最长时长拆分：单条超过 maxSec 秒就按字数比例切成几条 */
+  function splitByDur(cues, maxSec) {
+    var mx = Number(maxSec);
+    if (!isFinite(mx) || mx <= 0) return { cues: clone(cues), split: 0 };
+    var list = clone(cues), out = [], split = 0, i;
+    for (i = 0; i < list.length; i++) {
+      var c = list[i];
+      var dur = (c.end - c.start) / 1000;
+      var n = Math.ceil(dur / mx);
+      /* 双语那一条不要拆：切开会变成「原文一半 + 译文一半」这种废字幕 */
+      if (n > 1 && !isBilingualCue(c)) {
+        var segs = splitCue(c, n);
+        if (segs) { out = out.concat(segs); split += segs.length - 1; continue; }
+      }
+      out.push(c);
+    }
+    return { cues: out, split: split };
+  }
+  /* 按最多字数拆分：单条字数超过 maxChars 就切成几条 */
+  function splitByChars(cues, maxChars) {
+    var mx = Number(maxChars);
+    if (!isFinite(mx) || mx <= 0) return { cues: clone(cues), split: 0 };
+    var list = clone(cues), out = [], split = 0, i;
+    for (i = 0; i < list.length; i++) {
+      var c = list[i];
+      var n = Math.ceil(lenOf(c.text) / mx);
+      if (n > 1 && !isBilingualCue(c)) {
+        var segs = splitCue(c, n);
+        if (segs) { out = out.concat(segs); split += segs.length - 1; continue; }
+      }
+      out.push(c);
+    }
+    return { cues: out, split: split };
+  }
+
+  /* ---------------- 逐条微调：把操作记下来重放 ---------------- */
+  /* ops 按顺序作用在列表上，索引是「当时」的索引：
+     {op:'merge', i} 把第 i 条与下一条并成一条
+     {op:'split', i} 把第 i 条切成两条（能按行就按行，否则对半）
+     {op:'set', i, s, e} 直接改第 i 条的起止 */
+  function applyOps(cues, ops) {
+    var list = clone(cues);
+    (ops || []).forEach(function (o) {
+      if (!o || !isNum(o.i)) return;
+      var i = Math.round(o.i);
+      if (i < 0 || i >= list.length) return;
+      if (o.op === 'merge') {
+        if (i + 1 >= list.length) return;
+        var a = list[i], b = list[i + 1];
+        var two = scriptOf(a.text) !== scriptOf(b.text)
+          && scriptOf(a.text) !== 'other' && scriptOf(b.text) !== 'other';
+        list.splice(i, 2, {
+          start: a.start,
+          end: Math.max(a.end, b.end),
+          text: two ? (a.text + '\n' + b.text) : joinText(a.text, b.text),
+          _x: a._x || b._x
+        });
+        return;
+      }
+      if (o.op === 'split') {
+        var segs = splitCue(list[i], 2);
+        if (!segs) return;
+        list.splice(i, 1, segs[0], segs[1]);
+        return;
+      }
+      if (o.op === 'set') {
+        var s = Number(o.s), e = Number(o.e);
+        if (!isFinite(s) || !isFinite(e)) return;
+        if (s < 0) s = 0;
+        if (e <= s) e = s + 1;
+        list[i] = { start: Math.round(s), end: Math.round(e), text: list[i].text, _x: list[i]._x };
+      }
+    });
+    return list;
   }
 
   /* ---------------- 导出 ---------------- */
@@ -295,9 +572,9 @@
       return (i + 1) + '\n' + srtTime(c.start) + ' --> ' + srtTime(c.end) + '\n' + plain(c.text) + '\n';
     }).join('\n');
   }
-  function dumpVtt(cues) {
-    return 'WEBVTT\n\n' + cues.map(function (c) {
-      return vttTime(c.start) + ' --> ' + vttTime(c.end) + '\n' + plain(c.text) + '\n';
+  function dumpVtt(cues, head) {
+    return (head || 'WEBVTT\n\n') + cues.map(function (c) {
+      return vttTime(c.start) + ' --> ' + vttTime(c.end) + (c._x && c._x.settings ? ' ' + c._x.settings : '') + '\n' + plain(c.text) + '\n';
     }).join('\n');
   }
   function dumpSbv(cues) {
@@ -313,26 +590,41 @@
   function dumpTxt(cues) {
     return cues.map(function (c) { return plain(c.text); }).join('\n') + '\n';
   }
-  function dumpAss(cues) {
-    var head = '[Script Info]\n'
-      + 'ScriptType: v4.00+\n'
-      + 'PlayResX: 1920\n'
-      + 'PlayResY: 1080\n'
-      + 'WrapStyle: 0\n\n'
-      + '[V4+ Styles]\n'
-      + 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n'
-      + 'Style: Default,Arial,54,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,2,0,2,90,90,60,1\n\n'
-      + '[Events]\n'
-      + 'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n';
+  function dumpAss(cues, head) {
+    var h = head;
+    if (!h) {
+      h = '[Script Info]\n'
+        + 'ScriptType: v4.00+\n'
+        + 'PlayResX: 1920\n'
+        + 'PlayResY: 1080\n'
+        + 'WrapStyle: 0\n\n'
+        + '[V4+ Styles]\n'
+        + 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n'
+        + 'Style: Default,Arial,54,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,2,0,2,90,90,60,1\n\n'
+        + '[Events]\n'
+        + 'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n';
+    }
     var body = cues.map(function (c) {
+      var x = c._x || {};
       var txt = normBreaks(c.text).replace(/\r?\n/g, '\\N');
-      return 'Dialogue: 0,' + assTime(c.start) + ',' + assTime(c.end) + ',Default,,0,0,0,,' + txt;
+      return 'Dialogue: '
+        + [x.layer != null ? x.layer : '0', assTime(c.start), assTime(c.end),
+        x.style != null ? x.style : 'Default', x.name != null ? x.name : '',
+        x.ml != null ? x.ml : '0', x.mr != null ? x.mr : '0', x.mv != null ? x.mv : '0',
+        x.effect != null ? x.effect : '', txt].join(',');
     }).join('\n');
-    return head + body + '\n';
+    return h + body + '\n';
   }
 
   var READ = { srt: parseSrt, vtt: parseVtt, ass: parseAss, ssa: parseAss, sbv: parseSbv, lrc: parseLrc, txt: parseTxt };
-  var WRITE = { srt: dumpSrt, vtt: dumpVtt, ass: dumpAss, sbv: dumpSbv, lrc: dumpLrc, txt: dumpTxt };
+  var WRITE = {
+    srt: function (c) { return dumpSrt(c); },
+    vtt: function (c, h) { return dumpVtt(c, h); },
+    ass: function (c, h) { return dumpAss(c, h); },
+    sbv: function (c) { return dumpSbv(c); },
+    lrc: function (c) { return dumpLrc(c); },
+    txt: function (c) { return dumpTxt(c); }
+  };
 
   var FORMATS = [
     { id: 'srt', ext: 'srt', name: 'SRT', note: 'SubRip · 通用字幕' },
@@ -350,31 +642,121 @@
     var cues = fn(text);
     /* 时间轴倒置（常见于手改坏的 SRT）不自动纠正，但保证 end 不早于 start，免得下游算出负时长 */
     return cues.map(function (c) {
-      return { start: c.start, end: (c.end > c.start ? c.end : c.start + 1), text: String(c.text == null ? '' : c.text) };
+      return {
+        start: c.start,
+        end: (c.end > c.start ? c.end : c.start + 1),
+        text: String(c.text == null ? '' : c.text),
+        _x: c._x || null
+      };
     });
   }
-  function dump(cues, fmt) {
+  function head(src, fmt) { return headOf(src, fmt); }
+  function dump(cues, fmt, src) {
     var fn = WRITE[fmt];
     if (!fn) return '';
-    return fn(cues || []);
+    return fn(cues || [], (fmt === 'ass' || fmt === 'ssa' || fmt === 'vtt') ? headOf(src, fmt) : '');
   }
-  /* 换文件名后缀；原文件没有后缀就补一个 */
+  /* 换文件名后缀；本页不做格式转换，后缀沿用原文件的（ssa 就还是 ssa） */
   function outName(fname, fmt) {
     var f = String(fname || 'subtitle');
-    return (f.replace(/\.[a-z0-9]+$/i, '') || 'subtitle') + '.' + fmt;
+    var m = f.match(/\.([a-z0-9]+)$/i);
+    if (m) return f;                    /* 有后缀就原样 —— 同格式进出 */
+    return f + '.' + (fmt || 'srt');
+  }
+
+  /* ---------------- 保真改写：只动时间那几个字符 ---------------- */
+  /* 条目数没变时走这条路：整份文件逐行扫，认出时间就换成新值，别的字符一个都不碰。
+     这样 ASS 的样式表、每条的 Style / 边距 / 特效标记，VTT 的 NOTE 块与 cue 设置全都还在。
+     返回 null = 这条路走不通（条目数变了、或格式本来就没有时间轴），页面改用 dump。 */
+  function rewriteTimes(src, fmt, cues) {
+    if (!src || !cues) return null;
+    if (fmt === 'txt') return null;
+    var lines = String(src).replace(/\r\n?/g, '\n').split('\n');
+    var k = 0, out = [], i, ok = true;
+
+    if (fmt === 'ass' || fmt === 'ssa') {
+      for (i = 0; i < lines.length; i++) {
+        var ln = lines[i];
+        if (!/^\s*(Dialogue|Comment):/i.test(ln)) { out.push(ln); continue; }
+        if (/^\s*Comment:/i.test(ln)) { out.push(ln); continue; }
+        var p = ln.split(',');
+        if (p.length < 10) { out.push(ln); continue; }
+        if (k >= cues.length) { ok = false; break; }
+        p[1] = assTime(cues[k].start);
+        p[2] = assTime(cues[k].end);
+        out.push(p.join(','));
+        k++;
+      }
+      return (ok && k === cues.length) ? out.join('\n') : null;
+    }
+
+    if (fmt === 'lrc') {
+      var RE_TAG = /\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]/g;
+      for (i = 0; i < lines.length; i++) {
+        var line = lines[i], m;
+        RE_TAG.lastIndex = 0;
+        if (!RE_TAG.test(line)) { out.push(line); continue; }
+        RE_TAG.lastIndex = 0;
+        out.push(line.replace(RE_TAG, function (tag) {
+          if (k >= cues.length) { ok = false; return tag; }
+          return '[' + lrcTime(cues[k++].start) + ']';
+        }));
+      }
+      return (ok && k === cues.length) ? out.join('\n') : null;
+    }
+
+    var re = (fmt === 'sbv') ? RE_SBV : RE_SRT;
+    var fmtFn = (fmt === 'sbv') ? sbvTime : (fmt === 'vtt' ? vttTime : srtTime);
+    for (i = 0; i < lines.length; i++) {
+      var row = lines[i];
+      var mm = row.match(re);
+      if (!mm) { out.push(row); continue; }
+      if (k >= cues.length) { ok = false; break; }
+      var c = cues[k];
+      if (fmt === 'sbv') {
+        out.push(sbvTime(c.start) + ',' + sbvTime(c.end));
+      } else {
+        /* 保留原文里毫秒那一位用的是逗号还是点号 —— SRT 两种写法都有，别替用户换 */
+        var sep1 = /,\d/.test(mm[0]) ? ',' : '.';
+        var head2 = row.slice(0, mm.index);
+        var tail2 = row.slice(mm.index + mm[0].length);
+        var lead = (mm[0].match(/^\s*/) || [''])[0];
+        head2 += lead;
+        var mid = (mm[0].match(/\s*-->\s*/) || [' --> '])[0];
+        out.push(head2 + fmtFn(c.start).replace(',', sep1) + mid + fmtFn(c.end).replace(',', sep1) + tail2);
+      }
+      k++;
+    }
+    return (ok && k === cues.length) ? out.join('\n') : null;
+  }
+  /* 页面决定走哪条路：条目数没变就保真改写，变了就只能重新生成（但仍把样式带回去） */
+  function render(src, fmt, cues) {
+    var rw = rewriteTimes(src, fmt, cues);
+    if (rw != null) return rw;
+    return dump(cues, fmt, src);
   }
 
   root.ShiftCore = {
     FORMATS: FORMATS,
     READABLE: READABLE,
     MODES: MODES,
+    TOOLS: TOOLS,
     detect: detect,
     parse: parse,
+    head: head,
     dump: dump,
+    rewriteTimes: rewriteTimes,
+    render: render,
     outName: outName,
     apply: apply,
     valid: valid,
     info: info,
+    mergeGap: mergeGap,
+    splitByDur: splitByDur,
+    splitByChars: splitByChars,
+    applyOps: applyOps,
+    scriptOf: scriptOf,
+    isBilingualCue: isBilingualCue,
     parseUserTime: parseUserTime,
     time: { srt: srtTime, vtt: vttTime, sbv: sbvTime, lrc: lrcTime, ass: assTime }
   };
