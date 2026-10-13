@@ -676,11 +676,11 @@ function serveStatic(req, res, urlPath){
      ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
      会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
   /* v0.9.288：转换页 /convert.html 与 /en/convert.html */
-  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair)\.html$/);
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract)\.html$/);
   if (pm && SEO_ROUTE['/' + pm[1]]) {
     serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
   }
-  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair)\.html$/);
+  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
@@ -1558,7 +1558,7 @@ const SEO_CLEAN = {
   },
 };
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {};
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
   CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
@@ -1571,6 +1571,8 @@ SEO_LANGS.forEach(function (l) {
   SHIFT_PATH[l] = (l === 'zh-CN') ? '/shift.html' : '/' + l + '/shift.html';
   /* v0.9.296：字幕乱码修复页 */
   REPAIR_PATH[l] = (l === 'zh-CN') ? '/repair.html' : '/' + l + '/repair.html';
+  /* v0.9.299：字幕提取纯文本页 */
+  EXTRACT_PATH[l] = (l === 'zh-CN') ? '/extract.html' : '/' + l + '/extract.html';
 });
 /* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
    ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
@@ -2599,6 +2601,254 @@ const SEO_REPAIR = {
   }
 };
 
+/* v0.9.299：第九个页面 —— 字幕提取纯文本（/extract.html）
+   与前面几个工具页同理：纯前端、不烧 API 调用费，是优先抢的搜索词。 */
+const SEO_EXTRACT = {
+  'zh-CN': {
+    title: '字幕提取纯文本 - SRT / ASS / VTT 台词一键导出 | 随心字幕 AI',
+    desc: '免费在线把字幕提取成纯文本：SRT、VTT、ASS、SBV、LRC、TXT 都认，时间轴和序号自动去掉，输出连续段落或逐条一行，还能顺手去掉听障提示、水印和说话人名。',
+    kw: '字幕提取文本,srt转txt,ass转txt,字幕转文本,提取台词,字幕去时间轴,srt导出文本,字幕转纯文字,台词提取工具,subtitle to text,srt to txt,extract text from subtitles',
+    intro: '把 SRT / VTT / ASS / SBV / LRC / TXT 字幕里的台词提取成干净的纯文本，时间轴、序号、样式标记全部自动去掉。',
+    feat: '两种布局随选：连续段落按停顿和句末标点自动分段，适合当文章读；逐条一行适合拿去做对白清单。听障提示（如「(电话铃响)」）、片源水印、相邻重复句默认去掉，说话人名（如「TOM:」）和歌词行要不要留也可以自己选。中英日韩等不同文字的折行合并规则不同，按语言自动处理。',
+    who: '想把台词抄下来做笔记、做剧本、练翻译、喂给别的工具，但不想一条条手动删时间轴的人。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'zh-TW': {
+    title: '字幕提取純文字 - SRT / ASS / VTT 台詞一鍵匯出 | 隨心字幕 AI',
+    desc: '免費線上把字幕提取成純文字：SRT、VTT、ASS、SBV、LRC、TXT 都認得，時間軸和序號自動去掉，輸出連續段落或逐條一行，還能順手去掉聽障提示、浮水印和說話人名。',
+    kw: '字幕提取文字,srt轉txt,ass轉txt,字幕轉文字,提取台詞,字幕去時間軸,srt匯出文字,字幕轉純文字,台詞提取工具,subtitle to text,srt to txt,extract text from subtitles',
+    intro: '把 SRT / VTT / ASS / SBV / LRC / TXT 字幕裡的台詞提取成乾淨的純文字，時間軸、序號、樣式標記全部自動去掉。',
+    feat: '兩種版面隨選：連續段落按停頓和句末標點自動分段，適合當文章讀；逐條一行適合拿去做對白清單。聽障提示（如「(電話鈴響)」）、片源浮水印、相鄰重複句預設去掉，說話人名（如「TOM:」）和歌詞行要不要留也可以自己選。中英日韓等不同文字的換行合併規則不同，按語言自動處理。',
+    who: '想把台詞抄下來做筆記、寫劇本、練翻譯、餵給別的工具，但不想一條條手動刪時間軸的人。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'en': {
+    title: 'Extract Text From Subtitles - SRT/ASS/VTT to Plain Text | AI-SRTSub',
+    desc: 'Free online subtitle-to-text extractor: reads SRT, VTT, ASS, SBV, LRC and TXT, drops timecodes and line numbers, and outputs clean dialogue as paragraphs or one line per cue.',
+    kw: 'extract text from subtitles,subtitle to text,srt to txt,srt to plain text,ass to txt,vtt to txt,subtitle transcript,extract dialogue from srt,srt remove timecodes,subtitle text extractor',
+    intro: 'Pull the dialogue out of SRT / VTT / ASS / SBV / LRC / TXT subtitles as clean plain text: timecodes, cue numbers and style tags are stripped automatically.',
+    feat: 'Two layouts: continuous paragraphs split on pauses and end-of-sentence punctuation, or one line per cue for dialogue lists. Sound cues like "(phone ringing)", source watermarks and repeated back-to-back lines are removed by default; speaker names like "TOM:" and lyric lines can be kept or dropped. Line-wrapping is merged back per script — CJK joins directly, Korean and Latin add spaces — so nothing gets glued together.',
+    who: 'Anyone who wants subtitle text for notes, scripts, translation practice or feeding another tool, without deleting hundreds of timecodes by hand.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'ja': {
+    title: '字幕からテキスト抽出 - SRT / ASS / VTT のセリフを書き出し | AI-SRTSub',
+    desc: '無料のオンラインツール：SRT・VTT・ASS・SBV・LRC・TXT の字幕からセリフだけを取り出します。タイムコードと行番号は自動で消え、段落つなぎまたは一行ずつで出力できます。',
+    kw: '字幕 テキスト 抽出,srt テキスト 変換,ass テキスト 抽出,字幕 セリフ 書き出し,字幕 書き起こし,srt 台本,字幕 タイムコード 削除,subtitle to text,srt to txt',
+    intro: 'SRT / VTT / ASS / SBV / LRC / TXT の字幕から、タイムコード・行番号・スタイル指定を自動で取り除き、セリフだけをきれいなテキストとして取り出します。',
+    feat: '出力は二種類：休止と句読点で段落分けする「連続段落」は読み物向き、セリフを行ごとに並べる「一行ずつ」は台本作成向き。聴覚障害者向けの注記（「(電話の着信音)」など）、放送元の透かし、連続する重複行はデフォルトで除去。話者名（「TOM:」など）と歌詞行の去就は自分で選べます。折り返しの結合は文字体系ごとに判断し、日本語はそのまま、韓国語や英語はスペースを補います。',
+    who: 'セリフをメモや台本、翻訳の練習、他ツールへの入力に使いたいけど、タイムコードを一つずつ消すのは嫌な人。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'es': {
+    title: 'Extraer texto de subtítulos - SRT/ASS/VTT a texto plano | AI-SRTSub',
+    desc: 'Extractor gratuito online: lee SRT, VTT, ASS, SBV, LRC y TXT, elimina códigos de tiempo y números de línea, y entrega el diálogo limpio en párrafos o una línea por entrada.',
+    kw: 'extraer texto de subtítulos,subtítulos a texto,srt a txt,ass a txt,vtt a txt,extraer diálogos srt,transcripción de subtítulos,srt quitar tiempos,subtitle to text,srt to txt',
+    intro: 'Saca el diálogo de subtítulos SRT / VTT / ASS / SBV / LRC / TXT como texto plano limpio: códigos de tiempo, números y etiquetas de estilo se eliminan automáticamente.',
+    feat: 'Dos diseños: párrafos continuos divididos por pausas y puntuación final, o una línea por entrada para listas de diálogo. Las acotaciones sonoras como "(suena el teléfono)", marcas de agua y líneas repetidas consecutivas se quitan por defecto; los nombres de hablante como "TOM:" y las líneas de canciones se pueden conservar o descartar. Los saltos de línea se vuelven a unir según la escritura: el japonés se une directo y el coreano o el latino añaden espacios.',
+    who: 'Quien quiera el texto de los subtítulos para apuntes, guiones, práctica de traducción u otra herramienta, sin borrar cientos de códigos de tiempo a mano.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'pt': {
+    title: 'Extrair texto de legendas - SRT/ASS/VTT para texto | AI-SRTSub',
+    desc: 'Extrator online gratuito: lê SRT, VTT, ASS, SBV, LRC e TXT, remove timecodes e números de linha, e entrega o diálogo limpo em parágrafos ou uma linha por legenda.',
+    kw: 'extrair texto de legendas,legenda para texto,srt para txt,ass para txt,vtt para txt,extrair diálogo srt,transcrição de legenda,remover timecode srt,subtitle to text,srt to txt',
+    intro: 'Tire o diálogo de legendas SRT / VTT / ASS / SBV / LRC / TXT como texto puro e limpo: timecodes, números e tags de estilo são removidos automaticamente.',
+    feat: 'Dois layouts: parágrafos contínuos divididos por pausas e pontuação final de frase, ou uma linha por legenda para listas de diálogo. Indicações sonoras como "(telefone toca)", marcas d’água e linhas repetidas em sequência saem por padrão; nomes de personagem como "TOM:" e letras de música você escolhe manter ou tirar. As quebras de linha são reunidas conforme a escrita: japonês junta direto, coreano e latinos ganham espaços.',
+    who: 'Quem quer o texto das legendas para anotações, roteiros, prática de tradução ou outra ferramenta, sem apagar centenas de timecodes à mão.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'ko': {
+    title: '자막에서 텍스트 추출 - SRT / ASS / VTT 대사 내보내기 | AI-SRTSub',
+    desc: '무료 온라인 도구: SRT, VTT, ASS, SBV, LRC, TXT 자막에서 대사만 뽑아냅니다. 타임코드와 줄번호는 자동으로 지워지고, 문단 이어쓰기 또는 한 줄씩 출력을 고를 수 있습니다.',
+    kw: '자막 텍스트 추출,srt 텍스트 변환,ass 텍스트 추출,자막 대사 추출,자막 변환 텍스트,srt 대본,자막 타임코드 삭제,subtitle to text,srt to txt',
+    intro: 'SRT / VTT / ASS / SBV / LRC / TXT 자막에서 타임코드·줄번호·스타일 태그를 자동으로 걷어내고 대사만 깔끔한 텍스트로 뽑아냅니다.',
+    feat: '출력은 두 가지: 멈춤과 문장 끝 문장부호 기준으로 문단을 나누는 이어쓰기, 대사를 한 줄씩 나열하는 목록용. 청각 장애인용 표기("(전화벨 소리)" 등), 방송사 워터마크, 연속된 중복 줄은 기본적으로 제거하고 화자명("TOM:" 등)과 가사 줄은 남길지 직접 고릅니다. 줄바꿈 병합은 문자 체계별로 판단해 한국어와 영어는 공백을 넣고 일본어·중국어는 바로 이어 붙입니다.',
+    who: '대사를 메모·대본·번역 연습이나 다른 도구에 쓰고 싶지만 타임코드를 하나하나 지우기는 싫은 사람.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'de': {
+    title: 'Text aus Untertiteln extrahieren - SRT/ASS/VTT als Text | AI-SRTSub',
+    desc: 'Kostenloses Online-Tool: liest SRT, VTT, ASS, SBV, LRC und TXT, entfernt Timecodes und Zeilennummern und liefert den Dialog sauber als Absätze oder je Zeile eine Aussage.',
+    kw: 'untertitel text extrahieren,srt zu text,ass zu txt,vtt zu txt,untertitel transkript,dialog extrahieren srt,srt timecodes entfernen,subtitle to text,srt to txt',
+    intro: 'Zieh den Dialog aus SRT-/VTT-/ASS-/SBV-/LRC-/TXT-Untertiteln als sauberen Text: Timecodes, Zeilennummern und Style-Tags fallen automatisch weg.',
+    feat: 'Zwei Layouts: fortlaufende Absätze, getrennt nach Pausen und Satzzeichen, oder eine Zeile pro Untertitel für Dialoglisten. Sound-Hinweise wie "(Telefon klingelt)", Wasserzeichen und direkt wiederholte Zeilen sind standardmäßig raus; Sprechernamen wie "TOM:" und Songzeilen behältst oder wirfst du selbst. Umbrüche werden je Schrift wieder zusammengefügt — Japanisch direkt, Koreanisch und Lateinschrift mit Leerzeichen.',
+    who: 'Wer den Untertiteltext für Notizen, Drehbücher, Übersetzungsübung oder andere Tools braucht, aber keine Hunderten Timecodes von Hand löschen will.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'fr': {
+    title: 'Extraire le texte des sous-titres - SRT/ASS/VTT en texte | AI-SRTSub',
+    desc: 'Outil gratuit en ligne : lit les SRT, VTT, ASS, SBV, LRC et TXT, retire timecodes et numéros de ligne, et livre les dialogues propres en paragraphes ou une ligne par sous-titre.',
+    kw: 'extraire texte sous-titres,srt en txt,ass en txt,vtt en txt,sous-titres transcription,extraire dialogues srt,supprimer timecode srt,subtitle to text,srt to txt',
+    intro: 'Tirez les dialogues de sous-titres SRT / VTT / ASS / SBV / LRC / TXT en texte brut propre : timecodes, numéros et balises de style disparaissent automatiquement.',
+    feat: 'Deux dispositions : paragraphes continus coupés aux pauses et à la ponctuation de fin de phrase, ou une ligne par sous-titre pour les listes de dialogues. Les indications sonores comme "(le téléphone sonne)", les filigranes et les lignes répétées d’affilée partent par défaut ; les noms de locuteurs comme "TOM :" et les lignes de chansons, à toi de choisir. Les retours à la ligne sont recollés selon l’écriture : le japonais directement, le coréen et l’alphabet avec des espaces.',
+    who: 'Toute personne qui veut le texte des sous-titres pour des notes, un script, de la traduction ou un autre outil, sans supprimer des centaines de timecodes à la main.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'id': {
+    title: 'Ekstrak Teks dari Subtitle - SRT/ASS/VTT ke Teks | AI-SRTSub',
+    desc: 'Alat online gratis: membaca SRT, VTT, ASS, SBV, LRC, dan TXT, membuang timecode dan nomor baris, lalu menghasilkan dialog bersih sebagai paragraf atau satu baris per subtitle.',
+    kw: 'ekstrak teks subtitle,subtitle ke teks,srt ke txt,ass ke txt,vtt ke txt,transkrip subtitle,ambil dialog srt,hapus timecode srt,subtitle to text,srt to txt',
+    intro: 'Ambil dialog dari subtitle SRT / VTT / ASS / SBV / LRC / TXT sebagai teks bersih: timecode, nomor baris, dan tag gaya dibuang otomatis.',
+    feat: 'Dua tata letak: paragraf berkesinambungan yang dipotong pada jeda dan tanda baca akhir kalimat, atau satu baris per subtitle untuk daftar dialog. Keterangan suara seperti "(telepon berdering)", watermark, dan baris yang berulang berurutan dibuang secara bawaan; nama pembicara seperti "TOM:" dan baris lirik bisa Anda simpan atau buang. Penggabungan baris mengikuti aksara: Jepang langsung disambung, Korea dan Latin diberi spasi.',
+    who: 'Siapa pun yang butuh teks subtitle untuk catatan, naskah, latihan terjemahan, atau alat lain, tanpa menghapus ratusan timecode satu per satu.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'hi': {
+    title: 'सबटाइटल से टेक्स्ट निकालें - SRT/ASS/VTT से प्लेन टेक्स्ट | AI-SRTSub',
+    desc: 'मुफ्त ऑनलाइन टूल: SRT, VTT, ASS, SBV, LRC और TXT पढ़ता है, टाइमकोड और लाइन नंबर हटा देता है, और साफ़ संवाद पैराग्राफ या हर सबटाइटल एक लाइन में देता है।',
+    kw: 'सबटाइटल से टेक्स्ट,srt to text,srt से txt,subtitle transcript,संवाद निकालें srt,टाइमकोड हटाएं srt,ass to text,vtt to text,subtitle to plain text',
+    intro: 'SRT / VTT / ASS / SBV / LRC / TXT सबटाइटल से टाइमकोड, नंबर और स्टाइल टैग अपने आप हटाकर सिर्फ़ संवाद को साफ़ टेक्स्ट के रूप में निकालें।',
+    feat: 'दो लेआउट: ठहराव और वाक्य-अंत विराम चिह्न पर बँटे लगातार पैराग्राफ, या संवाद सूची के लिए हर सबटाइटल एक लाइन। "(फ़ोन बजता है)" जैसी ध्वनि-टिप्पणियाँ, वॉटरमार्क और लगातार दोहराई गई लाइनें डिफ़ॉल्ट रूप से हट जाती हैं; "TOM:" जैसे बोलने वाले का नाम और गीत की लाइनें रखना या हटाना आप तय करते हैं। लाइन-ब्रेक जोड़ने का नियम लिपि के हिसाब से है: जापानी सीधे जुड़ता है, कोरियाई और लैटिन में स्पेस लगता है।',
+    who: 'जो सबटाइटल का टेक्स्ट नोट्स, स्क्रिप्ट, अनुवाद अभ्यास या किसी और टूल के लिए चाहते हैं, लेकिन सैकड़ों टाइमकोड हाथ से मिटाना नहीं चाहते।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'th': {
+    title: 'แยกข้อความจากซับไตเติล - SRT/ASS/VTT เป็นข้อความ | AI-SRTSub',
+    desc: 'เครื่องมือออนไลน์ฟรี: อ่าน SRT, VTT, ASS, SBV, LRC และ TXT ตัดไทม์โค้ดกับหมายเลขบรรทัดทิ้ง แล้วส่งออกบทสนทนาเป็นย่อหน้า หรือบรรทัดละหนึ่งคิว',
+    kw: 'แยกข้อความจากซับ,ซับเป็นข้อความ,srt เป็น txt,ass เป็น txt,vtt เป็น txt,ถอดบทสนทนา srt,ลบไทม์โค้ด srt,subtitle to text,srt to txt',
+    intro: 'ดึงบทสนทนาจากซับไตเติล SRT / VTT / ASS / SBV / LRC / TXT ออกมาเป็นข้อความสะอาด ๆ โดยไทม์โค้ด หมายเลข และแท็กสไตล์ถูกตัดทิ้งให้อัตโนมัติ',
+    feat: 'เลย์เอาต์สองแบบ: ย่อหน้าต่อเนื่องที่แบ่งตามช่วงหยุดและเครื่องหมายสิ้นสุดประโยค หรือบรรทัดละหนึ่งคิวสำหรับทำรายการบทสนทนา คำอธิบายเสียงอย่าง "(เสียงโทรศัพท์)" ลายน้ำ และบรรทัดซ้ำติดกันถูกตัดทิ้งตั้งแต่ค่าเริ่มต้น ส่วนชื่อผู้พูดอย่าง "TOM:" และบรรทัดเนื้อเพลงจะเก็บหรือทิ้งก็เลือกได้เอง การรวมบรรทัดจะดูตามระบบตัวเขียน ญี่ปุ่นต่อกันได้เลย ส่วนเกาหลีและอักษรละตินใส่ช่องว่างให้',
+    who: 'คนที่อยากได้ข้อความจากซับไว้ทำโน้ต บทภาพยนตร์ ฝึกแปล หรือป้อนเข้าเครื่องมืออื่น แต่ไม่อยากนั่งลบไทม์โค้ดทีละร้อยด้วยมือ',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'vi': {
+    title: 'Trích văn bản từ phụ đề - SRT/ASS/VTT sang text | AI-SRTSub',
+    desc: 'Công cụ trực tuyến miễn phí: đọc SRT, VTT, ASS, SBV, LRC và TXT, loại timecode và số dòng, xuất lời thoại sạch thành đoạn văn hoặc mỗi dòng phụ đề một dòng.',
+    kw: 'trích văn bản từ phụ đề,phụ đề sang text,srt sang txt,ass sang txt,vtt sang txt,trích lời thoại srt,xóa timecode srt,subtitle to text,srt to txt',
+    intro: 'Lấy lời thoại từ phụ đề SRT / VTT / ASS / SBV / LRC / TXT thành văn bản sạch: timecode, số dòng và thẻ định dạng được loại tự động.',
+    feat: 'Hai bố cục: đoạn văn liền mạch ngắt theo chỗ dừng và dấu câu cuối câu, hoặc mỗi dòng phụ đề một dòng cho danh sách thoại. Chú thích âm thanh như "(điện thoại reo)", watermark và các dòng lặp liền nhau bị loại mặc định; tên nhân vật như "TOM:" và lời bài hát giữ hay bỏ do bạn chọn. Việc nối dòng ngắt được xử lý theo hệ chữ: tiếng Nhật nối thẳng, tiếng Hàn và chữ Latin thêm dấu cách.',
+    who: 'Ai cần văn bản phụ đề để ghi chú, viết kịch bản, luyện dịch hoặc đưa vào công cụ khác, mà không muốn xóa hàng trăm timecode bằng tay.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'ru': {
+    title: 'Извлечь текст из субтитров — SRT/ASS/VTT в текст | AI-SRTSub',
+    desc: 'Бесплатный онлайн-инструмент: читает SRT, VTT, ASS, SBV, LRC и TXT, убирает таймкоды и номера строк и выдаёт чистые диалоги абзацами или по строке на реплику.',
+    kw: 'извлечь текст из субтитров,srt в txt,ass в txt,vtt в txt,субтитры в текст,расшифровка субтитров,убрать таймкоды srt,диалоги из srt,subtitle to text,srt to txt',
+    intro: 'Достаньте диалоги из субтитров SRT / VTT / ASS / SBV / LRC / TXT в виде чистого текста: таймкоды, номера строк и теги стилей убираются автоматически.',
+    feat: 'Два формата: сплошные абзацы, разбитые по паузам и знакам конца предложения, или по строке на реплику для списка диалогов. Звуковые пометки вроде "(звонит телефон)", водяные знаки и подряд повторяющиеся строки убраны по умолчанию; имена говорящих вроде "TOM:" и строки песен оставляете или убираете сами. Переносы строк склеиваются по письму: японский — напрямую, корейский и латиница — с пробелом.',
+    who: 'Тем, кому нужен текст субтитров для заметок, сценария, практики перевода или другой программы, но не хочется вручную удалять сотни таймкодов.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'it': {
+    title: 'Estrarre testo dai sottotitoli - SRT/ASS/VTT in testo | AI-SRTSub',
+    desc: 'Strumento online gratuito: legge SRT, VTT, ASS, SBV, LRC e TXT, toglie timecode e numeri di riga e restituisce i dialoghi puliti in paragrafi o una riga per battuta.',
+    kw: 'estrarre testo sottotitoli,srt in txt,ass in txt,vtt in txt,transcrizione sottotitoli,estrarre dialoghi srt,rimuovere timecode srt,subtitle to text,srt to txt',
+    intro: 'Estrai i dialoghi da sottotitoli SRT / VTT / ASS / SBV / LRC / TXT come testo pulito: timecode, numeri e tag di stile vengono via automaticamente.',
+    feat: 'Due impaginazioni: paragrafi continui spezzati su pause e punteggiatura di fine frase, oppure una riga per battuta per le liste dei dialoghi. Le didascalie sonore come "(squilla il telefono)", i watermark e le righe ripetute di fila via per impostazione predefinita; i nomi dei parlanti come "TOM:" e le righe delle canzoni le scegli tu. Le interruzioni di riga vengono ricucite in base alla scrittura: il giapponese in diretta, il coreano e l’alfabeto latino con spazi.',
+    who: 'Chi vuole il testo dei sottotitoli per appunti, copioni, esercizio di traduzione o un altro strumento, senza cancellare a mano centinaia di timecode.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'ar': {
+    title: 'استخراج النص من الترجمات - SRT/ASS/VTT إلى نص | AI-SRTSub',
+    desc: 'أداة مجانية عبر الإنترنت: تقرأ SRT وVTT وASS وSBV وLRC وTXT، وتحذف أكواد التوقيت وأرقام الأسطر، وتخرج الحوارات نظيفة في فقرات أو سطر لكل ترجمة.',
+    kw: 'استخراج نص من الترجمات,تحويل الترجمة إلى نص,srt إلى txt,ass إلى txt,vtt إلى txt,تفريغ الترجمات,حذف التوقيت من srt,حوارات من srt,subtitle to text,srt to txt',
+    intro: 'استخرج الحوارات من ترجمات SRT / VTT / ASS / SBV / LRC / TXT كنص نظيف: أكواد التوقيت وأرقام الأسطر ووسوم التنسيق تُحذف تلقائيًا.',
+    feat: 'تخطيطان: فقرات متصلة تُقسم عند الوقفات وعلامات نهاية الجملة، أو سطر واحد لكل ترجمة لقوائم الحوار. الملاحظات الصوتية مثل "(رنين الهاتف)" والعلامات المائية والأسطر المتكررة المتتالية تُحذف افتراضيًا؛ أسماء المتحدثين مثل "TOM:" وأسطر الأغاني تحذفها أو تبقيها بنفسك. دمج فواصل الأسطر يتم حسب نظام الكتابة: اليابانية تُوصل مباشرة، والكورية والحروف اللاتينية تُفصل بمسافات.',
+    who: 'من يريد نص الترجمات للملاحظات أو السيناريو أو التدريب على الترجمة أو أداة أخرى، دون حذف مئات أكواد التوقيت يدويًا.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'tr': {
+    title: 'Altyazılardan metin çıkarma - SRT/ASS/VTT metin olarak | AI-SRTSub',
+    desc: 'Ücretsiz çevrimiçi araç: SRT, VTT, ASS, SBV, LRC ve TXT okur, zaman kodlarını ve satır numaralarını atar, temiz diyalogları paragraf ya da her satır için bir dize olarak verir.',
+    kw: 'altyazıdan metin çıkarma,srt txt yap,ass txt yap,vtt txt yap,altyazı transkript,srt diyalog çıkarma,srt zaman kodu silme,subtitle to text,srt to txt',
+    intro: 'SRT / VTT / ASS / SBV / LRC / TXT altyazılarındaki diyalogları temiz bir metin olarak çıkar: zaman kodları, numaralar ve stil etiketleri otomatik kalkar.',
+    feat: 'İki yerleşim: duraklamalara ve cümle sonu noktalamasına göre bölünen sürekli paragraflar, ya da diyalog listeleri için altyazı başına bir satır. "(telefon çalıyor)" gibi ses notları, kaynak filigranları ve art arda tekrarlanan satırlar varsayılan olarak çıkarılır; "TOM:" gibi konuşmacı adları ve şarkı satırlarını tutmak ya da atmak sana kalmış. Satır sonları yazı sistemine göre birleştirilir: Japonca doğrudan, Korece ve Latin alfabesi boşlukla.',
+    who: 'Altyazı metnini notlar, senaryo, çeviri pratiği ya da başka bir araç için isteyen ama yüzlerce zaman kodunu elle silmek istemeyen herkes.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'nl': {
+    title: 'Tekst uit ondertitels halen - SRT/ASS/VTT naar tekst | AI-SRTSub',
+    desc: 'Gratis online tool: leest SRT, VTT, ASS, SBV, LRC en TXT, haalt timecodes en regelnummers weg en levert schone dialoog als alinea’s of één regel per ondertitel.',
+    kw: 'ondertitel naar tekst,srt naar txt,ass naar txt,vtt naar txt,ondertitels transcriberen,dialoog uit srt,timecode verwijderen srt,subtitle to text,srt to txt',
+    intro: 'Haal de dialoog uit SRT-/VTT-/ASS-/SBV-/LRC-/TXT-ondertitels als schone platte tekst: timecodes, nummers en stijltags verdwijnen automatisch.',
+    feat: 'Twee lay-outs: doorlopende alinea’s, verdeeld op pauzes en eindpunten, of één regel per ondertitel voor dialooglijsten. Geluidsaanduidingen als "(telefoon gaat)", watermerken en direct herhaalde regels zijn standaard weg; sprekersnamen als "TOM:" en songregels houd of gooi je zelf weg. Regeleinden worden per schrift weer samengevoegd — Japans direct, Koreaans en Latijns met spaties.',
+    who: 'Wie de tekst van ondertitels wil voor aantekeningen, scripts, vertaaloefening of een andere tool, zonder honderden timecodes met de hand te wissen.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'pl': {
+    title: 'Wyodrębnij tekst z napisów - SRT/ASS/VTT do tekstu | AI-SRTSub',
+    desc: 'Darmowe narzędzie online: czyta SRT, VTT, ASS, SBV, LRC i TXT, usuwa kody czasu i numery linii, i zwraca czyste dialogi jako akapity albo po jednej linii na napis.',
+    kw: 'wyodrębnij tekst z napisów,srt do txt,ass do txt,vtt do txt,napisy transkrypcja,dialogi z srt,usuń kody czasu srt,subtitle to text,srt to txt',
+    intro: 'Wyciągnij dialogi z napisów SRT / VTT / ASS / SBV / LRC / TXT jako czysty tekst: kody czasu, numery i znaczniki stylu znikają automatycznie.',
+    feat: 'Dwa układy: ciągłe akapity dzielone po pauzach i interpunkcji kończącej zdanie albo po jednej linii na napis do list dialogów. Opisy dźwięków jak "(dzwoni telefon)", znaki wodne i linie powtórzone bezpośrednio po sobie schodzą domyślnie; nazwy mówców jak "TOM:" i linii piosenek pilnujesz sam. Złamania linii sklejają się według pisma: japoński bezpośrednio, koreański i łacina ze spacją.',
+    who: 'Każdy, kto chce tekst napisów do notatek, scenariusza, ćwiczeń tłumaczeniowych albo innego narzędzia, bez ręcznego usuwania setek kodów czasu.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'sv': {
+    title: 'Extrahera text från undertexter - SRT/ASS/VTT till text | AI-SRTSub',
+    desc: 'Gratis onlineverktyg: läser SRT, VTT, ASS, SBV, LRC och TXT, tar bort tidskoder och radnummer, och levererar ren dialog som stycken eller en rad per undertitel.',
+    kw: 'extrahera text undertexter,srt till txt,ass till txt,vtt till txt,undertexter transkribera,dialog ur srt,ta bort tidskoder srt,subtitle to text,srt to txt',
+    intro: 'Dra ut dialogen ur SRT-/VTT-/ASS-/SBV-/LRC-/TXT-undertexter som ren text: tidskoder, nummer och stiltaggar försvinner automatiskt.',
+    feat: 'Två layouter: sammanhängande stycken delade på pauser och meningsslutspunktering, eller en rad per undertitel för dialoglistor. Ljudnoteringar som "(telefonen ringer)", vattenstämplar och rader som upprepas direkt efter varandra är borta som standard; talarnamn som "TOM:" och sångrader behåller eller slänger du själv. Radbrytningar fogas ihop per skrift — japanska direkt, koreanska och latinska med mellanslag.',
+    who: 'Den som vill ha undertexttexten till anteckningar, manus, översättningsövning eller ett annat verktyg, utan att ta bort hundratals tidskoder för hand.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'cs': {
+    title: 'Vyextrahovat text z titulků - SRT/ASS/VTT do textu | AI-SRTSub',
+    desc: 'Bezplatný online nástroj: čte SRT, VTT, ASS, SBV, LRC a TXT, odstraňuje časové kódy a čísla řádků a vrací čisté dialogy jako odstavce nebo po jednom řádku na titulek.',
+    kw: 'vyextrahovat text z titulků,srt do txt,ass do txt,vtt do txt,titulky transkripce,dialogy ze srt,odstranit časové kódy srt,subtitle to text,srt to txt',
+    intro: 'Vytáhněte dialogy z titulků SRT / VTT / ASS / SBV / LRC / TXT jako čistý text: časové kódy, čísla a stylové značky zmizí automaticky.',
+    feat: 'Dvě rozložení: souvislé odstavce dělené po pauzách a interpunkci na konci věty, nebo jeden řádek na titulek pro seznamy dialogů. Zvukové poznámky jako "(zvoní telefon)", vodoznaky a bezprostředně opakované řádky jsou ve výchozím stavu pryč; jména mluvčích jako "TOM:" a řádky písní si ponecháte nebo zahodíte sami. Zalomení řádků se slepují podle písma: japonština přímo, korejština a latinka s mezerou.',
+    who: 'Kdo chce text titulků do poznámek, scénáře, cvičení překladu nebo jiného nástroje, bez ručního mazání stovek časových kódů.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'uk': {
+    title: 'Витягти текст із субтитрів — SRT/ASS/VTT у текст | AI-SRTSub',
+    desc: 'Безкоштовний онлайн-інструмент: читає SRT, VTT, ASS, SBV, LRC і TXT, прибирає таймкоди та номери рядків і видає чисті діалоги абзацами або по рядку на репліку.',
+    kw: 'витягти текст із субтитрів,srt в txt,ass в txt,vtt в txt,субтитри в текст,розшифровка субтитрів,прибрати таймкоди srt,діалоги з srt,subtitle to text,srt to txt',
+    intro: 'Дістаньте діалоги із субтитрів SRT / VTT / ASS / SBV / LRC / TXT як чистий текст: таймкоди, номери рядків і теги стилів прибираються автоматично.',
+    feat: 'Два формати: суцільні абзаци, розбиті за паузами та розділовими знаками кінця речення, або по рядку на репліку для списку діалогів. Звукові позначки на кшталт "(дзвонить телефон)", водяні знаки та підряд повторювані рядки прибрані за замовчуванням; імена мовців на кшталт "TOM:" і рядки пісень лишаєте чи прибираєте самі. Переноси рядків склеюються за письмом: японська — напряму, корейська та латиниця — із пробілом.',
+    who: 'Тим, кому потрібен текст субтитрів для нотаток, сценарію, практики перекладу чи іншої програми, але не хочеться вручну видаляти сотні таймкодів.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'da': {
+    title: 'Udtræk tekst fra undertekster - SRT/ASS/VTT til tekst | AI-SRTSub',
+    desc: 'Gratis onlineværktøj: læser SRT, VTT, ASS, SBV, LRC og TXT, fjerner tidskoder og linjenumre og giver ren dialog som afsnit eller én linje pr. undertekst.',
+    kw: 'udtræk tekst undertekster,srt til txt,ass til txt,vtt til txt,undertekster transskription,dialog fra srt,fjern tidskoder srt,subtitle to text,srt to txt',
+    intro: 'Træk dialogen ud af SRT-/VTT-/ASS-/SBV-/LRC-/TXT-undertekster som ren tekst: tidskoder, numre og style-tags fjernes automatisk.',
+    feat: 'To layouts: sammenhængende afsnit delt ved pauser og sætningsafsluttende tegnsætning, eller én linje pr. undertekst til dialoglister. Lydnoteringer som "(telefonen ringer)", vandmærker og linjer, der gentages lige efter hinanden, er væk som standard; talernavne som "TOM:" og sanglinjer beholder eller smider du selv væk. Linjeskift sættes sammen pr. skrift — japansk direkte, koreansk og latinsk med mellemrum.',
+    who: 'Alle, der vil have undertekstteksten til noter, manuskripter, oversættelsestræning eller et andet værktøj, uden at slette hundredvis af tidskoder i hånden.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'fi': {
+    title: 'Poimi teksti tekstityksistä - SRT/ASS/VTT tekstiksi | AI-SRTSub',
+    desc: 'Ilmainen verkkotyökalu: lukee SRT-, VTT-, ASS-, SBV-, LRC- ja TXT-tiedostot, poistaa aikakoodit ja rivinumerot ja antaa puhtaat dialogit kappaleina tai yhtenä rivinä per tekstitysrivi.',
+    kw: 'tekstitys tekstiksi,srt txt:ksi,ass txt:ksi,vtt txt:ksi,tekstitysten transkriptio,dialogi srt:stä,poista aikakoodit srt,subtitle to text,srt to txt',
+    intro: 'Poimi dialogi SRT-/VTT-/ASS-/SBV-/LRC-/TXT-tekstityksistä puhtaana tekstinä: aikakoodit, numerot ja tyylitunnisteet katoavat automaattisesti.',
+    feat: 'Kaksi asettelua: yhtenäiset kappaleet, jotka katkeavat taukojen ja virkkeen lopun välimerkkien kohdalta, tai yksi rivi per tekstitysrivi dialogilistoihin. Äänihuomiot kuten "(puhelin soi)", vesileimat ja peräkkäin toistetut rivit poistuvat oletuksena; puhujan nimet kuten "TOM:" ja laulurivit säilytät tai poistat itse. Rivinvaihdot liitetään kirjoitusjärjestelmän mukaan — japani suoraan, korea ja latina välilyönnillä.',
+    who: 'Kaikki, jotka haluavat tekstityksen tekstiä muistiinpanoihin, käsikirjoitukseen, käännösharjoitteluun tai toiseen työkaluun ilman satojen aikakoodien käsin poistamista.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'el': {
+    title: 'Εξαγωγή κειμένου από υπότιτλους - SRT/ASS/VTT σε κείμενο | AI-SRTSub',
+    desc: 'Δωρεάν διαδικτυακό εργαλείο: διαβάζει SRT, VTT, ASS, SBV, LRC και TXT, αφαιρεί κωδικούς χρόνου και αριθμούς γραμμών και αποδίδει καθαρούς διαλόγους σε παραγράφους ή μία γραμμή ανά υπότιτλο.',
+    kw: 'εξαγωγή κειμένου υπότιτλων,srt σε txt,ass σε txt,vtt σε txt,υπότιτλοι απομαγνητοφώνηση,διάλογοι από srt,αφαίρεση χρόνων srt,subtitle to text,srt to txt',
+    intro: 'Βγάλτε τους διαλόγους από υπότιτλους SRT / VTT / ASS / SBV / LRC / TXT ως καθαρό κείμενο: κωδικοί χρόνου, αριθμοί και ετικέτες στυλ φεύγουν αυτόματα.',
+    feat: 'Δύο διατάξεις: συνεχείς παράγραφοι που κόβονται σε παύσεις και τελικά σημεία στίξης, ή μία γραμμή ανά υπότιτλο για λίστες διαλόγων. Ηχητικές σημειώσεις όπως "(χτυπάει το τηλέφωνο)", υδατογραφήματα και γραμμές που επαναλαμβάνονται αμέσως μετά η μία την άλλη βγαίνουν από προεπιλογή· ονόματα ομιλητών όπως "TOM:" και στίχους τραγουδιών τους κρατάτε ή πετάτε μόνοι σας. Οι αλλαγές γραμμής ενώνονται ανά γραφή: τα ιαπωνικά απευθείας, τα κορεατικά και το λατινικό αλφάβητο με κενό.',
+    who: 'Όσοι θέλουν το κείμενο των υπότιτλων για σημειώσεις, σενάριο, εξάσκηση μετάφρασης ή άλλο εργαλείο, χωρίς να σβήνουν εκατοντάδες κωδικούς χρόνου στο χέρι.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'he': {
+    title: 'חילוץ טקסט מכתוביות - SRT/ASS/VTT לטקסט | AI-SRTSub',
+    desc: 'כלי אינטרנט חינמי: קורא SRT, VTT, ASS, SBV, LRC ו-TXT, מסיר קודי זמן ומספרי שורות, ומוציא דיאלוגים נקיים כפסקאות או שורה אחת לכל כתובית.',
+    kw: 'חילוץ טקסט מכתוביות,srt לטקסט,ass לטקסט,vtt לטקסט,תמליל כתוביות,דיאלוגים מ-srt,הסרת קודי זמן srt,subtitle to text,srt to txt',
+    intro: 'חלצו את הדיאלוגים מכתוביות SRT / VTT / ASS / SBV / LRC / TXT כטקסט נקי: קודי זמן, מספרים ותגיות עיצוב מוסרים אוטומטית.',
+    feat: 'שתי פריסות: פסקאות רצופות הנחתכות בהפסקות ובסימני סוף משפט, או שורה אחת לכל כתובית לרשימות דיאלוגים. הערות קול כמו "(הטלפון מצלצל)", סימני מים ושורות החוזרות זו אחר זו מוסרות כברירת מחדל; שמות דוברים כמו "TOM:" ושורות שירים תשמרו או תסירו בעצמכם. שבירות השורות מאוחות לפי כתב: יפנית ישירות, קוריאנית ולטינית עם רווח.',
+    who: 'מי שרוצה את טקסט הכתוביות לפתקים, לתסריט, לתרגול תרגום או לכלי אחר, בלי למחוק מאות קודי זמן ביד.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  },
+  'ro': {
+    title: 'Extrage textul din subtitrări - SRT/ASS/VTT în text | AI-SRTSub',
+    desc: 'Instrument online gratuit: citește SRT, VTT, ASS, SBV, LRC și TXT, scoate timecode-urile și numerele de linii și livrează dialogurile curate ca paragrafe sau o linie per subtitrare.',
+    kw: 'extrage text din subtitrări,srt în txt,ass în txt,vtt în txt,transcriere subtitrări,dialoguri din srt,șterge timecode srt,subtitle to text,srt to txt',
+    intro: 'Scoate dialogurile din subtitrări SRT / VTT / ASS / SBV / LRC / TXT ca text curat: timecode-urile, numerele și etichetele de stil dispar automat.',
+    feat: 'Două așezări: paragrafe continue tăiate la pauze și la punctuația de final de propoziție, sau o linie per subtitrare pentru liste de dialoguri. Indicațiile sonore precum "(sună telefonul)", mărcile de apă și liniile repetate una după alta dispar implicit; numele vorbitorilor precum "TOM:" și liniile de cântece le păstrezi sau le arunci tu. Ruperile de rând se reunesc după scriere: japoneza direct, coreeana și alfabetul latin cu spațiu.',
+    who: 'Oricine vrea textul subtitrărilor pentru notițe, scenariu, exersarea traducerii sau alt instrument, fără să șteargă manual sute de timecode-uri.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Text Extractor'
+  }
+};
+
 const SEO_PAGES = {
   index: { file: 'index.html', table: SEO, path: SEO_PATH, jsonldType: 'WebApplication' },
   merge: { file: 'merge.html', table: SEO_MERGE, path: MERGE_PATH, jsonldType: 'WebApplication' },
@@ -2611,7 +2861,9 @@ const SEO_PAGES = {
   /* v0.9.291：第七个页面 —— 字幕时间轴调整 */
   shift: { file: 'shift.html', table: SEO_SHIFT, path: SHIFT_PATH, jsonldType: 'WebApplication' },
   /* v0.9.296：第八个页面 */
-  repair: { file: 'repair.html', table: SEO_REPAIR, path: REPAIR_PATH, jsonldType: 'WebApplication' }
+  repair: { file: 'repair.html', table: SEO_REPAIR, path: REPAIR_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.299：第九个页面 —— 字幕提取纯文本 */
+  extract: { file: 'extract.html', table: SEO_EXTRACT, path: EXTRACT_PATH, jsonldType: 'WebApplication' }
 };
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
@@ -2719,11 +2971,12 @@ function serveIndexLang(req, res, lang, page){
   });
 }
 
-/* sitemap：八页 × 27 语言 = 216 条 URL，每条带本页的 hreflang alternates。
+/* sitemap：九页 × 27 语言 = 243 条 URL，每条带本页的 hreflang alternates。
    v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。
    v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。
    v0.9.288 起字幕格式转换独立成 /convert.html，第五个页面进表。
-   v0.9.296 起字幕乱码修复独立成 /repair.html，第八个页面进表。 */
+   v0.9.296 起字幕乱码修复独立成 /repair.html，第八个页面进表。
+   v0.9.299 起字幕提取纯文本独立成 /extract.html，第九个页面进表。 */
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {
