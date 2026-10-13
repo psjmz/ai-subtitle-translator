@@ -1,4 +1,4 @@
-/* shift-core.js —— 时间轴调整页的独立引擎（v0.9.294）
+/* shift-core.js —— 时间轴调整页的独立引擎（v0.9.295）
    与 convert-core.js / bilingual-core.js 完全隔离：本文件只被 shift.html 加载，
    不引入、不修改任何现有引擎。解析与导出都在浏览器里跑完。
 
@@ -12,6 +12,10 @@
     ⚠️ v0.9.294：调整不再单选。「调整方式」和「合并 / 拆分」本来就是同一类东西 —— 对时间轴做
         一个操作 —— 现在合成一条**可叠加、可排序、可单独停用**的步骤流水线 applySteps。
         典型用法：「先整体延后 2 秒」+「再按 1.001 缩放」，两步叠加，不用导两次。
+
+    ⚠️ v0.9.295：多了「时间轴体检」。checkCues 按常见字幕规范扫一遍（停留太短 / 太长 / 读不完 /
+        一行太宽 / 挨太近 / 重叠），只把「哪一条值得看一眼」列出来；suggest 给每一条「可以这样改」，
+        落到 op 上一看就懂。**一个字都不自动改** —— 自动修会动到用户刻意保留的地方。
 
    支持读取：SRT / VTT / ASS / SSA / SBV / LRC / TXT
    中间结构统一为 { start, end, text }（毫秒），_x 里挂着该格式自己的样式信息。
@@ -623,7 +627,9 @@
   /* ops 按顺序作用在列表上，索引是「当时」的索引：
      {op:'merge', i} 把第 i 条与下一条并成一条
      {op:'split', i} 把第 i 条切成两条（能按行就按行，否则对半）
-     {op:'set', i, s, e} 直接改第 i 条的起止 */
+     {op:'split', i, n} v0.9.295：切成 n 段（体检建议「太长」时用，n 由规则算出）
+     {op:'set', i, s, e} 直接改第 i 条的起止
+     ⚠️ n 缺省是 2 —— 292/294 记下的老 ops 没有这个字段，行为必须一模一样 */
   function applyOps(cues, ops) {
     var list = clone(cues);
     (ops || []).forEach(function (o) {
@@ -644,9 +650,15 @@
         return;
       }
       if (o.op === 'split') {
-        var segs = splitCue(list[i], 2);
+        /* ⚠️ 双语条目不许拆（splitCue 不认这条，得在这里拦）：
+           切开就变成「原文半句 + 译文半句」这种谁都看不懂的东西 */
+        var src = list[i];
+        if (isBilingualCue(src)) return;
+        var want = Math.max(2, Math.round(isNum(o.n) ? o.n : 2));
+        var segs = splitCue(src, want);
         if (!segs) return;
-        list.splice(i, 1, segs[0], segs[1]);
+        var repl = segs.slice();
+        list.splice.apply(list, [i, 1].concat(repl));
         return;
       }
       if (o.op === 'set') {
@@ -658,6 +670,161 @@
       }
     });
     return list;
+  }
+
+  /* ================= v0.9.295：时间轴体检 ================= */
+  /* ⚠️ 只标注，不自动改。用户决定哪一条要动 —— 自动修会动到他刻意保留的地方
+     （一句歌词跨两行显示、人名后故意留的空档，都是「不合规但故意的」）。
+     本模块的输出只有两种：「这里有 N 条值得看一眼」和「这几条可以这样改」。
+     改不改仍是一次 pushOp，和手工按钮走同一条路（能撤销，能重放）。 */
+  var CHECK_RULES = {
+    minDur: 700,      /* 一条最短要停多久（毫秒）—— 再短观众来不及读完 */
+    maxDur: 7000,     /* 一条最长停多久（毫秒）—— 再长画面都换了几帧还挂着同一句 */
+    maxCps: 21,       /* 每秒最多多少个「宽度单位」—— 超过就是读不完 */
+    minGap: 100,      /* 两条之间至少空多少毫秒 —— 挨太近会被看成一条 */
+    maxLine: 42       /* 一行最多多少个宽度单位 —— 超了要折行，占半屏 */
+  };
+  /* 体检面板上那五个框怎么排、人读的单位是什么。
+     ⚠️ 单位换算只在这一处（raw ↔ 引擎内部的毫秒），页面不许自己 ×1000 —— v0.9.294 的规矩。 */
+  var CHECK_FIELDS = [
+    { id: 'minDur', key: 'rlDurMin', unit: 'unitSec', mul: 1000, def: 0.7 },
+    { id: 'maxDur', key: 'rlDurMax', unit: 'unitSec', mul: 1000, def: 7 },
+    { id: 'maxCps', key: 'rlSpeed', unit: 'unitCps', mul: 1, def: 21 },
+    { id: 'minGap', key: 'rlGap', unit: 'unitMs', mul: 1, def: 100 },
+    { id: 'maxLine', key: 'rlLine', unit: 'unitChar', mul: 1, def: 42 }
+  ];
+  /* 页面上五个框的值（人读单位）→ 引擎内部的规则表。空值 / 非数字退回默认，
+     不因为用户把框清了就整份体检跑歪。 */
+  function uiRules(vals, fmt) {
+    var r = {}, i, f, v;
+    for (i = 0; i < CHECK_FIELDS.length; i++) {
+      f = CHECK_FIELDS[i];
+      v = Number((vals || {})[f.id]);
+      r[f.id] = isFinite(v) && v > 0 ? v * f.mul : CHECK_RULES[f.id];
+    }
+    /* 歌词天生一句接一句唱，中间没有空档 —— 按空档规则查会整份全红，等于没说 */
+    if (fmt === 'lrc') r.minGap = 0;
+    /* 短规则不能反过来比长规则还宽，用户拖错了按错处理 */
+    if (r.minDur > r.maxDur) r.minDur = CHECK_RULES.minDur;
+    return r;
+  }
+  /* 哪些格式值得体检：纯文本压根没有时间轴（每行 3 秒是临时排的），查出来全是噪音 */
+  function checkable(fmt) { return !!fmt && fmt !== 'txt'; }
+
+  function cueLines(cue) {
+    return plain(cue && cue.text).split('\n').filter(function (x) { return x.trim(); });
+  }
+  /* 一行占多宽：取最宽的那一行 —— 决定字幕宽度的永远是那一行 */
+  function cueWidth(cue) {
+    var ls = cueLines(cue), mx = 0, i;
+    for (i = 0; i < ls.length; i++) mx = Math.max(mx, wOf(ls[i]));
+    return mx;
+  }
+  /* 一条平均每秒要读多少 —— 按宽度算，中英混排也算得平 */
+  function cueCps(cue) {
+    var d = cue.end - cue.start;
+    if (d <= 0) return Infinity;
+    return cueWidth(cue) / (d / 1000);
+  }
+
+  /* 扫一遍当前时间轴，返回问题清单 [{ i, why:['short','fast',…] }]。
+     ⚠️ i 是当下这张列表的下标；用户动过任何一条之后下标就变了 ——
+        所以页面每次重算都整份重扫，不许缓存上一次的结果。
+     short   停留比 minDur 还短，观众来不及读完
+     long    停留比 maxDur 还长，这句在屏幕上挂太久
+     fast    读速超过 maxCps，字多时间少
+     line    单行宽度超过 maxLine，会折行占屏
+     overlap 已经开始于上一条还没结束 —— 两条会叠在屏幕上
+     gap     与上一条的空隙不足 minGap，看起来像没断开
+
+     ⚠️ 双语条目（原文一行 + 译文一行）只查它与相邻两条的时间关系，不查停留时长和行宽：
+        一条双语顶两条的信息量，拿单语的尺子量它不公平（8 秒停留对双语是正常的），
+        而「一切就要 longer 猩」的拆分动作作用在它身上会把原文和译文劈成两半。
+     ⚠️ 时长类规则给足 2% 余量（至少 50 毫秒）：体检建议「按最长停留切」时，每段是按宽度
+        比例分的 —— 各段字数不可能一模一样，占字数最多的那段自然比平均值长几十毫秒。
+        没有这点余量，用户采纳了建议往下看还是红的，会以为工具没干活。 */
+  function checkCues(cues, rules) {
+    var r = rules || CHECK_RULES, list = cues || [], out = [], i;
+    for (i = 0; i < list.length; i++) {
+      var c = list[i], why = [], dur = c.end - c.start, w = cueWidth(c);
+      var tolDur = r.maxDur * 0.02, tolMs = Math.max(50, tolDur);
+      if (!isBilingualCue(c)) {
+        if (dur < r.minDur - tolMs) why.push('short');
+        if (dur > r.maxDur + tolMs) why.push('long');
+        if (isFinite(cueCps(c)) && cueCps(c) > r.maxCps * 1.02) why.push('fast');
+        if (w > r.maxLine + 0.5) why.push('line');
+      }
+      if (i > 0) {
+        var pv = list[i - 1];
+        if (c.start < pv.end) why.push('overlap');
+        else if (c.start - pv.end < r.minGap) why.push('gap');
+      }
+      if (why.length) out.push({ i: i, why: why });
+    }
+    return out;
+  }
+
+  /* 一条问题「可以怎么办」。返回 [{ k: 文案键, op }]，op 直接就是 applyOps 认识的形状
+     —— 页面点一下就 pushOp，不再翻译一层，也不会出现「建议和实际动作不一致」。
+     ⚠️ 任何改动都不许压到相邻那条身上：顺着把下一条挤走只是把问题搬了个地方。 */
+  function suggest(list, issue, rules) {
+    var r = rules || CHECK_RULES, i = issue.i, c = list[i], out = [], seen = {};
+    if (!c) return out;
+    var why = issue.why || [], dur = c.end - c.start, w = cueWidth(c);
+    var prev = list[i - 1], next = list[i + 1];
+    function add(k, op) {
+      var key = JSON.stringify(op);
+      if (seen[key]) return;
+      seen[key] = 1;
+      out.push({ k: k, op: op });
+    }
+    var ceilEnd = next ? next.start - r.minGap : Infinity;   /* 这一条最晚能撑到哪 */
+
+    /* 双语条目（原文一行 + 译文一行）不给任何「切开」的建议：切开会变成
+       「半句原文 + 半句译文」，谁都看不懂。这一刀之所以放在这里而不是只依赖
+       checkCues —— 万一将来别的 pathways 也给双语报了 long，这里仍拦得住。 */
+    if (isBilingualCue(c)) {
+      why = why.filter(function (x) { return x !== 'long' && x !== 'line' && x !== 'fast' && x !== 'short'; });
+    }
+    if (!why.length) return out;
+
+    if (why.indexOf('overlap') >= 0 || why.indexOf('gap') >= 0) {
+      if (prev) {
+        add('btnMergePrev', { op: 'merge', i: i - 1 });
+        var ns = prev.end + r.minGap;
+        add('btnPush', { op: 'set', i: i, s: ns, e: Math.max(c.end, ns + Math.min(dur, r.minDur)) });
+      }
+    }
+    /* 时长类：短了就补到「最短停留」和「读得完」里更宽的那个，补齐一条整的要多久 */
+    var want = 0;
+    if (why.indexOf('short') >= 0) want = Math.max(want, r.minDur);
+    if (why.indexOf('fast') >= 0) want = Math.max(want, Math.round(w / r.maxCps * 1000));
+    if (want > dur) {
+      var e2 = Math.min(c.start + want, ceilEnd);
+      if (e2 > c.end) add('btnLengthen', { op: 'set', i: i, s: c.start, e: e2 });
+    }
+    /* 太长 / 一行太宽的切开：段数按「最长停留」和「最宽行」两把尺子取大的那个。
+       ⚠️ 算出来还得按「最宽那一段能占多少时间」复核一遍：各段字数不可能一模一样，
+          21 秒 ÷ 7 秒 = 3 段是纸面上的答案，可占字数最多的那段实际是 7.2 秒 ——
+          采纳完往下看还是红的，用户只会觉得工具没干活。这里按最宽段反推补几段。 */
+    if (why.indexOf('long') >= 0 || why.indexOf('line') >= 0) {
+      var n = 2;
+      if (why.indexOf('long') >= 0) n = Math.max(n, Math.ceil(dur / r.maxDur));
+      if (why.indexOf('line') >= 0) n = Math.max(n, Math.ceil(w / r.maxLine));
+      var ceil1 = Math.min(dur, ceilEnd - c.start);
+      for (var guard = 0; guard < 4; guard++) {
+        /* 切 n 段时最宽那段大约是这个宽度 —— 也是它将分到的时间 */
+        var widest = Math.ceil(w / n);
+        if (widest * ceil1 / w <= r.maxDur) break;
+        n++;
+      }
+      add('btnSplit', { op: 'split', i: i, n: n });
+    }
+    if (why.indexOf('short') >= 0) {
+      if (prev) add('btnMergePrev', { op: 'merge', i: i - 1 });
+      else if (next) add('btnMergeNext', { op: 'merge', i: i });
+    }
+    return out;
   }
 
   /* ---------------- 导出 ---------------- */
@@ -855,6 +1022,14 @@
     scriptOf: scriptOf,
     isBilingualCue: isBilingualCue,
     parseUserTime: parseUserTime,
+    CHECK_RULES: CHECK_RULES,
+    CHECK_FIELDS: CHECK_FIELDS,
+    uiRules: uiRules,
+    checkable: checkable,
+    checkCues: checkCues,
+    suggest: suggest,
+    cueWidth: cueWidth,
+    cueCps: cueCps,
     time: { srt: srtTime, vtt: vttTime, sbv: sbvTime, lrc: lrcTime, ass: assTime }
   };
 })(window);

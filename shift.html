@@ -122,6 +122,30 @@
   .li{display:flex;align-items:center;gap:8px;padding:7px 10px;border-top:1px solid var(--line);
     font-size:12.5px;background:var(--card)}
   .li:first-child{border-top:0}
+
+  /* v0.9.295：体检出的问题行。左边那道竖条是唯一的区别标示 ——
+     用 warn（黄）不用 del（红）：幕没有坏，只是「值得看一眼」，红出来的都以为出错了 */
+  .chkrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;
+    border-top:1px solid var(--line);font-size:12.5px;background:var(--card);
+    border-left:3px solid var(--warn)}
+  .chkrow:first-child{border-top:0}
+  .chkrow .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
+  .chkrow .tmv{flex:none;color:var(--sub);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px}
+  .chkrow .fx{display:flex;gap:4px;flex:none}
+  .chkrow .fx i{font-style:normal;display:inline-flex;align-items:center;height:19px;padding:0 7px;
+    border-radius:999px;background:var(--warn-weak);color:var(--warn);font-size:11.5px;white-space:nowrap}
+  .chkrow .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chkrow .op{display:flex;gap:6px;flex:none}
+  .chkrow .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+  .chkrow .op button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  /* 五个阈值：和步骤流水线同样做成「框里带单位后缀」，别再用 placeholder 传达单位 */
+  .rules{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;
+    background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
+  .rules .rl{display:inline-flex;align-items:center;gap:6px}
+  .rules .rl .lb{font-size:12.5px;color:var(--sub)}
+  .rules .rl .pv input.num{width:78px;padding-right:44px}
+  .rules .rl input.num{height:30px}
+  .chk-empty{font-size:12.5px;color:var(--ok-ink);padding:2px 0 6px}
   .li .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
   .li input.tm{width:104px;height:28px;flex:none}
   .li .arw{color:var(--mut);flex:none}
@@ -141,13 +165,14 @@
     font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
   .st .snm{min-width:76px;font-size:13px;font-weight:600;flex:none}
   .st .slb{font-size:12.5px;color:var(--sub);flex:none}
-  .st .pv{position:relative;display:inline-flex;align-items:center}
-  .st .pv input.num{width:110px;padding-right:46px}
-  .st .pv .un{position:absolute;right:10px;font-size:11.5px;color:var(--mut);pointer-events:none}
+  /* .pv / .un 是通用件（步骤流水线与体检阈值都用它），不写死在 .st 下面 */
+  .pv{position:relative;display:inline-flex;align-items:center}
+  .pv input.num{width:110px;padding-right:46px}
+  .pv .un{position:absolute;right:10px;font-size:11.5px;color:var(--mut);pointer-events:none}
   /* ⚠️ 阿拉伯语 / 希伯来语整页从右往左排 —— 单位后缀要跟着挪到左边，
      时间码和数字框本身仍保持从左往右（写成 [ل] 那种顺序没人读得懂） */
-  [dir="rtl"] .st .pv input.num{padding-right:8px;padding-left:46px}
-  [dir="rtl"] .st .pv .un{right:auto;left:10px}
+  [dir="rtl"] .pv input.num{padding-right:8px;padding-left:46px}
+  [dir="rtl"] .pv .un{right:auto;left:10px}
   [dir="rtl"] .num,[dir="rtl"] .tm{direction:ltr;text-align:left}
   .st .sh{flex:1;min-width:0;font-size:12px;color:var(--mut);line-height:1.6}
   .st .sop{display:flex;gap:6px;flex:none}
@@ -223,9 +248,26 @@ crossorigin="anonymous"></script>
     </div>
   </div>
 
+  <!-- v0.9.295：时间轴体检。只把「哪一条值得看一眼」列出来，一个字都不自动改 ——
+       改了万一不是用户想要的（他刻意留的编排），那是把他的字幕弄坏。
+       放在「逐条微调」前面：先看体检说了什么，再决定下面那条列表怎么动。 -->
+  <div class="card" id="chkCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="chkTitle">时间轴体检</span></h2>
+    <div class="hint" data-i18n="chkHint">按常见的字幕规范扫一遍：停留太短、停留太久、字太多读不完、一行太宽、两条挨太近或者叠在一起。只做标注，改不改由你决定。</div>
+    <div class="row">
+      <span class="chip" id="chkStat">—</span>
+      <span class="chip mut" id="chkNoTime" style="display:none" data-i18n="chkNoTime">这份没有时间轴，体检跳过</span>
+    </div>
+    <div class="rules" id="ruleRow"></div>
+    <div class="list" id="chkList"></div>
+    <div class="row" id="chkMoreRow" style="display:none">
+      <button id="chkMore" type="button" data-i18n="btnMore">显示更多</button>
+    </div>
+  </div>
+
   <!-- v0.9.292：逐条微调。操作记成一组步骤，每次重算从头依次重放 -->
   <div class="card" id="listCard" style="display:none">
-    <h2><span class="n">3</span><span data-i18n="lblList">逐条微调</span></h2>
+    <h2><span class="n">4</span><span data-i18n="lblList">逐条微调</span></h2>
     <div class="hint" data-i18n="hintList">可以合并相邻两条、切分某一条，或者直接改它的起止时间</div>
     <div class="row">
       <span class="chip mut" id="editStat"></span>
@@ -238,7 +280,7 @@ crossorigin="anonymous"></script>
   </div>
 
   <div class="card" id="repCard" style="display:none">
-    <h2><span class="n">4</span><span data-i18n="repTitle">结果</span></h2>
+    <h2><span class="n">5</span><span data-i18n="repTitle">结果</span></h2>
     <div id="parts"></div>
     <div class="msg" id="msg" style="display:none"></div>
   </div>
@@ -248,8 +290,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.294"></script>
-<script src="shift-core.js?v=0.9.294"></script>
+<script src="shift-i18n.js?v=0.9.295"></script>
+<script src="shift-core.js?v=0.9.295"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -261,6 +303,7 @@ var LANG = 'zh-CN';
 var S = {
   fname: '', src: '', fmt: null, base: [], work: null, text: '',
   steps: [], ops: [], limit: 60,
+  chkRules: null, chkLimit: 30, issues: [],
   clamped: 0, merged: 0, split: 0, bad: null
 };
 function $(s) { return document.querySelector(s); }
@@ -308,6 +351,7 @@ function applyI18n() {
   syncLogoHome();
   renderOptions();
   renderSteps();
+  renderRules();
   /* 「输出与原文件一致（SRT）」这行是拼出来的，不走 data-i18n —— 换语言时要自己重画 */
   renderSrcFmt();
 }
@@ -476,6 +520,7 @@ function setSrc(text, fname) {
   /* 换了文件就把手动步骤清空 —— 旧步骤的索引对着旧列表，留着会改错条目 */
   S.ops = [];
   S.limit = 60;
+  S.chkLimit = 30;
   S.work = null; S.text = '';
   S.base = S.src.trim() && S.fmt ? (C.parse(S.src, S.fmt) || []) : [];
   renderSrcFmt();
@@ -512,16 +557,20 @@ function clearAll() {
   S.fname = ''; S.src = ''; S.fmt = null; S.base = [];
   S.work = null; S.text = ''; S.ops = []; S.limit = 60;
   S.steps = [];
+  S.issues = []; S.chkLimit = 30; S.chkRules = defRules();
   S.clamped = 0; S.merged = 0; S.split = 0;
   $('#paste').value = '';
   $('#fname').textContent = '';
   $('#file').value = '';
   $('#parts').innerHTML = '';
   $('#list').innerHTML = '';
+  $('#chkList').innerHTML = '';
+  $('#chkCard').style.display = 'none';
   $('#listCard').style.display = 'none';
   $('#repCard').style.display = 'none';
   renderSrcFmt();
   renderSteps();
+  renderRules();
   hideMsg();
 }
 
@@ -554,6 +603,96 @@ function run() {
   else if (S.split > 0) showMsg(tpl('msgSplit', S.split), '');
   else if (!S.steps.length && !S.ops.length) showMsg(t('msgNoStep'), '');
   else showMsg(t('msgDone'), '');
+}
+
+/* ---------------- v0.9.295：时间轴体检 ---------------- */
+/* ⚠️ 一个字都不自动改。体检只产出两样东西：哪一条值得看一眼（issues）、
+   这一条可以怎么改（suggest 给出的 op）。改不改由用户点按钮决定，
+   点了就落成一次 pushOp —— 和手工按钮同一条路，能撤销也能重放。
+   五个阈值存在 S.chkRules（人读单位：秒 / 毫秒 / 字），交给引擎 uiRules 换算，
+   页面不碰 ×1000（v0.9.294 定下的：单位换算只有引擎那一处）。 */
+function defRules() {
+  var d = {};
+  window.ShiftCore.CHECK_FIELDS.forEach(function (f) { d[f.id] = String(f.def); });
+  return d;
+}
+function renderRules() {
+  var C = window.ShiftCore, box = $('#ruleRow');
+  if (!S.chkRules) S.chkRules = defRules();
+  box.innerHTML = C.CHECK_FIELDS.map(function (f) {
+    return '<span class="rl"><span class="lb">' + esc(t(f.key)) + '</span>'
+      + '<span class="pv"><input class="num" type="text" inputmode="decimal" data-rule="' + f.id + '"'
+      + ' value="' + esc(S.chkRules[f.id]) + '">'
+      + '<span class="un">' + esc(t(f.unit)) + '</span></span></span>';
+  }).join('');
+  box.querySelectorAll('[data-rule]').forEach(function (el) {
+    el.addEventListener('change', function () {
+      S.chkRules[el.getAttribute('data-rule')] = el.value;
+      renderCheck();
+    });
+  });
+}
+/* 每次列表变了就整份重扫 —— 下标是「当下这张列表」的下标，缓存上一次的会指错人 */
+function renderCheck() {
+  var C = window.ShiftCore, card = $('#chkCard'), stat = $('#chkStat');
+  /* 体检看的是「当下这条时间轴」：点过「开始」就是调整后的结果，没点过就是原始字幕 ——
+     放进字幕的那一刻就该说话，不能让用户先猜要不要点「开始」才知道有没有问题 */
+  var list = (S.work && S.work.length) ? S.work : S.base;
+  if (!list || !list.length) {
+    card.style.display = 'none';
+    S.issues = [];
+    return;
+  }
+  card.style.display = '';
+  /* 纯文本根本没有时间轴（那个每行 3 秒是硬排的），体检它等于自言自语 */
+  $('#chkNoTime').style.display = C.checkable(S.fmt) ? 'none' : '';
+  if (!C.checkable(S.fmt)) {
+    stat.className = 'chip mut'; stat.textContent = '—';
+    $('#chkList').innerHTML = '';
+    $('#chkMoreRow').style.display = 'none';
+    S.issues = [];
+    return;
+  }
+  var rules = C.uiRules(S.chkRules, S.fmt);
+  S.issues = C.checkCues(list, rules);
+  stat.textContent = tpl('chkStat', S.issues.length);
+  stat.className = S.issues.length ? 'chip mut' : 'chip';
+
+  var box = $('#chkList');
+  if (!S.issues.length) {
+    box.innerHTML = '<div class="chk-empty">' + esc(t('chkNone')) + '</div>';
+    $('#chkMoreRow').style.display = 'none';
+    return;
+  }
+  var n = Math.min(S.chkLimit, S.issues.length), i, html = '';
+  for (i = 0; i < n; i++) {
+    var is = S.issues[i], c = list[is.i];
+    if (!c) continue;
+    var fx = is.why.map(function (w) { return '<i>' + esc(t('chkWhy_' + w)) + '</i>'; }).join('');
+    var ops = C.suggest(list, is, rules).map(function (s) {
+      return '<button type="button" data-fix="' + i + ',' + esc(s.k) + '">' + esc(t(s.k)) + '</button>';
+    }).join('');
+    html += '<div class="chkrow">'
+      + '<span class="idx">' + (is.i + 1) + '</span>'
+      + '<span class="tmv">' + esc(C.time.srt(c.start) + ' → ' + C.time.srt(c.end)) + '</span>'
+      + '<span class="fx">' + fx + '</span>'
+      + '<span class="tx" title="' + esc(c.text) + '">' + esc(c.text.replace(/\n/g, ' ⏎ ')) + '</span>'
+      + '<span class="op">' + ops + '</span></div>';
+  }
+  box.innerHTML = html;
+  $('#chkMoreRow').style.display = (n < S.issues.length) ? '' : 'none';
+  box.querySelectorAll('[data-fix]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var p = String(b.getAttribute('data-fix')).split(',');
+      var is = S.issues[Number(p[0])];
+      if (!is) return;
+      /* 建议是按「当下的 issues」算出来的，这里重新按当前列表再算一次 ——
+         以免用户改过阈值却还拿着旧的 op */
+      var again = C.suggest(list, is, C.uiRules(S.chkRules, S.fmt)), hit = null;
+      again.forEach(function (s) { if (s.k === p[1]) hit = s.op; });
+      if (hit) pushOp(hit);
+    });
+  });
 }
 
 /* ---------------- 逐条微调 ---------------- */
@@ -679,6 +818,7 @@ function renderResult() {
   $('#repCard').style.display = '';
 }
 function renderAll() {
+  renderCheck();
   renderList();
   renderResult();
 }
@@ -726,12 +866,15 @@ function bind() {
   $('#btnGo').addEventListener('click', run);
   $('#btnUndo').addEventListener('click', undo);
   $('#btnMore').addEventListener('click', function () { S.limit += 60; renderList(); });
+  $('#chkMore').addEventListener('click', function () { S.chkLimit += 30; renderCheck(); });
 }
 
 (function main() {
   initLang();
+  S.chkRules = defRules();
   renderOptions();
   renderSteps();
+  renderRules();
   applyI18n();
   bind();
   renderAll();
