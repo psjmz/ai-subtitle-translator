@@ -326,6 +326,11 @@ function markEvent(ip, meta, ev){
         /* v0.9.244：导出格式。只在白名单内记账，认不出就不写（绝不信前端字符串）。 */
         const df = pickWL(DL_FMT, meta.fmt);
         if (df) { e.dlFmt = df; e[DL_FMT_FIELD[df]] = (e[DL_FMT_FIELD[df]] || 0) + 1; }
+      } else if (ev === 'copy') {
+        /* v0.9.298：复制到剪贴板也是「拿到结果」—— 与 download 同口径（点击计数，不去重），
+           补上「完成未下载」里复制党的统计盲区。fmt 不另记：格式分布只看下载口径，避免混淆。 */
+        e.copies = (e.copies || 0) + 1;
+        e.copiedAt = now;
       } else if (ev === 'fail') {
         e.failedAt = now;                      // v0.9.80：客户端异常（含错误消息）上报
         e.failMsg = cleanMsg(meta.msg);
@@ -357,6 +362,7 @@ function markEvent(ip, meta, ev){
     const lf = pickWL(DL_FMT, meta.fmt);
     if (lf) { lite.dlFmt = lf; lite[DL_FMT_FIELD[lf]] = 1; }
   }
+  else if (ev === 'copy') { lite.copies = 1; lite.copiedAt = now; }   // v0.9.298：自带 Key 用户的复制同样记账
   else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
   else return false;
   db.events.push(lite);
@@ -3520,8 +3526,8 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 400, { error: { message: 'Request body is not valid JSON' } });
       }
       const ev = String(body.ev || '');
-      if (ev !== 'finish' && ev !== 'download' && ev !== 'fail') {
-        return sendJson(res, 400, { error: { message: 'ev must be finish, download or fail' } });
+      if (ev !== 'finish' && ev !== 'download' && ev !== 'fail' && ev !== 'copy') {
+        return sendJson(res, 400, { error: { message: 'ev must be finish, download, copy or fail' } });
       }
       try { markEvent(clientIp(req), body, ev); } catch (e) {}
       return sendJson(res, 200, { ok: true });
@@ -3647,6 +3653,7 @@ const server = http.createServer(async (req, res) => {
             batches: todays.reduce((s, e) => s + (e.batches || 1), 0),
             finished: todays.filter(e => e.finishedAt && dateOfTs(e.finishedAt) === today).length,
             downloaded: todays.filter(e => e.downloadedAt && dateOfTs(e.downloadedAt) === today).length,
+            copied: todays.filter(e => e.copiedAt && dateOfTs(e.copiedAt) === today).length,   // v0.9.298：复制也是拿到结果
             failed: todays.filter(e => e.failedAt && dateOfTs(e.failedAt) === today).length
           },
           topFiles: cnt(all, 'file'),

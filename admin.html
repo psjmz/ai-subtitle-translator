@@ -525,6 +525,7 @@ async function loadEvents(){
     if (j.today.batches) chips.push('<b>' + j.today.batches + '</b> 次请求');
     if (j.today.finished !== undefined) chips.push('完成 <b>' + j.today.finished + '</b> 个');
     if (j.today.downloaded !== undefined) chips.push('下载 <b>' + j.today.downloaded + '</b> 次');
+    if (j.today.copied !== undefined) chips.push('复制 <b>' + j.today.copied + '</b> 次');   // v0.9.298：复制也是拿到结果
     if (j.today.failed) chips.push('<span style="color:#c00">失败 <b>' + j.today.failed + '</b> 个</span>');
     if (j.topFiles && j.topFiles[0]) chips.push('最常翻译：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
     if (j.topLangs && j.topLangs[0]) chips.push('最热目标语：<b>' + esc(j.topLangs[0].name) + '</b> ×' + j.topLangs[0].n);

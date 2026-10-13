@@ -796,10 +796,10 @@
   .progwrap.done .pg-dot{background:#0E9F6E;animation:none}
   .progwrap.done .prog i{background:linear-gradient(90deg,#0E9F6E,#10B981)}
   .prtxt{font-size:12px;color:var(--sub);font-family:var(--mono)}
-  /* v0.9.297：任务条下方那行「AI 算力紧张…」。只在跑的时候出现（见 pgBusy()），
-     压在进度条下沿、灰色小字 —— 目的是让用户知道还要等，不是让他在等的时候读文章。
-     用 --mut 而不是 --sub：它是安慰话，不该和「第 3/12 批」这类进度信息抢注意力。 */
-  .pg-busy{font-size:11.5px;color:var(--mut);line-height:1.4;margin-top:4px}
+  /* v0.9.297 加的那句「AI 算力紧张…」，v0.9.298 按用户定案挪进 pg-row、跟在「第 x/y 批」后面，
+     并从灰 (--mut) 换成品牌粉 (--tr-ink)。只在跑的时候出现（见 pgBusy()）；
+     flex:none + nowrap：行宽不够时整条折下去，不跟进度文本挤在一行里截断。 */
+  .pg-busy{font-size:11.5px;color:var(--tr-ink);line-height:1.4;white-space:nowrap;flex:none}
 
   /* v0.9.262：任务条下方的 AdSense 广告位（懒加载）。
      初始 display:none——页面加载时不 push：容器不可见时 availableWidth=0，
@@ -1064,7 +1064,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.297</span>
+    <span class="ver-tag">v0.9.298</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1271,13 +1271,13 @@ crossorigin="anonymous"></script>
           <div class="pg-row">
             <span class="pg-pct" id="pgPct">0%</span>
             <span class="pg-info" id="prText"></span>
+            <!-- v0.9.297 加的那句宽心话；v0.9.298 按用户定案挪进 pg-row、跟在「第 x/y 批」后面。
+                 默认 hidden，由 pgBusy() 在 pgStart / pgFinish / setProg(…,false) 三处开关 ——
+                 和任务条同生共死。data-i18n 让切界面语言时自动跟着换，不用额外接线。 -->
+            <span class="pg-busy" id="pgBusy" data-i18n="pgBusyTip" hidden>AI 算力紧张，等一会就出结果了</span>
             <span class="pg-eta" id="pgEta"></span>
           </div>
           <div class="prog" id="prog"><i></i></div>
-          <!-- v0.9.297：跑起来之后挂一句宽心话。默认 hidden，由 pgBusy() 在
-               pgStart / pgFinish / setProg(…,false) 三处开关 —— 和任务条同生共死。
-               data-i18n 让切界面语言时自动跟着换，不用额外接线。 -->
-          <div class="pg-busy" id="pgBusy" data-i18n="pgBusyTip" hidden>AI 算力紧张，等一会就出结果了</div>
         </div>
       </div>
       <!-- v0.9.262：任务条下方广告位。懒加载——首次随任务条（#progWrap.show）出现才 push，
@@ -1655,8 +1655,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.297"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.297"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.298"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.298"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4463,7 +4463,7 @@ async function extractGlossary(base,key,model,cfg,srcText){
 
 /* ---------------- 主流程 ---------------- */
 /* 会话生命周期上报（fire-and-forget 不阻塞不报错；云端与自带 Key 模式都上报）
-   ev: 'finish' 翻译完成 | 'download' 下载字幕；model：自带 Key 模式带用户填的模型名
+   ev: 'finish' 翻译完成 | 'download' 下载字幕 | 'copy' 复制到剪贴板（v0.9.298，与下载同口径）；model：自带 Key 模式带用户填的模型名
    v0.9.244：fmt = 本次导出（下载）的字幕文件格式（srt/vtt/sbv/ass/txt），仅 download 时传。
      后台此前只有「下载了几次」，看不出用户到底把字幕导成什么格式；只传格式码，
      不带文件名以外的任何内容，认不出的值由服务端白名单丢弃。 */
@@ -6033,6 +6033,10 @@ $('btnCopy').addEventListener('click', async ()=>{
     ta.select(); document.execCommand('copy'); ta.remove();
     log(t('copiedCompat'),'okc');
   }
+  /* v0.9.298：复制也算「拿到结果」—— 与下载同口径上报。
+     背景（10-13 分析）：后台只有 download 计数，走复制拿结果的用户在账本里是「完成未下载」，
+     下载率被系统性低估；补 copy 事件补上这块盲区。 */
+  reportEvent('copy', '', expFileFmt());
 });
 
 /* v0.9.258：去特效字幕处理 —— 把这份译文带到特效页继续调样式。
