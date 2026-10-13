@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/shift.html 与 /en/shift.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>字幕乱码修复 - 锟斤拷 / 乱码字幕 一键还原 | 随心字幕 AI</title>
+<meta name="description" content="免费在线修复字幕乱码：认出它原本是 UTF-8、GBK、Big5、Shift_JIS 还是 EUC-KR，把读错的字换回去，还能另存成播放器认得出的编码。支持 SRT、VTT、ASS、SBV、LRC、TXT，序号和时间轴一个字都不动。">
+<meta name="keywords" content="字幕乱码修复,srt乱码,字幕乱码怎么办,锟斤拷,utf8转gbk字幕,字幕编码转换,字幕编码识别,ass乱码,vtt乱码,播放器字幕乱码,subtitle mojibake,fix subtitle encoding">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#B42318">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* ================= 视觉系统沿用 v0.9.249「收敛精修」 =================
+     与其他页同源：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.296：乱码修复页认领「砖红」这条色线 ——
+     首页=粉、特效页=紫、清洗页=绿、转换页=蓝、剥离页=青、时间轴页=靛蓝、本页=砖红。
+     与其它页刻意不同色：几页都处理字幕文件，同色会让用户分不清自己在哪一页。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#B42318; --acc-weak:#FEF3F2; --acc-line:#FDA29B; --acc-ink:#8A1A12;
+    --grad:#B42318; --acc2:#B42318;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(180,35,24,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  /* 顶部胶囊导航：本页自带一份，不引入 site-nav.js（那三页的导航清单不该被新页牵动） */
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px;
+    text-decoration:none;white-space:nowrap}
+  .pill:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  .navpills{display:flex;gap:6px;flex-wrap:wrap}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{display:block;width:30px;height:30px;margin:0 auto 8px;border-radius:9px;background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+  textarea{width:100%;min-height:120px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical;background:var(--card);color:var(--ink)}
+  textarea:focus{outline:none;border-color:var(--acc-line)}
+  textarea[readonly]{background:var(--card-2);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  select.fmt{height:var(--ctl-h);border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:13px;min-width:190px}
+  /* 参数框：数字用普通文本框，自己解析 —— type=number 对「-2.5」这类输入在各浏览器里行为不一致 */
+  input.num{height:var(--ctl-h);width:150px;border:1px solid var(--line-strong);background:var(--card);
+    color:var(--ink);border-radius:var(--r-ctl);padding:0 10px;font-size:13px}
+  input.num:focus{outline:none;border-color:var(--acc-line)}
+  input.tm{height:var(--ctl-h);width:118px;border:1px solid var(--line-strong);background:var(--card);
+    color:var(--ink);border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  input.tm:focus{outline:none;border-color:var(--acc-line)}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+  select.fmt:disabled{opacity:.45;cursor:not-allowed;background:var(--card-2);color:var(--sub)}
+  button.pri:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .hint{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.7}
+  .part{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .part:first-child{border-top:0;padding-top:0;margin-top:0}
+  .part-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .part-hd b{font-size:13.5px}
+  .part-hd .cnt{font-size:12.5px;color:var(--mut);font-weight:400}
+  /* 时间对照：等宽对齐才看得出前后差多少 */
+  pre.cmp{margin:0;background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl);
+    padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
+    line-height:1.75;color:var(--body);overflow-x:auto;white-space:pre}
+
+  /* v0.9.292：逐条微调列表。字幕动辄上千条，一次只渲染一部分，靠「显示更多」往下加 */
+  .list{margin-top:10px;border:1px solid var(--line);border-radius:var(--r-ctl);overflow:hidden;
+    max-height:420px;overflow-y:auto}
+  .li{display:flex;align-items:center;gap:8px;padding:7px 10px;border-top:1px solid var(--line);
+    font-size:12.5px;background:var(--card)}
+  .li:first-child{border-top:0}
+
+  /* v0.9.295：体检出的问题行。左边那道竖条是唯一的区别标示 ——
+     用 warn（黄）不用 del（红）：幕没有坏，只是「值得看一眼」，红出来的都以为出错了 */
+  .chkrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;
+    border-top:1px solid var(--line);font-size:12.5px;background:var(--card);
+    border-left:3px solid var(--warn)}
+  .chkrow:first-child{border-top:0}
+  .chkrow .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
+  .chkrow .tmv{flex:none;color:var(--sub);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px}
+  .chkrow .fx{display:flex;gap:4px;flex:none}
+  .chkrow .fx i{font-style:normal;display:inline-flex;align-items:center;height:19px;padding:0 7px;
+    border-radius:999px;background:var(--warn-weak);color:var(--warn);font-size:11.5px;white-space:nowrap}
+  .chkrow .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chkrow .op{display:flex;gap:6px;flex:none}
+  .chkrow .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+  .chkrow .op button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  /* 五个阈值：和步骤流水线同样做成「框里带单位后缀」，别再用 placeholder 传达单位 */
+  .rules{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;
+    background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
+  .rules .rl{display:inline-flex;align-items:center;gap:6px}
+  .rules .rl .lb{font-size:12.5px;color:var(--sub)}
+  .rules .rl .pv input.num{width:78px;padding-right:44px}
+  .rules .rl input.num{height:30px}
+  .chk-empty{font-size:12.5px;color:var(--ok-ink);padding:2px 0 6px}
+  .li .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
+  .li input.tm{width:104px;height:28px;flex:none}
+  .li .arw{color:var(--mut);flex:none}
+  .li .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .li .op{display:flex;gap:6px;flex:none}
+  .li .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+  .li.bi .tx::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--acc);margin-right:7px;vertical-align:1px}
+
+  /* v0.9.294：调整步骤流水线。一道工序一行，单位贴在输入框里靠右显示
+     —— 单位不能只靠 placeholder 传达，用户一开始输入就看不见了 */
+  .steps{display:flex;flex-direction:column;gap:8px}
+  .st{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 11px;
+    background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
+  .st.off{opacity:.5}
+  .st .sn{width:19px;height:19px;border-radius:50%;background:var(--acc);color:#fff;flex:none;
+    font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .st .snm{min-width:76px;font-size:13px;font-weight:600;flex:none}
+  .st .slb{font-size:12.5px;color:var(--sub);flex:none}
+  /* .pv / .un 是通用件（步骤流水线与体检阈值都用它），不写死在 .st 下面 */
+  .pv{position:relative;display:inline-flex;align-items:center}
+  .pv input.num{width:110px;padding-right:46px}
+  .pv .un{position:absolute;right:10px;font-size:11.5px;color:var(--mut);pointer-events:none}
+  /* ⚠️ 阿拉伯语 / 希伯来语整页从右往左排 —— 单位后缀要跟着挪到左边，
+     时间码和数字框本身仍保持从左往右（写成 [ل] 那种顺序没人读得懂） */
+  [dir="rtl"] .pv input.num{padding-right:8px;padding-left:46px}
+  [dir="rtl"] .pv .un{right:auto;left:10px}
+  [dir="rtl"] .num,[dir="rtl"] .tm{direction:ltr;text-align:left}
+  .st .sh{flex:1;min-width:0;font-size:12px;color:var(--mut);line-height:1.6}
+  .st .sop{display:flex;gap:6px;flex:none}
+  .st .sop button{height:26px;min-width:26px;padding:0 8px;font-size:12px;border-radius:7px;color:var(--sub)}
+  .steps-empty{font-size:12.5px;color:var(--mut);padding:2px 0 6px}
+
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+  .note{margin-top:12px;font-size:12px;color:var(--mut)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .navpills{display:none}
+    input.tm{width:104px}
+    .li .tx{white-space:normal}
+  }
+
+  /* v0.9.296：候选行。左边是「从哪个编码读到哪个编码」，中间是预览，右边是「用这个」。
+     选中的那一行靠左边那道竖条认 —— 一行一个按钮已经够清楚，不再加勾选框。 */
+  .cand{display:flex;align-items:center;gap:10px;padding:8px 10px;border-top:1px solid var(--line);
+    font-size:12.5px;background:var(--card);border-left:3px solid transparent}
+  .cand:first-child{border-top:0}
+  .cand.on{border-left-color:var(--acc);background:var(--acc-weak)}
+  .cand .enc{flex:none;min-width:112px;font-weight:600;color:var(--acc-ink);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px}
+  .cand .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cand .op{display:flex;gap:6px;flex:none}
+  .cand .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+  .cand .op button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  .cand.on .op button{border-color:var(--acc);color:var(--acc-ink)}
+  @media (max-width:640px){
+    .cand{flex-wrap:wrap}
+    .cand .enc{min-width:0}
+    .cand .tx{white-space:normal;min-width:100%}
+  }
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span class="navpills" id="navPills"></span>
+      <select id="langSel" aria-label="界面语言"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">乱码修复</em></h1>
+    <p data-i18n="heroSub">认出它原本是什么编码，把读错的字换回去。字幕的序号、时间轴一个字都不动。</p>
+  </div>
+
+  <!-- 1. 放入字幕。⚠️ 文件必须按**字节**读（readAsArrayBuffer），不能按文本读：
+       一按文本读，浏览器先按 UTF-8 解一遍，解不动的字节就变成替换符 —— 原始信息当场没了，
+       后面再聪明的算法也修不回来。这是本页最要紧的一处。 -->
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入字幕</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-t" data-i18n="dzTxt">把文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="fname"></span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.sbv,.lrc,.txt,text/*" style="display:none">
+    <div class="row">
+      <span class="lb" data-i18n="lblSrc">认出来的编码</span>
+      <span class="chip mut" id="srcEnc">—</span>
+      <button id="btnClear" type="button" data-i18n="btnClear">清除</button>
+    </div>
+    <div style="margin-top:12px">
+      <textarea id="paste" data-i18n-ph="pastePh" placeholder="也可以直接把乱码内容粘贴到这里"></textarea>
+    </div>
+    <div class="hint" data-i18n="hintPaste">粘贴进来的已经不是原始字节了，能修的范围比传文件小得多。能传文件就传文件。</div>
+  </div>
+
+  <!-- 2. 诊断。先说清楚「这份到底怎么了」，再谈修不修 -->
+  <div class="card" id="diagCard" style="display:none">
+    <h2><span class="n">2</span><span data-i18n="lblDiag">诊断</span></h2>
+    <div class="row">
+      <span class="chip" id="diagStat">—</span>
+    </div>
+    <div class="list" id="diagList"></div>
+    <div class="msg warn" id="lostMsg" style="display:none" data-i18n="msgLost"></div>
+    <div class="msg" id="okMsg" style="display:none" data-i18n="msgOk"></div>
+  </div>
+
+  <!-- 3. 候选。系统挑一个最像人话的，但绝不替用户拍板 —— 全都摆出来让他自己看 -->
+  <div class="card" id="fixCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="lblFix">可以这样修</span></h2>
+    <div class="hint" data-i18n="hintFix">按「哪一个最像人话」排的序。点一个看看，选中之后到下面另存。</div>
+    <div class="list" id="candList"></div>
+  </div>
+
+  <!-- 4. 结果。⚠️ 很多时候文件本身没坏，是播放器读错了 —— 这时候正解是「另存一份对的编码」，
+       不是去改文本里任何一个字。所以这一卡永远可用，不管有没有修过。 -->
+  <div class="card" id="repCard" style="display:none">
+    <h2><span class="n">4</span><span data-i18n="repTitle">结果</span></h2>
+    <textarea id="out" readonly style="min-height:180px"></textarea>
+    <div class="row">
+      <span class="lb" data-i18n="lblSave">另存为</span>
+      <select class="fmt" id="saveEnc"></select>
+      <button class="pri" id="btnDl" type="button" data-i18n="btnDl">下载</button>
+      <button id="btnCopy" type="button" data-i18n="btnCopy">复制</button>
+    </div>
+    <div class="hint" data-i18n="hintSave">播放器认不出 UTF-8 时，存一份「带 BOM 的 UTF-8」（Windows 播放器靠 BOM 认编码）或者 GBK，通常就好了。</div>
+    <div class="msg" id="msg" style="display:none"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="footBrand">随心字幕 AI · 字幕乱码修复</span>
+  </footer>
+</div>
+
+<script src="repair-i18n.js?v=0.9.296"></script>
+<script src="repair-core.js?v=0.9.296"></script>
+<script>
+'use strict';
+var I18N = window.REPAIR_I18N.DICT, LANGS = window.REPAIR_I18N.LANGS;
+var LANG = 'zh-CN';
+var C = window.RepairCore;
+
+var S = {
+  fname: '', bytes: null, text: '',
+  shown: '', enc: null, diag: null, list: [], pick: -1, out: '',
+  encPicked: false      /* 用户自己动过「另存为」下拉 —— 之后就不再替他改默认值 */
+};
+
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* 顶部胶囊：本页自带一份，不引入 site-nav.js（那几页的导航清单不该被新页牵动） */
+var NAV = [
+  { key: 'navHome', href: null },
+  { key: 'navTr', href: '/translate.html' },
+  { key: 'navFx', href: '/merge.html' },
+  { key: 'navCl', href: '/clean.html' },
+  { key: 'navCv', href: '/convert.html' },
+  { key: 'navSp', href: '/bilingual.html' },
+  { key: 'navSh', href: '/shift.html' }
+];
+function renderNav() {
+  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
+  $('#navPills').innerHTML = NAV.map(function (n) {
+    var href = n.href === null ? home : ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href);
+    return '<a class="pill" href="' + href + '" data-nav="' + n.key + '"></a>';
+  }).join('');
+  NAV.forEach(function (n) {
+    var el = $('#navPills').querySelector('[data-nav="' + n.key + '"]');
+    if (el) el.textContent = t(n.key);
+  });
+}
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  /* 阿拉伯语 / 希伯来语整页从右往左排 */
+  document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-ph]'), function (el) {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「Fixgarbled subtitles」。
+     （这个写法是从 shift.html 沿下来的，五个垂直页的英文版都吃这个亏；本页先补上。） */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
+  renderNav();
+  renderSaveEnc();
+}
+
+/* ---------------- 另存：编码清单 ----------------
+   ⚠️ 编码名是专有名词，各国写法一样，不走词典；只有「带 BOM」这个说法要翻译。 */
+var SAVE_ENCS = [
+  { id: 'utf-8', bom: false, name: 'UTF-8' },
+  { id: 'utf-8', bom: true, name: '' },      /* name 由 encUtf8bom 提供 */
+  { id: 'gbk', bom: false, name: 'GBK' },
+  { id: 'big5', bom: false, name: 'Big5' },
+  { id: 'shift_jis', bom: false, name: 'Shift_JIS' },
+  { id: 'euc-kr', bom: false, name: 'EUC-KR' }
+];
+function renderSaveEnc() {
+  var sel = $('#saveEnc');
+  /* ⚠️ 认出来的编码不是 UTF-8，就把另存默认指到「带 BOM 的 UTF-8」——
+     这是播放器读错时最管用的一种。但用户自己动过下拉之后就不再替他改回去。 */
+  var want = S.encPicked ? sel.value : ((S.enc && S.enc !== 'utf-8') ? '1' : '0');
+  sel.innerHTML = SAVE_ENCS.map(function (e, i) {
+    return '<option value="' + i + '">' + esc(e.bom ? t('encUtf8bom') : e.name) + '</option>';
+  }).join('');
+  sel.value = want;
+}
+
+/* ---------------- 主流程 ---------------- */
+function run() {
+  var hasBytes = !!(S.bytes && S.bytes.length);
+  var hasText = !!S.text.trim();
+  if (!hasBytes && !hasText) { reset(); return; }
+  var r = C.repair({ bytes: S.bytes, text: S.text });
+  S.shown = r.shown; S.enc = r.enc; S.diag = r.diag; S.list = r.list;
+  S.pick = r.best ? 0 : -1;
+  S.out = S.pick >= 0 ? S.list[S.pick].text : S.shown;
+  renderDiag(r);
+  renderCands();
+  renderSaveEnc();     /* 认出编码之后另存的默认值可能要变 */
+  renderResult();
+}
+
+function reset() {
+  ['diagCard', 'fixCard', 'repCard'].forEach(function (id) { $('#' + id).style.display = 'none'; });
+  S.shown = ''; S.enc = null; S.diag = null; S.list = []; S.pick = -1; S.out = '';
+  $('#srcEnc').className = 'chip mut'; $('#srcEnc').textContent = '—';
+  hideMsg();
+}
+
+function renderDiag(r) {
+  var card = $('#diagCard'), stat = $('#diagStat'), box = $('#diagList');
+  card.style.display = '';
+  var el = $('#srcEnc');
+  if (S.enc) { el.className = 'chip'; el.textContent = S.enc.toUpperCase(); }
+  else { el.className = 'chip mut'; el.textContent = '—'; }
+
+  var reasons = r.diag.reasons || [];
+  stat.className = reasons.length ? 'chip' : 'chip mut';
+  stat.textContent = reasons.length ? t('dgMoji') : t('dgClean');
+  box.innerHTML = reasons.map(function (k) {
+    return '<div class="cand"><span class="tx">' + esc(t('dg_' + k)) + '</span></div>';
+  }).join('');
+  box.style.display = reasons.length ? '' : 'none';
+
+  /* 已经不可逆：只可能在「粘贴」这条路出现，直说，别给假希望 */
+  $('#lostMsg').style.display = (r.lost && r.list.length === 0) ? '' : 'none';
+  $('#okMsg').style.display = (reasons.length === 0) ? '' : 'none';
+}
+
+function renderCands() {
+  var card = $('#fixCard'), box = $('#candList');
+  if (!S.list.length) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  /* 第一行永远是「保持原样」—— 自动挑的那个万一不是他要的，得有地方退回去 */
+  var html = '<div class="cand' + (S.pick < 0 ? ' on' : '') + '">'
+    + '<span class="enc">' + esc(t('btnKeep')) + '</span>'
+    + '<span class="tx">' + esc(S.shown.slice(0, 90).replace(/\n/g, ' ⏎ ')) + '</span>'
+    + '<span class="op"><button type="button" data-use="-1">' + esc(t('btnUse')) + '</button></span></div>';
+  html += S.list.map(function (c, i) {
+    return '<div class="cand' + (S.pick === i ? ' on' : '') + '">'
+      + '<span class="enc">' + esc(C.label(c)) + '</span>'
+      + '<span class="tx">' + esc(c.text.slice(0, 90).replace(/\n/g, ' ⏎ ')) + '</span>'
+      + '<span class="op"><button type="button" data-use="' + i + '">' + esc(t('btnUse')) + '</button></span></div>';
+  }).join('');
+  box.innerHTML = html;
+  Array.prototype.forEach.call(box.querySelectorAll('[data-use]'), function (b) {
+    b.addEventListener('click', function () {
+      S.pick = Number(b.getAttribute('data-use'));
+      S.out = S.pick >= 0 ? S.list[S.pick].text : S.shown;
+      renderCands();
+      renderResult();
+    });
+  });
+}
+
+function renderResult() {
+  $('#repCard').style.display = '';
+  /* 特别大的文件只喂前两万字进去，不然光渲染就把页面拖住 */
+  $('#out').value = S.out.length > 20000 ? S.out.slice(0, 20000) : S.out;
+  hideMsg();
+}
+
+function showMsg(k, kind) {
+  var m = $('#msg');
+  m.textContent = t(k);
+  m.className = 'msg' + (kind ? ' ' + kind : '');
+  m.style.display = '';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+
+/* ---------------- 输入 ---------------- */
+/* 文本入口对外暴露（自动化冒烟用）；页面自身的上传与粘贴都走这里 */
+function setSrc(text, fname) {
+  S.bytes = null;
+  S.text = String(text || '');
+  S.fname = fname || S.fname || '';
+  $('#fname').textContent = S.fname;
+  if ($('#paste').value !== S.text) $('#paste').value = S.text;
+  run();
+}
+function setBytes(buf, fname) {
+  S.bytes = new Uint8Array(buf);
+  S.text = '';
+  S.fname = fname || '';
+  $('#fname').textContent = S.fname;
+  $('#paste').value = '';
+  run();
+}
+function readFile(f) {
+  if (!f) return;
+  var r = new FileReader();
+  /* ⚠️ 按字节读。readAsText 会先按 UTF-8 解一遍，解不动的字节就永久变成替换符了 */
+  r.onload = function () { setBytes(r.result, f.name); };
+  r.readAsArrayBuffer(f);
+}
+function clearAll() {
+  S.fname = ''; S.bytes = null; S.text = '';
+  $('#fname').textContent = '';
+  $('#paste').value = '';
+  $('#file').value = '';
+  reset();
+}
+
+function outName() {
+  var base = (S.fname || '').replace(/\.[^.]+$/, '') || 'subtitle';
+  var ext = ((S.fname || '').match(/\.[^.]+$/) || ['.txt'])[0];
+  return base + '-fixed' + ext;
+}
+function download() {
+  var e = SAVE_ENCS[Number($('#saveEnc').value) || 0];
+  var b = C.toBytes(S.out, e.id);
+  if (!b) { showMsg('msgEncFail', 'err'); return; }
+  var out = b;
+  if (e.bom) {
+    out = new Uint8Array(3 + b.length);
+    out.set([0xEF, 0xBB, 0xBF], 0);
+    out.set(b, 3);
+  }
+  var blob = new Blob([out], { type: 'text/plain;charset=' + e.id });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = outName();
+  document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  showMsg('msgDone');
+}
+function copyOut() {
+  var ta = $('#out');
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(S.out).then(function () { showMsg('msgCopy'); }, function () { fallbackCopy(ta); });
+      return;
+    }
+  } catch (e) { /* 非安全上下文里没有 clipboard，走下面的老办法 */ }
+  fallbackCopy(ta);
+}
+function fallbackCopy(ta) {
+  try {
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    showMsg('msgCopy');
+  } catch (e) { showMsg('msgEmpty', 'err'); }
+}
+
+/* ---------------- 语言 ---------------- */
+function pathUiLang() {
+  var m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/repair\.html/);
+  if (m && LANGS.some(function (x) { return x[0] === m[1]; })) return m[1];
+  return null;
+}
+function initLang() {
+  var sel = $('#langSel');
+  sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
+  var saved = 'zh-CN';
+  try { saved = localStorage.getItem('srt_repair_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
+  if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
+  LANG = pathUiLang() || saved;
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    try { localStorage.setItem('srt_repair_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
+    applyI18n();
+    if (S.list.length) { renderCands(); }
+    if (S.diag) { renderDiag({ diag: S.diag, lost: false, list: S.list }); }
+  });
+}
+
+/* ---------------- 绑定 ---------------- */
+function bind() {
+  var dz = $('#dz'), file = $('#file');
+  dz.addEventListener('click', function () { file.click(); });
+  dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', function () { dz.classList.remove('over'); });
+  dz.addEventListener('drop', function (e) {
+    e.preventDefault(); dz.classList.remove('over');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+  });
+  file.addEventListener('change', function () { readFile(file.files && file.files[0]); });
+  var timer = null;
+  $('#paste').addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      S.bytes = null;
+      S.text = $('#paste').value;
+      run();
+    }, 350);
+  });
+  $('#saveEnc').addEventListener('change', function () { S.encPicked = true; });
+  $('#btnClear').addEventListener('click', clearAll);
+  $('#btnDl').addEventListener('click', download);
+  $('#btnCopy').addEventListener('click', copyOut);
+}
+
+(function main() {
+  initLang();
+  applyI18n();
+  bind();
+  reset();
+})();
+</script>
+
+<!-- v0.9.296：SEO 静态文案（按语言路由替换；直接开文件时显示简体中文默认版）
+     爬虫不执行 JS，这一段是它唯一能读到的正文 —— 服务端按语言整段换掉 -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕乱码修复 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>字幕打开是一堆看不懂的字，多半是编码读错了。把文件丢进来，认出它原本用什么编码写的，把读错的字换回去。</strong></p>
+    <p style="margin-top:8px;">支持 SRT、VTT、ASS、SBV、LRC、TXT。传文件时按原始字节重新试各种编码，一个字节都不损失 —— 认出是 GBK 就直接告诉你，播放器读错的话另存一份「带 BOM 的 UTF-8」通常就好了。粘贴进来的文本已经不是原始字节了，能修的范围小得多；里面要是已经出现替换字符（方框问号），那就谁也修不回来，会直说而不是假装修好。序号、时间轴一个字都不动，ASS 的样式标记也原样保留。</p>
+    <p style="margin-top:8px;">下载的字幕打开是一堆怪字、播放器里中文全是方块、或者从别人手里拿到一份编码不明的字幕文件的人。</p>
+  </section>
+<!--SEO-COPY-END-->
+</body>
+</html>

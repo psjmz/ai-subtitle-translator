@@ -5384,7 +5384,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.295/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.296/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5425,9 +5425,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.295</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.295</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.295/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.296</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.296</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.296/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5613,8 +5613,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.295</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.295/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.296</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.296/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7455,11 +7455,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.295/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.295/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.295/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.295/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.295/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.296/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.296/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.296/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.296/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.296/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8964,14 +8964,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.295/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.295/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.296/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.296/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.295/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.295/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.295/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.296/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.296/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.296/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.295/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.296/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9446,13 +9446,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.295/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.295/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.295/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.295/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.295/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.296/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.296/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.296/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.296/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.296/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.295/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.296/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9474,7 +9474,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0\.9\.295">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0\.9\.296">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9485,7 +9485,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.295') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.296') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -10144,7 +10144,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/<script[^>]+site-nav\.js/.test(h), '转换页不许引入 site-nav.js（那是另外三页共用的导航）');
     assert.ok(!/<script[^>]+site-i18n\.js/.test(h), '转换页不许引入 site-i18n.js（那是另外三页共用的词典）');
     assert.ok(/convert-i18n\.js/.test(h), '转换页应加载自己的词典');
-    assert.ok(/convert-core\.js\?v=0\.9\.295/.test(h), '转换页引擎没带版本号');
+    assert.ok(/convert-core\.js\?v=0\.9\.296/.test(h), '转换页引擎没带版本号');
     assert.strictEqual((h.match(/<h1/g) || []).length, 1, '转换页只应有一个 h1');
     assert.ok(/<!--SEO-HEAD-START-->/.test(h) && /<!--SEO-COPY-START-->/.test(h),
       '缺 SEO 占位块，服务端按语言注入会失效');
@@ -10621,9 +10621,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 路由正则：语言目录 + zh-CN 直连，两处都得带上 shift */
     assert.ok(/\/\(\[a-zA-Z\]\[a-zA-Z\\-\]\*\)\\\/\([^)]*bilingual[^)]*shift[^)]*\)\\\.html\$/.test(sv),
       '语言目录路由没带上 shift');
-    assert.ok(/\^\\\/\(merge\|clean\|translate\|convert\|bilingual\|shift\)\\\.html\$/.test(sv),
+    /* v0.9.296：后面又加了 repair，判据只要求「带得上 shift」，别把整条正则钉死 */
+    assert.ok(/\^\\\/\(merge\|clean\|translate\|convert\|bilingual\|shift[^)]*\)\\\.html\$/.test(sv),
       'zh-CN 直连路由没带上 shift');
-    assert.ok(/七页 × 27 语言 = 189/.test(sv), 'sitemap 注释没改成七页 189 条');
+    /* v0.9.296：第八页上线，sitemap 注释跟着改成八页 216 条 */
+    assert.ok(/八页 × 27 语言 = 216/.test(sv), 'sitemap 注释没改成八页 216 条');
   });
 
 
@@ -10806,13 +10808,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('v0.9.293：不许再写「文件不上传服务器」这类隐私声明（v0.9.221 定过案）', function () {
     const BAD = /不上传服务器|不上傳伺服器|文件不上传|檔案不會上傳|noteLocal|tagLocal/;
     const BADEN = /never uploaded|never upload|nothing is uploaded|is never uploaded|never uploaded\./i;
-    ['clean.html', 'convert.html', 'bilingual.html', 'shift.html'].forEach(f => {
+    /* v0.9.296：第八页 repair.html 也进这条名单 */
+    ['clean.html', 'convert.html', 'bilingual.html', 'shift.html', 'repair.html'].forEach(f => {
       const src = readT(f);
       assert.ok(!BAD.test(src), f + ' 里又出现了「不上传服务器」这类文案');
       assert.ok(!BADEN.test(src), f + ' 的静态文案里又出现了 never uploaded');
       assert.ok(!/class="note"/.test(src), f + ' 底部那行 note 又回来了');
     });
-    ['convert-i18n.js', 'bilingual-i18n.js', 'shift-i18n.js'].forEach(f => {
+    ['convert-i18n.js', 'bilingual-i18n.js', 'shift-i18n.js', 'repair-i18n.js'].forEach(f => {
       const d = readT(f);
       assert.ok(!BAD.test(d), f + ' 里还有 noteLocal 之类的词条');
       const en = d.split("\n    'en':")[1].split("\n    '")[0];
@@ -10820,7 +10823,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
     /* 服务端 SEO 描述同样不许带这句 */
     const sv = readT('server.js');
-    ['SEO_CONVERT', 'SEO_BILINGUAL', 'SEO_SHIFT'].forEach(tb => {
+    ['SEO_CONVERT', 'SEO_BILINGUAL', 'SEO_SHIFT', 'SEO_REPAIR'].forEach(tb => {
       const b = sv.split('const ' + tb + ' = {')[1].split('\n};')[0];
       assert.ok(!/不上传服务器/.test(b), tb + ' 的 desc 还在说「不上传服务器」');
     });
@@ -11247,6 +11250,291 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         if (v) assert.ok(!han.test(v), lang + ' 的 ' + k + ' 没翻译干净：' + v);
       });
     });
+  });
+
+
+  /* ==========================================================================
+     v0.9.296：第八个页面 —— 字幕乱码修复（/repair.html）
+     三件套硬隔离（repair.html + repair-core.js + repair-i18n.js）。
+
+     这个页面有三条红线，全是「别骗用户」：
+       ① 传文件时按**原始字节**读 —— 一按文本读，解不动的字节就永久变成替换符，信息当场没了；
+       ② 字节已经丢了、里面还出现替换符 → **谁也修不回来**，必须直说，不许给一个看着像修好了的假结果；
+       ③ 很多时候文件根本没坏，是他的播放器读错了 —— 正解是「另存一份带 BOM 的 UTF-8」，
+          不是去改正文里任何一个字。所以结果卡永远可用，候选列表第一行永远是「保持原样」。
+     ========================================================================== */
+  let REP = null;
+  try {
+    const vm = require('vm');
+    /* ⚠️ vm 沙箱里没有宿主的 TextEncoder / TextDecoder，必须显式塞进去 ——
+       否则引擎里的 toBytes('utf-8') 与 fromBytes 全部返回 null，一排用例会假红 */
+    const sandbox = { window: {}, console: console, TextEncoder: TextEncoder, TextDecoder: TextDecoder };
+    sandbox.global = sandbox;
+    vm.createContext(sandbox);
+    vm.runInContext(readT('repair-core.js'), sandbox, { filename: 'repair-core.js' });
+    REP = sandbox.window.RepairCore;
+  } catch (e) { REP = null; }
+
+  const R_E = (s, e) => REP.toBytes(s, e);          /* 字 → 字节 */
+  const R_D = (b, e) => REP.fromBytes(b, e);        /* 字节 → 字 */
+
+  t('v0.9.296：乱码引擎能独立加载，六种编码都在', () => {
+    assert.ok(REP, 'repair-core.js 加载失败');
+    const ids = REP.ENCS.map(e => e.id);
+    ['utf-8', 'gbk', 'big5', 'shift_jis', 'euc-kr', 'latin1'].forEach(id => {
+      assert.ok(ids.indexOf(id) >= 0, '编码表里缺 ' + id);
+    });
+    ['repair', 'diagnose', 'scoreText', 'toBytes', 'fromBytes', 'sniffBom', 'stripBom', 'label']
+      .forEach(k => assert.strictEqual(typeof REP[k], 'function', '引擎缺 ' + k));
+  });
+
+  t('v0.9.296：文件没坏、是播放器读错了 —— 认出它其实是 GBK，正文一个字都不动', () => {
+    const gbk = R_E('这是一段正常的中文台词', 'gbk');
+    const r = REP.repair({ bytes: gbk, text: R_D(gbk, 'utf-8') });
+    assert.strictEqual(r.enc, 'gbk', '认错了编码：' + r.enc);
+    assert.strictEqual(r.shown, '这是一段正常的中文台词', '展示出来的内容不对：' + r.shown);
+    assert.strictEqual(r.diag.clean, true, '文本没坏却被说成乱码：' + J(r.diag.reasons));
+    /* 这种情况页面该做的是「另存」，不是「修」 —— 所以不许推荐任何候选 */
+    assert.strictEqual(r.best, null, '文件没坏却还给了一个修复候选');
+    /* 反过来：UTF-8 文件就认 UTF-8 */
+    assert.strictEqual(REP.repair({ bytes: R_E('Hello', 'utf-8'), text: 'Hello' }).enc, 'utf-8',
+      'UTF-8 文件没认出来');
+  });
+
+  t('v0.9.296：UTF-8 存、GBK 读的乱码能倒回原文（浣犲ソ 那一类）', () => {
+    const moji = R_D(R_E('你好世界', 'utf-8'), 'gbk');
+    assert.notStrictEqual(moji, '你好世界', '样例本来就该是乱的');
+    const r = REP.repair({ text: moji });
+    assert.strictEqual(r.diag.clean, false, '乱码没被诊断出来');
+    assert.ok(r.best && r.best.text.indexOf('你好世界') >= 0, '没修回来：' + (r.best && r.best.text));
+    assert.strictEqual(r.best.to, 'utf-8', '修的方向不对：' + r.best.from + ' → ' + r.best.to);
+  });
+
+  t('v0.9.296：Latin-1 那条路认得回智能引号（浏览器里的 latin1 其实是 windows-1252）', () => {
+    /* ’（U+2019）在 UTF-8 里是 E2 80 99；被当 latin1 读会变成 â€™。
+       ⚠️ 0x80–0x9F 这一批字节在 windows-1252 里解成 € ‚ ƒ „ … † ‡ 等符号，
+          不是控制字符 —— 反查表不认它们的话，「â€™ → ’」这种最常见的乱码会因为
+          「这个字在 latin1 里不存在」而被整个候选掐掉，页面上一个候选都不出。 */
+    const moji = R_D(R_E('It’s fine — really', 'utf-8'), 'latin1');
+    assert.strictEqual(moji, 'Itâ€™s fine â€” really', 'windows-1252 的解码形态变了：' + moji);
+    const back = R_E(moji, 'latin1');
+    assert.ok(back, 'latin1 反向编码失败了 —— 智能引号 / 破折号没被认回去');
+    assert.strictEqual(R_D(back, 'utf-8'), 'It’s fine — really', '往返之后不再是原句');
+    const r = REP.repair({ text: moji });
+    assert.ok(r.best && r.best.text.indexOf('It’s fine') >= 0,
+      '没修回来：' + (r.best && r.best.text));
+  });
+
+  t('v0.9.296：字节已经没了 + 出现替换符 —— 必须直说修不回来，不许给假希望', () => {
+    /* GBK 字节被当 UTF-8 读 → 一堆 U+FFFD，原始字节被替换符吃掉，任何办法都倒不回来 */
+    const lost = R_D(R_E('你好字幕', 'gbk'), 'utf-8');
+    assert.ok(lost.indexOf('�') >= 0, '样例没产生替换符');
+    const r = REP.repair({ text: lost });
+    assert.ok(r.diag.reasons.indexOf('fffd') >= 0, '没诊断出 fffd：' + J(r.diag.reasons));
+    assert.strictEqual(r.lost, true, '没标记为「修不回来」');
+    /* 但传文件就有救 —— 手上还有原始字节，认出是 GBK 就行 */
+    const saved = REP.repair({ bytes: R_E('你好字幕', 'gbk'), text: lost });
+    assert.strictEqual(saved.lost, false, '有原始字节却说修不回来');
+    assert.strictEqual(saved.enc, 'gbk', '没认出 GBK');
+    assert.strictEqual(saved.shown, '你好字幕', '救回来的内容不对：' + saved.shown);
+    /* 页面里这条提示要靠 lostMsg 显示出来 */
+    assert.ok(/lostMsg/.test(readT('repair.html')), '页面没有「修不回来」的提示位');
+  });
+
+  t('v0.9.296：好好的字幕不许被说成乱码', () => {
+    const good = [
+      '1\n00:00:01,000 --> 00:00:03,000\nHello there, how are you?\n',
+      "C'est très bon. À bientôt.",                 /* 法语：音标夹在普通字母中间 */
+      'Tiếng Việt có dấu',                          /* 越南语 */
+      'Polski napis z ogonkami: ą ć ę ł ń ó ś ź ż', /* 波兰语 */
+      '日本語の字幕です',                              /* 日语：汉字生僻但有假名 */
+      '안녕하세요 자막입니다',                          /* 韩语 */
+      '这是一句正常的中文台词'                          /* 简中 */
+    ];
+    good.forEach(s => {
+      const d = REP.diagnose(s);
+      assert.strictEqual(d.clean, true, '正常字幕被说成乱码：' + s.slice(0, 24) + ' → ' + J(d.reasons));
+    });
+  });
+
+  t('v0.9.296：候选按「哪个最像人话」排，第一个就是最像的那个', () => {
+    /* ⚠️ 不排序的话列表第 0 项永远是 utf-8（它在编码表最前面），
+       GBK 文件也会被认成 UTF-8 —— 这是踩过的坑，必须钉死 */
+    const gbk = R_E('这是一段正常的中文台词', 'gbk');
+    assert.strictEqual(REP.repair({ bytes: gbk }).enc, 'gbk', '有字节时认错了编码（候选没排序）');
+    const list = REP.repair({ text: R_D(R_E('你好世界', 'utf-8'), 'gbk') }).list;
+    assert.ok(list.length >= 2, '候选太少：' + list.length);
+    for (let i = 1; i < list.length; i++) {
+      assert.ok(list[i - 1].score >= list[i].score, '第 ' + i + ' 项的分数比前面高（没排序）');
+    }
+  });
+
+  t('v0.9.296：修完不许把字幕结构弄坏 —— 序号和时间轴一个字都不动', () => {
+    const head = '1\n00:00:01,000 --> 00:00:03,000\n';
+    const srt = head + R_D(R_E('你好世界', 'utf-8'), 'gbk') + '\n';
+    const r = REP.repair({ text: srt });
+    assert.ok(r.best, '没给出候选');
+    assert.ok(r.best.text.indexOf(head) === 0, '序号 / 时间码被改了：' + r.best.text.slice(0, 40));
+    assert.strictEqual((r.best.text.match(/-->/g) || []).length, 1, '时间轴箭头数量变了');
+    assert.ok(r.best.text.indexOf('你好世界') >= 0, '正文没修回来');
+  });
+
+  t('v0.9.296：另存别的编码 —— 装不下就返回 null，不许凑一个问号出来', () => {
+    assert.ok(R_E('你好', 'gbk'), 'GBK 装得下简体');
+    assert.strictEqual(R_E('안녕하세요', 'gbk'), null, 'GBK 装不下韩文却没返回 null');
+    assert.ok(R_E('안녕하세요', 'euc-kr'), 'EUC-KR 装得下韩文');
+    assert.ok(R_E('你好', 'big5'), 'Big5 装得下「你好」');
+    assert.strictEqual(R_E('国', 'big5'), null, 'Big5 装不下简体「国」却没返回 null');
+    /* 页面拿到 null 要给一句人话，不能静默下载一个错文件 */
+    const h = readT('repair.html');
+    assert.ok(/msgEncFail/.test(h), '页面没有「这个编码装不下」的提示词条');
+  });
+
+  t('v0.9.296：传文件必须按字节读 —— readAsText 会把字节当场毁掉', () => {
+    const h = readT('repair.html');
+    assert.ok(/readAsArrayBuffer/.test(h), '文件没按字节读');
+    /* readAsText 会先按 UTF-8 解一遍，解不动的字节永久变成替换符，后面再聪明也修不回来。
+       ⚠️ 评论里也会提到 readAsText 这四个字（说明为什么不能用它），所以只禁「真调用」 */
+    assert.ok(!/\.readAsText\(/.test(h), '页面里出现了 readAsText —— 原始字节会被当场毁掉');
+  });
+
+  t('v0.9.296：结果卡永远可用，另存默认指到「带 BOM 的 UTF-8」', () => {
+    const h = readT('repair.html');
+    assert.ok(/id="repCard"/.test(h), '没有结果卡');
+    /* 六个另存选项：UTF-8 / UTF-8 带 BOM / GBK / Big5 / Shift_JIS / EUC-KR */
+    assert.strictEqual((h.match(/SAVE_ENCS\s*=\s*\[[\s\S]*?\];/) || [''])[0].match(/\{ id:/g).length, 6,
+      '另存编码不是 6 个');
+    /* 认出来的编码不是 UTF-8 → 默认指到下标 1（带 BOM）。
+       但用户自己动过下拉之后就不再替他改回去（encPicked） */
+    assert.ok(/S\.encPicked \? sel\.value : \(\(S\.enc && S\.enc !== 'utf-8'\) \? '1' : '0'\)/.test(h),
+      '另存的默认值算法不对');
+    assert.ok(/encPicked = true/.test(h), '用户自己选过编码之后没记住');
+  });
+
+  t('v0.9.296：候选列表第一行是「保持原样」—— 系统不许替用户拍板', () => {
+    const h = readT('repair.html');
+    assert.ok(/data-use="-1"/.test(h), '没有「保持原样」这一行');
+    assert.ok(/btnKeep/.test(h), '没有 btnKeep 词条');
+    /* 自动挑的那个只是「选中」，不是「替他改了」 —— 结果框默认就用它，但一行就能退回去 */
+    assert.ok(/S\.pick = r\.best \? 0 : -1/.test(h), '默认选中逻辑不对');
+  });
+
+  t('v0.9.296：三件套硬隔离，没碰任何共用模块', () => {
+    const rp = readT('repair.html'), rc = readT('repair-core.js'), ri = readT('repair-i18n.js');
+    ['site-nav.js', 'site-i18n.js', 'srt-core.js', 'shift-core.js', 'shift-i18n.js',
+      'bilingual-core.js', 'bilingual-i18n.js', 'convert-core.js', 'convert-i18n.js'].forEach(f => {
+        assert.ok(!new RegExp('(src|require)[^\\n]{0,40}' + f.replace('.', '\\.')).test(rp),
+          'repair.html 引了共用模块 ' + f);
+      });
+    assert.ok(/repair-core\.js/.test(rp) && /repair-i18n\.js/.test(rp), 'repair.html 没引自己的三件套');
+    assert.ok(/REPAIR_I18N/.test(rp) && /RepairCore/.test(rp), 'repair.html 没用自己的全局出口');
+    assert.ok(!/ShiftCore|ConvertCore|BilingualCore|require\(/.test(rc), 'repair-core.js 依赖了别的引擎');
+    assert.ok(/RepairCore/.test(rc), 'repair-core.js 没导出 RepairCore');
+    assert.ok(/REPAIR_I18N/.test(ri) && !/SHIFT_I18N|BILINGUAL_I18N|CONVERT_I18N/.test(ri),
+      'repair-i18n.js 的出口不对');
+    /* ⚠️ AdSense 也是 script[src]，所以按「src 里带 site- 的」数，不许有 */
+    const n = (rp.match(/<script[^>]+src="[^"]*site-/g) || []).length;
+    assert.strictEqual(n, 0, 'repair.html 引了 site- 开头的共享脚本（' + n + ' 处）');
+    /* 老页面不许被塞进新页链接 —— 首页卡片区本轮不动 */
+    ['index.html', 'translate.html', 'merge.html', 'clean.html', 'convert.html',
+      'bilingual.html', 'shift.html'].forEach(f => {
+        assert.ok(!/repair\.html/.test(readT(f)), f + ' 里出现了 /repair.html（本轮不该动老页）');
+      });
+  });
+
+  t('v0.9.296：新页认领砖红这条色线，不与其它页撞色', () => {
+    const h = readT('repair.html');
+    assert.ok(/--acc:#B42318/.test(h), '本页的主色不是砖红 #B42318');
+    /* 七页各占一条线：粉 / 紫 / 绿 / 蓝 / 青 / 靛蓝 / 砖红 —— 撞色会让用户分不清自己在哪一页 */
+    [['index.html', '#D4206A'], ['merge.html', '#6D5BD0'], ['clean.html', '#0B7A5C'],
+      ['convert.html', '#185FA5'], ['bilingual.html', '#0E7490'], ['shift.html', '#4F46E5']]
+      .forEach(([f, c]) => {
+        assert.ok(!new RegExp('--acc:\\s*' + c).test(h), 'repair.html 用了 ' + f + ' 的色 ' + c);
+        assert.ok(!/#B42318/.test(readT(f)), f + ' 用了本页的砖红');
+      });
+  });
+
+  t('v0.9.296：服务端为第八页接了 SEO、路由与 sitemap', () => {
+    const sv = readT('server.js');
+    const blk = (sv.match(/const SEO_REPAIR = \{[\s\S]*?\n\};/) || [''])[0];
+    assert.ok(blk, 'server.js 里没有 SEO_REPAIR 表');
+    const codes = (blk.match(/^\s{2}'[a-zA-Z-]+':\s*\{/gm) || []).length;
+    assert.strictEqual(codes, 27, 'SEO_REPAIR 语言块数不是 27（实际 ' + codes + '）');
+    ['title', 'desc', 'kw', 'intro', 'feat', 'who'].forEach(k => {
+      const n = (blk.match(new RegExp('\\s' + k + ':', 'g')) || []).length;
+      assert.strictEqual(n, 27, 'SEO_REPAIR 的 ' + k + ' 不是 27 条（实际 ' + n + '）');
+    });
+    assert.ok(/REPAIR_PATH\[l\] = /.test(sv), 'server 没建 REPAIR_PATH');
+    assert.ok(/repair: \{ file: 'repair\.html', table: SEO_REPAIR, path: REPAIR_PATH/.test(sv),
+      'SEO_PAGES 里没登记 repair 页');
+    assert.ok(/\/\(\[a-zA-Z\]\[a-zA-Z\\-\]\*\)\\\/\([^)]*shift[^)]*repair[^)]*\)\\\.html\$/.test(sv),
+      '语言目录路由没带上 repair');
+    assert.ok(/\^\\\/\(merge\|clean\|translate\|convert\|bilingual\|shift\|repair\)\\\.html\$/.test(sv),
+      'zh-CN 直连路由没带上 repair');
+    assert.ok(/八页 × 27 语言 = 216/.test(sv), 'sitemap 注释没改成八页 216 条');
+  });
+
+  t('v0.9.296：词典 27 语齐全，非中日韩语言不许混汉字', () => {
+    const dic = readT('repair-i18n.js');
+    const NEW = ['heroA', 'heroEm', 'heroSub', 'upTitle', 'dzTxt', 'pastePh', 'lblSrc', 'btnClear',
+      'hintPaste', 'lblDiag', 'dgClean', 'dgMoji', 'msgLost', 'msgOk',
+      'dg_fffd', 'dg_c1', 'dg_sym', 'dg_latin', 'dg_run', 'dg_cjk',
+      'lblFix', 'hintFix', 'btnUse', 'btnKeep', 'repTitle', 'lblSave', 'btnDl', 'btnCopy',
+      'hintSave', 'msgDone', 'msgCopy', 'msgEncFail', 'msgEmpty', 'encUtf8bom', 'footBrand'];
+    NEW.forEach(k => {
+      const n = (dic.match(new RegExp('(^|[^A-Za-z_])' + k + '\\s*:', 'g')) || []).length;
+      assert.strictEqual(n, 27, k + ' 不是 27 语齐全（' + n + ' 处）');
+    });
+    const han = /[一-鿿]/;
+    const blocks = dic.split(/(?=^    '[a-zA-Z-]+': \{)/m);
+    let checked = 0;
+    blocks.forEach(b => {
+      const lang = (b.match(/^    '([a-zA-Z-]+)'/) || [])[1];
+      if (!lang || lang === 'zh-CN' || lang === 'zh-TW' || lang === 'ja') return;
+      checked++;
+      NEW.forEach(k => {
+        const v = (b.match(new RegExp('(^|[^A-Za-z_])' + k + ":\\s*'([^']*)'")) || [])[2];
+        if (v) assert.ok(!han.test(v), lang + ' 的 ' + k + ' 没翻译干净：' + v);
+      });
+    });
+    assert.strictEqual(checked, 24, '非中日韩语言块数不对（' + checked + '）');
+    /* 七个诊断原因 + 导航词条都得在 */
+    ['dg_fffd', 'dg_c1', 'dg_sym', 'dg_latin', 'dg_run', 'dg_cjk'].forEach(k => {
+      assert.ok(dic.indexOf(k + ':') > 0, '缺诊断词条 ' + k);
+    });
+    assert.ok(/navSh/.test(dic) && !/navRp/.test(dic), '导航词条没抄齐（本页不在自己的导航里）');
+  });
+
+  t('v0.9.296：版号升到 296，缓存 bust 跟着走', () => {
+    const h = readT('repair.html');
+    assert.ok(/repair-i18n\.js\?v=0\.9\.296/.test(h), 'repair-i18n.js 没带 296 版本号');
+    assert.ok(/repair-core\.js\?v=0\.9\.296/.test(h), 'repair-core.js 没带 296 版本号');
+    /* 老页的版本号这轮统一抬一次，否则改过 SEO 的老页在 CDN 上还是旧的 */
+    assert.ok(/class="ver">v0\.9\.296/.test(readT('index.html')), 'index.html 顶栏版号没升');
+    assert.ok(/ver-tag">v0\.9\.296/.test(readT('translate.html')), 'translate.html 页脚版号没升');
+    assert.ok(/class="ver">v0\.9\.296/.test(readT('merge.html')), 'merge.html 顶栏版号没升');
+    ['clean.html', 'convert.html', 'bilingual.html', 'shift.html'].forEach(f => {
+      assert.ok(/\?v=0\.9\.296/.test(readT(f)), f + ' 的脚本没带 296 版本号');
+    });
+  });
+
+  t('v0.9.296：标题是两段拼一句 —— 西文中间留空格，中文不留', () => {
+    /* ⚠️ 英雄区标题是 heroA + heroEm 两个紧挨着的 span，中间没有空白节点。
+       中文连写没问题，西文会连成「Fixgarbled subtitles」—— 五个垂直页的英文版都吃过这个亏。 */
+    const h = readT('repair.html');
+    const seg = (h.match(/hero h1 \[data-i18n="heroA"\][\s\S]{0,220}/) || [''])[0];
+    assert.ok(seg, '没有补空格的逻辑（英文标题会连成 Fixgarbled subtitles）');
+    assert.ok(/t\('heroA'\) \+/.test(seg), '空格不是在 heroA 后面补的');
+    assert.ok(/zh-CN\|zh-TW\|ja/.test(seg), '没把中日韩三种语言排除掉（中文标题中间不许有空格）');
+  });
+
+  t('v0.9.296：静态 SEO 正文块在位（爬虫不执行 JS，这是它唯一能读到的内容）', () => {
+    const h = readT('repair.html');
+    assert.ok(/<!--SEO-COPY-START-->[\s\S]+<!--SEO-COPY-END-->/.test(h), '没有静态正文块');
+    assert.ok(/<!--SEO-HEAD-START-->[\s\S]+<!--SEO-HEAD-END-->/.test(h), '没有 SEO head 占位块');
+    assert.ok(/<!--ANALYTICS-->/.test(h), '没留 GA4 注入位');
+    /* 每页 1 个 h1 */
+    assert.strictEqual((h.match(/<h1[\s>]/g) || []).length, 1, 'h1 不是一个');
   });
 
   });
