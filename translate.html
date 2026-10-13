@@ -200,7 +200,9 @@
      此前「导出译文 / ASS 字幕样式 / 折行设置」是三款同样的 sec-title（图标徽章 + 渐隐尾线），
      在 300px 的栏里看着就是三张平级卡片。现在参数区包浅底块，块标题降一级。 */
   .param-blk{background:var(--card-2);border-radius:12px;padding:12px;margin-top:12px}
-  .blk-title{font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.4px;margin:0 0 8px}
+  /* v0.9.297：块标题要能承载 ⓘ —— 浮层的定位基准是「最近的 position 非 static 祖先」，
+     不给 relative 的话它会一路找到面板上去（宽度/位置都不对）。 */
+  .blk-title{font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.4px;margin:0 0 8px;position:relative}
   .param-blk>.wrap-row:first-of-type{margin-top:0}
   /* v0.9.199：ASS 参数区的「一个列头 + 三行参数表」。
      列头把「译文 / 原文」说一次，行标签只留「字号 / 颜色 / 离底」——
@@ -249,20 +251,24 @@
      ③ 文件组两行式标签：主名 + 小注（ASS 两颗靠小注区分「上下双屏 / 底部双行」）；
      ④ 选中态分级：内容组 = 白底浮起 + 粉边（主选择），文件组 = 浅粉底（次选择）；
      ⑤ focus 接管：系统默认蓝环换成粉色（WCAG 2.4.7 要求 focus 必须可见，不能一删了之）。 */
-  .fmt-panel{display:flex;flex-direction:column;gap:7px;margin-top:2px}
-  .fmt-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:5px;
-    border-radius:11px;background:var(--card-2);border:1px solid var(--line)}
-  .fmt-btn{min-width:0;font:inherit;font-size:11.5px;line-height:1.3;padding:6px 4px;
+  .fmt-panel{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+  .fmt-row{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;
+    border-radius:10px;background:var(--card-2);border:1px solid var(--line)}
+  /* v0.9.297：整体再压一档高度（用户反馈「更紧凑些」）——
+     按钮内边距 6→4、行内边距 5→4、主名 11.5→11、小注 10→9.5、行距 1.3→1.25，
+     单个按钮约 41px→34px；文件组两行 + 内容组一行合计省下约 29px。
+     纵向空间一紧，右栏在矮屏上就不容易出内滚动条。 */
+  .fmt-btn{min-width:0;font:inherit;font-size:11px;line-height:1.25;padding:4px 3px;
     border-radius:8px;border:1px solid transparent;background:transparent;color:var(--sub);
-    cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+    cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
     transition:background .12s,border-color .12s,color .12s}
   .fmt-btn .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-  .fmt-btn .sub{font-size:10px;color:var(--mut);font-weight:400;white-space:nowrap;
+  .fmt-btn .sub{font-size:9.5px;color:var(--mut);font-weight:400;white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .fmt-btn:hover{color:var(--acc)}
   /* 内容组（主选择）：白底胶囊，选中 = 白底浮起 + 粉边。
-     字号压到 11px：「双语 · 原文在上」8 字在等分格里才放得下一行（12px 会折出孤字）。 */
-  #fmtRowKind .fmt-btn{background:var(--card);border-color:var(--line);font-size:11px}
+     字号压到 10.5px：「双语 · 原文在上」8 字在等分格里才放得下一行（更大就折出孤字）。 */
+  #fmtRowKind .fmt-btn{background:var(--card);border-color:var(--line);font-size:10.5px}
   #fmtRowKind .fmt-btn:hover{border-color:var(--acc-line)}
   #fmtRowKind .fmt-btn.on{background:var(--card);border-color:var(--acc);color:var(--acc);
     box-shadow:0 1px 5px rgba(236,72,153,.16)}
@@ -790,6 +796,10 @@
   .progwrap.done .pg-dot{background:#0E9F6E;animation:none}
   .progwrap.done .prog i{background:linear-gradient(90deg,#0E9F6E,#10B981)}
   .prtxt{font-size:12px;color:var(--sub);font-family:var(--mono)}
+  /* v0.9.297：任务条下方那行「AI 算力紧张…」。只在跑的时候出现（见 pgBusy()），
+     压在进度条下沿、灰色小字 —— 目的是让用户知道还要等，不是让他在等的时候读文章。
+     用 --mut 而不是 --sub：它是安慰话，不该和「第 3/12 批」这类进度信息抢注意力。 */
+  .pg-busy{font-size:11.5px;color:var(--mut);line-height:1.4;margin-top:4px}
 
   /* v0.9.262：任务条下方的 AdSense 广告位（懒加载）。
      初始 display:none——页面加载时不 push：容器不可见时 availableWidth=0，
@@ -1054,7 +1064,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.296</span>
+    <span class="ver-tag">v0.9.297</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1264,6 +1274,10 @@ crossorigin="anonymous"></script>
             <span class="pg-eta" id="pgEta"></span>
           </div>
           <div class="prog" id="prog"><i></i></div>
+          <!-- v0.9.297：跑起来之后挂一句宽心话。默认 hidden，由 pgBusy() 在
+               pgStart / pgFinish / setProg(…,false) 三处开关 —— 和任务条同生共死。
+               data-i18n 让切界面语言时自动跟着换，不用额外接线。 -->
+          <div class="pg-busy" id="pgBusy" data-i18n="pgBusyTip" hidden>AI 算力紧张，等一会就出结果了</div>
         </div>
       </div>
       <!-- v0.9.262：任务条下方广告位。懒加载——首次随任务条（#progWrap.show）出现才 push，
@@ -1564,9 +1578,14 @@ crossorigin="anonymous"></script>
            现在换成与「导出译文」同款的节标题（图标徽章 + 渐隐尾线），并补一句说明：
            折行是本地排版处理，改完不必重跑翻译 —— 之前用户以为要重新翻译，
            因此宁可不改设置也不动它。 -->
+      <!-- v0.9.297：那句说明从「常驻两行正文」收进标题后面的 ⓘ（用户定案：
+           它不用一直占着界面，想看再点）。两个理由：
+           ① 它是解释，不是操作项 —— 每次开页都读一遍「修改设置无须重新翻译」没有新信息；
+           ② 折行块本来只有「一个输入框 + 一行换算提示」，压着两行灰字显得比它实际的分量重。
+           文案与「跟着模式换（单语/双语）」的逻辑一个字没动，只是换了挂载点：
+           id 仍是 wrapTipEl，改挂 data-tip-i18n —— 浮层的取词口在这里（见 applyTipI18n）。 -->
       <div class="param-blk">
-        <div class="blk-title"><span data-i18n="secWrap">折行设置</span></div>
-      <div class="hint wtip" id="wrapTipEl" data-i18n="wrapTip">修改设置，无须重新翻译，可在编辑区查看单语字幕的折行效果。</div>
+        <div class="blk-title"><span data-i18n="secWrap">折行设置</span><i class="info" tabindex="0" id="wrapTipEl" data-tip-i18n="wrapTip">i</i></div>
       <!-- v0.9.190：两个宽度并排一行（原来是上下两组，各占 label+input+hint 三行），
            竖着排时右栏卡片过高、矮屏会出内滚动条。id 与 data-i18n key 全部原样保留。 -->
       <!-- v0.9.202：两个行宽改成「按字幕模式二选一」。此前两个框永远并排，
@@ -1636,8 +1655,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.296"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.296"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.297"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.297"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2083,9 +2102,16 @@ function showAd(){
     try{ (window.adsbygoogle = window.adsbygoogle || []).push({}); }catch(e){}
   });
 }
+/* v0.9.297：任务条下方那句宽心话的开关。只有一个调用点原则会漂 ——
+   所以集中到这里，三处（pgStart 开、pgFinish 关、setProg(…,false) 关）都走它。
+   文案本身不在这里：走 data-i18n="pgBusyTip"，applyI18n 负责 27 语。 */
+function pgBusy(on){
+  const el=$('pgBusy');
+  if(el) el.hidden=!on;
+}
 function setProg(p, show){
   const w=$('progWrap'); if(!w) return;
-  if(!show){ w.classList.remove('show','done'); $('prog').classList.remove('run'); document.title=BASE_TITLE; return; }
+  if(!show){ w.classList.remove('show','done'); $('prog').classList.remove('run'); pgBusy(false); document.title=BASE_TITLE; return; }
   w.classList.add('show');
   showAd();   /* v0.9.262：任务条出现即唤起广告位（内部幂等）
                  v0.9.263：任务条本身提前到 pgStart（点翻译那一刻）出现，广告随之提前 */
@@ -2100,6 +2126,7 @@ function pgStart(){
   if(w){ w.classList.remove('done'); $('prog').classList.add('run'); }
   const st=$('pgState'); if(st) st.textContent=t('pgRun');
   $('pgEta').textContent='';
+  pgBusy(true);   // v0.9.297：跑起来就挂上「AI 算力紧张…」，收工（pgFinish）时摘掉
   try{ setPrText(''); }catch(e){}   // v0.9.184：清掉上一轮完成态留下的消耗行，否则新一轮开头还挂着旧数字
   /* v0.9.263：任务条开局即显（0% + 流动动画），不等第一批返回。
      此前要等第一批落地（中途还有分组/歌词预处理），短任务也要十几秒，长任务更久——
@@ -2152,6 +2179,7 @@ function pgPace(sec){
 }
 function pgFinish(){
   PG.ok=true;
+  pgBusy(false);   // v0.9.297：出结果了，那句「等一会就出结果」立刻退场（含下面排队超时那条路）
   const w=$('progWrap');
   if(!w || !w.classList.contains('show')) return;
   $('pgState').textContent=t('pgDone', fmtDur((Date.now()-PG.tAll)/1000));
@@ -6507,10 +6535,14 @@ function syncWrapField(){
     const a = $('wcellMaxW'), b = $('wcellBiMaxW'), tip = $('wrapTipEl');
     if (a) a.hidden = !mono;
     if (b) b.hidden = mono;
-    /* 说明文案同样分模式：双语下还写着「单语字幕」就是错的 */
+    /* 说明文案同样分模式：双语下还写着「单语字幕」就是错的。
+       v0.9.297：这句从常驻正文收进了块标题后面的 ⓘ —— 取词口从 data-i18n 换成
+       data-tip-i18n（applyTipI18n 认这个属性刷 data-tip），所以这里两个都要重设：
+       只改 data-tip-i18n 不重设 data-tip，浮层会停在旧语言/旧模式上。 */
     if (tip) {
-      tip.dataset.i18n = mono ? 'wrapTip' : 'wrapTipBi';
-      tip.textContent = t(tip.dataset.i18n);
+      const key = mono ? 'wrapTip' : 'wrapTipBi';
+      tip.setAttribute('data-tip-i18n', key);
+      tip.setAttribute('data-tip', t(key));
     }
   } catch (e) {}
 }
