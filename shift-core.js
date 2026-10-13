@@ -678,27 +678,34 @@
      本模块的输出只有两种：「这里有 N 条值得看一眼」和「这几条可以这样改」。
      改不改仍是一次 pushOp，和手工按钮走同一条路（能撤销，能重放）。 */
   var CHECK_RULES = {
-    /* v0.9.300：五把尺子对齐行业通行规范（Netflix Timed Text Style Guide 为主）。
+    /* v0.9.300：四把尺子对齐行业通行规范（Netflix Timed Text Style Guide 为主）。
        宽度单位 = 全角字（汉字/假名/谚文记 1，两个拉丁字母记 1），wOf 的口径。 */
     minDur: 833,      /* 一条最短要停多久（毫秒）—— Netflix：5/6 秒（24fps 下 20 帧） */
     maxDur: 7000,     /* 一条最长停多久（毫秒）—— Netflix：7 秒 */
     maxCps: 9,        /* 每秒最多读多少宽度单位 —— Netflix 简中指南 9 字/秒；拉丁半宽即 18 字符/秒，落在 17~20 区间 */
-    minGap: 100,      /* 两条之间至少空多少毫秒 —— 约 2~3 帧（Netflix：至少 2 帧） */
     maxLine: 21       /* 一行最多多少宽度单位 —— 拉丁 42 字符（Netflix 最常引用的那条）；中文按简中指南可收紧到 16 */
   };
-  /* 体检面板上那五个框怎么排、人读的单位是什么。
-     ⚠️ 单位换算只在这一处（raw ↔ 引擎内部的毫秒），页面不许自己 ×1000 —— v0.9.294 的规矩。 */
+  /* v0.9.301：「两条之间留多大空档」不再当病灶查。
+     真实素材里绝大多数相邻对是首尾正好相接（歌词一句接一句唱、听写自动切分都是这个长相），
+     拿它当问题查，一份 81 条的字幕能报出 72 条 —— 整份全红等于没说。用户的原话：
+     「其实只要字幕没重叠就行」。所以这一版只把「叠在一起」当问题。
+     SNAP_GAP 这个数没被删干净，它还剩一个用途：改的时候别贴到邻居身上（挪位 / 补长要留出来）。 */
+  var SNAP_GAP = 100;
+  /* 几毫秒的「重叠」当作首尾相接：帧率换算（23.976 ↔ 25）会引入这种舍入误差，肉眼看不见 */
+  var OVERLAP_TOL = 20;
+  /* 体检面板上那四个框怎么排、人读的单位是什么。
+     ⚠️ 单位换算只在这一处（raw ↔ 引擎内部的毫秒），页面不许自己 ×1000 —— v0.9.294 的规矩。
+     v0.9.301：删掉「最小间隔」那一栏 —— 它已经不参与任何体检，留着只会让人以为调它能消掉红点。 */
   var CHECK_FIELDS = [
     { id: 'minDur', key: 'rlDurMin', unit: 'unitSec', mul: 1000, def: 0.833 },
     { id: 'maxDur', key: 'rlDurMax', unit: 'unitSec', mul: 1000, def: 7 },
     { id: 'maxCps', key: 'rlSpeed', unit: 'unitCps', mul: 1, def: 9 },
-    { id: 'minGap', key: 'rlGap', unit: 'unitMs', mul: 1, def: 100 },
     { id: 'maxLine', key: 'rlLine', unit: 'unitChar', mul: 1, def: 21 }
   ];
-  /* 页面上五个框的值（人读单位）→ 引擎内部的规则表。空值 / 非数字退回默认，
+  /* 页面上那四个框的值（人读单位）→ 引擎内部的规则表。空值 / 非数字退回默认，
      不因为用户把框清了就整份体检跑歪。
      portrait：竖屏（手机 9:16）画面窄 —— 每行字数按行业惯例收到横屏的 60%
-     （中文 16→10、拉丁 42→25），时长 / 读速 / 间隔不随方向变。 */
+     （中文 16→10、拉丁 42→25），时长 / 读速不随方向变。 */
   function uiRules(vals, fmt, portrait) {
     var r = {}, i, f, v;
     for (i = 0; i < CHECK_FIELDS.length; i++) {
@@ -706,8 +713,6 @@
       v = Number((vals || {})[f.id]);
       r[f.id] = isFinite(v) && v > 0 ? v * f.mul : CHECK_RULES[f.id];
     }
-    /* 歌词天生一句接一句唱，中间没有空档 —— 按空档规则查会整份全红，等于没说 */
-    if (fmt === 'lrc') r.minGap = 0;
     /* v0.9.300：竖屏开关。maxLine × 0.6 后四舍五入，但别低于 4（一行的最低可读宽度） */
     if (portrait) r.maxLine = Math.max(4, Math.round(r.maxLine * 0.6));
     /* 短规则不能反过来比长规则还宽，用户拖错了按错处理 */
@@ -741,12 +746,15 @@
      fast    读速超过 maxCps，字多时间少
      line    单行宽度超过 maxLine，会折行占屏
      rows    一条超过两行 —— Netflix「每条最多 2 行」，两大最常触发的规则之一
-     overlap 已经开始于上一条还没结束 —— 两条会叠在屏幕上
-     gap     与上一条的空隙不足 minGap，看起来像没断开
+     overlap 开始于上一条还没结束 —— 两条会叠在屏幕上同一个位置（v0.9.301 起只留这一条时间关系判据）
 
+     ⚠️ v0.9.301：原来还有一条 gap（两条之间的空档不足）。它被删掉了，原因是实测：
+        一份 81 条的真实字幕里 68 处是「上一条的终点 = 下一条的起点」，占相邻对的 90% ——
+        逐条报出来就是 72 条全红。这是素材本身的切法（歌词一句接一句、听写自动切分都这样），
+        不是错误。用户的原话：「其实只要字幕没重叠就行」。
      ⚠️ 双语条目（原文一行 + 译文一行）只查它与相邻两条的时间关系，不查停留时长、行宽和行数：
         一条双语顶两条的信息量，拿单语的尺子量它不公平（8 秒停留对双语是正常的），
-        而「一切就要 longer 猩」的拆分动作作用在它身上会把原文和译文劈成两半。
+        而「切分」这类动作作用在它身上会把原文和译文劈成两半。
      ⚠️ 检测阈值只留 2% 的小余量（v0.9.300 收紧：原来 short 也吃 maxDur 的 2%=140ms，
         700 的尺子实际 560 才响，比规范松了一大截）。「采纳建议后还是红的」那类余量
         由 suggest 侧自己兜底 —— 延长按 want 精确给、切分有最宽段复核的 guard 循环。 */
@@ -763,11 +771,9 @@
         if (w > r.maxLine + 0.25) why.push('line');
         if (cueLines(c).length > 2) why.push('rows');
       }
-      if (i > 0) {
-        var pv = list[i - 1];
-        if (c.start < pv.end) why.push('overlap');
-        else if (c.start - pv.end < r.minGap) why.push('gap');
-      }
+      /* 「首尾相接」不算问题（end == 下一条的 start 是真实素材最常见的切法），
+         只有真的叠在同一段时间里才报 —— 几毫秒的舍入误差仍按相接处理。 */
+      if (i > 0 && list[i - 1].end - c.start > OVERLAP_TOL) why.push('overlap');
       if (why.length) out.push({ i: i, why: why });
     }
     return out;
@@ -787,7 +793,7 @@
       seen[key] = 1;
       out.push({ k: k, op: op });
     }
-    var ceilEnd = next ? next.start - r.minGap : Infinity;   /* 这一条最晚能撑到哪 */
+    var ceilEnd = next ? next.start - SNAP_GAP : Infinity;   /* 这一条最晚能撑到哪 */
 
     /* 双语条目（原文一行 + 译文一行）不给任何「切开」的建议：切开会变成
        「半句原文 + 半句译文」，谁都看不懂。这一刀之所以放在这里而不是只依赖
@@ -797,10 +803,10 @@
     }
     if (!why.length) return out;
 
-    if (why.indexOf('overlap') >= 0 || why.indexOf('gap') >= 0) {
+    if (why.indexOf('overlap') >= 0) {
       if (prev) {
         add('btnMergePrev', { op: 'merge', i: i - 1 });
-        var ns = prev.end + r.minGap;
+        var ns = prev.end + SNAP_GAP;
         add('btnPush', { op: 'set', i: i, s: ns, e: Math.max(c.end, ns + Math.min(dur, r.minDur)) });
       }
     }
@@ -1035,6 +1041,8 @@
     parseUserTime: parseUserTime,
     CHECK_RULES: CHECK_RULES,
     CHECK_FIELDS: CHECK_FIELDS,
+    SNAP_GAP: SNAP_GAP,
+    OVERLAP_TOL: OVERLAP_TOL,
     uiRules: uiRules,
     checkable: checkable,
     checkCues: checkCues,

@@ -141,7 +141,7 @@
   .chkrow .op{display:flex;gap:6px;flex:none}
   .chkrow .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
   .chkrow .op button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
-  /* 五个阈值：和步骤流水线同样做成「框里带单位后缀」，别再用 placeholder 传达单位 */
+  /* 四个阈值：和步骤流水线同样做成「框里带单位后缀」，别再用 placeholder 传达单位 */
   .rules{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;
     background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
   .rules .rl{display:inline-flex;align-items:center;gap:6px}
@@ -293,8 +293,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.300"></script>
-<script src="shift-core.js?v=0.9.300"></script>
+<script src="shift-i18n.js?v=0.9.301"></script>
+<script src="shift-core.js?v=0.9.301"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -612,7 +612,7 @@ function run() {
 /* ⚠️ 一个字都不自动改。体检只产出两样东西：哪一条值得看一眼（issues）、
    这一条可以怎么改（suggest 给出的 op）。改不改由用户点按钮决定，
    点了就落成一次 pushOp —— 和手工按钮同一条路，能撤销也能重放。
-   五个阈值存在 S.chkRules（人读单位：秒 / 毫秒 / 字），交给引擎 uiRules 换算，
+   四个阈值存在 S.chkRules（人读单位：秒 / 字数），交给引擎 uiRules 换算，
    页面不碰 ×1000（v0.9.294 定下的：单位换算只有引擎那一处）。 */
 function defRules() {
   var d = {};
@@ -629,7 +629,7 @@ function renderRules() {
       + '<span class="un">' + esc(t(f.unit)) + '</span></span></span>';
   }).join('')
   /* v0.9.300：竖屏开关 —— 9:16 画面窄，行宽按行业惯例收到横屏的 60%（中文 16→10、拉丁 42→25）。
-     挂在阈值行尾，跟五个框同一排；状态只影响 maxLine，时长/读速/间隔与画面方向无关 */
+     挂在阈值行尾，跟四个框同一排；状态只影响 maxLine，时长与读速与画面方向无关 */
     + '<span class="rl"><span class="lb">' + esc(t('rlPortrait')) + '</span>'
     + '<button type="button" class="chip tog" id="rlPortrait" aria-pressed="' + (S.portrait ? 'true' : 'false') + '">'
     + esc(S.portrait ? t('rlOn') : t('rlOff')) + '</button></span>';
