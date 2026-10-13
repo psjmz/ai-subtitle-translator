@@ -1,26 +1,32 @@
-/* shift-core.js —— 时间轴调整页的独立引擎（v0.9.292）
+/* shift-core.js —— 时间轴调整页的独立引擎（v0.9.294）
    与 convert-core.js / bilingual-core.js 完全隔离：本文件只被 shift.html 加载，
-   不引入、不修改任何现有引擎。解析与导出都在浏览器里跑完，不上传、不调模型。
+   不引入、不修改任何现有引擎。解析与导出都在浏览器里跑完。
 
-   ⚠️ v0.9.292 的两条硬规矩：
+   ⚠️ v0.9.292 的两条硬规矩仍然有效：
      ① 进来什么格式，出去就是什么格式。本页不做格式转换 —— 那是 /convert.html 的事。
         而且不只是「换后缀」：ASS 的 Script Info、样式表、每条的 Layer / Style / 边距 / Effect
         一列都不能丢，VTT 的 NOTE / STYLE 块和 cue 设置也不能丢。
         所以条目数没变时走 rewriteTimes —— 只改时间那几个字符，其余一字不动。
      ② 双语字幕（原文一行 + 译文一行）不能被合并或拆分压坏。
         同轴 / 同条的两行一旦识别为双语，合并时保持两行、拆分时整条跳过。
+    ⚠️ v0.9.294：调整不再单选。「调整方式」和「合并 / 拆分」本来就是同一类东西 —— 对时间轴做
+        一个操作 —— 现在合成一条**可叠加、可排序、可单独停用**的步骤流水线 applySteps。
+        典型用法：「先整体延后 2 秒」+「再按 1.001 缩放」，两步叠加，不用导两次。
 
    支持读取：SRT / VTT / ASS / SSA / SBV / LRC / TXT
    中间结构统一为 { start, end, text }（毫秒），_x 里挂着该格式自己的样式信息。
 
-   时间轴三种调整，一次只用一种：
-     ① 平移   shift：整体提前 / 延后 N 秒（时长不变）
+   时间轴三种调整：
+     ① 平移   shift：整体提前 / 延后 N 秒（时长不变，输入框单位是「秒」）
      ② 倍速   rate ：整体 ×N（时长同步缩放）—— 24fps ↔ 25fps、片源与字幕速率不一致时用
      ③ 两点校正 two ：给「当前首条→目标」「当前末条→目标」两对时间，中间线性映射
-   合并与拆分（可选，一次只用一种）：
-     gap  合并间隙小于 N 毫秒的相邻两条
-     dur  把时长超过 N 秒的长条按字数比例切成几条
-     char 把字数超过 N 的长条切成几条
+   合并与拆分：
+     gap  合并间隙小于 N 毫秒的相邻两条（单位「毫秒」）
+     dur  把时长超过 N 秒的长条按字数比例切成几条（单位「秒」）
+     char 把字数超过 N 的长条切成几条（单位「字」）
+   ⚠️ v0.9.294 起这六种都是「工序」，可以任意组合进一条流水线，见 STEP_DEFS / applySteps。
+   ⚠️ 时间轴各家单位的换算全在这里，页面不许再自己 ×1000：
+        平移「秒」→ 毫秒、合并「毫秒」直接用、拆分「秒」直接用、字数「字」直接用。
    逐条微调：把「合并 / 切分 / 改时间」记成一组操作，重算时从头依次重放。
    ⚠️ 时间被压到负数会截断到 0，并把受影响条数回报给页面（不许静默改时间）。 */
 (function (root) {
@@ -313,18 +319,28 @@
     return null;
   }
 
-  /* ---------------- 时间轴调整 ---------------- */
-  var MODES = [
-    { id: 'shift', key: 'mShift' },
-    { id: 'rate', key: 'mRate' },
-    { id: 'two', key: 'mTwo' }
-  ];
-  var TOOLS = [
-    { id: 'none', key: 'toolNone' },
-    { id: 'gap', key: 'toolGap' },
-    { id: 'dur', key: 'toolDur' },
-    { id: 'char', key: 'toolChar' }
-  ];
+  /* v0.9.294 起，MODES / TOOLS 两张旧表被 STEP_DEFS 取代并删掉 —— 页面不再有
+     「调整方式」「合并与拆分」两个各选一项的下拉，它们统一成一条步骤流水线。 */
+  /* v0.9.294：六种工序的说明书。页面照着这张表渲染步骤行 —— 参数有几个、单位写什么、
+     默认值是多少都由这里定，页面上不许再散落这些数字。
+       kind:'plain' 一个数值框（unit 是输入框右侧那个固定单位后缀，不靠 placeholder）
+       kind:'time'  两点校正的四栏：当前首 / 当前末 / 目标首 / 目标末
+     ⚠️ 单位换算只有一处：secMode 标记这一栏是「秒」，applySteps 里乘 1000 变毫秒。 */
+  var STEP_DEFS = {
+    shift: { key: 'mShift', hint: 'hintMs', kind: 'plain', unit: 'unitSec', ph: 'phMs', def: 0, sec: true },
+    rate: { key: 'mRate', hint: 'hintRate', kind: 'plain', unit: 'unitX', ph: 'phRate', def: 1 },
+    two: { key: 'mTwo', hint: 'hintTwo', kind: 'time' },
+    gap: { key: 'toolGap', hint: 'hintGap', kind: 'plain', unit: 'unitMs', ph: 'phGap', def: 250 },
+    dur: { key: 'toolDur', hint: 'hintDur', kind: 'plain', unit: 'unitSec', ph: 'phDur', def: 6, sec: true },
+    char: { key: 'toolChar', hint: 'hintChar', kind: 'plain', unit: 'unitChar', ph: 'phChar', def: 42 }
+  };
+  var STEP_ORDER = ['shift', 'rate', 'two', 'gap', 'dur', 'char'];
+  function mkStep(id) {
+    var d = STEP_DEFS[id];
+    if (!d) return null;
+    if (d.kind === 'time') return { id: id, off: false, v: ['', '', '', ''] };
+    return { id: id, off: false, v: [d.def] };
+  }
 
   function info(cues) {
     var c = cues || [];
@@ -384,6 +400,56 @@
   function valid(mode, opt) {
     return !!makeMapper(mode, opt);
   }
+
+  /* ---------------- v0.9.294：可叠加的步骤流水线 ---------------- */
+  /* 一道工序的参数填没填对。空框 / 非数字一律不通过 —— 流水线里只要有一道填错，
+     整体拒绝出结果（与其给一份错字幕，不如什么都不给）。 */
+  function stepValid(id, v) {
+    var a = v || [], n;
+    if (id === 'shift') { n = Number(a[0]); return String(a[0]).trim() !== '' && isFinite(n); }
+    if (id === 'rate') { n = Number(a[0]); return String(a[0]).trim() !== '' && isFinite(n) && n > 0; }
+    if (id === 'two') {
+      return [a[0], a[1], a[2], a[3]].every(function (x) {
+        var t = parseUserTime(x);
+        return typeof t === 'number' && isFinite(t);
+      });
+    }
+    if (id === 'gap') { n = Number(a[0]); return String(a[0]).trim() !== '' && isFinite(n) && n >= 0; }
+    if (id === 'dur' || id === 'char') { n = Number(a[0]); return String(a[0]).trim() !== '' && isFinite(n) && n > 0; }
+    return false;
+  }
+  /* 从最原始的条目按顺序过一遍所有步骤。停用（off）的整道跳过；参数不合法立刻停，
+     返回 ok:false + bad:<步骤 id>，页面据此提示「哪一步没填」而不是笼统报错。
+     计数按工序累加：截断几条、合并几条、拆出几条，各自累计（多次合并会叠加）。 */
+  function applySteps(cues, steps) {
+    var list = clone(cues);
+    var res = { cues: list, clamped: 0, merged: 0, split: 0, ok: true, bad: null };
+    (steps || []).forEach(function (s) {
+      if (!s || s.off || !res.ok) return;
+      var id = s.id, v = s.v || [], r, a;
+      if (!STEP_DEFS[id]) return;
+      if (!stepValid(id, v)) { res.ok = false; res.bad = id; return; }
+      if (id === 'shift' || id === 'rate' || id === 'two') {
+        var opt;
+        if (id === 'rate') opt = { rate: Number(v[0]) };
+        else if (id === 'shift') opt = { ms: Math.round(Number(v[0]) * 1000) };   /* 界面单位是秒 */
+        else opt = {
+          fromStart: parseUserTime(v[0]), fromEnd: parseUserTime(v[1]),
+          toStart: parseUserTime(v[2]), toEnd: parseUserTime(v[3])
+        };
+        r = apply(list, id, opt);
+        if (!r.ok) { res.ok = false; res.bad = id; return; }
+        list = r.cues;
+        res.clamped += r.clamped;
+        return;
+      }
+      if (id === 'gap') { a = mergeGap(list, Number(v[0])); list = a.cues; res.merged += a.merged; return; }
+      if (id === 'dur') { a = splitByDur(list, Number(v[0])); list = a.cues; res.split += a.split; return; }
+      if (id === 'char') { a = splitByChars(list, Number(v[0])); list = a.cues; res.split += a.split; }
+    });
+    res.cues = list;
+    return res;
+  }
   function clone(cues) {
     return (cues || []).map(function (c) {
       return {
@@ -435,14 +501,19 @@
      段怎么切：优先按现有行数分组（保留原折行），行数不够再按字符切（尽量落在空格 / 标点后）。 */
   function splitCue(cue, n) {
     var lines = plain(cue.text).split('\n').filter(function (x) { return x.trim(); });
-    var segs;
-    if (lines.length >= n) {
-      segs = groupLines(lines, n);
-    } else {
-      segs = splitWords(plain(cue.text).replace(/\n/g, ' '), n);
+    var flat = plain(cue.text).replace(/\n/g, ' ');
+    var segs = null, k;
+    /* ⚠️ v0.9.294 补：理想段数切不动就往下降档，别整条放弃。
+       典型场景：一条 21 秒的长条，用户限定「最长 2 秒」→ 要切 11 段，可整句只有 5 个词，
+       拉丁语系又不许劈单词 —— 改之前 splitWords 直接返回 null，整条不拆，
+       于是「阈值调小反而切不动」，谁看都像 bug。现在逐级退到切得动为止（至少 2 段）：
+       不劈单词这条红线照旧，但不会再出现静默不干活的情况。 */
+    for (k = n; k >= 2; k--) {
+      var attempt = (lines.length >= k) ? groupLines(lines, k) : splitWords(flat, k);
+      if (attempt && attempt.length >= 2) { segs = attempt; break; }
     }
     if (!segs || segs.length <= 1) return null;
-    var total = 0, w = segs.map(function (s) { var v = Math.max(1, lenOf(s)); total += v; return v; });
+    var total = 0, w = segs.map(function (s) { var v = wOf(s); total += v; return v; });
     var dur = Math.max(1, cue.end - cue.start), t = cue.start, out = [];
     for (var i = 0; i < segs.length; i++) {
       var d = Math.round(dur * w[i] / total);
@@ -454,6 +525,22 @@
     return out;
   }
   function lenOf(s) { return String(s).replace(/\s/g, '').length || 1; }
+  /* ⚠️ v0.9.294：时间按「占多宽的屏幕」分，不是按字符数。
+     中文一个字是英文两个半字母的宽度，按字符数分时间，中文那一段会拿到过短的时间。
+     计数规则沿用主站口径：全角 / 汉字 = 1，拉丁等半角每 2 个字符 = 1。 */
+  function wOf(s) {
+    var str = String(s).replace(/\s/g, '');
+    if (!str) return 1;
+    var n = 0, i, c;
+    for (i = 0; i < str.length; i++) {
+      c = str.charCodeAt(i);
+      n += (c >= 0x1100 && (c <= 0x115f || c === 0x2e80 || (c >= 0x2e80 && c <= 0xa4cf) ||
+        (c >= 0xac00 && c <= 0xd7a3) || (c >= 0xf900 && c <= 0xfaff) ||
+        (c >= 0xfe30 && c <= 0xfe6f) || (c >= 0xff00 && c <= 0xff60) ||
+        (c >= 0xffe0 && c <= 0xffe6))) ? 1 : 0.5;
+    }
+    return Math.max(0.5, n);
+  }
   /* 把 n 行尽量均分成 k 组（每组至少一行） */
   function groupLines(lines, k) {
     var per = Math.ceil(lines.length / k), out = [], i;
@@ -463,13 +550,20 @@
   /* 单行文本切 k 段：优先在空格或标点后落刀。
      ⚠️ 拉丁语系没有词边界就硬切会把单词劈成 "Hel" / "lo"，这种字幕没人能用 —— 切不动就少切几段，
      实在一段都切不出来就返回 null（调用方据此整条不拆）。中文 / 日文没有词边界问题，允许按字数切。 */
-  var RE_CJK = /[㐀-䶿一-鿿぀-ヿ가-힯]/;
+  /* v0.9.294：按「文字之间有没有空格」分成两类，而不是按「是不是中日韩」。
+     ① RE_NOSPACE —— 词与词之间本来就不写空格的文字（中日 / 泰 / 老挝 / 缅甸 / 高棉 / 藏）。
+        这类语言找不到刀口时可以按字数硬切，切在"字"中间视觉上仍是完整的字符，
+        观众读得下去；反倒是找不到刀口就不许切 → 整条字幕永远拆不动。
+     ② 其余走词边界优先：拉丁 / 西里尔 / 希腊 / 阿拉伯 / 希伯来 / 越南字母 /
+        ⚠️ 谚文（韩语）—— 韩语是有空格分词的，硬切会把一个词劈成两半（한국어 → 한국/어）。
+        以前 RE_CJK 把谚文也算成「能硬切」，那是错的。 */
+  var RE_NOSPACE = /[㐀-䶿一-鿿぀-ヿ฀-๿຀-໿က-ჿក-៿ༀ-࿿]/;
   function splitWords(text, k) {
     var s = String(text).trim();
     if (!s) return null;
     var per = Math.ceil(lenOf(s) / k);
     if (per <= 0) return null;
-    var cjk = RE_CJK.test(s);
+    var hard = RE_NOSPACE.test(s);   /* 这类文字允许按字数硬切，其余必须落在词边界 */
     var out = [], i = 0;
     while (i < s.length && out.length < k - 1) {
       var want = Math.min(s.length, i + per), cut = -1, j;
@@ -479,7 +573,7 @@
         if (/[\s，。！？、,.!?;；:：]/.test(s.charAt(j - 1))) { cut = j; break; }
       }
       if (cut < 0) {
-        if (!cjk) break;                 /* 找不到断点就到此为止，剩下的当最后一段 */
+        if (!hard) break;                 /* 找不到断点就到此为止，剩下的当最后一段 */
         cut = want;
       }
       out.push(s.slice(i, cut).trim());
@@ -739,8 +833,6 @@
   root.ShiftCore = {
     FORMATS: FORMATS,
     READABLE: READABLE,
-    MODES: MODES,
-    TOOLS: TOOLS,
     detect: detect,
     parse: parse,
     head: head,
@@ -750,6 +842,11 @@
     outName: outName,
     apply: apply,
     valid: valid,
+    STEP_DEFS: STEP_DEFS,
+    STEP_ORDER: STEP_ORDER,
+    mkStep: mkStep,
+    stepValid: stepValid,
+    applySteps: applySteps,
     info: info,
     mergeGap: mergeGap,
     splitByDur: splitByDur,

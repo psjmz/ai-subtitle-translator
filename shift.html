@@ -131,6 +131,29 @@
   .li.bi .tx::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
     background:var(--acc);margin-right:7px;vertical-align:1px}
 
+  /* v0.9.294：调整步骤流水线。一道工序一行，单位贴在输入框里靠右显示
+     —— 单位不能只靠 placeholder 传达，用户一开始输入就看不见了 */
+  .steps{display:flex;flex-direction:column;gap:8px}
+  .st{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 11px;
+    background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
+  .st.off{opacity:.5}
+  .st .sn{width:19px;height:19px;border-radius:50%;background:var(--acc);color:#fff;flex:none;
+    font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .st .snm{min-width:76px;font-size:13px;font-weight:600;flex:none}
+  .st .slb{font-size:12.5px;color:var(--sub);flex:none}
+  .st .pv{position:relative;display:inline-flex;align-items:center}
+  .st .pv input.num{width:110px;padding-right:46px}
+  .st .pv .un{position:absolute;right:10px;font-size:11.5px;color:var(--mut);pointer-events:none}
+  /* ⚠️ 阿拉伯语 / 希伯来语整页从右往左排 —— 单位后缀要跟着挪到左边，
+     时间码和数字框本身仍保持从左往右（写成 [ل] 那种顺序没人读得懂） */
+  [dir="rtl"] .st .pv input.num{padding-right:8px;padding-left:46px}
+  [dir="rtl"] .st .pv .un{right:auto;left:10px}
+  [dir="rtl"] .num,[dir="rtl"] .tm{direction:ltr;text-align:left}
+  .st .sh{flex:1;min-width:0;font-size:12px;color:var(--mut);line-height:1.6}
+  .st .sop{display:flex;gap:6px;flex:none}
+  .st .sop button{height:26px;min-width:26px;padding:0 8px;font-size:12px;border-radius:7px;color:var(--sub)}
+  .steps-empty{font-size:12.5px;color:var(--mut);padding:2px 0 6px}
+
   .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
   .msg.err{color:var(--del)}
   .msg.warn{color:var(--warn)}
@@ -183,47 +206,16 @@ crossorigin="anonymous"></script>
     </div>
   </div>
 
+  <!-- v0.9.294：调整方式、合并与拆分本来就是同一类东西 —— 对时间轴做一个操作。
+       合成一条可增删、可排序、可单独停用的步骤流水线，从上往下依次作用。 -->
   <div class="card" id="optCard">
-    <h2><span class="n">2</span><span data-i18n="lblMode">调整方式</span></h2>
+    <h2><span class="n">2</span><span data-i18n="lblSteps">调整步骤</span></h2>
+    <div class="steps" id="steps"></div>
     <div class="row">
-      <select class="fmt" id="mode"></select>
+      <select class="fmt" id="addSel"></select>
+      <button id="btnAdd" type="button" data-i18n="btnAddStep">添加步骤</button>
     </div>
-
-    <!-- 平移 -->
-    <div class="row" id="rowShift">
-      <span class="lb" data-i18n="lblMs">平移</span>
-      <input class="num" id="msVal" type="text" inputmode="decimal" data-i18n-ph="phMs" placeholder="秒，负数提前" value="0">
-    </div>
-    <div class="hint" id="hintShift" data-i18n="hintMs">整片一起挪，每条字幕的时长不变</div>
-
-    <!-- 倍率 -->
-    <div class="row" id="rowRate" style="display:none">
-      <span class="lb" data-i18n="lblRate">倍率</span>
-      <input class="num" id="rateVal" type="text" inputmode="decimal" data-i18n-ph="phRate" placeholder="例如 1.0427" value="1">
-    </div>
-    <div class="hint" id="hintRate" style="display:none" data-i18n="hintRate">起点和终点一起乘，时长同步缩放（24 帧与 25 帧互转常用）</div>
-
-    <!-- 两点校正：「当前」两栏在读入字幕后自动填，用户只需填「目标」 -->
-    <div class="row" id="rowTwo" style="display:none">
-      <span class="lb" data-i18n="lblCur">当前</span>
-      <input class="tm" id="curA" type="text" data-i18n-ph="phTime" placeholder="00:00:00,000">
-      <input class="tm" id="curB" type="text" data-i18n-ph="phTime" placeholder="00:00:00,000">
-      <span class="lb" data-i18n="lblTgt">目标</span>
-      <input class="tm" id="tgtA" type="text" data-i18n-ph="phTime" placeholder="00:00:00,000">
-      <input class="tm" id="tgtB" type="text" data-i18n-ph="phTime" placeholder="00:00:00,000">
-    </div>
-    <div class="hint" id="hintTwo" style="display:none" data-i18n="hintTwo">同时有偏移和速率差时用这个：填当前首末条与目标首末条，中间按比例排</div>
-
-    <!-- v0.9.292：合并与拆分。与「调整方式」是两个独立步骤，可以叠加 -->
-    <div class="part">
-      <h2><span class="n">3</span><span data-i18n="lblTools">合并与拆分</span></h2>
-      <div class="row">
-        <select class="fmt" id="tool"></select>
-        <input class="num" id="toolVal" type="text" inputmode="decimal" data-i18n-ph="phGap" placeholder="毫秒" value="200">
-      </div>
-      <div class="hint" id="hintTool" data-i18n="hintGap">两条之间空档小于这个值就并成一条</div>
-    </div>
-
+    <div class="hint" data-i18n="hintSteps">从上往下依次作用，改任何一步都从原始字幕重算一遍。一道工序一个数值，单位就写在框里。</div>
     <div class="row">
       <span class="lb" data-i18n="lblOutKeep">输出格式</span>
       <span class="chip" id="outKeep">—</span>
@@ -233,7 +225,7 @@ crossorigin="anonymous"></script>
 
   <!-- v0.9.292：逐条微调。操作记成一组步骤，每次重算从头依次重放 -->
   <div class="card" id="listCard" style="display:none">
-    <h2><span class="n">4</span><span data-i18n="lblList">逐条微调</span></h2>
+    <h2><span class="n">3</span><span data-i18n="lblList">逐条微调</span></h2>
     <div class="hint" data-i18n="hintList">可以合并相邻两条、切分某一条，或者直接改它的起止时间</div>
     <div class="row">
       <span class="chip mut" id="editStat"></span>
@@ -246,7 +238,7 @@ crossorigin="anonymous"></script>
   </div>
 
   <div class="card" id="repCard" style="display:none">
-    <h2><span class="n">5</span><span data-i18n="repTitle">结果</span></h2>
+    <h2><span class="n">4</span><span data-i18n="repTitle">结果</span></h2>
     <div id="parts"></div>
     <div class="msg" id="msg" style="display:none"></div>
   </div>
@@ -256,18 +248,20 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.293"></script>
-<script src="shift-core.js?v=0.9.293"></script>
+<script src="shift-i18n.js?v=0.9.294"></script>
+<script src="shift-core.js?v=0.9.294"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
 var LANG = 'zh-CN';
-/* v0.9.292：流水线 = 原始条目(base) → 时间轴调整 → 合并/拆分 → 手动步骤(ops) → 输出文本。
-   每次改任何一环都从 base 重算，手动步骤作为最后一段重放，这样前后顺序永远一致。 */
+/* v0.9.294：流水线 = 原始条目(base) → 步骤流水线(steps，可叠加) → 手动操作(ops) → 输出文本。
+   每次改任何一环都从 base 重算，手动操作作为最后一段重放，这样前后顺序永远一致。
+   steps 里每项是 { id, off, v }：id 是工序名（引擎 STEP_DEFS 定），off=true 整道跳过，
+   v 是各输入框的值（字符串，单位换算在引擎里做一处）。 */
 var S = {
   fname: '', src: '', fmt: null, base: [], work: null, text: '',
-  mode: 'shift', tool: 'none', ops: [], limit: 60,
-  clamped: 0, merged: 0, split: 0
+  steps: [], ops: [], limit: 60,
+  clamped: 0, merged: 0, split: 0, bad: null
 };
 function $(s) { return document.querySelector(s); }
 function t(k) {
@@ -308,9 +302,12 @@ function applyI18n() {
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
   });
   document.documentElement.lang = LANG;
+  /* ⚠️ 阿拉伯语 / 希伯来语是从右往左写的 —— 只换文字不翻版面，整页看起来是错位的 */
+  document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
   renderNav();
   syncLogoHome();
   renderOptions();
+  renderSteps();
   /* 「输出与原文件一致（SRT）」这行是拼出来的，不走 data-i18n —— 换语言时要自己重画 */
   renderSrcFmt();
 }
@@ -319,38 +316,131 @@ function syncLogoHome() {
   if (el) el.href = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
 }
 
-/* 下拉：格式名是通用缩写不翻译；模式名走词典 */
+/* v0.9.294：只剩「添加哪道工序」这个下拉，工序自身的参数行由 renderSteps 渲染 */
 function renderOptions() {
-  var C = window.ShiftCore;
-  var ms = $('#mode'), curM = ms.value || S.mode;
-  ms.innerHTML = C.MODES.map(function (m) { return '<option value="' + m.id + '">' + t(m.key) + '</option>'; }).join('');
-  ms.value = curM; S.mode = ms.value;
-
-  var ts = $('#tool'), curT = ts.value || S.tool;
-  ts.innerHTML = C.TOOLS.map(function (m) { return '<option value="' + m.id + '">' + t(m.key) + '</option>'; }).join('');
-  ts.value = curT; S.tool = ts.value;
-  renderParams();
+  var C = window.ShiftCore, sel = $('#addSel'), cur = sel.value;
+  sel.innerHTML = C.STEP_ORDER.map(function (id) {
+    return '<option value="' + id + '">' + t(C.STEP_DEFS[id].key) + '</option>';
+  }).join('');
+  sel.value = cur || C.STEP_ORDER[0];
 }
-/* 只显示当前模式 / 当前工具要用的那一行参数，别把输入框全摊开 */
-function renderParams() {
-  var m = $('#mode').value || S.mode;
-  S.mode = m;
-  $('#rowShift').style.display = (m === 'shift') ? '' : 'none';
-  $('#hintShift').style.display = (m === 'shift') ? '' : 'none';
-  $('#rowRate').style.display = (m === 'rate') ? '' : 'none';
-  $('#hintRate').style.display = (m === 'rate') ? '' : 'none';
-  $('#rowTwo').style.display = (m === 'two') ? '' : 'none';
-  $('#hintTwo').style.display = (m === 'two') ? '' : 'none';
 
-  var tl = $('#tool').value || S.tool;
-  S.tool = tl;
-  var showVal = (tl !== 'none');
-  $('#toolVal').style.display = showVal ? '' : 'none';
-  $('#hintTool').style.display = showVal ? '' : 'none';
-  var phKey = (tl === 'gap') ? 'phGap' : (tl === 'dur' ? 'phDur' : (tl === 'char' ? 'phChar' : 'phGap'));
-  var hintKey = (tl === 'gap') ? 'hintGap' : (tl === 'dur' ? 'hintDur' : (tl === 'char' ? 'hintChar' : 'hintGap'));
-  $('#toolVal').setAttribute('placeholder', t(phKey));
-  $('#hintTool').textContent = t(hintKey);
+/* ---------------- 调整步骤流水线 ---------------- */
+function renderSteps() {
+  var C = window.ShiftCore, box = $('#steps');
+  if (!S.steps.length) {
+    box.innerHTML = '<div class="steps-empty">' + esc(t('emptySteps')) + '</div>';
+    return;
+  }
+  var html = '', i, j;
+  for (i = 0; i < S.steps.length; i++) {
+    var s = S.steps[i], d = C.STEP_DEFS[s.id];
+    var fields = '';
+    if (d.kind === 'time') {
+      /* 两点校正：当前首末 + 目标首末 四栏 */
+      /* ⚠️ 四个框的 placeholder 都用同一条 phTime（时间格式样例）—— 不新开
+         phCurA/phTgtA 之类词条，省得 27 语各补 4 条；前后两组靠 lblCur / lblTgt 标签区分 */
+      var lb = [t('lblCur'), '', t('lblTgt'), ''];
+      for (j = 0; j < 4; j++) {
+        if (lb[j]) fields += '<span class="slb">' + esc(lb[j]) + '</span>';
+        fields += '<input class="tm" type="text" data-sv="' + i + ',' + j + '" placeholder="' + esc(t('phTime')) + '" value="' + esc(s.v[j]) + '">';
+      }
+    } else {
+      /* 常规工序：一个数值框 + 框内右对齐的单位 */
+      fields += '<span class="pv">'
+        + '<input class="num" type="text" inputmode="decimal" data-sv="' + i + ',0" value="' + esc(String(s.v[0])) + '">'
+        + '<span class="un">' + esc(t(d.unit)) + '</span></span>';
+    }
+    html += '<div class="st' + (s.off ? ' off' : '') + '">'
+      + '<span class="sn">' + (i + 1) + '</span>'
+      + '<span class="snm">' + esc(t(d.key)) + '</span>'
+      + fields
+      + '<span class="sh">' + esc(t(d.hint)) + '</span>'
+      + '<span class="sop">'
+      + '<button type="button" data-toggle="' + i + '">' + esc(t(s.off ? 'btnOn' : 'btnOff')) + '</button>'
+      + '<button type="button" data-up="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+      + '<button type="button" data-dn="' + i + '"' + (i === S.steps.length - 1 ? ' disabled' : '') + '>↓</button>'
+      + '<button type="button" data-del="' + i + '">✕</button>'
+      + '</span></div>';
+  }
+  box.innerHTML = html;
+  bindSteps();
+}
+function bindSteps() {
+  var box = $('#steps');
+  box.querySelectorAll('[data-sv]').forEach(function (el) {
+    el.addEventListener('change', function () {
+      var p = String(el.getAttribute('data-sv')).split(',');
+      var k = Number(p[0]), j = Number(p[1]);
+      if (!S.steps[k]) return;
+      S.steps[k].v[j] = el.value;
+      if (S.base.length) run();
+    });
+    el.addEventListener('input', function () {
+      var p = String(el.getAttribute('data-sv')).split(',');
+      var k = Number(p[0]), j = Number(p[1]);
+      if (!S.steps[k]) return;
+      S.steps[k].v[j] = el.value;
+    });
+  });
+  box.querySelectorAll('[data-toggle]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-toggle'));
+      S.steps[k].off = !S.steps[k].off;
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+  box.querySelectorAll('[data-up]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-up'));
+      if (k <= 0) return;
+      var x = S.steps[k - 1]; S.steps[k - 1] = S.steps[k]; S.steps[k] = x;
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+  box.querySelectorAll('[data-dn]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-dn'));
+      if (k >= S.steps.length - 1) return;
+      var x = S.steps[k + 1]; S.steps[k + 1] = S.steps[k]; S.steps[k] = x;
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-del'));
+      S.steps.splice(k, 1);
+      /* 工序变了，逐条微调里记的索引对着旧列表，留着会改错条目 */
+      S.ops = [];
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+}
+function addStep() {
+  var C = window.ShiftCore, id = $('#addSel').value;
+  var st = C.mkStep(id);
+  if (!st) return;
+  S.steps.push(st);
+  /* 两点校正的「当前」两栏一进来就替用户填好，他只需要填「目标」 */
+  fillCurrentTimes();
+  renderSteps();
+  if (S.base.length) run();
+}
+/* 两点校正的「当前」两栏自动填首末条时间，用户只需要填「目标」 */
+function fillCurrentTimes() {
+  var C = window.ShiftCore;
+  if (!S.base.length) return;
+  var inf = C.info(S.base), i, s;
+  for (i = 0; i < S.steps.length; i++) {
+    s = S.steps[i];
+    if (s.id !== 'two') continue;
+    if (!s.v[0]) s.v[0] = C.time.srt(inf.first);
+    if (!s.v[1]) s.v[1] = C.time.srt(inf.last);
+  }
 }
 
 function pathUiLang() {
@@ -389,7 +479,9 @@ function setSrc(text, fname) {
   S.work = null; S.text = '';
   S.base = S.src.trim() && S.fmt ? (C.parse(S.src, S.fmt) || []) : [];
   renderSrcFmt();
+  /* 两点校正的「当前」两栏补上（这一步要等 base 出来才知道首末条） */
   fillCurrentTimes();
+  renderSteps();
   hideMsg();
   renderAll();
 }
@@ -410,14 +502,6 @@ function renderSrcFmt() {
   /* v0.9.292：本页不做格式转换 —— 进来什么格式出去就是什么格式，直接把这件事写明白 */
   keep.className = 'chip'; keep.textContent = tpl('outSame', nm);
 }
-/* 两点校正的「当前」两栏自动填首末条时间，用户只需要填「目标」 */
-function fillCurrentTimes() {
-  var C = window.ShiftCore;
-  if (!S.base.length) return;
-  var inf = C.info(S.base);
-  $('#curA').value = C.time.srt(inf.first);
-  $('#curB').value = C.time.srt(inf.last);
-}
 function readFile(f) {
   if (!f) return;
   var r = new FileReader();
@@ -427,54 +511,30 @@ function readFile(f) {
 function clearAll() {
   S.fname = ''; S.src = ''; S.fmt = null; S.base = [];
   S.work = null; S.text = ''; S.ops = []; S.limit = 60;
+  S.steps = [];
   S.clamped = 0; S.merged = 0; S.split = 0;
   $('#paste').value = '';
   $('#fname').textContent = '';
   $('#file').value = '';
-  $('#curA').value = ''; $('#curB').value = '';
   $('#parts').innerHTML = '';
   $('#list').innerHTML = '';
   $('#listCard').style.display = 'none';
   $('#repCard').style.display = 'none';
   renderSrcFmt();
+  renderSteps();
   hideMsg();
 }
 
 /* ---------------- 流水线 ---------------- */
-function optOf() {
-  var C = window.ShiftCore, m = $('#mode').value || S.mode;
-  if (m === 'rate') return { rate: Number(String($('#rateVal').value).trim()) };
-  if (m === 'two') {
-    return {
-      fromStart: C.parseUserTime($('#curA').value),
-      fromEnd: C.parseUserTime($('#curB').value),
-      toStart: C.parseUserTime($('#tgtA').value),
-      toEnd: C.parseUserTime($('#tgtB').value)
-    };
-  }
-  return { ms: Math.round(Number(String($('#msVal').value).trim()) * 1000) };
-}
-function toolVal() {
-  var v = String($('#toolVal').value).trim();
-  return v === '' ? NaN : Number(v);
-}
-/* 从原始条目重算一遍：时间轴 → 合并/拆分 → 手动步骤 */
+/* 从原始条目重算一遍：步骤流水线 → 手动操作 */
 function recompute() {
   var C = window.ShiftCore;
-  var m = $('#mode').value || S.mode;
-  var tl = $('#tool').value || S.tool;
-  var opt = optOf();
-  if (!C.valid(m, opt)) return false;
-
-  var r = C.apply(S.base, m, opt);
-  if (!r.ok) return false;
+  var r = C.applySteps(S.base, S.steps);
+  if (!r.ok) { S.bad = r.bad; return false; }
+  S.bad = null;
   var list = r.cues;
   S.clamped = r.clamped;
-  S.merged = 0; S.split = 0;
-
-  if (tl === 'gap') { var a = C.mergeGap(list, toolVal()); list = a.cues; S.merged = a.merged; }
-  else if (tl === 'dur') { var b = C.splitByDur(list, toolVal()); list = b.cues; S.split = b.split; }
-  else if (tl === 'char') { var c = C.splitByChars(list, toolVal()); list = c.cues; S.split = c.split; }
+  S.merged = r.merged; S.split = r.split;
 
   if (S.ops.length) list = C.applyOps(list, S.ops);
   S.work = list;
@@ -487,11 +547,12 @@ function run() {
   if (!S.src.trim()) { showMsg(t('errEmpty'), 'err'); return; }
   if (!S.fmt) { showMsg(t('errFmt'), 'err'); return; }
   if (!S.base.length) { showMsg(t('errFmt'), 'err'); return; }
-  if (!recompute()) { showMsg(t('errParam'), 'err'); return; }
+  if (!recompute()) { showMsg(tpl('errStep', t(C.STEP_DEFS[S.bad] ? C.STEP_DEFS[S.bad].key : '')), 'err'); return; }
   renderAll();
   if (S.clamped > 0) showMsg(tpl('msgClamp', S.clamped), 'warn');
   else if (S.merged > 0) showMsg(tpl('msgMerged', S.merged), '');
   else if (S.split > 0) showMsg(tpl('msgSplit', S.split), '');
+  else if (!S.steps.length && !S.ops.length) showMsg(t('msgNoStep'), '');
   else showMsg(t('msgDone'), '');
 }
 
@@ -661,9 +722,7 @@ function bind() {
   });
   $('#paste').addEventListener('input', function (e) { setSrc(e.target.value, S.fname); });
   $('#btnClear').addEventListener('click', clearAll);
-  $('#mode').addEventListener('change', function () { renderParams(); if (S.base.length) run(); });
-  $('#tool').addEventListener('change', function () { renderParams(); if (S.base.length) run(); });
-  $('#toolVal').addEventListener('change', function () { if (S.base.length) run(); });
+  $('#btnAdd').addEventListener('click', addStep);
   $('#btnGo').addEventListener('click', run);
   $('#btnUndo').addEventListener('click', undo);
   $('#btnMore').addEventListener('click', function () { S.limit += 60; renderList(); });
@@ -672,6 +731,7 @@ function bind() {
 (function main() {
   initLang();
   renderOptions();
+  renderSteps();
   applyI18n();
   bind();
   renderAll();

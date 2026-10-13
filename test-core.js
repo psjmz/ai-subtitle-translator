@@ -5384,7 +5384,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0\.9\.293/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0\.9\.294/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5425,9 +5425,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.293</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.293</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0\.9\.293/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.294</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.294</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0\.9\.294/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5613,8 +5613,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.293</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0\.9\.293/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.294</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0\.9\.294/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7455,11 +7455,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.293/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.293/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.293/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.293/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.293/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.294/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.294/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.294/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.294/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.294/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8964,14 +8964,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.293/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0\.9\.293/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.294/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0\.9\.294/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.293/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.293/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0\.9\.293/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.294/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.294/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0\.9\.294/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.293/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.294/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9446,13 +9446,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.293/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.293/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0\.9\.293/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.293/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0\.9\.293/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.294/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.294/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0\.9\.294/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.294/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0\.9\.294/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0\.9\.293/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0\.9\.294/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9474,7 +9474,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0\.9\.293">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0\.9\.294">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9485,7 +9485,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.293') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.294') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -10144,7 +10144,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/<script[^>]+site-nav\.js/.test(h), '转换页不许引入 site-nav.js（那是另外三页共用的导航）');
     assert.ok(!/<script[^>]+site-i18n\.js/.test(h), '转换页不许引入 site-i18n.js（那是另外三页共用的词典）');
     assert.ok(/convert-i18n\.js/.test(h), '转换页应加载自己的词典');
-    assert.ok(/convert-core\.js\?v=0\.9\.293/.test(h), '转换页引擎没带版本号');
+    assert.ok(/convert-core\.js\?v=0\.9\.294/.test(h), '转换页引擎没带版本号');
     assert.strictEqual((h.match(/<h1/g) || []).length, 1, '转换页只应有一个 h1');
     assert.ok(/<!--SEO-HEAD-START-->/.test(h) && /<!--SEO-COPY-START-->/.test(h),
       '缺 SEO 占位块，服务端按语言注入会失效');
@@ -10477,7 +10477,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.291：时间轴引擎能独立加载，三种调整方式都在', () => {
     assert.ok(SH, 'shift-core.js 加载失败');
-    assert.deepStrictEqual(HOST(SH.MODES.map(m => m.id)), ['shift', 'rate', 'two'], '三种调整方式变了');
+    /* v0.9.294：旧表 MODES 删了，六种工序统一由 STEP_DEFS 描述，前三种就是当年的「调整方式」 */
+    assert.ok(['shift', 'rate', 'two'].every(id => SH.STEP_DEFS[id]), '三种调整方式没了');
     assert.strictEqual(SH.FORMATS.length, 6, '输出格式数量变了，SEO 文案要跟着改');
     assert.strictEqual(SH.READABLE.length, 7, '读入格式数量变了');
   });
@@ -10656,8 +10657,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       'applyOps', 'isBilingualCue', 'scriptOf'].forEach(k => {
         assert.strictEqual(typeof SHF[k], 'function', '引擎缺 ' + k);
       });
-    assert.ok(SHF.TOOLS && SHF.TOOLS.length === 4, 'TOOLS 不是 4 项');
-    assert.strictEqual(J(SHF.TOOLS.map(x => x.id)), J(['none', 'gap', 'dur', 'char']), '合并拆分档位不对');
+    /* v0.9.294：合并 / 拆分的档位表从 TOOLS 换成 STEP_DEFS（不再有「不处理」这一项） */
+    assert.strictEqual(typeof SHF.mkStep, 'function', '引擎缺 mkStep');
+    assert.ok(SHF.mkStep('none') === null, '那个「不处理」的假档位怎么还在');
   });
 
   t('v0.9.292：ASS 只改时间，样式表与每条的样式列一字不差', function () {
@@ -10750,23 +10752,21 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.strictEqual(SHF.outName('noext', 'srt'), 'noext.srt', '没后缀的文件补不出后缀');
   });
 
-  t('v0.9.292：时间轴页的界面改了 —— 撤掉输出格式下拉、加上工具与逐条微调', function () {
+  /* ⚠️ 上面那三条（tool / toolVal / lblTools）在 v0.9.294 已经不存在了：
+     「合并与拆分」不是独立下拉，而是步骤流水线里的一道可叠加工序，见 294 那组断言。 */
+  t('v0.9.292：界面几处结构 —— 输出格式不是下拉、逐条微调在', function () {
     const h = readT('shift.html');
     assert.ok(!/id="outFmt"/.test(h), '页面还在让用户选输出格式（本页不做转换）');
-    assert.ok(/id="tool"/.test(h), '没有合并与拆分的下拉');
-    assert.ok(/id="toolVal"/.test(h), '没有合并与拆分的数值框');
     assert.ok(/id="outKeep"/.test(h), '没有「输出与原文件一致」的说明');
     assert.ok(/id="list"/.test(h), '没有逐条微调的列表');
     assert.ok(/data-i18n="btnUndo"/.test(h), '没有撤销按钮');
     assert.ok(/data-i18n="btnMore"/.test(h), '没有「显示更多」按钮');
-    assert.ok(/data-i18n="lblTools"/.test(h), '没有合并与拆分的标题');
-    assert.ok(/shift-core\.js\?v=0\.9\.293/.test(h) && /shift-i18n\.js\?v=0\.9\.293/.test(h),
-      '三件套没带版本号（改了词典老访客吃缓存）');
   });
 
   t('v0.9.292：新增词条 27 语齐全', function () {
     const dic = readT('shift-i18n.js');
-    ['lblTools', 'toolNone', 'toolGap', 'toolDur', 'toolChar', 'phGap', 'hintGap',
+    /* toolNone 已随 v0.9.294 的「步骤流水线」删掉，见下面那组 294 断言 */
+    ['lblTools', 'toolGap', 'toolDur', 'toolChar', 'phGap', 'hintGap',
       'phDur', 'hintDur', 'phChar', 'hintChar', 'lblList', 'hintList', 'btnMergeNext',
       'btnSplit', 'btnUndo', 'btnMore', 'statEdit', 'lblOutKeep', 'outSame',
       'msgMerged', 'msgSplit', 'msgUndo', 'msgNoEdit'].forEach(k => {
@@ -10823,6 +10823,226 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     ['SEO_CONVERT', 'SEO_BILINGUAL', 'SEO_SHIFT'].forEach(tb => {
       const b = sv.split('const ' + tb + ' = {')[1].split('\n};')[0];
       assert.ok(!/不上传服务器/.test(b), tb + ' 的 desc 还在说「不上传服务器」');
+    });
+  });
+
+  /* ============ v0.9.294：调整可以叠加 —— 一条可增删 / 排序 / 停用的步骤流水线 ============
+     背景：用户指出「调整方式」和「合并与拆分」本来就是同一类东西，而且只给单选不够用
+     —— 现实里常是「先延后 2 秒，再按 1.001 缩放」这种两步叠加。 */
+  const S3 = [
+    { start: 1000, end: 3000, text: 'Hello' },
+    { start: 3100, end: 5000, text: 'World' },
+    { start: 9000, end: 16000, text: 'A fairly long sentence here' }
+  ];
+
+  t('v0.9.294：六种工序都能在同一个流水线里当一步', function () {
+    assert.ok(SHF, '没加载到 shift-core.js');
+    assert.strictEqual(J(SHF.STEP_ORDER), J(['shift', 'rate', 'two', 'gap', 'dur', 'char']), '工序顺序不对');
+    ['shift', 'rate', 'two', 'gap', 'dur', 'char'].forEach(id => {
+      assert.ok(SHF.STEP_DEFS[id], '工序 ' + id + ' 没有定义');
+      const st = SHF.mkStep(id);
+      assert.strictEqual(st.id, id, id + ' 的 mkStep 不对');
+      assert.strictEqual(st.off, false, id + ' 默认该是启用的');
+      assert.strictEqual(typeof st.v.length, 'number', id + ' 的参数不是数组');
+    });
+    /* 两点校正是四栏（当前首末 + 目标首末），其余工序都是单值 */
+    assert.strictEqual(SHF.mkStep('two').v.length, 4, '两点校正不是四个输入框');
+    assert.strictEqual(SHF.mkStep('shift').v.length, 1, '平移不是单值');
+  });
+
+  t('v0.9.294：步骤按从上到下的顺序依次作用 —— 先平移再缩放', function () {
+    /* 用户提的真实场景：整体延后 2 秒，再按 1.001 缩放（25fps ↔ 23.976） */
+    const r = SHF.applySteps(S3, [
+      { id: 'shift', off: false, v: ['2'] },      /* 界面单位是「秒」，引擎自己乘 1000 */
+      { id: 'rate', off: false, v: ['1.001'] }
+    ]);
+    assert.ok(r.ok, '流水线跑不通');
+    /* 先平移（1000 → 3000）再缩放（3000 × 1.001 = 3003）；反过来算是 1000×1.001+2000 = 3001 */
+    assert.strictEqual(r.cues[0].start, Math.round((1000 + 2000) * 1.001), '先平移后缩放的结果不对');
+    assert.strictEqual(r.cues[0].start, 3003, '先平移后缩放的结果不对（应当是 3003 而不是 3001）');
+    /* 反过来摆：先缩放再平移，时长会跟着缩放 —— 顺序换了结果必须不一样 */
+    const r2 = SHF.applySteps(S3, [
+      { id: 'rate', off: false, v: ['2'] },
+      { id: 'shift', off: false, v: ['1'] }
+    ]);
+    assert.strictEqual(r2.cues[0].start, 2000 + 1000, '先缩放后平移的结果不对');
+    assert.strictEqual(r2.cues[0].end - r2.cues[0].start, 4000, '缩放后时长没跟着变');
+  });
+
+  t('v0.9.294：可以多步叠加 —— 平移 + 合并 + 拆分一起跑', function () {
+    const r = SHF.applySteps(S3, [
+      { id: 'shift', off: false, v: ['0.2'] },
+      { id: 'gap', off: false, v: ['5000'] },
+      { id: 'dur', off: false, v: ['3'] }
+    ]);
+    assert.ok(r.ok, '三步流水线跑不通');
+    assert.ok(r.merged > 0, '没合并');
+    assert.ok(r.split > 0, '没拆分');
+    assert.strictEqual(r.cues[0].start, 1200, '平移 0.2 秒没生效');
+    /* 合并计数 + 拆分计数各自独立累加，不许互相覆盖 */
+    assert.strictEqual(typeof r.clamped, 'number', '截断计数丢了');
+  });
+
+  t('v0.9.294：停用一道工序 = 整道跳过，删掉不用重建流水线', function () {
+    const r = SHF.applySteps(S3, [
+      { id: 'shift', off: true, v: ['5'] },
+      { id: 'gap', off: false, v: ['500'] }
+    ]);
+    assert.ok(r.ok, '停用的工序不该挡住流水线');
+    assert.strictEqual(r.cues[0].start, 1000, '停用的那步还是生效了');
+    assert.strictEqual(r.cues[0].start, S3[0].start, '停用平移后应该原封不动');
+  });
+
+  t('v0.9.294：参数填不对就整条拒绝出结果，并说是哪一步', function () {
+    const bad = [
+      [{ id: 'shift', off: false, v: [''] }, 'shift'],
+      [{ id: 'shift', off: false, v: ['abc'] }, 'shift'],
+      [{ id: 'rate', off: false, v: ['0'] }, 'rate'],
+      [{ id: 'rate', off: false, v: ['-1'] }, 'rate'],
+      [{ id: 'two', off: false, v: ['00:00:01,000', '', '00:00:02,000', '00:00:03,000'] }, 'two'],
+      [{ id: 'dur', off: false, v: ['0'] }, 'dur'],
+      [{ id: 'char', off: false, v: ['-5'] }, 'char']
+    ];
+    bad.forEach(p => {
+      const r = SHF.applySteps(S3, [p[0]]);
+      assert.strictEqual(r.ok, false, p[1] + ' 的参数明显不对却被放过去了');
+      assert.strictEqual(r.bad, p[1], '报错指错了工序（期望 ' + p[1] + '，实际 ' + r.bad + '）');
+    });
+    /* 停用的工序参数再烂也不该拦路 */
+    const r = SHF.applySteps(S3, [{ id: 'dur', off: true, v: [''] }]);
+    assert.ok(r.ok, '停用工序的参数不该参与校验');
+  });
+
+  t('v0.9.294：单位换算只在引擎做一处 —— 平移框写「秒」，毫秒不许外泄', function () {
+    const r = SHF.applySteps(S3, [{ id: 'shift', off: false, v: ['2'] }]);
+    assert.strictEqual(r.cues[0].start, 1000 + 2000, '2 秒没变成 2000 毫秒');
+    /* ⚠️ v0.9.293 之前 #msVal 这名字骗人：看着是毫秒，输入其实是秒 */
+    assert.ok(!/msVal/.test(readT('shift.html')), '那个叫 ms 却按秒算的输入框又回来了');
+  });
+
+  t('v0.9.294：页面撤掉两个独立区块，换成一条步骤列表', function () {
+    const h = readT('shift.html');
+    assert.ok(!/id="mode"/.test(h), '「调整方式」下拉没撤掉');
+    assert.ok(!/id="tool"/.test(h), '「合并与拆分」下拉没撤掉');
+    assert.ok(!/id="toolVal"/.test(h), '「合并与拆分」数值框没撤掉');
+    assert.ok(!/data-i18n="lblTools"/.test(h), '「合并与拆分」的独立标题没撤掉');
+    assert.ok(/id="steps"/.test(h), '没有步骤流水线的容器');
+    assert.ok(/id="addSel"/.test(h), '没有「添加哪道工序」的下拉');
+    assert.ok(/data-i18n="btnAddStep"/.test(h), '没有添加步骤按钮');
+    assert.ok(/data-i18n="lblSteps"/.test(h), '没有「调整步骤」标题');
+    /* 单位贴在输入框里（绝对定位的 .un），不靠 placeholder 传达 */
+    assert.ok(/\.st \.pv \.un/.test(h), '单位后缀的样式没了（单位又只能靠 placeholder 了）');
+    assert.ok(/data-toggle=/.test(h) && /data-up=/.test(h) && /data-dn=/.test(h) && /data-del=/.test(h),
+      '步骤行的停用 / 上下移 / 删除按钮不全');
+  });
+
+  t('v0.9.294：新增词条 27 语齐全（含三条短单位）', function () {
+    const dic = readT('shift-i18n.js');
+    ['lblSteps', 'btnAddStep', 'hintSteps', 'btnOff', 'btnOn', 'unitX',
+      'unitSec', 'unitMs', 'unitChar', 'emptySteps', 'errStep', 'msgNoStep'].forEach(k => {
+        const n = (dic.match(new RegExp('(^|[^A-Za-z])' + k + '\\s*:', 'gm')) || []).length;
+        assert.strictEqual(n, 27, '词条 ' + k + ' 不是 27 语（实际 ' + n + '）');
+      });
+    const n = (dic.match(/errStep:\s*'(?:[^'\\]|\\.)*\{0\}(?:[^'\\]|\\.)*'/g) || []).length;
+    assert.strictEqual(n, 27, 'errStep 的 {0} 占位符不是 27 处（实际 ' + n + '）');
+    /* 单位后缀要塞进 110px 的输入框，完整单词会撑爆 */
+    [['zh-CN', 'unitSec', '秒'], ['en', 'unitSec', 'sec'], ['fr', 'unitMs', 'ms']].forEach(p => {
+      const blk = dic.split("\n    '" + p[0] + "':")[1].split("\n    '")[0];
+      const m = blk.match(new RegExp("(?:^|[^\\w])" + p[1] + ":\\s*'((?:[^'\\\\]|\\\\.)*)'"));
+      assert.ok(m && m[1] === p[2], p[0] + ' 的 ' + p[1] + ' 不是短写法（实际 ' + (m && m[1]) + '）');
+    });
+  });
+
+  t('v0.9.294：阈值调小不许反而切不动 —— 切不到理想段数就降档', function () {
+    /* 一条 21 秒的长条，整句只有 5 个词；理想段数 = ceil(21/2) = 11 段，
+       但英语不许劈单词，切不出 11 段 —— 改之前是整条放弃（split=0），用户本想把字幕
+       切得更碎，结果一动不动。修法：从理想段数往下退到能切为止（至少 2 段）。 */
+    /* 线上真实例子：合并后的一条 21 秒长条，整句只有 5 个词 */
+    const big = { start: 1000, end: 22000, text: 'Hello there my friend\nBye' };
+    const a = SHF.splitByDur([big], 2);
+    const b = SHF.splitByDur([big], 3);
+    const c = SHF.splitByDur([big], 6);
+    assert.ok(a.split > 0, '最长 2 秒却一条都没切');
+    assert.ok(a.cues.length >= b.cues.length, '阈值更小反而段数更少（2s=' + a.cues.length + ' < 3s=' + b.cues.length + '）');
+    assert.ok(b.cues.length >= c.cues.length, '阈值更小反而段数更少（3s=' + b.cues.length + ' < 6s=' + c.cues.length + '）');
+    /* 降档归降档，首尾时间不许漂 */
+    assert.strictEqual(a.cues[0].start, big.start, '首条起点漂了');
+    assert.strictEqual(a.cues[a.cues.length - 1].end, big.end, '末条终点漂了');
+    /* ⚠️ 不劈单词这条红线不许因为降档被破：整条就一个单词时切不了就是不切 */
+    assert.strictEqual(SHF.splitByDur([{ start: 0, end: 9000, text: 'Hello' }], 2).cues.length, 1,
+      '单单词被劈开了（Hel / lo 这种字幕没人能用）');
+    /* 时长本来就在阈值以内的一条，不许被乱动 */
+    assert.strictEqual(SHF.splitByDur([{ start: 0, end: 2000, text: 'Ok' }], 6).cues.length, 1);
+  });
+
+  t('v0.9.294：按「有没有空格」分文字，别按「是不是中日韩」一刀切', function () {
+    /* 12 秒长条 + 最长 3 秒 == 要切 4 段。十种文字都得切得动，且不许劈坏词。 */
+    const CASES = [
+      ['中文', '这是一句没有任何空格的中文长句需要被拆开处理'],
+      ['日文', 'これはスペースのない日本語の長い字幕文です'],
+      ['韩语', '이것은 공백으로 단어를 구분하는 한국어 자막입니다'],
+      ['泰语', 'นี่คือคำบรรยายภาษาไทยที่ไม่มีช่องว่างระหว่างคำ'],
+      ['缅甸文', 'ဤသည်စာတန်းထိုးမြန်မာဘာသာစကားဖြစ်သည်'],
+      ['英文', 'This is an English subtitle sentence without breaks'],
+      ['俄文', 'Это русская субтитр строка без переносов'],
+      ['阿拉伯文', 'هذه جملة ترجمة عربية بدون فواصل داخلية'],
+      ['希伯来文', 'זוהי שורת כתוביות עברית ללא סימונים'],
+      ['越南语', 'Đây là một câu phụ đề tiếng Việt không dấu ngắt']
+    ];
+    CASES.forEach(p => {
+      const segs = SHF.splitByDur([{ start: 0, end: 12000, text: p[1] }], 3).cues;
+      assert.ok(segs.length >= 2, p[0] + ' 拆不动（"最长 3 秒"对 12 秒的长条没反应）');
+      segs.forEach(s => assert.ok(s.end > s.start, p[0] + ' 切出了零时长或倒挂的时间段'));
+      assert.strictEqual(segs[segs.length - 1].end, 12000, p[0] + ' 末段终点没落在原位');
+    });
+    /* ① 韩语有空格分词 —— 必须整词落地，不许在词中间硬切
+         （改之前 RE_CJK 里带了谚文，把 한국어 这类词切成了 두 半截） */
+    /* 用「拼回去还对不对」当判据：只要有一刀切在词中间，join(' ') 就还原不出原文 */
+    const ko = SHF.splitByDur([{ start: 0, end: 12000, text: '이것은 공백으로 단어를 구분하는 한국어 자막입니다' }], 3).cues;
+    assert.strictEqual(ko.map(s => s.text).join(' '),
+      '이것은 공백으로 단어를 구분하는 한국어 자막입니다',
+      '韩语被切在了词中间（改之前 RE_CJK 带着谚文，允许按字数硬切）');
+    /* ② 西文不许劈单词这条红线没被放宽 */
+    const en = SHF.splitByDur([{ start: 0, end: 12000, text: 'This is an English subtitle sentence without breaks' }], 3).cues;
+    assert.strictEqual(en.map(s => s.text).join(' '), 'This is an English subtitle sentence without breaks',
+      '英文切完拼不回原文（单词被劈了）');
+    /* ③ 泰语这种几乎没空格的文字，允许按字硬切 —— 但不许吐出空段 */
+    const th = SHF.splitByDur([{ start: 0, end: 12000, text: 'นี่คือคำบรรยายภาษาไทยที่ไม่มีช่องว่างระหว่างคำ' }], 3).cues;
+    assert.ok(th.length >= 2, '泰语拆不动');
+    th.forEach(s => assert.ok(s.text.trim().length > 0, '泰语切出了空片段'));
+  });
+
+  t('v0.9.294：时间按「占多宽」分，中文不该比英文拿得少', function () {
+    /* 同一个长度的两段：中文 6 字（显示宽 6），英文 6 词 29 字符（显示宽 14.5）。
+       按字符数分的话中文那段拿到的时间会明显偏短，读不完。 */
+    const cue = { start: 0, end: 12000, text: '一二三四五六 abcdefghijklmnopqrstuvwxyz' };
+    const segs = SHF.splitByDur([cue], 6).cues;
+    assert.ok(segs.length >= 2, '没拆开');
+    const mid = segs.find(s => /[一-鿿]/.test(s.text) && !/[a-z]/.test(s.text));
+    if (mid) {
+      const ratio = (mid.end - mid.start) / 12000;
+      assert.ok(ratio > 0.2, '中文那段只拿到 ' + Math.round(ratio * 100) + '% 的时间，字比字母宽、按字符数分是错的');
+    }
+    /* 混排：时间总和必须严丝合缝 */
+    assert.strictEqual(segs[segs.length - 1].end, 12000, '末段终点没落在原位');
+    for (let i = 1; i < segs.length; i++) assert.strictEqual(segs[i].start, segs[i - 1].end, '第 ' + i + ' 段与前一段之间有缝');
+  });
+
+  t('v0.9.294：阿拉伯语 / 希伯来语整页跟着翻成从右往左', function () {
+    const h = readT('shift.html');
+    assert.ok(/documentElement\.dir\s*=/.test(h), '切语言时没设置页面方向');
+    assert.ok(/LANG === 'ar' \|\| LANG === 'he'/.test(h), 'RTL 只该给阿拉伯语和希伯来语');
+    /* 单位后缀是绝对定位的，rtl 时必须挪到左边，否则压在数字上 */
+    assert.ok(/\[dir="rtl"\] \.st \.pv \.un\{right:auto;left:10px\}/.test(h), 'rtl 下单位后缀没挪位置');
+    /* 时间码和数字框本身仍保持左起 —— 反过来写没人读得懂 */
+    assert.ok(/\[dir="rtl"\] \.num,\[dir="rtl"\] \.tm\{direction:ltr/.test(h), 'rtl 下输入框没保持从左往右');
+  });
+
+  t('v0.9.294：两个旧词条（调整方式 / 不处理）已从 27 语里删干净', function () {
+    const dic = readT('shift-i18n.js');
+    ['lblMode', 'toolNone'].forEach(k => {
+      const n = (dic.match(new RegExp('(^|[^A-Za-z])' + k + '\\s*:', 'gm')) || []).length;
+      assert.strictEqual(n, 0, k + ' 成了死词条还在词典里（' + n + ' 处）');
     });
   });
 
