@@ -79,21 +79,37 @@
   /* 用指定编码把字串还原成字节。
      ⚠️ 有一个字在这个编码里不存在就返回 null —— 说明「这段字当初不可能是这么存的」，
         直接掐掉这个候选，比硬塞个问号凑出一个假结果强。 */
-  /* ⚠️ 浏览器 / Node 里的 'latin1' 其实是 **windows-1252**，不是纯粹的 ISO-8859-1：
-     字节 0x80–0x9F 会被解成 € ‚ ƒ „ … † ‡ ˆ ‰ Š ‹ Œ Ž ' ' " " • – — ˜ ™ š › œ ž Ÿ
-     这一批「智能引号 / 破折号 / 省略号」，而不是控制字符。
+  /* ⚠️ latin1 这一档真正说的是 **windows-1252**，不是纯粹的 ISO-8859-1：
+     字节 0x80–0x9F 是 € ‚ ƒ „ … † ‡ ˆ ‰ Š ‹ Œ Ž ' ' " " • – — ˜ ™ š › œ ž Ÿ
+     这一批「智能引号 / 破折号 / 省略号」，不是控制字符。
      所以反过来编码时必须把它们认回去 —— 不然「â€™ → '」「æ—¥ → 日」这类最常见的乱码
      会因为「这个字在 latin1 里没有」而被整个候选掐掉，页面上一个候选都不出。 */
+  /* 0x80~0x9F 共 32 个位置；其中 0x81/0x8D/0x8F/0x90/0x9D 在 windows-1252 里没有定义，
+     解码后仍是 C1 控制字符 —— 按「原样」认回同一个字节即可 */
+  var W1252_SEQ = [0x20AC, 0x0081, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021, 0x02C6, 0x2030,
+    0x0160, 0x2039, 0x0152, 0x008D, 0x017D, 0x008F, 0x0090, 0x2018, 0x2019, 0x201C,
+    0x201D, 0x2022, 0x2013, 0x2014, 0x02DC, 0x2122, 0x0161, 0x203A, 0x0153, 0x009D,
+    0x017E, 0x0178];
   var W1252 = (function () {
-    /* 0x80~0x9F 共 32 个位置；其中 0x81/0x8D/0x8F/0x90/0x9D 在 windows-1252 里没有定义，
-       解码后仍是 C1 控制字符 —— 按「原样」认回同一个字节即可 */
-    var seq = [0x20AC, 0x0081, 0x201A, 0x0192, 0x201E, 0x2026, 0x2020, 0x2021, 0x02C6, 0x2030,
-      0x0160, 0x2039, 0x0152, 0x008D, 0x017D, 0x008F, 0x0090, 0x2018, 0x2019, 0x201C,
-      0x201D, 0x2022, 0x2013, 0x2014, 0x02DC, 0x2122, 0x0161, 0x203A, 0x0153, 0x009D,
-      0x017E, 0x0178], m = {}, i;
-    for (i = 0; i < seq.length; i++) m[seq[i]] = 0x80 + i;
+    var m = {}, i;
+    for (i = 0; i < W1252_SEQ.length; i++) m[W1252_SEQ[i]] = 0x80 + i;
     return m;
   })();
+
+  /* ⚠️ latin1 这一档**不交给 TextDecoder**，自己解。
+     原因：同一个标签在不同运行时里不是一个东西 ——
+       浏览器 / Node 21+ 按 WHATWG 把它当 windows-1252（0x99 → ™、0x80 → €）；
+       Node 20 及更早走 ICU，把它当真正的 ISO-8859-1（0x99 → U+0099 控制字符）。
+     交给运行时的话「同一份乱码在不同环境修出不同结果」，测试也会在服务器上红。
+     自己解就一份答案：**一律按 windows-1252**，这也是各家浏览器与实际老播放器的行为。 */
+  function decodeLatin1(bytes) {
+    var out = '', i, b;
+    for (i = 0; i < bytes.length; i++) {
+      b = bytes[i];
+      out += String.fromCharCode((b >= 0x80 && b <= 0x9F) ? W1252_SEQ[b - 0x80] : b);
+    }
+    return out;
+  }
 
   function toBytes(str, enc) {
     if (enc === 'utf-8') { return TE ? TE.encode(str) : null; }
@@ -120,6 +136,7 @@
   }
 
   function fromBytes(bytes, enc) {
+    if (enc === 'latin1') { return decodeLatin1(bytes); }
     try { return new TextDecoder(enc).decode(bytes); } catch (e) { return null; }
   }
 

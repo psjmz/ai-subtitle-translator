@@ -11317,6 +11317,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
           「这个字在 latin1 里不存在」而被整个候选掐掉，页面上一个候选都不出。 */
     const moji = R_D(R_E('It’s fine — really', 'utf-8'), 'latin1');
     assert.strictEqual(moji, 'Itâ€™s fine â€” really', 'windows-1252 的解码形态变了：' + moji);
+    /* ⚠️ 这一档不许交给 TextDecoder：同一个 'latin1' 标签在浏览器 / Node 21+ 是 windows-1252
+       （0x99 → ™），在 Node 20 及更早走 ICU 是真正的 ISO-8859-1（0x99 → U+0099 控制字符）。
+       交给运行时的话同一份乱码在不同环境修出不同结果，服务器上跑单测还会红。
+       引擎自己解，一份答案 —— 下面这条钉死字节 → 字的对应关系。 */
+    assert.strictEqual(R_D(new Uint8Array([0x99, 0x80, 0x93, 0x41]), 'latin1'), '™€“A',
+      'latin1 这一档又交回运行时了（不同运行时结果会不一样）');
     const back = R_E(moji, 'latin1');
     assert.ok(back, 'latin1 反向编码失败了 —— 智能引号 / 破折号没被认回去');
     assert.strictEqual(R_D(back, 'utf-8'), 'It’s fine — really', '往返之后不再是原句');
