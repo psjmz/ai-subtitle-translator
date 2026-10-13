@@ -678,24 +678,28 @@
      本模块的输出只有两种：「这里有 N 条值得看一眼」和「这几条可以这样改」。
      改不改仍是一次 pushOp，和手工按钮走同一条路（能撤销，能重放）。 */
   var CHECK_RULES = {
-    minDur: 700,      /* 一条最短要停多久（毫秒）—— 再短观众来不及读完 */
-    maxDur: 7000,     /* 一条最长停多久（毫秒）—— 再长画面都换了几帧还挂着同一句 */
-    maxCps: 21,       /* 每秒最多多少个「宽度单位」—— 超过就是读不完 */
-    minGap: 100,      /* 两条之间至少空多少毫秒 —— 挨太近会被看成一条 */
-    maxLine: 42       /* 一行最多多少个宽度单位 —— 超了要折行，占半屏 */
+    /* v0.9.300：五把尺子对齐行业通行规范（Netflix Timed Text Style Guide 为主）。
+       宽度单位 = 全角字（汉字/假名/谚文记 1，两个拉丁字母记 1），wOf 的口径。 */
+    minDur: 833,      /* 一条最短要停多久（毫秒）—— Netflix：5/6 秒（24fps 下 20 帧） */
+    maxDur: 7000,     /* 一条最长停多久（毫秒）—— Netflix：7 秒 */
+    maxCps: 9,        /* 每秒最多读多少宽度单位 —— Netflix 简中指南 9 字/秒；拉丁半宽即 18 字符/秒，落在 17~20 区间 */
+    minGap: 100,      /* 两条之间至少空多少毫秒 —— 约 2~3 帧（Netflix：至少 2 帧） */
+    maxLine: 21       /* 一行最多多少宽度单位 —— 拉丁 42 字符（Netflix 最常引用的那条）；中文按简中指南可收紧到 16 */
   };
   /* 体检面板上那五个框怎么排、人读的单位是什么。
      ⚠️ 单位换算只在这一处（raw ↔ 引擎内部的毫秒），页面不许自己 ×1000 —— v0.9.294 的规矩。 */
   var CHECK_FIELDS = [
-    { id: 'minDur', key: 'rlDurMin', unit: 'unitSec', mul: 1000, def: 0.7 },
+    { id: 'minDur', key: 'rlDurMin', unit: 'unitSec', mul: 1000, def: 0.833 },
     { id: 'maxDur', key: 'rlDurMax', unit: 'unitSec', mul: 1000, def: 7 },
-    { id: 'maxCps', key: 'rlSpeed', unit: 'unitCps', mul: 1, def: 21 },
+    { id: 'maxCps', key: 'rlSpeed', unit: 'unitCps', mul: 1, def: 9 },
     { id: 'minGap', key: 'rlGap', unit: 'unitMs', mul: 1, def: 100 },
-    { id: 'maxLine', key: 'rlLine', unit: 'unitChar', mul: 1, def: 42 }
+    { id: 'maxLine', key: 'rlLine', unit: 'unitChar', mul: 1, def: 21 }
   ];
   /* 页面上五个框的值（人读单位）→ 引擎内部的规则表。空值 / 非数字退回默认，
-     不因为用户把框清了就整份体检跑歪。 */
-  function uiRules(vals, fmt) {
+     不因为用户把框清了就整份体检跑歪。
+     portrait：竖屏（手机 9:16）画面窄 —— 每行字数按行业惯例收到横屏的 60%
+     （中文 16→10、拉丁 42→25），时长 / 读速 / 间隔不随方向变。 */
+  function uiRules(vals, fmt, portrait) {
     var r = {}, i, f, v;
     for (i = 0; i < CHECK_FIELDS.length; i++) {
       f = CHECK_FIELDS[i];
@@ -704,6 +708,8 @@
     }
     /* 歌词天生一句接一句唱，中间没有空档 —— 按空档规则查会整份全红，等于没说 */
     if (fmt === 'lrc') r.minGap = 0;
+    /* v0.9.300：竖屏开关。maxLine × 0.6 后四舍五入，但别低于 4（一行的最低可读宽度） */
+    if (portrait) r.maxLine = Math.max(4, Math.round(r.maxLine * 0.6));
     /* 短规则不能反过来比长规则还宽，用户拖错了按错处理 */
     if (r.minDur > r.maxDur) r.minDur = CHECK_RULES.minDur;
     return r;
@@ -734,25 +740,28 @@
      long    停留比 maxDur 还长，这句在屏幕上挂太久
      fast    读速超过 maxCps，字多时间少
      line    单行宽度超过 maxLine，会折行占屏
+     rows    一条超过两行 —— Netflix「每条最多 2 行」，两大最常触发的规则之一
      overlap 已经开始于上一条还没结束 —— 两条会叠在屏幕上
      gap     与上一条的空隙不足 minGap，看起来像没断开
 
-     ⚠️ 双语条目（原文一行 + 译文一行）只查它与相邻两条的时间关系，不查停留时长和行宽：
+     ⚠️ 双语条目（原文一行 + 译文一行）只查它与相邻两条的时间关系，不查停留时长、行宽和行数：
         一条双语顶两条的信息量，拿单语的尺子量它不公平（8 秒停留对双语是正常的），
         而「一切就要 longer 猩」的拆分动作作用在它身上会把原文和译文劈成两半。
-     ⚠️ 时长类规则给足 2% 余量（至少 50 毫秒）：体检建议「按最长停留切」时，每段是按宽度
-        比例分的 —— 各段字数不可能一模一样，占字数最多的那段自然比平均值长几十毫秒。
-        没有这点余量，用户采纳了建议往下看还是红的，会以为工具没干活。 */
+     ⚠️ 检测阈值只留 2% 的小余量（v0.9.300 收紧：原来 short 也吃 maxDur 的 2%=140ms，
+        700 的尺子实际 560 才响，比规范松了一大截）。「采纳建议后还是红的」那类余量
+        由 suggest 侧自己兜底 —— 延长按 want 精确给、切分有最宽段复核的 guard 循环。 */
   function checkCues(cues, rules) {
     var r = rules || CHECK_RULES, list = cues || [], out = [], i;
+    var tolShort = Math.max(20, r.minDur * 0.02), tolLong = Math.max(50, r.maxDur * 0.02);
     for (i = 0; i < list.length; i++) {
       var c = list[i], why = [], dur = c.end - c.start, w = cueWidth(c);
-      var tolDur = r.maxDur * 0.02, tolMs = Math.max(50, tolDur);
       if (!isBilingualCue(c)) {
-        if (dur < r.minDur - tolMs) why.push('short');
-        if (dur > r.maxDur + tolMs) why.push('long');
+        if (dur < r.minDur - tolShort) why.push('short');
+        if (dur > r.maxDur + tolLong) why.push('long');
         if (isFinite(cueCps(c)) && cueCps(c) > r.maxCps * 1.02) why.push('fast');
-        if (w > r.maxLine + 0.5) why.push('line');
+        /* 行宽只留 0.25 的浮点余量：42 个拉丁字母 = 21.0 正好压线放行，43 个 = 21.5 必须报 */
+        if (w > r.maxLine + 0.25) why.push('line');
+        if (cueLines(c).length > 2) why.push('rows');
       }
       if (i > 0) {
         var pv = list[i - 1];
@@ -784,7 +793,7 @@
        「半句原文 + 半句译文」，谁都看不懂。这一刀之所以放在这里而不是只依赖
        checkCues —— 万一将来别的 pathways 也给双语报了 long，这里仍拦得住。 */
     if (isBilingualCue(c)) {
-      why = why.filter(function (x) { return x !== 'long' && x !== 'line' && x !== 'fast' && x !== 'short'; });
+      why = why.filter(function (x) { return x !== 'long' && x !== 'line' && x !== 'fast' && x !== 'short' && x !== 'rows'; });
     }
     if (!why.length) return out;
 
@@ -803,14 +812,16 @@
       var e2 = Math.min(c.start + want, ceilEnd);
       if (e2 > c.end) add('btnLengthen', { op: 'set', i: i, s: c.start, e: e2 });
     }
-    /* 太长 / 一行太宽的切开：段数按「最长停留」和「最宽行」两把尺子取大的那个。
+    /* 太长 / 一行太宽 / 行数超两条的切开：段数按「最长停留」「最宽行」「行数÷2」三把尺子取最大的那个。
        ⚠️ 算出来还得按「最宽那一段能占多少时间」复核一遍：各段字数不可能一模一样，
           21 秒 ÷ 7 秒 = 3 段是纸面上的答案，可占字数最多的那段实际是 7.2 秒 ——
           采纳完往下看还是红的，用户只会觉得工具没干活。这里按最宽段反推补几段。 */
-    if (why.indexOf('long') >= 0 || why.indexOf('line') >= 0) {
+    if (why.indexOf('long') >= 0 || why.indexOf('line') >= 0 || why.indexOf('rows') >= 0) {
       var n = 2;
       if (why.indexOf('long') >= 0) n = Math.max(n, Math.ceil(dur / r.maxDur));
       if (why.indexOf('line') >= 0) n = Math.max(n, Math.ceil(w / r.maxLine));
+      /* rows：3 行切 2 条（2+1）、5 行切 3 条（2+2+1）—— splitCue 优先按现有行分组 */
+      if (why.indexOf('rows') >= 0) n = Math.max(n, Math.ceil(cueLines(c).length / 2));
       var ceil1 = Math.min(dur, ceilEnd - c.start);
       for (var guard = 0; guard < 4; guard++) {
         /* 切 n 段时最宽那段大约是这个宽度 —— 也是它将分到的时间 */

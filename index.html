@@ -1014,6 +1014,14 @@
      粉/绿/紫/蓝已被四张工具卡占满，橙色是唯一还剩的暖色空位。
      ⚠️ 这张卡不在 site-nav.js 的 TOOLS[] 里（那是导航数据源），所以只在这一个地方定义。 */
   :root{ --as:#C2410C; --as-ink:#9A3412; --as-weak:#FFF2E8; --as-line:#FBDCC4; }
+  /* v0.9.300：五个垂直工具页（convert / bilingual / shift / repair / extract）上首页。
+     色线就是各页认领的 --acc*，色值三处同步：这里 ↔ 各页 :root ↔ 卡片与分区介绍。
+     cv 蓝 / bi 青 / sh 靛蓝 / rp 砖红 / ex 琥珀 —— 新页认色别跟这五条撞。 */
+  :root{ --cv:#185FA5; --cv-ink:#0C447C; --cv-weak:#E6F1FB; --cv-line:#B5D4F4;
+         --bi:#0E7490; --bi-ink:#0B5B72; --bi-weak:#E3F2F7; --bi-line:#A5D8E6;
+         --sh:#4F46E5; --sh-ink:#3B34B8; --sh-weak:#EEF0FE; --sh-line:#BCC2FB;
+         --rp:#B42318; --rp-ink:#8A1A12; --rp-weak:#FEF3F2; --rp-line:#FDA29B;
+         --ex:#B45309; --ex-ink:#8A3E06; --ex-weak:#FEF3E2; --ex-line:#EFAF6B; }
   .vh{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
   /* ---------------- 顶部：工具小卡 ---------------- */
@@ -1030,6 +1038,12 @@
   .tc.fx{--k:var(--fx);--kw:var(--fx-weak);--ki:var(--fx-ink);--kl:var(--fx-line)}
   .tc.dl{--k:var(--dl);--kw:var(--dl-weak);--ki:var(--dl-ink);--kl:var(--dl-line)}
   .tc.as{--k:var(--as);--kw:var(--as-weak);--ki:var(--as-ink);--kl:var(--as-line)}
+  /* v0.9.300：五张内部工具卡（垂直页），色线取自各页 --acc* */
+  .tc.cv{--k:var(--cv);--kw:var(--cv-weak);--ki:var(--cv-ink);--kl:var(--cv-line)}
+  .tc.bi{--k:var(--bi);--kw:var(--bi-weak);--ki:var(--bi-ink);--kl:var(--bi-line)}
+  .tc.sh{--k:var(--sh);--kw:var(--sh-weak);--ki:var(--sh-ink);--kl:var(--sh-line)}
+  .tc.rp{--k:var(--rp);--kw:var(--rp-weak);--ki:var(--rp-ink);--kl:var(--rp-line)}
+  .tc.ex{--k:var(--ex);--kw:var(--ex-weak);--ki:var(--ex-ink);--kl:var(--ex-line)}
   .tc:hover{border-color:var(--kl);box-shadow:0 8px 22px -16px rgba(18,18,24,.42);transform:translateY(-1px)}
   .tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--k);opacity:0;transition:opacity .15s}
   .tc:hover::before{opacity:1}
@@ -1052,6 +1066,12 @@
   .det-tx.cl{--k:var(--cl);--kw:var(--cl-weak);--ki:var(--cl-ink);--kl:var(--cl-line)}
   .det-tx.fx{--k:var(--fx);--kw:var(--fx-weak);--ki:var(--fx-ink);--kl:var(--fx-line)}
   .det-tx.dl{--k:var(--dl);--kw:var(--dl-weak);--ki:var(--dl-ink);--kl:var(--dl-line)}
+  /* v0.9.300：五段新分区介绍各认领自己的色线 */
+  .det-tx.cv{--k:var(--cv);--kw:var(--cv-weak);--ki:var(--cv-ink);--kl:var(--cv-line)}
+  .det-tx.bi{--k:var(--bi);--kw:var(--bi-weak);--ki:var(--bi-ink);--kl:var(--bi-line)}
+  .det-tx.sh{--k:var(--sh);--kw:var(--sh-weak);--ki:var(--sh-ink);--kl:var(--sh-line)}
+  .det-tx.rp{--k:var(--rp);--kw:var(--rp-weak);--ki:var(--rp-ink);--kl:var(--rp-line)}
+  .det-tx.ex{--k:var(--ex);--kw:var(--ex-weak);--ki:var(--ex-ink);--kl:var(--ex-line)}
   .det-eye{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.3px;
     padding:4px 12px;border-radius:99px;background:var(--kw);color:var(--ki)}
   .det h2{margin:15px 0 0;font-size:25px;font-weight:850;letter-spacing:-.5px;line-height:1.35;color:var(--ink)}
@@ -1128,6 +1148,16 @@
   .mk-prog i{display:block;height:100%;width:62%;background:var(--dl);border-radius:2px}
   .mk-st{font-size:11px;font-weight:700;color:var(--ok,#10B981);flex:none}
   .mk-st.run{color:var(--dl-ink)}
+  /* v0.9.300：五段新介绍（convert / bilingual / shift / repair / extract）复用上面的
+     mk-doc / mk-tl / mk-pair 拼示意图，但「结果档」的浅底与强调色跟着各段色线走 ——
+     老的 ①~④ 段不动，仍走 .mk-doc.ok 默认的 cl 绿。 */
+  .cv-fig .mk-doc.ok{background:var(--cv-weak);border-color:var(--cv-line)}
+  .cv-fig .mk-doc-h .d.good{color:var(--cv-ink)}
+  .rp-fig .mk-doc.ok{background:var(--rp-weak);border-color:var(--rp-line)}
+  .rp-fig .mk-doc-h .d.good{color:var(--rp-ink)}
+  .ex-fig .mk-doc.ok{background:var(--ex-weak);border-color:var(--ex-line)}
+  .ex-fig .mk-doc-h .d.good{color:var(--ex-ink)}
+  .sh-fig .mk-tl-row.d i{background:var(--sh);opacity:.42}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
@@ -1136,7 +1166,7 @@ crossorigin="anonymous"></script>
 
 <!-- ================================================================
      v0.9.277 首页：营销落地页
-     顶部四张工具小卡 + 每个工具一段图文详解。
+     顶部工具小卡（v0.9.300 起 8 张内部卡 + 2 张条件显示的外链卡）+ 每个工具一段图文详解。
      ⚠️ data-i18n 一律挂在「没有子元素」的节点上：
         applyI18n 是 el.textContent = t(key)，挂在有子元素的容器上会把子元素整个抹掉
         （v0.9.276 首页「当前页」标签就是这么没的）。
@@ -1149,20 +1179,20 @@ crossorigin="anonymous"></script>
     <nav class="lnav">
       <!-- v0.9.280：logo 整块做成「回首页」的入口（用户定案）。href 由 syncLogoHome() 跟着界面语言重算 ——
            /ja/ 点回来还是 /ja/，不掉语言。⚠️ 里面不放 <div>：<a> 的内容模型是「透明」，改成 span 更干净。 -->
-      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.299</span></a>
+      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.300</span></a>
       <div class="spacer"></div>
       <select id="uiLang2" aria-label="UI language"></select>
     </nav>
 
     <div class="hero">
       <h1 data-i18n-html="heroTitle">字幕的活儿，<em>交给 AI</em></h1>
-      <p data-i18n="heroSub">翻译、清洗、特效字幕、视频下载——四个工具各干各的，想用哪个点哪个。免费 · 免注册 · 隐私安全</p>
+      <p data-i18n="heroSub">翻译、清洗、特效、格式转换、双语剥离、时间轴、乱码修复、提取文本——工具各干各的，想用哪个点哪个。免费 · 免注册 · 隐私安全</p>
     </div>
   </div>
 
   <!-- 顶部：四张工具小卡 -->
   <section class="tools" aria-labelledby="toolsTitle">
-    <h2 class="vh" id="toolsTitle" data-i18n="toolsTitle">四个工具</h2>
+    <h2 class="vh" id="toolsTitle" data-i18n="toolsTitle">全部工具</h2>
     <div class="tools-row">
 
       <a class="tc tr" href="/translate.html">
@@ -1190,6 +1220,53 @@ crossorigin="anonymous"></script>
         </div>
         <div class="tc-n" data-i18n="tcFxN">特效字幕</div>
         <p class="tc-d" data-i18n="tcFxD">单语双语都能做特技：字体、颜色、描边、位置</p>
+      </a>
+
+      <!-- v0.9.300：五个垂直工具页上首页（内部工具卡，始终可见）。命名沿用各页：
+           cv=convert 格式转换 / bi=bilingual 双语剥离 / sh=shift 时间轴 / rp=repair 乱码 / ex=extract 提取。 -->
+      <a class="tc cv" href="/convert.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13m-3-3 3 3-3 3M20 17H7m3 3-3-3 3-3"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcCvN">格式转换</div>
+        <p class="tc-d" data-i18n="tcCvD">SRT / VTT / ASS 等 7 种格式互转</p>
+      </a>
+
+      <a class="tc bi" href="/bilingual.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="16" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="16" rx="1.6"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcBiN">双语剥离</div>
+        <p class="tc-d" data-i18n="tcBiD">把双语字幕拆成原文轨和译文轨</p>
+      </a>
+
+      <a class="tc sh" href="/shift.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4m10 0h4M7 8l4 4-4 4M17 8l-4 4 4 4"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcShN">时间轴调整</div>
+        <p class="tc-d" data-i18n="tcShD">整体偏移、缩放、合并拆分、逐条微调</p>
+      </a>
+
+      <a class="tc rp" href="/repair.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcRpN">乱码修复</div>
+        <p class="tc-d" data-i18n="tcRpD">认出认错的编码，把乱码倒回原样</p>
+      </a>
+
+      <a class="tc ex" href="/extract.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcExN">提取文本</div>
+        <p class="tc-d" data-i18n="tcExD">从字幕里提取纯台词，两种排版</p>
       </a>
 
       <!-- v0.9.277：视频下载工具。默认隐藏，仅官方域名由落地页脚本显示
@@ -1429,8 +1506,184 @@ crossorigin="anonymous"></script>
     </div>
   </section>
 
-  <!-- ④ 视频下载工具（同上：只在官方域名显示） -->
-  <section class="det rev" id="dlSec" aria-labelledby="detDlTitle" style="display:none">
+  <!-- ⑤ 字幕格式转换（v0.9.300：垂直页上首页，交替方向 rev） -->
+  <section class="det rev" aria-labelledby="detCvTitle">
+    <div class="det-in">
+      <div class="det-tx cv">
+        <span class="det-eye" data-i18n="tcCvN">格式转换</span>
+        <h2 id="detCvTitle" data-i18n="detCvT">字幕格式，随手一转就好</h2>
+        <p class="det-lead" data-i18n="detCvL">SRT、VTT、ASS、SBV、LRC——手里这份放不进播放器，转一下就好。时间轴和文本逐字保留，同轴双语转出来不会叠成两行。</p>
+        <ul class="det-list">
+          <li data-i18n="detCv1">读 SRT / VTT / ASS / SSA / SBV / LRC / TXT，共 7 种</li>
+          <li data-i18n="detCv2">导出 SRT / VTT / ASS / SBV / LRC / TXT，共 6 种</li>
+          <li data-i18n="detCv3">时间轴与文本逐字保留，不重排不丢条</li>
+          <li data-i18n="detCv4">双语处理四档：保留 / 只留原文 / 只留译文 / 智能去重</li>
+        </ul>
+        <a class="det-cta" href="/convert.html"><span data-i18n="detCvCta">打开格式转换</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig cv-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d">SRT</span><span class="mk-hit">00:00:01,000 --&gt; 00:00:02,000</span></div>
+          <p class="mk-p">1</p>
+          <p class="mk-p">00:00:01,000 --&gt; 00:00:02,000</p>
+          <p class="mk-p">Hello world</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">VTT</span><span class="mk-hit" data-i18n="mkTiming">时间轴未动</span></div>
+          <p class="mk-p">00:00:01.000 --&gt; 00:00:02.000</p>
+          <p class="mk-p">Hello world</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN5">逗号变点、序号褪掉，内容一个字不差</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ 双语字幕剥离 -->
+  <section class="det" aria-labelledby="detBiTitle">
+    <div class="det-in">
+      <div class="det-tx bi">
+        <span class="det-eye" data-i18n="tcBiN">双语剥离</span>
+        <h2 id="detBiTitle" data-i18n="detBiT">双语字幕，拆成干净的两轨</h2>
+        <p class="det-lead" data-i18n="detBiL">一条字幕里挤着原文和译文，或者双语 ASS 转出来两条叠在一起——四种模式拆开：整份保留、只留原文、只留译文、拆成两份各带各的时间轴。</p>
+        <ul class="det-list">
+          <li data-i18n="detBi1">一条里两行：按文字系统判断哪行是原文</li>
+          <li data-i18n="detBi2">同轴两条：按出现先后分出原文轨与译文轨</li>
+          <li data-i18n="detBi3">不假设译文一定是中文：英日、英法照样拆</li>
+          <li data-i18n="detBi4">只处理文本，时间轴一条不动</li>
+        </ul>
+        <a class="det-cta" href="/bilingual.html"><span data-i18n="detBiCta">打开双语剥离</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d" data-i18n="mkBi">双语</span><span class="mk-hit">00:00:01,000 --&gt; 00:00:02,000</span></div>
+          <p class="mk-p">Hello world</p>
+          <p class="mk-p">你好，世界</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-pair">
+          <div>
+            <span class="mk-cap" data-i18n="mkSrcAxis">原文轴</span>
+            <div class="mk-doc"><p class="mk-p">Hello world</p></div>
+          </div>
+          <div>
+            <span class="mk-cap" data-i18n="mkDstAxis">译文轴</span>
+            <div class="mk-doc"><p class="mk-p">你好，世界</p></div>
+          </div>
+        </div>
+        <p class="mk-note" data-i18n="mkN6">拆完两份各自独立，时间轴原样带走</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑦ 时间轴调整 -->
+  <section class="det rev" aria-labelledby="detShTitle">
+    <div class="det-in">
+      <div class="det-tx sh">
+        <span class="det-eye" data-i18n="tcShN">时间轴调整</span>
+        <h2 id="detShTitle" data-i18n="detShT">时间轴不对？拉一下就好</h2>
+        <p class="det-lead" data-i18n="detShL">字幕早半秒晚半秒、帧率对不上、想合并拆分、单条微调，都在一个页里做完。改完还是原来的格式，文件头一样不少。</p>
+        <ul class="det-list">
+          <li data-i18n="detSh1">整体偏移：+1.5s、-500ms、纯数字毫秒都认</li>
+          <li data-i18n="detSh2">比例缩放：23.976 与 25 的帧率错位一键拉正</li>
+          <li data-i18n="detSh3">合并 / 拆分：相邻条目随手并，长句按词边界切</li>
+          <li data-i18n="detSh4">时间轴体检：五把尺子扫一遍，只标建议不乱改</li>
+        </ul>
+        <a class="det-cta" href="/shift.html"><span data-i18n="detShCta">打开时间轴调整</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig sh-fig">
+        <div class="mk-legend" style="justify-content:center">
+          <span><i style="background:#C9C7D2"></i><span data-i18n="mkWas">原来</span></span>
+          <span><i style="background:#4F46E5;opacity:.42"></i><span data-i18n="mkNow">现在</span></span>
+        </div>
+        <div class="mk-tl">
+          <div class="mk-tl-row"><i style="left:8%;width:28%"></i><i style="left:42%;width:20%"></i><i style="left:66%;width:26%"></i></div>
+          <div class="mk-tl-row d"><i style="left:0;width:28%"></i><i style="left:34%;width:20%"></i><i style="left:58%;width:26%"></i></div>
+        </div>
+        <p class="mk-note" data-i18n="mkN7">整体偏移 0.5s：每一条一起挪，间隙不变</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑧ 乱码修复 -->
+  <section class="det" aria-labelledby="detRpTitle">
+    <div class="det-in">
+      <div class="det-tx rp">
+        <span class="det-eye" data-i18n="tcRpN">乱码修复</span>
+        <h2 id="detRpTitle" data-i18n="detRpT">字幕乱码，认出它本来的样子</h2>
+        <p class="det-lead" data-i18n="detRpL">打开是「æ—¥æœ¬èªž」这种天书？多半是编码认错了。认出它原本是 GBK 还是 Shift_JIS，把读错的字倒回去，另存成想要的编码。</p>
+        <ul class="det-list">
+          <li data-i18n="detRp1">认得 UTF-8 / GBK / Big5 / Shift_JIS / EUC-KR / Latin-1</li>
+          <li data-i18n="detRp2">粘贴的文本也能试；替换符太多会直说修不回来</li>
+          <li data-i18n="detRp3">文件往往没坏——结果卡永远可用，默认另存 UTF-8</li>
+          <li data-i18n="detRp4">另存六档编码，认出错编码时默认带 BOM</li>
+        </ul>
+        <a class="det-cta" href="/repair.html"><span data-i18n="detRpCta">打开乱码修复</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig rp-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad" data-i18n="mkGarbled">乱码</span><span class="mk-hit">UTF-8 ?</span></div>
+          <p class="mk-p">â€œæ—¥æœ¬èªž</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good" data-i18n="mkFixed">修复后</span><span class="mk-hit">Shift_JIS → UTF-8</span></div>
+          <p class="mk-p">「日本語の字幕」</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN8">认出它本来的编码，把读错的字倒回去</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑨ 提取纯文本 -->
+  <section class="det rev" aria-labelledby="detExTitle">
+    <div class="det-in">
+      <div class="det-tx ex">
+        <span class="det-eye" data-i18n="tcExN">提取文本</span>
+        <h2 id="detExTitle" data-i18n="detExT">把台词从字幕里提出来</h2>
+        <p class="det-lead" data-i18n="detExL">做笔记、发文章、喂模型，要的是纯文本不是时间码。连续段落像一篇文章，逐条一行像一份清单；听障提示、水印、重复句顺手去掉。</p>
+        <ul class="det-list">
+          <li data-i18n="detEx1">读 SRT / VTT / ASS / SBV / LRC / TXT</li>
+          <li data-i18n="detEx2">两种排版：按停顿句读拼成段落，或一行一条</li>
+          <li data-i18n="detEx3">可选去听障提示、水印行、相邻重复句</li>
+          <li data-i18n="detEx4">说话人前缀与歌词行默认保留，可一键关掉</li>
+        </ul>
+        <a class="det-cta" href="/extract.html"><span data-i18n="detExCta">打开文本提取</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig ex-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d">SRT</span></div>
+          <p class="mk-p"><s>(脚步声)</s></p>
+          <p class="mk-p">TOM: 你来了。</p>
+          <p class="mk-p"><s>字幕由某某组制作</s></p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">TXT</span></div>
+          <p class="mk-p">TOM: 你来了。</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN9">时间码褪掉，只剩台词本身</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑩ 视频下载工具（同上：只在官方域名显示） -->
+  <section class="det" id="dlSec" aria-labelledby="detDlTitle" style="display:none">
     <div class="det-in">
       <div class="det-tx dl">
         <span class="det-eye" data-i18n="tcDlN">视频下载工具</span>
@@ -1493,7 +1746,7 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.299"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
+<script src="site-i18n.js?v=0.9.300"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
 <script>
 /* =============================================================================
    首页（落地页）脚本 —— v0.9.277
