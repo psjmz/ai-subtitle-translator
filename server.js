@@ -1121,7 +1121,7 @@ const SEO = {
     htmlLang: 'el', ogLocale: 'el_GR', siteName: 'AI-SRTSub',
     title: 'AI-SRTSub - Δωρεάν μεταφραστής υποτίτλων με AI για ταινίες και σειρές',
     desc: 'Το ai-srtsub.com είναι ένας δωρεάν μεταφραστής υποτίτλων με AI για τους λάτρεις του κινηματογράφου. Μετέφρασε τους υπότιτλους ξένων ταινιών, σειρών και ντοκιμαντέρ στη γλώσσα σου με ένα κλικ.',
-    kw: 'μετάφραση υποτίτλων, μεταφραστής υποτίτλων AI, δωρεάν μετάφραση υποτίτλων, μετάφραση SRT, μετάφραση VTT, μετάφραση ASS, υπότιτλοι ταινιών, υπότιτλοι σειρών, υπότιτλοι Netflix, υπότιτλοι anime, δίγλωσσοι υπότιτλοι, μετάφραση υποτίτλων online, υπότιτλοι YouTube, δωρεάν εργαλείο υποτίτλων, δωρεάν μετάφραση υποτίτλων, δωρεάν μεταφραστής SRT',
+    kw: 'μετάφραση υποτίτλων, μεταφραστής υποτίτλων AI, δωρεάν μετάφραση υποτίτλων, μετάφραση SRT, μετάφραση VTT, μετάφραση ASS, υπότιτλοι ταινιών, υπότιτλοι σειρών, υπότιτλοι Netflix, υπότιτλοι anime, δίγλωσσοι υπότιτλοι, μετάφραση υποτίτλων online, υπότιτλοι YouTube, δωρεάν εργαλείο υποτίτλων, δωρεάν μεταφραστής SRT',
     ogTitle: 'AI-SRTSub - Δωρεάν μεταφραστής υποτίτλων με AI για ταινίες και σειρές',
     ogDesc: 'Δωρεάν μεταφραστής υποτίτλων με AI για τους λάτρεις του κινηματογράφου: υπότιτλοι ξένων ταινιών, σειρών και ντοκιμαντέρ στη γλώσσα σου με ένα κλικ, με αυτόματη ευθυγράμμιση χρονογραμμής.',
     jsonldName: 'AI-SRTSub', jsonldAlt: '随心字幕 AI',
@@ -3247,6 +3247,12 @@ function seoHead(lang, base, page){
     '<meta property="og:image" content="' + base + '/og-image.png">',
     '<meta property="og:site_name" content="' + siteName + '">',
     '<meta property="og:locale" content="' + ogLocale + '">',
+    /* v0.9.311：og:locale:alternate —— 本页其余 26 个语言版本，给 FB 等社交平台做语言发现用。
+       搜索引擎的语言版本靠 hreflang（早就有），这个缺失不影响 Google，但多语言站配上更完整。
+       ⚠️ 顺序跟 SEO_LANGS 走，与 hreflang 一一对应，方便对照排查。 */
+    SEO_LANGS.filter(function (l) { return l !== lang && P.table[l]; }).map(function (l) {
+      return '<meta property="og:locale:alternate" content="' + (OG_LOCALE[l] || '') + '">';
+    }).join('\n'),
     '<meta property="og:url" content="' + selfUrl + '">',
     '<meta name="twitter:card" content="summary_large_image">',
     '<meta name="twitter:title" content="' + ea(ogTitle) + '">',

@@ -112,8 +112,8 @@
     'hi': {
       brandName: 'AI-SRTSub', navHome: 'होम', navTr: 'अनुवाद', navFx: 'इफ़ेक्ट', navCl: 'क्लीनर',
       heroA: 'सबटाइटल', heroEm: 'कनवर्टर',
-      heroSub: '',
-      upTitle: 'सबटाइटल डालें', dzTxt: 'फ़ाइल यहाँ खींचें, या चुनने के लिए क्लिक करें', pastePh: 'या सबटाइटल का текст यहाँ पेस्ट करें',
+      heroSub: 'SRT, VTT, ASS, SBV, LRC और TXT के बीच बदलें, टाइमलाइन जस की तस रहती है',
+      upTitle: 'सबटाइटल डालें', dzTxt: 'फ़ाइल यहाँ खींचें, या चुनने के लिए क्लिक करें', pastePh: 'या सबटाइटल का टेक्स्ट यहाँ पेस्ट करें',
       btnClear: 'साफ़ करें', lblSrc: 'पहचाना गया फ़ॉर्मैट', lblOut: 'आउटपुट फ़ॉर्मैट', btnGo: 'कनवर्ट करें',
       repTitle: 'परिणाम', btnDl: 'डाउनलोड', btnCopy: 'कॉपी', statCues: '{0} पंक्तियाँ', statDur: 'लंबाई {0}',
       msgDone: 'हो गया', errEmpty: 'पहले सबटाइटल का टेक्स्ट डालें', errFmt: 'सबटाइटल फ़ॉर्मैट पहचाना नहीं जा सका', footBrand: 'AI-SRTSub · सबटाइटल कनवर्टर',
@@ -122,7 +122,7 @@
     'th': {
       brandName: 'AI-SRTSub', navHome: 'หน้าแรก', navTr: 'แปล subtitle', navFx: 'เอฟเฟกต์', navCl: 'คลีนเนอร์',
       heroA: 'ตัวแปลง', heroEm: 'ซับไตเติล',
-      heroSub: '',
+      heroSub: 'แปลงระหว่าง SRT, VTT, ASS, SBV, LRC และ TXT โดยไทม์ไลน์คงเดิม',
       upTitle: 'ใส่ซับไตเติล', dzTxt: 'ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือก', pastePh: 'หรือวางข้อความซับไตเติลที่นี่',
       btnClear: 'ล้าง', lblSrc: 'รูปแบบที่ตรวจพบ', lblOut: 'รูปแบบเอาต์พุต', btnGo: 'แปลง',
       repTitle: 'ผลลัพธ์', btnDl: 'ดาวน์โหลด', btnCopy: 'คัดลอก', statCues: '{0} บรรทัด', statDur: 'ความยาว {0}',
