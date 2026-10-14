@@ -575,6 +575,67 @@ function appendCEvent(ip, body){
   } catch (e) {}
 }
 
+/* ---------------- 六个垂直工具页的统一使用记录（v0.9.308）----------------
+   背景：shift / convert / extract / bilingual / repair / glossary 六个页面全是纯前端工具，
+   解析与生成都在浏览器里做，请求根本不过服务端 —— 不埋点，后台永远不知道有没有人在用、
+   哪一页最忙、用户是不是「传进来了却没导出」。六个 SEO 入口的价值就凭感觉判断。
+
+   ⚠️ 为什么这六页合起来只写一本账，而翻译/合并/清洗要分三本：
+      三本账的**口径互不相同**（翻译按任务去重累加、合并一次一记、清洗带规则命中），
+      混在一起没法看；而这六页口径完全一样 —— 都是「某个页发生了某个动作」，
+      合一本账、用 page 字段区分反而更好按页横向对比。真要拆，将来按 page 拆文件即可。
+   字段只有元数据：哪个页、什么动作、字幕条数、关键数字、导出格式。**绝不记字幕内容。 */
+const TEVENTS_PATH = path.join(DATA_DIR, 'tool-events.json');
+const TEVENTS_MAX = 3000;
+/* ⚠️ 页面白名单必须与六个页面的 reportTool(page,...) 首参一一对应。
+      漏一个 → 那一页的记录进来被判成未知页，后台看不见，等于白埋。 */
+const TOOL_PAGE = {
+  shift: 'shift', convert: 'convert', extract: 'extract',
+  bilingual: 'bilingual', repair: 'repair', glossary: 'glossary'
+};
+/* ⚠️ 动作白名单：与六页各自埋点处传的 act 一一对应（逐页对齐，共 14 个）。
+      加减动作两边必须同步，否则新动作被记成空值 —— 用户明明用了，后台却看不到。 */
+const TOOL_ACT = {
+  /* shift 时间轴调整：跑了流水线 / 用户改了一条 */
+  edit: 'edit', apply: 'apply',
+  /* convert 格式转换 / extract 字幕提取 */
+  convert: 'convert', extract: 'extract',
+  /* bilingual 双语处理：拆轨记 split，取原文·取译文·合并三档归入 merge */
+  merge: 'merge', split: 'split',
+  /* repair 乱码修复 */
+  repair: 'repair',
+  /* glossary 术语批量替换 */
+  replace: 'replace',
+  /* 六页共用的「真的下载了文件」 */
+  export: 'export'
+};
+const TOOL_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt', json: 'json' };
+function readTEvents(){
+  try {
+    const j = JSON.parse(fs.readFileSync(TEVENTS_PATH, 'utf8'));
+    if (Array.isArray(j.events)) return j;
+  } catch (e) {}
+  return { events: [] };
+}
+function appendTEvent(ip, body){
+  const b = (body && typeof body === 'object') ? body : {};
+  const page = pickWL(TOOL_PAGE, b.page);
+  const act = pickWL(TOOL_ACT, b.act);
+  /* 页或动作对不上号就丢：宁可不计，也不往账本里写一条认不出来的脏数据 */
+  if (!page || !act) return;
+  const num = v => Math.max(0, Math.min(1000000, Math.floor(+v || 0)));
+  const ev = { t: Date.now(), ip: String(ip || ''), page: page, act: act, cues: num(b.cues), n: num(b.n) };
+  /* ⚠️ 只有认得出来的格式才落字段：pickWL 认不出会返回空串，存进去后台 TOP 里就多一个
+     「(空)」，看着像「一堆人导出了未知格式」。repair 页按原编码另存，本来就没格式可说。 */
+  if (act === 'export') { const f = pickWL(TOOL_FMT, b.fmt); if (f) ev.fmt = f; }
+  try {
+    const db = readTEvents();
+    db.events.push(ev);
+    if (db.events.length > TEVENTS_MAX) db.events = db.events.slice(-TEVENTS_MAX);
+    fs.writeFileSync(TEVENTS_PATH, JSON.stringify(db), 'utf8');
+  } catch (e) {}
+}
+
 /* ---------------- 管理会话（内存 token） ---------------- */
 const TOKENS = new Set();
 function newToken(){ const tk = crypto.randomBytes(24).toString('hex'); TOKENS.add(tk); return tk; }
@@ -4061,6 +4122,21 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { ok: true });
     }
 
+    /* v0.9.308：六个垂直工具页的统一使用记录上报（公开轻接口，fire-and-forget，同上规格）。
+       body: {page:'shift'|'convert'|'extract'|'bilingual'|'repair'|'glossary',
+              act:'check'|'apply'|'edit'|'align'|'convert'|'extract'|'merge'|'split'|'repair'|'replace'|'export',
+              cues?, n?, fmt?}
+       ⚠️ page 或 act 不在白名单里就整条丢弃（不记账）—— 认不出来的脏数据会污染统计。
+       只收元数据，不收字幕内容；不认识的字段一律丢弃。 */
+    if (req.method === 'POST' && u === '/api/tool-event') {
+      let tbody;
+      try { tbody = JSON.parse(await readBody(req, 4 * 1024)); } catch (e) {
+        return sendJson(res, 400, { error: { message: 'Request body is not valid JSON' } });
+      }
+      try { appendTEvent(clientIp(req), tbody); } catch (e) {}
+      return sendJson(res, 200, { ok: true });
+    }
+
     /* 管理登录 */
     if (req.method === 'POST' && u === '/api/admin/login') {
       let body;
@@ -4252,6 +4328,56 @@ const server = http.createServer(async (req, res) => {
           topFiles: countTop(all.filter(e => e.src), 'src'),
           topRules: [...rm.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n })),
           topFmts: countTop(exp.filter(e => e.fmt), 'fmt')
+        };
+        const newest = all.slice().reverse();
+        if (q.page !== undefined) {
+          const size = Math.min(100, Math.max(1, parseInt(q.size, 10) || 20));
+          const pages = Math.max(1, Math.ceil(all.length / size));
+          const page = Math.min(pages, Math.max(1, parseInt(q.page, 10) || 1));
+          return sendJson(res, 200, Object.assign(base, {
+            page, size, pages,
+            events: newest.slice((page - 1) * size, page * size)
+          }));
+        }
+        const qLimit = Math.min(500, Math.max(1, parseInt(q.limit, 10) || 100));
+        return sendJson(res, 200, Object.assign(base, { events: newest.slice(0, qLimit) }));
+      }
+
+      /* v0.9.308：六个垂直工具页的统一使用记录。
+         与上面三本账平级、独立一个文件；返回里多一块 byPage —— 后台要靠它横向对比
+         「六个 SEO 入口哪一页最忙」，只看总数等于没看。 */
+      if (req.method === 'GET' && u === '/api/admin/tool-events') {
+        let q = {};
+        try { q = Object.fromEntries(new URL('http://x' + req.url).searchParams); } catch (e) {}
+        const all = readTEvents().events;
+        const today = todayStr();
+        const todays = all.filter(e => dateOfTs(e.t) === today);
+        /* 按页汇总：count + 独立 IP + 导出数 + 今日数。
+           ⚠️ 六个页面名在这里补齐（哪怕一条记录都没有也要出现），
+              否则后台表格会随数据漂移 —— 昨天没人的页今天突然没名字，看着像坏了。 */
+        const pm = new Map();
+        for (const p of Object.keys(TOOL_PAGE)) pm.set(p, { page: p, n: 0, ips: new Set(), exported: 0, today: 0 });
+        for (const e of all) {
+          const row = pm.get(e.page);
+          if (!row) continue;
+          row.n++;
+          if (e.ip) row.ips.add(e.ip);
+          if (e.act === 'export') row.exported++;
+          if (dateOfTs(e.t) === today) row.today++;
+        }
+        const byPage = [...pm.values()]
+          .sort((a, b) => b.n - a.n)
+          .map(r => ({ page: r.page, n: r.n, ips: r.ips.size, exported: r.exported, today: r.today }));
+        const base = {
+          total: all.length,
+          today: {
+            count: todays.length,
+            ips: new Set(todays.map(e => e.ip)).size,
+            exported: todays.filter(e => e.act === 'export').length
+          },
+          byPage: byPage,
+          topActs: countTop(all, 'act', 12),
+          topFmts: countTop(all.filter(e => e.fmt), 'fmt')
         };
         const newest = all.slice().reverse();
         if (q.page !== undefined) {
