@@ -158,6 +158,19 @@
   .li.bi .tx::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
     background:var(--acc);margin-right:7px;vertical-align:1px}
 
+  /* v0.9.305：形态 B 的一对在列表里要看得出来 —— 左边一道竖线把两条串起来，
+     两条各自保留独立的时间框，用户想怎么调就怎么调。
+     工具只做两件事：让「这是一对」看得见；把两条被调开之后的后果说出来、给一条退路。 */
+  .pg{border-left:3px solid var(--acc-line)}
+  .pg .li:first-child{border-top:0}
+  .pg + .pg, .li + .pg, .pg + .li{border-top:1px solid var(--line)}
+  /* 这一对被调开了：用 warn（黄）不用 del（红）—— 字幕没坏，只是「这两条现在对不上了」 */
+  .pnote{display:flex;align-items:center;gap:10px;padding:6px 10px 7px 13px;
+    background:var(--warn-weak);border-top:1px solid var(--line);font-size:12px;color:var(--warn)}
+  .pnote .pn{flex:1;min-width:0}
+  .pnote button{height:24px;padding:0 9px;font-size:11.5px;border-radius:7px;flex:none}
+  .pnote button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+
   /* v0.9.294：调整步骤流水线。一道工序一行，单位贴在输入框里靠右显示
      —— 单位不能只靠 placeholder 传达，用户一开始输入就看不见了 */
   .steps{display:flex;flex-direction:column;gap:8px}
@@ -296,8 +309,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.304"></script>
-<script src="shift-core.js?v=0.9.304"></script>
+<script src="shift-i18n.js?v=0.9.305"></script>
+<script src="shift-core.js?v=0.9.305"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -735,27 +748,55 @@ function undo() {
   renderAll();
   showMsg(t('msgUndo'), '');
 }
+/* 一行的 HTML。mate >= 0 表示这一条是「一对」里的前一条（原文多半在前面）。 */
+function rowHtml(list, i, mate) {
+  var C = window.ShiftCore, c = list[i], ops = '';
+  /* ⚠️ 双语条目不许拆（引擎 isBilingualEntry 拦着），按钮就别摆出来 ——
+     摆出来点不动，看着像坏了 */
+  if (mate >= 0) {
+    /* 这一条是「一对」的前一条：合并按钮的作用是把两条并成一条两行，
+       那是形态 B → 形态 A 的转换，文案必须说清楚，不能叫「合并下一条」 */
+    ops += '<button type="button" data-merge="' + i + '">' + esc(t('btnMergeOne')) + '</button>';
+  } else if (!C.isBilingualMate(list, i)) {
+    /* 一对里的后一条不给合并按钮：它下面接的是下一句的原文，跨句拼起来没有意义 */
+    ops += '<button type="button" data-merge="' + i + '">' + esc(t('btnMergeNext')) + '</button>';
+  }
+  if (!C.isBilingualEntry(list, i)) {
+    ops += '<button type="button" data-split="' + i + '">' + esc(t('btnSplit')) + '</button>';
+  }
+  return '<div class="li' + (C.isBilingualCue(c) ? ' bi' : '') + '">'
+    + '<span class="idx">' + (i + 1) + '</span>'
+    + '<input class="tm" type="text" data-s="' + i + '" value="' + C.time.srt(c.start) + '">'
+    + '<span class="arw">→</span>'
+    + '<input class="tm" type="text" data-e="' + i + '" value="' + C.time.srt(c.end) + '">'
+    + '<span class="tx" title="' + esc(c.text) + '">' + esc(c.text.replace(/\n/g, ' ⏎ ')) + '</span>'
+    + '<span class="op">' + ops + '</span></div>';
+}
+/* 一对 = 一个视觉组。两条各自保留独立的时间框（用户可以自己定原文和译文的时间轴），
+   只在两条被调开时补一行提示 + 「对齐」按钮。 */
+function pairHtml(list, i, mate) {
+  var C = window.ShiftCore;
+  var html = '<div class="pg">' + rowHtml(list, i, mate) + rowHtml(list, mate, -1);
+  var u = C.unalignedPair(list, i);
+  if (u) {
+    html += '<div class="pnote"><span class="pn">' + esc(tpl('msgUnalign', u.off)) + '</span>'
+      + '<button type="button" data-align="' + i + '">' + esc(t('btnAlign')) + '</button></div>';
+  }
+  return html + '</div>';
+}
 function renderList() {
   var C = window.ShiftCore, box = $('#list');
   if (!S.work || !S.work.length) { box.innerHTML = ''; $('#listCard').style.display = 'none'; return; }
   $('#listCard').style.display = '';
-  var n = Math.min(S.limit, S.work.length), i, html = '';
-  for (i = 0; i < n; i++) {
-    var c = S.work[i];
-    var bi = C.isBilingualCue(c);
-    html += '<div class="li' + (bi ? ' bi' : '') + '">'
-      + '<span class="idx">' + (i + 1) + '</span>'
-      + '<input class="tm" type="text" data-s="' + i + '" value="' + C.time.srt(c.start) + '">'
-      + '<span class="arw">→</span>'
-      + '<input class="tm" type="text" data-e="' + i + '" value="' + C.time.srt(c.end) + '">'
-      + '<span class="tx" title="' + esc(c.text) + '">' + esc(c.text.replace(/\n/g, ' ⏎ ')) + '</span>'
-      + '<span class="op">'
-      + '<button type="button" data-merge="' + i + '">' + esc(t('btnMergeNext')) + '</button>'
-      + '<button type="button" data-split="' + i + '">' + esc(t('btnSplit')) + '</button>'
-      + '</span></div>';
+  var list = S.work, n = 0, i = 0, html = '';
+  /* ⚠️ 一组要么整组渲染、要么都不渲染：只画前一条会让人以为另一条丢了。
+     n 按条数算，凑到 limit 时多带一条也没关系（最多多 1 条）。 */
+  while (i < list.length && n < S.limit) {
+    if (C.isPairGroup(list, i)) { html += pairHtml(list, i, i + 1); i += 2; n += 2; }
+    else { html += rowHtml(list, i, -1); i += 1; n += 1; }
   }
   box.innerHTML = html;
-  $('#rowMore').style.display = (n < S.work.length) ? '' : 'none';
+  $('#rowMore').style.display = (i < list.length) ? '' : 'none';
   $('#editStat').textContent = tpl('statEdit', S.ops.length);
   box.querySelectorAll('[data-merge]').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -765,6 +806,15 @@ function renderList() {
   box.querySelectorAll('[data-split]').forEach(function (b) {
     b.addEventListener('click', function () {
       pushOp({ op: 'split', i: Number(b.getAttribute('data-split')) });
+    });
+  });
+  /* v0.9.305：把一对重新拉回同轴。引擎给的是一组两个 set op（取并集），
+     走 304 的成组 op 通道 —— 撤销一次撤一整组，不会留下「只撤了一半」的中间态。 */
+  box.querySelectorAll('[data-align]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = Number(b.getAttribute('data-align'));
+      var ops = C.alignOps(S.work, i);
+      if (ops) pushOp(ops);
     });
   });
   box.querySelectorAll('[data-s]').forEach(function (b) {

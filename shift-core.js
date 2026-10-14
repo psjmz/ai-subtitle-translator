@@ -146,6 +146,61 @@
     return n;
   }
 
+  /* v0.9.305：一对被调开了 —— 文字系统不同、时间仍重叠着，但起止偏差超过了 ALIGN_TOL。
+     跟 isBilingualPair 互斥：那边要求「对得上」（≤ ALIGN_TOL），这边要的是「对不上了」。
+     返回 { j, ds, de, off }：j 是伙伴下标，ds/de 是起止各自差多少毫秒，
+     off 取两者较大的那个 —— 页面就照这个数说「差 N ms」。
+     ⚠️ 两道闸门，缺一就会把正常流水误认成「被拆散的一对」：
+        ① 时间必须**有重叠**：上一句英文、下一句中文首尾相接（ov = 0）是正常流水；
+        ② 重叠要**占较短那条七成以上**：只压住一点点（英文旁白 0-5s、中文解说 4-6s）
+           那是两条各说各的，不是同一句的两种语言。 */
+  var PAIR_OV = 0.7;
+  function unalignedPair(list, i) {
+    var a = list && list[i];
+    if (!a) return null;
+    var sa = scriptOf(a.text);
+    if (sa === 'other') return null;
+    var nb = [i - 1, i + 1], k, j, b, sb, ov, dur, ds, de;
+    for (k = 0; k < nb.length; k++) {
+      j = nb[k]; b = list[j];
+      if (!b) continue;
+      sb = scriptOf(b.text);
+      if (sb === 'other' || sb === sa) continue;
+      ov = Math.min(a.end, b.end) - Math.max(a.start, b.start);
+      if (ov <= 0) continue;
+      dur = Math.min(a.end - a.start, b.end - b.start);
+      if (dur <= 0 || ov / dur < PAIR_OV) continue;
+      ds = Math.abs(a.start - b.start); de = Math.abs(a.end - b.end);
+      if (ds <= ALIGN_TOL && de <= ALIGN_TOL) continue;
+      return { j: j, ds: ds, de: de, off: ds > de ? ds : de };
+    }
+    return null;
+  }
+  /* v0.9.305：列表分组用 —— 这两条是不是「同一句的两种语言」。
+     两种情形都算：① 还同轴（isBilingualPair）② 被调开了、但重叠仍然很高（unalignedPair）。
+     ⚠️ ② 必须一起算进来：两条一被手动调开，isBilingualPair 立刻就不认了，
+        界面反而更看不出它们曾经是一对 —— 而那恰恰是最该提示用户的时候。 */
+  function isPairGroup(list, i) {
+    var b = list && list[i + 1];
+    if (!b) return false;
+    if (isBilingualPair(list[i], b)) return true;
+    var u = unalignedPair(list, i);
+    return !!u && u.j === i + 1;
+  }
+  /* 把一对重新拉回同轴。取**并集**（min start / max end）：
+     用户既然把其中一条延长了，多半是想让这句多停一会；取并集不会把另一条截短。
+     ⚠️ 并集会把这一对撑大，有可能撞上前后两句 —— 这**不管**，也不该管：
+        手动改时间本来就可能撞，撞了体检照实报出来，让使用者自己看着办。
+        对齐只负责「把这一对拉回同轴」这一件事，别顺手替人做防碰撞。
+     返回一组两个 set op —— 走 304 的 flattenOps，撤销一次撤一整组。 */
+  function alignOps(list, i) {
+    var u = unalignedPair(list, i);
+    if (!u) return null;
+    var a = list[i], b = list[u.j];
+    var s = Math.min(a.start, b.start), e = Math.max(a.end, b.end);
+    return [{ op: 'set', i: i, s: s, e: e }, { op: 'set', i: u.j, s: s, e: e }];
+  }
+
   /* 形态 B 的双语：原文一条、译文一条，两条**同轴**（起止几乎相同）。
      这是双语字幕的正常写法 —— 播放器把两条各排一行，看着是「上下两行」，不是「叠在一起」。
      ⚠️ v0.9.303：体检原来只看时间关系，把这种一对当成「重叠」逐条报错。
@@ -721,7 +776,10 @@
         /* ⚠️ 双语条目不许拆（splitCue 不认这条，得在这里拦）：
            切开就变成「原文半句 + 译文半句」这种谁都看不懂的东西 */
         var src = list[i];
-        if (isBilingualCue(src)) return;
+        /* ⚠️ v0.9.305：这里原来是 isBilingualCue(src)，只挡了形态 A，形态 B 漏网 ——
+           形态 B 的原文被切开、译文还留在原地，一对就这么散了，还报出 overlap + short。
+           304 已经统一了「双语条目」的口径，这里必须跟着用 isBilingualEntry。 */
+        if (isBilingualEntry(list, i)) return;
         var want = Math.max(2, Math.round(isNum(o.n) ? o.n : 2));
         var segs = splitCue(src, want);
         if (!segs) return;
@@ -1164,6 +1222,10 @@
     isBilingualMate: isBilingualMate,
     isBilingualEntry: isBilingualEntry,
     bilingualCount: bilingualCount,
+    unalignedPair: unalignedPair,
+    alignOps: alignOps,
+    isPairGroup: isPairGroup,
+    PAIR_OV: PAIR_OV,
     ALIGN_TOL: ALIGN_TOL,
     parseUserTime: parseUserTime,
     CHECK_RULES: CHECK_RULES,
