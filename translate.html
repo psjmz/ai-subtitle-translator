@@ -798,8 +798,21 @@
   .prtxt{font-size:12px;color:var(--sub);font-family:var(--mono)}
   /* v0.9.297 加的那句「AI 算力紧张…」，v0.9.298 按用户定案挪进 pg-row、跟在「第 x/y 批」后面，
      并从灰 (--mut) 换成品牌粉 (--tr-ink)。只在跑的时候出现（见 pgBusy()）；
-     flex:none + nowrap：行宽不够时整条折下去，不跟进度文本挤在一行里截断。 */
-  .pg-busy{font-size:11.5px;color:var(--tr-ink);line-height:1.4;white-space:nowrap;flex:none}
+     flex:none + nowrap：行宽不够时整条折下去，不跟进度文本挤在一行里截断。
+     v0.9.309：以前它只是「同行的另一串粉字」，字号还比进度文本小半号，读起来像下半句进度信息，
+     用户反馈「不够明显」。改成和左侧「翻译中」徽章同一套视觉语言的**小药丸**——
+     浅粉底 + 同色描边 + 加粗 + 前面一个呼吸圆点，一眼认出这是「状态提示」而不是进度数据。
+     ⚠️ 图标只能用 ::before 画：data-i18n 走 textContent 赋值，内嵌 svg/span 会被整块抹掉。
+     ⚠️ 圆点用 absolute 定位而不是 flex 居中：.pg-row 是 align-items:baseline，
+        做成 inline-flex 会让「圆点的底边」充当基线，整颗药丸相对同行文字上下错位。
+     ⚠️ [hidden] 必须显式管住 display：这里给了 display:inline-block，
+        作者样式会盖掉浏览器对 [hidden] 的 display:none —— 收工后这句还得摘掉。 */
+  .pg-busy{display:inline-block;position:relative;font-size:12px;font-weight:600;
+    color:var(--tr-ink);background:var(--tr-weak);border:1px solid var(--tr-line);
+    border-radius:99px;padding:2px 10px 2px 22px;line-height:1.3;white-space:nowrap;flex:none}
+  .pg-busy[hidden]{display:none}
+  .pg-busy::before{content:'';position:absolute;left:9px;top:50%;width:6px;height:6px;margin-top:-3px;
+    border-radius:50%;background:var(--tr);animation:pgblink 1.4s ease-in-out infinite}
 
   /* v0.9.262：任务条下方的 AdSense 广告位（懒加载）。
      初始 display:none——页面加载时不 push：容器不可见时 availableWidth=0，
@@ -1064,7 +1077,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.308</span>
+    <span class="ver-tag">v0.9.309</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1655,8 +1668,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.308"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.308"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.309"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.309"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
