@@ -117,6 +117,34 @@
     if (lines.length < 2) return false;
     return trackScripts(cue.text).n >= 2;
   }
+  /* 形态 B 的成员：这一条跟旁边那条构成同轴的一对（原文一条 + 译文一条）。
+     见 isBilingualPair。 */
+  function isBilingualMate(list, i) {
+    var c = list[i];
+    if (!c) return false;
+    return isBilingualPair(list[i - 1], c) || isBilingualPair(c, list[i + 1]);
+  }
+  /* ⚠️ v0.9.304：体检认「双语」的统一入口。两种形态在播放器里看到的东西**一模一样**
+     —— 上面一行、下面一行、同时显示 —— 所以口径必须一致。
+     形态 A：一条里自带两套书写系统（原文一行 + 译文一行）
+     形态 B：两条同轴，各是一种文字
+     304 之前只有形态 A 豁免五把尺子，形态 B 按单语逐条查，同一份内容差 59 条，
+     说不通。两种形态现在都走同一条路。
+     ⚠️ 同轴但**不是**一对的（两条都是英文、时间还撞一起）不算双语 ——
+        那是屏幕叠字，真问题，原来怎么查还怎么查。 */
+  function isBilingualEntry(list, i) {
+    return isBilingualCue(list[i]) || isBilingualMate(list, i);
+  }
+  /* 这份字幕里有几「处」双语 —— 页面提示用，让工具认出来的东西被看见。
+     形态 A：一条算一处；形态 B：一对算一处（只数后头那条，免得一对变两处） */
+  function bilingualCount(cues) {
+    var list = cues || [], n = 0, i;
+    for (i = 0; i < list.length; i++) {
+      if (isBilingualCue(list[i])) n++;
+      else if (isBilingualPair(list[i - 1], list[i])) n++;
+    }
+    return n;
+  }
 
   /* 形态 B 的双语：原文一条、译文一条，两条**同轴**（起止几乎相同）。
      这是双语字幕的正常写法 —— 播放器把两条各排一行，看着是「上下两行」，不是「叠在一起」。
@@ -792,9 +820,13 @@
         一份 81 条的真实字幕里 68 处是「上一条的终点 = 下一条的起点」，占相邻对的 90% ——
         逐条报出来就是 72 条全红。这是素材本身的切法（歌词一句接一句、听写自动切分都这样），
         不是错误。用户的原话：「其实只要字幕没重叠就行」。
-     ⚠️ 双语条目（原文一行 + 译文一行）只查它与相邻两条的时间关系，不查停留时长、行宽和行数：
+     ⚠️ 双语条目只查它与相邻两条的时间关系，不查停留时长、行宽、读速和行数：
         一条双语顶两条的信息量，拿单语的尺子量它不公平（8 秒停留对双语是正常的），
         而「切分」这类动作作用在它身上会把原文和译文劈成两半。
+        ⚠️ v0.9.304：双语有两种写法，口径必须一致 ——
+           形态 A = 一条里两行（原文一行 + 译文一行）；形态 B = 两条同轴，各是一种文字。
+           两者在播放器里看到的东西完全一样（上下两行、同时显示），
+           但 304 之前只有形态 A 豁免，同一份真实素材差 59 条。判据见 isBilingualEntry。
      ⚠️ 检测阈值只留 2% 的小余量（v0.9.300 收紧：原来 short 也吃 maxDur 的 2%=140ms，
         700 的尺子实际 560 才响，比规范松了一大截）。「采纳建议后还是红的」那类余量
         由 suggest 侧自己兜底 —— 延长按 want 精确给、切分有最宽段复核的 guard 循环。 */
@@ -803,7 +835,7 @@
     var tolShort = Math.max(20, r.minDur * 0.02), tolLong = Math.max(50, r.maxDur * 0.02);
     for (i = 0; i < list.length; i++) {
       var c = list[i], why = [], dur = c.end - c.start, w = cueWidth(c);
-      if (!isBilingualCue(c)) {
+      if (!isBilingualEntry(list, i)) {
         if (dur < r.minDur - tolShort) why.push('short');
         if (dur > r.maxDur + tolLong) why.push('long');
         if (isFinite(cueCps(c)) && cueCps(c) > r.maxCps * 1.02) why.push('fast');
@@ -846,19 +878,44 @@
     }
     var ceilEnd = next ? next.start - SNAP_GAP : Infinity;   /* 这一条最晚能撑到哪 */
 
-    /* 双语条目（原文一行 + 译文一行）不给任何「切开」的建议：切开会变成
-       「半句原文 + 半句译文」，谁都看不懂。这一刀之所以放在这里而不是只依赖
-       checkCues —— 万一将来别的 pathways 也给双语报了 long，这里仍拦得住。 */
-    if (isBilingualCue(c)) {
+    /* 双语条目（形态 A 一条两行 / 形态 B 两条同轴）不给任何「切开」「合并」的建议：
+       切开会变成「半句原文 + 半句译文」，谁都看不懂；合并等于替用户改了字幕形态。
+       这一刀之所以放在这里而不是只依赖 checkCues ——
+       万一将来别的 pathway 也给双语报了 long，这里仍拦得住。
+       v0.9.304：两种形态都拦（304 之前只拦形态 A）。 */
+    if (isBilingualEntry(list, i)) {
       why = why.filter(function (x) { return x !== 'long' && x !== 'line' && x !== 'fast' && x !== 'short' && x !== 'rows'; });
     }
     if (!why.length) return out;
 
     if (why.indexOf('overlap') >= 0) {
+      /* ⚠️ v0.9.304：prev 是「时间上的上一句」，未必就是 list[i - 1] ——
+         中间可能夹着这一条自己的同轴伙伴（伙伴在前时 prevTemporal 会跳过它）。
+         「与前一条合并」的下标写 i - 1 就会把**上一句的译文**和**这一句**并成一条，
+         字幕直接毁掉（实测："你好世界\nNext sentence"）。有伙伴在前就不给这条建议 ——
+         mate < 0 时 prevTemporal 返回的一定就是 i - 1，下标不会错位。 */
+      if (prev && mate < 0) add('btnMergePrev', { op: 'merge', i: i - 1 });
       if (prev) {
-        add('btnMergePrev', { op: 'merge', i: i - 1 });
         var ns = prev.end + SNAP_GAP;
-        add('btnPush', { op: 'set', i: i, s: ns, e: Math.max(c.end, ns + Math.min(dur, r.minDur)) });
+        var ne2 = Math.max(c.end, ns + Math.min(dur, r.minDur));
+        /* 挪也要成对：只挪这一条，伙伴留在原地就错开了，下一轮体检认不出是一对，
+           两条都按单语查、还互相报重叠 —— 303 定下的原则，304 补上 overlap 这一路。 */
+        if (mate >= 0) {
+          /* 偏差按「新的终点 + 原来差多少」算，不能按平移量算 ——
+             这一条的终点被上面的 Math.max 截住过，未必真的平移了 dd，
+             照平移量给伙伴就会让两条终点错开（实测差 1100ms，又滚出重叠）。
+             跟下面「延长」那条路一个算法。 */
+          add('btnPush', [
+            { op: 'set', i: i, s: ns, e: ne2 },
+            {
+              op: 'set', i: mate,
+              s: ns + (list[mate].start - c.start),
+              e: ne2 + (list[mate].end - c.end)
+            }
+          ]);
+        } else {
+          add('btnPush', { op: 'set', i: i, s: ns, e: ne2 });
+        }
       }
     }
     /* 时长类：短了就补到「最短停留」和「读得完」里更宽的那个，补齐一条整的要多久 */
@@ -1104,6 +1161,9 @@
     scriptOf: scriptOf,
     isBilingualCue: isBilingualCue,
     isBilingualPair: isBilingualPair,
+    isBilingualMate: isBilingualMate,
+    isBilingualEntry: isBilingualEntry,
+    bilingualCount: bilingualCount,
     ALIGN_TOL: ALIGN_TOL,
     parseUserTime: parseUserTime,
     CHECK_RULES: CHECK_RULES,

@@ -260,6 +260,9 @@ crossorigin="anonymous"></script>
     <div class="row">
       <span class="chip" id="chkStat">—</span>
       <span class="chip mut" id="chkNoTime" style="display:none" data-i18n="chkNoTime">这份没有时间轴，体检跳过</span>
+      <!-- v0.9.304：双语条目整条豁免停留 / 行宽 / 读速。不提示的话，用户只会看到
+           「双语那几条什么都不报」，既不知道工具认出来了，也不知道是为什么没报 -->
+      <span class="chip mut" id="chkBil" style="display:none"></span>
     </div>
     <div class="rules" id="ruleRow"></div>
     <div class="list" id="chkList"></div>
@@ -293,8 +296,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.303"></script>
-<script src="shift-core.js?v=0.9.303"></script>
+<script src="shift-i18n.js?v=0.9.304"></script>
+<script src="shift-core.js?v=0.9.304"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -357,6 +360,9 @@ function applyI18n() {
   renderRules();
   /* 「输出与原文件一致（SRT）」这行是拼出来的，不走 data-i18n —— 换语言时要自己重画 */
   renderSrcFmt();
+  /* v0.9.304：体检那块的两行统计（条数、双语处数）也是拼出来的，带数字，
+     不走 data-i18n —— 换语言时同样要自己重画，否则提示还停在上一门语言 */
+  renderCheck();
 }
 function syncLogoHome() {
   var el = document.getElementById('logoHome');
@@ -664,6 +670,7 @@ function renderCheck() {
     stat.className = 'chip mut'; stat.textContent = '—';
     $('#chkList').innerHTML = '';
     $('#chkMoreRow').style.display = 'none';
+    $('#chkBil').style.display = 'none';
     S.issues = [];
     return;
   }
@@ -671,6 +678,12 @@ function renderCheck() {
   S.issues = C.checkCues(list, rules);
   stat.textContent = tpl('chkStat', S.issues.length);
   stat.className = S.issues.length ? 'chip mut' : 'chip';
+  /* v0.9.304：认出来的双语要让人看见 —— 双语条目（形态 A 一条两行 / 形态 B 两条同轴）
+     整条豁免停留、行宽、读速、行数，不提示就成了「悄悄放过」。
+     形态 A 一条算一处，形态 B 一对算一处（引擎里数后头那条，免得一对变两处）。 */
+  var nBil = C.bilingualCount(list);
+  $('#chkBil').style.display = nBil ? '' : 'none';
+  if (nBil) $('#chkBil').textContent = tpl('chkBil', nBil);
 
   var box = $('#chkList');
   if (!S.issues.length) {
