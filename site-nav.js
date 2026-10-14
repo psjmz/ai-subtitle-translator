@@ -110,12 +110,18 @@
   }
 
   /* ---------- 渲染 ---------- */
+  /* v0.9.312：链接带 URL 语言前缀。/en/ 等语言版页面点胶囊/卡片不该掉回中文版
+     （服务端已给页面静态 href 补了前缀，这里渲染出来的是客户端 DOM，得自己补）。
+     只认 URL 前缀 —— 与服务端 SEO 文案同一口径；无前缀（zh-CN 默认版）保持原样。
+     zh-TW 是混合大小写，匹配时别只写小写。 */
+  var mLP = String(w.location && w.location.pathname || '').match(/^\/([a-z]{2}(?:-[A-Za-z]{2})?)\//);
+  var LP = (mLP && mLP[1] !== 'zh-CN') ? '/' + mLP[1] : '';
   function renderNav(cur) {
     var box = d.getElementById('siteNav');
     if (!box) return 0;
     box.innerHTML = TOOLS.map(function (t) {
       var on = (t.id === cur);
-      return '<a class="snav-pill' + (on ? ' on' : '') + '" href="' + t.href + '"' +
+      return '<a class="snav-pill' + (on ? ' on' : '') + '" href="' + LP + t.href + '"' +
         (on ? ' aria-current="page"' : '') + '>' + svg(t.icon, 13) +
         '<span>' + esc(pick(t.name)) + '</span></a>';
     }).join('');
@@ -141,7 +147,7 @@
         '<div class="snav-tags">' + tags + '</div>';
       return on
         ? '<div class="snav-card cur">' + inner + '</div>'
-        : '<a class="snav-card" href="' + t.href + '"><span class="snav-go">' + esc(pick(T.go)) + ' →</span>' + inner + '</a>';
+        : '<a class="snav-card" href="' + LP + t.href + '"><span class="snav-go">' + esc(pick(T.go)) + ' →</span>' + inner + '</a>';
     }).join('');
     return TOOLS.length;
   }

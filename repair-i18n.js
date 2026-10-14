@@ -101,7 +101,7 @@ encUtf8bom: 'UTF-8（帶 BOM）',
 footBrand: '隨心字幕 AI · 字幕亂碼修復'
     },
     'en': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Home',
 navTr: 'Translate',
 navFx: 'Styled subs',
@@ -143,10 +143,10 @@ msgCopy: 'Copied',
 msgEncFail: 'This encoding cannot hold these characters (GBK cannot hold Korean, for example). Pick another one.',
 msgEmpty: 'Copying failed. Select the text box below and copy it yourself.',
 encUtf8bom: 'UTF-8 with BOM',
-footBrand: 'Suixin Subtitles · Mojibake repair'
+footBrand: 'AI-SRTSub · Mojibake repair'
     },
     'ja': {
-brandName: '随心字幕 AI',
+brandName: 'AI-SRTSub',
 navHome: 'ホーム',
 navTr: '字幕翻訳',
 navFx: '装飾字幕',
@@ -188,10 +188,10 @@ msgCopy: 'コピーしました',
 msgEncFail: 'この文字コードではこれらの文字を表現できません（GBK では韓国語を扱えません）。別のものを選んでください。',
 msgEmpty: 'コピーできませんでした。下のテキスト欄を手で選択してコピーしてください。',
 encUtf8bom: 'UTF-8（BOM 付き）',
-footBrand: '随心字幕 AI · 字幕の文字化け修復'
+footBrand: 'AI-SRTSub · 字幕の文字化け修復'
     },
     'es': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Inicio',
 navTr: 'Traducir',
 navFx: 'Subtítulos con estilo',
@@ -233,10 +233,10 @@ msgCopy: 'Copiado',
 msgEncFail: 'Esta codificación no admite estos caracteres (GBK no admite coreano, por ejemplo). Elige otra.',
 msgEmpty: 'No se pudo copiar. Selecciona el cuadro de texto de abajo y cópialo tú.',
 encUtf8bom: 'UTF-8 con BOM',
-footBrand: 'Suixin Subtitles · Reparación de codificación'
+footBrand: 'AI-SRTSub · Reparación de codificación'
     },
     'pt': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Início',
 navTr: 'Traduzir',
 navFx: 'Legendas estilizadas',
@@ -278,7 +278,7 @@ msgCopy: 'Copiado',
 msgEncFail: 'Esta codificação não comporta esses caracteres (GBK não comporta coreano, por exemplo). Escolha outra.',
 msgEmpty: 'Não foi possível copiar. Selecione a caixa de texto abaixo e copie você mesmo.',
 encUtf8bom: 'UTF-8 com BOM',
-footBrand: 'Suixin Subtitles · Correção de codificação'
+footBrand: 'AI-SRTSub · Correção de codificação'
     },
     'ko': {
 brandName: 'AI-SRTSub',
@@ -326,7 +326,7 @@ encUtf8bom: 'UTF-8(BOM 있음)',
 footBrand: 'AI-SRTSub · 자막 깨짐 복구'
     },
     'de': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Start',
 navTr: 'Übersetzen',
 navFx: 'Stilisierte Untertitel',
@@ -368,10 +368,10 @@ msgCopy: 'Kopiert',
 msgEncFail: 'Diese Kodierung kann diese Zeichen nicht darstellen (GBK kann etwa kein Koreanisch). Wähle eine andere.',
 msgEmpty: 'Kopieren fehlgeschlagen. Markiere das Textfeld unten und kopiere selbst.',
 encUtf8bom: 'UTF-8 mit BOM',
-footBrand: 'Suixin Subtitles · Zeichensalat reparieren'
+footBrand: 'AI-SRTSub · Zeichensalat reparieren'
     },
     'fr': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Accueil',
 navTr: 'Traduire',
 navFx: 'Sous-titres stylés',
@@ -413,10 +413,10 @@ msgCopy: 'Copié',
 msgEncFail: 'Cet encodage ne peut pas contenir ces caractères (le GBK ne peut pas contenir le coréen, par exemple). Choisissez-en un autre.',
 msgEmpty: 'La copie a échoué. Sélectionnez le champ de texte ci-dessous et copiez vous-même.',
 encUtf8bom: 'UTF-8 avec BOM',
-footBrand: 'Suixin Subtitles · Réparation d\'encodage'
+footBrand: 'AI-SRTSub · Réparation d\'encodage'
     },
     'id': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Beranda',
 navTr: 'Terjemahan',
 navFx: 'Subtitle beraksen',
@@ -458,10 +458,10 @@ msgCopy: 'Disalin',
 msgEncFail: 'Encoding ini tidak bisa menampung karakter tersebut (GBK tidak bisa menampung bahasa Korea, misalnya). Pilih yang lain.',
 msgEmpty: 'Gagal menyalin. Pilih sendiri kotak teks di bawah lalu salin.',
 encUtf8bom: 'UTF-8 dengan BOM',
-footBrand: 'Suixin Subtitles · Perbaikan encoding'
+footBrand: 'AI-SRTSub · Perbaikan encoding'
     },
     'hi': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'होम',
 navTr: 'अनुवाद',
 navFx: 'सजावटी सबटाइटल',
@@ -503,10 +503,10 @@ msgCopy: 'कॉपी हो गया',
 msgEncFail: 'यह एन्कोडिंग इन अक्षरों को नहीं समेट सकती (मसलन GBK कोरियाई नहीं समेट सकती)। दूसरी चुनें।',
 msgEmpty: 'कॉपी नहीं हो सका। नीचे के टेक्स्ट बॉक्स को खुद चुन कर कॉपी करें।',
 encUtf8bom: 'UTF-8 (BOM सहित)',
-footBrand: 'Suixin Subtitles · एन्कोडिंग सुधार'
+footBrand: 'AI-SRTSub · एन्कोडिंग सुधार'
     },
     'th': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'หน้าแรก',
 navTr: 'แปล',
 navFx: 'ซับไตเติลใส่เอฟเฟกต์',
@@ -548,10 +548,10 @@ msgCopy: 'คัดลอกแล้ว',
 msgEncFail: 'รหัสนี้เก็บตัวอักษรเหล่านี้ไม่ได้ (เช่น GBK เก็บภาษาเกาหลีไม่ได้) เลือกแบบอื่น',
 msgEmpty: 'คัดลอกไม่สำเร็จ ให้เลือกกล่องข้อความด้านล่างเองแล้วคัดลอก',
 encUtf8bom: 'UTF-8 แบบมี BOM',
-footBrand: 'Suixin Subtitles · ซ่อมรหัสตัวอักษร'
+footBrand: 'AI-SRTSub · ซ่อมรหัสตัวอักษร'
     },
     'vi': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Trang chủ',
 navTr: 'Dịch',
 navFx: 'Phụ đề cách điệu',
@@ -593,10 +593,10 @@ msgCopy: 'Đã sao chép',
 msgEncFail: 'Bảng mã này không chứa được các chữ này (chẳng hạn GBK không chứa được tiếng Hàn). Chọn bảng mã khác.',
 msgEmpty: 'Sao chép không được. Hãy tự chọn ô văn bản bên dưới rồi sao chép.',
 encUtf8bom: 'UTF-8 có BOM',
-footBrand: 'Suixin Subtitles · Sửa lỗi bảng mã'
+footBrand: 'AI-SRTSub · Sửa lỗi bảng mã'
     },
     'ru': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Главная',
 navTr: 'Перевод',
 navFx: 'Оформленные субтитры',
@@ -638,10 +638,10 @@ msgCopy: 'Скопировано',
 msgEncFail: 'Эта кодировка не вмещает эти символы (например, GBK не вмещает корейский). Выберите другую.',
 msgEmpty: 'Не удалось скопировать. Выделите текстовое поле ниже и скопируйте вручную.',
 encUtf8bom: 'UTF-8 с BOM',
-footBrand: 'Suixin Subtitles · Исправление кодировки'
+footBrand: 'AI-SRTSub · Исправление кодировки'
     },
     'it': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Home',
 navTr: 'Traduci',
 navFx: 'Sottotitoli con stile',
@@ -683,10 +683,10 @@ msgCopy: 'Copiato',
 msgEncFail: 'Questa codifica non può contenere questi caratteri (il GBK non può contenere il coreano, per esempio). Scegline un\'altra.',
 msgEmpty: 'Copia non riuscita. Seleziona tu la casella di testo qui sotto e copia.',
 encUtf8bom: 'UTF-8 con BOM',
-footBrand: 'Suixin Subtitles · Riparazione codifica'
+footBrand: 'AI-SRTSub · Riparazione codifica'
     },
     'ar': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'الرئيسية',
 navTr: 'ترجمة',
 navFx: 'ترجمات منسقة',
@@ -728,10 +728,10 @@ msgCopy: 'تم النسخ',
 msgEncFail: 'هذا الترميز لا يستوعب هذه الحروف (مثلًا GBK لا يستوعب الكورية). اختر ترميزًا آخر.',
 msgEmpty: 'تعذّر النسخ. حدد مربع النص بالأسفل ونسخه بنفسك.',
 encUtf8bom: 'UTF-8 مع BOM',
-footBrand: 'Suixin Subtitles · إصلاح الترميز'
+footBrand: 'AI-SRTSub · إصلاح الترميز'
     },
     'tr': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Ana sayfa',
 navTr: 'Çeviri',
 navFx: 'Stil altyazı',
@@ -773,10 +773,10 @@ msgCopy: 'Kopyalandı',
 msgEncFail: 'Bu kodlama bu karakterleri taşıyamaz (örneğin GBK Koreceyi taşıyamaz). Başka bir tane seçin.',
 msgEmpty: 'Kopyalanamadı. Aşağıdaki metin kutusunu kendiniz seçip kopyalayın.',
 encUtf8bom: 'BOM\'lu UTF-8',
-footBrand: 'Suixin Subtitles · Kodlama onarımı'
+footBrand: 'AI-SRTSub · Kodlama onarımı'
     },
     'nl': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Home',
 navTr: 'Vertalen',
 navFx: 'Ondertitels met stijl',
@@ -818,11 +818,11 @@ msgCopy: 'Gekopieerd',
 msgEncFail: 'Deze codering kan deze tekens niet bevatten (GBK kan bijvoorbeeld geen Koreaans bevatten). Kies een andere.',
 msgEmpty: 'Kopiëren mislukt. Selecteer het tekstvak hieronder zelf en kopieer.',
 encUtf8bom: 'UTF-8 met BOM',
-footBrand: 'Suixin Subtitles · Codering herstellen'
+footBrand: 'AI-SRTSub · Codering herstellen'
     },
     'pl': {
-brandName: 'Suixin Subtitles',
-navHome: 'Start',
+brandName: 'AI-SRTSub',
+navHome: 'Główna',
 navTr: 'Tłumaczenie',
 navFx: 'Napisy z efektami',
 navCl: 'Czyszczenie',
@@ -863,10 +863,10 @@ msgCopy: 'Skopiowano',
 msgEncFail: 'To kodowanie nie mieści tych znaków (na przykład GBK nie mieści koreańskiego). Wybierz inne.',
 msgEmpty: 'Kopiowanie się nie udało. Zaznacz poniższe pole tekstu i skopiuj sam.',
 encUtf8bom: 'UTF-8 z BOM',
-footBrand: 'Suixin Subtitles · Naprawa kodowania'
+footBrand: 'AI-SRTSub · Naprawa kodowania'
     },
     'sv': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Start',
 navTr: 'Översätt',
 navFx: 'Stilade undertexter',
@@ -908,10 +908,10 @@ msgCopy: 'Kopierad',
 msgEncFail: 'Den här kodningen rymmer inte dessa tecken (GBK rymmer till exempel inte koreanska). Välj en annan.',
 msgEmpty: 'Kunde inte kopiera. Markera textrutan nedan och kopiera själv.',
 encUtf8bom: 'UTF-8 med BOM',
-footBrand: 'Suixin Subtitles · Kodningsreparation'
+footBrand: 'AI-SRTSub · Kodningsreparation'
     },
     'cs': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Domů',
 navTr: 'Překlad',
 navFx: 'Stylované titulky',
@@ -953,10 +953,10 @@ msgCopy: 'Zkopírováno',
 msgEncFail: 'Toto kódování tyto znaky nepojme (GBK například nepojme korejštinu). Vyberte jiné.',
 msgEmpty: 'Kopírování se nezdařilo. Vyberte textové pole níže a zkopírujte sami.',
 encUtf8bom: 'UTF-8 s BOM',
-footBrand: 'Suixin Subtitles · Oprava kódování'
+footBrand: 'AI-SRTSub · Oprava kódování'
     },
     'uk': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Головна',
 navTr: 'Переклад',
 navFx: 'Оформлені субтитри',
@@ -998,11 +998,11 @@ msgCopy: 'Скопійовано',
 msgEncFail: 'Це кодування не вміщає ці символи (наприклад, GBK не вміщає корейську). Виберіть інше.',
 msgEmpty: 'Не вдалося скопіювати. Виділіть текстове поле нижче і скопіюйте вручну.',
 encUtf8bom: 'UTF-8 з BOM',
-footBrand: 'Suixin Subtitles · Виправлення кодування'
+footBrand: 'AI-SRTSub · Виправлення кодування'
     },
     'da': {
-brandName: 'Suixin Subtitles',
-navHome: 'Start',
+brandName: 'AI-SRTSub',
+navHome: 'Forside',
 navTr: 'Oversæt',
 navFx: 'Stilede undertekster',
 navCl: 'Ryd op',
@@ -1043,10 +1043,10 @@ msgCopy: 'Kopieret',
 msgEncFail: 'Denne kodning kan ikke rumme disse tegn (GBK kan f.eks. ikke rumme koreansk). Vælg en anden.',
 msgEmpty: 'Kunne ikke kopiere. Markér tekstfeltet nedenfor og kopiér selv.',
 encUtf8bom: 'UTF-8 med BOM',
-footBrand: 'Suixin Subtitles · Kodningsreparation'
+footBrand: 'AI-SRTSub · Kodningsreparation'
     },
     'fi': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Etusivu',
 navTr: 'Käännä',
 navFx: 'Tyylitellyt tekstit',
@@ -1088,10 +1088,10 @@ msgCopy: 'Kopioitu',
 msgEncFail: 'Tämä merkistö ei mahdu näille merkeille (GBK ei esimerkiksi mahdu korealle). Valitse toinen.',
 msgEmpty: 'Kopiointi ei onnistunut. Valitse alla oleva tekstikenttä itse ja kopioi.',
 encUtf8bom: 'UTF-8 BOM:illa',
-footBrand: 'Suixin Subtitles · Merkistön korjaus'
+footBrand: 'AI-SRTSub · Merkistön korjaus'
     },
     'el': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Αρχική',
 navTr: 'Μετάφραση',
 navFx: 'Υπότιτλοι με στυλ',
@@ -1133,10 +1133,10 @@ msgCopy: 'Αντιγράφηκε',
 msgEncFail: 'Αυτή η κωδικοποίηση δεν χωράει αυτούς τους χαρακτήρες (π.χ. το GBK δεν χωράει κορεατικά). Διάλεξε άλλη.',
 msgEmpty: 'Η αντιγραφή απέτυχε. Επίλεξε μόνος σου το πλαίσιο κειμένου παρακάτω και αντέγραψε.',
 encUtf8bom: 'UTF-8 με BOM',
-footBrand: 'Suixin Subtitles · Διόρθωση κωδικοποίησης'
+footBrand: 'AI-SRTSub · Διόρθωση κωδικοποίησης'
     },
     'he': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'בית',
 navTr: 'תרגום',
 navFx: 'כתוביות מעוצבות',
@@ -1178,10 +1178,10 @@ msgCopy: 'הועתק',
 msgEncFail: 'הקידוד הזה לא יכול להכיל את התווים האלה (GBK לא יכול להכיל קוריאנית, למשל). בחרו אחר.',
 msgEmpty: 'ההעתקה נכשלה. בחרו ידנית בתיבת הטקסט למטה והעתיקו.',
 encUtf8bom: 'UTF-8 עם BOM',
-footBrand: 'Suixin Subtitles · תיקון קידוד'
+footBrand: 'AI-SRTSub · תיקון קידוד'
     },
     'ro': {
-brandName: 'Suixin Subtitles',
+brandName: 'AI-SRTSub',
 navHome: 'Acasă',
 navTr: 'Traducere',
 navFx: 'Subtitrări cu stil',
@@ -1223,7 +1223,7 @@ msgCopy: 'Copiat',
 msgEncFail: 'Codarea asta nu poate cuprinde aceste caractere (de exemplu GBK nu cuprinde coreeana). Alege alta.',
 msgEmpty: 'Copierea a eșuat. Selectează singur câmpul de text de mai jos și copiază.',
 encUtf8bom: 'UTF-8 cu BOM',
-footBrand: 'Suixin Subtitles · Reparare codare'
+footBrand: 'AI-SRTSub · Reparare codare'
     },
   };
 

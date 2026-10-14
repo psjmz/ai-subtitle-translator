@@ -3291,6 +3291,19 @@ function serveIndexLang(req, res, lang, page){
     }
     const htmlLang = (page === 'index' && SEO[lang]) ? SEO[lang].htmlLang : lang;
     html = html.replace('<html lang="zh-CN"', '<html lang="' + htmlLang + '"' + ((htmlLang === 'ar' || htmlLang === 'he') ? ' dir="rtl"' : ''));
+    /* v0.9.312：站内链接按 URL 语言补前缀。页面源码里的站内链接（首页十二张工具卡、
+       各页 logo / 页脚）写的是无前缀形态 —— 那是 zh-CN 版的路径。语言版访客点了会
+       掉回中文版（底部 SEO 文案整段变中文，多语言联动就断在这）。六个垂直页自己的
+       胶囊导航有 JS 补前缀，但静态 href 没人管 —— 统一在这补：
+         /convert.html → /en/convert.html；/ → /en/（zh-CN 本就无前缀，不重写）
+       ⚠️ 正则只认「/」或「/xxx.html（可带 ?query#hash）」：favicon.svg 不匹配；
+          seoHead 注入的 canonical/hreflang 全是绝对 URL 也不匹配；
+          JS 里 a.href = URL.createObjectURL(...) 是赋值语句，同样碰不到。
+       site-nav.js 渲染的胶囊/卡片是客户端生成的 DOM，服务端够不着 —— 那边自己补。 */
+    if (lang !== 'zh-CN') {
+      const lp = '/' + lang;
+      html = html.replace(/href="(\/(?:[a-z-]+\.html)?(?:[?#][^"]*)?)"/g, 'href="' + lp + '$1"');
+    }
     /* GA4 统计：配置了 analyticsId 才注入（fork 部署者用自己的 ID，避免统计进原作者账号） */
     const ga = (readConfig().analyticsId || '').trim();
     const gaTag = /^G-[A-Z0-9]+$/.test(ga)

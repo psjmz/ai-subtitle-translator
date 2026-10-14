@@ -244,7 +244,7 @@
       errNoBi: 'Geen tweetalige inhoud gevonden - probeer een bestand met twee talen', mNone: 'Geen tweetalige ondertitels gevonden', mOk: 'Tweetalige ondertiteling gevonden', footBrand: 'AI-SRTSub · Tweetalige ondertiteling splitsen'
     },
     'pl': {
-      brandName: 'AI-SRTSub', navHome: 'Start', navTr: 'Tłumacz', navFx: 'Efekty', navCl: 'Czyszczenie', navCv: 'Konwerter',
+      brandName: 'AI-SRTSub', navHome: 'Główna', navTr: 'Tłumacz', navFx: 'Efekty', navCl: 'Czyszczenie', navCv: 'Konwerter',
       heroA: 'Napisy', heroEm: 'dwujęzyczne',
       heroSub: 'Podziel dwujęzyczne napisy na wersję oryginalną i przetłumaczoną albo zostaw tylko jedną z nich.',
       upTitle: 'Dodaj napisy', dzTxt: 'Przeciągnij plik tutaj lub kliknij, aby wybrać', pastePh: 'Albo wklej tutaj tekst napisów',
