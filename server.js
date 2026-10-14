@@ -676,11 +676,11 @@ function serveStatic(req, res, urlPath){
      ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
      会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
   /* v0.9.288：转换页 /convert.html 与 /en/convert.html */
-  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract)\.html$/);
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary)\.html$/);
   if (pm && SEO_ROUTE['/' + pm[1]]) {
     serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
   }
-  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract)\.html$/);
+  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
@@ -1557,8 +1557,255 @@ const SEO_CLEAN = {
     who: "Oricine are subtitrări gata făcute și vrea să le folosească imediat, plus echipele care curăță material pe loturi."
   },
 };
+/* v0.9.302：第十个页面 —— 字幕术语批量替换 /glossary.html 的 SEO 表。
+   与提取页同理：URL 不同就该有自己的 title / description，否则会被当重复内容收录。 */
+const SEO_GLOSSARY = {
+  'zh-CN': {
+    title: '字幕术语批量替换 - 一份术语表改完整个文件 | 随心字幕 AI',
+    desc: '免费在线按术语表批量改字幕：写好一串「原词 → 新词」，SRT / VTT / ASS / SBV / LRC / TXT 一次全部替换。时间轴、样式和 NOTE 块一个字符都不动，改动逐条可退回。',
+    kw: '字幕术语替换,批量替换字幕,srt批量替换,术语表,字幕统一译名,字幕批量修改,人名地名统一,字幕替换工具,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: '一份术语表，把整份字幕里的用词一次性改统一 —— 时间轴、ASS 样式与 VTT 的 NOTE 块一个字符都不动。',
+    feat: '每行一条规则，用 -> 、 => 、 → 或 Tab 分隔原词与新词，# 开头的行当注释。可整词匹配（art 不会误伤 start）、区分大小写、只替换双语条目里的第 1 行或第 2 行。改动明细逐条列出，哪一条不想改点一下就退回。',
+    who: '要统一人名地名译名、替换专有名词、批量修掉机器翻译翻错的词，或者接到别人的字幕要改成自己习惯用法的人。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'zh-TW': {
+    title: '字幕術語批次替換 - 一份術語表改完整個檔案 | 隨心字幕 AI',
+    desc: '免費線上按術語表批次改字幕：寫好一串「原詞 → 新詞」，SRT / VTT / ASS / SBV / LRC / TXT 一次全部替換。時間軸、樣式和 NOTE 區塊一個字元都不動，改動逐條可退回。',
+    kw: '字幕術語替換,批次替換字幕,srt批次替換,術語表,字幕統一譯名,字幕批次修改,人名地名統一,字幕替換工具,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: '一份術語表，把整份字幕裡的用詞一次改統一 —— 時間軸、ASS 樣式與 VTT 的 NOTE 區塊一個字元都不動。',
+    feat: '每行一條規則，用 -> 、 => 、 → 或 Tab 分隔原詞與新詞，# 開頭的行當註解。可全詞比對（art 不會誤傷 start）、區分大小寫、只替換雙語字幕裡的第 1 行或第 2 行。改動明細逐條列出，哪一條不想改點一下就退回。',
+    who: '要統一人名地名譯名、替換專有名詞、批次修掉機器翻譯翻錯的詞，或者接到別人的字幕要改成自己習慣用法的人。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'en': {
+    title: 'Batch Subtitle Term Replace - One Glossary, Whole File | AI-SRTSub',
+    desc: 'Free online glossary replace for subtitles: list "old term → new term" once and every cue in SRT / VTT / ASS / SBV / LRC / TXT is updated. Timing, styles and NOTE blocks stay byte-identical, and every change can be reverted per line.',
+    kw: 'subtitle glossary,batch replace srt,find and replace subtitle,subtitle term replace,srt batch edit,replace words in subtitles,unify subtitle names,subtitle terminology,replace text in vtt,glossary srt tool,batch terminology replace',
+    intro: 'A glossary of "old term → new term" rules applied across the whole subtitle file at once, with timing, ASS styles and VTT note blocks left byte-identical.',
+    feat: 'One rule per line, separated by -> , => , → or a tab; lines starting with # are comments. Whole-word matching keeps "art" out of "start", case sensitivity is optional, and you can restrict the replace to line 1 or line 2 of bilingual cues. Every changed cue is listed, and any single one can be put back.',
+    who: 'Anyone unifying names and terminology across a season, fixing machine-translation wording in bulk, or adapting someone else’s subtitles to their own house style.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'ja': {
+    title: '字幕用語一括置換 - 用語集ひとつでファイル全体 | AI-SRTSub',
+    desc: '無料のオンライン用語一括置換： 「置換前 → 置換後」 を並べるだけで、SRT / VTT / ASS / SBV / LRC / TXT の全字幕をまとめて置き換えます。時間軸・スタイル・NOTE ブロックは変更せず、行ごとに元に戻せます。',
+    kw: '字幕 用語 一括置換,srt 一括置換,字幕 置換,vtt 一括変換,字幕 用語統一,固有名詞 置換,字幕 名前 統一,字幕 編集,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: '「置換前 → 置換後」の用語集を、ファイル全体の字幕へ一度に適用します。時間軸・ASS スタイル・VTT の NOTE ブロックは一切変更しません。',
+    feat: '1 行に 1 ルール、区切りは -> 、 => 、 → 、タブのいずれか。# で始まる行はコメントです。単語単位の一致（art が start を置き換えない）、大文字と小文字の区別、字幕の 1 行目だけ / 2 行目だけといった指定ができます。変更点は行ごとに一覧表示され、個別に元へ戻せます。',
+    who: '人名や地名、専門用語の訳を統一したいとき、機械翻訳の言い回しをまとめて直したいとき、他人の字幕を自分の基準に合わせたいときに。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'es': {
+    title: 'Reemplazo masivo de términos en subtítulos - AI-SRTSub',
+    desc: 'Reemplaza términos en subtítulos en línea y gratis: escribe «término original → término nuevo» y se actualiza todo el SRT / VTT / ASS / SBV / LRC / TXT. Los tiempos, los estilos y los bloques NOTE no se alteran, y cada cambio se puede deshacer por línea.',
+    kw: 'reemplazar términos subtítulos,glosario subtítulos,reemplazo masivo srt,buscar y reemplazar subtítulos,editar srt por lotes,unificar nombres subtítulos,reemplazar palabras srt,sustituir texto vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Un glosario con reglas «término original → término nuevo» que se aplica a todo el archivo de subtítulos a la vez, sin tocar los tiempos, los estilos ASS ni los bloques NOTE del VTT.',
+    feat: 'Una regla por línea, separada por -> , => , → o tabulador; las líneas con # son comentarios. Coincidencia de palabra completa (art no altera start), distinción opcional de mayúsculas y posibilidad de limitar el cambio a la línea 1 o 2 en subtítulos bilingües. Todas las líneas modificadas se listan y se pueden revertir de una en una.',
+    who: 'Quien unifica nombres y términos en una serie, corrige en bloque el vocabulario de una traducción automática o adapta subtítulos ajenos a su propio criterio.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'pt': {
+    title: 'Substituição de termos em legendas em massa - AI-SRTSub',
+    desc: 'Substitua termos nas legendas online e de graça: escreva «termo original → termo novo» e atualize todo o SRT / VTT / ASS / SBV / LRC / TXT. Os tempos, os estilos e os blocos NOTE não mudam, e cada alteração pode ser desfeita por linha.',
+    kw: 'substituir termos legendas,glossário legendas,substituição em massa srt,localizar e substituir legendas,editar srt em lote,unificar nomes legendas,substituir palavras srt,alterar texto vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Um glossário com regras «termo original → termo novo» aplicado a todo o arquivo de legendas de uma vez, sem mexer nos tempos, nos estilos ASS nem nos blocos NOTE do VTT.',
+    feat: 'Uma regra por linha, separada por -> , => , → ou tabulação; linhas com # são comentários. Correspondência de palavra inteira (art não altera start), diferenciação opcional de maiúsculas e opção de limitar a troca à linha 1 ou 2 em legendas bilíngues. Todas as linhas alteradas aparecem listadas e podem ser revertidas individualmente.',
+    who: 'Quem unifica nomes e terminologia numa temporada, corrige em bloco o vocabulário de uma tradução automática ou adapta legendas de terceiros ao próprio padrão.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'ko': {
+    title: '자막 용어 일괄 바꾸기 - 용어집 하나로 파일 전체 | AI-SRTSub',
+    desc: '무료 온라인 자막 용어 일괄 교체: 「바꿀 말 → 새 말」을 한 번 적으면 SRT / VTT / ASS / SBV / LRC / TXT 전체가 한 번에 바뀝니다. 시간축·스타일·NOTE 블록은 그대로이고, 줄마다 되돌릴 수 있습니다.',
+    kw: '자막 일괄 바꾸기,자막 용어 교체,srt 일괄 수정,자막 찾아 바꾸기,자막 용어 통일,고유명사 일괄 수정,자막 인물명 통일,srt 용어 일괄,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: '「바꿀 말 → 새 말」 규칙을 모아 파일 전체 자막에 한 번에 적용합니다. 시간축·ASS 스타일·VTT의 NOTE 블록은 전혀 바꾸지 않습니다.',
+    feat: '한 줄에 규칙 하나, 구분은 -> 、 => 、 → 、탭 중 아무거나, # 로 시작하는 줄은 주석입니다. 단어 단위 일치(art 는 start 를 건드리지 않음), 대소문자 구분, 이중 언어 자막의 1번째 줄 또는 2번째 줄만 바꾸기를 지원합니다. 바뀐 줄은 목록으로 모두 표시되고, 하나씩 되돌릴 수 있습니다.',
+    who: '시리즈 전체의 인명·지명·전문용어를 통일하거나, 기계 번역의 표현을 한꺼번에 고치거나, 남의 자막을 자기 기준에 맞게 수정해야 하는 사람.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'de': {
+    title: 'Begriffe in Untertiteln massenhaft ersetzen - AI-SRTSub',
+    desc: 'Begriffe in Untertiteln kostenlos online ersetzen: «alter Begriff → neuer Begriff" notieren und das ganze SRT / VTT / ASS / SBV / LRC / TXT aktualisieren. Zeiten, Stile und NOTE-Blöcke bleiben unverändert, jede Änderung ist einzeln rücknehmbar.',
+    kw: 'untertitel begriffe ersetzen,glossar untertitel,srt massenersetzung,suchen und ersetzen untertitel,srt stapelverarbeitung,namen vereinheitlichen untertitel,wörter ersetzen srt,text ersetzen vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Ein Glossar mit Regeln «alter Begriff → neuer Begriff», das auf die ganze Untertiteldatei angewendet wird, ohne Zeiten, ASS-Stile oder VTT-NOTE-Blöcke anzufassen.',
+    feat: 'Eine Regel pro Zeile, getrennt durch -> , => , → oder Tab; Zeilen mit # sind Kommentare. Treffer nur als ganzes Wort (art lässt start unberührt), optionale Groß-/Kleinschreibung und Begrenzung auf Zeile 1 oder 2 bei zweisprachigen Untertiteln. Jede geänderte Zeile wird aufgelistet und lässt sich einzeln zurücknehmen.',
+    who: 'Wer Namen und Fachbegriffe über eine ganze Staffel vereinheitlicht, Formulierungen aus maschineller Übersetzung in Mengen korrigiert oder fremde Untertitel an die eigene Hausregel anpasst.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'fr': {
+    title: 'Remplacement de termes dans les sous-titres en masse - AI-SRTSub',
+    desc: 'Remplacez des termes dans vos sous-titres en ligne et gratuitement : notez « ancien terme → nouveau terme » et tout le fichier SRT / VTT / ASS / SBV / LRC / TXT est mis à jour. Les temps, les styles et les blocs NOTE restent identiques, et chaque ligne peut être rétablie séparément.',
+    kw: 'remplacer termes sous-titres,glossaire sous-titres,remplacement masse srt,chercher et remplacer sous-titres,modifier srt par lot,uniformiser noms sous-titres,remplacer mots srt,remplacer texte vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Un glossaire de règles « ancien terme → nouveau terme » appliqué à tout le fichier de sous-titres en une fois, sans toucher aux temps, aux styles ASS ni aux blocs NOTE du VTT.',
+    feat: 'Une règle par ligne, séparée par -> , => , → ou une tabulation ; les lignes commençant par # sont des commentaires. Correspondance sur le mot entier (art ne touche pas start), sensibilité à la casse optionnelle et limitation possible à la ligne 1 ou 2 des sous-titres bilingues. Chaque ligne modifiée est listée et peut être rétablie une par une.',
+    who: 'Celles et ceux qui uniformisent noms et terminologie sur toute une saison, corrigent en bloc le vocabulaire d’une traduction automatique, ou adaptent des sous-titres venus d’ailleurs à leur propre charte.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'id': {
+    title: 'Ganti Istilah Subtitle Sekaligus - Satu Daftar, Seluruh Berkas | AI-SRTSub',
+    desc: 'Ganti istilah di subtitle online gratis: tulis "istilah lama → istilah baru" sekali, seluruh SRT / VTT / ASS / SBV / LRC / TXT ikut berubah. Garis waktu, gaya, dan blok NOTE tidak tersentuh, dan setiap baris bisa dikembalikan sendiri.',
+    kw: 'ganti istilah subtitle,glosarium subtitle,ganti kata srt,replace teks subtitle,cari dan ganti subtitle,edit srt massal,samakan nama subtitle,ganti kata vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Satu daftar aturan "istilah lama → istilah baru" yang diterapkan ke seluruh berkas subtitle sekaligus, tanpa menyentuh garis waktu, gaya ASS, maupun blok NOTE di VTT.',
+    feat: 'Satu aturan per baris, dipisahkan -> , => , → , atau tab; baris berawal # adalah catatan. Cocok kata utuh (art tidak mengubah start), opsi bedakan huruf besar-kecil, dan bisa dibatasi hanya ke baris 1 atau baris 2 pada subtitle dwibahasa. Setiap baris yang berubah ditampilkan dan bisa dikembalikan satu-satu.',
+    who: 'Yang perlu menyeragamkan nama tokoh, tempat, dan istilah di satu seri, memperbaiki kata hasil terjemahan mesin sekaligus, atau menyesuaikan subtitle orang lain dengan gaya sendiri.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'hi': {
+    title: 'सबटाइटल में शब्द एक साथ बदलें - एक ग्लॉसरी, पूरी फ़ाइल | AI-SRTSub',
+    desc: 'सबटाइटल में शब्द बदलना अब मुफ़्त और ऑनलाइन: "पुराना शब्द → नया शब्द" लिखें और पूरा SRT / VTT / ASS / SBV / LRC / TXT अपडेट हो जाए। समय-रेखा, स्टाइल और NOTE ब्लॉक जस के तस रहते हैं, और हर बदलाव अलग से वापस किया जा सकता है।',
+    kw: 'सबटाइटल शब्द बदलें,सबटाइटल ग्लॉसरी,srt शब्द बदलें,सबटाइटल में टेक्स्ट रिप्लेस,एसआरटी बैच एडिट,सबटाइटल नाम एक जैसे,वीटीटी टेक्स्ट बदलें,शब्द एक साथ बदलें,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'एक ग्लॉसरी में "पुराना शब्द → नया शब्द" नियम लिखें और पूरी सबटाइटल फ़ाइल एक बार में बदल जाए — समय-रेखा, ASS स्टाइल और VTT के NOTE ब्लॉक पर कोई असर नहीं।',
+    feat: 'एक पंक्ति में एक नियम, -> , => , → या टैब से अलग करें; # से शुरू होने वाली पंक्ति टिप्पणी है। पूरे शब्द से मिलान (art से start नहीं बदलता), बड़े-छोटे अक्षर का विकल्प, और द्विभाषी सबटाइटल में सिर्फ़ पंक्ति 1 या 2 तक सीमित करने की सुविधा। बदली हुई हर पंक्ति सूची में दिखती है और अलग से वापस लाई जा सकती है।',
+    who: 'जिन्हें पूरे सीज़न में नाम और पारिभाषिक शब्द एक जैसे करने हैं, मशीनी अनुवाद की भाषा एक साथ सुधारनी है, या किसी और की सबटाइटल को अपने नियमों के अनुसार ढालना है।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'th': {
+    title: 'เปลี่ยนศัพท์ในซับไตเติลครั้งเดียวทั้งไฟล์ - AI-SRTSub',
+    desc: 'เปลี่ยนคำในซับไตเติลออนไลน์ฟรี: เขียน "คำเดิม → คำใหม่" ครั้งเดียว ทั้ง SRT / VTT / ASS / SBV / LRC / TXT ก็อัปเดตตาม เวลา สไตล์ และบล็อก NOTE จะไม่ถูกแตะต้อง และแต่ละบรรทัดก็เรียกคืนได้',
+    kw: 'เปลี่ยนศัพท์ซับไตเติล,อภิธานศัพท์ซับไตเติล,แก้คำ srt,แทนที่ข้อความซับไตเติล,ค้นหาและแทนที่ซับไตเติล,แก้ srt ทั้งชุด,ทำให้ชื่อในซับไตเติลตรงกัน,แก้ข้อความ vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'เขียนกฎ "คำเดิม → คำใหม่" ครั้งเดียว แล้วใช้กับซับไตเติลทั้งไฟล์ โดยไม่แตะต้อง เวลา สไตล์ ASS และบล็อก NOTE ของ VTT เลย',
+    feat: 'หนึ่งบรรทัดต่อหนึ่งกฎ คั่นด้วย -> , => , → หรือแท็บ บรรทัดที่ขึ้นต้นด้วย # คือหมายเหตุ จับคู่แบบเต็มคำ (art จะไม่ไปยุ่งกับ start) เลือกแยกตัวพิมพ์เล็กใหญ่ได้ และจำกัดให้แก้เฉพาะบรรทัดที่ 1 หรือ 2 ในซับไตเติลสองภาษาก็ได้ ทุกบรรทัดที่แก้จะแสดงเป็นรายการและเรียกคืนทีละบรรทัดได้',
+    who: 'คนที่ต้องทำให้ชื่อตัวละคร สถานที่ และศัพท์เฉพาะตรงกันทั้งซีรีส์ แก้คำแปลจากเครื่องแปลทีเดียวเป็นกลุ่ม หรือปรับซับไตเติลของคนอื่นให้เข้ากับมาตรฐานของตัวเอง',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'vi': {
+    title: 'Thay thuật ngữ phụ đề hàng loạt - Một bảng, cả tệp | AI-SRTSub',
+    desc: 'Thay thuật ngữ trong phụ đề trực tuyến miễn phí: ghi "thuật ngữ cũ → thuật ngữ mới" một lần, toàn bộ SRT / VTT / ASS / SBV / LRC / TXT được cập nhật. Trục thời gian, kiểu và khối NOTE không đổi, và từng dòng có thể hoàn tác riêng.',
+    kw: 'thay thuật ngữ phụ đề,bảng thuật ngữ phụ đề,sửa từ hàng loạt srt,thay thế văn bản phụ đề,tìm và thay thế phụ đề,sửa srt hàng loạt,thống nhất tên phụ đề,thay văn bản vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Một bảng quy tắc "thuật ngữ cũ → thuật ngữ mới" được áp dụng cho toàn bộ tệp phụ đề cùng lúc, không đụng vào trục thời gian, kiểu ASS hay khối NOTE của VTT.',
+    feat: 'Mỗi dòng một quy tắc, ngăn bằng -> , => , → hoặc tab; dòng bắt đầu bằng # là chú thích. Khớp nguyên từ (art không đụng vào start), tùy chọn phân biệt hoa thường, và có thể giới hạn chỉ dòng 1 hoặc dòng 2 trong phụ đề song ngữ. Mọi dòng bị thay đổi đều được liệt kê và hoàn tác từng dòng một.',
+    who: 'Người cần thống nhất tên nhân vật, địa danh và thuật ngữ trong cả mùa phim, sửa hàng loạt cách dùng từ của bản dịch máy, hoặc chỉnh phụ đề của người khác theo chuẩn của mình.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'ru': {
+    title: 'Массовая замена терминов в субтитрах - AI-SRTSub',
+    desc: 'Бесплатная онлайн-замена терминов в субтитрах: запишите «старый термин → новый термин» и весь файл SRT / VTT / ASS / SBV / LRC / TXT обновится. Тайминг, стили и блоки NOTE не меняются, любое изменение отменяется построчно.',
+    kw: 'замена терминов в субтитрах,глоссарий субтитров,массовая замена srt,найти и заменить в субтитрах,пакетное изменение srt,унификация имён в субтитрах,заменить слова в srt,заменить текст vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Глоссарий правил «старый термин → новый термин», применяемый ко всему файлу субтитров сразу: тайминг, стили ASS и блоки NOTE в VTT остаются без изменений.',
+    feat: 'Одно правило в строке, разделитель — -> , => , → или табуляция; строки с # — комментарии. Совпадение только по целому слову (art не трогает start), необязательный учёт регистра и возможность ограничить замену строкой 1 или 2 в двуязычных субтитрах. Все изменённые строки выводятся списком и отменяются по отдельности.',
+    who: 'Тем, кто приводит к единообразию имена и терминологию во всём сезоне, массово исправляет формулировки машинного перевода или подгоняет чужие субтитры под свой стандарт.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'it': {
+    title: 'Sostituzione termini nei sottotitoli in blocco - AI-SRTSub',
+    desc: 'Sostituisci i termini nei sottotitoli online gratis: scrivi «termine vecchio → termine nuovo» e si aggiornano tutti i file SRT / VTT / ASS / SBV / LRC / TXT. Tempi, stili e blocchi NOTE restano identici e ogni riga si può ripristinare da sola.',
+    kw: 'sostituire termini sottotitoli,glossario sottotitoli,sostituzione massiva srt,trova e sostituisci sottotitoli,modifica srt in blocco,uniformare nomi sottotitoli,sostituire parole srt,sostituire testo vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Un glossario di regole «termine vecchio → termine nuovo» applicato a tutto il file di sottotitoli in una volta, senza toccare tempi, stili ASS e blocchi NOTE del VTT.',
+    feat: 'Una regola per riga, separata da -> , => , → o tabulazione; le righe con # sono commenti. Corrispondenza sulla parola intera (art non tocca start), distinzione facoltativa tra maiuscole e possibilità di limitarsi alla riga 1 o 2 nei sottotitoli bilingui. Ogni riga modificata viene elencata e può essere ripristinata singolarmente.',
+    who: 'Chi uniforma nomi e terminologia in un’intera stagione, corregge in blocco il vocabolario di una traduzione automatica o adatta sottotitoli altrui al proprio standard.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'ar': {
+    title: 'استبدال المصطلحات في الترجمات دفعة واحدة - AI-SRTSub',
+    desc: 'استبدل المصطلحات في ملفات الترجمة مجاناً على الإنترنت: اكتب «المصطلح القديم → المصطلح الجديد» ويتحدَّث ملف SRT / VTT / ASS / SBV / LRC / TXT كاملًا. التوقيت والأنماط وكتل NOTE تبقى كما هي، ويمكن التراجع عن كل سطر على حدة.',
+    kw: 'استبدال المصطلحات في الترجمة,مسرد مصطلحات الترجمة,استبدال جماعي srt,ابحث واستبدل في الترجمة,تعديل srt دفعة,توحيد الأسماء في الترجمة,استبدال كلمات srt,استبدال نص vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'مسرد بقواعد «المصطلح القديم → المصطلح الجديد» يُطبَّق على ملف الترجمة كاملًا مرة واحدة، دون أن يمس التوقيت أو أنماط ASS أو كتل NOTE في VTT.',
+    feat: 'قاعدة واحدة في كل سطر، يفصل بينها -> أو => أو → أو مسافة جدولة، والأسطر التي تبدأ بـ # تعليقات. مطابقة الكلمة كاملة (art لا يمس start)، وخيار التفريق بين الحروف الكبيرة والصغيرة، وحصر الاستبدال في السطر 1 أو 2 للترجمات ثنائية اللغة. تُعرض كل الأسطر التي تغيّرت ويمكن إرجاع كل سطر بمفرده.',
+    who: 'من يوحّد أسماء الأشخاص والأماكن والمصطلحات في موسم كامل، أو يصحّح عبارات الترجمة الآلية دفعة واحدة، أو يكيّف ترجمات الآخرين مع معاييره.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'tr': {
+    title: 'Altyazıda Terimleri Toplu Değiştirme - Tek Liste, Tüm Dosya | AI-SRTSub',
+    desc: 'Altyazıdaki terimleri ücretsiz ve çevrimiçi değiştirin: "eski terim → yeni terim" yazın, tüm SRT / VTT / ASS / SBV / LRC / TXT güncellensin. Zamanlama, stiller ve NOTE blokları hiç değişmez, her satır tek başına geri alınabilir.',
+    kw: 'altyazı terim değiştirme,altyazı sözlüğü,srt toplu değiştirme,altyazıda bul ve değiştir,srt toplu düzenleme,altyazı isimleri eşitle,vtt metin değiştir,altyazı kelime değiştir,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Bir "eski terim → yeni terim" kuralları sözlüğü tüm altyazı dosyasına bir kerede uygulanır; zamanlama, ASS stilleri ve VTT NOTE bloklarına hiç dokunulmaz.',
+    feat: 'Her satıra bir kural; ayırıcı olarak -> , => , → veya sekme kullanılır, # ile başlayan satırlar açıklamadır. Sadece tam sözcük eşleşmesi (art, start’a dokunmaz), isteğe bağlı büyük/küçük harf duyarlılığı ve iki dilli altyazılarda değişikliği yalnızca 1. veya 2. satırla sınırlama. Değişen her satır listelenir ve tek tek geri alınabilir.',
+    who: 'Bir sezon boyunca kişi, yer ve terim adlarını tekdüze yapmak, makine çevirisinin ifadelerini topluca düzeltmek ya da başkasının altyazısını kendi ölçüsüne uydurmak isteyenler.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'nl': {
+    title: 'Termen in ondertitels in bulk vervangen - AI-SRTSub',
+    desc: 'Vervang termen in ondertitels gratis online: schrijf "oude term → nieuwe term" en heel het SRT / VTT / ASS / SBV / LRC / TXT-bestand wordt bijgewerkt. Timing, stijlen en NOTE-blokken blijven onaangeroerd en elke regel is afzonderlijk terug te zetten.',
+    kw: 'termen ondertitels vervangen,ondertitel glossarium,srt bulk vervangen,zoeken en vervangen ondertitels,srt batch bewerken,namen gelijk maken ondertitels,woorden vervangen srt,tekst vervangen vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Een glossarium met regels "oude term → nieuwe term" dat in één keer op het hele ondertitelbestand wordt toegepast, zonder timing, ASS-stijlen of VTT-NOTE-blokken aan te raken.',
+    feat: 'Eén regel per lijn, gescheiden door -> , => , → of een tab; regels die beginnen met # zijn opmerkingen. Alleen hele woorden (art laat start met rust), optioneel onderscheid tussen hoofdletters en beperking tot regel 1 of 2 bij tweetalige ondertitels. Elke gewijzigde regel wordt getoond en kan afzonderlijk worden teruggedraaid.',
+    who: 'Wie namen en terminologie in een heel seizoen gelijk wil trekken, machinevertalingen in één keer wil bijschaven, of ondertitels van anderen naar eigen huisstijl wil omzetten.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'pl': {
+    title: 'Masowa zamiana terminów w napisach - jedna lista, cały plik | AI-SRTSub',
+    desc: 'Zamieniaj terminy w napisach online za darmo: zapisz „stary termin → nowy termin" i zaktualizuj całe SRT / VTT / ASS / SBV / LRC / TXT. Czasy, style i bloki NOTE zostają bez zmian, a każdą linię można cofnąć osobno.',
+    kw: 'zamiana terminów w napisach,glosariusz napisów,masowa zamiana srt,znajdź i zamień w napisach,edycja srt hurtowo,ujednolić nazwy w napisach,zamienić słowa w srt,zamienić tekst vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Glosariusz reguł „stary termin → nowy termin" stosowany do całego pliku napisów naraz, bez dotykania czasów, stylów ASS i bloków NOTE w VTT.',
+    feat: 'Jedna reguła w wierszu, oddzielona -> , => , → lub tabulatorem; wiersze z # to komentarze. Trafienia tylko w całe słowa (art nie tyka start), opcjonalne rozróżnianie wielkości liter i możliwość ograniczenia do wiersza 1 lub 2 w napisach dwujęzycznych. Każda zmieniona linia jest wypisana i można ją cofnąć pojedynczo.',
+    who: 'Osobom ujednolicającym imiona, nazwy miejsc i terminologię w całym sezonie, poprawiającym hurtowo słownictwo z tłumaczenia maszynowego albo dopasowującym cudze napisy do własnego standardu.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'sv': {
+    title: 'Ersätt termer i undertexter i mängd - AI-SRTSub',
+    desc: 'Ersätt termer i undertexter gratis online: skriv "gammal term → ny term" så uppdateras hela SRT / VTT / ASS / SBV / LRC / TXT. Tidsättning, stilar och NOTE-block lämnas orörda och varje rad kan återställas för sig.',
+    kw: 'ersätt termer undertexter,ordlista undertexter,massersätt srt,sök och ersätt undertexter,redigera srt i mängd,enhetliga namn undertexter,ersätt ord i srt,ersätt text vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'En ordlista med regler "gammal term → ny term" som tillämpas på hela undertextfilen på en gång, utan att röra tidsättning, ASS-stilar eller VTT:s NOTE-block.',
+    feat: 'En regel per rad, avgränsad med -> , => , → eller tabb; rader som börjar med # är kommentarer. Träff på hela ord (art lämnar start ifred), valbar skiftlägeskänslighet och möjlighet att begränsa till rad 1 eller 2 i tvåspråkiga undertexter. Varje ändrad rad listas och kan återställas en och en.',
+    who: 'Den som vill ha enhetliga namn och terminologi genom en hel säsong, rätta maskinöversatta formuleringar i mängd, eller anpassa andras undertexter till sin egen standard.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'cs': {
+    title: 'Hromadná výměna pojmů v titulcích - AI-SRTSub',
+    desc: 'Vyměňujte pojmy v titulcích zdarma online: zapište „starý pojem → nový pojem" a celý soubor SRT / VTT / ASS / SBV / LRC / TXT se aktualizuje. Časování, styly a bloky NOTE zůstanou nedotčené a každý řádek lze vrátit zvlášť.',
+    kw: 'výměna pojmů v titulcích,glosář titulků,hromadná výměna srt,najít a nahradit v titulcích,hromadná úprava srt,sjednotit jména v titulcích,nahradit slova v srt,nahradit text vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Glosář pravidel „starý pojem → nový pojem" aplikovaný na celý soubor titulků najednou, bez zásahu do časování, stylů ASS a bloků NOTE ve VTT.',
+    feat: 'Jedno pravidlo na řádek, oddělené -> , => , → nebo tabulátorem; řádky začínající # jsou poznámky. Shoda jen u celých slov (art nezasáhne start), volitelné rozlišování velikosti písmen a možnost omezit změnu na řádek 1 nebo 2 u dvojjazyčných titulků. Každý změněný řádek je vypsán a dá se vrátit jednotlivě.',
+    who: 'Kdo sjednocuje jména, místa a terminologii v celé sérii, opravuje hromadně formulace strojového překladu nebo převádí cizí titulky na vlastní standard.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'uk': {
+    title: 'Масова заміна термінів у субтитрах - AI-SRTSub',
+    desc: 'Замінюйте терміни в субтитрах безкоштовно онлайн: запишіть «старий термін → новий термін» — і весь файл SRT / VTT / ASS / SBV / LRC / TXT оновиться. Таймінг, стилі та блоки NOTE не змінюються, будь-яку зміну можна скасувати порядково.',
+    kw: 'заміна термінів у субтитрах,глосарій субтитрів,масова заміна srt,знайти і замінити в субтитрах,пакетне редагування srt,уніфікувати імена в субтитрах,замінити слова в srt,замінити текст vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Глосарій правил «старий термін → новий термін», що застосовується до всього файлу субтитрів відразу, не зачіпаючи таймінг, стилі ASS і блоки NOTE у VTT.',
+    feat: 'Одне правило в рядку, роздільник — -> , => , → або табуляція; рядки з # — коментарі. Збіг лише цілим словом (art не чіпає start), необов’язкове врахування регістру та можливість обмежити заміну рядком 1 або 2 у двомовних субтитрах. Усі змінені рядки виводяться списком і скасовуються окремо.',
+    who: 'Тим, хто уніфікує імена, назви та термінологію в цілому сезоні, масово виправляє формулювання машинного перекладу або приводить чужі субтитри до власного стандарту.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'da': {
+    title: 'Erstat termer i undertekster i flæng - AI-SRTSub',
+    desc: 'Erstat termer i undertekster gratis online: skriv "gammelt udtryk → nyt udtryk" og hele SRT / VTT / ASS / SBV / LRC / TXT bliver opdateret. Timing, typografier og NOTE-blokker røres ikke, og hver linje kan rulles tilbage for sig.',
+    kw: 'erstat termer undertekster,ordliste undertekster,masserediger srt,søg og erstat undertekster,rediger srt i flæng,ensartede navne undertekster,erstat ord i srt,erstat tekst vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'En ordliste med regler "gammelt udtryk → nyt udtryk", der anvendes på hele undertitel­filen på én gang uden at røre timing, ASS-typografier eller VTT’s NOTE-blokker.',
+    feat: 'Én regel pr. linje adskilt af -> , => , → eller tabulatorslag; linjer der starter med # er kommentarer. Kun hele ord (art lader start være), valgfri forskel på store og små bogstaver og mulighed for at begrænse til linje 1 eller 2 i tosprogede undertekster. Hver ændret linje listes og kan rulles tilbage enkeltvis.',
+    who: 'Dem der vil ensrette navne og terminologi gennem en hel sæson, rette maskinoversatte formuleringer i flæng eller tilpasse andres undertekster til egen standard.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'fi': {
+    title: 'Termien massavaihto tekstityksissä - AI-SRTSub',
+    desc: 'Vaihda termejä tekstityksissä ilmaiseksi verkossa: kirjoita "vanha termi → uusi termi" ja koko SRT / VTT / ASS / SBV / LRC / TXT päivittyy. Ajoitus, tyylit ja NOTE-lohkot pysyvät ennallaan ja jokainen rivi voi palauttaa erikseen.',
+    kw: 'vaihda termejä tekstityksissä,tekstitysten sanasto,srt massavaihto,etsi ja korvaa tekstityksissä,srt joukkomuokkaus,yhtenäiset nimet tekstityksissä,korvaa sanat srt,korvaa teksti vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Sanasto säännöillä "vanha termi → uusi termi", joka sovelletaan koko tekstitystiedostoon kerralla koskematta ajoitukseen, ASS-tyyleihin tai VTT:n NOTE-lohkoihin.',
+    feat: 'Yksi sääntö rivillä, erottimena -> , => , → tai sarkain; # -merkillä alkavat rivit ovat kommentteja. Osuma vain kokonaisiin sanoihin (art ei koske sanaan start), valinnainen kirjainkoon erottelu ja mahdollisuus rajata muutos kaksikielisissä teksteissä riviin 1 tai 2. Jokainen muutettu rivi listataan ja voidaan palauttaa yksitellen.',
+    who: 'Niille, jotka yhtenäistävät nimet ja terminologian koko kauden ajan, korjaavat konetunnistuksen sanavalintoja joukkona tai sovittavat toisten tekstitykset omaan tyyliinsä.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'el': {
+    title: 'Μαζική αντικατάσταση όρων στους υπότιτλους - AI-SRTSub',
+    desc: 'Αντικαταστήστε όρους σε υπότιτλους δωρεάν στο διαδίκτυο: γράψτε «παλιός όρος → νέος όρος» και όλο το αρχείο SRT / VTT / ASS / SBV / LRC / TXT ενημερώνεται. Ο χρονισμός, τα στυλ και τα μπλοκ NOTE δεν αλλάζουν και κάθε γραμμή μπορεί να επανέλθει χωριστά.',
+    kw: 'αντικατάσταση όρων υπότιτλων,γλωσσάρι υπότιτλων,μαζική αντικατάσταση srt,εύρεση και αντικατάσταση υπότιτλων,μαζική επεξεργασία srt,ενιαία ονόματα υπότιτλων,αντικατάσταση λέξεων srt,αντικατάσταση κειμένου vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Ένα γλωσσάρι με κανόνες «παλιός όρος → νέος όρος» που εφαρμόζεται σε όλο το αρχείο υποτίτλων μεμιάς, χωρίς να πειράζει τον χρονισμό, τα στυλ ASS ή τα μπλοκ NOTE του VTT.',
+    feat: 'Ένας κανόνας ανά γραμμή, με διαχωριστικό -> , => , → ή στηλοθέτη· οι γραμμές που αρχίζουν με # είναι σχόλια. Αντιστοίχιση μόνο σε ολόκληρες λέξεις (το art δεν πειράζει το start), προαιρετική διάκριση πεζών/κεφαλαίων και δυνατότητα περιορισμού στη γραμμή 1 ή 2 σε δίγλωσσους υπότιτλους. Κάθε αλλαγμένη γραμμή εμφανίζεται στη λίστα και μπορεί να επανέλθει μία προς μία.',
+    who: 'Όσοι ενοποιούν ονόματα και ορολογία σε όλο τον κύκλο επεισοδίων, διορθώνουν μαζικά διατυπώσεις αυτόματης μετάφρασης ή προσαρμόζουν ξένους υπότιτλους στο δικό τους πρότυπο.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'he': {
+    title: 'החלפת מונחים בכתוביות בבת אחת - AI-SRTSub',
+    desc: 'החליפו מונחים בכתוביות בחינם באינטרנט: כתבו "מונח ישן → מונח חדש" וכל קובץ SRT / VTT / ASS / SBV / LRC / TXT יתעדכן. התזמון, הסגנונות ובלוקי NOTE נשארים כמו שהם, וכל שורה ניתנת להחזרה בנפרד.',
+    kw: 'החלפת מונחים בכתוביות,מילון מונחים לכתוביות,החלפה המונית srt,חיפוש והחלפה בכתוביות,עריכת srt בהמונים,איחוד שמות בכתוביות,החלפת מילים ב-srt,החלפת טקסט vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'מילון מונחים עם כללים של "מונח ישן → מונח חדש" שמוחל על כל קובץ הכתוביות בבת אחת, בלי לגעת בתזמון, בסגנונות ASS או בבלוקי NOTE ב־VTT.',
+    feat: 'כלל אחד בכל שורה, מופרד ב־-> , => , → או בטאב; שורות שמתחילות ב־# הן הערות. התאמה למילים שלמות בלבד (art לא נוגע ב־start), אפשרות להבחין בין אותיות גדולות לקטנות, ואפשרות להגביל לשורה 1 או 2 בכתוביות דו־לשוניות. כל שורה שהשתנתה מופיעה ברשימה ואפשר להחזיר אותה לבד.',
+    who: 'מי שמאחד שמות ומונחים בכל העונה, מתקן בבת אחת ניסוחים מתרגום מכונה, או מתאים כתוביות של אחרים לסטנדרט שלו.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  },
+  'ro': {
+    title: 'Înlocuire termeni în subtitrări în bloc - AI-SRTSub',
+    desc: 'Înlocuiți termeni în subtitrări gratuit online: scrieți „termen vechi → termen nou" și se actualizează tot fișierul SRT / VTT / ASS / SBV / LRC / TXT. Timpul, stilurile și blocurile NOTE rămân neschimbate, iar fiecare rând se poate anula separat.',
+    kw: 'înlocuire termeni subtitrări,glosar subtitrări,înlocuire în bloc srt,căutare și înlocuire subtitrări,editare srt în bloc,uniformizare nume subtitrări,înlocuire cuvinte srt,înlocuire text vtt,find and replace subtitle,subtitle glossary,batch replace srt',
+    intro: 'Un glosar de reguli „termen vechi → termen nou" aplicat pe tot fișierul de subtitrări dintr-o dată, fără să atingă timpul, stilurile ASS sau blocurile NOTE din VTT.',
+    feat: 'O regulă pe linie, separată prin -> , => , → sau tab; liniile care încep cu # sunt comentarii. Potrivire doar pe cuvântul întreg (art nu îl atinge pe start), diferențiere opțională a majusculelor și posibilitatea de a limita la linia 1 sau 2 în subtitrările bilingve. Fiecare linie modificată este listată și poate fi anulată individual.',
+    who: 'Cei care unifică nume și terminologie într-un sezon întreg, corectează în bloc formulările din traducerea automată sau adaptează subtitrările altora la propriul standard.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
+  }
+};
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {};
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
   CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
@@ -1573,6 +1820,8 @@ SEO_LANGS.forEach(function (l) {
   REPAIR_PATH[l] = (l === 'zh-CN') ? '/repair.html' : '/' + l + '/repair.html';
   /* v0.9.299：字幕提取纯文本页 */
   EXTRACT_PATH[l] = (l === 'zh-CN') ? '/extract.html' : '/' + l + '/extract.html';
+  /* v0.9.302：字幕术语批量替换页 */
+  GLOSSARY_PATH[l] = (l === 'zh-CN') ? '/glossary.html' : '/' + l + '/glossary.html';
 });
 /* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
    ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
@@ -2863,7 +3112,9 @@ const SEO_PAGES = {
   /* v0.9.296：第八个页面 */
   repair: { file: 'repair.html', table: SEO_REPAIR, path: REPAIR_PATH, jsonldType: 'WebApplication' },
   /* v0.9.299：第九个页面 —— 字幕提取纯文本 */
-  extract: { file: 'extract.html', table: SEO_EXTRACT, path: EXTRACT_PATH, jsonldType: 'WebApplication' }
+  extract: { file: 'extract.html', table: SEO_EXTRACT, path: EXTRACT_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.302：第十个页面 —— 字幕术语批量替换 */
+  glossary: { file: 'glossary.html', table: SEO_GLOSSARY, path: GLOSSARY_PATH, jsonldType: 'WebApplication' }
 };
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
@@ -2971,7 +3222,7 @@ function serveIndexLang(req, res, lang, page){
   });
 }
 
-/* sitemap：九页 × 27 语言 = 243 条 URL，每条带本页的 hreflang alternates。
+/* sitemap：十页 × 27 语言 = 270 条 URL，每条带本页的 hreflang alternates。
    v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。
    v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。
    v0.9.288 起字幕格式转换独立成 /convert.html，第五个页面进表。

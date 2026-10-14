@@ -1021,7 +1021,9 @@
          --bi:#0E7490; --bi-ink:#0B5B72; --bi-weak:#E3F2F7; --bi-line:#A5D8E6;
          --sh:#4F46E5; --sh-ink:#3B34B8; --sh-weak:#EEF0FE; --sh-line:#BCC2FB;
          --rp:#B42318; --rp-ink:#8A1A12; --rp-weak:#FEF3F2; --rp-line:#FDA29B;
-         --ex:#B45309; --ex-ink:#8A3E06; --ex-weak:#FEF3E2; --ex-line:#EFAF6B; }
+         --ex:#B45309; --ex-ink:#8A3E06; --ex-weak:#FEF3E2; --ex-line:#EFAF6B;
+         /* v0.9.302：第十条色线 —— 术语替换页（品红） */
+         --gl:#A21CAF; --gl-ink:#86198F; --gl-weak:#FBE9F7; --gl-line:#E9A3DC; }
   .vh{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
   /* ---------------- 顶部：工具小卡 ---------------- */
@@ -1044,6 +1046,7 @@
   .tc.sh{--k:var(--sh);--kw:var(--sh-weak);--ki:var(--sh-ink);--kl:var(--sh-line)}
   .tc.rp{--k:var(--rp);--kw:var(--rp-weak);--ki:var(--rp-ink);--kl:var(--rp-line)}
   .tc.ex{--k:var(--ex);--kw:var(--ex-weak);--ki:var(--ex-ink);--kl:var(--ex-line)}
+  .tc.gl{--k:var(--gl);--kw:var(--gl-weak);--ki:var(--gl-ink);--kl:var(--gl-line)}
   .tc:hover{border-color:var(--kl);box-shadow:0 8px 22px -16px rgba(18,18,24,.42);transform:translateY(-1px)}
   .tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--k);opacity:0;transition:opacity .15s}
   .tc:hover::before{opacity:1}
@@ -1072,6 +1075,7 @@
   .det-tx.sh{--k:var(--sh);--kw:var(--sh-weak);--ki:var(--sh-ink);--kl:var(--sh-line)}
   .det-tx.rp{--k:var(--rp);--kw:var(--rp-weak);--ki:var(--rp-ink);--kl:var(--rp-line)}
   .det-tx.ex{--k:var(--ex);--kw:var(--ex-weak);--ki:var(--ex-ink);--kl:var(--ex-line)}
+  .det-tx.gl{--k:var(--gl);--kw:var(--gl-weak);--ki:var(--gl-ink);--kl:var(--gl-line)}
   .det-eye{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.3px;
     padding:4px 12px;border-radius:99px;background:var(--kw);color:var(--ki)}
   .det h2{margin:15px 0 0;font-size:25px;font-weight:850;letter-spacing:-.5px;line-height:1.35;color:var(--ink)}
@@ -1157,6 +1161,8 @@
   .rp-fig .mk-doc-h .d.good{color:var(--rp-ink)}
   .ex-fig .mk-doc.ok{background:var(--ex-weak);border-color:var(--ex-line)}
   .ex-fig .mk-doc-h .d.good{color:var(--ex-ink)}
+  .gl-fig .mk-doc.ok{background:var(--gl-weak);border-color:var(--gl-line)}
+  .gl-fig .mk-doc-h .d.good{color:var(--gl-ink)}
   .sh-fig .mk-tl-row.d i{background:var(--sh);opacity:.42}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
@@ -1179,7 +1185,7 @@ crossorigin="anonymous"></script>
     <nav class="lnav">
       <!-- v0.9.280：logo 整块做成「回首页」的入口（用户定案）。href 由 syncLogoHome() 跟着界面语言重算 ——
            /ja/ 点回来还是 /ja/，不掉语言。⚠️ 里面不放 <div>：<a> 的内容模型是「透明」，改成 span 更干净。 -->
-      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.301</span></a>
+      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.302</span></a>
       <div class="spacer"></div>
       <select id="uiLang2" aria-label="UI language"></select>
     </nav>
@@ -1267,6 +1273,15 @@ crossorigin="anonymous"></script>
         </div>
         <div class="tc-n" data-i18n="tcExN">提取文本</div>
         <p class="tc-d" data-i18n="tcExD">从字幕里提取纯台词，两种排版</p>
+      </a>
+
+      <a class="tc gl" href="/glossary.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 4H19v16H6.5A2.5 2.5 0 0 1 4 17.5v-11A2.5 2.5 0 0 1 6.5 4z"/><path d="M9 8h7M9 12h5"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcGlN">术语替换</div>
+        <p class="tc-d" data-i18n="tcGlD">按术语表批量改词，逐条可还原</p>
       </a>
 
       <!-- v0.9.277：视频下载工具。默认隐藏，仅官方域名由落地页脚本显示
@@ -1682,7 +1697,42 @@ crossorigin="anonymous"></script>
     </div>
   </section>
 
-  <!-- ⑩ 视频下载工具（同上：只在官方域名显示） -->
+  <!-- ⑩ 术语批量替换 -->
+  <section class="det" aria-labelledby="detGlTitle">
+    <div class="det-in">
+      <div class="det-tx gl">
+        <span class="det-eye" data-i18n="tcGlN">术语替换</span>
+        <h2 id="detGlTitle" data-i18n="detGlT">整片字幕的用词，一次改统一</h2>
+        <p class="det-lead" data-i18n="detGlL">人名地名前后不一致、专有名词各家叫法不同、机器翻译留下的错词 —— 写一份术语表，剩下的交给它。时间轴、ASS 样式、VTT 的 NOTE 块一个字符都不动。</p>
+        <ul class="det-list">
+          <li data-i18n="detGl1">每行一条规则：原词 -> 新词，# 开头是注释</li>
+          <li data-i18n="detGl2">整词匹配、区分大小写，双语条目可只改一行</li>
+          <li data-i18n="detGl3">SRT / VTT / ASS / SBV / LRC / TXT 都支持</li>
+          <li data-i18n="detGl4">改动逐条列出，哪一条不想改点一下就退回</li>
+        </ul>
+        <a class="det-cta" href="/glossary.html"><span data-i18n="detGlCta">打开术语替换</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig gl-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">SRT</span></div>
+          <p class="mk-p">Meet me in <s>New York</s></p>
+          <p class="mk-p">Ask the <s>CEO</s></p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">SRT</span></div>
+          <p class="mk-p">Meet me in 纽约</p>
+          <p class="mk-p">Ask the 首席执行官</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN10">术语表一改，整片跟着改</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑪ 视频下载工具（同上：只在官方域名显示） -->
   <section class="det" id="dlSec" aria-labelledby="detDlTitle" style="display:none">
     <div class="det-in">
       <div class="det-tx dl">
@@ -1746,7 +1796,7 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.301"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
+<script src="site-i18n.js?v=0.9.302"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
 <script>
 /* =============================================================================
    首页（落地页）脚本 —— v0.9.277
