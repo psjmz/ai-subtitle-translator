@@ -118,6 +118,34 @@
     return trackScripts(cue.text).n >= 2;
   }
 
+  /* 形态 B 的双语：原文一条、译文一条，两条**同轴**（起止几乎相同）。
+     这是双语字幕的正常写法 —— 播放器把两条各排一行，看着是「上下两行」，不是「叠在一起」。
+     ⚠️ v0.9.303：体检原来只看时间关系，把这种一对当成「重叠」逐条报错。
+        更糟的是建议里给的「往后挪开」会把译文挪到原文之后 100ms —— 那才是真把双语毁了。
+        所以判据要落在「是不是一对」上，不是「时间有没有重合」上。 */
+  var ALIGN_TOL = 120;   /* 同轴容差：比 OVERLAP_TOL 宽，吸收帧率换算与手工微调的几十毫秒 */
+  function isBilingualPair(a, b) {
+    if (!a || !b) return false;
+    /* 起止各自对得上才算同轴 —— 只起点相同、终点差一大截的，是时间轴没对齐，照报 */
+    if (Math.abs(a.start - b.start) > ALIGN_TOL) return false;
+    if (Math.abs(a.end - b.end) > ALIGN_TOL) return false;
+    /* 分属两套书写系统。一方认不出（纯数字、纯标点、空行）就不认这一对 ——
+       宁可报出来让人看一眼，也不替用户把可疑的重复条目悄悄放过 */
+    var sa = scriptOf(a.text), sb = scriptOf(b.text);
+    return sa !== sb && sa !== 'other' && sb !== 'other';
+  }
+  /* 沿列表往前/往后找「时间上真正的邻居」—— 跳过同轴的双语伙伴。
+     形态 B 里 list[i-1] 是同一句的另一种语言，不是「上一条」，
+     拿它算「最晚能撑到哪」「跟谁合并」会给出荒谬的答案。 */
+  function prevTemporal(list, i) {
+    for (var j = i - 1; j >= 0; j--) if (!isBilingualPair(list[j], list[i])) return list[j];
+    return null;
+  }
+  function nextTemporal(list, i) {
+    for (var j = i + 1; j < list.length; j++) if (!isBilingualPair(list[j], list[i])) return list[j];
+    return null;
+  }
+
   /* ---------------- 文本清洗 ---------------- */
   /* ASS 的特效标记 {\pos(1,2)\b1} 只在 ASS 里有效，导出成别的格式时读出来就是噪音。
      \N / \n 是 ASS 与 SRT 各自的强制换行，统一还原成真换行。 */
@@ -629,10 +657,22 @@
      {op:'split', i} 把第 i 条切成两条（能按行就按行，否则对半）
      {op:'split', i, n} v0.9.295：切成 n 段（体检建议「太长」时用，n 由规则算出）
      {op:'set', i, s, e} 直接改第 i 条的起止
-     ⚠️ n 缺省是 2 —— 292/294 记下的老 ops 没有这个字段，行为必须一模一样 */
+     ⚠️ n 缺省是 2 —— 292/294 记下的老 ops 没有这个字段，行为必须一模一样
+     ⚠️ v0.9.303：ops 的元素也可以是**一组**操作（数组）。形态 B 的「成对延长」就是一组 ——
+        两条必须一起改，只改一条会让它们错开、下一轮体检又报重叠。
+        分组只是记账单位：撤销时 pop 一次正好撤掉一整组，不会出现「撤一半」的中间态。 */
+  function flattenOps(ops) {
+    var out = [];
+    (ops || []).forEach(function (o) {
+      if (!o) return;
+      if (Array.isArray(o)) { o.forEach(function (x) { if (x) out.push(x); }); return; }
+      out.push(o);
+    });
+    return out;
+  }
   function applyOps(cues, ops) {
     var list = clone(cues);
-    (ops || []).forEach(function (o) {
+    flattenOps(ops).forEach(function (o) {
       if (!o || !isNum(o.i)) return;
       var i = Math.round(o.i);
       if (i < 0 || i >= list.length) return;
@@ -772,8 +812,12 @@
         if (cueLines(c).length > 2) why.push('rows');
       }
       /* 「首尾相接」不算问题（end == 下一条的 start 是真实素材最常见的切法），
-         只有真的叠在同一段时间里才报 —— 几毫秒的舍入误差仍按相接处理。 */
-      if (i > 0 && list[i - 1].end - c.start > OVERLAP_TOL) why.push('overlap');
+         只有真的叠在同一段时间里才报 —— 几毫秒的舍入误差仍按相接处理。
+         ⚠️ v0.9.303：形态 B 的双语对（原文一条 + 译文一条，起止对得上）不报。
+            它们本来就该同轴，报出来就是每对必红一条；而「往后挪开」的建议会把译文
+            挪到原文之后，那才是真把双语毁了。判据见 isBilingualPair。 */
+      if (i > 0 && list[i - 1].end - c.start > OVERLAP_TOL
+        && !isBilingualPair(list[i - 1], c)) why.push('overlap');
       if (why.length) out.push({ i: i, why: why });
     }
     return out;
@@ -786,7 +830,14 @@
     var r = rules || CHECK_RULES, i = issue.i, c = list[i], out = [], seen = {};
     if (!c) return out;
     var why = issue.why || [], dur = c.end - c.start, w = cueWidth(c);
-    var prev = list[i - 1], next = list[i + 1];
+    /* 「邻居」要跳过同轴的双语伙伴：形态 B 里 list[i-1] 是同一句的另一种语言，
+       拿它算「最晚能撑到哪」会得出 c.start - 100 这种荒谬的上限，延长建议直接被吞掉。 */
+    var prev = prevTemporal(list, i), next = nextTemporal(list, i);
+    /* 同轴伙伴的下标（形态 B）。找着了就意味着：动这一条必须连伙伴一起动，
+       否则两条错开、下一次体检就把它们当重叠报出来 —— 从一个 bug 滚成另一个。 */
+    var mate = -1;
+    if (isBilingualPair(list[i - 1], c)) mate = i - 1;
+    else if (isBilingualPair(c, list[i + 1])) mate = i + 1;
     function add(k, op) {
       var key = JSON.stringify(op);
       if (seen[key]) return;
@@ -816,13 +867,26 @@
     if (why.indexOf('fast') >= 0) want = Math.max(want, Math.round(w / r.maxCps * 1000));
     if (want > dur) {
       var e2 = Math.min(c.start + want, ceilEnd);
-      if (e2 > c.end) add('btnLengthen', { op: 'set', i: i, s: c.start, e: e2 });
+      if (e2 > c.end) {
+        /* 形态 B：两条一起延，并且保留它们之间原来那点起止偏差
+           —— 有的字幕是故意让译文晚几十毫秒出现的，顺手抹平等于替用户改了主意 */
+        if (mate >= 0) {
+          add('btnLengthen', [
+            { op: 'set', i: i, s: c.start, e: e2 },
+            { op: 'set', i: mate, s: list[mate].start, e: e2 + (list[mate].end - c.end) }
+          ]);
+        } else {
+          add('btnLengthen', { op: 'set', i: i, s: c.start, e: e2 });
+        }
+      }
     }
     /* 太长 / 一行太宽 / 行数超两条的切开：段数按「最长停留」「最宽行」「行数÷2」三把尺子取最大的那个。
        ⚠️ 算出来还得按「最宽那一段能占多少时间」复核一遍：各段字数不可能一模一样，
           21 秒 ÷ 7 秒 = 3 段是纸面上的答案，可占字数最多的那段实际是 7.2 秒 ——
           采纳完往下看还是红的，用户只会觉得工具没干活。这里按最宽段反推补几段。 */
-    if (why.indexOf('long') >= 0 || why.indexOf('line') >= 0 || why.indexOf('rows') >= 0) {
+    /* 形态 B 不给切开建议：切开一条，原文与译文的条数就对不上了，
+       剩下那半句会孤零零挂在屏幕上（跟形态 A 不给切开建议同一个道理） */
+    if ((why.indexOf('long') >= 0 || why.indexOf('line') >= 0 || why.indexOf('rows') >= 0) && mate < 0) {
       var n = 2;
       if (why.indexOf('long') >= 0) n = Math.max(n, Math.ceil(dur / r.maxDur));
       if (why.indexOf('line') >= 0) n = Math.max(n, Math.ceil(w / r.maxLine));
@@ -837,7 +901,8 @@
       }
       add('btnSplit', { op: 'split', i: i, n: n });
     }
-    if (why.indexOf('short') >= 0) {
+    /* 形态 B 不给合并建议：把原文和译文并成一条，等于替用户改了字幕的形态 */
+    if (why.indexOf('short') >= 0 && mate < 0) {
       if (prev) add('btnMergePrev', { op: 'merge', i: i - 1 });
       else if (next) add('btnMergeNext', { op: 'merge', i: i });
     }
@@ -1038,6 +1103,8 @@
     applyOps: applyOps,
     scriptOf: scriptOf,
     isBilingualCue: isBilingualCue,
+    isBilingualPair: isBilingualPair,
+    ALIGN_TOL: ALIGN_TOL,
     parseUserTime: parseUserTime,
     CHECK_RULES: CHECK_RULES,
     CHECK_FIELDS: CHECK_FIELDS,
