@@ -1077,7 +1077,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.309</span>
+    <span class="ver-tag">v0.9.310</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1663,13 +1663,29 @@ crossorigin="anonymous"></script>
   </div>
 </div>
 
+<!-- v0.9.310：SEO 静态文案 —— 爬虫不执行 JS，这一段是它唯一能读到的正文。
+     server.js 按语言路由把下面两个 COPY 标记之间那一整段换成对应语言，
+     直接打开文件时显示这里的简体中文默认版。
+     ⚠️ 首页和工作台以前根本没这两个标记 —— 26 个非中文版本正文一直是中文。 -->
+<!--SEO-COPY-START-->
+  <section class="seo" aria-label="关于本工具" style="max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;">关于随心字幕 AI</h2>
+    <p>本工具是一款<strong>基于 AI 大模型的免费在线字幕翻译服务</strong>，支持 SRT / VTT / ASS 等主流字幕格式与中文、英文、日文等多语言互译。无需注册、无需下载客户端，浏览器打开即可使用，字幕数据全程不上传服务器（除非你勾选了云端翻译）。</p>
+    <p style="margin-top:8px;"><strong>主要功能：</strong>SRT / VTT / ASS 字幕解析与翻译、句级智能合并（一个完整句子分布在多条字幕时合并翻译后按时长回填）、时间轴对齐、自动折行（支持 CJK 与西文混合宽度）、去水词、专有名词保留或翻译、可选翻译风格（信达雅 / 大白话 / 自定义）。译文可直接导出为 SRT / VTT / ASS / TXT 等格式压制视频。</p>
+    <p style="margin-top:8px;"><strong>适用人群：</strong>视频翻译从业者、自媒体创作者、外语学习者、字幕组、需要快速本地化视频内容的团队。</p>
+  </section>
+  <noscript>
+    <p style="max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;">本工具需要启用 JavaScript 才能使用。请在浏览器中启用 JavaScript，然后上传 SRT / VTT / ASS 字幕文件即可使用 AI 免费字幕翻译。</p>
+  </noscript>
+  <!--SEO-COPY-END-->
+
 <!-- 共享页脚（两个视图之外） -->
 <div class="footer" data-i18n="footer">随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你</div>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.309"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.309"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.310"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.310"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
