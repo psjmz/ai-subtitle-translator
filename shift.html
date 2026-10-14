@@ -141,13 +141,33 @@
   .chkrow .op{display:flex;gap:6px;flex:none}
   .chkrow .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
   .chkrow .op button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
-  /* 四个阈值：和步骤流水线同样做成「框里带单位后缀」，别再用 placeholder 传达单位 */
+  /* 四个阈值：和步骤流水线同样做成「框里带单位后缀」，别再用 placeholder 传达单位。
+     v0.9.307：画面方向从行尾挪到**最前**（先定画面，参数才有意义），并做成分段控件 ——
+     原来是行尾一个灰底小 chip，用户反馈「横屏/竖屏的按钮应该明显点，放在前面」。 */
   .rules{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;
     background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
   .rules .rl{display:inline-flex;align-items:center;gap:6px}
   .rules .rl .lb{font-size:12.5px;color:var(--sub)}
-  .rules .rl .pv input.num{width:78px;padding-right:44px}
+  /* v0.9.307：把框加宽一点 —— 78px 装不下「0.833」，截图里被截成「0.8」，
+     用户会误读成值就是 0.8（单位「秒」只用得着 30px 左右） */
+  .rules .rl .pv input.num{width:92px;padding-right:36px}
   .rules .rl input.num{height:30px}
+  /* 分段控件：两格紧贴、选中格实心主色 —— 一眼看出当前是哪个方向 */
+  .rules .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:9px;
+    overflow:hidden;background:var(--card)}
+  .rules .seg button{height:30px;padding:0 13px;border:0;border-radius:0;background:transparent;
+    color:var(--sub);font-size:12.5px;font-weight:600;cursor:pointer}
+  .rules .seg button + button{border-left:1px solid var(--line-strong)}
+  .rules .seg button:hover{background:var(--acc-weak);color:var(--acc-ink)}
+  .rules .seg button[aria-pressed="true"]{background:var(--acc);color:#fff}
+  .rules .seg button[aria-pressed="true"]:hover{background:var(--acc);color:#fff}
+  .rules .vsep{width:1px;height:22px;background:var(--line-strong);flex:none}
+  /* 竖屏时行宽框的值被打了 0.6 折 —— 不标出来，用户会以为框自己变了 */
+  .rules .lk{font-size:10.5px;font-weight:700;color:var(--acc-ink);background:var(--acc-weak);
+    border:1px solid var(--acc-line);border-radius:5px;padding:1px 5px;white-space:nowrap}
+  /* 依据注释：这几个数凭什么这么定 —— 占满一整行，贴在参数下面 */
+  .rules .rnote{flex-basis:100%;border-top:1px solid var(--line);margin-top:2px;padding-top:8px;
+    font-size:12px;line-height:1.65;color:var(--mut)}
   .chk-empty{font-size:12.5px;color:var(--ok-ink);padding:2px 0 6px}
   .li .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
   .li input.tm{width:104px;height:28px;flex:none}
@@ -316,8 +336,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.306"></script>
-<script src="shift-core.js?v=0.9.306"></script>
+<script src="shift-i18n.js?v=0.9.307"></script>
+<script src="shift-core.js?v=0.9.307"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -337,7 +357,8 @@ function t(k) {
   var d = I18N[LANG] || I18N['en'];
   return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
 }
-function tpl(k, a) { return String(t(k)).replace('{0}', a); }
+/* v0.9.307：支持第二个占位符（依据注释里要说「当前 21 → 13」） */
+function tpl(k, a, b) { return String(t(k)).replace('{0}', a).replace('{1}', b); }
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -648,28 +669,54 @@ function defRules() {
 function renderRules() {
   var C = window.ShiftCore, box = $('#ruleRow');
   if (!S.chkRules) S.chkRules = defRules();
-  box.innerHTML = C.CHECK_FIELDS.map(function (f) {
+  /* v0.9.307：画面方向挪到**最前**，做成两格分段控件（选中格实心主色）。
+     原来是行尾一个灰底小 chip，用户反馈「横屏/竖屏的按钮应该明显点，放在前面」。 */
+  var dir = '<span class="rl"><span class="lb">' + esc(t('rlPortrait')) + '</span>'
+    + '<span class="seg">'
+    + '<button type="button" data-dir="land" aria-pressed="' + (S.portrait ? 'false' : 'true') + '">'
+    + esc(t('rlOff')) + '</button>'
+    + '<button type="button" data-dir="port" aria-pressed="' + (S.portrait ? 'true' : 'false') + '">'
+    + esc(t('rlOn')) + '</button>'
+    + '</span></span><span class="vsep"></span>';
+  /* 框里存的永远是横屏**基线**；竖屏时显示的是打过 0.6 折的值 ——
+     换算只有引擎那一处（uiLineOut / uiLineIn），页面不自己乘 */
+  var base = Number(S.chkRules.maxLine);
+  if (!isFinite(base) || base <= 0) base = C.CHECK_RULES.maxLine;
+  var line = C.uiLineOut(base, S.portrait);
+  box.innerHTML = dir + C.CHECK_FIELDS.map(function (f) {
+    /* 只有「单行最多」跟画面方向联动：竖屏画面窄，行宽上限按 60% 收。
+       停留时长和读速跟横竖屏没有关系 —— 一条停多久、每秒能读几个字，
+       跟画面是横是竖无关，跟着变反而会让人以为「竖屏就能读得更慢」。 */
+    var isLine = f.id === 'maxLine';
     return '<span class="rl"><span class="lb">' + esc(t(f.key)) + '</span>'
       + '<span class="pv"><input class="num" type="text" inputmode="decimal" data-rule="' + f.id + '"'
-      + ' value="' + esc(S.chkRules[f.id]) + '">'
-      + '<span class="un">' + esc(t(f.unit)) + '</span></span></span>';
+      + ' value="' + esc(String(isLine ? line : S.chkRules[f.id])) + '">'
+      + '<span class="un">' + esc(t(f.unit)) + '</span></span>'
+      + (isLine && S.portrait ? '<span class="lk">×' + C.PORTRAIT_LINE + '</span>' : '')
+      + '</span>';
   }).join('')
-  /* v0.9.300：竖屏开关 —— 9:16 画面窄，行宽按行业惯例收到横屏的 60%（中文 16→10、拉丁 42→25）。
-     挂在阈值行尾，跟四个框同一排；状态只影响 maxLine，时长与读速与画面方向无关 */
-    + '<span class="rl"><span class="lb">' + esc(t('rlPortrait')) + '</span>'
-    + '<button type="button" class="chip tog" id="rlPortrait" aria-pressed="' + (S.portrait ? 'true' : 'false') + '">'
-    + esc(S.portrait ? t('rlOn') : t('rlOff')) + '</button></span>';
+  /* 依据注释：这几个数凭什么这么定、为什么只有行宽跟着方向变。
+     ⚠️ 两个数分别是「横屏基线」和「竖屏换算值」—— 都是固定口径，不随当前方向变。
+        写成「当前方向的显示值」会在横屏时变成「横屏 21 字 → 竖屏 21 字」，等于没说。 */
+    + '<div class="rnote">' + esc(tpl('rlNote', base, C.uiLineOut(base, true))) + '</div>';
   box.querySelectorAll('[data-rule]').forEach(function (el) {
     el.addEventListener('change', function () {
-      S.chkRules[el.getAttribute('data-rule')] = el.value;
+      var id = el.getAttribute('data-rule');
+      /* 竖屏下行宽框填的是打过折的值，写回基线要反算回来（不然切一次方向就掉一次精度） */
+      S.chkRules[id] = (id === 'maxLine')
+        ? String(C.uiLineIn(el.value, S.portrait)) : el.value;
+      renderRules();
       renderCheck();
     });
   });
-  var pb = box.querySelector('#rlPortrait');
-  if (pb) pb.addEventListener('click', function () {
-    S.portrait = !S.portrait;
-    renderRules();
-    renderCheck();
+  box.querySelectorAll('[data-dir]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var p = b.getAttribute('data-dir') === 'port';
+      if (p === S.portrait) return;
+      S.portrait = p;
+      renderRules();
+      renderCheck();
+    });
   });
 }
 /* 每次列表变了就整份重扫 —— 下标是「当下这张列表」的下标，缓存上一次的会指错人 */

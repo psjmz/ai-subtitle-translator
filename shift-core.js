@@ -828,10 +828,28 @@
     { id: 'maxCps', key: 'rlSpeed', unit: 'unitCps', mul: 1, def: 9 },
     { id: 'maxLine', key: 'rlLine', unit: 'unitChar', mul: 1, def: 21 }
   ];
+  /* 竖屏（手机 9:16）画面窄 —— 单行字数按行业惯例收到横屏的 60%（21 → 13）。
+     v0.9.307：这个系数只有一处，正反两个方向都由它算，页面不自己乘：
+       uiLineOut 基线 → 当前方向的显示值（页面上行宽框里显示的）
+       uiLineIn  当前方向用户填的值 → 基线（竖屏下调成 14，基线就跟着走）
+     ⚠️ 框里存的永远是**基线**（横屏口径），方向只改变「看到哪个数」。
+        这样来回切方向不会一轮轮掉精度，也不会出现「竖屏调过就找不回原值」。 */
+  var PORTRAIT_LINE = 0.6;
+  function uiLineOut(base, portrait) {
+    var v = Number(base);
+    if (!isFinite(v) || v <= 0) v = CHECK_RULES.maxLine;
+    /* 最低 4 —— 一行再窄就没法读了 */
+    return portrait ? Math.max(4, Math.round(v * PORTRAIT_LINE)) : v;
+  }
+  function uiLineIn(shown, portrait) {
+    var v = Number(shown);
+    if (!isFinite(v) || v <= 0) return CHECK_RULES.maxLine;
+    return portrait ? Math.max(4, Math.round(v / PORTRAIT_LINE)) : v;
+  }
   /* 页面上那四个框的值（人读单位）→ 引擎内部的规则表。空值 / 非数字退回默认，
      不因为用户把框清了就整份体检跑歪。
-     portrait：竖屏（手机 9:16）画面窄 —— 每行字数按行业惯例收到横屏的 60%
-     （中文 16→10、拉丁 42→25），时长 / 读速不随方向变。 */
+     portrait：竖屏画面窄 —— 每行字数收到横屏的 60%，时长 / 读速不随方向变
+     （一条字幕停多久、每秒能读几个字，跟画面是横是竖没有关系）。 */
   function uiRules(vals, fmt, portrait) {
     var r = {}, i, f, v;
     for (i = 0; i < CHECK_FIELDS.length; i++) {
@@ -839,8 +857,7 @@
       v = Number((vals || {})[f.id]);
       r[f.id] = isFinite(v) && v > 0 ? v * f.mul : CHECK_RULES[f.id];
     }
-    /* v0.9.300：竖屏开关。maxLine × 0.6 后四舍五入，但别低于 4（一行的最低可读宽度） */
-    if (portrait) r.maxLine = Math.max(4, Math.round(r.maxLine * 0.6));
+    r.maxLine = uiLineOut(r.maxLine, !!portrait);
     /* 短规则不能反过来比长规则还宽，用户拖错了按错处理 */
     if (r.minDur > r.maxDur) r.minDur = CHECK_RULES.minDur;
     return r;
@@ -1233,6 +1250,9 @@
     SNAP_GAP: SNAP_GAP,
     OVERLAP_TOL: OVERLAP_TOL,
     uiRules: uiRules,
+    uiLineOut: uiLineOut,
+    uiLineIn: uiLineIn,
+    PORTRAIT_LINE: PORTRAIT_LINE,
     checkable: checkable,
     checkCues: checkCues,
     suggest: suggest,
