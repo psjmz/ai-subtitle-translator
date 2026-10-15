@@ -146,7 +146,7 @@ crossorigin="anonymous"></script>
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
-      <span class="navpills" id="navPills"></span>
+      <span id="topNav"></span>
       <select id="langSel" aria-label="界面语言"></select>
     </div>
   </header>
@@ -211,8 +211,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="videosub-i18n.js?v=0.9.316"></script>
-<script src="videosub-core.js?v=0.9.316"></script>
+<script src="videosub-i18n.js?v=0.9.317"></script>
+<script src="videosub-core.js?v=0.9.317"></script>
 <script>
 'use strict';
 var I18N = window.VIDEOSUB_I18N.DICT, LANGS = window.VIDEOSUB_I18N.LANGS;
@@ -253,30 +253,7 @@ function clockStr(ms) {
 
 /* 顶部胶囊：本页自带一份，不引入 site-nav.js（那几页的导航清单不该被新页牵动）。
    清单是「上线时点已有哪些页」的快照 —— 与 convert/bilingual/shift/repair/extract/glossary 各自的清单策略一致。 */
-var NAV = [
-  { key: 'navHome', href: null },
-  { key: 'navTr', href: '/translate.html' },
-  { key: 'navFx', href: '/merge.html' },
-  { key: 'navCl', href: '/clean.html' },
-  { key: 'navCv', href: '/convert.html' },
-  { key: 'navSp', href: '/bilingual.html' },
-  { key: 'navSh', href: '/shift.html' },
-  { key: 'navRp', href: '/repair.html' },
-  { key: 'navEx', href: '/extract.html' },
-  { key: 'navGl', href: '/glossary.html' },
-  { key: 'navHc', href: '/hanconv.html' }
-];
-function renderNav() {
-  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
-  $('#navPills').innerHTML = NAV.map(function (n) {
-    var href = n.href === null ? home : ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href);
-    return '<a class="pill" href="' + href + '" data-nav="' + n.key + '"></a>';
-  }).join('');
-  NAV.forEach(function (n) {
-    var el = $('#navPills').querySelector('[data-nav="' + n.key + '"]');
-    if (el) el.textContent = t(n.key);
-  });
-}
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 function applyI18n() {
   document.documentElement.lang = LANG;
   document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
@@ -289,7 +266,6 @@ function applyI18n() {
   /* 标题是「两段拼一句」：中文直接连写，西文中间要留空格，不然英文 h1 会连成「Videoembedded subtitles」 */
   var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
   if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
-  renderNav();
   renderTracks();
   renderStat();
 }
@@ -568,5 +544,6 @@ function bind() {
     <p style="margin-top:8px;">多语言字幕轨一条条列出来让你挑，ASS 轨自带的样式头与分辨率原样带回。图形字幕（蓝光 PGS、DVD 字幕）是刻在画面上的图，没有文字可抽，页面会直接告诉你。导出 SRT、VTT、ASS 或纯文本。</p>
   </section>
 <!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.317" data-tool="vs"></script>
 </body>
 </html>

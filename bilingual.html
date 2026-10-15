@@ -126,7 +126,7 @@ crossorigin="anonymous"></script>
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
-      <span class="navpills" id="navPills"></span>
+      <span id="topNav"></span>
       <select id="langSel" aria-label="界面语言"></select>
     </div>
   </header>
@@ -180,8 +180,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="bilingual-i18n.js?v=0.9.316"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
-<script src="bilingual-core.js?v=0.9.316"></script>
+<script src="bilingual-i18n.js?v=0.9.317"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="bilingual-core.js?v=0.9.317"></script>
 <script>
 'use strict';
 var I18N = window.BILINGUAL_I18N.DICT, LANGS = window.BILINGUAL_I18N.LANGS;
@@ -194,25 +194,7 @@ function t(k) {
 }
 function tpl(k, a) { return String(t(k)).replace('{0}', a); }
 
-/* 顶部胶囊：本页自带一份，不引入 site-nav.js */
-var NAV = [
-  { key: 'navHome', href: null },
-  { key: 'navTr', href: '/translate.html' },
-  { key: 'navFx', href: '/merge.html' },
-  { key: 'navCl', href: '/clean.html' },
-  { key: 'navCv', href: '/convert.html' }
-];
-function renderNav() {
-  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
-  $('#navPills').innerHTML = NAV.map(function (n) {
-    var href = n.href === null ? home : ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href);
-    return '<a class="pill" href="' + href + '" data-nav="' + n.key + '"></a>';
-  }).join('');
-  NAV.forEach(function (n) {
-    var el = $('#navPills').querySelector('[data-nav="' + n.key + '"]');
-    if (el) el.textContent = t(n.key);
-  });
-}
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(function (el) {
     el.textContent = t(el.getAttribute('data-i18n'));
@@ -226,7 +208,6 @@ function applyI18n() {
      v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
   var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
   if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
-  renderNav();
   syncLogoHome();
   renderOptions();
 }
@@ -492,5 +473,6 @@ function bind() {
     <p style="margin-top:8px;">拿到别人做的双语字幕、只想留一种语言的人，以及要把原文和译文分开存档的字幕组。</p>
   </section>
 <!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.317" data-tool="bi"></script>
 </body>
 </html>

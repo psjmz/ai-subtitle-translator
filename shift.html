@@ -246,7 +246,7 @@ crossorigin="anonymous"></script>
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
-      <span class="navpills" id="navPills"></span>
+      <span id="topNav"></span>
       <select id="langSel" aria-label="界面语言"></select>
     </div>
   </header>
@@ -336,8 +336,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.316"></script>
-<script src="shift-core.js?v=0.9.316"></script>
+<script src="shift-i18n.js?v=0.9.317"></script>
+<script src="shift-core.js?v=0.9.317"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -364,26 +364,7 @@ function esc(s) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-/* 顶部胶囊：本页自带一份，不引入 site-nav.js */
-var NAV = [
-  { key: 'navHome', href: null },
-  { key: 'navTr', href: '/translate.html' },
-  { key: 'navFx', href: '/merge.html' },
-  { key: 'navCl', href: '/clean.html' },
-  { key: 'navCv', href: '/convert.html' },
-  { key: 'navSp', href: '/bilingual.html' }
-];
-function renderNav() {
-  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
-  $('#navPills').innerHTML = NAV.map(function (n) {
-    var href = n.href === null ? home : ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href);
-    return '<a class="pill" href="' + href + '" data-nav="' + n.key + '"></a>';
-  }).join('');
-  NAV.forEach(function (n) {
-    var el = $('#navPills').querySelector('[data-nav="' + n.key + '"]');
-    if (el) el.textContent = t(n.key);
-  });
-}
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(function (el) {
     el.textContent = t(el.getAttribute('data-i18n'));
@@ -399,7 +380,6 @@ function applyI18n() {
   if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
   /* ⚠️ 阿拉伯语 / 希伯来语是从右往左写的 —— 只换文字不翻版面，整页看起来是错位的 */
   document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
-  renderNav();
   syncLogoHome();
   renderOptions();
   renderSteps();
@@ -1069,5 +1049,6 @@ function bind() {
     <p style="margin-top:8px;">需要把字幕对齐画面的人：换了片源、字幕整体快了慢了、拿到的是别人按不同帧率做的字幕，或者一句话被切得太碎、一条字幕在屏幕上停太久。</p>
   </section>
 <!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.317" data-tool="sh"></script>
 </body>
 </html>

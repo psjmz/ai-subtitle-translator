@@ -126,7 +126,7 @@ crossorigin="anonymous"></script>
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
-      <span class="navpills" id="navPills"></span>
+      <span id="topNav"></span>
       <select id="langSel" aria-label="界面语言"></select>
     </div>
   </header>
@@ -188,9 +188,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="hanconv-data.js?v=0.9.316"></script>
-<script src="hanconv-i18n.js?v=0.9.316"></script>
-<script src="hanconv-core.js?v=0.9.316"></script>
+<script src="hanconv-data.js?v=0.9.317"></script>
+<script src="hanconv-i18n.js?v=0.9.317"></script>
+<script src="hanconv-core.js?v=0.9.317"></script>
 <script>
 'use strict';
 var I18N = window.HANCONV_I18N.DICT, LANGS = window.HANCONV_I18N.LANGS;
@@ -221,30 +221,7 @@ function esc(s) {
 
 /* 顶部胶囊：本页自带一份，不引入 site-nav.js（那几页的导航清单不该被新页牵动）。
    清单是「上线时点已有哪些页」的快照 —— 与 convert/bilingual/shift/repair/extract/glossary 各自的清单策略一致。 */
-var NAV = [
-  { key: 'navHome', href: null },
-  { key: 'navTr', href: '/translate.html' },
-  { key: 'navFx', href: '/merge.html' },
-  { key: 'navCl', href: '/clean.html' },
-  { key: 'navCv', href: '/convert.html' },
-  { key: 'navSp', href: '/bilingual.html' },
-  { key: 'navSh', href: '/shift.html' },
-  { key: 'navRp', href: '/repair.html' },
-  { key: 'navEx', href: '/extract.html' },
-  { key: 'navGl', href: '/glossary.html' },
-  { key: 'navVs', href: '/videosub.html' }
-];
-function renderNav() {
-  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
-  $('#navPills').innerHTML = NAV.map(function (n) {
-    var href = n.href === null ? home : ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href);
-    return '<a class="pill" href="' + href + '" data-nav="' + n.key + '"></a>';
-  }).join('');
-  NAV.forEach(function (n) {
-    var el = $('#navPills').querySelector('[data-nav="' + n.key + '"]');
-    if (el) el.textContent = t(n.key);
-  });
-}
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 /* 方向下拉：三组，组名与词条都走 i18n（m_<id> 一组词条） */
 var GROUPS = [
   { key: 'grpS2T', modes: ['s2t', 's2twp', 's2tw', 's2hk'] },
@@ -272,7 +249,6 @@ function applyI18n() {
   /* 标题是「两段拼一句」：中文直接连写，西文中间要留空格，不然英文 h1 会连成「SubtitleChinese converter」 */
   var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
   if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
-  renderNav();
   renderDir();
   renderStat();
 }
@@ -473,5 +449,6 @@ function readFile(f) {
     <p style="margin-top:8px;">词库来自 OpenCC（Apache-2.0），长词优先：一简对多繁不会转错（干净是乾淨、干燥是乾燥、头发是頭髮），台湾用词与香港用词各按各的习惯（软件在台湾是軟體、在香港是軟件）。支持 SRT、VTT、ASS、TXT。</p>
   </section>
 <!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.317" data-tool="hc"></script>
 </body>
 </html>

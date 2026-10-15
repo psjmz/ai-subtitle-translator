@@ -213,7 +213,7 @@ crossorigin="anonymous"></script>
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 LANG 走。 -->
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
-      <span id="siteNav"></span>
+      <span id="topNav"></span>
       <select id="langSel" aria-label="界面语言"></select>
     </div>
   </header>
@@ -319,7 +319,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.316"></script>
+<script src="clean-core.js?v=0.9.317"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -3326,7 +3326,7 @@ function initLang() {
   render();
 })();
 </script>
-<script src="site-nav.js?v=0.9.316" data-tool="clean"></script>
+<script src="site-topnav.js?v=0.9.317" data-tool="cl"></script>
 
 <!-- v0.9.273：SEO 静态文案（同上，按语言路由替换；直接开文件时显示简体中文默认版） -->
 <!--SEO-COPY-START-->

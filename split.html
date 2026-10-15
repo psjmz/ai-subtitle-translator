@@ -151,7 +151,7 @@ crossorigin="anonymous"></script>
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
-      <span class="navpills" id="navPills"></span>
+      <span id="topNav"></span>
       <select id="langSel" aria-label="UI language"></select>
     </div>
   </header>
@@ -260,8 +260,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="split-i18n.js?v=0.9.316"></script>
-<script src="split-core.js?v=0.9.316"></script>
+<script src="split-i18n.js?v=0.9.317"></script>
+<script src="split-core.js?v=0.9.317"></script>
 <script>
 'use strict';
 var I18N = window.SPLIT_I18N.DICT, LANGS = window.SPLIT_I18N.LANGS;
@@ -293,32 +293,7 @@ function fmtDur(ms) {
   return m + ':' + String(s).padStart(2, '0');
 }
 
-/* 顶部胶囊：本页自带一份（快照策略，与其它垂直页一致，不含自己） */
-var NAV = [
-  { key: 'navHome', href: null },
-  { key: 'navTr', href: '/translate.html' },
-  { key: 'navFx', href: '/merge.html' },
-  { key: 'navCl', href: '/clean.html' },
-  { key: 'navCv', href: '/convert.html' },
-  { key: 'navSp', href: '/bilingual.html' },
-  { key: 'navSh', href: '/shift.html' },
-  { key: 'navRp', href: '/repair.html' },
-  { key: 'navEx', href: '/extract.html' },
-  { key: 'navGl', href: '/glossary.html' },
-  { key: 'navVs', href: '/videosub.html' },
-  { key: 'navHc', href: '/hanconv.html' },
-  { key: 'navTbl', href: '/table.html' },
-  { key: 'navBt', href: '/batch.html' },
-  { key: 'navLrc', href: '/lrc.html' }
-];
-function renderNav() {
-  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
-  $('#navPills').innerHTML = NAV.map(function (n) {
-    var href = n.href ? ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href) : home;
-    return '<a class="pill" href="' + href + '">' + esc(t(n.key)) + '</a>';
-  }).join('');
-}
-
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 /* ---------- i18n 应用 ---------- */
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(function (el) {
@@ -368,7 +343,7 @@ function initLang() {
   sel.addEventListener('change', function () {
     LANG = sel.value;
     try { localStorage.setItem('splitUiLang', LANG); } catch (e) { }
-    applyI18n(); renderNav(); updateLangLinks(); rerender();
+    applyI18n(); updateLangLinks(); rerender();
   });
   updateLangLinks();
 }
@@ -622,7 +597,6 @@ function hideMsg() { $('#msg').style.display = 'none'; }
 /* ---------- 启动 ---------- */
 initLang();
 applyI18n();
-renderNav();
 </script>
 
 <!-- v0.9.316：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
@@ -635,5 +609,6 @@ renderNav();
     <p style="margin-top:8px;">要做分集上传、分段校对、多段字幕合并的创作者、译制组、剪辑师。</p>
   </section>
 <!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.317" data-tool="sp"></script>
 </body>
 </html>

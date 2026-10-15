@@ -128,7 +128,7 @@ crossorigin="anonymous"></script>
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
-      <span class="navpills" id="navPills"></span>
+      <span id="topNav"></span>
       <select id="langSel" aria-label="界面语言"></select>
     </div>
   </header>
@@ -198,8 +198,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="extract-i18n.js?v=0.9.316"></script>
-<script src="extract-core.js?v=0.9.316"></script>
+<script src="extract-i18n.js?v=0.9.317"></script>
+<script src="extract-core.js?v=0.9.317"></script>
 <script>
 'use strict';
 var I18N = window.EXTRACT_I18N.DICT, LANGS = window.EXTRACT_I18N.LANGS;
@@ -229,27 +229,7 @@ function esc(s) {
 
 /* 顶部胶囊：本页自带一份，不引入 site-nav.js（那几页的导航清单不该被新页牵动）。
    清单是「上线时点已有哪些页」的快照 —— 与 convert/bilingual/shift/repair 各自的清单策略一致。 */
-var NAV = [
-  { key: 'navHome', href: null },
-  { key: 'navTr', href: '/translate.html' },
-  { key: 'navFx', href: '/merge.html' },
-  { key: 'navCl', href: '/clean.html' },
-  { key: 'navCv', href: '/convert.html' },
-  { key: 'navSp', href: '/bilingual.html' },
-  { key: 'navSh', href: '/shift.html' },
-  { key: 'navRp', href: '/repair.html' }
-];
-function renderNav() {
-  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
-  $('#navPills').innerHTML = NAV.map(function (n) {
-    var href = n.href === null ? home : ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href);
-    return '<a class="pill" href="' + href + '" data-nav="' + n.key + '"></a>';
-  }).join('');
-  NAV.forEach(function (n) {
-    var el = $('#navPills').querySelector('[data-nav="' + n.key + '"]');
-    if (el) el.textContent = t(n.key);
-  });
-}
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 function applyI18n() {
   document.documentElement.lang = LANG;
   /* 阿拉伯语 / 希伯来语整页从右往左排 */
@@ -264,7 +244,6 @@ function applyI18n() {
      中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「Subtitleextract text」。 */
   var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
   if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
-  renderNav();
   renderStats();
 }
 
@@ -498,5 +477,6 @@ function syncLayoutSeg() {
     <p style="margin-top:8px;">需要把 SRT 转成 TXT 做笔记、把访谈字幕整理成文稿、给视频写文字稿、或者只想快速读一遍台词的人。</p>
   </section>
 <!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.317" data-tool="ex"></script>
 </body>
 </html>

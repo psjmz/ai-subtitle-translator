@@ -119,17 +119,18 @@
      容器只有三种（凡挂 ⓘ 的）：
        · .flbl —— 字段标签（左栏绝大多数）
        · .tgl-row —— 开关那一整行（挂到行上，不能挂 .l：它只裹文字，实测浮层只有 44px 宽）
-       · .blk-title.wrap-head —— 折行块标题行（v0.9.316 起行宽标签也挂这行，按整行铺开；
-         按列铺只有 107px，浮层细长没法读）
+       · .wrap-line —— 折行块整行（v0.9.317 起标题行删掉，行宽标签与输入框同一排；
+         标签 ⓘ 装的是「无须重跑翻译 + 行宽释义」的合并文案，按整行铺开才放得下。
+         标签自身须 position:static，否则浮层缩回标签宽）
      （v0.9.74 那条「左栏自图标向右展开」的老 hack 一并作废：它只治左栏，且照样探出右边界。） */
   .info{position:static}
   .info::after{left:0;right:0;width:auto;max-width:none;transform:translateY(4px)}
   .info::before{left:50%;transform:translateX(-50%) rotate(45deg)}
   .info:hover::after{opacity:1;transform:translateY(0)}
   .flbl,.tgl-row{position:relative}
-  /* v0.9.316：挪上标题行的行宽标签不自成定位上下文 —— 浮层锚点由 .blk-title（relative）接管，
-     照旧铺满整行宽（与旧 .wrap-row 时代同理由） */
-  .wrap-head .wrap-lbl{position:static}
+  /* v0.9.317：折行单行里的行宽标签不自成定位上下文 —— 浮层锚点由 .wrap-line（relative）接管，
+     合并 ⓘ 的浮层照旧铺满整行宽（细在标签里没法读） */
+  .wrap-line .wrap-lbl{position:static}
   /* v0.9.199：ⓘ 此前只有 :hover 能唤出浮层——触屏没有 hover、键盘 Tab 不到（<i> 默认不可聚焦），
      这两类用户一条帮助都拿不到。给 <i> 补了 tabindex="0"，这里补聚焦态：键盘 Tab 到就显示，
      并显示焦点环（不然用户不知道焦点在哪）。同理 [data-tip] 虚线词也补一份。 */
@@ -175,13 +176,14 @@
   /* v0.9.190：「折行阈值 / 双语行宽」两列并排（右栏只有 226px 可用宽，两列各 ~108px，
      number 输入框足够；hint 是「21 ≈ 50 个字符」这类短句，2 行内放得下）。
      目的：把竖排时的两组 label+input+hint 并成一组，矮屏右栏不再出现内滚动条。 */
-  /* v0.9.316：折行设置压成两行 —— 行宽标签挪上标题行右端（跟着模式二选一），
-     输入框与换算提示并成一排。原先竖着四层（标题/标签/输入框/提示），
-     压两行后矮屏更难触发右栏内滚动（v0.9.190/202 两次压高度的延续）。
-     ⚠️ 给了 display 就要自己管住 [hidden]（v0.9.309 的教训）：wrap-lbl 与 wr-cell 都补了。 */
-  .blk-title.wrap-head{display:flex;align-items:center;gap:6px}
-  /* 标签 margin-left:auto 推到行尾；两个标签永远只显示一个（syncWrapField），auto 只生效一份 */
-  .wrap-head .wrap-lbl{margin:0 0 0 auto;overflow-wrap:anywhere}
+  /* v0.9.317：折行块压成一行 —— 「折行设置」标题行删掉（块里只剩一个行宽输入，
+     标题比内容还重），标签+输入框+换算提示同一排（316 两行制的延续，块高再降 ~20px）。
+     ⚠️ 给了 display 就要自己管住 [hidden]（v0.9.309 的教训）：wrap-lbl 与 wr-cell 都补了。
+     ⚠️ wrap-line 要 position:relative —— 标签 ⓘ 的合并浮层按整行铺开（标签只有 ~70px，
+     缩在标签里细长没法读）；标签自身必须 static，否则浮层缩回标签宽（同 .flbl 默认 relative）。 */
+  .wrap-line{display:flex;align-items:center;gap:10px;position:relative}
+  /* 行宽标签贴行首、不抢输入框的宽；两个标签永远只显示一个（syncWrapField） */
+  .wrap-line .wrap-lbl{margin:0;flex:none;position:static;overflow-wrap:anywhere}
   .wrap-lbl[hidden]{display:none}
   .wrap-line{display:flex;align-items:center;gap:10px}
   .wrap-line>.wr-cell{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
@@ -1087,8 +1089,11 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.316</span>
+    <span class="ver-tag">v0.9.317</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
+    <!-- v0.9.317：全站统一导航进工作台顶栏（278 曾撤掉本页胶囊；这次用户拍板全站 16 页统一，
+         工作台也挂同一条 site-topnav，替换掉当年「不需要导航」的决定） -->
+    <span id="topNav"></span>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
       <div class="tk-track" id="tkTrack"></div>
@@ -1607,24 +1612,24 @@ crossorigin="anonymous"></script>
            ② 折行块本来只有「一个输入框 + 一行换算提示」，压着两行灰字显得比它实际的分量重。
            文案与「跟着模式换（单语/双语）」的逻辑一个字没动，只是换了挂载点：
            id 仍是 wrapTipEl，改挂 data-tip-i18n —— 浮层的取词口在这里（见 applyTipI18n）。 -->
-      <!-- v0.9.316：整块压成两行（原先标题/标签/输入框/提示竖着四层，右栏高度吃紧）：
-           ① 行宽标签挪上标题行右端 —— 仍跟着模式二选一（syncWrapField 同步换），
-              与「折行设置」同行后语义正好：这节就是调一个行宽；
-           ② 输入框与换算提示并成一排。所有 id（wrapTipEl / wcellMaxW / maxW / maxWHint /
-              wcellBiMaxW / biMaxW / biMaxWHint）与 data-i18n key 一个不动，
-              updateWidthHints / 语言联动的取词口全部照旧。 -->
+      <!-- v0.9.316：曾把折行块压成两行（标签挪上标题行、输入框与换算提示并排）。
+           v0.9.317：整块再压成一行 —— 「折行设置」标题行删掉（块里只剩一个行宽输入，
+           标题比内容还重），标签+输入框+换算提示同一排；标题行 ⓘ 那句「无须重新翻译」
+           挪进行宽标签的 ⓘ、与行宽释义合并成一条浮层（syncWrapField 运行时现拼，
+           切语言由包装版 applyI18n 触发刷新）。两个 ⓘ 都不再挂 data-tip-i18n ——
+           applyTipI18n 只认单键，会把合并文案冲回半截。
+           所有 id（wrapTipEl / wrapTipBiEl / wlblMaxW / wcellMaxW / maxW / maxWHint /
+           wlblBiMaxW / wcellBiMaxW / biMaxW / biMaxWHint）与 data-i18n key 一个不动，
+           updateWidthHints / 语言联动的取词口全部照旧。 -->
       <div class="param-blk">
-      <div class="blk-title wrap-head">
-        <span data-i18n="secWrap">折行设置</span><i class="info" tabindex="0" id="wrapTipEl" data-tip-i18n="wrapTip">i</i>
-        <label class="flbl wrap-lbl" for="maxW" id="wlblMaxW"><span data-i18n="lblMaxWShort">单语行宽</span><i class="info" tabindex="0" data-tip-i18n="lblMaxW">i</i></label>
-        <label class="flbl wrap-lbl" for="biMaxW" id="wlblBiMaxW" hidden><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" tabindex="0" data-tip-i18n="lblBiMaxW">i</i></label>
-      </div>
       <div class="wrap-line">
+        <label class="flbl wrap-lbl" for="maxW" id="wlblMaxW"><span data-i18n="lblMaxWShort">单语行宽</span><i class="info" tabindex="0" id="wrapTipEl">i</i></label>
         <div class="wr-cell" id="wcellMaxW">
           <input type="number" id="maxW" value="21" min="8" max="48">
           <div class="hint" id="maxWHint"></div>
         </div>
         <!-- v0.9.95：双语专用行宽（只约束译文行），与单语折行阈值解耦 -->
+        <label class="flbl wrap-lbl" for="biMaxW" id="wlblBiMaxW" hidden><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" tabindex="0" id="wrapTipBiEl">i</i></label>
         <div class="wr-cell" id="wcellBiMaxW" hidden>
           <input type="number" id="biMaxW" value="32" min="12" max="64">
           <div class="hint" id="biMaxWHint"></div>
@@ -1697,8 +1702,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.316"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.316"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.317"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.317"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6583,22 +6588,22 @@ function paintSplitWarn(si, fmt){
 function syncWrapField(){
   try {
     const mono = (typeof expFmtOf === 'function') ? (expFmtOf() === 'mono') : true;
-    const a = $('wcellMaxW'), b = $('wcellBiMaxW'), tip = $('wrapTipEl');
-    /* v0.9.316：标签挪上标题行后，显隐要连标签一起切（否则换模式后标签与输入框对不上号） */
+    const a = $('wcellMaxW'), b = $('wcellBiMaxW');
+    /* v0.9.316：显隐要连标签一起切（否则换模式后标签与输入框对不上号）；
+       v0.9.317：标签与输入框同一排，显隐语义不变 */
     const la = $('wlblMaxW'), lb = $('wlblBiMaxW');
     if (a) a.hidden = !mono;
     if (b) b.hidden = mono;
     if (la) la.hidden = !mono;
     if (lb) lb.hidden = mono;
-    /* 说明文案同样分模式：双语下还写着「单语字幕」就是错的。
-       v0.9.297：这句从常驻正文收进了块标题后面的 ⓘ —— 取词口从 data-i18n 换成
-       data-tip-i18n（applyTipI18n 认这个属性刷 data-tip），所以这里两个都要重设：
-       只改 data-tip-i18n 不重设 data-tip，浮层会停在旧语言/旧模式上。 */
-    if (tip) {
-      const key = mono ? 'wrapTip' : 'wrapTipBi';
-      tip.setAttribute('data-tip-i18n', key);
-      tip.setAttribute('data-tip', t(key));
-    }
+    /* v0.9.317：标题行删掉后，「无须重新翻译」那句与行宽释义合并进行宽标签的 ⓘ。
+       两个 ⓘ 各自固定取一组词条（单语 wrapTip+lblMaxW / 双语 wrapTipBi+lblBiMaxW），
+       不随模式切 —— 每次都重设两个，切语言由包装版 applyI18n 调到这里刷新。
+       ⚠️ 不能挂 data-tip-i18n：applyTipI18n 只认单键，会把合并文案冲回半截。
+       浮层不支持换行（white-space:normal 只折不断），合并只能是句子拼接。 */
+    var tip = $('wrapTipEl'), tipB = $('wrapTipBiEl');
+    if (tip) tip.setAttribute('data-tip', t('wrapTip') + ' ' + t('lblMaxW'));
+    if (tipB) tipB.setAttribute('data-tip', t('wrapTipBi') + ' ' + t('lblBiMaxW'));
   } catch (e) {}
 }
 
@@ -7775,5 +7780,6 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
 </script>
 <!-- v0.9.278：本页不再引 site-nav.js —— 页面里已无 #siteNav / #toolCards 占位，
      引进来只会白注入一段没人用的样式。特效页 / 清洗页照旧引。 -->
+<script src="site-topnav.js?v=0.9.317" data-tool="tr"></script>
 </body>
 </html>
