@@ -212,6 +212,11 @@
      此前「导出译文 / ASS 字幕样式 / 折行设置」是三款同样的 sec-title（图标徽章 + 渐隐尾线），
      在 300px 的栏里看着就是三张平级卡片。现在参数区包浅底块，块标题降一级。 */
   .param-blk{background:var(--card-2);border-radius:12px;padding:12px;margin-top:12px}
+  /* v0.9.320：折行块只有「一个输入框 + 一行换算提示」，12px 的内衬让它看着像一张空卡片
+     （实测块高 56px = 12 + 32 + 12）。用户要求压紧：上下内衬 12→6、左右 12→10、上间距 12→8
+     → 块高 56→44px，输入框仍是 32px（通用控件高度不动，触摸与对齐都不受影响）。
+     只给这一块加 .wrap-blk —— 另外两块 .param-blk 是 ASS / VTT 样式面板，字段多，12px 的呼吸感要留着。 */
+  .param-blk.wrap-blk{padding:6px 10px;margin-top:8px}
   /* v0.9.297：块标题要能承载 ⓘ —— 浮层的定位基准是「最近的 position 非 static 祖先」，
      不给 relative 的话它会一路找到面板上去（宽度/位置都不对）。 */
   .blk-title{font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.4px;margin:0 0 8px;position:relative}
@@ -819,9 +824,15 @@
         做成 inline-flex 会让「圆点的底边」充当基线，整颗药丸相对同行文字上下错位。
      ⚠️ [hidden] 必须显式管住 display：这里给了 display:inline-block，
         作者样式会盖掉浏览器对 [hidden] 的 display:none —— 收工后这句还得摘掉。 */
+  /* v0.9.319：那句文案从 12 字加到 16 字（「因AI算力紧张，请你耐心等几分钟^^」）。
+     中间试过 20 字版（前面再加「AI正在翻译中，」），375 宽的手机上整条 314px > 任务条可用宽 250px，
+     把卡片顶出去、页面横滚（实测 +31px）→ 用户定案砍掉前半句（药丸只在跑的时候出现，
+     旁边本来就有「翻译中」徽章，那半句是冗余的）。
+     解法：把折行权交还文本（去掉 nowrap）+ max-width:100% —— 放不下就在药丸内折两行，不再撑破容器。
+     短版宽屏一行放得下，但**别的语言译文更长**（de/ru），窄屏上照样可能超宽，这两条得留着。 */
   .pg-busy{display:inline-block;position:relative;font-size:12px;font-weight:600;
     color:var(--tr-ink);background:var(--tr-weak);border:1px solid var(--tr-line);
-    border-radius:99px;padding:2px 10px 2px 22px;line-height:1.3;white-space:nowrap;flex:none}
+    border-radius:99px;padding:2px 10px 2px 22px;line-height:1.3;flex:none;max-width:100%}
   .pg-busy[hidden]{display:none}
   .pg-busy::before{content:'';position:absolute;left:9px;top:50%;width:6px;height:6px;margin-top:-3px;
     border-radius:50%;background:var(--tr);animation:pgblink 1.4s ease-in-out infinite}
@@ -1089,11 +1100,13 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.318</span>
+    <span class="ver-tag">v0.9.320</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
-    <!-- v0.9.317：全站统一导航进工作台顶栏（278 曾撤掉本页胶囊；这次用户拍板全站 16 页统一，
-         工作台也挂同一条 site-topnav，替换掉当年「不需要导航」的决定） -->
-    <span id="topNav"></span>
+    <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
+         上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
+         本页保留 logo +「首页」返回键，跨工具入口交给落地页的工具卡。
+         v0.9.278 原文：撤掉顶栏的工具胶囊导航（用户定案「这里不需要增加导航」）；
+         v0.9.317 曾推翻挂上 site-topnav，v0.9.319 再撤回来。 -->
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
       <div class="tk-track" id="tkTrack"></div>
@@ -1302,7 +1315,7 @@ crossorigin="anonymous"></script>
             <!-- v0.9.297 加的那句宽心话；v0.9.298 按用户定案挪进 pg-row、跟在「第 x/y 批」后面。
                  默认 hidden，由 pgBusy() 在 pgStart / pgFinish / setProg(…,false) 三处开关 ——
                  和任务条同生共死。data-i18n 让切界面语言时自动跟着换，不用额外接线。 -->
-            <span class="pg-busy" id="pgBusy" data-i18n="pgBusyTip" hidden>AI 算力紧张，等一会就出结果了</span>
+            <span class="pg-busy" id="pgBusy" data-i18n="pgBusyTip" hidden>因AI算力紧张，请你耐心等几分钟^^</span>
             <span class="pg-eta" id="pgEta"></span>
           </div>
           <div class="prog" id="prog"><i></i></div>
@@ -1621,7 +1634,7 @@ crossorigin="anonymous"></script>
            所有 id（wrapTipEl / wrapTipBiEl / wlblMaxW / wcellMaxW / maxW / maxWHint /
            wlblBiMaxW / wcellBiMaxW / biMaxW / biMaxWHint）与 data-i18n key 一个不动，
            updateWidthHints / 语言联动的取词口全部照旧。 -->
-      <div class="param-blk">
+      <div class="param-blk wrap-blk">
       <div class="wrap-line">
         <label class="flbl wrap-lbl" for="maxW" id="wlblMaxW"><span data-i18n="lblMaxWShort">单语行宽</span><i class="info" tabindex="0" id="wrapTipEl">i</i></label>
         <div class="wr-cell" id="wcellMaxW">
@@ -1669,7 +1682,7 @@ crossorigin="anonymous"></script>
       <div id="donateBox" hidden>
         <button id="btnDonate" type="button">
           <svg class="d-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.2-4.7-9.6-8.6C.5 9.5 2.4 5.8 5.8 5.8c2 0 3.4 1.1 4.1 2.2.2.3.8.3 1 0 .7-1.1 2.1-2.2 4.1-2.2 3.4 0 5.3 3.7 3.4 6.6C19.2 16.3 12 21 12 21z"/></svg>
-          <span id="donateTxt">如果这个工具有帮到你，欢迎赞助几块钱算力费</span>
+          <span id="donateTxt">🌹工具不错，支持网站运营❤️</span>
           <svg class="d-token" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.6" y="9" width="5.4" height="6" rx="1.6"/><rect x="9.3" y="9" width="5.4" height="6" rx="1.6"/><rect x="16" y="9" width="5.4" height="6" rx="1.6"/></svg>
         </button>
         <div id="donateQr" hidden>
@@ -1702,8 +1715,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.318"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.318"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.320"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.320"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2226,7 +2239,7 @@ function pgPace(sec){
 }
 function pgFinish(){
   PG.ok=true;
-  pgBusy(false);   // v0.9.297：出结果了，那句「等一会就出结果」立刻退场（含下面排队超时那条路）
+  pgBusy(false);   // v0.9.297：出结果了，那句「因AI算力紧张…」立刻退场（含下面排队超时那条路）
   const w=$('progWrap');
   if(!w || !w.classList.contains('show')) return;
   $('pgState').textContent=t('pgDone', fmtDur((Date.now()-PG.tAll)/1000));
@@ -7762,7 +7775,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
   var btn=document.getElementById('btnDonate'), qr=document.getElementById('donateQr'),
       img=document.getElementById('donateImg'), txt=document.getElementById('donateTxt');
   if(!btn||!qr||!img||!txt) return;
-  var TXT_IDLE='如果这个工具有帮到你，欢迎赞助几块钱算力费';
+  var TXT_IDLE='🌹工具不错，支持网站运营❤️';
     /* v0.9.206：常驻显示（v0.9.204 曾改成「导出过至少一次才露出」，理由是「还没拿到成果的人
      看到只会在要钱」；用户要求撤掉，恢复常驻）。
      srtDonateV1 标记照写不误——它不再决定显不显示，但将来要做
@@ -7778,8 +7791,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
   });
 })();
 </script>
-<!-- v0.9.278：本页不再引 site-nav.js —— 页面里已无 #siteNav / #toolCards 占位，
-     引进来只会白注入一段没人用的样式。特效页 / 清洗页照旧引。 -->
-<script src="site-topnav.js?v=0.9.318" data-tool="tr"></script>
+<!-- v0.9.319：本页不再引 site-topnav.js —— 顶栏已撤掉 #topNav 占位（318 挂过一版太挤），
+     引进来只会白渲染一段没人看的 DOM。其余 15 页照旧挂统一导航。 -->
 </body>
 </html>
