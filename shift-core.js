@@ -808,7 +808,9 @@
        宽度单位 = 全角字（汉字/假名/谚文记 1，两个拉丁字母记 1），wOf 的口径。 */
     minDur: 833,      /* 一条最短要停多久（毫秒）—— Netflix：5/6 秒（24fps 下 20 帧） */
     maxDur: 7000,     /* 一条最长停多久（毫秒）—— Netflix：7 秒 */
-    maxCps: 9,        /* 每秒最多读多少宽度单位 —— Netflix 简中指南 9 字/秒；拉丁半宽即 18 字符/秒，落在 17~20 区间 */
+    maxCps: 9,        /* 每秒最多读多少宽度单位 —— Netflix 简中指南 9 字/秒（全角口径）。
+                         v0.9.314 起纯半角条目放宽 20/18：9 → 10 宽度单位/秒 = 20 拉丁字符/秒
+                         （Netflix 英语指南成人节目 20 cps）。判据见 cpsCapOf。 */
     maxLine: 21       /* 一行最多多少宽度单位 —— 拉丁 42 字符（Netflix 最常引用的那条）；中文按简中指南可收紧到 16 */
   };
   /* v0.9.301：「两条之间留多大空档」不再当病灶查。
@@ -880,6 +882,25 @@
     if (d <= 0) return Infinity;
     return cueWidth(cue) / (d / 1000);
   }
+  /* v0.9.314：读速上限按文字系统分档（294 的「词间写不写空格」那一族判据的简化版）。
+     Netflix 的尺子本来就是两套：简中指南 9 字/秒，英语指南 20 字符/秒（成人节目）。
+     原来只按 9 宽度单位/秒一刀切，纯拉丁条目等于 18 字符/秒 —— 合规的英语字幕
+     （20 cps）整份被当成超速报红。分档判据简化为「条目里有没有全角字」：
+       有全角字（汉字/假名/谚文…）→ r.maxCps（全角口径，默认 9）；
+       纯半角（拉丁/西里尔/希腊…）→ r.maxCps × 20/18（9 → 10 宽度单位/秒 = 20 字符/秒）。
+     全半混排（双语条目）从严走全角档 —— 中文那半才是读速瓶颈。
+     用户在面板上调的是全角基准，两档按同一比例缩放，调过之后相对关系不变。 */
+  function cueHasWide(cue) {
+    var s = String(cue.text || '').replace(/\s/g, '');
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      if (c >= 0x1100 && (c <= 0x115f || (c >= 0x2e80 && c <= 0xa4cf) || (c >= 0xac00 && c <= 0xd7a3) ||
+        (c >= 0xf900 && c <= 0xfaff) || (c >= 0xfe30 && c <= 0xfe6f) || (c >= 0xff00 && c <= 0xff60) ||
+        (c >= 0xffe0 && c <= 0xffe6))) return true;
+    }
+    return false;
+  }
+  function cpsCapOf(cue, r) { return cueHasWide(cue) ? r.maxCps : r.maxCps * 20 / 18; }
 
   /* 扫一遍当前时间轴，返回问题清单 [{ i, why:['short','fast',…] }]。
      ⚠️ i 是当下这张列表的下标；用户动过任何一条之后下标就变了 ——
@@ -913,7 +934,7 @@
       if (!isBilingualEntry(list, i)) {
         if (dur < r.minDur - tolShort) why.push('short');
         if (dur > r.maxDur + tolLong) why.push('long');
-        if (isFinite(cueCps(c)) && cueCps(c) > r.maxCps * 1.02) why.push('fast');
+        if (isFinite(cueCps(c)) && cueCps(c) > cpsCapOf(c, r) * 1.02) why.push('fast');
         /* 行宽只留 0.25 的浮点余量：42 个拉丁字母 = 21.0 正好压线放行，43 个 = 21.5 必须报 */
         if (w > r.maxLine + 0.25) why.push('line');
         if (cueLines(c).length > 2) why.push('rows');
@@ -996,7 +1017,7 @@
     /* 时长类：短了就补到「最短停留」和「读得完」里更宽的那个，补齐一条整的要多久 */
     var want = 0;
     if (why.indexOf('short') >= 0) want = Math.max(want, r.minDur);
-    if (why.indexOf('fast') >= 0) want = Math.max(want, Math.round(w / r.maxCps * 1000));
+    if (why.indexOf('fast') >= 0) want = Math.max(want, Math.round(w / cpsCapOf(c, r) * 1000));
     if (want > dur) {
       var e2 = Math.min(c.start + want, ceilEnd);
       if (e2 > c.end) {

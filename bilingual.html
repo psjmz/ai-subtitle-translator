@@ -180,8 +180,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="bilingual-i18n.js?v=0.9.313"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
-<script src="bilingual-core.js?v=0.9.313"></script>
+<script src="bilingual-i18n.js?v=0.9.314"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="bilingual-core.js?v=0.9.314"></script>
 <script>
 'use strict';
 var I18N = window.BILINGUAL_I18N.DICT, LANGS = window.BILINGUAL_I18N.LANGS;
@@ -221,6 +221,11 @@ function applyI18n() {
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
   });
   document.documentElement.lang = LANG;
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「BilingualSubtitle Splitter」。
+     v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
   renderNav();
   syncLogoHome();
   renderOptions();

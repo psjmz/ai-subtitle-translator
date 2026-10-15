@@ -857,7 +857,7 @@ const SEO = {
   'en': {
     htmlLang: 'en', ogLocale: 'en_US', siteName: 'AI-SRTSub',
     title: 'AI-SRTSub - Global Movies & Series, Subtitles in Your Language',
-    desc: 'ai-srtsub.com is a free AI subtitle translator built for movie fans — no signup, no limits, no watermark. Turn subtitles of foreign films, US & UK series and documentaries into your native language in one click.',
+    desc: "Free AI subtitle translator — no signup, no limits, no watermark. Turn subtitles of foreign films, series and documentaries into your language in one click.",
     kw: 'AI subtitle translator, translate subtitles, free subtitle translator, translate SRT file, translate VTT, translate ASS, movie subtitle translation, TV series subtitles, Netflix subtitles, KDrama subtitles, anime subtitles, bilingual subtitles, foreign film subtitles, translate subtitles online, YouTube subtitles,free subtitle translation tool,translate subtitles free,free SRT translator',
     ogTitle: 'AI-SRTSub - Global Movies & Series, Subtitles in Your Language',
     ogDesc: '100% free AI subtitle translator for movie fans: one click turns subtitles of foreign films, series and documentaries into your native language, with automatic timeline alignment. Enjoy global content barrier-free.',
@@ -929,7 +929,7 @@ const SEO = {
   'fr': {
     htmlLang: 'fr', ogLocale: 'fr_FR', siteName: 'AI-SRTSub',
     title: 'AI-SRTSub - Films et séries du monde, sous-titres dans votre langue',
-    desc: 'ai-srtsub.com est un traducteur de sous-titres IA gratuit, pensé pour les cinéphiles — sans inscription. Traduisez en un clic les sous-titres de films étrangers, de séries et de documentaires dans votre langue en un clic.',
+    desc: "Traducteur de sous-titres IA gratuit — sans inscription. Traduisez en un clic les sous-titres de films étrangers, séries et documentaires dans votre langue.",
     kw: 'traduire sous-titres, sous-titres IA, traduction srt, traduction vtt, traduction ass, traducteur sous-titres gratuit, traduire sous-titres en ligne, sous-titres films, sous-titres séries, sous-titres dramas, sous-titres anime, sous-titres bilingues, sous-titres youtube, sous-titres Netflix, traduire sous-titres anglais français,outil traduction sous-titres gratuit,traduire des sous-titres gratuitement',
     ogTitle: 'AI-SRTSub - Films et séries du monde, sous-titres dans votre langue',
     ogDesc: 'Traducteur de sous-titres IA gratuit pour cinéphiles : sous-titres de films étrangers, de séries et de documentaires dans votre langue maternelle en un clic, avec alignement automatique de la timeline.',
@@ -1144,7 +1144,7 @@ const SEO = {
   },
   'ro': {
     htmlLang: 'ro', ogLocale: 'ro_RO', siteName: 'AI-SRTSub',
-    title: 'AI-SRTSub - Traducător AI de subtitrări gratuit pentru filme și seriale',
+    title: "AI-SRTSub - Traducător AI subtitrări, filme și seriale",
     desc: 'ai-srtsub.com este un traducător AI de subtitrări gratuit, creat pentru pasionații de film. Traduceți subtitrările filmelor străine, serialelor și documentarelor în limba ta cu un singur clic.',
     kw: 'traducere subtitrări, traducător subtitrări AI, traducere subtitrări gratuită, traducere SRT, traducere VTT, traducere ASS, subtitrări filme, subtitrări seriale, subtitrări Netflix, subtitrări anime, subtitrări bilingve, traducere subtitrări online, subtitrări YouTube, instrument gratuit pentru subtitrări, traduce subtitrări gratis, traducător SRT gratuit',
     ogTitle: 'AI-SRTSub - Traducător AI de subtitrări gratuit pentru filme și seriale',
@@ -1183,7 +1183,7 @@ const SEO_MERGE = {
   },
   'en': {
     title: 'Styled Subtitle Maker - Merge Bilingual, ASS & VTT Effect',
-    desc: 'Free online tool for styled subtitles: merge two files into bilingual, reorder or restyle an existing bilingual track, or add effects to a single-language track. 5 ASS / 6 VTT presets, live preview that is the export itself, output as SRT / VTT / ASS.',
+    desc: "Free tool for styled subtitles: merge two files into bilingual, restyle a bilingual track, or add effects. 5 ASS / 6 VTT presets; export as SRT / VTT / ASS.",
     kw: 'merge subtitles, bilingual subtitles, combine subtitle files, styled subtitles, ASS subtitle styles, VTT subtitle styles, subtitle effects, dual subtitle maker, ASS presets, subtitle template, free subtitle tool',
     intro: 'Merge two subtitle files into bilingual, or style a track: font, colour, outline and position, all WYSIWYG.',
     feat: 'Bilingual merge and adjust, ASS / VTT style presets, per-value style slots, in-place and bulk timeline fixes, and a live preview that is literally the exported file.',
@@ -1217,7 +1217,7 @@ const SEO_MERGE = {
   },
   'es': {
     title: "Herramienta de subtítulos con estilo - unir bilingües · p",
-    desc: 'Herramienta online gratuita de subtítulos con estilo: une dos archivos en bilingüe, reordena y reestiliza una pista bilingüe o añade efectos a una pista de un solo idioma. 5 plantillas ASS / 6 VTT, vista previa igual al resultado, exporta a SRT / VTT / ASS.',
+    desc: "Herramienta gratis de subtítulos con estilo: une dos archivos en bilingüe o reestiliza una pista bilingüe. 5 plantillas ASS / 6 VTT, exporta a SRT / VTT / ASS.",
     kw: "unir subtitulos, subtitulos bilingües, combinar subtitulos, subtitulos con estilo, estilos ASS, estilos VTT, efectos subtitulos, plantilla subtitulos, herramienta subtitulos gratis, merge subtitles",
     intro: "Une dos archivos de subtítulos en uno bilingüe o aplícales estilo: tipografía, color, contorno y posición, todo en WYSIWYG.",
     feat: "Unión y ajuste bilingüe, plantillas de estilo ASS / VTT, ranuras de estilo para afinar cada valor, corrección de la línea de tiempo al detalle o en bloque, y una vista previa que es literalmente el archivo exportado.",
@@ -1225,7 +1225,7 @@ const SEO_MERGE = {
   },
   'pt': {
     title: "Ferramenta de legendas com estilo - unir bilíngues · mode",
-    desc: 'Ferramenta online grátis de legendas com estilo: una dois arquivos em bilíngue, reordene e reestilize uma faixa bilíngue ou aplique efeitos a uma faixa de um só idioma. 5 modelos ASS / 6 VTT, pré-visualização igual ao resultado, exporta SRT / VTT / ASS.',
+    desc: "Ferramenta grátis de legendas com estilo: una dois arquivos em bilíngue ou reestilize uma faixa bilíngue. 5 modelos ASS / 6 VTT, exporta SRT / VTT / ASS.",
     kw: "unir legendas, legendas bilíngues, combinar legendas, legendas com estilo, estilos ASS, estilos VTT, efeitos em legendas, modelo de legenda, ferramenta de legenda grátis, merge subtitles",
     intro: "Una dois arquivos de legenda em bilíngue ou aplique estilo: fonte, cor, contorno e posição, tudo em WYSIWYG.",
     feat: "União e ajuste bilíngue, modelos de estilo ASS / VTT, slots de estilo para ajustar cada valor, correção da timeline no detalhe ou em bloco, e uma prévia que é literalmente o arquivo exportado.",
@@ -1234,7 +1234,7 @@ const SEO_MERGE = {
 
   'de': {
     title: "Untertitel mit Stil - zweisprachig zusammenführen · Vorla",
-    desc: 'Kostenloses Online-Tool für gestaltete Untertitel: zwei Dateien zu zweisprachig zusammenführen, eine bestehende zweisprachige Spur umordnen und neu gestalten oder einspurige Untertitel mit Effekten versehen: 5 ASS- / 6 VTT-Vorlagen, Live-Vorschau wie im Export, Ausgabe als SRT / VTT / ASS.',
+    desc: "Kostenloses Tool für Untertitel mit Stil: zwei Dateien zweisprachig zusammenführen, eine Spur umgestalten. 5 ASS- / 6 VTT-Vorlagen, Ausgabe SRT / VTT / ASS.",
     kw: "untertitel zusammenführen, zweisprachige untertitel, untertitel kombinieren, untertitel mit stil, ASS stile, VTT stile, untertitel effekte, untertitel vorlage, kostenloses untertitel tool",
     intro: "Zwei Untertitel-Dateien zu zweisprachig zusammenführen oder direkt gestalten: Schrift, Farbe, Kontur und Position — WYSIWYG.",
     feat: "Zweisprachiges Zusammenführen und Anpassen, ASS- / VTT-Stilvorlagen, Stil-Slots für jeden Wert, Zeitleisten-Korrektur im Detail oder im Block, und eine Vorschau, die buchstäblich die exportierte Datei ist.",
@@ -1258,7 +1258,7 @@ const SEO_MERGE = {
   },
   'hi': {
     title: "स्टाइल सबटाइटल टूल - द्विभाषी मर्ज · टेम्पलेट · ASS/VTT इ",
-    desc: 'मुफ़्त ऑनलाइन स्टाइल सबटाइटल टूल: दो फ़ाइलों को द्विभाषी बनाएँ, मौजूदा द्विभाषी ट्रैक को दोबारा क्रमबद्ध और स्टाइल करें, या एक भाषा के ट्रैक में इफ़ेक्ट जोड़ें: ASS 5 / VTT 6 टेम्पलेट, लाइव प्रीव्यू, SRT / VTT / ASS में निर्यात।',
+    desc: "मुफ़्त स्टाइल टूल: दो फ़ाइलों को द्विभाषी बनाएँ, द्विभाषी ट्रैक को नया स्टाइल दें या इफ़ेक्ट जोड़ें। ASS 5 / VTT 6 टेम्पलेट, SRT / VTT / ASS में निर्यात।",
     kw: "सबटाइटल मर्ज, द्विभाषी सबटाइटल, सबटाइटल जोड़ें, स्टाइलिश सबटाइटल, ASS स्टाइल, VTT स्टाइल, सबटाइटल इफ़ेक्ट, सबटाइटल टेम्पलेट, मुफ़्त सबटाइटल टूल",
     intro: "दो सबटाइटल फ़ाइलों को द्विभाषी बनाएँ या सीधे स्टाइल दें: फ़ॉन्ट, रंग, आउटलाइन और जगह — WYSIWYG में।",
     feat: "द्विभाषी मर्ज और समायोजन, ASS / VTT स्टाइल टेम्पलेट, हर वैल्यू के लिए स्टाइल स्लॉट, टाइमलाइन की बिंदुवत या सामूहिक सुधार, और प्रीव्यू जो वही फ़ाइल है जो निर्यात होगी।",
@@ -1266,7 +1266,7 @@ const SEO_MERGE = {
   },
   'th': {
     title: "เครื่องมือซับไตเติลใส่สไตล์ - รวมสองภาษา · แม่แบบ · เอฟเฟ",
-    desc: 'เครื่องมือซับใส่สไตล์ออนไลน์ฟรี: รวมสองไฟล์เป็นสองภาษา จัดลำดับและปรับสไตล์ซับสองภาษาที่มีอยู่ หรือเพิ่มเอฟเฟกต์ให้ซับภาษาเดียว แม่แบบ ASS 5 แบบ / VTT 6 แบบ, พรีวิวตรงกับผลลัพธ์, ส่งออก SRT / VTT / ASS',
+    desc: "เครื่องมือซับใส่สไตล์ฟรี: รวมสองไฟล์เป็นสองภาษา ปรับสไตล์ซับสองภาษาใหม่ หรือเพิ่มเอฟเฟกต์ แม่แบบ ASS 5 / VTT 6 แบบ ส่งออก SRT / VTT / ASS",
     kw: "รวมซับไตเติล, ซับสองภาษา, รวมไฟล์ซับ, ซับใส่สไตล์, สไตล์ ASS, สไตล์ VTT, เอฟเฟกต์ซับ, แม่แบบซับ, เครื่องมือซับฟรี",
     intro: "รวมซับสองไฟล์เป็นสองภาษา หรือแต่งสไตล์ได้เลย: ฟอนต์ สี ขอบ และตำแหน่ง — WYSIWYG ทั้งหมด",
     feat: "รวมและปรับสองภาษา, แม่แบบสไตล์ ASS / VTT, ช่องสไตล์ปรับทีละค่า, แก้ไทม์ไลน์ทีละจุดหรือทั้งชุด, และพรีวิวที่ตรงกับไฟล์ที่ส่งออกทุกประการ",
@@ -1274,7 +1274,7 @@ const SEO_MERGE = {
   },
   'vi': {
     title: "Công cụ phụ đề tạo kiểu - gộp song ngữ · mẫu · hiệu ứng A",
-    desc: 'Công cụ phụ đề tạo kiểu online miễn phí: gộp hai file thành song ngữ, sắp xếp lại và đổi kiểu phụ đề song ngữ có sẵn, hoặc thêm hiệu ứng cho phụ đề một ngôn ngữ. 5 mẫu ASS / 6 VTT, xem trước đúng kết quả, xuất SRT / VTT / ASS.',
+    desc: "Công cụ phụ đề tạo kiểu miễn phí: gộp hai file thành song ngữ, đổi kiểu phụ đề song ngữ có sẵn hoặc thêm hiệu ứng. 5 mẫu ASS / 6 VTT, xuất SRT / VTT / ASS.",
     kw: "gộp phụ đề, phụ đề song ngữ, kết hợp phụ đề, phụ đề tạo kiểu, kiểu ASS, kiểu VTT, hiệu ứng phụ đề, mẫu phụ đề, công cụ phụ đề miễn phí",
     intro: "Gộp hai file phụ đề thành song ngữ hoặc tạo kiểu trực tiếp: phông, màu, viền và vị trí — tất cả WYSIWYG.",
     feat: "Gộp và điều chỉnh song ngữ, mẫu kiểu ASS / VTT, slot kiểu cho từng giá trị, sửa timeline từng điểm hoặc hàng loạt, và bản xem trước chính là file được xuất.",
@@ -1283,7 +1283,7 @@ const SEO_MERGE = {
 
   'ru': {
     title: "Инструмент оформленных субтитров - слияние двуязычных · ш",
-    desc: 'Бесплатный онлайн-инструмент для оформленных субтитров: объедините два файла в двуязычные, поменяйте порядок и стиль готовой двуязычной дорожки или добавьте эффекты к одному языку: 5 шаблонов ASS / 6 VTT, предпросмотр как в экспорте, вывод в SRT / VTT / ASS.',
+    desc: "Бесплатный инструмент для субтитров: объедините два файла в двуязычные или переоформите двуязычную дорожку. 5 шаблонов ASS / 6 VTT, вывод в SRT / VTT / ASS.",
     kw: "объединить субтитры, двуязычные субтитры, соединить субтитры, оформленные субтитры, стили ASS, стили VTT, эффекты субтитров, шаблон субтитров, бесплатный инструмент субтитров",
     intro: "Объедините два файла субтитров в двуязычные или сразу оформите их: шрифт, цвет, контур и положение — всё в WYSIWYG.",
     feat: "Двуязычное слияние и настройка, шаблоны стилей ASS / VTT, слоты стиля для каждой величины, точечная или пакетная правка таймлайна и предпросмотр, буквально равный экспортированному файлу.",
@@ -1291,7 +1291,7 @@ const SEO_MERGE = {
   },
   'it': {
     title: "Strumento sottotitoli con stile - unione bilingue · model",
-    desc: 'Strumento online gratuito per sottotitoli con stile: unisci due file in bilingue, riordina e ristilizza una traccia bilingue esistente oppure aggiungi effetti a una traccia in una sola lingua. 5 modelli ASS / 6 VTT, anteprima uguale all’export, esporta in SRT / VTT / ASS.',
+    desc: "Strumento gratuito per sottotitoli con stile: unisci due file in bilingue o ristilizza una traccia bilingue. 5 modelli ASS / 6 VTT, esporta in SRT / VTT / ASS.",
     kw: "unire sottotitoli, sottotitoli bilingue, combinare sottotitoli, sottotitoli con stile, stili ASS, stili VTT, effetti sottotitoli, modello sottotitoli, strumento sottotitoli gratis",
     intro: "Unisci due file di sottotitoli in bilingue o applicali uno stile: font, colore, contorno e posizione — tutto WYSIWYG.",
     feat: "Unione e regolazione bilingue, modelli di stile ASS / VTT, slot di stile per ogni valore, correzione della timeline nel dettaglio o in blocco, e un’anteprima che è letteralmente il file esportato.",
@@ -1299,7 +1299,7 @@ const SEO_MERGE = {
   },
   'ar': {
     title: "أداة الترجمة بتنسيق - دمج بلغتين · قوالب · تأثيرات ASS/VT",
-    desc: 'أداة مجانية على الإنترنت للترجمات المنسّقة: ادمج ملفين في ترجمة بلغتين، أعد ترتيب وتنسيق ترجمة بلغتين موجودة، أو أضف تأثيرات إلى ترجمة بلغة واحدة. 5 قوالب ASS / 6 قوالب VTT، معاينة مطابقة للمخرَج، تصدير SRT / VTT / ASS.',
+    desc: "أداة مجانية للترجمات المنسّقة: ادمج ملفين في ترجمة بلغتين، أعد تنسيق ترجمة بلغتين موجودة، أو أضف تأثيرات. 5 قوالب ASS / 6 VTT، تصدير SRT / VTT / ASS.",
     kw: "دمج الترجمة, ترجمة بلغتين, دمج ملفات الترجمة, ترجمة بتنسيق, أنماط ASS, أنماط VTT, تأثيرات الترجمة, قالب ترجمة, أداة ترجمة مجانية",
     intro: "ادمج ملفي ترجمة في واحد بلغتين، أو أعطهما تنسيقاً مباشرة: الخط واللون والإطار والموضع — كما تراه تماماً.",
     feat: "الدمج والضبط بلغتين، قوالب أنماط ASS / VTT، خانات نمط لضبط كل قيمة، تصحيح التوقيتات نقطة بنقطة أو دفعة واحدة، ومعاينة هي نفسها الملف المُصدَّر.",
@@ -1307,7 +1307,7 @@ const SEO_MERGE = {
   },
   'tr': {
     title: "Stil altyazı aracı - iki dilli birleştirme · şablonlar ·",
-    desc: 'Ücretsiz online stil altyazı aracı: iki dosyayı iki dilli hale getirin, mevcut iki dilli altyazıyı yeniden sıralayıp biçimlendirin ya da tek dilli bir altyazıya efekt ekleyin: 5 ASS / 6 VTT şablonu, canlı önizleme, SRT / VTT / ASS çıktısı.',
+    desc: "Ücretsiz stil altyazı aracı: iki dosyayı iki dilli hale getirin veya iki dilli altyazıyı yeniden biçimlendirin. 5 ASS / 6 VTT şablonu, SRT / VTT / ASS çıktısı.",
     kw: "altyazı birleştirme, iki dilli altyazı, altyazıları birleştir, stilli altyazı, ASS stilleri, VTT stilleri, altyazı efektleri, altyazı şablonu, ücretsiz altyazı aracı",
     intro: "İki altyazı dosyasını iki dilli yapın ya da doğrudan stil verin: yazı tipi, renk, kontur ve konum — hepsi WYSIWYG.",
     feat: "İki dilli birleştirme ve ayar, ASS / VTT stil şablonları, her değer için stil yuvası, zaman çizelgesinin noktasal veya toplu düzeltilmesi ve düpedüz dışa aktarılan dosyanın kendisi olan önizleme.",
@@ -1315,7 +1315,7 @@ const SEO_MERGE = {
   },
   'nl': {
     title: "Tool voor ondertitels met stijl - tweetalig samenvoegen ·",
-    desc: 'Gratis online tool voor ondertitels met stijl: voeg twee bestanden samen tot tweetalig, herschik en herstijl een bestaand tweetalig spoor of voeg effecten toe aan een eentalig spoor. 5 ASS- / 6 VTT-sjablonen, live voorbeeld gelijk aan de export, uitvoer als SRT / VTT / ASS.',
+    desc: "Gratis tool voor gestylede ondertitels: voeg twee bestanden samen tot tweetalig of herstijl een tweetalig spoor. 5 ASS- / 6 VTT-sjablonen, uitvoer SRT/VTT/ASS.",
     kw: "ondertitels samenvoegen, tweetalige ondertitels, ondertitels combineren, ondertitels met stijl, ASS stijlen, VTT stijlen, ondertitel effecten, ondertitel sjabloon, gratis ondertitel tool",
     intro: "Voeg twee ondertitelbestanden samen tot tweetalig of geef ze direct stijl: lettertype, kleur, contour en positie — allemaal WYSIWYG.",
     feat: "Tweetalig samenvoegen en aanpassen, ASS- / VTT-stijlsjablonen, stijlsleuven voor elke waarde, tijdlijncorrectie per punt of in bulk, en een voorbeeld dat letterlijk het geëxporteerde bestand is.",
@@ -1323,7 +1323,7 @@ const SEO_MERGE = {
   },
   'pl': {
     title: "Narzędzie napisów ze stylem - łączenie dwujęzyczne · szab",
-    desc: 'Darmowe narzędzie online do napisów ze stylem: połącz dwa pliki w dwujęzyczne, zmień kolejność i styl istniejącej dwujęzycznej ścieżki albo dodaj efekty do jednojęzycznej ścieżki. 5 szablonów ASS / 6 VTT, podgląd zgodny z eksportem, zapis do SRT / VTT / ASS.',
+    desc: "Darmowe narzędzie do napisów ze stylem: połącz dwa pliki w dwujęzyczne lub zmień styl ścieżki dwujęzycznej. 5 szablonów ASS / 6 VTT, zapis do SRT / VTT / ASS.",
     kw: "łączenie napisów, napisy dwujęzyczne, łączenie plików napisów, napisy ze stylem, style ASS, style VTT, efekty napisów, szablon napisów, darmowe narzędzie napisów",
     intro: "Połącz dwa pliki napisów w dwujęzyczne albo od razu nadaj im styl: font, kolor, kontur i położenie — wszystko WYSIWYG.",
     feat: "Łączenie i dopasowanie dwujęzyczne, szablony stylów ASS / VTT, gniazda stylu dla każdej wartości, korekta osi czasu punktowo lub hurtem oraz podgląd, który jest dosłownie eksportowanym plikiem.",
@@ -1332,7 +1332,7 @@ const SEO_MERGE = {
 
   'sv': {
     title: "Verktyg för undertexter med stil - slå ihop tvåspråkigt ·",
-    desc: 'Gratis onlineverktyg för undertexter med stil: slå ihop två filer till tvåspråkig, ordna om och forma om ett befintligt tvåspråkigt spår eller lägg till effekter på ett enspråkigt spår. 5 ASS- / 6 VTT-mallar, live-förhandsvisning, export till SRT / VTT / ASS.',
+    desc: "Gratis verktyg för undertexter med stil: slå ihop två filer till tvåspråkig eller forma om tvåspråkigt spår. 5 ASS- / 6 VTT-mallar, export till SRT / VTT / ASS.",
     kw: "slå ihop undertexter, tvåspråkiga undertexter, kombinera undertexter, undertexter med stil, ASS-stilar, VTT-stilar, undertexteffekter, undertextmall, gratis undertextverktyg",
     intro: "Slå ihop två undertextfiler till tvåspråkig eller ge dem stil direkt: typsnitt, färg, kontur och placering — allt WYSIWYG.",
     feat: "Tvåspråkig sammanslagning och justering, ASS- / VTT-stilmallar, stilplatser för varje värde, tidslinjekorrigering punktvis eller i block, och en förhandsvisning som är exakt den exporterade filen.",
@@ -1340,7 +1340,7 @@ const SEO_MERGE = {
   },
   'cs': {
     title: "Nástroj pro titulky se stylem - sloučení dvojjazyčných ·",
-    desc: 'Bezplatný online nástroj pro titulky se stylem: spojte dva soubory do dvojjazyčných, přeuspořádejte a přestylujte existující dvojjazyčnou stopu nebo přidejte efekty jednojazyčné stopě. 5 šablon ASS / 6 VTT, živý náhled shodný s exportem, výstup SRT / VTT / ASS.',
+    desc: "Bezplatný nástroj pro titulky se stylem: spojte dva soubory do dvojjazyčných nebo přestylujte dvojjazyčnou stopu. 5 šablon ASS / 6 VTT, výstup SRT / VTT / ASS.",
     kw: "sloučit titulky, dvojjazyčné titulky, spojit titulky, titulky se stylem, styly ASS, styly VTT, efekty titulků, šablona titulků, bezplatný nástroj titulky",
     intro: "Spojte dva soubory titulků do dvojjazyčných nebo jim rovnou dejte styl: písmo, barva, obrys a pozice — vše WYSIWYG.",
     feat: "Dvojjazyčné sloučení a úprava, šablony stylů ASS / VTT, sloty stylu pro každou hodnotu, oprava časové osy po bodech nebo hromadně a náhled, který je doslova exportovaný soubor.",
@@ -1348,7 +1348,7 @@ const SEO_MERGE = {
   },
   'uk': {
     title: "Інструмент оформлених субтитрів - злиття двомовних · шабл",
-    desc: 'Безплатний онлайн-інструмент для оформлених субтитрів: об’єднайте два файли в двомовні, переставте й переоформіть наявну двомовну доріжку або додайте ефекти до одномовної доріжки: 5 шаблонів ASS / 6 VTT, живий перегляд як в експорті, вивід у SRT / VTT / ASS.',
+    desc: "Безплатний інструмент для субтитрів: об'єднайте два файли в двомовні або переоформіть двомовну доріжку. 5 шаблонів ASS / 6 VTT, вивід у SRT / VTT / ASS.",
     kw: "об’єднати субтитри, двомовні субтитри, поєднати субтитри, оформлені субтитри, стилі ASS, стилі VTT, ефекти субтитрів, шаблон субтитрів, безплатний інструмент субтитрів",
     intro: "Об’єднайте два файли субтитрів у двомовні або відразу оформіть їх: шрифт, колір, контур і позиція — усе в WYSIWYG.",
     feat: "Двомовне злиття і налаштування, шаблони стилів ASS / VTT, слоти стилю для кожного значення, точкове або пакетне виправлення таймлайну і попередній перегляд, що буквально дорівнює експортованому файлу.",
@@ -1356,7 +1356,7 @@ const SEO_MERGE = {
   },
   'da': {
     title: "Værktøj til undertekster med stil - slå tosproget sammen",
-    desc: 'Gratis online værktøj til undertekster med stil: sæt to filer sammen til tosproget, omrokér og omstil et eksisterende tosproget spor, eller tilføj effekter til et etsproget spor. 5 ASS- / 6 VTT-skabeloner, live preview lig eksporten, output som SRT / VTT / ASS.',
+    desc: "Gratis værktøj til undertekster med stil: sæt to filer sammen til tosproget eller omstil et tosproget spor. 5 ASS- / 6 VTT-skabeloner, output SRT / VTT / ASS.",
     kw: "slå undertekster sammen, tosprogede undertekster, kombiner undertekster, undertekster med stil, ASS-stile, VTT-stile, underteksteffekter, undertekstskabelon, gratis undertekstværktøj",
     intro: "Sæt to undertekstfiler sammen til tosproget, eller giv dem stil med det samme: skrifttype, farve, kontur og placering — det hele i WYSIWYG.",
     feat: "Tosproget sammenlægning og justering, ASS- / VTT-stilskabeloner, stil-pladser til hver værdi, rettelse af tidslinjen punktvist eller i blok, og en forhåndsvisning der bogstaveligt er den eksporterede fil.",
@@ -1364,7 +1364,7 @@ const SEO_MERGE = {
   },
   'fi': {
     title: "Tyyliteltyjen tekstitysten työkalu - kaksikielisten yhdis",
-    desc: 'Ilmainen verkkotyökalu tyylitellyille tekstityksille: yhdistä kaksi tiedostoa kaksikieliseksi, järjestä ja muotoile uudelleen olemassa oleva kaksikielinen raita tai lisää tehosteita yksikieliseen raitaan. 5 ASS- / 6 VTT-mallia, esikatselu kuten vienti, vienti SRT / VTT / ASS -muodossa.',
+    desc: "Ilmainen tyyliteltyjen tekstitysten työkalu: yhdistä tiedostot kaksikieliseksi tai muotoile raita uudelleen. 5 ASS- / 6 VTT-mallia, vienti SRT / VTT / ASS.",
     kw: "yhdistä tekstitykset, kaksikieliset tekstitykset, yhdistä tekstitystiedostot, tyylitellyt tekstitykset, ASS-tyylit, VTT-tyylit, tekstitystehosteet, tekstitysmalli, ilmainen tekstitystyökalu",
     intro: "Yhdistä kaksi tekstitystiedostoa kaksikieliseksi tai anna niille tyyli suoraan: fontti, väri, ääriviiva ja sijainti — kaikki WYSIWYG.",
     feat: "Kaksikielinen yhdistäminen ja säätö, ASS- / VTT-tyylimallit, tyylipaikat jokaiselle arvolle, aikajanan korjaus kohdittain tai erissä ja esikatselu, joka on kirjaimellisesti viety tiedosto.",
@@ -1372,7 +1372,7 @@ const SEO_MERGE = {
   },
   'el': {
     title: "Εργαλείο υποτίτλων με στυλ - συγχώνευση δίγλωσσων · πρότυ",
-    desc: 'Δωρεάν διαδικτυακό εργαλείο για υπότιτλους με στυλ: ενώστε δύο αρχεία σε δίγλωσσο, αναδιατάξτε και αλλάξτε το στυλ ενός υπάρχοντος δίγλωσσου κομματιού ή προσθέστε εφέ σε μονόγλωσσο κομμάτι. 5 πρότυπα ASS / 6 VTT, ζωντανή προεπισκόπηση ίδια με την εξαγωγή, εξαγωγή σε SRT / VTT / ASS.',
+    desc: "Δωρεάν εργαλείο για υπότιτλους με στυλ: ενώστε δύο αρχεία σε δίγλωσσο ή αλλάξτε στυλ δίγλωσσου κομματιού. 5 πρότυπα ASS / 6 VTT, εξαγωγή σε SRT / VTT / ASS.",
     kw: "συγχώνευση υποτίτλων, δίγλωσσοι υπότιτλοι, ένωση υποτίτλων, υπότιτλοι με στυλ, στυλ ASS, στυλ VTT, εφέ υποτίτλων, πρότυπο υποτίτλων, δωρεάν εργαλείο υποτίτλων",
     intro: "Ενώστε δύο αρχεία υποτίτλων σε δίγλωσσο ή δώστε τους στυλ απευθείας: γραμματοσειρά, χρώμα, περίγραμμα και θέση — όλα WYSIWYG.",
     feat: "Δίγλωσση συγχώνευση και προσαρμογή, πρότυπα στυλ ASS / VTT, υποδοχές στυλ για κάθε τιμή, διόρθωση χρονικής γραμμής σημειακά ή μαζικά, και προεπισκόπηση που είναι κυριολεκτικά το εξαγόμενο αρχείο.",
@@ -1380,7 +1380,7 @@ const SEO_MERGE = {
   },
   'he': {
     title: "כלי כתוביות עם סגנון - מיזוג דו-לשוני · תבניות · אפקטים A",
-    desc: 'כלי מקוון חינם לכתוביות עם סגנון: חברו שני קבצים לדו-לשוני, סדרו מחדש ועצבו מחדש רצועה דו-לשונית קיימת, או הוסיפו אפקטים לרצועה בשפה אחת. 5 תבניות ASS ו-6 תבניות VTT, תצוגה מקדימה זהה לייצוא, ייצוא ל-SRT / VTT / ASS.',
+    desc: "כלי חינם לכתוביות עם סגנון: חברו שני קבצים לדו-לשוני, עצבו מחדש רצועה דו-לשונית או הוסיפו אפקטים. 5 תבניות ASS ו-6 VTT, ייצוא ל-SRT / VTT / ASS.",
     kw: "מיזוג כתוביות, כתוביות דו-לשוניות, שילוב כתוביות, כתוביות עם סגנון, סגנונות ASS, סגנונות VTT, אפקטים לכתוביות, תבנית כתוביות, כלי כתוביות חינם",
     intro: "חברו שני קבצי כתוביות לדו-לשוני או תנו להן סגנון ישר: גופן, צבע, מסגרת ומיקום — הכל WYSIWYG.",
     feat: "מיזוג וכוונון דו-לשוני, תבניות סגנון ASS / VTT, חריצי סגנון לכל ערך, תיקון ציר הזמן נקודתית או בקבוצות, ותצוגה מקדימה שהיא פשוט הקובץ שייצא.",
@@ -1407,7 +1407,7 @@ const SEO_CLEAN = {
   },
   'en': {
     title: 'Subtitle Cleaner - Strip Watermarks, SDH Cues & HTML Tags',
-    desc: 'Free online subtitle cleaner: strip group watermarks, ads, SDH cues, HTML tags and ASS effects, fix all-caps and mojibake. 13 rules in four groups, each switchable; every change is listed and can be reverted individually; the timeline is never touched.',
+    desc: "Free online subtitle cleaner: strip watermarks, ads, SDH, HTML tags, ASS effects; fix caps, mojibake. 13 switchable rules, undo per change, timeline untouched.",
     kw: 'subtitle cleaner, clean srt file, remove subtitle watermark, remove SDH subtitles, remove HTML tags from subtitles, fix all caps subtitles, fix mojibake, remove hearing impaired subtitles, strip ASS effects',
     intro: 'Run a downloaded subtitle through here first: watermarks, ads, SDH cues and HTML tags, gone in one pass.',
     feat: '13 rules in four groups (9 on by default), watermark and SDH removal, all-caps and mojibake fixes, per-cue change list with individual revert, and the timing is never touched.',
@@ -1441,7 +1441,7 @@ const SEO_CLEAN = {
   },
   'es': {
     title: "Limpiador de subtítulos - quita marcas de agua, avisos SD",
-    desc: 'Limpiador de subtítulos online gratuito: elimina marcas de agua de grupos, anuncios, avisos SDH, etiquetas HTML y efectos ASS; corrige el texto en mayúsculas y los caracteres corruptos. 13 reglas en cuatro grupos, cada una activable; cada cambio se lista y se puede revertir; la línea de tiempo no se toca.',
+    desc: "Limpiador de subtítulos gratis: quita marcas de agua, anuncios, SDH, etiquetas HTML, efectos ASS; corrige mayúsculas y mojibake. 13 reglas, deshacer por cambio.",
     kw: "limpiar subtitulos, limpiar srt, quitar marca de agua subtitulos, quitar subtitulos SDH, quitar anuncios subtitulos, arreglar caracteres corruptos, quitar etiquetas html subtitulos",
     intro: "Pasa primero los subtítulos descargados por aquí: marcas de agua, anuncios, avisos SDH y etiquetas HTML, fuera en una pasada.",
     feat: "13 reglas en cuatro grupos (9 activas por defecto), eliminación de marcas de agua, anuncios y SDH, corrección de mayúsculas y caracteres corruptos, lista de cambios por rótulo con reversión individual y tiempos intactos.",
@@ -1449,7 +1449,7 @@ const SEO_CLEAN = {
   },
   'pt': {
     title: "Limpador de legendas - remove marcas d’água, avisos SDH e",
-    desc: 'Limpador de legendas online grátis: remove marcas d’água de grupos, anúncios, avisos SDH, tags HTML e efeitos ASS; corrige texto em maiúsculas e caracteres corrompidos. 13 regras em quatro grupos, cada uma ajustável; cada alteração é listada e pode ser revertida; a timeline não é mexida.',
+    desc: "Limpador de legendas grátis: remove marcas d'água, SDH, tags HTML e efeitos ASS; corrige maiúsculas e caracteres corrompidos. 13 regras, desfaça por item.",
     kw: "limpar legendas, limpar srt, remover marca d’água legenda, remover SDH legenda, remover anúncios legenda, corrigir caracteres corrompidos, remover tags html legenda",
     intro: "Passe as legendas baixadas primeiro por aqui: marcas d’água, anúncios, avisos SDH e tags HTML saem de uma vez.",
     feat: "13 regras em quatro grupos (9 ativas por padrão), remoção de marcas d’água, anúncios e SDH, correção de maiúsculas e caracteres corrompidos, lista de mudanças por legenda com reversão individual e tempos intactos.",
@@ -1458,7 +1458,7 @@ const SEO_CLEAN = {
 
   'de': {
     title: "Untertitel-Reiniger - entfernt Wasserzeichen, SDH-Hinweis",
-    desc: 'Kostenloser Online-Reiniger für Untertitel: entfernt Gruppen-Wasserzeichen, Werbung, SDH-Hinweise, HTML-Tags und ASS-Effekte; korrigiert Großbuchstaben und kaputte Zeichen. 13 Regeln in vier Gruppen, jede einzeln schaltbar; jede Änderung wird gelistet und ist einzeln rückgängig; die Zeitachse bleibt unangetastet.',
+    desc: "Untertitel reinigen: Wasserzeichen, Werbung, SDH, HTML-Tags und ASS-Effekte entfernen; Großschreibung und kaputte Zeichen korrigieren. 13 schaltbare Regeln.",
     kw: "untertitel reinigen, srt reinigen, wasserzeichen aus untertiteln entfernen, SDH untertitel entfernen, werbung aus untertiteln entfernen, zeichensalat reparieren, html tags untertitel entfernen",
     intro: "Heruntergeladene Untertitel zuerst hier durchlaufen lassen: Wasserzeichen, Werbung, SDH-Hinweise und HTML-Tags sind in einem Durchgang weg.",
     feat: "13 Regeln in vier Gruppen (9 standardmäßig aktiv), Wasserzeichen-, Werbe- und SDH-Entfernung, Korrektur von Großbuchstaben und Zeichensalat, Änderungsliste pro Titel mit einzelnem Rückgängig und unangetastete Zeiten.",
@@ -1466,7 +1466,7 @@ const SEO_CLEAN = {
   },
   'fr': {
     title: "Nettoyeur de sous-titres - supprime filigranes, indicatio",
-    desc: 'Nettoyeur de sous-titres en ligne gratuit : supprime les filigranes de groupes, les pubs, les indications SDH, les balises HTML et les effets ASS; corrige les majuscules et les caractères cassés. 13 règles en quatre groupes, chacune désactivable; chaque modification est listée et réversible; la timeline n’est jamais touchée.',
+    desc: "Nettoyeur de sous-titres gratuit : supprime filigranes, pubs, SDH, balises HTML et effets ASS; corrige majuscules et caractères cassés. 13 règles réversibles.",
     kw: "nettoyer sous-titres, nettoyer srt, retirer filigrane sous-titres, retirer sous-titres SDH, retirer publicités sous-titres, réparer caractères corrompus, retirer balises html sous-titres",
     intro: "Faites d’abord passer les sous-titres téléchargés ici : filigranes, pubs, indications SDH et balises HTML disparaissent en une passe.",
     feat: "13 règles en quatre groupes (9 actives par défaut), suppression des filigranes, pubs et SDH, correction des majuscules et caractères corrompus, liste des modifications par sous-titre avec annulation individuelle et temps intacts.",
@@ -1474,7 +1474,7 @@ const SEO_CLEAN = {
   },
   'id': {
     title: "Pembersih subtitle - hapus watermark, penanda SDH dan kar",
-    desc: 'Pembersih subtitle online gratis: hapus watermark grup, iklan, penanda SDH, tag HTML dan efek ASS; perbaiki teks huruf kapital semua dan karakter rusak. 13 aturan dalam empat kelompok, masing-masing bisa diaktifkan; setiap perubahan dicantumkan dan bisa dibatalkan sendiri; timeline tidak disentuh.',
+    desc: "Pembersih subtitle gratis: hapus watermark, iklan, penanda SDH, tag HTML dan efek ASS; perbaiki karakter rusak. 13 aturan, batalkan satu per satu.",
     kw: "bersihkan subtitle, bersihkan srt, hapus watermark subtitle, hapus subtitle SDH, hapus iklan subtitle, perbaiki karakter rusak, hapus tag html subtitle",
     intro: "Lewatkan subtitle yang sudah diunduh ke sini dulu: watermark, iklan, penanda SDH, dan tag HTML hilang dalam satu kali jalan.",
     feat: "13 aturan dalam empat kelompok (9 aktif bawaan), penghapusan watermark, iklan dan SDH, perbaikan huruf kapital dan karakter rusak, daftar perubahan per subtitle dengan pembatalan satuan, serta waktu yang tetap utuh.",
@@ -1482,7 +1482,7 @@ const SEO_CLEAN = {
   },
   'hi': {
     title: "सबटाइटल क्लीनर - वॉटरमार्क, SDH संकेत और गड़बड़ अक्षर हटा",
-    desc: 'मुफ़्त ऑनलाइन सबटाइटल क्लीनर: ग्रुप वॉटरमार्क, विज्ञापन, SDH संकेत, HTML टैग और ASS इफ़ेक्ट हटाता है; ऑल-कैप्स और गड़बड़ अक्षर ठीक करता है। 13 नियम चार समूहों में, हर एक चालू-बंद किया जा सकता है; हर बदलाव सूचीबद्ध और अलग से वापस किया जा सकता है; टाइमलाइन नहीं छेड़ी जाती।',
+    desc: "मुफ़्त ऑनलाइन सबटाइटल क्लीनर: वॉटरमार्क, विज्ञापन, SDH, HTML टैग और ASS इफ़ेक्ट हटाता है; ऑल-कैप्स और गड़बड़ अक्षर ठीक करता है। 13 नियम, हर बदलाव अलग से वापस।",
     kw: "सबटाइटल साफ़ करें, srt साफ़ करें, सबटाइटल वॉटरमार्क हटाएँ, SDH सबटाइटल हटाएँ, सबटाइटल विज्ञापन हटाएँ, गड़बड़ अक्षर ठीक करें, html टैग हटाएँ",
     intro: "डाउनलोड किए सबटाइटल पहले यहाँ से गुज़ारें: वॉटरमार्क, विज्ञापन, SDH संकेत और HTML टैग एक ही पास में हट जाते हैं।",
     feat: "चार समूहों में 13 नियम (डिफ़ॉल्ट 9 चालू), वॉटरमार्क·विज्ञापन·SDH हटाना, बड़े अक्षरों और गड़बड़ अक्षरों की मरम्मत, हर सबटाइटल के बदलाव की सूची और अलग से वापसी, और समय बिलकुल सुरक्षित।",
@@ -1490,7 +1490,7 @@ const SEO_CLEAN = {
   },
   'th': {
     title: "เครื่องมือล้างซับไตเติล - ลบลายน้ำ โฆษณา ป้าย SDH และตัวอ",
-    desc: 'เครื่องมือล้างซับออนไลน์ฟรี: ลบลายน้ำของทีมซับ โฆษณา ป้าย SDH แท็ก HTML และเอฟเฟกต์ ASS แก้ตัวพิมพ์ใหญ่ทั้งหมดและตัวอักษรเพี้ยน 13 กฎเปิดปิดได้ตามใจชอบใน 4 กลุ่ม; แต่ละการแก้ไขแสดงเป็นรายการและย้อนกลับได้ทีละจุด; ไม่แตะไทม์ไลน์',
+    desc: "เครื่องมือล้างซับออนไลน์ฟรี: ลบลายน้ำ โฆษณา ป้าย SDH แท็ก HTML และเอฟเฟกต์ ASS แก้ตัวพิมพ์ใหญ่และตัวอักษรเพี้ยน 13 กฎเปิดปิดได้ ย้อนกลับทีละจุด ไม่แตะไทม์ไลน์",
     kw: "ล้างซับไตเติล, ล้าง srt, ลบลายน้ำซับ, ลบซับ SDH, ลบโฆษณาซับ, ซ่อมตัวอักษรเพี้ยน, ลบแท็ก html ซับ",
     intro: "เอาซับที่โหลดมากรองผ่านที่นี่ก่อน: ลายน้ำ โฆษณา ป้าย SDH และแท็ก HTML หายในรอบเดียว",
     feat: "13 กฎใน 4 กลุ่ม (เปิดมา 9 ข้อ), ลบลายน้ำ โฆษณา และ SDH, แก้ตัวพิมพ์ใหญ่และตัวอักษรเพี้ยน, รายการเปลี่ยนแปลงรายซับพร้อมย้อนกลับรายการ และไทม์ไลน์คงเดิม",
@@ -1498,7 +1498,7 @@ const SEO_CLEAN = {
   },
   'vi': {
     title: "Công cụ làm sạch phụ đề - xóa watermark, ký hiệu SDH và k",
-    desc: 'Công cụ làm sạch phụ đề online miễn phí: xóa watermark nhóm, quảng cáo, ký hiệu SDH, thẻ HTML và hiệu ứng ASS; sửa chữ toàn viết hoa và ký tự lỗi. 13 quy tắc trong bốn nhóm, bật tắt từng cái; mỗi thay đổi được liệt kê và có thể hoàn tác riêng; không đụng vào timeline.',
+    desc: "Công cụ làm sạch phụ đề online miễn phí: xóa watermark, quảng cáo, SDH, thẻ HTML và hiệu ứng ASS; sửa chữ viết hoa và ký tự lỗi. 13 quy tắc, hoàn tác riêng.",
     kw: "làm sạch phụ đề, làm sạch srt, xóa watermark phụ đề, xóa phụ đề SDH, xóa quảng cáo phụ đề, sửa ký tự lỗi, xóa thẻ html phụ đề",
     intro: "Cho phụ đề đã tải qua đây trước: watermark, quảng cáo, ký hiệu SDH và thẻ HTML biến mất trong một lượt.",
     feat: "13 quy tắc trong bốn nhóm (9 bật sẵn), xóa watermark, quảng cáo và SDH, sửa viết hoa và ký tự lỗi, danh sách thay đổi theo từng phụ đề với hoàn tác riêng, và thời gian giữ nguyên.",
@@ -1507,7 +1507,7 @@ const SEO_CLEAN = {
 
   'ru': {
     title: "Очиститель субтитров - удаляет водяные знаки, пометки SDH",
-    desc: 'Бесплатный онлайн-очиститель субтитров: удаляет водяные знаки групп, рекламу, пометки SDH, HTML-теги и эффекты ASS; исправляет ЗАГЛАВНЫЕ БУКВЫ и кракозябры. 13 правил в четырёх группах, каждое включается отдельно; каждое изменение показывается списком и откатывается по одному; таймлайн не трогается.',
+    desc: "Бесплатный онлайн-очиститель субтитров: удаляет водяные знаки, рекламу, SDH, HTML-теги и эффекты ASS; исправляет КАПС и кракозябры. 13 правил, откат по одному.",
     kw: "очистить субтитры, очистить srt, удалить водяной знак субтитров, удалить субтитры SDH, удалить рекламу из субтитров, исправить кракозябры, удалить html теги субтитров",
     intro: "Сначала прогоните скачанные субтитры здесь: водяные знаки, реклама, пометки SDH и HTML-теги исчезают за один проход.",
     feat: "13 правил в четырёх группах (9 включены по умолчанию), удаление водяных знаков, рекламы и SDH, исправление заглавных букв и кракозябр, список изменений по титрам с отменой каждого и нетронутые таймкоды.",
@@ -1515,7 +1515,7 @@ const SEO_CLEAN = {
   },
   'it': {
     title: "Pulitore di sottotitoli - rimuove filigrane, indicazioni",
-    desc: 'Pulitore di sottotitoli online gratuito: rimuove filigrane dei gruppi, pubblicità, indicazioni SDH, tag HTML ed effetti ASS; sistema il tutto maiuscolo e i caratteri rotti. 13 regole in quattro gruppi, ognuna attivabile; ogni modifica è elencata e si può annullare singolarmente; la timeline non viene toccata.',
+    desc: "Pulitore di sottotitoli gratuito: rimuove filigrane, pubblicità, SDH, tag HTML ed effetti ASS; sistema maiuscole e caratteri rotti. 13 regole, annullabile.",
     kw: "pulire sottotitoli, pulire srt, rimuovere filigrana sottotitoli, rimuovere sottotitoli SDH, rimuovere pubblicità sottotitoli, riparare caratteri corrotti, rimuovere tag html sottotitoli",
     intro: "Fai passare prima i sottotitoli scaricati da qui: filigrane, pubblicità, indicazioni SDH e tag HTML spariscono in una passata.",
     feat: "13 regole in quattro gruppi (9 attive di default), rimozione di filigrane, pubblicità e SDH, correzione di maiuscole e caratteri corrotti, elenco delle modifiche per sottotitolo con annullamento singolo e tempi intatti.",
@@ -1523,7 +1523,7 @@ const SEO_CLEAN = {
   },
   'ar': {
     title: "منظّف الترجمة - يزيل العلامات المائية وإشارات SDH والأحرف",
-    desc: 'منظّف ترجمة مجاني على الإنترنت: يزيل علامات الفرق المائية والإعلانات وإشارات SDH ووسوم HTML وتأثيرات ASS؛ ويصلح الكتابة بأحرف كبيرة والأحرف التالفة. 13 قاعدة في أربع مجموعات، كل واحدة قابلة للتشغيل؛ كل تغيير يُدرج في قائمة ويمكن التراجع عنه بشكل فردي؛ لا يُمسّ التوقيت.',
+    desc: "منظّف ترجمة مجاني: يزيل العلامات المائية والإعلانات وإشارات SDH ووسوم HTML وتأثيرات ASS؛ ويصلح الكتابة بأحرف كبيرة والأحرف التالفة. 13 قاعدة، تراجع فردي.",
     kw: "تنظيف الترجمة, تنظيف srt, إزالة العلامة المائية من الترجمة, إزالة ترجمة SDH, إزالة الإعلانات من الترجمة, إصلاح الأحرف التالفة, إزالة وسوم html من الترجمة",
     intro: "مرّر الترجمة التي حمّلتها من هنا أولاً: العلامات المائية والإعلانات وإشارات SDH ووسوم HTML تختفي بمرور واحد.",
     feat: "13 قاعدة في أربع مجموعات (9 مفعّلة افتراضياً)، إزالة العلامات المائية والإعلانات وSDH، إصلاح الأحرف الكبيرة والتالفة، قائمة بالتغييرات لكل ترجمة مع تراجع منفرد، والتوقيتات سليمة تماماً.",
@@ -1531,7 +1531,7 @@ const SEO_CLEAN = {
   },
   'tr': {
     title: "Altyazı temizleyici - filigranları, SDH işaretlerini ve b",
-    desc: 'Ücretsiz online altyazı temizleyici: ekip filigranlarını, reklamları, SDH işaretlerini, HTML etiketlerini ve ASS efektlerini siler; tamamı büyük harf ve bozuk karakterleri düzeltir. Dört grupta 13 kural, her biri açılıp kapanabilir; her değişiklik listelenir ve tek tek geri alınabilir; zaman çizelgesine dokunulmaz.',
+    desc: "Ücretsiz altyazı temizleyici: filigranları, reklamları, SDH, HTML ve ASS etiketlerini siler; büyük harf, bozuk karakterleri düzeltir. 13 kural, geri alınabilir.",
     kw: "altyazı temizleme, srt temizleme, altyazıdan filigran kaldırma, SDH altyazı kaldırma, altyazıdan reklam kaldırma, bozuk karakter onarma, html etiketlerini kaldırma",
     intro: "İndirdiğiniz altyazıyı önce buradan geçirin: filigranlar, reklamlar, SDH işaretleri ve HTML etiketleri tek geçişte silinir.",
     feat: "Dört grupta 13 kural (9’u varsayılan açık), filigran · reklam · SDH silme, büyük harf ve bozuk karakter düzeltme, altyazı başına değişiklik listesi ve tek tek geri alma, zamanlar ise hiç dokunulmadan kalır.",
@@ -1539,7 +1539,7 @@ const SEO_CLEAN = {
   },
   'nl': {
     title: "Ondertitel-schoonmaker - verwijdert watermerken, SDH-mark",
-    desc: 'Gratis online ondertitel-schoonmaker: verwijdert groepswatermerken, reclame, SDH-markeringen, HTML-tags en ASS-effecten; herstelt hoofdletters en kapotte tekens. 13 regels in vier groepen, elk afzonderlijk schakelbaar; elke wijziging wordt getoond en is apart terug te draaien; de tijdlijn blijft onaangeroerd.',
+    desc: "Gratis ondertitel-schoonmaker: verwijdert watermerken, reclame, SDH, HTML- en ASS-tags; herstelt hoofdletters en kapotte tekens. 13 regels, terug te draaien.",
     kw: "ondertitels schoonmaken, srt schoonmaken, watermerk uit ondertitels verwijderen, SDH ondertitels verwijderen, reclame uit ondertitels verwijderen, corrupte tekens herstellen, html tags verwijderen",
     intro: "Haal gedownloade ondertitels eerst hier doorheen: watermerken, reclame, SDH-markeringen en HTML-tags verdwijnen in één keer.",
     feat: "13 regels in vier groepen (9 standaard aan), verwijdering van watermerken, reclame en SDH, herstel van hoofdletters en corrupte tekens, wijzigingenlijst per ondertitel met individuele terugdraai en intacte tijden.",
@@ -1547,7 +1547,7 @@ const SEO_CLEAN = {
   },
   'pl': {
     title: "Czyścik napisów - usuwa znaki wodne, oznaczenia SDH i krz",
-    desc: 'Darmowy czyścik napisów online: usuwa znaki wodne grup, reklamy, oznaczenia SDH, tagi HTML i efekty ASS; naprawia WIELKIE LITERY i krzaki. 13 reguł w czterech grupach, każdą można przełączyć; każda zmiana jest wypisana i można ją cofnąć osobno; oś czasu pozostaje nietknięta.',
+    desc: "Darmowy czyścik napisów online: usuwa znaki wodne, reklamy, SDH, tagi HTML i efekty ASS; naprawia WIELKIE LITERY i krzaki. 13 reguł, cofaj po jednej.",
     kw: "czyszczenie napisów, czyszczenie srt, usuwanie znaku wodnego z napisów, usuwanie napisów SDH, usuwanie reklam z napisów, naprawa krzaków, usuwanie tagów html",
     intro: "Przepuść pobrane napisy najpierw tutaj: znaki wodne, reklamy, oznaczenia SDH i tagi HTML znikają w jednym przebiegu.",
     feat: "13 reguł w czterech grupach (9 domyślnie włączonych), usuwanie znaków wodnych, reklam i SDH, naprawa wielkich liter i krzaków, lista zmian per napis z osobnym cofnięciem i nienaruszalne czasy.",
@@ -1556,7 +1556,7 @@ const SEO_CLEAN = {
 
   'sv': {
     title: "Rensare för undertexter - tar bort vattenmärken, SDH-mark",
-    desc: 'Gratis onlineverktyg som rensar undertexter: tar bort grupp-vattenmärken, reklam, SDH-markeringar, HTML-taggar och ASS-effekter; åtgärdar VERSALER och trasiga tecken. 13 regler i fyra grupper, var och en kan slås på eller av; varje ändring listas och kan ångras enskilt; tidslinjen rörs aldrig.',
+    desc: "Gratis rensning av undertexter: tar bort vattenmärken, reklam, SDH, HTML-taggar och ASS-effekter; åtgärdar VERSALER, trasiga tecken. 13 regler, ångra enskilt.",
     kw: "rensa undertexter, rensa srt, ta bort vattenmärke undertexter, ta bort SDH-undertexter, ta bort reklam undertexter, reparera trasiga tecken, ta bort html-taggar",
     intro: "Kör nedladdade undertexter hit först: vattenmärken, reklam, SDH-markeringar och HTML-taggar försvinner i ett svep.",
     feat: "13 regler i fyra grupper (9 på som standard), borttagning av vattenmärken, reklam och SDH, åtgärd av versaler och trasiga tecken, ändringslista per undertext med enskild ångra och intakta tider.",
@@ -1564,7 +1564,7 @@ const SEO_CLEAN = {
   },
   'cs': {
     title: "Čistič titulků - odstraní vodoznaky, SDH značky a rozbité",
-    desc: 'Bezplatný online čistič titulků: odstraní vodoznaky skupin, reklamu, SDH značky, HTML tagy a ASS efekty; opraví VELKÁ PÍSMENA a rozbité znaky. 13 pravidel ve čtyřech skupinách, každé lze přepnout; každá změna je vypsána a dá se vrátit samostatně; časová osa se nemění.',
+    desc: "Bezplatný čistič titulků: odstraní vodoznaky, reklamu, SDH, HTML tagy a ASS efekty; opraví VELKÁ PÍSMENA a rozbité znaky. 13 pravidel, vrátit po jedné.",
     kw: "vyčistit titulky, vyčistit srt, odstranit vodoznak titulků, odstranit SDH titulky, odstranit reklamu z titulků, opravit rozbité znaky, odstranit html tagy",
     intro: "Stažené titulky nejdřív prožeňte tudy: vodoznaky, reklama, SDH značky a HTML tagy zmizí v jednom průchodu.",
     feat: "13 pravidel ve čtyřech skupinách (9 ve výchozím stavu zapnuto), odstranění vodoznaků, reklamy a SDH, oprava velkých písmen a rozbitých znaků, seznam změn po titulcích s jednotlivým vrácením a netknuté časy.",
@@ -1572,7 +1572,7 @@ const SEO_CLEAN = {
   },
   'uk': {
     title: "Очищувач субтитрів - видаляє водяні знаки, позначки SDH і",
-    desc: 'Безплатний онлайн-очищувач субтитрів: видаляє водяні знаки груп, рекламу, позначки SDH, HTML-теги й ефекти ASS; виправляє ВЕЛИКІ ЛІТЕРИ та кракозябри. 13 правил у чотирьох групах, кожне вмикається окремо; кожну зміну показано списком і можна скасувати окремо; таймлайн не чіпається.',
+    desc: "Безплатний очищувач субтитрів: видаляє водяні знаки, рекламу, SDH, HTML-теги й ефекти ASS; виправляє ВЕЛИКІ ЛІТЕРИ та кракозябри. 13 правил, скасування окремо.",
     kw: "очистити субтитри, очистити srt, видалити водяний знак субтитрів, видалити субтитри SDH, видалити рекламу з субтитрів, виправити кракозябри, видалити html теги",
     intro: "Спершу проженіть завантажені субтитри тут: водяні знаки, реклама, позначки SDH і HTML-теги зникають за один прохід.",
     feat: "13 правил у чотирьох групах (9 увімкнено за замовчуванням), видалення водяних знаків, реклами і SDH, виправлення великих літер і кракозябрів, перелік змін по титрах з окремим скасуванням і недоторкані таймкоди.",
@@ -1580,7 +1580,7 @@ const SEO_CLEAN = {
   },
   'da': {
     title: "Renser til undertekster - fjerner vandmærker, SDH-markeri",
-    desc: 'Gratis online renser til undertekster: fjerner gruppe-vandmærker, reklamer, SDH-markeringer, HTML-tags og ASS-effekter; retter VERSALER og ødelagte tegn. 13 regler i fire grupper, hver kan slås til eller fra; hver ændring listes og kan fortrydes enkeltvis; tidslinjen røres ikke.',
+    desc: "Gratis renser: fjerner vandmærker, reklamer, SDH, HTML-tags og ASS-effekter; retter VERSALER og ødelagte tegn. 13 regler at slå til/fra, fortryd enkeltvis.",
     kw: "rense undertekster, rense srt, fjerne vandmærke undertekster, fjerne SDH undertekster, fjerne reklamer undertekster, reparere ødelagte tegn, fjerne html tags",
     intro: "Kør downloadede undertekster igennem her først: vandmærker, reklamer, SDH-markeringer og HTML-tags forsvinder på én gang.",
     feat: "13 regler i fire grupper (9 slået til som standard), fjernelse af vandmærker, reklamer og SDH, rettelse af versaler og ødelagte tegn, ændringsliste per undertekst med individuel fortryd og intakte tider.",
@@ -1588,7 +1588,7 @@ const SEO_CLEAN = {
   },
   'fi': {
     title: "Tekstitysten puhdistaja - poistaa vesileimat, SDH-merkinn",
-    desc: 'Ilmainen verkkotyökalu tekstitysten puhdistukseen: poistaa ryhmien vesileimat, mainokset, SDH-merkinnät, HTML-tagit ja ASS-tehosteet; korjaa ISOILLA kirjoitetun ja rikkinäiset merkit. 13 sääntöä neljässä ryhmässä, jokainen kytkettävissä; jokainen muutos listataan ja voi perua erikseen; aikajanaan ei kosketa.',
+    desc: "Ilmainen tekstitysten puhdistus: poistaa vesileimat, SDH-merkinnät, HTML-tagit ja ASS-tehosteet; korjaa ISOILLA kirjoitetun ja rikkinäiset merkit. 13 sääntöä.",
     kw: "puhdista tekstitykset, puhdista srt, poista vesileima tekstityksistä, poista SDH-tekstitykset, poista mainokset tekstityksistä, korjaa rikkinäiset merkit, poista html-tagit",
     intro: "Aja ladatut tekstitykset ensin tämän kautta: vesileimat, mainokset, SDH-merkinnät ja HTML-tagit poistuvat yhdellä kertaa.",
     feat: "13 sääntöä neljässä ryhmässä (9 oletuksena päällä), vesileimojen, mainosten ja SDH:n poisto, isojen kirjainten ja rikkinäisten merkkien korjaus, muutoslista per tekstitys yksittäisellä peruutuksella ja koskemattomat ajat.",
@@ -1596,7 +1596,7 @@ const SEO_CLEAN = {
   },
   'el': {
     title: "Καθαριστής υποτίτλων - αφαιρεί υδατογραφήματα, σημάνσεις",
-    desc: 'Δωρεάν διαδικτυακός καθαριστής υποτίτλων: αφαιρεί υδατογραφήματα ομάδων, διαφημίσεις, σημάνσεις SDH, ετικέτες HTML και εφέ ASS· διορθώνει τα ΚΕΦΑΛΑΙΑ και τους χαλασμένους χαρακτήρες. 13 κανόνες σε τέσσερις ομάδες, καθένας ενεργοποιείται ξεχωριστά· κάθε αλλαγή εμφανίζεται σε λίστα και αναστρέφεται μία προς μία· η χρονική γραμμή δεν πειράζεται.',
+    desc: "Δωρεάν καθαριστής υποτίτλων: αφαιρεί υδατογραφήματα, διαφημίσεις, SDH, ετικέτες HTML και εφέ ASS· διορθώνει ΚΕΦΑΛΑΙΑ και χαλασμένους χαρακτήρες. 13 κανόνες.",
     kw: "καθαρισμός υποτίτλων, καθαρισμός srt, αφαίρεση υδατογραφήματος υποτίτλων, αφαίρεση SDH υποτίτλων, αφαίρεση διαφημίσεων υποτίτλων, επιδιόρθωση χαλασμένων συμβόλων, αφαίρεση ετικετών html",
     intro: "Περάστε πρώτα τους κατεβασμένους υπότιτλους από εδώ: υδατογραφήματα, διαφημίσεις, σημάνσεις SDH και ετικέτες HTML εξαφανίζονται με μία.",
     feat: "13 κανόνες σε τέσσερις ομάδες (9 ενεργοί εξ ορισμού), αφαίρεση υδατογραφημάτων, διαφημίσεων και SDH, διόρθωση κεφαλαίων και χαλασμένων συμβόλων, λίστα αλλαγών ανά υπότιτλο με μεμονωμένη αναίρεση και άθικτοι χρόνοι.",
@@ -1612,7 +1612,7 @@ const SEO_CLEAN = {
   },
   'ro': {
     title: "Curățător de subtitrări - elimină filigranele, marcajele",
-    desc: 'Curățător de subtitrări online gratuit: elimină filigranele echipelor, reclamele, marcajele SDH, tagurile HTML și efectele ASS; corectează MAJUSCULELE și caracterele stricate. 13 reguli în patru grupe, fiecare poate fi comutată; fiecare modificare este listată și poate fi revertită individual; timeline-ul nu este atins.',
+    desc: "Curățător de subtitrări gratuit: elimină filigrane, SDH, taguri HTML și efecte ASS; corectează MAJUSCULE și caractere stricate. 13 reguli, revert individual.",
     kw: "curățare subtitrări, curățare srt, eliminare filigran subtitrări, eliminare subtitrări SDH, eliminare reclame subtitrări, reparare caractere stricate, eliminare taguri html",
     intro: "Treci mai întâi subtitrările descărcate pe aici: filigranele, reclamele, marcajele SDH și tagurile HTML dispar dintr-o singură trecere.",
     feat: "13 reguli în patru grupe (9 active implicit), eliminarea filigranelor, reclamelor și SDH, corectarea majusculelor și caracterelor stricate, lista modificărilor per subtitrare cu anulare individuală și timpi intacte.",
@@ -1642,7 +1642,7 @@ const SEO_GLOSSARY = {
   },
   'en': {
     title: 'Batch Subtitle Term Replace - One Glossary, Whole File | AI-SRTSub',
-    desc: 'Free online glossary replace for subtitles: list "old term → new term" once and every cue in SRT / VTT / ASS / SBV / LRC / TXT is updated. Timing, styles and NOTE blocks stay byte-identical, and every change can be reverted per line.',
+    desc: "Glossary replace for subtitles: list \"old → new\" once and the whole SRT / VTT / ASS / TXT file updates. Timing, styles and NOTE blocks stay; revert per line.",
     kw: 'subtitle glossary,batch replace srt,find and replace subtitle,subtitle term replace,srt batch edit,replace words in subtitles,unify subtitle names,subtitle terminology,replace text in vtt,glossary srt tool,batch terminology replace',
     intro: 'A glossary of "old term → new term" rules applied across the whole subtitle file at once, with timing, ASS styles and VTT note blocks left byte-identical.',
     feat: 'One rule per line, separated by -> , => , → or a tab; lines starting with # are comments. Whole-word matching keeps "art" out of "start", case sensitivity is optional, and you can restrict the replace to line 1 or line 2 of bilingual cues. Every changed cue is listed, and any single one can be put back.',
@@ -1660,7 +1660,7 @@ const SEO_GLOSSARY = {
   },
   'es': {
     title: 'Reemplazo masivo de términos en subtítulos - AI-SRTSub',
-    desc: 'Reemplaza términos en subtítulos en línea y gratis: escribe «término original → término nuevo» y se actualiza todo el SRT / VTT / ASS / SBV / LRC / TXT. Los tiempos, los estilos y los bloques NOTE no se alteran, y cada cambio se puede deshacer por línea.',
+    desc: "Reemplaza términos en subtítulos gratis: escribe «original → nuevo» y se actualiza el archivo. Tiempos, estilos y bloques NOTE no cambian; deshacer por línea.",
     kw: 'reemplazar términos subtítulos,glosario subtítulos,reemplazo masivo srt,buscar y reemplazar subtítulos,editar srt por lotes,unificar nombres subtítulos,reemplazar palabras srt,sustituir texto vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Un glosario con reglas «término original → término nuevo» que se aplica a todo el archivo de subtítulos a la vez, sin tocar los tiempos, los estilos ASS ni los bloques NOTE del VTT.',
     feat: 'Una regla por línea, separada por -> , => , → o tabulador; las líneas con # son comentarios. Coincidencia de palabra completa (art no altera start), distinción opcional de mayúsculas y posibilidad de limitar el cambio a la línea 1 o 2 en subtítulos bilingües. Todas las líneas modificadas se listan y se pueden revertir de una en una.',
@@ -1669,7 +1669,7 @@ const SEO_GLOSSARY = {
   },
   'pt': {
     title: 'Substituição de termos em legendas em massa - AI-SRTSub',
-    desc: 'Substitua termos nas legendas online e de graça: escreva «termo original → termo novo» e atualize todo o SRT / VTT / ASS / SBV / LRC / TXT. Os tempos, os estilos e os blocos NOTE não mudam, e cada alteração pode ser desfeita por linha.',
+    desc: "Substitua termos nas legendas grátis: escreva «original → novo» e atualize todo o arquivo. Tempos, estilos e blocos NOTE não mudam; desfazer por linha.",
     kw: 'substituir termos legendas,glossário legendas,substituição em massa srt,localizar e substituir legendas,editar srt em lote,unificar nomes legendas,substituir palavras srt,alterar texto vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Um glossário com regras «termo original → termo novo» aplicado a todo o arquivo de legendas de uma vez, sem mexer nos tempos, nos estilos ASS nem nos blocos NOTE do VTT.',
     feat: 'Uma regra por linha, separada por -> , => , → ou tabulação; linhas com # são comentários. Correspondência de palavra inteira (art não altera start), diferenciação opcional de maiúsculas e opção de limitar a troca à linha 1 ou 2 em legendas bilíngues. Todas as linhas alteradas aparecem listadas e podem ser revertidas individualmente.',
@@ -1687,7 +1687,7 @@ const SEO_GLOSSARY = {
   },
   'de': {
     title: 'Begriffe in Untertiteln massenhaft ersetzen - AI-SRTSub',
-    desc: 'Begriffe in Untertiteln kostenlos online ersetzen: «alter Begriff → neuer Begriff" notieren und das ganze SRT / VTT / ASS / SBV / LRC / TXT aktualisieren. Zeiten, Stile und NOTE-Blöcke bleiben unverändert, jede Änderung ist einzeln rücknehmbar.',
+    desc: "Begriffe in Untertiteln kostenlos ersetzen: «alt → neu» notieren, das ganze File wird aktualisiert. Zeiten, Stile und NOTE-Blöcke bleiben, rücknehmbar.",
     kw: 'untertitel begriffe ersetzen,glossar untertitel,srt massenersetzung,suchen und ersetzen untertitel,srt stapelverarbeitung,namen vereinheitlichen untertitel,wörter ersetzen srt,text ersetzen vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Ein Glossar mit Regeln «alter Begriff → neuer Begriff», das auf die ganze Untertiteldatei angewendet wird, ohne Zeiten, ASS-Stile oder VTT-NOTE-Blöcke anzufassen.',
     feat: 'Eine Regel pro Zeile, getrennt durch -> , => , → oder Tab; Zeilen mit # sind Kommentare. Treffer nur als ganzes Wort (art lässt start unberührt), optionale Groß-/Kleinschreibung und Begrenzung auf Zeile 1 oder 2 bei zweisprachigen Untertiteln. Jede geänderte Zeile wird aufgelistet und lässt sich einzeln zurücknehmen.',
@@ -1696,7 +1696,7 @@ const SEO_GLOSSARY = {
   },
   'fr': {
     title: 'Remplacement de termes dans les sous-titres en masse - AI-SRTSub',
-    desc: 'Remplacez des termes dans vos sous-titres en ligne et gratuitement : notez « ancien terme → nouveau terme » et tout le fichier SRT / VTT / ASS / SBV / LRC / TXT est mis à jour. Les temps, les styles et les blocs NOTE restent identiques, et chaque ligne peut être rétablie séparément.',
+    desc: "Remplacez des termes dans les sous-titres gratuitement : notez « ancien → nouveau » et tout le fichier est mis à jour. Temps, styles et blocs NOTE restent.",
     kw: 'remplacer termes sous-titres,glossaire sous-titres,remplacement masse srt,chercher et remplacer sous-titres,modifier srt par lot,uniformiser noms sous-titres,remplacer mots srt,remplacer texte vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Un glossaire de règles « ancien terme → nouveau terme » appliqué à tout le fichier de sous-titres en une fois, sans toucher aux temps, aux styles ASS ni aux blocs NOTE du VTT.',
     feat: 'Une règle par ligne, séparée par -> , => , → ou une tabulation ; les lignes commençant par # sont des commentaires. Correspondance sur le mot entier (art ne touche pas start), sensibilité à la casse optionnelle et limitation possible à la ligne 1 ou 2 des sous-titres bilingues. Chaque ligne modifiée est listée et peut être rétablie une par une.',
@@ -1704,8 +1704,8 @@ const SEO_GLOSSARY = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
   },
   'id': {
-    title: 'Ganti Istilah Subtitle Sekaligus - Satu Daftar, Seluruh Berkas | AI-SRTSub',
-    desc: 'Ganti istilah di subtitle online gratis: tulis "istilah lama → istilah baru" sekali, seluruh SRT / VTT / ASS / SBV / LRC / TXT ikut berubah. Garis waktu, gaya, dan blok NOTE tidak tersentuh, dan setiap baris bisa dikembalikan sendiri.',
+    title: "Ganti Istilah Subtitle Sekaligus - Satu Daftar, Semua File",
+    desc: "Ganti istilah di subtitle gratis: tulis \"istilah lama → baru\" sekali, seluruh berkas berubah. Garis waktu, gaya dan blok NOTE utuh, kembalikan per baris.",
     kw: 'ganti istilah subtitle,glosarium subtitle,ganti kata srt,replace teks subtitle,cari dan ganti subtitle,edit srt massal,samakan nama subtitle,ganti kata vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Satu daftar aturan "istilah lama → istilah baru" yang diterapkan ke seluruh berkas subtitle sekaligus, tanpa menyentuh garis waktu, gaya ASS, maupun blok NOTE di VTT.',
     feat: 'Satu aturan per baris, dipisahkan -> , => , → , atau tab; baris berawal # adalah catatan. Cocok kata utuh (art tidak mengubah start), opsi bedakan huruf besar-kecil, dan bisa dibatasi hanya ke baris 1 atau baris 2 pada subtitle dwibahasa. Setiap baris yang berubah ditampilkan dan bisa dikembalikan satu-satu.',
@@ -1714,7 +1714,7 @@ const SEO_GLOSSARY = {
   },
   'hi': {
     title: 'सबटाइटल में शब्द एक साथ बदलें - एक ग्लॉसरी, पूरी फ़ाइल | AI-SRTSub',
-    desc: 'सबटाइटल में शब्द बदलना अब मुफ़्त और ऑनलाइन: "पुराना शब्द → नया शब्द" लिखें और पूरा SRT / VTT / ASS / SBV / LRC / TXT अपडेट हो जाए। समय-रेखा, स्टाइल और NOTE ब्लॉक जस के तस रहते हैं, और हर बदलाव अलग से वापस किया जा सकता है।',
+    desc: "सबटाइटल में शब्द बदलना मुफ़्त और ऑनलाइन: \"पुराना → नया शब्द\" लिखें और पूरी फ़ाइल अपडेट हो जाए। समय-रेखा, स्टाइल और NOTE ब्लॉक जस के तस, हर बदलाव अलग से वापस।",
     kw: 'सबटाइटल शब्द बदलें,सबटाइटल ग्लॉसरी,srt शब्द बदलें,सबटाइटल में टेक्स्ट रिप्लेस,एसआरटी बैच एडिट,सबटाइटल नाम एक जैसे,वीटीटी टेक्स्ट बदलें,शब्द एक साथ बदलें,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'एक ग्लॉसरी में "पुराना शब्द → नया शब्द" नियम लिखें और पूरी सबटाइटल फ़ाइल एक बार में बदल जाए — समय-रेखा, ASS स्टाइल और VTT के NOTE ब्लॉक पर कोई असर नहीं।',
     feat: 'एक पंक्ति में एक नियम, -> , => , → या टैब से अलग करें; # से शुरू होने वाली पंक्ति टिप्पणी है। पूरे शब्द से मिलान (art से start नहीं बदलता), बड़े-छोटे अक्षर का विकल्प, और द्विभाषी सबटाइटल में सिर्फ़ पंक्ति 1 या 2 तक सीमित करने की सुविधा। बदली हुई हर पंक्ति सूची में दिखती है और अलग से वापस लाई जा सकती है।',
@@ -1732,7 +1732,7 @@ const SEO_GLOSSARY = {
   },
   'vi': {
     title: 'Thay thuật ngữ phụ đề hàng loạt - Một bảng, cả tệp | AI-SRTSub',
-    desc: 'Thay thuật ngữ trong phụ đề trực tuyến miễn phí: ghi "thuật ngữ cũ → thuật ngữ mới" một lần, toàn bộ SRT / VTT / ASS / SBV / LRC / TXT được cập nhật. Trục thời gian, kiểu và khối NOTE không đổi, và từng dòng có thể hoàn tác riêng.',
+    desc: "Thay thuật ngữ trong phụ đề miễn phí: ghi \"cũ → mới\" một lần, toàn bộ tệp được cập nhật. Trục thời gian, kiểu và khối NOTE giữ nguyên, hoàn tác từng dòng.",
     kw: 'thay thuật ngữ phụ đề,bảng thuật ngữ phụ đề,sửa từ hàng loạt srt,thay thế văn bản phụ đề,tìm và thay thế phụ đề,sửa srt hàng loạt,thống nhất tên phụ đề,thay văn bản vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Một bảng quy tắc "thuật ngữ cũ → thuật ngữ mới" được áp dụng cho toàn bộ tệp phụ đề cùng lúc, không đụng vào trục thời gian, kiểu ASS hay khối NOTE của VTT.',
     feat: 'Mỗi dòng một quy tắc, ngăn bằng -> , => , → hoặc tab; dòng bắt đầu bằng # là chú thích. Khớp nguyên từ (art không đụng vào start), tùy chọn phân biệt hoa thường, và có thể giới hạn chỉ dòng 1 hoặc dòng 2 trong phụ đề song ngữ. Mọi dòng bị thay đổi đều được liệt kê và hoàn tác từng dòng một.',
@@ -1741,7 +1741,7 @@ const SEO_GLOSSARY = {
   },
   'ru': {
     title: 'Массовая замена терминов в субтитрах - AI-SRTSub',
-    desc: 'Бесплатная онлайн-замена терминов в субтитрах: запишите «старый термин → новый термин» и весь файл SRT / VTT / ASS / SBV / LRC / TXT обновится. Тайминг, стили и блоки NOTE не меняются, любое изменение отменяется построчно.',
+    desc: "Бесплатная онлайн-замена терминов в субтитрах: запишите «старый → новый термин» и весь файл обновится. Тайминг, стили и блоки NOTE не меняются, откат построчно.",
     kw: 'замена терминов в субтитрах,глоссарий субтитров,массовая замена srt,найти и заменить в субтитрах,пакетное изменение srt,унификация имён в субтитрах,заменить слова в srt,заменить текст vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Глоссарий правил «старый термин → новый термин», применяемый ко всему файлу субтитров сразу: тайминг, стили ASS и блоки NOTE в VTT остаются без изменений.',
     feat: 'Одно правило в строке, разделитель — -> , => , → или табуляция; строки с # — комментарии. Совпадение только по целому слову (art не трогает start), необязательный учёт регистра и возможность ограничить замену строкой 1 или 2 в двуязычных субтитрах. Все изменённые строки выводятся списком и отменяются по отдельности.',
@@ -1750,7 +1750,7 @@ const SEO_GLOSSARY = {
   },
   'it': {
     title: 'Sostituzione termini nei sottotitoli in blocco - AI-SRTSub',
-    desc: 'Sostituisci i termini nei sottotitoli online gratis: scrivi «termine vecchio → termine nuovo» e si aggiornano tutti i file SRT / VTT / ASS / SBV / LRC / TXT. Tempi, stili e blocchi NOTE restano identici e ogni riga si può ripristinare da sola.',
+    desc: "Sostituisci i termini nei sottotitoli gratis: scrivi «vecchio → nuovo» e si aggiorna tutto il file. Tempi, stili e NOTE restano identici; ripristino per riga.",
     kw: 'sostituire termini sottotitoli,glossario sottotitoli,sostituzione massiva srt,trova e sostituisci sottotitoli,modifica srt in blocco,uniformare nomi sottotitoli,sostituire parole srt,sostituire testo vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Un glossario di regole «termine vecchio → termine nuovo» applicato a tutto il file di sottotitoli in una volta, senza toccare tempi, stili ASS e blocchi NOTE del VTT.',
     feat: 'Una regola per riga, separata da -> , => , → o tabulazione; le righe con # sono commenti. Corrispondenza sulla parola intera (art non tocca start), distinzione facoltativa tra maiuscole e possibilità di limitarsi alla riga 1 o 2 nei sottotitoli bilingui. Ogni riga modificata viene elencata e può essere ripristinata singolarmente.',
@@ -1759,7 +1759,7 @@ const SEO_GLOSSARY = {
   },
   'ar': {
     title: 'استبدال المصطلحات في الترجمات دفعة واحدة - AI-SRTSub',
-    desc: 'استبدل المصطلحات في ملفات الترجمة مجاناً على الإنترنت: اكتب «المصطلح القديم → المصطلح الجديد» ويتحدَّث ملف SRT / VTT / ASS / SBV / LRC / TXT كاملًا. التوقيت والأنماط وكتل NOTE تبقى كما هي، ويمكن التراجع عن كل سطر على حدة.',
+    desc: "استبدل المصطلحات في ملفات الترجمة مجاناً: اكتب «المصطلح القديم → الجديد» ويتحدَّث الملف كاملًا. التوقيت والأنماط وكتل NOTE تبقى، والتراجع يتم سطرًا سطرًا.",
     kw: 'استبدال المصطلحات في الترجمة,مسرد مصطلحات الترجمة,استبدال جماعي srt,ابحث واستبدل في الترجمة,تعديل srt دفعة,توحيد الأسماء في الترجمة,استبدال كلمات srt,استبدال نص vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'مسرد بقواعد «المصطلح القديم → المصطلح الجديد» يُطبَّق على ملف الترجمة كاملًا مرة واحدة، دون أن يمس التوقيت أو أنماط ASS أو كتل NOTE في VTT.',
     feat: 'قاعدة واحدة في كل سطر، يفصل بينها -> أو => أو → أو مسافة جدولة، والأسطر التي تبدأ بـ # تعليقات. مطابقة الكلمة كاملة (art لا يمس start)، وخيار التفريق بين الحروف الكبيرة والصغيرة، وحصر الاستبدال في السطر 1 أو 2 للترجمات ثنائية اللغة. تُعرض كل الأسطر التي تغيّرت ويمكن إرجاع كل سطر بمفرده.',
@@ -1767,8 +1767,8 @@ const SEO_GLOSSARY = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
   },
   'tr': {
-    title: 'Altyazıda Terimleri Toplu Değiştirme - Tek Liste, Tüm Dosya | AI-SRTSub',
-    desc: 'Altyazıdaki terimleri ücretsiz ve çevrimiçi değiştirin: "eski terim → yeni terim" yazın, tüm SRT / VTT / ASS / SBV / LRC / TXT güncellensin. Zamanlama, stiller ve NOTE blokları hiç değişmez, her satır tek başına geri alınabilir.',
+    title: "Altyazıda Terimleri Toplu Değiştirme - Tek Liste, Tüm Dosya",
+    desc: "Altyazıdaki terimleri ücretsiz değiştirin: \"eski → yeni\" yazın, tüm dosya güncellensin. Zamanlama, stiller ve NOTE blokları değişmez, geri alma satır bazlı.",
     kw: 'altyazı terim değiştirme,altyazı sözlüğü,srt toplu değiştirme,altyazıda bul ve değiştir,srt toplu düzenleme,altyazı isimleri eşitle,vtt metin değiştir,altyazı kelime değiştir,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Bir "eski terim → yeni terim" kuralları sözlüğü tüm altyazı dosyasına bir kerede uygulanır; zamanlama, ASS stilleri ve VTT NOTE bloklarına hiç dokunulmaz.',
     feat: 'Her satıra bir kural; ayırıcı olarak -> , => , → veya sekme kullanılır, # ile başlayan satırlar açıklamadır. Sadece tam sözcük eşleşmesi (art, start’a dokunmaz), isteğe bağlı büyük/küçük harf duyarlılığı ve iki dilli altyazılarda değişikliği yalnızca 1. veya 2. satırla sınırlama. Değişen her satır listelenir ve tek tek geri alınabilir.',
@@ -1777,7 +1777,7 @@ const SEO_GLOSSARY = {
   },
   'nl': {
     title: 'Termen in ondertitels in bulk vervangen - AI-SRTSub',
-    desc: 'Vervang termen in ondertitels gratis online: schrijf "oude term → nieuwe term" en heel het SRT / VTT / ASS / SBV / LRC / TXT-bestand wordt bijgewerkt. Timing, stijlen en NOTE-blokken blijven onaangeroerd en elke regel is afzonderlijk terug te zetten.',
+    desc: "Vervang termen in ondertitels gratis: schrijf \"oude → nieuwe\" en het hele bestand verandert. Timing, stijlen en NOTE-blokken blijven; per regel terug te zetten.",
     kw: 'termen ondertitels vervangen,ondertitel glossarium,srt bulk vervangen,zoeken en vervangen ondertitels,srt batch bewerken,namen gelijk maken ondertitels,woorden vervangen srt,tekst vervangen vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Een glossarium met regels "oude term → nieuwe term" dat in één keer op het hele ondertitelbestand wordt toegepast, zonder timing, ASS-stijlen of VTT-NOTE-blokken aan te raken.',
     feat: 'Eén regel per lijn, gescheiden door -> , => , → of een tab; regels die beginnen met # zijn opmerkingen. Alleen hele woorden (art laat start met rust), optioneel onderscheid tussen hoofdletters en beperking tot regel 1 of 2 bij tweetalige ondertitels. Elke gewijzigde regel wordt getoond en kan afzonderlijk worden teruggedraaid.',
@@ -1785,8 +1785,8 @@ const SEO_GLOSSARY = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
   },
   'pl': {
-    title: 'Masowa zamiana terminów w napisach - jedna lista, cały plik | AI-SRTSub',
-    desc: 'Zamieniaj terminy w napisach online za darmo: zapisz „stary termin → nowy termin" i zaktualizuj całe SRT / VTT / ASS / SBV / LRC / TXT. Czasy, style i bloki NOTE zostają bez zmian, a każdą linię można cofnąć osobno.',
+    title: "Masowa zamiana terminów w napisach - jedna lista, cały plik",
+    desc: "Zamieniaj terminy w napisach online za darmo: zapisz „stary → nowy termin\" i zaktualizuj cały plik. Czasy, style i bloki NOTE bez zmian, cofanie linia po linii.",
     kw: 'zamiana terminów w napisach,glosariusz napisów,masowa zamiana srt,znajdź i zamień w napisach,edycja srt hurtowo,ujednolić nazwy w napisach,zamienić słowa w srt,zamienić tekst vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Glosariusz reguł „stary termin → nowy termin" stosowany do całego pliku napisów naraz, bez dotykania czasów, stylów ASS i bloków NOTE w VTT.',
     feat: 'Jedna reguła w wierszu, oddzielona -> , => , → lub tabulatorem; wiersze z # to komentarze. Trafienia tylko w całe słowa (art nie tyka start), opcjonalne rozróżnianie wielkości liter i możliwość ograniczenia do wiersza 1 lub 2 w napisach dwujęzycznych. Każda zmieniona linia jest wypisana i można ją cofnąć pojedynczo.',
@@ -1795,7 +1795,7 @@ const SEO_GLOSSARY = {
   },
   'sv': {
     title: 'Ersätt termer i undertexter i mängd - AI-SRTSub',
-    desc: 'Ersätt termer i undertexter gratis online: skriv "gammal term → ny term" så uppdateras hela SRT / VTT / ASS / SBV / LRC / TXT. Tidsättning, stilar och NOTE-block lämnas orörda och varje rad kan återställas för sig.',
+    desc: "Ersätt termer i undertexter gratis: skriv \"gammal → ny term\" så uppdateras hela filen. Tidsättning, stilar och NOTE-block lämnas orörda, återställ rad för rad.",
     kw: 'ersätt termer undertexter,ordlista undertexter,massersätt srt,sök och ersätt undertexter,redigera srt i mängd,enhetliga namn undertexter,ersätt ord i srt,ersätt text vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'En ordlista med regler "gammal term → ny term" som tillämpas på hela undertextfilen på en gång, utan att röra tidsättning, ASS-stilar eller VTT:s NOTE-block.',
     feat: 'En regel per rad, avgränsad med -> , => , → eller tabb; rader som börjar med # är kommentarer. Träff på hela ord (art lämnar start ifred), valbar skiftlägeskänslighet och möjlighet att begränsa till rad 1 eller 2 i tvåspråkiga undertexter. Varje ändrad rad listas och kan återställas en och en.',
@@ -1804,7 +1804,7 @@ const SEO_GLOSSARY = {
   },
   'cs': {
     title: 'Hromadná výměna pojmů v titulcích - AI-SRTSub',
-    desc: 'Vyměňujte pojmy v titulcích zdarma online: zapište „starý pojem → nový pojem" a celý soubor SRT / VTT / ASS / SBV / LRC / TXT se aktualizuje. Časování, styly a bloky NOTE zůstanou nedotčené a každý řádek lze vrátit zvlášť.',
+    desc: "Vyměňujte pojmy v titulcích zdarma online: zapište „starý → nový\" a celý soubor se aktualizuje. Časování, styly a bloky NOTE zůstávají, každý řádek jde vrátit.",
     kw: 'výměna pojmů v titulcích,glosář titulků,hromadná výměna srt,najít a nahradit v titulcích,hromadná úprava srt,sjednotit jména v titulcích,nahradit slova v srt,nahradit text vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Glosář pravidel „starý pojem → nový pojem" aplikovaný na celý soubor titulků najednou, bez zásahu do časování, stylů ASS a bloků NOTE ve VTT.',
     feat: 'Jedno pravidlo na řádek, oddělené -> , => , → nebo tabulátorem; řádky začínající # jsou poznámky. Shoda jen u celých slov (art nezasáhne start), volitelné rozlišování velikosti písmen a možnost omezit změnu na řádek 1 nebo 2 u dvojjazyčných titulků. Každý změněný řádek je vypsán a dá se vrátit jednotlivě.',
@@ -1813,7 +1813,7 @@ const SEO_GLOSSARY = {
   },
   'uk': {
     title: 'Масова заміна термінів у субтитрах - AI-SRTSub',
-    desc: 'Замінюйте терміни в субтитрах безкоштовно онлайн: запишіть «старий термін → новий термін» — і весь файл SRT / VTT / ASS / SBV / LRC / TXT оновиться. Таймінг, стилі та блоки NOTE не змінюються, будь-яку зміну можна скасувати порядково.',
+    desc: "Замінюйте терміни в субтитрах безкоштовно: запишіть «старий → новий термін» — весь файл оновиться. Таймінг, стилі та блоки NOTE без змін, скасування порядково.",
     kw: 'заміна термінів у субтитрах,глосарій субтитрів,масова заміна srt,знайти і замінити в субтитрах,пакетне редагування srt,уніфікувати імена в субтитрах,замінити слова в srt,замінити текст vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Глосарій правил «старий термін → новий термін», що застосовується до всього файлу субтитрів відразу, не зачіпаючи таймінг, стилі ASS і блоки NOTE у VTT.',
     feat: 'Одне правило в рядку, роздільник — -> , => , → або табуляція; рядки з # — коментарі. Збіг лише цілим словом (art не чіпає start), необов’язкове врахування регістру та можливість обмежити заміну рядком 1 або 2 у двомовних субтитрах. Усі змінені рядки виводяться списком і скасовуються окремо.',
@@ -1822,7 +1822,7 @@ const SEO_GLOSSARY = {
   },
   'da': {
     title: 'Erstat termer i undertekster i flæng - AI-SRTSub',
-    desc: 'Erstat termer i undertekster gratis online: skriv "gammelt udtryk → nyt udtryk" og hele SRT / VTT / ASS / SBV / LRC / TXT bliver opdateret. Timing, typografier og NOTE-blokker røres ikke, og hver linje kan rulles tilbage for sig.',
+    desc: "Erstat termer i undertekster gratis: skriv \"gammel → ny\" og hele filen bliver opdateret. Timing, typografier og NOTE-blokke røres ikke; fortryd pr. linje.",
     kw: 'erstat termer undertekster,ordliste undertekster,masserediger srt,søg og erstat undertekster,rediger srt i flæng,ensartede navne undertekster,erstat ord i srt,erstat tekst vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'En ordliste med regler "gammelt udtryk → nyt udtryk", der anvendes på hele undertitel­filen på én gang uden at røre timing, ASS-typografier eller VTT’s NOTE-blokker.',
     feat: 'Én regel pr. linje adskilt af -> , => , → eller tabulatorslag; linjer der starter med # er kommentarer. Kun hele ord (art lader start være), valgfri forskel på store og små bogstaver og mulighed for at begrænse til linje 1 eller 2 i tosprogede undertekster. Hver ændret linje listes og kan rulles tilbage enkeltvis.',
@@ -1831,7 +1831,7 @@ const SEO_GLOSSARY = {
   },
   'fi': {
     title: 'Termien massavaihto tekstityksissä - AI-SRTSub',
-    desc: 'Vaihda termejä tekstityksissä ilmaiseksi verkossa: kirjoita "vanha termi → uusi termi" ja koko SRT / VTT / ASS / SBV / LRC / TXT päivittyy. Ajoitus, tyylit ja NOTE-lohkot pysyvät ennallaan ja jokainen rivi voi palauttaa erikseen.',
+    desc: "Vaihda termejä tekstityksissä ilmaiseksi: kirjoita \"vanha → uusi\" ja koko tiedosto päivittyy. Ajoitus, tyylit ja NOTE-lohkot pysyvät, palautus rivikohtaisesti.",
     kw: 'vaihda termejä tekstityksissä,tekstitysten sanasto,srt massavaihto,etsi ja korvaa tekstityksissä,srt joukkomuokkaus,yhtenäiset nimet tekstityksissä,korvaa sanat srt,korvaa teksti vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Sanasto säännöillä "vanha termi → uusi termi", joka sovelletaan koko tekstitystiedostoon kerralla koskematta ajoitukseen, ASS-tyyleihin tai VTT:n NOTE-lohkoihin.',
     feat: 'Yksi sääntö rivillä, erottimena -> , => , → tai sarkain; # -merkillä alkavat rivit ovat kommentteja. Osuma vain kokonaisiin sanoihin (art ei koske sanaan start), valinnainen kirjainkoon erottelu ja mahdollisuus rajata muutos kaksikielisissä teksteissä riviin 1 tai 2. Jokainen muutettu rivi listataan ja voidaan palauttaa yksitellen.',
@@ -1840,7 +1840,7 @@ const SEO_GLOSSARY = {
   },
   'el': {
     title: 'Μαζική αντικατάσταση όρων στους υπότιτλους - AI-SRTSub',
-    desc: 'Αντικαταστήστε όρους σε υπότιτλους δωρεάν στο διαδίκτυο: γράψτε «παλιός όρος → νέος όρος» και όλο το αρχείο SRT / VTT / ASS / SBV / LRC / TXT ενημερώνεται. Ο χρονισμός, τα στυλ και τα μπλοκ NOTE δεν αλλάζουν και κάθε γραμμή μπορεί να επανέλθει χωριστά.',
+    desc: "Αντικαταστήστε όρους σε υπότιτλους δωρεάν: γράψτε «παλιός → νέος» και όλο το αρχείο ενημερώνεται. Χρονισμός, στυλ και μπλοκ NOTE δεν αλλάζουν.",
     kw: 'αντικατάσταση όρων υπότιτλων,γλωσσάρι υπότιτλων,μαζική αντικατάσταση srt,εύρεση και αντικατάσταση υπότιτλων,μαζική επεξεργασία srt,ενιαία ονόματα υπότιτλων,αντικατάσταση λέξεων srt,αντικατάσταση κειμένου vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Ένα γλωσσάρι με κανόνες «παλιός όρος → νέος όρος» που εφαρμόζεται σε όλο το αρχείο υποτίτλων μεμιάς, χωρίς να πειράζει τον χρονισμό, τα στυλ ASS ή τα μπλοκ NOTE του VTT.',
     feat: 'Ένας κανόνας ανά γραμμή, με διαχωριστικό -> , => , → ή στηλοθέτη· οι γραμμές που αρχίζουν με # είναι σχόλια. Αντιστοίχιση μόνο σε ολόκληρες λέξεις (το art δεν πειράζει το start), προαιρετική διάκριση πεζών/κεφαλαίων και δυνατότητα περιορισμού στη γραμμή 1 ή 2 σε δίγλωσσους υπότιτλους. Κάθε αλλαγμένη γραμμή εμφανίζεται στη λίστα και μπορεί να επανέλθει μία προς μία.',
@@ -1858,7 +1858,7 @@ const SEO_GLOSSARY = {
   },
   'ro': {
     title: 'Înlocuire termeni în subtitrări în bloc - AI-SRTSub',
-    desc: 'Înlocuiți termeni în subtitrări gratuit online: scrieți „termen vechi → termen nou" și se actualizează tot fișierul SRT / VTT / ASS / SBV / LRC / TXT. Timpul, stilurile și blocurile NOTE rămân neschimbate, iar fiecare rând se poate anula separat.',
+    desc: "Înlocuiți termeni în subtitrări gratuit: scrieți „vechi → nou\" și se actualizează tot fișierul. Timpul, stilurile și blocurile NOTE rămân; anulare pe rând.",
     kw: 'înlocuire termeni subtitrări,glosar subtitrări,înlocuire în bloc srt,căutare și înlocuire subtitrări,editare srt în bloc,uniformizare nume subtitrări,înlocuire cuvinte srt,înlocuire text vtt,find and replace subtitle,subtitle glossary,batch replace srt',
     intro: 'Un glosar de reguli „termen vechi → termen nou" aplicat pe tot fișierul de subtitrări dintr-o dată, fără să atingă timpul, stilurile ASS sau blocurile NOTE din VTT.',
     feat: 'O regulă pe linie, separată prin -> , => , → sau tab; liniile care încep cu # sunt comentarii. Potrivire doar pe cuvântul întreg (art nu îl atinge pe start), diferențiere opțională a majusculelor și posibilitatea de a limita la linia 1 sau 2 în subtitrările bilingve. Fiecare linie modificată este listată și poate fi anulată individual.',
@@ -1902,7 +1902,7 @@ const SEO_TRANSLATE = {
   'pt': { title: "Tradutor de legendas — SRT / VTT / ASS no seu idioma", desc: "Envie um SRT/VTT/ASS, escolha o idioma e receba legendas com sincronia automática e glossário consistente. 75 idiomas, grátis e sem cadastro." },
   'ko': { title: "자막 번역 - SRT / VTT / ASS 를 내 언어로 | AI-SRTSub", desc: "SRT / VTT / ASS 자막을 넣고 대상 언어만 고르면 내 언어 자막이 됩니다. 타임라인 자동 정렬, 문장 단위 병합, 용어 통일, 문장부호 기준 줄바꿈까지 자동. 75개 언어, 무료·가입 없음." },
   'de': { title: "Untertitel übersetzen — SRT / VTT / ASS in deine Sprache", desc: "SRT/VTT/ASS hochladen, Zielsprache wählen, Untertitel erhalten – exakte Zeitachse, 75 Sprachen, kostenlos, ohne Anmeldung." },
-  'fr': { title: 'Traducteur de sous-titres — SRT / VTT / ASS dans votre langue', desc: 'Déposez un fichier SRT / VTT / ASS, choisissez la langue cible et obtenez des sous-titres dans votre langue : synchronisation automatique, fusion par phrase, glossaire cohérent et retours à la ligne automatiques. 75 langues, gratuit, sans inscription.' },
+  'fr': { title: 'Traducteur de sous-titres — SRT / VTT / ASS dans votre langue', desc: "Déposez un SRT / VTT / ASS, choisissez la langue et recevez des sous-titres synchronisés, au vocabulaire cohérent et bien découpés. Gratuit, sans inscription." },
   'id': { title: "Penerjemah Subtitle — Terjemahkan SRT/VTT/ASS ke Bahasamu", desc: "Unggah subtitle SRT/VTT/ASS, pilih bahasa tujuan, dapatkan subtitle dalam bahasamu dengan sinkronisasi otomatis. 75 bahasa, gratis, tanpa daftar." },
   'hi': { title: "सबटाइटल अनुवादक - SRT / VTT / ASS को अपनी भाषा में", desc: "SRT / VTT / ASS सबटाइटल अपलोड करें, लक्ष्य भाषा चुनें और अपनी भाषा में सबटाइटल पाएं: स्वचालित समय-रेखा मिलान। 75 भाषाएं, मुफ़्त, बिना साइन-अप।" },
   'th': { title: "แปลซับไตเติล - แปล SRT / VTT / ASS เป็นภาษาของคุณ", desc: "อัปโหลดซับไตเติล SRT / VTT / ASS เลือกภาษาปลายทาง รับซับไตเติลในภาษาของคุณ จัดแนวไทม์ไลน์อัตโนมัติ 75 ภาษา ฟรี ไม่ต้องสมัคร" },
@@ -1913,11 +1913,11 @@ const SEO_TRANSLATE = {
   'tr': { title: "Altyazı Çevirici - SRT / VTT / ASS'i Kendi Dilinize Çevirin", desc: "SRT/VTT/ASS altyazı yükleyin, hedef dili seçin, kendi dilinizde altyazı alın. Otomatik hizalama, 75 dil, ücretsiz, kayıt gerekmez." },
   'nl': { title: "Ondertitels vertalen — SRT / VTT / ASS naar jouw taal", desc: "Upload SRT/VTT/ASS, kies je doeltaal en krijg ondertitels in je eigen taal. Automatische tijdlijnuitlijning, 75 talen, gratis, zonder registratie." },
   'pl': { title: "Tłumacz napisów — Przetłumacz SRT / VTT / ASS na swój język", desc: "Wgraj napisy SRT/VTT/ASS, wybierz język docelowy i otrzymaj napisy w swoim języku. 75 języków, za darmo, bez rejestracji." },
-  'sv': { title: "Översätt undertexter — SRT / VTT / ASS till ditt språk", desc: 'Ladda upp en SRT / VTT / ASS-fil, välj målspråk och få undertexter på ditt eget språk: automatisk tidslinjejustering, sammanslagning per mening, enhetlig terminologi och automatiska radbrytningar. 75 språk, gratis, ingen registrering.' },
+  'sv': { title: "Översätt undertexter — SRT / VTT / ASS till ditt språk", desc: "Ladda upp en SRT / VTT / ASS-fil, välj målspråk och få undertexter på ditt språk: tidslinjejustering, enhetlig terminologi. Gratis, ingen registrering." },
   'cs': { title: "Překladač titulků — Přeložte SRT / VTT / ASS do svého jazyka", desc: "Nahrajte titulky SRT/VTT/ASS, zvolte cílový jazyk a získejte titulky: automatické zarovnání časové osy, 75 jazyků, zdarma, bez registrace." },
   'uk': { title: "Переклад субтитрів — SRT / VTT / ASS вашою мовою", desc: "Завантажте субтитри SRT/VTT/ASS, виберіть мову перекладу й отримайте субтитри своєю мовою. 75 мов, безкоштовно й без реєстрації." },
   'da': { title: "Oversæt undertekster — SRT / VTT / ASS til dit sprog", desc: "Upload SRT/VTT/ASS-fil, vælg målsprog og få undertekster på dit eget sprog. Automatisk tidslinjejustering, ensartet terminologi. 75 sprog, gratis." },
-  'fi': { title: 'Tekstitysten kääntäjä — Käännä SRT / VTT / ASS omalle kielellesi', desc: 'Lataa SRT / VTT / ASS -tekstitys, valitse kohdekieli ja saa tekstitys omalla kielelläsi: automaattinen aikajanan kohdistus, lauseittainen yhdistäminen, yhtenäinen sanasto ja automaattiset rivinvaihdot. 75 kieltä, ilmainen, ei rekisteröitymistä.' },
+  'fi': { title: 'Tekstitysten kääntäjä — Käännä SRT / VTT / ASS omalle kielellesi', desc: "Lataa SRT / VTT / ASS -tekstitys, valitse kieli ja saat tekstityksen omallasi: lukittu aikajana, yhtenäinen sanasto. Ilmainen, ei rekisteröitymistä." },
   'el': { title: "Μεταφραστής υποτίτλων — SRT / VTT / ASS στη γλώσσα σας", desc: "Ανεβάστε SRT/VTT/ASS, επιλέξτε γλώσσα και λάβετε υπότιτλους με αυτόματη ευθυγράμμιση και έξυπνο σπάσιμο γραμμών. 75 γλώσσες, δωρεάν, χωρίς εγγραφή." },
   'he': { title: "מתרגם כתוביות - תרגום SRT / VTT / ASS לשפה שלך", desc: "העלה SRT/VTT/ASS, בחר שפת יעד וקבל כתוביות בשפה שלך: יישור ציר זמן אוטומטי. 75 שפות, חינם, בלי הרשמה." },
   'ro': { title: "Traducător de subtitrări — SRT / VTT / ASS în limba ta", desc: "Încarcă SRT/VTT/ASS, alege limba țintă și primești subtitrări cu aliniere automată pe axa timpului. 75 de limbi, gratuit, fără cont." }
@@ -1963,7 +1963,7 @@ const SEO_CONVERT = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
   },
   'es': {
-    title: 'Conversor de subtítulos - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    title: "Conversor de subtítulos - SRT / VTT / ASS / SBV / LRC / TXT",
     desc: 'Conversor de subtítulos online gratis: convierte entre SRT, VTT, ASS, SBV, LRC y TXT conservando la línea de tiempo y limpiando las etiquetas de efectos ASS.',
     kw: 'convertir subtítulos,srt a vtt,vtt a srt,ass a srt,sbv a srt,srt a lrc,subtítulos a txt,conversor srt,subtitle converter',
     intro: 'Convierte entre SRT, VTT, ASS, SBV, LRC y TXT conservando la línea de tiempo.',
@@ -1999,7 +1999,7 @@ const SEO_CONVERT = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
   },
   'fr': {
-    title: 'Convertisseur de sous-titres - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    title: "Convertisseur de sous-titres - SRT, VTT, ASS, SBV, LRC, TXT",
     desc: 'Convertisseur de sous-titres en ligne gratuit : convertissez entre SRT, VTT, ASS, SBV, LRC et TXT en conservant la ligne de temps, les balises d\'effet ASS sont nettoyées automatiquement.',
     kw: 'convertir sous-titres,srt vers vtt,vtt vers srt,ass vers srt,sbv vers srt,srt vers lrc,sous-titres vers txt,convertisseur srt,subtitle converter',
     intro: 'Convertissez entre SRT, VTT, ASS, SBV, LRC et TXT en conservant la ligne de temps.',
@@ -2053,7 +2053,7 @@ const SEO_CONVERT = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
   },
   'it': {
-    title: 'Convertitore di sottotitoli - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    title: "Convertitore di sottotitoli - SRT, VTT, ASS, SBV, LRC, TXT",
     desc: 'Convertitore di sottotitoli online gratuito: converti tra SRT, VTT, ASS, SBV, LRC e TXT mantenendo la linea temporale, i tag di effetto ASS vengono puliti automaticamente.',
     kw: 'convertire sottotitoli,srt in vtt,vtt in srt,ass in srt,sbv in srt,srt in lrc,sottotitoli in testo,convertitore srt,subtitle converter',
     intro: 'Converti tra SRT, VTT, ASS, SBV, LRC e TXT mantenendo la linea temporale.',
@@ -2161,7 +2161,7 @@ const SEO_CONVERT = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Converter'
   },
   'ro': {
-    title: 'Convertor de subtitrări - SRT / VTT / ASS / SBV / LRC / TXT | AI-SRTSub',
+    title: "Convertor de subtitrări - SRT / VTT / ASS / SBV / LRC / TXT",
     desc: 'Convertor de subtitrări online gratuit: convertește între SRT, VTT, ASS, SBV, LRC și TXT păstrând linia de timp, etichetele de efecte ASS sunt curățate automat.',
     kw: 'conversie subtitrări,srt în vtt,vtt în srt,ass în srt,sbv în srt,subtitrări în text,subtitle converter,srt converter',
     intro: 'Convertește între SRT, VTT, ASS, SBV, LRC și TXT păstrând linia de timp.',
@@ -2241,7 +2241,7 @@ const SEO_BILINGUAL = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
   'de': {
-    title: 'Zweisprachige Untertitel trennen - nur eine Sprache behalten | AI-SRTSub',
+    title: "Zweisprachige Untertitel trennen - nur eine Sprache behalten",
     desc: 'Kostenloses Online-Werkzeug: zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen oder nur eine behalten.',
     kw: 'zweisprachige untertitel trennen,nur eine sprache untertitel,zweite sprache entfernen untertitel,srt zweisprachig trennen,untertitel übersetzung extrahieren',
     intro: 'Zweisprachige Untertitel in eine Original- und eine übersetzte Spur aufteilen - oder nur eine von beiden behalten.',
@@ -2250,7 +2250,7 @@ const SEO_BILINGUAL = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
   'fr': {
-    title: 'Séparer les sous-titres bilingues - ne garder qu\'une langue | AI-SRTSub',
+    title: "Séparer les sous-titres bilingues - ne garder qu'une langue",
     desc: 'Outil en ligne gratuit : séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez qu\'une seule.',
     kw: 'séparer sous-titres bilingues,garder une seule langue sous-titres,retirer deuxième langue sous-titres,srt bilingue séparer,extraire sous-titres traduits',
     intro: 'Séparez des sous-titres bilingues en une piste originale et une piste traduite, ou ne gardez que l\'une des deux.',
@@ -2412,7 +2412,7 @@ const SEO_BILINGUAL = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Bilingual Subtitle Splitter'
   },
   'ro': {
-    title: 'Împărțirea subtitrărilor bilingve - păstrează o singură limbă | AI-SRTSub',
+    title: "Separă subtitrările bilingve - păstrează o singură limbă",
     desc: 'Instrument online gratuit: împarte subtitrările bilingve într-o versiune originală și una tradusă sau păstrează doar una.',
     kw: 'împărțire subtitrări bilingve,subtitrări o singură limbă,elimină a doua limbă subtitrări,împarte srt bilingv,extrage subtitrări traduse',
     intro: 'Împarte subtitrările bilingve într-o versiune originală și una tradusă sau păstrează doar una dintre ele.',
@@ -2506,7 +2506,7 @@ const SEO_SHIFT = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Timeline Shift'
   },
   'id': {
-    title: 'Penyesuaian waktu subtitle - geser, skala, gabung dan pisah | AI-SRTSub',
+    title: "Penyesuaian waktu subtitle - geser, skala, gabung dan pisah",
     desc: 'Alat online gratis: geser semuanya sekaligus, ubah skala dengan faktor, atau koreksi dengan dua titik. Mendukung SRT, VTT, ASS, SBV, LRC, dan TXT.',
     kw: 'sesuaikan waktu subtitle,geser subtitle srt,sinkronkan subtitle,perbaiki subtitle telat,ubah skala subtitle,srt waktu bergeser,gabung subtitle,pisah subtitle,gabung srt,subtitle panjang dipisah',
     intro: 'Saat subtitle tidak sinkron, geser seluruh timeline, ubah skalanya dengan faktor, atau koreksi dengan dua titik. Juga bisa menggabungkan baris yang terpecah dan memisahkan yang terlalu panjang.',
@@ -2515,8 +2515,8 @@ const SEO_SHIFT = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Timeline Shift'
   },
   'hi': {
-    title: 'सबटाइटल समय समायोजन - खिसकाएँ, स्केल करें, मिलाएँ और बाँटें | AI-SRTSub',
-    desc: 'जब सबटाइटल मेल न खाएँ, पूरी समय रेखा खिसकाएँ, गुणक से स्केल करें, या दो बिंदुओं से ठीक करें। छोटी पंक्तियों को मिलाया और लंबी पंक्तियों को बाँटा भी जा सकता है; SRT, VTT, ASS, SBV, LRC और TXT सब चलते हैं।',
+    title: "सबटाइटल समय समायोजन - खिसकाएँ, स्केल करें, मिलाएँ और बाँटें",
+    desc: "पूरी समय रेखा खिसकाएँ, गुणक से स्केल करें, या दो बिंदुओं से ठीक करें। छोटी पंक्तियाँ मिलाई और लंबी बाँटी जा सकती हैं; SRT, VTT, ASS, SBV, LRC, TXT सब चलते हैं।",
     kw: 'सबटाइटल समय समायोजन,सबटाइटल सिंक,srt समय सुधार,सबटाइटल देरी,सबटाइटल स्केल,ass टाइमलाइन,सबटाइटल मिलाना,सबटाइटल बाँटना,srt मिलाना,लंबी सबटाइटल बाँटें',
     intro: 'जब सबटाइटल मेल न खाएँ, पूरी समय रेखा खिसकाएँ, गुणक से स्केल करें, या दो बिंदुओं से ठीक करें। छोटी-छोटी पंक्तियों को मिलाया और बहुत लंबी पंक्तियों को बाँटा भी जा सकता है।',
     feat: 'खिसकाने से हर पंक्ति की प्रदर्शन अवधि बदले बिना समय बदलता है। स्केलिंग से शुरू और अंत दोनों गुणा होते हैं, इसलिए अवधि भी बदलती है - 24 और 25 fps के बीच काम का। दो-बिंदु सुधार उन फ़ाइलों के लिए है जिनमें खिसकाव और गलत गति दोनों हैं। ऋणात्मक समय 0 कर दिया जाता है और बताया जाता है कि कितनी पंक्तियाँ प्रभावित हुईं। जैसा फ़ॉर्मैट अंदर जाता है, वैसा ही बाहर आता है — कोई रूपांतरण नहीं, और ASS की स्टाइल, हर पंक्ति की फ़ॉर्मैटिंग और टैग ज्यों के त्यों रहते हैं। द्विभाषी सबटाइटल मिलाने पर दो पंक्तियों में रहते हैं और बाँटते समय छोड़ दिए जाते हैं।',
@@ -2525,7 +2525,7 @@ const SEO_SHIFT = {
   },
   'th': {
     title: 'ปรับไทม์ไลน์ซับไตเติล - เลื่อน, ปรับสัดส่วน, รวมและแบ่ง | AI-SRTSub',
-    desc: 'เมื่อซับไตเติลไม่ตรงกับภาพ ให้เลื่อนทั้งไทม์ไลน์ ปรับสัดส่วนด้วยอัตรา หรือแก้ด้วยจุดอ้างอิงสองจุด ยังรวมบรรทัดที่แตกเป็นชิ้นเล็กชิ้นน้อยและแบ่งบรรทัดที่ยาวเกินไปได้ ใช้ได้กับ SRT, VTT, ASS, SBV, LRC และ TXT',
+    desc: "เลื่อนทั้งไทม์ไลน์ ปรับสัดส่วนด้วยอัตรา หรือแก้ด้วยจุดอ้างอิงสองจุด รวมบรรทัดเล็กและแบ่งบรรทัดยาวได้ ใช้ได้กับ SRT, VTT, ASS, SBV, LRC และ TXT",
     kw: 'ปรับเวลาซับไตเติล,เลื่อนซับไตเติล,ซิงค์ซับไตเติล,แก้ซับไตเติลช้า,ปรับสัดส่วนซับไตเติล,srt เวลาเพี้ยน,รวมซับไตเติล,แบ่งซับไตเติล,รวม srt,แบ่งซับไตเติลยาว',
     intro: 'เมื่อซับไตเติลไม่ตรงกับภาพ ให้เลื่อนทั้งไทม์ไลน์ ปรับสัดส่วนด้วยอัตรา หรือแก้ด้วยจุดอ้างอิงสองจุด ยังรวมบรรทัดที่แตกเป็นชิ้นเล็กชิ้นน้อยและแบ่งบรรทัดที่ยาวเกินไปได้',
     feat: 'การเลื่อนจะขยับทุกบรรทัดโดยไม่เปลี่ยนระยะเวลาที่แสดง การปรับสัดส่วนคูณทั้งเวลาเริ่มและจบ จึงเปลี่ยนความยาวด้วย - เหมาะระหว่าง 24 กับ 25 fps การแก้สองจุดจัดการไฟล์ที่ทั้งเพี้ยนและความเร็วไม่ตรง เวลาที่ติดลบจะถูกตั้งเป็น 0 และแจ้งจำนวนบรรทัดที่ได้รับผล ฟอร์แมตที่เข้าและออกเหมือนกัน ไม่มีการแปลงรูปแบบ สไตล์ ASS การจัดรูปแบบของแต่ละบรรทัดและแท็กยังคงเดิม คำบรรยายสองภาษาเมื่อรวมจะอยู่สองบรรทัด และข้ามเมื่อแบ่ง',
@@ -2691,7 +2691,7 @@ const SEO_REPAIR = {
   },
   'en': {
     title: 'Fix Garbled Subtitles - Repair Mojibake / Wrong Encoding | AI-SRTSub',
-    desc: 'Free online repair for garbled subtitles: detects whether the file was really UTF-8, GBK, Big5, Shift_JIS or EUC-KR, turns the misread text back into words, and can re-save it in an encoding your player understands.',
+    desc: "Free online repair for garbled subtitles: detects if the file is UTF-8, GBK, Big5, Shift_JIS or EUC-KR, restores misread text, re-saves for your player.",
     kw: 'fix garbled subtitles,subtitle mojibake,srt encoding fix,fix subtitle encoding,utf8 to gbk subtitle,srt shows weird characters,subtitle wrong encoding,ass garbled,vtt garbled,detect subtitle encoding',
     intro: 'Subtitles that open as a wall of nonsense are almost always read with the wrong encoding. Drop the file in, and it works out which encoding the file was really written in and puts the misread characters back.',
     feat: 'Uploaded files are re-decoded from the original bytes, so nothing is lost: if the file turns out to be GBK, it says so, and if your player is the one misreading it, saving a copy as "UTF-8 with BOM" usually settles it. Pasted text is no longer the original bytes, so much less can be recovered; if it already contains replacement characters, that is unrecoverable and the tool says so plainly instead of pretending otherwise. Line numbers and timecodes are never touched, and ASS style tags are left exactly as they were.',
@@ -2708,8 +2708,8 @@ const SEO_REPAIR = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Mojibake Repair'
   },
   'es': {
-    title: 'Reparar subtítulos con caracteres extraños - Codificación incorrecta | AI-SRTSub',
-    desc: 'Reparación online gratuita de subtítulos ilegibles: detecta si el archivo era realmente UTF-8, GBK, Big5, Shift_JIS o EUC-KR, devuelve el texto mal leído a su forma correcta y puede volver a guardarlo en una codificación que tu reproductor entienda.',
+    title: "Reparar subtítulos ilegibles - codificación errónea",
+    desc: "Reparación online gratuita de subtítulos ilegibles: detecta si el archivo era UTF-8, GBK, Big5, Shift_JIS o EUC-KR, devuelve el texto a su forma correcta.",
     kw: 'reparar subtítulos codificación,subtítulos caracteres extraños,srt caracteres raros,corregir codificación subtítulos,utf8 a gbk subtítulos,subtítulos ilegibles,detectar codificación subtítulos,ass caracteres raros,vtt caracteres raros',
     intro: 'Cuando los subtítulos se abren como un muro de caracteres sin sentido, casi siempre se han leído con la codificación equivocada. Suelta el archivo: averigua con qué codificación se escribió y devuelve los caracteres mal leídos a su sitio.',
     feat: 'Los archivos se vuelven a decodificar desde los bytes originales, así que no se pierde nada: si resulta ser GBK lo indica, y si el que se equivoca es tu reproductor, guardar una copia como «UTF-8 con BOM» suele bastar. El texto pegado ya no son los bytes originales, así que se recupera mucho menos; si ya contiene caracteres de reemplazo, es imposible recuperarlo y la herramienta lo dice sin rodeos en lugar de aparentar lo contrario. Los números de línea y los códigos de tiempo no se tocan, y las etiquetas de estilo del ASS se dejan tal cual.',
@@ -2717,8 +2717,8 @@ const SEO_REPAIR = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Reparación de codificación de subtítulos'
   },
   'pt': {
-    title: 'Corrigir legendas com caracteres estranhos - Codificação errada | AI-SRTSub',
-    desc: 'Reparo online gratuito de legendas ilegíveis: detecta se o arquivo era mesmo UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, devolve o texto mal lido à forma correta e pode salvá-lo novamente numa codificação que seu player entende.',
+    title: "Corrigir legendas ilegíveis - codificação errada",
+    desc: "Reparo online gratuito de legendas ilegíveis: detecta se o arquivo era UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, devolve o texto à forma correta.",
     kw: 'corrigir legenda caracteres estranhos,legenda codificação errada,srt caracteres estranhos,converter utf8 para gbk legenda,legenda ilegível,detectar codificação legenda,ass caracteres estranhos,vtt caracteres estranhos',
     intro: 'Legendas que abrem como um muro de caracteres sem sentido quase sempre foram lidas com a codificação errada. Solte o arquivo: ele descobre em qual codificação foi escrito e devolve os caracteres mal lidos ao lugar.',
     feat: 'Os arquivos são decodificados novamente a partir dos bytes originais, então nada se perde: se for GBK, ele informa, e se o erro for do seu player, salvar uma cópia como "UTF-8 com BOM" costuma resolver. O texto colado já não são os bytes originais, então muito menos pode ser recuperado; se já contiver caracteres de substituição, não há como recuperar e a ferramenta diz isso claramente em vez de fingir o contrário. Números de linha e códigos de tempo não são tocados, e as tags de estilo do ASS ficam exatamente como estavam.',
@@ -2736,7 +2736,7 @@ const SEO_REPAIR = {
   },
   'de': {
     title: 'Untertitel mit Zeichensalat reparieren - Falsche Kodierung | AI-SRTSub',
-    desc: 'Kostenlose Online-Reparatur für unlesbare Untertitel: erkennt, ob die Datei wirklich UTF-8, GBK, Big5, Shift_JIS oder EUC-KR war, macht falsch gelesene Zeichen wieder lesbar und kann sie in einer Kodierung speichern, die dein Player versteht.',
+    desc: "Kostenlose Online-Reparatur für unlesbare Untertitel: erkennt, ob die Datei UTF-8, GBK, Big5, Shift_JIS oder EUC-KR war, macht falsch gelesene Zeichen lesbar.",
     kw: 'untertitel zeichensalat reparieren,srt kodierung korrigieren,untertitel falsche kodierung,utf8 nach gbk untertitel,untertitel unlesbar,kodierung untertitel erkennen,ass zeichensalat,vtt zeichensalat',
     intro: 'Wenn Untertitel als Wand aus sinnlosen Zeichen aufgehen, wurden sie fast immer mit der falschen Kodierung gelesen. Datei hineinwerfen: Sie findet heraus, in welcher Kodierung sie wirklich geschrieben wurden, und setzt die falsch gelesenen Zeichen zurück.',
     feat: 'Dateien werden aus den ursprünglichen Bytes neu dekodiert, es geht also nichts verloren: Ist es GBK, wird das angezeigt, und wenn dein Player sich irrt, hilft meist eine Kopie als „UTF-8 mit BOM“. Eingefügter Text sind nicht mehr die ursprünglichen Bytes, deshalb lässt sich viel weniger retten; enthält er bereits Ersatzzeichen, ist nichts mehr zu holen, und das Werkzeug sagt das klar statt es zu vertuschen. Zeilennummern und Zeitcodes bleiben unangetastet, ASS-Formatierungen werden exakt so belassen.',
@@ -2745,7 +2745,7 @@ const SEO_REPAIR = {
   },
   'fr': {
     title: 'Réparer les sous-titres illisibles - Mauvais encodage | AI-SRTSub',
-    desc: 'Réparation en ligne gratuite des sous-titres illisibles : détecte si le fichier était vraiment en UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, remet les caractères mal lus en forme et peut le réenregistrer dans un encodage que votre lecteur comprend.',
+    desc: "Réparation en ligne gratuite des sous-titres illisibles : détecte si le fichier était en UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, remet les caractères en forme.",
     kw: 'réparer sous-titres illisibles,sous-titres caractères bizarres,corriger encodage sous-titres,srt caractères étranges,utf8 vers gbk sous-titres,détecter encodage sous-titres,ass caractères bizarres,vtt caractères bizarres',
     intro: 'Des sous-titres qui s\'ouvrent comme un mur de caractères incompréhensibles ont presque toujours été lus avec le mauvais encodage. Déposez le fichier : il détermine l\'encodage réel et remet les caractères mal lus à leur place.',
     feat: 'Les fichiers sont redécodés à partir des octets d\'origine, donc rien n\'est perdu : si c\'est du GBK, il l\'indique, et si c\'est votre lecteur qui se trompe, enregistrer une copie en « UTF-8 avec BOM » suffit généralement. Le texte collé n\'est plus les octets d\'origine, on peut donc récupérer beaucoup moins ; s\'il contient déjà des caractères de remplacement, c\'est irrécupérable et l\'outil le dit clairement au lieu de faire semblant. Les numéros de ligne et les codes de temps ne sont jamais touchés, et les balises de style ASS restent exactement telles quelles.',
@@ -2754,7 +2754,7 @@ const SEO_REPAIR = {
   },
   'id': {
     title: 'Perbaiki Subtitle Rusak - Karakter Aneh / Salah Encoding | AI-SRTSub',
-    desc: 'Perbaikan online gratis untuk subtitle yang rusak: mendeteksi apakah berkas sebenarnya UTF-8, GBK, Big5, Shift_JIS, atau EUC-KR, mengembalikan teks yang salah dibaca, dan bisa menyimpannya ulang dengan encoding yang dipahami pemutar Anda.',
+    desc: "Perbaikan online gratis untuk subtitle yang rusak: mendeteksi apakah berkas UTF-8, GBK, Big5, Shift_JIS atau EUC-KR, mengembalikan teks yang salah dibaca.",
     kw: 'perbaiki subtitle rusak,subtitle karakter aneh,srt karakter aneh,perbaiki encoding subtitle,utf8 ke gbk subtitle,subtitle tidak terbaca,deteksi encoding subtitle,ass karakter aneh,vtt karakter aneh',
     intro: 'Subtitle yang terbuka sebagai tumpukan karakter tak bermakna hampir selalu dibaca dengan encoding yang salah. Masukkan berkasnya, dan akan diketahui encoding aslinya lalu karakter yang salah dibaca dikembalikan.',
     feat: 'Berkas didekode ulang dari byte aslinya, jadi tidak ada yang hilang: jika ternyata GBK, akan diberitahu, dan jika pemutar Anda yang salah membaca, menyimpan salinan sebagai "UTF-8 dengan BOM" biasanya sudah cukup. Teks yang ditempel bukan lagi byte asli, jadi yang bisa dipulihkan jauh lebih sedikit; jika sudah berisi karakter pengganti, itu tidak bisa dipulihkan dan alat ini mengatakannya terus terang. Nomor baris dan kode waktu tidak disentuh, dan tag gaya ASS dibiarkan persis seperti semula.',
@@ -2763,7 +2763,7 @@ const SEO_REPAIR = {
   },
   'hi': {
     title: 'खराब सबटाइटल ठीक करें - गलत एन्कोडिंग / अजीब अक्षर | AI-SRTSub',
-    desc: 'गड़बड़ सबटाइटल की मुफ़्त ऑनलाइन मरम्मत: पता लगाता है कि फ़ाइल वाकई UTF-8, GBK, Big5, Shift_JIS या EUC-KR में थी, गलत पढ़े गए अक्षरों को वापस लाता है, और उसे ऐसी एन्कोडिंग में सहेज सकता है जो आपका प्लेयर समझे।',
+    desc: "गड़बड़ सबटाइटल की मुफ़्त मरम्मत: पता लगाता है कि फ़ाइल UTF-8, GBK, Big5, Shift_JIS या EUC-KR में थी और गलत पढ़े अक्षर वापस लाता है।",
     kw: 'सबटाइटल गड़बड़ ठीक,srt अजीब अक्षर,सबटाइटल एन्कोडिंग ठीक,utf8 से gbk सबटाइटल,सबटाइटल पढ़ा नहीं जा रहा,एन्कोडिंग पहचानें सबटाइटल,ass गड़बड़,vtt गड़बड़',
     intro: 'सबटाइटल खुलते ही अगर बेतुके अक्षरों की दीवार दिखे, तो लगभग हमेशा गलत एन्कोडिंग से पढ़ी गई होती हैं। फ़ाइल डालें: यह पता लगाता है कि वे वाकई किस एन्कोडिंग में लिखी थीं और गलत पढ़े गए अक्षर वापस ला देता है।',
     feat: 'फ़ाइलें मूल बाइट्स से दोबारा डिकोड की जाती हैं, इसलिए कुछ भी नहीं खोता: अगर वह GBK है तो बताया जाता है, और अगर गलती आपके प्लेयर की है, तो "BOM वाले UTF-8" के रूप में एक कॉपी सहेजना आम तौर पर काफी होता है। चिपकाया गया टेक्स्ट अब मूल बाइट्स नहीं रहता, इसलिए बहुत कम बचाया जा सकता है; अगर उसमें पहले से रिप्लेसमेंट कैरेक्टर हैं, तो वह वापस नहीं लाया जा सकता और यह उपकरण साफ़-साफ़ कहता है, दिखावा नहीं करता। पंक्ति संख्या और समय कोड छुए नहीं जाते, और ASS स्टाइल टैग ज्यों के त्यों रहते हैं।',
@@ -2772,7 +2772,7 @@ const SEO_REPAIR = {
   },
   'th': {
     title: 'ซ่อมซับไตเติลที่เป็นตัวอักษรแปลก ๆ - รหัสตัวอักษรผิด | AI-SRTSub',
-    desc: 'ซ่อมซับไตเติลที่อ่านไม่ได้ฟรีออนไลน์: ตรวจสอบว่าไฟล์เป็น UTF-8, GBK, Big5, Shift_JIS หรือ EUC-KR กันแน่ เปลี่ยนตัวอักษรที่อ่านผิดกลับเป็นข้อความที่อ่านได้ และบันทึกใหม่ด้วยรหัสที่เครื่องเล่นของคุณอ่านได้',
+    desc: "ซ่อมซับไตเติลที่อ่านไม่ได้ฟรีออนไลน์: ตรวจว่าไฟล์เป็น UTF-8, GBK, Big5, Shift_JIS หรือ EUC-KR เปลี่ยนตัวอักษรที่อ่านผิดกลับเป็นข้อความที่อ่านได้",
     kw: 'ซ่อมซับไตเติลตัวอักษรแปลก,srt ตัวอักษรแปลก,ซับไตเติลอ่านไม่ได้,แก้รหัสตัวอักษรซับไตเติล,แปลง utf8 เป็น gbk ซับไตเติล,ตรวจสอบรหัสตัวอักษรซับไตเติล,ass ตัวอักษรแปลก,vtt ตัวอักษรแปลก',
     intro: 'ซับไตเติลที่เปิดมาแล้วเจอแต่ตัวอักษรที่อ่านไม่ออกเรียงกัน แทบทุกครั้งมาจากการอ่านรหัสตัวอักษรผิด ใส่ไฟล์เข้ามา ระบบจะดูว่าเขียนด้วยรหัสใด แล้วเปลี่ยนตัวอักษรที่อ่านผิดกลับมา',
     feat: 'ไฟล์จะถูกถอดรหัสใหม่จากไบต์ต้นฉบับ จึงไม่มีอะไรหายไป: ถ้าเป็น GBK ก็จะบอกให้ และถ้าเครื่องเล่นของคุณต่างหากที่อ่านผิด การบันทึกสำเนาเป็น "UTF-8 แบบมี BOM" มักจะเพียงพอ ข้อความที่วางมาไม่ใช่ไบต์ต้นฉบับอีกต่อไป จึงกู้คืนได้น้อยกว่ามาก และถ้ามีตัวอักษรแทนที่อยู่แล้ว ก็กู้คืนไม่ได้และเครื่องมือจะบอกตรง ๆ ไม่ใช่แกล้งทำเป็นว่าแก้ได้ หมายเลขบรรทัดและรหัสเวลาจะไม่ถูกแตะต้อง และแท็กสไตล์ของ ASS ก็คงไว้ตามเดิมทุกประการ',
@@ -2781,7 +2781,7 @@ const SEO_REPAIR = {
   },
   'vi': {
     title: 'Sửa phụ đề bị lỗi font - Sai bảng mã / Ký tự lạ | AI-SRTSub',
-    desc: 'Sửa phụ đề không đọc được miễn phí trực tuyến: nhận ra tệp thật ra là UTF-8, GBK, Big5, Shift_JIS hay EUC-KR, trả chữ bị đọc sai về dạng đọc được, và có thể lưu lại bằng bảng mã mà trình phát của bạn hiểu.',
+    desc: "Sửa phụ đề không đọc được miễn phí: nhận ra tệp là UTF-8, GBK, Big5, Shift_JIS hay EUC-KR, trả chữ bị đọc sai về dạng đúng và lưu lại cho trình phát của bạn.",
     kw: 'sửa phụ đề lỗi font,phụ đề ký tự lạ,srt ký tự lạ,sửa bảng mã phụ đề,chuyển utf8 sang gbk phụ đề,phụ đề không đọc được,nhận diện bảng mã phụ đề,ass lỗi font,vtt lỗi font',
     intro: 'Phụ đề mở ra chỉ thấy một bức tường ký tự vô nghĩa hầu như luôn là bị đọc sai bảng mã. Đưa tệp vào, nó sẽ biết tệp được viết bằng bảng mã nào và trả những chữ bị đọc sai về chỗ cũ.',
     feat: 'Tệp được giải mã lại từ byte gốc nên không mất gì: nếu là GBK thì nói rõ, và nếu chính trình phát của bạn đọc sai thì lưu một bản dưới dạng "UTF-8 có BOM" thường là đủ. Chữ dán vào không còn là byte gốc nên cứu được ít hơn nhiều; nếu đã có ký tự thay thế thì không thể cứu và công cụ nói thẳng chứ không giả vờ sửa được. Số thứ tự và mã thời gian không bị đụng tới, thẻ định dạng ASS cũng giữ nguyên.',
@@ -2790,7 +2790,7 @@ const SEO_REPAIR = {
   },
   'ru': {
     title: 'Исправить кракозябры в субтитрах - Неверная кодировка | AI-SRTSub',
-    desc: 'Бесплатное онлайн-исправление нечитаемых субтитров: определяет, был ли файл на самом деле в UTF-8, GBK, Big5, Shift_JIS или EUC-KR, возвращает неправильно прочитанные символы и может сохранить файл в кодировке, которую понимает ваш проигрыватель.',
+    desc: "Бесплатное онлайн-исправление нечитаемых субтитров: определяет, был ли файл в UTF-8, GBK, Big5, Shift_JIS или EUC-KR, возвращает неверно прочитанные символы.",
     kw: 'исправить кракозябры в субтитрах,субтитры неверная кодировка,srt кракозябры,исправить кодировку субтитров,utf8 в gbk субтитры,субтитры не читаются,определить кодировку субтитров,ass кракозябры,vtt кракозябры',
     intro: 'Если субтитры открываются как стена бессмысленных символов, почти всегда их прочитали в неправильной кодировке. Загрузите файл: он определит настоящую кодировку и вернёт символы на место.',
     feat: 'Файлы перекодируются из исходных байтов, поэтому ничего не теряется: если это GBK, об этом сообщается, а если ошибается ваш проигрыватель, обычно достаточно сохранить копию как «UTF-8 с BOM». Вставленный текст уже не является исходными байтами, поэтому возвращается гораздо меньше; если в нём уже есть символы-заменители, восстановление невозможно, и инструмент говорит об этом прямо, а не делает вид, что всё исправлено. Номера строк и таймкоды не затрагиваются, теги оформления ASS остаются без изменений.',
@@ -2799,7 +2799,7 @@ const SEO_REPAIR = {
   },
   'it': {
     title: 'Ripara sottotitoli illeggibili - Codifica errata | AI-SRTSub',
-    desc: 'Riparazione online gratuita dei sottotitoli illeggibili: rileva se il file era davvero in UTF-8, GBK, Big5, Shift_JIS o EUC-KR, riporta i caratteri letti male alla forma corretta e può salvarlo in una codifica che il tuo lettore capisce.',
+    desc: "Riparazione online gratuita dei sottotitoli illeggibili: rileva se il file era in UTF-8, GBK, Big5, Shift_JIS o EUC-KR, riporta i caratteri a posto.",
     kw: 'riparare sottotitoli illeggibili,sottotitoli caratteri strani,srt caratteri strani,correggere codifica sottotitoli,utf8 in gbk sottotitoli,sottotitoli non leggibili,rilevare codifica sottotitoli,ass caratteri strani,vtt caratteri strani',
     intro: 'Sottotitoli che si aprono come un muro di caratteri senza senso sono stati quasi sempre letti con la codifica sbagliata. Inserisci il file: scopre con quale codifica era stato scritto e rimette a posto i caratteri letti male.',
     feat: 'I file vengono decodificati di nuovo dai byte originali, quindi non si perde nulla: se è GBK lo dice, e se è il tuo lettore a sbagliare, di solito basta salvare una copia come "UTF-8 con BOM". Il testo incollato non è più costituito dai byte originali, quindi si recupera molto meno; se contiene già caratteri di sostituzione, non c\'è nulla da fare e lo strumento lo dice apertamente invece di fingere il contrario. I numeri di riga e i codici di tempo non vengono toccati, e i tag di stile ASS restano esattamente com\'erano.',
@@ -2808,7 +2808,7 @@ const SEO_REPAIR = {
   },
   'ar': {
     title: 'إصلاح الترجمات ذات الحروف الغريبة - ترميز خاطئ | AI-SRTSub',
-    desc: 'إصلاح مجاني عبر الإنترنت للترجمات غير المقروءة: يكتشف ما إذا كان الملف في الواقع UTF-8 أم GBK أم Big5 أم Shift_JIS أم EUC-KR، ويعيد الحروف التي قُرئت خطأً إلى صورتها الصحيحة، ويمكنه حفظها بترميز يفهمه مشغّلك.',
+    desc: "إصلاح مجاني للترجمات غير المقروءة: يكتشف إن كان الملف UTF-8 أم GBK أم Big5 أم Shift_JIS أم EUC-KR، يعيد الحروف المقروءة خطأً ويحفظ بترميز يفهمه مشغّلك.",
     kw: 'إصلاح ترجمة حروف غريبة,ترجمة حروف غريبة,srt حروف غريبة,تصحيح ترميز الترجمة,تحويل utf8 إلى gbk ترجمة,ترجمة غير مقروءة,اكتشاف ترميز الترجمة,ass حروف غريبة,vtt حروف غريبة',
     intro: 'الترجمات التي تُفتح كجدار من الحروف غير المفهومة قُرئت في الغالب بترميز خاطئ. ضع الملف، وسيعرف الترميز الأصلي ويعيد الحروف التي قُرئت خطأً إلى مكانها.',
     feat: 'تُفكّ شفرة الملفات من البايتات الأصلية، فلا يضيع شيء: إن كانت GBK فسيُخبرك، وإن كان مشغّلك هو من يخطئ فعادةً يكفي حفظ نسخة باسم «UTF-8 مع BOM». النص الملصوق ليس البايتات الأصلية، لذا يمكن استرجاع قدر أقل بكثير؛ وإن كان يحتوي بالفعل على أحرف استبدال فلا سبيل لاسترجاعه، وتقول الأداة ذلك صراحةً بدل التظاهر بغيره. أرقام الأسطر ورموز التوقيت لا تُغيَّر، ووسوم تنسيق ASS تُترك كما هي تماماً.',
@@ -2817,7 +2817,7 @@ const SEO_REPAIR = {
   },
   'tr': {
     title: 'Bozuk Altyazıyı Onar - Yanlış Kodlama / Garip Karakterler | AI-SRTSub',
-    desc: 'Okunamayan altyazılar için ücretsiz çevrimiçi onarım: dosyanın aslında UTF-8 mi, GBK mı, Big5 mi, Shift_JIS mi yoksa EUC-KR mı olduğunu saptar, yanlış okunan karakterleri geri çevirir ve oynatıcınızın anladığı bir kodlamayla kaydedebilir.',
+    desc: "Okunamayan altyazılar için ücretsiz çevrimiçi onarım: dosyanın UTF-8, GBK, Big5, Shift_JIS veya EUC-KR olduğunu saptar, yanlış okunan karakterleri düzeltir.",
     kw: 'altyazı bozuk karakterler,altyazı kodlama hatası,srt bozuk karakterler,altyazı kodlamasını düzelt,utf8\'den gbk\'ye altyazı,altyazı okunamıyor,altyazı kodlamasını algıla,ass bozuk,vtt bozuk',
     intro: 'Açıldığında anlamsız karakterlerden oluşan bir duvara dönüşen altyazılar neredeyse her zaman yanlış kodlamayla okunmuştur. Dosyayı verin: hangi kodlamayla yazıldığını bulur ve yanlış okunan karakterleri yerine koyar.',
     feat: 'Dosyalar özgün baytlardan yeniden çözülür, yani hiçbir şey kaybolmaz: GBK çıkarsa bunu söyler, yanlış okuyan sizin oynatıcınızsa "BOM\'lu UTF-8" olarak bir kopya kaydetmek genelde yeterlidir. Yapıştırılan metin artık özgün baytlar değildir, bu yüzden çok daha azı kurtarılabilir; içinde yedek karakterler varsa kurtarılamaz ve araç bunu açıkça söyler, aksini iddia etmez. Satır numaraları ve zaman kodlarına dokunulmaz, ASS biçim etiketleri de tamamen korunur.',
@@ -2825,8 +2825,8 @@ const SEO_REPAIR = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Mojibake Repair'
   },
   'nl': {
-    title: 'Ondertitels met vreemde tekens herstellen - Verkeerde codering | AI-SRTSub',
-    desc: 'Gratis online herstel voor onleesbare ondertitels: detecteert of het bestand echt UTF-8, GBK, Big5, Shift_JIS of EUC-KR was, zet verkeerd gelezen tekens terug en kan het opslaan in een codering die je speler begrijpt.',
+    title: "Ondertitels met vreemde tekens herstellen - foute codering",
+    desc: "Gratis online herstel voor onleesbare ondertitels: detecteert of het bestand UTF-8, GBK, Big5, Shift_JIS of EUC-KR was, zet verkeerd gelezen tekens terug.",
     kw: 'ondertitels vreemde tekens herstellen,ondertitel codering corrigeren,srt vreemde tekens,utf8 naar gbk ondertitels,ondertitels onleesbaar,ondertitel codering detecteren,ass vreemde tekens,vtt vreemde tekens',
     intro: 'Ondertitels die opengaan als een muur van onbegrijpelijke tekens zijn bijna altijd met de verkeerde codering gelezen. Gooi het bestand erin: hij zoekt uit in welke codering het echt geschreven is en zet de verkeerd gelezen tekens terug.',
     feat: 'Bestanden worden opnieuw gedecodeerd vanaf de oorspronkelijke bytes, dus er gaat niets verloren: is het GBK, dan zegt hij dat, en als jouw speler het mis heeft, is een kopie opslaan als "UTF-8 met BOM" meestal genoeg. Geplakte tekst zijn niet meer de oorspronkelijke bytes, dus er valt veel minder te redden; bevat die al vervangingstekens, dan is er niets meer aan te doen en zegt het gereedschap dat ronduit in plaats van iets anders te doen voorkomen. Regelnummers en tijdscodes blijven onaangeroerd, en ASS-opmaakcodes blijven precies zoals ze waren.',
@@ -2835,7 +2835,7 @@ const SEO_REPAIR = {
   },
   'pl': {
     title: 'Napraw napisy z krzakami - Złe kodowanie | AI-SRTSub',
-    desc: 'Darmowa naprawa nieczytelnych napisów online: wykrywa, czy plik był naprawdę w UTF-8, GBK, Big5, Shift_JIS czy EUC-KR, przywraca źle odczytane znaki i może zapisać go w kodowaniu, które rozumie twój odtwarzacz.',
+    desc: "Darmowa naprawa nieczytelnych napisów online: wykrywa, czy plik był w UTF-8, GBK, Big5, Shift_JIS czy EUC-KR, przywraca źle odczytane znaki.",
     kw: 'napraw napisy krzaki,napisy dziwne znaki,srt krzaki,napraw kodowanie napisów,utf8 na gbk napisy,napisy nieczytelne,wykryj kodowanie napisów,ass krzaki,vtt krzaki',
     intro: 'Napisy, które po otwarciu wyglądają jak ściana bezsensownych znaków, prawie zawsze zostały odczytane w złym kodowaniu. Wrzuć plik: narzędzie ustali właściwe kodowanie i przywróci źle odczytane znaki.',
     feat: 'Pliki są dekodowane ponownie z oryginalnych bajtów, więc nic nie ginie: jeśli to GBK, zostanie to powiedziane, a jeśli to twój odtwarzacz się myli, zwykle wystarczy zapisać kopię jako „UTF-8 z BOM”. Wklejony tekst nie jest już oryginalnymi bajtami, więc da się odzyskać znacznie mniej; jeśli zawiera już znaki zastępcze, nie da się go odzyskać i narzędzie mówi to wprost, zamiast udawać. Numery linii i kody czasu pozostają nietknięte, a znaczniki stylów ASS zostają dokładnie takie, jakie były.',
@@ -2844,7 +2844,7 @@ const SEO_REPAIR = {
   },
   'sv': {
     title: 'Reparera undertexter med konstiga tecken - Fel kodning | AI-SRTSub',
-    desc: 'Gratis online-reparation för oläsbara undertexter: känner av om filen egentligen var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, återställer fellästa tecken och kan spara den i en kodning som din spelare förstår.',
+    desc: "Gratis online-reparation för oläsbara undertexter: känner av om filen var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, återställer fellästa tecken.",
     kw: 'reparera undertexter konstiga tecken,undertext fel kodning,srt konstiga tecken,åtgärda kodning undertexter,utf8 till gbk undertexter,undertexter oläsbara,upptäck kodning undertexter,ass konstiga tecken,vtt konstiga tecken',
     intro: 'Undertexter som öppnas som en vägg av meningslösa tecken har nästan alltid lästs med fel kodning. Lägg in filen: den tar reda på vilken kodning den faktiskt skrevs i och sätter tillbaka de fellästa tecknen.',
     feat: 'Filer avkodas om från originalbyten, så inget går förlorat: är det GBK säger den det, och om det är din spelare som läser fel räcker det oftast att spara en kopia som "UTF-8 med BOM". Inklistrad text är inte längre originalbytena, så mycket mindre kan räddas; om den redan innehåller ersättningstecken går den inte att återställa, och verktyget säger det rakt ut i stället för att låtsas. Radnummer och tidskoder rörs inte, och ASS-formatkoder lämnas precis som de var.',
@@ -2853,7 +2853,7 @@ const SEO_REPAIR = {
   },
   'cs': {
     title: 'Opravit titulky s rozbitými znaky - Špatné kódování | AI-SRTSub',
-    desc: 'Bezplatná online oprava nečitelných titulků: zjistí, zda soubor byl ve skutečnosti UTF-8, GBK, Big5, Shift_JIS nebo EUC-KR, vrátí špatně přečtené znaky a může ho uložit v kódování, kterému váš přehrávač rozumí.',
+    desc: "Bezplatná online oprava nečitelných titulků: zjistí, zda soubor byl UTF-8, GBK, Big5, Shift_JIS nebo EUC-KR, a vrátí špatně přečtené znaky.",
     kw: 'opravit titulky rozbité znaky,titulky špatné kódování,srt rozbité znaky,opravit kódování titulků,utf8 na gbk titulky,titulky nečitelné,zjistit kódování titulků,ass rozbité znaky,vtt rozbité znaky',
     intro: 'Titulky, které se po otevření změní v zeď nesmyslných znaků, byly téměř vždy přečteny ve špatném kódování. Vložte soubor: nástroj zjistí skutečné kódování a vrátí špatně přečtené znaky na místo.',
     feat: 'Soubory se dekódují znovu z původních bajtů, takže se nic neztratí: jde-li o GBK, nástroj to sdělí, a pokud se mýlí váš přehrávač, obvykle stačí uložit kopii jako „UTF-8 s BOM“. Vložený text už nejsou původní bajty, takže toho lze zachránit mnohem méně; pokud už obsahuje náhradní znaky, nelze ho obnovit a nástroj to řekne rovnou, místo aby to zastíral. Čísla řádků a časové kódy zůstanou nedotčené a značky stylů ASS se ponechají přesně tak, jak byly.',
@@ -2862,7 +2862,7 @@ const SEO_REPAIR = {
   },
   'uk': {
     title: 'Виправити «кракозябри» в субтитрах - Неправильне кодування | AI-SRTSub',
-    desc: 'Безкоштовне онлайн-виправлення нерозбірливих субтитрів: визначає, чи був файл насправді в UTF-8, GBK, Big5, Shift_JIS чи EUC-KR, повертає неправильно прочитані символи і може зберегти його в кодуванні, яке розуміє ваш програвач.',
+    desc: "Безкоштовне онлайн-виправлення нерозбірливих субтитрів: визначає, чи був файл у UTF-8, GBK, Big5, Shift_JIS чи EUC-KR, повертає неправильно прочитані символи.",
     kw: 'виправити кракозябри субтитри,субтитри неправильне кодування,srt кракозябри,виправити кодування субтитрів,utf8 у gbk субтитри,субтитри не читаються,визначити кодування субтитрів,ass кракозябри,vtt кракозябри',
     intro: 'Субтитри, які відкриваються як стіна безглуздих символів, майже завжди прочитані в неправильному кодуванні. Завантажте файл: він визначить справжнє кодування і поверне символи на місце.',
     feat: 'Файли перекодовуються з вихідних байтів, тож нічого не втрачається: якщо це GBK, про це повідомляється, а якщо помиляється ваш програвач, зазвичай досить зберегти копію як «UTF-8 з BOM». Вставлений текст уже не є вихідними байтами, тому відновлюється набагато менше; якщо в ньому вже є символи-замінники, відновлення неможливе, і інструмент каже це прямо, а не вдає інше. Номери рядків і таймкоди не чіпаються, а теги оформлення ASS залишаються без змін.',
@@ -2871,7 +2871,7 @@ const SEO_REPAIR = {
   },
   'da': {
     title: 'Reparer undertekster med mærkelige tegn - Forkert kodning | AI-SRTSub',
-    desc: 'Gratis online reparation af ulæselige undertekster: registrerer om filen egentlig var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, sætter forkert læste tegn på plads igen og kan gemme den i en kodning, din afspiller forstår.',
+    desc: "Gratis online reparation af ulæselige undertekster: registrerer om filen var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, sætter tegnene på plads.",
     kw: 'reparer undertekster mærkelige tegn,undertekster forkert kodning,srt mærkelige tegn,ret undertekster kodning,utf8 til gbk undertekster,undertekster ulæselige,registrer undertekster kodning,ass mærkelige tegn,vtt mærkelige tegn',
     intro: 'Undertekster, der åbner som en mur af meningsløse tegn, er næsten altid læst med forkert kodning. Smid filen ind: den finder ud af, hvilken kodning den faktisk blev skrevet i, og sætter de forkert læste tegn tilbage.',
     feat: 'Filer afkodes igen fra de oprindelige bytes, så intet går tabt: er det GBK, siger den det, og hvis det er din afspiller, der læser forkert, er det som regel nok at gemme en kopi som "UTF-8 med BOM". Indsat tekst er ikke længere de oprindelige bytes, så der er meget mindre at redde; indeholder den allerede erstatningstegn, kan den ikke gendannes, og værktøjet siger det rent ud i stedet for at lade som om. Linjenumre og tidskoder røres ikke, og ASS-formateringskoder bevares nøjagtigt, som de var.',
@@ -2880,7 +2880,7 @@ const SEO_REPAIR = {
   },
   'fi': {
     title: 'Korjaa tekstityksen outo merkistö - Väärä koodaus | AI-SRTSub',
-    desc: 'Ilmainen verkkokorjaus lukukelvottomille tekstityksille: tunnistaa, oliko tiedosto oikeasti UTF-8, GBK, Big5, Shift_JIS vai EUC-KR, palauttaa väärin luetut merkit ja voi tallentaa sen koodauksella, jonka soittimesi ymmärtää.',
+    desc: "Ilmainen verkkokorjaus lukukelvottomille tekstityksille: tunnistaa, oliko tiedosto UTF-8, GBK, Big5, Shift_JIS vai EUC-KR, palauttaa väärin luetut merkit.",
     kw: 'korjaa tekstitys outo merkistö,tekstitys väärä koodaus,srt outoja merkkejä,korjaa tekstityksen koodaus,utf8 gbk tekstitys,tekstitys ei lukukelpoinen,tunnista tekstityksen koodaus,ass outoja merkkejä,vtt outoja merkkejä',
     intro: 'Tekstitykset, jotka avautuvat merkityksettömien merkkien muurina, on lähes aina luettu väärällä merkistöllä. Pudota tiedosto: se selvittää, millä merkistöllä se oikeasti kirjoitettiin, ja palauttaa väärin luetut merkit.',
     feat: 'Tiedostot puretaan uudelleen alkuperäisistä tavuista, joten mitään ei katoa: jos kyseessä on GBK, se kerrotaan, ja jos soittimesi lukee väärin, kopion tallentaminen "UTF-8 BOM:illa" riittää yleensä. Liitetty teksti ei ole enää alkuperäisiä tavuja, joten palautettavaa on paljon vähemmän; jos siinä on jo korvausmerkkejä, sitä ei voi palauttaa, ja työkalu sanoo tämän suoraan sen sijaan että teeskentelisi. Rivi­numeroita ja aikakoodeja ei kosketa, ja ASS-tyylimerkit jätetään täsmälleen ennalleen.',
@@ -2888,8 +2888,8 @@ const SEO_REPAIR = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Tekstityksen koodauksen korjaus'
   },
   'el': {
-    title: 'Διόρθωση υποτίτλων με περίεργα σύμβολα - Λάθος κωδικοποίηση | AI-SRTSub',
-    desc: 'Δωρεάν διαδικτυακή επιδιόρθωση για μη αναγνώσιμους υπότιτλους: εντοπίζει αν το αρχείο ήταν πραγματικά UTF-8, GBK, Big5, Shift_JIS ή EUC-KR, επαναφέρει τους χαρακτήρες που διαβάστηκαν λάθος και μπορεί να το αποθηκεύσει σε κωδικοποίηση που καταλαβαίνει ο αναπαραγωγέας σας.',
+    title: "Διόρθωση υποτίτλων με περίεργα σύμβολα - Λάθος κωδικοποίηση",
+    desc: "Δωρεάν online επιδιόρθωση μη αναγνώσιμων υπότιτλων: εντοπίζει αν το αρχείο ήταν UTF-8, GBK, Big5, Shift_JIS ή EUC-KR, επαναφέρει τους λάθος χαρακτήρες.",
     kw: 'διόρθωση υποτίτλων περίεργα σύμβολα,υπότιτλοι λάθος κωδικοποίηση,srt περίεργα σύμβολα,διόρθωση κωδικοποίησης υποτίτλων,utf8 σε gbk υπότιτλοι,υπότιτλοι μη αναγνώσιμοι,εντοπισμός κωδικοποίησης υποτίτλων,ass περίεργα σύμβολα,vtt περίεργα σύμβολα',
     intro: 'Υπότιτλοι που ανοίγουν ως ένας τοίχος από ακατανόητα σύμβολα έχουν σχεδόν πάντα διαβαστεί με λάθος κωδικοποίηση. Ρίξτε το αρχείο: βρίσκει σε ποια κωδικοποίηση γράφτηκε πραγματικά και επαναφέρει τους χαρακτήρες.',
     feat: 'Τα αρχεία αποκωδικοποιούνται ξανά από τα πρωτότυπα bytes, οπότε δεν χάνεται τίποτα: αν είναι GBK το λέει, κι αν αυτός που κάνει λάθος είναι ο αναπαραγωγέας σας, συνήθως αρκεί να αποθηκεύσετε ένα αντίγραφο ως «UTF-8 με BOM». Το κείμενο που επικολλάται δεν είναι πλέον τα πρωτότυπα bytes, οπότε ανακτάται πολύ λιγότερο· αν περιέχει ήδη χαρακτήρες αντικατάστασης, δεν ανακτάται και το εργαλείο το λέει ξεκάθαρα αντί να το αποκρύπτει. Οι αριθμοί γραμμών και οι κωδικοί χρόνου δεν πειράζονται, και οι ετικέτες μορφοποίησης ASS μένουν ακριβώς όπως ήταν.',
@@ -2907,7 +2907,7 @@ const SEO_REPAIR = {
   },
   'ro': {
     title: 'Repară subtitrări cu caractere ciudate - Codare greșită | AI-SRTSub',
-    desc: 'Reparare online gratuită pentru subtitrări ilizibile: detectează dacă fișierul a fost de fapt UTF-8, GBK, Big5, Shift_JIS sau EUC-KR, readuce caracterele citite greșit și îl poate salva într-o codare pe care playerul tău o înțelege.',
+    desc: "Reparare online gratuită pentru subtitrări ilizibile: detectează dacă fișierul era UTF-8, GBK, Big5, Shift_JIS sau EUC-KR, readuce caracterele citite greșit.",
     kw: 'repară subtitrări caractere ciudate,subtitrări codare greșită,srt caractere ciudate,corectează codare subtitrări,utf8 în gbk subtitrări,subtitrări ilizibile,detectează codare subtitrări,ass caractere ciudate,vtt caractere ciudate',
     intro: 'Subtitrările care se deschid ca un zid de caractere fără sens au fost aproape mereu citite cu codarea greșită. Pune fișierul: află în ce codare a fost scris de fapt și readuce caracterele citite greșit.',
     feat: 'Fișierele sunt decodificate din nou din octeții originali, deci nu se pierde nimic: dacă este GBK, spune asta, iar dacă playerul tău este cel care greșește, de obicei ajunge să salvezi o copie ca „UTF-8 cu BOM”. Textul lipit nu mai este octeții originali, așa că se recuperează mult mai puțin; dacă deja conține caractere de înlocuire, nu se mai poate recupera și unealta o spune clar în loc să prefacă. Numerele de linie și codurile de timp nu sunt atinse, iar etichetele de stil ASS rămân exact cum erau.',
@@ -3188,7 +3188,7 @@ const SEO_VIDEOSUB = {
   },
   'en': {
     title: 'Extract Embedded Subtitles from MKV / MP4 to SRT | AI-SRTSub',
-    desc: 'Free online extractor for subtitle tracks sealed inside MKV, WebM, MP4 and MOV — export to SRT, VTT, ASS or TXT. No upload, no re-encode: the file is read locally in your browser, so multi-gigabyte movies are fine.',
+    desc: "Extract embedded subtitles from MKV, WebM, MP4, MOV; export as SRT / VTT / ASS / TXT. No upload or re-encode — files are read in your browser; multi-GB OK.",
     kw: 'extract embedded subtitles,mkv to srt,mp4 subtitle extract,extract subtitles from video,embedded subtitle extractor,srt from mkv,mov subtitle extract,subtitle track export,vtt from mkv,extract soft subtitles,mkv subtitle rip',
     intro: 'Pull the subtitle track sealed inside an MKV or MP4 straight out into an SRT — no upload, it all happens in your browser.',
     feat: 'Reads plain-text, ASS, WebVTT and mov_text / tx3g tracks, keeps the original ASS header and resolution, and reads in small slices by offset so a huge file never fills memory.',
@@ -3206,7 +3206,7 @@ const SEO_VIDEOSUB = {
   },
   'es': {
     title: 'Extraer subtítulos incrustados de MKV / MP4 a SRT | AI-SRTSub',
-    desc: 'Extrae gratis las pistas de subtítulos incrustadas en MKV, WebM, MP4 y MOV y expórtalas a SRT, VTT, ASS o TXT. Sin subida ni recodificación: el archivo se lee en tu navegador, así que un vídeo de varios gigabytes no es problema.',
+    desc: "Extrae gratis las pistas de subtítulos incrustadas en MKV, MP4 y MOV y expórtalas a SRT, VTT, ASS o TXT. Sin subida ni recodificación: se lee en tu navegador.",
     kw: 'extraer subtítulos incrustados,mkv a srt,extraer subtítulos mp4,sacar subtítulos del vídeo,exportar pista de subtítulos,srt desde mkv,mov extraer subtítulos,subtítulos sueltos,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'Saca la pista de subtítulos incrustada en un MKV o MP4 y llévatela a SRT — sin subidas, todo ocurre en tu navegador.',
     feat: 'Lee pistas de texto plano, ASS, WebVTT y mov_text / tx3g, conserva la cabecera y resolución ASS originales y lee por fragmentos pequeños para no llenar la memoria.',
@@ -3215,7 +3215,7 @@ const SEO_VIDEOSUB = {
   },
   'pt': {
     title: 'Extrair legendas embutidas de MKV / MP4 para SRT | AI-SRTSub',
-    desc: 'Extraia grátis as faixas de legenda embutidas em MKV, WebM, MP4 e MOV e exporte para SRT, VTT, ASS ou TXT. Sem upload e sem recodificação: o arquivo é lido no seu navegador, então um vídeo de vários gigabytes não é problema.',
+    desc: "Extraia grátis as faixas de legenda embutidas em MKV, WebM, MP4 e MOV e exporte para SRT, VTT, ASS ou TXT. Sem upload nem recodificação: lido no navegador.",
     kw: 'extrair legendas embutidas,mkv para srt,extrair legenda mp4,tirar legenda do vídeo,exportar faixa de legenda,srt a partir de mkv,mov extrair legenda,legenda solta,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'Tire a faixa de legenda embutida em um MKV ou MP4 e leve para SRT — sem upload, tudo acontece no seu navegador.',
     feat: 'Lê faixas de texto simples, ASS, WebVTT e mov_text / tx3g, mantém o cabeçalho e a resolução ASS originais e lê em pedaços pequenos para não encher a memória.',
@@ -3233,7 +3233,7 @@ const SEO_VIDEOSUB = {
   },
   'de': {
     title: 'Eingebettete Untertitel aus MKV / MP4 als SRT extrahieren | AI-SRTSub',
-    desc: 'Kostenlos die Untertitelspur extrahieren, die in MKV, WebM, MP4 oder MOV steckt, und als SRT, VTT, ASS oder TXT exportieren. Kein Upload, kein Umkodieren: die Datei wird im Browser gelesen, mehrere Gigabyte sind kein Problem.',
+    desc: "Extrahieren Sie kostenlos Untertitelspuren aus MKV, MP4, MOV und exportieren als SRT, VTT, ASS oder TXT. Kein Upload — Dateien werden im Browser gelesen.",
     kw: 'eingebettete untertitel extrahieren,mkv zu srt,untertitel aus mp4 extrahieren,untertitel aus video holen,untertitelspur exportieren,srt aus mkv,mov untertitel extrahieren,softsubs extrahieren,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'Holt die Untertitelspur aus einer MKV oder MP4 direkt als SRT heraus — ohne Upload, alles im Browser.',
     feat: 'Liest Klartext-, ASS-, WebVTT- und mov_text- / tx3g-Spuren, behält den originalen ASS-Kopf mit Auflösung und liest in kleinen Stücken, damit große Dateien den Speicher nicht füllen.',
@@ -3242,7 +3242,7 @@ const SEO_VIDEOSUB = {
   },
   'fr': {
     title: 'Extraire les sous-titres intégrés de MKV / MP4 vers SRT | AI-SRTSub',
-    desc: 'Extrayez gratuitement la piste de sous-titres intégrée dans un MKV, WebM, MP4 ou MOV et exportez-la en SRT, VTT, ASS ou TXT. Aucun envoi, aucun réencodage : le fichier est lu dans votre navigateur, plusieurs gigaoctets passent sans souci.',
+    desc: "Extrayez gratuitement la piste de sous-titres d'un MKV, MP4 ou MOV; export en SRT, VTT, ASS ou TXT. Aucun envoi ni réencodage : lu dans votre navigateur.",
     kw: 'extraire sous-titres intégrés,mkv vers srt,extraire sous-titres mp4,récupérer sous-titres vidéo,exporter piste sous-titres,srt depuis mkv,mov extraire sous-titres,softsubs,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'Sortez la piste de sous-titres intégrée à un MKV ou MP4 directement en SRT — sans envoi, tout se passe dans le navigateur.',
     feat: 'Lit les pistes texte brut, ASS, WebVTT et mov_text / tx3g, conserve l’en-tête et la résolution ASS d’origine, et lit par petits blocs pour ne pas saturer la mémoire.',
@@ -3251,7 +3251,7 @@ const SEO_VIDEOSUB = {
   },
   'id': {
     title: 'Ekstrak Subtitle Tertanam dari MKV / MP4 ke SRT | AI-SRTSub',
-    desc: 'Ekstrak gratis trek subtitle yang tertanam di MKV, WebM, MP4, dan MOV lalu ekspor ke SRT, VTT, ASS, atau TXT. Tanpa upload, tanpa encode ulang: berkas dibaca di browser Anda, jadi video beberapa gigabyte bukan masalah.',
+    desc: "Ekstrak gratis trek subtitle yang tertanam di MKV, WebM, MP4 dan MOV lalu ekspor ke SRT, VTT, ASS atau TXT. Tanpa upload: berkas dibaca di browser.",
     kw: 'ekstrak subtitle tertanam,mkv ke srt,ekstrak subtitle mp4,ambil subtitle dari video,ekspor trek subtitle,srt dari mkv,mov ekstrak subtitle,softsub,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'Keluarkan trek subtitle yang tertanam di MKV atau MP4 langsung menjadi SRT — tanpa upload, semuanya di browser.',
     feat: 'Membaca trek teks biasa, ASS, WebVTT, dan mov_text / tx3g, mempertahankan header dan resolusi ASS asli, serta membaca per potongan kecil agar memori tidak penuh.',
@@ -3260,7 +3260,7 @@ const SEO_VIDEOSUB = {
   },
   'hi': {
     title: 'MKV / MP4 में एम्बेडेड सबटाइटल निकालें - SRT में | AI-SRTSub',
-    desc: 'MKV, WebM, MP4 और MOV के अंदर बंद सबटाइटल ट्रैक को मुफ़्त में निकालें और SRT / VTT / ASS / TXT में एक्सपोर्ट करें। अपलोड नहीं, री-एन्कोड नहीं: फ़ाइल आपके ब्राउज़र में पढ़ी जाती है, कई गीगाबाइट की फ़िल्म भी चल जाती है।',
+    desc: "MKV, WebM, MP4 और MOV के अंदर बंद सबटाइटल ट्रैक मुफ़्त में निकालें और SRT / VTT / ASS / TXT में एक्सपोर्ट करें। अपलोड नहीं: फ़ाइल ब्राउज़र में पढ़ी जाती है।",
     kw: 'एम्बेडेड सबटाइटल निकालें,mkv से srt,mp4 सबटाइटल निकालें,वीडियो से सबटाइटल,srt में बदलें,mov सबटाइटल निकालें,सॉफ्ट सबटाइटल,subtitle track export,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'MKV या MP4 में छिपी सबटाइटल ट्रैक को सीधे SRT में निकालें — अपलोड नहीं, सब आपके ब्राउज़र में।',
     feat: 'प्लेन टेक्स्ट, ASS, WebVTT और mov_text / tx3g ट्रैक पढ़ता है; ASS का मूल हेडर और रिज़ॉल्यूशन वैसा ही रहता है; छोटे हिस्सों में पढ़ता है इसलिए बड़ी फ़ाइल भी मेमोरी नहीं भरती।',
@@ -3278,7 +3278,7 @@ const SEO_VIDEOSUB = {
   },
   'vi': {
     title: 'Trích phụ đề nhúng từ MKV / MP4 sang SRT | AI-SRTSub',
-    desc: 'Trích miễn phí track phụ đề nằm trong MKV, WebM, MP4 và MOV rồi xuất ra SRT / VTT / ASS / TXT. Không tải lên, không mã hóa lại: tập tin được đọc ngay trong trình duyệt, phim vài gigabyte vẫn chạy tốt.',
+    desc: "Trích miễn phí phụ đề nằm trong MKV, WebM, MP4 và MOV rồi xuất ra SRT / VTT / ASS / TXT. Không tải lên, không mã hóa lại: tệp được đọc trong trình duyệt.",
     kw: 'trích phụ đề nhúng,mkv sang srt,trích phụ đề mp4,lấy phụ đề từ video,xuất track phụ đề,srt từ mkv,mov trích phụ đề,softsub,subtitle track export,extract embedded subtitles,mkv to srt',
     intro: 'Lấy track phụ đề đang nằm trong MKV hoặc MP4 ra thẳng thành SRT — không tải lên, mọi thứ trong trình duyệt.',
     feat: 'Đọc track văn bản thuần, ASS, WebVTT và mov_text / tx3g, giữ nguyên header và độ phân giải ASS gốc, đọc từng phần nhỏ nên file lớn không chiếm bộ nhớ.',
@@ -3287,7 +3287,7 @@ const SEO_VIDEOSUB = {
   },
   'ru': {
     title: 'Извлечь встроенные субтитры из MKV / MP4 в SRT | AI-SRTSub',
-    desc: 'Бесплатно извлеките дорожку субтитров, спрятанную в MKV, WebM, MP4 или MOV, и экспортируйте в SRT, VTT, ASS или TXT. Без загрузки и перекодирования: файл читается прямо в браузере, так что фильм в несколько гигабайт не проблема.',
+    desc: "Извлеките дорожку субтитров из MKV, WebM, MP4, MOV и экспортируйте в SRT, VTT, ASS или TXT. Без загрузки и перекодирования: файл читается в браузере.",
     kw: 'извлечь встроенные субтитры,mkv в srt,извлечь субтитры из mp4,достать субтитры из видео,экспорт дорожки субтитров,srt из mkv,mov извлечь субтитры,софтсабы,subtitle track export,extract embedded subtitles,mkv to srt',
     intro: 'Вытащите дорожку субтитров из MKV или MP4 прямо в SRT — без загрузки, всё в вашем браузере.',
     feat: 'Читает дорожки обычного текста, ASS, WebVTT и mov_text / tx3g, сохраняет исходный заголовок ASS с разрешением и читает небольшими фрагментами, поэтому большой файл не забьёт память.',
@@ -3296,7 +3296,7 @@ const SEO_VIDEOSUB = {
   },
   'it': {
     title: 'Estrarre i sottotitoli incorporati da MKV / MP4 in SRT | AI-SRTSub',
-    desc: 'Estraete gratis la traccia di sottotitoli incorporata in MKV, WebM, MP4 e MOV ed esportatela in SRT, VTT, ASS o TXT. Nessun upload e nessuna ricodifica: il file viene letto nel browser, quindi un film da diversi gigabyte va bene.',
+    desc: "Estraete gratis la traccia di sottotitoli da MKV, WebM, MP4 e MOV ed esportatela in SRT, VTT, ASS o TXT. Nessun upload: il file si legge nel browser.",
     kw: 'estrarre sottotitoli incorporati,mkv in srt,estrarre sottotitoli mp4,prendere sottotitoli dal video,esportare traccia sottotitoli,srt da mkv,mov estrarre sottotitoli,softsub,subtitle track export,extract embedded subtitles,mkv to srt',
     intro: 'Tirate fuori la traccia di sottotitoli da un MKV o MP4 direttamente in SRT — senza upload, tutto nel browser.',
     feat: 'Legge tracce di testo semplice, ASS, WebVTT e mov_text / tx3g, conserva intestazione e risoluzione ASS originali e legge a piccoli blocchi, così un file grande non riempie la memoria.',
@@ -3314,7 +3314,7 @@ const SEO_VIDEOSUB = {
   },
   'tr': {
     title: 'MKV / MP4 içindeki gömülü altyazıyı SRT olarak çıkar | AI-SRTSub',
-    desc: 'MKV, WebM, MP4 ve MOV içindeki altyazı parçasını ücretsiz çıkarıp SRT, VTT, ASS veya TXT olarak dışa aktarın. Yükleme yok, yeniden kodlama yok: dosya tarayıcınızda okunur, birkaç gigabaytlık film sorun değil.',
+    desc: "MKV, WebM, MP4 ve MOV içindeki altyazı parçasını ücretsiz çıkarıp SRT, VTT, ASS veya TXT olarak dışa aktarın. Yükleme yok: dosya tarayıcınızda okunur.",
     kw: 'gömülü altyazı çıkarma,mkv srt dönüştür,mp4 altyazı çıkar,videodan altyazı alma,srt olarak aktar,mov altyazı çıkar,yumuşak altyazı,altyazı parçası dışa aktar,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'Bir MKV veya MP4 dosyasındaki altyazı parçasını doğrudan SRT olarak çıkarın — yükleme yok, hepsi tarayıcıda.',
     feat: 'Düz metin, ASS, WebVTT ve mov_text / tx3g parçalarını okur, ASS başlığını ve çözünürlüğünü korur, küçük parçalarla okuduğu için büyük dosya belleği doldurmaz.',
@@ -3323,7 +3323,7 @@ const SEO_VIDEOSUB = {
   },
   'nl': {
     title: 'Ingebedde ondertiteling uit MKV / MP4 naar SRT halen | AI-SRTSub',
-    desc: 'Haal gratis het ondertitelspoor dat in MKV, WebM, MP4 en MOV zit naar buiten en exporteer als SRT, VTT, ASS of TXT. Geen upload, geen hercodering: het bestand wordt in je browser gelezen, een film van meerdere gigabyte is geen probleem.',
+    desc: "Haal gratis het ondertitelspoor uit MKV, WebM, MP4 en MOV en exporteer als SRT, VTT, ASS of TXT. Geen upload: het bestand wordt in je browser gelezen.",
     kw: 'ingebedde ondertiteling extraheren,mkv naar srt,ondertitel uit mp4 halen,ondertitel uit video,srt maken van mkv,mov ondertitel extraheren,softsub,ondertitelspoor exporteren,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
     intro: 'Haal het ondertitelspoor uit een MKV of MP4 direct als SRT naar buiten — geen upload, alles in je browser.',
     feat: 'Leest tekst-, ASS-, WebVTT- en mov_text- / tx3g-sporen, behoudt de oorspronkelijke ASS-header en resolutie, en leest in kleine stukken zodat een groot bestand het geheugen niet vult.',
@@ -3332,7 +3332,7 @@ const SEO_VIDEOSUB = {
   },
   'pl': {
     title: 'Wyciągnij osadzone napisy z MKV / MP4 do SRT | AI-SRTSub',
-    desc: 'Wyciągnij za darmo ścieżkę napisów ukrytą w MKV, WebM, MP4 i MOV i wyeksportuj ją jako SRT, VTT, ASS lub TXT. Bez wysyłania i bez rekompresji: plik jest czytany w przeglądarce, więc film wielu gigabajtów nie jest problemem.',
+    desc: "Wyciągnij za darmo ścieżkę napisów z MKV, WebM, MP4 i MOV i wyeksportuj jako SRT, VTT, ASS lub TXT. Bez wysyłania i rekompresji: plik czytany w przeglądarce.",
     kw: 'wyciągnij osadzone napisy,mkv do srt,napisy z mp4,napisy z wideo,eksport ścieżki napisów,srt z mkv,mov napisy,softsub,wyodrębnianie napisów,extract embedded subtitles,mkv to srt',
     intro: 'Wyciągnij ścieżkę napisów z MKV lub MP4 prosto do SRT — bez wysyłania, wszystko w przeglądarce.',
     feat: 'Czyta ścieżki zwykłego tekstu, ASS, WebVTT i mov_text / tx3g, zachowuje oryginalny nagłówek ASS i rozdzielczość, czyta małymi fragmentami, więc duży plik nie zapcha pamięci.',
@@ -3341,7 +3341,7 @@ const SEO_VIDEOSUB = {
   },
   'sv': {
     title: 'Extrahera inbäddad undertext från MKV / MP4 till SRT | AI-SRTSub',
-    desc: 'Extrahera gratis textspåret som ligger i MKV, WebM, MP4 och MOV och exportera som SRT, VTT, ASS eller TXT. Ingen uppladdning, ingen omkodning: filen läses i din webbläsare, så en film på flera gigabyte är inga problem.',
+    desc: "Extrahera gratis textspåret i MKV, WebM, MP4 och MOV och exportera som SRT, VTT, ASS eller TXT. Ingen uppladdning eller omkodning: filen läses i webbläsaren.",
     kw: 'extrahera inbäddad undertext,mkv till srt,undertext från mp4,undertext från video,exportera textspår,srt från mkv,mov undertext extrahera,softsub,extrahera undertext,extract embedded subtitles,mkv to srt',
     intro: 'Ta ut textspåret ur en MKV eller MP4 direkt som SRT — ingen uppladdning, allt i webbläsaren.',
     feat: 'Läser text-, ASS-, WebVTT- och mov_text- / tx3g-spår, behåller originalets ASS-huvud och upplösning och läser i små bitar så en stor fil inte fyller minnet.',
@@ -3376,7 +3376,7 @@ const SEO_VIDEOSUB = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
   },
   'fi': {
-    title: 'Pura upotetut tekstitykset MKV / MP4 -tiedostosta SRT-muotoon | AI-SRTSub',
+    title: "Pura upotetut tekstitykset MKV/MP4-tiedostosta SRT-muotoon",
     desc: 'Ilmainen verkkotyökalu MKV-, WebM-, MP4- ja MOV-tiedostoihin upotetun tekstitysraidan purkamiseen — vienti SRT-, VTT-, ASS- tai TXT-muotoon. Ei latausta, ei uudelleenkoodausta.',
     kw: 'purista upotetut tekstitykset,mkv srt-muotoon,mp4 tekstitys purkaa,tekstitykset videosta,tekstitysraita vienti,srt mkv-tiedostosta,mov tekstitys,vienti tekstitykset,vtt mkv,pehmeät tekstitykset,mkv tekstitykset',
     intro: 'Pura MKV- tai MP4-tiedostoon upotettu tekstitysraita suoraan SRT-muotoon — ei latausta, kaikki tapahtuu selaimessasi.',
@@ -3437,7 +3437,7 @@ const SEO_HANCONV = {
   },
   'en': {
     title: 'Chinese Subtitle Converter - Simplified ⇄ Traditional | AI-SRTSub',
-    desc: 'Free online Simplified / Traditional converter for subtitles: Simplified to Traditional (Taiwan or Hong Kong) and back again. Only the dialogue changes — timecodes, cue numbers and ASS style tags stay byte-identical. Powered by the OpenCC dictionary.',
+    desc: "Free Chinese subtitle converter: Simplified ⇄ Traditional (Taiwan / Hong Kong) and back. Only dialogue changes — timecodes and ASS tags stay. Built on OpenCC.",
     kw: 'chinese subtitle converter,simplified to traditional,traditional to simplified,srt traditional chinese,convert subtitle chinese,taiwan traditional chinese,hong kong traditional chinese,han conversion,convert srt to traditional chinese,simplified chinese srt,opencc subtitle',
     intro: 'Convert a whole subtitle file between Simplified and Traditional, changing nothing but the dialogue.',
     feat: 'Nine directions: general Traditional, Taiwan vocabulary, Taiwan forms, Hong Kong, back to Simplified, and Traditional-to-Traditional regional forms. Uses the OpenCC dictionary with longest-match-first phrase resolution.',
@@ -3455,7 +3455,7 @@ const SEO_HANCONV = {
   },
   'es': {
     title: 'Convertir subtítulos chino simplificado y tradicional | AI-SRTSub',
-    desc: 'Conversor gratuito de chino para subtítulos: del simplificado al tradicional (Taiwán o Hong Kong) y de vuelta. Solo cambian los diálogos: los códigos de tiempo, los números y las etiquetas de estilo ASS quedan intactos. Con el diccionario de OpenCC.',
+    desc: "Conversor gratuito de chino para subtítulos: simplificado ⇄ tradicional (Taiwán/Hong Kong). Solo cambian los diálogos; códigos y etiquetas ASS intactos.",
     kw: 'convertir chino simplificado tradicional,subtítulos chino tradicional,srt chino tradicional,convertir subtítulos chino,chino de taiwán,chino de hong kong,simplificado a tradicional,opencc subtítulos,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Convierte un archivo de subtítulos completo entre simplificado y tradicional sin tocar nada más que los diálogos.',
     feat: 'Nueve direcciones: tradicional general, vocabulario de Taiwán, formas de Taiwán, Hong Kong, vuelta al simplificado y formas regionales. Usa el diccionario OpenCC con resolución por frase.',
@@ -3464,7 +3464,7 @@ const SEO_HANCONV = {
   },
   'pt': {
     title: 'Converter legendas do chinês simplificado e tradicional | AI-SRTSub',
-    desc: 'Conversor gratuito de chinês para legendas: do simplificado ao tradicional (Taiwan ou Hong Kong) e de volta. Só os diálogos mudam: códigos de tempo, numeração e tags de estilo ASS ficam intactos. Com o dicionário OpenCC.',
+    desc: "Conversor gratuito de chinês para legendas: simplificado ⇄ tradicional (Taiwan/Hong Kong). Só os diálogos mudam; códigos de tempo e tags ASS ficam intactos.",
     kw: 'converter chinês simplificado tradicional,legendas chinês tradicional,srt chinês tradicional,converter legenda chinesa,chinês de taiwan,chinês de hong kong,simplificado para tradicional,opencc legendas,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Converta um arquivo de legendas inteiro entre simplificado e tradicional sem mexer em nada além dos diálogos.',
     feat: 'Nove direções: tradicional geral, vocabulário de Taiwan, formas de Taiwan, Hong Kong, volta ao simplificado e formas regionais. Usa o dicionário OpenCC com decisão por palavra.',
@@ -3481,8 +3481,8 @@ const SEO_HANCONV = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
   },
   'de': {
-    title: 'Chinesische Untertitel umwandeln - Vereinfacht ⇄ Traditionell | AI-SRTSub',
-    desc: 'Kostenloser Konverter für chinesische Untertitel: von Vereinfacht nach Traditionell (Taiwan oder Hongkong) und zurück. Es ändern sich nur die Dialoge — Zeitcodes, Nummern und ASS-Stilbefehle bleiben unangetastet. Mit dem OpenCC-Wörterbuch.',
+    title: "Chinesische Untertitel - Vereinfacht ⇄ Traditionell",
+    desc: "Kostenloser chinesischer Untertitel-Konverter: vereinfacht ⇄ traditionell (Taiwan/Hongkong). Nur die Dialoge ändern sich — Zeitcodes und ASS-Stile bleiben.",
     kw: 'chinesische untertitel umwandeln,vereinfacht zu traditionell,srt traditionelles chinesisch,untertitel chinesisch konvertieren,taiwan chinesisch,hongkong chinesisch,traditionell zu vereinfacht,opencc untertitel,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Eine ganze Untertiteldatei zwischen Vereinfacht und Traditionell umwandeln, ohne etwas anderes als die Dialoge anzufassen.',
     feat: 'Neun Richtungen: allgemeines Traditionell, Taiwan-Wortschatz, Taiwan-Formen, Hongkong, zurück zu Vereinfacht und regionale Formen. Mit dem OpenCC-Wörterbuch und Entscheidung auf Wortebene.',
@@ -3490,8 +3490,8 @@ const SEO_HANCONV = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
   },
   'fr': {
-    title: 'Convertir les sous-titres chinois simplifié et traditionnel | AI-SRTSub',
-    desc: 'Convertisseur gratuit pour sous-titres chinois : du simplifié au traditionnel (Taïwan ou Hong Kong) et inversement. Seuls les dialogues changent : codes temporels, numéros et balises de style ASS restent intacts. Basé sur le dictionnaire OpenCC.',
+    title: "Convertir les sous-titres chinois simplifié et traditionnel",
+    desc: "Convertisseur gratuit pour sous-titres chinois : simplifié ⇄ traditionnel (Taïwan/Hong Kong). Seuls les dialogues changent — codes et balises ASS intacts.",
     kw: 'convertir chinois simplifié traditionnel,sous-titres chinois traditionnel,srt chinois traditionnel,convertir sous-titres chinois,chinois de taïwan,chinois de hong kong,simplifié vers traditionnel,opencc sous-titres,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Convertissez un fichier de sous-titres entier entre le simplifié et le traditionnel sans toucher à autre chose que les dialogues.',
     feat: 'Neuf sens : traditionnel général, vocabulaire de Taïwan, formes de Taïwan, Hong Kong, retour au simplifié et formes régionales. S’appuie sur le dictionnaire OpenCC avec résolution par mot.',
@@ -3500,7 +3500,7 @@ const SEO_HANCONV = {
   },
   'id': {
     title: 'Konverter Hanzi Subtitle - Sederhana ⇄ Tradisional | AI-SRTSub',
-    desc: 'Konverter gratis untuk subtitle bahasa Mandarin: dari Hanzi sederhana ke tradisional (Taiwan atau Hong Kong) dan sebaliknya. Hanya dialognya yang berubah — kode waktu, nomor, dan tag gaya ASS tetap utuh. Memakai kamus OpenCC.',
+    desc: "Konverter gratis untuk subtitle bahasa Mandarin: Hanzi sederhana ⇄ tradisional (Taiwan/Hongkong). Hanya dialog yang berubah — kode waktu dan tag ASS tetap.",
     kw: 'konversi hanzi sederhana tradisional,subtitle mandarin tradisional,srt mandarin tradisional,konversi subtitle china,mandarin taiwan,mandarin hong kong,sederhana ke tradisional,opencc subtitle,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Ubah seluruh berkas subtitle antara Hanzi sederhana dan tradisional tanpa menyentuh apa pun selain dialognya.',
     feat: 'Sembilan arah: tradisional umum, kosakata Taiwan, bentuk Taiwan, Hong Kong, kembali ke sederhana, dan bentuk regional. Memakai kamus OpenCC dengan penentuan berbasis kata.',
@@ -3527,7 +3527,7 @@ const SEO_HANCONV = {
   },
   'vi': {
     title: 'Chuyển đổi phụ đề chữ Hán giản thể ⇄ phồn thể | AI-SRTSub',
-    desc: 'Công cụ chuyển đổi tiếng Trung cho phụ đề: từ giản thể sang phồn thể (Đài Loan hoặc Hồng Kông) và ngược lại. Chỉ lời thoại thay đổi — mã thời gian, số thứ tự và thẻ định dạng ASS giữ nguyên. Dùng từ điển OpenCC.',
+    desc: "Công cụ chuyển tiếng Trung cho phụ đề: giản thể ⇄ phồn thể (Đài Loan hoặc Hồng Kông) và ngược lại. Chỉ lời thoại thay đổi — mã thời gian và thẻ ASS giữ nguyên.",
     kw: 'chuyển đổi phụ đề trung quốc,giản thể sang phồn thể,srt phồn thể,chuyển phụ đề tiếng trung,phồn thể đài loan,phồn thể hồng kông,phồn thể sang giản thể,opencc phụ đề,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Chuyển toàn bộ tệp phụ đề giữa giản thể và phồn thể mà không đụng vào gì ngoài lời thoại.',
     feat: 'Chín hướng: phồn thể phổ thông, từ vựng Đài Loan, dạng chữ Đài Loan, Hồng Kông, về giản thể và dạng vùng miền. Dùng từ điển OpenCC, quyết định theo cấp độ từ.',
@@ -3536,7 +3536,7 @@ const SEO_HANCONV = {
   },
   'ru': {
     title: 'Конвертер китайских субтитров - упрощённый ⇄ традиционный | AI-SRTSub',
-    desc: 'Бесплатный конвертер китайского для субтитров: из упрощённого в традиционный (Тайвань или Гонконг) и обратно. Меняются только реплики — таймкоды, номера и теги стилей ASS остаются неизменными. На словаре OpenCC.',
+    desc: "Бесплатный конвертер китайского для субтитров: упрощённый ⇄ традиционный (Тайвань/Гонконг) и обратно. Меняются только реплики — таймкоды и теги ASS остаются.",
     kw: 'конвертер китайских субтитров,упрощённый в традиционный,srt традиционный китайский,конвертировать субтитры китайский,традиционный тайвань,традиционный гонконг,традиционный в упрощённый,opencc субтитры,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Преобразуйте весь файл субтитров между упрощённым и традиционным, не трогая ничего, кроме реплик.',
     feat: 'Девять направлений: общее традиционное, словарь Тайваня, формы Тайваня, Гонконг, обратно в упрощённое и региональные формы. Словарь OpenCC с решением на уровне слова.',
@@ -3544,8 +3544,8 @@ const SEO_HANCONV = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
   },
   'it': {
-    title: 'Convertitore di sottotitoli cinesi - semplificato ⇄ tradizionale | AI-SRTSub',
-    desc: 'Convertitore gratuito di cinese per sottotitoli: dal semplificato al tradizionale (Taiwan o Hong Kong) e viceversa. Cambiano solo i dialoghi: codici di tempo, numeri e tag di stile ASS restano identici. Basato sul dizionario OpenCC.',
+    title: "Converti sottotitoli cinesi - semplificato ⇄ tradizionale",
+    desc: "Convertitore gratuito di cinese per sottotitoli: semplificato ⇄ tradizionale (Taiwan/Hongkong). Cambiano solo i dialoghi; codici di tempo e tag ASS restano.",
     kw: 'convertitore sottotitoli cinesi,semplificato a tradizionale,srt cinese tradizionale,convertire sottotitoli cinesi,cinese di taiwan,cinese di hong kong,tradizionale a semplificato,opencc sottotitoli,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Converti un intero file di sottotitoli tra semplificato e tradizionale senza toccare nulla oltre ai dialoghi.',
     feat: 'Nove direzioni: tradizionale generale, vocabolario di Taiwan, forme di Taiwan, Hong Kong, ritorno al semplificato e forme regionali. Usa il dizionario OpenCC con decisione a livello di parola.',
@@ -3563,7 +3563,7 @@ const SEO_HANCONV = {
   },
   'tr': {
     title: 'Çince altyazı dönüştürücü - basitleştirilmiş ⇄ geleneksel | AI-SRTSub',
-    desc: 'Altyazılar için ücretsiz Çince dönüştürücü: basitleştirilmişten geleneğe (Tayvan veya Hong Kong) ve geri. Yalnızca diyaloglar değişir — zaman kodları, numaralar ve ASS biçim etiketleri aynı kalır. OpenCC sözlüğüyle.',
+    desc: "Ücretsiz Çince altyazı dönüştürücü: basitleştirilmiş ⇄ geleneksel (Tayvan/Hong Kong). Yalnızca diyaloglar değişir — zaman kodları ve ASS etiketleri kalır.",
     kw: 'çince altyazı dönüştürücü,basitleştirilmişten geleneğe,srt geleneksel çince,altyazı çince çevir, Tayvan geleneksel,Hong Kong geleneksel,gelenekselden basitleştirilmişe,opencc altyazı,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Altyazı dosyasının tamamını diyaloglardan başka hiçbir şeye dokunmadan basitleştirilmiş ile geleneksel arasında dönüştürün.',
     feat: 'Dokuz yön: genel geleneksel, Tayvan sözcükleri, Tayvan biçimleri, Hong Kong, basitleştirilmişe dönüş ve bölgesel biçimler. OpenCC sözlüğüyle sözcük düzeyinde karar verir.',
@@ -3572,7 +3572,7 @@ const SEO_HANCONV = {
   },
   'nl': {
     title: 'Chinese ondertitelconverter - vereenvoudigd ⇄ traditioneel | AI-SRTSub',
-    desc: 'Gratis converter voor Chinese ondertitels: van vereenvoudigd naar traditioneel (Taiwan of Hongkong) en terug. Alleen de dialogen veranderen — tijdscodes, nummers en ASS-stijltags blijven gelijk. Gebaseerd op het OpenCC-woordenboek.',
+    desc: "Gratis converter voor Chinese ondertitels: vereenvoudigd ⇄ traditioneel (Taiwan/Hongkong). Alleen de dialogen veranderen — tijdscodes en ASS-stijltags blijven.",
     kw: 'chinese ondertitelconverter,vereenvoudigd naar traditioneel,srt traditioneel chinees,ondertitel chinees omzetten,chinees taiwan,chinees hongkong,traditioneel naar vereenvoudigd,opencc ondertitel,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Zet een heel ondertitelbestand om tussen vereenvoudigd en traditioneel zonder iets anders dan de dialogen aan te raken.',
     feat: 'Negen richtingen: algemeen traditioneel, Taiwan-woordenschat, Taiwan-vormen, Hongkong, terug naar vereenvoudigd en regionale vormen. Gebruikt het OpenCC-woordenboek met beslissing op woordniveau.',
@@ -3581,7 +3581,7 @@ const SEO_HANCONV = {
   },
   'pl': {
     title: 'Konwerter chińskich napisów - uproszczony ⇄ tradycyjny | AI-SRTSub',
-    desc: 'Darmowy konwerter chińskiego dla napisów: z uproszczonego na tradycyjny (Tajwan lub Hongkong) i z powrotem. Zmieniają się tylko dialogi — kody czasu, numery i tagi stylów ASS zostają bez zmian. Na słowniku OpenCC.',
+    desc: "Darmowy konwerter chińskiego dla napisów: uproszczony ⇄ tradycyjny (Tajwan/Hongkong) i z powrotem. Zmieniają się tylko dialogi — kody czasu i tagi ASS zostają.",
     kw: 'konwerter chińskich napisów,uproszczony na tradycyjny,srt tradycyjny chiński,napisy chińskie konwersja,chiński tajwański,chiński hongkoński,tradycyjny na uproszczony,opencc napisy,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Zamień cały plik napisów między uproszczonym a tradycyjnym, nie ruszając niczego poza dialogami.',
     feat: 'Dziewięć kierunków: tradycyjny ogólny, słownictwo Tajwanu, formy Tajwanu, Hongkong, powrót do uproszczonego i formy regionalne. Słownik OpenCC z decyzją na poziomie słowa.',
@@ -3590,7 +3590,7 @@ const SEO_HANCONV = {
   },
   'sv': {
     title: 'Kinesisk undertextomvandlare - förenklad ⇄ traditionell | AI-SRTSub',
-    desc: 'Gratis omvandlare för kinesiska undertexter: från förenklad till traditionell (Taiwan eller Hongkong) och tillbaka. Bara replikerna ändras — tidskoder, nummer och ASS-formatkoder förblir desamma. Med OpenCC-ordlistan.',
+    desc: "Gratis omvandlare för kinesiska undertexter: förenklad ⇄ traditionell (Taiwan/Hongkong). Bara replikerna ändras — tidskoder och ASS-koder förblir.",
     kw: 'kinesisk undertextomvandlare,förenklad till traditionell,srt traditionell kinesiska,omvandla undertext kinesiska,kinesiska taiwan,kinesiska hongkong,traditionell till förenklad,opencc undertext,chinese subtitle converter,simplified to traditional,srt traditional chinese',
     intro: 'Gör om en hel undertextfil mellan förenklad och traditionell utan att röra något annat än replikerna.',
     feat: 'Nio riktningar: allmän traditionell, taiwanesiskt ordförråd, taiwanesiska former, Hongkong, tillbaka till förenklad och regionala former. Använder OpenCC-ordlistan med beslut på ordnivå.',
@@ -3599,7 +3599,7 @@ const SEO_HANCONV = {
   },
   'cs': {
     title: 'Konvertor čínských titulků - zjednodušená ⇄ tradiční | AI-SRTSub',
-    desc: 'Zdarma převeďte čínské titulky mezi zjednodušenou a tradiční čínštinou: do tradiční (tchajwanské nebo hongkongské) i zpět. Mění se jen repliky — časové kódy a ASS značky zůstávají stejné. Používá slovník OpenCC.',
+    desc: "Zdarma převeďte čínské titulky mezi zjednodušenou a tradiční čínštinou (Tchaj-wan, Hongkong) a zpět. Mění se jen repliky — časové kódy a ASS značky zůstávají.",
     kw: 'konvertor čínských titulků,zjednodušená na tradiční,tradiční na zjednodušenou,srt tradiční čínština,převod titulků čínština,tchajwanská tradiční čínština,hongkongská tradiční čínština,převod znaků,srt do tradiční čínštiny,zjednodušená čínština srt,opencc titulky',
     intro: 'Převeďte celý soubor titulků mezi zjednodušenou a tradiční čínštinou, aniž by se změnilo cokoli kromě replik.',
     feat: 'Devět směrů: obecná tradiční, tchajwanský slovník, tchajwanské tvary, hongkongské, zpět na zjednodušenou a regionální tvary. Používá slovník OpenCC s rozhodováním podle nejdelší shody.',
@@ -3608,7 +3608,7 @@ const SEO_HANCONV = {
   },
   'uk': {
     title: 'Конвертер китайських субтитрів - спрощена ⇄ традиційна | AI-SRTSub',
-    desc: 'Безкоштовно перетворіть китайські субтитри: зі спрощеної на традиційну (тайванську або гонконгську) і назад. Змінюються лише репліки — часові коди та ASS-теги стилю залишаються ідентичними. На базі словника OpenCC.',
+    desc: "Безкоштовний конвертер китайських субтитрів: спрощена ⇄ традиційна (Тайвань або Гонконг) і назад. Змінюються лише репліки — часові коди та ASS-теги лишаються.",
     kw: 'конвертер китайських субтитрів,спрощена в традиційну,традиційна в спрощену,srt традиційна китайська,перетворення субтитрів китайська,традиційна тайванська,гонконгська традиційна,перетворення ієрогліфів,srt в традиційну китайську,спрощена китайська srt,opencc субтитри',
     intro: 'Перетворіть весь файл субтитрів між спрощеною та традиційною китайською, не змінюючи нічого, крім реплік.',
     feat: 'Дев\'ять напрямків: загальна традиційна, тайванський словник, тайванські форми, гонконгська, назад до спрощеної та регіональні форми. Використовує словник OpenCC за принципом найдовшої відповідності.',
@@ -3617,7 +3617,7 @@ const SEO_HANCONV = {
   },
   'da': {
     title: 'Kinesisk undertekstkonverter - forenklet ⇄ traditionelt | AI-SRTSub',
-    desc: 'Konvertér gratis kinesiske undertekster: fra forenklet til traditionelt (Taiwan eller Hongkong) og tilbage. Kun replikkerne ændres — tidskoder, numre og ASS-formatkoder forbliver de samme. Med OpenCC-ordlisten.',
+    desc: "Konvertér gratis kinesiske undertekster: forenklet ⇄ traditionelt (Taiwan/Hongkong) og tilbage. Kun replikkerne ændres — tidskoder og ASS-koder forbliver.",
     kw: 'kinesisk undertekstkonverter,forenklet til traditionelt,traditionelt til forenklet,srt traditionelt kinesisk,konverter undertekster kinesisk,taiwan traditionelt kinesisk,hongkong traditionelt kinesisk,tegnkonvertering,srt til traditionelt kinesisk,forenklet kinesisk srt,opencc undertekster',
     intro: 'Konvertér en hel undertekstfil mellem forenklet og traditionelt kinesisk uden at ændre andet end replikkerne.',
     feat: 'Ni retninger: generelt traditionelt, taiwansk ordforråd, taiwanske former, Hongkong, tilbage til forenklet og regionale former. Bruger OpenCC-ordlisten med længste match først.',
@@ -3625,8 +3625,8 @@ const SEO_HANCONV = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
   },
   'fi': {
-    title: 'Kiinalaisten tekstitysten muunnin - yksinkertaistettu ⇄ perinteinen | AI-SRTSub',
-    desc: 'Muunna ilmaiseksi kiinalaiset tekstitykset: yksinkertaistetusta perinteiseen (Taiwan tai Hongkong) ja takaisin. Vain repliikit muuttuvat — aikakoodit, numerot ja ASS-tyylitunnisteet pysyvät samoina. Perustuu OpenCC-sanakirjaan.',
+    title: "Tekstitysten muunnin: yksinkertaistettu ⇄ perinteinen kiina",
+    desc: "Muunna ilmaiseksi kiinalaiset tekstitykset: yksinkertaistettu ⇄ perinteinen (Taiwan/Hongkong). Vain repliikit muuttuvat — aikakoodit ja ASS-tyylit pysyvät.",
     kw: 'kiinan tekstitysten muunnin,yksinkertaistettu perinteiseksi,perinteinen yksinkertaistetuksi,srt perinteinen kiina,muunna tekstitykset kiina,taiwan perinteinen kiina,hongkong perinteinen kiina,merkkimuunnos,srt perinteiseen kiinaan,yksinkertaistettu kiina srt,opencc tekstitykset',
     intro: 'Muunna koko tekstitystiedosto yksinkertaistetun ja perinteisen kiinan välillä muuttamatta mitään muuta kuin repliikit.',
     feat: 'Yhdeksän suuntaa: yleinen perinteinen, taiwanilainen sanasto, taiwanilaiset muodot, Hongkong, takaisin yksinkertaistettuun ja alueelliset muodot. Käyttää OpenCC-sanakirjaa pisin täsmäys ensin.',
@@ -3634,8 +3634,8 @@ const SEO_HANCONV = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
   },
   'el': {
-    title: 'Μετατροπέας κινεζικών υποτίτλων - απλοποιημένα ⇄ παραδοσιακά | AI-SRTSub',
-    desc: 'Μετατρέψτε δωρεάν τους κινεζικούς υπότιτλους: από απλοποιημένα σε παραδοσιακά (Ταϊβάν ή Χονγκ Κονγκ) και αντίστροφα. Αλλάζουν μόνο οι διάλογοι — οι χρονικοί κωδικοί και οι ετικέτες ASS παραμένουν ίδιες. Με το λεξικό OpenCC.',
+    title: "Μετατροπέας κινεζικών υποτίτλων - απλοποιημένα ⇄ παραδοσιακά",
+    desc: "Δωρεάν μετατροπέας κινεζικών υποτίτλων: απλοποιημένα ⇄ παραδοσιακά (Ταϊβάν/Χονγκ Κονγκ). Αλλάζουν μόνο οι διάλογοι — χρονικοί κωδικοί και ετικέτες ASS μένουν.",
     kw: 'μετατροπέας κινεζικών υποτίτλων,απλοποιημένα σε παραδοσιακά,παραδοσιακά σε απλοποιημένα,srt παραδοσιακά κινεζικά,μετατροπή υποτίτλων κινεζικά,παραδοσιακά ταϊβάν,παραδοσιακά χονγκ κονγκ,μετατροπή χαρακτήρων,srt σε παραδοσιακά κινεζικά,απλοποιημένα κινεζικά srt,opencc υπότιτλοι',
     intro: 'Μετατρέψτε ολόκληρο το αρχείο υποτίτλων μεταξύ απλοποιημένων και παραδοσιακών κινεζικών, αλλάζοντας μόνο τους διαλόγους.',
     feat: 'Εννέα κατευθύνσεις: γενικά παραδοσιακά, λεξιλόγιο Ταϊβάν, μορφές Ταϊβάν, Χονγκ Κονγκ, επιστροφή στα απλοποιημένα και περιφερειακές μορφές. Χρησιμοποιεί το λεξικό OpenCC με πρώτη τη μεγαλύτερη αντιστοίχιση.',
@@ -3652,8 +3652,8 @@ const SEO_HANCONV = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
   },
   'ro': {
-    title: 'Convertor de subtitrări chinezești - simplificat ⇄ tradițional | AI-SRTSub',
-    desc: 'Convertește gratuit subtitrările chinezești: din simplificat în tradițional (Taiwan sau Hong Kong) și invers. Se schimbă doar replicile — codurile de timp, numerele și etichetele de stil ASS rămân identice. Bazat pe dicționarul OpenCC.',
+    title: "Convertor subtitrări chinezești - simplificat ⇄ tradițional",
+    desc: "Convertor gratuit pentru subtitrări chinezești: simplificat ⇄ tradițional (Taiwan/Hongkong). Se schimbă doar replicile — codurile și etichetele ASS rămân.",
     kw: 'convertor subtitrări chinezești,simplificat în tradițional,tradițional în simplificat,srt chineză tradițională,conversie subtitrări chineză,chineză tradițională taiwan,chineză tradițională hong kong,conversie caractere,srt în chineză tradițională,chineză simplificată srt,opencc subtitrări',
     intro: 'Convertește un întreg fișier de subtitrări între chineza simplificată și cea tradițională, fără să schimbi altceva în afară de replici.',
     feat: 'Nouă direcții: tradițional general, vocabular taiwanez, forme taiwaneze, Hong Kong, înapoi la simplificat și forme regionale. Folosește dicționarul OpenCC cu cea mai lungă potrivire întâi.',

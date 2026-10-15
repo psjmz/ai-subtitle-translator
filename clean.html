@@ -319,7 +319,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.313"></script>
+<script src="clean-core.js?v=0.9.314"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -3221,6 +3221,11 @@ function applyI18n() {
     el.setAttribute('data-tip', t(el.getAttribute('data-tip-i18n')));
   });
   document.documentElement.lang = LANG;
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「SubtitleCleaner」。
+     v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
   if ($('#fname').textContent && S.fname) $('#fname').textContent = S.fname;
   syncOptCnt();
   syncLogoHome();   /* v0.9.280：左上 logo 的回首页地址跟着界面语言走 */
@@ -3321,7 +3326,7 @@ function initLang() {
   render();
 })();
 </script>
-<script src="site-nav.js?v=0.9.313" data-tool="clean"></script>
+<script src="site-nav.js?v=0.9.314" data-tool="clean"></script>
 
 <!-- v0.9.273：SEO 静态文案（同上，按语言路由替换；直接开文件时显示简体中文默认版） -->
 <!--SEO-COPY-START-->

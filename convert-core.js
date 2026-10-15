@@ -49,6 +49,9 @@
   /* 两者都是「时间行 + 随后的文本行 + 空行」结构，只有时间码写法不同 */
   var RE_SRT = /^\s*(\d{1,3}):(\d{2}):(\d{2})(?:[,.](\d{1,3}))?\s*-->\s*(\d{1,3}):(\d{2}):(\d{2})(?:[,.](\d{1,3}))?/;
   var RE_SBV = /^\s*(\d{1,3}):(\d{2}):(\d{2})\.(\d{1,3})\s*,\s*(\d{1,3}):(\d{2}):(\d{2})\.(\d{1,3})\s*$/;
+  /* v0.9.314：VTT 允许无小时位（MM:SS.mmm）—— 三段式 RE_SRT 罩不住，单独给一条两段式。
+     （extract-core 同病在 v0.9.299 修过，这里照抄；结束端小时位可有可无。） */
+  var RE_VTT2 = /^\s*(\d{1,2}):(\d{2})\.(\d{1,3})\s*-->\s*(?:(\d{1,3}):)?(\d{1,2}):(\d{2})\.(\d{1,3})/;
 
   function parseBlocks(text, re, mapTime) {
     var lines = String(text).replace(/\r\n?/g, '\n').split('\n');
@@ -103,18 +106,24 @@
         continue;
       }
       var m = line.match(RE_SRT);
+      var st, en;
       if (m) {
-        flush();
-        var tm = [parseHMS(m[1], m[2], m[3], m[4]), parseHMS(m[5], m[6], m[7], m[8])];
-        cur = { start: tm[0], end: tm[1], text: '' };
-        /* 时间行尾部的 cue 设置属于样式，不是字幕正文 */
-        var rest = line.slice(m[0].length).trim();
-        if (rest) continue;
-        continue;
+        st = parseHMS(m[1], m[2], m[3], m[4]); en = parseHMS(m[5], m[6], m[7], m[8]);
+      } else {
+        /* 两段式：开始端无小时位（结束端可有可无）—— v0.9.314 补，之前这种 cue 整条被吞 */
+        var m2 = line.match(RE_VTT2);
+        if (!m2) {
+          if (cur === null) continue;
+          if (line.trim() === '') { flush(); continue; }
+          cur.text += (cur.text ? '\n' : '') + line;
+          continue;
+        }
+        st = parseHMS('0', m2[1], m2[2], m2[3]); en = parseHMS(m2[4] || '0', m2[5], m2[6], m2[7]);
       }
-      if (cur === null) continue;
-      if (line.trim() === '') { flush(); continue; }
-      cur.text += (cur.text ? '\n' : '') + line;
+      flush();
+      cur = { start: st, end: en, text: '' };
+      /* 时间行尾部的 cue 设置属于样式，不是字幕正文 */
+      continue;
     }
     flush();
     return out;

@@ -336,8 +336,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.313"></script>
-<script src="shift-core.js?v=0.9.313"></script>
+<script src="shift-i18n.js?v=0.9.314"></script>
+<script src="shift-core.js?v=0.9.314"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -392,6 +392,11 @@ function applyI18n() {
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
   });
   document.documentElement.lang = LANG;
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「Subtitletimeline shift」。
+     v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
   /* ⚠️ 阿拉伯语 / 希伯来语是从右往左写的 —— 只换文字不翻版面，整页看起来是错位的 */
   document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
   renderNav();
