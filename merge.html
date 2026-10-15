@@ -663,7 +663,7 @@ crossorigin="anonymous"></script>
 <div class="wrap">
   <nav class="lnav">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
-    <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.314</span></a>
+    <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.315</span></a>
     <div class="spacer"></div>
     <span id="siteNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -1201,7 +1201,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.314"></script>
+<script src="merge-core.js?v=0.9.315"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -15022,6 +15022,8 @@ function setAssFieldsRaw(pfx, f){
      这些字段 parseAssStyles 早就读出来了，不在这里回填的话「导入继承样式」是假的
      （导一份带底衬的字幕进来，界面上会显示成「无」）。 */
   setv(pfx + 'Bold', f.bold ? true : false);
+  /* v0.9.315：斜体一并继承（assStyleFields 以前漏传 Italic，导入后勾选框恒为空） */
+  setv(pfx + 'Italic', f.italic ? true : false);
   setv(pfx + 'Spacing', f.spacing != null ? f.spacing : 0);
   setv(pfx + 'Edge', f.edge || 'none');
   setv(pfx + 'EdgeSize', f.edgeSize != null ? f.edgeSize : 0);
@@ -15278,7 +15280,7 @@ init();
   toast(t('fxImported', mode==='mono' ? t('modeMono') : t('modeAdjust')));
 })();
 </script>
-<script src="site-nav.js?v=0.9.314" data-tool="fx"></script>
+<script src="site-nav.js?v=0.9.315" data-tool="fx"></script>
 
 <!-- v0.9.272：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
      server.js 按语言路由替换成对应语言，直接开文件时显示下面的简体中文默认版） -->

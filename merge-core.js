@@ -1119,6 +1119,10 @@
       outlineColor: oc.hex,
       /* Bold 在 ASS 里 -1/0（也有写 1 的），不等于 0 就算粗 */
       bold: (st.bold !== 0),
+      /* v0.9.315：Italic 与 Bold 同口径（-1=斜 / 0=正，也有写 1 的）。
+         此前面板 v0.9.245 就有斜体勾选框、导出端也认 Italic，唯独这里漏传 →
+         导入一份带斜体的 ASS，勾选框恒为空，「样式继承」对斜体是假的。 */
+      italic: (st.italic !== 0),
       spacing: Math.max(-20, Math.min(20, (isFinite(st.spacing) ? st.spacing : 0) * kk)),
       edge: box ? 'box' : (sh > 0.05 ? 'shadow' : 'none'),
       edgeSize: Math.max(0, Math.min(20, Math.round(sh * 10) / 10)),
