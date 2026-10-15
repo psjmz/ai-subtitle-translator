@@ -1023,7 +1023,11 @@
          --rp:#B42318; --rp-ink:#8A1A12; --rp-weak:#FEF3F2; --rp-line:#FDA29B;
          --ex:#B45309; --ex-ink:#8A3E06; --ex-weak:#FEF3E2; --ex-line:#EFAF6B;
          /* v0.9.302：第十条色线 —— 术语替换页（品红） */
-         --gl:#A21CAF; --gl-ink:#86198F; --gl-weak:#FBE9F7; --gl-line:#E9A3DC; }
+         --gl:#A21CAF; --gl-ink:#86198F; --gl-weak:#FBE9F7; --gl-line:#E9A3DC;
+         /* v0.9.313：第十一条色线 —— 视频内封字幕提取页（墨绿） */
+         --vs:#0F766E; --vs-ink:#0B5B55; --vs-weak:#E6F4F2; --vs-line:#A5D9D3;
+         /* v0.9.313：第十二条色线 —— 中文字幕繁简转换页（紫罗兰） */
+         --hc:#5B21B6; --hc-ink:#4C1D95; --hc-weak:#F3EAFE; --hc-line:#D6C4F5; }
   .vh{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
   /* ---------------- 顶部：工具小卡 ---------------- */
@@ -1047,6 +1051,9 @@
   .tc.rp{--k:var(--rp);--kw:var(--rp-weak);--ki:var(--rp-ink);--kl:var(--rp-line)}
   .tc.ex{--k:var(--ex);--kw:var(--ex-weak);--ki:var(--ex-ink);--kl:var(--ex-line)}
   .tc.gl{--k:var(--gl);--kw:var(--gl-weak);--ki:var(--gl-ink);--kl:var(--gl-line)}
+  /* v0.9.313：第十一、十二张工具卡 */
+  .tc.vs{--k:var(--vs);--kw:var(--vs-weak);--ki:var(--vs-ink);--kl:var(--vs-line)}
+  .tc.hc{--k:var(--hc);--kw:var(--hc-weak);--ki:var(--hc-ink);--kl:var(--hc-line)}
   .tc:hover{border-color:var(--kl);box-shadow:0 8px 22px -16px rgba(18,18,24,.42);transform:translateY(-1px)}
   .tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--k);opacity:0;transition:opacity .15s}
   .tc:hover::before{opacity:1}
@@ -1076,6 +1083,9 @@
   .det-tx.rp{--k:var(--rp);--kw:var(--rp-weak);--ki:var(--rp-ink);--kl:var(--rp-line)}
   .det-tx.ex{--k:var(--ex);--kw:var(--ex-weak);--ki:var(--ex-ink);--kl:var(--ex-line)}
   .det-tx.gl{--k:var(--gl);--kw:var(--gl-weak);--ki:var(--gl-ink);--kl:var(--gl-line)}
+  /* v0.9.313：第十一、十二段详解 */
+  .det-tx.vs{--k:var(--vs);--kw:var(--vs-weak);--ki:var(--vs-ink);--kl:var(--vs-line)}
+  .det-tx.hc{--k:var(--hc);--kw:var(--hc-weak);--ki:var(--hc-ink);--kl:var(--hc-line)}
   .det-eye{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.3px;
     padding:4px 12px;border-radius:99px;background:var(--kw);color:var(--ki)}
   .det h2{margin:15px 0 0;font-size:25px;font-weight:850;letter-spacing:-.5px;line-height:1.35;color:var(--ink)}
@@ -1163,6 +1173,11 @@
   .ex-fig .mk-doc-h .d.good{color:var(--ex-ink)}
   .gl-fig .mk-doc.ok{background:var(--gl-weak);border-color:var(--gl-line)}
   .gl-fig .mk-doc-h .d.good{color:var(--gl-ink)}
+  /* v0.9.313：第十一、十二段配图 */
+  .vs-fig .mk-doc.ok{background:var(--vs-weak);border-color:var(--vs-line)}
+  .vs-fig .mk-doc-h .d.good{color:var(--vs-ink)}
+  .hc-fig .mk-doc.ok{background:var(--hc-weak);border-color:var(--hc-line)}
+  .hc-fig .mk-doc-h .d.good{color:var(--hc-ink)}
   .sh-fig .mk-tl-row.d i{background:var(--sh);opacity:.42}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
@@ -1185,7 +1200,7 @@ crossorigin="anonymous"></script>
     <nav class="lnav">
       <!-- v0.9.280：logo 整块做成「回首页」的入口（用户定案）。href 由 syncLogoHome() 跟着界面语言重算 ——
            /ja/ 点回来还是 /ja/，不掉语言。⚠️ 里面不放 <div>：<a> 的内容模型是「透明」，改成 span 更干净。 -->
-      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.312</span></a>
+      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.313</span></a>
       <div class="spacer"></div>
       <select id="uiLang2" aria-label="UI language"></select>
     </nav>
@@ -1282,6 +1297,26 @@ crossorigin="anonymous"></script>
         </div>
         <div class="tc-n" data-i18n="tcGlN">术语替换</div>
         <p class="tc-d" data-i18n="tcGlD">按术语表批量改词，逐条可还原</p>
+      </a>
+
+      <!-- v0.9.313：第十一、十二张内部工具卡 —— vs=videosub 视频内封字幕提取 /
+           hc=hanconv 中文字幕繁简转换。 -->
+      <a class="tc vs" href="/videosub.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2.2"/><path d="M6.5 19h11"/><path d="M9 21.5h6"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcVsN">视频提取字幕</div>
+        <p class="tc-d" data-i18n="tcVsD">把 MKV / MP4 里的内封字幕轨抽成 SRT</p>
+      </a>
+
+      <a class="tc hc" href="/hanconv.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5h13"/><path d="M14 5.5 17.5 8.5 14 11.5"/><path d="M20 15.5H7"/><path d="M10 12.5 6.5 15.5 10 18.5"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcHcN">繁简转换</div>
+        <p class="tc-d" data-i18n="tcHcD">简繁互转，可选台湾 / 香港用法</p>
       </a>
 
       <!-- v0.9.277：视频下载工具。默认隐藏，仅官方域名由落地页脚本显示
@@ -1732,7 +1767,75 @@ crossorigin="anonymous"></script>
     </div>
   </section>
 
-  <!-- ⑪ 视频下载工具（同上：只在官方域名显示） -->
+  <!-- ⑪ 视频内封字幕提取 -->
+  <section class="det" aria-labelledby="detVsTitle">
+    <div class="det-in">
+      <div class="det-tx vs">
+        <span class="det-eye" data-i18n="tcVsN">视频提取字幕</span>
+        <h2 id="detVsTitle" data-i18n="detVsT">视频里封着的字幕轨，直接抽出来</h2>
+        <p class="det-lead" data-i18n="detVsL">MKV、MP4 里常常埋着一条现成的字幕轨，播放器能开，却拿不到文本。把它整条抽出来存成 SRT / VTT / ASS / TXT —— 不上传、不重编码，文件就在你自己的浏览器里读。</p>
+        <ul class="det-list">
+          <li data-i18n="detVs1">认 MKV / WebM 的 SRT、ASS、WebVTT 轨，也认 MP4 的 mov_text / tx3g</li>
+          <li data-i18n="detVs2">ASS 轨连原文件的样式头和分辨率一起带回，不是重新生成一套</li>
+          <li data-i18n="detVs3">按文件位置小段读取，几个 G 的电影也不会把内存吃满</li>
+          <li data-i18n="detVs4">图形字幕（DVD / 蓝光 PGS）没有文字可抽，会直说 —— 那需要 OCR</li>
+        </ul>
+        <a class="det-cta" href="/videosub.html"><span data-i18n="detVsCta">打开视频提取字幕</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig vs-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">MKV</span></div>
+          <p class="mk-p">movie.mkv</p>
+          <p class="mk-p">Track 3 · subtitles</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">SRT</span></div>
+          <p class="mk-p">00:00:01,000 → 00:00:03,400</p>
+          <p class="mk-p">Hello, world</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN11">不上传、不重编码</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑫ 中文字幕繁简转换 -->
+  <section class="det" aria-labelledby="detHcTitle">
+    <div class="det-in">
+      <div class="det-tx hc">
+        <span class="det-eye" data-i18n="tcHcN">繁简转换</span>
+        <h2 id="detHcTitle" data-i18n="detHcT">简繁互转，只改字不改别的</h2>
+        <p class="det-lead" data-i18n="detHcL">整份字幕在简体与繁体之间互转，九个方向：通用繁体、台湾用词、台湾字形、香港用法，以及繁体转回简体。时间码、序号和 ASS 样式标签一个字节都不动。</p>
+        <ul class="det-list">
+          <li data-i18n="detHc1">一简对多繁按词决定：干净与乾燥、头发与頭髮各自分开</li>
+          <li data-i18n="detHc2">台湾档连用词一起换：软件 → 軟體，不只是换字形</li>
+          <li data-i18n="detHc3">SRT / VTT / ASS / TXT 都支持，VTT 的 NOTE 与 STYLE 块不动</li>
+          <li data-i18n="detHc4">词库取自 OpenCC，长词优先匹配</li>
+        </ul>
+        <a class="det-cta" href="/hanconv.html"><span data-i18n="detHcCta">打开繁简转换</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig hc-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">SRT</span></div>
+          <p class="mk-p">里面有个软件</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">SRT</span></div>
+          <p class="mk-p">裡面有個軟體</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN12">只换字，时间轴不动</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑬ 视频下载工具（同上：只在官方域名显示） -->
   <section class="det" id="dlSec" aria-labelledby="detDlTitle" style="display:none">
     <div class="det-in">
       <div class="det-tx dl">
@@ -1812,7 +1915,7 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.312"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
+<script src="site-i18n.js?v=0.9.313"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
 <script>
 /* =============================================================================
    首页（落地页）脚本 —— v0.9.277
@@ -1990,6 +2093,6 @@ function repaintStats() { if (statsRaw) paintStats(statsRaw); }
   if (asCard) asCard.style.display = '';
 })();
 </script>
-<script src="site-nav.js?v=0.9.312" data-tool="tr"></script>
+<script src="site-nav.js?v=0.9.313" data-tool="tr"></script>
 </body>
 </html>

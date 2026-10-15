@@ -591,7 +591,8 @@ const TEVENTS_MAX = 3000;
       漏一个 → 那一页的记录进来被判成未知页，后台看不见，等于白埋。 */
 const TOOL_PAGE = {
   shift: 'shift', convert: 'convert', extract: 'extract',
-  bilingual: 'bilingual', repair: 'repair', glossary: 'glossary'
+  bilingual: 'bilingual', repair: 'repair', glossary: 'glossary',
+  videosub: 'videosub', hanconv: 'hanconv'
 };
 /* ⚠️ 动作白名单：与六页各自埋点处传的 act 一一对应（逐页对齐，共 14 个）。
       加减动作两边必须同步，否则新动作被记成空值 —— 用户明明用了，后台却看不到。 */
@@ -737,11 +738,11 @@ function serveStatic(req, res, urlPath){
      ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
      会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
   /* v0.9.288：转换页 /convert.html 与 /en/convert.html */
-  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary)\.html$/);
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv)\.html$/);
   if (pm && SEO_ROUTE['/' + pm[1]]) {
     serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
   }
-  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary)\.html$/);
+  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
@@ -1866,7 +1867,7 @@ const SEO_GLOSSARY = {
   }
 };
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {};
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
   CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
@@ -1883,6 +1884,10 @@ SEO_LANGS.forEach(function (l) {
   EXTRACT_PATH[l] = (l === 'zh-CN') ? '/extract.html' : '/' + l + '/extract.html';
   /* v0.9.302：字幕术语批量替换页 */
   GLOSSARY_PATH[l] = (l === 'zh-CN') ? '/glossary.html' : '/' + l + '/glossary.html';
+  /* v0.9.313：视频内封字幕提取页 */
+  VIDEOSUB_PATH[l] = (l === 'zh-CN') ? '/videosub.html' : '/' + l + '/videosub.html';
+  /* v0.9.313：中文字幕繁简转换页 */
+  HANCONV_PATH[l] = (l === 'zh-CN') ? '/hanconv.html' : '/' + l + '/hanconv.html';
 });
 /* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
    ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
@@ -3159,6 +3164,504 @@ const SEO_EXTRACT = {
   }
 };
 
+/* v0.9.313：第十一个页面 —— 视频内封字幕提取 /videosub.html 的 SEO 表。
+   与前十张表同规格：title / desc / kw 是 head 三件套，intro / feat / who 是爬虫唯一能读到的
+   静态正文三段（seoCopy 注入 <!--SEO-COPY-START-->），siteName / jsonldName 走品牌口径。 */
+const SEO_VIDEOSUB = {
+  'zh-CN': {
+    title: '提取视频内封字幕 - MKV / MP4 里的字幕轨直接导出 SRT | 随心字幕 AI',
+    desc: '免费在线提取 MKV、WebM、MP4、MOV 里内封的字幕轨，导出成 SRT / VTT / ASS / TXT。视频不上传、不转码，全在浏览器本地读取，几个 G 的片子也吃得下。多语言轨逐条列出，图形字幕会明说抽不了。',
+    kw: '提取视频内封字幕,mkv 提取字幕,mp4 提取字幕,视频字幕转 srt,内嵌字幕导出,字幕轨导出,视频转 srt,mov 提取字幕,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: '把封在 MKV / MP4 里的字幕轨直接读出来导出成 SRT —— 视频不上传，就在浏览器里翻。',
+    feat: '认得纯文本轨、ASS 轨、WebVTT 轨与 MP4 的 mov_text / tx3g 轨，ASS 原轨自带的样式头与分辨率原样带回，按偏移小段读取所以几 GB 的文件也不占内存。',
+    who: '拿到带内封字幕的片子想直接改字幕的人、压制组、要拿原文轨做翻译或双语的字幕组。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'zh-TW': {
+    title: '提取影片內封字幕 - MKV / MP4 裡的字幕軌直接匯出 SRT | 隨心字幕 AI',
+    desc: '免費線上提取 MKV、WebM、MP4、MOV 裡內封的字幕軌，匯出成 SRT / VTT / ASS / TXT。影片不上傳、不轉檔，全在瀏覽器本機讀取，幾個 G 的片子也吃得下。多語言軌逐條列出，圖形字幕會明說抽不了。',
+    kw: '提取影片內封字幕,mkv 提取字幕,mp4 提取字幕,影片字幕轉 srt,內嵌字幕匯出,字幕軌匯出,影片轉 srt,mov 提取字幕,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: '把封在 MKV / MP4 裡的字幕軌直接讀出來匯出成 SRT —— 影片不上傳，就在瀏覽器裡翻。',
+    feat: '認得純文字軌、ASS 軌、WebVTT 軌與 MP4 的 mov_text / tx3g 軌，ASS 原軌自帶的樣式頭與解析度原樣帶回，按偏移小段讀取所以幾 GB 的檔案也不佔記憶體。',
+    who: '拿到有內封字幕的片子想直接改字幕的人、壓製組、要拿原文軌做翻譯或雙語的字幕組。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'en': {
+    title: 'Extract Embedded Subtitles from MKV / MP4 to SRT | AI-SRTSub',
+    desc: 'Free online extractor for subtitle tracks sealed inside MKV, WebM, MP4 and MOV — export to SRT, VTT, ASS or TXT. No upload, no re-encode: the file is read locally in your browser, so multi-gigabyte movies are fine.',
+    kw: 'extract embedded subtitles,mkv to srt,mp4 subtitle extract,extract subtitles from video,embedded subtitle extractor,srt from mkv,mov subtitle extract,subtitle track export,vtt from mkv,extract soft subtitles,mkv subtitle rip',
+    intro: 'Pull the subtitle track sealed inside an MKV or MP4 straight out into an SRT — no upload, it all happens in your browser.',
+    feat: 'Reads plain-text, ASS, WebVTT and mov_text / tx3g tracks, keeps the original ASS header and resolution, and reads in small slices by offset so a huge file never fills memory.',
+    who: 'Anyone with a movie carrying soft subtitles who wants the text out, encoding groups, and fansub teams starting from the original track.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'ja': {
+    title: '動画の内蔵字幕を取り出して SRT へ - MKV / MP4 対応 | AI-SRTSub',
+    desc: 'MKV、WebM、MP4、MOV に内蔵された字幕トラックを無料で取り出し、SRT / VTT / ASS / TXT に書き出せます。アップロードも再エンコードもなく、ブラウザ内で読むので数 GB の動画でも大丈夫です。',
+    kw: '内蔵字幕 取り出し,mkv 字幕 抽出,mp4 字幕 抽出,動画 字幕 srt,字幕トラック 抽出,srt 書き出し,mov 字幕 抽出,ソフト字幕 抽出,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'MKV や MP4 に封じられた字幕トラックをそのまま取り出して SRT に。アップロード不要、ブラウザ内で完結します。',
+    feat: 'プレーンテキスト、ASS、WebVTT、mov_text / tx3g の各トラックに対応。ASS の元ヘッダーと解像度はそのまま保持し、オフセット指定で小さく読むので大きなファイルでもメモリを圧迫しません。',
+    who: 'ソフト字幕入りの動画からテキストを取り出したい人、エンコードグループ、原文トラックから翻訳や二か国語字幕を作る人。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'es': {
+    title: 'Extraer subtítulos incrustados de MKV / MP4 a SRT | AI-SRTSub',
+    desc: 'Extrae gratis las pistas de subtítulos incrustadas en MKV, WebM, MP4 y MOV y expórtalas a SRT, VTT, ASS o TXT. Sin subida ni recodificación: el archivo se lee en tu navegador, así que un vídeo de varios gigabytes no es problema.',
+    kw: 'extraer subtítulos incrustados,mkv a srt,extraer subtítulos mp4,sacar subtítulos del vídeo,exportar pista de subtítulos,srt desde mkv,mov extraer subtítulos,subtítulos sueltos,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'Saca la pista de subtítulos incrustada en un MKV o MP4 y llévatela a SRT — sin subidas, todo ocurre en tu navegador.',
+    feat: 'Lee pistas de texto plano, ASS, WebVTT y mov_text / tx3g, conserva la cabecera y resolución ASS originales y lee por fragmentos pequeños para no llenar la memoria.',
+    who: 'Quien tiene una película con subtítulos incrustados y quiere el texto, los grupos de codificación y los equipos de fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'pt': {
+    title: 'Extrair legendas embutidas de MKV / MP4 para SRT | AI-SRTSub',
+    desc: 'Extraia grátis as faixas de legenda embutidas em MKV, WebM, MP4 e MOV e exporte para SRT, VTT, ASS ou TXT. Sem upload e sem recodificação: o arquivo é lido no seu navegador, então um vídeo de vários gigabytes não é problema.',
+    kw: 'extrair legendas embutidas,mkv para srt,extrair legenda mp4,tirar legenda do vídeo,exportar faixa de legenda,srt a partir de mkv,mov extrair legenda,legenda solta,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'Tire a faixa de legenda embutida em um MKV ou MP4 e leve para SRT — sem upload, tudo acontece no seu navegador.',
+    feat: 'Lê faixas de texto simples, ASS, WebVTT e mov_text / tx3g, mantém o cabeçalho e a resolução ASS originais e lê em pedaços pequenos para não encher a memória.',
+    who: 'Quem tem um filme com legendas embutidas e quer o texto, grupos de encoding e equipes de fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'ko': {
+    title: 'MKV / MP4 내장 자막 추출해서 SRT로 | AI-SRTSub',
+    desc: 'MKV, WebM, MP4, MOV 안에 들어 있는 자막 트랙을 무료로 추출해 SRT / VTT / ASS / TXT로 내보냅니다. 업로드도 재인코딩도 없고 브라우저에서 바로 읽으니 몇 GB짜리 영상도 괜찮습니다.',
+    kw: '내장 자막 추출,mkv 자막 추출,mp4 자막 추출,동영상 자막 srt,자막 트랙 추출,srt 변환,mov 자막 추출,소프트 자막 추출,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'MKV나 MP4 안에 든 자막 트랙을 그대로 꺼내 SRT로 만듭니다. 업로드 없이 브라우저에서 끝납니다.',
+    feat: '일반 텍스트, ASS, WebVTT, mov_text / tx3g 트랙을 읽고 ASS 원본 헤더와 해상도를 그대로 유지합니다. 오프셋으로 조금씩 읽어 큰 파일도 메모리를 잡아먹지 않습니다.',
+    who: '소프트 자막이 든 영상에서 텍스트를 뽑고 싶은 사람, 인코딩 팀, 원문 트랙에서 번역이나 이중 자막을 만드는 팀.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'de': {
+    title: 'Eingebettete Untertitel aus MKV / MP4 als SRT extrahieren | AI-SRTSub',
+    desc: 'Kostenlos die Untertitelspur extrahieren, die in MKV, WebM, MP4 oder MOV steckt, und als SRT, VTT, ASS oder TXT exportieren. Kein Upload, kein Umkodieren: die Datei wird im Browser gelesen, mehrere Gigabyte sind kein Problem.',
+    kw: 'eingebettete untertitel extrahieren,mkv zu srt,untertitel aus mp4 extrahieren,untertitel aus video holen,untertitelspur exportieren,srt aus mkv,mov untertitel extrahieren,softsubs extrahieren,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'Holt die Untertitelspur aus einer MKV oder MP4 direkt als SRT heraus — ohne Upload, alles im Browser.',
+    feat: 'Liest Klartext-, ASS-, WebVTT- und mov_text- / tx3g-Spuren, behält den originalen ASS-Kopf mit Auflösung und liest in kleinen Stücken, damit große Dateien den Speicher nicht füllen.',
+    who: 'Wer einen Film mit Softsubs hat und den Text braucht, Encoding-Gruppen und Fansub-Teams.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'fr': {
+    title: 'Extraire les sous-titres intégrés de MKV / MP4 vers SRT | AI-SRTSub',
+    desc: 'Extrayez gratuitement la piste de sous-titres intégrée dans un MKV, WebM, MP4 ou MOV et exportez-la en SRT, VTT, ASS ou TXT. Aucun envoi, aucun réencodage : le fichier est lu dans votre navigateur, plusieurs gigaoctets passent sans souci.',
+    kw: 'extraire sous-titres intégrés,mkv vers srt,extraire sous-titres mp4,récupérer sous-titres vidéo,exporter piste sous-titres,srt depuis mkv,mov extraire sous-titres,softsubs,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'Sortez la piste de sous-titres intégrée à un MKV ou MP4 directement en SRT — sans envoi, tout se passe dans le navigateur.',
+    feat: 'Lit les pistes texte brut, ASS, WebVTT et mov_text / tx3g, conserve l’en-tête et la résolution ASS d’origine, et lit par petits blocs pour ne pas saturer la mémoire.',
+    who: 'Ceux qui ont un film avec sous-titres incrustés et veulent le texte, les groupes d’encodage et les équipes de fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'id': {
+    title: 'Ekstrak Subtitle Tertanam dari MKV / MP4 ke SRT | AI-SRTSub',
+    desc: 'Ekstrak gratis trek subtitle yang tertanam di MKV, WebM, MP4, dan MOV lalu ekspor ke SRT, VTT, ASS, atau TXT. Tanpa upload, tanpa encode ulang: berkas dibaca di browser Anda, jadi video beberapa gigabyte bukan masalah.',
+    kw: 'ekstrak subtitle tertanam,mkv ke srt,ekstrak subtitle mp4,ambil subtitle dari video,ekspor trek subtitle,srt dari mkv,mov ekstrak subtitle,softsub,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'Keluarkan trek subtitle yang tertanam di MKV atau MP4 langsung menjadi SRT — tanpa upload, semuanya di browser.',
+    feat: 'Membaca trek teks biasa, ASS, WebVTT, dan mov_text / tx3g, mempertahankan header dan resolusi ASS asli, serta membaca per potongan kecil agar memori tidak penuh.',
+    who: 'Siapa pun yang punya film bersubtitle lunak dan ingin teksnya, grup encoding, dan tim fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'hi': {
+    title: 'MKV / MP4 में एम्बेडेड सबटाइटल निकालें - SRT में | AI-SRTSub',
+    desc: 'MKV, WebM, MP4 और MOV के अंदर बंद सबटाइटल ट्रैक को मुफ़्त में निकालें और SRT / VTT / ASS / TXT में एक्सपोर्ट करें। अपलोड नहीं, री-एन्कोड नहीं: फ़ाइल आपके ब्राउज़र में पढ़ी जाती है, कई गीगाबाइट की फ़िल्म भी चल जाती है।',
+    kw: 'एम्बेडेड सबटाइटल निकालें,mkv से srt,mp4 सबटाइटल निकालें,वीडियो से सबटाइटल,srt में बदलें,mov सबटाइटल निकालें,सॉफ्ट सबटाइटल,subtitle track export,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'MKV या MP4 में छिपी सबटाइटल ट्रैक को सीधे SRT में निकालें — अपलोड नहीं, सब आपके ब्राउज़र में।',
+    feat: 'प्लेन टेक्स्ट, ASS, WebVTT और mov_text / tx3g ट्रैक पढ़ता है; ASS का मूल हेडर और रिज़ॉल्यूशन वैसा ही रहता है; छोटे हिस्सों में पढ़ता है इसलिए बड़ी फ़ाइल भी मेमोरी नहीं भरती।',
+    who: 'जिसके पास सॉफ्ट सबटाइटल वाली फ़िल्म है और टेक्स्ट चाहिए, एन्कोडिंग ग्रुप, और फैनसब टीम।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'th': {
+    title: 'ดึงซับไตเติลใน MKV / MP4 ออกเป็น SRT | AI-SRTSub',
+    desc: 'ดึงแทร็กซับไตเติลที่ฝังอยู่ใน MKV, WebM, MP4 และ MOV ได้ฟรี แล้วส่งออกเป็น SRT / VTT / ASS / TXT ไม่ต้องอัปโหลด ไม่ต้องเข้ารหัสใหม่ อ่านไฟล์ในเบราว์เซอร์ของคุณเอง หนังหลายกิกะไบต์ก็ทำได้',
+    kw: 'ดึงซับไตเติลที่ฝังมา,mkv เป็น srt,ดึงซับไตเติล mp4,แปลงซับไตเติลเป็น srt,mov ดึงซับไตเติล,ส่งออกแทร็กซับไตเติล,ซับไตเติลแบบซอฟต์,subtitle track export,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'ดึงแทร็กซับไตเติลใน MKV หรือ MP4 ออกมาเป็น SRT ได้เลย — ไม่ต้องอัปโหลด ทำในเบราว์เซอร์ทั้งหมด',
+    feat: 'อ่านแทร็กข้อความธรรมดา, ASS, WebVTT และ mov_text / tx3g เก็บส่วนหัวและความละเอียดของ ASS ไว้ตามต้นฉบับ และอ่านทีละส่วนเล็ก ๆ จึงไม่กินหน่วยความจำ',
+    who: 'คนที่มีหนังพร้อมซับไตเติลแบบซอฟต์และต้องการข้อความ กลุ่มทีมเข้ารหัส และทีมซับไตเติลแฟนคลับ',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'vi': {
+    title: 'Trích phụ đề nhúng từ MKV / MP4 sang SRT | AI-SRTSub',
+    desc: 'Trích miễn phí track phụ đề nằm trong MKV, WebM, MP4 và MOV rồi xuất ra SRT / VTT / ASS / TXT. Không tải lên, không mã hóa lại: tập tin được đọc ngay trong trình duyệt, phim vài gigabyte vẫn chạy tốt.',
+    kw: 'trích phụ đề nhúng,mkv sang srt,trích phụ đề mp4,lấy phụ đề từ video,xuất track phụ đề,srt từ mkv,mov trích phụ đề,softsub,subtitle track export,extract embedded subtitles,mkv to srt',
+    intro: 'Lấy track phụ đề đang nằm trong MKV hoặc MP4 ra thẳng thành SRT — không tải lên, mọi thứ trong trình duyệt.',
+    feat: 'Đọc track văn bản thuần, ASS, WebVTT và mov_text / tx3g, giữ nguyên header và độ phân giải ASS gốc, đọc từng phần nhỏ nên file lớn không chiếm bộ nhớ.',
+    who: 'Người có phim kèm phụ đề mềm và muốn lấy văn bản, nhóm encode, và đội làm phụ đề fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'ru': {
+    title: 'Извлечь встроенные субтитры из MKV / MP4 в SRT | AI-SRTSub',
+    desc: 'Бесплатно извлеките дорожку субтитров, спрятанную в MKV, WebM, MP4 или MOV, и экспортируйте в SRT, VTT, ASS или TXT. Без загрузки и перекодирования: файл читается прямо в браузере, так что фильм в несколько гигабайт не проблема.',
+    kw: 'извлечь встроенные субтитры,mkv в srt,извлечь субтитры из mp4,достать субтитры из видео,экспорт дорожки субтитров,srt из mkv,mov извлечь субтитры,софтсабы,subtitle track export,extract embedded subtitles,mkv to srt',
+    intro: 'Вытащите дорожку субтитров из MKV или MP4 прямо в SRT — без загрузки, всё в вашем браузере.',
+    feat: 'Читает дорожки обычного текста, ASS, WebVTT и mov_text / tx3g, сохраняет исходный заголовок ASS с разрешением и читает небольшими фрагментами, поэтому большой файл не забьёт память.',
+    who: 'Тем, у кого фильм с мягкими субтитрами и нужен текст, группам кодирования и командам фэнсаба.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'it': {
+    title: 'Estrarre i sottotitoli incorporati da MKV / MP4 in SRT | AI-SRTSub',
+    desc: 'Estraete gratis la traccia di sottotitoli incorporata in MKV, WebM, MP4 e MOV ed esportatela in SRT, VTT, ASS o TXT. Nessun upload e nessuna ricodifica: il file viene letto nel browser, quindi un film da diversi gigabyte va bene.',
+    kw: 'estrarre sottotitoli incorporati,mkv in srt,estrarre sottotitoli mp4,prendere sottotitoli dal video,esportare traccia sottotitoli,srt da mkv,mov estrarre sottotitoli,softsub,subtitle track export,extract embedded subtitles,mkv to srt',
+    intro: 'Tirate fuori la traccia di sottotitoli da un MKV o MP4 direttamente in SRT — senza upload, tutto nel browser.',
+    feat: 'Legge tracce di testo semplice, ASS, WebVTT e mov_text / tx3g, conserva intestazione e risoluzione ASS originali e legge a piccoli blocchi, così un file grande non riempie la memoria.',
+    who: 'Chi ha un film con sottotitoli morbidi e vuole il testo, i gruppi di encoding e le squadre di fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'ar': {
+    title: 'استخراج الترجمة المدمجة من MKV / MP4 إلى SRT | AI-SRTSub',
+    desc: 'استخرج مجاناً مسار الترجمة المدمج داخل MKV وWebM وMP4 وMOV وصدّره كملف SRT أو VTT أو ASS أو TXT. بلا رفع وبلا إعادة ترميز: يُقرأ الملف في متصفحك، وفيلم بحجم عدة غيغابايت ليس مشكلة.',
+    kw: 'استخراج الترجمة المدمجة,mkv إلى srt,استخراج ترجمة mp4,استخراج ترجمة من الفيديو,تصدير مسار الترجمة,srt من mkv,mov استخراج ترجمة,ترجمة ناعمة,subtitle track export,extract embedded subtitles,mkv to srt',
+    intro: 'أخرج مسار الترجمة من داخل MKV أو MP4 مباشرة إلى SRT — بلا رفع، كل شيء يجري في المتصفح.',
+    feat: 'يقرأ مسارات النص العادي وASS وWebVTT وmov_text / tx3g، ويحافظ على ترويسة ASS ودقتها الأصلية، ويقرأ على دفعات صغيرة فلا يمتلئ الذاكرة.',
+    who: 'من لديه فيلم بترجمة مدمجة ويريد النص، ومجموعات الترميز، وفرق ترجمة المعجبين.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'tr': {
+    title: 'MKV / MP4 içindeki gömülü altyazıyı SRT olarak çıkar | AI-SRTSub',
+    desc: 'MKV, WebM, MP4 ve MOV içindeki altyazı parçasını ücretsiz çıkarıp SRT, VTT, ASS veya TXT olarak dışa aktarın. Yükleme yok, yeniden kodlama yok: dosya tarayıcınızda okunur, birkaç gigabaytlık film sorun değil.',
+    kw: 'gömülü altyazı çıkarma,mkv srt dönüştür,mp4 altyazı çıkar,videodan altyazı alma,srt olarak aktar,mov altyazı çıkar,yumuşak altyazı,altyazı parçası dışa aktar,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'Bir MKV veya MP4 dosyasındaki altyazı parçasını doğrudan SRT olarak çıkarın — yükleme yok, hepsi tarayıcıda.',
+    feat: 'Düz metin, ASS, WebVTT ve mov_text / tx3g parçalarını okur, ASS başlığını ve çözünürlüğünü korur, küçük parçalarla okuduğu için büyük dosya belleği doldurmaz.',
+    who: 'Filminde yumuşak altyazı olup metni isteyenler, kodlama grupları ve fansub ekipleri.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'nl': {
+    title: 'Ingebedde ondertiteling uit MKV / MP4 naar SRT halen | AI-SRTSub',
+    desc: 'Haal gratis het ondertitelspoor dat in MKV, WebM, MP4 en MOV zit naar buiten en exporteer als SRT, VTT, ASS of TXT. Geen upload, geen hercodering: het bestand wordt in je browser gelezen, een film van meerdere gigabyte is geen probleem.',
+    kw: 'ingebedde ondertiteling extraheren,mkv naar srt,ondertitel uit mp4 halen,ondertitel uit video,srt maken van mkv,mov ondertitel extraheren,softsub,ondertitelspoor exporteren,extract embedded subtitles,mkv to srt,mp4 subtitle extract',
+    intro: 'Haal het ondertitelspoor uit een MKV of MP4 direct als SRT naar buiten — geen upload, alles in je browser.',
+    feat: 'Leest tekst-, ASS-, WebVTT- en mov_text- / tx3g-sporen, behoudt de oorspronkelijke ASS-header en resolutie, en leest in kleine stukken zodat een groot bestand het geheugen niet vult.',
+    who: 'Wie een film met zachte ondertiteling heeft en de tekst wil, encoding-groepen en fansubteams.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'pl': {
+    title: 'Wyciągnij osadzone napisy z MKV / MP4 do SRT | AI-SRTSub',
+    desc: 'Wyciągnij za darmo ścieżkę napisów ukrytą w MKV, WebM, MP4 i MOV i wyeksportuj ją jako SRT, VTT, ASS lub TXT. Bez wysyłania i bez rekompresji: plik jest czytany w przeglądarce, więc film wielu gigabajtów nie jest problemem.',
+    kw: 'wyciągnij osadzone napisy,mkv do srt,napisy z mp4,napisy z wideo,eksport ścieżki napisów,srt z mkv,mov napisy,softsub,wyodrębnianie napisów,extract embedded subtitles,mkv to srt',
+    intro: 'Wyciągnij ścieżkę napisów z MKV lub MP4 prosto do SRT — bez wysyłania, wszystko w przeglądarce.',
+    feat: 'Czyta ścieżki zwykłego tekstu, ASS, WebVTT i mov_text / tx3g, zachowuje oryginalny nagłówek ASS i rozdzielczość, czyta małymi fragmentami, więc duży plik nie zapcha pamięci.',
+    who: 'Osoby z filmem z miękkimi napisami, grupy encodingowe i zespoły fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'sv': {
+    title: 'Extrahera inbäddad undertext från MKV / MP4 till SRT | AI-SRTSub',
+    desc: 'Extrahera gratis textspåret som ligger i MKV, WebM, MP4 och MOV och exportera som SRT, VTT, ASS eller TXT. Ingen uppladdning, ingen omkodning: filen läses i din webbläsare, så en film på flera gigabyte är inga problem.',
+    kw: 'extrahera inbäddad undertext,mkv till srt,undertext från mp4,undertext från video,exportera textspår,srt från mkv,mov undertext extrahera,softsub,extrahera undertext,extract embedded subtitles,mkv to srt',
+    intro: 'Ta ut textspåret ur en MKV eller MP4 direkt som SRT — ingen uppladdning, allt i webbläsaren.',
+    feat: 'Läser text-, ASS-, WebVTT- och mov_text- / tx3g-spår, behåller originalets ASS-huvud och upplösning och läser i små bitar så en stor fil inte fyller minnet.',
+    who: 'Den som har en film med mjuk undertext och vill ha texten, encodinggrupper och fansubteam.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'cs': {
+    title: 'Extrahujte vložené titulky z MKV / MP4 do SRT | AI-SRTSub',
+    desc: 'Zdarma extrahujte titulkovou stopu uzavřenou v MKV, WebM, MP4 a MOV a exportujte do SRT, VTT, ASS nebo TXT. Bez nahrávání a bez překódování: soubor se čte lokálně ve vašem prohlížeči.',
+    kw: 'extrahovat vložené titulky,mkv do srt,mp4 titulky extrahovat,extrahovat titulky z videa,titulková stopa export,srt z mkv,mov titulky,export titulků,vtt z mkv,extrahovat měkké titulky,mkv titulky rip',
+    intro: 'Vytáhněte titulkovou stopu z MKV nebo MP4 rovnou do SRT — bez nahrávání, vše ve vašem prohlížeči.',
+    feat: 'Přečte textové stopy, ASS, WebVTT i mov_text / tx3g, zachová původní ASS hlavičku a rozlišení a čte po malých úsecích podle offsetu, takže velký soubor nezaplní paměť.',
+    who: 'Kdokoli s filmem s měkkými titulky, kdo chce text ven, encoding skupiny a fansub týmy začínající od původní stopy.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'uk': {
+    title: 'Витягти вбудовані субтитри з MKV / MP4 у SRT | AI-SRTSub',
+    desc: 'Безкоштовно витягніть доріжку субтитрів, запаковану в MKV, WebM, MP4 і MOV, та експортуйте в SRT, VTT, ASS або TXT. Без завантаження і перекодування: файл читається локально у вашому браузері.',
+    kw: 'витягти вбудовані субтитри,mkv в srt,субтитри з mp4,витягти субтитри з відео,експорт доріжки субтитрів,srt з mkv,субтитри mov,експорт субтитрів,vtt з mkv,витягти softsub,субтитри з mkv',
+    intro: 'Витягніть доріжку субтитрів з MKV або MP4 прямо в SRT — без завантаження, все у вашому браузері.',
+    feat: 'Читає текстові доріжки, ASS, WebVTT і mov_text / tx3g, зберігає оригінальний ASS-заголовок і роздільність і читає невеликими фрагментами за зміщенням, тому великий файл не заповнює пам\'ять.',
+    who: 'Усі, хто має фільм із м\'якими субтитрами і хоче дістати текст, групи кодування та команди фансабу.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'da': {
+    title: 'Udtræk indlejrede undertekster fra MKV / MP4 til SRT | AI-SRTSub',
+    desc: 'Udtræk gratis undertekstsporet i MKV, WebM, MP4 og MOV og eksportér til SRT, VTT, ASS eller TXT. Ingen upload, ingen omkodning: filen læses lokalt i din browser.',
+    kw: 'udtræk indlejrede undertekster,mkv til srt,mp4 undertekster udtræk,udtræk undertekster fra video,eksporter undertekstspor,srt fra mkv,mov undertekster,eksport undertekster,vtt fra mkv,udtræk softsubs,mkv undertekster rip',
+    intro: 'Træk undertekstsporet ud af en MKV eller MP4 direkte som SRT — ingen upload, det hele i din browser.',
+    feat: 'Læser tekst-, ASS-, WebVTT- og mov_text-/tx3g-spor, bevarer originalens ASS-hoved og opløsning og læser i små udsnit efter offset, så en stor fil ikke fylder hukommelsen.',
+    who: 'Alle med en film med softsubs der vil have teksten ud, encodinggrupper og fansub-hold der starter fra originalsporet.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'fi': {
+    title: 'Pura upotetut tekstitykset MKV / MP4 -tiedostosta SRT-muotoon | AI-SRTSub',
+    desc: 'Ilmainen verkkotyökalu MKV-, WebM-, MP4- ja MOV-tiedostoihin upotetun tekstitysraidan purkamiseen — vienti SRT-, VTT-, ASS- tai TXT-muotoon. Ei latausta, ei uudelleenkoodausta.',
+    kw: 'purista upotetut tekstitykset,mkv srt-muotoon,mp4 tekstitys purkaa,tekstitykset videosta,tekstitysraita vienti,srt mkv-tiedostosta,mov tekstitys,vienti tekstitykset,vtt mkv,pehmeät tekstitykset,mkv tekstitykset',
+    intro: 'Pura MKV- tai MP4-tiedostoon upotettu tekstitysraita suoraan SRT-muotoon — ei latausta, kaikki tapahtuu selaimessasi.',
+    feat: 'Lukee teksti-, ASS-, WebVTT- ja mov_text-/tx3g-raidat, säilyttää alkuperäisen ASS-otsikon ja resoluution ja lukee pienissä osissa, jolloin suuri tiedosto ei täytä muistia.',
+    who: 'Kaikki, joilla on elokuva pehmeillä tekstityksillä ja jotka haluavat tekstin ulos, koodausryhmät ja fansub-tiimit.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'el': {
+    title: 'Εξαγωγή ενσωματωμένων υποτίτλων από MKV / MP4 σε SRT | AI-SRTSub',
+    desc: 'Δωρεάν εξαγωγή του κομματιού υποτίτλων μέσα σε MKV, WebM, MP4 και MOV — εξαγωγή σε SRT, VTT, ASS ή TXT. Χωρίς μεταφόρτωση και επανακωδικοποίηση: το αρχείο διαβάζεται τοπικά.',
+    kw: 'εξαγωγή ενσωματωμένων υποτίτλων,mkv σε srt,εξαγωγή υποτίτλων mp4,υπότιτλοι από βίντεο,εξαγωγή κομματιού υποτίτλων,srt από mkv,υπότιτλοι mov,εξαγωγή υποτίτλων,vtt από mkv,εξαγωγή softsubs,mkv υπότιτλοι',
+    intro: 'Βγάλτε το κομμάτι υποτίτλων από ένα MKV ή MP4 κατευθείαν σε SRT — χωρίς μεταφόρτωση, όλα στον περιηγητή σας.',
+    feat: 'Διαβάζει κομμάτια κειμένου, ASS, WebVTT και mov_text / tx3g, κρατά την αυθεντική ASS κεφαλίδα και ανάλυση και διαβάζει σε μικρά τμήματα ώστε να μη γεμίζει τη μνήμη.',
+    who: 'Όσοι έχουν ταινία με softsubs και θέλουν το κείμενο, ομάδες κωδικοποίησης και ομάδες fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'he': {
+    title: 'חילוץ כתוביות מובנות מ-MKV / MP4 ל-SRT | AI-SRTSub',
+    desc: 'חילוץ חינמי באינטרנט לרצועת כתוביות שסגורה ב-MKV, WebM, MP4 ו-MOV — ייצוא ל-SRT, VTT, ASS או TXT. בלי העלאה ובלי המרה מחדש: הקובץ נקרא מקומית בדפדפן שלכם.',
+    kw: 'חילוץ כתוביות מובנות,mkv ל-srt,חילוץ כתוביות mp4,כתוביות מסרטון,ייצוא רצועת כתוביות,srt מ-mkv,כתוביות mov,ייצוא כתוביות,vtt מ-mkv,חילוץ כתוביות רכות,mkv כתוביות',
+    intro: 'הוציאו את רצועת הכתוביות מתוך MKV או MP4 ישר ל-SRT — בלי העלאה, הכול בדפדפן שלכם.',
+    feat: 'קורא רצועות טקסט, ASS, WebVTT ו-mov_text / tx3g, שומר על כותרת ה-ASS והרזולוציה המקוריים וקורא במקטעים קטנים, כך שקובץ ענק לא ממלא את הזיכרון.',
+    who: 'כל מי שיש לו סרט עם כתוביות רכות ורוצה את הטקסט החוצה, קבוצות קידוד וצוותי fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  },
+  'ro': {
+    title: 'Extrage subtitrările încorporate din MKV / MP4 în SRT | AI-SRTSub',
+    desc: 'Extrage gratuit pista de subtitrări din MKV, WebM, MP4 și MOV și exportă în SRT, VTT, ASS sau TXT. Fără încărcare și fără reencodare: fișierul este citit local în browserul tău.',
+    kw: 'extrage subtitrări încorporate,mkv în srt,extrage subtitrări mp4,subtitrări din video,export pistă subtitrări,srt din mkv,subtitrări mov,export subtitrări,vtt din mkv,extrage softsub-uri,mkv subtitrări',
+    intro: 'Scoate pista de subtitrări dintr-un MKV sau MP4 direct în SRT — fără încărcare, totul în browserul tău.',
+    feat: 'Citește piste text, ASS, WebVTT și mov_text / tx3g, păstrează antetul ASS și rezoluția originale și citește în bucăți mici după offset, astfel încât un fișier mare nu umple memoria.',
+    who: 'Oricine are un film cu softsub-uri și vrea textul afară, grupuri de encodare și echipe de fansub.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Video Embedded Subtitle Extractor'
+  }
+};
+
+/* v0.9.313：第十二个页面 —— 中文字幕繁简转换 /hanconv.html 的 SEO 表。
+   与前十张表同规格：title / desc / kw 是 head 三件套，intro / feat / who 是爬虫唯一能读到的
+   静态正文三段（seoCopy 注入 <!--SEO-COPY-START-->），siteName / jsonldName 走品牌口径。 */
+const SEO_HANCONV = {
+  'zh-CN': {
+    title: '字幕简繁转换 - 简体转繁体只动台词 | 随心字幕 AI',
+    desc: '免费在线给字幕做简繁转换：简体转繁体、台湾正体、香港繁体，也能整份转回简体。时间轴、序号、ASS 样式指令一个字都不动，只换台词正文。词库来自 OpenCC，一简对多繁不会转错。',
+    kw: '简繁转换,简体转繁体,繁体转简体,字幕简繁转换,srt 简繁转换,台湾正体,香港繁体,繁简互转,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: '一份字幕整份简繁互转，只换台词正文 —— 时间轴、序号与 ASS 样式指令一个字都不动。',
+    feat: '九个方向：通用繁体、台湾用词、台湾字形、香港繁体、转回简体、繁体之间换字形。词库来自 OpenCC，长词优先，一简对多繁按词组判定。',
+    who: '要把字幕发给台湾或香港观众的人、做两岸三地版本的发行方、接到繁体字幕想转成简体再加工的人。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'zh-TW': {
+    title: '字幕簡繁轉換 - 簡體轉繁體只動台詞 | 隨心字幕 AI',
+    desc: '免費線上給字幕做簡繁轉換：簡體轉繁體、台灣正體、香港繁體，也能整份轉回簡體。時間軸、序號、ASS 樣式指令一個字都不動，只換台詞正文。詞庫來自 OpenCC，一簡對多繁不會轉錯。',
+    kw: '簡繁轉換,簡體轉繁體,繁體轉簡體,字幕簡繁轉換,srt 簡繁轉換,台灣正體,香港繁體,繁簡互轉,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: '一份字幕整份簡繁互轉，只換台詞正文 —— 時間軸、序號與 ASS 樣式指令一個字都不動。',
+    feat: '九個方向：通用繁體、台灣用詞、台灣字形、香港繁體、轉回簡體、繁體之間換字形。詞庫來自 OpenCC，長詞優先，一簡對多繁按詞組判定。',
+    who: '要把字幕發給台灣或香港觀眾的人、做兩岸三地版本的發行方、接到繁體字幕想轉成簡體再加工的人。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'en': {
+    title: 'Chinese Subtitle Converter - Simplified ⇄ Traditional | AI-SRTSub',
+    desc: 'Free online Simplified / Traditional converter for subtitles: Simplified to Traditional (Taiwan or Hong Kong) and back again. Only the dialogue changes — timecodes, cue numbers and ASS style tags stay byte-identical. Powered by the OpenCC dictionary.',
+    kw: 'chinese subtitle converter,simplified to traditional,traditional to simplified,srt traditional chinese,convert subtitle chinese,taiwan traditional chinese,hong kong traditional chinese,han conversion,convert srt to traditional chinese,simplified chinese srt,opencc subtitle',
+    intro: 'Convert a whole subtitle file between Simplified and Traditional, changing nothing but the dialogue.',
+    feat: 'Nine directions: general Traditional, Taiwan vocabulary, Taiwan forms, Hong Kong, back to Simplified, and Traditional-to-Traditional regional forms. Uses the OpenCC dictionary with longest-match-first phrase resolution.',
+    who: 'Anyone delivering subtitles to Taiwanese or Hong Kong audiences, distributors preparing regional versions, and editors who received a Traditional file and want Simplified.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'ja': {
+    title: '字幕の繁簡変換 - 簡体字と繁体字を一括変換 | AI-SRTSub',
+    desc: '字幕ファイルを無料で繁簡変換：簡体字から繁体字（台湾・香港）へ、そして繁体字から簡体字へも一括で変換します。タイムコード、通し番号、ASS のスタイル指定には一切触れません。辞書は OpenCC 由来です。',
+    kw: '繁簡変換,簡体字 繁体字 変換,srt 繁体字,字幕 中国語 変換,台湾 繁体字,香港 繁体字,繁体字 簡体字 変換,字幕 変換,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: '字幕ファイルをまるごと繁簡変換。変わるのはセリフだけで、時間軸やスタイル指定はそのままです。',
+    feat: '9 方向対応：共通繁体字、台湾の語彙、台湾の字体、香港、簡体字への逆変換、繁体字どうしの字体変換。OpenCC 辞書で longest-match により語単位で判定します。',
+    who: '台湾・香港向けに字幕を出す人、地域別バージョンを作る配給元、繁体字字幕を簡体字に直して編集したい人。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'es': {
+    title: 'Convertir subtítulos chino simplificado y tradicional | AI-SRTSub',
+    desc: 'Conversor gratuito de chino para subtítulos: del simplificado al tradicional (Taiwán o Hong Kong) y de vuelta. Solo cambian los diálogos: los códigos de tiempo, los números y las etiquetas de estilo ASS quedan intactos. Con el diccionario de OpenCC.',
+    kw: 'convertir chino simplificado tradicional,subtítulos chino tradicional,srt chino tradicional,convertir subtítulos chino,chino de taiwán,chino de hong kong,simplificado a tradicional,opencc subtítulos,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Convierte un archivo de subtítulos completo entre simplificado y tradicional sin tocar nada más que los diálogos.',
+    feat: 'Nueve direcciones: tradicional general, vocabulario de Taiwán, formas de Taiwán, Hong Kong, vuelta al simplificado y formas regionales. Usa el diccionario OpenCC con resolución por frase.',
+    who: 'Quien entrega subtítulos a público taiwanés o hongkonés, distribuidores con versiones regionales y editores que reciben un archivo tradicional.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'pt': {
+    title: 'Converter legendas do chinês simplificado e tradicional | AI-SRTSub',
+    desc: 'Conversor gratuito de chinês para legendas: do simplificado ao tradicional (Taiwan ou Hong Kong) e de volta. Só os diálogos mudam: códigos de tempo, numeração e tags de estilo ASS ficam intactos. Com o dicionário OpenCC.',
+    kw: 'converter chinês simplificado tradicional,legendas chinês tradicional,srt chinês tradicional,converter legenda chinesa,chinês de taiwan,chinês de hong kong,simplificado para tradicional,opencc legendas,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Converta um arquivo de legendas inteiro entre simplificado e tradicional sem mexer em nada além dos diálogos.',
+    feat: 'Nove direções: tradicional geral, vocabulário de Taiwan, formas de Taiwan, Hong Kong, volta ao simplificado e formas regionais. Usa o dicionário OpenCC com decisão por palavra.',
+    who: 'Quem entrega legendas para público de Taiwan ou Hong Kong, distribuidores com versões regionais e editores que recebem arquivo tradicional.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'ko': {
+    title: '자막 한자 간번 변환 - 간체자 ↔ 번체자 | AI-SRTSub',
+    desc: '자막 전용 무료 한자 변환기: 간체자를 번체자(대만·홍콩)로, 번체자를 다시 간체자로 한 번에 바꿉니다. 타임코드·번호·ASS 스타일 태그는 전혀 건드리지 않습니다. OpenCC 사전 기반입니다.',
+    kw: '한자 변환,간체자 번체자 변환,srt 번체자,자막 중국어 변환,대만 번체자,홍콩 번체자,번체자 간체자 변환,자막 변환,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: '자막 파일 전체를 간체자와 번체자 사이에서 변환합니다. 바뀌는 것은 대사뿐입니다.',
+    feat: '아홉 가지 방향: 공통 번체자, 대만 어휘, 대만 자형, 홍콩, 간체자로 되돌리기, 번체자 간 자형 변환. OpenCC 사전으로 낱말 단위 longest-match 판정을 씁니다.',
+    who: '대만·홍콩 시청자에게 자막을 내보내는 사람, 지역별 버전을 만드는 배급사, 번체자 자막을 받아 간체자로 고치려는 편집자.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'de': {
+    title: 'Chinesische Untertitel umwandeln - Vereinfacht ⇄ Traditionell | AI-SRTSub',
+    desc: 'Kostenloser Konverter für chinesische Untertitel: von Vereinfacht nach Traditionell (Taiwan oder Hongkong) und zurück. Es ändern sich nur die Dialoge — Zeitcodes, Nummern und ASS-Stilbefehle bleiben unangetastet. Mit dem OpenCC-Wörterbuch.',
+    kw: 'chinesische untertitel umwandeln,vereinfacht zu traditionell,srt traditionelles chinesisch,untertitel chinesisch konvertieren,taiwan chinesisch,hongkong chinesisch,traditionell zu vereinfacht,opencc untertitel,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Eine ganze Untertiteldatei zwischen Vereinfacht und Traditionell umwandeln, ohne etwas anderes als die Dialoge anzufassen.',
+    feat: 'Neun Richtungen: allgemeines Traditionell, Taiwan-Wortschatz, Taiwan-Formen, Hongkong, zurück zu Vereinfacht und regionale Formen. Mit dem OpenCC-Wörterbuch und Entscheidung auf Wortebene.',
+    who: 'Wer Untertitel für Taiwan oder Hongkong ausliefert, Verteiler mit Regionalfassungen und Editoren mit traditioneller Quelldatei.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'fr': {
+    title: 'Convertir les sous-titres chinois simplifié et traditionnel | AI-SRTSub',
+    desc: 'Convertisseur gratuit pour sous-titres chinois : du simplifié au traditionnel (Taïwan ou Hong Kong) et inversement. Seuls les dialogues changent : codes temporels, numéros et balises de style ASS restent intacts. Basé sur le dictionnaire OpenCC.',
+    kw: 'convertir chinois simplifié traditionnel,sous-titres chinois traditionnel,srt chinois traditionnel,convertir sous-titres chinois,chinois de taïwan,chinois de hong kong,simplifié vers traditionnel,opencc sous-titres,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Convertissez un fichier de sous-titres entier entre le simplifié et le traditionnel sans toucher à autre chose que les dialogues.',
+    feat: 'Neuf sens : traditionnel général, vocabulaire de Taïwan, formes de Taïwan, Hong Kong, retour au simplifié et formes régionales. S’appuie sur le dictionnaire OpenCC avec résolution par mot.',
+    who: 'Ceux qui livrent des sous-titres au public taïwanais ou hongkongais, les distributeurs de versions régionales et les éditeurs qui reçoivent un fichier traditionnel.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'id': {
+    title: 'Konverter Hanzi Subtitle - Sederhana ⇄ Tradisional | AI-SRTSub',
+    desc: 'Konverter gratis untuk subtitle bahasa Mandarin: dari Hanzi sederhana ke tradisional (Taiwan atau Hong Kong) dan sebaliknya. Hanya dialognya yang berubah — kode waktu, nomor, dan tag gaya ASS tetap utuh. Memakai kamus OpenCC.',
+    kw: 'konversi hanzi sederhana tradisional,subtitle mandarin tradisional,srt mandarin tradisional,konversi subtitle china,mandarin taiwan,mandarin hong kong,sederhana ke tradisional,opencc subtitle,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Ubah seluruh berkas subtitle antara Hanzi sederhana dan tradisional tanpa menyentuh apa pun selain dialognya.',
+    feat: 'Sembilan arah: tradisional umum, kosakata Taiwan, bentuk Taiwan, Hong Kong, kembali ke sederhana, dan bentuk regional. Memakai kamus OpenCC dengan penentuan berbasis kata.',
+    who: 'Yang mengirim subtitle untuk penonton Taiwan atau Hong Kong, distributor versi regional, dan editor yang menerima berkas tradisional.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'hi': {
+    title: 'सबटाइटल सरलीकृत ↔ पारंपरिक चीनी परिवर्तक | AI-SRTSub',
+    desc: 'सबटाइटल के लिए मुफ़्त चीनी परिवर्तक: सरलीकृत से पारंपरिक (ताइवान या हांगकांग) और वापस। केवल संवाद बदलते हैं — समय-कोड, क्रमांक और ASS स्टाइल टैग ज्यों के त्यों रहते हैं। OpenCC शब्दकोश पर आधारित।',
+    kw: 'चीनी सबटाइटल परिवर्तक,सरलीकृत से पारंपरिक,srt पारंपरिक चीनी,सबटाइटल चीनी बदलें,ताइवान पारंपरिक,हांगकांग पारंपरिक,पारंपरिक से सरलीकृत,opencc सबटाइटल,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'पूरी सबटाइटल फ़ाइल को सरलीकृत और पारंपरिक के बीच बदलें — संवाद के अलावा कुछ नहीं छुआ जाता।',
+    feat: 'नौ दिशाएँ: सामान्य पारंपरिक, ताइवान शब्दावली, ताइवान रूप, हांगकांग, वापस सरलीकृत, और क्षेत्रीय रूप। OpenCC शब्दकोश के साथ शब्द-स्तर पर निर्णय।',
+    who: 'ताइवान या हांगकांग के दर्शकों के लिए सबटाइटल देने वाले, क्षेत्रीय संस्करण बनाने वाले वितरक, और पारंपरिक फ़ाइल पाने वाले संपादक।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'th': {
+    title: 'แปลงซับไตเติลจีนตัวย่อ ⇄ ตัวเต็ม | AI-SRTSub',
+    desc: 'ตัวแปลงภาษาจีนสำหรับซับไตเติลฟรี: จากตัวย่อเป็นตัวเต็ม (ไต้หวันหรือฮ่องกง) และกลับกัน เปลี่ยนเฉพาะบทสนทนา รหัสเวลา หมายเลข และแท็กสไตล์ ASS คงเดิมทุกประการ ใช้พจนานุกรม OpenCC',
+    kw: 'แปลงซับไตเติลจีน,ตัวย่อเป็นตัวเต็ม,srt ตัวเต็ม,ซับไตเติลจีนแปลง,ตัวเต็มไต้หวัน,ตัวเต็มฮ่องกง,ตัวเต็มเป็นตัวย่อ,opencc ซับไตเติล,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'แปลงไฟล์ซับไตเติลทั้งไฟล์ระหว่างตัวย่อและตัวเต็ม โดยไม่แตะต้องอะไรนอกจากบทสนทนา',
+    feat: 'เก้าทิศทาง: ตัวเต็มทั่วไป คำศัพท์ไต้หวัน รูปอักษรไต้หวัน ฮ่องกง กลับเป็นตัวย่อ และรูปแบบภูมิภาค ใช้พจนานุกรม OpenCC ตัดสินระดับคำ',
+    who: 'คนที่ส่งซับไตเติลให้ผู้ชมไต้หวันหรือฮ่องกง ผู้จัดจำหน่ายที่ทำเวอร์ชันภูมิภาค และบรรณาธิการที่ได้รับไฟล์ตัวเต็ม',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'vi': {
+    title: 'Chuyển đổi phụ đề chữ Hán giản thể ⇄ phồn thể | AI-SRTSub',
+    desc: 'Công cụ chuyển đổi tiếng Trung cho phụ đề: từ giản thể sang phồn thể (Đài Loan hoặc Hồng Kông) và ngược lại. Chỉ lời thoại thay đổi — mã thời gian, số thứ tự và thẻ định dạng ASS giữ nguyên. Dùng từ điển OpenCC.',
+    kw: 'chuyển đổi phụ đề trung quốc,giản thể sang phồn thể,srt phồn thể,chuyển phụ đề tiếng trung,phồn thể đài loan,phồn thể hồng kông,phồn thể sang giản thể,opencc phụ đề,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Chuyển toàn bộ tệp phụ đề giữa giản thể và phồn thể mà không đụng vào gì ngoài lời thoại.',
+    feat: 'Chín hướng: phồn thể phổ thông, từ vựng Đài Loan, dạng chữ Đài Loan, Hồng Kông, về giản thể và dạng vùng miền. Dùng từ điển OpenCC, quyết định theo cấp độ từ.',
+    who: 'Người giao phụ đề cho khán giả Đài Loan hoặc Hồng Kông, nhà phát hành bản vùng, và biên tập viên nhận tệp phồn thể.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'ru': {
+    title: 'Конвертер китайских субтитров - упрощённый ⇄ традиционный | AI-SRTSub',
+    desc: 'Бесплатный конвертер китайского для субтитров: из упрощённого в традиционный (Тайвань или Гонконг) и обратно. Меняются только реплики — таймкоды, номера и теги стилей ASS остаются неизменными. На словаре OpenCC.',
+    kw: 'конвертер китайских субтитров,упрощённый в традиционный,srt традиционный китайский,конвертировать субтитры китайский,традиционный тайвань,традиционный гонконг,традиционный в упрощённый,opencc субтитры,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Преобразуйте весь файл субтитров между упрощённым и традиционным, не трогая ничего, кроме реплик.',
+    feat: 'Девять направлений: общее традиционное, словарь Тайваня, формы Тайваня, Гонконг, обратно в упрощённое и региональные формы. Словарь OpenCC с решением на уровне слова.',
+    who: 'Тем, кто отдаёт субтитры зрителям Тайваня или Гонконга, дистрибьюторам региональных версий и редакторам традиционных файлов.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'it': {
+    title: 'Convertitore di sottotitoli cinesi - semplificato ⇄ tradizionale | AI-SRTSub',
+    desc: 'Convertitore gratuito di cinese per sottotitoli: dal semplificato al tradizionale (Taiwan o Hong Kong) e viceversa. Cambiano solo i dialoghi: codici di tempo, numeri e tag di stile ASS restano identici. Basato sul dizionario OpenCC.',
+    kw: 'convertitore sottotitoli cinesi,semplificato a tradizionale,srt cinese tradizionale,convertire sottotitoli cinesi,cinese di taiwan,cinese di hong kong,tradizionale a semplificato,opencc sottotitoli,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Converti un intero file di sottotitoli tra semplificato e tradizionale senza toccare nulla oltre ai dialoghi.',
+    feat: 'Nove direzioni: tradizionale generale, vocabolario di Taiwan, forme di Taiwan, Hong Kong, ritorno al semplificato e forme regionali. Usa il dizionario OpenCC con decisione a livello di parola.',
+    who: 'Chi consegna sottotitoli al pubblico di Taiwan o Hong Kong, i distributori di versioni regionali e i redattori che ricevono file tradizionali.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'ar': {
+    title: 'محوّل الترجمة الصينية - المبسّطة ⇄ التقليدية | AI-SRTSub',
+    desc: 'محوّل صيني مجاني للترجمة: من المبسّطة إلى التقليدية (تايوان أو هونغ كونغ) وبالعكس. الحوار وحده هو الذي يتغيّر، أما رموز التوقيت والأرقام ووسوم التنسيق ASS فتبقى كما هي. يعتمد على قاموس OpenCC.',
+    kw: 'محول الترجمة الصينية,المبسطة إلى التقليدية,srt صينية تقليدية,تحويل الترجمة الصينية,صينية تايوان,صينية هونغ كونغ,التقليدية إلى المبسطة,opencc ترجمة,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'حوّل ملف الترجمة بالكامل بين المبسّطة والتقليدية دون أن يُمسّ شيء غير الحوار.',
+    feat: 'تسعة اتجاهات: التقليدية العامة، مفردات تايوان، أشكال تايوان، هونغ كونغ، العودة إلى المبسّطة، والأشكال الإقليمية. يستخدم قاموس OpenCC ويحسم على مستوى الكلمة.',
+    who: 'من يسلّم الترجمة لجمهور تايوان أو هونغ كونغ، والموزّعون الذين يعدّون نسخاً إقليمية، والمحرّرون الذين يتسلّمون ملفاً تقليدياً.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'tr': {
+    title: 'Çince altyazı dönüştürücü - basitleştirilmiş ⇄ geleneksel | AI-SRTSub',
+    desc: 'Altyazılar için ücretsiz Çince dönüştürücü: basitleştirilmişten geleneğe (Tayvan veya Hong Kong) ve geri. Yalnızca diyaloglar değişir — zaman kodları, numaralar ve ASS biçim etiketleri aynı kalır. OpenCC sözlüğüyle.',
+    kw: 'çince altyazı dönüştürücü,basitleştirilmişten geleneğe,srt geleneksel çince,altyazı çince çevir, Tayvan geleneksel,Hong Kong geleneksel,gelenekselden basitleştirilmişe,opencc altyazı,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Altyazı dosyasının tamamını diyaloglardan başka hiçbir şeye dokunmadan basitleştirilmiş ile geleneksel arasında dönüştürün.',
+    feat: 'Dokuz yön: genel geleneksel, Tayvan sözcükleri, Tayvan biçimleri, Hong Kong, basitleştirilmişe dönüş ve bölgesel biçimler. OpenCC sözlüğüyle sözcük düzeyinde karar verir.',
+    who: 'Tayvan veya Hong Kong izleyicisine altyazı verenler, bölgesel sürüm hazırlayan dağıtımcılar ve geleneksel dosya alan editörler.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'nl': {
+    title: 'Chinese ondertitelconverter - vereenvoudigd ⇄ traditioneel | AI-SRTSub',
+    desc: 'Gratis converter voor Chinese ondertitels: van vereenvoudigd naar traditioneel (Taiwan of Hongkong) en terug. Alleen de dialogen veranderen — tijdscodes, nummers en ASS-stijltags blijven gelijk. Gebaseerd op het OpenCC-woordenboek.',
+    kw: 'chinese ondertitelconverter,vereenvoudigd naar traditioneel,srt traditioneel chinees,ondertitel chinees omzetten,chinees taiwan,chinees hongkong,traditioneel naar vereenvoudigd,opencc ondertitel,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Zet een heel ondertitelbestand om tussen vereenvoudigd en traditioneel zonder iets anders dan de dialogen aan te raken.',
+    feat: 'Negen richtingen: algemeen traditioneel, Taiwan-woordenschat, Taiwan-vormen, Hongkong, terug naar vereenvoudigd en regionale vormen. Gebruikt het OpenCC-woordenboek met beslissing op woordniveau.',
+    who: 'Wie ondertitels levert aan Taiwanese of Hongkongse kijkers, distributeurs van regionale versies en redacteuren met een traditioneel bestand.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'pl': {
+    title: 'Konwerter chińskich napisów - uproszczony ⇄ tradycyjny | AI-SRTSub',
+    desc: 'Darmowy konwerter chińskiego dla napisów: z uproszczonego na tradycyjny (Tajwan lub Hongkong) i z powrotem. Zmieniają się tylko dialogi — kody czasu, numery i tagi stylów ASS zostają bez zmian. Na słowniku OpenCC.',
+    kw: 'konwerter chińskich napisów,uproszczony na tradycyjny,srt tradycyjny chiński,napisy chińskie konwersja,chiński tajwański,chiński hongkoński,tradycyjny na uproszczony,opencc napisy,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Zamień cały plik napisów między uproszczonym a tradycyjnym, nie ruszając niczego poza dialogami.',
+    feat: 'Dziewięć kierunków: tradycyjny ogólny, słownictwo Tajwanu, formy Tajwanu, Hongkong, powrót do uproszczonego i formy regionalne. Słownik OpenCC z decyzją na poziomie słowa.',
+    who: 'Dostawcy napisów dla widzów z Tajwanu lub Hongkongu, dystrybutorzy wersji regionalnych i redaktorzy z tradycyjnym plikiem.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'sv': {
+    title: 'Kinesisk undertextomvandlare - förenklad ⇄ traditionell | AI-SRTSub',
+    desc: 'Gratis omvandlare för kinesiska undertexter: från förenklad till traditionell (Taiwan eller Hongkong) och tillbaka. Bara replikerna ändras — tidskoder, nummer och ASS-formatkoder förblir desamma. Med OpenCC-ordlistan.',
+    kw: 'kinesisk undertextomvandlare,förenklad till traditionell,srt traditionell kinesiska,omvandla undertext kinesiska,kinesiska taiwan,kinesiska hongkong,traditionell till förenklad,opencc undertext,chinese subtitle converter,simplified to traditional,srt traditional chinese',
+    intro: 'Gör om en hel undertextfil mellan förenklad och traditionell utan att röra något annat än replikerna.',
+    feat: 'Nio riktningar: allmän traditionell, taiwanesiskt ordförråd, taiwanesiska former, Hongkong, tillbaka till förenklad och regionala former. Använder OpenCC-ordlistan med beslut på ordnivå.',
+    who: 'Den som levererar undertexter till taiwanesisk eller hongkongkinesisk publik, distributörer av regionala versioner och redaktörer med traditionell fil.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'cs': {
+    title: 'Konvertor čínských titulků - zjednodušená ⇄ tradiční | AI-SRTSub',
+    desc: 'Zdarma převeďte čínské titulky mezi zjednodušenou a tradiční čínštinou: do tradiční (tchajwanské nebo hongkongské) i zpět. Mění se jen repliky — časové kódy a ASS značky zůstávají stejné. Používá slovník OpenCC.',
+    kw: 'konvertor čínských titulků,zjednodušená na tradiční,tradiční na zjednodušenou,srt tradiční čínština,převod titulků čínština,tchajwanská tradiční čínština,hongkongská tradiční čínština,převod znaků,srt do tradiční čínštiny,zjednodušená čínština srt,opencc titulky',
+    intro: 'Převeďte celý soubor titulků mezi zjednodušenou a tradiční čínštinou, aniž by se změnilo cokoli kromě replik.',
+    feat: 'Devět směrů: obecná tradiční, tchajwanský slovník, tchajwanské tvary, hongkongské, zpět na zjednodušenou a regionální tvary. Používá slovník OpenCC s rozhodováním podle nejdelší shody.',
+    who: 'Kdokoli, kdo dodává titulky pro tchajwanské nebo hongkongské publikum, distributoři regionálních verzí a střihači, kteří dostali tradiční soubor.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'uk': {
+    title: 'Конвертер китайських субтитрів - спрощена ⇄ традиційна | AI-SRTSub',
+    desc: 'Безкоштовно перетворіть китайські субтитри: зі спрощеної на традиційну (тайванську або гонконгську) і назад. Змінюються лише репліки — часові коди та ASS-теги стилю залишаються ідентичними. На базі словника OpenCC.',
+    kw: 'конвертер китайських субтитрів,спрощена в традиційну,традиційна в спрощену,srt традиційна китайська,перетворення субтитрів китайська,традиційна тайванська,гонконгська традиційна,перетворення ієрогліфів,srt в традиційну китайську,спрощена китайська srt,opencc субтитри',
+    intro: 'Перетворіть весь файл субтитрів між спрощеною та традиційною китайською, не змінюючи нічого, крім реплік.',
+    feat: 'Дев\'ять напрямків: загальна традиційна, тайванський словник, тайванські форми, гонконгська, назад до спрощеної та регіональні форми. Використовує словник OpenCC за принципом найдовшої відповідності.',
+    who: 'Усі, хто готує субтитри для тайванської або гонконгської аудиторії, дистриб\'ютори регіональних версій і редактори.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'da': {
+    title: 'Kinesisk undertekstkonverter - forenklet ⇄ traditionelt | AI-SRTSub',
+    desc: 'Konvertér gratis kinesiske undertekster: fra forenklet til traditionelt (Taiwan eller Hongkong) og tilbage. Kun replikkerne ændres — tidskoder, numre og ASS-formatkoder forbliver de samme. Med OpenCC-ordlisten.',
+    kw: 'kinesisk undertekstkonverter,forenklet til traditionelt,traditionelt til forenklet,srt traditionelt kinesisk,konverter undertekster kinesisk,taiwan traditionelt kinesisk,hongkong traditionelt kinesisk,tegnkonvertering,srt til traditionelt kinesisk,forenklet kinesisk srt,opencc undertekster',
+    intro: 'Konvertér en hel undertekstfil mellem forenklet og traditionelt kinesisk uden at ændre andet end replikkerne.',
+    feat: 'Ni retninger: generelt traditionelt, taiwansk ordforråd, taiwanske former, Hongkong, tilbage til forenklet og regionale former. Bruger OpenCC-ordlisten med længste match først.',
+    who: 'Alle der leverer undertekster til taiwansk eller hongkongkinesisk publikum, distributører af regionale versioner og redaktører.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'fi': {
+    title: 'Kiinalaisten tekstitysten muunnin - yksinkertaistettu ⇄ perinteinen | AI-SRTSub',
+    desc: 'Muunna ilmaiseksi kiinalaiset tekstitykset: yksinkertaistetusta perinteiseen (Taiwan tai Hongkong) ja takaisin. Vain repliikit muuttuvat — aikakoodit, numerot ja ASS-tyylitunnisteet pysyvät samoina. Perustuu OpenCC-sanakirjaan.',
+    kw: 'kiinan tekstitysten muunnin,yksinkertaistettu perinteiseksi,perinteinen yksinkertaistetuksi,srt perinteinen kiina,muunna tekstitykset kiina,taiwan perinteinen kiina,hongkong perinteinen kiina,merkkimuunnos,srt perinteiseen kiinaan,yksinkertaistettu kiina srt,opencc tekstitykset',
+    intro: 'Muunna koko tekstitystiedosto yksinkertaistetun ja perinteisen kiinan välillä muuttamatta mitään muuta kuin repliikit.',
+    feat: 'Yhdeksän suuntaa: yleinen perinteinen, taiwanilainen sanasto, taiwanilaiset muodot, Hongkong, takaisin yksinkertaistettuun ja alueelliset muodot. Käyttää OpenCC-sanakirjaa pisin täsmäys ensin.',
+    who: 'Kaikki, jotka toimittavat tekstityksiä taiwanilaiselle tai hongkongilaiselle yleisölle, alueversioiden jakelijat ja editorit.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'el': {
+    title: 'Μετατροπέας κινεζικών υποτίτλων - απλοποιημένα ⇄ παραδοσιακά | AI-SRTSub',
+    desc: 'Μετατρέψτε δωρεάν τους κινεζικούς υπότιτλους: από απλοποιημένα σε παραδοσιακά (Ταϊβάν ή Χονγκ Κονγκ) και αντίστροφα. Αλλάζουν μόνο οι διάλογοι — οι χρονικοί κωδικοί και οι ετικέτες ASS παραμένουν ίδιες. Με το λεξικό OpenCC.',
+    kw: 'μετατροπέας κινεζικών υποτίτλων,απλοποιημένα σε παραδοσιακά,παραδοσιακά σε απλοποιημένα,srt παραδοσιακά κινεζικά,μετατροπή υποτίτλων κινεζικά,παραδοσιακά ταϊβάν,παραδοσιακά χονγκ κονγκ,μετατροπή χαρακτήρων,srt σε παραδοσιακά κινεζικά,απλοποιημένα κινεζικά srt,opencc υπότιτλοι',
+    intro: 'Μετατρέψτε ολόκληρο το αρχείο υποτίτλων μεταξύ απλοποιημένων και παραδοσιακών κινεζικών, αλλάζοντας μόνο τους διαλόγους.',
+    feat: 'Εννέα κατευθύνσεις: γενικά παραδοσιακά, λεξιλόγιο Ταϊβάν, μορφές Ταϊβάν, Χονγκ Κονγκ, επιστροφή στα απλοποιημένα και περιφερειακές μορφές. Χρησιμοποιεί το λεξικό OpenCC με πρώτη τη μεγαλύτερη αντιστοίχιση.',
+    who: 'Όσοι παραδίδουν υπότιτλους σε κοινό Ταϊβάν ή Χονγκ Κονγκ, διανομείς περιφερειακών εκδόσεων και μοντέρ.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'he': {
+    title: 'ממיר כתוביות סיניות - מפושט ⇄ מסורתי | AI-SRTSub',
+    desc: 'המירו חינם כתוביות סיניות: מפושטת למסורתית (טאיוואן או הונג קונג) ובחזרה. רק הדיאלוגים משתנים — קודי זמן, מספרים ותגיות עיצוב ASS נותרים זהים. מבוסס על מילון OpenCC.',
+    kw: 'ממיר כתוביות סיניות,מפושטת למסורתית,מסורתית למפושטת,srt סינית מסורתית,המרת כתוביות סינית,סינית מסורתית טאיוואן,סינית מסורתית הונג קונג,המרת תווים,srt לסינית מסורתית,סינית מפושטת srt,opencc כתוביות',
+    intro: 'המירו קובץ כתוביות שלם בין סינית מפושטת למסורתית בלי לשנות שום דבר מלבד הדיאלוגים.',
+    feat: 'תשעה כיוונים: מסורתית כללית, אוצר מילים טאיוואני, צורות טאיוואניות, הונג קונג, חזרה למפושטת וצורות אזוריות. משתמש במילון OpenCC עם התאמה ארוכה ביותר קודם.',
+    who: 'כל מי שמספק כתוביות לקהל בטאיוואן או בהונג קונג, מפיצים של גרסאות אזוריות ועורכים.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  },
+  'ro': {
+    title: 'Convertor de subtitrări chinezești - simplificat ⇄ tradițional | AI-SRTSub',
+    desc: 'Convertește gratuit subtitrările chinezești: din simplificat în tradițional (Taiwan sau Hong Kong) și invers. Se schimbă doar replicile — codurile de timp, numerele și etichetele de stil ASS rămân identice. Bazat pe dicționarul OpenCC.',
+    kw: 'convertor subtitrări chinezești,simplificat în tradițional,tradițional în simplificat,srt chineză tradițională,conversie subtitrări chineză,chineză tradițională taiwan,chineză tradițională hong kong,conversie caractere,srt în chineză tradițională,chineză simplificată srt,opencc subtitrări',
+    intro: 'Convertește un întreg fișier de subtitrări între chineza simplificată și cea tradițională, fără să schimbi altceva în afară de replici.',
+    feat: 'Nouă direcții: tradițional general, vocabular taiwanez, forme taiwaneze, Hong Kong, înapoi la simplificat și forme regionale. Folosește dicționarul OpenCC cu cea mai lungă potrivire întâi.',
+    who: 'Oricine livrează subtitrări pentru publicul din Taiwan sau Hong Kong, distribuitorii de versiuni regionale și editorii.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Chinese Simplified Traditional Converter'
+  }
+};
+
 const SEO_PAGES = {
   index: { file: 'index.html', table: SEO, path: SEO_PATH, jsonldType: 'WebApplication' },
   merge: { file: 'merge.html', table: SEO_MERGE, path: MERGE_PATH, jsonldType: 'WebApplication' },
@@ -3175,7 +3678,11 @@ const SEO_PAGES = {
   /* v0.9.299：第九个页面 —— 字幕提取纯文本 */
   extract: { file: 'extract.html', table: SEO_EXTRACT, path: EXTRACT_PATH, jsonldType: 'WebApplication' },
   /* v0.9.302：第十个页面 —— 字幕术语批量替换 */
-  glossary: { file: 'glossary.html', table: SEO_GLOSSARY, path: GLOSSARY_PATH, jsonldType: 'WebApplication' }
+  glossary: { file: 'glossary.html', table: SEO_GLOSSARY, path: GLOSSARY_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.313：第十一个页面 —— 视频内封字幕提取 */
+  videosub: { file: 'videosub.html', table: SEO_VIDEOSUB, path: VIDEOSUB_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.313：第十二个页面 —— 中文字幕繁简转换 */
+  hanconv: { file: 'hanconv.html', table: SEO_HANCONV, path: HANCONV_PATH, jsonldType: 'WebApplication' }
 };
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
@@ -3316,12 +3823,14 @@ function serveIndexLang(req, res, lang, page){
   });
 }
 
-/* sitemap：十页 × 27 语言 = 270 条 URL，每条带本页的 hreflang alternates。
+/* sitemap：十二页 × 27 语言 = 324 条 URL，每条带本页的 hreflang alternates。
    v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。
    v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。
    v0.9.288 起字幕格式转换独立成 /convert.html，第五个页面进表。
    v0.9.296 起字幕乱码修复独立成 /repair.html，第八个页面进表。
-   v0.9.299 起字幕提取纯文本独立成 /extract.html，第九个页面进表。 */
+   v0.9.299 起字幕提取纯文本独立成 /extract.html，第九个页面进表。
+   v0.9.302 起术语批量替换独立成 /glossary.html，第十个页面进表。
+   v0.9.313 起视频内封字幕提取 /videosub.html、繁简转换 /hanconv.html 进表，共十二页 324 条。 */
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {
@@ -4155,8 +4664,8 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { ok: true });
     }
 
-    /* v0.9.308：六个垂直工具页的统一使用记录上报（公开轻接口，fire-and-forget，同上规格）。
-       body: {page:'shift'|'convert'|'extract'|'bilingual'|'repair'|'glossary',
+    /* v0.9.308：八个垂直工具页的统一使用记录上报（公开轻接口，fire-and-forget，同上规格）。
+       body: {page:'shift'|'convert'|'extract'|'bilingual'|'repair'|'glossary'|'videosub'|'hanconv',
               act:'check'|'apply'|'edit'|'align'|'convert'|'extract'|'merge'|'split'|'repair'|'replace'|'export',
               cues?, n?, fmt?}
        ⚠️ page 或 act 不在白名单里就整条丢弃（不记账）—— 认不出来的脏数据会污染统计。
@@ -4378,7 +4887,7 @@ const server = http.createServer(async (req, res) => {
 
       /* v0.9.308：六个垂直工具页的统一使用记录。
          与上面三本账平级、独立一个文件；返回里多一块 byPage —— 后台要靠它横向对比
-         「六个 SEO 入口哪一页最忙」，只看总数等于没看。 */
+         「八个 SEO 入口哪一页最忙」，只看总数等于没看。 */
       if (req.method === 'GET' && u === '/api/admin/tool-events') {
         let q = {};
         try { q = Object.fromEntries(new URL('http://x' + req.url).searchParams); } catch (e) {}
@@ -4386,7 +4895,7 @@ const server = http.createServer(async (req, res) => {
         const today = todayStr();
         const todays = all.filter(e => dateOfTs(e.t) === today);
         /* 按页汇总：count + 独立 IP + 导出数 + 今日数。
-           ⚠️ 六个页面名在这里补齐（哪怕一条记录都没有也要出现），
+           ⚠️ 八个页面名在这里补齐（哪怕一条记录都没有也要出现），
               否则后台表格会随数据漂移 —— 昨天没人的页今天突然没名字，看着像坏了。 */
         const pm = new Map();
         for (const p of Object.keys(TOOL_PAGE)) pm.set(p, { page: p, n: 0, ips: new Set(), exported: 0, today: 0 });

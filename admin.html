@@ -758,13 +758,16 @@ $('clPager').addEventListener('click', e => {
 $('btnRefreshClean').addEventListener('click', loadCleanEvents);
 
 /* v0.9.308：六个垂直工具页的统一使用记录（第四张卡，与前三张互不影响）。
+   v0.9.313：加上 videosub / hanconv 两页，共八个。
    ⚠️ 页面名与动作名要翻成中文 —— 后台是给站长看的，别甩 shift / replace 这种内部 id。
       ⚠️ 与 server.js 的 TOOL_PAGE / TOOL_ACT 白名单一一对应，加页或加动作必须同步这里，
          否则后台表格里会出现「认不出来的原始码」，等于没翻译。 */
 let tlPage = 1;
 const TL_PAGE_TXT = {
   shift: '时间轴调整', convert: '格式转换', extract: '字幕提取',
-  bilingual: '双语处理', repair: '乱码修复', glossary: '术语替换'
+  bilingual: '双语处理', repair: '乱码修复', glossary: '术语替换',
+  /* v0.9.313：第十一、十二页 */
+  videosub: '视频提取字幕', hanconv: '繁简转换'
 };
 const TL_ACT_TXT = {
   edit: '跑了流水线', apply: '改了一条', convert: '完成转换', extract: '完成提取',
@@ -782,13 +785,13 @@ async function loadToolEvents(){
     if (j.topActs && j.topActs[0]) chips.push('最常做：<b>' + esc(j.topActs.slice(0, 3).map(x => (TL_ACT_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
     chips.push('累计 <b>' + j.total + '</b> 条');
     $('tlStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
-    /* 按页汇总：六个 SEO 入口横向对比。没人用过的页也要出现在表里（服务端已补齐六个），
+    /* 按页汇总：八个 SEO 入口横向对比。没人用过的页也要出现在表里（服务端已补齐八个），
        否则站长会怀疑「这一页是不是挂了」，而不是「就是没人来」。 */
     const busiest = (j.byPage || []).filter(r => r.n > 0);
     const topN = busiest.length ? busiest[0].n : 0;
     $('tlPageRows').innerHTML = (j.byPage || []).map(r => {
       const nm = '<b>' + esc(TL_PAGE_TXT[r.page] || r.page) + '</b>';
-      /* 最忙的那一页加粗+主色，一眼看出六个入口的主力是哪个 */
+      /* 最忙的那一页加粗+主色，一眼看出八个入口的主力是哪个 */
       const cnt = (r.n > 0 && r.n === topN) ? '<b style="color:var(--pri)">' + r.n + '</b>'
         : (r.n ? '<b>' + r.n + '</b>' : '<span style="color:var(--mut)">0</span>');
       const noexp = r.n > 0 && r.exported === 0;
@@ -807,7 +810,7 @@ async function loadToolEvents(){
       return '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) +
         '</td><td>' + esc(TL_PAGE_TXT[e.page] || e.page) + '</td><td>' + actTd +
         '</td><td>' + (e.cues || '-') + '</td><td>' + nTd + '</td><td>' + fmtTd + '</td></tr>';
-    }).join('') || '<tr><td colspan="7" style="color:var(--mut)">暂无记录（用户在六个垂直工具页上处理字幕或下载结果后会出现在这里）</td></tr>';
+    }).join('') || '<tr><td colspan="7" style="color:var(--mut)">暂无记录（用户在八个垂直工具页上处理字幕或下载结果后会出现在这里）</td></tr>';
     renderPager(j, 'tlPager', tlPage);
   }
   catch (e) { /* 记录区加载失败不影响主配置页 */ }
