@@ -592,10 +592,14 @@ const TEVENTS_MAX = 3000;
 const TOOL_PAGE = {
   shift: 'shift', convert: 'convert', extract: 'extract',
   bilingual: 'bilingual', repair: 'repair', glossary: 'glossary',
-  videosub: 'videosub', hanconv: 'hanconv'
+  videosub: 'videosub', hanconv: 'hanconv',
+  /* v0.9.316：四个新工具页进账（纯前端页，与上六页同一本账） */
+  split: 'split', table: 'table', batch: 'batch', lrc: 'lrc'
 };
 /* ⚠️ 动作白名单：与六页各自埋点处传的 act 一一对应（逐页对齐，共 14 个）。
-      加减动作两边必须同步，否则新动作被记成空值 —— 用户明明用了，后台却看不到。 */
+      加减动作两边必须同步，否则新动作被记成空值 —— 用户明明用了，后台却看不到。
+      v0.9.316 四页复用现有动作不新增：split 页 split/merge，table 页 convert/merge，
+      batch 页 convert，lrc 页 export。 */
 const TOOL_ACT = {
   /* shift 时间轴调整：跑了流水线 / 用户改了一条 */
   edit: 'edit', apply: 'apply',
@@ -610,7 +614,9 @@ const TOOL_ACT = {
   /* 六页共用的「真的下载了文件」 */
   export: 'export'
 };
-const TOOL_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt', json: 'json' };
+const TOOL_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt', json: 'json',
+  /* v0.9.316：table 页 xlsx/csv、batch 页 zip、lrc 页 lrc */
+  xlsx: 'xlsx', csv: 'csv', zip: 'zip', lrc: 'lrc' };
 function readTEvents(){
   try {
     const j = JSON.parse(fs.readFileSync(TEVENTS_PATH, 'utf8'));
@@ -738,11 +744,11 @@ function serveStatic(req, res, urlPath){
      ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
      会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
   /* v0.9.288：转换页 /convert.html 与 /en/convert.html */
-  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv)\.html$/);
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv|split|table|batch|lrc)\.html$/);
   if (pm && SEO_ROUTE['/' + pm[1]]) {
     serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
   }
-  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv)\.html$/);
+  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv|split|table|batch|lrc)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
@@ -1867,7 +1873,7 @@ const SEO_GLOSSARY = {
   }
 };
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {}, SPLIT_PATH = {}, TABLE_PATH = {}, BATCH_PATH = {}, LRC_PATH = {};
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
   CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
@@ -1888,6 +1894,11 @@ SEO_LANGS.forEach(function (l) {
   VIDEOSUB_PATH[l] = (l === 'zh-CN') ? '/videosub.html' : '/' + l + '/videosub.html';
   /* v0.9.313：中文字幕繁简转换页 */
   HANCONV_PATH[l] = (l === 'zh-CN') ? '/hanconv.html' : '/' + l + '/hanconv.html';
+  /* v0.9.316：四个新工具页 */
+  SPLIT_PATH[l] = (l === 'zh-CN') ? '/split.html' : '/' + l + '/split.html';
+  TABLE_PATH[l] = (l === 'zh-CN') ? '/table.html' : '/' + l + '/table.html';
+  BATCH_PATH[l] = (l === 'zh-CN') ? '/batch.html' : '/' + l + '/batch.html';
+  LRC_PATH[l] = (l === 'zh-CN') ? '/lrc.html' : '/' + l + '/lrc.html';
 });
 /* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
    ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
@@ -3662,6 +3673,994 @@ const SEO_HANCONV = {
   }
 };
 
+/* v0.9.316：第十三个页面 —— 字幕拆分与拼接 /split.html 的 SEO 表。与既有十二张表同规格。 */
+const SEO_SPLIT = {
+  'zh-CN': {
+    title: '字幕拆分与拼接 - 切成多段 / 多份合一 | 随心字幕 AI',
+    desc: '免费在线拆分和拼接字幕文件：按时长或条数把一份字幕切成多段，每段可从零开始计时；也能把多份按顺序拼成一集，或保留时间戳交织合并。序号自动重排，台词一个字不改。支持 SRT、VTT。',
+    kw: '字幕拆分,字幕拼接,srt拆分,srt合并,字幕分割,字幕合并成一个,srt splitter,merge srt files,split subtitle,combine subtitles',
+    intro: '把一份长字幕切成多段，或把多份散字幕拼成一份。全程在浏览器里完成，文件不上传。',
+    feat: '按时长或条数拆分、每段重新从零计时；多份按顺序拼接或按时间交织合并，序号自动重排，台词一字不改。支持 SRT、VTT。',
+    who: '要做分集上传、分段校对、多段字幕合并的创作者、译制组、剪辑师。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'zh-TW': {
+    title: '字幕拆分與拼接 - 切成多段 / 多份合一 | 隨心字幕 AI',
+    desc: '免費線上拆分和拼接字幕檔案：按時長或條數把一份字幕切成多段，每段可從零開始計時；也能把多份按順序拼成一集，或保留時間戳交織合併。序號自動重排，台詞一個字不改。支援 SRT、VTT。',
+    kw: '字幕拆分,字幕拼接,srt拆分,srt合併,字幕分割,字幕合併成一個,srt splitter,merge srt files,split subtitle,combine subtitles',
+    intro: '把一份長字幕切成多段，或把多份散字幕拼成一份。全程在瀏覽器裡完成，檔案不上傳。',
+    feat: '按時長或條數拆分、每段重新從零計時；多份按順序拼接或按時間交織合併，序號自動重排，台詞一字不改。支援 SRT、VTT。',
+    who: '要做分集上傳、分段校對、多段字幕合併的創作者、譯製組、剪輯師。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'en': {
+    title: 'Subtitle Splitter & Merger - SRT / VTT | AI-SRTSub',
+    desc: 'Split subtitles by duration or count, or join many files in order or by timestamp. Renumbering is automatic, dialogue untouched. SRT & VTT.',
+    kw: 'subtitle splitter,split subtitles,merge srt files,srt merger,combine subtitles,split srt,join srt files,cut subtitles,split vtt,subtitle merger',
+    intro: 'Cut one long subtitle into parts, or join many files into one. Runs fully in your browser — nothing is uploaded.',
+    feat: 'Split by duration or count with per-part renumbering and optional zero-based timing; join sequentially with a gap or interleave by original timestamps. SRT and VTT.',
+    who: 'Creators splitting episodes for upload, teams reviewing in parts, and editors merging multi-part subtitles.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'ja': {
+    title: '字幕の分割・結合 - SRT / VTT 対応 | AI-SRTSub',
+    desc: '字幕を無料で分割・結合：長さや条数で分割、複数ファイルを順番に連結、またはタイムスタンプで統合。番号は自動振り直し、セリフは一切変更しません。SRT / VTT 対応。',
+    kw: '字幕 分割,字幕 結合,srt 分割,srt 結合,字幕 連結,subtitle splitter,merge srt files,split subtitle,combine subtitles',
+    intro: '長い字幕を複数パートに分割、または複数ファイルを 1 本に結合。すべてブラウザ内で処理され、ファイルはアップロードされません。',
+    feat: '長さ・条数での分割（各パートをゼロから計測可能）、順次連結またはタイムスタンプでの統合。番号は自動で振り直されます。SRT / VTT 対応。',
+    who: 'アップロード用にエピソードを分割するクリエイター、分担チェックする翻訳チーム、複数パートの字幕を統合する編集者。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'es': {
+    title: 'Dividir y unir subtítulos - SRT / VTT | AI-SRTSub',
+    desc: 'Divide subtítulos por duración o número de líneas, o une varios archivos en orden o por marca de tiempo. Renumeración automática, diálogos intactos. SRT y VTT.',
+    kw: 'dividir subtítulos,unir subtítulos,dividir srt,unir srt,combinar subtítulos,subtitle splitter,merge srt files,split subtitle',
+    intro: 'Corta un subtítulo largo en partes o une varios archivos en uno. Todo ocurre en tu navegador; nada se sube.',
+    feat: 'División por duración o número con renumeración automática y reinicio de tiempos opcional; unión secuencial o por marcas de tiempo. SRT y VTT.',
+    who: 'Creadores que trocean episodios, equipos que revisan por partes y editores que unen subtítulos multiparte.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'pt': {
+    title: 'Dividir e unir legendas - SRT / VTT | AI-SRTSub',
+    desc: 'Divida legendas por duração ou número de linhas, ou una vários arquivos em ordem ou por marca de tempo. Renumeração automática, diálogos intactos. SRT e VTT.',
+    kw: 'dividir legendas,unir legendas,dividir srt,unir srt,combinar legendas,subtitle splitter,merge srt files,split subtitle',
+    intro: 'Corte uma legenda longa em partes ou una vários arquivos em um só. Tudo no navegador, nada é enviado.',
+    feat: 'Divisão por duração ou número com renumeração automática e reinício opcional dos tempos; união sequencial ou por marcas de tempo. SRT e VTT.',
+    who: 'Criadores que dividem episódios, equipes que revisam por partes e editores que unem legendas multiparte.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'ko': {
+    title: '자막 분할·병합 - SRT / VTT | AI-SRTSub',
+    desc: '자막을 길이나 줄 수로 분할하거나, 여러 파일을 순서대로 또는 타임스탬프 기준으로 하나로 합칩니다. 번호는 자동으로 다시 매겨지고 대사는 그대로입니다. SRT / VTT 지원.',
+    kw: '자막 분할,자막 병합,srt 분할,srt 병합,자막 합치기,subtitle splitter,merge srt files,split subtitle',
+    intro: '긴 자막을 여러 파트로 나누거나 여러 파일을 하나로 합칩니다. 모두 브라우저에서 처리되며 파일은 업로드되지 않습니다.',
+    feat: '길이·줄 수 기준 분할(파트별 0초 시작 가능), 순차 연결 또는 타임스탬프 기준 병합. 번호는 자동으로 재정렬됩니다. SRT / VTT 지원.',
+    who: '업로드용으로 에피소드를 나누는 크리에이터, 분담 검수하는 팀, 여러 파트 자막을 합치는 편집자.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'de': {
+    title: 'Untertitel teilen & zusammenfügen | AI-SRTSub',
+    desc: 'Untertitel nach Dauer oder Zeilen teilen oder viele Dateien geordnet oder nach Zeitstempel vereinen. Nummerierung automatisch, Text bleibt. SRT & VTT.',
+    kw: 'untertitel teilen,untertitel zusammenfügen,srt teilen,srt zusammenfügen,untertitel splitten,subtitle splitter,merge srt files',
+    intro: 'Einen langen Untertitel in Teile schneiden oder viele Dateien zu einem vereinen. Läuft komplett im Browser, nichts wird hochgeladen.',
+    feat: 'Teilung nach Dauer oder Anzahl mit automatischer Nummerierung und optionalem Neustart bei null; sequentielles oder zeitstempelbasiertes Vereinen. SRT und VTT.',
+    who: 'Creator, die Episoden aufteilen, Teams, die in Teilen prüfen, und Cutter, die mehrteilige Untertitel vereinen.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'fr': {
+    title: 'Découper et fusionner des sous-titres | AI-SRTSub',
+    desc: "Découpez des sous-titres par durée ou nombre, ou fusionnez des fichiers dans l'ordre ou par horodatage. Renumérotation automatique, dialogues intacts. SRT et VTT.",
+    kw: 'découper sous-titres,fusionner sous-titres,diviser srt,fusionner srt,combiner sous-titres,subtitle splitter,merge srt files',
+    intro: "Coupez un long sous-titre en parties ou fusionnez plusieurs fichiers en un seul. Tout se passe dans le navigateur, rien n'est envoyé.",
+    feat: 'Découpage par durée ou nombre avec renumérotation automatique et redémarrage optionnel à zéro ; fusion séquentielle ou par horodatage. SRT et VTT.',
+    who: 'Créateurs qui découpent des épisodes, équipes qui vérifient par parties et monteurs qui fusionnent des sous-titres.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'id': {
+    title: 'Pisah & Gabung Subtitle - SRT / VTT | AI-SRTSub',
+    desc: 'Pisahkan subtitle berdasarkan durasi atau jumlah baris, atau gabungkan banyak file berurutan atau menurut stempel waktu. Penomoran otomatis, dialog utuh. SRT & VTT.',
+    kw: 'pisah subtitle,gabung subtitle,split srt,merge srt,gabung srt,subtitle splitter,merge srt files',
+    intro: 'Potong subtitle panjang menjadi beberapa bagian atau gabungkan banyak file menjadi satu. Semua di browser, tak ada unggahan.',
+    feat: 'Pemisahan menurut durasi atau jumlah dengan penomoran otomatis dan mulai dari nol opsional; penggabungan berurutan atau menurut stempel waktu. SRT dan VTT.',
+    who: 'Kreator yang membagi episode, tim yang meninjau per bagian, dan editor yang menggabungkan subtitle multi-bagian.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'hi': {
+    title: 'सबटाइटल स्प्लिटर और मर्जर | AI-SRTSub',
+    desc: 'सबटाइटल को अवधि या पंक्तियों की संख्या से बाँटें, या कई फ़ाइलों को क्रम या टाइमस्टैम्प से जोड़ें। नंबरिंग स्वतः, संवाद अपरिवर्तित। SRT और VTT।',
+    kw: 'सबटाइटल स्प्लिटर,सबटाइटल मर्जर,srt स्प्लिट,srt मर्ज,subtitle splitter,merge srt files',
+    intro: 'लंबे सबटाइटल को भागों में बाँटें या कई फ़ाइलों को एक में जोड़ें। सब ब्राउज़र में होता है, कुछ अपलोड नहीं होता।',
+    feat: 'अवधि या संख्या से विभाजन, स्वतः नंबरिंग और वैकल्पिक शून्य-आधारित समय; क्रमबद्ध या टाइमस्टैम्प से संयोजन। SRT और VTT।',
+    who: 'एपिसोड बाँटने वाले क्रिएटर, भागों में समीक्षा करने वाली टीमें और बहु-भाग सबटाइटल जोड़ने वाले एडिटर।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'th': {
+    title: 'แยกและรวมซับไทย - SRT / VTT | AI-SRTSub',
+    desc: 'แยกซับตามความยาวหรือจำนวนบรรทัด หรือรวมหลายไฟล์ตามลำดับหรือตาม timestamp โน้มตัวเลขใหม่อัตโนมัติ ไม่แตะต้องบทสนทนา รองรับ SRT และ VTT',
+    kw: 'แยกซับ,รวมซับ,split srt,merge srt,รวมไฟล์ซับ,subtitle splitter,merge srt files',
+    intro: 'ตัดซับยาว ๆ เป็นหลายช่วง หรือรวมหลายไฟล์เป็นหนึ่งเดียว ทำทั้งหมดในเบราว์เซอร์ ไม่มีการอัปโหลดไฟล์',
+    feat: 'แยกตามความยาวหรือจำนวนบรรทัด เริ่มนับใหม่จากศูนย์ได้ รวมแบบเรียงลำดับหรือแทรกตาม timestamp รองรับ SRT และ VTT',
+    who: 'ครีเอเตอร์ที่แยกตอนเพื่ออัปโหลด ทีมที่ตรวจทีละช่วง และคนตัดต่อที่รวมซับหลายส่วนเข้าด้วยกัน',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'vi': {
+    title: 'Tách và gộp phụ đề - SRT / VTT | AI-SRTSub',
+    desc: 'Tách phụ đề theo thời lượng hoặc số dòng, hoặc gộp nhiều file theo thứ tự hay theo timestamp. Đánh số lại tự động, lời thoại giữ nguyên. Hỗ trợ SRT và VTT.',
+    kw: 'tách phụ đề,gộp phụ đề,tách srt,gộp srt,subtitle splitter,merge srt files',
+    intro: 'Cắt một phụ đề dài thành nhiều phần hoặc gộp nhiều file thành một. Mọi thứ chạy trong trình duyệt, không tải lên đâu cả.',
+    feat: 'Tách theo thời lượng hoặc số dòng, có thể tính lại từ 0; gộp theo thứ tự hoặc đan xen theo timestamp. Hỗ trợ SRT và VTT.',
+    who: 'Creator tách tập để đăng tải, đội soát từng phần, và biên tập viên gộp phụ đề nhiều phần.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'ru': {
+    title: 'Разделение и склейка субтитров | AI-SRTSub',
+    desc: 'Разрезайте субтитры по длительности или числу строк либо склеивайте файлы по порядку или по меткам времени. Нумерация заново, реплики без изменений. SRT и VTT.',
+    kw: 'разделить субтитры,склеить субтитры,разделить srt,склеить srt,объединить субтитры,subtitle splitter,merge srt files',
+    intro: 'Разрежьте длинные субтитры на части или склейте несколько файлов в один. Всё в браузере, ничего не загружается.',
+    feat: 'Разрезка по длительности или количеству строк со сбросом времени на ноль; склейка по порядку или по меткам времени. SRT и VTT.',
+    who: 'Авторы, режущие эпизоды на части, команды с проверкой по частям и монтажёры, склеивающие многотомные субтитры.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'it': {
+    title: 'Dividi e unisci sottotitoli | AI-SRTSub',
+    desc: 'Dividi sottotitoli per durata o numero di righe, o unisci più file in ordine o per timestamp. Rinumerazione automatica, dialoghi intatti. SRT e VTT.',
+    kw: 'dividere sottotitoli,unire sottotitoli,dividere srt,unire srt,combinare sottotitoli,subtitle splitter,merge srt files',
+    intro: 'Taglia un sottotitolo lungo in parti o unisci più file in uno. Tutto nel browser, nessun caricamento.',
+    feat: 'Divisione per durata o numero con rinumerazione automatica e ripartenza opzionale da zero; unione sequenziale o per timestamp. SRT e VTT.',
+    who: 'Creator che dividono episodi, team che revisionano a parti e montatori che uniscono sottotitoli in più parti.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'ar': {
+    title: 'تقسيم ودمج الترجمات - SRT / VTT | AI-SRTSub',
+    desc: 'قسّم ملفات الترجمة حسب المدة أو عدد الأسطر، أو ادمج عدة ملفات بالترتيب أو حسب الطوابع الزمنية. ترقيم تلقائي جديد والحوارات بلا تغيير. يدعم SRT و VTT.',
+    kw: 'تقسيم الترجمة,دمج الترجمة,تقسيم srt,دمج srt,subtitle splitter,merge srt files',
+    intro: 'قسّم ترجمة طويلة إلى أجزاء أو ادمج عدة ملفات في واحد. كل شيء في المتصفح ولا يُرفع أي ملف.',
+    feat: 'التقسيم حسب المدة أو العدد مع إعادة الترقيم تلقائيًا وإمكانية العد من الصفر؛ الدمج بالتسلسل أو حسب الطوابع الزمنية. يدعم SRT و VTT.',
+    who: 'صنّاع محتوى يقسمون الحلقات، وفرق تراجع جزءًا جزءًا، ومونتيرات يدمجون ترجمات متعددة الأجزاء.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'tr': {
+    title: 'Altyazı bölme ve birleştirme | AI-SRTSub',
+    desc: 'Altyazıları süreye veya satıra göre bölün ya da çok dosyayı sırayla veya zamana göre birleştirin. Numaralama otomatik, diyaloglara dokunulmaz. SRT ve VTT.',
+    kw: 'altyazı bölme,altyazı birleştirme,srt bölme,srt birleştirme,subtitle splitter,merge srt files',
+    intro: 'Uzun bir altyazıyı parçalara bölün veya çok sayıda dosyayı tek dosyada birleştirin. Hepsi tarayıcıda olur, hiçbir şey yüklenmez.',
+    feat: 'Süreye veya sayıya göre bölme, sıfırdan başlatma seçeneğiyle otomatik numaralama; sıralı veya zaman damgalı birleştirme. SRT ve VTT.',
+    who: 'Bölümleri ayıran içerik üreticileri, parça parça kontrol eden ekipler ve çok parçalı altyazıları birleştiren kurgucular.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'nl': {
+    title: 'Ondertitels splitsen en samenvoegen | AI-SRTSub',
+    desc: 'Splits ondertitels op duur of regelental, of voeg vele bestanden op volgorde of op timestamp samen. Automatische hernummering, dialogen onaangeroerd. SRT en VTT.',
+    kw: 'ondertitels splitsen,ondertitels samenvoegen,srt splitsen,srt samenvoegen,subtitle splitter,merge srt files',
+    intro: 'Knip een lange ondertitel in delen of voeg vele bestanden samen tot één. Alles in de browser, niets wordt geüpload.',
+    feat: 'Splitsen op duur of aantal met automatische hernummering en optioneel vanaf nul; sequentieel of op timestamp samenvoegen. SRT en VTT.',
+    who: 'Creators die afleveringen knippen, teams die per deel controleren en editors die meerdelige ondertitels samenvoegen.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'pl': {
+    title: 'Dzielenie i łączenie napisów | AI-SRTSub',
+    desc: 'Podziel napisy według czasu lub liczby linii albo połącz wiele plików po kolei lub według znaczników czasu. Automatyczna numeracja, dialogi bez zmian. SRT i VTT.',
+    kw: 'dzielenie napisów,łączenie napisów,podziel srt,połącz srt,subtitle splitter,merge srt files',
+    intro: 'Potnij długie napisy na części albo połącz wiele plików w jeden. Wszystko w przeglądarce, nic nie jest wysyłane.',
+    feat: 'Dzielenie według czasu lub liczby z automatyczną numeracją i opcjonalnym startem od zera; łączenie sekwencyjne lub po znacznikach czasu. SRT i VTT.',
+    who: 'Twórcy dzielący odcinki, zespoły sprawdzające częściami i montażyści łączący wieloczęściowe napisy.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'sv': {
+    title: 'Dela och slå ihop undertexter | AI-SRTSub',
+    desc: 'Dela undertexter efter längd eller antal rader, eller slå ihop många filer i ordning eller efter tidsstämpel. Automatisk omnumrering, dialoger orörda. SRT och VTT.',
+    kw: 'dela undertexter,slå ihop undertexter,dela srt,slå ihop srt,subtitle splitter,merge srt files',
+    intro: 'Klipp en lång undertext i delar eller slå ihop många filer till en. Allt sker i webbläsaren, inget laddas upp.',
+    feat: 'Delning efter längd eller antal med automatisk omnumrering och valfri nollställning; sammanslagning i ordning eller efter tidsstämplar. SRT och VTT.',
+    who: 'Skapare som delar avsnitt, team som granskar delvis och klippare som slår ihop flerdelade undertexter.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'cs': {
+    title: 'Dělení a slučování titulků | AI-SRTSub',
+    desc: 'Dělte titulky podle délky nebo počtu řádků, nebo slučujte mnoho souborů podle pořadí či časových značek. Automatické číslování, dialogy beze změny. SRT a VTT.',
+    kw: 'dělení titulků,slučování titulků,rozdělit srt,sloučit srt,subtitle splitter,merge srt files',
+    intro: 'Rozdělte dlouhé titulky na části nebo slučte mnoho souborů do jednoho. Vše v prohlížeči, nic se nenahrává.',
+    feat: 'Dělení podle délky nebo počtu s automatickým číslováním a volitelným startem od nuly; slučování postupně nebo podle časových značek. SRT a VTT.',
+    who: 'Tvůrci dělící epizody, týmy kontrolojící po částech a střihači slučující vícedílné titulky.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'uk': {
+    title: 'Розділення та склеювання субтитрів | AI-SRTSub',
+    desc: 'Ріжте субтитри за тривалістю або кількістю рядків або склеюйте багато файлів за порядком чи мітками часу. Автоматична нумерація, репліки без змін. SRT і VTT.',
+    kw: 'розділити субтитри,склеїти субтитри,розділити srt,склеїти srt,subtitle splitter,merge srt files',
+    intro: 'Розріжте довгі субтитри на частини або склейте багато файлів в один. Усе в браузері, нічого не завантажується.',
+    feat: 'Розділення за тривалістю або кількістю з автоматичною нумерацією та скиданням до нуля; склеювання послідовно або за мітками часу. SRT і VTT.',
+    who: 'Автори, що ділять епізоди, команди з перевіркою частинами та монтажери, що склеюють багаточастинні субтитри.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'da': {
+    title: 'Opdel og sæt undertekster sammen | AI-SRTSub',
+    desc: 'Opdel undertekster efter varighed eller linjeantal, eller sæt filer sammen i rækkefølge eller efter tidsstempel. Nummerering automatisk, dialog urørt.',
+    kw: 'opdel undertekster,sæt undertekster sammen,opdel srt,sæt srt sammen,subtitle splitter,merge srt files',
+    intro: 'Klip en lang undertekst i dele eller sæt mange filer sammen til én. Alt sker i browseren, intet uploades.',
+    feat: 'Opdeling efter varighed eller antal med automatisk nummerering og valgfri nulstilling; sammensætning i rækkefølge eller efter tidsstempler. SRT og VTT.',
+    who: 'Skabere der opdeler afsnit, teams der reviewer i dele og klippere der sætter flerdelte undertekster sammen.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'fi': {
+    title: 'Tekstitysten jakaminen ja yhdistäminen | AI-SRTSub',
+    desc: 'Jaa tekstityksiä keston tai rivimäärän mukaan tai yhdistä tiedostoja järjestyksessä tai aikaleimojen mukaan. Numerointi automaattinen, dialogi koskematon.',
+    kw: 'jaa tekstitys,yhdistä tekstitykset,jaa srt,yhdistä srt,subtitle splitter,merge srt files',
+    intro: 'Leikkaa pitkä tekstitys osiin tai yhdistä monta tiedostoa yhdeksi. Kaikki tapahtuu selaimessa, mitään ei lähetetä.',
+    feat: 'Jakaminen keston tai määrän mukaan automaattisella numeroinnilla ja valinnaisella nollasta aloittamisella; yhdistäminen järjestyksessä tai aikaleimojen mukaan. SRT ja VTT.',
+    who: 'Jaksuja jaavat tekijät, osissa tarkistavat tiimit ja moniosaisia tekstityksiä yhdistävät leikkaajat.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'el': {
+    title: 'Διαχωρισμός και συγχώνευση υποτίτλων | AI-SRTSub',
+    desc: 'Διαχωρίστε υπότιτλους κατά διάρκεια ή αριθμό γραμμών, ή συγχωνεύστε αρχεία με σειρά ή βάσει χρονοσφραγίδων. Αυτόματη αρίθμηση, διάλογοι ανέγγιχτοι. SRT και VTT.',
+    kw: 'διαχωρισμός υποτίτλων,συγχώνευση υποτίτλων,διαχωρισμός srt,συγχώνευση srt,subtitle splitter,merge srt files',
+    intro: 'Κόψτε έναν μακρύ υπότιτλο σε μέρη ή συγχωνεύστε πολλά αρχεία σε ένα. Όλα γίνονται στο πρόγραμμα περιήγησης, δεν ανεβαίνει τίποτα.',
+    feat: 'Διαχωρισμός κατά διάρκεια ή αριθμό με αυτόματη αρίθμηση και προαιρετικό μηδενισμό· συγχώνευση με σειρά ή βάσει χρονοσφραγίδων. SRT και VTT.',
+    who: 'Δημιουργοί που κόβουν επεισόδια, ομάδες που ελέγχουν τμηματικά και μοντέρ που συγχωνεύουν πολυμερείς υπότιτλους.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'he': {
+    title: 'פיצול ומיזוג כתוביות | AI-SRTSub',
+    desc: 'פצלו כתוביות לפי משך או מספר שורות, או מזגו קבצים רבים לפי סדר או לפי חותמות זמן. מספור אוטומטי מחדש, הדיאלוגים ללא שינוי. תומך SRT ו-VTT.',
+    kw: 'פיצול כתוביות,מיזוג כתוביות,פיצול srt,מיזוג srt,subtitle splitter,merge srt files',
+    intro: 'חתכו כתוביות ארוכות לחלקים או מזגו קבצים רבים לאחד. הכול מתבצע בדפדפן, שום דבר לא מועלה.',
+    feat: 'פיצול לפי משך או כמות עם מספור אוטומטי ואיפוס לאפס אופציונלי; מיזוג עוקב או לפי חותמות זמן. תומך SRT ו-VTT.',
+    who: 'יוצרים שמפצלים פרקים, צוותים שסוקרים חלק-חלק ועורכים שממזגים כתוביות מרובות חלקים.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+  'ro': {
+    title: 'Împărțire și îmbinare subtitrări | AI-SRTSub',
+    desc: 'Împărțiți subtitrări după durată sau număr de linii, sau îmbinați multe fișiere în ordine sau după timestamp. Numerotare automată, dialoguri neatinse. SRT și VTT.',
+    kw: 'împărțire subtitrări,îmbinare subtitrări,împarte srt,îmbină srt,subtitle splitter,merge srt files',
+    intro: 'Tăiați un subtitraj lung în părți sau îmbinați multe fișiere într-unul singur. Totul în browser, nimic nu se încarcă.',
+    feat: 'Împărțire după durată sau număr cu numerotare automată și repornire opțională de la zero; îmbinare secvențială sau după timestamp. SRT și VTT.',
+    who: 'Creatori care împart episoade, echipe care verifică pe părți și editori care îmbină subtitrări în mai multe părți.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Splitter and Merger'
+  },
+};
+
+/* v0.9.316：第十四个页面 —— 字幕 Excel/CSV 互转 /table.html 的 SEO 表。与既有十二张表同规格。 */
+const SEO_TABLE = {
+  'zh-CN': {
+    title: '字幕转 Excel/CSV 表格 - 批量翻译校对好帮手 | 随心字幕 AI',
+    desc: '免费在线字幕表格互转：把 SRT、VTT 字幕导出成 Excel（xlsx）或 CSV 表格，在 Excel 里逐行校对、翻译、批注后再导回字幕；时间列用文本保真，台词换行原样保留。全程在浏览器里完成，文件不上传。',
+    kw: '字幕转excel,srt转csv,srt转excel,excel转srt,csv转srt,字幕表格,subtitle to excel,srt to csv,excel to srt,subtitle spreadsheet',
+    intro: '把字幕导出成表格逐行校对翻译，改完再导回字幕。全程在浏览器里完成，文件不上传。',
+    feat: 'SRT、VTT 一键转 Excel（xlsx）或 CSV，在表格里改时间、改台词、写批注，再导回 SRT、VTT。时间列按文本原样保留不丢毫秒，台词里的换行原样进单元格。支持中英文列头，识别不了的行自动跳过。',
+    who: '要做翻译校对、团队协作审稿、批量修改字幕的译者、译制组、剪辑师。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'zh-TW': {
+    title: '字幕轉 Excel/CSV 表格 - 批量翻譯校對好幫手 | 隨心字幕 AI',
+    desc: '免費線上字幕表格互轉：把 SRT、VTT 字幕匯出成 Excel（xlsx）或 CSV 表格，在 Excel 裡逐行校對、翻譯、批註後再匯回字幕；時間欄用文字保真，台詞換行原樣保留。全程在瀏覽器裡完成，檔案不上傳。',
+    kw: '字幕轉excel,srt轉csv,srt轉excel,excel轉srt,csv轉srt,字幕表格,subtitle to excel,srt to csv,excel to srt,subtitle spreadsheet',
+    intro: '把字幕匯出成表格逐行校對翻譯，改完再匯回字幕。全程在瀏覽器裡完成，檔案不上傳。',
+    feat: 'SRT、VTT 一鍵轉 Excel（xlsx）或 CSV，在表格裡改時間、改台詞、寫批註，再匯回 SRT、VTT。時間欄按文字原樣保留不丟毫秒，台詞裡的換行原樣進儲存格。支援中英文欄頭，識別不了的行自動跳過。',
+    who: '要做翻譯校對、團隊協作審稿、批量修改字幕的譯者、譯製組、剪輯師。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'en': {
+    title: 'Subtitles to Excel/CSV and Back | AI-SRTSub',
+    desc: 'Turn SRT or VTT into an Excel or CSV sheet for review and translation, then bring it back. Timecodes stay exact, line breaks survive. Nothing uploads.',
+    kw: 'subtitle to excel,srt to csv,srt to excel,excel to srt,csv to srt,subtitle spreadsheet,subtitle converter table',
+    intro: 'Export subtitles to a spreadsheet for review and translation, then import the sheet back. Runs fully in your browser.',
+    feat: 'One click from SRT or VTT to xlsx or CSV; edit times, text and notes in your spreadsheet, then export back to SRT or VTT. Time columns keep full millisecond precision; in-cell line breaks are preserved. Chinese and English headers both work.',
+    who: 'Translators, fansub teams and editors who review, annotate or batch-fix subtitles in a spreadsheet.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'ja': {
+    title: '字幕を Excel/CSV に変換 | AI-SRTSub',
+    desc: 'SRT・VTT を Excel（xlsx）や CSV に書き出し、表で訳文チェック・翻訳・注記をつけ、また字幕に戻せます。時間はテキストで保持され、改行もそのまま。ブラウザ内で完結します。',
+    kw: '字幕 excel,srt csv 変換,srt excel,excel 字幕,subtitle to excel,srt to csv',
+    intro: '字幕を表計算に出して訳文をチェックし、編集後に字幕へ戻します。すべてブラウザ内で処理されます。',
+    feat: 'SRT・VTT をワンクリックで xlsx・CSV に。表で時間・テキスト・注記を編集し、SRT・VTT に戻せます。時間列はミリ秒まで保持、セル内改行も維持。中国語・英語の列ヘッダーに対応。',
+    who: '表計算で字幕を校正・翻訳・注記する翻訳者、ファンサブ、編集者。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'es': {
+    title: 'Subtítulos a Excel/CSV y al revés | AI-SRTSub',
+    desc: 'Pasa SRT o VTT a una hoja Excel o CSV para revisar y traducir línea a línea, y vuelve a subtítulos. Los tiempos siguen exactos y los saltos de línea se conservan.',
+    kw: 'subtítulos a excel,srt a csv,srt a excel,excel a srt,csv a srt,subtitle to excel',
+    intro: 'Exporta subtítulos a una hoja de cálculo para revisarlos y traducirlos, y luego importa la hoja de vuelta. Todo en tu navegador.',
+    feat: 'De SRT o VTT a xlsx o CSV en un clic; edita tiempos, texto y notas en tu hoja y exporta de nuevo a SRT o VTT. Las columnas de tiempo conservan los milisegundos y los saltos de línea en celda se mantienen. Cabeceras en chino e inglés.',
+    who: 'Traductores, equipos de fansub y editores que revisan, anotan o corrigen subtítulos en una hoja de cálculo.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'pt': {
+    title: 'Legendas para Excel/CSV e de volta | AI-SRTSub',
+    desc: 'Converta SRT ou VTT em planilha Excel ou CSV para revisar e traduzir linha a linha, e volte a legendas. Tempos exatos, quebras de linha preservadas.',
+    kw: 'legendas para excel,srt para csv,srt para excel,excel para srt,subtitle to excel',
+    intro: 'Exporte legendas para uma planilha, revise e traduza, e importe a planilha de volta. Tudo no navegador.',
+    feat: 'De SRT ou VTT para xlsx ou CSV em um clique; edite tempos, texto e notas na planilha e exporte de volta. As colunas de tempo mantêm os milissegundos e as quebras de linha nas células ficam intactas. Cabeçalhos em chinês e inglês.',
+    who: 'Tradutores, equipes de fansub e editores que revisam, anotam ou corrigem legendas em planilha.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'ko': {
+    title: '자막 Excel/CSV 변환 | AI-SRTSub',
+    desc: 'SRT·VTT 자막을 Excel(xlsx)이나 CSV 표로 내보내 한 줄씩 검수·번역하고 다시 자막으로 되돌립니다. 시간은 텍스트 그대로, 줄바꿈도 유지됩니다. 모두 브라우저에서 처리됩니다.',
+    kw: '자막 엑셀,srt csv 변환,srt 엑셀,엑셀 자막,subtitle to excel,srt to csv',
+    intro: '자막을 스프레드시트로 내보내 검수·번역하고, 편집한 표를 다시 자막으로 가져옵니다. 모두 브라우저에서 처리됩니다.',
+    feat: 'SRT·VTT를 한 번에 xlsx·CSV로; 표에서 시간·텍스트·메모를 고치고 SRT·VTT로 되돌립니다. 시간 열은 밀리초까지 보존되고 셀 안 줄바꿈도 유지됩니다. 중국어·영어 열 머리글 모두 지원.',
+    who: '스프레드시트에서 자막을 검수·번역·주석 다는 번역가, 자막 팀, 편집자.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'de': {
+    title: 'Untertitel nach Excel/CSV und zurück | AI-SRTSub',
+    desc: 'SRT oder VTT als Excel- oder CSV-Tabelle exportieren, Zeile für Zeile prüfen und übersetzen, dann zurückwandeln. Zeiten bleiben exakt, Umbrüche bleiben erhalten.',
+    kw: 'untertitel excel,srt zu csv,srt zu excel,excel zu srt,subtitle to excel',
+    intro: 'Untertitel für Durchsicht und Übersetzung ins Tabellenblatt exportieren und die Tabelle danach zurückholen. Läuft komplett im Browser.',
+    feat: 'SRT oder VTT per Klick als xlsx oder CSV; Zeiten, Text und Notizen im Blatt bearbeiten und wieder als SRT oder VTT exportieren. Zeitspalten behalten Millisekunden, Zellumbrüche bleiben erhalten. Chinesische und englische Kopfzeilen.',
+    who: 'Übersetzer, Fansub-Teams und Redakteure, die Untertitel im Tabellenblatt prüfen, kommentieren oder korrigieren.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'fr': {
+    title: 'Sous-titres vers Excel/CSV et retour | AI-SRTSub',
+    desc: 'Exportez SRT ou VTT en feuille Excel ou CSV pour relire et traduire ligne à ligne, puis revenez aux sous-titres. Horodatages exacts, sauts de ligne conservés.',
+    kw: 'sous-titres excel,srt vers csv,srt vers excel,excel vers srt,subtitle to excel',
+    intro: 'Exportez les sous-titres vers un tableur pour les relire et les traduire, puis réimportez la feuille. Tout dans le navigateur.',
+    feat: 'De SRT ou VTT vers xlsx ou CSV en un clic ; modifiez temps, texte et notes dans le tableur, puis réexportez en SRT ou VTT. Les colonnes de temps gardent les millisecondes, les retours à la ligne en cellule sont préservés. En-têtes chinois et anglais.',
+    who: 'Traducteurs, équipes de fansub et monteurs qui relisent, annotent ou corrigent des sous-titres dans un tableur.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'id': {
+    title: 'Subtitle ke Excel/CSV dan sebaliknya | AI-SRTSub',
+    desc: 'Ubah SRT atau VTT menjadi lembar Excel atau CSV untuk periksa dan terjemahkan per baris, lalu kembali ke subtitle. Waktu tetap presisi, baris baru utuh.',
+    kw: 'subtitle ke excel,srt ke csv,srt ke excel,excel ke srt,subtitle to excel',
+    intro: 'Ekspor subtitle ke spreadsheet untuk ditinjau dan diterjemahkan, lalu impor kembali lembarannya. Semua di browser.',
+    feat: 'Dari SRT atau VTT ke xlsx atau CSV sekali klik; edit waktu, teks, dan catatan di spreadsheet lalu ekspor kembali. Kolom waktu menjaga presisi milidetik, pemisah baris dalam sel utuh. Header bahasa Mandarin dan Inggris.',
+    who: 'Penerjemah, tim fansub, dan editor yang meninjau, memberi catatan, atau memperbaiki subtitle di spreadsheet.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'hi': {
+    title: 'सबटाइटल Excel/CSV कनवर्टर | AI-SRTSub',
+    desc: 'SRT या VTT को Excel या CSV शीट में निकालें, पंक्ति-दर-पंक्ति समीक्षा और अनुवाद करें, फिर सबटाइटल में वापस लाएँ। समय सटीक रहता है, लाइन ब्रेक बने रहते हैं।',
+    kw: 'सबटाइटल excel,srt to csv,srt excel,excel to srt,subtitle spreadsheet',
+    intro: 'सबटाइटल को समीक्षा और अनुवाद के लिए स्प्रेडशीट में निर्यात करें, फिर शीट वापस आयात करें। सब ब्राउज़र में।',
+    feat: 'SRT या VTT से xlsx या CSV एक क्लिक में; स्प्रेडशीट में समय, पाठ और नोट्स संपादित करें और SRT या VTT में वापस निर्यात करें। समय कॉलम मिलीसेकंड सटीक रहते हैं, सेल-भर लाइन ब्रेक सुरक्षित। चीनी-अंग्रेज़ी दोनों हेडर।',
+    who: 'स्प्रेडशीट में सबटाइटल समीक्षा करने, टिप्पणी करने या सुधारने वाले अनुवादक, फैनसब टीम और संपादक।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'th': {
+    title: 'แปลงซับเป็น Excel/CSV และย้อนกลับ | AI-SRTSub',
+    desc: 'เปลี่ยน SRT หรือ VTT เป็นชีต Excel หรือ CSV เพื่อตรวจทานและแปลทีละบรรทัด แล้วส่งกลับเป็นซับได้ เวลายังเป๊ะ การขึ้นบรรทัดใหม่คงเดิม',
+    kw: 'ซับเป็น excel,srt เป็น csv,excel เป็น srt,subtitle to excel,srt to csv',
+    intro: 'ส่งออกซับไปสเปรดชีตเพื่อตรวจทานและแปล แล้วนำชีตกลับมาเป็นซับอีกครั้ง ทำทั้งหมดในเบราว์เซอร์',
+    feat: 'จาก SRT หรือ VTT เป็น xlsx หรือ CSV ในคลิกเดียว แก้เวลา ข้อความ และโน้ตในสเปรดชีตแล้วส่งออกกลับ คอลัมน์เวลารักษาความละเอียดระดับมิลลิวินาที การขึ้นบรรทัดในเซลคงเดิม รองรับหัวคอลัมน์จีน-อังกฤษ',
+    who: 'นักแปล ทีมแฟนซับ และคนตัดต่อที่ตรวจทาน ใส่โน้ต หรือแก้ซับเป็นกลุ่มในสเปรดชีต',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'vi': {
+    title: 'Phụ đề sang Excel/CSV và ngược lại | AI-SRTSub',
+    desc: 'Đưa SRT hoặc VTT thành trang tính Excel hoặc CSV để soát và dịch từng dòng, rồi đưa về phụ đề. Thời gian giữ chính xác, xuống dòng giữ nguyên.',
+    kw: 'phụ đề excel,srt sang csv,srt sang excel,excel sang srt,subtitle to excel',
+    intro: 'Xuất phụ đề ra trang tính để soát và dịch, rồi nhập lại trang tính. Mọi thứ trong trình duyệt.',
+    feat: 'Từ SRT hoặc VTT sang xlsx hoặc CSV một cú nhấp; sửa thời gian, văn bản, ghi chú rồi xuất lại. Cột thời gian giữ trọn milli-giây, xuống dòng trong ô được giữ. Tiêu đề tiếng Trung và tiếng Anh.',
+    who: 'Dịch giả, nhóm fansub và biên tập viên soát, chú thích hay sửa phụ đề trong trang tính.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'ru': {
+    title: 'Субтитры в Excel/CSV и обратно | AI-SRTSub',
+    desc: 'Экспортируйте SRT или VTT в лист Excel или CSV, вычитывайте и переводите построчно, затем верните в субтитры. Времена точны, переносы строк сохранены.',
+    kw: 'субтитры excel,srt в csv,srt в excel,excel в srt,subtitle to excel',
+    intro: 'Экспортируйте субтитры в таблицу для вычитки и перевода, затем импортируйте лист обратно. Всё в браузере.',
+    feat: 'Из SRT или VTT в xlsx или CSV в один клик; правьте время, текст и заметки в таблице и экспортируйте обратно. Столбцы времени хранят миллисекунды, переносы строк в ячейках сохраняются. Заголовки на китайском и английском.',
+    who: 'Переводчики, фанатские команды и редакторы, которые вычитывают, комментируют или правят субтитры в таблице.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'it': {
+    title: 'Sottotitoli in Excel/CSV e ritorno | AI-SRTSub',
+    desc: 'Esporta SRT o VTT in un foglio Excel o CSV per rivedere e tradurre riga per riga, poi torna ai sottotitoli. Tempi esatti, a capo conservato.',
+    kw: 'sottotitoli excel,srt in csv,srt in excel,excel in srt,subtitle to excel',
+    intro: 'Esporta i sottotitoli in un foglio di calcolo per revisione e traduzione, quindi reimporta il foglio. Tutto nel browser.',
+    feat: 'Da SRT o VTT a xlsx o CSV in un clic; modifica tempi, testo e note nel foglio ed esporta di nuovo. Le colonne dei tempi mantengono i millisecondi, gli a capo in cella restano. Intestazioni cinesi e inglesi.',
+    who: 'Traduttori, team di fansub ed editor che rivedono, annotano o correggono sottotitoli in un foglio di calcolo.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'ar': {
+    title: 'الترجمات إلى Excel/CSV والعكس | AI-SRTSub',
+    desc: 'حوّل SRT أو VTT إلى ورقة Excel أو CSV لمراجعتها وترجمتها سطرًا سطرًا، ثم أعدها إلى ترجمات. الأوقات دقيقة وفواصل الأسطر محفوظة.',
+    kw: 'ترجمات excel,srt إلى csv,srt إلى excel,excel إلى srt,subtitle to excel',
+    intro: 'صدّر الترجمات إلى جدول بيانات للمراجعة والترجمة، ثم أعد استيراد الورقة. كل شيء في المتصفح.',
+    feat: 'من SRT أو VTT إلى xlsx أو CSV بنقرة واحدة؛ حرّر الأوقات والنص والملاحظات في الجدول ثم صدّر مجددًا. أعمدة الوقت تحفظ أجزاء الثانية وفواصل الأسطر داخل الخلايا تبقى. رؤوس بالصينية والإنجليزية.',
+    who: 'المترجمون وفرق المعجبين والمحررون الذين يراجعون الترجمات أو يعلّقون عليها أو يصححونها في جدول بيانات.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'tr': {
+    title: "Altyazıları Excel/CSV'ye çevir ve geri | AI-SRTSub",
+    desc: "SRT veya VTT'yi Excel ya da CSV sayfasına aktarıp satır satır inceleyin ve çevirin, sonra altyazıya geri dönün. Zamanlar keskin, satır sonları korunur.",
+    kw: 'altyazı excel,srt csv,srt excel,excelden srt,subtitle to excel',
+    intro: 'Altyazıları inceleme ve çeviri için tabloya aktarın, sonra sayfayı geri alın. Hepsi tarayıcıda.',
+    feat: "SRT veya VTT'den xlsx veya CSV'ye tek tıkla; tabloda zamanları, metni ve notları düzenleyip geri dışa aktarın. Zaman sütunları milisaniyeyi korur, hücre içi satır sonları kalır. Çince ve İngilizce başlıklar.",
+    who: 'Altyazıları tabloda inceleyen, not alan veya düzelten çevirmenler, fansub ekipleri ve editörler.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'nl': {
+    title: 'Ondertitels naar Excel/CSV en terug | AI-SRTSub',
+    desc: 'Zet SRT of VTT om naar een Excel- of CSV-blad om regel voor regel te controleren en vertalen, en keer dan terug naar ondertitels. Tijden exact, regeleinden bewaard.',
+    kw: 'ondertitels excel,srt naar csv,srt naar excel,excel naar srt,subtitle to excel',
+    intro: 'Exporteer ondertitels naar een spreadsheet voor controle en vertaling, en importeer het blad daarna terug. Alles in de browser.',
+    feat: 'Van SRT of VTT naar xlsx of CSV in één klik; bewerk tijden, tekst en notities in het blad en exporteer opnieuw. Tijdkolommen behouden milliseconden, regeleinden in cellen blijven staan. Chinese en Engelse koppen.',
+    who: 'Vertalers, fansub-teams en editors die ondertitels in een spreadsheet nazien, annoteren of verbeteren.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'pl': {
+    title: 'Napisy do Excela/CSV i z powrotem | AI-SRTSub',
+    desc: 'Wyeksportuj SRT lub VTT do arkusza Excel lub CSV, sprawdzaj i tłumacz wiersz po wierszu, a potem wróć do napisów. Czasy dokładne, łamanie wierszy zachowane.',
+    kw: 'napisy excel,srt do csv,srt do excelu,excel do srt,subtitle to excel',
+    intro: 'Eksportuj napisy do arkusza kalkulacyjnego do sprawdzenia i tłumaczenia, po czym zaimportuj arkusz z powrotem. Wszystko w przeglądarce.',
+    feat: 'Z SRT lub VTT do xlsx lub CSV jednym kliknięciem; edytuj czasy, tekst i notatki w arkuszu i eksportuj z powrotem. Kolumny czasu zachowują milisekundy, łamanie wierszy w komórkach zostaje. Nagłówki chińskie i angielskie.',
+    who: 'Tłumacze, zespoły fansub i edytorzy, którzy sprawdzają, komentują lub poprawiają napisy w arkuszu.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'sv': {
+    title: 'Undertexter till Excel/CSV och tillbaka | AI-SRTSub',
+    desc: 'Exportera SRT eller VTT till ett Excel- eller CSV-blad för granskning och översättning, och återvänd till undertexter. Tider exakta, radbrytningar bevarade.',
+    kw: 'undertexter excel,srt till csv,srt till excel,excel till srt,subtitle to excel',
+    intro: 'Exportera undertexter till ett kalkylblad för granskning och översättning, importera sedan bladet tillbaka. Allt i webbläsaren.',
+    feat: 'Från SRT eller VTT till xlsx eller CSV med ett klick; redigera tider, text och anteckningar i bladet och exportera igen. Tidskolumner behåller millisekunder, radbrytningar i celler bevaras. Kinesiska och engelska rubriker.',
+    who: 'Översättare, fansub-team och redaktörer som granskar, kommenterar eller rättar undertexter i ett kalkylblad.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'cs': {
+    title: 'Titulky do Excelu/CSV a zpět | AI-SRTSub',
+    desc: 'Exportujte SRT nebo VTT do listu Excel nebo CSV, kontrolujte a překládejte řádek po řádku a vraťte se k titulkům. Časy přesné, zalomení řádků zachováno.',
+    kw: 'titulky excel,srt do csv,srt do excelu,excel do srt,subtitle to excel',
+    intro: 'Exportujte titulky do tabulky pro kontrolu a překlad a poté list importujte zpět. Vše v prohlížeči.',
+    feat: 'Ze SRT nebo VTT do xlsx nebo CSV na jedno kliknutí; upravujte časy, text a poznámky v listu a exportujte zpět. Sloupce času uchovávají milisekundy, zalomení řádků v buňkách zůstává. Čínské i anglické záhlaví.',
+    who: 'Překladatelé, fansub týmy a editoři, kteří v tabulce kontrolují, komentují nebo opravují titulky.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'uk': {
+    title: 'Субтитри в Excel/CSV і назад | AI-SRTSub',
+    desc: 'Експортуйте SRT або VTT у аркуш Excel або CSV, вичитуйте й перекладайте рядок за рядком, потім повертайте до субтитрів. Часи точні, переноси рядків збережено.',
+    kw: 'субтитри excel,srt в csv,srt в excel,excel в srt,subtitle to excel',
+    intro: 'Експортуйте субтитри в таблицю для вичитки та перекладу, потім імпортуйте аркуш назад. Усе в браузері.',
+    feat: 'З SRT або VTT у xlsx або CSV за один клік; правьте час, текст і нотатки в таблиці та експортуйте назад. Стовпці часу зберігають мілісекунди, переноси в клітинках лишаються. Заголовки китайською та англійською.',
+    who: 'Перекладачі, фан-команди та редактори, що вичитують, коментують чи правлять субтитри в таблиці.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'da': {
+    title: 'Undertekster til Excel/CSV og tilbage | AI-SRTSub',
+    desc: 'Eksportér SRT eller VTT til et Excel- eller CSV-ark for linjevis gennemgang og oversættelse, og vend tilbage til undertekster. Tider præcise, linjeskift bevaret.',
+    kw: 'undertekster excel,srt til csv,srt til excel,excel til srt,subtitle to excel',
+    intro: 'Eksportér undertekster til et regneark til gennemgang og oversættelse, og importér arket tilbage bagefter. Alt i browseren.',
+    feat: 'Fra SRT eller VTT til xlsx eller CSV med ét klik; redigér tider, tekst og noter i arket og eksportér igen. Tidskolonner bevarer millisekunder, linjeskift i celler bevares. Kinesiske og engelske overskrifter.',
+    who: 'Oversættere, fansub-hold og klippere, der gennemgår, kommenterer eller retter undertekster i et regneark.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'fi': {
+    title: 'Tekstitykset Exceliin/CSV:hen ja takaisin | AI-SRTSub',
+    desc: 'Vie SRT tai VTT Excel- tai CSV-taulukkoon rivikohtaiseen tarkistukseen ja kääntämiseen, ja palaa sitten tekstityksiin. Ajat tarkkoja, rivinvaihdot säilyvät.',
+    kw: 'tekstitys excel,srt csv:hen,srt excel,excel srt,subtitle to excel',
+    intro: 'Vie tekstitykset taulukkolaskentaan tarkistettavaksi ja käännettäväksi, tuo taulukko sitten takaisin. Kaikki selaimessa.',
+    feat: 'SRT:stä tai VTT:stä xlsx- tai CSV-muotoon yhdellä napsautuksella; muokkaa aikoja, tekstiä ja muistiinpanoja taulukossa ja vie takaisin. Aikasarjat säilyttävät millisekunnit, solujen rivinvaihdot pysyvät. Kiinalaiset ja englantilaiset otsikot.',
+    who: 'Kääntäjät, fansub-tiimit ja leikkaajat, jotka tarkistavat, kommentoivat tai korjaavat tekstityksiä taulukkolaskennassa.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'el': {
+    title: 'Υπότιτλοι σε Excel/CSV και αντίστροφα | AI-SRTSub',
+    desc: 'Εξαγάγετε SRT ή VTT σε φύλλο Excel ή CSV για γραμμή-γραμμή αναθεώρηση και μετάφραση, και επιστρέψτε σε υπότιτλους. Ακριβείς χρόνοι, διατηρημένες αλλαγές γραμμής.',
+    kw: 'υπότιτλοι excel,srt σε csv,srt σε excel,excel σε srt,subtitle to excel',
+    intro: 'Εξαγάγετε υπότιτλους σε υπολογιστικό φύλλο για αναθεώρηση και μετάφραση, μετά επανεισάγετε το φύλλο. Όλα στο πρόγραμμα περιήγησης.',
+    feat: 'Από SRT ή VTT σε xlsx ή CSV με ένα κλικ· επεξεργαστείτε χρόνους, κείμενο και σημειώσεις στο φύλλο και εξαγάγετε ξανά. Οι στήλες χρόνου κρατούν τα millisecond, οι αλλαγές γραμμής στα κελιά διατηρούνται. Κινεζικές και αγγλικές κεφαλίδες.',
+    who: 'Μεταφραστές, ομάδες fansub και μοντέρ που αναθεωρούν, σχολιάζουν ή διορθώνουν υπότιτλους σε υπολογιστικό φύλλο.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'he': {
+    title: 'כתוביות ל-Excel/CSV ובחזרה | AI-SRTSub',
+    desc: 'המירו SRT או VTT לגיליון Excel או CSV לביקורת ותרגום שורה-שורה, ואז החזירו לכתוביות. זמנים מדויקים, שבירת שורות נשמרת.',
+    kw: 'כתוביות excel,srt ל csv,srt ל excel,excel ל srt,subtitle to excel',
+    intro: 'ייצאו כתוביות לגיליון אלקטרוני לביקורת ותרגום, ואז ייבאו את הגיליון בחזרה. הכול בדפדפן.',
+    feat: 'מ-SRT או VTT אל xlsx או CSV בלחיצה אחת; ערכו זמנים, טקסט והערות בגיליון וייצאו שוב. עמודות הזמן שומרות מילישניות, שבירת שורות בתאים נשמרת. כותרות בסינית ובאנגלית.',
+    who: 'מתרגמים, צוותי מעריצים ועורכים שסוקרים, מעירים או מתקנים כתוביות בגיליון אלקטרוני.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+  'ro': {
+    title: 'Subtitrări în Excel/CSV și invers | AI-SRTSub',
+    desc: 'Exportați SRT sau VTT într-o foaie Excel sau CSV pentru revizuire și traducere rând cu rând, apoi reveniți la subtitrări. Timpi exacți, rânduri noi păstrate.',
+    kw: 'subtitrări excel,srt în csv,srt în excel,excel în srt,subtitle to excel',
+    intro: 'Exportați subtitrările într-o foaie de calcul pentru revizuire și traducere, apoi importați foaia înapoi. Totul în browser.',
+    feat: 'Din SRT sau VTT în xlsx sau CSV într-un clic; editați timpii, textul și notele în foaie și exportați din nou. Coloanele de timp păstrează milisecundele, rândurile noi din celule rămân. Antete în chineză și engleză.',
+    who: 'Traducători, echipe de fansub și editori care revizuiesc, adnotează sau corectează subtitrări într-o foaie de calcul.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Excel CSV Converter'
+  },
+};
+
+/* v0.9.316：第十五个页面 —— 批量字幕转换打包 /batch.html 的 SEO 表。与既有十二张表同规格。 */
+const SEO_BATCH = {
+  'zh-CN': {
+    title: '批量转换字幕 SRT/VTT 并打包下载 - 一次几百个 | 随心字幕 AI',
+    desc: '免费在线批量字幕转换：一次拖入几十上百个 SRT 或 VTT，统一转成目标格式后打成一个 ZIP 下载。序号重排、时间戳规范化，认不出的文件单独标出来不含糊。全程在浏览器里完成，文件不上传。',
+    kw: '批量转换字幕,srt批量转vtt,vtt批量转srt,字幕批量处理,batch convert subtitles,srt to vtt online,批量字幕工具',
+    intro: '几十上百个字幕文件一次拖进来，统一转格式，打成一个 ZIP 拿走。全程在浏览器里完成，文件不上传。',
+    feat: 'SRT 批量转 VTT、VTT 批量转 SRT，序号统一重排，时间戳按目标格式规范化。认不出的文件单独标出来、不进包。文件名保持原名只换扩展名，重名自动加序号。',
+    who: '要给整个剧集目录换格式、给播放器统一喂 VTT 的剪辑师、字幕组、站长。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'zh-TW': {
+    title: '批次轉換字幕 SRT/VTT 並打包下載 - 一次幾百個 | 隨心字幕 AI',
+    desc: '免費線上批次字幕轉換：一次拖入幾十上百個 SRT 或 VTT，統一轉成目標格式後打成一個 ZIP 下載。序號重排、時間戳規範化，認不出的檔案單獨標出來不含糊。全程在瀏覽器裡完成，檔案不上傳。',
+    kw: '批次轉換字幕,srt批次轉vtt,vtt批次轉srt,字幕批次處理,batch convert subtitles,srt to vtt online,批次字幕工具',
+    intro: '幾十上百個字幕檔案一次拖進來，統一轉格式，打成一個 ZIP 拿走。全程在瀏覽器裡完成，檔案不上傳。',
+    feat: 'SRT 批次轉 VTT、VTT 批次轉 SRT，序號統一重排，時間戳按目標格式規範化。認不出的檔案單獨標出來、不進包。檔名保持原名只換副檔名，重名自動加序號。',
+    who: '要給整個劇集目錄換格式、給播放器統一餵 VTT 的剪輯師、字幕組、站長。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'en': {
+    title: 'Batch Convert Subtitles to SRT/VTT | AI-SRTSub',
+    desc: 'Drop dozens or hundreds of SRT/VTT files, convert them all to one format and download one ZIP. Renumbering and timestamps normalized; unreadable files flagged.',
+    kw: 'batch convert subtitles,srt to vtt,batch subtitle converter,bulk srt,convert multiple subtitles,subtitle zip',
+    intro: 'Drag in hundreds of subtitle files, convert them all, take away one ZIP. Runs fully in your browser.',
+    feat: "SRT to VTT and back in bulk; sequence numbers re-ordered and timestamps normalized per target format. Files that can't be parsed are flagged and left out of the ZIP. Original filenames kept with a new extension; collisions get a suffix.",
+    who: 'Editors and subtitlers converting whole series folders, and site owners feeding players a single format.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'ja': {
+    title: '字幕を一括変換して ZIP で保存 | AI-SRTSub',
+    desc: '何十・何百もの SRT/VTT をまとめて投入し、全てを目標形式へ変換、ZIP 1 つでダウンロード。番号は振り直し、読めないファイルは明示。ブラウザ内で完結します。',
+    kw: '字幕 一括変換,srt 一括 vtt,vtt 一括 srt,一括 字幕,batch convert subtitles,srt to vtt',
+    intro: '何百もの字幕ファイルを一度に投入し、全て変換して ZIP 1 つで持ち帰れます。すべてブラウザ内で処理されます。',
+    feat: 'SRT→VTT、VTT→SRT を一括で。番号は統一して振り直し、タイムスタンプは出力形式に正規化。解析できないファイルは明示され ZIP に入りません。ファイル名は元のままで拡張子だけ変更、重複には番号を付与。',
+    who: 'シリーズ全体のフォルダを変換したい編集者・字幕チーム、プレイヤーに VTT を統一供給したいサイト管理者。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'es': {
+    title: 'Conversión por lotes de subtítulos | AI-SRTSub',
+    desc: 'Suelta decenas o cientos de SRT/VTT, conviértelos todos a un formato y descarga un único ZIP. Renumeración y marcas normalizadas; los ilegibles se señalan.',
+    kw: 'convertir subtítulos por lotes,srt a vtt por lotes,conversor masivo subtítulos,batch convert subtitles',
+    intro: 'Arrastra cientos de archivos de subtítulos, conviértelos todos y llévate un solo ZIP. Todo en tu navegador.',
+    feat: 'SRT a VTT y al revés en masa; renumeración de secuencias y marcas de tiempo normalizadas al formato destino. Los archivos ilegibles se marcan y quedan fuera del ZIP. Se conservan los nombres originales con nueva extensión; los duplicados llevan sufijo.',
+    who: 'Editores y subtituladores que convierten carpetas de series enteras, y webmasters que alimentan reproductores con un solo formato.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'pt': {
+    title: 'Conversão em lote de legendas | AI-SRTSub',
+    desc: 'Solte dezenas ou centenas de SRT/VTT, converta todos para um formato e baixe um único ZIP. Renumeração e marcas normalizadas; ilegíveis sinalizados.',
+    kw: 'converter legendas em lote,srt para vtt em lote,conversor em massa de legendas,batch convert subtitles',
+    intro: 'Arraste centenas de arquivos de legenda, converta todos e leve um único ZIP. Tudo no navegador.',
+    feat: 'SRT para VTT e vice-versa em massa; renumeração e marcações de tempo normalizadas ao formato alvo. Arquivos ilegíveis são marcados e ficam de fora do ZIP. Nomes originais mantidos com nova extensão; duplicatas ganham sufixo.',
+    who: 'Editores e legendadores convertendo pastas de séries inteiras, e donos de sites que alimentam players com um único formato.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'ko': {
+    title: '자막 일괄 변환 | AI-SRTSub',
+    desc: '수십~수백 개의 SRT/VTT를 한 번에 넣고 모두 목표 형식으로 변환해 ZIP 하나로 받습니다. 번호 재정렬, 타임스탬프 정규화, 못 읽는 파일은 따로 표시됩니다.',
+    kw: '자막 일괄 변환,srt 일괄 vtt,자막 대량 변환,batch convert subtitles,srt to vtt',
+    intro: '수백 개 자막 파일을 한 번에 넣고 모두 변환해 ZIP 하나로 가져갑니다. 모두 브라우저에서 처리됩니다.',
+    feat: 'SRT↔VTT 대량 변환; 번호는 통일해 다시 매기고 타임스탬프는 대상 형식에 맞춰 정규화합니다. 파싱 못 하는 파일은 표시되고 ZIP에 들어가지 않습니다. 파일명은 유지하고 확장자만 교체, 중복엔 번호를 붙입니다.',
+    who: '시즌 전체 폴더를 변환하는 편집자·자막 팀, 플레이어에 VTT를 통일해 먹이는 사이트 운영자.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'de': {
+    title: 'Untertitel stapelweise konvertieren | AI-SRTSub',
+    desc: 'Ziehen Sie Dutzende oder Hunderte SRT/VTT-Dateien hinein, konvertieren Sie alle in ein Format und laden Sie ein ZIP herunter. Unlesbare Dateien werden markiert.',
+    kw: 'untertitel stapelweise konvertieren,srt stapelweise vtt,untertitel massenkonvertierung,batch convert subtitles',
+    intro: 'Hunderte Untertiteldateien hineinziehen, alle konvertieren, ein ZIP mitnehmen. Läuft komplett im Browser.',
+    feat: 'SRT nach VTT und zurück in Masse; Nummern neu geordnet, Zeitstempel ans Zielformat angepasst. Unlesbare Dateien werden markiert und landen nicht im ZIP. Ursprüngliche Namen mit neuer Endung; bei Kollisionen gibt es einen Suffix.',
+    who: 'Cutter und Untertitler, die ganze Serienordner umwandeln, und Betreiber, die Playern ein einheitliches Format füttern.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'fr': {
+    title: 'Conversion de sous-titres par lot | AI-SRTSub',
+    desc: 'Déposez des dizaines ou centaines de fichiers SRT/VTT, convertissez-les tous vers un format cible et téléchargez un seul ZIP. Les fichiers illisibles sont signalés.',
+    kw: 'convertir sous-titres par lot,srt vers vtt par lot,conversion en masse sous-titres,batch convert subtitles',
+    intro: 'Glissez des centaines de fichiers de sous-titres, convertissez-les tous et repartez avec un seul ZIP. Tout dans le navigateur.',
+    feat: "SRT vers VTT et inversement en masse ; renumérotation et horodatages normalisés selon le format cible. Les fichiers illisibles sont signalés et exclus du ZIP. Noms d'origine conservés avec nouvelle extension ; les doublons reçoivent un suffixe.",
+    who: 'Monteurs et sous-titreurs convertissant des dossiers de séries entières, et webmestres alimentant leurs lecteurs avec un format unique.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'id': {
+    title: 'Konversi subtitle massal | AI-SRTSub',
+    desc: 'Masukkan puluhan hingga ratusan file SRT/VTT, konversi semua ke satu format, unduh satu ZIP. Penomoran dan stempel waktu dinormalisasi; file tak terbaca ditandai.',
+    kw: 'konversi subtitle massal,srt ke vtt massal,konverter batch subtitle,batch convert subtitles',
+    intro: 'Seret ratusan file subtitle, konversi semuanya, dan bawa pulang satu ZIP. Semua di browser.',
+    feat: 'SRT ke VTT dan sebaliknya secara massal; penomoran urutan diurutkan ulang dan stempel waktu dinormalisasi sesuai format target. File yang tak terurai ditandai dan tidak masuk ZIP. Nama asli dipertahankan dengan ekstensi baru; tabrakan nama diberi akhiran.',
+    who: 'Editor dan pembuat subtitle yang mengonversi folder serial utuh, dan pengelola situs yang memberi player satu format seragam.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'hi': {
+    title: 'सबटाइटल बैच कनवर्टर | AI-SRTSub',
+    desc: 'दर्जनों-सैकड़ों SRT/VTT फ़ाइलें डालें, सबको एक फ़ॉर्मैट में बदलें, एक ZIP डाउनलोड करें। नंबरिंग फिर से, टाइमस्टैम्प सामान्यीकृत; न पढ़ी जाने वाली चिह्नित।',
+    kw: 'सबटाइटल बैच कनवर्टर,srt बैच vtt,सबटाइटल थोक कनवर्टर,batch convert subtitles',
+    intro: 'सैकड़ों सबटाइटल फ़ाइलें डालें, सब बदलें, एक ZIP लेकर चलें। सब ब्राउज़र में होता है।',
+    feat: 'SRT↔VTT थोक में; क्रम संख्याएँ फिर लगती हैं और टाइमस्टैम्प लक्ष्य फ़ॉर्मैट के अनुसार सामान्यीकृत होते हैं। जो फ़ाइलें पार्स नहीं होतीं वे चिह्नित होकर ZIP में नहीं आतीं। मूल नाम बने रहते हैं, केवल एक्सटेंशन बदलता है; टकराव पर प्रत्यय लगता है।',
+    who: 'पूरे सीरीज़ फ़ोल्डर बदलने वाले एडिटर-सबटाइटलर और प्लेयर को एक ही फ़ॉर्मैट खिलाने वाले साइट संचालक।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'th': {
+    title: 'แปลงซับแบบชุด | AI-SRTSub',
+    desc: 'ลากไฟล์ SRT/VTT หลายสิบหลายร้อยไฟล์เข้ามา แปลงทั้งหมดเป็นฟอร์แมตเดียว แล้วดาวน์โหลดเป็น ZIP เดียว ไฟล์ที่อ่านไม่ออกจะถูกทำเครื่องหมายแยกไว้',
+    kw: 'แปลงซับแบบชุด,srt เป็น vtt ทีเดียว,ตัวแปลงซับจำนวนมาก,batch convert subtitles',
+    intro: 'ลากไฟล์ซับหลายร้อยไฟล์เข้ามา แปลงให้หมดแล้วรับกลับเป็น ZIP เดียว ทำทั้งหมดในเบราว์เซอร์',
+    feat: 'แปลง SRT↔VTT แบบจำนวนมาก เลขลำดับเรียงใหม่ timestamp ปรับตามฟอร์แมตปลายทาง ไฟล์ที่อ่านไม่ออกถูกทำเครื่องหมายและไม่เข้า ZIP ชื่อไฟล์เดิมเปลี่ยนแค่นามสกุล ชื่อซ้ำต่อท้ายเลข',
+    who: 'คนตัดต่อและทีมซับที่แปลงทั้งโฟลเดอร์ซีรีส์ และเว็บมาสเตอร์ที่ป้อน VTT ให้เครื่องเล่นเป็นฟอร์แมตเดียว',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'vi': {
+    title: 'Chuyển đổi phụ đề hàng loạt | AI-SRTSub',
+    desc: 'Kéo hàng chục hay hàng trăm file SRT/VTT vào, chuyển tất cả sang một định dạng, tải về một ZIP. Đánh số lại, timestamp chuẩn hóa; file không đọc được bị đánh dấu.',
+    kw: 'chuyển đổi phụ đề hàng loạt,srt sang vtt hàng loạt,batch convert subtitles',
+    intro: 'Kéo hàng trăm file phụ đề vào, chuyển tất cả và mang về một ZIP. Mọi thứ trong trình duyệt.',
+    feat: 'SRT↔VTT hàng loạt; số thứ tự được đánh lại, timestamp chuẩn hóa theo định dạng đích. File không phân tích được bị đánh dấu và không vào ZIP. Giữ tên gốc, chỉ đổi phần mở rộng; trùng tên thì thêm hậu tố.',
+    who: 'Biên tập viên và người làm phụ đề chuyển cả thư mục series, và chủ trang web muốn trình phát dùng một định dạng duy nhất.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'ru': {
+    title: 'Пакетное конвертирование субтитров | AI-SRTSub',
+    desc: 'Закиньте десятки или сотни файлов SRT/VTT, переведите их все в один формат и скачайте один ZIP. Нумерация заново, метки нормализованы; нечитаемые файлы помечены.',
+    kw: 'пакетное конвертирование субтитров,srt в vtt пачкой,массовая конвертация субтитров,batch convert subtitles',
+    intro: 'Перетащите сотни файлов субтитров, конвертируйте все и заберите один ZIP. Всё в браузере.',
+    feat: 'SRT↔VTT массово; нумерация переупорядочена, метки времени нормализованы под целевой формат. Нечитаемые файлы помечаются и не попадают в ZIP. Исходные имена сохраняются, меняется только расширение; при совпадении добавляется суффикс.',
+    who: 'Монтажёры и субтитровщики, конвертирующие целые папки сериалов, и владельцы сайтов, дающие плеерам единый формат.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'it': {
+    title: 'Conversione sottotitoli in batch | AI-SRTSub',
+    desc: 'Trascina decine o centinaia di SRT/VTT, convertili in un formato e scarica un solo ZIP. Rinumerazione e timestamp normalizzati; i file illeggibili sono segnalati.',
+    kw: 'convertire sottotitoli in batch,srt in vtt in blocco,conversione in massa sottotitoli,batch convert subtitles',
+    intro: 'Trascina centinaia di file di sottotitoli, convertili tutti e portati via un solo ZIP. Tutto nel browser.',
+    feat: 'Da SRT a VTT e viceversa in blocco; sequenze rinumerate e timestamp normalizzati al formato di destinazione. I file illeggibili sono segnalati ed esclusi dallo ZIP. I nomi originali restano con la nuova estensione; ai doppioni va un suffisso.',
+    who: 'Montatori e sottotitolatori che convertono intere cartelle di serie, e webmaster che danno ai player un unico formato.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'ar': {
+    title: 'تحويل الترجمات دفعة واحدة | AI-SRTSub',
+    desc: 'ألقِ عشرات أو مئات ملفات SRT/VTT، وحوّلها كلها إلى صيغة واحدة ونزّل ملف ZIP واحد. إعادة ترقيم وطوابع زمنية منظمة؛ الملفات غير المقروءة تُعلَّم.',
+    kw: 'تحويل الترجمات دفعة,srt إلى vtt بالجملة,محول ترجمات جماعي,batch convert subtitles',
+    intro: 'اسحب مئات ملفات الترجمة، حوّلها كلها واحصل على ملف ZIP واحد. كل شيء في المتصفح.',
+    feat: 'تحويل جماعي بين SRT و VTT؛ إعادة ترقيم التسلسلات وتنظيم الطوابع الزمنية حسب الصيغة الهدف. الملفات غير المقروءة تُعلَّم ولا تدخل الأرشيف. تُحفظ الأسماء الأصلية مع امتداد جديد، والمتكررة تأخذ لاحقة.',
+    who: 'المونتيرون والمترجمون الذين يحولون مجلدات مسلسلات كاملة، وأصحاب المواقع الذين يقدمون للمشغّلات صيغة واحدة.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'tr': {
+    title: 'Toplu altyazı dönüştürme | AI-SRTSub',
+    desc: 'Onlarca ya da yüzlerce SRT/VTT bırakın, hepsini tek biçime dönüştürün ve tek ZIP indirin. Yeniden numaralama, normalize damgalar; okunmayanlar işaretlenir.',
+    kw: 'toplu altyazı dönüştürme,srt toplu vtt,toplu subtitle dönüştürücü,batch convert subtitles',
+    intro: 'Yüzlerce altyazı dosyasını sürükleyin, hepsini dönüştürün ve tek ZIP alın. Hepsi tarayıcıda.',
+    feat: "SRT↔VTT toplu; sıra numaraları yeniden düzenlenir, zaman damgaları hedef biçime göre normalize edilir. Okunamayan dosyalar işaretlenir ve ZIP'e girmez. Özgün adlar korunur, sadece uzantı değişir; çakışmalara sonek eklenir.",
+    who: 'Tüm dizi klasörlerini dönüştüren kurgucular, altyazıcular ve oynatıcılara tek biçim sunan site sahipleri.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'nl': {
+    title: 'Ondertitels bulksgewijs converteren | AI-SRTSub',
+    desc: 'Sleep tientallen of honderden SRT/VTT-bestanden in, converteer alles naar één formaat en download één ZIP. Onleesbare bestanden worden gemarkeerd.',
+    kw: 'ondertitels bulksgewijs,srt naar vtt in bulk,bulk subtitle converter,batch convert subtitles',
+    intro: 'Sleep honderden ondertitelbestanden, converteer alles en neem één ZIP mee. Alles in de browser.',
+    feat: 'SRT naar VTT en terug in bulk; volgnummers opnieuw gerangschikt, tijdstempels genormaliseerd naar het doelformaat. Onleesbare bestanden worden gemarkeerd en gaan de ZIP niet in. Originele namen blijven, alleen de extensie verandert; bij botsingen komt er een achtervoegsel.',
+    who: 'Cutters en ondertitelaars die hele seriemappen converteren, en webmasters die spelers één formaat voeden.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'pl': {
+    title: 'Masowa konwersja napisów | AI-SRTSub',
+    desc: 'Wrzuć dziesiątki lub setki plików SRT/VTT, przekonwertuj je na jeden format i pobierz ZIP. Renumeracja i znaczniki znormalizowane; nieczytelne pliki oznaczone.',
+    kw: 'masowa konwersja napisów,srt do vtt hurtowo,konwerter wsadowy napisów,batch convert subtitles',
+    intro: 'Przeciągnij setki plików napisów, przekonwertuj wszystkie i zabierz jedno ZIP. Wszystko w przeglądarce.',
+    feat: 'SRT↔VTT masowo; numeracja ponownie uporządkowana, znaczniki czasu znormalizowane do formatu docelowego. Nieczytelne pliki są oznaczane i nie trafiają do ZIP-a. Nazwy oryginalne zostają, zmienia się tylko rozszerzenie; kolizje dostają przyrostek.',
+    who: 'Montażyści i twórcy napisów konwertujący całe foldery seriali oraz właściciele stron karmiący odtwarzacze jednym formatem.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'sv': {
+    title: 'Masskonvertering av undertexter | AI-SRTSub',
+    desc: 'Släpp in dussentals eller hundratals SRT/VTT-filer, konvertera alla till ett format och ladda ner en ZIP. Oläsliga filer markeras.',
+    kw: 'masskonvertera undertexter,srt till vtt i bulk,konvertera undertexter batchvis,batch convert subtitles',
+    intro: 'Dra in hundratals undertextfiler, konvertera alla och hämta en enda ZIP. Allt i webbläsaren.',
+    feat: 'SRT till VTT och tillbaka i bulk; sekvensnummer omordnade, tidsstämplar normaliserade till målformatet. Oläsliga filer markeras och hamnar inte i ZIP:en. Ursprungliga namn behålls med ny filändelse; kollisioner får ett suffix.',
+    who: 'Klippare och undertextare som konverterar hela seriemappar, och webbansvariga som ger spelarna ett enda format.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'cs': {
+    title: 'Hromadná konverze titulků | AI-SRTSub',
+    desc: 'Hoďte desítky či stovky souborů SRT/VTT, převeďte je do jednoho formátu a stáhněte ZIP. Přečíslování a časové značky normalizovány; nečitelné soubory označeny.',
+    kw: 'hromadná konverze titulků,srt na vtt hromadně,dávkový převod titulků,batch convert subtitles',
+    intro: 'Přetáhněte stovky souborů titulků, převeďte všechny a odneste jedno ZIP. Vše v prohlížeči.',
+    feat: 'SRT↔VTT hromadně; čísla sekvencí přečíslována, časové značky normalizovány pro cílový formát. Nečitelné soubory se označí a do ZIPu se nedostanou. Původní názvy zůstávají, mění se jen přípona; kolize dostanou číselnou příponu.',
+    who: 'Střihači a titulkáři převádějící celé složky seriálů a provozovatelé webů, kteří přehrávačům dávají jednotný formát.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'uk': {
+    title: 'Пакетне конвертування субтитрів | AI-SRTSub',
+    desc: 'Закиньте десятки чи сотні файлів SRT/VTT, конвертуйте всі в один формат і скачайте один ZIP. Перенумерація та мітки нормалізовані; нечитані файли позначено.',
+    kw: 'пакетне конвертування субтитрів,srt у vtt пачкою,масове конвертування субтитрів,batch convert subtitles',
+    intro: 'Перетягніть сотні файлів субтитрів, конвертуйте всі та заберіть один ZIP. Усе в браузері.',
+    feat: 'SRT↔VTT масово; нумерація перевпорядкована, мітки часу нормалізовані під цільовий формат. Нечитані файли позначаються і не потрапляють у ZIP. Початкові назви зберігаються, змінюється лише розширення; збіги отримують суфікс.',
+    who: 'Монтажери та субтитрувальники, що конвертують цілі теки серіалів, і власники сайтів, які дають плеєрам один формат.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'da': {
+    title: 'Massekonvertering af undertekster | AI-SRTSub',
+    desc: 'Smid dusinvise eller hundredvis af SRT/VTT ind, konvertér dem alle til ét format og download én ZIP. Gennumrering og tider normaliseret; ulæselige filer markeres.',
+    kw: 'massekonverter undertekster,srt til vtt i bulk,konverter undertekster batchvis,batch convert subtitles',
+    intro: 'Træk hundredvis af undertekstfiler ind, konvertér dem alle og hent én ZIP. Alt i browseren.',
+    feat: "SRT til VTT og tilbage i bulk; sekvensnumre omnummereret, tidsstempler normaliseret til målformatet. Ulæselige filer markeres og kommer ikke i ZIP'en. Oprindelige navne bevares med ny filendelse; kollisioner får et suffiks.",
+    who: 'Klippere og undertekstere, der konverterer hele seriemapper, og webansvarlige, der giver afspillerne ét format.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'fi': {
+    title: 'Tekstitysten massamuunnos | AI-SRTSub',
+    desc: 'Pudota kymmeniä tai satoja SRT/VTT-tiedostoa, muunna kaikki yhteen muotoon ja lataa yksi ZIP. Uudelleennumerointi ja aikaleimat normalisoitu; lukemattomat merkitty.',
+    kw: 'tekstitysten massamuunnos,srt vtt:ksi erissä,muunna tekstitykset erissä,batch convert subtitles',
+    intro: 'Vedä satoja tekstitystiedostoja, muunna kaikki ja nappaa yksi ZIP. Kaikki selaimessa.',
+    feat: 'SRT↔VTT massana; järjestysnumerot uudelleennumeroitu, aikaleimat normalisoitu kohdemuotoon. Lukemattomat tiedostot merkitään eivätkä päädy ZIP:iin. Alkuperäiset nimet säilyvät, vain tiedostopääte vaihtuu; törmäykset saavat jälkiliitteen.',
+    who: 'Koko sarjakansioita muuntavat leikkaajat ja tekstittäjät sekä sivuston ylläpitäjät, jotka syöttävät soittimille yhden muodon.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'el': {
+    title: 'Μαζική μετατροπή υποτίτλων | AI-SRTSub',
+    desc: 'Ρίξτε δεκάδες ή εκατοντάδες SRT/VTT, μετατρέψτε όλα σε μία μορφή και κατεβάστε ένα ZIP. Επαναρίθμηση και χρονοσφραγίδες κανονικοποιημένες· τα αδιάβαστα σημειώνονται.',
+    kw: 'μαζική μετατροπή υποτίτλων,srt σε vtt μαζικά,μαζικός μετατροπέας υποτίτλων,batch convert subtitles',
+    intro: 'Σύρετε εκατοντάδες αρχεία υποτίτλων, μετατρέψτε τα όλα και πάρετε ένα ZIP. Όλα στο πρόγραμμα περιήγησης.',
+    feat: 'SRT↔VTT μαζικά· η αρίθμηση αναδιατάσσεται και οι χρονοσφραγίδες κανονικοποιούνται στην μορφή προορισμού. Τα αδιάβαστα αρχεία σημειώνονται και μένουν εκτός ZIP. Τα αρχικά ονόματα μένουν με νέα κατάληξη· οι συγκρούσεις παίρνουν επίθεμα.',
+    who: 'Μοντέρ και υπότιτλοι που μετατρέπουν ολόκληρους φακέλους σειρών και διαχειριστές που δίνουν στους players μία μορφή.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'he': {
+    title: 'המרת כתוביות באצווה | AI-SRTSub',
+    desc: 'השליכו עשרות או מאות קבצי SRT/VTT, המירו את כולם לפורמט אחד והורידו ZIP אחד. מספור מחדש וחותמות זמן מנורמלות; קבצים בלתי קריאים מסומנים.',
+    kw: 'המרת כתוביות באצווה,srt ל vtt בכמות גדולה,ממיר כתוביות המוני,batch convert subtitles',
+    intro: 'גררו מאות קבצי כתוביות, המירו את כולם וקחו ZIP אחד. הכול בדפדפן.',
+    feat: 'המרה המונית בין SRT ל-VTT; המספור מסודר מחדש וחותמות הזמן מנורמלות לפורמט היעד. קבצים בלתי קריאים מסומנים ולא נכנסים ל-ZIP. השמות המקוריים נשמרים עם סיומת חדשה; התנגשויות מקבלות סיומת מספר.',
+    who: 'עורכים ומתרגמים הממירים תיקיות סדרות שלמות, ומנהלי אתרים שמזינים לנגנים פורמט אחד.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+  'ro': {
+    title: 'Conversia în lot a subtitrărilor | AI-SRTSub',
+    desc: 'Aruncați zeci sau sute de fișiere SRT/VTT, convertiți-le într-un format și descărcați un ZIP. Renumerotare și marcaje normalizate; fișierele ilizibile sunt marcate.',
+    kw: 'conversie subtitrări în lot,srt în vtt în masă,convertor lot subtitrări,batch convert subtitles',
+    intro: 'Trageți sute de fișiere de subtitrări, convertiți-le pe toate și luați un singur ZIP. Totul în browser.',
+    feat: 'SRT↔VTT în masă; numerotarea se reordonează, marcajele de timp se normalizează pentru formatul țintă. Fișierele ilizibile sunt marcate și rămân afară din ZIP. Numele originale rămân cu extensie nouă; coliziunile primesc un sufix.',
+    who: 'Editori și subtitratori care convertesc foldere întregi de seriale și administratori care dau playelor un singur format.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Batch Subtitle Converter'
+  },
+};
+
+/* v0.9.316：第十六个页面 —— 歌词打轴 /lrc.html 的 SEO 表。与既有十二张表同规格。 */
+const SEO_LRC = {
+  'zh-CN': {
+    title: '歌词打轴器：听歌逐句点时间，导出 LRC/SRT - 在线免费 | 随心字幕 AI',
+    desc: '免费在线歌词打轴：放入音乐、贴入歌词，边听边逐句点时间轴，实时预览 LRC 效果，导出 LRC 或 SRT。支持导入已有 LRC 微调，快捷键打轴，全程在浏览器里完成，文件不上传。',
+    kw: '歌词打轴,LRC制作,歌词同步,lrc editor online,打轴工具,lrc生成,歌词时间轴,make lrc online',
+    intro: '放入音乐、贴入歌词，边听边逐句点时间轴，导出标准 LRC 或 SRT。全程在浏览器里完成，文件不上传。',
+    feat: '支持 MP3、M4A、FLAC、WAV、OGG 等常见音频；歌词一行一句贴进来即可，已有的 LRC 文件也能导入微调。空格键播放暂停、回车键打当前句、Z 键撤销，双手不离键盘。',
+    who: '给自制视频配歌、给播放器做歌词字幕、翻唱爱好者对时间轴的音乐人。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'zh-TW': {
+    title: '歌詞打軸器：聽歌逐句點時間，匯出 LRC/SRT - 線上免費 | 隨心字幕 AI',
+    desc: '免費線上歌詞打軸：放入音樂、貼入歌詞，邊聽邊逐句點時間軸，即時預覽 LRC 效果，匯出 LRC 或 SRT。支援匯入已有 LRC 微調，快捷鍵打軸，全程在瀏覽器裡完成，檔案不上傳。',
+    kw: '歌詞打軸,LRC製作,歌詞同步,lrc editor online,打軸工具,lrc生成,歌詞時間軸,make lrc online',
+    intro: '放入音樂、貼入歌詞，邊聽邊逐句點時間軸，匯出標準 LRC 或 SRT。全程在瀏覽器裡完成，檔案不上傳。',
+    feat: '支援 MP3、M4A、FLAC、WAV、OGG 等常見音訊；歌詞一行一句貼進來即可，已有的 LRC 檔案也能匯入微調。空格鍵播放暫停、Enter 鍵打當前句、Z 鍵復原，雙手不離鍵盤。',
+    who: '給自製影片配歌、給播放器做歌詞字幕、翻唱愛好者對時間軸的音樂人。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'en': {
+    title: 'LRC Lyric Editor - Tap Timing While Listening | AI-SRTSub',
+    desc: "Load a song, paste the lyrics, and tap each line's time while listening; export LRC or SRT. Import existing LRC to fine-tune. Keyboard-driven, fully in-browser.",
+    kw: 'lrc editor online,make lrc,lyric timing,lrc maker,create lrc,lyrics synchronizer,lrc to srt',
+    intro: 'Load music, paste lyrics, tap the timing line by line as you listen, and export LRC or SRT. Nothing uploads.',
+    feat: 'Works with MP3, M4A, FLAC, WAV and OGG. One line per row; existing LRC files can be imported and adjusted. Space plays/pauses, Enter stamps the current line, Z undoes — hands stay on the keyboard.',
+    who: 'Musicians syncing covers, creators adding songs to videos, and anyone building lyric subtitles for a player.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'ja': {
+    title: '歌詞タイマー - LRC メーカー | AI-SRTSub',
+    desc: '音楽を入れて歌詞を貼り、聴きながら各行にタイミングを打ち、LRC または SRT で書き出せます。既存 LRC の取り込み微調整も可能。キーボード操作中心です。',
+    kw: '歌詞 タイマー,lrc メーカー,lrc 作成,歌詞 シンクロ,lrc editor',
+    intro: '音楽と歌詞を用意して聴きながら一行ずつタイミングを打ち、LRC / SRT を書き出します。すべてブラウザ内で処理されます。',
+    feat: 'MP3・M4A・FLAC・WAV・OGG に対応。歌詞は 1 行 1 文で貼るだけ。既存 LRC の取り込みと微調整もできます。スペースで再生/一時停止、Enter で現在行に打刻、Z で取り消し。',
+    who: 'カバー曲のシンクロをする音楽家、動画に曲を付けるクリエイター、プレイヤー用の歌詞字幕を作る人。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'es': {
+    title: 'Editor LRC - marca letras al escuchar | AI-SRTSub',
+    desc: 'Carga la canción, pega la letra y marca cada línea mientras escuchas; exporta LRC o SRT. Importa un LRC existente para afinarlo. Manejado por teclado.',
+    kw: 'editor lrc online,crear lrc,sincronizar letras,letras con tiempo,lrc maker',
+    intro: 'Carga música, pega la letra, marca el tiempo línea a línea mientras escuchas y exporta LRC o SRT. Nada se sube.',
+    feat: 'Funciona con MP3, M4A, FLAC, WAV y OGG. Una línea por fila; los LRC existentes se pueden importar y ajustar. Espacio reproduce/pausa, Enter marca la línea actual, Z deshace.',
+    who: 'Músicos que sincronizan versiones, creadores que añaden canciones a vídeos y quien hace subtítulos de letras para un reproductor.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'pt': {
+    title: 'Editor LRC - marque a letra ouvindo | AI-SRTSub',
+    desc: 'Carregue a música, cole a letra e marque cada linha enquanto ouve; exporte LRC ou SRT. Importe um LRC existente para ajustar. Controlado pelo teclado.',
+    kw: 'editor lrc online,criar lrc,sincronizar letras,letra com tempo,lrc maker',
+    intro: 'Carregue música, cole a letra, marque o tempo linha a linha ouvindo e exporte LRC ou SRT. Nada é enviado.',
+    feat: 'Funciona com MP3, M4A, FLAC, WAV e OGG. Uma linha por linha da letra; LRCs existentes podem ser importados e ajustados. Espaço toca/pausa, Enter marca a linha atual, Z desfaz.',
+    who: 'Músicos sincronizando covers, criadores adicionando músicas a vídeos e quem faz legendas de letras para um player.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'ko': {
+    title: 'LRC 가사 타이머 | AI-SRTSub',
+    desc: '음악을 넣고 가사를 붙여 넣은 뒤, 듣면서 각 줄의 시간을 찍어 LRC 또는 SRT로 내보냅니다. 기존 LRC를 가져와 다듬을 수도 있습니다. 키보드 중심 조작입니다.',
+    kw: 'lrc 편집기,lrc 만들기,가사 싱크,가사 타이밍,lrc 메이커',
+    intro: '음악과 가사를 준비하고 듣으며 한 줄씩 시간을 찍어 LRC / SRT로 내보냅니다. 모두 브라우저에서 처리됩니다.',
+    feat: 'MP3, M4A, FLAC, WAV, OGG 지원. 가사는 한 줄에 한 문장씩 붙여넣으면 됩니다. 기존 LRC 가져와 미세 조정 가능. 스페이스 재생/일시정지, Enter 현재 줄 찍기, Z 되돌리기.',
+    who: '커버 곡을 싱크하는 뮤지션, 영상에 곡을 넣는 크리에이터, 플레이어용 가사 자막을 만드는 사람.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'de': {
+    title: 'LRC-Editor - Lyrics beim Hören timen | AI-SRTSub',
+    desc: 'Song laden, Lyrics einfügen und jede Zeile beim Hören timen; als LRC oder SRT exportieren. Vorhandene LRC-Dateien importieren und feinjustieren. Tastaturgesteuert.',
+    kw: 'lrc editor online,lrc erstellen,lyrics synchronisieren,lrc maker,text timing',
+    intro: 'Musik laden, Lyrics einfügen, Zeile für Zeile beim Hören timen und als LRC oder SRT exportieren. Nichts wird hochgeladen.',
+    feat: 'Läuft mit MP3, M4A, FLAC, WAV und OGG. Eine Zeile pro Reihe; bestehende LRC-Dateien lassen sich importieren und anpassen. Leertaste spielt/pausiert, Enter setzt die aktuelle Zeile, Z macht rückgängig.',
+    who: 'Musiker, die Covers synchronisieren, Creator, die Songs ins Video bringen, und alle, die Lyrics-Untertitel für einen Player bauen.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'fr': {
+    title: 'Éditeur LRC - chronométrez en écoutant | AI-SRTSub',
+    desc: "Chargez la chanson, collez les paroles et chronométrez chaque ligne en écoutant ; exportez en LRC ou SRT. Importez un LRC existant pour l'affiner. Au clavier.",
+    kw: 'éditeur lrc en ligne,créer lrc,synchroniser paroles,minuterie paroles,lrc maker',
+    intro: 'Chargez la musique, collez les paroles, tapez le minutage ligne par ligne en écoutant et exportez en LRC ou SRT. Aucun envoi.',
+    feat: "Compatible MP3, M4A, FLAC, WAV et OGG. Une ligne par ligne de paroles ; les LRC existants s'importent et se règlent finement. Espace lecture/pause, Entrée horodate la ligne courante, Z annule.",
+    who: 'Musiciens qui synchronisent des reprises, créateurs qui ajoutent des chansons à des vidéos et quiconque fait des sous-titres de paroles pour un lecteur.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'id': {
+    title: 'Editor LRC - tandai lirik sambil dengar | AI-SRTSub',
+    desc: 'Muat lagunya, tempel liriknya, dan tandai waktu tiap baris sambil mendengarkan; ekspor LRC atau SRT standar. Impor LRC lama untuk disetel halus. Berbasis keyboard.',
+    kw: 'editor lrc online,buat lrc,sinkron lirik,timing lirik,lrc maker',
+    intro: 'Muat musik, tempel lirik, tandai waktunya baris demi baris sambil mendengar, lalu ekspor LRC atau SRT. Tak ada unggahan.',
+    feat: 'Mendukung MP3, M4A, FLAC, WAV, dan OGG. Satu baris per baris; LRC yang sudah ada bisa diimpor dan disetel. Spasi putar/jeda, Enter menandai baris aktif, Z membatalkan.',
+    who: 'Musisi yang menyinkronkan cover, kreator yang menambahkan lagu ke video, dan siapa pun yang membuat subtitel lirik untuk pemutar.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'hi': {
+    title: 'LRC लिरिक्स टाइमर | AI-SRTSub',
+    desc: 'गाना लोड करें, बोल पेस्ट करें, सुनते हुए हर पंक्ति का समय टैप करें; LRC या SRT में निर्यात करें। पुराना LRC इम्पोर्ट कर बारीकी लें।',
+    kw: 'lrc एडिटर ऑनलाइन,lrc बनाएं,लिरिक्स सिंक,लिरिक्स टाइमिंग,lrc मेकर',
+    intro: 'संगीत लोड करें, बोल चिपकाएँ, सुनते हुए पंक्ति-दर-पंक्ति समय टैप करें और LRC या SRT निर्यात करें। कुछ अपलोड नहीं होता।',
+    feat: 'MP3, M4A, FLAC, WAV, OGG समर्थित। बोल एक पंक्ति में एक पंक्ति चिपकाएँ; पुरानी LRC फ़ाइलें इम्पोर्ट कर सुधारी जा सकती हैं। स्पेस चलाएँ/रोकें, Enter वर्तमान पंक्ति दर्ज करे, Z पूर्ववत करे।',
+    who: 'कवर सिंक करने वाले संगीतकार, वीडियो में गाने जोड़ने वाले क्रिएटर और प्लेयर के लिए लिरिक्स सबटाइटल बनाने वाले।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'th': {
+    title: 'เครื่องมือทำ LRC - จับเวลาเนื้อร้อง | AI-SRTSub',
+    desc: 'ใส่เพลง วางเนื้อร้อง แล้วจับเวลาทีละบรรทัดไปพร้อมกับที่ฟัง ส่งออกเป็น LRC หรือ SRT มาตรฐาน นำเข้าไฟล์ LRC เดิมมาปรับจูนได้',
+    kw: 'ทำ lrc,lrc editor,จับเวลาเนื้อร้อง,ซิงค์เนื้อร้อง,สร้าง lrc',
+    intro: 'ใส่เพลงและเนื้อร้อง จับเวลาทีละบรรทัดไปพร้อมที่ฟัง แล้วส่งออก LRC หรือ SRT ไม่มีการอัปโหลด',
+    feat: 'รองรับ MP3, M4A, FLAC, WAV, OGG วางเนื้อร้องบรรทัดละหนึ่งประโยค นำเข้า LRC เดิมมาปรับได้ spacebar เล่น/หยุด Enter ปักเวลาบรรทัดปัจจุบัน Z ย้อน',
+    who: 'นักดนตรีที่ซิงค์เพลง cover ครีเอเตอร์ที่ใส่เพลงในวิดีโอ และคนทำซับเนื้อร้องให้เครื่องเล่น',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'vi': {
+    title: 'Trục thời gian lời bài hát LRC | AI-SRTSub',
+    desc: 'Nạp bài hát, dán lời và bấm mốc thời gian từng dòng khi nghe; xuất LRC hoặc SRT chuẩn. Nhập file LRC sẵn có để tinh chỉnh. Vận hành bằng bàn phím.',
+    kw: 'trình chỉnh lrc online,tạo lrc,canh lời bài hát,gõ thời gian lời,lrc maker',
+    intro: 'Nạp nhạc, dán lời, bấm mốc từng dòng khi nghe và xuất LRC hoặc SRT. Không tải gì lên.',
+    feat: 'Chạy với MP3, M4A, FLAC, WAV và OGG. Mỗi dòng một hàng; LRC sẵn có có thể nhập vào và chỉnh. Space phát/tạm dừng, Enter đóng dấu dòng hiện tại, Z hoàn tác.',
+    who: 'Nhạc sĩ căn lời bản cover, creator thêm bài hát vào video và người làm phụ đề lời cho trình phát.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'ru': {
+    title: 'Редактор LRC — тайминг по слуху | AI-SRTSub',
+    desc: 'Загрузите песню, вставьте текст и отмечайте время каждой строки на слух; экспорт в LRC или SRT. Готовый LRC можно импортировать и подправить. Всё с клавиатуры.',
+    kw: 'редактор lrc онлайн,создать lrc,синхронизация текста песни,тайминг текста,lrc maker',
+    intro: 'Загрузите музыку, вставьте текст, отбивайте тайминг построчно на слух и экспортируйте в LRC или SRT. Ничего не загружается.',
+    feat: 'Работает с MP3, M4A, FLAC, WAV и OGG. Одна строка на строку текста; готовые LRC импортируются и корректируются. Пробел — воспроизведение/пауза, Enter — метка текущей строки, Z — отмена.',
+    who: 'Музыканты, синхронизирующие каверы, авторы, добавляющие песни в видео, и все, кто делает текстовые субтитры для плеера.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'it': {
+    title: 'Editor LRC - timing delle parole | AI-SRTSub',
+    desc: 'Carica il brano, incolla il testo e segna il tempo di ogni riga mentre ascolti; esporta in LRC o SRT standard. Importa un LRC esistente per rifinirlo. Da tastiera.',
+    kw: 'editor lrc online,creare lrc,sincronizzare testo canzone,timing testo,lrc maker',
+    intro: 'Carica la musica, incolla il testo, batti il tempo riga per riga mentre ascolti ed esporta in LRC o SRT. Nessun caricamento.',
+    feat: 'Funziona con MP3, M4A, FLAC, WAV e OGG. Una riga per verso; i file LRC esistenti si importano e si regolano. Spazio riproduce/pausa, Invio timbra la riga corrente, Z annulla.',
+    who: 'Musicisti che sincronizzano cover, creator che aggiungono canzoni ai video e chi fa sottotitoli di testo per un lettore.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'ar': {
+    title: 'محرر LRC - توقيت الكلمات بالاستماع | AI-SRTSub',
+    desc: 'حمّل الأغنية وألصق الكلمات وسجّل توقيت كل سطر أثناء الاستماع؛ صدّر بصيغة LRC أو SRT القياسية. استورد ملف LRC جاهزًا لضبطه. تحكم بلوحة المفاتيح.',
+    kw: 'محرر lrc اونلاين,انشاء lrc,مزامنة كلمات الاغاني,توقيت الكلمات,lrc maker',
+    intro: 'حمّل الموسيقى، ألصق الكلمات، سجّل التوقيت سطرًا سطرًا أثناء الاستماع وصدّر بصيغة LRC أو SRT. لا يُرفع شيء.',
+    feat: 'يدعم MP3 و M4A و FLAC و WAV و OGG. سطر واحد لكل صف؛ ملفات LRC الجاهزة تُستورد وتُضبط. المسافة تشغيل/إيقاف، Enter يسجّل السطر الحالي، Z يتراجع.',
+    who: 'الموسيقيون الذين يزامنون أغاني الغلاف، وصنّاع المحتوى الذين يضيفون الأغاني إلى الفيديو، ومن يصنع ترجمات كلمات لمشغّل.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'tr': {
+    title: 'LRC editörü - dinleyerek zamanlama | AI-SRTSub',
+    desc: "Şarkıyı yükleyin, sözleri yapıştırın ve dinlerken her satırın zamanını vurun; standart LRC veya SRT olarak dışa aktarın. Mevcut bir LRC'yi içe alıp ince ayar yapın.",
+    kw: 'lrc editör online,lrc oluşturma,şarkı sözü senkron,söz zamanlaması,lrc maker',
+    intro: 'Müziği yükleyin, sözleri yapıştırın, dinlerken satır satır zaman vurun ve LRC veya SRT dışa aktarın. Hiçbir şey yüklenmez.',
+    feat: 'MP3, M4A, FLAC, WAV ve OGG ile çalışır. Satır başına bir dize; mevcut LRC dosyaları içe alınıp ayarlanabilir. Boşluk oynat/duraklat, Enter geçerli satırı damgalar, Z geri alır.',
+    who: 'Cover senkronlayan müzisyenler, videolara şarkı ekleyen içerik üreticileri ve oynatıcı için şarkı sözü altyazısı yapan herkes.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'nl': {
+    title: 'LRC-editor - lyrics timen tijdens luisteren | AI-SRTSub',
+    desc: "Laad het nummer, plak de lyrics en tim elke regel terwijl je luistert; exporteer als standaard LRC of SRT. Bestaande LRC's importeer je voor fijnafstelling.",
+    kw: 'lrc editor online,lrc maken,lyrics synchroniseren,tekst timing,lrc maker',
+    intro: 'Laad muziek, plak de lyrics, tim regel voor regel mee met het luisteren en exporteer LRC of SRT. Niets wordt geüpload.',
+    feat: "Werkt met MP3, M4A, FLAC, WAV en OGG. Eén regel per rij; bestaande LRC's importeren en bijstellen kan. Spatie speelt/pauzeert, Enter zet de huidige regel, Z maakt ongedaan.",
+    who: "Muzikanten die covers syncen, creators die nummers aan video's toevoegen en iedereen die lyric-ondertitels voor een speler maakt.",
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'pl': {
+    title: 'Edytor LRC - timing tekstu na słuch | AI-SRTSub',
+    desc: 'Wczytaj piosenkę, wklej tekst i zaznaczaj czas linijek podczas słuchania; eksportuj do LRC lub SRT. Zaimportuj istniejący LRC i doszlifuj. Z klawiatury.',
+    kw: 'edytor lrc online,stwórz lrc,synchronizacja tekstu,timing tekstu piosenki,lrc maker',
+    intro: 'Wczytaj muzykę, wklej tekst, odmierzaj czas linijka po linijce na słuch i eksportuj do LRC lub SRT. Nic nie jest wysyłane.',
+    feat: 'Działa z MP3, M4A, FLAC, WAV i OGG. Jedna linijka na wiersz; istniejące pliki LRC można importować i stroić. Spacja odtwarza/pauzuje, Enter znaczy bieżącą linijkę, Z cofa.',
+    who: 'Muzycy synchronizujący covery, twórcy dodający piosenki do filmów i wszyscy, którzy robią napisy z tekstem dla odtwarzacza.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'sv': {
+    title: 'LRC-redigerare - tida texten vid lyssning | AI-SRTSub',
+    desc: 'Ladda låten, klistra in texten och markera varje rads tid medan du lyssnar; exportera som LRC eller SRT. Befintliga LRC kan importeras och finjusteras.',
+    kw: 'lrc redigerare online,skapa lrc,synka text,timing låttext,lrc maker',
+    intro: 'Ladda musik, klistra in texten, tida rad för rad medan du lyssnar och exportera LRC eller SRT. Inget laddas upp.',
+    feat: 'Fungerar med MP3, M4A, FLAC, WAV och OGG. En rad per rad; befintliga LRC-filer kan importeras och justeras. Mellanslag spelar/pausar, Enter stämplar aktuell rad, Z ångrar.',
+    who: 'Musiker som synkar covers, skapare som lägger låtar på video och alla som gör textundertexter till en spelare.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'cs': {
+    title: 'LRC editor - časuj text poslechem | AI-SRTSub',
+    desc: 'Nahrajte píseň, vložte text a při poslechu označujte čas řádků; exportujte do LRC nebo SRT. Existující LRC naimportujete a doladíte. Ovládání klávesnicí.',
+    kw: 'lrc editor online,vytvořit lrc,synchronizace textu,časování textu,lrc maker',
+    intro: 'Nahrajte hudbu, vložte text, časujte řádek po řádku při poslechu a exportujte LRC nebo SRT. Nic se nenahrává.',
+    feat: 'Funguje s MP3, M4A, FLAC, WAV a OGG. Jeden řádek na řádek textu; hotová LRC lze importovat a upravit. Mezerník přehraje/pozastaví, Enter označí aktuální řádek, Z vrátí zpět.',
+    who: 'Hudebníci synchronizující covery, tvůrci přidávající písně do videí a všichni, kdo dělají textové titulky pro přehrávač.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'uk': {
+    title: 'LRC-редактор — таймінг на слух | AI-SRTSub',
+    desc: 'Завантажте пісню, вставте текст і позначайте час рядків на слух; експорт у LRC або SRT. Наявний LRC можна імпортувати та підправити. Керування з клавіатури.',
+    kw: 'lrc редактор онлайн,створити lrc,синхронізація тексту пісні,таймінг тексту,lrc maker',
+    intro: 'Завантажте музику, вставте текст, відбивайте таймінг рядок за рядком на слух і експортуйте у LRC або SRT. Нічого не завантажується.',
+    feat: 'Працює з MP3, M4A, FLAC, WAV і OGG. Один рядок на рядок тексту; готові LRC імпортуються й коригуються. Пробіл — відтворення/пауза, Enter — позначка поточного рядка, Z — скасування.',
+    who: 'Музиканти, що синхронізують кавери, автори, що додають пісні у відео, і всі, хто робить текстові субтитри для плеєра.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'da': {
+    title: 'LRC-editor - timing teksten mens du hører | AI-SRTSub',
+    desc: 'Indlæs sangen, indsæt teksten og markér hver linje, mens du hører; eksportér som LRC eller SRT. Importér en eksisterende LRC og finjustér. Tastaturstyret.',
+    kw: 'lrc editor online,lav lrc,synkroniser tekst,timing sangtekst,lrc maker',
+    intro: 'Indlæs musik, indsæt teksten, markér tiden linje for linje, mens du hører, og eksportér LRC eller SRT. Intet uploades.',
+    feat: 'Virker med MP3, M4A, FLAC, WAV og OGG. Én linje pr. række; eksisterende LRC-filer kan importeres og justeres. Mellemrum afspiller/pauser, Enter stempler den aktuelle linje, Z fortryder.',
+    who: 'Musikere, der synkroniserer covers, skabere, der tilføjer sange til video, og alle, der laver tekstundertekster til en afspiller.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'fi': {
+    title: 'LRC-editori - aikana sanoitukset kuunnellen | AI-SRTSub',
+    desc: 'Lataa kappale, liitä sanoitus ja merkitse rivien ajat kuunnellessasi; vie LRC:nä tai SRT:nä. Tuo olemassa oleva LRC ja hienosäädä. Näppäimistöohjattu.',
+    kw: 'lrc editor verkossa,tee lrc,sanoitusten synkronointi,sanoitusten ajoitus,lrc maker',
+    intro: 'Lataa musiikki, liitä sanoitus, merkitse rivien ajat kuunnellessa ja vie LRC tai SRT. Mitään ei lähetetä.',
+    feat: 'Toimii MP3-, M4A-, FLAC-, WAV- ja OGG-tiedostojen kanssa. Yksi rivi per rivi; olemassa olevia LRC-tiedostoja voi tuoda ja säätää. Välilyönti toistaa/keskeyttää, Enter leimaa nykyisen rivin, Z kumoa.',
+    who: 'Covereita synkronoivat muusikot, videoihin kappaleita lisäävät tekijät ja kaikki, jotka tekevät sanoitustekstityksiä soittimelle.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'el': {
+    title: 'Επεξεργαστής LRC - χρονισμός στίχων | AI-SRTSub',
+    desc: 'Φορτώστε το τραγούδι, επικολλήστε τους στίχους και σημειώστε τον χρόνο του καθενός καθώς ακούτε· εξαγωγή σε LRC ή SRT. Ένα υπάρχον LRC εισάγεται για ρύθμιση.',
+    kw: 'lrc editor online,δημιουργία lrc,συγχρονισμός στίχων,χρονισμός στίχων,lrc maker',
+    intro: 'Φορτώστε μουσική, επικολλήστε τους στίχους, σημειώστε τον χρόνο στίχο-στίχο καθώς ακούτε και εξαγάγετε LRC ή SRT. Τίποτα δεν ανεβαίνει.',
+    feat: 'Λειτουργεί με MP3, M4A, FLAC, WAV και OGG. Μία γραμμή ανά σειρά· υπάρχοντα LRC εισάγονται και ρυθμίζονται. Το κενό παίζει/παύει, το Enter σφραγίζει την τρέχουσα γραμμή, το Z αναιρεί.',
+    who: 'Μουσικοί που συγχρονίζουν διασκευές, δημιουργοί που προσθέτουν τραγούδια σε βίντεο και όσοι φτιάχνουν υπότιτλους στίχων για player.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'he': {
+    title: 'עורך LRC - תזמון מילים בהאזנה | AI-SRTSub',
+    desc: 'טענו את השיר, הדביקו את המילים וסמנו את זמן כל שורה תוך כדי האזנה; ייצאו כ-LRC או SRT תקני. ייבאו קובץ LRC קיים לכיול עדין. בניהול מקלדת.',
+    kw: 'עורך lrc אונליין,יצירת lrc,סנכרון מילים,תזמון מילים,lrc maker',
+    intro: 'טענו מוזיקה, הדביקו מילים, סמנו זמנים שורה-שורה בהאזנה וייצאו LRC או SRT. שום דבר לא מועלה.',
+    feat: 'תומך ב-MP3, M4A, FLAC, WAV ו-OGG. שורה אחת לכל שורת טקסט; קובצי LRC קיימים ניתנים לייבוא וכיול. רווח מנגן/עוצר, Enter מתעד את השורה הנוכחית, Z מבטל.',
+    who: 'מוזיקאים שמסנכרנים גרסאות כיסוי, יוצרים שמוסיפים שירים לסרטונים וכל מי שמכין כתוביות מילים לנגן.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+  'ro': {
+    title: 'Editor LRC - sincronizezi ascultând | AI-SRTSub',
+    desc: 'Încarcă piesa, lipește versurile și marchează timpul liniilor în timp ce asculți; exportă în LRC sau SRT. Importă un LRC existent pentru ajustări. Din tastatură.',
+    kw: 'editor lrc online,creare lrc,sincronizare versuri,timing versuri,lrc maker',
+    intro: 'Încarcă muzica, lipește versurile, marchează timpul linie cu linie în timp ce asculți și exportă LRC sau SRT. Nimic nu se încarcă.',
+    feat: 'Merge cu MP3, M4A, FLAC, WAV și OGG. Un rând pe linie; fișierele LRC existente se importă și se ajustează. Spațiu play/pauză, Enter marchează linia curentă, Z anulează.',
+    who: 'Muzicieni care sincronizează cover-uri, creatori care adaugă melodii în videoclipuri și oricine face subtitrări de versuri pentru un player.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'LRC Lyric Timing Editor'
+  },
+};
+
 const SEO_PAGES = {
   index: { file: 'index.html', table: SEO, path: SEO_PATH, jsonldType: 'WebApplication' },
   merge: { file: 'merge.html', table: SEO_MERGE, path: MERGE_PATH, jsonldType: 'WebApplication' },
@@ -3682,7 +4681,15 @@ const SEO_PAGES = {
   /* v0.9.313：第十一个页面 —— 视频内封字幕提取 */
   videosub: { file: 'videosub.html', table: SEO_VIDEOSUB, path: VIDEOSUB_PATH, jsonldType: 'WebApplication' },
   /* v0.9.313：第十二个页面 —— 中文字幕繁简转换 */
-  hanconv: { file: 'hanconv.html', table: SEO_HANCONV, path: HANCONV_PATH, jsonldType: 'WebApplication' }
+  hanconv: { file: 'hanconv.html', table: SEO_HANCONV, path: HANCONV_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.316：第十三个页面 —— 字幕拆分与拼接 */
+  split: { file: 'split.html', table: SEO_SPLIT, path: SPLIT_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.316：第十四个页面 —— 字幕 Excel/CSV 互转 */
+  table: { file: 'table.html', table: SEO_TABLE, path: TABLE_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.316：第十五个页面 —— 批量字幕转换打包 */
+  batch: { file: 'batch.html', table: SEO_BATCH, path: BATCH_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.316：第十六个页面 —— 歌词打轴 */
+  lrc: { file: 'lrc.html', table: SEO_LRC, path: LRC_PATH, jsonldType: 'WebApplication' }
 };
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
@@ -3823,14 +4830,15 @@ function serveIndexLang(req, res, lang, page){
   });
 }
 
-/* sitemap：十二页 × 27 语言 = 324 条 URL，每条带本页的 hreflang alternates。
+/* sitemap：十六页 × 27 语言 = 432 条 URL，每条带本页的 hreflang alternates。
    v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。
    v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。
    v0.9.288 起字幕格式转换独立成 /convert.html，第五个页面进表。
    v0.9.296 起字幕乱码修复独立成 /repair.html，第八个页面进表。
    v0.9.299 起字幕提取纯文本独立成 /extract.html，第九个页面进表。
    v0.9.302 起术语批量替换独立成 /glossary.html，第十个页面进表。
-   v0.9.313 起视频内封字幕提取 /videosub.html、繁简转换 /hanconv.html 进表，共十二页 324 条。 */
+   v0.9.313 起视频内封字幕提取 /videosub.html、繁简转换 /hanconv.html 进表，共十二页 324 条。
+   v0.9.316 起拆分拼接 /split.html、表格互转 /table.html、批量转换 /batch.html、歌词打轴 /lrc.html 进表，共十六页 432 条。 */
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {

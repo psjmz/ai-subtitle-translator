@@ -1027,7 +1027,13 @@
          /* v0.9.313：第十一条色线 —— 视频内封字幕提取页（墨绿） */
          --vs:#0F766E; --vs-ink:#0B5B55; --vs-weak:#E6F4F2; --vs-line:#A5D9D3;
          /* v0.9.313：第十二条色线 —— 中文字幕繁简转换页（紫罗兰） */
-         --hc:#5B21B6; --hc-ink:#4C1D95; --hc-weak:#F3EAFE; --hc-line:#D6C4F5; }
+         --hc:#5B21B6; --hc-ink:#4C1D95; --hc-weak:#F3EAFE; --hc-line:#D6C4F5;
+         /* v0.9.316：第十三至十六条色线 —— split 拆分拼接(深橙) / table 表格互转(橄榄绿) /
+            batch 批量转换(石板) / lrc 歌词打轴(酒红) */
+         --sp:#C2410C; --sp-ink:#9A3412; --sp-weak:#FEF0E7; --sp-line:#FBC8A6;
+         --tb:#4D7C0F; --tb-ink:#3F660C; --tb-weak:#F1F7E8; --tb-line:#CBDFA6;
+         --bt:#334155; --bt-ink:#263549; --bt-weak:#EEF1F5; --bt-line:#C3CBD6;
+         --lr:#9D174D; --lr-ink:#7F1140; --lr-weak:#FBEBF1; --lr-line:#EFAEC6; }
   .vh{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
   /* ---------------- 顶部：工具小卡 ---------------- */
@@ -1054,6 +1060,11 @@
   /* v0.9.313：第十一、十二张工具卡 */
   .tc.vs{--k:var(--vs);--kw:var(--vs-weak);--ki:var(--vs-ink);--kl:var(--vs-line)}
   .tc.hc{--k:var(--hc);--kw:var(--hc-weak);--ki:var(--hc-ink);--kl:var(--hc-line)}
+  /* v0.9.316：第十三至十六张工具卡 */
+  .tc.sp{--k:var(--sp);--kw:var(--sp-weak);--ki:var(--sp-ink);--kl:var(--sp-line)}
+  .tc.tb{--k:var(--tb);--kw:var(--tb-weak);--ki:var(--tb-ink);--kl:var(--tb-line)}
+  .tc.bt{--k:var(--bt);--kw:var(--bt-weak);--ki:var(--bt-ink);--kl:var(--bt-line)}
+  .tc.lr{--k:var(--lr);--kw:var(--lr-weak);--ki:var(--lr-ink);--kl:var(--lr-line)}
   .tc:hover{border-color:var(--kl);box-shadow:0 8px 22px -16px rgba(18,18,24,.42);transform:translateY(-1px)}
   .tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--k);opacity:0;transition:opacity .15s}
   .tc:hover::before{opacity:1}
@@ -1086,6 +1097,11 @@
   /* v0.9.313：第十一、十二段详解 */
   .det-tx.vs{--k:var(--vs);--kw:var(--vs-weak);--ki:var(--vs-ink);--kl:var(--vs-line)}
   .det-tx.hc{--k:var(--hc);--kw:var(--hc-weak);--ki:var(--hc-ink);--kl:var(--hc-line)}
+  /* v0.9.316：四段新详解 */
+  .det-tx.sp{--k:var(--sp);--kw:var(--sp-weak);--ki:var(--sp-ink);--kl:var(--sp-line)}
+  .det-tx.tb{--k:var(--tb);--kw:var(--tb-weak);--ki:var(--tb-ink);--kl:var(--tb-line)}
+  .det-tx.bt{--k:var(--bt);--kw:var(--bt-weak);--ki:var(--bt-ink);--kl:var(--bt-line)}
+  .det-tx.lr{--k:var(--lr);--kw:var(--lr-weak);--ki:var(--lr-ink);--kl:var(--lr-line)}
   .det-eye{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.3px;
     padding:4px 12px;border-radius:99px;background:var(--kw);color:var(--ki)}
   .det h2{margin:15px 0 0;font-size:25px;font-weight:850;letter-spacing:-.5px;line-height:1.35;color:var(--ink)}
@@ -1178,6 +1194,15 @@
   .vs-fig .mk-doc-h .d.good{color:var(--vs-ink)}
   .hc-fig .mk-doc.ok{background:var(--hc-weak);border-color:var(--hc-line)}
   .hc-fig .mk-doc-h .d.good{color:var(--hc-ink)}
+  /* v0.9.316 */
+  .sp-fig .mk-doc.ok{background:var(--sp-weak);border-color:var(--sp-line)}
+  .sp-fig .mk-doc-h .d.good{color:var(--sp-ink)}
+  .tb-fig .mk-doc.ok{background:var(--tb-weak);border-color:var(--tb-line)}
+  .tb-fig .mk-doc-h .d.good{color:var(--tb-ink)}
+  .bt-fig .mk-doc.ok{background:var(--bt-weak);border-color:var(--bt-line)}
+  .bt-fig .mk-doc-h .d.good{color:var(--bt-ink)}
+  .lr-fig .mk-doc.ok{background:var(--lr-weak);border-color:var(--lr-line)}
+  .lr-fig .mk-doc-h .d.good{color:var(--lr-ink)}
   .sh-fig .mk-tl-row.d i{background:var(--sh);opacity:.42}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
@@ -1200,7 +1225,7 @@ crossorigin="anonymous"></script>
     <nav class="lnav">
       <!-- v0.9.280：logo 整块做成「回首页」的入口（用户定案）。href 由 syncLogoHome() 跟着界面语言重算 ——
            /ja/ 点回来还是 /ja/，不掉语言。⚠️ 里面不放 <div>：<a> 的内容模型是「透明」，改成 span 更干净。 -->
-      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.315</span></a>
+      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.316</span></a>
       <div class="spacer"></div>
       <select id="uiLang2" aria-label="UI language"></select>
     </nav>
@@ -1317,6 +1342,45 @@ crossorigin="anonymous"></script>
         </div>
         <div class="tc-n" data-i18n="tcHcN">繁简转换</div>
         <p class="tc-d" data-i18n="tcHcD">简繁互转，可选台湾 / 香港用法</p>
+      </a>
+
+
+      <!-- v0.9.316：第十三至十六张内部工具卡 —— sp=split 拆分拼接 / tb=table 表格互转 /
+           bt=batch 批量转换 / lr=lrc 歌词打轴。 -->
+      <a class="tc sp" href="/split.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h6M15 12h6"/><path d="m7 8-4 4 4 4"/><path d="m17 8 4 4-4 4"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcSpN">字幕拆分拼接</div>
+        <p class="tc-d" data-i18n="tcSpD">按时长条数切开，多份合一</p>
+      </a>
+
+      <a class="tc tb" href="/table.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcTbN">字幕转表格</div>
+        <p class="tc-d" data-i18n="tcTbD">Excel 里逐行校对，改完导回</p>
+      </a>
+
+      <a class="tc bt" href="/batch.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M10 6h2M14 8h2M10 10h2M14 12h2M10 14h2M14 16h2"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcBtN">批量转格式</div>
+        <p class="tc-d" data-i18n="tcBtD">几百个文件一次转，打包 ZIP</p>
+      </a>
+
+      <a class="tc lr" href="/lrc.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="19" cy="16" r="3"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcLrN">歌词打轴</div>
+        <p class="tc-d" data-i18n="tcLrD">听歌逐句点时间，导出 LRC</p>
       </a>
 
       <!-- v0.9.277：视频下载工具。默认隐藏，仅官方域名由落地页脚本显示
@@ -1835,7 +1899,148 @@ crossorigin="anonymous"></script>
     </div>
   </section>
 
-  <!-- ⑬ 视频下载工具（同上：只在官方域名显示） -->
+
+  <!-- v0.9.316 ⑬ 字幕拆分与拼接 -->
+  <section class="det" aria-labelledby="detSpTitle">
+    <div class="det-in">
+      <div class="det-tx sp">
+        <span class="det-eye" data-i18n="tcSpN">字幕拆分拼接</span>
+        <h2 id="detSpTitle" data-i18n="detSpT">一份切多段，多段拼一份</h2>
+        <p class="det-lead" data-i18n="detSpL">长字幕按时长或条数切成几段，每段可以从零重新计时；散落的多份按顺序接成一集，或按时间戳交织合并。序号自动重排，台词一个字不改。</p>
+        <ul class="det-list">
+          <li data-i18n="detSp1">只按字幕条边界切，绝不把一条台词从中间腰斩</li>
+          <li data-i18n="detSp2">拼接保留每段内部的节奏，段间隔自己定</li>
+          <li data-i18n="detSp3">交织模式按原始时间轴排序，重叠如实保留并提醒</li>
+          <li data-i18n="detSp4">SRT 与 VTT 都支持，拆完逐段下载</li>
+        </ul>
+        <a class="det-cta" href="/split.html"><span data-i18n="detSpCta">打开字幕拆分拼接</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig sp-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">SRT</span></div>
+          <p class="mk-p">一份 40 分钟</p>
+          <p class="mk-p">1180 条台词</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">SRT ×4</span></div>
+          <p class="mk-p">part1 · part2</p>
+          <p class="mk-p">part3 · part4</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN13">按条切，不腰斩</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- v0.9.316 ⑭ 字幕 Excel/CSV 互转 -->
+  <section class="det" aria-labelledby="detTbTitle">
+    <div class="det-in">
+      <div class="det-tx tb">
+        <span class="det-eye" data-i18n="tcTbN">字幕转表格</span>
+        <h2 id="detTbTitle" data-i18n="detTbT">字幕搬进 Excel，改完再搬回来</h2>
+        <p class="det-lead" data-i18n="detTbL">把 SRT / VTT 导出成 Excel 或 CSV，在表格里逐行校对、翻译、写批注，然后整表导回字幕。时间列按文本保真不丢毫秒，台词换行原样进单元格。</p>
+        <ul class="det-list">
+          <li data-i18n="detTb1">时间列保持 00:00:01,000 原样文本，毫秒不丢</li>
+          <li data-i18n="detTb2">单元格里的换行导回字幕时原样还原</li>
+          <li data-i18n="detTb3">中英文列头都认，识别不了的行自动跳过</li>
+          <li data-i18n="detTb4">表格发出去审稿，收回来直接导回字幕</li>
+        </ul>
+        <a class="det-cta" href="/table.html"><span data-i18n="detTbCta">打开字幕转表格</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig tb-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">SRT</span></div>
+          <p class="mk-p">00:00:01,000</p>
+          <p class="mk-p">Hello, world</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">XLSX</span></div>
+          <p class="mk-p"># · Start · End · Text</p>
+          <p class="mk-p">筛选、批注、排序</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN14">时间不丢毫秒</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- v0.9.316 ⑮ 批量字幕转换打包 -->
+  <section class="det" aria-labelledby="detBtTitle">
+    <div class="det-in">
+      <div class="det-tx bt">
+        <span class="det-eye" data-i18n="tcBtN">批量转格式</span>
+        <h2 id="detBtTitle" data-i18n="detBtT">整个文件夹的字幕，一次换完格式</h2>
+        <p class="det-lead" data-i18n="detBtL">几十上百个 SRT / VTT 拖进来，统一转成目标格式，打成一个 ZIP 拿走。序号重排、时间戳规范化，认不出的文件单独标出来不含糊。</p>
+        <ul class="det-list">
+          <li data-i18n="detBt1">文件名保持原名只换扩展名，重名自动加序号</li>
+          <li data-i18n="detBt2">全程在浏览器里完成，几百个文件也不上传</li>
+          <li data-i18n="detBt3">认不出的文件单独列出、不进包，不静默丢弃</li>
+          <li data-i18n="detBt4">剧集整季目录拖进来，格式立刻统一</li>
+        </ul>
+        <a class="det-cta" href="/batch.html"><span data-i18n="detBtCta">打开批量转换</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig bt-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">文件夹</span></div>
+          <p class="mk-p">128 个 .srt</p>
+          <p class="mk-p">ep01 … ep128</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">ZIP</span></div>
+          <p class="mk-p">subtitles-vtt.zip</p>
+          <p class="mk-p">128 个 .vtt</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN15">一次几百个，一个 ZIP</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- v0.9.316 ⑯ 歌词打轴 -->
+  <section class="det" aria-labelledby="detLrTitle">
+    <div class="det-in">
+      <div class="det-tx lr">
+        <span class="det-eye" data-i18n="tcLrN">歌词打轴</span>
+        <h2 id="detLrTitle" data-i18n="detLrT">边听边敲，一首歌的 LRC 就出来了</h2>
+        <p class="det-lead" data-i18n="detLrL">放入音乐、贴入歌词，播放的同时逐句敲下时间点，导出标准 LRC 或 SRT。已有的 LRC 也能导入微调。空格播放暂停、回车打轴、Z 撤销，双手不离键盘。</p>
+        <ul class="det-list">
+          <li data-i18n="detLr1">支持 MP3 / M4A / FLAC / WAV / OGG 常见音频</li>
+          <li data-i18n="detLr2">快捷键打轴，双手不离键盘</li>
+          <li data-i18n="detLr3">已有 LRC 导入微调，一句一句对</li>
+          <li data-i18n="detLr4">导出 LRC 给播放器，导出 SRT 给剪辑软件</li>
+        </ul>
+        <a class="det-cta" href="/lrc.html"><span data-i18n="detLrCta">打开歌词打轴</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig lr-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">歌词</span></div>
+          <p class="mk-p">一句歌词一行</p>
+          <p class="mk-p">（还没有时间）</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">LRC</span></div>
+          <p class="mk-p">[00:12.30]一句歌词</p>
+          <p class="mk-p">[00:18.05]下一句</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN16">空格播放，回车打轴</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 外链 · 视频下载工具（同上：只在官方域名显示） -->
   <section class="det" id="dlSec" aria-labelledby="detDlTitle" style="display:none">
     <div class="det-in">
       <div class="det-tx dl">
@@ -1915,7 +2120,7 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.315"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
+<script src="site-i18n.js?v=0.9.316"></script><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
 <script>
 /* =============================================================================
    首页（落地页）脚本 —— v0.9.277
@@ -2093,6 +2298,6 @@ function repaintStats() { if (statsRaw) paintStats(statsRaw); }
   if (asCard) asCard.style.display = '';
 })();
 </script>
-<script src="site-nav.js?v=0.9.315" data-tool="tr"></script>
+<script src="site-nav.js?v=0.9.316" data-tool="tr"></script>
 </body>
 </html>

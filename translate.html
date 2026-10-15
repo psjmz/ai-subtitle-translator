@@ -119,14 +119,17 @@
      容器只有三种（凡挂 ⓘ 的）：
        · .flbl —— 字段标签（左栏绝大多数）
        · .tgl-row —— 开关那一整行（挂到行上，不能挂 .l：它只裹文字，实测浮层只有 44px 宽）
-       · .wrap-row —— 两列并排时按整行铺开；按列铺只有 107px，浮层细长没法读
+       · .blk-title.wrap-head —— 折行块标题行（v0.9.316 起行宽标签也挂这行，按整行铺开；
+         按列铺只有 107px，浮层细长没法读）
      （v0.9.74 那条「左栏自图标向右展开」的老 hack 一并作废：它只治左栏，且照样探出右边界。） */
   .info{position:static}
   .info::after{left:0;right:0;width:auto;max-width:none;transform:translateY(4px)}
   .info::before{left:50%;transform:translateX(-50%) rotate(45deg)}
   .info:hover::after{opacity:1;transform:translateY(0)}
   .flbl,.tgl-row{position:relative}
-  .wrap-row>.wr-cell>.flbl{position:static}
+  /* v0.9.316：挪上标题行的行宽标签不自成定位上下文 —— 浮层锚点由 .blk-title（relative）接管，
+     照旧铺满整行宽（与旧 .wrap-row 时代同理由） */
+  .wrap-head .wrap-lbl{position:static}
   /* v0.9.199：ⓘ 此前只有 :hover 能唤出浮层——触屏没有 hover、键盘 Tab 不到（<i> 默认不可聚焦），
      这两类用户一条帮助都拿不到。给 <i> 补了 tabindex="0"，这里补聚焦态：键盘 Tab 到就显示，
      并显示焦点环（不然用户不知道焦点在哪）。同理 [data-tip] 虚线词也补一份。 */
@@ -172,16 +175,23 @@
   /* v0.9.190：「折行阈值 / 双语行宽」两列并排（右栏只有 226px 可用宽，两列各 ~108px，
      number 输入框足够；hint 是「21 ≈ 50 个字符」这类短句，2 行内放得下）。
      目的：把竖排时的两组 label+input+hint 并成一组，矮屏右栏不再出现内滚动条。 */
-  .wrap-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative}
-  /* v0.9.202：两个行宽按模式二选一，永远只显示一个 → 收成单列，别留半行空白 */
-  .wrap-row.solo{grid-template-columns:1fr}
+  /* v0.9.316：折行设置压成两行 —— 行宽标签挪上标题行右端（跟着模式二选一），
+     输入框与换算提示并成一排。原先竖着四层（标题/标签/输入框/提示），
+     压两行后矮屏更难触发右栏内滚动（v0.9.190/202 两次压高度的延续）。
+     ⚠️ 给了 display 就要自己管住 [hidden]（v0.9.309 的教训）：wrap-lbl 与 wr-cell 都补了。 */
+  .blk-title.wrap-head{display:flex;align-items:center;gap:6px}
+  /* 标签 margin-left:auto 推到行尾；两个标签永远只显示一个（syncWrapField），auto 只生效一份 */
+  .wrap-head .wrap-lbl{margin:0 0 0 auto;overflow-wrap:anywhere}
+  .wrap-lbl[hidden]{display:none}
+  .wrap-line{display:flex;align-items:center;gap:10px}
+  .wrap-line>.wr-cell{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+  .wrap-line>.wr-cell[hidden]{display:none}
+  .wrap-line input[type=number]{width:86px;flex:none}
+  .wrap-line .hint{margin:0;flex:1;min-width:0}
   .wr-cell{min-width:0}
-  /* 两个 label 字数差得多（「折行阈值」4 字 vs「双语行宽（译文行）」9 字，其余语言同样长短不齐），
-     窄列里右边会折成两行 → 两个输入框上下错开一行，看着像没对齐。给 label 固定两行高，
-     多行的那侧顶对齐，两个输入框就齐平了。 */
-  .wr-cell .flbl{margin-top:0;min-height:31px;align-items:flex-start}
   /* v0.9.194：窄列里「原文离底距离 + info 图标」这类长标签会横向溢出，把小图标顶到格子外面
-     （实测 en/ja/ar 更明显）。让文字可断行，图标就能留在原位。 */
+     （实测 en/ja/ar 更明显）。让文字可断行，图标就能留在原位。
+     （v0.9.316：折行标签挪上标题行后，.wr-cell 里不再有 .flbl，此规则只剩 ASS 区沿用。） */
   .wr-cell .flbl>span{overflow-wrap:anywhere}
   /* v0.9.194：ASS 原文列在单语导出时整列隐藏，剩下的译文列要跨满整行
      （.wrap-row 是固定两列网格，某一列 display:none 不会自动补位，右半栏会空着）。 */
@@ -203,7 +213,7 @@
   /* v0.9.297：块标题要能承载 ⓘ —— 浮层的定位基准是「最近的 position 非 static 祖先」，
      不给 relative 的话它会一路找到面板上去（宽度/位置都不对）。 */
   .blk-title{font-size:11px;font-weight:600;color:var(--sub);letter-spacing:.4px;margin:0 0 8px;position:relative}
-  .param-blk>.wrap-row:first-of-type{margin-top:0}
+  .param-blk>.wrap-line{margin-top:0}
   /* v0.9.199：ASS 参数区的「一个列头 + 三行参数表」。
      列头把「译文 / 原文」说一次，行标签只留「字号 / 颜色 / 离底」——
      标签从 6 字缩到 2 字，不用再换行，行数从 9 行压到 3 行。
@@ -1077,7 +1087,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.315</span>
+    <span class="ver-tag">v0.9.316</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <div class="proj"><span class="live"></span><span id="projName" data-i18n="projEmpty">未导入字幕</span></div>
     <div class="ticker" id="ticker" hidden aria-live="off">
@@ -1597,22 +1607,25 @@ crossorigin="anonymous"></script>
            ② 折行块本来只有「一个输入框 + 一行换算提示」，压着两行灰字显得比它实际的分量重。
            文案与「跟着模式换（单语/双语）」的逻辑一个字没动，只是换了挂载点：
            id 仍是 wrapTipEl，改挂 data-tip-i18n —— 浮层的取词口在这里（见 applyTipI18n）。 -->
+      <!-- v0.9.316：整块压成两行（原先标题/标签/输入框/提示竖着四层，右栏高度吃紧）：
+           ① 行宽标签挪上标题行右端 —— 仍跟着模式二选一（syncWrapField 同步换），
+              与「折行设置」同行后语义正好：这节就是调一个行宽；
+           ② 输入框与换算提示并成一排。所有 id（wrapTipEl / wcellMaxW / maxW / maxWHint /
+              wcellBiMaxW / biMaxW / biMaxWHint）与 data-i18n key 一个不动，
+              updateWidthHints / 语言联动的取词口全部照旧。 -->
       <div class="param-blk">
-        <div class="blk-title"><span data-i18n="secWrap">折行设置</span><i class="info" tabindex="0" id="wrapTipEl" data-tip-i18n="wrapTip">i</i></div>
-      <!-- v0.9.190：两个宽度并排一行（原来是上下两组，各占 label+input+hint 三行），
-           竖着排时右栏卡片过高、矮屏会出内滚动条。id 与 data-i18n key 全部原样保留。 -->
-      <!-- v0.9.202：两个行宽改成「按字幕模式二选一」。此前两个框永远并排，
-           单语模式下「双语行宽」改了毫无作用、双语模式下「折行阈值」只管双说话人对白行 ——
-           两个框各自都有一半时间是「改了没反应」的假控件。现在由导出样式决定显示哪个。 -->
-      <div class="wrap-row solo">
+      <div class="blk-title wrap-head">
+        <span data-i18n="secWrap">折行设置</span><i class="info" tabindex="0" id="wrapTipEl" data-tip-i18n="wrapTip">i</i>
+        <label class="flbl wrap-lbl" for="maxW" id="wlblMaxW"><span data-i18n="lblMaxWShort">单语行宽</span><i class="info" tabindex="0" data-tip-i18n="lblMaxW">i</i></label>
+        <label class="flbl wrap-lbl" for="biMaxW" id="wlblBiMaxW" hidden><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" tabindex="0" data-tip-i18n="lblBiMaxW">i</i></label>
+      </div>
+      <div class="wrap-line">
         <div class="wr-cell" id="wcellMaxW">
-          <label class="flbl" for="maxW"><span data-i18n="lblMaxWShort">单语行宽</span><i class="info" tabindex="0" data-tip-i18n="lblMaxW">i</i></label>
           <input type="number" id="maxW" value="21" min="8" max="48">
           <div class="hint" id="maxWHint"></div>
         </div>
         <!-- v0.9.95：双语专用行宽（只约束译文行），与单语折行阈值解耦 -->
         <div class="wr-cell" id="wcellBiMaxW" hidden>
-          <label class="flbl" for="biMaxW"><span data-i18n="lblBiMaxWShort">双语行宽</span><i class="info" tabindex="0" data-tip-i18n="lblBiMaxW">i</i></label>
           <input type="number" id="biMaxW" value="32" min="12" max="64">
           <div class="hint" id="biMaxWHint"></div>
         </div>
@@ -1684,8 +1697,8 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.315"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.315"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.316"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="srt-core.js?v=0.9.316"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -6571,8 +6584,12 @@ function syncWrapField(){
   try {
     const mono = (typeof expFmtOf === 'function') ? (expFmtOf() === 'mono') : true;
     const a = $('wcellMaxW'), b = $('wcellBiMaxW'), tip = $('wrapTipEl');
+    /* v0.9.316：标签挪上标题行后，显隐要连标签一起切（否则换模式后标签与输入框对不上号） */
+    const la = $('wlblMaxW'), lb = $('wlblBiMaxW');
     if (a) a.hidden = !mono;
     if (b) b.hidden = mono;
+    if (la) la.hidden = !mono;
+    if (lb) lb.hidden = mono;
     /* 说明文案同样分模式：双语下还写着「单语字幕」就是错的。
        v0.9.297：这句从常驻正文收进了块标题后面的 ⓘ —— 取词口从 data-i18n 换成
        data-tip-i18n（applyTipI18n 认这个属性刷 data-tip），所以这里两个都要重设：

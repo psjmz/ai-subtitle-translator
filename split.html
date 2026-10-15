@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/split.html 与 /en/split.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>字幕拆分与拼接 - 切成多段 / 多份合一 | 随心字幕 AI</title>
+<meta name="description" content="免费在线拆分和拼接字幕文件：按时长或条数把一份字幕切成多段，每段可从零开始计时；也能把多份按顺序拼成一集，或保留时间戳交织合并。序号自动重排，时间轴只在拼接时平移，台词一个字不改。支持 SRT、VTT。">
+<meta name="keywords" content="字幕拆分,字幕拼接,srt拆分,srt合并,字幕分割,字幕合并成一个,srt splitter,merge srt files,split subtitle,combine subtitles">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#C2410C">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* 视觉系统沿用 v0.9.249「收敛精修」：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.316：本页认领「深橙」色线 ——
+     首页=粉、特效页=淡紫、清洗页=绿、转换页=蓝、剥离页=青、时间轴页=靛蓝、乱码页=砖红、
+     提取页=琥珀、术语页=品红、视频字幕页=墨绿、简繁页=紫罗兰、本页=深橙。
+     与其它页刻意不同色：十六页都处理字幕文件，同色会让用户分不清自己在哪一页。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#C2410C; --acc-weak:#FDEEE5; --acc-line:#F3C9AF; --acc-ink:#9A3412;
+    --grad:#C2410C; --acc2:#C2410C;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(194,65,12,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px;
+    text-decoration:none;white-space:nowrap}
+  .pill:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  .navpills{display:flex;gap:6px;flex-wrap:wrap}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+
+  /* 模式签（拆分 / 拼接）—— 与 merge 页同一套交互语言 */
+  .modes{display:flex;gap:6px;margin-top:16px}
+  .mode{flex:1;height:40px;border:1.5px solid var(--line-strong);border-radius:11px;background:var(--card);
+    color:var(--sub);font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+  .mode:hover{border-color:var(--acc-line)}
+  .mode.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
+  .mode:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{display:block;width:30px;height:30px;margin:0 auto 8px;border-radius:9px;background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+
+  textarea{width:100%;min-height:110px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical;background:var(--card);color:var(--ink)}
+  textarea:focus{outline:none;border-color:var(--acc-line)}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.mini{height:26px;padding:0 10px;font-size:12px;border-radius:7px}
+
+  input[type=number]{height:var(--ctl-h);width:110px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--ink);font-size:13px;padding:0 10px}
+  input[type=number]:focus{outline:none;border-color:var(--acc-line)}
+  select{height:var(--ctl-h);border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--ink);font-size:13px;padding:0 10px}
+  select:focus{outline:none;border-color:var(--acc-line)}
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-ctl);overflow:hidden}
+  .seg button{border:none;border-radius:0;height:30px;font-size:12.5px;color:var(--sub)}
+  .seg button.on{background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
+
+  /* 拼接模式的文件列表（可排序） */
+  .flist{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .fitem{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;
+    background:var(--card-2);padding:8px 12px;font-size:13px}
+  .fitem .no{width:22px;height:22px;border-radius:7px;background:var(--acc-weak);color:var(--acc-ink);
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+  .fitem .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fitem .meta{color:var(--mut);font-size:12px;flex:none}
+  .fitem button{flex:none}
+
+  /* 拆分结果：每段一张小条 */
+  .plist{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .pitem{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;
+    background:var(--card-2);padding:8px 12px;font-size:13px}
+
+  .hint{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.7}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;
+    background:var(--stage);padding:1px 5px;border-radius:5px}
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .navpills{display:none}
+    input[type=number]{width:90px}
+  }
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span class="navpills" id="navPills"></span>
+      <select id="langSel" aria-label="UI language"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">拆分与拼接</em></h1>
+    <p data-i18n="heroSub">一份太长？按时长或条数切成多段，每段可以重新从零开始计时。好几份散的？按顺序拼成一集，或保留各自时间戳交织合并。序号自动重排，台词一个字不改。支持 SRT、VTT。</p>
+  </div>
+
+  <!-- 模式：拆分 / 拼接 -->
+  <div class="modes" role="tablist">
+    <button class="mode on" id="mSplit" role="tab" aria-selected="true" data-i18n="modeSplit">拆分：一份切成多段</button>
+    <button class="mode" id="mJoin" role="tab" aria-selected="false" data-i18n="modeJoin">拼接：多份合成一份</button>
+  </div>
+
+  <!-- 1. 放入字幕 -->
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入字幕</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-t" id="dzTxt" data-i18n="dzTxt">把文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="fname"></span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,text/*" style="display:none">
+    <input type="file" id="fileMany" accept=".srt,.vtt,text/*" multiple style="display:none">
+    <div class="row">
+      <span class="lb" data-i18n="lblFmt">认出来的格式</span>
+      <span class="chip mut" id="fmtChip">—</span>
+      <button id="btnClear" type="button" data-i18n="btnClear">清除</button>
+    </div>
+    <div class="hint" data-i18n="upHint">编码坏了（满屏问号或方块）先去乱码修复页；本页只按 UTF-8 读。</div>
+  </div>
+
+  <!-- 2a. 拆分选项 -->
+  <div class="card" id="splitCard" style="display:none">
+    <h2><span class="n">2</span><span data-i18n="splitTitle">怎么切</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblBy">按</span>
+      <span class="seg">
+        <button type="button" id="byDur" class="on" data-i18n="byDur">时长</button>
+        <button type="button" id="byCount" data-i18n="byCount">条数</button>
+      </span>
+      <input type="number" id="num" min="1" step="1" value="10" aria-label="value">
+      <span class="lb" id="unit" data-i18n="unitMin">分钟一段</span>
+    </div>
+    <div class="row">
+      <label class="lb" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="optZero" checked>
+        <span data-i18n="optZero">每段从 0:00 重新开始计时</span>
+      </label>
+    </div>
+    <div class="hint" data-i18n="splitHint">只在字幕条的边界下刀，绝不把一句话切成两半；一条特别长的字幕跨过时间线时，整条留在前一段。</div>
+  </div>
+
+  <!-- 2b. 拼接选项 -->
+  <div class="card" id="joinCard" style="display:none">
+    <h2><span class="n">2</span><span data-i18n="joinTitle">怎么拼</span></h2>
+    <div class="flist" id="flist"></div>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblOrder">顺序就是拼接顺序（用箭头调整）</span>
+    </div>
+    <div class="row">
+      <span class="lb" data-i18n="lblWay">拼法</span>
+      <span class="seg">
+        <button type="button" id="wSeq" class="on" data-i18n="joinSeqOpt">按顺序接</button>
+        <button type="button" id="wSort" data-i18n="joinSortOpt">按时间交织</button>
+      </span>
+      <span class="lb" id="gapWrap"><span data-i18n="lblGap">段间隔</span></span>
+      <input type="number" id="gap" min="0" step="100" value="0" style="width:90px">
+      <span class="lb" id="gapUnit" data-i18n="unitMs">毫秒</span>
+    </div>
+    <div class="hint" id="joinHint" data-i18n="joinSeqHint">「按顺序接」把后一份整体平移到前一份结束之后，段与段之间不重叠；「按时间交织」保留各份原时间戳、按开始时间排（本来就该同屏的译文轨用它）。</div>
+  </div>
+
+  <!-- 3. 结果 -->
+  <div class="card" id="outCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="outTitle">结果</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblFmtOut">导出格式</span>
+      <span class="seg">
+        <button type="button" id="fSrt" class="on">SRT</button>
+        <button type="button" id="fVtt">VTT</button>
+      </span>
+      <span class="chip mut" id="statChip">—</span>
+    </div>
+    <div id="joinOut" style="display:none">
+      <div class="row">
+        <button class="pri" id="btnDl" type="button" data-i18n="btnDl">下载</button>
+        <button id="btnCopy" type="button" data-i18n="btnCopy">复制</button>
+        <a class="pill" id="goTr" href="/translate.html" data-i18n="goTr">拿去翻译</a>
+      </div>
+      <div style="margin-top:12px"><textarea id="out" readonly></textarea></div>
+    </div>
+    <div id="splitOut" style="display:none">
+      <div class="plist" id="plist"></div>
+      <div class="row">
+        <button class="pri" id="btnDlAll" type="button" data-i18n="btnDlAll">逐段全部下载</button>
+        <span class="lb" data-i18n="dlAllHint">浏览器会依次弹出每一段的下载</span>
+      </div>
+    </div>
+    <div class="msg" id="msg" style="display:none"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="brandName">随心字幕 AI</span> · <span data-i18n="heroEm">拆分与拼接</span>
+  </footer>
+</div>
+
+<script src="split-i18n.js?v=0.9.316"></script>
+<script src="split-core.js?v=0.9.316"></script>
+<script>
+'use strict';
+var I18N = window.SPLIT_I18N.DICT, LANGS = window.SPLIT_I18N.LANGS;
+var LANG = 'zh-CN';
+var C = window.SplitCore;
+
+var S = {
+  mode: 'split',            /* split | join */
+  by: 'dur',                /* dur | count */
+  way: 'seq',               /* seq | sort */
+  fmt: 'srt',               /* 导出格式 */
+  files: [],                /* 拼接模式的多文件 [{name,text,fmt,items}] */
+  single: null,             /* 拆分模式的单文件 */
+  segs: []                  /* 拆分结果（items 数组的数组） */
+};
+
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function fmtDur(ms) {
+  ms = Math.max(0, Math.round(ms));
+  var m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+/* 顶部胶囊：本页自带一份（快照策略，与其它垂直页一致，不含自己） */
+var NAV = [
+  { key: 'navHome', href: null },
+  { key: 'navTr', href: '/translate.html' },
+  { key: 'navFx', href: '/merge.html' },
+  { key: 'navCl', href: '/clean.html' },
+  { key: 'navCv', href: '/convert.html' },
+  { key: 'navSp', href: '/bilingual.html' },
+  { key: 'navSh', href: '/shift.html' },
+  { key: 'navRp', href: '/repair.html' },
+  { key: 'navEx', href: '/extract.html' },
+  { key: 'navGl', href: '/glossary.html' },
+  { key: 'navVs', href: '/videosub.html' },
+  { key: 'navHc', href: '/hanconv.html' },
+  { key: 'navTbl', href: '/table.html' },
+  { key: 'navBt', href: '/batch.html' },
+  { key: 'navLrc', href: '/lrc.html' }
+];
+function renderNav() {
+  var home = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
+  $('#navPills').innerHTML = NAV.map(function (n) {
+    var href = n.href ? ((LANG === 'zh-CN') ? n.href : '/' + LANG + n.href) : home;
+    return '<a class="pill" href="' + href + '">' + esc(t(n.key)) + '</a>';
+  }).join('');
+}
+
+/* ---------- i18n 应用 ---------- */
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+  document.title = t('docTitle');
+  var seg = $('#langSel');
+  if (seg && seg.value !== LANG) seg.value = LANG;
+}
+
+/* ---------- 语言初始化：URL > 上次选的 > 浏览器 ---------- */
+function detectUiLang() {
+  try {
+    var ls = (navigator.languages && navigator.languages[0]) || navigator.language || 'zh-CN';
+    ls = String(ls).toLowerCase();
+    if (ls.indexOf('zh') === 0) return /tw|hk|hant/.test(ls) ? 'zh-TW' : 'zh-CN';
+    for (var i = 0; i < LANGS.length; i++) { if (ls.indexOf(LANGS[i][0].toLowerCase()) === 0) return LANGS[i][0]; }
+    if (/^pt/.test(ls)) return ls.indexOf('br') >= 0 ? 'pt' : 'pt';
+  } catch (e) { }
+  return 'zh-CN';
+}
+function pathUiLang() {
+  try {
+    var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:split\.html)?$/);
+    if (m && LANGS.some(function (x) { return x[0] === m[1]; })) return m[1];
+  } catch (e) { }
+  return null;
+}
+/* 语言相关链接：logo 回家 + 拿去翻译，切语言时也要跟着换（v0.9.316 修复：原先只在 initLang 设一次） */
+function updateLangLinks() {
+  var pre = (LANG === 'zh-CN') ? '' : '/' + LANG;
+  $('#logoHome').href = pre + '/';
+  var goTr = $('#goTr');
+  if (goTr) goTr.href = pre + '/translate.html';
+}
+function initLang() {
+  var sel = $('#langSel');
+  LANGS.forEach(function (pair) { var o = document.createElement('option'); o.value = pair[0]; o.textContent = pair[1]; sel.appendChild(o); });
+  var saved = null;
+  try { saved = localStorage.getItem('splitUiLang'); } catch (e) { }
+  var pLang = pathUiLang();
+  LANG = pLang || ((saved && LANGS.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    try { localStorage.setItem('splitUiLang', LANG); } catch (e) { }
+    applyI18n(); renderNav(); updateLangLinks(); rerender();
+  });
+  updateLangLinks();
+}
+
+/* ---------- 模式切换 ---------- */
+function setMode(m) {
+  S.mode = m;
+  $('#mSplit').classList.toggle('on', m === 'split');
+  $('#mJoin').classList.toggle('on', m === 'join');
+  $('#mSplit').setAttribute('aria-selected', m === 'split');
+  $('#mJoin').setAttribute('aria-selected', m === 'join');
+  $('#dzTxt').textContent = t(m === 'split' ? 'dzTxt' : 'dzMany');
+  rerender();
+}
+$('#mSplit').addEventListener('click', function () { setMode('split'); });
+$('#mJoin').addEventListener('click', function () { setMode('join'); });
+
+/* ---------- 上传 ---------- */
+var dz = $('#dz');
+dz.addEventListener('click', function () { $(S.mode === 'split' ? '#file' : '#fileMany').click(); });
+['dragover', 'dragenter'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('over'); }); });
+['dragleave', 'drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove('over'); }); });
+dz.addEventListener('drop', function (e) {
+  var fs = e.dataTransfer.files;
+  if (fs && fs.length) readFiles(fs);
+});
+$('#file').addEventListener('change', function () { if (this.files.length) readFiles([this.files[0]]); this.value = ''; });
+$('#fileMany').addEventListener('change', function () { if (this.files.length) readFiles(this.files); this.value = ''; });
+
+function readFiles(fs) {
+  var arr = Array.prototype.slice.call(fs);
+  if (S.mode === 'split') {
+    var f = arr[0];
+    f.text().then(function (tx) {
+      var fmt = C.detectFmt(f.name, tx);
+      var items = C.parse(tx, fmt);
+      if (!items.length) { showMsg('msgNoCue', 'err'); return; }
+      S.single = { name: f.name, fmt: fmt, items: items };
+      $('#fmtChip').textContent = fmt.toUpperCase() + ' · ' + items.length;
+      $('#fname').textContent = f.name;
+      rerender();
+    });
+  } else {
+    var jobs = arr.map(function (f) {
+      return f.text().then(function (tx) {
+        var fmt = C.detectFmt(f.name, tx);
+        var items = C.parse(tx, fmt);
+        return { name: f.name, fmt: fmt, items: items, ok: items.length > 0 };
+      });
+    });
+    Promise.all(jobs).then(function (list) {
+      var bad = list.filter(function (x) { return !x.ok; });
+      S.files = S.files.concat(list.filter(function (x) { return x.ok; }));
+      $('#fmtChip').textContent = S.files.length + ' × SRT/VTT';
+      $('#fname').textContent = S.files.map(function (x) { return x.name; }).join(' · ');
+      if (bad.length) showMsg('msgNoCue', 'err');
+      rerender();
+    });
+  }
+}
+
+$('#btnClear').addEventListener('click', function () {
+  S.single = null; S.files = []; S.segs = [];
+  $('#fmtChip').textContent = '—'; $('#fname').textContent = '';
+  rerender();
+});
+
+/* ---------- 拆分选项 ---------- */
+$('#byDur').addEventListener('click', function () { setBy('dur'); });
+$('#byCount').addEventListener('click', function () { setBy('count'); });
+function setBy(b) {
+  S.by = b;
+  $('#byDur').classList.toggle('on', b === 'dur');
+  $('#byCount').classList.toggle('on', b === 'count');
+  var num = $('#num');
+  if (b === 'dur') { num.min = 1; num.value = Math.max(1, Math.round(+num.value / 60) || 10); $('#unit').textContent = t('unitMin'); num.step = 1; }
+  else { num.min = 1; num.value = 10; $('#unit').textContent = t('unitCount'); num.step = 1; }
+  rerender();
+}
+$('#num').addEventListener('change', rerender);
+$('#optZero').addEventListener('change', rerender);
+
+/* ---------- 拼接选项 ---------- */
+$('#wSeq').addEventListener('click', function () { setWay('seq'); });
+$('#wSort').addEventListener('click', function () { setWay('sort'); });
+function setWay(w) {
+  S.way = w;
+  $('#wSeq').classList.toggle('on', w === 'seq');
+  $('#wSort').classList.toggle('on', w === 'sort');
+  $('#gap').disabled = (w !== 'seq');
+  $('#gapWrap').style.opacity = (w === 'seq') ? '1' : '.45';
+  $('#gapUnit').style.opacity = (w === 'seq') ? '1' : '.45';
+  $('#joinHint').textContent = t(w === 'seq' ? 'joinSeqHint' : 'joinSortHint');
+  rerender();
+}
+$('#gap').addEventListener('change', rerender);
+
+function moveFile(i, d) {
+  var j = i + d;
+  if (j < 0 || j >= S.files.length) return;
+  var tmp = S.files[i]; S.files[i] = S.files[j]; S.files[j] = tmp;
+  rerender();
+}
+function rmFile(i) { S.files.splice(i, 1); rerender(); }
+
+/* ---------- 导出格式 ---------- */
+$('#fSrt').addEventListener('click', function () { setFmt('srt'); });
+$('#fVtt').addEventListener('click', function () { setFmt('vtt'); });
+function setFmt(f) {
+  S.fmt = f;
+  $('#fSrt').classList.toggle('on', f === 'srt');
+  $('#fVtt').classList.toggle('on', f === 'vtt');
+  rerender();
+}
+
+/* ---------- 主渲染 ---------- */
+function rerender() {
+  var isSplit = S.mode === 'split';
+  $('#splitCard').style.display = (isSplit && S.single) ? '' : 'none';
+  $('#joinCard').style.display = (!isSplit && S.files.length) ? '' : 'none';
+  $('#outCard').style.display = isSplit ? (S.segs.length ? '' : 'none') : (S.files.length >= 2 ? '' : 'none');
+
+  if (isSplit) {
+    $('#splitOut').style.display = '';
+    $('#joinOut').style.display = 'none';
+    if (S.single) doSplit();
+  } else {
+    $('#splitOut').style.display = 'none';
+    $('#joinOut').style.display = '';
+    renderFileList();
+    if (S.files.length >= 2) doJoin();
+  }
+}
+
+/* v0.9.316：tool-events 埋点（口径与 convert/shift 等页一致：page/act 双白名单、
+   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：split=执行拆分 / merge=执行拼接 */
+var _tlLast = { body: '', t: 0 };
+function reportTool(act, extra) {
+  try {
+    var e = extra || {};
+    var body = JSON.stringify({ page: 'split', act: act, cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || '' });
+    var now = Date.now();
+    if (body === _tlLast.body && now - _tlLast.t < 60000) return;
+    _tlLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+    }
+    fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () { });
+  } catch (err) { }
+}
+
+function doSplit() {
+  var v = Math.max(1, parseInt($('#num').value, 10) || 1);
+  var segs = (S.by === 'dur') ? C.splitByDuration(S.single.items, v * 60000) : C.splitByCount(S.single.items, v);
+  if ($('#optZero').checked) segs = segs.map(C.zeroBase);
+  S.segs = segs;
+  var total = S.single.items.length;
+  reportTool('split', { cues: total, n: segs.length, fmt: S.fmt });
+  $('#statChip').textContent = t('statSegs').replace('{0}', segs.length).replace('{1}', total);
+  renderPartList();
+}
+
+function renderPartList() {
+  var base = (S.single.name || 'subtitle.srt').replace(/\.[^.]+$/, '');
+  $('#plist').innerHTML = S.segs.map(function (seg, i) {
+    var st = C.statOf(seg);
+    var nm = base + '.part' + (i + 1) + '.' + S.fmt;
+    return '<div class="pitem"><span class="no">' + (i + 1) + '</span>' +
+      '<span class="nm">' + esc(nm) + '</span>' +
+      '<span class="meta">' + seg.length + ' · ' + fmtDur(st.duration) + '</span>' +
+      '<button class="mini" data-dl="' + i + '">' + esc(t('btnDl')) + '</button></div>';
+  }).join('');
+  $('#plist').querySelectorAll('[data-dl]').forEach(function (b) {
+    b.addEventListener('click', function () { dlSeg(+b.getAttribute('data-dl')); });
+  });
+}
+
+function segText(i) {
+  var seg = S.segs[i];
+  return (S.fmt === 'vtt') ? C.formatVtt(seg) : C.formatSrt(seg);
+}
+function dlSeg(i) {
+  var base = (S.single.name || 'subtitle.srt').replace(/\.[^.]+$/, '');
+  dlText(segText(i), base + '.part' + (i + 1) + '.' + S.fmt);
+}
+$('#btnDlAll').addEventListener('click', function () {
+  S.segs.forEach(function (_, i) { setTimeout(function () { dlSeg(i); }, i * 350); });
+});
+
+function renderFileList() {
+  $('#flist').innerHTML = S.files.map(function (f, i) {
+    var st = C.statOf(f.items);
+    return '<div class="fitem"><span class="no">' + (i + 1) + '</span>' +
+      '<span class="nm" title="' + esc(f.name) + '">' + esc(f.name) + '</span>' +
+      '<span class="meta">' + f.fmt.toUpperCase() + ' · ' + f.items.length + ' · ' + fmtDur(st.duration) + '</span>' +
+      '<button class="mini" data-up="' + i + '">' + '↑' + '</button>' +
+      '<button class="mini" data-dn="' + i + '">' + '↓' + '</button>' +
+      '<button class="mini" data-rm="' + i + '">' + esc(t('btnRm')) + '</button></div>';
+  }).join('');
+  $('#flist').querySelectorAll('[data-up]').forEach(function (b) { b.addEventListener('click', function () { moveFile(+b.getAttribute('data-up'), -1); }); });
+  $('#flist').querySelectorAll('[data-dn]').forEach(function (b) { b.addEventListener('click', function () { moveFile(+b.getAttribute('data-dn'), 1); }); });
+  $('#flist').querySelectorAll('[data-rm]').forEach(function (b) { b.addEventListener('click', function () { rmFile(+b.getAttribute('data-rm')); }); });
+}
+
+function doJoin() {
+  var segs = S.files.map(function (f) { return f.items; });
+  var items = (S.way === 'seq') ? C.joinSeq(segs, +$('#gap').value || 0) : C.joinSorted(segs);
+  var st = C.statOf(items);
+  $('#statChip').textContent = t('statJoin').replace('{0}', S.files.length).replace('{1}', items.length).replace('{2}', fmtDur(st.duration));
+  $('#out').value = (S.fmt === 'vtt') ? C.formatVtt(items) : C.formatSrt(items);
+  reportTool('merge', { cues: items.length, n: S.files.length, fmt: S.fmt });
+  if (S.way === 'sort') {
+    /* 交织模式如实保留重叠，给一句说明就行（要不要处理是别页的事） */
+    var ov = 0;
+    for (var i = 1; i < items.length; i++) { if (items[i].start < items[i - 1].end) ov++; }
+    if (ov) showMsgRaw(t('msgOverlap').replace('{0}', ov), 'warn');
+    else hideMsg();
+  } else hideMsg();
+}
+
+/* ---------- 下载 / 复制 ---------- */
+function dlText(text, name) {
+  var b = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  var u = URL.createObjectURL(b);
+  var a = document.createElement('a');
+  a.href = u; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+}
+$('#btnDl').addEventListener('click', function () {
+  if (!$('#out').value) { showMsg('msgEmpty', 'err'); return; }
+  dlText($('#out').value, 'joined.' + S.fmt);
+  showMsg('msgDone', '');
+});
+$('#btnCopy').addEventListener('click', function () {
+  if (!$('#out').value) { showMsg('msgEmpty', 'err'); return; }
+  var done = function () { showMsg('msgCopy', ''); };
+  var fail = function () { showMsg('msgCopyFail', 'err'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText($('#out').value).then(done, fail);
+  else fail();
+});
+
+function showMsg(k, cls) { showMsgRaw(t(k), cls); }
+function showMsgRaw(txt, cls) {
+  var el = $('#msg');
+  el.textContent = txt; el.className = 'msg' + (cls ? ' ' + cls : ''); el.style.display = '';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+
+/* ---------- 启动 ---------- */
+initLang();
+applyI18n();
+renderNav();
+</script>
+
+<!-- v0.9.316：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
+     server.js 按语言路由替换成对应语言，直接开文件时显示下面的简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕拆分与拼接工具 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>把一份长字幕切成多段，或把多份散字幕拼成一份。全程在浏览器里完成，文件不上传。</strong></p>
+    <p style="margin-top:8px;">按时长或条数拆分、每段重新从零计时；多份按顺序拼接或按时间交织合并，序号自动重排，台词一字不改。支持 SRT、VTT。</p>
+    <p style="margin-top:8px;">要做分集上传、分段校对、多段字幕合并的创作者、译制组、剪辑师。</p>
+  </section>
+<!--SEO-COPY-END-->
+</body>
+</html>
