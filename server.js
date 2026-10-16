@@ -5215,33 +5215,33 @@ function guideInline(t) {
 
 /* 指南索引页自己的 27 语表（标题/分组名/面包屑），与各文章数据文件无关 */
 const GUIDE_INDEX = {
-  'zh-CN': { title: '字幕工具使用指南与教程 – 随心字幕 AI', desc: '图文教程：字幕翻译、格式转换、时间轴调整等工具怎么用，常见字幕问题怎么解决。', h1: '字幕指南与教程', intro: '每篇指南对应一个具体需求：怎么用某个工具、某个场景怎么解决、出了问题怎么修。', lhowto: '工具使用说明', lscene: '场景指南', lguide: '问题指南', lrel: '相关指南', home: '首页', guides: '指南' },
-  'zh-TW': { title: '字幕工具使用指南與教學 – 隨心字幕 AI', desc: '圖文教學：字幕翻譯、格式轉換、時間軸調整等工具怎麼用，常見字幕問題怎麼解決。', h1: '字幕指南與教學', intro: '每篇指南對應一個具體需求：怎麼用某個工具、某個場景怎麼解決、出了問題怎麼修。', lhowto: '工具使用說明', lscene: '場景指南', lguide: '問題指南', lrel: '相關指南', home: '首頁', guides: '指南' },
-  'en': { title: 'Subtitle Tool Guides & Tutorials – AI-SRTSub', desc: 'Illustrated guides: how to use the subtitle translator, format converter, timing editor and other tools, and how to fix common subtitle problems.', h1: 'Subtitle Guides & Tutorials', intro: 'Every guide answers one specific need: how to use a tool, how to solve a scenario, or how to fix a problem.', lhowto: 'Tool guides', lscene: 'Scenario guides', lguide: 'Troubleshooting guides', lrel: 'Related guides', home: 'Home', guides: 'Guides' },
-  'ja': { title: '字幕ツール使い方ガイドとチュートリアル – AI-SRTSub', desc: '字幕翻訳・形式変換・タイミング調整など各ツールの使い方と、よくある字幕トラブルの直し方を画像付きで解説。', h1: '字幕ガイドとチュートリアル', intro: '各ガイドはひとつの具体的なニーズに応えます。ツールの使い方、シーン別の解決策、トラブルの直し方。', lhowto: 'ツール使い方ガイド', lscene: 'シナリオガイド', lguide: 'トラブル解決ガイド', lrel: '関連ガイド', home: 'ホーム', guides: 'ガイド' },
-  'es': { title: 'Guías y tutoriales de subtítulos – AI-SRTSub', desc: 'Guías ilustradas: cómo usar el traductor, el conversor de formatos, el editor de tiempos y otras herramientas, y cómo resolver problemas comunes de subtítulos.', h1: 'Guías y tutoriales de subtítulos', intro: 'Cada guía responde a una necesidad concreta: usar una herramienta, resolver un escenario o arreglar un problema.', lhowto: 'Guías de herramientas', lscene: 'Guías por escenario', lguide: 'Guías de solución de problemas', lrel: 'Guías relacionadas', home: 'Inicio', guides: 'Guías' },
-  'pt': { title: 'Guias e tutoriais de legendas – AI-SRTSub', desc: 'Guias ilustrados: como usar o tradutor, o conversor de formatos, o editor de tempo e outras ferramentas, e como resolver problemas comuns de legendas.', h1: 'Guias e tutoriais de legendas', intro: 'Cada guia responde a uma necessidade específica: usar uma ferramenta, resolver um cenário ou corrigir um problema.', lhowto: 'Guias de ferramentas', lscene: 'Guias por cenário', lguide: 'Guias de solução de problemas', lrel: 'Guias relacionados', home: 'Início', guides: 'Guias' },
-  'ko': { title: '자막 도구 사용 가이드와 튜토리얼 – AI-SRTSub', desc: '자막 번역, 형식 변환, 타이밍 조정 등 도구 사용법과 흔한 자막 문제 해결 방법을 그림과 함께 설명합니다.', h1: '자막 가이드와 튜토리얼', intro: '모든 가이드는 하나의 구체적인 필요를 해결합니다. 도구 사용법, 시나리오별 해결책, 문제 해결.', lhowto: '도구 사용 가이드', lscene: '시나리오 가이드', lguide: '문제 해결 가이드', lrel: '관련 가이드', home: '홈', guides: '가이드' },
-  'de': { title: 'Anleitungen und Tutorials für Untertitel-Tools – AI-SRTSub', desc: 'Illustrierte Anleitungen: So nutzt du Übersetzer, Formatkonverter, Zeitachsen-Editor und weitere Tools – und behebst häufige Untertitel-Probleme.', h1: 'Anleitungen und Tutorials', intro: 'Jede Anleitung beantwortet ein konkretes Bedürfnis: ein Tool nutzen, ein Szenario lösen oder ein Problem beheben.', lhowto: 'Tool-Anleitungen', lscene: 'Szenario-Anleitungen', lguide: 'Problemlösungen', lrel: 'Verwandte Anleitungen', home: 'Startseite', guides: 'Anleitungen' },
-  'fr': { title: 'Guides et tutoriels sous-titres – AI-SRTSub', desc: "Guides illustrés : utiliser le traducteur, le convertisseur de formats, l'éditeur de synchronisation et les autres outils, et résoudre les problèmes courants de sous-titres.", h1: 'Guides et tutoriels sous-titres', intro: 'Chaque guide répond à un besoin précis : utiliser un outil, résoudre un scénario ou corriger un problème.', lhowto: "Guides d'outils", lscene: 'Guides par scénario', lguide: 'Guides de dépannage', lrel: 'Guides associés', home: 'Accueil', guides: 'Guides' },
-  'id': { title: 'Panduan & Tutorial Alat Subtitle – AI-SRTSub', desc: 'Panduan bergambar: cara menggunakan penerjemah, konverter format, editor waktu, dan alat lainnya, serta cara memperbaiki masalah subtitle umum.', h1: 'Panduan & Tutorial Subtitle', intro: 'Setiap panduan menjawab satu kebutuhan spesifik: menggunakan alat, menyelesaikan skenario, atau memperbaiki masalah.', lhowto: 'Panduan alat', lscene: 'Panduan per skenario', lguide: 'Panduan pemecahan masalah', lrel: 'Panduan terkait', home: 'Beranda', guides: 'Panduan' },
-  'hi': { title: 'सबटाइटल टूल गाइड और ट्यूटोरियल – AI-SRTSub', desc: 'चित्रों के साथ गाइड: अनुवादक, फॉर्मेट कनवर्टर, टाइमिंग एडिटर जैसे टूल कैसे इस्तेमाल करें और आम सबटाइटल समस्याएँ कैसे ठीक करें।', h1: 'सबटाइटल गाइड और ट्यूटोरियल', intro: 'हर गाइड एक ठोस ज़रूरत का जवाब देता है: टूल इस्तेमाल करना, किसी स्थिति का हल निकालना या समस्या ठीक करना।', lhowto: 'टूल गाइड', lscene: 'परिदृश्य गाइड', lguide: 'समस्या समाधान गाइड', lrel: 'संबंधित गाइड', home: 'होम', guides: 'गाइड' },
-  'th': { title: 'คู่มือและบทแนะนำเครื่องมือซับไตเติล – AI-SRTSub', desc: 'คู่มือประกอบภาพ: วิธีใช้ตัวแปลภาษา ตัวแปลงรูปแบบ ตัวแก้ไขจังหวะเวลา และเครื่องมืออื่น ๆ รวมถึงวิธีแก้ปัญหาซับไตเติลที่พบบ่อย', h1: 'คู่มือและบทแนะนำซับไตเติล', intro: 'ทุกคู่มือตอบโจทย์ความต้องการเฉพาะเรื่อง: ใช้เครื่องมือ แก้ปัญหาตามสถานการณ์ หรือแก้ไขข้อผิดพลาด', lhowto: 'คู่มือการใช้เครื่องมือ', lscene: 'คู่มือตามสถานการณ์', lguide: 'คู่มือแก้ปัญหา', lrel: 'คู่มือที่เกี่ยวข้อง', home: 'หน้าแรก', guides: 'คู่มือ' },
-  'vi': { title: 'Hướng dẫn và bài viết về công cụ phụ đề – AI-SRTSub', desc: 'Hướng dẫn kèm hình ảnh: cách dùng trình dịch, bộ chuyển đổi định dạng, trình chỉnh thời gian và các công cụ khác, cùng cách xử lý các lỗi phụ đề thường gặp.', h1: 'Hướng dẫn phụ đề', intro: 'Mỗi hướng dẫn trả lời một nhu cầu cụ thể: dùng một công cụ, giải quyết một tình huống hay sửa một lỗi.', lhowto: 'Hướng dẫn công cụ', lscene: 'Hướng dẫn theo tình huống', lguide: 'Hướng dẫn xử lý sự cố', lrel: 'Hướng dẫn liên quan', home: 'Trang chủ', guides: 'Hướng dẫn' },
-  'ru': { title: 'Руководства по инструментам для субтитров – AI-SRTSub', desc: 'Иллюстрированные руководства: как пользоваться переводчиком, конвертером форматов, редактором тайминга и другими инструментами, а также как решать типичные проблемы с субтитрами.', h1: 'Руководства и уроки по субтитрам', intro: 'Каждое руководство отвечает на конкретный запрос: освоить инструмент, решить сценарий или устранить проблему.', lhowto: 'Руководства по инструментам', lscene: 'Руководства по сценариям', lguide: 'Устранение проблем', lrel: 'Похожие руководства', home: 'Главная', guides: 'Руководства' },
-  'it': { title: 'Guide e tutorial sui sottotitoli – AI-SRTSub', desc: 'Guide illustrate: come usare traduttore, convertitore di formati, editor dei tempi e altri strumenti, e come risolvere i problemi più comuni di sottotitolatura.', h1: 'Guide e tutorial sui sottotitoli', intro: 'Ogni guida risponde a un bisogno preciso: usare uno strumento, risolvere uno scenario o correggere un problema.', lhowto: 'Guide agli strumenti', lscene: 'Guide per scenario', lguide: 'Guide alla risoluzione dei problemi', lrel: 'Guide correlate', home: 'Home', guides: 'Guide' },
-  'ar': { title: 'أدلة ودروس أدوات الترجمة – AI-SRTSub', desc: 'أدلة مصوّرة: كيف تستخدم المترجم ومحوّل الصيغ ومحرّر التوقيت وغيرها من الأدوات، وكيف تحل مشاكل الترجمة الشائعة.', h1: 'أدلة ودروس الترجمة', intro: 'كل دليل يجيب عن حاجة محددة: استخدام أداة، أو حل سيناريو، أو إصلاح مشكلة.', lhowto: 'أدلة الأدوات', lscene: 'أدلة السيناريوهات', lguide: 'أدلة حل المشكلات', lrel: 'أدلة ذات صلة', home: 'الرئيسية', guides: 'الأدلة' },
-  'tr': { title: 'Altyazı Araç Kılavuzları – AI-SRTSub', desc: 'Resimli kılavuzlar: çevirmen, format dönüştürücü, zaman düzenleyici ve diğer araçları nasıl kullanırsınız, sık altyazı sorunlarını nasıl çözersiniz.', h1: 'Altyazı Kılavuzları ve Dersler', intro: 'Her kılavuz tek bir somut ihtiyaca cevap verir: araç kullanmak, bir senaryoyu çözmek veya sorunu düzeltmek.', lhowto: 'Araç kılavuzları', lscene: 'Senaryo kılavuzları', lguide: 'Sorun çözme kılavuzları', lrel: 'İlgili kılavuzlar', home: 'Ana sayfa', guides: 'Kılavuzlar' },
-  'nl': { title: 'Handleidingen en tutorials voor ondertiteltools – AI-SRTSub', desc: 'Geïllustreerde handleidingen: hoe je de vertaler, formaatconverter, timing-editor en andere tools gebruikt, en hoe je veelvoorkomende ondertitelproblemen oplost.', h1: 'Handleidingen en tutorials', intro: 'Elke handleiding beantwoordt één concrete vraag: een tool gebruiken, een scenario oplossen of een probleem verhelpen.', lhowto: 'Toolhandleidingen', lscene: 'Scenariohandleidingen', lguide: 'Problemen oplossen', lrel: 'Gerelateerde handleidingen', home: 'Startpagina', guides: 'Handleidingen' },
-  'pl': { title: 'Poradniki i tutoriale narzędzi do napisów – AI-SRTSub', desc: 'Ilustrowane poradniki: jak korzystać z tłumacza, konwertera formatów, edytora synchronizacji i innych narzędzi oraz jak rozwiązywać typowe problemy z napisami.', h1: 'Poradniki i tutoriale o napisach', intro: 'Każdy poradnik odpowiada na jedną konkretną potrzebę: korzystanie z narzędzia, rozwiązanie scenariusza lub naprawa problemu.', lhowto: 'Poradniki narzędzi', lscene: 'Poradniki scenariuszowe', lguide: 'Rozwiązywanie problemów', lrel: 'Powiązane poradniki', home: 'Strona główna', guides: 'Poradniki' },
-  'sv': { title: 'Guider och självstudier för undertextverktyg – AI-SRTSub', desc: 'Illustrerade guider: hur du använder översättaren, formatkonverteraren, tidsredigeraren och andra verktyg – och löser vanliga undertextproblem.', h1: 'Guider och självstudier', intro: 'Varje guide svarar på ett konkret behov: använda ett verktyg, lösa ett scenario eller åtgärda ett problem.', lhowto: 'Verktygsguider', lscene: 'Scenarioguider', lguide: 'Felsökningsguider', lrel: 'Relaterade guider', home: 'Startsida', guides: 'Guider' },
-  'cs': { title: 'Návody a tutoriály pro nástroje na titulky – AI-SRTSub', desc: 'Návody s obrázky: jak používat překladač, převodník formátů, editor časování a další nástroje a jak řešit časté problémy s titulky.', h1: 'Návody a tutoriály k titulkům', intro: 'Každý návod odpovídá na jednu konkrétní potřebu: použití nástroje, vyřešení scénáře nebo oprava problému.', lhowto: 'Návody k nástrojům', lscene: 'Návody podle scénáře', lguide: 'Řešení problémů', lrel: 'Související návody', home: 'Domů', guides: 'Návody' },
-  'uk': { title: 'Посібники та уроки з інструментів для субтитрів – AI-SRTSub', desc: 'Ілюстровані посібники: як користуватися перекладачем, конвертером форматів, редактором таймінгу та іншими інструментами, і як вирішувати типові проблеми із субтитрами.', h1: 'Посібники та уроки з субтитрів', intro: 'Кожен посібник відповідає на одну конкретну потребу: опанувати інструмент, вирішити сценарій чи усунути проблему.', lhowto: 'Посібники з інструментів', lscene: 'Посібники за сценаріями', lguide: 'Вирішення проблем', lrel: 'Схожі посібники', home: 'Головна', guides: 'Посібники' },
-  'da': { title: 'Vejledninger og tutorials til undertekstværktøjer – AI-SRTSub', desc: 'Illustrerede vejledninger: Sådan bruger du oversætteren, formatkonverteren, timing-editoren og andre værktøjer – og løser almindelige undertekstproblemer.', h1: 'Vejledninger og tutorials', intro: 'Hver vejledning besvarer ét konkret behov: at bruge et værktøj, løse et scenarie eller rette et problem.', lhowto: 'Værktøjsvejledninger', lscene: 'Scenarievejledninger', lguide: 'Fejlfinding', lrel: 'Relaterede vejledninger', home: 'Forside', guides: 'Vejledninger' },
-  'fi': { title: 'Ohjeet ja oppaat tekstitystyökaluille – AI-SRTSub', desc: 'Kuvitellut ohjeet: miten käytät kääntäjää, muunninta, ajoituseditoria ja muita työkaluja – ja korjaat yleiset tekstitysongelmat.', h1: 'Ohjeet ja oppaat tekstitykseen', intro: 'Jokainen opas vastaa yhteen konkreettiseen tarpeeseen: työkalun käyttöön, skenaarion ratkaisuun tai ongelman korjaamiseen.', lhowto: 'Työkaluohjeet', lscene: 'Skenaario-oppaat', lguide: 'Vianetsintäoppaat', lrel: 'Aiheeseen liittyvät oppaat', home: 'Etusivu', guides: 'Oppaat' },
-  'el': { title: 'Οδηγοί και μαθήματα για εργαλεία υπότιτλων – AI-SRTSub', desc: 'Εικονογραφημένοι οδηγοί: πώς να χρησιμοποιείτε τον μεταφραστή, τον μετατροπέα μορφών, τον επεξεργαστή συγχρονισμού και άλλα εργαλεία, και πώς να λύνετε συνηθισμένα προβλήματα υποτίτλων.', h1: 'Οδηγοί και μαθήματα υποτίτλων', intro: 'Κάθε οδηγός απαντά σε μία συγκεκριμένη ανάγκη: χρήση ενός εργαλείου, επίλυση ενός σεναρίου ή διόρθωση ενός προβλήματος.', lhowto: 'Οδηγοί εργαλείων', lscene: 'Οδηγοί σεναρίων', lguide: 'Αντιμετώπιση προβλημάτων', lrel: 'Σχετικοί οδηγοί', home: 'Αρχική', guides: 'Οδηγοί' },
-  'he': { title: 'מדריכים ושיעורים לכלי כתוביות – AI-SRTSub', desc: 'מדריכים מאוירים: איך משתמשים במתרגם, בממיר הפורמטים, בעורך התזמון ובשאר הכלים, ואיך פותרים בעיות כתוביות נפוצות.', h1: 'מדריכים ושיעורים לכתוביות', intro: 'כל מדריך עונה על צורך אחד מוגדר: להשתמש בכלי, לפתור תרחיש או לתקן בעיה.', lhowto: 'מדריכי כלים', lscene: 'מדריכי תרחישים', lguide: 'פתרון בעיות', lrel: 'מדריכים קשורים', home: 'דף הבית', guides: 'מדריכים' },
-  'ro': { title: 'Ghiduri și tutoriale pentru instrumente de subtitrări – AI-SRTSub', desc: 'Ghiduri ilustrate: cum folosești traducătorul, convertorul de formate, editorul de sincronizare și celelalte instrumente, și cum rezolvi problemele frecvente de subtitrare.', h1: 'Ghiduri și tutoriale de subtitrări', intro: 'Fiecare ghid răspunde unei nevoi concrete: să folosești un instrument, să rezolvi un scenariu sau să corectezi o problemă.', lhowto: 'Ghiduri de instrumente', lscene: 'Ghiduri pe scenarii', lguide: 'Rezolvarea problemelor', lrel: 'Ghiduri similare', home: 'Acasă', guides: 'Ghiduri' }
+  'zh-CN': { title: '字幕工具使用指南与教程 – 随心字幕 AI', desc: '图文教程：字幕翻译、格式转换、时间轴调整等工具怎么用，常见字幕问题怎么解决。', h1: '字幕指南与教程', intro: '每篇指南对应一个具体需求：怎么用某个工具、某个场景怎么解决、出了问题怎么修。', lhowto: '工具使用说明', lscene: '场景指南', lguide: '问题指南', lrel: '相关指南', home: '首页', guides: '指南' , toc: '本页内容', upd: '更新于', ctaLead: '全程在浏览器里完成，无需安装。' },
+  'zh-TW': { title: '字幕工具使用指南與教學 – 隨心字幕 AI', desc: '圖文教學：字幕翻譯、格式轉換、時間軸調整等工具怎麼用，常見字幕問題怎麼解決。', h1: '字幕指南與教學', intro: '每篇指南對應一個具體需求：怎麼用某個工具、某個場景怎麼解決、出了問題怎麼修。', lhowto: '工具使用說明', lscene: '場景指南', lguide: '問題指南', lrel: '相關指南', home: '首頁', guides: '指南' , toc: '本頁內容', upd: '更新於', ctaLead: '全程在瀏覽器裡完成，無需安裝。' },
+  'en': { title: 'Subtitle Tool Guides & Tutorials – AI-SRTSub', desc: 'Illustrated guides: how to use the subtitle translator, format converter, timing editor and other tools, and how to fix common subtitle problems.', h1: 'Subtitle Guides & Tutorials', intro: 'Every guide answers one specific need: how to use a tool, how to solve a scenario, or how to fix a problem.', lhowto: 'Tool guides', lscene: 'Scenario guides', lguide: 'Troubleshooting guides', lrel: 'Related guides', home: 'Home', guides: 'Guides' , toc: 'On this page', upd: 'Updated', ctaLead: 'Runs entirely in your browser, nothing to install.' },
+  'ja': { title: '字幕ツール使い方ガイドとチュートリアル – AI-SRTSub', desc: '字幕翻訳・形式変換・タイミング調整など各ツールの使い方と、よくある字幕トラブルの直し方を画像付きで解説。', h1: '字幕ガイドとチュートリアル', intro: '各ガイドはひとつの具体的なニーズに応えます。ツールの使い方、シーン別の解決策、トラブルの直し方。', lhowto: 'ツール使い方ガイド', lscene: 'シナリオガイド', lguide: 'トラブル解決ガイド', lrel: '関連ガイド', home: 'ホーム', guides: 'ガイド' , toc: 'このページの内容', upd: '更新日', ctaLead: 'すべてブラウザ内で完結します。インストールは不要です。' },
+  'es': { title: 'Guías y tutoriales de subtítulos – AI-SRTSub', desc: 'Guías ilustradas: cómo usar el traductor, el conversor de formatos, el editor de tiempos y otras herramientas, y cómo resolver problemas comunes de subtítulos.', h1: 'Guías y tutoriales de subtítulos', intro: 'Cada guía responde a una necesidad concreta: usar una herramienta, resolver un escenario o arreglar un problema.', lhowto: 'Guías de herramientas', lscene: 'Guías por escenario', lguide: 'Guías de solución de problemas', lrel: 'Guías relacionadas', home: 'Inicio', guides: 'Guías' , toc: 'En esta página', upd: 'Actualizado', ctaLead: 'Todo ocurre en el navegador, sin instalar nada.' },
+  'pt': { title: 'Guias e tutoriais de legendas – AI-SRTSub', desc: 'Guias ilustrados: como usar o tradutor, o conversor de formatos, o editor de tempo e outras ferramentas, e como resolver problemas comuns de legendas.', h1: 'Guias e tutoriais de legendas', intro: 'Cada guia responde a uma necessidade específica: usar uma ferramenta, resolver um cenário ou corrigir um problema.', lhowto: 'Guias de ferramentas', lscene: 'Guias por cenário', lguide: 'Guias de solução de problemas', lrel: 'Guias relacionados', home: 'Início', guides: 'Guias' , toc: 'Nesta página', upd: 'Atualizado', ctaLead: 'Tudo acontece no navegador, sem instalar nada.' },
+  'ko': { title: '자막 도구 사용 가이드와 튜토리얼 – AI-SRTSub', desc: '자막 번역, 형식 변환, 타이밍 조정 등 도구 사용법과 흔한 자막 문제 해결 방법을 그림과 함께 설명합니다.', h1: '자막 가이드와 튜토리얼', intro: '모든 가이드는 하나의 구체적인 필요를 해결합니다. 도구 사용법, 시나리오별 해결책, 문제 해결.', lhowto: '도구 사용 가이드', lscene: '시나리오 가이드', lguide: '문제 해결 가이드', lrel: '관련 가이드', home: '홈', guides: '가이드' , toc: '이 페이지의 내용', upd: '업데이트', ctaLead: '모두 브라우저에서 실행됩니다. 설치가 필요 없습니다.' },
+  'de': { title: 'Anleitungen und Tutorials für Untertitel-Tools – AI-SRTSub', desc: 'Illustrierte Anleitungen: So nutzt du Übersetzer, Formatkonverter, Zeitachsen-Editor und weitere Tools – und behebst häufige Untertitel-Probleme.', h1: 'Anleitungen und Tutorials', intro: 'Jede Anleitung beantwortet ein konkretes Bedürfnis: ein Tool nutzen, ein Szenario lösen oder ein Problem beheben.', lhowto: 'Tool-Anleitungen', lscene: 'Szenario-Anleitungen', lguide: 'Problemlösungen', lrel: 'Verwandte Anleitungen', home: 'Startseite', guides: 'Anleitungen' , toc: 'Auf dieser Seite', upd: 'Aktualisiert', ctaLead: 'Läuft vollständig im Browser, nichts zu installieren.' },
+  'fr': { title: 'Guides et tutoriels sous-titres – AI-SRTSub', desc: "Guides illustrés : utiliser le traducteur, le convertisseur de formats, l'éditeur de synchronisation et les autres outils, et résoudre les problèmes courants de sous-titres.", h1: 'Guides et tutoriels sous-titres', intro: 'Chaque guide répond à un besoin précis : utiliser un outil, résoudre un scénario ou corriger un problème.', lhowto: "Guides d'outils", lscene: 'Guides par scénario', lguide: 'Guides de dépannage', lrel: 'Guides associés', home: 'Accueil', guides: 'Guides' , toc: 'Sur cette page', upd: 'Mis à jour', ctaLead: 'Tout se passe dans le navigateur, rien à installer.' },
+  'id': { title: 'Panduan & Tutorial Alat Subtitle – AI-SRTSub', desc: 'Panduan bergambar: cara menggunakan penerjemah, konverter format, editor waktu, dan alat lainnya, serta cara memperbaiki masalah subtitle umum.', h1: 'Panduan & Tutorial Subtitle', intro: 'Setiap panduan menjawab satu kebutuhan spesifik: menggunakan alat, menyelesaikan skenario, atau memperbaiki masalah.', lhowto: 'Panduan alat', lscene: 'Panduan per skenario', lguide: 'Panduan pemecahan masalah', lrel: 'Panduan terkait', home: 'Beranda', guides: 'Panduan' , toc: 'Di halaman ini', upd: 'Diperbarui', ctaLead: 'Semua berjalan di browser, tidak perlu menginstal apa pun.' },
+  'hi': { title: 'सबटाइटल टूल गाइड और ट्यूटोरियल – AI-SRTSub', desc: 'चित्रों के साथ गाइड: अनुवादक, फॉर्मेट कनवर्टर, टाइमिंग एडिटर जैसे टूल कैसे इस्तेमाल करें और आम सबटाइटल समस्याएँ कैसे ठीक करें।', h1: 'सबटाइटल गाइड और ट्यूटोरियल', intro: 'हर गाइड एक ठोस ज़रूरत का जवाब देता है: टूल इस्तेमाल करना, किसी स्थिति का हल निकालना या समस्या ठीक करना।', lhowto: 'टूल गाइड', lscene: 'परिदृश्य गाइड', lguide: 'समस्या समाधान गाइड', lrel: 'संबंधित गाइड', home: 'होम', guides: 'गाइड' , toc: 'इस पृष्ठ पर', upd: 'अपडेट', ctaLead: 'सब कुछ ब्राउज़र में ही होता है, इंस्टॉल करने की ज़रूरत नहीं।' },
+  'th': { title: 'คู่มือและบทแนะนำเครื่องมือซับไตเติล – AI-SRTSub', desc: 'คู่มือประกอบภาพ: วิธีใช้ตัวแปลภาษา ตัวแปลงรูปแบบ ตัวแก้ไขจังหวะเวลา และเครื่องมืออื่น ๆ รวมถึงวิธีแก้ปัญหาซับไตเติลที่พบบ่อย', h1: 'คู่มือและบทแนะนำซับไตเติล', intro: 'ทุกคู่มือตอบโจทย์ความต้องการเฉพาะเรื่อง: ใช้เครื่องมือ แก้ปัญหาตามสถานการณ์ หรือแก้ไขข้อผิดพลาด', lhowto: 'คู่มือการใช้เครื่องมือ', lscene: 'คู่มือตามสถานการณ์', lguide: 'คู่มือแก้ปัญหา', lrel: 'คู่มือที่เกี่ยวข้อง', home: 'หน้าแรก', guides: 'คู่มือ' , toc: 'ในหน้านี้', upd: 'อัปเดตเมื่อ', ctaLead: 'ทั้งหมดทำงานในเบราว์เซอร์ ไม่ต้องติดตั้งอะไร' },
+  'vi': { title: 'Hướng dẫn và bài viết về công cụ phụ đề – AI-SRTSub', desc: 'Hướng dẫn kèm hình ảnh: cách dùng trình dịch, bộ chuyển đổi định dạng, trình chỉnh thời gian và các công cụ khác, cùng cách xử lý các lỗi phụ đề thường gặp.', h1: 'Hướng dẫn phụ đề', intro: 'Mỗi hướng dẫn trả lời một nhu cầu cụ thể: dùng một công cụ, giải quyết một tình huống hay sửa một lỗi.', lhowto: 'Hướng dẫn công cụ', lscene: 'Hướng dẫn theo tình huống', lguide: 'Hướng dẫn xử lý sự cố', lrel: 'Hướng dẫn liên quan', home: 'Trang chủ', guides: 'Hướng dẫn' , toc: 'Trang này', upd: 'Cập nhật', ctaLead: 'Tất cả diễn ra trong trình duyệt, không cần cài đặt.' },
+  'ru': { title: 'Руководства по инструментам для субтитров – AI-SRTSub', desc: 'Иллюстрированные руководства: как пользоваться переводчиком, конвертером форматов, редактором тайминга и другими инструментами, а также как решать типичные проблемы с субтитрами.', h1: 'Руководства и уроки по субтитрам', intro: 'Каждое руководство отвечает на конкретный запрос: освоить инструмент, решить сценарий или устранить проблему.', lhowto: 'Руководства по инструментам', lscene: 'Руководства по сценариям', lguide: 'Устранение проблем', lrel: 'Похожие руководства', home: 'Главная', guides: 'Руководства' , toc: 'На этой странице', upd: 'Обновлено', ctaLead: 'Всё работает в браузере, ничего устанавливать не нужно.' },
+  'it': { title: 'Guide e tutorial sui sottotitoli – AI-SRTSub', desc: 'Guide illustrate: come usare traduttore, convertitore di formati, editor dei tempi e altri strumenti, e come risolvere i problemi più comuni di sottotitolatura.', h1: 'Guide e tutorial sui sottotitoli', intro: 'Ogni guida risponde a un bisogno preciso: usare uno strumento, risolvere uno scenario o correggere un problema.', lhowto: 'Guide agli strumenti', lscene: 'Guide per scenario', lguide: 'Guide alla risoluzione dei problemi', lrel: 'Guide correlate', home: 'Home', guides: 'Guide' , toc: 'In questa pagina', upd: 'Aggiornato', ctaLead: 'Tutto avviene nel browser, niente da installare.' },
+  'ar': { title: 'أدلة ودروس أدوات الترجمة – AI-SRTSub', desc: 'أدلة مصوّرة: كيف تستخدم المترجم ومحوّل الصيغ ومحرّر التوقيت وغيرها من الأدوات، وكيف تحل مشاكل الترجمة الشائعة.', h1: 'أدلة ودروس الترجمة', intro: 'كل دليل يجيب عن حاجة محددة: استخدام أداة، أو حل سيناريو، أو إصلاح مشكلة.', lhowto: 'أدلة الأدوات', lscene: 'أدلة السيناريوهات', lguide: 'أدلة حل المشكلات', lrel: 'أدلة ذات صلة', home: 'الرئيسية', guides: 'الأدلة' , toc: 'في هذه الصفحة', upd: 'آخر تحديث', ctaLead: 'كل شيء يعمل في المتصفح، لا حاجة للتثبيت.' },
+  'tr': { title: 'Altyazı Araç Kılavuzları – AI-SRTSub', desc: 'Resimli kılavuzlar: çevirmen, format dönüştürücü, zaman düzenleyici ve diğer araçları nasıl kullanırsınız, sık altyazı sorunlarını nasıl çözersiniz.', h1: 'Altyazı Kılavuzları ve Dersler', intro: 'Her kılavuz tek bir somut ihtiyaca cevap verir: araç kullanmak, bir senaryoyu çözmek veya sorunu düzeltmek.', lhowto: 'Araç kılavuzları', lscene: 'Senaryo kılavuzları', lguide: 'Sorun çözme kılavuzları', lrel: 'İlgili kılavuzlar', home: 'Ana sayfa', guides: 'Kılavuzlar' , toc: 'Bu sayfada', upd: 'Güncelleme', ctaLead: 'Her şey tarayıcıda çalışır, kurulum gerekmez.' },
+  'nl': { title: 'Handleidingen en tutorials voor ondertiteltools – AI-SRTSub', desc: 'Geïllustreerde handleidingen: hoe je de vertaler, formaatconverter, timing-editor en andere tools gebruikt, en hoe je veelvoorkomende ondertitelproblemen oplost.', h1: 'Handleidingen en tutorials', intro: 'Elke handleiding beantwoordt één concrete vraag: een tool gebruiken, een scenario oplossen of een probleem verhelpen.', lhowto: 'Toolhandleidingen', lscene: 'Scenariohandleidingen', lguide: 'Problemen oplossen', lrel: 'Gerelateerde handleidingen', home: 'Startpagina', guides: 'Handleidingen' , toc: 'Op deze pagina', upd: 'Bijgewerkt', ctaLead: 'Alles gebeurt in de browser, niets installeren.' },
+  'pl': { title: 'Poradniki i tutoriale narzędzi do napisów – AI-SRTSub', desc: 'Ilustrowane poradniki: jak korzystać z tłumacza, konwertera formatów, edytora synchronizacji i innych narzędzi oraz jak rozwiązywać typowe problemy z napisami.', h1: 'Poradniki i tutoriale o napisach', intro: 'Każdy poradnik odpowiada na jedną konkretną potrzebę: korzystanie z narzędzia, rozwiązanie scenariusza lub naprawa problemu.', lhowto: 'Poradniki narzędzi', lscene: 'Poradniki scenariuszowe', lguide: 'Rozwiązywanie problemów', lrel: 'Powiązane poradniki', home: 'Strona główna', guides: 'Poradniki' , toc: 'Na tej stronie', upd: 'Zaktualizowano', ctaLead: 'Wszystko działa w przeglądarce, nic nie trzeba instalować.' },
+  'sv': { title: 'Guider och självstudier för undertextverktyg – AI-SRTSub', desc: 'Illustrerade guider: hur du använder översättaren, formatkonverteraren, tidsredigeraren och andra verktyg – och löser vanliga undertextproblem.', h1: 'Guider och självstudier', intro: 'Varje guide svarar på ett konkret behov: använda ett verktyg, lösa ett scenario eller åtgärda ett problem.', lhowto: 'Verktygsguider', lscene: 'Scenarioguider', lguide: 'Felsökningsguider', lrel: 'Relaterade guider', home: 'Startsida', guides: 'Guider' , toc: 'På den här sidan', upd: 'Uppdaterad', ctaLead: 'Allt sker i webbläsaren, inget att installera.' },
+  'cs': { title: 'Návody a tutoriály pro nástroje na titulky – AI-SRTSub', desc: 'Návody s obrázky: jak používat překladač, převodník formátů, editor časování a další nástroje a jak řešit časté problémy s titulky.', h1: 'Návody a tutoriály k titulkům', intro: 'Každý návod odpovídá na jednu konkrétní potřebu: použití nástroje, vyřešení scénáře nebo oprava problému.', lhowto: 'Návody k nástrojům', lscene: 'Návody podle scénáře', lguide: 'Řešení problémů', lrel: 'Související návody', home: 'Domů', guides: 'Návody' , toc: 'Na této stránce', upd: 'Aktualizováno', ctaLead: 'Vše probíhá v prohlížeči, není třeba nic instalovat.' },
+  'uk': { title: 'Посібники та уроки з інструментів для субтитрів – AI-SRTSub', desc: 'Ілюстровані посібники: як користуватися перекладачем, конвертером форматів, редактором таймінгу та іншими інструментами, і як вирішувати типові проблеми із субтитрами.', h1: 'Посібники та уроки з субтитрів', intro: 'Кожен посібник відповідає на одну конкретну потребу: опанувати інструмент, вирішити сценарій чи усунути проблему.', lhowto: 'Посібники з інструментів', lscene: 'Посібники за сценаріями', lguide: 'Вирішення проблем', lrel: 'Схожі посібники', home: 'Головна', guides: 'Посібники' , toc: 'На цій сторінці', upd: 'Оновлено', ctaLead: 'Усе відбувається у браузері, нічого не треба встановлювати.' },
+  'da': { title: 'Vejledninger og tutorials til undertekstværktøjer – AI-SRTSub', desc: 'Illustrerede vejledninger: Sådan bruger du oversætteren, formatkonverteren, timing-editoren og andre værktøjer – og løser almindelige undertekstproblemer.', h1: 'Vejledninger og tutorials', intro: 'Hver vejledning besvarer ét konkret behov: at bruge et værktøj, løse et scenarie eller rette et problem.', lhowto: 'Værktøjsvejledninger', lscene: 'Scenarievejledninger', lguide: 'Fejlfinding', lrel: 'Relaterede vejledninger', home: 'Forside', guides: 'Vejledninger' , toc: 'På denne side', upd: 'Opdateret', ctaLead: 'Det hele foregår i browseren, intet at installere.' },
+  'fi': { title: 'Ohjeet ja oppaat tekstitystyökaluille – AI-SRTSub', desc: 'Kuvitellut ohjeet: miten käytät kääntäjää, muunninta, ajoituseditoria ja muita työkaluja – ja korjaat yleiset tekstitysongelmat.', h1: 'Ohjeet ja oppaat tekstitykseen', intro: 'Jokainen opas vastaa yhteen konkreettiseen tarpeeseen: työkalun käyttöön, skenaarion ratkaisuun tai ongelman korjaamiseen.', lhowto: 'Työkaluohjeet', lscene: 'Skenaario-oppaat', lguide: 'Vianetsintäoppaat', lrel: 'Aiheeseen liittyvät oppaat', home: 'Etusivu', guides: 'Oppaat' , toc: 'Tällä sivulla', upd: 'Päivitetty', ctaLead: 'Kaikki tapahtuu selaimessa, ei asennettavaa.' },
+  'el': { title: 'Οδηγοί και μαθήματα για εργαλεία υπότιτλων – AI-SRTSub', desc: 'Εικονογραφημένοι οδηγοί: πώς να χρησιμοποιείτε τον μεταφραστή, τον μετατροπέα μορφών, τον επεξεργαστή συγχρονισμού και άλλα εργαλεία, και πώς να λύνετε συνηθισμένα προβλήματα υποτίτλων.', h1: 'Οδηγοί και μαθήματα υποτίτλων', intro: 'Κάθε οδηγός απαντά σε μία συγκεκριμένη ανάγκη: χρήση ενός εργαλείου, επίλυση ενός σεναρίου ή διόρθωση ενός προβλήματος.', lhowto: 'Οδηγοί εργαλείων', lscene: 'Οδηγοί σεναρίων', lguide: 'Αντιμετώπιση προβλημάτων', lrel: 'Σχετικοί οδηγοί', home: 'Αρχική', guides: 'Οδηγοί' , toc: 'Σε αυτή τη σελίδα', upd: 'Ενημερώθηκε', ctaLead: 'Όλα γίνονται στον περιηγητή, δεν χρειάζεται εγκατάσταση.' },
+  'he': { title: 'מדריכים ושיעורים לכלי כתוביות – AI-SRTSub', desc: 'מדריכים מאוירים: איך משתמשים במתרגם, בממיר הפורמטים, בעורך התזמון ובשאר הכלים, ואיך פותרים בעיות כתוביות נפוצות.', h1: 'מדריכים ושיעורים לכתוביות', intro: 'כל מדריך עונה על צורך אחד מוגדר: להשתמש בכלי, לפתור תרחיש או לתקן בעיה.', lhowto: 'מדריכי כלים', lscene: 'מדריכי תרחישים', lguide: 'פתרון בעיות', lrel: 'מדריכים קשורים', home: 'דף הבית', guides: 'מדריכים' , toc: 'בעמוד זה', upd: 'עודכן', ctaLead: 'הכול מתבצע בדפדפן, אין צורך בהתקנה.' },
+  'ro': { title: 'Ghiduri și tutoriale pentru instrumente de subtitrări – AI-SRTSub', desc: 'Ghiduri ilustrate: cum folosești traducătorul, convertorul de formate, editorul de sincronizare și celelalte instrumente, și cum rezolvi problemele frecvente de subtitrare.', h1: 'Ghiduri și tutoriale de subtitrări', intro: 'Fiecare ghid răspunde unei nevoi concrete: să folosești un instrument, să rezolvi un scenariu sau să corectezi o problemă.', lhowto: 'Ghiduri de instrumente', lscene: 'Ghiduri pe scenarii', lguide: 'Rezolvarea problemelor', lrel: 'Ghiduri similare', home: 'Acasă', guides: 'Ghiduri' , toc: 'Pe această pagină', upd: 'Actualizat', ctaLead: 'Totul se întâmplă în browser, nimic de instalat.' }
 };
 /* 语言切换下拉的 27 语原生名（与各工具页 select 同一张名单） */
 const GUIDE_LANG_NAMES = [['zh-CN', '简体中文'], ['zh-TW', '繁體中文'], ['en', 'English'], ['ja', '日本語'], ['es', 'Español'], ['pt', 'Português'], ['ko', '한국어'], ['de', 'Deutsch'], ['fr', 'Français'], ['id', 'Bahasa Indonesia'], ['hi', 'हिन्दी'], ['th', 'ไทย'], ['vi', 'Tiếng Việt'], ['ru', 'Русский'], ['it', 'Italiano'], ['ar', 'العربية'], ['tr', 'Türkçe'], ['nl', 'Nederlands'], ['pl', 'Polski'], ['sv', 'Svenska'], ['cs', 'Čeština'], ['uk', 'Українська'], ['da', 'Dansk'], ['fi', 'Suomi'], ['el', 'Ελληνικά'], ['he', 'עברית'], ['ro', 'Română']];
@@ -5286,7 +5286,7 @@ function guideHead(lang, base, slug) {
     '<title>' + guideEsc(s.title) + '</title>',
     '<meta name="description" content="' + guideEsc(s.desc) + '">',
     '<meta name="robots" content="index, follow">',
-    '<meta name="theme-color" content="#0E9488">',
+    '<meta name="theme-color" content="#4F46E5">',
     '<link rel="icon" type="image/svg+xml" href="/favicon.svg">',
     '<link rel="canonical" href="' + selfUrl + '">',
     alternates,
@@ -5334,7 +5334,7 @@ function guideIndexHead(lang, base) {
     '<title>' + guideEsc(IX.title) + '</title>',
     '<meta name="description" content="' + guideEsc(IX.desc) + '">',
     '<meta name="robots" content="index, follow">',
-    '<meta name="theme-color" content="#0E9488">',
+    '<meta name="theme-color" content="#4F46E5">',
     '<link rel="icon" type="image/svg+xml" href="/favicon.svg">',
     '<link rel="canonical" href="' + selfUrl + '">',
     alternates,
@@ -5354,13 +5354,69 @@ function guideIndexHead(lang, base) {
   ].join('\n');
 }
 
-/* 正文 → HTML：intro 段 + 各 section（h2/ps/ul/figure）+ CTA + 相关指南 */
+/* v0.9.325：左分组导航（按 kind 三组）。文章页传当前 slug 标 aria-current，索引页传 ''。
+   ⚠️ 只列「当前语言版本存在」的文章（与索引页同一判据），不给爬虫和用户看到死链 */
+function guideNavHtml(lang, curSlug) {
+  const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+  const groups = [['howto', IX.lhowto], ['scene', IX.lscene], ['guide', IX.lguide]];
+  const out = ['<p class="snav-h"><a href="' + guideIndexUrl(lang) + '">' + guideEsc(IX.guides) + '</a></p>'];
+  groups.forEach(function (grp) {
+    const items = Object.keys(GUIDE_PAGES).filter(function (sl) {
+      const g = GUIDE_PAGES[sl];
+      return g.kind === grp[0] && g.seo[lang] && g.body[lang];
+    }).sort();
+    if (!items.length) return;
+    out.push('<div class="snav-grp"><h3>' + guideEsc(grp[1]) + '</h3><ul>'
+      + items.map(function (sl) {
+        const s = GUIDE_PAGES[sl].seo[lang];
+        return '<li><a href="' + guideUrl(lang, sl) + '"'
+          + (sl === curSlug ? ' aria-current="page"' : '') + '>' + guideEsc(s.h1 || s.title) + '</a></li>';
+      }).join('') + '</ul></div>');
+  });
+  return out.join('\n');
+}
+
+/* v0.9.325：右栏「本页内容」目录。锚点序号必须与 guideBodyHtml 的 h2 id 完全一致
+   （两边都只给「真有 h2 的 section」计数，空标题的 section 不占位） */
+function guideTocHtml(g, lang) {
+  let n = 0;
+  return (g.body[lang] || []).filter(function (sec) { return sec.h2; }).map(function (sec) {
+    n += 1;
+    return '<a href="#sec' + n + '">' + guideEsc(sec.h2) + '</a>';
+  }).join('');
+}
+
+/* v0.9.325：底部深色行动带（整页唯一「重物」）。文案只用既有的 ctaText + 新增的 ctaLead，
+   不编流程叙事；没有 CTA 的文章（工具字段缺失）就整块不输出 */
+function guideCtaHtml(g, lang) {
+  const s = g.seo[lang] || {};
+  if (!(g.tool && s.ctaText)) return '';
+  const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+  return '<div class="gcta"><p>' + guideEsc(IX.ctaLead || '') + '</p>'
+    + '<a class="gbtn" href="/' + g.tool + '.html">' + guideInline(s.ctaText) + '</a></div>';
+}
+
+/* v0.9.325：相关指南卡片网格（从正文里独立出来，正文只留图文，左边界才跟标题对齐） */
+function guideRelHtml(g, lang) {
+  if (!(g.related && g.related.length)) return '';
+  const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+  const lis = g.related.map(function (sl) {
+    const rg = GUIDE_PAGES[sl];
+    if (!rg || !(rg.seo[lang] && rg.body[lang])) return '';
+    return '<li><a href="' + guideUrl(lang, sl) + '">' + guideEsc(rg.seo[lang].h1 || rg.seo[lang].title) + '</a></li>';
+  }).join('');
+  if (!lis) return '';
+  return '<h2 class="grelnav">' + guideEsc(IX.lrel) + '</h2><ul class="grel">' + lis + '</ul>';
+}
+
+/* 正文 → HTML：各 section（h2/ps/ul/figure）。
+   ⚠️ v0.9.325 起 intro / CTA / 相关指南都不再塞进正文 —— intro 提到题头，
+   CTA 变底部深色带、相关指南变卡片网格，正文左边界才与 h1 在同一条轴线上。 */
 function guideBodyHtml(g, lang) {
-  const s = g.seo[lang];
   const out = [];
-  out.push('<p class="gintro">' + guideInline(s.intro || '') + '</p>');
+  let n = 0;
   (g.body[lang] || []).forEach(function (sec) {
-    if (sec.h2) out.push('<h2>' + guideInline(sec.h2) + '</h2>');
+    if (sec.h2) { n += 1; out.push('<h2 id="sec' + n + '">' + guideInline(sec.h2) + '</h2>'); }
     (sec.ps || []).forEach(function (p) { out.push('<p>' + guideInline(p) + '</p>'); });
     if (sec.ul && sec.ul.length) {
       out.push('<ul>' + sec.ul.map(function (li) { return '<li>' + guideInline(li) + '</li>'; }).join('') + '</ul>');
@@ -5372,34 +5428,37 @@ function guideBodyHtml(g, lang) {
         + (sec.img.cap ? '<figcaption>' + guideInline(sec.img.cap) + '</figcaption>' : '') + '</figure>');
     }
   });
-  if (g.tool && s.ctaText) {
-    out.push('<div class="gcta"><a class="gbtn" href="/' + g.tool + '.html">' + guideInline(s.ctaText) + '</a></div>');
-  }
-  if (g.related && g.related.length) {
-    const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
-    const lis = g.related.map(function (sl) {
-      const rg = GUIDE_PAGES[sl];
-      if (!rg || !(rg.seo[lang] && rg.body[lang])) return '';
-      return '<li><a href="' + guideUrl(lang, sl) + '">' + guideEsc(rg.seo[lang].h1 || rg.seo[lang].title) + '</a></li>';
-    }).join('');
-    if (lis) out.push('<h2 class="grelh">' + guideEsc(IX.lrel) + '</h2><ul class="grel">' + lis + '</ul>');
-  }
   return out.join('\n');
 }
 
-/* 文章页与索引页共用的注入逻辑（读 guides.html 模板） */
-function serveGuideHtml(req, res, lang, headHtml, h1Html, crumbHtml, bodyHtml) {
+/* 文章页与索引页共用的注入逻辑（读 guides.html 模板）
+   v0.9.325：面包屑取消（用户定案「非常多余」），换成左分组导航 + 题头 intro/meta、
+   右栏本页目录、底部深色行动带、相关指南卡片。parts 缺哪个就注空串。 */
+/* v0.9.325：指南页照 Astro Starlight 重做 —— 版心 1200（左分组导航 232 + 正文 + 右「本页内容」192），
+   面包屑取消，CTA 换成底部深色行动带。占位符从 5 个换成 12 个，改对象传参 parts。 */
+function serveGuideHtml(req, res, lang, parts) {
   fs.readFile(path.join(ROOT, 'guides.html'), 'utf8', function (err, html) {
     if (err) { res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('guides.html missing'); return; }
     const base = publicBase(req) || '';
-    html = html.replace(/<!--GUIDE-HEAD-START-->[\s\S]*?<!--GUIDE-HEAD-END-->/,
-      '<!--GUIDE-HEAD-START-->\n' + headHtml + '\n<!--GUIDE-HEAD-END-->');
-    html = html.replace(/<!--GUIDE-H1-START-->[\s\S]*?<!--GUIDE-H1-END-->/,
-      '<!--GUIDE-H1-START-->' + h1Html + '<!--GUIDE-H1-END-->');
-    html = html.replace(/<!--GUIDE-CRUMB-START-->[\s\S]*?<!--GUIDE-CRUMB-END-->/,
-      '<!--GUIDE-CRUMB-START-->' + crumbHtml + '<!--GUIDE-CRUMB-END-->');
-    html = html.replace(/<!--GUIDE-BODY-START-->[\s\S]*?<!--GUIDE-BODY-END-->/,
-      '<!--GUIDE-BODY-START-->\n' + bodyHtml + '\n<!--GUIDE-BODY-END-->');
+    const P = parts || {};
+    const put = function (key, val) {
+      const re = new RegExp('<!--GUIDE-' + key + '-START-->[\\s\\S]*?<!--GUIDE-' + key + '-END-->');
+      html = html.replace(re, '<!--GUIDE-' + key + '-START-->' + (val || '') + '<!--GUIDE-' + key + '-END-->');
+    };
+    const put1 = function (key, val) {   /* 无 END 配对的单标记（纯占位替换） */
+      html = html.replace('<!--GUIDE-' + key + '-->', val || '');
+    };
+    put('HEAD', P.head);
+    put('H1', P.h1);
+    put('INTRO', P.intro);
+    put('META', P.meta);
+    put('NAV', P.nav);
+    put('TOCH', P.toch);
+    put('TOC', P.toc);
+    put('BODY', P.body);
+    put('CTA', P.cta);
+    put('REL', P.rel);
+    put1('CLS', P.cls);   /* 唯一无 END 配对的：class 属性里的占位符 */
     /* 语言切换下拉：服务端注入 27 个 option，当前语言选中 */
     const opts = GUIDE_LANG_NAMES.map(function (p) {
       return '<option value="' + p[0] + '"' + (p[0] === lang ? ' selected' : '') + '>' + p[1] + '</option>';
@@ -5430,37 +5489,56 @@ function serveGuide(req, res, lang, slug) {
   }
   const s = g.seo[lang];
   const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
-  const homeHref = lang === 'zh-CN' ? '/' : '/' + lang + '/';
   const base = publicBase(req) || '';
-  const crumb = '<a href="' + homeHref + '">' + guideEsc(IX.home) + '</a><span>/</span>'
-    + '<a href="' + guideIndexUrl(lang) + '">' + guideEsc(IX.guides) + '</a><span>/</span>'
-    + '<em>' + guideEsc(s.h1 || s.title) + '</em>';
-  serveGuideHtml(req, res, lang, guideHead(lang, base, slug),
-    guideInline(s.h1 || s.title), crumb, guideBodyHtml(g, lang));
+  /* meta：更新时间 + 所属分组（分组名是既有词条，按 kind 取；不编新文案） */
+  const KIND_LABEL = { howto: IX.lhowto, scene: IX.lscene, guide: IX.lguide };
+  const kindLabel = KIND_LABEL[g.kind] || '';
+  const meta = '<span>' + guideEsc(IX.upd || '') + ' ' + guideEsc(g.date || '') + '</span>'
+    + (kindLabel ? '<span>' + guideEsc(kindLabel) + '</span>' : '');
+  serveGuideHtml(req, res, lang, {
+    head: guideHead(lang, base, slug),
+    h1: guideInline(s.h1 || s.title),
+    intro: guideInline(s.intro || ''),
+    meta: meta,
+    nav: guideNavHtml(lang, slug),
+    toch: guideEsc(IX.toc || ''),
+    toc: guideTocHtml(g, lang),
+    body: guideBodyHtml(g, lang),
+    cta: guideCtaHtml(g, lang),
+    rel: guideRelHtml(g, lang),
+    cls: ''
+  });
 }
 
 function serveGuideIndex(req, res, lang) {
   const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
-  const homeHref = lang === 'zh-CN' ? '/' : '/' + lang + '/';
   const base = publicBase(req) || '';
-  const crumb = '<a href="' + homeHref + '">' + guideEsc(IX.home) + '</a><span>/</span><em>' + guideEsc(IX.guides) + '</em>';
   /* 三组：工具使用说明 / 场景指南 / 问题指南。组内按字母序，只列当前语言版本存在的文章 */
   const groups = [['howto', IX.lhowto], ['scene', IX.lscene], ['guide', IX.lguide]];
-  let bodyHtml = '<p class="gintro">' + guideInline(IX.intro) + '</p>';
+  const out = [];
   groups.forEach(function (grp) {
     const items = Object.keys(GUIDE_PAGES).filter(function (sl) {
       const g = GUIDE_PAGES[sl];
       return g.kind === grp[0] && g.seo[lang] && g.body[lang];
     }).sort();
     if (!items.length) return;
-    bodyHtml += '\n<h2>' + guideEsc(grp[1]) + '</h2>\n<ul class="glist">'
+    out.push('<section class="ggrp"><div class="ghd"><h2>' + guideEsc(grp[1]) + '</h2><em>' + items.length + '</em></div><ul class="glist">'
       + items.map(function (sl) {
         const s = GUIDE_PAGES[sl].seo[lang];
-        return '<li><a href="' + guideUrl(lang, sl) + '">' + guideEsc(s.h1 || s.title) + '</a><span>' + guideEsc(s.intro || s.desc) + '</span></li>';
-      }).join('') + '</ul>';
+        return '<li><a href="' + guideUrl(lang, sl) + '"><b>' + guideEsc(s.h1 || s.title) + '</b>'
+          + '<span>' + guideEsc(s.intro || s.desc) + '</span></a></li>';
+      }).join('') + '</ul></section>');
   });
-  serveGuideHtml(req, res, lang, guideIndexHead(lang, base),
-    guideEsc(IX.h1), crumb, bodyHtml);
+  serveGuideHtml(req, res, lang, {
+    head: guideIndexHead(lang, base),
+    h1: guideEsc(IX.h1),
+    intro: guideInline(IX.intro || ''),
+    /* 索引页的篇数已经逐组标了胶囊，题头不再重复一个裸数字（.ameta:empty 会自己收掉） */
+    meta: '',
+    nav: guideNavHtml(lang, ''),
+    /* 索引页没有正文小节 → 右栏「本页内容」整块收掉（cls=gidx），正文占满整行 */
+    toch: '', toc: '', body: out.join('\n'), cta: '', rel: '', cls: ' gidx'
+  });
 }
 
 function proto(req){

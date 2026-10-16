@@ -318,7 +318,7 @@ console.log('\n— v0.9.271：页面契约 —');
   const html = fs.readFileSync(__dirname + '/clean.html', 'utf8');
   /* ⚠️ 升版时这里两处都要动：正则里的 0\.9\.NNN **和** 提示文字里的 NNN。
      只改正则不改文字，看输出会以为还是上一版（10/14 v0.9.302 实证）。 */
-  ok(/clean-core\.js\?v=0\.9\.324/.test(html), 'clean.html 版号已升 324');
+  ok(/clean-core\.js\?v=0\.9\.325/.test(html), 'clean.html 版号已升 325');
   /* v0.9.280：左上 logo 整块可点回首页（清洗页这条也核一遍，别只靠主站那条） */
   ok(/<a class="brand" id="logoHome" href="\/">/.test(html), '左上 logo 是指向首页的链接');
   ok(/function syncLogoHome\s*\(/.test(html) && /'\s*\+\s*LANG\s*\+\s*'\/'/.test(html),
