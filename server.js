@@ -665,8 +665,9 @@ function authed(req){ const tk = req.headers['x-admin-token']; return tk && TOKE
       自己连错 3 次被锁时 `systemctl restart srt-translator` 即可恢复，不必改代码。
       代价是重启后攻击者也能重来一轮，所以账户维度必须同步存在。
 
-   ⚠️ IP 取自 X-Forwarded-For 首段（沿用既有 clientIp 行为，本次不改）：站前若无可信代理，
-      该头可被伪造，因此不能只依赖 IP 这一条。当前部署在 Cloudflare 之后，CF 会重写该头。 */
+   ⚠️ IP 取自 clientIp()：v0.9.324 起优先 CF-Connecting-IP（真实访客 IP），无该头时回退
+      X-Forwarded-For 首段。头均可被直连伪造，因此不能只依赖 IP 这一条，
+      账户维度锁定必须同步存在。当前部署在 Cloudflare 之后。 */
 const LOGIN_MAX_FAIL = 3;
 const LOGIN_LOCK_MS = 24 * 60 * 60 * 1000;
 const loginIp = new Map();              // ip -> { n, until }
@@ -715,6 +716,13 @@ function sendJson(res, code, obj){
   res.end(body);
 }
 function clientIp(req){
+  /* v0.9.324：站前是 Cloudflare，真实访客 IP 在 CF-Connecting-IP；X-Forwarded-For 首段
+     实测是 CF 边缘节点 IP（162.158/172.68-71/104.22-23 段），随请求漂移 —— 同一个用户
+     每次请求可能换节点，按它统计/限流会把一个人拆成多个"IP"（10-16 账本诊断实证）。
+     ⚠️ 该头可被「直连源站」伪造（绕过 CF），所以带格式校验 + 保留 XFF/remoteAddress 兜底；
+     登录锁定等安全逻辑不能只依赖 IP，账户维度锁定兜底（见上方 loginBump）。 */
+  const cf = String(req.headers['cf-connecting-ip'] || '').trim();
+  if (cf && (/^(\d{1,3}\.){3}\d{1,3}$/.test(cf) || /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/.test(cf))) return cf;
   return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
 }
 const MIME = {
