@@ -721,6 +721,8 @@ const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
   '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+  /* v0.9.323：内容页截图用 WebP+PNG 双源（<picture>），MIME 得认识 webp */
+  '.webp': 'image/webp',
   '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8'
 };
 function serveStatic(req, res, urlPath){
@@ -731,7 +733,7 @@ function serveStatic(req, res, urlPath){
     /* v0.9.284：/data/ 一并声明不抓取。
        ⚠️ 别把 robots 当安全手段 —— 它只挡守规矩的爬虫，挡不住直接 curl。
           真正的防线是上面 serveStatic 里那条 404（v0.9.283）。 */
-    const body = 'User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /data/\n\nSitemap: ' + baseUrl + '/sitemap.xml\n';
+    const body = 'User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /data/\nDisallow: /content/\n\nSitemap: ' + baseUrl + '/sitemap.xml\n';
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end(body); return;
   }
@@ -754,6 +756,20 @@ function serveStatic(req, res, urlPath){
   }
   pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv|split|table|batch|lrc|qc)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
+  /* v0.9.323：内容页（指南）路由 —— 独立分支，不动上面那条 16 页白名单正则。
+     URL 形态：/guides/<slug>.html（简中）与 /<lang>/guides/<slug>.html（语言版）；
+     /guides/ 是索引页。slug 来自 content/ 目录扫描（GUIDE_PAGES），
+     没注册的一律不接 —— 下面自然落进静态 404。
+     ⚠️ 必须排在「语言目录下的静态资源回退」之前：否则 /en/guides/x.html 会被
+        改写成 /guides/x.html 直接当静态文件找（不存在 → 404），SEO head 一个字都注入不上。 */
+  let gm = p.match(/^\/guides\/([a-z0-9][a-z0-9\-]*)\.html$/);
+  if (gm && GUIDE_PAGES[gm[1]]) { serveGuide(req, res, 'zh-CN', gm[1]); return; }
+  gm = p.match(/^\/guides\/?$/);
+  if (gm) { serveGuideIndex(req, res, 'zh-CN'); return; }
+  gm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/guides\/([a-z0-9][a-z0-9\-]*)\.html$/);
+  if (gm && SEO_ROUTE['/' + gm[1]] && GUIDE_PAGES[gm[2]]) { serveGuide(req, res, SEO_ROUTE['/' + gm[1]], gm[2]); return; }
+  gm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/guides\/?$/);
+  if (gm && SEO_ROUTE['/' + gm[1]]) { serveGuideIndex(req, res, SEO_ROUTE['/' + gm[1]]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
   const lm = p.match(/^\/([a-zA-Z][a-zA-Z-]*)\/(.+)$/);
@@ -771,6 +787,12 @@ function serveStatic(req, res, urlPath){
      等于给那条鉴权开了一扇后门——明文 API Key、adminHash、analyticsId 公网可读。
      ⚠️ data/data.bak/ 是本地备份副本，含同样的 config.json，必须一起挡。 */
   if (p === '/data' || p.startsWith('/data/') || p === '/data.bak' || p.startsWith('/data.bak/')) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Not Found'); return;
+  }
+  /* v0.9.323：content/ 是内容页的数据源（正文+SEO 文案），只有渲染后的 HTML 对外，
+     数据文件本身不许被直接读到 —— 照 data/ 的做法整目录 404。 */
+  if (p === '/content' || p.startsWith('/content/')) {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Not Found'); return;
   }
@@ -5097,7 +5119,9 @@ function serveIndexLang(req, res, lang, page){
    v0.9.302 起术语批量替换独立成 /glossary.html，第十个页面进表。
    v0.9.313 起视频内封字幕提取 /videosub.html、繁简转换 /hanconv.html 进表，共十二页 324 条。
    v0.9.316 起拆分拼接 /split.html、表格互转 /table.html、批量转换 /batch.html、歌词打轴 /lrc.html 进表，共十六页 432 条。
-   v0.9.321 起字幕质检 /qc.html 进表，共十七页 459 条。 */
+   v0.9.321 起字幕质检 /qc.html 进表，共十七页 459 条。
+   v0.9.323 起内容页（指南）进表：/guides/<slug>.html 每篇按其实际语言版本列出，
+   只列 seo+body 双全的语言，不骗爬虫。第一批 5 篇 × 27 语 = 135 条，共 594 条。 */
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {
@@ -5113,10 +5137,322 @@ function sitemapXml(base){
         + '\n    <changefreq>weekly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
     });
   });
+  /* v0.9.323：内容页段。指南索引页 /guides/ 不进 sitemap（靠文章面包屑互链发现），
+     只列文章本身。x-default 指向 en 版；某篇没有 en 版时退回首语言。 */
+  Object.keys(GUIDE_PAGES).sort().forEach(function (slug) {
+    const g = GUIDE_PAGES[slug];
+    const langs = guideLangs(g);
+    if (!langs.length) return;
+    const xdef = langs.indexOf('en') >= 0 ? 'en' : langs[0];
+    const alts = langs.map(function (l) {
+      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + guideUrl(l, slug) + '"/>';
+    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + guideUrl(xdef, slug) + '"/>';
+    langs.forEach(function (l) {
+      const pr = (l === 'zh-CN') ? '0.6' : '0.5';
+      urls.push('  <url>\n    <loc>' + base + guideUrl(l, slug) + '</loc>\n' + alts
+        + '\n    <changefreq>monthly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+    });
+  });
   return '<?xml version="1.0" encoding="UTF-8"?>\n'
     + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
     + '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
     + urls.join('\n') + '\n</urlset>\n';
+}
+
+/* ---------------- v0.9.323 内容模块（指南页） ----------------
+ * 数据源：content/<slug>.js（CommonJS 导出 { slug, kind, tool, date, seo, body, related }）。
+ * 启动时扫描注册进 GUIDE_PAGES，之后加文章只往 content/ 放一个文件（重启生效），
+ * server.js 不用再动 —— 老的「每加一页改四处」只留给工具页。
+ * 渲染完全独立成套（guideHead/guideBodyHtml/serveGuide），不碰 seoHead/seoCopy/serveIndexLang。
+ * ⚠️ 语言版本判据：seo[l] 与 body[l] 双全才算有该语言（sitemap 也只列双全的，不骗爬虫）。
+ * ⚠️ 截图铁律：图里不打一个字。图注/alt 放数据文件里随语言翻译；
+ *    截图文件出 en 与 zh-CN 两套（<file>.en.png / <file>.zh-CN.png），
+ *    zh-CN 用中文版，其余 26 语共用英文版。 */
+const GUIDE_DIR = path.join(ROOT, 'content');
+const GUIDE_PAGES = {};
+try {
+  fs.readdirSync(GUIDE_DIR).sort().forEach(function (f) {
+    if (!/^[a-z0-9][a-z0-9\-]*\.js$/.test(f)) return;
+    let d = null;
+    try { d = require(path.join(GUIDE_DIR, f)); } catch (e) { d = null; }
+    if (d && d.slug && d.kind && d.seo && d.body && !GUIDE_PAGES[d.slug]) GUIDE_PAGES[d.slug] = d;
+  });
+} catch (e) { /* content/ 目录还没建：安静跳过，站点照常跑 */ }
+
+function guideLangs(g) {
+  return SEO_LANGS.filter(function (l) { return g.seo[l] && g.body[l]; });
+}
+function guideUrl(lang, slug) {
+  return (lang === 'zh-CN' ? '' : '/' + lang) + '/guides/' + slug + '.html';
+}
+function guideIndexUrl(lang) {
+  return (lang === 'zh-CN' ? '' : '/' + lang) + '/guides/';
+}
+/* 截图路径：zh-CN 用中文版，其余语言共用英文版；img.nolang 时是无文字图表，全语共用 */
+function guideImgPath(img, lang) {
+  return '/img/guides/' + img.file + (img.nolang ? '' : (lang === 'zh-CN' ? '.zh-CN' : '.en'));
+}
+function guideEsc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&(?!(amp|lt|gt|quot|#\d+|#x[0-9a-f]+);)/gi, '&amp;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+/* 正文内联标记（翻译时原样保留，渲染时转 HTML，杜绝手写 HTML 注入）：
+   **加粗** → <strong>；[[文字|/shift.html]] → 站内链接 */
+function guideInline(t) {
+  return guideEsc(t)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[\[([^|\]]+)\|([a-zA-Z0-9\-\/.#?]+)\]\]/g, '<a href="$2">$1</a>');
+}
+
+/* 指南索引页自己的 27 语表（标题/分组名/面包屑），与各文章数据文件无关 */
+const GUIDE_INDEX = {
+  'zh-CN': { title: '字幕工具使用指南与教程 – 随心字幕 AI', desc: '图文教程：字幕翻译、格式转换、时间轴调整等工具怎么用，常见字幕问题怎么解决。', h1: '字幕指南与教程', intro: '每篇指南对应一个具体需求：怎么用某个工具、某个场景怎么解决、出了问题怎么修。', lhowto: '工具使用说明', lscene: '场景指南', lguide: '问题指南', lrel: '相关指南', home: '首页', guides: '指南' },
+  'zh-TW': { title: '字幕工具使用指南與教學 – 隨心字幕 AI', desc: '圖文教學：字幕翻譯、格式轉換、時間軸調整等工具怎麼用，常見字幕問題怎麼解決。', h1: '字幕指南與教學', intro: '每篇指南對應一個具體需求：怎麼用某個工具、某個場景怎麼解決、出了問題怎麼修。', lhowto: '工具使用說明', lscene: '場景指南', lguide: '問題指南', lrel: '相關指南', home: '首頁', guides: '指南' },
+  'en': { title: 'Subtitle Tool Guides & Tutorials – AI-SRTSub', desc: 'Illustrated guides: how to use the subtitle translator, format converter, timing editor and other tools, and how to fix common subtitle problems.', h1: 'Subtitle Guides & Tutorials', intro: 'Every guide answers one specific need: how to use a tool, how to solve a scenario, or how to fix a problem.', lhowto: 'Tool guides', lscene: 'Scenario guides', lguide: 'Troubleshooting guides', lrel: 'Related guides', home: 'Home', guides: 'Guides' },
+  'ja': { title: '字幕ツール使い方ガイドとチュートリアル – AI-SRTSub', desc: '字幕翻訳・形式変換・タイミング調整など各ツールの使い方と、よくある字幕トラブルの直し方を画像付きで解説。', h1: '字幕ガイドとチュートリアル', intro: '各ガイドはひとつの具体的なニーズに応えます。ツールの使い方、シーン別の解決策、トラブルの直し方。', lhowto: 'ツール使い方ガイド', lscene: 'シナリオガイド', lguide: 'トラブル解決ガイド', lrel: '関連ガイド', home: 'ホーム', guides: 'ガイド' },
+  'es': { title: 'Guías y tutoriales de subtítulos – AI-SRTSub', desc: 'Guías ilustradas: cómo usar el traductor, el conversor de formatos, el editor de tiempos y otras herramientas, y cómo resolver problemas comunes de subtítulos.', h1: 'Guías y tutoriales de subtítulos', intro: 'Cada guía responde a una necesidad concreta: usar una herramienta, resolver un escenario o arreglar un problema.', lhowto: 'Guías de herramientas', lscene: 'Guías por escenario', lguide: 'Guías de solución de problemas', lrel: 'Guías relacionadas', home: 'Inicio', guides: 'Guías' },
+  'pt': { title: 'Guias e tutoriais de legendas – AI-SRTSub', desc: 'Guias ilustrados: como usar o tradutor, o conversor de formatos, o editor de tempo e outras ferramentas, e como resolver problemas comuns de legendas.', h1: 'Guias e tutoriais de legendas', intro: 'Cada guia responde a uma necessidade específica: usar uma ferramenta, resolver um cenário ou corrigir um problema.', lhowto: 'Guias de ferramentas', lscene: 'Guias por cenário', lguide: 'Guias de solução de problemas', lrel: 'Guias relacionados', home: 'Início', guides: 'Guias' },
+  'ko': { title: '자막 도구 사용 가이드와 튜토리얼 – AI-SRTSub', desc: '자막 번역, 형식 변환, 타이밍 조정 등 도구 사용법과 흔한 자막 문제 해결 방법을 그림과 함께 설명합니다.', h1: '자막 가이드와 튜토리얼', intro: '모든 가이드는 하나의 구체적인 필요를 해결합니다. 도구 사용법, 시나리오별 해결책, 문제 해결.', lhowto: '도구 사용 가이드', lscene: '시나리오 가이드', lguide: '문제 해결 가이드', lrel: '관련 가이드', home: '홈', guides: '가이드' },
+  'de': { title: 'Anleitungen und Tutorials für Untertitel-Tools – AI-SRTSub', desc: 'Illustrierte Anleitungen: So nutzt du Übersetzer, Formatkonverter, Zeitachsen-Editor und weitere Tools – und behebst häufige Untertitel-Probleme.', h1: 'Anleitungen und Tutorials', intro: 'Jede Anleitung beantwortet ein konkretes Bedürfnis: ein Tool nutzen, ein Szenario lösen oder ein Problem beheben.', lhowto: 'Tool-Anleitungen', lscene: 'Szenario-Anleitungen', lguide: 'Problemlösungen', lrel: 'Verwandte Anleitungen', home: 'Startseite', guides: 'Anleitungen' },
+  'fr': { title: 'Guides et tutoriels sous-titres – AI-SRTSub', desc: "Guides illustrés : utiliser le traducteur, le convertisseur de formats, l'éditeur de synchronisation et les autres outils, et résoudre les problèmes courants de sous-titres.", h1: 'Guides et tutoriels sous-titres', intro: 'Chaque guide répond à un besoin précis : utiliser un outil, résoudre un scénario ou corriger un problème.', lhowto: "Guides d'outils", lscene: 'Guides par scénario', lguide: 'Guides de dépannage', lrel: 'Guides associés', home: 'Accueil', guides: 'Guides' },
+  'id': { title: 'Panduan & Tutorial Alat Subtitle – AI-SRTSub', desc: 'Panduan bergambar: cara menggunakan penerjemah, konverter format, editor waktu, dan alat lainnya, serta cara memperbaiki masalah subtitle umum.', h1: 'Panduan & Tutorial Subtitle', intro: 'Setiap panduan menjawab satu kebutuhan spesifik: menggunakan alat, menyelesaikan skenario, atau memperbaiki masalah.', lhowto: 'Panduan alat', lscene: 'Panduan per skenario', lguide: 'Panduan pemecahan masalah', lrel: 'Panduan terkait', home: 'Beranda', guides: 'Panduan' },
+  'hi': { title: 'सबटाइटल टूल गाइड और ट्यूटोरियल – AI-SRTSub', desc: 'चित्रों के साथ गाइड: अनुवादक, फॉर्मेट कनवर्टर, टाइमिंग एडिटर जैसे टूल कैसे इस्तेमाल करें और आम सबटाइटल समस्याएँ कैसे ठीक करें।', h1: 'सबटाइटल गाइड और ट्यूटोरियल', intro: 'हर गाइड एक ठोस ज़रूरत का जवाब देता है: टूल इस्तेमाल करना, किसी स्थिति का हल निकालना या समस्या ठीक करना।', lhowto: 'टूल गाइड', lscene: 'परिदृश्य गाइड', lguide: 'समस्या समाधान गाइड', lrel: 'संबंधित गाइड', home: 'होम', guides: 'गाइड' },
+  'th': { title: 'คู่มือและบทแนะนำเครื่องมือซับไตเติล – AI-SRTSub', desc: 'คู่มือประกอบภาพ: วิธีใช้ตัวแปลภาษา ตัวแปลงรูปแบบ ตัวแก้ไขจังหวะเวลา และเครื่องมืออื่น ๆ รวมถึงวิธีแก้ปัญหาซับไตเติลที่พบบ่อย', h1: 'คู่มือและบทแนะนำซับไตเติล', intro: 'ทุกคู่มือตอบโจทย์ความต้องการเฉพาะเรื่อง: ใช้เครื่องมือ แก้ปัญหาตามสถานการณ์ หรือแก้ไขข้อผิดพลาด', lhowto: 'คู่มือการใช้เครื่องมือ', lscene: 'คู่มือตามสถานการณ์', lguide: 'คู่มือแก้ปัญหา', lrel: 'คู่มือที่เกี่ยวข้อง', home: 'หน้าแรก', guides: 'คู่มือ' },
+  'vi': { title: 'Hướng dẫn và bài viết về công cụ phụ đề – AI-SRTSub', desc: 'Hướng dẫn kèm hình ảnh: cách dùng trình dịch, bộ chuyển đổi định dạng, trình chỉnh thời gian và các công cụ khác, cùng cách xử lý các lỗi phụ đề thường gặp.', h1: 'Hướng dẫn phụ đề', intro: 'Mỗi hướng dẫn trả lời một nhu cầu cụ thể: dùng một công cụ, giải quyết một tình huống hay sửa một lỗi.', lhowto: 'Hướng dẫn công cụ', lscene: 'Hướng dẫn theo tình huống', lguide: 'Hướng dẫn xử lý sự cố', lrel: 'Hướng dẫn liên quan', home: 'Trang chủ', guides: 'Hướng dẫn' },
+  'ru': { title: 'Руководства по инструментам для субтитров – AI-SRTSub', desc: 'Иллюстрированные руководства: как пользоваться переводчиком, конвертером форматов, редактором тайминга и другими инструментами, а также как решать типичные проблемы с субтитрами.', h1: 'Руководства и уроки по субтитрам', intro: 'Каждое руководство отвечает на конкретный запрос: освоить инструмент, решить сценарий или устранить проблему.', lhowto: 'Руководства по инструментам', lscene: 'Руководства по сценариям', lguide: 'Устранение проблем', lrel: 'Похожие руководства', home: 'Главная', guides: 'Руководства' },
+  'it': { title: 'Guide e tutorial sui sottotitoli – AI-SRTSub', desc: 'Guide illustrate: come usare traduttore, convertitore di formati, editor dei tempi e altri strumenti, e come risolvere i problemi più comuni di sottotitolatura.', h1: 'Guide e tutorial sui sottotitoli', intro: 'Ogni guida risponde a un bisogno preciso: usare uno strumento, risolvere uno scenario o correggere un problema.', lhowto: 'Guide agli strumenti', lscene: 'Guide per scenario', lguide: 'Guide alla risoluzione dei problemi', lrel: 'Guide correlate', home: 'Home', guides: 'Guide' },
+  'ar': { title: 'أدلة ودروس أدوات الترجمة – AI-SRTSub', desc: 'أدلة مصوّرة: كيف تستخدم المترجم ومحوّل الصيغ ومحرّر التوقيت وغيرها من الأدوات، وكيف تحل مشاكل الترجمة الشائعة.', h1: 'أدلة ودروس الترجمة', intro: 'كل دليل يجيب عن حاجة محددة: استخدام أداة، أو حل سيناريو، أو إصلاح مشكلة.', lhowto: 'أدلة الأدوات', lscene: 'أدلة السيناريوهات', lguide: 'أدلة حل المشكلات', lrel: 'أدلة ذات صلة', home: 'الرئيسية', guides: 'الأدلة' },
+  'tr': { title: 'Altyazı Araç Kılavuzları – AI-SRTSub', desc: 'Resimli kılavuzlar: çevirmen, format dönüştürücü, zaman düzenleyici ve diğer araçları nasıl kullanırsınız, sık altyazı sorunlarını nasıl çözersiniz.', h1: 'Altyazı Kılavuzları ve Dersler', intro: 'Her kılavuz tek bir somut ihtiyaca cevap verir: araç kullanmak, bir senaryoyu çözmek veya sorunu düzeltmek.', lhowto: 'Araç kılavuzları', lscene: 'Senaryo kılavuzları', lguide: 'Sorun çözme kılavuzları', lrel: 'İlgili kılavuzlar', home: 'Ana sayfa', guides: 'Kılavuzlar' },
+  'nl': { title: 'Handleidingen en tutorials voor ondertiteltools – AI-SRTSub', desc: 'Geïllustreerde handleidingen: hoe je de vertaler, formaatconverter, timing-editor en andere tools gebruikt, en hoe je veelvoorkomende ondertitelproblemen oplost.', h1: 'Handleidingen en tutorials', intro: 'Elke handleiding beantwoordt één concrete vraag: een tool gebruiken, een scenario oplossen of een probleem verhelpen.', lhowto: 'Toolhandleidingen', lscene: 'Scenariohandleidingen', lguide: 'Problemen oplossen', lrel: 'Gerelateerde handleidingen', home: 'Startpagina', guides: 'Handleidingen' },
+  'pl': { title: 'Poradniki i tutoriale narzędzi do napisów – AI-SRTSub', desc: 'Ilustrowane poradniki: jak korzystać z tłumacza, konwertera formatów, edytora synchronizacji i innych narzędzi oraz jak rozwiązywać typowe problemy z napisami.', h1: 'Poradniki i tutoriale o napisach', intro: 'Każdy poradnik odpowiada na jedną konkretną potrzebę: korzystanie z narzędzia, rozwiązanie scenariusza lub naprawa problemu.', lhowto: 'Poradniki narzędzi', lscene: 'Poradniki scenariuszowe', lguide: 'Rozwiązywanie problemów', lrel: 'Powiązane poradniki', home: 'Strona główna', guides: 'Poradniki' },
+  'sv': { title: 'Guider och självstudier för undertextverktyg – AI-SRTSub', desc: 'Illustrerade guider: hur du använder översättaren, formatkonverteraren, tidsredigeraren och andra verktyg – och löser vanliga undertextproblem.', h1: 'Guider och självstudier', intro: 'Varje guide svarar på ett konkret behov: använda ett verktyg, lösa ett scenario eller åtgärda ett problem.', lhowto: 'Verktygsguider', lscene: 'Scenarioguider', lguide: 'Felsökningsguider', lrel: 'Relaterade guider', home: 'Startsida', guides: 'Guider' },
+  'cs': { title: 'Návody a tutoriály pro nástroje na titulky – AI-SRTSub', desc: 'Návody s obrázky: jak používat překladač, převodník formátů, editor časování a další nástroje a jak řešit časté problémy s titulky.', h1: 'Návody a tutoriály k titulkům', intro: 'Každý návod odpovídá na jednu konkrétní potřebu: použití nástroje, vyřešení scénáře nebo oprava problému.', lhowto: 'Návody k nástrojům', lscene: 'Návody podle scénáře', lguide: 'Řešení problémů', lrel: 'Související návody', home: 'Domů', guides: 'Návody' },
+  'uk': { title: 'Посібники та уроки з інструментів для субтитрів – AI-SRTSub', desc: 'Ілюстровані посібники: як користуватися перекладачем, конвертером форматів, редактором таймінгу та іншими інструментами, і як вирішувати типові проблеми із субтитрами.', h1: 'Посібники та уроки з субтитрів', intro: 'Кожен посібник відповідає на одну конкретну потребу: опанувати інструмент, вирішити сценарій чи усунути проблему.', lhowto: 'Посібники з інструментів', lscene: 'Посібники за сценаріями', lguide: 'Вирішення проблем', lrel: 'Схожі посібники', home: 'Головна', guides: 'Посібники' },
+  'da': { title: 'Vejledninger og tutorials til undertekstværktøjer – AI-SRTSub', desc: 'Illustrerede vejledninger: Sådan bruger du oversætteren, formatkonverteren, timing-editoren og andre værktøjer – og løser almindelige undertekstproblemer.', h1: 'Vejledninger og tutorials', intro: 'Hver vejledning besvarer ét konkret behov: at bruge et værktøj, løse et scenarie eller rette et problem.', lhowto: 'Værktøjsvejledninger', lscene: 'Scenarievejledninger', lguide: 'Fejlfinding', lrel: 'Relaterede vejledninger', home: 'Forside', guides: 'Vejledninger' },
+  'fi': { title: 'Ohjeet ja oppaat tekstitystyökaluille – AI-SRTSub', desc: 'Kuvitellut ohjeet: miten käytät kääntäjää, muunninta, ajoituseditoria ja muita työkaluja – ja korjaat yleiset tekstitysongelmat.', h1: 'Ohjeet ja oppaat tekstitykseen', intro: 'Jokainen opas vastaa yhteen konkreettiseen tarpeeseen: työkalun käyttöön, skenaarion ratkaisuun tai ongelman korjaamiseen.', lhowto: 'Työkaluohjeet', lscene: 'Skenaario-oppaat', lguide: 'Vianetsintäoppaat', lrel: 'Aiheeseen liittyvät oppaat', home: 'Etusivu', guides: 'Oppaat' },
+  'el': { title: 'Οδηγοί και μαθήματα για εργαλεία υπότιτλων – AI-SRTSub', desc: 'Εικονογραφημένοι οδηγοί: πώς να χρησιμοποιείτε τον μεταφραστή, τον μετατροπέα μορφών, τον επεξεργαστή συγχρονισμού και άλλα εργαλεία, και πώς να λύνετε συνηθισμένα προβλήματα υποτίτλων.', h1: 'Οδηγοί και μαθήματα υποτίτλων', intro: 'Κάθε οδηγός απαντά σε μία συγκεκριμένη ανάγκη: χρήση ενός εργαλείου, επίλυση ενός σεναρίου ή διόρθωση ενός προβλήματος.', lhowto: 'Οδηγοί εργαλείων', lscene: 'Οδηγοί σεναρίων', lguide: 'Αντιμετώπιση προβλημάτων', lrel: 'Σχετικοί οδηγοί', home: 'Αρχική', guides: 'Οδηγοί' },
+  'he': { title: 'מדריכים ושיעורים לכלי כתוביות – AI-SRTSub', desc: 'מדריכים מאוירים: איך משתמשים במתרגם, בממיר הפורמטים, בעורך התזמון ובשאר הכלים, ואיך פותרים בעיות כתוביות נפוצות.', h1: 'מדריכים ושיעורים לכתוביות', intro: 'כל מדריך עונה על צורך אחד מוגדר: להשתמש בכלי, לפתור תרחיש או לתקן בעיה.', lhowto: 'מדריכי כלים', lscene: 'מדריכי תרחישים', lguide: 'פתרון בעיות', lrel: 'מדריכים קשורים', home: 'דף הבית', guides: 'מדריכים' },
+  'ro': { title: 'Ghiduri și tutoriale pentru instrumente de subtitrări – AI-SRTSub', desc: 'Ghiduri ilustrate: cum folosești traducătorul, convertorul de formate, editorul de sincronizare și celelalte instrumente, și cum rezolvi problemele frecvente de subtitrare.', h1: 'Ghiduri și tutoriale de subtitrări', intro: 'Fiecare ghid răspunde unei nevoi concrete: să folosești un instrument, să rezolvi un scenariu sau să corectezi o problemă.', lhowto: 'Ghiduri de instrumente', lscene: 'Ghiduri pe scenarii', lguide: 'Rezolvarea problemelor', lrel: 'Ghiduri similare', home: 'Acasă', guides: 'Ghiduri' }
+};
+/* 语言切换下拉的 27 语原生名（与各工具页 select 同一张名单） */
+const GUIDE_LANG_NAMES = [['zh-CN', '简体中文'], ['zh-TW', '繁體中文'], ['en', 'English'], ['ja', '日本語'], ['es', 'Español'], ['pt', 'Português'], ['ko', '한국어'], ['de', 'Deutsch'], ['fr', 'Français'], ['id', 'Bahasa Indonesia'], ['hi', 'हिन्दी'], ['th', 'ไทย'], ['vi', 'Tiếng Việt'], ['ru', 'Русский'], ['it', 'Italiano'], ['ar', 'العربية'], ['tr', 'Türkçe'], ['nl', 'Nederlands'], ['pl', 'Polski'], ['sv', 'Svenska'], ['cs', 'Čeština'], ['uk', 'Українська'], ['da', 'Dansk'], ['fi', 'Suomi'], ['el', 'Ελληνικά'], ['he', 'עברית'], ['ro', 'Română']];
+
+/* 文章页 <head>：Article + BreadcrumbList（⚠️ 不上 HowTo / FAQPage，Google 已移除其富摘要） */
+function guideHead(lang, base, slug) {
+  const g = GUIDE_PAGES[slug];
+  const s = g.seo[lang];
+  const selfUrl = base + guideUrl(lang, slug);
+  const langs = guideLangs(g);
+  const xdef = langs.indexOf('en') >= 0 ? 'en' : langs[0];
+  const alternates = langs.map(function (l) {
+    return '<link rel="alternate" hreflang="' + l + '" href="' + base + guideUrl(l, slug) + '">';
+  }).join('\n') + '\n<link rel="alternate" hreflang="x-default" href="' + base + guideUrl(xdef, slug) + '">';
+  const firstImg = (g.body[lang] || []).filter(function (sec) { return sec.img && sec.img.file; })[0];
+  const imgUrl = firstImg ? base + guideImgPath(firstImg.img, lang) + '.png' : base + '/og-image.png';
+  const brand = (lang === 'zh-CN') ? '随心字幕 AI' : (lang === 'zh-TW') ? '隨心字幕 AI' : 'AI-SRTSub';
+  const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+  const article = '{\n'
+    + '  "@context": "https://schema.org",\n'
+    + '  "@type": "Article",\n'
+    + '  "headline": ' + JSON.stringify(s.h1 || s.title) + ',\n'
+    + '  "description": ' + JSON.stringify(s.desc) + ',\n'
+    + '  "mainEntityOfPage": ' + JSON.stringify(selfUrl) + ',\n'
+    + '  "image": ' + JSON.stringify([imgUrl]) + ',\n'
+    + '  "inLanguage": ' + JSON.stringify(lang) + ',\n'
+    + '  "datePublished": ' + JSON.stringify(g.date || '') + (g.date ? '' : '') + ',\n'
+    + '  "dateModified": ' + JSON.stringify(g.date || '') + ',\n'
+    + '  "author": { "@type": "Organization", "name": ' + JSON.stringify(brand) + ', "url": ' + JSON.stringify(base + '/') + ' },\n'
+    + '  "publisher": { "@type": "Organization", "name": ' + JSON.stringify(brand) + ', "url": ' + JSON.stringify(base + '/') + ' }\n'
+    + '}';
+  const crumb = '{\n'
+    + '  "@context": "https://schema.org",\n'
+    + '  "@type": "BreadcrumbList",\n'
+    + '  "itemListElement": [\n'
+    + '    { "@type": "ListItem", "position": 1, "name": ' + JSON.stringify(IX.home) + ', "item": ' + JSON.stringify(base + (lang === 'zh-CN' ? '/' : '/' + lang + '/')) + ' },\n'
+    + '    { "@type": "ListItem", "position": 2, "name": ' + JSON.stringify(IX.guides) + ', "item": ' + JSON.stringify(base + guideIndexUrl(lang)) + ' },\n'
+    + '    { "@type": "ListItem", "position": 3, "name": ' + JSON.stringify(s.h1 || s.title) + ', "item": ' + JSON.stringify(selfUrl) + ' }\n'
+    + '  ]\n'
+    + '}';
+  return [
+    '<title>' + guideEsc(s.title) + '</title>',
+    '<meta name="description" content="' + guideEsc(s.desc) + '">',
+    '<meta name="robots" content="index, follow">',
+    '<meta name="theme-color" content="#0E9488">',
+    '<link rel="icon" type="image/svg+xml" href="/favicon.svg">',
+    '<link rel="canonical" href="' + selfUrl + '">',
+    alternates,
+    '<meta property="og:type" content="article">',
+    '<meta property="og:title" content="' + guideEsc(s.title) + '">',
+    '<meta property="og:description" content="' + guideEsc(s.desc) + '">',
+    '<meta property="og:image" content="' + imgUrl + '">',
+    '<meta property="og:site_name" content="' + brand + '">',
+    '<meta property="og:locale" content="' + (OG_LOCALE[lang] || 'en_US') + '">',
+    '<meta property="og:url" content="' + selfUrl + '">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:title" content="' + guideEsc(s.title) + '">',
+    '<meta name="twitter:description" content="' + guideEsc(s.desc) + '">',
+    '<meta name="twitter:image" content="' + imgUrl + '">',
+    '<script type="application/ld+json">\n' + article + '\n</script>',
+    '<script type="application/ld+json">\n' + crumb + '\n</script>'
+  ].join('\n');
+}
+
+/* 索引页 <head>：CollectionPage + 两级面包屑 */
+function guideIndexHead(lang, base) {
+  const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+  const selfUrl = base + guideIndexUrl(lang);
+  const alternates = SEO_LANGS.map(function (l) {
+    return '<link rel="alternate" hreflang="' + l + '" href="' + base + guideIndexUrl(l) + '">';
+  }).join('\n') + '\n<link rel="alternate" hreflang="x-default" href="' + base + guideIndexUrl('en') + '">';
+  const brand = (lang === 'zh-CN') ? '随心字幕 AI' : (lang === 'zh-TW') ? '隨心字幕 AI' : 'AI-SRTSub';
+  const jsonld = '{\n'
+    + '  "@context": "https://schema.org",\n'
+    + '  "@type": "CollectionPage",\n'
+    + '  "name": ' + JSON.stringify(IX.h1) + ',\n'
+    + '  "description": ' + JSON.stringify(IX.desc) + ',\n'
+    + '  "url": ' + JSON.stringify(selfUrl) + ',\n'
+    + '  "inLanguage": ' + JSON.stringify(lang) + '\n'
+    + '}';
+  const crumb = '{\n'
+    + '  "@context": "https://schema.org",\n'
+    + '  "@type": "BreadcrumbList",\n'
+    + '  "itemListElement": [\n'
+    + '    { "@type": "ListItem", "position": 1, "name": ' + JSON.stringify(IX.home) + ', "item": ' + JSON.stringify(base + (lang === 'zh-CN' ? '/' : '/' + lang + '/')) + ' },\n'
+    + '    { "@type": "ListItem", "position": 2, "name": ' + JSON.stringify(IX.guides) + ', "item": ' + JSON.stringify(selfUrl) + ' }\n'
+    + '  ]\n'
+    + '}';
+  return [
+    '<title>' + guideEsc(IX.title) + '</title>',
+    '<meta name="description" content="' + guideEsc(IX.desc) + '">',
+    '<meta name="robots" content="index, follow">',
+    '<meta name="theme-color" content="#0E9488">',
+    '<link rel="icon" type="image/svg+xml" href="/favicon.svg">',
+    '<link rel="canonical" href="' + selfUrl + '">',
+    alternates,
+    '<meta property="og:type" content="website">',
+    '<meta property="og:title" content="' + guideEsc(IX.title) + '">',
+    '<meta property="og:description" content="' + guideEsc(IX.desc) + '">',
+    '<meta property="og:image" content="' + base + '/og-image.png">',
+    '<meta property="og:site_name" content="' + brand + '">',
+    '<meta property="og:locale" content="' + (OG_LOCALE[lang] || 'en_US') + '">',
+    '<meta property="og:url" content="' + selfUrl + '">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:title" content="' + guideEsc(IX.title) + '">',
+    '<meta name="twitter:description" content="' + guideEsc(IX.desc) + '">',
+    '<meta name="twitter:image" content="' + base + '/og-image.png">',
+    '<script type="application/ld+json">\n' + jsonld + '\n</script>',
+    '<script type="application/ld+json">\n' + crumb + '\n</script>'
+  ].join('\n');
+}
+
+/* 正文 → HTML：intro 段 + 各 section（h2/ps/ul/figure）+ CTA + 相关指南 */
+function guideBodyHtml(g, lang) {
+  const s = g.seo[lang];
+  const out = [];
+  out.push('<p class="gintro">' + guideInline(s.intro || '') + '</p>');
+  (g.body[lang] || []).forEach(function (sec) {
+    if (sec.h2) out.push('<h2>' + guideInline(sec.h2) + '</h2>');
+    (sec.ps || []).forEach(function (p) { out.push('<p>' + guideInline(p) + '</p>'); });
+    if (sec.ul && sec.ul.length) {
+      out.push('<ul>' + sec.ul.map(function (li) { return '<li>' + guideInline(li) + '</li>'; }).join('') + '</ul>');
+    }
+    if (sec.img && sec.img.file) {
+      const b = guideImgPath(sec.img, lang);
+      const dim = sec.img.w ? ' width="' + sec.img.w + '" height="' + sec.img.h + '"' : '';
+      out.push('<figure class="gfig"><picture><source type="image/webp" srcset="' + b + '.webp"><img src="' + b + '.png" alt="' + guideEsc(sec.img.alt || '') + '" loading="lazy"' + dim + '></picture>'
+        + (sec.img.cap ? '<figcaption>' + guideInline(sec.img.cap) + '</figcaption>' : '') + '</figure>');
+    }
+  });
+  if (g.tool && s.ctaText) {
+    out.push('<div class="gcta"><a class="gbtn" href="/' + g.tool + '.html">' + guideInline(s.ctaText) + '</a></div>');
+  }
+  if (g.related && g.related.length) {
+    const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+    const lis = g.related.map(function (sl) {
+      const rg = GUIDE_PAGES[sl];
+      if (!rg || !(rg.seo[lang] && rg.body[lang])) return '';
+      return '<li><a href="' + guideUrl(lang, sl) + '">' + guideEsc(rg.seo[lang].h1 || rg.seo[lang].title) + '</a></li>';
+    }).join('');
+    if (lis) out.push('<h2 class="grelh">' + guideEsc(IX.lrel) + '</h2><ul class="grel">' + lis + '</ul>');
+  }
+  return out.join('\n');
+}
+
+/* 文章页与索引页共用的注入逻辑（读 guides.html 模板） */
+function serveGuideHtml(req, res, lang, headHtml, h1Html, crumbHtml, bodyHtml) {
+  fs.readFile(path.join(ROOT, 'guides.html'), 'utf8', function (err, html) {
+    if (err) { res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('guides.html missing'); return; }
+    const base = publicBase(req) || '';
+    html = html.replace(/<!--GUIDE-HEAD-START-->[\s\S]*?<!--GUIDE-HEAD-END-->/,
+      '<!--GUIDE-HEAD-START-->\n' + headHtml + '\n<!--GUIDE-HEAD-END-->');
+    html = html.replace(/<!--GUIDE-H1-START-->[\s\S]*?<!--GUIDE-H1-END-->/,
+      '<!--GUIDE-H1-START-->' + h1Html + '<!--GUIDE-H1-END-->');
+    html = html.replace(/<!--GUIDE-CRUMB-START-->[\s\S]*?<!--GUIDE-CRUMB-END-->/,
+      '<!--GUIDE-CRUMB-START-->' + crumbHtml + '<!--GUIDE-CRUMB-END-->');
+    html = html.replace(/<!--GUIDE-BODY-START-->[\s\S]*?<!--GUIDE-BODY-END-->/,
+      '<!--GUIDE-BODY-START-->\n' + bodyHtml + '\n<!--GUIDE-BODY-END-->');
+    /* 语言切换下拉：服务端注入 27 个 option，当前语言选中 */
+    const opts = GUIDE_LANG_NAMES.map(function (p) {
+      return '<option value="' + p[0] + '"' + (p[0] === lang ? ' selected' : '') + '>' + p[1] + '</option>';
+    }).join('');
+    html = html.replace('<!--GUIDE-LANGS-->', opts);
+    html = html.replace('<html lang="zh-CN"', '<html lang="' + lang + '"' + ((lang === 'ar' || lang === 'he') ? ' dir="rtl"' : ''));
+    /* 站内链接按 URL 语言补前缀（与 serveIndexLang 同思路，模板里写的都是无前缀形态）。
+       v0.9.323 挂 topnav 后多了 /guides/ 形态的链接，一并纳入改写 */
+    if (lang !== 'zh-CN') {
+      const lp = '/' + lang;
+      html = html.replace(/href="(\/(?:guides\/[a-z0-9-]+\.html|guides\/|[a-z-]+\.html)?(?:[?#][^"]*)?)"/g, 'href="' + lp + '$1"');
+    }
+    const ga = (readConfig().analyticsId || '').trim();
+    const gaTag = /^G-[A-Z0-9]+$/.test(ga)
+      ? '<!-- Google tag (gtag.js) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=' + ga + '"></script>\n<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag(\'js\', new Date());\ngtag(\'config\', \'' + ga + '\');\n</script>'
+      : '';
+    html = html.replace('<!--ANALYTICS-->', gaTag);
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(html);
+  });
+}
+
+function serveGuide(req, res, lang, slug) {
+  const g = GUIDE_PAGES[slug];
+  if (!g || !g.seo[lang] || !g.body[lang]) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Not Found'); return;
+  }
+  const s = g.seo[lang];
+  const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+  const homeHref = lang === 'zh-CN' ? '/' : '/' + lang + '/';
+  const base = publicBase(req) || '';
+  const crumb = '<a href="' + homeHref + '">' + guideEsc(IX.home) + '</a><span>/</span>'
+    + '<a href="' + guideIndexUrl(lang) + '">' + guideEsc(IX.guides) + '</a><span>/</span>'
+    + '<em>' + guideEsc(s.h1 || s.title) + '</em>';
+  serveGuideHtml(req, res, lang, guideHead(lang, base, slug),
+    guideInline(s.h1 || s.title), crumb, guideBodyHtml(g, lang));
+}
+
+function serveGuideIndex(req, res, lang) {
+  const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
+  const homeHref = lang === 'zh-CN' ? '/' : '/' + lang + '/';
+  const base = publicBase(req) || '';
+  const crumb = '<a href="' + homeHref + '">' + guideEsc(IX.home) + '</a><span>/</span><em>' + guideEsc(IX.guides) + '</em>';
+  /* 三组：工具使用说明 / 场景指南 / 问题指南。组内按字母序，只列当前语言版本存在的文章 */
+  const groups = [['howto', IX.lhowto], ['scene', IX.lscene], ['guide', IX.lguide]];
+  let bodyHtml = '<p class="gintro">' + guideInline(IX.intro) + '</p>';
+  groups.forEach(function (grp) {
+    const items = Object.keys(GUIDE_PAGES).filter(function (sl) {
+      const g = GUIDE_PAGES[sl];
+      return g.kind === grp[0] && g.seo[lang] && g.body[lang];
+    }).sort();
+    if (!items.length) return;
+    bodyHtml += '\n<h2>' + guideEsc(grp[1]) + '</h2>\n<ul class="glist">'
+      + items.map(function (sl) {
+        const s = GUIDE_PAGES[sl].seo[lang];
+        return '<li><a href="' + guideUrl(lang, sl) + '">' + guideEsc(s.h1 || s.title) + '</a><span>' + guideEsc(s.intro || s.desc) + '</span></li>';
+      }).join('') + '</ul>';
+  });
+  serveGuideHtml(req, res, lang, guideIndexHead(lang, base),
+    guideEsc(IX.h1), crumb, bodyHtml);
 }
 
 function proto(req){
