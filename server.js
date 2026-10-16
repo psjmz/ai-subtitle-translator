@@ -594,7 +594,9 @@ const TOOL_PAGE = {
   bilingual: 'bilingual', repair: 'repair', glossary: 'glossary',
   videosub: 'videosub', hanconv: 'hanconv',
   /* v0.9.316：四个新工具页进账（纯前端页，与上六页同一本账） */
-  split: 'split', table: 'table', batch: 'batch', lrc: 'lrc'
+  split: 'split', table: 'table', batch: 'batch', lrc: 'lrc',
+  /* v0.9.321：字幕质检页。act 复用现有动作不新增：check=执行质检，fix=应用修复 */
+  qc: 'qc'
 };
 /* ⚠️ 动作白名单：与六页各自埋点处传的 act 一一对应（逐页对齐，共 14 个）。
       加减动作两边必须同步，否则新动作被记成空值 —— 用户明明用了，后台却看不到。
@@ -612,7 +614,9 @@ const TOOL_ACT = {
   /* glossary 术语批量替换 */
   replace: 'replace',
   /* 六页共用的「真的下载了文件」 */
-  export: 'export'
+  export: 'export',
+  /* v0.9.321：qc 页的两个动作 —— 跑一遍检查 / 应用修复 */
+  check: 'check', fix: 'fix'
 };
 const TOOL_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt', json: 'json',
   /* v0.9.316：table 页 xlsx/csv、batch 页 zip、lrc 页 lrc */
@@ -744,11 +748,11 @@ function serveStatic(req, res, urlPath){
      ⚠️ 必须排在下面那条「语言目录下的静态资源回退」之前 —— 否则 /en/merge.html
      会被当成 /merge.html 原样吐出去，SEO head 一个字都换不掉，等于没做。 */
   /* v0.9.288：转换页 /convert.html 与 /en/convert.html */
-  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv|split|table|batch|lrc)\.html$/);
+  let pm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv|split|table|batch|lrc|qc)\.html$/);
   if (pm && SEO_ROUTE['/' + pm[1]]) {
     serveIndexLang(req, res, SEO_ROUTE['/' + pm[1]], pm[2]); return;
   }
-  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv|split|table|batch|lrc)\.html$/);
+  pm = p.match(/^\/(merge|clean|translate|convert|bilingual|shift|repair|extract|glossary|videosub|hanconv|split|table|batch|lrc|qc)\.html$/);
   if (pm) { serveIndexLang(req, res, 'zh-CN', pm[1]); return; }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
@@ -1872,8 +1876,258 @@ const SEO_GLOSSARY = {
     siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'Subtitle Glossary Batch Replace'
   }
 };
+/* v0.9.321：第十七个页面 —— 字幕质检（/qc.html）
+   与前面十六页同一套字段：title / desc / kw / intro / feat / who + 品牌三件套。
+   ⚠️ 卖点不是「又一个 srt 校验器」，而是「按字幕语言自己的规矩查」——
+      feat 里必须写清楚按文字系统分档的口径，以及那几条语言专属规范。 */
+const SEO_QC = {
+  'zh-CN': {
+    title: "字幕质检 - 按语言规则查时间轴与排版 | 随心字幕 AI",
+    desc: "免费在线字幕质检：上传 SRT / VTT / ASS，按这门语言自己的规矩查时间轴重叠、停留时长、阅读速度、行宽、断行位置、序号与编码。27 种语言各有各的阈值，另带中西文空格、全角标点等语言专属规范。",
+    kw: "字幕质检,字幕检查,srt检查,字幕校验,字幕体检,字幕规范检查,字幕时间轴检查,srt validator,subtitle checker,subtitle qc",
+    intro: "上传一份字幕，按这门语言自己的规矩查一遍，每条问题都给出实测值和阈值。全程在浏览器里完成，文件不上传。",
+    feat: "时间轴重叠、停留过短或过长、阅读速度过快、单行过宽、超过两行、断行位置、序号错乱、空条目、乱码与控制字符都能查。行宽与阅读速度按文字系统口径算：中文按全角字计宽，泰文与阿拉伯文的组合记号不计宽。语言专属规范包括西班牙语疑问句开头的 ¿、法语在 ? ! ; : 之前的不破空格、希腊语的问号、中文与日文的全角标点、阿拉伯语的 ؟ 与 ،。可自动修的项目单独列出，会动时间轴的默认不勾选。",
+    who: "译制组、字幕组、剪辑师和本地化团队，在交付前把字幕过一遍。",
+    siteName: "随心字幕 AI", jsonldName: "随心字幕 AI", jsonldAlt: "Subtitle QC Checker"
+  },
+  'zh-TW': {
+    title: "字幕質檢 - 依語言規則檢查時間軸與排版 | 隨心字幕 AI",
+    desc: "免費線上字幕質檢：上傳 SRT / VTT / ASS，依這門語言自己的規矩檢查時間軸重疊、停留時長、閱讀速度、行寬、斷行位置、序號與編碼。27 種語言各有各的門檻，另帶中西文空格、全角標點等語言專屬規範。",
+    kw: "字幕質檢,字幕檢查,srt檢查,字幕校驗,字幕體檢,字幕規範檢查,字幕時間軸檢查,srt validator,subtitle checker,subtitle qc",
+    intro: "上傳一份字幕，依這門語言自己的規矩檢查一遍，每個問題都給出實測值和門檻。全程在瀏覽器裡完成，檔案不上傳。",
+    feat: "時間軸重疊、停留過短或過長、閱讀速度過快、單行過寬、超過兩行、斷行位置、序號錯亂、空條目、亂碼與控制字元都能查。行寬與閱讀速度依文字系統口徑計算：中文按全形字計寬，泰文與阿拉伯文的組合記號不計寬。語言專屬規範包括西班牙語疑問句開頭的 ¿、法語在 ? ! ; : 之前的不換行空格、希臘語的問號、中文與日文的全形標點、阿拉伯語的 ؟ 與 ،。可自動修的項目單獨列出，會動時間軸的預設不勾選。",
+    who: "譯製組、字幕組、剪輯師和本地化團隊，在交付前把字幕過一遍。",
+    siteName: "隨心字幕 AI", jsonldName: "隨心字幕 AI", jsonldAlt: "Subtitle QC Checker"
+  },
+  'en': {
+    title: "Subtitle QC - Check Timing and Layout per Language | AI-SRTSub",
+    desc: "Free online subtitle QC: upload SRT, VTT or ASS and check overlaps, duration, reading speed, line width, line breaks, numbering and encoding against the rules of that language. 27 languages, 27 sets of thresholds, plus language-specific rules.",
+    kw: "subtitle checker,subtitle qc,srt validator,subtitle quality check,srt check,subtitle timing check,subtitle validator,check srt file,subtitle proofreading,subtitle linter",
+    intro: "Upload a subtitle file and check it against the rules of its own language - every finding comes with the measured value and the threshold. Runs fully in your browser, nothing is uploaded.",
+    feat: "Checks overlapping cues, too short or too long on screen, reading speed, line width, line count, awkward line breaks, numbering, empty cues, mojibake and control characters. Width and reading speed follow the writing system: Chinese is measured in full-width characters, Thai and Arabic combining marks count as zero width. Language-specific rules cover the Spanish opening ¿, the French non-breaking space before ? ! ; :, the Greek question mark, full-width punctuation in Chinese and Japanese, and the Arabic question mark and comma. Auto-fixable items are listed separately, and anything that moves timecodes is unchecked by default.",
+    who: "Subtitle groups, localisation vendors, editors and anyone who wants to check a file before delivery.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'ja': {
+    title: "字幕QC - 言語ごとの規則でタイミングと組み版を検査 | AI-SRTSub",
+    desc: "無料のオンライン字幕QC。SRT・VTT・ASS を読み込み、その言語の規則で時間の重なり、表示時間、読み速度、行の幅、改行位置、番号、エンコーディングを検査します。27言語それぞれに閾値があり、言語固有の規則も備えています。",
+    kw: "字幕QC,字幕チェック,srtチェック,字幕検査,字幕校正,字幕タイミング検査,subtitle checker,subtitle qc,srt validator,字幕検証",
+    intro: "字幕ファイルをアップロードして、その言語自身の規則で検査します。指摘ごとに実測値と閾値が表示されます。すべてブラウザ内で動作し、ファイルはアップロードされません。",
+    feat: "時間の重なり、表示が短すぎ・長すぎ、読み速度、行の幅、行数、不自然な改行、番号の乱れ、空の字幕、文字化けと制御文字を検査します。幅と読み速度は文字体系に従って計算します：中国語は全角文字で測り、タイ語とアラビア語の結合記号は幅ゼロとして扱います。言語固有の規則として、スペイン語の文頭の ¿、フランス語の ? ! ; : 前のノーブレークスペース、ギリシャ語の疑問符、中国語と日本語の全角句読点、アラビア語の ؟ と ، に対応します。自動修正できる項目は別にまとめ、タイミングを動かす項目は既定でオフです。",
+    who: "字幕グループ、ローカライズ担当者、編集者、納品前に字幕を確認したいすべての人に。",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'es': {
+    title: "Control de calidad de subtítulos - tiempo y maquetación por idioma | AI-SRTSub",
+    desc: "Control de calidad de subtítulos gratis en línea: sube SRT, VTT o ASS y comprueba solapamientos, duración, velocidad de lectura, ancho de línea, cortes de línea, numeración y codificación según las reglas de ese idioma. 27 idiomas, 27 umbrales y reglas específicas por idioma.",
+    kw: "control calidad subtítulos,comprobar subtítulos,validador srt,revisar subtítulos,corrector subtítulos,comprobar tiempo subtítulos,subtitle checker,subtitle qc,srt validator, revisión de subtítulos",
+    intro: "Sube un archivo de subtítulos y compruébalo con las reglas de su propia idioma: cada aviso incluye el valor medido y el umbral. Funciona en tu navegador, no se sube nada.",
+    feat: "Comprueba solapamientos, duración demasiado corta o larga, velocidad de lectura, ancho de línea, número de líneas, cortes incómodos, numeración, subtítulos vacíos y codificación rota. El ancho y la velocidad siguen el sistema de escritura: el chino se mide en caracteres de ancho completo y los signos combinantes del tailandés y el árabe cuentan como ancho cero. Las reglas específicas cubren la ¿ inicial española, el espacio duro francés antes de ? ! ; :, el signo de interrogación griego, la puntuación de ancho completo en chino y japonés y los signos árabes. Los elementos corregibles automáticamente se listan aparte y los que mueven los códigos de tiempo vienen desmarcados.",
+    who: "Grupos de subtitulado, proveedores de localización, editores y cualquiera que quiera revisar un archivo antes de entregarlo.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'pt': {
+    title: "Controlo de qualidade de legendas - tempo e formatação por idioma | AI-SRTSub",
+    desc: "Controlo de qualidade de legendas grátis online: carregue SRT, VTT ou ASS e verifique sobreposições, duração, velocidade de leitura, largura da linha, quebras de linha, numeração e codificação segundo as regras desse idioma. 27 idiomas, 27 limiares e regras específicas.",
+    kw: "controlo qualidade legendas,verificar legendas,validador srt,revisar legendas,corretor legendas,verificar tempo legendas,subtitle checker,subtitle qc,srt validator,revisão de legendas",
+    intro: "Carregue um ficheiro de legendas e verifique-o com as regras do seu próprio idioma: cada aviso traz o valor medido e o limiar. Funciona no navegador, nada é enviado.",
+    feat: "Verifica sobreposições, duração curta ou longa demais, velocidade de leitura, largura da linha, número de linhas, quebras estranhas, numeração, legendas vazias e codificação corrompida. A largura e a velocidade seguem o sistema de escrita: o chinês mede-se em caracteres de largura total e os sinais combinantes do tailandês e do árabe contam como largura zero. As regras específicas cobrem o ¿ inicial espanhol, o espaço inquebrável francês antes de ? ! ; :, o ponto de interrogação grego, a pontuação de largura total em chinês e japonês e os sinais árabes. Os itens corrigíveis automaticamente ficam separados e os que mexem nos códigos de tempo vêm desmarcados.",
+    who: "Grupos de legendagem, fornecedores de localização, editores e quem quiser rever um ficheiro antes da entrega.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'ko': {
+    title: "자막 검수 - 언어별 규칙으로 타임라인과 줄바꿈 확인 | AI-SRTSub",
+    desc: "무료 온라인 자막 검수: SRT, VTT, ASS를 올리면 해당 언어의 규칙으로 겹침·노출 시간·읽기 속도·줄 너비·줄바꿈·번호·인코딩을 확인합니다. 27개 언어에 각자의 기준값과 언어 전용 규칙이 있습니다.",
+    kw: "자막 검수,자막 검사,srt 검사,자막 확인,자막 교정,자막 타임라인 검사,subtitle checker,subtitle qc,srt validator,자막 검증",
+    intro: "자막 파일을 올리고 그 언어 고유의 규칙으로 검사하세요. 지적마다 실측값과 기준값이 함께 표시됩니다. 모두 브라우저에서 실행되며 파일은 업로드되지 않습니다.",
+    feat: "겹침, 너무 짧거나 긴 노출, 읽기 속도, 줄 너비, 줄 수, 어색한 줄바꿈, 번호 오류, 빈 자막, 깨진 문자와 제어 문자를 검사합니다. 너비와 속도는 문자 체계에 따라 계산합니다. 중국어는 전각 문자로 재고, 태국어와 아랍어의 결합 기호는 너비 0으로 봅니다. 언어 전용 규칙으로 스페인어 문두의 ¿, 프랑스어의 ? ! ; : 앞 줄바꿈 없는 공백, 그리스어 물음표, 중국어와 일본어의 전각 문장부호, 아랍어의 ؟와 ،를 다룹니다. 자동 수정 항목은 따로 모아 두고, 타임코드를 움직이는 항목은 기본적으로 꺼져 있습니다.",
+    who: "자막팀, 로컬라이제이션 업체, 편집자, 납품 전에 파일을 확인하려는 모든 사람에게.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'de': {
+    title: "Untertitel-Prüfung - Timing und Satz nach Sprache | AI-SRTSub",
+    desc: "Kostenlose Untertitel-Prüfung online: SRT, VTT oder ASS laden und Überlappungen, Dauer, Lesegeschwindigkeit, Zeilenbreite, Zeilenumbrüche, Nummerierung und Kodierung nach den Regeln dieser Sprache prüfen. 27 Sprachen, 27 Grenzwerte, dazu sprachspezifische Regeln.",
+    kw: "Untertitel prüfen,Untertitel Kontrolle,srt validieren,Untertitel Korrektur,Untertitel Timing prüfen,Untertitel Qualität,subtitle checker,subtitle qc,srt validator, Untertitel Prüftool",
+    intro: "Untertitel-Datei laden und nach den Regeln ihrer eigenen Sprache prüfen lassen - jeder Befund nennt Messwert und Grenzwert. Läuft vollständig im Browser, nichts wird hochgeladen.",
+    feat: "Prüft Überlappungen, zu kurze oder zu lange Anzeige, Lesegeschwindigkeit, Zeilenbreite, Zeilenzahl, ungünstige Umbrüche, Nummerierung, leere Untertitel sowie defekte Kodierung. Breite und Tempo folgen dem Schriftsystem: Chinesisch wird in vollen Zeichenbreiten gemessen, kombinierende Zeichen im Thailändischen und Arabischen zählen null Breite. Sprachspezifische Regeln betreffen das spanische eröffnende ¿, das französische geschützte Leerzeichen vor ? ! ; :, das griechische Fragezeichen, volle Satzzeichen im Chinesischen und Japanischen sowie die arabischen Zeichen. Automatisch korrigierbare Punkte stehen getrennt, und was Zeitcodes verschiebt, ist standardmäßig abgewählt.",
+    who: "Untertitel-Gruppen, Lokalisierungsdienstleister, Cutter und alle, die eine Datei vor der Abgabe prüfen wollen.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'fr': {
+    title: "Contrôle qualité des sous-titres - timing et mise en page par langue | AI-SRTSub",
+    desc: "Contrôle qualité des sous-titres gratuit en ligne : chargez SRT, VTT ou ASS et vérifiez chevauchements, durée, vitesse de lecture, largeur de ligne, coupures, numérotation et encodage selon les règles de cette langue. 27 langues, 27 seuils et des règles propres à chaque langue.",
+    kw: "contrôle qualité sous-titres,vérifier sous-titres,validateur srt,corriger sous-titres,vérifier timing sous-titres,qualité sous-titres,subtitle checker,subtitle qc,srt validator, relecture sous-titres",
+    intro: "Chargez un fichier de sous-titres et vérifiez-le selon les règles de sa propre langue : chaque signalement donne la valeur mesurée et le seuil. Tout se passe dans le navigateur, rien n'est envoyé.",
+    feat: "Vérifie les chevauchements, les durées trop courtes ou trop longues, la vitesse de lecture, la largeur de ligne, le nombre de lignes, les coupures mal placées, la numérotation, les sous-titres vides et l'encodage cassé. Largeur et vitesse suivent le système d'écriture : le chinois se mesure en caractères pleine largeur, les signes combinants du thaï et de l'arabe comptent pour une largeur nulle. Les règles propres à chaque langue couvrent le ¿ ouvrant espagnol, l'espace insécable française avant ? ! ; :, le point d'interrogation grec, la ponctuation pleine largeur en chinois et japonais et les signes arabes. Les éléments corrigibles automatiquement sont listés à part, et ceux qui déplacent les codes temporels sont décochés par défaut.",
+    who: "Groupes de sous-titrage, prestataires de localisation, monteurs et tous ceux qui veulent vérifier un fichier avant livraison.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'id': {
+    title: "Pemeriksaan subtitle - timing dan tata letak per bahasa | AI-SRTSub",
+    desc: "Pemeriksaan subtitle gratis online: unggah SRT, VTT, atau ASS dan periksa tumpang tindih, durasi, kecepatan baca, lebar baris, pemotongan baris, penomoran, dan encoding menurut aturan bahasa itu. 27 bahasa, 27 set ambang, plus aturan khusus per bahasa.",
+    kw: "pemeriksaan subtitle,cek subtitle,validator srt,koreksi subtitle,cek timing subtitle,kualitas subtitle,subtitle checker,subtitle qc,srt validator,pemeriksaan kualitas subtitle",
+    intro: "Unggah file subtitle dan periksa dengan aturan bahasanya sendiri - setiap temuan menyertakan nilai terukur dan ambangnya. Berjalan sepenuhnya di browser, tidak ada yang diunggah.",
+    feat: "Memeriksa tumpang tindih, durasi terlalu pendek atau panjang, kecepatan baca, lebar baris, jumlah baris, pemotongan baris yang jangkal, penomoran, subtitle kosong, dan encoding rusak. Lebar dan kecepatan mengikuti sistem tulisan: bahasa Cina diukur dalam karakter lebar penuh, tanda gabungan Thai dan Arab dihitung lebar nol. Aturan khusus bahasa mencakup ¿ pembuka dalam bahasa Spanyol, spasi tak terputus bahasa Prancis sebelum ? ! ; :, tanda tanya Yunani, tanda baca lebar penuh dalam bahasa Cina dan Jepang, serta tanda Arab. Item yang bisa diperbaiki otomatis dikelompokkan terpisah, dan yang menggeser kode waktu tidak dicentang secara bawaan.",
+    who: "Tim subtitle, vendor lokalisasi, editor, dan siapa pun yang ingin memeriksa file sebelum dikirim.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'hi': {
+    title: "सबटाइटल जाँच - भाषा के अनुसार समय और लेआउट | AI-SRTSub",
+    desc: "मुफ़्त ऑनलाइन सबटाइटल जाँच: SRT, VTT या ASS अपलोड करें और उस भाषा के नियमों से ओवरलैप, अवधि, पढ़ने की गति, पंक्ति की चौड़ाई, पंक्ति-विच्छेद, क्रमांक और एन्कोडिंग जाँचें। 27 भाषाएँ, 27 सीमा-मान, साथ ही भाषा-विशेष नियम।",
+    kw: "सबटाइटल जाँच,सबटाइटल जांच,srt जांच,सबटाइटल सुधार,सबटाइटल टाइमिंग जांच,सबटाइटल गुणवत्ता,subtitle checker,subtitle qc,srt validator,सबटाइटल समीक्षा",
+    intro: "सबटाइटल फ़ाइल अपलोड करें और उसे उसकी अपनी भाषा के नियमों से जाँचें - हर नतीजे के साथ मापा गया मान और सीमा दी गई है। पूरा काम ब्राउज़र में होता है, कुछ अपलोड नहीं होता।",
+    feat: "ओवरलैप, बहुत कम या अधिक समय, पढ़ने की गति, पंक्ति की चौड़ाई, पंक्तियों की संख्या, अजीब पंक्ति-विच्छेद, क्रमांक, खाली सबटाइटल और खराब एन्कोडिंग जाँची जाती है। चौड़ाई और गति लेखन-प्रणाली के अनुसार तय होती है: चीनी पूर्ण-चौड़ाई के अक्षरों में मापी जाती है, थाई और अरबी के संयुक्त चिह्न शून्य चौड़ाई माने जाते हैं। भाषा-विशेष नियमों में स्पेनिश का शुरुआती ¿, फ़्रांसीसी का ? ! ; : से पहले का non-breaking space, ग्रीक प्रश्नचिह्न, चीनी और जापानी के पूर्ण-चौड़ाई विराम-चिह्न और अरबी चिह्न शामिल हैं। स्वचालित सुधार वाले आइटम अलग रखे गए हैं और जो समय-कोड हिलाते हैं वे डिफ़ॉल्ट रूप से अनचेक हैं।",
+    who: "सबटाइटल टीमें, लोकलाइज़ेशन विक्रेता, संपादक और कोई भी जो डिलीवरी से पहले फ़ाइल जाँचना चाहता है।",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'th': {
+    title: "ตรวจซับไตเติล - ตรวจเวลาและการจัดวางตามภาษา | AI-SRTSub",
+    desc: "ตรวจซับไตเติลออนไลน์ฟรี: อัปโหลด SRT, VTT หรือ ASS แล้วตรวจเวลาซ้อน ระยะเวลา ความเร็วอ่าน ความกว้างบรรทัด การตัดบรรทัด ลำดับเลข และการเข้ารหัสตามกฎของภาษานั้น 27 ภาษา 27 ชุดเกณฑ์ พร้อมกฎเฉพาะของแต่ละภาษา",
+    kw: "ตรวจซับไตเติล,เช็คซับไตเติล,ตรวจ srt,แก้ซับไตเติล,เช็คเวลาซับไตเติล,คุณภาพซับไตเติล,subtitle checker,subtitle qc,srt validator,ตรวจคุณภาพซับไตเติล",
+    intro: "อัปโหลดไฟล์ซับไตเติลแล้วตรวจด้วยกฎของภาษานั้นเอง - ทุกข้อที่พบจะแสดงค่าที่วัดได้และเกณฑ์ ทำงานในเบราว์เซอร์ทั้งหมด ไม่มีการอัปโหลด",
+    feat: "ตรวจเวลาซ้อน อยู่บนจอสั้นหรือยาวเกินไป ความเร็วอ่าน ความกว้างบรรทัด จำนวนบรรทัด ตัดบรรทัดไม่เหมาะ ลำดับเลข ซับไตเติลว่าง และการเข้ารหัสพัง ความกว้างและความเร็วอิงตามระบบตัวอักษร: ภาษาจีนวัดเป็นตัวอักษรเต็มความกว้าง สัญลักษณ์รวมของไทยและอาหรับนับเป็นความกว้างศูนย์ กฎเฉพาะภาษาครอบคลุม ¿ เปิดประโยคของสเปน ช่องว่างไม่ตัดคำของฝรั่งเศสก่อน ? ! ; : เครื่องหมายคำถามกรีก เครื่องหมายวรรคตอนเต็มความกว้างของจีนและญี่ปุ่น และเครื่องหมายอาหรับ รายการที่แก้ได้อัตโนมัติแยกไว้ต่างหาก และรายการที่ขยับรหัสเวลาจะไม่ถูกเลือกโดยค่าเริ่มต้น",
+    who: "ทีมซับไตเติล ผู้รับจ้างโลคัลไลซ์ ผู้ตัดต่อ และทุกคนที่อยากตรวจไฟล์ก่อนส่งมอบ",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'vi': {
+    title: "Kiểm tra phụ đề - thời gian và bố cục theo ngôn ngữ | AI-SRTSub",
+    desc: "Kiểm tra phụ đề trực tuyến miễn phí: tải lên SRT, VTT hoặc ASS và kiểm tra chồng lấn thời gian, thời lượng, tốc độ đọc, độ rộng dòng, ngắt dòng, đánh số và mã hóa theo quy tắc của ngôn ngữ đó. 27 ngôn ngữ, 27 bộ ngưỡng, cùng các quy tắc riêng theo ngôn ngữ.",
+    kw: "kiểm tra phụ đề,kiểm tra srt,sửa phụ đề,kiểm tra thời gian phụ đề,chất lượng phụ đề,subtitle checker,subtitle qc,srt validator,kiểm tra chất lượng phụ đề,hiệu đính phụ đề",
+    intro: "Tải file phụ đề lên và kiểm tra theo quy tắc của chính ngôn ngữ đó - mỗi kết quả đều kèm giá trị đo được và ngưỡng. Chạy hoàn toàn trong trình duyệt, không có gì được tải lên.",
+    feat: "Kiểm tra chồng lấn, hiển thị quá ngắn hoặc quá dài, tốc độ đọc, độ rộng dòng, số dòng, ngắt dòng không hợp lý, đánh số, phụ đề trống và mã hóa hỏng. Độ rộng và tốc độ đi theo hệ chữ viết: tiếng Trung đo bằng ký tự toàn chiều rộng, dấu tổ hợp của tiếng Thái và tiếng Ả Rập tính là độ rộng bằng không. Quy tắc riêng bao gồm dấu ¿ mở đầu trong tiếng Tây Ban Nha, dấu cách không ngắt của tiếng Pháp trước ? ! ; :, dấu hỏi của tiếng Hy Lạp, dấu câu toàn chiều rộng trong tiếng Trung và tiếng Nhật, và các dấu tiếng Ả Rập. Các mục có thể sửa tự động được tách riêng, và những mục làm dịch chuyển mã thời gian mặc định không được chọn.",
+    who: "Nhóm phụ đề, nhà cung cấp bản địa hóa, người dựng phim và bất kỳ ai muốn kiểm tra file trước khi giao.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'ru': {
+    title: "Проверка субтитров - тайминг и вёрстка по языку | AI-SRTSub",
+    desc: "Бесплатная онлайн-проверка субтитров: загрузите SRT, VTT или ASS и проверьте перекрытия, длительность, скорость чтения, ширину строки, переносы, нумерацию и кодировку по правилам этого языка. 27 языков, 27 наборов порогов плюс правила для конкретных языков.",
+    kw: "проверка субтитров,проверить субтитры,валидатор srt,исправление субтитров,проверка тайминга субтитров,качество субтитров,subtitle checker,subtitle qc,srt validator,проверка srt",
+    intro: "Загрузите файл субтитров и проверьте его по правилам его собственного языка - у каждой находки указаны измеренное значение и порог. Всё считается в браузере, файл никуда не отправляется.",
+    feat: "Проверяются перекрытия, слишком короткий или долгий показ, скорость чтения, ширина строки, число строк, неудачные переносы, нумерация, пустые субтитры и битая кодировка. Ширина и скорость считаются по системе письма: китайский измеряется полноширинными символами, комбинированные знаки тайского и арабского имеют нулевую ширину. Языковые правила охватывают открывающее ¿ в испанском, неразрывный пробел во французском перед ? ! ; :, греческий вопросительный знак, полноширинную пунктуацию в китайском и японском, а также арабские знаки. Правимое автоматически вынесено отдельно, а то, что сдвигает таймкоды, по умолчанию отключено.",
+    who: "Командам субтитров, поставщикам локализации, монтажёрам и всем, кто хочет проверить файл перед сдачей.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'it': {
+    title: "Controllo qualità sottotitoli - timing e impaginazione per lingua | AI-SRTSub",
+    desc: "Controllo qualità dei sottotitoli gratuito online: carica SRT, VTT o ASS e verifica sovrapposizioni, durata, velocità di lettura, larghezza della riga, a capo, numerazione e codifica secondo le regole di quella lingua. 27 lingue, 27 soglie e regole specifiche per lingua.",
+    kw: "controllo qualità sottotitoli,verifica sottotitoli,validatore srt,correzione sottotitoli,controllo timing sottotitoli,qualità sottotitoli,subtitle checker,subtitle qc,srt validator,revisione sottotitoli",
+    intro: "Carica un file di sottotitoli e controllalo secondo le regole della sua stessa lingua: ogni segnalazione riporta il valore misurato e la soglia. Gira tutto nel browser, non si carica nulla.",
+    feat: "Controlla sovrapposizioni, durata troppo breve o lunga, velocità di lettura, larghezza della riga, numero di righe, a capo mal posizionati, numerazione, sottotitoli vuoti e codifica rotta. Larghezza e velocità seguono il sistema di scrittura: il cinese si misura in caratteri a larghezza piena, i segni combinanti di thai e arabo valgono larghezza zero. Le regole specifiche coprono la ¿ iniziale spagnola, lo spazio unificatore francese prima di ? ! ; :, il punto interrogativo greco, la punteggiatura a larghezza piena in cinese e giapponese e i segni arabi. Le voci correggibili automaticamente sono elencate a parte e quelle che spostano i timecode sono disattivate per impostazione predefinita.",
+    who: "Gruppi di sottotitolazione, fornitori di localizzazione, montatori e chiunque voglia controllare un file prima della consegna.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'ar': {
+    title: "فحص الترجمة - التوقيت والتنسيق حسب اللغة | AI-SRTSub",
+    desc: "فحص ترجمة مجاني على الإنترنت: ارفع SRT أو VTT أو ASS وافحص التداخل والمدة وسرعة القراءة وعرض السطر وكسر السطر والترقيم والترميز وفق قواعد تلك اللغة. 27 لغة و27 مجموعة عتبات، إضافة إلى قواعد خاصة بكل لغة.",
+    kw: "فحص الترجمة,فحص الترجمة النصية,التحقق من srt,تدقيق الترجمة,فحص توقيت الترجمة,جودة الترجمة,subtitle checker,subtitle qc,srt validator,مراجعة الترجمة",
+    intro: "ارفع ملف ترجمة وافحصه بقواعد لغته نفسها - كل ملاحظة تعرض القيمة المقاسة والعتبة. كل شيء يعمل في المتصفح ولا يُرفع أي ملف.",
+    feat: "يفحص التداخل، والمدة القصيرة أو الطويلة جداً، وسرعة القراءة، وعرض السطر، وعدد الأسطر، وكسر السطر غير المناسب، والترقيم، والمقاطع الفارغة، والترميز التالف. العرض والسرعة يتبعان نظام الكتابة: الصينية تُقاس بالأحرف كاملة العرض، والعلامات المركّبة في التايلاندية والعربية تُحسب بعرض صفر. القواعد الخاصة باللغة تغطي ¿ الافتتاحية في الإسبانية، والمسافة غير القابلة للكسر في الفرنسية قبل ? ! ; :، وعلامة الاستفهام اليونانية، وعلامات الترقيم كاملة العرض في الصينية واليابانية، والعلامات العربية. العناصر القابلة للإصلاح التلقائي مدرجة بشكل منفصل، والعناصر التي تحرك الأكواد الزمنية غير محددة افتراضياً.",
+    who: "فرق الترجمة، ومورّدو التعريب، والمونتيرون، وكل من يريد فحص ملف قبل التسليم.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'tr': {
+    title: "Altyazı denetimi - dile göre zamanlama ve dizgi | AI-SRTSub",
+    desc: "Ücretsiz çevrimiçi altyazı denetimi: SRT, VTT veya ASS yükleyin ve o dilin kurallarına göre çakışmaları, süreyi, okuma hızını, satır genişliğini, satır kesmelerini, numaralandırmayı ve kodlamayı denetleyin. 27 dil, 27 eşik seti ve dile özel kurallar.",
+    kw: "altyazı denetimi,altyazı kontrol,srt doğrulama,altyazı düzeltme,altyazı zamanlama kontrolü,altyazı kalitesi,subtitle checker,subtitle qc,srt validator,altyazı inceleme",
+    intro: "Bir altyazı dosyası yükleyin ve kendi dilinin kurallarıyla denetlenmesini sağlayın - her bulgu ölçülen değeri ve eşiği gösterir. Tamamen tarayıcıda çalışır, hiçbir şey yüklenmez.",
+    feat: "Çakışmalar, çok kısa veya uzun süre, okuma hızı, satır genişliği, satır sayısı, yersiz satır kesmeleri, numaralandırma, boş altyazılar ve bozuk kodlama denetlenir. Genişlik ve hız yazı sistemine göre hesaplanır: Çince tam genişlikli karakterle ölçülür, Tayca ve Arapçadaki birleşik işaretler sıfır genişlik sayılır. Dile özel kurallar İspanyolcadaki açılış ¿ işaretini, Fransızcada ? ! ; : öncesindeki bölünmeyen boşluğu, Yunanca soru işaretini, Çince ve Japoncadaki tam genişlikli noktalamayı ve Arapça işaretleri kapsar. Otomatik düzeltilebilen maddeler ayrı listelenir ve zaman kodlarını kaydıranlar varsayılan olarak seçili değildir.",
+    who: "Altyazı ekipleri, yerelleştirme sağlayıcıları, kurgucular ve teslimden önce dosyasını denetlemek isteyen herkes.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'nl': {
+    title: "Ondertitelcontrole - timing en opmaak per taal | AI-SRTSub",
+    desc: "Gratis online ondertitelcontrole: laad SRT, VTT of ASS en controleer overlappingen, duur, leestempo, regelbreedte, regeleinden, nummering en codering volgens de regels van die taal. 27 talen, 27 sets drempels plus taalspecifieke regels.",
+    kw: "ondertitelcontrole,ondertitels controleren,srt validatie,ondertitels corrigeren,ondertitel timing controleren,ondertitelkwaliteit,subtitle checker,subtitle qc,srt validator,ondertitels nakijken",
+    intro: "Laad een ondertitelbestand en laat het controleren volgens de regels van de eigen taal - elke bevinding geeft de gemeten waarde en de drempel. Alles draait in de browser, er wordt niets geüpload.",
+    feat: "Controleert overlappingen, te korte of te lange weergave, leestempo, regelbreedte, aantal regels, onhandige regeleinden, nummering, lege ondertitels en kapotte codering. Breedte en tempo volgen het schriftsysteem: Chinees wordt gemeten in volle tekenbreedte, gecombineerde tekens in het Thais en Arabisch tellen als nul breedte. Taalspecifieke regels omvatten de Spaanse openings-¿, de Franse vaste spatie voor ? ! ; :, het Griekse vraagteken, volledige leestekens in het Chinees en Japans en de Arabische tekens. Automatisch corrigeerbare items staan apart en wat tijdcodes verschuift staat standaard uitgevinkt.",
+    who: "Ondertitelteams, lokalisatiebureaus, editors en iedereen die een bestand vóór levering wil controleren.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'pl': {
+    title: "Kontrola napisów - czas i układ według języka | AI-SRTSub",
+    desc: "Darmowa kontrola napisów online: wczytaj SRT, VTT lub ASS i sprawdź nakładanie, czas trwania, tempo czytania, szerokość wiersza, łamanie wierszy, numerację i kodowanie według reguł tego języka. 27 języków, 27 zestawów progów oraz reguły dla konkretnych języków.",
+    kw: "kontrola napisów,sprawdzanie napisów,walidator srt,korekta napisów,kontrola czasu napisów,jakość napisów,subtitle checker,subtitle qc,srt validator,sprawdzenie napisów",
+    intro: "Wczytaj plik napisów i sprawdź go według reguł jego własnego języka - każde znalezisko podaje wartość zmierzoną i próg. Wszystko działa w przeglądarce, nic nie jest wysyłane.",
+    feat: "Sprawdza nakładanie, zbyt krótki lub długi czas, tempo czytania, szerokość wiersza, liczbę wierszy, niefortunne łamanie, numerację, puste napisy i uszkodzone kodowanie. Szerokość i tempo wynikają z systemu pisma: chiński mierzony jest pełną szerokością znaku, znaki łączone w tajskim i arabskim mają zerową szerokość. Reguły językowe obejmują hiszpańskie otwierające ¿, francuską spację niełamliwą przed ? ! ; :, grecki znak zapytania, pełnoszerokościową interpunkcję w chińskim i japońskim oraz znaki arabskie. Pozycje możliwe do automatycznej poprawy są wyszczególnione osobno, a te przesuwające kody czasu są domyślnie odznaczone.",
+    who: "Grupy napisów, dostawcy lokalizacji, montażyści i każdy, kto chce sprawdzić plik przed przekazaniem.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'sv': {
+    title: "Undertextkontroll - timing och layout per språk | AI-SRTSub",
+    desc: "Gratis undertextkontroll online: ladda SRT, VTT eller ASS och kontrollera överlappningar, varaktighet, läshastighet, radbredd, radbrytningar, numrering och kodning enligt reglerna för det språket. 27 språk, 27 gränsvärden plus språkspecifika regler.",
+    kw: "undertextkontroll,kontrollera undertexter,srt-validering,korrigera undertexter,kontrollera undertexttiming,undertextkvalitet,subtitle checker,subtitle qc,srt validator,granska undertexter",
+    intro: "Ladda en undertextfil och låt den kontrolleras enligt sitt eget språks regler - varje fynd visar uppmätt värde och gräns. Allt körs i webbläsaren, inget laddas upp.",
+    feat: "Kontrollerar överlappningar, för kort eller lång visningstid, läshastighet, radbredd, antal rader, klumpiga radbrytningar, numrering, tomma undertexter och trasig kodning. Bredd och hastighet följer skriftsystemet: kinesiska mäts i hela teckenbredder, kombinerande tecken i thailändska och arabiska räknas som noll bredd. Språkspecifika regler täcker spanskans inledande ¿, franskans hårda mellanslag före ? ! ; :, grekiskt frågetecken, fullbreddsskiljetecken i kinesiska och japanska samt arabiska tecken. Automatiskt rättningsbara poster listas separat och de som flyttar tidskoder är avmarkerade som standard.",
+    who: "Undertextgrupper, lokaliseringsleverantörer, klippare och alla som vill kontrollera en fil före leverans.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'cs': {
+    title: "Kontrola titulků - timing a sazba podle jazyka | AI-SRTSub",
+    desc: "Bezplatná online kontrola titulků: načtěte SRT, VTT nebo ASS a zkontrolujte překrývání, délku, rychlost čtení, šířku řádku, zalomení, číslování a kódování podle pravidel daného jazyka. 27 jazyků, 27 sad prahů a pravidla pro konkrétní jazyky.",
+    kw: "kontrola titulků,kontrola titulků srt,validace srt,oprava titulků,kontrola času titulků,kvalita titulků,subtitle checker,subtitle qc,srt validator,kontrola kvality titulků",
+    intro: "Načtěte soubor s titulky a nechte ho zkontrolovat podle pravidel jeho vlastního jazyka - u každého nálezu je uvedena naměřená hodnota a práh. Vše běží v prohlížeči, nic se nenahrává.",
+    feat: "Kontroluje překrývání, příliš krátké nebo dlouhé zobrazení, rychlost čtení, šířku řádku, počet řádků, nevhodné zalomení, číslování, prázdné titulky a rozbité kódování. Šířka a rychlost vycházejí ze systému písma: čínština se měří v plné šířce znaku, kombinující značky v thajštině a arabštině mají nulovou šířku. Jazyková pravidla pokrývají španělské úvodní ¿, francouzskou pevnou mezeru před ? ! ; :, řecký otazník, plnošířkovou interpunkci v čínštině a japonštině a arabské znaky. Položky opravitelné automaticky jsou uvedeny zvlášť a ty, které posouvají časové kódy, jsou ve výchozím stavu nezaškrtnuté.",
+    who: "Týmy titulků, dodavatelé lokalizace, střihači a kdokoli, kdo chce soubor před odevzdáním zkontrolovat.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'uk': {
+    title: "Перевірка субтитрів - таймінг і верстка за мовою | AI-SRTSub",
+    desc: "Безкоштовна онлайн-перевірка субтитрів: завантажте SRT, VTT або ASS і перевірте перекриття, тривалість, швидкість читання, ширину рядка, переноси, нумерацію та кодування за правилами цієї мови. 27 мов, 27 наборів порогів і правила для окремих мов.",
+    kw: "перевірка субтитрів,перевірити субтитри,валідатор srt,виправлення субтитрів,перевірка таймінгу субтитрів,якість субтитрів,subtitle checker,subtitle qc,srt validator,перевірка srt",
+    intro: "Завантажте файл субтитрів і перевірте його за правилами його власної мови - кожна знахідка містить виміряне значення і поріг. Усе працює в браузері, файл нікуди не надсилається.",
+    feat: "Перевіряються перекриття, надто короткий або довгий показ, швидкість читання, ширина рядка, кількість рядків, невдалі переноси, нумерація, порожні субтитри та зіпсована кодування. Ширина і швидкість визначаються системою письма: китайська вимірюється повноширинними символами, комбіновані знаки тайської та арабської мають нульову ширину. Мовні правила охоплюють відкривне ¿ в іспанській, нерозривний пробіл у французькій перед ? ! ; :, грецький знак питання, повноширинну пунктуацію в китайській і японській та арабські знаки. Те, що правиться автоматично, винесено окремо, а те, що зсуває таймкоди, за замовчуванням вимкнено.",
+    who: "Командам субтитрів, постачальникам локалізації, монтажерам і всім, хто хоче перевірити файл перед здачею.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'da': {
+    title: "Undertekstkontrol - timing og layout pr. sprog | AI-SRTSub",
+    desc: "Gratis online undertekstkontrol: indlæs SRT, VTT eller ASS og kontroller overlap, varighed, læsehastighed, linjebredde, linjeskift, nummerering og kodning efter reglerne for det sprog. 27 sprog, 27 sæt grænseværdier plus sprogsspecifikke regler.",
+    kw: "undertekstkontrol,kontroller undertekster,srt-validering,ret undertekster,kontroller underteksttiming,undertekstkvalitet,subtitle checker,subtitle qc,srt validator,gennemse undertekster",
+    intro: "Indlæs en undertekstfil og få den kontrolleret efter sit eget sprogs regler - hvert fund viser den målte værdi og grænsen. Det hele kører i browseren, intet uploades.",
+    feat: "Kontrollerer overlap, for kort eller lang visningstid, læsehastighed, linjebredde, antal linjer, uheldige linjeskift, nummerering, tomme undertekster og ødelagt kodning. Bredde og hastighed følger skriftsystemet: kinesisk måles i fuld tegnbredde, kombinerende tegn i thai og arabisk tæller som nul bredde. Sprogsspecifikke regler dækker spansk indledende ¿, fransk fast mellemrum før ? ! ; :, græsk spørgsmålstegn, fuld bredde-tegnsætning på kinesisk og japansk samt arabiske tegn. Automatisk rettelige punkter er listet separat, og dem der flytter tidskoder er fravalgt som standard.",
+    who: "Underteksthold, lokaliseringspartnere, klippere og alle der vil kontrollere en fil før levering.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'fi': {
+    title: "Tekstitysten tarkistus - ajoitus ja asettelu kielen mukaan | AI-SRTSub",
+    desc: "Ilmainen verkkotarkistus tekstityksille: lataa SRT, VTT tai ASS ja tarkista päällekkäisyydet, kesto, lukunopeus, rivin leveys, rivinvaihdot, numerointi ja merkistö kyseisen kielen sääntöjen mukaan. 27 kieltä, 27 raja-arvosarjaa sekä kielikohtaisia sääntöjä.",
+    kw: "tekstitysten tarkistus,tarkista tekstitykset,srt-validointi,korjaa tekstitykset,tarkista tekstitysten ajoitus,tekstitysten laatu,subtitle checker,subtitle qc,srt validator,tekstitysten tarkastus",
+    intro: "Lataa tekstitystiedosto ja tarkistuta se oman kielensä säännöillä - jokainen löydös näyttää mitatun arvon ja rajan. Kaikki toimii selaimessa, mitään ei ladata ylös.",
+    feat: "Tarkistaa päällekkäisyydet, liian lyhyen tai pitkän näyttöajan, lukunopeuden, rivin leveyden, rivimäärän, huonot rivinvaihdot, numeroinnin, tyhjät tekstitykset ja rikkinäisen merkistön. Leveys ja nopeus seuraavat kirjoitusjärjestelmää: kiina mitataan täysleveinä merkkeinä, thain ja arabian yhdistyvät merkit lasketaan nollalevyisiksi. Kielikohtaiset säännöt kattavat espanjan aloittavan ¿-merkin, ranskan sitovan välilyönnin ennen ? ! ; :, kreikkalaisen kysymysmerkin, kiinan ja japanin täysleveät välimerkit sekä arabialaiset merkit. Automaattisesti korjattavat kohdat on listattu erikseen, ja aikakoodeja siirtävät kohdat ovat oletuksena valitsematta.",
+    who: "Tekstitystiimeille, lokalisointikumppaneille, leikkaajille ja kaikille, jotka haluavat tarkistaa tiedoston ennen luovutusta.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'el': {
+    title: "Έλεγχος υποτίτλων - χρονισμός και στοίχιση ανά γλώσσα | AI-SRTSub",
+    desc: "Δωρεάν διαδικτυακός έλεγχος υποτίτλων: φορτώστε SRT, VTT ή ASS και ελέγξτε επικαλύψεις, διάρκεια, ταχύτητα ανάγνωσης, πλάτος γραμμής, αλλαγές γραμμής, αρίθμηση και κωδικοποίηση σύμφωνα με τους κανόνες της γλώσσας. 27 γλώσσες, 27 σειρές ορίων και κανόνες ανά γλώσσα.",
+    kw: "έλεγχος υποτίτλων,έλεγχος srt,επικύρωση srt,διόρθωση υποτίτλων,έλεγχος χρονισμού υποτίτλων,ποιότητα υποτίτλων,subtitle checker,subtitle qc,srt validator,επιμέλεια υποτίτλων",
+    intro: "Φορτώστε ένα αρχείο υποτίτλων και ελέγξτε το σύμφωνα με τους κανόνες της δικής του γλώσσας - κάθε εύρημα δείχνει τη μετρημένη τιμή και το όριο. Όλα τρέχουν στον περιηγητή, δεν ανεβαίνει τίποτα.",
+    feat: "Ελέγχει επικαλύψεις, πολύ σύντομη ή μεγάλη διάρκεια, ταχύτητα ανάγνωσης, πλάτος γραμμής, αριθμό γραμμών, ακατάλληλες αλλαγές γραμμής, αρίθμηση, κενούς υπότιτλους και χαλασμένη κωδικοποίηση. Το πλάτος και η ταχύτητα ακολουθούν το σύστημα γραφής: τα κινεζικά μετρώνται σε χαρακτήρες πλήρους πλάτους, τα συνδυαστικά σημεία στα ταϊλανδικά και τα αραβικά μετρώνται ως μηδενικό πλάτος. Οι κανόνες ανά γλώσσα καλύπτουν το ισπανικό εναρκτήριο ¿, το γαλλικό αδιάσπαστο διάστημα πριν από ? ! ; :, το ελληνικό ερωτηματικό, τα σημεία στίξης πλήρους πλάτους στα κινεζικά και τα ιαπωνικά και τα αραβικά σημεία. Τα στοιχεία που διορθώνονται αυτόματα εμφανίζονται ξεχωριστά και όσα μετακινούν τους χρονικούς κώδικες είναι εξ ορισμού ανεπιλεγμένα.",
+    who: "Ομάδες υποτίτλων, πάροχοι τοπικοποίησης, μοντέρ και όποιος θέλει να ελέγξει ένα αρχείο πριν την παράδοση.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'he': {
+    title: "בדיקת כתוביות - תזמון ועימוד לפי שפה | AI-SRTSub",
+    desc: "בדיקת כתוביות חינמית באינטרנט: טען SRT, VTT או ASS ובדוק חפיפות, משך, קצב קריאה, רוחב שורה, שבירות שורה, מספור וקידוד לפי הכללים של השפה הזאת. 27 שפות, 27 מערכי ספים וכללים ייעודיים לשפות.",
+    kw: "בדיקת כתוביות,בדוק כתוביות,אימות srt,תיקון כתוביות,בדיקת תזמון כתוביות,איכות כתוביות,subtitle checker,subtitle qc,srt validator,ביקורת כתוביות",
+    intro: "טען קובץ כתוביות ובדוק אותו לפי הכללים של השפה שלו - כל ממצא מציג את הערך שנמדד ואת הסף. הכול רץ בדפדפן, שום דבר לא מועלה.",
+    feat: "בודק חפיפות, תצוגה קצרה או ארוכה מדי, קצב קריאה, רוחב שורה, מספר שורות, שבירות שורה לא מוצלחות, מספור, כתוביות ריקות וקידוד שבור. הרוחב והקצב נגזרים ממערכת הכתב: סינית נמדדת בתווים ברוחב מלא, סימנים משולבים בתאית ובערבית נספרים כרוחב אפס. הכללים הייעודיים מכסים את ה-¿ הפותחת בספרדית, הרווח הקשיח בצרפתית לפני ? ! ; :, סימן השאלה היווני, פיסוק ברוחב מלא בסינית וביפנית והסימנים הערביים. פריטים שניתן לתקן אוטומטית מופיעים בנפרד, ואלה שמזיזים קודי זמן אינם מסומנים כברירת מחדל.",
+    who: "צוותי כתוביות, ספקי לוקליזציה, עורכים וכל מי שרוצה לבדוק קובץ לפני מסירה.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  },
+  'ro': {
+    title: "Verificare subtitrări - timing și aspect pe limbă | AI-SRTSub",
+    desc: "Verificare gratuită de subtitrări online: încarcă SRT, VTT sau ASS și verifică suprapunerile, durata, viteza de citire, lățimea liniei, tăierile de linie, numerotarea și codificarea după regulile limbii respective. 27 de limbi, 27 de seturi de praguri și reguli specifice pe limbă.",
+    kw: "verificare subtitrări,verificare srt,validare srt,corectare subtitrări,verificare timing subtitrări,calitate subtitrări,subtitle checker,subtitle qc,srt validator,revizuire subtitrări",
+    intro: "Încarcă un fișier de subtitrări și verifică-l după regulile limbii lui - fiecare constatare afișează valoarea măsurată și pragul. Totul rulează în browser, nu se încarcă nimic.",
+    feat: "Verifică suprapunerile, afișarea prea scurtă sau prea lungă, viteza de citire, lățimea liniei, numărul de linii, tăierile nepotrivite, numerotarea, subtitrările goale și codificarea stricată. Lățimea și viteza urmează sistemul de scriere: chineza se măsoară în caractere de lățime întreagă, semnele combinante din thailandeză și arabă se numără ca lățime zero. Regulile specifice acoperă ¿-ul de deschidere din spaniolă, spațiul insecabil din franceză înainte de ? ! ; :, semnul întrebării grecesc, punctuația de lățime întreagă în chineză și japoneză și semnele arabe. Elementele care se pot corecta automat sunt listate separat, iar cele care mută codurile de timp sunt debifate implicit.",
+    who: "Echipe de subtitrare, furnizori de localizare, editori și oricine vrea să verifice un fișier înainte de livrare.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Subtitle QC Checker"
+  }
+};
+
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {}, SPLIT_PATH = {}, TABLE_PATH = {}, BATCH_PATH = {}, LRC_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {}, SPLIT_PATH = {}, TABLE_PATH = {}, BATCH_PATH = {}, LRC_PATH = {}, QC_PATH = {};
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
   CLEAN_PATH[l] = (l === 'zh-CN') ? '/clean.html' : '/' + l + '/clean.html';
@@ -1899,6 +2153,8 @@ SEO_LANGS.forEach(function (l) {
   TABLE_PATH[l] = (l === 'zh-CN') ? '/table.html' : '/' + l + '/table.html';
   BATCH_PATH[l] = (l === 'zh-CN') ? '/batch.html' : '/' + l + '/batch.html';
   LRC_PATH[l] = (l === 'zh-CN') ? '/lrc.html' : '/' + l + '/lrc.html';
+  /* v0.9.321：字幕质检页 */
+  QC_PATH[l] = (l === 'zh-CN') ? '/qc.html' : '/' + l + '/qc.html';
 });
 /* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
    ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
@@ -4689,7 +4945,9 @@ const SEO_PAGES = {
   /* v0.9.316：第十五个页面 —— 批量字幕转换打包 */
   batch: { file: 'batch.html', table: SEO_BATCH, path: BATCH_PATH, jsonldType: 'WebApplication' },
   /* v0.9.316：第十六个页面 —— 歌词打轴 */
-  lrc: { file: 'lrc.html', table: SEO_LRC, path: LRC_PATH, jsonldType: 'WebApplication' }
+  lrc: { file: 'lrc.html', table: SEO_LRC, path: LRC_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.321：第十七个页面 —— 字幕质检 */
+  qc: { file: 'qc.html', table: SEO_QC, path: QC_PATH, jsonldType: 'WebApplication' }
 };
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
@@ -4830,7 +5088,7 @@ function serveIndexLang(req, res, lang, page){
   });
 }
 
-/* sitemap：十六页 × 27 语言 = 432 条 URL，每条带本页的 hreflang alternates。
+/* sitemap：十七页 × 27 语言 = 459 条 URL，每条带本页的 hreflang alternates。
    v0.9.273 之前只有首页进 sitemap —— 特效页和清洗页对爬虫来说是不存在的。
    v0.9.277 起字幕翻译工作台独立成 /translate.html，第四个页面进表。
    v0.9.288 起字幕格式转换独立成 /convert.html，第五个页面进表。
@@ -4838,7 +5096,8 @@ function serveIndexLang(req, res, lang, page){
    v0.9.299 起字幕提取纯文本独立成 /extract.html，第九个页面进表。
    v0.9.302 起术语批量替换独立成 /glossary.html，第十个页面进表。
    v0.9.313 起视频内封字幕提取 /videosub.html、繁简转换 /hanconv.html 进表，共十二页 324 条。
-   v0.9.316 起拆分拼接 /split.html、表格互转 /table.html、批量转换 /batch.html、歌词打轴 /lrc.html 进表，共十六页 432 条。 */
+   v0.9.316 起拆分拼接 /split.html、表格互转 /table.html、批量转换 /batch.html、歌词打轴 /lrc.html 进表，共十六页 432 条。
+   v0.9.321 起字幕质检 /qc.html 进表，共十七页 459 条。 */
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {

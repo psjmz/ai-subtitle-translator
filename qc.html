@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/qc.html 与 /en/qc.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>字幕质检 - 按语言规则查时间轴与排版 | 随心字幕 AI</title>
+<meta name="description" content="免费在线字幕质检：上传 SRT、VTT、ASS，按这门语言自己的规矩查时间轴重叠、停留时长、阅读速度、行宽、断行位置、序号与编码。27 种语言各有各的阈值，还带中西文空格、全角标点、法语不破空格等语言专属规范。全程在浏览器里跑。">
+<meta name="keywords" content="字幕质检,字幕检查,srt检查,字幕校验,字幕体检,srt validator,subtitle checker,subtitle qc,字幕规范检查">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#166534">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* 视觉系统沿用 v0.9.249「收敛精修」：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.321：本页认领「深绿」色线 ——
+     首页=粉、特效页=淡紫、清洗页=绿松、转换页=蓝、剥离页=青、时间轴页=靛蓝、乱码页=砖红、
+     提取页=琥珀、术语页=品红、视频字幕页=墨绿、简繁页=紫罗兰、拆分页=深橙、表格页=黄绿、
+     批量页=石板、歌词页=玫红、本页=深绿（#166534，真绿；与清洗页的绿松 #0B7A5C 刻意区分）。
+     与其它页刻意不同色：十七页都处理字幕文件，同色会让用户分不清自己在哪一页。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#166534; --acc-weak:#E9F7EE; --acc-line:#A7D8B6; --acc-ink:#14532D;
+    --grad:#166534; --acc2:#166534;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(22,101,52,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{display:block;width:30px;height:30px;margin:0 auto 8px;border-radius:9px;background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.mini{height:26px;padding:0 10px;font-size:12px;border-radius:7px}
+
+  input[type=number]{height:var(--ctl-h);width:88px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--ink);font-size:13px;padding:0 10px}
+  input[type=number]:focus{outline:none;border-color:var(--acc-line)}
+  select{height:var(--ctl-h);border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--ink);font-size:13px;padding:0 10px}
+  select:focus{outline:none;border-color:var(--acc-line)}
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-ctl);overflow:hidden}
+  .seg button{border:none;border-radius:0;height:30px;font-size:12.5px;color:var(--sub)}
+  .seg button.on{background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
+
+  /* 阈值栅格：两列自适应，窄屏单列 */
+  .th{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:4px}
+  .thi{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;
+    background:var(--card-2);padding:8px 12px;font-size:12.5px;color:var(--sub)}
+  .thi input{margin-left:auto}
+
+  /* 规则清单 */
+  .rules{margin-top:4px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:6px}
+  .rul{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:10px;
+    background:var(--card-2);padding:8px 12px;font-size:13px;cursor:pointer}
+  .rul:hover{border-color:var(--acc-line)}
+  .rul input{margin:0;flex:none}
+  .rul .nm{flex:1;min-width:0}
+  .rul .tg{font-size:11px;color:var(--mut);flex:none}
+  .rul .tg.tm{color:var(--warn)}
+  .lv{width:8px;height:8px;border-radius:99px;flex:none}
+  .lv.err{background:var(--del)} .lv.warn{background:var(--warn)} .lv.info{background:var(--mut)}
+
+  /* 报告 */
+  .sum{display:flex;gap:8px;flex-wrap:wrap;margin-top:0}
+  .issues{margin-top:12px;max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+  .iss{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:12.5px}
+  .iss:last-child{border-bottom:none}
+  .iss .no{width:44px;flex:none;color:var(--mut);font-variant-numeric:tabular-nums}
+  .iss .rn{flex:none;font-weight:600;min-width:150px}
+  .iss .dt{color:var(--mut);flex:1;min-width:0;word-break:break-word}
+  .iss .lv{margin-top:6px}
+  .clean{padding:16px;text-align:center;color:var(--ok-ink);font-size:13.5px;background:var(--ok-weak);
+    border-radius:10px;margin-top:12px}
+
+  .hint{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.7}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;
+    background:var(--stage);padding:1px 5px;border-radius:5px}
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+
+  textarea{width:100%;min-height:110px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical;background:var(--card);color:var(--ink);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  textarea:focus{outline:none;border-color:var(--acc-line)}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px;
+    text-decoration:none;white-space:nowrap}
+  .pill:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .iss .rn{min-width:0}
+  }
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span id="topNav"></span>
+      <select id="langSel" aria-label="UI language"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">质检</em></h1>
+    <p data-i18n="heroSub">上传一份字幕，按这门语言自己的规矩查一遍：时间轴重叠、停留太短、读不完的速度、行太长、断行位置、序号和编码。27 种语言各有各的阈值，换语言就换标准。全程在浏览器里跑，文件不上传。</p>
+  </div>
+
+  <!-- 1. 放入字幕 -->
+  <div class="card">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入字幕</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-t" id="dzTxt" data-i18n="dzTxt">把字幕文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="fname"></span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,text/*" style="display:none">
+    <div class="row">
+      <span class="lb" data-i18n="lblFmt">认出来的格式</span>
+      <span class="chip mut" id="fmtChip">—</span>
+      <button id="btnClear" type="button" data-i18n="btnClear">清除</button>
+    </div>
+    <div class="hint" data-i18n="upHint">支持 SRT、VTT、ASS。编码坏了（满屏问号或方块）先去乱码修复页，本页只按 UTF-8 读。</div>
+  </div>
+
+  <!-- 2. 按哪种语言的规矩查 -->
+  <div class="card">
+    <h2><span class="n">2</span><span data-i18n="langTitle">按哪种语言的规矩查</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblSubLang">字幕语言</span>
+      <select id="subLang" aria-label="subtitle language"></select>
+      <span class="chip mut" id="sysChip">—</span>
+    </div>
+    <div class="th" id="thBox"></div>
+    <div class="hint" data-i18n="langHint">换语言，下面的阈值跟着换：中文按全角字量宽度，泰文和阿拉伯文的组合记号不占宽度，阅读速度上限也不一样。阈值是本站默认，可以自己改。</div>
+    <div class="hint" id="specNote"></div>
+  </div>
+
+  <!-- 3. 查哪些 -->
+  <div class="card">
+    <h2><span class="n">3</span><span data-i18n="ruleTitle">查哪些</span></h2>
+    <div class="rules" id="ruleBox"></div>
+    <div class="row">
+      <button class="pri" id="btnRun" type="button" data-i18n="btnRun">开始检查</button>
+      <span class="chip mut" id="runChip">—</span>
+    </div>
+  </div>
+
+  <!-- 4. 报告 -->
+  <div class="card" id="repCard" style="display:none">
+    <h2><span class="n">4</span><span data-i18n="repTitle">体检报告</span></h2>
+    <div class="row sum" style="margin-top:0">
+      <span class="chip mut" id="sumCue">—</span>
+      <span class="chip" id="sumErr" style="background:var(--del-weak);color:var(--del)">—</span>
+      <span class="chip" id="sumWarn" style="background:var(--warn-weak);color:var(--warn)">—</span>
+      <span class="chip mut" id="sumInfo">—</span>
+      <select id="lvFilter" aria-label="filter"></select>
+    </div>
+    <div id="issBox"></div>
+  </div>
+
+  <!-- 5. 修与导出 -->
+  <div class="card" id="fixCard" style="display:none">
+    <h2><span class="n">5</span><span data-i18n="fixTitle">修与导出</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblFmtOut">导出格式</span>
+      <span class="seg">
+        <button type="button" id="fSrt" class="on">SRT</button>
+        <button type="button" id="fVtt">VTT</button>
+      </span>
+    </div>
+    <div class="rules" id="fixBox" style="margin-top:12px"></div>
+    <div class="row">
+      <button class="pri" id="btnFix" type="button" data-i18n="btnFix">应用修复</button>
+      <button id="btnDl" type="button" data-i18n="btnDl">下载</button>
+      <button id="btnDlRep" type="button" data-i18n="btnDlRep">下载报告</button>
+      <button id="btnCopy" type="button" data-i18n="btnCopy">复制</button>
+      <a class="pill" id="goTr" href="/translate.html" data-i18n="goTr">拿去翻译</a>
+    </div>
+    <div class="hint" data-i18n="fixTimeNote">带「会改时间轴」标记的项目改完时间真的会变；只想调排版就别勾它们。</div>
+    <div style="margin-top:12px"><textarea id="out" readonly></textarea></div>
+    <div class="msg" id="msg" style="display:none"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="brandName">随心字幕 AI</span> · <span data-i18n="heroEm">质检</span>
+  </footer>
+</div>
+
+<script src="qc-i18n.js?v=0.9.321"></script>
+<script src="qc-core.js?v=0.9.321"></script>
+<script>
+'use strict';
+var I18N = window.QC_I18N.DICT, LANGS = window.QC_I18N.LANGS;
+var LANG = 'zh-CN';
+var C = window.QCCore;
+
+var S = {
+  items: [], name: '', fmt: 'srt',
+  subLang: 'auto',           /* auto = 按内容猜 */
+  out: 'srt',
+  res: null,                 /* 最近一次 check 结果 */
+  fixed: null,               /* 修完的条目 */
+  on: {},                    /* 规则开关 */
+  fix: {}                    /* 要修哪些 */
+};
+
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function t2(k, a, b) { return t(k).replace('{0}', a).replace('{1}', b); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* ---------- 自动识别字幕语言：整份文件里出现最多的文字系统 → 代表语言 ---------- */
+var AUTO = { han: 'zh-CN', kana: 'ja', hangul: 'ko', thai: 'th', arab: 'ar', hebr: 'he', cyr: 'ru', gre: 'el', deva: 'hi', lat: 'en' };
+function guessLang() {
+  var cnt = {}, best = '', bn = 0, k;
+  S.items.forEach(function (c) {
+    c.tx.forEach(function (x) {
+      for (var i = 0; i < x.length; i++) {
+        var s = C.mainScript(x.charAt(i));
+        if (!s) continue;
+        cnt[s] = (cnt[s] || 0) + 1;
+        if (cnt[s] > bn) { bn = cnt[s]; best = s; }
+      }
+    });
+  });
+  return AUTO[best] || 'en';
+}
+/* 真正落到引擎里的语言（auto 会先解一次） */
+function effLang() { return (S.subLang === 'auto') ? guessLang() : S.subLang; }
+
+/* ---------- 阈值 ---------- */
+var THS = [
+  { k: 'maxLineW', i: 'thWid', u: 'uW' },
+  { k: 'maxCpsW', i: 'thCps', u: 'uCps' },
+  { k: 'minDur', i: 'thMin', u: 'uMs' },
+  { k: 'maxDur', i: 'thMax', u: 'uMs' },
+  { k: 'maxLines', i: 'thLines', u: 'uLine' }
+];
+function loadTh() {
+  var p = C.paramsFor(effLang());
+  THS.forEach(function (x) { $('#th_' + x.k).value = p[x.k]; });
+}
+function readTh() {
+  var o = { lang: effLang() };
+  THS.forEach(function (x) {
+    var v = parseInt($('#th_' + x.k).value, 10);
+    o[x.k] = isFinite(v) && v > 0 ? v : C.paramsFor(effLang())[x.k];
+  });
+  return o;
+}
+
+/* ---------- 规则清单 ---------- */
+/* 哪条规则对当前语言有意义 —— 语言专属规则只对有规范的语言显示 */
+function ruleOn(r) {
+  var lg = effLang();
+  if (r.id === 'rSpc') { var s = C.sysOf(lg); return (s === 'cjk' || s === 'hangul'); }
+  if (r.id === 'rPun') return C.hasPunct(lg);
+  if (r.id === 'rDir') return C.hasDir(lg);
+  return true;
+}
+function renderRules() {
+  var lg = effLang();
+  /* 3. 查哪些 */
+  $('#ruleBox').innerHTML = C.RULES.map(function (r) {
+    if (!ruleOn(r)) return '';
+    var on = S.on[r.id] !== false;
+    return '<label class="rul"><input type="checkbox" data-on="' + r.id + '"' + (on ? ' checked' : '') + '>' +
+      '<span class="lv ' + r.lv + '"></span>' +
+      '<span class="nm">' + esc(t(r.id)) + '</span>' +
+      (r.fix ? '<span class="tg">' + esc(t('tagFix')) + '</span>' : '') +
+      (r.time ? '<span class="tg tm">' + esc(t('tagTime')) + '</span>' : '') + '</label>';
+  }).join('');
+  $('#ruleBox').querySelectorAll('[data-on]').forEach(function (b) {
+    b.addEventListener('change', function () { S.on[b.getAttribute('data-on')] = b.checked; });
+  });
+  /* 5. 要修哪些（只列可修的；默认勾「不动时间轴」的） */
+  $('#fixBox').innerHTML = C.RULES.filter(function (r) { return r.fix && ruleOn(r); }).map(function (r) {
+    var want = S.fix[r.id];
+    if (want === undefined) want = !r.time;
+    S.fix[r.id] = want;
+    return '<label class="rul"><input type="checkbox" data-fix="' + r.id + '"' + (want ? ' checked' : '') + '>' +
+      '<span class="lv ' + r.lv + '"></span>' +
+      '<span class="nm">' + esc(t(r.id)) + '</span>' +
+      (r.time ? '<span class="tg tm">' + esc(t('tagTime')) + '</span>' : '') + '</label>';
+  }).join('');
+  $('#fixBox').querySelectorAll('[data-fix]').forEach(function (b) {
+    b.addEventListener('change', function () { S.fix[b.getAttribute('data-fix')] = b.checked; });
+  });
+  /* 语言专属说明：把这门语言额外启用的规则名列出来 */
+  var extra = [];
+  if (C.hasPunct(lg) && S.on.rPun !== false) extra.push(t('rPun'));
+  if (C.hasDir(lg) && S.on.rDir !== false) extra.push(t('rDir'));
+  if ((C.sysOf(lg) === 'cjk' || C.sysOf(lg) === 'hangul') && S.on.rSpc !== false) extra.push(t('rSpc'));
+  $('#specNote').textContent = extra.length ? t2('specHint', extra.join(' · '), '') : t('specNone');
+  $('#sysChip').textContent = (S.subLang === 'auto') ? (t('auto') + ' → ' + lg) : lg;
+}
+
+/* ---------- 上传 ---------- */
+var dz = $('#dz');
+dz.addEventListener('click', function () { $('#file').click(); });
+['dragover', 'dragenter'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('over'); }); });
+['dragleave', 'drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove('over'); }); });
+dz.addEventListener('drop', function (e) { if (e.dataTransfer.files && e.dataTransfer.files.length) readFile(e.dataTransfer.files[0]); });
+$('#file').addEventListener('change', function () { if (this.files.length) readFile(this.files[0]); this.value = ''; });
+
+function readFile(f) {
+  f.text().then(function (tx) {
+    var fmt = C.detectFmt(f.name, tx);
+    var items = C.parse(tx, fmt);
+    if (!items.length) { showMsg('msgNoCue', 'err'); return; }
+    S.items = items; S.name = f.name; S.fmt = fmt; S.res = null; S.fixed = null;
+    $('#fmtChip').textContent = fmt.toUpperCase() + ' · ' + items.length;
+    $('#fname').textContent = f.name;
+    $('#repCard').style.display = 'none';
+    $('#fixCard').style.display = 'none';
+    hideMsg();
+    /* ⚠️ 自动识别模式下，识别结果要回头刷新阈值 —— 否则上传中文却按英文的 20 宽/秒查
+       （手动选过语言的场合 effLang 没变，别去覆盖用户改过的数字） */
+    if (S.subLang === 'auto') loadTh();
+    renderRules();
+  });
+}
+$('#btnClear').addEventListener('click', function () {
+  S.items = []; S.name = ''; S.res = null; S.fixed = null;
+  $('#fmtChip').textContent = '—'; $('#fname').textContent = '';
+  $('#repCard').style.display = 'none'; $('#fixCard').style.display = 'none';
+  hideMsg();
+});
+
+/* ---------- 报告 ---------- */
+function detailOf(x) {
+  if (!x.v) return '';
+  var lg = effLang(), p = C.paramsFor(lg);
+  if (x.r === 'rCps') return t2('dOver', x.v, readTh().maxCpsW || p.maxCpsW);
+  if (x.r === 'rWid') return t2('dOver', x.v, readTh().maxLineW || p.maxLineW);
+  if (x.r === 'rLin') return t2('dOver', x.v, readTh().maxLines || p.maxLines);
+  if (x.r === 'rShort') return t2('dOver', x.v, readTh().minDur || p.minDur);
+  if (x.r === 'rLong') return t2('dOver', x.v, readTh().maxDur || p.maxDur);
+  if (x.r === 'rOvl') return t2('dOver', x.v, 0);
+  return '';
+}
+function run() {
+  if (!S.items.length) { showMsg('msgNoFile', 'err'); return; }
+  var opt = readTh();
+  opt.on = S.on;
+  S.res = C.check(S.items, opt);
+  S.fixed = null;
+  reportTool('check', { cues: S.items.length, n: S.res.issues.length, fmt: S.fmt });
+  $('#repCard').style.display = '';
+  $('#fixCard').style.display = '';
+  renderReport();
+  $('#out').value = (S.out === 'vtt') ? C.formatVtt(S.items) : C.formatSrt(S.items);
+  hideMsg();
+  showMsgRaw(t('msgDone'), '');
+}
+function renderReport() {
+  var iss = S.res.issues, f = $('#lvFilter').value;
+  var n = { err: 0, warn: 0, info: 0 };
+  iss.forEach(function (x) { n[x.lv]++; });
+  $('#sumCue').textContent = t2('sumCues', S.items.length, 0).replace(/ · $/, '');
+  $('#sumErr').textContent = t('lvErr') + ' ' + n.err;
+  $('#sumWarn').textContent = t('lvWarn') + ' ' + n.warn;
+  $('#sumInfo').textContent = t('lvInfo') + ' ' + n.info;
+  $('#runChip').textContent = t2('sumCues', S.items.length, 0) + ' · ' +
+    t('lvErr') + ' ' + n.err + ' · ' + t('lvWarn') + ' ' + n.warn + ' · ' + t('lvInfo') + ' ' + n.info;
+  var show = iss.filter(function (x) { return (f === 'all' || f === x.lv); });
+  if (!iss.length) {
+    $('#issBox').innerHTML = '<div class="clean">' + esc(t('sumClean')) + '</div>';
+    return;
+  }
+  $('#issBox').innerHTML = '<div class="issues">' + show.map(function (x) {
+    return '<div class="iss"><span class="lv ' + x.lv + '"></span>' +
+      '<span class="no">' + (x.i < 0 ? '—' : '#' + x.i) + '</span>' +
+      '<span class="rn">' + esc(t(x.r)) + '</span>' +
+      '<span class="dt">' + esc(detailOf(x)) + '</span></div>';
+  }).join('') + '</div>';
+}
+
+/* ---------- 修 ---------- */
+$('#btnFix').addEventListener('click', function () {
+  if (!S.items.length) { showMsg('msgNoFile', 'err'); return; }
+  var opt = readTh();
+  var r = C.applyFix(S.items, opt, S.fix);
+  var cnt = 0; for (var k in r.done) cnt += r.done[k];
+  S.items = r.items; S.fixed = r.items; S.res = null;
+  $('#fmtChip').textContent = S.fmt.toUpperCase() + ' · ' + S.items.length;
+  $('#out').value = (S.out === 'vtt') ? C.formatVtt(S.items) : C.formatSrt(S.items);
+  reportTool('fix', { cues: S.items.length, n: cnt, fmt: S.out });
+  if (!cnt) { showMsg('msgNothing', 'warn'); return; }
+  showMsgRaw(t2('msgFixed', cnt, 0), '');
+  run();   /* 修完立刻复查一遍，让人看见还剩下什么 */
+});
+
+/* ---------- 导出格式 ---------- */
+$('#fSrt').addEventListener('click', function () { setOut('srt'); });
+$('#fVtt').addEventListener('click', function () { setOut('vtt'); });
+function setOut(v) {
+  S.out = v;
+  $('#fSrt').classList.toggle('on', v === 'srt');
+  $('#fVtt').classList.toggle('on', v === 'vtt');
+  $('#out').value = (v === 'vtt') ? C.formatVtt(S.items) : C.formatSrt(S.items);
+}
+
+/* ---------- 下载 / 复制 / 报告 ---------- */
+function baseName() { return (S.name || 'subtitle.srt').replace(/\.[^.]+$/, ''); }
+function dlText(text, name) {
+  var b = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  var u = URL.createObjectURL(b);
+  var a = document.createElement('a');
+  a.href = u; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+}
+$('#btnDl').addEventListener('click', function () {
+  if (!$('#out').value) { showMsg('msgNoFile', 'err'); return; }
+  dlText($('#out').value, baseName() + '.' + S.out);
+});
+$('#btnDlRep').addEventListener('click', function () {
+  if (!S.res) { showMsg('msgNoFile', 'err'); return; }
+  dlText(reportText(), baseName() + '.qc.txt');
+});
+$('#btnCopy').addEventListener('click', function () {
+  if (!$('#out').value) { showMsg('msgNoFile', 'err'); return; }
+  var done = function () { showMsg('msgCopy', ''); };
+  var fail = function () { showMsg('msgCopyFail', 'err'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText($('#out').value).then(done, fail);
+  else fail();
+});
+function reportText() {
+  var lg = effLang(), p = readTh();
+  var L = [t('repFile'), '— ' + (S.name || '')];
+  L.push(t('lblSubLang') + ': ' + lg + '   (' + t('thWid') + ' ' + p.maxLineW + ' ' + t('uW') +
+    ', ' + t('thCps') + ' ' + p.maxCpsW + ' ' + t('uCps') +
+    ', ' + t('thMin') + ' ' + p.minDur + ' ' + t('uMs') +
+    ', ' + t('thMax') + ' ' + p.maxDur + ' ' + t('uMs') + ')');
+  L.push(t2('sumCues', S.items.length, 0) + '   ' + (S.res ? S.res.issues.length : 0) + ' ' + t('repTitle'));
+  L.push('');
+  (S.res ? S.res.issues : []).forEach(function (x) {
+    L.push('[' + t(x.lv === 'err' ? 'lvErr' : x.lv === 'warn' ? 'lvWarn' : 'lvInfo') + '] ' +
+      (x.i < 0 ? '' : '#' + x.i + ' ') + t(x.r) + (detailOf(x) ? '  ' + detailOf(x) : ''));
+  });
+  if (S.res && !S.res.issues.length) L.push(t('sumClean'));
+  return L.join('\n');
+}
+
+/* v0.9.321：tool-events 埋点（口径与 split/shift 等页一致：page/act 双白名单、
+   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：check=执行质检 / fix=应用修复 */
+var _tlLast = { body: '', t: 0 };
+function reportTool(act, extra) {
+  try {
+    var e = extra || {};
+    var body = JSON.stringify({ page: 'qc', act: act, cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || '' });
+    var now = Date.now();
+    if (body === _tlLast.body && now - _tlLast.t < 60000) return;
+    _tlLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+    }
+    fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () { });
+  } catch (err) { }
+}
+
+/* ---------- i18n ---------- */
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  /* ⚠️ ar / he 要整页翻成从右往左（服务端按 /ar/qc.html 这种路由注入时已经翻过一次，
+     这里管的是页面上手动切界面语言 —— 每页都要有，别漏（shift/glossary/extract 等都有） */
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
+  document.title = t('docTitle');
+  var sel = $('#langSel');
+  if (sel && sel.value !== LANG) sel.value = LANG;
+  if (!S.items.length) $('#dzTxt').textContent = t('dzTxt');
+  buildSubLang();
+  buildFilter();
+  buildTh();
+  renderRules();
+}
+function buildTh() {
+  $('#thBox').innerHTML = THS.map(function (x) {
+    return '<label class="thi"><span>' + esc(t(x.i)) + '</span>' +
+      '<input type="number" id="th_' + x.k + '" min="1" step="1">' +
+      '<span>' + esc(t(x.u)) + '</span></label>';
+  }).join('');
+  loadTh();
+  THS.forEach(function (x) {
+    $('#th_' + x.k).addEventListener('change', function () { renderRules(); });
+  });
+}
+function buildSubLang() {
+  var sel = $('#subLang');
+  sel.innerHTML = '<option value="auto">' + esc(t('auto')) + '</option>' +
+    LANGS.map(function (p) { return '<option value="' + p[0] + '">' + esc(p[1]) + '</option>'; }).join('');
+  sel.value = S.subLang;
+  sel.addEventListener('change', function () {
+    S.subLang = sel.value; loadTh(); renderRules();
+  });
+}
+function buildFilter() {
+  var f = $('#lvFilter'), keep = f.value;
+  f.innerHTML = '<option value="all">' + esc(t('all')) + '</option>' +
+    '<option value="err">' + esc(t('lvErr')) + '</option>' +
+    '<option value="warn">' + esc(t('lvWarn')) + '</option>' +
+    '<option value="info">' + esc(t('lvInfo')) + '</option>';
+  f.value = keep || 'all';
+  f.addEventListener('change', function () { if (S.res) renderReport(); });
+}
+
+function detectUiLang() {
+  try {
+    var ls = (navigator.languages && navigator.languages[0]) || navigator.language || 'zh-CN';
+    ls = String(ls).toLowerCase();
+    if (ls.indexOf('zh') === 0) return /tw|hk|hant/.test(ls) ? 'zh-TW' : 'zh-CN';
+    for (var i = 0; i < LANGS.length; i++) { if (ls.indexOf(LANGS[i][0].toLowerCase()) === 0) return LANGS[i][0]; }
+  } catch (e) { }
+  return 'zh-CN';
+}
+function pathUiLang() {
+  try {
+    var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:qc\.html)?$/);
+    if (m && LANGS.some(function (x) { return x[0] === m[1]; })) return m[1];
+  } catch (e) { }
+  return null;
+}
+/* 语言相关链接：logo 回家 + 拿去翻译，切语言时也要跟着换 */
+function updateLangLinks() {
+  var pre = (LANG === 'zh-CN') ? '' : '/' + LANG;
+  $('#logoHome').href = pre + '/';
+  $('#goTr').href = pre + '/translate.html';
+}
+function initLang() {
+  var sel = $('#langSel');
+  LANGS.forEach(function (pair) { var o = document.createElement('option'); o.value = pair[0]; o.textContent = pair[1]; sel.appendChild(o); });
+  var saved = null;
+  try { saved = localStorage.getItem('qcUiLang'); } catch (e) { }
+  var pLang = pathUiLang();
+  LANG = pLang || ((saved && LANGS.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    try { localStorage.setItem('qcUiLang', LANG); } catch (e) { }
+    applyI18n(); updateLangLinks();
+    if (S.res) renderReport();
+  });
+  updateLangLinks();
+}
+
+function showMsg(k, cls) { showMsgRaw(t(k), cls); }
+function showMsgRaw(txt, cls) {
+  var el = $('#msg');
+  el.textContent = txt; el.className = 'msg' + (cls ? ' ' + cls : ''); el.style.display = '';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+
+$('#btnRun').addEventListener('click', run);
+
+/* ---------- 启动 ---------- */
+initLang();
+applyI18n();
+</script>
+
+<!-- v0.9.321：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
+     server.js 按语言路由替换成对应语言，直接开文件时显示下面的简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕质检工具 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>上传一份字幕，按这门语言自己的规矩查一遍。全程在浏览器里完成，文件不上传。</strong></p>
+    <p style="margin-top:8px;">时间轴重叠、停留过短或过长、阅读速度过快、单行过宽、超过两行、断行位置、序号错乱、空条目、乱码与控制字符，逐条标出来并给出实测值与阈值。27 种语言有各自的行宽与阅读速度口径：中文按全角字计宽，泰文与阿拉伯文的组合记号不计宽。另有语言专属规范，例如西班牙语疑问句需要开头的 ¿、法语在 ? ! ; : 前使用不破空格、希腊语问号用 ;、中文标点用全角、阿拉伯语用 ؟ 与 ،。</p>
+    <p style="margin-top:8px;">给译制组、字幕组、剪辑师和本地化团队，在交付前把字幕过一遍。</p>
+  </section>
+<!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.321" data-tool="qc"></script>
+</body>
+</html>
