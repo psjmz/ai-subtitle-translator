@@ -194,8 +194,13 @@ crossorigin="anonymous"></script>
       <select id="subLang" aria-label="subtitle language"></select>
       <span class="chip mut" id="sysChip">—</span>
     </div>
+    <div class="row">
+      <span class="lb" data-i18n="lblFrame">画面方向</span>
+      <select id="frameSel" aria-label="aspect ratio"></select>
+    </div>
     <div class="th" id="thBox"></div>
     <div class="hint" data-i18n="langHint">换语言，下面的阈值跟着换：中文按全角字量宽度，泰文和阿拉伯文的组合记号不占宽度，阅读速度上限也不一样。阈值是本站默认，可以自己改。</div>
+    <div class="hint" data-i18n="frameHint">换画面方向只改「单行最大宽度」这一项：竖屏的画面本来就窄，还要给平台的标题栏和按钮让位置。这三个数是本站的推荐起点，不是哪家的认证标准，播放器不同可以自己在上面改。</div>
     <div class="hint" id="specNote"></div>
   </div>
 
@@ -241,6 +246,7 @@ crossorigin="anonymous"></script>
       <a class="pill" id="goTr" href="/translate.html" data-i18n="goTr">拿去翻译</a>
     </div>
     <div class="hint" data-i18n="fixTimeNote">带「会改时间轴」标记的项目改完时间真的会变；只想调排版就别勾它们。</div>
+    <div class="hint" data-i18n="biNote">双语字幕（一条两行，一行原文一行译文）按每行自己的语言折行，两行不会互相串；某一行单独太宽的，本页不会把它拆成第三行——那得改短译文或拆时间轴。</div>
     <div style="margin-top:12px"><textarea id="out" readonly></textarea></div>
     <div class="msg" id="msg" style="display:none"></div>
   </div>
@@ -250,8 +256,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="qc-i18n.js?v=0.9.321"></script>
-<script src="qc-core.js?v=0.9.321"></script>
+<script src="qc-i18n.js?v=0.9.322"></script>
+<script src="qc-core.js?v=0.9.322"></script>
 <script>
 'use strict';
 var I18N = window.QC_I18N.DICT, LANGS = window.QC_I18N.LANGS;
@@ -261,6 +267,7 @@ var C = window.QCCore;
 var S = {
   items: [], name: '', fmt: 'srt',
   subLang: 'auto',           /* auto = 按内容猜 */
+  frame: 'land',             /* land 横屏 / square 方形 / port 竖屏 —— 只影响单行行宽 */
   out: 'srt',
   res: null,                 /* 最近一次 check 结果 */
   fixed: null,               /* 修完的条目 */
@@ -307,14 +314,15 @@ var THS = [
   { k: 'maxLines', i: 'thLines', u: 'uLine' }
 ];
 function loadTh() {
-  var p = C.paramsFor(effLang());
+  var p = C.paramsFor(effLang(), S.frame);
   THS.forEach(function (x) { $('#th_' + x.k).value = p[x.k]; });
 }
 function readTh() {
   var o = { lang: effLang() };
+  var p = C.paramsFor(effLang(), S.frame);
   THS.forEach(function (x) {
     var v = parseInt($('#th_' + x.k).value, 10);
-    o[x.k] = isFinite(v) && v > 0 ? v : C.paramsFor(effLang())[x.k];
+    o[x.k] = isFinite(v) && v > 0 ? v : p[x.k];
   });
   return o;
 }
@@ -545,9 +553,19 @@ function applyI18n() {
   if (sel && sel.value !== LANG) sel.value = LANG;
   if (!S.items.length) $('#dzTxt').textContent = t('dzTxt');
   buildSubLang();
+  buildFrame();
   buildFilter();
   buildTh();
   renderRules();
+}
+var FRAMES = [['land', 'frLand'], ['square', 'frSquare'], ['port', 'frPort']];
+function buildFrame() {
+  var sel = $('#frameSel'), keep = sel.value || S.frame;
+  sel.innerHTML = FRAMES.map(function (f) {
+    return '<option value="' + f[0] + '">' + esc(t(f[1])) + '</option>';
+  }).join('');
+  sel.value = keep;
+  S.frame = sel.value;
 }
 function buildTh() {
   $('#thBox').innerHTML = THS.map(function (x) {
@@ -625,6 +643,16 @@ function showMsgRaw(txt, cls) {
 }
 function hideMsg() { $('#msg').style.display = 'none'; }
 
+/* 画面方向：只在启动时绑一次，别放进 buildFrame —— 切界面语言会重建它，重复绑会叠加 */
+$('#frameSel').addEventListener('change', function () {
+  S.frame = $('#frameSel').value;
+  /* 换方向就把行宽重给成这一档的推荐值；用户随后仍能在输入框里改。
+     只动行宽，读速/时长/行数不跟着变（竖屏不会因为画面窄就读得更慢）。 */
+  loadTh();
+  /* 已经查过就重跑一遍 —— 行宽变了，报告里的「行太长」是算出来的，不重跑会停在旧的数上 */
+  if (S.res) run();
+});
+
 $('#btnRun').addEventListener('click', run);
 
 /* ---------- 启动 ---------- */
@@ -642,6 +670,6 @@ applyI18n();
     <p style="margin-top:8px;">给译制组、字幕组、剪辑师和本地化团队，在交付前把字幕过一遍。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.321" data-tool="qc"></script>
+<script src="site-topnav.js?v=0.9.322" data-tool="qc"></script>
 </body>
 </html>

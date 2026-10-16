@@ -1,4 +1,4 @@
-/* qc-core.js —— 字幕质检引擎（v0.9.321 新增，纯前端自包含）
+/* qc-core.js —— 字幕质检引擎（v0.9.321 新增，v0.9.322 双语与画面方向修正）
  *
  * 设计要点：
  *  1) **多语言是第一位的**——每条规则的阈值按「字幕语言」所属的文字系统分档，不是一套
@@ -8,7 +8,19 @@
  *     这样 42 宽度 = 拉丁 42 字符 = 中文 21 全角字，与本站既有体检口径（maxLine 21）对齐。
  *  3) 阅读速度同样按宽度/秒：中文 18（=9 全角字/秒，与既有 maxCps 9 对齐），拉丁等 20。
  *  4) 双语条目（形态 A：一条两行分属两种文字；形态 B：两条同轴）识别出来，
- *     阅读速度只算「与字幕语言一致的那一行」，重叠检查整对豁免 —— 否则每条双语都误报。
+ *     阅读速度只算写着这门语言的那一行，重叠检查整对豁免 —— 否则每条双语都误报。
+ *
+ * v0.9.322 修正（都是真跑出来改坏字幕才发现的，别退化回去）：
+ *  5) **折行按每行自己的文字决定，不看「字幕语言」**。以前拿字幕语言的折法去折内容，
+ *     英文被按中文的无空格规则腰斩成 "defi / nitely"；现在统一走 lineSys() 每行自判。
+ *  6) **双语 A 形态逐行各自重排**，不许 join 成一坨 —— 以前会把原文与译文糊进同一行，
+ *     折完再也分不开。双语每行只占 1 行，某地单独超宽的宁可原样留下也不做成第 3 行。
+ *  7) **check 与 applyFix 共用 ownLines() 判据**：语言专属规则（rPun/rSpc/rDir）只看属于
+ *     这门语言的行。分开写过一次就出现「报得出来却修不动」，两边必须是同一批行号。
+ *  8) **画面方向**（land/square/port）三档行宽 42/36/28，只改行宽这一项；
+ *     读速与时长不随画面方向变 —— 竖屏不会因为画面窄就读得更慢。
+ *  9) **修不动就不要报「已修 N 处」**：折行前后文本一样时不计数，否则用户看到的
+ *     修复数字和素材实际内容对不上。
  *
  * 只输出数据，不碰 DOM、不引 site-i18n；文案全部由调用方（qc.html）按界面语言渲染。
  * ⚠️ 所有字符类一律写 \uXXXX 转义：组合记号/零宽字符直接进源码会被终端与编辑器吃掉，
@@ -115,12 +127,44 @@
     return best;
   }
 
+  /* ---------- 一行文本属于哪一族 ----------
+    SCRIPT return 的是字符层面的名（han/kana/thai…），DEF 用的是阈值分档名（cjk/nospc…）；
+    双语条目里每一行是各判各的，所以要有这层映射。日文的 mainScript 可能是 kana 也可能是 han，
+    两者都得落到 cjk —— 早先按「等于 han 才算中文」判过，结果日语自己被当成外语漏掉。 */
+  var SYS_OF_SCRIPT = {
+    han: 'cjk', kana: 'cjk', hangul: 'hangul', thai: 'nospc',
+    lat: 'lat', cyr: 'cyr', gre: 'gre', arab: 'arab', hebr: 'hebr', deva: 'deva'
+  };
+  function scriptSys(sc) { return SYS_OF_SCRIPT[sc] || 'lat'; }
+  /* 一行自己的判断，不看「字幕语言」—— v0.9.322 的核心修正，详见 ownLines / applyFix */
+  function lineSys(line) { return scriptSys(mainScript(line)); }
+
   /* ---------- 参数 ---------- */
   function sysOf(lang) { return SYS[lang] || 'lat'; }
-  function paramsFor(lang) {
+
+  /* 画面方向 → 行宽系数。DEF 里的 42 是按 16:9 横屏推的（= 中文 21 全角字 / 英文 42 字符）；
+     方形与竖屏的画面本身就窄，竖屏还要避开平台自己的标题栏、按钮、进度条，可用行宽更短。
+     ⚠️ 这三个系数是本页的推荐口径，不是哪家的认证标准 —— 实际能压到多少取决于播放器 UI，
+     页面上给的就是起点，用户可以自己在输入框里改。 */
+  var FRAME = {
+    land:   { k: 1,    maxLineW: 42 },
+    square: { k: 0.86, maxLineW: 36 },
+    port:   { k: 0.67, maxLineW: 28 }
+  };
+  function frameOf(f) { return FRAME[f] ? f : 'land'; }
+  /* 某一族的某个画面方向下推荐的行宽（半角单位） */
+  function lineWFor(sys, frame) {
+    var d = DEF[sys] || DEF.lat, fr = FRAME[frameOf(frame)];
+    return Math.round(d.maxLineW * fr.k);
+  }
+  /* opt.frame: 'land' | 'square' | 'port'；不给就按横屏。
+     ⚠️ 其余阈值（读速/时长/行数）不随画面方向变 —— 竖屏不会因为窄就读得更慢。 */
+  function paramsFor(lang, frame) {
     var s = sysOf(lang), d = DEF[s] || DEF.lat, o = {};
     for (var k in d) o[k] = d[k];
+    o.maxLineW = (FRAME[frame] && frame !== 'land') ? lineWFor(s, frame) : d.maxLineW;
     o.sys = s;
+    o.frame = frameOf(frame);
     return o;
   }
   /* 数值兜底：页面上的输入可能被清空或填了非数字 */
@@ -242,6 +286,22 @@
     return !!prev && prev.st === cur.st && prev.en === cur.en;
   }
 
+  /* 哪些行归「字幕语言」管 —— check 与 applyFix 共用这一个判据。
+     单语条目：每行都是。
+     形态 A（一行外文 + 一行母语）：只挑写着这门语言的那一行 ——
+       英文行不该被按中文规矩换成全角逗号，中文行也不该被按法语规矩插不换行空格。
+     返回空数组表示这条里没有属于这门语言的行（纯外语条目），语言专属规则整条跳过。 */
+  function ownLines(tx, lang, isA, out) {
+    var want = sysOf(lang), k;
+    out = out || [];
+    if (!isA) { for (k = 0; k < tx.length; k++) out.push(k); return out; }
+    for (k = 0; k < tx.length; k++) if (lineSys(tx[k]) === want) out.push(k);
+    /* 这一条里压根没有这门语言的行（自动识别没认准，或用户选错了语言）→ 退回全行。
+       不这样兜底的话这类条目连读速都不查，整条从体检里消失。 */
+    if (!out.length) for (k = 0; k < tx.length; k++) out.push(k);
+    return out;
+  }
+
   /* ---------- 断行禁则 ---------- */
   var RE_NO_END = /[([{\uFF08\u3010\u300A\u300C\u300E\u201C\u2018]$/;
   var RE_NO_START = /^[,.;:!?\u3001\u3002\uFF0C\uFF1A\uFF1B\uFF01\uFF1F\uFF09\u3011\u300B\u300D\u300F\u201D\u2019\u2026\uFF5E\u00B7]/;
@@ -322,14 +382,16 @@
     return 0;
   }
 
-  function badBreak(c, sys) {
+  /* 断行禁则：每一行按它自己的文字判定 —— 双语里中文行结尾带「。」是正常的，
+     英文行结尾逗号才是别扭。v0.9.322 起第 2 参 sys 作废（留着只为兼容老调用）。 */
+  function badBreak(c) {
     var L = c.tx;
     if (L.length < 2) return 0;
     for (var i = 0; i < L.length; i++) {
       var isLast = (i === L.length - 1);
       if (!isLast) {
         if (RE_NO_END.test(L[i])) return 1;
-        if (sys === 'cjk' || sys === 'hangul' || sys === 'nospc') {
+        if (hardWrap(lineSys(L[i]))) {
           if (RE_CJK_TAIL.test(L[i])) return 1;
         } else if (RE_BAD_TAIL.test(L[i])) return 1;
       }
@@ -340,9 +402,14 @@
 
   /* ---------- 折行（修 rWid / rLin / rBrk） ---------- */
   function hardWrap(sys) { return sys === 'cjk' || sys === 'hangul' || sys === 'nospc'; }
-  function rewrap(text, sys, maxW) {
+  /* maxRows：折完最多留几行。双语条目每一行只能占 1 行（两行已经给两种语言占满了），
+     所以那里传 1；单语传 maxLines（默认 2）。
+     sys 不给或给 'auto' → 按这段文字自己的语言决定折法。 */
+  function rewrap(text, sys, maxW, maxRows) {
     var flat = String(text).replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
     if (!flat) return [''];
+    if (!sys || sys === 'auto') sys = lineSys(flat);
+    var lim = maxRows > 0 ? maxRows : 2;
     var out = [], cur = '', i;
     if (hardWrap(sys)) {
       /* 无词间空格（中/日/韩/泰）：按字符硬切，切点只躲开禁则标点。
@@ -366,10 +433,11 @@
       }
       if (cur) out.push(cur);
     }
-    /* 折完超过两行就把余下的并回第二行（不造第三行） */
-    if (out.length > 2) {
-      var head = out.slice(0, 2), glue = hardWrap(sys) ? '' : ' ';
-      head[1] = head[1] + glue + out.slice(2).join(glue);
+    /* 折完超过允许行数就把余下的并回最后一行（不造第三行）。
+       ⚠️ lim=1 时 head 只有 head[0]，下标必须用 lim-1 —— 写死 [1] 会在双语场景越界。 */
+    if (out.length > lim) {
+      var head = out.slice(0, lim), glue = hardWrap(sys) ? '' : ' ';
+      head[lim - 1] = head[lim - 1] + glue + out.slice(lim).join(glue);
       out = head;
     }
     return out.length ? out : [''];
@@ -431,20 +499,19 @@
       if (enabled('rEmp') && !flat) { issues.push({ r: 'rEmp', lv: 'warn', i: n, v: 0 }); continue; }
       if (!flat) continue;
 
+      /* 属于这门语言的行号 —— 必须在 rCps 之前算出来，rSpc/rPun/rDir 也用它 */
+      var own = ownLines(c.tx, lang, isA[i]);
       var dur = c.en - c.st;
       if (enabled('rShort') && dur > 0 && dur < minD) issues.push({ r: 'rShort', lv: 'warn', i: n, v: dur });
       if (enabled('rLong') && dur > maxD) issues.push({ r: 'rLong', lv: 'warn', i: n, v: dur });
       if (enabled('rOvl') && i > 0 && !isB[i] && !isA[i] && !isA[i - 1]) {
         if (c.st < items[i - 1].en - 1) issues.push({ r: 'rOvl', lv: 'warn', i: n, v: items[i - 1].en - c.st });
       }
-      /* 阅读速度：形态 A 只算与字幕语言一致的那一行 */
+      /* 阅读速度：形态 A 只算写着这门语言的那一行（两种语言不叠加读） */
       if (enabled('rCps') && dur > 0) {
         var lines = c.tx, wsum = 0, j;
         if (isA[i]) {
-          var want = (sys === 'cjk') ? 'han' : (sys === 'hangul' ? 'hangul' : (sys === 'nospc' ? 'thai' : 'lat'));
-          var pick = -1;
-          for (j = 0; j < lines.length; j++) { if (mainScript(lines[j]) === want) { pick = j; break; } }
-          wsum = widthOf(pick >= 0 ? lines[pick] : lines[0]);
+          for (j = 0; j < own.length; j++) wsum += widthOf(lines[own[j]]);
         } else {
           for (j = 0; j < lines.length; j++) wsum += widthOf(lines[j]);
         }
@@ -463,14 +530,15 @@
           issues.push({ r: 'rTrim', lv: 'info', i: n, v: 0 });
         }
       }
+      /* 语言专属规则只看属于这门语言的行 —— own 已在上面算好，别再算一遍 */
       if (enabled('rSpc') && (sys === 'cjk' || sys === 'hangul')) {
-        if (c.tx.some(needSpace)) issues.push({ r: 'rSpc', lv: 'info', i: n, v: 0 });
+        if (own.some(function (j) { return needSpace(c.tx[j]); })) issues.push({ r: 'rSpc', lv: 'info', i: n, v: 0 });
       }
       if (enabled('rPun') && hasPunct(lang)) {
-        if (c.tx.some(function (x) { return punctIssue(x, lang); })) issues.push({ r: 'rPun', lv: 'info', i: n, v: 0 });
+        if (own.some(function (j) { return punctIssue(c.tx[j], lang); })) issues.push({ r: 'rPun', lv: 'info', i: n, v: 0 });
       }
       if (enabled('rDir') && hasDir(lang)) {
-        if (c.tx.some(function (x) { return dirIssue(x, lang); })) issues.push({ r: 'rDir', lv: 'info', i: n, v: 0 });
+        if (own.some(function (j) { return dirIssue(c.tx[j], lang); })) issues.push({ r: 'rDir', lv: 'info', i: n, v: 0 });
       }
     }
     return {
@@ -538,30 +606,53 @@
         }
         if (dirt) hit('rTrim');
       }
+      /* 语言专属修复：行号判据必须和 check 里的 ownLines 一模一样，
+         否则会出现「报告说这条有错、点修复却纹丝不动」——两边要做到同一批行。 */
+      var own = ownLines(c.tx, lang, isBilingualA(c));
       if (fixIds.rSpc) {
         var sp = false;
-        for (j = 0; j < c.tx.length; j++) {
-          if (needSpace(c.tx[j])) { c.tx[j] = addSpace(c.tx[j]); sp = true; }
+        for (j = 0; j < own.length; j++) {
+          if (needSpace(c.tx[own[j]])) { c.tx[own[j]] = addSpace(c.tx[own[j]]); sp = true; }
         }
         if (sp) hit('rSpc');
       }
       if (fixIds.rPun && hasPunct(lang)) {
         var pf = false;
-        for (j = 0; j < c.tx.length; j++) {
-          if (punctIssue(c.tx[j], lang)) { c.tx[j] = punctFix(c.tx[j], lang); pf = true; }
+        for (j = 0; j < own.length; j++) {
+          var op = own[j];
+          if (punctIssue(c.tx[op], lang)) { c.tx[op] = punctFix(c.tx[op], lang); pf = true; }
         }
         if (pf) hit('rPun');
       }
       if (needWrap) {
-        var flat = c.tx.join('\n');
         var tooWide = c.tx.some(function (x) { return widthOf(x) > maxW; });
         var tooMany = c.tx.length > maxL;
-        var badBrk = badBreak(c, sys);
+        var badBrk = badBreak(c);
         if (tooWide || tooMany || badBrk) {
-          if (tooWide) hit('rWid');
-          if (tooMany) hit('rLin');
-          if (badBrk) hit('rBrk');
-          c.tx = rewrap(flat, sys, maxW);
+          /* ⚠️ 折行是这一步最容易改坏字幕的地方，两条铁律：
+             ① 折法按每行自己的文字决定 —— 拿「字幕语言」的折法去折另一门语言，
+                英文会被按中文的无空格规则腰斩成 "defi / nitely"（v0.9.321 实测 bug）。
+             ② 双语 A 形态逐行各自重排 —— 把两行 join 成一坨会把中英文串进同一行，
+                折完之后外语和母语就再也分不开了（同版实测 bug）。 */
+          var before = c.tx.join('\n');
+          if (isBilingualA(c)) {
+            c.tx = c.tx.map(function (ln) {
+              /* 双语每行只许占 1 行：重排到 1 行还超宽的宁原样留下，也不做成 3 行 ——
+                 那得靠改译文或拆时间轴，不是折行能解决的 */
+              return rewrap(ln, lineSys(ln), maxW, 1).join('\n');
+            });
+          } else {
+            var whole = c.tx.join('\n');
+            c.tx = rewrap(whole, lineSys(whole), maxW, maxL);
+          }
+          /* ⚠️ 只在真解决掉的时候才计数 —— 双语超宽折不动，就不能报「已修 N 处」，
+             否则用户看到的修复数字与文件实际内容对不上 */
+          if (c.tx.join('\n') !== before) {
+            var nowWide = c.tx.some(function (x) { return widthOf(x) > maxW; });
+            if (tooWide && !nowWide) hit('rWid');
+            if (tooMany && c.tx.length <= maxL) hit('rLin');
+            if (badBrk && !badBreak(c)) hit('rBrk');
+          }
         }
       }
     });
@@ -572,12 +663,13 @@
   }
 
   g.QCCore = {
-    SYS: SYS, DEF: DEF, RULES: RULES,
+    SYS: SYS, DEF: DEF, RULES: RULES, PUNCT: PUNCT, FRAME: FRAME,
     sysOf: sysOf, paramsFor: paramsFor, widthOf: widthOf, mainScript: mainScript,
+    scriptSys: scriptSys, lineSys: lineSys, lineWFor: lineWFor, frameOf: frameOf,
     detectFmt: detectFmt, parse: parse, formatSrt: formatSrt, formatVtt: formatVtt,
     statOf: statOf, check: check, applyFix: applyFix, rewrap: rewrap, addSpace: addSpace,
-    isBilingualA: isBilingualA, isBilingualB: isBilingualB, badBreak: badBreak,
-    PUNCT: PUNCT, hasPunct: hasPunct, hasDir: hasDir, punctIssue: punctIssue, punctFix: punctFix, dirIssue: dirIssue,
+    isBilingualA: isBilingualA, isBilingualB: isBilingualB, ownLines: ownLines, badBreak: badBreak,
+    hasPunct: hasPunct, hasDir: hasDir, punctIssue: punctIssue, punctFix: punctFix, dirIssue: dirIssue,
     pad: pad, tsSrt: tsSrt, tsVtt: tsVtt
   };
 })(typeof window !== 'undefined' ? window : this);
