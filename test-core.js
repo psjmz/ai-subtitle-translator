@@ -14107,7 +14107,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     /* 326 起第二批 convert 九篇加入：5（shift 组）+ 9（convert 组）= 14 */
     /* 327 起第三批十篇加入：translate / clean / bilingual / qc 等 howto 与问题指南 = 24 */
     /* 328 起第四批十篇加入：repair / hanconv / table / batch 四个工具的用法与问题指南 = 34 */
-    assert.strictEqual(slugs.length, 34, '内容页应有 34 篇，实际 ' + slugs.length);
+    /* 329 起第五批九篇加入：merge / extract / split / lrc / videosub / glossary 六个工具的使用说明，
+   加 extract-subtitles-from-video / how-to-make-lrc-file / subtitle-glossary 三篇指南 = 43 */
+  assert.strictEqual(slugs.length, 43, '内容页应有 43 篇，实际 ' + slugs.length);
     slugs.forEach(function (slug) {
       const g = GS[slug];
       assert.ok(['howto', 'scene', 'guide'].indexOf(g.kind) >= 0, slug + ' kind 不认识：' + g.kind);
