@@ -14106,7 +14106,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const slugs = Object.keys(GS).sort();
     /* 326 起第二批 convert 九篇加入：5（shift 组）+ 9（convert 组）= 14 */
     /* 327 起第三批十篇加入：translate / clean / bilingual / qc 等 howto 与问题指南 = 24 */
-    assert.strictEqual(slugs.length, 24, '内容页应有 24 篇，实际 ' + slugs.length);
+    /* 328 起第四批十篇加入：repair / hanconv / table / batch 四个工具的用法与问题指南 = 34 */
+    assert.strictEqual(slugs.length, 34, '内容页应有 34 篇，实际 ' + slugs.length);
     slugs.forEach(function (slug) {
       const g = GS[slug];
       assert.ok(['howto', 'scene', 'guide'].indexOf(g.kind) >= 0, slug + ' kind 不认识：' + g.kind);
