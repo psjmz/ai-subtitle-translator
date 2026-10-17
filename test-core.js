@@ -14105,7 +14105,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
     const slugs = Object.keys(GS).sort();
     /* 326 起第二批 convert 九篇加入：5（shift 组）+ 9（convert 组）= 14 */
-    assert.strictEqual(slugs.length, 14, '内容页应有 14 篇，实际 ' + slugs.length);
+    /* 327 起第三批十篇加入：translate / clean / bilingual / qc 等 howto 与问题指南 = 24 */
+    assert.strictEqual(slugs.length, 24, '内容页应有 24 篇，实际 ' + slugs.length);
     slugs.forEach(function (slug) {
       const g = GS[slug];
       assert.ok(['howto', 'scene', 'guide'].indexOf(g.kind) >= 0, slug + ' kind 不认识：' + g.kind);
@@ -14120,7 +14121,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
           assert.strictEqual(((tx.match(/\*\*/g) || []).length) % 2, 0, slug + ' ' + l + ' 加粗不成对：' + tx.slice(0, 40));
         });
         if (!/^(zh-CN|zh-TW|ja|ko)$/.test(l)) texts.forEach(function (tx) {
-          assert.ok(!RE_HAN.test(tx), slug + ' ' + l + ' 混汉字：' + tx.slice(0, 30));
+          /* 反引号里的示例原样保留（如双语对照示例 `你还在等什么？`），只查正文散文 */
+          const prose = tx.replace(/`[^`]*`/g, '');
+          assert.ok(!RE_HAN.test(prose), slug + ' ' + l + ' 混汉字：' + tx.slice(0, 30));
         });
         /* 图片四源：en/zh-CN × png/webp（guideImgPath 的取图规则） */
         g.body[l].forEach(function (sec) {
