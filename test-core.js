@@ -14104,7 +14104,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       if (d && d.slug) GS[d.slug] = d;
     });
     const slugs = Object.keys(GS).sort();
-    assert.strictEqual(slugs.length, 5, '内容页应有 5 篇，实际 ' + slugs.length);
+    /* 326 起第二批 convert 九篇加入：5（shift 组）+ 9（convert 组）= 14 */
+    assert.strictEqual(slugs.length, 14, '内容页应有 14 篇，实际 ' + slugs.length);
     slugs.forEach(function (slug) {
       const g = GS[slug];
       assert.ok(['howto', 'scene', 'guide'].indexOf(g.kind) >= 0, slug + ' kind 不认识：' + g.kind);
