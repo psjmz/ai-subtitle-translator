@@ -67,7 +67,7 @@ const NEW25 = ['yue','be','tg','ky','tk','bs','mt','cy','ga','hy','ka','ti','bo'
   ok(d.ready === 'complete' && d.core === 'object' && d.dst > 0, 'DIAG：页面 + 引擎就位', JSON.stringify(d));
   ok(d.dst === 100, '目标语言下拉 100 项（原 75）', d.dst);
   ok(d.src === 101, '源语言下拉 101 项（100 种 + auto）', d.src);
-  ok(/\?v=0\.9\.325/.test(d.bust), 'srt-core 缓存参数仍是 325（本批不占版号）', d.bust);
+  ok(/\?v=0\.9\.338/.test(d.bust), 'srt-core 缓存参数已升到 338（强制换缓存）', d.bust);
 
   console.log('— ② 25 种新语言在位，显示名是自称 —');
   d = await ev(`(() => {
@@ -112,7 +112,7 @@ const NEW25 = ['yue','be','tg','ky','tk','bs','mt','cy','ga','hy','ka','ti','bo'
   d = await ev(`({ ver: (document.querySelector('.ver')||{}).textContent,
                     has75zh: document.body.innerText.indexOf('75 种语言') >= 0,
                     has100zh: document.body.innerText.indexOf('100 种语言') >= 0 })`);
-  ok(d.ver === 'v0.9.325', '首页版号仍是 v0.9.325', d.ver);
+  ok(d.ver === 'v0.9.338', '首页版号已升到 v0.9.338', d.ver);
   ok(!d.has75zh, '首页已无「75 种语言」', JSON.stringify(d));
 
   ok(errs.length === 0, '全程无 JS 异常 / console.error', errs.slice(0, 3).join(' | '));
