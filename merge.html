@@ -216,8 +216,8 @@ textarea.paste-box{margin-top:8px;min-height:96px}
   .vtt-cols.mono .ass-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px 26px;align-content:start}
   /* 栏标题与小分组标题（文字 · 效果 · 位置）不属于任何一列，占满整行 */
-  .ass-cols.mono .ass-col > h4,
-  .vtt-cols.mono .ass-col > h4,
+  .ass-cols.mono .ass-col > h3,
+  .vtt-cols.mono .ass-col > h3,
   .ass-cols.mono .ass-col > .ass-sub{grid-column:1/-1;margin:0}
   .ass-cols.mono .ass-col > .ass-sub{margin:8px 0 0}
   /* 字段卡片：第 1 行标签，第 2 行控件 */
@@ -287,9 +287,13 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     .ass-cols.mono .ass-col,
     .vtt-cols.mono .ass-col{grid-template-columns:1fr}
   }
-  .ass-col h4,.grp-t{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--acc-ink);letter-spacing:.3px;
+  /* ⚠️ .stylebox > h3 是 #mVttGrpAllTitle（VTT 的「整条字幕（两层共用）」）：
+       它挂在 .stylebox 下而不是 .ass-col 里，此前一直匹配不到这条规则，
+       只能吃浏览器默认的 h4 样式（14px / block / 无竖条），跟并列的
+       「译文行」「原文行」两个层标题长得不一样 —— 336 一并纳入。 */
+  .ass-col h3,.stylebox > h3,.grp-t{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--acc-ink);letter-spacing:.3px;
     display:flex;align-items:center;gap:7px}
-  .ass-col h4::before,.grp-t::before{content:'';width:4px;height:12px;border-radius:2px;background:var(--acc);flex:none}
+  .ass-col h3::before,.stylebox > h3::before,.grp-t::before{content:'';width:4px;height:12px;border-radius:2px;background:var(--acc);flex:none}
   .grp-t{margin:15px 0 7px;padding-top:12px;border-top:1px dashed var(--line)}
   /* 左右边距是全局一对，并排两行（与上面两列同宽，视觉上对齐） */
   .mg-row{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
@@ -648,7 +652,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     display:flex;align-items:center;justify-content:center;padding:20px}
   .fx-ask{background:var(--card,#fff);border:1px solid var(--line-strong,#DCDCE2);border-radius:14px;
     max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22)}
-  .fx-ask h4{font-weight:700;font-size:16px;color:var(--acc,#534AB7);margin:0 0 12px}
+  .fx-ask h3{font-weight:700;font-size:16px;color:var(--acc,#534AB7);margin:0 0 12px}
   .fx-ask .f{margin-bottom:12px}
   .fx-ask .f label{display:block;font-size:12.5px;color:var(--sub,#666);margin-bottom:4px}
   .fx-ask .f input{width:100%;box-sizing:border-box;font-family:var(--mono,ui-monospace,monospace);
@@ -809,7 +813,7 @@ crossorigin="anonymous"></script>
              只剩的那一栏标题改叫「字幕」，两栏栅格收成单列（CSS 见 .ass-cols.mono）。 -->
         <div class="ass-cols" id="assCols">
           <div class="ass-col" id="assDstCol">
-            <h4 id="assDstColTitle" data-i18n="lblDstCol">译文（主）</h4>
+            <h3 id="assDstColTitle" data-i18n="lblDstCol">译文（主）</h3>
             <div class="ass-sub" data-i18n="assGrpText">文字</div>
             <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assDstSize" value="56" min="8" max="200"></div>
             <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assDstColor" value="#FFFFFF"><span class="sw" id="assDstColorSw"></span></div>
@@ -841,7 +845,7 @@ crossorigin="anonymous"></script>
             <!-- v0.9.229：译文/原文两个框语义完全一致——都是「这一行离画面底边多远」。 -->
           </div>
           <div class="ass-col" id="assSrcCol">
-            <h4 data-i18n="lblSrcCol">原文（副）</h4>
+            <h3 data-i18n="lblSrcCol">原文（副）</h3>
             <div class="ass-sub" data-i18n="assGrpText">文字</div>
             <div class="af"><label data-i18n="lblSize">字号</label><input type="number" id="assSrcSize" value="50" min="8" max="200"></div>
             <div class="af"><label data-i18n="lblColor">颜色</label><input type="text" id="assSrcColor" value="#FFD700"><span class="sw" id="assSrcColorSw"></span></div>
@@ -938,7 +942,7 @@ crossorigin="anonymous"></script>
         <!-- v0.9.239：按「层」重排 —— 整条 / 译文行 / 原文行。
              原文行是覆盖层：字号与颜色始终单独设；字体、粗体、斜体、底衬、描边是三态
              （沿用 / 开 / 关），默认「沿用」= 一个字都不写，所以默认导出与 238 逐字节相同。 -->
-        <h4 id="mVttGrpAllTitle" data-i18n="vttGrpAll">整条字幕（两层共用）</h4>
+        <h3 id="mVttGrpAllTitle" data-i18n="vttGrpAll">整条字幕（两层共用）</h3>
         <div class="vtt-cols">
           <div class="ass-col">
             <div class="af"><label data-i18n="lblVttLine">垂直 line</label><input type="number" id="mVttLine" value="90" step="1"></div>
@@ -961,7 +965,7 @@ crossorigin="anonymous"></script>
         </div>
         <div class="vtt-cols" id="mVttCols2">
           <div class="ass-col">
-            <h4 id="mVttGrpDstTitle" data-i18n="vttGrpDst">译文行（主样式）</h4>
+            <h3 id="mVttGrpDstTitle" data-i18n="vttGrpDst">译文行（主样式）</h3>
             <div class="af"><label data-i18n="lblVttSize">字号</label><input type="number" id="mVttSize" value="100" step="5"></div>
             <div class="af"><label data-i18n="lblVttColor">颜色</label><input type="text" id="mVttColor" value="#FFFFFF"><span class="sw" id="mVttColorSw"></span></div>
             <div class="af"><label data-i18n="lblVttFont">字体</label><select id="mVttFont"></select></div>
@@ -975,7 +979,7 @@ crossorigin="anonymous"></script>
             <div class="af"><label data-i18n="lblVttShadowColor">描边色</label><input type="text" id="mVttShadowColor" value="#000000"><span class="sw" id="mVttShadowColorSw"></span></div>
           </div>
           <div class="ass-col" id="mVttSrcGrp">
-            <h4><span data-i18n="vttGrpSrc">原文行</span><i class="info" tabindex="0" data-tip-i18n="vttSrcTip">i</i></h4>
+            <h3><span data-i18n="vttGrpSrc">原文行</span><i class="info" tabindex="0" data-tip-i18n="vttSrcTip">i</i></h3>
             <div class="af"><label data-i18n="lblVttSrcSize">字号</label><select id="mVttSrcSizeMode" class="me">
               <option value="" data-i18n="vttInherit">沿用</option>
               <option value="set" data-i18n="vttOptSet" selected>单独设</option>
@@ -12119,7 +12123,7 @@ function fxAsk(title, fields, okTxt){
   return new Promise(resolve => {
     const mask = document.createElement('div'); mask.className = 'fx-ask-mask';
     const box = document.createElement('div'); box.className = 'fx-ask';
-    const h = document.createElement('h4'); h.textContent = title; box.appendChild(h);
+    const h = document.createElement('h3'); h.textContent = title; box.appendChild(h);
     const ins = [];
     (fields || []).forEach(f => {
       const d = document.createElement('div'); d.className = 'f';

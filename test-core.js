@@ -8760,7 +8760,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/\.ass-cols\.mono \.ass-col,\s*\n\s*\.vtt-cols\.mono \.ass-col\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/.test(mg),
       '单语栏不是 2 列网格（字段会挤在左边一条线上）');
     /* ② 栏标题 / 小分组标题占满整行 —— 漏了会把「文字 / 效果 / 位置」挤进某一列 */
-    assert.ok(/\.ass-cols\.mono \.ass-col > h4,\s*\n\s*\.vtt-cols\.mono \.ass-col > h4,\s*\n\s*\.ass-cols\.mono \.ass-col > \.ass-sub\{grid-column:1\/-1/.test(mg),
+    /* ⚠️ 原写 h4，336 批次把栏标题从 h4 提为 h3（h2 后直接 h4 跳了一级），
+       这里跟着改，否则断言查不到规则块会误报「标题没占满整行」。 */
+    assert.ok(/\.ass-cols\.mono \.ass-col > h3,\s*\n\s*\.vtt-cols\.mono \.ass-col > h3,\s*\n\s*\.ass-cols\.mono \.ass-col > \.ass-sub\{grid-column:1\/-1/.test(mg),
       '栏标题/小分组标题没占满整行');
     /* ③ 字段是「第 1 行标签 + 第 2 行控件」的两行网格 —— 方案 A 的核心 */
     assert.ok(/\.ass-cols\.mono \.ass-col \.af,\s*\n\s*\.vtt-cols\.mono \.ass-col \.af,\s*\n\s*\.ass-cols\.mono ~ \.mg-row \.af\{\s*\n\s*display:grid;grid-template-columns:minmax\(0,1fr\) auto;/.test(mg),
