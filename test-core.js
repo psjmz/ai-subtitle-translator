@@ -2360,16 +2360,25 @@ t('formatSbv 往返一致', () => {
 
 
 console.log('— v0.9.105 ASS 推荐字号（按书写系统字形高度补偿）—');
+/* v0.9.338：48 → 100 种。v0.9.112 的 27 种当时漏了同步这张表，这次一并补齐，
+   让「原文号 28~50 / 主次关系 / 视觉高度 / 行宽封顶」四条也罩住它们。 */
 const LANGS_ALL = [
   'en', 'zh-CN', 'zh-TW', 'ja', 'ko', 'fr', 'de', 'es', 'pt', 'it', 'ru', 'ar', 'th', 'vi',
   'id', 'hi', 'tr', 'pl', 'nl', 'ms', 'fil', 'fa', 'sv', 'da', 'fi', 'nb', 'cs', 'sk', 'hu',
   'ro', 'ca', 'hr', 'el', 'uk', 'sr', 'bg', 'he', 'ur', 'bn', 'ta', 'te', 'mr', 'ne', 'si',
-  'my', 'km', 'lo', 'sw'
-];   // v0.9.109：22 → 48 种目标语言
-const MAXW_LANG = { 'zh-CN':16,'zh-TW':16,'ja':13,'ko':16 };
+  'my', 'km', 'lo', 'sw',
+  // v0.9.112 的 27 种
+  'gu', 'kn', 'ml', 'pa', 'or', 'as', 'kk', 'uz', 'mn', 'az', 'is', 'et', 'lv', 'lt', 'sl',
+  'sq', 'mk', 'eu', 'gl', 'am', 'ha', 'yo', 'zu', 'so', 'ps', 'ku', 'af',
+  // v0.9.338 的 25 种
+  'yue', 'be', 'tg', 'ky', 'tk', 'bs', 'mt', 'cy', 'ga', 'hy', 'ka', 'ti', 'bo', 'ug', 'sd',
+  'yi', 'jv', 'su', 'ceb', 'mg', 'ig', 'xh', 'sn', 'ny', 'mi'
+];
+const MAXW_LANG = { 'zh-CN':16,'zh-TW':16,'ja':13,'ko':16,'yue':16 };   // v0.9.338：粤语用汉字，同 zh-TW 16 全角
 const INK = C.INK_RATIO;
 const inkOf = (l) => (!l || l === 'auto' || typeof INK[l] !== 'number') ? INK._default : INK[l];
-t('共 48 种语言都有推荐值（漏一个就会静默回落到 76）', () => {
+t('共 ' + LANGS_ALL.length + ' 种语言都有推荐值（漏一个就会静默回落到 76）', () => {
+  assert.strictEqual(LANGS_ALL.length, 100, '目标语言数不是 100');
   const miss = LANGS_ALL.filter(l => typeof C.REC_ASS_SIZE[l] !== 'number');
   assert.deepStrictEqual(miss, [], '缺推荐值: ' + miss.join(','));
 });
@@ -2533,6 +2542,78 @@ t('assStackMV：缺参/异常参数不炸，且结果落在 1~1080', () => {
       });
     });
   }
+}
+
+// ---------------- v0.9.338：目标语言 75 → 100 ----------------
+console.log('— v0.9.338：目标语言扩到 100 种 —');
+{
+  const html = WS_SRC;
+  /* 早期条目有的字段间对齐空格、有的紧贴（zh-TW 的 `file:'繁体中文',prompt:` 就没空格），一律按 \s* */
+  const L_RE = /\{ v:'([a-zA-Z-]+)',\s*zh:'([^']*)',\s*en:'([^']*)',\s*file:'([^']*)',\s*prompt:'([^']*)'\s*\}/g;
+  const rows = []; let mm;
+  while ((mm = L_RE.exec(html))) rows.push({ v: mm[1], zh: mm[2], en: mm[3], file: mm[4], prompt: mm[5] });
+  const E_RE = /'([a-zA-Z-]+)':\s*\{dash:'((?:[^'\\]|\\.)*)',\s*lyric:'((?:[^'\\]|\\.)*)',\s*plain:'((?:[^'\\]|\\.)*)'\}/g;
+  const exs = {}; let em;
+  while ((em = E_RE.exec(html))) exs[em[1]] = { dash: em[2], lyric: em[3], plain: em[4] };
+  const NEW338 = ['yue','be','tg','ky','tk','bs','mt','cy','ga','hy','ka','ti','bo','ug','sd',
+                  'yi','jv','su','ceb','mg','ig','xh','sn','ny','mi'];
+  t('解析到 100 种目标语言，代码无重复、无遗漏', () => {
+    assert.strictEqual(rows.length, 100, '解析到 ' + rows.length + ' 种（LANGS 条目格式变了？）');
+    const vs = rows.map(r => r.v);
+    assert.deepStrictEqual(vs.filter((c, i) => vs.indexOf(c) !== i), [], '有重复代码');
+    NEW338.forEach(l => assert.ok(vs.indexOf(l) >= 0, '缺新语言 ' + l));
+  });
+  t('100 种里每一种的五个字段都非空，自称不等于代码', () => {
+    rows.forEach(r => {
+      ['zh', 'en', 'file', 'prompt'].forEach(k =>
+        assert.ok(r[k] && r[k].trim(), r.v + ' 的 ' + k + ' 是空的'));
+      assert.notStrictEqual(r.zh, r.v, r.v + ' 自称不能就是代码本身');
+    });
+  });
+  t('自称互不重复（下拉里出现两条同名会看不出区别）', () => {
+    const seen = {}, dup = [];
+    rows.forEach(r => { const k = r.zh.toLowerCase(); if (seen[k]) dup.push(seen[k] + '/' + r.v); seen[k] = r.v; });
+    assert.deepStrictEqual(dup, [], '自称撞车: ' + dup.join(','));
+  });
+  t('100 种都有译文示例，且三条都不为空、对白带换行', () => {
+    const miss = rows.map(r => r.v).filter(v => !exs[v]);
+    assert.deepStrictEqual(miss, [], '缺译文示例: ' + miss.join(','));
+    Object.keys(exs).forEach(v => {
+      const e = exs[v];
+      ['dash', 'lyric', 'plain'].forEach(k =>
+        assert.ok(e[k] && e[k].trim(), v + ' 的 ' + k + ' 是空的'));
+      assert.ok(/\\n/.test(e.dash), v + ' 的对白样本应带 \\n 换行（双人对白）');
+    });
+  });
+  t('v0.9.338 新增 24 种（除汉字粤语）推荐字号都符合 size = even(40.992 / INK_RATIO)', () => {
+    NEW338.filter(l => l !== 'yue').forEach(l => {
+      const want = Math.round((40.992 / inkOf(l)) / 2) * 2;
+      assert.strictEqual(C.REC_ASS_SIZE[l], want, l + ' 推荐号 ' + C.REC_ASS_SIZE[l] + ' 应为 ' + want);
+    });
+  });
+  t('粤语 yue 归汉字族：与 zh-TW 同墨迹比、同下伸深度，字号维持 56 不缩小', () => {
+    assert.strictEqual(C.INK_RATIO['yue'], C.INK_RATIO['zh-TW'], 'yue 墨迹比应同 zh-TW');
+    assert.strictEqual(C.INK_DESC['yue'], C.INK_DESC['zh-TW'], 'yue 下伸应同 zh-TW');
+    assert.strictEqual(C.REC_ASS_SIZE['yue'], 56, 'yue 应维持 56');
+  });
+  t('同字母族沿用既有值：ti 同 am、ug/sd 同 ar、yi 同 he', () => {
+    assert.strictEqual(C.INK_RATIO['ti'], C.INK_RATIO['am'], 'ti 应同 am（吉兹字母）');
+    assert.strictEqual(C.INK_RATIO['ug'], C.INK_RATIO['ar'], 'ug 应同 ar（阿拉伯字母）');
+    assert.strictEqual(C.INK_RATIO['sd'], C.INK_RATIO['ar'], 'sd 应同 ar（阿拉伯字母）');
+    assert.strictEqual(C.INK_RATIO['yi'], C.INK_RATIO['he'], 'yi 应同 he（希伯来字母）');
+    assert.strictEqual(C.INK_DESC['yi'], C.INK_DESC['he'], 'yi 下伸应同 he');
+  });
+  t('行宽表：粤语 16 全角、其余新增语言 21，且键不超出语言清单', () => {
+    const src = (html.match(/MAXW_BY_LANG\s*=\s*\{([\s\S]*?)\};/) || [])[1] || '';
+    assert.ok(src, '没抠到 MAXW_BY_LANG');
+    const map = {};
+    src.replace(/'([a-zA-Z-]+)':\s*(\d+)/g, (_, k, n) => { map[k] = +n; return ''; });
+    NEW338.forEach(l => {
+      assert.strictEqual(map[l], l === 'yue' ? 16 : 21, l + ' 行宽 ' + map[l]);
+    });
+    const vs = rows.map(r => r.v);
+    assert.deepStrictEqual(Object.keys(map).filter(k => vs.indexOf(k) < 0), [], '行宽表里有不存在的语言');
+  });
 }
 
 console.log('— 行内格式标签（v0.9.129）—');

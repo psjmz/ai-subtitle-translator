@@ -1955,6 +1955,42 @@ const LANGS = [
   { v:'ku', zh:'کوردی', en:'Kurdish', file:'库尔德文', prompt:'Kurdish (Sorani)' },
   { v:'af', zh:'Afrikaans', en:'Afrikaans', file:'南非荷兰文', prompt:'Afrikaans' },
 
+  /* v0.9.338：25 种新语言（75 → 100）。与前两批同样同步四处：
+     ① 这里的显示名与文件名 ② MAXW_BY_LANG 折行阈值 ③ EX_SAMPLE 真实译文
+     ④ srt-core.js 的 INK_RATIO / REC_ASS_SIZE / INK_DESC。
+     字形度量这次改用「多组真实文本合并取中位数」——单样本会随文本构成漂（实测同一语言换一段文本，
+     中位数能差 0.2），先用 15 种既有语言校验，全部复现（平均绝对偏差 0.002）后才取信新值：
+       · 全新书写系统实测：hy 0.738 / ka 0.724 / bo 0.525（藏文的元音符号是组合标记，
+         悬浮在 baseline 上方、单独测 descent 为负，按既有「只滤标点」口径计入中位数）
+       · 同字母族沿用既有值：ti 同 am（吉兹字母，本次实测 0.843 与 am 实测 0.837 互证）、
+         yue 同 zh-TW（汉字）、ug/sd 同 ar（阿拉伯字母）、yi 同 he（希伯来字母）
+       · 其余拉丁/西里尔一律走 _default 0.545，连带变音符的 tk/cy/ga/mt/ig 也不单列（同 v0.9.109 口径）*/
+  { v:'yue', zh:'粵語', en:'Cantonese', file:'粤文', prompt:'Cantonese (Yue)' },
+  { v:'be', zh:'Беларуская', en:'Belarusian', file:'白俄罗斯文', prompt:'Belarusian' },
+  { v:'tg', zh:'Тоҷикӣ', en:'Tajik', file:'塔吉克文', prompt:'Tajik' },
+  { v:'ky', zh:'Кыргызча', en:'Kyrgyz', file:'吉尔吉斯文', prompt:'Kyrgyz' },
+  { v:'tk', zh:'Türkmençe', en:'Turkmen', file:'土库曼文', prompt:'Turkmen' },
+  { v:'bs', zh:'Bosanski', en:'Bosnian', file:'波斯尼亚文', prompt:'Bosnian' },
+  { v:'mt', zh:'Malti', en:'Maltese', file:'马耳他文', prompt:'Maltese' },
+  { v:'cy', zh:'Cymraeg', en:'Welsh', file:'威尔士文', prompt:'Welsh' },
+  { v:'ga', zh:'Gaeilge', en:'Irish', file:'爱尔兰文', prompt:'Irish' },
+  { v:'hy', zh:'Հայերեն', en:'Armenian', file:'亚美尼亚文', prompt:'Armenian' },
+  { v:'ka', zh:'ქართული', en:'Georgian', file:'格鲁吉亚文', prompt:'Georgian' },
+  { v:'ti', zh:'ትግርኛ', en:'Tigrinya', file:'提格利尼亚文', prompt:'Tigrinya' },
+  { v:'bo', zh:'བོད་སྐད', en:'Tibetan', file:'藏文', prompt:'Tibetan' },
+  { v:'ug', zh:'ئۇيغۇرچە', en:'Uyghur', file:'维吾尔文', prompt:'Uyghur' },
+  { v:'sd', zh:'سنڌي', en:'Sindhi', file:'信德文', prompt:'Sindhi' },
+  { v:'yi', zh:'ייִדיש', en:'Yiddish', file:'意第绪文', prompt:'Yiddish' },
+  { v:'jv', zh:'Basa Jawa', en:'Javanese', file:'爪哇文', prompt:'Javanese' },
+  { v:'su', zh:'Basa Sunda', en:'Sundanese', file:'巽他文', prompt:'Sundanese' },
+  { v:'ceb', zh:'Cebuano', en:'Cebuano', file:'宿务文', prompt:'Cebuano' },
+  { v:'mg', zh:'Malagasy', en:'Malagasy', file:'马达加斯加文', prompt:'Malagasy' },
+  { v:'ig', zh:'Igbo', en:'Igbo', file:'伊博文', prompt:'Igbo' },
+  { v:'xh', zh:'isiXhosa', en:'Xhosa', file:'科萨文', prompt:'Xhosa' },
+  { v:'sn', zh:'chiShona', en:'Shona', file:'绍纳文', prompt:'Shona' },
+  { v:'ny', zh:'Chichewa', en:'Chichewa', file:'齐切瓦文', prompt:'Chichewa (Nyanja)' },
+  { v:'mi', zh:'Māori', en:'Maori', file:'毛利文', prompt:'Māori (Te Reo)' },
+
 ];
 const LBY = (v) => LANGS.find(l => l.v === v) || { zh:v, file:v, prompt:v };
 /* v0.9.117：目标语言名去重——prompt 已含该语言自称时不再补一次
@@ -3100,6 +3136,32 @@ const EX_SAMPLE = {
   'ps':{dash:'- راځې؟\\n- ستا په شا کې یم.', lyric:'[1] ما کور ته یوسه [2] نن شپه', plain:'سبا به سره وګورو.'},
   'ku':{dash:'- دێیت؟\\n- ڕاست لە دواوەتەوەم.', lyric:'[1] بمبەرەوە ماٵەوە [2] ئەم شەوە', plain:'سبەی دەبینینەوە.'},
   'af':{dash:'- Kom jy?\\n- Net agter jou.', lyric:'[1] Vat my huis toe [2] vanaand', plain:'Sien jou môre.'},
+  // v0.9.338 新增 25 种：对白 / 歌词 / 普通句 三条真实译文样本（与上面三批同口径）
+  'yue':{dash:'- 你嚟唔嚟？\\n- 就喺你後面。', lyric:'[1] 帶我返屋企 [2] 今晚', plain:'聽日見。'},
+  'be':{dash:'- Ідзеш?\\n- Адразу за табой.', lyric:'[1] Забяры мяне дамоў [2] сёння ўвечары', plain:'Да заўтра.'},
+  'tg':{dash:'- Меоед?\\n- Рост дар паси шумо.', lyric:'[1] Маро ба хона бар [2] имшаб', plain:'Пагоҳ мебинем.'},
+  'ky':{dash:'- Келесиңби?\\n- Дароо артыңдамын.', lyric:'[1] Мени үйгө алып бар [2] бүгүн кечинде', plain:'Эртең көрүшкөнчө.'},
+  'tk':{dash:'- Gelýäňmi?\\n- Göni yzyňda.', lyric:'[1] Meni öýe äkit [2] şu gije', plain:'Ertir görüşeris.'},
+  'bs':{dash:'- Dolaziš?\\n- Tačno iza tebe.', lyric:'[1] Vodi me kući [2] večeras', plain:'Vidimo se sutra.'},
+  'mt':{dash:'- Ġej?\\n- Eżatt warajk.', lyric:'[1] Ħudni d-dar [2] illejla', plain:'Narak għada.'},
+  'cy':{dash:'- Ddoi di?\\n- Yn syth ar dy ôl.', lyric:'[1] Tyrd â fi adre [2] heno', plain:'Wela i di fory.'},
+  'ga':{dash:'- An dtiocfaidh tú?\\n- Díreach taobh thiar duit.', lyric:'[1] Tabhair abhaile mé [2] anocht', plain:'Feicfidh mé amárach thú.'},
+  'hy':{dash:'- Գալո՞ւ ես:\\n- Հենց քո հետևում եմ:', lyric:'[1] Տար ինձ տուն [2] այսօր երեկոյան', plain:'Կտեսնվենք վաղը:'},
+  'ka':{dash:'- მოხვალ?\\n- ზუსტად შენს უკან ვარ.', lyric:'[1] წამიყვანე სახლში [2] ამაღამ', plain:'ხვალამდე.'},
+  'ti':{dash:'- ትመጽእ ዲኻ?\\n- ኣብ ድሕሬኻ ኣለኹ።', lyric:'[1] ናብ ገዛ ውሰደኒ [2] ሎሚ ለይቲ', plain:'ጽባሕ ክንራኸብ።'},
+  'bo':{dash:'- ཡོང་ངམ།\\n- ང་ཁྱེད་རང་གི་རྒྱབ་ཏུ་ཡོད།', lyric:'[1] ང་ཁྱིམ་ལ་ཁྲིད་ [2] དེ་རིང་མཚན་མོར', plain:'སང་ཉིན་མཇལ་ཡོང།'},
+  'ug':{dash:'- كېلەمسەن؟\\n- دەل ئارقاڭدىمەن.', lyric:'[1] مېنى ئۆيگە ئاپىرىپ قوي [2] بۈگۈن كەچتە', plain:'ئەتە كۆرۈشەيلى.'},
+  'sd':{dash:'- اچين ٿا؟\\n- بلڪل توهانجي پويان آهيان.', lyric:'[1] مون کي گهر وٺي هل [2] اڄ رات', plain:'سڀاڻي ملنداسين.'},
+  'yi':{dash:'- קומסטו?\\n- גלייך הינטער דיר.', lyric:'[1] נעם מיך אהיים [2] היינט ביי נאכט', plain:'זען מיר זיך מארגן.'},
+  'jv':{dash:'- Arep melu?\\n- Tepak ing mburimu.', lyric:'[1] Gawa aku mulih [2] bengi iki', plain:'Ketemu sesuk.'},
+  'su':{dash:'- Arek indit?\\n- Persis di tukangeun anjeun.', lyric:'[1] Bawa ka imah [2] peuting ieu', plain:'Patepang isukan.'},
+  'ceb':{dash:'- Moanhi ka?\\n- Tuo ra sa imong likod.', lyric:'[1] Dad-a ko sa balay [2] karong gabhiona', plain:'Magkita ta ugma.'},
+  'mg':{dash:'- Ho avy ve ianao?\\n- Eo aorianao ihany.', lyric:'[1] Ento mody aho [2] anio alina', plain:'Mifankahita rahampitso.'},
+  'ig':{dash:'- Ị na-abịa?\\n- N\'azụ gị kpọmkwem.', lyric:'[1] Kpọla m laa n\'ụlọ [2] n\'abalị a', plain:'Ka anyị zute echi.'},
+  'xh':{dash:'- Uyeza?\\n- Ndikanye emva kwakho.', lyric:'[1] Ndise ekhaya [2] ngobu busuku', plain:'Sobonana ngomso.'},
+  'sn':{dash:'- Uri kuuya here?\\n- Ndakarurama shure kwako.', lyric:'[1] Ndisvitsa kumba [2] nhasi manheru', plain:'Tichaonana mangwana.'},
+  'ny':{dash:'- Uli kubwera?\\n- Ndili pompopo kumbuyo kwako.', lyric:'[1] Nditengere kunyumba [2] usiku uno', plain:'Tidzaonana mawa.'},
+  'mi':{dash:'- Kei te haere mai koe?\\n- Kei muri tonu i a koe.', lyric:'[1] Haria ahau ki te kāinga [2] i tēnei pō', plain:'Ka kite anō āpōpō.'},
 };
 function systemPromptEn(cfg){
   const srcN = LBY(cfg.src), dstN = LBY(cfg.dst);
@@ -6342,7 +6404,9 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
     'sv':21, 'da':21, 'fi':21, 'nb':21, 'cs':21, 'sk':21, 'hu':21, 'ro':21, 'ca':21, 'hr':21, 'el':21, 'uk':21, 'sr':21,
     'bg':21, 'he':21, 'ur':21, 'bn':21, 'ta':21, 'te':21, 'mr':21, 'ne':21, 'si':21, 'my':21, 'km':21, 'lo':21, 'sw':21,
     // v0.9.112 新增：非 CJK 一律 21 全角（Netflix TTSG 42 CPL 口径）
-    'gu':21, 'kn':21, 'ml':21, 'pa':21, 'or':21, 'as':21, 'kk':21, 'uz':21, 'mn':21, 'az':21, 'is':21, 'et':21, 'lv':21, 'lt':21, 'sl':21, 'sq':21, 'mk':21, 'eu':21, 'gl':21, 'am':21, 'ha':21, 'yo':21, 'zu':21, 'so':21, 'ps':21, 'ku':21, 'af':21
+    'gu':21, 'kn':21, 'ml':21, 'pa':21, 'or':21, 'as':21, 'kk':21, 'uz':21, 'mn':21, 'az':21, 'is':21, 'et':21, 'lv':21, 'lt':21, 'sl':21, 'sq':21, 'mk':21, 'eu':21, 'gl':21, 'am':21, 'ha':21, 'yo':21, 'zu':21, 'so':21, 'ps':21, 'ku':21, 'af':21,
+    // v0.9.338 新增：非 CJK 一律 21（Netflix TTSG 42 CPL 口径）；粤语 yue 用汉字，跟 zh-TW 一样 16 全角
+    'yue':16, 'be':21, 'tg':21, 'ky':21, 'tk':21, 'bs':21, 'mt':21, 'cy':21, 'ga':21, 'hy':21, 'ka':21, 'ti':21, 'bo':21, 'ug':21, 'sd':21, 'yi':21, 'jv':21, 'su':21, 'ceb':21, 'mg':21, 'ig':21, 'xh':21, 'sn':21, 'ny':21, 'mi':21
   };
   // v0.9.133：不再推断「用户有没有手调过」——改由 mwMemo 按语言记账（见「本地记忆」段）
   const mw=$('maxW');

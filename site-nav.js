@@ -31,10 +31,10 @@
       c: { bg: '#FDF1F6', fg: '#C02159' },
       name: { 'zh-CN': '字幕翻译', 'zh-TW': '字幕翻譯', 'en': 'Translate', 'ja': '字幕翻訳' },
       desc: {
-        'zh-CN': '75 种语言互译，自动配轴对齐，导出 SRT / VTT / ASS / SBV / TXT。',
-        'zh-TW': '75 種語言互譯，自動對軸對齊，匯出 SRT / VTT / ASS / SBV / TXT。',
-        'en': 'Translate between 75 languages, auto-align the timeline, export SRT / VTT / ASS / SBV / TXT.',
-        'ja': '75 言語を相互翻訳、タイムライン自動調整、SRT / VTT / ASS / SBV / TXT で書き出し。'
+        'zh-CN': '100 种语言互译，自动配轴对齐，导出 SRT / VTT / ASS / SBV / TXT。',
+        'zh-TW': '100 種語言互譯，自動對軸對齊，匯出 SRT / VTT / ASS / SBV / TXT。',
+        'en': 'Translate between 100 languages, auto-align the timeline, export SRT / VTT / ASS / SBV / TXT.',
+        'ja': '100 言語を相互翻訳、タイムライン自動調整、SRT / VTT / ASS / SBV / TXT で書き出し。'
       },
       tags: ['SRT', 'VTT', 'ASS']
     },

@@ -349,7 +349,7 @@ const PRESETS = [
   { id: 'custom',      name: '手动自定义',              base: '' }
 ];
 
-/* 目标语言清单（v0.9.112 起 75 种；与 index.html 的 LANGS 同步）
+/* 目标语言清单（v0.9.338 起 100 种；与 translate.html 的 LANGS 同步）
    g = 批量分组标记：cjk=中日韩 / nonlatin=非拉丁文字 */
 const LANGS = [
   { v:'en', zh:'English', en:'English', g:'' },
@@ -426,7 +426,35 @@ const LANGS = [
   { v:'so', zh:'Soomaali', en:'Somali', g:'' },
   { v:'ps', zh:'پښتو', en:'Pashto', g:'nonlatin' },
   { v:'ku', zh:'کوردی', en:'Kurdish', g:'nonlatin' },
-  { v:'af', zh:'Afrikaans', en:'Afrikaans', g:'' }
+  { v:'af', zh:'Afrikaans', en:'Afrikaans', g:'' },
+  /* v0.9.338 新增 25 种（与 translate.html 的 LANGS 同步）：
+     粤语归 cjk（汉字）；西里尔 be/tg/ky、亚美尼亚 hy、格鲁吉亚 ka、吉兹 ti、藏文 bo、
+     阿拉伯字母 ug/sd、希伯来字母 yi 归 nonlatin；其余拉丁语不标分组 */
+  { v:'yue', zh:'粵語', en:'Cantonese', g:'cjk nonlatin' },
+  { v:'be', zh:'Беларуская', en:'Belarusian', g:'nonlatin' },
+  { v:'tg', zh:'Тоҷикӣ', en:'Tajik', g:'nonlatin' },
+  { v:'ky', zh:'Кыргызча', en:'Kyrgyz', g:'nonlatin' },
+  { v:'tk', zh:'Türkmençe', en:'Turkmen', g:'' },
+  { v:'bs', zh:'Bosanski', en:'Bosnian', g:'' },
+  { v:'mt', zh:'Malti', en:'Maltese', g:'' },
+  { v:'cy', zh:'Cymraeg', en:'Welsh', g:'' },
+  { v:'ga', zh:'Gaeilge', en:'Irish', g:'' },
+  { v:'hy', zh:'Հայերեն', en:'Armenian', g:'nonlatin' },
+  { v:'ka', zh:'ქართული', en:'Georgian', g:'nonlatin' },
+  { v:'ti', zh:'ትግርኛ', en:'Tigrinya', g:'nonlatin' },
+  { v:'bo', zh:'བོད་སྐད', en:'Tibetan', g:'nonlatin' },
+  { v:'ug', zh:'ئۇيغۇرچە', en:'Uyghur', g:'nonlatin' },
+  { v:'sd', zh:'سنڌي', en:'Sindhi', g:'nonlatin' },
+  { v:'yi', zh:'ייִדיש', en:'Yiddish', g:'nonlatin' },
+  { v:'jv', zh:'Basa Jawa', en:'Javanese', g:'' },
+  { v:'su', zh:'Basa Sunda', en:'Sundanese', g:'' },
+  { v:'ceb', zh:'Cebuano', en:'Cebuano', g:'' },
+  { v:'mg', zh:'Malagasy', en:'Malagasy', g:'' },
+  { v:'ig', zh:'Igbo', en:'Igbo', g:'' },
+  { v:'xh', zh:'isiXhosa', en:'Xhosa', g:'' },
+  { v:'sn', zh:'chiShona', en:'Shona', g:'' },
+  { v:'ny', zh:'Chichewa', en:'Chichewa', g:'' },
+  { v:'mi', zh:'Māori', en:'Maori', g:'' }
 ];
 
 /* 走模型 B 的目标语言集合 */
