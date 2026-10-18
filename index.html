@@ -1240,7 +1240,7 @@ crossorigin="anonymous"></script>
     <nav class="lnav">
       <!-- v0.9.280：logo 整块做成「回首页」的入口（用户定案）。href 由 syncLogoHome() 跟着界面语言重算 ——
            /ja/ 点回来还是 /ja/，不掉语言。⚠️ 里面不放 <div>：<a> 的内容模型是「透明」，改成 span 更干净。 -->
-      <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.325</span></a>
+      <a class="logo" id="logoHome" href="/"><span class="logo-mark" data-keep-han>字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.325</span></a>
       <div class="spacer"></div>
       <!-- v0.9.317：全站统一导航（渲染进 #topNav）。site-nav.js 同版退役：首页早已没有
            #siteNav/#toolCards 挂载点（276/277 撤的），它在首页一直是空转的死引用，删。 -->
@@ -1471,7 +1471,7 @@ crossorigin="anonymous"></script>
 
       <div class="det-fig">
         <div class="mk-play">
-          <span class="l1">Where are you going?</span>
+          <span class="l1" lang="en">Where are you going?</span>
           <span class="l2" data-i18n="demoGoDst">你要去哪儿？</span>
         </div>
         <div class="mk-legend">
@@ -1528,7 +1528,7 @@ crossorigin="anonymous"></script>
       </div>
       <div class="fcard">
         <div class="fviz">
-          <div class="viz-player"><span class="l1" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span><span class="l2">♪ Love is in the air ♪</span></div>
+          <div class="viz-player"><span class="l1" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span><span class="l2" lang="en">♪ Love is in the air ♪</span></div>
         </div>
         <h4><span class="h-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg></span><span data-i18n="feat5T">双语字幕随心排</span></h4>
         <p data-i18n="feat5D">原文译文双行、堆叠、分屏随意切换，还能导出 TXT 对照稿，字幕组级的花样全都有。</p>
@@ -1636,7 +1636,7 @@ crossorigin="anonymous"></script>
           </div>
           <div>
             <span class="mk-cap" data-i18n="mkBi">双语</span>
-            <div class="mk-screen"><span class="l1">♪ Love is in the air ♪</span><span class="l2" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span></div>
+            <div class="mk-screen"><span class="l1" lang="en">♪ Love is in the air ♪</span><span class="l2" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</span></div>
           </div>
         </div>
         <div class="mk-slots">
@@ -1779,12 +1779,12 @@ crossorigin="anonymous"></script>
       <div class="det-fig rp-fig">
         <div class="mk-doc">
           <div class="mk-doc-h"><span class="d bad" data-i18n="mkGarbled">乱码</span><span class="mk-hit">UTF-8 ?</span></div>
-          <p class="mk-p">â€œæ—¥æœ¬èªž</p>
+          <p class="mk-p" data-keep-han>â€œæ—¥æœ¬èªž</p>
         </div>
         <div class="mk-arrow">↓</div>
         <div class="mk-doc ok">
           <div class="mk-doc-h"><span class="d good" data-i18n="mkFixed">修复后</span><span class="mk-hit">Shift_JIS → UTF-8</span></div>
-          <p class="mk-p">「日本語の字幕」</p>
+          <p class="mk-p" data-keep-han>「日本語の字幕」</p>
         </div>
         <p class="mk-note" data-i18n="mkN8">认出它本来的编码，把读错的字倒回去</p>
       </div>
@@ -1917,12 +1917,12 @@ crossorigin="anonymous"></script>
       <div class="det-fig hc-fig">
         <div class="mk-doc">
           <div class="mk-doc-h"><span class="d bad">SRT</span></div>
-          <p class="mk-p">里面有个软件</p>
+          <p class="mk-p" data-keep-han>里面有个软件</p>
         </div>
         <div class="mk-arrow">↓</div>
         <div class="mk-doc ok">
           <div class="mk-doc-h"><span class="d good">SRT</span></div>
-          <p class="mk-p">裡面有個軟體</p>
+          <p class="mk-p" data-keep-han>裡面有個軟體</p>
         </div>
         <p class="mk-note" data-i18n="mkN12">只换字，时间轴不动</p>
       </div>
