@@ -5223,6 +5223,28 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '首页数字带还在显示「时间轴对齐 / 字幕上传服务器」（用户 10-03 要求去掉）');
   });
 
+  t('v0.9.333：数字带单位按语言走（韩语别再借中文「亿」，繁体/日语各用本字形）', () => {
+    const at = HOME_SRC.indexOf('function fmtCount(n, lang) {');
+    assert.ok(at > 0, '首页找不到 fmtCount');
+    const seg = HOME_SRC.slice(at, HOME_SRC.indexOf('\n}', at) + 2);
+    const fmtCount = new Function('return (' + seg + ')')();
+    assert.ok(typeof fmtCount === 'function', 'fmtCount 抽不出来');
+    /* 韩语：만 / 억，一个汉字都不许有（线上 2.7亿 就是这么露出来的） */
+    assert.strictEqual(fmtCount(270000000, 'ko'), '2.7억');
+    assert.strictEqual(fmtCount(15000000, 'ko'), '1500만');
+    assert.ok(!/[\u4e00-\u9fff]/.test(fmtCount(270000000, 'ko') + fmtCount(15000000, 'ko') + fmtCount(1234567, 'ko')),
+      '韩语数字单位又混进汉字了');
+    /* 繁体：萬 / 億；日语：万 / 億（原来三语共用简体「万/亿」） */
+    assert.strictEqual(fmtCount(15000000, 'zh-TW'), '1500萬');
+    assert.strictEqual(fmtCount(270000000, 'zh-TW'), '2.7億');
+    assert.strictEqual(fmtCount(15000000, 'ja'), '1500万');
+    assert.strictEqual(fmtCount(270000000, 'ja'), '2.7億');
+    /* 简体与非 CJK 不受影响 */
+    assert.strictEqual(fmtCount(270000000, 'zh-CN'), '2.7亿');
+    assert.strictEqual(fmtCount(270000000, 'en'), '270M');
+    assert.strictEqual(fmtCount(9999, 'en'), '9,999');
+  });
+
   t('v0.9.215 顶栏播报改静态一行（信息不多，不必滚动）', () => {
     assert.ok(/id="ticker"/.test(html) && /id="tkTrack"/.test(html), '顶栏缺少播报容器');
     /* 用户 2026-10-03 定案：静态直接显示。滚动那套一律不许复活。 */
@@ -12317,8 +12339,16 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const boxS = { window: {}, console: console, navigator: { language: 'zh-CN' }, localStorage: undefined };
     boxS.globalThis = boxS;
     vmS.createContext(boxS);
-    vmS.runInContext(readT('site-i18n.js')
-      + '\n;globalThis.__D = { I18N: I18N, LANGS: UI_LANGS.map(function(p){return p[0];}) };', boxS);
+    vmS.runInContext(readT('site-i18n.js'), boxS);
+    /* 原生词条（demo-i18n.js 合并之前）—— 用来判定「首页新增的键到底归哪本词典」 */
+    vmS.runInContext('globalThis.__N = Object.keys(I18N["zh-CN"]);', boxS);
+    /* v0.9.333：首页演示区的样例句住在 demo-i18n.js，加载时合进 site-i18n 的 I18N。
+       浏览器里生效的是合并后的那一份，测试也按合并后的读，不能只读老的。 */
+    vmS.runInContext(readT('demo-i18n.js'), boxS);
+    const DEMO = (boxS.window.SiteI18N && boxS.window.SiteI18N.DEMO) || null;
+    vmS.runInContext('globalThis.__D = { I18N: I18N, LANGS: UI_LANGS.map(function(p){return p[0];}) };', boxS);
+    boxS.__D.DEMO = DEMO;
+    boxS.__D.NATIVE = boxS.__N;
     return boxS.__D;
   };
 
@@ -12591,6 +12621,44 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         }
       });
     });
+  });
+
+  t('v0.9.333：首页演示区样例句 27 语零缺条、非中日韩不混汉字、与 index.html 双向对齐', () => {
+    const SD = siteDict();
+    assert.ok(SD.DEMO, 'demo-i18n.js 没读出 DEMO（加载顺序或 IIFE 出错）');
+    const LANGS = SD.LANGS;
+    const base = Object.keys(SD.DEMO['zh-CN']);
+    assert.ok(base.length >= 30, '演示区词条数偏少（抠错了？）实际 ' + base.length);
+    /* ① 27 语逐键齐全，一个都不许空 */
+    const gaps = [];
+    LANGS.forEach(l => {
+      const miss = base.filter(k => typeof SD.DEMO[l][k] !== 'string' || !SD.DEMO[l][k].trim());
+      if (miss.length) gaps.push(l + ':' + miss.length + '（' + miss.slice(0, 3).join(',') + '）');
+    });
+    assert.strictEqual(gaps.length, 0, '演示区词条有缺 — ' + gaps.join(' '));
+    /* ② 反向：多出来的键也算错（手滑加的键永远不会被页面用到） */
+    const extra = [];
+    LANGS.forEach(l => Object.keys(SD.DEMO[l]).forEach(k => {
+      if (base.indexOf(k) < 0) extra.push(l + '.' + k);
+    }));
+    assert.strictEqual(extra.length, 0, '演示区多出基准里没有的键 — ' + extra.slice(0, 6).join(', '));
+    /* ③ 非中日韩语种不许混汉字（原文照抄 = 等于没翻） */
+    const RE_HAN2 = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/;
+    const bad = [];
+    LANGS.forEach(l => {
+      if (/^(zh-CN|zh-TW|ja)$/.test(l)) return;
+      base.forEach(k => { if (RE_HAN2.test(SD.DEMO[l][k])) bad.push(l + '.' + k + '=' + SD.DEMO[l][k]); });
+    });
+    assert.strictEqual(bad.length, 0, '演示区译文混进汉字 — ' + bad.slice(0, 4).join(' | '));
+    /* ④ 双向对齐：页面新增的键（原生词典没有的）恰好就是演示词典这 32 个，一个不多一个不少 */
+    const page = [];
+    (HOME_SRC.match(/data-i18n="([A-Za-z0-9_]+)"/g) || []).forEach(m => {
+      const k = m.slice(11, -1);
+      if (page.indexOf(k) < 0) page.push(k);
+    });
+    const pageNew = page.filter(k => SD.NATIVE.indexOf(k) < 0).sort();
+    assert.deepStrictEqual(pageNew, base.slice().sort(),
+      'index.html 新增的 data-i18n 键与 demo-i18n.js 的键不一致');
   });
 
   t('v0.9.302：词典 52 键 × 27 语全齐、非中日韩不混汉字、占位符保留', () => {
