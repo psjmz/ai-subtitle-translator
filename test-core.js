@@ -3433,7 +3433,7 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        不合并则一次任务（十几批）会刷出十几条。故改为按前端每次点翻译生成的任务号合并。 */
     /* v0.9.161 把三处的清洗与命中判定收进了 evFields / evHit，判据随之更新（语义不变） */
     assert.ok(/task: String\(m\.taskId \|\| ''\)/.test(srvSrc), '服务端未读取任务号');
-    assert.ok(/f\.task \? \(e\.taskId === f\.task\)/.test(srvSrc),
+    assert.ok(/if \(f\.task\) return e\.taskId === f\.task;/.test(srvSrc),
       '去重未以任务号为准（会退回成按文件名合并，第二次翻译又看不见了）');
     assert.ok(/if \(task\) ev\.taskId = task;/.test(srvSrc), '新建记录未存任务号（后续批次归不进来）');
     assert.ok(/S\.taskId = 't'/.test(html), '前端未生成任务号');
@@ -3470,8 +3470,36 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '还有地方在各自判断「文件名+语言」（口径又分散了，迟早再漏改一处）');
     assert.ok(!/e\.ip !== ip \|\| e\.file !== file/.test(srvSrc),
       'recordTokens 仍在用旧的 IP+文件名+语言 匹配');
-    /* 匹配必须先看 IP，否则跨 IP 会串账 */
-    assert.ok(/if \(e\.ip !== ip\) return false;/.test(srvSrc), 'evHit 未先校验 IP');
+    /* v0.9.337：带任务号时以任务号为准、不再比 IP；IP 校验只在无任务号的老口径里生效 */
+    assert.ok(/if \(f\.task\) return e\.taskId === f\.task;/.test(srvSrc), '带任务号时未以任务号为准');
+    assert.ok(/if \(e\.ip !== ip\) return false;/.test(srvSrc), '无任务号的老口径漏了 IP 校验（会跨 IP 串账）');
+    const hitFn = srvSrc.match(/function evHit\(e, ip, f\)\{[\s\S]*?\n\}/);
+    assert.ok(hitFn, '读不出 evHit 函数体');
+    assert.ok(hitFn[0].indexOf('if (f.task)') < hitFn[0].indexOf('e.ip !== ip'),
+      '任务号分支必须排在 IP 分支之前（否则 IP 一变任务号永远吃不到）');
+  });
+
+  /* v0.9.337：客户端走轮换住宅代理时出口 IP 每批一换，任务号不变。
+     10-18 实证：一个任务 25 批刷出 17 条事件（IP 落在两个 /24 里轮），
+     后台「已翻译字幕数」被同一任务灌了 17 次。两处修：去重认任务号、计数按任务号幂等。 */
+  t('v0.9.337 带任务号时不再比较 IP（代理轮换不再把一条任务拆成十几条）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    assert.ok(/if \(f\.task\) return e\.taskId === f\.task;/.test(srvSrc), '带任务号时仍在比 IP');
+    /* 切换痕迹要留：以后一眼能看出哪些任务是「IP 在换、任务没换」 */
+    assert.ok(/if \(e\.ip !== ip\) e\.ipSwap = \(e\.ipSwap \|\| 0\) \+ 1;/.test(srvSrc),
+      '同任务换 IP 未留痕（下次再出同样问题仍然只能靠猜）');
+  });
+
+  t('v0.9.337 字幕数按任务计一次（同一任务号不重复累加）', () => {
+    const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
+    assert.ok(/function subsCounted\(db, task, now\)/.test(srvSrc), '缺少字幕数幂等判定');
+    assert.ok(/const counted = task \? subsCounted\(db, task, now\) : false;/.test(srvSrc),
+      '新建事件前未查该任务号是否计过数');
+    assert.ok(/if \(task && !counted\) ev\.subCounted = 1;/.test(srvSrc), '新建事件未打「已计」标记');
+    assert.ok(/if \(!task \|\| !counted\) bumpStats\(\{ ip: ip, subs: 1 \}\);/.test(srvSrc),
+      '字幕数未按任务去重累加（IP 轮换会灌 N 倍）');
+    /* 回填口径必须同步，否则删掉账本重建会照着错的重犯一遍 */
+    assert.ok(/b\.subs = subsN \+ seenTask\.size;/.test(srvSrc), '回填未按任务号去重');
   });
 
   /* v0.9.162：工作台字幕表下方的 risekol 引流卡。与首页横条共用 rkTx / rkGo 文案，

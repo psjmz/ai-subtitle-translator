@@ -158,7 +158,16 @@ function backfillStats(){
     if (e && e.ip && b.ips.indexOf(e.ip) < 0) b.ips.push(e.ip);
   }
   b.ipN = b.ips.length;
-  b.subs = db.events.length;   /* 任务数口径：一条事件 = 一次翻译任务 */
+  /* v0.9.337：回填口径与线上记账对齐 —— 一次任务算一次，不是一条事件算一次。
+     历史里同一任务号被 IP 轮换拆成的多条只算一条；没有任务号的老事件（v0.9.159 之前）按条计。 */
+  const seenTask = new Set();
+  let subsN = 0;
+  for (const e of db.events){
+    if (!e) continue;
+    if (e.taskId) { seenTask.add(e.taskId); continue; }
+    subsN += 1;
+  }
+  b.subs = subsN + seenTask.size;
   b.tkIn  = db.events.reduce((a, e) => a + (Number(e.tkIn)  || 0), 0);
   b.tkOut = db.events.reduce((a, e) => a + (Number(e.tkOut) || 0), 0);
   b.tkCache = db.events.reduce((a, e) => a + (Number(e.tkCache) || 0), 0);
@@ -217,10 +226,32 @@ function evFields(meta){
     task: String(m.taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24)
   };
 }
-/* 带任务号就以任务号为准；不带（老版本页面）沿用「文件名+语言」，行为不变 */
+/* 带任务号就以任务号为准，且**不再比较 IP**；不带（老版本页面）沿用「IP+文件名+语言」，行为不变。
+   v0.9.337：IP 那句原本挡在最前面，带任务号也先过它 —— 任务号于是永远吃不到。
+   后果 10-18 实测：用户端走轮换住宅代理，出口 IP 每批一换（一个任务 25 批刷出 17 条事件、
+   IP 落在 31.171.100/101 两个 /24 里轮），而任务号整段任务不变；去重落空 → 每批新建一条事件，
+   后台「已翻译字幕数」被同一任务灌了 17 次。任务号由前端每次点「开始翻译」随机生成、
+   一次任务内恒定，比 IP 稳，故以它为准；IP 只在无任务号的老口径里参与判定。 */
 function evHit(e, ip, f){
+  if (f.task) return e.taskId === f.task;
   if (e.ip !== ip) return false;
-  return f.task ? (e.taskId === f.task) : (e.file === f.file && e.lang === f.lang);
+  return e.file === f.file && e.lang === f.lang;
+}
+/* v0.9.337：字幕数幂等键 —— 一次任务只给「已翻译字幕数」加一次。
+   上面改完 evHit 后同一任务不会再被拆成多条，这条是兜底：万一仍出现两条同任务号的记录
+   （典型是批间隔超过 30 分钟去重窗口、或中途换网络），第二条不再重复计数。
+   以事件上的 subCounted 标记为凭（只有真正加过数的新建事件才带），自带 Key 用户的轻量记录
+   不走 appendEvent、不带标记，不会被误判成「已计」。无任务号的老事件按条计，行为不变。
+   扫描上界 24 小时：事件按时间序追加，更早的不必再找。 */
+const SUBS_SCAN_MS = 24 * 60 * 60 * 1000;
+function subsCounted(db, task, now){
+  for (let i = db.events.length - 1; i >= 0; i--) {
+    const e = db.events[i];
+    if (!e || !(e.t > 0)) continue;
+    if (now - e.t > SUBS_SCAN_MS) break;
+    if (e.taskId === task && e.subCounted) return true;
+  }
+  return false;
 }
 /* v0.9.244：用户导出（下载）的字幕格式。此前后台只有「下载了几次」，
    看不出用户到底把字幕导成什么格式——ASS 样式、VTT 样式做了那么多版，
@@ -269,6 +300,9 @@ function appendEvent(ip, meta, model, extra){
          后台列表（按追加序倒序、显示 t）于是纹丝不动 → 用户翻完一次以为「后台没日志」。
          只补这一个字段，不动 t、不改任何计数口径。 */
       e.lastAt = now;
+      /* v0.9.337：本批 IP 与首条不同 → 记一笔。正常数据里不会出现这个字段，
+         后台一眼能看出哪些任务是「IP 一直在换、任务其实没换」（客户端代理轮换）。 */
+      if (e.ip !== ip) e.ipSwap = (e.ipSwap || 0) + 1;
       if (src) e.src = src;   // v0.9.179: keep the newest known source language on the record
       if (extra && typeof extra === 'object') Object.assign(e, extra);
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
@@ -282,13 +316,18 @@ function appendEvent(ip, meta, model, extra){
   if (extra && typeof extra === 'object') Object.assign(ev, extra);
   bumpRetry(ev, meta.rt);
   if (meta.fwhy) bumpFail(ev, meta.fwhy);
+  /* v0.9.337：先查这个任务号有没有计过数（见 subsCounted）。
+     v0.9.212 起字幕数是「每新建一条事件 +1」，前提是同一任务只会有一条事件；
+     IP 轮换会把一条任务拆成多条（10-18 实证：一个任务 25 批刷出 17 条、字幕数被灌 17 次），
+     故再加一层以任务号为凭的幂等键。不带任务号的老请求按条计，行为不变。 */
+  const counted = task ? subsCounted(db, task, now) : false;
+  if (task && !counted) ev.subCounted = 1;
   db.events.push(ev);
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
   fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
-  /* v0.9.212：累计账本顺带累加。位置很关键——只在「新建事件」这一处加，
-     上面那个同会话去重分支（batches+1）提前 return，不会走到这里，
-     所以同一任务的第 2/3 批不会把字幕数重复计入。自带 Key 用户进不了本函数，不受影响。 */
-  bumpStats({ ip: ip, subs: 1 });
+  /* v0.9.212：只在「新建事件」这一处累加（去重分支提前 return，第 2/3 批不会走到这里）；
+     自带 Key 用户进不了本函数，不受影响。v0.9.337：同任务号已计过则跳过。 */
+  if (!task || !counted) bumpStats({ ip: ip, subs: 1 });
 }
 /* 前端生命周期上报：翻译完成（finish）/ 下载字幕（download）。
    匹配窗口放宽到 3 小时（大文件翻译+用户迟些下载都算同一次会话），取最新一条。
