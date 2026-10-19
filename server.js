@@ -11,6 +11,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+/* v0.9.343：100 种语言的单一数据源（代码 / 自称 / dir / 是否中日韩）。
+   页脚多语言互链要用它的 zh（语言自称）与 dir 字段 —— 别在 server.js 里另抄一份名册。 */
+const LANGS100 = require(path.join(__dirname, 'langs100.js'));
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, 'data');
@@ -5183,6 +5186,51 @@ function seoHead(lang, base, page){
 }
 
 /* 按语言服务某一页（index / merge / clean）：替换 SEO head 与静态文案块 */
+/* v0.9.343：页脚多语言互链 —— 服务端渲染，爬虫不跑 JS 也能顺着爬到全部语言版本。
+   为什么需要：语言切换器是个 <select>，Googlebot 就算执行 JS 也不会去「选」它，
+   各语言版本此前只能靠 hreflang 与 sitemap 被发现。这里补一层站内可抓取的互链
+   （Wikipedia 式的紧凑排布），三条发现路径互相兜底。
+   ⚠️ 必须用绝对 URL：下面 serveIndexLang 里「按 URL 语言补前缀」那段会把 href="/xxx"
+      改写成 /<lang>/xxx，这里若写相对路径会被二次补前缀成 /ms/ms/xxx（直接 404）。
+   ⚠️ 语言自称取 LANGS100.BY_CODE[l].zh（永远用该语言自己写，不翻译成中文）；
+      rtl 语言名要带 dir="rtl"，否则混在 ltr 列表里会贴错边。 */
+function langLinksRender(base, lang, items){
+  if (!items || items.length < 2) return '';
+  const esc = function (v) {
+    return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+  const lis = items.map(function (it) {
+    const m = LANGS100.BY_CODE[it.code];
+    const dir = (m && m.dir === 'rtl') ? ' dir="rtl"' : '';
+    /* 当前语言：aria-current 给读屏器，加粗给眼睛；其余用弱化色 */
+    const cur = (it.code === lang)
+      ? ' aria-current="page" style="font-weight:600;color:var(--ink,#15151A)"'
+      : ' style="color:var(--sub,#767680)"';
+    return '<li><a href="' + base + it.url + '" hreflang="' + it.code + '" lang="' + it.code + '"'
+      + dir + cur + '>' + esc((m && m.zh) || it.code) + '</a></li>';
+  }).join('');
+  return '<nav class="langlinks" aria-label="Languages" style="max-width:1080px;margin:26px auto 0;'
+    + 'padding:14px 24px 24px;border-top:1px solid var(--line,#E9E9EF)">'
+    + '<ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;'
+    + 'gap:4px 14px;font-size:12px;line-height:1.9">'
+    + lis + '</ul></nav>';
+}
+/* 工具页：SEO_PAGES 那 17 页，每页 100 种语言 */
+function langLinksHtml(base, lang, page){
+  const P = SEO_PAGES[page];
+  if (!P) return '';
+  return langLinksRender(base, lang, SEO_LANGS.filter(function (l) { return P.table[l]; })
+    .map(function (l) { return { code: l, url: P.path[l] }; }));
+}
+/* 指南页：只列这篇指南真正有的语言版本（目前 27 语，不是 100），URL 走 guideUrl() */
+function guideLangLinksHtml(base, lang, slug){
+  const g = GUIDE_PAGES[slug];
+  if (!g) return '';
+  return langLinksRender(base, lang, guideLangs(g)
+    .map(function (l) { return { code: l, url: guideUrl(l, slug) }; }));
+}
+
 function serveIndexLang(req, res, lang, page){
   page = page || 'index';
   const P = SEO_PAGES[page];
@@ -5229,6 +5277,10 @@ function serveIndexLang(req, res, lang, page){
       ? '<!-- Google tag (gtag.js) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=' + ga + '"></script>\n<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag(\'js\', new Date());\ngtag(\'config\', \'' + ga + '\');\n</script>'
       : '';
     html = html.replace('<!--ANALYTICS-->', gaTag);
+    /* v0.9.343：页脚多语言互链。放在补前缀那段之后 —— 它生成的是绝对 URL，
+       不会被那条 href="/xxx" 的正则二次改写。 */
+    const langNav = langLinksHtml(base, lang, page);
+    if (langNav) html = html.replace('</body>', langNav + '\n</body>');
     /* v0.9.75：页面必须协调验证（no-cache），否则新版 srt-core.js?v= 参数可能被旧缓存页面屏蔽 */
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(html);
@@ -5247,9 +5299,22 @@ function serveIndexLang(req, res, lang, page){
    v0.9.321 起字幕质检 /qc.html 进表，共十七页 459 条。
    v0.9.323 起内容页（指南）进表：/guides/<slug>.html 每篇按其实际语言版本列出，
    只列 seo+body 双全的语言，不骗爬虫。第一批 5 篇 × 27 语 = 135 条，共 594 条。 */
+/* v0.9.343：<lastmod> 取源文件 mtime，W3C 日期格式（YYYY-MM-DD）。
+   Google 拿它做增量抓取判断 —— 以前一条都没有，爬虫每次只能全量重抓。
+   ⚠️ 取不到就返回空串，调用方整行省略，别输出空的 <lastmod></lastmod>。 */
+function lastmodOf(file){
+  try {
+    return fs.statSync(path.join(ROOT, file)).mtime.toISOString().slice(0, 10);
+  } catch (e) { return ''; }
+}
+function lmTag(file){
+  const d = lastmodOf(file);
+  return d ? '    <lastmod>' + d + '</lastmod>\n' : '';
+}
+
 /* v0.9.342：sitemap index —— 按语言切分，每种语言一片。
    子片命名 /sitemap-<lang>.xml（含 zh-CN 这种带连字符的），index 只列它们。
-   ⚠️ 不列 /sitemap-all.xml：那是给人排障用的全量版，别让爬虫再下一遍 19MB。 */
+   ⚠️ 不列 /sitemap-all.xml：那是给人排障用的全量版，别让爬虫再下一遍。 */
 function sitemapIndexXml(base){
   const items = SEO_LANGS.map(function (l) {
     return '  <sitemap>\n    <loc>' + base + '/sitemap-' + l + '.xml</loc>\n  </sitemap>';
@@ -5260,38 +5325,32 @@ function sitemapIndexXml(base){
 }
 
 /* v0.9.342：某一种语言的子 sitemap —— 该语言的 17 个工具页 + 该语言有的指南页。
-   ⚠️ hreflang 必须整簇重复：每个 <url> 里都要列出本页的全部语言版本（含 x-default），
-      即使同簇在别的子片里已经出现过 —— 跨 sitemap 时 Google 靠这个拼回完整簇，
-      只列自己那一条会让 hreflang 判定失败。这也是拆片后总体积不变的原因。 */
+   v0.9.343：不再写 xhtml:link。每个页面的 <head> 里已有完整双向 hreflang
+   （工具页 101 条、指南页 28 条，都含 x-default），Google 三选一即可 ——
+   sitemap 里再写一遍纯属冗余：2861 条 × 101 个 link 把文件撑到 19.6MB，去掉后约 1/34，
+   而 head 那份才是它认的主来源。
+   ⚠️ 若哪天改回在 sitemap 带 hreflang：必须整簇重复且跟 head 完全一致，
+      两处不一致会让 Google 直接忽略整组注解（比不放还糟）。 */
 function sitemapLangXml(base, lang){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {
     const P = SEO_PAGES[page];
     if (!P.table[lang]) return;
-    const langs = SEO_LANGS.filter(function (l) { return P.table[l]; });
-    const alts = langs.map(function (l) {
-      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + P.path[l] + '"/>';
-    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + P.path['en'] + '"/>';
     /* 首页权重最高，两个工具页低一档 */
     const pr = (page === 'index') ? (lang === 'zh-CN' ? '1.0' : '0.9') : (lang === 'zh-CN' ? '0.8' : '0.7');
-    urls.push('  <url>\n    <loc>' + base + P.path[lang] + '</loc>\n' + alts
-      + '\n    <changefreq>weekly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+    urls.push('  <url>\n    <loc>' + base + P.path[lang] + '</loc>\n' + lmTag(P.file)
+      + '    <changefreq>weekly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
   });
   Object.keys(GUIDE_PAGES).sort().forEach(function (slug) {
     const g = GUIDE_PAGES[slug];
     const langs = guideLangs(g);
     if (langs.indexOf(lang) < 0) return;
-    const xdef = langs.indexOf('en') >= 0 ? 'en' : langs[0];
-    const alts = langs.map(function (l) {
-      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + guideUrl(l, slug) + '"/>';
-    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + guideUrl(xdef, slug) + '"/>';
     const pr = (lang === 'zh-CN') ? '0.6' : '0.5';
-    urls.push('  <url>\n    <loc>' + base + guideUrl(lang, slug) + '</loc>\n' + alts
-      + '\n    <changefreq>monthly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+    urls.push('  <url>\n    <loc>' + base + guideUrl(lang, slug) + '</loc>\n' + lmTag('content/' + slug + '.js')
+      + '    <changefreq>monthly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
   });
   return '<?xml version="1.0" encoding="UTF-8"?>\n'
-    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
-    + '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + urls.join('\n') + '\n</urlset>\n';
 }
 
@@ -5300,14 +5359,11 @@ function sitemapXml(base){
   Object.keys(SEO_PAGES).forEach(function (page) {
     const P = SEO_PAGES[page];
     const langs = SEO_LANGS.filter(function (l) { return P.table[l]; });
-    const alts = langs.map(function (l) {
-      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + P.path[l] + '"/>';
-    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + P.path['en'] + '"/>';
     langs.forEach(function (l) {
       /* 首页权重最高，两个工具页低一档 */
       const pr = (page === 'index') ? (l === 'zh-CN' ? '1.0' : '0.9') : (l === 'zh-CN' ? '0.8' : '0.7');
-      urls.push('  <url>\n    <loc>' + base + P.path[l] + '</loc>\n' + alts
-        + '\n    <changefreq>weekly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+      urls.push('  <url>\n    <loc>' + base + P.path[l] + '</loc>\n' + lmTag(P.file)
+        + '    <changefreq>weekly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
     });
   });
   /* v0.9.323：内容页段。指南索引页 /guides/ 不进 sitemap（靠文章面包屑互链发现），
@@ -5316,19 +5372,14 @@ function sitemapXml(base){
     const g = GUIDE_PAGES[slug];
     const langs = guideLangs(g);
     if (!langs.length) return;
-    const xdef = langs.indexOf('en') >= 0 ? 'en' : langs[0];
-    const alts = langs.map(function (l) {
-      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + guideUrl(l, slug) + '"/>';
-    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + guideUrl(xdef, slug) + '"/>';
     langs.forEach(function (l) {
       const pr = (l === 'zh-CN') ? '0.6' : '0.5';
-      urls.push('  <url>\n    <loc>' + base + guideUrl(l, slug) + '</loc>\n' + alts
-        + '\n    <changefreq>monthly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+      urls.push('  <url>\n    <loc>' + base + guideUrl(l, slug) + '</loc>\n' + lmTag('content/' + slug + '.js')
+        + '    <changefreq>monthly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
     });
   });
   return '<?xml version="1.0" encoding="UTF-8"?>\n'
-    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
-    + '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + urls.join('\n') + '\n</urlset>\n';
 }
 
@@ -5641,6 +5692,9 @@ function serveGuideHtml(req, res, lang, parts) {
       ? '<!-- Google tag (gtag.js) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=' + ga + '"></script>\n<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag(\'js\', new Date());\ngtag(\'config\', \'' + ga + '\');\n</script>'
       : '';
     html = html.replace('<!--ANALYTICS-->', gaTag);
+    /* v0.9.343：页脚多语言互链（指南页版）。放在补前缀那段之后 —— 生成的是绝对 URL，
+       不会被那条 href="/xxx" 的正则二次改写。 */
+    if (P.langlinks) html = html.replace('</body>', P.langlinks + '\n</body>');
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(html);
   });
@@ -5671,6 +5725,8 @@ function serveGuide(req, res, lang, slug) {
     body: guideBodyHtml(g, lang),
     cta: guideCtaHtml(g, lang),
     rel: guideRelHtml(g, lang),
+    /* v0.9.343：指南页同样补一层可抓取的语言互链（这篇有几种语言就列几种） */
+    langlinks: guideLangLinksHtml(base, lang, slug),
     cls: ''
   });
 }

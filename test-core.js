@@ -13550,11 +13550,12 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         pg[0] + ' 缺 SEO-COPY 占位符（非中文版本的正文会退回中文）');
       assert.ok(pg[1].indexOf('<!--SEO-HEAD-START-->') >= 0, pg[0] + ' 缺 SEO-HEAD 占位符');
     });
-    /* ② x-default 指向 en（国际站惯例）：三处（页内 hreflang + 全量 sitemap + 按语言子 sitemap），且不许再指回 zh-CN。
-       v0.9.342：sitemap 拆成 index + 100 片语言子片后，x-default 从 2 处变 3 处 ——
-       子片里那一处不能少，否则拆片后每片各自缺 x-default，hreflang 簇不完整。 */
+    /* ② x-default 指向 en（国际站惯例），且不许再指回 zh-CN。
+       计数沿革：2 处（页内 + sitemap）→ 342 拆成语言子片后 3 处 → 343 起 sitemap 不再
+       重复 hreflang（head 里那份才是 Google 认的主来源），回到 1 处。
+       ⚠️ 改动 sitemap 是否带 hreflang 时，这个数要跟着走。 */
     const XD_EN = 'hreflang="x-default" href="\' + base + P.path[\'en\']';
-    assert.strictEqual(sv.split(XD_EN).length - 1, 3, 'x-default 应指向 en（页内 + 全量 sitemap + 语言子 sitemap 三处）');
+    assert.strictEqual(sv.split(XD_EN).length - 1, 1, 'x-default 应只在页内 hreflang 出现 1 处（343 起 sitemap 不重复）');
     assert.ok(sv.indexOf('hreflang="x-default" href="\' + base + P.path[\'zh-CN\']') < 0, 'x-default 又指回 zh-CN 了');
     /* ③ 十张表不许再有「被砍过」的 desc：… 结尾的、或空串的。
        （279 那条只管四张老表，这里把六张垂直工具页的表也一起管上） */
@@ -14757,6 +14758,33 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     const idxBody = sv.slice(sv.indexOf('function sitemapIndexXml'), sv.indexOf('function sitemapLangXml'));
     assert.ok(idxBody.indexOf('/sitemap-all.xml') < 0, 'sitemap index 里列了全量版（爬虫会再下 19MB）');
     assert.ok(idxBody.indexOf('sitemapindex') >= 0, 'index 用的不是 sitemapindex 根节点');
+    /* v0.9.343：sitemap 不再重复 hreflang —— head 里已有完整双向簇，重复会把文件撑到 19.6MB。
+       ⚠️ 切片从 lastmodOf 起算（它排在 sitemapIndexXml 前面），否则漏掉 lastmod 那段。
+       ⚠️ 只查 '<xhtml:link'（带尖括号）：注释里会提到 xhtml:link 这个词，不带尖括号不会误伤。 */
+    const xmlBody = sv.slice(sv.indexOf('function lastmodOf'), sv.indexOf('/* ---------------- v0.9.323'));
+    assert.ok(xmlBody.indexOf('<xhtml:link') < 0, 'sitemap 又写 xhtml:link 了（head 里已有完整 hreflang）');
+    assert.ok(xmlBody.indexOf('xmlns:xhtml') < 0, 'sitemap 还声明着 xhtml 命名空间');
+    /* v0.9.343：<lastmod> 是 Google 做增量抓取的依据，以前一条都没有 */
+    assert.ok(/<lastmod>/.test(xmlBody), 'sitemap 缺 <lastmod>（爬虫只能全量重抓）');
+    assert.ok(/function lastmodOf/.test(xmlBody), '缺 lastmodOf（lastmod 来源函数）');
+  });
+
+  t('v0.9.343：页脚多语言互链（爬虫不跑 JS 也要能发现各语言版本）', () => {
+    const sv = readT('server.js');
+    /* 三个函数：底层渲染 + 工具页版（100 语）+ 指南页版（该篇实际有的语言） */
+    assert.ok(/function langLinksRender\(base, lang, items\)/.test(sv), '缺 langLinksRender');
+    assert.ok(/function langLinksHtml\(base, lang, page\)/.test(sv), '缺 langLinksHtml（工具页）');
+    assert.ok(/function guideLangLinksHtml\(base, lang, slug\)/.test(sv), '缺 guideLangLinksHtml（指南页）');
+    /* 两处注入点：17 个工具页走 serveIndexLang，指南页走 serveGuideHtml */
+    assert.ok(/langLinksHtml\(base, lang, page\)/.test(sv), 'serveIndexLang 里没注入页脚互链');
+    assert.ok(/P\.langlinks/.test(sv), 'serveGuideHtml 里没注入页脚互链');
+    const body = sv.slice(sv.indexOf('function langLinksRender'), sv.indexOf('function serveIndexLang'));
+    /* 必须绝对 URL：相对路径会被「按 URL 语言补前缀」二次改写成 /xx/xx/（404） */
+    assert.ok(/href="' \+ base \+ it\.url/.test(body), '互链用了相对路径（会被补前缀逻辑二次改写）');
+    /* 语言自称走 langs100.js 单一数据源；rtl 语言名要自带 dir，否则混排贴错边 */
+    assert.ok(/LANGS100\.BY_CODE/.test(body), '语言名没走 LANGS100（另抄名册迟早不一致）');
+    assert.ok(/dir="rtl"/.test(body), 'rtl 语言名没带 dir="rtl"');
+    assert.ok(/require\(path\.join\(__dirname, 'langs100\.js'\)\)/.test(sv), 'server.js 没引用 langs100.js');
   });
 
   if (have.length !== files.length)
