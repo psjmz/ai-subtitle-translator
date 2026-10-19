@@ -48,7 +48,7 @@
     if (pending[lang]) { pending[lang].push(fire); return; }
     pending[lang] = [fire];
     var el = document.createElement('script');
-    el.src = '/i18n/ui-' + lang + '.js?v=0.9.340';
+    el.src = '/i18n/ui-' + lang + '.js?v=0.9.341';
     el.async = false;
     el.onload = el.onerror = function () {
       var q = pending[lang] || [];
@@ -64,5 +64,5 @@
   if (!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(lang)) return;
 
   /* v= 与页面版号绑定；分片本身是 no-cache + Last-Modified，带 v 只是让 CDN 层也换 */
-  document.write('<script src="/i18n/ui-' + lang + '.js?v=0.9.340"><\/script>');
+  document.write('<script src="/i18n/ui-' + lang + '.js?v=0.9.341"><\/script>');
 })();

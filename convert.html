@@ -114,7 +114,7 @@
     .navpills{display:none}
   }
 </style>
-<script src="ui-codes.js?v=0.9.340"></script>
+<script src="ui-codes.js?v=0.9.341"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -187,8 +187,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="convert-i18n.js?v=0.9.340"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
-<script src="convert-core.js?v=0.9.340"></script>
+<script src="convert-i18n.js?v=0.9.341"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="convert-core.js?v=0.9.341"></script>
 <script>
 'use strict';
 var I18N = window.CONVERT_I18N.DICT, LANGS = window.CONVERT_I18N.LANGS;
@@ -213,6 +214,8 @@ function applyI18n() {
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
   });
   document.documentElement.lang = LANG;
+  /* 阿拉伯语 / 希伯来语 / 波斯语等整页从右往左排 */
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
   /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
      中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「SubtitleConverter」。
      v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
@@ -280,15 +283,18 @@ function pathUiLang() {
   return null;
 }
 function initLang() {
+  TP_ADD_LANGS(LANGS);
   var sel = $('#langSel');
   sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
   var saved = 'zh-CN';
   try { saved = localStorage.getItem('srt_convert_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
   if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
   LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'convert'); if (__tp) I18N[LANG] = __tp; }
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'convert')) return;
     try { localStorage.setItem('srt_convert_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
     applyI18n();
     render();
@@ -473,6 +479,6 @@ function bind() {
     <p style="margin-top:8px;">拿到字幕但播放器不认的人、要在剪辑软件与网页播放器之间来回倒素材的人。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.340" data-tool="cv"></script>
+<script src="site-topnav.js?v=0.9.341" data-tool="cv"></script>
 </body>
 </html>

@@ -140,7 +140,7 @@
     .navpills{display:none}
   }
 </style>
-<script src="ui-codes.js?v=0.9.340"></script>
+<script src="ui-codes.js?v=0.9.341"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -228,8 +228,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="glossary-i18n.js?v=0.9.340"></script>
-<script src="glossary-core.js?v=0.9.340"></script>
+<script src="glossary-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="glossary-core.js?v=0.9.341"></script>
 <script>
 'use strict';
 var I18N = window.GLOSSARY_I18N.DICT, LANGS = window.GLOSSARY_I18N.LANGS;
@@ -511,15 +512,18 @@ function pathUiLang() {
   return null;
 }
 function initLang() {
+  TP_ADD_LANGS(LANGS);
   var sel = $('#langSel');
   sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
   var saved = 'zh-CN';
   try { saved = localStorage.getItem('srt_glossary_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
   if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
   LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'glossary'); if (__tp) I18N[LANG] = __tp; }
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'glossary')) return;
     try { localStorage.setItem('srt_glossary_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
     applyI18n();
   });
@@ -595,6 +599,6 @@ function syncScopeSeg() {
     <p style="margin-top:8px;">适合统一人名地名译名、替换专有名词与术语、批量修掉机器翻译里翻错的词。支持 SRT、VTT、ASS、SBV、LRC、TXT。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.340" data-tool="gl"></script>
+<script src="site-topnav.js?v=0.9.341" data-tool="gl"></script>
 </body>
 </html>

@@ -151,7 +151,7 @@
     .iss .rn{min-width:0}
   }
 </style>
-<script src="ui-codes.js?v=0.9.340"></script>
+<script src="ui-codes.js?v=0.9.341"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -257,8 +257,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="qc-i18n.js?v=0.9.340"></script>
-<script src="qc-core.js?v=0.9.340"></script>
+<script src="qc-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="qc-core.js?v=0.9.341"></script>
 <script>
 'use strict';
 var I18N = window.QC_I18N.DICT, LANGS = window.QC_I18N.LANGS;
@@ -621,15 +622,18 @@ function updateLangLinks() {
   $('#goTr').href = pre + '/translate.html';
 }
 function initLang() {
+  TP_ADD_LANGS(LANGS);
   var sel = $('#langSel');
   LANGS.forEach(function (pair) { var o = document.createElement('option'); o.value = pair[0]; o.textContent = pair[1]; sel.appendChild(o); });
   var saved = null;
   try { saved = localStorage.getItem('qcUiLang'); } catch (e) { }
   var pLang = pathUiLang();
   LANG = pLang || ((saved && LANGS.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'qc'); if (__tp) I18N[LANG] = __tp; }
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'qc')) return;
     try { localStorage.setItem('qcUiLang', LANG); } catch (e) { }
     applyI18n(); updateLangLinks();
     if (S.res) renderReport();
@@ -671,6 +675,6 @@ applyI18n();
     <p style="margin-top:8px;">给译制组、字幕组、剪辑师和本地化团队，在交付前把字幕过一遍。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.340" data-tool="qc"></script>
+<script src="site-topnav.js?v=0.9.341" data-tool="qc"></script>
 </body>
 </html>

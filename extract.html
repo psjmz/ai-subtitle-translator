@@ -120,7 +120,7 @@
     .navpills{display:none}
   }
 </style>
-<script src="ui-codes.js?v=0.9.340"></script>
+<script src="ui-codes.js?v=0.9.341"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -199,8 +199,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="extract-i18n.js?v=0.9.340"></script>
-<script src="extract-core.js?v=0.9.340"></script>
+<script src="extract-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="extract-core.js?v=0.9.341"></script>
 <script>
 'use strict';
 var I18N = window.EXTRACT_I18N.DICT, LANGS = window.EXTRACT_I18N.LANGS;
@@ -402,15 +403,18 @@ function pathUiLang() {
   return null;
 }
 function initLang() {
+  TP_ADD_LANGS(LANGS);
   var sel = $('#langSel');
   sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
   var saved = 'zh-CN';
   try { saved = localStorage.getItem('srt_extract_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
   if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
   LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'extract'); if (__tp) I18N[LANG] = __tp; }
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'extract')) return;
     try { localStorage.setItem('srt_extract_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
     applyI18n();
   });
@@ -478,6 +482,6 @@ function syncLayoutSeg() {
     <p style="margin-top:8px;">需要把 SRT 转成 TXT 做笔记、把访谈字幕整理成文稿、给视频写文字稿、或者只想快速读一遍台词的人。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.340" data-tool="ex"></script>
+<script src="site-topnav.js?v=0.9.341" data-tool="ex"></script>
 </body>
 </html>

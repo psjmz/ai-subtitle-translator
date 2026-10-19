@@ -238,7 +238,7 @@
     .li .tx{white-space:normal}
   }
 </style>
-<script src="ui-codes.js?v=0.9.340"></script>
+<script src="ui-codes.js?v=0.9.341"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -337,8 +337,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="shift-i18n.js?v=0.9.340"></script>
-<script src="shift-core.js?v=0.9.340"></script>
+<script src="shift-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="shift-core.js?v=0.9.341"></script>
 <script>
 'use strict';
 var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
@@ -529,15 +530,18 @@ function pathUiLang() {
   return null;
 }
 function initLang() {
+  TP_ADD_LANGS(LANGS);
   var sel = $('#langSel');
   sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
   var saved = 'zh-CN';
   try { saved = localStorage.getItem('srt_shift_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
   if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
   LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'shift'); if (__tp) I18N[LANG] = __tp; }
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'shift')) return;
     try { localStorage.setItem('srt_shift_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
     applyI18n();
     renderAll();
@@ -1050,6 +1054,6 @@ function bind() {
     <p style="margin-top:8px;">需要把字幕对齐画面的人：换了片源、字幕整体快了慢了、拿到的是别人按不同帧率做的字幕，或者一句话被切得太碎、一条字幕在屏幕上停太久。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.340" data-tool="sh"></script>
+<script src="site-topnav.js?v=0.9.341" data-tool="sh"></script>
 </body>
 </html>

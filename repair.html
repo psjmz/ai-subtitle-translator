@@ -214,7 +214,7 @@
     .cand .tx{white-space:normal;min-width:100%}
   }
 </style>
-<script src="ui-codes.js?v=0.9.340"></script>
+<script src="ui-codes.js?v=0.9.341"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -293,8 +293,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="repair-i18n.js?v=0.9.340"></script>
-<script src="repair-core.js?v=0.9.340"></script>
+<script src="repair-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="repair-core.js?v=0.9.341"></script>
 <script>
 'use strict';
 var I18N = window.REPAIR_I18N.DICT, LANGS = window.REPAIR_I18N.LANGS;
@@ -557,15 +558,18 @@ function pathUiLang() {
   return null;
 }
 function initLang() {
+  TP_ADD_LANGS(LANGS);
   var sel = $('#langSel');
   sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
   var saved = 'zh-CN';
   try { saved = localStorage.getItem('srt_repair_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
   if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
   LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'repair'); if (__tp) I18N[LANG] = __tp; }
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'repair')) return;
     try { localStorage.setItem('srt_repair_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
     applyI18n();
     if (S.list.length) { renderCands(); }
@@ -617,6 +621,6 @@ function bind() {
     <p style="margin-top:8px;">下载的字幕打开是一堆怪字、播放器里中文全是方块、或者从别人手里拿到一份编码不明的字幕文件的人。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.340" data-tool="rp"></script>
+<script src="site-topnav.js?v=0.9.341" data-tool="rp"></script>
 </body>
 </html>

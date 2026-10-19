@@ -121,7 +121,7 @@
     .fitem .meta{display:none}
   }
 </style>
-<script src="ui-codes.js?v=0.9.340"></script>
+<script src="ui-codes.js?v=0.9.341"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -186,9 +186,10 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="jszip.min.js?v=0.9.340"></script>
-<script src="batch-i18n.js?v=0.9.340"></script>
-<script src="batch-core.js?v=0.9.340"></script>
+<script src="jszip.min.js?v=0.9.341"></script>
+<script src="batch-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="batch-core.js?v=0.9.341"></script>
 <script>
 'use strict';
 var I18N = window.BATCH_I18N.DICT, LANGS = window.BATCH_I18N.LANGS;
@@ -213,6 +214,9 @@ function esc(s) {
 /* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 /* ---------- i18n 应用 ---------- */
 function applyI18n() {
+  document.documentElement.lang = LANG;
+  /* 阿拉伯语 / 希伯来语 / 波斯语等整页从右往左排 */
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
   document.querySelectorAll('[data-i18n]').forEach(function (el) {
     el.textContent = t(el.getAttribute('data-i18n'));
   });
@@ -248,15 +252,18 @@ function updateLangLinks() {
   $('#logoHome').href = pre + '/';
 }
 function initLang() {
+  TP_ADD_LANGS(LANGS);
   var sel = $('#langSel');
   LANGS.forEach(function (pair) { var o = document.createElement('option'); o.value = pair[0]; o.textContent = pair[1]; sel.appendChild(o); });
   var saved = null;
   try { saved = localStorage.getItem('batchUiLang'); } catch (e) { }
   var pLang = pathUiLang();
   LANG = pLang || ((saved && LANGS.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'batch'); if (__tp) I18N[LANG] = __tp; }
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'batch')) return;
     try { localStorage.setItem('batchUiLang', LANG); } catch (e) { }
     applyI18n(); updateLangLinks(); rerender();
   });
@@ -411,6 +418,6 @@ applyI18n();
     <p style="margin-top:8px;">要给整个剧集目录换格式、给播放器统一喂 VTT 的剪辑师、字幕组、站长。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.340" data-tool="bt"></script>
+<script src="site-topnav.js?v=0.9.341" data-tool="bt"></script>
 </body>
 </html>
