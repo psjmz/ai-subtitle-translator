@@ -784,8 +784,23 @@ function serveStatic(req, res, urlPath){
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end(body); return;
   }
+  /* v0.9.342：sitemap 拆成 index + 按语言的子 sitemap。
+     之前是单个 19.6MB 的巨型文件（2861 条 URL × 每条 101 个 xhtml:link），
+     爬虫每次都要整包重下；拆开后每片 ~190KB，可按语言增量、单独重抓。
+     ⚠️ /sitemap-all.xml 保留全量版（排障/第三方工具要用），但不进 index、不进 robots。 */
   if (p === '/sitemap.xml' && baseUrl) {
+    const body = sitemapIndexXml(baseUrl);
+    res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8' });
+    res.end(body); return;
+  }
+  if (p === '/sitemap-all.xml' && baseUrl) {
     const body = sitemapXml(baseUrl);
+    res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8' });
+    res.end(body); return;
+  }
+  const smLang = /^\/sitemap-([a-zA-Z][a-zA-Z-]*)\.xml$/.exec(p);
+  if (smLang && baseUrl && SEO_LANGS.indexOf(smLang[1]) >= 0) {
+    const body = sitemapLangXml(baseUrl, smLang[1]);
     res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8' });
     res.end(body); return;
   }
@@ -5060,6 +5075,18 @@ const SEO_OG_LOCALE = {
     SEO_ROUTE['/' + lang + '/'] = lang;
     for (var pg in SEO_PAGES) {
       if (data[pg]) SEO_PAGES[pg].table[lang] = data[pg];
+      /* ④ 工具页路径。16 个 *_PATH 早在 2203 行就 SEO_LANGS.forEach 跑完了，
+         73 种新语言是之后才 push 进 SEO_LANGS 的 —— 那 16 张表从此没有它们的条目。
+         后果：seoHead() 里 base + P.path[lang] 拼成 "https://ai-srtsub.comundefined"，
+         每个工具页的 canonical + 73 条 hreflang 全指向无效 URL，sitemap.xml 同样被污染
+         （语言首页没事，因为 SEO_PATH 在上面单独补过）。
+         ⚠️ 路径跟该页有没有 seo 数据无关（路由本身是确定的），所以放在 if 外边。
+         ⚠️ index 的 path 就是 SEO_PATH，上面刚赋过值；if 保护避免被覆盖成 /xx/index.html。 */
+      if (!SEO_PAGES[pg].path[lang]) {
+        SEO_PAGES[pg].path[lang] = (lang === 'zh-CN')
+          ? '/' + SEO_PAGES[pg].file
+          : '/' + lang + '/' + SEO_PAGES[pg].file;
+      }
     }
   }
 })();
@@ -5220,6 +5247,54 @@ function serveIndexLang(req, res, lang, page){
    v0.9.321 起字幕质检 /qc.html 进表，共十七页 459 条。
    v0.9.323 起内容页（指南）进表：/guides/<slug>.html 每篇按其实际语言版本列出，
    只列 seo+body 双全的语言，不骗爬虫。第一批 5 篇 × 27 语 = 135 条，共 594 条。 */
+/* v0.9.342：sitemap index —— 按语言切分，每种语言一片。
+   子片命名 /sitemap-<lang>.xml（含 zh-CN 这种带连字符的），index 只列它们。
+   ⚠️ 不列 /sitemap-all.xml：那是给人排障用的全量版，别让爬虫再下一遍 19MB。 */
+function sitemapIndexXml(base){
+  const items = SEO_LANGS.map(function (l) {
+    return '  <sitemap>\n    <loc>' + base + '/sitemap-' + l + '.xml</loc>\n  </sitemap>';
+  }).join('\n');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    + items + '\n</sitemapindex>\n';
+}
+
+/* v0.9.342：某一种语言的子 sitemap —— 该语言的 17 个工具页 + 该语言有的指南页。
+   ⚠️ hreflang 必须整簇重复：每个 <url> 里都要列出本页的全部语言版本（含 x-default），
+      即使同簇在别的子片里已经出现过 —— 跨 sitemap 时 Google 靠这个拼回完整簇，
+      只列自己那一条会让 hreflang 判定失败。这也是拆片后总体积不变的原因。 */
+function sitemapLangXml(base, lang){
+  const urls = [];
+  Object.keys(SEO_PAGES).forEach(function (page) {
+    const P = SEO_PAGES[page];
+    if (!P.table[lang]) return;
+    const langs = SEO_LANGS.filter(function (l) { return P.table[l]; });
+    const alts = langs.map(function (l) {
+      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + P.path[l] + '"/>';
+    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + P.path['en'] + '"/>';
+    /* 首页权重最高，两个工具页低一档 */
+    const pr = (page === 'index') ? (lang === 'zh-CN' ? '1.0' : '0.9') : (lang === 'zh-CN' ? '0.8' : '0.7');
+    urls.push('  <url>\n    <loc>' + base + P.path[lang] + '</loc>\n' + alts
+      + '\n    <changefreq>weekly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+  });
+  Object.keys(GUIDE_PAGES).sort().forEach(function (slug) {
+    const g = GUIDE_PAGES[slug];
+    const langs = guideLangs(g);
+    if (langs.indexOf(lang) < 0) return;
+    const xdef = langs.indexOf('en') >= 0 ? 'en' : langs[0];
+    const alts = langs.map(function (l) {
+      return '    <xhtml:link rel="alternate" hreflang="' + l + '" href="' + base + guideUrl(l, slug) + '"/>';
+    }).join('\n') + '\n    <xhtml:link rel="alternate" hreflang="x-default" href="' + base + guideUrl(xdef, slug) + '"/>';
+    const pr = (lang === 'zh-CN') ? '0.6' : '0.5';
+    urls.push('  <url>\n    <loc>' + base + guideUrl(lang, slug) + '</loc>\n' + alts
+      + '\n    <changefreq>monthly</changefreq>\n    <priority>' + pr + '</priority>\n  </url>');
+  });
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n'
+    + '        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+    + urls.join('\n') + '\n</urlset>\n';
+}
+
 function sitemapXml(base){
   const urls = [];
   Object.keys(SEO_PAGES).forEach(function (page) {

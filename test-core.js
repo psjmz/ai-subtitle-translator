@@ -13550,9 +13550,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         pg[0] + ' 缺 SEO-COPY 占位符（非中文版本的正文会退回中文）');
       assert.ok(pg[1].indexOf('<!--SEO-HEAD-START-->') >= 0, pg[0] + ' 缺 SEO-HEAD 占位符');
     });
-    /* ② x-default 指向 en（国际站惯例）：两处（页内 hreflang + sitemap），且不许再指回 zh-CN */
+    /* ② x-default 指向 en（国际站惯例）：三处（页内 hreflang + 全量 sitemap + 按语言子 sitemap），且不许再指回 zh-CN。
+       v0.9.342：sitemap 拆成 index + 100 片语言子片后，x-default 从 2 处变 3 处 ——
+       子片里那一处不能少，否则拆片后每片各自缺 x-default，hreflang 簇不完整。 */
     const XD_EN = 'hreflang="x-default" href="\' + base + P.path[\'en\']';
-    assert.strictEqual(sv.split(XD_EN).length - 1, 2, 'x-default 应指向 en（页内 + sitemap 两处）');
+    assert.strictEqual(sv.split(XD_EN).length - 1, 3, 'x-default 应指向 en（页内 + 全量 sitemap + 语言子 sitemap 三处）');
     assert.ok(sv.indexOf('hreflang="x-default" href="\' + base + P.path[\'zh-CN\']') < 0, 'x-default 又指回 zh-CN 了');
     /* ③ 十张表不许再有「被砍过」的 desc：… 结尾的、或空串的。
        （279 那条只管四张老表，这里把六张垂直工具页的表也一起管上） */
@@ -14720,6 +14722,41 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     const idSrc = readT('index.html'), trSrc = readT('translate.html');
     assert.ok(/SiteI18N\.loadShard\(UI\.lang,\s*go\)/.test(idSrc), 'index.html 切语言时没走 loadShard');
     assert.ok(/SiteI18N\.loadShard\(UI\.lang,\s*go\)/.test(trSrc), 'translate.html 切语言时没走 loadShard');
+  });
+
+  t('v0.9.342：工具页 canonical/hreflang 不许拼出 undefined（16 张 *_PATH 缺 73 语）', () => {
+    const sv = readT('server.js');
+    /* 根因：16 个 *_PATH 是在 SEO_LANGS.forEach 那一段跑的，而 73 种新语言是之后
+       loadSeoShards() 才 push 进 SEO_LANGS 的 —— 那 16 张表从此没有新语言的条目，
+       seoHead() 里 base + P.path[lang] 于是拼成 "https://ai-srtsub.comundefined"，
+       每个工具页的 canonical + 73 条 hreflang 全指向无效 URL，sitemap 同样被污染。
+       语言首页没事（SEO_PATH 单独补过），所以只查工具页这边。 */
+    const shard = sv.slice(sv.indexOf('function loadSeoShards'), sv.indexOf('/* 静态文案块'));
+    assert.ok(shard.indexOf('function loadSeoShards') >= 0, 'loadSeoShards 定位失败（源码结构变了）');
+    assert.ok(/SEO_PAGES\[pg\]\.path\[lang\]/.test(shard),
+      'loadSeoShards 没有补 SEO_PAGES[].path —— 新语言的工具页 canonical/hreflang 会拼出 undefined');
+    /* 必须带 if 保护：index 的 path 就是 SEO_PATH，zh-CN 的值是 '/'，
+       无条件覆盖会写成 '/zh-CN/index.html'，等于把中文首页踢出根路径。 */
+    assert.ok(/if\s*\(!SEO_PAGES\[pg\]\.path\[lang\]\)/.test(shard),
+      '补 path 没带 if 保护（会覆盖 index 已设的 zh-CN -> /）');
+    /* 路径取值要落在页自己的 file 上，不能写死某个页面名 */
+    assert.ok(/SEO_PAGES\[pg\]\.file/.test(shard), '补 path 没有用 SEO_PAGES[pg].file（会漏页/写死）');
+  });
+
+  t('v0.9.342：sitemap 拆成 index + 语言子片（单文件 19.6MB 太大）', () => {
+    const sv = readT('server.js');
+    /* 三样都要有：index 生成器、按语言的子片生成器、两条路由（index + 子片） */
+    assert.ok(/function sitemapIndexXml\(base\)/.test(sv), '缺 sitemapIndexXml（/sitemap.xml 还是 19.6MB 全量）');
+    assert.ok(/function sitemapLangXml\(base, lang\)/.test(sv), '缺 sitemapLangXml（没有按语言的子片）');
+    assert.ok(/\/sitemap-index|p === '\/sitemap\.xml' && baseUrl/.test(sv), '/sitemap.xml 路由没接上');
+    /* 子片路由正则要能吃下 zh-CN 这种带连字符的语言码 */
+    const m = /const smLang = \/\^\\\/sitemap-\(([^)]*)\)\\\.xml\$/.exec(sv);
+    assert.ok(m, '找不到子片路由正则 /^\\/sitemap-(...)\\.xml$/');
+    assert.ok(m[1].indexOf('-') >= 0, '子片正则没放行连字符（zh-CN / zh-TW 会 404）：' + m[1]);
+    /* index 只列语言子片，不许把 19MB 的全量版塞进去让爬虫重下一遍 */
+    const idxBody = sv.slice(sv.indexOf('function sitemapIndexXml'), sv.indexOf('function sitemapLangXml'));
+    assert.ok(idxBody.indexOf('/sitemap-all.xml') < 0, 'sitemap index 里列了全量版（爬虫会再下 19MB）');
+    assert.ok(idxBody.indexOf('sitemapindex') >= 0, 'index 用的不是 sitemapindex 根节点');
   });
 
   if (have.length !== files.length)
