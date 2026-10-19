@@ -261,7 +261,7 @@
      这里量一次「单行需要多宽」，放不下就加 .tnav-tight 收字号与内边距；
      收完仍放不下的（极少数）照旧折行，下拉菜单由 placeMenu() 夹在视口内兜底。 */
   function tighten(box) {
-    box.className = box.className.replace(/s*tnav-tight2?/g, '');
+    box.className = box.className.replace(/\s*tnav-tight2?/g, '');
     /* ⚠️ 不要用「算一遍可用宽度再比 max-content」：logo 是 flex 子项，会先被压窄
           （德语在 1080 里 logo 从 180 缩到 168），按缩窄后的宽度算就永远「放得下」，
           可实际还是折行 —— 第一次就是这么误判的。
