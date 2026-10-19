@@ -179,7 +179,7 @@
     assApply: 'Ulanyjy',
     assUndo: 'Yzyna al',
     lblOutlineShort: 'Kontur',
-    lblFontShort: 'Şрифт',
+    lblFontShort: 'Şrift',
     lblAlphaShort: 'Mötülük',
     secVttStyle: 'WebVTT subtitr stili',
     lblVttLine: 'Tikin setir',

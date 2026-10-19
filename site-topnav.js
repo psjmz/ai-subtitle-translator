@@ -13,15 +13,22 @@
    用法（页面侧只需两处）：
      1) 在页头放占位：<span id="topNav"></span>
      2) body 末尾引入：<script src="site-topnav.js?v=0.9.318" data-tool="tr"><\/script>
-        data-tool 填本页 id（tr/fx/cv/tb/hc/bi/sp/sh/cl/lr/ex/vs/rp/gl/bt/qc；首页留空），
+        data-tool 填本页 id（tr/fx/gd/cv/tb/hc/bi/sp/sh/cl/lr/ex/vs/rp/gl/bt/qc；首页留空），
         当前页在主项与下拉里都会高亮。
 
    词典来源：
-     · 16 个工具名 navXx × 27 语 —— 收割自 split-i18n.js（全站同名同译，真翻 27 语）；
-     · 13 个一句话描述 tcXxD × 27 语 —— 收割自 site-i18n.js（与首页工具卡片同文案）；
+     · 17 个工具名 navXx × 27 语 —— 收割自 split-i18n.js（全站同名同译，真翻 27 语）；
+       其中 navGuide / navQc 两键那边没有，落在本生成器的 HAND 里（见后）；
+     · 14 个一句话描述 tcXxD × 27 语 —— 收割自 site-i18n.js（与首页工具卡片同文案）；
+       其中 tcQcD 同样落在 HAND 里；
      · 7 个手写键（tnVd/tnMore/tnG1..tnG4/tnAll）× 27 语。
    本文件自包含、零依赖，不引 site-i18n.js / site-nav.js；
    改词典/配色/图标 → 改 _mk_topnav.js → 重跑生成 → 三副本同步。
+
+   v0.9.339：界面语言 27 → 100。上面三张表只有 27 语（这三个键集不在
+      ui-<lang>.js 的 337 键核心集里，339 那轮扩容漏了它们，结果 73 种新语言的
+      顶栏整栏回落英文）。补翻的 37 个键按语言单独成片 i18n/tnav-<lang>.js，
+     由本文件在解析期 document.write 同步注入 —— 27 个内置语言零额外请求。
    ============================================================================= */
 (function (w, d) {
   'use strict';
@@ -158,13 +165,41 @@
 
   var L = 'zh-CN';
 
-  /* ---------- 语言：URL 前缀 → 语言下拉 → html[lang] → navigator，逐级兜底 ---------- */
+  /* ---------- 100 种界面语言代码（v0.9.339 起） ----------
+     ⚠️ 与 site-i18n.js 的 UI_LANGS / ui-codes.js 同源，由 _mk_topnav.js 生成时内联。
+        为什么不直接读 window.UI_CODES：本文件刻意零依赖（15 个工具页不加载主词典，
+        只有部分页面引了 ui-codes.js），内联一份 0.6KB 数组比引入加载顺序约束更稳。 */
+  var UI100 = ["en","zh-CN","zh-TW","ja","ko","fr","de","es","pt","it","ru","ar","th","vi","id","hi","tr","pl","nl","ms","fil","fa","sv","da","fi","nb","cs","sk","hu","ro","ca","hr","el","uk","sr","bg","he","ur","bn","ta","te","mr","ne","si","my","km","lo","sw","gu","kn","ml","pa","or","as","kk","uz","mn","az","is","et","lv","lt","sl","sq","mk","eu","gl","am","ha","yo","zu","so","ps","ku","af","yue","be","tg","ky","tk","bs","mt","cy","ga","hy","ka","ti","bo","ug","sd","yi","jv","su","ceb","mg","ig","xh","sn","ny","mi"];
+
+  /* ---------- 顶栏文案分片（v0.9.339 起） ----------
+     三张表只到 27 语；27 语之外的语言从 /i18n/tnav-<lang>.js 取。
+     ⚠️ 必须同步注入（document.write）：顶栏是首屏内容，异步加载会先渲染一遍英文再跳成本地语言。
+     ⚠️ 位置的两条约束：
+        1) 必须在 SEL_IDS / TOOLS 等 var 之后 —— resolveLang() 会读 SEL_IDS，
+           放早了它是 undefined，直接 TypeError 炸掉整个顶栏；
+        2) 必须在下方取 d.currentScript（CUR）之前 —— document.write 插进来的
+           脚本会改变 currentScript，那时再取就取不到 data-tool 了。
+        resolveLang 是函数声明，会被提升，所以这里调用没问题。 */
+  var SH = w.__TNAV__ || (w.__TNAV__ = {});
+  (function () {
+    var l0 = resolveLang();                 /* 只依赖 UI100，不依赖分片，可以提前算 */
+    if (!l0 || N[l0]) return;               /* 内置 27 语：三张表里已有，不发请求 */
+    if (!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(l0)) return;
+    /* ⚠️ 这里的版号要跟整站版号一起升（?v= 是缓存键）。_bumpNNN.py 只改交付文件、
+           不改本脚本（_ 开头一律跳过），所以升版时记得顺手改这一行 + 下面第 0 行。 */
+    d.write('<script src="/i18n/tnav-' + l0 + '.js?v=0.9.340"><\/script>');
+  })();
+
+  /* ---------- 语言：URL 前缀 → 语言下拉 → html[lang] → navigator，逐级兜底 ----------
+     ⚠️ v0.9.339：候选集从「N 表的 27 语」换成 UI100（100 语）。
+        不改这里的话，73 种新语言一律判不出来 → 退回 navigator.language，
+        于是中文访客进 /ms/ 看到的是中文顶栏（与 339 那轮 pathUiLang 同一个坑）。 */
   function norm(x) {
     if (!x) return null;
     x = String(x).trim();
-    if (N[x]) return x;
+    if (N[x] || UI100.indexOf(x) >= 0) return x;
     var lo = x.toLowerCase();
-    var ks = Object.keys(N);
+    var ks = UI100;
     for (var i = 0; i < ks.length; i++) if (ks[i].toLowerCase() === lo) return ks[i];
     if (/^zh/i.test(x)) return /tw|hk|mo|hant/i.test(x) ? 'zh-TW' : 'zh-CN';
     var p = lo.split('-')[0];
@@ -173,7 +208,10 @@
   }
   function resolveLang() {
     var cands = [];
-    var m = String(w.location && w.location.pathname || '').match(/^\/([a-zA-Z]{2}(?:-[A-Za-z]{2,4})?)\//);
+    /* ⚠️ 原来是 {2} —— 三个字母的语言码（yue / fil / ceb）根本匹配不到，
+       在 /yue/ 这类路径下顶栏会直接跳过 URL 判定。改成 {2,3}，
+       末尾也从「必须有 /」放宽到「/ 或 ? 或 # 或结尾」，覆盖 /ms 与 /ms/index.html。 */
+    var m = String(w.location && w.location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[A-Za-z]{2,4})?)(?:[\/#?]|$)/);
     if (m) cands.push(m[1]);
     /* 语言下拉排在 html[lang] 前：用户在页内切语言时，有的页不回写 html[lang]
        （如 split 页的 applyI18n 不设），select 的实时值才是用户的选择 */
@@ -190,16 +228,21 @@
     }
     return 'zh-CN';
   }
+  /* 三张表的取值统一走「分片 → 内嵌 27 语 → 英文」三级。
+     ⚠️ 顺序不能反：分片键与内嵌键有交集（navGuide / tcClD 两边都有），
+        分片里的是该语言真翻的，内嵌 27 语里对 73 种新语言根本不存在该语言的列，
+        所以分片必须优先 —— 反过来写就永远取不到新语言译文。 */
   function t(k) {   /* 手写键：T 表 */
-    return (T[L] && T[L][k]) || (T['en'] && T['en'][k]) || k;
+    var s = SH[L];
+    return (s && s[k]) || (T[L] && T[L][k]) || (T['en'] && T['en'][k]) || k;
   }
   function tn(k) {  /* 工具名：N 表 */
-    var b = N[L] || N['en'];
-    return (b && b[k]) || (N['en'] && N['en'][k]) || k;
+    var s = SH[L], b = N[L] || N['en'];
+    return (s && s[k]) || (b && b[k]) || (N['en'] && N['en'][k]) || k;
   }
   function td(k) {  /* 工具描述：D 表 */
-    var b = D[L] || D['en'];
-    return (b && b[k]) || (D['en'] && D['en'][k]) || '';
+    var s = SH[L], b = D[L] || D['en'];
+    return (s && s[k]) || (b && b[k]) || (D['en'] && D['en'][k]) || '';
   }
   /* 链接语言前缀跟「当前界面语言」走（与各页 updateLangLinks / 服务端同口径） */
   function lp(href) { return (L === 'zh-CN' ? '' : '/' + L) + href; }
@@ -210,6 +253,47 @@
     return '<svg viewBox="0 0 24 24" width="' + (size || 17) + '" height="' + (size || 17) +
       '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" ' +
       'stroke-linejoin="round" aria-hidden="true">' + ICONS[id] + '</svg>';
+  }
+
+  /* ---------- 放不下就收一点（v0.9.339 补） ----------
+     100 语里有十几种（卡纳达、亚美尼亚、保加利亚…）单行比 .lnav 的 1080 还宽，
+     一折行「更多工具」就掉到第二行左端 —— 视觉上像导航散架。
+     这里量一次「单行需要多宽」，放不下就加 .tnav-tight 收字号与内边距；
+     收完仍放不下的（极少数）照旧折行，下拉菜单由 placeMenu() 夹在视口内兜底。 */
+  function tighten(box) {
+    box.className = box.className.replace(/s*tnav-tight2?/g, '');
+    /* ⚠️ 不要用「算一遍可用宽度再比 max-content」：logo 是 flex 子项，会先被压窄
+          （德语在 1080 里 logo 从 180 缩到 168），按缩窄后的宽度算就永远「放得下」，
+          可实际还是折行 —— 第一次就是这么误判的。
+          直接看结果：单行 31px，折行后 63px 以上。
+       两级：tight 收字号/内边距；德语实测只差 2px 还折，所以留了第二级。 */
+    if (box.getBoundingClientRect().height <= 44) return;
+    box.className += ' tnav-tight';
+    if (box.getBoundingClientRect().height <= 44) return;
+    box.className += ' tnav-tight2';
+    /* 收了两级还放不下（卡纳达这种超长文字）：认了，折成两行。
+       但要让每行右对齐 —— 否则第二行只剩「更多工具」挂在左边，像散架。 */
+    if (box.getBoundingClientRect().height > 44) box.className += ' tnav-wrapped';
+  }
+
+  /* ---------- 下拉定位：夹在视口内 ----------
+     默认样式是 position:absolute;right:0（对齐按钮右边缘）。折行后按钮在左端，
+     菜单宽 700+，right:0 会把左半边推到屏幕外（真机截图复现过）。
+     改成打开时按视口算一次 fixed 坐标：优先右对齐按钮，左右各留 8px。 */
+  function placeMenu(btn, menu) {
+    menu.style.position = 'fixed';
+    menu.style.right = 'auto';
+    menu.style.left = '0px';
+    menu.style.top = '0px';
+    var b = btn.getBoundingClientRect();
+    var mw = menu.offsetWidth, mh = menu.offsetHeight;
+    var vw = w.innerWidth || d.documentElement.clientWidth;
+    var vh = w.innerHeight || d.documentElement.clientHeight;
+    var left = Math.min(Math.max(8, b.right - mw), Math.max(8, vw - mw - 8));
+    var top = b.bottom + 10;
+    if (top + mh > vh - 8) top = Math.max(8, b.top - mh - 10);
+    menu.style.left = Math.round(left) + 'px';
+    menu.style.top = Math.round(top) + 'px';
   }
 
   /* ---------- 图标（24 视图；stroke 走 currentColor，由外层 --tc 控制） ---------- */
@@ -250,6 +334,7 @@
       svg('arr', 13) + '</a></div>';
     h += '</div></div>';
     box.innerHTML = h;
+    tighten(box);
 
     /* 下拉交互：点按钮开合；点外面 / Esc 收起 */
     var btn = d.getElementById('tnavBtn'), menu = d.getElementById('tnavMenu');
@@ -257,7 +342,10 @@
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         var open = menu.hidden;
+        /* ⚠️ 必须先显示再量：hidden 时 offsetWidth 是 0，夹取算出来会把菜单
+              放到按钮右边（实测 1085 → 1785，整块在屏幕外）。 */
         menu.hidden = !open;
+        if (open) placeMenu(btn, menu);
         btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
       d.addEventListener('click', function (e) {
@@ -301,6 +389,15 @@
     '#topNav .tnav-btn[aria-expanded="true"] svg{transform:rotate(180deg)}',
     /* Mega 面板 */
     '#topNav .tnav-more{position:relative;display:inline-flex}',
+    /* 放不下时的紧凑档：只收字号与内边距，配色/层级一律不动（见 tighten） */
+    '#topNav.tnav-tight{gap:0}',
+    '#topNav.tnav-tight .tnav-lnk{padding:0 7px;font-size:12.8px}',
+    '#topNav.tnav-tight .tnav-btn{padding:0 8px;font-size:12.8px}',
+    '#topNav.tnav-tight .tnav-promo{padding:0 10px 0 8px;font-size:12.4px;gap:5px}',
+    '#topNav.tnav-tight2 .tnav-lnk{padding:0 6px;font-size:12.3px}',
+    '#topNav.tnav-tight2 .tnav-btn{padding:0 6px;font-size:12.3px}',
+    '#topNav.tnav-tight2 .tnav-promo{padding:0 8px 0 6px;font-size:11.8px;gap:4px}',
+    '#topNav.tnav-wrapped{justify-content:flex-end}',
     '#topNav .tnav-menu{position:absolute;top:calc(100% + 10px);right:0;z-index:120;',
     'width:min(700px,calc(100vw - 28px));background:#fff;border:1px solid #EBEBF1;border-radius:18px;',
     'box-shadow:0 28px 64px -20px rgba(22,22,34,.30),0 2px 6px rgba(22,22,34,.05);',
@@ -352,12 +449,55 @@
     render();
     SEL_IDS.forEach(function (id) {
       var el = d.getElementById(id);
-      if (el) el.addEventListener('change', render);   /* 切界面语言时导航跟着换 */
+      if (el) el.addEventListener('change', onLangChange);
     });
+    /* 菜单是 open 时算一次的 fixed 坐标 —— 滚动/改窗口大小就不对了，直接收起。
+       ⚠️ 只在 boot 绑一次：render 每次都会重建 menu，绑在 render 里会越积越多。 */
+    function closeMenu() {
+      var m = d.getElementById('tnavMenu'), b = d.getElementById('tnavBtn');
+      if (m && !m.hidden) { m.hidden = true; if (b) b.setAttribute('aria-expanded', 'false'); }
+    }
+    w.addEventListener('scroll', closeMenu, { passive: true });
+    w.addEventListener('resize', closeMenu);
+  }
+
+  /* ---------- 切界面语言后重绘 ----------
+     ⚠️ 原来这里直接绑 render：切到 73 种新语言时，tnav 分片还没下载过，
+        render 取不到译文就整栏退回英文，而且不会再补一次（用户看到的是「切了语言
+        顶栏没反应，还变英文了」）。改成先补片、到位再重绘。
+     ⚠️ 27 个内置语言没有分片，直接重绘，不发请求。 */
+  function onLangChange() {
+    var nl = resolveLang();
+    if (!nl || nl === L) return;
+    if (N[nl] || SH[nl]) { render(); return; }
+    loadShard(nl, render);
+  }
+  /* 运行时按需补片（只在「切到新语言」这条路上会用到）。
+     首次进入的分片是解析期 document.write 同步加载的，不走这里。
+     ⚠️ 不能 document.write：那时解析已结束，写了会整页清空。
+     ⚠️ 同一语言并发点两次要合并成一次请求，否则会插两个同 src 的 script。
+     404（分片还没做出来）时 onerror 也回调，顶栏回落英文但不卡住。 */
+  var pendingShard = {};
+  function loadShard(lang, cb) {
+    var fire = function () { if (typeof cb === 'function') { try { cb(); } catch (e) {} } };
+    if (!lang || SH[lang]) { fire(); return; }
+    if (!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(lang)) { fire(); return; }
+    if (pendingShard[lang]) { pendingShard[lang].push(fire); return; }
+    pendingShard[lang] = [fire];
+    var el = d.createElement('script');
+    el.src = '/i18n/tnav-' + lang + '.js?v=0.9.340';    /* ⚠️ 整站升版时同步改（缓存键） */
+    el.async = false;
+    el.onload = el.onerror = function () {
+      var q = pendingShard[lang] || [];
+      delete pendingShard[lang];
+      for (var i = 0; i < q.length; i++) q[i]();
+    };
+    (d.head || d.documentElement).appendChild(el);
   }
 
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  w.SiteTopNav = { render: render, lang: function () { return L; }, cur: CUR };
+  w.SiteTopNav = { render: render, lang: function () { return L; }, cur: CUR,
+    loadShard: loadShard };   /* 供页面在自定义切语言流程里显式调用 */
 })(window, document);

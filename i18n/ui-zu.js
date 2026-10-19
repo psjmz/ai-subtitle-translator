@@ -66,7 +66,7 @@
     styleCustomPh: 'Chaza iphimbo olifunayo, isb. ukukhanya kwenhliziyo, njengokutshela indaba umngane',
     hintElegant: 'Okulinganiselwe: okunembile, okushelelayo nobuhle, okulandela ukukhuluma kwemvelo kolimi oluya kulo.',
     hintPlain: 'Okungokwemvelo nokukhulunywayo: okwejwayelekile futhi kulula ukukuqonda, njengengxoxo yansuku zonke; imifushane, amagama ajwayelekile, gcina iphimbo likhulumi.',
-    hintCustom: 'Okwezifiso: incazelo engezansi ithunyelwa kumodeli ngqo nj প্রয়োজন yesitayela.',
+    hintCustom: 'Okwezifiso: incazelo engezansi ithunyelwa kumodeli ngqo njengesidingo sesitayela.',
     optCustom: 'Okwezifiso…',
     lblProvider: 'Umhlinzeki',
     lblBase: 'I-URL Eyisisekelo (/chat/completions yengezwe ngokuzenzakalelayo)',

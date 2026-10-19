@@ -66,7 +66,7 @@
     styleCustomPh: 'Chaza ithowuni oyifunayo, umz. elula, njengokuxoxela ibali umhlobo',
     hintElegant: 'Olinganiselweyo: ochanekileyo, otyibilikayo kwaye unobabalo, olandela intetho yendalo yolwimi ekujoliswe kulo.',
     hintPlain: 'Ngokwemvelo & encokozelayo: eyayelana nendlela yokuphila kwaye kulula ukuyiqonda, njengentetho yemihla ngemihla; izivakalisi ezimfutshane, amagama aqhelekileyo, gcina ithowuni yesithethi.',
-    hintCustom: 'Eyenziwe ngokwezifiso: inkcazo engezantsi ithunyelwa kwimodeli ngokuchanekileyo nj అభిyimfuneko yesimbo.',
+    hintCustom: 'Eyenziwe ngokwezifiso: inkcazo engezantsi ithunyelwa kwimodeli ngokuchanekileyo njengoko kuyimfuneko yesimbo.',
     optCustom: 'Eyenziwe ngokwezifiso…',
     lblProvider: 'Umboneleli',
     lblBase: 'I-URL esisekelo (/chat/completions zongezwe ngokuzenzekelayo)',

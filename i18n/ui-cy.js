@@ -260,7 +260,7 @@
     aboutRepo: 'Ystorfa GitHub',
     aboutLicense: 'Agored i gyd AGPL-3.0',
     modSecTitle: 'Tri offeryn',
-    modSecSub: 'Tri offeryn is-deitlau annibynnol, pob un â\'i waith ei hun. Defnyddiwch bwy bynnag sy\'n ffitio\'r dasg o\' നിങ്ങളുടെ flaen.',
+    modSecSub: 'Tri offeryn is-deitlau annibynnol, pob un â\'i waith ei hun. Defnyddiwch bwy bynnag sy\'n ffitio\'r dasg o\'ch flaen.',
     modCur: 'Rydych chi yma',
     modFix: 'Yr hyn y mae\'n ei drwsio',
     modWho: 'Pwy yw e ar ei gyfer',

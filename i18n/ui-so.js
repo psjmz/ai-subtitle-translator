@@ -205,7 +205,7 @@
     vttSchemeDel: 'Tirtir',
     parseOk: '✅ Waa la falanqeeyay si sax ah: {0} cues.',
     imported: 'Waxaa la soo dejiyay {0}: {1} cues.',
-    noSrc: 'Markii hոorbee soo dejiso oo falanqee qoraal hoosaadyada.',
+    noSrc: 'Markii hoorbee soo dejiso oo falanqee qoraal hoosaadyada.',
     langSame: 'Luqadda isha iyo tan la tilmaamayo waa isku mid ({0}); dooro luqad kale oo la beegsado.',
     customNeed: 'Habka "Custom" wuxuu u baahan yahay sharaxaad; ama dooro hab kale.',
     degradeDemo: 'Habka API wuxuu ka maqan yahay Base URL / Furaha / Model → wuxuu ku noqday tijaabo qalalan.',
