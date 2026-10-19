@@ -211,8 +211,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="videosub-i18n.js?v=0.9.338"></script>
-<script src="videosub-core.js?v=0.9.338"></script>
+<script src="videosub-i18n.js?v=0.9.339"></script>
+<script src="videosub-core.js?v=0.9.339"></script>
 <script>
 'use strict';
 var I18N = window.VIDEOSUB_I18N.DICT, LANGS = window.VIDEOSUB_I18N.LANGS;
@@ -256,7 +256,7 @@ function clockStr(ms) {
 /* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
 function applyI18n() {
   document.documentElement.lang = LANG;
-  document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
   Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
     el.textContent = t(el.getAttribute('data-i18n'));
   });
@@ -544,6 +544,6 @@ function bind() {
     <p style="margin-top:8px;">多语言字幕轨一条条列出来让你挑，ASS 轨自带的样式头与分辨率原样带回。图形字幕（蓝光 PGS、DVD 字幕）是刻在画面上的图，没有文字可抽，页面会直接告诉你。导出 SRT、VTT、ASS 或纯文本。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.338" data-tool="vs"></script>
+<script src="site-topnav.js?v=0.9.339" data-tool="vs"></script>
 </body>
 </html>

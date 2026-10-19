@@ -198,8 +198,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="extract-i18n.js?v=0.9.338"></script>
-<script src="extract-core.js?v=0.9.338"></script>
+<script src="extract-i18n.js?v=0.9.339"></script>
+<script src="extract-core.js?v=0.9.339"></script>
 <script>
 'use strict';
 var I18N = window.EXTRACT_I18N.DICT, LANGS = window.EXTRACT_I18N.LANGS;
@@ -233,7 +233,7 @@ function esc(s) {
 function applyI18n() {
   document.documentElement.lang = LANG;
   /* 阿拉伯语 / 希伯来语整页从右往左排 */
-  document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
   Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
     el.textContent = t(el.getAttribute('data-i18n'));
   });
@@ -477,6 +477,6 @@ function syncLayoutSeg() {
     <p style="margin-top:8px;">需要把 SRT 转成 TXT 做笔记、把访谈字幕整理成文稿、给视频写文字稿、或者只想快速读一遍台词的人。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.338" data-tool="ex"></script>
+<script src="site-topnav.js?v=0.9.339" data-tool="ex"></script>
 </body>
 </html>

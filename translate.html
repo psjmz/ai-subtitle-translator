@@ -1100,7 +1100,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.338</span>
+    <span class="ver-tag">v0.9.339</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1715,8 +1715,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.338"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="srt-core.js?v=0.9.338"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.339"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.339"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.339"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2061,7 +2062,7 @@ function rkBanner(){
 
 function applyI18n(){
   document.documentElement.lang = UI.lang;
-  document.documentElement.dir = (UI.lang==='ar'||UI.lang==='he') ? 'rtl' : 'ltr'; // v0.9.113：阿拉伯语、希伯来语界面从右向左
+  document.documentElement.dir = (RTL_UI.indexOf(UI.lang) >= 0) ? 'rtl' : 'ltr'; // v0.9.113：阿拉伯语、希伯来语界面从右向左
   document.title = t('docTitle');
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.dataset.i18nHtml); });
@@ -7680,18 +7681,25 @@ ulang.addEventListener('change', ()=>{
   if(!UI.dstManual && LANGS.some(l=>l.v===UI.lang)){
     $('dstLang').value = UI.lang;
   }
-  applyI18n();
-  /* v0.9.212：数字排版跟随界面语言（万/亿 ↔ K/M/B），切语言后按已取到的值重排一次，
-     不重新请求接口（statsRaw 存的是接口原始数字，与语言无关）。 */
-  if(typeof repaintStats==='function') repaintStats();
-  /* URL 与界面语言保持一致（可分享、可被搜索引擎按语言收录）；仅 http(s) 环境下改写 */
-  if(location.protocol.startsWith('http')){
-    try{
-      /* v0.9.277：本页自带文件名，别把 /ja/translate.html 改写成 /ja/（会跳回落地页） */
-      const p = (UI.lang==='zh-CN' ? '/' : '/'+UI.lang+'/') + SELF_PAGE + (location.search||'') + (location.hash||'');
-      history.replaceState(null,'',p);
-    }catch(e){}
-  }
+  const go = ()=>{
+    applyI18n();
+    /* v0.9.212：数字排版跟随界面语言（万/亿 ↔ K/M/B），切语言后按已取到的值重排一次，
+       不重新请求接口（statsRaw 存的是接口原始数字，与语言无关）。 */
+    if(typeof repaintStats==='function') repaintStats();
+    /* URL 与界面语言保持一致（可分享、可被搜索引擎按语言收录）；仅 http(s) 环境下改写。
+       v0.9.339：新增的 73 种界面语言还没有本地化页面 → 统一回到不带语言段的 /translate.html，
+       否则刷一下就 404。 */
+    if(location.protocol.startsWith('http')){
+      try{
+        /* v0.9.277：本页自带文件名，别把 /ja/translate.html 改写成 /ja/（会跳回落地页） */
+        const base = (UI.lang==='zh-CN') ? '/' : (UI27.indexOf(UI.lang)>=0 ? '/'+UI.lang+'/' : '/');
+        const p = base + SELF_PAGE + (location.search||'') + (location.hash||'');
+        history.replaceState(null,'',p);
+      }catch(e){}
+    }
+  };
+  /* v0.9.339：新增语言是独立分片，先取回字典再重绘（否则只显示英文） */
+  if(window.SiteI18N && SiteI18N.loadShard) SiteI18N.loadShard(UI.lang, go); else go();
 });
 
 applyI18n();

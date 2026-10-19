@@ -906,6 +906,9 @@ const SEO_ROUTE = {
   '/he': 'he', '/he/': 'he',
   '/ro': 'ro', '/ro/': 'ro'
 };
+/* v0.9.339：从右向左书写的语言（页面 <html dir> 用）。
+   与 site-i18n.js 的 RTL_UI 保持一致 —— 那 9 种文字都是 RTL。 */
+const RTL_LANGS = ['ar', 'fa', 'he', 'ur', 'ps', 'ku', 'ug', 'sd', 'yi'];
 const SEO_LANGS = ['zh-CN', 'zh-TW', 'en', 'ja', 'es', 'pt', 'ko', 'de', 'fr', 'id', 'hi', 'th', 'vi', 'ru', 'it', 'ar', 'tr', 'nl', 'pl', 'sv', 'cs', 'uk', 'da', 'fi', 'el', 'he', 'ro'];
 const SEO_PATH = { 'zh-CN': '/', 'zh-TW': '/zh-TW/', 'en': '/en/', 'ja': '/ja/', 'es': '/es/', 'pt': '/pt/', 'ko': '/ko/', 'de': '/de/', 'fr': '/fr/', 'id': '/id/', 'hi': '/hi/', 'th': '/th/', 'vi': '/vi/', 'ru': '/ru/', 'it': '/it/', 'ar': '/ar/', 'tr': '/tr/', 'nl': '/nl/', 'pl': '/pl/', 'sv': '/sv/', 'cs': '/cs/', 'uk': '/uk/', 'da': '/da/', 'fi': '/fi/', 'el': '/el/', 'he': '/he/', 'ro': '/ro/' };
 const SEO = {
@@ -5018,6 +5021,48 @@ const SEO_PAGES = {
   /* v0.9.321：第十七个页面 —— 字幕质检 */
   qc: { file: 'qc.html', table: SEO_QC, path: QC_PATH, jsonldType: 'WebApplication' }
 };
+
+/* __SEO_SHARDS__ */
+/* v0.9.339：新增 73 种语言的 SEO 元数据走分片（i18n/seo-<lang>.json），启动时并入上面 17 张表。
+   ❗四件事必须一起做，漏一件就会「页面能开但 SEO 半残」：
+     ① SEO_LANGS.push  —— sitemap 与 hreflang 全从它派生
+     ② SEO_PATH        —— 语言首页路径
+     ③ SEO_ROUTE       —— /<lang>/ 与 /<lang>/xxx.html 路由，缺了就 404
+     ④ SEO_PAGES[].path —— 16 个工具页路径；那 16 个 *_PATH 映射早在 2203 行就
+        SEO_LANGS.forEach 跑完了，新语言是之后才 push 的，只能在这里补。 */
+/* 新增 73 语的 og:locale。内置 27 语走上面那张 OG_LOCALE —— 它只覆盖 27 语，
+   所以 og:locale:alternate 必须两个都查，否则新语言会输出空 content。 */
+const SEO_OG_LOCALE = {
+  ms: 'ms_MY', fil: 'fil_PH', fa: 'fa_IR', nb: 'nb_NO', sk: 'sk_SK', hu: 'hu_HU', ca: 'ca_AD',
+  hr: 'hr_HR', sr: 'sr_RS', bg: 'bg_BG', ur: 'ur_PK', bn: 'bn_BD', ta: 'ta_IN', te: 'te_IN',
+  mr: 'mr_IN', ne: 'ne_NP', si: 'si_LK', my: 'my_MM', km: 'km_KH', lo: 'lo_LA', sw: 'sw_KE',
+  gu: 'gu_IN', kn: 'kn_IN', ml: 'ml_IN', pa: 'pa_IN', or: 'or_IN', as: 'as_IN', kk: 'kk_KZ',
+  uz: 'uz_UZ', mn: 'mn_MN', az: 'az_AZ', is: 'is_IS', et: 'et_EE', lv: 'lv_LV', lt: 'lt_LT',
+  sl: 'sl_SI', sq: 'sq_AL', mk: 'mk_MK', eu: 'eu_ES', gl: 'gl_ES', am: 'am_ET', ha: 'ha_NG',
+  yo: 'yo_NG', zu: 'zu_ZA', so: 'so_SO', ps: 'ps_AF', ku: 'ku_IQ', af: 'af_ZA',
+  yue: 'yue_HK', be: 'be_BY', tg: 'tg_TJ', ky: 'ky_KG', tk: 'tk_TM', bs: 'bs_BA',
+  mt: 'mt_MT', cy: 'cy_GB', ga: 'ga_IE', hy: 'hy_AM', ka: 'ka_GE', ti: 'ti_ET', bo: 'bo_CN',
+  ug: 'ug_CN', sd: 'sd_PK', yi: 'yi_US', jv: 'jv_ID', su: 'su_ID', ceb: 'ceb_PH', mg: 'mg_MG',
+  ig: 'ig_NG', xh: 'xh_ZA', sn: 'sn_ZW', ny: 'ny_MW', mi: 'mi_NZ'
+};
+(function loadSeoShards() {
+  var d = path.join(__dirname, 'i18n');
+  var files;
+  try { files = fs.readdirSync(d); } catch (e) { return; }
+  for (var i = 0; i < files.length; i++) {
+    var m = /^seo-(.+)\.json$/.exec(files[i]);
+    if (!m) continue;
+    var lang = m[1], data;
+    try { data = JSON.parse(fs.readFileSync(path.join(d, files[i]), 'utf8')); } catch (e) { continue; }
+    if (SEO_LANGS.indexOf(lang) < 0) SEO_LANGS.push(lang);
+    SEO_PATH[lang] = (lang === 'zh-CN') ? '/' : '/' + lang + '/';
+    SEO_ROUTE['/' + lang] = lang;
+    SEO_ROUTE['/' + lang + '/'] = lang;
+    for (var pg in SEO_PAGES) {
+      if (data[pg]) SEO_PAGES[pg].table[lang] = data[pg];
+    }
+  }
+})();
 /* 静态文案块：爬虫不执行 JS，这一段是它唯一能读到的正文 */
 function seoCopy(page, lang){
   const s = SEO_PAGES[page].table[lang];
@@ -5049,7 +5094,10 @@ function seoHead(lang, base, page){
   const jsonldName = s.jsonldName || siteName;
   const jsonldAlt = s.jsonldAlt || (page === 'merge' ? 'Subtitle Effects' : page === 'clean' ? 'Subtitle Cleaner' : 'AI-SRTSub');
   const jsonldDesc = s.jsonldDesc || s.desc;
-  const ogLocale = s.ogLocale || OG_LOCALE[lang] || 'en_US';
+  /* v0.9.339：16 个工具页的表里没有 ogLocale 字段（og:locale 只跟界面语言走），
+     所以内置 27 语靠 OG_LOCALE，新增 73 语必须再查 SEO_OG_LOCALE —— 否则会静默
+     回落成 en_US，社交平台按错误语言展示。 */
+  const ogLocale = s.ogLocale || OG_LOCALE[lang] || SEO_OG_LOCALE[lang] || 'en_US';
   const currency = s.currency || 'USD';
   const jsonld = '{\n'
     + '  "@context": "https://schema.org",\n'
@@ -5090,9 +5138,12 @@ function seoHead(lang, base, page){
     '<meta property="og:locale" content="' + ogLocale + '">',
     /* v0.9.311：og:locale:alternate —— 本页其余 26 个语言版本，给 FB 等社交平台做语言发现用。
        搜索引擎的语言版本靠 hreflang（早就有），这个缺失不影响 Google，但多语言站配上更完整。
-       ⚠️ 顺序跟 SEO_LANGS 走，与 hreflang 一一对应，方便对照排查。 */
+       ⚠️ 顺序跟 SEO_LANGS 走，与 hreflang 一一对应，方便对照排查。
+       v0.9.339：OG_LOCALE 只有内置 27 语，新增 73 语会落成空 content —— 改从各表自己的
+       ogLocale 字段取（分片里已按「语言_主要使用地区」写好），取不到才回 OG_LOCALE。 */
     SEO_LANGS.filter(function (l) { return l !== lang && P.table[l]; }).map(function (l) {
-      return '<meta property="og:locale:alternate" content="' + (OG_LOCALE[l] || '') + '">';
+      return '<meta property="og:locale:alternate" content="'
+        + (P.table[l].ogLocale || OG_LOCALE[l] || SEO_OG_LOCALE[l] || '') + '">';
     }).join('\n'),
     '<meta property="og:url" content="' + selfUrl + '">',
     '<meta name="twitter:card" content="summary_large_image">',
@@ -5131,7 +5182,7 @@ function serveIndexLang(req, res, lang, page){
         '<!--SEO-COPY-START-->\n  ' + copyHtml + '\n  <!--SEO-COPY-END-->');
     }
     const htmlLang = (page === 'index' && SEO[lang]) ? SEO[lang].htmlLang : lang;
-    html = html.replace('<html lang="zh-CN"', '<html lang="' + htmlLang + '"' + ((htmlLang === 'ar' || htmlLang === 'he') ? ' dir="rtl"' : ''));
+    html = html.replace('<html lang="zh-CN"', '<html lang="' + htmlLang + '"' + (RTL_LANGS.indexOf(htmlLang) >= 0 ? ' dir="rtl"' : ''));
     /* v0.9.312：站内链接按 URL 语言补前缀。页面源码里的站内链接（首页十二张工具卡、
        各页 logo / 页脚）写的是无前缀形态 —— 那是 zh-CN 版的路径。语言版访客点了会
        掉回中文版（底部 SEO 文案整段变中文，多语言联动就断在这）。六个垂直页自己的
@@ -5503,7 +5554,7 @@ function serveGuideHtml(req, res, lang, parts) {
       return '<option value="' + p[0] + '"' + (p[0] === lang ? ' selected' : '') + '>' + p[1] + '</option>';
     }).join('');
     html = html.replace('<!--GUIDE-LANGS-->', opts);
-    html = html.replace('<html lang="zh-CN"', '<html lang="' + lang + '"' + ((lang === 'ar' || lang === 'he') ? ' dir="rtl"' : ''));
+    html = html.replace('<html lang="zh-CN"', '<html lang="' + lang + '"' + (RTL_LANGS.indexOf(lang) >= 0 ? ' dir="rtl"' : ''));
     /* 站内链接按 URL 语言补前缀（与 serveIndexLang 同思路，模板里写的都是无前缀形态）。
        v0.9.323 挂 topnav 后多了 /guides/ 形态的链接，一并纳入改写 */
     if (lang !== 'zh-CN') {

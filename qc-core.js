@@ -327,7 +327,9 @@
   };
   function reEsc(ch) { return /[.^$*+?()\[\]{}|\\]/.test(ch) ? '\\' + ch : ch; }
   function hasPunct(lang) { return !!PUNCT[lang]; }
-  function hasDir(lang) { return lang === 'ar' || lang === 'he'; }
+  /* v0.9.339：从右向左书写的语言扩到 9 种（阿拉伯字母系 + 希伯来字母系） */
+  var RTL_LANGS = ['ar', 'fa', 'he', 'ur', 'ps', 'ku', 'ug', 'sd', 'yi'];
+  function hasDir(lang) { return RTL_LANGS.indexOf(lang) >= 0; }
 
   function punctIssue(text, lang) {
     var p = PUNCT[lang];

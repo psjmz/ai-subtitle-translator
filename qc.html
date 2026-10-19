@@ -256,8 +256,8 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="qc-i18n.js?v=0.9.338"></script>
-<script src="qc-core.js?v=0.9.338"></script>
+<script src="qc-i18n.js?v=0.9.339"></script>
+<script src="qc-core.js?v=0.9.339"></script>
 <script>
 'use strict';
 var I18N = window.QC_I18N.DICT, LANGS = window.QC_I18N.LANGS;
@@ -547,7 +547,7 @@ function applyI18n() {
   /* ⚠️ ar / he 要整页翻成从右往左（服务端按 /ar/qc.html 这种路由注入时已经翻过一次，
      这里管的是页面上手动切界面语言 —— 每页都要有，别漏（shift/glossary/extract 等都有） */
   document.documentElement.lang = LANG;
-  document.documentElement.dir = (LANG === 'ar' || LANG === 'he') ? 'rtl' : 'ltr';
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
   document.title = t('docTitle');
   var sel = $('#langSel');
   if (sel && sel.value !== LANG) sel.value = LANG;
@@ -670,6 +670,6 @@ applyI18n();
     <p style="margin-top:8px;">给译制组、字幕组、剪辑师和本地化团队，在交付前把字幕过一遍。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.338" data-tool="qc"></script>
+<script src="site-topnav.js?v=0.9.339" data-tool="qc"></script>
 </body>
 </html>
