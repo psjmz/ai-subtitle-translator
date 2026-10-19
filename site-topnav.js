@@ -398,6 +398,11 @@
     '#topNav.tnav-tight2 .tnav-btn{padding:0 6px;font-size:12.3px}',
     '#topNav.tnav-tight2 .tnav-promo{padding:0 8px 0 6px;font-size:11.8px;gap:4px}',
     '#topNav.tnav-wrapped{justify-content:flex-end}',
+    /* 品牌块不参与压缩：整行挤满时浏览器先压 flex 子项，logo 从 180 收到 163，
+       品牌名就断成「AI- / SRTSub」两行（卡纳达语在 1080 版心上实测 42px 高）。
+       各页品牌类名不统一（.logo / .brand / .logo-sm / .gbrand），四种都钉住。 */
+    '.lnav>.logo,.lnav>.brand,.lnav>.logo-sm,.hd>.logo,.hd>.brand,.hd>.logo-sm,.hd>.gbrand,',
+    '.ghead>.gbrand{flex:0 0 auto;white-space:nowrap}',
     '#topNav .tnav-menu{position:absolute;top:calc(100% + 10px);right:0;z-index:120;',
     'width:min(700px,calc(100vw - 28px));background:#fff;border:1px solid #EBEBF1;border-radius:18px;',
     'box-shadow:0 28px 64px -20px rgba(22,22,34,.30),0 2px 6px rgba(22,22,34,.05);',
