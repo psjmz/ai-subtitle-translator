@@ -130,6 +130,7 @@
     button.big{width:100%}
   }
 </style>
+<script src="ui-codes.js?v=0.9.339"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -258,7 +259,7 @@ function detectUiLang() {
 function pathUiLang() {
   try {
     var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:lrc\.html)?$/);
-    if (m && LANGS.some(function (x) { return x[0] === m[1]; })) return m[1];
+    if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
   } catch (e) { }
   return null;
 }

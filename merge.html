@@ -660,6 +660,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     background:var(--card-2,#FAFAFC);color:var(--ink,#1F2430)}
   .fx-ask .btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
 </style>
+<script src="ui-codes.js?v=0.9.339"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -15088,7 +15089,7 @@ function syncColorSw(id){
    顺序：URL > 上次手动选的 > 浏览器语言。 */
 function pathUiLang(){
   const m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:merge|clean)\.html/);
-  if (m && UI_LANGS.some(x=>x[0]===m[1])) return m[1];
+  if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : UI_LANGS.some(x=>x[0]===m[1]))) return m[1];
   return null;
 }
 function initLang(){

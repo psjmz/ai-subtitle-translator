@@ -2232,7 +2232,7 @@ function writeSv(patch) {
 /* 语言路由：/ja/ 与 /ja/index.html 都算（zh-CN 走站点根 /） */
 function pathUiLang() {
   try {
-    var m = location.pathname.match(/^\/(zh-CN|zh-TW|en|ja|es|pt|ko|de|fr|id|hi|th|vi|ru|it|ar|tr|nl|pl|sv|cs|uk|da|fi|el|he|ro)(?:\/(?:index\.html)?)?$/);
+    var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)(?:\/(?:index\.html)?)?$/);
     if (m && UI_LANGS.some(function (x) { return x[0] === m[1]; })) return m[1];
   } catch (e) {}
   return null;

@@ -7667,7 +7667,7 @@ UI_LANGS.forEach(pair=>{ const o=document.createElement('option'); o.value=pair[
 function pathUiLang(){
   try{
     /* v0.9.277：工作台的 URL 是 /ja/translate.html 这种带文件名的，原正则只认 /ja/ */
-    const m = location.pathname.match(/^\/(zh-CN|zh-TW|en|ja|es|pt|ko|de|fr|id|hi|th|vi|ru|it|ar|tr|nl|pl|sv|cs|uk|da|fi|el|he|ro)(?:\/(?:translate\.html)?)?$/);
+    const m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)(?:\/(?:translate\.html)?)?$/);
     if (m && UI_LANGS.some(x=>x[0]===m[1])) return m[1];
   }catch(e){}
   return null;

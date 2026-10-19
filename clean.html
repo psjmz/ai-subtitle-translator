@@ -204,6 +204,7 @@
     .cbox{grid-template-columns:1fr}
   }
 </style>
+<script src="ui-codes.js?v=0.9.339"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -3296,7 +3297,7 @@ const CLEAN_UI_LANGS = [['zh-CN', '简体中文'], ['zh-TW', '繁體中文'], ['
 /* URL 语言优先（/en/clean.html 就该是英文界面），其次上次手动选的，最后浏览器语言 */
 function pathUiLang() {
   const m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:merge|clean)\.html/);
-  if (m && CLEAN_UI_LANGS.some(function (x) { return x[0] === m[1]; })) return m[1];
+  if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : CLEAN_UI_LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
   return null;
 }
 function initLang() {
