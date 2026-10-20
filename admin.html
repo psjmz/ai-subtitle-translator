@@ -228,6 +228,18 @@
           <input type="number" id="rpdD" min="1" max="1000000" step="1">
         </div>
       </div>
+      <!-- v0.9.346：整槽流量闸。用户只想有一个数能拧，不想算比例 -->
+      <div class="row">
+        <div>
+          <label>整槽每小时最多发多少请求（0 = 不限）</label>
+          <input type="number" id="hourlyD" min="0" max="100000" step="1" placeholder="建议 RPD × key 数 ÷ 24">
+        </div>
+        <div>
+          <label>额度用量</label>
+          <div class="note" id="dPoolHint" style="margin:8px 0 0">—</div>
+        </div>
+      </div>
+      <div class="note" style="margin:-6px 0 12px">按小时匀速放行，<b>用不完的会攒着（最多攒 3 小时）</b>，深夜攒下的额度正好留给白天高峰。名额用完时新批次直接走 C / B / A，不排队。填 0 = 关闭此闸，仍受每个 key 的 RPD 约束。</div>
 
       <label>Key 1（<span class="mask" id="keyMask4_1">未设置</span>）<span class="dstat" id="dStat1"></span></label>
       <div class="drow">
@@ -589,6 +601,17 @@ function batchLangs(kind, which){
 
 /* v0.9.345：三个 key 的状态（用量 / 本分钟 / 今日耗尽）。服务端只给掩码，永不下发明文。
    固定渲染 3 行：输入框是固定三个，没配的位置也要能看到「未设置」。 */
+/* v0.9.346：整槽额度一行看完。用户就是靠这行判断「到底是额度用完了，还是被小时闸卡住了」。 */
+function renderDPool(p){
+  const el = $('dPoolHint');
+  if (!el) return;
+  if (!p) { el.textContent = '—'; return; }
+  const cap = p.dailyCap || 0;
+  const used = Math.max(0, cap - (p.dailyRemain || 0));
+  const daily = cap ? ('今日 ' + used + '/' + cap) : '今日不限';
+  if (!p.hourly) { el.textContent = daily + ' · 每小时不限'; return; }
+  el.textContent = '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily;
+}
 function renderDKeys(list){
   for (let i = 0; i < 3; i++) {
     const k = (Array.isArray(list) ? list[i] : null) || { set: false };
@@ -666,6 +689,8 @@ async function loadConfig(){
     $('model4').value = c.model4 || '';
     $('rpmD').value = c.rpmD || 15;
     $('rpdD').value = c.rpdD || 1500;
+    $('hourlyD').value = c.hourlyD ? c.hourlyD : '';
+    renderDPool(c.dPool || null);
     $('extraParams4').value = paramsText(c.extraParams4);
     const dAll = c.langModelDAll !== false;
     $('dScopeAll').checked = dAll;
@@ -1157,7 +1182,8 @@ $('btnSave4').addEventListener('click', async () => {
     provider4: $('provider4').value, base4, model4, extraParams4,
     langModelDAll: $('dScopeAll').checked,
     langModelD: [...langSelD],
-    rpmD: +$('rpmD').value || 15, rpdD: +$('rpdD').value || 1500
+    rpmD: +$('rpmD').value || 15, rpdD: +$('rpdD').value || 1500,
+    hourlyD: +$('hourlyD').value || 0
   };
   keys.forEach((v, i) => { if (v) body['key4_' + (i + 1)] = v; });
   try {

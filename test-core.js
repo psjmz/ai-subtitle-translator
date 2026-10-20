@@ -14832,7 +14832,36 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/function renderDKeys/.test(adm), 'admin.html 缺 renderDKeys（三个 key 的状态显示）');
     /* 明文 key 绝不出服务端：GET config 只给 dKeys 掩码 */
     assert.ok(/dKeys: dKeyStatus\(cfg\)/.test(sv), 'GET config 没返回 D 的 key 状态');
-    assert.ok(!/keys4: cfg\.keys4/.test(sv), 'GET config 把 keys4 明文回传了');
+    assert.ok(!/keys4: cfg\.keys4/.test(sv), 'GET config 把 keys4 明文传回前端了');
+
+    /* v0.9.346：整槽「每小时 N 次」流量闸 —— 用户只拧一个数，不掺比例算法。
+       要点：① 令牌桶（按小时滴水），不是整点清零；② 攒 3 小时封顶；
+             ③ 桶空 → 走 C/B/A 不排队；④ 0 = 不限（老配置零变化）；⑤ 与 RPD 取小。 */
+    assert.ok(/\bhourlyD:/.test(sv), 'DEFAULTS 缺 hourlyD');
+    assert.ok(sv.indexOf('if (Number.isFinite(+body.hourlyD))') >= 0, '后台保存没接收 hourlyD');
+    assert.ok(sv.indexOf('Math.max(0, Math.min(100000, Math.floor(+body.hourlyD)))') >= 0,
+      'hourlyD 下界必须是 0（0=不限）；写成 1 会让「关掉闸」变成「每小时只发一次」');
+    const bk = sv.slice(sv.indexOf('function dBucket'), sv.indexOf('function dRemain'));
+    assert.ok(/cap \* dt \/ 3600000/.test(bk), 'dBucket 没按时间比例补名额（那就成了整点清零，59 分和 00 分各放一批）');
+    assert.ok(/cap \* D_BURST_H/.test(bk), 'dBucket 没设攒额度的上限');
+    assert.ok(/q\.bucket = \{ at: now, tokens: cap \}/.test(bk), '当天第一次没给桶初始化（首小时会直接断流）');
+    assert.ok(/if \(!cap\) return null/.test(bk), 'cap=0 时没短路（0 应表示不限）');
+    const pk0 = sv.slice(sv.indexOf('function dPeek'), sv.indexOf('function dPick'));
+    assert.ok(/if \(b && b\.tokens < 1\) return \{ deny: 'hourly' \}/.test(pk0), 'dPeek 没在桶空时拒绝');
+    assert.ok(pk0.indexOf('return { wait: wait || 30 }') > 0, 'dPeek 的 RPM 等待分支被弄丢了');
+    const dp0 = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dExhaust'));
+    assert.ok(/if \(b\) b\.tokens -= 1;/.test(dp0), 'dPick 没扣桶里的名额（并发会超发）');
+    const pr0 = sv.slice(sv.indexOf('function pickRoute'), sv.indexOf('async function callModelD'));
+    assert.ok(/peek\.deny\) return pickModel/.test(pr0), 'pickRoute 没在桶空时降级到 C/B/A');
+    const cd0 = sv.slice(sv.indexOf('async function callModelD'), sv.indexOf('/* ---------------- v0.9.183'));
+    assert.ok(/kp\.deny/.test(cd0), 'callModelD 没处理桶空（任务跑到一半会变成 500）');
+    const ts0 = sv.slice(sv.indexOf('function dTaskSlot'), sv.indexOf('function langInD'));
+    assert.ok(/dAvail\(cfg\) >= need/.test(ts0), '整集锁还在用 dRemain，没把小时桶算进去');
+    /* 后台：一个输入框 + 一行用量；保存必须带上这个字段，否则改了不生效 */
+    ['hourlyD', 'dPoolHint'].forEach(id => assert.ok(adm.indexOf('id="' + id + '"') >= 0, 'admin.html 缺 #' + id));
+    assert.ok(/function renderDPool/.test(adm), 'admin.html 缺 renderDPool');
+    assert.ok(adm.indexOf("hourlyD: +$('hourlyD').value || 0") >= 0, '后台保存没带 hourlyD');
+    assert.ok(/dPool: dPoolStatus\(cfg\)/.test(sv), 'GET config 没返回整槽额度面板');
   });
 
   if (have.length !== files.length)

@@ -68,7 +68,8 @@ const DEFAULTS = {
   langModelDAll: true,     // true = 全部目标语言先走 D；false = 只走 langModelD 列出的
   langModelD: [],
   rpmD: 15,                // 每个 key 每分钟请求上限（按 AI Studio 速率限制页的实际数字填）
-  rpdD: 1500               // 每个 key 每日请求上限（同上）
+  rpdD: 1500,              // 每个 key 每日请求上限（同上）
+  hourlyD: 0               // v0.9.346：整槽每小时补多少个名额（0 = 不限）。见 dBucket 注释
 };
 
 function ensureData(){
@@ -6031,10 +6032,48 @@ function dRpmWait(i){
   if (!arr.length) return 0;
   return Math.max(1, Math.ceil((arr[0] + D_RPM_WIN - Date.now()) / 1000));
 }
+
+/* ---------------- v0.9.346：整槽「每小时 N 次」流量闸 ----------------
+   用户 10-20 拍板：不要那套按太平洋时间算比例的算法，就要后台一个数好调。
+   所以这里只做一件事 —— 每小时往桶里补 N 个名额，桶空了就走 C/B/A。
+
+   为什么是令牌桶，不是「整点清零的计数器」：
+   · 整点清零会在 59 分和 00 分各放行 N 次，一瞬间 2N，正是要避免的猛冲；
+   · 桶按小时匀速滴水，**用不完的会攒着**（最多攒 3 小时）。
+     深夜没人用，额度就攒到白天高峰 —— 用户要的「别上午就见底」和
+     「把额度留给高峰」其实是同一件事，一个桶就都解决了。
+   语义：cap 是「每小时补多少」，不是「每小时只能发多少」；上限是 3×cap。
+
+   ⚠️ 桶与每个 key 的 RPD 是两套独立约束，取小的那个生效：
+      桶管节奏（用户可控），RPD 管 Google 那边的硬顶（不可超）。
+   ⚠️ 桶在内存里结算、由调用方 dWrite 落盘。dPeek 只读不写，别在探测里改文件。 */
+const D_BURST_H = 3;                // 最多攒 3 小时的量，防止攒够了一次性倾泻
+const D_HIT     = [];               // 池级时间戳，只用于后台显示「近 60 分钟已发」
+
+function dHourly(cfg){ return Math.max(0, Math.floor(+cfg.hourlyD || 0)); }
+function dHourUsed(){
+  const cut = Date.now() - D_RPM_WIN;
+  while (D_HIT.length && D_HIT[0] < cut) D_HIT.shift();
+  return D_HIT.length;
+}
+/* 取桶并结算到此刻。cap = 0 时返回 null（表示不限，调用方一律当作「有额度」） */
+function dBucket(q, cfg){
+  const cap = dHourly(cfg);
+  if (!cap) return null;
+  const now = Date.now();
+  const b = (q.bucket && typeof q.bucket === 'object') ? q.bucket : null;
+  if (!b) { q.bucket = { at: now, tokens: cap }; return q.bucket; }  // 当天第一次：先给满一小时
+  const dt = Math.max(0, now - (+b.at || now));
+  let tok = Math.max(0, +b.tokens || 0) + cap * dt / 3600000;
+  const ceil = cap * D_BURST_H;
+  b.tokens = tok > ceil ? ceil : tok;
+  b.at = now;
+  return b;
+}
 /* 今日还能发多少次（几个 key 加总）。整集锁 D 用它判断「够不够跑完这一集」 */
-function dRemain(cfg){
+function dRemain(cfg, q0){
   const rpd = Math.max(1, +cfg.rpdD || 1500);
-  const q = dRead();
+  const q = q0 || dRead();
   let n = 0;
   for (const k of dKeyList(cfg)) {
     const st = dState(q, k.i);
@@ -6042,6 +6081,30 @@ function dRemain(cfg){
     n += Math.max(0, rpd - (st.used || 0));
   }
   return n;
+}
+/* 此刻真正还能发几次 = min(今日剩余, 桶里剩的名额)。整集锁要用它，
+   否则「今天够、但这一小时已经用光」的任务会被判成能走 D，第一批就掉回 C/B/A。 */
+function dAvail(cfg){
+  const q = dRead();
+  const rem = dRemain(cfg, q);
+  const b = dBucket(q, cfg);
+  return b ? Math.min(rem, Math.floor(b.tokens)) : rem;
+}
+/* 后台展示：整槽视角的额度面板（每个 key 的明细仍走 dKeyStatus） */
+function dPoolStatus(cfg){
+  const q = dRead();
+  const cap = dHourly(cfg);
+  const b = dBucket(q, cfg);
+  const rpd = Math.max(1, +cfg.rpdD || 1500);
+  const nk = dKeyList(cfg).length;
+  return {
+    hourly: cap,                                  // 0 = 不限
+    tokens: b ? Math.floor(b.tokens) : 0,         // 现在能发几次
+    max: cap ? cap * D_BURST_H : 0,               // 桶的上限（攒满 3 小时）
+    hourUsed: dHourUsed(),                        // 近 60 分钟已发
+    dailyCap: rpd * nk, dailyRemain: dRemain(cfg, q),
+    date: ptDateStr()
+  };
 }
 /* 后台展示用：每个 key 的掩码 + 今日用量 + 状态。明文一律不回传（与 A/B/C 的 keyMask 同规矩）。
    固定返回 3 项：输入框是固定三个，没配的位置也要能显示「未设置」。 */
@@ -6070,6 +6133,10 @@ function dPeek(cfg){
   const rpm = Math.max(1, +cfg.rpmD || 15);
   const rpd = Math.max(1, +cfg.rpdD || 1500);
   const q = dRead();
+  /* v0.9.346：小时名额空了 → 直接交给 C/B/A，**不回 wait**。
+     这是用户自己拧的流量阀门，不是额度临时紧张，让他等没有意义。 */
+  const b = dBucket(q, cfg);
+  if (b && b.tokens < 1) return { deny: 'hourly' };
   let live = 0, wait = 0;
   for (const k of list) {
     const st = q.keys[k.i] || {};
@@ -6092,6 +6159,8 @@ function dPick(cfg){
   const rpm = Math.max(1, +cfg.rpmD || 15);
   const rpd = Math.max(1, +cfg.rpdD || 1500);
   const q = dRead();
+  const b = dBucket(q, cfg);
+  if (b && b.tokens < 1) return { deny: 'hourly' };   // v0.9.346 小时名额空 → 跨槽
   let live = 0, wait = 0;
   for (const k of list) {
     const st = dState(q, k.i);
@@ -6102,8 +6171,11 @@ function dPick(cfg){
       if (!wait || w < wait) wait = w;      // 最早恢复的那个就是能用的时刻
       continue;
     }
+    const now = Date.now();
     st.used = (st.used || 0) + 1;           // 预扣
-    (D_RPM[k.i] || (D_RPM[k.i] = [])).push(Date.now());
+    (D_RPM[k.i] || (D_RPM[k.i] = [])).push(now);
+    if (b) b.tokens -= 1;                   // 桶也一起扣，别让并发看见同一个名额
+    D_HIT.push(now);
     dWrite(q);
     return { i: k.i, key: k.key };
   }
@@ -6138,7 +6210,7 @@ function dTaskSlot(task, cfg, cues){
   const hit = D_TASK.get(task);
   if (hit) { hit.at = now; return hit.slot; }
   const need = Math.max(1, Math.ceil((Number(cues) || 0) / D_CUE_CAP));
-  const slot = dRemain(cfg) >= need ? 'D' : 'X';
+  const slot = dAvail(cfg) >= need ? 'D' : 'X';
   D_TASK.set(task, { slot: slot, at: now });
   return slot;
 }
@@ -6159,6 +6231,7 @@ function pickRoute(cfg, lang, meta){
   if (dTaskSlot(task, cfg, cues) !== 'D') return pickModel(cfg, lang);
   const peek = dPeek(cfg);
   if (!peek) return pickModel(cfg, lang);   // 三个 key 当天都满了 → 交给 C/B/A
+  if (peek.deny) return pickModel(cfg, lang);  // v0.9.346 本小时名额用完 → 交给 C/B/A，不排队
   if (peek.wait) return { which: 'D', wait: peek.wait };
   /* 不带 cfg：D 的 key 是 callModelD 现选现扣的，这里给不出确定的一份。
      主流程取模型名一律走 slotModelName，不要去碰 pick.cfg。 */
@@ -6178,6 +6251,13 @@ async function callModelD(cfg, messages, maxTokens, opts){
       const e = new Error('Gemini 免费额度已用尽（' + dKeys(cfg).length + ' 个 key 全部到限）');
       e._dExhausted = true; e._status = 429;
       if (last) e.message += '；最后一次上游报错：' + String(last.message || '').slice(0, 120);
+      throw e;
+    }
+    /* v0.9.346：任务跑到一半小时名额被别的任务用完 → 这一批交给 C/B/A。
+       不回 wait：等一小时不如直接换槽，用户至少能拿到结果。 */
+    if (kp.deny) {
+      const e = new Error('Gemini 本小时名额已用完（每小时 ' + dHourly(cfg) + ' 次）');
+      e._dExhausted = true; e._status = 429;
       throw e;
     }
     if (kp.wait) { const e = new Error('Gemini 免费额度 RPM 已满'); e._dWait = kp.wait; throw e; }
@@ -6975,6 +7055,7 @@ const server = http.createServer(async (req, res) => {
           langModelDAll: cfg.langModelDAll !== false,
           langModelD: Array.isArray(cfg.langModelD) ? cfg.langModelD.slice() : [],
           rpmD: cfg.rpmD || 15, rpdD: cfg.rpdD || 1500,
+          hourlyD: cfg.hourlyD || 0, dPool: dPoolStatus(cfg),
           dKeys: dKeyStatus(cfg), dDate: ptDateStr(),
           fallbackToA: cfg.fallbackToA !== false,
           perIpDaily: cfg.perIpDaily, globalDaily: cfg.globalDaily,
@@ -7244,11 +7325,14 @@ const server = http.createServer(async (req, res) => {
         }
         if (Number.isFinite(+body.rpmD)) cfg.rpmD = Math.max(1, Math.min(600, Math.floor(+body.rpmD)));
         if (Number.isFinite(+body.rpdD)) cfg.rpdD = Math.max(1, Math.min(1000000, Math.floor(+body.rpdD)));
+        /* v0.9.346：整槽每小时名额。0 = 不限（保持老行为），所以下界是 0 不是 1 */
+        if (Number.isFinite(+body.hourlyD)) cfg.hourlyD = Math.max(0, Math.min(100000, Math.floor(+body.hourlyD)));
         /* 重置今日计数：误判把某个 key 锁死一整天时的手动出口。连带清整集锁，
            否则刚才被判「额度不够」的任务还会继续走 C/B/A */
         if (body.resetD) {
           try { fs.unlinkSync(DQUOTA_PATH); } catch (e) {}
           for (const k in D_RPM) delete D_RPM[k];
+          D_HIT.length = 0;
           D_TASK.clear();
         }
         if (body.fallbackToA !== undefined) cfg.fallbackToA = !!body.fallbackToA;
