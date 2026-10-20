@@ -14798,10 +14798,10 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     const adm = readT('admin.html');
     /* 配置字段：keys4 是数组（1~3 个 key）；语言范围用显式开关，而不是 C 那种「空数组 = 不接管」——
        同一个空数组在 D 上意味着「配好 key 却没流量」，是最难查的一类问题。 */
-    ['provider4', 'base4', 'model4', 'keys4', 'extraParams4', 'langModelDAll', 'langModelD', 'rpmD', 'rpdD']
+    ['provider4', 'base4', 'model4', 'models4', 'keys4', 'extraParams4', 'langModelDAll', 'langModelD', 'rpmD', 'rpdD']
       .forEach(k => assert.ok(new RegExp('\\b' + k + ':').test(sv), 'DEFAULTS 缺 ' + k));
-    assert.ok(/if \(which === 'D'\) return !!\(cfg\.base4 && cfg\.model4 && dKeys\(cfg\)\.length\)/.test(sv),
-      'slotReady 没把 D 算进「配全」判断');
+    assert.ok(/if \(which === 'D'\) return !!\(cfg\.base4 && dModels\(cfg\)\.length && dKeys\(cfg\)\.length\)/.test(sv),
+      'slotReady 没把 D 算进「配全」判断（v0.9.347 起按「至少一档启用的模型」判）');
     /* 选路：pickRoute 先判 D，不命中才落回老的 pickModel —— 老路径零改动 */
     assert.ok(/function pickRoute\(cfg, lang, meta\)/.test(sv), '缺 pickRoute');
     const prBody = sv.slice(sv.indexOf('function pickRoute'), sv.indexOf('async function callModelD'));
@@ -14809,25 +14809,26 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(prBody.indexOf('langInD(cfg, lang)') >= 0, 'pickRoute 没做 D 的语言范围判断');
     assert.ok(prBody.indexOf('pickModel(cfg, lang)') >= 0, 'pickRoute 没落回 pickModel');
     assert.ok(/pickRoute\(cfg, lang, body\.meta\)/.test(sv), 'translate 主流程没用 pickRoute');
-    /* 轮换规则（用户 10-20 定案）：RPD 打满退役、RPM 打满只跳过、RPM 全满回 wait 不降级 */
-    const dpBody = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dExhaust'));
-    assert.ok(/st\.ex \|\| \(st\.used \|\| 0\) >= rpd/.test(dpBody), 'dPick 没把「当日耗尽」的 key 排除');
-    assert.ok(/dRpmUsed\(k\.i\) >= rpm/.test(dpBody), 'dPick 没把「本分钟满」的 key 跳过');
+    /* 轮换规则（用户 10-20 定案）：RPD 打满退役、RPM 打满只跳过、RPM 全满回 wait 不降级。
+       v0.9.347：单元从 key 变成 (key, 模型)，判定改走 dCellDead / dCellList。 */
+    const dpBody = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dQuotaErr'));
+    assert.ok(/dCellDead\(st, c\.rpd\)/.test(dpBody), 'dPick 没把「当日耗尽」的单元排除');
+    assert.ok(/dRpmUsed\(c\.i, c\.model\) >= c\.rpm/.test(dpBody), 'dPick 没把「本分钟满」的单元跳过');
     assert.ok(/return \{ wait: wait \|\| 30 \}/.test(dpBody), 'RPM 全满时没回 wait（直接降级 = 白扔免费额度）');
     assert.ok(/if \(!live\) return null/.test(dpBody), 'RPD 全满时没返回 null（应跨槽降级）');
     /* 换 key：只有额度类错误才换，其他错误必须上抛去走跨槽回退 */
     const cdBody = sv.slice(sv.indexOf('async function callModelD'), sv.indexOf('/* ---------------- v0.9.183'));
     assert.ok(/dQuotaErr\(e\)/.test(cdBody), 'callModelD 没判额度类错误');
-    assert.ok(/dExhaust\(kp\.i, e\)/.test(cdBody), 'callModelD 没标记耗尽');
+    assert.ok(/dMarkErr\(cfg, kp\.i, kp\.model, e\)/.test(cdBody), 'callModelD 没标记耗尽');
     assert.ok(/throw e;\s*\/\/ 非额度错误/.test(cdBody), 'callModelD 把非额度错误也吞了（会白白耗掉三个 key）');
     /* 回退链 D → C → B → A，且带 lang（D 退到 C/B 时要尊重它们各自的分流） */
     const fcBody = sv.slice(sv.indexOf('function fallbackChain'), sv.indexOf('/* ---------------- v0.9.345：模型 D'));
     assert.ok(/which === 'D'/.test(fcBody), 'fallbackChain 没处理 D');
     assert.ok(/out\.push\('C'\)/.test(fcBody) && /out\.push\('A'\)/.test(fcBody), 'D 的回退链没按 C→B→A 排');
     assert.ok(/fallbackChain\(cfg, pick\.which, lang\)/.test(sv), '回退调用没带 lang（D 退到 C/B 会绕过语言分流）');
-    /* 后台：三行 key + 语言范围开关 + 四个按钮 */
+    /* 后台：三行 key + 语言范围开关 + 四个按钮 + 模型池表格 */
     ['btnSave4', 'btnTest4', 'btnReset4', 'btnClear4', 'key4_1', 'key4_2', 'key4_3',
-     'dScopeAll', 'dScopePick', 'rpmD', 'rpdD', 'langChipsD', 'langCountD']
+     'dScopeAll', 'dScopePick', 'dModelRows', 'btnAddModel4', 'langChipsD', 'langCountD']
       .forEach(id => assert.ok(adm.indexOf('id="' + id + '"') >= 0, 'admin.html 缺 #' + id));
     assert.ok(/function renderDKeys/.test(adm), 'admin.html 缺 renderDKeys（三个 key 的状态显示）');
     /* 明文 key 绝不出服务端：GET config 只给 dKeys 掩码 */
@@ -14849,7 +14850,7 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     const pk0 = sv.slice(sv.indexOf('function dPeek'), sv.indexOf('function dPick'));
     assert.ok(/if \(b && b\.tokens < 1\) return \{ deny: 'hourly' \}/.test(pk0), 'dPeek 没在桶空时拒绝');
     assert.ok(pk0.indexOf('return { wait: wait || 30 }') > 0, 'dPeek 的 RPM 等待分支被弄丢了');
-    const dp0 = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dExhaust'));
+    const dp0 = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dQuotaErr'));
     assert.ok(/if \(b\) b\.tokens -= 1;/.test(dp0), 'dPick 没扣桶里的名额（并发会超发）');
     const pr0 = sv.slice(sv.indexOf('function pickRoute'), sv.indexOf('async function callModelD'));
     assert.ok(/peek\.deny\) return pickModel/.test(pr0), 'pickRoute 没在桶空时降级到 C/B/A');
@@ -14862,6 +14863,84 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/function renderDPool/.test(adm), 'admin.html 缺 renderDPool');
     assert.ok(adm.indexOf("hourlyD: +$('hourlyD').value || 0") >= 0, '后台保存没带 hourlyD');
     assert.ok(/dPool: dPoolStatus\(cfg\)/.test(sv), 'GET config 没返回整槽额度面板');
+  });
+
+  t('v0.9.347：模型 D 支持多模型（模型池 / 先横后纵 / 429 分日限额与分钟限额）', () => {
+    const sv = readT('server.js');
+    const adm = readT('admin.html');
+
+    /* 一、配置与兼容：models4 是带顺序的数组；老的单 model4 自动当一档，升级不用重填 */
+    assert.ok(/\bmodels4: \[\]/.test(sv), 'DEFAULTS 缺 models4');
+    assert.ok(/const D_MAX_MODELS = 6/.test(sv), '模型池上限没定义');
+    const mr = sv.slice(sv.indexOf('function dModelsRaw'), sv.indexOf('function dModels('));
+    assert.ok(/if \(!out\.length && String\(\(cfg && cfg\.model4\) \|\| ''\)\.trim\(\)\)/.test(mr),
+      'dModelsRaw 没做老配置兼容（models4 为空时应回落单 model4）');
+    assert.ok(/on: m\.on !== false/.test(mr), '模型档没有「启用」开关（想临时停用某档只能删掉重建？）');
+    const dm = sv.slice(sv.indexOf('function dModels('), sv.indexOf('/* 账本单元'));
+    assert.ok(/filter\(m => m\.on\)/.test(dm), 'dModels 没过滤掉停用的档');
+
+    /* 二、顺序：先横向换 key、再纵向降档。反过来的话，同一档还有 key 余量却换了模型，
+       等于为省一次请求把输出质量换掉 —— 模型池的核心价值就没了。 */
+    const cl = sv.slice(sv.indexOf('function dCellList'), sv.indexOf('function dCellDead'));
+    const iModelLoop = cl.indexOf('for (const m of ordered)');
+    const iKeyLoop = cl.indexOf('for (const k of keys)');
+    assert.ok(iModelLoop > 0 && iKeyLoop > iModelLoop, 'dCellList 不是「外层模型、内层 key」（应先把同档的 key 用完）');
+    /* ⚠️ 必须是 pi >= 0：粘性档就是第一档时 pi=0，写成 pi > 0 会让它既没被提前 push、
+       又被下面的循环（i !== pi）跳过 —— 第一档凭空消失，一集里第一批用完就直接掉第二档。
+       v0.9.347 端到端实测踩过，这里钉死。 */
+    assert.ok(/if \(pi >= 0\) ordered\.push\(ms\[pi\]\)/.test(cl),
+      'dCellList 没把整集锁记住的档位提到最前（集内会来回跳档）');
+    assert.ok(/for \(let i = 0; i < ms\.length; i\+\+\) if \(i !== pi\) ordered\.push\(ms\[i\]\)/.test(cl),
+      'dCellList 把粘性档排到前面后忘了排其余档（会丢掉后面的模型）');
+
+    /* 三、账本按「模型名」记，不按数组下标：后台能上移下移，用下标会让用量记到别的模型头上 */
+    assert.ok(/function dCellKey\(i, model\)\{ return i \+ '\|' \+ model; \}/.test(sv),
+      '账本单元不是 (key 下标 + 模型名)');
+    assert.ok(/function dRpmKey\(i, model\)/.test(sv), 'RPM 滑窗没按 (key, 模型) 分开——不同模型 RPM 不同，共用一个窗口会互相误伤');
+
+    /* 四、dPeek 与 dPick 必须共用 dCellList：否则「探到的」和「扣掉的」不是同一格，
+       会重演 v0.9.345 那个「一批吃掉两倍额度」的真 bug */
+    const pk = sv.slice(sv.indexOf('function dPeek'), sv.indexOf('function dPick'));
+    assert.ok(/const cells = dCellList\(cfg, prefer\)/.test(pk), 'dPeek 没走 dCellList（会与 dPick 选出不同的单元）');
+    assert.ok(/return \{ ok: true, model: c\.model, i: c\.i \}/.test(pk), 'dPeek 没返回它会选中的模型（事件里的模型名只能靠它）');
+
+    /* 五、429 必须分清「日限额」和「分钟限额」：分钟限额按天退役的话，上午就会把全池判死 */
+    const mk = sv.slice(sv.indexOf('function dErrKind'), sv.indexOf('function dMarkErr'));
+    assert.ok(/return 'rpm'/.test(mk) && /return 'day'/.test(mk), 'dErrKind 没区分分钟/日限额');
+    assert.ok(/st\.cool = Date\.now\(\) \+ 60000/.test(sv), '分钟限额没设冷静期（会被当成当日耗尽）');
+    assert.ok(/function dKeyDead/.test(sv), '缺 dKeyDead（无效 key 应连坐该 key 的所有模型）');
+    const me = sv.slice(sv.indexOf('function dMarkErr'), sv.indexOf('/* 整集锁'));
+    assert.ok(/if \(dKeyDead\(err\)\)/.test(me), 'dMarkErr 没处理「key 本身无效」');
+    assert.ok(/for \(const m of dModels\(cfg\)\)/.test(me), '无效 key 没连坐该 key 的所有模型');
+
+    /* 六、调用链：档位粘性、真实模型名回传、轮数按单元数算 */
+    assert.ok(/async function callModelD\(cfg, messages, maxTokens, opts, task\)/.test(sv), 'callModelD 没接 task（记不住本集用的哪一档）');
+    assert.ok(/dTaskMark\(task, kp\.model\)/.test(sv), 'callModelD 成功后没记住档位');
+    assert.ok(/const maxRound = Math\.max\(4, dCellList\(cfg, prefer\)\.length \+ 2\)/.test(sv),
+      'callModelD 的轮数没跟着单元数走（多档时会在还有额度的情况下提前放弃）');
+    assert.ok(/if \(out && typeof out === 'object'\) out\._used = kp\.model/.test(sv), 'callModelD 没把真实模型名写进 _used');
+    assert.ok(/!out\._used\) out\._used = String\(slotModelName/.test(sv),
+      '主流程无条件覆写了 _used（降档后前端会显示一个没用过的模型名）');
+    assert.ok(/callModelD\(cfg, body\.messages, undefined, Object\.assign\(\{\}, jsonOpts, \{ signal: cliAc\.signal, timeoutMs: CALL_BUDGET_MS \}\), dTaskId\)/.test(sv),
+      '主流程调 callModelD 没把 dTaskId 传进去');
+    assert.ok(/function slotCfgD\(cfg, key, model\)/.test(sv), 'slotCfgD 还是单模型签名');
+
+    /* 七、后台：模型池表格 + 保存时带 models4；老的单 model4 输入框必须消失，
+       否则会出现「两个地方都能改模型名，以哪个为准」 */
+    assert.ok(/function renderDModels/.test(adm) && /function syncDModels/.test(adm), 'admin.html 缺模型池的渲染/同步函数');
+    assert.ok(/models4: models\.map\(m => \(\{ name: m\.name, rpm: m\.rpm, rpd: m\.rpd, on: m\.on !== false \}\)\)/.test(adm),
+      '后台保存没带 models4');
+    /* 旧后台页（缓存）只发 model4：必须把模型池收敛成一档，否则「保存成功但没生效」 */
+    assert.ok(/else if \(typeof body\.model4 === 'string' && body\.model4\.trim\(\)\)/.test(sv),
+      '旧后台页的 model4 写入没做收敛（会变成「保存了却不生效」）');
+    assert.ok(adm.indexOf('id="model4"') < 0, '后台还留着单模型输入框 #model4（应与模型池二选一）');
+    assert.ok(/data-mv/.test(adm) && /data-mdel/.test(adm), '模型池没有上移/下移/删除按钮');
+    assert.ok(/if \(new Set\(names\)\.size !== names\.length\)/.test(adm), '后台没拦重复模型名（同名两档不会变成两份额度）');
+    /* 测试按钮要连模型一起测：key 有效但某个模型没开通，是最容易漏的一类 */
+    assert.ok(/models\.push\(\{ name: ms\[mi\]\.name/.test(sv), '测试接口没覆盖「除第一档以外的模型」');
+    assert.ok(/dModelsRaw\(cfg\),     \/\/ v0\.9\.347/.test(sv), 'GET config 没返回 models4（后台就渲染不出模型池）');
+    /* 额度面板要按档给出今日用量，否则用户不知道该不该再加一档 */
+    assert.ok(/models: ms,/.test(sv) && /dailyCap: ms\.reduce/.test(sv), 'dPoolStatus 没按档汇总用量/总容量');
   });
 
   if (have.length !== files.length)

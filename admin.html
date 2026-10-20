@@ -62,6 +62,16 @@
   .drow{display:flex;gap:8px;align-items:center;margin-top:4px}
   .drow input{flex:1}
   .drow button{padding:6px 12px;font-size:13px;flex:0 0 auto}
+  /* v0.9.347：模型池表格（模型名 / RPM / RPD / 今日用量 / 排序删除） */
+  .mhead,.mrow{display:grid;grid-template-columns:20px minmax(0,1fr) 62px 76px 118px 66px;gap:8px;align-items:center}
+  .mhead{font-size:12px;color:var(--mut);padding:0 2px}
+  .mrow{margin-top:6px}
+  .mrow input{padding:6px 8px;font-size:13px}
+  .mrow input[type=checkbox]{width:auto;justify-self:center;margin:0}
+  .mstat{font-size:12px;color:var(--mut);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mstat.bad{color:var(--err)}
+  .mops{display:flex;gap:4px;justify-content:flex-end}
+  .mops button{padding:3px 7px;font-size:12px;line-height:1.2}
   .chip2 .cv{opacity:.65;font-size:11px;margin-left:2px}
   /* v0.9.308：后台分 tab —— 此前模型配置、使用记录、改密码全平铺在一页里，
      改一次 Key 要往下翻很久才到统计，日常用起来是滚动条管理。 */
@@ -205,41 +215,29 @@
          且额度按「请求次数」算（RPM / RPD），不是 token。 -->
     <div class="card">
       <h2>模型 D（Gemini 免费额度池 · 优先级最高）</h2>
-      <div class="note" style="margin:0 0 12px">三个 key <b>顺序使用</b>：前一个到当日上限才动下一个，不是轮询。单个 key 到「每分钟」上限只是跳过它、不退役；三个都到「每日」上限才回退到 C / B / A。<b>RPM / RPD 请照 Google AI Studio 速率限制页显示的数字填</b> —— 填大了会撞 429（能兜住，但白跑一趟），填小了会提前停用免费额度。</div>
-      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
+      <div class="note" style="margin:0 0 12px">三个 key <b>顺序使用</b>：前一个到当日上限才动下一个，不是轮询。模型池按<b>从上到下的顺序</b>用：上一档的 key 全用满，才降下一档。单个 key 到「每分钟」上限只是跳过它、不退役；全池（所有档 × 所有 key）都到「每日」上限才回退到 C / B / A。<b>RPM / RPD 请照 Google AI Studio 速率限制页显示的数字填</b> —— 填大了会撞 429（能兜住，但白跑一趟），填小了会提前停用免费额度。</div>
+      <label>服务商（Base URL 自动填充，模型名在下面的模型池里填）</label>
       <select id="provider4"></select>
-      <div class="row">
-        <div>
-          <label>Base URL（自动拼接 /chat/completions）</label>
-          <input type="text" id="base4" spellcheck="false" placeholder="https://generativelanguage.googleapis.com/v1beta/openai">
-        </div>
-        <div>
-          <label>模型名</label>
-          <input type="text" id="model4" spellcheck="false" placeholder="gemini-3-flash">
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label>每个 key 每分钟请求上限（RPM）</label>
-          <input type="number" id="rpmD" min="1" max="600" step="1">
-        </div>
-        <div>
-          <label>每个 key 每日请求上限（RPD）</label>
-          <input type="number" id="rpdD" min="1" max="1000000" step="1">
-        </div>
-      </div>
+      <label>Base URL（自动拼接 /chat/completions）</label>
+      <input type="text" id="base4" spellcheck="false" placeholder="https://generativelanguage.googleapis.com/v1beta/openai">
+
+      <label style="margin-top:16px">模型池（按优先级从上到下；每档的 RPM / RPD 各自独立）</label>
+      <div class="mhead"><span></span><span>模型名</span><span>RPM</span><span>RPD</span><span>今日用量</span><span></span></div>
+      <div id="dModelRows"></div>
+      <div class="btns" style="margin-top:10px"><button type="button" id="btnAddModel4">+ 增加一档</button></div>
+      <div class="note">Google 的免费额度按「项目 × 模型」<b>各自独立</b>计算，所以每加一档就多一份免费请求额度。建议只挂 Flash / Flash-Lite 这类稳定输出 JSON 的模型；调整顺序或删除后要<b>点「保存模型 D」</b>才生效。</div>
       <!-- v0.9.346：整槽流量闸。用户只想有一个数能拧，不想算比例 -->
       <div class="row">
         <div>
           <label>整槽每小时最多发多少请求（0 = 不限）</label>
-          <input type="number" id="hourlyD" min="0" max="100000" step="1" placeholder="建议 RPD × key 数 ÷ 24">
+          <input type="number" id="hourlyD" min="0" max="100000" step="1" placeholder="建议 日容量 ÷ 24">
         </div>
         <div>
           <label>额度用量</label>
           <div class="note" id="dPoolHint" style="margin:8px 0 0">—</div>
         </div>
       </div>
-      <div class="note" style="margin:-6px 0 12px">按小时匀速放行，<b>用不完的会攒着（最多攒 3 小时）</b>，深夜攒下的额度正好留给白天高峰。名额用完时新批次直接走 C / B / A，不排队。填 0 = 关闭此闸，仍受每个 key 的 RPD 约束。</div>
+      <div class="note" style="margin:-6px 0 12px">按小时匀速放行，<b>用不完的会攒着（最多攒 3 小时）</b>，深夜攒下的额度正好留给白天高峰。名额是<b>整个 D 槽共用</b>（不分档、不分 key），用完时新批次直接走 C / B / A，不排队。填 0 = 关闭此闸，仍受每档的 RPD 约束。</div>
 
       <label>Key 1（<span class="mask" id="keyMask4_1">未设置</span>）<span class="dstat" id="dStat1"></span></label>
       <div class="drow">
@@ -258,7 +256,7 @@
         <input type="password" id="key4_3" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
         <button type="button" data-cleard="2">清除</button>
       </div>
-      <div class="note">只填 1~2 个也能用。三个 key 属于同一模型时额度才是三份；换了模型名就是另一套额度，不叠加。</div>
+      <div class="note">只填 1~2 个也能用。⚠️ Google 的额度按<b>项目</b>算、不按 key 算：三个 key 要分别属于三个项目才是三份额度；建在同一个项目里的多个 key 共享同一份，轮换会一起失效。</div>
 
       <label style="margin-top:16px;display:flex;align-items:center;gap:8px">
         <input type="radio" name="dScope" value="all" id="dScopeAll" style="width:auto" checked>
@@ -285,7 +283,7 @@
       <textarea id="extraParams4" spellcheck="false" placeholder='{}'></textarea>
       <div class="btns">
         <button class="primary" id="btnSave4">保存模型 D</button>
-        <button id="btnTest4">测试三个 Key</button>
+        <button id="btnTest4">测试全部 Key 与模型</button>
         <button id="btnReset4">重置今日计数</button>
         <button id="btnClear4" style="margin-left:auto">清空模型 D</button>
       </div>
@@ -562,6 +560,48 @@ let langSelC = new Set();
 /* v0.9.345：走模型 D 的目标语言集合。只在「只走勾选的语言」时生效；
    默认「全部语言」时这个集合会被忽略，但仍保留用户勾过的内容，切回来不用重勾。 */
 let langSelD = new Set();
+/* v0.9.347：模型池的编辑态。顺序即优先级；used/cap 是服务端给的今日用量，
+   只用于显示，保存时不会回传（免得把显示值当成配置存进 config.json）。 */
+let dModelList = [];
+function dModelStatText(m){
+  const used = m.used || 0;
+  if (!m.cap) return '今日 ' + used + ' 次';
+  return '今日 ' + used + '/' + m.cap;
+}
+function renderDModels(){
+  const box = $('dModelRows');
+  if (!box) return;
+  if (!dModelList.length){
+    box.innerHTML = '<div class="note">还没有模型。点下面「增加一档」，第一档建议填 gemini-3-flash。</div>';
+    return;
+  }
+  box.innerHTML = dModelList.map((m, i) =>
+    '<div class="mrow" data-i="' + i + '">' +
+      '<input type="checkbox" class="mon"' + (m.on !== false ? ' checked' : '') + ' title="启用这一档">' +
+      '<input type="text" class="mname" spellcheck="false" value="' + esc(m.name || '') + '" placeholder="gemini-3-flash">' +
+      '<input type="number" class="mrpm" min="1" max="600" step="1" value="' + (m.rpm || 15) + '" title="每分钟请求上限">' +
+      '<input type="number" class="mrpd" min="1" max="1000000" step="1" value="' + (m.rpd || 1500) + '" title="每日请求上限">' +
+      '<span class="mstat' + (m.ex ? ' bad' : '') + '">' + esc(dModelStatText(m)) + '</span>' +
+      '<span class="mops"><button type="button" data-mv="-1" title="上移（优先级更高）">↑</button>' +
+      '<button type="button" data-mv="1" title="下移">↓</button>' +
+      '<button type="button" data-mdel="1" title="删除这一档">×</button></span>' +
+    '</div>').join('');
+}
+/* DOM → dModelList。排序/删除前必须先同步，否则刚改的模型名会丢。 */
+function syncDModels(){
+  const rows = Array.prototype.slice.call(document.querySelectorAll('#dModelRows .mrow'));
+  if (!rows.length) return;
+  dModelList = rows.map((r, i) => {
+    const old = dModelList[i] || {};
+    return {
+      name: r.querySelector('.mname').value.trim(),
+      rpm: +r.querySelector('.mrpm').value || 15,
+      rpd: +r.querySelector('.mrpd').value || 1500,
+      on: r.querySelector('.mon').checked,
+      used: old.used || 0, cap: old.cap || 0, ex: old.ex || 0
+    };
+  });
+}
 function paramsText(v){
   if (!v || typeof v !== 'object' || Array.isArray(v)) return '';
   const ks = Object.keys(v);
@@ -609,8 +649,9 @@ function renderDPool(p){
   const cap = p.dailyCap || 0;
   const used = Math.max(0, cap - (p.dailyRemain || 0));
   const daily = cap ? ('今日 ' + used + '/' + cap) : '今日不限';
-  if (!p.hourly) { el.textContent = daily + ' · 每小时不限'; return; }
-  el.textContent = '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily;
+  const mdl = p.modelCount ? (p.modelCount + ' 档 · ') : '';
+  if (!p.hourly) { el.textContent = mdl + daily + ' · 每小时不限'; return; }
+  el.textContent = mdl + '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily;
 }
 function renderDKeys(list){
   for (let i = 0; i < 3; i++) {
@@ -684,11 +725,16 @@ async function loadConfig(){
     $('extraParams3').value = paramsText(c.extraParams3);
     langSel = new Set(Array.isArray(c.langModelB) ? c.langModelB : []);
     langSelC = new Set(Array.isArray(c.langModelC) ? c.langModelC : []);
-    /* v0.9.345：模型 D（老 config.json 没这些字段 → 走空值/默认值，不影响既有行为） */
+    /* v0.9.345：模型 D（老 config.json 没这些字段 → 走空值/默认值，不影响既有行为）
+       v0.9.347：模型名改成模型池；服务端会把老的单模型配置当作一档返回，升级不用重填。 */
     $('base4').value = c.base4 || '';
-    $('model4').value = c.model4 || '';
-    $('rpmD').value = c.rpmD || 15;
-    $('rpdD').value = c.rpdD || 1500;
+    const dStats = (c.dPool && Array.isArray(c.dPool.models)) ? c.dPool.models : [];
+    dModelList = (Array.isArray(c.models4) ? c.models4 : []).map(m => {
+      const st = dStats.find(x => x.name === m.name) || {};
+      return { name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false,
+        used: st.used || 0, cap: st.cap || 0, ex: st.ex || 0 };
+    });
+    renderDModels();
     $('hourlyD').value = c.hourlyD ? c.hourlyD : '';
     renderDPool(c.dPool || null);
     $('extraParams4').value = paramsText(c.extraParams4);
@@ -1167,45 +1213,83 @@ $('provider3').addEventListener('change', () => {
   if (p && p.id !== 'custom' && !$('base3').value.trim()) $('base3').value = p.base;
 });
 
-/* v0.9.345：模型 D（Gemini 免费额度池）。三件事与 B/C 不同：
+/* v0.9.345：模型 D（Gemini 免费额度池）。四件事与 B/C 不同：
    ① 三个 key 一起保存（各自留空 = 保留原值）；
-   ② 「测试三个 Key」逐个测，一个死 key 不该等真用户撞上才发现；
-   ③ 有「重置今日计数」—— 误判把 key 锁死一整天时的手动出口。 */
+   ② 模型是一张池表（v0.9.347），顺序即优先级；
+   ③ 「测试全部 Key 与模型」逐个测，一个死 key / 没开通的模型不该等真用户撞上才发现；
+   ④ 有「重置今日计数」—— 误判把 key 锁死一整天时的手动出口。 */
 $('btnSave4').addEventListener('click', async () => {
-  const base4 = $('base4').value.trim(), model4 = $('model4').value.trim();
+  const base4 = $('base4').value.trim();
   const keys = [1, 2, 3].map(n => $('key4_' + n).value.trim());
-  if (!base4 && !model4 && !keys.some(Boolean)) return msg('cfg4Msg', '模型 D 三项都为空 = 不启用，无需保存', 'err');
-  if (!base4 || !model4) return msg('cfg4Msg', 'Base URL 和模型名不能为空（除非清空模型 D）', 'err');
+  syncDModels();
+  /* 名字为空的档直接丢弃（用户点了「增加一档」但没填，不该拦住保存） */
+  const models = dModelList.filter(m => m.name);
+  if (!base4 && !models.length && !keys.some(Boolean)) return msg('cfg4Msg', '模型 D 三项都为空 = 不启用，无需保存', 'err');
+  if (!base4) return msg('cfg4Msg', 'Base URL 不能为空（除非清空模型 D）', 'err');
+  if (!models.length) return msg('cfg4Msg', '模型池至少填一档模型名', 'err');
+  const names = models.map(m => m.name);
+  if (new Set(names).size !== names.length) return msg('cfg4Msg', '模型名重复了：同一个模型填两档不会变成两份额度', 'err');
   let extraParams4;
   try { extraParams4 = readParams('extraParams4'); } catch (e) { return msg('cfg4Msg', e.message, 'err'); }
   const body = {
-    provider4: $('provider4').value, base4, model4, extraParams4,
+    provider4: $('provider4').value, base4, extraParams4,
+    models4: models.map(m => ({ name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false })),
     langModelDAll: $('dScopeAll').checked,
     langModelD: [...langSelD],
-    rpmD: +$('rpmD').value || 15, rpdD: +$('rpdD').value || 1500,
     hourlyD: +$('hourlyD').value || 0
   };
   keys.forEach((v, i) => { if (v) body['key4_' + (i + 1)] = v; });
   try {
     await api('/api/admin/config', 'POST', body);
     [1, 2, 3].forEach(n => { $('key4_' + n).value = ''; });
-    msg('cfg4Msg', '模型 D 已保存并即时生效 ✓' + ($('dScopeAll').checked ? '（当前接管全部语言）' : '（只接管已勾选的语言）'), 'ok');
+    msg('cfg4Msg', '模型 D 已保存并即时生效 ✓（' + models.length + ' 档模型' +
+      ($('dScopeAll').checked ? ' · 接管全部语言' : ' · 只接管已勾选的语言') + '）', 'ok');
     await loadConfig();
   } catch (e) { msg('cfg4Msg', '保存失败：' + e.message, 'err'); }
 });
 
+/* 模型池：增加一档 / 上移 / 下移 / 删除。改完只重渲染，落盘统一走「保存模型 D」 */
+$('btnAddModel4').addEventListener('click', () => {
+  syncDModels();
+  if (dModelList.length >= 6) return msg('cfg4Msg', '最多 6 档（再多后台也看不清，收益也有限）', 'err');
+  dModelList.push({ name: '', rpm: 15, rpd: 500, on: true, used: 0, cap: 0, ex: 0 });
+  renderDModels();
+});
+$('dModelRows').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const row = btn.closest('.mrow');
+  if (!row) return;
+  syncDModels();
+  const i = +row.dataset.i;
+  if (btn.dataset.mv) {
+    const j = i + (+btn.dataset.mv);
+    if (j < 0 || j >= dModelList.length) return;
+    const t = dModelList[i]; dModelList[i] = dModelList[j]; dModelList[j] = t;
+  } else if (btn.dataset.mdel) {
+    if (!confirm('删除「' + (dModelList[i].name || '未命名') + '」这一档？该档今日的用量记录会一起丢掉。')) return;
+    dModelList.splice(i, 1);
+  }
+  renderDModels();
+});
+
 $('btnTest4').addEventListener('click', async () => {
-  msg('cfg4Msg', '测试中（逐个 key，每个消耗 1 次免费额度）…', 'ok');
+  msg('cfg4Msg', '测试中（逐个 key + 逐个模型，每项消耗 1 次免费额度）…', 'ok');
   try {
     const r = await api('/api/admin/test', 'POST', { which: 'D' });
     const parts = (r.keys || []).map(k =>
-      'Key ' + (k.i + 1) + '：' + (k.ok ? '✓ ' + (k.sample || '(空)') : '✗ ' + (k.err || k.hint || '失败')));
-    msg('cfg4Msg', '模型 D —— ' + (parts.join(' · ') || '没有可测的 key'), r.ok ? 'ok' : 'err');
+      'Key ' + (k.i + 1) + '（' + (r.first || '第一档') + '）：' +
+      (k.ok ? '✓ ' + (k.sample || '(空)') : '✗ ' + (k.err || k.hint || '失败')));
+    if ((r.models || []).length) {
+      parts.push('模型 ' + r.models.map(m =>
+        m.name + '：' + (m.ok ? '✓ ' + (m.sample || '(空)') : '✗ ' + (m.err || m.hint || '失败'))).join(' · '));
+    }
+    msg('cfg4Msg', '模型 D —— ' + (parts.join(' ｜ ') || '没有可测的项'), r.ok ? 'ok' : 'err');
   } catch (e) { msg('cfg4Msg', e.message, 'err'); }
 });
 
 $('btnReset4').addEventListener('click', async () => {
-  if (!confirm('把模型 D 三个 key 的今日用量清零？清零后它们会被重新当作「还有额度」使用。\n\n只在确认某个 key 被误判耗尽时才需要这么做。')) return;
+  if (!confirm('把模型 D 所有 key × 所有模型的今日用量清零？清零后它们会被重新当作「还有额度」使用。\n\n只在确认某档被误判耗尽时才需要这么做。')) return;
   try {
     await api('/api/admin/config', 'POST', { resetD: true });
     msg('cfg4Msg', '今日计数已重置 ✓', 'ok');

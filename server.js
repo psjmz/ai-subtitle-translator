@@ -62,13 +62,17 @@ const DEFAULTS = {
      优先级 D > C > B > A —— D 是唯一「免费优先」的槽，配好就该先吃它的额度。 */
   provider4: '',
   base4: '',
-  model4: '',
+  model4: '',              // 兼容字段：等于 models4[0].name（老代码/老配置都认它）
   keys4: [],               // 1~3 个 API Key：顺序填充，用完一个才动下一个（不是轮询）
+  /* v0.9.347：模型池。Google 的免费额度按「项目 × 模型」各自独立算，挂几档就有几份额度。
+     数组顺序 = 优先级（强的在前）：上一档的 key 全用满才降下一档。
+     每档独立 RPM / RPD —— 不同模型的免费档位本来就不一样。 */
+  models4: [],
   extraParams4: {},
   langModelDAll: true,     // true = 全部目标语言先走 D；false = 只走 langModelD 列出的
   langModelD: [],
-  rpmD: 15,                // 每个 key 每分钟请求上限（按 AI Studio 速率限制页的实际数字填）
-  rpdD: 1500,              // 每个 key 每日请求上限（同上）
+  rpmD: 15,                // 兼容字段：等于 models4[0].rpm（models4 为空时才是唯一模型的 RPM）
+  rpdD: 1500,              // 兼容字段：等于 models4[0].rpd
   hourlyD: 0               // v0.9.346：整槽每小时补多少个名额（0 = 不限）。见 dBucket 注释
 };
 
@@ -5913,8 +5917,9 @@ function withExtra(core, extra){
 function slotReady(cfg, which){
   if (which === 'B') return !!(cfg.base2 && cfg.model2 && cfg.key2);
   if (which === 'C') return !!(cfg.base3 && cfg.model3 && cfg.key3);
-  /* v0.9.345：D 的「配全」= base + model + 至少一个 key。keys4 是数组，1~3 个都算配全 */
-  if (which === 'D') return !!(cfg.base4 && cfg.model4 && dKeys(cfg).length);
+  /* v0.9.345：D 的「配全」= base + 至少一档启用的模型 + 至少一个 key。
+     keys4 是数组（1~3 个），models4 也是数组（1~6 档，v0.9.347）—— 任一档有 key 就能跑。 */
+  if (which === 'D') return !!(cfg.base4 && dModels(cfg).length && dKeys(cfg).length);
   return false;
 }
 function modelBReady(cfg){ return slotReady(cfg, 'B'); }
@@ -5925,10 +5930,10 @@ function slotCfg(cfg, which){
   if (which === 'C') return { base: cfg.base3, model: cfg.model3, key: cfg.key3, temperature: cfg.temperature, extraParams: cfg.extraParams3 };
   return { base: cfg.base,  model: cfg.model,  key: cfg.key,  temperature: cfg.temperature, extraParams: cfg.extraParams };
 }
-/* v0.9.345：D 槽的调用配置。key 由 dPick 现选（D 的 key 是动态的，不像 A/B/C 固定一个），
-   故单列一个函数、不塞进 slotCfg —— slotCfg(cfg,'D') 没有确定的 key，塞进去只会让人误用。 */
-function slotCfgD(cfg, key){
-  return { base: cfg.base4, model: cfg.model4, key: key, temperature: cfg.temperature, extraParams: cfg.extraParams4 };
+/* v0.9.345：D 槽的调用配置。key 由 dPick 现选、模型由模型池现挑（都不像 A/B/C 是固定一个），
+   故单列一个函数、不塞进 slotCfg —— slotCfg(cfg,'D') 没有确定的 key/model，塞进去只会让人误用。 */
+function slotCfgD(cfg, key, model){
+  return { base: cfg.base4, model: model, key: key, temperature: cfg.temperature, extraParams: cfg.extraParams4 };
 }
 /* v0.9.193：按目标语言分流，优先级 C > B > A。
    先查 langModelC（C 配全才作数）→ 再查 langModelB → 否则 A。
@@ -5981,10 +5986,11 @@ function fallbackChain(cfg, which, lang){
       否则用户在后台清空 Key 2，Key 3 的用量会错记到 Key 2 头上。 */
 const DQUOTA_PATH = path.join(DATA_DIR, 'gemini-quota.json');
 const D_RPM_WIN   = 60000;          // RPM 滑窗长度
-const D_RPM       = Object.create(null);   // 原始下标 -> [时间戳…]（内存，重启清零可接受）
-const D_TASK      = new Map();      // taskId -> {slot:'D'|'X', at} 整集锁
+const D_RPM       = Object.create(null);   // 'key下标|模型名' -> [时间戳…]（内存，重启清零可接受）
+const D_TASK      = new Map();      // taskId -> {slot:'D'|'X', model, at} 整集锁 + 档位粘性
 const D_TASK_TTL  = 6 * 3600 * 1000;
 const D_CUE_CAP   = 45;             // 保守估批数用：45 是前端最细的 CUE_CAP（中日韩/日/荷/瑞）
+const D_MAX_MODELS = 6;             // 模型池上限。再多后台表格就看不清了，也没有实际收益
 
 /* 太平洋时间日期串（YYYY-MM-DD）。Gemini 免费额度按 PT 午夜重置，用本地日期会在
    北京时间下午三点前后错位一天 —— 那正好是国内用户最活跃的时段。 */
@@ -6007,28 +6013,77 @@ function dKeyList(cfg){
 /* dKeys 保留成「只看数量」的简写，slotReady / 报错文案用它 */
 function dKeys(cfg){ return dKeyList(cfg).map(x => x.key); }
 
+/* ---------------- v0.9.347：模型池 ----------------
+   背景：Gemini 免费层的额度是**每个模型各自独立**的（同一项目里 Flash 和 Flash-Lite
+   各算各的 RPD）。所以「加一档模型」等于「多加一份免费额度」—— 这是唯一不花钱、
+   又能实打实提高免费请求总量的办法（合并批次也能省请求数，但那个动的是翻译主链路）。
+
+   排序即优先级：数组从上到下，上一档的**所有 key** 都用满，才降下一档。
+   为什么不是轮询均摊：Flash 的质量明显好于 Lite，把额度均摊等于主动降质。
+   和 key 的关系是「先横向、再纵向」—— key 换掉不改变模型，输出质量不变；
+   跨档才会换模型，所以要尽量晚发生。
+
+   on:false 的档留在配置里但不参与选路（想临时停用某档不必删掉它再重建）。
+   老配置兼容：models4 为空时，把单个 model4 + rpmD/rpdD 当成一档 —— 升级不用重填。 */
+function dModelsRaw(cfg){
+  const arr = (cfg && Array.isArray(cfg.models4)) ? cfg.models4 : [];
+  const out = [];
+  for (const m of arr) {
+    if (!m || typeof m !== 'object') continue;
+    const name = String(m.name == null ? '' : m.name).trim().slice(0, 64);
+    if (!name) continue;
+    out.push({
+      name: name,
+      rpm: Math.max(1, Math.min(600, Math.floor(+m.rpm || 15))),
+      rpd: Math.max(1, Math.min(1000000, Math.floor(+m.rpd || 1500))),
+      on: m.on !== false
+    });
+    if (out.length >= D_MAX_MODELS) break;
+  }
+  if (!out.length && String((cfg && cfg.model4) || '').trim()) {
+    out.push({ name: String(cfg.model4).trim().slice(0, 64),
+      rpm: Math.max(1, Math.min(600, Math.floor(+cfg.rpmD || 15))),
+      rpd: Math.max(1, Math.min(1000000, Math.floor(+cfg.rpdD || 1500))), on: true });
+  }
+  return out;
+}
+/* 参与选路的档（on:false 与空名跳过）。顺序就是优先级顺序。 */
+function dModels(cfg){ return dModelsRaw(cfg).filter(m => m.on); }
+
+/* 账本单元 = (key 下标, 模型名)。用模型名而不是数组下标当键，是因为后台可以上移下移
+   调整顺序 —— 用下标的话，调一次顺序昨天的用量就记到别的模型头上了。
+   ⚠️ 老版本（345/346）的账本是 q.keys[i]（按 key 记、只有单模型）。升级当天那份用量
+      不会被继承（cells 里没有对应单元），当天会多放一截流量；第二天自然对齐。
+      生产环境升级时 D 槽还没有 key，实际影响为零。 */
+function dCellKey(i, model){ return i + '|' + model; }
 function dRead(){
   try {
     const q = JSON.parse(fs.readFileSync(DQUOTA_PATH, 'utf8'));
-    if (q && q.date === ptDateStr() && Array.isArray(q.keys)) return q;
+    if (q && q.date === ptDateStr()) {
+      if (!q.cells || typeof q.cells !== 'object' || Array.isArray(q.cells)) q.cells = {};
+      return q;
+    }
   } catch (e) {}
-  return { date: ptDateStr(), keys: [] };
+  return { date: ptDateStr(), cells: {} };
 }
 function dWrite(q){
   try { fs.writeFileSync(DQUOTA_PATH, JSON.stringify(q), 'utf8'); } catch (e) {}
 }
-function dState(q, i){
-  while (q.keys.length <= i) q.keys.push({ used: 0, ex: 0, err: '' });
-  return q.keys[i];
+function dCell(q, i, model){
+  const k = dCellKey(i, model);
+  if (!q.cells[k]) q.cells[k] = { used: 0, ex: 0, cool: 0, err: '' };
+  return q.cells[k];
 }
-function dRpmUsed(i){
-  const arr = D_RPM[i] || (D_RPM[i] = []);
+function dRpmKey(i, model){ return i + '|' + model; }
+function dRpmUsed(i, model){
+  const k = dRpmKey(i, model);
+  const arr = D_RPM[k] || (D_RPM[k] = []);
   const cut = Date.now() - D_RPM_WIN;
   while (arr.length && arr[0] < cut) arr.shift();
   return arr.length;
 }
-function dRpmWait(i){
-  const arr = D_RPM[i] || [];
+function dRpmWait(i, model){
+  const arr = D_RPM[dRpmKey(i, model)] || [];
   if (!arr.length) return 0;
   return Math.max(1, Math.ceil((arr[0] + D_RPM_WIN - Date.now()) / 1000));
 }
@@ -6070,15 +6125,39 @@ function dBucket(q, cfg){
   b.at = now;
   return b;
 }
-/* 今日还能发多少次（几个 key 加总）。整集锁 D 用它判断「够不够跑完这一集」 */
+/* 选路用的候选单元，按「先横向换 key、再纵向降档」排好：
+       档 1 × Key1 → 档 1 × Key2 → 档 1 × Key3 → 档 2 × Key1 → …
+   prefer 是整集锁记下的档位：上一批用的是哪个模型，这一批先试它。
+   同一档换 key 输出完全一致（同一个模型），跨档才是真的换模型 —— 所以顺序不能反。
+   dPeek 与 dPick 必须共用这一份顺序，否则「探到的」和「扣掉的」不是同一格。 */
+function dCellList(cfg, prefer){
+  const keys = dKeyList(cfg);
+  const ms = dModels(cfg);
+  if (!keys.length || !ms.length) return [];
+  const ordered = [];
+  const pi = prefer ? ms.findIndex(m => m.name === prefer) : -1;
+  /* ⚠️ 必须 >= 0：粘性档就是第一档时 pi=0，写成 > 0 会让它既没被提前 push、又被下面的
+     循环跳过（i !== pi），整档凭空消失 —— v0.9.347 端到端实测：一集里第一批用完就直接掉第二档。 */
+  if (pi >= 0) ordered.push(ms[pi]);
+  for (let i = 0; i < ms.length; i++) if (i !== pi) ordered.push(ms[i]);
+  const out = [];
+  for (const m of ordered) {
+    for (const k of keys) out.push({ i: k.i, key: k.key, model: m.name, rpm: m.rpm, rpd: m.rpd });
+  }
+  return out;
+}
+/* 该单元今天还能不能用（ex=当日报废；used 到 RPD 也算报废） */
+function dCellDead(st, rpd){ return !!(st.ex || (st.used || 0) >= rpd); }
+
+/* 今日还能发多少次（所有模型 × 所有 key 加总）。整集锁 D 用它判断「够不够跑完这一集」。
+   v0.9.347：多档模型时这里自然翻倍 —— 2 档 × 2 key × 500 RPD = 2000 次，正是模型池的意义。 */
 function dRemain(cfg, q0){
-  const rpd = Math.max(1, +cfg.rpdD || 1500);
   const q = q0 || dRead();
   let n = 0;
-  for (const k of dKeyList(cfg)) {
-    const st = dState(q, k.i);
+  for (const c of dCellList(cfg, '')) {
+    const st = q.cells[dCellKey(c.i, c.model)] || {};
     if (st.ex) continue;
-    n += Math.max(0, rpd - (st.used || 0));
+    n += Math.max(0, c.rpd - (st.used || 0));
   }
   return n;
 }
@@ -6090,129 +6169,198 @@ function dAvail(cfg){
   const b = dBucket(q, cfg);
   return b ? Math.min(rem, Math.floor(b.tokens)) : rem;
 }
-/* 后台展示：整槽视角的额度面板（每个 key 的明细仍走 dKeyStatus） */
+/* 后台展示：整槽视角的额度面板（每个 key 的明细仍走 dKeyStatus）。
+   models 一栏是每档模型今天的合计用量 —— 用户就是靠它判断「该不该再加一档」。 */
 function dPoolStatus(cfg){
   const q = dRead();
   const cap = dHourly(cfg);
   const b = dBucket(q, cfg);
-  const rpd = Math.max(1, +cfg.rpdD || 1500);
-  const nk = dKeyList(cfg).length;
+  const keys = dKeyList(cfg);
+  const ms = dModels(cfg).map(m => {
+    let used = 0, ex = 0;
+    for (const k of keys) {
+      const st = q.cells[dCellKey(k.i, m.name)] || {};
+      used += (st.used || 0);
+      if (st.ex) ex = 1;
+    }
+    return { name: m.name, rpm: m.rpm, rpd: m.rpd, cap: m.rpd * keys.length, used: used, ex: ex };
+  });
   return {
     hourly: cap,                                  // 0 = 不限
     tokens: b ? Math.floor(b.tokens) : 0,         // 现在能发几次
     max: cap ? cap * D_BURST_H : 0,               // 桶的上限（攒满 3 小时）
     hourUsed: dHourUsed(),                        // 近 60 分钟已发
-    dailyCap: rpd * nk, dailyRemain: dRemain(cfg, q),
+    models: ms,                                   // 每档模型的今日用量
+    modelCount: ms.length,
+    dailyCap: ms.reduce((s, m) => s + m.cap, 0),  // 全池日容量（RPD × key 数 × 档数）
+    dailyRemain: dRemain(cfg, q),
     date: ptDateStr()
   };
 }
 /* 后台展示用：每个 key 的掩码 + 今日用量 + 状态。明文一律不回传（与 A/B/C 的 keyMask 同规矩）。
-   固定返回 3 项：输入框是固定三个，没配的位置也要能显示「未设置」。 */
+   固定返回 3 项：输入框是固定三个，没配的位置也要能显示「未设置」。
+   v0.9.347：一个 key 现在横跨多档模型，used/rpd 都是**各档之和**；
+   本分钟取各档里最挤的那个（rpm 取最严的），这样一眼能看出是不是快撞 RPM 了。 */
 function dKeyStatus(cfg){
   const q = dRead();
-  const rpd = Math.max(1, +cfg.rpdD || 1500);
-  const rpm = Math.max(1, +cfg.rpmD || 15);
+  const ms = dModels(cfg);
   const arr = (cfg && Array.isArray(cfg.keys4)) ? cfg.keys4 : [];
   const out = [];
   for (let i = 0; i < 3; i++) {
     const raw = String(arr[i] == null ? '' : arr[i]).trim();
-    const st = q.keys[i] || {};
+    let used = 0, cap = 0, ex = 0, err = '', rpmUsed = 0, rpm = 0;
+    const cells = [];
+    for (const m of ms) {
+      const st = q.cells[dCellKey(i, m.name)] || {};
+      used += (st.used || 0);
+      cap += m.rpd;
+      if (st.ex) { ex = 1; if (!err) err = st.err || ''; }
+      const ru = dRpmUsed(i, m.name);
+      if (ru > rpmUsed) rpmUsed = ru;
+      if (!rpm || m.rpm < rpm) rpm = m.rpm;
+      cells.push({ model: m.name, used: st.used || 0, rpd: m.rpd, ex: st.ex || 0 });
+    }
     out.push({ i: i, set: !!raw,
       mask: raw ? (raw.slice(0, 5) + '…' + raw.slice(-4)) : '',
-      used: st.used || 0, rpd: rpd, ex: st.ex || 0, err: st.err || '',
-      rpmUsed: dRpmUsed(i), rpm: rpm });
+      used: used, rpd: cap, ex: ex, err: err,
+      rpmUsed: rpmUsed, rpm: rpm || 15, cells: cells });
   }
   return out;
 }
-/* 只探测「有没有可用 key」，**不预扣**。选路的判断（走 D 还是走 C/B/A）用它，
+/* 只探测「有没有可用 key+模型」，**不预扣**。选路的判断（走 D 还是走 C/B/A）用它，
    真正扣额度留给 callModelD —— 否则同一批会被扣两次（v0.9.345 自测抓到的真 bug：
-   选路时预扣一次、调用时又选一次，结果一个 key 的每日额度被吃掉两倍）。 */
-function dPeek(cfg){
-  const list = dKeyList(cfg);
-  if (!list.length) return null;
-  const rpm = Math.max(1, +cfg.rpmD || 15);
-  const rpd = Math.max(1, +cfg.rpdD || 1500);
+   选路时预扣一次、调用时又选一次，结果一个 key 的每日额度被吃掉两倍）。
+   prefer 是整集锁记下的档位，只影响「先试哪档」，不影响能不能用。 */
+function dPeek(cfg, prefer){
+  const cells = dCellList(cfg, prefer);
+  if (!cells.length) return null;
   const q = dRead();
   /* v0.9.346：小时名额空了 → 直接交给 C/B/A，**不回 wait**。
      这是用户自己拧的流量阀门，不是额度临时紧张，让他等没有意义。 */
   const b = dBucket(q, cfg);
   if (b && b.tokens < 1) return { deny: 'hourly' };
+  const now = Date.now();
   let live = 0, wait = 0;
-  for (const k of list) {
-    const st = q.keys[k.i] || {};
-    if (st.ex || (st.used || 0) >= rpd) continue;
+  for (const c of cells) {
+    const st = q.cells[dCellKey(c.i, c.model)] || {};
+    if (dCellDead(st, c.rpd)) continue;
     live++;
-    if (dRpmUsed(k.i) >= rpm) {
-      const w = dRpmWait(k.i);
-      if (!wait || w < wait) wait = w;
+    /* RPM 满 / 刚被上游按分钟限过（cool）都只是「这一会儿不行」，不退役 */
+    const cool = Math.max(0, Math.ceil(((+st.cool || 0) - now) / 1000));
+    if (dRpmUsed(c.i, c.model) >= c.rpm || cool > 0) {
+      const w = Math.max(dRpmWait(c.i, c.model), cool);
+      if (w > 0 && (!wait || w < wait)) wait = w;
       continue;
     }
-    return { ok: true };
+    return { ok: true, model: c.model, i: c.i };
   }
-  if (!live) return null;                   // 全部当日耗尽 → 跨槽降级
+  if (!live) return null;                   // 全池当日耗尽 → 跨槽降级
   return { wait: wait || 30 };              // 还有额度，只是这一分钟满
 }
-/* 选一个 key。返回 {i,key}（已预扣）/ {wait:n}（只是 RPM 满）/ null（RPD 全满或没配 key） */
-function dPick(cfg){
-  const list = dKeyList(cfg);
-  if (!list.length) return null;
-  const rpm = Math.max(1, +cfg.rpmD || 15);
-  const rpd = Math.max(1, +cfg.rpdD || 1500);
+/* 选一个 (key, 模型) 单元并**预扣**。
+   返回 {i,key,model} / {wait:n}（只是这一分钟满）/ {deny:'hourly'}（小时闸空）/ null（全池当日耗尽） */
+function dPick(cfg, prefer){
+  const cells = dCellList(cfg, prefer);
+  if (!cells.length) return null;
   const q = dRead();
   const b = dBucket(q, cfg);
   if (b && b.tokens < 1) return { deny: 'hourly' };   // v0.9.346 小时名额空 → 跨槽
+  const now = Date.now();
   let live = 0, wait = 0;
-  for (const k of list) {
-    const st = dState(q, k.i);
-    if (st.ex || (st.used || 0) >= rpd) continue;
+  for (const c of cells) {
+    const st = dCell(q, c.i, c.model);          // 预扣前先拿到单元（会补默认值）
+    if (dCellDead(st, c.rpd)) continue;
     live++;
-    if (dRpmUsed(k.i) >= rpm) {
-      const w = dRpmWait(k.i);
-      if (!wait || w < wait) wait = w;      // 最早恢复的那个就是能用的时刻
+    const cool = Math.max(0, Math.ceil(((+st.cool || 0) - now) / 1000));
+    if (dRpmUsed(c.i, c.model) >= c.rpm || cool > 0) {
+      const w = Math.max(dRpmWait(c.i, c.model), cool);
+      if (w > 0 && (!wait || w < wait)) wait = w;      // 最早恢复的那个就是能用的时刻
       continue;
     }
-    const now = Date.now();
-    st.used = (st.used || 0) + 1;           // 预扣
-    (D_RPM[k.i] || (D_RPM[k.i] = [])).push(now);
-    if (b) b.tokens -= 1;                   // 桶也一起扣，别让并发看见同一个名额
+    st.used = (st.used || 0) + 1;               // 预扣
+    (D_RPM[dRpmKey(c.i, c.model)] || (D_RPM[dRpmKey(c.i, c.model)] = [])).push(now);
+    if (b) b.tokens -= 1;                       // 桶也一起扣，别让并发看见同一个名额
     D_HIT.push(now);
     dWrite(q);
-    return { i: k.i, key: k.key };
+    return { i: c.i, key: c.key, model: c.model };
   }
-  if (!live) return null;                   // 全部当日耗尽 → 跨槽降级
-  return { wait: wait || 30 };              // 还有额度，只是这一分钟满
-}
-/* 把一个 key 标记为当日耗尽（额度类错误专用） */
-function dExhaust(i, err){
-  const q = dRead();
-  const st = dState(q, i);
-  st.ex = Date.now();
-  st.err = String((err && err.message) || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 120);
-  dWrite(q);
+  if (!live) return null;                       // 全池当日耗尽 → 跨槽降级
+  return { wait: wait || 30 };                  // 还有额度，只是这一分钟满
 }
 /* 额度类错误：429 / 403 一律算「这个 key 现在用不了」。
    403 也要算 —— Gemini 对无效 key、未开通的模型、地区不支持都回 403，
    不换 key 的话这条请求就死在这儿了。文案匹配只作兜底（有些网关把 429 包成 400）。 */
 function dQuotaErr(e){
   const st = e && e._status;
-  if (st === 429 || st === 403) return true;
+  /* 401 也算：D 的 Base URL 可以填任意 OpenAI 兼容端点，那种端点对无效 key 回的是 401。
+     Gemini 自己回 400/403，两种都覆盖到才不用为「换了一家上游」改代码。 */
+  if (st === 429 || st === 403 || st === 401) return true;
   const s = String((e && e.message) || '');
-  return /RESOURCE_EXHAUSTED|exceeded your current quota|quota|rate.?limit|API[_ ]?KEY_INVALID|API key not valid/i.test(s);
+  return /RESOURCE_EXHAUSTED|exceeded your current quota|quota|rate.?limit|API[_ ]?KEY_INVALID|API key not valid|invalid[_ ]api[_ ]key/i.test(s);
+}
+/* v0.9.347：429 要分两种，否则会把一整天的额度白白作废。
+   · per day（RPD 打满）→ 这格今天真的没了
+   · per minute（RPM 打满）→ 只是这一分钟，冷静 60 秒就回来，绝不能标成「今日耗尽」
+     免费档的 RPM 只有十几次，撞 minute 限额是常态；按天退役的话，上午就会把
+     三个 key 全部判死 —— 正是用户说的「很早就榨干」。
+   说不清是哪种时按「当天」处理（保守：宁可少发，也别反复撞 429 白等）。 */
+function dErrKind(e){
+  const s = String((e && e.message) || '');
+  if (/per[\s_-]?day|per[\s_-]?diem|daily|RPD/i.test(s)) return 'day';
+  if (/per[\s_-]?minute|per[\s_-]?min|rate.?limit|RPM/i.test(s)) return 'rpm';
+  return 'day';
+}
+/* 明确的「key 本身无效」才把整个 key 判死（它在所有模型上都不通）。
+   ⚠️ 403 不都是 key 的问题 —— 「模型没开通」「地区不支持」也回 403，
+      那种只该废掉当前这一格，不能连坐这个 key 的其它模型。 */
+function dKeyDead(e){
+  const st = e && e._status;
+  const s = String((e && e.message) || '');
+  return /API[_ ]?KEY[_ ]?INVALID|API key not valid|invalid.*api.?key/i.test(s)
+    || (st === 401);
+}
+/* 标记一次失败。kind='key' 连坐该 key 的所有模型；'rpm' 只冷静 60 秒；其余按当日耗尽。 */
+function dMarkErr(cfg, i, model, err){
+  const q = dRead();
+  const msg = String((err && err.message) || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 120);
+  if (dKeyDead(err)) {
+    for (const m of dModels(cfg)) {
+      const st = dCell(q, i, m.name);
+      st.ex = Date.now(); st.err = msg;
+    }
+  } else if (dErrKind(err) === 'rpm') {
+    const st = dCell(q, i, model);
+    st.cool = Date.now() + 60000;
+    st.err = msg;
+  } else {
+    const st = dCell(q, i, model);
+    st.ex = Date.now(); st.err = msg;
+  }
+  dWrite(q);
 }
 /* 整集锁：任务第一次进来决定走不走 D，之后整个任务沿用（用户 10-20 拍板：
    一集里不要出现两个模型 —— 前半 Gemini 后半 DeepSeek，语气会跳）。
+   v0.9.347：锁从「整个 D 槽」细化到「某一档模型」。同一档换 key 输出完全一致，
+   所以粘住档位就够；上一档真用满了，还是会降下一档（但尽量不在集内来回跳）。
    总批数前端没带，用字幕条数估：÷45（最细的 CUE_CAP）算出来的批数偏高，
    偏高只会让「额度不够就跑整集 C/B/A」判得更早，不会中途断在半路。 */
 function dTaskSlot(task, cfg, cues){
-  if (!task) return 'D';                    // 没有任务号（老前端）：不锁，单批判断
+  if (!task) return { slot: 'D', model: '' };   // 没有任务号（老前端）：不锁，单批判断
   const now = Date.now();
   for (const [k, v] of D_TASK) if (now - v.at > D_TASK_TTL) D_TASK.delete(k);
+  let hit = D_TASK.get(task);
+  if (!hit) {
+    const need = Math.max(1, Math.ceil((Number(cues) || 0) / D_CUE_CAP));
+    hit = { slot: dAvail(cfg) >= need ? 'D' : 'X', model: '', at: now };
+    D_TASK.set(task, hit);
+  } else hit.at = now;
+  return hit;
+}
+/* 记住这一集实际用的是哪一档，后面几批优先沿用 */
+function dTaskMark(task, model){
+  if (!task) return;
   const hit = D_TASK.get(task);
-  if (hit) { hit.at = now; return hit.slot; }
-  const need = Math.max(1, Math.ceil((Number(cues) || 0) / D_CUE_CAP));
-  const slot = dAvail(cfg) >= need ? 'D' : 'X';
-  D_TASK.set(task, { slot: slot, at: now });
-  return slot;
+  if (hit && model) { hit.model = model; hit.at = Date.now(); }
 }
 function langInD(cfg, lang){
   if (cfg.langModelDAll !== false) return true;
@@ -6228,27 +6376,33 @@ function pickRoute(cfg, lang, meta){
   if (!langInD(cfg, lang)) return pickModel(cfg, lang);
   const task = String((meta && meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
   const cues = Math.max(0, Math.floor(+((meta && meta.cues) || 0)));
-  if (dTaskSlot(task, cfg, cues) !== 'D') return pickModel(cfg, lang);
-  const peek = dPeek(cfg);
-  if (!peek) return pickModel(cfg, lang);   // 三个 key 当天都满了 → 交给 C/B/A
-  if (peek.deny) return pickModel(cfg, lang);  // v0.9.346 本小时名额用完 → 交给 C/B/A，不排队
+  const lock = dTaskSlot(task, cfg, cues);
+  if (lock.slot !== 'D') return pickModel(cfg, lang);
+  const peek = dPeek(cfg, lock.model);
+  if (!peek) return pickModel(cfg, lang);        // 全池当天都满了 → 交给 C/B/A
+  if (peek.deny) return pickModel(cfg, lang);    // v0.9.346 本小时名额用完 → 交给 C/B/A，不排队
   if (peek.wait) return { which: 'D', wait: peek.wait };
-  /* 不带 cfg：D 的 key 是 callModelD 现选现扣的，这里给不出确定的一份。
-     主流程取模型名一律走 slotModelName，不要去碰 pick.cfg。 */
-  return { which: 'D' };
+  /* 带上 peek 预测的档位只用于「事件里记哪个模型名」——真正选 key+预扣在 callModelD 里做且只做一次。
+     pick.cfg 恒为 undefined：D 的 key 和模型都是调用时现选的，这里给不出确定的一份。 */
+  return { which: 'D', model: peek.model };
 }
-/* D 槽调用：额度类错误就地换 key（同一批重发，前端完全无感），其他错误原样抛出。
-   最多 6 轮 —— 3 个 key 在并发下可能被别的请求抢先占满，留一点余量。
-   ⚠️ 换 key 共用**同一份**超时预算：一次换 key 不该让总耗时翻倍，否则前端 105 秒的
+/* D 槽调用：额度类错误就地换 key / 降档（同一批重发，前端完全无感），其他错误原样抛出。
+   v0.9.347：轮数上限按「单元数 + 2」算 —— 3 key × 6 档 = 18 格，固定 6 轮会在
+   多档场景下提前放弃（明明还有额度，却当成都用完了）。
+   ⚠️ 换 key / 降档共用**同一份**超时预算：一次换 key 不该让总耗时翻倍，否则前端 105 秒的
       总预算会在槽内就被吃光，连跨槽回退的机会都没有。 */
-async function callModelD(cfg, messages, maxTokens, opts){
+async function callModelD(cfg, messages, maxTokens, opts, task){
   const t0 = Date.now();
   const budget = (opts && opts.timeoutMs) || 90000;
+  const lock = task ? D_TASK.get(task) : null;
+  const prefer = (lock && lock.model) || '';
+  const maxRound = Math.max(4, dCellList(cfg, prefer).length + 2);
   let last = null;
-  for (let round = 0; round < 6; round++) {
-    const kp = dPick(cfg);
+  for (let round = 0; round < maxRound; round++) {
+    const kp = dPick(cfg, prefer);
     if (!kp) {
-      const e = new Error('Gemini 免费额度已用尽（' + dKeys(cfg).length + ' 个 key 全部到限）');
+      const e = new Error('Gemini 免费额度已用尽（' + dKeys(cfg).length + ' 个 key × ' +
+        dModels(cfg).length + ' 档模型全部到限）');
       e._dExhausted = true; e._status = 429;
       if (last) e.message += '；最后一次上游报错：' + String(last.message || '').slice(0, 120);
       throw e;
@@ -6263,13 +6417,17 @@ async function callModelD(cfg, messages, maxTokens, opts){
     if (kp.wait) { const e = new Error('Gemini 免费额度 RPM 已满'); e._dWait = kp.wait; throw e; }
     const left = Math.max(5000, budget - (Date.now() - t0));
     try {
-      return await callModel(slotCfgD(cfg, kp.key), messages, maxTokens, Object.assign({}, opts, { timeoutMs: left }));
+      const out = await callModel(slotCfgD(cfg, kp.key, kp.model), messages, maxTokens, Object.assign({}, opts, { timeoutMs: left }));
+      /* 真正生效的模型名回传，主流程不要再覆写成第一档 */
+      try { if (out && typeof out === 'object') out._used = kp.model; } catch (e8) {}
+      dTaskMark(task, kp.model);            // 这一集后面几批优先用同一档
+      return out;
     } catch (e) {
-      if (dQuotaErr(e)) { dExhaust(kp.i, e); last = e; continue; }   // 换下一个 key
+      if (dQuotaErr(e)) { dMarkErr(cfg, kp.i, kp.model, e); last = e; continue; }  // 换 key / 降档
       throw e;                                                        // 非额度错误 → 跨槽
     }
   }
-  const e = new Error('Gemini 免费额度已用尽（连续换 key 均失败）');
+  const e = new Error('Gemini 免费额度已用尽（连续换 key / 降档均失败）');
   e._dExhausted = true; e._status = 429;
   throw e;
 }
@@ -6744,14 +6902,21 @@ const server = http.createServer(async (req, res) => {
          v0.9.345：D 槽（Gemini 免费池）优先级最高。pickRoute 内部先判 D，
          不命中就原样落回老的 pickModel（C > B > A），老路径零改动。 */
       const lang = (body.meta && String(body.meta.lang || '')) || '';
+      /* 任务号与 pickRoute 内部用的是同一套清洗规则（脏字符去掉、截 24 字），
+         否则「选路时锁定 A 档」和「调用时读粘性档位」会读到两个不同的 key。 */
+      const dTaskId = String((body.meta && body.meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
       const pick = pickRoute(cfg, lang, body.meta);
       /* D 的额度还在、只是这一分钟 RPM 满了：让前端等几十秒重发同一批，**不降级**。
          免费额度一分钟后就回来，降到 C/B/A 等于白扔。复用既有 {wait} 回执
          （只有带 meta.pace=1 的前端才认，老前端根本走不到这里）。 */
       if (pick && pick.wait) return sendJson(res, 200, { wait: pick.wait, slot: pick.which, why: 'rpm' });
-      /* D 的 key 由 callModelD 现选现扣，pick 上没有 cfg —— 模型名一律从这里取，
-         别处不要再碰 pick.cfg（D 走这条路时它是 undefined）。 */
-      const slotModelName = pick.which === 'D' ? String(cfg.model4 || '') : String((pick.cfg && pick.cfg.model) || '');
+      /* D 的 key/模型由 callModelD 现选现扣，pick 上没有 cfg —— 模型名一律从这里取，
+         别处不要再碰 pick.cfg（D 走这条路时它是 undefined）。
+         v0.9.347：多档模型时用 peek 预测的那一档（事件里记的名称）；真正调用的档位
+         若因额度变化换了一档，callModelD 会把 out._used 覆写成真实值。 */
+      const slotModelName = pick.which === 'D'
+        ? String(pick.model || (dModels(cfg)[0] && dModels(cfg)[0].name) || '')
+        : String((pick.cfg && pick.cfg.model) || '');
       /* v0.9.183：排队闸门，按槽位判定。只有前端在 meta 里声明 pace=1 才可能收到 wait——
          旧版本不带这个标记，走的是原路径，不会因为收到一个没有 choices 的响应而误判成「上游返回空」。
          日配额与埋点都放在闸门之后再记：排队只是「晚点再来」，既没真翻译也不该留下事件。 */
@@ -6845,7 +7010,7 @@ const server = http.createServer(async (req, res) => {
         /* v0.9.345：D 走 callModelD —— 它在槽内换 key（额度类错误就换下一个重发同一批，
            前端完全无感）。注意它吃的是**同一份** 90 秒预算，不会因为换 key 就多拿时间。 */
         const out = pick.which === 'D'
-          ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }))
+          ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }), dTaskId)
           : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
         try { if (canPace) { noteQuota(pick.which, out && out._rl); if (out) delete out._rl; } } catch (e13) {}
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
@@ -6871,8 +7036,10 @@ const server = http.createServer(async (req, res) => {
         } catch (e10) {}
         /* v0.9.157：本次实际生效的模型名回传前端。分流只在服务端发生，前端原本无从得知
            自己这次用的是 A 还是 B，只能靠后台 events 反推（而后台记账又有延迟/去重问题）。
-           模型名是专有名词，不需要进界面字典，直接原样输出。 */
-        try { if (out && typeof out === 'object') out._used = String(slotModelName || ''); } catch (e9) {}
+           模型名是专有名词，不需要进界面字典，直接原样输出。
+           v0.9.347：D 槽在 callModelD 里已经把真实档位写进 _used（锁档/降档后可能与
+           事件里记的不同），这里不能再无条件覆写，否则前端会显示一个没用过的模型名。 */
+        try { if (out && typeof out === 'object' && !out._used) out._used = String(slotModelName || ''); } catch (e9) {}
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
         /* v0.9.345：D 槽 RPM 满但当日额度还在 → 回 wait 让前端等几十秒，绝不降级。
@@ -7051,6 +7218,7 @@ const server = http.createServer(async (req, res) => {
           langModelC: Array.isArray(cfg.langModelC) ? cfg.langModelC.slice() : [],
           /* v0.9.345：D 槽（Gemini 免费池）。key 只回掩码与今日用量，明文绝不出服务端 */
           provider4: cfg.provider4 || '', base4: cfg.base4 || '', model4: cfg.model4 || '',
+          models4: dModelsRaw(cfg),     // v0.9.347：模型池（含停用的档，后台要能编辑/重新启用）
           extraParams4: normParams(cfg.extraParams4),
           langModelDAll: cfg.langModelDAll !== false,
           langModelD: Array.isArray(cfg.langModelD) ? cfg.langModelD.slice() : [],
@@ -7291,7 +7459,6 @@ const server = http.createServer(async (req, res) => {
            clearDKey 是按**下标**清单条，clearKey4 是整槽清空。
            ⚠️ 清空中间某个 key 时不重排数组：账本按原始下标记，重排会让 key3 的用量记到 key2 头上。 */
         if (typeof body.base4 === 'string') cfg.base4 = body.base4.trim();
-        if (typeof body.model4 === 'string') cfg.model4 = body.model4.trim();
         if (typeof body.provider4 === 'string') cfg.provider4 = body.provider4.trim();
         if (!Array.isArray(cfg.keys4)) cfg.keys4 = [];
         ['1', '2', '3'].forEach((n, idx) => {
@@ -7301,18 +7468,52 @@ const server = http.createServer(async (req, res) => {
             cfg.keys4[idx] = v.trim();
           }
         });
+        /* v0.9.347：模型池。数组顺序就是优先级，第一档同步写回 model4（兼容字段与老代码）。
+           模型名只留可见 ASCII —— 它会被拿去拼 JSON 请求，允许空格/引号只会制造无解的 400。 */
+        if (Array.isArray(body.models4)) {
+          const seenM = {};
+          const list = [];
+          for (const m of body.models4) {
+            if (!m || typeof m !== 'object') continue;
+            const name = String(m.name == null ? '' : m.name).trim().slice(0, 64);
+            if (!name || !/^[A-Za-z0-9][A-Za-z0-9._:\/-]*$/.test(name)) continue;
+            if (seenM[name]) continue;
+            seenM[name] = 1;
+            list.push({
+              name: name,
+              rpm: Math.max(1, Math.min(600, Math.floor(+m.rpm || 15))),
+              rpd: Math.max(1, Math.min(1000000, Math.floor(+m.rpd || 1500))),
+              on: m.on !== false
+            });
+            if (list.length >= D_MAX_MODELS) break;
+          }
+          cfg.models4 = list;
+          cfg.model4 = list.length ? list[0].name : '';
+          /* 兼容字段跟着第一档走：老代码、老前端、slotModelName 的兜底都读它 */
+          if (list.length) { cfg.rpmD = list[0].rpm; cfg.rpdD = list[0].rpd; }
+        } else if (typeof body.model4 === 'string' && body.model4.trim()) {
+          /* 只发单模型字段 = 浏览器还在用缓存的旧后台页。这时必须把模型池收敛成一档，
+             否则用户改了模型名、保存成功，实际却还在用模型池里的旧名字 —— 最难查的一类。 */
+          cfg.models4 = [];
+          cfg.model4 = body.model4.trim();
+        }
         if (Number.isFinite(+body.clearDKey)) {
           const i = Math.floor(+body.clearDKey);
           if (i >= 0 && i < 3) {
             while (cfg.keys4.length <= i) cfg.keys4.push('');
             cfg.keys4[i] = '';
-            /* 该位置的用量也归零：换了新 key 还背着旧 key 的用量，等于一上来就少半天额度 */
-            try { const q = dRead(); if (q.keys[i]) { q.keys[i] = { used: 0, ex: 0, err: '' }; dWrite(q); } } catch (e) {}
-            if (D_RPM[i]) delete D_RPM[i];
+            /* 该位置的用量也归零：换了新 key 还背着旧 key 的用量，等于一上来就少半天额度。
+               v0.9.347：要按模型逐格清 —— 账本是 (key, 模型)，只清一格会留下别的档的用量。 */
+            try {
+              const q = dRead();
+              for (const m of dModelsRaw(cfg)) delete q.cells[dCellKey(i, m.name)];
+              dWrite(q);
+            } catch (e) {}
+            for (const k in D_RPM) if (k.indexOf(i + '|') === 0) delete D_RPM[k];
           }
         }
         if (body.clearKey4) {
-          cfg.keys4 = []; cfg.base4 = ''; cfg.model4 = ''; cfg.provider4 = '';
+          cfg.keys4 = []; cfg.base4 = ''; cfg.model4 = ''; cfg.models4 = []; cfg.provider4 = '';
           cfg.extraParams4 = {}; cfg.langModelD = [];
         }
         if (body.extraParams4 !== undefined) cfg.extraParams4 = normParams(body.extraParams4);
@@ -7359,22 +7560,44 @@ const server = http.createServer(async (req, res) => {
         const which = (tbody && (tbody.which === 'B' || tbody.which === 'C' || tbody.which === 'D')) ? tbody.which : 'A';
         if (which === 'D') {
           const list = dKeyList(cfg);
-          if (!cfg.base4 || !cfg.model4) {
-            return sendJson(res, 400, { error: { message: '请先保存模型 D 的 Base URL / 模型名 / 至少一个 API Key' } });
+          const ms = dModels(cfg);
+          if (!cfg.base4 || !ms.length) {
+            return sendJson(res, 400, { error: { message: '请先保存模型 D 的 Base URL / 至少一档模型 / 至少一个 API Key' } });
           }
-          const results = [];
+          /* v0.9.347：key 数 + 模型档数一起测。
+             逐个 key 打**第一档**（能同时验证 key 是否有效、第一档是否可用），
+             再逐个**其余档**用第一个 key 打一下（验证这些模型名对这个 key 开通了没）。
+             总次数 = key 数 + (档数 − 1)，最多 3 + 5 = 8 次，手动点一次可以接受。
+             ⚠️ 测试不记入 D 的额度账本（管理员手点的几次不该把 key 打到退役）。 */
+          const sampleMsg = [{ role: 'user', content: 'Reply with exactly: OK' }];
+          const keys = [];
           for (const k of list) {
             try {
-              const out = await callModel(slotCfgD(cfg, k.key), [{ role: 'user', content: 'Reply with exactly: OK' }], 256, { timeoutMs: 20000 });
+              const out = await callModel(slotCfgD(cfg, k.key, ms[0].name), sampleMsg, 256, { timeoutMs: 20000 });
               const c = out.choices && out.choices[0];
               const sample = c && c.message ? c.message.content : '';
-              results.push({ i: k.i, ok: !!sample, sample: String(sample || '').slice(0, 40),
+              keys.push({ i: k.i, ok: !!sample, sample: String(sample || '').slice(0, 40),
                 hint: sample ? '' : '模型未返回正文（finish_reason=' + ((c && c.finish_reason) || '?') + '）' });
             } catch (e) {
-              results.push({ i: k.i, ok: false, err: String((e && e.message) || e).slice(0, 160), quota: dQuotaErr(e) });
+              keys.push({ i: k.i, ok: false, err: String((e && e.message) || e).slice(0, 160), quota: dQuotaErr(e) });
             }
           }
-          return sendJson(res, 200, { ok: results.some(r => r.ok), which: 'D', keys: results });
+          const models = [];
+          for (let mi = 1; mi < ms.length; mi++) {
+            try {
+              const out = await callModel(slotCfgD(cfg, list[0].key, ms[mi].name), sampleMsg, 256, { timeoutMs: 20000 });
+              const c = out.choices && out.choices[0];
+              const sample = c && c.message ? c.message.content : '';
+              models.push({ name: ms[mi].name, ok: !!sample, sample: String(sample || '').slice(0, 40),
+                hint: sample ? '' : '模型未返回正文（finish_reason=' + ((c && c.finish_reason) || '?') + '）' });
+            } catch (e) {
+              models.push({ name: ms[mi].name, ok: false, err: String((e && e.message) || e).slice(0, 160), quota: dQuotaErr(e) });
+            }
+          }
+          return sendJson(res, 200, {
+            ok: keys.some(r => r.ok) && !models.some(r => !r.ok),
+            which: 'D', first: ms[0].name, keys: keys, models: models
+          });
         }
         const slot = slotCfg(cfg, which);
         if (!(slot.base && slot.model && slot.key)) {
