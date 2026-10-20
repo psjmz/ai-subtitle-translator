@@ -2729,9 +2729,49 @@
     const nonCjk = cjk ? core.length - cjk.length : core.length;
     return nonCjk >= 2;
   }
+  /* v0.9.348：CJK 目标下，译文整段一个 CJK 字符都没有时，只可能是两种情况：
+     「专名」或「整段没翻译」。旧规则一律放行（本意是防专名误伤），代价是模型整句
+     原样返回也会被当成合格译文 —— 线上实测（英文源 · 中文目标，网站自带示例）：
+     模型把两条 cue 合并翻译进前一条，后一条原样返回英文
+     「your old tenants left you a lot of nice little gifts」，anchorOk 判 true、
+     validateCueAlign 只看结构也判 ok，两道质检全放行，用户看到的就是「有一条英文没翻」。
+     区分靠词数与功能词（不是靠语言识别，零依赖）：
+       · 1~2 个词 → 专名（OpenAI / GPT-4 / The Beatles），放行
+       · ≥3 个词且含英文功能词（the/is/and/to/my/you…）→ 句子，判没翻译
+       · ≥8 个词（哪怕全是实词）→ 句子，判没翻译
+       · 其余（Mr. John Smith / New York City）→ 专名，放行
+     误伤代价只是多一次单组重译；重译后模型仍坚持的会被接受，不会丢内容。 */
+  const RE_LATIN_WORD = /[A-Za-z\u00C0-\u024F\u0400-\u04FF]+/g;
+  const RE_FUNC_WORD = /^(?:the|a|an|and|or|but|is|are|was|were|be|been|being|to|of|in|on|at|for|with|from|by|as|than|then|that|this|these|those|there|here|you|your|yours|i|me|my|mine|we|us|our|ours|he|him|his|she|her|hers|it|its|they|them|their|not|no|nor|do|does|did|done|can|could|will|would|shall|should|may|might|must|have|has|had|just|so|if|all|any|some|every|very|too|also|about|into|over|out|up|down|off|what|who|whom|whose|how|why|when|where)$/i;
+  function looksUntranslatedLatin(s){
+    const words = String(s == null ? '' : s).match(RE_LATIN_WORD);
+    if (!words || !words.length) return false;
+    if (words.length >= 8) return true;
+    if (words.length < 3) return false;
+    for (let i = 0; i < words.length; i++) if (RE_FUNC_WORD.test(words[i])) return true;
+    return false;
+  }
+  /* v0.9.348：译文与源文「实质相同」= 100% 没翻译。比语言锚定更直接，而且不依赖语言知识
+     —— 英→法这种同字母体系的也能抓（anchorOk 对拉丁目标根本无从判断）。
+     只比对去掉空白/标点/符号后的骨架；短文本不判，避免误伤专名组：
+       · 源文 "OpenAI" → 译文 "OpenAI" 是合法保留，必须放行
+       · 源文整句 → 译文整句照抄，才是没翻译
+     阈值取骨架长度 ≥8 字符（"thankyou" / "goodmorning" 这个量级起步）。 */
+  function sameAsSource(out, src){
+    const norm = (s) => String(s == null ? '' : s).toLowerCase().replace(/[\s\p{P}\p{S}]/gu, '');
+    const a = norm(out), b = norm(src);
+    if (!a || !b) return false;
+    if (a === b) return b.length >= 8;
+    /* 模型偶尔在译文前后多留一个字母/数字（编号、"..."），长度差 ≤2 且互相包含也算照抄 */
+    if (Math.abs(a.length - b.length) <= 2 && b.length >= 8 &&
+        (a.indexOf(b) >= 0 || b.indexOf(a) >= 0)) return true;
+    return false;
+  }
   function anchorForeignOk(s, foreignRe, keepNames, cjkDst){
     const cjk = s.match(RE_ALL_CJK);
-    if (!cjk || !cjk.length) return true;      // 无 CJK（纯拉丁/符号）→ 沿用既有策略，不拦
+    /* v0.9.348：CJK 目标不能无条件放行 —— 见上面 looksUntranslatedLatin 的注释。
+       非 CJK 目标（英/法/…) 的目标文字本身就是拉丁，这里必须照旧放行。 */
+    if (!cjk || !cjk.length) return cjkDst ? !looksUntranslatedLatin(s) : true;
     let bad = 0;
     for (let i = 0; i < cjk.length; i++) if (foreignRe.test(cjk[i])) bad++;
     if (!bad) return true;
@@ -2765,12 +2805,15 @@
          长度闸（JA_HAN_SHORT_W）也关掉（长中文专名会被它误判）。
          只拦「一句假名都没有 + 含中文虚词」的整段中文 = 确实没翻译。 */
       if (keepNames){
-        if (kana || hangul || !han) return true;
+        if (kana || hangul) return true;
+        /* v0.9.348：纯拉丁仍要判是不是整句没翻译 —— 保留专名 ≠ 保留整句英文 */
+        if (!han) return !looksUntranslatedLatin(s);
         return !RE_ZH_MARK.test(s);
       }
       if (hangul) return false;
       if (kana) return true;          // 含假名 → 一定是日语（或至少不是纯汉字中文）
-      if (!han) return true;          // 纯拉丁/符号 → 沿用既有策略（防专名误伤），不拦
+      /* v0.9.348：纯拉丁不再无条件放行，整句英文 = 没翻译（OpenAI / GPT-4 这类专名仍放行） */
+      if (!han) return !looksUntranslatedLatin(s);
       // 纯汉字无假名：
       if (RE_ZH_MARK.test(s)) return false;             // ① 含中文虚词 → 中文跑偏
       return textWidth(s) <= JA_HAN_SHORT_W;            // ② 短名词放行，长句判跑偏
@@ -2876,7 +2919,7 @@
     recAssSize, REC_ASS_SIZE, INK_RATIO, ASS_AVAIL_W,
     INK_DESC, BOX_DESC, ASS_STACK_GAP,   // v0.9.109：导出给单测读真值（此前测试自带副本，加语言会静默漂移）
     formatTxt, detectFormat,
-    isFillerCue, hasWordChar, isSrcMeaningless, stripSoundTags, monoFit, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines,
+    isFillerCue, hasWordChar, isSrcMeaningless, stripSoundTags, monoFit, squashLines, joinSrc, needJoinSpace, mergePunctOnlyLines, sameAsSource,
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,

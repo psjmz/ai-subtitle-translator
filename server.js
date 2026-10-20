@@ -11,12 +11,20 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+/* v0.9.348：两件事 ——
+   ① D 槽从「整个槽锁给一个任务」细化成「按模型档认领」：3 档可同时服务 3 个任务，
+      任务结束（前端 POST /api/model-done）立刻释放，闲置 3 分钟只是兜底。
+   ② 质检补洞：纯拉丁译文在 CJK 目标下曾被 anchorOk 无条件放行，导致「两条 cue 并成
+      一条翻译、后一条原样返回英文」整段通过。新增 sameAsSource（与源文比对）+
+      looksUntranslated（无 CJK 且 ≥3 词含功能词）。 */
 /* v0.9.343：100 种语言的单一数据源（代码 / 自称 / dir / 是否中日韩）。
    页脚多语言互链要用它的 zh（语言自称）与 dir 字段 —— 别在 server.js 里另抄一份名册。 */
 const LANGS100 = require(path.join(__dirname, 'langs100.js'));
 
 const ROOT = __dirname;
-const DATA_DIR = path.join(ROOT, 'data');
+/* v0.9.348：允许用 DATA_DIR 指向独立目录 —— 只为端到端测试时能起一个不碰真实配置的实例。
+   不设这个环境变量时行为与之前完全一致（生产环境不会设）。 */
+const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(ROOT, 'data');
 const CONFIG_PATH = path.join(DATA_DIR, 'config.json');
 const USAGE_PATH = path.join(DATA_DIR, 'usage.json');
 const PORT = Number(process.env.PORT) || 3000;
@@ -5989,6 +5997,14 @@ const D_RPM_WIN   = 60000;          // RPM 滑窗长度
 const D_RPM       = Object.create(null);   // 'key下标|模型名' -> [时间戳…]（内存，重启清零可接受）
 const D_TASK      = new Map();      // taskId -> {slot:'D'|'X', model, at} 整集锁 + 档位粘性
 const D_TASK_TTL  = 6 * 3600 * 1000;
+/* v0.9.348：档位认领表 —— 模型名 -> {task, at}。
+   用户 10-20 定案：按「模型档」认领，不是按整个 D 槽认领。3 档就能同时服务 3 个任务，
+   各占一档、互不抢 RPM；整槽独占是反的（1 个任务就把三档全占了，后面的人全被赶去 C/B/A）。
+   at = 最后活跃时间。超过 D_TIER_TTL 就允许别人接手 —— 前端没有「任务结束」信号，
+   只能靠这个阈值判断它是跑完了还是卡死了。3 分钟是排队预算（90 秒）的两倍余量，
+   不会把「正在老实排队」的任务误判成结束。 */
+const D_TIER_OWN  = new Map();
+const D_TIER_TTL  = 3 * 60 * 1000;
 const D_CUE_CAP   = 45;             // 保守估批数用：45 是前端最细的 CUE_CAP（中日韩/日/荷/瑞）
 const D_MAX_MODELS = 6;             // 模型池上限。再多后台表格就看不清了，也没有实际收益
 
@@ -6161,6 +6177,32 @@ function dRemain(cfg, q0){
   }
   return n;
 }
+/* v0.9.348：某一档此刻能不能接一个新任务。三个条件缺一不可：
+     ① 该档日剩余 ≥ 本集估算批数 —— 否则跑到一半日额度就没了，只能中途降档；
+     ② 该档至少有一个 key 的本分钟名额没被占（RPM 未满、也没在 429 冷静期）；
+     ③ 没被别的活跃任务认领（认领判断在 dTaskSlot 里做，这里只管额度与速率）。
+   用户 10-20 定案：分配阶段一旦发现档被占，就把整集交给 C/B/A，不要排队等 ——
+   任务还没开始，等一分钟纯属白拖；等待只留给「已经分到这一档、中途撞限速」的情况。 */
+function dTierReady(cfg, m, need, q0){
+  const q = q0 || dRead();
+  const keys = dKeyList(cfg);
+  if (!keys.length) return false;
+  const now = Date.now();
+  let day = 0;
+  for (const k of keys) {
+    const st = q.cells[dCellKey(k.i, m.name)] || {};
+    if (st.ex) continue;
+    day += Math.max(0, m.rpd - (st.used || 0));
+  }
+  if (day < Math.max(1, need)) return false;
+  for (const k of keys) {
+    const st = q.cells[dCellKey(k.i, m.name)] || {};
+    if (st.ex) continue;
+    if ((+st.cool || 0) > now) continue;
+    if (dRpmUsed(k.i, m.name) < m.rpm) return true;
+  }
+  return false;
+}
 /* 此刻真正还能发几次 = min(今日剩余, 桶里剩的名额)。整集锁要用它，
    否则「今天够、但这一小时已经用光」的任务会被判成能走 D，第一批就掉回 C/B/A。 */
 function dAvail(cfg){
@@ -6227,21 +6269,23 @@ function dKeyStatus(cfg){
   }
   return out;
 }
-/* 只探测「有没有可用 key+模型」，**不预扣**。选路的判断（走 D 还是走 C/B/A）用它，
-   真正扣额度留给 callModelD —— 否则同一批会被扣两次（v0.9.345 自测抓到的真 bug：
-   选路时预扣一次、调用时又选一次，结果一个 key 的每日额度被吃掉两倍）。
-   prefer 是整集锁记下的档位，只影响「先试哪档」，不影响能不能用。 */
-function dPeek(cfg, prefer){
+/* v0.9.348：把候选单元分成「锁定档」和「其余档」两组。
+   锁档组里只要还有未报废的单元，就只在这一组里找 —— RPM 满就回 wait，**不往下走**
+   （用户 10-20 定案：模型分给这个任务了，就按它的限速慢慢发，别中途换）。
+   锁档组当天真的全耗尽了（live=0），才允许用其余档 —— 同槽换档总比掉到 C/B/A 好，
+   而且那是唯一的活路：不换就只能整集换供应商，语气跳得更大。 */
+function dCellSplit(cfg, prefer){
   const cells = dCellList(cfg, prefer);
-  if (!cells.length) return null;
-  const q = dRead();
-  /* v0.9.346：小时名额空了 → 直接交给 C/B/A，**不回 wait**。
-     这是用户自己拧的流量阀门，不是额度临时紧张，让他等没有意义。 */
-  const b = dBucket(q, cfg);
-  if (b && b.tokens < 1) return { deny: 'hourly' };
-  const now = Date.now();
+  if (!prefer) return { locked: [], rest: cells };
+  const locked = [], rest = [];
+  for (const c of cells) (c.model === prefer ? locked : rest).push(c);
+  return { locked: locked, rest: rest };
+}
+/* 扫一组单元，找第一个「今天没报废 + 本分钟有名额」的。只读，不扣。
+   返回 {ok:单元} / {live, wait}：live=0 表示这组今天真的没了；live>0 表示只是这一分钟满。 */
+function dScanCells(q, arr, now){
   let live = 0, wait = 0;
-  for (const c of cells) {
+  for (const c of arr) {
     const st = q.cells[dCellKey(c.i, c.model)] || {};
     if (dCellDead(st, c.rpd)) continue;
     live++;
@@ -6252,40 +6296,56 @@ function dPeek(cfg, prefer){
       if (w > 0 && (!wait || w < wait)) wait = w;
       continue;
     }
-    return { ok: true, model: c.model, i: c.i };
+    return { ok: c, live: live, wait: wait };
   }
-  if (!live) return null;                   // 全池当日耗尽 → 跨槽降级
-  return { wait: wait || 30 };              // 还有额度，只是这一分钟满
+  return { live: live, wait: wait };
+}
+/* 只探测「有没有可用 key+模型」，**不预扣**。选路的判断（走 D 还是走 C/B/A）用它，
+   真正扣额度留给 callModelD —— 否则同一批会被扣两次（v0.9.345 自测抓到的真 bug：
+   选路时预扣一次、调用时又选一次，结果一个 key 的每日额度被吃掉两倍）。
+   prefer 是整集锁记下的档位，v0.9.348 起它是「锁」而不只是「优先」。 */
+function dPeek(cfg, prefer){
+  const g = dCellSplit(cfg, prefer);
+  if (!g.locked.length && !g.rest.length) return null;
+  const q = dRead();
+  /* v0.9.346：小时名额空了 → 直接交给 C/B/A，**不回 wait**。
+     这是用户自己拧的流量阀门，不是额度临时紧张，让他等没有意义。 */
+  const b = dBucket(q, cfg);
+  if (b && b.tokens < 1) return { deny: 'hourly' };
+  const now = Date.now();
+  const a = dScanCells(q, g.locked, now);
+  if (a.ok) return { ok: true, model: a.ok.model, i: a.ok.i };
+  if (a.live > 0) return { wait: a.wait || 30 };     // 锁档只是这一分钟满 → 等，不降档
+  const r = dScanCells(q, g.rest, now);
+  if (r.ok) return { ok: true, model: r.ok.model, i: r.ok.i };
+  if (r.live > 0) return { wait: r.wait || 30 };
+  return null;                                       // 全池当日耗尽 → 跨槽降级
 }
 /* 选一个 (key, 模型) 单元并**预扣**。
    返回 {i,key,model} / {wait:n}（只是这一分钟满）/ {deny:'hourly'}（小时闸空）/ null（全池当日耗尽） */
 function dPick(cfg, prefer){
-  const cells = dCellList(cfg, prefer);
-  if (!cells.length) return null;
+  const g = dCellSplit(cfg, prefer);
+  if (!g.locked.length && !g.rest.length) return null;
   const q = dRead();
   const b = dBucket(q, cfg);
   if (b && b.tokens < 1) return { deny: 'hourly' };   // v0.9.346 小时名额空 → 跨槽
   const now = Date.now();
-  let live = 0, wait = 0;
-  for (const c of cells) {
-    const st = dCell(q, c.i, c.model);          // 预扣前先拿到单元（会补默认值）
-    if (dCellDead(st, c.rpd)) continue;
-    live++;
-    const cool = Math.max(0, Math.ceil(((+st.cool || 0) - now) / 1000));
-    if (dRpmUsed(c.i, c.model) >= c.rpm || cool > 0) {
-      const w = Math.max(dRpmWait(c.i, c.model), cool);
-      if (w > 0 && (!wait || w < wait)) wait = w;      // 最早恢复的那个就是能用的时刻
-      continue;
-    }
-    st.used = (st.used || 0) + 1;               // 预扣
+  const take = (c) => {
+    const st = dCell(q, c.i, c.model);            // 预扣前先拿到单元（会补默认值）
+    st.used = (st.used || 0) + 1;                 // 预扣
     (D_RPM[dRpmKey(c.i, c.model)] || (D_RPM[dRpmKey(c.i, c.model)] = [])).push(now);
-    if (b) b.tokens -= 1;                       // 桶也一起扣，别让并发看见同一个名额
+    if (b) b.tokens -= 1;                         // 桶也一起扣，别让并发看见同一个名额
     D_HIT.push(now);
     dWrite(q);
     return { i: c.i, key: c.key, model: c.model };
-  }
-  if (!live) return null;                       // 全池当日耗尽 → 跨槽降级
-  return { wait: wait || 30 };                  // 还有额度，只是这一分钟满
+  };
+  const a = dScanCells(q, g.locked, now);
+  if (a.ok) return take(a.ok);
+  if (a.live > 0) return { wait: a.wait || 30 };      // 锁档只是这一分钟满 → 等，不降档
+  const r = dScanCells(q, g.rest, now);
+  if (r.ok) return take(r.ok);
+  if (r.live > 0) return { wait: r.wait || 30 };
+  return null;                                        // 全池当日耗尽 → 跨槽降级
 }
 /* 额度类错误：429 / 403 一律算「这个 key 现在用不了」。
    403 也要算 —— Gemini 对无效 key、未开通的模型、地区不支持都回 403，
@@ -6338,29 +6398,85 @@ function dMarkErr(cfg, i, model, err){
   }
   dWrite(q);
 }
-/* 整集锁：任务第一次进来决定走不走 D，之后整个任务沿用（用户 10-20 拍板：
-   一集里不要出现两个模型 —— 前半 Gemini 后半 DeepSeek，语气会跳）。
+/* 整集锁：任务第一次进来决定「走不走 D、用哪一档模型」，之后整个任务沿用
+   （用户 10-20 拍板：一集里不要出现两个模型 —— 前半 Gemini 后半 DeepSeek，语气会跳）。
    v0.9.347：锁从「整个 D 槽」细化到「某一档模型」。同一档换 key 输出完全一致，
    所以粘住档位就够；上一档真用满了，还是会降下一档（但尽量不在集内来回跳）。
+   v0.9.348：首次分配改成「认领」—— 按档位顺序找第一个「没被别的活跃任务认领 +
+   日额度够跑完这一集 + 当前 RPM 有空位」的模型，整集锁在它上面。一个都认领不到
+   就直接判 X 走 C/B/A，不在这里排队（用户 10-20 定案：档被占了就换槽，别等）。
    总批数前端没带，用字幕条数估：÷45（最细的 CUE_CAP）算出来的批数偏高，
    偏高只会让「额度不够就跑整集 C/B/A」判得更早，不会中途断在半路。 */
 function dTaskSlot(task, cfg, cues){
   if (!task) return { slot: 'D', model: '' };   // 没有任务号（老前端）：不锁，单批判断
   const now = Date.now();
   for (const [k, v] of D_TASK) if (now - v.at > D_TASK_TTL) D_TASK.delete(k);
+  /* 认领表按「最后活跃时间」过期：跑完的任务不会发任何信号，闲置超时即视为结束 */
+  for (const [k, v] of D_TIER_OWN) if (now - v.at > D_TIER_TTL) D_TIER_OWN.delete(k);
   let hit = D_TASK.get(task);
   if (!hit) {
     const need = Math.max(1, Math.ceil((Number(cues) || 0) / D_CUE_CAP));
-    hit = { slot: dAvail(cfg) >= need ? 'D' : 'X', model: '', at: now };
+    const q = dRead();
+    const b = dBucket(q, cfg);
+    /* 小时令牌桶是整槽共享的：这一集的名额都不够，就别占着一档 */
+    let pick = '';
+    if (!b || Math.floor(b.tokens) >= need) {
+      for (const m of dModels(cfg)) {
+        const own = D_TIER_OWN.get(m.name);
+        if (own && own.task !== task) continue;        // 已被别的活跃任务认领
+        if (!dTierReady(cfg, m, need, q)) continue;    // 日额度不够 / 本分钟满
+        pick = m.name;
+        break;
+      }
+    }
+    if (pick) D_TIER_OWN.set(pick, { task: task, at: now });
+    hit = { slot: pick ? 'D' : 'X', model: pick, at: now };
     D_TASK.set(task, hit);
-  } else hit.at = now;
+  } else {
+    hit.at = now;
+    /* 已分配的任务续约认领。⚠️ 只在「这档还没被别人接手」时续：
+       自己闲置超时被 B 接手后再回来，两个任务共享这一档即可，不要把 B 踢掉
+       —— 踢掉会让 B 的整集锁指向一个它不再独占的模型，反而更乱。 */
+    if (hit.slot === 'D' && hit.model){
+      const own = D_TIER_OWN.get(hit.model);
+      if (!own || own.task === task) D_TIER_OWN.set(hit.model, { task: task, at: now });
+    }
+  }
   return hit;
 }
-/* 记住这一集实际用的是哪一档，后面几批优先沿用 */
+/* 记住这一集实际用的是哪一档，后面几批优先沿用。
+   中途真降了档（该档日额度耗尽）→ 认领也要跟着搬走，并把旧档让出来，
+   否则旧档会一直被这个任务占着、直到 3 分钟闲置过期。 */
 function dTaskMark(task, model){
-  if (!task) return;
+  if (!task || !model) return;
+  const now = Date.now();
   const hit = D_TASK.get(task);
-  if (hit && model) { hit.model = model; hit.at = Date.now(); }
+  if (hit){
+    if (hit.model && hit.model !== model){
+      const old = D_TIER_OWN.get(hit.model);
+      if (old && old.task === task) D_TIER_OWN.delete(hit.model);
+    }
+    hit.model = model;
+    hit.at = now;
+  }
+  const own = D_TIER_OWN.get(model);
+  if (!own || own.task === task) D_TIER_OWN.set(model, { task: task, at: now });
+}
+/* v0.9.348：任务收尾时主动释放认领的模型档。
+   用户 10-20 定案：「任务完没完咱们自己清楚，完成了就释放给别人」。
+   只靠 D_TIER_TTL 闲置过期是不够的 —— 小任务 1 分钟就跑完，白占满 3 分钟，
+   这段时间别人只能去 C/B/A。前端跑完 / 失败 / 用户点停止都会 POST 一次。 */
+function dReleaseTask(taskId){
+  const tid = String(taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
+  if (!tid) return false;
+  let freed = false;
+  /* 认领表按 owner 扫一遍：档位中途搬过家（降档）时，D_TASK.model 只指向当前这一档，
+     旧档若不一起清掉会一直占着，直到 3 分钟闲置过期。 */
+  for (const [m, v] of D_TIER_OWN){
+    if (v && v.task === tid){ D_TIER_OWN.delete(m); freed = true; }
+  }
+  D_TASK.delete(tid);
+  return freed;
 }
 function langInD(cfg, lang){
   if (cfg.langModelDAll !== false) return true;
@@ -6868,6 +6984,16 @@ const server = http.createServer(async (req, res) => {
       } catch (e) {
         return sendJson(res, 502, { error: { code: 'upstream', message: String((e && e.message) || e).slice(0, 300) } });
       }
+    }
+
+    /* 公开：任务结束 → 立刻释放 D 槽认领的模型档（v0.9.348）。
+       只带 taskId，没有敏感信息；前端在 finally 里发（跑完 / 失败 / 用户停止都发）。
+       没有它，档位就只能等 3 分钟闲置过期，小任务会把后面的人挤去 C/B/A。 */
+    if (req.method === 'POST' && u === '/api/model-done') {
+      let b = {};
+      try { b = JSON.parse(await readBody(req, 4096)); } catch (e) {}
+      const freed = dReleaseTask(String((b && b.taskId) || ''));
+      return sendJson(res, 200, { ok: 1, released: freed ? 1 : 0 });
     }
 
     /* 公开：翻译代理 */
