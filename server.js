@@ -403,6 +403,9 @@ function markEvent(ip, meta, ev){
            前端保证每行只按第一个把它标记为 drop 的原因计一次，故三项之和 ≤ dropN。
            纯统计，不影响任何行为。 */
         Object.assign(e, dropFields(meta), cueErrFields(meta));
+        /* v0.9.351：用户点停止也会走到 finish（批次循环 break 后照常收尾），
+           以前后台看不出「真跑完」和「被停掉」。续跑真跑完后要能清掉旧标记。 */
+        if (meta.stopped) e.stopped = 1; else delete e.stopped;
       } else if (ev === 'download') {
         e.downloads = (e.downloads || 0) + 1;
         e.downloadedAt = now;
@@ -438,7 +441,7 @@ function markEvent(ip, meta, ev){
      （典型是「完成」之后「下载」）匹配不到自己那条，又新建一条：后台看到两条同任务的记录、
      下载次数恒为 1，v0.9.244 新加的导出格式计数也被拆到两条里（同一单导了 SRT 又导 ASS 看不出来）。 */
   if (f.task) lite.taskId = f.task;
-  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta)); }
+  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta)); if (meta.stopped) lite.stopped = 1; }
   /* v0.9.244：自带 Key 用户同样记导出格式（这条记录是本次上报新建的，计数从 1 起） */
   else if (ev === 'download') {
     lite.downloads = 1; lite.downloadedAt = now;
@@ -6036,7 +6039,23 @@ const D_TASK_TTL  = 6 * 3600 * 1000;
    不会把「正在老实排队」的任务误判成结束。 */
 const D_TIER_OWN  = new Map();
 const D_TIER_TTL  = 3 * 60 * 1000;
-const D_CUE_CAP   = 45;             // 保守估批数用：45 是前端最细的 CUE_CAP（中日韩/日/荷/瑞）
+/* v0.9.351：估批数不再一律 ÷45。
+   前端只有 ja / nl / sv / zh-CN / zh-TW 是 45 条一批，其余语言都是 60 条 ——
+   10-21 00:43 那集 1948 条的波斯语，真实要 33 批，按 45 估成 44 批，而该档当日
+   只剩 42 次，差 2 次就被判「这一集在 D 里跑不完」整集扔给 B。 */
+const D_CUE_CAP_CJK = 45;           // 与前端 CUE_CAP_BY_LANG 一致（ja/nl/sv/zh-CN/zh-TW）
+const D_CUE_CAP     = 60;           // 前端默认值（其余语言）
+/* 同一个人刷新/重开页面时，旧任务的认领还在（刷新瞬间 finally 里的 model-done 发不出去），
+   要等 3 分钟才过期 —— 这段时间新任务被挤去 B，然后旧认领一过期又跳回 D，来回抖。
+   v0.9.351：IP + 目标语言 + 字幕条数三项全同、且旧认领已静默 20 秒 → 认定为同一人重开，
+   直接把认领接过来，不必等满 3 分钟。20 秒是「排队一次最长 60 秒」的三分之一，
+   正常在跑的任务每批都会续约，不会静默这么久。测试可用环境变量缩短。 */
+const D_TAKEOVER_MS = Math.max(1000, Number(process.env.D_TAKEOVER_MS) || 20 * 1000);
+let D_TAKEOVER_N = 0;               // 接手次数（进程内累计，重启清零；只给后台看）
+function dCueCap(lang){
+  const L = String(lang || '');
+  return (L === 'ja' || L === 'nl' || L === 'sv' || L === 'zh-CN' || L === 'zh-TW') ? D_CUE_CAP_CJK : D_CUE_CAP;
+}
 const D_MAX_MODELS = 6;             // 模型池上限。再多后台表格就看不清了，也没有实际收益
 
 /* 太平洋时间日期串（YYYY-MM-DD）。Gemini 免费额度按 PT 午夜重置，用本地日期会在
@@ -6234,14 +6253,6 @@ function dTierReady(cfg, m, need, q0){
   }
   return false;
 }
-/* 此刻真正还能发几次 = min(今日剩余, 桶里剩的名额)。整集锁要用它，
-   否则「今天够、但这一小时已经用光」的任务会被判成能走 D，第一批就掉回 C/B/A。 */
-function dAvail(cfg){
-  const q = dRead();
-  const rem = dRemain(cfg, q);
-  const b = dBucket(q, cfg);
-  return b ? Math.min(rem, Math.floor(b.tokens)) : rem;
-}
 /* 后台展示：整槽视角的额度面板（每个 key 的明细仍走 dKeyStatus）。
    models 一栏是每档模型今天的合计用量 —— 用户就是靠它判断「该不该再加一档」。 */
 function dPoolStatus(cfg){
@@ -6263,6 +6274,7 @@ function dPoolStatus(cfg){
     tokens: b ? Math.floor(b.tokens) : 0,         // 现在能发几次
     max: cap ? cap * D_BURST_H : 0,               // 桶的上限（攒满 3 小时）
     over: (+q.over || 0),                         // v0.9.349：今日超桶放行的请求数
+    takeovers: D_TAKEOVER_N,                      // v0.9.351：同人重开直接接手的次数（内存计数）
     hourUsed: dHourUsed(),                        // 近 60 分钟已发
     models: ms,                                   // 每档模型的今日用量
     modelCount: ms.length,
@@ -6442,9 +6454,10 @@ function dMarkErr(cfg, i, model, err){
    v0.9.348：首次分配改成「认领」—— 按档位顺序找第一个「没被别的活跃任务认领 +
    日额度够跑完这一集 + 当前 RPM 有空位」的模型，整集锁在它上面。一个都认领不到
    就直接判 X 走 C/B/A，不在这里排队（用户 10-20 定案：档被占了就换槽，别等）。
-   总批数前端没带，用字幕条数估：÷45（最细的 CUE_CAP）算出来的批数偏高，
-   偏高只会让「额度不够就跑整集 C/B/A」判得更早，不会中途断在半路。 */
-function dTaskSlot(task, cfg, cues){
+   总批数：v0.9.351 起由前端报真实值（meta.batches）；老前端退回「按目标语言的
+   真实每批上限」估（45 / 60），不再一律 ÷45。另外支持「同一个人重开 → 接管
+   旧认领」，见 D_TAKEOVER_MS。 */
+function dTaskSlot(task, cfg, cues, lang, planB, ip, file){
   if (!task) return { slot: 'D', model: '' };   // 没有任务号（老前端）：不锁，单批判断
   const now = Date.now();
   for (const [k, v] of D_TASK) if (now - v.at > D_TASK_TTL) D_TASK.delete(k);
@@ -6452,7 +6465,16 @@ function dTaskSlot(task, cfg, cues){
   for (const [k, v] of D_TIER_OWN) if (now - v.at > D_TIER_TTL) D_TIER_OWN.delete(k);
   let hit = D_TASK.get(task);
   if (!hit) {
-    const need = Math.max(1, Math.ceil((Number(cues) || 0) / D_CUE_CAP));
+    /* v0.9.351：优先用前端报的真实总批数；没有就按目标语言的真实每批上限估。
+       少估只会让更多任务进 D（跑完前额度耗尽再降档），多估会把整集挡在门外 ——
+       10-21 00:43 那集波斯语就是被多估的 11 批挡掉的。 */
+    const real = Math.min(5000, Math.floor(Number(planB) || 0));
+    const need = Math.max(1, real > 0 ? real : Math.ceil((Number(cues) || 0) / dCueCap(lang)));
+    /* 身份指纹：同 IP + 同目标语言 + 同文件名 + 同字幕条数。只看 IP 不够（31.171.x 是
+       代理池），四项一起看基本不会把「另一个人」错认成同一人重开。文件名取自前端上报的
+       片名（不带内容），贴字幕没有文件名时退化成空串，剩下三项仍然可用。 */
+    const fp = ip ? (ip + '|' + String(lang || '') + '|' + String(file || '') + '|' +
+      String(Math.max(0, Math.floor(+cues || 0)))) : '';
     const q = dRead();
     const b = dBucket(q, cfg);
     /* v0.9.349：桶只决定「新任务能不能进 D」，不再要求「桶里备齐整集的量」。
@@ -6460,17 +6482,30 @@ function dTaskSlot(task, cfg, cues){
        一个 1033 条的任务 need=23，桶里只剩 3 个名额 → 整集扔给 B，
        而当时 D 的日额度还剩 900 多次）。用户定案：分配只看有没有名额，
        跑起来按限速慢慢发；桶空了也不许把在跑的任务踢走。 */
-    let pick = '';
+    let pick = '', took = false;
     if (!b || b.tokens >= 1) {
       for (const m of dModels(cfg)) {
         const own = D_TIER_OWN.get(m.name);
-        if (own && own.task !== task) continue;        // 已被别的活跃任务认领
+        let tookThis = false;
+        if (own && own.task !== task) {
+          /* v0.9.351：同一个人重开 → 旧认领静默够久就直接接手，不等 3 分钟过期。
+             旧任务若真的还活着（例如两个标签页），它下一批会重新评估并落去 C/B/A；
+             这比「两个都卡在 D 门外」好，认错了也只是共用一档、分摊 RPM，不会丢数据。 */
+          const same = !!fp && own.fp === fp && (now - (own.at || 0)) >= D_TAKEOVER_MS;
+          if (!same) continue;        // 已被别的活跃任务认领
+          D_TASK.delete(own.task);    // 旧任务的僵死记录一并清掉，别让它继续指向这一档
+          tookThis = true;
+        }
         if (!dTierReady(cfg, m, need, q)) continue;    // 日额度不够 / 本分钟满
         pick = m.name;
+        took = tookThis;
         break;
       }
     }
-    if (pick) D_TIER_OWN.set(pick, { task: task, at: now });
+    if (pick) {
+      D_TIER_OWN.set(pick, { task: task, at: now, fp: fp });
+      if (took) D_TAKEOVER_N++;     // 只统计真正接手成功的那次（额度不够的尝试不算）
+    }
     hit = { slot: pick ? 'D' : 'X', model: pick, at: now };
     D_TASK.set(task, hit);
   } else {
@@ -6480,7 +6515,7 @@ function dTaskSlot(task, cfg, cues){
        —— 踢掉会让 B 的整集锁指向一个它不再独占的模型，反而更乱。 */
     if (hit.slot === 'D' && hit.model){
       const own = D_TIER_OWN.get(hit.model);
-      if (!own || own.task === task) D_TIER_OWN.set(hit.model, { task: task, at: now });
+      if (!own || own.task === task) D_TIER_OWN.set(hit.model, { task: task, at: now, fp: (own && own.fp) || '' });
     }
   }
   return hit;
@@ -6492,16 +6527,19 @@ function dTaskMark(task, model){
   if (!task || !model) return;
   const now = Date.now();
   const hit = D_TASK.get(task);
+  const own = D_TIER_OWN.get(model);
+  /* v0.9.351：身份指纹要跟着任务走。每批成功调用都会走这里续约，漏掉 fp 会被冲成空，
+     后面的「同人重开」就永远认不出来（v0.9.351 端到端第一次跑就是这么挂的）。 */
+  let fp = (own && own.fp) || '';
   if (hit){
     if (hit.model && hit.model !== model){
       const old = D_TIER_OWN.get(hit.model);
-      if (old && old.task === task) D_TIER_OWN.delete(hit.model);
+      if (old && old.task === task) { fp = fp || old.fp || ''; D_TIER_OWN.delete(hit.model); }
     }
     hit.model = model;
     hit.at = now;
   }
-  const own = D_TIER_OWN.get(model);
-  if (!own || own.task === task) D_TIER_OWN.set(model, { task: task, at: now });
+  if (!own || own.task === task) D_TIER_OWN.set(model, { task: task, at: now, fp: fp });
 }
 /* v0.9.348：任务收尾时主动释放认领的模型档。
    用户 10-20 定案：「任务完没完咱们自己清楚，完成了就释放给别人」。
@@ -6647,7 +6685,7 @@ function eTaskFail(taskId){
    不命中就原样落回 C > B > A，老行为零变化。
    ⚠️ 这里只 dPeek、不 dPick：真正的「选 key + 预扣」在 callModelD 里做且只做一次。
       两处都预扣的话，一个 key 的每日额度会被同一批请求吃掉两倍（自测实证）。 */
-function pickRoute(cfg, lang, meta){
+function pickRoute(cfg, lang, meta, ip){
   /* v0.9.350：E 排最前。命中就直走 E；不命中（没配 / 语言没勾 / 被占 / 任务已降级）
      原样往下走 D → C → B → A，老路径一行未动。 */
   const pe = ePick(cfg, lang, meta);
@@ -6656,7 +6694,11 @@ function pickRoute(cfg, lang, meta){
   if (!langInD(cfg, lang)) return pickModel(cfg, lang);
   const task = String((meta && meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
   const cues = Math.max(0, Math.floor(+((meta && meta.cues) || 0)));
-  const lock = dTaskSlot(task, cfg, cues);
+  /* v0.9.351：前端报的真实总批数（meta.batches）。有它就不猜了 —— 猜错两种方向都难受：
+     多估会把整集挡在 D 门外，少估会让它在额度耗尽时中途降档。 */
+  const planB = Math.max(0, Math.floor(+((meta && meta.batches) || 0)));
+  const file = String((meta && meta.file) || '').replace(/[\x00-\x1f]/g, '').slice(0, 120);
+  const lock = dTaskSlot(task, cfg, cues, lang, planB, ip || '', file);
   if (lock.slot !== 'D') return pickModel(cfg, lang);
   const peek = dPeek(cfg, lock.model);
   if (!peek) return pickModel(cfg, lang);        // 全池当天都满了 → 交给 C/B/A
@@ -7197,7 +7239,7 @@ const server = http.createServer(async (req, res) => {
       /* 任务号与 pickRoute 内部用的是同一套清洗规则（脏字符去掉、截 24 字），
          否则「选路时锁定 A 档」和「调用时读粘性档位」会读到两个不同的 key。 */
       const dTaskId = String((body.meta && body.meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
-      const pick = pickRoute(cfg, lang, body.meta);
+      const pick = pickRoute(cfg, lang, body.meta, ip);
       /* D 的额度还在、只是这一分钟 RPM 满了：让前端等几十秒重发同一批，**不降级**。
          免费额度一分钟后就回来，降到 C/B/A 等于白扔。复用既有 {wait} 回执
          （只有带 meta.pace=1 的前端才认，老前端根本走不到这里）。 */

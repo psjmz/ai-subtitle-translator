@@ -1100,7 +1100,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.348</span>
+    <span class="ver-tag">v0.9.351</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1715,9 +1715,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.348"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.348"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.348"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.351"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.351"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.351"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4603,7 +4603,7 @@ function reportEvent(ev, extra, fmt){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0});
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,stopped:(ev==='finish'&&S.stop)?1:0});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
     if(navigator.sendBeacon && typeof Blob==='function'){
       try{ if(navigator.sendBeacon('/api/event', new Blob([body],{type:'application/json'}))) return; }catch(_){}
@@ -4852,6 +4852,11 @@ async function runTranslate(){
     const res=new Map();
     const fillerSet=new Set();
     const totalB=batches.length;
+    /* v0.9.351：把真实总批数随请求带给服务端。服务端分配 D 档时要判断「这一集的
+       额度够不够跑完」，以前只能按字幕条数 ÷45 猜 —— 非中日韩字幕每批 60 条，
+       猜出来的批数比真实多三成，大任务因此被整集挡在 D 门外（10-21 00:43 的
+       1948 条波斯语：真实 33 批被估成 44 批，差 2 次就进不去）。 */
+    if(S.trMeta) S.trMeta.batches = totalB;
     let ctx=[]; // v0.9.62：跨批上下文（前批末尾 ≤2 组的原文+已定译文，随批发给模型做衔接参考）
     // v0.9.77 断点续传：同一文件 + 同语言对 + 同切批参数才认；批数对不上说明参数变了，旧快照作废
     const snapFpStr=snapFp(cfg, CHAR_BUDGET, CUE_CAP);
@@ -5439,6 +5444,21 @@ $('filter').addEventListener('change', renderRows);
    站长也无法远程定位。现在至少日志区能看到 [Error]/[Unhandled] 前缀的红字。 */
 window.addEventListener('error', function(e){ try{ log('[Error] '+String((e&&e.message)||''),'err'); }catch(_){} });
 window.addEventListener('unhandledrejection', function(e){ try{ var r=e&&e.reason; log('[Unhandled] '+(r&&r.message?r.message:String(r||'')),'err'); }catch(_){} });
+
+/* v0.9.351：刷新 / 关标签页时 finally 不会执行，model-done 发不出去，D 档的认领只能
+   等 3 分钟闲置过期 —— 这期间同一个人重新点一次翻译，新任务会被挤去 B，等旧认领一过期
+   又跳回 D，后台看起来就是 D→B→D→B 来回抖（10-21 00:43 的 SpongeBob 任务实例）。
+   pagehide 是页面消失前最后一个还能发请求的时机，用 sendBeacon 补一发；
+   服务端另有「同人重开直接接手」兜底，两条一起才压得住。 */
+window.addEventListener('pagehide', function(){
+  if(!S.taskId || !S.translating) return;
+  try{
+    var body = JSON.stringify({taskId:S.taskId, why:'pagehide'});
+    if(navigator.sendBeacon && typeof Blob==='function'){
+      navigator.sendBeacon('/api/model-done', new Blob([body],{type:'application/json'}));
+    }
+  }catch(_){}
+});
 
 /* ---------------- 导入 ---------------- */
 /* v0.9.144：整片文本指纹，用来判断「换了一部新片」还是「重新载入同一部片」。
