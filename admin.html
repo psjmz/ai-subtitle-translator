@@ -185,7 +185,7 @@
     </div>
 
     <div class="card">
-      <h2>模型 C（可选，优先级最高）</h2>
+      <h2>模型 C（可选）</h2>
       <div class="note" style="margin:0 0 12px">参数结构与模型 B 完全相同。分流优先级 <b>C &gt; B &gt; A</b>：勾给 C 的语言走 C，没勾 C 的才看 B，都没有就走 A。<b>C 没配全、或没勾任何语言时，C 完全不参与</b>（默认留空，先配参数再挑语言试点）。</div>
       <label>服务商（Base URL 自动填充，模型名由你指定）</label>
       <select id="provider3"></select>
@@ -214,7 +214,7 @@
     <!-- v0.9.345：模型 D —— Gemini 免费额度池。与 A/B/C 的最大差别是 key 有三个，
          且额度按「请求次数」算（RPM / RPD），不是 token。 -->
     <div class="card">
-      <h2>模型 D（Gemini 免费额度池 · 优先级最高）</h2>
+      <h2>模型 D（Gemini 免费额度池）</h2>
       <div class="note" style="margin:0 0 12px">三个 key <b>顺序使用</b>：前一个到当日上限才动下一个，不是轮询。模型池按<b>从上到下的顺序</b>用：上一档的 key 全用满，才降下一档。单个 key 到「每分钟」上限只是跳过它、不退役；全池（所有档 × 所有 key）都到「每日」上限才回退到 C / B / A。<b>RPM / RPD 请照 Google AI Studio 速率限制页显示的数字填</b> —— 填大了会撞 429（能兜住，但白跑一趟），填小了会提前停用免费额度。</div>
       <label>服务商（Base URL 自动填充，模型名在下面的模型池里填）</label>
       <select id="provider4"></select>
@@ -290,11 +290,66 @@
       <div class="msg" id="cfg4Msg"></div>
     </div>
 
+    <!-- v0.9.350：模型 E —— 网页 Gemini 独占通道。结构与 C 相同（一组 base/model/key），
+         分流方式也和 C/B 一样（勾语言）；差别只有两条：同一时刻只服务一个任务、
+         以及每分钟请求数与批间间隔。 -->
     <div class="card">
-      <h2>语言分流（优先级 D &gt; C &gt; B &gt; A）</h2>
-      <div class="note" style="margin:0 0 12px">默认全部走模型 A。判定顺序：先查 C 的勾选 → 再查 B 的勾选 → 都没有走 A。分流只看目标语言，不看源语言、文件大小。<b>某个模型没配全时，它的勾选不生效</b>。</div>
+      <h2>模型 E（网页 Gemini · 独占通道，优先级最高）</h2>
+      <div class="note" style="margin:0 0 12px">这里是自建的网页版 Gemini 通道（new-api → 桥接 → gemini.google.com）。它<b>同一时刻只服务一个翻译任务</b>：别的任务一旦判定「E 正忙」，整程自动走 D / C / B / A，不排队、不报错。<b>分流规则和 C / B 完全一样</b>：只有下面「语言分流」里勾给 E 的语言才会走它，一门都不勾 = E 不接管任何语言。网页通道单批约 6–7 秒，这不是故障。</div>
+      <label>服务商（Base URL 自动填充）</label>
+      <select id="provider5"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base5" spellcheck="false" placeholder="http://127.0.0.1:3001/v1">
+        </div>
+        <div>
+          <label>模型名</label>
+          <input type="text" id="model5" spellcheck="false" placeholder="gemini-3.8-flash">
+        </div>
+      </div>
+      <label>API Key（<span class="mask" id="keyMask5">未设置</span>）</label>
+      <input type="password" id="key5" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+      <div class="row">
+        <div>
+          <label>每分钟最多请求（0 = 不限）</label>
+          <input type="number" id="rpmE" min="0" max="600" step="1" placeholder="8">
+        </div>
+        <div>
+          <label>批间最小间隔（秒，0 = 不限）</label>
+          <input type="number" id="gapE" min="0" max="30" step="1" placeholder="2">
+        </div>
+      </div>
+      <div class="note">两个数都只约束<b>同一个任务自己</b>：到顶了就等几十秒重发同一批，<b>不会降级换模型</b>（一集里前后两个模型语气会跳）。实测单批 6–7 秒，间隔设 2 秒平时几乎不会真正触发，它只是保险丝。</div>
+      <div class="note" id="eStat">状态：—</div>
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams5" spellcheck="false" placeholder='{}'></textarea>
+      <div class="btns">
+        <button class="primary" id="btnSave5">保存模型 E</button>
+        <button id="btnTest5">测试模型 E</button>
+        <button id="btnClear5" style="margin-left:auto">清空模型 E</button>
+      </div>
+      <div class="msg" id="cfg5Msg"></div>
+    </div>
 
-      <h3 style="margin:18px 0 6px;font-size:14px">模型 C（优先级最高）</h3>
+    <div class="card">
+      <h2>语言分流（优先级 E &gt; D &gt; C &gt; B &gt; A）</h2>
+      <div class="note" style="margin:0 0 12px">默认全部走模型 A。判定顺序：先查 E 的勾选 → 再查 D → C → B，都没有走 A。分流只看目标语言，不看源语言、文件大小。<b>某个模型没配全时，它的勾选不生效</b>。</div>
+
+      <h3 style="margin:18px 0 6px;font-size:14px">模型 E（优先级最高 · 独占）</h3>
+      <div class="note" style="margin:0 0 12px">留空 = E 不接管任何语言。勾了的语言会先抢 E；同一时刻 E 只服务一个任务，抢不到的那个任务自动走 D / C / B / A。</div>
+      <label>搜索语言（中文名 / 英文名 / 语言码）</label>
+      <input type="text" id="langSearchE" spellcheck="false" placeholder="如 日语 / Japanese / ja">
+      <div class="btns" style="margin-top:10px">
+        <button data-batche="all">全选</button>
+        <button data-batche="none">清空</button>
+        <button data-batche="cjk">中日韩</button>
+        <button data-batche="nonlatin">非拉丁文字</button>
+      </div>
+      <div class="chips" id="langChipsE"></div>
+      <div class="note">已选 <b id="langCountE">0</b> 种语言走模型 E</div>
+
+      <h3 style="margin:18px 0 6px;font-size:14px">模型 C</h3>
       <div class="note" style="margin:0 0 12px">留空 = C 不接管任何语言。同一门语言在 C 和 B 里都勾了，以 C 为准。</div>
       <label>搜索语言（中文名 / 英文名 / 语言码）</label>
       <input type="text" id="langSearchC" spellcheck="false" placeholder="如 日语 / Japanese / ja">
@@ -560,6 +615,8 @@ let langSelC = new Set();
 /* v0.9.345：走模型 D 的目标语言集合。只在「只走勾选的语言」时生效；
    默认「全部语言」时这个集合会被忽略，但仍保留用户勾过的内容，切回来不用重勾。 */
 let langSelD = new Set();
+/* v0.9.350：走模型 E 的目标语言集合（与 C/B 同语义：空 = 不接管任何语言） */
+let langSelE = new Set();
 /* v0.9.347：模型池的编辑态。顺序即优先级；used/cap 是服务端给的今日用量，
    只用于显示，保存时不会回传（免得把显示值当成配置存进 config.json）。 */
 let dModelList = [];
@@ -619,9 +676,9 @@ function readParams(id){
    v0.9.345：加 'D'。三组的 id 差异只在后缀（'' / C / D），故共用一个渲染器，
    别为 D 抄一份 —— 抄了以后加语言要改三处。 */
 function renderLangs(which){
-  const isD = which === 'D', isC = which === 'C';
-  const sel = isD ? langSelD : isC ? langSelC : langSel;
-  const sfx = isD ? 'D' : isC ? 'C' : '';
+  const isD = which === 'D', isC = which === 'C', isE = which === 'E';
+  const sel = isD ? langSelD : isC ? langSelC : isE ? langSelE : langSel;
+  const sfx = isD ? 'D' : isC ? 'C' : isE ? 'E' : '';
   const q = ($('langSearch' + sfx).value || '').trim().toLowerCase();
   const rows = LANGS.filter(l => !q || l.zh.toLowerCase().indexOf(q) >= 0 ||
     l.en.toLowerCase().indexOf(q) >= 0 || l.v.toLowerCase().indexOf(q) >= 0);
@@ -632,7 +689,7 @@ function renderLangs(which){
   $('langCount' + sfx).textContent = sel.size;
 }
 function batchLangs(kind, which){
-  const sel = which === 'D' ? langSelD : which === 'C' ? langSelC : langSel;
+  const sel = which === 'D' ? langSelD : which === 'C' ? langSelC : which === 'E' ? langSelE : langSel;
   if (kind === 'none') sel.clear();
   else if (kind === 'all') LANGS.forEach(l => sel.add(l.v));
   else LANGS.forEach(l => { if ((' ' + (l.g || '') + ' ').indexOf(' ' + kind + ' ') >= 0) sel.add(l.v); });
@@ -652,6 +709,23 @@ function renderDPool(p){
   const mdl = p.modelCount ? (p.modelCount + ' 档 · ') : '';
   if (!p.hourly) { el.textContent = mdl + daily + ' · 每小时不限'; return; }
   el.textContent = mdl + '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily + (p.over ? (' · 超桶 ' + p.over + ' 次') : '');
+}
+/* v0.9.350：模型 E 的状态灯。cookie 掉了整条通道就废，所以「最近成功」超过 1 小时标红。 */
+function renderEStat(st){
+  const el = $('eStat');
+  if (!el) return;
+  if (!st) { el.textContent = '状态：—'; el.style.color = ''; return; }
+  const parts = [];
+  parts.push('当前占用：' + (st.busy ? ('任务 ' + st.busy) : '空闲'));
+  parts.push('本分钟已发 ' + (st.rpm || 0) + ' 次');
+  if (st.okAt) {
+    const mins = Math.floor((Date.now() - st.okAt) / 60000);
+    parts.push('最近成功：' + (mins < 1 ? '刚刚' : mins + ' 分钟前') + (st.okModel ? (' · ' + st.okModel) : ''));
+  } else {
+    parts.push('最近成功：还没有成功的调用');
+  }
+  el.textContent = '状态：' + parts.join(' · ');
+  el.style.color = (st.okAt && (Date.now() - st.okAt) > 3600000) ? '#A32D2D' : '';
 }
 function renderDKeys(list){
   for (let i = 0; i < 3; i++) {
@@ -701,6 +775,7 @@ async function loadConfig(){
     fillProviderSelect(c.provider2 || '', 'provider2');
     fillProviderSelect(c.provider3 || '', 'provider3');
     fillProviderSelect(c.provider4 || '', 'provider4');
+    fillProviderSelect(c.provider5 || '', 'provider5');
     /* 老数据如果有 base 与某预设的 base 一致，但 provider 字段没存（或存了别的东西），补上匹配预设的 id */
     if (!pid && c.base) {
       const m = PRESETS.find(p => p.base && p.base === (c.base || '').replace(/\/+$/, ''));
@@ -744,10 +819,20 @@ async function loadConfig(){
     $('dPickBox').style.display = dAll ? 'none' : '';
     langSelD = new Set(Array.isArray(c.langModelD) ? c.langModelD : []);
     renderDKeys(c.dKeys || []);
+    /* v0.9.350：模型 E（老 config.json 没这些字段 → 走空值/默认值，不影响既有行为） */
+    $('base5').value = c.base5 || '';
+    $('model5').value = c.model5 || '';
+    $('keyMask5').textContent = c.keySet5 ? ('已保存：' + c.keyMask5) : '未设置';
+    $('extraParams5').value = paramsText(c.extraParams5);
+    $('rpmE').value = (typeof c.rpmE === 'number' && Number.isFinite(c.rpmE)) ? c.rpmE : '';
+    $('gapE').value = (typeof c.gapE === 'number' && Number.isFinite(c.gapE)) ? c.gapE : '';
+    renderEStat(c.eStat || null);
+    langSelE = new Set(Array.isArray(c.langModelE) ? c.langModelE : []);
     $('fallbackToA').checked = c.fallbackToA !== false;
     renderLangs();
     renderLangs('C');
     renderLangs('D');
+    renderLangs('E');
     $('publicUrl').value = c.publicUrl || '';
     $('analyticsId').value = c.analyticsId || '';
     $('usage').innerHTML = '今日用量：全站 <b>' + c.usedToday + '</b> / ' + (c.globalDaily || '∞') +
@@ -1213,6 +1298,43 @@ $('provider3').addEventListener('change', () => {
   if (p && p.id !== 'custom' && !$('base3').value.trim()) $('base3').value = p.base;
 });
 
+/* v0.9.350：模型 E —— 网页 Gemini 独占通道。保存逻辑与 C 同构，
+   多两个闸门参数（每分钟请求 / 批间间隔），并把语言勾选一起存（和 D 一样）。 */
+$('btnSave5').addEventListener('click', async () => {
+  const base5 = $('base5').value.trim(), model5 = $('model5').value.trim(), key5 = $('key5').value.trim();
+  if (!base5 && !model5 && !key5) return msg('cfg5Msg', '模型 E 三项都为空 = 不启用（不会接管任何语言），无需保存', 'err');
+  if (!base5 || !model5) return msg('cfg5Msg', 'Base URL 和模型名不能为空（除非清空模型 E）', 'err');
+  let extraParams5;
+  try { extraParams5 = readParams('extraParams5'); } catch (e) { return msg('cfg5Msg', e.message, 'err'); }
+  const payload = { provider5: $('provider5').value, base5, model5, key5, extraParams5, langModelE: [...langSelE] };
+  /* 留空 = 不传，服务端保留原值。直接 +'' 会得到 0（= 不限），把「没填」误当成「关掉限流」。 */
+  const rpmRaw = $('rpmE').value.trim(), gapRaw = $('gapE').value.trim();
+  if (rpmRaw !== '') payload.rpmE = +rpmRaw;
+  if (gapRaw !== '') payload.gapE = +gapRaw;
+  try {
+    await api('/api/admin/config', 'POST', payload);
+    $('key5').value = '';
+    msg('cfg5Msg', '模型 E 已保存并即时生效 ✓（还要在「语言分流」里勾选要交给 E 的语言，否则 E 不接管流量）', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg5Msg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnTest5').addEventListener('click', () => runTest('E', 'cfg5Msg', '模型 E：'));
+
+$('btnClear5').addEventListener('click', async () => {
+  if (!confirm('确定清空模型 E 的全部配置（含 API Key）？清空后 E 不再接管任何语言，流量回到 D / C / B / A。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { clearKey5: true });
+    msg('cfg5Msg', '模型 E 已清空 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg5Msg', '清空失败：' + e.message, 'err'); }
+});
+
+$('provider5').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider5').value);
+  if (p && p.id !== 'custom' && !$('base5').value.trim()) $('base5').value = p.base;
+});
+
 /* v0.9.345：模型 D（Gemini 免费额度池）。四件事与 B/C 不同：
    ① 三个 key 一起保存（各自留空 = 保留原值）；
    ② 模型是一张池表（v0.9.347），顺序即优先级；
@@ -1364,13 +1486,25 @@ $('langChipsC').addEventListener('click', e => {
 document.querySelectorAll('button[data-batchc]').forEach(b => {
   b.addEventListener('click', () => batchLangs(b.dataset.batchc, 'C'));
 });
+/* v0.9.350：模型 E 的语言 chips（同样是独立一组） */
+$('langSearchE').addEventListener('input', () => renderLangs('E'));
+$('langChipsE').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  const v = b.dataset.v;
+  if (langSelE.has(v)) langSelE.delete(v); else langSelE.add(v);
+  renderLangs('E');
+});
+document.querySelectorAll('button[data-batche]').forEach(b => {
+  b.addEventListener('click', () => batchLangs(b.dataset.batche, 'E'));
+});
 
 $('btnSaveRoute').addEventListener('click', async () => {
   try {
     await api('/api/admin/config', 'POST', {
-      langModelB: [...langSel], langModelC: [...langSelC], fallbackToA: $('fallbackToA').checked
+      langModelB: [...langSel], langModelC: [...langSelC], langModelE: [...langSelE], fallbackToA: $('fallbackToA').checked
     });
-    msg('routeMsg', '已保存：' + langSelC.size + ' 种语言走模型 C、' + langSel.size + ' 种语言走模型 B ✓', 'ok');
+    msg('routeMsg', '已保存：' + langSelE.size + ' 种语言走模型 E、' + langSelC.size + ' 种语言走模型 C、' + langSel.size + ' 种语言走模型 B ✓', 'ok');
   } catch (e) { msg('routeMsg', '保存失败：' + e.message, 'err'); }
 });
 

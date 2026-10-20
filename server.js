@@ -81,7 +81,22 @@ const DEFAULTS = {
   langModelD: [],
   rpmD: 15,                // 兼容字段：等于 models4[0].rpm（models4 为空时才是唯一模型的 RPM）
   rpdD: 1500,              // 兼容字段：等于 models4[0].rpd
-  hourlyD: 0               // v0.9.346：整槽每小时补多少个名额（0 = 不限）。见 dBucket 注释
+  hourlyD: 0,              // v0.9.346：整槽每小时补多少个名额（0 = 不限）。见 dBucket 注释
+  /* --- 模型 E（v0.9.350）：网页 Gemini 独占通道 ---
+     结构与 A/B/C 完全同构（一组 base/model/key）+ 与 C/B 同一套语言分流（langModelE）。
+     两条 A/B/C 没有的规则：
+     ① **独占**：同一时刻只服务一个任务。别的任务首批判定就判「用不上 E」，整程走 D/C/B/A，
+        不排队（用户 10-21 定案：档被占了就换槽，别等）。
+     ② 流量：批间最小间隔 gapE + 每分钟请求数 rpmE，两者都只约束**同一个任务自己**。
+     ⚠️ langModelE 留空 = E 不接管任何语言（与 C/B 一致），配好参数也不会有流量进来。 */
+  provider5: '',
+  base5: '',
+  model5: '',
+  key5: '',
+  extraParams5: {},
+  langModelE: [],          // 走模型 E 的目标语言码数组；空 = E 不参与分流
+  rpmE: 8,                 // 每分钟最多请求数（60 秒滑窗）；0 = 不限
+  gapE: 2                  // 批间最小间隔（秒）；0 = 不限
 };
 
 function ensureData(){
@@ -5925,6 +5940,8 @@ function withExtra(core, extra){
 function slotReady(cfg, which){
   if (which === 'B') return !!(cfg.base2 && cfg.model2 && cfg.key2);
   if (which === 'C') return !!(cfg.base3 && cfg.model3 && cfg.key3);
+  /* v0.9.350：E 与 A/B/C 同构，三项配全即启用（独占、限流另算，见 ePick） */
+  if (which === 'E') return !!(cfg.base5 && cfg.model5 && cfg.key5);
   /* v0.9.345：D 的「配全」= base + 至少一档启用的模型 + 至少一个 key。
      keys4 是数组（1~3 个），models4 也是数组（1~6 档，v0.9.347）—— 任一档有 key 就能跑。 */
   if (which === 'D') return !!(cfg.base4 && dModels(cfg).length && dKeys(cfg).length);
@@ -5936,6 +5953,8 @@ function modelCReady(cfg){ return slotReady(cfg, 'C'); }
 function slotCfg(cfg, which){
   if (which === 'B') return { base: cfg.base2, model: cfg.model2, key: cfg.key2, temperature: cfg.temperature, extraParams: cfg.extraParams2 };
   if (which === 'C') return { base: cfg.base3, model: cfg.model3, key: cfg.key3, temperature: cfg.temperature, extraParams: cfg.extraParams3 };
+  /* v0.9.350：E 也是固定一组 base/model/key —— 直接复用 callModel，不需要单独一套调用路径 */
+  if (which === 'E') return { base: cfg.base5, model: cfg.model5, key: cfg.key5, temperature: cfg.temperature, extraParams: cfg.extraParams5 };
   return { base: cfg.base,  model: cfg.model,  key: cfg.key,  temperature: cfg.temperature, extraParams: cfg.extraParams };
 }
 /* v0.9.345：D 槽的调用配置。key 由 dPick 现选、模型由模型池现挑（都不像 A/B/C 是固定一个），
@@ -5972,6 +5991,18 @@ function fallbackChain(cfg, which, lang){
   }
   if (which === 'C') return [slotReady(cfg, 'B') ? 'B' : null, 'A'].filter(Boolean);
   if (which === 'B') return ['A'];
+  /* v0.9.350：E 失败 → C → B → A。与 D 同一条规矩：C/B 的勾选是我们自己定的分流规则，
+     E 落下来也必须尊重，不能把没勾给 C 的语言硬塞过去。
+     ⚠️ 不把 D 放进这条链：D 的 key/模型是调用时现选的，slotCfg 给不出确定的一份。
+        本批由 C/B/A 兜住，下一批起任务已标成 on=-1，自然会走 D。 */
+  if (which === 'E') {
+    const lg = String(lang || '');
+    const out = [];
+    if (slotReady(cfg, 'C') && (!lg || (Array.isArray(cfg.langModelC) && cfg.langModelC.indexOf(lg) >= 0))) out.push('C');
+    if (slotReady(cfg, 'B') && (!lg || (Array.isArray(cfg.langModelB) && cfg.langModelB.indexOf(lg) >= 0))) out.push('B');
+    out.push('A');
+    return out;
+  }
   return [];
 }
 
@@ -6493,11 +6524,134 @@ function langInD(cfg, lang){
   const arr = Array.isArray(cfg.langModelD) ? cfg.langModelD : [];
   return arr.indexOf(String(lang || '')) >= 0;
 }
+
+/* ---------------- v0.9.350：模型 E · 网页 Gemini 独占通道 ----------------
+   和 A/B/C 同构（base5/model5/key5 + langModelE 语言分流），额外两条规则：
+
+   ① 独占（用户 10-21 定案）：同一时刻只服务一个任务。别的任务**首批判定**时就判
+      「这个任务用不上 E」，整程走 D/C/B/A —— 不排队、不提示、不改前端。
+      判完就粘住：中途 E 空出来了也不回头，避免一集里前后两个模型。
+   ② 流量：批间最小间隔 + 每分钟请求数。两者都只约束**同一个任务自己**，
+      所以到顶时回 {wait:N} 让前端等几十秒，绝不降级（降级会让语气跳）。
+   ⚠️ 没有 taskId 的请求不给 E：认领、释放、粘性全靠任务号，没有号就保证不了独占。
+   ⚠️ 这里的表全是内存态，重启清零 —— 与 D 的 D_RPM/D_TASK 同一取舍。 */
+const E_TASK = new Map();            // taskId -> { on: 1 | 0 | -1, why, at }
+const E_OWN  = { task: '', at: 0 };  // 当前占用者（同一时刻只有一个）
+const E_LAST = { at: 0 };            // 上次发往 E 的起始时间（算批间间隔）
+const E_RPM  = [];                   // 最近 60 秒的请求时间戳
+const E_OK   = { at: 0, model: '' }; // 最近一次成功调用（后台健康灯：cookie 掉了能一眼看出）
+const E_TTL  = 3 * 60 * 1000;        // 闲置多久视为任务已结束（与 D_TIER_TTL 同一取舍）
+const E_RPM_WIN = 60000;
+
+/* 分流：与 C/B 同一套语义 —— 空数组 = E 不接管任何语言 */
+function langInE(cfg, lang){
+  const arr = Array.isArray(cfg.langModelE) ? cfg.langModelE : [];
+  return arr.indexOf(String(lang || '')) >= 0;
+}
+function eGapMs(cfg){
+  const n = Number(cfg.gapE);
+  // 上界 30 秒：填多大都不会把一批请求拖过前端的 105 秒预算
+  return (Number.isFinite(n) ? Math.max(0, Math.min(30, n)) : 2) * 1000;
+}
+function eRpmCap(cfg){
+  const n = Number(cfg.rpmE);
+  if (!Number.isFinite(n) || n <= 0) return 0;          // 0 / 非法 = 不限
+  return Math.max(1, Math.min(600, Math.floor(n)));
+}
+/* 清掉闲置超时的任务记录与占用。跑完的任务会主动 POST /api/model-done 释放，
+   这里只是兜底（关标签页、断网这类收不到收尾信号的）。 */
+function eSweep(now){
+  for (const [k, v] of E_TASK) if (now - v.at > E_TTL) E_TASK.delete(k);
+  if (E_OWN.task && now - E_OWN.at > E_TTL) { E_OWN.task = ''; E_OWN.at = 0; }
+}
+/* 任务结束 → 立刻让出 E（和 dReleaseTask 一个作用：小任务不必白占 3 分钟） */
+function eRelease(taskId){
+  const tid = String(taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
+  if (!tid) return false;
+  const had = E_TASK.delete(tid);
+  if (E_OWN.task === tid) { E_OWN.task = ''; E_OWN.at = 0; }
+  /* 本分钟已发的请求仍留在窗口里 —— 那是真实发生过的请求，不该因为任务结束就当成没发生 */
+  return !!had;
+}
+/* 整槽清空配置时一起清：不然刚清掉 base5，旧任务还占着 E 直到超时 */
+function eClearAll(){
+  E_TASK.clear();
+  E_OWN.task = ''; E_OWN.at = 0;
+  E_LAST.at = 0;
+  E_RPM.length = 0;
+  E_OK.at = 0; E_OK.model = '';
+}
+/* 后台状态灯：当前占用 / 最近成功 / 本分钟已发几次（只给已鉴权的 /api/admin/config 用） */
+function eStatus(){
+  const now = Date.now();
+  eSweep(now);
+  let n = 0;
+  for (let i = E_RPM.length - 1; i >= 0; i--) {
+    if (now - E_RPM[i] < E_RPM_WIN) n++; else break;
+  }
+  return { busy: E_OWN.task || '', okAt: E_OK.at || 0, okModel: E_OK.model || '', rpm: n, lastAt: E_LAST.at || 0 };
+}
+/* 每分钟窗口还有名额吗？满了返回「还要等几秒」 */
+function eRpmWait(cfg, now){
+  const cap = eRpmCap(cfg);
+  while (E_RPM.length && now - E_RPM[0] >= E_RPM_WIN) E_RPM.shift();
+  if (!cap || E_RPM.length < cap) return 0;
+  return Math.max(1, Math.ceil((E_RPM[0] + E_RPM_WIN - now) / 1000));
+}
+/* 选路。命中返回 {which:'E', cfg, model} 或 {which:'E', wait}；不命中返回 null（交回 D/C/B/A）。
+   注意：这里是**唯一**决定「这个任务用不用 E」的地方，之后的批次只读 E_TASK 的结果。 */
+function ePick(cfg, lang, meta){
+  if (!slotReady(cfg, 'E')) return null;
+  if (!langInE(cfg, lang)) return null;
+  const task = String((meta && meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
+  if (!task) return null;
+  const now = Date.now();
+  eSweep(now);
+  let rec = E_TASK.get(task);
+  if (!rec) {
+    /* 首批判定：E 空着就抢下来，被别人占着就直接认降级（不排队） */
+    const busy = !!E_OWN.task && E_OWN.task !== task;
+    rec = busy ? { on: 0, why: 'busy', at: now } : { on: 1, why: '', at: now };
+    E_TASK.set(task, rec);
+    if (!busy) { E_OWN.task = task; E_OWN.at = now; }
+  } else {
+    rec.at = now;
+    /* 自己闲置超时、被别人接手了 → 本任务认降级，不抢回来（抢回来会让两边来回跳） */
+    if (rec.on === 1 && E_OWN.task !== task) { rec.on = 0; rec.why = 'lost'; }
+    if (rec.on === 1) E_OWN.at = now;
+  }
+  if (rec.on !== 1) return null;
+  const w = eRpmWait(cfg, now);
+  if (w) return { which: 'E', wait: w };
+  return { which: 'E', cfg: slotCfg(cfg, 'E'), model: cfg.model5 };
+}
+/* 后台使用记录的「E 为什么没用上」：只给管理员看，不返回前端。 */
+function eOffReason(cfg, lang, meta){
+  if (!slotReady(cfg, 'E') || !langInE(cfg, lang)) return '';
+  const task = String((meta && meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
+  if (!task) return '';
+  const rec = E_TASK.get(task);
+  if (!rec) return '';
+  return rec.on === 1 ? '' : (rec.why || 'off');
+}
+/* E 调用失败（桥接挂 / cookie 掉 / 超时）：本批交给 C/B/A 兜，之后这个任务不再撞 E。
+   不标记的话，几十批会挨个白等一次 90 秒超时，一集能拖成两小时。 */
+function eTaskFail(taskId){
+  const tid = String(taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
+  if (!tid) return;
+  const rec = E_TASK.get(tid);
+  if (rec) { rec.on = -1; rec.why = 'dead'; rec.at = Date.now(); }
+  if (E_OWN.task === tid) { E_OWN.task = ''; E_OWN.at = 0; }
+}
 /* v0.9.345：D 槽选路。老的 pickModel 一字未动 —— D 的判断全在这里，
    不命中就原样落回 C > B > A，老行为零变化。
    ⚠️ 这里只 dPeek、不 dPick：真正的「选 key + 预扣」在 callModelD 里做且只做一次。
       两处都预扣的话，一个 key 的每日额度会被同一批请求吃掉两倍（自测实证）。 */
 function pickRoute(cfg, lang, meta){
+  /* v0.9.350：E 排最前。命中就直走 E；不命中（没配 / 语言没勾 / 被占 / 任务已降级）
+     原样往下走 D → C → B → A，老路径一行未动。 */
+  const pe = ePick(cfg, lang, meta);
+  if (pe) return pe;
   if (!slotReady(cfg, 'D')) return pickModel(cfg, lang);
   if (!langInD(cfg, lang)) return pickModel(cfg, lang);
   const task = String((meta && meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
@@ -7003,6 +7157,8 @@ const server = http.createServer(async (req, res) => {
       let b = {};
       try { b = JSON.parse(await readBody(req, 4096)); } catch (e) {}
       const freed = dReleaseTask(String((b && b.taskId) || ''));
+      /* v0.9.350：E 的占用也在这里一起放掉 —— 前端跑完/失败/停止都只发这一个请求 */
+      try { eRelease(String((b && b.taskId) || '')); } catch (e2) {}
       return sendJson(res, 200, { ok: 1, released: freed ? 1 : 0 });
     }
 
@@ -7065,8 +7221,9 @@ const server = http.createServer(async (req, res) => {
          那时它确实得排队保护——所以「A 是否进闸门」取决于它自己有没有被限流。 */
       /* v0.9.345：D 槽不进 token 闸门 —— 它自己的 RPM/RPD 账本已经管着节流，
          再套一层按 token 的 FIFO 只会把「还有请求额度」的批次白白卡住。
-         在途闸同理（那个是防多标签页霸占 B/C 的 token 额度）。 */
-      const needGate = canPace && pick.which !== 'D' && (pick.which !== 'A' || (RATE_LIMIT[pick.which] || 0) > 0);
+         在途闸同理（那个是防多标签页霸占 B/C 的 token 额度）。
+         v0.9.350：E 同理 —— 独占 + 每秒/每分钟闸已在 ePick 里，再套 FIFO 只会互相打架。 */
+      const needGate = canPace && pick.which !== 'D' && pick.which !== 'E' && (pick.which !== 'A' || (RATE_LIMIT[pick.which] || 0) > 0);
       const est = needGate ? estTokens(body.messages, pick.which) : 0;
       let tookInflight = false;
       if (needGate) {
@@ -7139,15 +7296,40 @@ const server = http.createServer(async (req, res) => {
          这样既有的「viaB=1 即 B 槽」统计口径继续成立，C 用 viaC 单独识别。
          ⚠️ 两个标记记的都是**分流归属**（初次选中谁），不是最终落地模型 ——
          回退会把 e.model 覆写成真正生效的那个，跟既有行为一致。 */
-      try { appendEvent(ip, body.meta, slotModelName, { viaB: pick.which === 'B' ? 1 : 0, viaC: pick.which === 'C' ? 1 : 0, viaD: pick.which === 'D' ? 1 : 0 }); } catch (e) {} // 行为记录失败不影响翻译主流程
+      try {
+        const evExtra = { viaB: pick.which === 'B' ? 1 : 0, viaC: pick.which === 'C' ? 1 : 0, viaD: pick.which === 'D' ? 1 : 0, viaE: pick.which === 'E' ? 1 : 0 };
+        /* v0.9.350：E 明明勾了这门语言却没走成，把原因记在事件上（busy / lost / dead）。
+           只在真降级时才写这个字段，正常走 E 或压根没配 E 的任务不落这个键。 */
+        const eoff = eOffReason(cfg, lang, body.meta);
+        if (eoff) evExtra.eOff = eoff;
+        appendEvent(ip, body.meta, slotModelName, evExtra);
+      } catch (e) {} // 行为记录失败不影响翻译主流程
       /* v0.9.132：前端在 meta.json 里声明「本请求期望 JSON 输出」（非 JSON 请求不注入，否则上游会 400） */
       const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
+      /* v0.9.350：E 的批间间隔。只有 E 会进这里；睡的是「距上次请求不足 gapE」的差额，
+         最多 gapE 秒（≤30），远小于前端 105 秒预算。此刻 E 只被本任务占着，睡期间没人抢。
+         ⚠️ 计时从**发出请求**那一刻算（E_LAST = 发请求时间），不是从响应回来算 ——
+            否则「调用耗时 7 秒 + gap 2 秒」会变成 9 秒的真空档，纯浪费。 */
+      if (pick.which === 'E') {
+        const gapMs = eGapMs(cfg);
+        const gapWait = gapMs - (Date.now() - E_LAST.at);
+        if (gapWait > 0 && !cliAc.signal.aborted) {
+          try { await sleepMs(gapWait); } catch (e20) {}
+        }
+        /* 客户端在间隔里断开了 → 这次请求根本没发出去，不该记进每分钟窗口 */
+        if (!cliAc.signal.aborted) {
+          E_LAST.at = Date.now();
+          E_RPM.push(E_LAST.at);
+        }
+      }
       try {
         /* v0.9.345：D 走 callModelD —— 它在槽内换 key（额度类错误就换下一个重发同一批，
            前端完全无感）。注意它吃的是**同一份** 90 秒预算，不会因为换 key 就多拿时间。 */
         const out = pick.which === 'D'
           ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }), dTaskId)
           : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
+        /* v0.9.350：E 的成功时间只用于后台健康灯（cookie 掉了要能一眼看出） */
+        if (pick.which === 'E') { E_OK.at = Date.now(); E_OK.model = String(slotModelName || ''); }
         try { if (canPace) { noteQuota(pick.which, out && out._rl); if (out) delete out._rl; } } catch (e13) {}
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
         /* v0.9.183：按真实消耗修正预扣（只补正差额，实际比预估少的部分随滑窗自然滑出），
@@ -7181,6 +7363,11 @@ const server = http.createServer(async (req, res) => {
         /* v0.9.345：D 槽 RPM 满但当日额度还在 → 回 wait 让前端等几十秒，绝不降级。
            注意这一条要放在「学限额」之前：它不是失败，是节流。 */
         if (e && e._dWait) return sendJson(res, 200, { wait: e._dWait, slot: 'D', why: 'rpm' });
+        /* v0.9.350：E 失败 = 这个任务不再用 E（本批照常走下面的 C/B/A 回退）。
+           不标记的话，后面每一批都白等一次 90 秒超时。
+           ⚠️ 客户端主动断开（关标签页 / 前端放弃）不算 E 挂 —— 那种情况任务本身已经停了，
+              标成 dead 会让「重新开始的任务」也拿不到 E。 */
+        if (pick.which === 'E' && !cliAc.signal.aborted) { try { eTaskFail(dTaskId); } catch (e21) {} }
         /* v0.9.183：429 的报错文案里带着上游的限额，学下来。硬编码的额度迟早会变，
            而这个数字是上游亲口报的——哪天 A 槽也开始限流了，不用改代码就能自动生效。
            v0.9.345：D 槽跳过这套 token 账本，它的额度是请求数，学来只会污染 RATE_LIMIT.D。 */
@@ -7361,6 +7548,15 @@ const server = http.createServer(async (req, res) => {
           rpmD: cfg.rpmD || 15, rpdD: cfg.rpdD || 1500,
           hourlyD: cfg.hourlyD || 0, dPool: dPoolStatus(cfg),
           dKeys: dKeyStatus(cfg), dDate: ptDateStr(),
+          /* v0.9.350：E 槽（网页 Gemini 独占通道）。key 只回掩码，明文绝不出服务端 */
+          provider5: cfg.provider5 || '', base5: cfg.base5 || '', model5: cfg.model5 || '',
+          keySet5: !!cfg.key5,
+          keyMask5: cfg.key5 ? (cfg.key5.slice(0, 4) + '…' + cfg.key5.slice(-4)) : '',
+          extraParams5: normParams(cfg.extraParams5),
+          langModelE: Array.isArray(cfg.langModelE) ? cfg.langModelE.slice() : [],
+          rpmE: (typeof cfg.rpmE === 'number' && Number.isFinite(cfg.rpmE)) ? cfg.rpmE : 8,
+          gapE: (typeof cfg.gapE === 'number' && Number.isFinite(cfg.gapE)) ? cfg.gapE : 2,
+          eStat: eStatus(),
           fallbackToA: cfg.fallbackToA !== false,
           perIpDaily: cfg.perIpDaily, globalDaily: cfg.globalDaily,
           temperature: (typeof cfg.temperature === 'number' && Number.isFinite(cfg.temperature)) ? cfg.temperature : 0.2,
@@ -7672,6 +7868,27 @@ const server = http.createServer(async (req, res) => {
           D_HIT.length = 0;
           D_TASK.clear();
         }
+        /* v0.9.350：模型 E（网页 Gemini 独占通道）。与 A/B/C 同规矩：key 留空 = 保留原值，
+           clearKey5 = 整槽清空（连带释放占用与限流窗口，否则清完还被旧任务占着）。 */
+        if (typeof body.base5 === 'string') cfg.base5 = body.base5.trim();
+        if (typeof body.model5 === 'string') cfg.model5 = body.model5.trim();
+        if (typeof body.provider5 === 'string') cfg.provider5 = body.provider5.trim();
+        if (typeof body.key5 === 'string' && body.key5.trim() !== '') cfg.key5 = body.key5.trim();
+        if (body.clearKey5) {
+          cfg.key5 = ''; cfg.base5 = ''; cfg.model5 = ''; cfg.provider5 = '';
+          cfg.extraParams5 = {}; cfg.langModelE = [];
+          try { eClearAll(); } catch (e) {}
+        }
+        if (body.extraParams5 !== undefined) cfg.extraParams5 = normParams(body.extraParams5);
+        if (Array.isArray(body.langModelE)) {
+          const seenE = {};
+          cfg.langModelE = body.langModelE
+            .map(x => String(x || ''))
+            .filter(x => /^[A-Za-z][A-Za-z0-9-]{0,11}$/.test(x) && !seenE[x] && (seenE[x] = 1));
+        }
+        /* rpmE 下界是 0：0 = 不限（与 hourlyD 同一约定）；gapE 上界 30 秒，见 eGapMs */
+        if (body.rpmE !== undefined && Number.isFinite(+body.rpmE)) cfg.rpmE = Math.max(0, Math.min(600, Math.floor(+body.rpmE)));
+        if (body.gapE !== undefined && Number.isFinite(+body.gapE)) cfg.gapE = Math.max(0, Math.min(30, Math.floor(+body.gapE)));
         if (body.fallbackToA !== undefined) cfg.fallbackToA = !!body.fallbackToA;
         if (Number.isFinite(+body.perIpDaily)) cfg.perIpDaily = Math.max(0, Math.floor(+body.perIpDaily));
         if (Number.isFinite(+body.globalDaily)) cfg.globalDaily = Math.max(0, Math.floor(+body.globalDaily));
@@ -7693,7 +7910,7 @@ const server = http.createServer(async (req, res) => {
         /* v0.9.193：连通性测试支持 C 槽；v0.9.345 加 D —— D 是逐个 key **各测一次**，
            因为一个死 key 混在里面，要等真用户撞上才发现，代价是那批字幕白跑一趟。
            ⚠️ 测试不记入 D 的额度账本（管理员手点的几次不该把 key 打到退役）。 */
-        const which = (tbody && (tbody.which === 'B' || tbody.which === 'C' || tbody.which === 'D')) ? tbody.which : 'A';
+        const which = (tbody && (tbody.which === 'B' || tbody.which === 'C' || tbody.which === 'D' || tbody.which === 'E')) ? tbody.which : 'A';
         if (which === 'D') {
           const list = dKeyList(cfg);
           const ms = dModels(cfg);

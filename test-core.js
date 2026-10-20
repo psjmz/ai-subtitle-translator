@@ -3481,9 +3481,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     /* 走 A 时若传 null，旧事件上的 viaB=1 永远不会被清掉 */
     /* v0.9.193：三槽后多带 viaC。要求 viaB 仍是「走 B 才 1」的无条件 0/1 写法 —— 否则
        「viaB=1 即 B 槽」这个既有统计口径会被 C 槽污染（走 C 时 viaB 必须是 0）。
-       v0.9.345：再加 viaD，同样必须是无条件 0/1 —— 走 D 时 viaB/viaC 都得是 0。 */
-    assert.ok(/\{ viaB: pick\.which === 'B' \? 1 : 0, viaC: pick\.which === 'C' \? 1 : 0, viaD: pick\.which === 'D' \? 1 : 0 \}/.test(srvSrc),
-      'appendEvent 调用处未恒传 viaB/viaC/viaD 0/1（三槽后要同时恒传三个）');
+       v0.9.345：再加 viaD，同样必须是无条件 0/1 —— 走 D 时 viaB/viaC 都得是 0。
+       v0.9.350：加 viaE（E 槽），四条一起恒传，语义互不重叠。 */
+    assert.ok(/\{ viaB: pick\.which === 'B' \? 1 : 0, viaC: pick\.which === 'C' \? 1 : 0, viaD: pick\.which === 'D' \? 1 : 0, viaE: pick\.which === 'E' \? 1 : 0 \}/.test(srvSrc),
+      'appendEvent 调用处未恒传 viaB/viaC/viaD/viaE 0/1（四槽后要同时恒传四个）');
     /* v0.9.193：回退改成 fallbackChain 循环，变量从写死的 outA 变成 outF（语义不变：
        每一级回退都要给前端带回 _fb 回执，否则用户永远不知道自己被降级了）。 */
     assert.ok(/outF\._fb\s*=/.test(srvSrc), '回退响应未带 _fb 回执');
@@ -4272,9 +4273,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        A 槽 1133 个任务零限流，让它排队纯属拖慢。
        但也不能永久豁免：A 真挨 429 时 learnLimit 会把 RATE_LIMIT.A 从 0 改成非零，那时它确实要排队。 */
     /* v0.9.345：再多豁免一个 D —— 它的额度是请求数（RPM/RPD），自己有账本，
-       套一层按 token 的 FIFO 只会把「还有请求额度」的批次白白卡住。 */
-    assert.ok(/const needGate = canPace && pick\.which !== 'D' && \(pick\.which !== 'A' \|\| \(RATE_LIMIT\[pick\.which\] \|\| 0\) > 0\);/.test(srvSrc),
-      'D 槽没被排除在 token 闸门外（它有自己的 RPM 账本），或 A 槽的判定被改坏了');
+       套一层按 token 的 FIFO 只会把「还有请求额度」的批次白白卡住。
+       v0.9.350：E 同理 —— 独占判定与每分钟闸都在 ePick 里，再进 FIFO 只会两套节流打架。 */
+    assert.ok(/const needGate = canPace && pick\.which !== 'D' && pick\.which !== 'E' && \(pick\.which !== 'A' \|\| \(RATE_LIMIT\[pick\.which\] \|\| 0\) > 0\);/.test(srvSrc),
+      'D / E 槽没被排除在 token 闸门外（它们各有自己的请求数账本），或 A 槽的判定被改坏了');
     assert.ok(/if \(needGate\) \{[\s\S]{0,240}inflightTake/.test(srvSrc), '闸门仍由 canPace 控制，A 槽会被队列拦住');
     /* est 只在真进闸门时才非零：A 不进闸门却拿 est 去补正，等于把没预扣过的量减掉，账本被冲成负数 */
     assert.ok(/const est = needGate \? estTokens/.test(srvSrc), 'est 仍按 canPace 算——A 槽没预扣却会被减掉');
@@ -14841,7 +14843,9 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
 
     /* v0.9.346：整槽「每小时 N 次」流量闸 —— 用户只拧一个数，不掺比例算法。
        要点：① 令牌桶（按小时滴水），不是整点清零；② 攒 3 小时封顶；
-             ③ 桶空 → 走 C/B/A 不排队；④ 0 = 不限（老配置零变化）；⑤ 与 RPD 取小。 */
+             ③ 0 = 不限（老配置零变化）；④ 与 RPD 取小。
+       v0.9.349 改口径：桶只拦「新任务准入」，不再拦已经在跑的任务 ——
+       桶空时把任务踢去 C/B/A 会让一集里出现两个模型（10-20 定案：日额度还有就允许超桶）。 */
     assert.ok(/\bhourlyD:/.test(sv), 'DEFAULTS 缺 hourlyD');
     assert.ok(sv.indexOf('if (Number.isFinite(+body.hourlyD))') >= 0, '后台保存没接收 hourlyD');
     assert.ok(sv.indexOf('Math.max(0, Math.min(100000, Math.floor(+body.hourlyD)))') >= 0,
@@ -14852,17 +14856,23 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/q\.bucket = \{ at: now, tokens: cap \}/.test(bk), '当天第一次没给桶初始化（首小时会直接断流）');
     assert.ok(/if \(!cap\) return null/.test(bk), 'cap=0 时没短路（0 应表示不限）');
     const pk0 = sv.slice(sv.indexOf('function dPeek'), sv.indexOf('function dPick'));
-    assert.ok(/if \(b && b\.tokens < 1\) return \{ deny: 'hourly' \}/.test(pk0), 'dPeek 没在桶空时拒绝');
+    assert.ok(pk0.indexOf("deny: 'hourly'") < 0, 'dPeek 又因桶空拒绝了（v0.9.349 起运行中的任务允许超桶，否则一集会中途换模型）');
     assert.ok(pk0.indexOf('return { wait: a.wait || 30 }') > 0 || pk0.indexOf('return { wait: r.wait || 30 }') > 0, 'dPeek 的 RPM 等待分支被弄丢了');
     const dp0 = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dQuotaErr'));
-    assert.ok(/if \(b\) b\.tokens -= 1;/.test(dp0), 'dPick 没扣桶里的名额（并发会超发）');
+    assert.ok(dp0.indexOf("deny: 'hourly'") < 0, 'dPick 又因桶空把任务踢去 C/B/A 了');
+    assert.ok(/if \(b\.tokens >= 1\) b\.tokens -= 1;/.test(dp0), 'dPick 没扣桶里的名额（并发会超发）');
+    assert.ok(/q\.over = \(q\.over \|\| 0\) \+ 1/.test(dp0), '超桶放行没记账（后台看不到阀门被踩穿多少次）');
     const pr0 = sv.slice(sv.indexOf('function pickRoute'), sv.indexOf('async function callModelD'));
     assert.ok(/peek\.deny\) return pickModel/.test(pr0), 'pickRoute 没在桶空时降级到 C/B/A');
     const cd0 = sv.slice(sv.indexOf('async function callModelD'), sv.indexOf('/* ---------------- v0.9.183'));
     assert.ok(/kp\.deny/.test(cd0), 'callModelD 没处理桶空（任务跑到一半会变成 500）');
     const ts0 = sv.slice(sv.indexOf('function dTaskSlot'), sv.indexOf('function langInD'));
-    assert.ok(/Math\.floor\(b\.tokens\) >= need/.test(ts0), '整集锁没把小时桶算进去（当天够、这一小时空的任务会被判成能走 D）');
+    assert.ok(ts0.indexOf('b.tokens >= need') < 0, '整集锁又要求「桶里备齐整集的量」了（线上实测：大任务因此全部进不了 D）');
+    assert.ok(/if \(!b \|\| b\.tokens >= 1\)/.test(ts0), '整集锁没把桶当准入闸（桶空时新任务仍会被塞进 D）');
     assert.ok(/dTierReady\(cfg, m, need, q\)/.test(ts0), '整集锁没按档判断日额度与 RPM（会分进一个已经占满的档）');
+    /* 超桶次数要能被后台看见，否则「阀门被踩穿多少」只能靠猜 */
+    assert.ok(/over: \(\+q\.over \|\| 0\)/.test(sv), 'dPoolStatus 没把超桶次数带回后台');
+    assert.ok(/p\.over \?/.test(adm), 'admin.html 没显示超桶次数');
     /* 后台：一个输入框 + 一行用量；保存必须带上这个字段，否则改了不生效 */
     ['hourlyD', 'dPoolHint'].forEach(id => assert.ok(adm.indexOf('id="' + id + '"') >= 0, 'admin.html 缺 #' + id));
     assert.ok(/function renderDPool/.test(adm), 'admin.html 缺 renderDPool');
