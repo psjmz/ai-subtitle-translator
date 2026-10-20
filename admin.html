@@ -237,7 +237,7 @@
           <div class="note" id="dPoolHint" style="margin:8px 0 0">—</div>
         </div>
       </div>
-      <div class="note" style="margin:-6px 0 12px">按小时匀速放行，<b>用不完的会攒着（最多攒 3 小时）</b>，深夜攒下的额度正好留给白天高峰。名额是<b>整个 D 槽共用</b>（不分档、不分 key），用完时新批次直接走 C / B / A，不排队。填 0 = 关闭此闸，仍受每档的 RPD 约束。</div>
+      <div class="note" style="margin:-6px 0 12px">这个数只拦<b>新任务</b>：桶里有名额才把新任务分给 D，空了就让给 C / B / A，不排队。已经分到某一档的任务<b>不受它限制</b>——只要日额度还有，桶空了也照样发（超出的次数单独计数），否则一集里会中途换模型。用不完的会攒着（最多攒 3 小时），深夜攒下的正好留给白天高峰。名额是<b>整个 D 槽共用</b>。填 0 = 关闭此闸，仍受每档的 RPD 约束。</div>
 
       <label>Key 1（<span class="mask" id="keyMask4_1">未设置</span>）<span class="dstat" id="dStat1"></span></label>
       <div class="drow">
@@ -651,7 +651,7 @@ function renderDPool(p){
   const daily = cap ? ('今日 ' + used + '/' + cap) : '今日不限';
   const mdl = p.modelCount ? (p.modelCount + ' 档 · ') : '';
   if (!p.hourly) { el.textContent = mdl + daily + ' · 每小时不限'; return; }
-  el.textContent = mdl + '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily;
+  el.textContent = mdl + '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily + (p.over ? (' · 超桶 ' + p.over + ' 次') : '');
 }
 function renderDKeys(list){
   for (let i = 0; i < 3; i++) {

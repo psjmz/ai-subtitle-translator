@@ -6231,6 +6231,7 @@ function dPoolStatus(cfg){
     hourly: cap,                                  // 0 = 不限
     tokens: b ? Math.floor(b.tokens) : 0,         // 现在能发几次
     max: cap ? cap * D_BURST_H : 0,               // 桶的上限（攒满 3 小时）
+    over: (+q.over || 0),                         // v0.9.349：今日超桶放行的请求数
     hourUsed: dHourUsed(),                        // 近 60 分钟已发
     models: ms,                                   // 每档模型的今日用量
     modelCount: ms.length,
@@ -6308,10 +6309,9 @@ function dPeek(cfg, prefer){
   const g = dCellSplit(cfg, prefer);
   if (!g.locked.length && !g.rest.length) return null;
   const q = dRead();
-  /* v0.9.346：小时名额空了 → 直接交给 C/B/A，**不回 wait**。
-     这是用户自己拧的流量阀门，不是额度临时紧张，让他等没有意义。 */
-  const b = dBucket(q, cfg);
-  if (b && b.tokens < 1) return { deny: 'hourly' };
+  /* v0.9.349：桶空不再把请求交给 C/B/A。走到这里说明任务已经分到 D 了，
+     半路换槽 = 一集两个模型（用户 10-20 定案：只要日额度还有，允许超桶跑完）。
+     桶只在新任务分配时起作用，见 dTaskSlot。 */
   const now = Date.now();
   const a = dScanCells(q, g.locked, now);
   if (a.ok) return { ok: true, model: a.ok.model, i: a.ok.i };
@@ -6322,19 +6322,25 @@ function dPeek(cfg, prefer){
   return null;                                       // 全池当日耗尽 → 跨槽降级
 }
 /* 选一个 (key, 模型) 单元并**预扣**。
-   返回 {i,key,model} / {wait:n}（只是这一分钟满）/ {deny:'hourly'}（小时闸空）/ null（全池当日耗尽） */
+   返回 {i,key,model} / {wait:n}（只是这一分钟满）/ null（全池当日耗尽）
+   ⚠️ v0.9.349 起这里**不会**再因「小时桶空」返回 deny：任务已经分到 D 了，
+      中途踢去 C/B/A 会让一集里出现两个模型。桶空只记账（q.over），照发。 */
 function dPick(cfg, prefer){
   const g = dCellSplit(cfg, prefer);
   if (!g.locked.length && !g.rest.length) return null;
   const q = dRead();
   const b = dBucket(q, cfg);
-  if (b && b.tokens < 1) return { deny: 'hourly' };   // v0.9.346 小时名额空 → 跨槽
   const now = Date.now();
   const take = (c) => {
     const st = dCell(q, c.i, c.model);            // 预扣前先拿到单元（会补默认值）
     st.used = (st.used || 0) + 1;                 // 预扣
     (D_RPM[dRpmKey(c.i, c.model)] || (D_RPM[dRpmKey(c.i, c.model)] = [])).push(now);
-    if (b) b.tokens -= 1;                         // 桶也一起扣，别让并发看见同一个名额
+    if (b){
+      /* v0.9.349 超额放行：日额度还有就发。桶扣到 0 为止（不记负），
+         超额次数单独记在 q.over，后台能看到「阀门被踩穿了多少次」。 */
+      if (b.tokens >= 1) b.tokens -= 1;
+      else { b.tokens = 0; q.over = (q.over || 0) + 1; }
+    }
     D_HIT.push(now);
     dWrite(q);
     return { i: c.i, key: c.key, model: c.model };
@@ -6418,9 +6424,13 @@ function dTaskSlot(task, cfg, cues){
     const need = Math.max(1, Math.ceil((Number(cues) || 0) / D_CUE_CAP));
     const q = dRead();
     const b = dBucket(q, cfg);
-    /* 小时令牌桶是整槽共享的：这一集的名额都不够，就别占着一档 */
+    /* v0.9.349：桶只决定「新任务能不能进 D」，不再要求「桶里备齐整集的量」。
+       旧判据 `tokens >= need` 在线上把大任务全挡在门外（10-20 21:00 实测：
+       一个 1033 条的任务 need=23，桶里只剩 3 个名额 → 整集扔给 B，
+       而当时 D 的日额度还剩 900 多次）。用户定案：分配只看有没有名额，
+       跑起来按限速慢慢发；桶空了也不许把在跑的任务踢走。 */
     let pick = '';
-    if (!b || Math.floor(b.tokens) >= need) {
+    if (!b || b.tokens >= 1) {
       for (const m of dModels(cfg)) {
         const own = D_TIER_OWN.get(m.name);
         if (own && own.task !== task) continue;        // 已被别的活跃任务认领
