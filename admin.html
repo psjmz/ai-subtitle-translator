@@ -55,6 +55,13 @@
   .chip2{font-size:12px;background:#f4f6f9;border:1px solid var(--line);border-radius:14px;padding:4px 11px;cursor:pointer;color:var(--mut);line-height:1.5}
   .chip2:hover{border-color:var(--pri)}
   .chip2.on{background:var(--pri);border-color:var(--pri);color:#fff}
+  /* v0.9.345：模型 D 的每个 key 状态（用量 / 今日耗尽 / 本分钟） */
+  .dstat{font-size:12px;margin-left:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .dstat.ok{color:var(--ok)}
+  .dstat.bad{color:var(--err)}
+  .drow{display:flex;gap:8px;align-items:center;margin-top:4px}
+  .drow input{flex:1}
+  .drow button{padding:6px 12px;font-size:13px;flex:0 0 auto}
   .chip2 .cv{opacity:.65;font-size:11px;margin-left:2px}
   /* v0.9.308：后台分 tab —— 此前模型配置、使用记录、改密码全平铺在一页里，
      改一次 Key 要往下翻很久才到统计，日常用起来是滚动条管理。 */
@@ -194,8 +201,87 @@
       <div class="msg" id="cfg3Msg"></div>
     </div>
 
+    <!-- v0.9.345：模型 D —— Gemini 免费额度池。与 A/B/C 的最大差别是 key 有三个，
+         且额度按「请求次数」算（RPM / RPD），不是 token。 -->
     <div class="card">
-      <h2>语言分流（优先级 C &gt; B &gt; A）</h2>
+      <h2>模型 D（Gemini 免费额度池 · 优先级最高）</h2>
+      <div class="note" style="margin:0 0 12px">三个 key <b>顺序使用</b>：前一个到当日上限才动下一个，不是轮询。单个 key 到「每分钟」上限只是跳过它、不退役；三个都到「每日」上限才回退到 C / B / A。<b>RPM / RPD 请照 Google AI Studio 速率限制页显示的数字填</b> —— 填大了会撞 429（能兜住，但白跑一趟），填小了会提前停用免费额度。</div>
+      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
+      <select id="provider4"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base4" spellcheck="false" placeholder="https://generativelanguage.googleapis.com/v1beta/openai">
+        </div>
+        <div>
+          <label>模型名</label>
+          <input type="text" id="model4" spellcheck="false" placeholder="gemini-3-flash">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>每个 key 每分钟请求上限（RPM）</label>
+          <input type="number" id="rpmD" min="1" max="600" step="1">
+        </div>
+        <div>
+          <label>每个 key 每日请求上限（RPD）</label>
+          <input type="number" id="rpdD" min="1" max="1000000" step="1">
+        </div>
+      </div>
+
+      <label>Key 1（<span class="mask" id="keyMask4_1">未设置</span>）<span class="dstat" id="dStat1"></span></label>
+      <div class="drow">
+        <input type="password" id="key4_1" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+        <button type="button" data-cleard="0">清除</button>
+      </div>
+
+      <label>Key 2（<span class="mask" id="keyMask4_2">未设置</span>）<span class="dstat" id="dStat2"></span></label>
+      <div class="drow">
+        <input type="password" id="key4_2" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+        <button type="button" data-cleard="1">清除</button>
+      </div>
+
+      <label>Key 3（<span class="mask" id="keyMask4_3">未设置</span>）<span class="dstat" id="dStat3"></span></label>
+      <div class="drow">
+        <input type="password" id="key4_3" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+        <button type="button" data-cleard="2">清除</button>
+      </div>
+      <div class="note">只填 1~2 个也能用。三个 key 属于同一模型时额度才是三份；换了模型名就是另一套额度，不叠加。</div>
+
+      <label style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <input type="radio" name="dScope" value="all" id="dScopeAll" style="width:auto" checked>
+        <span>全部目标语言先走 D（推荐：配好就生效，不用再勾语言）</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px">
+        <input type="radio" name="dScope" value="pick" id="dScopePick" style="width:auto">
+        <span>只走下面勾选的语言（没勾的语言不会在 D 上试，直接去 C / B / A）</span>
+      </label>
+      <div id="dPickBox" style="display:none">
+        <label>搜索语言（中文名 / 英文名 / 语言码）</label>
+        <input type="text" id="langSearchD" spellcheck="false" placeholder="如 日语 / Japanese / ja">
+        <div class="btns" style="margin-top:10px">
+          <button data-batchd="all">全选</button>
+          <button data-batchd="none">清空</button>
+          <button data-batchd="cjk">中日韩</button>
+          <button data-batchd="nonlatin">非拉丁文字</button>
+        </div>
+        <div class="chips" id="langChipsD"></div>
+        <div class="note">已选 <b id="langCountD">0</b> 种语言走模型 D</div>
+      </div>
+
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams4" spellcheck="false" placeholder='{}'></textarea>
+      <div class="btns">
+        <button class="primary" id="btnSave4">保存模型 D</button>
+        <button id="btnTest4">测试三个 Key</button>
+        <button id="btnReset4">重置今日计数</button>
+        <button id="btnClear4" style="margin-left:auto">清空模型 D</button>
+      </div>
+      <div class="msg" id="cfg4Msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>语言分流（优先级 D &gt; C &gt; B &gt; A）</h2>
       <div class="note" style="margin:0 0 12px">默认全部走模型 A。判定顺序：先查 C 的勾选 → 再查 B 的勾选 → 都没有走 A。分流只看目标语言，不看源语言、文件大小。<b>某个模型没配全时，它的勾选不生效</b>。</div>
 
       <h3 style="margin:18px 0 6px;font-size:14px">模型 C（优先级最高）</h3>
@@ -461,6 +547,9 @@ const LANGS = [
 let langSel = new Set();
 /* v0.9.193：走模型 C 的目标语言集合（判定优先于 B，两者可重叠） */
 let langSelC = new Set();
+/* v0.9.345：走模型 D 的目标语言集合。只在「只走勾选的语言」时生效；
+   默认「全部语言」时这个集合会被忽略，但仍保留用户勾过的内容，切回来不用重勾。 */
+let langSelD = new Set();
 function paramsText(v){
   if (!v || typeof v !== 'object' || Array.isArray(v)) return '';
   const ks = Object.keys(v);
@@ -474,25 +563,51 @@ function readParams(id){
   if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('附加请求参数必须是 JSON 对象（如 {"enable_thinking": false}）');
   return o;
 }
-/* v0.9.193：which = 'C' 渲染模型 C 那组 chips，否则渲染模型 B 那组（无参调用 = B，旧行为不变） */
+/* v0.9.193：which = 'C' 渲染模型 C 那组 chips，否则渲染模型 B 那组（无参调用 = B，旧行为不变）
+   v0.9.345：加 'D'。三组的 id 差异只在后缀（'' / C / D），故共用一个渲染器，
+   别为 D 抄一份 —— 抄了以后加语言要改三处。 */
 function renderLangs(which){
-  const isC = which === 'C';
-  const sel = isC ? langSelC : langSel;
-  const q = ($(isC ? 'langSearchC' : 'langSearch').value || '').trim().toLowerCase();
+  const isD = which === 'D', isC = which === 'C';
+  const sel = isD ? langSelD : isC ? langSelC : langSel;
+  const sfx = isD ? 'D' : isC ? 'C' : '';
+  const q = ($('langSearch' + sfx).value || '').trim().toLowerCase();
   const rows = LANGS.filter(l => !q || l.zh.toLowerCase().indexOf(q) >= 0 ||
     l.en.toLowerCase().indexOf(q) >= 0 || l.v.toLowerCase().indexOf(q) >= 0);
-  $(isC ? 'langChipsC' : 'langChips').innerHTML = rows.map(l =>
+  $('langChips' + sfx).innerHTML = rows.map(l =>
     '<button type="button" class="chip2' + (sel.has(l.v) ? ' on' : '') + '" data-v="' + l.v + '">' +
     esc(l.zh) + ' <span class="cv">' + esc(l.v) + '</span></button>').join('') ||
     '<div class="note">没有匹配的语言</div>';
-  $(isC ? 'langCountC' : 'langCount').textContent = sel.size;
+  $('langCount' + sfx).textContent = sel.size;
 }
 function batchLangs(kind, which){
-  const sel = which === 'C' ? langSelC : langSel;
+  const sel = which === 'D' ? langSelD : which === 'C' ? langSelC : langSel;
   if (kind === 'none') sel.clear();
   else if (kind === 'all') LANGS.forEach(l => sel.add(l.v));
   else LANGS.forEach(l => { if ((' ' + (l.g || '') + ' ').indexOf(' ' + kind + ' ') >= 0) sel.add(l.v); });
   renderLangs(which);
+}
+
+/* v0.9.345：三个 key 的状态（用量 / 本分钟 / 今日耗尽）。服务端只给掩码，永不下发明文。
+   固定渲染 3 行：输入框是固定三个，没配的位置也要能看到「未设置」。 */
+function renderDKeys(list){
+  for (let i = 0; i < 3; i++) {
+    const k = (Array.isArray(list) ? list[i] : null) || { set: false };
+    const n = i + 1;
+    $('keyMask4_' + n).textContent = k.set ? ('已保存：' + k.mask) : '未设置';
+    const el = $('dStat' + n);
+    if (!k.set) { el.textContent = ''; el.className = 'dstat'; continue; }
+    const used = k.used || 0, rpd = k.rpd || 0;
+    if (k.ex) {
+      el.textContent = '● 今日已耗尽 ' + used + '/' + rpd + (k.err ? ' · ' + k.err.slice(0, 36) : '');
+      el.className = 'dstat bad';
+    } else if (rpd && used >= rpd) {
+      el.textContent = '● 今日额度已满 ' + used + '/' + rpd;
+      el.className = 'dstat bad';
+    } else {
+      el.textContent = '● 可用 ' + used + '/' + rpd + ' · 本分钟 ' + (k.rpmUsed || 0) + '/' + (k.rpm || 15);
+      el.className = 'dstat ok';
+    }
+  }
 }
 
 function show(el, on){ $(el).style.display = on ? '' : 'none'; }
@@ -521,6 +636,7 @@ async function loadConfig(){
     fillProviderSelect(pid, 'provider');
     fillProviderSelect(c.provider2 || '', 'provider2');
     fillProviderSelect(c.provider3 || '', 'provider3');
+    fillProviderSelect(c.provider4 || '', 'provider4');
     /* 老数据如果有 base 与某预设的 base 一致，但 provider 字段没存（或存了别的东西），补上匹配预设的 id */
     if (!pid && c.base) {
       const m = PRESETS.find(p => p.base && p.base === (c.base || '').replace(/\/+$/, ''));
@@ -545,9 +661,22 @@ async function loadConfig(){
     $('extraParams3').value = paramsText(c.extraParams3);
     langSel = new Set(Array.isArray(c.langModelB) ? c.langModelB : []);
     langSelC = new Set(Array.isArray(c.langModelC) ? c.langModelC : []);
+    /* v0.9.345：模型 D（老 config.json 没这些字段 → 走空值/默认值，不影响既有行为） */
+    $('base4').value = c.base4 || '';
+    $('model4').value = c.model4 || '';
+    $('rpmD').value = c.rpmD || 15;
+    $('rpdD').value = c.rpdD || 1500;
+    $('extraParams4').value = paramsText(c.extraParams4);
+    const dAll = c.langModelDAll !== false;
+    $('dScopeAll').checked = dAll;
+    $('dScopePick').checked = !dAll;
+    $('dPickBox').style.display = dAll ? 'none' : '';
+    langSelD = new Set(Array.isArray(c.langModelD) ? c.langModelD : []);
+    renderDKeys(c.dKeys || []);
     $('fallbackToA').checked = c.fallbackToA !== false;
     renderLangs();
     renderLangs('C');
+    renderLangs('D');
     $('publicUrl').value = c.publicUrl || '';
     $('analyticsId').value = c.analyticsId || '';
     $('usage').innerHTML = '今日用量：全站 <b>' + c.usedToday + '</b> / ' + (c.globalDaily || '∞') +
@@ -1011,6 +1140,95 @@ $('btnClear3').addEventListener('click', async () => {
 $('provider3').addEventListener('change', () => {
   const p = PRESETS.find(x => x.id === $('provider3').value);
   if (p && p.id !== 'custom' && !$('base3').value.trim()) $('base3').value = p.base;
+});
+
+/* v0.9.345：模型 D（Gemini 免费额度池）。三件事与 B/C 不同：
+   ① 三个 key 一起保存（各自留空 = 保留原值）；
+   ② 「测试三个 Key」逐个测，一个死 key 不该等真用户撞上才发现；
+   ③ 有「重置今日计数」—— 误判把 key 锁死一整天时的手动出口。 */
+$('btnSave4').addEventListener('click', async () => {
+  const base4 = $('base4').value.trim(), model4 = $('model4').value.trim();
+  const keys = [1, 2, 3].map(n => $('key4_' + n).value.trim());
+  if (!base4 && !model4 && !keys.some(Boolean)) return msg('cfg4Msg', '模型 D 三项都为空 = 不启用，无需保存', 'err');
+  if (!base4 || !model4) return msg('cfg4Msg', 'Base URL 和模型名不能为空（除非清空模型 D）', 'err');
+  let extraParams4;
+  try { extraParams4 = readParams('extraParams4'); } catch (e) { return msg('cfg4Msg', e.message, 'err'); }
+  const body = {
+    provider4: $('provider4').value, base4, model4, extraParams4,
+    langModelDAll: $('dScopeAll').checked,
+    langModelD: [...langSelD],
+    rpmD: +$('rpmD').value || 15, rpdD: +$('rpdD').value || 1500
+  };
+  keys.forEach((v, i) => { if (v) body['key4_' + (i + 1)] = v; });
+  try {
+    await api('/api/admin/config', 'POST', body);
+    [1, 2, 3].forEach(n => { $('key4_' + n).value = ''; });
+    msg('cfg4Msg', '模型 D 已保存并即时生效 ✓' + ($('dScopeAll').checked ? '（当前接管全部语言）' : '（只接管已勾选的语言）'), 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg4Msg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnTest4').addEventListener('click', async () => {
+  msg('cfg4Msg', '测试中（逐个 key，每个消耗 1 次免费额度）…', 'ok');
+  try {
+    const r = await api('/api/admin/test', 'POST', { which: 'D' });
+    const parts = (r.keys || []).map(k =>
+      'Key ' + (k.i + 1) + '：' + (k.ok ? '✓ ' + (k.sample || '(空)') : '✗ ' + (k.err || k.hint || '失败')));
+    msg('cfg4Msg', '模型 D —— ' + (parts.join(' · ') || '没有可测的 key'), r.ok ? 'ok' : 'err');
+  } catch (e) { msg('cfg4Msg', e.message, 'err'); }
+});
+
+$('btnReset4').addEventListener('click', async () => {
+  if (!confirm('把模型 D 三个 key 的今日用量清零？清零后它们会被重新当作「还有额度」使用。\n\n只在确认某个 key 被误判耗尽时才需要这么做。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { resetD: true });
+    msg('cfg4Msg', '今日计数已重置 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg4Msg', '重置失败：' + e.message, 'err'); }
+});
+
+$('btnClear4').addEventListener('click', async () => {
+  if (!confirm('确定清空模型 D 的全部配置（含三个 API Key）？清空后不再走 Gemini 免费额度，流量回到 C / B / A。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { clearKey4: true });
+    msg('cfg4Msg', '模型 D 已清空 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg4Msg', '清空失败：' + e.message, 'err'); }
+});
+
+document.querySelectorAll('button[data-cleard]').forEach(b => {
+  b.addEventListener('click', async () => {
+    const i = +b.dataset.cleard;
+    if (!confirm('清除 Key ' + (i + 1) + '？该位置的用量记录会一起归零。')) return;
+    try {
+      await api('/api/admin/config', 'POST', { clearDKey: i });
+      msg('cfg4Msg', 'Key ' + (i + 1) + ' 已清除 ✓', 'ok');
+      await loadConfig();
+    } catch (e) { msg('cfg4Msg', '清除失败：' + e.message, 'err'); }
+  });
+});
+
+$('provider4').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider4').value);
+  if (p && p.id !== 'custom' && !$('base4').value.trim()) $('base4').value = p.base;
+});
+
+document.querySelectorAll('input[name="dScope"]').forEach(r => {
+  r.addEventListener('change', () => {
+    $('dPickBox').style.display = $('dScopePick').checked ? '' : 'none';
+  });
+});
+
+$('langSearchD').addEventListener('input', () => renderLangs('D'));
+$('langChipsD').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  const v = b.dataset.v;
+  if (langSelD.has(v)) langSelD.delete(v); else langSelD.add(v);
+  renderLangs('D');
+});
+document.querySelectorAll('button[data-batchd]').forEach(b => {
+  b.addEventListener('click', () => batchLangs(b.dataset.batchd, 'D'));
 });
 
 $('langSearch').addEventListener('input', () => renderLangs());

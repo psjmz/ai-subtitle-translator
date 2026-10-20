@@ -55,7 +55,20 @@ const DEFAULTS = {
   model3: '',
   key3: '',
   extraParams3: {},        // 模型 C 的附加请求参数
-  langModelC: []           // 走模型 C 的目标语言码数组；空 = C 不参与分流
+  langModelC: [],          // 走模型 C 的目标语言码数组；空 = C 不参与分流
+  /* --- 模型 D（v0.9.345）：Gemini 免费额度池 ---
+     与 A/B/C 的根本差别：额度单位是**请求次数**（免费层 RPM / RPD），不是 token。
+     一个槽带 1~3 个 key：单个 key 到限就换下一个，三个都到限才跨槽降级 C → B → A。
+     优先级 D > C > B > A —— D 是唯一「免费优先」的槽，配好就该先吃它的额度。 */
+  provider4: '',
+  base4: '',
+  model4: '',
+  keys4: [],               // 1~3 个 API Key：顺序填充，用完一个才动下一个（不是轮询）
+  extraParams4: {},
+  langModelDAll: true,     // true = 全部目标语言先走 D；false = 只走 langModelD 列出的
+  langModelD: [],
+  rpmD: 15,                // 每个 key 每分钟请求上限（按 AI Studio 速率限制页的实际数字填）
+  rpdD: 1500               // 每个 key 每日请求上限（同上）
 };
 
 function ensureData(){
@@ -5403,8 +5416,37 @@ try {
   });
 } catch (e) { /* content/ 目录还没建：安静跳过，站点照常跑 */ }
 
+/* v0.9.344：指南页 73 种新语言的译文放在 i18n/gd-<lang>.js（_mkgd.js 生成，每片约 160KB / 43 篇）。
+   content/*.js 里仍只有原来 27 语 —— 100 语全塞进 content/ 会让目录从 5.1MB 涨到约 19MB，
+   而 server 启动是整体 require 的，内存和启动时间都吃亏。这里改成按需 require + 缓存：
+   只有真的有人访问该语言的指南页时才读那一片。
+   ⚠️ gd-<lang>.js 是 server 自己 require 的，不被任何 html 引用 ——
+      _mkpkg341.py 那种「扫 html 引用」的打包规则装不到它，部署时必须显式加进传输列表
+      （343 那次 langs100.js 就是这么漏掉、导致线上 MODULE_NOT_FOUND 全站宕机的）。 */
+const GD_CACHE = {};
+function gdShard(lang) {
+  if (GD_CACHE[lang] === undefined) {
+    const f = path.join(__dirname, 'i18n', 'gd-' + lang + '.js');
+    let d = null;
+    try { d = fs.existsSync(f) ? require(f) : null; } catch (e) { d = null; }
+    GD_CACHE[lang] = d;
+  }
+  return GD_CACHE[lang];
+}
+/* 统一取值口：content 里有就用 content 的（原 27 语），没有就回落到语言分片 */
+function gdSeo(g, lang) {
+  if (g.seo[lang]) return g.seo[lang];
+  const s = gdShard(lang);
+  return (s && s[g.slug] && s[g.slug].seo) || null;
+}
+function gdBody(g, lang) {
+  if (g.body[lang]) return g.body[lang];
+  const s = gdShard(lang);
+  return (s && s[g.slug] && s[g.slug].body) || null;
+}
+
 function guideLangs(g) {
-  return SEO_LANGS.filter(function (l) { return g.seo[l] && g.body[l]; });
+  return SEO_LANGS.filter(function (l) { return gdSeo(g, l) && gdBody(g, l); });
 }
 function guideUrl(lang, slug) {
   return (lang === 'zh-CN' ? '' : '/' + lang) + '/guides/' + slug + '.html';
@@ -5465,14 +5507,14 @@ const GUIDE_LANG_NAMES = [['zh-CN', '简体中文'], ['zh-TW', '繁體中文'], 
 /* 文章页 <head>：Article + BreadcrumbList（⚠️ 不上 HowTo / FAQPage，Google 已移除其富摘要） */
 function guideHead(lang, base, slug) {
   const g = GUIDE_PAGES[slug];
-  const s = g.seo[lang];
+  const s = gdSeo(g, lang);
   const selfUrl = base + guideUrl(lang, slug);
   const langs = guideLangs(g);
   const xdef = langs.indexOf('en') >= 0 ? 'en' : langs[0];
   const alternates = langs.map(function (l) {
     return '<link rel="alternate" hreflang="' + l + '" href="' + base + guideUrl(l, slug) + '">';
   }).join('\n') + '\n<link rel="alternate" hreflang="x-default" href="' + base + guideUrl(xdef, slug) + '">';
-  const firstImg = (g.body[lang] || []).filter(function (sec) { return sec.img && sec.img.file; })[0];
+  const firstImg = (gdBody(g, lang) || []).filter(function (sec) { return sec.img && sec.img.file; })[0];
   const imgUrl = firstImg ? base + guideImgPath(firstImg.img, lang) + '.png' : base + '/og-image.png';
   const brand = (lang === 'zh-CN') ? '随心字幕 AI' : (lang === 'zh-TW') ? '隨心字幕 AI' : 'AI-SRTSub';
   const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
@@ -5579,12 +5621,12 @@ function guideNavHtml(lang, curSlug) {
   groups.forEach(function (grp) {
     const items = Object.keys(GUIDE_PAGES).filter(function (sl) {
       const g = GUIDE_PAGES[sl];
-      return g.kind === grp[0] && g.seo[lang] && g.body[lang];
+      return g.kind === grp[0] && gdSeo(g, lang) && gdBody(g, lang);
     }).sort();
     if (!items.length) return;
     out.push('<div class="snav-grp"><h3>' + guideEsc(grp[1]) + '</h3><ul>'
       + items.map(function (sl) {
-        const s = GUIDE_PAGES[sl].seo[lang];
+        const s = gdSeo(GUIDE_PAGES[sl], lang);
         return '<li><a href="' + guideUrl(lang, sl) + '"'
           + (sl === curSlug ? ' aria-current="page"' : '') + '>' + guideEsc(s.h1 || s.title) + '</a></li>';
       }).join('') + '</ul></div>');
@@ -5596,7 +5638,7 @@ function guideNavHtml(lang, curSlug) {
    （两边都只给「真有 h2 的 section」计数，空标题的 section 不占位） */
 function guideTocHtml(g, lang) {
   let n = 0;
-  return (g.body[lang] || []).filter(function (sec) { return sec.h2; }).map(function (sec) {
+  return (gdBody(g, lang) || []).filter(function (sec) { return sec.h2; }).map(function (sec) {
     n += 1;
     return '<a href="#sec' + n + '">' + guideEsc(sec.h2) + '</a>';
   }).join('');
@@ -5605,7 +5647,7 @@ function guideTocHtml(g, lang) {
 /* v0.9.325：底部深色行动带（整页唯一「重物」）。文案只用既有的 ctaText + 新增的 ctaLead，
    不编流程叙事；没有 CTA 的文章（工具字段缺失）就整块不输出 */
 function guideCtaHtml(g, lang) {
-  const s = g.seo[lang] || {};
+  const s = gdSeo(g, lang) || {};
   if (!(g.tool && s.ctaText)) return '';
   const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
   return '<div class="gcta"><p>' + guideEsc(IX.ctaLead || '') + '</p>'
@@ -5618,8 +5660,9 @@ function guideRelHtml(g, lang) {
   const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
   const lis = g.related.map(function (sl) {
     const rg = GUIDE_PAGES[sl];
-    if (!rg || !(rg.seo[lang] && rg.body[lang])) return '';
-    return '<li><a href="' + guideUrl(lang, sl) + '">' + guideEsc(rg.seo[lang].h1 || rg.seo[lang].title) + '</a></li>';
+    const rs = rg && gdSeo(rg, lang);
+    if (!rs || !gdBody(rg, lang)) return '';
+    return '<li><a href="' + guideUrl(lang, sl) + '">' + guideEsc(rs.h1 || rs.title) + '</a></li>';
   }).join('');
   if (!lis) return '';
   return '<h2 class="grelnav">' + guideEsc(IX.lrel) + '</h2><ul class="grel">' + lis + '</ul>';
@@ -5631,7 +5674,7 @@ function guideRelHtml(g, lang) {
 function guideBodyHtml(g, lang) {
   const out = [];
   let n = 0;
-  (g.body[lang] || []).forEach(function (sec) {
+  (gdBody(g, lang) || []).forEach(function (sec) {
     if (sec.h2) { n += 1; out.push('<h2 id="sec' + n + '">' + guideInline(sec.h2) + '</h2>'); }
     (sec.ps || []).forEach(function (p) { out.push('<p>' + guideInline(p) + '</p>'); });
     if (sec.ul && sec.ul.length) {
@@ -5702,11 +5745,11 @@ function serveGuideHtml(req, res, lang, parts) {
 
 function serveGuide(req, res, lang, slug) {
   const g = GUIDE_PAGES[slug];
-  if (!g || !g.seo[lang] || !g.body[lang]) {
+  if (!g || !gdSeo(g, lang) || !gdBody(g, lang)) {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Not Found'); return;
   }
-  const s = g.seo[lang];
+  const s = gdSeo(g, lang);
   const IX = GUIDE_INDEX[lang] || GUIDE_INDEX['en'];
   const base = publicBase(req) || '';
   /* meta：更新时间 + 所属分组（分组名是既有词条，按 kind 取；不编新文案） */
@@ -5740,12 +5783,12 @@ function serveGuideIndex(req, res, lang) {
   groups.forEach(function (grp) {
     const items = Object.keys(GUIDE_PAGES).filter(function (sl) {
       const g = GUIDE_PAGES[sl];
-      return g.kind === grp[0] && g.seo[lang] && g.body[lang];
+      return g.kind === grp[0] && gdSeo(g, lang) && gdBody(g, lang);
     }).sort();
     if (!items.length) return;
     out.push('<section class="ggrp"><div class="ghd"><h2>' + guideEsc(grp[1]) + '</h2><em>' + items.length + '</em></div><ul class="glist">'
       + items.map(function (sl) {
-        const s = GUIDE_PAGES[sl].seo[lang];
+        const s = gdSeo(GUIDE_PAGES[sl], lang);
         return '<li><a href="' + guideUrl(lang, sl) + '"><b>' + guideEsc(s.h1 || s.title) + '</b>'
           + '<span>' + guideEsc(s.intro || s.desc) + '</span></a></li>';
       }).join('') + '</ul></section>');
@@ -5869,6 +5912,8 @@ function withExtra(core, extra){
 function slotReady(cfg, which){
   if (which === 'B') return !!(cfg.base2 && cfg.model2 && cfg.key2);
   if (which === 'C') return !!(cfg.base3 && cfg.model3 && cfg.key3);
+  /* v0.9.345：D 的「配全」= base + model + 至少一个 key。keys4 是数组，1~3 个都算配全 */
+  if (which === 'D') return !!(cfg.base4 && cfg.model4 && dKeys(cfg).length);
   return false;
 }
 function modelBReady(cfg){ return slotReady(cfg, 'B'); }
@@ -5878,6 +5923,11 @@ function slotCfg(cfg, which){
   if (which === 'B') return { base: cfg.base2, model: cfg.model2, key: cfg.key2, temperature: cfg.temperature, extraParams: cfg.extraParams2 };
   if (which === 'C') return { base: cfg.base3, model: cfg.model3, key: cfg.key3, temperature: cfg.temperature, extraParams: cfg.extraParams3 };
   return { base: cfg.base,  model: cfg.model,  key: cfg.key,  temperature: cfg.temperature, extraParams: cfg.extraParams };
+}
+/* v0.9.345：D 槽的调用配置。key 由 dPick 现选（D 的 key 是动态的，不像 A/B/C 固定一个），
+   故单列一个函数、不塞进 slotCfg —— slotCfg(cfg,'D') 没有确定的 key，塞进去只会让人误用。 */
+function slotCfgD(cfg, key){
+  return { base: cfg.base4, model: cfg.model4, key: key, temperature: cfg.temperature, extraParams: cfg.extraParams4 };
 }
 /* v0.9.193：按目标语言分流，优先级 C > B > A。
    先查 langModelC（C 配全才作数）→ 再查 langModelB → 否则 A。
@@ -5894,10 +5944,254 @@ function pickModel(cfg, lang){
 }
 /* v0.9.193：回退链。C → B → A，B → A，A 是终点（它自己失败就真的失败了）。
    前一级没配全就直接跳过（比如 C 挂了但 B 压根没配 → 直接退 A）。 */
-function fallbackChain(cfg, which){
+function fallbackChain(cfg, which, lang){
+  /* v0.9.345：D 耗尽/失败 → C → B → A。这里比 C/B 多一步语言过滤：
+     D 是「全部语言」的槽，落到 C/B 时必须尊重它们各自的分流勾选，
+     否则没勾给 C 的语言会被硬塞过去 —— C 的勾选是我们自己定的规则，不该被 D 绕过。 */
+  if (which === 'D') {
+    const lg = String(lang || '');
+    const out = [];
+    if (slotReady(cfg, 'C') && (!lg || (Array.isArray(cfg.langModelC) && cfg.langModelC.indexOf(lg) >= 0))) out.push('C');
+    if (slotReady(cfg, 'B') && (!lg || (Array.isArray(cfg.langModelB) && cfg.langModelB.indexOf(lg) >= 0))) out.push('B');
+    out.push('A');
+    return out;
+  }
   if (which === 'C') return [slotReady(cfg, 'B') ? 'B' : null, 'A'].filter(Boolean);
   if (which === 'B') return ['A'];
   return [];
+}
+
+/* ---------------- v0.9.345：模型 D · Gemini 免费额度池 ----------------
+   为什么另起一套账本：A/B/C 的额度是 token（TPM），按滑窗估算；Gemini 免费层的额度是
+   **请求次数**（RPM / RPD）。用 token 账本管它两头都不对——3000 字符的批次会被当成几千
+   token 去排队（白白拖慢），而按 token 算「还够」的时候请求数早就超了（直接 429）。
+
+   轮换规则（用户 2026-10-20 定案）：
+   · RPD 打满 → 该 key 当天退役，按顺序用下一个
+   · RPM 打满 → 只是这一分钟，**跳过它用下一个**，不退役
+   · 三个 key 的 RPM 都满、RPD 还有 → 回 {wait}，等几十秒重发同一批，**不降级**
+     （免费额度一分钟后就回来，降到 C/B/A 等于白扔）
+   · 三个 key 的 RPD 都满 → 抛 _dExhausted，交给 C → B → A
+
+   计数一律在「选 key 那一刻预扣」：并发请求必须看见彼此，否则三个请求同时看到
+   1499/1500 一起放行，一起撞 429。预扣后请求失败（非额度类错误）不退回 ——
+   宁可多算一次，也不能超发；多算的代价只是提前几分钟下班。
+   ⚠️ 账本索引用 keys4 的**原始下标**，不是过滤空 key 后的下标：
+      否则用户在后台清空 Key 2，Key 3 的用量会错记到 Key 2 头上。 */
+const DQUOTA_PATH = path.join(DATA_DIR, 'gemini-quota.json');
+const D_RPM_WIN   = 60000;          // RPM 滑窗长度
+const D_RPM       = Object.create(null);   // 原始下标 -> [时间戳…]（内存，重启清零可接受）
+const D_TASK      = new Map();      // taskId -> {slot:'D'|'X', at} 整集锁
+const D_TASK_TTL  = 6 * 3600 * 1000;
+const D_CUE_CAP   = 45;             // 保守估批数用：45 是前端最细的 CUE_CAP（中日韩/日/荷/瑞）
+
+/* 太平洋时间日期串（YYYY-MM-DD）。Gemini 免费额度按 PT 午夜重置，用本地日期会在
+   北京时间下午三点前后错位一天 —— 那正好是国内用户最活跃的时段。 */
+function ptDateStr(){
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles',
+      year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  } catch (e) { return todayStr(); }
+}
+/* keys4 → [{i, key}]，i 是原始下标（账本用） */
+function dKeyList(cfg){
+  const arr = (cfg && Array.isArray(cfg.keys4)) ? cfg.keys4 : [];
+  const out = [];
+  for (let i = 0; i < arr.length && i < 3; i++) {
+    const k = String(arr[i] == null ? '' : arr[i]).trim();
+    if (k) out.push({ i: i, key: k });
+  }
+  return out;
+}
+/* dKeys 保留成「只看数量」的简写，slotReady / 报错文案用它 */
+function dKeys(cfg){ return dKeyList(cfg).map(x => x.key); }
+
+function dRead(){
+  try {
+    const q = JSON.parse(fs.readFileSync(DQUOTA_PATH, 'utf8'));
+    if (q && q.date === ptDateStr() && Array.isArray(q.keys)) return q;
+  } catch (e) {}
+  return { date: ptDateStr(), keys: [] };
+}
+function dWrite(q){
+  try { fs.writeFileSync(DQUOTA_PATH, JSON.stringify(q), 'utf8'); } catch (e) {}
+}
+function dState(q, i){
+  while (q.keys.length <= i) q.keys.push({ used: 0, ex: 0, err: '' });
+  return q.keys[i];
+}
+function dRpmUsed(i){
+  const arr = D_RPM[i] || (D_RPM[i] = []);
+  const cut = Date.now() - D_RPM_WIN;
+  while (arr.length && arr[0] < cut) arr.shift();
+  return arr.length;
+}
+function dRpmWait(i){
+  const arr = D_RPM[i] || [];
+  if (!arr.length) return 0;
+  return Math.max(1, Math.ceil((arr[0] + D_RPM_WIN - Date.now()) / 1000));
+}
+/* 今日还能发多少次（几个 key 加总）。整集锁 D 用它判断「够不够跑完这一集」 */
+function dRemain(cfg){
+  const rpd = Math.max(1, +cfg.rpdD || 1500);
+  const q = dRead();
+  let n = 0;
+  for (const k of dKeyList(cfg)) {
+    const st = dState(q, k.i);
+    if (st.ex) continue;
+    n += Math.max(0, rpd - (st.used || 0));
+  }
+  return n;
+}
+/* 后台展示用：每个 key 的掩码 + 今日用量 + 状态。明文一律不回传（与 A/B/C 的 keyMask 同规矩）。
+   固定返回 3 项：输入框是固定三个，没配的位置也要能显示「未设置」。 */
+function dKeyStatus(cfg){
+  const q = dRead();
+  const rpd = Math.max(1, +cfg.rpdD || 1500);
+  const rpm = Math.max(1, +cfg.rpmD || 15);
+  const arr = (cfg && Array.isArray(cfg.keys4)) ? cfg.keys4 : [];
+  const out = [];
+  for (let i = 0; i < 3; i++) {
+    const raw = String(arr[i] == null ? '' : arr[i]).trim();
+    const st = q.keys[i] || {};
+    out.push({ i: i, set: !!raw,
+      mask: raw ? (raw.slice(0, 5) + '…' + raw.slice(-4)) : '',
+      used: st.used || 0, rpd: rpd, ex: st.ex || 0, err: st.err || '',
+      rpmUsed: dRpmUsed(i), rpm: rpm });
+  }
+  return out;
+}
+/* 只探测「有没有可用 key」，**不预扣**。选路的判断（走 D 还是走 C/B/A）用它，
+   真正扣额度留给 callModelD —— 否则同一批会被扣两次（v0.9.345 自测抓到的真 bug：
+   选路时预扣一次、调用时又选一次，结果一个 key 的每日额度被吃掉两倍）。 */
+function dPeek(cfg){
+  const list = dKeyList(cfg);
+  if (!list.length) return null;
+  const rpm = Math.max(1, +cfg.rpmD || 15);
+  const rpd = Math.max(1, +cfg.rpdD || 1500);
+  const q = dRead();
+  let live = 0, wait = 0;
+  for (const k of list) {
+    const st = q.keys[k.i] || {};
+    if (st.ex || (st.used || 0) >= rpd) continue;
+    live++;
+    if (dRpmUsed(k.i) >= rpm) {
+      const w = dRpmWait(k.i);
+      if (!wait || w < wait) wait = w;
+      continue;
+    }
+    return { ok: true };
+  }
+  if (!live) return null;                   // 全部当日耗尽 → 跨槽降级
+  return { wait: wait || 30 };              // 还有额度，只是这一分钟满
+}
+/* 选一个 key。返回 {i,key}（已预扣）/ {wait:n}（只是 RPM 满）/ null（RPD 全满或没配 key） */
+function dPick(cfg){
+  const list = dKeyList(cfg);
+  if (!list.length) return null;
+  const rpm = Math.max(1, +cfg.rpmD || 15);
+  const rpd = Math.max(1, +cfg.rpdD || 1500);
+  const q = dRead();
+  let live = 0, wait = 0;
+  for (const k of list) {
+    const st = dState(q, k.i);
+    if (st.ex || (st.used || 0) >= rpd) continue;
+    live++;
+    if (dRpmUsed(k.i) >= rpm) {
+      const w = dRpmWait(k.i);
+      if (!wait || w < wait) wait = w;      // 最早恢复的那个就是能用的时刻
+      continue;
+    }
+    st.used = (st.used || 0) + 1;           // 预扣
+    (D_RPM[k.i] || (D_RPM[k.i] = [])).push(Date.now());
+    dWrite(q);
+    return { i: k.i, key: k.key };
+  }
+  if (!live) return null;                   // 全部当日耗尽 → 跨槽降级
+  return { wait: wait || 30 };              // 还有额度，只是这一分钟满
+}
+/* 把一个 key 标记为当日耗尽（额度类错误专用） */
+function dExhaust(i, err){
+  const q = dRead();
+  const st = dState(q, i);
+  st.ex = Date.now();
+  st.err = String((err && err.message) || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 120);
+  dWrite(q);
+}
+/* 额度类错误：429 / 403 一律算「这个 key 现在用不了」。
+   403 也要算 —— Gemini 对无效 key、未开通的模型、地区不支持都回 403，
+   不换 key 的话这条请求就死在这儿了。文案匹配只作兜底（有些网关把 429 包成 400）。 */
+function dQuotaErr(e){
+  const st = e && e._status;
+  if (st === 429 || st === 403) return true;
+  const s = String((e && e.message) || '');
+  return /RESOURCE_EXHAUSTED|exceeded your current quota|quota|rate.?limit|API[_ ]?KEY_INVALID|API key not valid/i.test(s);
+}
+/* 整集锁：任务第一次进来决定走不走 D，之后整个任务沿用（用户 10-20 拍板：
+   一集里不要出现两个模型 —— 前半 Gemini 后半 DeepSeek，语气会跳）。
+   总批数前端没带，用字幕条数估：÷45（最细的 CUE_CAP）算出来的批数偏高，
+   偏高只会让「额度不够就跑整集 C/B/A」判得更早，不会中途断在半路。 */
+function dTaskSlot(task, cfg, cues){
+  if (!task) return 'D';                    // 没有任务号（老前端）：不锁，单批判断
+  const now = Date.now();
+  for (const [k, v] of D_TASK) if (now - v.at > D_TASK_TTL) D_TASK.delete(k);
+  const hit = D_TASK.get(task);
+  if (hit) { hit.at = now; return hit.slot; }
+  const need = Math.max(1, Math.ceil((Number(cues) || 0) / D_CUE_CAP));
+  const slot = dRemain(cfg) >= need ? 'D' : 'X';
+  D_TASK.set(task, { slot: slot, at: now });
+  return slot;
+}
+function langInD(cfg, lang){
+  if (cfg.langModelDAll !== false) return true;
+  const arr = Array.isArray(cfg.langModelD) ? cfg.langModelD : [];
+  return arr.indexOf(String(lang || '')) >= 0;
+}
+/* v0.9.345：D 槽选路。老的 pickModel 一字未动 —— D 的判断全在这里，
+   不命中就原样落回 C > B > A，老行为零变化。
+   ⚠️ 这里只 dPeek、不 dPick：真正的「选 key + 预扣」在 callModelD 里做且只做一次。
+      两处都预扣的话，一个 key 的每日额度会被同一批请求吃掉两倍（自测实证）。 */
+function pickRoute(cfg, lang, meta){
+  if (!slotReady(cfg, 'D')) return pickModel(cfg, lang);
+  if (!langInD(cfg, lang)) return pickModel(cfg, lang);
+  const task = String((meta && meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
+  const cues = Math.max(0, Math.floor(+((meta && meta.cues) || 0)));
+  if (dTaskSlot(task, cfg, cues) !== 'D') return pickModel(cfg, lang);
+  const peek = dPeek(cfg);
+  if (!peek) return pickModel(cfg, lang);   // 三个 key 当天都满了 → 交给 C/B/A
+  if (peek.wait) return { which: 'D', wait: peek.wait };
+  /* 不带 cfg：D 的 key 是 callModelD 现选现扣的，这里给不出确定的一份。
+     主流程取模型名一律走 slotModelName，不要去碰 pick.cfg。 */
+  return { which: 'D' };
+}
+/* D 槽调用：额度类错误就地换 key（同一批重发，前端完全无感），其他错误原样抛出。
+   最多 6 轮 —— 3 个 key 在并发下可能被别的请求抢先占满，留一点余量。
+   ⚠️ 换 key 共用**同一份**超时预算：一次换 key 不该让总耗时翻倍，否则前端 105 秒的
+      总预算会在槽内就被吃光，连跨槽回退的机会都没有。 */
+async function callModelD(cfg, messages, maxTokens, opts){
+  const t0 = Date.now();
+  const budget = (opts && opts.timeoutMs) || 90000;
+  let last = null;
+  for (let round = 0; round < 6; round++) {
+    const kp = dPick(cfg);
+    if (!kp) {
+      const e = new Error('Gemini 免费额度已用尽（' + dKeys(cfg).length + ' 个 key 全部到限）');
+      e._dExhausted = true; e._status = 429;
+      if (last) e.message += '；最后一次上游报错：' + String(last.message || '').slice(0, 120);
+      throw e;
+    }
+    if (kp.wait) { const e = new Error('Gemini 免费额度 RPM 已满'); e._dWait = kp.wait; throw e; }
+    const left = Math.max(5000, budget - (Date.now() - t0));
+    try {
+      return await callModel(slotCfgD(cfg, kp.key), messages, maxTokens, Object.assign({}, opts, { timeoutMs: left }));
+    } catch (e) {
+      if (dQuotaErr(e)) { dExhaust(kp.i, e); last = e; continue; }   // 换下一个 key
+      throw e;                                                        // 非额度错误 → 跨槽
+    }
+  }
+  const e = new Error('Gemini 免费额度已用尽（连续换 key 均失败）');
+  e._dExhausted = true; e._status = 429;
+  throw e;
 }
 
 /* ---------------- v0.9.183 上游额度排队（按模型槽位分开） ----------------
@@ -6366,9 +6660,18 @@ const server = http.createServer(async (req, res) => {
       if (!Array.isArray(body.messages) || !body.messages.length) {
         return sendJson(res, 400, { error: { code: 'missing_messages', message: 'Missing messages' } });
       }
-      /* v0.9.119：按目标语言分流到模型 A / B（meta.lang 由前端随每次请求带上） */
+      /* v0.9.119：按目标语言分流到模型 A / B（meta.lang 由前端随每次请求带上）
+         v0.9.345：D 槽（Gemini 免费池）优先级最高。pickRoute 内部先判 D，
+         不命中就原样落回老的 pickModel（C > B > A），老路径零改动。 */
       const lang = (body.meta && String(body.meta.lang || '')) || '';
-      const pick = pickModel(cfg, lang);
+      const pick = pickRoute(cfg, lang, body.meta);
+      /* D 的额度还在、只是这一分钟 RPM 满了：让前端等几十秒重发同一批，**不降级**。
+         免费额度一分钟后就回来，降到 C/B/A 等于白扔。复用既有 {wait} 回执
+         （只有带 meta.pace=1 的前端才认，老前端根本走不到这里）。 */
+      if (pick && pick.wait) return sendJson(res, 200, { wait: pick.wait, slot: pick.which, why: 'rpm' });
+      /* D 的 key 由 callModelD 现选现扣，pick 上没有 cfg —— 模型名一律从这里取，
+         别处不要再碰 pick.cfg（D 走这条路时它是 undefined）。 */
+      const slotModelName = pick.which === 'D' ? String(cfg.model4 || '') : String((pick.cfg && pick.cfg.model) || '');
       /* v0.9.183：排队闸门，按槽位判定。只有前端在 meta 里声明 pace=1 才可能收到 wait——
          旧版本不带这个标记，走的是原路径，不会因为收到一个没有 choices 的响应而误判成「上游返回空」。
          日配额与埋点都放在闸门之后再记：排队只是「晚点再来」，既没真翻译也不该留下事件。 */
@@ -6379,7 +6682,10 @@ const server = http.createServer(async (req, res) => {
          1133 个任务零限流，让它排队纯属拖慢。
          但也不能一刀切永久豁免：A 真挨了 429 时 learnLimit 会把 RATE_LIMIT.A 从 0 改成非零，
          那时它确实得排队保护——所以「A 是否进闸门」取决于它自己有没有被限流。 */
-      const needGate = canPace && (pick.which !== 'A' || (RATE_LIMIT[pick.which] || 0) > 0);
+      /* v0.9.345：D 槽不进 token 闸门 —— 它自己的 RPM/RPD 账本已经管着节流，
+         再套一层按 token 的 FIFO 只会把「还有请求额度」的批次白白卡住。
+         在途闸同理（那个是防多标签页霸占 B/C 的 token 额度）。 */
+      const needGate = canPace && pick.which !== 'D' && (pick.which !== 'A' || (RATE_LIMIT[pick.which] || 0) > 0);
       const est = needGate ? estTokens(body.messages, pick.which) : 0;
       let tookInflight = false;
       if (needGate) {
@@ -6452,11 +6758,15 @@ const server = http.createServer(async (req, res) => {
          这样既有的「viaB=1 即 B 槽」统计口径继续成立，C 用 viaC 单独识别。
          ⚠️ 两个标记记的都是**分流归属**（初次选中谁），不是最终落地模型 ——
          回退会把 e.model 覆写成真正生效的那个，跟既有行为一致。 */
-      try { appendEvent(ip, body.meta, pick.cfg.model, { viaB: pick.which === 'B' ? 1 : 0, viaC: pick.which === 'C' ? 1 : 0 }); } catch (e) {} // 行为记录失败不影响翻译主流程
+      try { appendEvent(ip, body.meta, slotModelName, { viaB: pick.which === 'B' ? 1 : 0, viaC: pick.which === 'C' ? 1 : 0, viaD: pick.which === 'D' ? 1 : 0 }); } catch (e) {} // 行为记录失败不影响翻译主流程
       /* v0.9.132：前端在 meta.json 里声明「本请求期望 JSON 输出」（非 JSON 请求不注入，否则上游会 400） */
       const jsonOpts = (body.meta && body.meta.json) ? { json: 1 } : null;
       try {
-        const out = await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
+        /* v0.9.345：D 走 callModelD —— 它在槽内换 key（额度类错误就换下一个重发同一批，
+           前端完全无感）。注意它吃的是**同一份** 90 秒预算，不会因为换 key 就多拿时间。 */
+        const out = pick.which === 'D'
+          ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }))
+          : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
         try { if (canPace) { noteQuota(pick.which, out && out._rl); if (out) delete out._rl; } } catch (e13) {}
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
         /* v0.9.183：按真实消耗修正预扣（只补正差额，实际比预估少的部分随滑窗自然滑出），
@@ -6482,13 +6792,17 @@ const server = http.createServer(async (req, res) => {
         /* v0.9.157：本次实际生效的模型名回传前端。分流只在服务端发生，前端原本无从得知
            自己这次用的是 A 还是 B，只能靠后台 events 反推（而后台记账又有延迟/去重问题）。
            模型名是专有名词，不需要进界面字典，直接原样输出。 */
-        try { if (out && typeof out === 'object') out._used = String(pick.cfg.model || ''); } catch (e9) {}
+        try { if (out && typeof out === 'object') out._used = String(slotModelName || ''); } catch (e9) {}
         return sendJson(res, 200, out); // 原样透传 OpenAI 兼容响应
       } catch (e) {
+        /* v0.9.345：D 槽 RPM 满但当日额度还在 → 回 wait 让前端等几十秒，绝不降级。
+           注意这一条要放在「学限额」之前：它不是失败，是节流。 */
+        if (e && e._dWait) return sendJson(res, 200, { wait: e._dWait, slot: 'D', why: 'rpm' });
         /* v0.9.183：429 的报错文案里带着上游的限额，学下来。硬编码的额度迟早会变，
-           而这个数字是上游亲口报的——哪天 A 槽也开始限流了，不用改代码就能自动生效。 */
+           而这个数字是上游亲口报的——哪天 A 槽也开始限流了，不用改代码就能自动生效。
+           v0.9.345：D 槽跳过这套 token 账本，它的额度是请求数，学来只会污染 RATE_LIMIT.D。 */
         try {
-          if (canPace) {
+          if (canPace && pick.which !== 'D') {
             learnLimit(pick.which, e && e.message);
             noteQuota(pick.which, e && e._rl);
             /* 429 时余额基本见底；上游若给了 Retry-After，那是最权威的等待时间，优先于我们算的 */
@@ -6499,16 +6813,18 @@ const server = http.createServer(async (req, res) => {
         } catch (e11) {}
         /* v0.9.193：C/B 失败且开启回退 → 按 C→B→A 逐级再试（此前只写了 B→A 一条）。
            回退成功后把事件里的模型改写成真正生效的那个，并记 fallback 次数。
-           ⚠️ 每一级回退都走自己的槽位记账：记到原槽位上会凭空吃掉它的额度（原槽正堵着，等于火上浇油）。 */
+           ⚠️ 每一级回退都走自己的槽位记账：记到原槽位上会凭空吃掉它的额度（原槽正堵着，等于火上浇油）。
+           v0.9.345：D 也走这条链，且带上 lang —— D 是「全部语言」的槽，落到 C/B 时要尊重
+           它们各自的分流勾选，不能把没勾给 C 的语言硬塞过去。 */
         if (cfg.fallbackToA && pick.which !== 'A') {
           let lastErr = e;
-          for (const fb of fallbackChain(cfg, pick.which)) {
+          for (const fb of fallbackChain(cfg, pick.which, lang)) {
             try {
               const slotFb = slotCfg(cfg, fb);
               const outF = await callModel(slotFb, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
               try {
                 markEvent(ip, Object.assign({}, body.meta || {}, {
-                  model: pick.cfg.model, usedModel: slotFb.model, msg: String(e.message || '').slice(0, 200)
+                  model: slotModelName, usedModel: slotFb.model, msg: String(e.message || '').slice(0, 200)
                 }), 'fallback');
               } catch (e2) {}
               try { recordTokens(ip, body.meta, outF && outF.usage); } catch (e4) {} // v0.9.145：回退也算真实开销
@@ -6521,7 +6837,7 @@ const server = http.createServer(async (req, res) => {
               } catch (e12) {}
               /* v0.9.156：回退必须让用户看得见。此前静默降级——界面无任何提示，
                  后台又因为上面那条记账问题显示的是 A 的名字，用户只能判定「分流没生效」。 */
-              try { if (outF && typeof outF === 'object') outF._fb = { from: pick.cfg.model, to: slotFb.model, msg: String(e.message || '').slice(0, 200) }; } catch (e5) {}
+              try { if (outF && typeof outF === 'object') outF._fb = { from: slotModelName, to: slotFb.model, msg: String(e.message || '').slice(0, 200) }; } catch (e5) {}
               try { if (outF && typeof outF === 'object') outF._used = String(slotFb.model || ''); } catch (e6) {} // v0.9.157：回退后真正生效的是 fb
               return sendJson(res, 200, outF);
             } catch (e3) { lastErr = e3; }
@@ -6653,6 +6969,13 @@ const server = http.createServer(async (req, res) => {
           keyMask3: cfg.key3 ? (cfg.key3.slice(0, 4) + '…' + cfg.key3.slice(-4)) : '',
           extraParams3: normParams(cfg.extraParams3),
           langModelC: Array.isArray(cfg.langModelC) ? cfg.langModelC.slice() : [],
+          /* v0.9.345：D 槽（Gemini 免费池）。key 只回掩码与今日用量，明文绝不出服务端 */
+          provider4: cfg.provider4 || '', base4: cfg.base4 || '', model4: cfg.model4 || '',
+          extraParams4: normParams(cfg.extraParams4),
+          langModelDAll: cfg.langModelDAll !== false,
+          langModelD: Array.isArray(cfg.langModelD) ? cfg.langModelD.slice() : [],
+          rpmD: cfg.rpmD || 15, rpdD: cfg.rpdD || 1500,
+          dKeys: dKeyStatus(cfg), dDate: ptDateStr(),
           fallbackToA: cfg.fallbackToA !== false,
           perIpDaily: cfg.perIpDaily, globalDaily: cfg.globalDaily,
           temperature: (typeof cfg.temperature === 'number' && Number.isFinite(cfg.temperature)) ? cfg.temperature : 0.2,
@@ -6882,6 +7205,52 @@ const server = http.createServer(async (req, res) => {
             .map(x => String(x || ''))
             .filter(x => /^[A-Za-z][A-Za-z0-9-]{0,11}$/.test(x) && !seenC[x] && (seenC[x] = 1));
         }
+        /* v0.9.345：模型 D（Gemini 免费池）
+           keys4 是数组 —— key4_1/2/3 分别落到下标 0/1/2，留空 = 保留原值（与 A/B/C 同规矩）；
+           clearDKey 是按**下标**清单条，clearKey4 是整槽清空。
+           ⚠️ 清空中间某个 key 时不重排数组：账本按原始下标记，重排会让 key3 的用量记到 key2 头上。 */
+        if (typeof body.base4 === 'string') cfg.base4 = body.base4.trim();
+        if (typeof body.model4 === 'string') cfg.model4 = body.model4.trim();
+        if (typeof body.provider4 === 'string') cfg.provider4 = body.provider4.trim();
+        if (!Array.isArray(cfg.keys4)) cfg.keys4 = [];
+        ['1', '2', '3'].forEach((n, idx) => {
+          const v = body['key4_' + n];
+          if (typeof v === 'string' && v.trim() !== '') {
+            while (cfg.keys4.length <= idx) cfg.keys4.push('');
+            cfg.keys4[idx] = v.trim();
+          }
+        });
+        if (Number.isFinite(+body.clearDKey)) {
+          const i = Math.floor(+body.clearDKey);
+          if (i >= 0 && i < 3) {
+            while (cfg.keys4.length <= i) cfg.keys4.push('');
+            cfg.keys4[i] = '';
+            /* 该位置的用量也归零：换了新 key 还背着旧 key 的用量，等于一上来就少半天额度 */
+            try { const q = dRead(); if (q.keys[i]) { q.keys[i] = { used: 0, ex: 0, err: '' }; dWrite(q); } } catch (e) {}
+            if (D_RPM[i]) delete D_RPM[i];
+          }
+        }
+        if (body.clearKey4) {
+          cfg.keys4 = []; cfg.base4 = ''; cfg.model4 = ''; cfg.provider4 = '';
+          cfg.extraParams4 = {}; cfg.langModelD = [];
+        }
+        if (body.extraParams4 !== undefined) cfg.extraParams4 = normParams(body.extraParams4);
+        if (body.langModelDAll !== undefined) cfg.langModelDAll = !!body.langModelDAll;
+        if (Array.isArray(body.langModelD)) {
+          const seenD = {};
+          cfg.langModelD = body.langModelD
+            .map(x => String(x || ''))
+            .filter(x => /^[A-Za-z][A-Za-z0-9-]{0,11}$/.test(x) && !seenD[x] && (seenD[x] = 1));
+        }
+        if (Number.isFinite(+body.rpmD)) cfg.rpmD = Math.max(1, Math.min(600, Math.floor(+body.rpmD)));
+        if (Number.isFinite(+body.rpdD)) cfg.rpdD = Math.max(1, Math.min(1000000, Math.floor(+body.rpdD)));
+        /* 重置今日计数：误判把某个 key 锁死一整天时的手动出口。连带清整集锁，
+           否则刚才被判「额度不够」的任务还会继续走 C/B/A */
+        if (body.resetD) {
+          try { fs.unlinkSync(DQUOTA_PATH); } catch (e) {}
+          for (const k in D_RPM) delete D_RPM[k];
+          D_TASK.clear();
+        }
         if (body.fallbackToA !== undefined) cfg.fallbackToA = !!body.fallbackToA;
         if (Number.isFinite(+body.perIpDaily)) cfg.perIpDaily = Math.max(0, Math.floor(+body.perIpDaily));
         if (Number.isFinite(+body.globalDaily)) cfg.globalDaily = Math.max(0, Math.floor(+body.globalDaily));
@@ -6900,8 +7269,29 @@ const server = http.createServer(async (req, res) => {
         const cfg = readConfig();
         let tbody = {};
         try { tbody = JSON.parse(await readBody(req, 64 * 1024)); } catch (e) {}
-        /* v0.9.193：连通性测试支持 C 槽 */
-        const which = (tbody && (tbody.which === 'B' || tbody.which === 'C')) ? tbody.which : 'A';
+        /* v0.9.193：连通性测试支持 C 槽；v0.9.345 加 D —— D 是逐个 key **各测一次**，
+           因为一个死 key 混在里面，要等真用户撞上才发现，代价是那批字幕白跑一趟。
+           ⚠️ 测试不记入 D 的额度账本（管理员手点的几次不该把 key 打到退役）。 */
+        const which = (tbody && (tbody.which === 'B' || tbody.which === 'C' || tbody.which === 'D')) ? tbody.which : 'A';
+        if (which === 'D') {
+          const list = dKeyList(cfg);
+          if (!cfg.base4 || !cfg.model4) {
+            return sendJson(res, 400, { error: { message: '请先保存模型 D 的 Base URL / 模型名 / 至少一个 API Key' } });
+          }
+          const results = [];
+          for (const k of list) {
+            try {
+              const out = await callModel(slotCfgD(cfg, k.key), [{ role: 'user', content: 'Reply with exactly: OK' }], 256, { timeoutMs: 20000 });
+              const c = out.choices && out.choices[0];
+              const sample = c && c.message ? c.message.content : '';
+              results.push({ i: k.i, ok: !!sample, sample: String(sample || '').slice(0, 40),
+                hint: sample ? '' : '模型未返回正文（finish_reason=' + ((c && c.finish_reason) || '?') + '）' });
+            } catch (e) {
+              results.push({ i: k.i, ok: false, err: String((e && e.message) || e).slice(0, 160), quota: dQuotaErr(e) });
+            }
+          }
+          return sendJson(res, 200, { ok: results.some(r => r.ok), which: 'D', keys: results });
+        }
         const slot = slotCfg(cfg, which);
         if (!(slot.base && slot.model && slot.key)) {
           const hint = which === 'A' ? '请先保存 Base URL / 模型 / API Key'

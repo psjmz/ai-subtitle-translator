@@ -3480,9 +3480,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const srvSrc = require('fs').readFileSync(require('path').join(__dirname, 'server.js'), 'utf8');
     /* 走 A 时若传 null，旧事件上的 viaB=1 永远不会被清掉 */
     /* v0.9.193：三槽后多带 viaC。要求 viaB 仍是「走 B 才 1」的无条件 0/1 写法 —— 否则
-       「viaB=1 即 B 槽」这个既有统计口径会被 C 槽污染（走 C 时 viaB 必须是 0）。 */
-    assert.ok(/\{ viaB: pick\.which === 'B' \? 1 : 0, viaC: pick\.which === 'C' \? 1 : 0 \}/.test(srvSrc),
-      'appendEvent 调用处未恒传 viaB 0/1（三槽后还要同时恒传 viaC）');
+       「viaB=1 即 B 槽」这个既有统计口径会被 C 槽污染（走 C 时 viaB 必须是 0）。
+       v0.9.345：再加 viaD，同样必须是无条件 0/1 —— 走 D 时 viaB/viaC 都得是 0。 */
+    assert.ok(/\{ viaB: pick\.which === 'B' \? 1 : 0, viaC: pick\.which === 'C' \? 1 : 0, viaD: pick\.which === 'D' \? 1 : 0 \}/.test(srvSrc),
+      'appendEvent 调用处未恒传 viaB/viaC/viaD 0/1（三槽后要同时恒传三个）');
     /* v0.9.193：回退改成 fallbackChain 循环，变量从写死的 outA 变成 outF（语义不变：
        每一级回退都要给前端带回 _fb 回执，否则用户永远不知道自己被降级了）。 */
     assert.ok(/outF\._fb\s*=/.test(srvSrc), '回退响应未带 _fb 回执');
@@ -4100,8 +4101,10 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     const seedB = (srvSrc.match(/const RATE_LIMIT = \{ A: 0, B: (\d+), C: \d+ \};/) || [])[1];
     assert.strictEqual(seedB, '2000000', 'B 槽种子值应跟真实额度 200 万同量级，实际 ' + seedB);
     assert.ok(/if \(limit <= 0\) return 0;/.test(srvSrc), 'LIMIT=0 的槽位没有直接放行');
-    /* ② 判定必须在 pickModel 之后：不知道走哪个槽位就查不了对应的账本 */
-    const iPick = srvSrc.indexOf('const pick = pickModel(cfg, lang);');
+    /* ② 判定必须在选路之后：不知道走哪个槽位就查不了对应的账本。
+       v0.9.345：入口从 pickModel 换成 pickRoute（D 优先，内部落回 pickModel）——
+       这条断言的语义没变：选路一定发生在排队判定之前。 */
+    const iPick = srvSrc.indexOf('const pick = pickRoute(cfg, lang, body.meta);');
     const iPace = srvSrc.indexOf('paceCheck(pick.which, est)');
     assert.ok(iPick > 0 && iPace > iPick, '排队判定跑在 pickModel 之前，查不到对应槽位的账本');
     /* ③ 版本协商：不带 meta.pace 的旧前端永远不能收到 wait，
@@ -4268,14 +4271,17 @@ console.log('— 专名策略与术语表（v0.9.134）—');
        因为最初只豁免了「在途闸」，A 照样进 FIFO 队列——队里只要有个更早的号就被拦。
        A 槽 1133 个任务零限流，让它排队纯属拖慢。
        但也不能永久豁免：A 真挨 429 时 learnLimit 会把 RATE_LIMIT.A 从 0 改成非零，那时它确实要排队。 */
-    assert.ok(/const needGate = canPace && \(pick\.which !== 'A' \|\| \(RATE_LIMIT\[pick\.which\] \|\| 0\) > 0\);/.test(srvSrc),
-      'A 槽没有按「自己有没有被限流」决定是否进闸门——要么限流时裸奔，要么零限流时也排队');
+    /* v0.9.345：再多豁免一个 D —— 它的额度是请求数（RPM/RPD），自己有账本，
+       套一层按 token 的 FIFO 只会把「还有请求额度」的批次白白卡住。 */
+    assert.ok(/const needGate = canPace && pick\.which !== 'D' && \(pick\.which !== 'A' \|\| \(RATE_LIMIT\[pick\.which\] \|\| 0\) > 0\);/.test(srvSrc),
+      'D 槽没被排除在 token 闸门外（它有自己的 RPM 账本），或 A 槽的判定被改坏了');
     assert.ok(/if \(needGate\) \{[\s\S]{0,240}inflightTake/.test(srvSrc), '闸门仍由 canPace 控制，A 槽会被队列拦住');
     /* est 只在真进闸门时才非零：A 不进闸门却拿 est 去补正，等于把没预扣过的量减掉，账本被冲成负数 */
     assert.ok(/const est = needGate \? estTokens/.test(srvSrc), 'est 仍按 canPace 算——A 槽没预扣却会被减掉');
     assert.ok(/if \(needGate\) \{\s*\/\* ⚠️ 只补正/.test(srvSrc), '预扣补正没有跟着 needGate 走');
-    /* 读余额头 / 学限额仍对所有槽生效：A 真限流了要靠它们把 RATE_LIMIT.A 从 0 抬起来 */
-    assert.ok(/if \(canPace\) \{\s*learnLimit\(pick\.which/.test(srvSrc), 'learnLimit 不该被 needGate 挡掉——A 限流后要靠它进闸门');
+    /* 读余额头 / 学限额仍对所有槽生效：A 真限流了要靠它们把 RATE_LIMIT.A 从 0 抬起来。
+       v0.9.345：D 例外 —— 它的额度是请求数，学 token 限额只会把 RATE_LIMIT.D 污染成无意义的值。 */
+    assert.ok(/if \(canPace && pick\.which !== 'D'\) \{\s*learnLimit\(pick\.which/.test(srvSrc), 'learnLimit 不该被 needGate 挡掉——A 限流后要靠它进闸门（D 除外）');
     assert.ok(/if \(canPace\) \{ noteQuota\(pick\.which, out && out\._rl\)/.test(srvSrc), 'noteQuota 不该被 needGate 挡掉');
   });
 
@@ -14785,6 +14791,48 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/LANGS100\.BY_CODE/.test(body), '语言名没走 LANGS100（另抄名册迟早不一致）');
     assert.ok(/dir="rtl"/.test(body), 'rtl 语言名没带 dir="rtl"');
     assert.ok(/require\(path\.join\(__dirname, 'langs100\.js'\)\)/.test(sv), 'server.js 没引用 langs100.js');
+  });
+
+  t('v0.9.345：模型 D（Gemini 免费额度池）—— 三 key 轮换 + 耗尽回退 C/B/A', () => {
+    const sv = readT('server.js');
+    const adm = readT('admin.html');
+    /* 配置字段：keys4 是数组（1~3 个 key）；语言范围用显式开关，而不是 C 那种「空数组 = 不接管」——
+       同一个空数组在 D 上意味着「配好 key 却没流量」，是最难查的一类问题。 */
+    ['provider4', 'base4', 'model4', 'keys4', 'extraParams4', 'langModelDAll', 'langModelD', 'rpmD', 'rpdD']
+      .forEach(k => assert.ok(new RegExp('\\b' + k + ':').test(sv), 'DEFAULTS 缺 ' + k));
+    assert.ok(/if \(which === 'D'\) return !!\(cfg\.base4 && cfg\.model4 && dKeys\(cfg\)\.length\)/.test(sv),
+      'slotReady 没把 D 算进「配全」判断');
+    /* 选路：pickRoute 先判 D，不命中才落回老的 pickModel —— 老路径零改动 */
+    assert.ok(/function pickRoute\(cfg, lang, meta\)/.test(sv), '缺 pickRoute');
+    const prBody = sv.slice(sv.indexOf('function pickRoute'), sv.indexOf('async function callModelD'));
+    assert.ok(prBody.indexOf("slotReady(cfg, 'D')") >= 0, 'pickRoute 没判 D 是否配全');
+    assert.ok(prBody.indexOf('langInD(cfg, lang)') >= 0, 'pickRoute 没做 D 的语言范围判断');
+    assert.ok(prBody.indexOf('pickModel(cfg, lang)') >= 0, 'pickRoute 没落回 pickModel');
+    assert.ok(/pickRoute\(cfg, lang, body\.meta\)/.test(sv), 'translate 主流程没用 pickRoute');
+    /* 轮换规则（用户 10-20 定案）：RPD 打满退役、RPM 打满只跳过、RPM 全满回 wait 不降级 */
+    const dpBody = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dExhaust'));
+    assert.ok(/st\.ex \|\| \(st\.used \|\| 0\) >= rpd/.test(dpBody), 'dPick 没把「当日耗尽」的 key 排除');
+    assert.ok(/dRpmUsed\(k\.i\) >= rpm/.test(dpBody), 'dPick 没把「本分钟满」的 key 跳过');
+    assert.ok(/return \{ wait: wait \|\| 30 \}/.test(dpBody), 'RPM 全满时没回 wait（直接降级 = 白扔免费额度）');
+    assert.ok(/if \(!live\) return null/.test(dpBody), 'RPD 全满时没返回 null（应跨槽降级）');
+    /* 换 key：只有额度类错误才换，其他错误必须上抛去走跨槽回退 */
+    const cdBody = sv.slice(sv.indexOf('async function callModelD'), sv.indexOf('/* ---------------- v0.9.183'));
+    assert.ok(/dQuotaErr\(e\)/.test(cdBody), 'callModelD 没判额度类错误');
+    assert.ok(/dExhaust\(kp\.i, e\)/.test(cdBody), 'callModelD 没标记耗尽');
+    assert.ok(/throw e;\s*\/\/ 非额度错误/.test(cdBody), 'callModelD 把非额度错误也吞了（会白白耗掉三个 key）');
+    /* 回退链 D → C → B → A，且带 lang（D 退到 C/B 时要尊重它们各自的分流） */
+    const fcBody = sv.slice(sv.indexOf('function fallbackChain'), sv.indexOf('/* ---------------- v0.9.345：模型 D'));
+    assert.ok(/which === 'D'/.test(fcBody), 'fallbackChain 没处理 D');
+    assert.ok(/out\.push\('C'\)/.test(fcBody) && /out\.push\('A'\)/.test(fcBody), 'D 的回退链没按 C→B→A 排');
+    assert.ok(/fallbackChain\(cfg, pick\.which, lang\)/.test(sv), '回退调用没带 lang（D 退到 C/B 会绕过语言分流）');
+    /* 后台：三行 key + 语言范围开关 + 四个按钮 */
+    ['btnSave4', 'btnTest4', 'btnReset4', 'btnClear4', 'key4_1', 'key4_2', 'key4_3',
+     'dScopeAll', 'dScopePick', 'rpmD', 'rpdD', 'langChipsD', 'langCountD']
+      .forEach(id => assert.ok(adm.indexOf('id="' + id + '"') >= 0, 'admin.html 缺 #' + id));
+    assert.ok(/function renderDKeys/.test(adm), 'admin.html 缺 renderDKeys（三个 key 的状态显示）');
+    /* 明文 key 绝不出服务端：GET config 只给 dKeys 掩码 */
+    assert.ok(/dKeys: dKeyStatus\(cfg\)/.test(sv), 'GET config 没返回 D 的 key 状态');
+    assert.ok(!/keys4: cfg\.keys4/.test(sv), 'GET config 把 keys4 明文回传了');
   });
 
   if (have.length !== files.length)
