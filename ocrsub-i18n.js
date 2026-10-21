@@ -1,0 +1,222 @@
+/* ocrsub-i18n.js —— 画面硬字幕提取页自己的词典（v0.9.356）
+   只服务 ocrsub.html，与 site-i18n.js / autosub-i18n.js 等完全分开。
+   ⚠️ 三条硬规矩：1) 每个 key 在本文件的每个语言块里都必须存在；
+      2) 非中日韩语言块里不许混汉字；3) 占位符 {n} 必须原样保留。
+   首批先做 3 语（简中 / 繁中 / 英），其余语言由 DICT 缺失时回落英文，页面功能不受影响。 */
+(function (root) {
+  'use strict';
+
+  var LANGS = [["zh-CN", "简体中文"], ["zh-TW", "繁體中文"], ["en", "English"], ["ja", "日本語"], ["es", "Español"], ["pt", "Português"], ["ko", "한국어"], ["de", "Deutsch"], ["fr", "Français"], ["id", "Bahasa Indonesia"], ["hi", "हिन्दी"], ["th", "ไทย"], ["vi", "Tiếng Việt"], ["ru", "Русский"], ["it", "Italiano"], ["ar", "العربية"], ["tr", "Türkçe"], ["nl", "Nederlands"], ["pl", "Polski"], ["sv", "Svenska"], ["cs", "Čeština"], ["uk", "Українська"], ["da", "Dansk"], ["fi", "Suomi"], ["el", "Ελληνικά"], ["he", "עברית"], ["ro", "Română"]];
+
+  var DICT = {
+    'zh-CN': {
+      'brandName': '随心字幕 AI',
+      'heroA': '画面里的字幕',
+      'heroEm': '取出来',
+      'heroSub': '烧死在画面上的字幕（抖音、录屏、老片源）没有字幕轨可抽，只能一帧一帧认。这里做的是：框出字幕所在的那一条、把亮字二值化、连续相同的帧合并成一条，导出 SRT。视频不上传。',
+
+      'upTitle': '放入视频',
+      'dzTxt': '把视频拖到这里，或点击选择文件',
+      'dzFmt': 'MP4 · WebM · MOV · M4V',
+      'upHint': '只读画面，不上传。浏览器解不了的封装（MKV / AVI）先用本地工具转成 MP4。',
+      'btnClear': '清除',
+      'errDecode': '这个视频浏览器打不开。换成 MP4（H.264）或 WebM 再试。',
+      'errBig': '视频超过 2 GB。先截出需要提取的那一段。',
+      'errEmpty': '文件是空的。',
+
+      'cropTitle': '框出字幕位置',
+      'cropHint': '只在这一条里找字。框得越准，背景干扰越少，认错的字也越少。右侧的框就是当前范围，直接在画面上看。',
+      'lblTop': '上边',
+      'lblBottom': '下边',
+      'lblLeft': '左边',
+      'lblRight': '右边',
+
+      'setTitle': '识别设置',
+      'lblFps': '每秒取几帧',
+      'fpsHint': '字幕一般停留 1~3 秒，每秒 2 帧够用。取太密只会更慢，不会更准。',
+      'lblLang': '字幕语言',
+      'langHint': '识别器按语言加载字库，选错语言基本认不出来。中英混排选中文，它能同时认英文。',
+      'lblThr': '亮度阈值',
+      'thrHint': '字幕通常是画面里最亮的东西：亮度高于这个值的像素被当成字。阈值太低会把背景吃进来，太高会把笔画削掉。',
+      'btnTest': '试识别这一帧',
+      'testConf': '置信度',
+      'testEmpty': '这一帧没认出字。把阈值调低一点，或者调整框选范围。',
+      'testBusy': '正在加载字库…',
+
+      'runTitle': '开始提取',
+      'btnRun': '开始提取',
+      'btnCancel': '停止',
+      'runHint': '逐帧读画面，只在本机跑。中途可以停，已经认出来的部分会保留。',
+      'phModel': '正在加载识别字库…',
+      'phFrame': '正在识别：第 {a} / {b} 帧（{p}%）',
+      'phDone': '提取完成，用时 {t}。',
+      'phCanceled': '已停止。已经认出来的部分保留在下面。',
+      'phError': '提取失败：{m}',
+
+      'resTitle': '提取结果',
+      'statCues': '条字幕',
+      'statFrames': '识别帧数',
+      'statChars': '字符',
+      'statTime': '视频时长',
+      'btnTxt': '纯文本',
+      'btnCopy': '复制',
+      'btnDl': '下载',
+      'listMore': '还有 {n} 条未展开',
+      'msgCopy': '已复制',
+      'msgCopyFail': '复制失败，请手动选中',
+
+      'nextTitle': '下一步',
+      'nextHint': '认出来的字一定会有错：形近字、漏笔画、把标点认成字。接着做清洗和质检，比一条条手改快。',
+      'linkQc': '字幕质检',
+      'linkQcD': '查停留过短、一行超宽、读不完的条目',
+      'linkClean': '字幕清洗',
+      'linkCleanD': '去水印、去提示音、统一标点',
+      'linkYtfix': '重新断句',
+      'linkYtfixD': '把断在半句的地方按标点重新对齐',
+      'linkTranslate': '翻译成别的语言',
+      'linkTranslateD': '100 种语言，翻完自动配轴',
+
+      'privacy': '视频只在这台设备的浏览器里解码，不读取音轨、不上传服务器。'
+    },
+    'zh-TW': {
+      'brandName': '隨心字幕 AI',
+      'heroA': '畫面裡的字幕',
+      'heroEm': '取出來',
+      'heroSub': '燒死在畫面上的字幕（抖音、錄屏、老片源）沒有字幕軌可抽，只能一幀一幀認。這裡做的是：框出字幕所在的那一條、把亮字二值化、連續相同的幀合併成一條，匯出 SRT。影片不上傳。',
+
+      'upTitle': '放入影片',
+      'dzTxt': '把影片拖到這裡，或點擊選擇檔案',
+      'dzFmt': 'MP4 · WebM · MOV · M4V',
+      'upHint': '只讀畫面，不上傳。瀏覽器解不了的封裝（MKV / AVI）先用本機工具轉成 MP4。',
+      'btnClear': '清除',
+      'errDecode': '這個影片瀏覽器打不開。換成 MP4（H.264）或 WebM 再試。',
+      'errBig': '影片超過 2 GB。先截出需要提取的那一段。',
+      'errEmpty': '檔案是空的。',
+
+      'cropTitle': '框出字幕位置',
+      'cropHint': '只在這一條裡找字。框得越準，背景干擾越少，認錯的字也越少。右側的框就是目前範圍，直接在畫面上看。',
+      'lblTop': '上邊',
+      'lblBottom': '下邊',
+      'lblLeft': '左邊',
+      'lblRight': '右邊',
+
+      'setTitle': '辨識設定',
+      'lblFps': '每秒取幾幀',
+      'fpsHint': '字幕一般停留 1~3 秒，每秒 2 幀夠用。取太密只會更慢，不會更準。',
+      'lblLang': '字幕語言',
+      'langHint': '辨識器依語言載入字庫，選錯語言基本認不出來。中英混排選中文，它能同時認英文。',
+      'lblThr': '亮度閾值',
+      'thrHint': '字幕通常是畫面裡最亮的東西：亮度高於這個值的像素被當成字。閾值太低會把背景吃進來，太高會把筆畫削掉。',
+      'btnTest': '試辨識這一幀',
+      'testConf': '信賴度',
+      'testEmpty': '這一幀沒認出字。把閾值調低一點，或者調整框選範圍。',
+      'testBusy': '正在載入字庫…',
+
+      'runTitle': '開始提取',
+      'btnRun': '開始提取',
+      'btnCancel': '停止',
+      'runHint': '逐幀讀畫面，只在本機跑。中途可以停，已經認出來的部分會保留。',
+      'phModel': '正在載入辨識字庫…',
+      'phFrame': '正在辨識：第 {a} / {b} 幀（{p}%）',
+      'phDone': '提取完成，用時 {t}。',
+      'phCanceled': '已停止。已經認出來的部分保留在下面。',
+      'phError': '提取失敗：{m}',
+
+      'resTitle': '提取結果',
+      'statCues': '條字幕',
+      'statFrames': '辨識幀數',
+      'statChars': '字元',
+      'statTime': '影片長度',
+      'btnTxt': '純文字',
+      'btnCopy': '複製',
+      'btnDl': '下載',
+      'listMore': '還有 {n} 條未展開',
+      'msgCopy': '已複製',
+      'msgCopyFail': '複製失敗，請手動選取',
+
+      'nextTitle': '下一步',
+      'nextHint': '認出來的字一定會有錯：形近字、漏筆畫、把標點認成字。接著做清洗和質檢，比一條條手改快。',
+      'linkQc': '字幕質檢',
+      'linkQcD': '查停留過短、一行超寬、讀不完的條目',
+      'linkClean': '字幕清洗',
+      'linkCleanD': '去浮水印、去提示音、統一標點',
+      'linkYtfix': '重新斷句',
+      'linkYtfixD': '把斷在半句的地方依標點重新對齊',
+      'linkTranslate': '翻譯成別的語言',
+      'linkTranslateD': '100 種語言，翻完自動對軸',
+
+      'privacy': '影片只在這台裝置的瀏覽器裡解碼，不讀取音軌、不上傳伺服器。'
+    },
+    'en': {
+      'brandName': 'AI-SRTSub',
+      'heroA': 'Subtitles burned',
+      'heroEm': 'into the picture',
+      'heroSub': 'Subtitles baked into the frame (TikTok, screen recordings, old releases) have no track to extract — they can only be read frame by frame. This page crops the strip where the text sits, binarises the bright glyphs, merges identical consecutive frames into one cue, and exports SRT. The video is never uploaded.',
+
+      'upTitle': 'Add a video',
+      'dzTxt': 'Drop a video here, or click to choose one',
+      'dzFmt': 'MP4 · WebM · MOV · M4V',
+      'upHint': 'Only the picture is read, nothing is uploaded. Containers the browser cannot open (MKV / AVI) need converting to MP4 first.',
+      'btnClear': 'Clear',
+      'errDecode': 'This video cannot be opened by the browser. Try MP4 (H.264) or WebM.',
+      'errBig': 'The video is over 2 GB. Cut out the part you need first.',
+      'errEmpty': 'The file is empty.',
+
+      'cropTitle': 'Mark where the subtitles are',
+      'cropHint': 'Only this strip is scanned. The tighter the box, the less background noise, and the fewer misread characters. The box on the right is the current range — check it on the picture.',
+      'lblTop': 'Top',
+      'lblBottom': 'Bottom',
+      'lblLeft': 'Left',
+      'lblRight': 'Right',
+
+      'setTitle': 'Recognition settings',
+      'lblFps': 'Frames per second',
+      'fpsHint': 'Subtitles usually stay for 1-3 seconds, so 2 frames per second is enough. Sampling denser only makes it slower, not more accurate.',
+      'lblLang': 'Subtitle language',
+      'langHint': 'The recogniser loads one character set per language; the wrong one simply will not read anything. For mixed Chinese and English pick Chinese — it reads Latin letters too.',
+      'lblThr': 'Brightness threshold',
+      'thrHint': 'Subtitles are usually the brightest thing on screen: pixels brighter than this become text. Too low and the background leaks in; too high and strokes get cut away.',
+      'btnTest': 'Test this frame',
+      'testConf': 'confidence',
+      'testEmpty': 'No text found in this frame. Lower the threshold a little, or adjust the crop box.',
+      'testBusy': 'Loading the character set…',
+
+      'runTitle': 'Run extraction',
+      'btnRun': 'Start extracting',
+      'btnCancel': 'Stop',
+      'runHint': 'Frames are read locally in this browser. You can stop midway — whatever has been read so far is kept.',
+      'phModel': 'Loading the character set…',
+      'phFrame': 'Recognising frame {a} of {b} ({p}%)',
+      'phDone': 'Done in {t}.',
+      'phCanceled': 'Stopped. What was read so far is kept below.',
+      'phError': 'Extraction failed: {m}',
+
+      'resTitle': 'Result',
+      'statCues': 'cues',
+      'statFrames': 'frames read',
+      'statChars': 'characters',
+      'statTime': 'video length',
+      'btnTxt': 'Plain text',
+      'btnCopy': 'Copy',
+      'btnDl': 'Download',
+      'listMore': '{n} more cues not shown',
+      'msgCopy': 'Copied',
+      'msgCopyFail': 'Copy failed, please select manually',
+
+      'nextTitle': 'What next',
+      'nextHint': 'There will be mistakes: lookalike characters, missing strokes, punctuation read as text. Cleaning and checking afterwards beats fixing cue by cue.',
+      'linkQc': 'Subtitle check',
+      'linkQcD': 'Find cues that are too short, too wide or unreadable',
+      'linkClean': 'Subtitle cleaner',
+      'linkCleanD': 'Strip watermarks, sound cues, unify punctuation',
+      'linkYtfix': 'Re-cut sentences',
+      'linkYtfixD': 'Move breaks back to where sentences actually end',
+      'linkTranslate': 'Translate it',
+      'linkTranslateD': '100 languages, timing carried over',
+
+      'privacy': 'The video is decoded inside this browser only. The audio track is not read and nothing is uploaded.'
+    }
+  };
+
+  root.OCRSUB_I18N = { LANGS: LANGS, DICT: DICT };
+})(typeof window !== 'undefined' ? window : this);

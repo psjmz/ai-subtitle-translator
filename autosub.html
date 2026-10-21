@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/autosub.html 与 /en/autosub.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>音频自动生成字幕 - 浏览器里把语音转成 SRT | 随心字幕 AI</title>
+<meta name="description" content="把音频或视频丢进来，语音识别在浏览器里跑：句子按标点切开、长句按词边界再切、每行不超宽、停留时间按语速补足，直接导出 SRT / VTT。文件不上传，免费免注册。">
+<meta name="keywords" content="音频转字幕,语音生成字幕,自动字幕生成,audio to srt,generate subtitles from audio,speech to subtitle,whisper 字幕,本地识别字幕">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0E4C92">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* 视觉系统沿用 v0.9.249「收敛精修」：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.356：本页认领「海军蓝」#0E4C92 —— 与转换页的 #185FA5 拉开明度，避免两页混淆。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#0E4C92; --acc-weak:#EAF1FA; --acc-line:#B9CFE8; --acc-ink:#0A3769;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(14,76,146,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none}
+  .lnav{margin-left:auto}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    padding:18px 20px;margin:14px 0;box-shadow:var(--sh-card)}
+  .card h2{font-size:14.5px;margin:0 0 12px;font-weight:650;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+  .dz{border:1.5px dashed var(--line-strong);border-radius:11px;background:var(--card-2);
+    padding:26px 18px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc);background:var(--acc-weak)}
+  .dz.done{border-style:solid;border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{width:34px;height:34px;margin:0 auto 8px;color:var(--acc)}
+  .dz-ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round}
+  .dz-t{font-size:14px;font-weight:600;margin-bottom:3px}
+  .dz-f{font-size:12px;color:var(--mut)}
+  .hidden{display:none !important}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .row .lb{font-size:12.5px;color:var(--sub);min-width:96px}
+  .chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:20px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub)}
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden;background:var(--card)}
+  .seg button{height:32px;padding:0 13px;border:0;background:transparent;color:var(--sub);
+    font-size:12.5px;cursor:pointer}
+  .seg button:hover{background:var(--card-2)}
+  .seg button.on{background:var(--acc);color:#fff;font-weight:600}
+  .thi{display:flex;align-items:center;gap:6px;border:1px solid var(--line-strong);
+    border-radius:var(--r-ctl);padding:0 9px;height:34px;background:var(--card)}
+  .thi input{width:56px;border:0;outline:0;background:transparent;font-size:13px;
+    font-variant-numeric:tabular-nums;color:var(--ink)}
+  .thi span{font-size:11.5px;color:var(--mut)}
+  .hint{font-size:12px;color:var(--mut);line-height:1.65;margin-top:10px}
+  .btn{height:36px;padding:0 18px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover{background:var(--card-2)}
+  .btn.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn)}
+  .btn.pri:hover{filter:brightness(1.06)}
+  .btn.sm{height:30px;padding:0 12px;font-size:12px}
+  .btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
+  select.sel{height:34px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--ink);padding:0 9px;font-size:13px;max-width:280px}
+  .prog{height:8px;border-radius:6px;background:var(--stage);overflow:hidden;margin-top:12px}
+  .prog i{display:block;height:100%;width:0;background:var(--acc);transition:width .25s}
+  .stat{display:flex;gap:12px;flex-wrap:wrap;margin:2px 0 14px}
+  .stat div{background:var(--card-2);border:1px solid var(--line);border-radius:10px;
+    padding:8px 14px;min-width:104px}
+  .stat b{display:block;font-size:16px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.3}
+  .stat span{font-size:11.5px;color:var(--mut)}
+  .list{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--card-2)}
+  .cue{display:flex;gap:12px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px}
+  .cue:last-child{border-bottom:0}
+  .cue .t{color:var(--mut);font-size:11.5px;font-variant-numeric:tabular-nums;white-space:nowrap;
+    padding-top:2px;min-width:150px}
+  .cue .x{white-space:pre-line;color:var(--body)}
+  .more{text-align:center;padding:9px;font-size:12px;color:var(--sub);cursor:pointer;background:var(--card)}
+  .msg{margin-top:10px;font-size:12.5px;padding:9px 12px;border-radius:9px;display:none}
+  .msg.show{display:block}
+  .msg.ok{background:var(--ok-weak);color:var(--ok-ink)}
+  .msg.warn{background:var(--warn-weak);color:var(--warn)}
+  .msg.err{background:var(--del-weak);color:var(--del)}
+  .next{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:4px}
+  .next a{display:block;border:1px solid var(--line);border-radius:10px;padding:11px 13px;
+    text-decoration:none;color:inherit;background:var(--card-2);transition:border-color .15s}
+  .next a:hover{border-color:var(--acc-line);background:var(--acc-weak)}
+  .next b{display:block;font-size:13px;font-weight:600;margin-bottom:2px}
+  .next span{font-size:11.5px;color:var(--mut);line-height:1.5}
+  .prv{margin-top:10px;font-size:12px;color:var(--mut)}
+  .seo{max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line);
+    color:var(--sub);font-size:13px;line-height:1.8}
+  @media (max-width:640px){
+    .wrap{padding:0 16px}
+    .hero h1{font-size:23px}
+    .cue{flex-direction:column;gap:2px}
+    .cue .t{min-width:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav"><select id="langSel" aria-label="interface language"></select></div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">声音直接变成</span><em data-i18n="heroEm">字幕</em></h1>
+    <p data-i18n="heroSub">把音频或视频丢进来，识别引擎在浏览器里把语音转成带时间码的字幕：句子按标点切开、长句按词边界再切、每行不超宽、停留时间按语速补足。文件不上传，识别完直接导 SRT。</p>
+  </div>
+
+  <!-- 1 放入文件 -->
+  <div class="card">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入音频或视频</span></h2>
+    <div class="dz" id="dz">
+      <div class="dz-ico"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 12 5 5 5-5"/><path d="M4 17v1.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V17"/></svg></div>
+      <div class="dz-t" data-i18n="dzTxt">把音频 / 视频拖到这里，或点击选择文件</div>
+      <div class="dz-f" data-i18n="dzFmt">MP3 · M4A · WAV · OGG · FLAC · MP4 · WebM</div>
+    </div>
+    <input type="file" id="file" accept="audio/*,video/mp4,video/webm,.mp3,.m4a,.wav,.ogg,.flac,.aac,.mp4,.webm" class="hidden">
+    <div class="row" id="fileRow" style="display:none">
+      <span class="chip" id="fileInfo"></span>
+      <button class="btn sm" id="btnClear" data-i18n="btnClear">清除</button>
+    </div>
+    <audio id="preview" controls class="hidden" style="width:100%;margin-top:12px"></audio>
+    <div class="hint" id="upHint" data-i18n="upHint">只取音轨，画面不参与。MKV 里的音轨浏览器解不了，先用站内的视频字幕页或本地工具把音轨取出来。</div>
+  </div>
+
+  <!-- 2 识别设置 -->
+  <div class="card">
+    <h2><span class="n">2</span><span data-i18n="setTitle">识别设置</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblModel">模型</span>
+      <div class="seg" id="modelSeg">
+        <button data-model="tiny" data-i18n="mdlTiny">小（约 40 MB）</button>
+        <button data-model="base" class="on" data-i18n="mdlBase">中（约 80 MB）</button>
+        <button data-model="small" data-i18n="mdlSmall">大（约 250 MB）</button>
+      </div>
+    </div>
+    <div class="row">
+      <span class="lb" data-i18n="lblLang">音频语言</span>
+      <select class="sel" id="spkLang"></select>
+    </div>
+    <div class="hint" data-i18n="langHint">说清楚是哪种语言，识别会更准，也能避免把中文听成日文。选错语言不会损坏文件，换一个重跑即可。</div>
+
+    <div class="row">
+      <span class="lb" data-i18n="lblMaxLine">单行字符数</span>
+      <div class="thi"><input type="number" id="maxLine" min="8" max="60" step="1"><span data-i18n="uChar">字符</span></div>
+      <span class="lb" style="min-width:0" data-i18n="lblMaxDur">最长停留</span>
+      <div class="thi"><input type="number" id="maxDur" min="1" max="12" step="0.5"><span data-i18n="uSec">秒</span></div>
+      <span class="lb" style="min-width:0" data-i18n="lblMinDur">最短停留</span>
+      <div class="thi"><input type="number" id="minDur" min="0.3" max="4" step="0.1"><span data-i18n="uSec2">秒</span></div>
+      <span class="lb" style="min-width:0" data-i18n="lblGap">条间间隙</span>
+      <div class="thi"><input type="number" id="gap" min="0" max="500" step="10"><span data-i18n="uMs">毫秒</span></div>
+    </div>
+    <div class="hint" data-i18n="paramHint">这些是上限：工具只在上限内决定在哪断句，不会为了让一条放下而删字。中文默认每行 16 字，西文 42 字符。</div>
+    <div class="hint" data-i18n="modelHint">模型第一次用要下载，之后浏览器会缓存。小模型快、错字多；大模型慢、更准。中文和日文的错字主要出现在人名、术语和同音字上。</div>
+  </div>
+
+  <!-- 3 开始识别 -->
+  <div class="card">
+    <h2><span class="n">3</span><span data-i18n="runTitle">开始识别</span></h2>
+    <div class="row" style="margin-top:0">
+      <button class="btn pri" id="btnRun" disabled data-i18n="btnRun">开始识别</button>
+      <button class="btn hidden" id="btnCancel" data-i18n="btnCancel">停止</button>
+      <span class="chip mut" id="phaseChip" style="display:none"></span>
+    </div>
+    <div class="prog" id="progWrap" style="display:none"><i id="progBar"></i></div>
+    <div class="msg" id="msg"></div>
+    <div class="hint" id="runHint" data-i18n="runHint">识别在本机浏览器里跑，文件不上传。中途可以停，已经转出来的部分会保留。</div>
+    <div class="prv" data-i18n="privacy">音频只在这台设备的浏览器里解码和识别，不上传服务器，也不写入任何日志。</div>
+  </div>
+
+  <!-- 4 结果 -->
+  <div class="card hidden" id="resCard">
+    <h2><span class="n">4</span><span data-i18n="resTitle">识别结果</span></h2>
+    <div class="stat">
+      <div><b id="stCues">0</b><span data-i18n="statCues">条字幕</span></div>
+      <div><b id="stChars">0</b><span data-i18n="statChars">字符</span></div>
+      <div><b id="stCps">0</b><span data-i18n="statCps">最快读速</span></div>
+      <div><b id="stAudio">0</b><span data-i18n="statAudio">音频时长</span></div>
+    </div>
+    <div class="list" id="cueList"></div>
+    <div class="row">
+      <label class="chip mut" style="cursor:pointer;gap:6px">
+        <input type="checkbox" id="tradChk" style="margin:0">
+        <span data-i18n="lblTrad">中文转简体</span>
+      </label>
+      <div class="seg" id="fmtSeg">
+        <button data-fmt="srt" class="on">SRT</button>
+        <button data-fmt="vtt">VTT</button>
+        <button data-fmt="txt" data-i18n="btnTxt">纯文本</button>
+      </div>
+      <button class="btn sm" id="btnCopy" data-i18n="btnCopy">复制</button>
+      <button class="btn pri sm" id="btnDl" data-i18n="btnDl">下载</button>
+    </div>
+    <div class="hint" data-i18n="tradHint">识别引擎的中文输出常是繁体。打开这个开关，导出的字幕会转成简体；原文本身是繁体时不要开。</div>
+  </div>
+
+  <!-- 下一步 -->
+  <div class="card hidden" id="nextCard">
+    <h2><span data-i18n="nextTitle">下一步</span></h2>
+    <p class="hint" style="margin-top:0" data-i18n="nextHint">识别出来的是草稿：错字要改、术语要统一、长句可能还要再断。这些都能接着做，不用换站点。</p>
+    <div class="next">
+      <a href="/qc.html"><b data-i18n="linkQc">字幕质检</b><span data-i18n="linkQcD">查停留过短、一行超宽、读不完的条目</span></a>
+      <a href="/ytfix.html"><b data-i18n="linkYtfix">重新断句</b><span data-i18n="linkYtfixD">把断在半句的地方按标点重新对齐</span></a>
+      <a href="/translate.html"><b data-i18n="linkTranslate">翻译成别的语言</b><span data-i18n="linkTranslateD">100 种语言，翻完自动配轴</span></a>
+      <a href="/shift.html"><b data-i18n="linkShift">调整时间轴</b><span data-i18n="linkShiftD">整体平移、倍速、两点校正</span></a>
+    </div>
+  </div>
+</div>
+
+<!--SEO-COPY-START-->
+  <section class="seo">
+    <h2>音频自动生成字幕 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>把音频或视频丢进来，语音识别在浏览器里跑：句子按标点切开、长句按词边界再切、每行不超宽、停留时间按语速补足，直接导出 SRT / VTT。文件不上传。</strong></p>
+    <p style="margin-top:8px;">识别引擎给的是「一串词 + 每个词的真实起止时间」，它不知道什么叫一条字幕：句号后面不会自动断开，长句也不会自己折行。本工具在识别结果之上再做一层排版：按这门语言的句末标点断句，一条放不下就按逗号与词边界再切，按文字系统给行宽上限（中文 16 个全角字、西文 42 字符），最后按阅读速度补最短停留时间、条间留出间隙，并保证时间不倒退不重叠。</p>
+    <p style="margin-top:8px;">给要给自己拍的视频配字幕的创作者、要把播客和网课转成文字的团队，以及拿到一份没有字幕的素材、只想要个能改的初稿的人。</p>
+  </section>
+<!--SEO-COPY-END-->
+
+<script src="autosub-i18n.js?v=0.9.357"></script>
+<script src="autosub-core.js?v=0.9.357"></script>
+<script>
+(function () {
+  'use strict';
+
+  var I18N = window.AUTOSUB_I18N || { LANGS: [['zh-CN', '简体中文'], ['en', 'English']], DICT: {} };
+  var UI = I18N.LANGS, DICT = I18N.DICT;
+  var C = window.AutoSubCore;
+  var RTL = ['ar', 'fa', 'he', 'ur', 'ps', 'ku', 'ug', 'sd', 'yi'];
+
+  var curLang = 'zh-CN';
+  var state = { file: null, audio: null, duration: 0, words: null, cues: null, busy: false, result: null };
+
+  function T(k) {
+    var d = DICT[curLang] || {};
+    if (d[k] != null) return d[k];
+    var e = DICT['en'] || {};
+    if (e[k] != null) return e[k];
+    var z = DICT['zh-CN'] || {};
+    return z[k] != null ? z[k] : k;
+  }
+  function $(id) { return document.getElementById(id); }
+  function fmtTpl(s, map) {
+    return String(s).replace(/\{(\w+)\}/g, function (m, k) { return map[k] != null ? map[k] : m; });
+  }
+  function reportTool(act, extra) {
+    try {
+      var e = extra || {};
+      var body = JSON.stringify({ page: 'autosub', act: act, cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || '' });
+      if (navigator.sendBeacon && typeof Blob === 'function') {
+        try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+      }
+      fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+        .catch(function () { });
+    } catch (err) { }
+  }
+
+  /* ---------------- 界面语言 ---------------- */
+  function detectUiLang() {
+    try {
+      var ls = String((navigator.languages && navigator.languages[0]) || navigator.language || 'zh-CN').toLowerCase();
+      if (ls.indexOf('zh') === 0) return /tw|hk|hant/.test(ls) ? 'zh-TW' : 'zh-CN';
+      for (var i = 0; i < UI.length; i++) if (ls.indexOf(String(UI[i][0]).toLowerCase()) === 0) return UI[i][0];
+    } catch (e) { }
+    return 'zh-CN';
+  }
+  function pathUiLang() {
+    try {
+      var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/autosub\.html$/);
+      if (m && UI.some(function (x) { return x[0] === m[1]; })) return m[1];
+    } catch (e) { }
+    return null;
+  }
+  function initLang() {
+    var sel = $('langSel');
+    sel.innerHTML = '';
+    UI.forEach(function (p) {
+      var o = document.createElement('option');
+      o.value = p[0]; o.textContent = p[1];
+      sel.appendChild(o);
+    });
+    var saved = null;
+    try { saved = localStorage.getItem('sitesub_lang'); } catch (e) { }
+    curLang = pathUiLang() || ((saved && UI.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+    sel.value = curLang;
+    sel.addEventListener('change', function () {
+      curLang = sel.value;
+      try { localStorage.setItem('sitesub_lang', curLang); } catch (e) { }
+      applyI18n();
+    });
+  }
+  function applyI18n() {
+    var nodes = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < nodes.length; i++) {
+      var k = nodes[i].getAttribute('data-i18n');
+      var v = T(k);
+      if (v && v !== k) nodes[i].textContent = v;
+    }
+    document.documentElement.lang = curLang;
+    document.documentElement.dir = RTL.indexOf(curLang) >= 0 ? 'rtl' : 'ltr';
+    var pre = (curLang === 'zh-CN') ? '' : '/' + curLang;
+    ['/qc.html', '/ytfix.html', '/translate.html', '/shift.html'].forEach(function (p, i) {
+      var ids = ['linkQc', 'linkYtfix', 'linkTranslate', 'linkShift'];
+      var a = document.querySelector('.next a[href="' + p + '"]');
+      if (a) a.setAttribute('href', pre + p);
+    });
+    if (state.cues) renderResult();
+  }
+
+  /* ---------------- 音频语言下拉 ---------------- */
+  function initSpkLang() {
+    var sel = $('spkLang');
+    var auto = document.createElement('option');
+    auto.value = ''; auto.textContent = T('langAuto');
+    sel.appendChild(auto);
+    var names = {};
+    UI.forEach(function (p) { names[p[0]] = p[1]; });
+    var codes = Object.keys(C.WHISPER_LANG).sort(function (a, b) {
+      return (names[a] || a).localeCompare(names[b] || b);
+    });
+    codes.forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c;
+      o.textContent = names[c] || c;
+      sel.appendChild(o);
+    });
+    sel.value = curLang && C.WHISPER_LANG[curLang] ? curLang : '';
+    sel.addEventListener('change', syncDefaults);
+  }
+
+  /* ---------------- 参数默认值 ---------------- */
+  function currentOpts() {
+    var lang = $('spkLang').value || 'en';
+    var o = C.optsForLang(lang);
+    o.lang = lang;
+    o.maxWidth = Math.max(8, Math.min(60, Number($('maxLine').value) || o.maxWidth));
+    o.maxDur = Math.max(1000, Math.min(12000, (Number($('maxDur').value) || 7) * 1000));
+    o.minDur = Math.max(300, Math.min(4000, (Number($('minDur').value) || 0.8) * 1000));
+    o.gap = Math.max(0, Math.min(500, Number($('gap').value) || 60));
+    return o;
+  }
+  function syncDefaults() {
+    var lang = $('spkLang').value || 'en';
+    var o = C.optsForLang(lang);
+    $('maxLine').value = o.maxWidth;
+    $('maxDur').value = (o.maxDur / 1000).toFixed(1).replace(/\.0$/, '');
+    $('minDur').value = (o.minDur / 1000).toFixed(1).replace(/\.0$/, '');
+    $('gap').value = o.gap;
+  }
+
+  /* ---------------- 文件 ---------------- */
+  function showMsg(text, kind) {
+    var m = $('msg');
+    m.className = 'msg show ' + (kind || 'ok');
+    m.textContent = text;
+  }
+  function hideMsg() { $('msg').className = 'msg'; }
+
+  function humanSize(n) {
+    if (n > 1024 * 1024) return (n / 1024 / 1024).toFixed(1) + ' MB';
+    return Math.max(1, Math.round(n / 1024)) + ' KB';
+  }
+  function humanDur(ms) {
+    var s = Math.round(ms / 1000);
+    var m = Math.floor(s / 60);
+    s = s % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  /* 浏览器解码只给「已经解好的音频」，采样率不一定是 16k，声道可能是两个。
+     OfflineAudioContext 一步拿到 16k 单声道，比手写重采样稳。 */
+  async function decodeTo16k(file) {
+    var buf = await file.arrayBuffer();
+    var AC = window.AudioContext || window.webkitAudioContext;
+    var tmp = new AC();
+    var ab = await tmp.decodeAudioData(buf);
+    tmp.close && tmp.close();
+    if (ab.sampleRate === 16000 && ab.numberOfChannels === 1) {
+      return { data: ab.getChannelData(0).slice(), duration: ab.duration };
+    }
+    var frames = Math.ceil(ab.duration * 16000);
+    var off = new OfflineAudioContext(1, frames, 16000);
+    var src = off.createBufferSource();
+    src.buffer = ab;
+    src.connect(off.destination);
+    src.start();
+    var out = await off.startRendering();
+    return { data: out.getChannelData(0).slice(), duration: ab.duration };
+  }
+
+  async function acceptFile(f) {
+    if (!f) return;
+    if (!f.size) { showMsg(T('errEmpty'), 'err'); return; }
+    if (f.size > 500 * 1024 * 1024) { showMsg(T('errBig'), 'err'); return; }
+    hideMsg();
+    state.file = f;
+    state.words = null; state.cues = null;
+    $('resCard').classList.add('hidden');
+    $('nextCard').classList.add('hidden');
+    $('fileRow').style.display = '';
+    $('fileInfo').textContent = f.name + ' · ' + humanSize(f.size);
+    $('dz').classList.add('done');
+    $('btnRun').disabled = true;
+    $('phaseChip').style.display = '';
+    $('phaseChip').textContent = T('infoDecode');
+
+    try {
+      var r = await decodeTo16k(f);
+      state.audio = r.data;
+      state.duration = r.duration;
+      $('phaseChip').textContent = T('infoDur') + ' ' + humanDur(r.duration * 1000);
+      $('uploadInfo') && 0;
+      $('fileInfo').textContent = f.name + ' · ' + humanSize(f.size) + ' · ' + humanDur(r.duration * 1000);
+      $('btnRun').disabled = false;
+      var pv = $('preview');
+      pv.src = URL.createObjectURL(f);
+    } catch (e) {
+      $('phaseChip').style.display = 'none';
+      showMsg(T('errDecode'), 'err');
+      $('btnRun').disabled = true;
+    }
+  }
+
+  /* ---------------- 识别 ---------------- */
+  var worker = null, modelReady = '';
+
+  function startRun() {
+    if (!state.audio) return;
+    if (state.busy) return;
+    hideMsg();
+    state.busy = true;
+    $('btnRun').disabled = true;
+    $('btnCancel').classList.remove('hidden');
+    $('progWrap').style.display = '';
+    $('progBar').style.width = '0%';
+    $('phaseChip').style.display = '';
+    $('phaseChip').textContent = T('phReady');
+
+    var model = document.querySelector('#modelSeg button.on').getAttribute('data-model');
+    var code = $('spkLang').value;
+    var whisperLang = code ? (C.WHISPER_LANG[code] || '') : '';
+
+    try {
+      if (!worker) {
+        worker = new Worker('autosub-worker.js', { type: 'module' });
+        worker.onmessage = onWorker;
+        worker.onerror = function (ev) {
+          finish();
+          showMsg(fmtTpl(T('phError'), { m: (ev && ev.message) || 'worker' }), 'err');
+        };
+      }
+    } catch (e) {
+      finish();
+      showMsg(fmtTpl(T('phError'), { m: String(e.message || e) }), 'err');
+      return;
+    }
+
+    /* 传副本：worker 里用 transfer 会把这边的 buffer 移走，重跑还得再解码一次文件 */
+    var copy = state.audio.slice();
+    worker.postMessage({
+      type: 'run', audio: copy, sampleRate: 16000, model: model,
+      whisperLang: whisperLang
+    }, [copy.buffer]);
+    state.runModel = model;
+    state.runLang = code;
+    reportTool('run', { n: Math.round(state.duration) });
+  }
+
+  function onWorker(ev) {
+    var d = ev.data || {};
+    if (d.type === 'phase') {
+      if (d.phase === 'model') {
+        $('phaseChip').textContent = modelReady === d.model ? T('phModelDone') : fmtTpl(T('phModel'), { f: d.model, p: 0 });
+      } else if (d.phase === 'asr') {
+        $('phaseChip').textContent = fmtTpl(T('phAsr'), { a: '0:00', b: humanDur(d.totalMs) });
+      }
+      return;
+    }
+    if (d.type === 'modelProgress') {
+      var pct = d.total ? Math.round(d.loaded / d.total * 100) : Math.round(d.progress || 0);
+      $('progBar').style.width = Math.max(2, Math.min(100, pct * 0.3)) + '%';
+      $('phaseChip').textContent = fmtTpl(T('phModel'), { f: (d.file || '').split('/').pop(), p: pct });
+      return;
+    }
+    if (d.type === 'progress') {
+      var r = d.totalMs ? d.doneMs / d.totalMs : 0;
+      $('progBar').style.width = (30 + r * 70) + '%';
+      $('phaseChip').textContent = fmtTpl(T('phAsr'), { a: humanDur(d.doneMs), b: humanDur(d.totalMs) });
+      return;
+    }
+    if (d.type === 'done') {
+      modelReady = state.runModel;
+      $('progBar').style.width = '100%';
+      buildResult(d.words, d.elapsedMs);
+      finish();
+      showMsg(fmtTpl(T('phDone'), { t: (d.elapsedMs / 1000).toFixed(1) + 's' }), 'ok');
+      return;
+    }
+    if (d.type === 'canceled') {
+      if (d.words && d.words.length) {
+        buildResult(d.words, 0);
+        showMsg(T('phCanceled'), 'warn');
+      } else {
+        showMsg(T('phCanceled'), 'warn');
+      }
+      finish();
+      return;
+    }
+    if (d.type === 'error') {
+      finish();
+      showMsg(fmtTpl(T('phError'), { m: d.message || '' }), 'err');
+    }
+  }
+
+  function finish() {
+    state.busy = false;
+    $('btnCancel').classList.add('hidden');
+    $('btnRun').disabled = !state.audio;
+    setTimeout(function () { if (!state.busy) $('progWrap').style.display = 'none'; }, 800);
+  }
+
+  /* ---------------- 结果 ---------------- */
+  var shown = 200;
+
+  function buildResult(words, elapsedMs) {
+    var o = currentOpts();
+    var r = C.buildCues(words, o);
+    state.words = words;
+    state.cues = C.tidyCues(r.cues);
+    state.stats = r.stats;
+    state.elapsed = elapsedMs;
+    $('resCard').classList.remove('hidden');
+    $('nextCard').classList.remove('hidden');
+    $('tradChk').checked = /^zh/.test(o.lang) && /^zh/.test(state.runLang || '');
+    renderResult();
+    reportTool('apply', { cues: state.cues.length });
+    try { $('resCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { }
+  }
+
+  /* 繁简：用到时才把词库拉下来（340KB），不做中文的用户一点流量都不多花 */
+  var hanReady = null;
+  function ensureHanConv() {
+    if (hanReady) return hanReady;
+    hanReady = new Promise(function (res, rej) {
+      function load(src) {
+        return new Promise(function (ok, no) {
+          var s = document.createElement('script');
+          s.src = src; s.onload = ok; s.onerror = no;
+          document.head.appendChild(s);
+        });
+      }
+      load('hanconv-data.js?v=0.9.357')
+        .then(function () { return load('hanconv-core.js?v=0.9.357'); })
+        .then(function () {
+          if (!window.HanConvCore) throw new Error('no engine');
+          window.HanConvCore.setData(window.HanConvData);
+          res(window.HanConvCore);
+        })
+        .catch(rej);
+    });
+    return hanReady;
+  }
+
+  function outputCues() {
+    var cues = state.cues || [];
+    if (!$('tradChk').checked) return cues;
+    return cues;
+  }
+
+  async function outputText(fmt) {
+    var cues = outputCues();
+    if ($('tradChk').checked) {
+      try {
+        var hc = await ensureHanConv();
+        cues = cues.map(function (c) {
+          return { start: c.start, end: c.end, text: hc.convert(c.text, 't2s').text };
+        });
+      } catch (e) { /* 转换失败就按原文导出，不阻断 */ }
+    }
+    if (fmt === 'vtt') return C.toVtt(cues);
+    if (fmt === 'txt') return C.toTxt(cues, false);
+    return C.toSrt(cues);
+  }
+
+  function renderResult() {
+    var cues = outputCues();
+    $('stCues').textContent = cues.length;
+    $('stChars').textContent = (state.stats && state.stats.chars) || 0;
+    $('stCps').textContent = (state.stats && state.stats.maxCps) || 0;
+    $('stAudio').textContent = humanDur((state.duration || 0) * 1000);
+
+    var box = $('cueList');
+    box.innerHTML = '';
+    var frag = document.createDocumentFragment();
+    var n = Math.min(cues.length, shown);
+    for (var i = 0; i < n; i++) {
+      var d = document.createElement('div');
+      d.className = 'cue';
+      var t = document.createElement('div');
+      t.className = 't';
+      t.textContent = C.toSrt([cues[i]]).split('\n')[1];
+      var x = document.createElement('div');
+      x.className = 'x';
+      x.textContent = cues[i].text;
+      d.appendChild(t); d.appendChild(x);
+      frag.appendChild(d);
+    }
+    box.appendChild(frag);
+    if (cues.length > n) {
+      var more = document.createElement('div');
+      more.className = 'more';
+      more.textContent = fmtTpl(T('listMore'), { n: cues.length - n });
+      more.addEventListener('click', function () { shown = cues.length; renderResult(); });
+      box.appendChild(more);
+    }
+  }
+
+  var outFmt = 'srt';
+  function bindFmt() {
+    var segs = document.querySelectorAll('#fmtSeg button');
+    for (var i = 0; i < segs.length; i++) {
+      segs[i].addEventListener('click', function () {
+        for (var k = 0; k < segs.length; k++) segs[k].classList.remove('on');
+        this.classList.add('on');
+        outFmt = this.getAttribute('data-fmt');
+      });
+    }
+  }
+
+  /* ---------------- 事件绑定 ---------------- */
+  function bind() {
+    var fileInput = $('file');
+    $('dz').addEventListener('click', function () { fileInput.click(); });
+    fileInput.addEventListener('change', function () { if (this.files && this.files[0]) acceptFile(this.files[0]); });
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      $('dz').addEventListener(ev, function (e) { e.preventDefault(); $('dz').classList.add('over'); });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      $('dz').addEventListener(ev, function (e) { e.preventDefault(); $('dz').classList.remove('over'); });
+    });
+    $('dz').addEventListener('drop', function (e) {
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) acceptFile(e.dataTransfer.files[0]);
+    });
+    $('btnClear').addEventListener('click', function () {
+      state.file = null; state.audio = null; state.duration = 0; state.cues = null;
+      $('fileRow').style.display = 'none';
+      $('dz').classList.remove('done');
+      $('preview').classList.add('hidden');
+      $('preview').src = '';
+      $('resCard').classList.add('hidden');
+      $('nextCard').classList.add('hidden');
+      $('phaseChip').style.display = 'none';
+      $('btnRun').disabled = true;
+      fileInput.value = '';
+      hideMsg();
+    });
+    $('btnRun').addEventListener('click', startRun);
+    $('btnCancel').addEventListener('click', function () {
+      if (worker) worker.postMessage({ type: 'cancel' });
+    });
+
+    var segs = document.querySelectorAll('#modelSeg button');
+    for (var i = 0; i < segs.length; i++) {
+      segs[i].addEventListener('click', function () {
+        for (var k = 0; k < segs.length; k++) segs[k].classList.remove('on');
+        this.classList.add('on');
+      });
+    }
+
+    $('tradChk').addEventListener('change', renderResult);
+    bindFmt();
+
+    $('btnDl').addEventListener('click', async function () {
+      var txt = await outputText(outFmt);
+      if (!txt) return;
+      var base = (state.file ? state.file.name : 'audio').replace(/\.[^.]+$/, '');
+      var blob = new Blob([outFmt === 'vtt' ? txt : '\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = base + '.' + outFmt;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      reportTool('export', { cues: state.cues ? state.cues.length : 0, fmt: outFmt });
+    });
+
+    $('btnCopy').addEventListener('click', async function () {
+      var txt = await outputText(outFmt);
+      if (!txt) return;
+      function ok() { showMsg(T('msgCopy'), 'ok'); }
+      function bad() { showMsg(T('msgCopyFail'), 'warn'); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(ok, bad);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); ok(); } catch (e) { bad(); }
+        ta.remove();
+      }
+    });
+
+    $('logoHome').addEventListener('click', function (e) { e.preventDefault(); location.href = '/'; });
+  }
+
+  initLang();
+  applyI18n();
+  initSpkLang();
+  syncDefaults();
+  bind();
+})();
+</script>
+<script src="site-topnav.js?v=0.9.357" data-tool=""></script>
+</body>
+</html>

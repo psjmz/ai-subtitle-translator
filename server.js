@@ -687,7 +687,10 @@ const TOOL_PAGE = {
      act 同样复用现有动作：apply=真跑了一次修正，export=真下载了文件。
      ⚠️ 这一页此前完全没埋点 —— 上线后后台看不到「有没有人用、用了多少人、有没有导出」，
         只能去 GA 看个页面浏览量。白名单漏了 ytfix，前端发过来的记录会被整条丢弃。 */
-  ytfix: 'ytfix'
+  ytfix: 'ytfix',
+  /* v0.9.356：自动生成字幕页与画面硬字幕提取页。
+     act 复用现有动作：run=真跑了一次识别，apply=出了结果，export=真下载了文件。 */
+  autosub: 'autosub', ocrsub: 'ocrsub'
 };
 /* ⚠️ 动作白名单：与六页各自埋点处传的 act 一一对应（逐页对齐，共 14 个）。
       加减动作两边必须同步，否则新动作被记成空值 —— 用户明明用了，后台却看不到。
@@ -707,7 +710,11 @@ const TOOL_ACT = {
   /* 六页共用的「真的下载了文件」 */
   export: 'export',
   /* v0.9.321：qc 页的两个动作 —— 跑一遍检查 / 应用修复 */
-  check: 'check', fix: 'fix'
+  check: 'check', fix: 'fix',
+  /* v0.9.356：autosub 页的「真跑完一次识别」。
+     不复用 check —— 那一档在后台记的是「体检」，跟识别不是一回事；
+     漏在这里的话，这一页的上报会被下面那道「page/act 对不上就整条丢」的闸全丢掉。 */
+  run: 'run'
 };
 const TOOL_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt', json: 'json',
   /* v0.9.316：table 页 xlsx/csv、batch 页 zip、lrc 页 lrc */
@@ -878,6 +885,13 @@ function serveStatic(req, res, urlPath){
   const ym = p.match(/^\/(?:([a-zA-Z][a-zA-Z\-]*)\/)?ytfix\.html$/);
   if (ym && (!ym[1] || SEO_ROUTE['/' + ym[1]])) {
     serveIndexLang(req, res, ym[1] ? SEO_ROUTE['/' + ym[1]] : 'zh-CN', 'ytfix'); return;
+  }
+  /* v0.9.356：自动生成字幕页与画面硬字幕提取页。与上面那条 17 页白名单分开，
+     理由同上（不动老页面路由）。URL 形态只有 /xxx.html 与 /<lang>/xxx.html 两种。
+     ⚠️ 同样必须排在「语言目录下的静态资源回退」之前。 */
+  const am = p.match(/^\/(?:([a-zA-Z][a-zA-Z\-]*)\/)?(autosub|ocrsub)\.html$/);
+  if (am && (!am[1] || SEO_ROUTE['/' + am[1]])) {
+    serveIndexLang(req, res, am[1] ? SEO_ROUTE['/' + am[1]] : 'zh-CN', am[2]); return;
   }
   /* v0.9.323：内容页（指南）路由 —— 独立分支，不动上面那条 16 页白名单正则。
      URL 形态：/guides/<slug>.html（简中）与 /<lang>/guides/<slug>.html（语言版）；
@@ -2528,7 +2542,7 @@ const SEO_YTFIX = {
 };
 
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {}, SPLIT_PATH = {}, TABLE_PATH = {}, BATCH_PATH = {}, LRC_PATH = {}, QC_PATH = {}, YTFIX_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {}, SPLIT_PATH = {}, TABLE_PATH = {}, BATCH_PATH = {}, LRC_PATH = {}, QC_PATH = {}, YTFIX_PATH = {}, AUTOSUB_PATH = {}, OCRSUB_PATH = {};
 
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
@@ -2559,7 +2573,79 @@ SEO_LANGS.forEach(function (l) {
   QC_PATH[l] = (l === 'zh-CN') ? '/qc.html' : '/' + l + '/qc.html';
   /* v0.9.352：YouTube 字幕优化页 */
   YTFIX_PATH[l] = (l === 'zh-CN') ? '/ytfix.html' : '/' + l + '/ytfix.html';
+  /* v0.9.356：自动生成字幕页与画面硬字幕提取页 */
+  AUTOSUB_PATH[l] = (l === 'zh-CN') ? '/autosub.html' : '/' + l + '/autosub.html';
+  OCRSUB_PATH[l] = (l === 'zh-CN') ? '/ocrsub.html' : '/' + l + '/ocrsub.html';
 });
+/* v0.9.356：第十九个页面 —— 自动生成字幕（/autosub.html）
+   ⚠️ 这一页的卖点与前十八页正好相反：前面全是「手上已经有字幕」的处理工具，
+     这一页是「从零开始把声音变成字幕」。文案里必须出现「识别」「生成」「草稿」，
+     不能让人以为它又是格式转换或清洗。
+   ⚠️ 「100 种语言」说的是**音频语言**（识别引擎支持），与界面语言是两件事。
+   ⚠️ 不许写「三步走 / 一条龙」这类流程叙事（站内有回归断言）。 */
+const SEO_AUTOSUB = {
+  'zh-CN': {
+    title: "音频自动生成字幕 - 浏览器里把语音转成 SRT | 随心字幕 AI",
+    desc: "把音频或视频丢进来，识别引擎在浏览器里把语音转成带时间码的字幕：按标点断句、长句按词边界再切、每行不超宽、停留时间按语速补足，直接导 SRT / VTT。支持 100 种语言的音频，文件不上传，免费免注册。",
+    kw: "音频转字幕,语音生成字幕,自动字幕生成,音频识别,srt 自动生成,audio to srt,generate subtitles from audio,speech to subtitle,whisper 字幕,本地识别字幕",
+    intro: "把音频或视频丢进来，选好语言和模型，识别在本机浏览器里跑，出来的是一份带时间码、已经按句子切好、每行不超宽的字幕草稿。",
+    feat: "识别引擎给的是「一串词 + 每个词的真实起止时间」，它不知道什么叫一条字幕：句号后面不会自动断开，长句也不会自己折行。本工具在识别结果之上再做一层排版——按这门语言的句末标点断句，一条放不下就按逗号与词边界再切，按文字系统给行宽上限（中文 16 个全角字、西文 42 字符），最后按阅读速度补最短停留时间、条间留出间隙，并保证时间不倒退不重叠。模型有三个档位，第一次用要下载，之后浏览器会缓存。识别在本机跑，音频不上传服务器。中文的识别结果常是繁体，导出时可以一键转简体。",
+    who: "要给自己拍的视频配字幕的创作者、要把播客和网课转成文字的团队，以及拿到一份没有字幕的素材、只想要个能改的初稿的人。",
+    siteName: "随心字幕 AI", jsonldName: "随心字幕 AI", jsonldAlt: "Audio to Subtitle Generator"
+  },
+  'zh-TW': {
+    title: "音訊自動生成字幕 - 瀏覽器裡把語音轉成 SRT | 隨心字幕 AI",
+    desc: "把音訊或影片丟進來，辨識引擎在瀏覽器裡把語音轉成帶時間碼的字幕：依標點斷句、長句依詞邊界再切、每行不超寬、停留時間依語速補足，直接匯出 SRT / VTT。支援 100 種語言的音訊，檔案不上傳，免費免註冊。",
+    kw: "音訊轉字幕,語音生成字幕,自動字幕生成,音訊辨識,srt 自動生成,audio to srt,generate subtitles from audio,speech to subtitle,whisper 字幕,本機辨識字幕",
+    intro: "把音訊或影片丟進來，選好語言和模型，辨識在本機瀏覽器裡跑，出來的是一份帶時間碼、已經依句子切好、每行不超寬的字幕草稿。",
+    feat: "辨識引擎給的是「一串詞 + 每個詞的真實起止時間」，它不知道什麼叫一條字幕：句號後面不會自動斷開，長句也不會自己折行。本工具在辨識結果之上再做一層排版——依這門語言的句末標點斷句，一條放不下就依逗號與詞邊界再切，依文字系統給行寬上限（中文 16 個全角字、西文 42 字元），最後依閱讀速度補最短停留時間、條間留出間隙，並保證時間不倒退不重疊。模型有三個檔位，第一次用要下載，之後瀏覽器會快取。辨識在本機跑，音訊不上傳伺服器。中文的辨識結果常是繁體，匯出時可以一鍵轉簡體。",
+    who: "要給自己拍的影片配字幕的創作者、要把 Podcast 和線上課程轉成文字的團隊，以及拿到一份沒有字幕的素材、只想要個能改的初稿的人。",
+    siteName: "隨心字幕 AI", jsonldName: "隨心字幕 AI", jsonldAlt: "Audio to Subtitle Generator"
+  },
+  'en': {
+    title: "Audio to Subtitles — turn speech into SRT in your browser | AI-SRTSub",
+    desc: "Drop in an audio or video file and the recogniser runs in your browser: sentences are cut at punctuation, long ones are re-cut at word edges, every line stays within width, and on-screen time is topped up to the reading speed. Exports SRT / VTT. 100 audio languages, nothing uploaded, free and no sign-up.",
+    kw: "audio to srt,speech to subtitle,generate subtitles from audio,automatic subtitle generator,transcribe audio to srt,whisper subtitles,browser speech recognition,offline subtitle generation",
+    intro: "Drop in an audio or video file, pick a language and a model, and the recognition runs in your browser. What comes out is a subtitle draft with timing, already cut at sentences and already within line width.",
+    feat: "A speech recogniser returns a stream of words with real start and end times — it has no idea what a subtitle cue is. Full stops do not break anything, and long sentences do not wrap themselves. This tool adds that layer: sentences are cut at the punctuation the language actually uses, a cue that does not fit is re-cut at commas and word edges, line width follows the writing system (16 full-width characters for Chinese, 42 for Latin scripts), and on-screen time is topped up to the reading speed with a gap between cues and no overlap or backwards jump. Three model sizes are available; the model downloads on first use and is then cached by the browser. Recognition runs locally and the audio is never uploaded. Chinese output is often traditional characters — one switch converts it to simplified on export.",
+    who: "Creators captioning their own videos, teams turning podcasts and courses into text, and anyone handed footage with no subtitles who just wants a draft they can edit.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Audio to Subtitle Generator"
+  }
+};
+
+/* v0.9.356：第二十个页面 —— 画面硬字幕提取（/ocrsub.html）
+   ⚠️ 与 videosub 的分工必须写清楚：videosub 抽的是**内封字幕轨**（MKV/MP4 里的文字流），
+     这一页认的是**烧在画面上的字**（抖音、录屏、老片源）。两者混了用户会走错门。 */
+const SEO_OCRSUB = {
+  'zh-CN': {
+    title: "画面硬字幕提取 - 从视频里把烧死的字幕认出来 | 随心字幕 AI",
+    desc: "视频里的字幕烧在画面上，没有字幕轨可抽。框出字幕所在的横条，工具逐帧取画面、按亮度二值化、识别文字，把连续相同的帧合并成一条字幕，导出 SRT / VTT。视频不上传，免费免注册。",
+    kw: "硬字幕提取,视频字幕提取,画面字幕识别,视频转字幕,ocr 字幕,extract hardcoded subtitles,burn-in subtitle ocr,video subtitle ocr,subtitle from video",
+    intro: "把视频丢进来，框出字幕所在的那一条，工具逐帧认字，再把连续相同的帧合并成一条带时间码的字幕。",
+    feat: "烧死在画面上的字幕没有轨道可抽，只能看画面。字幕有三个可以利用的特点：它是画面里最亮的一批像素，位置固定在下方一条带子里，一句台词会停留一到三秒。所以先把这条带子裁出来、按亮度二值化，背景的花花绿绿就全没了，识别器只需要认形状；同一段文字出现在连续几帧里，合并成一条字幕，时间取第一帧到最后一帧。裁得越准、阈值调得越对，认错的字越少。得到的是一份初稿：形近字、漏笔画、把标点认成字这类错误一定会有，接着用清洗和质检过一遍比一条条手改快。",
+    who: "要搬运外语短视频的字幕组、要把老片源重新做字幕的人，以及手上只有成片、拿不到原始字幕文件的剪辑。",
+    siteName: "随心字幕 AI", jsonldName: "随心字幕 AI", jsonldAlt: "Hardcoded Subtitle OCR"
+  },
+  'zh-TW': {
+    title: "畫面硬字幕提取 - 從影片裡把燒死的字幕認出來 | 隨心字幕 AI",
+    desc: "影片裡的字幕燒在畫面上，沒有字幕軌可抽。框出字幕所在的那一條，工具逐幀取畫面、依亮度二值化、辨識文字，把連續相同的幀合併成一條字幕，匯出 SRT / VTT。影片不上傳，免費免註冊。",
+    kw: "硬字幕提取,影片字幕提取,畫面字幕辨識,影片轉字幕,ocr 字幕,extract hardcoded subtitles,burn-in subtitle ocr,video subtitle ocr,subtitle from video",
+    intro: "把影片丟進來，框出字幕所在的那一條，工具逐幀認字，再把連續相同的幀合併成一條帶時間碼的字幕。",
+    feat: "燒死在畫面上的字幕沒有軌道可抽，只能看畫面。字幕有三個可以利用的特點：它是畫面裡最亮的一批像素，位置固定在下方一條帶子裡，一句台詞會停留一到三秒。所以先把這條帶子裁出來、依亮度二值化，背景的花花綠綠就全沒了，辨識器只需要認形狀；同一段文字出現在連續幾幀裡，合併成一條字幕，時間取第一幀到最後一幀。裁得越準、閾值調得越對，認錯的字越少。得到的是一份初稿：形近字、漏筆畫、把標點認成字這類錯誤一定會有，接著用清洗和質檢過一遍比一條條手改快。",
+    who: "要搬運外語短影音的字幕組、要把老片源重新做字幕的人，以及手上只有成片、拿不到原始字幕檔案的剪輯。",
+    siteName: "隨心字幕 AI", jsonldName: "隨心字幕 AI", jsonldAlt: "Hardcoded Subtitle OCR"
+  },
+  'en': {
+    title: "Hardcoded Subtitle OCR — read subtitles burned into the picture | AI-SRTSub",
+    desc: "When subtitles are baked into the frame there is no track to extract. Mark the strip where the text sits and the tool samples frames, binarises the bright glyphs, reads the characters and merges identical consecutive frames into one cue. Exports SRT / VTT. Nothing is uploaded.",
+    kw: "extract hardcoded subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles from video,video to srt,subtitle from video,hardcoded caption ocr",
+    intro: "Drop in a video, mark the strip the subtitles sit in, and the tool reads frame by frame, merging identical consecutive frames into one cue with timing.",
+    feat: "Subtitles baked into the picture have no track to pull. They do have three useful properties: they are the brightest pixels on screen, they stay in a fixed strip near the bottom, and one line stays for one to three seconds. So the strip is cropped out and binarised by brightness — the background disappears and the recogniser only has shapes to read. The same text appearing across consecutive frames becomes one cue, timed from the first frame to the last. A tighter crop and a better threshold mean fewer misread characters. What you get is a draft: lookalike characters, missing strokes and punctuation read as text will happen, and running the cleaner and the checker afterwards beats fixing cue by cue.",
+    who: "Subtitle teams localising short foreign videos, anyone re-subtitling an old release, and editors who only have the finished video and no original subtitle file.",
+    siteName: "AI-SRTSub", jsonldName: "AI-SRTSub", jsonldAlt: "Hardcoded Subtitle OCR"
+  }
+};
+
 /* v0.9.277：字幕翻译工作台（/translate.html）的 SEO 表。
    ❗为什么单独一张：v0.9.277 起首页是落地页（讲四个工具），翻译工具搬去了 /translate.html。
      两个 URL 若共用一套 title/description，搜索引擎会当成重复内容收录，所以这里另写一套。
@@ -5353,7 +5439,10 @@ const SEO_PAGES = {
   /* v0.9.321：第十七个页面 —— 字幕质检 */
   qc: { file: 'qc.html', table: SEO_QC, path: QC_PATH, jsonldType: 'WebApplication' },
   /* v0.9.352：第十八个页面 —— YouTube 字幕优化 */
-  ytfix: { file: 'ytfix.html', table: SEO_YTFIX, path: YTFIX_PATH, jsonldType: 'WebApplication' }
+  ytfix: { file: 'ytfix.html', table: SEO_YTFIX, path: YTFIX_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.356：第十九、二十个页面 —— 自动生成字幕 / 画面硬字幕提取 */
+  autosub: { file: 'autosub.html', table: SEO_AUTOSUB, path: AUTOSUB_PATH, jsonldType: 'WebApplication' },
+  ocrsub: { file: 'ocrsub.html', table: SEO_OCRSUB, path: OCRSUB_PATH, jsonldType: 'WebApplication' }
 };
 
 /* __SEO_SHARDS__ */
@@ -6958,19 +7047,38 @@ function eOffReason(cfg, lang, meta){
   if (!rec) return '';
   return rec.on === 1 ? '' : (rec.why || 'off');
 }
-/* E 调用失败（桥接挂 / cookie 掉 / 超时）：本批交给 C/B/A 兜，之后这个任务不再撞 E。
-   不标记的话，几十批会挨个白等一次 90 秒超时，一集能拖成两小时。
-   v0.9.354：顺带记一笔失败次数与最后错误 —— 只给后台看，不影响任何判断。 */
+/* E 调用失败（桥接挂 / cookie 掉 / 超时）：本批交给 C/B/A 兜。
+   v0.9.354：顺带记一笔失败次数与最后错误 —— 只给后台看，不影响任何判断。
+   v0.9.357：**软失败不再一次判死**。上游 gemini 网页单批已经要 40~66 秒，撞上 code 13
+      重试就是 105~263 秒，必然顶穿 90 秒预算。10-21 晚上 5 次 dead 里有 4 次是这种偶发超时，
+      而原来的逻辑是「一次失败 → 整集后续批次全部弃用 E」，代价太大。
+      现在：超时类（软失败）连着 2 次才判死，中间保持认领、下批继续用 E；连接拒绝 / DNS
+      这类硬失败仍是一次判死（那种不会自愈，多试一次纯浪费 90 秒）。
+   ⚠️ 只有真判死才释放 E_OWN —— 软失败期间把占用放掉，别的任务抢走后就轮到本任务 lost。
+   ⚠️ 计数在成功时清零（见下方 E_OK 更新处），所以「连续」是真的连续。 */
 function eTaskFail(taskId, err){
   const tid = String(taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
   if (!tid) return;
   eDiagRoll();
   E_DIAG.fail++;
-  E_DIAG.lastErr = String((err && err.message) || err || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 160);
+  const msg = String((err && err.message) || err || '');
+  E_DIAG.lastErr = msg.replace(/[\x00-\x1f]/g, ' ').slice(0, 160);
   E_DIAG.lastErrAt = Date.now();
   const rec = E_TASK.get(tid);
-  if (rec) { rec.on = -1; rec.why = 'dead'; rec.at = Date.now(); }
-  if (E_OWN.task === tid) { E_OWN.task = ''; E_OWN.at = 0; }
+  if (!rec) return;
+  rec.at = Date.now();
+  rec.fail = (rec.fail || 0) + 1;
+  /* 超时 / 被前端放弃 = 软失败；桥接没起来、DNS 挂了 = 硬失败 */
+  const soft = (err && err.name === 'AbortError') || /timeout|timed? ?out|abort|ETIMEDOUT|EAI_AGAIN/i.test(msg);
+  const need = soft ? 2 : 1;
+  if (rec.fail >= need) {
+    rec.on = -1; rec.why = 'dead';
+    if (E_OWN.task === tid) { E_OWN.task = ''; E_OWN.at = 0; }
+  } else {
+    /* 软失败第一次：保持 on=1 与认领，本批已由调用方回退到 C/B/A，下一批再给 E 一次机会 */
+    rec.on = 1; rec.why = '';
+    if (E_OWN.task === tid) E_OWN.at = Date.now();
+  }
 }
 /* v0.9.345：D 槽选路。老的 pickModel 一字未动 —— D 的判断全在这里，
    不命中就原样落回 C > B > A，老行为零变化。
@@ -7661,8 +7769,14 @@ const server = http.createServer(async (req, res) => {
         const out = pick.which === 'D'
           ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }), dTaskId)
           : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
-        /* v0.9.350：E 的成功时间只用于后台健康灯（cookie 掉了要能一眼看出） */
-        if (pick.which === 'E') { E_OK.at = Date.now(); E_OK.model = String(slotModelName || ''); }
+        /* v0.9.350：E 的成功时间只用于后台健康灯（cookie 掉了要能一眼看出）
+           v0.9.357：成功一次就把该任务的连续失败计数清零 —— 否则「2 次才判死」会变成
+           「历史上失败过 2 次就死」，跑一整天必然误杀。 */
+        if (pick.which === 'E') {
+          E_OK.at = Date.now(); E_OK.model = String(slotModelName || '');
+          const r0 = E_TASK.get(dTaskId);
+          if (r0) { r0.fail = 0; r0.on = 1; r0.why = ''; }
+        }
         try { if (canPace) { noteQuota(pick.which, out && out._rl); if (out) delete out._rl; } } catch (e13) {}
         try { recordTokens(ip, body.meta, out && out.usage); } catch (e) {} // v0.9.145 token 埋点：失败一律静默
         /* v0.9.183：按真实消耗修正预扣（只补正差额，实际比预估少的部分随滑窗自然滑出），
