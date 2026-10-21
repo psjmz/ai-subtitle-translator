@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/ytfix.html 与 /en/ytfix.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>YouTube 字幕优化 - 把断在半句的字幕重新对齐到句子 | 随心字幕 AI</title>
+<meta name="description" content="YouTube 自动字幕按固定 3~4 秒切条，句子被拦腰切断，上一句的尾巴挂到下一条开头。这里不改一个字，只把边界搬回句子该在的位置：时间轴沿用原字幕的真实锚点，100 种语言各有各的断句标点。全程在浏览器里跑，文件不上传。">
+<meta name="keywords" content="youtube字幕,自动字幕修复,字幕断句,字幕时间轴,字幕重切,srt断句,sentence alignment,subtitle sentence fix,youtube字幕优化">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#C4302B">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* 视觉系统沿用 v0.9.249「收敛精修」：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.352：本页认领「油管红」色线 ——
+     首页=粉、特效页=淡紫、清洗页=绿松、转换页=蓝、剥离页=青、时间轴页=靛蓝、乱码页=砖红、
+     提取页=琥珀、术语页=品红、视频字幕页=墨绿、简繁页=紫罗兰、拆分页=深橙、表格页=黄绿、
+     批量页=石板、歌词页=玫红、质检页=深绿、本页=油管红（#C4302B，比乱码页的砖红 #B42318 更亮更饱和）。
+     十七页都处理字幕文件，同色会让用户分不清自己在哪一页。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#C4302B; --acc-weak:#FDECEA; --acc-line:#F3BDBA; --acc-ink:#8E1F1C;
+    --grad:#C4302B; --acc2:#C4302B;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(196,48,43,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    padding:18px 20px;margin:14px 0;box-shadow:var(--sh-card)}
+  .card h2{font-size:14.5px;margin:0 0 12px;font-weight:650;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:11px;background:var(--card-2);
+    padding:26px 18px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc);background:var(--acc-weak)}
+  .dz-ico{width:34px;height:34px;margin:0 auto 8px;color:var(--acc)}
+  .dz-ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round}
+  .dz-t{font-size:14px;font-weight:600;margin-bottom:3px}
+  .dz-f{font-size:12px;color:var(--mut)}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .row .lb{font-size:12.5px;color:var(--sub);min-width:96px}
+  .chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:20px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub)}
+
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden;background:var(--card)}
+  .seg button{height:32px;padding:0 13px;border:0;background:transparent;color:var(--sub);
+    font-size:12.5px;cursor:pointer}
+  .seg button:hover{background:var(--card-2)}
+  .seg button.on{background:var(--acc);color:#fff;font-weight:600}
+  .seg button.on:hover{background:var(--acc)}
+
+  .th{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .thi{display:flex;align-items:center;gap:6px;border:1px solid var(--line-strong);
+    border-radius:var(--r-ctl);padding:0 9px;height:34px;background:var(--card)}
+  .thi input{width:56px;border:0;outline:0;background:transparent;font-size:13px;
+    font-variant-numeric:tabular-nums;color:var(--ink)}
+  .thi span{font-size:11.5px;color:var(--mut)}
+
+  .hint{font-size:12px;color:var(--mut);line-height:1.65;margin-top:10px}
+
+  .btn{height:36px;padding:0 18px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover{background:var(--card-2)}
+  .btn.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn)}
+  .btn.pri:hover{filter:brightness(1.06)}
+  .btn.pri:disabled,.btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
+  .btn.sm{height:30px;padding:0 12px;font-size:12px}
+
+  /* 体检对比表 */
+  .stat{width:100%;border-collapse:collapse;font-size:13px}
+  .stat th,.stat td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line)}
+  .stat th{font-size:11.5px;color:var(--mut);font-weight:600;letter-spacing:.02em}
+  .stat td:first-child{color:var(--body)}
+  .stat .num{font-variant-numeric:tabular-nums;font-weight:600}
+  .stat .good{color:var(--ok-ink)}
+  .stat .was{color:var(--mut);font-weight:400}
+
+  /* 断点分布条 */
+  .bar{display:flex;height:26px;border-radius:7px;overflow:hidden;margin-top:6px;
+    border:1px solid var(--line);background:var(--stage)}
+  .bar i{display:block;height:100%;font-style:normal;font-size:10.5px;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;
+    white-space:nowrap;overflow:hidden}
+  .bar .b1{background:var(--ok)}
+  .bar .b2{background:#C99A2E}
+  .bar .b3{background:var(--acc)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:7px;font-size:11.5px;color:var(--sub)}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+  /* 逐条对比 */
+  .cmp{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+  .cmp table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .cmp thead th{position:sticky;top:0;background:var(--card-2);z-index:2;
+    padding:8px 10px;text-align:left;font-size:11.5px;color:var(--mut);font-weight:600;
+    border-bottom:1px solid var(--line-strong)}
+  .cmp td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+  .cmp tr:last-child td{border-bottom:0}
+  .cmp .ts{font-variant-numeric:tabular-nums;color:var(--mut);font-size:11.5px;white-space:nowrap;width:78px}
+  .cmp .old{color:var(--sub);width:44%}
+  .cmp .new{color:var(--ink)}
+  .cmp .bad{background:var(--del-weak)}
+  .cmp .fixed{color:var(--ok-ink)}
+  .cmp .nl{display:block}
+  .cmp .mark{display:inline-block;width:0;border-left:2px solid var(--acc);height:12px;
+    vertical-align:-1px;margin:0 3px}
+
+  .msg{margin-top:12px;padding:9px 12px;border-radius:9px;font-size:12.5px;
+    background:var(--acc-weak);color:var(--acc-ink)}
+  .msg.err{background:var(--del-weak);color:#991B1B}
+  .msg.warn{background:var(--warn-weak);color:var(--warn)}
+  .msg.ok{background:var(--ok-weak);color:var(--ok-ink)}
+
+  footer{margin:26px 0 40px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--mut);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  footer .ver{margin-left:auto;font-variant-numeric:tabular-nums}
+
+  .seo{max-width:1080px;margin:28px auto 0;padding:18px 24px;font-size:12.5px;color:var(--sub);line-height:1.8}
+  .seo h2{font-size:14px;color:var(--ink);margin:0 0 8px}
+  .seo p{margin:0 0 8px}
+
+  textarea.paste{width:100%;min-height:120px;border:1px solid var(--line-strong);border-radius:9px;
+    padding:10px 12px;font-size:12.5px;line-height:1.6;resize:vertical;outline:0;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  textarea.paste:focus{border-color:var(--acc)}
+  select.langsel{height:34px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--ink);padding:0 8px;font-size:13px;max-width:230px}
+  .hidden{display:none !important}
+
+  /* ---------- 「问题在哪」说明卡（v0.9.352）----------
+     这一块是用户第一眼要读到的东西：先认问题，再谈工具。所以不用 hint 那种灰字，
+     用「编号列表 + 一条实色结论条」——结论条与主按钮同色，视线自然落到「开始优化」。 */
+  .prob-list{margin:10px 0 12px;padding:0;list-style:none;counter-reset:p}
+  .prob-list li{position:relative;padding:5px 0 5px 26px;font-size:13px;color:var(--body);
+    line-height:1.65;border-bottom:1px dashed var(--line)}
+  .prob-list li:last-child{border-bottom:0}
+  .prob-list li::before{counter-increment:p;content:counter(p);position:absolute;left:0;top:7px;
+    width:17px;height:17px;border-radius:50%;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:10.5px;font-weight:700;line-height:17px;text-align:center}
+  .prob-fix{border-left:3px solid var(--acc);background:var(--acc-weak);color:var(--acc-ink);
+    padding:9px 12px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.7;font-weight:500}
+
+  /* ---------- 本语言切分规则条（v0.9.352）----------
+     用户明确要求：不同语言的切分方式不一样，工具里要看得见。
+     所以这三个值不是写死的文案，是跟着「字幕语言」下拉实时变的（ruleFor/defaultsFor）。 */
+  .rule{margin-top:12px;border:1px solid var(--line);border-radius:10px;background:var(--card-2);
+    padding:10px 12px}
+  .rule-h{font-size:11.5px;font-weight:600;color:var(--sub);letter-spacing:.2px;margin-bottom:7px}
+  .rule-g{display:flex;gap:22px;flex-wrap:wrap}
+  .rule-i{display:flex;flex-direction:column;gap:2px;min-width:96px}
+  .rule-i span{font-size:11px;color:var(--mut)}
+  .rule-i b{font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.45}
+  /* 句末标点有的是 8 个以上（中文带 ASCII 兜底），允许换行别撑破卡片 */
+  #ruleSent{white-space:normal;word-break:break-all}
+</style>
+<script src="ui-codes.js?v=0.9.352"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <select id="langSel" aria-label="interface language"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">YouTube 字幕</span><em data-i18n="heroEm">优化</em></h1>
+    <p data-i18n="heroSub">YouTube 自动字幕按固定 3~4 秒切条，不看句子在哪结束，于是上一句的尾巴被挂到下一条开头。这里不改一个字，只把边界搬回句子该在的位置。支持 100 种语言，全程在浏览器里跑。</p>
+  </div>
+
+  <!-- 0 问题说明（v0.9.352：用户要求先讲清「下载下来的字幕到底哪里不对」） -->
+  <div class="card" id="probCard">
+    <h2><span data-i18n="pbTitle">下载下来的字幕，问题在哪</span></h2>
+    <ul class="prob-list">
+      <li data-i18n="pbL1">按 3~4 秒硬切，切点跟句子无关，一句话常被拆成两条</li>
+      <li data-i18n="pbL2">上一条的尾巴跑到下一条开头，读到一半句子就断了</li>
+      <li data-i18n="pbL3">自动字幕常常整段不带标点，句子边界只能靠语速和长度推</li>
+      <li data-i18n="pbL4">一条里塞三行、单词被切断，越小的屏幕越难看</li>
+    </ul>
+    <div class="prob-fix" data-i18n="pbFix">这里只做一件事：把边界搬回句子该在的位置，按语速补足停留时间，再按这门语言的规则重新折行。文字一个字都不动。</div>
+    <div class="hint" style="margin-top:10px" data-i18n="pbNote">不同语言的切分规则本来就不一样：中文和日文没有词间空格，泰文连词边界都不明显，印地语用 । 收句，阿拉伯语用 ؟。你选哪种语言，就按哪种语言的规矩切。</div>
+  </div>
+
+  <!-- 1 放入字幕 -->
+  <div class="card">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入字幕</span></h2>
+    <div class="dz" id="dz">
+      <div class="dz-ico"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16"/></svg></div>
+      <div class="dz-t" data-i18n="dzTxt">把字幕文件拖到这里，或点击选择文件</div>
+      <div class="dz-f">SRT · VTT · 纯文本</div>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.txt,.sbv,text/plain" class="hidden">
+    <div class="row">
+      <button class="btn sm" id="btnPaste" data-i18n="btnPaste">粘贴文字</button>
+      <button class="btn sm" id="btnSample" data-i18n="btnSample">看示例</button>
+      <button class="btn sm" id="btnClear" data-i18n="btnClear">清除</button>
+      <span class="chip mut" id="fileInfo" style="display:none"></span>
+    </div>
+    <textarea class="paste hidden" id="pasteBox" spellcheck="false" placeholder="把 SRT / VTT 内容粘在这里…"></textarea>
+    <div class="hint" id="upHint" data-i18n="upHint">只读文本，不动画面也不下视频。导出格式跟输入一致：进来是 SRT，出去还是 SRT。</div>
+  </div>
+
+  <!-- 2 语言与参数 -->
+  <div class="card">
+    <h2><span class="n">2</span><span data-i18n="langTitle">语言与断句规则</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblLang">字幕语言</span>
+      <select class="langsel" id="subLang"></select>
+      <span class="chip" id="detChip" style="display:none"></span>
+    </div>
+    <div class="hint" id="langHint" data-i18n="langHint">断句靠的是标点，而每种语言的标点不一样：中文用「。！？」，印地语用「।」，阿拉伯语用「؟」，泰文根本没有句号。换语言就换一套规则和行宽。自动识别不放心时可以自己选。</div>
+
+    <div class="row">
+      <span class="lb" data-i18n="lblMaxLine">单行字符数</span>
+      <div class="thi"><input type="number" id="maxLine" min="8" max="60" step="1"><span data-i18n="uChar">字符</span></div>
+      <span class="lb" style="min-width:0" data-i18n="lblMaxDur">最长停留</span>
+      <div class="thi"><input type="number" id="maxDur" min="1" max="12" step="0.5"><span data-i18n="uSec">秒</span></div>
+      <span class="lb" style="min-width:0" data-i18n="lblMinDur">最短停留</span>
+      <div class="thi"><input type="number" id="minDur" min="0.3" max="4" step="0.1"><span data-i18n="uSec2">秒</span></div>
+      <span class="lb" style="min-width:0" data-i18n="lblGap">条间间隙</span>
+      <div class="thi"><input type="number" id="gap" min="0" max="500" step="10"><span>ms</span></div>
+    </div>
+    <div class="hint" id="paramHint" data-i18n="paramHint">这些是上限，工具只在上限内做选择，不会为了让一条放下而改你的文字。中文默认每行 16 字（跟影视字幕规范一致），西文默认 42 字符。</div>
+
+    <!-- 本语言切分规则：跟着「字幕语言」实时变（v0.9.352） -->
+    <div class="rule">
+      <div class="rule-h" data-i18n="ruleTitle">本语言的切分规则</div>
+      <div class="rule-g">
+        <div class="rule-i"><span data-i18n="ruleSentLbl">句子终点</span><b id="ruleSent">. ? !</b></div>
+        <div class="rule-i"><span data-i18n="ruleWordsLbl">词边界</span><b id="ruleWords">按空格分词</b></div>
+        <div class="rule-i"><span data-i18n="ruleWidthLbl">默认行宽</span><b id="ruleWidth">42 字符</b></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn pri" id="btnRun" data-i18n="btnRun">开始优化</button>
+      <button class="btn" id="btnReset" data-i18n="btnReset">恢复默认</button>
+    </div>
+    <div class="msg hidden" id="msg"></div>
+  </div>
+
+  <!-- 3 结果 -->
+  <div class="card hidden" id="resCard">
+    <h2><span class="n">3</span><span data-i18n="statTitle">改了什么</span></h2>
+    <table class="stat">
+      <thead><tr>
+        <th data-i18n="statWhat">项目</th>
+        <th data-i18n="statBefore">原始</th>
+        <th data-i18n="statAfter">优化后</th>
+      </tr></thead>
+      <tbody id="statBody"></tbody>
+    </table>
+
+    <div style="margin-top:16px">
+      <div style="font-size:12.5px;color:var(--sub);font-weight:600" data-i18n="brkTitle">每条字幕的结尾落在哪</div>
+      <div class="bar" id="barBefore"></div>
+      <div class="legend">
+        <span><i class="b1"></i><span data-i18n="brkEnd">句末标点</span></span>
+        <span><i class="b2"></i><span data-i18n="brkComma">逗号</span></span>
+        <span><i class="b3"></i><span data-i18n="brkHard">句中硬切</span></span>
+      </div>
+      <div style="font-size:11.5px;color:var(--mut);margin-top:6px" id="brkBeforeLbl"></div>
+      <div class="bar" id="barAfter" style="margin-top:10px"></div>
+      <div style="font-size:11.5px;color:var(--mut);margin-top:6px" id="brkAfterLbl"></div>
+    </div>
+  </div>
+
+  <!-- 4 逐条对比 -->
+  <div class="card hidden" id="cmpCard">
+    <h2><span class="n">4</span><span data-i18n="cmpTitle">逐条对照</span></h2>
+    <div class="hint" style="margin-top:0" data-i18n="cmpHint">左边是原始字幕，右边是重切后的。橙色竖线标出原始字幕把一句话切断的位置。</div>
+    <div class="cmp" id="cmpBox"></div>
+  </div>
+
+  <!-- 5 导出 -->
+  <div class="card hidden" id="expCard">
+    <h2><span class="n">5</span><span data-i18n="expTitle">导出</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblFmtOut">导出格式</span>
+      <div class="seg" id="fmtSeg">
+        <button data-fmt="srt" class="on">SRT</button>
+        <button data-fmt="vtt">VTT</button>
+        <button data-fmt="txt">TXT</button>
+      </div>
+      <button class="btn pri" id="btnDl" data-i18n="btnDl">下载</button>
+      <button class="btn" id="btnCopy" data-i18n="btnCopy">复制</button>
+    </div>
+    <div class="hint" id="expHint" data-i18n="expHint">文件名加 .ytfix 标记，不会覆盖原文件。追加剧集、合集都能直接再跑一遍。</div>
+  </div>
+
+  <footer>
+    <span data-i18n="footNote">全程在浏览器本地完成，字幕不上传服务器</span>
+    <a href="/guides/" id="goGuide" style="color:var(--sub)" data-i18n="navGuide">看怎么用</a>
+    <span class="ver">v0.9.352</span>
+  </footer>
+</div>
+
+<script src="ytfix-i18n.js?v=0.9.352"></script>
+<script src="/i18n/tp-boot.js?v=0.9.352"></script>
+<script src="ytfix-core.js?v=0.9.352"></script>
+<script>
+(function () {
+  'use strict';
+  var C = window.YtfixCore;
+  var DICT = (window.YTFIX_I18N || {}).DICT || {};
+  var UI = (window.YTFIX_I18N || {}).LANGS || [];
+  var curLang = 'zh-CN';
+  /* 从右往左书写的语言（引擎的 listLangs() 里带 rtl 标记，这里一次性取出来） */
+  var RTL = (function () {
+    var a = [];
+    try { C.listLangs().forEach(function (l) { if (l.rtl) a.push(l.v); }); } catch (e) { }
+    return a;
+  })();
+
+  function T(k) {
+    if (PACK && PACK[k] != null) return PACK[k];
+    var d = DICT[curLang] || {};
+    if (d[k] != null) return d[k];
+    var e = DICT['en'] || {};
+    if (e[k] != null) return e[k];
+    var z = DICT['zh-CN'] || {};
+    return z[k] != null ? z[k] : k;
+  }
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------------- 界面语言 ----------------
+     与站上其余工具页同一套口径（qc.html / hanconv.html 都是这么做的）：
+       · 27 个内置语言走 ytfix-i18n.js 自带词典，零请求；
+       · 另外 73 语由 /i18n/tp-boot.js 补语言名，词条从 i18n/tp-<lang>.js 里取 page='ytfix' 那一块；
+         本页还没翻到那 73 语，TP_LOAD 返回 null，界面自然回落英文（不半中半英）。
+       · URL 上的语言优先于本地记忆：/ja/ytfix.html 打开就是日文界面。
+     ⚠️ 切换语言不能只 applyI18n()：73 语要整页跳到 /<lang>/ytfix.html 重新加载，
+        否则下拉框选了也白选。跳不跳由 TP_SWITCH 判断，它返回 true 表示已经跳了。 */
+  var PACK = null;   /* tp 分片里本页的词条（73 语才有） */
+
+  function detectUiLang() {
+    try {
+      var ls = String((navigator.languages && navigator.languages[0]) || navigator.language || 'zh-CN').toLowerCase();
+      if (ls.indexOf('zh') === 0) return /tw|hk|hant/.test(ls) ? 'zh-TW' : 'zh-CN';
+      for (var i = 0; i < UI.length; i++) {
+        if (ls.indexOf(String(UI[i][0]).toLowerCase()) === 0) return UI[i][0];
+      }
+    } catch (e) { }
+    return 'zh-CN';
+  }
+  function pathUiLang() {
+    try {
+      var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:ytfix\.html)?$/);
+      if (m && UI.some(function (x) { return x[0] === m[1]; })) return m[1];
+    } catch (e) { }
+    return null;
+  }
+
+  function initLang() {
+    if (window.TP_ADD_LANGS) TP_ADD_LANGS(UI);      /* 下拉补到 100 语，UI 数组原地变长 */
+    var sel = $('langSel');
+    sel.innerHTML = '';
+    UI.forEach(function (p) {
+      var o = document.createElement('option');
+      o.value = p[0]; o.textContent = p[1];
+      sel.appendChild(o);
+    });
+    var saved = null;
+    try { saved = localStorage.getItem('sitesub_lang'); } catch (e) { }
+    curLang = pathUiLang()
+      || ((saved && UI.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+    if (!DICT[curLang] && window.TP_LOAD) PACK = TP_LOAD(curLang, 'ytfix');
+    sel.value = curLang;
+    sel.addEventListener('change', function () {
+      curLang = sel.value;
+      if (window.TP_SWITCH && TP_SWITCH(curLang, 'ytfix')) return;   /* 73 语：整页跳过去 */
+      PACK = null;
+      try { localStorage.setItem('sitesub_lang', curLang); } catch (e) { }
+      applyI18n();
+    });
+  }
+
+  function applyI18n() {
+    var nodes = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < nodes.length; i++) {
+      var k = nodes[i].getAttribute('data-i18n');
+      var v = T(k);
+      if (v && v !== k) nodes[i].textContent = v;
+    }
+    document.documentElement.lang = curLang;
+    document.documentElement.dir = RTL.indexOf(curLang) >= 0 ? 'rtl' : 'ltr';
+    /* 站内链接跟着界面语言走：语言版访客点 logo 不该掉回中文首页 */
+    var pre = (curLang === 'zh-CN') ? '' : '/' + curLang;
+    var lg = $('logoHome'); if (lg) lg.setAttribute('href', pre + '/');
+    var gd = $('goGuide'); if (gd) gd.setAttribute('href', pre + '/guides/');
+    buildSubLangSelect(true);
+  }
+
+  /* ---------------- 字幕语言下拉（100 种） ---------------- */
+  var subLangSel = $('subLang');
+  function buildSubLangSelect(keep) {
+    var prev = keep ? subLangSel.value : null;
+    subLangSel.innerHTML = '';
+    var o = document.createElement('option');
+    o.value = 'auto'; o.textContent = T('autoDetect');
+    subLangSel.appendChild(o);
+    C.listLangs().forEach(function (l) {
+      var op = document.createElement('option');
+      op.value = l.v;
+      op.textContent = l.self === l.name ? l.name : (l.self + ' · ' + l.name);
+      subLangSel.appendChild(op);
+    });
+    if (prev) subLangSel.value = prev;
+  }
+
+  /* ---------------- 参数 ---------------- */
+  function setOpts(o) {
+    $('maxLine').value = o.maxLine;
+    $('maxDur').value = (o.maxDur / 1000);
+    $('minDur').value = (o.minDur / 1000);
+    $('gap').value = o.gap;
+  }
+  function readOpts() {
+    return {
+      lang: subLangSel.value,
+      maxLine: Math.max(8, Math.min(60, +$('maxLine').value || 42)),
+      maxDur: Math.max(1000, Math.min(12000, (+$('maxDur').value || 6) * 1000)),
+      minDur: Math.max(300, Math.min(4000, (+$('minDur').value || 1) * 1000)),
+      maxCps: 19,
+      gap: Math.max(0, Math.min(500, +$('gap').value || 0))
+    };
+  }
+
+  /* 换语言 → 参数跟随该语言的默认值（除非用户已经手动改过） */
+  var userTouched = false;
+  var lastDet = null;   /* 自动识别出的字幕语言；还没识别时为 null */
+
+  /* 「这一次到底按哪种语言切」——参数默认值和切分规则小表都只认这个函数。
+     auto 且还没识别时的兜底顺序：界面语言 → en。
+     为什么不直接兜 en：/ja/ytfix.html 打开时字幕语言是「自动判定」，一上来就把
+     42 字符 + ASCII 标点摆给日本用户看是错的；他手上的字幕八成是日文。 */
+  function effLang() {
+    var lv = subLangSel.value;
+    if (lv !== 'auto') return lv;
+    if (lastDet) return lastDet;
+    return curLang || 'en';
+  }
+
+  function syncDefaults() {
+    var d = C.defaultsFor(effLang());
+    setOpts(d);
+    userTouched = false;
+    renderRule();
+  }
+  ['maxLine', 'maxDur', 'minDur', 'gap'].forEach(function (id) {
+    $(id).addEventListener('input', function () { userTouched = true; });
+  });
+  subLangSel.addEventListener('change', function () {
+    if (!userTouched) syncDefaults();
+    if (subLangSel.value !== 'auto') { $('detChip').style.display = 'none'; }
+    renderRule();
+  });
+
+  /* ---------------- 本语言切分规则小表 ----------------
+     用户明确要求「不同语言的切分方式不一样，工具里要看得到」。所以这三个值
+     全部从引擎现取（rule.sent / rule.space / defaultsFor().maxLine），不写死文案：
+     换到印地语就显示 ।，换到泰文就显示「无词间空格」，换到中文行宽变 16。 */
+  function renderRule() {
+    var code = effLang();
+    var r, d;
+    try { r = C.ruleFor(code); d = C.defaultsFor(code); } catch (e) { return; }
+    if (!r) return;
+    /* 句末标点是逐字用的（「。！？…．.!?」），直接拼在一起会糊成一团，
+       所以用细空格隔开；个别语言带 8 个以上，允许换行不撑破卡片。 */
+    $('ruleSent').textContent = String(r.sent || '').split('').join('\u2009');
+    $('ruleWords').textContent = r.space ? T('ruleWordsSpaced') : T('ruleWordsUnspaced');
+    $('ruleWidth').textContent = d.maxLine + ' ' + T('uChar');
+  }
+
+  /* ---------------- 状态 ---------------- */
+  var state = { src: '', name: '', result: null, fmt: 'srt', cues: null };
+
+  function showMsg(text, kind) {
+    var m = $('msg');
+    m.className = 'msg' + (kind ? ' ' + kind : '');
+    m.textContent = text;
+    m.classList.remove('hidden');
+  }
+  function hideMsg() { $('msg').classList.add('hidden'); }
+
+  /* ---------------- 读文件 ---------------- */
+  var dz = $('dz'), fileInput = $('file');
+  dz.addEventListener('click', function () { fileInput.click(); });
+  dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', function () { dz.classList.remove('over'); });
+  dz.addEventListener('drop', function (e) {
+    e.preventDefault(); dz.classList.remove('over');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', function () {
+    if (fileInput.files && fileInput.files[0]) loadFile(fileInput.files[0]);
+  });
+
+  function loadFile(f) {
+    if (f.size > 8 * 1024 * 1024) { showMsg(T('msgTooBig'), 'err'); return; }
+    var r = new FileReader();
+    r.onload = function () {
+      var txt = String(r.result || '');
+      state.src = txt;
+      state.name = f.name || 'subtitle.srt';
+      var fi = $('fileInfo');
+      fi.style.display = '';
+      fi.textContent = state.name + ' · ' + (txt.split(/\n\s*\n/).length) + ' ' + T('uBlocks');
+      inspectOnly();
+    };
+    r.readAsText(f, 'utf-8');
+  }
+
+  $('btnPaste').addEventListener('click', function () {
+    $('pasteBox').classList.toggle('hidden');
+    if (!$('pasteBox').classList.contains('hidden')) $('pasteBox').focus();
+  });
+  $('pasteBox').addEventListener('input', function () {
+    state.src = $('pasteBox').value;
+    state.name = 'paste.srt';
+    if (/\S/.test(state.src)) inspectOnly();
+  });
+  $('btnClear').addEventListener('click', function () {
+    state.src = ''; state.name = ''; state.result = null; state.cues = null;
+    $('pasteBox').value = '';
+    $('fileInfo').style.display = 'none';
+    ['resCard', 'cmpCard', 'expCard'].forEach(function (id) { $(id).classList.add('hidden'); });
+    hideMsg();
+  });
+
+  /* 示例：一段真实的 YouTube 自动字幕切法（固定 3~4 秒一条，句子被拦腰切断）。
+     前 16 条取自 SpaceX 财报那期的 [auto] 字幕。为什么不用几条短的：条数太少
+     「句末占比」只有 4/7 → 5/7，看不出差别；16 条是 14 → 3，一眼就明白改了什么。
+     这段里还带着 $15 billion、1.77、AI、>> 说话人标记，正好覆盖按发音算时长那套。 */
+  var SAMPLE = [
+    '1',
+    '00:00:00,320 --> 00:00:04,560',
+    'Meanwhile, we\'re keeping an eye on',
+    'SpaceX. So, shares up about 2% here on',
+    '',
+    '2',
+    '00:00:04,560 --> 00:00:06,320',
+    'the back of its earnings revenue in the',
+    '',
+    '3',
+    '00:00:06,320 --> 00:00:10,480',
+    'quarter coming in at about $15 billion.',
+    'I\'m rounding up. The street was looking',
+    '',
+    '4',
+    '00:00:10,480 --> 00:00:14,040',
+    'for about $13 billion. Actual space',
+    '',
+    '5',
+    '00:00:14,040 --> 00:00:18,320',
+    'revenue itself coming in at 1.77',
+    'billion. That\'s a beat. Connectivity',
+    '',
+    '6',
+    '00:00:18,320 --> 00:00:21,000',
+    'revenue 5.25 billion dollars. That\'s a',
+    '',
+    '7',
+    '00:00:21,000 --> 00:00:24,280',
+    'beat. AI revenue 7.6 billion dollars.',
+    '',
+    '8',
+    '00:00:24,280 --> 00:00:27,600',
+    'That\'s also a beat. CapEx spending 19.6',
+    '',
+    '9',
+    '00:00:27,600 --> 00:00:31,000',
+    'billion dollars. Pretty much what the',
+    'street was looking for. Ross Gerber',
+    '',
+    '10',
+    '00:00:31,000 --> 00:00:34,920',
+    'joins us right now, co-founder,',
+    'president, and CEO of Gerber Kawasaki',
+    '',
+    '11',
+    '00:00:34,920 --> 00:00:38,440',
+    'Wealth and Investment Management. And he',
+    'owns SpaceX as well as Netflix. We\'ll',
+    '',
+    '12',
+    '00:00:38,440 --> 00:00:41,600',
+    'get to Netflix in a second, Ross, but',
+    'let\'s start with SpaceX here. I mean,',
+    '',
+    '13',
+    '00:00:41,600 --> 00:00:45,160',
+    'the numbers look, I guess, on the',
+    'surface to be pretty good. I mean, how',
+    '',
+    '14',
+    '00:00:45,160 --> 00:00:47,160',
+    'much does this actually tell us though',
+    '',
+    '15',
+    '00:00:47,160 --> 00:00:50,360',
+    'about where SpaceX goes next?',
+    '',
+    '16',
+    '00:00:50,360 --> 00:00:52,640',
+    '>> Well, I think it just confirms that it\'s',
+    ''
+  ].join('\n');
+  $('btnSample').addEventListener('click', function () {
+    state.src = SAMPLE;
+    state.name = 'sample.srt';
+    $('pasteBox').value = SAMPLE;
+    $('pasteBox').classList.remove('hidden');
+    inspectOnly();
+  });
+
+  /* ---------------- 体检（不改文本） ---------------- */
+  function inspectOnly() {
+    if (!/\S/.test(state.src)) return;
+    var lang = subLangSel.value;
+    var r;
+    try { r = C.inspect(state.src, lang); } catch (e) { showMsg(String(e.message || e), 'err'); return; }
+    if (r.error) { showMsg(T('msgNoCue'), 'err'); return; }
+    hideMsg();
+    state.cues = C.parseSrt(state.src);
+    if (!state.cues.length) state.cues = C.parseVtt(state.src);
+    state.fmt = state.cues.length ? (/^WEBVTT/i.test(state.src.trim()) ? 'vtt' : 'srt') : 'txt';
+
+    /* 自动识别结果提示 */
+    var chip = $('detChip');
+    if (lang === 'auto') {
+      var d = C.detectLang(state.cues.map(function (c) { return c.text; }).join(' '));
+      lastDet = d.lang;
+      chip.style.display = '';
+      chip.className = 'chip' + (d.confidence >= 0.5 ? '' : ' mut');
+      chip.textContent = T('detected') + ' ' + C.langLabel(d.lang)
+        + (d.confidence < 0.4 ? ' · ' + T('lowConf') : '');
+      /* auto 时参数与切分规则都跟随检测出的语言 */
+      if (!userTouched) {
+        var dd = C.defaultsFor(d.lang);
+        setOpts(dd);
+      }
+      renderRule();
+    } else {
+      chip.style.display = 'none';
+    }
+  }
+
+  /* ---------------- 主流程 ---------------- */
+  $('btnRun').addEventListener('click', function () {
+    if (!/\S/.test(state.src)) { showMsg(T('msgNoFile'), 'err'); return; }
+    var btn = $('btnRun');
+    btn.disabled = true;
+    btn.textContent = T('msgRunning');
+    setTimeout(function () {
+      try {
+        var opts = readOpts();
+        var r = C.realign(state.src, opts);
+        if (r.error === 'empty') { showMsg(T('msgNoFile'), 'err'); return; }
+        if (r.error) { showMsg(T('msgNoCue'), 'err'); return; }
+        state.result = r;
+        renderResult();
+        hideMsg();
+      } catch (e) {
+        showMsg(String(e && e.message || e), 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = T('btnRun');
+      }
+    }, 30);
+  });
+
+  $('btnReset').addEventListener('click', function () { syncDefaults(); });
+
+  /* ---------------- 渲染结果 ---------------- */
+  function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+
+  function renderResult() {
+    var r = state.result, s = r.stats, rule = r.rule;
+    var b = s.before, a = s.after;
+    var bb = s.breaksBefore, ba = s.breaksAfter;
+
+    /* --- 体检表 --- */
+    var rows = [
+      [T('statCues'), b.cues, a.cues, false],
+      [T('statEndTail'), pct(bb.sentenceEnd, bb.total) + '%', pct(ba.sentenceEnd, ba.total) + '%', 'up'],
+      [T('statCross'), countCross(state.cues, rule), countCross(r.cues, rule), 'down'],
+      [T('statHard'), pct(bb.hard, bb.total) + '%', pct(ba.hard, ba.total) + '%', 'down'],
+      [T('statMaxDur'), b.maxDur + 's', a.maxDur + 's', false],
+      [T('statOverlap'), b.overlaps, a.overlaps, 'down']
+    ];
+    var html = '';
+    rows.forEach(function (r2) {
+      var good = '';
+      if (r2[3] === 'up' && parseFloat(r2[2]) > parseFloat(r2[1])) good = ' good';
+      if (r2[3] === 'down' && parseFloat(r2[2]) < parseFloat(r2[1])) good = ' good';
+      html += '<tr><td>' + r2[0] + '</td><td class="num was">' + r2[1] +
+        '</td><td class="num' + good + '">' + r2[2] + '</td></tr>';
+    });
+    /* 文本守恒单独一行，这是最重要的一行 */
+    html += '<tr><td>' + T('statIntact') + '</td><td class="was">—</td><td class="num ' +
+      (s.textIntact ? 'good' : '') + '" style="' + (s.textIntact ? '' : 'color:var(--del)') + '">' +
+      (s.textIntact ? T('yes') : T('no')) + '</td></tr>';
+    $('statBody').innerHTML = html;
+
+    /* --- 断点分布条 --- */
+    drawBar('barBefore', bb, T('statBefore'), 'brkBeforeLbl');
+    drawBar('barAfter', ba, T('statAfter'), 'brkAfterLbl');
+
+    /* --- 逐条对照 --- */
+    renderCompare();
+
+    ['resCard', 'cmpCard', 'expCard'].forEach(function (id) { $(id).classList.remove('hidden'); });
+
+    if (!s.textIntact) {
+      showMsg(T('msgTextLost') + ' (#' + s.firstDiffAt + ')', 'warn');
+    }
+  }
+
+  function drawBar(id, st, label, lblId) {
+    var t = st.total || 1;
+    var el = $(id);
+    var h = '';
+    function seg(cls, n) {
+      var w = n / t * 100;
+      if (w <= 0) return '';
+      return '<i class="' + cls + '" style="width:' + w + '%">' + (w >= 14 ? n : '') + '</i>';
+    }
+    h += seg('b1', st.sentenceEnd) + seg('b2', st.comma) + seg('b3', st.hard);
+    el.innerHTML = h;
+    $(lblId).textContent = label + ' · ' + st.total + ' ' + T('uCues') +
+      ' — ' + T('brkEnd') + ' ' + st.sentenceEnd +
+      ' / ' + T('brkComma') + ' ' + st.comma +
+      ' / ' + T('brkHard') + ' ' + st.hard;
+  }
+
+  /* 一条字幕后半截没有句末标点、且条内还有别的句子边界 = 「跨句」 */
+  function countCross(cues, rule) {
+    var n = 0;
+    (cues || []).forEach(function (c) {
+      var s = String(c.text).replace(/\n/g, ' ');
+      for (var i = 0; i < s.length - 1; i++) {
+        if (rule.sent.indexOf(s[i]) >= 0) {
+          var rest = s.slice(i + 1).replace(/^["'\u201d\u2019)\]]*/, '').trim();
+          if (rest && (!rule.upper || /[A-Z\u00c0-\u00de]/.test(rest[0]))) { n++; return; }
+        }
+      }
+    });
+    return n;
+  }
+
+  /* 逐条对照：以「原始 cue」为行，把落在它区间里的新 cue 列在右边 */
+  function renderCompare() {
+    var r = state.result, rule = r.rule;
+    var oldCues = state.cues || [];
+    var newCues = r.cues;
+    var body = '';
+    var ni = 0;
+
+    /* 行头（表头）*/
+    body += '<thead><tr><th class="ts"></th><th class="old">' + T('statBefore') +
+      '</th><th class="new">' + T('statAfter') + '</th></tr></thead><tbody>';
+
+    for (var i = 0; i < oldCues.length; i++) {
+      var o = oldCues[i];
+      /* 收集起点落在本条区间内的新条（以及跨界的最后一条） */
+      var mine = [];
+      while (ni < newCues.length && newCues[ni].start < o.end) {
+        mine.push(newCues[ni]); ni++;
+      }
+      /* 原始文本：在句界处插竖线，标出被切断的位置 */
+      var oldHtml = markBreaks(String(o.text).replace(/\n/g, ' '), rule);
+      var newHtml = mine.length ? mine.map(function (m) {
+        return '<i class="ts" style="color:var(--mut);font-style:normal;margin-right:6px">' +
+          C.fmtTime(m.start).slice(3, 11) + '</i>' +
+          String(m.text).split('\n').map(function (l) { return '<span class="nl">' + esc(l) + '</span>'; }).join('');
+      }).join('<div style="height:4px"></div>') : '<span style="color:var(--mut)">—</span>';
+
+      var wasCross = markBreaks(String(o.text).replace(/\n/g, ' '), rule) !== esc(String(o.text).replace(/\n/g, ' '));
+      body += '<tr>' +
+        '<td class="ts">' + C.fmtTime(o.start).slice(3, 11) + '</td>' +
+        '<td class="old' + (wasCross ? ' bad' : '') + '">' + oldHtml + '</td>' +
+        '<td class="new">' + newHtml + '</td></tr>';
+    }
+    body += '</tbody>';
+    $('cmpBox').innerHTML = '<table>' + body + '</table>';
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  /* 在句末标点后插一条细竖线；同一函数也用来判断「这条是否跨句」 */
+  function markBreaks(s, rule) {
+    var out = '', marked = false;
+    for (var i = 0; i < s.length; i++) {
+      var ch = s[i];
+      if (rule.sent.indexOf(ch) >= 0) {
+        var rest = s.slice(i + 1).replace(/^["'\u201d\u2019)\]]*/, '').trim();
+        if (rest && (!rule.upper || /[A-Z\u00c0-\u00de]/.test(rest[0]))) {
+          out += esc(ch) + '<span class="mark"></span>';
+          marked = true;
+          continue;
+        }
+      }
+      out += esc(ch);
+    }
+    return marked ? out : esc(s);
+  }
+
+  /* ---------------- 导出 ---------------- */
+  var outFmt = 'srt';
+  var segs = document.querySelectorAll('#fmtSeg button');
+  for (var si = 0; si < segs.length; si++) {
+    segs[si].addEventListener('click', function () {
+      for (var k = 0; k < segs.length; k++) segs[k].classList.remove('on');
+      this.classList.add('on');
+      outFmt = this.getAttribute('data-fmt');
+    });
+  }
+
+  function outText() {
+    var r = state.result;
+    if (!r) return '';
+    if (outFmt === 'vtt') return C.formatVtt(r.cues);
+    if (outFmt === 'txt') return C.formatTxt(r.cues);
+    return C.formatSrt(r.cues);
+  }
+
+  $('btnDl').addEventListener('click', function () {
+    var txt = outText();
+    if (!txt) return;
+    var base = (state.name || 'subtitle').replace(/\.[^.]+$/, '');
+    var blob = new Blob([outFmt === 'vtt' ? txt : '\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = base + '.ytfix.' + outFmt;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  });
+
+  $('btnCopy').addEventListener('click', function () {
+    var txt = outText();
+    if (!txt) return;
+    function ok() { showMsg(T('msgCopy'), 'ok'); }
+    function bad() { showMsg(T('msgCopyFail'), 'warn'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(ok, bad);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); ok(); } catch (e) { bad(); }
+      ta.remove();
+    }
+  });
+
+  /* ---------------- 启动 ---------------- */
+  initLang();
+  applyI18n();
+  if (!userTouched) syncDefaults();
+  $('logoHome').addEventListener('click', function (e) {
+    e.preventDefault(); location.href = '/';
+  });
+})();
+</script>
+
+<!-- v0.9.352：SEO 静态正文。页面主体由 JS 渲染，这段是爬虫唯一能读到的文字；
+     server.js 按 URL 语言整段替换（SEO_YTFIX 的 intro / feat / who），
+     直接以文件方式打开时显示下面这份简体中文默认版。
+     ⚠️ 注入时服务端会把 data-i18n 属性剥掉，这段归 URL 语言管，不再被界面语言改一遍。 -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">YouTube 字幕优化 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>把 YouTube 自动生成的字幕丢进来，选好语言，工具会把跨条断开的句子拼回去，再按句子重新切条。一个字都不改，时间轴尽量落在原字幕的真实时间点上。</strong></p>
+    <p style="margin-top:8px;">YouTube 自动字幕按近似固定的 3~4 秒切条，切点跟句子无关，所以常见「上一句的尾巴 + 下一句的开头」挤在同一条里。本工具以原字幕的时间戳为锚点——那些时间本来就是语音识别给出的真实词边界——按标点判断句子在哪结束，用动态规划在句末、逗号、连词、硬切之间选代价最小的落点，再按语速把停留时间补回去。100 种语言各有一套断句规则：中文和日文没有词间空格，泰文连词边界都不明显，印地语用 ।，阿拉伯语用 ؟，亚美尼亚语用 ։。行宽上限与阅读速度按文字系统分档，中文默认每行 16 字，西文 42 字符。导出前会逐字核对文本，字少了或多了当场告警。</p>
+    <p style="margin-top:8px;">给把 YouTube、播客、网课的自动字幕整理成正式字幕的字幕组和译制团队，也给自己剪视频、被半句字幕烦到的创作者。</p>
+  </section>
+<!--SEO-COPY-END-->
+
+<script src="site-topnav.js?v=0.9.352" data-tool="yt"></script>
+</body>
+</html>
