@@ -189,7 +189,7 @@
   /* 句末标点有的是 8 个以上（中文带 ASCII 兜底），允许换行别撑破卡片 */
   #ruleSent{white-space:normal;word-break:break-all}
 </style>
-<script src="ui-codes.js?v=0.9.352"></script>
+<script src="ui-codes.js?v=0.9.353"></script>
 </head>
 <body>
 <div class="wrap">
@@ -328,13 +328,13 @@
   <footer>
     <span data-i18n="footNote">全程在浏览器本地完成，字幕不上传服务器</span>
     <a href="/guides/" id="goGuide" style="color:var(--sub)" data-i18n="navGuide">看怎么用</a>
-    <span class="ver">v0.9.352</span>
+    <span class="ver">v0.9.353</span>
   </footer>
 </div>
 
-<script src="ytfix-i18n.js?v=0.9.352"></script>
-<script src="/i18n/tp-boot.js?v=0.9.352"></script>
-<script src="ytfix-core.js?v=0.9.352"></script>
+<script src="ytfix-i18n.js?v=0.9.353"></script>
+<script src="/i18n/tp-boot.js?v=0.9.353"></script>
+<script src="ytfix-core.js?v=0.9.353"></script>
 <script>
 (function () {
   'use strict';
@@ -364,7 +364,7 @@
      与站上其余工具页同一套口径（qc.html / hanconv.html 都是这么做的）：
        · 27 个内置语言走 ytfix-i18n.js 自带词典，零请求；
        · 另外 73 语由 /i18n/tp-boot.js 补语言名，词条从 i18n/tp-<lang>.js 里取 page='ytfix' 那一块；
-         本页还没翻到那 73 语，TP_LOAD 返回 null，界面自然回落英文（不半中半英）。
+         分片缺这一块时 TP_LOAD 返回 null，界面回落英文（不半中半英）。
        · URL 上的语言优先于本地记忆：/ja/ytfix.html 打开就是日文界面。
      ⚠️ 切换语言不能只 applyI18n()：73 语要整页跳到 /<lang>/ytfix.html 重新加载，
         否则下拉框选了也白选。跳不跳由 TP_SWITCH 判断，它返回 true 表示已经跳了。 */
@@ -913,6 +913,6 @@
   </section>
 <!--SEO-COPY-END-->
 
-<script src="site-topnav.js?v=0.9.352" data-tool="yt"></script>
+<script src="site-topnav.js?v=0.9.353" data-tool="yt"></script>
 </body>
 </html>
