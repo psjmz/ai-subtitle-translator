@@ -724,8 +724,16 @@ function renderEStat(st){
   } else {
     parts.push('最近成功：还没有成功的调用');
   }
+  /* v0.9.354：失败次数与最后一条错误。E 挂了以前只能靠「很久没成功」间接猜，
+     现在能直接看到「今天试了几次、错在哪」。只显示，不参与任何自动停用。 */
+  if (st.fail) {
+    const fm = st.lastErrAt ? Math.floor((Date.now() - st.lastErrAt) / 60000) : -1;
+    parts.push('今日失败 ' + st.fail + ' 次' + (fm >= 0 ? ('（最后 ' + (fm < 1 ? '刚刚' : fm + ' 分钟前') + (st.lastErr ? ' · ' + st.lastErr : '') + '）') : ''));
+  }
   el.textContent = '状态：' + parts.join(' · ');
-  el.style.color = (st.okAt && (Date.now() - st.okAt) > 3600000) ? '#A32D2D' : '';
+  /* 最近半小时内失败过 → 直接标红；否则沿用「1 小时没成功」的老判据 */
+  const recentFail = st.fail && st.lastErrAt && (Date.now() - st.lastErrAt) < 1800000;
+  el.style.color = (recentFail || (st.okAt && (Date.now() - st.okAt) > 3600000)) ? '#A32D2D' : '';
 }
 function renderDKeys(list){
   for (let i = 0; i < 3; i++) {

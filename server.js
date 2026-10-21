@@ -6845,6 +6845,15 @@ const E_OWN  = { task: '', at: 0 };  // 当前占用者（同一时刻只有一�
 const E_LAST = { at: 0 };            // 上次发往 E 的起始时间（算批间间隔）
 const E_RPM  = [];                   // 最近 60 秒的请求时间戳
 const E_OK   = { at: 0, model: '' }; // 最近一次成功调用（后台健康灯：cookie 掉了能一眼看出）
+/* v0.9.354：E 的失败计数。原来只有「最近成功」一盏灯 —— 通道挂了后台只能看出「很久没成功」，
+   看不出「试了几次、错在哪一条」。这里纯统计，不参与任何选路判断。
+   ⚠️ 不做熔断：线上 30 小时只 dead 过 1 次、日流量 4~10 个任务，加状态机不划算（10-21 定案）。
+   按 PT 日滚动，与配额重置同步 —— 用本地日会在下午三点错位一天。 */
+const E_DIAG = { day: '', fail: 0, lastErr: '', lastErrAt: 0 };
+function eDiagRoll(){
+  const d = ptDateStr();
+  if (E_DIAG.day !== d) { E_DIAG.day = d; E_DIAG.fail = 0; }
+}
 const E_TTL  = 3 * 60 * 1000;        // 闲置多久视为任务已结束（与 D_TIER_TTL 同一取舍）
 const E_RPM_WIN = 60000;
 
@@ -6885,16 +6894,21 @@ function eClearAll(){
   E_LAST.at = 0;
   E_RPM.length = 0;
   E_OK.at = 0; E_OK.model = '';
+  /* v0.9.354：清配置就是「当它没配过」，旧失败计数留着会让新配置一上来就顶着红灯 */
+  E_DIAG.day = ''; E_DIAG.fail = 0; E_DIAG.lastErr = ''; E_DIAG.lastErrAt = 0;
 }
 /* 后台状态灯：当前占用 / 最近成功 / 本分钟已发几次（只给已鉴权的 /api/admin/config 用） */
 function eStatus(){
   const now = Date.now();
   eSweep(now);
+  eDiagRoll();
   let n = 0;
   for (let i = E_RPM.length - 1; i >= 0; i--) {
     if (now - E_RPM[i] < E_RPM_WIN) n++; else break;
   }
-  return { busy: E_OWN.task || '', okAt: E_OK.at || 0, okModel: E_OK.model || '', rpm: n, lastAt: E_LAST.at || 0 };
+  /* v0.9.354：带上失败次数与最后一条错误（后台健康灯的第二个判据） */
+  return { busy: E_OWN.task || '', okAt: E_OK.at || 0, okModel: E_OK.model || '', rpm: n, lastAt: E_LAST.at || 0,
+           fail: E_DIAG.fail || 0, lastErr: E_DIAG.lastErr || '', lastErrAt: E_DIAG.lastErrAt || 0 };
 }
 /* 每分钟窗口还有名额吗？满了返回「还要等几秒」 */
 function eRpmWait(cfg, now){
@@ -6940,10 +6954,15 @@ function eOffReason(cfg, lang, meta){
   return rec.on === 1 ? '' : (rec.why || 'off');
 }
 /* E 调用失败（桥接挂 / cookie 掉 / 超时）：本批交给 C/B/A 兜，之后这个任务不再撞 E。
-   不标记的话，几十批会挨个白等一次 90 秒超时，一集能拖成两小时。 */
-function eTaskFail(taskId){
+   不标记的话，几十批会挨个白等一次 90 秒超时，一集能拖成两小时。
+   v0.9.354：顺带记一笔失败次数与最后错误 —— 只给后台看，不影响任何判断。 */
+function eTaskFail(taskId, err){
   const tid = String(taskId || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
   if (!tid) return;
+  eDiagRoll();
+  E_DIAG.fail++;
+  E_DIAG.lastErr = String((err && err.message) || err || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 160);
+  E_DIAG.lastErrAt = Date.now();
   const rec = E_TASK.get(tid);
   if (rec) { rec.on = -1; rec.why = 'dead'; rec.at = Date.now(); }
   if (E_OWN.task === tid) { E_OWN.task = ''; E_OWN.at = 0; }
@@ -7676,7 +7695,7 @@ const server = http.createServer(async (req, res) => {
            不标记的话，后面每一批都白等一次 90 秒超时。
            ⚠️ 客户端主动断开（关标签页 / 前端放弃）不算 E 挂 —— 那种情况任务本身已经停了，
               标成 dead 会让「重新开始的任务」也拿不到 E。 */
-        if (pick.which === 'E' && !cliAc.signal.aborted) { try { eTaskFail(dTaskId); } catch (e21) {} }
+        if (pick.which === 'E' && !cliAc.signal.aborted) { try { eTaskFail(dTaskId, e); } catch (e21) {} }
         /* v0.9.183：429 的报错文案里带着上游的限额，学下来。硬编码的额度迟早会变，
            而这个数字是上游亲口报的——哪天 A 槽也开始限流了，不用改代码就能自动生效。
            v0.9.345：D 槽跳过这套 token 账本，它的额度是请求数，学来只会污染 RATE_LIMIT.D。 */
