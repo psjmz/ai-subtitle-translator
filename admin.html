@@ -1094,7 +1094,9 @@ const TL_PAGE_TXT = {
   /* v0.9.316：第十三至十六页 */
   split: '拆分拼接', table: '表格互转', batch: '批量转换', lrc: '歌词打轴',
   /* v0.9.321：第十七页 */
-  qc: '字幕质检'
+  qc: '字幕质检',
+  /* v0.9.355：第十八页 */
+  ytfix: 'YouTube 字幕修正'
 };
 const TL_ACT_TXT = {
   edit: '跑了流水线', apply: '改了一条', convert: '完成转换', extract: '完成提取',
@@ -1139,7 +1141,7 @@ async function loadToolEvents(){
       return '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) +
         '</td><td>' + esc(TL_PAGE_TXT[e.page] || e.page) + '</td><td>' + actTd +
         '</td><td>' + (e.cues || '-') + '</td><td>' + nTd + '</td><td>' + fmtTd + '</td></tr>';
-    }).join('') || '<tr><td colspan="7" style="color:var(--mut)">暂无记录（用户在十二个垂直工具页上处理字幕或下载结果后会出现在这里）</td></tr>';
+    }).join('') || '<tr><td colspan="7" style="color:var(--mut)">暂无记录（用户在垂直工具页上处理字幕或下载结果后会出现在这里）</td></tr>';
     renderPager(j, 'tlPager', tlPage);
   }
   catch (e) { /* 记录区加载失败不影响主配置页 */ }
