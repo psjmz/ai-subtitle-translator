@@ -569,6 +569,10 @@ const MERGE_TPL = {
 /* 合并页三种模式：merge=两份字幕合并；adjust=一份双语字幕拆原文/译文；
    mono=单语字幕直接加特效（v0.9.245 新增，不配对不拆分） */
 const MERGE_MODE = { merge: 'merge', adjust: 'adjust', mono: 'mono' };
+/* v0.9.363：动作三态 —— merge=合并/调整完成、export=下载成文件、copy=复制结果到剪贴板。
+   ⚠️ 以前只有 merge/export，复制完全不上报：用户复制走了结果，后台只看到一条 merge，
+      会被误判成「上传了没导出（多半卡住）」。translate 页早有 copy 事件，这里补齐。 */
+const MERGE_KIND = { merge: 'merge', export: 'export', copy: 'copy' };
 function readMEvents(){
   try {
     const j = JSON.parse(fs.readFileSync(MEVENTS_PATH, 'utf8'));
@@ -576,11 +580,11 @@ function readMEvents(){
   } catch (e) {}
   return { events: [] };
 }
-/* kind: 'merge'（合并/拆分完成）| 'export'（导出成文件）。两条都写：
-   merge 那条能看出「有人上传了却没导出」（多半是中途卡住），export 那条带格式与模板。 */
+/* kind: 'merge'（合并/拆分完成）| 'export'（导出成文件）| 'copy'（复制结果）。
+   三条都写：merge 那条能看出「有人上传了却没拿走结果」，export/copy 那条带格式与模板。 */
 function appendMEvent(ip, body){
   const b = (body && typeof body === 'object') ? body : {};
-  const kind = (b.kind === 'export') ? 'export' : 'merge';
+  const kind = pickWL(MERGE_KIND, b.kind) || 'merge';
   const src = cleanName(b.src), dst = cleanName(b.dst);
   if (!src && !dst) return;    // 连文件名都没有（异常/空请求）不记
   const ev = {
@@ -589,7 +593,8 @@ function appendMEvent(ip, body){
     cues: Math.max(0, Math.min(1000000, Math.floor(+b.cues || 0))),
     mode: pickWL(MERGE_MODE, b.mode) || 'merge'
   };
-  if (kind === 'export') {
+  /* export 与 copy 都是「用户把结果拿走了」，都带格式与模板；merge 只是算完看了一眼 */
+  if (kind !== 'merge') {
     ev.fmt = pickWL(MERGE_FMT, b.fmt);
     ev.tpl = pickWL(MERGE_TPL, b.tpl);
   }
@@ -620,6 +625,8 @@ const CEVENTS_PATH = path.join(DATA_DIR, 'clean-events.json');
 const CEVENTS_MAX = 2000;
 /* v0.9.362：补 txt —— 清洗页的「导出纯文本」也是一次真实导出，不认这个格式就会被丢掉 */
 const CLEAN_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt' };
+/* v0.9.363：clean=洗完看了一眼 / export=下载成文件 / copy=复制走结果 */
+const CLEAN_KIND = { clean: 'clean', export: 'export', copy: 'copy' };
 /* 清洗规则白名单：与 clean.html 的 OPT[].id 一一对应（13 条）。
    ⚠️ 加减规则必须同步这里，否则新规则命中了后台却记成空值——
       等于「用户在用这条规则，但站长看不见」，统计直接失真。 */
@@ -649,7 +656,7 @@ function readCEvents(){
    export 那条带最终生效的改动数、删除数与导出格式。 */
 function appendCEvent(ip, body){
   const b = (body && typeof body === 'object') ? body : {};
-  const kind = (b.kind === 'export') ? 'export' : 'clean';
+  const kind = pickWL(CLEAN_KIND, b.kind) || 'clean';
   const src = cleanName(b.src);
   const cues = Math.max(0, Math.min(1000000, Math.floor(+b.cues || 0)));
   /* ⚠️ 粘贴进来的字幕没有文件名。此时不能按「没有文件名就丢弃」处理——
@@ -663,7 +670,7 @@ function appendCEvent(ip, body){
     mod: num(b.mod), del: num(b.del),
     rules: cleanRulesOf(b.rules)
   };
-  if (kind === 'export') ev.fmt = pickWL(CLEAN_FMT, b.fmt);
+  if (kind !== 'clean') ev.fmt = pickWL(CLEAN_FMT, b.fmt);
   try {
     const db = readCEvents();
     db.events.push(ev);
@@ -8227,7 +8234,8 @@ const server = http.createServer(async (req, res) => {
             count: todays.length,
             ips: new Set(todays.map(e => e.ip)).size,
             merged: todays.filter(e => e.kind === 'merge').length,
-            exported: todays.filter(e => e.kind === 'export').length
+            exported: todays.filter(e => e.kind === 'export').length,
+            copied: todays.filter(e => e.kind === 'copy').length
           },
           topFiles: [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n })),
           topFmts: countTop(exp.filter(e => e.fmt), 'fmt'),
@@ -8266,7 +8274,8 @@ const server = http.createServer(async (req, res) => {
             count: todays.length,
             ips: new Set(todays.map(e => e.ip)).size,
             cleaned: todays.filter(e => e.kind === 'clean').length,
-            exported: todays.filter(e => e.kind === 'export').length
+            exported: todays.filter(e => e.kind === 'export').length,
+            copied: todays.filter(e => e.kind === 'copy').length
           },
           topFiles: countTop(all.filter(e => e.src), 'src'),
           topRules: [...rm.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n })),

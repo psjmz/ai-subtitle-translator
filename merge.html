@@ -660,7 +660,7 @@ textarea.paste-box{margin-top:8px;min-height:96px}
     background:var(--card-2,#FAFAFC);color:var(--ink,#1F2430)}
   .fx-ask .btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
 </style>
-<script src="ui-codes.js?v=0.9.362"></script>
+<script src="ui-codes.js?v=0.9.363"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -668,7 +668,7 @@ crossorigin="anonymous"></script>
 <div class="wrap">
   <nav class="lnav">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
-    <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.362</span></a>
+    <a class="logo" id="logoHome" href="/"><span class="logo-mark">字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.363</span></a>
     <div class="spacer"></div>
     <span id="topNav"></span>
     <select id="uiLang" aria-label="UI language"></select>
@@ -1206,7 +1206,7 @@ crossorigin="anonymous"></script>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="merge-core.js?v=0.9.362"></script>
+<script src="merge-core.js?v=0.9.363"></script>
 <script>
 'use strict';
 /* merge-core.js 在浏览器端暴露为 window.MergeCore（双语合并工具的独立引擎，
@@ -14535,11 +14535,13 @@ function expTplKey(){
    ⚠️ 客户端去重的必要性：改「结构」下拉会自动重跑 doAdjust（v0.9.222），
       不去重的话用户每切一次就多一条记录，后台立刻被刷屏。
       窗口按 kind 分开：merge 30 分钟（同一批文件反复调算一次），export 60 秒（防连点）。 */
-const MG_DEDUP_MS = { merge: 30 * 60 * 1000, export: 60 * 1000 };
-let _mgLast = { key: '', t: 0 };
+/* v0.9.363：动作三态 —— merge=算完（合并/调整/单语）、export=下载成文件、copy=复制结果。
+   以前复制不上报：用户复制走了结果，后台只看到一条 merge，会被当成「上传了没导出（卡住了）」。 */
+const MG_DEDUP_MS = { merge: 30 * 60 * 1000, export: 60 * 1000, copy: 60 * 1000 };
+let _mgLast = { body: '', t: 0 };
 function reportMerge(kind){
   try{
-    const k = (kind === 'export') ? 'export' : 'merge';
+    const k = (kind === 'export' || kind === 'copy') ? kind : 'merge';
     /* ⚠️ 「调整双语」只有一个输入文件（放 src 侧），dst 侧在界面上整个隐藏。
        而 syncMode() 切模式时并不清 S.dstName —— 直接报上去会把上一次合并残留的译文文件名
        当成这次的输入，后台看到的「上传字幕」就是错的（两个文件名，其实只传了一个）。 */
@@ -14550,8 +14552,8 @@ function reportMerge(kind){
       src: S.srcName || '', dst: (adj || mono) ? '' : (S.dstName || ''),
       cues: (S.rows && S.rows.length) || 0,
       mode: mono ? 'mono' : (adj ? 'adjust' : 'merge'),
-      fmt: k === 'export' ? expExt() : '',
-      tpl: k === 'export' ? expTplKey() : ''
+      fmt: k === 'merge' ? '' : expExt(),
+      tpl: k === 'merge' ? '' : expTplKey()
     });
     const now = Date.now();
     if (body === _mgLast.body && now - _mgLast.t < (MG_DEDUP_MS[k] || 0)) return;
@@ -14581,9 +14583,9 @@ function doCopy(){
   if (!S.rows){ toast(t('needMerge')); return; }
   const text = buildExport();
   (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
-    .then(()=>toast(t('copied')))
+    .then(()=>{ toast(t('copied')); reportMerge('copy'); })
     .catch(()=>{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
-      ta.select(); try{ document.execCommand('copy'); toast(t('copied')); }catch(e){} ta.remove(); });
+      ta.select(); try{ document.execCommand('copy'); toast(t('copied')); reportMerge('copy'); }catch(e){} ta.remove(); });
 }
 
 /* ================= v0.9.245：样式槽 / 筛选器 的事件绑定 =================
@@ -15285,7 +15287,7 @@ init();
   toast(t('fxImported', mode==='mono' ? t('modeMono') : t('modeAdjust')));
 })();
 </script>
-<script src="site-topnav.js?v=0.9.362" data-tool="fx"></script>
+<script src="site-topnav.js?v=0.9.363" data-tool="fx"></script>
 
 <!-- v0.9.272：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
      server.js 按语言路由替换成对应语言，直接开文件时显示下面的简体中文默认版） -->
