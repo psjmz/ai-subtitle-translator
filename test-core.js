@@ -5568,7 +5568,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0.9.360/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0.9.361/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5609,9 +5609,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.360</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.360</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0.9.360/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.361</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.361</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0.9.361/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5805,8 +5805,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, 27, k + ' 应有 27 种语言，实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.360</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0.9.360/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.361</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0.9.361/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7668,11 +7668,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.360/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0.9.360/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.360/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.360/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0.9.360/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.361/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0.9.361/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.361/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.361/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0.9.361/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -9179,14 +9179,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.360/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0.9.360/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.361/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0.9.361/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.360/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.360/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0.9.360/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.361/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.361/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0.9.361/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0.9.360/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0.9.361/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9691,13 +9691,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.360/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.360/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0.9.360/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.360/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0.9.360/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.361/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.361/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0.9.361/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.361/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0.9.361/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0.9.360/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0.9.361/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9719,7 +9719,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0.9.360">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0.9.361">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9730,7 +9730,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.360') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.361') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -10448,7 +10448,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/<script[^>]+site-nav\.js/.test(h), '转换页不许引入 site-nav.js（那是另外三页共用的导航）');
     assert.ok(!/<script[^>]+site-i18n\.js/.test(h), '转换页不许引入 site-i18n.js（那是另外三页共用的词典）');
     assert.ok(/convert-i18n\.js/.test(h), '转换页应加载自己的词典');
-    assert.ok(/convert-core\.js\?v=0.9.360/.test(h), '转换页引擎没带版本号');
+    assert.ok(/convert-core\.js\?v=0.9.361/.test(h), '转换页引擎没带版本号');
     assert.strictEqual((h.match(/<h1/g) || []).length, 1, '转换页只应有一个 h1');
     assert.ok(/<!--SEO-HEAD-START-->/.test(h) && /<!--SEO-COPY-START-->/.test(h),
       '缺 SEO 占位块，服务端按语言注入会失效');
@@ -12019,14 +12019,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.296：版号升到 296，缓存 bust 跟着走', () => {
     const h = readT('repair.html');
-    assert.ok(/repair-i18n\.js\?v=0.9.360/.test(h), 'repair-i18n.js 没带 296 版本号');
-    assert.ok(/repair-core\.js\?v=0.9.360/.test(h), 'repair-core.js 没带 296 版本号');
+    assert.ok(/repair-i18n\.js\?v=0.9.361/.test(h), 'repair-i18n.js 没带 296 版本号');
+    assert.ok(/repair-core\.js\?v=0.9.361/.test(h), 'repair-core.js 没带 296 版本号');
     /* 老页的版本号这轮统一抬一次，否则改过 SEO 的老页在 CDN 上还是旧的 */
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('index.html')), 'index.html 顶栏版号没升');
-    assert.ok(/ver-tag">v0\.9\.360/.test(readT('translate.html')), 'translate.html 页脚版号没升');
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('merge.html')), 'merge.html 顶栏版号没升');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('index.html')), 'index.html 顶栏版号没升');
+    assert.ok(/ver-tag">v0\.9\.361/.test(readT('translate.html')), 'translate.html 页脚版号没升');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('merge.html')), 'merge.html 顶栏版号没升');
     ['clean.html', 'convert.html', 'bilingual.html', 'shift.html'].forEach(f => {
-      assert.ok(/\?v=0.9.360/.test(readT(f)), f + ' 的脚本没带 296 版本号');
+      assert.ok(/\?v=0.9.361/.test(readT(f)), f + ' 的脚本没带 296 版本号');
     });
   });
 
@@ -12340,7 +12340,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/EXTRACT_I18N/.test(ep) && /ExtractCore/.test(ep), 'extract.html 没用自己的全局出口');
     assert.ok(!/ShiftCore|ConvertCore|BilingualCore|RepairCore/.test(ec), 'extract-core.js 依赖了别的引擎');
     /* 三件套脚本带 ?v= 缓存参数并升到 299 */
-    assert.ok(/extract-core\.js\?v=0.9.360/.test(ep) && /extract-i18n\.js\?v=0.9.360/.test(ep),
+    assert.ok(/extract-core\.js\?v=0.9.361/.test(ep) && /extract-i18n\.js\?v=0.9.361/.test(ep),
       '三件套的 ?v= 缓存参数没带上或没升到 299');
     /* 老页面不许被塞进新页链接 —— 首页卡片 v0.9.300 起是正门，index 不在名单里 */
     ['translate.html', 'merge.html', 'clean.html', 'convert.html',
@@ -12873,14 +12873,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.302：版号升到 302，三件套缓存 bust 跟着走', () => {
     const h = readT('glossary.html');
-    assert.ok(/glossary-i18n\.js\?v=0.9.360/.test(h), 'glossary-i18n.js 没带 302 版本号');
-    assert.ok(/glossary-core\.js\?v=0.9.360/.test(h), 'glossary-core.js 没带 302 版本号');
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('index.html')), 'index.html 顶栏版号没升');
-    assert.ok(/ver-tag">v0\.9\.360/.test(readT('translate.html')), 'translate.html 页脚版号没升');
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('merge.html')), 'merge.html 顶栏版号没升');
+    assert.ok(/glossary-i18n\.js\?v=0.9.361/.test(h), 'glossary-i18n.js 没带 302 版本号');
+    assert.ok(/glossary-core\.js\?v=0.9.361/.test(h), 'glossary-core.js 没带 302 版本号');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('index.html')), 'index.html 顶栏版号没升');
+    assert.ok(/ver-tag">v0\.9\.361/.test(readT('translate.html')), 'translate.html 页脚版号没升');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('merge.html')), 'merge.html 顶栏版号没升');
     ['clean.html', 'convert.html', 'bilingual.html', 'shift.html', 'repair.html', 'extract.html']
       .forEach(f => {
-        assert.ok(/\?v=0.9.360/.test(readT(f)), f + ' 的脚本没带 302 版本号');
+        assert.ok(/\?v=0.9.361/.test(readT(f)), f + ' 的脚本没带 302 版本号');
       });
   });
 
@@ -13323,24 +13323,24 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.306：版号升到 306，shift 的两个缓存键跟着走', () => {
     const SH = readT('shift.html');
-    assert.ok(/shift-core\.js\?v=0.9.360/.test(SH),
+    assert.ok(/shift-core\.js\?v=0.9.361/.test(SH),
       'shift.html 的引擎缓存键没升（改了引擎不发版 = 老访客吃旧引擎）');
-    assert.ok(/shift-i18n\.js\?v=0.9.360/.test(SH),
+    assert.ok(/shift-i18n\.js\?v=0.9.361/.test(SH),
       'shift.html 的词典缓存键没升（改了词条不发版 = 老访客看键名）');
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('index.html')), '首页版号没升');
-    assert.ok(/ver-tag">v0\.9\.360/.test(readT('translate.html')), '工作台版号没升');
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('merge.html')), 'merge.html 版号没升');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('index.html')), '首页版号没升');
+    assert.ok(/ver-tag">v0\.9\.361/.test(readT('translate.html')), '工作台版号没升');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('merge.html')), 'merge.html 版号没升');
   });
 
   t('v0.9.304：版号升到 304，shift 的两个缓存键跟着走', () => {
     const SH = readT('shift.html');
-    assert.ok(/shift-core\.js\?v=0.9.360/.test(SH),
+    assert.ok(/shift-core\.js\?v=0.9.361/.test(SH),
       'shift.html 的引擎缓存键没升（改了引擎不发版 = 老访客吃旧引擎）');
-    assert.ok(/shift-i18n\.js\?v=0.9.360/.test(SH),
+    assert.ok(/shift-i18n\.js\?v=0.9.361/.test(SH),
       'shift.html 的词典缓存键没升（改了词条不发版 = 老访客看键名）');
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('index.html')), '首页版号没升');
-    assert.ok(/ver-tag">v0\.9\.360/.test(readT('translate.html')), '工作台版号没升');
-    assert.ok(/class="ver">v0\.9\.360/.test(readT('merge.html')), 'merge.html 版号没升');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('index.html')), '首页版号没升');
+    assert.ok(/ver-tag">v0\.9\.361/.test(readT('translate.html')), '工作台版号没升');
+    assert.ok(/class="ver">v0\.9\.361/.test(readT('merge.html')), 'merge.html 版号没升');
   });
 
   /* ---------------- v0.9.308：六个垂直工具页的埋点 + 后台分 tab ----------------
@@ -13470,14 +13470,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.308：版号升到 308，全站十页的缓存键跟着走', () => {
-    const V = /0\.9\.360/;
+    const V = /0\.9\.361/;
     assert.ok(V.test(readT('index.html')), '首页没升');
     ['translate', 'merge', 'clean', 'convert', 'bilingual', 'shift', 'repair', 'extract', 'glossary']
       .forEach(f => assert.ok(V.test(readT(f + '.html')), f + '.html 没升'));
     /* 六个页都改了（加了埋点），六页的引擎缓存键必须跟着走，否则老访客吃旧页 */
     ['convert', 'bilingual', 'repair', 'extract', 'glossary'].forEach(f => {
       const h = readT(f + '.html');
-      assert.ok(new RegExp(f + '-core\\.js\\?v=0\\.9\\.360').test(h), f + ' 页的引擎缓存键没升');
+      assert.ok(new RegExp(f + '-core\\.js\\?v=0\\.9\\.361').test(h), f + ' 页的引擎缓存键没升');
     });
   });
 
@@ -14433,8 +14433,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         const h = readT(p + '.html');
         assert.ok(/function reportTool\(/.test(h), p + ' 页没有 reportTool 定义');
         /* 首发缓存键：四页的 core/i18n 引用必须带当前版号（发版即换缓存） */
-        assert.ok(new RegExp(p + '-core\\.js\\?v=0\\.9\\.360').test(h), p + ' 页的 core 缓存键不是当前版号');
-        assert.ok(new RegExp(p + '-i18n\\.js\\?v=0\\.9\\.360').test(h), p + ' 页的 i18n 缓存键不是当前版号');
+        assert.ok(new RegExp(p + '-core\\.js\\?v=0\\.9\\.361').test(h), p + ' 页的 core 缓存键不是当前版号');
+        assert.ok(new RegExp(p + '-i18n\\.js\\?v=0\\.9\\.361').test(h), p + ' 页的 i18n 缓存键不是当前版号');
         assert.ok(new RegExp("page: '" + p + "'").test(h), p + ' 页的 page 名与文件名对不上');
         assert.ok(/navigator\.sendBeacon\('\/api\/tool-event'/.test(h), p + ' 页没走 sendBeacon');
         assert.ok(/fetch\('\/api\/tool-event'/.test(h), p + ' 页没有 fetch 兜底（没有 sendBeacon 的浏览器就丢了）');
@@ -14813,10 +14813,10 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     const adm = readT('admin.html');
     /* 配置字段：keys4 是数组（1~3 个 key）；语言范围用显式开关，而不是 C 那种「空数组 = 不接管」——
        同一个空数组在 D 上意味着「配好 key 却没流量」，是最难查的一类问题。 */
-    ['provider4', 'base4', 'model4', 'models4', 'keys4', 'extraParams4', 'langModelDAll', 'langModelD', 'rpmD', 'rpdD']
+    ['provider4', 'base4', 'model4', 'models4', 'keyModels4', 'keys4', 'extraParams4', 'langModelDAll', 'langModelD', 'rpmD', 'rpdD']
       .forEach(k => assert.ok(new RegExp('\\b' + k + ':').test(sv), 'DEFAULTS 缺 ' + k));
-    assert.ok(/if \(which === 'D'\) return !!\(cfg\.base4 && dModels\(cfg\)\.length && dKeys\(cfg\)\.length\)/.test(sv),
-      'slotReady 没把 D 算进「配全」判断（v0.9.347 起按「至少一档启用的模型」判）');
+    assert.ok(/if \(which === 'D'\) return !!\(cfg\.base4 && dSlots\(cfg\)\.length\)/.test(sv),
+      'slotReady 没把 D 算进「配全」判断（v0.9.361 起按「至少一把 key 配了至少一档启用的模型」判）');
     /* 选路：pickRoute 先判 D，不命中才落回老的 pickModel —— 老路径零改动 */
     assert.ok(/function pickRoute\(cfg, lang, meta, ip\)/.test(sv), '缺 pickRoute（v0.9.351 加了 ip 参数：认领接管要用它做身份指纹）');
     const prBody = sv.slice(sv.indexOf('function pickRoute'), sv.indexOf('async function callModelD'));
@@ -14845,11 +14845,11 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/which === 'D'/.test(fcBody), 'fallbackChain 没处理 D');
     assert.ok(/out\.push\('C'\)/.test(fcBody) && /out\.push\('A'\)/.test(fcBody), 'D 的回退链没按 C→B→A 排');
     assert.ok(/fallbackChain\(cfg, pick\.which, lang\)/.test(sv), '回退调用没带 lang（D 退到 C/B 会绕过语言分流）');
-    /* 后台：三行 key + 语言范围开关 + 四个按钮 + 模型池表格 */
-    ['btnSave4', 'btnTest4', 'btnReset4', 'btnClear4', 'key4_1', 'key4_2', 'key4_3',
-     'dScopeAll', 'dScopePick', 'dModelRows', 'btnAddModel4', 'langChipsD', 'langCountD']
+    /* 后台：每把 key 一张卡（key 输入 + 备注 + 卡内模型表）+ 语言范围开关 + 四个按钮 */
+    ['btnSave4', 'btnTest4', 'btnReset4', 'btnClear4',
+     'dScopeAll', 'dScopePick', 'dKeyCards', 'langChipsD', 'langCountD']
       .forEach(id => assert.ok(adm.indexOf('id="' + id + '"') >= 0, 'admin.html 缺 #' + id));
-    assert.ok(/function renderDKeys/.test(adm), 'admin.html 缺 renderDKeys（三个 key 的状态显示）');
+    assert.ok(/function renderDKeySlots/.test(adm), 'admin.html 缺 renderDKeySlots（每把 key 一张卡）');
     /* 明文 key 绝不出服务端：GET config 只给 dKeys 掩码 */
     assert.ok(/dKeys: dKeyStatus\(cfg\)/.test(sv), 'GET config 没返回 D 的 key 状态');
     assert.ok(!/keys4: cfg\.keys4/.test(sv), 'GET config 把 keys4 明文传回前端了');
@@ -14882,7 +14882,7 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     const ts0 = sv.slice(sv.indexOf('function dTaskSlot'), sv.indexOf('function langInD'));
     assert.ok(ts0.indexOf('b.tokens >= need') < 0, '整集锁又要求「桶里备齐整集的量」了（线上实测：大任务因此全部进不了 D）');
     assert.ok(/if \(!b \|\| b\.tokens >= 1\)/.test(ts0), '整集锁没把桶当准入闸（桶空时新任务仍会被塞进 D）');
-    assert.ok(/dTierReady\(cfg, m, need, q\)/.test(ts0), '整集锁没按档判断日额度与 RPM（会分进一个已经占满的档）');
+    assert.ok(/dSlotReady\(cfg, s, need, q\)/.test(ts0), '整集锁没按 key 判断日额度与 RPM（会分进一个已经占满的 key）');
     /* 超桶次数要能被后台看见，否则「阀门被踩穿多少」只能靠猜 */
     assert.ok(/over: \(\+q\.over \|\| 0\)/.test(sv), 'dPoolStatus 没把超桶次数带回后台');
     assert.ok(/p\.over \?/.test(adm), 'admin.html 没显示超桶次数');
@@ -14897,29 +14897,33 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     const sv = readT('server.js');
     const adm = readT('admin.html');
 
-    /* 一、配置与兼容：models4 是带顺序的数组；老的单 model4 自动当一档，升级不用重填 */
+    /* 一、配置与兼容：models4 降为兼容字段；keyModels4 才是「每把 key 的模型」。
+       老配置（只有 models4）必须自动摊平成「每把 key 都挂同一份」，升级不用重填。 */
     assert.ok(/\bmodels4: \[\]/.test(sv), 'DEFAULTS 缺 models4');
+    assert.ok(/\bkeyModels4: \[\]/.test(sv), 'DEFAULTS 缺 keyModels4（每把 key 的模型配置）');
     assert.ok(/const D_MAX_MODELS = 6/.test(sv), '模型池上限没定义');
-    const mr = sv.slice(sv.indexOf('function dModelsRaw'), sv.indexOf('function dModels('));
+    const mr = sv.slice(sv.indexOf('function dNormModels'), sv.indexOf('function dSlotsRaw'));
     assert.ok(/if \(!out\.length && String\(\(cfg && cfg\.model4\) \|\| ''\)\.trim\(\)\)/.test(mr),
       'dModelsRaw 没做老配置兼容（models4 为空时应回落单 model4）');
     assert.ok(/on: m\.on !== false/.test(mr), '模型档没有「启用」开关（想临时停用某档只能删掉重建？）');
-    const dm = sv.slice(sv.indexOf('function dModels('), sv.indexOf('/* 账本单元'));
-    assert.ok(/filter\(m => m\.on\)/.test(dm), 'dModels 没过滤掉停用的档');
+    const sr = sv.slice(sv.indexOf('function dSlotsRaw'), sv.indexOf('function dSlots(cfg)'));
+    assert.ok(/else if \(!arr\.length\) \{[\s\S]{0,260}legacy\.map/.test(sr),
+      'dSlotsRaw 没做老配置摊平（老 config 的 models4 要复制到有 key 的槽，升级才不用重填）');
+    assert.ok(/if \(src && Array\.isArray\(src\.models\)\) models = dNormModels\(src\.models\)/.test(sr),
+      'dSlotsRaw 没优先读 keyModels4（后台删掉的档会自己长回来）');
 
-    /* 二、顺序：先横向换 key、再纵向降档。反过来的话，同一档还有 key 余量却换了模型，
-       等于为省一次请求把输出质量换掉 —— 模型池的核心价值就没了。 */
+    /* 二、顺序：key 优先 —— 外层是 key，内层是该 key 自己的模型。
+       用户 2026-10-22 定案：一把一把用干净，不要跨 key 轮询均摊。 */
     const cl = sv.slice(sv.indexOf('function dCellList'), sv.indexOf('function dCellDead'));
-    const iModelLoop = cl.indexOf('for (const m of ordered)');
-    const iKeyLoop = cl.indexOf('for (const k of keys)');
-    assert.ok(iModelLoop > 0 && iKeyLoop > iModelLoop, 'dCellList 不是「外层模型、内层 key」（应先把同档的 key 用完）');
-    /* ⚠️ 必须是 pi >= 0：粘性档就是第一档时 pi=0，写成 pi > 0 会让它既没被提前 push、
-       又被下面的循环（i !== pi）跳过 —— 第一档凭空消失，一集里第一批用完就直接掉第二档。
-       v0.9.347 端到端实测踩过，这里钉死。 */
-    assert.ok(/if \(pi >= 0\) ordered\.push\(ms\[pi\]\)/.test(cl),
-      'dCellList 没把整集锁记住的档位提到最前（集内会来回跳档）');
-    assert.ok(/for \(let i = 0; i < ms\.length; i\+\+\) if \(i !== pi\) ordered\.push\(ms\[i\]\)/.test(cl),
-      'dCellList 把粘性档排到前面后忘了排其余档（会丢掉后面的模型）');
+    const iKeyLoop = cl.indexOf('for (const s of dSlots(cfg))');
+    const iModelLoop = cl.indexOf('for (const m of s.models)');
+    assert.ok(iKeyLoop > 0 && iModelLoop > iKeyLoop,
+      'dCellList 不是「外层 key、内层模型」（现在应先把一把 key 的模型全用完，再动下一把）');
+    /* ⚠️ prefer 是整集锁记下的格子（'下标|模型名'），必须提到最前，否则一集里会乱跳 */
+    assert.ok(/if \(pi <= 0\) return out;/.test(cl),
+      'dCellList 没把整集锁记住的格子提到最前（集内会来回跳档）');
+    assert.ok(/const one = out\.splice\(pi, 1\)\[0\];/.test(cl) && /out\.unshift\(one\)/.test(cl),
+      'dCellList 提前锁定格子的方式不对（会丢掉那一格或打乱其余顺序）');
 
     /* 三、账本按「模型名」记，不按数组下标：后台能上移下移，用下标会让用量记到别的模型头上 */
     assert.ok(/function dCellKey\(i, model\)\{ return i \+ '\|' \+ model; \}/.test(sv),
@@ -14930,7 +14934,7 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
        会重演 v0.9.345 那个「一批吃掉两倍额度」的真 bug */
     const pk = sv.slice(sv.indexOf('function dPeek'), sv.indexOf('function dPick'));
     assert.ok(/const g = dCellSplit\(cfg, prefer\)/.test(pk), 'dPeek 没走 dCellSplit（会与 dPick 选出不同的单元）');
-    assert.ok(/return \{ ok: true, model: a\.ok\.model, i: a\.ok\.i \}/.test(pk), 'dPeek 没返回它会选中的模型（事件里的模型名只能靠它）');
+    assert.ok(/return \{ ok: true, model: a\.ok\.model, i: a\.ok\.i, key: a\.ok\.key, cell: a\.ok\.cell \}/.test(pk), 'dPeek 没返回它会选中的格子（事件里的模型名只能靠它）');
 
     /* 五、429 必须分清「日限额」和「分钟限额」：分钟限额按天退役的话，上午就会把全池判死 */
     const mk = sv.slice(sv.indexOf('function dErrKind'), sv.indexOf('function dMarkErr'));
@@ -14939,11 +14943,11 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/function dKeyDead/.test(sv), '缺 dKeyDead（无效 key 应连坐该 key 的所有模型）');
     const me = sv.slice(sv.indexOf('function dMarkErr'), sv.indexOf('/* 整集锁'));
     assert.ok(/if \(dKeyDead\(err\)\)/.test(me), 'dMarkErr 没处理「key 本身无效」');
-    assert.ok(/for \(const m of dModels\(cfg\)\)/.test(me), '无效 key 没连坐该 key 的所有模型');
+    assert.ok(/for \(const m of dSlotModelsAll\(cfg, i\)\)/.test(me), '无效 key 没连坐该 key 自己的模型（不能连坐别的 key 上的同名格）');
 
     /* 六、调用链：档位粘性、真实模型名回传、轮数按单元数算 */
     assert.ok(/async function callModelD\(cfg, messages, maxTokens, opts, task\)/.test(sv), 'callModelD 没接 task（记不住本集用的哪一档）');
-    assert.ok(/dTaskMark\(task, kp\.model\)/.test(sv), 'callModelD 成功后没记住档位');
+    assert.ok(/dTaskMark\(task, kp\.i, kp\.model\)/.test(sv), 'callModelD 成功后没记住格子');
     assert.ok(/const maxRound = Math\.max\(4, dCellList\(cfg, prefer\)\.length \+ 2\)/.test(sv),
       'callModelD 的轮数没跟着单元数走（多档时会在还有额度的情况下提前放弃）');
     assert.ok(/if \(out && typeof out === 'object'\) out\._used = kp\.model/.test(sv), 'callModelD 没把真实模型名写进 _used');
@@ -14953,22 +14957,20 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
       '主流程调 callModelD 没把 dTaskId 传进去');
     assert.ok(/function slotCfgD\(cfg, key, model\)/.test(sv), 'slotCfgD 还是单模型签名');
 
-    /* 七、后台：模型池表格 + 保存时带 models4；老的单 model4 输入框必须消失，
+    /* 七、后台：每把 key 一张卡（卡内模型表）+ 保存时带 keyModels4；老的单 model4 输入框必须消失，
        否则会出现「两个地方都能改模型名，以哪个为准」 */
-    assert.ok(/function renderDModels/.test(adm) && /function syncDModels/.test(adm), 'admin.html 缺模型池的渲染/同步函数');
-    assert.ok(/models4: models\.map\(m => \(\{ name: m\.name, rpm: m\.rpm, rpd: m\.rpd, on: m\.on !== false \}\)\)/.test(adm),
-      '后台保存没带 models4');
-    /* 旧后台页（缓存）只发 model4：必须把模型池收敛成一档，否则「保存成功但没生效」 */
+    assert.ok(/function renderDKeySlots/.test(adm) && /function syncDKeySlots/.test(adm), 'admin.html 缺 key 卡片的渲染/同步函数');
+    assert.ok(/keyModels4: slots,/.test(adm), '后台保存没带 keyModels4');
+    /* 旧后台页（缓存）只发 model4：必须把每把 key 都收敛成一档，否则「保存成功但没生效」 */
     assert.ok(/else if \(typeof body\.model4 === 'string' && body\.model4\.trim\(\)\)/.test(sv),
       '旧后台页的 model4 写入没做收敛（会变成「保存了却不生效」）');
-    assert.ok(adm.indexOf('id="model4"') < 0, '后台还留着单模型输入框 #model4（应与模型池二选一）');
-    assert.ok(/data-mv/.test(adm) && /data-mdel/.test(adm), '模型池没有上移/下移/删除按钮');
-    assert.ok(/if \(new Set\(names\)\.size !== names\.length\)/.test(adm), '后台没拦重复模型名（同名两档不会变成两份额度）');
-    /* 测试按钮要连模型一起测：key 有效但某个模型没开通，是最容易漏的一类 */
-    assert.ok(/models\.push\(\{ name: ms\[mi\]\.name/.test(sv), '测试接口没覆盖「除第一档以外的模型」');
-    assert.ok(/dModelsRaw\(cfg\),     \/\/ v0\.9\.347/.test(sv), 'GET config 没返回 models4（后台就渲染不出模型池）');
-    /* 额度面板要按档给出今日用量，否则用户不知道该不该再加一档 */
-    assert.ok(/models: ms,/.test(sv) && /dailyCap: ms\.reduce/.test(sv), 'dPoolStatus 没按档汇总用量/总容量');
+    assert.ok(adm.indexOf('id="model4"') < 0, '后台还留着单模型输入框 #model4（应与模型卡片二选一）');
+    assert.ok(/data-dmv/.test(adm) && /data-ddel/.test(adm), '模型表没有上移/下移/删除按钮');
+    assert.ok(/if \(new Set\(names\)\.size !== names\.length\)/.test(adm), '后台没拦同一把 key 内的重复模型名');
+    /* 测试按钮要按 key 测它自己的模型：Key 2 挂着和 Key 1 不同的模型时，拿 Key 1 的结果推断会误判 */
+    assert.ok(/groups\.push\(\{ i: s\.i, label: s\.label, results: rows \}\)/.test(sv), '测试接口没按 key 分组');
+    assert.ok(/models: ms,/.test(sv) && /dailyCap: keyRows\.reduce\(\(s, k\) => s \+ k\.cap, 0\)/.test(sv),
+      'dPoolStatus 没按档汇总用量/总容量');
   });
 
   t('v0.9.348：D 槽按「模型档」认领 + 任务结束主动释放', () => {
@@ -14982,27 +14984,27 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
 
     /* 二、分配：跳过被别的活跃任务认领的档；一个都认领不到 → 整集走 C/B/A，不排队（用户定案） */
     const ts = sv.slice(sv.indexOf('function dTaskSlot'), sv.indexOf('function dTaskMark'));
-    assert.ok(/const own = D_TIER_OWN\.get\(m\.name\);/.test(ts), 'dTaskSlot 没查认领表');
-    assert.ok(/if \(own && own\.task !== task\) \{/.test(ts), 'dTaskSlot 没查「这档被别的任务认领」');
-    assert.ok(/if \(!same\) continue/.test(ts), 'dTaskSlot 没跳过已被别人认领的档（接管条件不成立时必须让开）');
-    assert.ok(/D_TIER_OWN\.set\(pick, \{ task: task, at: now, fp: fp \}\)/.test(ts), '分配成功后没登记认领（也没存身份指纹）');
-    assert.ok(/slot: pick \? 'D' : 'X'/.test(ts), '一个档都认领不到时没判 X（应整集走 C/B/A，不该排队等）');
-    const tr = sv.slice(sv.indexOf('function dTierReady'), sv.indexOf('/* 此刻真正还能发几次'));
-    assert.ok(/if \(day < Math\.max\(1, need\)\) return false/.test(tr), 'dTierReady 没查「日额度够不够跑完这一集」（会跑到一半掉档）');
-    assert.ok(/if \(dRpmUsed\(k\.i, m\.name\) < m\.rpm\) return true/.test(tr), 'dTierReady 没查本分钟 RPM 空位');
-    assert.ok(/if \(\(\+st\.cool \|\| 0\) > now\) continue/.test(tr), 'dTierReady 没排除 429 冷静期内的 key');
+    assert.ok(/const own = D_TIER_OWN\.get\(cell\);/.test(ts), 'dTaskSlot 没查认领表');
+    assert.ok(/if \(own && own\.task !== task\) \{/.test(ts), 'dTaskSlot 没查「这格被别的任务认领」');
+    assert.ok(/if \(!same\) continue/.test(ts), 'dTaskSlot 没跳过已被别人认领的格子（接管条件不成立时必须让开）');
+    assert.ok(/D_TIER_OWN\.set\(picked, \{ task: task, at: now, fp: fp \}\)/.test(ts), '分配成功后没登记认领（也没存身份指纹）');
+    assert.ok(/slot: picked \? 'D' : 'X'/.test(ts), '一个格子都认领不到时没判 X（应整集走 C/B/A，不该排队等）');
+    const tr = sv.slice(sv.indexOf('function dSlotReady'), sv.indexOf('/* 后台展示：整槽视角'));
+    assert.ok(/if \(day < Math\.max\(1, need\)\) return \[\];/.test(tr), 'dSlotReady 没查「这把 key 的日额度够不够跑完这一集」（会跑到一半掉档）');
+    assert.ok(/if \(dRpmUsed\(s\.i, m\.name\) < m\.rpm\) out\.push\(m\);/.test(tr), 'dSlotReady 没查本分钟 RPM 空位');
+    assert.ok(/if \(\(\+st\.cool \|\| 0\) > now\) continue/.test(tr), 'dSlotReady 没排除 429 冷静期内的格子');
 
     /* 三、运行期锁档：锁档里还有日额度就只等、不降档（一集不能出现两个模型） */
     const cs = sv.slice(sv.indexOf('function dCellSplit'), sv.indexOf('function dScanCells'));
-    assert.ok(/c\.model === prefer \? locked : rest/.test(cs), 'dCellSplit 没按模型分组（锁档失效）');
+    assert.ok(/c\.cell === prefer \? locked : rest/.test(cs), 'dCellSplit 没按格子分组（锁档失效）');
     const pk = sv.slice(sv.indexOf('function dPeek'), sv.indexOf('function dPick'));
     assert.ok(/if \(a\.live > 0\) return \{ wait: a\.wait \|\| 30 \}/.test(pk),
       'dPeek 在锁档只是分钟限额时就降档了（应回 wait 等它恢复）');
     const dp = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dQuotaErr'));
     assert.ok(/if \(a\.live > 0\) return \{ wait: a\.wait \|\| 30 \}/.test(dp),
       'dPick 在锁档只是分钟限额时就降档了（整集会变成两个模型）');
-    assert.ok(/if \(old && old\.task === task\) \{[\s\S]{0,80}D_TIER_OWN\.delete\(hit\.model\)/.test(sv),
-      '降档后没释放旧档认领（旧档会被白占到过期）');
+    assert.ok(/if \(old && old\.task === task\) \{[\s\S]{0,80}D_TIER_OWN\.delete\(hit\.cell\)/.test(sv),
+      '降档后没释放旧格认领（旧格会被白占到过期）');
 
     /* 四、任务结束主动释放：用户定案「任务完没完咱们自己清楚」，不能只靠 3 分钟闲置 */
     assert.ok(/function dReleaseTask\(taskId\)/.test(sv), '缺 dReleaseTask（只能等闲置过期）');
@@ -15012,6 +15014,120 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/if\(S\.taskId\) fetch\('\/api\/model-done'/.test(th), '前端收尾时没释放档位');
     assert.ok(/\}finally\{[\s\S]{0,600}\/api\/model-done/.test(th),
       '释放请求没放在 finally（失败 / 用户停止时不会释放）');
+  });
+
+  t('v0.9.361：模型 D 改成 key 为第一层，模型挂在 key 下，调度按 key 从上到下', () => {
+    const sv = readT('server.js');
+    const adm = readT('admin.html');
+
+    /* 一、结构：keyModels4 固定三项、与 keys4 下标对齐；每把 key 有自己的 label/on/models。
+       为什么不是「全局模型池 × 所有 key」：Google 的免费额度按项目给，一把 key 只属于一个项目，
+       不同项目开通的模型不一定一样 —— 笛卡尔积会给没开通的模型也记一份额度，容量虚高。 */
+    assert.ok(/\bkeyModels4: \[\]/.test(sv), 'DEFAULTS 缺 keyModels4');
+    const sr = sv.slice(sv.indexOf('function dSlotsRaw'), sv.indexOf('function dSlots(cfg)'));
+    assert.ok(/for \(let i = 0; i < 3; i\+\+\)/.test(sr), 'dSlotsRaw 没固定三把 key 的槽位');
+    assert.ok(/label: String\(\(src && src\.label\) \|\| ''\)\.trim\(\)\.slice\(0, 24\)/.test(sr),
+      'key 没有备注字段（三把 key 分不清哪个是哪个项目）');
+    assert.ok(/on: src \? src\.on !== false : true/.test(sr), 'key 没有整把启停开关');
+    const sl = sv.slice(sv.indexOf('function dSlots(cfg)'), sv.indexOf('function dSlotModelsAll'));
+    assert.ok(/if \(!k \|\| !s\.on\) continue;/.test(sl), 'dSlots 没跳过「没 key / 整把停用」的槽');
+    assert.ok(/const ms = s\.models\.filter\(m => m\.on && m\.name\);/.test(sl),
+      'dSlots 没过滤停用的模型档（停用档还会被调度到）');
+
+    /* 二、容量：dRemain 逐格加总 —— 每把 key 只算它自己挂的模型。
+       原来按「档数 × key 数」算，某把 key 没开通某模型时会多算一份，判「够跑完」就虚高。 */
+    const rm = sv.slice(sv.indexOf('function dRemain'), sv.indexOf('function dSlotReady'));
+    assert.ok(/for \(const c of dCellList\(cfg, ''\)\) \{/.test(rm), 'dRemain 没按真实格子加总');
+    assert.ok(rm.indexOf('rpd * ') < 0, 'dRemain 又用了「RPD × key 数」的乘法（会把没开通的模型也算成额度）');
+
+    /* 三、分配：按 key 合计判额度，锁在该 key 第一个可用模型上。
+       按单档判会把「模型1剩 10、模型2剩 400」的 key 整把跳过，白白让给下一个项目。 */
+    const ts = sv.slice(sv.indexOf('function dTaskSlot'), sv.indexOf('function dTaskMark'));
+    assert.ok(/for \(const s of dSlots\(cfg\)\) \{/.test(ts), 'dTaskSlot 没按 key 顺序遍历');
+    assert.ok(/const ready = dSlotReady\(cfg, s, need, q\);/.test(ts), 'dTaskSlot 没按 key 判额度/RPM');
+    assert.ok(/const cell = dCellKey\(s\.i, m\.name\);/.test(ts), '认领键不是 (key下标, 模型名) —— 不同 key 上的同名模型会互相顶掉');
+    assert.ok(/if \(picked\) break;/.test(ts), '锁到一把 key 后没有停（会继续占后面的 key）');
+    assert.ok(/hit = \{ slot: picked \? 'D' : 'X', model: pick, cell: picked, i: pickI, at: now \}/.test(ts),
+      '整集锁没带上格子下标（后面续约/降档找不到原来的格）');
+
+    /* 四、换 key 只在「这把 key 用完」时发生：降档顺序必须仍是 key 内从上到下，
+       不能因为某一格的 RPM 满了就跳到下一把 key（那样一把没用完就去挤别人）。 */
+    const dp = sv.slice(sv.indexOf('function dPick'), sv.indexOf('function dQuotaErr'));
+    assert.ok(/const g = dCellSplit\(cfg, prefer\)/.test(dp), 'dPick 没走 dCellSplit（整集锁会失效）');
+    assert.ok(/if \(a\.live > 0\) return \{ wait: a\.wait \|\| 30 \}/.test(dp),
+      'dPick 在锁定格只是分钟限额时就往后走了（整集会变成两个模型）');
+
+    /* 五、保存：接收 keyModels4；老的 models4 / model4 仍要能收（缓存里的旧后台页）。
+       兼容字段 models4 跟「第一把配了模型的 key」走，老代码读它不会读到空。 */
+    assert.ok(/if \(Array\.isArray\(body\.keyModels4\)\) \{/.test(sv), '保存接口没接收 keyModels4');
+    assert.ok(/const cleanDModels = \(arr\) => \{/.test(sv), '保存接口没做模型名校验/去重（空格与引号会拼出无解的 400）');
+    assert.ok(/for \(let i = 0; i < 3; i\+\+\) \{[\s\S]{0,600}cleanDModels\(src\.models\)/.test(sv),
+      '保存时没有逐把 key 清洗模型');
+    assert.ok(/const firstSlot = \(\(\) => \{/.test(sv), '没同步兼容字段（models4 应与第一把有 key 的槽一致）');
+    assert.ok(/cfg\.model4 = firstSlot\.models\[0\]\.name;/.test(sv), '兼容字段 model4 没跟着第一把 key 走');
+
+    /* 六、清 key / key 失效：只动这把 key 自己的格子，绝不连坐别的 key 上的同名模型 */
+    assert.ok(/for \(const m of dSlotModelsAll\(cfg, i\)\) delete q\.cells\[dCellKey\(i, m\.name\)\]/.test(sv),
+      '清 key 时没按这把 key 的模型逐格清（会留下旧用量，或误清别人的同名格）');
+    assert.ok(/for \(const m of dSlotModelsAll\(cfg, i\)\) \{[\s\S]{0,120}st\.ex = Date\.now\(\)/.test(sv),
+      '无效 key 没只连坐这把 key 自己的模型');
+
+    /* 七、后台：每把 key 一张卡（key 输入 + 备注 + 状态 + 卡内模型表），保存整棵树 */
+    assert.ok(/id="dKeyCards"/.test(adm), 'admin.html 缺 #dKeyCards');
+    assert.ok(/function loadDKeySlots\(c\)/.test(adm), '缺 loadDKeySlots（把服务端的 keyModels4 + 用量拼成编辑态）');
+    assert.ok(/function renderDKeySlots\(\)/.test(adm), '缺 renderDKeySlots（每把 key 一张卡）');
+    assert.ok(/function syncDKeySlots\(\)/.test(adm), '缺 syncDKeySlots（保存前要把 DOM 读回编辑态）');
+    assert.ok(/keyModels4: slots,/.test(adm), '后台保存没提交 keyModels4');
+    assert.ok(/if \(k\.models\.length >= 6\)/.test(adm), '后台没拦「每把 key 最多 6 档」');
+    assert.ok(/是启用状态，但下面一档模型都没填/.test(adm),
+      '后台没拦「启用的 key 一档模型都没有」（会配出一把永远用不上的 key）');
+    assert.ok(/data-dadd/.test(adm) && /data-dtest/.test(adm) && /data-dclear/.test(adm),
+      'key 卡片缺增档/测试/清除按钮');
+    /* 测试结果按 key 分组显示：Key 2 挂着不同模型时，不能拿 Key 1 的结果推断 */
+    assert.ok(/Array\.isArray\(r\.groups\)/.test(adm), '后台没处理按 key 分组的测试结果');
+    assert.ok(/r\.groups\.map\(g =>/.test(adm), '后台没逐把 key 显示测试结果');
+
+    /* 八、GET config 必须把摊平后的每把 key 模型发给后台，否则老配置打开就成空表 */
+    assert.ok(/keyModels4: dSlotsRaw\(cfg\),/.test(sv), 'GET config 没返回 keyModels4');
+    assert.ok(!/keyModels4: cfg\.keyModels4/.test(sv), 'GET config 直接回了原始配置（老配置不会摊平，后台会显示空）');
+    assert.ok(!/keys4: cfg\.keys4/.test(sv), 'GET config 把 keys4 明文传回前端了');
+
+    /* 九、容量口径必须和 dRemain 完全一致：只算「有 key + 槽启用 + 这一档启用」的格子。
+       后台那行「今日 used / cap」是 cap − dailyRemain 反算的（renderDPool），
+       cap 一旦把没配 key 的位置或停用档算进去，used 会凭空变大 —— 端到端实测过：
+       3 个槽位里只有 2 把 key、其中一档停用，虚报成 1650，真实只有 700。
+       这条不属于「显示好不好看」，属于「后台给了一个假数字」。 */
+    const ps = sv.slice(sv.indexOf('function dPoolStatus'), sv.indexOf('function dKeyStatus'));
+    assert.ok(/const ready = set && s\.on && live\.length > 0;/.test(ps),
+      'dPoolStatus 没定义「这把 key 真会被调度」（有 key + 启用 + 至少一档启用）');
+    assert.ok(/cap: ready \? sum : 0, capAll: allCap/.test(ps),
+      '每把 key 的 cap 没跟 ready 走（没配 key / 停用的 key 会把自己算进日容量）');
+    assert.ok(/if \(on\) \{ used \+= \(st\.used \|\| 0\); sum \+= m\.rpd; \}/.test(ps),
+      '停用档仍在计入该 key 的用量/容量');
+    assert.ok(/keyCount: keyRows\.filter\(k => k\.ready\)\.length/.test(ps),
+      'keyCount 没按 ready 算（会报出「3 把 key」但实际只有 2 把能派活）');
+    assert.ok(/if \(on && ready\) \{\n\s*if \(!byName\[m\.name\]\)/.test(ps),
+      '每档合计把不参与调度的 key 也算进去了（sum(每档 cap) 会对不上 dailyCap）');
+    const ks = sv.slice(sv.indexOf('function dKeyStatus'), sv.indexOf('/* v0.9.348：把候选单元分成'));
+    assert.ok(/ready: !!raw && s\.on && live > 0,/.test(ks), 'dKeyStatus 没返回 ready（后台分不清「已停用」和「没挂模型」）');
+    /* 徽章的「到限」必须含 used>=rpd：新结构按 key 合计跳过，用满了也不会去撞 429 */
+    assert.ok(/if \(dCellDead\(st, m\.rpd\)\) \{ dead\+\+;/.test(ks),
+      '卡片 ex 只看 429（Key 1 用满 900/900 时后台仍显示「正常」）');
+    assert.ok(/if \(on && dCellDead\(st, m\.rpd\)\) \{ dead\+\+;/.test(ps),
+      '池面板每把 key 的 ex 只看 429（用满的 key 仍按正常计入）');
+    assert.ok(/if \(dCellDead\(st, m\.rpd\)\) byName\[m\.name\]\.ex = 1;/.test(ps),
+      '每档模型的合计 ex 只看 429');
+    assert.ok(/if \(on\) \{\n\s*live\+\+;\n\s*used \+= \(st\.used \|\| 0\);\n\s*cap \+= m\.rpd;/.test(ks),
+      '卡片合计没跟启用的档走（停用档的 RPD 仍算在分母里，三张卡加起来对不上整槽）');
+    assert.ok(/const stat = \(!k\.set \|\| !k\.ready\) \? '' :/.test(adm),
+      '后台对「没配 key / 没挂模型」的卡还在显示 0/0 用量行');
+    assert.ok(/else if \(!k\.ready\) badge = '<span class="kbadge idle">无可用模型<\/span>'/.test(adm),
+      '后台没有「无可用模型」状态（勾了启用但一档都没勾，会显示成正常）');
+    assert.ok(/ready: st\.ready !== undefined \? !!st\.ready/.test(adm),
+      '后台没兼容老服务端（滚动升级中间态会把每张卡显示成无可用模型）');
+    /* cap=0 是「没有额度」，不是「不限」—— 没配 key / 模型全停用时写成「今日不限」会让人以为还能跑 */
+    assert.ok(/cap \? \('今日 ' \+ used \+ '\/' \+ cap\) : '今日无可用额度/.test(adm),
+      '后台把「日容量 0」显示成了「今日不限」');
   });
 
   t('v0.9.351：D 分配按真实批数；同人重开直接接管认领；停止与真完成分开记', () => {

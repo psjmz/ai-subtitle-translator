@@ -62,7 +62,7 @@
   .drow{display:flex;gap:8px;align-items:center;margin-top:4px}
   .drow input{flex:1}
   .drow button{padding:6px 12px;font-size:13px;flex:0 0 auto}
-  /* v0.9.347：模型池表格（模型名 / RPM / RPD / 今日用量 / 排序删除） */
+  /* v0.9.347：模型表格（模型名 / RPM / RPD / 今日用量 / 排序删除）；v0.9.361 起每把 key 一张 */
   .mhead,.mrow{display:grid;grid-template-columns:20px minmax(0,1fr) 62px 76px 118px 66px;gap:8px;align-items:center}
   .mhead{font-size:12px;color:var(--mut);padding:0 2px}
   .mrow{margin-top:6px}
@@ -81,6 +81,47 @@
   .tabs button:hover{background:#eef1f5;color:var(--txt)}
   .tabs button[aria-selected="true"]{color:var(--pri);border-bottom-color:var(--pri);background:#fff}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  /* v0.9.361：模型 D 的 key 卡片（key 为第一层，模型表格在卡片里） */
+  .keycard{border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px;background:#fbfcfd}
+  .keycard.off{opacity:.6}
+  .khead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .kname{font-size:14px;font-weight:600;white-space:nowrap}
+  .kbadge{font-size:12px;border-radius:10px;padding:2px 8px;white-space:nowrap}
+  .kbadge.ok{background:#eaf5ee;color:var(--ok)}
+  .kbadge.bad{background:#fdecea;color:var(--err)}
+  .kbadge.idle{background:#f1f2f4;color:var(--mut)}
+  .klabel{flex:1;min-width:140px;margin:0;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);white-space:nowrap}
+  .klabel input{padding:5px 8px;font-size:13px}
+  .ktoogle{margin:0;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);white-space:nowrap}
+  .kstat{font-size:12px;color:var(--mut);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin-top:6px}
+  .kstat b{color:var(--txt)}
+  .mwrap{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  /* 窄屏（手机上看后台）：6 列固定宽度在 480px 下会溢出 20 多像素，
+     把 RPM/RPD/用量/按钮四列压窄一点就够放，桌面端不受影响 */
+  @media (max-width:560px){
+    .card{padding:14px}
+    .keycard{padding:10px}
+    .mwrap{padding:6px 8px}
+    .mhead,.mrow{grid-template-columns:18px minmax(0,1fr) 48px 62px 82px 46px;gap:6px}
+    .mhead{font-size:11px}
+    .mstat{font-size:11px}
+    .mrow input{padding:5px 6px;font-size:12px}
+    .kstat{font-size:11px}
+  }
+  /* 375/380 这一档（iPhone SE 竖屏）再压 8px 就够，别为它改桌面布局 */
+  @media (max-width:400px){
+    .mhead,.mrow{grid-template-columns:16px minmax(0,1fr) 44px 56px 74px 44px;gap:5px}
+    .mstat{font-size:10px}
+  }
+  /* 再窄就别硬塞 6 列了：手机上砍掉「今日用量」这一列（每档的用量是桌面才看的细节，
+     整把 key 的合计量仍在卡片顶部那行），否则模型名会被挤成三个字母 */
+  @media (max-width:480px){
+    .mhead > span:nth-child(5), .mrow > .mstat{display:none}
+    .mhead,.mrow{grid-template-columns:16px minmax(0,1fr) 40px 52px 62px}
+    /* 三个排序按钮挤在 62px 里：不收窄内边距就会被 flex 压成椭圆 */
+    .mops{gap:2px}
+    .mops button{padding:2px 3px;font-size:11px}
+  }
 </style>
 </head>
 <body>
@@ -211,21 +252,20 @@
       <div class="msg" id="cfg3Msg"></div>
     </div>
 
-    <!-- v0.9.345：模型 D —— Gemini 免费额度池。与 A/B/C 的最大差别是 key 有三个，
-         且额度按「请求次数」算（RPM / RPD），不是 token。 -->
+    <!-- v0.9.361：模型 D —— key 是第一层，模型挂在每把 key 下面。
+         为什么这么改：Gemini 的免费额度是「按项目」给的，一把 key 属于一个项目，
+         而不同项目开通的模型不一定一样。原来的「全局模型池 × 所有 key」做笛卡尔积，
+         会给没开通的模型也算一份额度，容量虚高，跑到一半撞 403 再降档。 -->
     <div class="card">
       <h2>模型 D（Gemini 免费额度池）</h2>
-      <div class="note" style="margin:0 0 12px">三个 key <b>顺序使用</b>：前一个到当日上限才动下一个，不是轮询。模型池按<b>从上到下的顺序</b>用：上一档的 key 全用满，才降下一档。单个 key 到「每分钟」上限只是跳过它、不退役；全池（所有档 × 所有 key）都到「每日」上限才回退到 C / B / A。<b>RPM / RPD 请照 Google AI Studio 速率限制页显示的数字填</b> —— 填大了会撞 429（能兜住，但白跑一趟），填小了会提前停用免费额度。</div>
-      <label>服务商（Base URL 自动填充，模型名在下面的模型池里填）</label>
+      <div class="note" style="margin:0 0 12px">每把 key 对应一个 Google 项目，模型挂在 key 底下。调度<b>从上到下</b>：Key 1 的模型依次用满，才动 Key 2，最后才回退 C / B / A。同一把 key 内 RPM 满只等一分钟、不退役；所有 key 的日额度都到限才跨槽。<b>RPM / RPD 照 Google AI Studio 速率限制页显示的数字填</b> —— 填大了会撞 429（能兜住，但白跑一趟），填小了会提前停用免费额度。</div>
+      <label>服务商（Base URL 自动填充，模型名在每把 key 的卡片里填）</label>
       <select id="provider4"></select>
       <label>Base URL（自动拼接 /chat/completions）</label>
       <input type="text" id="base4" spellcheck="false" placeholder="https://generativelanguage.googleapis.com/v1beta/openai">
 
-      <label style="margin-top:16px">模型池（按优先级从上到下；每档的 RPM / RPD 各自独立）</label>
-      <div class="mhead"><span></span><span>模型名</span><span>RPM</span><span>RPD</span><span>今日用量</span><span></span></div>
-      <div id="dModelRows"></div>
-      <div class="btns" style="margin-top:10px"><button type="button" id="btnAddModel4">+ 增加一档</button></div>
-      <div class="note">Google 的免费额度按「项目 × 模型」<b>各自独立</b>计算，所以每加一档就多一份免费请求额度。建议只挂 Flash / Flash-Lite 这类稳定输出 JSON 的模型；调整顺序或删除后要<b>点「保存模型 D」</b>才生效。</div>
+      <label style="margin-top:16px">Key 与模型（从上到下使用）</label>
+      <div id="dKeyCards"></div>
       <!-- v0.9.346：整槽流量闸。用户只想有一个数能拧，不想算比例 -->
       <div class="row">
         <div>
@@ -237,26 +277,8 @@
           <div class="note" id="dPoolHint" style="margin:8px 0 0">—</div>
         </div>
       </div>
-      <div class="note" style="margin:-6px 0 12px">这个数只拦<b>新任务</b>：桶里有名额才把新任务分给 D，空了就让给 C / B / A，不排队。已经分到某一档的任务<b>不受它限制</b>——只要日额度还有，桶空了也照样发（超出的次数单独计数），否则一集里会中途换模型。用不完的会攒着（最多攒 3 小时），深夜攒下的正好留给白天高峰。名额是<b>整个 D 槽共用</b>。填 0 = 关闭此闸，仍受每档的 RPD 约束。</div>
-
-      <label>Key 1（<span class="mask" id="keyMask4_1">未设置</span>）<span class="dstat" id="dStat1"></span></label>
-      <div class="drow">
-        <input type="password" id="key4_1" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
-        <button type="button" data-cleard="0">清除</button>
-      </div>
-
-      <label>Key 2（<span class="mask" id="keyMask4_2">未设置</span>）<span class="dstat" id="dStat2"></span></label>
-      <div class="drow">
-        <input type="password" id="key4_2" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
-        <button type="button" data-cleard="1">清除</button>
-      </div>
-
-      <label>Key 3（<span class="mask" id="keyMask4_3">未设置</span>）<span class="dstat" id="dStat3"></span></label>
-      <div class="drow">
-        <input type="password" id="key4_3" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
-        <button type="button" data-cleard="2">清除</button>
-      </div>
-      <div class="note">只填 1~2 个也能用。⚠️ Google 的额度按<b>项目</b>算、不按 key 算：三个 key 要分别属于三个项目才是三份额度；建在同一个项目里的多个 key 共享同一份，轮换会一起失效。</div>
+      <div class="note" style="margin:-6px 0 12px">这个数只拦<b>新任务</b>：桶里有名额才把新任务分给 D，空了就让给 C / B / A，不排队。已经分到某一格的任务<b>不受它限制</b>——只要日额度还有，桶空了也照样发（超出的次数单独计数），否则一集里会中途换模型。用不完的会攒着（最多攒 3 小时），深夜攒下的正好留给白天高峰。名额是<b>整个 D 槽共用</b>。填 0 = 关闭此闸，仍受每档的 RPD 约束。</div>
+      <div class="note">只填 1~2 把 key 也能用。⚠️ Google 的额度按<b>项目</b>算、不按 key 算：三把 key 要分别属于三个项目才是三份额度；建在同一个项目里的多把 key 共享同一份，轮换会一起失效。</div>
 
       <label style="margin-top:16px;display:flex;align-items:center;gap:8px">
         <input type="radio" name="dScope" value="all" id="dScopeAll" style="width:auto" checked>
@@ -617,46 +639,119 @@ let langSelC = new Set();
 let langSelD = new Set();
 /* v0.9.350：走模型 E 的目标语言集合（与 C/B 同语义：空 = 不接管任何语言） */
 let langSelE = new Set();
-/* v0.9.347：模型池的编辑态。顺序即优先级；used/cap 是服务端给的今日用量，
-   只用于显示，保存时不会回传（免得把显示值当成配置存进 config.json）。 */
-let dModelList = [];
+/* v0.9.361：模型 D 的编辑态。三把 key 固定三项（与 keys4 下标对齐），
+   每项 { label, on, set, mask, models:[{name,rpm,rpd,on,used,cap,ex}] }。
+   used/cap/ex 只用于显示，保存时不回传（免得把显示值当成配置写进 config.json）。 */
+let dKeySlots = [];
+function dEmptyModel(){
+  return { name: '', rpm: 12, rpd: 450, on: true, used: 0, cap: 0, ex: 0 };
+}
+function dEmptySlot(){
+  return { label: '', on: true, set: false, mask: '', used: 0, rpd: 0, ex: 0, err: '',
+    rpmUsed: 0, rpm: 15, models: [dEmptyModel()] };
+}
 function dModelStatText(m){
   const used = m.used || 0;
-  if (!m.cap) return '今日 ' + used + ' 次';
-  return '今日 ' + used + '/' + m.cap;
+  /* cap 来自服务端的账本；刚加的空行没有账本记录，退回用它自己填的 RPD，
+     否则同一行上「RPD 写着 450、用量写着 今日 0 次（没有分母）」会显得像坏了 */
+  const cap = m.cap || m.rpd || 0;
+  if (!cap) return '今日 ' + used + ' 次';
+  return '今日 ' + used + '/' + cap;
 }
-function renderDModels(){
-  const box = $('dModelRows');
-  if (!box) return;
-  if (!dModelList.length){
-    box.innerHTML = '<div class="note">还没有模型。点下面「增加一档」，第一档建议填 gemini-3-flash。</div>';
-    return;
+/* 从服务端返回的 keyModels4 + dKeys 拼出编辑态。
+   服务端已经做过老配置摊平，所以这里不用再判老新 —— 老配置会显示成「每把 key 都挂着同一份模型」，
+   这正是升级前的真实行为。 */
+function loadDKeySlots(c){
+  const raw = Array.isArray(c.keyModels4) ? c.keyModels4 : [];
+  const stats = Array.isArray(c.dKeys) ? c.dKeys : [];
+  dKeySlots = [];
+  for (let i = 0; i < 3; i++) {
+    const st = stats.find(x => x.i === i) || {};
+    const src = raw[i] || {};
+    const list = (Array.isArray(src.models) ? src.models : []).map(m => {
+      const cell = (Array.isArray(st.cells) ? st.cells : []).find(x => x.model === m.name) || {};
+      return { name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false,
+        used: cell.used || 0, cap: m.rpd || 0, ex: cell.ex || 0 };
+    });
+    dKeySlots.push({
+      label: src.label || '', on: src.on !== false,
+      set: !!st.set, mask: st.mask || '',
+      used: st.used || 0, rpd: st.rpd || 0, ex: st.ex || 0, err: st.err || '',
+      rpmUsed: st.rpmUsed || 0, rpm: st.rpm || 15,
+      /* 服务端算好的 ready（有 key + 槽启用 + 至少一档启用）；老服务端没这字段就本地推一遍，
+         别让滚动升级的中间态把每张卡都显示成「无可用模型」 */
+      ready: st.ready !== undefined ? !!st.ready
+        : (!!st.set && src.on !== false && list.some(m => m.on)),
+      models: list.length ? list : [dEmptyModel()]
+    });
   }
-  box.innerHTML = dModelList.map((m, i) =>
-    '<div class="mrow" data-i="' + i + '">' +
-      '<input type="checkbox" class="mon"' + (m.on !== false ? ' checked' : '') + ' title="启用这一档">' +
-      '<input type="text" class="mname" spellcheck="false" value="' + esc(m.name || '') + '" placeholder="gemini-3-flash">' +
-      '<input type="number" class="mrpm" min="1" max="600" step="1" value="' + (m.rpm || 15) + '" title="每分钟请求上限">' +
-      '<input type="number" class="mrpd" min="1" max="1000000" step="1" value="' + (m.rpd || 1500) + '" title="每日请求上限">' +
-      '<span class="mstat' + (m.ex ? ' bad' : '') + '">' + esc(dModelStatText(m)) + '</span>' +
-      '<span class="mops"><button type="button" data-mv="-1" title="上移（优先级更高）">↑</button>' +
-      '<button type="button" data-mv="1" title="下移">↓</button>' +
-      '<button type="button" data-mdel="1" title="删除这一档">×</button></span>' +
-    '</div>').join('');
 }
-/* DOM → dModelList。排序/删除前必须先同步，否则刚改的模型名会丢。 */
-function syncDModels(){
-  const rows = Array.prototype.slice.call(document.querySelectorAll('#dModelRows .mrow'));
-  if (!rows.length) return;
-  dModelList = rows.map((r, i) => {
-    const old = dModelList[i] || {};
-    return {
-      name: r.querySelector('.mname').value.trim(),
-      rpm: +r.querySelector('.mrpm').value || 15,
-      rpd: +r.querySelector('.mrpd').value || 1500,
-      on: r.querySelector('.mon').checked,
-      used: old.used || 0, cap: old.cap || 0, ex: old.ex || 0
-    };
+/* 每把 key 一张卡：key 输入 + 备注 + 状态 + 卡内模型表。顺序即调度顺序。 */
+function renderDKeySlots(){
+  const box = $('dKeyCards');
+  if (!box) return;
+  box.innerHTML = dKeySlots.map((k, i) => {
+    let badge = '<span class="kbadge idle">未设置</span>';
+    if (k.set) {
+      if (!k.on) badge = '<span class="kbadge idle">已停用</span>';
+      else if (!k.ready) badge = '<span class="kbadge idle">无可用模型</span>';
+      else if (k.ex) badge = '<span class="kbadge bad">今日已满</span>';
+      else badge = '<span class="kbadge ok">正常</span>';
+    }
+    const day = k.used || 0, cap = k.rpd || 0;
+    /* 没配 key / 没勾启用 / 一档都没启用 → 这行没有意义（分母是 0），干脆不显示 */
+    const stat = (!k.set || !k.ready) ? '' :
+      '<div class="kstat">今日 <b>' + day + '</b> / ' + cap + ' 次 · 本分钟 <b>' + (k.rpmUsed || 0) + '</b> / ' + (k.rpm || 15) +
+      (k.err ? ' · <span style="color:var(--err)">' + esc(String(k.err).slice(0, 48)) + '</span>' : '') + '</div>';
+    const rows = k.models.map((m, j) => {
+      const pct = m.rpd ? Math.min(100, Math.round((m.used || 0) / m.rpd * 100)) : 0;
+      const cls = pct >= 100 ? ' bad' : '';
+      return '<div class="mrow" data-i="' + i + '" data-j="' + j + '">' +
+        '<input type="checkbox" class="dmon"' + (m.on !== false ? ' checked' : '') + ' title="启用这一档">' +
+        '<input type="text" class="dmname" spellcheck="false" value="' + esc(m.name || '') + '" placeholder="gemini-3.5-flash-lite">' +
+        '<input type="number" class="dmrpm" min="1" max="600" step="1" value="' + (m.rpm || 12) + '" title="每分钟请求上限">' +
+        '<input type="number" class="dmrpd" min="1" max="1000000" step="1" value="' + (m.rpd || 450) + '" title="每日请求上限">' +
+        '<span class="mstat' + cls + '">' + esc(dModelStatText(m)) + '</span>' +
+        '<span class="mops"><button type="button" data-dmv="-1" title="上移（优先级更高）">↑</button>' +
+        '<button type="button" data-dmv="1" title="下移">↓</button>' +
+        '<button type="button" data-ddel="1" title="删除这一档">×</button></span></div>';
+    }).join('');
+    return '<div class="keycard' + (k.on ? '' : ' off') + '" data-k="' + i + '">' +
+      '<div class="khead"><span class="kname">Key ' + (i + 1) + '</span>' + badge +
+      '<label class="klabel">备注 <input type="text" class="dlabel" spellcheck="false" value="' + esc(k.label || '') + '" placeholder="如 项目 ' + ('ABC'[i] || (i + 1)) + '"></label>' +
+      '<label class="ktoogle"><input type="checkbox" class="kon"' + (k.on ? ' checked' : '') + '> 启用</label></div>' +
+      '<div class="drow"><input type="password" id="key4_' + (i + 1) + '" class="dkey" autocomplete="new-password" placeholder="' +
+        (k.set ? '已保存：' + esc(k.mask) + '（留空 = 不变）' : '粘贴 API Key') + '">' +
+        '<button type="button" class="sm" data-dtest="' + i + '">测试</button>' +
+        '<button type="button" class="sm" data-dclear="' + i + '">清除</button></div>' +
+      stat +
+      '<div class="mwrap"><div class="mhead"><span></span><span>模型名</span><span>RPM</span><span>RPD</span><span>今日用量</span><span></span></div>' + rows + '</div>' +
+      '<div class="btns" style="margin-top:8px"><button type="button" class="sm" data-dadd="' + i + '">+ 增加一档模型</button></div>' +
+      '</div>';
+  }).join('');
+}
+/* DOM → dKeySlots。保存 / 排序 / 删除前必须先同步，否则刚改的模型名会丢。 */
+function syncDKeySlots(){
+  const cards = Array.prototype.slice.call(document.querySelectorAll('#dKeyCards .keycard'));
+  if (!cards.length) return;
+  cards.forEach(card => {
+    const i = +card.dataset.k;
+    const k = dKeySlots[i];
+    if (!k) return;
+    k.label = card.querySelector('.dlabel').value.trim();
+    k.on = card.querySelector('.kon').checked;
+    const rows = Array.prototype.slice.call(card.querySelectorAll('.mrow'));
+    if (!rows.length) return;
+    k.models = rows.map((r, j) => {
+      const old = k.models[j] || dEmptyModel();
+      return {
+        name: r.querySelector('.dmname').value.trim(),
+        rpm: +r.querySelector('.dmrpm').value || 12,
+        rpd: +r.querySelector('.dmrpd').value || 450,
+        on: r.querySelector('.dmon').checked,
+        used: old.used || 0, cap: old.cap || 0, ex: old.ex || 0
+      };
+    });
   });
 }
 function paramsText(v){
@@ -696,16 +791,17 @@ function batchLangs(kind, which){
   renderLangs(which);
 }
 
-/* v0.9.345：三个 key 的状态（用量 / 本分钟 / 今日耗尽）。服务端只给掩码，永不下发明文。
-   固定渲染 3 行：输入框是固定三个，没配的位置也要能看到「未设置」。 */
-/* v0.9.346：整槽额度一行看完。用户就是靠这行判断「到底是额度用完了，还是被小时闸卡住了」。 */
+/* v0.9.346：整槽额度一行看完。用户就是靠这行判断「到底是额度用完了，还是被小时闸卡住了」。
+   v0.9.361：模型改成挂在 key 下面，这行仍然是整槽视角（每把 key 的明细在卡片里）。 */
 function renderDPool(p){
   const el = $('dPoolHint');
   if (!el) return;
   if (!p) { el.textContent = '—'; return; }
   const cap = p.dailyCap || 0;
   const used = Math.max(0, cap - (p.dailyRemain || 0));
-  const daily = cap ? ('今日 ' + used + '/' + cap) : '今日不限';
+  /* cap=0 有两种意思，别混成一句「今日不限」：真没配 key / 模型全停用时是**没有额度**，
+     写成「不限」会让用户以为还能跑，实际任务全被推到 C/B/A 去了。 */
+  const daily = cap ? ('今日 ' + used + '/' + cap) : '今日无可用额度（没配 key 或模型都停用了）';
   const mdl = p.modelCount ? (p.modelCount + ' 档 · ') : '';
   if (!p.hourly) { el.textContent = mdl + daily + ' · 每小时不限'; return; }
   el.textContent = mdl + '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily + (p.over ? (' · 超桶 ' + p.over + ' 次') : '') + (p.takeovers ? (' · 同人重开接手 ' + p.takeovers + ' 次') : '');
@@ -734,26 +830,6 @@ function renderEStat(st){
   /* 最近半小时内失败过 → 直接标红；否则沿用「1 小时没成功」的老判据 */
   const recentFail = st.fail && st.lastErrAt && (Date.now() - st.lastErrAt) < 1800000;
   el.style.color = (recentFail || (st.okAt && (Date.now() - st.okAt) > 3600000)) ? '#A32D2D' : '';
-}
-function renderDKeys(list){
-  for (let i = 0; i < 3; i++) {
-    const k = (Array.isArray(list) ? list[i] : null) || { set: false };
-    const n = i + 1;
-    $('keyMask4_' + n).textContent = k.set ? ('已保存：' + k.mask) : '未设置';
-    const el = $('dStat' + n);
-    if (!k.set) { el.textContent = ''; el.className = 'dstat'; continue; }
-    const used = k.used || 0, rpd = k.rpd || 0;
-    if (k.ex) {
-      el.textContent = '● 今日已耗尽 ' + used + '/' + rpd + (k.err ? ' · ' + k.err.slice(0, 36) : '');
-      el.className = 'dstat bad';
-    } else if (rpd && used >= rpd) {
-      el.textContent = '● 今日额度已满 ' + used + '/' + rpd;
-      el.className = 'dstat bad';
-    } else {
-      el.textContent = '● 可用 ' + used + '/' + rpd + ' · 本分钟 ' + (k.rpmUsed || 0) + '/' + (k.rpm || 15);
-      el.className = 'dstat ok';
-    }
-  }
 }
 
 function show(el, on){ $(el).style.display = on ? '' : 'none'; }
@@ -809,15 +885,11 @@ async function loadConfig(){
     langSel = new Set(Array.isArray(c.langModelB) ? c.langModelB : []);
     langSelC = new Set(Array.isArray(c.langModelC) ? c.langModelC : []);
     /* v0.9.345：模型 D（老 config.json 没这些字段 → 走空值/默认值，不影响既有行为）
-       v0.9.347：模型名改成模型池；服务端会把老的单模型配置当作一档返回，升级不用重填。 */
+       v0.9.347：模型名改成模型池；服务端会把老的单模型配置当作一档返回，升级不用重填。
+       v0.9.361：模型挂在 key 下面，服务端把老配置摊平成「每把 key 同一份」返回。 */
     $('base4').value = c.base4 || '';
-    const dStats = (c.dPool && Array.isArray(c.dPool.models)) ? c.dPool.models : [];
-    dModelList = (Array.isArray(c.models4) ? c.models4 : []).map(m => {
-      const st = dStats.find(x => x.name === m.name) || {};
-      return { name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false,
-        used: st.used || 0, cap: st.cap || 0, ex: st.ex || 0 };
-    });
-    renderDModels();
+    loadDKeySlots(c);
+    renderDKeySlots();
     $('hourlyD').value = c.hourlyD ? c.hourlyD : '';
     renderDPool(c.dPool || null);
     $('extraParams4').value = paramsText(c.extraParams4);
@@ -826,7 +898,6 @@ async function loadConfig(){
     $('dScopePick').checked = !dAll;
     $('dPickBox').style.display = dAll ? 'none' : '';
     langSelD = new Set(Array.isArray(c.langModelD) ? c.langModelD : []);
-    renderDKeys(c.dKeys || []);
     /* v0.9.350：模型 E（老 config.json 没这些字段 → 走空值/默认值，不影响既有行为） */
     $('base5').value = c.base5 || '';
     $('model5').value = c.model5 || '';
@@ -1350,27 +1421,45 @@ $('provider5').addEventListener('change', () => {
   if (p && p.id !== 'custom' && !$('base5').value.trim()) $('base5').value = p.base;
 });
 
-/* v0.9.345：模型 D（Gemini 免费额度池）。四件事与 B/C 不同：
-   ① 三个 key 一起保存（各自留空 = 保留原值）；
-   ② 模型是一张池表（v0.9.347），顺序即优先级；
-   ③ 「测试全部 Key 与模型」逐个测，一个死 key / 没开通的模型不该等真用户撞上才发现；
+/* v0.9.361：模型 D（Gemini 免费额度池），key 为第一层。
+   ① 三把 key 一起保存（各自留空 = 保留原值），每把 key 带自己的模型表；
+   ② 顺序即优先级：Key 1 的模型从上到下 → Key 2 → Key 3；
+   ③ 「测试」按 key × 它自己的模型逐个测，一个死 key / 没开通的模型不该等真用户撞上才发现；
    ④ 有「重置今日计数」—— 误判把 key 锁死一整天时的手动出口。 */
 $('btnSave4').addEventListener('click', async () => {
   const base4 = $('base4').value.trim();
-  const keys = [1, 2, 3].map(n => $('key4_' + n).value.trim());
-  syncDModels();
+  const keys = [1, 2, 3].map(n => ($('key4_' + n) ? $('key4_' + n).value.trim() : ''));
+  syncDKeySlots();
   /* 名字为空的档直接丢弃（用户点了「增加一档」但没填，不该拦住保存） */
-  const models = dModelList.filter(m => m.name);
-  if (!base4 && !models.length && !keys.some(Boolean)) return msg('cfg4Msg', '模型 D 三项都为空 = 不启用，无需保存', 'err');
+  const slots = dKeySlots.map(k => ({
+    label: k.label || '',
+    on: k.on !== false,
+    models: k.models.filter(m => m.name)
+      .map(m => ({ name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false }))
+  }));
+  const modelTotal = slots.reduce((s, k) => s + k.models.length, 0);
+  if (!base4 && !modelTotal && !keys.some(Boolean)) return msg('cfg4Msg', '模型 D 三项都为空 = 不启用，无需保存', 'err');
   if (!base4) return msg('cfg4Msg', 'Base URL 不能为空（除非清空模型 D）', 'err');
-  if (!models.length) return msg('cfg4Msg', '模型池至少填一档模型名', 'err');
-  const names = models.map(m => m.name);
-  if (new Set(names).size !== names.length) return msg('cfg4Msg', '模型名重复了：同一个模型填两档不会变成两份额度', 'err');
+  for (let i = 0; i < 3; i++) {
+    const isUsed = keys[i] || dKeySlots[i].set;
+    if (!isUsed || dKeySlots[i].on === false) continue;
+    if (!slots[i].models.length) {
+      return msg('cfg4Msg', 'Key ' + (i + 1) + ' 是启用状态，但下面一档模型都没填。要么填一档，要么把这张卡的「启用」取消', 'err');
+    }
+  }
+  /* 同一把 key 内模型名不能重复（同一个模型填两档不会变成两份额度）。
+     不同 key 之间可以同名 —— 它们属于不同项目，各有一份额度。 */
+  for (let i = 0; i < 3; i++) {
+    const names = slots[i].models.map(m => m.name);
+    if (new Set(names).size !== names.length) {
+      return msg('cfg4Msg', 'Key ' + (i + 1) + ' 里模型名重复了：同一把 key 下同一个模型填两档不会变成两份额度', 'err');
+    }
+  }
   let extraParams4;
   try { extraParams4 = readParams('extraParams4'); } catch (e) { return msg('cfg4Msg', e.message, 'err'); }
   const body = {
     provider4: $('provider4').value, base4, extraParams4,
-    models4: models.map(m => ({ name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false })),
+    keyModels4: slots,
     langModelDAll: $('dScopeAll').checked,
     langModelD: [...langSelD],
     hourlyD: +$('hourlyD').value || 0
@@ -1378,52 +1467,92 @@ $('btnSave4').addEventListener('click', async () => {
   keys.forEach((v, i) => { if (v) body['key4_' + (i + 1)] = v; });
   try {
     await api('/api/admin/config', 'POST', body);
-    [1, 2, 3].forEach(n => { $('key4_' + n).value = ''; });
-    msg('cfg4Msg', '模型 D 已保存并即时生效 ✓（' + models.length + ' 档模型' +
+    [1, 2, 3].forEach(n => { if ($('key4_' + n)) $('key4_' + n).value = ''; });
+    const usedKeys = slots.filter(k => k.models.length).length;
+    msg('cfg4Msg', '模型 D 已保存并即时生效 ✓（' + usedKeys + ' 把 key · ' + modelTotal + ' 档模型' +
       ($('dScopeAll').checked ? ' · 接管全部语言' : ' · 只接管已勾选的语言') + '）', 'ok');
     await loadConfig();
   } catch (e) { msg('cfg4Msg', '保存失败：' + e.message, 'err'); }
 });
 
-/* 模型池：增加一档 / 上移 / 下移 / 删除。改完只重渲染，落盘统一走「保存模型 D」 */
-$('btnAddModel4').addEventListener('click', () => {
-  syncDModels();
-  if (dModelList.length >= 6) return msg('cfg4Msg', '最多 6 档（再多后台也看不清，收益也有限）', 'err');
-  dModelList.push({ name: '', rpm: 15, rpd: 500, on: true, used: 0, cap: 0, ex: 0 });
-  renderDModels();
-});
-$('dModelRows').addEventListener('click', (e) => {
+/* 卡片内的增删移：改完只重渲染，落盘统一走「保存模型 D」 */
+$('dKeyCards').addEventListener('click', (e) => {
   const btn = e.target.closest('button');
   if (!btn) return;
+  syncDKeySlots();
+  const addI = btn.dataset.dadd, testI = btn.dataset.dtest, clearI = btn.dataset.dclear;
+  if (addI !== undefined) {
+    const k = dKeySlots[+addI];
+    if (!k) return;
+    if (k.models.length >= 6) return msg('cfg4Msg', '每把 key 最多 6 档（再多后台也看不清，收益也有限）', 'err');
+    k.models.push(dEmptyModel());
+    return renderDKeySlots();
+  }
+  if (testI !== undefined) {
+    return testDKey(+testI);
+  }
+  if (clearI !== undefined) {
+    const i = +clearI;
+    if (!confirm('清除 Key ' + (i + 1) + '？该 key 下所有模型的今日用量会一起清掉。')) return;
+    api('/api/admin/config', 'POST', { clearDKey: i }).then(async () => {
+      msg('cfg4Msg', 'Key ' + (i + 1) + ' 已清除 ✓', 'ok');
+      await loadConfig();
+    }).catch(e => msg('cfg4Msg', '清除失败：' + e.message, 'err'));
+    return;
+  }
   const row = btn.closest('.mrow');
   if (!row) return;
-  syncDModels();
-  const i = +row.dataset.i;
-  if (btn.dataset.mv) {
-    const j = i + (+btn.dataset.mv);
-    if (j < 0 || j >= dModelList.length) return;
-    const t = dModelList[i]; dModelList[i] = dModelList[j]; dModelList[j] = t;
-  } else if (btn.dataset.mdel) {
-    if (!confirm('删除「' + (dModelList[i].name || '未命名') + '」这一档？该档今日的用量记录会一起丢掉。')) return;
-    dModelList.splice(i, 1);
+  const i = +row.dataset.i, j = +row.dataset.j;
+  const k = dKeySlots[i];
+  if (!k) return;
+  if (btn.dataset.dmv) {
+    const t = j + (+btn.dataset.dmv);
+    if (t < 0 || t >= k.models.length) return;
+    const tmp = k.models[j]; k.models[j] = k.models[t]; k.models[t] = tmp;
+  } else if (btn.dataset.ddel) {
+    if (k.models.length <= 1) return msg('cfg4Msg', '每把 key 至少留一档；不想用就取消左边的勾选', 'err');
+    if (!confirm('删除「' + (k.models[j].name || '未命名') + '」这一档？该档今日的用量记录会一起丢掉。')) return;
+    k.models.splice(j, 1);
   }
-  renderDModels();
+  renderDKeySlots();
 });
 
 $('btnTest4').addEventListener('click', async () => {
-  msg('cfg4Msg', '测试中（逐个 key + 逐个模型，每项消耗 1 次免费额度）…', 'ok');
+  msg('cfg4Msg', '测试中（每把 key 逐个测它自己挂的模型，每项消耗 1 次免费额度）…', 'ok');
   try {
     const r = await api('/api/admin/test', 'POST', { which: 'D' });
-    const parts = (r.keys || []).map(k =>
-      'Key ' + (k.i + 1) + '（' + (r.first || '第一档') + '）：' +
-      (k.ok ? '✓ ' + (k.sample || '(空)') : '✗ ' + (k.err || k.hint || '失败')));
-    if ((r.models || []).length) {
-      parts.push('模型 ' + r.models.map(m =>
-        m.name + '：' + (m.ok ? '✓ ' + (m.sample || '(空)') : '✗ ' + (m.err || m.hint || '失败'))).join(' · '));
+    if (Array.isArray(r.groups)) {
+      const parts = r.groups.map(g => {
+        const body = g.results.map(x => x.name + '：' +
+          (x.ok ? '✓ ' + (x.sample || '(空)') : '✗ ' + (x.err || x.hint || '失败'))).join(' · ');
+        return 'Key ' + (g.i + 1) + (g.label ? '（' + g.label + '）' : '') + ' —— ' + body;
+      });
+      msg('cfg4Msg', '模型 D ｜ ' + (parts.join(' ｜ ') || '没有可测的项'), r.ok ? 'ok' : 'err');
+    } else {
+      /* 服务端还是旧版（滚动升级的中间态）：按老格式显示，不要报错 */
+      const parts = (r.keys || []).map(k =>
+        'Key ' + (k.i + 1) + '：' + (k.ok ? '✓ ' + (k.sample || '(空)') : '✗ ' + (k.err || k.hint || '失败')));
+      msg('cfg4Msg', '模型 D —— ' + (parts.join(' ｜ ') || '没有可测的项'), r.ok ? 'ok' : 'err');
     }
-    msg('cfg4Msg', '模型 D —— ' + (parts.join(' ｜ ') || '没有可测的项'), r.ok ? 'ok' : 'err');
   } catch (e) { msg('cfg4Msg', e.message, 'err'); }
 });
+/* 单独测一把 key：把该 key 的模型与状态一并交给测试接口会更准，
+   但接口是整槽测的 —— 这里只负责把结果里属于这把 key 的那一段拎出来。
+   为什么不另开接口：D 的测试本来就要逐 key 打，整槽测一遍再筛，次数一样、代码少一半。 */
+async function testDKey(i){
+  msg('cfg4Msg', '测试 Key ' + (i + 1) + ' …', 'ok');
+  try {
+    const r = await api('/api/admin/test', 'POST', { which: 'D' });
+    const g = (r.groups || []).find(x => x.i === i);
+    if (!g) {
+      msg('cfg4Msg', 'Key ' + (i + 1) + ' 没有可测的模型（先在卡片里填一档）', 'err');
+      return;
+    }
+    const body = g.results.map(x => x.name + '：' +
+      (x.ok ? '✓ ' + (x.sample || '(空)') : '✗ ' + (x.err || x.hint || '失败'))).join(' · ');
+    msg('cfg4Msg', 'Key ' + (i + 1) + ' —— ' + body, g.results.every(x => x.ok) ? 'ok' : 'err');
+  } catch (e) { msg('cfg4Msg', e.message, 'err'); }
+}
 
 $('btnReset4').addEventListener('click', async () => {
   if (!confirm('把模型 D 所有 key × 所有模型的今日用量清零？清零后它们会被重新当作「还有额度」使用。\n\n只在确认某档被误判耗尽时才需要这么做。')) return;
@@ -1435,24 +1564,12 @@ $('btnReset4').addEventListener('click', async () => {
 });
 
 $('btnClear4').addEventListener('click', async () => {
-  if (!confirm('确定清空模型 D 的全部配置（含三个 API Key）？清空后不再走 Gemini 免费额度，流量回到 C / B / A。')) return;
+  if (!confirm('确定清空模型 D 的全部配置（含三把 API Key 与各自的模型）？清空后不再走 Gemini 免费额度，流量回到 C / B / A。')) return;
   try {
     await api('/api/admin/config', 'POST', { clearKey4: true });
     msg('cfg4Msg', '模型 D 已清空 ✓', 'ok');
     await loadConfig();
   } catch (e) { msg('cfg4Msg', '清空失败：' + e.message, 'err'); }
-});
-
-document.querySelectorAll('button[data-cleard]').forEach(b => {
-  b.addEventListener('click', async () => {
-    const i = +b.dataset.cleard;
-    if (!confirm('清除 Key ' + (i + 1) + '？该位置的用量记录会一起归零。')) return;
-    try {
-      await api('/api/admin/config', 'POST', { clearDKey: i });
-      msg('cfg4Msg', 'Key ' + (i + 1) + ' 已清除 ✓', 'ok');
-      await loadConfig();
-    } catch (e) { msg('cfg4Msg', '清除失败：' + e.message, 'err'); }
-  });
 });
 
 $('provider4').addEventListener('change', () => {

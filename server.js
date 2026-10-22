@@ -74,8 +74,18 @@ const DEFAULTS = {
   keys4: [],               // 1~3 个 API Key：顺序填充，用完一个才动下一个（不是轮询）
   /* v0.9.347：模型池。Google 的免费额度按「项目 × 模型」各自独立算，挂几档就有几份额度。
      数组顺序 = 优先级（强的在前）：上一档的 key 全用满才降下一档。
-     每档独立 RPM / RPD —— 不同模型的免费档位本来就不一样。 */
+     每档独立 RPM / RPD —— 不同模型的免费档位本来就不一样。
+     v0.9.361：降级为**兼容字段** —— 等于第一把有 key 的槽的模型列表。老前端与老配置仍认它。 */
   models4: [],
+  /* v0.9.361：key 为第一层的模型配置。下标与 keys4 一一对应（固定 3 项）：
+       [{ label:'项目A', on:true, models:[{ name, rpm, rpd, on }] }, …]
+     为什么改成 key 先：Google 的免费额度是「按项目」给的，一把 key 只属于一个项目，
+     而不同项目里开通的模型不一定相同（有的项目只有 lite）。原来的「全局模型池 × 所有 key」
+     做笛卡尔积，会给没开通的模型格子也记一份额度 —— 判「这一集够不够跑完」时虚高，
+     跑到一半撞 403/429 再降档。改成 key 下挂自己的模型，容量才是真的。
+     调度顺序：Key 1 的模型从上到下 → Key 1 全用满 → Key 2 的模型从上到下 → …
+     （用户 2026-10-22 定案：不要跨 key 轮询均摊，一把一把用干净）。 */
+  keyModels4: [],
   extraParams4: {},
   langModelDAll: true,     // true = 全部目标语言先走 D；false = 只走 langModelD 列出的
   langModelD: [],
@@ -6306,9 +6316,9 @@ function slotReady(cfg, which){
   if (which === 'C') return !!(cfg.base3 && cfg.model3 && cfg.key3);
   /* v0.9.350：E 与 A/B/C 同构，三项配全即启用（独占、限流另算，见 ePick） */
   if (which === 'E') return !!(cfg.base5 && cfg.model5 && cfg.key5);
-  /* v0.9.345：D 的「配全」= base + 至少一档启用的模型 + 至少一个 key。
-     keys4 是数组（1~3 个），models4 也是数组（1~6 档，v0.9.347）—— 任一档有 key 就能跑。 */
-  if (which === 'D') return !!(cfg.base4 && dModels(cfg).length && dKeys(cfg).length);
+  /* v0.9.345：D 的「配全」= base + 至少一把 key 配了至少一档启用的模型。
+     v0.9.361：模型挂在 key 下面，dSlots 已经把「没 key / 停用 / 没有可用模型」的槽滤掉了。 */
+  if (which === 'D') return !!(cfg.base4 && dSlots(cfg).length);
   return false;
 }
 function modelBReady(cfg){ return slotReady(cfg, 'B'); }
@@ -6445,16 +6455,12 @@ function dKeys(cfg){ return dKeyList(cfg).map(x => x.key); }
    各算各的 RPD）。所以「加一档模型」等于「多加一份免费额度」—— 这是唯一不花钱、
    又能实打实提高免费请求总量的办法（合并批次也能省请求数，但那个动的是翻译主链路）。
 
-   排序即优先级：数组从上到下，上一档的**所有 key** 都用满，才降下一档。
-   为什么不是轮询均摊：Flash 的质量明显好于 Lite，把额度均摊等于主动降质。
-   和 key 的关系是「先横向、再纵向」—— key 换掉不改变模型，输出质量不变；
-   跨档才会换模型，所以要尽量晚发生。
-
-   on:false 的档留在配置里但不参与选路（想临时停用某档不必删掉它再重建）。
-   老配置兼容：models4 为空时，把单个 model4 + rpmD/rpdD 当成一档 —— 升级不用重填。 */
-function dModelsRaw(cfg){
-  const arr = (cfg && Array.isArray(cfg.models4)) ? cfg.models4 : [];
+   v0.9.361：模型不再是全局池，而是挂在每把 key 下面（见 keyModels4 的注释）。
+   下面这几个函数是唯一的读配置入口，调度、状态面板、保存校验都走它们，
+   别在别处直接读 cfg.keyModels4 —— 老配置（只有 models4）要靠这里摊平。 */
+function dNormModels(arr){
   const out = [];
+  if (!Array.isArray(arr)) return out;
   for (const m of arr) {
     if (!m || typeof m !== 'object') continue;
     const name = String(m.name == null ? '' : m.name).trim().slice(0, 64);
@@ -6467,6 +6473,11 @@ function dModelsRaw(cfg){
     });
     if (out.length >= D_MAX_MODELS) break;
   }
+  return out;
+}
+/* 老的单模型 / 全局模型池（models4）。老配置兼容：models4 为空时把 model4 当成一档。 */
+function dModelsRaw(cfg){
+  const out = dNormModels((cfg && Array.isArray(cfg.models4)) ? cfg.models4 : []);
   if (!out.length && String((cfg && cfg.model4) || '').trim()) {
     out.push({ name: String(cfg.model4).trim().slice(0, 64),
       rpm: Math.max(1, Math.min(600, Math.floor(+cfg.rpmD || 15))),
@@ -6474,8 +6485,68 @@ function dModelsRaw(cfg){
   }
   return out;
 }
-/* 参与选路的档（on:false 与空名跳过）。顺序就是优先级顺序。 */
-function dModels(cfg){ return dModelsRaw(cfg).filter(m => m.on); }
+/* 三把 key 的模型配置，固定 3 项、下标与 keys4 对齐。
+   ⚠️ 老配置（keyModels4 完全没有）→ 每把 key 都挂同一份 models4。
+      这样升级当天不用重填，行为和升级前完全一致（都是「每把 key 都有这几档」）；
+      区别只是调度顺序从「跨 key 先横着换」变成「一把一把用干净」。
+   ⚠️ keyModels4 存在但某一项缺 models → 就是空的（用户在后台真的清空了），不要拿 legacy 兜底，
+      否则删掉的档会自己长回来。 */
+function dSlotsRaw(cfg){
+  const arr = (cfg && Array.isArray(cfg.keyModels4)) ? cfg.keyModels4 : [];
+  const legacy = dModelsRaw(cfg);
+  const out = [];
+  for (let i = 0; i < 3; i++) {
+    const src = arr[i] && typeof arr[i] === 'object' ? arr[i] : null;
+    let models;
+    if (src && Array.isArray(src.models)) models = dNormModels(src.models);
+    else if (!arr.length) {
+      /* 老配置摊平：只给**有 key** 的槽挂上模型 —— 没配 key 的槽留空表，
+         否则后台会出现「未设置的 Key 3 里挂着两档模型」这种看不懂的画面。 */
+      const hasKey = String(((cfg && Array.isArray(cfg.keys4)) ? cfg.keys4[i] : '') || '').trim();
+      models = hasKey ? legacy.map(m => Object.assign({}, m)) : [];
+    }
+    else models = [];
+    out.push({
+      i: i,
+      label: String((src && src.label) || '').trim().slice(0, 24),
+      on: src ? src.on !== false : true,
+      models: models
+    });
+  }
+  return out;
+}
+/* 参与调度的 key 槽：有 key、没被停用、至少一档启用的模型。顺序 = key 顺序。 */
+function dSlots(cfg){
+  const keys = dKeyList(cfg);
+  const out = [];
+  for (const s of dSlotsRaw(cfg)) {
+    const k = keys.find(x => x.i === s.i);
+    if (!k || !s.on) continue;
+    const ms = s.models.filter(m => m.on && m.name);
+    if (!ms.length) continue;
+    out.push({ i: s.i, key: k.key, label: s.label, models: ms });
+  }
+  return out;
+}
+/* 某把 key 的全部模型（含停用档）—— 清用量 / 判 key 死要用它，
+   否则停用档上留着的旧用量永远清不掉。 */
+function dSlotModelsAll(cfg, i){
+  const s = dSlotsRaw(cfg).find(x => x.i === i);
+  return s ? s.models : [];
+}
+/* 跨 key 去重后的模型列表（顺序：先按第一个出现的 key 排，再补后面 key 独有的）。
+   只给状态面板的「每档合计」用；调度不再用它 —— 调度走 dCellList。 */
+function dModels(cfg){
+  const seen = Object.create(null), out = [];
+  for (const s of dSlotsRaw(cfg)) {
+    for (const m of s.models) {
+      if (!m.on || !m.name || seen[m.name]) continue;
+      seen[m.name] = 1;
+      out.push(m);
+    }
+  }
+  return out;
+}
 
 /* 账本单元 = (key 下标, 模型名)。用模型名而不是数组下标当键，是因为后台可以上移下移
    调整顺序 —— 用下标的话，调一次顺序昨天的用量就记到别的模型头上了。
@@ -6552,32 +6623,34 @@ function dBucket(q, cfg){
   b.at = now;
   return b;
 }
-/* 选路用的候选单元，按「先横向换 key、再纵向降档」排好：
-       档 1 × Key1 → 档 1 × Key2 → 档 1 × Key3 → 档 2 × Key1 → …
-   prefer 是整集锁记下的档位：上一批用的是哪个模型，这一批先试它。
-   同一档换 key 输出完全一致（同一个模型），跨档才是真的换模型 —— 所以顺序不能反。
+/* 选路用的候选单元，按「key 从上到下、key 内的模型也从上到下」排好：
+       Key1·模型1 → Key1·模型2 → Key2·模型1 → Key2·模型2 → …
+   v0.9.361 改的就是这两层循环的顺序。原来外层是模型、内层是 key（同样模型先跨 key 横着换），
+   现在外层是 key —— 用户 2026-10-22 定案：一把 key 就是一个项目，先把一个项目用干净，
+   再动下一个。
+   prefer 是整集锁记下的格子（'key下标|模型名'）：上一批用的那一格先试，其余保持原顺序。
+   只把锁定的那格提到最前，不重排整个池 —— 一集里不要因为「锁的格暂时 RPM 满」就跳到别的模型。
    dPeek 与 dPick 必须共用这一份顺序，否则「探到的」和「扣掉的」不是同一格。 */
 function dCellList(cfg, prefer){
-  const keys = dKeyList(cfg);
-  const ms = dModels(cfg);
-  if (!keys.length || !ms.length) return [];
-  const ordered = [];
-  const pi = prefer ? ms.findIndex(m => m.name === prefer) : -1;
-  /* ⚠️ 必须 >= 0：粘性档就是第一档时 pi=0，写成 > 0 会让它既没被提前 push、又被下面的
-     循环跳过（i !== pi），整档凭空消失 —— v0.9.347 端到端实测：一集里第一批用完就直接掉第二档。 */
-  if (pi >= 0) ordered.push(ms[pi]);
-  for (let i = 0; i < ms.length; i++) if (i !== pi) ordered.push(ms[i]);
   const out = [];
-  for (const m of ordered) {
-    for (const k of keys) out.push({ i: k.i, key: k.key, model: m.name, rpm: m.rpm, rpd: m.rpd });
+  for (const s of dSlots(cfg)) {
+    for (const m of s.models) {
+      out.push({ i: s.i, key: s.key, model: m.name, rpm: m.rpm, rpd: m.rpd,
+        cell: dCellKey(s.i, m.name) });
+    }
   }
+  if (!prefer) return out;
+  const pi = out.findIndex(c => c.cell === prefer);
+  if (pi <= 0) return out;
+  const one = out.splice(pi, 1)[0];
+  out.unshift(one);
   return out;
 }
 /* 该单元今天还能不能用（ex=当日报废；used 到 RPD 也算报废） */
 function dCellDead(st, rpd){ return !!(st.ex || (st.used || 0) >= rpd); }
 
-/* 今日还能发多少次（所有模型 × 所有 key 加总）。整集锁 D 用它判断「够不够跑完这一集」。
-   v0.9.347：多档模型时这里自然翻倍 —— 2 档 × 2 key × 500 RPD = 2000 次，正是模型池的意义。 */
+/* 今日还能发多少次（每把 key × 它自己的模型，逐格加总）。整集锁 D 用它判断「够不够跑完这一集」。
+   v0.9.361：只算真实存在的格子 —— 某把 key 没挂的模型不再凭空多出一份额度。 */
 function dRemain(cfg, q0){
   const q = q0 || dRead();
   let n = 0;
@@ -6588,48 +6661,81 @@ function dRemain(cfg, q0){
   }
   return n;
 }
-/* v0.9.348：某一档此刻能不能接一个新任务。三个条件缺一不可：
-     ① 该档日剩余 ≥ 本集估算批数 —— 否则跑到一半日额度就没了，只能中途降档；
-     ② 该档至少有一个 key 的本分钟名额没被占（RPM 未满、也没在 429 冷静期）；
-     ③ 没被别的活跃任务认领（认领判断在 dTaskSlot 里做，这里只管额度与速率）。
-   用户 10-20 定案：分配阶段一旦发现档被占，就把整集交给 C/B/A，不要排队等 ——
+/* v0.9.361：某把 key 此刻能不能接一个新任务，能就返回该 key 下第一个可用的模型名。
+   ① 这把 key 的**日剩余合计** ≥ 本集估算批数 —— 按 key 合计，不按单档：
+      同一把 key 的额度是同一个项目给的，模型之间换档是允许的，只要总量够跑完。
+      按单档判会把「模型1剩 10、模型2剩 400」的 key 整把跳过，白白让给下一个项目。
+   ② 至少一档还有本分钟名额（RPM 未满、不在 429 冷静期）。
+   ③ 没被别的活跃任务认领（认领判断在 dTaskSlot 里做，这里只管额度与速率）。
+   用户 10-20 定案：分配阶段发现档被占就整集交给 C/B/A，不排队等 ——
    任务还没开始，等一分钟纯属白拖；等待只留给「已经分到这一档、中途撞限速」的情况。 */
-function dTierReady(cfg, m, need, q0){
+function dSlotReady(cfg, s, need, q0){
   const q = q0 || dRead();
-  const keys = dKeyList(cfg);
-  if (!keys.length) return false;
   const now = Date.now();
   let day = 0;
-  for (const k of keys) {
-    const st = q.cells[dCellKey(k.i, m.name)] || {};
+  for (const m of s.models) {
+    const st = q.cells[dCellKey(s.i, m.name)] || {};
     if (st.ex) continue;
     day += Math.max(0, m.rpd - (st.used || 0));
   }
-  if (day < Math.max(1, need)) return false;
-  for (const k of keys) {
-    const st = q.cells[dCellKey(k.i, m.name)] || {};
-    if (st.ex) continue;
+  if (day < Math.max(1, need)) return [];
+  const out = [];
+  for (const m of s.models) {
+    const st = q.cells[dCellKey(s.i, m.name)] || {};
+    if (dCellDead(st, m.rpd)) continue;
     if ((+st.cool || 0) > now) continue;
-    if (dRpmUsed(k.i, m.name) < m.rpm) return true;
+    if (dRpmUsed(s.i, m.name) < m.rpm) out.push(m);
   }
-  return false;
+  return out;
 }
-/* 后台展示：整槽视角的额度面板（每个 key 的明细仍走 dKeyStatus）。
-   models 一栏是每档模型今天的合计用量 —— 用户就是靠它判断「该不该再加一档」。 */
+/* 后台展示：整槽视角的额度面板（每个 key 的明细走 dKeyStatus）。
+   v0.9.361：多一层 key 汇总 —— 后台要能一眼看出「Key 1 今天用了多少 / 还剩多少」，
+   这正是改成 key 优先之后最需要的那个数。
+   ⚠️ 容量的口径必须和 dRemain 完全一致：都只算**能真派出去的格子**
+      （有 key + 槽没停用 + 这一档也没停用）。后台那行「今日 used / cap」是用
+      cap − dailyRemain 反算 used 的（见 admin.html renderDPool），
+      一旦 cap 把「没配 key 的位置」或「停用档」算进去，used 会跟着虚高 ——
+      少挂一把 key 就凭空多出几百次「已用」，比不显示更糟。 */
 function dPoolStatus(cfg){
   const q = dRead();
   const cap = dHourly(cfg);
   const b = dBucket(q, cfg);
   const keys = dKeyList(cfg);
-  const ms = dModels(cfg).map(m => {
-    let used = 0, ex = 0;
-    for (const k of keys) {
-      const st = q.cells[dCellKey(k.i, m.name)] || {};
-      used += (st.used || 0);
-      if (st.ex) ex = 1;
+  const byName = Object.create(null), order = [], keyRows = [];
+  for (const s of dSlotsRaw(cfg)) {
+    const set = !!keys.find(k => k.i === s.i);
+    const live = s.models.filter(m => m.on && m.name);      // 真正占额度的档
+    const ready = set && s.on && live.length > 0;           // 真会被调度的 key
+    let used = 0, sum = 0, allCap = 0, dead = 0, err = '';
+    const models = [];
+    for (const m of s.models) {
+      const st = q.cells[dCellKey(s.i, m.name)] || {};
+      const on = m.on !== false;
+      allCap += m.rpd;
+      if (on) { used += (st.used || 0); sum += m.rpd; }
+      /* v0.9.361：这里的 ex 是「后台徽章用的到限」，口径含 used>=rpd（不是只有 429 才算）。
+         新结构按 key 合计判额度，用量走到 rpd 就直接跳过、根本不会去撞 429，
+         只看 st.ex 会让「已经用满 900/900」的 key 一直显示正常。 */
+      if (on && dCellDead(st, m.rpd)) { dead++; if (!err && st.ex) err = st.err || ''; }
+      models.push({ name: m.name, rpm: m.rpm, rpd: m.rpd, used: st.used || 0, ex: st.ex || 0, on: on });
+      if (on && ready) {
+        if (!byName[m.name]) {
+          byName[m.name] = { name: m.name, rpm: m.rpm, rpd: m.rpd, cap: 0, used: 0, ex: 0 };
+          order.push(m.name);
+        }
+        byName[m.name].cap += m.rpd;
+        byName[m.name].used += (st.used || 0);
+        if (dCellDead(st, m.rpd)) byName[m.name].ex = 1;
+      }
     }
-    return { name: m.name, rpm: m.rpm, rpd: m.rpd, cap: m.rpd * keys.length, used: used, ex: ex };
-  });
+    keyRows.push({
+      i: s.i, label: s.label, on: s.on, set: set, ready: ready,
+      used: used, cap: ready ? sum : 0, capAll: allCap,   // cap 才是算进日容量的那份
+      ex: (live.length && dead === live.length) ? 1 : 0,
+      err: err, models: models
+    });
+  }
+  const ms = order.map(n => byName[n]);
   return {
     hourly: cap,                                  // 0 = 不限
     tokens: b ? Math.floor(b.tokens) : 0,         // 现在能发几次
@@ -6637,40 +6743,54 @@ function dPoolStatus(cfg){
     over: (+q.over || 0),                         // v0.9.349：今日超桶放行的请求数
     takeovers: D_TAKEOVER_N,                      // v0.9.351：同人重开直接接手的次数（内存计数）
     hourUsed: dHourUsed(),                        // 近 60 分钟已发
-    models: ms,                                   // 每档模型的今日用量
+    models: ms,                                   // 每档模型的今日合计（跨 key，只算参与调度的）
+    keyCount: keyRows.filter(k => k.ready).length,
+    keys: keyRows,                                // v0.9.361：每把 key 的合计与明细（固定 3 项，没配的也在）
     modelCount: ms.length,
-    dailyCap: ms.reduce((s, m) => s + m.cap, 0),  // 全池日容量（RPD × key 数 × 档数）
+    dailyCap: keyRows.reduce((s, k) => s + k.cap, 0),  // 全池日容量 = dCellList 的 RPD 之和
     dailyRemain: dRemain(cfg, q),
     date: ptDateStr()
   };
 }
 /* 后台展示用：每个 key 的掩码 + 今日用量 + 状态。明文一律不回传（与 A/B/C 的 keyMask 同规矩）。
    固定返回 3 项：输入框是固定三个，没配的位置也要能显示「未设置」。
-   v0.9.347：一个 key 现在横跨多档模型，used/rpd 都是**各档之和**；
-   本分钟取各档里最挤的那个（rpm 取最严的），这样一眼能看出是不是快撞 RPM 了。 */
+   v0.9.361：用量只算**这把 key 自己挂的模型**；ex 改成「该 key 的所有档都到限」才置 1 ——
+   一档用满不等于整把 key 用满，原来的语义在新结构下会把「还有别的档能用」的 key 显示成耗尽。
+   注意这里「到限」= dCellDead（429 报废 **或** used>=rpd）：新结构按 key 合计判额度，
+   用到 rpd 就直接跳过、不会再去撞 429，光看 st.ex 会让用满的 key 一直显示绿色。
+   v0.9.361：合计的 used / rpd 跟着「启用的档」走，与 dPoolStatus.dailyCap 同一口径 ——
+   停用一档就等于这份额度不用了，卡片上的分母要立刻变小，否则三张卡的合计对不上整槽那行。 */
 function dKeyStatus(cfg){
   const q = dRead();
-  const ms = dModels(cfg);
   const arr = (cfg && Array.isArray(cfg.keys4)) ? cfg.keys4 : [];
+  const slots = dSlotsRaw(cfg);
   const out = [];
   for (let i = 0; i < 3; i++) {
     const raw = String(arr[i] == null ? '' : arr[i]).trim();
-    let used = 0, cap = 0, ex = 0, err = '', rpmUsed = 0, rpm = 0;
+    const s = slots.find(x => x.i === i) || { label: '', on: true, models: [] };
+    let used = 0, cap = 0, dead = 0, err = '', rpmUsed = 0, rpm = 0, live = 0;
     const cells = [];
-    for (const m of ms) {
+    for (const m of s.models) {
       const st = q.cells[dCellKey(i, m.name)] || {};
-      used += (st.used || 0);
-      cap += m.rpd;
-      if (st.ex) { ex = 1; if (!err) err = st.err || ''; }
-      const ru = dRpmUsed(i, m.name);
-      if (ru > rpmUsed) rpmUsed = ru;
-      if (!rpm || m.rpm < rpm) rpm = m.rpm;
-      cells.push({ model: m.name, used: st.used || 0, rpd: m.rpd, ex: st.ex || 0 });
+      const on = m.on !== false;
+      if (on) {
+        live++;
+        used += (st.used || 0);
+        cap += m.rpd;
+        /* 到限（429 报废 或 used>=rpd）都算这一档用完；err 只在真被上游拒时才有 */
+        if (dCellDead(st, m.rpd)) { dead++; if (!err && st.ex) err = st.err || ''; }
+        const ru = dRpmUsed(i, m.name);
+        if (ru > rpmUsed) rpmUsed = ru;
+        if (!rpm || m.rpm < rpm) rpm = m.rpm;
+      }
+      cells.push({ model: m.name, used: st.used || 0, rpd: m.rpd, ex: st.ex || 0, rpm: m.rpm, on: on });
     }
-    out.push({ i: i, set: !!raw,
+    out.push({ i: i, set: !!raw, label: s.label, on: s.on,
+      ready: !!raw && s.on && live > 0,          // 后台据此决定「正常 / 无可用模型」
       mask: raw ? (raw.slice(0, 5) + '…' + raw.slice(-4)) : '',
-      used: used, rpd: cap, ex: ex, err: err,
-      rpmUsed: rpmUsed, rpm: rpm || 15, cells: cells });
+      used: used, rpd: cap,
+      ex: (live && dead === live) ? 1 : 0,
+      err: err, rpmUsed: rpmUsed, rpm: rpm || 15, cells: cells });
   }
   return out;
 }
@@ -6683,7 +6803,7 @@ function dCellSplit(cfg, prefer){
   const cells = dCellList(cfg, prefer);
   if (!prefer) return { locked: [], rest: cells };
   const locked = [], rest = [];
-  for (const c of cells) (c.model === prefer ? locked : rest).push(c);
+  for (const c of cells) (c.cell === prefer ? locked : rest).push(c);
   return { locked: locked, rest: rest };
 }
 /* 扫一组单元，找第一个「今天没报废 + 本分钟有名额」的。只读，不扣。
@@ -6718,10 +6838,10 @@ function dPeek(cfg, prefer){
      桶只在新任务分配时起作用，见 dTaskSlot。 */
   const now = Date.now();
   const a = dScanCells(q, g.locked, now);
-  if (a.ok) return { ok: true, model: a.ok.model, i: a.ok.i };
+  if (a.ok) return { ok: true, model: a.ok.model, i: a.ok.i, key: a.ok.key, cell: a.ok.cell };
   if (a.live > 0) return { wait: a.wait || 30 };     // 锁档只是这一分钟满 → 等，不降档
   const r = dScanCells(q, g.rest, now);
-  if (r.ok) return { ok: true, model: r.ok.model, i: r.ok.i };
+  if (r.ok) return { ok: true, model: r.ok.model, i: r.ok.i, key: r.ok.key, cell: r.ok.cell };
   if (r.live > 0) return { wait: r.wait || 30 };
   return null;                                       // 全池当日耗尽 → 跨槽降级
 }
@@ -6747,7 +6867,7 @@ function dPick(cfg, prefer){
     }
     D_HIT.push(now);
     dWrite(q);
-    return { i: c.i, key: c.key, model: c.model };
+    return { i: c.i, key: c.key, model: c.model, cell: c.cell };
   };
   const a = dScanCells(q, g.locked, now);
   if (a.ok) return take(a.ok);
@@ -6794,7 +6914,9 @@ function dMarkErr(cfg, i, model, err){
   const q = dRead();
   const msg = String((err && err.message) || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 120);
   if (dKeyDead(err)) {
-    for (const m of dModels(cfg)) {
+    /* v0.9.361：只连坐**这把 key 自己的**模型。以前遍历全局模型池，
+       会把别的 key 上同名的格子也一起判死（新结构下每把 key 的模型可以完全不同）。 */
+    for (const m of dSlotModelsAll(cfg, i)) {
       const st = dCell(q, i, m.name);
       st.ex = Date.now(); st.err = msg;
     }
@@ -6815,11 +6937,13 @@ function dMarkErr(cfg, i, model, err){
    v0.9.348：首次分配改成「认领」—— 按档位顺序找第一个「没被别的活跃任务认领 +
    日额度够跑完这一集 + 当前 RPM 有空位」的模型，整集锁在它上面。一个都认领不到
    就直接判 X 走 C/B/A，不在这里排队（用户 10-20 定案：档被占了就换槽，别等）。
+   v0.9.361：顺序改成 key 优先 —— 先 Key 1 的模型从上到下，Key 1 装不下这一集，
+   再试 Key 2。认领键也改成 'key下标|模型名'（不同 key 上的同名模型不再是同一个东西）。
    总批数：v0.9.351 起由前端报真实值（meta.batches）；老前端退回「按目标语言的
    真实每批上限」估（45 / 60），不再一律 ÷45。另外支持「同一个人重开 → 接管
    旧认领」，见 D_TAKEOVER_MS。 */
 function dTaskSlot(task, cfg, cues, lang, planB, ip, file){
-  if (!task) return { slot: 'D', model: '' };   // 没有任务号（老前端）：不锁，单批判断
+  if (!task) return { slot: 'D', model: '', cell: '' };   // 没有任务号（老前端）：不锁，单批判断
   const now = Date.now();
   for (const [k, v] of D_TASK) if (now - v.at > D_TASK_TTL) D_TASK.delete(k);
   /* 认领表按「最后活跃时间」过期：跑完的任务不会发任何信号，闲置超时即视为结束 */
@@ -6843,64 +6967,74 @@ function dTaskSlot(task, cfg, cues, lang, planB, ip, file){
        一个 1033 条的任务 need=23，桶里只剩 3 个名额 → 整集扔给 B，
        而当时 D 的日额度还剩 900 多次）。用户定案：分配只看有没有名额，
        跑起来按限速慢慢发；桶空了也不许把在跑的任务踢走。 */
-    let pick = '', took = false;
+    let pick = '', pickI = -1, picked = '', took = false;
     if (!b || b.tokens >= 1) {
-      for (const m of dModels(cfg)) {
-        const own = D_TIER_OWN.get(m.name);
-        let tookThis = false;
-        if (own && own.task !== task) {
-          /* v0.9.351：同一个人重开 → 旧认领静默够久就直接接手，不等 3 分钟过期。
-             旧任务若真的还活着（例如两个标签页），它下一批会重新评估并落去 C/B/A；
-             这比「两个都卡在 D 门外」好，认错了也只是共用一档、分摊 RPM，不会丢数据。 */
-          const same = !!fp && own.fp === fp && (now - (own.at || 0)) >= D_TAKEOVER_MS;
-          if (!same) continue;        // 已被别的活跃任务认领
-          D_TASK.delete(own.task);    // 旧任务的僵死记录一并清掉，别让它继续指向这一档
-          tookThis = true;
+      for (const s of dSlots(cfg)) {
+        /* 按 key 合计判额度：同一把 key 的模型之间换档是允许的，
+           只要这个项目今天还剩够跑完这一集的量。按单档判会把
+           「模型1剩 10、模型2剩 400」的 key 整把跳过，白白让给下一个项目。 */
+        const ready = dSlotReady(cfg, s, need, q);
+        if (!ready.length) continue;
+        for (const m of ready) {
+          const cell = dCellKey(s.i, m.name);
+          const own = D_TIER_OWN.get(cell);
+          let tookThis = false;
+          if (own && own.task !== task) {
+            /* v0.9.351：同一个人重开 → 旧认领静默够久就直接接手，不等 3 分钟过期。
+               旧任务若真的还活着（例如两个标签页），它下一批会重新评估并落去 C/B/A；
+               这比「两个都卡在 D 门外」好，认错了也只是共用一格、分摊 RPM，不会丢数据。 */
+            const same = !!fp && own.fp === fp && (now - (own.at || 0)) >= D_TAKEOVER_MS;
+            if (!same) continue;        // 已被别的活跃任务认领
+            D_TASK.delete(own.task);    // 旧任务的僵死记录一并清掉，别让它继续指着这一格
+            tookThis = true;
+          }
+          pick = m.name; pickI = s.i; picked = cell; took = tookThis;
+          break;
         }
-        if (!dTierReady(cfg, m, need, q)) continue;    // 日额度不够 / 本分钟满
-        pick = m.name;
-        took = tookThis;
-        break;
+        if (picked) break;              // 锁在这把 key 上了，后面的 key 一个都不动
       }
     }
-    if (pick) {
-      D_TIER_OWN.set(pick, { task: task, at: now, fp: fp });
+    if (picked) {
+      D_TIER_OWN.set(picked, { task: task, at: now, fp: fp });
       if (took) D_TAKEOVER_N++;     // 只统计真正接手成功的那次（额度不够的尝试不算）
     }
-    hit = { slot: pick ? 'D' : 'X', model: pick, at: now };
+    hit = { slot: picked ? 'D' : 'X', model: pick, cell: picked, i: pickI, at: now };
     D_TASK.set(task, hit);
   } else {
     hit.at = now;
-    /* 已分配的任务续约认领。⚠️ 只在「这档还没被别人接手」时续：
-       自己闲置超时被 B 接手后再回来，两个任务共享这一档即可，不要把 B 踢掉
-       —— 踢掉会让 B 的整集锁指向一个它不再独占的模型，反而更乱。 */
-    if (hit.slot === 'D' && hit.model){
-      const own = D_TIER_OWN.get(hit.model);
-      if (!own || own.task === task) D_TIER_OWN.set(hit.model, { task: task, at: now, fp: (own && own.fp) || '' });
+    /* 已分配的任务续约认领。⚠️ 只在「这格还没被别人接手」时续：
+       自己闲置超时被 B 接手后再回来，两个任务共享这一格即可，不要把 B 踢掉
+       —— 踢掉会让 B 的整集锁指向一个它不再独占的格子，反而更乱。 */
+    if (hit.slot === 'D' && hit.cell){
+      const own = D_TIER_OWN.get(hit.cell);
+      if (!own || own.task === task) D_TIER_OWN.set(hit.cell, { task: task, at: now, fp: (own && own.fp) || '' });
     }
   }
   return hit;
 }
-/* 记住这一集实际用的是哪一档，后面几批优先沿用。
-   中途真降了档（该档日额度耗尽）→ 认领也要跟着搬走，并把旧档让出来，
-   否则旧档会一直被这个任务占着、直到 3 分钟闲置过期。 */
-function dTaskMark(task, model){
+/* 记住这一集实际用的是哪一格，后面几批优先沿用。
+   中途真降了档（该格日额度耗尽）→ 认领也要跟着搬走，并把旧格让出来，
+   否则旧格会一直被这个任务占着、直到 3 分钟闲置过期。 */
+function dTaskMark(task, i, model){
   if (!task || !model) return;
+  const cell = dCellKey(i, model);
   const now = Date.now();
   const hit = D_TASK.get(task);
-  const own = D_TIER_OWN.get(model);
+  const own = D_TIER_OWN.get(cell);
   /* v0.9.351：身份指纹要跟着任务走。每批成功调用都会走这里续约，漏掉 fp 会被冲成空，
      后面的「同人重开」就永远认不出来（v0.9.351 端到端第一次跑就是这么挂的）。 */
   let fp = (own && own.fp) || '';
   if (hit){
-    if (hit.model && hit.model !== model){
-      const old = D_TIER_OWN.get(hit.model);
-      if (old && old.task === task) { fp = fp || old.fp || ''; D_TIER_OWN.delete(hit.model); }
+    if (hit.cell && hit.cell !== cell){
+      const old = D_TIER_OWN.get(hit.cell);
+      if (old && old.task === task) { fp = fp || old.fp || ''; D_TIER_OWN.delete(hit.cell); }
     }
+    hit.cell = cell;
+    hit.i = i;
     hit.model = model;
     hit.at = now;
   }
-  if (!own || own.task === task) D_TIER_OWN.set(model, { task: task, at: now, fp: fp });
+  if (!own || own.task === task) D_TIER_OWN.set(cell, { task: task, at: now, fp: fp });
 }
 /* v0.9.348：任务收尾时主动释放认领的模型档。
    用户 10-20 定案：「任务完没完咱们自己清楚，完成了就释放给别人」。
@@ -7099,7 +7233,7 @@ function pickRoute(cfg, lang, meta, ip){
   const file = String((meta && meta.file) || '').replace(/[\x00-\x1f]/g, '').slice(0, 120);
   const lock = dTaskSlot(task, cfg, cues, lang, planB, ip || '', file);
   if (lock.slot !== 'D') return pickModel(cfg, lang);
-  const peek = dPeek(cfg, lock.model);
+  const peek = dPeek(cfg, lock.cell);
   if (!peek) return pickModel(cfg, lang);        // 全池当天都满了 → 交给 C/B/A
   if (peek.deny) return pickModel(cfg, lang);    // v0.9.346 本小时名额用完 → 交给 C/B/A，不排队
   if (peek.wait) return { which: 'D', wait: peek.wait };
@@ -7116,14 +7250,15 @@ async function callModelD(cfg, messages, maxTokens, opts, task){
   const t0 = Date.now();
   const budget = (opts && opts.timeoutMs) || 90000;
   const lock = task ? D_TASK.get(task) : null;
-  const prefer = (lock && lock.model) || '';
+  const prefer = (lock && lock.cell) || '';
   const maxRound = Math.max(4, dCellList(cfg, prefer).length + 2);
   let last = null;
   for (let round = 0; round < maxRound; round++) {
     const kp = dPick(cfg, prefer);
     if (!kp) {
-      const e = new Error('Gemini 免费额度已用尽（' + dKeys(cfg).length + ' 个 key × ' +
-        dModels(cfg).length + ' 档模型全部到限）');
+      const cells = dCellList(cfg, '');
+      const e = new Error('Gemini 免费额度已用尽（' + dKeys(cfg).length + ' 把 key 下 ' +
+        cells.length + ' 个模型格子全部到限）');
       e._dExhausted = true; e._status = 429;
       if (last) e.message += '；最后一次上游报错：' + String(last.message || '').slice(0, 120);
       throw e;
@@ -7141,7 +7276,7 @@ async function callModelD(cfg, messages, maxTokens, opts, task){
       const out = await callModel(slotCfgD(cfg, kp.key, kp.model), messages, maxTokens, Object.assign({}, opts, { timeoutMs: left }));
       /* 真正生效的模型名回传，主流程不要再覆写成第一档 */
       try { if (out && typeof out === 'object') out._used = kp.model; } catch (e8) {}
-      dTaskMark(task, kp.model);            // 这一集后面几批优先用同一档
+      dTaskMark(task, kp.i, kp.model);      // 这一集后面几批优先用同一格
       return out;
     } catch (e) {
       if (dQuotaErr(e)) { dMarkErr(cfg, kp.i, kp.model, e); last = e; continue; }  // 换 key / 降档
@@ -7647,8 +7782,9 @@ const server = http.createServer(async (req, res) => {
          别处不要再碰 pick.cfg（D 走这条路时它是 undefined）。
          v0.9.347：多档模型时用 peek 预测的那一档（事件里记的名称）；真正调用的档位
          若因额度变化换了一档，callModelD 会把 out._used 覆写成真实值。 */
+      const firstCell = pick.which === 'D' ? (dCellList(cfg, '')[0] || null) : null;
       const slotModelName = pick.which === 'D'
-        ? String(pick.model || (dModels(cfg)[0] && dModels(cfg)[0].name) || '')
+        ? String(pick.model || (firstCell && firstCell.model) || '')
         : String((pick.cfg && pick.cfg.model) || '');
       /* v0.9.183：排队闸门，按槽位判定。只有前端在 meta 里声明 pace=1 才可能收到 wait——
          旧版本不带这个标记，走的是原路径，不会因为收到一个没有 choices 的响应而误判成「上游返回空」。
@@ -7989,6 +8125,9 @@ const server = http.createServer(async (req, res) => {
           /* v0.9.345：D 槽（Gemini 免费池）。key 只回掩码与今日用量，明文绝不出服务端 */
           provider4: cfg.provider4 || '', base4: cfg.base4 || '', model4: cfg.model4 || '',
           models4: dModelsRaw(cfg),     // v0.9.347：模型池（含停用的档，后台要能编辑/重新启用）
+          /* v0.9.361：每把 key 的模型与备注。老配置在这里已经被摊平成
+             「每把 key 各挂同一份 models4」，后台直接按新结构渲染即可，不需要自己判老新。 */
+          keyModels4: dSlotsRaw(cfg),
           extraParams4: normParams(cfg.extraParams4),
           langModelDAll: cfg.langModelDAll !== false,
           langModelD: Array.isArray(cfg.langModelD) ? cfg.langModelD.slice() : [],
@@ -8247,17 +8386,19 @@ const server = http.createServer(async (req, res) => {
             cfg.keys4[idx] = v.trim();
           }
         });
-        /* v0.9.347：模型池。数组顺序就是优先级，第一档同步写回 model4（兼容字段与老代码）。
-           模型名只留可见 ASCII —— 它会被拿去拼 JSON 请求，允许空格/引号只会制造无解的 400。 */
-        if (Array.isArray(body.models4)) {
-          const seenM = {};
+        /* v0.9.361：模型挂在 key 下面。三把固定槽，下标与 keys4 对齐。
+           ⚠️ 模型名只留可见 ASCII —— 它会被拿去拼 JSON 请求，允许空格/引号只会制造无解的 400。
+           ⚠️ 老后台页面（浏览器还缓存着旧 admin.html）只会发 models4 —— 当成
+              「每把 key 都挂这一份」处理，保存后的行为和升级前完全一致，不会把配置弄丢。 */
+        const cleanDModels = (arr) => {
+          const seen = {};
           const list = [];
-          for (const m of body.models4) {
+          for (const m of (Array.isArray(arr) ? arr : [])) {
             if (!m || typeof m !== 'object') continue;
             const name = String(m.name == null ? '' : m.name).trim().slice(0, 64);
             if (!name || !/^[A-Za-z0-9][A-Za-z0-9._:\/-]*$/.test(name)) continue;
-            if (seenM[name]) continue;
-            seenM[name] = 1;
+            if (seen[name]) continue;
+            seen[name] = 1;
             list.push({
               name: name,
               rpm: Math.max(1, Math.min(600, Math.floor(+m.rpm || 15))),
@@ -8266,15 +8407,51 @@ const server = http.createServer(async (req, res) => {
             });
             if (list.length >= D_MAX_MODELS) break;
           }
-          cfg.models4 = list;
-          cfg.model4 = list.length ? list[0].name : '';
-          /* 兼容字段跟着第一档走：老代码、老前端、slotModelName 的兜底都读它 */
-          if (list.length) { cfg.rpmD = list[0].rpm; cfg.rpdD = list[0].rpd; }
+          return list;
+        };
+        if (Array.isArray(body.keyModels4)) {
+          const slots = [];
+          for (let i = 0; i < 3; i++) {
+            const src = body.keyModels4[i] && typeof body.keyModels4[i] === 'object' ? body.keyModels4[i] : {};
+            slots.push({
+              label: String(src.label == null ? '' : src.label).trim().slice(0, 24),
+              on: src.on !== false,
+              models: cleanDModels(src.models)
+            });
+          }
+          cfg.keyModels4 = slots;
+        } else if (Array.isArray(body.models4)) {
+          const list = cleanDModels(body.models4);
+          cfg.keyModels4 = [0, 1, 2].map(() => ({
+            label: '', on: true, models: list.map(m => Object.assign({}, m))
+          }));
         } else if (typeof body.model4 === 'string' && body.model4.trim()) {
-          /* 只发单模型字段 = 浏览器还在用缓存的旧后台页。这时必须把模型池收敛成一档，
+          /* 只发单模型字段 = 浏览器还在用更早的后台页。把三把 key 都收敛成这一档，
              否则用户改了模型名、保存成功，实际却还在用模型池里的旧名字 —— 最难查的一类。 */
+          const one = { name: body.model4.trim(), rpm: 15, rpd: 1500, on: true };
+          cfg.keyModels4 = [0, 1, 2].map(() => ({ label: '', on: true, models: [Object.assign({}, one)] }));
+        }
+        /* 兼容字段（models4 / model4 / rpmD / rpdD）跟「第一把配了模型的 key」走。
+           老代码、老前端、slotModelName 的兜底都读它们。 */
+        const firstSlot = (() => {
+          const keys = Array.isArray(cfg.keys4) ? cfg.keys4 : [];
+          const slots = Array.isArray(cfg.keyModels4) ? cfg.keyModels4 : [];
+          for (let i = 0; i < 3; i++) {
+            if (String(keys[i] || '').trim() && slots[i] && slots[i].models.length) return slots[i];
+          }
+          for (let i = 0; i < 3; i++) if (slots[i] && slots[i].models.length) return slots[i];
+          return null;
+        })();
+        if (firstSlot) {
+          cfg.models4 = firstSlot.models.map(m => ({
+            name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on
+          }));
+          cfg.model4 = firstSlot.models[0].name;
+          cfg.rpmD = firstSlot.models[0].rpm;
+          cfg.rpdD = firstSlot.models[0].rpd;
+        } else {
           cfg.models4 = [];
-          cfg.model4 = body.model4.trim();
+          cfg.model4 = '';
         }
         if (Number.isFinite(+body.clearDKey)) {
           const i = Math.floor(+body.clearDKey);
@@ -8282,10 +8459,10 @@ const server = http.createServer(async (req, res) => {
             while (cfg.keys4.length <= i) cfg.keys4.push('');
             cfg.keys4[i] = '';
             /* 该位置的用量也归零：换了新 key 还背着旧 key 的用量，等于一上来就少半天额度。
-               v0.9.347：要按模型逐格清 —— 账本是 (key, 模型)，只清一格会留下别的档的用量。 */
+               v0.9.361：只清**这把 key 挂的**模型格（含停用档），别把别的 key 上的同名格清掉。 */
             try {
               const q = dRead();
-              for (const m of dModelsRaw(cfg)) delete q.cells[dCellKey(i, m.name)];
+              for (const m of dSlotModelsAll(cfg, i)) delete q.cells[dCellKey(i, m.name)];
               dWrite(q);
             } catch (e) {}
             for (const k in D_RPM) if (k.indexOf(i + '|') === 0) delete D_RPM[k];
@@ -8293,6 +8470,7 @@ const server = http.createServer(async (req, res) => {
         }
         if (body.clearKey4) {
           cfg.keys4 = []; cfg.base4 = ''; cfg.model4 = ''; cfg.models4 = []; cfg.provider4 = '';
+          cfg.keyModels4 = [];
           cfg.extraParams4 = {}; cfg.langModelD = [];
         }
         if (body.extraParams4 !== undefined) cfg.extraParams4 = normParams(body.extraParams4);
@@ -8359,44 +8537,52 @@ const server = http.createServer(async (req, res) => {
            ⚠️ 测试不记入 D 的额度账本（管理员手点的几次不该把 key 打到退役）。 */
         const which = (tbody && (tbody.which === 'B' || tbody.which === 'C' || tbody.which === 'D' || tbody.which === 'E')) ? tbody.which : 'A';
         if (which === 'D') {
-          const list = dKeyList(cfg);
-          const ms = dModels(cfg);
-          if (!cfg.base4 || !ms.length) {
-            return sendJson(res, 400, { error: { message: '请先保存模型 D 的 Base URL / 至少一档模型 / 至少一个 API Key' } });
+          const slots = dSlots(cfg);
+          if (!cfg.base4 || !slots.length) {
+            return sendJson(res, 400, { error: { message: '请先保存模型 D 的 Base URL / 至少一把 key / 每把 key 至少一档模型' } });
           }
-          /* v0.9.347：key 数 + 模型档数一起测。
-             逐个 key 打**第一档**（能同时验证 key 是否有效、第一档是否可用），
-             再逐个**其余档**用第一个 key 打一下（验证这些模型名对这个 key 开通了没）。
-             总次数 = key 数 + (档数 − 1)，最多 3 + 5 = 8 次，手动点一次可以接受。
+          /* v0.9.361：改成按 key 分组，每把 key 测它**自己挂的**模型。
+             原来只测「第一个 key × 其余模型」，新结构下 Key 2 可能挂着完全不同的模型，
+             拿 Key 1 的结果推断 Key 2 会得出错误结论。
+             总次数 = 各 key 的模型数之和；给 12 项上限，3 把 key × 2 档 = 6 次，
+             真有人每把挂 6 档也不会把后台点成几分钟没响应。
              ⚠️ 测试不记入 D 的额度账本（管理员手点的几次不该把 key 打到退役）。 */
           const sampleMsg = [{ role: 'user', content: 'Reply with exactly: OK' }];
-          const keys = [];
-          for (const k of list) {
-            try {
-              const out = await callModel(slotCfgD(cfg, k.key, ms[0].name), sampleMsg, 256, { timeoutMs: 20000 });
-              const c = out.choices && out.choices[0];
-              const sample = c && c.message ? c.message.content : '';
-              keys.push({ i: k.i, ok: !!sample, sample: String(sample || '').slice(0, 40),
-                hint: sample ? '' : '模型未返回正文（finish_reason=' + ((c && c.finish_reason) || '?') + '）' });
-            } catch (e) {
-              keys.push({ i: k.i, ok: false, err: String((e && e.message) || e).slice(0, 160), quota: dQuotaErr(e) });
+          const groups = [];
+          let budget = 12;
+          for (const s of slots) {
+            const rows = [];
+            for (const m of s.models) {
+              if (budget <= 0) {
+                rows.push({ name: m.name, ok: false, skipped: 1, err: '测试次数已达上限（12 项）' });
+                continue;
+              }
+              budget--;
+              try {
+                const out = await callModel(slotCfgD(cfg, s.key, m.name), sampleMsg, 256, { timeoutMs: 20000 });
+                const c = out.choices && out.choices[0];
+                const sample = c && c.message ? c.message.content : '';
+                rows.push({ name: m.name, ok: !!sample, sample: String(sample || '').slice(0, 40),
+                  hint: sample ? '' : '模型未返回正文（finish_reason=' + ((c && c.finish_reason) || '?') + '）' });
+              } catch (e) {
+                rows.push({ name: m.name, ok: false, err: String((e && e.message) || e).slice(0, 160), quota: dQuotaErr(e) });
+              }
             }
+            groups.push({ i: s.i, label: s.label, results: rows });
           }
-          const models = [];
-          for (let mi = 1; mi < ms.length; mi++) {
-            try {
-              const out = await callModel(slotCfgD(cfg, list[0].key, ms[mi].name), sampleMsg, 256, { timeoutMs: 20000 });
-              const c = out.choices && out.choices[0];
-              const sample = c && c.message ? c.message.content : '';
-              models.push({ name: ms[mi].name, ok: !!sample, sample: String(sample || '').slice(0, 40),
-                hint: sample ? '' : '模型未返回正文（finish_reason=' + ((c && c.finish_reason) || '?') + '）' });
-            } catch (e) {
-              models.push({ name: ms[mi].name, ok: false, err: String((e && e.message) || e).slice(0, 160), quota: dQuotaErr(e) });
-            }
-          }
+          /* keys / models / first 是给缓存里的旧后台页留的兼容字段：
+             旧页面只认「每个 key 一个结果 + 一份模型列表」，这里按 key 结果汇总。 */
+          const keys = groups.map(g => {
+            const bad = g.results.filter(r => !r.ok);
+            return bad.length
+              ? { i: g.i, ok: false, err: (bad[0].err || bad[0].hint || '失败') }
+              : { i: g.i, ok: true, sample: (g.results[0] && g.results[0].sample) || '' };
+          });
+          const first = (slots[0] && slots[0].models[0] && slots[0].models[0].name) || '';
           return sendJson(res, 200, {
-            ok: keys.some(r => r.ok) && !models.some(r => !r.ok),
-            which: 'D', first: ms[0].name, keys: keys, models: models
+            ok: groups.every(g => g.results.every(r => r.ok)),
+            which: 'D', first: first, keys: keys, models: [],
+            groups: groups
           });
         }
         const slot = slotCfg(cfg, which);
