@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio în subtitrări — generează SRT în browser | AI-SRTSub",
+    "desc": "Transformă audio sau video în subtitrări SRT / VTT direct în browser prin recunoaștere vocală locală. Fără încărcări, gratuit și privat.",
+    "kw": "audio în srt,vorbire în subtitrare,generare automată subtitrări,transcriere audio srt,recunoaștere vocală browser,generare subtitrări offline,ASR browser",
+    "intro": "Încarcă un fișier audio sau video, alege limba și modelul, iar recunoașterea va rula direct în browserul tău. Rezultatul este o schiță de subtitrare sincronizată, segmentată corect pe propoziții.",
+    "feat": "Acest instrument procesează fluxul ASR pentru a segmenta textul în indicii de subtitrare optimizate, respectând limitele de caractere și viteza de citire fără suprapuneri.",
+    "who": "Creatori de conținut, echipe care transcriu podcasturi sau cursuri și oricine are nevoie de o schiță de subtitrare editabilă pentru materiale video."
+  },
+  "ocrsub": {
+    "title": "OCR pentru subtitrări hardcoded — extrage text video | AI-SRTSub",
+    "desc": "Extrage subtitrările arse în imagine folosind OCR. Marchează zona, iar instrumentul citește cadrul cu cadru pentru a genera fișiere SRT / VTT gratuit.",
+    "kw": "extragere subtitrări hardcoded,ocr subtitrări,subtitrări arse în video,ocr video în srt,extragere text din video,subtitrări din video,ocr subtitrări",
+    "intro": "Încarcă un video, selectează zona unde apar subtitrările, iar instrumentul va citi cadrul cu cadru, unind secvențele identice într-un singur indiciu temporizat.",
+    "feat": "Instrumentul izolează zona subtitrărilor, aplică binarizarea pentru a elimina fundalul și utilizează OCR pentru a converti textul ars în fișiere SRT sau VTT editabile.",
+    "who": "Echipe de traducători, editori video care lucrează cu materiale vechi și profesioniști care au nevoie de text din fișiere video fără subtitrări separate."
+  }
+}

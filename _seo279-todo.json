@@ -1,0 +1,1002 @@
+[
+ {
+  "table": "SEO",
+  "lang": "zh-CN",
+  "title": "随心字幕 AI (AI-SRTSub) - 全球好剧随心看，一键生成专属母语字幕",
+  "desc": "ai-srtsub.com 是专为影迷打造的免费 AI 字幕翻译工具。支持海外电影、美剧英剧、纪录片一键生成精准母语字幕，自动配轴对齐，无需注册，轻松告别啃生肉，让全球好内容无语言障碍随心畅享。",
+  "overT": true,
+  "overD": false,
+  "w": 62,
+  "dl": 97
+ },
+ {
+  "table": "SEO",
+  "lang": "zh-TW",
+  "title": "隨心字幕 AI (AI-SRTSub) - 全球好劇隨心看，一鍵生成專屬母語字幕",
+  "desc": "ai-srtsub.com 是專為影迷打造的免費 AI 字幕翻譯工具。支援海外電影、美劇英劇、紀錄片一鍵生成精準母語字幕，自動配軸對齊，無需註冊，輕鬆告別啃生肉，讓全球好內容無語言障礙隨心暢享。",
+  "overT": true,
+  "overD": false,
+  "w": 62,
+  "dl": 97
+ },
+ {
+  "table": "SEO",
+  "lang": "en",
+  "title": "AI-SRTSub - Global Movies & Series, Subtitles in Your Language",
+  "desc": "ai-srtsub.com is a free AI subtitle translator built for movie fans — no signup, no limits, no watermark. Turn subtitles of foreign films, US & UK series and documentaries into your native language in one click, with automatic timeline alignment. Stop hunting for subs and enjoy global content barrier-free.",
+  "overT": true,
+  "overD": true,
+  "w": 62,
+  "dl": 307
+ },
+ {
+  "table": "SEO",
+  "lang": "es",
+  "title": "AI-SRTSub - Cine y series del mundo, subtítulos en tu idioma",
+  "desc": "ai-srtsub.com es un traductor de subtítulos con IA gratis, hecho para cinéfilos — sin registro. Convierte en un clic los subtítulos de películas extranjeras, series y documentales a tu idioma materno, con alineación automática de tiempos. Deja de buscar subtítulos y disfruta del contenido mundial sin barreras.",
+  "overT": false,
+  "overD": true,
+  "w": 60,
+  "dl": 311
+ },
+ {
+  "table": "SEO",
+  "lang": "pt",
+  "title": "AI-SRTSub - Filmes e séries do mundo, legendas no seu idioma",
+  "desc": "ai-srtsub.com é um tradutor de legendas com IA grátis, para fãs de cinema e séries — sem cadastro. Converta em um clique as legendas de filmes estrangeiros, séries americanas e britânicas e documentários para o seu idioma, com alinhamento automático de tempos. Chega de caçar legendas: conteúdo global sem barreiras.",
+  "overT": false,
+  "overD": true,
+  "w": 60,
+  "dl": 316
+ },
+ {
+  "table": "SEO",
+  "lang": "ko",
+  "title": "AI-SRTSub - 세계 영화·드라마를 내 언어 자막으로 즐기는 AI 자막 번역기",
+  "desc": "ai-srtsub.com은 영화 팬을 위한 무료 AI 자막 번역기입니다. 해외 영화·미국/영국 드라마·다큐멘터리 자막을 원클릭으로 한국어로 번역하고 타임라인도 자동 정렬됩니다. 자막 찾아 해매는 대신, 언어의 장벽 없이 세계 콘텐츠를 마음껏 즐기세요.",
+  "overT": true,
+  "overD": false,
+  "w": 69,
+  "dl": 140
+ },
+ {
+  "table": "SEO",
+  "lang": "de",
+  "title": "AI-SRTSub - Filme & Serien weltweit, Untertitel in deiner Sprache",
+  "desc": "ai-srtsub.com ist ein kostenloser KI-Untertitel-Übersetzer für Filmfans — ohne Anmeldung. Übersetze Untertitel ausländischer Filme, Serien und Dokumentationen mit einem Klick in deine Sprache, mit automatischer Zeitleisten-Ausrichtung. Schluss mit der Untertitel-Suche: Genieße globale Inhalte ohne Sprachbarrieren.",
+  "overT": true,
+  "overD": true,
+  "w": 65,
+  "dl": 315
+ },
+ {
+  "table": "SEO",
+  "lang": "fr",
+  "title": "AI-SRTSub - Films et séries du monde, sous-titres dans votre langue",
+  "desc": "ai-srtsub.com est un traducteur de sous-titres IA gratuit, pensé pour les cinéphiles — sans inscription. Traduisez en un clic les sous-titres de films étrangers, de séries et de documentaires dans votre langue, avec alignement automatique de la timeline. Fini la chasse aux sous-titres — contenu mondial sans barrière.",
+  "overT": true,
+  "overD": true,
+  "w": 67,
+  "dl": 318
+ },
+ {
+  "table": "SEO",
+  "lang": "id",
+  "title": "AI-SRTSub - Film & drama dunia, subtitle dalam bahasa Anda",
+  "desc": "ai-srtsub.com adalah penerjemah subtitle AI gratis untuk para penikmat film — tanpa perlu daftar. Ubah subtitle film luar negeri, serial Barat, dan dokumenter menjadi bahasa Anda dalam satu klik, dengan penyelarasan timeline otomatis. Berhenti memburu subtitle — nikmati konten global tanpa hambatan bahasa.",
+  "overT": false,
+  "overD": true,
+  "w": 58,
+  "dl": 307
+ },
+ {
+  "table": "SEO",
+  "lang": "hi",
+  "title": "AI-SRTSub - दुनिया की फ़िल्में और सीरीज़, सबटाइटल आपकी भाषा में",
+  "desc": "ai-srtsub.com फ़िल्म प्रेमियों के लिए बना मुफ़्त AI सबटाइटल अनुवादक है — बिना रजिस्ट्रेशन। विदेशी फ़िल्मों, अमेरिकी-ब्रिटिश सीरीज़ और डॉक्यूमेंट्री के सबटाइटल एक क्लिक में अपनी भाषा में अनुवाद करें, टाइमलाइन अपने आप संरेखित होती है। सबटाइटल ढूँढने की झंझट ख़त्म — भाषा की दीवार के बिना वैश्विक कंटेंट का आनंद लें।",
+  "overT": true,
+  "overD": true,
+  "w": 63,
+  "dl": 313
+ },
+ {
+  "table": "SEO",
+  "lang": "th",
+  "title": "AI-SRTSub - หนังและซีรีส์จากทั่วโลก ซับในภาษาของคุณ",
+  "desc": "ai-srtsub.com คือเครื่องมือแปลซับไตเติลด้วย AI ฟรี สำหรับสายหนังตัวจริง ไม่ต้องสมัคร แปลซับหนังต่างประเทศ ซีรีส์ฝรั่ง และสารคดี เป็นภาษาของคุณในคลิกเดียว พร้อมจัดแนวไทม์ไลน์อัตโนมัติ ไม่ต้องเหนื่อยกับการหาซับอีกต่อไป ดื่มด่ำคอนเทนต์ทั่วโลกไร้กำแพงภาษา",
+  "overT": false,
+  "overD": true,
+  "w": 51,
+  "dl": 251
+ },
+ {
+  "table": "SEO",
+  "lang": "vi",
+  "title": "AI-SRTSub - Phim và series thế giới, phụ đề bằng ngôn ngữ của bạn",
+  "desc": "ai-srtsub.com là công cụ dịch phụ đề AI miễn phí dành cho người yêu phim — không cần đăng ký. Chuyển phụ đề phim nước ngoài, phim Mỹ - Anh và phim tài liệu sang ngôn ngữ của bạn chỉ trong một cú nhấp, tự động căn chỉnh timeline. Không còn cảnh đi tìm phụ đề — tận hưởng nội dung toàn cầu không rào cản ngôn ngữ.",
+  "overT": true,
+  "overD": true,
+  "w": 65,
+  "dl": 311
+ },
+ {
+  "table": "SEO",
+  "lang": "ru",
+  "title": "AI-SRTSub - Фильмы и сериалы всего мира с субтитрами на вашем языке",
+  "desc": "ai-srtsub.com — бесплатный ИИ-переводчик субтитров для киноманов — без регистрации. Переводите субтитры зарубежных фильмов, американских и британских сериалов и документалок на родной язык в один клик, с автоматическим выравниванием таймлайна. Хватит искать субтитры — смотрите мировой контент без языкового барьера.",
+  "overT": true,
+  "overD": true,
+  "w": 67,
+  "dl": 316
+ },
+ {
+  "table": "SEO",
+  "lang": "it",
+  "title": "AI-SRTSub - Film e serie del mondo, sottotitoli nella tua lingua",
+  "desc": "ai-srtsub.com è un traduttore di sottotitoli IA gratuito, pensato per i cinefili — senza registrazione. Traduci in un clic i sottotitoli di film stranieri, serie e documentari nella tua lingua madre, con allineamento automatico della timeline. Basta cercare sottotitoli — contenuti mondiali senza barriere.",
+  "overT": true,
+  "overD": true,
+  "w": 64,
+  "dl": 306
+ },
+ {
+  "table": "SEO",
+  "lang": "ar",
+  "title": "AI-SRTSub - أفلام ومسلسلات من العالم بترجمات بلغتك",
+  "desc": "ai-srtsub.com أداة ترجمة ترجمات بالذكاء الاصطناعي مجانية، صُممت لعشاق الأفلام — دون تسجيل. حوّل ترجمات الأفلام الأجنبية والمسلسلات الأمريكية والبريطانية والأفلام الوثائقية إلى لغتك في نقرة واحدة، مع محاذاة تلقائية للخط الزمني. لا مزيد من البحث عن الترجمات — استمتع بالمحتوى العالمي بلا حواجز لغوية.",
+  "overT": false,
+  "overD": true,
+  "w": 50,
+  "dl": 298
+ },
+ {
+  "table": "SEO",
+  "lang": "tr",
+  "title": "AI-SRTSub - Dünyanın film ve dizileri, altyazı senin dilinde",
+  "desc": "ai-srtsub.com, film tutkunları için tasarlanmış ücretsiz bir AI altyazı çevirmenisidir — kayıt gerektirmez. Yabancı filmlerin, Amerikan ve İngiliz dizilerinin ve belgesellerin altyazılarını tek tıkla ana diline çevir; zaman çizgisi otomatik hizalanır. Altyazı avı sona erdi: küresel içerik, dil bariyersiz.",
+  "overT": false,
+  "overD": true,
+  "w": 60,
+  "dl": 306
+ },
+ {
+  "table": "SEO",
+  "lang": "nl",
+  "title": "AI-SRTSub - Gratis AI-ondertitelvertaler voor films en series",
+  "desc": "ai-srtsub.com is een gratis AI-ondertitelvertaler voor filmliefhebbers. Vertaal ondertitels van buitenlandse films, series en documentaires in één klik naar je eigen taal, met automatische tijdlijn-uitlijning. Geen registratie, geen limiet.",
+  "overT": true,
+  "overD": true,
+  "w": 61,
+  "dl": 240
+ },
+ {
+  "table": "SEO",
+  "lang": "pl",
+  "title": "AI-SRTSub - Darmowy tłumacz napisów AI do filmów i seriali",
+  "desc": "ai-srtsub.com to darmowy tłumacz napisów AI dla miłośników kina. Przetłumacz napisy zagranicznych filmów, seriali i dokumentów jednym kliknięciem na swój język, z automatycznym dopasowaniem osi czasu. Bez rejestracji i bez limitów.",
+  "overT": false,
+  "overD": true,
+  "w": 58,
+  "dl": 231
+ },
+ {
+  "table": "SEO",
+  "lang": "sv",
+  "title": "AI-SRTSub - Gratis AI-översättare för undertexter till film och serier",
+  "desc": "ai-srtsub.com är en gratis AI-översättare för undertexter, byggd för filmälskare. Översätt undertexter till utländska filmer, serier och dokumentärer till ditt eget språk med ett klick, med automatisk tidslinjejustering. Ingen registrering, inga begränsningar.",
+  "overT": true,
+  "overD": true,
+  "w": 70,
+  "dl": 260
+ },
+ {
+  "table": "SEO",
+  "lang": "cs",
+  "title": "AI-SRTSub - Bezplatný AI překladač titulků k filmům a seriálům",
+  "desc": "ai-srtsub.com je bezplatný AI překladač titulků pro milovníky filmů. Přeložte titulky zahraničních filmů, seriálů a dokumentů jedním kliknutím do svého jazyka, s automatickým zarovnáním časové osy. Bez registrace a bez omezení.",
+  "overT": true,
+  "overD": true,
+  "w": 62,
+  "dl": 227
+ },
+ {
+  "table": "SEO",
+  "lang": "uk",
+  "title": "AI-SRTSub - Безкоштовний AI-перекладач субтитрів до фільмів і серіалів",
+  "desc": "ai-srtsub.com — безкоштовний AI-перекладач субтитрів для поціновувачів кіно. Перекладайте субтитри іноземних фільмів, серіалів і документалок одним кліком рідною мовою з автоматичним вирівнюванням таймлайну. Без реєстрації та обмежень.",
+  "overT": true,
+  "overD": true,
+  "w": 70,
+  "dl": 235
+ },
+ {
+  "table": "SEO",
+  "lang": "da",
+  "title": "AI-SRTSub - Gratis AI-oversætter af undertekster til film og serier",
+  "desc": "ai-srtsub.com er en gratis AI-oversætter af undertekster, bygget til filmelskere. Oversæt undertekster til udenlandske film, serier og dokumentarer til dit eget sprog med ét klik, med automatisk tidslinjejustering. Ingen tilmelding, ingen begrænsninger.",
+  "overT": true,
+  "overD": true,
+  "w": 67,
+  "dl": 253
+ },
+ {
+  "table": "SEO",
+  "lang": "fi",
+  "title": "AI-SRTSub - Ilmainen tekoälypohjainen tekstitysten kääntäjä elokuville ja sarjoille",
+  "desc": "ai-srtsub.com on ilmainen tekoälypohjainen tekstitysten kääntäjä elokuvien ystäville. Käännä ulkomaisten elokuvien, sarjojen ja dokumenttien tekstitykset yhdellä klikkauksella omalle kielellesi automaattisella aikajanan kohdistuksella. Ei rekisteröitymistä, ei rajoituksia.",
+  "overT": true,
+  "overD": true,
+  "w": 83,
+  "dl": 273
+ },
+ {
+  "table": "SEO",
+  "lang": "el",
+  "title": "AI-SRTSub - Δωρεάν μεταφραστής υποτίτλων με AI για ταινίες και σειρές",
+  "desc": "Το ai-srtsub.com είναι ένας δωρεάν μεταφραστής υποτίτλων με AI για τους λάτρεις του κινηματογράφου. Μετέφρασε τους υπότιτλους ξένων ταινιών, σειρών και ντοκιμαντέρ στη γλώσσα σου με ένα κλικ, με αυτόματη ευθυγράμμιση χρονογραμμής. Χωρίς εγγραφή, χωρίς περιορισμούς.",
+  "overT": true,
+  "overD": true,
+  "w": 69,
+  "dl": 265
+ },
+ {
+  "table": "SEO",
+  "lang": "he",
+  "title": "AI-SRTSub - מתרגם כתוביות AI חינם לסרטים וסדרות",
+  "desc": "ai-srtsub.com הוא מתרגם כתוביות AI חינמי שנבנה בשביל חובבי קולנוע. תרגמו כתוביות של סרטים זרים, סדרות וסרטי תעודה לשפה שלכם בלחיצה אחת, עם יישור אוטומטי של ציר הזמן. בלי הרשמה, בלי הגבלות.",
+  "overT": false,
+  "overD": true,
+  "w": 47,
+  "dl": 188
+ },
+ {
+  "table": "SEO",
+  "lang": "ro",
+  "title": "AI-SRTSub - Traducător AI de subtitrări gratuit pentru filme și seriale",
+  "desc": "ai-srtsub.com este un traducător AI de subtitrări gratuit, creat pentru pasionații de film. Traduceți subtitrările filmelor străine, serialelor și documentarelor în limba voastră cu un singur clic, cu aliniere automată a timeline-ului. Fără înregistrare, fără limite.",
+  "overT": true,
+  "overD": true,
+  "w": 71,
+  "dl": 267
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "zh-CN",
+  "title": "特效字幕工具 - 双语合并 · 样式模板 · ASS/VTT 特效 | 随心字幕 AI",
+  "desc": "免费在线特效字幕工具：两份字幕合并成双语、调整已有双语的顺序与样式、给单语字幕加特效。ASS 5 套 / VTT 6 套行业模板，实时预览所见即所得，导出 SRT / VTT / ASS。",
+  "overT": true,
+  "overD": false,
+  "w": 63,
+  "dl": 94
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "en",
+  "title": "Styled Subtitle Maker - Merge Bilingual, ASS & VTT Effects | AI-SRTSub",
+  "desc": "Free online tool for styled subtitles: merge two files into bilingual, reorder or restyle an existing bilingual track, or add effects to a single-language track. 5 ASS and 6 VTT industry presets with live WYSIWYG preview. Export SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 70,
+  "dl": 245
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "zh-TW",
+  "title": "特效字幕工具 - 雙語合併 · 樣式範本 · ASS/VTT 特效 | 隨心字幕 AI",
+  "desc": "免費線上特效字幕工具：兩份字幕合併成雙語、調整既有雙語的順序與樣式、替單語字幕加特效。ASS 5 套 / VTT 6 套業界範本，即時預覽所見即所得，匯出 SRT / VTT / ASS。",
+  "overT": true,
+  "overD": false,
+  "w": 63,
+  "dl": 94
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "ja",
+  "title": "装飾字幕ツール - 二か国語結合 · スタイルテンプレート · ASS/VTT 装飾 | AI-SRTSub",
+  "desc": "無料のオンライン装飾字幕ツール：2本の字幕を二か国語に統合、既存の二か国語字幕の順序とスタイルを調整、単一言語の字幕に装飾を追加。ASS 5種 / VTT 6種の業界テンプレート、ライブプレビューは書き出し結果と同じです。SRT / VTT / ASS で書き出し。",
+  "overT": true,
+  "overD": false,
+  "w": 79,
+  "dl": 133
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "ko",
+  "title": "스타일 자막 도구 - 두 언어 합치기 · 스타일 템플릿 · ASS/VTT 효과 | AI-SRTSub",
+  "desc": "무료 온라인 스타일 자막 도구: 자막 두 개를 두 언어로 합치고, 기존 두 언어 자막의 순서와 스타일을 조정하고, 단일 언어 자막에 효과를 더합니다. ASS 5종 / VTT 6종 업계 프리셋, 실시간 미리보기는 내보낸 결과와 같습니다. SRT / VTT / ASS로 내보내기.",
+  "overT": true,
+  "overD": false,
+  "w": 76,
+  "dl": 154
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "es",
+  "title": "Herramienta de subtítulos con estilo - unir bilingües · plantillas · efectos ASS/VTT | AI-SRTSub",
+  "desc": "Herramienta online gratuita de subtítulos con estilo: une dos archivos en bilingüe, reordena y reestiliza una pista bilingüe o añade efectos a una pista de un solo idioma. 5 plantillas ASS y 6 VTT con vista previa WYSIWYG. Exporta SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 96,
+  "dl": 247
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "pt",
+  "title": "Ferramenta de legendas com estilo - unir bilíngues · modelos · efeitos ASS/VTT | AI-SRTSub",
+  "desc": "Ferramenta online grátis de legendas com estilo: una dois arquivos em bilíngue, reordene e reestilize uma faixa bilíngue ou aplique efeitos a uma faixa de um idioma só. 5 modelos ASS e 6 VTT com pré-visualização WYSIWYG. Exporte SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 90,
+  "dl": 245
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "de",
+  "title": "Untertitel mit Stil - zweisprachig zusammenführen · Vorlagen · ASS/VTT-Effekte | AI-SRTSub",
+  "desc": "Kostenloses Online-Tool für gestaltete Untertitel: zwei Dateien zu zweisprachig zusammenführen, eine bestehende zweisprachige Spur umordnen und umgestalten oder Effekte auf eine einsprachige Spur anwenden. 5 ASS- und 6 VTT-Vorlagen mit WYSIWYG-Vorschau. Export als SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 90,
+  "dl": 281
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "fr",
+  "title": "Outil de sous-titres stylisés - fusion bilingue · modèles · effets ASS/VTT | AI-SRTSub",
+  "desc": "Outil en ligne gratuit pour sous-titres stylisés : fusionnez deux fichiers en bilingue, réordonnez et restituez une piste bilingue ou ajoutez des effets à une piste monolingue. 5 modèles ASS et 6 VTT avec aperçu WYSIWYG. Export SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 86,
+  "dl": 244
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "id",
+  "title": "Alat subtitle berestet - gabung dwibahasa · template · efek ASS/VTT | AI-SRTSub",
+  "desc": "Alat subtitle berestet online gratis: gabung dua file jadi dwibahasa, susun ulang dan ubah gaya subtitle dwibahasa yang sudah ada, atau tambahkan efek ke subtitle satu bahasa. 5 template ASS dan 6 VTT dengan pratinjau WYSIWYG. Ekspor SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 79,
+  "dl": 250
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "hi",
+  "title": "स्टाइल सबटाइटल टूल - द्विभाषी मर्ज · टेम्पलेट · ASS/VTT इफ़ेक्ट | AI-SRTSub",
+  "desc": "मुफ़्त ऑनलाइन स्टाइल सबटाइटल टूल: दो फ़ाइलों को द्विभाषी बनाएँ, मौजूदा द्विभाषी ट्रैक को दोबारा क्रमबद्ध और स्टाइल करें, या एक भाषा के ट्रैक में इफ़ेक्ट जोड़ें। 5 ASS और 6 VTT टेम्पलेट, WYSIWYG प्रीव्यू के साथ। SRT / VTT / ASS निर्यात।",
+  "overT": true,
+  "overD": true,
+  "w": 75,
+  "dl": 235
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "th",
+  "title": "เครื่องมือซับไตเติลใส่สไตล์ - รวมสองภาษา · แม่แบบ · เอฟเฟกต์ ASS/VTT | AI-SRTSub",
+  "desc": "เครื่องมือซับใส่สไตล์ออนไลน์ฟรี: รวมสองไฟล์เป็นสองภาษา จัดลำดับและปรับสไตล์ซับสองภาษาที่มีอยู่ หรือเพิ่มเอฟเฟกต์ให้ซับภาษาเดียว แม่แบบ ASS 5 แบบ / VTT 6 แบบ พร้อมพรีวิว WYSIWYG ส่งออก SRT / VTT / ASS",
+  "overT": true,
+  "overD": true,
+  "w": 80,
+  "dl": 199
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "vi",
+  "title": "Công cụ phụ đề tạo kiểu - gộp song ngữ · mẫu · hiệu ứng ASS/VTT | AI-SRTSub",
+  "desc": "Công cụ phụ đề tạo kiểu online miễn phí: gộp hai file thành song ngữ, sắp xếp lại và đổi kiểu phụ đề song ngữ có sẵn, hoặc thêm hiệu ứng cho phụ đề một ngôn ngữ. 5 mẫu ASS và 6 VTT với xem trước WYSIWYG. Xuất SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 75,
+  "dl": 225
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "ru",
+  "title": "Инструмент оформленных субтитров - слияние двуязычных · шаблоны · эффекты ASS/VTT | AI-SRTSub",
+  "desc": "Бесплатный онлайн-инструмент для оформленных субтитров: объедините два файла в двуязычные, поменяйте порядок и стиль готовой двуязычной дорожки или добавьте эффекты к одному языку. 5 шаблонов ASS и 6 VTT с предпросмотром WYSIWYG. Экспорт в SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 93,
+  "dl": 256
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "it",
+  "title": "Strumento sottotitoli con stile - unione bilingue · modelli · effetti ASS/VTT | AI-SRTSub",
+  "desc": "Strumento online gratuito per sottotitoli con stile: unisci due file in bilingue, riordina e ristilizza una traccia bilingue esistente oppure aggiungi effetti a una traccia in una sola lingua. 5 modelli ASS e 6 VTT con anteprima WYSIWYG. Esporta SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 89,
+  "dl": 262
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "ar",
+  "title": "أداة الترجمة بتنسيق - دمج بلغتين · قوالب · تأثيرات ASS/VTT | AI-SRTSub",
+  "desc": "أداة مجانية على الإنترنت للترجمات المنسّقة: ادمج ملفين في ترجمة بلغتين، أعد ترتيب وتنسيق ترجمة بلغتين موجودة، أو أضف تأثيرات إلى ترجمة بلغة واحدة. 5 قوالب ASS و6 قوالب VTT مع معاينة WYSIWYG. تصدير SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 70,
+  "dl": 213
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "tr",
+  "title": "Stil altyazı aracı - iki dilli birleştirme · şablonlar · ASS/VTT efektleri | AI-SRTSub",
+  "desc": "Ücretsiz online stil altyazı aracı: iki dosyayı iki dilli hale getirin, mevcut iki dilli altyazıyı yeniden sıralayıp biçimlendirin ya da tek dilli bir altyazıya efekt ekleyin. WYSIWYG önizlemeli 5 ASS ve 6 VTT şablonu. SRT / VTT / ASS dışa aktarın.",
+  "overT": true,
+  "overD": true,
+  "w": 86,
+  "dl": 248
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "nl",
+  "title": "Tool voor ondertitels met stijl - tweetalig samenvoegen · sjablonen · ASS/VTT-effecten | AI-SRTSub",
+  "desc": "Gratis online tool voor ondertitels met stijl: voeg twee bestanden samen tot tweetalig, herschik en herstijl een bestaand tweetalig spoor of voeg effecten toe aan een eentalig spoor. 5 ASS- en 6 VTT-sjablonen met WYSIWYG-voorbeeld. Exporteer SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 98,
+  "dl": 258
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "pl",
+  "title": "Narzędzie napisów ze stylem - łączenie dwujęzyczne · szablony · efekty ASS/VTT | AI-SRTSub",
+  "desc": "Darmowe narzędzie online do napisów ze stylem: połącz dwa pliki w dwujęzyczne, zmień kolejność i styl istniejącej dwujęzycznej ścieżki albo dodaj efekty do napisów w jednym języku. 5 szablonów ASS i 6 VTT z podglądem WYSIWYG. Eksport SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 90,
+  "dl": 250
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "sv",
+  "title": "Verktyg för undertexter med stil - slå ihop tvåspråkigt · mallar · ASS/VTT-effekter | AI-SRTSub",
+  "desc": "Gratis onlineverktyg för undertexter med stil: slå ihop två filer till tvåspråkig, ordna om och forma om ett befintligt tvåspråkigt spår eller lägg till effekter på ett enspråkigt spår. 5 ASS- och 6 VTT-mallar med WYSIWYG-förhandsvisning. Exportera SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 95,
+  "dl": 265
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "cs",
+  "title": "Nástroj pro titulky se stylem - sloučení dvojjazyčných · šablony · efekty ASS/VTT | AI-SRTSub",
+  "desc": "Bezplatný online nástroj pro titulky se stylem: spojte dva soubory do dvojjazyčných, přeuspořádejte a přestylujte existující dvojjazyčnou stopu nebo přidejte efekty k jednojazyčné stopě. 5 šablon ASS a 6 VTT s náhledem WYSIWYG. Export SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 93,
+  "dl": 251
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "uk",
+  "title": "Інструмент оформлених субтитрів - злиття двомовних · шаблони · ефекти ASS/VTT | AI-SRTSub",
+  "desc": "Безплатний онлайн-інструмент для оформлених субтитрів: об’єднайте два файли в двомовні, переставте й переоформіть наявну двомовну доріжку або додайте ефекти до одномовної. 5 шаблонів ASS і 6 VTT з попереднім переглядом WYSIWYG. Експорт у SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 89,
+  "dl": 254
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "da",
+  "title": "Værktøj til undertekster med stil - slå tosproget sammen · skabeloner · ASS/VTT-effekter | AI-SRTSub",
+  "desc": "Gratis online værktøj til undertekster med stil: sæt to filer sammen til tosproget, omrokér og omstil et eksisterende tosproget spor, eller tilføj effekter til et etsproget spor. 5 ASS- og 6 VTT-skabeloner med WYSIWYG-forhåndsvisning. Eksporter SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 100,
+  "dl": 261
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "fi",
+  "title": "Tyyliteltyjen tekstitysten työkalu - kaksikielisten yhdistäminen · mallit · ASS/VTT-tehosteet | AI-SRTSub",
+  "desc": "Ilmainen verkkotyökalu tyylitellyille tekstityksille: yhdistä kaksi tiedostoa kaksikieliseksi, järjestä ja muotoile uudelleen olemassa oleva kaksikielinen raita tai lisää tehosteita yksikieliseen raitaan. 5 ASS- ja 6 VTT-mallia WYSIWYG-esikatselulla. Vie SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 105,
+  "dl": 271
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "el",
+  "title": "Εργαλείο υποτίτλων με στυλ - συγχώνευση δίγλωσσων · πρότυπα · εφέ ASS/VTT | AI-SRTSub",
+  "desc": "Δωρεάν διαδικτυακό εργαλείο για υπότιτλους με στυλ: ενώστε δύο αρχεία σε δίγλωσσο, αναδιατάξτε και αλλάξτε το στυλ ενός υπάρχοντος δίγλωσσου κομματιού ή προσθέστε εφέ σε μονόγλωσσο. 5 πρότυπα ASS και 6 VTT με προεπισκόπηση WYSIWYG. Εξαγωγή SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 85,
+  "dl": 256
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "he",
+  "title": "כלי כתוביות עם סגנון - מיזוג דו-לשוני · תבניות · אפקטים ASS/VTT | AI-SRTSub",
+  "desc": "כלי מקוון חינם לכתוביות עם סגנון: חברו שני קבצים לדו-לשוני, סדרו מחדש ועצבו מחדש רצועה דו-לשונית קיימת, או הוסיפו אפקטים לרצועה בשפה אחת. 5 תבניות ASS ו-6 VTT עם תצוגה מקדימה WYSIWYG. ייצוא SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 75,
+  "dl": 206
+ },
+ {
+  "table": "SEO_MERGE",
+  "lang": "ro",
+  "title": "Instrument pentru subtitrări cu stil - îmbinare bilingvă · șabloane · efecte ASS/VTT | AI-SRTSub",
+  "desc": "Instrument online gratuit pentru subtitrări cu stil: îmbină două fișiere într-unul bilingv, reordonează și restituie o pistă bilingvă existentă sau adaugă efecte pe o pistă într-o singură limbă. 5 șabloane ASS și 6 VTT cu previzualizare WYSIWYG. Export SRT / VTT / ASS.",
+  "overT": true,
+  "overD": true,
+  "w": 96,
+  "dl": 269
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "en",
+  "title": "Subtitle Cleaner - Strip Watermarks, SDH Cues & HTML Tags | AI-SRTSub",
+  "desc": "Free online subtitle cleaner: strip group watermarks, ads, SDH cues, HTML tags and ASS effects, fix all-caps and mojibake. 13 rules in four groups, every change listed and revertible, timing never moves.",
+  "overT": true,
+  "overD": true,
+  "w": 69,
+  "dl": 203
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "ja",
+  "title": "字幕クリーニング - ウォーターマーク広告・聴覚障害者向け表記・文字化けを一括除去 | AI-SRTSub",
+  "desc": "無料のオンライン字幕クリーニングツール：字幕組のウォーターマークと広告、聴覚障害者向け表記、HTMLタグ、ASS装飾を除去し、全角大文字と文字化けを修復。13項目のルールを個別に切替、変更は一件ずつ取り消し可能、時間軸は不変更。",
+  "overT": true,
+  "overD": false,
+  "w": 91,
+  "dl": 114
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "ko",
+  "title": "자막 정리 도구 - 워터마크 광고 · 청각 장애인용 표기 · 깨진 글자 제거 | AI-SRTSub",
+  "desc": "무료 온라인 자막 정리 도구: 자막팀 워터마크와 광고, 청각 장애인용 표기, HTML 태그, ASS 효과를 제거하고 전체 대문자와 깨진 글자를 고칩니다. 13개 규칙을 자유롭게 켜고 끌 수 있고, 바뀐 내용은 하나씩 되돌릴 수 있으며 시간축은 그대로입니다.",
+  "overT": true,
+  "overD": false,
+  "w": 80,
+  "dl": 143
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "es",
+  "title": "Limpiador de subtítulos - quita marcas de agua, avisos SDH y caracteres corruptos | AI-SRTSub",
+  "desc": "Limpiador de subtítulos online gratuito: elimina marcas de agua de grupos, anuncios, avisos SDH, etiquetas HTML y efectos ASS; corrige el texto en mayúsculas y los caracteres corruptos. 13 reglas que activas a tu gusto, cada cambio es reversible y los tiempos no se mueven.",
+  "overT": true,
+  "overD": true,
+  "w": 93,
+  "dl": 273
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "pt",
+  "title": "Limpador de legendas - remove marcas d’água, avisos SDH e caracteres corrompidos | AI-SRTSub",
+  "desc": "Limpador de legendas online grátis: remove marcas d’água de grupos, anúncios, avisos SDH, tags HTML e efeitos ASS; corrige texto em maiúsculas e caracteres corrompidos. 13 regras que você liga e desliga, cada mudança reversível e os tempos não se movem.",
+  "overT": true,
+  "overD": true,
+  "w": 92,
+  "dl": 253
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "de",
+  "title": "Untertitel-Reiniger - entfernt Wasserzeichen, SDH-Hinweise und Zeichensalat | AI-SRTSub",
+  "desc": "Kostenloser Online-Reiniger für Untertitel: entfernt Gruppen-Wasserzeichen, Werbung, SDH-Hinweise, HTML-Tags und ASS-Effekte; korrigiert Großbuchstaben und Zeichensalat. 13 Regeln nach Wahl, jede Änderung rückgängig machbar, die Zeiten bleiben unangetastet.",
+  "overT": true,
+  "overD": true,
+  "w": 87,
+  "dl": 257
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "fr",
+  "title": "Nettoyeur de sous-titres - supprime filigranes, indications SDH et caractères corrompus | AI-SRTSub",
+  "desc": "Nettoyeur de sous-titres en ligne gratuit : supprime les filigranes de groupes, les pubs, les indications SDH, les balises HTML et les effets ASS ; corrige le tout-en-majuscules et les caractères corrompus. 13 règles à activer à volonté, chaque modification annulable, les temps ne bougent pas.",
+  "overT": true,
+  "overD": true,
+  "w": 99,
+  "dl": 294
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "id",
+  "title": "Pembersih subtitle - hapus watermark, penanda SDH dan karakter rusak | AI-SRTSub",
+  "desc": "Pembersih subtitle online gratis: hapus watermark grup, iklan, penanda SDH, tag HTML dan efek ASS; perbaiki teks huruf kapital semua dan karakter rusak. 13 aturan bisa diaktifkan sesukanya, setiap perubahan bisa dibatalkan, dan waktu tidak pernah bergeser.",
+  "overT": true,
+  "overD": true,
+  "w": 80,
+  "dl": 256
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "hi",
+  "title": "सबटाइटल क्लीनर - वॉटरमार्क, SDH संकेत और गड़बड़ अक्षर हटाएँ | AI-SRTSub",
+  "desc": "मुफ़्त ऑनलाइन सबटाइटल क्लीनर: ग्रुप वॉटरमार्क, विज्ञापन, SDH संकेत, HTML टैग और ASS इफ़ेक्ट हटाता है; ऑल-कैप्स और गड़बड़ अक्षर ठीक करता है। 13 नियम अपनी मर्ज़ी से चालू करें, हर बदलाव वापस किया जा सकता है, समय बिलकुल नहीं हिलता।",
+  "overT": true,
+  "overD": true,
+  "w": 71,
+  "dl": 227
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "th",
+  "title": "เครื่องมือล้างซับไตเติล - ลบลายน้ำ โฆษณา ป้าย SDH และตัวอักษรเพี้ยน | AI-SRTSub",
+  "desc": "เครื่องมือล้างซับออนไลน์ฟรี: ลบลายน้ำของทีมซับ โฆษณา ป้าย SDH แท็ก HTML และเอฟเฟกต์ ASS แก้ตัวพิมพ์ใหญ่ทั้งหมดและตัวอักษรเพี้ยน 13 กฎเปิดปิดได้ตามใจ ทุกการเปลี่ยนแปลงย้อนกลับได้ และไทม์ไลน์ไม่ขยับ",
+  "overT": true,
+  "overD": true,
+  "w": 79,
+  "dl": 196
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "vi",
+  "title": "Công cụ làm sạch phụ đề - xóa watermark, ký hiệu SDH và ký tự lỗi | AI-SRTSub",
+  "desc": "Công cụ làm sạch phụ đề online miễn phí: xóa watermark nhóm, quảng cáo, ký hiệu SDH, thẻ HTML và hiệu ứng ASS; sửa chữ toàn viết hoa và ký tự lỗi. 13 quy tắc bật tắt tùy ý, mỗi thay đổi đều hoàn tác được, thời gian không hề thay đổi.",
+  "overT": true,
+  "overD": true,
+  "w": 77,
+  "dl": 233
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "ru",
+  "title": "Очиститель субтитров - удаляет водяные знаки, пометки SDH и кракозябры | AI-SRTSub",
+  "desc": "Бесплатный онлайн-очиститель субтитров: удаляет водяные знаки групп, рекламу, пометки SDH, HTML-теги и эффекты ASS; исправляет ЗАГЛАВНЫЕ БУКВЫ и кракозябры. 13 правил включаются по желанию, каждое изменение отменяется, таймкоды не двигаются.",
+  "overT": true,
+  "overD": true,
+  "w": 82,
+  "dl": 241
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "it",
+  "title": "Pulitore di sottotitoli - rimuove filigrane, indicazioni SDH e caratteri corrotti | AI-SRTSub",
+  "desc": "Pulitore di sottotitoli online gratuito: rimuove filigrane dei gruppi, pubblicità, indicazioni SDH, tag HTML ed effetti ASS; sistema il tutto maiuscolo e i caratteri corrotti. 13 regole attivabili a piacere, ogni modifica annullabile, i tempi non si muovono.",
+  "overT": true,
+  "overD": true,
+  "w": 93,
+  "dl": 258
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "ar",
+  "title": "منظّف الترجمة - يزيل العلامات المائية وإشارات SDH والأحرف التالفة | AI-SRTSub",
+  "desc": "منظّف ترجمة مجاني على الإنترنت: يزيل علامات الفرق المائية والإعلانات وإشارات SDH ووسوم HTML وتأثيرات ASS؛ ويصلح الكتابة بأحرف كبيرة والأحرف التالفة. 13 قاعدة تُفعّل كما تشاء، وكل تغيير قابل للتراجع، والتوقيتات لا تتغيّر.",
+  "overT": true,
+  "overD": true,
+  "w": 77,
+  "dl": 220
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "tr",
+  "title": "Altyazı temizleyici - filigranları, SDH işaretlerini ve bozuk karakterleri siler | AI-SRTSub",
+  "desc": "Ücretsiz online altyazı temizleyici: ekip filigranlarını, reklamları, SDH işaretlerini, HTML etiketlerini ve ASS efektlerini siler; tamamı büyük harf ve bozuk karakterleri düzeltir. 13 kural istediğiniz gibi açılıp kapanır, her değişiklik geri alınabilir, zamanlar asla kaymaz.",
+  "overT": true,
+  "overD": true,
+  "w": 92,
+  "dl": 277
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "nl",
+  "title": "Ondertitel-schoonmaker - verwijdert watermerken, SDH-markeringen en corrupte tekens | AI-SRTSub",
+  "desc": "Gratis online ondertitel-schoonmaker: verwijdert groepswatermerken, reclame, SDH-markeringen, HTML-tags en ASS-effecten; herstelt hoofdletters en corrupte tekens. 13 regels naar keuze aan te zetten, elke wijziging is terug te draaien en de tijden blijven onaangeroerd.",
+  "overT": true,
+  "overD": true,
+  "w": 95,
+  "dl": 268
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "pl",
+  "title": "Czyścik napisów - usuwa znaki wodne, oznaczenia SDH i krzaki | AI-SRTSub",
+  "desc": "Darmowy czyścik napisów online: usuwa znaki wodne grup, reklamy, oznaczenia SDH, tagi HTML i efekty ASS; naprawia WIELKIE LITERY i krzaki. 13 reguł włączasz według uznania, każdą zmianę można cofnąć, a czasy nie ruszają się ani o milisekundę.",
+  "overT": true,
+  "overD": true,
+  "w": 72,
+  "dl": 242
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "sv",
+  "title": "Rensare för undertexter - tar bort vattenmärken, SDH-markeringar och trasiga tecken | AI-SRTSub",
+  "desc": "Gratis onlineverktyg som rensar undertexter: tar bort grupp-vattenmärken, reklam, SDH-markeringar, HTML-taggar och ASS-effekter; åtgärdar VERSALER och trasiga tecken. 13 regler du slår på som du vill, varje ändring kan ångras och tiderna rör sig aldrig.",
+  "overT": true,
+  "overD": true,
+  "w": 95,
+  "dl": 253
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "cs",
+  "title": "Čistič titulků - odstraní vodoznaky, SDH značky a rozbité znaky | AI-SRTSub",
+  "desc": "Bezplatný online čistič titulků: odstraní vodoznaky skupin, reklamu, SDH značky, HTML tagy a ASS efekty; opraví VELKÁ PÍSMENA a rozbité znaky. 13 pravidel zapnete podle sebe, každou změnu lze vrátit a časy se nikdy nehnou.",
+  "overT": true,
+  "overD": true,
+  "w": 75,
+  "dl": 222
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "uk",
+  "title": "Очищувач субтитрів - видаляє водяні знаки, позначки SDH і кракозябри | AI-SRTSub",
+  "desc": "Безплатний онлайн-очищувач субтитрів: видаляє водяні знаки груп, рекламу, позначки SDH, HTML-теги й ефекти ASS; виправляє ВЕЛИКІ ЛІТЕРИ та кракозябри. 13 правил вмикаєте на свій розсуд, кожну зміну можна скасувати, а таймкоди не рухаються.",
+  "overT": true,
+  "overD": true,
+  "w": 80,
+  "dl": 239
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "da",
+  "title": "Renser til undertekster - fjerner vandmærker, SDH-markeringer og ødelagte tegn | AI-SRTSub",
+  "desc": "Gratis online renser til undertekster: fjerner gruppe-vandmærker, reklamer, SDH-markeringer, HTML-tags og ASS-effekter; retter VERSALER og ødelagte tegn. 13 regler du tænder som du vil, hver ændring kan fortrydes, og tiderne flytter sig aldrig.",
+  "overT": true,
+  "overD": true,
+  "w": 90,
+  "dl": 244
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "fi",
+  "title": "Tekstitysten puhdistaja - poistaa vesileimat, SDH-merkinnät ja rikkinäiset merkit | AI-SRTSub",
+  "desc": "Ilmainen verkkotyökalu tekstitysten puhdistukseen: poistaa ryhmien vesileimat, mainokset, SDH-merkinnät, HTML-tagit ja ASS-tehosteet; korjaa ISOILLA KIRJAIMILLA kirjoitetun tekstin ja rikkinäiset merkit. 13 sääntöä kytketään halutessa, jokainen muutos voi perua, eivätkä ajat siirry.",
+  "overT": true,
+  "overD": true,
+  "w": 93,
+  "dl": 283
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "el",
+  "title": "Καθαριστής υποτίτλων - αφαιρεί υδατογραφήματα, σημάνσεις SDH και χαλασμένα σύμβολα | AI-SRTSub",
+  "desc": "Δωρεάν διαδικτυακός καθαριστής υποτίτλων: αφαιρεί υδατογραφήματα ομάδων, διαφημίσεις, σημάνσεις SDH, ετικέτες HTML και εφέ ASS· διορθώνει τα ΚΕΦΑΛΑΙΑ και τα χαλασμένα σύμβολα. 13 κανόνες ενεργοποιούνται κατά βούληση, κάθε αλλαγή αναστρέφεται και οι χρόνοι δεν μετακινούνται.",
+  "overT": true,
+  "overD": true,
+  "w": 94,
+  "dl": 274
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "he",
+  "title": "מנקה כתוביות - מסיר סימני מים, סימוני SDH ותווים שבורים | AI-SRTSub",
+  "desc": "מנקה כתוביות מקוון חינם: מסיר סימני מים של קבוצות, פרסומות, סימוני SDH, תגי HTML ואפקטים של ASS; מתקן אותיות גדולות ותווים שבורים. 13 כללים אפשר להפעיל כרצונכם, כל שינוי ניתן לביטול, והזמנים לא זזים.",
+  "overT": true,
+  "overD": true,
+  "w": 67,
+  "dl": 199
+ },
+ {
+  "table": "SEO_CLEAN",
+  "lang": "ro",
+  "title": "Curățător de subtitrări - elimină filigranele, marcajele SDH și caracterele stricate | AI-SRTSub",
+  "desc": "Curățător de subtitrări online gratuit: elimină filigranele echipelor, reclamele, marcajele SDH, tagurile HTML și efectele ASS; corectează MAJUSCULELE și caracterele stricate. 13 reguli pe care le activezi cum vrei, fiecare modificare se poate anula, iar timpii nu se mișcă.",
+  "overT": true,
+  "overD": true,
+  "w": 96,
+  "dl": 274
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "en",
+  "title": "Subtitle Translator — Turn SRT / VTT / ASS into Your Language",
+  "desc": "Drop in an SRT / VTT / ASS file, pick a target language, and get subtitles in your own language: timeline-locked translation, sentence-level merging, glossary consistency and punctuation-aware wrapping. 75 languages, free, no sign-up.",
+  "overT": true,
+  "overD": true,
+  "w": 61,
+  "dl": 234
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "es",
+  "title": "Traductor de subtítulos — Traduce SRT / VTT / ASS a tu idioma",
+  "desc": "Carga tu subtítulo SRT / VTT / ASS, elige el idioma de destino y obtén subtítulos en tu idioma: sincronización automática, fusión por frases, glosario coherente y saltos de línea inteligentes. 75 idiomas, gratis y sin registro.",
+  "overT": true,
+  "overD": true,
+  "w": 61,
+  "dl": 227
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "pt",
+  "title": "Tradutor de legendas — Traduza SRT / VTT / ASS para o seu idioma",
+  "desc": "Envie um arquivo SRT / VTT / ASS, escolha o idioma de destino e receba legendas no seu idioma: sincronia automática, fusão por frases, glossário consistente e quebra de linha inteligente. 75 idiomas, grátis e sem cadastro.",
+  "overT": true,
+  "overD": true,
+  "w": 64,
+  "dl": 222
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "de",
+  "title": "Untertitel übersetzen — SRT / VTT / ASS in deine Sprache",
+  "desc": "Lade SRT / VTT / ASS hoch, wähle die Zielsprache und erhalte Untertitel in deiner Sprache: exakte Zeitachse, satzweises Zusammenführen, einheitliche Fachbegriffe und intelligenter Zeilenumbruch. 75 Sprachen, kostenlos, ohne Anmeldung.",
+  "overT": false,
+  "overD": true,
+  "w": 56,
+  "dl": 234
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "fr",
+  "title": "Traducteur de sous-titres — SRT / VTT / ASS dans votre langue",
+  "desc": "Déposez un fichier SRT / VTT / ASS, choisissez la langue cible et obtenez des sous-titres dans votre langue : synchronisation automatique, fusion par phrases, glossaire cohérent et retours à la ligne intelligents. 75 langues, gratuit, sans inscription.",
+  "overT": true,
+  "overD": true,
+  "w": 61,
+  "dl": 252
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "id",
+  "title": "Penerjemah Subtitle — Terjemahkan SRT / VTT / ASS ke Bahasamu",
+  "desc": "Unggah subtitle SRT / VTT / ASS, pilih bahasa tujuan, dan dapatkan subtitle dalam bahasamu: sinkronisasi otomatis, penggabungan per kalimat, glosarium konsisten, dan pemotongan baris cerdas. 75 bahasa, gratis, tanpa daftar.",
+  "overT": true,
+  "overD": true,
+  "w": 61,
+  "dl": 223
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "hi",
+  "title": "सबटाइटल अनुवादक - SRT / VTT / ASS को अपनी भाषा में",
+  "desc": "SRT / VTT / ASS सबटाइटल अपलोड करें, लक्ष्य भाषा चुनें और अपनी भाषा में सबटाइटल पाएं: स्वचालित समय-रेखा मिलान, वाक्य-स्तरीय विलय, शब्दावली एकरूपता और बुद्धिमान पंक्ति-विभाजन। 75 भाषाएं, मुफ़्त, बिना साइन-अप।",
+  "overT": false,
+  "overD": true,
+  "w": 50,
+  "dl": 206
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "th",
+  "title": "แปลซับไตเติล - แปล SRT / VTT / ASS เป็นภาษาของคุณ",
+  "desc": "อัปโหลดซับไตเติล SRT / VTT / ASS เลือกภาษาปลายทาง แล้วรับซับไตเติลในภาษาของคุณ: จัดแนวไทม์ไลน์อัตโนมัติ รวมประโยคอัตโนมัติ ศัพท์สม่ำเสมอทั้งเรื่อง และขึ้นบรรทัดใหม่ตามเครื่องหมายวรรคตอน 75 ภาษา ฟรี ไม่ต้องสมัคร",
+  "overT": false,
+  "overD": true,
+  "w": 49,
+  "dl": 210
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "vi",
+  "title": "Dịch phụ đề - Dịch SRT / VTT / ASS sang ngôn ngữ của bạn",
+  "desc": "Tải lên phụ đề SRT / VTT / ASS, chọn ngôn ngữ đích và nhận phụ đề bằng ngôn ngữ của bạn: căn chỉnh thời gian tự động, gộp theo câu, thuật ngữ nhất quán và xuống dòng thông minh. 75 ngôn ngữ, miễn phí, không cần đăng ký.",
+  "overT": false,
+  "overD": true,
+  "w": 56,
+  "dl": 219
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "ru",
+  "title": "Перевод субтитров — SRT / VTT / ASS на ваш язык",
+  "desc": "Загрузите субтитры SRT / VTT / ASS, выберите язык перевода и получите субтитры на своём языке: точная привязка к таймкодам, объединение по предложениям, единый глоссарий и умный перенос строк. 75 языков, бесплатно, без регистрации.",
+  "overT": false,
+  "overD": true,
+  "w": 47,
+  "dl": 231
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "it",
+  "title": "Traduttore di sottotitoli — SRT / VTT / ASS nella tua lingua",
+  "desc": "Carica un file SRT / VTT / ASS, scegli la lingua di destinazione e ottieni i sottotitoli nella tua lingua: sincronizzazione automatica, unione per frasi, glossario coerente e a capo intelligente. 75 lingue, gratis e senza registrazione.",
+  "overT": false,
+  "overD": true,
+  "w": 60,
+  "dl": 236
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "ar",
+  "title": "مترجم الترجمات المصاحبة — ترجمة SRT / VTT / ASS إلى لغتك",
+  "desc": "ارفع ملف SRT / VTT / ASS، اختر اللغة الهدف، واحصل على ترجمة بلغتك: محاذاة زمنية تلقائية، دمج على مستوى الجملة، مصطلحات موحّدة في الملف كله، وتقسيم أسطر ذكي. 75 لغة، مجاناً وبدون تسجيل.",
+  "overT": false,
+  "overD": true,
+  "w": 56,
+  "dl": 184
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "tr",
+  "title": null,
+  "desc": "SRT / VTT / ASS altyazınızı yükleyin, hedef dili seçin ve kendi dilinizde altyazı alın: otomatik zaman çizelgesi hizalama, cümle bazlı birleştirme, tutarlı terimler ve akıllı satır bölme. 75 dil, ücretsiz, kayıt gerekmez.",
+  "overT": false,
+  "overD": true,
+  "w": 0,
+  "dl": 221
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "nl",
+  "title": "Ondertitels vertalen — SRT / VTT / ASS naar jouw taal",
+  "desc": "Upload een SRT / VTT / ASS-bestand, kies de doeltaal en krijg ondertitels in je eigen taal: automatische tijdlijnuitlijning, samenvoegen per zin, consistente terminologie en slimme regeleinden. 75 talen, gratis, zonder registratie.",
+  "overT": false,
+  "overD": true,
+  "w": 53,
+  "dl": 231
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "pl",
+  "title": "Tłumacz napisów — Przetłumacz SRT / VTT / ASS na swój język",
+  "desc": "Wgraj napisy SRT / VTT / ASS, wybierz język docelowy i otrzymaj napisy w swoim języku: automatyczne dopasowanie czasu, łączenie zdań, spójna terminologia i inteligentne łamanie wierszy. 75 języków, za darmo, bez rejestracji.",
+  "overT": false,
+  "overD": true,
+  "w": 59,
+  "dl": 224
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "sv",
+  "title": "Översätt undertexter — SRT / VTT / ASS till ditt språk",
+  "desc": "Ladda upp en SRT / VTT / ASS-fil, välj målspråk och få undertexter på ditt eget språk: automatisk tidslinjejustering, sammanslagning per mening, konsekvent ordlista och smart radbrytning. 75 språk, gratis, ingen registrering.",
+  "overT": false,
+  "overD": true,
+  "w": 54,
+  "dl": 225
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "cs",
+  "title": "Překladač titulků — Přeložte SRT / VTT / ASS do svého jazyka",
+  "desc": "Nahrajte titulky SRT / VTT / ASS, zvolte cílový jazyk a získejte titulky ve svém jazyce: automatické zarovnání časové osy, slučování vět, jednotná terminologie a chytré zalomení řádků. 75 jazyků, zdarma, bez registrace.",
+  "overT": false,
+  "overD": true,
+  "w": 60,
+  "dl": 219
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "da",
+  "title": "Oversæt undertekster — SRT / VTT / ASS til dit sprog",
+  "desc": "Upload en SRT / VTT / ASS-fil, vælg målsproget og få undertekster på dit eget sprog: automatisk tidslinjejustering, sætningsvis sammenlægning, ensartet terminologi og intelligent linjeskift. 75 sprog, gratis, ingen tilmelding.",
+  "overT": false,
+  "overD": true,
+  "w": 52,
+  "dl": 226
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "fi",
+  "title": "Tekstitysten kääntäjä — Käännä SRT / VTT / ASS omalle kielellesi",
+  "desc": "Lataa SRT / VTT / ASS -tekstitys, valitse kohdekieli ja saa tekstitys omalla kielelläsi: automaattinen aikajanan kohdistus, lauseittainen yhdistäminen, yhtenäinen sanasto ja älykäs rivinvaihto. 75 kieltä, ilmainen, ei rekisteröitymistä.",
+  "overT": true,
+  "overD": true,
+  "w": 64,
+  "dl": 236
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "el",
+  "title": "Μεταφραστής υποτίτλων — SRT / VTT / ASS στη γλώσσα σας",
+  "desc": "Ανεβάστε ένα αρχείο SRT / VTT / ASS, επιλέξτε γλώσσα στόχου και λάβετε υπότιτλους στη γλώσσα σας: αυτόματη ευθυγράμμιση χρονολογίου, συγχώνευση ανά πρόταση, συνεπής ορολογία και έξυπνο σπάσιμο γραμμών. 75 γλώσσες, δωρεάν, χωρίς εγγραφή.",
+  "overT": false,
+  "overD": true,
+  "w": 54,
+  "dl": 236
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "he",
+  "title": "מתרגם כתוביות - תרגום SRT / VTT / ASS לשפה שלך",
+  "desc": "העלה קובץ SRT / VTT / ASS, בחר שפת יעד וקבל כתוביות בשפה שלך: יישור ציר זמן אוטומטי, מיזוג לפי משפטים, מונחים עקביים לאורך הקובץ וחלוקת שורות חכמה. 75 שפות, חינם, בלי הרשמה.",
+  "overT": false,
+  "overD": true,
+  "w": 46,
+  "dl": 173
+ },
+ {
+  "table": "SEO_TRANSLATE",
+  "lang": "ro",
+  "title": "Traducător de subtitrări — SRT / VTT / ASS în limba ta",
+  "desc": "Încarcă un fișier SRT / VTT / ASS, alege limba țintă și primește subtitrări în limba ta: aliniere automată pe axa timpului, îmbinare pe propoziții, terminologie consecventă și împărțire inteligentă a liniilor. 75 de limbi, gratuit, fără cont.",
+  "overT": false,
+  "overD": true,
+  "w": 54,
+  "dl": 242
+ }
+]

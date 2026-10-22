@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio na napisy — zamień mowę na SRT w przeglądarce | AI-SRTSub",
+    "desc": "Prześlij audio lub wideo, aby wygenerować napisy SRT/VTT w przeglądarce. Rozpoznawanie mowy działa lokalnie, bez przesyłania plików, całkowicie za darmo.",
+    "kw": "audio na srt, mowa na napisy, generator napisów, automatyczne napisy, transkrypcja audio na srt, napisy whisper, rozpoznawanie mowy w przeglądarce, napisy offline",
+    "intro": "Przeciągnij plik audio lub wideo, wybierz język i model, a rozpoznawanie mowy wykona się w Twojej przeglądarce. Otrzymasz gotowy szkic napisów z synchronizacją czasową.",
+    "feat": "Narzędzie przetwarza strumień mowy na poprawne napisy, dzieląc tekst na zdania, dbając o limity znaków w linii oraz zachowując odpowiednie tempo czytania bez nakładania się napisów.",
+    "who": "Twórcy wideo, zespoły transkrybujące podcasty i kursy oraz osoby potrzebujące szybkiego szkicu napisów do edycji."
+  },
+  "ocrsub": {
+    "title": "OCR napisów wtopionych — odczytaj napisy z wideo | AI-SRTSub",
+    "desc": "Napisy wtopione w obraz nie mają ścieżki tekstowej. Zaznacz obszar, a narzędzie odczyta tekst klatka po klatce i wyeksportuje plik SRT lub VTT za darmo.",
+    "kw": "ekstrakcja napisów wtopionych, ocr napisów, wyciąganie napisów z wideo, napisy hardcoded, ocr z wideo, wideo na srt, napisy z filmu, ocr napisów wideo",
+    "intro": "Prześlij wideo, zaznacz obszar z napisami, a narzędzie odczyta tekst klatka po klatce, łącząc identyczne sekwencje w jeden czasowy blok napisów.",
+    "feat": "Narzędzie wycina obszar napisów, stosuje binaryzację dla poprawy czytelności i rozpoznaje tekst, łącząc powtarzające się klatki w jeden spójny napis z odpowiednim czasem trwania.",
+    "who": "Zespoły lokalizujące krótkie filmy, osoby tworzące nowe napisy do starych wydań oraz montażyści posiadający tylko gotowy plik wideo bez oryginalnych napisów."
+  }
+}

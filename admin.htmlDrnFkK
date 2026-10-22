@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>AI 字幕工具 · 管理后台</title>
+<!-- v0.9.284：其余四页都声明了 icon，只有后台没声明，
+     浏览器于是每次自动请求 /favicon.ico → 一条 404。补上即可消掉。 -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --line:#e4e7ec; --txt:#1f2328; --mut:#6a737d;
+    --pri:#2f6fed; --ok:#1a7f4b; --err:#c62828; --warn:#9a6700;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:640px;margin:32px auto;padding:0 16px}
+  h1{font-size:20px;margin:0 0 4px}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+  h2{font-size:15px;margin:0 0 14px}
+  label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+  input,select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--txt)}
+  input:focus,select:focus{outline:2px solid #bcd3fb;border-color:var(--pri)}
+  .row{display:flex;gap:12px}
+  .row>div{flex:1}
+  .btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button{padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer}
+  button.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .msg{margin-top:12px;font-size:13px;display:none;padding:8px 12px;border-radius:8px}
+  .msg.ok{display:block;background:#eaf5ee;color:var(--ok)}
+  .msg.err{display:block;background:#fdecea;color:var(--err)}
+  .usage{font-size:13px;color:var(--mut);background:#f4f6f9;border-radius:8px;padding:10px 12px;margin-top:14px}
+  /* v0.9.42：使用记录分页条 */
+  .pager{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .pager button{padding:4px 12px;font-size:13px;border-radius:6px}
+  .pager button.cur{background:var(--pri);border-color:var(--pri);color:#fff;cursor:default}
+  .pager .pinfo{color:var(--mut);font-size:13px;margin:0 6px}
+  .usage b{color:var(--txt)}
+  .note{font-size:12px;color:var(--mut);margin-top:6px}
+  .mask{color:var(--mut);font-family:monospace;font-size:13px}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .chip{font-size:12px;background:#f4f6f9;border-radius:16px;padding:4px 12px;color:var(--mut)}
+  .chip b{color:var(--txt)}
+  .tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .tbl th,.tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+  .tbl th{color:var(--mut);font-weight:500;font-size:12px}
+  .tbl tr:hover td{background:#f8fafc}
+  textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;min-height:54px;background:#fff;color:var(--txt)}
+  textarea:focus{outline:2px solid #bcd3fb;border-color:var(--pri)}
+  /* v0.9.119：语言分流 chips */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;max-height:280px;overflow-y:auto;padding:2px}
+  .chip2{font-size:12px;background:#f4f6f9;border:1px solid var(--line);border-radius:14px;padding:4px 11px;cursor:pointer;color:var(--mut);line-height:1.5}
+  .chip2:hover{border-color:var(--pri)}
+  .chip2.on{background:var(--pri);border-color:var(--pri);color:#fff}
+  /* v0.9.345：模型 D 的每个 key 状态（用量 / 今日耗尽 / 本分钟） */
+  .dstat{font-size:12px;margin-left:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .dstat.ok{color:var(--ok)}
+  .dstat.bad{color:var(--err)}
+  .drow{display:flex;gap:8px;align-items:center;margin-top:4px}
+  .drow input{flex:1}
+  .drow button{padding:6px 12px;font-size:13px;flex:0 0 auto}
+  /* v0.9.347：模型池表格（模型名 / RPM / RPD / 今日用量 / 排序删除） */
+  .mhead,.mrow{display:grid;grid-template-columns:20px minmax(0,1fr) 62px 76px 118px 66px;gap:8px;align-items:center}
+  .mhead{font-size:12px;color:var(--mut);padding:0 2px}
+  .mrow{margin-top:6px}
+  .mrow input{padding:6px 8px;font-size:13px}
+  .mrow input[type=checkbox]{width:auto;justify-self:center;margin:0}
+  .mstat{font-size:12px;color:var(--mut);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mstat.bad{color:var(--err)}
+  .mops{display:flex;gap:4px;justify-content:flex-end}
+  .mops button{padding:3px 7px;font-size:12px;line-height:1.2}
+  .chip2 .cv{opacity:.65;font-size:11px;margin-left:2px}
+  /* v0.9.308：后台分 tab —— 此前模型配置、使用记录、改密码全平铺在一页里，
+     改一次 Key 要往下翻很久才到统计，日常用起来是滚动条管理。 */
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:18px}
+  .tabs button{padding:9px 16px;border:0;border-radius:8px 8px 0 0;background:transparent;
+    color:var(--mut);font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent}
+  .tabs button:hover{background:#eef1f5;color:var(--txt)}
+  .tabs button[aria-selected="true"]{color:var(--pri);border-bottom-color:var(--pri);background:#fff}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔧 SRT 工具 · 管理后台</h1>
+  <div class="sub">配置给所有用户免费使用的默认翻译模型。Key 只保存在服务器上，不会下发给浏览器。</div>
+
+  <div class="card" id="loginCard" style="display:none">
+    <h2>管理员登录</h2>
+    <label>管理密码</label>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="输入管理密码">
+    <div class="btns"><button class="primary" id="btnLogin">登录</button></div>
+    <div class="note" id="firstRunNote" style="display:none">🚀 首次部署：现在输入的密码将直接成为管理密码，请立即登录一次完成初始化。</div>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <div id="main" style="display:none">
+    <!-- v0.9.308：三个 tab。切换记在 location.hash 里 —— 刷新后还在原来那一页，
+         不会每次打开都跳回模型配置（后台是天天要打开的页面，这一步省事很明显）。 -->
+    <div class="tabs" id="adminTabs">
+      <button type="button" data-tab="model" aria-selected="true">模型配置</button>
+      <button type="button" data-tab="stats" aria-selected="false">统计</button>
+      <button type="button" data-tab="acct" aria-selected="false">账户安全</button>
+    </div>
+
+    <div id="paneModel">
+    <div class="card">
+      <h2>模型 A（默认）</h2>
+      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
+      <select id="provider"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base" spellcheck="false" placeholder="https://api.deepseek.com">
+        </div>
+        <div>
+          <label>模型名（如 deepseek-chat / gpt-4o / claude-sonnet-4.6 / 按服务商准确填写）</label>
+          <input type="text" id="model" spellcheck="false" placeholder="deepseek-chat">
+        </div>
+      </div>
+      <label>API Key（<span class="mask" id="keyMask">未设置</span>）</label>
+      <input type="password" id="key" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+      <div class="row">
+        <div>
+          <label>单 IP 每日请求数上限（0 = 不限）</label>
+          <input type="number" id="perIpDaily" min="0" max="10000">
+        </div>
+        <div>
+          <label>全站每日请求总量上限（0 = 不限）</label>
+          <input type="number" id="globalDaily" min="0" max="1000000">
+        </div>
+        <div>
+          <label>Temperature 采样温度（0-2，越低越稳定，字幕建议 0.2）</label>
+          <input type="number" id="temperature" min="0" max="2" step="0.1">
+        </div>
+      </div>
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams" spellcheck="false" placeholder='{"enable_thinking": false}'></textarea>
+      <div class="note">会合并进发给该模型的请求体（如 qwen3.x 需要 <span class="mono">enable_thinking:false</span> 来关掉思考，否则容易超时）。留空 = 不附加。禁止覆盖 model / messages / stream / temperature / max_tokens。</div>
+      <div class="row">
+        <label>站点公开 URL（SEO 用：canonical / sitemap / og:image 的前缀；留空按当前域名）</label>
+        <input type="text" id="publicUrl" spellcheck="false" placeholder="https://srt.your-domain.com">
+      </div>
+      <div class="row">
+        <label>GA4 统计 ID（如 G-XXXXXXXXXX；留空 = 不注入统计代码）</label>
+        <input type="text" id="analyticsId" spellcheck="false" placeholder="G-XXXXXXXXXX">
+      </div>
+      <div class="btns">
+        <button class="primary" id="btnSave">保存配置</button>
+        <button id="btnTest">测试连通</button>
+        <button id="btnLogout" style="margin-left:auto">退出登录</button>
+      </div>
+      <div class="usage" id="usage"></div>
+      <div class="msg" id="cfgMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>模型 B（可选）</h2>
+      <div class="note" style="margin:0 0 12px">配好后在下面的「语言分流」里勾选要走模型 B 的目标语言；未勾选的语言、以及模型 B 没配全时，一律走模型 A。</div>
+      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
+      <select id="provider2"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base2" spellcheck="false" placeholder="https://api.deepseek.com">
+        </div>
+        <div>
+          <label>模型名</label>
+          <input type="text" id="model2" spellcheck="false" placeholder="deepseek-chat">
+        </div>
+      </div>
+      <label>API Key（<span class="mask" id="keyMask2">未设置</span>）</label>
+      <input type="password" id="key2" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams2" spellcheck="false" placeholder='{"enable_thinking": false}'></textarea>
+      <div class="btns">
+        <button class="primary" id="btnSave2">保存模型 B</button>
+        <button id="btnTest2">测试模型 B</button>
+        <button id="btnClear2" style="margin-left:auto">清空模型 B</button>
+      </div>
+      <div class="msg" id="cfg2Msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>模型 C（可选，优先级最高）</h2>
+      <div class="note" style="margin:0 0 12px">参数结构与模型 B 完全相同。分流优先级 <b>C &gt; B &gt; A</b>：勾给 C 的语言走 C，没勾 C 的才看 B，都没有就走 A。<b>C 没配全、或没勾任何语言时，C 完全不参与</b>（默认留空，先配参数再挑语言试点）。</div>
+      <label>服务商（Base URL 自动填充，模型名由你指定）</label>
+      <select id="provider3"></select>
+      <div class="row">
+        <div>
+          <label>Base URL（自动拼接 /chat/completions）</label>
+          <input type="text" id="base3" spellcheck="false" placeholder="https://api.openai.com">
+        </div>
+        <div>
+          <label>模型名</label>
+          <input type="text" id="model3" spellcheck="false" placeholder="gpt-6-luna">
+        </div>
+      </div>
+      <label>API Key（<span class="mask" id="keyMask3">未设置</span>）</label>
+      <input type="password" id="key3" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams3" spellcheck="false" placeholder='{"reasoning_effort": "low"}'></textarea>
+      <div class="btns">
+        <button class="primary" id="btnSave3">保存模型 C</button>
+        <button id="btnTest3">测试模型 C</button>
+        <button id="btnClear3" style="margin-left:auto">清空模型 C</button>
+      </div>
+      <div class="msg" id="cfg3Msg"></div>
+    </div>
+
+    <!-- v0.9.345：模型 D —— Gemini 免费额度池。与 A/B/C 的最大差别是 key 有三个，
+         且额度按「请求次数」算（RPM / RPD），不是 token。 -->
+    <div class="card">
+      <h2>模型 D（Gemini 免费额度池 · 优先级最高）</h2>
+      <div class="note" style="margin:0 0 12px">三个 key <b>顺序使用</b>：前一个到当日上限才动下一个，不是轮询。模型池按<b>从上到下的顺序</b>用：上一档的 key 全用满，才降下一档。单个 key 到「每分钟」上限只是跳过它、不退役；全池（所有档 × 所有 key）都到「每日」上限才回退到 C / B / A。<b>RPM / RPD 请照 Google AI Studio 速率限制页显示的数字填</b> —— 填大了会撞 429（能兜住，但白跑一趟），填小了会提前停用免费额度。</div>
+      <label>服务商（Base URL 自动填充，模型名在下面的模型池里填）</label>
+      <select id="provider4"></select>
+      <label>Base URL（自动拼接 /chat/completions）</label>
+      <input type="text" id="base4" spellcheck="false" placeholder="https://generativelanguage.googleapis.com/v1beta/openai">
+
+      <label style="margin-top:16px">模型池（按优先级从上到下；每档的 RPM / RPD 各自独立）</label>
+      <div class="mhead"><span></span><span>模型名</span><span>RPM</span><span>RPD</span><span>今日用量</span><span></span></div>
+      <div id="dModelRows"></div>
+      <div class="btns" style="margin-top:10px"><button type="button" id="btnAddModel4">+ 增加一档</button></div>
+      <div class="note">Google 的免费额度按「项目 × 模型」<b>各自独立</b>计算，所以每加一档就多一份免费请求额度。建议只挂 Flash / Flash-Lite 这类稳定输出 JSON 的模型；调整顺序或删除后要<b>点「保存模型 D」</b>才生效。</div>
+      <!-- v0.9.346：整槽流量闸。用户只想有一个数能拧，不想算比例 -->
+      <div class="row">
+        <div>
+          <label>整槽每小时最多发多少请求（0 = 不限）</label>
+          <input type="number" id="hourlyD" min="0" max="100000" step="1" placeholder="建议 日容量 ÷ 24">
+        </div>
+        <div>
+          <label>额度用量</label>
+          <div class="note" id="dPoolHint" style="margin:8px 0 0">—</div>
+        </div>
+      </div>
+      <div class="note" style="margin:-6px 0 12px">按小时匀速放行，<b>用不完的会攒着（最多攒 3 小时）</b>，深夜攒下的额度正好留给白天高峰。名额是<b>整个 D 槽共用</b>（不分档、不分 key），用完时新批次直接走 C / B / A，不排队。填 0 = 关闭此闸，仍受每档的 RPD 约束。</div>
+
+      <label>Key 1（<span class="mask" id="keyMask4_1">未设置</span>）<span class="dstat" id="dStat1"></span></label>
+      <div class="drow">
+        <input type="password" id="key4_1" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+        <button type="button" data-cleard="0">清除</button>
+      </div>
+
+      <label>Key 2（<span class="mask" id="keyMask4_2">未设置</span>）<span class="dstat" id="dStat2"></span></label>
+      <div class="drow">
+        <input type="password" id="key4_2" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+        <button type="button" data-cleard="1">清除</button>
+      </div>
+
+      <label>Key 3（<span class="mask" id="keyMask4_3">未设置</span>）<span class="dstat" id="dStat3"></span></label>
+      <div class="drow">
+        <input type="password" id="key4_3" autocomplete="new-password" placeholder="留空 = 保持现有 Key 不变">
+        <button type="button" data-cleard="2">清除</button>
+      </div>
+      <div class="note">只填 1~2 个也能用。⚠️ Google 的额度按<b>项目</b>算、不按 key 算：三个 key 要分别属于三个项目才是三份额度；建在同一个项目里的多个 key 共享同一份，轮换会一起失效。</div>
+
+      <label style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <input type="radio" name="dScope" value="all" id="dScopeAll" style="width:auto" checked>
+        <span>全部目标语言先走 D（推荐：配好就生效，不用再勾语言）</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px">
+        <input type="radio" name="dScope" value="pick" id="dScopePick" style="width:auto">
+        <span>只走下面勾选的语言（没勾的语言不会在 D 上试，直接去 C / B / A）</span>
+      </label>
+      <div id="dPickBox" style="display:none">
+        <label>搜索语言（中文名 / 英文名 / 语言码）</label>
+        <input type="text" id="langSearchD" spellcheck="false" placeholder="如 日语 / Japanese / ja">
+        <div class="btns" style="margin-top:10px">
+          <button data-batchd="all">全选</button>
+          <button data-batchd="none">清空</button>
+          <button data-batchd="cjk">中日韩</button>
+          <button data-batchd="nonlatin">非拉丁文字</button>
+        </div>
+        <div class="chips" id="langChipsD"></div>
+        <div class="note">已选 <b id="langCountD">0</b> 种语言走模型 D</div>
+      </div>
+
+      <label>附加请求参数（可选，JSON 对象）</label>
+      <textarea id="extraParams4" spellcheck="false" placeholder='{}'></textarea>
+      <div class="btns">
+        <button class="primary" id="btnSave4">保存模型 D</button>
+        <button id="btnTest4">测试全部 Key 与模型</button>
+        <button id="btnReset4">重置今日计数</button>
+        <button id="btnClear4" style="margin-left:auto">清空模型 D</button>
+      </div>
+      <div class="msg" id="cfg4Msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>语言分流（优先级 D &gt; C &gt; B &gt; A）</h2>
+      <div class="note" style="margin:0 0 12px">默认全部走模型 A。判定顺序：先查 C 的勾选 → 再查 B 的勾选 → 都没有走 A。分流只看目标语言，不看源语言、文件大小。<b>某个模型没配全时，它的勾选不生效</b>。</div>
+
+      <h3 style="margin:18px 0 6px;font-size:14px">模型 C（优先级最高）</h3>
+      <div class="note" style="margin:0 0 12px">留空 = C 不接管任何语言。同一门语言在 C 和 B 里都勾了，以 C 为准。</div>
+      <label>搜索语言（中文名 / 英文名 / 语言码）</label>
+      <input type="text" id="langSearchC" spellcheck="false" placeholder="如 日语 / Japanese / ja">
+      <div class="btns" style="margin-top:10px">
+        <button data-batchc="all">全选</button>
+        <button data-batchc="none">清空</button>
+        <button data-batchc="cjk">中日韩</button>
+        <button data-batchc="nonlatin">非拉丁文字</button>
+      </div>
+      <div class="chips" id="langChipsC"></div>
+      <div class="note">已选 <b id="langCountC">0</b> 种语言走模型 C</div>
+
+      <h3 style="margin:18px 0 6px;font-size:14px">模型 B</h3>
+      <div class="note" style="margin:0 0 12px">被 C 接管的语言不会再走 B；只有 C 没勾的才轮到 B。</div>
+      <label>搜索语言（中文名 / 英文名 / 语言码）</label>
+      <input type="text" id="langSearch" spellcheck="false" placeholder="如 日语 / Japanese / ja">
+      <div class="btns" style="margin-top:10px">
+        <button data-batch="all">全选</button>
+        <button data-batch="none">清空</button>
+        <button data-batch="cjk">中日韩</button>
+        <button data-batch="nonlatin">非拉丁文字</button>
+      </div>
+      <div class="chips" id="langChips"></div>
+      <div class="note">已选 <b id="langCount">0</b> 种语言走模型 B</div>
+      <label style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="fallbackToA" style="width:auto">
+        <span>模型 B / C 调用失败时自动回退（C → B → A，推荐；使用记录里会记 fallback 次数和原因）</span>
+      </label>
+      <div class="btns"><button class="primary" id="btnSaveRoute">保存分流设置</button></div>
+      <div class="msg" id="routeMsg"></div>
+    </div>
+    </div><!-- /paneModel -->
+
+    <div id="paneStats" style="display:none">
+
+    <div class="card" id="eventsCard" style="display:none">
+      <h2>📊 使用记录（用户在翻译什么）</h2>
+      <div class="stats" id="evStats"></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>开始时间</th><th>结束时间</th><th>时长</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th><th>模型</th><th>下载</th><th>导出格式</th></tr></thead>
+          <tbody id="evRows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="evPager"></div>
+      <div class="note">记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数、所用模型、完成/下载状态；不记录字幕内容。自带 API Key 的翻译直连服务商，仅在完成/下载时上报轻量记录（模型/语言/下载状态可统计，批次与时长不适用）。同 IP 同文件同语言 30 分钟内算一次会话。「导出格式」读的是各格式的累计次数（同一任务先下 SRT 再下 ASS 会记两次）。</div>
+      <div class="btns"><button id="btnRefreshEvents">刷新</button></div>
+    </div>
+
+    <!-- v0.9.244：双语合并页（merge.html）此前完全没有埋点——它是纯前端工具，请求不过服务端，
+         谁在用、上传的什么字幕、导成什么格式、套的哪个模板，后台一概看不见。 -->
+    <div class="card" id="mergeCard" style="display:none">
+      <h2>🔗 双语合并记录（合并 / 调整双语模块）</h2>
+      <div class="stats" id="mgStats"></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>IP</th><th>上传字幕</th><th>条数</th><th>模式</th><th>动作</th><th>导出格式</th><th>模板</th></tr></thead>
+          <tbody id="mgRows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="mgPager"></div>
+      <div class="note">双语合并页是纯前端工具（不调模型、不翻译），只在使用时上报元数据：上传的两个字幕文件名、结果条数、模式（两份合并 / 调整双语）、导出文件格式与所用模板；<b>不记录任何字幕内容</b>。「合并」= 合并/拆分完成，「导出」= 真的下载了文件——只合并没导出的会停在前一种，多半是中途卡住了。</div>
+      <div class="btns"><button id="btnRefreshMerge">刷新</button></div>
+    </div>
+
+    <!-- v0.9.275：字幕清洗页（clean.html）同样是纯前端工具，此前零埋点——
+         谁在用、一份字幕被改动了多少条、哪几条清洗规则最常命中、导成什么格式，后台一概看不见。 -->
+    <div class="card" id="cleanCard" style="display:none">
+      <h2>🧹 字幕清洗记录（清洗 / 整理模块）</h2>
+      <div class="stats" id="clStats"></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>IP</th><th>上传字幕</th><th>条数</th><th>改动</th><th>删除</th><th>命中规则</th><th>导出格式</th></tr></thead>
+          <tbody id="clRows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="clPager"></div>
+      <div class="note">清洗页是纯前端工具（解析、清洗、导出全在浏览器里做），只在使用时上报元数据：文件名、条目数、改动条数、删除条数、命中的清洗规则、导出格式；<b>不记录任何字幕内容</b>。「清洗」= 上传解析完成，「导出」= 真的下载了文件——只清洗没导出的会停在前一种，多半是结果不满意。<b>改动</b>是最终生效的条数（用户在界面上「还原」过的不算）。</div>
+      <div class="btns"><button id="btnRefreshClean">刷新</button></div>
+    </div>
+
+    <!-- v0.9.308：六个垂直工具页（shift/convert/extract/bilingual/repair/glossary）
+         全是纯前端、零埋点 —— SEO 流量进来多少、用户走到哪一步流失，后台此前一无所知。 -->
+    <div class="card" id="toolCard" style="display:none">
+      <h2>🧰 垂直工具页记录（时间轴 / 转换 / 提取 / 双语 / 修码 / 术语）</h2>
+      <div class="stats" id="tlStats"></div>
+      <div style="overflow-x:auto;margin-top:6px">
+        <table class="tbl">
+          <thead><tr><th>页面</th><th>记录数</th><th>独立 IP</th><th>今日</th><th>导出</th></tr></thead>
+          <tbody id="tlPageRows"></tbody>
+        </table>
+      </div>
+      <div style="overflow-x:auto;margin-top:14px">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>IP</th><th>页面</th><th>动作</th><th>字幕条数</th><th>关键数字</th><th>导出格式</th></tr></thead>
+          <tbody id="tlRows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="tlPager"></div>
+      <div class="note">六个垂直工具页都是纯前端（不调模型），只在使用时上报元数据：哪个页、做了什么动作、字幕条数、关键数字、导出格式；<b>不记录任何字幕内容</b>，也不记录用户的术语表。上面那张是<b>按页汇总</b>——六个 SEO 入口哪一页最忙、今天有人来过没有；下面是逐条明细。
+      <b>关键数字</b>随页面而异：glossary 是「实际替换了多少处」，repair 是「读出几种读得通的候选」，bilingual 是「拆/合成几份」，extract 是「抽出多少字符」，shift 与 convert 这一列用不到（看字幕条数）。<b>做了处理却没导出</b>的，明细里停在动作那一行没有 export —— 多半是结果不满意。</div>
+      <div class="btns"><button id="btnRefreshTool">刷新</button></div>
+    </div>
+
+    </div>
+
+    <div id="paneAcct" style="display:none">
+    <div class="card">
+      <h2>修改管理密码</h2>
+      <div class="row">
+        <div>
+          <label>新密码（至少 6 位）</label>
+          <input type="password" id="npw" autocomplete="new-password">
+        </div>
+        <div>
+          <label>确认新密码</label>
+          <input type="password" id="npw2" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="btns"><button class="primary" id="btnPw">更新密码</button></div>
+      <div class="msg" id="pwMsg"></div>
+      <div class="note">修改后下次登录用新密码，本页面仍保持登录状态。</div>
+    </div>
+
+    <div class="note">提示：配置保存后立即生效（前端刷新即可看到新模型）；用户侧的「默认模型」开箱即用，高级用户仍可自带 Key。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const TOKEN_KEY = 'srtAdminToken';
+let token = localStorage.getItem(TOKEN_KEY) || '';
+
+const PRESETS = [
+  { id: 'openai',      name: 'OpenAI',                  base: 'https://api.openai.com/v1' },
+  { id: 'anthropic',   name: 'Anthropic Claude',        base: 'https://api.anthropic.com/v1' },
+  { id: 'gemini',      name: 'Google Gemini',           base: 'https://generativelanguage.googleapis.com/v1beta/openai' },
+  { id: 'xai',         name: 'xAI Grok',                base: 'https://api.x.ai/v1' },
+  { id: 'openrouter',  name: 'OpenRouter（聚合百模）',  base: 'https://openrouter.ai/api/v1' },
+  { id: 'deepseek',    name: 'DeepSeek（推荐）',        base: 'https://api.deepseek.com' },
+  { id: 'qwen',        name: '阿里通义千问',            base: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+  { id: 'glm',         name: '智谱 GLM',                base: 'https://open.bigmodel.cn/api/paas/v4' },
+  { id: 'kimi',        name: '月之暗面 Kimi',           base: 'https://api.moonshot.cn/v1' },
+  { id: 'doubao',      name: '字节豆包（火山方舟）',    base: 'https://ark.cn-beijing.volces.com/api/v3' },
+  { id: 'siliconflow', name: '硅基流动 SiliconFlow',    base: 'https://api.siliconflow.cn/v1' },
+  { id: 'custom',      name: '手动自定义',              base: '' }
+];
+
+/* 目标语言清单（v0.9.338 起 100 种；与 translate.html 的 LANGS 同步）
+   g = 批量分组标记：cjk=中日韩 / nonlatin=非拉丁文字 */
+const LANGS = [
+  { v:'en', zh:'English', en:'English', g:'' },
+  { v:'zh-CN', zh:'简体中文', en:'Chinese', g:'cjk nonlatin' },
+  { v:'zh-TW', zh:'繁體中文', en:'Chinese (Trad.)', g:'cjk nonlatin' },
+  { v:'ja', zh:'日本語', en:'Japanese', g:'cjk nonlatin' },
+  { v:'ko', zh:'한국어', en:'Korean', g:'cjk nonlatin' },
+  { v:'fr', zh:'Français', en:'French', g:'' },
+  { v:'de', zh:'Deutsch', en:'German', g:'' },
+  { v:'es', zh:'Español', en:'Spanish', g:'' },
+  { v:'pt', zh:'Português', en:'Portuguese', g:'' },
+  { v:'it', zh:'Italiano', en:'Italian', g:'' },
+  { v:'ru', zh:'Русский', en:'Russian', g:'nonlatin' },
+  { v:'ar', zh:'العربية', en:'Arabic', g:'nonlatin' },
+  { v:'th', zh:'ไทย', en:'Thai', g:'nonlatin' },
+  { v:'vi', zh:'Tiếng Việt', en:'Vietnamese', g:'' },
+  { v:'id', zh:'Bahasa Indonesia', en:'Indonesian', g:'' },
+  { v:'hi', zh:'हिन्दी', en:'Hindi', g:'nonlatin' },
+  { v:'tr', zh:'Türkçe', en:'Turkish', g:'' },
+  { v:'pl', zh:'Polski', en:'Polish', g:'' },
+  { v:'nl', zh:'Nederlands', en:'Dutch', g:'' },
+  { v:'ms', zh:'Bahasa Melayu', en:'Malay', g:'' },
+  { v:'fil', zh:'Filipino', en:'Filipino', g:'' },
+  { v:'fa', zh:'فارسی', en:'Persian', g:'nonlatin' },
+  { v:'sv', zh:'Svenska', en:'Swedish', g:'' },
+  { v:'da', zh:'Dansk', en:'Danish', g:'' },
+  { v:'fi', zh:'Suomi', en:'Finnish', g:'' },
+  { v:'nb', zh:'Norsk bokmål', en:'Norwegian', g:'' },
+  { v:'cs', zh:'Čeština', en:'Czech', g:'' },
+  { v:'sk', zh:'Slovenčina', en:'Slovak', g:'' },
+  { v:'hu', zh:'Magyar', en:'Hungarian', g:'' },
+  { v:'ro', zh:'Română', en:'Romanian', g:'' },
+  { v:'ca', zh:'Català', en:'Catalan', g:'' },
+  { v:'hr', zh:'Hrvatski', en:'Croatian', g:'' },
+  { v:'el', zh:'Ελληνικά', en:'Greek', g:'nonlatin' },
+  { v:'uk', zh:'Українська', en:'Ukrainian', g:'nonlatin' },
+  { v:'sr', zh:'Српски', en:'Serbian', g:'nonlatin' },
+  { v:'bg', zh:'Български', en:'Bulgarian', g:'nonlatin' },
+  { v:'he', zh:'עברית', en:'Hebrew', g:'nonlatin' },
+  { v:'ur', zh:'اردو', en:'Urdu', g:'nonlatin' },
+  { v:'bn', zh:'বাংলা', en:'Bengali', g:'nonlatin' },
+  { v:'ta', zh:'தமிழ்', en:'Tamil', g:'nonlatin' },
+  { v:'te', zh:'తెలుగు', en:'Telugu', g:'nonlatin' },
+  { v:'mr', zh:'मराठी', en:'Marathi', g:'nonlatin' },
+  { v:'ne', zh:'नेपाली', en:'Nepali', g:'nonlatin' },
+  { v:'si', zh:'සිංහල', en:'Sinhala', g:'nonlatin' },
+  { v:'my', zh:'မြန်မာ', en:'Burmese', g:'nonlatin' },
+  { v:'km', zh:'ខ្មែរ', en:'Khmer', g:'nonlatin' },
+  { v:'lo', zh:'ລາວ', en:'Lao', g:'nonlatin' },
+  { v:'sw', zh:'Kiswahili', en:'Swahili', g:'' },
+  { v:'gu', zh:'ગુજરાતી', en:'Gujarati', g:'nonlatin' },
+  { v:'kn', zh:'ಕನ್ನಡ', en:'Kannada', g:'nonlatin' },
+  { v:'ml', zh:'മലയാളം', en:'Malayalam', g:'nonlatin' },
+  { v:'pa', zh:'ਪੰਜਾਬੀ', en:'Punjabi', g:'nonlatin' },
+  { v:'or', zh:'ଓଡ଼ିଆ', en:'Odia', g:'nonlatin' },
+  { v:'as', zh:'অসমীয়া', en:'Assamese', g:'nonlatin' },
+  { v:'kk', zh:'Қазақша', en:'Kazakh', g:'nonlatin' },
+  { v:'uz', zh:'O‘zbekcha', en:'Uzbek', g:'' },
+  { v:'mn', zh:'Монгол', en:'Mongolian', g:'nonlatin' },
+  { v:'az', zh:'Azərbaycan', en:'Azerbaijani', g:'' },
+  { v:'is', zh:'Íslenska', en:'Icelandic', g:'' },
+  { v:'et', zh:'Eesti', en:'Estonian', g:'' },
+  { v:'lv', zh:'Latviešu', en:'Latvian', g:'' },
+  { v:'lt', zh:'Lietuvių', en:'Lithuanian', g:'' },
+  { v:'sl', zh:'Slovenščina', en:'Slovenian', g:'' },
+  { v:'sq', zh:'Shqip', en:'Albanian', g:'' },
+  { v:'mk', zh:'Македонски', en:'Macedonian', g:'nonlatin' },
+  { v:'eu', zh:'Euskara', en:'Basque', g:'' },
+  { v:'gl', zh:'Galego', en:'Galician', g:'' },
+  { v:'am', zh:'አማርኛ', en:'Amharic', g:'nonlatin' },
+  { v:'ha', zh:'Hausa', en:'Hausa', g:'' },
+  { v:'yo', zh:'Yorùbá', en:'Yoruba', g:'' },
+  { v:'zu', zh:'isiZulu', en:'Zulu', g:'' },
+  { v:'so', zh:'Soomaali', en:'Somali', g:'' },
+  { v:'ps', zh:'پښتو', en:'Pashto', g:'nonlatin' },
+  { v:'ku', zh:'کوردی', en:'Kurdish', g:'nonlatin' },
+  { v:'af', zh:'Afrikaans', en:'Afrikaans', g:'' },
+  /* v0.9.338 新增 25 种（与 translate.html 的 LANGS 同步）：
+     粤语归 cjk（汉字）；西里尔 be/tg/ky、亚美尼亚 hy、格鲁吉亚 ka、吉兹 ti、藏文 bo、
+     阿拉伯字母 ug/sd、希伯来字母 yi 归 nonlatin；其余拉丁语不标分组 */
+  { v:'yue', zh:'粵語', en:'Cantonese', g:'cjk nonlatin' },
+  { v:'be', zh:'Беларуская', en:'Belarusian', g:'nonlatin' },
+  { v:'tg', zh:'Тоҷикӣ', en:'Tajik', g:'nonlatin' },
+  { v:'ky', zh:'Кыргызча', en:'Kyrgyz', g:'nonlatin' },
+  { v:'tk', zh:'Türkmençe', en:'Turkmen', g:'' },
+  { v:'bs', zh:'Bosanski', en:'Bosnian', g:'' },
+  { v:'mt', zh:'Malti', en:'Maltese', g:'' },
+  { v:'cy', zh:'Cymraeg', en:'Welsh', g:'' },
+  { v:'ga', zh:'Gaeilge', en:'Irish', g:'' },
+  { v:'hy', zh:'Հայերեն', en:'Armenian', g:'nonlatin' },
+  { v:'ka', zh:'ქართული', en:'Georgian', g:'nonlatin' },
+  { v:'ti', zh:'ትግርኛ', en:'Tigrinya', g:'nonlatin' },
+  { v:'bo', zh:'བོད་སྐད', en:'Tibetan', g:'nonlatin' },
+  { v:'ug', zh:'ئۇيغۇرچە', en:'Uyghur', g:'nonlatin' },
+  { v:'sd', zh:'سنڌي', en:'Sindhi', g:'nonlatin' },
+  { v:'yi', zh:'ייִדיש', en:'Yiddish', g:'nonlatin' },
+  { v:'jv', zh:'Basa Jawa', en:'Javanese', g:'' },
+  { v:'su', zh:'Basa Sunda', en:'Sundanese', g:'' },
+  { v:'ceb', zh:'Cebuano', en:'Cebuano', g:'' },
+  { v:'mg', zh:'Malagasy', en:'Malagasy', g:'' },
+  { v:'ig', zh:'Igbo', en:'Igbo', g:'' },
+  { v:'xh', zh:'isiXhosa', en:'Xhosa', g:'' },
+  { v:'sn', zh:'chiShona', en:'Shona', g:'' },
+  { v:'ny', zh:'Chichewa', en:'Chichewa', g:'' },
+  { v:'mi', zh:'Māori', en:'Maori', g:'' }
+];
+
+/* 走模型 B 的目标语言集合 */
+let langSel = new Set();
+/* v0.9.193：走模型 C 的目标语言集合（判定优先于 B，两者可重叠） */
+let langSelC = new Set();
+/* v0.9.345：走模型 D 的目标语言集合。只在「只走勾选的语言」时生效；
+   默认「全部语言」时这个集合会被忽略，但仍保留用户勾过的内容，切回来不用重勾。 */
+let langSelD = new Set();
+/* v0.9.347：模型池的编辑态。顺序即优先级；used/cap 是服务端给的今日用量，
+   只用于显示，保存时不会回传（免得把显示值当成配置存进 config.json）。 */
+let dModelList = [];
+function dModelStatText(m){
+  const used = m.used || 0;
+  if (!m.cap) return '今日 ' + used + ' 次';
+  return '今日 ' + used + '/' + m.cap;
+}
+function renderDModels(){
+  const box = $('dModelRows');
+  if (!box) return;
+  if (!dModelList.length){
+    box.innerHTML = '<div class="note">还没有模型。点下面「增加一档」，第一档建议填 gemini-3-flash。</div>';
+    return;
+  }
+  box.innerHTML = dModelList.map((m, i) =>
+    '<div class="mrow" data-i="' + i + '">' +
+      '<input type="checkbox" class="mon"' + (m.on !== false ? ' checked' : '') + ' title="启用这一档">' +
+      '<input type="text" class="mname" spellcheck="false" value="' + esc(m.name || '') + '" placeholder="gemini-3-flash">' +
+      '<input type="number" class="mrpm" min="1" max="600" step="1" value="' + (m.rpm || 15) + '" title="每分钟请求上限">' +
+      '<input type="number" class="mrpd" min="1" max="1000000" step="1" value="' + (m.rpd || 1500) + '" title="每日请求上限">' +
+      '<span class="mstat' + (m.ex ? ' bad' : '') + '">' + esc(dModelStatText(m)) + '</span>' +
+      '<span class="mops"><button type="button" data-mv="-1" title="上移（优先级更高）">↑</button>' +
+      '<button type="button" data-mv="1" title="下移">↓</button>' +
+      '<button type="button" data-mdel="1" title="删除这一档">×</button></span>' +
+    '</div>').join('');
+}
+/* DOM → dModelList。排序/删除前必须先同步，否则刚改的模型名会丢。 */
+function syncDModels(){
+  const rows = Array.prototype.slice.call(document.querySelectorAll('#dModelRows .mrow'));
+  if (!rows.length) return;
+  dModelList = rows.map((r, i) => {
+    const old = dModelList[i] || {};
+    return {
+      name: r.querySelector('.mname').value.trim(),
+      rpm: +r.querySelector('.mrpm').value || 15,
+      rpd: +r.querySelector('.mrpd').value || 1500,
+      on: r.querySelector('.mon').checked,
+      used: old.used || 0, cap: old.cap || 0, ex: old.ex || 0
+    };
+  });
+}
+function paramsText(v){
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return '';
+  const ks = Object.keys(v);
+  return ks.length ? JSON.stringify(v, null, 2) : '';
+}
+function readParams(id){
+  const t = $(id).value.trim();
+  if (!t) return {};
+  let o;
+  try { o = JSON.parse(t); } catch (e) { throw new Error('附加请求参数不是合法 JSON：' + e.message); }
+  if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('附加请求参数必须是 JSON 对象（如 {"enable_thinking": false}）');
+  return o;
+}
+/* v0.9.193：which = 'C' 渲染模型 C 那组 chips，否则渲染模型 B 那组（无参调用 = B，旧行为不变）
+   v0.9.345：加 'D'。三组的 id 差异只在后缀（'' / C / D），故共用一个渲染器，
+   别为 D 抄一份 —— 抄了以后加语言要改三处。 */
+function renderLangs(which){
+  const isD = which === 'D', isC = which === 'C';
+  const sel = isD ? langSelD : isC ? langSelC : langSel;
+  const sfx = isD ? 'D' : isC ? 'C' : '';
+  const q = ($('langSearch' + sfx).value || '').trim().toLowerCase();
+  const rows = LANGS.filter(l => !q || l.zh.toLowerCase().indexOf(q) >= 0 ||
+    l.en.toLowerCase().indexOf(q) >= 0 || l.v.toLowerCase().indexOf(q) >= 0);
+  $('langChips' + sfx).innerHTML = rows.map(l =>
+    '<button type="button" class="chip2' + (sel.has(l.v) ? ' on' : '') + '" data-v="' + l.v + '">' +
+    esc(l.zh) + ' <span class="cv">' + esc(l.v) + '</span></button>').join('') ||
+    '<div class="note">没有匹配的语言</div>';
+  $('langCount' + sfx).textContent = sel.size;
+}
+function batchLangs(kind, which){
+  const sel = which === 'D' ? langSelD : which === 'C' ? langSelC : langSel;
+  if (kind === 'none') sel.clear();
+  else if (kind === 'all') LANGS.forEach(l => sel.add(l.v));
+  else LANGS.forEach(l => { if ((' ' + (l.g || '') + ' ').indexOf(' ' + kind + ' ') >= 0) sel.add(l.v); });
+  renderLangs(which);
+}
+
+/* v0.9.345：三个 key 的状态（用量 / 本分钟 / 今日耗尽）。服务端只给掩码，永不下发明文。
+   固定渲染 3 行：输入框是固定三个，没配的位置也要能看到「未设置」。 */
+/* v0.9.346：整槽额度一行看完。用户就是靠这行判断「到底是额度用完了，还是被小时闸卡住了」。 */
+function renderDPool(p){
+  const el = $('dPoolHint');
+  if (!el) return;
+  if (!p) { el.textContent = '—'; return; }
+  const cap = p.dailyCap || 0;
+  const used = Math.max(0, cap - (p.dailyRemain || 0));
+  const daily = cap ? ('今日 ' + used + '/' + cap) : '今日不限';
+  const mdl = p.modelCount ? (p.modelCount + ' 档 · ') : '';
+  if (!p.hourly) { el.textContent = mdl + daily + ' · 每小时不限'; return; }
+  el.textContent = mdl + '每小时 ' + p.hourly + ' 次 · 现在能发 ' + (p.tokens || 0) + ' 次（最多攒 ' + (p.max || 0) + '）· 近 60 分钟 ' + (p.hourUsed || 0) + ' 次 · ' + daily;
+}
+function renderDKeys(list){
+  for (let i = 0; i < 3; i++) {
+    const k = (Array.isArray(list) ? list[i] : null) || { set: false };
+    const n = i + 1;
+    $('keyMask4_' + n).textContent = k.set ? ('已保存：' + k.mask) : '未设置';
+    const el = $('dStat' + n);
+    if (!k.set) { el.textContent = ''; el.className = 'dstat'; continue; }
+    const used = k.used || 0, rpd = k.rpd || 0;
+    if (k.ex) {
+      el.textContent = '● 今日已耗尽 ' + used + '/' + rpd + (k.err ? ' · ' + k.err.slice(0, 36) : '');
+      el.className = 'dstat bad';
+    } else if (rpd && used >= rpd) {
+      el.textContent = '● 今日额度已满 ' + used + '/' + rpd;
+      el.className = 'dstat bad';
+    } else {
+      el.textContent = '● 可用 ' + used + '/' + rpd + ' · 本分钟 ' + (k.rpmUsed || 0) + '/' + (k.rpm || 15);
+      el.className = 'dstat ok';
+    }
+  }
+}
+
+function show(el, on){ $(el).style.display = on ? '' : 'none'; }
+function msg(el, text, cls){ const m = $(el); m.textContent = text; m.className = 'msg ' + (cls || 'ok'); }
+
+async function api(path, method, body){
+  const r = await fetch(path, {
+    method: method || 'GET',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Token': token },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error && j.error.message ? j.error.message : ('HTTP ' + r.status));
+  return j;
+}
+
+async function loadConfig(){
+  try {
+    const c = await api('/api/admin/config');
+    /* 兼容老数据：按 id 找预设，找不到但 provider 是中文名也对一次（升级前保存的旧名） */
+    let pid = '';
+    if (c.provider) {
+      const hit = PRESETS.find(p => p.id === c.provider || p.name === c.provider);
+      pid = hit ? hit.id : '';
+    }
+    fillProviderSelect(pid, 'provider');
+    fillProviderSelect(c.provider2 || '', 'provider2');
+    fillProviderSelect(c.provider3 || '', 'provider3');
+    fillProviderSelect(c.provider4 || '', 'provider4');
+    /* 老数据如果有 base 与某预设的 base 一致，但 provider 字段没存（或存了别的东西），补上匹配预设的 id */
+    if (!pid && c.base) {
+      const m = PRESETS.find(p => p.base && p.base === (c.base || '').replace(/\/+$/, ''));
+      if (m) { $('provider').value = m.id; }
+      else { $('provider').value = 'custom'; }
+    }
+    $('base').value = c.base || '';
+    $('model').value = c.model || '';
+    $('keyMask').textContent = c.keySet ? ('已保存：' + c.keyMask) : '未设置';
+    $('perIpDaily').value = c.perIpDaily;
+    $('globalDaily').value = c.globalDaily;
+    $('temperature').value = (typeof c.temperature === 'number' && Number.isFinite(c.temperature)) ? c.temperature : 0.2;
+    $('extraParams').value = paramsText(c.extraParams);
+    $('base2').value = c.base2 || '';
+    $('model2').value = c.model2 || '';
+    $('keyMask2').textContent = c.keySet2 ? ('已保存：' + c.keyMask2) : '未设置';
+    $('extraParams2').value = paramsText(c.extraParams2);
+    /* v0.9.193：模型 C 的字段（老 config.json 没有这些字段 → 走空值，不影响既有行为） */
+    $('base3').value = c.base3 || '';
+    $('model3').value = c.model3 || '';
+    $('keyMask3').textContent = c.keySet3 ? ('已保存：' + c.keyMask3) : '未设置';
+    $('extraParams3').value = paramsText(c.extraParams3);
+    langSel = new Set(Array.isArray(c.langModelB) ? c.langModelB : []);
+    langSelC = new Set(Array.isArray(c.langModelC) ? c.langModelC : []);
+    /* v0.9.345：模型 D（老 config.json 没这些字段 → 走空值/默认值，不影响既有行为）
+       v0.9.347：模型名改成模型池；服务端会把老的单模型配置当作一档返回，升级不用重填。 */
+    $('base4').value = c.base4 || '';
+    const dStats = (c.dPool && Array.isArray(c.dPool.models)) ? c.dPool.models : [];
+    dModelList = (Array.isArray(c.models4) ? c.models4 : []).map(m => {
+      const st = dStats.find(x => x.name === m.name) || {};
+      return { name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false,
+        used: st.used || 0, cap: st.cap || 0, ex: st.ex || 0 };
+    });
+    renderDModels();
+    $('hourlyD').value = c.hourlyD ? c.hourlyD : '';
+    renderDPool(c.dPool || null);
+    $('extraParams4').value = paramsText(c.extraParams4);
+    const dAll = c.langModelDAll !== false;
+    $('dScopeAll').checked = dAll;
+    $('dScopePick').checked = !dAll;
+    $('dPickBox').style.display = dAll ? 'none' : '';
+    langSelD = new Set(Array.isArray(c.langModelD) ? c.langModelD : []);
+    renderDKeys(c.dKeys || []);
+    $('fallbackToA').checked = c.fallbackToA !== false;
+    renderLangs();
+    renderLangs('C');
+    renderLangs('D');
+    $('publicUrl').value = c.publicUrl || '';
+    $('analyticsId').value = c.analyticsId || '';
+    $('usage').innerHTML = '今日用量：全站 <b>' + c.usedToday + '</b> / ' + (c.globalDaily || '∞') +
+      ' 次请求 · 独立访问 IP <b>' + c.usedIps + '</b> 个' +
+      (c.keySet ? '' : ' · <span style="color:var(--err)">尚未配置模型，用户端不可用</span>');
+    return true;
+  } catch (e) {
+    if (/未登录|会话/.test(e.message)) return false;
+    throw e;
+  }
+}
+
+function fillProviderSelect(current, selId){
+  const sel = $(selId || 'provider');
+  sel.innerHTML = '';
+  /* 全部服务商平铺（与 index.html 一致） */
+  PRESETS.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.id; o.textContent = p.name;
+    sel.appendChild(o);
+  });
+  if (current) sel.value = current;
+}
+
+async function enterAdmin(){
+  show('loginCard', false); show('main', true);
+  /* v0.9.308：不再一进来就把四张统计表全拉一遍 —— 大多数时候进来只是改个 Key。
+     按 hash 落到对应 tab，切到「统计」时才加载（switchTab 里负责）。 */
+  switchTab((location.hash || '').replace(/^#/, ''), true);
+  try { await loadConfig(); }
+  catch (e) { msg('cfgMsg', '读取配置失败：' + e.message, 'err'); }
+}
+
+/* 使用行为记录（v0.9.42 分页：20 条/页，最新在第 1 页） */
+let evPage = 1;
+function evTime(ts){
+  const d = new Date(ts);
+  const p = n => String(n).padStart(2, '0');
+  return (d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function esc(s){ const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+async function loadEvents(){
+  try {
+    const j = await api('/api/admin/events?page=' + evPage + '&size=20');
+    show('eventsCard', true);
+    const chips = [];
+    chips.push('今日 <b>' + j.today.count + '</b> 个翻译会话');
+    if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
+    if (j.today.batches) chips.push('<b>' + j.today.batches + '</b> 次请求');
+    if (j.today.finished !== undefined) chips.push('完成 <b>' + j.today.finished + '</b> 个');
+    if (j.today.downloaded !== undefined) chips.push('下载 <b>' + j.today.downloaded + '</b> 次');
+    if (j.today.copied !== undefined) chips.push('复制 <b>' + j.today.copied + '</b> 次');   // v0.9.298：复制也是拿到结果
+    if (j.today.failed) chips.push('<span style="color:#c00">失败 <b>' + j.today.failed + '</b> 个</span>');
+    if (j.topFiles && j.topFiles[0]) chips.push('最常翻译：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
+    if (j.topLangs && j.topLangs[0]) chips.push('最热目标语：<b>' + esc(j.topLangs[0].name) + '</b> ×' + j.topLangs[0].n);
+    if (j.topModels && j.topModels[0]) chips.push('最常用模型：<b>' + esc(j.topModels[0].name) + '</b> ×' + j.topModels[0].n);
+    if (j.topFails && j.topFails[0]) chips.push('<span style="color:#c00">失败原因：<b>' + esc(j.topFails[0].name) + '</b> ×' + j.topFails[0].n + '</span>');
+    /* v0.9.244：导出格式分布（读累计计数，不是「最后一次」） */
+    if (j.dlFmts && j.dlFmts.length) chips.push('导出格式：<b>' + esc(j.dlFmts.slice(0, 3).map(x => x.name.toUpperCase() + '×' + x.n).join(' ')) + '</b>');
+    chips.push('累计 <b>' + j.total + '</b> 条');
+    $('evStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+    const fmtDur = ms => {
+      const s = Math.round(ms / 1000);
+      if (s < 60) return s + '秒';
+      if (s < 3600) return Math.floor(s / 60) + '分' + (s % 60 ? (s % 60) + '秒' : '');
+      return Math.floor(s / 3600) + '时' + Math.floor((s % 3600) / 60) + '分';
+    };
+    $('evRows').innerHTML = (j.events || []).map(e => {
+      const endTd = e.finishedAt ? evTime(e.finishedAt) : (e.failMsg ? '<span style="color:#c00" title="' + esc(e.failMsg) + '">失败</span>' : '<span style="color:var(--mut)">未完成</span>');
+      /* 自带 Key 会话的 t 是首次上报时间（非翻译开始），时长无意义不显示 */
+      const durTd = (e.finishedAt && !e.byok) ? fmtDur(e.finishedAt - e.t) : '-';
+      const mdlTd = e.model ? esc(e.model) + (e.byok ? ' <span style="color:var(--mut);font-size:11px">(自带Key)</span>' : '') : '<span style="color:var(--mut)">-</span>';
+      const dlTd = e.downloads ? '✓ ×' + e.downloads : '<span style="color:var(--mut)">-</span>';
+      /* v0.9.158：被会话去重合并进来的批次不新建条目、也不改 t，列表位置纹丝不动。
+         有 lastAt 就在开始时间下补一行「末次」，让用户一眼看出这条会话刚刚还在跑。 */
+      const lastTd = (e.lastAt && e.lastAt - e.t > 1000)
+        ? '<div style="color:var(--mut);font-size:11px" title="最后活动时间 ' + new Date(e.lastAt).toLocaleTimeString() + '">末次 ' + evTime(e.lastAt) + '</div>'
+        : '';
+      return '<tr><td>' + evTime(e.t) + lastTd + '</td><td>' + endTd + '</td><td>' + durTd + '</td><td>' + esc(e.ip) +
+        '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
+        '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + dlTd + '</td><td>' + dlFmtCell(e) + '</td></tr>';
+    }).join('') || '<tr><td colspan="11" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
+    renderPager(j, 'evPager', evPage);
+  }
+  catch (e) { /* 记录区加载失败不影响主配置页 */ }
+}
+/* v0.9.244：导出格式列。⚠️ 不能只显示 dlFmt —— 它只是「最后一次」，
+   同一任务先下 SRT 再下 ASS 会被覆盖成一条；这里读各格式的累计计数（dlSrt/dlVtt/…），
+   一眼看出这单到底导了几种格式、各几次。 */
+const DL_FMT_KEYS = [['srt','dlSrt'],['vtt','dlVtt'],['sbv','dlSbv'],['ass','dlAss'],['txt','dlTxt']];
+function dlFmtCell(e){
+  const parts = DL_FMT_KEYS
+    .filter(x => (Number(e[x[1]]) || 0) > 0)
+    .map(x => x[0].toUpperCase() + (e[x[1]] > 1 ? ' ×' + e[x[1]] : ''));
+  if (!parts.length) return '<span style="color:var(--mut)">-</span>';
+  return '<span title="本任务各格式的导出次数">' + esc(parts.join('，')) + '</span>';
+}
+/* 分页条：上一页/下一页 + 窗口化页码（首末页 + 当前页前后各 1，超过间隔用 …）
+   v0.9.244：加 elId / cur 两个参数 —— 翻译记录与双语合并记录是两张表各翻各的页，
+   写死 evPager + 全局 evPage 的话第二张表会把第一张的页码冲掉。 */
+function renderPager(j, elId, cur){
+  const el = $(elId);
+  const pages = j.pages || 1;
+  if (pages <= 1) { el.innerHTML = j.total ? '<span class="pinfo">共 ' + j.total + ' 条</span>' : ''; return; }
+  const btn = (p, label, on, dis) =>
+    '<button' + (on ? ' class="cur"' : '') + (dis ? ' disabled' : '') + ' data-p="' + p + '">' + (label || p) + '</button>';
+  const win = [];
+  const add = p => { if (p >= 1 && p <= pages && !win.includes(p)) win.push(p); };
+  add(1); add(pages);
+  for (let p = cur - 1; p <= cur + 1; p++) add(p);
+  win.sort((a, b) => a - b);
+  let html = btn(cur - 1, '‹ 上一页', false, cur <= 1);
+  let prev = 0;
+  for (const p of win) {
+    if (p - prev > 1) html += '<span class="pinfo">…</span>';
+    html += btn(p, p, p === cur, false);
+    prev = p;
+  }
+  html += btn(cur + 1, '下一页 ›', false, cur >= pages);
+  html += '<span class="pinfo">第 ' + cur + ' / ' + pages + ' 页 · 共 ' + j.total + ' 条</span>';
+  el.innerHTML = html;
+}
+$('evPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === evPage) return;
+  evPage = p;
+  loadEvents();
+});
+$('btnRefreshEvents').addEventListener('click', loadEvents);
+
+/* v0.9.244：双语合并页使用记录（独立卡片、独立分页，与上面的翻译记录互不干扰） */
+let mgPage = 1;
+const MG_FMT_TXT = { srt: 'SRT', vtt: 'VTT', ass: 'ASS' };
+/* 模板码 → 中文名。⚠️ 后台是中文界面，别把前端的档位码直接甩给站长看 */
+const MG_TPL_TXT = {
+  'srt': '—', 'vtt': '无样式 VTT',
+  'ass-split': 'ASS 分屏', 'ass-stack': 'ASS 底部双行', 'ass-custom': 'ASS 自定义',
+  'vtt-std': 'VTT 标准', 'vtt-compact': 'VTT 紧凑', 'vtt-cinema': 'VTT 电影感', 'vtt-custom': 'VTT 自定义'
+};
+const MG_MODE_TXT = { merge: '两份合并', adjust: '调整双语' };
+async function loadMergeEvents(){
+  try {
+    const j = await api('/api/admin/merge-events?page=' + mgPage + '&size=20');
+    show('mergeCard', true);
+    const chips = [];
+    chips.push('今日 <b>' + j.today.count + '</b> 条');
+    if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
+    if (j.today.merged !== undefined) chips.push('合并 <b>' + j.today.merged + '</b> 次');
+    if (j.today.exported !== undefined) chips.push('导出 <b>' + j.today.exported + '</b> 次');
+    if (j.topFmts && j.topFmts[0]) chips.push('导出格式：<b>' + esc(j.topFmts.slice(0, 3).map(x => (MG_FMT_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topTpls && j.topTpls[0]) chips.push('最常用模板：<b>' + esc(j.topTpls.slice(0, 3).map(x => (MG_TPL_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topFiles && j.topFiles[0]) chips.push('最常处理：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
+    chips.push('累计 <b>' + j.total + '</b> 条');
+    $('mgStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+    $('mgRows').innerHTML = (j.events || []).map(e => {
+      const files = [e.src, e.dst].filter(Boolean);
+      const joined = files.join(' ＋ ');
+      const fileTd = files.length ? esc(joined) : '<span style="color:var(--mut)">-</span>';
+      /* 「导出」才是真正拿到了文件；只停在「合并」说明用户上传后没下载（多半是卡住或结果不满意） */
+      const kindTd = (e.kind === 'export') ? '<b>导出</b>' : '<span style="color:var(--mut)">合并</span>';
+      const fmtTd = e.fmt ? '<b>' + esc(MG_FMT_TXT[e.fmt] || e.fmt) + '</b>' : '<span style="color:var(--mut)">-</span>';
+      const tplTd = e.tpl ? esc(MG_TPL_TXT[e.tpl] || e.tpl) : '<span style="color:var(--mut)">-</span>';
+      return '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) +
+        '</td><td title="' + esc(files.join('\n')) + '">' + fileTd + '</td><td>' + (e.cues || '-') +
+        '</td><td>' + esc(MG_MODE_TXT[e.mode] || e.mode || '-') + '</td><td>' + kindTd +
+        '</td><td>' + fmtTd + '</td><td>' + tplTd + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" style="color:var(--mut)">暂无记录（用户在双语合并页点「合并」或「下载」后会出现在这里）</td></tr>';
+    renderPager(j, 'mgPager', mgPage);
+  }
+  catch (e) { /* 记录区加载失败不影响主配置页 */ }
+}
+$('mgPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === mgPage) return;
+  mgPage = p;
+  loadMergeEvents();
+});
+$('btnRefreshMerge').addEventListener('click', loadMergeEvents);
+
+/* v0.9.275：字幕清洗页使用记录（第三张独立卡片，与前两张互不干扰） */
+let clPage = 1;
+const CL_FMT_TXT = { srt: 'SRT', vtt: 'VTT', ass: 'ASS' };
+/* 规则码 → 中文名。后台是中文界面，别把 assFx / sdh 这种内部 id 直接甩给站长看。
+   ⚠️ 与 clean.html 的 OPT[].id 一一对应，加规则时必须同步这里和 server.js 的 CLEAN_RULE。 */
+const CL_RULE_TXT = {
+  assFx: 'ASS 特效', html: 'HTML 标签', ctrl: '控制符', sort: '排序', sdh: '听障提示',
+  speaker: '说话人', music: '歌词行', wm: '水印', dup: '重复条目', empty: '空条目',
+  punct: '标点', upper: '全大写', merge: '合并短句'
+};
+async function loadCleanEvents(){
+  try {
+    const j = await api('/api/admin/clean-events?page=' + clPage + '&size=20');
+    show('cleanCard', true);
+    const chips = [];
+    chips.push('今日 <b>' + j.today.count + '</b> 条');
+    if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
+    if (j.today.cleaned !== undefined) chips.push('清洗 <b>' + j.today.cleaned + '</b> 次');
+    if (j.today.exported !== undefined) chips.push('导出 <b>' + j.today.exported + '</b> 次');
+    if (j.topRules && j.topRules[0]) chips.push('最常命中规则：<b>' + esc(j.topRules.slice(0, 3).map(x => (CL_RULE_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topFmts && j.topFmts[0]) chips.push('导出格式：<b>' + esc(j.topFmts.slice(0, 3).map(x => (CL_FMT_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    if (j.topFiles && j.topFiles[0]) chips.push('最常处理：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
+    chips.push('累计 <b>' + j.total + '</b> 条');
+    $('clStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+    $('clRows').innerHTML = (j.events || []).map(e => {
+      const fileTd = e.src ? esc(e.src) : '<span style="color:var(--mut)">粘贴输入</span>';
+      /* 「导出」才是真正拿到了文件；只停在「清洗」说明用户没下载（多半是结果不满意） */
+      const kindTd = (e.kind === 'export') ? '<b>导出</b>' : '<span style="color:var(--mut)">清洗</span>';
+      const fmtTd = e.fmt ? '<b>' + esc(CL_FMT_TXT[e.fmt] || e.fmt) + '</b>' : '<span style="color:var(--mut)">-</span>';
+      const ruleTd = (e.rules && e.rules.length)
+        ? esc(e.rules.map(r => CL_RULE_TXT[r] || r).join('、'))
+        : '<span style="color:var(--mut)">无改动</span>';
+      /* 0 条保持灰色，避免整列全是高亮数字反而看不出重点 */
+      const modTd = e.mod ? '<b>' + e.mod + '</b>' : '<span style="color:var(--mut)">0</span>';
+      const delTd = e.del ? '<b style="color:#c00">' + e.del + '</b>' : '<span style="color:var(--mut)">0</span>';
+      return '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) +
+        '</td><td title="' + esc(e.src || '') + '">' + fileTd + '</td><td>' + (e.cues || '-') +
+        '</td><td>' + modTd + '</td><td>' + delTd + '</td><td class="rulecell">' + ruleTd +
+        '</td><td>' + kindTd + ' ' + fmtTd + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" style="color:var(--mut)">暂无记录（用户在清洗页上传字幕或下载结果后会出现在这里）</td></tr>';
+    renderPager(j, 'clPager', clPage);
+  }
+  catch (e) { /* 记录区加载失败不影响主配置页 */ }
+}
+$('clPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === clPage) return;
+  clPage = p;
+  loadCleanEvents();
+});
+$('btnRefreshClean').addEventListener('click', loadCleanEvents);
+
+/* v0.9.308：六个垂直工具页的统一使用记录（第四张卡，与前三张互不影响）。
+   v0.9.313：加上 videosub / hanconv 两页，共八个。
+   v0.9.316：加上 split / table / batch / lrc 四页，共十二个。
+   ⚠️ 页面名与动作名要翻成中文 —— 后台是给站长看的，别甩 shift / replace 这种内部 id。
+      ⚠️ 与 server.js 的 TOOL_PAGE / TOOL_ACT 白名单一一对应，加页或加动作必须同步这里，
+         否则后台表格里会出现「认不出来的原始码」，等于没翻译。 */
+let tlPage = 1;
+const TL_PAGE_TXT = {
+  shift: '时间轴调整', convert: '格式转换', extract: '字幕提取',
+  bilingual: '双语处理', repair: '乱码修复', glossary: '术语替换',
+  /* v0.9.313：第十一、十二页 */
+  videosub: '视频提取字幕', hanconv: '繁简转换',
+  /* v0.9.316：第十三至十六页 */
+  split: '拆分拼接', table: '表格互转', batch: '批量转换', lrc: '歌词打轴',
+  /* v0.9.321：第十七页 */
+  qc: '字幕质检'
+};
+const TL_ACT_TXT = {
+  edit: '跑了流水线', apply: '改了一条', convert: '完成转换', extract: '完成提取',
+  merge: '合并/拼接', split: '拆分/拆轨', repair: '完成修复', replace: '执行替换',
+  export: '导出文件',
+  /* v0.9.321：字幕质检页的两个动作 */
+  check: '跑了一次体检', fix: '修了问题'
+};
+async function loadToolEvents(){
+  try {
+    const j = await api('/api/admin/tool-events?page=' + tlPage + '&size=20');
+    show('toolCard', true);
+    const chips = [];
+    chips.push('今日 <b>' + j.today.count + '</b> 条');
+    if (j.today.ips) chips.push('<b>' + j.today.ips + '</b> 个 IP');
+    if (j.today.exported !== undefined) chips.push('导出 <b>' + j.today.exported + '</b> 次');
+    if (j.topActs && j.topActs[0]) chips.push('最常做：<b>' + esc(j.topActs.slice(0, 3).map(x => (TL_ACT_TXT[x.name] || x.name) + '×' + x.n).join(' ')) + '</b>');
+    chips.push('累计 <b>' + j.total + '</b> 条');
+    $('tlStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+    /* 按页汇总：十二个 SEO 入口横向对比。没人用过的页也要出现在表里（服务端已补齐十二个），
+       否则站长会怀疑「这一页是不是挂了」，而不是「就是没人来」。 */
+    const busiest = (j.byPage || []).filter(r => r.n > 0);
+    const topN = busiest.length ? busiest[0].n : 0;
+    $('tlPageRows').innerHTML = (j.byPage || []).map(r => {
+      const nm = '<b>' + esc(TL_PAGE_TXT[r.page] || r.page) + '</b>';
+      /* 最忙的那一页加粗+主色，一眼看出十二个入口的主力是哪个 */
+      const cnt = (r.n > 0 && r.n === topN) ? '<b style="color:var(--pri)">' + r.n + '</b>'
+        : (r.n ? '<b>' + r.n + '</b>' : '<span style="color:var(--mut)">0</span>');
+      const noexp = r.n > 0 && r.exported === 0;
+      /* 一次导出都没有 = 用户试了但没拿到文件，这正是最值得站长回头看的一列 */
+      const exptd = noexp ? '<b style="color:var(--warn)">0</b>'
+        : (r.exported ? '<b>' + r.exported + '</b>' : '<span style="color:var(--mut)">-</span>');
+      return '<tr><td>' + nm + '</td><td>' + cnt + '</td><td>' + (r.ips || '-') +
+        '</td><td>' + (r.today ? '<b>' + r.today + '</b>' : '<span style="color:var(--mut)">0</span>') +
+        '</td><td>' + exptd + '</td></tr>';
+    }).join('') || '<tr><td colspan="5" style="color:var(--mut)">暂无数据</td></tr>';
+    $('tlRows').innerHTML = (j.events || []).map(e => {
+      const actTd = (e.act === 'export') ? '<b>' + esc(TL_ACT_TXT[e.act] || e.act) + '</b>'
+        : '<span style="color:var(--mut)">' + esc(TL_ACT_TXT[e.act] || e.act) + '</span>';
+      const fmtTd = e.fmt ? '<b>' + esc(String(e.fmt).toUpperCase()) + '</b>' : '<span style="color:var(--mut)">-</span>';
+      const nTd = e.n ? '<b>' + e.n + '</b>' : '<span style="color:var(--mut)">-</span>';
+      return '<tr><td>' + evTime(e.t) + '</td><td>' + esc(e.ip) +
+        '</td><td>' + esc(TL_PAGE_TXT[e.page] || e.page) + '</td><td>' + actTd +
+        '</td><td>' + (e.cues || '-') + '</td><td>' + nTd + '</td><td>' + fmtTd + '</td></tr>';
+    }).join('') || '<tr><td colspan="7" style="color:var(--mut)">暂无记录（用户在十二个垂直工具页上处理字幕或下载结果后会出现在这里）</td></tr>';
+    renderPager(j, 'tlPager', tlPage);
+  }
+  catch (e) { /* 记录区加载失败不影响主配置页 */ }
+}
+$('tlPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === tlPage) return;
+  tlPage = p;
+  loadToolEvents();
+});
+$('btnRefreshTool').addEventListener('click', loadToolEvents);
+
+/* v0.9.308：tab 切换。三块内容此前平铺在一页，改一次 Key 要往下滚很久。
+   ⚠️ 切过来时才去拉数据 —— 后台一进来就拉四张表没必要，而统计也是最常被打开的那个 tab。
+   ⚠️ 当前 tab 记进 location.hash：刷新后还在原来那一页。hash 认不出来就回落 model。 */
+const PANES = { model: 'paneModel', stats: 'paneStats', acct: 'paneAcct' };
+function switchTab(name, silent){
+  const key = PANES[name] ? name : 'model';
+  Object.keys(PANES).forEach(k => {
+    show(PANES[k], k === key);
+    const btn = document.querySelector('#adminTabs button[data-tab="' + k + '"]');
+    if (btn) btn.setAttribute('aria-selected', k === key ? 'true' : 'false');
+  });
+  if (!silent) {
+    try { history.replaceState(null, '', '#' + key); } catch (e) { location.hash = key; }
+  }
+  if (key === 'stats') { loadEvents(); loadMergeEvents(); loadCleanEvents(); loadToolEvents(); }
+}
+$('adminTabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-tab]');
+  if (!b) return;
+  switchTab(b.dataset.tab);
+});
+
+/* 初始化：有 token 直接进，否则显示登录 */
+(async function init(){
+  if (token) {
+    try { if (await loadConfig()) return enterAdmin(); }
+    catch (e) { msg('loginMsg', '读取配置失败：' + e.message, 'err'); }
+  }
+  show('loginCard', true);
+  // 首次部署（服务端尚无管理密码）：提示本次输入将成为管理密码
+  try {
+    const r = await fetch('/api/model-info');
+    const j = await r.json();
+    if (j && j.adminInit === false) document.getElementById('firstRunNote').style.display = '';
+  } catch (e) {}
+})();
+
+$('btnLogin').addEventListener('click', async () => {
+  const pw = $('pw').value;
+  if (!pw) return msg('loginMsg', '请输入密码', 'err');
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error && j.error.message || '登录失败');
+    token = j.token; localStorage.setItem(TOKEN_KEY, token);
+    msg('loginMsg', j.firstRun ? '管理密码已初始化并登录成功' : '登录成功', 'ok');
+    enterAdmin();
+  } catch (e) { msg('loginMsg', e.message, 'err'); }
+});
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnLogin').click(); });
+
+$('provider').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider').value);
+  /* 选预设自动填 base；模型由用户手填（不预设），避免误覆盖用户指定的具体型号 */
+  if (p && p.id !== 'custom' && !$('base').value.trim()) $('base').value = p.base;
+});
+
+$('btnSave').addEventListener('click', async () => {
+  const base = $('base').value.trim(), model = $('model').value.trim(), key = $('key').value.trim();
+  if (!base || !model) return msg('cfgMsg', 'Base URL 和模型名不能为空', 'err');
+  let extraParams;
+  try { extraParams = readParams('extraParams'); } catch (e) { return msg('cfgMsg', e.message, 'err'); }
+  try {
+    await api('/api/admin/config', 'POST', {
+      provider: $('provider').value, base, model, key,
+      perIpDaily: +$('perIpDaily').value || 0, globalDaily: +$('globalDaily').value || 0,
+      temperature: +$('temperature').value,
+      publicUrl: $('publicUrl').value.trim(), analyticsId: $('analyticsId').value.trim(),
+      extraParams
+    });
+    $('key').value = '';
+    msg('cfgMsg', '已保存并即时生效 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfgMsg', '保存失败：' + e.message, 'err'); }
+});
+
+async function runTest(which, msgEl, prefix){
+  msg(msgEl, '测试中…', 'ok');
+  try {
+    const r = await api('/api/admin/test', 'POST', { which });
+    // v0.9.44：服务器 ok:false 表示连通但模型没返回正文（思考型模型 token 限额/模型名错/鉴权空 body），r.hint 给可读原因
+    if (r && r.ok) msg(msgEl, prefix + '连通成功，模型返回：' + (r.sample || '(空字符串)'), 'ok');
+    else msg(msgEl, (r && r.hint) ? prefix + '连通成功但模型未返回正文：' + r.hint : prefix + '连通成功但模型未返回正文', 'err');
+  } catch (e) { msg(msgEl, e.message, 'err'); }
+}
+$('btnTest').addEventListener('click', () => runTest('A', 'cfgMsg', ''));
+$('btnTest2').addEventListener('click', () => runTest('B', 'cfg2Msg', '模型 B：'));
+$('btnTest3').addEventListener('click', () => runTest('C', 'cfg3Msg', '模型 C：'));
+
+$('btnSave2').addEventListener('click', async () => {
+  const base2 = $('base2').value.trim(), model2 = $('model2').value.trim(), key2 = $('key2').value.trim();
+  if (!base2 && !model2 && !key2) return msg('cfg2Msg', '模型 B 三项都为空 = 不启用（所有语言走模型 A），无需保存', 'err');
+  if (!base2 || !model2) return msg('cfg2Msg', 'Base URL 和模型名不能为空（除非清空模型 B）', 'err');
+  let extraParams2;
+  try { extraParams2 = readParams('extraParams2'); } catch (e) { return msg('cfg2Msg', e.message, 'err'); }
+  try {
+    await api('/api/admin/config', 'POST', {
+      provider2: $('provider2').value, base2, model2, key2, extraParams2
+    });
+    $('key2').value = '';
+    msg('cfg2Msg', '模型 B 已保存并即时生效 ✓（记得在「语言分流」里勾选目标语言）', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg2Msg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnClear2').addEventListener('click', async () => {
+  if (!confirm('确定清空模型 B 的全部配置（含 API Key）？清空后所有目标语言都会走模型 A。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { clearKey2: true });
+    msg('cfg2Msg', '模型 B 已清空 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg2Msg', '清空失败：' + e.message, 'err'); }
+});
+
+$('provider2').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider2').value);
+  if (p && p.id !== 'custom' && !$('base2').value.trim()) $('base2').value = p.base;
+});
+
+/* v0.9.193：模型 C（与 B 同逻辑） */
+$('btnSave3').addEventListener('click', async () => {
+  const base3 = $('base3').value.trim(), model3 = $('model3').value.trim(), key3 = $('key3').value.trim();
+  if (!base3 && !model3 && !key3) return msg('cfg3Msg', '模型 C 三项都为空 = 不启用（不会接管任何语言），无需保存', 'err');
+  if (!base3 || !model3) return msg('cfg3Msg', 'Base URL 和模型名不能为空（除非清空模型 C）', 'err');
+  let extraParams3;
+  try { extraParams3 = readParams('extraParams3'); } catch (e) { return msg('cfg3Msg', e.message, 'err'); }
+  try {
+    await api('/api/admin/config', 'POST', {
+      provider3: $('provider3').value, base3, model3, key3, extraParams3
+    });
+    $('key3').value = '';
+    msg('cfg3Msg', '模型 C 已保存并即时生效 ✓（还要在「语言分流」里勾选要交给 C 的语言，否则 C 不接管流量）', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg3Msg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnClear3').addEventListener('click', async () => {
+  if (!confirm('确定清空模型 C 的全部配置（含 API Key）？清空后 C 不再接管任何语言，流量回到模型 B / A。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { clearKey3: true });
+    msg('cfg3Msg', '模型 C 已清空 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg3Msg', '清空失败：' + e.message, 'err'); }
+});
+
+$('provider3').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider3').value);
+  if (p && p.id !== 'custom' && !$('base3').value.trim()) $('base3').value = p.base;
+});
+
+/* v0.9.345：模型 D（Gemini 免费额度池）。四件事与 B/C 不同：
+   ① 三个 key 一起保存（各自留空 = 保留原值）；
+   ② 模型是一张池表（v0.9.347），顺序即优先级；
+   ③ 「测试全部 Key 与模型」逐个测，一个死 key / 没开通的模型不该等真用户撞上才发现；
+   ④ 有「重置今日计数」—— 误判把 key 锁死一整天时的手动出口。 */
+$('btnSave4').addEventListener('click', async () => {
+  const base4 = $('base4').value.trim();
+  const keys = [1, 2, 3].map(n => $('key4_' + n).value.trim());
+  syncDModels();
+  /* 名字为空的档直接丢弃（用户点了「增加一档」但没填，不该拦住保存） */
+  const models = dModelList.filter(m => m.name);
+  if (!base4 && !models.length && !keys.some(Boolean)) return msg('cfg4Msg', '模型 D 三项都为空 = 不启用，无需保存', 'err');
+  if (!base4) return msg('cfg4Msg', 'Base URL 不能为空（除非清空模型 D）', 'err');
+  if (!models.length) return msg('cfg4Msg', '模型池至少填一档模型名', 'err');
+  const names = models.map(m => m.name);
+  if (new Set(names).size !== names.length) return msg('cfg4Msg', '模型名重复了：同一个模型填两档不会变成两份额度', 'err');
+  let extraParams4;
+  try { extraParams4 = readParams('extraParams4'); } catch (e) { return msg('cfg4Msg', e.message, 'err'); }
+  const body = {
+    provider4: $('provider4').value, base4, extraParams4,
+    models4: models.map(m => ({ name: m.name, rpm: m.rpm, rpd: m.rpd, on: m.on !== false })),
+    langModelDAll: $('dScopeAll').checked,
+    langModelD: [...langSelD],
+    hourlyD: +$('hourlyD').value || 0
+  };
+  keys.forEach((v, i) => { if (v) body['key4_' + (i + 1)] = v; });
+  try {
+    await api('/api/admin/config', 'POST', body);
+    [1, 2, 3].forEach(n => { $('key4_' + n).value = ''; });
+    msg('cfg4Msg', '模型 D 已保存并即时生效 ✓（' + models.length + ' 档模型' +
+      ($('dScopeAll').checked ? ' · 接管全部语言' : ' · 只接管已勾选的语言') + '）', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg4Msg', '保存失败：' + e.message, 'err'); }
+});
+
+/* 模型池：增加一档 / 上移 / 下移 / 删除。改完只重渲染，落盘统一走「保存模型 D」 */
+$('btnAddModel4').addEventListener('click', () => {
+  syncDModels();
+  if (dModelList.length >= 6) return msg('cfg4Msg', '最多 6 档（再多后台也看不清，收益也有限）', 'err');
+  dModelList.push({ name: '', rpm: 15, rpd: 500, on: true, used: 0, cap: 0, ex: 0 });
+  renderDModels();
+});
+$('dModelRows').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const row = btn.closest('.mrow');
+  if (!row) return;
+  syncDModels();
+  const i = +row.dataset.i;
+  if (btn.dataset.mv) {
+    const j = i + (+btn.dataset.mv);
+    if (j < 0 || j >= dModelList.length) return;
+    const t = dModelList[i]; dModelList[i] = dModelList[j]; dModelList[j] = t;
+  } else if (btn.dataset.mdel) {
+    if (!confirm('删除「' + (dModelList[i].name || '未命名') + '」这一档？该档今日的用量记录会一起丢掉。')) return;
+    dModelList.splice(i, 1);
+  }
+  renderDModels();
+});
+
+$('btnTest4').addEventListener('click', async () => {
+  msg('cfg4Msg', '测试中（逐个 key + 逐个模型，每项消耗 1 次免费额度）…', 'ok');
+  try {
+    const r = await api('/api/admin/test', 'POST', { which: 'D' });
+    const parts = (r.keys || []).map(k =>
+      'Key ' + (k.i + 1) + '（' + (r.first || '第一档') + '）：' +
+      (k.ok ? '✓ ' + (k.sample || '(空)') : '✗ ' + (k.err || k.hint || '失败')));
+    if ((r.models || []).length) {
+      parts.push('模型 ' + r.models.map(m =>
+        m.name + '：' + (m.ok ? '✓ ' + (m.sample || '(空)') : '✗ ' + (m.err || m.hint || '失败'))).join(' · '));
+    }
+    msg('cfg4Msg', '模型 D —— ' + (parts.join(' ｜ ') || '没有可测的项'), r.ok ? 'ok' : 'err');
+  } catch (e) { msg('cfg4Msg', e.message, 'err'); }
+});
+
+$('btnReset4').addEventListener('click', async () => {
+  if (!confirm('把模型 D 所有 key × 所有模型的今日用量清零？清零后它们会被重新当作「还有额度」使用。\n\n只在确认某档被误判耗尽时才需要这么做。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { resetD: true });
+    msg('cfg4Msg', '今日计数已重置 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg4Msg', '重置失败：' + e.message, 'err'); }
+});
+
+$('btnClear4').addEventListener('click', async () => {
+  if (!confirm('确定清空模型 D 的全部配置（含三个 API Key）？清空后不再走 Gemini 免费额度，流量回到 C / B / A。')) return;
+  try {
+    await api('/api/admin/config', 'POST', { clearKey4: true });
+    msg('cfg4Msg', '模型 D 已清空 ✓', 'ok');
+    await loadConfig();
+  } catch (e) { msg('cfg4Msg', '清空失败：' + e.message, 'err'); }
+});
+
+document.querySelectorAll('button[data-cleard]').forEach(b => {
+  b.addEventListener('click', async () => {
+    const i = +b.dataset.cleard;
+    if (!confirm('清除 Key ' + (i + 1) + '？该位置的用量记录会一起归零。')) return;
+    try {
+      await api('/api/admin/config', 'POST', { clearDKey: i });
+      msg('cfg4Msg', 'Key ' + (i + 1) + ' 已清除 ✓', 'ok');
+      await loadConfig();
+    } catch (e) { msg('cfg4Msg', '清除失败：' + e.message, 'err'); }
+  });
+});
+
+$('provider4').addEventListener('change', () => {
+  const p = PRESETS.find(x => x.id === $('provider4').value);
+  if (p && p.id !== 'custom' && !$('base4').value.trim()) $('base4').value = p.base;
+});
+
+document.querySelectorAll('input[name="dScope"]').forEach(r => {
+  r.addEventListener('change', () => {
+    $('dPickBox').style.display = $('dScopePick').checked ? '' : 'none';
+  });
+});
+
+$('langSearchD').addEventListener('input', () => renderLangs('D'));
+$('langChipsD').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  const v = b.dataset.v;
+  if (langSelD.has(v)) langSelD.delete(v); else langSelD.add(v);
+  renderLangs('D');
+});
+document.querySelectorAll('button[data-batchd]').forEach(b => {
+  b.addEventListener('click', () => batchLangs(b.dataset.batchd, 'D'));
+});
+
+$('langSearch').addEventListener('input', () => renderLangs());
+$('langChips').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  const v = b.dataset.v;
+  if (langSel.has(v)) langSel.delete(v); else langSel.add(v);
+  renderLangs();
+});
+document.querySelectorAll('button[data-batch]').forEach(b => {
+  b.addEventListener('click', () => batchLangs(b.dataset.batch));
+});
+/* v0.9.193：模型 C 的语言 chips（独立一组，与 B 互不干扰） */
+$('langSearchC').addEventListener('input', () => renderLangs('C'));
+$('langChipsC').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]');
+  if (!b) return;
+  const v = b.dataset.v;
+  if (langSelC.has(v)) langSelC.delete(v); else langSelC.add(v);
+  renderLangs('C');
+});
+document.querySelectorAll('button[data-batchc]').forEach(b => {
+  b.addEventListener('click', () => batchLangs(b.dataset.batchc, 'C'));
+});
+
+$('btnSaveRoute').addEventListener('click', async () => {
+  try {
+    await api('/api/admin/config', 'POST', {
+      langModelB: [...langSel], langModelC: [...langSelC], fallbackToA: $('fallbackToA').checked
+    });
+    msg('routeMsg', '已保存：' + langSelC.size + ' 种语言走模型 C、' + langSel.size + ' 种语言走模型 B ✓', 'ok');
+  } catch (e) { msg('routeMsg', '保存失败：' + e.message, 'err'); }
+});
+
+$('btnPw').addEventListener('click', async () => {
+  const a = $('npw').value, b = $('npw2').value;
+  if (a.length < 6) return msg('pwMsg', '新密码至少 6 位', 'err');
+  if (a !== b) return msg('pwMsg', '两次输入不一致', 'err');
+  try {
+    await api('/api/admin/config', 'POST', { newPassword: a });
+    $('npw').value = $('npw2').value = '';
+    msg('pwMsg', '管理密码已更新 ✓', 'ok');
+  } catch (e) { msg('pwMsg', e.message, 'err'); }
+});
+
+$('btnLogout').addEventListener('click', () => {
+  localStorage.removeItem(TOKEN_KEY); token = '';
+  location.reload();
+});
+</script>
+</body>
+</html>

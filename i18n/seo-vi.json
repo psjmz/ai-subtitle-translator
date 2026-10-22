@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Chuyển âm thanh sang phụ đề SRT trên trình duyệt | AI-SRTSub",
+    "desc": "Chuyển âm thanh hoặc video thành phụ đề SRT/VTT bằng ASR ngay trên trình duyệt. Không cần tải lên, miễn phí, bảo mật và tự động ngắt câu chính xác.",
+    "kw": "chuyển âm thanh sang srt,tạo phụ đề từ âm thanh,công cụ tạo phụ đề tự động,chuyển giọng nói thành phụ đề,whisper phụ đề,nhận dạng giọng nói trên trình duyệt,tạo phụ đề ngoại tuyến",
+    "intro": "Tải tệp âm thanh hoặc video lên, chọn ngôn ngữ và mô hình để AI-SRTSub thực hiện nhận dạng ngay trong trình duyệt. Kết quả là bản nháp phụ đề đã được căn chỉnh thời gian và ngắt dòng phù hợp.",
+    "feat": "Công cụ này tự động ngắt câu dựa trên dấu câu, điều chỉnh độ dài dòng theo hệ chữ viết và tối ưu hóa thời gian hiển thị để đảm bảo tốc độ đọc mà không bị chồng chéo.",
+    "who": "Người sáng tạo nội dung, đội ngũ sản xuất podcast hoặc khóa học cần tạo bản nháp phụ đề nhanh chóng từ video gốc."
+  },
+  "ocrsub": {
+    "title": "OCR phụ đề cứng — trích xuất phụ đề từ video | AI-SRTSub",
+    "desc": "Trích xuất phụ đề bị cháy (hardcoded) vào video bằng công nghệ OCR. Đánh dấu vùng phụ đề, công cụ sẽ đọc từng khung hình và xuất ra tệp SRT/VTT miễn phí.",
+    "kw": "trích xuất phụ đề cứng,ocr phụ đề,lấy phụ đề từ video,phụ đề bị cháy,ocr phụ đề từ video,video sang srt,phụ đề từ video,ocr phụ đề hardcoded",
+    "intro": "Tải video lên, đánh dấu khu vực chứa phụ đề và công cụ sẽ đọc từng khung hình, hợp nhất các khung hình giống nhau thành một phụ đề có thời gian cụ thể.",
+    "feat": "Công cụ cắt vùng chứa phụ đề, nhị phân hóa độ sáng để loại bỏ nền và sử dụng OCR để nhận dạng văn bản, sau đó hợp nhất các khung hình liên tiếp thành một tệp phụ đề hoàn chỉnh.",
+    "who": "Đội ngũ dịch thuật nội dung, người biên tập video cần lấy lại phụ đề từ các bản phát hành cũ hoặc video không có tệp phụ đề gốc."
+  }
+}

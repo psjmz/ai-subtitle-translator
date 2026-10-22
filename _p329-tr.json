@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "tr": {
+      "seo": {
+        "title": "Özel efekt altyazı ve iki dilli birleştirme – Birleştir·stil – AI-SRTSub",
+        "desc": "Tam kullanım: iki altyazıyı tek iki dilli dosyada birleştirin, iki dillinin sırasını ve stilini düzeltin, tek dilliye efekt ekleyin. Eşleştirme yöntemi, ASS ve VTT şablonları ve dışa aktarma biçimi.",
+        "h1": "Özel efekt altyazı ve iki dilli birleştirme nasıl kullanılır",
+        "intro": "İki altyazıyı tek iki dilli dosyada birleştirin veya altyazıya doğrudan stil verin: yazı tipi, renk, kontur ve konum gördüğünüz gibi — önizlemede ne görünüyorsa o dışa aktarılır.",
+        "ctaText": "Özel efekt altyazı aracını aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Tek sayfada aslında üç iş var: kaynak ve çeviri altyazısını tek iki dilli dosyada birleştirmek, zaten iki dilli olan altyazının sırasını ve stilini düzeltmek, tek dilli altyazıya efekt eklemek. Üçü de aynı stil parametrelerini ve aynı önizlemeyi kullanır."
+          ],
+          "ul": [
+            "**İki altyazıyı birleştir** —— elinizde kaynak ve çeviri olmak üzere iki dosya var, tek iki dilli dosyada birleştirip dışa aktarın.",
+            "**İki dilli altyazıyı düzelt** —— zaten iki dilli ama sıra veya stil yanlış, yeniden düzenleyin.",
+            "**Tek dilli altyazı** —— tek dosya var, ona yazı tipi, kontur ve konum verin.",
+            "Üçü soldaki sekmelerden değişir, stil alanı ile önizleme alanı ortaktır."
+          ]
+        },
+        {
+          "h2": "Üç iş, tek sayfa",
+          "ps": [
+            "Sayfanın üstünde üç sekme var: **İki altyazıyı birleştir**, **İki dilli altyazıyı düzelt**, **Tek dilli altyazı**. Seçim, solda kaç giriş sütunu olacağını belirler.",
+            "İki altyazıyı birleştirirken solda «1 Kaynak altyazı» ve «2 Çeviri altyazısı» olmak üzere iki sütun çıkar; her birine dosya yükleyebilir veya altyazı metnini doğrudan yapıştırabilirsiniz. İki dilli düzeltmede ve tek dillide tek sütun vardır."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Özel efekt altyazı aracının üstündeki üç sekme ve soldaki giriş alanı",
+            "cap": "Üstte üç sekme; «İki altyazıyı birleştir» seçilince solda kaynak ve çeviri sütunları çıkar"
+          }
+        },
+        {
+          "h2": "İki altyazı nasıl eşleştirilir",
+          "ps": [
+            "«3 Birleştirme ayarları»ndaki ilk madde eşleştirme yöntemidir: **Sırayla eşleştir · kaynak zaman çizelgesi**, **Zaman çizelgesine göre eşleştir · kaynak zaman çizelgesi**, **Sırayla eşleştir · çeviri zaman çizelgesi**.",
+            "İki altyazının giriş sayısı ve sırası aynıysa sırayla eşleştirme en sağlamıdır; sayı tutmuyorsa (biri girişleri birleştirmiş, diğeri bölmüş) zaman çizelgesine göre eşleştirin, araç zamanca en yakın olanı bulsun. Hangi zaman çizelgesinin kullanılacağı daha doğru olana göre seçilir, genelde kaynak daha doğrudur.",
+            "Altında metin yapısı (otomatik algıla / tek giriş iki satır / dönüşümlü çift) ve sıra (kaynak üstte / çeviri üstte) seçenekleri de var."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Birleştirme ayarlarındaki eşleştirme yöntemi, metin yapısı ve sıra seçenekleri",
+            "cap": "Eşleştirme yöntemi kimin kiminle tek satır olacağını belirler; zaman çizelgesinin kaynaktan mı çeviriden mi alınacağı da burada seçilir"
+          }
+        },
+        {
+          "h2": "Stili tek tek değiştir",
+          "ps": [
+            "Sağda stil alanı var. ASS'e aktarırken «ASS görünümü» geçerlidir: yerleşim (bölünmüş · üst-alt ayrı / yığın · altta iki satır), çevirinin (ana) yazı boyutu, rengi, opaklığı, yazı tipi, kalın, italik, harf aralığı, kontur, kontur rengi, gölge/arka bant (yok / gölge / arka bant), derinlik, kenar rengi, kenar opaklığı, yatay hizalama (alt · sol / alt · orta / alt · sağ), alt kenardan uzaklık; ayrıca kaynağın (alt) yazı tipi, gölge/arka bandı ve sağ-sol kenar boşlukları.",
+            "VTT iki dilli stile aktarırken «WebVTT stili» geçerlidir: altı hazır ayarın (standart / kompakt / sinematik / üst / erişilebilirlik / dikey ekran) üzerinde tüm altyazının dikey line değeri, bağlantı noktası (alt / üst / orta), yatay position, genişlik size, hizalama align, satır yüksekliği ve çeviri satırının arka bant rengi, arka bant opaklığı, kontur kalınlığı değiştirilebilir; kaynak satırı ana stili izleyebilir veya ayrı ayarlanabilir.",
+            "Değiştirdikten sonra «Ayar olarak kaydet» diyebilirsiniz; sonraki sefer «Kayıtlı ayardan» seçip «Uygula»ya basınca yeniden kullanılır."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Sağdaki ASS görünümü stil alanının parametreleri",
+            "cap": "Yazı boyutu, renk, kontur, gölge/arka bant ve hizalama tek tek ayarlanabilir; değiştirdikten sonra ayar olarak kaydedilebilir"
+          }
+        },
+        {
+          "h2": "Dışa aktarmadan önce önizleme",
+          "ps": [
+            "«Birleştirme önizlemesi» bir tablodur: #, zaman, kaynak, çeviri, stil. Üstten «Ses efekti içeriyor», «Konuşmacı öneki var», «Süre < 1 saniye», «İkiden fazla satır», «Okuma hızı aşıldı» ile şüpheli satırlar süzülebilir veya doğrudan anahtar kelime yazılarak filtrelenebilir.",
+            "Bir satırın stil yuvasına tıklamak o yuvanın düzenlemesini açar ve yalnızca hangi satırlarda kullanıldığını listeler; «Tüm geçersiz kılmaları kaldır» elle yapılan tüm geçersiz kılmaları şablona döndürür. Alttaki zaman çizelgesi ayar alanında toplu kaydırma (belirli bir girişten itibaren) ve oransal ölçekleme yapılabilir.",
+            "Onayladıktan sonra «4 Dışa aktar»a gidin: altyazı dosyasını indirin veya içeriği kopyalayın."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Birleştirme önizlemesinin tablosu ve filtre çubuğu",
+            "cap": "Önizleme dışa aktarma sonucunun kendisidir; şüpheli satırlar türe göre süzülebilir, tek bir stil yuvası ayrıca açılabilir"
+          }
+        },
+        {
+          "h2": "Neye dokunulmaz",
+          "ps": [
+            "Stil yalnızca görünümü değiştirir, repliklere dokunmaz. Kaynak ve çeviri metni birleştirme sırasında tek harf değişmez; zaman çizelgesi de önizlemenin altındaki ayar alanında kendiniz değiştirmedikçe seçtiğiniz tarafınki kalır.",
+            "SRT veya «stilsiz VTT» olarak dışa aktarırken stil bilgisi dosyaya yazılmaz — sayfa, şu anda STYLE bloğu içermeyen stilsiz VTT aktarıldığını ve oynatıcının varsayılan görünümü kullanacağını bildirir. Stil istiyorsanız VTT iki dilli stil veya ASS seçin."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**İki altyazının giriş sayısı farklıysa ne yapmalı?** «Zaman çizelgesine göre eşleştir» kullanın, araç zamanca en yakın olanı eşler; eşleşmeyen girişler yoktan üretilmez.",
+            "**ASS olarak aktarılan stili oynatıcı tanımıyorsa?** ASS stili dosyanın içine yazılır ama oynatıcıların ASS desteği farklıdır. Daha genel bir görünüm istiyorsanız VTT iki dilli stil aktarın.",
+            "**Şablonu bozduysam başlangıca nasıl dönerim?** ASS alanındaki «Varsayılan parametrelere dön» ve VTT alanındaki «Şablon varsayılanına dön» iki bölümü ayrı ayrı geri alır.",
+            "**Örnekteki 7 satır ne?** Sayfaya gömülü bir örnek, birleştirme sonrası nasıl göründüğünü önce görmek için. Örnek dışa aktarılamaz; kendi altyazınızı yükleyip birleştirme önizlemesine bastığınızda otomatik değişir."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Altyazı tüm süreç boyunca tarayıcının içinde işlenir, yüklenmez ve sunucudan geçmez. Tarayıcıyı kapatınca işlem sırasındaki içerik de gider."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "İki dilliyi yeniden iki iz olarak ayırmak için [[İki dilli ayırma|/bilingual.html]], tersine tek dilliden iki dilli yapmak için [[İki dilli altyazı yapmanın iki yolu|/guides/make-bilingual-subtitles.html]] sayfasına bakın; birleştirdikten sonra [[Altyazı kalite denetimi|/qc.html]] ile bir kez geçirin; bir sezonu tek seferde işlemek için [[Toplu dönüştürme|/batch.html]] sayfasına gidin."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "tr": {
+      "seo": {
+        "title": "Altyazıdan düz metin çıkarma – İki düzen ve beş temizlik – AI-SRTSub",
+        "desc": "Tam kullanım: sürekli paragraf ve satır satır iki düzen, işitme engeli ipuçları, filigran, bitişik tekrar, konuşmacı öneki ve şarkı sözü — beş anahtarın neyi kaldırdığı ve altı biçim desteği.",
+        "h1": "Altyazıdan düz metin çıkarma nasıl kullanılır",
+        "intro": "Altyazıdaki replikleri temiz düz metin olarak çıkarın: zaman çizelgesi, sıra numarası ve stil işaretleri kendiliğinden kalkar, sonuç doğrudan yazı gibi okunur veya replik listesi olarak kullanılır.",
+        "ctaText": "Düz metin çıkarmayı aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Altyazı dosyasında gerçekten işe yarayan tek şey repliklerdir, gerisi oynatıcının okuduğu yapıdır: sıra numarası, zaman çizelgesi, stil işaretleri. Bu sayfa yapıyı kaldırır, yalnızca harfleri bırakır."
+          ],
+          "ul": [
+            "**Yazı gibi oku** —— sürekli paragraf verir, duraklamalara ve cümle sonu noktalama işaretlerine göre paragrafları kendi böler.",
+            "**Liste olarak kullan** —— satır satır verir, bir altyazı bir satır; replik tablosu yapmak veya başka bir araca beslemek için elverişli.",
+            "**Arada temizle** —— işitme engeli ipuçları, filigran reklamlar ve bitişik tekrar eden cümleler varsayılan olarak çıkarılır.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** altı biçimin tümü desteklenir."
+          ]
+        },
+        {
+          "h2": "Koyun, yalnızca yüklemeyi düşünmeyin",
+          "ps": [
+            "Soldaki «1 Altyazı koy» dosya yüklemeyi destekler, altyazı içeriği doğrudan metin kutusuna da yapıştırılabilir. Yanlış koyduysanız «Temizle»ye basıp yeniden yapın.",
+            "Bu sayfa dosyayı UTF-8 olarak okur. Altyazıyı açtığınızda her yer soru işareti veya kare ise kodlama bozulmuştur; önce [[Bozuk kodlamayı onar|/repair.html]] sayfasında UTF-8'e çevirip dönün."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Düz metin çıkarma sayfasının altyazı koyma alanı",
+            "cap": "Dosya yükleyin veya altyazı içeriğini doğrudan metin kutusuna yapıştırın"
+          }
+        },
+        {
+          "h2": "Hangi düzen seçilir",
+          "ps": [
+            "«2 Çıkarma seçenekleri»nin en üstünde düzen var: **Sürekli paragraf** duraklamalara ve cümle sonu noktalamaya göre paragrafları kendi böler, yazı gibi okunur; **Satır satır** bir altyazıyı bir satıra çevirir ve kaynak dosyanın girişleriyle bire bir eşleşir.",
+            "Replikleri not almak, çeviri alıştırması yapmak veya yazı gibi okumak için sürekli paragraf; replik listesi yapmak, kaynakla giriş giriş karşılaştırmak veya başka bir araca beslemek için satır satır kullanın."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Çıkarma seçeneklerindeki düzen ve temizlik anahtarları",
+            "cap": "Bir düzen seçin; alttaki beş anahtar hangi türün çıkarılacağını belirler"
+          }
+        },
+        {
+          "h2": "Beş temizlik neyi çıkarır",
+          "ps": [
+            "**İşitme engeli ipuçlarını kaldır**: «(ayak sesleri)», «[müzik]» gibi sesi betimleyen parantezler silinir, replikler kalır.",
+            "**Filigran reklamları kaldır**: altyazı ekibi imzası, site adresi, kanal adı gibi satırlar ayıklanır.",
+            "**Bitişik tekrarı kaldır**: aynı cümle hemen iki kez gelirse (oynatma kazası) biri kalır; aralıklı tekrarın anlamı vardır, dokunulmaz.",
+            "**Konuşmacı önekini kaldır**: «JOHN: merhaba» yalnızca «merhaba» olur. Varsayılan korumaktır — senaryo türü metinde kimin konuştuğu bilinmelidir.",
+            "**Şarkı sözü satırlarını atla**: tümü «♪ … ♪» olan satır atlanır. Varsayılan korumaktır — söz de sözdür."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Çıkarma seçeneklerindeki beş temizlik anahtarı ve açıklamaları",
+            "cap": "Her anahtarın sağında neyi çıkardığı yazıyor, gerekeni işaretleyin"
+          }
+        },
+        {
+          "h2": "Sonucu nasıl alırsınız",
+          "ps": [
+            "Sağdaki «3 Sonuç» çıkarılan metni anında gösterir, seçenek değişince hemen yeniden hesaplar.",
+            "Onayladıktan sonra «İndir» ile .txt olarak kaydedin veya «Kopyala» ile doğrudan alın. Çince ve Japonca gibi sözcükleri boşlukla ayırmayan dillerde satır birleştirme kuralları İngilizceden farklıdır, araç dili tanıyıp kendisi uygular."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Sonuç alanı ile indir ve kopyala düğmeleri",
+            "cap": "Sonuç anında güncellenir; txt olarak indirin veya doğrudan kopyalayın"
+          }
+        },
+        {
+          "h2": "Neye dokunulmaz",
+          "ps": [
+            "Repliklerin kendisi yeniden yazılmaz. Temizlik anahtarları yalnızca hangi türün tümüyle çıkarılacağını belirler, girişin harflerini değiştirmez.",
+            "Zaman çizelgesi ve sıra numarası «çıktıya yazılmaz», «önce değiştirilip sonra yazılır» değildir — kaynak dosya etkilenmez ve bu sayfa zaman çizelgesi içeren sürümü dışa aktarmaz; o iş [[Biçim dönüştürme|/convert.html]] sayfasına aittir."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**ASS'in stil işaretleri metinde kalır mı?** Hayır. ASS'in `{}` stil geçersiz kılma işaretleri kaldırılır, yalnızca replik metni kalır.",
+            "**İki dilli altyazı çıkarılınca iki satır mı bir satır mı olur?** Kaynak girişte kaç satır varsa o kadar kalır; bu sayfa ne birleştirir ne böler — bölmek için [[İki dilli ayırma|/bilingual.html]] kullanın.",
+            "**Konuşmacı öneki neden varsayılan olarak kalır?** «JOHN: merhaba»daki ad çoğu zaman işe yarar bilgidir (senaryo, replik tablosu); silinince kimin konuştuğu anlaşılmaz, bu yüzden karar size bırakılmıştır.",
+            "**LRC şarkı sözü dosyası da çıkarılır mı?** Evet. LRC'nin zaman etiketleri kaldırılır, söz satırları kalır; sözleri istemiyorsanız «Şarkı sözü satırlarını atla»yı işaretleyin."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Altyazı tüm süreç boyunca tarayıcının içinde işlenir, yüklenmez ve sunucudan geçmez. Metin yalnızca bu sayfada kalır, yenileyince silinir."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Altyazı dosyasında gerçekte ne yazdığını anlamak için [[SRT dosyasında ne yazar|/guides/srt-file-format.html]]; çıkarılan replikleri çevirmek için [[Altyazı çevirisi|/translate.html]]; tabloya dökmek için [[Altyazıyı Excel/CSV'ye|/guides/srt-to-excel.html]]; teslim etmeden önce [[Altyazı kalite denetimi|/qc.html]] ile geçirin."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "tr": {
+      "seo": {
+        "title": "Altyazı bölme ve birleştirme – Aralıkla kes · sırayla ekle – AI-SRTSub",
+        "desc": "Tam kullanım: dosyayı süreye veya giriş sayısına göre parçalara bölün, her parçayı sıfırdan saydırın; birden çok dosyayı sırayla ekleyin veya zaman damgalarını koruyup zamanla örün.",
+        "h1": "Altyazı bölme ve birleştirme nasıl kullanılır",
+        "intro": "Uzun bir altyazıyı parçalara bölün veya dağınık altyazıları tek dosyada toplayın. Kesim yalnızca giriş sınırında olur, bir cümle asla ikiye bölünmez.",
+        "ctaText": "Bölme ve birleştirmeyi aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Bölüm ayırma, aralık bölme, kaynak birleştirme işlerinde altyazının parçaları birbirini tutmaz: ya bir dosyanın kesilmesi gerekir ya da birkaç dosyanın tek dosyada toplanması. Bu sayfa iki işi de üstlenir; kesme ve ekleme ayrı sekmelerdedir."
+          ],
+          "ul": [
+            "**Bölme** —— uzun bir altyazıyı süreye veya giriş sayısına göre parçalara kesin.",
+            "**Ekleme** —— birkaç altyazıyı sırayla tek bölümde birleştirin veya zamanla örün.",
+            "**Yalnızca giriş sınırında kesim** —— bir cümle ikiye bölünmez.",
+            "**Sıra numarası kendi düzenlenir** —— eklemeden sonra numaraları elle düzeltmeyin, replikler tek harf değişmez."
+          ]
+        },
+        {
+          "h2": "Önce seçin: kesmek mi eklemek mi",
+          "ps": [
+            "Üstte iki sekme: **Bölme: tek dosyayı parçalara** ve **Ekleme: birkaç dosyayı tek dosyaya**. Seçimden sonra alttaki ikinci adım seçenekleri buna göre değişir.",
+            "«1 Altyazı koy»da dosya yükleyin veya metin yapıştırın, yanlış koyduysanız «Temizle»ye basın. Bu sayfa yalnızca UTF-8 okur — kodlama bozuksa (her yer soru işareti veya kare) önce [[Bozuk kodlamayı onar|/repair.html]] sayfasına gidin."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Bölme ve birleştirme sayfasının üstündeki iki sekme",
+            "cap": "Kesme ve ekleme iki sekme; seçimden sonra ikinci adımın seçenekleri değişir"
+          }
+        },
+        {
+          "h2": "Nasıl kesilir",
+          "ps": [
+            "«2 Nasıl kesilir»de ölçüt seçin: **Süre** (her X dakikada bir parça) veya **Sayı** (her X girişte bir parça) ve bir sayı girin.",
+            "«Her parçayı 0:00'dan yeniden say» işaretlenirse kesilen her parça sıfırdan başlar — bölümleri ayrı ayrı yüklerken veya her parçayı oynatıcıya tek tek verirken kullanılır. İşaretlenmezse zaman damgaları korunur ve kesilen parçalar kaynak videodaki konumla eşleşmeye devam eder.",
+            "Kesim yalnızca altyazı satırının sınırında olur: sınırı aşan çok uzun bir satır, tamamı önceki parçada kalır."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Bölme sayfasındaki süre/sayı ve sıfırdan sayma seçenekleri",
+            "cap": "Süreye veya sayıya göre kesin, her parçayı 0:00'dan başlatabilirsiniz"
+          }
+        },
+        {
+          "h2": "Nasıl eklenir",
+          "ps": [
+            "«2 Nasıl eklenir»de yöntem seçin: **Sırayla ekle** sonraki dosyayı bir öncekinin bitiminden sonraya tümüyle kaydırır, parçalar üst üste binmez; **Zamanla ör** her dosyanın özgün zaman damgalarını korur ve başlangıç zamanına göre sıralar.",
+            "Dosyalar aynı bölümün ön ve arka yarısıysa ya da denetim için bölünüp geri birleştirilecekse sırayla ekle kullanın; birkaç dosya zaten aynı ekranda olmalıysa (örneğin kaynak iz ile çeviri izi) zamanla ör kullanın.",
+            "Eklemeden sonra sıra numarası kendi düzenlenir ve replikler tek harf değişmez."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Ekleme sayfasındaki sırayla ekle ve zamanla ör seçenekleri",
+            "cap": "Sırayla ekle ön-arka yarı için, zamanla ör kaynak iz ile çeviri izini birleştirmek için uygundur"
+          }
+        },
+        {
+          "h2": "Sonucu nasıl alırsınız",
+          "ps": [
+            "Sağdaki «3 Sonuç» **SRT** ve **VTT** iki biçimde dışa aktarmayı destekler, «İndir» veya «Kopyala»ya basın.",
+            "Bölerken «Tüm parçaları indir» ile kesilen parçaların hepsini tek seferde kaydedebilirsiniz, tek tek basmanız gerekmez."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Sonuç alanında SRT/VTT biçim seçimi, indir ve tüm parçaları indir",
+            "cap": "Bölme sonucu tüm parçalar hâlinde tek seferde indirilebilir; eklenmiş sonuç doğrudan indirilir veya kopyalanır"
+          }
+        },
+        {
+          "h2": "Neye dokunulmaz",
+          "ps": [
+            "Replikler tek harf değişmez. Bu sayfa yalnızca «hangi girişler hangi parçada» ve «numaralar nasıl sıralanır» ile ilgilenir, giriş içeriğine dokunmaz.",
+            "«Sırayla ekle» seçilince sonraki dosyaların zaman damgaları tümüyle kaydırılır — bu eklemenin kendi gereğidir; «Zamanla ör» seçilince her dosyanın özgün zaman damgaları korunur."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Kesince son parça çok kısa olduysa?** Normaldir. Tam uzunluğa yetmeyen artık kendi başına bir parça olur, zorla doldurulmaz.",
+            "**Sınıra denk gelen cümle kesilir mi?** Hayır. Kesim yalnızca giriş sınırında olur, sınırı aşan satır tamamı önceki parçada kalır.",
+            "**Zamanla örmede iki girişin zamanı tamamen aynıysa nasıl sıralanır?** Başlangıç zamanına göre sıralanır, başlangıç zamanı eşitse sizin koyduğunuz sıra korunur.",
+            "**ASS kesilebilir mi?** Bu sayfa SRT ve VTT destekler. ASS'yi önce [[Biçim dönüştürme|/convert.html]] ile SRT veya VTT'ye çevirip sonra işleyin."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Altyazı tüm süreç boyunca tarayıcının içinde işlenir, yüklenmez ve sunucudan geçmez. Sayfayı kapatınca içerik de gider."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "İki dosyayı iki dilli olarak birleştirmek için (bölüm olarak eklemek değil) [[Özel efekt altyazı ve iki dilli birleştirme|/guides/merge.html]]; zaman çizelgesi tümüyle kaydıysa [[Zaman çizelgesi ayarı|/shift.html]]; bir sezonluk miktar için [[Toplu dönüştürme|/batch.html]]; iş bitince [[Altyazı kalite denetimi|/qc.html]] ile geçirin."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "tr": {
+      "seo": {
+        "title": "Şarkı sözü zamanlama aracı – Şarkı koy · söz yapıştır – AI-SRTSub",
+        "desc": "Tam kullanım: müziği koyun, sözleri yapıştırın, dinlerken her satırın zamanına basın, LRC sonucunu anında görün ve LRC ya da SRT aktarın. Boşluk oynat/durdur, Enter geçerli satır, Z geri al.",
+        "h1": "Şarkı sözü zamanlama aracı nasıl kullanılır",
+        "intro": "Müziği koyun, sözleri yapıştırın, dinlerken her satıra zaman verin, standart LRC veya SRT aktarın. Ses yalnızca bu makinede çalar, yüklenmez.",
+        "ctaText": "Şarkı sözü zamanlama aracını aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Bir şarkıya eşlik ederek söylenebilecek söz dosyası yapın: satır başına bir cümle, her satırda bir zaman noktası. Oynatıcılar LRC okur, altyazı izi SRT okur; ikisi de aktarılabilir."
+          ],
+          "ul": [
+            "**Sıfırdan zamanla** —— düz metin sözleri yapıştırın, dinlerken basın.",
+            "**Mevcut olanı düzelt** —— hazır LRC içe aktarın, zamanı olmayan ilk satırdan devam edin.",
+            "**İki biçim aktar** —— LRC oynatıcıya, SRT video altyazı izine.",
+            "**Tümüyle klavyeyle** —— boşluk oynat/durdur, Enter geçerli satır, Z geri al."
+          ]
+        },
+        {
+          "h2": "1 Müziği koy",
+          "ps": [
+            "Soldaki ilk sütuna ses yükleyin, **MP3, M4A, FLAC, WAV, OGG** hepsi olur. Ses yalnızca bu makinede çalar, yüklenmez.",
+            "Ses kalitesi zamanlama hassasiyetini etkilemez ama vokali net kaynak daha doğru duyulur; canlı sürümler veya müziğin çok yüksek olduğu kaynakları eşlemek belirgin biçimde zorlaşır."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Şarkı sözü zamanlama aracının müzik koyma alanı",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG hepsi olur, ses yalnızca bu makinede çalar"
+          }
+        },
+        {
+          "h2": "2 Sözleri yapıştır",
+          "ps": [
+            "İkinci sütuna sözleri yapıştırın, **satır başına bir cümle**, boş satırlar kendiliğinden atlanır. Yapıştırdıktan sonra «Sözleri çözümle»ye basın.",
+            "Var olan LRC de yapıştırılabilir — `[mm:ss.xx]` zaman etiketleri kendiliğinden tanınır, içe aktardıktan sonra zamanı olmayan ilk satırdan devam edilir, zamanı verilmiş cümleleri yeniden yapmanız gerekmez."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Söz yapıştırma alanı ve sözleri çözümle düğmesi",
+            "cap": "Satır başına bir cümle yapıştırın veya tüm LRC'yi yapıştırıp var olan zamanları okutun"
+          }
+        },
+        {
+          "h2": "3 Dinlerken bas",
+          "ps": [
+            "Müziği çalın, bir cümle başladığı anda Enter'a basın (veya «Bu satırı zamanla»ya basın); o cümlenin zamanı kaydedilir ve imleç kendiliğinden sonraki satıra geçer.",
+            "Kısayollar: **boşluk** oynat/durdur, **Enter** geçerli satırı zamanla, **Z** bir satır geri al. Çalarken Enter'a basmak en pratiğidir, fareyle klavye arasında gidip gelmeniz gerekmez.",
+            "Yanlış bastıysanız Z ile o satırı geri alıp yeniden basın; bir satıra zaman vermek istemiyorsanız (ara, yalnız müzik bölümü) «Bu satırı atla»ya basın, dışa aktarmada görünmez."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Dinlerken basma alanındaki oynat, bu satırı zamanla, bir satır geri al, bu satırı atla",
+            "cap": "Boşluk oynat/durdur, Enter geçerli satır, Z geri al; iki eliniz klavyede kalır"
+          }
+        },
+        {
+          "h2": "4 Dışa aktarma",
+          "ps": [
+            "Bitince dördüncü sütuna geçin: **LRC indir** oynatıcı için, **SRT indir** video altyazı izi için; doğrudan «Kopyala» da yapabilirsiniz.",
+            "Yalnızca zamanı verilmiş satırlar aktarılır; atlanan satırlar dosyaya girmez. SRT aktarırken her satır sonraki başlayana kadar sürer, son satıra en az 2 saniye verilir."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Dışa aktarma alanındaki LRC indir, SRT indir ve kopyala düğmeleri",
+            "cap": "LRC oynatıcıya, SRT videoya; yalnızca zamanı verilmiş satırlar aktarılır"
+          }
+        },
+        {
+          "h2": "Neye dokunulmaz",
+          "ps": [
+            "Söz metni yeniden yazılmaz. Zamanlama her satıra yalnızca bir zaman noktası ekler, yapıştırdığınız harflere dokunmaz.",
+            "Var olan LRC içe aktarılırken zaman etiketi olan satırlar özgün zamanını korur, zamanı olmayan ilk satırdan devam edilir."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Aktardım birkaç satır eksik?** Atlanan ve zamanı verilmemiş satırlar dosyaya girmez. Üçüncü adıma dönüp tamamlayın veya zaten atlanması gerektiğini doğrulayın.",
+            "**JSON'daki zaman değiştirilebilir mi?** Bitirdikten sonra tümünü biraz kaydırmak istiyorsanız SRT aktarıp [[Zaman çizelgesi ayarı|/shift.html]] ile tümünü kaydırın veya oransal ölçekleyin.",
+            "**LRC mi SRT mi aktarılmalı?** Müzik oynatıcısı (foobar2000 ve çeşitli oynatıcılar) için LRC; videoya takmak veya altyazı araçlarıyla işlemeye devam etmek için SRT.",
+            "**Bir şarkının zamanlaması ne kadar sürer?** Söz satırı sayısına ve istediğiniz doğruluğa bağlı. Otuz-kırk satırlık bir şarkı akışa alışınca birkaç dakikada geçilir; harf harf eşlemek isterseniz daha uzun sürer."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Ses ve sözler tüm süreç boyunca tarayıcının içinde işlenir, yüklenmez ve sunucudan geçmez. Ses yalnızca bu makinede çözülüp çalar."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Var olan LRC'yi altyazıya çevirmek için [[LRC'den SRT'ye|/guides/lrc-to-srt.html]]; zamanlamanın mantığı ve tuzakları için [[Şarkı sözü LRC nasıl zamanlanır|/guides/how-to-make-lrc-file.html]]; aktarılan SRT'nin zamanı tutmuyorsa [[Zaman çizelgesi ayarı|/shift.html]]; ürünü [[Altyazı kalite denetimi|/qc.html]] ile geçirin."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "tr": {
+      "seo": {
+        "title": "Videoya gömülü altyazıyı çıkarma – AI-SRTSub",
+        "desc": "Tam kullanım: MKV, WebM, MP4, MOV içine gömülü altyazı izlerini okuyup SRT / VTT / ASS / TXT aktarın. Video yüklenmez ve yeniden kodlanmaz, görüntü altyazıların çıkmayacağı belirtilir.",
+        "h1": "Videoya gömülü altyazıyı çıkarma nasıl kullanılır",
+        "intro": "MKV / MP4 içine gömülü altyazı izini doğrudan okuyup SRT olarak aktarın — video yüklenmez, her şey tarayıcıda olur.",
+        "ctaText": "Video altyazı çıkarmayı aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Altyazı ayrı bir dosya olmayıp video dosyasının içine gömülü olabilir. Onu değiştirmek, çevirmek veya iki dilli yapmak için önce çıkarmak gerekir — bu sayfa yalnızca bunu yapar."
+          ],
+          "ul": [
+            "**Dört kapsayıcı tanır** —— MKV / WebM ve MP4 / MOV.",
+            "**Dört tür iz tanır** —— düz metin izi, ASS izi, WebVTT izi ve MP4'ün mov_text / tx3g izi.",
+            "**Dört biçim aktarır** —— SRT / VTT / ASS / TXT.",
+            "**Yükleme yok, yeniden kodlama yok** —— ofsetle küçük parçalar okur, birkaç GB'lık dosya belleği doldurmaz."
+          ]
+        },
+        {
+          "h2": "1 Videoyu koy",
+          "ps": [
+            "İlk sütuna video dosyasını sürükleyin veya tıklayıp seçin. Yalnızca **MKV / WebM** ve **MP4 / MOV** tanınır, başka kapsayıcıların izleri okunamaz.",
+            "Dosya bilgisayarınızdan çıkmaz — yükleme adımı yoktur. Araç ofsetle küçük parçalar okur, bu yüzden birkaç GB'lık film bile belleği doldurmaz; ama ilk okumada iz bilgileri bir kez taranana kadar beklemek gerekir."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Videoya gömülü altyazı çıkarma sayfasının video koyma alanı",
+            "cap": "MKV / WebM ve MP4 / MOV desteklenir, dosya bu makineden çıkmaz"
+          }
+        },
+        {
+          "h2": "2 Gömülü altyazı izleri",
+          "ps": [
+            "Okuma bitince ikinci sütun dosyadaki altyazı izlerini **satır başına bir iz** olarak listeler, genelde dil ve iz adıyla birlikte (örneğin «Türkçe», «English», «Zorunlu altyazı»). Hangisine tıklarsanız o çıkarılır.",
+            "Dosyada tek altyazı izi varsa çıkarma kendiliğinden başlar, tıklamanız gerekmez.",
+            "**Görüntü altyazılar çıkarılamaz**: Blu-ray PGS ve DVD altyazıları içine işlenmiş resimlerdir, alınacak harf yoktur — sayfa bunu açıkça söyler, o durumda OCR tanıma gerekir."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Gömülü altyazı izlerinin listesi, satır başına bir iz",
+            "cap": "Bir iz bir satır; tek iz varsa çıkarma kendiliğinden başlar"
+          }
+        },
+        {
+          "h2": "3 Sonuç",
+          "ps": [
+            "Sağdaki «3 Sonuç» çıkarılan altyazı metnini verir, üstte aktarma biçimini seçin (**SRT / VTT / ASS / TXT**) ve «İndir» veya «Kopyala»ya basın.",
+            "Kaynak iz ASS ise izin kendi stil başlığı ve çözünürlüğü olduğu gibi taşınır — ASS olarak aktarınca bu bilgiler korunur, SRT olarak aktarınca yalnızca metin gelir."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Sonuç alanı ve SRT / VTT / ASS / TXT biçim seçimi",
+            "cap": "Dört aktarma biçimi; ASS kaynak izinin stil başlığı ve çözünürlüğü olduğu gibi taşınır"
+          }
+        },
+        {
+          "h2": "Neye dokunulmaz",
+          "ps": [
+            "Video dosyasının kendisine hiç dokunulmaz — yalnızca okunur, yazılmaz, yeniden kodlanmaz ve yeniden kaplanmaz.",
+            "Altyazı içeriği olduğu gibi çıkarılır, kodlama tahmini yapılmaz ve zaman çizelgesi düzeltilmez. Çıkarılan altyazı bozuksa bu kaynak izin kodlama sorunudur, [[Bozuk kodlamayı onar|/repair.html]] sayfasında ele alın."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Görüntü altyazılar (PGS / DVD) için gerçekten yol yok mu?** Bu sayfada yok — resimdir, metin katmanı yoktur. Önce OCR tanıma gerekir, bu sayfa onu yapmaz.",
+            "**Çıkarılan altyazının zamanı tutmuyor?** Bu sayfa zaman çizelgesini düzeltmez, ne bulduysa onu verir. Tümüyle kayma veya oran sorunu için [[Zaman çizelgesi ayarı|/shift.html]] kullanın.",
+            "**Neden tarama uzun sürüyor?** Büyük dosyalarda iz bilgileri ofsetle sırayla taranır, dosya büyüdükçe bekleme uzar; bu süre yerelde geçer, internet hızıyla ilgisi yoktur.",
+            "**Harici altyazı dosyası bu sayfayla olur mu?** Gerek yok — harici .srt / .ass doğrudan [[Biçim dönüştürme|/convert.html]] veya başka bir araca girer, bu sayfa «videoya gömülü» altyazılar içindir."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Video tüm süreç boyunca tarayıcıda yerel olarak okunur, yüklenmez, yeniden kodlanmaz ve sunucudan geçmez. Sayfayı kapatınca okunan içerik de serbest kalır."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Çıkardığınızı çevirmek için [[Altyazı çevirisi|/translate.html]], iki dilli yapmak için [[İki dilli altyazı yapmanın iki yolu|/guides/make-bilingual-subtitles.html]]; gömülü ile harici arasındaki fark, neyin çıkıp neyin çıkmadığı [[Videoya gömülü altyazı nasıl çıkarılır|/guides/extract-subtitles-from-video.html]] sayfasında."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "tr": {
+      "seo": {
+        "title": "Altyazı terimlerini toplu değiştirme – Tek tabloyla tüm dosya – AI-SRTSub",
+        "desc": "Tam kullanım: satır başına bir kural, eski ve yeni sözcüğü -> ya da => ya da → ya da Tab ile ayırın, # ile başlayan satır yorum. Tam sözcük eşleşmesi, harf duyarlılığı ve değişiklikleri geri alma.",
+        "h1": "Altyazı terimlerini toplu değiştirme nasıl kullanılır",
+        "intro": "Tek terim tablosuyla tüm altyazıdaki sözcükleri bir seferde aynı hâle getirin — zaman çizelgesi, ASS stili ve VTT'nin NOTE bloğu tek harf değişmez.",
+        "ctaText": "Terim toplu değiştirmeyi aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Altyazıda aynı sözcüğün çevirisi yer yer farklı olur, adlar ve yerler makine çevirisini izler ya da başkasının altyazısını alıp kendi alışkanlığınıza göre değiştirmek gerekir — bu değişikliklerin ortak yanı şudur: değişen sözcüktür, yapı değil. Bu sayfa yalnızca sözcüğü değiştirir."
+          ],
+          "ul": [
+            "**Adları birleştir** —— kişi, yer ve terim adlarının baştan sona aynı olması.",
+            "**Toplu düzeltme** —— makine çevirisinin yanlış çevirdiği bir sözcüğü tüm dosyada değiştirin.",
+            "**Devralıp alışkanlığa uyarla** —— başkasının altyazısını kendi kullanımınıza göre yeniden düzenleyin.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** altı biçimin tümü desteklenir."
+          ]
+        },
+        {
+          "h2": "İki şey: altyazı ve terim tablosu",
+          "ps": [
+            "Soldaki «1 Altyazı koy» altyazı dosyasını yükler veya içeriği doğrudan yapıştırmanızı sağlar; yanlış koyduysanız «Temizle»ye basın.",
+            "Sağdaki «2 Terim tablosu»na kuralları yazın. **Satır başına bir kural**, eski ve yeni sözcüğü `->` ya da `=>` ya da `→` ya da Tab ile ayırın, dördü de tanınır; `#` ile başlayan satır yorum sayılır ve değiştirmeye katılmaz.",
+            "Biçimden emin değilseniz «Örnek doldur»a basıp örneğe bakarak düzeltin."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Değiştirme sayfasının altyazı koyma alanı ve terim tablosu giriş alanı",
+            "cap": "Solda altyazı, sağda kurallar; satır başına bir kural, -> eskiyi yeniden ayırır"
+          }
+        },
+        {
+          "h2": "Terim tablosu nasıl yazılır",
+          "ps": [
+            "Satır başına bir kural, solda şu an kullanılan sözcük, sağda yerine geçecek olan. Örneğin `Sor -> Thor` tüm altyazıda «Sor»u «Thor» yapar.",
+            "Yorum `#` ile başlar; bir kural grubuna açıklama yazmak (örneğin «# 1. sezon adları aynı olsun») veya bir kuralı geçici olarak kapatmak için uygundur — başına `#` ekleyin, silmeniz gerekmez.",
+            "Kurallar yukarıdan aşağı sırayla uygulanır; bir kuralın ürettiği harfler sonraki kurallardan yeniden geçer. Sıraya bağlılık varsa (örneğin önce A'yı B yap, sonra B'yi C yap) buna dikkat edin."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Terim tablosu kutusundaki satır satır değiştirme kuralları",
+            "cap": "Satır başına bir kural; # ile başlayan satır yorumdur, bir kuralı geçici kapatmakta işe yarar"
+          }
+        },
+        {
+          "h2": "Üç anahtar neyi yönetir",
+          "ps": [
+            "**Kapsam**: `Tümü` / `Yalnız 1. satır` / `Yalnız 2. satır`. İki dilli altyazıda yalnızca çeviriyi değiştirmek için «Yalnız 2. satır»ı seçin; tek satırlı girişler bu iki tek satır modunda değişmez — araç hangi tarafın kaynak olduğunu tahmin etmez.",
+            "**Tam sözcük eşleşmesi**: yalnızca tek başına sözcük olanları değiştirir, `art` bir `start`a dokunmaz. Çince ve Japonca gibi sözcükleri boşlukla ayırmayan dillerde bu seçenek işlemez — dizi içinde geçen kısım değiştirilir.",
+            "**Büyük-küçük harf duyarlılığı**: varsayılan duyarsızdır, `CEO` ile `ceo` birlikte değişir; işaretlerseniz yalnızca tamamen aynı yazım değişir."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Terim tablosunun altındaki kapsam, tam sözcük eşleşmesi ve harf duyarlılığı anahtarları",
+            "cap": "Kapsam hangi satırın değişeceğini, tam sözcük ve harf duyarlılığı eşleşmenin ne kadar sıkı olacağını belirler"
+          }
+        },
+        {
+          "h2": "Ne değişti, tek tek geri alınabilir",
+          "ps": [
+            "«3 Sonuç»ta değiştirilmiş altyazıdan başka **değişiklik dökümü tek tek listelenir**: hangi giriş, kaçıncı satır, neden neye.",
+            "Değiştirmek istemediğiniz girişe dökümde bir kez tıklarsanız yalnızca o giriş geri döner, tabloyu düzeltip yeniden çalıştırmanız gerekmez. Onayladıktan sonra «İndir» veya «Kopyala»ya basın."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Sonuç alanı ve tek tek listelenen değişiklik dökümü",
+            "cap": "Değişiklikler tek tek listelenir, istemediğiniz giriş tek tıkla geri döner"
+          }
+        },
+        {
+          "h2": "Neye dokunulmaz",
+          "ps": [
+            "**Zaman çizelgesi, ASS'in stil satırları ve VTT'nin `NOTE` bloğu tek harf değişmez.** Değiştirme yalnızca replik metnine uygulanır, yapı satırlarına dokunmaz.",
+            "Terim tablosu altyazı dosyanızı kendiliğinden değiştirmez — sonuç yeni bir çıktıdır, kaynak dosya olduğu gibi kalır."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Bazı sözcükler neden değişmedi?** Önce kapsamı kontrol edin: «Yalnız 2. satır» seçiliyse tek satırlı girişler değişmez; sonra tam sözcük eşleşmesine bakın, işaretliyse sözcük olarak durmayan geçişler değişmez.",
+            "**Çincede tam sözcük eşleşmesini işaretledim ama yine kısım kısım değişiyor?** Normaldir. Çince ve Japonca sözcükleri boşlukla ayırmadığı için araç sözcük sınırını belirleyemez, bu modda tam sözcük eşleşmesi işlemez.",
+            "**Yanlış değiştirdim, tümünü nasıl geri alırım?** Dökümden tek tek geri alın; her şeyi baştan yapmak için tabloyu boşaltıp altyazıyı yeniden koyun.",
+            "**ASS'in stil satırları yanlışlıkla değişir mi?** Hayır. Stil satırları ve `NOTE` bloğu değiştirme kapsamı dışındadır, yalnızca replik metni katılır."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Altyazı ve terim tablosu tüm süreç boyunca tarayıcının içinde işlenir, yüklenmez ve sunucudan geçmez. Terim tablosu saklanmaz, sonraki açılışta boş bulursunuz."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Terim tablosu kurmalı mıyım, bir sezonu nasıl yönetirim: [[Terim listesi: tüm sezon boyunca aynı sözcükler|/guides/subtitle-glossary.html]]; içerik kirliyse (filigran, işitme engeli ipuçları) önce [[Altyazı temizliği|/clean.html]]; adları birleştirdikten sonra başka dile çevirmek için [[Altyazı çevirisi|/translate.html]]; ürünü [[Altyazı kalite denetimi|/qc.html]] ile geçirin."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "tr": {
+      "seo": {
+        "title": "Videoya gömülü altyazı nasıl çıkarılır – AI-SRTSub",
+        "desc": "Altyazı videonun içine gömülüyse nasıl çıkarılır: MKV / WebM / MP4 / MOV hangi izi taşır, metin izi, ASS izi, WebVTT izi ve mov_text izi arasındaki fark, görüntü altyazılardan neden harf çıkmaz.",
+        "h1": "Videoya gömülü altyazı nasıl çıkarılır",
+        "intro": "Altyazı video dosyasının içinde de olabilir, dışında ayrı bir dosya olarak da. İçindeyken kapsayıcının bir izidir — ve onu çıkarmak yeniden kodlamayla ilgili değildir.",
+        "ctaText": "Video altyazı çıkarmayı aç"
+      },
+      "body": [
+        {
+          "h2": "Altyazı nerede: gömülü ve harici",
+          "ps": [
+            "Video dosyası (MKV, MP4) bir kapsayıcıdır; içinde video izi, ses izi ve altyazı izi birlikte durur. Altyazı içindeyse **gömülü** ya da **gömülmüş** denir; ayrı bir .srt / .ass dosyası dışarıdaysa **harici** denir.",
+            "Harici altyazıyı doğrudan kullanırsınız. Sorun gömülü olanda: onu değiştirmek, çevirmek ya da kaynak izinden iki dilli yapmak istiyorsunuz ama elinizde altyazı dosyası yok — önce izi kapsayıcıdan okumak gerekir. Bu adım yeniden kodlama değildir, videoyu yeniden kodlamaz, yalnızca kapsayıcıda zaten duran veriyi çıkarır."
+          ]
+        },
+        {
+          "h2": "Hangi kapsayıcı neyi taşır",
+          "ps": [
+            "Her kapsayıcı farklı altyazı biçimi alabilir, çıkarma zorluğu da farklıdır:"
+          ],
+          "ul": [
+            "**MKV / WebM** —— en esnek, düz metin izi, ASS izi ve WebVTT izini alabilir, çok dilli izler de en çok burada görülür.",
+            "**MP4 / MOV** —— yaygını `mov_text` / `tx3g` izidir, düz metin, az miktarda stil bilgisiyle.",
+            "**Düz metin izi** —— çıkarınca harf, doğrudan SRT olur.",
+            "**ASS izi** —— stil başlığı ve çözünürlük taşır, ASS olarak çıkarınca korunur, SRT olarak çıkarınca yalnızca metin kalır.",
+            "**Görüntü altyazılar (Blu-ray PGS, DVD altyazısı)** —— saklanan resimdir, harf değil, harf çıkarılamaz."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Videoya gömülü altyazı çıkarma sayfasında listelenen altyazı izleri",
+            "cap": "Bir iz bir satır, genelde dil ve iz adıyla; tek iz varsa çıkarma kendiliğinden başlar"
+          }
+        },
+        {
+          "h2": "Görüntü altyazılar neden çıkmaz",
+          "ps": [
+            "Blu-ray PGS ve DVD altyazıları harf değil, saydam kanalı olan resimler saklar. Oynatıcı bunları gösterirken «resim yapıştırır», «metin oluşturmaz».",
+            "Bu yüzden böyle bir izde okunacak metin yoktur — araç desteklemediği için değil, orada harf zaten yoktur. Sayfa böyle bir ize rastlayınca çıkarılamayacağını açıkça söyler.",
+            "Harf elde etmenin tek yolu var: önce resimdeki harfleri tanımak (OCR), sonra altyazı yapmak. Bu başka bir iştir, «iz çıkarmak» ile aynı şey değildir."
+          ]
+        },
+        {
+          "h2": "Çıkardıktan sonra genelde yeniden işlemek gerekir",
+          "ps": [
+            "Çıkarılan altyazı «olduğu gibi»dir; araç kodlama tahmini yapmaz, zaman çizelgesini düzeltmez. Bu yüzden iki durum sık görülür:",
+            "Birincisi **bozuk metin** — kaynak izin kodlama sorunudur, çıkarınca da bozuk gelir, [[Bozuk kodlama nasıl onarılır|/guides/repair.html]] sayfasında kodlamayı belirlemek gerekir; ikincisi **zamanın tutmaması** — kaynakta açılış logosu olması veya kare hızının tutmaması çıkarınca tümünü kaydırır, [[Zaman çizelgesi ayarı|/shift.html]] ile kaydırın veya oransal ölçekleyin.",
+            "Bundan sonra çevirmek için [[Altyazı çevirisi|/translate.html]], iki dilli yapmak için [[İki dilli altyazı yapmanın iki yolu|/guides/make-bilingual-subtitles.html]] sayfasına bakın."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Sonuç alanı ve SRT / VTT / ASS / TXT dört aktarma biçimi",
+            "cap": "Çıkarılan altyazı dört biçimde aktarılabilir, ASS kaynak izinin stil başlığı ve çözünürlüğü olduğu gibi gelir"
+          }
+        },
+        {
+          "h2": "Sık karıştırılan noktalar",
+          "ps": [
+            "**Altyazı çıkarmak görüntüye yakmak değildir.** Video yeniden kodlanmaz, görüntü kalitesi ve ses izi hiç etkilenmez.",
+            "**Çıkarmak kaynak dosyayı etkilemez.** Yalnızca okunur, yazılmaz; video dosyasında tek bayt değişmez.",
+            "**Büyük dosyada yavaşlık internet hızı sorunu değildir.** Araç iz bilgilerini ofsetle sırayla tarar, dosya büyüdükçe tarama uzar, hepsi yerelde olur.",
+            "**Harici altyazı bu sayfayı gerektirmez.** Elinizde .srt / .ass varsa doğrudan [[Biçim dönüştürme|/convert.html]] sayfasına gidin, izi önce çıkarmak yalnızca videoya gömülü altyazı için gereklidir."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Tüm işlem [[Videoya gömülü altyazıyı çıkarma|/guides/videosub.html]] sayfasında; çıkardığınızı çevirmek için [[Altyazı çevirisi|/translate.html]], iki dilli yapmak için [[İki dilli altyazı yapmanın iki yolu|/guides/make-bilingual-subtitles.html]]; bozuk metin önce [[Bozuk kodlamayı onar|/repair.html]] sayfasından başlar."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "tr": {
+      "seo": {
+        "title": "Şarkı sözü LRC nasıl zamanlanır – AI-SRTSub",
+        "desc": "LRC söz dosyası sıfırdan nasıl yapılır: satır başına bir cümle yapıştırın, dinlerken zamana basın, üç sık kısayol, hangi durumda satır atlanır, LRC mi SRT mi aktarılır ve zaman kayarsa ne yapılır.",
+        "h1": "Şarkı sözü LRC nasıl zamanlanır",
+        "intro": "LRC «bir söz satırı + bir zaman noktası»dır. Bunu yapma sürecine zamanlama denir: her cümlenin başladığı anı kaydetmek.",
+        "ctaText": "Şarkı sözü zamanlama aracını aç"
+      },
+      "body": [
+        {
+          "h2": "Zamanlama ne yapar",
+          "ps": [
+            "LRC dosyasının yapısı çok yalındır: satır başına bir söz cümlesi, önünde `[mm:ss.xx]` zaman etiketi. Oynatıcı bir satırı okuduğunda o cümleyi o anda gösterir.",
+            "Bu yüzden «bir LRC yapma»nın tüm işi her söz cümlesine bir zaman noktası belirlemektir — bu işi makine sizin yerinize yapamaz, çünkü «bu cümle nerede başlıyor» kararını vermek gerekir ve bu ancak dinleyerek anlaşılır."
+          ]
+        },
+        {
+          "h2": "Bir şarkı kaç kez zamanlanır",
+          "ps": [
+            "Başlamadan bir dakika düşünmek yeniden işin çoğunu önler:"
+          ],
+          "ul": [
+            "**Tek geçiş** —— vokal net, satır az ve kabaca uyması yeterliyse çalarken bir kez basmak yeter.",
+            "**İki geçiş** —— önce kabaca, sonra satır satır düzeltme; doğruluk isteyenlerin olağan yolu.",
+            "**İçe aktarıp düzelt** —— elde LRC var, birkaç satır hatalı; içe aktarıp zamanı olmayan ilk satırdan devam edin.",
+            "**Ara ve yalnız müzik bölümleri** zamanlanmaz —— «Bu satırı atla»ya basın, dışa aktarma dosyasına girmez.",
+            "**Koro ve üst üste binme** için yalnızca bir başlangıç noktası kaydedilir, üst üste binen kısım ana vokal satırına göre sayılır."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Dinlerken basma alanındaki oynat, bu satırı zamanla, bir satır geri al, bu satırı atla",
+            "cap": "Çalarken Enter'a basmak en pratiği; yanlış bastıysanız Z ile o satırı geri alıp yeniden basın"
+          }
+        },
+        {
+          "h2": "Sözleri yapıştırma adımı sonrasını belirler",
+          "ps": [
+            "Sözleri satır başına bir cümle yapıştırın, boş satırlar kendiliğinden atlanır. Buradaki satır bölünmesi sonraki zamanlama satırlarıdır — yapıştırırken kaç satır fazla bölerseniz zamanlarken o kadar fazla basmanız gerekir.",
+            "Var olan LRC de yapıştırılabilir: `[mm:ss.xx]` zaman etiketleri kendiliğinden tanınır, içe aktardıktan sonra **zamanı olmayan ilk satırdan devam edilir**, zamanı verilmiş cümleleri yeniden yapmanız gerekmez.",
+            "Bu yüzden yarısı zamanlanmış bir LRC kaydedilip sonra yeniden yapıştırılarak devam edilebilir."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Söz yapıştırma alanı ve sözleri çözümle düğmesi",
+            "cap": "Satır başına bir cümle; tüm LRC'yi yapıştırmak da var olan zamanları okuyup devam eder"
+          }
+        },
+        {
+          "h2": "LRC mi SRT mi aktarılır",
+          "ps": [
+            "**Müzik oynatıcısı için LRC aktarın.** foobar2000, çeşitli oynatıcılar ve söz gösteren cihazlar bunu okur.",
+            "**Videoya takmak veya işlemeye devam etmek için SRT aktarın.** Videonun altyazı izi, altyazı araçları ve kurgu yazılımları SRT okur. Aktarırken her satır sonraki başlayana kadar sürer, son satıra en az 2 saniye verilir.",
+            "İkisi de yalnızca zamanı verilmiş satırları aktarır — atlanan satırlar dosyaya girmez."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Dışa aktarma alanındaki LRC indir, SRT indir ve kopyala düğmeleri",
+            "cap": "LRC oynatıcıya, SRT videoya; yalnızca zamanı verilmiş satırlar aktarılır"
+          }
+        },
+        {
+          "h2": "Sık karıştırılan noktalar",
+          "ps": [
+            "**Bitince tümü biraz kaydıysa kaydırma kullanın.** SRT aktarıp [[Zaman çizelgesi ayarı|/shift.html]] ile tümünü kaydırın, satır satır yeniden basmaktan çok daha hızlıdır.",
+            "**Kayma giderek artıyorsa sorun hızdadır.** Sesin çalma hızı ile kayıt uyuşmuyorsa sona doğru kayma büyür, o zaman kaydırma değil oransal ölçekleme gerekir.",
+            "**Kısayollar ardı ardına kullanılınca akıcı olur.** Boşluk oynat/durdur, Enter geçerli satır, Z bir satır geri al — çalarken doğrudan Enter'a basın, fareyle klavye arasında gidip gelmeyin.",
+            "**Ses kalitesi doğruluğu etkiler.** Vokali net kaynak daha doğru duyulur; canlı sürümler veya müziğin çok yüksek olduğu kaynakları eşlemek belirgin biçimde zordur."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Tüm işlem [[Şarkı sözü zamanlama aracı|/guides/lrc.html]] sayfasında; var olan LRC'yi altyazıya çevirmek için [[LRC'den SRT'ye|/guides/lrc-to-srt.html]]; aktarılan SRT'nin zamanı tutmuyorsa [[Zaman çizelgesi ayarı|/shift.html]]; ürünü [[Altyazı kalite denetimi|/qc.html]] ile geçirin."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "tr": {
+      "seo": {
+        "title": "Terim listesi: Tüm sezon boyunca aynı sözcükler – AI-SRTSub",
+        "desc": "Altyazı terim listesi «aynı sözcüğün yer yer farklı olması»nı çözer: ne zaman kurmaya değer, bir sezon boyunca aynı tablo nasıl kullanılır, Çincede tam sözcük eşleşmesi neden işlemez.",
+        "h1": "Terim listesi: Tüm sezon boyunca aynı sözcükler",
+        "intro": "Bir karakterin adı 1. bölümde A, 7. bölümde B olursa seyirci iki ayrı karakter sanır. Terim listesi bunu önler — «neye ne denecek»i sabitler.",
+        "ctaText": "Terim toplu değiştirmeyi aç"
+      },
+      "body": [
+        {
+          "h2": "Terim listesi «tutarsızlığı» çözer",
+          "ps": [
+            "Altyazıdaki sözcük hataları iki türlüdür: biri «bu sözcük yanlış çevrildi», diğeri «aynı sözcük yer yer farklı çevrildi». İlki sözlüğü düzeltmeyi gerektirir, ikincisini terim listesi yönetir.",
+            "İkincisi daha yaygın ve fark edilmesi daha zordur: 1. bölümde `Thor` «Sor», 7. bölümde «Thor» olursa tek tek bakınca sorun görünmez ama art arda izleyen seyirci yeni bir karakter geldi sanır. Terim listesinin yaptığı, «bu yapımda ona Sor denir»i uygulanabilir tek bir kurala çevirip tüm altyazıya bir seferde uygulamaktır."
+          ]
+        },
+        {
+          "h2": "Ne zaman kurmaya değer",
+          "ps": [
+            "Her altyazı terim listesi gerektirmez. Kurmaya değen durumlar genelde şunlardır:"
+          ],
+          "ul": [
+            "**Bir sezon / bir dizi** —— bölüm sayısı arttıkça tutarsızlık olasılığı artar.",
+            "**Terim yoğunluğu** —— kişi, yer, kurum adları ve yapım içinde uydurulmuş sözcükler.",
+            "**Çok kişi çalışıyorsa** —— birkaç kişi bölümleri paylaşıp çevirir, alışkanlıkları farklıdır.",
+            "**Başkasının altyazısını devralınca** —— kendi (veya müşterinin) kullanımına çevirmek gerekir.",
+            "**Makine çevirisinden sonra birleştirme** —— makine çevirisi aynı sözcüğe birkaç karşılık verebilir."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Terim listesinde kategoriye göre gruplanmış satır satır değiştirme kuralları",
+            "cap": "# ile başlayan yorumlarla kuralları gruplayın, düzeltirken bir kuralı geçici kapatmak da kolaylaşır"
+          }
+        },
+        {
+          "h2": "Bir sezon boyunca aynı tablo nasıl korunur",
+          "ps": [
+            "Terim listesi **kademeli olarak** bakılır: 1. bölümde adları belirleyin, sonra her yeni sözcükte bir satır ekleyin, sezon bitince tablo tamamlanır. Aynı dizinin ikinci sezonunda bunu doğrudan başlangıç noktası yapın.",
+            "Kuralları biraz geniş yazmak daha kullanışlıdır — «Sor'da birleştir» diye karar verdikten sonra «Thor -> Sor»u da yazın; başkasının altyazısını devraldığınızda da tek seferde hizalanır.",
+            "Değiştirdikten sonra mutlaka **değişiklik dökümüne** bakın: hangi giriş, kaçıncı satır, neden neye, tek tek söyler. «Doğru değişti ve fazla değişmedi»yi doğrulayabileceğiniz tek yer burasıdır; değiştirmek istemediğiniz giriş tek tıkla geri döner."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Sonuç alanında tek tek listelenen değişiklik dökümü",
+            "cap": "Değişiklikler tek tek listelenir, istemediğiniz giriş tek tıkla geri döner"
+          }
+        },
+        {
+          "h2": "Hangi değişiklikler terim listesine bırakılmamalı",
+          "ps": [
+            "Terim listesi **sözcüğü** değiştirir. Şu üçünü yönetmez, yönetmemelidir de:",
+            "**Dil bilgisi ve cümle yapısı** —— tek sözcükle cümle değişmez; cümle düzeyindeki düzeltme [[Altyazı çevirisi|/translate.html]] sayfasına veya insana dönmelidir.",
+            "**İçerik temizliği** —— filigran reklam, işitme engeli ipucu gibi satırın tümünü silmek [[Altyazı temizliği|/clean.html]] işidir; terim listesinin kuralları değiştirmek içindir, satır silmek için değil.",
+            "**Zaman çizelgesi** —— terim listesi zamana dokunmaz. Tümüyle kayma veya oran sorunu [[Zaman çizelgesi ayarı|/shift.html]] sayfasına."
+          ]
+        },
+        {
+          "h2": "Sık karıştırılan noktalar",
+          "ps": [
+            "**Çincede tam sözcük eşleşmesini işaretledim, yine kısım kısım değişiyor — normal.** Çince ve Japonca sözcükleri boşlukla ayırmadığı için araç sınırı belirleyemez, bu modda tam sözcük eşleşmesi işlemez; `art`ın `start`a dokunmamasını sağlayan koruma yalnızca İngilizcede geçerlidir.",
+            "**Sıra sonucu etkiler.** Kurallar yukarıdan aşağı uygulanır, bir kuralın ürettiği harfler sonraki kurallardan yeniden geçer. A'yı B yapıp sonra B'yi C yaparsanız sonuçta C elde edilir.",
+            "**Yalnızca çeviriyi değiştirmek için kapsam seçin.** İki dilli altyazıda yalnızca 2. satırı değiştirmek için «Yalnız 2. satır»ı seçin; tek satırlı girişler bu iki modda değişmez — araç hangi tarafın kaynak olduğunu tahmin etmez.",
+            "**Terim listesi saklanmaz.** Her açılışta boştur, kendiniz bir metin dosyasına kaydedip kullanın."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Tüm işlem [[Altyazı terimlerini toplu değiştirme|/guides/glossary.html]] sayfasında; içerik kirliyse önce [[Altyazı temizliği|/clean.html]]; adları birleştirdikten sonra başka dile çevirmek için [[Altyazı çevirisi|/translate.html]]; ürünü [[Altyazı kalite denetimi|/qc.html]] ile geçirin."
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/table.html 与 /en/table.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>字幕转 Excel/CSV 表格 - 批量翻译校对好帮手 | 随心字幕 AI</title>
+<meta name="description" content="免费在线字幕表格互转：把 SRT、VTT 字幕导出成 Excel（xlsx）或 CSV 表格，在 Excel 里逐行校对、翻译、批注后再导回字幕；时间列用文本保真，台词换行原样保留。全程在浏览器里完成，文件不上传。">
+<meta name="keywords" content="字幕转excel,srt转csv,srt转excel,excel转srt,csv转srt,字幕表格,subtitle to excel,srt to csv,excel to srt,subtitle spreadsheet">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#4D7C0F">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* 视觉系统沿用 v0.9.249「收敛精修」：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.316：本页认领「橄榄绿」色线 ——
+     首页=粉、特效页=淡紫、清洗页=绿、转换页=蓝、剥离页=青、时间轴页=靛蓝、乱码页=砖红、
+     提取页=琥珀、术语页=品红、视频字幕页=墨绿、简繁页=紫罗兰、拆分页=深橙、本页=橄榄绿。
+     与其它页刻意不同色：十六页都处理字幕文件，同色会让用户分不清自己在哪一页。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#4D7C0F; --acc-weak:#F0F5E6; --acc-line:#CBDDB0; --acc-ink:#3F6212;
+    --grad:#4D7C0F; --acc2:#4D7C0F;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(77,124,15,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px;
+    text-decoration:none;white-space:nowrap}
+  .pill:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  .navpills{display:flex;gap:6px;flex-wrap:wrap}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+
+  /* 模式签（转表格 / 转字幕）—— 与 merge 页同一套交互语言 */
+  .modes{display:flex;gap:6px;margin-top:16px}
+  .mode{flex:1;height:40px;border:1.5px solid var(--line-strong);border-radius:11px;background:var(--card);
+    color:var(--sub);font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+  .mode:hover{border-color:var(--acc-line)}
+  .mode.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-weak)}
+  .mode:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{display:block;width:30px;height:30px;margin:0 auto 8px;border-radius:9px;background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+
+  textarea{width:100%;min-height:110px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical;background:var(--card);color:var(--ink)}
+  textarea:focus{outline:none;border-color:var(--acc-line)}
+
+  /* 预览表格 */
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+  .tbl th,.tbl td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}
+  .tbl th{background:var(--card-2);color:var(--sub);font-weight:600;white-space:nowrap}
+  .tbl td.tno{color:var(--mut);white-space:nowrap}
+  .tbl td.ttime{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11.5px;white-space:nowrap}
+  .tbl td.ttx{white-space:pre-wrap;word-break:break-word;max-width:520px}
+  .tbl-wrap{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:var(--r-ctl)}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-ctl);overflow:hidden}
+  .seg button{border:none;border-radius:0;height:30px;font-size:12.5px;color:var(--sub)}
+  .seg button.on{background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
+
+  .hint{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.7}
+  code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px;
+    background:var(--stage);padding:1px 5px;border-radius:5px}
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .navpills{display:none}
+    .tbl td.ttx{max-width:200px}
+  }
+</style>
+<script src="ui-codes.js?v=0.9.341"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span id="topNav"></span>
+      <select id="langSel" aria-label="UI language"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">字幕与</span><em data-i18n="heroEm">表格互转</em></h1>
+    <p data-i18n="heroSub">把 SRT、VTT 字幕导出成 Excel 或 CSV 表格，在熟悉的表格里逐行校对、翻译、批注，改完再导回字幕。时间列按文本原样保留，台词里的换行一个不少。全程在浏览器里完成，文件不上传。</p>
+  </div>
+
+  <!-- 模式：转表格 / 转字幕 -->
+  <div class="modes" role="tablist">
+    <button class="mode on" id="mToTable" role="tab" aria-selected="true" data-i18n="modeToTable">转表格：字幕导出 Excel/CSV</button>
+    <button class="mode" id="mToSub" role="tab" aria-selected="false" data-i18n="modeToSub">转字幕：表格导回 SRT/VTT</button>
+  </div>
+
+  <!-- 1. 放入文件 -->
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入文件</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-t" id="dzTxt" data-i18n="dzTxt">把字幕文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="fname"></span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,text/*" style="display:none">
+    <div class="row">
+      <span class="lb" data-i18n="lblFmt">认出来的格式</span>
+      <span class="chip mut" id="fmtChip">—</span>
+      <button id="btnClear" type="button" data-i18n="btnClear">清除</button>
+    </div>
+    <div class="hint" id="upHint" data-i18n="upHint">编码坏了（满屏问号或方块）先去乱码修复页；本页只按 UTF-8 读。</div>
+  </div>
+
+  <!-- 2. 结果：字幕 → 表格 -->
+  <div class="card" id="ttCard" style="display:none">
+    <h2><span class="n">2</span><span data-i18n="ttTitle">表格预览</span></h2>
+    <div class="tbl-wrap"><table class="tbl" id="prev"></table></div>
+    <div class="row">
+      <button class="pri" id="btnXlsx" type="button" data-i18n="btnXlsx">下载 Excel（.xlsx）</button>
+      <button id="btnCsv" type="button" data-i18n="btnCsv">下载 CSV</button>
+      <span class="chip mut" id="statChip">—</span>
+    </div>
+    <div class="hint" data-i18n="csvHint">Excel 打开 CSV 若时间列显示不对，选中文本列设为「文本」格式；或直接用 xlsx，没有这个问题。</div>
+  </div>
+
+  <!-- 2. 结果：表格 → 字幕 -->
+  <div class="card" id="tsCard" style="display:none">
+    <h2><span class="n">2</span><span data-i18n="tsTitle">字幕结果</span></h2>
+    <div class="row" style="margin-top:0">
+      <span class="lb" data-i18n="lblFmtOut">导出格式</span>
+      <span class="seg">
+        <button type="button" id="fSrt" class="on">SRT</button>
+        <button type="button" id="fVtt">VTT</button>
+      </span>
+      <span class="chip mut" id="statChip2">—</span>
+    </div>
+    <div class="hint" data-i18n="tsHint">表格要有 Start / End / Text 三列（中文「开始/结束/文本」也认），列顺序不限；时间写成 00:00:01,500 或 00:00:01.500 都行。识别不了的行自动跳过。</div>
+    <div class="row">
+      <button class="pri" id="btnDl" type="button" data-i18n="btnDl">下载</button>
+      <button id="btnCopy" type="button" data-i18n="btnCopy">复制</button>
+      <a class="pill" id="goTr" href="/translate.html" data-i18n="goTr">拿去翻译</a>
+    </div>
+    <div style="margin-top:12px"><textarea id="out" readonly></textarea></div>
+  </div>
+
+  <div class="msg" id="msg" style="display:none"></div>
+
+  <footer>
+    <span data-i18n="brandName">随心字幕 AI</span> · <span data-i18n="heroEm">表格互转</span>
+  </footer>
+</div>
+
+<script src="xlsx.full.min.js?v=0.9.341"></script>
+<script src="table-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="table-core.js?v=0.9.341"></script>
+<script>
+'use strict';
+var I18N = window.TABLE_I18N.DICT, LANGS = window.TABLE_I18N.LANGS;
+var LANG = 'zh-CN';
+var C = window.TableCore;
+
+var S = {
+  mode: 'toTable',           /* toTable | toSub */
+  fmt: 'srt',                /* toSub 的导出格式 */
+  sub: null,                 /* 字幕 items（toTable 方向） */
+  items: null                /* 解析出的 items（toSub 方向） */
+};
+
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function fmtDur(ms) {
+  ms = Math.max(0, Math.round(ms));
+  var m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
+/* ---------- i18n 应用 ---------- */
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  /* 阿拉伯语 / 希伯来语 / 波斯语等整页从右往左排 */
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+  document.title = t('docTitle');
+  var seg = $('#langSel');
+  if (seg && seg.value !== LANG) seg.value = LANG;
+}
+
+/* ---------- 语言初始化：URL > 上次选的 > 浏览器 ---------- */
+function detectUiLang() {
+  try {
+    var ls = (navigator.languages && navigator.languages[0]) || navigator.language || 'zh-CN';
+    ls = String(ls).toLowerCase();
+    if (ls.indexOf('zh') === 0) return /tw|hk|hant/.test(ls) ? 'zh-TW' : 'zh-CN';
+    for (var i = 0; i < LANGS.length; i++) { if (ls.indexOf(LANGS[i][0].toLowerCase()) === 0) return LANGS[i][0]; }
+    if (/^pt/.test(ls)) return 'pt';
+  } catch (e) { }
+  return 'zh-CN';
+}
+function pathUiLang() {
+  try {
+    var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:table\.html)?$/);
+    if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
+  } catch (e) { }
+  return null;
+}
+/* 语言相关链接：logo 回家 + 拿去翻译，切语言时也要跟着换 */
+function updateLangLinks() {
+  var pre = (LANG === 'zh-CN') ? '' : '/' + LANG;
+  $('#logoHome').href = pre + '/';
+  var goTr = $('#goTr');
+  if (goTr) goTr.href = pre + '/translate.html';
+}
+function initLang() {
+  TP_ADD_LANGS(LANGS);
+  var sel = $('#langSel');
+  LANGS.forEach(function (pair) { var o = document.createElement('option'); o.value = pair[0]; o.textContent = pair[1]; sel.appendChild(o); });
+  var saved = null;
+  try { saved = localStorage.getItem('tableUiLang'); } catch (e) { }
+  var pLang = pathUiLang();
+  LANG = pLang || ((saved && LANGS.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'table'); if (__tp) I18N[LANG] = __tp; }
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'table')) return;
+    try { localStorage.setItem('tableUiLang', LANG); } catch (e) { }
+    applyI18n(); updateLangLinks(); rerender();
+  });
+  updateLangLinks();
+}
+
+/* ---------- 模式切换 ---------- */
+function setMode(m) {
+  S.mode = m;
+  $('#mToTable').classList.toggle('on', m === 'toTable');
+  $('#mToSub').classList.toggle('on', m === 'toSub');
+  $('#mToTable').setAttribute('aria-selected', m === 'toTable');
+  $('#mToSub').setAttribute('aria-selected', m === 'toSub');
+  $('#dzTxt').textContent = t(m === 'toTable' ? 'dzTxt' : 'dzMany');
+  $('#file').accept = (m === 'toTable') ? '.srt,.vtt,text/*' : '.csv,.xlsx,.xls';
+  $('#upHint').textContent = t(m === 'toTable' ? 'upHint' : 'upHint2');
+  clearAll();
+}
+$('#mToTable').addEventListener('click', function () { setMode('toTable'); });
+$('#mToSub').addEventListener('click', function () { setMode('toSub'); });
+
+/* ---------- 上传 ---------- */
+var dz = $('#dz');
+dz.addEventListener('click', function () { $('#file').click(); });
+['dragover', 'dragenter'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('over'); }); });
+['dragleave', 'drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove('over'); }); });
+dz.addEventListener('drop', function (e) {
+  var fs = e.dataTransfer.files;
+  if (fs && fs.length) readFile(fs[0]);
+});
+$('#file').addEventListener('change', function () { if (this.files.length) readFile(this.files[0]); this.value = ''; });
+
+function readFile(f) {
+  var fmt = C.detectFmt(f.name);
+  if (S.mode === 'toTable') {
+    if (fmt !== 'srt' && fmt !== 'vtt') { showMsg('msgNoSub', 'err'); return; }
+    f.text().then(function (tx) {
+      var items = C.parse(tx, fmt);
+      if (!items.length) { showMsg('msgNoCue', 'err'); return; }
+      S.sub = items;
+      $('#fmtChip').textContent = fmt.toUpperCase() + ' · ' + items.length;
+      $('#fname').textContent = f.name;
+      rerender();
+    });
+  } else {
+    if (fmt === 'csv') {
+      f.text().then(function (tx) { takeRows(C.parseCsv(tx), f.name, 'CSV'); });
+    } else if (fmt === 'xlsx' || fmt === 'xls') {
+      /* 二进制必须 readAsArrayBuffer（保字节，学乱码修复页的教训） */
+      var fr = new FileReader();
+      fr.onload = function () {
+        try { takeRows(C.fromXlsx(fr.result), f.name, 'XLSX'); }
+        catch (e) { showMsg('msgBadTable', 'err'); }
+      };
+      fr.onerror = function () { showMsg('msgBadTable', 'err'); };
+      fr.readAsArrayBuffer(f);
+    } else { showMsg('msgNoTable', 'err'); return; }
+  }
+}
+function takeRows(rows, name, kind) {
+  var r = C.fromRows(rows);
+  if (!r.items.length) { showMsg('msgBadTable', 'err'); return; }
+  S.items = r.items;
+  $('#fmtChip').textContent = kind + ' · ' + r.items.length;
+  $('#fname').textContent = name;
+  rerender();
+}
+
+function clearAll() {
+  S.sub = null; S.items = null;
+  $('#fmtChip').textContent = '—'; $('#fname').textContent = '';
+  hideMsg();
+  rerender();
+}
+$('#btnClear').addEventListener('click', clearAll);
+
+/* ---------- 导出格式（toSub） ---------- */
+$('#fSrt').addEventListener('click', function () { setFmt('srt'); });
+$('#fVtt').addEventListener('click', function () { setFmt('vtt'); });
+function setFmt(f) {
+  S.fmt = f;
+  $('#fSrt').classList.toggle('on', f === 'srt');
+  $('#fVtt').classList.toggle('on', f === 'vtt');
+  renderOut();
+}
+
+/* v0.9.316：tool-events 埋点（口径与 convert/shift 等页一致：page/act 双白名单、
+   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：convert=字幕转表格 / merge=表格转回字幕 */
+var _tlLast = { body: '', t: 0 };
+function reportTool(act, extra) {
+  try {
+    var e = extra || {};
+    var body = JSON.stringify({ page: 'table', act: act, cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || '' });
+    var now = Date.now();
+    if (body === _tlLast.body && now - _tlLast.t < 60000) return;
+    _tlLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+    }
+    fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () { });
+  } catch (err) { }
+}
+
+/* ---------- 主渲染 ---------- */
+function rerender() {
+  var isTT = S.mode === 'toTable';
+  $('#ttCard').style.display = (isTT && S.sub) ? '' : 'none';
+  $('#tsCard').style.display = (!isTT && S.items) ? '' : 'none';
+  if (isTT && S.sub) renderPrev();
+  if (!isTT && S.items) renderOut();
+}
+
+function renderPrev() {
+  var items = S.sub, N = 50;
+  var head = '<tr><th>#</th><th>' + esc(t('colStart')) + '</th><th>' + esc(t('colEnd')) + '</th><th>' + esc(t('colText')) + '</th></tr>';
+  var body = items.slice(0, N).map(function (it, i) {
+    return '<tr><td class="tno">' + (i + 1) + '</td><td class="ttime">' + esc(C.fmtTs(it.start)) + '</td><td class="ttime">' + esc(C.fmtTs(it.end)) + '</td><td class="ttx">' + esc(it.text) + '</td></tr>';
+  }).join('');
+  $('#prev').innerHTML = head + body;
+  var st = C.statOf(items);
+  $('#statChip').textContent = t('statItems').replace('{0}', items.length).replace('{1}', fmtDur(st.duration));
+}
+
+function renderOut() {
+  if (!S.items) return;
+  var st = C.statOf(S.items);
+  $('#statChip2').textContent = t('statItems').replace('{0}', S.items.length).replace('{1}', fmtDur(st.duration));
+  $('#out').value = (S.fmt === 'vtt') ? C.formatVtt(S.items) : C.formatSrt(S.items);
+}
+
+/* ---------- 下载 / 复制 ---------- */
+function dlText(text, name) {
+  var b = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  var u = URL.createObjectURL(b);
+  var a = document.createElement('a');
+  a.href = u; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+}
+$('#btnCsv').addEventListener('click', function () {
+  if (!S.sub) return;
+  reportTool('convert', { cues: S.sub.length, n: 1, fmt: 'csv' });
+  dlText('\uFEFF' + C.toCsv(S.sub), 'subtitles.csv');   /* BOM：让 Excel 直接认 UTF-8 */
+  showMsg('msgDone', '');
+});
+$('#btnXlsx').addEventListener('click', function () {
+  if (!S.sub) return;
+  try {
+    reportTool('convert', { cues: S.sub.length, n: 1, fmt: 'xlsx' });
+    var buf = C.toXlsx(S.sub);
+    var b = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var u = URL.createObjectURL(b);
+    var a = document.createElement('a');
+    a.href = u; a.download = 'subtitles.xlsx';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    showMsg('msgDone', '');
+  } catch (e) { showMsg('msgBadTable', 'err'); }
+});
+$('#btnDl').addEventListener('click', function () {
+  if (!$('#out').value) { showMsg('msgEmpty', 'err'); return; }
+  reportTool('merge', { cues: S.items.length, n: 1, fmt: S.fmt });
+  dlText($('#out').value, 'subtitles.' + S.fmt);
+  showMsg('msgDone', '');
+});
+$('#btnCopy').addEventListener('click', function () {
+  if (!$('#out').value) { showMsg('msgEmpty', 'err'); return; }
+  var done = function () { showMsg('msgCopy', ''); };
+  var fail = function () { showMsg('msgCopyFail', 'err'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText($('#out').value).then(done, fail);
+  else fail();
+});
+
+function showMsg(k, cls) { showMsgRaw(t(k), cls); }
+function showMsgRaw(txt, cls) {
+  var el = $('#msg');
+  el.textContent = txt; el.className = 'msg' + (cls ? ' ' + cls : ''); el.style.display = '';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+
+/* ---------- 启动 ---------- */
+initLang();
+applyI18n();
+</script>
+
+<!-- v0.9.316：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
+     server.js 按语言路由替换成对应语言，直接开文件时显示下面的简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕与 Excel/CSV 表格互转工具 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>把字幕导出成表格逐行校对翻译，改完再导回字幕。全程在浏览器里完成，文件不上传。</strong></p>
+    <p style="margin-top:8px;">SRT、VTT 一键转 Excel（xlsx）或 CSV，在表格里改时间、改台词、写批注，再导回 SRT、VTT。时间列按文本原样保留不丢毫秒，台词里的换行原样进单元格。支持中英文列头，识别不了的行自动跳过。</p>
+    <p style="margin-top:8px;">要做翻译校对、团队协作审稿、批量修改字幕的译者、译制组、剪辑师。</p>
+  </section>
+<!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.341" data-tool="tb"></script>
+</body>
+</html>

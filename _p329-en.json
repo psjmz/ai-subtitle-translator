@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "en": {
+      "seo": {
+        "title": "Merging bilingual and styled subtitles – Merge, style, export – AI-SRTSub",
+        "desc": "Merge two subtitle files into a bilingual track, restyle an existing bilingual file, or style a single-language one: pairing modes, the ASS and VTT templates, and which format to export.",
+        "h1": "How to use bilingual merging and special-effect subtitles",
+        "intro": "Combine two subtitle files into one bilingual track, or style subtitles directly: font, colour, outline and position are what-you-see-is-what-you-get, and the preview matches the export.",
+        "ctaText": "Open the special-effect subtitle tool"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "This one page actually covers three jobs: merging an original and a translated subtitle file into one bilingual file, adjusting the order and style of a file that is already bilingual, and adding special effects to a single-language file. All three share the same style parameters and the same preview."
+          ],
+          "ul": [
+            "**Merge two files** — you have an original and a translation; combine them into one bilingual file and export it.",
+            "**Adjust a bilingual file** — it is already bilingual but the order or the styling is wrong; lay it out again.",
+            "**Single-language file** — only one file; give it a font, an outline, a position.",
+            "Switch between the three with the tabs on the left; the style panel and the preview are shared."
+          ]
+        },
+        {
+          "h2": "Three jobs, one page",
+          "ps": [
+            "The top of the page has three tabs: **Merge two files**, **Adjust a bilingual file**, **Single-language file**. Your choice decides how many input columns appear on the left.",
+            "When merging two files, the left side holds two columns, \"1 Original subtitles\" and \"2 Translated subtitles\"; each accepts an uploaded file or text pasted straight in. Adjusting a bilingual file and styling a single-language file each need only one column."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "The three tabs at the top of the special-effect subtitle tool and the input area on the left",
+            "cap": "Three tabs at the top; picking \"Merge two files\" brings up an original and a translated column on the left"
+          }
+        },
+        {
+          "h2": "How two files are paired",
+          "ps": [
+            "The first item under \"3 Merge settings\" is the pairing mode: **Pair by order · use the original timeline**, **Pair by timeline · use the original timeline**, **Pair by order · use the translated timeline**.",
+            "When both files have the same number of entries in the same order, pairing by order is the safest. When the counts differ (one side merged entries, the other split them), pair by timeline and let the tool match by proximity. Whose timeline to use depends on which file is more accurate — usually the original.",
+            "Below that are the text structure (auto-detect / two lines per entry / alternating pairs) and the order (original on top / translation on top)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Pairing mode, text structure and order options under merge settings",
+            "cap": "The pairing mode decides which line goes with which, and whose timeline to use is set here too"
+          }
+        },
+        {
+          "h2": "Adjust the style item by item",
+          "ps": [
+            "The style panel sits on the right. When you export ASS, the \"ASS appearance\" block applies: layout (split · separated top and bottom / stacked · two lines at the bottom), the size, colour, opacity, font, bold, italic, letter spacing, outline, outline colour, shadow/background (none / shadow / background), depth, border colour, border opacity, horizontal alignment (bottom · left / bottom · centre / bottom · right) and distance from the bottom of the translation (primary) line, plus the font, shadow/background and left/right margins of the original (secondary) line.",
+            "When you export bilingual VTT styling, the \"WebVTT style\" block applies: on top of six presets (standard / compact / cinematic / top / accessible / portrait) you can change the vertical line, the anchor (bottom / top / centre), the horizontal position, the width size, the align value and the line height of the whole cue, plus the background colour, background opacity and outline width of the translation line; the original line can inherit the main style or be set separately.",
+            "When you are done you can save the result as a preset and reuse it later by selecting it under \"From saved presets\" and clicking \"Apply\"."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "The parameters of the ASS appearance panel on the right",
+            "cap": "Size, colour, outline, shadow/background and alignment are all adjustable, and the result can be saved as a preset"
+          }
+        },
+        {
+          "h2": "Check the preview before exporting",
+          "ps": [
+            "\"Merge preview\" is a table: #, time, original, translation, style. The bar above filters suspect rows by \"has sound effects\", \"has a speaker prefix\", \"shorter than 1 second\", \"more than two lines\" and \"reading speed exceeded\", or by a keyword you type.",
+            "Clicking the style slot of a row expands that slot's editor and lists only the rows using it; \"Clear all overrides\" returns every manual override to the template. The timeline adjustment area below handles a global offset (from a given cue) and proportional scaling.",
+            "Once it looks right, go to \"4 Export\": download the subtitle file or copy its contents."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "The merge preview table and its filter bar",
+            "cap": "The preview is the export; filter suspect rows by type or expand a single style slot"
+          }
+        },
+        {
+          "h2": "What is left untouched",
+          "ps": [
+            "Styling changes appearance only, never dialogue. The text of the original and the translation is not altered by a single character during the merge; unless you deliberately change it in the adjustment area below the preview, the timeline comes from the file you chose.",
+            "When you export SRT or \"VTT without styling\", no style information is written into the file — the page tells you that the VTT has no STYLE block and the player will use its default appearance. If you want styling, choose bilingual VTT styling or ASS."
+          ]
+        },
+        {
+          "h2": "Common questions",
+          "ps": [
+            "**What if the two files have different entry counts?** Use \"Pair by timeline\" and the tool matches by proximity; entries it cannot match are not invented.",
+            "**What if a player ignores the styling in an exported ASS?** The styles are stored inside the file, but player support for ASS varies. If you need a more portable look, export bilingual VTT styling.",
+            "**How do I get back to the initial template after messing it up?** \"Restore default parameters\" in the ASS block and \"Restore template defaults\" in the VTT block each reset their own section.",
+            "**What are the seven rows in the sample?** They are a built-in example, only there so you can see what a merge looks like; the sample cannot be exported. Upload your own subtitles and click the merge preview and they are replaced automatically."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Subtitles are processed entirely in the browser: nothing is uploaded and nothing goes through a server. Close the browser and everything from that session is gone."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "To split a bilingual file back into two tracks use [[Bilingual split|/bilingual.html]]; to go the other way and turn a single language into a bilingual file see [[Two ways to make bilingual subtitles|/guides/make-bilingual-subtitles.html]]; run the result through [[Subtitle QC|/qc.html]]; for a whole season at once use [[Batch conversion|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "en": {
+      "seo": {
+        "title": "Extracting plain text from subtitles – Two layouts, five clean-ups – AI-SRTSub",
+        "desc": "Extract dialogue from subtitles as clean plain text: continuous paragraphs or one line per cue, and what the five switches for SDH cues, watermarks, duplicates, prefixes and lyrics remove.",
+        "h1": "How to extract plain text from subtitles",
+        "intro": "Pull the dialogue out of a subtitle file as clean plain text: cue numbers, timelines and style tags are stripped automatically, so the result reads as an article or works as a dialogue list.",
+        "ctaText": "Open the plain-text extractor"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "Only the dialogue in a subtitle file matters to a reader; the rest is structure meant for a player — cue numbers, timelines, style tags. This page removes the structure and keeps the words."
+          ],
+          "ul": [
+            "**Read it as an article** — output continuous paragraphs, broken at pauses and sentence-ending punctuation.",
+            "**Use it as a list** — output one line per cue, one subtitle line each, handy for a dialogue sheet or for feeding another tool.",
+            "**Clean as it goes** — SDH cues, watermarks and duplicated neighbouring lines are removed by default.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — all six formats are recognised."
+          ]
+        },
+        {
+          "h2": "Drop it in, not just upload",
+          "ps": [
+            "The \"1 Add subtitles\" column on the left accepts an uploaded file, and you can also paste subtitle content straight into the text box. If you picked the wrong file, click \"Clear\" and start again.",
+            "This page reads files as UTF-8. If the subtitles open as a wall of question marks or boxes, the encoding is broken — convert it to UTF-8 in [[Garbled text repair|/repair.html]] first, then come back."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "The add-subtitles area of the plain-text extractor",
+            "cap": "Upload a file, or paste subtitle content straight into the text box"
+          }
+        },
+        {
+          "h2": "Choosing between the two layouts",
+          "ps": [
+            "At the top of \"2 Extraction options\" is the layout: **Continuous paragraphs** breaks text at pauses and sentence-ending punctuation so it reads like an article; **One line per cue** gives one line per subtitle entry, matching the entries of the original file one to one.",
+            "Copying dialogue for notes, practising translation or reading it as prose calls for continuous paragraphs; building a dialogue sheet, comparing line by line with the original or feeding another tool calls for one line per cue."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "The layout and clean-up switches under extraction options",
+            "cap": "Pick one layout; the five switches below decide which kind of content gets removed"
+          }
+        },
+        {
+          "h2": "What each of the five clean-ups removes",
+          "ps": [
+            "**Remove SDH cues**: deletes bracketed sound descriptions such as \"(footsteps)\" or \"[music]\" and keeps the dialogue.",
+            "**Remove watermarks and ads**: drops lines such as fansub credits, URLs and channel handles.",
+            "**Remove duplicate neighbours**: when the same sentence appears twice in a row (a playback glitch) only one copy is kept; duplicates further apart carry meaning and are left alone.",
+            "**Remove speaker prefixes**: \"JOHN: Hello\" becomes \"Hello\". Off by default — script-style text needs to show who is speaking.",
+            "**Skip lyric lines**: lines that are entirely \"♪ … ♪\" are skipped. Off by default — lyrics are words too."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "The five clean-up switches and their descriptions under extraction options",
+            "cap": "Each switch says what it removes on its right; tick the ones you need"
+          }
+        },
+        {
+          "h2": "Taking the result away",
+          "ps": [
+            "The \"3 Result\" column on the right shows the extracted text live and recalculates as soon as you change an option.",
+            "When you are happy, click \"Download\" to save a .txt or \"Copy\" to take the text with you. For languages that do not separate words with spaces, such as Chinese and Japanese, line merging follows different rules, and the tool handles that per language automatically."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "The result area with the download and copy buttons",
+            "cap": "The result updates live; download it as a txt or copy it directly"
+          }
+        },
+        {
+          "h2": "What is left untouched",
+          "ps": [
+            "The dialogue itself is not rewritten. The clean-up switches only decide which whole lines or blocks are dropped; they never change the wording of an entry.",
+            "Timelines and cue numbers are simply not output, not altered and then output — the original file is untouched, and this page does not offer an export with timelines. That job belongs to [[Format conversion|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Common questions",
+          "ps": [
+            "**Do ASS style tags stay in the text?** No. ASS `{}` override blocks are stripped and only the dialogue remains.",
+            "**Does a bilingual file come out as two lines or one?** As many lines as the entry had; this page neither merges nor splits them — to separate them use [[Bilingual split|/bilingual.html]].",
+            "**Why are speaker prefixes kept by default?** The name in \"JOHN: Hello\" is often useful information (scripts, dialogue sheets), and removing it makes it hard to tell who is talking, so the choice is left to you.",
+            "**Can LRC lyric files be extracted too?** Yes. LRC time tags are removed and the lyric lines remain; if you do not want lyrics, tick \"Skip lyric lines\"."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Subtitles are processed entirely in the browser: nothing is uploaded and nothing goes through a server. The text stays on the current page only and is cleared on refresh."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "To understand what a subtitle file actually contains see [[What is inside an SRT file|/guides/srt-file-format.html]]; to translate the extracted dialogue go to [[Subtitle translation|/translate.html]]; to turn it into a table use [[Subtitles to Excel/CSV|/guides/srt-to-excel.html]]; and run [[Subtitle QC|/qc.html]] before handing anything over."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "en": {
+      "seo": {
+        "title": "Splitting and joining subtitles – Cut by block, chain in order – AI-SRTSub",
+        "desc": "Cut one file into segments by duration or cue count, restart each at zero, or chain several files in order or interleave them by timeline. Cue numbers renumbered, text untouched.",
+        "h1": "How to split and join subtitles",
+        "intro": "Cut one long subtitle file into segments, or join several scattered files into one. The cut always falls on an entry boundary — a sentence is never sliced in half.",
+        "ctaText": "Open split and join"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "Splitting episodes, splitting segments and combining sources all run into the same mismatch between subtitle blocks and video blocks: either one file has to be cut or several have to be combined. This page handles both, one tab each."
+          ],
+          "ul": [
+            "**Split** — cut one long file into segments by duration or by cue count.",
+            "**Join** — chain several files in order into one episode, or interleave them by timeline.",
+            "**Cuts only on entry boundaries** — a sentence is never split in two.",
+            "**Cue numbers renumbered automatically** — no manual renumbering after a join, and not a word of dialogue changes."
+          ]
+        },
+        {
+          "h2": "First choose cut or join",
+          "ps": [
+            "Two tabs at the top: **Split: one file into segments** and **Join: several files into one**. The step-two options below change with your choice.",
+            "In \"1 Add subtitles\" you upload a file or paste text; if you picked the wrong one, click \"Clear\". This page reads UTF-8 only — if the encoding is broken (a wall of question marks or boxes) go to [[Garbled text repair|/repair.html]] first."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "The two tabs at the top of the split and join page",
+            "cap": "Cut and join are two tabs; the step-two options follow your choice"
+          }
+        },
+        {
+          "h2": "How to cut",
+          "ps": [
+            "Under \"2 How to cut\" choose the basis: **duration** (one segment every X minutes) or **cue count** (one segment every X cues), then enter a number.",
+            "Tick \"Restart each segment at 0:00\" and every resulting segment counts from zero — use this when you upload episodes and give each segment to a player on its own. Leave it unticked to keep the original timestamps, so each segment still lines up with its position in the source video.",
+            "The cut falls only on cue boundaries: when a very long subtitle straddles the cut point, the whole cue stays in the earlier segment."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "The duration and cue-count options with the restart-at-zero switch on the split page",
+            "cap": "Cut by duration or by cue count, and optionally restart every segment at 0:00"
+          }
+        },
+        {
+          "h2": "How to join",
+          "ps": [
+            "Under \"2 How to join\" choose the method: **Chain in order** shifts the later file so it starts after the earlier one ends, with no overlap between segments; **Interleave by timeline** keeps each file's original timestamps and sorts by start time.",
+            "Use chain in order when the files are the first and second half of one episode, or when separately proofread halves have to be put back together; use interleave by timeline when the files belong on screen together, such as an original track and a translated track.",
+            "After a join the cue numbers are renumbered automatically and not a word of dialogue changes."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "The chain-in-order and interleave-by-timeline options on the join page",
+            "cap": "Chain in order suits two halves of one episode; interleave by timeline suits an original and a translated track"
+          }
+        },
+        {
+          "h2": "Taking the result away",
+          "ps": [
+            "\"3 Result\" on the right exports **SRT** and **VTT**; click \"Download\" or \"Copy\".",
+            "When splitting you can use \"Download every segment\", which saves each cut segment at once instead of one click per segment."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "The SRT/VTT format choice with download and download-every-segment buttons in the result area",
+            "cap": "Split results can be downloaded segment by segment; a joined file is downloaded or copied directly"
+          }
+        },
+        {
+          "h2": "What is left untouched",
+          "ps": [
+            "Not a character of dialogue changes. This page only changes which cues belong to which segment and how they are numbered; the contents of the entries stay as they are.",
+            "With \"Chain in order\" the timestamps of the later files are shifted as a whole — that is what joining requires; with \"Interleave by timeline\" every original timestamp is preserved."
+          ]
+        },
+        {
+          "h2": "Common questions",
+          "ps": [
+            "**What if the last segment ends up very short?** That is normal. The remainder that does not fill a whole segment becomes its own segment instead of being padded.",
+            "**Will a sentence that straddles the cut point be split?** No. Cuts fall on entry boundaries only, and a cue that crosses the line stays in the earlier segment.",
+            "**After interleaving, how are two cues with identical times ordered?** By start time; when start times are equal, the order in which you added the files is kept.",
+            "**Can ASS be split?** This page handles SRT and VTT. Convert ASS to SRT or VTT with [[Format conversion|/convert.html]] first."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Subtitles are processed entirely in the browser: nothing is uploaded and nothing goes through a server. Close the page and the content is gone."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "To combine two files into a bilingual track (rather than into one episode) use [[Bilingual merging and special effects|/guides/merge.html]]; if the whole timeline is off go to [[Timeline adjustment|/shift.html]]; for a whole season's worth use [[Batch conversion|/batch.html]]; and run [[Subtitle QC|/qc.html]] when you are done."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "en": {
+      "seo": {
+        "title": "Lyric sync tool – Load a song, paste lyrics, tap along – AI-SRTSub",
+        "desc": "Load a song, paste the lyrics, tap a timestamp per line as you listen, and export LRC or SRT. Space plays and pauses, Enter stamps the line, Z undoes, hands stay on the keyboard.",
+        "h1": "How to use the lyric sync tool",
+        "intro": "Load a song, paste the lyrics, tap a timestamp for each line as you listen, and export standard LRC or SRT. The audio plays locally and is never uploaded.",
+        "ctaText": "Open the lyric sync tool"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "Give a song a lyric file that can be sung along to: one line per lyric, each line carrying a time point. Players read LRC, subtitle tracks read SRT, and both can be exported here."
+          ],
+          "ul": [
+            "**Start from scratch** — paste plain-text lyrics and tap along as you listen.",
+            "**Fix an existing file** — import an existing LRC and carry on from the first line without a time.",
+            "**Export two formats** — LRC for players, SRT for video subtitle tracks.",
+            "**All keyboard** — space plays and pauses, Enter stamps the current line, Z undoes."
+          ]
+        },
+        {
+          "h2": "1 Load the song",
+          "ps": [
+            "The first column on the left takes an audio file: **MP3, M4A, FLAC, WAV and OGG** all work. The audio plays locally and is never uploaded.",
+            "Audio quality does not affect timing accuracy, but a source with clear vocals is easier to follow; live recordings and sources with loud backing tracks are noticeably harder to sync."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "The load-a-song area of the lyric sync tool",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG all work, and the audio plays locally only"
+          }
+        },
+        {
+          "h2": "2 Paste the lyrics",
+          "ps": [
+            "Paste the lyrics into the second column, **one line per lyric**; blank lines are skipped automatically. Then click \"Parse lyrics\".",
+            "Pasting an existing LRC works too — its `[mm:ss.xx]` time tags are recognised, and after import you carry on from the first line without a time, so lines that are already timed do not have to be redone."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "The paste-lyrics area and the parse-lyrics button",
+            "cap": "Paste one line per lyric, or paste a whole LRC and let the tool read the existing times"
+          }
+        },
+        {
+          "h2": "3 Tap along as you listen",
+          "ps": [
+            "Play the song and press Enter at the moment a line starts (or click \"Stamp this line\"); the time for that line is recorded and the cursor jumps to the next one.",
+            "Shortcuts: **space** plays and pauses, **Enter** stamps the current line, **Z** undoes one line. Pressing Enter during playback is the smoothest way to work — no switching back and forth between mouse and keyboard.",
+            "Stamped the wrong line? Press Z to undo it and stamp again. If you do not want to stamp a line at all (an instrumental break, a purely musical passage), click \"Skip this line\" and it will not appear in the export."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "The play, stamp-this-line, undo-one-line and skip-this-line controls in the tap-along area",
+            "cap": "Space plays and pauses, Enter stamps the current line, Z undoes — hands stay on the keyboard"
+          }
+        },
+        {
+          "h2": "4 Export",
+          "ps": [
+            "The fourth column does the export: **Download LRC** for players, **Download SRT** for video subtitle tracks, or \"Copy\" to take the text directly.",
+            "Only lines with a time are exported; skipped lines never enter the file. In the SRT export each line lasts until the next one begins, and the last line falls back to 2 seconds."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "The download-LRC, download-SRT and copy buttons in the export area",
+            "cap": "LRC for players, SRT for video; only lines with a time are exported"
+          }
+        },
+        {
+          "h2": "What is left untouched",
+          "ps": [
+            "The lyric text is not rewritten. Timing only adds one time point per line and never touches the words you pasted.",
+            "When you import an existing LRC, lines that already carry a time tag keep their original time and you only stamp from the first untimed line onward."
+          ]
+        },
+        {
+          "h2": "Common questions",
+          "ps": [
+            "**Why are some lines missing from the export?** Skipped lines and lines without a time never enter the file. Go back to step three and add them, or confirm they were meant to be skipped.",
+            "**Can the times be changed afterwards?** If you want to shift everything a little after stamping, export SRT and use [[Timeline adjustment|/shift.html]] to offset or scale it as a whole.",
+            "**LRC or SRT — which should I export?** LRC for music players (foobar2000, streaming clients, all sorts of players); SRT when the lyrics have to sit on video or be processed further with subtitle tools.",
+            "**How long does one song take?** It depends on how many lines there are and how precise you want to be. For a song of thirty or forty lines, a few minutes per pass once you know the flow; chasing word-level accuracy takes longer."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Audio and lyrics are processed entirely in the browser: nothing is uploaded and nothing goes through a server. The audio is decoded and played locally only."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "If you already have an LRC and want subtitles see [[LRC to SRT|/guides/lrc-to-srt.html]]; for the thinking and the pitfalls behind timing see [[How to sync LRC lyrics|/guides/how-to-make-lrc-file.html]]; if the exported SRT is off use [[Timeline adjustment|/shift.html]]; and run the result through [[Subtitle QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "en": {
+      "seo": {
+        "title": "Extracting embedded video subtitles – MKV / MP4 tracks – AI-SRTSub",
+        "desc": "Read the subtitle tracks inside MKV, WebM, MP4 and MOV straight out and export SRT / VTT / ASS / TXT. No upload, no transcoding, every language track listed, image subtitles called out.",
+        "h1": "How to extract subtitles embedded in a video",
+        "intro": "Read the subtitle track sealed inside an MKV / MP4 straight out as SRT — the video is never uploaded, it is all read in the browser.",
+        "ctaText": "Open video subtitle extraction"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "Subtitles can be sealed inside a video file instead of standing alone. To edit, translate or pair them you first have to get them out — that is the one thing this page does."
+          ],
+          "ul": [
+            "**Four containers** — MKV / WebM and MP4 / MOV.",
+            "**Four kinds of track** — plain text, ASS, WebVTT, and the `mov_text` / `tx3g` tracks in MP4.",
+            "**Four export formats** — SRT / VTT / ASS / TXT.",
+            "**No upload, no transcoding** — read in small chunks by offset, so even a multi-gigabyte file does not fill memory."
+          ]
+        },
+        {
+          "h2": "1 Add the video",
+          "ps": [
+            "Drag a video file into the first column or click to choose one. Only **MKV / WebM** and **MP4 / MOV** are recognised; other containers will not yield any track.",
+            "The file never leaves your computer — there is no upload step. The tool reads in small chunks by offset, so a multi-gigabyte film does not fill memory, but the first read has to scan through the track information once."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "The add-video area of the embedded subtitle extraction page",
+            "cap": "MKV / WebM and MP4 / MOV are supported, and the file never leaves your machine"
+          }
+        },
+        {
+          "h2": "2 The embedded subtitle tracks",
+          "ps": [
+            "Once the read finishes, the second column lists the subtitle tracks in the file **one per row**, usually with a language and a track name (for example \"Chinese\", \"English\", \"Forced\"). Click a row to extract that track.",
+            "When the file holds only one subtitle track, extraction starts automatically — no click needed.",
+            "**Image subtitles cannot be extracted**: Blu-ray PGS and DVD subtitles are pictures burned into the stream with no text to take, and the page says so plainly; those need OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "The list of embedded subtitle tracks, one per row",
+            "cap": "One track per row; when there is only one, extraction starts automatically"
+          }
+        },
+        {
+          "h2": "3 The result",
+          "ps": [
+            "\"3 Result\" on the right shows the extracted subtitle text, with the export format above it: **SRT / VTT / ASS / TXT**. Click \"Download\" or \"Copy\".",
+            "When the source track is ASS, its own style header and resolution come back unchanged — exporting as ASS preserves them, while exporting as SRT carries only the text."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "The result area with the SRT / VTT / ASS / TXT format choice",
+            "cap": "Four export formats; an ASS source keeps its style header and resolution"
+          }
+        },
+        {
+          "h2": "What is left untouched",
+          "ps": [
+            "The video file itself is not touched at all — read only, no writing, no transcoding, no remuxing.",
+            "Subtitle content comes out as it is: no encoding guessing, no timeline correction. If the extracted subtitles are garbled, that is an encoding problem in the source track — take it to [[Garbled text repair|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Common questions",
+          "ps": [
+            "**Is there really no way to handle image subtitles (PGS / DVD)?** Not on this page — they are pictures with no text layer. OCR has to come first, and this page does not do that.",
+            "**The extracted subtitles are mistimed — why?** This page does not correct timelines; what comes out is what was there. For a global offset or a rate problem use [[Timeline adjustment|/shift.html]].",
+            "**Why does it take so long before anything happens?** A large file has to be scanned chunk by chunk for track information, and the bigger the file the longer it takes; this happens locally and has nothing to do with your connection.",
+            "**Can I use this page for external subtitle files?** You do not need to — an external .srt / .ass goes straight into [[Format conversion|/convert.html]] or another tool. This page is for subtitles that are sealed inside a video."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "The video is read entirely in the browser: nothing is uploaded, nothing is transcoded, nothing goes through a server. Close the page and the data that was read is released."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "To translate what you extract go to [[Subtitle translation|/translate.html]], to make it bilingual see [[Two ways to make bilingual subtitles|/guides/make-bilingual-subtitles.html]]; for the difference between embedded and external tracks, and which ones can be extracted, see [[How to get subtitles out of a video|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "en": {
+      "seo": {
+        "title": "Batch term replacement in subtitles – One table fixes a file – AI-SRTSub",
+        "desc": "One rule per line, separated by -> , => , → or Tab, with # for comments. Whole-word matching, case sensitivity, first or second line of a bilingual cue, every change listed and reversible.",
+        "h1": "How to batch-replace terms in subtitles",
+        "intro": "One term table makes the wording of an entire subtitle file consistent in one go — timelines, ASS styles and VTT NOTE blocks are not touched by a single character.",
+        "ctaText": "Open batch term replacement"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "The same word translated two different ways, names and places drifting with machine translation, someone else's subtitles that need to match your own conventions — all of these share one trait: what changes is a word, not the structure. This page changes words only."
+          ],
+          "ul": [
+            "**Unify names** — people, places and proper nouns stay consistent throughout.",
+            "**Fix machine errors** — a term the machine translated wrongly is replaced across the whole file.",
+            "**Adopt your own usage** — rework someone else's subtitles to your conventions.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — all six formats are recognised."
+          ]
+        },
+        {
+          "h2": "Two inputs: subtitles and a term table",
+          "ps": [
+            "The \"1 Add subtitles\" column on the left takes a subtitle file, or you can paste the content straight in; if you picked the wrong file, click \"Clear\".",
+            "The \"2 Term table\" column on the right holds the rules. **One rule per line**, with the old term and the new term separated by `->` , `=>` , `→` or a Tab — all four work. Lines starting with `#` are comments and take no part in replacement.",
+            "If you are unsure about the format, click \"Fill in an example\" and edit that."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "The add-subtitles area and the term table input of the term replacement page",
+            "cap": "Subtitles on the left, rules on the right; one rule per line, old term and new term separated by ->"
+          }
+        },
+        {
+          "h2": "How to write the term table",
+          "ps": [
+            "One rule per line: the current term on the left, what it should become on the right. For example `Thor -> Donar` replaces every \"Thor\" in the file with \"Donar\".",
+            "Comments start with `#` and are handy for labelling a group of rules (for example \"# season 1 name fixes\"), and for switching a rule off temporarily — just put a `#` in front instead of deleting it.",
+            "Rules run from top to bottom; text produced by one rule is scanned again by the rules below it. When order matters (say, replace A with B first and then B with C), keep that in mind."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Line after line of replacement rules in the term table input",
+            "cap": "One rule per line; lines starting with # are comments and can switch a rule off temporarily"
+          }
+        },
+        {
+          "h2": "What the three switches do",
+          "ps": [
+            "**Scope**: `all` / `first line only` / `second line only`. In a bilingual file, pick \"second line only\" when you only want to change the translation; entries that have just one line stay untouched under either single-line setting — the tool does not guess which side is the original.",
+            "**Whole word**: replaces only terms that stand alone as a word, so `art` will not touch `start`. For languages that do not separate words with spaces, such as Chinese and Japanese, this switch has no effect — replacement works on substrings there.",
+            "**Case sensitive**: off by default, so `CEO` and `ceo` are both replaced; when ticked, only the exact same spelling is replaced."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "The scope, whole-word and case-sensitive switches below the term table",
+            "cap": "Scope decides which line changes; whole-word and case decide how strictly a term is matched"
+          }
+        },
+        {
+          "h2": "Every change listed, every change reversible",
+          "ps": [
+            "\"3 Result\" shows the replaced subtitles and also **lists every change**: which cue, which line, from what to what.",
+            "If you do not want one of them, click it in the list to revert just that entry — no need to edit the term table and rerun. When you are happy, click \"Download\" or \"Copy\"."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "The result area with the list of individual changes",
+            "cap": "Every change is listed; click one you do not want to revert it"
+          }
+        },
+        {
+          "h2": "What is left untouched",
+          "ps": [
+            "**Timelines, ASS style lines and VTT `NOTE` blocks are not touched by a single character.** Replacement applies to dialogue text only, never to structural lines.",
+            "The term table never modifies your subtitle file automatically — the result is a new output and the original stays as it is."
+          ]
+        },
+        {
+          "h2": "Common questions",
+          "ps": [
+            "**Why was a term not replaced?** Check the scope first: with \"second line only\" selected, entries that have just one line stay untouched. Then check whole-word matching, which stops matches that are not standalone words.",
+            "**Why does Chinese still replace substrings with whole-word matching ticked?** That is expected. Chinese and Japanese do not separate words with spaces, so the tool cannot determine word boundaries and whole-word matching has no effect there.",
+            "**How do I roll everything back after a mistake?** Revert entries one by one in the change list; to start over entirely, clear the term table and add the subtitles again.",
+            "**Can ASS style lines be changed by accident?** No. Style lines and `NOTE` blocks are out of scope; only dialogue text takes part."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Subtitles and the term table are processed entirely in the browser: nothing is uploaded and nothing goes through a server. The term table is not stored, so it is empty the next time you open the page."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "Whether to build a term table and how to maintain one across a season, see [[Term tables: keeping a season consistent|/guides/subtitle-glossary.html]]; if the content is dirty (watermarks, SDH cues) run [[Subtitle cleaning|/clean.html]] first; once the names are settled and you need other languages go to [[Subtitle translation|/translate.html]]; and run the result through [[Subtitle QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "en": {
+      "seo": {
+        "title": "Getting subtitles out of a video – Embedded vs external – AI-SRTSub",
+        "desc": "What MKV / WebM / MP4 / MOV each carry, how text, ASS, WebVTT and mov_text tracks differ, why image subtitles (PGS / DVD) have no text, and what to do after extraction.",
+        "h1": "Getting subtitles out of a video",
+        "intro": "Subtitles can live inside a video file or stand alone outside it. Inside, they are a track in the container — extracting them has nothing to do with transcoding.",
+        "ctaText": "Open video subtitle extraction"
+      },
+      "body": [
+        {
+          "h2": "Where subtitles live: embedded and external",
+          "ps": [
+            "A video file (MKV, MP4) is a container holding a video track, an audio track and subtitle tracks at the same time. Subtitles sealed inside are **embedded**; a separate .srt / .ass file sitting outside is **external**, and an embedded track is also called **muxed in**.",
+            "External subtitles can be used as they are. The problem is the embedded ones: to edit them, translate them or build a bilingual track from the original, you have no subtitle file in hand — you have to read the track out of the container first. This step is not transcoding: the video is not re-encoded, only the data already stored in the container is read out."
+          ]
+        },
+        {
+          "h2": "Which container carries what",
+          "ps": [
+            "Different containers hold different subtitle formats, and extraction difficulty differs too:"
+          ],
+          "ul": [
+            "**MKV / WebM** — the most permissive: plain text, ASS and WebVTT tracks all fit, and multiple language tracks are common.",
+            "**MP4 / MOV** — usually a `mov_text` / `tx3g` track: plain text with a little style information.",
+            "**Plain text track** — comes out as text and becomes SRT directly.",
+            "**ASS track** — carries a style header and resolution; exporting ASS preserves them, exporting SRT leaves only the text.",
+            "**Image subtitles (Blu-ray PGS, DVD subtitles)** — store pictures, not characters, so no text can be extracted."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "The subtitle tracks listed by the embedded subtitle extraction page",
+            "cap": "One track per row, usually with a language and a track name; when there is only one it is extracted automatically"
+          }
+        },
+        {
+          "h2": "Why image subtitles cannot be extracted",
+          "ps": [
+            "Blu-ray PGS and DVD subtitles store no characters at all, only a series of images with an alpha channel. When a player shows them it is pasting a picture, not rendering text.",
+            "So there is no text in such a track to read — it is not that the tool does not support it, it is that no characters are there. The page says plainly when it runs into one.",
+            "The only way to get words is to recognise the characters in those images first (OCR) and build subtitles from that. That is a separate process from pulling a track out."
+          ]
+        },
+        {
+          "h2": "What usually comes after extraction",
+          "ps": [
+            "What comes out is the track as it was: the tool does not guess encodings and does not correct timelines. So two things come up often:",
+            "One is **garbled text** — an encoding problem in the source track that comes out garbled all the same; go to [[How to repair garbled text|/guides/repair.html]] to identify the encoding. The other is **wrong timing** — whether the source has an intro logo, or the frame rates do not match, the result is offset as a whole; use [[Timeline adjustment|/shift.html]] to offset or scale it.",
+            "After that, to translate go to [[Subtitle translation|/translate.html]], and to make it bilingual see [[Two ways to make bilingual subtitles|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "The result area with the SRT / VTT / ASS / TXT export formats",
+            "cap": "Extracted subtitles can be exported in four formats; an ASS source keeps its style header and resolution"
+          }
+        },
+        {
+          "h2": "A few things easy to get wrong",
+          "ps": [
+            "**Extracting subtitles is not burning them in.** The video is not re-encoded, so picture quality and audio are unaffected.",
+            "**Extraction does not affect the original file.** Read only, never written, and not a byte of the video changes.",
+            "**A large file being slow is not a connection problem.** The tool scans track information chunk by chunk, and the bigger the file the longer it takes; all of it happens locally.",
+            "**External subtitles do not need this page.** If you have a .srt / .ass, go straight to [[Format conversion|/convert.html]]; only subtitles sealed inside a video need extracting first."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "For the full walkthrough see [[How to extract subtitles embedded in a video|/guides/videosub.html]]; to translate what you extract go to [[Subtitle translation|/translate.html]], to make it bilingual see [[Two ways to make bilingual subtitles|/guides/make-bilingual-subtitles.html]]; for garbled text start with [[Garbled text repair|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "en": {
+      "seo": {
+        "title": "How to sync LRC lyrics – One line per lyric, tap along – AI-SRTSub",
+        "desc": "Build an LRC file from scratch: paste one lyric per line, tap the time as you listen, the shortcuts that matter, when to skip a line, LRC or SRT, and what to do when timing drifts.",
+        "h1": "How to sync LRC lyrics",
+        "intro": "An LRC file is just \"one lyric line plus one time point\". Making one is called timing: capturing the instant each line starts.",
+        "ctaText": "Open the lyric sync tool"
+      },
+      "body": [
+        {
+          "h2": "What timing actually is",
+          "ps": [
+            "The structure of an LRC file could hardly be simpler: one lyric per line, each preceded by a `[mm:ss.xx]` time tag. When a player reaches a line, it shows that lyric at that moment.",
+            "So the whole job of \"making an LRC\" is assigning a time point to every lyric line — and no machine can do that for you, because deciding where a line starts to be sung takes listening."
+          ]
+        },
+        {
+          "h2": "How many passes a song needs",
+          "ps": [
+            "It is worth a minute of thought before you start; it saves most of the rework:"
+          ],
+          "ul": [
+            "**One pass** — clear vocals, few lines, roughly good enough: tapping straight through once will do.",
+            "**Two passes** — a rough pass, then a line-by-line check; the usual approach when accuracy matters.",
+            "**Import and fix** — you already have an LRC and only a few lines are off; import it and carry on from the first untimed line.",
+            "**Instrumental breaks and purely musical passages** do not need timing — click \"Skip this line\" and they stay out of the export.",
+            "**Choruses and overlaps** can only record one starting point; overlapping parts are counted with the lead vocal line."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "The play, stamp-this-line, undo-one-line and skip-this-line controls in the tap-along area",
+            "cap": "Pressing Enter during playback is the smoothest; stamped the wrong line? Press Z and stamp again"
+          }
+        },
+        {
+          "h2": "Pasting the lyrics decides how smooth the rest goes",
+          "ps": [
+            "Paste the lyrics one line per lyric; blank lines are skipped. The line breaks you paste are the lines you will time later — break them into more lines now and you will tap more times later.",
+            "Pasting an existing LRC works too: its `[mm:ss.xx]` time tags are recognised, and after import you **carry on from the first line without a time**, so already-timed lines do not have to be redone.",
+            "That means a half-finished LRC can be saved and pasted back later to continue."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "The paste-lyrics area and the parse-lyrics button",
+            "cap": "One line per lyric; pasting a whole LRC reads the existing times so you can carry on"
+          }
+        },
+        {
+          "h2": "Export LRC or SRT",
+          "ps": [
+            "**For a music player, export LRC.** foobar2000, all sorts of players and devices with lyric display read it.",
+            "**To put lyrics on video or process them further, export SRT.** Video subtitle tracks, subtitle tools and editing software read SRT. In the export each line lasts until the next one begins, and the last line falls back to 2 seconds.",
+            "Both export only lines that have a time — skipped lines never enter the file."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "The download-LRC, download-SRT and copy buttons in the export area",
+            "cap": "LRC for players, SRT for video; only lines with a time are exported"
+          }
+        },
+        {
+          "h2": "A few things easy to get wrong",
+          "ps": [
+            "**Everything is slightly off after timing? Use an offset.** Export SRT and shift it as a whole with [[Timeline adjustment|/shift.html]]; far faster than retiming line by line.",
+            "**The drift grows as the song goes on? That is a rate problem.** When playback speed and recording speed differ, the error grows towards the end, and that needs proportional scaling, not an offset.",
+            "**Shortcuts only feel natural if you use them together.** Space plays and pauses, Enter stamps the current line, Z undoes one line — press Enter directly during playback instead of switching between mouse and keyboard.",
+            "**Audio quality affects precision.** A source with clear vocals is easier to follow; live recordings and sources with loud backing tracks are noticeably harder."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "For the full walkthrough see [[How to use the lyric sync tool|/guides/lrc.html]]; to turn an existing LRC into subtitles see [[LRC to SRT|/guides/lrc-to-srt.html]]; if the exported SRT is mistimed use [[Timeline adjustment|/shift.html]]; and run the result through [[Subtitle QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "en": {
+      "seo": {
+        "title": "Term tables: one season, one vocabulary – When to build one – AI-SRTSub",
+        "desc": "A term table fixes the same word rendered inconsistently: when to build one, how to reuse it across a season, why whole-word matching does nothing in Chinese, and what not to hand to it.",
+        "h1": "Term tables: keeping a season consistent",
+        "intro": "When a name is A in episode one and B in episode seven, viewers think they are two characters. A term table prevents exactly that — it fixes what things are called.",
+        "ctaText": "Open batch term replacement"
+      },
+      "body": [
+        {
+          "h2": "A term table fixes inconsistency",
+          "ps": [
+            "Wording problems in subtitles come in two kinds: \"this word is translated wrongly\" and \"the same word is translated differently from one place to another\". The first is a dictionary problem; the second is what a term table is for.",
+            "The second is both more common and harder to spot: `Thor` becomes \"Thor\" in episode one and \"Donar\" in episode seven, and each episode looks fine on its own while the series as a whole makes viewers think a new character appeared. A term table turns \"this production calls him Thor\" into an executable rule applied to the whole subtitle file at once."
+          ]
+        },
+        {
+          "h2": "When it is worth building one",
+          "ps": [
+            "Not every subtitle file needs a term table. The cases that justify one are usually these:"
+          ],
+          "ul": [
+            "**A whole season or a series** — the more episodes, the higher the chance of drift.",
+            "**Dense proper nouns** — people, places, organisations, invented terms inside the work.",
+            "**Several people working** — episodes split between translators with different habits.",
+            "**Taking over someone else's subtitles** — bringing them in line with your own (or a client's) usage.",
+            "**Cleaning up after machine translation** — the machine may render the same term several ways."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Replacement rules grouped by category in a term table",
+            "cap": "Use # comments to group rules, and to switch one off temporarily while editing"
+          }
+        },
+        {
+          "h2": "Keeping one table across a season",
+          "ps": [
+            "A term table is maintained **incrementally**: settle the names in episode one, then add a rule whenever a new term appears, and by the end of the season the table is complete. For the next season of the same series, start from it.",
+            "Write rules a little wider than strictly needed — once you have decided on \"Thor\", add \"Donar -> Thor\" as well, so someone else's subtitles can be brought in line in the same pass.",
+            "Always read the **change list** afterwards: it names each cue, each line and what became what. It is the only place where you can confirm that the change was right and not overdone, and any entry you dislike can be reverted with a click."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "The list of individual changes in the result area",
+            "cap": "Every change is listed; click one you do not want to revert it"
+          }
+        },
+        {
+          "h2": "What not to hand to a term table",
+          "ps": [
+            "A term table changes **words**. These three things are outside its job, and should be:",
+            "**Grammar and sentence structure** — you cannot turn a word into a sentence; sentence-level work goes back to [[Subtitle translation|/translate.html]] or to a human.",
+            "**Content cleaning** — dropping whole lines such as watermarks, ads and SDH cues belongs to [[Subtitle cleaning|/clean.html]]; term table rules replace, they do not delete lines.",
+            "**Timelines** — a term table never touches time. For a global offset or a rate problem go to [[Timeline adjustment|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "A few things easy to get wrong",
+          "ps": [
+            "**Chinese still replaces substrings with whole-word matching ticked — that is normal.** Chinese and Japanese do not separate words with spaces, so the tool cannot determine word boundaries and whole-word matching has no effect there; the `art` will not touch `start` protection only works for English.",
+            "**Order changes the result.** Rules run from top to bottom and text produced by one rule is scanned again by the rules below it. Replace A with B and then B with C and you end up with C.",
+            "**To change only the translation, set the scope.** In a bilingual file, pick \"second line only\"; entries with just one line stay untouched under either single-line setting — the tool does not guess which side is the original.",
+            "**The term table is not saved.** It is empty every time you open the page, so keep your own text file and pass it on."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "For the full walkthrough see [[How to batch-replace terms in subtitles|/guides/glossary.html]]; if the content is dirty run [[Subtitle cleaning|/clean.html]] first; once the names are settled and you need other languages go to [[Subtitle translation|/translate.html]]; and run the result through [[Subtitle QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

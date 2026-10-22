@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio na titulky — převod řeči na SRT v prohlížeči | AI-SRTSub",
+    "desc": "Vložte audio nebo video a získejte titulky. Rozpoznávání řeči běží v prohlížeči, dělí text na věty a exportuje SRT / VTT. Nic se nenahrává, zdarma.",
+    "kw": "audio na srt,převod řeči na titulky,generátor titulků,automatické titulky,přepis audia na srt,whisper titulky,rozpoznávání řeči v prohlížeči,offline titulky",
+    "intro": "Vložte audio nebo video soubor, vyberte jazyk a model, a rozpoznávání proběhne přímo ve vašem prohlížeči. Výsledkem je návrh titulků s časováním, rozdělený na věty a upravený na délku řádků.",
+    "feat": "Nástroj zpracovává proud slov z rozpoznávání řeči, dělí je podle interpunkce na logické celky a automaticky upravuje délku řádků podle typu písma. Časování je optimalizováno pro čitelnost bez překryvů, přičemž rozpoznávání probíhá lokálně v prohlížeči bez nahrávání dat na server.",
+    "who": "Tvůrci videí, týmy pracující s podcasty a kurzy, a kdokoli, kdo potřebuje rychle vytvořit návrh titulků k videu bez původního souboru."
+  },
+  "ocrsub": {
+    "title": "OCR vypálených titulků — čtení titulků z videa | AI-SRTSub",
+    "desc": "Vypálené titulky nelze extrahovat jako stopu. Označte oblast, nástroj ji přečte snímek po snímku a sloučí do časovaných titulků. SRT / VTT, zdarma.",
+    "kw": "extrakce vypálených titulků,ocr titulků,převod titulků z videa,vypálené titulky,ocr z videa,video na srt,titulky z videa,ocr pro titulky",
+    "intro": "Vložte video, označte oblast, kde se nacházejí titulky, a nástroj je snímek po snímku přečte a sloučí do jednoho časovaného celku.",
+    "feat": "Tento nástroj ořízne oblast titulků, převede ji na binární obraz pro lepší čitelnost a pomocí OCR rozpozná text, který následně spojí do souvislých časových úseků. Zpracování probíhá lokálně, což umožňuje efektivní převod vypálených titulků na editovatelný formát SRT nebo VTT.",
+    "who": "Lokalizační týmy, editoři pracující se staršími záznamy a kdokoli, kdo má k dispozici pouze finální video bez původního souboru s titulky."
+  }
+}

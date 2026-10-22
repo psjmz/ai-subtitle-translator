@@ -343,6 +343,21 @@
         </div>
       </div>
       <div class="note">两个数都只约束<b>同一个任务自己</b>：到顶了就等几十秒重发同一批，<b>不会降级换模型</b>（一集里前后两个模型语气会跳）。实测单批 6–7 秒，间隔设 2 秒平时几乎不会真正触发，它只是保险丝。</div>
+      <!-- v0.9.365：E 专属节奏。晚高峰窗口 + 超时冷却 + 桥接活性探测，全是 E 自己的参数，
+           共用链路一概不碰。 -->
+      <div class="row">
+        <div>
+          <label>晚高峰窗口（北京时间，如 18-23；留空 = 关）</label>
+          <input type="text" id="eOffHours" spellcheck="false" placeholder="18-23">
+        </div>
+        <div>
+          <label>超时判死后全局冷却（分钟，0 = 关）</label>
+          <input type="number" id="eCooldownMin" min="0" max="720" step="1" placeholder="30">
+        </div>
+      </div>
+      <div class="note">窗口内（含两端）<b>E 不接新任务</b>，整程走 D / C / B / A —— 晚高峰 Google 网页端单批会涨到几分钟，等了也白等；已在跑的 E 任务不会被中途切断。连续超时把 E 判死后，全局冷却期内新任务也直接走 D，不再重复交学费；E 一旦成功立刻解除冷却。</div>
+      <label>桥接活性探测地址（后台健康灯用，留空 = 不探测）</label>
+      <input type="text" id="eBridgeUrl" spellcheck="false" placeholder="http://127.0.0.1:4982/openai/v1/models">
       <div class="note" id="eStat">状态：—</div>
       <label>附加请求参数（可选，JSON 对象）</label>
       <textarea id="extraParams5" spellcheck="false" placeholder='{}'></textarea>
@@ -826,10 +841,21 @@ function renderEStat(st){
     const fm = st.lastErrAt ? Math.floor((Date.now() - st.lastErrAt) / 60000) : -1;
     parts.push('今日失败 ' + st.fail + ' 次' + (fm >= 0 ? ('（最后 ' + (fm < 1 ? '刚刚' : fm + ' 分钟前') + (st.lastErr ? ' · ' + st.lastErr : '') + '）') : ''));
   }
+  /* v0.9.365：E 自己的节奏状态 —— 晚高峰窗口 / 冷却剩余 / 桥接活性。
+     桥接探测是异步的，首轮显示「探测中…」，下一轮刷新（30 秒缓存）出结果。 */
+  if (st.offHours) parts.push('当前在晚高峰窗口内（E 不接新任务）');
+  if (st.coolUntil) {
+    const cm = Math.ceil((st.coolUntil - Date.now()) / 60000);
+    if (cm > 0) parts.push('超时冷却中，还剩 ' + cm + ' 分钟');
+  }
+  if (st.bridge) {
+    parts.push(st.bridge.pending ? '桥接探测中…' : (st.bridge.ok ? ('桥接在线（' + (st.bridge.ms || 0) + 'ms）') : '桥接无响应'));
+  }
   el.textContent = '状态：' + parts.join(' · ');
   /* 最近半小时内失败过 → 直接标红；否则沿用「1 小时没成功」的老判据 */
   const recentFail = st.fail && st.lastErrAt && (Date.now() - st.lastErrAt) < 1800000;
-  el.style.color = (recentFail || (st.okAt && (Date.now() - st.okAt) > 3600000)) ? '#A32D2D' : '';
+  const bridgeDown = st.bridge && !st.bridge.pending && !st.bridge.ok;
+  el.style.color = (recentFail || bridgeDown || (st.okAt && (Date.now() - st.okAt) > 3600000)) ? '#A32D2D' : '';
 }
 
 function show(el, on){ $(el).style.display = on ? '' : 'none'; }
@@ -905,6 +931,10 @@ async function loadConfig(){
     $('extraParams5').value = paramsText(c.extraParams5);
     $('rpmE').value = (typeof c.rpmE === 'number' && Number.isFinite(c.rpmE)) ? c.rpmE : '';
     $('gapE').value = (typeof c.gapE === 'number' && Number.isFinite(c.gapE)) ? c.gapE : '';
+    /* v0.9.365：E 专属节奏参数 */
+    $('eOffHours').value = c.eOffHours || '';
+    $('eCooldownMin').value = (typeof c.eCooldownMin === 'number' && Number.isFinite(c.eCooldownMin)) ? c.eCooldownMin : '';
+    $('eBridgeUrl').value = c.eBridgeUrl || '';
     renderEStat(c.eStat || null);
     langSelE = new Set(Array.isArray(c.langModelE) ? c.langModelE : []);
     $('fallbackToA').checked = c.fallbackToA !== false;
@@ -1410,6 +1440,12 @@ $('btnSave5').addEventListener('click', async () => {
   const rpmRaw = $('rpmE').value.trim(), gapRaw = $('gapE').value.trim();
   if (rpmRaw !== '') payload.rpmE = +rpmRaw;
   if (gapRaw !== '') payload.gapE = +gapRaw;
+  /* v0.9.365：E 专属节奏 —— 窗口原样传（服务端校验格式，非法落空=关）；冷却/探测地址带空值也传，
+     这样「清空输入框 = 恢复默认/关闭」能生效，而不是被「留空=不改」吞掉 */
+  payload.eOffHours = $('eOffHours').value.trim();
+  const cdRaw = $('eCooldownMin').value.trim();
+  if (cdRaw !== '') payload.eCooldownMin = +cdRaw;
+  payload.eBridgeUrl = $('eBridgeUrl').value.trim();
   try {
     await api('/api/admin/config', 'POST', payload);
     $('key5').value = '';

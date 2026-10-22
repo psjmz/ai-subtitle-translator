@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Puhe tekstitykseksi — luo SRT selaimessa | AI-SRTSub",
+    "desc": "Muunna puhe tekstitykseksi selaimessa. Työkalu tunnistaa puheen, pilkkoo sen lauseiksi ja vie SRT- tai VTT-muodossa. Ei latauksia, täysin ilmainen.",
+    "kw": "puhe tekstitykseksi,automaattinen tekstityksen luonti,transkriptio tekstiksi,SRT-generaattori,puheentunnistus selaimessa,offline-tekstitys,AI-SRTSub",
+    "intro": "Lataa ääni- tai videotiedosto, valitse kieli ja malli, niin tunnistus tapahtuu suoraan selaimessasi. Lopputuloksena on valmiiksi ajoitettu ja lauseiksi jaettu tekstitysluonnos.",
+    "feat": "Työkalu analysoi puheen, pilkkoo sen kieliopillisesti oikeisiin lauseisiin, huomioi rivinpituudet ja varmistaa tekstitysten luettavuuden ilman päällekkäisyyksiä. Tunnistus tapahtuu paikallisesti selaimessa, eikä ääntä lähetetä palvelimelle.",
+    "who": "Sisällöntuottajat, podcastien tekijät ja kaikki, jotka tarvitsevat nopean ja muokattavan tekstitysluonnoksen videoilleen."
+  },
+  "ocrsub": {
+    "title": "Poltettujen tekstitysten OCR — lue tekstitys videosta | AI-SRTSub",
+    "desc": "Pura videokuvaan poltetut tekstitykset OCR-tekniikalla. Merkitse tekstitysalue, niin työkalu lukee tekstin ja luo SRT- tai VTT-tiedoston ilmaiseksi.",
+    "kw": "tekstitysten purku,OCR-tekstitys,poltetut tekstitykset,video tekstitykseksi,tekstityksen tunnistus,OCR-työkalu,SRT-purku,AI-SRTSub",
+    "intro": "Lataa video, merkitse tekstityksen sijainti, niin työkalu lukee tekstin ruutu ruudulta ja yhdistää identtiset kehykset ajoitetuiksi tekstityksiksi.",
+    "feat": "Työkalu rajaa tekstitysalueen, suodattaa taustan ja tunnistaa tekstin kuvasta, yhdistäen peräkkäiset samankaltaiset kehykset yhdeksi tekstitykseksi. Tämä mahdollistaa tekstitysten erottamisen videoista, joissa ei ole erillistä tekstitystiedostoa.",
+    "who": "Kääntäjät, editoijat ja videoiden parissa työskentelevät, joilla on käytössään vain valmis videotiedosto ilman alkuperäistä tekstitystiedostoa."
+  }
+}

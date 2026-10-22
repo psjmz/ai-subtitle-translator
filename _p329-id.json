@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "id": {
+      "seo": {
+        "title": "Cara memakai subtitle efek dan gabung bilingual – Gabung · Gaya – AI-SRTSub",
+        "desc": "Gabungkan dua berkas subtitle jadi satu bilingual, atur ulang urutan dan gaya, atau beri efek pada subtitle satu bahasa. Pilih cara memasangkan, sesuaikan templat ASS dan VTT, lalu ekspor.",
+        "h1": "Cara memakai subtitle efek dan gabung bilingual",
+        "intro": "Gabungkan dua berkas subtitle menjadi bilingual, atau langsung beri gaya pada subtitle: font, warna, garis tepi, posisi — apa yang terlihat di pratinjau itulah yang diekspor.",
+        "ctaText": "Buka alat subtitle efek"
+      },
+      "body": [
+        {
+          "h2": "Alat ini menyelesaikan apa",
+          "ps": [
+            "Dalam satu halaman sebenarnya ada tiga pekerjaan: menggabungkan berkas asli dan terjemahan menjadi satu berkas bilingual, mengatur urutan dan gaya subtitle yang sudah bilingual, dan memberi efek pada subtitle satu bahasa. Ketiganya memakai satu set parameter gaya dan satu pratinjau yang sama."
+          ],
+          "ul": [
+            "**Gabung dua berkas subtitle** —— punya berkas asli dan terjemahan, gabungkan jadi satu berkas bilingual untuk diekspor.",
+            "**Atur subtitle bilingual** —— sudah bilingual tetapi urutan atau gayanya belum pas, susun ulang sekali.",
+            "**Subtitle satu bahasa** —— hanya satu berkas, beri font, garis tepi, posisi.",
+            "Ketiganya berpindah tab di kiri, area gaya dan pratinjau dipakai bersama."
+          ]
+        },
+        {
+          "h2": "Tiga pekerjaan, satu halaman",
+          "ps": [
+            "Di atas halaman ada tiga tab: **Gabung dua berkas subtitle**, **Atur subtitle bilingual**, **Subtitle satu bahasa**. Pilihan tab menentukan berapa kolom input di kiri.",
+            "Saat menggabung dua berkas, di kiri ada dua kolom «1 Subtitle asli» dan «2 Subtitle terjemahan», masing-masing bisa mengunggah berkas, juga bisa menempelkan teks subtitle langsung. Atur subtitle bilingual dan subtitle satu bahasa hanya punya satu kolom."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Tiga tab di atas alat subtitle efek dan area input di kiri",
+            "cap": "Tiga tab di atas halaman; pilih «Gabung dua berkas subtitle» maka di kiri muncul kolom asli dan terjemahan"
+          }
+        },
+        {
+          "h2": "Bagaimana dua berkas dipasangkan",
+          "ps": [
+            "Item pertama di «3 Pengaturan gabung» adalah cara memasangkan: **Pasangkan berurutan · pakai timeline asli**, **Pasangkan per timeline · pakai timeline asli**, **Pasangkan berurutan · pakai timeline terjemahan**.",
+            "Bila jumlah item dan urutan kedua berkas sama, memasangkan berurutan paling stabil; bila jumlahnya tidak cocok (satu pihak sudah menggabung item, satu pihak sudah memecah), pasangkan per timeline agar alat mencari berdasarkan waktu terdekat. Timeline milik siapa yang dipakai tergantung mana yang lebih akurat — biasanya berkas asli lebih akurat.",
+            "Di bawahnya ada struktur teks (deteksi otomatis / satu item dua baris / bergantian berpasangan) dan urutan (asli di atas / terjemahan di atas)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Cara memasangkan, struktur teks dan urutan di pengaturan gabung",
+            "cap": "Cara memasangkan menentukan siapa berpasangan dengan siapa, timeline asli atau terjemahan juga dipilih di sini"
+          }
+        },
+        {
+          "h2": "Sesuaikan gaya satu per satu",
+          "ps": [
+            "Di kanan ada area gaya. Saat mengekspor ASS yang berlaku adalah «Tampilan ASS»: tata letak (belah layar · pisah atas bawah / bertumpuk · dua baris bawah), ukuran font, warna, opasitas, font, tebal, miring, jarak huruf, garis tepi, warna garis tepi, bayangan/latar (tanpa / bayangan / latar), kedalaman, warna sisi, opasitas warna sisi, perataan horizontal (bawah · kiri / bawah · tengah / bawah · kanan), jarak dari bawah untuk terjemahan (utama), serta font, bayangan/latar dan margin kiri kanan untuk teks asli (pendamping).",
+            "Saat mengekspor gaya bilingual VTT yang berlaku adalah «Gaya WebVTT»: di atas enam preset (Standar / Ringkas / Sinematik / Atas / Aksesibilitas / Vertikal), masih bisa mengubah line vertikal, titik jangkar (menempel bawah / menempel atas / tengah), position horizontal, lebar size, perataan align, tinggi baris seluruh item, serta warna latar, opasitas latar, ketebalan garis tepi baris terjemahan; baris asli bisa memakai gaya utama atau diatur sendiri.",
+            "Setelah diatur bisa «Simpan sebagai skema»; lain kali pilih di «Dari skema tersimpan» lalu klik «Terapkan» untuk memakainya lagi."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Berbagai parameter di area gaya Tampilan ASS sebelah kanan",
+            "cap": "Ukuran font, warna, garis tepi, bayangan/latar, perataan bisa diatur satu per satu; setelah selesai simpan sebagai skema"
+          }
+        },
+        {
+          "h2": "Lihat pratinjau sebelum ekspor",
+          "ps": [
+            "«Pratinjau gabung» adalah tabel: #, waktu, asli, terjemahan, gaya. Di atasnya bisa menyaring baris mencurigakan menurut «Ada efek suara», «Ada awalan pembicara», «Durasi < 1 detik», «Lebih dari dua baris», «Kecepatan baca melebihi batas», atau mengetik kata kunci.",
+            "Klik slot gaya sebuah baris akan membuka penyuntingan slot itu, hanya menampilkan baris mana saja yang memakainya; «Lepas semua penimpaan» mengembalikan semua penimpaan manual ke templat. Area penyesuaian timeline di bawah bisa menggeser keseluruhan (mulai dari item tertentu) dan menskalakan proporsional.",
+            "Setelah yakin lanjut ke «4 Ekspor»: unduh berkas subtitle, atau salin isinya."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Tabel pratinjau gabung dan bilah penyaring",
+            "cap": "Pratinjau adalah hasil ekspornya, bisa menyaring baris mencurigakan menurut jenis, juga membuka satu slot gaya"
+          }
+        },
+        {
+          "h2": "Apa yang tidak tersentuh",
+          "ps": [
+            "Gaya hanya mengubah tampilan, tidak mengubah dialog. Isi teks asli dan terjemahan tidak berubah satu huruf pun selama penggabungan; timeline mengikuti berkas yang kamu pilih kecuali kamu sendiri mengubahnya di area penyesuaian bawah pratinjau.",
+            "Saat mengekspor SRT atau «VTT tanpa gaya», informasi gaya tidak ditulis ke berkas — halaman akan memberi tahu bahwa yang diekspor adalah VTT tanpa gaya, tanpa blok STYLE, pemutar memakai tampilan bawaan. Ingin bergaya, pilih VTT bilingual atau ASS."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Jumlah item dua berkas berbeda, bagaimana?** Pakai «Pasangkan per timeline», alat mencocokkan berdasarkan waktu terdekat; item yang tidak cocok tidak akan dibuat-buat.",
+            "**Gaya ekspor ASS tidak dikenali pemutar?** Gaya ASS ditulis di dalam berkas, tetapi dukungan ASS tiap pemutar berbeda. Ingin tampilan lebih universal, ekspor VTT bilingual.",
+            "**Templat sudah kacau, bagaimana kembali ke awal?** «Pulihkan parameter bawaan» di area ASS dan «Pulihkan templat bawaan» di area VTT mengembalikan kedua bagian.",
+            "**Tujuh baris di contoh itu apa?** Itu contoh bawaan halaman, hanya untuk melihat bentuk setelah digabung, contoh tidak bisa diekspor; unggah subtitle sendiri dan klik pratinjau gabung maka otomatis terganti."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Subtitle diproses sepenuhnya di browser, tidak diunggah, tidak melewati server. Tutup browser, isi yang sedang diproses hilang."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Kalau perlu memecah bilingual menjadi dua track pakai [[Pisah bilingual|/bilingual.html]]; sebaliknya untuk membuat subtitle satu bahasa menjadi bilingual lihat [[Dua cara membuat subtitle bilingual|/guides/make-bilingual-subtitles.html]]; setelah digabung lewatkan [[Pemeriksaan subtitle|/qc.html]]; untuk satu season penuh pakai [[Konversi massal|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "id": {
+      "seo": {
+        "title": "Cara mengekstrak teks biasa dari subtitle – AI-SRTSub",
+        "desc": "Pilih tata letak paragraf berurutan atau satu baris per item, lima tombol pembersih membuang apa saja, dan enam format SRT / VTT / ASS / SBV / LRC / TXT semuanya dikenali.",
+        "h1": "Cara mengekstrak teks biasa dari subtitle",
+        "intro": "Ekstrak dialog di subtitle menjadi teks biasa yang bersih: timeline, nomor, penanda gaya dibuang otomatis, hasilnya langsung bisa dibaca sebagai artikel atau dipakai sebagai daftar dialog.",
+        "ctaText": "Buka ekstrak teks biasa"
+      },
+      "body": [
+        {
+          "h2": "Alat ini menyelesaikan apa",
+          "ps": [
+            "Yang benar-benar berguna di berkas subtitle hanya dialognya, sisanya struktur untuk pemutar: nomor, timeline, penanda gaya. Halaman ini membuang struktur, hanya menyisakan teks."
+          ],
+          "ul": [
+            "**Dibaca seperti artikel** —— keluaran paragraf berurutan, dipotong otomatis menurut jeda dan tanda akhir kalimat.",
+            "**Dipakai sebagai daftar** —— keluaran satu baris per item, satu item subtitle satu baris, praktis untuk tabel dialog atau untuk alat lain.",
+            "**Sekalian dibersihkan** —— keterangan tunarungu, watermark iklan, kalimat berulang berdampingan dibuang secara bawaan.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** enam format dikenali."
+          ]
+        },
+        {
+          "h2": "Masukkan, jangan cuma memikirkan unggah",
+          "ps": [
+            "Kolom «1 Masukkan subtitle» di kiri mendukung unggah berkas, juga bisa menempelkan isi subtitle langsung ke kotak teks. Salah masuk klik «Hapus» lalu ulangi.",
+            "Halaman ini membaca berkas sebagai UTF-8. Kalau subtitle terbuka penuh tanda tanya atau kotak, itu encoding rusak, pergi ke [[Perbaikan encoding|/repair.html]] ubah ke UTF-8 lalu kembali."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Area masukkan subtitle di halaman ekstrak teks biasa",
+            "cap": "Unggah berkas, atau tempelkan isi subtitle langsung ke kotak teks"
+          }
+        },
+        {
+          "h2": "Pilih tata letak mana",
+          "ps": [
+            "Di atas «2 Opsi ekstraksi» ada tata letak: **Paragraf berurutan** memotong otomatis menurut jeda dan tanda akhir kalimat, terbaca seperti artikel; **Satu baris per item** satu item subtitle satu baris, satu-satu sesuai item di berkas asli.",
+            "Mau menyalin dialog untuk catatan, latihan terjemahan, dibaca seperti artikel, pakai paragraf berurutan; mau membuat daftar dialog, membandingkan per item dengan aslinya, memberi ke alat lain, pakai satu baris per item."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Tata letak dan tombol pembersih di opsi ekstraksi",
+            "cap": "Pilih satu tata letak; lima tombol di bawah masing-masing menentukan jenis isi mana yang dibuang"
+          }
+        },
+        {
+          "h2": "Lima pembersih masing-masing membuang apa",
+          "ps": [
+            "**Buang keterangan tunarungu**: hapus tanda kurung yang menjelaskan suara seperti «(langkah kaki)», «[musik]», dialog tetap.",
+            "**Buang watermark iklan**: singkirkan baris seperti nama grup penerjemah, alamat situs, akun media sosial.",
+            "**Buang kalimat berulang berdampingan**: kalimat yang sama muncul dua kali berdekatan (insiden pemutaran) hanya disisakan satu; pengulangan yang berjauhan punya makna, tidak disentuh.",
+            "**Buang awalan pembicara**: «JOHN: Halo» hanya menyisakan «Halo». Bawaan tetap disimpan — teks bergaya naskah perlu mengenali siapa yang bicara.",
+            "**Lewati baris lirik**: lewati baris yang seluruhnya «♪ … ♪». Bawaan tetap disimpan — lirik juga termasuk kata."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Lima tombol pembersih dan penjelasannya di opsi ekstraksi",
+            "cap": "Di kanan tiap tombol tertulis apa yang dibuang, centang sesuai kebutuhan"
+          }
+        },
+        {
+          "h2": "Cara mengambil hasilnya",
+          "ps": [
+            "Kolom «3 Hasil» di kanan menampilkan teks hasil ekstraksi secara langsung, mengubah opsi langsung dihitung ulang.",
+            "Setelah yakin klik «Unduh» untuk menyimpan sebagai .txt, atau «Salin» untuk langsung dibawa. Untuk bahasa seperti Mandarin dan Jepang yang tidak memakai spasi sebagai pemisah kata, aturan penggabungan baris berbeda dari Inggris, alat menanganinya otomatis menurut bahasa."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Area hasil ekstraksi dengan tombol unduh dan salin",
+            "cap": "Hasil diperbarui langsung, unduh sebagai txt atau salin langsung"
+          }
+        },
+        {
+          "h2": "Apa yang tidak tersentuh",
+          "ps": [
+            "Dialognya sendiri tidak ditulis ulang. Tombol pembersih hanya menentukan jenis mana yang dibuang seluruh baris atau seluruh paragraf, tidak mengubah kata di dalam item.",
+            "Timeline dan nomor itu «tidak dikeluarkan», bukan «diubah lalu dikeluarkan» — berkas asli tidak terpengaruh, halaman ini tidak menyediakan ekspor dengan timeline, itu urusan [[Konversi format|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Penanda gaya ASS tertinggal di teks?** Tidak. Penanda timpa gaya `{}` ASS dibuang, hanya teks dialog yang tersisa.",
+            "**Subtitle bilingual diekstrak jadi dua baris atau satu baris?** Item asli punya berapa baris ya sebanyak itu, halaman ini tidak menggabung juga tidak memecah — mau memecah pakai [[Pisah bilingual|/bilingual.html]].",
+            "**Mengapa awalan pembicara disimpan secara bawaan?** Nama orang di «JOHN: Halo» sering merupakan informasi berguna (naskah, tabel dialog), kalau dibuang mudah tidak tahu siapa yang bicara, jadi diserahkan kepadamu.",
+            "**Berkas lirik LRC bisa diekstrak?** Bisa. Label waktu LRC dibuang, baris lirik tetap; tidak ingin menyimpan lirik centang «Lewati baris lirik»."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Subtitle diproses sepenuhnya di browser, tidak diunggah, tidak melewati server. Teks hanya tinggal di halaman ini, muat ulang langsung kosong."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Mau tahu apa isi berkas subtitle sebenarnya lihat [[Isi berkas SRT sebenarnya|/guides/srt-file-format.html]]; dialog hasil ekstraksi perlu diterjemahkan masuk ke [[Terjemahan subtitle|/translate.html]]; perlu dibuat tabel pakai [[Subtitle ke Excel/CSV|/guides/srt-to-excel.html]]; sebelum diserahkan lewatkan [[Pemeriksaan subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "id": {
+      "seo": {
+        "title": "Cara memisah dan menyambung subtitle – Potong per segmen – AI-SRTSub",
+        "desc": "Potong satu berkas jadi beberapa segmen menurut durasi atau jumlah item, tiap segmen bisa mulai dari nol; sambung berkas berurutan atau jalin per waktu. Nomor urut disusun ulang, dialog tetap.",
+        "h1": "Cara memisah dan menyambung subtitle",
+        "intro": "Satu berkas subtitle panjang dipotong menjadi beberapa segmen, atau beberapa berkas terpisah digabung menjadi satu. Hanya memotong di batas item, tidak pernah membelah satu kalimat.",
+        "ctaText": "Buka pisah dan sambung"
+      },
+      "body": [
+        {
+          "h2": "Alat ini menyelesaikan apa",
+          "ps": [
+            "Membagi episode, membagi segmen, menggabung sumber film — semuanya menemui subtitle yang segmennya tidak cocok: entah satu berkas harus dipotong, entah beberapa berkas harus digabung jadi satu. Halaman ini menangani keduanya, potong dan sambung masing-masing satu tab."
+          ],
+          "ul": [
+            "**Pisah** —— satu berkas subtitle panjang dipotong jadi beberapa segmen menurut durasi atau jumlah item.",
+            "**Sambung** —— beberapa berkas subtitle disambung berurutan jadi satu episode, atau dijalin per waktu.",
+            "**Hanya memotong di batas item** —— satu kalimat tidak akan terbelah dua.",
+            "**Nomor urut disusun ulang otomatis** —— setelah disambung tidak perlu memperbaiki nomor sendiri, dialog tidak berubah satu kata."
+          ]
+        },
+        {
+          "h2": "Pilih potong atau sambung dulu",
+          "ps": [
+            "Dua tab di atas: **Pisah: satu berkas jadi beberapa segmen** dan **Sambung: beberapa berkas jadi satu**. Setelah dipilih, langkah kedua di bawah ikut berubah.",
+            "Di «1 Masukkan subtitle» bisa mengunggah berkas atau menempel teks, salah masuk klik «Hapus». Halaman ini hanya membaca UTF-8 — encoding rusak (penuh tanda tanya atau kotak) pergi ke [[Perbaikan encoding|/repair.html]] dulu."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Dua tab di atas halaman pisah dan sambung",
+            "cap": "Pisah dan sambung adalah dua tab, setelah dipilih opsi di langkah kedua ikut berubah"
+          }
+        },
+        {
+          "h2": "Cara memotong",
+          "ps": [
+            "Di «2 Cara memotong» pilih dasar: **Durasi** (setiap X menit satu segmen) atau **Jumlah item** (setiap X item satu segmen), isi satu angka.",
+            "Centang «Tiap segmen dihitung ulang dari 0:00» maka tiap segmen dihitung dari awal — dipakai saat mengunggah per episode, tiap segmen diberikan terpisah ke pemutar. Tidak dicentang maka stempel waktu asli dipertahankan, segmen hasil potong masih cocok dengan posisi di film asli.",
+            "Hanya memotong di batas item subtitle: satu item yang sangat panjang melewati garis waktu akan tetap utuh di segmen sebelumnya."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Opsi durasi/jumlah item dan hitung ulang dari nol di halaman pisah",
+            "cap": "Potong menurut durasi atau jumlah item, bisa membuat tiap segmen mulai dari 0:00"
+          }
+        },
+        {
+          "h2": "Cara menyambung",
+          "ps": [
+            "Di «2 Cara menyambung» pilih cara: **Sambung berurutan** menggeser seluruh berkas berikutnya ke setelah titik akhir berkas sebelumnya, segmen tidak bertumpuk; **Jalin per waktu** mempertahankan stempel waktu asli tiap berkas, disusun menurut waktu mulai.",
+            "Beberapa berkas adalah paruh awal dan paruh akhir episode yang sama, atau sudah dipisah untuk diperiksa lalu perlu digabung kembali, pakai sambung berurutan; beberapa berkas yang memang seharusnya tampil bersamaan (misalnya track asli dan track terjemahan) pakai jalin per waktu.",
+            "Setelah disambung nomor urut disusun ulang otomatis, dialog tidak berubah satu kata."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Opsi sambung berurutan dan jalin per waktu di halaman sambung",
+            "cap": "Sambung berurutan cocok untuk paruh awal/akhir, jalin per waktu cocok untuk track asli dan track terjemahan"
+          }
+        },
+        {
+          "h2": "Cara mengambil hasilnya",
+          "ps": [
+            "Kolom «3 Hasil» di kanan mendukung ekspor **SRT** dan **VTT**, klik «Unduh» atau «Salin».",
+            "Saat memisah bisa «Unduh semua per segmen», menyimpan semua segmen sekali jalan, tidak perlu klik satu per satu."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Pilihan format SRT/VTT dan tombol unduh, unduh semua per segmen di area hasil",
+            "cap": "Hasil pemisahan bisa diunduh semua per segmen, setelah disambung langsung unduh atau salin"
+          }
+        },
+        {
+          "h2": "Apa yang tidak tersentuh",
+          "ps": [
+            "Dialog tidak berubah satu kata. Halaman ini hanya menyentuh «item mana masuk segmen mana» dan «nomor urut disusun bagaimana», tidak menyentuh isi item.",
+            "Saat memilih «Sambung berurutan», stempel waktu berkas berikutnya digeser seluruhnya — itu memang tuntutan penyambungan itu sendiri; memilih «Jalin per waktu» maka stempel waktu asli tiap berkas dipertahankan."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Segmen terakhir pendek sekali, wajar?** Wajar. Sisa yang tidak cukup satu panjang utuh menjadi segmen sendiri, tidak dipaksakan.",
+            "**Kalimat yang tepat berada di garis pemisah akan terpotong?** Tidak. Hanya memotong di batas item, item yang melewati garis waktu tetap di segmen sebelumnya.",
+            "**Setelah jalin per waktu, dua item dengan waktu persis sama disusun bagaimana?** Disusun menurut waktu mulai, bila waktu mulai sama urutan masukanmu dipertahankan.",
+            "**ASS bisa dipotong?** Halaman ini mendukung SRT dan VTT. ASS ubah dulu dengan [[Konversi format|/convert.html]] ke SRT atau VTT lalu diproses."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Subtitle diproses sepenuhnya di browser, tidak diunggah, tidak melewati server. Tutup halaman, isinya hilang."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Dua berkas yang perlu digabung jadi bilingual (bukan disambung jadi satu episode) pakai [[Subtitle efek dan gabung bilingual|/guides/merge.html]]; timeline bergeser keseluruhan pergi ke [[Penyesuaian timeline|/shift.html]]; volume satu season pakai [[Konversi massal|/batch.html]]; setelah selesai lewatkan [[Pemeriksaan subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "id": {
+      "seo": {
+        "title": "Cara memakai penanda waktu lirik – Putar · Tempel – AI-SRTSub",
+        "desc": "Masukkan musik, tempel lirik, sambil mendengar ketuk waktu tiap baris, ekspor LRC atau SRT. Spasi putar/jeda, Enter tandai baris ini, Z batalkan — tangan tidak lepas dari keyboard.",
+        "h1": "Cara memakai penanda waktu lirik",
+        "intro": "Masukkan musik, tempel lirik, sambil mendengar ketuk waktu tiap baris, ekspor LRC standar atau SRT. Audio hanya diputar di perangkat, tidak diunggah.",
+        "ctaText": "Buka penanda waktu lirik"
+      },
+      "body": [
+        {
+          "h2": "Alat ini menyelesaikan apa",
+          "ps": [
+            "Beri sebuah lagu berkas lirik yang bisa dinyanyikan mengikuti: satu kalimat satu baris, tiap baris membawa satu titik waktu. Pemutar mengenali LRC, track subtitle mengenali SRT, keduanya bisa diekspor."
+          ],
+          "ul": [
+            "**Tandai dari nol** —— tempel lirik teks biasa, sambil mendengar sambil mengetuk.",
+            "**Ubah yang sudah ada** —— impor LRC yang sudah ada, lanjut menandai dari baris pertama yang belum punya waktu.",
+            "**Ekspor dua jenis** —— LRC untuk pemutar, SRT untuk track subtitle video.",
+            "**Sepenuhnya keyboard** —— spasi putar/jeda, Enter tandai baris ini, Z batalkan."
+          ]
+        },
+        {
+          "h2": "1 Masukkan musik",
+          "ps": [
+            "Kolom pertama di kiri untuk mengunggah audio, **MP3, M4A, FLAC, WAV, OGG** semuanya bisa. Audio hanya diputar di perangkat, tidak diunggah.",
+            "Kualitas audio tidak memengaruhi ketepatan penandaan, tetapi sumber dengan vokal jelas lebih mudah didengar; versi live, versi dengan iringan terlalu keras akan jelas lebih sulit dicocokkan."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Area masukkan musik di alat penanda waktu lirik",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG semuanya bisa, audio hanya diputar di perangkat"
+          }
+        },
+        {
+          "h2": "2 Tempel lirik",
+          "ps": [
+            "Kolom kedua untuk menempel lirik, **satu baris satu kalimat**, baris kosong dilewati otomatis. Setelah ditempel klik «Urai lirik».",
+            "Menempel berkas LRC yang sudah ada juga bisa — label waktu `[mm:ss.xx]` dikenali otomatis, setelah diimpor lanjut menandai dari baris pertama yang belum punya waktu, kalimat yang sudah bertanda waktu tidak perlu diulang."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Area tempel lirik dan tombol urai lirik",
+            "cap": "Tempel satu baris satu kalimat, atau tempel seluruh berkas LRC agar alat membaca waktu yang sudah ada"
+          }
+        },
+        {
+          "h2": "3 Sambil mendengar sambil menandai",
+          "ps": [
+            "Putar musik, saat mendengar momen sebuah kalimat mulai tekan Enter (atau klik «Tandai baris ini»), waktu kalimat itu tercatat, kursor otomatis pindah ke kalimat berikutnya.",
+            "Pintasan: **spasi** putar/jeda, **Enter** tandai kalimat ini, **Z** batalkan satu kalimat. Saat sedang diputar menekan Enter paling praktis, tidak perlu berpindah antara mouse dan keyboard.",
+            "Salah tandai tekan Z untuk membatalkan kalimat itu lalu tandai lagi; kalimat yang tidak ingin ditandai (interlude, bagian instrumental) klik «Lewati baris ini», tidak akan muncul di hasil ekspor."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Area sambil mendengar sambil menandai: putar, tandai baris ini, batalkan, lewati baris ini",
+            "cap": "Spasi putar/jeda, Enter tandai kalimat ini, Z batalkan, tangan tidak lepas dari keyboard"
+          }
+        },
+        {
+          "h2": "4 Ekspor",
+          "ps": [
+            "Setelah selesai pindah ke kolom keempat: **Unduh LRC** untuk pemutar, **Unduh SRT** untuk track subtitle video, juga bisa «Salin» langsung.",
+            "Hanya mengekspor kalimat yang sudah bertanda waktu; kalimat yang dilewati tidak masuk berkas. Saat mengekspor SRT, tiap kalimat berlangsung sampai kalimat berikutnya mulai, kalimat terakhir memakai 2 detik sebagai cadangan."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Area ekspor dengan unduh LRC, unduh SRT dan tombol salin",
+            "cap": "LRC untuk pemutar, SRT untuk video; hanya mengekspor kalimat yang sudah bertanda waktu"
+          }
+        },
+        {
+          "h2": "Apa yang tidak tersentuh",
+          "ps": [
+            "Teks lirik tidak ditulis ulang. Penandaan hanya menambahkan satu titik waktu untuk tiap baris, tidak menyentuh kata yang kamu tempel.",
+            "Saat mengimpor LRC yang sudah ada, baris yang punya label waktu mempertahankan waktu aslinya, hanya melanjutkan dari baris pertama yang belum punya waktu."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Hasil ekspor kurang beberapa kalimat?** Kalimat yang dilewati dan kalimat yang belum bertanda waktu tidak masuk berkas. Kembali ke langkah tiga untuk melengkapi, atau pastikan memang seharusnya dilewati.",
+            "**Waktu di JSON bisa diubah?** Setelah selesai ingin menggeser sedikit, ekspor SRT lalu pakai [[Penyesuaian timeline|/shift.html]] untuk menggeser atau menskalakan proporsional.",
+            "**Sebaiknya ekspor LRC atau SRT?** Untuk pemutar musik (foobar2000, aplikasi musik, segala pemutar) pakai LRC; untuk ditempel ke video atau diproses lagi dengan alat subtitle pakai SRT.",
+            "**Satu lagu butuh berapa lama?** Tergantung jumlah baris lirik dan ketepatan yang kamu mau. Lagu tiga puluhan baris, setelah terbiasa beberapa menit bisa selesai; kalau ingin cocok per kata akan lebih lambat."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Audio dan lirik diproses sepenuhnya di browser, tidak diunggah, tidak melewati server. Audio hanya didekode dan diputar di perangkat."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Sudah punya LRC dan ingin jadi subtitle lihat [[LRC ke SRT|/guides/lrc-to-srt.html]]; cara berpikir dan jebakan saat menandai waktu lihat [[Cara menandai waktu lirik LRC|/guides/how-to-make-lrc-file.html]]; SRT hasil ekspor waktunya tidak pas pakai [[Penyesuaian timeline|/shift.html]]; hasil akhir lewatkan [[Pemeriksaan subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "id": {
+      "seo": {
+        "title": "Cara mengekstrak subtitle tertanam di video – AI-SRTSub",
+        "desc": "Baca langsung track subtitle tertanam di MKV, WebM, MP4, MOV, ekspor SRT / VTT / ASS / TXT. Video tidak diunggah, tidak ditranskode, track multibahasa didaftar satu per satu.",
+        "h1": "Cara mengekstrak subtitle tertanam di video",
+        "intro": "Baca langsung track subtitle yang tertanam di MKV / MP4 lalu ekspor menjadi SRT — video tidak diunggah, diproses langsung di browser.",
+        "ctaText": "Buka ekstrak subtitle video"
+      },
+      "body": [
+        {
+          "h2": "Alat ini menyelesaikan apa",
+          "ps": [
+            "Subtitle bisa tertanam di dalam berkas video, tidak berdiri sendiri sebagai berkas. Untuk mengubah, menerjemahkan, membuat bilingual, harus diambil dulu — halaman ini hanya melakukan itu."
+          ],
+          "ul": [
+            "**Mengenali empat container** —— MKV / WebM dan MP4 / MOV.",
+            "**Mengenali empat jenis track** —— track teks biasa, track ASS, track WebVTT, track mov_text / tx3g milik MP4.",
+            "**Ekspor empat format** —— SRT / VTT / ASS / TXT.",
+            "**Tidak diunggah, tidak ditranskode** —— dibaca per potongan menurut offset, berkas beberapa GB juga tidak memakan memori."
+          ]
+        },
+        {
+          "h2": "1 Masukkan video",
+          "ps": [
+            "Kolom pertama tarik berkas video ke sana atau klik pilih berkas. Hanya mengenali **MKV / WebM** dan **MP4 / MOV**, container lain tidak akan terbaca track-nya.",
+            "Berkas tidak meninggalkan komputer — tidak ada langkah unggah. Alat membaca per potongan menurut offset, film beberapa GB juga tidak memakan memori, tetapi pembacaan pertama harus menunggu pemindaian info track selesai."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Area masukkan video di halaman ekstrak subtitle tertanam",
+            "cap": "Mendukung MKV / WebM dan MP4 / MOV, berkas tidak meninggalkan perangkat"
+          }
+        },
+        {
+          "h2": "2 Track subtitle tertanam",
+          "ps": [
+            "Setelah terbaca, kolom kedua mendaftar track subtitle di dalam berkas **satu track satu baris**, biasanya dengan bahasa dan nama track (misalnya «Chinese», «English», «Subtitle wajib»). Klik track mana maka diekstrak track itu.",
+            "Bila berkas hanya punya satu track subtitle, ekstraksi dimulai otomatis, tidak perlu klik.",
+            "**Subtitle gambar tidak bisa diekstrak**: PGS Blu-ray, subtitle DVD adalah gambar yang dicetak, tidak ada teks untuk diambil — halaman akan menyatakan jelas, jenis itu perlu OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Daftar track subtitle tertanam, satu track satu baris",
+            "cap": "Satu track satu baris; bila hanya satu track ekstraksi dimulai otomatis"
+          }
+        },
+        {
+          "h2": "3 Hasil",
+          "ps": [
+            "Kolom «3 Hasil» di kanan menampilkan teks subtitle hasil ekstraksi, di atasnya pilih format ekspor: **SRT / VTT / ASS / TXT**, klik «Unduh» atau «Salin».",
+            "Bila track sumber adalah ASS, kepala gaya dan resolusi bawaan track dibawa kembali apa adanya — memilih ekspor ASS menjaga informasi ini, memilih SRT hanya membawa teks."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Area hasil dan pilihan format SRT / VTT / ASS / TXT",
+            "cap": "Empat format ekspor; kepala gaya dan resolusi track ASS dibawa apa adanya"
+          }
+        },
+        {
+          "h2": "Apa yang tidak tersentuh",
+          "ps": [
+            "Berkas video itu sendiri sama sekali tidak berubah — hanya dibaca, tidak ditulis, tidak ditranskode, juga tidak dikemas ulang.",
+            "Isi subtitle diambil apa adanya, tidak menebak encoding, tidak memperbaiki timeline. Kalau subtitle hasil ekstraksi berantakan, itu masalah encoding track sumber, pergi ke [[Perbaikan encoding|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Subtitle gambar (PGS / DVD) benar-benar tidak ada cara?** Di halaman ini tidak — itu gambar, tidak ada lapisan teks. Harus OCR dulu, halaman ini tidak melakukan itu.",
+            "**Subtitle hasil ekstraksi waktunya salah?** Halaman ini tidak memperbaiki timeline, apa adanya. Bergeser keseluruhan atau masalah proporsi pakai [[Penyesuaian timeline|/shift.html]].",
+            "**Mengapa lama baru ada respons?** Berkas besar harus memindai info track per potongan menurut offset, makin besar makin lama; proses ini berjalan di perangkat, tidak terkait kecepatan internet.",
+            "**Berkas subtitle eksternal bisa pakai halaman ini?** Tidak perlu — .srt / .ass eksternal langsung masuk [[Konversi format|/convert.html]] atau alat lain, halaman ini untuk subtitle yang «tertanam di video»."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Video dibaca sepenuhnya secara lokal di browser, tidak diunggah, tidak ditranskode, tidak melewati server. Tutup halaman, isi yang telah dibaca dilepas."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Setelah diambil perlu diterjemahkan masuk ke [[Terjemahan subtitle|/translate.html]], perlu dibuat bilingual lihat [[Dua cara membuat subtitle bilingual|/guides/make-bilingual-subtitles.html]]; beda tertanam dan eksternal, jenis mana yang bisa diambil, lihat [[Cara mengambil subtitle yang tertanam di video|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "id": {
+      "seo": {
+        "title": "Cara mengganti istilah subtitle secara massal – AI-SRTSub",
+        "desc": "Tabel istilah satu baris satu aturan, pisahkan kata lama dan baru dengan ->, =>, → atau Tab, baris berawalan # adalah komentar. Cocokkan seluruh kata, setiap perubahan didaftar dan bisa dibatalkan.",
+        "h1": "Cara mengganti istilah subtitle secara massal",
+        "intro": "Satu tabel istilah menyamakan cara penyebutan di seluruh berkas subtitle sekaligus — timeline, gaya ASS dan blok NOTE VTT tidak berubah satu karakter.",
+        "ctaText": "Buka ganti istilah"
+      },
+      "body": [
+        {
+          "h2": "Alat ini menyelesaikan apa",
+          "ps": [
+            "Di subtitle, kata yang sama diterjemahkan berbeda di tempat lain, nama orang dan tempat mengikuti terjemahan mesin, menerima subtitle orang lain harus diubah ke kebiasaan sendiri — perubahan ini punya ciri sama: mengubah kata, bukan struktur. Halaman ini hanya mengubah kata."
+          ],
+          "ul": [
+            "**Samakan nama terjemahan** —— nama orang, nama tempat, kata khusus konsisten dari awal sampai akhir.",
+            "**Perbaiki massal** —— satu kata yang salah diterjemahkan mesin, diganti seluruh berkas sekaligus.",
+            "**Ikuti kebiasaan sendiri** —— subtitle orang lain disusun ulang istilahnya menurut caramu.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** enam format dikenali."
+          ]
+        },
+        {
+          "h2": "Dua hal: subtitle dan tabel istilah",
+          "ps": [
+            "Kolom «1 Masukkan subtitle» di kiri untuk mengunggah berkas subtitle, juga bisa menempel isi subtitle langsung; salah masuk klik «Hapus».",
+            "Kolom «2 Tabel istilah» di kanan untuk menulis aturan. **Satu baris satu aturan**, pisahkan kata lama dan kata baru dengan `->`, `=>`, `→` atau Tab, keempat cara dikenali; baris berawalan `#` adalah komentar, tidak ikut penggantian.",
+            "Kalau tidak yakin formatnya klik «Isi contoh», ubah mengikuti contoh."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Area masukkan subtitle dan area input tabel istilah di halaman ganti istilah",
+            "cap": "Kiri untuk subtitle, kanan untuk aturan; satu baris satu aturan, dipisah dengan ->"
+          }
+        },
+        {
+          "h2": "Bagaimana menulis tabel istilah",
+          "ps": [
+            "Satu baris satu aturan, kiri adalah kata sekarang, kanan adalah kata pengganti. Misalnya `Thor -> Dewa Petir` akan mengganti «Thor» di seluruh berkas menjadi «Dewa Petir».",
+            "Komentar diawali `#`, cocok untuk memberi catatan pada satu kelompok aturan (seperti «# Samakan nama musim satu»), juga praktis untuk mematikan sementara satu aturan — tambahkan `#` di depan, tidak perlu menghapus.",
+            "Aturan dijalankan dari atas ke bawah; kata hasil penggantian satu aturan akan dipindai lagi oleh aturan berikutnya. Bila ada ketergantungan urutan (misalnya dulu ubah A jadi B, lalu ubah B jadi C) perlu diperhatikan."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Baris-baris aturan penggantian di kotak input tabel istilah",
+            "cap": "Satu baris satu aturan; baris berawalan # adalah komentar, bisa dipakai mematikan sementara satu aturan"
+          }
+        },
+        {
+          "h2": "Tiga tombol masing-masing mengatur apa",
+          "ps": [
+            "**Cakupan**: `Semua` / `Hanya baris 1` / `Hanya baris 2`. Di subtitle bilingual bila hanya ingin mengubah terjemahan pilih «Hanya baris 2»; item yang hanya punya satu baris tidak disentuh di dua mode satu baris ini — alat tidak menebak mana yang asli.",
+            "**Cocokkan seluruh kata**: hanya mengganti yang berdiri sendiri sebagai kata, `art` tidak akan menyentuh `start`. Untuk bahasa seperti Mandarin dan Jepang yang tidak memakai spasi, tombol ini tidak berlaku — tetap diganti menurut potongan teks.",
+            "**Bedakan huruf besar kecil**: bawaan tidak membedakan, `CEO` dan `ceo` diganti bersamaan; dicentang maka hanya yang penulisannya persis sama."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Tombol cakupan, cocokkan seluruh kata dan bedakan huruf besar kecil di bawah tabel istilah",
+            "cap": "Cakupan menentukan baris mana yang diubah, cocokkan seluruh kata dan huruf menentukan seketat apa pencocokan"
+          }
+        },
+        {
+          "h2": "Apa yang berubah, bisa dibatalkan per item",
+          "ps": [
+            "«3 Hasil» selain subtitle setelah penggantian juga **mendaftar tiap perubahan**: item mana, baris ke berapa, dari apa menjadi apa.",
+            "Item yang tidak ingin diubah cukup diklik di daftar untuk mengembalikannya, tidak perlu mengubah tabel istilah lalu menjalankan ulang. Setelah yakin klik «Unduh» atau «Salin»."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Area hasil dan daftar perubahan per item",
+            "cap": "Perubahan didaftar per item, yang tidak ingin diubah cukup diklik untuk dikembalikan"
+          }
+        },
+        {
+          "h2": "Apa yang tidak tersentuh",
+          "ps": [
+            "**Timeline, baris gaya ASS dan blok `NOTE` VTT tidak berubah satu karakter.** Penggantian hanya berlaku pada teks dialog, tidak menyentuh baris struktur.",
+            "Tabel istilah tidak otomatis mengubah berkas subtitle-mu — hasilnya adalah keluaran baru, berkas asli tidak berubah."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Mengapa ada kata yang tidak terganti?** Periksa cakupan dulu: memilih «Hanya baris 2» maka item satu baris tidak disentuh; lalu periksa cocokkan seluruh kata, bila dicentang kemunculan yang bukan kata utuh tidak diganti.",
+            "**Mandarin dicentang cocokkan seluruh kata kok masih diganti menurut potongan?** Wajar. Mandarin dan Jepang tidak memakai spasi, alat tidak punya cara menentukan batas kata, mode ini tidak berlaku.",
+            "**Salah ganti lalu ingin mundur semua?** Mundurkan per item di daftar perubahan; ingin mulai dari awal kosongkan tabel istilah dan masukkan subtitle lagi sekali.",
+            "**Baris gaya ASS bisa ikut terganti?** Tidak. Baris gaya dan blok `NOTE` tidak termasuk cakupan penggantian, hanya teks dialog yang ikut."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Subtitle dan tabel istilah diproses sepenuhnya di browser, tidak diunggah, tidak melewati server. Tabel istilah tidak disimpan, lain kali dibuka kosong."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Perlu membuat tabel istilah, bagaimana merawatnya sepanjang season lihat [[Glosarium: menyamakan istilah sepanjang season|/guides/subtitle-glossary.html]]; isi kotor (watermark, keterangan tunarungu) lewatkan [[Bersihkan subtitle|/clean.html]] dulu; setelah nama terjemahan disamakan ingin menerjemahkan ke bahasa lain masuk ke [[Terjemahan subtitle|/translate.html]]; hasil akhir lewatkan [[Pemeriksaan subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "id": {
+      "seo": {
+        "title": "Cara mengambil subtitle yang tertanam di video – AI-SRTSub",
+        "desc": "Saat subtitle tertanam di video, bagaimana mengambilnya: MKV / WebM / MP4 / MOV memuat track apa, beda track teks, ASS, WebVTT, mov_text, dan mengapa subtitle gambar tidak bisa diambil.",
+        "h1": "Cara mengambil subtitle yang tertanam di video",
+        "intro": "Subtitle bisa berada di dalam berkas video, bisa juga berdiri sendiri di luar. Saat di dalam, ia adalah salah satu track di container — mengambilnya tidak ada hubungannya dengan transcoding.",
+        "ctaText": "Buka ekstrak subtitle video"
+      },
+      "body": [
+        {
+          "h2": "Subtitle di mana: tertanam dan eksternal",
+          "ps": [
+            "Berkas video (MKV, MP4) adalah container, di dalamnya sekaligus memuat track video, track audio, track subtitle. Saat subtitle berada di dalam disebut **subtitle tertanam** atau **subtitle embedded**; berkas .srt / .ass yang berdiri sendiri di luar disebut **subtitle eksternal**.",
+            "Subtitle eksternal bisa langsung dipakai. Masalahnya ada pada yang tertanam: kamu ingin mengubah, menerjemahkan, memakai track asli untuk bilingual, tetapi tidak punya berkas subtitle — harus membaca track keluar dari container dulu. Langkah ini bukan transcoding, tidak mengodekan ulang video, hanya mengambil potongan data yang sudah tersimpan di container."
+          ]
+        },
+        {
+          "h2": "Container mana memuat apa",
+          "ps": [
+            "Container berbeda memuat format subtitle berbeda, tingkat kesulitan mengambilnya juga berbeda:"
+          ],
+          "ul": [
+            "**MKV / WebM** —— paling longgar, bisa memuat track teks biasa, track ASS, track WebVTT, juga sering punya track multibahasa.",
+            "**MP4 / MOV** —— umumnya track `mov_text` / `tx3g`, teks biasa, membawa sedikit informasi gaya.",
+            "**Track teks biasa** —— diambil langsung jadi teks, langsung menjadi SRT.",
+            "**Track ASS** —— membawa kepala gaya dan resolusi, ekspor ASS menjaga itu, ekspor SRT hanya tersisa teks.",
+            "**Subtitle gambar (PGS Blu-ray, subtitle DVD)** —— menyimpan gambar, bukan teks, tidak bisa diambil teksnya."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Track subtitle yang didaftar di halaman ekstrak subtitle tertanam",
+            "cap": "Satu track satu baris, biasanya dengan bahasa dan nama track; hanya satu track maka ekstraksi dimulai otomatis"
+          }
+        },
+        {
+          "h2": "Mengapa subtitle gambar tidak bisa diambil",
+          "ps": [
+            "PGS Blu-ray dan subtitle DVD menyimpan bukan karakter, melainkan gambar demi gambar dengan kanal transparan. Saat pemutar menampilkannya, itu «menempel gambar», bukan «merender teks».",
+            "Jadi di track jenis ini tidak ada teks untuk dibaca — bukan alat tidak mendukung, memang di sana tidak ada teks. Halaman akan menyatakan jelas saat menemui track seperti ini.",
+            "Untuk mendapat teks hanya ada satu jalan: kenali dulu teks di dalam gambar (OCR), lalu buat subtitle. Itu tahap lain, bukan hal yang sama dengan «mengambil track»."
+          ]
+        },
+        {
+          "h2": "Setelah diambil biasanya masih perlu diproses",
+          "ps": [
+            "Subtitle hasil ekstraksi adalah «apa adanya», alat tidak menebak encoding, juga tidak memperbaiki timeline. Jadi dua hal sangat umum:",
+            "Pertama **teks berantakan** — masalah encoding track sumber itu sendiri, diambil tetap berantakan, harus ke [[Cara memperbaiki encoding|/guides/repair.html]] mengenali encoding; kedua **waktu salah** — sumber dengan atau tanpa logo pembuka, laju frame tidak cocok, hasilnya bergeser seluruhnya, pakai [[Penyesuaian timeline|/shift.html]] untuk menggeser atau menskalakan proporsional.",
+            "Setelah itu perlu diterjemahkan masuk ke [[Terjemahan subtitle|/translate.html]], perlu dibuat bilingual lihat [[Dua cara membuat subtitle bilingual|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Area hasil dan empat format ekspor SRT / VTT / ASS / TXT",
+            "cap": "Subtitle hasil ekstraksi bisa diekspor menjadi empat format, kepala gaya dan resolusi track ASS dibawa apa adanya"
+          }
+        },
+        {
+          "h2": "Beberapa hal yang mudah disalahpahami",
+          "ps": [
+            "**Mengambil subtitle bukan hardsub.** Tidak mengodekan ulang video, kualitas gambar dan track audio tidak terpengaruh sama sekali.",
+            "**Mengambil tidak memengaruhi berkas asli.** Hanya membaca tidak menulis, berkas video tidak berubah satu byte pun.",
+            "**Berkas besar lambat bukan masalah internet.** Alat memindai info track per potongan menurut offset, makin besar makin lama, semuanya berjalan di perangkat.",
+            "**Subtitle eksternal tidak perlu lewat halaman ini.** Kalau punya .srt / .ass langsung masuk [[Konversi format|/convert.html]], hanya yang tertanam di video yang perlu mengambil track dulu."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Cara lengkap lihat [[Cara mengekstrak subtitle tertanam di video|/guides/videosub.html]]; setelah diambil perlu diterjemahkan masuk ke [[Terjemahan subtitle|/translate.html]], perlu dibuat bilingual lihat [[Dua cara membuat subtitle bilingual|/guides/make-bilingual-subtitles.html]]; teks berantakan pergi ke [[Perbaikan encoding|/repair.html]] dulu."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "id": {
+      "seo": {
+        "title": "Cara menandai waktu lirik LRC – AI-SRTSub",
+        "desc": "Membuat berkas lirik LRC dari nol: tempel satu baris satu kalimat, sambil mendengar ketuk waktu, tiga pintasan umum, kapan melewati satu baris, dan cara menangani waktu yang bergeser.",
+        "h1": "Cara menandai waktu lirik LRC",
+        "intro": "LRC adalah «satu kalimat lirik + satu titik waktu». Proses membuatnya disebut penandaan waktu: mencatat momen tiap kalimat mulai.",
+        "ctaText": "Buka penanda waktu lirik"
+      },
+      "body": [
+        {
+          "h2": "Menandai waktu itu sedang apa",
+          "ps": [
+            "Struktur berkas LRC sangat sederhana: satu baris satu kalimat lirik, di depannya digantung label waktu `[mm:ss.xx]`. Pemutar membaca sampai baris mana, menampilkan kalimat itu pada saat tersebut.",
+            "Jadi seluruh pekerjaan «membuat berkas LRC» adalah memberi tiap kalimat lirik satu titik waktu — mesin tidak bisa menggantikanmu, karena harus menilai «kalimat ini mulai dinyanyikan dari mana», hanya bisa mengandalkan pendengaran."
+          ]
+        },
+        {
+          "h2": "Satu lagu perlu berapa kali penandaan",
+          "ps": [
+            "Sebaiknya luangkan satu menit memikirkan matang sebelum mulai, bisa menghemat sebagian besar pekerjaan ulang:"
+          ],
+          "ul": [
+            "**Satu kali** —— vokal jelas, baris lirik sedikit, hanya perlu kira-kira mengikuti, sekali putar dan tandai sudah cukup.",
+            "**Dua kali** —— putaran pertama menandai kasar, putaran kedua memeriksa per kalimat, cara umum bila ingin tepat.",
+            "**Impor lalu ubah** —— sudah ada LRC, hanya beberapa kalimat yang belum pas, impor lalu lanjut dari baris pertama tanpa waktu.",
+            "**Interlude dan bagian instrumental** tidak perlu ditandai —— klik «Lewati baris ini», tidak masuk berkas ekspor.",
+            "**Vokal bertumpuk** hanya bisa dicatat satu titik mulai, bagian bertumpuk dihitung mengikuti kalimat vokal utama."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Area sambil mendengar sambil menandai: putar, tandai baris ini, batalkan, lewati baris ini",
+            "cap": "Saat diputar menekan Enter paling praktis; salah tandai tekan Z batalkan kalimat itu lalu ulangi"
+          }
+        },
+        {
+          "h2": "Langkah tempel lirik menentukan lancar atau tidaknya",
+          "ps": [
+            "Lirik ditempel satu baris satu kalimat, baris kosong dilewati otomatis. Cara memecah baris di langkah ini adalah baris yang ditandai nanti — kalau menempel memecah beberapa baris tambahan, menandai juga harus mengklik beberapa kali tambahan.",
+            "Menempel LRC yang sudah ada juga bisa: label waktu `[mm:ss.xx]` dikenali otomatis, setelah diimpor **lanjut dari baris pertama yang belum punya waktu**, kalimat yang sudah bertanda waktu tidak perlu diulang.",
+            "Jadi berkas LRC yang baru separuh ditandai bisa disimpan, lain kali ditempel lagi dan lanjut."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Area tempel lirik dan tombol urai lirik",
+            "cap": "Satu baris satu kalimat; menempel seluruh LRC juga bisa membaca waktu yang ada, lalu lanjut ke bawah"
+          }
+        },
+        {
+          "h2": "Ekspor LRC atau SRT",
+          "ps": [
+            "**Untuk pemutar musik ekspor LRC.** foobar2000, berbagai pemutar, perangkat dengan tampilan lirik semuanya mengenali.",
+            "**Perlu ditempel ke video atau diproses lagi ekspor SRT.** Track subtitle video, alat subtitle, perangkat lunak penyuntingan mengenali SRT. Saat ekspor tiap kalimat berlangsung sampai kalimat berikutnya mulai, kalimat terakhir memakai 2 detik sebagai cadangan.",
+            "Keduanya hanya mengekspor kalimat yang sudah bertanda waktu — kalimat yang dilewati tidak masuk berkas."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Area ekspor dengan unduh LRC, unduh SRT dan tombol salin",
+            "cap": "LRC untuk pemutar, SRT untuk video; hanya mengekspor kalimat yang sudah bertanda waktu"
+          }
+        },
+        {
+          "h2": "Beberapa hal yang mudah disalahpahami",
+          "ps": [
+            "**Setelah selesai bergeser sedikit, pakai penggeseran.** Ekspor SRT lalu pakai [[Penyesuaian timeline|/shift.html]] menggeser keseluruhan, jauh lebih cepat daripada menandai ulang per kalimat.",
+            "**Makin ke belakang makin bergeser itu masalah laju.** Saat kecepatan putar audio tidak cocok dengan saat direkam, makin ke belakang makin bergeser, harus diskalakan proporsional bukan digeser.",
+            "**Pintasan harus dipakai berurutan agar lancar.** Spasi putar/jeda, Enter tandai kalimat ini, Z batalkan satu kalimat — saat diputar langsung tekan Enter, tidak perlu berpindah antara mouse dan keyboard.",
+            "**Kualitas audio memengaruhi ketepatan.** Sumber dengan vokal jelas lebih mudah didengar; versi live, versi dengan iringan terlalu keras jelas lebih sulit dicocokkan."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Cara lengkap lihat [[Cara memakai penanda waktu lirik|/guides/lrc.html]]; sudah punya LRC ingin jadi subtitle lihat [[LRC ke SRT|/guides/lrc-to-srt.html]]; SRT hasil ekspor waktunya tidak pas pakai [[Penyesuaian timeline|/shift.html]]; hasil akhir lewatkan [[Pemeriksaan subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "id": {
+      "seo": {
+        "title": "Glosarium: menyamakan istilah sepanjang season – AI-SRTSub",
+        "desc": "Glosarium subtitle menyelesaikan «kata yang sama tidak konsisten»: kapan perlu dibuat, bagaimana memakai satu tabel sepanjang season, mengapa cocokkan seluruh kata tidak berlaku untuk Mandarin.",
+        "h1": "Glosarium: menyamakan istilah sepanjang season",
+        "intro": "Satu tokoh di episode 1 disebut A, di episode 7 disebut B, penonton akan mengira itu dua tokoh. Glosarium mencegah hal itu — ia mematok «seharusnya disebut apa».",
+        "ctaText": "Buka ganti istilah"
+      },
+      "body": [
+        {
+          "h2": "Glosarium menyelesaikan «ketidakcocokan»",
+          "ps": [
+            "Kesalahan istilah di subtitle terbagi dua: satu «kata ini salah diterjemahkan», satu «kata yang sama diterjemahkan berbeda dari awal sampai akhir». Yang pertama harus memperbaiki kamus, yang kedua baru urusan glosarium.",
+            "Jenis kedua lebih umum dan lebih sulit ditemukan: episode 1 menerjemahkan `Thor` menjadi «Thor», episode 7 diganti «Dewa Petir», dilihat per episode tidak ada masalah, dilihat berurutan penonton akan mengira muncul tokoh baru. Yang dilakukan glosarium adalah menjadikan «film ini konsisten disebut Dewa Petir» satu aturan yang bisa dijalankan, diterapkan sekali ke seluruh berkas subtitle."
+          ]
+        },
+        {
+          "h2": "Kapan sebuah tabel layak dibuat",
+          "ps": [
+            "Tidak setiap berkas subtitle perlu glosarium. Kasus yang layak biasanya:"
+          ],
+          "ul": [
+            "**Satu season / satu seri** —— makin banyak episode, peluang tidak konsisten makin tinggi.",
+            "**Kata khusus padat** —— nama orang, nama tempat, nama organisasi, kata ciptaan di dalam karya.",
+            "**Dikerjakan banyak orang** —— beberapa orang membagi episode, kebiasaan tiap orang berbeda.",
+            "**Menerima subtitle orang lain** —— perlu diubah ke kebiasaan sendiri (atau klien).",
+            "**Menyamakan setelah terjemahan mesin** —— terjemahan mesin bisa memberi beberapa versi untuk kata yang sama."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Aturan penggantian yang dikelompokkan menurut jenis di tabel istilah",
+            "cap": "Pakai komentar berawalan # untuk mengelompokkan aturan, sekaligus praktis mematikan sementara satu aturan"
+          }
+        },
+        {
+          "h2": "Bagaimana menjaga satu tabel sepanjang season",
+          "ps": [
+            "Glosarium harus **dirawat bertahap**: episode 1 mematok nama orang, berikutnya setiap menemui kata baru tambahkan satu baris, setelah satu season selesai tabelnya lengkap. Lain kali mengerjakan season dua dari seri yang sama, pakai itu sebagai titik awal.",
+            "Aturan ditulis lebih longgar lebih praktis — setelah memutuskan seragam disebut «Dewa Petir», tulis juga «Thor -> Dewa Petir», sehingga saat menerima subtitle orang lain bisa ikut disamakan.",
+            "Setelah diubah wajib melihat **daftar perubahan**: ia mendaftar tiap item, baris ke berapa, dari apa menjadi apa. Daftar adalah satu-satunya tempat memastikan «sudah benar, tidak berlebihan», item yang tidak ingin diubah cukup diklik untuk dikembalikan."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Daftar perubahan per item di area hasil",
+            "cap": "Perubahan didaftar per item, yang tidak ingin diubah cukup diklik untuk dikembalikan"
+          }
+        },
+        {
+          "h2": "Perubahan mana yang tidak seharusnya diserahkan ke glosarium",
+          "ps": [
+            "Glosarium mengubah **kata**. Tiga hal ini tidak diurusnya, juga tidak seharusnya:",
+            "**Tata bahasa dan pola kalimat** —— satu kata tidak bisa berubah menjadi satu kalimat, perbaikan tingkat kalimat harus kembali ke [[Terjemahan subtitle|/translate.html]] atau dikerjakan manual.",
+            "**Pembersihan isi** —— watermark iklan, keterangan tunarungu termasuk membuang seluruh baris, masuk ke [[Bersihkan subtitle|/clean.html]], aturan glosarium adalah untuk mengganti, bukan untuk menghapus baris.",
+            "**Timeline** —— glosarium tidak menyentuh waktu. Bergeser keseluruhan atau masalah proporsi pergi ke [[Penyesuaian timeline|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Beberapa hal yang mudah disalahpahami",
+          "ps": [
+            "**Mandarin dicentang cocokkan seluruh kata masih diganti menurut potongan — wajar.** Mandarin dan Jepang tidak memakai spasi, alat tidak punya cara menentukan batas kata, mode ini tidak berlaku, perlindungan seperti `art` tidak menyentuh `start` hanya berlaku untuk Inggris.",
+            "**Urutan memengaruhi hasil.** Aturan dijalankan dari atas ke bawah, kata hasil satu aturan masih dipindai aturan berikutnya. Dulu ubah A jadi B, lalu ubah B jadi C, akhirnya mendapat C.",
+            "**Hanya mengubah terjemahan harus memilih cakupan.** Di subtitle bilingual hanya mengubah baris 2 maka pilih «Hanya baris 2»; item satu baris tidak disentuh di dua mode ini — alat tidak menebak mana yang asli.",
+            "**Glosarium tidak disimpan.** Setiap kali dibuka kosong, perlu menyimpan sendiri berkas teks untuk diteruskan."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Cara lengkap lihat [[Cara mengganti istilah subtitle secara massal|/guides/glossary.html]]; isi kotor lewatkan [[Bersihkan subtitle|/clean.html]] dulu; setelah nama terjemahan disamakan ingin menerjemahkan ke bahasa lain masuk ke [[Terjemahan subtitle|/translate.html]]; hasil akhir lewatkan [[Pemeriksaan subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

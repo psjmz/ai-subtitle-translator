@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "da": {
+      "seo": {
+        "title": "Flet og stil undertekster – Fletning, stil, eksport – AI-SRTSub",
+        "desc": "Flet to filer til et tosproget spor, byg en eksisterende tosproget fil om, eller giv en etsproget fil stil: parringsmetoder, ASS- og VTT-skabeloner og valg af eksportformat.",
+        "h1": "Sådan fletter du tosprogede undertekster og sætter effekter",
+        "intro": "Sæt to filer sammen til et tosproget spor, eller giv underteksterne stil direkte: skrift, farve, kontur og placering som du ser det, og forhåndsvisningen svarer til eksporten.",
+        "ctaText": "Åbn værktøjet til effektundertekster"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Denne ene side dækker tre opgaver: flette en original og en oversættelse til én tosproget fil, justere rækkefølge og stil i en fil der allerede er tosproget, og give en etsproget fil effekter. Alle tre deler de samme stilparametre og samme forhåndsvisning."
+          ],
+          "ul": [
+            "**Flet to filer** — du har originalen og oversættelsen; sæt dem sammen til én tosproget fil og eksportér.",
+            "**Juster en tosproget fil** — den er allerede tosproget, men rækkefølgen eller stilen er forkert; byg den om.",
+            "**Etsproget fil** — kun én fil; giv den skrift, kontur og placering.",
+            "Du skifter mellem de tre med fanerne til venstre; stilområdet og forhåndsvisningen er fælles."
+          ]
+        },
+        {
+          "h2": "Tre opgaver, én side",
+          "ps": [
+            "Øverst er der tre faner: **Flet to filer**, **Juster en tosproget fil**, **Etsproget fil**. Valget afgør, hvor mange inputkolonner der vises til venstre.",
+            "Ved fletning står der to kolonner til venstre, »1 Originals undertekster« og »2 Oversatte undertekster«; begge tager imod en uploadet fil eller tekst indsat direkte. Justering og stilisering kræver kun én kolonne."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "De tre faner øverst i værktøjet til effektundertekster og inputområdet til venstre",
+            "cap": "Tre faner øverst; vælger du »Flet to filer«, kommer der en original- og en oversættelseskolonne til venstre"
+          }
+        },
+        {
+          "h2": "Hvordan to filer parres",
+          "ps": [
+            "Det første punkt under »3 Fletteindstillinger« er parringsmetoden: **Efter rækkefølge · originalens tidslinje**, **Efter tidslinje · originalens tidslinje**, **Efter rækkefølge · oversættelsens tidslinje**.",
+            "Når begge filer har samme antal poster i samme rækkefølge, er parring efter rækkefølge sikrest. Når antallet ikke stemmer (den ene side har slået poster sammen, den anden delt dem), så par efter tidslinje og lad værktøjet matche efter nærhed. Hvilken tidslinje der skal bruges, afhænger af, hvilken fil der er mest præcis — som regel originalen.",
+            "Nedenunder står tekststruktur (auto-genkend / to linjer pr. post / skiftende par) og rækkefølge (original øverst / oversættelse øverst)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Parringsmetode, tekststruktur og rækkefølge under fletteindstillinger",
+            "cap": "Parringsmetoden afgør, hvad der hører sammen, og her vælges også hvilken tidslinje der bruges"
+          }
+        },
+        {
+          "h2": "Juster stilen punkt for punkt",
+          "ps": [
+            "Stilområdet er til højre. Ved ASS-eksport gælder »ASS-udseende«: layout (delt · top og bund adskilt / stablet · to linjer i bunden), størrelse, farve, uigennemsigtighed, skrift, fed, kursiv, bogstavafstand, kontur, konturfarve, skygge/baggrund (ingen / skygge / baggrund), dybde, kantfarve, kantens uigennemsigtighed, vandret justering (bund · venstre / bund · midt / bund · højre) og afstand til bunden af oversættelseslinjen (primær), plus skrift, skygge/baggrund og venstre/højre margen for originallinjen (sekundær).",
+            "Ved eksport af tosproget VTT-stil gælder »WebVTT-stil«: oven på seks forindstillinger (standard / kompakt / filmisk / top / tilgængelig / lodret) kan du ændre hele replikkens lodrette line, anker (bund / top / midt), vandrette position, bredde size, justering align og linjehøjde samt oversættelseslinjens baggrundsfarve, baggrundsuigennemsigtighed og konturtykkelse; originallinjen kan arve hovedstilen eller sættes særskilt.",
+            "Resultatet kan gemmes som en forindstilling og bruges igen under »Fra gemte forindstillinger« med »Anvend«."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Parametrene i ASS-udseende-området til højre",
+            "cap": "Størrelse, farve, kontur, skygge/baggrund og justering kan justeres enkeltvis, og resultatet kan gemmes som forindstilling"
+          }
+        },
+        {
+          "h2": "Se forhåndsvisningen før eksport",
+          "ps": [
+            "»Fletteforhåndsvisning« er en tabel: nr., tid, original, oversættelse, stil. Bjælken ovenover filtrerer mistænkelige linjer efter »med lydeffekter«, »med talerpræfiks«, »under 1 sekund«, »mere end to linjer« og »læsehastighed overskredet« eller efter et indtastet nøgleord.",
+            "Et klik på en linjes stilplads åbner dens editor og viser kun de linjer, der bruger den; »Ophæv alle tilsidesættelser« fører hver manuel ændring tilbage til skabelonen. Tidslinjeområdet nedenunder klarer et samlet offset (fra en given replik) og proportional skalering.",
+            "Når det ser rigtigt ud, gå til »4 Eksportér«: hent filen eller kopiér indholdet."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Tabellen i fletteforhåndsvisningen og dens filterbjælke",
+            "cap": "Forhåndsvisningen er eksporten; filtrér mistænkelige linjer efter type eller fold en enkelt stilplads ud"
+          }
+        },
+        {
+          "h2": "Hvad der ikke røres",
+          "ps": [
+            "Stil ændrer kun udseendet, aldrig dialogen. Teksten i original og oversættelse ændres ikke med ét tegn under fletningen; medmindre du ændrer den med vilje i området under forhåndsvisningen, kommer tidslinjen fra den valgte fil.",
+            "Ved eksport til SRT eller »VTT uden stil« skrives ingen stilinformation i filen — siden gør opmærksom på, at VTT'en ikke har nogen STYLE-blok, og at afspilleren bruger standardudseendet. Vil du have stil, vælg tosproget VTT eller ASS."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Hvad hvis de to filer har forskelligt antal poster?** Brug »Efter tidslinje«; værktøjet matcher efter nærhed og opfinder ikke de poster, det ikke kan parre.",
+            "**Hvad hvis en afspiller ignorerer stilen i en eksporteret ASS?** Stilene ligger i filen, men ASS-understøttelsen varierer. Vil du have et mere portabelt udseende, eksportér tosproget VTT.",
+            "**Hvordan kommer jeg tilbage til skabelonen efter at have rodet den til?** »Gendan standardparametre« i ASS-området og »Gendan skabelonstandard« i VTT-området nulstiller hver deres del.",
+            "**Hvad er de syv linjer i eksemplet?** Et indbygget eksempel, kun for at vise, hvordan en fletning ser ud; det kan ikke eksporteres. Upload dine egne undertekster og klik på forhåndsvisningen, så erstattes det automatisk."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Undertekster behandles udelukkende i browseren: intet uploades, og intet går gennem en server. Luk browseren, og alt fra den session er væk."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Vil du dele en tosproget fil op i to spor, brug [[Tosproget opdeling|/bilingual.html]]; den modsatte vej fra ét sprog til tosproget er beskrevet i [[To måder at lave tosprogede undertekster|/guides/make-bilingual-subtitles.html]]; send resultatet gennem [[Undertekst-QC|/qc.html]]; til en hel sæson på én gang brug [[Batchkonvertering|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "da": {
+      "seo": {
+        "title": "Træk ren tekst ud af undertekster – To layouts, fem oprydninger – AI-SRTSub",
+        "desc": "Tekstudtrækkeren i detaljer: løbende afsnit eller én linje pr. post, og hvad de fem kontakter til SDH-antejsninger, vandmærker, dubletter, præfikser og sangtekst fjerner.",
+        "h1": "Sådan trækker du ren tekst ud af undertekster",
+        "intro": "Hent dialogen ud af en undertekstfil som ren tekst: numre, tidslinjer og stilmarkeringer forsvinder af sig selv, og resultatet kan læses som en artikel eller bruges som replikliste.",
+        "ctaText": "Åbn tekstudtrækkeren"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "I en undertekstfil er det kun dialogen, læseren har brug for; resten er struktur til afspilleren — numre, tidslinjer og stilmarkeringer. Denne side fjerner strukturen og beholder ordene."
+          ],
+          "ul": [
+            "**Læs som artikel** — løbende afsnit, brudt ved pauser og afsluttende tegnsætning.",
+            "**Brug som liste** — én linje pr. post, én undertekst pr. linje, praktisk til en replikliste eller som input til et andet værktøj.",
+            "**Ryd op undervejs** — SDH-antejsninger, vandmærker og gentagne naboer fjernes som standard.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — alle seks formater genkendes."
+          ]
+        },
+        {
+          "h2": "Læg det ind, ikke bare upload",
+          "ps": [
+            "Kolonnen »1 Tilføj undertekster« til venstre tager imod en uploadet fil, og du kan også indsætte undertekstindhold direkte i tekstfeltet. Forkert fil? Klik »Ryd« og start forfra.",
+            "Denne side læser filer som UTF-8. Hvis underteksterne åbner som en mur af spørgsmålstegn eller kasser, er kodningen i stykker — konvertér den til UTF-8 i [[Reparation af ulæselig tekst|/repair.html]] og kom tilbage."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Området til at tilføje undertekster i tekstudtrækkeren",
+            "cap": "Upload en fil, eller indsæt undertekstindhold direkte i feltet"
+          }
+        },
+        {
+          "h2": "Valg mellem de to layouts",
+          "ps": [
+            "Øverst under »2 Udtræksindstillinger« står layoutet: **Løbende afsnit** bryder teksten ved pauser og afsluttende tegnsætning, så den læses som en artikel; **Én linje pr. post** giver én linje pr. undertekst, en til en med posterne i kildefilen.",
+            "Skal du kopiere dialogen til noter, øve oversættelse eller læse den som prosa, brug løbende afsnit; skal du bygge en replikliste, sammenligne linje for linje med originalen eller fodre et andet værktøj, brug én linje pr. post."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Layoutet og oprydningskontakterne under udtræksindstillinger",
+            "cap": "Vælg ét layout; de fem kontakter nedenunder afgør, hvilken type indhold der fjernes"
+          }
+        },
+        {
+          "h2": "Hvad de fem oprydninger hver fjerner",
+          "ps": [
+            "**Fjern SDH-antejsninger**: sletter lydbeskrivelser i parentes som »(skridt)« eller »[musik]« og beholder dialogen.",
+            "**Fjern vandmærker og reklamer**: smider linjer som fansub-credits, URL'er og kanalnavne ud.",
+            "**Fjern gentagne naboer**: står samme sætning to gange lige efter hinanden (en afspilningsfejl), beholdes kun én; dubletter længere fra hinanden har betydning og bliver.",
+            "**Fjern talerpræfikser**: »JOHN: Hej« bliver til »Hej«. Slået fra som standard — manuskripttekst har brug for at vise, hvem der taler.",
+            "**Spring sanglinjer over**: linjer, der kun er »♪ … ♪«, springes over. Slået fra som standard — sangtekst er også ord."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "De fem oprydningskontakter og deres beskrivelser under udtræksindstillinger",
+            "cap": "Hver kontakt fortæller til højre, hvad den fjerner; sæt kryds i dem, du har brug for"
+          }
+        },
+        {
+          "h2": "Tag resultatet med",
+          "ps": [
+            "Kolonnen »3 Resultat« til højre viser den udtrukne tekst live og regner straks om, når du ændrer en indstilling.",
+            "Når det passer, klik »Download« for en .txt eller »Kopiér«. I sprog uden ordmellemrum, som kinesisk og japansk, følger linjesammenlægningen andre regler, og værktøjet klarer det automatisk pr. sprog."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Resultatområdet med knapperne til download og kopiering",
+            "cap": "Resultatet opdateres live; hent det som txt eller kopiér det direkte"
+          }
+        },
+        {
+          "h2": "Hvad der ikke røres",
+          "ps": [
+            "Selve dialogen skrives ikke om. Oprydningskontakterne afgør kun, hvilke hele linjer eller blokke der smides ud; de ændrer aldrig en posts formulering.",
+            "Tidslinjer og numre udlæses bare ikke, de ændres ikke og udlæses så — kildefilen er urørt, og denne side tilbyder ikke eksport med tidslinje. Det hører til [[Formatkonvertering|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Bliver ASS-stilmarkeringer i teksten?** Nej. ASS' `{}`-tilsidesættelsesblokke fjernes, og kun dialogen bliver tilbage.",
+            "**Kommer en tosproget fil ud som to linjer eller én?** Lige så mange linjer, som posten havde; denne side hverken slår sammen eller deler — til opdeling brug [[Tosproget opdeling|/bilingual.html]].",
+            "**Hvorfor bevares talerpræfikser som standard?** Navnet i »JOHN: Hej« er ofte nyttig information (manuskripter, repliklister); fjerner man det, er det svært at se, hvem der taler, så valget er dit.",
+            "**Kan LRC-sangfiler også udtrækkes?** Ja. LRC-tidsmarkeringer fjernes, og sanglinjerne bliver tilbage; vil du ikke have sangtekst, sæt kryds i »Spring sanglinjer over«."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Undertekster behandles udelukkende i browseren: intet uploades, og intet går gennem en server. Teksten bliver kun på den aktuelle side og forsvinder ved genindlæsning."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Vil du forstå, hvad en undertekstfil egentlig indeholder, se [[Hvad der står i en SRT-fil|/guides/srt-file-format.html]]; skal den udtrukne dialog oversættes, gå til [[Undertekstoversættelse|/translate.html]]; skal det blive en tabel, brug [[Undertekster til Excel/CSV|/guides/srt-to-excel.html]]; og kør [[Undertekst-QC|/qc.html]] før aflevering."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "da": {
+      "seo": {
+        "title": "Del og saml undertekster – Klip ved blokke, kæd i rækkefølge – AI-SRTSub",
+        "desc": "Opdeling og samling i detaljer: klip en fil i segmenter efter varighed eller antal poster, start hvert segment ved nul, kæd flere filer i rækkefølge eller flet dem efter tidslinje.",
+        "h1": "Sådan deler og samler du undertekster",
+        "intro": "Klip en lang fil i segmenter, eller saml flere spredte filer til én. Klippet falder altid på en postgrænse — en sætning bliver aldrig skåret over.",
+        "ctaText": "Åbn del og saml"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Ved opdeling af afsnit, segmentering og samling af kilder passer undertekstblokkene aldrig med videoblokkene: enten skal en fil klippes, eller flere skal blive til én. Denne side klarer begge, én fane hver."
+          ],
+          "ul": [
+            "**Del** — klip en lang fil i segmenter efter varighed eller antal poster.",
+            "**Saml** — kæd flere filer til et afsnit eller flet dem efter tidslinje.",
+            "**Klip kun på postgrænser** — en sætning bliver aldrig skåret over.",
+            "**Numre omnummereres automatisk** — intet at omnummerere manuelt efter en samling, og ikke ét ord af dialogen ændres."
+          ]
+        },
+        {
+          "h2": "Vælg først: dele eller samle",
+          "ps": [
+            "To faner øverst: **Del: én fil i segmenter** og **Saml: flere filer til én**. Indstillingerne i trin to ændrer sig med valget.",
+            "Under »1 Tilføj undertekster« uploader du en fil eller indsætter tekst; forkert? »Ryd«. Denne side læser kun UTF-8 — er kodningen i stykker (en mur af spørgsmålstegn eller kasser), gå først til [[Reparation af ulæselig tekst|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "De to faner øverst på siden del og saml",
+            "cap": "Del og saml er to faner; indstillingerne i trin to følger valget"
+          }
+        },
+        {
+          "h2": "Sådan klipper du",
+          "ps": [
+            "Under »2 Sådan deler du« vælger du grundlaget: **varighed** (et segment hver X minutter) eller **antal poster** (et segment hver X poster), og indtaster et tal.",
+            "Sæt kryds i »Start hvert segment ved 0:00«, og hvert segment tæller fra nul — brug det, når du uploader afsnit og giver hvert segment til en afspiller for sig. Uden kryds bevares de oprindelige tidsstempler, og hvert segment passer stadig til sin placering i kildevideoen.",
+            "Klippet falder kun på postgrænser: når en meget lang undertekst krydser klippunktet, bliver hele posten i det forrige segment."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Indstillingerne for varighed og antal poster med kontakten til at starte ved nul",
+            "cap": "Klip efter varighed eller antal poster, og start eventuelt hvert segment ved 0:00"
+          }
+        },
+        {
+          "h2": "Sådan samler du",
+          "ps": [
+            "Under »2 Sådan samler du« vælger du metoden: **Kæd i rækkefølge** flytter den senere fil, så den starter efter den forriges slutning uden overlapning; **Flet efter tidslinje** beholder hver fils oprindelige tidsstempler og sorterer efter starttid.",
+            "Brug kædning, når filerne er første og anden halvdel af et afsnit, eller når halvdele korrekturlæst hver for sig skal samles igen; brug fletning, når filerne skal stå sammen på skærmen, som et originalt spor og et oversat spor.",
+            "Efter samlingen omnummereres numrene automatisk, og ikke ét ord af dialogen ændres."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Indstillingerne Kæd i rækkefølge og Flet efter tidslinje på saml-siden",
+            "cap": "Kædning passer til to halvdele af et afsnit, fletning til et originalt og et oversat spor"
+          }
+        },
+        {
+          "h2": "Tag resultatet med",
+          "ps": [
+            "»3 Resultat« til højre eksporterer **SRT** og **VTT**; klik »Download« eller »Kopiér«.",
+            "Ved opdeling findes »Download alle segmenter«, som gemmer hvert segment på én gang i stedet for ét klik pr. segment."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Formatvalget SRT/VTT med knapper til download og til alle segmenter",
+            "cap": "Opdelingsresultater kan hentes segment for segment; en samlet fil hentes eller kopieres direkte"
+          }
+        },
+        {
+          "h2": "Hvad der ikke røres",
+          "ps": [
+            "Ikke ét tegn af dialogen ændres. Denne side ændrer kun, hvilket segment hver post hører til, og hvordan der nummereres; posternes indhold står uændret.",
+            "Med »Kæd i rækkefølge« flyttes de senere files tidsstempler samlet — det kræver samlingen; med »Flet efter tidslinje« bevares alle oprindelige tidsstempler."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Hvad hvis det sidste segment bliver meget kort?** Det er normalt. Resten, der ikke fylder et helt segment, bliver sit eget segment i stedet for at blive fyldt op.",
+            "**Bliver en sætning, der krydser klippunktet, delt?** Nej. Klip falder kun på postgrænser, og en post, der krydser linjen, bliver i det forrige segment.",
+            "**Efter fletning, hvordan sorteres to poster med samme tid?** Efter starttid; ved samme starttid bevares den rækkefølge, du tilføjede filerne i.",
+            "**Kan ASS deles?** Denne side klarer SRT og VTT. Konvertér først ASS til SRT eller VTT med [[Formatkonvertering|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Undertekster behandles udelukkende i browseren: intet uploades, og intet går gennem en server. Luk siden, og indholdet er væk."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Skal to filer samles til et tosproget spor (og ikke til et afsnit), brug [[Tosproget fletning og effekter|/guides/merge.html]]; er hele tidslinjen forskudt, [[Justering af tidslinjen|/shift.html]]; til en hel sæson, [[Batchkonvertering|/batch.html]]; og kør [[Undertekst-QC|/qc.html]] til sidst."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "da": {
+      "seo": {
+        "title": "Synkronisér LRC-tekster – Indlæs, indsæt, tap med – AI-SRTSub",
+        "desc": "Indlæs en sang, indsæt teksten, sæt et tidspunkt pr. linje mens du lytter, og eksportér LRC eller SRT. Mellemrum afspiller, Enter stemplet, Z fortryder — hænderne på tastaturet.",
+        "h1": "Sådan bruger du synkroniseringsværktøjet til sangtekster",
+        "intro": "Indlæs en sang, indsæt teksten, sæt et tidspunkt pr. linje mens du lytter, og eksportér standard-LRC eller SRT. Lyden afspilles lokalt og uploades aldrig.",
+        "ctaText": "Åbn synkroniseringsværktøjet"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Giv en sang en tekstfil, man kan synge med på: én linje pr. tekstlinje, hver med et tidspunkt. Afspillere læser LRC, undertekstspor læser SRT, og begge kan eksporteres her."
+          ],
+          "ul": [
+            "**Start fra nul** — indsæt ren tekst og tap med, mens du lytter.",
+            "**Ret det eksisterende** — importér en eksisterende LRC og fortsæt fra første linje uden tid.",
+            "**Eksportér to formater** — LRC til afspillere, SRT til videospore.",
+            "**Alt via tastatur** — mellemrum afspiller og pauser, Enter stemplet den aktuelle linje, Z fortryder."
+          ]
+        },
+        {
+          "h2": "1 Indlæs sangen",
+          "ps": [
+            "Den første kolonne til venstre tager imod en lydfil: **MP3, M4A, FLAC, WAV og OGG** virker alle. Lyden afspilles lokalt og uploades aldrig.",
+            "Lydkvaliteten påvirker ikke præcisionen, men en kilde med klar vokal er lettere at følge; liveoptagelser og kilder med meget høj akkompagnement er mærkbart sværere at synkronisere."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Området til at indlæse en sang i synkroniseringsværktøjet",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG virker alle, og lyden afspilles kun lokalt"
+          }
+        },
+        {
+          "h2": "2 Indsæt teksten",
+          "ps": [
+            "Indsæt teksten i den anden kolonne, **én linje pr. tekstlinje**; tomme linjer springes over. Klik derefter på »Analysér tekst«.",
+            "At indsætte en eksisterende LRC virker også — dens `[mm:ss.xx]`-tidsmærker genkendes, og efter import fortsætter du fra første linje uden tid, så linjer, der allerede har tid, ikke skal laves om."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Området til at indsætte teksten og knappen til at analysere",
+            "cap": "Indsæt én linje pr. tekstlinje, eller indsæt en hel LRC og lad værktøjet læse de eksisterende tider"
+          }
+        },
+        {
+          "h2": "3 Tap med, mens du lytter",
+          "ps": [
+            "Afspil sangen, og tryk Enter i det øjeblik en linje begynder (eller klik »Stempl denne linje«); tiden registreres, og markøren springer til den næste.",
+            "Genveje: **mellemrum** afspiller og pauser, **Enter** stemplet den aktuelle linje, **Z** fortryder én linje. At trykke Enter under afspilning er det mest flydende — ingen skiften mellem mus og tastatur.",
+            "Forkert linje? Tryk Z for at fortryde den og stempl igen. Vil du slet ikke stemple en linje (et mellemspil, en rent musikalsk passage), klik »Spring denne linje over«, og den kommer ikke med i eksporten."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Knapperne afspil, stempl denne linje, fortryd én linje og spring denne linje over",
+            "cap": "Mellemrum afspiller og pauser, Enter stemplet den aktuelle linje, Z fortryder — hænderne bliver på tastaturet"
+          }
+        },
+        {
+          "h2": "4 Eksportér",
+          "ps": [
+            "Fjerde kolonne eksporterer: **Download LRC** til afspillere, **Download SRT** til videospore, eller »Kopiér« for at tage teksten direkte.",
+            "Kun linjer med tid eksporteres; oversprungne linjer kommer aldrig i filen. I SRT-eksporten varer hver linje, til den næste begynder, og den sidste falder tilbage til 2 sekunder."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Knapperne Download LRC, Download SRT og Kopiér i eksportområdet",
+            "cap": "LRC til afspillere, SRT til video; kun linjer med tid eksporteres"
+          }
+        },
+        {
+          "h2": "Hvad der ikke røres",
+          "ps": [
+            "Sangteksten skrives ikke om. Synkroniseringen tilføjer kun ét tidspunkt pr. linje og rører ikke ordene, du indsatte.",
+            "Ved import af en eksisterende LRC beholder linjer med tidsmærke deres oprindelige tid, og du stempler kun fra første linje uden tid."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Hvorfor mangler der linjer i eksporten?** Oversprungne linjer og linjer uden tid kommer aldrig i filen. Gå tilbage til trin tre og tilføj dem, eller bekræft, at de skulle springes over.",
+            "**Kan tiderne ændres bagefter?** Vil du flytte alt en smule efter stemplingen, eksportér SRT og brug [[Justering af tidslinjen|/shift.html]] til at forskyde eller skalere samlet.",
+            "**LRC eller SRT?** LRC til musikafspillere (foobar2000, streamingklienter, diverse afspillere); SRT når teksten skal ligge på video eller bearbejdes videre med undertekstværktøjer.",
+            "**Hvor lang tid tager en sang?** Det afhænger af antallet af linjer og den ønskede præcision. Ved tredive-fyrre linjer er en gennemgang klaret på få minutter, når flowet er inde; ordret præcision tager længere."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Lyd og tekst behandles udelukkende i browseren: intet uploades, og intet går gennem en server. Lyden afkodes og afspilles kun lokalt."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Har du allerede en LRC og vil have undertekster, se [[LRC til SRT|/guides/lrc-to-srt.html]]; til metoden og faldgruberne i synkronisering, [[Sådan synkroniserer du LRC-tekster|/guides/how-to-make-lrc-file.html]]; er den eksporterede SRT forskudt, [[Justering af tidslinjen|/shift.html]]; og kør resultatet gennem [[Undertekst-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "da": {
+      "seo": {
+        "title": "Træk indlejrede videoundertekster ud – MKV / MP4-spor – AI-SRTSub",
+        "desc": "Udtræk af indlejrede undertekster i detaljer: læs sporene i MKV, WebM, MP4 og MOV direkte ud og eksportér SRT / VTT / ASS / TXT. Ingen upload, ingen transkodning, alle sprogspor listet.",
+        "h1": "Sådan trækker du undertekster indlejret i en video ud",
+        "intro": "Læs undertekstsporet, der er lukket inde i en MKV / MP4, direkte ud som SRT — videoen uploades aldrig, alt foregår i browseren.",
+        "ctaText": "Åbn udtræk af videoundertekster"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Undertekster kan være lukket inde i en videofil i stedet for at stå alene. Skal de redigeres, oversættes eller parres, må de først ud — det er det eneste, denne side gør."
+          ],
+          "ul": [
+            "**Fire containere** — MKV / WebM og MP4 / MOV.",
+            "**Fire slags spor** — ren tekst, ASS, WebVTT og `mov_text` / `tx3g`-sporene i MP4.",
+            "**Fire eksportformater** — SRT / VTT / ASS / TXT.",
+            "**Ingen upload, ingen transkodning** — læses i små blokke efter offset, så en fil på flere GB ikke fylder hukommelsen."
+          ]
+        },
+        {
+          "h2": "1 Tilføj videoen",
+          "ps": [
+            "Træk en videofil ind i første kolonne, eller klik for at vælge en. Kun **MKV / WebM** og **MP4 / MOV** genkendes; andre containere giver ingen spor.",
+            "Filen forlader aldrig din computer — der er intet upload-trin. Værktøjet læser i små blokke efter offset, så en film på flere GB ikke fylder hukommelsen, men første læsning skal gennemgå sporinformationen én gang."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Området til at tilføje video på siden til udtræk af indlejrede undertekster",
+            "cap": "MKV / WebM og MP4 / MOV understøttes, og filen forlader aldrig din maskine"
+          }
+        },
+        {
+          "h2": "2 De indlejrede undertekstspor",
+          "ps": [
+            "Når læsningen er færdig, lister anden kolonne filens undertekstspor **ét pr. linje**, som regel med sprog og spornavn (fx »Kinesisk«, »Engelsk«, »Forced«). Klik på en linje for at trække det spor ud.",
+            "Har filen kun ét undertekstspor, starter udtrækket automatisk — intet klik nødvendigt.",
+            "**Billedundertekster kan ikke trækkes ud**: Blu-ray PGS og DVD-undertekster er billeder brændt ind i streamen uden tekst at hente, og siden siger det klart; de kræver OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Listen over indlejrede undertekstspor, ét pr. linje",
+            "cap": "Ét spor pr. linje; er der kun ét, starter udtrækket automatisk"
+          }
+        },
+        {
+          "h2": "3 Resultatet",
+          "ps": [
+            "»3 Resultat« til højre viser den udtrukne tekst med eksportformatet ovenover: **SRT / VTT / ASS / TXT**. Klik »Download« eller »Kopiér«.",
+            "Er kildesporet ASS, kommer dets eget stilheader og opløsning uændret tilbage — ASS-eksport bevarer dem, SRT-eksport tager kun teksten."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Resultatområdet med formatvalget SRT / VTT / ASS / TXT",
+            "cap": "Fire eksportformater; en ASS-kilde beholder stilheader og opløsning"
+          }
+        },
+        {
+          "h2": "Hvad der ikke røres",
+          "ps": [
+            "Selve videofilen røres slet ikke — kun læsning, ingen skrivning, ingen transkodning, ingen remux.",
+            "Undertekstindholdet kommer ud, som det er: ingen gætværk om kodning, ingen rettelse af tidslinjer. Er de udtrukne undertekster ulæselige, er det et kodningsproblem i kildesporet — tag det til [[Reparation af ulæselig tekst|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Er der virkelig ingen måde at klare billedundertekster (PGS / DVD)?** Ikke på denne side — de er billeder uden tekstlag. OCR skal komme først, og det gør denne side ikke.",
+            "**De udtrukne undertekster passer ikke i tid — hvorfor?** Denne side retter ikke tidslinjer; det kommer ud, som det lå der. Til et samlet offset eller et hastighedsproblem, [[Justering af tidslinjen|/shift.html]].",
+            "**Hvorfor tager det så lang tid, før der sker noget?** En stor fil skal gennemsøges blok for blok efter sporinformation, og jo større fil, jo længere; det foregår lokalt og har intet med forbindelsen at gøre.",
+            "**Kan jeg bruge denne side til eksterne undertekstfiler?** Det er ikke nødvendigt — en ekstern .srt / .ass går direkte i [[Formatkonvertering|/convert.html]] eller et andet værktøj. Denne side er til undertekster, der er lukket inde i en video."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Videoen læses udelukkende i browseren: intet uploades, intet transkodes, intet går gennem en server. Luk siden, og de læste data frigives."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Skal det udtrukne oversættes, gå til [[Undertekstoversættelse|/translate.html]], skal det være tosproget, se [[To måder at lave tosprogede undertekster|/guides/make-bilingual-subtitles.html]]; om forskellen på indlejrede og eksterne spor, og hvad der kan trækkes ud, se [[Sådan får du undertekster ud af en video|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "da": {
+      "seo": {
+        "title": "Udskift termer i undertekster – Én tabel retter en fil – AI-SRTSub",
+        "desc": "Termudskiftning i detaljer: én regel pr. linje, adskilt af -> , => , → eller Tab, med # som kommentar. Hele ord, store og små bogstaver, første eller anden linje, hver ændring listet.",
+        "h1": "Sådan udskifter du termer i undertekster på én gang",
+        "intro": "Én termtabel gør ordvalget i en hel undertekstfil ensartet på én gang — tidslinjer, ASS-stile og VTT-NOTE-blokke røres ikke med ét tegn.",
+        "ctaText": "Åbn termudskiftning"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Samme ord oversat på to måder, navne og steder der følger maskinoversættelsen, andres undertekster der skal rettes til dine konventioner — alt dette har ét til fælles: det er et ord, der ændres, ikke strukturen. Denne side ændrer kun ord."
+          ],
+          "ul": [
+            "**Ensret navne** — personer, steder og egennavne er ens hele vejen igennem.",
+            "**Ret maskinfejl** — en term, maskinen har oversat forkert, udskiftes i hele filen.",
+            "**Overtag eget brug** — byg andres undertekster om til dit ordvalg.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — alle seks formater genkendes."
+          ]
+        },
+        {
+          "h2": "To input: undertekster og termtabel",
+          "ps": [
+            "Kolonnen »1 Tilføj undertekster« til venstre tager imod en fil, eller du indsætter indholdet direkte; forkert? »Ryd«.",
+            "Kolonnen »2 Termtabel« til højre indeholder reglerne. **Én regel pr. linje**, med den gamle og den nye term adskilt af `->` , `=>` , `→` eller en tabulator — alle fire virker. Linjer, der begynder med `#`, er kommentarer og deltager ikke i udskiftningen.",
+            "Er du i tvivl om formatet, klik »Indsæt et eksempel« og ret det til."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Området til at tilføje undertekster og termtabellen på udskiftningssiden",
+            "cap": "Undertekster til venstre, regler til højre; én regel pr. linje, gammel og ny term adskilt af ->"
+          }
+        },
+        {
+          "h2": "Sådan skriver du termtabellen",
+          "ps": [
+            "Én regel pr. linje: den nuværende term til venstre, det den skal blive til, til højre. Fx erstatter `Thor -> Donar` hver »Thor« i filen med »Donar«.",
+            "Kommentarer begynder med `#` og er gode til at mærke en gruppe regler (fx »# navne sæson 1«) og til midlertidigt at slå en regel fra — sæt bare et `#` foran i stedet for at slette den.",
+            "Reglerne kører oppefra og ned; tekst, en regel har lavet, gennemsøges igen af reglerne nedenunder. Når rækkefølgen betyder noget (fx først A til B, så B til C), skal man være opmærksom på det."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Linje efter linje med udskiftningsregler i termtabellens felt",
+            "cap": "Én regel pr. linje; linjer med # er kommentarer og kan slå en regel midlertidigt fra"
+          }
+        },
+        {
+          "h2": "Hvad de tre kontakter gør",
+          "ps": [
+            "**Omfang**: `alt` / `kun 1. linje` / `kun 2. linje`. I en tosproget fil vælger du »kun 2. linje«, hvis du kun vil ændre oversættelsen; poster med kun én linje røres ikke under nogen af de to enkeltlinje-indstillinger — værktøjet gætter ikke, hvilken side der er originalen.",
+            "**Hele ord**: erstatter kun termer, der står alene som ord, så `art` rører ikke `start`. I sprog uden ordmellemrum, som kinesisk og japansk, virker denne kontakt ikke — der udskiftes på delstrenge.",
+            "**Forskel på store og små bogstaver**: slået fra som standard, så både `CEO` og `ceo` udskiftes; sat til erstattes kun den helt identiske stavemåde."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Kontakterne omfang, hele ord og store/små bogstaver under termtabellen",
+            "cap": "Omfanget afgør, hvilken linje der ændres; hele ord og bogstaver, hvor strengt der matches"
+          }
+        },
+        {
+          "h2": "Hver ændring listet, hver ændring kan fortrydes",
+          "ps": [
+            "»3 Resultat« viser de udskiftede undertekster og **lister hver ændring**: hvilken post, hvilken linje, fra hvad til hvad.",
+            "Vil du ikke have en af dem, klikker du på den i listen og fører kun den post tilbage, uden at ændre tabellen og køre igen. Når det passer, klik »Download« eller »Kopiér«."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Resultatområdet med listen over de enkelte ændringer",
+            "cap": "Hver ændring er listet; klik på en, du ikke vil have, for at føre den tilbage"
+          }
+        },
+        {
+          "h2": "Hvad der ikke røres",
+          "ps": [
+            "**Tidslinjer, ASS-stillinjer og VTT-`NOTE`-blokke røres ikke med ét tegn.** Udskiftningen gælder kun dialogtekst, aldrig strukturelle linjer.",
+            "Termtabellen ændrer ikke din undertekstfil automatisk — resultatet er et nyt output, og originalen står uændret."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Hvorfor blev en term ikke udskiftet?** Tjek først omfanget: med »kun 2. linje« røres poster med kun én linje ikke. Tjek derefter hele ord, som blokerer match, der ikke er selvstændige ord.",
+            "**Hvorfor udskifter kinesisk stadig delstrenge med hele ord slået til?** Det er forventet. Kinesisk og japansk skiller ikke ord med mellemrum, værktøjet kan ikke afgøre ordgrænser, og hele ord virker ikke der.",
+            "**Hvordan ruller jeg alt tilbage efter en fejl?** Før posterne tilbage én efter én i listen; vil du starte helt forfra, tøm tabellen og tilføj underteksterne igen.",
+            "**Kan ASS-stillinjer ændres ved et uheld?** Nej. Stillinjer og `NOTE`-blokke er uden for omfanget; kun dialogtekst deltager."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Undertekster og termtabel behandles udelukkende i browseren: intet uploades, og intet går gennem en server. Tabellen gemmes ikke og er tom, næste gang du åbner siden."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Om det kan betale sig at lave en termtabel, og hvordan man vedligeholder den gennem en sæson, se [[Termtabeller: ét ordvalg pr. sæson|/guides/subtitle-glossary.html]]; er indholdet beskidt (vandmærker, SDH), kør først [[Oprydning af undertekster|/clean.html]]; er navnene fastlagt, og skal der andre sprog til, gå til [[Undertekstoversættelse|/translate.html]]; og kør resultatet gennem [[Undertekst-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "da": {
+      "seo": {
+        "title": "Få undertekster ud af en video – Indlejrede eller eksterne – AI-SRTSub",
+        "desc": "Sådan får du undertekster ud, der er lukket inde i en video: hvad MKV / WebM / MP4 / MOV hver bærer, forskellen på tekst-, ASS-, WebVTT- og mov_text-spor, og hvorfor billedundertekster ikke har tekst.",
+        "h1": "Sådan får du undertekster ud af en video",
+        "intro": "Undertekster kan bo inde i en videofil eller stå alene udenfor. Indeni er de et spor i containeren — at få dem ud har intet med transkodning at gøre.",
+        "ctaText": "Åbn udtræk af videoundertekster"
+      },
+      "body": [
+        {
+          "h2": "Hvor underteksterne bor: indlejrede og eksterne",
+          "ps": [
+            "En videofil (MKV, MP4) er en container, der rummer et videosporet, et lydspor og undertekstspor på samme tid. Undertekster lukket inde kaldes **indlejrede**; en separat .srt / .ass-fil ved siden af kaldes **ekstern**, og et indlejret spor kaldes også **multiplexet**.",
+            "Eksterne undertekster bruges som de er. Problemet er de indlejrede: for at redigere, oversætte eller bygge et tosproget spor af originalen har du ingen undertekstfil i hånden — sporet skal først læses ud af containeren. Dette trin er ikke transkodning: videoen kodes ikke om, kun de data, der allerede ligger i containeren, læses ud."
+          ]
+        },
+        {
+          "h2": "Hvilken container bærer hvad",
+          "ps": [
+            "Forskellige containere rummer forskellige undertekstformater, og sværhedsgraden varierer også:"
+          ],
+          "ul": [
+            "**MKV / WebM** — den mest fleksible: ren tekst, ASS og WebVTT kan alle være der, og flere sprogspor er almindelige.",
+            "**MP4 / MOV** — oftest et `mov_text` / `tx3g`-spor: ren tekst med lidt stilinformation.",
+            "**Rent tekstspor** — kommer ud som tekst og bliver SRT direkte.",
+            "**ASS-spor** — bærer stilheader og opløsning; ASS-eksport bevarer dem, SRT-eksport efterlader kun teksten.",
+            "**Billedundertekster (Blu-ray PGS, DVD-undertekster)** — gemmer billeder, ikke tegn: der kan ikke trækkes tekst ud."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Undertekstsporene, som udtrækssiden lister dem",
+            "cap": "Ét spor pr. linje, som regel med sprog og spornavn; er der kun ét, trækkes det automatisk ud"
+          }
+        },
+        {
+          "h2": "Hvorfor billedundertekster ikke kan trækkes ud",
+          "ps": [
+            "Blu-ray PGS og DVD-undertekster gemmer ikke tegn, men en serie billeder med alfakanal. Når en afspiller viser dem, sætter den et billede ind, den gengiver ikke tekst.",
+            "I sådan et spor er der derfor ingen læsbar tekst — ikke fordi værktøjet ikke understøtter det, men fordi der ikke er tegn. Siden siger det klart, når den møder et.",
+            "Den eneste vej til ord er at genkende tegnene i de billeder først (OCR) og bygge undertekster af det. Det er en anden proces end at trække et spor ud."
+          ]
+        },
+        {
+          "h2": "Hvad der ofte kommer efter udtrækket",
+          "ps": [
+            "Det, der kommer ud, er sporet, som det var: værktøjet gætter ikke på kodninger og retter ikke tidslinjer. Derfor sker to ting ofte:",
+            "Den ene er **ulæselig tekst** — et kodningsproblem i kildesporet, som kommer ulæseligt ud alligevel; gå til [[Reparation af ulæselig tekst|/guides/repair.html]] for at finde kodningen. Den anden er **forkert tid** — hvad enten kilden har en intro-logo, eller billedhastighederne ikke passer, er resultatet forskudt samlet; brug [[Justering af tidslinjen|/shift.html]] til at forskyde eller skalere.",
+            "Derefter går du til [[Undertekstoversættelse|/translate.html]] for at oversætte, og til [[To måder at lave tosprogede undertekster|/guides/make-bilingual-subtitles.html]] for tosproget."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Resultatområdet med eksportformaterne SRT / VTT / ASS / TXT",
+            "cap": "Udtrukne undertekster kan eksporteres i fire formater; en ASS-kilde beholder stilheader og opløsning"
+          }
+        },
+        {
+          "h2": "Et par ting, der er lette at tage fejl af",
+          "ps": [
+            "**At trække undertekster ud er ikke at brænde dem ind.** Videoen kodes ikke om, så billedkvalitet og lyd påvirkes ikke.",
+            "**Udtræk påvirker ikke originalfilen.** Kun læsning, aldrig skrivning, og ikke én byte af videoen ændres.",
+            "**At en stor fil er langsom, er ikke et forbindelsesproblem.** Værktøjet gennemsøger sporinformation blok for blok, og jo større fil, jo længere; alt foregår lokalt.",
+            "**Eksterne undertekster har ikke brug for denne side.** Har du en .srt / .ass, gå direkte til [[Formatkonvertering|/convert.html]]; kun undertekster lukket inde i en video skal trækkes ud først."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Den fulde gennemgang står i [[Sådan trækker du undertekster indlejret i en video ud|/guides/videosub.html]]; skal det udtrukne oversættes, [[Undertekstoversættelse|/translate.html]], skal det være tosproget, [[To måder at lave tosprogede undertekster|/guides/make-bilingual-subtitles.html]]; ved ulæselig tekst, start med [[Reparation af ulæselig tekst|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "da": {
+      "seo": {
+        "title": "Sådan synkroniserer du LRC-tekster – Én linje, ét tidspunkt – AI-SRTSub",
+        "desc": "Byg en LRC-fil fra bunden: indsæt én tekstlinje pr. linje, sæt tiden mens du lytter, de tre vigtige genveje, hvornår en linje springes over, LRC eller SRT, og hvad du gør ved tidsdrift.",
+        "h1": "Sådan synkroniserer du LRC-tekster",
+        "intro": "En LRC er bare »én tekstlinje plus ét tidspunkt«. At lave den kaldes at synkronisere: at fange det øjeblik, hver linje begynder.",
+        "ctaText": "Åbn synkroniseringsværktøjet"
+      },
+      "body": [
+        {
+          "h2": "Hvad synkronisering er",
+          "ps": [
+            "Strukturen i en LRC-fil er så enkel som muligt: én tekstlinje pr. linje, foran hver en `[mm:ss.xx]`-tidsmærke. Når en afspiller når en linje, viser den teksten i det øjeblik.",
+            "Så hele arbejdet med en LRC er at give hver tekstlinje et tidspunkt — og det kan ingen maskine gøre for dig, for at afgøre hvor en linje begynder at blive sunget kræver, at man lytter."
+          ]
+        },
+        {
+          "h2": "Hvor mange gennemgange en sang kræver",
+          "ps": [
+            "Det kan betale sig at tænke et minut over det, før du starter; det sparer det meste af omarbejdet:"
+          ],
+          "ul": [
+            "**Én gennemgang** — klar vokal, få linjer, nogenlunde rigtigt: at tappe igennem én gang er nok.",
+            "**To gennemgange** — en grov gennemgang og derefter kontrol linje for linje; det sædvanlige, når præcision betyder noget.",
+            "**Importér og ret** — der er allerede en LRC, og kun få linjer er forkerte; importér og fortsæt fra første linje uden tid.",
+            "**Mellemspil og rent musikalske passager** skal ikke synkroniseres — klik »Spring denne linje over«, og de bliver uden for eksporten.",
+            "**Omkvæd og overlapninger** kan kun registrere ét startpunkt; overlappende dele tælles med hovedvokalen."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Knapperne afspil, stempl denne linje, fortryd én linje og spring denne linje over",
+            "cap": "Enter under afspilning er det mest flydende; forkert linje? Z for at fortryde og stempl igen"
+          }
+        },
+        {
+          "h2": "Indsætningen afgør resten",
+          "ps": [
+            "Indsæt teksten én linje pr. tekstlinje; tomme linjer springes over. De linjeskift, du indsætter, er de linjer, du synkroniserer senere — flere brud nu betyder flere klik senere.",
+            "At indsætte en eksisterende LRC virker også: dens `[mm:ss.xx]`-tidsmærker genkendes, og efter import **fortsætter du fra første linje uden tid**, så linjer, der allerede har tid, ikke skal laves om.",
+            "En halvfærdig LRC kan altså gemmes og indsættes igen senere for at fortsætte."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Området til at indsætte teksten og knappen til at analysere",
+            "cap": "Én linje pr. tekstlinje; indsætter du en hel LRC, læses de eksisterende tider, så du kan fortsætte"
+          }
+        },
+        {
+          "h2": "Eksportér LRC eller SRT",
+          "ps": [
+            "**Til en musikafspiller, eksportér LRC.** foobar2000, diverse afspillere og enheder med tekstvisning læser det.",
+            "**Skal teksten på video eller bearbejdes videre, eksportér SRT.** Videosporets undertekster, undertekstværktøjer og redigeringssoftware læser SRT. I eksporten varer hver linje, til den næste begynder, og den sidste falder tilbage til 2 sekunder.",
+            "Begge eksporterer kun linjer med tid — oversprungne linjer kommer aldrig i filen."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Knapperne Download LRC, Download SRT og Kopiér i eksportområdet",
+            "cap": "LRC til afspillere, SRT til video; kun linjer med tid eksporteres"
+          }
+        },
+        {
+          "h2": "Et par ting, der er lette at tage fejl af",
+          "ps": [
+            "**Er alt en smule forskudt efter synkroniseringen? Brug et offset.** Eksportér SRT og forskyd helheden med [[Justering af tidslinjen|/shift.html]]; langt hurtigere end at synkronisere linje for linje igen.",
+            "**Vokser afvigelsen gennem sangen? Det er et hastighedsproblem.** Når afspilnings- og optagelseshastighed ikke er ens, vokser fejlen mod slutningen, og det kræver proportional skalering, ikke et offset.",
+            "**Genveje føles kun naturlige, når de bruges sammen.** Mellemrum afspiller og pauser, Enter stemplet den aktuelle linje, Z fortryder én linje — tryk Enter direkte under afspilning i stedet for at skifte mellem mus og tastatur.",
+            "**Lydkvaliteten påvirker præcisionen.** En kilde med klar vokal er lettere at følge; liveoptagelser og meget høj akkompagnement er mærkbart sværere."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Den fulde gennemgang står i [[Sådan bruger du synkroniseringsværktøjet til sangtekster|/guides/lrc.html]]; skal en eksisterende LRC blive undertekster, se [[LRC til SRT|/guides/lrc-to-srt.html]]; er den eksporterede SRT forskudt, [[Justering af tidslinjen|/shift.html]]; og kør resultatet gennem [[Undertekst-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "da": {
+      "seo": {
+        "title": "Termtabeller: ét ordvalg pr. sæson – Hvornår de kan betale sig – AI-SRTSub",
+        "desc": "En termtabel løser ét problem: samme ord gengivet forskelligt. Hvornår den er værd at lave, hvordan man genbruger den gennem en sæson, og hvorfor hele ord ikke virker på kinesisk.",
+        "h1": "Termtabeller: ét ordvalg pr. sæson",
+        "intro": "Når et navn hedder A i afsnit 1 og B i afsnit 7, tror seerne, at det er to personer. En termtabel forhindrer netop det — den fastlægger, hvad ting hedder.",
+        "ctaText": "Åbn termudskiftning"
+      },
+      "body": [
+        {
+          "h2": "En termtabel løser inkonsistens",
+          "ps": [
+            "Ordvalgsfejl i undertekster er af to slags: »dette ord er oversat forkert« og »samme ord er oversat forskelligt fra sted til sted«. Det første er et ordbogsproblem; det andet er det, en termtabel løser.",
+            "Det andet er både mere almindeligt og sværere at opdage: `Thor` bliver »Thor« i afsnit 1 og »Donar« i afsnit 7, hvert afsnit ser fint ud for sig, og serien får seerne til at tro, at der er kommet en ny person. En termtabel gør »i denne produktion hedder han Thor« til en kørbar regel, der anvendes på hele filen på én gang."
+          ]
+        },
+        {
+          "h2": "Hvornår den er værd at lave",
+          "ps": [
+            "Ikke alle undertekstfiler har brug for en termtabel. De tilfælde, der berettiger den, er som regel disse:"
+          ],
+          "ul": [
+            "**En hel sæson eller serie** — jo flere afsnit, jo større risiko for afvigelse.",
+            "**Tæt på egennavne** — personer, steder, organisationer, opdigtede ord i værket.",
+            "**Flere personer om arbejdet** — afsnit delt mellem oversættere med forskellige vaner.",
+            "**Overtage andres undertekster** — rette dem til dit eget (eller kundens) brug.",
+            "**Rydde op efter maskinoversættelse** — maskinen kan gengive samme term på flere måder."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Udskiftningsregler grupperet efter kategori i en termtabel",
+            "cap": "Brug #-kommentarer til at gruppere regler og til midlertidigt at slå en regel fra"
+          }
+        },
+        {
+          "h2": "Holde én tabel gennem en sæson",
+          "ps": [
+            "En termtabel vedligeholdes **løbende**: fastlæg navnene i afsnit 1, tilføj en regel, hver gang en ny term dukker op, og når sæsonen er slut, er tabellen komplet. Til næste sæson af samme serie starter du fra den.",
+            "Skriv reglerne lidt bredere end strengt nødvendigt — når »Thor« er besluttet, så tilføj også »Donar -> Thor«, så andres undertekster kan rettes i samme omgang.",
+            "Se altid **ændringslisten** bagefter: den angiver hver post, hver linje og hvad der blev hvad. Det er det eneste sted, man kan bekræfte, at ændringen var rigtig og ikke gik for vidt, og enhver post, du ikke vil have, rulles tilbage med et klik."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Listen over de enkelte ændringer i resultatområdet",
+            "cap": "Hver ændring er listet; klik på en, du ikke vil have, for at føre den tilbage"
+          }
+        },
+        {
+          "h2": "Hvad man ikke bør overlade til en termtabel",
+          "ps": [
+            "En termtabel ændrer **ord**. Disse tre ting ligger uden for dens opgave og bør blive der:",
+            "**Grammatik og sætningsbygning** — et ord bliver ikke til en sætning; arbejde på sætningsniveau hører til [[Undertekstoversættelse|/translate.html]] eller et menneske.",
+            "**Oprydning af indhold** — at fjerne hele linjer som vandmærker, reklamer og SDH-antejsninger hører til [[Oprydning af undertekster|/clean.html]]; regler erstatter, de sletter ikke linjer.",
+            "**Tidslinjer** — en termtabel rører ikke tiden. Til et samlet offset eller et hastighedsproblem, [[Justering af tidslinjen|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Et par ting, der er lette at tage fejl af",
+          "ps": [
+            "**Kinesisk udskifter stadig delstrenge med hele ord slået til — det er normalt.** Kinesisk og japansk skiller ikke ord med mellemrum, værktøjet kan ikke afgøre ordgrænser, og hele ord virker ikke der; beskyttelsen `art` der skåner `start` virker kun på engelsk.",
+            "**Rækkefølgen ændrer resultatet.** Reglerne kører oppefra og ned, og tekst lavet af en regel gennemses igen af reglerne nedenunder. Først A til B, så B til C giver til sidst C.",
+            "**Vil du kun ændre oversættelsen, sæt omfanget.** I en tosproget fil vælg »kun 2. linje«; poster med kun én linje røres ikke under nogen af de to indstillinger — værktøjet gætter ikke, hvilken side der er originalen.",
+            "**Termtabellen gemmes ikke.** Den er tom, hver gang du åbner siden, så gem din egen tekstfil og giv den videre."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Den fulde gennemgang står i [[Sådan udskifter du termer i undertekster på én gang|/guides/glossary.html]]; er indholdet beskidt, kør først [[Oprydning af undertekster|/clean.html]]; er navnene fastlagt, og skal der andre sprog til, [[Undertekstoversættelse|/translate.html]]; og kør resultatet gennem [[Undertekst-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

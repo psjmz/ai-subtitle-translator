@@ -106,7 +106,17 @@ const DEFAULTS = {
   extraParams5: {},
   langModelE: [],          // 走模型 E 的目标语言码数组；空 = E 不参与分流
   rpmE: 8,                 // 每分钟最多请求数（60 秒滑窗）；0 = 不限
-  gapE: 2                  // 批间最小间隔（秒）；0 = 不限
+  gapE: 2,                 // 批间最小间隔（秒）；0 = 不限
+  /* --- v0.9.365：E 专属节奏（用户定案：E 单独一套策略，不动共用链路） ---
+     eOffHours：晚高峰窗口（北京时间 "a-b" 含两端，跨零点如 "23-6" 也认；空串 = 关）。
+       Google 网页端在美东上午（北京 18~24 点）拥堵最重，单批从十几秒涨到 200~300 秒，
+       必然顶穿预算。窗口内 E 不接**新任务**（整程走 D），已在跑的任务不切断。
+     eCooldownMin：超时判死后全局冷却多少分钟（0 = 关）。晚高峰拥堵时每个新任务都会
+       重新撞 E、烧 2×120 秒才降级 —— 冷却让后面的任务直接走 D，不重复交学费。
+     eBridgeUrl：桥接活性探测地址（后台健康灯用；空串 = 不探测）。 */
+  eOffHours: '18-23',
+  eCooldownMin: 30,
+  eBridgeUrl: 'http://127.0.0.1:4982/openai/v1/models'
 };
 
 function ensureData(){
@@ -2316,7 +2326,7 @@ const SEO_QC = {
 const SEO_YTFIX = {
   'zh-CN': {
     title: "YouTube 字幕优化 - 把断在半句的字幕重新对齐 | 随心字幕 AI",
-    desc: "免费在线修复 YouTube 自动字幕：官方自动字幕按固定 3~4 秒切条，不看句子在哪结束，于是上一句的尾巴挂到下一条开头。本工具一个字都不改，只把边界搬回句子该在的位置，时间轴沿用原字幕的真实锚点。可处理 100 种语言的字幕，全程在浏览器里跑。",
+    desc: "油管自动字幕按固定 3~4 秒切条，句子常被切断。本工具一个字不改，只把断句边界搬回句子真正结束的位置。免费，支持 100 种语言。",
     kw: "youtube字幕优化,youtube自动字幕修复,字幕断句,字幕重切,字幕时间轴对齐,srt断句,字幕句子合并,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "把 YouTube 自动生成的字幕丢进来，选好语言，工具会把跨条断开的句子拼回去，再按句子重新切条。一个字都不改，时间轴尽量落在原字幕的真实时间点上。",
     feat: "YouTube 自动字幕按近似固定的 3~4 秒切条，切点跟句子无关，所以常见「上一句的尾巴 + 下一句的开头」挤在同一条里。本工具以原字幕的时间戳为锚点——那些时间本来就是语音识别给出的真实词边界——按标点判断句子在哪结束，用动态规划在句末、逗号、连词、硬切之间选代价最小的落点，再按语速把停留时间补回去。100 种语言各有一套断句规则：中文和日文没有词间空格，泰文连词边界都不明显，印地语用 ।，阿拉伯语用 ؟，亚美尼亚语用 ։。行宽上限与阅读速度按文字系统分档，中文默认每行 16 字，西文 42 字符。导出前会逐字核对文本，字少了或多了当场告警。",
@@ -2334,7 +2344,7 @@ const SEO_YTFIX = {
   },
   'en': {
     title: "YouTube Subtitle Realigner - Put Broken Sentences Back Together | AI-SRTSub",
-    desc: "Free online fix for YouTube auto-captions: the automatic captions are sliced into fixed 3-4 second cues with no regard for sentences, so the tail of one sentence lands at the start of the next cue. This tool changes no words at all - it only moves the cue boundaries back to where the sentences actually end, using the original timestamps as anchors. Works with 100 languages, entirely in your browser.",
+    desc: "YouTube auto-captions break sentences at fixed 3-4 second marks. This tool keeps every word and moves the cue boundaries back to where sentences really end. Free, 100 languages.",
     kw: "youtube subtitle fix,youtube auto captions,subtitle realign,subtitle sentence alignment,fix broken subtitles,srt sentence alignment,subtitle re-segmentation,youtube captions repair,sentence aware subtitles",
     intro: "Drop in a YouTube auto-generated subtitle file, pick the language, and the tool stitches sentences back together across cues, then re-cuts the file sentence by sentence. Not a single word is changed, and cue times stay as close to the original timestamps as possible.",
     feat: "YouTube auto-captions are cut into near-fixed 3-4 second cues regardless of where sentences end, so one cue often carries the tail of the previous sentence plus the start of the next one. The tool treats the original timestamps as anchors - those times are the real word boundaries the speech recogniser produced - decides where each sentence ends from punctuation, and uses dynamic programming to pick the cheapest break point among sentence end, comma, conjunction and hard cut, then extends the on-screen time to match the reading rate. Each of the 100 languages has its own sentence rules: Chinese and Japanese have no spaces between words, Thai barely marks word edges, Hindi ends sentences with ।, Arabic with ؟, Armenian with ։. Line width and reading speed follow the writing system - 16 full-width characters per line for Chinese, 42 characters for Latin scripts. Before export the text is compared character by character, and any lost or added word is flagged on the spot.",
@@ -2604,7 +2614,7 @@ SEO_LANGS.forEach(function (l) {
 const SEO_AUTOSUB = {
   'zh-CN': {
     title: "音频自动生成字幕 - 浏览器里把语音转成 SRT | 随心字幕 AI",
-    desc: "把音频或视频丢进来，识别引擎在浏览器里把语音转成带时间码的字幕：按标点断句、长句按词边界再切、每行不超宽、停留时间按语速补足，直接导 SRT / VTT。支持 100 种语言的音频，文件不上传，免费免注册。",
+    desc: "音频或视频丢进来，语音识别在浏览器里跑：按句子断开、控制行宽、按语速补停留时间，导出 SRT / VTT。文件不上传，免费。",
     kw: "音频转字幕,语音生成字幕,自动字幕生成,音频识别,srt 自动生成,audio to srt,generate subtitles from audio,speech to subtitle,whisper 字幕,本地识别字幕",
     intro: "把音频或视频丢进来，选好语言和模型，识别在本机浏览器里跑，出来的是一份带时间码、已经按句子切好、每行不超宽的字幕草稿。",
     feat: "识别引擎给的是「一串词 + 每个词的真实起止时间」，它不知道什么叫一条字幕：句号后面不会自动断开，长句也不会自己折行。本工具在识别结果之上再做一层排版——按这门语言的句末标点断句，一条放不下就按逗号与词边界再切，按文字系统给行宽上限（中文 16 个全角字、西文 42 字符），最后按阅读速度补最短停留时间、条间留出间隙，并保证时间不倒退不重叠。模型有三个档位，第一次用要下载，之后浏览器会缓存。识别在本机跑，音频不上传服务器。中文的识别结果常是繁体，导出时可以一键转简体。",
@@ -2622,7 +2632,7 @@ const SEO_AUTOSUB = {
   },
   'en': {
     title: "Audio to Subtitles — turn speech into SRT in your browser | AI-SRTSub",
-    desc: "Drop in an audio or video file and the recogniser runs in your browser: sentences are cut at punctuation, long ones are re-cut at word edges, every line stays within width, and on-screen time is topped up to the reading speed. Exports SRT / VTT. 100 audio languages, nothing uploaded, free and no sign-up.",
+    desc: "Audio or video in, subtitles out: speech recognition runs in your browser, cuts the result into cues at real sentence ends and exports SRT / VTT. Nothing is uploaded, free.",
     kw: "audio to srt,speech to subtitle,generate subtitles from audio,automatic subtitle generator,transcribe audio to srt,whisper subtitles,browser speech recognition,offline subtitle generation",
     intro: "Drop in an audio or video file, pick a language and a model, and the recognition runs in your browser. What comes out is a subtitle draft with timing, already cut at sentences and already within line width.",
     feat: "A speech recogniser returns a stream of words with real start and end times — it has no idea what a subtitle cue is. Full stops do not break anything, and long sentences do not wrap themselves. This tool adds that layer: sentences are cut at the punctuation the language actually uses, a cue that does not fit is re-cut at commas and word edges, line width follows the writing system (16 full-width characters for Chinese, 42 for Latin scripts), and on-screen time is topped up to the reading speed with a gap between cues and no overlap or backwards jump. Three model sizes are available; the model downloads on first use and is then cached by the browser. Recognition runs locally and the audio is never uploaded. Chinese output is often traditional characters — one switch converts it to simplified on export.",
@@ -2637,7 +2647,7 @@ const SEO_AUTOSUB = {
 const SEO_OCRSUB = {
   'zh-CN': {
     title: "画面硬字幕提取 - 从视频里把烧死的字幕认出来 | 随心字幕 AI",
-    desc: "视频里的字幕烧在画面上，没有字幕轨可抽。框出字幕所在的横条，工具逐帧取画面、按亮度二值化、识别文字，把连续相同的帧合并成一条字幕，导出 SRT / VTT。视频不上传，免费免注册。",
+    desc: "字幕烧在画面上、没有轨道可抽时，框出字幕条，工具逐帧认字并把相同画面并成一条字幕，导出 SRT / VTT。视频不上传，免费。",
     kw: "硬字幕提取,视频字幕提取,画面字幕识别,视频转字幕,ocr 字幕,extract hardcoded subtitles,burn-in subtitle ocr,video subtitle ocr,subtitle from video",
     intro: "把视频丢进来，框出字幕所在的那一条，工具逐帧认字，再把连续相同的帧合并成一条带时间码的字幕。",
     feat: "烧死在画面上的字幕没有轨道可抽，只能看画面。字幕有三个可以利用的特点：它是画面里最亮的一批像素，位置固定在下方一条带子里，一句台词会停留一到三秒。所以先把这条带子裁出来、按亮度二值化，背景的花花绿绿就全没了，识别器只需要认形状；同一段文字出现在连续几帧里，合并成一条字幕，时间取第一帧到最后一帧。裁得越准、阈值调得越对，认错的字越少。得到的是一份初稿：形近字、漏笔画、把标点认成字这类错误一定会有，接着用清洗和质检过一遍比一条条手改快。",
@@ -2655,7 +2665,7 @@ const SEO_OCRSUB = {
   },
   'en': {
     title: "Hardcoded Subtitle OCR — read subtitles burned into the picture | AI-SRTSub",
-    desc: "When subtitles are baked into the frame there is no track to extract. Mark the strip where the text sits and the tool samples frames, binarises the bright glyphs, reads the characters and merges identical consecutive frames into one cue. Exports SRT / VTT. Nothing is uploaded.",
+    desc: "Subtitles burned into the picture have no track to extract. Mark the strip and the tool reads it frame by frame, merging identical frames into one timed cue. SRT / VTT out, free.",
     kw: "extract hardcoded subtitles,subtitle ocr,video subtitle extraction,burned in subtitles,ocr subtitles from video,video to srt,subtitle from video,hardcoded caption ocr",
     intro: "Drop in a video, mark the strip the subtitles sit in, and the tool reads frame by frame, merging identical consecutive frames into one cue with timing.",
     feat: "Subtitles baked into the picture have no track to pull. They do have three useful properties: they are the brightest pixels on screen, they stay in a fixed strip near the bottom, and one line stays for one to three seconds. So the strip is cropped out and binarised by brightness — the background disappears and the recogniser only has shapes to read. The same text appearing across consecutive frames becomes one cue, timed from the first frame to the last. A tighter crop and a better threshold mean fewer misread characters. What you get is a draft: lookalike characters, missing strokes and punctuation read as text will happen, and running the cleaner and the checker afterwards beats fixing cue by cue.",
@@ -5657,6 +5667,18 @@ function guideLangLinksHtml(base, lang, slug){
 function serveIndexLang(req, res, lang, page){
   page = page || 'index';
   const P = SEO_PAGES[page];
+  /* v0.9.364：这一页还没有这个语言的版本 → 302 到该页英文版。
+     此前 autosub / ocrsub 只有 3 语的 SEO 表，其余 97 个语言 URL 一样返 200：
+     标题英文、正文中文、<html lang> 却是路径上那个语言 —— 用户在下拉框选「日本語」
+     会得到一整页中文，爬虫则把同一份中文正文按 100 种语言各收一遍。
+     收口放在渲染前（不是渲染后加 noindex）：内容不存在就不该有 200。
+     ⚠️ 用 302 不用 301：译文补齐后这条自然失效，浏览器也不会把旧跳转长期缓存。 */
+  if (!P.table[lang]) {
+    const to = P.path['en'] || ('/' + P.file);
+    const b0 = publicBase(req) || '';
+    res.writeHead(302, { 'Location': b0 + to, 'Cache-Control': 'no-store' });
+    res.end(); return;
+  }
   fs.readFile(path.join(ROOT, P.file), 'utf8', (err, html) => {
     if (err) { res.writeHead(500, {'Content-Type':'text/plain; charset=utf-8'}); res.end(P.file + ' missing'); return; }
     const base = publicBase(req) || '';
@@ -7092,6 +7114,49 @@ function eDiagRoll(){
 }
 const E_TTL  = 3 * 60 * 1000;        // 闲置多久视为任务已结束（与 D_TIER_TTL 同一取舍）
 const E_RPM_WIN = 60000;
+/* v0.9.365：E 的全局冷却。晚高峰拥堵（超时类软失败）判死后，别的任务别再一头撞进去
+   重交 2×120 秒学费 —— 暂停接新任务，到期自动恢复。E 一旦成功一次立刻清零（见 E_OK 更新处）。
+   ⚠️ 硬失败（cookie 掉 / 连接拒绝）不冷却：等待不会让它自愈，对症疗法是换 cookie。 */
+const E_COOLDOWN = { until: 0 };
+function eCooldownMs(cfg){
+  const n = Number(cfg && cfg.eCooldownMin);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(720, Math.floor(n)) * 60000;
+}
+/* v0.9.365：晚高峰窗口判定（北京时间，"a-b" 含两端；空串/非法 = 永不屏蔽）。
+   ⚠️ 北京时间必须显式算：服务器时区不可信（PT 日滚动已经踩过本地日错位的坑）。 */
+function eOffHoursHit(cfg){
+  const m = /^(\d{1,2})-(\d{1,2})$/.exec(String((cfg && cfg.eOffHours) || '').replace(/\s+/g, ''));
+  if (!m || +m[1] > 23 || +m[2] > 23) return false;
+  const a = +m[1], b = +m[2];
+  const h = new Date(Date.now() + 8 * 3600 * 1000).getUTCHours();
+  return a <= b ? (h >= a && h <= b) : (h >= a || h <= b);
+}
+/* v0.9.365：桥接活性探测（后台健康灯）。cookie 掉了桥接会回 400「no Gemini models available」，
+   以前要等翻译报错才知道。这里 4 秒超时 GET 一次，结果缓存 30 秒 —— admin 页每次 loadConfig
+   都会来问，真打这么频会把桥接的限速窗口打满（10-22 的教训）。
+   ⚠️ 异步 fire-and-forget：本轮返回的是上次缓存，下一轮 poll 拿到本轮结果 —— 首轮显示
+   「探测中…」是预期行为。探测地址只在配置里出现，绝不写死进选路逻辑。 */
+const E_BRIDGE = { at: 0, ok: false, ms: 0, pending: false };
+function eBridgeProbe(cfg){
+  const url = String((cfg && cfg.eBridgeUrl) || '').trim();
+  if (!/^https?:\/\//.test(url)) return null;         // 没配/配错 = 不探测
+  const now = Date.now();
+  if (now - E_BRIDGE.at < 30000) return E_BRIDGE;     // 30 秒缓存
+  E_BRIDGE.at = now;
+  E_BRIDGE.pending = true;                            // 本轮还没回来，别让后台当成「无响应」
+  const t0 = now;
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), 4000);
+  fetch(url, { signal: ac.signal })
+    .then(r => r.json().then(j => {
+      E_BRIDGE.ok = !!(r.ok && Array.isArray(j.data) && j.data.length);
+      E_BRIDGE.ms = Date.now() - t0;
+    }))
+    .catch(() => { E_BRIDGE.ok = false; E_BRIDGE.ms = Date.now() - t0; })
+    .finally(() => { E_BRIDGE.pending = false; clearTimeout(timer); });
+  return E_BRIDGE;
+}
 
 /* 分流：与 C/B 同一套语义 —— 空数组 = E 不接管任何语言 */
 function langInE(cfg, lang){
@@ -7130,11 +7195,13 @@ function eClearAll(){
   E_LAST.at = 0;
   E_RPM.length = 0;
   E_OK.at = 0; E_OK.model = '';
+  E_COOLDOWN.until = 0;   // v0.9.365：冷却一起清（配置换了，旧冷却的归因已失效）
   /* v0.9.354：清配置就是「当它没配过」，旧失败计数留着会让新配置一上来就顶着红灯 */
   E_DIAG.day = ''; E_DIAG.fail = 0; E_DIAG.lastErr = ''; E_DIAG.lastErrAt = 0;
 }
-/* 后台状态灯：当前占用 / 最近成功 / 本分钟已发几次（只给已鉴权的 /api/admin/config 用） */
-function eStatus(){
+/* 后台状态灯：当前占用 / 最近成功 / 本分钟已发几次（只给已鉴权的 /api/admin/config 用）
+   v0.9.365：带 cfg —— 顺带算「此刻在不在晚高峰窗口」与冷却剩余；E 配齐时探一次桥接活性。 */
+function eStatus(cfg){
   const now = Date.now();
   eSweep(now);
   eDiagRoll();
@@ -7142,9 +7209,13 @@ function eStatus(){
   for (let i = E_RPM.length - 1; i >= 0; i--) {
     if (now - E_RPM[i] < E_RPM_WIN) n++; else break;
   }
-  /* v0.9.354：带上失败次数与最后一条错误（后台健康灯的第二个判据） */
+  const bridge = slotReady(cfg, 'E') ? eBridgeProbe(cfg) : null;
+  /* v0.9.354：带上失败次数与最后一条错误（后台健康灯的第二个判据）
+     v0.9.365：加 offHours / coolUntil / bridge（E 槽自己的节奏，后台一眼看全） */
   return { busy: E_OWN.task || '', okAt: E_OK.at || 0, okModel: E_OK.model || '', rpm: n, lastAt: E_LAST.at || 0,
-           fail: E_DIAG.fail || 0, lastErr: E_DIAG.lastErr || '', lastErrAt: E_DIAG.lastErrAt || 0 };
+           fail: E_DIAG.fail || 0, lastErr: E_DIAG.lastErr || '', lastErrAt: E_DIAG.lastErrAt || 0,
+           offHours: eOffHoursHit(cfg) ? 1 : 0, coolUntil: E_COOLDOWN.until || 0,
+           bridge: bridge ? { ok: !!bridge.ok, ms: bridge.ms || 0, pending: !!bridge.pending } : null };
 }
 /* 每分钟窗口还有名额吗？满了返回「还要等几秒」 */
 function eRpmWait(cfg, now){
@@ -7166,9 +7237,14 @@ function ePick(cfg, lang, meta){
   if (!rec) {
     /* 首批判定：E 空着就抢下来，被别人占着就直接认降级（不排队） */
     const busy = !!E_OWN.task && E_OWN.task !== task;
-    rec = busy ? { on: 0, why: 'busy', at: now } : { on: 1, why: '', at: now };
+    /* v0.9.365：晚高峰窗口 / 全局冷却中 → 首批就认降级，整程走 D/C/B/A。
+       只拦**新任务**：已在跑的 E 任务不切断（中途换模型语气会跳），跑完自然释放。
+       rec 粘住降级决定，窗口中途结束本任务也不回头 —— 与 busy 同一语义。 */
+    const off = eOffHoursHit(cfg) ? 'offhours' : (E_COOLDOWN.until > now ? 'cooldown' : '');
+    const deny = busy || !!off;
+    rec = deny ? { on: 0, why: off || 'busy', at: now } : { on: 1, why: '', at: now };
     E_TASK.set(task, rec);
-    if (!busy) { E_OWN.task = task; E_OWN.at = now; }
+    if (!deny) { E_OWN.task = task; E_OWN.at = now; }
   } else {
     rec.at = now;
     /* 自己闲置超时、被别人接手了 → 本任务认降级，不抢回来（抢回来会让两边来回跳） */
@@ -7216,6 +7292,13 @@ function eTaskFail(taskId, err){
   if (rec.fail >= need) {
     rec.on = -1; rec.why = 'dead';
     if (E_OWN.task === tid) { E_OWN.task = ''; E_OWN.at = 0; }
+    /* v0.9.365：软失败（晚高峰拥堵超时）判死 → 全局冷却，后面的任务直接走 D，
+       不再每个新任务重交一遍学费。硬失败不冷却：cookie 掉了等不来，对症是换 cookie。
+       cfg 现读而非传参 —— eTaskFail 的签名被 354 断言钉死，且这里一天也走不到几次。 */
+    if (soft) {
+      const cd = eCooldownMs(readConfig());
+      if (cd > 0) E_COOLDOWN.until = Date.now() + cd;
+    }
   } else {
     /* 软失败第一次：保持 on=1 与认领，本批已由调用方回退到 C/B/A，下一批再给 E 一次机会 */
     rec.on = 1; rec.why = '';
@@ -7754,6 +7837,9 @@ const server = http.createServer(async (req, res) => {
       const cliAc = new AbortController();
       res.on('close', () => { if (!res.writableFinished) cliAc.abort(); });
       const CALL_BUDGET_MS = 90000;   /* 与前端「90 秒模型预算 + 15 秒排队冗余」对齐；回退链每级各拿一份 */
+      /* v0.9.365：E 走网页桥接，正常单批 6~66 秒，90 秒预算贴着上限 —— 晚高峰前段（还没拥堵到
+         200 秒）的批会被误杀。给 E 单独放宽到 120 秒（用户定案）；回退链每级仍是 90 秒。 */
+      const CALL_BUDGET_E_MS = 120000;
       const cfg = readConfig();
       if (!(cfg.base && cfg.model && cfg.key)) {
         return sendJson(res, 503, { error: { code: 'not_configured', message: 'Default model is not configured by the site admin. Use your own API instead.' } });
@@ -7912,12 +7998,13 @@ const server = http.createServer(async (req, res) => {
            前端完全无感）。注意它吃的是**同一份** 90 秒预算，不会因为换 key 就多拿时间。 */
         const out = pick.which === 'D'
           ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }), dTaskId)
-          : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
+          : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: pick.which === 'E' ? CALL_BUDGET_E_MS : CALL_BUDGET_MS }));
         /* v0.9.350：E 的成功时间只用于后台健康灯（cookie 掉了要能一眼看出）
            v0.9.357：成功一次就把该任务的连续失败计数清零 —— 否则「2 次才判死」会变成
            「历史上失败过 2 次就死」，跑一整天必然误杀。 */
         if (pick.which === 'E') {
           E_OK.at = Date.now(); E_OK.model = String(slotModelName || '');
+          E_COOLDOWN.until = 0;               // v0.9.365：成功一次立刻解除全局冷却（E 已被证明可用）
           const r0 = E_TASK.get(dTaskId);
           if (r0) { r0.fail = 0; r0.on = 1; r0.why = ''; }
         }
@@ -8150,7 +8237,10 @@ const server = http.createServer(async (req, res) => {
           langModelE: Array.isArray(cfg.langModelE) ? cfg.langModelE.slice() : [],
           rpmE: (typeof cfg.rpmE === 'number' && Number.isFinite(cfg.rpmE)) ? cfg.rpmE : 8,
           gapE: (typeof cfg.gapE === 'number' && Number.isFinite(cfg.gapE)) ? cfg.gapE : 2,
-          eStat: eStatus(),
+          eOffHours: cfg.eOffHours || '',
+          eCooldownMin: (typeof cfg.eCooldownMin === 'number' && Number.isFinite(cfg.eCooldownMin)) ? cfg.eCooldownMin : 30,
+          eBridgeUrl: cfg.eBridgeUrl || '',
+          eStat: eStatus(cfg),
           fallbackToA: cfg.fallbackToA !== false,
           perIpDaily: cfg.perIpDaily, globalDaily: cfg.globalDaily,
           temperature: (typeof cfg.temperature === 'number' && Number.isFinite(cfg.temperature)) ? cfg.temperature : 0.2,
@@ -8524,6 +8614,13 @@ const server = http.createServer(async (req, res) => {
         /* rpmE 下界是 0：0 = 不限（与 hourlyD 同一约定）；gapE 上界 30 秒，见 eGapMs */
         if (body.rpmE !== undefined && Number.isFinite(+body.rpmE)) cfg.rpmE = Math.max(0, Math.min(600, Math.floor(+body.rpmE)));
         if (body.gapE !== undefined && Number.isFinite(+body.gapE)) cfg.gapE = Math.max(0, Math.min(30, Math.floor(+body.gapE)));
+        /* v0.9.365：E 专属节奏 —— 晚高峰窗口（"a-b" 或空=关）/ 冷却分钟 / 桥接探测地址 */
+        if (typeof body.eOffHours === 'string') {
+          const m = /^(\d{1,2})-(\d{1,2})$/.exec(body.eOffHours.replace(/\s+/g, ''));
+          cfg.eOffHours = (m && +m[1] <= 23 && +m[2] <= 23) ? (+m[1] + '-' + +m[2]) : '';
+        }
+        if (body.eCooldownMin !== undefined && Number.isFinite(+body.eCooldownMin)) cfg.eCooldownMin = Math.max(0, Math.min(720, Math.floor(+body.eCooldownMin)));
+        if (typeof body.eBridgeUrl === 'string') cfg.eBridgeUrl = body.eBridgeUrl.trim();
         if (body.fallbackToA !== undefined) cfg.fallbackToA = !!body.fallbackToA;
         if (Number.isFinite(+body.perIpDaily)) cfg.perIpDaily = Math.max(0, Math.floor(+body.perIpDaily));
         if (Number.isFinite(+body.globalDaily)) cfg.globalDaily = Math.max(0, Math.floor(+body.globalDaily));
@@ -8606,8 +8703,9 @@ const server = http.createServer(async (req, res) => {
           //  message.content 字段直接缺失，前端拿到 undefined（误判"模型返回空"）。
           /* v0.9.358：E 走网页桥接，单次实测 17~66 秒，30 秒测试预算必然超时 ——
              后台点「测试」就报 502「连通失败」，看着像通道挂了，其实只是预算太短。
-             按槽位给预算：E 用 90 秒（与正式调用的 CALL_BUDGET_MS 一致），A/B/C 维持 30 秒。 */
-          const testBudget = which === 'E' ? 90000 : 30000;
+             v0.9.365：E 的正式预算放宽到 120 秒，测试预算同步跟上（与 CALL_BUDGET_E_MS 一致），
+             A/B/C 维持 30 秒。 */
+          const testBudget = which === 'E' ? 120000 : 30000;
           const out = await callModel(slot, [{ role: 'user', content: 'Reply with exactly: OK' }], 256, { timeoutMs: testBudget });
           const choice = out.choices && out.choices[0];
           const sample = choice && choice.message ? choice.message.content : '';

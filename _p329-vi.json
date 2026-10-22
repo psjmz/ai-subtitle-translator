@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "vi": {
+      "seo": {
+        "title": "Cách dùng phụ đề hiệu ứng và ghép song ngữ – Ghép · Kiểu · Xuất – AI-SRTSub",
+        "desc": "Ghép hai tệp phụ đề thành song ngữ, chỉnh thứ tự và kiểu dáng của bản song ngữ có sẵn, gắn hiệu ứng cho phụ đề đơn ngữ. Chọn cách ghép cặp, tinh chỉnh năm mẫu ASS và sáu mẫu VTT, chọn định dạng xuất.",
+        "h1": "Cách dùng phụ đề hiệu ứng và ghép song ngữ",
+        "intro": "Ghép hai tệp phụ đề thành song ngữ, hoặc gắn trực tiếp kiểu dáng cho phụ đề: phông chữ, màu, viền, vị trí — thấy gì trong bản xem trước thì xuất ra đúng như vậy.",
+        "ctaText": "Mở công cụ phụ đề hiệu ứng"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết việc gì",
+          "ps": [
+            "Trong cùng một trang thực ra có ba việc: ghép bản gốc và bản dịch thành một tệp song ngữ, chỉnh thứ tự và kiểu dáng cho phụ đề đã song ngữ, và gắn hiệu ứng cho phụ đề đơn ngữ. Cả ba dùng chung một bộ tham số kiểu dáng và một bản xem trước."
+          ],
+          "ul": [
+            "**Ghép hai tệp phụ đề** —— có sẵn bản gốc và bản dịch, ghép thành một tệp song ngữ để xuất.",
+            "**Chỉnh phụ đề song ngữ** —— đã song ngữ nhưng thứ tự hoặc kiểu dáng chưa đúng, xếp lại một lượt.",
+            "**Phụ đề đơn ngữ** —— chỉ có một tệp, gắn phông chữ, viền, vị trí.",
+            "Ba việc chuyển tab ở bên trái, vùng kiểu dáng và vùng xem trước dùng chung."
+          ]
+        },
+        {
+          "h2": "Ba việc, cùng một trang",
+          "ps": [
+            "Đầu trang có ba tab: **Ghép hai tệp phụ đề**, **Chỉnh phụ đề song ngữ**, **Phụ đề đơn ngữ**. Chọn tab nào thì quyết định bên trái có mấy ô nhập.",
+            "Khi ghép hai tệp, bên trái là hai ô «1 Phụ đề gốc» và «2 Phụ đề dịch», mỗi ô đều tải tệp lên được, cũng dán trực tiếp văn bản phụ đề vào được. Chỉnh phụ đề song ngữ và phụ đề đơn ngữ chỉ có một ô."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Ba tab ở đầu công cụ phụ đề hiệu ứng và vùng nhập bên trái",
+            "cap": "Ba tab ở đầu trang; chọn «Ghép hai tệp phụ đề» thì bên trái hiện hai ô gốc và dịch"
+          }
+        },
+        {
+          "h2": "Hai tệp phụ đề ghép cặp thế nào",
+          "ps": [
+            "Mục đầu tiên trong «3 Thiết lập ghép» là cách ghép cặp: **Ghép theo thứ tự · dùng timeline bản gốc**, **Ghép theo timeline · dùng timeline bản gốc**, **Ghép theo thứ tự · dùng timeline bản dịch**.",
+            "Khi hai tệp có số mục và thứ tự khớp nhau, ghép theo thứ tự là ổn định nhất; nếu số mục lệch (một bên đã gộp mục, một bên đã tách), hãy ghép theo timeline để công cụ tìm theo thời điểm gần nhất. Dùng timeline của bên nào thì xem bên nào chính xác hơn — thường bản gốc chính xác hơn.",
+            "Bên dưới còn có cấu trúc văn bản (tự nhận diện / một mục hai dòng / xen kẽ từng cặp) và thứ tự (bản gốc ở trên / bản dịch ở trên)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Cách ghép cặp, cấu trúc văn bản và thứ tự trong thiết lập ghép",
+            "cap": "Cách ghép cặp quyết định ai đi với ai thành một mục, dùng timeline gốc hay dịch cũng chọn ở đây"
+          }
+        },
+        {
+          "h2": "Chỉnh từng mục kiểu dáng",
+          "ps": [
+            "Bên phải là vùng kiểu dáng. Khi xuất ASS, phần có hiệu lực là «Giao diện ASS»: bố cục (chia màn hình · tách trên dưới / xếp chồng · hai dòng dưới), cỡ chữ, màu, độ mờ, phông, đậm, nghiêng, khoảng cách chữ, viền, màu viền, bóng/nền (không / bóng / nền), độ sâu, màu cạnh, độ mờ màu cạnh, căn ngang (dưới · trái / dưới · giữa / dưới · phải), khoảng cách tới đáy của bản dịch (chính), cùng phông, bóng/nền và lề trái phải của bản gốc (phụ).",
+            "Khi xuất kiểu song ngữ VTT, phần có hiệu lực là «Kiểu WebVTT»: trên sáu mẫu đặt sẵn (Chuẩn / Gọn / Điện ảnh / Trên cùng / Trợ năng / Dọc), còn chỉnh được line dọc, điểm neo (sát đáy / sát đỉnh / giữa), position ngang, độ rộng size, căn lề align, chiều cao dòng của cả mục, cùng màu nền, độ mờ nền, độ dày viền của dòng bản dịch; dòng bản gốc có thể dùng chung kiểu chính hoặc đặt riêng.",
+            "Chỉnh xong có thể «Lưu thành bộ»; lần sau chọn trong «Từ bộ đã lưu» rồi bấm «Áp dụng» là dùng lại được."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Các tham số trong vùng kiểu dáng Giao diện ASS bên phải",
+            "cap": "Cỡ chữ, màu, viền, bóng/nền, căn lề đều chỉnh được từng mục; chỉnh xong lưu thành bộ"
+          }
+        },
+        {
+          "h2": "Xem trước trước khi xuất",
+          "ps": [
+            "«Xem trước ghép» là một bảng: #, thời gian, bản gốc, bản dịch, kiểu dáng. Phía trên lọc được các dòng đáng ngờ theo «Có hiệu ứng âm thanh», «Có tiền tố người nói», «Thời lượng < 1 giây», «Trên hai dòng», «Tốc độ đọc vượt mức», hoặc nhập từ khóa để lọc.",
+            "Bấm vào ô kiểu dáng của một dòng sẽ mở phần chỉnh sửa ô đó, chỉ liệt kê những dòng nó dùng; «Gỡ toàn bộ ghi đè» trả mọi ghi đè thủ công về mẫu. Vùng chỉnh timeline bên dưới cho phép dịch chuyển toàn bộ (từ một mục nào đó) và co giãn theo tỉ lệ.",
+            "Xác nhận xong thì sang «4 Xuất»: tải tệp phụ đề hoặc sao chép nội dung."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Bảng xem trước ghép và thanh lọc",
+            "cap": "Xem trước chính là kết quả xuất, lọc được dòng đáng ngờ theo loại, cũng mở riêng được từng ô kiểu dáng"
+          }
+        },
+        {
+          "h2": "Những gì không bị đụng tới",
+          "ps": [
+            "Kiểu dáng chỉ đổi hình thức, không đổi lời thoại. Nội dung chữ của bản gốc và bản dịch không đổi một chữ trong quá trình ghép; timeline giữ nguyên bản bạn chọn trừ khi bạn chủ động chỉnh ở vùng điều chỉnh dưới bản xem trước.",
+            "Khi xuất SRT hoặc «VTT không kiểu», thông tin kiểu dáng không ghi vào tệp — trang sẽ báo đang xuất VTT không kiểu, không có khối STYLE, trình phát dùng giao diện mặc định. Muốn có kiểu thì chọn VTT song ngữ hoặc ASS."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Hai tệp phụ đề lệch số mục thì sao?** Dùng «Ghép theo timeline», công cụ khớp theo thời điểm gần nhất; mục không khớp được sẽ không tự sinh ra.",
+            "**Kiểu xuất ASS bị trình phát không nhận?** Kiểu ASS ghi trong tệp, nhưng mức hỗ trợ ASS của các trình phát khác nhau. Cần giao diện phổ biến hơn thì xuất VTT song ngữ.",
+            "**Sửa mẫu lung tung rồi muốn về ban đầu?** «Khôi phục tham số mặc định» ở vùng ASS và «Khôi phục mẫu mặc định» ở vùng VTT lần lượt trả hai phần về ban đầu.",
+            "**Bảy dòng trong bản mẫu là gì?** Là ví dụ có sẵn trong trang, chỉ để xem trước dạng sau khi ghép, bản mẫu không xuất được; tải phụ đề của bạn lên và bấm xem trước ghép thì nó tự thay thế."
+          ]
+        },
+        {
+          "h2": "Quyền riêng tư",
+          "ps": [
+            "Phụ đề được xử lý hoàn toàn trong trình duyệt, không tải lên, không qua máy chủ. Đóng trình duyệt là nội dung trong quá trình xử lý biến mất."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Cần tách bản song ngữ thành hai track thì dùng [[Tách song ngữ|/bilingual.html]]; ngược lại muốn làm phụ đề đơn ngữ thành song ngữ thì xem [[Hai cách làm phụ đề song ngữ|/guides/make-bilingual-subtitles.html]]; ghép xong đưa qua [[Kiểm tra phụ đề|/qc.html]] một lượt; cần xử lý cả một season thì đi [[Chuyển đổi hàng loạt|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "vi": {
+      "seo": {
+        "title": "Cách trích xuất văn bản thuần từ phụ đề – Hai bố cục và bốn mục dọn – AI-SRTSub",
+        "desc": "Cách dùng đầy đủ: chọn bố cục đoạn liên tục hay từng dòng, năm công tắc dọn dẹp bỏ đi những gì, và sáu định dạng SRT / VTT / ASS / SBV / LRC / TXT đều nhận.",
+        "h1": "Cách trích xuất văn bản thuần từ phụ đề",
+        "intro": "Trích lời thoại trong phụ đề thành văn bản thuần sạch: timeline, số thứ tự, thẻ kiểu dáng đều tự bỏ, kết quả đọc được ngay như một bài viết hoặc dùng làm danh sách đối thoại.",
+        "ctaText": "Mở trích xuất văn bản thuần"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết việc gì",
+          "ps": [
+            "Trong tệp phụ đề chỉ có lời thoại là thực sự hữu ích, phần còn lại là cấu trúc cho trình phát đọc: số thứ tự, timeline, thẻ kiểu dáng. Trang này bỏ cấu trúc, chỉ giữ chữ."
+          ],
+          "ul": [
+            "**Đọc như bài viết** —— xuất đoạn liên tục, tự ngắt đoạn theo khoảng lặng và dấu câu cuối câu.",
+            "**Dùng như danh sách** —— xuất từng dòng, một mục phụ đề một dòng, tiện làm bảng đối thoại hoặc đưa sang công cụ khác.",
+            "**Dọn luôn một lượt** —— ghi chú cho người khiếm thính, watermark quảng cáo, câu lặp liền kề mặc định bị bỏ.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** sáu định dạng đều nhận."
+          ]
+        },
+        {
+          "h2": "Đưa vào, đừng chỉ nghĩ tới tải lên",
+          "ps": [
+            "Ô «1 Đưa phụ đề vào» bên trái hỗ trợ tải tệp, cũng dán trực tiếp nội dung phụ đề vào khung văn bản. Đưa nhầm thì bấm «Xóa» làm lại.",
+            "Trang này đọc tệp theo UTF-8. Nếu mở phụ đề ra thấy đầy dấu hỏi hoặc ô vuông thì là hỏng bảng mã, hãy sang [[Sửa lỗi mã hóa|/repair.html]] đổi sang UTF-8 rồi quay lại."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Vùng đưa phụ đề vào của trang trích xuất văn bản thuần",
+            "cap": "Tải tệp lên, hoặc dán thẳng nội dung phụ đề vào khung văn bản"
+          }
+        },
+        {
+          "h2": "Chọn bố cục nào",
+          "ps": [
+            "Trên cùng «2 Tùy chọn trích xuất» là bố cục: **Đoạn liên tục** tự ngắt đoạn theo khoảng lặng và dấu câu cuối câu, đọc như một bài viết; **Từng dòng** một mục phụ đề một dòng, tương ứng một-một với mục trong tệp gốc.",
+            "Muốn chép lời thoại để ghi chú, luyện dịch, đọc như bài thì dùng đoạn liên tục; muốn làm danh sách đối thoại, đối chiếu từng mục với bản gốc, đưa sang công cụ khác thì dùng từng dòng."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Bố cục và các công tắc dọn trong tùy chọn trích xuất",
+            "cap": "Chọn một bố cục; năm công tắc bên dưới mỗi cái quyết định bỏ loại nội dung nào"
+          }
+        },
+        {
+          "h2": "Năm mục dọn bỏ những gì",
+          "ps": [
+            "**Bỏ ghi chú khiếm thính**: xóa các ngoặc mô tả âm thanh như «(tiếng bước chân)», «[nhạc]», giữ lại lời thoại.",
+            "**Bỏ watermark quảng cáo**: loại các dòng như tên nhóm dịch, địa chỉ web, tài khoản mạng xã hội.",
+            "**Bỏ câu lặp liền kề**: cùng một câu xuất hiện hai lần sát nhau (sự cố phát) thì chỉ giữ một; lặp cách xa là có ý nghĩa, không đụng.",
+            "**Bỏ tiền tố người nói**: «JOHN: Chào bạn» chỉ giữ «Chào bạn». Mặc định giữ lại — văn bản dạng kịch bản cần nhận ra ai nói.",
+            "**Bỏ dòng lời bài hát**: bỏ qua dòng toàn bộ là «♪ … ♪». Mặc định giữ lại — lời bài hát cũng là lời."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Năm công tắc dọn và phần giải thích trong tùy chọn trích xuất",
+            "cap": "Bên phải mỗi công tắc đều ghi rõ nó bỏ đi cái gì, cần thì tích"
+          }
+        },
+        {
+          "h2": "Lấy kết quả thế nào",
+          "ps": [
+            "Ô «3 Kết quả» bên phải hiển thị văn bản sau trích xuất theo thời gian thực, đổi tùy chọn là tính lại ngay.",
+            "Xác nhận xong bấm «Tải xuống» để lưu thành .txt, hoặc «Sao chép» để mang đi luôn. Với tiếng Trung, tiếng Nhật — những ngôn ngữ không dùng dấu cách để tách từ — quy tắc gộp dòng khác tiếng Anh, công cụ tự xử lý theo ngôn ngữ."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Vùng kết quả trích xuất cùng nút tải xuống và sao chép",
+            "cap": "Kết quả cập nhật theo thời gian thực, tải thành txt hoặc sao chép trực tiếp"
+          }
+        },
+        {
+          "h2": "Những gì không bị đụng tới",
+          "ps": [
+            "Bản thân lời thoại không bị viết lại. Công tắc dọn chỉ quyết định loại nào bị bỏ cả dòng hoặc cả đoạn, không đổi chữ trong mục.",
+            "Timeline và số thứ tự là «không xuất ra», không phải «sửa rồi mới xuất» — tệp gốc không bị ảnh hưởng, trang này không cung cấp bản xuất kèm timeline, việc đó thuộc về [[Chuyển đổi định dạng|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Thẻ kiểu dáng ASS có sót lại trong văn bản không?** Không. Thẻ ghi đè kiểu `{}` của ASS bị bỏ, chỉ giữ chữ thoại.",
+            "**Phụ đề song ngữ trích ra là hai dòng hay một dòng?** Mục gốc có mấy dòng thì giữ mấy dòng, trang này không gộp cũng không tách — muốn tách thì dùng [[Tách song ngữ|/bilingual.html]].",
+            "**Vì sao tiền tố người nói mặc định được giữ?** Tên người trong «JOHN: Chào bạn» thường là thông tin hữu ích (kịch bản, bảng đối thoại), bỏ đi dễ không biết ai đang nói, nên để bạn tự quyết.",
+            "**Tệp lời bài hát LRC có trích được không?** Được. Nhãn thời gian LRC bị bỏ, chỉ giữ dòng lời; không muốn giữ lời thì tích «Bỏ dòng lời bài hát»."
+          ]
+        },
+        {
+          "h2": "Quyền riêng tư",
+          "ps": [
+            "Phụ đề được xử lý hoàn toàn trong trình duyệt, không tải lên, không qua máy chủ. Văn bản chỉ ở lại trang hiện tại, làm mới là xóa sạch."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Muốn hiểu tệp phụ đề thực sự chứa gì thì xem [[Tệp SRT thực sự chứa gì|/guides/srt-file-format.html]]; lời thoại trích ra cần dịch thì vào [[Dịch phụ đề|/translate.html]]; cần làm thành bảng thì dùng [[Phụ đề sang Excel/CSV|/guides/srt-to-excel.html]]; trước khi giao đi thì qua [[Kiểm tra phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "vi": {
+      "seo": {
+        "title": "Cách tách và nối phụ đề – Cắt theo đoạn · Nối theo thứ tự – AI-SRTSub",
+        "desc": "Cắt một tệp thành nhiều đoạn theo thời lượng hoặc số mục, mỗi đoạn đếm lại từ đầu; nối nhiều tệp theo thứ tự, hoặc giữ mốc thời gian và đan theo thời gian. Số thứ tự tự xếp lại.",
+        "h1": "Cách tách và nối phụ đề",
+        "intro": "Một tệp phụ đề dài cắt thành nhiều đoạn, hoặc nhiều tệp rời ghép thành một. Chỉ cắt ở ranh giới mục, tuyệt đối không chặt đôi một câu.",
+        "ctaText": "Mở tách và nối"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết việc gì",
+          "ps": [
+            "Chia tập, chia đoạn, ghép nguồn phim — đều gặp chuyện phụ đề lệch đoạn: hoặc một tệp cần cắt ra, hoặc vài tệp cần ghép thành một. Trang này lo hai việc đó, cắt và nối mỗi thứ một tab."
+          ],
+          "ul": [
+            "**Tách** —— một tệp phụ đề dài cắt thành nhiều đoạn theo thời lượng hoặc số mục.",
+            "**Nối** —— nhiều tệp phụ đề nối theo thứ tự thành một tập, hoặc đan theo thời gian.",
+            "**Chỉ cắt ở ranh giới mục** —— một câu không bị chặt làm đôi.",
+            "**Số thứ tự tự xếp lại** —— nối xong không phải tự sửa số, lời thoại không đổi một chữ."
+          ]
+        },
+        {
+          "h2": "Chọn cắt hay nối trước",
+          "ps": [
+            "Hai tab ở đầu: **Tách: một tệp thành nhiều đoạn** và **Nối: nhiều tệp thành một**. Chọn xong thì bước hai bên dưới đổi theo.",
+            "Trong «1 Đưa phụ đề vào» có thể tải tệp hoặc dán văn bản, đưa nhầm thì bấm «Xóa». Trang này chỉ đọc UTF-8 — hỏng bảng mã (đầy dấu hỏi hoặc ô vuông) thì sang [[Sửa lỗi mã hóa|/repair.html]] trước."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Hai tab ở đầu trang tách và nối",
+            "cap": "Tách và nối là hai tab, chọn xong thì tùy chọn ở bước hai đổi theo"
+          }
+        },
+        {
+          "h2": "Cắt thế nào",
+          "ps": [
+            "Trong «2 Cắt thế nào» chọn căn cứ: **Thời lượng** (mỗi X phút một đoạn) hoặc **Số mục** (mỗi X mục một đoạn), điền một số.",
+            "Tích «Mỗi đoạn đếm lại từ 0:00» thì mỗi đoạn cắt ra tự tính từ đầu — dùng khi tải từng tập lên, mỗi đoạn đưa riêng cho trình phát. Không tích thì giữ mốc thời gian gốc, đoạn cắt ra vẫn khớp vị trí trong phim gốc.",
+            "Chỉ cắt ở ranh giới của mục phụ đề: một mục đặc biệt dài vắt qua mốc thời gian thì cả mục ở lại đoạn trước."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Tùy chọn thời lượng/số mục và đếm lại từ đầu ở trang tách",
+            "cap": "Cắt theo thời lượng hoặc số mục, có thể để mỗi đoạn bắt đầu từ 0:00"
+          }
+        },
+        {
+          "h2": "Nối thế nào",
+          "ps": [
+            "Trong «2 Nối thế nào» chọn cách: **Nối theo thứ tự** dịch chuyển cả tệp sau ra sau điểm kết thúc của tệp trước, các đoạn không chồng lên nhau; **Đan theo thời gian** giữ mốc thời gian gốc của từng tệp, xếp theo thời điểm bắt đầu.",
+            "Nhiều tệp là nửa đầu và nửa sau của cùng một tập, hoặc đã tách ra soát xong cần ghép lại thì dùng nối theo thứ tự; vài tệp vốn nên cùng màn hình (như track gốc và track dịch) thì dùng đan theo thời gian.",
+            "Nối xong số thứ tự tự xếp lại, lời thoại không đổi một chữ."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Tùy chọn nối theo thứ tự và đan theo thời gian ở trang nối",
+            "cap": "Nối theo thứ tự hợp với nửa đầu/nửa sau, đan theo thời gian hợp với track gốc và track dịch"
+          }
+        },
+        {
+          "h2": "Lấy kết quả thế nào",
+          "ps": [
+            "Ô «3 Kết quả» bên phải hỗ trợ xuất **SRT** và **VTT**, bấm «Tải xuống» hoặc «Sao chép».",
+            "Khi tách có thể «Tải xuống tất cả từng đoạn», lưu một lần mọi đoạn đã cắt, không phải bấm từng đoạn."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Chọn định dạng SRT/VTT và nút tải xuống, tải tất cả từng đoạn ở vùng kết quả",
+            "cap": "Kết quả tách tải được tất cả từng đoạn, nối xong thì tải xuống hoặc sao chép"
+          }
+        },
+        {
+          "h2": "Những gì không bị đụng tới",
+          "ps": [
+            "Lời thoại không đổi một chữ. Trang này chỉ đụng «mục nào thuộc đoạn nào» và «số thứ tự xếp thế nào», không đụng nội dung mục.",
+            "Khi chọn «Nối theo thứ tự», mốc thời gian của các tệp sau bị dịch chuyển toàn bộ — đó là yêu cầu của chính việc nối; chọn «Đan theo thời gian» thì mốc thời gian gốc của từng tệp đều được giữ."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Đoạn cuối cắt ra ngắn bất thường thì sao?** Bình thường. Phần dư không đủ một độ dài trọn vẹn tự thành một đoạn, không gò cho đủ.",
+            "**Một câu nằm đúng trên mốc chia có bị cắt đôi không?** Không. Chỉ cắt ở ranh giới mục, mục vắt qua mốc thời gian ở lại đoạn trước.",
+            "**Đan theo thời gian mà hai mục trùng thời điểm hoàn toàn thì xếp thế nào?** Xếp theo thời điểm bắt đầu, trùng thời điểm bắt đầu thì giữ thứ tự bạn đưa vào.",
+            "**ASS có cắt được không?** Trang này hỗ trợ SRT và VTT. ASS thì dùng [[Chuyển đổi định dạng|/convert.html]] đổi sang SRT hoặc VTT rồi xử lý."
+          ]
+        },
+        {
+          "h2": "Quyền riêng tư",
+          "ps": [
+            "Phụ đề được xử lý hoàn toàn trong trình duyệt, không tải lên, không qua máy chủ. Đóng trang là nội dung biến mất."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Hai tệp cần ghép thành song ngữ (không phải nối thành một tập) thì dùng [[Phụ đề hiệu ứng và ghép song ngữ|/guides/merge.html]]; timeline bị lệch toàn bộ thì sang [[Điều chỉnh timeline|/shift.html]]; khối lượng cả một season thì đi [[Chuyển đổi hàng loạt|/batch.html]]; xử lý xong qua [[Kiểm tra phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "vi": {
+      "seo": {
+        "title": "Cách dùng công cụ đánh thời gian lời bài hát – Phát · Dán – AI-SRTSub",
+        "desc": "Đưa nhạc vào, dán lời, vừa nghe vừa bấm thời gian từng câu, xem trước LRC theo thời gian thực, xuất LRC hoặc SRT. Dấu cách phát/tạm dừng, Enter đánh câu hiện tại, Z hoàn tác.",
+        "h1": "Cách dùng công cụ đánh thời gian lời bài hát",
+        "intro": "Đưa nhạc vào, dán lời, vừa nghe vừa bấm thời gian từng câu, xuất LRC chuẩn hoặc SRT. Âm thanh chỉ phát trên máy, không tải lên.",
+        "ctaText": "Mở công cụ đánh thời gian lời"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết việc gì",
+          "ps": [
+            "Gắn cho một bài hát một tệp lời có thể hát theo: một câu một dòng, mỗi dòng kèm một mốc thời gian. Trình phát nhận LRC, track phụ đề nhận SRT, xuất được cả hai."
+          ],
+          "ul": [
+            "**Đánh từ đầu** —— dán lời dạng văn bản thuần, vừa nghe vừa bấm.",
+            "**Sửa bản có sẵn** —— nhập LRC có sẵn, đánh tiếp từ dòng đầu tiên chưa có thời gian.",
+            "**Xuất hai loại** —— LRC cho trình phát, SRT cho track phụ đề video.",
+            "**Toàn bàn phím** —— dấu cách phát/tạm dừng, Enter đánh câu hiện tại, Z hoàn tác."
+          ]
+        },
+        {
+          "h2": "1 Đưa nhạc vào",
+          "ps": [
+            "Ô đầu tiên bên trái tải âm thanh lên, **MP3, M4A, FLAC, WAV, OGG** đều được. Âm thanh chỉ phát trên máy, không tải lên.",
+            "Chất lượng âm thanh không ảnh hưởng độ chính xác khi đánh, nhưng nguồn có giọng hát rõ thì nghe chuẩn hơn; bản live, bản có nhạc đệm quá to sẽ khó khớp hơn rõ rệt."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Vùng đưa nhạc vào của công cụ đánh thời gian lời",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG đều được, âm thanh chỉ phát trên máy"
+          }
+        },
+        {
+          "h2": "2 Dán lời",
+          "ps": [
+            "Ô thứ hai dán lời vào, **một dòng một câu**, dòng trống tự bỏ qua. Dán xong bấm «Phân tích lời».",
+            "Dán cả tệp LRC có sẵn cũng được — nhãn thời gian `[mm:ss.xx]` của nó được tự nhận diện, nhập vào rồi đánh tiếp từ dòng đầu tiên chưa có thời gian, những câu đã có thời gian không phải làm lại."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Vùng dán lời và nút phân tích lời",
+            "cap": "Dán một dòng một câu, hoặc dán cả tệp LRC để công cụ đọc ra thời gian có sẵn"
+          }
+        },
+        {
+          "h2": "3 Vừa nghe vừa đánh",
+          "ps": [
+            "Phát nhạc, nghe tới khoảnh khắc một câu bắt đầu thì bấm Enter (hoặc bấm «Đánh câu này»), thời gian của câu đó được ghi lại, con trỏ tự nhảy sang câu sau.",
+            "Phím tắt: **dấu cách** phát/tạm dừng, **Enter** đánh câu hiện tại, **Z** hoàn tác một câu. Đang phát mà bấm Enter là tiện nhất, không phải chuyển qua lại giữa chuột và bàn phím.",
+            "Đánh nhầm thì bấm Z hoàn tác câu đó rồi đánh lại; câu nào không muốn đánh (đoạn nhạc dạo, đoạn thuần nhạc) thì bấm «Bỏ qua câu này», nó sẽ không có trong bản xuất."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Vùng vừa nghe vừa đánh: phát, đánh câu này, hoàn tác, bỏ qua câu này",
+            "cap": "Dấu cách phát/tạm dừng, Enter đánh câu hiện tại, Z hoàn tác, hai tay không rời bàn phím"
+          }
+        },
+        {
+          "h2": "4 Xuất",
+          "ps": [
+            "Đánh xong sang ô thứ tư: **Tải LRC** cho trình phát, **Tải SRT** cho track phụ đề video, cũng có thể «Sao chép» trực tiếp.",
+            "Chỉ xuất những câu đã có thời gian; câu bị bỏ qua không vào tệp. Khi xuất SRT, mỗi câu kéo dài tới khi câu sau bắt đầu, câu cuối lấy 2 giây làm mức dự phòng."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Vùng xuất với tải LRC, tải SRT và nút sao chép",
+            "cap": "LRC cho trình phát, SRT cho video; chỉ xuất những câu đã đánh thời gian"
+          }
+        },
+        {
+          "h2": "Những gì không bị đụng tới",
+          "ps": [
+            "Văn bản lời không bị viết lại. Đánh thời gian chỉ thêm một mốc thời gian cho mỗi dòng, không đụng chữ bạn đã dán vào.",
+            "Khi nhập LRC có sẵn, những dòng có nhãn thời gian giữ nguyên thời gian, chỉ đánh tiếp từ dòng đầu tiên chưa có thời gian."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Xuất ra thiếu mấy câu?** Câu bị bỏ qua và câu chưa đánh thời gian đều không vào tệp. Quay lại bước ba bổ sung, hoặc xác nhận rằng chúng vốn nên bỏ qua.",
+            "**Thời gian trong JSON sửa được không?** Đánh xong muốn dịch chuyển toàn bộ một chút thì xuất SRT rồi dùng [[Điều chỉnh timeline|/shift.html]] dịch chuyển hoặc co giãn theo tỉ lệ.",
+            "**Nên xuất LRC hay SRT?** Dùng cho trình phát nhạc (foobar2000, các ứng dụng nghe nhạc, mọi loại trình phát) thì LRC; cần gắn lên video hoặc tiếp tục gia công bằng công cụ phụ đề thì SRT.",
+            "**Một bài mất bao lâu?** Tùy số dòng lời và độ chính xác bạn muốn. Bài ba bốn chục dòng, quen quy trình thì vài phút là xong một lượt; muốn khớp từng chữ thì sẽ chậm hơn."
+          ]
+        },
+        {
+          "h2": "Quyền riêng tư",
+          "ps": [
+            "Âm thanh và lời được xử lý hoàn toàn trong trình duyệt, không tải lên, không qua máy chủ. Âm thanh chỉ được giải mã và phát trên máy."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Đã có LRC mà muốn thành phụ đề thì xem [[LRC sang SRT|/guides/lrc-to-srt.html]]; cách nghĩ và những cái bẫy khi đánh thời gian thì xem [[Cách đánh thời gian lời LRC|/guides/how-to-make-lrc-file.html]]; SRT xuất ra lệch thời gian thì dùng [[Điều chỉnh timeline|/shift.html]]; thành phẩm qua [[Kiểm tra phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "vi": {
+      "seo": {
+        "title": "Cách trích phụ đề đóng trong video – AI-SRTSub",
+        "desc": "Đọc thẳng track phụ đề đóng trong MKV, WebM, MP4, MOV, xuất SRT / VTT / ASS / TXT. Video không tải lên, không chuyển mã, track đa ngôn ngữ liệt kê từng cái, phụ đề hình không trích được.",
+        "h1": "Cách trích phụ đề đóng trong video",
+        "intro": "Đọc thẳng track phụ đề đóng trong MKV / MP4 rồi xuất thành SRT — video không tải lên, lật ngay trong trình duyệt.",
+        "ctaText": "Mở trích phụ đề video"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết việc gì",
+          "ps": [
+            "Phụ đề có thể đóng trong tệp video, không đứng riêng thành một tệp. Muốn sửa, dịch, làm song ngữ thì trước hết phải lấy nó ra — trang này chỉ làm đúng việc đó."
+          ],
+          "ul": [
+            "**Nhận bốn loại container** —— MKV / WebM và MP4 / MOV.",
+            "**Nhận bốn loại track** —— track văn bản thuần, track ASS, track WebVTT, track mov_text / tx3g của MP4.",
+            "**Xuất bốn định dạng** —— SRT / VTT / ASS / TXT.",
+            "**Không tải lên, không chuyển mã** —— đọc từng đoạn theo offset, tệp vài GB cũng không chiếm bộ nhớ."
+          ]
+        },
+        {
+          "h2": "1 Đưa video vào",
+          "ps": [
+            "Ô đầu tiên kéo tệp video vào hoặc bấm chọn tệp. Chỉ nhận **MKV / WebM** và **MP4 / MOV**, container khác đưa vào sẽ không đọc ra track.",
+            "Tệp không rời khỏi máy bạn — không có bước tải lên. Công cụ đọc từng đoạn theo offset, phim vài GB cũng không chiếm bộ nhớ, nhưng lần đọc đầu phải chờ nó quét xong thông tin track."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Vùng đưa video vào của trang trích phụ đề đóng",
+            "cap": "Hỗ trợ MKV / WebM và MP4 / MOV, tệp không rời khỏi máy"
+          }
+        },
+        {
+          "h2": "2 Track phụ đề đóng",
+          "ps": [
+            "Đọc xong, ô thứ hai liệt kê các track phụ đề trong tệp **một track một dòng**, thường kèm ngôn ngữ và tên track (ví dụ «Chinese», «English», «Phụ đề bắt buộc»). Bấm track nào thì trích track đó.",
+            "Tệp chỉ có một track phụ đề thì tự bắt đầu trích, không cần bấm.",
+            "**Phụ đề hình không trích được**: PGS của Blu-ray, phụ đề DVD là hình đã khắc, không có chữ để lấy — trang sẽ báo rõ, loại đó phải dùng OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Danh sách track phụ đề đóng, một track một dòng",
+            "cap": "Một track một dòng; chỉ có một track thì tự bắt đầu trích"
+          }
+        },
+        {
+          "h2": "3 Kết quả",
+          "ps": [
+            "Ô «3 Kết quả» bên phải đưa ra văn bản phụ đề đã trích, phía trên chọn định dạng xuất: **SRT / VTT / ASS / TXT**, bấm «Tải xuống» hoặc «Sao chép».",
+            "Khi track nguồn là ASS, phần đầu kiểu dáng và độ phân giải có sẵn của track được mang theo nguyên vẹn — chọn xuất ASS giữ được những thông tin này, chọn SRT thì chỉ mang theo văn bản."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Vùng kết quả và lựa chọn định dạng SRT / VTT / ASS / TXT",
+            "cap": "Bốn định dạng xuất; phần đầu kiểu dáng và độ phân giải của track ASS giữ nguyên"
+          }
+        },
+        {
+          "h2": "Những gì không bị đụng tới",
+          "ps": [
+            "Bản thân tệp video hoàn toàn không đổi — chỉ đọc, không ghi, không chuyển mã, cũng không đóng gói lại.",
+            "Nội dung phụ đề lấy ra nguyên như cũ, không đoán bảng mã, không sửa timeline. Phụ đề lấy ra mà bị lỗi ký tự thì đó là vấn đề bảng mã của track nguồn, sang [[Sửa lỗi mã hóa|/repair.html]] xử lý."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Phụ đề hình (PGS / DVD) thực sự không có cách nào?** Trang này thì không — chúng là hình, không có lớp chữ. Phải OCR trước, trang này không làm việc đó.",
+            "**Phụ đề trích ra bị sai thời gian?** Trang này không sửa timeline, lấy ra sao thì là vậy. Lệch toàn bộ hoặc lệch theo tỉ lệ thì dùng [[Điều chỉnh timeline|/shift.html]].",
+            "**Sao quét lâu mới có phản hồi?** Tệp lớn phải quét thông tin track từng đoạn theo offset, tệp càng lớn chờ càng lâu; khoảng thời gian này chạy trên máy, không liên quan tốc độ mạng.",
+            "**Tệp phụ đề ngoài có dùng trang này được không?** Không cần — .srt / .ass bên ngoài thì vào thẳng [[Chuyển đổi định dạng|/convert.html]] hoặc công cụ khác, trang này dành cho phụ đề «đóng trong video»."
+          ]
+        },
+        {
+          "h2": "Quyền riêng tư",
+          "ps": [
+            "Video được đọc hoàn toàn cục bộ trong trình duyệt, không tải lên, không chuyển mã, không qua máy chủ. Đóng trang là nội dung đã đọc được giải phóng."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Lấy ra rồi cần dịch thì vào [[Dịch phụ đề|/translate.html]], cần làm song ngữ thì xem [[Hai cách làm phụ đề song ngữ|/guides/make-bilingual-subtitles.html]]; khác biệt giữa đóng và ngoài, loại nào trích được loại nào không, xem [[Cách lấy phụ đề đóng trong video|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "vi": {
+      "seo": {
+        "title": "Cách thay thế hàng loạt thuật ngữ phụ đề – Một bảng sửa cả tệp – AI-SRTSub",
+        "desc": "Bảng thuật ngữ mỗi dòng một mục, phân tách từ cũ và mới bằng ->, =>, → hoặc Tab, dòng bắt đầu bằng # là chú thích. Khớp toàn từ, chỉ sửa dòng 1 hoặc 2, mọi thay đổi liệt kê và hoàn tác được.",
+        "h1": "Cách thay thế hàng loạt thuật ngữ phụ đề",
+        "intro": "Một bảng thuật ngữ, đổi thống nhất cách dùng từ trong cả tệp phụ đề một lần — timeline, kiểu ASS và khối NOTE của VTT không đổi một ký tự.",
+        "ctaText": "Mở thay thế thuật ngữ"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết việc gì",
+          "ps": [
+            "Trong phụ đề, cùng một từ chỗ này dịch khác chỗ kia, tên người tên đất đi theo bản dịch máy, nhận phụ đề của người khác phải đổi về cách dùng quen của mình — những thay đổi này có chung một đặc điểm: đổi từ, không đổi cấu trúc. Trang này chỉ đổi từ."
+          ],
+          "ul": [
+            "**Thống nhất tên dịch** —— tên người, tên đất, danh từ riêng trước sau nhất quán.",
+            "**Sửa lỗi hàng loạt** —— một từ bản dịch máy dịch sai, đổi cả tệp một lượt.",
+            "**Nhận lại thói quen** —— phụ đề của người khác xếp lại cách dùng từ theo cách của bạn.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** sáu định dạng đều nhận."
+          ]
+        },
+        {
+          "h2": "Hai thứ: phụ đề và bảng thuật ngữ",
+          "ps": [
+            "Ô «1 Đưa phụ đề vào» bên trái tải tệp phụ đề lên, cũng dán trực tiếp nội dung phụ đề vào được; đưa nhầm thì bấm «Xóa».",
+            "Ô «2 Bảng thuật ngữ» bên phải viết quy tắc. **Mỗi dòng một mục**, phân tách từ cũ và từ mới bằng `->`, `=>`, `→` hoặc Tab, bốn cách viết đều nhận; dòng bắt đầu bằng `#` là chú thích, không tham gia thay thế.",
+            "Không chắc định dạng thì bấm «Điền ví dụ», sửa theo ví dụ."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Vùng đưa phụ đề vào và vùng nhập bảng thuật ngữ của trang thay thế",
+            "cap": "Bên trái đưa phụ đề, bên phải viết quy tắc; mỗi dòng một mục, phân tách bằng ->"
+          }
+        },
+        {
+          "h2": "Bảng thuật ngữ viết thế nào",
+          "ps": [
+            "Một dòng một quy tắc, bên trái là từ hiện tại, bên phải là từ muốn đổi thành. Ví dụ `Thor -> Thần Sấm` sẽ đổi «Thor» trong cả tệp thành «Thần Sấm».",
+            "Chú thích bắt đầu bằng `#`, hợp để ghi chú cho một nhóm quy tắc (như «# Thống nhất tên người mùa một»), cũng tiện tạm tắt một quy tắc — thêm `#` vào trước là được, không phải xóa.",
+            "Quy tắc chạy từ trên xuống dưới; chữ do một quy tắc đổi ra sẽ được các quy tắc sau quét lại. Khi có phụ thuộc thứ tự (ví dụ trước đổi A thành B, sau đổi B thành C) thì phải chú ý điều này."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Từng dòng quy tắc thay thế trong khung nhập bảng thuật ngữ",
+            "cap": "Mỗi dòng một quy tắc; dòng bắt đầu bằng # là chú thích, có thể dùng để tạm tắt một quy tắc"
+          }
+        },
+        {
+          "h2": "Ba công tắc mỗi cái quản gì",
+          "ps": [
+            "**Phạm vi**: `Toàn bộ` / `Chỉ dòng 1` / `Chỉ dòng 2`. Trong phụ đề song ngữ chỉ muốn sửa bản dịch thì chọn «Chỉ dòng 2»; mục chỉ có một dòng thì không bị đụng ở hai chế độ một dòng này — công cụ không đoán bên nào là bản gốc.",
+            "**Khớp toàn từ**: chỉ đổi những chỗ đứng riêng thành từ, `art` sẽ không đụng `start`. Với tiếng Trung, tiếng Nhật — ngôn ngữ không dùng dấu cách tách từ — mục này không có tác dụng, vẫn thay theo chuỗi con.",
+            "**Phân biệt hoa thường**: mặc định không phân biệt, `CEO` và `ceo` đổi cùng nhau; tích vào thì chỉ đổi chỗ viết hoàn toàn giống."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Công tắc phạm vi, khớp toàn từ và phân biệt hoa thường dưới bảng thuật ngữ",
+            "cap": "Phạm vi quyết định sửa dòng nào, khớp toàn từ và hoa thường quyết định khớp chặt đến đâu"
+          }
+        },
+        {
+          "h2": "Đã đổi gì, từng mục hoàn tác được",
+          "ps": [
+            "«3 Kết quả» ngoài phụ đề sau thay thế còn **liệt kê từng mục thay đổi**: mục nào, dòng thứ mấy, từ gì thành gì.",
+            "Mục nào không muốn đổi thì bấm một cái trong danh sách là trả mục đó lại, không phải sửa bảng thuật ngữ rồi chạy lại. Xác nhận xong bấm «Tải xuống» hoặc «Sao chép»."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Vùng kết quả và danh sách thay đổi liệt kê từng mục",
+            "cap": "Thay đổi liệt kê từng mục, mục nào không muốn đổi thì bấm một cái là trả lại"
+          }
+        },
+        {
+          "h2": "Những gì không bị đụng tới",
+          "ps": [
+            "**Timeline, dòng kiểu dáng của ASS và khối `NOTE` của VTT không đổi một ký tự.** Thay thế chỉ tác động lên văn bản lời thoại, không đụng dòng cấu trúc.",
+            "Bảng thuật ngữ không tự sửa tệp phụ đề của bạn — kết quả là đầu ra mới, tệp gốc không đổi."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Vì sao có từ không được đổi?** Xem phạm vi trước: chọn «Chỉ dòng 2» thì mục chỉ có một dòng không bị đụng; rồi xem khớp toàn từ, tích vào thì chỗ không thành từ sẽ không được đổi.",
+            "**Tiếng Trung tích khớp toàn từ sao vẫn thay theo chuỗi con?** Bình thường. Tiếng Trung, tiếng Nhật không dùng dấu cách tách từ, công cụ không có cách nào xác định ranh giới từ, chế độ này không có tác dụng.",
+            "**Đổi nhầm rồi muốn lùi toàn bộ?** Lùi từng mục trong danh sách thay đổi; muốn làm lại từ đầu thì xóa bảng thuật ngữ và đưa phụ đề vào lại một lần.",
+            "**Dòng kiểu dáng ASS có bị đổi nhầm không?** Không. Dòng kiểu dáng và khối `NOTE` không nằm trong phạm vi thay thế, chỉ văn bản lời thoại tham gia."
+          ]
+        },
+        {
+          "h2": "Quyền riêng tư",
+          "ps": [
+            "Phụ đề và bảng thuật ngữ được xử lý hoàn toàn trong trình duyệt, không tải lên, không qua máy chủ. Bảng thuật ngữ không được lưu lại, lần sau mở là trống."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Có nên lập bảng thuật ngữ, cả một season duy trì thế nào thì xem [[Bảng thuật ngữ: thống nhất cách dùng từ cả season|/guides/subtitle-glossary.html]]; nội dung bẩn (watermark, ghi chú khiếm thính) thì qua [[Làm sạch phụ đề|/clean.html]] trước; thống nhất tên dịch xong muốn dịch sang ngôn ngữ khác thì vào [[Dịch phụ đề|/translate.html]]; thành phẩm qua [[Kiểm tra phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "vi": {
+      "seo": {
+        "title": "Cách lấy phụ đề đóng trong video – Khác biệt giữa đóng và ngoài – AI-SRTSub",
+        "desc": "Khi phụ đề đóng trong video thì lấy ra thế nào: MKV / WebM / MP4 / MOV chứa track gì, track văn bản, ASS, WebVTT, mov_text khác nhau ra sao, vì sao phụ đề hình (PGS / DVD) không trích ra chữ được.",
+        "h1": "Cách lấy phụ đề đóng trong video",
+        "intro": "Phụ đề có thể nằm trong tệp video, cũng có thể đứng riêng bên ngoài. Khi nằm trong, nó là một track của container — lấy ra không liên quan tới chuyển mã.",
+        "ctaText": "Mở trích phụ đề video"
+      },
+      "body": [
+        {
+          "h2": "Phụ đề ở đâu: đóng và ngoài",
+          "ps": [
+            "Tệp video (MKV, MP4) là một container, bên trong đồng thời chứa track video, track âm thanh, track phụ đề. Khi phụ đề đóng bên trong gọi là **phụ đề đóng** hoặc **phụ đề nhúng**; một tệp .srt / .ass đứng riêng bên ngoài gọi là **phụ đề ngoài**.",
+            "Phụ đề ngoài thì dùng thẳng được. Vấn đề nằm ở phụ đề đóng: bạn muốn sửa, dịch, lấy track gốc làm song ngữ, nhưng trong tay không có tệp phụ đề nào — phải đọc track ra khỏi container trước. Bước này không phải chuyển mã, không mã hóa lại video, chỉ lấy ra đoạn dữ liệu đã được lưu sẵn trong container."
+          ]
+        },
+        {
+          "h2": "Container nào chứa được gì",
+          "ps": [
+            "Các container khác nhau chứa được định dạng phụ đề khác nhau, độ khó lấy ra cũng khác:"
+          ],
+          "ul": [
+            "**MKV / WebM** —— thoáng nhất, chứa được track văn bản thuần, track ASS, track WebVTT, cũng thường có track đa ngôn ngữ.",
+            "**MP4 / MOV** —— thường là track `mov_text` / `tx3g`, văn bản thuần, kèm ít thông tin kiểu dáng.",
+            "**Track văn bản thuần** —— lấy ra là chữ, thành SRT ngay.",
+            "**Track ASS** —— có phần đầu kiểu dáng và độ phân giải, xuất ASS giữ được, xuất SRT chỉ còn văn bản.",
+            "**Phụ đề hình (PGS Blu-ray, phụ đề DVD)** —— lưu hình, không lưu chữ, không trích ra chữ được."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Các track phụ đề được liệt kê ở trang trích phụ đề đóng",
+            "cap": "Một track một dòng, thường kèm ngôn ngữ và tên track; chỉ có một track thì tự bắt đầu trích"
+          }
+        },
+        {
+          "h2": "Vì sao phụ đề hình không trích ra được",
+          "ps": [
+            "PGS Blu-ray và phụ đề DVD lưu không phải ký tự, mà từng tấm hình có kênh trong suốt. Khi trình phát hiển thị là đang «dán hình», không phải «kết xuất chữ».",
+            "Nên trong loại track này không có văn bản để đọc — không phải công cụ không hỗ trợ, mà ở đó vốn không có chữ. Trang gặp loại track này sẽ báo rõ là không trích được.",
+            "Muốn có chữ chỉ có một đường: nhận diện chữ trong hình trước (OCR), rồi mới làm phụ đề. Đó là một công đoạn khác, không phải cùng việc với «lấy track ra»."
+          ]
+        },
+        {
+          "h2": "Lấy ra rồi thường vẫn phải gia công",
+          "ps": [
+            "Phụ đề lấy ra là «nguyên như cũ», công cụ không đoán bảng mã, cũng không sửa timeline. Nên hai chuyện rất thường gặp:",
+            "Một là **lỗi ký tự** — vấn đề bảng mã của chính track nguồn, lấy ra vẫn lỗi, phải sang [[Cách sửa lỗi mã hóa|/guides/repair.html]] nhận bảng mã; hai là **sai thời gian** — nguồn có hay không có logo đầu phim, tốc độ khung hình lệch, lấy ra là lệch toàn bộ, dùng [[Điều chỉnh timeline|/shift.html]] dịch chuyển hoặc co giãn theo tỉ lệ.",
+            "Sau đó cần dịch thì vào [[Dịch phụ đề|/translate.html]], cần làm song ngữ thì xem [[Hai cách làm phụ đề song ngữ|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Vùng kết quả và bốn định dạng xuất SRT / VTT / ASS / TXT",
+            "cap": "Phụ đề lấy ra xuất được thành bốn định dạng, phần đầu kiểu dáng và độ phân giải của track ASS giữ nguyên"
+          }
+        },
+        {
+          "h2": "Vài chỗ dễ nghĩ sai",
+          "ps": [
+            "**Lấy phụ đề ra không phải là hardsub.** Không mã hóa lại video, chất lượng hình và track âm thanh không bị ảnh hưởng gì.",
+            "**Lấy ra không ảnh hưởng tệp gốc.** Chỉ đọc không ghi, tệp video không đổi một byte.",
+            "**Tệp lớn chậm không phải do mạng.** Công cụ quét thông tin track từng đoạn theo offset, tệp càng lớn quét càng lâu, toàn bộ chạy trên máy.",
+            "**Phụ đề ngoài không cần qua trang này.** Trong tay có .srt / .ass thì vào thẳng [[Chuyển đổi định dạng|/convert.html]], chỉ khi đóng trong video mới cần lấy track trước."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Thao tác đầy đủ xem [[Cách trích phụ đề đóng trong video|/guides/videosub.html]]; lấy ra cần dịch thì vào [[Dịch phụ đề|/translate.html]], cần làm song ngữ thì xem [[Hai cách làm phụ đề song ngữ|/guides/make-bilingual-subtitles.html]]; lỗi ký tự thì sang [[Sửa lỗi mã hóa|/repair.html]] trước."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "vi": {
+      "seo": {
+        "title": "Cách đánh thời gian lời LRC – Một câu một dòng, vừa nghe vừa bấm – AI-SRTSub",
+        "desc": "Làm tệp lời LRC từ đầu thế nào: dán một câu một dòng, vừa nghe vừa bấm thời gian, ba phím tắt, khi nào nên bỏ qua một câu, nên xuất LRC hay SRT, và đánh xong mà lệch toàn bộ thì xử lý ra sao.",
+        "h1": "Cách đánh thời gian lời LRC",
+        "intro": "LRC chính là «một câu lời + một mốc thời gian». Quá trình làm nó gọi là đánh thời gian: ghi lại khoảnh khắc từng câu bắt đầu.",
+        "ctaText": "Mở công cụ đánh thời gian lời"
+      },
+      "body": [
+        {
+          "h2": "Đánh thời gian là đang làm gì",
+          "ps": [
+            "Cấu trúc tệp LRC cực đơn giản: một dòng một câu lời, phía trước gắn một nhãn thời gian `[mm:ss.xx]`. Trình phát đọc tới dòng nào thì hiển thị câu đó ở đúng thời điểm ấy.",
+            "Nên toàn bộ công việc «làm một tệp LRC» là đặt cho mỗi câu lời một mốc thời gian — việc này máy không làm thay được, vì nó phải phán đoán «câu này bắt đầu hát từ đâu», chỉ có thể dựa vào nghe."
+          ]
+        },
+        {
+          "h2": "Một bài phải đánh mấy lượt",
+          "ps": [
+            "Nên bỏ một phút nghĩ rõ trước khi làm, sẽ tiết kiệm được phần lớn công làm lại:"
+          ],
+          "ul": [
+            "**Một lượt** —— giọng hát rõ, ít dòng lời, chỉ cần đại khái theo kịp, vừa phát vừa đánh một lượt là đủ.",
+            "**Hai lượt** —— lượt đầu đánh thô, lượt hai soát từng câu, cách làm quen thuộc khi cần khớp chính xác.",
+            "**Nhập rồi sửa** —— đã có LRC, chỉ vài câu chưa chuẩn, nhập vào rồi đánh tiếp từ dòng đầu tiên chưa có thời gian.",
+            "**Đoạn nhạc dạo và đoạn thuần nhạc** không cần đánh —— bấm «Bỏ qua câu này», nó không vào tệp xuất.",
+            "**Hát đè và hát cùng lúc** chỉ ghi được một điểm bắt đầu, phần chồng lên tính theo câu của giọng chính."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Vùng vừa nghe vừa đánh: phát, đánh câu này, hoàn tác, bỏ qua câu này",
+            "cap": "Đang phát mà bấm Enter là tiện nhất; đánh nhầm thì bấm Z hoàn tác câu đó rồi đánh lại"
+          }
+        },
+        {
+          "h2": "Bước dán lời quyết định phía sau có suôn sẻ",
+          "ps": [
+            "Lời dán vào một dòng một câu, dòng trống tự bỏ qua. Cách ngắt dòng ở bước này chính là các dòng đánh thời gian phía sau — dán mà ngắt thêm mấy dòng thì đánh cũng phải bấm thêm mấy lần.",
+            "Dán LRC có sẵn cũng được: nhãn thời gian `[mm:ss.xx]` được tự nhận diện, nhập vào rồi **đánh tiếp từ dòng đầu tiên chưa có thời gian**, những câu đã có thời gian không phải làm lại.",
+            "Nên một tệp LRC đánh dở có thể lưu lại, lần sau dán vào đánh tiếp."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Vùng dán lời và nút phân tích lời",
+            "cap": "Một dòng một câu; dán cả tệp LRC cũng đọc ra được thời gian có sẵn, rồi đánh tiếp xuống dưới"
+          }
+        },
+        {
+          "h2": "Xuất LRC hay SRT",
+          "ps": [
+            "**Cho trình phát nhạc thì xuất LRC.** foobar2000, các loại trình phát, thiết bị có hiển thị lời đều nhận.",
+            "**Cần gắn lên video hoặc tiếp tục gia công thì xuất SRT.** Track phụ đề của video, công cụ phụ đề, phần mềm dựng phim nhận SRT. Khi xuất, mỗi câu kéo dài tới khi câu sau bắt đầu, câu cuối lấy 2 giây làm mức dự phòng.",
+            "Cả hai đều chỉ xuất những câu đã có thời gian — câu bị bỏ qua không vào tệp."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Vùng xuất với tải LRC, tải SRT và nút sao chép",
+            "cap": "LRC cho trình phát, SRT cho video; chỉ xuất những câu đã đánh thời gian"
+          }
+        },
+        {
+          "h2": "Vài chỗ dễ nghĩ sai",
+          "ps": [
+            "**Đánh xong lệch toàn bộ một chút thì dùng dịch chuyển.** Xuất SRT rồi dùng [[Điều chỉnh timeline|/shift.html]] dịch chuyển toàn bộ, nhanh hơn đánh lại từng câu nhiều.",
+            "**Càng về sau càng lệch là vấn đề tốc độ.** Khi tốc độ phát âm thanh không khớp với lúc ghi, càng về sau càng lệch nhiều, phải co giãn theo tỉ lệ chứ không phải dịch chuyển.",
+            "**Phím tắt phải dùng liền tay mới suôn.** Dấu cách phát/tạm dừng, Enter đánh câu hiện tại, Z hoàn tác một câu — đang phát thì bấm Enter luôn, không phải chuyển qua lại giữa chuột và bàn phím.",
+            "**Chất lượng âm thanh ảnh hưởng độ chính xác.** Nguồn có giọng hát rõ thì nghe chuẩn; bản live, bản có nhạc đệm quá to sẽ khó khớp hơn rõ rệt."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Thao tác đầy đủ xem [[Cách dùng công cụ đánh thời gian lời bài hát|/guides/lrc.html]]; đã có LRC muốn thành phụ đề thì xem [[LRC sang SRT|/guides/lrc-to-srt.html]]; SRT xuất ra lệch thời gian thì dùng [[Điều chỉnh timeline|/shift.html]]; thành phẩm qua [[Kiểm tra phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "vi": {
+      "seo": {
+        "title": "Bảng thuật ngữ: thống nhất cách dùng từ cả season – AI-SRTSub",
+        "desc": "Bảng thuật ngữ phụ đề giải quyết chuyện «cùng một từ trước sau không thống nhất»: khi nào đáng lập một bảng, cả season dùng lại cùng một bảng thế nào, vì sao khớp toàn từ vô hiệu với tiếng Trung.",
+        "h1": "Bảng thuật ngữ: thống nhất cách dùng từ cả season",
+        "intro": "Một nhân vật tập 1 gọi là A, tập 7 gọi là B, khán giả sẽ tưởng là hai nhân vật. Bảng thuật ngữ ngăn chuyện đó — nó cố định «nên gọi là gì».",
+        "ctaText": "Mở thay thế thuật ngữ"
+      },
+      "body": [
+        {
+          "h2": "Bảng thuật ngữ giải quyết «không thống nhất»",
+          "ps": [
+            "Lỗi dùng từ trong phụ đề chia hai loại: một là «từ này dịch sai», một là «cùng một từ trước sau dịch khác nhau». Loại trước phải sửa từ điển, loại sau mới là việc của bảng thuật ngữ.",
+            "Loại thứ hai phổ biến hơn và khó phát hiện hơn: tập 1 dịch `Thor` thành «Thần Sấm», tập 7 đổi thành «Thor», xem riêng từng tập đều không có vấn đề, xem liền nhau khán giả sẽ tưởng xuất hiện nhân vật mới. Việc bảng thuật ngữ làm là biến «phim này thống nhất gọi là Thần Sấm» thành một quy tắc thực thi được, áp một lần cho cả tệp phụ đề."
+          ]
+        },
+        {
+          "h2": "Khi nào mới đáng lập một bảng",
+          "ps": [
+            "Không phải tệp phụ đề nào cũng cần bảng thuật ngữ. Những trường hợp đáng lập thường là:"
+          ],
+          "ul": [
+            "**Cả một season / một series** —— càng nhiều tập, xác suất không thống nhất càng cao.",
+            "**Danh từ riêng dày đặc** —— tên người, tên đất, tên tổ chức, từ tự tạo trong tác phẩm.",
+            "**Nhiều người làm chung** —— vài người chia nhau dịch từng tập, thói quen mỗi người một khác.",
+            "**Nhận phụ đề của người khác** —— cần đổi về cách dùng của mình (hoặc của khách hàng).",
+            "**Thống nhất sau khi dịch máy** —— bản dịch máy có thể đưa ra nhiều cách dịch cho cùng một từ."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Từng quy tắc thay thế được nhóm theo loại trong bảng thuật ngữ",
+            "cap": "Dùng chú thích bắt đầu bằng # để nhóm quy tắc, khi cần cũng tiện tạm tắt một quy tắc"
+          }
+        },
+        {
+          "h2": "Cả một season giữ cùng một bảng thế nào",
+          "ps": [
+            "Bảng thuật ngữ phải được **duy trì tăng dần**: tập 1 chốt tên người, về sau gặp từ mới thì thêm một dòng, làm xong một season là bảng đầy đủ. Lần sau làm season hai của cùng series thì lấy nó làm điểm xuất phát.",
+            "Quy tắc viết rộng ra thì dùng tốt hơn — sau khi quyết định thống nhất gọi «Thần Sấm», viết thêm «Thor -> Thần Sấm», như vậy khi nhận phụ đề của người khác cũng kéo về một mối được.",
+            "Sửa xong nhất định phải xem **danh sách thay đổi**: nó liệt kê từng mục, dòng thứ mấy, từ gì thành gì. Danh sách là nơi duy nhất xác nhận được «đã sửa đúng, không sửa quá tay», mục nào không muốn đổi thì bấm một cái là trả lại."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Danh sách thay đổi liệt kê từng mục ở vùng kết quả",
+            "cap": "Liệt kê thay đổi từng mục, mục nào không muốn đổi thì bấm một cái là trả lại"
+          }
+        },
+        {
+          "h2": "Những thay đổi nào không nên giao cho bảng thuật ngữ",
+          "ps": [
+            "Bảng thuật ngữ đổi **từ**. Ba việc này nó không quản, cũng không nên quản:",
+            "**Ngữ pháp và cấu trúc câu** —— một từ không đổi được thành một câu, sửa ở mức câu phải quay lại [[Dịch phụ đề|/translate.html]] hoặc làm thủ công.",
+            "**Dọn nội dung** —— watermark quảng cáo, ghi chú khiếm thính thuộc loại bỏ cả dòng, thuộc về [[Làm sạch phụ đề|/clean.html]], quy tắc của bảng thuật ngữ là để thay thế, không phải để xóa dòng.",
+            "**Timeline** —— bảng thuật ngữ không đụng thời gian. Lệch toàn bộ hoặc lệch theo tỉ lệ thì sang [[Điều chỉnh timeline|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Vài chỗ dễ nghĩ sai",
+          "ps": [
+            "**Tiếng Trung tích khớp toàn từ vẫn thay theo chuỗi con — bình thường.** Tiếng Trung, tiếng Nhật không dùng dấu cách tách từ, công cụ không có cách nào xác định ranh giới từ, chế độ này không có tác dụng, kiểu bảo vệ `art` không đụng `start` chỉ có hiệu lực với tiếng Anh.",
+            "**Thứ tự ảnh hưởng kết quả.** Quy tắc chạy từ trên xuống dưới, chữ do một quy tắc đổi ra còn bị các quy tắc sau quét lại. Trước đổi A thành B, sau đổi B thành C thì cuối cùng nhận được C.",
+            "**Chỉ sửa bản dịch thì phải chọn phạm vi.** Trong phụ đề song ngữ chỉ sửa dòng 2 thì chọn «Chỉ dòng 2»; mục chỉ có một dòng thì không bị đụng ở hai chế độ một dòng này — công cụ không đoán bên nào là bản gốc.",
+            "**Bảng thuật ngữ không được lưu lại.** Mỗi lần mở là trống, cần tự lưu một tệp văn bản để truyền đi."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Thao tác đầy đủ xem [[Cách thay thế hàng loạt thuật ngữ phụ đề|/guides/glossary.html]]; nội dung bẩn thì qua [[Làm sạch phụ đề|/clean.html]] trước; thống nhất tên dịch xong muốn dịch sang ngôn ngữ khác thì vào [[Dịch phụ đề|/translate.html]]; thành phẩm qua [[Kiểm tra phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  }
+}

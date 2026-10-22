@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "de": {
+      "seo": {
+        "title": "Untertitel zusammenführen und stylen – Merge, Stil, Export – AI-SRTSub",
+        "desc": "Zwei Untertiteldateien zu einer bilingualen Spur verbinden, eine vorhandene bilinguale Datei umbauen oder eine einsprachige gestalten: Paarmodi, ASS- und VTT-Vorlagen, Exportformat.",
+        "h1": "Bilinguale Untertitel zusammenführen und Effekte setzen",
+        "intro": "Zwei Untertiteldateien zu einer bilingualen Spur verbinden oder Untertitel direkt gestalten: Schrift, Farbe, Kontur und Position in WYSIWYG, und die Vorschau zeigt genau das, was exportiert wird.",
+        "ctaText": "Effekt-Untertitelwerkzeug öffnen"
+      },
+      "body": [
+        {
+          "h2": "Wofür dieses Werkzeug da ist",
+          "ps": [
+            "Diese eine Seite deckt drei Aufgaben ab: Original und Übersetzung zu einer bilingualen Datei zusammenführen, Reihenfolge und Stil einer bereits bilingualen Datei anpassen und einer einsprachigen Datei Effekte geben. Alle drei teilen dieselben Stilparameter und dieselbe Vorschau."
+          ],
+          "ul": [
+            "**Zwei Dateien zusammenführen** — Original und Übersetzung liegen vor; daraus eine bilinguale Datei machen und exportieren.",
+            "**Bilinguale Datei anpassen** — sie ist schon bilingual, aber Reihenfolge oder Stil stimmen nicht; neu aufbauen.",
+            "**Einsprachige Datei** — nur eine Datei; ihr Schrift, Kontur und Position geben.",
+            "Zwischen den drei Aufgaben wechseln die Tabs links; Stilbereich und Vorschau sind gemeinsam."
+          ]
+        },
+        {
+          "h2": "Drei Aufgaben, eine Seite",
+          "ps": [
+            "Oben auf der Seite stehen drei Tabs: **Zwei Dateien zusammenführen**, **Bilinguale Datei anpassen**, **Einsprachige Datei**. Die Wahl entscheidet, wie viele Eingabespalten links erscheinen.",
+            "Beim Zusammenführen stehen links zwei Spalten, „1 Originaluntertitel“ und „2 Übersetzte Untertitel“; beide nehmen eine hochgeladene Datei oder direkt eingefügten Text auf. Anpassen und Gestalten brauchen nur eine Spalte."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Die drei Tabs oben im Effekt-Untertitelwerkzeug und der Eingabebereich links",
+            "cap": "Drei Tabs oben; bei „Zwei Dateien zusammenführen“ erscheinen links eine Original- und eine Übersetzungsspalte"
+          }
+        },
+        {
+          "h2": "Wie zwei Dateien gepaart werden",
+          "ps": [
+            "Der erste Punkt unter „3 Zusammenführungseinstellungen“ ist der Paarmodus: **Nach Reihenfolge paaren · Original-Zeitleiste**, **Nach Zeitleiste paaren · Original-Zeitleiste**, **Nach Reihenfolge paaren · Übersetzungs-Zeitleiste**.",
+            "Haben beide Dateien gleich viele Einträge in gleicher Reihenfolge, ist Paaren nach Reihenfolge am stabilsten. Weichen die Zahlen ab (eine Seite hat Einträge zusammengefasst, die andere geteilt), nach Zeitleiste paaren und das Werkzeug nach Nähe zuordnen lassen. Welche Zeitleiste gilt, hängt davon ab, welche Datei genauer ist — meist die Originaldatei.",
+            "Darunter stehen Textstruktur (automatisch erkennen / zwei Zeilen pro Eintrag / abwechselnd gepaart) und Reihenfolge (Original oben / Übersetzung oben)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Paarmodus, Textstruktur und Reihenfolge in den Zusammenführungseinstellungen",
+            "cap": "Der Paarmodus entscheidet, was zu was gehört; auch die Zeitleiste wird hier gewählt"
+          }
+        },
+        {
+          "h2": "Den Stil Punkt für Punkt ändern",
+          "ps": [
+            "Rechts liegt der Stilbereich. Beim ASS-Export gilt „ASS-Aussehen“: Layout (geteilt · oben und unten getrennt / gestapelt · zwei Zeilen unten), Größe, Farbe, Deckkraft, Schrift, fett, kursiv, Zeichenabstand, Kontur, Konturfarbe, Schatten/Hintergrund (keiner / Schatten / Hintergrund), Tiefe, Randfarbe, Randdeckkraft, horizontale Ausrichtung (unten · links / unten · Mitte / unten · rechts) und Abstand zum unteren Rand der Übersetzung (primär), dazu Schrift, Schatten/Hintergrund und linke/rechte Ränder des Originals (sekundär).",
+            "Beim Export bilingualer VTT-Stile gilt „WebVTT-Stil“: zusätzlich zu sechs Voreinstellungen (Standard / kompakt / filmisch / oben / barrierefrei / Hochformat) lassen sich vertikale line, Anker (unten / oben / Mitte), horizontale position, Breite size, Ausrichtung align und Zeilenhöhe der gesamten Einblendung ändern, dazu Hintergrundfarbe, Hintergrunddeckkraft und Konturstärke der Übersetzungszeile; die Originalzeile kann den Hauptstil übernehmen oder eigene Werte bekommen.",
+            "Das Ergebnis lässt sich als Vorlage speichern und später unter „Aus gespeicherten Vorlagen“ auswählen und mit „Anwenden“ wiederverwenden."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Die Parameter des ASS-Aussehen-Bereichs rechts",
+            "cap": "Größe, Farbe, Kontur, Schatten/Hintergrund und Ausrichtung sind einzeln einstellbar, das Ergebnis lässt sich als Vorlage speichern"
+          }
+        },
+        {
+          "h2": "Vor dem Export in die Vorschau sehen",
+          "ps": [
+            "„Zusammenführungsvorschau“ ist eine Tabelle: Nr., Zeit, Original, Übersetzung, Stil. Die Leiste darüber filtert verdächtige Zeilen nach „mit Toneffekten“, „mit Sprecherpräfix“, „kürzer als 1 Sekunde“, „mehr als zwei Zeilen“ und „Lesegeschwindigkeit überschritten“ oder nach einem eingegebenen Stichwort.",
+            "Ein Klick auf den Stil-Slot einer Zeile öffnet dessen Editor und listet nur die Zeilen, die ihn nutzen; „Alle Überschreibungen aufheben“ setzt jede manuelle Änderung auf die Vorlage zurück. Der Zeitleistenbereich darunter erlaubt einen globalen Versatz (ab einem Eintrag) und proportionale Skalierung.",
+            "Passt alles, geht es unter „4 Export“ weiter: Datei herunterladen oder Inhalt kopieren."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Die Tabelle der Zusammenführungsvorschau und ihre Filterleiste",
+            "cap": "Die Vorschau ist der Export; verdächtige Zeilen lassen sich filtern, einzelne Stil-Slots aufklappen"
+          }
+        },
+        {
+          "h2": "Was unangetastet bleibt",
+          "ps": [
+            "Stil ändert nur das Aussehen, nie den Dialog. Der Text von Original und Übersetzung wird beim Zusammenführen nicht um ein Zeichen verändert; die Zeitleiste stammt aus der gewählten Datei, außer du änderst sie im Bereich unter der Vorschau bewusst.",
+            "Beim Export als SRT oder „VTT ohne Stil“ werden keine Stilinformationen in die Datei geschrieben — die Seite weist darauf hin, dass die VTT keinen STYLE-Block enthält und der Player das Standardaussehen nutzt. Wer Stil will, wählt bilinguales VTT oder ASS."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Was, wenn die beiden Dateien unterschiedlich viele Einträge haben?** „Nach Zeitleiste paaren“ wählen; das Werkzeug ordnet nach Nähe zu, nicht zuordenbare Einträge werden nicht erfunden.",
+            "**Was, wenn ein Player den Stil eines exportierten ASS ignoriert?** Die Stile stehen in der Datei, aber die ASS-Unterstützung der Player ist unterschiedlich. Für ein portableres Aussehen bilinguales VTT exportieren.",
+            "**Wie komme ich nach dem Verstellen zur Ausgangsvorlage zurück?** „Standardparameter wiederherstellen“ im ASS-Bereich und „Vorlagenstandard wiederherstellen“ im VTT-Bereich setzen jeweils ihren Teil zurück.",
+            "**Was sind die sieben Zeilen im Beispiel?** Ein eingebautes Beispiel, nur damit du siehst, wie eine Zusammenführung aussieht; es lässt sich nicht exportieren. Lädst du eigene Untertitel hoch und klickst auf die Vorschau, wird es automatisch ersetzt."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Untertitel werden vollständig im Browser verarbeitet: nichts wird hochgeladen, nichts läuft über einen Server. Browser schließen, und alles aus dieser Sitzung ist weg."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Um eine bilinguale Datei wieder in zwei Spuren zu trennen, nimm [[Bilinguale Trennung|/bilingual.html]]; den umgekehrten Weg von einer Sprache zu bilingual zeigt [[Zwei Wege zu bilingualen Untertiteln|/guides/make-bilingual-subtitles.html]]; das Ergebnis durch [[Untertitel-QC|/qc.html]] schicken; für eine ganze Staffel auf einmal [[Stapelkonvertierung|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "de": {
+      "seo": {
+        "title": "Klartext aus Untertiteln holen – Zwei Layouts, fünf Filter – AI-SRTSub",
+        "desc": "Der Klartext-Extraktor im Detail: fortlaufende Absätze oder eine Zeile pro Eintrag, und was die fünf Schalter für SDH-Hinweise, Wasserzeichen, Doppelungen, Sprecherpräfixe und Liedzeilen entfernen.",
+        "h1": "Klartext aus Untertiteln extrahieren",
+        "intro": "Den Dialog aus einer Untertiteldatei als sauberen Klartext herausziehen: Nummern, Zeitleisten und Stilmarken fallen automatisch weg, das Ergebnis liest sich als Artikel oder dient als Dialogliste.",
+        "ctaText": "Klartext-Extraktor öffnen"
+      },
+      "body": [
+        {
+          "h2": "Wofür dieses Werkzeug da ist",
+          "ps": [
+            "Von einer Untertiteldatei ist für Leser nur der Dialog interessant; der Rest ist Struktur für den Player — Nummern, Zeitleisten, Stilmarken. Diese Seite entfernt die Struktur und behält die Wörter."
+          ],
+          "ul": [
+            "**Als Artikel lesen** — fortlaufende Absätze, getrennt an Pausen und Satzzeichen.",
+            "**Als Liste nutzen** — eine Zeile pro Eintrag, ein Untertitel pro Zeile, praktisch für Dialoglisten oder als Zulieferung für andere Werkzeuge.",
+            "**Nebenbei säubern** — SDH-Hinweise, Wasserzeichen und direkt aufeinanderfolgende Doppelungen fallen standardmäßig weg.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — alle sechs Formate werden erkannt."
+          ]
+        },
+        {
+          "h2": "Hineinlegen, nicht nur hochladen",
+          "ps": [
+            "Die Spalte „1 Untertitel einfügen“ links nimmt eine hochgeladene Datei, und Untertiteltext lässt sich auch direkt ins Textfeld einfügen. Falsche Datei? „Leeren“ klicken und neu beginnen.",
+            "Diese Seite liest Dateien als UTF-8. Öffnen sich die Untertitel als Wand aus Fragezeichen oder Kästchen, ist die Kodierung kaputt — zuerst in [[Textreparatur|/repair.html]] nach UTF-8 wandeln und dann zurückkommen."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Der Bereich zum Einfügen von Untertiteln im Klartext-Extraktor",
+            "cap": "Datei hochladen oder Untertiteltext direkt ins Textfeld einfügen"
+          }
+        },
+        {
+          "h2": "Welches der beiden Layouts",
+          "ps": [
+            "Oben unter „2 Extraktionsoptionen“ steht das Layout: **Fortlaufende Absätze** trennt an Pausen und Satzzeichen und liest sich wie ein Artikel; **Eine Zeile pro Eintrag** gibt eine Zeile pro Untertitel, eins zu eins zu den Einträgen der Originaldatei.",
+            "Dialog für Notizen mitschreiben, Übersetzen üben oder als Fließtext lesen: fortlaufende Absätze. Dialogliste bauen, Zeile für Zeile mit dem Original vergleichen oder ein anderes Werkzeug füttern: eine Zeile pro Eintrag."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Layout und Säuberungsschalter unter den Extraktionsoptionen",
+            "cap": "Ein Layout wählen; die fünf Schalter darunter entscheiden, welche Art Inhalt wegfällt"
+          }
+        },
+        {
+          "h2": "Was die fünf Säuberungen jeweils entfernen",
+          "ps": [
+            "**SDH-Hinweise entfernen**: löscht Geräuschbeschreibungen in Klammern wie „(Schritte)“ oder „[Musik]“ und behält den Dialog.",
+            "**Wasserzeichen und Werbung entfernen**: wirft Zeilen wie Fansub-Credits, URLs und Kanalnamen raus.",
+            "**Direkte Doppelungen entfernen**: steht derselbe Satz zweimal direkt hintereinander (ein Wiedergabefehler), bleibt eine Fassung; weiter auseinanderliegende Doppelungen haben Bedeutung und bleiben.",
+            "**Sprecherpräfixe entfernen**: aus „JOHN: Hallo“ wird „Hallo“. Standardmäßig aus — Drehbuchtexte brauchen die Sprecherangabe.",
+            "**Liedzeilen überspringen**: Zeilen, die ganz aus „♪ … ♪“ bestehen, werden übersprungen. Standardmäßig aus — Liedtexte sind auch Wörter."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Die fünf Säuberungsschalter und ihre Beschreibungen unter den Extraktionsoptionen",
+            "cap": "Rechts neben jedem Schalter steht, was er entfernt; nur die nötigen anhaken"
+          }
+        },
+        {
+          "h2": "Das Ergebnis mitnehmen",
+          "ps": [
+            "Die Spalte „3 Ergebnis“ rechts zeigt den extrahierten Text live und rechnet sofort neu, sobald eine Option geändert wird.",
+            "Passt es, „Herunterladen“ für eine .txt oder „Kopieren“ klicken. Bei Sprachen ohne Wortabstände wie Chinesisch und Japanisch gelten andere Regeln für das Zusammenführen von Zeilen, und das Werkzeug behandelt das je Sprache automatisch."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Der Ergebnisbereich mit den Schaltflächen zum Herunterladen und Kopieren",
+            "cap": "Das Ergebnis aktualisiert sich live; als txt speichern oder direkt kopieren"
+          }
+        },
+        {
+          "h2": "Was unangetastet bleibt",
+          "ps": [
+            "Der Dialog selbst wird nicht umgeschrieben. Die Säuberungsschalter entscheiden nur, welche ganzen Zeilen oder Blöcke wegfallen; die Formulierung eines Eintrags ändern sie nie.",
+            "Zeitleisten und Nummern werden nicht ausgegeben, nicht verändert und dann ausgegeben — die Originaldatei bleibt unberührt, und diese Seite bietet keinen Export mit Zeitleiste an. Das ist Sache der [[Formatkonvertierung|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Bleiben ASS-Stilmarken im Text?** Nein. `{}`-Überschreibungsblöcke von ASS werden entfernt, nur der Dialog bleibt.",
+            "**Kommt eine bilinguale Datei als zwei oder eine Zeile heraus?** So viele Zeilen, wie der Eintrag hatte; diese Seite führt weder zusammen noch teilt sie — zum Trennen [[Bilinguale Trennung|/bilingual.html]].",
+            "**Warum bleiben Sprecherpräfixe standardmäßig erhalten?** Der Name in „JOHN: Hallo“ ist oft eine nützliche Information (Drehbuch, Dialogliste); fällt er weg, ist schwer zu erkennen, wer spricht — deshalb entscheidest du.",
+            "**Gehen auch LRC-Lieddateien?** Ja. LRC-Zeitmarken werden entfernt, die Liedzeilen bleiben; ohne Liedtexte „Liedzeilen überspringen“ anhaken."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Untertitel werden vollständig im Browser verarbeitet: nichts wird hochgeladen, nichts läuft über einen Server. Der Text bleibt nur auf der aktuellen Seite und ist nach dem Neuladen weg."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Was in einer Untertiteldatei wirklich steht, zeigt [[Was in einer SRT-Datei steht|/guides/srt-file-format.html]]; der extrahierte Dialog soll übersetzt werden? Dann [[Untertitelübersetzung|/translate.html]]; als Tabelle brauchst du [[Untertitel nach Excel/CSV|/guides/srt-to-excel.html]]; und vor der Abgabe [[Untertitel-QC|/qc.html]] laufen lassen."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "de": {
+      "seo": {
+        "title": "Untertitel teilen und zusammenfügen – Nach Block schneiden – AI-SRTSub",
+        "desc": "Eine Datei nach Dauer oder Eintragszahl in Abschnitte schneiden, jeden bei null starten, mehrere Dateien verketten oder nach Zeitleiste verweben. Nummern neu, Text unverändert.",
+        "h1": "Untertitel teilen und zusammenfügen",
+        "intro": "Eine lange Untertiteldatei in Abschnitte schneiden oder mehrere verstreute Dateien zu einer verbinden. Der Schnitt fällt immer auf eine Eintagsgrenze — ein Satz wird nie halbiert.",
+        "ctaText": "Teilen und Zusammenfügen öffnen"
+      },
+      "body": [
+        {
+          "h2": "Wofür dieses Werkzeug da ist",
+          "ps": [
+            "Beim Aufteilen von Episoden, beim Segmentieren und beim Zusammenlegen von Quellen passt der Untertitelblock nie zum Videoblock: entweder muss eine Datei geteilt werden oder mehrere müssen zu einer werden. Diese Seite erledigt beides, je ein Tab."
+          ],
+          "ul": [
+            "**Teilen** — eine lange Datei nach Dauer oder Eintragszahl in Abschnitte schneiden.",
+            "**Zusammenfügen** — mehrere Dateien der Reihe nach zu einer Episode verketten oder nach Zeitleiste verweben.",
+            "**Schnitt nur an Eintagsgrenzen** — ein Satz wird nicht zweigeteilt.",
+            "**Nummern automatisch neu** — nach dem Zusammenfügen muss nichts von Hand nummeriert werden, und kein Wort Dialog ändert sich."
+          ]
+        },
+        {
+          "h2": "Zuerst Teilen oder Zusammenfügen wählen",
+          "ps": [
+            "Zwei Tabs oben: **Teilen: eine Datei in Abschnitte** und **Zusammenfügen: mehrere Dateien zu einer**. Die Optionen im zweiten Schritt darunter richten sich danach.",
+            "Unter „1 Untertitel einfügen“ lädst du eine Datei hoch oder fügst Text ein; falsche Datei? „Leeren“. Diese Seite liest nur UTF-8 — bei kaputter Kodierung (Wand aus Fragezeichen oder Kästchen) zuerst zu [[Textreparatur|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Die zwei Tabs oben auf der Seite zum Teilen und Zusammenfügen",
+            "cap": "Teilen und Zusammenfügen sind zwei Tabs; die Optionen im zweiten Schritt folgen der Wahl"
+          }
+        },
+        {
+          "h2": "Wie geschnitten wird",
+          "ps": [
+            "Unter „2 Wie teilen“ die Grundlage wählen: **Dauer** (alle X Minuten ein Abschnitt) oder **Eintragszahl** (alle X Einträge ein Abschnitt), dann eine Zahl eingeben.",
+            "„Jeden Abschnitt bei 0:00 neu starten“ anhaken, und jeder Abschnitt zählt ab null — passend, wenn du Episoden hochlädst und jeden Abschnitt einzeln an einen Player gibst. Ohne Haken bleiben die Original-Zeitstempel, und jeder Abschnitt passt weiter zur Position im Quellvideo.",
+            "Der Schnitt fällt nur auf Eintagsgrenzen: Überschreitet ein sehr langer Untertitel den Schnittpunkt, bleibt der ganze Eintrag im früheren Abschnitt."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Dauer- und Eintragszahloptionen mit dem Neustartschalter auf der Teilen-Seite",
+            "cap": "Nach Dauer oder Eintragszahl schneiden, auf Wunsch jeden Abschnitt bei 0:00 beginnen"
+          }
+        },
+        {
+          "h2": "Wie zusammengefügt wird",
+          "ps": [
+            "Unter „2 Wie zusammenfügen“ die Methode wählen: **Der Reihe nach verketten** verschiebt die spätere Datei so, dass sie nach der früheren endet, ohne Überlappung; **Nach Zeitleiste verweben** behält die Original-Zeitstempel jeder Datei und sortiert nach Startzeit.",
+            "Verketten passt, wenn die Dateien erste und zweite Hälfte einer Episode sind oder getrennt geprüfte Hälften wieder zusammenkommen; Verweben passt, wenn die Dateien gemeinsam auf dem Bildschirm stehen sollen, etwa Original- und Übersetzungsspur.",
+            "Nach dem Zusammenfügen werden die Nummern automatisch neu vergeben, und kein Wort Dialog ändert sich."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Die Optionen Verketten und Verweben auf der Zusammenfügen-Seite",
+            "cap": "Verketten passt für zwei Hälften einer Episode, Verweben für Original- und Übersetzungsspur"
+          }
+        },
+        {
+          "h2": "Das Ergebnis mitnehmen",
+          "ps": [
+            "„3 Ergebnis“ rechts exportiert **SRT** und **VTT**; „Herunterladen“ oder „Kopieren“ klicken.",
+            "Beim Teilen gibt es „Alle Abschnitte herunterladen“, das jeden geschnittenen Abschnitt auf einmal speichert statt einen Klick pro Abschnitt."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Die SRT/VTT-Formatwahl mit Schaltflächen zum Herunterladen und für alle Abschnitte im Ergebnisbereich",
+            "cap": "Teilungsergebnisse lassen sich abschnittsweise herunterladen; eine zusammengefügte Datei direkt"
+          }
+        },
+        {
+          "h2": "Was unangetastet bleibt",
+          "ps": [
+            "Kein Zeichen Dialog ändert sich. Diese Seite ändert nur, welche Einträge zu welchem Abschnitt gehören und wie sie nummeriert werden; der Inhalt der Einträge bleibt, wie er ist.",
+            "Bei „Der Reihe nach verketten“ werden die Zeitstempel der späteren Dateien insgesamt verschoben — das verlangt das Zusammenfügen; bei „Nach Zeitleiste verweben“ bleibt jeder Original-Zeitstempel erhalten."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Was, wenn der letzte Abschnitt sehr kurz wird?** Das ist normal. Der Rest, der keinen vollen Abschnitt füllt, wird ein eigener Abschnitt, statt aufgefüllt zu werden.",
+            "**Wird ein Satz am Schnittpunkt zerteilt?** Nein. Schnitte fallen nur auf Eintagsgrenzen, ein Eintrag über der Grenze bleibt im früheren Abschnitt.",
+            "**Wie werden nach dem Verweben zwei Einträge mit gleicher Zeit sortiert?** Nach Startzeit; bei gleicher Startzeit bleibt die Reihenfolge, in der du die Dateien hinzugefügt hast.",
+            "**Lässt sich ASS teilen?** Diese Seite kann SRT und VTT. ASS vorher mit [[Formatkonvertierung|/convert.html]] in SRT oder VTT wandeln."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Untertitel werden vollständig im Browser verarbeitet: nichts wird hochgeladen, nichts läuft über einen Server. Seite schließen, und der Inhalt ist weg."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Zwei Dateien zu einer bilingualen Spur (nicht zu einer Episode) verbinden: [[Bilingual zusammenführen und Effekte|/guides/merge.html]]; ist die ganze Zeitleiste verschoben, [[Zeitleiste anpassen|/shift.html]]; für eine ganze Staffel [[Stapelkonvertierung|/batch.html]]; und danach [[Untertitel-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "de": {
+      "seo": {
+        "title": "Liedtext-Timing – Song laden, Text einfügen, mitklicken – AI-SRTSub",
+        "desc": "Song laden, Liedtext einfügen, beim Hören jede Zeile stempeln und LRC oder SRT exportieren. Leertaste spielt, Enter stempelt, Z nimmt zurück — Hände auf der Tastatur.",
+        "h1": "Liedtext-Timing: so funktioniert es",
+        "intro": "Song laden, Liedtext einfügen, beim Hören für jede Zeile einen Zeitpunkt setzen und Standard-LRC oder SRT exportieren. Das Audio läuft lokal und wird nie hochgeladen.",
+        "ctaText": "Liedtext-Werkzeug öffnen"
+      },
+      "body": [
+        {
+          "h2": "Wofür dieses Werkzeug da ist",
+          "ps": [
+            "Einem Song eine Liedtextdatei geben, zu der man mitsingen kann: eine Zeile pro Liedzeile, jede mit einem Zeitpunkt. Player lesen LRC, Untertitelspuren lesen SRT, und beides lässt sich hier exportieren."
+          ],
+          "ul": [
+            "**Von null anfangen** — Klartext-Liedtext einfügen und beim Hören mitklicken.",
+            "**Vorhandenes korrigieren** — eine vorhandene LRC importieren und ab der ersten Zeile ohne Zeit weitermachen.",
+            "**Zwei Formate exportieren** — LRC für Player, SRT für Videospuren.",
+            "**Alles über Tastatur** — Leertaste spielt und pausiert, Enter stempelt die aktuelle Zeile, Z macht rückgängig."
+          ]
+        },
+        {
+          "h2": "1 Song laden",
+          "ps": [
+            "Die erste Spalte links nimmt eine Audiodatei: **MP3, M4A, FLAC, WAV und OGG** gehen alle. Das Audio läuft lokal und wird nie hochgeladen.",
+            "Die Audioqualität beeinflusst die Genauigkeit nicht, aber eine Quelle mit klarem Gesang ist leichter zu treffen; Liveaufnahmen und Quellen mit lauter Begleitung sind deutlich schwerer zu synchronisieren."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Der Bereich zum Laden eines Songs im Liedtext-Werkzeug",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG gehen alle, und das Audio läuft nur lokal"
+          }
+        },
+        {
+          "h2": "2 Liedtext einfügen",
+          "ps": [
+            "Den Liedtext in die zweite Spalte einfügen, **eine Zeile pro Liedzeile**; Leerzeilen werden übersprungen. Dann „Liedtext auswerten“ klicken.",
+            "Eine vorhandene LRC einfügen geht auch — ihre `[mm:ss.xx]`-Zeitmarken werden erkannt, und nach dem Import machst du ab der ersten Zeile ohne Zeit weiter, sodass bereits getimte Zeilen nicht neu gemacht werden müssen."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Der Bereich zum Einfügen des Liedtexts und die Schaltfläche zum Auswerten",
+            "cap": "Eine Zeile pro Liedzeile einfügen, oder eine ganze LRC einfügen und die Zeiten auslesen lassen"
+          }
+        },
+        {
+          "h2": "3 Beim Hören mitklicken",
+          "ps": [
+            "Song abspielen und in dem Moment, in dem eine Zeile beginnt, Enter drücken (oder „Diese Zeile stempeln“ klicken); die Zeit wird festgehalten und der Cursor springt zur nächsten Zeile.",
+            "Kürzel: **Leertaste** spielt und pausiert, **Enter** stempelt die aktuelle Zeile, **Z** nimmt eine Zeile zurück. Enter während der Wiedergabe zu drücken ist am bequemsten — kein Wechsel zwischen Maus und Tastatur.",
+            "Falsche Zeile gestempelt? Mit Z zurücknehmen und neu stempeln. Soll eine Zeile gar nicht gestempelt werden (Instrumental, rein musikalischer Teil), „Diese Zeile überspringen“ klicken — sie erscheint nicht im Export."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Wiedergabe, Zeile stempeln, eine Zeile zurücknehmen und Zeile überspringen im Mitklick-Bereich",
+            "cap": "Leertaste spielt, Enter stempelt, Z nimmt zurück — die Hände bleiben auf der Tastatur"
+          }
+        },
+        {
+          "h2": "4 Export",
+          "ps": [
+            "Die vierte Spalte exportiert: **LRC herunterladen** für Player, **SRT herunterladen** für Videospuren, oder „Kopieren“ für den Text direkt.",
+            "Exportiert werden nur Zeilen mit Zeit; übersprungene Zeilen kommen nie in die Datei. Im SRT-Export dauert jede Zeile bis zum Beginn der nächsten, die letzte Zeile fällt auf 2 Sekunden zurück."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Die Schaltflächen LRC herunterladen, SRT herunterladen und Kopieren im Exportbereich",
+            "cap": "LRC für Player, SRT für Video; nur Zeilen mit Zeit werden exportiert"
+          }
+        },
+        {
+          "h2": "Was unangetastet bleibt",
+          "ps": [
+            "Der Liedtext wird nicht umgeschrieben. Das Timing fügt nur einen Zeitpunkt pro Zeile hinzu und berührt die eingefügten Wörter nicht.",
+            "Beim Import einer vorhandenen LRC behalten Zeilen mit Zeitmarke ihre Originalzeit, und du stempelst nur ab der ersten Zeile ohne Zeit weiter."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Warum fehlen Zeilen im Export?** Übersprungene Zeilen und Zeilen ohne Zeit kommen nie in die Datei. Zurück zu Schritt drei und ergänzen, oder bestätigen, dass sie übersprungen werden sollten.",
+            "**Lassen sich die Zeiten nachträglich ändern?** Soll nach dem Stempeln alles ein Stück verschoben werden, SRT exportieren und mit [[Zeitleiste anpassen|/shift.html]] insgesamt verschieben oder skalieren.",
+            "**LRC oder SRT exportieren?** LRC für Musikplayer (foobar2000, Streaming-Clients, diverse Player); SRT, wenn der Text auf Video soll oder mit Untertitelwerkzeugen weiterverarbeitet wird.",
+            "**Wie lange dauert ein Song?** Das hängt von der Zeilenzahl und der gewünschten Genauigkeit ab. Bei dreißig bis vierzig Zeilen ist ein Durchlauf in wenigen Minuten erledigt, wenn man den Ablauf kennt; wortgenau dauert länger."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Audio und Liedtext werden vollständig im Browser verarbeitet: nichts wird hochgeladen, nichts läuft über einen Server. Das Audio wird nur lokal dekodiert und abgespielt."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Liegt eine LRC vor und soll daraus ein Untertitel werden: [[LRC zu SRT|/guides/lrc-to-srt.html]]; zum Vorgehen und zu Fallstricken beim Timing: [[LRC-Liedtexte richtig timen|/guides/how-to-make-lrc-file.html]]; stimmt das exportierte SRT nicht, [[Zeitleiste anpassen|/shift.html]]; und das Ergebnis durch [[Untertitel-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "de": {
+      "seo": {
+        "title": "Eingebettete Videountertitel extrahieren – MKV / MP4 – AI-SRTSub",
+        "desc": "Eingebettete Untertitel im Detail: die Untertitelspuren in MKV, WebM, MP4 und MOV direkt auslesen und als SRT / VTT / ASS / TXT exportieren. Kein Upload, kein Transcoding, alle Sprachspuren gelistet.",
+        "h1": "Untertitel aus einem Video extrahieren",
+        "intro": "Die in einem MKV / MP4 eingebettete Untertitelspur direkt als SRT auslesen — das Video wird nie hochgeladen, alles läuft im Browser.",
+        "ctaText": "Video-Untertitel-Extraktion öffnen"
+      },
+      "body": [
+        {
+          "h2": "Wofür dieses Werkzeug da ist",
+          "ps": [
+            "Untertitel können in einer Videodatei eingebettet sein statt als eigene Datei zu existieren. Um sie zu bearbeiten, zu übersetzen oder bilingual zu paaren, müssen sie erst heraus — genau das tut diese Seite."
+          ],
+          "ul": [
+            "**Vier Container** — MKV / WebM und MP4 / MOV.",
+            "**Vier Spurarten** — reiner Text, ASS, WebVTT und die `mov_text` / `tx3g`-Spuren in MP4.",
+            "**Vier Exportformate** — SRT / VTT / ASS / TXT.",
+            "**Kein Upload, kein Transcoding** — in kleinen Blöcken nach Offset gelesen, damit auch eine mehrere GB große Datei den Speicher nicht füllt."
+          ]
+        },
+        {
+          "h2": "1 Video hinzufügen",
+          "ps": [
+            "Eine Videodatei in die erste Spalte ziehen oder anklicken und auswählen. Erkannt werden nur **MKV / WebM** und **MP4 / MOV**; andere Container liefern keine Spur.",
+            "Die Datei verlässt deinen Rechner nie — es gibt keinen Upload-Schritt. Das Werkzeug liest in kleinen Blöcken nach Offset, damit ein mehrere GB großer Film den Speicher nicht füllt, aber der erste Lesevorgang muss die Spureninformationen einmal durchscannen."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Der Bereich zum Hinzufügen eines Videos auf der Seite zur Extraktion eingebetteter Untertitel",
+            "cap": "MKV / WebM und MP4 / MOV werden unterstützt, die Datei verlässt deinen Rechner nie"
+          }
+        },
+        {
+          "h2": "2 Die eingebetteten Untertitelspuren",
+          "ps": [
+            "Ist der Lesevorgang fertig, listet die zweite Spalte die Untertitelspuren der Datei **eine pro Zeile**, meist mit Sprache und Spurname (etwa „Chinesisch“, „Englisch“, „Forced“). Ein Klick auf eine Zeile extrahiert diese Spur.",
+            "Enthält die Datei nur eine Untertitelspur, startet die Extraktion automatisch — kein Klick nötig.",
+            "**Bilduntertitel lassen sich nicht extrahieren**: Blu-ray-PGS und DVD-Untertitel sind Bilder im Stream, ohne Text zum Auslesen, und die Seite sagt das klar; dafür braucht es OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Die Liste der eingebetteten Untertitelspuren, eine pro Zeile",
+            "cap": "Eine Spur pro Zeile; gibt es nur eine, startet die Extraktion automatisch"
+          }
+        },
+        {
+          "h2": "3 Das Ergebnis",
+          "ps": [
+            "„3 Ergebnis“ rechts zeigt den extrahierten Untertiteltext, darüber das Exportformat: **SRT / VTT / ASS / TXT**. „Herunterladen“ oder „Kopieren“ klicken.",
+            "Ist die Quellspur ASS, kommen ihr eigener Stilkopf und ihre Auflösung unverändert zurück — ein ASS-Export bewahrt sie, ein SRT-Export trägt nur den Text."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Der Ergebnisbereich mit der Formatwahl SRT / VTT / ASS / TXT",
+            "cap": "Vier Exportformate; eine ASS-Quelle behält Stilkopf und Auflösung"
+          }
+        },
+        {
+          "h2": "Was unangetastet bleibt",
+          "ps": [
+            "Die Videodatei selbst wird überhaupt nicht berührt — nur lesen, kein Schreiben, kein Transcoding, kein Remuxing.",
+            "Der Untertitelinhalt kommt so heraus, wie er ist: keine Kodierungsraterei, keine Zeitleistenkorrektur. Sind die extrahierten Untertitel unlesbar, ist das ein Kodierungsproblem der Quellspur — damit zu [[Textreparatur|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Gibt es wirklich keine Möglichkeit für Bilduntertitel (PGS / DVD)?** Nicht auf dieser Seite — das sind Bilder ohne Textebene. Zuerst muss OCR laufen, und das macht diese Seite nicht.",
+            "**Die extrahierten Untertitel haben falsche Zeiten — warum?** Diese Seite korrigiert keine Zeitleisten; es kommt heraus, was drin war. Für einen globalen Versatz oder ein Ratenproblem [[Zeitleiste anpassen|/shift.html]].",
+            "**Warum dauert es lange, bis etwas passiert?** Eine große Datei muss blockweise nach Spureninformationen durchsucht werden, und je größer die Datei, desto länger; das läuft lokal und hat nichts mit der Verbindung zu tun.",
+            "**Kann ich diese Seite für externe Untertiteldateien nutzen?** Nicht nötig — eine externe .srt / .ass geht direkt in die [[Formatkonvertierung|/convert.html]] oder ein anderes Werkzeug. Diese Seite ist für Untertitel, die in einem Video eingebettet sind."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Das Video wird vollständig im Browser gelesen: nichts wird hochgeladen, nichts transkodiert, nichts läuft über einen Server. Seite schließen, und die gelesenen Daten sind frei."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Das Extrahierte soll übersetzt werden: [[Untertitelübersetzung|/translate.html]]; bilingual machen: [[Zwei Wege zu bilingualen Untertiteln|/guides/make-bilingual-subtitles.html]]; Unterschied zwischen eingebettet und extern und was sich extrahieren lässt: [[Untertitel aus einem Video holen|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "de": {
+      "seo": {
+        "title": "Begriffe in Untertiteln ersetzen – Eine Tabelle, eine Datei – AI-SRTSub",
+        "desc": "Begriffsersetzung im Detail: eine Regel pro Zeile, getrennt durch -> , => , → oder Tab, # beginnt einen Kommentar. Ganzwort, Groß-/Kleinschreibung, erste oder zweite Zeile, jede Änderung aufgelistet.",
+        "h1": "Begriffe in Untertiteln stapelweise ersetzen",
+        "intro": "Eine Begrifftabelle vereinheitlicht die Wortwahl einer ganzen Untertiteldatei auf einmal — Zeitleisten, ASS-Stile und VTT-NOTE-Blöcke bleiben Zeichen für Zeichen unberührt.",
+        "ctaText": "Begriffsersetzung öffnen"
+      },
+      "body": [
+        {
+          "h2": "Wofür dieses Werkzeug da ist",
+          "ps": [
+            "Dasselbe Wort zweimal verschieden übersetzt, Namen und Orte, die der Maschinenübersetzung folgen, fremde Untertitel, die an die eigenen Konventionen angepasst werden sollen — all das hat eines gemeinsam: Geändert wird ein Wort, nicht die Struktur. Diese Seite ändert nur Wörter."
+          ],
+          "ul": [
+            "**Namen vereinheitlichen** — Personen, Orte und Eigennamen bleiben durchgehend gleich.",
+            "**Maschinenfehler beheben** — ein falsch übersetzter Begriff wird in der ganzen Datei ersetzt.",
+            "**Eigene Konventionen übernehmen** — fremde Untertitel auf die eigene Wortwahl umstellen.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — alle sechs Formate werden erkannt."
+          ]
+        },
+        {
+          "h2": "Zwei Eingaben: Untertitel und Begrifftabelle",
+          "ps": [
+            "Die Spalte „1 Untertitel einfügen“ links nimmt eine Untertiteldatei, oder du fügst den Inhalt direkt ein; falsche Datei? „Leeren“.",
+            "Die Spalte „2 Begrifftabelle“ rechts enthält die Regeln. **Eine Regel pro Zeile**, alter und neuer Begriff getrennt durch `->` , `=>` , `→` oder einen Tab — alle vier gehen. Zeilen mit `#` am Anfang sind Kommentare und nehmen an der Ersetzung nicht teil.",
+            "Wenn du unsicher bist, „Beispiel einfügen“ klicken und das Beispiel anpassen."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Der Bereich zum Einfügen von Untertiteln und die Begrifftabelle auf der Seite zur Ersetzung",
+            "cap": "Untertitel links, Regeln rechts; eine Regel pro Zeile, alter und neuer Begriff durch -> getrennt"
+          }
+        },
+        {
+          "h2": "Wie die Begrifftabelle geschrieben wird",
+          "ps": [
+            "Eine Regel pro Zeile: links der aktuelle Begriff, rechts, was daraus werden soll. Zum Beispiel ersetzt `Thor -> Donar` jedes „Thor“ in der Datei durch „Donar“.",
+            "Kommentare beginnen mit `#` und eignen sich, um eine Regelgruppe zu beschriften (etwa „# Namensfixes Staffel 1“) und um eine Regel vorübergehend abzuschalten — einfach ein `#` davor setzen statt sie zu löschen.",
+            "Regeln laufen von oben nach unten; Text, den eine Regel erzeugt, wird von den Regeln darunter erneut durchsucht. Wenn die Reihenfolge zählt (etwa erst A durch B ersetzen, dann B durch C), ist das zu beachten."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Zeile für Zeile Ersetzungsregeln im Eingabefeld der Begrifftabelle",
+            "cap": "Eine Regel pro Zeile; Zeilen mit # sind Kommentare und können eine Regel vorübergehend abschalten"
+          }
+        },
+        {
+          "h2": "Was die drei Schalter tun",
+          "ps": [
+            "**Bereich**: `alle` / `nur 1. Zeile` / `nur 2. Zeile`. In einer bilingualen Datei „nur 2. Zeile“ wählen, wenn nur die Übersetzung geändert werden soll; Einträge mit nur einer Zeile bleiben bei beiden Einzelzeilen-Einstellungen unberührt — das Werkzeug rät nicht, welche Seite das Original ist.",
+            "**Ganzwort**: ersetzt nur Begriffe, die allein als Wort stehen, sodass `art` das `start` nicht antastet. Für Sprachen ohne Wortabstände wie Chinesisch und Japanisch wirkt dieser Schalter nicht — dort wird per Teilstring ersetzt.",
+            "**Groß-/Kleinschreibung beachten**: standardmäßig aus, `CEO` und `ceo` werden beide ersetzt; angehakt wird nur die exakt gleiche Schreibweise ersetzt."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Die Schalter Bereich, Ganzwort und Groß-/Kleinschreibung unter der Begrifftabelle",
+            "cap": "Der Bereich entscheidet, welche Zeile geändert wird; Ganzwort und Groß-/Kleinschreibung, wie streng zugeordnet wird"
+          }
+        },
+        {
+          "h2": "Jede Änderung aufgelistet, jede rückholbar",
+          "ps": [
+            "„3 Ergebnis“ zeigt die ersetzten Untertitel und **listet jede Änderung auf**: welcher Eintrag, welche Zeile, von was zu was.",
+            "Eine Änderung, die du nicht willst, klickst du in der Liste an und holst nur diesen Eintrag zurück — die Begrifftabelle muss nicht geändert und neu laufen gelassen werden. Passt es, „Herunterladen“ oder „Kopieren“."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Der Ergebnisbereich mit der Liste der einzelnen Änderungen",
+            "cap": "Jede Änderung ist aufgelistet; ein Klick auf eine unerwünschte holt sie zurück"
+          }
+        },
+        {
+          "h2": "Was unangetastet bleibt",
+          "ps": [
+            "**Zeitleisten, ASS-Stilzeilen und VTT-`NOTE`-Blöcke bleiben Zeichen für Zeichen unberührt.** Die Ersetzung wirkt nur auf Dialogtext, nie auf Strukturzeilen.",
+            "Die Begrifftabelle verändert deine Untertiteldatei nicht automatisch — das Ergebnis ist eine neue Ausgabe, das Original bleibt, wie es ist."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Warum wurde ein Begriff nicht ersetzt?** Zuerst den Bereich prüfen: bei „nur 2. Zeile“ bleiben Einträge mit nur einer Zeile unberührt. Dann die Ganzwort-Option prüfen, die Treffer stoppt, die nicht als eigenes Wort stehen.",
+            "**Warum ersetzt Chinesisch trotz Ganzwort weiter per Teilstring?** Das ist erwartet. Chinesisch und Japanisch trennen Wörter nicht mit Leerzeichen, das Werkzeug kann Wortgrenzen nicht bestimmen, und Ganzwort wirkt dort nicht.",
+            "**Wie hole ich nach einem Fehler alles zurück?** In der Änderungsliste Eintrag für Eintrag; zum kompletten Neustart die Begrifftabelle leeren und die Untertitel erneut hinzufügen.",
+            "**Können ASS-Stilzeilen versehentlich geändert werden?** Nein. Stilzeilen und `NOTE`-Blöcke liegen außerhalb des Bereichs; nur Dialogtext nimmt teil."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Untertitel und Begrifftabelle werden vollständig im Browser verarbeitet: nichts wird hochgeladen, nichts läuft über einen Server. Die Begrifftabelle wird nicht gespeichert und ist beim nächsten Öffnen leer."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Ob sich eine Begrifftabelle lohnt und wie man sie über eine Staffel pflegt: [[Begrifftabellen: eine Staffel, eine Wortwahl|/guides/subtitle-glossary.html]]; ist der Inhalt schmutzig (Wasserzeichen, SDH), zuerst [[Untertitel säubern|/clean.html]]; stehen die Namen und es sollen andere Sprachen dazu, [[Untertitelübersetzung|/translate.html]]; und das Ergebnis durch [[Untertitel-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "de": {
+      "seo": {
+        "title": "Untertitel aus einem Video holen – Eingebettet vs. extern – AI-SRTSub",
+        "desc": "Was MKV / WebM / MP4 / MOV tragen, wie sich Text-, ASS-, WebVTT- und mov_text-Spuren unterscheiden, warum Bilduntertitel keinen Text haben und was danach kommt.",
+        "h1": "Untertitel aus einem Video holen",
+        "intro": "Untertitel können in einer Videodatei stecken oder als eigene Datei daneben liegen. Drinnen sind sie eine Spur im Container — sie herauszuholen hat nichts mit Transcoding zu tun.",
+        "ctaText": "Video-Untertitel-Extraktion öffnen"
+      },
+      "body": [
+        {
+          "h2": "Wo Untertitel liegen: eingebettet und extern",
+          "ps": [
+            "Eine Videodatei (MKV, MP4) ist ein Container, der gleichzeitig eine Videospur, eine Audiospur und Untertitelspuren enthält. Eingeschlossene Untertitel heißen **eingebettet**, eine separate .srt / .ass-Datei daneben heißt **extern**, und eine eingebettete Spur wird auch **eingemuxt** genannt.",
+            "Externe Untertitel lassen sich direkt verwenden. Das Problem sind die eingebetteten: Um sie zu ändern, zu übersetzen oder aus der Original-Spur eine bilinguale Fassung zu bauen, hast du keine Untertiteldatei in der Hand — die Spur muss erst aus dem Container gelesen werden. Dieser Schritt ist kein Transcoding: Das Video wird nicht neu kodiert, nur die bereits im Container gespeicherten Daten werden ausgelesen."
+          ]
+        },
+        {
+          "h2": "Welcher Container was trägt",
+          "ps": [
+            "Verschiedene Container halten verschiedene Untertitelformate, und auch der Aufwand beim Extrahieren unterscheidet sich:"
+          ],
+          "ul": [
+            "**MKV / WebM** — am großzügigsten: reiner Text, ASS und WebVTT passen alle hinein, mehrere Sprachspuren sind üblich.",
+            "**MP4 / MOV** — meist eine `mov_text` / `tx3g`-Spur: reiner Text mit etwas Stilinformation.",
+            "**Reine Textspur** — kommt als Text heraus und wird direkt SRT.",
+            "**ASS-Spur** — trägt Stilkopf und Auflösung; ein ASS-Export bewahrt sie, ein SRT-Export lässt nur den Text.",
+            "**Bilduntertitel (Blu-ray PGS, DVD-Untertitel)** — speichern Bilder, keine Zeichen, es lässt sich kein Text extrahieren."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Die von der Extraktionsseite gelisteten Untertitelspuren",
+            "cap": "Eine Spur pro Zeile, meist mit Sprache und Spurname; gibt es nur eine, startet die Extraktion automatisch"
+          }
+        },
+        {
+          "h2": "Warum Bilduntertitel nicht extrahierbar sind",
+          "ps": [
+            "Blu-ray-PGS und DVD-Untertitel speichern keine Zeichen, sondern eine Folge von Bildern mit Alphakanal. Zeigt ein Player sie an, klebt er ein Bild hin, er rendert keinen Text.",
+            "In so einer Spur gibt es also keinen lesbaren Text — nicht weil das Werkzeug es nicht unterstützt, sondern weil dort keine Zeichen sind. Die Seite sagt klar Bescheid, wenn sie auf eine stößt.",
+            "Der einzige Weg zu Wörtern ist, die Zeichen in diesen Bildern zuerst zu erkennen (OCR) und daraus Untertitel zu bauen. Das ist ein anderer Vorgang als das Herausziehen einer Spur."
+          ]
+        },
+        {
+          "h2": "Was nach dem Extrahieren meist noch kommt",
+          "ps": [
+            "Heraus kommt die Spur so, wie sie war: Das Werkzeug rät keine Kodierungen und korrigiert keine Zeitleisten. Zwei Dinge kommen deshalb häufig vor:",
+            "Zum einen **unlesbarer Text** — ein Kodierungsproblem der Quellspur, das genauso unlesbar herauskommt; in [[Textreparatur – so geht es|/guides/repair.html]] die Kodierung bestimmen. Zum anderen **falsche Zeiten** — ob die Quelle ein Intro-Logo hat oder die Bildraten nicht passen, das Ergebnis ist insgesamt versetzt; mit [[Zeitleiste anpassen|/shift.html]] verschieben oder skalieren.",
+            "Danach geht es zum Übersetzen in die [[Untertitelübersetzung|/translate.html]], und für bilingual siehe [[Zwei Wege zu bilingualen Untertiteln|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Der Ergebnisbereich mit den Exportformaten SRT / VTT / ASS / TXT",
+            "cap": "Extrahierte Untertitel lassen sich in vier Formaten exportieren; eine ASS-Quelle behält Stilkopf und Auflösung"
+          }
+        },
+        {
+          "h2": "Ein paar leicht zu verwechselnde Punkte",
+          "ps": [
+            "**Untertitel extrahieren ist nicht Einbrennen.** Das Video wird nicht neu kodiert, Bildqualität und Tonspur bleiben unberührt.",
+            "**Extrahieren verändert die Originaldatei nicht.** Nur lesen, nie schreiben, kein Byte des Videos ändert sich.",
+            "**Dass eine große Datei langsam ist, liegt nicht an der Verbindung.** Das Werkzeug durchsucht Spureninformationen blockweise, je größer die Datei, desto länger; alles läuft lokal.",
+            "**Externe Untertitel brauchen diese Seite nicht.** Liegt eine .srt / .ass vor, direkt in die [[Formatkonvertierung|/convert.html]]; nur in einem Video eingebettete Untertitel müssen erst extrahiert werden."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Die vollständige Anleitung steht in [[Untertitel aus einem Video extrahieren|/guides/videosub.html]]; das Extrahierte soll übersetzt werden: [[Untertitelübersetzung|/translate.html]], bilingual: [[Zwei Wege zu bilingualen Untertiteln|/guides/make-bilingual-subtitles.html]]; bei unlesbarem Text zuerst [[Textreparatur|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "de": {
+      "seo": {
+        "title": "LRC-Liedtexte timen – Eine Zeile, ein Zeitpunkt – AI-SRTSub",
+        "desc": "Eine LRC-Datei von Grund auf bauen: eine Liedzeile pro Zeile einfügen, beim Hören die Zeit setzen, die drei wichtigen Kürzel, wann man eine Zeile überspringt, LRC oder SRT exportieren.",
+        "h1": "LRC-Liedtexte richtig timen",
+        "intro": "Eine LRC ist nur „eine Liedzeile plus ein Zeitpunkt“. Sie zu bauen heißt Timen: den Moment festhalten, in dem jede Zeile beginnt.",
+        "ctaText": "Liedtext-Werkzeug öffnen"
+      },
+      "body": [
+        {
+          "h2": "Was Timen eigentlich ist",
+          "ps": [
+            "Der Aufbau einer LRC-Datei ist denkbar einfach: eine Liedzeile pro Zeile, davor eine `[mm:ss.xx]`-Zeitmarke. Erreicht ein Player eine Zeile, zeigt er diesen Text in diesem Moment.",
+            "Die ganze Arbeit an einer LRC besteht also darin, jeder Liedzeile einen Zeitpunkt zuzuweisen — und das kann keine Maschine für dich tun, denn zu entscheiden, wo eine Zeile zu singen beginnt, verlangt Zuhören."
+          ]
+        },
+        {
+          "h2": "Wie viele Durchläufe ein Song braucht",
+          "ps": [
+            "Eine Minute Nachdenken vor dem Start spart den größten Teil der Nacharbeit:"
+          ],
+          "ul": [
+            "**Ein Durchlauf** — klarer Gesang, wenige Zeilen, ungefähr passend: einmal durchklicken reicht.",
+            "**Zwei Durchläufe** — ein grober Durchlauf, dann Zeile für Zeile prüfen; das übliche Vorgehen, wenn es genau sein soll.",
+            "**Importieren und korrigieren** — eine LRC liegt vor und nur wenige Zeilen stimmen nicht; importieren und ab der ersten Zeile ohne Zeit weitermachen.",
+            "**Instrumentalparts und rein musikalische Teile** brauchen kein Timing — „Diese Zeile überspringen“ klicken, sie bleibt aus dem Export.",
+            "**Chöre und Überlappungen** können nur einen Startpunkt festhalten; überlappende Teile werden der Leadstimme zugerechnet."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Wiedergabe, Zeile stempeln, eine Zeile zurücknehmen und Zeile überspringen im Mitklick-Bereich",
+            "cap": "Enter während der Wiedergabe ist am bequemsten; falsche Zeile? Mit Z zurücknehmen und neu stempeln"
+          }
+        },
+        {
+          "h2": "Das Einfügen entscheidet über den Rest",
+          "ps": [
+            "Liedtext eine Zeile pro Liedzeile einfügen; Leerzeilen werden übersprungen. Die Zeilenumbrüche, die du einfügst, sind die Zeilen, die du später timest — mehr Umbrüche jetzt bedeuten mehr Klicks später.",
+            "Eine vorhandene LRC einfügen geht auch: ihre `[mm:ss.xx]`-Zeitmarken werden erkannt, und nach dem Import **machst du ab der ersten Zeile ohne Zeit weiter**, sodass bereits getimte Zeilen nicht neu gemacht werden müssen.",
+            "Eine halbfertige LRC lässt sich also speichern und später wieder einfügen, um weiterzumachen."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Der Bereich zum Einfügen des Liedtexts und die Schaltfläche zum Auswerten",
+            "cap": "Eine Zeile pro Liedzeile; eine ganze LRC einfügen liest die vorhandenen Zeiten und du machst weiter"
+          }
+        },
+        {
+          "h2": "LRC oder SRT exportieren",
+          "ps": [
+            "**Für einen Musikplayer LRC exportieren.** foobar2000, diverse Player und Geräte mit Liedtextanzeige lesen es.",
+            "**Für Video oder Weiterverarbeitung SRT exportieren.** Video-Untertitelspuren, Untertitelwerkzeuge und Schnittsoftware lesen SRT. Im Export dauert jede Zeile bis zum Beginn der nächsten, die letzte fällt auf 2 Sekunden zurück.",
+            "Beide exportieren nur Zeilen mit Zeit — übersprungene Zeilen kommen nie in die Datei."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Die Schaltflächen LRC herunterladen, SRT herunterladen und Kopieren im Exportbereich",
+            "cap": "LRC für Player, SRT für Video; nur Zeilen mit Zeit werden exportiert"
+          }
+        },
+        {
+          "h2": "Ein paar leicht zu verwechselnde Punkte",
+          "ps": [
+            "**Nach dem Timen ist alles leicht verschoben? Versatz nutzen.** SRT exportieren und mit [[Zeitleiste anpassen|/shift.html]] insgesamt verschieben; viel schneller als Zeile für Zeile neu zu timen.",
+            "**Die Abweichung wächst zum Ende? Das ist ein Ratenproblem.** Weichen Wiedergabe- und Aufnahmegeschwindigkeit ab, wächst der Fehler nach hinten, und dafür braucht es proportionale Skalierung, keinen Versatz.",
+            "**Kürzel wirken erst zusammen natürlich.** Leertaste spielt und pausiert, Enter stempelt die aktuelle Zeile, Z nimmt eine zurück — während der Wiedergabe direkt Enter drücken, statt zwischen Maus und Tastatur zu wechseln.",
+            "**Die Audioqualität beeinflusst die Genauigkeit.** Eine Quelle mit klarem Gesang ist leichter zu treffen; Liveaufnahmen und laute Begleitung deutlich schwerer."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Die vollständige Anleitung steht in [[Liedtext-Timing: so funktioniert es|/guides/lrc.html]]; eine vorhandene LRC soll Untertitel werden: [[LRC zu SRT|/guides/lrc-to-srt.html]]; stimmt das exportierte SRT nicht, [[Zeitleiste anpassen|/shift.html]]; und das Ergebnis durch [[Untertitel-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "de": {
+      "seo": {
+        "title": "Begrifftabellen: eine Staffel, eine Wortwahl – Wann sinnvoll – AI-SRTSub",
+        "desc": "Eine Begrifftabelle löst uneinheitliche Übersetzungen: wann sie sich lohnt, wie man sie über eine Staffel wiederverwendet, warum Ganzwort im Chinesischen nichts tut.",
+        "h1": "Begrifftabellen: eine Staffel, eine Wortwahl",
+        "intro": "Wenn ein Name in Folge eins A heißt und in Folge sieben B, halten Zuschauer ihn für zwei Figuren. Eine Begrifftabelle verhindert genau das — sie legt fest, wie etwas heißt.",
+        "ctaText": "Begriffsersetzung öffnen"
+      },
+      "body": [
+        {
+          "h2": "Eine Begrifftabelle löst Uneinheitlichkeit",
+          "ps": [
+            "Wortfehler in Untertiteln sind zweierlei: „dieses Wort ist falsch übersetzt“ und „dasselbe Wort ist an verschiedenen Stellen verschieden übersetzt“. Das erste ist ein Wörterbuchproblem, das zweite ist die Aufgabe einer Begrifftabelle.",
+            "Das zweite ist häufiger und schwerer zu entdecken: `Thor` heißt in Folge eins „Thor“ und in Folge sieben „Donar“, jede Folge für sich sieht in Ordnung aus, und in der Serie wirkt es, als wäre eine neue Figur aufgetaucht. Eine Begrifftabelle macht aus „in dieser Produktion heißt er Thor“ eine ausführbare Regel, die auf die ganze Datei auf einmal angewendet wird."
+          ]
+        },
+        {
+          "h2": "Wann sich eine Tabelle lohnt",
+          "ps": [
+            "Nicht jede Untertiteldatei braucht eine Begrifftabelle. Sinnvoll ist sie meist in diesen Fällen:"
+          ],
+          "ul": [
+            "**Eine ganze Staffel oder Serie** — je mehr Folgen, desto wahrscheinlicher die Abweichung.",
+            "**Viele Eigennamen** — Personen, Orte, Organisationen, erfundene Begriffe des Werks.",
+            "**Mehrere Beteiligte** — Folgen auf Übersetzer mit verschiedenen Gewohnheiten verteilt.",
+            "**Fremde Untertitel übernehmen** — an die eigene (oder die des Kunden) Wortwahl angleichen.",
+            "**Nach der Maschinenübersetzung aufräumen** — die Maschine gibt denselben Begriff oft mehrfach verschieden wieder."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Nach Kategorien gruppierte Ersetzungsregeln in einer Begrifftabelle",
+            "cap": "Mit #-Kommentaren Regeln gruppieren und beim Bearbeiten eine Regel vorübergehend abschalten"
+          }
+        },
+        {
+          "h2": "Eine Tabelle über eine Staffel halten",
+          "ps": [
+            "Eine Begrifftabelle wird **schrittweise gepflegt**: in Folge eins die Namen festlegen, danach bei jedem neuen Begriff eine Regel ergänzen, und am Ende der Staffel ist die Tabelle vollständig. Für die nächste Staffel derselben Serie dient sie als Ausgangspunkt.",
+            "Regeln etwas breiter schreiben als nötig — steht „Thor“ fest, auch „Donar -> Thor“ aufnehmen, damit fremde Untertitel im selben Durchgang angeglichen werden.",
+            "Danach immer die **Änderungsliste** ansehen: Sie nennt jeden Eintrag, jede Zeile und was zu was wurde. Nur dort lässt sich bestätigen, dass die Änderung richtig und nicht zu weit ging, und jeder unerwünschte Eintrag ist mit einem Klick zurückgeholt."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Die Liste der einzelnen Änderungen im Ergebnisbereich",
+            "cap": "Jede Änderung ist aufgelistet; ein Klick auf eine unerwünschte holt sie zurück"
+          }
+        },
+        {
+          "h2": "Was nicht in eine Begrifftabelle gehört",
+          "ps": [
+            "Eine Begrifftabelle ändert **Wörter**. Diese drei Dinge liegen außerhalb ihrer Aufgabe und sollten es bleiben:",
+            "**Grammatik und Satzbau** — aus einem Wort wird kein Satz; Arbeit auf Satzebene gehört zurück in die [[Untertitelübersetzung|/translate.html]] oder zu einem Menschen.",
+            "**Inhalt säubern** — ganze Zeilen wie Wasserzeichen, Werbung und SDH-Hinweise zu entfernen ist Sache von [[Untertitel säubern|/clean.html]]; Regeln ersetzen, sie löschen keine Zeilen.",
+            "**Zeitleisten** — eine Begrifftabelle berührt keine Zeit. Für globalen Versatz oder ein Ratenproblem zu [[Zeitleiste anpassen|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Ein paar leicht zu verwechselnde Punkte",
+          "ps": [
+            "**Chinesisch ersetzt trotz Ganzwort weiter per Teilstring — das ist normal.** Chinesisch und Japanisch trennen Wörter nicht mit Leerzeichen, das Werkzeug kann Wortgrenzen nicht bestimmen, und Ganzwort wirkt dort nicht; der Schutz `art` lässt `start` in Ruhe funktioniert nur für Englisch.",
+            "**Die Reihenfolge ändert das Ergebnis.** Regeln laufen von oben nach unten, und Text aus einer Regel wird von den Regeln darunter erneut geprüft. Erst A durch B, dann B durch C ersetzen ergibt am Ende C.",
+            "**Nur die Übersetzung ändern: Bereich setzen.** In einer bilingualen Datei „nur 2. Zeile“ wählen; Einträge mit nur einer Zeile bleiben bei beiden Einzelzeilen-Einstellungen unberührt — das Werkzeug rät nicht, welche Seite das Original ist.",
+            "**Die Begrifftabelle wird nicht gespeichert.** Sie ist bei jedem Öffnen leer, also eine eigene Textdatei aufbewahren und weitergeben."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Anleitungen",
+          "ps": [
+            "Die vollständige Anleitung steht in [[Begriffe in Untertiteln stapelweise ersetzen|/guides/glossary.html]]; ist der Inhalt schmutzig, zuerst [[Untertitel säubern|/clean.html]]; stehen die Namen und es sollen andere Sprachen dazu, [[Untertitelübersetzung|/translate.html]]; und das Ergebnis durch [[Untertitel-QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

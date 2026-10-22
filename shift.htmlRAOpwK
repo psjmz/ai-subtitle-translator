@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/shift.html 与 /en/shift.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>字幕时间轴调整 - 平移 / 缩放 / 两点校正 / 合并拆分 | 随心字幕 AI</title>
+<meta name="description" content="免费在线字幕时间轴调整：整体提前或延后、按倍率缩放、两点校正一次对上，还能合并碎片、拆分长句。支持 SRT、VTT、ASS、SBV、LRC、TXT，进来什么格式就出去什么格式，ASS 样式不丢。">
+<meta name="keywords" content="字幕时间轴调整,字幕时间轴平移,字幕延迟调整,srt时间轴校正,字幕对不上,字幕快慢调整,ass时间轴调整,字幕时间轴缩放,字幕合并,字幕拆分,subtitle timing shift,subtitle sync adjust">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#4F46E5">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* ================= 视觉系统沿用 v0.9.249「收敛精修」 =================
+     与其他页同源：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.291：时间轴页认领「靛蓝」这条色线
+     （首页=粉、特效页=紫、清洗页=绿、转换页=蓝、剥离页=青、本页=靛蓝）。
+     与转换页、剥离页刻意不同色：三页都处理字幕文件，同色会让用户分不清自己在哪一页。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#4F46E5; --acc-weak:#EEF0FE; --acc-line:#BCC2FB; --acc-ink:#3B34B8;
+    --grad:#4F46E5; --acc2:#4F46E5;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(79,70,229,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  /* 顶部胶囊导航：本页自带一份，不引入 site-nav.js（那三页的导航清单不该被新页牵动） */
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px;
+    text-decoration:none;white-space:nowrap}
+  .pill:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  .navpills{display:flex;gap:6px;flex-wrap:wrap}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{display:block;width:30px;height:30px;margin:0 auto 8px;border-radius:9px;background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+  textarea{width:100%;min-height:120px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical;background:var(--card);color:var(--ink)}
+  textarea:focus{outline:none;border-color:var(--acc-line)}
+  textarea[readonly]{background:var(--card-2);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  select.fmt{height:var(--ctl-h);border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:13px;min-width:190px}
+  /* 参数框：数字用普通文本框，自己解析 —— type=number 对「-2.5」这类输入在各浏览器里行为不一致 */
+  input.num{height:var(--ctl-h);width:150px;border:1px solid var(--line-strong);background:var(--card);
+    color:var(--ink);border-radius:var(--r-ctl);padding:0 10px;font-size:13px}
+  input.num:focus{outline:none;border-color:var(--acc-line)}
+  input.tm{height:var(--ctl-h);width:118px;border:1px solid var(--line-strong);background:var(--card);
+    color:var(--ink);border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  input.tm:focus{outline:none;border-color:var(--acc-line)}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+  /* v0.9.300：竖屏开关。未开 = 灰Chip（横屏默认），按开 = 认领色 */
+  .chip.tog{cursor:pointer;border:1px solid var(--line-strong);background:var(--card-2);color:var(--sub);font-weight:500}
+  .chip.tog[aria-pressed="true"]{background:var(--acc-weak);color:var(--acc-ink);border-color:var(--acc-line);font-weight:600}
+  select.fmt:disabled{opacity:.45;cursor:not-allowed;background:var(--card-2);color:var(--sub)}
+  button.pri:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .hint{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.7}
+  .part{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .part:first-child{border-top:0;padding-top:0;margin-top:0}
+  .part-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .part-hd b{font-size:13.5px}
+  .part-hd .cnt{font-size:12.5px;color:var(--mut);font-weight:400}
+  /* 时间对照：等宽对齐才看得出前后差多少 */
+  pre.cmp{margin:0;background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl);
+    padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
+    line-height:1.75;color:var(--body);overflow-x:auto;white-space:pre}
+
+  /* v0.9.292：逐条微调列表。字幕动辄上千条，一次只渲染一部分，靠「显示更多」往下加 */
+  .list{margin-top:10px;border:1px solid var(--line);border-radius:var(--r-ctl);overflow:hidden;
+    max-height:420px;overflow-y:auto}
+  .li{display:flex;align-items:center;gap:8px;padding:7px 10px;border-top:1px solid var(--line);
+    font-size:12.5px;background:var(--card)}
+  .li:first-child{border-top:0}
+
+  /* v0.9.295：体检出的问题行。左边那道竖条是唯一的区别标示 ——
+     用 warn（黄）不用 del（红）：幕没有坏，只是「值得看一眼」，红出来的都以为出错了 */
+  .chkrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;
+    border-top:1px solid var(--line);font-size:12.5px;background:var(--card);
+    border-left:3px solid var(--warn)}
+  .chkrow:first-child{border-top:0}
+  .chkrow .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
+  .chkrow .tmv{flex:none;color:var(--sub);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px}
+  .chkrow .fx{display:flex;gap:4px;flex:none}
+  .chkrow .fx i{font-style:normal;display:inline-flex;align-items:center;height:19px;padding:0 7px;
+    border-radius:999px;background:var(--warn-weak);color:var(--warn);font-size:11.5px;white-space:nowrap}
+  .chkrow .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chkrow .op{display:flex;gap:6px;flex:none}
+  .chkrow .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+  .chkrow .op button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  /* 四个阈值：和步骤流水线同样做成「框里带单位后缀」，别再用 placeholder 传达单位。
+     v0.9.307：画面方向从行尾挪到**最前**（先定画面，参数才有意义），并做成分段控件 ——
+     原来是行尾一个灰底小 chip，用户反馈「横屏/竖屏的按钮应该明显点，放在前面」。 */
+  .rules{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;
+    background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
+  .rules .rl{display:inline-flex;align-items:center;gap:6px}
+  .rules .rl .lb{font-size:12.5px;color:var(--sub)}
+  /* v0.9.307：把框加宽一点 —— 78px 装不下「0.833」，截图里被截成「0.8」，
+     用户会误读成值就是 0.8（单位「秒」只用得着 30px 左右） */
+  .rules .rl .pv input.num{width:92px;padding-right:36px}
+  .rules .rl input.num{height:30px}
+  /* 分段控件：两格紧贴、选中格实心主色 —— 一眼看出当前是哪个方向 */
+  .rules .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:9px;
+    overflow:hidden;background:var(--card)}
+  .rules .seg button{height:30px;padding:0 13px;border:0;border-radius:0;background:transparent;
+    color:var(--sub);font-size:12.5px;font-weight:600;cursor:pointer}
+  .rules .seg button + button{border-left:1px solid var(--line-strong)}
+  .rules .seg button:hover{background:var(--acc-weak);color:var(--acc-ink)}
+  .rules .seg button[aria-pressed="true"]{background:var(--acc);color:#fff}
+  .rules .seg button[aria-pressed="true"]:hover{background:var(--acc);color:#fff}
+  .rules .vsep{width:1px;height:22px;background:var(--line-strong);flex:none}
+  /* 竖屏时行宽框的值被打了 0.6 折 —— 不标出来，用户会以为框自己变了 */
+  .rules .lk{font-size:10.5px;font-weight:700;color:var(--acc-ink);background:var(--acc-weak);
+    border:1px solid var(--acc-line);border-radius:5px;padding:1px 5px;white-space:nowrap}
+  /* 依据注释：这几个数凭什么这么定 —— 占满一整行，贴在参数下面 */
+  .rules .rnote{flex-basis:100%;border-top:1px solid var(--line);margin-top:2px;padding-top:8px;
+    font-size:12px;line-height:1.65;color:var(--mut)}
+  .chk-empty{font-size:12.5px;color:var(--ok-ink);padding:2px 0 6px}
+  .li .idx{width:36px;color:var(--mut);font-variant-numeric:tabular-nums;flex:none}
+  .li input.tm{width:104px;height:28px;flex:none}
+  .li .arw{color:var(--mut);flex:none}
+  .li .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .li .op{display:flex;gap:6px;flex:none}
+  .li .op button{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+  .li.bi .tx::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--acc);margin-right:7px;vertical-align:1px}
+
+  /* v0.9.305：形态 B 的一对在列表里要看得出来 —— 两条各自保留独立的时间框，
+     用户想怎么调就怎么调。工具只做两件事：让「这是一对」看得见；
+     把两条被调开之后的后果说出来、给一条退路。
+     v0.9.306：305 只画了一道 3px 的 --acc-line 竖线（#BCC2FB，最淡那档），还贴在卡片
+     最左边缘 —— 白底上基本等于没画，用户实测「没看出来」。更要命的是那道线满高，
+     组与组之间只隔 1px 发丝线，三组的竖线连成一整条，反而看不出「哪两条是一组」。
+     改法：整对做成一条**淡靛蓝色带**（色带的起止就是这一对的边界）+ 4px 实心左条 + 圆角，
+     组与组之间留 6px 间隙 —— 断开的地方就是分组线。 */
+  .pg{margin:6px 0;background:var(--acc-weak);border-left:4px solid var(--acc);
+    border-radius:9px 0 0 9px}
+  .pg .li{background:transparent}
+  .pg .li + .li{border-top:1px solid var(--acc-line)}
+  .pg .li:first-child{border-top:0}
+  /* 这一对被调开了：用 warn（黄）不用 del（红）—— 字幕没坏，只是「这两条现在对不上了」 */
+  .pnote{display:flex;align-items:center;gap:10px;padding:6px 10px 7px 13px;
+    background:var(--warn-weak);border-top:1px solid var(--line);font-size:12px;color:var(--warn)}
+  .pnote .pn{flex:1;min-width:0}
+  .pnote button{height:24px;padding:0 9px;font-size:11.5px;border-radius:7px;flex:none}
+  .pnote button:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+
+  /* v0.9.294：调整步骤流水线。一道工序一行，单位贴在输入框里靠右显示
+     —— 单位不能只靠 placeholder 传达，用户一开始输入就看不见了 */
+  .steps{display:flex;flex-direction:column;gap:8px}
+  .st{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 11px;
+    background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-ctl)}
+  .st.off{opacity:.5}
+  .st .sn{width:19px;height:19px;border-radius:50%;background:var(--acc);color:#fff;flex:none;
+    font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .st .snm{min-width:76px;font-size:13px;font-weight:600;flex:none}
+  .st .slb{font-size:12.5px;color:var(--sub);flex:none}
+  /* .pv / .un 是通用件（步骤流水线与体检阈值都用它），不写死在 .st 下面 */
+  .pv{position:relative;display:inline-flex;align-items:center}
+  .pv input.num{width:110px;padding-right:46px}
+  .pv .un{position:absolute;right:10px;font-size:11.5px;color:var(--mut);pointer-events:none}
+  /* ⚠️ 阿拉伯语 / 希伯来语整页从右往左排 —— 单位后缀要跟着挪到左边，
+     时间码和数字框本身仍保持从左往右（写成 [ل] 那种顺序没人读得懂） */
+  [dir="rtl"] .pv input.num{padding-right:8px;padding-left:46px}
+  [dir="rtl"] .pv .un{right:auto;left:10px}
+  [dir="rtl"] .num,[dir="rtl"] .tm{direction:ltr;text-align:left}
+  .st .sh{flex:1;min-width:0;font-size:12px;color:var(--mut);line-height:1.6}
+  .st .sop{display:flex;gap:6px;flex:none}
+  .st .sop button{height:26px;min-width:26px;padding:0 8px;font-size:12px;border-radius:7px;color:var(--sub)}
+  .steps-empty{font-size:12.5px;color:var(--mut);padding:2px 0 6px}
+
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+  .note{margin-top:12px;font-size:12px;color:var(--mut)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .navpills{display:none}
+    input.tm{width:104px}
+    .li .tx{white-space:normal}
+  }
+</style>
+<script src="ui-codes.js?v=0.9.341"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span id="topNav"></span>
+      <select id="langSel" aria-label="界面语言"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">时间轴调整</em></h1>
+    <p data-i18n="heroSub">整体提前或延后、按倍率缩放、两点校正一次对上，还能合并碎片、拆分长句。</p>
+  </div>
+
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入字幕</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-t" data-i18n="dzTxt">把文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="fname"></span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.sbv,.lrc,.txt,text/*" style="display:none">
+    <div class="row">
+      <span class="lb" data-i18n="lblSrc">识别到的格式</span>
+      <span class="chip mut" id="srcFmt">—</span>
+      <button id="btnClear" type="button" data-i18n="btnClear">清除</button>
+    </div>
+    <div style="margin-top:12px">
+      <textarea id="paste" data-i18n-ph="pastePh" placeholder="也可以直接把字幕内容粘贴到这里"></textarea>
+    </div>
+  </div>
+
+  <!-- v0.9.294：调整方式、合并与拆分本来就是同一类东西 —— 对时间轴做一个操作。
+       合成一条可增删、可排序、可单独停用的步骤流水线，从上往下依次作用。 -->
+  <div class="card" id="optCard">
+    <h2><span class="n">2</span><span data-i18n="lblSteps">调整步骤</span></h2>
+    <div class="steps" id="steps"></div>
+    <div class="row">
+      <select class="fmt" id="addSel"></select>
+      <button id="btnAdd" type="button" data-i18n="btnAddStep">添加步骤</button>
+    </div>
+    <div class="hint" data-i18n="hintSteps">从上往下依次作用，改任何一步都从原始字幕重算一遍。一道工序一个数值，单位就写在框里。</div>
+    <div class="row">
+      <span class="lb" data-i18n="lblOutKeep">输出格式</span>
+      <span class="chip" id="outKeep">—</span>
+      <button class="pri" id="btnGo" type="button" data-i18n="btnGo">开始</button>
+    </div>
+  </div>
+
+  <!-- v0.9.295：时间轴体检。只把「哪一条值得看一眼」列出来，一个字都不自动改 ——
+       改了万一不是用户想要的（他刻意留的编排），那是把他的字幕弄坏。
+       放在「逐条微调」前面：先看体检说了什么，再决定下面那条列表怎么动。 -->
+  <div class="card" id="chkCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="chkTitle">时间轴体检</span></h2>
+    <div class="hint" data-i18n="chkHint">按常见的字幕规范扫一遍：停留太短、停留太久、字太多读不完、一行太宽、两条挨太近或者叠在一起。只做标注，改不改由你决定。</div>
+    <div class="row">
+      <span class="chip" id="chkStat">—</span>
+      <span class="chip mut" id="chkNoTime" style="display:none" data-i18n="chkNoTime">这份没有时间轴，体检跳过</span>
+      <!-- v0.9.304：双语条目整条豁免停留 / 行宽 / 读速。不提示的话，用户只会看到
+           「双语那几条什么都不报」，既不知道工具认出来了，也不知道是为什么没报 -->
+      <span class="chip mut" id="chkBil" style="display:none"></span>
+    </div>
+    <div class="rules" id="ruleRow"></div>
+    <div class="list" id="chkList"></div>
+    <div class="row" id="chkMoreRow" style="display:none">
+      <button id="chkMore" type="button" data-i18n="btnMore">显示更多</button>
+    </div>
+  </div>
+
+  <!-- v0.9.292：逐条微调。操作记成一组步骤，每次重算从头依次重放 -->
+  <div class="card" id="listCard" style="display:none">
+    <h2><span class="n">4</span><span data-i18n="lblList">逐条微调</span></h2>
+    <div class="hint" data-i18n="hintList">可以合并相邻两条、切分某一条，或者直接改它的起止时间</div>
+    <div class="row">
+      <span class="chip mut" id="editStat"></span>
+      <button id="btnUndo" type="button" data-i18n="btnUndo">撤销</button>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="row" id="rowMore" style="display:none">
+      <button id="btnMore" type="button" data-i18n="btnMore">显示更多</button>
+    </div>
+  </div>
+
+  <div class="card" id="repCard" style="display:none">
+    <h2><span class="n">5</span><span data-i18n="repTitle">结果</span></h2>
+    <div id="parts"></div>
+    <div class="msg" id="msg" style="display:none"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="footBrand">随心字幕 AI · 字幕时间轴调整</span>
+  </footer>
+</div>
+
+<script src="shift-i18n.js?v=0.9.341"></script>
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="shift-core.js?v=0.9.341"></script>
+<script>
+'use strict';
+var I18N = window.SHIFT_I18N.DICT, LANGS = window.SHIFT_I18N.LANGS;
+var LANG = 'zh-CN';
+/* v0.9.294：流水线 = 原始条目(base) → 步骤流水线(steps，可叠加) → 手动操作(ops) → 输出文本。
+   每次改任何一环都从 base 重算，手动操作作为最后一段重放，这样前后顺序永远一致。
+   steps 里每项是 { id, off, v }：id 是工序名（引擎 STEP_DEFS 定），off=true 整道跳过，
+   v 是各输入框的值（字符串，单位换算在引擎里做一处）。 */
+var S = {
+  fname: '', src: '', fmt: null, base: [], work: null, text: '',
+  steps: [], ops: [], limit: 60,
+  chkRules: null, chkLimit: 30, issues: [], portrait: false,
+  clamped: 0, merged: 0, split: 0, bad: null
+};
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+/* v0.9.307：支持第二个占位符（依据注释里要说「当前 21 → 13」） */
+function tpl(k, a, b) { return String(t(k)).replace('{0}', a).replace('{1}', b); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  document.documentElement.lang = LANG;
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「Subtitletimeline shift」。
+     v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
+  /* ⚠️ 阿拉伯语 / 希伯来语是从右往左写的 —— 只换文字不翻版面，整页看起来是错位的 */
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
+  syncLogoHome();
+  renderOptions();
+  renderSteps();
+  renderRules();
+  /* 「输出与原文件一致（SRT）」这行是拼出来的，不走 data-i18n —— 换语言时要自己重画 */
+  renderSrcFmt();
+  /* v0.9.304：体检那块的两行统计（条数、双语处数）也是拼出来的，带数字，
+     不走 data-i18n —— 换语言时同样要自己重画，否则提示还停在上一门语言 */
+  renderCheck();
+}
+function syncLogoHome() {
+  var el = document.getElementById('logoHome');
+  if (el) el.href = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
+}
+
+/* v0.9.294：只剩「添加哪道工序」这个下拉，工序自身的参数行由 renderSteps 渲染 */
+function renderOptions() {
+  var C = window.ShiftCore, sel = $('#addSel'), cur = sel.value;
+  sel.innerHTML = C.STEP_ORDER.map(function (id) {
+    return '<option value="' + id + '">' + t(C.STEP_DEFS[id].key) + '</option>';
+  }).join('');
+  sel.value = cur || C.STEP_ORDER[0];
+}
+
+/* ---------------- 调整步骤流水线 ---------------- */
+function renderSteps() {
+  var C = window.ShiftCore, box = $('#steps');
+  if (!S.steps.length) {
+    box.innerHTML = '<div class="steps-empty">' + esc(t('emptySteps')) + '</div>';
+    return;
+  }
+  var html = '', i, j;
+  for (i = 0; i < S.steps.length; i++) {
+    var s = S.steps[i], d = C.STEP_DEFS[s.id];
+    var fields = '';
+    if (d.kind === 'time') {
+      /* 两点校正：当前首末 + 目标首末 四栏 */
+      /* ⚠️ 四个框的 placeholder 都用同一条 phTime（时间格式样例）—— 不新开
+         phCurA/phTgtA 之类词条，省得 27 语各补 4 条；前后两组靠 lblCur / lblTgt 标签区分 */
+      var lb = [t('lblCur'), '', t('lblTgt'), ''];
+      for (j = 0; j < 4; j++) {
+        if (lb[j]) fields += '<span class="slb">' + esc(lb[j]) + '</span>';
+        fields += '<input class="tm" type="text" data-sv="' + i + ',' + j + '" placeholder="' + esc(t('phTime')) + '" value="' + esc(s.v[j]) + '">';
+      }
+    } else {
+      /* 常规工序：一个数值框 + 框内右对齐的单位 */
+      fields += '<span class="pv">'
+        + '<input class="num" type="text" inputmode="decimal" data-sv="' + i + ',0" value="' + esc(String(s.v[0])) + '">'
+        + '<span class="un">' + esc(t(d.unit)) + '</span></span>';
+    }
+    html += '<div class="st' + (s.off ? ' off' : '') + '">'
+      + '<span class="sn">' + (i + 1) + '</span>'
+      + '<span class="snm">' + esc(t(d.key)) + '</span>'
+      + fields
+      + '<span class="sh">' + esc(t(d.hint)) + '</span>'
+      + '<span class="sop">'
+      + '<button type="button" data-toggle="' + i + '">' + esc(t(s.off ? 'btnOn' : 'btnOff')) + '</button>'
+      + '<button type="button" data-up="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+      + '<button type="button" data-dn="' + i + '"' + (i === S.steps.length - 1 ? ' disabled' : '') + '>↓</button>'
+      + '<button type="button" data-del="' + i + '">✕</button>'
+      + '</span></div>';
+  }
+  box.innerHTML = html;
+  bindSteps();
+}
+function bindSteps() {
+  var box = $('#steps');
+  box.querySelectorAll('[data-sv]').forEach(function (el) {
+    el.addEventListener('change', function () {
+      var p = String(el.getAttribute('data-sv')).split(',');
+      var k = Number(p[0]), j = Number(p[1]);
+      if (!S.steps[k]) return;
+      S.steps[k].v[j] = el.value;
+      if (S.base.length) run();
+    });
+    el.addEventListener('input', function () {
+      var p = String(el.getAttribute('data-sv')).split(',');
+      var k = Number(p[0]), j = Number(p[1]);
+      if (!S.steps[k]) return;
+      S.steps[k].v[j] = el.value;
+    });
+  });
+  box.querySelectorAll('[data-toggle]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-toggle'));
+      S.steps[k].off = !S.steps[k].off;
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+  box.querySelectorAll('[data-up]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-up'));
+      if (k <= 0) return;
+      var x = S.steps[k - 1]; S.steps[k - 1] = S.steps[k]; S.steps[k] = x;
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+  box.querySelectorAll('[data-dn]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-dn'));
+      if (k >= S.steps.length - 1) return;
+      var x = S.steps[k + 1]; S.steps[k + 1] = S.steps[k]; S.steps[k] = x;
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = Number(b.getAttribute('data-del'));
+      S.steps.splice(k, 1);
+      /* 工序变了，逐条微调里记的索引对着旧列表，留着会改错条目 */
+      S.ops = [];
+      renderSteps();
+      if (S.base.length) run();
+    });
+  });
+}
+function addStep() {
+  var C = window.ShiftCore, id = $('#addSel').value;
+  var st = C.mkStep(id);
+  if (!st) return;
+  S.steps.push(st);
+  /* 两点校正的「当前」两栏一进来就替用户填好，他只需要填「目标」 */
+  fillCurrentTimes();
+  renderSteps();
+  if (S.base.length) run();
+}
+/* 两点校正的「当前」两栏自动填首末条时间，用户只需要填「目标」 */
+function fillCurrentTimes() {
+  var C = window.ShiftCore;
+  if (!S.base.length) return;
+  var inf = C.info(S.base), i, s;
+  for (i = 0; i < S.steps.length; i++) {
+    s = S.steps[i];
+    if (s.id !== 'two') continue;
+    if (!s.v[0]) s.v[0] = C.time.srt(inf.first);
+    if (!s.v[1]) s.v[1] = C.time.srt(inf.last);
+  }
+}
+
+function pathUiLang() {
+  var m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/shift\.html/);
+  if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
+  return null;
+}
+function initLang() {
+  TP_ADD_LANGS(LANGS);
+  var sel = $('#langSel');
+  sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
+  var saved = 'zh-CN';
+  try { saved = localStorage.getItem('srt_shift_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
+  if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
+  LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'shift'); if (__tp) I18N[LANG] = __tp; }
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'shift')) return;
+    try { localStorage.setItem('srt_shift_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
+    applyI18n();
+    renderAll();
+  });
+}
+
+/* ---------------- 输入 ---------------- */
+/* 文本入口对外暴露，方便自动化冒烟；页面自身的上传与粘贴都走这里 */
+function setSrc(text, fname) {
+  var C = window.ShiftCore;
+  S.src = String(text || '');
+  S.fname = fname || S.fname || '';
+  S.fmt = C.detect(S.src, S.fname);
+  if ($('#paste') && $('#paste').value !== S.src) $('#paste').value = S.src;
+  $('#fname').textContent = S.fname;
+  /* 换了文件就把手动步骤清空 —— 旧步骤的索引对着旧列表，留着会改错条目 */
+  S.ops = [];
+  S.limit = 60;
+  S.chkLimit = 30;
+  S.work = null; S.text = '';
+  S.base = S.src.trim() && S.fmt ? (C.parse(S.src, S.fmt) || []) : [];
+  renderSrcFmt();
+  /* 两点校正的「当前」两栏补上（这一步要等 base 出来才知道首末条） */
+  fillCurrentTimes();
+  renderSteps();
+  hideMsg();
+  renderAll();
+}
+function renderSrcFmt() {
+  var el = $('#srcFmt'), keep = $('#outKeep');
+  if (!S.src.trim()) {
+    el.className = 'chip mut'; el.textContent = '—';
+    keep.className = 'chip mut'; keep.textContent = '—';
+    return;
+  }
+  if (!S.fmt) {
+    el.className = 'chip mut'; el.textContent = t('errFmt');
+    keep.className = 'chip mut'; keep.textContent = '—';
+    return;
+  }
+  var nm = S.fmt.toUpperCase();
+  el.className = 'chip'; el.textContent = nm;
+  /* v0.9.292：本页不做格式转换 —— 进来什么格式出去就是什么格式，直接把这件事写明白 */
+  keep.className = 'chip'; keep.textContent = tpl('outSame', nm);
+}
+function readFile(f) {
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () { setSrc(String(r.result || ''), f.name); };
+  r.readAsText(f, 'utf-8');
+}
+function clearAll() {
+  S.fname = ''; S.src = ''; S.fmt = null; S.base = [];
+  S.work = null; S.text = ''; S.ops = []; S.limit = 60;
+  S.steps = [];
+  S.issues = []; S.chkLimit = 30; S.chkRules = defRules(); S.portrait = false;
+  S.clamped = 0; S.merged = 0; S.split = 0;
+  $('#paste').value = '';
+  $('#fname').textContent = '';
+  $('#file').value = '';
+  $('#parts').innerHTML = '';
+  $('#list').innerHTML = '';
+  $('#chkList').innerHTML = '';
+  $('#chkCard').style.display = 'none';
+  $('#listCard').style.display = 'none';
+  $('#repCard').style.display = 'none';
+  renderSrcFmt();
+  renderSteps();
+  renderRules();
+  hideMsg();
+}
+
+/* ---------------- 流水线 ---------------- */
+/* 从原始条目重算一遍：步骤流水线 → 手动操作 */
+function recompute() {
+  var C = window.ShiftCore;
+  var r = C.applySteps(S.base, S.steps);
+  if (!r.ok) { S.bad = r.bad; return false; }
+  S.bad = null;
+  var list = r.cues;
+  S.clamped = r.clamped;
+  S.merged = r.merged; S.split = r.split;
+
+  if (S.ops.length) list = C.applyOps(list, S.ops);
+  S.work = list;
+  /* 条目数没变就走保真改写（只动时间那几个字符），变了才重新生成整份文件 */
+  S.text = C.render(S.src, S.fmt, list);
+  return true;
+}
+/* ---------------- v0.9.308：使用埋点 ----------------
+   本页是纯前端工具：解析、体检、导出全在浏览器里做，请求根本不过服务端 ——
+   不主动上报，后台永远不知道这一页有多少人在用、用户是不是改完了没导出。
+   ⚠️ 只报元数据（动作 + 条数 + 导出格式），**一个字的字幕内容都不带**。
+   ⚠️ act 必须与服务端 server.js 的 TOOL_ACT 白名单对齐，对不上号服务端整条丢弃。
+   ⚠️ 去重：同一份内容 30 分钟内反复点只算一次（改了字数或条数 body 才会变）。 */
+/* ⚠️ 去重窗口直接写毫秒字面量，不写成「分钟 × 60 × 1000」那种算式 ——
+   shift 页有一条「阈值换算只在引擎一处，页面不许出现 ×1000」的回归断言，
+   它管的是**字幕时间**的秒→毫秒换算（必须走引擎），跟这个上报去重窗口没关系，
+   但没必要留一个长得像的写法去绊它。1800000 = 30 分钟，60000 = 1 分钟。 */
+var TOOL_DEDUP_MS = { edit: 1800000, apply: 1800000, export: 60000 };
+var _tlLast = { body: '', t: 0 };
+function reportTool(act, extra) {
+  try {
+    var e = extra || {};
+    var body = JSON.stringify({
+      page: 'shift', act: act,
+      cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || ''
+    });
+    var now = Date.now();
+    if (body === _tlLast.body && now - _tlLast.t < (TOOL_DEDUP_MS[act] || 0)) return;
+    _tlLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+    }
+    fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () { });
+  } catch (err) { }
+}
+/* 当前展示的行数：没点「开始」时 S.work 是空的，页面自己回退到 S.base，这里跟着回退 */
+function rowN() { return ((S.work && S.work.length) ? S.work : S.base).length; }
+
+function run() {
+  var C = window.ShiftCore;
+  if (!S.src.trim()) { showMsg(t('errEmpty'), 'err'); return; }
+  if (!S.fmt) { showMsg(t('errFmt'), 'err'); return; }
+  if (!S.base.length) { showMsg(t('errFmt'), 'err'); return; }
+  if (!recompute()) { showMsg(tpl('errStep', t(C.STEP_DEFS[S.bad] ? C.STEP_DEFS[S.bad].key : '')), 'err'); return; }
+  renderAll();
+  reportTool('edit', { cues: rowN() });
+  if (S.clamped > 0) showMsg(tpl('msgClamp', S.clamped), 'warn');
+  else if (S.merged > 0) showMsg(tpl('msgMerged', S.merged), '');
+  else if (S.split > 0) showMsg(tpl('msgSplit', S.split), '');
+  else if (!S.steps.length && !S.ops.length) showMsg(t('msgNoStep'), '');
+  else showMsg(t('msgDone'), '');
+}
+
+/* ---------------- v0.9.295：时间轴体检 ---------------- */
+/* ⚠️ 一个字都不自动改。体检只产出两样东西：哪一条值得看一眼（issues）、
+   这一条可以怎么改（suggest 给出的 op）。改不改由用户点按钮决定，
+   点了就落成一次 pushOp —— 和手工按钮同一条路，能撤销也能重放。
+   四个阈值存在 S.chkRules（人读单位：秒 / 字数），交给引擎 uiRules 换算，
+   页面不碰 ×1000（v0.9.294 定下的：单位换算只有引擎那一处）。 */
+function defRules() {
+  var d = {};
+  window.ShiftCore.CHECK_FIELDS.forEach(function (f) { d[f.id] = String(f.def); });
+  return d;
+}
+function renderRules() {
+  var C = window.ShiftCore, box = $('#ruleRow');
+  if (!S.chkRules) S.chkRules = defRules();
+  /* v0.9.307：画面方向挪到**最前**，做成两格分段控件（选中格实心主色）。
+     原来是行尾一个灰底小 chip，用户反馈「横屏/竖屏的按钮应该明显点，放在前面」。 */
+  var dir = '<span class="rl"><span class="lb">' + esc(t('rlPortrait')) + '</span>'
+    + '<span class="seg">'
+    + '<button type="button" data-dir="land" aria-pressed="' + (S.portrait ? 'false' : 'true') + '">'
+    + esc(t('rlOff')) + '</button>'
+    + '<button type="button" data-dir="port" aria-pressed="' + (S.portrait ? 'true' : 'false') + '">'
+    + esc(t('rlOn')) + '</button>'
+    + '</span></span><span class="vsep"></span>';
+  /* 框里存的永远是横屏**基线**；竖屏时显示的是打过 0.6 折的值 ——
+     换算只有引擎那一处（uiLineOut / uiLineIn），页面不自己乘 */
+  var base = Number(S.chkRules.maxLine);
+  if (!isFinite(base) || base <= 0) base = C.CHECK_RULES.maxLine;
+  var line = C.uiLineOut(base, S.portrait);
+  box.innerHTML = dir + C.CHECK_FIELDS.map(function (f) {
+    /* 只有「单行最多」跟画面方向联动：竖屏画面窄，行宽上限按 60% 收。
+       停留时长和读速跟横竖屏没有关系 —— 一条停多久、每秒能读几个字，
+       跟画面是横是竖无关，跟着变反而会让人以为「竖屏就能读得更慢」。 */
+    var isLine = f.id === 'maxLine';
+    return '<span class="rl"><span class="lb">' + esc(t(f.key)) + '</span>'
+      + '<span class="pv"><input class="num" type="text" inputmode="decimal" data-rule="' + f.id + '"'
+      + ' value="' + esc(String(isLine ? line : S.chkRules[f.id])) + '">'
+      + '<span class="un">' + esc(t(f.unit)) + '</span></span>'
+      + (isLine && S.portrait ? '<span class="lk">×' + C.PORTRAIT_LINE + '</span>' : '')
+      + '</span>';
+  }).join('')
+  /* 依据注释：这几个数凭什么这么定、为什么只有行宽跟着方向变。
+     ⚠️ 两个数分别是「横屏基线」和「竖屏换算值」—— 都是固定口径，不随当前方向变。
+        写成「当前方向的显示值」会在横屏时变成「横屏 21 字 → 竖屏 21 字」，等于没说。 */
+    + '<div class="rnote">' + esc(tpl('rlNote', base, C.uiLineOut(base, true))) + '</div>';
+  box.querySelectorAll('[data-rule]').forEach(function (el) {
+    el.addEventListener('change', function () {
+      var id = el.getAttribute('data-rule');
+      /* 竖屏下行宽框填的是打过折的值，写回基线要反算回来（不然切一次方向就掉一次精度） */
+      S.chkRules[id] = (id === 'maxLine')
+        ? String(C.uiLineIn(el.value, S.portrait)) : el.value;
+      renderRules();
+      renderCheck();
+    });
+  });
+  box.querySelectorAll('[data-dir]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var p = b.getAttribute('data-dir') === 'port';
+      if (p === S.portrait) return;
+      S.portrait = p;
+      renderRules();
+      renderCheck();
+    });
+  });
+}
+/* 每次列表变了就整份重扫 —— 下标是「当下这张列表」的下标，缓存上一次的会指错人 */
+function renderCheck() {
+  var C = window.ShiftCore, card = $('#chkCard'), stat = $('#chkStat');
+  /* 体检看的是「当下这条时间轴」：点过「开始」就是调整后的结果，没点过就是原始字幕 ——
+     放进字幕的那一刻就该说话，不能让用户先猜要不要点「开始」才知道有没有问题 */
+  var list = (S.work && S.work.length) ? S.work : S.base;
+  if (!list || !list.length) {
+    card.style.display = 'none';
+    S.issues = [];
+    return;
+  }
+  card.style.display = '';
+  /* 纯文本根本没有时间轴（那个每行 3 秒是硬排的），体检它等于自言自语 */
+  $('#chkNoTime').style.display = C.checkable(S.fmt) ? 'none' : '';
+  if (!C.checkable(S.fmt)) {
+    stat.className = 'chip mut'; stat.textContent = '—';
+    $('#chkList').innerHTML = '';
+    $('#chkMoreRow').style.display = 'none';
+    $('#chkBil').style.display = 'none';
+    S.issues = [];
+    return;
+  }
+  var rules = C.uiRules(S.chkRules, S.fmt, S.portrait);
+  S.issues = C.checkCues(list, rules);
+  stat.textContent = tpl('chkStat', S.issues.length);
+  stat.className = S.issues.length ? 'chip mut' : 'chip';
+  /* v0.9.304：认出来的双语要让人看见 —— 双语条目（形态 A 一条两行 / 形态 B 两条同轴）
+     整条豁免停留、行宽、读速、行数，不提示就成了「悄悄放过」。
+     形态 A 一条算一处，形态 B 一对算一处（引擎里数后头那条，免得一对变两处）。 */
+  var nBil = C.bilingualCount(list);
+  $('#chkBil').style.display = nBil ? '' : 'none';
+  if (nBil) $('#chkBil').textContent = tpl('chkBil', nBil);
+
+  var box = $('#chkList');
+  if (!S.issues.length) {
+    box.innerHTML = '<div class="chk-empty">' + esc(t('chkNone')) + '</div>';
+    $('#chkMoreRow').style.display = 'none';
+    return;
+  }
+  var n = Math.min(S.chkLimit, S.issues.length), i, html = '';
+  for (i = 0; i < n; i++) {
+    var is = S.issues[i], c = list[is.i];
+    if (!c) continue;
+    var fx = is.why.map(function (w) { return '<i>' + esc(t('chkWhy_' + w)) + '</i>'; }).join('');
+    var ops = C.suggest(list, is, rules).map(function (s) {
+      return '<button type="button" data-fix="' + i + ',' + esc(s.k) + '">' + esc(t(s.k)) + '</button>';
+    }).join('');
+    html += '<div class="chkrow">'
+      + '<span class="idx">' + (is.i + 1) + '</span>'
+      + '<span class="tmv">' + esc(C.time.srt(c.start) + ' → ' + C.time.srt(c.end)) + '</span>'
+      + '<span class="fx">' + fx + '</span>'
+      + '<span class="tx" title="' + esc(c.text) + '">' + esc(c.text.replace(/\n/g, ' ⏎ ')) + '</span>'
+      + '<span class="op">' + ops + '</span></div>';
+  }
+  box.innerHTML = html;
+  $('#chkMoreRow').style.display = (n < S.issues.length) ? '' : 'none';
+  box.querySelectorAll('[data-fix]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var p = String(b.getAttribute('data-fix')).split(',');
+      var is = S.issues[Number(p[0])];
+      if (!is) return;
+      /* 建议是按「当下的 issues」算出来的，这里重新按当前列表再算一次 ——
+         以免用户改过阈值却还拿着旧的 op */
+      var again = C.suggest(list, is, C.uiRules(S.chkRules, S.fmt, S.portrait)), hit = null;
+      again.forEach(function (s) { if (s.k === p[1]) hit = s.op; });
+      if (hit) pushOp(hit);
+    });
+  });
+}
+
+/* ---------------- 逐条微调 ---------------- */
+function pushOp(o) {
+  S.ops.push(o);
+  if (!recompute()) { S.ops.pop(); return; }
+  renderAll();
+  reportTool('apply', { cues: rowN() });
+}
+function undo() {
+  if (!S.ops.length) { showMsg(t('msgNoEdit'), 'warn'); return; }
+  S.ops.pop();
+  recompute();
+  renderAll();
+  showMsg(t('msgUndo'), '');
+}
+/* 一行的 HTML。role：-1 = 独立一条；0 = 一对里的前一条；1 = 一对里的后一条。
+   ⚠️ v0.9.306：护栏一律看 role，**不许现算「当前还算不算一对」**。
+   305 就是这么写的（后一条传 mate=-1，靠 isBilingualMate / isBilingualEntry 现判），
+   结果两条一被调开超过 120ms，配对关系立刻不成立，护栏集体失效：
+   译文行冒出「合并下一条」（点下去跨句拼的是下一句的原文）和「切分」
+   （引擎 isBilingualEntry 拦着，点了没反应，看着像坏了）——
+   而那恰恰是最该拦住的时候。 */
+function rowHtml(list, i, role) {
+  var C = window.ShiftCore, c = list[i], ops = '';
+  if (role === 0) {
+    /* 一对里的前一条：合并按钮的作用是把两条并成一条两行，
+       那是形态 B → 形态 A 的转换，文案必须说清楚，不能叫「合并下一条」 */
+    ops += '<button type="button" data-merge="' + i + '">' + esc(t('btnMergeOne')) + '</button>';
+  } else if (role < 0 && !C.isBilingualMate(list, i)) {
+    /* 一对里的后一条不给合并按钮：它下面接的是下一句的原文，跨句拼起来没有意义 */
+    ops += '<button type="button" data-merge="' + i + '">' + esc(t('btnMergeNext')) + '</button>';
+  }
+  /* 双语条目不许拆（引擎 isBilingualEntry 拦着），按钮就别摆出来 ——
+     摆出来点不动，看着像坏了。组里的两条一律不摆。 */
+  if (role < 0 && !C.isBilingualEntry(list, i)) {
+    ops += '<button type="button" data-split="' + i + '">' + esc(t('btnSplit')) + '</button>';
+  }
+  return '<div class="li' + (C.isBilingualCue(c) ? ' bi' : '') + '">'
+    + '<span class="idx">' + (i + 1) + '</span>'
+    + '<input class="tm" type="text" data-s="' + i + '" value="' + C.time.srt(c.start) + '">'
+    + '<span class="arw">→</span>'
+    + '<input class="tm" type="text" data-e="' + i + '" value="' + C.time.srt(c.end) + '">'
+    + '<span class="tx" title="' + esc(c.text) + '">' + esc(c.text.replace(/\n/g, ' ⏎ ')) + '</span>'
+    + '<span class="op">' + ops + '</span></div>';
+}
+/* 一对 = 一个视觉组。两条各自保留独立的时间框（用户可以自己定原文和译文的时间轴），
+   只在两条被调开时补一行提示 + 「对齐」按钮。 */
+function pairHtml(list, i, mate) {
+  var C = window.ShiftCore;
+  var html = '<div class="pg">' + rowHtml(list, i, 0) + rowHtml(list, mate, 1);
+  var u = C.unalignedPair(list, i);
+  if (u) {
+    html += '<div class="pnote"><span class="pn">' + esc(tpl('msgUnalign', u.off)) + '</span>'
+      + '<button type="button" data-align="' + i + '">' + esc(t('btnAlign')) + '</button></div>';
+  }
+  return html + '</div>';
+}
+function renderList() {
+  var C = window.ShiftCore, box = $('#list');
+  if (!S.work || !S.work.length) { box.innerHTML = ''; $('#listCard').style.display = 'none'; return; }
+  $('#listCard').style.display = '';
+  var list = S.work, n = 0, i = 0, html = '';
+  /* ⚠️ 一组要么整组渲染、要么都不渲染：只画前一条会让人以为另一条丢了。
+     n 按条数算，凑到 limit 时多带一条也没关系（最多多 1 条）。 */
+  while (i < list.length && n < S.limit) {
+    if (C.isPairGroup(list, i)) { html += pairHtml(list, i, i + 1); i += 2; n += 2; }
+    else { html += rowHtml(list, i, -1); i += 1; n += 1; }
+  }
+  box.innerHTML = html;
+  $('#rowMore').style.display = (i < list.length) ? '' : 'none';
+  $('#editStat').textContent = tpl('statEdit', S.ops.length);
+  box.querySelectorAll('[data-merge]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      pushOp({ op: 'merge', i: Number(b.getAttribute('data-merge')) });
+    });
+  });
+  box.querySelectorAll('[data-split]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      pushOp({ op: 'split', i: Number(b.getAttribute('data-split')) });
+    });
+  });
+  /* v0.9.305：把一对重新拉回同轴。引擎给的是一组两个 set op（取并集），
+     走 304 的成组 op 通道 —— 撤销一次撤一整组，不会留下「只撤了一半」的中间态。 */
+  box.querySelectorAll('[data-align]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = Number(b.getAttribute('data-align'));
+      var ops = C.alignOps(S.work, i);
+      if (ops) pushOp(ops);
+    });
+  });
+  box.querySelectorAll('[data-s]').forEach(function (b) {
+    b.addEventListener('change', function () {
+      var i = Number(b.getAttribute('data-s'));
+      var v = C.parseUserTime(b.value);
+      if (v == null) { renderList(); return; }
+      pushOp({ op: 'set', i: i, s: v, e: S.work[i].end });
+    });
+  });
+  box.querySelectorAll('[data-e]').forEach(function (b) {
+    b.addEventListener('change', function () {
+      var i = Number(b.getAttribute('data-e'));
+      var v = C.parseUserTime(b.value);
+      if (v == null) { renderList(); return; }
+      pushOp({ op: 'set', i: i, s: S.work[i].start, e: v });
+    });
+  });
+}
+
+/* ---------------- 结果 ---------------- */
+function fmtDur(ms) {
+  var t2 = Math.max(0, Math.round(ms / 1000));
+  var h = Math.floor(t2 / 3600), m = Math.floor(t2 % 3600 / 60), s = t2 % 60;
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return (h ? h + ':' + p(m) : String(m)) + ':' + p(s);
+}
+function showMsg(text, kind) {
+  var el = $('#msg');
+  el.textContent = text;
+  el.className = 'msg' + (kind ? ' ' + kind : '');
+  el.style.display = 'block';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+/* 前 5 条的前后对照：等宽排出来，一眼能看出挪了多少 */
+function cmpText(before, after) {
+  var C = window.ShiftCore, n = Math.min(5, before.length, after.length), i, out = [];
+  for (i = 0; i < n; i++) {
+    out.push(C.time.srt(before[i].start) + ' → ' + C.time.srt(before[i].end)
+      + '   ⇒   ' + C.time.srt(after[i].start) + ' → ' + C.time.srt(after[i].end));
+  }
+  return out.join('\n');
+}
+function renderResult() {
+  var box = $('#parts');
+  box.innerHTML = '';
+  if (!S.work) { $('#repCard').style.display = 'none'; return; }
+  var C = window.ShiftCore;
+
+  var div = document.createElement('div');
+  div.className = 'part';
+
+  var head = document.createElement('div');
+  head.className = 'part-hd';
+  var b = document.createElement('b'); b.textContent = t('repTitle');
+  var c = document.createElement('span'); c.className = 'cnt';
+  var inf = C.info(S.work);
+  c.textContent = tpl('statCues', S.work.length) + ' · ' + tpl('statRange', fmtDur(inf.last - inf.first));
+  head.appendChild(b); head.appendChild(c);
+
+  var pre = document.createElement('pre');
+  pre.className = 'cmp';
+  pre.textContent = cmpText(S.base, S.work);
+
+  var ta = document.createElement('textarea');
+  ta.readOnly = true; ta.value = S.text;
+
+  var row = document.createElement('div');
+  row.className = 'row';
+  var dl = document.createElement('button'); dl.className = 'pri'; dl.type = 'button'; dl.textContent = t('btnDl');
+  var cp = document.createElement('button'); cp.type = 'button'; cp.textContent = t('btnCopy');
+  dl.addEventListener('click', download);
+  cp.addEventListener('click', copyText);
+  row.appendChild(dl); row.appendChild(cp);
+
+  div.appendChild(head); div.appendChild(pre); div.appendChild(ta); div.appendChild(row);
+  box.appendChild(div);
+  $('#repCard').style.display = '';
+}
+function renderAll() {
+  renderCheck();
+  renderList();
+  renderResult();
+}
+function download() {
+  if (!S.work) return;
+  /* v0.9.292：不做格式转换，文件名沿用原文件（后缀也是） */
+  var name = window.ShiftCore.outName(S.fname || 'subtitle', S.fmt);
+  reportTool('export', { cues: S.work.length, fmt: S.fmt });
+  var blob = new Blob([S.text], { type: 'text/plain;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function copyText() {
+  if (!S.work) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(S.text).then(function () { showMsg(t('msgDone'), ''); }, function () { });
+    return;
+  }
+  var ta = document.createElement('textarea');
+  ta.value = S.text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showMsg(t('msgDone'), ''); } catch (e) { /* 复制不了就算了 */ }
+  ta.remove();
+}
+
+function bind() {
+  var dz = $('#dz');
+  dz.addEventListener('click', function () { $('#file').click(); });
+  dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', function () { dz.classList.remove('over'); });
+  dz.addEventListener('drop', function (e) {
+    e.preventDefault(); dz.classList.remove('over');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+  });
+  $('#file').addEventListener('change', function (e) {
+    if (e.target.files && e.target.files[0]) readFile(e.target.files[0]);
+  });
+  $('#paste').addEventListener('input', function (e) { setSrc(e.target.value, S.fname); });
+  $('#btnClear').addEventListener('click', clearAll);
+  $('#btnAdd').addEventListener('click', addStep);
+  $('#btnGo').addEventListener('click', run);
+  $('#btnUndo').addEventListener('click', undo);
+  $('#btnMore').addEventListener('click', function () { S.limit += 60; renderList(); });
+  $('#chkMore').addEventListener('click', function () { S.chkLimit += 30; renderCheck(); });
+}
+
+(function main() {
+  initLang();
+  S.chkRules = defRules();
+  renderOptions();
+  renderSteps();
+  renderRules();
+  applyI18n();
+  bind();
+  renderAll();
+  window.setSrc = setSrc;   /* 自动化冒烟用的文本入口 */
+  window.runShift = run;
+})();
+</script>
+
+<!-- v0.9.292：SEO 静态文案（按语言路由替换；直接开文件时显示简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕时间轴调整 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>字幕和画面对不上时，把时间轴整体提前或延后、按倍率缩放，或者用两点校正一次对上；还能把碎片并成一条、把长句拆成几条。</strong></p>
+    <p style="margin-top:8px;">支持 SRT、VTT、ASS、SBV、LRC、TXT，进来什么格式就出去什么格式 —— 不做格式转换，ASS 的样式表和每条的样式、特效标记都原样保留。平移只改位置、不动每条字幕的时长，倍率缩放会把时长同步缩放（24 帧与 25 帧互转这类场景常用），两点校正适合既有偏移又有速率差的字幕。双语字幕合并时保持「原文一行 / 译文一行」，拆分时会整条跳过，不会把原文和译文切坏。算出来是负数的时间会截断到 0，并告诉你有几条受影响。</p>
+    <p style="margin-top:8px;">需要把字幕对齐画面的人：换了片源、字幕整体快了慢了、拿到的是别人按不同帧率做的字幕，或者一句话被切得太碎、一条字幕在屏幕上停太久。</p>
+  </section>
+<!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.341" data-tool="sh"></script>
+</body>
+</html>

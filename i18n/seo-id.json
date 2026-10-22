@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio ke Subtitle — ubah ucapan ke SRT di browser | AI-SRTSub",
+    "desc": "Ubah audio atau video menjadi subtitle. Pengenalan ucapan berjalan di browser, memotong teks menjadi cue, dan ekspor ke SRT / VTT. Gratis dan privat.",
+    "kw": "audio ke srt,ucapan ke subtitle,buat subtitle dari audio,generator subtitle otomatis,transkrip audio ke srt,subtitle whisper,pengenalan ucapan browser,generasi subtitle offline",
+    "intro": "Masukkan file audio atau video, pilih bahasa dan model, lalu proses pengenalan berjalan langsung di browser Anda. Hasilnya adalah draf subtitle dengan pengaturan waktu yang sudah dipotong sesuai kalimat.",
+    "feat": "Alat ini memproses aliran kata menjadi cue subtitle yang rapi dengan memotong kalimat berdasarkan tanda baca, menyesuaikan lebar baris, serta mengatur durasi tampilan agar sesuai dengan kecepatan membaca tanpa tumpang tindih.",
+    "who": "Pembuat konten yang ingin memberi teks pada video, tim yang mengubah podcast menjadi teks, dan siapa saja yang membutuhkan draf subtitle untuk diedit."
+  },
+  "ocrsub": {
+    "title": "OCR Subtitle Hardcoded — baca subtitle di video | AI-SRTSub",
+    "desc": "Subtitle yang menyatu dalam video tidak bisa diekstrak secara langsung. Tandai area subtitle dan alat ini akan membacanya frame demi frame ke SRT / VTT.",
+    "kw": "ekstrak subtitle hardcoded,ocr subtitle,ekstraksi subtitle video,subtitle burned in,ocr subtitle dari video,video ke srt,subtitle dari video,ocr caption hardcoded",
+    "intro": "Masukkan video, tandai area tempat subtitle berada, dan alat ini akan membaca frame demi frame untuk menggabungkan frame identik menjadi satu cue dengan pengaturan waktu.",
+    "feat": "Alat ini memotong area subtitle, melakukan binerisasi berdasarkan kecerahan untuk menghilangkan latar belakang, dan mengenali teks yang muncul di beberapa frame sebagai satu cue tunggal dengan durasi yang akurat.",
+    "who": "Tim subtitle yang melokalisasi video asing, editor yang melakukan re-subtitling pada rilis lama, dan siapa saja yang hanya memiliki video tanpa file subtitle asli."
+  }
+}

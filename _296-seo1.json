@@ -1,0 +1,79 @@
+{
+"zh-CN": {
+"title": "字幕乱码修复 - 锟斤拷 / 浣犲ソ 一键还原 | 随心字幕 AI",
+"desc": "免费在线修复字幕乱码：认出它原本是 UTF-8、GBK、Big5、Shift_JIS 还是 EUC-KR，把读错的字换回去，还能另存成播放器认得出的编码。",
+"kw": "字幕乱码修复,srt乱码,字幕乱码怎么办,锟斤拷,utf8转gbk字幕,字幕编码转换,字幕编码识别,ass乱码,vtt乱码,播放器字幕乱码,subtitle mojibake,fix subtitle encoding",
+"intro": "字幕打开是一堆看不懂的字，多半是编码读错了。把文件丢进来，认出它原本用什么编码写的，把读错的字换回去。",
+"feat": "传文件时按原始字节重新试各种编码，一个字节都不损失 —— 认出是 GBK 就直接告诉你，播放器读错的话另存一份「带 BOM 的 UTF-8」通常就好了。粘贴进来的文本已经不是原始字节了，能修的范围小得多；里面要是已经出现替换字符（方框问号），那就谁也修不回来，会直说而不是假装修好。序号、时间轴一个字都不动，ASS 的样式标记也原样保留。",
+"who": "下载的字幕打开是一堆怪字、播放器里中文全是方块、或者从别人手里拿到一份编码不明的字幕文件的人。"
+},
+"zh-TW": {
+"title": "字幕亂碼修復 - 錕斤拷 / 浣犲ソ 一鍵還原 | 隨心字幕 AI",
+"desc": "免費線上修復字幕亂碼：認出它原本是 UTF-8、GBK、Big5、Shift_JIS 還是 EUC-KR，把讀錯的字換回去，還能另存成播放器認得出的編碼。",
+"kw": "字幕亂碼修復,srt亂碼,字幕亂碼怎麼辦,錕斤拷,utf8轉gbk字幕,字幕編碼轉換,字幕編碼識別,ass亂碼,vtt亂碼,播放器字幕亂碼,subtitle mojibake,fix subtitle encoding",
+"intro": "字幕打開是一堆看不懂的字，多半是編碼讀錯了。把檔案丟進來，認出它原本用什麼編碼寫的，把讀錯的字換回去。",
+"feat": "傳檔案時按原始位元組重新試各種編碼，一個位元組都不損失 —— 認出是 GBK 就直接告訴你，播放器讀錯的話另存一份「帶 BOM 的 UTF-8」通常就好了。貼進來的文字已經不是原始位元組了，能修的範圍小得多；裡面要是已經出現替換字元（方框問號），那就誰也修不回來，會直說而不是假裝修好。序號、時間軸一個字都不動，ASS 的樣式標記也原樣保留。",
+"who": "下載的字幕打開是一堆怪字、播放器裡中文全是方塊、或者從別人手裡拿到一份編碼不明的字幕檔案的人。"
+},
+"en": {
+"title": "Fix Garbled Subtitles - Repair Mojibake / Wrong Encoding | AI-SRTSub",
+"desc": "Free online repair for garbled subtitles: detects whether the file was really UTF-8, GBK, Big5, Shift_JIS or EUC-KR, turns the misread text back into words, and can re-save it in an encoding your player understands.",
+"kw": "fix garbled subtitles,subtitle mojibake,srt encoding fix,fix subtitle encoding,utf8 to gbk subtitle,srt shows weird characters,subtitle wrong encoding,ass garbled,vtt garbled,detect subtitle encoding",
+"intro": "Subtitles that open as a wall of nonsense are almost always read with the wrong encoding. Drop the file in, and it works out which encoding the file was really written in and puts the misread characters back.",
+"feat": "Uploaded files are re-decoded from the original bytes, so nothing is lost: if the file turns out to be GBK, it says so, and if your player is the one misreading it, saving a copy as \"UTF-8 with BOM\" usually settles it. Pasted text is no longer the original bytes, so much less can be recovered; if it already contains replacement characters, that is unrecoverable and the tool says so plainly instead of pretending otherwise. Line numbers and timecodes are never touched, and ASS style tags are left exactly as they were.",
+"who": "Anyone who downloaded subtitles that open as gibberish, sees boxes instead of Chinese in the player, or was handed a file with an unknown encoding.",
+"alt": "Subtitle Mojibake Repair"
+},
+"ja": {
+"title": "字幕の文字化け修復 - 豆腐 / 浣犲ソ を元に戻す | AI-SRTSub",
+"desc": "無料のオンライン文字化け修復：ファイルが本当は UTF-8 / GBK / Big5 / Shift_JIS / EUC-KR のどれで書かれていたかを判別し、読み間違えられた文字を元に戻します。プレイヤーが読めるエンコードで保存し直すこともできます。",
+"kw": "字幕 文字化け 直す,srt 文字化け,字幕 文字化け 修正,utf8 gbk 変換 字幕,字幕 エンコード 変換,字幕 エンコード 判定,ass 文字化け,vtt 文字化け,プレイヤー 字幕 文字化け,subtitle mojibake",
+"intro": "字幕を開いたときに意味不明な文字の羅列になるのは、ほぼエンコードの読み間違いです。ファイルを放り込めば、本来どのエンコードで書かれていたかを判別し、読み間違えられた文字を元に戻します。",
+"feat": "アップロードされたファイルは元のバイト列から各エンコードで再デコードされるため、情報は一切失われません。GBK だと判明すればそのように表示し、プレイヤー側が読み間違えている場合は「BOM 付き UTF-8」で保存し直せば大抵解決します。貼り付けられたテキストは元のバイト列ではないため復元できる範囲が狭く、すでに置換文字（豆腐）が含まれている場合は修復不能とはっきり伝えます。行番号とタイムコードには一切触れず、ASS のスタイル指定もそのまま残します。",
+"who": "ダウンロードした字幕が開くと意味不明な文字になる人、プレイヤーで中国語が四角になってしまう人、エンコード不明の字幕ファイルを渡された人。"
+},
+"es": {
+"title": "Reparar subtítulos con caracteres extraños - Codificación incorrecta | AI-SRTSub",
+"desc": "Reparación online gratuita de subtítulos ilegibles: detecta si el archivo era realmente UTF-8, GBK, Big5, Shift_JIS o EUC-KR, devuelve el texto mal leído a su forma correcta y puede volver a guardarlo en una codificación que tu reproductor entienda.",
+"kw": "reparar subtítulos codificación,subtítulos caracteres extraños,srt caracteres raros,corregir codificación subtítulos,utf8 a gbk subtítulos,subtítulos ilegibles,detectar codificación subtítulos,ass caracteres raros,vtt caracteres raros",
+"intro": "Cuando los subtítulos se abren como un muro de caracteres sin sentido, casi siempre se han leído con la codificación equivocada. Suelta el archivo: averigua con qué codificación se escribió y devuelve los caracteres mal leídos a su sitio.",
+"feat": "Los archivos se vuelven a decodificar desde los bytes originales, así que no se pierde nada: si resulta ser GBK lo indica, y si el que se equivoca es tu reproductor, guardar una copia como «UTF-8 con BOM» suele bastar. El texto pegado ya no son los bytes originales, así que se recupera mucho menos; si ya contiene caracteres de reemplazo, es imposible recuperarlo y la herramienta lo dice sin rodeos en lugar de aparentar lo contrario. Los números de línea y los códigos de tiempo no se tocan, y las etiquetas de estilo del ASS se dejan tal cual.",
+"who": "Quien descarga subtítulos que se abren como jerigonza, ve cuadros en lugar de caracteres chinos en el reproductor, o recibe un archivo de codificación desconocida.",
+"alt": "Reparación de codificación de subtítulos"
+},
+"pt": {
+"title": "Corrigir legendas com caracteres estranhos - Codificação errada | AI-SRTSub",
+"desc": "Reparo online gratuito de legendas ilegíveis: detecta se o arquivo era mesmo UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, devolve o texto mal lido à forma correta e pode salvá-lo novamente numa codificação que seu player entende.",
+"kw": "corrigir legenda caracteres estranhos,legenda codificação errada,srt caracteres estranhos,converter utf8 para gbk legenda,legenda ilegível,detectar codificação legenda,ass caracteres estranhos,vtt caracteres estranhos",
+"intro": "Legendas que abrem como um muro de caracteres sem sentido quase sempre foram lidas com a codificação errada. Solte o arquivo: ele descobre em qual codificação foi escrito e devolve os caracteres mal lidos ao lugar.",
+"feat": "Os arquivos são decodificados novamente a partir dos bytes originais, então nada se perde: se for GBK, ele informa, e se o erro for do seu player, salvar uma cópia como \"UTF-8 com BOM\" costuma resolver. O texto colado já não são os bytes originais, então muito menos pode ser recuperado; se já contiver caracteres de substituição, não há como recuperar e a ferramenta diz isso claramente em vez de fingir o contrário. Números de linha e códigos de tempo não são tocados, e as tags de estilo do ASS ficam exatamente como estavam.",
+"who": "Quem baixa legendas que abrem como um monte de caracteres estranhos, vê quadrados no lugar de caracteres chineses no player, ou recebeu um arquivo de codificação desconhecida.",
+"alt": "Correção de codificação de legendas"
+},
+"ko": {
+"title": "자막 깨짐 복구 - 인코딩 오류 / 문자 깨짐 되돌리기 | AI-SRTSub",
+"desc": "무료 온라인 자막 깨짐 복구: 파일이 원래 UTF-8 / GBK / Big5 / Shift_JIS / EUC-KR 중 무엇이었는지 판별해 잘못 읽힌 글자를 되돌리고, 플레이어가 읽을 수 있는 인코딩으로 다시 저장할 수 있습니다.",
+"kw": "자막 깨짐,자막 인코딩,srt 깨짐,자막 문자 깨짐 해결,utf8 gbk 자막 변환,자막 인코딩 변환,자막 인코딩 확인,ass 깨짐,vtt 깨짐,플레이어 자막 깨짐",
+"intro": "자막을 열었을 때 알 수 없는 글자만 잔뜩 나온다면 대개 인코딩을 잘못 읽은 것입니다. 파일을 넣으면 원래 어떤 인코딩으로 쓰였는지 판별해 잘못 읽힌 글자를 되돌립니다.",
+"feat": "업로드한 파일은 원래 바이트에서 각 인코딩으로 다시 디코딩하므로 손실이 없습니다. GBK로 판명되면 그대로 알려주고, 플레이어가 잘못 읽는 것이라면 'BOM 있는 UTF-8'로 다시 저장하면 대개 해결됩니다. 붙여넣은 텍스트는 이미 원래 바이트가 아니므로 복구 범위가 훨씬 좁고, 이미 대체 문자가 들어 있다면 복구가 불가능하다고 숨기지 않고 분명히 알려줍니다. 줄 번호와 타임코드는 전혀 건드리지 않고 ASS 스타일 태그도 그대로 둡니다.",
+"who": "다운로드한 자막이 열면 이상한 글자로만 보이는 사람, 플레이어에서 중국어가 네모로 나오는 사람, 인코딩을 알 수 없는 자막 파일을 받은 사람."
+},
+"de": {
+"title": "Untertitel mit Zeichensalat reparieren - Falsche Kodierung | AI-SRTSub",
+"desc": "Kostenlose Online-Reparatur für unlesbare Untertitel: erkennt, ob die Datei wirklich UTF-8, GBK, Big5, Shift_JIS oder EUC-KR war, macht falsch gelesene Zeichen wieder lesbar und kann sie in einer Kodierung speichern, die dein Player versteht.",
+"kw": "untertitel zeichensalat reparieren,srt kodierung korrigieren,untertitel falsche kodierung,utf8 nach gbk untertitel,untertitel unlesbar,kodierung untertitel erkennen,ass zeichensalat,vtt zeichensalat",
+"intro": "Wenn Untertitel als Wand aus sinnlosen Zeichen aufgehen, wurden sie fast immer mit der falschen Kodierung gelesen. Datei hineinwerfen: Sie findet heraus, in welcher Kodierung sie wirklich geschrieben wurden, und setzt die falsch gelesenen Zeichen zurück.",
+"feat": "Dateien werden aus den ursprünglichen Bytes neu dekodiert, es geht also nichts verloren: Ist es GBK, wird das angezeigt, und wenn dein Player sich irrt, hilft meist eine Kopie als „UTF-8 mit BOM“. Eingefügter Text sind nicht mehr die ursprünglichen Bytes, deshalb lässt sich viel weniger retten; enthält er bereits Ersatzzeichen, ist nichts mehr zu holen, und das Werkzeug sagt das klar statt es zu vertuschen. Zeilennummern und Zeitcodes bleiben unangetastet, ASS-Formatierungen werden exakt so belassen.",
+"who": "Wer Untertitel herunterlädt und nur Buchstabensalat sieht, im Player Kästchen statt chinesischer Zeichen bekommt oder eine Datei mit unbekannter Kodierung erhalten hat.",
+"alt": "Untertitel-Kodierung reparieren"
+},
+"fr": {
+"title": "Réparer les sous-titres illisibles - Mauvais encodage | AI-SRTSub",
+"desc": "Réparation en ligne gratuite des sous-titres illisibles : détecte si le fichier était vraiment en UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, remet les caractères mal lus en forme et peut le réenregistrer dans un encodage que votre lecteur comprend.",
+"kw": "réparer sous-titres illisibles,sous-titres caractères bizarres,corriger encodage sous-titres,srt caractères étranges,utf8 vers gbk sous-titres,détecter encodage sous-titres,ass caractères bizarres,vtt caractères bizarres",
+"intro": "Des sous-titres qui s'ouvrent comme un mur de caractères incompréhensibles ont presque toujours été lus avec le mauvais encodage. Déposez le fichier : il détermine l'encodage réel et remet les caractères mal lus à leur place.",
+"feat": "Les fichiers sont redécodés à partir des octets d'origine, donc rien n'est perdu : si c'est du GBK, il l'indique, et si c'est votre lecteur qui se trompe, enregistrer une copie en « UTF-8 avec BOM » suffit généralement. Le texte collé n'est plus les octets d'origine, on peut donc récupérer beaucoup moins ; s'il contient déjà des caractères de remplacement, c'est irrécupérable et l'outil le dit clairement au lieu de faire semblant. Les numéros de ligne et les codes de temps ne sont jamais touchés, et les balises de style ASS restent exactement telles quelles.",
+"who": "Ceux qui téléchargent des sous-titres qui s'ouvrent en charabia, voient des carrés à la place des caractères chinois dans le lecteur, ou reçoivent un fichier dont l'encodage est inconnu.",
+"alt": "Réparation d'encodage des sous-titres"
+}
+}

@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "pl": {
+      "seo": {
+        "title": "Jak używać naprawy krzaczków w napisach – rozpoznaj kodowanie – AI-SRTSub",
+        "desc": "Naprawa krzaczków: rozpoznaj oryginalne kodowanie (GBK / Big5 / Shift_JIS / EUC-KR), ustaw kandydatów według tego, co najbardziej przypomina ludzki tekst, zapisz jako UTF-8 z BOM albo GBK.",
+        "h1": "Jak używać naprawy krzaczków w napisach",
+        "intro": "Jeśli napisy po otwarciu to same krzaczki, zwykle plik nie jest uszkodzony — po prostu odczytano go z niewłaściwym kodowaniem. Naprawiacz rozpoznaje oryginalne kodowanie i zamienia źle odczytane znaki z powrotem.",
+        "ctaText": "Otwórz naprawiacz krzaczków"
+      },
+      "body": [
+        {
+          "h2": "Co rozwiązuje to narzędzie",
+          "ps": [
+            "Te same bajty odczytane jako UTF-8 i jako GBK dają dwa zupełnie różne zestawy znaków — plik nie jest uszkodzony, przy odczycie wybrano złe kodowanie. Co robi naprawiacz:"
+          ],
+          "ul": [
+            "Rozpoznaje, w jakim kodowaniu plik został napisany, i zamienia znaki z powrotem według właściwego zestawu",
+            "Mówi, gdzie jest błąd: znak zastępczy, znak sterujący, symbol waluty, ciągi liter z akcentami, ciągi rzadkich znaków",
+            "Ustawia kandydatów według tego, co najbardziej przypomina ludzki tekst, żebyś wybrał jednego i zapisał",
+            "Gdy odtwarzacz nie rozpoznaje kodowania, zapisuje kopię jako UTF-8 z BOM albo GBK i oddaje ją odtwarzaczowi"
+          ]
+        },
+        {
+          "h2": "Wgraj plik, nie wklejaj",
+          "ps": [
+            "Dwa wejścia naprawiają nie to samo, **jeśli możesz wgrać plik, wgraj plik**. Przy wgrywaniu oryginalne bajty są wciąż dostępne: narzędzie może próbować każdego kodowania po kolei, rozpoznać GBK i zdekodować jako GBK, bez zgadywania czegokolwiek. To, co wklejasz, nie jest już oryginalnymi bajtami — gdy przeglądarka przekazuje tekst, błędny krok już się zdarzył; zostaje tylko wnioskowanie wstecz i naprawia się, ile się da.",
+            "Jeśli w wklejonym tekście jest już znak zastępczy (ten kwadratowy pytajnik `�`), oryginalne bajty zniknęły i nikt ich nie odzyska. Strona mówi to wprost: wróć wyżej i wgraj oryginalny plik przez „Wybierz plik”."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Strefa wgrywania na stronie naprawy: obszar upuszczania i pole wklejania, nad nimi rozpoznane kodowanie",
+            "cap": "Upuść plik albo wybierz go; pole wklejania jest niżej i naprawia znacznie mniej"
+          }
+        },
+        {
+          "h2": "Co mówi diagnoza",
+          "ps": [
+            "Po wgraniu pole diagnozy daje werdykt. **Nie znaleziono krzaczków**: ta treść czyta się normalnie; jeśli w odtwarzaczu nadal widzisz krzaczki, to odtwarzacz wybrał złe kodowanie — przejdź do „Zapisz jako” niżej, zamień na inne kodowanie i oddaj mu ten plik. Gdy **wygląda na krzaczki**, wypisuje konkretnie, jaki to ślad:"
+          ],
+          "ul": [
+            "Jest w nim znak zastępczy — oryginalne bajty już zniknęły",
+            "Wmieszały się znaki sterujące",
+            "Jest pełno symboli walut i matematycznych",
+            "Litery z akcentami pojawiają się ciągami — jakby UTF-8 czytano jako kodowanie jednobajtowe (`ä½ å¥½` to ten przypadek)",
+            "Znaki stoją w ciągach, ale nie ma ani jednego pospolitego — jakby UTF-8 czytano jako GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Karta diagnozy: werdykt i wypisane po kolei ślady krzaczków",
+            "cap": "Diagnoza wypisuje ślady według typu, nie rzuca jednego zdania o krzaczkach"
+          }
+        },
+        {
+          "h2": "Jak ustawiani są kandydaci",
+          "ps": [
+            "Pod „Tak można naprawić” kandydaci są ustawieni według **tego, co najbardziej przypomina ludzki tekst**, najwyżej 12 pozycji, każda opisana, z jakiego kodowania na jakie ją odczytano. Kliknij jedną, zobacz efekt; jeśli pasuje, zapisz niżej; jeśli nie, kliknij „Zostaw jak jest”, żeby wrócić do oryginału.",
+            "Kolejność bierze się z punktacji: udział pospolitych znaków, ciągi akcentów, ciągi symboli i rzadkie znaki — wszystko się liczy. **Jeśli wynik nie jest wyraźnie lepszy, nic nie jest polecane** — nie wymyśla się kandydata na siłę, żeby był choć jeden. Przy plikach potraktowanych źle dwa razy narzędzie cofa się o jedną warstwę przy pierwszych kandydatach."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Lista kandydatów naprawy: według podobieństwa do ludzkiego tekstu, każda z parą kodowań",
+            "cap": "Kandydaci według tego, co najbardziej przypomina ludzki tekst, każda opisana parą kodowań"
+          }
+        },
+        {
+          "h2": "Zapis to ostatni krok",
+          "ps": [
+            "Po naprawie trzeba też dobrze zapisać. Gdy odtwarzacz nie rozpoznaje UTF-8, zapisz **UTF-8 z BOM** (odtwarzacze w Windows rozpoznają kodowanie po BOM-ie) albo **GBK**, zwykle to pomaga. Do zapisu można wybrać UTF-8, UTF-8 (z BOM), GBK, Big5, Shift_JIS, EUC-KR; gdy się nie mieści, pojawia się prośba o inne kodowanie. Do pobranej nazwy pliku dopisywane jest `-fixed`.",
+            "Gdy rozpoznane kodowanie to nie UTF-8, „Zapisz jako” już wskazuje „UTF-8 z BOM”; gdy sam zmienisz listę, nie wraca już za ciebie."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Pole wyniku: pole tekstowe, lista Zapisz jako i przycisk pobierania",
+            "cap": "Wybierz kodowanie i pobierz; do nazwy pliku dopisuje się -fixed"
+          }
+        },
+        {
+          "h2": "Co nie zostanie zmienione",
+          "ps": [
+            "Zmieniane są tylko źle odczytane znaki. Numery, oś czasu i polecenia stylów ASS nie zmieniają się ani o znak."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Wgrałem plik, dlaczego każecie mi jeszcze zapisać?** Sam plik zwykle nie jest uszkodzony; problem w tym, że odtwarzacz czyta go z niewłaściwym kodowaniem. Nie trzeba zmieniać ani jednego znaku w tekście: wystarczy dać odtwarzaczowi kopię zapisaną jako UTF-8 z BOM albo GBK.",
+            "**Dlaczego wklejonego nie da się naprawić?** Gdy w wklejonym tekście pojawia się znak zastępczy, oryginalne bajty są już stracone i wnioskowanie wstecz nie ma podstawy. Wróć wyżej i wgraj oryginalny plik.",
+            "**Nie ma kandydata, którego chcę?** Gdy wynik nie jest wyraźnie lepszy od obecnego, narzędzie nic nie poleca. Możesz najpierw zmienić „Rozpoznane kodowanie” na inne i kazać ułożyć listę od nowa.",
+            "**Ile naraz można naprawić?** Jeden. Napraw, pobierz, wgraj następny."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Rozpoznawanie i naprawa odbywają się całkowicie lokalnie w przeglądarce; żadna treść napisów nie jest wysyłana na serwer."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Skąd biorą się krzaczki, zobacz [[Skąd biorą się krzaczki w napisach|/guides/subtitle-garbled-characters.html]]; gdy kodowanie jest dobre, ale treść brudna, użyj [[Czyszczenie napisów|/clean.html]]; żeby sprawdzić oś czasu i długość tekstu, użyj [[Kontrola jakości napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "pl": {
+      "seo": {
+        "title": "Skąd biorą się krzaczki w napisach – rozpoznane da się naprawić – AI-SRTSub",
+        "desc": "Krzaczki to nie uszkodzony plik, tylko bajty odczytane z niewłaściwym kodowaniem. Znak zastępczy, ciągi liter z akcentami i ciągi rzadkich znaków odpowiadają innym przyczynom.",
+        "h1": "Skąd biorą się krzaczki w napisach",
+        "intro": "Te same bajty odczytane jako UTF-8 i jako GBK dają dwa zupełnie różne zestawy znaków. To, jak wyglądają krzaczki, jest bezpośrednim dowodem, który krok poszedł źle.",
+        "ctaText": "Otwórz naprawiacz krzaczków"
+      },
+      "body": [
+        {
+          "h2": "Plik nie jest uszkodzony, odczyt jest zły",
+          "ps": [
+            "W pliku napisów są bajty. Żeby zamienić bajty na znaki, trzeba wiedzieć, w jakim kodowaniu je zapisano — jeśli wybierzesz źle, wyjdą krzaczki. Sam plik nie stracił ani jednego bajtu; odczytasz go innym kodowaniem, a znaki wrócą.",
+            "Krzaczki to więc dwie rzeczy: **rozpoznać oryginalne kodowanie** i **zapisać w kodowaniu, które odtwarzacz rozpozna**. Pierwsze załatwia próbny odczyt z punktacją, drugie zapis jako. To dwa różne problemy."
+          ]
+        },
+        {
+          "h2": "Pięć postaci, pięć przyczyn",
+          "ps": [
+            "Krzaczki nie powstają przypadkiem; ich wygląd od razu zdradza przyczynę:"
+          ],
+          "ul": [
+            "**Ciągi liter z akcentami** (`ä½ å¥½`): tekst w UTF-8 odczytano jako kodowanie jednobajtowe — w UTF-8 znak to trzy bajty, przy odczycie po jednym bajcie każdy bajt staje się osobną literą",
+            "**Ciągi znaków, ale ani jednego pospolitego**: UTF-8 odczytano jako GBK — po dwa bajty łączą się na nowo i wychodzą same rzadkie znaki",
+            "**Pełno symboli walut i matematycznych**: bajty trafiły do obszaru symboli, często przy odczycie jako Mac Roman albo rodzina Latin-1",
+            "**Wmieszały się znaki sterujące**: bajty trafiły do niewidocznego obszaru sterującego, na ekranie widać pustkę albo kwadrat",
+            "**Kwadratowy pytajnik `�`**: to **znak zastępczy**, nie krzaczki — oznacza, że tu był znak, ale przy odczycie już go nie ma"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Karta diagnozy: ślady krzaczków wypisane po kolei",
+            "cap": "Diagnoza dzieli krzaczki według przyczyny, nie wrzuca wszystkiego do jednego worka"
+          }
+        },
+        {
+          "h2": "Dlaczego znaku zastępczego nie da się naprawić",
+          "ps": [
+            "Znak zastępczy to kluczowa granica. Gdy widać `�`, bajty zostały odrzucone już w **wcześniejszym kroku** (zwykle jakiś program raz plik odczytał i raz zapisał); po odrzuconej części nie ma żadnego śladu. Wnioskowanie wstecz nie ma wtedy podstawy — nikt tego nie naprawi.",
+            "Dlatego strona naprawy rozdziela dwa przypadki: przy wgrywaniu oryginalne bajty są wciąż dostępne, można próbować każdego kodowania po kolei; gdy w wklejonym tekście jest już znak zastępczy, mówi wprost, że się nie da i trzeba wgrać oryginalny plik.",
+            "Jest też sytuacja odwrotna: treść czyta się całkiem normalnie, a w odtwarzaczu wciąż są krzaczki. To nie wina pliku, tylko **odtwarzacz wybrał złe kodowanie**. Zmiana pliku nic nie da; wystarczy dać mu kopię zapisaną jako UTF-8 z BOM albo GBK."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Strefa wgrywania: dwa wejścia, upuszczanie i wklejanie",
+            "cap": "Wgraj plik, jeśli możesz — są bajty, więc jest co naprawiać"
+          }
+        },
+        {
+          "h2": "Co się porównuje przy naprawie",
+          "ps": [
+            "Narzędzie próbuje każdego możliwego kodowania po kolei, potem daje każdemu wynikowi punkty: ile pospolitych znaków, czy są ciągi akcentów, czy są ciągi symboli, czy znaki są ciągiem rzadkich. Najwyżej punktowany jest na górze.",
+            "**Jeśli wynik nie jest wyraźnie lepszy, nic nie jest polecane** — woli powiedzieć, że ten plik czyta się normalnie, niż zbyć cię naciąganym wynikiem. Przy plikach potraktowanych źle dwa razy narzędzie cofa się o jedną warstwę przy pierwszych kandydatach."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Lista kandydatów: według punktacji, każda z parą kodowań",
+            "cap": "Kandydaci według punktacji; bez wyraźnej przewagi nic nie jest polecane"
+          }
+        },
+        {
+          "h2": "Zapis w dobrym kodowaniu kończy sprawę",
+          "ps": [
+            "Naprawiony tekst trzeba też zapisać w kodowaniu, które odtwarzacz rozpozna. Odtwarzacze w Windows rozpoznają kodowanie zwykle po BOM-ie, więc najprościej zapisać **UTF-8 z BOM**; starsze urządzenia i lokalne odtwarzacze rozpoznają GBK. Dostępne kodowania: UTF-8, UTF-8 (z BOM), GBK, Big5, Shift_JIS, EUC-KR; gdy się nie mieści, pojawia się prośba o inne."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Pole wyniku: lista kodowań Zapisz jako i przycisk pobierania",
+            "cap": "Zapisz w kodowaniu, które odtwarzacz rozpozna — wtedy krzaczki są naprawdę rozwiązane"
+          }
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Cała procedura w [[Jak używać naprawy krzaczków w napisach|/guides/repair.html]]; co właściwie jest w pliku SRT w [[Co jest w pliku SRT|/guides/srt-file-format.html]]; gdy kodowanie jest dobre, ale treść brudna (znak wodny, reklamy, oznaczenia dla głuchych), użyj [[Czyszczenie napisów|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "pl": {
+      "seo": {
+        "title": "Konwersja uproszczony-tradycyjny – Tajwan i Hongkong – AI-SRTSub",
+        "desc": "Konwersja uproszczony-tradycyjny: dziewięć kierunków, dla Tajwanu wymiana słów albo tylko postać, Hongkong osobny zestaw. Zmienia się tylko tekst kwestii; oś czasu i numery zostają nietknięte.",
+        "h1": "Jak używać konwersji uproszczony-tradycyjny",
+        "intro": "Gdy te same napisy idą na Tajwan, do Hongkongu albo na kontynent, słownictwo i postać znaków są inne. Na stronie konwersji wybierasz z dziewięciu kierunków; zmienia się tylko tekst kwestii.",
+        "ctaText": "Otwórz konwersję"
+      },
+      "body": [
+        {
+          "h2": "Co rozwiązuje to narzędzie",
+          "ps": [
+            "Konwersja uproszczony-tradycyjny to nie jest zmiana pisowni każdego znaku i koniec. To samo słowo uproszczone ma w różnych regionach inne słowo. Strona konwersji rozdziela to:"
+          ],
+          "ul": [
+            "Uproszczony na tradycyjny (ogólny / Tajwan / Hongkong)",
+            "Tradycyjny na uproszczony (ogólny / z tradycyjnego tajwańskiego / z tradycyjnego hongkońskiego)",
+            "Zmiana postaci między tradycyjnymi (na postać tajwańską / na postać hongkońską)",
+            "Jeden znak uproszczony o wielu tradycyjnych nie zostanie źle zamieniony (decyduje słowo, nie pojedynczy znak)"
+          ]
+        },
+        {
+          "h2": "Wgrywanie i rozpoznawanie",
+          "ps": [
+            "Upuść plik albo wybierz go; obsługiwane są SRT, VTT, ASS, TXT, możesz też wkleić treść napisów wprost. Po wgraniu format jest rozpoznawany automatycznie i pokazywany w „Rozpoznany format”."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Strefa wgrywania na stronie konwersji: obszar upuszczania i pole wklejania, nad nimi rozpoznany format",
+            "cap": "SRT / VTT / ASS / TXT, format rozpoznawany automatycznie"
+          }
+        },
+        {
+          "h2": "Jak wybrać z dziewięciu kierunków",
+          "ps": [
+            "Dziewięć kierunków w „Kierunku konwersji” dzieli się na trzy grupy. **Uproszczony na tradycyjny**: ogólny tradycyjny, tradycyjny tajwański (wymiana słów), tradycyjny tajwański (tylko postać), tradycyjny hongkoński. **Tradycyjny na uproszczony**: ogólny, z tradycyjnego tajwańskiego, z tradycyjnego hongkońskiego. **Zmiana postaci między tradycyjnymi**: na postać tajwańską, na postać hongkońską.",
+            "„Słowa tajwańskie” zamienia też regionalne terminy; „postać tajwańska” zmienia tylko pisownię i zostawia twoje słowa. Hongkong to osobny zestaw: ten sam termin pisze się tam inaczej. Żeby wrócić do uproszczonego, wybierz grupę niżej — trzeba powiedzieć, z jakiego tradycyjnego wracasz, bo droga z tajwańskiego i z hongkońskiego do uproszczonego nie jest ta sama."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Karta kierunku konwersji: lista przekonwertuj na, obecnie wybrany uproszczony na tradycyjny tajwański (wymiana słów)",
+            "cap": "Kierunek wybiera się z listy przekonwertuj na, dziewięć w trzech grupach; tu tradycyjny tajwański z wymianą słów"
+          }
+        },
+        {
+          "h2": "Wynik i eksport",
+          "ps": [
+            "Pole wyniku daje od razu przekonwertowane napisy, pasek statystyk pokazuje, ile jest linii i ile się zmieniło. Gdy nie zmienił się ani jeden znak, pojawia się uwaga, że w tych napisach może nie być znaków chińskich — konwersja rusza tylko część chińską.",
+            "Po zatwierdzeniu pobierz albo skopiuj. Do pobranej nazwy pliku dopisywana jest etykieta języka — `demo.srt` po konwersji na tradycyjny tajwański to `demo.zh-TW.srt`, ogólny tradycyjny `.zh-Hant`, powrót do uproszczonego `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Pole wyniku: przekonwertowane napisy i pasek statystyk",
+            "cap": "Pasek statystyk daje liczbę linii i zmienionych linii; można pobrać albo wysłać do tłumaczenia"
+          }
+        },
+        {
+          "h2": "Co nie zostanie zmienione",
+          "ps": [
+            "Zmienia się tylko tekst kwestii. Oś czasu, numery i polecenia stylów ASS nie zmieniają się ani o znak — po konwersji można używać od razu."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Dlaczego nie każdy znak zamienił się tak, jak się spodziewałem?** Gdy jednemu znakowi uproszczonemu odpowiada kilka tradycyjnych, decyduje słowo: ten sam znak idzie w różnych słowach do innego znaku tradycyjnego. Słownik pochodzi z OpenCC.",
+            "**Czym różni się tradycyjny tajwański od hongkońskiego?** Słownictwem: ten sam termin pisze się na Tajwanie i w Hongkongu inaczej. Wybierz kierunek tego regionu, do którego wysyłasz.",
+            "**Zmieniła mi się liczba linii?** Zmieniają się tylko znaki chińskie, nie dodaje się ani nie usuwa pozycji, oś czasu zostaje. Jeśli liczba linii się zmieniła, sprawdź, czy format nie został rozpoznany źle.",
+            "**Co jeśli słownik się nie wczyta?** Strona poprosi o odświeżenie i ponowną próbę. Słownik wczytuje się lokalnie, nie trzeba wysyłać napisów do sieci."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Konwersja odbywa się całkowicie lokalnie w przeglądarce; żadna treść napisów nie jest wysyłana na serwer."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Jeśli potrzebujesz tylko uproszczony na tradycyjny, zobacz [[Uproszczone napisy na tradycyjne|/guides/srt-simplified-to-traditional.html]]; dlaczego to nie tylko inny znak, zobacz [[Konwersja uproszczony-tradycyjny to nie inny znak|/guides/simplified-traditional-chinese.html]]; żeby przełożyć na inny język, użyj [[Tłumaczenie napisów|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "pl": {
+      "seo": {
+        "title": "Uproszczone napisy na tradycyjne – Tajwan i Hongkong osobno – AI-SRTSub",
+        "desc": "Zamień uproszczone napisy na tradycyjne: do wyboru Tajwan (wymiana słów albo tylko postać) i Hongkong. Gdy jednemu znakowi odpowiada kilka, decyduje słowo. Zmienia się tylko tekst kwestii.",
+        "h1": "Uproszczone napisy na tradycyjne",
+        "intro": "Masz napisy po chińsku uproszczonym i idą do widzów na Tajwanie albo w Hongkongu — wystarczy jedna konwersja. Tajwan i Hongkong to dwa zestawy; przy złym kierunku nikt tam tak nie mówi.",
+        "ctaText": "Przekonwertuj te napisy"
+      },
+      "body": [
+        {
+          "h2": "Ta potrzeba",
+          "ps": [
+            "Napisy są po chińsku uproszczonym i mają iść do widzów na Tajwanie albo w Hongkongu. Zmienianie znak po znaku nie wchodzi w grę, jeden odcinek ma setki pozycji. Poza tym Tajwan i Hongkong nie chcą tego samego tradycyjnego — słownictwo się różni."
+          ]
+        },
+        {
+          "h2": "Gdzie to zrobić",
+          "ps": [
+            "Otwórz [[Konwersja uproszczony-tradycyjny|/hanconv.html]], upuść napisy i w „Kierunku konwersji” wybierz jeden z kierunków uproszczony na tradycyjny: ogólny tradycyjny, tradycyjny tajwański (wymiana słów), tradycyjny tajwański (tylko postać), tradycyjny hongkoński. Konwersja kończy się od razu, pole wyniku daje przekonwertowane napisy.",
+            "**Dla widzów na Tajwanie**: jeśli chcesz zabrać też słowa, wybierz „tradycyjny tajwański (wymiana słów)”; jeśli chcesz tylko postać i zostawić swoje słowa, wybierz „tradycyjny tajwański (tylko postać)”. **Dla widzów w Hongkongu**: wybierz „tradycyjny hongkoński”."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Karta kierunku konwersji: lista przekonwertuj na, obecnie wybrany uproszczony na tradycyjny tajwański (wymiana słów)",
+            "cap": "Tajwan i Hongkong to na liście dwa kierunki, z różnym słownictwem"
+          }
+        },
+        {
+          "h2": "Częste pułapki",
+          "ps": [
+            "**Jeden znak o wielu tradycyjnych to nie problem**: ten sam znak uproszczony idzie w różnych słowach do innego znaku tradycyjnego; słownik decyduje według grupy słów i nie zamienia wszystkiego na jeden znak.",
+            "**Zmienia się tylko tekst kwestii**: oś czasu, numery i polecenia stylów ASS nie zmieniają się ani o znak, można używać od razu.",
+            "**Nic się nie zmieniło — nie panikuj od razu**: jeśli pasek statystyk pokazuje 0 zmienionych linii, w tych napisach może nie być znaków chińskich albo format rozpoznano źle — sprawdź „Rozpoznany format”."
+          ]
+        },
+        {
+          "h2": "Powiązane",
+          "ps": [
+            "Pełen opis dziewięciu kierunków w [[Jak używać konwersji uproszczony-tradycyjny|/guides/hanconv.html]]; dlaczego to nie tylko inny znak w [[Konwersja uproszczony-tradycyjny to nie inny znak|/guides/simplified-traditional-chinese.html]]; droga w drugą stronę też jest w [[Konwersja uproszczony-tradycyjny|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "pl": {
+      "seo": {
+        "title": "Konwersja uproszczony-tradycyjny to nie inny znak – jeden do wielu – AI-SRTSub",
+        "desc": "Konwersja uproszczony-tradycyjny jest trudna w trzech miejscach: jeden znak o wielu tradycyjnych decyduje słowo, Tajwan i Hongkong mają inne słowa, a zmieniać wolno tylko tekst kwestii.",
+        "h1": "Konwersja uproszczony-tradycyjny to nie inny znak",
+        "intro": "W który znak tradycyjny zamieni się dany znak, zależy od znaku przed nim. Dlatego konwersji nie da się przeprowadzić na ślepo, znak po znaku.",
+        "ctaText": "Otwórz konwersję"
+      },
+      "body": [
+        {
+          "h2": "Po pierwsze: jeden znak, wiele tradycyjnych",
+          "ps": [
+            "Uproszczenie złączyło kilka znaków tradycyjnych w jeden uproszczony. Wracając w drugą stronę, jednemu znakowi uproszczonemu odpowiada kilka tradycyjnych; który wybrać, zależy od tego, z czym występuje:",
+            "Zamiana na ślepo, znak po znaku, zamieni wszystko na jeden znak i cały tekst będzie usiany błędami. **Decyzja według słowa** to rozdziela — słownik pochodzi z OpenCC i najpierw dopasowuje grupy słów. Na przykład:"
+          ],
+          "ul": [
+            "Ten sam znak w słowie oznaczającym czysty idzie w jeden znak tradycyjny, w słowie oznaczającym pień drzewa w inny",
+            "W słowie oznaczającym włosy w jeden znak, w słowie oznaczającym rozwój w inny",
+            "W znaczeniu za, po w jeden znak, w słowie oznaczającym królową w inny"
+          ]
+        },
+        {
+          "h2": "Po drugie: Tajwan i Hongkong to nie to samo",
+          "ps": [
+            "Po zamianie na tradycyjny jest jeszcze jedna warstwa: to samo słowo pisze się na Tajwanie i w Hongkongu inaczej. Zwykły termin informatyczny ma na Tajwanie jedną pisownię, w Hongkongu inną.",
+            "Dlatego kierunki są rozdzielone: w tradycyjnym tajwańskim są dwie opcje, wymiana słów i tylko postać — tylko postać zostawia twoje słowa, wymiana słów zamienia też terminy regionalne. Hongkong jest osobnym kierunkiem."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Karta kierunku konwersji: lista przekonwertuj na, obecnie wybrany uproszczony na tradycyjny tajwański (wymiana słów)",
+            "cap": "Na Tajwanie można wymienić słowa albo tylko postać, Hongkong ma osobny kierunek"
+          }
+        },
+        {
+          "h2": "Po trzecie: tylko tekst kwestii",
+          "ps": [
+            "Plik napisów to nie tylko kwestie. Są w nim też numery, oś czasu i polecenia stylów ASS, i z nich nie powinno się zmieniać ani znaku — zwłaszcza w wierszach stylów ASS mieszają się angielskie nazwy poleceń; potraktowane jak tekst kwestii popsują się.",
+            "Dlatego konwersja idzie po rozbiorze formatu: w SRT, VTT, ASS i TXT rozpoznawana jest osobno część tekstowa i zmieniają się tylko chińskie znaki w niej. Po konwersji oś czasu i style zostają bez zmian."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Pole wyniku: przekonwertowane napisy i pasek statystyk z liczbą zmienionych linii",
+            "cap": "Pasek statystyk daje liczbę zmienionych linii, część formatowa zostaje bez zmian"
+          }
+        },
+        {
+          "h2": "Wracając do uproszczonego: na co uważać",
+          "ps": [
+            "Przy powrocie do uproszczonego też trzeba powiedzieć, **z jakiego tradycyjnego wracasz**: ogólny tradycyjny, tradycyjny tajwański i tradycyjny hongkoński to trzy różne drogi, bo słowa regionalne Tajwanu i Hongkongu przy powrocie najpierw sprowadza się do słowa ogólnego.",
+            "Dolna grupa z dziewięciu kierunków to te wracające do uproszczonego: tradycyjny na uproszczony, tradycyjny tajwański na uproszczony, tradycyjny hongkoński na uproszczony."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Cała procedura w [[Jak używać konwersji uproszczony-tradycyjny|/guides/hanconv.html]]; jeśli potrzebujesz tylko uproszczony na tradycyjny, zobacz [[Uproszczone napisy na tradycyjne|/guides/srt-simplified-to-traditional.html]]; żeby przełożyć na inny język, użyj [[Tłumaczenie napisów|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "pl": {
+      "seo": {
+        "title": "Jak używać napisów do Excel/CSV – w dwie strony – AI-SRTSub",
+        "desc": "Napisy i tabela w dwie strony: SRT/VTT eksportowane do Excela albo CSV, poprawiane wiersz po wierszu i wracające do napisów. Tabela rozpoznaje trzy kolumny: początek, koniec i tekst.",
+        "h1": "Jak używać napisów do Excel/CSV",
+        "intro": "Korekta i tłumaczenie idą najwygodniej w tabeli. Napisy trafiają do Excela albo CSV, poprawiasz wiersz po wierszu i wracasz do napisów — kolumna czasu zostaje tekstem.",
+        "ctaText": "Otwórz konwersję tabeli"
+      },
+      "body": [
+        {
+          "h2": "Co rozwiązuje to narzędzie",
+          "ps": [
+            "Napisy to pozycja po pozycji, tabela też rekord po rekordzie — po przejściu do tabeli można używać znanych funkcji do korekty, uwag i tłumaczenia hurtowego. Działają obie strony:"
+          ],
+          "ul": [
+            "**Do tabeli**: SRT i VTT eksportowane do Excela (.xlsx) albo CSV, jeden wiersz to jedna pozycja",
+            "**Do napisów**: poprawiona tabela wraca do SRT albo VTT",
+            "Kolumna czasu zostaje tekstem, program tabelaryczny nie zamieni jej na liczbę ani datę",
+            "Złamania wierszy w kwestiach nie giną, przy powrocie są takie same"
+          ]
+        },
+        {
+          "h2": "Wgrywanie i wybór kierunku",
+          "ps": [
+            "Upuść plik albo wybierz go. Dwa kierunki potrzebują innych plików: **do tabeli** chce pliku napisów (SRT / VTT), **do napisów** chce pliku tabeli (CSV / Excel, w tym xlsx i xls). Przy złym trybie od razu pojawia się informacja, jakiego pliku ten tryb potrzebuje.",
+            "⚠️ Ta strona czyta tylko jako UTF-8. Jeśli po otwarciu napisów widać same pytajniki albo kwadraty, najpierw napraw kodowanie w [[Naprawa krzaczków|/repair.html]] — przy uszkodzonym kodowaniu tu odczyta się stertę znaków zastępczych."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Strefa wgrywania na stronie tabeli: obszar upuszczania i przełącznik dwóch trybów",
+            "cap": "Dwa tryby potrzebują innych plików: do tabeli napisy, do napisów tabela"
+          }
+        },
+        {
+          "h2": "Z napisów do tabeli",
+          "ps": [
+            "Wybierz „do tabeli”, wrzuć napisy, a pole podglądu wypisuje każdą pozycję: numer, początek, koniec, tekst. Pasek statystyk daje liczbę pozycji i łączny czas. Po zatwierdzeniu kliknij Pobierz Excel (.xlsx) albo Pobierz CSV.",
+            "Różnica między dwiema formami eksportu: xlsx to prawdziwy plik tabeli, Excel nie zmieni samowolnie formatu kolumny czasu; CSV jest bardziej uniwersalny, ale przy otwieraniu w Excelu kolumna czasu może pokazać się jako coś innego — wtedy zaznacz kolumnę i ustaw format Tekst."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Pole podglądu tabeli: cztery kolumny numer, początek, koniec, tekst i pasek statystyk",
+            "cap": "Podgląd wypisuje pozycje, pasek statystyk daje liczbę pozycji i łączny czas"
+          }
+        },
+        {
+          "h2": "Z tabeli z powrotem do napisów",
+          "ps": [
+            "Wybierz „do napisów”, wrzuć tabelę, a zasada rozpoznawania nazw kolumn jest taka: tabela musi mieć **początek, koniec i tekst** (angielskie Start / End / Text też są rozpoznawane), **kolejność kolumn nie ma znaczenia**. Czas może być zapisany jako `00:00:01,500` albo `00:00:01.500`; wierszy, których nie da się rozpoznać, się pomija.",
+            "Wynik powrotu jest wypisany w polu podglądu, po zatwierdzeniu pobierasz SRT albo VTT. Gdy tych trzech kolumn nie ma, pojawia się prośba o sprawdzenie nazw — częstą przyczyną jest użycie innych nazw przy eksporcie albo nagłówek nie w pierwszym wierszu."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Pole wyniku napisów: napisy po powrocie wypisane pozycja po pozycji",
+            "cap": "Gdy trzech kolumn nie da się rozpoznać, jest to powiedziane wprost, bez cichego błędu"
+          }
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Kolumna czasu w Excelu pokazuje się źle, co robić?** Zamiast CSV użyj od razu xlsx i problemu nie ma. Jeśli musi być CSV: zaznacz kolumnę czasu, ustaw format komórek na Tekst i otwórz.",
+            "**Czy nazwy kolumn muszą być po chińsku?** Nie. Początek, koniec i tekst oraz Start / End / Text są rozpoznawane, wielkość liter nie ma znaczenia.",
+            "**Po poprawkach złamania wierszy zostają?** Tak. Złamania w kwestiach zostają bez zmian i przy powrocie są takie same.",
+            "**Czy ASS jest obsługiwany?** Ta strona robi tylko SRT i VTT. ASS ma polecenia stylów, najpierw zamień go w [[Konwersja formatu|/convert.html]] na SRT.",
+            "**Ile naraz?** Jeden. Do dziesiątek i setek naraz jest [[Konwersja hurtowa|/batch.html]] (tam tylko format, bez tabeli)."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Konwersja odbywa się całkowicie lokalnie w przeglądarce; żadna treść napisów nie jest wysyłana na serwer."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Jeśli potrzebujesz tylko kroku napisy do Excela, zobacz [[Napisy do Excela|/guides/srt-to-excel.html]]; po poprawkach, żeby przełożyć na inny język, użyj [[Tłumaczenie napisów|/translate.html]]; żeby hurtem zmienić format dziesiątek plików, użyj [[Konwersja hurtowa|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "pl": {
+      "seo": {
+        "title": "Napisy do Excela – SRT jako xlsx do korekty wiersz po wierszu – AI-SRTSub",
+        "desc": "Przenieś napisy SRT do Excela: jeden wiersz to jedna pozycja, cztery kolumny numer, początek, koniec i tekst; czasy zostają tekstem, złamania w kwestiach nie giną. Po poprawkach wraca do napisów.",
+        "h1": "Napisy do Excela",
+        "intro": "Korygowanie setek pozycji w edytorze tekstu jedna po drugiej jest męczące; w Excelu jeden wiersz to jedna pozycja i są filtry, uwagi i zamiana hurtowa. Po wszystkim wraca się do SRT.",
+        "ctaText": "Eksportuj do Excela"
+      },
+      "body": [
+        {
+          "h2": "Ta potrzeba",
+          "ps": [
+            "Musisz skorygować napisy, hurtem zmienić słowa albo rozdać kilku osobom po kawałku — to wszystko idzie w tabeli znacznie szybciej niż w tekście. SRT sam w sobie jest tekstem, ale struktura pozycji rozkłada się dokładnie na cztery kolumny tabeli."
+          ]
+        },
+        {
+          "h2": "Gdzie to zrobić",
+          "ps": [
+            "Otwórz [[Konwersja tabeli|/table.html]], wybierz tryb do tabeli, upuść SRT, a pole podglądu od razu wypisuje każdą pozycję — cztery kolumny numer, początek, koniec, tekst. Kliknij Pobierz Excel (.xlsx) i gotowe. VTT też jest obsługiwane.",
+            "Po poprawkach: przełącz tryb na do napisów, wrzuć tę tabelę z powrotem i znów masz SRT. Zasada rozpoznawania nazw kolumn: muszą być początek, koniec i tekst (Start / End / Text też), kolejność nie ma znaczenia."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Podgląd tabeli: każda pozycja SRT w jednym wierszu, cztery kolumny i pasek statystyk",
+            "cap": "SRT rozkłada się wprost na cztery kolumny, po poprawkach wraca tą samą drogą"
+          }
+        },
+        {
+          "h2": "Częste pułapki",
+          "ps": [
+            "**Najpierw napraw kodowanie**: ta strona czyta tylko jako UTF-8. Jeśli napisy po otwarciu to same pytajniki albo kwadraty, najpierw idź do [[Naprawa krzaczków|/repair.html]].",
+            "**CSV czy xlsx**: jeśli idzie do Excela, wybierz xlsx, kolumna czasu nie zmieni formatu; CSV jest bardziej uniwersalny, ale Excel może go wziąć za co innego — wtedy ustaw kolumnę czasu na Tekst.",
+            "**ASS nie przejdzie**: ASS z poleceniami stylów najpierw na SRT, potem do tabeli."
+          ]
+        },
+        {
+          "h2": "Powiązane",
+          "ps": [
+            "Pełen opis w dwie strony w [[Jak używać napisów do Excel/CSV|/guides/table.html]]; po poprawkach, żeby przełożyć na inny język, użyj [[Tłumaczenie napisów|/translate.html]]; przed oddaniem przejdź jeszcze przez [[Kontrola jakości napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "pl": {
+      "seo": {
+        "title": "Jak używać konwersji hurtowej napisów – setki w jednym ZIP – AI-SRTSub",
+        "desc": "Konwersja hurtowa: wrzuć dziesiątki albo setki SRT/VTT naraz, zamień na jeden format docelowy i odbierz jako jeden ZIP. Numery układane od nowa, nierozpoznane pliki zostają osobno.",
+        "h1": "Jak używać konwersji hurtowej napisów",
+        "intro": "Gdy dziesiątki napisów z jednego sezonu mają dostać jeden format, wgrywanie po jednej sztuce jest za wolne. Na stronie hurtowej wrzucasz je naraz i odbierasz jako jeden ZIP — nierozpoznane pliki nie trafiają do paczki.",
+        "ctaText": "Otwórz konwersję hurtową"
+      },
+      "body": [
+        {
+          "h2": "Co rozwiązuje to narzędzie",
+          "ps": [
+            "Napisy z całego sezonu albo całej kolekcji trzeba zwykle najpierw sprowadzić do jednego formatu, zanim będą do użytku. Co robi strona hurtowa:"
+          ],
+          "ul": [
+            "Przyjmuje dziesiątki i setki SRT oraz VTT naraz (można zaznaczyć wiele na raz)",
+            "Zamienia na jeden format: SRT albo VTT, numery układane od nowa, znaczniki czasu normalizowane",
+            "Pobiera się jako jeden ZIP, nazwy plików zostają, zmienia się tylko rozszerzenie",
+            "Pliki, z których nie da się odczytać żadnej pozycji, są osobno zaznaczane i nie idą do paczki"
+          ]
+        },
+        {
+          "h2": "Wkładanie plików",
+          "ps": [
+            "Upuść kilka plików napisów naraz w przerywaną ramkę albo kliknij i zaznacz kilka za jednym razem. Lista plików wypisuje je jeden po drugim: przy rozpoznanych widać liczbę pozycji, nierozpoznane dostają „nierozpoznany”. Statystyka u góry daje liczbę plików i łączną liczbę pozycji.",
+            "⚠️ Ta strona czyta tylko jako UTF-8. Napisy z uszkodzonym kodowaniem (ekran pełen pytajników albo kwadratów) napraw najpierw w [[Naprawa krzaczków|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Lista plików: nazwy i liczby pozycji jeden po drugim, nierozpoznane na czerwono",
+            "cap": "Lista wypisuje jeden po drugim, nierozpoznane są zaznaczane od razu"
+          }
+        },
+        {
+          "h2": "Na jaki format",
+          "ps": [
+            "W „Zamień na jeden format” wybierz format docelowy — SRT albo VTT. Po wyborze każdy plik z listy jest tworzony od nowa według formatu docelowego: numery układane od początku, znaczniki czasu normalizowane (SRT oddziela milisekundy przecinkiem, VTT kropką).",
+            "**Nazwa pliku zostaje, zmienia się tylko rozszerzenie**; przy tych samych nazwach dopisywany jest numer, nie nadpisują się nawzajem."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Wybór formatu docelowego i stan listy, pasek statystyk z liczbą plików i pozycji",
+            "cap": "Po wyborze formatu lista jest tworzona od nowa; nazwie pliku zmienia się tylko rozszerzenie"
+          }
+        },
+        {
+          "h2": "Pakowanie i pobieranie",
+          "ps": [
+            "Kliknij Pobierz jako jeden ZIP, a w archiwum są wszystkie przekonwertowane pliki. **Pliki, z których nie da się odczytać żadnej pozycji, nie idą do paczki** — zostają zaznaczone na liście i nie wślizgują się do środka na niby. Gdy paczka jest gotowa, pojawia się informacja, ile plików jest w środku."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Pole pakowania: przycisk pobierania ZIP i komunikat o wyniku pakowania",
+            "cap": "Nierozpoznane pliki nie idą do paczki, zostają zaznaczone na liście"
+          }
+        },
+        {
+          "h2": "Kiedy pojawia się nierozpoznany",
+          "ps": [
+            "Gdy z pliku nie da się odczytać żadnej pozycji napisów, pojawia się „nierozpoznany”. Trzy częste przyczyny: plik nie jest napisami (na przykład plik .txt z opisem), kodowanie to nie UTF-8, albo treść została ściśnięta w jeden akapit bez znaczników czasu.",
+            "Zaznaczone pliki można potraktować osobno: problem z kodowaniem idzie do [[Naprawa krzaczków|/repair.html]], problem z formatem do [[Konwersja formatu|/convert.html]] — zamień osobno i wrzuć z powrotem na listę."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Ile naraz można włożyć?** Nie ma sztywnego limitu, zależy od pamięci przeglądarki; kilkaset SRT zwykle nie robi problemu.",
+            "**Czy zmieni mi się treść kwestii?** Nie. Konwersja hurtowa zmienia tylko format pojemnika, układa numery od nowa i normalizuje znaczniki czasu; kwestie zostają nietknięte.",
+            "**Chcę zmienić treść, co wtedy?** Ta strona robi tylko format. Do hurtowej zmiany osi czasu jest [[Dopasowanie osi czasu|/shift.html]], do hurtowej zmiany tekstu [[Zamiana terminów|/glossary.html]]; oba działają na swoich stronach.",
+            "**Czy ASS jest obsługiwany?** Ta strona zamienia tylko między SRT i VTT. ASS ma style, zamień go osobno w [[Konwersja formatu|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Konwersja i pakowanie odbywają się całkowicie lokalnie w przeglądarce; żadna treść napisów nie jest wysyłana na serwer."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Co zmieniać w całym sezonie i od którego kroku zacząć, zobacz [[Jak hurtem poprawić napisy z całego sezonu|/guides/batch-convert-srt.html]]; więcej formatów dla jednego pliku w [[Konwersja formatu|/convert.html]]; korekta w tabeli to [[Konwersja tabeli|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "pl": {
+      "seo": {
+        "title": "Jak hurtem poprawić napisy z całego sezonu – co da się hurtem – AI-SRTSub",
+        "desc": "W całym sezonie zmienia się zwykle jedna rzecz: ten sam format, to samo przesunięcie osi czasu, te same terminy. Co da się zrobić naraz, co plik po pliku i jak potraktować nierozpoznane pliki.",
+        "h1": "Jak hurtem poprawić napisy z całego sezonu",
+        "intro": "W dziesiątkach napisów z jednego sezonu zwykle dzieje się wciąż to samo. Rozdzielenie tego, co da się zrobić naraz, od tego, co plik po pliku, oszczędza więcej niż przerabianie pojedynczo.",
+        "ctaText": "Otwórz konwersję hurtową"
+      },
+      "body": [
+        {
+          "h2": "Zwykle zmienia się jedna rzecz",
+          "ps": [
+            "Gdy w napisach z sezonu coś jest nie tak, rzadko każdy odcinek ma własną usterkę — zwykle ta sama przyczyna trafiła w każdy odcinek: cały sezon skompresowała ta sama grupa napisów (format jeden, znak wodny jeden), cały sezon jest robiony pod tę samą wersję wideo (kierunek i wielkość przesunięcia te same), albo nazwy przekładu są niespójne.",
+            "Najpierw wyjmij dwa odcinki (jeden z początku, jeden z końca) i sprawdź, czy to **ta sama usterka**, zanim ruszysz hurtem. Jeśli usterka na początku i na końcu jest inna, to nie jest sprawa do załatwienia hurtem."
+          ]
+        },
+        {
+          "h2": "Co da się zrobić naraz",
+          "ps": [
+            "**Sprowadzenie do jednego formatu** to jedyna rzecz, którą naprawdę da się zrobić naraz: dziesiątki i setki SRT oraz VTT idą razem do [[Konwersja hurtowa|/batch.html]], wybierasz format docelowy i odbierasz jeden ZIP. Układanie numerów od nowa i normalizacja znaczników czasu dzieją się w tym kroku."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Lista plików na stronie hurtowej: liczby pozycji jeden po drugim, nierozpoznane na czerwono",
+            "cap": "Sprowadzenie do jednego formatu to jedyna rzecz do zrobienia naraz"
+          }
+        },
+        {
+          "h2": "Co plik po pliku",
+          "ps": [
+            "Na poniższe nie ma wejścia hurtowego, trzeba przejść plik po pliku — ale zwykle istnieje równoważna czynność, którą **robi się raz i stosuje na cały sezon**:"
+          ],
+          "ul": [
+            "**Ujednolicenie przesunięcia osi czasu**: jeśli przesunięcie jest w każdym odcinku takie samo, zmierz je przy jednym odcinku w [[Dopasowanie osi czasu|/shift.html]], zapisz tę liczbę i wpisz tę samą przy pozostałych",
+            "**Ujednolicenie terminów**: lista terminów ustawia się raz w [[Zamiana terminów|/glossary.html]], każde napisy biorą tę samą listę",
+            "**Ujednolicenie usuwania znaku wodnego**: reguła znaku wodnego jest stała, domyślne zaznaczenia w [[Czyszczenie napisów|/clean.html]] obejmują typowe znaki wodne"
+          ]
+        },
+        {
+          "h2": "Nie odwracaj kolejności",
+          "ps": [
+            "Gdy do zrobienia jest kilka rzeczy, zła kolejność oznacza przerabianie. Idź w tej kolejności:",
+            "**Najpierw napraw kodowanie** → **potem sprowadź do jednego formatu** → **potem zmieniaj treść** (znak wodny, terminy, oś czasu) → **na końcu kontrola jakości**. Bez naprawy kodowania zmiana formatu dalej daje krzaczki; bez jednego formatu zmiana treści nie działa, bo narzędzia nie obsługują tych samych formatów."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Pole pakowania: przycisk pobierania ZIP i komunikat o wyniku",
+            "cap": "Sprowadzanie do jednego formatu idzie pierwsze, zmiana treści potem"
+          }
+        },
+        {
+          "h2": "Co z nierozpoznanymi plikami",
+          "ps": [
+            "Pliki, które w konwersji hurtowej dostają „nierozpoznany”, nie idą do ZIP i zostają na liście. Trzy częste przyczyny: to nie jest plik napisów (plik z opisem), kodowanie to nie UTF-8, albo treść została ściśnięta w jeden akapit bez znaczników czasu.",
+            "Problem z kodowaniem napraw osobno w [[Naprawa krzaczków|/repair.html]]; problem z formatem zamień osobno w [[Konwersja formatu|/convert.html]] i wrzuć z powrotem na listę. **Nie wpychaj nierozpoznanych na siłę, żeby dopełnić liczbę** — odkrycie w odtwarzaczu, że brakuje odcinka, jest znacznie gorsze niż minuta więcej teraz."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Pełne użycie konwersji hurtowej w [[Jak używać konwersji hurtowej napisów|/guides/batch.html]]; sprowadzenie osi czasu do jednego przesunięcia w [[Jak używać dopasowania osi czasu|/guides/shift.html]]; przed oddaniem przejdź jeszcze przez [[Kontrola jakości napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "pl": {
+      "seo": {
+        "title": "Co to jest 23.976 / 24 / 25 / 30 fps – oś czasu napisów – AI-SRTSub",
+        "desc": "23.976 to nie 24, a 29.97 to nie 30: te 0,1 procent pochodzi z kolorystyki NTSC. W regionach PAL film puszczany jako 25 przyspiesza o 4 procent. Jak te liczby wpływają na oś czasu napisów.",
+        "h1": "Co to jest 23.976 / 24 / 25 / 30 fps",
+        "intro": "Te 0,1 procent między 23.976 a 24 to ogon z historii telewizji. W połączeniu z 4 procentami PAL to właśnie źródło tego, że napisy coraz bardziej się rozjeżdżają.",
+        "ctaText": "Otwórz dopasowanie osi czasu"
+      },
+      "body": [
+        {
+          "h2": "Co to za cztery liczby",
+          "ps": [
+            "Liczba klatek to ile obrazów pokazuje się w jednej sekundzie. Cztery najczęstsze:"
+          ],
+          "ul": [
+            "**24 fps** — tempo nagrywania i wyświetlania filmu, kino to 24",
+            "**23.976 fps** — tempo filmu po wejściu do telewizji NTSC, o 0,1 procent wolniej niż 24",
+            "**25 fps** — tempo telewizji w systemie PAL (Europa, Chiny, Australia i inne regiony 50 Hz)",
+            "**29.97 fps / 30 fps** — tempo programów NTSC, znów ta sama różnica 0,1 procent"
+          ]
+        },
+        {
+          "h2": "Skąd się wzięło 0,1 procent",
+          "ps": [
+            "23.976 = 24 × 1000/1001, 29.97 = 30 × 1000/1001. Ten 1000/1001 został z czasów koloryzacji NTSC: żeby upchnąć podnośną koloru bez zmiany istniejących odbiorników czarno-białych, częstotliwość pola obniżono z 60 Hz do 59,94 Hz (60 × 1000/1001), a liczba klatek poszła razem z nią.",
+            "Skutek: film w regionach NTSC idzie na 23.976, nie na 24. Różnica 0,1 procent to przy godzinnym filmie 3,6 sekundy — sama w sobie prawie niezauważalna, ale to nie to samo co 4 procent niżej."
+          ]
+        },
+        {
+          "h2": "A 4 procent",
+          "ps": [
+            "W regionach PAL nadaje się na 25 fps. Film nagrano na 24 fps i puszcza się go wprost na 25 — liczba klatek się nie zmienia, tempo odtwarzania rośnie o 4 procent (25/24 ≈ 1,0417). Film stuminutowy ma w wersji PAL 96 minut.",
+            "To właśnie źródło **stopniowego rozjeżdżania się**: napisy zrobiono do oryginału, wideo to wersja PAL; na początku zgadza się co do sekundy, na końcu brakuje 4 minut. Przesunięcie całości tego nie uratuje, trzeba przeliczyć proporcjonalnie."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Pole zmiany tempa na stronie osi czasu: pole wprowadzania proporcji",
+            "cap": "Przeliczanie według proporcji, jedna wartość dla całego filmu"
+          }
+        },
+        {
+          "h2": "Jak przeliczyć",
+          "ps": [
+            "Przeliczenie to pomnożenie przez jedną wartość proporcji, ważną dla całego filmu:"
+          ],
+          "ul": [
+            "**24 → 25** (przyspieszenie PAL): × 0,96",
+            "**23.976 → 25**: × 0,959 (wartość ścisła 23.976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 albo × 0,999, różnica tylko 0,1 procent",
+            "Między 0,96 a 0,959 jest 0,1 procent, przy całym filmie mniej niż 6 sekund — jeśli nie jesteś pewien, czy źródło to 24 czy 23.976, 0,96 też działa, a resztę domykasz zakotwiczeniem na dwóch punktach"
+          ]
+        },
+        {
+          "h2": "Jak poznać, którą masz",
+          "ps": [
+            "Nie chcesz zgadywać proporcji, to znajdź dwa momenty, co do których jesteś pewien, że są poprawne — zwykle pierwsza i ostatnia kwestia — i powiedz narzędziu, że ta kwestia ma być o 00:00:12, a tamta o 01:35:40; rozciągnie cały film liniowo według tych dwóch punktów. To zakotwiczenie na dwóch punktach i nie musisz liczyć liczby klatek.",
+            "Chcesz sam potwierdzić liczbę klatek źródła: jest podana w odtwarzaczu albo w narzędziu informacji o mediach. Gdy nazwa pliku nie zawiera informacji o liczbie klatek, jak `1080p.WEB`, bezpieczniejsze jest zakotwiczenie na dwóch punktach."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Pole zakotwiczenia na dwóch punktach na stronie osi czasu: dwa pola wprowadzania momentów",
+            "cap": "Zakotwiczenie na dwóch punktach nie wymaga liczenia klatek, wystarczą dwa momenty"
+          }
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Przeliczenie liczby klatek bezpośrednio w [[Konwersja liczby klatek napisów|/guides/srt-fps-converter.html]]; zmiana tempa w [[Zmiana tempa napisów|/guides/subtitle-speed-converter.html]]; czy to przesunięcie całości, czy stopniowe rozjeżdżanie, zobacz [[Napisy coraz bardziej się rozjeżdżają|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

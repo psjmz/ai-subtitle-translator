@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "tr": {
+      "seo": {
+        "title": "Altyazı bozuk karakter onarımı – kodlamayı tanı – AI-SRTSub",
+        "desc": "Bozuk karakter onarımının tam kullanımı: özgün kodlamayı tanı (GBK / Big5 / Shift_JIS / EUC-KR), adayları insan diline en çok benzeyene göre sırala, BOM'lu UTF-8 veya GBK olarak kaydet.",
+        "h1": "Altyazı bozuk karakter onarımı nasıl kullanılır",
+        "intro": "Altyazı açıldığında karşına bozuk karakterler çıkıyorsa sorun genelde dosyanın bozulması değil, okunurken yanlış kodlamanın seçilmesidir. Onarıcı özgün kodlamayı tanır, yanlış okunan karakterleri geri çevirir; numaralar ve zaman çizgisi hiç değişmez.",
+        "ctaText": "Bozuk karakter onarıcısını aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Aynı baytlar UTF-8 ile okunduğunda ve GBK ile okunduğunda bambaşka iki karakter kümesi çıkar — dosya bozulmamıştır, okurken kodlama yanlış seçilmiştir. Onarıcının yaptığı:"
+          ],
+          "ul": [
+            "Bu dosyanın özgün kodlamasını tanır ve karakterleri doğru kümeyle geri çevirir",
+            "Bozukluğun nerede olduğunu söyler: yedek karakter, kontrol karakteri, para birimi simgesi, aksanlı harf kümeleri, ardışık nadide karakterler",
+            "Adayları hangisi en çok insan diline benziyor diye sıralar, birini seçip kaydedersin",
+            "Oynatıcı kodlamayı tanımadığında, BOM'lu UTF-8 veya GBK olarak bir kopya kaydedip ona verirsin"
+          ]
+        },
+        {
+          "h2": "Dosya yükle, yapıştırma",
+          "ps": [
+            "İki girişin onarabildiği kapsam aynı değil, **dosya yükleyebiliyorsan dosya yükle**. Dosya yüklerken özgün baytlar duruyor: araç kodlamaları tek tek deneyip okuyabilir, GBK olduğunu tanırsa GBK ile çözer ve hiçbir şeyi tahmin etmesi gerekmez. Yapıştırılan içerik artık özgün bayt değildir — tarayıcı metni teslim ettiğinde hatalı adım çoktan gerçekleşmiştir; geriye sadece tersine çıkarım kalır ve ne kadar düzelebilirse o kadar düzelir.",
+            "Yapıştırılan içerikte yedek karakter (o kutulu soru işareti `�`) varsa özgün baytlar çoktan kaybolmuş demektir, kimse geri getiremez. Bu durumda sayfa açıkça söyler: yukarı dönüp “Dosya seç” ile özgün dosyayı yükle."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Bozuk karakter onarımı sayfasının yükleme alanı: sürükle-bırak alanı ve yapıştırma kutusu, üstte tanınan kodlama görünüyor",
+            "cap": "Dosyayı sürükle veya seçerek yükle; yapıştırma kutusu altta, onarabildiği kapsam çok daha küçük"
+          }
+        },
+        {
+          "h2": "Teşhis ne diyor",
+          "ps": [
+            "Yükledikten sonra teşhis alanı sonucu verir. **Bozukluk bulunmadı**: bu içerik normal okunuyor; oynatıcıda hâlâ bozuksa kodlamayı oynatıcı yanlış seçmiştir, aşağıdaki “Farklı kaydet” bölümünden başka bir kodlamaya çevirip ona ver. **Bozuk gibi görünüyor** derse, hangi iz olduğunu tek tek listeler:"
+          ],
+          "ul": [
+            "İçinde yedek karakter var — özgün baytlar kaybolmuş",
+            "Kontrol karakterleri karışmış",
+            "Arada bir sürü para birimi ve matematik simgesi var",
+            "Aksanlı harfler kümeler hâlinde çıkıyor — UTF-8 tek baytlık gibi okunmuş sanki (`ä½ å¥½` bu tür)",
+            "Karakterler ardışık ama tek bir yaygın karakter yok — UTF-8 GBK gibi okunmuş sanki"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Teşhis kartı: sonuç ve bozukluk izlerinin tek tek listelenmesi",
+            "cap": "Teşhis bozukluğu türe göre ayırıp listeler, tek bir “bozuk” cümlesiyle geçiştirmez"
+          }
+        },
+        {
+          "h2": "Adaylar nasıl sıralanır, nasıl seçilir",
+          "ps": [
+            "“Şöyle onarılabilir” altındaki adaylar **hangisi en çok insan diline benziyor** sırasına göre dizilir, en çok 12 kayıt; her birinde hangi kodlamadan hangi kodlamaya okunduğu yazar. Birine tıkla, sonucu gör; beğenirsen aşağıda kaydet, beğenmezsen “Olduğu gibi bırak” ile özgün hâline dön.",
+            "Sıralama puana dayanır: yaygın karakter oranı, ardışık aksanlar, ardışık simgeler ve nadide karakterlerin hepsi hesaba katılır. **Puan belirgin biçimde iyiyse önerilir** — sana bir aday uydurmak için zorlama bir sonuç sunmaz. Üst üste iki kez yanlış işlem görmüş dosyalarda (bir kez yanlış kaydedilmiş, bir kez de yanlış onarılmış) araç ilk birkaç adayda bir katman daha geriye çıkarım yapar; iki katman içindekilerin kurtulma şansı var."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Onarım aday listesi: insan diline benzerlik sırasına göre, her kayıtta kodlama çifti yazılı",
+            "cap": "Adaylar en çok insan diline benzeyene göre sıralı, her birinde hangi kodlamadan hangisine okunduğu yazılı"
+          }
+        },
+        {
+          "h2": "Kaydetmek son adım",
+          "ps": [
+            "Onardıktan sonra doğru kaydetmek gerekir. Oynatıcı UTF-8'i tanımadığında **BOM'lu UTF-8** (Windows oynatıcılar kodlamayı BOM'dan tanır) veya **GBK** kaydet, genelde düzelir. Farklı kaydet seçenekleri: UTF-8, UTF-8 (BOM'lu), GBK, Big5, Shift_JIS, EUC-KR; sığmazsa başka bir kodlamaya geçmen istenir (örneğin GBK Koreceyi taşıyamaz). İndirilen dosyanın adına otomatik olarak `-fixed` eklenir.",
+            "Tanınan kodlama UTF-8 değilse farklı kaydet zaten senin için “BOM'lu UTF-8”i işaret etmiş olur; açılır listeyi kendin değiştirdikten sonra artık senin yerine geri almaz."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Sonuç alanı: metin kutusu, farklı kaydet açılır listesi ve indirme düğmesi",
+            "cap": "Kodlamayı seçip indir; dosya adına otomatik olarak -fixed eklenir"
+          }
+        },
+        {
+          "h2": "Ne değiştirilmez",
+          "ps": [
+            "Sadece yanlış okunan karakterler değişir. Numaralar, zaman çizgisi ve ASS stil komutları hiç değişmez."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Dosya yükledim, neden hâlâ kaydetmemi istiyor?** Dosyanın kendisi genelde bozuk değil; bozuk olan, oynatıcının onu yanlış kodlamayla okuması. Bu durumda metindeki tek bir karakteri değiştirmen gerekmez, oynatıcıya BOM'lu UTF-8 veya GBK olarak kaydedilmiş bir kopya vermen yeter.",
+            "**Yapıştırdığım neden onarılmıyor?** Yapıştırılan içerikte yedek karakter çıktığı anda özgün baytlar gitmiş demektir, geriye çıkarımın dayanağı kalmaz. Yukarı dönüp “Dosya seç” ile özgün dosyayı yükle.",
+            "**Adaylar arasında istediğim yok?** Puan mevcut olandan belirgin biçimde iyi değilse araç önermez. Önce “Tanınan kodlama”yı başka bir kodlamaya çevirip yeniden sıralatabilirsin.",
+            "**Bir seferde kaç dosya onarılır?** Bir tane. Onar, indir, sonra sıradakini yükle."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Tanıma ve onarım tamamen tarayıcıda yerel olarak yapılır, sunucuya hiçbir altyazı içeriği gönderilmez."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Bozukluğun nereden geldiği için [[Altyazı bozuk karakterleri nereden gelir|/guides/subtitle-garbled-characters.html]]; kodlaması normal ama içeriği kirliyse [[Altyazı temizleme|/clean.html]]; zaman çizgisini ve karakter sayısını denetlemek için [[Altyazı kalite kontrolü|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "tr": {
+      "seo": {
+        "title": "Altyazı bozuk karakterleri nereden gelir – tanınabilirse onarılır – AI-SRTSub",
+        "desc": "Altyazı bozukluğu dosyanın bozulması değil, baytların yanlış kodlamayla okunmasıdır. Yedek karakter, aksanlı harf kümeleri ve ardışık nadide karakterlerin her biri ayrı bir nedene karşılık gelir.",
+        "h1": "Altyazı bozuk karakterleri nereden gelir",
+        "intro": "Aynı baytlar UTF-8 ile ve GBK ile okunduğunda bambaşka iki karakter kümesi çıkar. Bozukluğun görünümü, hangi adımın yanlış yapıldığının doğrudan kanıtıdır.",
+        "ctaText": "Bozuk karakter onarıcısını aç"
+      },
+      "body": [
+        {
+          "h2": "Dosya bozulmadı, okuma yanlış",
+          "ps": [
+            "Altyazı dosyasında baytlar durur. Baytları karaktere çevirmek için hangi kodlamayla yazıldığını bilmek gerekir — bu adım yanlış seçilirse çıkan şey bozuk karakterdir. Dosyanın kendisi tek bir bayt kaybetmemiştir; başka bir kodlamayla bir kez daha okunduğunda karakterler geri gelir.",
+            "Bu yüzden bozukluk iki ayrı iştir: **özgün kodlamayı tanımak** ve **oynatıcının tanıyabileceği kodlamada kaydetmek**. İlki deneme okuma ve puanlamayla, ikincisi farklı kaydetmekle çözülür. İkisi farklı sorunları onarır."
+          ]
+        },
+        {
+          "h2": "Beş görünüm, beş neden",
+          "ps": [
+            "Bozukluk rastgele oluşmaz; görünümü nedeni doğrudan ele verir:"
+          ],
+          "ul": [
+            "**Kümeler hâlinde aksanlı harfler** (`ä½ å¥½`): UTF-8'deki metin tek baytlık kodlamayla okunmuş — UTF-8'de bir karakter üç bayttır, tek bayt okumak her baytı ayrı bir harf sayar",
+            "**Ardışık karakterler ama tek yaygın karakter yok**: UTF-8 GBK gibi okunmuş — iki bayt bir arada yeniden eşleşir ve hep nadide karakterler çıkar",
+            "**Bir sürü para birimi ve matematik simgesi**: baytlar simge bölgesine düşmüş, genelde Mac Roman veya Latin-1 ailesiyle okunmuş",
+            "**Kontrol karakterleri karışmış**: baytlar görünmez kontrol bölgesine düşmüş, ekranda boşluk veya kutu olarak görünür",
+            "**Kutulu soru işareti `�`**: bu bir **yedek karakter**, bozukluk değil — burada bir karakter vardı ama okunurken kayboldu demektir"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Teşhis kartı: bozukluk izlerinin tek tek listelenmesi",
+            "cap": "Teşhis bozukluğu nedene göre sınıflandırır, tek bir bozuk cümlesiyle geçiştirmez"
+          }
+        },
+        {
+          "h2": "Yedek karakter neden onarılamaz",
+          "ps": [
+            "Yedek karakter kritik sınır çizgisidir. `�` görünmesi, **daha önceki bir adımda** (genelde bir program dosyayı bir kez okuyup bir kez kaydettiğinde) baytların çoktan atıldığı anlamına gelir; atılan kısmın hiçbir kaydı yoktur. Bu noktada geriye çıkarımın dayanağı kalmaz — kimse onaramaz.",
+            "Bu yüzden onarım sayfası iki durumu ayrı ele alır: dosya yüklenirken özgün baytlar duruyor, kodlamalar tek tek denenebilir; yapıştırılan içerikte yedek karakter çıkmışsa onarılamaz, lütfen özgün dosyayı yükle der.",
+            "Tersi bir durum da var: içerik tamamen normal okunuyor ama oynatıcıda hâlâ bozuk. Bu dosyanın hatası değil, **oynatıcı kodlamayı yanlış seçmiştir**. Dosyayı değiştirmek işe yaramaz; BOM'lu UTF-8 veya GBK olarak kaydedilmiş bir kopyayı ona vermek yeter."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Yükleme alanı: sürükle-bırak ve yapıştırma olmak üzere iki giriş",
+            "cap": "Dosya yükleyebiliyorsan yükle — baytlar duruyorsa onarılacak bir şey var"
+          }
+        },
+        {
+          "h2": "Onarırken ne karşılaştırılıyor",
+          "ps": [
+            "Araç her olası kodlamayı tek tek dener, sonra her sonuca puan verir: yaygın karakter oranı, ardışık aksan var mı, ardışık simge var mı, karakterler ardışık nadide mi. En yüksek puanlı olan en üste çıkar.",
+            "**Puan belirgin biçimde iyiyse önerilir** — sana bu dosya normal okunuyor demeyi, zorlama bir sonuçla idare etmeye yeğler. Üst üste iki kez yanlış işlem görmüş dosyalarda ilk birkaç adayda bir katman daha geriye çıkarım yapılır."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Aday listesi: puana göre sıralı, her kayıtta kodlama çifti yazılı",
+            "cap": "Adaylar puana göre sıralanır, puan üstün değilse önerilmez"
+          }
+        },
+        {
+          "h2": "Doğru kodlamada kaydetmek işi bitirir",
+          "ps": [
+            "Onarılan metni oynatıcının tanıyabileceği kodlamada kaydetmek gerekir. Windows'taki oynatıcılar kodlamayı genelde BOM'dan tanır, **BOM'lu UTF-8** kaydetmek en kolayıdır; eski cihazlar veya yerel oynatıcılar GBK tanır. Seçilebilir kodlamalar: UTF-8, UTF-8 (BOM'lu), GBK, Big5, Shift_JIS, EUC-KR; sığmazsa başka bir kodlamaya geçmen istenir (örneğin GBK Koreceyi taşıyamaz)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Sonuç alanı: farklı kaydet kodlama açılır listesi ve indirme düğmesi",
+            "cap": "Oynatıcının tanıyabileceği kodlamada kaydet, bozukluk ancak o zaman gerçekten çözülür"
+          }
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Tam işlem için [[Bozuk karakter onarımı nasıl kullanılır|/guides/repair.html]]; SRT dosyasında ne yazdığı için [[SRT dosyasında ne yazıyor|/guides/srt-file-format.html]]; kodlaması normal ama içeriği kirliyse (filigran, reklam, işitme engelli açıklamaları) [[Altyazı temizleme|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "tr": {
+      "seo": {
+        "title": "Altyazı basit-geleneksel dönüşümü – Tayvan ve Hong Kong – AI-SRTSub",
+        "desc": "Basit-geleneksel dönüşümün tam kullanımı: dokuz yön, Tayvan için kelime değişimi veya sadece biçim, Hong Kong ayrı bir küme. Sadece diyalog metni değişir; zaman çizgisi ve numaralar hiç değişmez.",
+        "h1": "Altyazı basit-geleneksel dönüşümü nasıl kullanılır",
+        "intro": "Aynı altyazı Tayvan'a, Hong Kong'a veya anakara Çin'e gidecekse kelimeler ve karakter biçimleri farklıdır. Dönüşüm sayfasında dokuz yön serbest; sadece diyalog metni değişir — zaman çizgisi, numaralar ve ASS stil komutları hiç değişmez.",
+        "ctaText": "Basit-geleneksel dönüşümü aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Basit-geleneksel dönüşüm her karakterin yazımını değiştirip bırakmak değildir. Aynı basit kelime farklı bölgelerde farklı kelimeye karşılık gelir. Dönüşüm sayfası bunları ayrı ele alır:"
+          ],
+          "ul": [
+            "Basitten geleneksele (genel / Tayvan / Hong Kong)",
+            "Gelenekselden basite (genel / Tayvan gelenekselinden / Hong Kong gelenekselinden)",
+            "Gelenekseller arasında biçim değişimi (Tayvan biçimi / Hong Kong biçimi)",
+            "Bir basit karaktere çok geleneksel karakter düştüğünde yanlış dönmez (kelimeye göre karar verir, tek karakteri körlemesine değiştirmez)"
+          ]
+        },
+        {
+          "h2": "Yükleme ve tanıma",
+          "ps": [
+            "Dosyayı sürükle veya seçerek yükle; SRT, VTT, ASS, TXT desteklenir, altyazı içeriğini doğrudan da yapıştırabilirsin. Yükledikten sonra biçim otomatik tanınır ve “Tanınan biçim” alanında gösterilir."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Basit-geleneksel dönüşüm sayfasının yükleme alanı: sürükle-bırak alanı ve yapıştırma kutusu, üstte tanınan biçim görünüyor",
+            "cap": "SRT / VTT / ASS / TXT desteklenir, biçim otomatik tanınır"
+          }
+        },
+        {
+          "h2": "Dokuz yön nasıl seçilir",
+          "ps": [
+            "“Dönüşüm yönü” içindeki dokuz yön üç gruba ayrılır. **Basitten geleneksele**: genel geleneksel, Tayvan geleneksel (kelime değişimi), Tayvan geleneksel (sadece biçim), Hong Kong geleneksel. **Gelenekselden basite**: genel, Tayvan gelenekselinden, Hong Kong gelenekselinden. **Gelenekseller arasında biçim değişimi**: Tayvan biçimine, Hong Kong biçimine.",
+            "“Tayvan kelimeleri” bölgesel terimleri de birlikte değiştirir; “Tayvan biçimi” sadece karakterin yazımını değiştirir, kelimeyi korur. Hong Kong ayrı bir küme: aynı terim orada başka yazılır. Tersine basit Çinceye dönmek için alttaki grubu seç — hangi gelenekselden döndüğünü belirtmek gerekir, çünkü Tayvan ve Hong Kong gelenekselinden basit Çinceye giden yol farklıdır."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Dönüşüm yönü kartı: şuna dönüştür açılır kutusu, şu an basitten Tayvan gelenekseline (kelime değişimi) seçili",
+            "cap": "Yön şuna dönüştür açılır listesinden seçilir, dokuzu üç grupta dizilidir; bu görüntüde Tayvan geleneksel kelime değişimi seçili"
+          }
+        },
+        {
+          "h2": "Sonuç ve dışa aktarma",
+          "ps": [
+            "Sonuç alanı dönüştürülmüş altyazıyı doğrudan verir, istatistik çubuğu toplam satır sayısını ve kaç satırın değiştiğini gösterir. Tek bir karakter bile değişmediyse bu altyazıda Çince karakter olmayabilir uyarısı çıkar — dönüşüm sadece Çince kısmı değiştirir, düz İngilizce veya sayılardan oluşan altyazı değişmez.",
+            "Onayladıktan sonra indir veya kopyala. İndirilen dosyanın adına dil etiketi eklenir — `demo.srt` Tayvan gelenekseline dönünce `demo.zh-TW.srt` olur, genel geleneksel `.zh-Hant`, basit Çinceye dönüş `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Sonuç alanı: dönüştürülmüş altyazı ve istatistik çubuğu",
+            "cap": "İstatistik çubuğu toplam ve değişen satır sayısını verir; doğrudan indirebilir veya çeviriye gönderebilirsin"
+          }
+        },
+        {
+          "h2": "Ne değiştirilmez",
+          "ps": [
+            "Sadece diyalog metni değişir. Zaman çizgisi, numaralar ve ASS stil komutları hiç değişmez — dönünce doğrudan kullanılır, biçimi yeniden ayarlaman gerekmez."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Neden bazı karakterler beklediğim gibi dönüşmedi?** Bir basit karaktere çok geleneksel karakter düştüğünde karar kelimeye göre verilir: aynı karakter farklı kelimelerde farklı geleneksel karaktere gider. Sözlük OpenCC'den gelir, tek karakter değil kelime grubu temel alınır.",
+            "**Tayvan ve Hong Kong gelenekseli arasındaki fark ne?** Kullanılan kelimeler farklı: aynı terim Tayvan'da ve Hong Kong'da başka yazılır. Hangi bölgeye göndereceksen o yönü seç.",
+            "**Dönüşüm sonrası satır sayım değişti mi?** Sadece Çince karakterler değişir, kayıt eklenip çıkarılmaz, zaman çizgisi değişmez. Satır sayısı değiştiyse yüklerken biçimin yanlış tanınıp tanınmadığını kontrol et.",
+            "**Sözlük yüklenmezse ne yapmalı?** Sayfa yenileyip tekrar denemenizi ister. Sözlük yerel olarak yüklenir, altyazıyı internete yüklemen gerekmez."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Dönüşüm tamamen tarayıcıda yerel olarak yapılır, sunucuya hiçbir altyazı içeriği gönderilmez."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Sadece basitten geleneksele işi için [[Basit altyazıyı geleneksel Çinceye çevir|/guides/srt-simplified-to-traditional.html]]; dönüşümün neden sadece karakter değiştirmek olmadığı için [[Basit-geleneksel dönüşüm karakter değiştirmek değildir|/guides/simplified-traditional-chinese.html]]; yabancı dile çevirmek için [[Altyazı çevirisi|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "tr": {
+      "seo": {
+        "title": "Basit altyazıyı geleneksel Çinceye çevir – Tayvan ve Hong Kong ayrı – AI-SRTSub",
+        "desc": "Basit Çince altyazıyı geleneksel Çinceye çevir: Tayvan (kelime değişimi veya sadece biçim) ve Hong Kong ayrı seçenek. Bir basit karaktere çok gelenekselde karar kelimeye göre verilir.",
+        "h1": "Basit altyazıyı geleneksel Çinceye çevir",
+        "intro": "Basit Çince bir altyazıyı Tayvan veya Hong Kong izleyicisine göndereceksen bir dönüşüm yeter — Tayvan ve Hong Kong iki ayrı kümedir, yanlış yönü seçersen çıkan kelimeyi orada kimse öyle kullanmaz.",
+        "ctaText": "Bu altyazıyı dönüştür"
+      },
+      "body": [
+        {
+          "h2": "Bu ihtiyaç",
+          "ps": [
+            "Altyazı basit Çince ve Tayvan veya Hong Kong izleyicisine gidecek. Karakter karakter değiştirmek gerçekçi değil, bir bölümde yüzlerce kayıt var. Üstelik Tayvan ve Hong Kong'un istediği geleneksel Çince aynı değil — kullanılan kelimeler farklı, yanlış yönü seçersen çıkan kelime orada öyle denmez."
+          ]
+        },
+        {
+          "h2": "Nerede yapılır",
+          "ps": [
+            "[[Basit-geleneksel dönüşüm|/hanconv.html]] sayfasını aç, altyazıyı sürükle, “Dönüşüm yönü” içinden basitten geleneksele giden yönlerden birini seç: genel geleneksel, Tayvan geleneksel (kelime değişimi), Tayvan geleneksel (sadece biçim), Hong Kong geleneksel. Dönüşüm anında tamamlanır, sonuç alanı dönüşmüş altyazıyı verir, indirmen yeter.",
+            "**Tayvan izleyicisi için**: kelimeleri birlikte değiştirmek istiyorsan “Tayvan geleneksel (kelime değişimi)” seç, bölgesel terimler de döner; sadece biçimi değiştirip mevcut kelimeleri korumak istiyorsan “Tayvan geleneksel (sadece biçim)” seç. **Hong Kong izleyicisi için**: “Hong Kong geleneksel” seç."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Dönüşüm yönü kartı: şuna dönüştür açılır kutusu, şu an basitten Tayvan gelenekseline (kelime değişimi) seçili",
+            "cap": "Tayvan ve Hong Kong açılır listede iki ayrı yön, kullandıkları kelimeler farklı"
+          }
+        },
+        {
+          "h2": "Sık karşılaşılan tuzaklar",
+          "ps": [
+            "**Bir basit karaktere çok geleneksel karakter sorun değil**: aynı basit karakter farklı kelimelerde farklı geleneksel karaktere gider, sözlük kelime grubuna göre karar verir, hepsini tek bir karaktere çevirmez.",
+            "**Sadece diyalog metni değişir**: zaman çizgisi, numaralar ve ASS stil komutları hiç değişmez, dönünce doğrudan kullanılır.",
+            "**Hiçbir şey değişmediyse hemen telaşlanma**: istatistik çubuğu 0 satır değişti gösteriyorsa bu altyazıda Çince karakter olmayabilir ya da biçim yanlış tanınmıştır — “Tanınan biçim”in gönderdiğin tür olup olmadığına bak."
+          ]
+        },
+        {
+          "h2": "İlgili",
+          "ps": [
+            "Dokuz yönün tam açıklaması için [[Basit-geleneksel dönüşüm nasıl kullanılır|/guides/hanconv.html]]; dönüşümün neden sadece karakter değiştirmek olmadığı için [[Basit-geleneksel dönüşüm karakter değiştirmek değildir|/guides/simplified-traditional-chinese.html]]; ters yönde gelenekselden basit Çinceye dönüş de [[Basit-geleneksel dönüşüm|/hanconv.html]] içinde."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "tr": {
+      "seo": {
+        "title": "Basit-geleneksel dönüşüm karakter değiştirmek değil – AI-SRTSub",
+        "desc": "Basit-geleneksel dönüşümün zorluğu üç şeyde: bir basit karaktere çok geleneksel kelimeye göre karara bağlanır, Tayvan ve Hong Kong kelimeleri farklı, dönüşüm sadece diyalog metnini değiştirmeli.",
+        "h1": "Basit-geleneksel dönüşüm karakter değiştirmek değildir",
+        "intro": "Bir karakterin hangi geleneksel karaktere dönüşeceği, önündeki karaktere bağlıdır. Bu yüzden dönüşüm tek tek karakter değiştirerek yapılamaz.",
+        "ctaText": "Basit-geleneksel dönüşümü aç"
+      },
+      "body": [
+        {
+          "h2": "Birinci: bir basit karaktere çok geleneksel",
+          "ps": [
+            "Basitleştirme birden çok geleneksel karakteri tek bir basit karakterde birleştirdi. Ters yöne dönerken bir basit karaktere birden çok geleneksel karakter düşer; hangisinin seçileceği hangi karakterle eşleştiğine bağlıdır:",
+            "Tek karakteri körlemesine değiştirmek hepsini aynı karaktere çevirir ve metin baştan sona yanlış olur. **Kelimeye göre karar vermek** ayırt eder — sözlük OpenCC'den gelir, önce kelime grubunu sonra tek karakteri eşleştirir. Örneğin:"
+          ],
+          "ul": [
+            "Aynı basit karakter temiz anlamındaki kelimede bir geleneksel karaktere, ağaç gövdesi anlamındaki kelimede başka bir karaktere gider",
+            "Saç anlamındaki kelimede bir karaktere, gelişme anlamındaki kelimede başka bir karaktere gider",
+            "Arka, sonra anlamında bir karaktere, kraliçe anlamındaki kelimede başka bir karaktere gider"
+          ]
+        },
+        {
+          "h2": "İkinci: Tayvan ve Hong Kong aynı şey değil",
+          "ps": [
+            "Geleneksel Çinceye dönünce bir katman daha var: aynı kelime Tayvan'da ve Hong Kong'da aynı yazılmaz. Yaygın bir bilişim terimi Tayvan'da bir yazım, Hong Kong'da başka bir yazım kullanır.",
+            "Bu yüzden dönüşüm yönleri ayrı tutulur: Tayvan gelenekselinde kelime değişimi ve sadece biçim olmak üzere iki seçenek var — sadece biçim mevcut kelimelerini korur, kelime değişimi bölgesel terimleri de değiştirir. Hong Kong tek başına bir yöndür."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Dönüşüm yönü kartı: şuna dönüştür açılır kutusu, şu an basitten Tayvan gelenekseline (kelime değişimi) seçili",
+            "cap": "Tayvan'da kelime değişimi veya sadece biçim seçilebilir, Hong Kong ayrı bir yön"
+          }
+        },
+        {
+          "h2": "Üçüncü: sadece diyalog metni değişmeli",
+          "ps": [
+            "Altyazı dosyası sadece diyaloglardan ibaret değil. Numaralar, zaman çizgisi ve ASS stil komutları da içinde; bunların hiçbiri dönüştürülmemeli — özellikle ASS stil satırlarında İngilizce komut adları karışmıştır, metin gibi ele alınırlarsa bozulurlar.",
+            "Bu yüzden dönüşüm biçim ayrıştırıldıktan sonra yapılır: SRT, VTT, ASS, TXT'nin her birinde metin kısmı ayrı tanınır ve sadece oradaki Çince karakterler değişir. Dönüşüm sonrası zaman çizgisi ve stiller aynı kalır, biçimi yeniden ayarlaman gerekmez."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Sonuç alanı: dönüştürülmüş altyazı ve istatistik çubuğu, değişen satır sayısı görünüyor",
+            "cap": "İstatistik çubuğu değişen satır sayısını verir, biçim kısmı aynı kalır"
+          }
+        },
+        {
+          "h2": "Tersine basit Çinceye dönerken neye dikkat etmeli",
+          "ps": [
+            "Gelenekselden basit Çinceye dönerken de **hangi gelenekselden döndüğünü** belirtmek gerekir: genel geleneksel, Tayvan geleneksel ve Hong Kong geleneksel üç ayrı yoldur, çünkü Tayvan ve Hong Kong'un bölgesel kelimeleri basit Çinceye dönerken önce genel kelimeye indirgenir. Yön yanlış seçilirse çıkan basit Çincede bölgesel kelime kalıntısı olur.",
+            "Dokuz yönün alt grubu basit Çinceye dönenlerdir: gelenekselden basite, Tayvan gelenekselinden basite, Hong Kong gelenekselinden basite."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Tam işlem için [[Basit-geleneksel dönüşüm nasıl kullanılır|/guides/hanconv.html]]; sadece basitten geleneksele işi için [[Basit altyazıyı geleneksel Çinceye çevir|/guides/srt-simplified-to-traditional.html]]; yabancı dile çevirmek için [[Altyazı çevirisi|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "tr": {
+      "seo": {
+        "title": "Altyazı Excel/CSV dönüşümü nasıl kullanılır – iki yönlü – AI-SRTSub",
+        "desc": "Altyazı ile tablo arasında iki yönlü dönüşüm: SRT/VTT Excel veya CSV olarak dışa aktarılır, satır satır düzeltilir, sonra altyazıya geri alınır. Tablo başlangıç, bitiş, metin üç sütununu tanır.",
+        "h1": "Altyazı Excel/CSV dönüşümü nasıl kullanılır",
+        "intro": "Düzeltme ve çeviri tabloda çok daha rahat yapılır. Altyazı Excel veya CSV olarak dışa aktarılır, satır satır düzeltilip altyazıya geri alınır — zaman sütunu metin olarak kalır, diyaloglardaki satır sonları eksilmez.",
+        "ctaText": "Tablo dönüşümünü aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Altyazı satır satır kayıtlardan oluşur, tablo da satır satır kayıtlardan — tabloya geçince düzeltme, not alma ve toplu çeviri için alışık olduğun tablo işlevlerini kullanabilirsin. İki yön de desteklenir:"
+          ],
+          "ul": [
+            "**Tabloya çevir**: SRT, VTT Excel (.xlsx) veya CSV olarak dışa aktarılır, her satır bir kayıt; numara, başlangıç, bitiş, metin sütunlarıyla",
+            "**Altyazıya çevir**: düzeltilmiş tablo SRT veya VTT olarak geri alınır",
+            "Zaman sütunu metin olarak korunur, tablo yazılımının onu sayı veya tarihe çevirmesine izin verilmez",
+            "Diyalogdaki satır sonları eksilmez, geri alınırken yine aynı satır sonları olur"
+          ]
+        },
+        {
+          "h2": "Yükleme ve yön seçimi",
+          "ps": [
+            "Dosyayı sürükle veya seçerek yükle. İki yön farklı dosya ister: **tabloya çevir** altyazı dosyası (SRT / VTT), **altyazıya çevir** tablo dosyası (CSV / Excel, xlsx ve xls dâhil) ister. Mod yanlış seçilirse bu modun hangi dosyayı istediği doğrudan söylenir.",
+            "⚠️ Bu sayfa sadece UTF-8 ile okur. Altyazı açıldığında ekran soru işareti veya kutu doluysa önce [[Bozuk karakter onarımı|/repair.html]] sayfasında kodlamayı düzelt — kodlama bozuksa burada okunan şey bir yığın yedek karakter olur."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Tablo dönüşümü sayfasının yükleme alanı: sürükle-bırak alanı ve iki mod geçişi",
+            "cap": "İki mod farklı dosya ister: tabloya çevirirken altyazı, altyazıya çevirirken tablo"
+          }
+        },
+        {
+          "h2": "Altyazıyı tabloya aktarma",
+          "ps": [
+            "“Tabloya çevir”i seçip altyazıyı koy, önizleme alanı her kaydı tek tek listeler: numara, başlangıç, bitiş, metin. İstatistik çubuğu kayıt sayısını ve toplam süreyi verir. Onayladıktan sonra Excel indir (.xlsx) veya CSV indir'e tıkla.",
+            "İki dışa aktarma biçiminin farkı: xlsx gerçek bir tablo dosyasıdır, zaman sütununun biçimini Excel kendiliğinden bozamaz; CSV daha evrenseldir ama Excel'de açılırken zaman sütunu başka bir şey gibi görünebilir — gerçekten karşılaşırsan zaman sütununu seçip Metin biçimine al, ya da doğrudan xlsx kullan."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Tablo önizleme alanı: numara, başlangıç, bitiş, metin dört sütun ve istatistik çubuğu",
+            "cap": "Önizleme tek tek listeler, istatistik çubuğu kayıt sayısını ve toplam süreyi verir"
+          }
+        },
+        {
+          "h2": "Tabloyu altyazıya geri alma",
+          "ps": [
+            "“Altyazıya çevir”i seçip tabloyu koy, sütun adını tanıma kuralı şu: tabloda **başlangıç, bitiş, metin** üç sütun olmalı (İngilizce Start / End / Text de tanınır), **sütun sırası önemsiz**. Zaman `00:00:01,500` veya `00:00:01.500` biçiminde yazılabilir; tanınamayan satırlar atlanır, tüm dosya ölü sayılmaz.",
+            "Geri alınan sonuç önizleme alanında tek tek listelenir, onayladıktan sonra SRT veya VTT indirilir. Tabloda bu üç sütun yoksa sütun adlarını kontrol etmesi istenir — yaygın neden, dışa aktarırken başka sütun adları kullanılması veya başlığın ilk satırda olmamasıdır."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Altyazı sonuç alanı: geri alınan altyazı tek tek listelenmiş",
+            "cap": "Üç sütun tanınmazsa doğrudan söylenir, sessizce başarısız olmaz"
+          }
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Excel'de zaman sütunu yanlış görünüyorsa?** CSV yerine doğrudan xlsx kullan, sorun olmaz. CSV kullanacaksan: zaman sütununu seç, hücre biçimini Metin yap, sonra aç.",
+            "**Tablodaki sütun adları Çince olmak zorunda mı?** Hayır. Başlangıç / bitiş / metin ile Start / End / Text de tanınır, büyük-küçük harf farkı yok.",
+            "**Düzelttikten sonra geri alınca satır sonları duruyor mu?** Evet. Diyalogdaki satır sonları aynen korunur, geri alınırken yine aynı satır sonları olur.",
+            "**ASS destekleniyor mu?** Bu sayfa sadece SRT ve VTT ile çalışır. ASS stil komutları taşır, önce [[Biçim dönüşümü|/convert.html]] ile SRT'ye çevir, sonra tabloya geç.",
+            "**Bir seferde kaç dosya işlenir?** Bir tane. Onlarca-yüzlerce dosyayı birlikte işlemek için [[Toplu dönüşüm|/batch.html]] var (o sadece biçim dönüştürür, tabloya girmez)."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Dönüşüm tamamen tarayıcıda yerel olarak yapılır, sunucuya hiçbir altyazı içeriği gönderilmez."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Sadece altyazıyı Excel'e çevir adımı için [[Altyazıyı Excel'e çevir|/guides/srt-to-excel.html]]; düzelttikten sonra yabancı dile çevirmek için [[Altyazı çevirisi|/translate.html]]; onlarca dosyanın biçimini birlikte değiştirmek için [[Toplu dönüşüm|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "tr": {
+      "seo": {
+        "title": "Altyazıyı Excel'e çevir – SRT'yi xlsx olarak dışa aktar – AI-SRTSub",
+        "desc": "SRT altyazısını Excel'e aktar: her satır bir kayıt, numara, başlangıç, bitiş, metin dört sütun; zamanlar metin olarak kalır, diyalog satır sonları kaybolmaz. Düzeltince altyazıya geri alınır.",
+        "h1": "Altyazıyı Excel'e çevir",
+        "intro": "Yüzlerce altyazı kaydını metin düzenleyicide tek tek düzeltmek yorucudur; Excel'de bir satır bir kayıt olur, filtre, not ve toplu değiştirme hazır gelir. Bitince tekrar SRT'ye alınır.",
+        "ctaText": "Excel olarak dışa aktar"
+      },
+      "body": [
+        {
+          "h2": "Bu ihtiyaç",
+          "ps": [
+            "Altyazıyı düzeltmek, toplu kelime değiştirmek ya da birkaç kişiye birer bölüm vermek gerekiyor — bunlar tabloda metinden çok daha hızlı. SRT'nin kendisi düz metindir ama kayıt yapısı (numara, zaman, diyalog) tam olarak tablonun dört sütununa yayılır."
+          ]
+        },
+        {
+          "h2": "Nerede yapılır",
+          "ps": [
+            "[[Tablo dönüşümü|/table.html]] sayfasını aç, modu tabloya çevir seç, SRT'yi sürükle, önizleme alanı her kaydı hemen listeler — numara, başlangıç, bitiş, metin dört sütun. Excel indir (.xlsx)'e tıkla ve al. VTT de desteklenir.",
+            "Düzeltme bitince: modu altyazıya çevir'e al, bu tabloyu geri koy, SRT'ye dönmüş olur. Sütun adını tanıma kuralı: başlangıç, bitiş, metin üç sütun olmalı (İngilizce Start / End / Text de tanınır), sütun sırası önemsiz."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Tablo önizlemesi: SRT'nin her kaydı bir satıra yayılıyor, dört sütun ve istatistik çubuğu",
+            "cap": "SRT doğrudan dört sütuna yayılır, düzeltince aynı yoldan geri alınır"
+          }
+        },
+        {
+          "h2": "Sık karşılaşılan tuzaklar",
+          "ps": [
+            "**Kodlama bozuksa önce onu düzelt**: bu sayfa sadece UTF-8 ile okur. Altyazı açıldığında ekran soru işareti veya kutu doluysa önce [[Bozuk karakter onarımı|/repair.html]] sayfasına git.",
+            "**CSV mi xlsx mi**: Excel'e götüreceksen xlsx seç, zaman sütununun biçimi bozulmaz; CSV daha evrensel ama Excel onu başka bir biçim gibi tanıyabilir, karşılaşırsan zaman sütununu Metin yap.",
+            "**ASS olmaz**: stil komutları taşıyan ASS'yi önce SRT'ye çevir, sonra tabloya geç."
+          ]
+        },
+        {
+          "h2": "İlgili",
+          "ps": [
+            "İki yönlü tam açıklama için [[Altyazı Excel/CSV dönüşümü nasıl kullanılır|/guides/table.html]]; düzeltince yabancı dile çevirmek için [[Altyazı çevirisi|/translate.html]]; teslim etmeden önce [[Altyazı kalite kontrolü|/qc.html]]'nden bir geç."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "tr": {
+      "seo": {
+        "title": "Toplu altyazı dönüşümü nasıl kullanılır – yüzlercesi tek ZIP – AI-SRTSub",
+        "desc": "Toplu altyazı dönüşümü: onlarca-yüzlerce SRT/VTT birlikte sürüklenir, tek hedef biçime çevrilir, tek ZIP olarak alınır. Numaralar yeniden sıralanır, tanınamayan dosya pakete girmez.",
+        "h1": "Toplu altyazı dönüşümü nasıl kullanılır",
+        "intro": "Bir sezonun onlarca altyazısını tek biçime getirmek gerekince tek tek yüklemek çok yavaş. Toplu dönüşüm sayfasına birlikte sürükle, tek hedef biçime çevir, tek ZIP olarak al — tanınamayan dosyalar ayrı işaretlenir, pakete karışmaz.",
+        "ctaText": "Toplu dönüşümü aç"
+      },
+      "body": [
+        {
+          "h2": "Bu araç neyi çözer",
+          "ps": [
+            "Bir sezonun, bir koleksiyonun altyazıları genelde kullanılmadan önce tek biçime getirilmek zorundadır. Toplu dönüşüm sayfasının yaptığı:"
+          ],
+          "ul": [
+            "Onlarca-yüzlerce SRT, VTT birlikte sürüklenir (tek seferde çoklu seçim)",
+            "Tek biçime çevirilir: SRT veya VTT; numaralar yeniden sıralanır, zaman damgaları hedef biçime göre normalleşir",
+            "Tek ZIP olarak indirilir, dosya adları aynı kalır sadece uzantı değişir",
+            "Altyazı kaydı tanınamayan dosyalar ayrı işaretlenir, pakete girmez"
+          ]
+        },
+        {
+          "h2": "Dosyaları ekle",
+          "ps": [
+            "Birden çok altyazı dosyasını birlikte kesikli çerçevenin içine sürükle ya da tıklayıp tek seferde çoklu seç. Dosya listesi tek tek sıralanır: tanınanların kayıt sayısı görünür, tanınamayanlar “tanınamadı” diye işaretlenir. Üstteki istatistik dosya sayısını, toplam kayıt sayısını ve tanınamayanların sayısını verir.",
+            "⚠️ Bu sayfa sadece UTF-8 ile okur. Kodlaması bozuk (ekran soru işareti veya kutu dolu) altyazıları önce [[Bozuk karakter onarımı|/repair.html]] sayfasında düzelt."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Dosya listesi: dosya adları ve kayıt sayıları tek tek, tanınamayanlar kırmızı işaretli",
+            "cap": "Liste tek tek sıralar, tanınamayanlar orada işaretlenir"
+          }
+        },
+        {
+          "h2": "Tek biçime çevirme",
+          "ps": [
+            "“Tek biçime çevir” içinden hedef biçimi seç — SRT veya VTT. Seçtikten sonra listedeki her dosya hedef biçime göre yeniden üretilir: numaralar baştan sıralanır, zaman damgaları hedef biçime göre normalleşir (SRT milisaniyeyi virgülle, VTT noktayla ayırır).",
+            "**Dosya adları aynı kalır, sadece uzantı değişir**; aynı adlılara otomatik sıra numarası eklenir, birbirini üzerine yazmaz."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Hedef biçim seçimi ve liste durumu, istatistik çubuğunda dosya ve kayıt sayısı",
+            "cap": "Hedef biçim seçildikten sonra liste yeni biçime göre yeniden üretilir, dosya adının sadece uzantısı değişir"
+          }
+        },
+        {
+          "h2": "Paketle ve indir",
+          "ps": [
+            "“Tek ZIP olarak indir”e tıkla, aldığın arşivde dönüşmüş dosyaların tamamı var. **Altyazı kaydı tanınamayan dosyalar pakete girmez** — listede işaretli kalırlar, başarılı gibi pakete sızmazlar. Paket hazır olunca toplam kaç dosya olduğu söylenir."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Paketleme alanı: ZIP indirme düğmesi ve paketleme sonucu bildirimi",
+            "cap": "Tanınamayan dosyalar pakete girmez, listede işaretli kalır"
+          }
+        },
+        {
+          "h2": "Ne zaman tanınamadı işareti konur",
+          "ps": [
+            "Dosyadan hiç altyazı kaydı okunamadığında “tanınamadı” işareti konur. Üç yaygın neden: dosya altyazı değil (örneğin araya karışmış bir .txt açıklama dosyası), kodlama UTF-8 değil (okunan her şey yedek karakter), ya da içerik zaman damgası olmadan tek paragraf hâline sıkıştırılmış.",
+            "İşaretlenen dosyalar tek tek ele alınabilir: kodlama sorunu için [[Bozuk karakter onarımı|/repair.html]], biçim sorunu için [[Biçim dönüşümü|/convert.html]] sayfasında tek dönüştür, sonra listeye geri koy."
+          ]
+        },
+        {
+          "h2": "Sık sorulanlar",
+          "ps": [
+            "**Bir seferde kaç dosya eklenebilir?** Sabit bir üst sınır yok, tarayıcı belleğine bağlı; birkaç yüz SRT genelde sorun olmaz.",
+            "**Diyalog içeriğim değişir mi?** Hayır. Toplu dönüşüm sadece kapsayıcı biçimi değiştirir, numaraları yeniden sıralar, zaman damgalarını normalleştirir; diyaloglara hiç dokunmaz.",
+            "**İçeriği değiştirmek istersem?** Bu sayfa sadece biçim dönüştürür. Zaman çizgisini toplu değiştirmek için [[Zaman çizgisi ayarı|/shift.html]], metni toplu değiştirmek için [[Terim değiştirme|/glossary.html]] var; ikisi de kendi sayfasında tek tek işler.",
+            "**ASS destekleniyor mu?** Bu sayfa sadece SRT ve VTT arasında dönüştürür. ASS stil taşır, [[Biçim dönüşümü|/convert.html]] ile tek tek çevir."
+          ]
+        },
+        {
+          "h2": "Gizlilik",
+          "ps": [
+            "Dönüşüm ve paketleme tamamen tarayıcıda yerel olarak yapılır, sunucuya hiçbir altyazı içeriği gönderilmez."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Bir sezonda neyin değişeceği ve hangi adımdan başlanacağı için [[Bir sezon altyazısı toplu nasıl düzeltilir|/guides/batch-convert-srt.html]]; tek dosyada daha çok biçim için [[Biçim dönüşümü|/convert.html]]; tabloda düzeltmek için [[Tablo dönüşümü|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "tr": {
+      "seo": {
+        "title": "Bir sezon altyazısını toplu düzeltme – yapılabilen ve yapılamayan – AI-SRTSub",
+        "desc": "Bir sezon altyazısında değişen genelde tek şeydir: biçim, zaman çizgisi kayması, terimler. Hangisi tek seferde bitirilir, hangisi tek tek ele alınmalı, tanınamayan dosya nasıl işlenir.",
+        "h1": "Bir sezon altyazısı toplu nasıl düzeltilir",
+        "intro": "Bir sezonun onlarca altyazısında değişen genelde tek şeydir. Neyin tek seferde bitirilebileceğini, neyin tek tek ele alınması gerektiğini ayırmak, hepsini tek tek göğüslemekten çok daha az iş çıkarır.",
+        "ctaText": "Toplu dönüşümü aç"
+      },
+      "body": [
+        {
+          "h2": "Değişen genelde tek şeydir",
+          "ps": [
+            "Bir sezon altyazısı bozulduğunda her bölümün ayrı bir derdi olduğu nadirdir — genelde aynı neden her bölüme düşmüştür: sezonun tamamını aynı altyazı grubu sıkıştırmıştır (biçim tek, filigran tek), sezonun tamamı aynı video sürümüne yapılmıştır (kayma yönü ve miktarı aynı), ya da sezon boyunca çeviri adları tutarsızdır.",
+            "Önce iki bölüm (biri baştan, biri sondan) çıkarıp bak, **aynı dert** olduğunu doğrula, sonra toplu işleme geç. Baş ve sondaki bölümün derdi farklıysa bu toplu çözülebilecek bir iş değil."
+          ]
+        },
+        {
+          "h2": "Tek seferde bitirilebilen",
+          "ps": [
+            "**Biçimi tek biçime getirmek** gerçekten tek seferde bitirilebilen tek iştir: onlarca-yüzlerce SRT, VTT birlikte [[Toplu dönüşüm|/batch.html]] sayfasına sürüklenir, hedef biçim seçilir, tek ZIP olarak alınır. Numaraların yeniden sıralanması ve zaman damgalarının normalleşmesi bu adımda tamamlanır, diyaloglara hiç dokunulmaz."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Toplu dönüşüm sayfasının dosya listesi: kayıt sayıları tek tek, tanınamayanlar kırmızı işaretli",
+            "cap": "Biçimi tek biçime getirmek tek seferde bitirilebilen tek iş"
+          }
+        },
+        {
+          "h2": "Tek tek ele alınması gerekenler",
+          "ps": [
+            "Aşağıdakilerin toplu girişi yok, tek tek geçmek gerekir — ama genelde **bir kez yapılıp tüm sezona uygulanan** eşdeğer işlemleri var:"
+          ],
+          "ul": [
+            "**Zaman çizgisi kaymasını tek biçime getirmek**: her bölümde kayma aynıysa [[Zaman çizgisi ayarı|/shift.html]] sayfasında bir bölümün kaymasını ölç, o sayıyı not et, kalan bölümlere aynı sayıyı yaz",
+            "**Terimleri tek biçime getirmek**: terim listesi [[Terim değiştirme|/glossary.html]] sayfasında bir kez yapılandırılır, her altyazıya aynı liste uygulanır",
+            "**Filigranı tek biçime getirmek**: filigran kuralı sabittir, [[Altyazı temizleme|/clean.html]] sayfasındaki varsayılan seçimler yaygın filigranları kapsar, dosyaları tek tek sürüklemen yeter"
+          ]
+        },
+        {
+          "h2": "Sırayı ters çevirme",
+          "ps": [
+            "Birkaç iş birlikte yapılacaksa sıra yanlış olursa iş geri döner. Şu sırayla git:",
+            "**Önce kodlamayı düzelt** → **sonra biçimi tek biçime getir** → **sonra içerik değişikliklerini yap** (filigran, terim, zaman çizgisi) → **en son kalite kontrolü**. Kodlama düzeltilmeden biçim değiştirilirse okunan hâlâ bozuktur; biçim tek biçime getirilmeden içerik değiştirilirse farklı biçimlerde araçların desteklediği kapsam aynı olmaz."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Paketleme alanı: ZIP indirme düğmesi ve sonuç bildirimi",
+            "cap": "Biçimi tek biçime getirmek öne alınır, içerik değişiklikleri sonra"
+          }
+        },
+        {
+          "h2": "Tanınamayan dosya nasıl işlenir",
+          "ps": [
+            "Toplu dönüşümde “tanınamadı” işareti alan dosyalar ZIP'e girmez, listede kalır. Üç yaygın neden: altyazı dosyası değil (araya karışmış açıklama dosyası), kodlama UTF-8 değil, içerik zaman damgası olmadan tek paragraf hâline sıkıştırılmış.",
+            "Kodlama sorunu için [[Bozuk karakter onarımı|/repair.html]] sayfasında tek düzelt; biçim sorunu için [[Biçim dönüşümü|/convert.html]] sayfasında tek dönüştür, sonra listeye geri koy. **Sayıyı tamamlamak için tanınamayanı zorla pakete sokma** — eksik bir bölümü oynatıcıda fark etmek, şimdi bir dakika fazla harcamaktan çok daha büyük derttir."
+          ]
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Toplu dönüşümün tam kullanımı için [[Toplu dönüşüm nasıl kullanılır|/guides/batch.html]]; zaman çizgisinin tek kaymaya getirilmesi için [[Zaman çizgisi ayarı nasıl kullanılır|/guides/shift.html]]; teslim etmeden önce [[Altyazı kalite kontrolü|/qc.html]]'nden bir geç."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "tr": {
+      "seo": {
+        "title": "23.976 / 24 / 25 / 30 fps nedir – altyazı zaman çizgisi – AI-SRTSub",
+        "desc": "23.976, 24 değildir; 29.97, 30 değildir: aradaki yüzde 0,1 NTSC'nin renklenmesinden gelir. PAL bölgesinde 25 ile yayın filmi yüzde 4 hızlandırır. Bu sayılar altyazı zaman çizgisini nasıl etkiler.",
+        "h1": "23.976 / 24 / 25 / 30 fps nedir",
+        "intro": "23.976 ile 24 arasındaki yüzde 0,1, televizyon tarihinden kalan bir kuyruktur. PAL'in yüzde 4'üyle birleştiğinde, altyazının ilerledikçe kaymasının kökü budur.",
+        "ctaText": "Zaman çizgisi ayarını aç"
+      },
+      "body": [
+        {
+          "h2": "Bu dört sayı nedir",
+          "ps": [
+            "Kare hızı bir saniyede kaç kare gösterildiğidir. Yaygın dört tanesi:"
+          ],
+          "ul": [
+            "**24 fps** — filmin çekim ve gösterim hızı, sinema 24'tür",
+            "**23.976 fps** — film NTSC standardındaki televizyona girdikten sonraki hızı, 24'ten yüzde 0,1 yavaş",
+            "**25 fps** — PAL standardının (Avrupa, Çin, Avustralya gibi 50 Hz şebeke bölgeleri) televizyon hızı",
+            "**29.97 fps / 30 fps** — NTSC televizyon programlarının hızı, yine o yüzde 0,1 fark"
+          ]
+        },
+        {
+          "h2": "Yüzde 0,1 nereden geliyor",
+          "ps": [
+            "23.976 = 24 × 1000/1001, 29.97 = 30 × 1000/1001. Bu 1000/1001, NTSC renklendirilirken kalmıştır: mevcut siyah-beyaz alıcıları değiştirmeden renk alt taşıyıcısını sığdırmak için alan frekansı 60 Hz'den 59.94 Hz'e (60 × 1000/1001) çekildi, kare hızı da onunla birlikte düştü.",
+            "Sonuç: film NTSC bölgesinde yayınlanırken 24 değil 23.976'dır. Yüzde 0,1 fark bir saatlik filmde 3,6 saniye eder — tek başına neredeyse farkedilmez, ama aşağıdaki yüzde 4 ile aynı şey değildir, ikisini karıştırıp hesaplama."
+          ]
+        },
+        {
+          "h2": "Yüzde 4 nereden geliyor",
+          "ps": [
+            "PAL bölgesinde 25 fps ile yayın yapılır. Film 24 fps çekilmiştir, doğrudan 25 ile oynatılır — kare sayısı hiç değişmez, oynatma hızı yüzde 4 artar (25/24 ≈ 1,0417). 100 dakikalık bir film, PAL sürümünde 96 dakikadır.",
+            "**Aşamalı kaymanın** kökü budur: altyazı orijinaline göre yapılmış, video PAL sürümü; başta kusursuz, film sonunda 4 dakika fark. Tümünü kaydırmak kurtarmaz, orana göre çevirmek gerekir."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Zaman çizgisi ayarı sayfasının hız ayarı alanı: oran giriş kutusu",
+            "cap": "Orana göre çevir, tek oran değeri tüm filmde geçerli"
+          }
+        },
+        {
+          "h2": "Nasıl çevrilir",
+          "ps": [
+            "Çevirmek bir oran değeriyle çarpmaktır, tüm filmde geçerlidir:"
+          ],
+          "ul": [
+            "**24 → 25** (PAL hızlanması): × 0,96",
+            "**23.976 → 25**: × 0,959 (kesin değer 23.976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 veya × 0,999, sadece yüzde 0,1 fark",
+            "0,96 ile 0,959 arasında yüzde 0,1 var, bütün bir filmde 6 saniyeden az — kaynağın 24 mü 23.976 mı olduğundan emin değilsen 0,96 da iş görür, kalan sapma iki noktayla sabitlemede kapanır"
+          ]
+        },
+        {
+          "h2": "Elindekinin hangisi olduğunu nasıl anlarsın",
+          "ps": [
+            "Oranı tahmin etmek istemiyorsan doğru olduğundan emin olduğun iki zaman noktası bul — genelde ilk diyalog ve son diyalog — araca bu cümle 00:00:12'de, şu cümle 01:35:40'ta olmalı de, o iki noktaya göre tüm filmi doğrusal olarak gerer. Buna iki noktayla sabitleme denir, kare hızını hesaplaman gerekmez.",
+            "Kaynağın kare hızını kendin doğrulamak istersen: oynatıcıda veya medya bilgisi aracında yazar. Dosya adı `1080p.WEB` gibi kare hızı bilgisi içermiyorsa iki noktayla sabitleme daha güvenlidir."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Zaman çizgisi ayarı sayfasının iki noktayla sabitleme alanı: üst ve alt iki zaman noktası girişi",
+            "cap": "İki noktayla sabitleme kare hızı hesabı istemez, iki zaman noktası yeter"
+          }
+        },
+        {
+          "h2": "İlgili araçlar ve kılavuzlar",
+          "ps": [
+            "Kare hızı çevirimini doğrudan yapmak için [[Altyazı kare hızı dönüşümü|/guides/srt-fps-converter.html]]; hız ayarı için [[Altyazı hız ayarı|/guides/subtitle-speed-converter.html]]; tümünün mü kaydığı yoksa aşamalı mı kaydığı ayrımı için [[Altyazı ilerledikçe kayıyor|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

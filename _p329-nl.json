@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "nl": {
+      "seo": {
+        "title": "Ondertitels samenvoegen en stylen – Samenvoegen, stijl – AI-SRTSub",
+        "desc": "Twee bestanden samenvoegen tot één tweetalig spoor, een bestaand tweetalig bestand ombouwen of een eentalig bestand stylen: koppelmodi, ASS- en VTT-sjablonen en het juiste exportformaat.",
+        "h1": "Tweetalige ondertitels samenvoegen en effecten toepassen",
+        "intro": "Combineer twee bestanden tot één tweetalig spoor, of style ondertitels direct: lettertype, kleur, contour en positie in WYSIWYG, en de voorbeeldweergave komt overeen met de export.",
+        "ctaText": "Effectondertitel-tool openen"
+      },
+      "body": [
+        {
+          "h2": "Wat deze tool doet",
+          "ps": [
+            "Deze ene pagina dekt drie taken: een origineel en een vertaling samenvoegen tot één tweetalig bestand, de volgorde en stijl van een al tweetalig bestand aanpassen, en een eentalig bestand effecten geven. Alle drie delen dezelfde stijlparameters en dezelfde voorbeeldweergave."
+          ],
+          "ul": [
+            "**Twee bestanden samenvoegen** — je hebt het origineel en de vertaling; maak er één tweetalig bestand van en exporteer.",
+            "**Tweetalig bestand aanpassen** — het is al tweetalig, maar volgorde of stijl klopt niet; zet het opnieuw in elkaar.",
+            "**Eentalig bestand** — maar één bestand; geef het een lettertype, contour en positie.",
+            "Wisselen tussen de drie doe je met de tabbladen links; stijlgebied en voorbeeld zijn gedeeld."
+          ]
+        },
+        {
+          "h2": "Drie taken, één pagina",
+          "ps": [
+            "Boven aan de pagina staan drie tabbladen: **Twee bestanden samenvoegen**, **Tweetalig bestand aanpassen**, **Eentalig bestand**. Je keuze bepaalt hoeveel invoerkolommen links verschijnen.",
+            "Bij samenvoegen staan links twee kolommen, ‘1 Originele ondertitels’ en ‘2 Vertaalde ondertitels’; elk neemt een geüpload bestand of direct geplakte tekst aan. Aanpassen en stylen hebben maar één kolom nodig."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "De drie tabbladen boven in de effectondertitel-tool en het invoergebied links",
+            "cap": "Drie tabbladen boven; bij ‘Twee bestanden samenvoegen’ verschijnen links een origineel- en een vertaalkolom"
+          }
+        },
+        {
+          "h2": "Hoe twee bestanden worden gekoppeld",
+          "ps": [
+            "Het eerste item onder ‘3 Samenvoeginstellingen’ is de koppelmodus: **Op volgorde · tijdlijn van het origineel**, **Op tijdlijn · tijdlijn van het origineel**, **Op volgorde · tijdlijn van de vertaling**.",
+            "Hebben beide bestanden evenveel items in dezelfde volgorde, dan is koppelen op volgorde het veiligst. Wijkt het aantal af (de ene kant heeft items samengevoegd, de andere gesplitst), koppel dan op tijdlijn en laat de tool op nabijheid matchen. Welke tijdlijn je gebruikt, hangt af van welk bestand nauwkeuriger is — meestal het origineel.",
+            "Daaronder staan tekststructuur (automatisch herkennen / twee regels per item / afwisselende paren) en volgorde (origineel boven / vertaling boven)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Koppelmodus, tekststructuur en volgorde onder samenvoeginstellingen",
+            "cap": "De koppelmodus bepaalt wat bij wat hoort, en hier kies je ook welke tijdlijn geldt"
+          }
+        },
+        {
+          "h2": "De stijl item voor item aanpassen",
+          "ps": [
+            "Het stijlgebied staat rechts. Bij ASS-export geldt ‘ASS-uiterlijk’: indeling (gesplitst · boven en onder gescheiden / gestapeld · twee regels onderaan), grootte, kleur, dekking, lettertype, vet, cursief, letterafstand, contour, contourkleur, schaduw/achtergrond (geen / schaduw / achtergrond), diepte, randkleur, randdekking, horizontale uitlijning (onder · links / onder · midden / onder · rechts) en afstand tot de onderkant van de vertaalregel (primair), plus lettertype, schaduw/achtergrond en linker/rechter marge van de originele regel (secundair).",
+            "Bij export van tweetalige VTT-stijl geldt ‘WebVTT-stijl’: bovenop zes voorinstellingen (standaard / compact / filmisch / boven / toegankelijk / staand) kun je de verticale line, het anker (onder / boven / midden), de horizontale position, de breedte size, de uitlijning align en de regelhoogte van de hele cue wijzigen, plus de achtergrondkleur, achtergronddekking en contourdikte van de vertaalregel; de originele regel kan de hoofdstijl erven of apart worden ingesteld.",
+            "Het resultaat kun je opslaan als voorinstelling en later hergebruiken via ‘Uit opgeslagen voorinstellingen’ en ‘Toepassen’."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "De parameters van het ASS-uiterlijk-gebied rechts",
+            "cap": "Grootte, kleur, contour, schaduw/achtergrond en uitlijning zijn apart instelbaar, en het resultaat kan als voorinstelling worden opgeslagen"
+          }
+        },
+        {
+          "h2": "Het voorbeeld bekijken vóór de export",
+          "ps": [
+            "‘Samenvoegvoorbeeld’ is een tabel: nr., tijd, origineel, vertaling, stijl. De balk erboven filtert verdachte regels op ‘met geluidseffecten’, ‘met sprekerprefix’, ‘korter dan 1 seconde’, ‘meer dan twee regels’ en ‘leessnelheid overschreden’, of op een getypt trefwoord.",
+            "Een klik op de stijlslot van een regel opent de editor ervan en toont alleen de regels die hem gebruiken; ‘Alle overschrijvingen opheffen’ zet elke handmatige wijziging terug naar het sjabloon. Het tijdlijngebied eronder regelt een globale verschuiving (vanaf een bepaalde cue) en proportionele schaling.",
+            "Ziet het er goed uit, ga dan naar ‘4 Exporteren’: het bestand downloaden of de inhoud kopiëren."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "De tabel van het samenvoegvoorbeeld en de filterbalk",
+            "cap": "Het voorbeeld is de export; filter verdachte regels op type of klap één stijlslot open"
+          }
+        },
+        {
+          "h2": "Wat onaangeroerd blijft",
+          "ps": [
+            "Stijl verandert alleen het uiterlijk, nooit de dialoog. De tekst van origineel en vertaling wordt tijdens het samenvoegen geen letter veranderd; tenzij je die bewust wijzigt in het gebied onder het voorbeeld, komt de tijdlijn uit het gekozen bestand.",
+            "Bij export als SRT of ‘VTT zonder stijl’ wordt geen stijlinformatie in het bestand geschreven — de pagina meldt dat de VTT geen STYLE-blok heeft en dat de speler het standaarduiterlijk gebruikt. Wil je stijl, kies tweetalige VTT of ASS."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Wat als de twee bestanden verschillende aantallen items hebben?** Gebruik ‘Op tijdlijn’; de tool matcht op nabijheid en verzint geen items die hij niet kan koppelen.",
+            "**Wat als een speler de stijl van een geëxporteerde ASS negeert?** De stijlen staan in het bestand, maar ASS-ondersteuning verschilt per speler. Wil je een draagbaarder uiterlijk, exporteer dan tweetalige VTT.",
+            "**Hoe kom ik terug bij het beginsjabloon na geknoei?** ‘Standaardparameters herstellen’ in het ASS-gebied en ‘Sjabloonstandaard herstellen’ in het VTT-gebied zetten elk hun eigen deel terug.",
+            "**Wat zijn de zeven regels in het voorbeeld?** Een ingebouwd voorbeeld, alleen om te zien hoe een samenvoeging eruitziet; het is niet exporteerbaar. Upload je eigen ondertitels en klik op het voorbeeld, dan wordt het automatisch vervangen."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Ondertitels worden volledig in de browser verwerkt: niets wordt geüpload en niets gaat via een server. Sluit de browser en alles van die sessie is weg."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Om een tweetalig bestand weer in twee sporen te splitsen gebruik je [[Tweetalig splitsen|/bilingual.html]]; de omgekeerde weg van één taal naar tweetalig staat in [[Twee manieren om tweetalige ondertitels te maken|/guides/make-bilingual-subtitles.html]]; laat het resultaat door [[Ondertitel-QC|/qc.html]] gaan; voor een heel seizoen in één keer [[Batchconversie|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "nl": {
+      "seo": {
+        "title": "Platte tekst uit ondertitels halen – AI-SRTSub",
+        "desc": "De tekstextractor in detail: doorlopende alinea's of één regel per cue, en wat de vijf schakelaars voor SDH-aanwijzingen, watermerken, duplicaten, sprekerprefixen en songtekst weghalen.",
+        "h1": "Platte tekst uit ondertitels halen",
+        "intro": "Haal de dialoog uit een ondertitelbestand als schone platte tekst: nummers, tijdlijnen en stijltags verdwijnen vanzelf, en het resultaat leest als een artikel of dient als dialooglijst.",
+        "ctaText": "Tekstextractor openen"
+      },
+      "body": [
+        {
+          "h2": "Wat deze tool doet",
+          "ps": [
+            "Van een ondertitelbestand is alleen de dialoog interessant voor een lezer; de rest is structuur voor de speler — nummers, tijdlijnen en stijltags. Deze pagina haalt de structuur weg en houdt de woorden."
+          ],
+          "ul": [
+            "**Als artikel lezen** — doorlopende alinea's, afgebroken bij pauzes en eindpunctuatie.",
+            "**Als lijst gebruiken** — één regel per cue, één ondertitel per regel, handig voor een dialoogblad of als invoer voor een andere tool.",
+            "**Onderweg opschonen** — SDH-aanwijzingen, watermerken en dubbele buren verdwijnen standaard.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — alle zes formaten worden herkend."
+          ]
+        },
+        {
+          "h2": "Erin leggen, niet alleen uploaden",
+          "ps": [
+            "De kolom ‘1 Ondertitels toevoegen’ links neemt een geüpload bestand aan, en je kunt de inhoud ook direct in het tekstvak plakken. Verkeerd bestand? Klik ‘Wissen’ en begin opnieuw.",
+            "Deze pagina leest bestanden als UTF-8. Openen de ondertitels als een muur van vraagtekens of blokjes, dan is de codering stuk — converteer naar UTF-8 in [[Herstel van onleesbare tekst|/repair.html]] en kom terug."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Het gebied om ondertitels toe te voegen in de tekstextractor",
+            "cap": "Upload een bestand, of plak de ondertitelinhoud direct in het vak"
+          }
+        },
+        {
+          "h2": "Kiezen tussen de twee indelingen",
+          "ps": [
+            "Boven ‘2 Extractieopties’ staat de indeling: **Doorlopende alinea's** breekt de tekst bij pauzes en eindpunctuatie, zodat hij als artikel leest; **Eén regel per cue** geeft één regel per ondertitel, één op één met de items van het bronbestand.",
+            "Dialoog overnemen voor notities, vertalen oefenen of als proza lezen vraagt doorlopende alinea's; een dialoogblad maken, regel voor regel met het origineel vergelijken of een andere tool voeden vraagt één regel per cue."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "De indeling en opschoningsschakelaars onder extractieopties",
+            "cap": "Kies één indeling; de vijf schakelaars eronder bepalen welk soort inhoud verdwijnt"
+          }
+        },
+        {
+          "h2": "Wat elk van de vijf opschoningen weghaalt",
+          "ps": [
+            "**SDH-aanwijzingen verwijderen**: wist geluidsbeschrijvingen tussen haakjes zoals ‘(voetstappen)’ of ‘[muziek]’ en houdt de dialoog.",
+            "**Watermerken en advertenties verwijderen**: gooit regels als fansub-credits, URL's en kanaalnamen weg.",
+            "**Dubbele buren verwijderen**: staat dezelfde zin twee keer direct achter elkaar (een afspeelfout), dan blijft er één; duplicaten verder uit elkaar hebben betekenis en blijven.",
+            "**Sprekerprefixen verwijderen**: ‘JOHN: Hallo’ wordt ‘Hallo’. Standaard uit — scripttekst heeft de spreker nodig.",
+            "**Songtekstregels overslaan**: regels die alleen ‘♪ … ♪’ zijn, worden overgeslagen. Standaard uit — songtekst is ook tekst."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "De vijf opschoningsschakelaars en hun beschrijvingen onder extractieopties",
+            "cap": "Elke schakelaar zegt rechts wat hij weghaalt; vink aan wat je nodig hebt"
+          }
+        },
+        {
+          "h2": "Het resultaat meenemen",
+          "ps": [
+            "De kolom ‘3 Resultaat’ rechts toont de geëxtraheerde tekst live en rekent direct opnieuw zodra je een optie wijzigt.",
+            "Klopt het, klik ‘Downloaden’ voor een .txt of ‘Kopiëren’. Voor talen die woorden niet met spaties scheiden, zoals Chinees en Japans, gelden andere regels voor het samenvoegen van regels, en de tool regelt dat automatisch per taal."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Het resultaatgebied met de knoppen voor downloaden en kopiëren",
+            "cap": "Het resultaat werkt live bij; download het als txt of kopieer het direct"
+          }
+        },
+        {
+          "h2": "Wat onaangeroerd blijft",
+          "ps": [
+            "De dialoog zelf wordt niet herschreven. De opschoningsschakelaars bepalen alleen welke hele regels of blokken wegvallen; ze veranderen nooit de formulering van een item.",
+            "Tijdlijnen en nummers worden simpelweg niet uitgevoerd, niet eerst gewijzigd en dan uitgevoerd — het bronbestand blijft ongemoeid, en deze pagina biedt geen export met tijdlijn. Dat hoort bij [[Formaatconversie|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Blijven ASS-stijltags in de tekst staan?** Nee. De `{}`-overschrijvingsblokken van ASS worden verwijderd en alleen de dialoog blijft over.",
+            "**Komt een tweetalig bestand er als twee regels of één uit?** Met zoveel regels als het item had; deze pagina voegt niet samen en splitst niet — om te splitsen gebruik je [[Tweetalig splitsen|/bilingual.html]].",
+            "**Waarom blijven sprekerprefixen standaard staan?** De naam in ‘JOHN: Hallo’ is vaak nuttige informatie (scripts, dialoogbladen); haal je die weg, dan is moeilijk te zien wie er praat, dus de keuze is aan jou.",
+            "**Kunnen LRC-songbestanden ook worden geëxtraheerd?** Ja. LRC-tijdstags worden verwijderd en de songtekstregels blijven; wil je geen songtekst, vink ‘Songtekstregels overslaan’ aan."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Ondertitels worden volledig in de browser verwerkt: niets wordt geüpload en niets gaat via een server. De tekst blijft alleen op de huidige pagina en verdwijnt bij verversen."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Wil je begrijpen wat er echt in een ondertitelbestand staat, zie [[Wat staat er in een SRT-bestand|/guides/srt-file-format.html]]; moet de geëxtraheerde dialoog vertaald worden, ga naar [[Ondertitelvertaling|/translate.html]]; als tabel gebruik je [[Ondertitels naar Excel/CSV|/guides/srt-to-excel.html]]; en laat [[Ondertitel-QC|/qc.html]] eroverheen gaan vóór je iets oplevert."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "nl": {
+      "seo": {
+        "title": "Ondertitels splitsen en samenvoegen – Knippen per blok – AI-SRTSub",
+        "desc": "Splitsen en samenvoegen in detail: één bestand in segmenten knippen op duur of aantal items, elk segment bij nul laten starten, meerdere bestanden op volgorde aaneenrijgen of op tijdlijn verweven.",
+        "h1": "Ondertitels splitsen en samenvoegen",
+        "intro": "Knip één lang bestand in segmenten, of voeg meerdere losse bestanden samen tot één. De knip valt altijd op een itemgrens — een zin wordt nooit doormidden geknipt.",
+        "ctaText": "Splitsen en samenvoegen openen"
+      },
+      "body": [
+        {
+          "h2": "Wat deze tool doet",
+          "ps": [
+            "Bij het splitsen van afleveringen, segmenteren en combineren van bronnen passen ondertitelblokken nooit op videoblokken: of één bestand moet worden geknipt, of meerdere moeten er één worden. Deze pagina doet beide, elk met een eigen tabblad."
+          ],
+          "ul": [
+            "**Splitsen** — één lang bestand in segmenten knippen op duur of aantal items.",
+            "**Samenvoegen** — meerdere bestanden op volgorde aaneenrijgen tot één aflevering, of op tijdlijn verweven.",
+            "**Alleen knippen op itemgrenzen** — een zin wordt nooit in tweeën geknipt.",
+            "**Nummers automatisch hernummerd** — na het samenvoegen niets handmatig nummeren, en geen woord dialoog verandert."
+          ]
+        },
+        {
+          "h2": "Eerst kiezen: splitsen of samenvoegen",
+          "ps": [
+            "Twee tabbladen boven: **Splitsen: één bestand in segmenten** en **Samenvoegen: meerdere bestanden tot één**. De opties van stap twee eronder veranderen mee.",
+            "In ‘1 Ondertitels toevoegen’ upload je een bestand of plak je tekst; verkeerd? ‘Wissen’. Deze pagina leest alleen UTF-8 — is de codering stuk (een muur van vraagtekens of blokjes), ga dan eerst naar [[Herstel van onleesbare tekst|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "De twee tabbladen boven op de pagina splitsen en samenvoegen",
+            "cap": "Splitsen en samenvoegen zijn twee tabbladen; de opties van stap twee volgen je keuze"
+          }
+        },
+        {
+          "h2": "Hoe je knipt",
+          "ps": [
+            "Kies onder ‘2 Hoe splitsen’ de basis: **duur** (elke X minuten een segment) of **aantal items** (elk X items een segment), en vul een getal in.",
+            "Vink ‘Elk segment bij 0:00 laten starten’ aan en elk segment telt vanaf nul — handig als je afleveringen uploadt en elk segment apart aan een speler geeft. Zonder vinkje blijven de originele tijdstempels staan en past elk segment nog bij zijn positie in de bronvideo.",
+            "De knip valt alleen op itemgrenzen: wanneer een zeer lange ondertitel het knipunt overschrijdt, blijft het hele item in het eerdere segment."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "De opties voor duur en aantal items met de schakelaar voor starten bij nul",
+            "cap": "Knip op duur of aantal items, en laat elk segment eventueel bij 0:00 beginnen"
+          }
+        },
+        {
+          "h2": "Hoe je samenvoegt",
+          "ps": [
+            "Kies onder ‘2 Hoe samenvoegen’ de methode: **Op volgorde aaneenrijgen** verschuift het latere bestand zodat het begint na het einde van het eerdere, zonder overlap; **Op tijdlijn verweven** behoudt de originele tijdstempels van elk bestand en sorteert op starttijd.",
+            "Gebruik aaneenrijgen als de bestanden de eerste en tweede helft van één aflevering zijn, of als apart nagekeken helften weer bij elkaar moeten; gebruik verweven als de bestanden samen op het scherm horen, zoals een origineel spoor en een vertaald spoor.",
+            "Na het samenvoegen worden de nummers automatisch hernummerd en verandert geen woord dialoog."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "De opties Op volgorde aaneenrijgen en Op tijdlijn verweven op de samenvoegpagina",
+            "cap": "Aaneenrijgen past bij twee helften van een aflevering, verweven bij een origineel en een vertaald spoor"
+          }
+        },
+        {
+          "h2": "Het resultaat meenemen",
+          "ps": [
+            "‘3 Resultaat’ rechts exporteert **SRT** en **VTT**; klik ‘Downloaden’ of ‘Kopiëren’.",
+            "Bij splitsen is er ‘Alle segmenten downloaden’, dat elk geknipt segment in één keer opslaat in plaats van één klik per segment."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "De formaatkeuze SRT/VTT met knoppen voor downloaden en alle segmenten",
+            "cap": "Splitsresultaten zijn per segment te downloaden; een samengevoegd bestand download of kopieer je direct"
+          }
+        },
+        {
+          "h2": "Wat onaangeroerd blijft",
+          "ps": [
+            "Geen letter van de dialoog verandert. Deze pagina wijzigt alleen bij welk segment een item hoort en hoe er genummerd wordt; de inhoud van de items blijft zoals hij is.",
+            "Met ‘Op volgorde aaneenrijgen’ worden de tijdstempels van de latere bestanden in hun geheel verschoven — dat vraagt het samenvoegen; met ‘Op tijdlijn verweven’ blijven alle originele tijdstempels behouden."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Wat als het laatste segment erg kort wordt?** Dat is normaal. De rest die geen vol segment vult, wordt een eigen segment in plaats van opgevuld.",
+            "**Wordt een zin die over het knipunt valt doormidden geknipt?** Nee. Knippen gebeurt alleen op itemgrenzen, en een item dat de grens overschrijdt blijft in het eerdere segment.",
+            "**Hoe worden na verweven twee items met dezelfde tijd gesorteerd?** Op starttijd; bij gelijke starttijd blijft de volgorde waarin je de bestanden hebt toegevoegd.",
+            "**Kan ASS gesplitst worden?** Deze pagina doet SRT en VTT. Converteer ASS eerst naar SRT of VTT met [[Formaatconversie|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Ondertitels worden volledig in de browser verwerkt: niets wordt geüpload en niets gaat via een server. Sluit de pagina en de inhoud is weg."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Om twee bestanden tot één tweetalig spoor te maken (niet tot één aflevering) gebruik je [[Tweetalig samenvoegen en effecten|/guides/merge.html]]; staat de hele tijdlijn scheef, [[Tijdlijn aanpassen|/shift.html]]; voor een heel seizoen [[Batchconversie|/batch.html]]; en laat [[Ondertitel-QC|/qc.html]] er op het eind overheen gaan."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "nl": {
+      "seo": {
+        "title": "LRC-teksten syncen – Nummer laden, tekst plakken, meetikken – AI-SRTSub",
+        "desc": "De sync-tool in detail: een nummer laden, de tekst plakken, per regel een tijdstip meetikken en LRC of SRT exporteren. Spatie speelt, Enter stempelt, Z maakt ongedaan, handen op het toetsenbord.",
+        "h1": "De tool voor songtekst-sync gebruiken",
+        "intro": "Laad een nummer, plak de tekst, tik per regel een tijdstip terwijl je luistert, en exporteer standaard-LRC of SRT. De audio speelt lokaal en wordt nooit geüpload.",
+        "ctaText": "Sync-tool openen"
+      },
+      "body": [
+        {
+          "h2": "Wat deze tool doet",
+          "ps": [
+            "Geef een nummer een tekstbestand waarop je kunt meezingen: één regel per songtekstregel, elk met een tijdstip. Spelers lezen LRC, ondertitelsporen lezen SRT, en beide zijn hier te exporteren."
+          ],
+          "ul": [
+            "**Vanaf nul beginnen** — plak platte tekst en tik mee terwijl je luistert.",
+            "**Bestaand repareren** — importeer een bestaande LRC en ga verder vanaf de eerste regel zonder tijd.",
+            "**Twee formaten exporteren** — LRC voor spelers, SRT voor videosporen.",
+            "**Alles met het toetsenbord** — spatie speelt en pauzeert, Enter stempelt de huidige regel, Z maakt ongedaan."
+          ]
+        },
+        {
+          "h2": "1 Het nummer laden",
+          "ps": [
+            "De eerste kolom links neemt een audiobestand aan: **MP3, M4A, FLAC, WAV en OGG** werken allemaal. De audio speelt lokaal en wordt nooit geüpload.",
+            "De audiokwaliteit beïnvloedt de nauwkeurigheid niet, maar een bron met heldere zang is makkelijker te volgen; live-versies en bronnen met te harde begeleiding zijn duidelijk lastiger te syncen."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Het gebied om een nummer te laden in de sync-tool",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG werken allemaal, en de audio speelt alleen lokaal"
+          }
+        },
+        {
+          "h2": "2 De tekst plakken",
+          "ps": [
+            "Plak de tekst in de tweede kolom, **één regel per songtekstregel**; lege regels worden overgeslagen. Klik daarna op ‘Tekst analyseren’.",
+            "Een bestaande LRC plakken werkt ook — de `[mm:ss.xx]`-tijdstags worden herkend, en na het importeren ga je verder vanaf de eerste regel zonder tijd, zodat al getimede regels niet opnieuw hoeven."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Het gebied om de tekst te plakken en de knop om te analyseren",
+            "cap": "Plak één regel per songtekstregel, of plak een hele LRC en laat de tool de bestaande tijden lezen"
+          }
+        },
+        {
+          "h2": "3 Meetikken terwijl je luistert",
+          "ps": [
+            "Speel het nummer en druk op Enter op het moment dat een regel begint (of klik ‘Deze regel stempelen’); de tijd wordt vastgelegd en de cursor springt naar de volgende.",
+            "Sneltoetsen: **spatie** speelt en pauzeert, **Enter** stempelt de huidige regel, **Z** maakt één regel ongedaan. Enter indrukken tijdens het afspelen werkt het soepelst — geen heen en weer tussen muis en toetsenbord.",
+            "Verkeerde regel? Druk op Z om hem ongedaan te maken en stempel opnieuw. Wil je een regel helemaal niet stempelen (een interlude, een puur muzikaal stuk), klik ‘Deze regel overslaan’ — hij komt niet in de export."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "De knoppen afspelen, deze regel stempelen, één regel ongedaan maken en deze regel overslaan",
+            "cap": "Spatie speelt en pauzeert, Enter stempelt de huidige regel, Z maakt ongedaan — handen blijven op het toetsenbord"
+          }
+        },
+        {
+          "h2": "4 Exporteren",
+          "ps": [
+            "De vierde kolom exporteert: **LRC downloaden** voor spelers, **SRT downloaden** voor videosporen, of ‘Kopiëren’ om de tekst direct mee te nemen.",
+            "Alleen regels met een tijd worden geëxporteerd; overgeslagen regels komen nooit in het bestand. In de SRT-export duurt elke regel tot de volgende begint, en de laatste valt terug op 2 seconden."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "De knoppen LRC downloaden, SRT downloaden en Kopiëren in het exportgebied",
+            "cap": "LRC voor spelers, SRT voor video; alleen regels met een tijd worden geëxporteerd"
+          }
+        },
+        {
+          "h2": "Wat onaangeroerd blijft",
+          "ps": [
+            "De songtekst wordt niet herschreven. Syncen voegt alleen één tijdstip per regel toe en raakt de geplakte woorden niet aan.",
+            "Bij het importeren van een bestaande LRC houden regels met een tijdstip hun originele tijd, en stempel je alleen vanaf de eerste regel zonder tijd."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Waarom ontbreken er regels in de export?** Overgeslagen regels en regels zonder tijd komen nooit in het bestand. Ga terug naar stap drie om ze toe te voegen, of bevestig dat ze overgeslagen moesten worden.",
+            "**Kunnen de tijden achteraf worden aangepast?** Wil je na het stempelen alles een stukje verschuiven, exporteer SRT en gebruik [[Tijdlijn aanpassen|/shift.html]] om het geheel te verschuiven of te schalen.",
+            "**LRC of SRT?** LRC voor muziekspelers (foobar2000, streamingclients, diverse spelers); SRT als de tekst op video moet of verder verwerkt wordt met ondertiteltools.",
+            "**Hoe lang duurt één nummer?** Dat hangt af van het aantal regels en de gewenste nauwkeurigheid. Bij dertig tot veertig regels is een doorloop in een paar minuten klaar als je de slag te pakken hebt; woordnauwkeurig werken duurt langer."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Audio en tekst worden volledig in de browser verwerkt: niets wordt geüpload en niets gaat via een server. De audio wordt alleen lokaal gedecodeerd en afgespeeld."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Heb je al een LRC en wil je ondertitels, zie [[LRC naar SRT|/guides/lrc-to-srt.html]]; voor de methode en valkuilen van syncen, [[Hoe sync je LRC-songteksten|/guides/how-to-make-lrc-file.html]]; staat de geëxporteerde SRT scheef, [[Tijdlijn aanpassen|/shift.html]]; en laat het resultaat door [[Ondertitel-QC|/qc.html]] gaan."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "nl": {
+      "seo": {
+        "title": "Ingesloten video-ondertitels eruit halen – MKV / MP4-sporen – AI-SRTSub",
+        "desc": "Ingesloten ondertitels in detail: lees de sporen in MKV, WebM, MP4 en MOV direct uit en exporteer SRT / VTT / ASS / TXT. Geen upload, geen transcodering, alle taalsporen vermeld.",
+        "h1": "Ondertitels uit een video halen die erin zijn ingesloten",
+        "intro": "Lees het ondertitelspoor dat in een MKV / MP4 zit direct uit als SRT — de video wordt nooit geüpload, alles gebeurt in de browser.",
+        "ctaText": "Video-ondertitel-extractie openen"
+      },
+      "body": [
+        {
+          "h2": "Wat deze tool doet",
+          "ps": [
+            "Ondertitels kunnen in een videobestand zijn ingesloten in plaats van los te bestaan. Om ze te bewerken, vertalen of koppelen moeten ze er eerst uit — dat is het enige dat deze pagina doet."
+          ],
+          "ul": [
+            "**Vier containers** — MKV / WebM en MP4 / MOV.",
+            "**Vier soorten sporen** — platte tekst, ASS, WebVTT en de `mov_text` / `tx3g`-sporen in MP4.",
+            "**Vier exportformaten** — SRT / VTT / ASS / TXT.",
+            "**Geen upload, geen transcodering** — in kleine blokken per offset gelezen, zodat een bestand van meerdere GB het geheugen niet vult."
+          ]
+        },
+        {
+          "h2": "1 De video toevoegen",
+          "ps": [
+            "Sleep een videobestand in de eerste kolom of klik om er een te kiezen. Alleen **MKV / WebM** en **MP4 / MOV** worden herkend; andere containers leveren geen spoor op.",
+            "Het bestand verlaat je computer nooit — er is geen uploadstap. De tool leest in kleine blokken per offset, zodat een film van meerdere GB het geheugen niet vult, maar de eerste lezing moet de spoorinformatie één keer doorlopen."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Het gebied om een video toe te voegen op de pagina voor ingesloten ondertitels",
+            "cap": "MKV / WebM en MP4 / MOV worden ondersteund, en het bestand verlaat je machine nooit"
+          }
+        },
+        {
+          "h2": "2 De ingesloten ondertitelsporen",
+          "ps": [
+            "Als het lezen klaar is, somt de tweede kolom de ondertitelsporen in het bestand **één per regel** op, meestal met taal en spoor Naam (bijvoorbeeld ‘Chinees’, ‘Engels’, ‘Geforceerd’). Klik op een regel om dat spoor te extraheren.",
+            "Heeft het bestand maar één ondertitelspoor, dan begint de extractie automatisch — geen klik nodig.",
+            "**Beeldondertitels kunnen niet worden geëxtraheerd**: Blu-ray PGS en dvd-ondertitels zijn beelden die in de stream zijn gebrand, zonder tekst om te pakken, en de pagina zegt dat duidelijk; die hebben OCR nodig."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "De lijst met ingesloten ondertitelsporen, één per regel",
+            "cap": "Eén spoor per regel; is er maar één, dan begint de extractie automatisch"
+          }
+        },
+        {
+          "h2": "3 Het resultaat",
+          "ps": [
+            "‘3 Resultaat’ rechts toont de geëxtraheerde tekst, met het exportformaat erboven: **SRT / VTT / ASS / TXT**. Klik ‘Downloaden’ of ‘Kopiëren’.",
+            "Is het bronspoor ASS, dan komen de eigen stijlkop en resolutie ongewijzigd terug — ASS-export behoudt ze, SRT-export neemt alleen de tekst mee."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Het resultaatgebied met de formaatkeuze SRT / VTT / ASS / TXT",
+            "cap": "Vier exportformaten; een ASS-bron behoudt stijlkop en resolutie"
+          }
+        },
+        {
+          "h2": "Wat onaangeroerd blijft",
+          "ps": [
+            "Het videobestand zelf wordt helemaal niet aangeraakt — alleen lezen, geen schrijven, geen transcodering, geen remuxen.",
+            "De ondertitelinhoud komt eruit zoals hij is: geen giswerk over codering, geen correctie van tijdlijnen. Zijn de geëxtraheerde ondertitels onleesbaar, dan is dat een coderingsprobleem van het bronspoor — ga ermee naar [[Herstel van onleesbare tekst|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Is er echt geen manier voor beeldondertitels (PGS / dvd)?** Niet op deze pagina — het zijn beelden zonder tekstlaag. Eerst moet OCR gebeuren, en dat doet deze pagina niet.",
+            "**De geëxtraheerde ondertitels lopen niet synchroon — waarom?** Deze pagina corrigeert geen tijdlijnen; er komt uit wat erin zat. Voor een globale verschuiving of een snelheidsprobleem, [[Tijdlijn aanpassen|/shift.html]].",
+            "**Waarom duurt het zo lang voor er iets gebeurt?** Een groot bestand moet blok voor blok worden doorzocht op spoorinformatie, en hoe groter het bestand, hoe langer; dat gebeurt lokaal en heeft niets met je verbinding te maken.",
+            "**Kan ik deze pagina voor losse ondertitelbestanden gebruiken?** Dat hoeft niet — een losse .srt / .ass gaat direct naar [[Formaatconversie|/convert.html]] of een andere tool. Deze pagina is voor ondertitels die in een video zijn ingesloten."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "De video wordt volledig in de browser gelezen: niets wordt geüpload, niets getranscodeerd, niets gaat via een server. Sluit de pagina en de gelezen data komt vrij."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Wil je het geëxtraheerde vertalen, ga naar [[Ondertitelvertaling|/translate.html]]; tweetalig maken, zie [[Twee manieren om tweetalige ondertitels te maken|/guides/make-bilingual-subtitles.html]]; over het verschil tussen ingesloten en losse sporen en wat er wel en niet uit te halen is, zie [[Ondertitels uit een video halen|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "nl": {
+      "seo": {
+        "title": "Termen in ondertitels vervangen – Eén tabel, één bestand – AI-SRTSub",
+        "desc": "Termvervanging in detail: één regel per regel, gescheiden door -> , => , → of Tab, met # voor commentaar. Heel woord, hoofdletters, eerste of tweede regel, elke wijziging vermeld.",
+        "h1": "Termen in ondertitels in één keer vervangen",
+        "intro": "Eén termentabel maakt het woordgebruik van een heel ondertitelbestand in één keer consistent — tijdlijnen, ASS-stijlen en VTT-NOTE-blokken blijven letter voor letter ongemoeid.",
+        "ctaText": "Termvervanging openen"
+      },
+      "body": [
+        {
+          "h2": "Wat deze tool doet",
+          "ps": [
+            "Hetzelfde woord op twee manieren vertaald, namen en plaatsen die de machinevertaling volgen, andermans ondertitels die aan jouw conventies moeten worden aangepast — dat alles heeft één ding gemeen: er verandert een woord, niet de structuur. Deze pagina verandert alleen woorden."
+          ],
+          "ul": [
+            "**Namen gelijktrekken** — personen, plaatsen en eigennamen blijven van begin tot eind consistent.",
+            "**Machinefouten herstellen** — een verkeerd vertaalde term wordt in het hele bestand vervangen.",
+            "**Eigen gebruik overnemen** — andermans ondertitels naar jouw woordkeuze omzetten.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — alle zes formaten worden herkend."
+          ]
+        },
+        {
+          "h2": "Twee invoeren: ondertitels en termentabel",
+          "ps": [
+            "De kolom ‘1 Ondertitels toevoegen’ links neemt een bestand aan, of je plakt de inhoud direct; verkeerd? ‘Wissen’.",
+            "De kolom ‘2 Termentabel’ rechts bevat de regels. **Eén regel per regel**, met de oude en de nieuwe term gescheiden door `->` , `=>` , `→` of een tab — alle vier werken. Regels die met `#` beginnen zijn commentaar en doen niet mee aan de vervanging.",
+            "Twijfel je over het formaat, klik ‘Een voorbeeld invoegen’ en pas dat aan."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Het gebied om ondertitels toe te voegen en de termentabel op de vervangingspagina",
+            "cap": "Ondertitels links, regels rechts; één regel per regel, oude en nieuwe term gescheiden door ->"
+          }
+        },
+        {
+          "h2": "Hoe je de termentabel schrijft",
+          "ps": [
+            "Eén regel per regel: links de huidige term, rechts wat het moet worden. Bijvoorbeeld `Thor -> Donar` vervangt elke ‘Thor’ in het bestand door ‘Donar’.",
+            "Commentaar begint met `#` en is handig om een groep regels te labelen (bijvoorbeeld ‘# namen seizoen 1’) en om een regel tijdelijk uit te zetten — zet er gewoon een `#` voor in plaats van hem te verwijderen.",
+            "Regels lopen van boven naar beneden; tekst die een regel oplevert, wordt opnieuw door de regels eronder bekeken. Als de volgorde uitmaakt (bijvoorbeeld eerst A door B, dan B door C), moet je daarop letten."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Regel na regel vervangingsregels in het veld van de termentabel",
+            "cap": "Eén regel per regel; regels met # zijn commentaar en kunnen een regel tijdelijk uitzetten"
+          }
+        },
+        {
+          "h2": "Wat de drie schakelaars doen",
+          "ps": [
+            "**Bereik**: `alles` / `alleen 1e regel` / `alleen 2e regel`. Kies in een tweetalig bestand ‘alleen 2e regel’ als je alleen de vertaling wilt wijzigen; items met maar één regel blijven bij beide enkelregel-instellingen ongemoeid — de tool raadt niet welke kant het origineel is.",
+            "**Heel woord**: vervangt alleen termen die op zichzelf een woord vormen, dus `art` raakt `start` niet aan. Voor talen zonder woordspaties, zoals Chinees en Japans, heeft deze schakelaar geen effect — daar wordt op deelstrings vervangen.",
+            "**Hoofdlettergevoelig**: standaard uit, dus `CEO` en `ceo` worden beide vervangen; aangevinkt alleen de exact zelfde spelling."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "De schakelaars bereik, heel woord en hoofdlettergevoelig onder de termentabel",
+            "cap": "Het bereik bepaalt welke regel verandert; heel woord en hoofdletters hoe streng er gematcht wordt"
+          }
+        },
+        {
+          "h2": "Elke wijziging vermeld, elke wijziging terug te draaien",
+          "ps": [
+            "‘3 Resultaat’ toont de vervangen ondertitels en **somt elke wijziging op**: welke cue, welke regel, van wat naar wat.",
+            "Wil je er een niet, klik hem in de lijst aan om alleen dat item terug te draaien, zonder de tabel aan te passen en opnieuw te draaien. Klopt het, klik ‘Downloaden’ of ‘Kopiëren’."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Het resultaatgebied met de lijst van afzonderlijke wijzigingen",
+            "cap": "Elke wijziging staat vermeld; klik er een aan die je niet wilt om hem terug te draaien"
+          }
+        },
+        {
+          "h2": "Wat onaangeroerd blijft",
+          "ps": [
+            "**Tijdlijnen, ASS-stijlregels en VTT-`NOTE`-blokken blijven letter voor letter ongemoeid.** De vervanging geldt alleen voor dialoogtekst, nooit voor structuurregels.",
+            "De termentabel wijzigt je ondertitelbestand niet automatisch — het resultaat is een nieuwe uitvoer en het origineel blijft zoals het is."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Waarom is een term niet vervangen?** Controleer eerst het bereik: bij ‘alleen 2e regel’ blijven items met maar één regel ongemoeid. Controleer dan heel woord, dat matches blokkeert die geen zelfstandig woord zijn.",
+            "**Waarom vervangt Chinees nog deelstrings met heel woord aangevinkt?** Dat is verwacht. Chinees en Japans scheiden woorden niet met spaties, de tool kan woordgrenzen niet bepalen en heel woord heeft daar geen effect.",
+            "**Hoe draai ik alles terug na een fout?** Draai items een voor een terug in de lijst; om helemaal opnieuw te beginnen, leeg de tabel en voeg de ondertitels opnieuw toe.",
+            "**Kunnen ASS-stijlregels per ongeluk worden gewijzigd?** Nee. Stijlregels en `NOTE`-blokken vallen buiten het bereik; alleen dialoogtekst doet mee."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Ondertitels en termentabel worden volledig in de browser verwerkt: niets wordt geüpload en niets gaat via een server. De tabel wordt niet opgeslagen en is de volgende keer leeg."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Of een termentabel de moeite loont en hoe je hem een seizoen lang bijhoudt, zie [[Termentabellen: één woordkeuze per seizoen|/guides/subtitle-glossary.html]]; is de inhoud vies (watermerken, SDH), ga eerst door [[Ondertitels opschonen|/clean.html]]; staan de namen vast en moeten er andere talen bij, ga naar [[Ondertitelvertaling|/translate.html]]; en laat het resultaat door [[Ondertitel-QC|/qc.html]] gaan."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "nl": {
+      "seo": {
+        "title": "Ondertitels uit een video halen – Ingesloten of los – AI-SRTSub",
+        "desc": "Hoe je ondertitels uit een video haalt: wat MKV / WebM / MP4 / MOV bevatten, het verschil tussen tekst-, ASS-, WebVTT- en mov_text-sporen, en waarom beeldondertitels geen tekst hebben.",
+        "h1": "Ondertitels uit een video halen",
+        "intro": "Ondertitels kunnen in een videobestand zitten of er los naast staan. Binnenin zijn ze een spoor in de container — ze eruit halen heeft niets met transcoderen te maken.",
+        "ctaText": "Video-ondertitel-extractie openen"
+      },
+      "body": [
+        {
+          "h2": "Waar ondertitels wonen: ingesloten en los",
+          "ps": [
+            "Een videobestand (MKV, MP4) is een container met een videospoor, een audiospoor en ondertitelsporen tegelijk. Ingesloten ondertitels heten **embedded**; een los .srt / .ass-bestand ernaast heet **extern**, en een ingesloten spoor wordt ook **gemultiplext** genoemd.",
+            "Losse ondertitels gebruik je zoals ze zijn. Het probleem zijn de ingesloten: om ze te bewerken, vertalen of er een tweetalig spoor van te maken heb je geen ondertitelbestand in handen — het spoor moet eerst uit de container worden gelezen. Deze stap is geen transcodering: de video wordt niet opnieuw gecodeerd, alleen de data die al in de container staat wordt uitgelezen."
+          ]
+        },
+        {
+          "h2": "Welke container wat bevat",
+          "ps": [
+            "Verschillende containers bevatten verschillende ondertitelformaten, en ook de moeilijkheid verschilt:"
+          ],
+          "ul": [
+            "**MKV / WebM** — het ruimst: platte tekst, ASS en WebVTT passen er allemaal in, en meerdere taalsporen komen vaak voor.",
+            "**MP4 / MOV** — meestal een `mov_text` / `tx3g`-spoor: platte tekst met wat stijlinformatie.",
+            "**Plat tekstspoor** — komt er als tekst uit en wordt direct SRT.",
+            "**ASS-spoor** — bevat stijlkop en resolutie; ASS-export behoudt ze, SRT-export laat alleen de tekst.",
+            "**Beeldondertitels (Blu-ray PGS, dvd-ondertitels)** — bewaren beelden, geen tekens: er is geen tekst uit te halen."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "De ondertitelsporen die de extractiepagina opsomt",
+            "cap": "Eén spoor per regel, meestal met taal en naam; is er maar één, wordt het automatisch geëxtraheerd"
+          }
+        },
+        {
+          "h2": "Waarom beeldondertitels niet te extraheren zijn",
+          "ps": [
+            "Blu-ray PGS en dvd-ondertitels bewaren geen tekens, maar een reeks beelden met alfa-kanaal. Als een speler ze toont, plakt hij een beeld neer, hij rendert geen tekst.",
+            "In zo'n spoor zit dus geen leesbare tekst — niet omdat de tool het niet ondersteunt, maar omdat er geen tekens zijn. De pagina zegt het duidelijk als ze er een tegenkomt.",
+            "De enige weg naar woorden is eerst de tekens in die beelden herkennen (OCR) en daar ondertitels van maken. Dat is een ander proces dan een spoor eruit halen."
+          ]
+        },
+        {
+          "h2": "Wat er meestal na de extractie komt",
+          "ps": [
+            "Wat eruit komt is het spoor zoals het was: de tool raadt geen coderingen en corrigeert geen tijdlijnen. Daarom gebeuren twee dingen vaak:",
+            "Eén is **onleesbare tekst** — een coderingsprobleem van het bronspoor dat er net zo onleesbaar uitkomt; ga naar [[Herstel van onleesbare tekst|/guides/repair.html]] om de codering te bepalen. Het andere is **verkeerde timing** — of de bron een intro-logo heeft of de framerates niet kloppen, het resultaat is als geheel verschoven; gebruik [[Tijdlijn aanpassen|/shift.html]] om te verschuiven of te schalen.",
+            "Daarna ga je naar [[Ondertitelvertaling|/translate.html]] om te vertalen, en naar [[Twee manieren om tweetalige ondertitels te maken|/guides/make-bilingual-subtitles.html]] voor tweetalig."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Het resultaatgebied met de exportformaten SRT / VTT / ASS / TXT",
+            "cap": "Geëxtraheerde ondertitels zijn in vier formaten te exporteren; een ASS-bron behoudt stijlkop en resolutie"
+          }
+        },
+        {
+          "h2": "Een paar dingen die makkelijk misgaan",
+          "ps": [
+            "**Ondertitels extraheren is ze niet inbranden.** De video wordt niet opnieuw gecodeerd, dus beeldkwaliteit en audio blijven onaangetast.",
+            "**Extractie beïnvloedt het originele bestand niet.** Alleen lezen, nooit schrijven, en geen byte van de video verandert.",
+            "**Dat een groot bestand traag is, ligt niet aan de verbinding.** De tool doorzoekt spoorinformatie blok voor blok, en hoe groter het bestand, hoe langer; alles gebeurt lokaal.",
+            "**Losse ondertitels hebben deze pagina niet nodig.** Heb je een .srt / .ass, ga direct naar [[Formaatconversie|/convert.html]]; alleen ondertitels die in een video zijn ingesloten moeten eerst worden geëxtraheerd."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Voor de volledige uitleg zie [[Ondertitels uit een video halen die erin zijn ingesloten|/guides/videosub.html]]; wil je het geëxtraheerde vertalen, [[Ondertitelvertaling|/translate.html]], tweetalig: [[Twee manieren om tweetalige ondertitels te maken|/guides/make-bilingual-subtitles.html]]; bij onleesbare tekst begin je met [[Herstel van onleesbare tekst|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "nl": {
+      "seo": {
+        "title": "LRC-songteksten syncen – Eén regel, één tijdstip – AI-SRTSub",
+        "desc": "Een LRC-bestand vanaf nul maken: één songtekstregel per regel plakken, de tijd meetikken terwijl je luistert, de drie sneltoetsen die tellen, wanneer je een regel overslaat, en LRC of SRT.",
+        "h1": "Hoe je LRC-songteksten synct",
+        "intro": "Een LRC is niets meer dan ‘één songtekstregel plus één tijdstip’. Hem maken heet syncen: het moment vastleggen waarop elke regel begint.",
+        "ctaText": "Sync-tool openen"
+      },
+      "body": [
+        {
+          "h2": "Wat syncen eigenlijk is",
+          "ps": [
+            "De structuur van een LRC-bestand is zo eenvoudig mogelijk: één songtekstregel per regel, voorafgegaan door een `[mm:ss.xx]`-tijdstag. Bereikt een speler een regel, dan toont hij de tekst op dat moment.",
+            "Al het werk aan een LRC is dus elke regel een tijdstip geven — en geen machine kan dat voor je doen, want bepalen waar een regel begint te worden gezongen vraagt om luisteren."
+          ]
+        },
+        {
+          "h2": "Hoeveel doorlopen een nummer nodig heeft",
+          "ps": [
+            "Een minuut nadenken voor je begint scheelt het grootste deel van het herwerk:"
+          ],
+          "ul": [
+            "**Eén doorloop** — heldere zang, weinig regels, ongeveer goed: één keer meetikken is genoeg.",
+            "**Twee doorlopen** — een grove doorloop en dan regel voor regel controleren; de gebruikelijke aanpak als nauwkeurigheid telt.",
+            "**Importeren en corrigeren** — er is al een LRC en alleen een paar regels kloppen niet; importeer en ga verder vanaf de eerste regel zonder tijd.",
+            "**Interludes en puur muzikale stukken** hoeven niet gesynct — klik ‘Deze regel overslaan’ en ze blijven buiten de export.",
+            "**Refreinen en overlappingen** kunnen maar één startpunt vastleggen; overlappende delen tellen mee met de hoofdstem."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "De knoppen afspelen, deze regel stempelen, één regel ongedaan maken en deze regel overslaan",
+            "cap": "Enter tijdens het afspelen werkt het soepelst; verkeerde regel? Z om hem ongedaan te maken en opnieuw te stempelen"
+          }
+        },
+        {
+          "h2": "Het plakken bepaalt de rest",
+          "ps": [
+            "Plak de tekst één regel per songtekstregel; lege regels worden overgeslagen. De regeleinden die je plakt zijn de regels die je later synct — meer afbrekingen nu betekent meer klikken later.",
+            "Een bestaande LRC plakken werkt ook: de `[mm:ss.xx]`-tijdstags worden herkend, en na het importeren **ga je verder vanaf de eerste regel zonder tijd**, zodat al getimede regels niet opnieuw hoeven.",
+            "Een half afgemaakte LRC kun je dus opslaan en later terugplakken om verder te gaan."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Het gebied om de tekst te plakken en de knop om te analyseren",
+            "cap": "Eén regel per songtekstregel; een hele LRC plakken leest de bestaande tijden zodat je verder kunt"
+          }
+        },
+        {
+          "h2": "LRC of SRT exporteren",
+          "ps": [
+            "**Voor een muziekspeler exporteer je LRC.** foobar2000, diverse spelers en apparaten met tekstweergave lezen het.",
+            "**Om de tekst op video te zetten of verder te verwerken, exporteer je SRT.** Videosporen, ondertiteltools en montagesoftware lezen SRT. In de export duurt elke regel tot de volgende begint, en de laatste valt terug op 2 seconden.",
+            "Beide exporteren alleen regels met een tijd — overgeslagen regels komen nooit in het bestand."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "De knoppen LRC downloaden, SRT downloaden en Kopiëren in het exportgebied",
+            "cap": "LRC voor spelers, SRT voor video; alleen regels met een tijd worden geëxporteerd"
+          }
+        },
+        {
+          "h2": "Een paar dingen die makkelijk misgaan",
+          "ps": [
+            "**Staat alles na het syncen een beetje scheef? Gebruik een verschuiving.** Exporteer SRT en verschuif het geheel met [[Tijdlijn aanpassen|/shift.html]]; veel sneller dan regel voor regel opnieuw syncen.",
+            "**Wordt de afwijking gaandeweg groter? Dat is een snelheidsprobleem.** Als afspeel- en opnamesnelheid verschillen, groeit de fout naar het eind toe, en dat vraagt proportionele schaling, geen verschuiving.",
+            "**Sneltoetsen voelen pas natuurlijk als je ze samen gebruikt.** Spatie speelt en pauzeert, Enter stempelt de huidige regel, Z maakt één regel ongedaan — druk tijdens het afspelen direct op Enter in plaats van te wisselen tussen muis en toetsenbord.",
+            "**De audiokwaliteit beïnvloedt de nauwkeurigheid.** Een bron met heldere zang is makkelijker te volgen; live-versies en te harde begeleiding zijn duidelijk lastiger."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Voor de volledige uitleg zie [[De tool voor songtekst-sync gebruiken|/guides/lrc.html]]; om een bestaande LRC om te zetten in ondertitels, [[LRC naar SRT|/guides/lrc-to-srt.html]]; staat de geëxporteerde SRT scheef, [[Tijdlijn aanpassen|/shift.html]]; en laat het resultaat door [[Ondertitel-QC|/qc.html]] gaan."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "nl": {
+      "seo": {
+        "title": "Termentabellen: één woordkeuze per seizoen – Wanneer zinvol – AI-SRTSub",
+        "desc": "Een termentabel lost één probleem op: hetzelfde woord steeds anders vertaald. Wanneer hij de moeite loont, hoe je hem een seizoen hergebruikt, en waarom heel woord in het Chinees niets doet.",
+        "h1": "Termentabellen: één woordkeuze per seizoen",
+        "intro": "Als een naam in aflevering 1 A heet en in 7 B, denken kijkers dat het twee personages zijn. Een termentabel voorkomt precies dat — hij legt vast hoe iets heet.",
+        "ctaText": "Termvervanging openen"
+      },
+      "body": [
+        {
+          "h2": "Een termentabel lost inconsistentie op",
+          "ps": [
+            "Woordfouten in ondertitels zijn van twee soorten: ‘dit woord is verkeerd vertaald’ en ‘hetzelfde woord is op verschillende plekken anders vertaald’. Het eerste is een woordenboekprobleem; het tweede is wat een termentabel oplost.",
+            "Het tweede komt vaker voor en is lastiger te zien: `Thor` heet in aflevering 1 ‘Thor’ en in 7 ‘Donar’, elke aflevering apart ziet er prima uit, en de serie wekt de indruk dat er een nieuw personage is opgedoken. Een termentabel maakt van ‘in deze productie heet hij Thor’ een uitvoerbare regel die in één keer op het hele bestand wordt toegepast."
+          ]
+        },
+        {
+          "h2": "Wanneer hij de moeite loont",
+          "ps": [
+            "Niet elk ondertitelbestand heeft een termentabel nodig. De gevallen die hem rechtvaardigen zijn meestal deze:"
+          ],
+          "ul": [
+            "**Een heel seizoen of een serie** — hoe meer afleveringen, hoe groter de kans op afwijking.",
+            "**Veel eigennamen** — personen, plaatsen, organisaties, verzonnen termen in het werk.",
+            "**Meerdere mensen aan het werk** — afleveringen verdeeld over vertalers met verschillende gewoonten.",
+            "**Andermans ondertitels overnemen** — ze aan jouw (of de klant z'n) gebruik aanpassen.",
+            "**Opschonen na machinevertaling** — de machine kan dezelfde term op meerdere manieren weergeven."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Per categorie gegroepeerde vervangingsregels in een termentabel",
+            "cap": "Gebruik #-commentaar om regels te groeperen en om er tijdens het bewerken een tijdelijk uit te zetten"
+          }
+        },
+        {
+          "h2": "Eén tabel een seizoen lang bijhouden",
+          "ps": [
+            "Een termentabel wordt **gaandeweg** bijgehouden: leg de namen vast in aflevering 1, voeg een regel toe zodra een nieuwe term opduikt, en aan het eind van het seizoen is de tabel compleet. Voor het volgende seizoen van dezelfde serie begin je ermee.",
+            "Schrijf regels wat breder dan strikt nodig — is ‘Thor’ eenmaal besloten, voeg dan ook ‘Donar -> Thor’ toe, zodat andermans ondertitels in dezelfde ronde worden gelijkgetrokken.",
+            "Bekijk daarna altijd de **wijzigingslijst**: die noemt elke cue, elke regel en wat wat werd. Het is de enige plek om te bevestigen dat de wijziging juist was en niet te ver ging, en elk item dat je niet wilt, draai je met één klik terug."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "De lijst met afzonderlijke wijzigingen in het resultaatgebied",
+            "cap": "Elke wijziging staat vermeld; klik er een aan die je niet wilt om hem terug te draaien"
+          }
+        },
+        {
+          "h2": "Wat je niet aan een termentabel moet overlaten",
+          "ps": [
+            "Een termentabel verandert **woorden**. Deze drie dingen vallen buiten zijn taak, en horen dat te blijven:",
+            "**Grammatica en zinsbouw** — een woord wordt geen zin; werk op zinsniveau hoort terug bij [[Ondertitelvertaling|/translate.html]] of bij een mens.",
+            "**Inhoud opschonen** — hele regels weghalen zoals watermerken, advertenties en SDH-aanwijzingen hoort bij [[Ondertitels opschonen|/clean.html]]; regels vervangen, ze verwijderen geen regels.",
+            "**Tijdlijnen** — een termentabel raakt de tijd niet aan. Voor een globale verschuiving of een snelheidsprobleem, [[Tijdlijn aanpassen|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Een paar dingen die makkelijk misgaan",
+          "ps": [
+            "**Chinees vervangt nog deelstrings met heel woord aangevinkt — dat is normaal.** Chinees en Japans scheiden woorden niet met spaties, de tool kan woordgrenzen niet bepalen en heel woord heeft daar geen effect; de bescherming `art` die `start` ontziet werkt alleen voor Engels.",
+            "**De volgorde verandert het resultaat.** Regels lopen van boven naar beneden en tekst die een regel oplevert, wordt opnieuw bekeken door de regels eronder. Eerst A door B, dan B door C geeft uiteindelijk C.",
+            "**Om alleen de vertaling te wijzigen, zet het bereik.** Kies in een tweetalig bestand ‘alleen 2e regel’; items met maar één regel blijven bij beide instellingen ongemoeid — de tool raadt niet welke kant het origineel is.",
+            "**De termentabel wordt niet opgeslagen.** Hij is leeg elke keer dat je de pagina opent, dus bewaar je eigen tekstbestand en geef dat door."
+          ]
+        },
+        {
+          "h2": "Gerelateerde tools en gidsen",
+          "ps": [
+            "Voor de volledige uitleg zie [[Termen in ondertitels in één keer vervangen|/guides/glossary.html]]; is de inhoud vies, ga eerst door [[Ondertitels opschonen|/clean.html]]; staan de namen vast en moeten er andere talen bij, [[Ondertitelvertaling|/translate.html]]; en laat het resultaat door [[Ondertitel-QC|/qc.html]] gaan."
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "it": {
+      "seo": {
+        "title": "Riparare i caratteri illeggibili – Riconosci la codifica – AI-SRTSub",
+        "desc": "Riconosci la codifica originale (GBK / Big5 / Shift_JIS / EUC-KR), scegli la proposta che assomiglia di più a una lingua, poi salva in UTF-8 con BOM o GBK. Numerazione e tempi non cambiano.",
+        "h1": "Come usare la riparazione dei caratteri illeggibili",
+        "intro": "Se i sottotitoli si aprono pieni di caratteri illeggibili, di solito il file non è danneggiato: è stato letto con la codifica sbagliata. Lo strumento di riparazione riconosce la codifica originale e rimette a posto i caratteri; numerazione e tempi non cambiano di una virgola.",
+        "ctaText": "Apri la riparazione dei caratteri"
+      },
+      "body": [
+        {
+          "h2": "Cosa risolve questo strumento",
+          "ps": [
+            "Lo stesso gruppo di byte letto come UTF-8 e come GBK produce due insiemi di caratteri completamente diversi — il file non è danneggiato, è la codifica scelta in lettura a essere sbagliata. Ecco cosa fa lo strumento di riparazione:"
+          ],
+          "ul": [
+            "Riconoscere quale codifica usava questo file e riportare i caratteri all'insieme giusto",
+            "Dire con precisione dov'è il guasto: carattere di sostituzione, caratteri di controllo, simboli di valuta, lettere accentate a raffica, caratteri CJK rari uno dietro l'altro",
+            "Ordinare le proposte in base a quale assomiglia di più a una lingua, poi sceglierne una e salvare",
+            "Quando il lettore non riconosce la codifica, salvare una copia in UTF-8 con BOM o GBK e dargliela"
+          ]
+        },
+        {
+          "h2": "Carica il file, non incollare",
+          "ps": [
+            "I due ingressi riparano cose diverse, **se puoi caricare il file, caricalo**. Quando carichi un file i byte originali ci sono ancora: lo strumento prova a leggere una codifica alla volta e, se riconosce GBK, decodifica come GBK senza tirare a indovinare un solo carattere. Il testo incollato non è più fatto di byte originali — quando il browser passa la stringa, il passo sbagliato è già avvenuto: si può solo risalire a ritroso, e si recupera quel che si può.",
+            "Se nel testo incollato compare già il carattere di sostituzione (quel punto interrogativo dentro un riquadro `�`), i byte originali sono persi da un pezzo e nessuno può recuperarli. La pagina lo dice chiaramente: torna su e carica il file originale con \"Scegli file\"."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Area di caricamento della pagina di riparazione: zona di trascinamento e casella in cui incollare, in alto la codifica riconosciuta",
+            "cap": "Trascina il file o clicca per caricarlo; la casella in cui incollare è sotto e ripara molto meno"
+          }
+        },
+        {
+          "h2": "Cosa dice la diagnosi",
+          "ps": [
+            "Dopo il caricamento, l'area di diagnosi dà un verdetto. **Nessun carattere illeggibile**: il contenuto si legge normalmente; se nel lettore vedi ancora caratteri strani, è il lettore che ha scelto la codifica sbagliata — vai giù in \"Salva come\", cambia codifica e dagli quel file. Quando **sembra un testo illeggibile**, vengono elencate tracce precise:"
+          ],
+          "ul": [
+            "Contiene caratteri di sostituzione — i byte originali sono già persi",
+            "Si sono infiltrati caratteri di controllo",
+            "È cosparso di simboli di valuta e simboli matematici",
+            "Le lettere accentate compaiono a raffica — come se l'UTF-8 fosse stato letto un byte alla volta (`ä½ å¥½` è quel caso)",
+            "Caratteri CJK uno dietro l'altro senza uno solo comune — come se l'UTF-8 fosse stato letto come GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Scheda di diagnosi: verdetto e tracce di caratteri illeggibili elencate una per una",
+            "cap": "La diagnosi elenca le tracce per tipo, non si limita a dire \"è illeggibile\""
+          }
+        },
+        {
+          "h2": "Come vengono ordinate e scelte le proposte",
+          "ps": [
+            "Sotto \"Si può riparare così\" le proposte sono ordinate in base a **quale assomiglia di più a una lingua**, al massimo 12 voci, ognuna con l'indicazione da quale codifica a quale codifica è stata letta. Cliccane una per vedere l'effetto, scegli e poi salva più in basso; se non ti convince, clicca \"Lascia tutto com'è\" per tornare all'originale.",
+            "L'ordine dipende da un punteggio: quota di caratteri comuni, sequenze di accenti, sequenze di simboli, caratteri CJK rari. **Se il punteggio non è chiaramente migliore, non viene proposto nulla** — non ti viene infilata una proposta solo per averne una. Nei casi sbagliati due volte (salvati male una volta, poi riparati male), sulle prime proposte si risale a ritroso di un altro livello: gli errori entro due livelli hanno ancora speranza."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Elenco delle proposte di riparazione: ordinate per quanto assomigliano a una lingua, ogni voce indica la coppia di codifiche",
+            "cap": "Le proposte sono ordinate per \"assomiglianza a una lingua\", ognuna indica da quale codifica a quale"
+          }
+        },
+        {
+          "h2": "Salvare è l'ultimo passo",
+          "ps": [
+            "Una volta riparato bisogna anche salvare bene. Se il lettore non riconosce l'UTF-8, salva in **UTF-8 con BOM** (i lettori su Windows riconoscono la codifica dal BOM) o in **GBK**: di solito basta questo. Si può salvare in UTF-8, UTF-8 (con BOM), GBK, Big5, Shift_JIS, EUC-KR; se non ci sta, viene chiesto di cambiare (per esempio GBK non contiene il coreano). Il nome del file scaricato aggiunge `-fixed`.",
+            "Quando la codifica riconosciuta non è UTF-8, l'opzione di salvataggio è già puntata su \"UTF-8 con BOM\"; dopo che hai cambiato il menu a discesa da solo, non viene più cambiato al posto tuo."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Area del risultato: casella di testo con il menu a discesa Salva come e il pulsante di download",
+            "cap": "Scegli la codifica e scarica; il nome del file aggiunge -fixed da sé"
+          }
+        },
+        {
+          "h2": "Cosa non viene toccato",
+          "ps": [
+            "Vengono sostituiti solo i caratteri letti male. Numerazione, tempi e comandi di stile ASS non cambiano di una virgola."
+          ]
+        },
+        {
+          "h2": "Domande frequenti",
+          "ps": [
+            "**Ho caricato il file, perché mi chiede ancora di salvare?** Il file di solito non è danneggiato; è il lettore che lo legge con la codifica sbagliata. In questo caso non serve cambiare un solo carattere del testo: basta salvare una copia in UTF-8 con BOM o GBK e darla al lettore.",
+            "**Perché il testo incollato non si recupera?** Una volta che nel testo incollato compare il carattere di sostituzione, i byte originali sono persi e risalire a ritroso non ha appigli. Torna su e carica il file originale con \"Scegli file\".",
+            "**Manca la proposta che volevo?** Se il punteggio non è chiaramente migliore di quello attuale, lo strumento non propone nulla. Prova a cambiare la \"codifica riconosciuta\" e falla riordinare.",
+            "**Quanti file alla volta?** Uno. Scarica il risultato, poi carica il successivo."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Riconoscimento e riparazione avvengono interamente nel browser; nessun contenuto dei sottotitoli viene inviato a un server."
+          ]
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "Da dove arrivano i caratteri illeggibili e perché assumono quella forma, vedi [[Da dove arrivano i caratteri illeggibili nei sottotitoli|/guides/subtitle-garbled-characters.html]]; codifica a posto ma contenuto sporco, usa [[Pulizia dei sottotitoli|/clean.html]]; per controllare tempi e numero di caratteri, usa [[Controllo qualità dei sottotitoli|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "it": {
+      "seo": {
+        "title": "Da dove arrivano i caratteri illeggibili – Se si riconoscono – AI-SRTSub",
+        "desc": "I caratteri illeggibili non sono un file danneggiato, ma byte letti con la codifica sbagliata. Ogni forma ha una causa diversa: quale si ripara e quale no, si vede subito.",
+        "h1": "Da dove arrivano i caratteri illeggibili nei sottotitoli",
+        "intro": "Lo stesso gruppo di byte letto come UTF-8 e come GBK dà due insiemi di caratteri completamente diversi. La forma dei caratteri illeggibili è la prova diretta di quale passaggio è andato storto.",
+        "ctaText": "Apri la riparazione dei caratteri"
+      },
+      "body": [
+        {
+          "h2": "Il file non è danneggiato, è la lettura a essere sbagliata",
+          "ps": [
+            "In un file di sottotitoli sono memorizzati dei byte. Per trasformare i byte in caratteri bisogna sapere con quale codifica sono stati scritti — se questo passaggio è sbagliato, il risultato sono caratteri illeggibili. Il file non ha perso un solo byte: basta rileggerlo con un'altra codifica e i caratteri tornano.",
+            "Quindi ci sono due cose distinte: **riconoscere la codifica originale**, e **salvare in una codifica che il lettore riconosca**. La prima si fa provando a leggere e assegnando un punteggio, la seconda con \"Salva come\". Le due cose risolvono problemi diversi."
+          ]
+        },
+        {
+          "h2": "Cinque forme, cinque cause",
+          "ps": [
+            "I caratteri illeggibili non nascono a caso: la loro forma rivela la causa:"
+          ],
+          "ul": [
+            "**Lettere accentate a raffica** (`ä½ å¥½`): testo cinese UTF-8 letto come se fosse a byte singolo — in UTF-8 un carattere cinese occupa tre byte, e leggendo un byte alla volta ogni byte diventa una lettera a sé",
+            "**Caratteri CJK uno dietro l'altro senza uno solo comune**: UTF-8 letto come GBK — i byte vengono riappaiati a due a due e ogni coppia finisce su un carattere raro",
+            "**Una montagna di simboli di valuta e simboli matematici**: i byte sono finiti nella zona dei simboli, tipico di una lettura come Mac Roman o della famiglia Latin-1",
+            "**Caratteri di controllo infiltrati**: i byte sono finiti nella zona di controllo invisibile, e sullo schermo compaiono spazi vuoti o riquadri",
+            "**Il punto interrogativo nel riquadro `�`**: questo è il **carattere di sostituzione**, non un carattere illeggibile — significa \"qui c'era un carattere, ed è già andato perso durante la lettura\""
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Scheda di diagnosi: tipo di tracce di caratteri illeggibili elencato riga per riga",
+            "cap": "La diagnosi divide i caratteri illeggibili per causa, non li accorpa in un generico \"è illeggibile\""
+          }
+        },
+        {
+          "h2": "Perché il carattere di sostituzione non si ripara",
+          "ps": [
+            "Il carattere di sostituzione è la linea di confine. La presenza di `�` significa che i byte sono stati buttati via **in un passaggio precedente** (di solito un programma che ha letto e poi risalvato), e della parte persa non è rimasta traccia. A quel punto non c'è nulla da cui risalire — nessuno può ripararlo.",
+            "Per questo la pagina di riparazione gestisce due situazioni in modo diverso: se carichi un file i byte originali sono intatti e si può provare una codifica alla volta; se il testo incollato contiene già il carattere di sostituzione, dice chiaramente \"non si può riparare, carica il file originale\".",
+            "C'è anche il caso inverso: il contenuto si legge perfettamente, ma nel lettore si vedono ancora caratteri strani. Non è colpa del file, è **il lettore che ha scelto la codifica sbagliata**. Modificare il file non serve: salva una copia in UTF-8 con BOM o GBK e dagli quella."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Area di caricamento: trascinamento per caricare e incolla, due ingressi",
+            "cap": "Se puoi caricare il file, caricalo — solo con i byte intatti c'è qualcosa da riparare"
+          }
+        },
+        {
+          "h2": "Cosa si confronta durante la riparazione",
+          "ps": [
+            "Lo strumento prova ogni codifica possibile, poi assegna un punteggio a ogni risultato: quanti caratteri comuni, se ci sono sequenze di accenti, se ci sono sequenze di simboli, se i caratteri CJK sono una fila di rari. Il punteggio più alto sta in cima.",
+            "**Se il punteggio non è chiaramente migliore, non viene proposto nulla** — meglio dirti \"questo si legge normalmente\" che rifilarti un risultato che assomiglia a una lingua solo per modo di dire. Nei casi sbagliati due volte, sulle prime proposte si risale a ritroso di un altro livello."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Elenco delle proposte: ordinate per punteggio, ogni voce indica la coppia di codifiche",
+            "cap": "Le proposte sono ordinate per punteggio; se il punteggio non è migliore, non viene proposto nulla"
+          }
+        },
+        {
+          "h2": "Si conclude solo salvando con la codifica giusta",
+          "ps": [
+            "Il testo riparato va salvato in una codifica che il lettore riconosca. I lettori su Windows riconoscono spesso la codifica dal BOM, quindi salvare in **UTF-8 con BOM** è la strada più comoda; i dispositivi vecchi o i lettori locali riconoscono GBK. Codifiche disponibili: UTF-8, UTF-8 (con BOM), GBK, Big5, Shift_JIS, EUC-KR; se non ci sta, viene chiesto di cambiare (per esempio GBK non contiene il coreano)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Area del risultato: menu a discesa della codifica Salva come e pulsante di download",
+            "cap": "Salva nella codifica che il lettore riconosce: solo così i caratteri illeggibili sono davvero risolti"
+          }
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "La procedura completa è in [[Come riparare i caratteri illeggibili|/guides/repair.html]]; cosa c'è davvero dentro un file SRT è in [[Cosa c'è scritto in un file SRT|/guides/srt-file-format.html]]; codifica a posto ma contenuto sporco (filigrane pubblicitarie, indicazioni per non udenti) usa [[Pulizia dei sottotitoli|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "it": {
+      "seo": {
+        "title": "Conversione semplificato–tradizionale – Taiwan e Hong Kong – AI-SRTSub",
+        "desc": "Nove direzioni: Taiwan cambia le parole o solo la forma dei caratteri, Hong Kong è un caso a parte, e si può tornare al semplificato. Cambia solo il testo delle battute.",
+        "h1": "Come usare la conversione semplificato–tradizionale",
+        "intro": "Gli stessi sottotitoli da mandare a Taiwan, Hong Kong o alla Cina continentale — parole e forme dei caratteri sono diverse. La pagina di conversione offre nove direzioni e cambia solo il testo delle battute; tempi, numerazione e comandi di stile ASS non vengono toccati.",
+        "ctaText": "Apri la conversione semplificato–tradizionale"
+      },
+      "body": [
+        {
+          "h2": "Cosa risolve questo strumento",
+          "ps": [
+            "Convertire dal semplificato al tradizionale non è solo cambiare la forma di ogni carattere. A una stessa parola semplificata corrispondono parole diverse in regioni diverse — la parola per software a Taiwan e la parola per informazione a Taiwan non sono quelle usate altrove, e Hong Kong è un altro caso ancora. La pagina di conversione separa tutto questo:"
+          ],
+          "ul": [
+            "Dal semplificato al tradizionale (generico / Taiwan / Hong Kong)",
+            "Dal tradizionale al semplificato (generico / dal tradizionale di Taiwan / dal tradizionale di Hong Kong)",
+            "Cambiare la forma dei caratteri fra varianti tradizionali (verso la forma di Taiwan / verso la forma di Hong Kong)",
+            "Un semplificato che ha più tradizionali non viene convertito male (parole come \"pulito\" e \"capelli\" si decidono per parola, non carattere per carattere)"
+          ]
+        },
+        {
+          "h2": "Caricamento e riconoscimento",
+          "ps": [
+            "Trascina il file dentro o selezionalo per caricarlo: sono supportati SRT, VTT, ASS, TXT e puoi anche incollare direttamente il contenuto dei sottotitoli. Dopo il caricamento il formato viene riconosciuto automaticamente e mostrato in \"Formato riconosciuto\"."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Area di caricamento della pagina di conversione: zona di trascinamento e casella in cui incollare, in alto il formato riconosciuto",
+            "cap": "Supporta SRT / VTT / ASS / TXT, il formato viene riconosciuto da sé"
+          }
+        },
+        {
+          "h2": "Come scegliere fra le nove direzioni",
+          "ps": [
+            "Le nove direzioni in \"Direzione di conversione\" si dividono in tre gruppi. **Semplificato → tradizionale**: tradizionale generico, tradizionale di Taiwan (cambia parole), tradizionale di Taiwan (solo forma dei caratteri), tradizionale di Hong Kong. **Tradizionale → semplificato**: generico, dal tradizionale di Taiwan, dal tradizionale di Hong Kong. **Cambio di forma fra tradizionali**: verso la forma di Taiwan, verso la forma di Hong Kong.",
+            "\"Parole di Taiwan\" sostituisce la parola per software e la parola per informazione con quelle taiwanesi; \"forma dei caratteri di Taiwan\" cambia solo il modo di scrivere, non le parole. Hong Kong è un altro caso: lì software si scrive con una parola propria. Per tornare al semplificato scegli il gruppo in basso — devi dire da quale tradizionale parti, perché il percorso di ritorno al semplificato di Taiwan e di Hong Kong è diverso."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Scheda della direzione di conversione: menu a discesa \"converti in\" con selezionato \"Semplificato → tradizionale di Taiwan (cambia parole)\"",
+            "cap": "La direzione si sceglie nel menu \"converti in\", le nove sono divise in tre gruppi; qui è tradizionale di Taiwan con cambio parole"
+          }
+        },
+        {
+          "h2": "Risultato ed esportazione",
+          "ps": [
+            "L'area del risultato mostra subito i sottotitoli convertiti e la barra delle statistiche indica quante righe ci sono in totale e quante sono state cambiate. Se non cambia un solo carattere, compare l'avviso \"forse in questi sottotitoli non ci sono caratteri cinesi\" — la conversione tocca solo la parte in caratteri cinesi, quindi sottotitoli in inglese o di soli numeri restano identici.",
+            "Quando sei soddisfatto, scarica o copia. Il nome del file scaricato include un'etichetta di lingua — `demo.srt` diventa `demo.zh-TW.srt` dopo la conversione al tradizionale di Taiwan, `.zh-Hant` per il tradizionale generico e `.zh-Hans` per il ritorno al semplificato."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Area del risultato: i sottotitoli convertiti e la barra delle statistiche",
+            "cap": "La barra delle statistiche dà il totale delle righe e quante sono cambiate; si può scaricare o mandare alla traduzione"
+          }
+        },
+        {
+          "h2": "Cosa non viene toccato",
+          "ps": [
+            "Cambia solo il testo delle battute. Tempi, numerazione e comandi di stile ASS non cambiano di una virgola — dopo la conversione è subito utilizzabile, senza dover rimettere a posto la formattazione."
+          ]
+        },
+        {
+          "h2": "Domande frequenti",
+          "ps": [
+            "**Perché la parola per \"pulito\" non è stata convertita?** Le corrispondenze uno-a-molti si risolvono per parola: i sensi di \"pulito\" e di \"secco\" condividono una stessa forma tradizionale, mentre il senso di \"tronco\" ne usa un'altra. Le tabelle vengono da OpenCC e confrontano prima le locuzioni, poi i caratteri singoli.",
+            "**Che differenza c'è fra il tradizionale di Taiwan e quello di Hong Kong?** Il vocabolario: la parola per software è diversa. Scegli la direzione in base alla regione a cui consegni.",
+            "**Il numero di caratteri è cambiato dopo la conversione?** Cambiano solo i caratteri cinesi: nessuna voce viene aggiunta o rimossa e i tempi non si spostano. Se il numero di righe è cambiato, controlla se il formato è stato riconosciuto correttamente.",
+            "**Le tabelle non si caricano?** La pagina invita ad aggiornare e riprovare. Le tabelle si caricano in locale, non c'è bisogno di caricare i sottotitoli da nessuna parte."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "La conversione avviene interamente nel browser; nessun contenuto dei sottotitoli viene inviato a un server."
+          ]
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "Se ti serve solo dal semplificato al tradizionale, vedi [[Sottotitoli dal semplificato al tradizionale|/guides/srt-simplified-to-traditional.html]]; perché semplificato e tradizionale non è solo questione di cambiare carattere, vedi [[Semplificato e tradizionale non è solo cambiare carattere|/guides/simplified-traditional-chinese.html]]; per tradurre in un'altra lingua usa [[Traduzione dei sottotitoli|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "it": {
+      "seo": {
+        "title": "Sottotitoli dal semplificato al tradizionale – Taiwan e Hong Kong – AI-SRTSub",
+        "desc": "Converti dal semplificato al tradizionale: scegli Taiwan (cambia le parole o solo la forma dei caratteri) o Hong Kong. Le corrispondenze uno-a-molti si decidono per parola.",
+        "h1": "Sottotitoli dal semplificato al tradizionale",
+        "intro": "Hai dei sottotitoli in cinese semplificato da mandare al pubblico di Taiwan o Hong Kong — basta convertirli. Taiwan e Hong Kong sono due set diversi: se sbagli direzione, le parole non suoneranno come quelle del posto.",
+        "ctaText": "Converti questi sottotitoli"
+      },
+      "body": [
+        {
+          "h2": "Questa esigenza",
+          "ps": [
+            "I sottotitoli sono in cinese semplificato e devono andare al pubblico di Taiwan o di Hong Kong. Cambiare carattere per carattere non è realistico: un episodio ha centinaia di righe. Inoltre il tradizionale che vogliono Taiwan e Hong Kong non è lo stesso — il vocabolario è diverso, e con la direzione sbagliata vengono fuori parole che lì nessuno usa."
+          ]
+        },
+        {
+          "h2": "Dove farlo",
+          "ps": [
+            "Apri [[Conversione semplificato–tradizionale|/hanconv.html]], trascina i sottotitoli e scegli una direzione semplificato → tradizionale in \"Direzione di conversione\": tradizionale generico, tradizionale di Taiwan (cambia parole), tradizionale di Taiwan (solo forma dei caratteri), tradizionale di Hong Kong. La conversione è immediata, l'area del risultato mostra i sottotitoli convertiti e non resta che scaricare.",
+            "**Per il pubblico di Taiwan**: se vuoi cambiare anche le parole, scegli \"tradizionale di Taiwan (cambia parole)\" — la parola per software e quella per informazione diventano quelle taiwanesi; se vuoi solo cambiare la forma dei caratteri e tenere le parole che hai, scegli \"tradizionale di Taiwan (solo forma dei caratteri)\". **Per il pubblico di Hong Kong**: scegli \"tradizionale di Hong Kong\", la parola per software si scrive con il termine locale."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Scheda della direzione di conversione: menu a discesa \"converti in\" con selezionato \"Semplificato → tradizionale di Taiwan (cambia parole)\"",
+            "cap": "Taiwan e Hong Kong sono due direzioni distinte nel menu, il vocabolario non è lo stesso"
+          }
+        },
+        {
+          "h2": "Trappole frequenti",
+          "ps": [
+            "**Uno a molti, niente paura**: il carattere di \"pulito\", \"secco\" e \"tronco\" ha tradizionali diversi; le tabelle decidono in base alla locuzione, quindi non finisce tutto in un unico carattere.",
+            "**Cambia solo il testo delle battute**: tempi, numerazione e comandi di stile ASS non vengono toccati; dopo la conversione è subito utilizzabile.",
+            "**Se non cambia nemmeno un carattere, non preoccuparti**: se la barra delle statistiche indica 0 righe modificate, forse in questi sottotitoli non ci sono caratteri cinesi, oppure il formato è stato riconosciuto male — controlla che \"formato riconosciuto\" corrisponda a quello che hai caricato."
+          ]
+        },
+        {
+          "h2": "Correlati",
+          "ps": [
+            "La spiegazione completa delle nove direzioni è in [[Come usare la conversione semplificato–tradizionale|/guides/hanconv.html]]; perché semplificato e tradizionale non è solo cambiare carattere, vedi [[Semplificato e tradizionale non è solo cambiare carattere|/guides/simplified-traditional-chinese.html]]; anche l'inverso, dal tradizionale al semplificato, è in [[Conversione semplificato–tradizionale|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "it": {
+      "seo": {
+        "title": "Semplificato e tradizionale: non è cambiare carattere – AI-SRTSub",
+        "desc": "La conversione è difficile in tre punti: uno a molti va deciso per parola, Taiwan e Hong Kong hanno vocabolari diversi, e si deve toccare solo il testo delle battute, non i tempi.",
+        "h1": "Semplificato e tradizionale non è solo cambiare carattere",
+        "intro": "Quale carattere tradizionale usare al suo posto dipende dal carattere che lo precede. È per questo che la conversione non può essere fatta a forza, carattere per carattere.",
+        "ctaText": "Apri la conversione semplificato–tradizionale"
+      },
+      "body": [
+        {
+          "h2": "Primo: un semplificato, molti tradizionali",
+          "ps": [
+            "La semplificazione ha fuso più caratteri tradizionali in uno solo. Andando a ritroso, a un carattere semplificato corrispondono più caratteri tradizionali, e quale scegliere dipende da cosa lo accompagna:",
+            "Sostituendo a forza carattere per carattere, tutto finisce in un unico carattere e il testo è sbagliato da cima a fondo. Solo **decidendo per parola** si distingue — le tabelle vengono da OpenCC e confrontano prima le locuzioni, poi i caratteri singoli. Per esempio:"
+          ],
+          "ul": [
+            "Il senso di \"pulito\" → una forma; il senso di \"tronco\" → un'altra",
+            "I sensi di \"capelli\" e di \"sviluppo\" di uno stesso carattere semplificato finiscono in due tradizionali diversi",
+            "Il senso di \"dietro\" prende una forma tradizionale, mentre \"imperatrice\" tiene il carattere che ha già"
+          ]
+        },
+        {
+          "h2": "Secondo: Taiwan e Hong Kong non sono la stessa cosa",
+          "ps": [
+            "Dopo essere diventato tradizionale resta un'altra differenza: la stessa parola si scrive in modo diverso a Taiwan e a Hong Kong. La parola per software si scrive in un modo a Taiwan e in un altro a Hong Kong; per informazione Taiwan ha una parola propria.",
+            "Per questo le direzioni di conversione sono separate. Il tradizionale di Taiwan si divide addirittura in \"cambia parole\" e \"solo forma dei caratteri\" — la sola forma dei caratteri mantiene il tuo vocabolario, mentre \"cambia parole\" sostituisce anche termini regionali come quello per software. Hong Kong ha una direzione tutta sua."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Scheda della direzione di conversione: menu a discesa \"converti in\" con selezionato \"Semplificato → tradizionale di Taiwan (cambia parole)\"",
+            "cap": "Taiwan offre cambio parole o sola forma dei caratteri; Hong Kong ha una direzione propria"
+          }
+        },
+        {
+          "h2": "Terzo: si può toccare solo il testo delle battute",
+          "ps": [
+            "Un file di sottotitoli non è fatto solo di battute. Numerazione, tempi e comandi di stile ASS stanno lì dentro, e di tutto questo non si deve cambiare un solo carattere — soprattutto perché nelle righe di stile ASS ci sono nomi di comandi in inglese, che si romperebbero se venissero trattati come testo delle battute.",
+            "Per questo la conversione avviene dopo l'analisi del formato: SRT, VTT, ASS e TXT vengono riconosciuti nella loro parte di battute e si cambiano solo i caratteri cinesi al loro interno. Tempi e stile restano identici, senza dover rimettere a posto la formattazione."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Area del risultato: i sottotitoli convertiti e la barra delle statistiche con il numero di righe modificate",
+            "cap": "La barra delle statistiche dà le righe modificate; la parte di formattazione resta identica"
+          }
+        },
+        {
+          "h2": "Cosa richiede attenzione quando si torna al semplificato",
+          "ps": [
+            "Anche dal tradizionale al semplificato bisogna indicare **da quale tradizionale si torna**: tradizionale generico, di Taiwan, di Hong Kong sono tre percorsi diversi, perché i termini regionali di Taiwan e Hong Kong vanno prima riportati a parole generiche e poi convertiti. Con la direzione sbagliata, nel semplificato restano termini regionali.",
+            "Il gruppo in basso fra le nove direzioni è quello del ritorno al semplificato: tradizionale → semplificato, tradizionale di Taiwan → semplificato, tradizionale di Hong Kong → semplificato."
+          ]
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "La procedura completa è in [[Come usare la conversione semplificato–tradizionale|/guides/hanconv.html]]; se ti serve solo dal semplificato al tradizionale, vedi [[Sottotitoli dal semplificato al tradizionale|/guides/srt-simplified-to-traditional.html]]; per tradurre in un'altra lingua usa [[Traduzione dei sottotitoli|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "it": {
+      "seo": {
+        "title": "Come usare la conversione sottotitoli in Excel/CSV – Nei due sensi – AI-SRTSub",
+        "desc": "Conversione fra sottotitoli e foglio di calcolo: esporta SRT/VTT in Excel o CSV per rivedere riga per riga, poi riportali a sottotitoli. Bastano tre colonne: inizio, fine, testo.",
+        "h1": "Come usare la conversione sottotitoli in Excel/CSV",
+        "intro": "La revisione e la traduzione sono più comode su un foglio di calcolo. Esporta i sottotitoli in Excel o CSV, correggi riga per riga e poi riportali a sottotitoli — la colonna dei tempi resta testo e le interruzioni di riga nelle battute non si perdono.",
+        "ctaText": "Apri la conversione in tabella"
+      },
+      "body": [
+        {
+          "h2": "Cosa risolve questo strumento",
+          "ps": [
+            "I sottotitoli sono voci una per riga e anche un foglio di calcolo è fatto di record uno per riga — una volta diventati tabella, revisione, annotazioni e traduzione in blocco si fanno con le funzioni di foglio di calcolo che già conosci. Sono supportati entrambi i sensi:"
+          ],
+          "ul": [
+            "**Verso tabella**: esporta SRT e VTT in Excel (.xlsx) o CSV, una voce per riga, con numerazione, inizio, fine, testo",
+            "**Verso sottotitoli**: riporta la tabella corretta in SRT o VTT",
+            "La colonna dei tempi resta testo e non viene trasformata in numero o data dal programma di foglio di calcolo",
+            "Le interruzioni di riga nelle battute non si perdono: al ritorno sono quelle di prima"
+          ]
+        },
+        {
+          "h2": "Caricamento e scelta del senso",
+          "ps": [
+            "Trascina il file dentro o selezionalo per caricarlo. I due sensi richiedono file diversi: **verso tabella** richiede un file di sottotitoli (SRT / VTT), **verso sottotitoli** richiede un file di tabella (CSV / Excel, xlsx e xls compresi). Se il senso è sbagliato, viene detto chiaramente quale file serve in quel senso.",
+            "⚠️ Questa pagina legge solo in UTF-8. Se i sottotitoli si aprono pieni di punti interrogativi o riquadri, prima sistema la codifica in [[Riparazione dei caratteri|/repair.html]] — con la codifica rotta, qui dentro si leggerebbe solo un mucchio di caratteri di sostituzione."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Area di caricamento della pagina di conversione in tabella: zona di trascinamento e interruttore a due sensi",
+            "cap": "I due sensi richiedono file diversi: verso tabella i sottotitoli, verso sottotitoli la tabella"
+          }
+        },
+        {
+          "h2": "Esportare i sottotitoli in tabella",
+          "ps": [
+            "Scegli \"verso tabella\" e inserisci i sottotitoli: l'anteprima elenca subito ogni voce — numerazione, inizio, fine, testo. La barra delle statistiche dà il numero di voci e la durata totale. Quando sei pronto, clicca \"Scarica Excel (.xlsx)\" o \"Scarica CSV\".",
+            "La differenza fra i due formati di esportazione: xlsx è un vero file di foglio di calcolo, quindi Excel non si mette a cambiare il formato della colonna dei tempi; CSV è più universale, ma aprendolo con Excel la colonna dei tempi può essere interpretata come altro — se succede, seleziona la colonna dei tempi e imposta il formato su \"Testo\", oppure usa direttamente xlsx."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Area di anteprima della tabella: quattro colonne numerazione, inizio, fine, testo e barra delle statistiche",
+            "cap": "L'anteprima elenca voce per voce; la barra delle statistiche dà numero di voci e durata totale"
+          }
+        },
+        {
+          "h2": "Riportare la tabella a sottotitoli",
+          "ps": [
+            "Scegli \"verso sottotitoli\" e inserisci la tabella; la regola per riconoscere le colonne è che la tabella abbia tre colonne **inizio, fine, testo** (anche i nomi inglesi Start / End / Text sono riconosciuti) e **l'ordine delle colonne non conta**. I tempi possono essere scritti `00:00:01,500` o `00:00:01.500`; le righe non riconosciute vengono saltate da sé, senza far fallire tutto il file.",
+            "Il risultato del ritorno è elencato voce per voce nell'anteprima; quando sei pronto, scarica SRT o VTT. Se le tre colonne non ci sono, viene invitato a controllare i nomi — la causa più comune è che in fase di esportazione siano stati usati nomi diversi, oppure che l'intestazione non sia nella prima riga."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Area del risultato dei sottotitoli: i sottotitoli riportati sono elencati voce per voce",
+            "cap": "Se le tre colonne non si riconoscono viene detto subito, non fallisce in silenzio"
+          }
+        },
+        {
+          "h2": "Domande frequenti",
+          "ps": [
+            "**La colonna dei tempi in Excel si vede male, cosa faccio?** Usa direttamente xlsx, il problema non si pone. Se devi usare CSV: seleziona la colonna dei tempi, imposta il formato cella su \"Testo\" e poi apri.",
+            "**I nomi delle colonne devono essere in cinese?** No. Inizio / fine / testo e Start / End / Text sono riconosciuti entrambi, e maiuscole e minuscole non contano.",
+            "**Dopo le correzioni e il ritorno, le interruzioni di riga ci sono ancora?** Ci sono. Le interruzioni di riga nelle battute restano identiche e al ritorno sono quelle di prima.",
+            "**ASS è supportato?** Questa pagina gestisce solo SRT e VTT. ASS ha comandi di stile: convertilo in SRT con [[Conversione di formato|/convert.html]] prima di portarlo in tabella.",
+            "**Quanti file alla volta?** Uno. Per decine o centinaia insieme, usa [[Conversione in blocco|/batch.html]] (che cambia solo il formato e non passa dalla tabella)."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "La conversione avviene interamente nel browser; nessun contenuto dei sottotitoli viene inviato a un server."
+          ]
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "Se ti serve solo il passaggio \"sottotitoli in Excel\", vedi [[Sottotitoli in Excel|/guides/srt-to-excel.html]]; per tradurre in un'altra lingua dopo le correzioni usa [[Traduzione dei sottotitoli|/translate.html]]; per cambiare formato a decine di file insieme usa [[Conversione in blocco|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "it": {
+      "seo": {
+        "title": "Sottotitoli in Excel – SRT in xlsx riga per riga – AI-SRTSub",
+        "desc": "Esporta i sottotitoli SRT in Excel: una voce per riga, quattro colonne numerazione, inizio, fine, testo; i tempi restano testo e le interruzioni di riga non si perdono.",
+        "h1": "Sottotitoli in Excel",
+        "intro": "Rivedere centinaia di voci una per una in un editor di testo è una fatica; in Excel una voce per riga, e filtri, annotazioni e sostituzioni in blocco sono tutti disponibili. Finito, si riporta in SRT.",
+        "ctaText": "Esporta in Excel"
+      },
+      "body": [
+        {
+          "h2": "Questa esigenza",
+          "ps": [
+            "Devi rivedere i sottotitoli, sostituire parole in blocco o dividerli fra più persone che correggono ciascuna una parte — tutte cose che su un foglio di calcolo sono molto più rapide che su un testo. Il file SRT è testo semplice, ma la sua struttura a voci (numerazione, tempi, battute) si distende perfettamente nelle quattro colonne di una tabella."
+          ]
+        },
+        {
+          "h2": "Dove farlo",
+          "ps": [
+            "Apri [[Conversione in tabella|/table.html]], scegli il senso \"verso tabella\", trascina l'SRT e l'anteprima elenca subito ogni voce — quattro colonne: numerazione, inizio, fine, testo. Clicca \"Scarica Excel (.xlsx)\" per portartelo via. Anche VTT è supportato.",
+            "Dopo le correzioni: passa al senso \"verso sottotitoli\", rimetti dentro questa tabella e ottieni di nuovo l'SRT. La regola per riconoscere le colonne è che ci siano inizio, fine, testo (anche Start / End / Text sono riconosciuti) e l'ordine non conta."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Anteprima della tabella: ogni voce dell'SRT diventa una riga, quattro colonne e barra delle statistiche",
+            "cap": "L'SRT si distende direttamente in quattro colonne e dopo le correzioni torna indietro per la stessa strada"
+          }
+        },
+        {
+          "h2": "Trappole frequenti",
+          "ps": [
+            "**Codifica rotta? Sistemala prima**: questa pagina legge solo in UTF-8. Se i sottotitoli si aprono pieni di punti interrogativi o riquadri, vai prima in [[Riparazione dei caratteri|/repair.html]].",
+            "**CSV o xlsx, quale scegliere**: se lo porti in Excel scegli xlsx, così la colonna dei tempi non cambia formato; CSV è più universale ma Excel può interpretarlo come un altro formato e in quel caso imposta la colonna dei tempi su \"Testo\".",
+            "**ASS no**: l'ASS con comandi di stile va prima trasformato in SRT, poi si porta in tabella."
+          ]
+        },
+        {
+          "h2": "Correlati",
+          "ps": [
+            "La spiegazione completa dei due sensi è in [[Come usare la conversione sottotitoli in Excel/CSV|/guides/table.html]]; per tradurre in un'altra lingua dopo le correzioni usa [[Traduzione dei sottotitoli|/translate.html]]; prima di consegnare, passa da [[Controllo qualità dei sottotitoli|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "it": {
+      "seo": {
+        "title": "Conversione in blocco – Centinaia di file in un ZIP – AI-SRTSub",
+        "desc": "Trascina decine o centinaia di SRT/VTT insieme, uniforma al formato di destinazione e porta via un solo ZIP. Numerazione rifatta, tempi normalizzati; i non riconosciuti restano fuori.",
+        "h1": "Come usare la conversione in blocco dei sottotitoli",
+        "intro": "Decine di sottotitoli di un'intera stagione devono avere lo stesso formato, e caricarli uno per uno è troppo lento. Nella pagina di conversione in blocco li trascini tutti insieme, li uniformi al formato di destinazione e porti via un solo ZIP — i file non riconosciuti restano segnati a parte e non entrano nel pacchetto fingendosi riusciti.",
+        "ctaText": "Apri la conversione in blocco"
+      },
+      "body": [
+        {
+          "h2": "Cosa risolve questo strumento",
+          "ps": [
+            "I sottotitoli di un'intera stagione o di una raccolta spesso devono essere tutti nello stesso formato prima di poter essere usati. Ecco cosa fa la pagina di conversione in blocco:"
+          ],
+          "ul": [
+            "Trascinare insieme decine o centinaia di SRT e VTT (si possono selezionare più file in una volta)",
+            "Uniformare a SRT o VTT, rifacendo la numerazione e normalizzando i tempi secondo il formato di destinazione",
+            "Impacchettare in un unico ZIP da scaricare, con i nomi originali e solo l'estensione cambiata",
+            "I file da cui non si ricava nessuna voce di sottotitolo vengono segnati a parte e non entrano nel pacchetto"
+          ]
+        },
+        {
+          "h2": "Inserire i file",
+          "ps": [
+            "Trascina più file di sottotitoli insieme nel riquadro tratteggiato, oppure clicca e selezionane più di uno in una volta. L'elenco li mostra uno per uno: quelli riconosciuti indicano il numero di voci, quelli non riconosciuti sono marcati \"non riconosciuto\". Le statistiche in alto danno il numero di file, il totale delle voci e quanti non sono stati riconosciuti.",
+            "⚠️ Questa pagina legge solo in UTF-8. I sottotitoli con la codifica rotta (pieni di punti interrogativi o riquadri) vanno prima sistemati in [[Riparazione dei caratteri|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Elenco dei file: nome file e numero di voci uno per uno, i non riconosciuti sono segnati in rosso",
+            "cap": "L'elenco mostra tutto uno per uno; i non riconosciuti vengono segnati lì sul momento"
+          }
+        },
+        {
+          "h2": "Uniformare a cosa",
+          "ps": [
+            "Scegli il formato di destinazione in \"Uniforma a\" — SRT o VTT. Una volta scelto, ogni file dell'elenco viene rigenerato nel formato di destinazione: la numerazione viene rifatta dall'inizio e i tempi normalizzati secondo quel formato (SRT usa la virgola per i millisecondi, VTT il punto).",
+            "**Il nome del file resta quello originale, cambia solo l'estensione**; i nomi doppi ricevono un numero automatico e non si sovrascrivono a vicenda."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Scelta del formato di destinazione e stato dell'elenco, la barra delle statistiche mostra il numero di file e delle voci",
+            "cap": "Scelto il formato di destinazione, l'elenco viene rigenerato nel nuovo formato; il nome del file cambia solo nell'estensione"
+          }
+        },
+        {
+          "h2": "Impacchettare e scaricare",
+          "ps": [
+            "Clicca \"impacchetta in un unico ZIP e scarica\": nell'archivio che ricevi ci sono tutti i file convertiti. **I file da cui non è stata riconosciuta nessuna voce non entrano nel pacchetto** — restano nell'elenco con il loro contrassegno e non vengono mescolati dentro facendo finta che sia andato tutto bene. A pacchetto pronto viene indicato il numero di file."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Area di impacchettamento: pulsante di download dello ZIP e messaggio con l'esito",
+            "cap": "I file non riconosciuti non entrano nel pacchetto, restano nell'elenco con il loro segno"
+          }
+        },
+        {
+          "h2": "Quando scatta il \"non riconosciuto\"",
+          "ps": [
+            "Se da un file non si ricava nessuna voce di sottotitolo, viene marcato \"non riconosciuto\". Tre cause comuni: il file non è un sottotitolo (per esempio è finito dentro un .txt di avvisi), la codifica non è UTF-8 (si leggono solo caratteri di sostituzione) oppure il contenuto è stato compresso in un unico paragrafo senza tempi.",
+            "I file contrassegnati si possono gestire uno per uno: per la codifica vai in [[Riparazione dei caratteri|/repair.html]], per il formato in [[Conversione di formato|/convert.html]], convertili una volta e rimettili nell'elenco."
+          ]
+        },
+        {
+          "h2": "Domande frequenti",
+          "ps": [
+            "**Quanti se ne possono inserire alla volta?** Non c'è un limite rigido, dipende dalla memoria del browser; qualche centinaio di SRT di solito non è un problema.",
+            "**Il testo delle battute viene modificato?** No. La conversione in blocco cambia solo il contenitore, rifà la numerazione e normalizza i tempi; le battute non cambiano di un carattere.",
+            "**E se devo cambiare il contenuto?** Questa pagina cambia solo il formato. Per i tempi in blocco usa [[Regolazione dei tempi|/shift.html]], per il testo in blocco usa [[Sostituzione dei termini|/glossary.html]], entrambi si usano file per file nelle rispettive pagine.",
+            "**ASS è supportato?** Questa pagina converte solo fra SRT e VTT. ASS ha lo stile: convertilo a parte con [[Conversione di formato|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Conversione e impacchettamento avvengono interamente nel browser; nessun contenuto dei sottotitoli viene inviato a un server."
+          ]
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "Cosa cambiare in una stagione intera e da quale passo cominciare, vedi [[Come correggere in blocco i sottotitoli di una stagione|/guides/batch-convert-srt.html]]; per un singolo file in più formati usa [[Conversione di formato|/convert.html]]; per passare alla revisione in tabella usa [[Conversione in tabella|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "it": {
+      "seo": {
+        "title": "Correggere in blocco i sottotitoli di una stagione – AI-SRTSub",
+        "desc": "In una stagione di solito c'è una cosa sola da cambiare: formato, scostamento dei tempi, termini. Cosa si chiude in una volta sola, cosa va fatto file per file e come gestire i file non riconosciuti.",
+        "h1": "Come correggere in blocco i sottotitoli di una stagione",
+        "intro": "In una stagione di decine di file, quello che va cambiato di solito è sempre la stessa cosa. Distinguere cosa si chiude in una volta sola da cosa va fatto file per file è molto più conveniente che farsi carico di ogni singolo file.",
+        "ctaText": "Apri la conversione in blocco"
+      },
+      "body": [
+        {
+          "h2": "Quello che va cambiato di solito è sempre la stessa cosa",
+          "ps": [
+            "Se i sottotitoli di una stagione hanno problemi, è raro che ogni episodio ne abbia uno diverso — di solito è la stessa causa che ricade su ogni episodio: l'intera stagione è stata compressa dallo stesso gruppo di sottotitoli (formato uniforme, filigrana uniforme), l'intera stagione è stata abbinata alla stessa versione video (direzione ed entità dello scostamento identiche) oppure le traduzioni dei nomi non sono coerenti in tutta la stagione.",
+            "Prendi prima due episodi (uno all'inizio, uno alla fine) per dare un'occhiata e accertati che sia **lo stesso problema**, prima di metterti a lavorare in blocco. Se il primo e l'ultimo episodio hanno problemi diversi, non è una cosa che si risolve in blocco."
+          ]
+        },
+        {
+          "h2": "Quello che si chiude in una volta sola",
+          "ps": [
+            "**Uniformare il formato** è l'unica cosa che si chiude davvero in una volta sola: trascina decine o centinaia di SRT e VTT in [[Conversione in blocco|/batch.html]], scegli il formato di destinazione e porta via un solo ZIP. Rifare la numerazione e normalizzare i tempi avviene in questo passaggio; le battute non cambiano di un carattere."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Elenco dei file della pagina di conversione in blocco: numero di voci uno per uno, i non riconosciuti segnati in rosso",
+            "cap": "Uniformare il formato è l'unica cosa che si chiude in una volta sola"
+          }
+        },
+        {
+          "h2": "Quello che va fatto file per file",
+          "ps": [
+            "Qui sotto non c'è un ingresso in blocco e bisogna passarli uno per uno — ma di solito **basta farlo una volta e poi vale per tutta la stagione**, tramite un'operazione equivalente:"
+          ],
+          "ul": [
+            "**Uniformare lo scostamento dei tempi**: se lo scostamento è uguale per ogni episodio, misura quello di un episodio in [[Regolazione dei tempi|/shift.html]], segnati il numero e inserisci lo stesso numero negli altri episodi",
+            "**Uniformare i termini**: il glossario si configura una volta in [[Sostituzione dei termini|/glossary.html]] e ogni sottotitolo usa lo stesso glossario",
+            "**Uniformare la rimozione della filigrana**: le regole della filigrana sono fisse e le caselle preselezionate in [[Pulizia dei sottotitoli|/clean.html]] coprono già le filigrane comuni: basta trascinarli dentro uno per uno"
+          ]
+        },
+        {
+          "h2": "Non invertire l'ordine",
+          "ps": [
+            "Se ci sono più cose da fare, un ordine sbagliato costringe a rifare tutto. Segui quest'ordine:",
+            "**Prima sistema la codifica** → **poi uniforma il formato** → **poi cambia il contenuto** (filigrana, termini, tempi) → **per ultimo il controllo qualità**. Se cambi formato senza aver sistemato la codifica, quello che si legge resta illeggibile; se cambi il contenuto senza aver uniformato il formato, ogni strumento ha un supporto di formato diverso."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Area di impacchettamento: pulsante di download dello ZIP e messaggio con l'esito",
+            "cap": "Uniformare il formato davanti, cambiare il contenuto dopo"
+          }
+        },
+        {
+          "h2": "Come gestire i file non riconosciuti",
+          "ps": [
+            "Nella conversione in blocco, i file marcati \"non riconosciuto\" non entrano nello ZIP e restano nell'elenco. Tre cause comuni: non sono file di sottotitoli (è finito dentro un file di avvisi), la codifica non è UTF-8 oppure il contenuto è stato compresso in un unico paragrafo senza tempi.",
+            "Per la codifica vai in [[Riparazione dei caratteri|/repair.html]] e sistémali a parte; per il formato vai in [[Conversione di formato|/convert.html]], convertili una volta e rimettili nell'elenco. **Non infilare a forza i file non riconosciuti nel pacchetto solo per fare numero** — scoprire durante la riproduzione che manca un episodio è molto più seccante che dedicare un minuto adesso."
+          ]
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "La guida completa alla conversione in blocco è in [[Come usare la conversione in blocco|/guides/batch.html]]; lo scostamento dei tempi uniforme è in [[Come usare la regolazione dei tempi|/guides/shift.html]]; prima di consegnare, passa da [[Controllo qualità dei sottotitoli|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "it": {
+      "seo": {
+        "title": "Cosa sono 23,976 / 24 / 25 / 30 fps – I tempi dei sottotitoli – AI-SRTSub",
+        "desc": "23,976 non è 24 e 29,97 non è 30: quello 0,1% viene dalla colorazione NTSC. Le regioni PAL a 25 rendono il film il 4% più veloce. Come incidono sui tempi dei sottotitoli e come convertire.",
+        "h1": "Cosa sono 23,976 / 24 / 25 / 30 fps",
+        "intro": "Lo 0,1% di differenza fra 23,976 e 24 è una coda rimasta dalla storia della televisione. Insieme al 4% del PAL, è la radice del fatto che i sottotitoli, più si va avanti, più risultano sfalsati.",
+        "ctaText": "Apri la regolazione dei tempi"
+      },
+      "body": [
+        {
+          "h2": "Cosa sono questi quattro numeri",
+          "ps": [
+            "La frequenza dei fotogrammi è quante immagini scorrono in un secondo. I quattro comuni sono:"
+          ],
+          "ul": [
+            "**24 fps** — la frequenza di ripresa e proiezione del cinema; la sala è a 24",
+            "**23,976 fps** — la frequenza del film dopo il passaggio alla televisione NTSC, lo 0,1% più lenta di 24",
+            "**25 fps** — la frequenza della televisione PAL (Europa, Cina, Australia e altre regioni a 50 Hz)",
+            "**29,97 fps / 30 fps** — la frequenza dei programmi televisivi NTSC, con lo stesso 0,1% di differenza"
+          ]
+        },
+        {
+          "h2": "Da dove arriva lo 0,1%",
+          "ps": [
+            "23,976 = 24 × 1000/1001 e 29,97 = 30 × 1000/1001. Questo 1000/1001 è il segno lasciato dalla colorazione NTSC: per inserire la sottoportante colore senza modificare i ricevitori in bianco e nero già esistenti, la frequenza di campo venne abbassata da 60 Hz a 59,94 Hz (60 × 1000/1001) e la frequenza dei fotogrammi scese di conseguenza.",
+            "Il risultato è che il film trasmesso nelle regioni NTSC gira a 23,976 e non a 24. Uno 0,1% di differenza, pari a 3,6 secondi su un'ora — preso da solo quasi non si nota, ma è una cosa diversa dal 4% qui sotto, non sommarli."
+          ]
+        },
+        {
+          "h2": "E il 4% da dove arriva",
+          "ps": [
+            "Le regioni PAL trasmettono a 25 fps. Il film è girato a 24 fps e viene proiettato direttamente a 25 — il numero di fotogrammi non cambia di uno, quindi la velocità di riproduzione sale del 4% (25/24 ≈ 1,0417). Un film da 100 minuti in versione PAL dura 96 minuti.",
+            "Questa è la radice della **deriva progressiva**: i sottotitoli sono fatti sull'originale e il video è la versione PAL, all'inizio non si scosta di un secondo e alla fine si scosta di 4 minuti. Spostare tutto in blocco non la risolve: bisogna convertire in proporzione."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Area di regolazione della velocità nella pagina di regolazione dei tempi: casella per il rapporto",
+            "cap": "Conversione in proporzione, un rapporto valido per tutto il film"
+          }
+        },
+        {
+          "h2": "Come convertire",
+          "ps": [
+            "Convertire significa moltiplicare per un rapporto, valido per tutto il film:"
+          ],
+          "ul": [
+            "**24 → 25** (accelerazione PAL): × 0,96",
+            "**23,976 → 25**: × 0,959 (valore esatto 23,976/25 = 0,95904)",
+            "**25 → 23,976**: × 1,0427",
+            "**23,976 ↔ 24**: × 1,001 o × 0,999, solo lo 0,1% di differenza",
+            "0,96 e 0,959 differiscono dello 0,1%, meno di 6 secondi su un film intero — se non sei sicuro che la fonte sia 24 o 23,976, va bene anche 0,96 e il resto lo aggiusti con l'ancoraggio a due punti"
+          ]
+        },
+        {
+          "h2": "Come capire quale hai in mano",
+          "ps": [
+            "Invece di tirare a indovinare il rapporto, trova due momenti di cui sei sicuro — di solito la prima e l'ultima battuta — e di' allo strumento \"questa battuta deve stare a 00:00:12 e quella a 01:35:40\"; lui tende tutto il film in linea retta fra i due punti. È l'\"ancoraggio a due punti\" e non richiede di calcolare la frequenza dei fotogrammi.",
+            "Se vuoi confermare da solo la frequenza della fonte: la scrivono il lettore o un programma di informazioni sui media. Se un nome come `1080p.WEB` non dà indicazioni sulla frequenza, l'ancoraggio a due punti è più sicuro."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Area di ancoraggio a due punti nella pagina di regolazione dei tempi: due righe per i momenti",
+            "cap": "L'ancoraggio a due punti non richiede di calcolare la frequenza, bastano due momenti"
+          }
+        },
+        {
+          "h2": "Strumenti e guide correlati",
+          "ps": [
+            "Per la conversione della frequenza dei fotogrammi vai in [[Conversione della frequenza dei fotogrammi|/guides/srt-fps-converter.html]]; per la regolazione della velocità vedi [[Regolazione della velocità dei sottotitoli|/guides/subtitle-speed-converter.html]]; se non distingui fra scostamento complessivo e deriva progressiva, guarda [[Perché i sottotitoli si sfalsano sempre di più|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

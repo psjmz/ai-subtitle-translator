@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "fr": {
+      "seo": {
+        "title": "Fusionner et styliser des sous-titres – Fusion, style, export – AI-SRTSub",
+        "desc": "Fusionner deux fichiers en une piste bilingue, remettre en forme un fichier bilingue existant ou styliser un fichier monolingue : modes d'appariement, modèles ASS et VTT, format d'export.",
+        "h1": "Fusionner des sous-titres bilingues et appliquer des effets",
+        "intro": "Réunir deux fichiers en une piste bilingue, ou styliser directement les sous-titres : police, couleur, contour et position en WYSIWYG, et l'aperçu montre exactement ce qui sera exporté.",
+        "ctaText": "Ouvrir l'outil de sous-titres à effets"
+      },
+      "body": [
+        {
+          "h2": "À quoi sert cet outil",
+          "ps": [
+            "Cette seule page couvre trois tâches : réunir un original et une traduction en un fichier bilingue, ajuster l'ordre et le style d'un fichier déjà bilingue, et ajouter des effets à un fichier monolingue. Les trois partagent les mêmes paramètres de style et le même aperçu."
+          ],
+          "ul": [
+            "**Fusionner deux fichiers** — vous avez l'original et la traduction ; en faire un fichier bilingue et l'exporter.",
+            "**Ajuster un fichier bilingue** — il est déjà bilingue mais l'ordre ou le style ne va pas ; le remettre en forme.",
+            "**Fichier monolingue** — un seul fichier ; lui donner une police, un contour, une position.",
+            "On passe de l'une à l'autre par les onglets à gauche ; la zone de style et l'aperçu sont communs."
+          ]
+        },
+        {
+          "h2": "Trois tâches, une page",
+          "ps": [
+            "En haut de la page, trois onglets : **Fusionner deux fichiers**, **Ajuster un fichier bilingue**, **Fichier monolingue**. Le choix détermine le nombre de colonnes de saisie à gauche.",
+            "En fusion, la gauche affiche deux colonnes, « 1 Sous-titres originaux » et « 2 Sous-titres traduits » ; chacune accepte un fichier importé ou du texte collé directement. Ajuster et styliser ne demandent qu'une colonne."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Les trois onglets en haut de l'outil de sous-titres à effets et la zone de saisie à gauche",
+            "cap": "Trois onglets en haut ; choisir « Fusionner deux fichiers » fait apparaître à gauche une colonne original et une colonne traduction"
+          }
+        },
+        {
+          "h2": "Comment deux fichiers sont appariés",
+          "ps": [
+            "Le premier point sous « 3 Réglages de fusion » est le mode d'appariement : **Par ordre · chronologie de l'original**, **Par chronologie · chronologie de l'original**, **Par ordre · chronologie de la traduction**.",
+            "Quand les deux fichiers ont le même nombre d'entrées dans le même ordre, l'appariement par ordre est le plus sûr. Quand les nombres diffèrent (un côté a fusionné des entrées, l'autre les a scindées), apparier par chronologie et laisser l'outil rapprocher par proximité. Quelle chronologie utiliser dépend du fichier le plus fiable — en général l'original.",
+            "En dessous viennent la structure du texte (détection automatique / deux lignes par entrée / paires alternées) et l'ordre (original en haut / traduction en haut)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Mode d'appariement, structure du texte et ordre dans les réglages de fusion",
+            "cap": "Le mode d'appariement décide qui va avec quoi, et le choix de la chronologie se fait ici aussi"
+          }
+        },
+        {
+          "h2": "Régler le style point par point",
+          "ps": [
+            "La zone de style est à droite. À l'export ASS, c'est « Apparence ASS » qui s'applique : disposition (scindé · haut et bas séparés / empilé · deux lignes en bas), taille, couleur, opacité, police, gras, italique, interlettrage, contour, couleur du contour, ombre/fond (aucun / ombre / fond), profondeur, couleur de bord, opacité du bord, alignement horizontal (bas · gauche / bas · centre / bas · droite) et distance au bas de la ligne de traduction (principale), plus la police, l'ombre/le fond et les marges gauche/droite de la ligne originale (secondaire).",
+            "À l'export des styles VTT bilingues, c'est « Style WebVTT » qui s'applique : en plus de six préréglages (standard / compact / cinématographique / haut / accessible / portrait), vous ajustez la ligne verticale, l'ancre (bas / haut / centre), la position horizontale, la largeur size, l'alignement align et la hauteur de ligne de la réplique entière, ainsi que la couleur de fond, l'opacité du fond et l'épaisseur du contour de la ligne de traduction ; la ligne originale peut hériter du style principal ou être réglée séparément.",
+            "Le résultat peut être enregistré comme préréglage et réutilisé plus tard via « Depuis les préréglages enregistrés » puis « Appliquer »."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Les paramètres de la zone Apparence ASS à droite",
+            "cap": "Taille, couleur, contour, ombre/fond et alignement se règlent séparément, et le résultat peut être enregistré comme préréglage"
+          }
+        },
+        {
+          "h2": "Vérifier l'aperçu avant l'export",
+          "ps": [
+            "« Aperçu de la fusion » est un tableau : n°, temps, original, traduction, style. La barre au-dessus filtre les lignes suspectes par « avec effets sonores », « avec préfixe de locuteur », « moins d'une seconde », « plus de deux lignes » et « vitesse de lecture dépassée », ou par un mot-clé saisi.",
+            "Un clic sur l'emplacement de style d'une ligne ouvre son éditeur et ne liste que les lignes qui l'utilisent ; « Annuler toutes les substitutions » ramène chaque modification manuelle au modèle. La zone de chronologie en dessous gère un décalage global (à partir d'une réplique) et une mise à l'échelle proportionnelle.",
+            "Quand tout va bien, passez à « 4 Export » : télécharger le fichier ou copier le contenu."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Le tableau de l'aperçu de fusion et sa barre de filtres",
+            "cap": "L'aperçu est l'export ; filtrez les lignes suspectes par type ou dépliez un emplacement de style"
+          }
+        },
+        {
+          "h2": "Ce qui n'est pas touché",
+          "ps": [
+            "Le style ne change que l'apparence, jamais le dialogue. Le texte de l'original et de la traduction n'est pas modifié d'un seul caractère pendant la fusion ; sauf si vous le changez volontairement dans la zone sous l'aperçu, la chronologie vient du fichier choisi.",
+            "À l'export SRT ou « VTT sans style », aucune information de style n'est écrite dans le fichier — la page vous indique que la VTT n'a pas de bloc STYLE et que le lecteur utilisera son apparence par défaut. Pour du style, choisissez VTT bilingue ou ASS."
+          ]
+        },
+        {
+          "h2": "Questions fréquentes",
+          "ps": [
+            "**Et si les deux fichiers n'ont pas le même nombre d'entrées ?** Choisissez « Par chronologie » ; l'outil rapproche par proximité et n'invente pas les entrées qu'il ne peut pas apparier.",
+            "**Et si un lecteur ignore le style d'un ASS exporté ?** Les styles sont dans le fichier, mais la prise en charge d'ASS varie selon les lecteurs. Pour un rendu plus portable, exportez en VTT bilingue.",
+            "**Comment revenir au modèle initial après avoir tout modifié ?** « Restaurer les paramètres par défaut » dans la zone ASS et « Restaurer les valeurs du modèle » dans la zone VTT réinitialisent chacune leur section.",
+            "**Que sont les sept lignes de l'exemple ?** Un exemple intégré, uniquement pour voir à quoi ressemble une fusion ; il n'est pas exportable. Importez vos sous-titres et cliquez sur l'aperçu pour qu'il soit remplacé automatiquement."
+          ]
+        },
+        {
+          "h2": "Confidentialité",
+          "ps": [
+            "Les sous-titres sont traités entièrement dans le navigateur : rien n'est envoyé, rien ne passe par un serveur. Fermez le navigateur et tout ce qui concernait cette session disparaît."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Pour séparer un fichier bilingue en deux pistes, utilisez [[Séparation bilingue|/bilingual.html]] ; pour le chemin inverse, d'une langue vers le bilingue, voir [[Deux façons de faire des sous-titres bilingues|/guides/make-bilingual-subtitles.html]] ; passez le résultat au [[Contrôle qualité des sous-titres|/qc.html]] ; pour une saison entière, [[Conversion par lots|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "fr": {
+      "seo": {
+        "title": "Extraire le texte brut des sous-titres – Deux dispositions – AI-SRTSub",
+        "desc": "L'extracteur de texte brut en détail : paragraphes continus ou une ligne par réplique, et ce que retirent les cinq options pour indications sonores, filigranes, doublons, préfixes et paroles.",
+        "h1": "Extraire le texte brut des sous-titres",
+        "intro": "Tirer le dialogue d'un fichier de sous-titres sous forme de texte brut propre : numéros, chronologies et balises de style disparaissent automatiquement, le résultat se lit comme un article ou sert de liste de répliques.",
+        "ctaText": "Ouvrir l'extracteur de texte brut"
+      },
+      "body": [
+        {
+          "h2": "À quoi sert cet outil",
+          "ps": [
+            "Dans un fichier de sous-titres, seul le dialogue intéresse le lecteur ; le reste est une structure destinée au lecteur multimédia — numéros, chronologies, balises de style. Cette page retire la structure et garde les mots."
+          ],
+          "ul": [
+            "**Lire comme un article** — des paragraphes continus, coupés aux pauses et aux ponctuations finales.",
+            "**Utiliser comme liste** — une ligne par réplique, un sous-titre par ligne, pratique pour une feuille de dialogue ou pour alimenter un autre outil.",
+            "**Nettoyer au passage** — indications sonores, filigranes et doublons consécutifs sont retirés par défaut.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — les six formats sont reconnus."
+          ]
+        },
+        {
+          "h2": "Déposer, pas seulement importer",
+          "ps": [
+            "La colonne « 1 Ajouter les sous-titres » à gauche accepte un fichier importé, et vous pouvez aussi coller le contenu directement dans le champ de texte. Mauvais fichier ? Cliquez sur « Effacer » et recommencez.",
+            "Cette page lit les fichiers en UTF-8. Si les sous-titres s'ouvrent en un mur de points d'interrogation ou de carrés, l'encodage est cassé — convertissez-le en UTF-8 dans [[Réparation du texte illisible|/repair.html]] puis revenez."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "La zone d'ajout des sous-titres de l'extracteur de texte brut",
+            "cap": "Importez un fichier, ou collez le contenu des sous-titres directement dans le champ"
+          }
+        },
+        {
+          "h2": "Choisir entre les deux dispositions",
+          "ps": [
+            "En haut de « 2 Options d'extraction » se trouve la disposition : **Paragraphes continus** coupe le texte aux pauses et aux ponctuations finales, ce qui se lit comme un article ; **Une ligne par réplique** donne une ligne par entrée, en correspondance un pour un avec le fichier d'origine.",
+            "Recopier le dialogue pour prendre des notes, s'entraîner à traduire ou lire comme un texte suivi appelle les paragraphes continus ; constituer une feuille de dialogue, comparer ligne à ligne avec l'original ou alimenter un autre outil appelle une ligne par réplique."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "La disposition et les options de nettoyage sous les options d'extraction",
+            "cap": "Choisissez une disposition ; les cinq options en dessous décident quelle catégorie de contenu disparaît"
+          }
+        },
+        {
+          "h2": "Ce que retire chacune des cinq options",
+          "ps": [
+            "**Retirer les indications sonores** : supprime les descriptions entre parenthèses comme « (pas) » ou « [musique] » et garde le dialogue.",
+            "**Retirer filigranes et publicités** : écarte les lignes du type crédits de fansub, URL et noms de chaîne.",
+            "**Retirer les doublons consécutifs** : quand la même phrase apparaît deux fois de suite (un incident de lecture), une seule reste ; les doublons plus éloignés ont un sens et sont conservés.",
+            "**Retirer les préfixes de locuteur** : « JOHN : Bonjour » devient « Bonjour ». Désactivé par défaut — un texte de type scénario a besoin de savoir qui parle.",
+            "**Ignorer les lignes de paroles** : les lignes entièrement en « ♪ … ♪ » sont ignorées. Désactivé par défaut — les paroles sont aussi des mots."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Les cinq options de nettoyage et leurs descriptions sous les options d'extraction",
+            "cap": "Chaque option indique à sa droite ce qu'elle retire ; cochez celles dont vous avez besoin"
+          }
+        },
+        {
+          "h2": "Récupérer le résultat",
+          "ps": [
+            "La colonne « 3 Résultat » à droite affiche le texte extrait en direct et recalcule dès qu'une option change.",
+            "Quand tout vous convient, cliquez sur « Télécharger » pour un .txt ou sur « Copier ». Pour les langues qui ne séparent pas les mots par des espaces, comme le chinois et le japonais, la fusion des lignes suit d'autres règles, et l'outil la gère automatiquement selon la langue."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "La zone de résultat avec les boutons de téléchargement et de copie",
+            "cap": "Le résultat se met à jour en direct ; téléchargez-le en txt ou copiez-le directement"
+          }
+        },
+        {
+          "h2": "Ce qui n'est pas touché",
+          "ps": [
+            "Le dialogue lui-même n'est pas réécrit. Les options de nettoyage décident seulement quelles lignes ou quels blocs entiers sont écartés ; elles ne changent jamais la formulation d'une entrée.",
+            "Les chronologies et les numéros ne sont pas sortis, ni modifiés puis sortis — le fichier d'origine reste intact, et cette page ne propose pas d'export avec chronologie. C'est le rôle de la [[Conversion de format|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Questions fréquentes",
+          "ps": [
+            "**Les balises de style ASS restent-elles dans le texte ?** Non. Les blocs de substitution `{}` d'ASS sont retirés et seul le dialogue reste.",
+            "**Un fichier bilingue sort-il en deux lignes ou une ?** Autant de lignes que l'entrée en avait ; cette page ne fusionne ni ne scinde — pour séparer, voir [[Séparation bilingue|/bilingual.html]].",
+            "**Pourquoi les préfixes de locuteur sont-ils conservés par défaut ?** Le nom dans « JOHN : Bonjour » est souvent une information utile (scénarios, feuilles de dialogue) ; le retirer rend difficile de savoir qui parle, donc le choix vous revient.",
+            "**Les fichiers de paroles LRC passent aussi ?** Oui. Les balises de temps LRC sont retirées et les lignes de paroles restent ; sans paroles, cochez « Ignorer les lignes de paroles »."
+          ]
+        },
+        {
+          "h2": "Confidentialité",
+          "ps": [
+            "Les sous-titres sont traités entièrement dans le navigateur : rien n'est envoyé, rien ne passe par un serveur. Le texte reste sur la page courante et disparaît à l'actualisation."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Pour comprendre ce que contient vraiment un fichier de sous-titres, voir [[Ce que contient un fichier SRT|/guides/srt-file-format.html]] ; pour traduire le dialogue extrait, allez à la [[Traduction de sous-titres|/translate.html]] ; pour en faire un tableau, [[Sous-titres vers Excel/CSV|/guides/srt-to-excel.html]] ; et passez le [[Contrôle qualité des sous-titres|/qc.html]] avant de livrer."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "fr": {
+      "seo": {
+        "title": "Scinder et assembler des sous-titres – Couper par bloc – AI-SRTSub",
+        "desc": "Scinder et assembler en détail : couper un fichier en segments par durée ou par nombre de répliques, redémarrer chaque segment à zéro, enchaîner plusieurs fichiers ou les entrelacer par chronologie.",
+        "h1": "Scinder et assembler des sous-titres",
+        "intro": "Couper un long fichier en segments, ou réunir plusieurs fichiers épars en un seul. La coupe tombe toujours sur une frontière d'entrée — une phrase n'est jamais coupée en deux.",
+        "ctaText": "Ouvrir scinder et assembler"
+      },
+      "body": [
+        {
+          "h2": "À quoi sert cet outil",
+          "ps": [
+            "Découper des épisodes, segmenter, réunir des sources : les blocs de sous-titres ne correspondent jamais aux blocs vidéo. Soit un fichier doit être coupé, soit plusieurs doivent n'en faire qu'un. Cette page traite les deux, un onglet chacun."
+          ],
+          "ul": [
+            "**Scinder** — couper un long fichier en segments par durée ou par nombre de répliques.",
+            "**Assembler** — enchaîner plusieurs fichiers en un épisode, ou les entrelacer par chronologie.",
+            "**Couper seulement aux frontières** — une phrase n'est jamais coupée en deux.",
+            "**Numéros renumérotés automatiquement** — rien à renuméroter à la main, et pas un mot de dialogue ne change."
+          ]
+        },
+        {
+          "h2": "D'abord choisir : scinder ou assembler",
+          "ps": [
+            "Deux onglets en haut : **Scinder : un fichier en segments** et **Assembler : plusieurs fichiers en un**. Les options de l'étape deux suivent votre choix.",
+            "Dans « 1 Ajouter les sous-titres », importez un fichier ou collez du texte ; mauvais fichier ? « Effacer ». Cette page ne lit qu'en UTF-8 — encodage cassé (mur de points d'interrogation ou de carrés) ? Passez d'abord par [[Réparation du texte illisible|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Les deux onglets en haut de la page scinder et assembler",
+            "cap": "Scinder et assembler sont deux onglets ; les options de l'étape deux suivent le choix"
+          }
+        },
+        {
+          "h2": "Comment couper",
+          "ps": [
+            "Sous « 2 Comment scinder », choisissez la base : **durée** (un segment toutes les X minutes) ou **nombre de répliques** (un segment toutes les X répliques), puis saisissez un nombre.",
+            "Cochez « Redémarrer chaque segment à 0:00 » et chaque segment compte à partir de zéro — utile quand vous déposez des épisodes et donnez chaque segment séparément à un lecteur. Sans la coche, les horodatages d'origine sont conservés et chaque segment correspond toujours à sa position dans la vidéo source.",
+            "La coupe ne tombe que sur des frontières de réplique : quand un sous-titre très long chevauche le point de coupe, la réplique entière reste dans le segment précédent."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Les options durée et nombre de répliques avec l'option de redémarrage à zéro",
+            "cap": "Coupez par durée ou par nombre de répliques, et redémarrez éventuellement chaque segment à 0:00"
+          }
+        },
+        {
+          "h2": "Comment assembler",
+          "ps": [
+            "Sous « 2 Comment assembler », choisissez la méthode : **Enchaîner dans l'ordre** décale le fichier suivant pour qu'il commence après la fin du précédent, sans chevauchement ; **Entrelacer par chronologie** conserve les horodatages d'origine de chaque fichier et trie par heure de début.",
+            "Utilisez l'enchaînement quand les fichiers sont la première et la seconde moitié d'un épisode, ou quand des moitiés relues séparément doivent être réunies ; utilisez l'entrelacement quand les fichiers doivent apparaître ensemble à l'écran, comme une piste originale et une piste traduite.",
+            "Après l'assemblage, les numéros sont renumérotés automatiquement et pas un mot de dialogue ne change."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Les options Enchaîner dans l'ordre et Entrelacer par chronologie de la page assembler",
+            "cap": "L'enchaînement convient aux deux moitiés d'un épisode, l'entrelacement à une piste originale et une piste traduite"
+          }
+        },
+        {
+          "h2": "Récupérer le résultat",
+          "ps": [
+            "« 3 Résultat » à droite exporte en **SRT** et **VTT** ; cliquez sur « Télécharger » ou « Copier ».",
+            "En mode scinder, « Télécharger tous les segments » enregistre chaque segment d'un coup au lieu d'un clic par segment."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Le choix de format SRT/VTT avec les boutons de téléchargement et de téléchargement de tous les segments",
+            "cap": "Les résultats de scission se téléchargent segment par segment ; un fichier assemblé se télécharge ou se copie directement"
+          }
+        },
+        {
+          "h2": "Ce qui n'est pas touché",
+          "ps": [
+            "Pas un caractère de dialogue ne change. Cette page ne modifie que l'appartenance des répliques aux segments et leur numérotation ; le contenu des entrées reste tel quel.",
+            "Avec « Enchaîner dans l'ordre », les horodatages des fichiers suivants sont décalés en bloc — c'est ce qu'exige l'assemblage ; avec « Entrelacer par chronologie », tous les horodatages d'origine sont conservés."
+          ]
+        },
+        {
+          "h2": "Questions fréquentes",
+          "ps": [
+            "**Et si le dernier segment est très court ?** C'est normal. Le reste qui ne remplit pas un segment complet devient son propre segment au lieu d'être complété.",
+            "**Une phrase à cheval sur la coupe sera-t-elle coupée ?** Non. Les coupes tombent uniquement sur des frontières d'entrée, et une réplique qui dépasse la limite reste dans le segment précédent.",
+            "**Après entrelacement, comment sont triées deux répliques au même instant ?** Par heure de début ; à heure égale, l'ordre dans lequel vous avez ajouté les fichiers est conservé.",
+            "**Peut-on scinder de l'ASS ?** Cette page traite SRT et VTT. Convertissez d'abord l'ASS en SRT ou VTT avec la [[Conversion de format|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Confidentialité",
+          "ps": [
+            "Les sous-titres sont traités entièrement dans le navigateur : rien n'est envoyé, rien ne passe par un serveur. Fermez la page et le contenu disparaît."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Pour réunir deux fichiers en une piste bilingue (et non en un épisode), utilisez [[Fusion bilingue et effets|/guides/merge.html]] ; si toute la chronologie est décalée, [[Ajustement de la chronologie|/shift.html]] ; pour une saison entière, [[Conversion par lots|/batch.html]] ; et passez le [[Contrôle qualité des sous-titres|/qc.html]] à la fin."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "fr": {
+      "seo": {
+        "title": "Synchronisation de paroles – Charger, coller, taper le tempo – AI-SRTSub",
+        "desc": "Charger un morceau, coller les paroles, marquer un temps par ligne à l'écoute et exporter en LRC ou SRT. Espace lit, Entrée marque, Z annule, les mains restent au clavier.",
+        "h1": "Utiliser l'outil de synchronisation de paroles",
+        "intro": "Chargez un morceau, collez les paroles, marquez un temps par ligne à l'écoute et exportez en LRC standard ou SRT. L'audio est lu localement et n'est jamais envoyé.",
+        "ctaText": "Ouvrir l'outil de synchronisation"
+      },
+      "body": [
+        {
+          "h2": "À quoi sert cet outil",
+          "ps": [
+            "Donner à un morceau un fichier de paroles qu'on peut suivre en chantant : une ligne par parole, chacune portant un instant. Les lecteurs lisent le LRC, les pistes de sous-titres lisent le SRT, et les deux s'exportent ici."
+          ],
+          "ul": [
+            "**Partir de zéro** — collez des paroles en texte brut et tapez le tempo à l'écoute.",
+            "**Corriger l'existant** — importez un LRC existant et reprenez à la première ligne sans temps.",
+            "**Exporter deux formats** — LRC pour les lecteurs, SRT pour les pistes vidéo.",
+            "**Tout au clavier** — espace lit et met en pause, Entrée marque la ligne, Z annule."
+          ]
+        },
+        {
+          "h2": "1 Charger le morceau",
+          "ps": [
+            "La première colonne à gauche accepte un fichier audio : **MP3, M4A, FLAC, WAV et OGG** fonctionnent. L'audio est lu localement et n'est jamais envoyé.",
+            "La qualité audio n'affecte pas la précision, mais une source avec un chant clair est plus facile à suivre ; les versions live et les sources à l'accompagnement trop fort sont nettement plus difficiles à synchroniser."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "La zone de chargement d'un morceau de l'outil de synchronisation",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG fonctionnent, et l'audio n'est lu que localement"
+          }
+        },
+        {
+          "h2": "2 Coller les paroles",
+          "ps": [
+            "Collez les paroles dans la deuxième colonne, **une ligne par parole** ; les lignes vides sont ignorées. Cliquez ensuite sur « Analyser les paroles ».",
+            "Coller un LRC existant fonctionne aussi — ses balises `[mm:ss.xx]` sont reconnues, et après l'import vous reprenez à la première ligne sans temps, donc les lignes déjà datées n'ont pas à être refaites."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "La zone de collage des paroles et le bouton d'analyse",
+            "cap": "Collez une ligne par parole, ou collez un LRC entier et laissez l'outil lire les temps existants"
+          }
+        },
+        {
+          "h2": "3 Taper le tempo à l'écoute",
+          "ps": [
+            "Lancez le morceau et appuyez sur Entrée au moment où une ligne commence (ou cliquez sur « Marquer cette ligne ») ; le temps est enregistré et le curseur passe à la suivante.",
+            "Raccourcis : **espace** lit et met en pause, **Entrée** marque la ligne courante, **Z** annule une ligne. Appuyer sur Entrée pendant la lecture est le plus fluide — pas d'aller-retour entre souris et clavier.",
+            "Mauvaise ligne ? Appuyez sur Z pour l'annuler et recommencez. Si vous ne voulez pas marquer une ligne (un interlude, un passage purement musical), cliquez sur « Ignorer cette ligne » : elle n'apparaîtra pas dans l'export."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Les commandes lecture, marquer cette ligne, annuler une ligne et ignorer cette ligne",
+            "cap": "Espace lit et met en pause, Entrée marque la ligne, Z annule — les mains restent au clavier"
+          }
+        },
+        {
+          "h2": "4 Export",
+          "ps": [
+            "La quatrième colonne exporte : **Télécharger le LRC** pour les lecteurs, **Télécharger le SRT** pour les pistes vidéo, ou « Copier » pour prendre le texte directement.",
+            "Seules les lignes datées sont exportées ; les lignes ignorées n'entrent jamais dans le fichier. À l'export SRT, chaque ligne dure jusqu'au début de la suivante, et la dernière retombe sur 2 secondes."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Les boutons Télécharger le LRC, Télécharger le SRT et Copier de la zone d'export",
+            "cap": "LRC pour les lecteurs, SRT pour la vidéo ; seules les lignes datées sont exportées"
+          }
+        },
+        {
+          "h2": "Ce qui n'est pas touché",
+          "ps": [
+            "Le texte des paroles n'est pas réécrit. La synchronisation ajoute seulement un instant par ligne et ne touche pas aux mots collés.",
+            "À l'import d'un LRC existant, les lignes déjà datées gardent leur temps d'origine et vous ne marquez qu'à partir de la première ligne sans temps."
+          ]
+        },
+        {
+          "h2": "Questions fréquentes",
+          "ps": [
+            "**Pourquoi des lignes manquent-elles à l'export ?** Les lignes ignorées et celles sans temps n'entrent jamais dans le fichier. Revenez à l'étape trois pour les ajouter, ou confirmez qu'elles devaient être ignorées.",
+            "**Peut-on modifier les temps après coup ?** Si vous voulez tout décaler un peu après le marquage, exportez en SRT et utilisez [[Ajustement de la chronologie|/shift.html]] pour décaler ou mettre à l'échelle l'ensemble.",
+            "**LRC ou SRT, que faut-il exporter ?** Le LRC pour les lecteurs de musique (foobar2000, clients de streaming, divers lecteurs) ; le SRT quand les paroles doivent accompagner une vidéo ou être retravaillées avec des outils de sous-titres.",
+            "**Combien de temps pour un morceau ?** Cela dépend du nombre de lignes et de la précision voulue. Pour trente à quarante lignes, quelques minutes par passe une fois le rythme pris ; viser le mot près prend plus longtemps."
+          ]
+        },
+        {
+          "h2": "Confidentialité",
+          "ps": [
+            "L'audio et les paroles sont traités entièrement dans le navigateur : rien n'est envoyé, rien ne passe par un serveur. L'audio n'est décodé et lu que localement."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Si vous avez déjà un LRC et voulez des sous-titres, voir [[LRC vers SRT|/guides/lrc-to-srt.html]] ; pour la méthode et les pièges de la synchronisation, [[Comment synchroniser des paroles LRC|/guides/how-to-make-lrc-file.html]] ; si le SRT exporté est décalé, [[Ajustement de la chronologie|/shift.html]] ; et passez le résultat au [[Contrôle qualité des sous-titres|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "fr": {
+      "seo": {
+        "title": "Extraire les sous-titres d'une vidéo – Pistes MKV / MP4 – AI-SRTSub",
+        "desc": "Extraire les sous-titres intégrés en détail : lire directement les pistes de MKV, WebM, MP4 et MOV et exporter en SRT / VTT / ASS / TXT. Aucun envoi, aucun transcodage, toutes les pistes listées.",
+        "h1": "Extraire les sous-titres intégrés à une vidéo",
+        "intro": "Lire directement en SRT la piste de sous-titres enfermée dans un MKV / MP4 — la vidéo n'est jamais envoyée, tout se passe dans le navigateur.",
+        "ctaText": "Ouvrir l'extraction de sous-titres vidéo"
+      },
+      "body": [
+        {
+          "h2": "À quoi sert cet outil",
+          "ps": [
+            "Les sous-titres peuvent être enfermés dans un fichier vidéo au lieu d'exister seuls. Pour les modifier, les traduire ou les apparier, il faut d'abord les sortir — c'est la seule chose que fait cette page."
+          ],
+          "ul": [
+            "**Quatre conteneurs** — MKV / WebM et MP4 / MOV.",
+            "**Quatre types de pistes** — texte brut, ASS, WebVTT et les pistes `mov_text` / `tx3g` des MP4.",
+            "**Quatre formats d'export** — SRT / VTT / ASS / TXT.",
+            "**Ni envoi ni transcodage** — lecture par petits blocs selon l'offset, donc un fichier de plusieurs Go ne remplit pas la mémoire."
+          ]
+        },
+        {
+          "h2": "1 Ajouter la vidéo",
+          "ps": [
+            "Glissez un fichier vidéo dans la première colonne ou cliquez pour en choisir un. Seuls **MKV / WebM** et **MP4 / MOV** sont reconnus ; les autres conteneurs ne livreront aucune piste.",
+            "Le fichier ne quitte jamais votre ordinateur — il n'y a pas d'étape d'envoi. L'outil lit par petits blocs selon l'offset, donc un film de plusieurs Go ne remplit pas la mémoire, mais la première lecture doit parcourir une fois les informations de pistes."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "La zone d'ajout de vidéo de la page d'extraction des sous-titres intégrés",
+            "cap": "MKV / WebM et MP4 / MOV sont pris en charge, et le fichier ne quitte jamais votre machine"
+          }
+        },
+        {
+          "h2": "2 Les pistes de sous-titres intégrées",
+          "ps": [
+            "Une fois la lecture terminée, la deuxième colonne liste les pistes de sous-titres du fichier **une par ligne**, généralement avec une langue et un nom de piste (par exemple « Chinois », « Anglais », « Forcé »). Cliquez sur une ligne pour extraire cette piste.",
+            "Quand le fichier ne contient qu'une piste de sous-titres, l'extraction démarre automatiquement — pas besoin de cliquer.",
+            "**Les sous-titres image ne s'extraient pas** : les PGS Blu-ray et les sous-titres DVD sont des images incrustées dans le flux, sans texte à prendre, et la page le dit clairement ; il faut passer par l'OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "La liste des pistes de sous-titres intégrées, une par ligne",
+            "cap": "Une piste par ligne ; quand il n'y en a qu'une, l'extraction démarre automatiquement"
+          }
+        },
+        {
+          "h2": "3 Le résultat",
+          "ps": [
+            "« 3 Résultat » à droite donne le texte extrait, avec le format d'export au-dessus : **SRT / VTT / ASS / TXT**. Cliquez sur « Télécharger » ou « Copier ».",
+            "Quand la piste source est en ASS, son en-tête de style et sa résolution reviennent tels quels — un export ASS les conserve, un export SRT ne porte que le texte."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "La zone de résultat avec le choix de format SRT / VTT / ASS / TXT",
+            "cap": "Quatre formats d'export ; une source ASS conserve son en-tête de style et sa résolution"
+          }
+        },
+        {
+          "h2": "Ce qui n'est pas touché",
+          "ps": [
+            "Le fichier vidéo lui-même n'est pas touché du tout — lecture seule, aucune écriture, aucun transcodage, aucun remultiplexage.",
+            "Le contenu des sous-titres sort tel quel : aucune supposition d'encodage, aucune correction de chronologie. Si les sous-titres extraits sont illisibles, c'est un problème d'encodage de la piste source — à traiter dans [[Réparation du texte illisible|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Questions fréquentes",
+          "ps": [
+            "**N'y a-t-il vraiment aucun moyen pour les sous-titres image (PGS / DVD) ?** Pas sur cette page — ce sont des images sans couche de texte. Il faut d'abord de l'OCR, et cette page ne le fait pas.",
+            "**Les sous-titres extraits sont mal calés — pourquoi ?** Cette page ne corrige pas les chronologies ; ce qui sort est ce qui était là. Pour un décalage global ou un problème de vitesse, [[Ajustement de la chronologie|/shift.html]].",
+            "**Pourquoi faut-il attendre si longtemps avant que quelque chose se passe ?** Un gros fichier doit être parcouru bloc par bloc pour trouver les informations de pistes, et plus il est gros plus c'est long ; cela se passe en local et n'a rien à voir avec la connexion.",
+            "**Peut-on utiliser cette page pour des sous-titres externes ?** Ce n'est pas nécessaire — un .srt / .ass externe va directement dans la [[Conversion de format|/convert.html]] ou un autre outil. Cette page est faite pour les sous-titres enfermés dans une vidéo."
+          ]
+        },
+        {
+          "h2": "Confidentialité",
+          "ps": [
+            "La vidéo est lue entièrement dans le navigateur : rien n'est envoyé, rien n'est transcodé, rien ne passe par un serveur. Fermez la page et les données lues sont libérées."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Pour traduire ce que vous avez extrait, allez à la [[Traduction de sous-titres|/translate.html]], pour le rendre bilingue voir [[Deux façons de faire des sous-titres bilingues|/guides/make-bilingual-subtitles.html]] ; pour la différence entre piste intégrée et externe, et ce qui s'extrait ou non, voir [[Sortir les sous-titres d'une vidéo|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "fr": {
+      "seo": {
+        "title": "Remplacer des termes dans les sous-titres – Un tableau suffit – AI-SRTSub",
+        "desc": "Le remplacement de termes en détail : une règle par ligne, séparée par -> , => , → ou Tab, # pour un commentaire. Mot entier, casse, première ou deuxième ligne, chaque changement listé et annulable.",
+        "h1": "Remplacer des termes en lot dans les sous-titres",
+        "intro": "Un tableau de termes uniformise en une fois le vocabulaire de tout un fichier de sous-titres — chronologies, styles ASS et blocs NOTE VTT ne bougent pas d'un caractère.",
+        "ctaText": "Ouvrir le remplacement de termes"
+      },
+      "body": [
+        {
+          "h2": "À quoi sert cet outil",
+          "ps": [
+            "Le même mot traduit de deux façons, des noms et des lieux qui suivent la traduction automatique, des sous-titres d'autrui à aligner sur vos conventions — tout cela partage un trait : ce qui change est un mot, pas la structure. Cette page ne change que des mots."
+          ],
+          "ul": [
+            "**Unifier les noms** — personnes, lieux et noms propres restent cohérents d'un bout à l'autre.",
+            "**Corriger les erreurs machine** — un terme mal traduit est remplacé dans tout le fichier.",
+            "**Adopter vos usages** — remettre les sous-titres d'autrui à votre vocabulaire.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — les six formats sont reconnus."
+          ]
+        },
+        {
+          "h2": "Deux entrées : les sous-titres et le tableau",
+          "ps": [
+            "La colonne « 1 Ajouter les sous-titres » à gauche accepte un fichier, ou vous collez le contenu directement ; mauvais fichier ? « Effacer ».",
+            "La colonne « 2 Tableau de termes » à droite contient les règles. **Une règle par ligne**, l'ancien et le nouveau terme séparés par `->` , `=>` , `→` ou une tabulation — les quatre fonctionnent. Les lignes commençant par `#` sont des commentaires et ne participent pas au remplacement.",
+            "En cas de doute sur le format, cliquez sur « Insérer un exemple » et adaptez-le."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "La zone d'ajout des sous-titres et le tableau de termes de la page de remplacement",
+            "cap": "Sous-titres à gauche, règles à droite ; une règle par ligne, ancien et nouveau terme séparés par ->"
+          }
+        },
+        {
+          "h2": "Comment écrire le tableau de termes",
+          "ps": [
+            "Une règle par ligne : le terme actuel à gauche, ce qu'il doit devenir à droite. Par exemple `Thor -> Donar` remplace chaque « Thor » du fichier par « Donar ».",
+            "Les commentaires commencent par `#` et servent à étiqueter un groupe de règles (par exemple « # noms saison 1 ») et à désactiver une règle temporairement — il suffit de mettre un `#` devant au lieu de la supprimer.",
+            "Les règles s'exécutent de haut en bas ; le texte produit par une règle est de nouveau parcouru par les règles suivantes. Quand l'ordre compte (par exemple remplacer A par B, puis B par C), il faut en tenir compte."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Des lignes de règles de remplacement dans le champ du tableau de termes",
+            "cap": "Une règle par ligne ; les lignes en # sont des commentaires et peuvent désactiver une règle"
+          }
+        },
+        {
+          "h2": "Ce que font les trois options",
+          "ps": [
+            "**Portée** : `tout` / `1re ligne seulement` / `2e ligne seulement`. Dans un fichier bilingue, choisissez « 2e ligne seulement » pour ne changer que la traduction ; les entrées à une seule ligne restent intactes avec l'un ou l'autre réglage monoligne — l'outil ne devine pas quel côté est l'original.",
+            "**Mot entier** : ne remplace que les termes qui forment un mot à part entière, donc `art` ne touche pas `start`. Pour les langues sans espaces entre les mots, comme le chinois et le japonais, cette option n'a aucun effet — le remplacement se fait alors sur des sous-chaînes.",
+            "**Respecter la casse** : désactivé par défaut, `CEO` et `ceo` sont tous deux remplacés ; coché, seule l'orthographe exactement identique est remplacée."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Les options portée, mot entier et respect de la casse sous le tableau de termes",
+            "cap": "La portée décide quelle ligne change ; mot entier et casse décident de la strictesse de la correspondance"
+          }
+        },
+        {
+          "h2": "Chaque changement listé, chaque changement annulable",
+          "ps": [
+            "« 3 Résultat » affiche les sous-titres remplacés et **liste chaque changement** : quelle réplique, quelle ligne, de quoi vers quoi.",
+            "Un changement non désiré se retire d'un clic dans la liste, sans modifier le tableau et relancer. Quand tout vous convient, cliquez sur « Télécharger » ou « Copier »."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "La zone de résultat avec la liste des changements individuels",
+            "cap": "Chaque changement est listé ; un clic sur celui que vous ne voulez pas l'annule"
+          }
+        },
+        {
+          "h2": "Ce qui n'est pas touché",
+          "ps": [
+            "**Les chronologies, les lignes de style ASS et les blocs `NOTE` VTT ne bougent pas d'un caractère.** Le remplacement ne s'applique qu'au texte du dialogue, jamais aux lignes de structure.",
+            "Le tableau de termes ne modifie pas automatiquement votre fichier — le résultat est une nouvelle sortie et l'original reste tel quel."
+          ]
+        },
+        {
+          "h2": "Questions fréquentes",
+          "ps": [
+            "**Pourquoi un terme n'a-t-il pas été remplacé ?** Vérifiez d'abord la portée : avec « 2e ligne seulement », les entrées à une seule ligne restent intactes. Puis vérifiez le mot entier, qui bloque les correspondances qui ne forment pas un mot autonome.",
+            "**Pourquoi le chinois remplace-t-il encore des sous-chaînes avec le mot entier coché ?** C'est normal. Le chinois et le japonais ne séparent pas les mots par des espaces, l'outil ne peut pas déterminer les frontières de mots et le mot entier n'a aucun effet là.",
+            "**Comment tout annuler après une erreur ?** Retirez les entrées une à une dans la liste ; pour repartir de zéro, videz le tableau et ajoutez de nouveau les sous-titres.",
+            "**Les lignes de style ASS peuvent-elles être modifiées par erreur ?** Non. Les lignes de style et les blocs `NOTE` sont hors portée ; seul le texte du dialogue participe."
+          ]
+        },
+        {
+          "h2": "Confidentialité",
+          "ps": [
+            "Les sous-titres et le tableau de termes sont traités entièrement dans le navigateur : rien n'est envoyé, rien ne passe par un serveur. Le tableau n'est pas conservé et sera vide à la prochaine ouverture."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Faut-il un tableau de termes et comment le tenir sur une saison, voir [[Tableaux de termes : un vocabulaire pour la saison|/guides/subtitle-glossary.html]] ; si le contenu est sale (filigranes, indications sonores), passez d'abord par [[Nettoyage des sous-titres|/clean.html]] ; une fois les noms fixés, pour d'autres langues allez à la [[Traduction de sous-titres|/translate.html]] ; et passez le résultat au [[Contrôle qualité des sous-titres|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "fr": {
+      "seo": {
+        "title": "Sortir les sous-titres d'une vidéo – Intégrés ou externes – AI-SRTSub",
+        "desc": "Comment sortir des sous-titres enfermés dans une vidéo : ce que portent MKV / WebM / MP4 / MOV, la différence entre pistes texte, ASS, WebVTT et mov_text, et pourquoi l'image n'a pas de texte.",
+        "h1": "Sortir les sous-titres d'une vidéo",
+        "intro": "Les sous-titres peuvent vivre dans un fichier vidéo ou à côté, seuls. À l'intérieur, ils sont une piste du conteneur — les sortir n'a rien à voir avec le transcodage.",
+        "ctaText": "Ouvrir l'extraction de sous-titres vidéo"
+      },
+      "body": [
+        {
+          "h2": "Où vivent les sous-titres : intégrés et externes",
+          "ps": [
+            "Un fichier vidéo (MKV, MP4) est un conteneur qui réunit une piste vidéo, une piste audio et des pistes de sous-titres. Les sous-titres enfermés dedans sont dits **intégrés** ; un fichier .srt / .ass séparé à côté est dit **externe**, et une piste intégrée est aussi dite **multiplexée**.",
+            "Les sous-titres externes s'utilisent tels quels. Le problème vient des intégrés : pour les modifier, les traduire ou bâtir une piste bilingue à partir de l'original, vous n'avez aucun fichier de sous-titres en main — il faut d'abord lire la piste dans le conteneur. Cette étape n'est pas du transcodage : la vidéo n'est pas réencodée, seules les données déjà stockées dans le conteneur sont extraites."
+          ]
+        },
+        {
+          "h2": "Quel conteneur porte quoi",
+          "ps": [
+            "Les conteneurs n'accueillent pas les mêmes formats de sous-titres, et la difficulté d'extraction varie aussi :"
+          ],
+          "ul": [
+            "**MKV / WebM** — le plus permissif : texte brut, ASS et WebVTT passent tous, et les pistes multilingues sont courantes.",
+            "**MP4 / MOV** — le plus souvent une piste `mov_text` / `tx3g` : du texte brut avec un peu d'information de style.",
+            "**Piste texte brut** — sort en texte et devient directement du SRT.",
+            "**Piste ASS** — porte un en-tête de style et une résolution ; l'export ASS les conserve, l'export SRT ne laisse que le texte.",
+            "**Sous-titres image (PGS Blu-ray, sous-titres DVD)** — stockent des images, pas des caractères : aucun texte ne peut être extrait."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Les pistes de sous-titres listées par la page d'extraction",
+            "cap": "Une piste par ligne, en général avec une langue et un nom ; quand il n'y en a qu'une, elle est extraite automatiquement"
+          }
+        },
+        {
+          "h2": "Pourquoi les sous-titres image ne s'extraient pas",
+          "ps": [
+            "Les PGS Blu-ray et les sous-titres DVD ne stockent pas de caractères mais une suite d'images avec un canal alpha. Quand un lecteur les affiche, il colle une image, il ne compose pas du texte.",
+            "Une telle piste ne contient donc aucun texte lisible — non pas parce que l'outil ne le prend pas en charge, mais parce qu'il n'y a pas de caractères. La page le dit clairement quand elle en rencontre une.",
+            "La seule façon d'obtenir des mots est de reconnaître d'abord les caractères de ces images (OCR) puis de fabriquer des sous-titres. C'est un autre travail que de sortir une piste."
+          ]
+        },
+        {
+          "h2": "Ce qui vient souvent après l'extraction",
+          "ps": [
+            "Ce qui sort est la piste telle quelle : l'outil ne devine pas les encodages et ne corrige pas les chronologies. Deux choses arrivent donc souvent :",
+            "D'une part le **texte illisible** — un problème d'encodage de la piste source, qui sort illisible de la même façon ; allez dans [[Réparation du texte illisible|/guides/repair.html]] pour identifier l'encodage. D'autre part le **calage faux** — que la source ait un logo d'intro ou que les cadences ne correspondent pas, le résultat est décalé en bloc ; utilisez [[Ajustement de la chronologie|/shift.html]] pour décaler ou mettre à l'échelle.",
+            "Ensuite, pour traduire, allez à la [[Traduction de sous-titres|/translate.html]], et pour le bilingue voir [[Deux façons de faire des sous-titres bilingues|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "La zone de résultat avec les formats d'export SRT / VTT / ASS / TXT",
+            "cap": "Les sous-titres extraits s'exportent en quatre formats ; une source ASS conserve son en-tête de style et sa résolution"
+          }
+        },
+        {
+          "h2": "Quelques points faciles à confondre",
+          "ps": [
+            "**Extraire les sous-titres n'est pas les incruster.** La vidéo n'est pas réencodée : image et audio ne sont pas affectés.",
+            "**L'extraction ne touche pas le fichier d'origine.** Lecture seule, jamais d'écriture, pas un octet de la vidéo ne change.",
+            "**Un gros fichier lent n'est pas un problème de connexion.** L'outil parcourt les informations de pistes bloc par bloc, et plus le fichier est gros plus c'est long ; tout se passe en local.",
+            "**Les sous-titres externes n'ont pas besoin de cette page.** Avec un .srt / .ass, allez directement à la [[Conversion de format|/convert.html]] ; seuls les sous-titres enfermés dans une vidéo demandent une extraction."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Pour la marche à suivre complète, voir [[Extraire les sous-titres intégrés à une vidéo|/guides/videosub.html]] ; pour traduire ce que vous avez extrait, [[Traduction de sous-titres|/translate.html]], pour le bilingue [[Deux façons de faire des sous-titres bilingues|/guides/make-bilingual-subtitles.html]] ; en cas de texte illisible, commencez par [[Réparation du texte illisible|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "fr": {
+      "seo": {
+        "title": "Synchroniser des paroles LRC – Une ligne, un instant – AI-SRTSub",
+        "desc": "Créer un fichier LRC de zéro : coller une parole par ligne, marquer le temps à l'écoute, les trois raccourcis utiles, quand ignorer une ligne, exporter en LRC ou SRT, et que faire si le calage dérive.",
+        "h1": "Comment synchroniser des paroles LRC",
+        "intro": "Un LRC, c'est « une ligne de paroles plus un instant ». Le fabriquer s'appelle synchroniser : saisir le moment où chaque ligne commence.",
+        "ctaText": "Ouvrir l'outil de synchronisation"
+      },
+      "body": [
+        {
+          "h2": "Ce que synchroniser veut dire",
+          "ps": [
+            "La structure d'un fichier LRC est on ne peut plus simple : une ligne de paroles par ligne, précédée d'une balise `[mm:ss.xx]`. Quand un lecteur atteint une ligne, il affiche cette parole à cet instant.",
+            "Tout le travail de fabrication d'un LRC consiste donc à attribuer un instant à chaque ligne — et aucune machine ne peut le faire à votre place, car décider où une ligne commence à être chantée demande de l'écoute."
+          ]
+        },
+        {
+          "h2": "Combien de passes pour un morceau",
+          "ps": [
+            "Une minute de réflexion avant de commencer épargne la plus grande partie des reprises :"
+          ],
+          "ul": [
+            "**Une passe** — chant clair, peu de lignes, à peu près calé : taper d'un bout à l'autre suffit.",
+            "**Deux passes** — une passe grossière, puis une vérification ligne par ligne ; la méthode habituelle quand la précision compte.",
+            "**Importer et corriger** — un LRC existe et seules quelques lignes sont fausses ; l'importer et reprendre à la première ligne sans temps.",
+            "**Les interludes et passages purement musicaux** n'ont pas besoin d'être calés — cliquez sur « Ignorer cette ligne » et ils restent hors de l'export.",
+            "**Refrains et chevauchements** ne peuvent enregistrer qu'un point de départ ; les parties qui se chevauchent sont comptées avec la voix principale."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Les commandes lecture, marquer cette ligne, annuler une ligne et ignorer cette ligne",
+            "cap": "Appuyer sur Entrée pendant la lecture est le plus fluide ; mauvaise ligne ? Z pour l'annuler et recommencer"
+          }
+        },
+        {
+          "h2": "Le collage décide de la suite",
+          "ps": [
+            "Collez les paroles une ligne par parole ; les lignes vides sont ignorées. Les retours à la ligne collés sont les lignes que vous calerez ensuite — plus de coupures maintenant, plus de clics plus tard.",
+            "Coller un LRC existant fonctionne aussi : ses balises `[mm:ss.xx]` sont reconnues, et après l'import vous **reprenez à la première ligne sans temps**, donc les lignes déjà datées n'ont pas à être refaites.",
+            "Un LRC à moitié fait peut donc être enregistré puis recollé plus tard pour continuer."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "La zone de collage des paroles et le bouton d'analyse",
+            "cap": "Une ligne par parole ; coller un LRC entier lit les temps existants pour continuer"
+          }
+        },
+        {
+          "h2": "Exporter en LRC ou en SRT",
+          "ps": [
+            "**Pour un lecteur de musique, exportez en LRC.** foobar2000, divers lecteurs et appareils avec affichage de paroles le lisent.",
+            "**Pour poser les paroles sur une vidéo ou les retravailler, exportez en SRT.** Les pistes de sous-titres vidéo, les outils de sous-titres et les logiciels de montage lisent le SRT. À l'export, chaque ligne dure jusqu'au début de la suivante, et la dernière retombe sur 2 secondes.",
+            "Les deux n'exportent que les lignes datées — les lignes ignorées n'entrent jamais dans le fichier."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Les boutons Télécharger le LRC, Télécharger le SRT et Copier de la zone d'export",
+            "cap": "LRC pour les lecteurs, SRT pour la vidéo ; seules les lignes datées sont exportées"
+          }
+        },
+        {
+          "h2": "Quelques points faciles à confondre",
+          "ps": [
+            "**Tout est légèrement décalé après le calage ? Utilisez un décalage.** Exportez en SRT et décalez l'ensemble avec [[Ajustement de la chronologie|/shift.html]] ; bien plus rapide que de recaler ligne par ligne.",
+            "**L'écart grandit au fil du morceau ? C'est un problème de vitesse.** Quand la vitesse de lecture et celle de l'enregistrement diffèrent, l'erreur grandit vers la fin, et cela demande une mise à l'échelle proportionnelle, pas un décalage.",
+            "**Les raccourcis ne sont naturels qu'utilisés ensemble.** Espace lit et met en pause, Entrée marque la ligne, Z annule une ligne — appuyez sur Entrée pendant la lecture au lieu de passer de la souris au clavier.",
+            "**La qualité audio affecte la précision.** Une source au chant clair est plus facile à suivre ; les versions live et les accompagnements trop forts sont nettement plus difficiles."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Pour la marche à suivre complète, voir [[Utiliser l'outil de synchronisation de paroles|/guides/lrc.html]] ; pour transformer un LRC existant en sous-titres, [[LRC vers SRT|/guides/lrc-to-srt.html]] ; si le SRT exporté est mal calé, [[Ajustement de la chronologie|/shift.html]] ; et passez le résultat au [[Contrôle qualité des sous-titres|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "fr": {
+      "seo": {
+        "title": "Tableaux de termes : un vocabulaire par saison – Quand en créer – AI-SRTSub",
+        "desc": "Un tableau de termes règle un problème : un même mot rendu de façons différentes. Quand il vaut la peine, comment le réutiliser sur une saison, pourquoi le mot entier ne fait rien en chinois.",
+        "h1": "Tableaux de termes : un vocabulaire par saison",
+        "intro": "Quand un nom s'appelle A à l'épisode 1 et B à l'épisode 7, le public croit à deux personnages. Un tableau de termes évite exactement cela — il fixe ce qui s'appelle comment.",
+        "ctaText": "Ouvrir le remplacement de termes"
+      },
+      "body": [
+        {
+          "h2": "Un tableau de termes règle l'incohérence",
+          "ps": [
+            "Les erreurs de vocabulaire dans les sous-titres sont de deux ordres : « ce mot est mal traduit » et « le même mot est traduit différemment d'un endroit à l'autre ». Le premier est un problème de dictionnaire, le second est le domaine du tableau de termes.",
+            "Le second est plus fréquent et plus difficile à repérer : `Thor` devient « Thor » à l'épisode 1 et « Donar » à l'épisode 7, chaque épisode pris seul semble correct, et la série donne l'impression qu'un nouveau personnage est apparu. Un tableau de termes transforme « dans cette production il s'appelle Thor » en une règle exécutable appliquée à tout le fichier d'un coup."
+          ]
+        },
+        {
+          "h2": "Quand il vaut la peine d'en créer un",
+          "ps": [
+            "Tous les fichiers de sous-titres n'ont pas besoin d'un tableau de termes. Les cas qui le justifient sont généralement ceux-ci :"
+          ],
+          "ul": [
+            "**Une saison ou une série entière** — plus il y a d'épisodes, plus le risque d'écart est élevé.",
+            "**Des noms propres nombreux** — personnes, lieux, organisations, termes inventés dans l'œuvre.",
+            "**Un travail à plusieurs** — des épisodes répartis entre traducteurs aux habitudes différentes.",
+            "**Reprendre les sous-titres d'autrui** — les aligner sur vos usages (ou ceux du client).",
+            "**Nettoyer après la traduction automatique** — la machine peut rendre un même terme de plusieurs façons."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Des règles de remplacement groupées par catégorie dans un tableau de termes",
+            "cap": "Les commentaires en # regroupent les règles et permettent d'en désactiver une temporairement"
+          }
+        },
+        {
+          "h2": "Tenir un même tableau sur une saison",
+          "ps": [
+            "Un tableau de termes s'entretient **au fil de l'eau** : fixez les noms à l'épisode 1, ajoutez une règle à chaque nouveau terme, et en fin de saison le tableau est complet. Pour la saison suivante de la même série, partez de lui.",
+            "Écrivez les règles un peu plus larges que nécessaire — une fois « Thor » décidé, ajoutez aussi « Donar -> Thor », pour aligner les sous-titres d'autrui dans la même passe.",
+            "Regardez toujours la **liste des changements** ensuite : elle nomme chaque réplique, chaque ligne et ce qui est devenu quoi. C'est le seul endroit où confirmer que le changement est juste et n'est pas allé trop loin, et toute entrée indésirable se retire d'un clic."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "La liste des changements individuels dans la zone de résultat",
+            "cap": "Chaque changement est listé ; un clic sur celui que vous ne voulez pas l'annule"
+          }
+        },
+        {
+          "h2": "Ce qu'il ne faut pas confier à un tableau de termes",
+          "ps": [
+            "Un tableau de termes change des **mots**. Ces trois choses sortent de son rôle, et doivent en sortir :",
+            "**Grammaire et syntaxe** — on ne transforme pas un mot en phrase ; le travail au niveau de la phrase retourne à la [[Traduction de sous-titres|/translate.html]] ou à un humain.",
+            "**Nettoyage du contenu** — supprimer des lignes entières comme les filigranes, la publicité et les indications sonores relève du [[Nettoyage des sous-titres|/clean.html]] ; les règles remplacent, elles ne suppriment pas de lignes.",
+            "**Chronologies** — un tableau de termes ne touche pas au temps. Pour un décalage global ou un problème de vitesse, [[Ajustement de la chronologie|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Quelques points faciles à confondre",
+          "ps": [
+            "**Le chinois remplace encore des sous-chaînes avec le mot entier coché — c'est normal.** Le chinois et le japonais ne séparent pas les mots par des espaces, l'outil ne peut pas déterminer les frontières et le mot entier n'a aucun effet ; la protection `art` qui épargne `start` ne vaut que pour l'anglais.",
+            "**L'ordre change le résultat.** Les règles s'exécutent de haut en bas et le texte produit par une règle est revu par les suivantes. Remplacer A par B puis B par C donne finalement C.",
+            "**Pour ne changer que la traduction, réglez la portée.** Dans un fichier bilingue, choisissez « 2e ligne seulement » ; les entrées à une seule ligne restent intactes avec l'un ou l'autre réglage monoligne — l'outil ne devine pas quel côté est l'original.",
+            "**Le tableau de termes n'est pas conservé.** Il est vide à chaque ouverture ; gardez votre propre fichier texte et transmettez-le."
+          ]
+        },
+        {
+          "h2": "Outils et guides associés",
+          "ps": [
+            "Pour la marche à suivre complète, voir [[Remplacer des termes en lot dans les sous-titres|/guides/glossary.html]] ; si le contenu est sale, passez d'abord par [[Nettoyage des sous-titres|/clean.html]] ; une fois les noms fixés, pour d'autres langues allez à la [[Traduction de sous-titres|/translate.html]] ; et passez le résultat au [[Contrôle qualité des sous-titres|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

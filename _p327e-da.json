@@ -1,0 +1,435 @@
+{
+  "translate": {
+    "da": [
+      {
+        "h2": "Hvad værktøjet løser",
+        "ps": [
+          "Oversætter undertekster fra ét sprog til et andet og lader dig eksportere en færdig undertekstfil med det samme. Typiske behov:"
+        ],
+        "ul": [
+          "Udenlandsk materiale med danske undertekster, eller dansk indhold med undertekster på et andet sprog",
+          "Oversættelsen skal blive tosprogede undertekster sammen med originalen (original øverst eller oversættelse øverst)",
+          "Ensartede navne og stednavne gennem en hel sæson (ordliste)",
+          "Justere tidsaksen bagefter (forskydning eller skalering)"
+        ]
+      },
+      {
+        "h2": "Upload af undertekster",
+        "ps": [
+          "Klik på »Vælg undertekstfil«, eller indsæt undertekstteksten direkte i feltet i venstre kolonne. Der er støtte til seks formater: SRT, VTT, ASS, SSA, SBV og TXT. Har du ingen fil, kan du klikke på »Indlæs eksempel«. Når filen er læst, vises underteksttabellen i midterkolonnen med nummer, tidsakse og originaltekst for hver linje."
+        ],
+        "img": {
+          "file": "translate-upload",
+          "alt": "Importområdet i oversættelsesværktøjet: vælg undertekstfil, felt til indsættelse og knappen til at indlæse et eksempel",
+          "cap": "Venstre kolonne »Importér undertekster«: vælg fil, indsæt tekst eller indlæs eksempel"
+        }
+      },
+      {
+        "h2": "Vælg sprog og stil",
+        "ps": [
+          "»Kildesprog« kan stå på automatisk registrering, og »målsprog« vælges blandt 75 sprog. Der er fem oversættelsesstile: afbalanceret (standard), naturligt talt sprog, formelt skriftsprog, dubbingstil og tilpasset. »Dubbingstil« passer til filmdialog, og »formelt skriftsprog« passer til dokumentarer og kurser."
+        ],
+        "img": {
+          "file": "translate-lang",
+          "alt": "Indstillinger for sprog og oversættelsesstil: kildesprog, målsprog og fem stile",
+          "cap": "»Sprog« og »oversættelsesstil«: kilden kan registreres automatisk, målsproget vælges blandt 75"
+        }
+      },
+      {
+        "h2": "Ordliste: ensartede navne i hele filmen",
+        "ps": [
+          "AI oversætter i portioner, og det samme navn kan ende med to forskellige stavemåder i forskellige portioner. Skriv »original → hvad det skal hedde« i ordlisten, så gennemsøges hver portion, før den oversættes, og fundene følges. Én post pr. linje; som pil accepteres `->`, `=>`, `→` og Tab. Skriver du kun originalen, betyder det, at den skal stå urørt; flere stavemåder kan dele én oversættelse med `|`. Klik på »✨ AI-udtræk« for at lade AI trække egennavnene ud af filmen og udfylde listen først, ret til og oversæt derefter."
+        ],
+        "img": {
+          "file": "translate-glossary",
+          "alt": "Området for termer og egennavne: ordlistens felt samt knapperne til AI-udtræk og gem",
+          "cap": "Ordlisten »Ensartede navne«: AI trækker egennavne ud, og listen indlæses automatisk næste gang"
+        }
+      },
+      {
+        "h2": "Sådan foregår oversættelsen",
+        "ps": [
+          "Klik på »▶ Start oversættelse« i topbjælken. Statistiklinjen i midterkolonnen viser i realtid antal linjer, oversatte linjer, fjernede fyldord og sætningsgrupper over flere linjer; statuslinjen viser anslået resterende tid og det brugte antal tokens. Undervejs kan du når som helst klikke på en oversættelsescelle i tabellen og rette teksten – ændringerne gemmes lokalt og forsvinder ikke ved genindlæsning. Lukker du siden midt i arbejdet, tilbydes du næste gang at fortsætte, hvor du slap. Når en hel sætning er delt over flere undertekster, oversættes sætningsgruppen som en enhed og fordeles derefter tilbage efter hver linjes varighed."
+        ],
+        "img": {
+          "file": "translate-workspace",
+          "alt": "Oversættelsesarbejdsfladen: statistiklinje, statuslinje og redigerbar underteksttabel",
+          "cap": "Midterkolonnen: statistiklinje + statuslinje + klikbar underteksttabel"
+        }
+      },
+      {
+        "h2": "Eksport",
+        "ps": [
+          "Vælg først indholdsform i højre kolonne: kun oversættelse (et sprog), tosproget med original øverst eller tosproget med oversættelse øverst. Vælg derefter filformat: SRT, WebVTT, SBV, ASS eller TXT. Til ASS findes desuden to layouts: »to skærme over og under« og »to linjer i bunden«. Indhold og format kombineres frit, i alt 14 eksportvarianter. Linjebredden for tosprogede undertekster indstilles separat. Klik på »Download undertekster« for at gemme filen, eller »Kopiér til udklipsholder« for at tage den med det samme."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Eksportpanelet: tre indholdsformer, fem filformater og indstilling for tosproget linjebredde",
+          "cap": "Eksport i højre kolonne: vælg indholdsform først, derefter filformat"
+        }
+      },
+      {
+        "h2": "Pris og privatliv",
+        "ps": [
+          "Standardmodellen kræver hverken registrering eller nøgle og virker med det samme, med en grænse pr. antal forespørgsler: hver IP har et dagligt loft, og hele webstedet har desuden en fælles dagskvote. Ved store mængder bør du indtaste din egen API-nøgle under »Oversættelsesmotor«. For privatliv følger du oplysningen på siden: undertekster, der oversættes med standardmodellen, sendes via webstedets server videre til udbyderen, mens et eget API håndteres direkte af den udbyder, du angiver, og nøglen gemmes kun i din browser. Indlæsning, linjebrydning og tosproget layout foregår helt lokalt i browseren."
+        ]
+      },
+      {
+        "h2": "Ofte stillede spørgsmål",
+        "ps": [
+          "**Kommer der andre sprog ind i oversættelsen?** Værktøjet opdager, når oversættelsen skrider over i et forkert sprog, og oversætter igen. Er en enkelt linje stadig forkert, kan du klikke på cellen og rette den manuelt.",
+          "**Hvordan håndteres sanglekster?** Under »Indholdsfilter« er der tre valg: oversæt sangteksten, behold originalen eller fjern sangteksten.",
+          "**Er navnene uens?** Tilføj de afvigende stavemåder til ordlisten, og oversæt igen; ordlisten har forrang for den globale indstilling »Håndtering af egennavne«.",
+          "**Vil du have engelsk øverst og dansk nederst?** Vælg »tosproget · original øverst« ved eksport. Skal dansk stå øverst, vælger du »tosproget · oversættelse øverst«."
+        ]
+      },
+      {
+        "h2": "Relaterede værktøjer og guides",
+        "ps": [
+          "Passer formatet ikke, så start med [[Formatkonvertering|/convert.html]]; er tidsaksen skæv, brug [[Justering af tidsakse|/shift.html]]; inden du afleverer, så kør [[Undertekstkontrol|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  },
+  "clean": {
+    "da": [
+      {
+        "h2": "Hvad værktøjet løser",
+        "ps": [
+          "Downloadede undertekster indeholder ofte ting, der ikke hører til. Renseren fjerner dem efter regler i én gennemgang:"
+        ],
+        "ul": [
+          "Vandmærker fra undertekstgrupper, webadresser og reklamelinjer",
+          "Hørehæmmede-markeringer (som [fodtrin], (musik)) og taleretiketter",
+          "ASS-effekter, HTML-tags og styretegn",
+          "Dublerede linjer, tomme linjer og rod i tegnsætning og mellemrum"
+        ]
+      },
+      {
+        "h2": "Upload og registrering",
+        "ps": [
+          "Træk filen ind eller vælg den – SRT, VTT, ASS, SSA og TXT understøttes, og du kan også indsætte undertekstteksten direkte. Tegnsættet registreres automatisk: giver UTF-8 erstatningstegn, falder værktøjet tilbage til GBK eller Big5, og siden oplyser »tegnsæt rettet til {encoding}«. Uploader du tosprogede dobbeltspor (to linjer med præcis samme tidsakse, én på kinesisk og én på engelsk), flettes de automatisk til én tosproget linje, og du får en kontakt til »sæt original øverst / oversættelse øverst«."
+        ]
+      },
+      {
+        "h2": "Sådan sætter du de 13 regler",
+        "ps": [
+          "Grænsefladen har 13 afkrydsningsfelter i fire grupper: **tags og format** (ASS-effekter, HTML-tags, styretegn, sortering og omnummerering), **hørehæmmede og lyde** (hørehæmmede-markeringer, taleretiketter, rene sanglekstlinjer), **vandmærker og skraldelinjer** (vandmærker og reklame, dublerede linjer, tomme linjer) og **tekstretning** (tegnsætning og mellemrum, retning af store bogstaver, sammenlægning af korte sætninger). Som standard er kun de tabsfri og sikre valg slået til; dem, der kan miste indhold (sanglekstlinjer, retning af store bogstaver, sammenlægning), er slået fra og kan slås til efter behov. Hver regel har en ⓘ-forklaring ved musemarkering, og enhver ændring genberegnes med det samme."
+        ],
+        "img": {
+          "file": "clean-opts",
+          "alt": "Renseindstillingerne: 13 afkrydsningsfelter i fire grupper, med antallet af aktive øverst",
+          "cap": "13 regler i fire grupper – kun de tabsfri er slået til fra start, og ændringer slår igennem med det samme"
+        }
+      },
+      {
+        "h2": "Sammenligning og fortryd",
+        "ps": [
+          "Resultatet overskriver ikke noget direkte: hver ændring vises i en sammenligningstabel med en etiket, der angiver reglen bag. Vil du beholde en linje, klikker du på »Fortryd« på netop den; »Fortryd alt« ruller alt tilbage i ét klik, og endnu et klik anvender rensningen igen. Statistiklinjen viser antal før, efter, fjernede, ændrede og fortrydte linjer."
+        ],
+        "img": {
+          "file": "clean-diff",
+          "alt": "Sammenligningstabellen: nummer, tid, original mod renset tekst, med en regel-etiket på hver linje",
+          "cap": "Hver ændring har en regel-etiket og kan fortrydes enkeltvis eller samlet"
+        }
+      },
+      {
+        "h2": "Forhåndsvisning og eksport",
+        "ps": [
+          "Skift mellem visningerne »renset« og »original«. I originalvisningen er fjernede linjer overstreget og markeret som »fjernet«. Det eksporterede indhold er præcis det, du ser. Eksportformater: SRT (standard), VTT, ASS (valgfrit, når kildefilen er ASS, så bevares stilafsnittet uændret) samt ren tekst i TXT uden tidsakse. Filnavnet får automatisk markeringen `.clean`."
+        ],
+        "img": {
+          "file": "clean-preview",
+          "alt": "Forhåndsvisning af hele teksten: skift mellem renset og original, med antal i statistiklinjen",
+          "cap": "To visninger at skifte mellem – det, du ser, er det, du får"
+        }
+      },
+      {
+        "h2": "Ofte stillede spørgsmål",
+        "ps": [
+          "**Kan almindelig dialog blive fjernet ved en fejl?** Vandmærkereglen fjerner først vandmærkelinjer linje for linje (dialogen i tosprogede linjer bevares) og fjerner kun hele linjen, hvis der er spor tilbage bagefter. Hørehæmmede-markeringer fjernes kun, når parentesen indeholder en markering og højst er 40 tegn; almindelig dialog i parentes røres ikke.",
+          "**Hvordan skelnes rene sanglekstlinjer fra sang i dialogen?** Kun linjer, hvor hver linje er omkranset af ♪ eller består af markeringer som [music], fjernes; dialog med sangtekst bevares.",
+          "**Kan taleretiketterne skade kinesisk?** De matcher kun et navn med store bogstaver og tal i begyndelsen af linjen efterfulgt af kolon (fx `GEORGE:`); kinesiske sætninger med kolon matcher ikke.",
+          "**Kan man rense flere filer ad gangen?** Nej, én fil ad gangen; download den færdige og læg den næste ind."
+        ]
+      },
+      {
+        "h2": "Privatliv",
+        "ps": [
+          "Rensningen foregår helt lokalt i browseren, og intet undertekstindhold sendes til nogen server."
+        ]
+      },
+      {
+        "h2": "Relaterede værktøjer og guides",
+        "ps": [
+          "En kort gennemgang af netop vandmærker og reklame findes i [[Fjern reklame og vandmærker|/guides/remove-subtitle-ads.html]]; inden du afleverer, så kør [[Undertekstkontrol|/guides/subtitle-quality-check.html]]; skal formatet skiftes, brug [[Formatkonvertering|/convert.html]]."
+        ]
+      }
+    ]
+  },
+  "bilingual": {
+    "da": [
+      {
+        "h2": "Hvad værktøjet løser",
+        "ps": [
+          "Du har tosprogede undertekster, men vil kun have ét af sporene – eller omvendt dele eller flette de to spor:"
+        ],
+        "ul": [
+          "Kun originalsporet eller kun oversættelsessporet",
+          "Dele op i to separate filer, »original« og »oversættelse«",
+          "Flette to tosprogede linjer på samme tidsakse til én linje med to tekstlinjer",
+          "Skifte format samtidig (læse ASS og eksportere SRT og lignende)"
+        ]
+      },
+      {
+        "h2": "Sådan genkender den tosprogethed",
+        "ps": [
+          "Tosprogede undertekster findes i to almindelige former, som værktøjet skelner mellem, **uden at gætte sprog**: **Form A (én undertekst med to linjer)** deles efter skriftsystem – ti systemer som kana, hangul, hanzi og latinsk skrift. Der skal to af dem til at regne det som tosproget, og det, der kommer først, regnes som original; er der kun ét system (fx en lang kinesisk sætning, der er brudt), bevares linjen som etsproget. **Form B (to separate linjer med præcis samme tidsakse)** deles efter placering – to linjer med samme tid danner en gruppe, den første regnes som original, og kombinationer som engelsk med fransk eller engelsk med tysk kan også skelnes, fordi de ligger på hver sin linje. Findes der intet tosproget indhold, grånes både tilstandsvalget og startknappen med en tydelig besked – værktøjet deler aldrig op på må og få."
+        ]
+      },
+      {
+        "h2": "Fire tilstande",
+        "ps": [
+          "Listen »Hvilken vil du have« har fire valg: **kun original** og **kun oversættelse** giver én fil hver; **del i to filer** giver en originalfil og en oversættelsesfil, hvor filnavnene automatisk får `.orig` / `.dst`, så de ikke overskriver hinanden; **flet til to linjer** gør hver gruppe til en tosproget linje med originalen på én linje og oversættelsen på den næste, mens etsprogede grupper bevares, som de er, uden at der opfindes en anden linje. Skifter du tilstand eller udformat, genberegnes det eksisterende indhold med det samme, uden at du skal klikke på start igen."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Tilstandsvalget i værktøjet til at opdele tosprogede undertekster: kun original, kun oversættelse, del i to filer, flet til to linjer",
+          "cap": "Fire tilstande: behold ét spor, del i to filer eller flet til to linjer"
+        }
+      },
+      {
+        "h2": "Input og output",
+        "ps": [
+          "Læser syv formater: SRT, VTT, ASS, SSA, SBV, LRC og TXT (først efter filendelse, ellers efter indhold). Eksporterer fire: SRT, VTT, ASS og TXT. Input og output kan kombineres frit, så formatskift følger med. Linjeskiftet `\\N` i ASS bliver et rigtigt linjeskift, og effekttags fjernes ved eksport til andre formater."
+        ]
+      },
+      {
+        "h2": "Resultat og eksport",
+        "ps": [
+          "Resultatet vises i sin helhed i et skrivebeskyttet tekstfelt med antal linjer og samlet varighed for hver fil, og knapperne »Download« og »Kopiér« tager sig af resten. Resultatområdet er kun en forhåndsvisning og lader dig ikke ændre tekst eller tidsakse – eksportér først og redigér derefter i det rette værktøj."
+        ],
+        "img": {
+          "file": "bilingual-result",
+          "alt": "Resultatområdet: skrivebeskyttet forhåndsvisning, antal linjer og knapper til download og kopiering",
+          "cap": "Hele resultatet i forhåndsvisning + antal linjer og samlet varighed + download og kopiering"
+        }
+      },
+      {
+        "h2": "Ofte stillede spørgsmål",
+        "ps": [
+          "**Hvorfor kan engelsk og fransk ikke skilles ad på samme linje?** Form A deler efter skriftsystem, og to sprog med samme skriftsystem kan ikke skilles ad inden for én linje. Læg i stedet indholdet op som form B (to linjer på samme tidsakse), så skilles de efter placering.",
+          "**Fik jeg kun én fil?** »Kun original«, »kun oversættelse« og »flet til to linjer« giver altid én fil; kun »del i to filer« giver to, med `.orig` / `.dst` i filnavnet.",
+          "**Kan det køre i batch?** Én fil ad gangen, ingen kø.",
+          "**Bliver mine undertekster uploadet?** Nej, læsning og eksport foregår helt lokalt i browseren."
+        ]
+      },
+      {
+        "h2": "Relaterede guides",
+        "ps": [
+          "En kort gennemgang af at dele op i to spor findes i [[Del tosprogede undertekster i to spor|/guides/split-bilingual-subtitles.html]]; hvordan tosprogede undertekster laves, står i [[To måder at lave tosprogede undertekster|/guides/make-bilingual-subtitles.html]]; til maskinoversættelse brug [[AI-undertekstoversættelse|/translate.html]]."
+        ]
+      }
+    ]
+  },
+  "make-bilingual-subtitles": {
+    "da": [
+      {
+        "h2": "Sådan ser de to former ud",
+        "ps": [
+          "**Form B: to linjer på samme tidsakse.** Samme sætning ligger som to separate undertekstlinjer med præcis samme tidsakse, én på engelsk og én på kinesisk, og afspilles oven på hinanden. Det er den mest almindelige måde at lave tosprogede ASS-filer på."
+        ],
+        "ul": [
+          "`What are you waiting for?`",
+          "`你还在等什么？`"
+        ]
+      },
+      {
+        "h2": "Hver form har sine svagheder",
+        "ps": [
+          "Form A har en faldgrube i **genkendelsen**: opdelingen bygger på skriftsystem, og kombinationer som kinesisk med engelsk eller japansk med engelsk er nemme at skelne – men engelsk med fransk eller kinesisk med japanske kanji, som **deler samme skriftsystem**, kan ikke skilles ad. Form B har en faldgrube i **produktionen**: de to tidsakser skal stemme præcis, og manuel justering er slidson; desuden tegner nogle afspillere begge linjer, og så bliver teksten trængt på skærmen. Tommelfingerregel: færdige filer til seere laves oftest i form A; skal hvert spor bruges videre i efterarbejdet, er form B nemmest at dele op."
+        ]
+      },
+      {
+        "h2": "De to veje",
+        "ps": [
+          "**Lav tosproget ud fra originalen**: brug [[AI-undertekstoversættelse|/translate.html]] og vælg »tosproget · original øverst« eller »tosproget · oversættelse øverst« ved eksport, så får du form A med det samme. Vælger du ASS-format, findes desuden layoutene »to skærme over og under« og »to linjer i bunden«.",
+          "**Flet eller konvertér sporene**: brug »flet til to linjer« i [[Opdel tosprogede undertekster|/bilingual.html]] – form B ind, form A ud. Omvendt giver »del i to filer« to separate spor ud, uanset om du lægger form A eller B ind."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "De fire tilstande i værktøjet til at opdele tosprogede undertekster, hvor flet til to linjer kan samle to linjer på samme tidsakse",
+          "cap": "»Flet til to linjer«: form B bliver form A"
+        }
+      },
+      {
+        "h2": "Hvilken enhed skal vise den",
+        "ps": [
+          "Webafspillere (HTML5 `<track>`) og de fleste mobilafspillere håndterer form A mere stabilt; professionelle desktopafspillere (VLC, mpv, PotPlayer) klarer begge og kan desuden give de to linjer forskellige farver og placeringer. Er du i tvivl, så lav form A som SRT, det er det mest universelle. Forskellene mellem formaterne findes i [[SRT, VTT eller ASS – hvilken skal du vælge|/guides/subtitle-format-comparison.html]]."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Valgene for tosproget stil i oversættelsesværktøjets eksportpanel",
+          "cap": "Vælg rækkefølgen for de tosprogede linjer direkte ved eksport"
+        }
+      },
+      {
+        "h2": "Ofte stillede spørgsmål",
+        "ps": [
+          "**Hvad gør man, hvis de tosprogede undertekster føles trængte?** Begræns linjebredden: eksportpanelet i oversættelsesværktøjet har indstillingen »tosproget linjebredde«, og smallere linjer giver færre tegn pr. linje og en renere skærm.",
+          "**Vil du kun beholde ét spor?** »Kun original / kun oversættelse« i værktøjet til at opdele tosprogede undertekster klarer det med ét klik – se [[Del tosprogede undertekster i to spor|/guides/split-bilingual-subtitles.html]]."
+        ]
+      }
+    ]
+  },
+  "qc": {
+    "da": [
+      {
+        "h2": "Hvad værktøjet løser",
+        "ps": [
+          "Underteksterne ser fejlfri ud for øjet, og først når de er afleveret, opdager man overlappende tidsakser, for brede linjer eller for høj læsehastighed. Kontrolsiden lister hvert sådant problem linje for linje:"
+        ],
+        "ul": [
+          "Tidsakse: overlap, slut før start, for kort eller for lang visningstid, forkert nummerering",
+          "Layout: for bred linje, flere end to linjer, uhensigtsmæssig linjebrydning, mellemrum i starten og slutningen",
+          "Sprogdetaljer: manglende mellemrum mellem latinsk og kinesisk tekst, tegnsætning i modstrid med sprogets regler, skriveretning",
+          "Grove fejl: sjusk eller styretegn, forkert format på tidsstempel"
+        ]
+      },
+      {
+        "h2": "Start med at vælge sprogregler",
+        "ps": [
+          "Under »Hvilke sprogregler skal gælde« er der fem tærskler: **største linjebredde** (42 halvbredder som standard i liggende billede, 36 i kvadratisk og 28 i stående), **højeste læsehastighed** (18 bredder/sekund for kinesisk, japansk og koreansk, 20 for andre sprog), **korteste visningstid 833 millisekunder**, **længste visningstid 7000 millisekunder** og **højst 2 linjer**. Undertekstsproget kan registreres automatisk eller angives manuelt blandt 27 sprog; billedretningen ændrer kun linjebredden – læsehastighed, visningstid og antal linjer påvirkes ikke. Halvbredde er et ensartet mål: ét kinesisk tegn tæller som 2 og ét latinsk bogstav som 1, så en linjebredde på 42 svarer til 21 kinesiske tegn eller 42 bogstaver."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Kontrolindstillingerne: fem tærskelfelter samt lister for undertekstsprog og billedretning",
+          "cap": "Fem tærskler + sprog + billedretning, med sædvanlige standardværdier"
+        }
+      },
+      {
+        "h2": "Læs rapporten",
+        "ps": [
+          "De 17 regler giver resultat på tre niveauer: **fejl** (sjusk, tidsstempelformat, slut før start, forkert nummerering), **advarsler** (tomme linjer, overlap, for kort eller for lang visningstid, overskredet læsehastighed, for bred linje, flere end to linjer) og **tip** (linjebrydning, mellemrum i starten og slutningen, manglende mellemrum, tegnsætning med mere). Hver post har linjenummer og oplysningen »målt X, tærskel Y« og kan filtreres efter niveau. Tosprogede linjer har undtagelser: de to former genkendes automatisk, overlapkontrollen springer hele parret over, og læsehastigheden tælles kun på den linje, der står på målsproget."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Kontrolrapporten: poster grupperet som fejl, advarsler og tip, med linjenummer og målte værdier",
+          "cap": "Rapport på tre niveauer: hvert problem har linjenummer og målt værdi mod tærsklen"
+        }
+      },
+      {
+        "h2": "Ret og eksportér",
+        "ps": [
+          "Kortet »Ret og eksportér« viser kun det, der **kan rettes automatisk**: ombrydning af linjer, fjernelse af tomme linjer, tilføjelse af mellemrum, tegnsætning efter sprogets regler og rettet nummerering – det, der ikke rører tidsaksen, er slået til som standard. Det, der **ændrer tidsaksen** (bytte start og slut, skubbe overlap, klippe eller forlænge visningstid), er slået fra og slås til efter egen vurdering. Klik på »Anvend rettelser«, så kontrolleres alt igen, og tælleren medtager kun det, der faktisk blev rettet – linjer, der ikke kunne ombrydes, rapporteres ikke som rettede. **Overskredet læsehastighed rettes ikke automatisk**: maskinen ved ikke, hvilket ord der skal væk, så du må forkorte oversættelsen eller justere tidsaksen manuelt. Eksportér derefter som SRT eller VTT, eller klik på »Download rapport« for at gemme en ren tekst-rapport som `.qc.txt`."
+        ],
+        "img": {
+          "file": "qc-fix",
+          "alt": "Rettelseskortet: afkrydsningsfelter for automatisk retbare poster og knappen til at anvende",
+          "cap": "Kun automatisk retbare poster havner i listen; det, der ændrer tidsaksen, er slået fra fra start"
+        }
+      },
+      {
+        "h2": "Ofte stillede spørgsmål",
+        "ps": [
+          "**Hvorfor kan jeg ikke eksportere min ASS-fil?** Kontrollen eksporterer kun SRT og VTT; ASS kan læses ind, men ikke skrives ud. Skal ASS-effekterne bevares, bør du gå til [[Formatkonvertering|/convert.html]] og tænke det igennem først.",
+          "**Hvad betyder læsehastighed 18?** For kinesisk, japansk og koreansk regnes højst 9 fuldbreddetegn pr. sekund (18 halvbredder), og for andre sprog 20 halvbredder pr. sekund. Det er et almindeligt niveau for behagelig læsning, og feltet kan ændres.",
+          "**Kan man kontrollere en fil med ødelagt tegnsæt?** Kontrollen læser kun UTF-8, så en fil med forkert tegnsæt bør først gennem siden til reparation af sjusk.",
+          "**Rører den min tidsakse?** Ikke hvis du lader gruppen »ændrer tidsaksen« være slået fra; slår du den til, vises en tydelig advarsel før rettelsen."
+        ]
+      },
+      {
+        "h2": "Relaterede guides",
+        "ps": [
+          "Undertekster, der blinker forbi, har deres egen guide: [[Undertekster, man ikke kan nå at læse|/guides/subtitle-too-fast.html]]. Hvilke punkter du bør kontrollere før aflevering, står i [[Det bør du kontrollere før aflevering|/guides/subtitle-quality-check.html]]. En tidsakse, der glider, er et andet problem – se [[Undertekster, der ikke passer længere fremme|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-quality-check": {
+    "da": [
+      {
+        "h2": "Hvorfor man ikke selv ser fejlene",
+        "ps": [
+          "Den, der laver underteksterne, kender indholdet for godt – man ved, hvad der siges i næste sekund, og oplever aldrig, at det går for stærkt at læse, og efter hundredvis af gennemlæsninger har øjet holdt op med at se layoutfejlene. Derfor kan kontrollen før aflevering ikke være »at læse det hele igennem en gang til«, men må være **måling mod retningsværdier**: læsehastighed, linjebredde, visningstid og overlap – tallene afgør."
+        ]
+      },
+      {
+        "h2": "De seks hyppigste faldgruber",
+        "ps": [
+          "Rangeret efter, hvor ofte de giver problemer ved aflevering:"
+        ],
+        "ul": [
+          "**For høj læsehastighed**: teksten forsvinder, før seeren når at læse, og helhedsindtrykket falder",
+          "**Overlappende tidsakser**: to linjer står på skærmen samtidig, oftest rester fra klipning eller sammenfletning",
+          "**For bred linje**: over 42 halvbredder i liggende billede løber ud over kanten på små skærme",
+          "**Flere end to linjer**: blokke med tre linjer eller mere fylder halvdelen af mobilskærmen",
+          "**Sjusket tegnsætning**: manglende mellemrum mellem latinsk og kinesisk tekst og forveksling af fuld og halv bredde virker billigt",
+          "**Forkert nummerering og tomme linjer**: man glemte at omnummerere efter sletning eller sammenfletning"
+        ]
+      },
+      {
+        "h2": "Sådan kontrollerer du",
+        "ps": [
+          "Åbn [[Undertekstkontrol|/qc.html]], træk underteksterne ind, og lad sproget blive registreret automatisk (reglerne er opdelt for 27 sprog). Rapporten vises på tre niveauer – **fejl / advarsler / tip** – og hver post har linjenummer og målt værdi. Fejl skal håndteres (sjusk, tidsstempelformat, slut før start, forkert nummerering); advarsler vurderes fra sag til sag (overlap, læsehastighed, linjebredde, visningstid); tip er finpudsning (linjebrydning, mellemrum, tegnsætning)."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Kontrolrapporten: problemliste på tre niveauer, hver med linjenummer og målt værdi mod tærsklen",
+          "cap": "Rapport på tre niveauer, hvert problem har linjenummer og målt værdi"
+        }
+      },
+      {
+        "h2": "Hvad kan rettes med ét klik",
+        "ps": [
+          "Nummerering, tomme linjer, linjebrydning, mellemrum og tegnsætning – altså det, der **ikke rører tidsaksen** – kan rettes automatisk. Rettelser, der **ændrer tidsaksen** (bytte start og slut, skubbe overlap, klippe eller forlænge visningstid), er slået fra som standard og slås til, når du har vurderet effekten. **Overskredet læsehastighed rettes ikke automatisk** – maskinen ved ikke, hvilket ord der skal væk, så du må enten forkorte oversættelsen eller give tidsaksen lidt mere plads; se [[Undertekster, man ikke kan nå at læse|/guides/subtitle-too-fast.html]]. Efter rettelsen kontrolleres alt igen, og rapporten tæller kun det, der faktisk blev rettet."
+        ]
+      },
+      {
+        "h2": "Det gør du lige bagefter",
+        "ps": [
+          "Rapportsiden kan downloade en ren tekst-rapport som `.qc.txt` – læg den ved afleveringen, så modtageren straks kan se, hvad du har kontrolleret. Er oversættelsen netop færdig, så kør kontrollen før aflevering; en tidsakse, der glider, er et andet problem, og har du stadig problemer med læsehastigheden, kan du læse [[Undertekster, der ikke passer længere fremme|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-too-fast": {
+    "da": [
+      {
+        "h2": "Hvad er læsehastighed",
+        "ps": [
+          "Læsehastighed handler om **hvorvidt seeren når at læse teksten, mens linjen er på skærmen**. Beregningen er ligetil: tekstens bredde divideret med visningstiden i sekunder. Almindelige grænser i branchen: 9 fuldbreddetegn pr. sekund for kinesisk, japansk og koreansk (18 halvbredder) og 20 halvbredder pr. sekund for andre sprog. En kinesisk linje med 20 tegn, der vises i 1 sekund, ligger på 40 bredder/sekund – mere end det dobbelte af grænsen, og så når seeren aldrig at læse."
+        ]
+      },
+      {
+        "h2": "Find først ud af, hvilken slags hastighed der er tale om",
+        "ps": [
+          "»Kan ikke nå at læse« kan være to helt forskellige problemer: **for kort visningstid** – linjen forsvinder efter et par hundrede millisekunder, oftest en timingfejl eller en rest fra klipningen; eller **for lang tekst** – visningstiden er normal, men linjen har 30 kinesiske tegn, og uanset hvor langsomt man læser, er det ikke nok. Rettelserne er hinandens modsatte, så find først ud af, hvilket problem du har."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Indstillingen for højeste læsehastighed på kontrolsiden, med 18 for kinesisk, japansk og koreansk og 20 for andre sprog som standard",
+          "cap": "Tærskel for læsehastighed: 18 bredder/sekund for kinesisk, japansk og koreansk, 20 for andre sprog"
+        }
+      },
+      {
+        "h2": "Sådan kontrollerer du",
+        "ps": [
+          "Åbn [[Undertekstkontrol|/qc.html]] og træk underteksterne ind. I rapporten ligger »for kort visningstid« på advarselsniveau og angiver målte millisekunder (tærskel 833 millisekunder); »hastighed, man ikke kan læse« er en egen post med målte bredder/sekund. For tosprogede undertekster tælles kun linjen på målsproget – de to sprog lægges ikke sammen."
+        ]
+      },
+      {
+        "h2": "Sådan retter du",
+        "ps": [
+          "**For kort visningstid**: kan rettes med ét klik – linjen forlænges automatisk til 833 millisekunder og går ikke forbi næste linjes starttid (rettelsen må ikke skabe nye overlap). **For lang tekst**: ingen automatisk rettelse, for maskinen ved ikke, hvilket ord der skal væk. Du vælger selv: forkort oversættelsen (klik på cellen i oversættelsesværktøjet), eller forlæng visningstiden for linjen (forudsat at der er et hul før næste linje; er hele tidsaksen forkert, brug [[Justering af tidsakse|/shift.html]]). Kør kontrollen igen bagefter, og bekræft at læsehastigheden er tilbage under tærsklen."
+        ]
+      },
+      {
+        "h2": "Overdriv ikke",
+        "ps": [
+          "At klare læsehastigheden betyder ikke, at det er behageligt: lægger man hver linje præcis på 9 tegn/sekund, bliver hele filmen svær at læse. Tommelfingerreglen er at ligge omkring halvfjerds procent af tærsklen i normale passager og acceptere en smule over i dialogtunge scener. For hyppige skift mellem undertekstblokke er også et problem i sig selv, så gennemgå hele sættet af retningsværdier før aflevering – se [[Det bør du kontrollere før aflevering|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  }
+}

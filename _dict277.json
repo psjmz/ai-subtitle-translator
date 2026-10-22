@@ -1,0 +1,356 @@
+{
+  "toolsTitle": {
+    "zh-CN": "四个工具",
+    "zh-TW": "四個工具",
+    "en": "Four tools",
+    "ja": "4つのツール"
+  },
+  "tcTrN": {
+    "zh-CN": "字幕翻译",
+    "zh-TW": "字幕翻譯",
+    "en": "Subtitle Translator",
+    "ja": "字幕翻訳"
+  },
+  "tcClN": {
+    "zh-CN": "字幕清洗",
+    "zh-TW": "字幕清洗",
+    "en": "Subtitle Cleaner",
+    "ja": "字幕クリーニング"
+  },
+  "tcFxN": {
+    "zh-CN": "特效字幕",
+    "zh-TW": "特效字幕",
+    "en": "Styled Subtitles",
+    "ja": "装飾字幕"
+  },
+  "tcDlN": {
+    "zh-CN": "视频下载工具",
+    "zh-TW": "影片下載工具",
+    "en": "Video Downloader",
+    "ja": "動画ダウンロード"
+  },
+  "tcTrD": {
+    "zh-CN": "75 种语言互译，自动配轴、自动折行",
+    "zh-TW": "75 種語言互譯，自動對軸、自動折行",
+    "en": "75 languages, auto-timed and auto-wrapped",
+    "ja": "75 言語に対応、時間軸と折り返しも自動"
+  },
+  "tcClD": {
+    "zh-CN": "去广告水印、听障提示，13 条规则可开关",
+    "zh-TW": "去廣告浮水印、聽障提示，13 條規則可開關",
+    "en": "Strip ads, watermarks and SDH cues — 13 switchable rules",
+    "ja": "広告・透かし・聴覚障害者向け字幕を除去、13 ルールを個別に切替"
+  },
+  "tcFxD": {
+    "zh-CN": "单语双语都能做特技：字体、颜色、描边、位置",
+    "zh-TW": "單語雙語都能做特效：字體、顏色、描邊、位置",
+    "en": "Mono or bilingual: font, colour, outline, position",
+    "ja": "単語・二か国語どちらも装飾可：フォント、色、縁取り、位置"
+  },
+  "tcDlD": {
+    "zh-CN": "RiseKol 下载器：视频、音频、字幕一起存到本地",
+    "zh-TW": "RiseKol 下載器：影片、音訊、字幕一起存到本機",
+    "en": "RiseKol downloader: video, audio and subtitles to your disk",
+    "ja": "RiseKol ダウンローダー：動画・音声・字幕をまとめて保存"
+  },
+  "tcGo": {
+    "zh-CN": "进入 →",
+    "zh-TW": "進入 →",
+    "en": "Open →",
+    "ja": "開く →"
+  },
+  "tcGoOut": {
+    "zh-CN": "前往 ↗",
+    "zh-TW": "前往 ↗",
+    "en": "Visit ↗",
+    "ja": "見る ↗"
+  },
+  "detTrT": {
+    "zh-CN": "把一整份外文字幕，翻成你的语言",
+    "zh-TW": "把一整份外文字幕，翻成你的語言",
+    "en": "Turn a whole foreign subtitle file into your language",
+    "ja": "外国語の字幕を丸ごと、あなたの言語へ"
+  },
+  "detClT": {
+    "zh-CN": "字幕拿到手，先过一遍水",
+    "zh-TW": "字幕拿到手，先過一遍水",
+    "en": "Subtitles off the web deserve a rinse first",
+    "ja": "手に入れた字幕は、まず一度すすぎ洗い"
+  },
+  "detFxT": {
+    "zh-CN": "单语双语，都能做出片级特效",
+    "zh-TW": "單語雙語，都能做出片級特效",
+    "en": "Mono or bilingual — either way, ready for the screen",
+    "ja": "単語でも二か国語でも、映画級の装飾を"
+  },
+  "detDlT": {
+    "zh-CN": "看到想要的视频，直接存下来",
+    "zh-TW": "看到想要的影片，直接存下來",
+    "en": "See a video you want? Save it right there",
+    "ja": "欲しい動画は、その場で保存"
+  },
+  "detTrL": {
+    "zh-CN": "选好目标语言丢进来，句级合并、术语统一、折行排版一次做完。译文严格贴合原时间轴，导出的时间轴一条都不漂。",
+    "zh-TW": "選好目標語言丟進來，句級合併、術語統一、折行排版一次做完。譯文嚴格貼合原時間軸，匯出的時間軸一條都不漂。",
+    "en": "Pick your target language and drop the file in: sentence merging, glossary consistency and line wrapping all happen in one pass. The translation stays locked to the original timing — not a single cue drifts.",
+    "ja": "翻訳先の言語を選んで放り込むだけ。文単位の結合、用語統一、折り返し整形まで一度に片付きます。訳文は元の時間軸にぴたりと沿い、書き出した時間軸は 1 本もずれません。"
+  },
+  "detClL": {
+    "zh-CN": "从网站扒下来的字幕总带着广告、水印和听障提示。13 条规则按需开关，改了什么逐条列给你看，还能一条条撤回——时间轴一动不动。",
+    "zh-TW": "從網站抓下來的字幕總帶著廣告、浮水印和聽障提示。13 條規則按需開關，改了什麼逐條列給你看，還能一條條撤回——時間軸一動不動。",
+    "en": "Scraped subtitles come with ads, watermarks and hearing-impaired tags. Thirteen rules you can switch on and off, every change listed line by line and undoable one at a time — the timing never moves.",
+    "ja": "サイトから拾った字幕には広告や透かし、聴覚障害者向けの表記がつきものです。13 のルールを必要なぶんだけONにすれば、変更点を 1 行ずつ一覧表示。個別に取り消しもできます。時間軸には一切触れません。"
+  },
+  "detFxL": {
+    "zh-CN": "手上是一条单语字幕，还是已经排好的双语，都能在这里定型：字体、字号、颜色、描边、位置、边距逐项调，预览就是你导出拿到的那一份。",
+    "zh-TW": "手上是一條單語字幕，還是已經排好的雙語，都能在這裡定型：字體、字號、顏色、描邊、位置、邊距逐項調，預覽就是你匯出拿到的那一份。",
+    "en": "Whether you start from a single track or an already-paired bilingual one, this is where it gets its final look: font, size, colour, outline, position and margins, tuned one by one. The preview is exactly what you export.",
+    "ja": "単語字幕でも、すでに組み上がった二か国語字幕でも、仕上げはここで。フォント、サイズ、色、縁取り、位置、余白を一つずつ詰められます。プレビューはそのまま書き出される物です。"
+  },
+  "detDlL": {
+    "zh-CN": "RiseKol 视频下载器：粘个链接就能把视频、音频和原文字幕存到本地。桌面客户端，macOS 与 Windows 都有。",
+    "zh-TW": "RiseKol 影片下載器：貼個連結就能把影片、音訊和原文字幕存到本機。桌面客戶端，macOS 與 Windows 都有。",
+    "en": "RiseKol video downloader: paste a link and save the video, audio and original subtitles to your machine. A desktop app for macOS and Windows.",
+    "ja": "RiseKol 動画ダウンローダー：リンクを貼るだけで動画・音声・オリジナル字幕を手元に保存。macOS と Windows 対応のデスクトップアプリです。"
+  },
+  "detTr1": {
+    "zh-CN": "75 种语言互译，句级合并后按时长回填",
+    "zh-TW": "75 種語言互譯，句級合併後按時長回填",
+    "en": "Translate between 75 languages; merged sentences are re-timed by duration",
+    "ja": "75 言語に対応。文単位で結合しても尺どおりに再配置"
+  },
+  "detTr2": {
+    "zh-CN": "自动提取专名生成术语表，全片译法一致",
+    "zh-TW": "自動擷取專名生成術語表，全片譯法一致",
+    "en": "Proper nouns are collected into a glossary, so the whole file stays consistent",
+    "ja": "固有名詞を自動抽出して用語集に。全編で訳し方がぶれない"
+  },
+  "detTr3": {
+    "zh-CN": "超长自动折行，按标点与词边界走，不劈词",
+    "zh-TW": "超長自動折行，按標點與詞邊界走，不劈詞",
+    "en": "Long lines wrap at punctuation and word edges — no words split in half",
+    "ja": "長い行は句読点と語の切れ目で折り返し、単語を途中で割らない"
+  },
+  "detTr4": {
+    "zh-CN": "导出单语 / 双语，SRT / VTT / ASS / SBV / TXT",
+    "zh-TW": "匯出單語 / 雙語，SRT / VTT / ASS / SBV / TXT",
+    "en": "Export mono or bilingual: SRT / VTT / ASS / SBV / TXT",
+    "ja": "単語 / 二か国語を選んで SRT / VTT / ASS / SBV / TXT で書き出し"
+  },
+  "detCl1": {
+    "zh-CN": "去水印广告、听障提示、HTML 标签与 ASS 特效标记",
+    "zh-TW": "去浮水印廣告、聽障提示、HTML 標籤與 ASS 特效標記",
+    "en": "Strip watermarks, ads, SDH cues, HTML tags and ASS effect codes",
+    "ja": "透かし・広告・聴覚障害者向け表記、HTML タグや ASS の装飾指定を除去"
+  },
+  "detCl2": {
+    "zh-CN": "全大写、乱码、多余空行一并修掉",
+    "zh-TW": "全大寫、亂碼、多餘空行一併修掉",
+    "en": "Fix all-caps, mojibake and stray blank lines in the same pass",
+    "ja": "全角大文字、文字化け、余分な空行もまとめて修正"
+  },
+  "detCl3": {
+    "zh-CN": "改动对照表逐条可还原，只改文本不动时间",
+    "zh-TW": "改動對照表逐條可還原，只改文本不動時間",
+    "en": "Each change is listed and revertible; only text is touched",
+    "ja": "変更点は一覧で個別に元へ戻せる。触るのはテキストだけ"
+  },
+  "detCl4": {
+    "zh-CN": "源文件是双语 ASS 时，合并与翻转也在这做",
+    "zh-TW": "來源檔是雙語 ASS 時，合併與翻轉也在這做",
+    "en": "Source is a bilingual ASS? Merge and flip it here too",
+    "ja": "元が二か国語の ASS なら、結合と上下入れ替えもここで"
+  },
+  "detFx1": {
+    "zh-CN": "单语整饰 / 调整已有双语 / 两份合成双语，三种模式",
+    "zh-TW": "單語整飾 / 調整既有雙語 / 兩份合成雙語，三種模式",
+    "en": "Three modes: style a single track, adjust bilingual rows, or merge two files",
+    "ja": "単語仕上げ / 既存の二か国語を調整 / 2 本を合成、3 モード"
+  },
+  "detFx2": {
+    "zh-CN": "ASS 与 VTT 各一套模板，样式槽逐项微调",
+    "zh-TW": "ASS 與 VTT 各一套範本，樣式槽逐項微調",
+    "en": "Templates for ASS and VTT each, with style slots for fine-tuning",
+    "ja": "ASS と VTT に専用テンプレート、スタイルスロットで微調整"
+  },
+  "detFx3": {
+    "zh-CN": "字体、颜色、描边、位置、安全边距全部可视调节",
+    "zh-TW": "字體、顏色、描邊、位置、安全邊距全部可視調節",
+    "en": "Font, colour, outline, position and safe margins — all visual",
+    "ja": "フォント、色、縁取り、位置、安全域まで画面で調整"
+  },
+  "detFx4": {
+    "zh-CN": "时间轴就地精修：整体偏移、比例缩放、重叠体检",
+    "zh-TW": "時間軸就地精修：整體偏移、比例縮放、重疊體檢",
+    "en": "Retiming on the spot: global shift, proportional scale, overlap check",
+    "ja": "その場で時間軸を微調整：一括シフト、比率伸縮、重なり診断"
+  },
+  "detDl1": {
+    "zh-CN": "粘个链接就能下：视频、音频、字幕",
+    "zh-TW": "貼個連結就能下：影片、音訊、字幕",
+    "en": "Paste a link: video, audio and subtitles",
+    "ja": "リンクを貼るだけ：動画・音声・字幕"
+  },
+  "detDl2": {
+    "zh-CN": "macOS 与 Windows 桌面客户端",
+    "zh-TW": "macOS 與 Windows 桌面客戶端",
+    "en": "Desktop app for macOS and Windows",
+    "ja": "macOS と Windows のデスクトップアプリ"
+  },
+  "detDl3": {
+    "zh-CN": "客户端自己下载，不依赖浏览器插件",
+    "zh-TW": "客戶端自己下載，不依賴瀏覽器外掛",
+    "en": "Downloads run in the app itself — no browser extension needed",
+    "ja": "アプリ本体がダウンロード実行、ブラウザ拡張は不要"
+  },
+  "detTrCta": {
+    "zh-CN": "打开字幕翻译",
+    "zh-TW": "打開字幕翻譯",
+    "en": "Open Subtitle Translator",
+    "ja": "字幕翻訳を開く"
+  },
+  "detClCta": {
+    "zh-CN": "打开字幕清洗",
+    "zh-TW": "打開字幕清洗",
+    "en": "Open Subtitle Cleaner",
+    "ja": "字幕クリーニングを開く"
+  },
+  "detFxCta": {
+    "zh-CN": "打开特效字幕制作",
+    "zh-TW": "打開特效字幕製作",
+    "en": "Open Styled Subtitles",
+    "ja": "装飾字幕を開く"
+  },
+  "detDlCta": {
+    "zh-CN": "前往下载",
+    "zh-TW": "前往下載",
+    "en": "Go to download",
+    "ja": "ダウンロードへ"
+  },
+  "mkSrcAxis": {
+    "zh-CN": "原文轴",
+    "zh-TW": "原文軸",
+    "en": "Source timing",
+    "ja": "元の時間軸"
+  },
+  "mkDstAxis": {
+    "zh-CN": "译文轴",
+    "zh-TW": "譯文軸",
+    "en": "Translated timing",
+    "ja": "訳文の時間軸"
+  },
+  "mkBefore": {
+    "zh-CN": "清洗前",
+    "zh-TW": "清洗前",
+    "en": "Before",
+    "ja": "処理前"
+  },
+  "mkAfter": {
+    "zh-CN": "清洗后",
+    "zh-TW": "清洗後",
+    "en": "After",
+    "ja": "処理後"
+  },
+  "mkHits": {
+    "zh-CN": "命中 4 处",
+    "zh-TW": "命中 4 處",
+    "en": "4 hits",
+    "ja": "4 件ヒット"
+  },
+  "mkTiming": {
+    "zh-CN": "时间轴未动",
+    "zh-TW": "時間軸未動",
+    "en": "Timing untouched",
+    "ja": "時間軸は不変更"
+  },
+  "mkMono": {
+    "zh-CN": "单语",
+    "zh-TW": "單語",
+    "en": "Mono",
+    "ja": "単語"
+  },
+  "mkBi": {
+    "zh-CN": "双语",
+    "zh-TW": "雙語",
+    "en": "Bilingual",
+    "ja": "二か国語"
+  },
+  "mkSlot1": {
+    "zh-CN": "叙事",
+    "zh-TW": "敘事",
+    "en": "Narration",
+    "ja": "ナレーション"
+  },
+  "mkSlot2": {
+    "zh-CN": "歌词",
+    "zh-TW": "歌詞",
+    "en": "Lyrics",
+    "ja": "歌詞"
+  },
+  "mkSlot3": {
+    "zh-CN": "重点",
+    "zh-TW": "重點",
+    "en": "Emphasis",
+    "ja": "強調"
+  },
+  "mkSlot4": {
+    "zh-CN": "自定义",
+    "zh-TW": "自訂",
+    "en": "Custom",
+    "ja": "カスタム"
+  },
+  "mkN1": {
+    "zh-CN": "一条对一条；需要合并拆分时按时长智能分配",
+    "zh-TW": "一條對一條；需要合併拆分時按時長智慧分配",
+    "en": "One cue to one cue; merges and splits share their duration by length",
+    "ja": "1 対 1 で対応。結合や分割が必要なときは尺で按分"
+  },
+  "mkN2": {
+    "zh-CN": "逐条列出改了什么，可一条条还原",
+    "zh-TW": "逐條列出改了什麼，可一條條還原",
+    "en": "Every change is listed, and each one can be undone",
+    "ja": "変更点を 1 件ずつ表示、個別に元へ戻せます"
+  },
+  "mkN3": {
+    "zh-CN": "预览 = 导出；样式槽改一项，整片跟着变",
+    "zh-TW": "預覽 = 匯出；樣式槽改一項，整片跟著變",
+    "en": "Preview = export; tweak a slot and the whole file follows",
+    "ja": "プレビュー＝書き出し。スロットを 1 つ変えれば全体に反映"
+  },
+  "mkN4": {
+    "zh-CN": "视频、音轨、字幕分轨下载",
+    "zh-TW": "影片、音軌、字幕分軌下載",
+    "en": "Video, audio and subtitles download as separate tracks",
+    "ja": "動画・音声・字幕を別トラックで保存"
+  },
+  "mkVideo": {
+    "zh-CN": "视频 1080p",
+    "zh-TW": "影片 1080p",
+    "en": "Video 1080p",
+    "ja": "動画 1080p"
+  },
+  "mkSaved": {
+    "zh-CN": "已保存到「下载」",
+    "zh-TW": "已儲存到「下載」",
+    "en": "Saved to Downloads",
+    "ja": "「ダウンロード」に保存済み"
+  },
+  "mkSubs": {
+    "zh-CN": "原文字幕",
+    "zh-TW": "原文字幕",
+    "en": "Original subtitles",
+    "ja": "オリジナル字幕"
+  },
+  "mkAudio": {
+    "zh-CN": "音轨",
+    "zh-TW": "音軌",
+    "en": "Audio track",
+    "ja": "音声トラック"
+  },
+  "heroSub": {
+    "zh-CN": "翻译、清洗、特效字幕、视频下载——四个工具各干各的，想用哪个点哪个。免费 · 免注册 · 隐私安全",
+    "zh-TW": "翻譯、清洗、特效字幕、影片下載——四個工具各做各的，想用哪個點哪個。免費 · 免註冊 · 隱私安全",
+    "en": "Translate, clean up, style and download — four independent tools, pick the one you need. Free · no sign-up · privacy-first.",
+    "ja": "翻訳、クリーニング、装飾、ダウンロード——4 つの道具はそれぞれ独立。使いたいものをどうぞ。無料 · 登録不要 · プライバシー重視"
+  }
+}

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案样张 · v0.9.276 三色模块化</title>
+<style>
+  /* ===== 中性底：三页统一（取代 index 的暖白 #F8F7F5） ===== */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+
+    /* ===== 三条模块色线（每页挑一条装进 --acc*） ===== */
+    --tr:#D4206A; --tr-ink:#C02159; --tr-weak:#FDF1F6; --tr-line:#F6CADC;
+    --cl:#0B7A5C; --cl-ink:#0B7A5C; --cl-weak:#E6F6EF; --cl-line:#BFE6D7;
+    --fx:#6D5BD0; --fx-ink:#534AB7; --fx-weak:#EEEDFE; --fx-line:#D9D4F8;
+
+    --r-card:14px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+  .doc-h1{font-size:26px;font-weight:800;letter-spacing:-.4px;margin:0 0 8px}
+  .doc-sub{margin:0;color:var(--sub);font-size:13.5px;line-height:1.8;max-width:720px}
+  .sec{margin-top:44px}
+  .sec-h{display:flex;align-items:baseline;gap:10px;margin:0 0 4px;
+    font-size:17px;font-weight:750;letter-spacing:-.2px}
+  .sec-h span{font-size:12px;font-weight:500;color:var(--mut)}
+  .sec-p{margin:0 0 18px;font-size:13px;line-height:1.8;color:var(--sub);max-width:760px}
+  hr.rule{border:0;border-top:1px solid var(--line);margin:40px 0 0}
+
+  /* ===== 色板 ===== */
+  .pal{display:grid;gap:12px}
+  .pal-row{display:grid;grid-template-columns:112px repeat(4,1fr);gap:10px;align-items:stretch}
+  .pal-name{display:flex;flex-direction:column;justify-content:center;gap:3px;
+    font-size:13px;font-weight:700}
+  .pal-name em{font-style:normal;font-weight:500;font-size:11px;color:var(--mut)}
+  .sw{border-radius:10px;border:1px solid var(--line);padding:10px 11px;min-height:64px;
+    display:flex;flex-direction:column;justify-content:space-between}
+  .sw b{font-size:11px;font-weight:700;letter-spacing:.2px}
+  .sw code{font-size:10.5px;font-family:ui-monospace,Menlo,monospace;opacity:.8}
+  .sw i{font-style:normal;font-size:10.5px;opacity:.72}
+
+  /* ===== 首页三卡（新） ===== */
+  .mod-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .mcard{position:relative;display:flex;flex-direction:column;background:var(--card);
+    border:1px solid var(--line);border-radius:16px;padding:20px 19px 18px;
+    box-shadow:0 1px 2px rgba(18,18,24,.04);text-decoration:none;color:inherit;
+    transition:border-color .15s,box-shadow .15s,transform .15s;overflow:hidden}
+  .mcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--k);opacity:0}
+  .mcard.tr{--k:var(--tr);--kw:var(--tr-weak);--ki:var(--tr-ink);--kl:var(--tr-line)}
+  .mcard.cl{--k:var(--cl);--kw:var(--cl-weak);--ki:var(--cl-ink);--kl:var(--cl-line)}
+  .mcard.fx{--k:var(--fx);--kw:var(--fx-weak);--ki:var(--fx-ink);--kl:var(--fx-line)}
+  .mcard:hover{border-color:var(--kl);box-shadow:0 8px 22px -16px rgba(18,18,24,.42);transform:translateY(-1px)}
+  .mcard:hover::before{opacity:1}
+  .mcard.cur{border-color:var(--kl);box-shadow:0 1px 2px rgba(18,18,24,.04),0 0 0 3px var(--kw)}
+  .mcard.cur::before{opacity:1}
+  .m-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:13px}
+  .m-ic{width:38px;height:38px;border-radius:11px;background:var(--kw);color:var(--ki);
+    display:flex;align-items:center;justify-content:center;flex:none}
+  .m-ic svg{width:19px;height:19px}
+  .m-go{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;
+    color:var(--mut);text-decoration:none;white-space:nowrap;transition:color .15s}
+  .mcard:hover .m-go{color:var(--ki)}
+  .m-go svg{width:12px;height:12px}
+  .mcard h3{margin:0;font-size:16px;font-weight:750;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+  .m-cur{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--kw);color:var(--ki)}
+  .m-lead{margin:8px 0 0;font-size:13px;line-height:1.75;color:var(--sub)}
+  .m-do{list-style:none;margin:13px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .m-do li{position:relative;padding-left:17px;font-size:12.6px;line-height:1.7;color:var(--body);
+    transition:color .15s}
+  .m-do li::before{content:'';position:absolute;left:0;top:.55em;width:8px;height:4.5px;
+    border-left:2px solid var(--k);border-bottom:2px solid var(--k);transform:rotate(-45deg);opacity:.7}
+  .m-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+  .m-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;
+    color:var(--ki);background:var(--kw);border:1px solid var(--kl)}
+
+  /* ===== 三页主题对照 ===== */
+  .themes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .th{border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden}
+  .th-h{padding:11px 14px;border-bottom:1px solid var(--line);background:var(--tw);
+    display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--ti)}
+  .th-h code{font-weight:500;font-size:11px;opacity:.75;font-family:ui-monospace,Menlo,monospace}
+  .th-b{padding:14px;display:flex;flex-direction:column;gap:13px}
+  .th.tr{--tk:var(--tr);--tw:var(--tr-weak);--ti:var(--tr-ink);--tl:var(--tr-line)}
+  .th.cl{--tk:var(--cl);--tw:var(--cl-weak);--ti:var(--cl-ink);--tl:var(--cl-line)}
+  .th.fx{--tk:var(--fx);--tw:var(--fx-weak);--ti:var(--fx-ink);--tl:var(--fx-line)}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .lbl{font-size:10.5px;color:var(--mut);width:100%;margin-bottom:-6px}
+  .nav{display:inline-flex;align-items:center;gap:6px}
+  .pill{display:inline-flex;align-items:center;gap:6px;height:29px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px}
+  .pill svg{width:13px;height:13px}
+  .pill.on{background:var(--tw);border-color:var(--tl);color:var(--ti);font-weight:600}
+  .btn{height:34px;padding:0 16px;border-radius:var(--r-btn);border:0;background:var(--tk);
+    color:#fff;font-size:13px;font-weight:650;font-family:inherit;cursor:pointer}
+  .btn.ghost{background:var(--card);border:1px solid var(--line-strong);color:var(--body)}
+  .chip{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;color:var(--ti);
+    background:var(--tw);border:1px solid var(--tl)}
+  .cap{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:650;
+    background:var(--tw);color:var(--ti);border-radius:99px;padding:4px 11px}
+  .cap b{font-size:14px}
+  .inp{height:34px;width:100%;border-radius:9px;border:1px solid var(--line-strong);
+    background:var(--card);padding:0 11px;font-size:13px;font-family:inherit;color:var(--ink)}
+  .inp:focus{outline:0;border-color:var(--tk);box-shadow:0 0 0 3px var(--tw)}
+  .lnk{font-size:13px;font-weight:650;color:var(--ti);text-decoration:none}
+
+  .note{margin-top:14px;padding:13px 15px;border-radius:10px;background:var(--card);
+    border:1px solid var(--line);border-left:3px solid var(--warn,#C77C0A);
+    font-size:12.5px;line-height:1.8;color:var(--body)}
+  .note b{color:var(--ink)}
+  .todo{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+  .todo li{display:flex;gap:9px;font-size:13px;line-height:1.75;color:var(--body)}
+  .todo li b{color:var(--ink);font-weight:700;flex:none}
+  .kbd{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:var(--stage);
+    border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--body)}
+  @media (max-width:860px){.mod-grid,.themes{grid-template-columns:1fr}
+    .pal-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="doc-h1">方案样张 · 一个颜色 = 一个模块</h1>
+  <p class="doc-sub">把首页三张导览卡现有的三条色线（粉 / 绿 / 紫）提升为三个模块的完整身份色：首页分区介绍跟着走，三个子页面各认领一条。以下均为真实尺寸渲染，可直接对着看。</p>
+
+  <!-- ① 色板 -->
+  <section class="sec">
+    <h2 class="sec-h">① 三条色线 <span>每条 4 个派生值，缺的值是我新定的</span></h2>
+    <p class="sec-p">现在只有「图标底 + 标签」两个值在色线上，其余全走页面的粉色。补齐后每个模块都有可用的浅底、描边、文字、实心四种强度。</p>
+    <div class="pal">
+      <div class="pal-row">
+        <div class="pal-name">翻译<em>translate</em></div>
+        <div class="sw" style="background:#FDF1F6"><b style="color:#C02159">weak 浅底</b><code style="color:#C02159">#FDF1F6</code><i style="color:#C02159">图标底 / 标签底 / 胶囊</i></div>
+        <div class="sw" style="background:#F6CADC"><b style="color:#8E1541">line 描边</b><code style="color:#8E1541">#F6CADC</code><i style="color:#8E1541">卡片边框 / hover</i></div>
+        <div class="sw" style="background:#C02159"><b style="color:#fff">ink 文字</b><code style="color:#fff">#C02159</code><i style="color:#fff">标题 / 链接 / 图标</i></div>
+        <div class="sw" style="background:#D4206A"><b style="color:#fff">solid 实心</b><code style="color:#fff">#D4206A</code><i style="color:#fff">主按钮（原 #E12D6E 白字只有 4.4:1，不够 AA）</i></div>
+      </div>
+      <div class="pal-row">
+        <div class="pal-name">清洗<em>clean</em></div>
+        <div class="sw" style="background:#E6F6EF"><b style="color:#0B7A5C">weak 浅底</b><code style="color:#0B7A5C">#E6F6EF</code><i style="color:#0B7A5C">现成值，直接沿用</i></div>
+        <div class="sw" style="background:#BFE6D7"><b style="color:#0A5B45">line 描边</b><code style="color:#0A5B45">#BFE6D7</code><i style="color:#0A5B45">新定</i></div>
+        <div class="sw" style="background:#0B7A5C"><b style="color:#fff">ink 文字</b><code style="color:#fff">#0B7A5C</code><i style="color:#fff">现成值，直接沿用</i></div>
+        <div class="sw" style="background:#0E9F6E"><b style="color:#fff">solid 实心</b><code style="color:#fff">#0E9F6E</code><i style="color:#fff">白字只有 3.4:1 → 实心按钮实际用 ink 那档</i></div>
+      </div>
+      <div class="pal-row">
+        <div class="pal-name">特效<em>effects</em></div>
+        <div class="sw" style="background:#EEEDFE"><b style="color:#534AB7">weak 浅底</b><code style="color:#534AB7">#EEEDFE</code><i style="color:#534AB7">现成值，直接沿用</i></div>
+        <div class="sw" style="background:#D9D4F8"><b style="color:#3D3598">line 描边</b><code style="color:#3D3598">#D9D4F8</code><i style="color:#3D3598">新定</i></div>
+        <div class="sw" style="background:#534AB7"><b style="color:#fff">ink 文字</b><code style="color:#fff">#534AB7</code><i style="color:#fff">现成值，直接沿用</i></div>
+        <div class="sw" style="background:#6D5BD0"><b style="color:#fff">solid 实心</b><code style="color:#fff">#6D5BD0</code><i style="color:#fff">新定，白字 5.2:1</i></div>
+      </div>
+    </div>
+    <div class="note">浅底上的彩字对比度实测：粉 <b>5.3:1</b> · 绿 <b>4.8:1</b> · 紫 <b>6.0:1</b>，三个都过 AA。三个实心底配白字：<b>#D4206A 4.98</b> / <b>#0B7A5C 5.31</b> / <b>#6D5BD0 5.17</b>。</div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ② 首页三卡 -->
+  <section class="sec">
+    <h2 class="sec-h">② 首页分区介绍 · 三张卡 <span>把鼠标放到卡上试试</span></h2>
+    <p class="sec-p">橙色是你要的样子。变化点：每张卡认领自己的色线（勾选符、边框、标签、进入都跟着走）；「进入」从卡片底部挪到右上角，跟上面那三张导览卡对齐；底部加一条分隔线放标签；当前页不再用虚线框（虚线读起来像"占位/禁用"），改成彩色描边 + 一圈很浅的同色光晕。</p>
+    <div class="mod-grid">
+
+      <a class="mcard tr cur" href="/">
+        <div class="m-top">
+          <div class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h11"/></svg></div>
+          <span class="m-go">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></span>
+        </div>
+        <h3>字幕翻译<span class="m-cur">当前页</span></h3>
+        <p class="m-lead">把一整份外文字幕翻成你的语言，顺手把时间轴和折行一起收拾好。</p>
+        <ul class="m-do">
+          <li>75 种语言互译，句级合并翻译后按时长回填</li>
+          <li>自动折行、去口语水词、统一专名与术语</li>
+          <li>导出单语 / 双语，SRT / VTT / ASS / SBV / TXT</li>
+        </ul>
+        <div class="m-tags"><span class="m-tag">75 种语言</span><span class="m-tag">SRT / VTT / ASS</span></div>
+      </a>
+
+      <a class="mcard cl" href="/clean.html">
+        <div class="m-top">
+          <div class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-7 8v6l-4-2v-4z"/></svg></div>
+          <span class="m-go">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></span>
+        </div>
+        <h3>字幕清洗</h3>
+        <p class="m-lead">字幕拿到手先过一遍：广告、水印、听障提示这些脏东西一次剔干净。</p>
+        <ul class="m-do">
+          <li>13 条规则分四类，默认开 9 条，随手开关</li>
+          <li>去水印广告、听障提示、HTML 标签，修全大写与乱码</li>
+          <li>逐条列出改了什么，可一条条还原，不动时间轴</li>
+        </ul>
+        <div class="m-tags"><span class="m-tag">13 条规则</span><span class="m-tag">不改时间轴</span></div>
+      </a>
+
+      <a class="mcard fx" href="/merge.html">
+        <div class="m-top">
+          <div class="m-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10M7 11.5h10"/></svg></div>
+          <span class="m-go">进入 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg></span>
+        </div>
+        <h3>特效字幕</h3>
+        <p class="m-lead">双语合并 + 上样式：字体、颜色、描边、位置所见即所得，导出就能压片。</p>
+        <ul class="m-do">
+          <li>两份字幕合并成双语，或调整已有双语的顺序与样式</li>
+          <li>ASS 5 套 / VTT 6 套行业模板，样式槽逐项微调</li>
+          <li>实时预览 = 导出结果，时间轴也能就地精修与批量校正</li>
+        </ul>
+        <div class="m-tags"><span class="m-tag">双语合并</span><span class="m-tag">样式槽</span></div>
+      </a>
+
+    </div>
+    <div class="note">「解决什么 / 适合谁」两段我<b>没放进卡片</b>——三张卡各塞 5 段文字谁都不看。两个选择：<b>(a)</b> 删掉（内容并进上面的要点句）；<b>(b)</b> 收进卡片底部一个默认折起的「适合谁」小展开。你挑一个。</div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ③ 三页主题 -->
+  <section class="sec">
+    <h2 class="sec-h">③ 三个子页面各认领一条色线 <span>同一组组件，三种主题</span></h2>
+    <p class="sec-p">三页现在的区别只是底色不同（首页暖白、另两页冷灰），主色全是同一个玫红。改后每页用自己模块的色：导航选中态、主按钮、输入框聚焦、统计胶囊、标签全部跟着换。底色统一成冷灰，三色都是冷调，暖白底会跟它们打架。</p>
+    <div class="themes">
+
+      <div class="th tr">
+        <div class="th-h">翻译页 <code>index.html · 粉</code></div>
+        <div class="th-b">
+          <span class="lbl">顶部导航</span>
+          <div class="nav"><span class="pill on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h11"/></svg>字幕翻译</span><span class="pill">字幕清洗</span></div>
+          <span class="lbl">按钮</span>
+          <div class="row"><button class="btn">开始翻译</button><button class="btn ghost">示例</button></div>
+          <span class="lbl">输入框聚焦</span>
+          <input class="inp" value="整句合并、按时长回填">
+          <span class="lbl">统计胶囊 · 标签 · 链接</span>
+          <div class="row"><span class="cap">已完成 <b>312</b> 条</span><span class="chip">75 种语言</span><a class="lnk" href="#">查看记录 ›</a></div>
+        </div>
+      </div>
+
+      <div class="th cl">
+        <div class="th-h">清洗页 <code>clean.html · 绿</code></div>
+        <div class="th-b">
+          <span class="lbl">顶部导航</span>
+          <div class="nav"><span class="pill">字幕翻译</span><span class="pill on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18l-7 8v6l-4-2v-4z"/></svg>字幕清洗</span></div>
+          <span class="lbl">按钮</span>
+          <div class="row"><button class="btn">开始清洗</button><button class="btn ghost">还原改动</button></div>
+          <span class="lbl">输入框聚焦</span>
+          <input class="inp" value="13 条规则 · 默认开 9 条">
+          <span class="lbl">统计胶囊 · 标签 · 链接</span>
+          <div class="row"><span class="cap">已清洗 <b>842</b> 条</span><span class="chip">不改时间轴</span><a class="lnk" href="#">查看记录 ›</a></div>
+        </div>
+      </div>
+
+      <div class="th fx">
+        <div class="th-h">特效页 <code>merge.html · 紫</code></div>
+        <div class="th-b">
+          <span class="lbl">顶部导航</span>
+          <div class="nav"><span class="pill">字幕翻译</span><span class="pill on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10"/></svg>特效字幕</span></div>
+          <span class="lbl">按钮</span>
+          <div class="row"><button class="btn">导出 ASS</button><button class="btn ghost">重置样式</button></div>
+          <span class="lbl">输入框聚焦</span>
+          <input class="inp" value="样式槽 · 逐项微调">
+          <span class="lbl">统计胶囊 · 标签 · 链接</span>
+          <div class="row"><span class="cap">合并 <b>128</b> 次</span><span class="chip">双语合并</span><a class="lnk" href="#">查看记录 ›</a></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ④ 三个坑 -->
+  <section class="sec">
+    <h2 class="sec-h">④ 三个必须先说清的坑</h2>
+    <ul class="todo">
+      <li><b>1</b><span><b>清洗页的绿色会和"成功态"撞车。</b>清洗页现在 <span class="kbd">--ok:#0E9F6E</span> 就是绿，用来标"修好了"。主题色也变绿之后，「成功」和「品牌色」是同一个色。两个办法：(a) 不管它，反而统一；(b) 成功态改成更深更灰的绿 <span class="kbd">#0A6B4E</span>，拉开层次。我建议 (b)。</span></li>
+      <li><b>2</b><span><b>特效页的紫色会和 --lav 撞车。</b>merge.html 里 <span class="kbd">--lav:#8B5CF6</span> 是给"当前选中"用的点缀色，跟主题紫同族。需要把它并进色线（选中态用 ink 那档），否则一个页面里出现两种紫。</span></li>
+      <li><b>3</b><span><b>三页会各自"变成另一个牌子"。</b>这是你要的效果，但副作用是错开的：用户在清洗页看到的是绿色界面，回首页又是粉的。要接受这个观感，或者退一步只换"强调色"、导航框架保持中性。这个得你点头。</span></li>
+    </ul>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ⑤ 待确认 -->
+  <section class="sec">
+    <h2 class="sec-h">⑤ 等你拍板的四件事</h2>
+    <ul class="todo">
+      <li><b>1</b><span>首页「能做什么三条 + 解决什么 + 适合谁」——<b>全删</b>（并进要点）、还是<b>收进可展开</b>？</span></li>
+      <li><b>2</b><span>要不要保留虚线框表示当前页？（我的建议是不保留，用彩色描边 + 浅光晕）</span></li>
+      <li><b>3</b><span>粉色实心按钮从 <span class="kbd">#E12D6E</span> 挪到 <span class="kbd">#D4206A</span> 吗？挪了才过 AA，但按钮会稍微暗一点点。</span></li>
+      <li><b>4</b><span>清洗页的成功态要不要让位（坑 1 的 b 方案）？</span></li>
+    </ul>
+    <div class="note">确认完我按这个改：首页分区 + 三页主题色 + 导航，<b>不动任何功能逻辑和导出引擎</b>。文案走 27 语，新加的标签词条要补 27 个语言块。</div>
+  </section>
+
+</div>
+</body>
+</html>

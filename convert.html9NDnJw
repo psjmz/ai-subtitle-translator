@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/convert.html 与 /en/convert.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>字幕格式转换 - SRT / VTT / ASS / SBV / LRC / TXT 互转 | 随心字幕 AI</title>
+<meta name="description" content="免费在线字幕格式转换：SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留，ASS 特效标记自动清理。">
+<meta name="keywords" content="字幕格式转换,srt转vtt,vtt转srt,ass转srt,sbv转srt,srt转lrc,字幕转txt,subtitle converter,srt to vtt,vtt to srt">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#185FA5">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* ================= 视觉系统沿用 v0.9.249「收敛精修」 =================
+     与其他三页同源：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.288：转换页认领「蓝」这条色线（首页=粉、特效页=紫、清洗页=绿）。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#185FA5; --acc-weak:#E6F1FB; --acc-line:#B5D4F4; --acc-ink:#0C447C;
+    --grad:#185FA5; --acc2:#185FA5;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(24,95,165,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  /* 顶部胶囊导航：与其他页同款，当前页不高亮（本页不在那三页的导航清单里） */
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px;
+    text-decoration:none;white-space:nowrap}
+  .pill:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  .navpills{display:flex;gap:6px;flex-wrap:wrap}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+  .card h2 .cnt{margin-left:auto;font-size:12px;color:var(--mut);font-weight:400}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{display:block;width:30px;height:30px;margin:0 auto 8px;border-radius:9px;background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+  textarea{width:100%;min-height:120px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical;background:var(--card);color:var(--ink)}
+  textarea:focus{outline:none;border-color:var(--acc-line)}
+  textarea[readonly]{background:var(--card-2);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  select.fmt{height:var(--ctl-h);border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:13px;min-width:170px}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+  /* v0.9.290：没检测到双语时「双语处理」整行置灰 —— 下拉禁用、标签也跟着淡下去 */
+  .chip.warn{background:var(--stage);color:var(--sub);font-weight:400}
+  .row .lb.off{opacity:.5}
+  select.fmt:disabled{opacity:.45;cursor:not-allowed;background:var(--card-2);color:var(--sub)}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .stat-row{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--sub);margin-bottom:12px}
+  .stat-row b{color:var(--ink);font-weight:650}
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+  .note{margin-top:12px;font-size:12px;color:var(--mut)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .navpills{display:none}
+  }
+</style>
+<script src="ui-codes.js?v=0.9.341"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span id="topNav"></span>
+      <select id="langSel" aria-label="界面语言"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">格式转换</em></h1>
+    <p data-i18n="heroSub">SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留。</p>
+  </div>
+
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入字幕</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-t" data-i18n="dzTxt">把文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="fname"></span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.sbv,.lrc,.txt,text/*" style="display:none">
+    <div class="row">
+      <span class="lb" data-i18n="lblSrc">识别到的格式</span>
+      <span class="chip mut" id="srcFmt">—</span>
+      <button id="btnClear" type="button" data-i18n="btnClear">清除</button>
+    </div>
+    <div style="margin-top:12px">
+      <textarea id="paste" data-i18n-ph="pastePh" placeholder="也可以直接把字幕内容粘贴到这里"></textarea>
+    </div>
+  </div>
+
+  <div class="card" id="optCard">
+    <h2><span class="n">2</span><span data-i18n="lblOut">输出格式</span></h2>
+    <div class="row">
+      <select class="fmt" id="outFmt"></select>
+      <button class="pri" id="btnGo" type="button" data-i18n="btnGo">转换</button>
+    </div>
+    <!-- v0.9.289：双语处理。默认「保留双语」，与 288 的行为完全一致；
+         只有用户主动选了才动字幕内容。
+         v0.9.290：没检测到双语时整行置灰（下拉禁用 + 标签变淡 + 说明文字），
+         免得用户在那儿选半天其实这功能用不上。 -->
+    <div class="row" id="biRow">
+      <span class="lb" id="biLb" data-i18n="lblBi">双语处理</span>
+      <select class="fmt" id="biMode"></select>
+      <span class="chip mut" id="biHint" style="display:none" data-i18n="biHint">检测到双语字幕</span>
+    </div>
+  </div>
+
+  <div class="card" id="repCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="repTitle">转换结果</span></h2>
+    <div class="stat-row" id="statRow">
+      <span data-i18n="statCues">{0} 条</span>
+      <span id="durWrap"></span>
+    </div>
+    <textarea id="out" readonly></textarea>
+    <div class="row">
+      <button class="pri" id="btnDl" type="button" data-i18n="btnDl">下载</button>
+      <button id="btnCopy" type="button" data-i18n="btnCopy">复制</button>
+    </div>
+    <div class="msg" id="msg" style="display:none"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="footBrand">随心字幕 AI · 字幕格式转换</span>
+  </footer>
+</div>
+
+<script src="convert-i18n.js?v=0.9.341"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="convert-core.js?v=0.9.341"></script>
+<script>
+'use strict';
+var I18N = window.CONVERT_I18N.DICT, LANGS = window.CONVERT_I18N.LANGS;
+var LANG = 'zh-CN';
+var S = { fname: '', src: '', fmt: null, cues: [], out: '', outFmt: 'vtt', bi: 'keep' };
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function tpl(k, a) { return String(t(k)).replace('{0}', a); }
+
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    var k = el.getAttribute('data-i18n');
+    /* 统计里的 {0} 由 render() 填，这里只处理没有占位的普通节点 */
+    if (k === 'statCues') return;
+    el.textContent = t(k);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  document.documentElement.lang = LANG;
+  /* 阿拉伯语 / 希伯来语 / 波斯语等整页从右往左排 */
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「SubtitleConverter」。
+     v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
+  syncLogoHome();
+  renderOutFmtOptions();
+  renderBiOptions();
+  refreshBiHint();   /* v0.9.290：刚进页面没内容，双语处理就该是锁着的 */
+}
+function syncLogoHome() {
+  var el = document.getElementById('logoHome');
+  if (el) el.href = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
+}
+
+/* 输出格式下拉：名称是通用缩写，不翻译 */
+function renderOutFmtOptions() {
+  var sel = $('#outFmt');
+  var cur = sel.value || S.outFmt;
+  sel.innerHTML = window.ConvertCore.FORMATS.map(function (f) {
+    return '<option value="' + f.id + '">' + f.name + ' · ' + f.note + '</option>';
+  }).join('');
+  sel.value = cur;
+  S.outFmt = sel.value;
+}
+
+/* 双语处理下拉：默认保留双语，不动字幕内容 */
+function renderBiOptions() {
+  var sel = $('#biMode');
+  var cur = sel.value || S.bi;
+  sel.innerHTML = window.ConvertCore.BI_MODES.map(function (m) {
+    return '<option value="' + m.id + '">' + t(m.key) + '</option>';
+  }).join('');
+  sel.value = cur;
+  S.bi = sel.value;
+}
+/* 检测这批字幕有没有双语：检测到才放开下拉，没检测到就置灰 + 说明。
+   空输入时什么都不说（那时候还没得判）。 */
+function refreshBiHint() {
+  var sel = $('#biMode'), el = $('#biHint'), lb = $('#biLb');
+  if (!sel) return;
+  var has = !!S.src.trim(), yes = false;
+  if (has && S.fmt) {
+    try { yes = window.ConvertCore.hasBilingual(window.ConvertCore.parse(S.src, S.fmt)); } catch (e) { yes = false; }
+  }
+  sel.disabled = !yes;
+  if (lb) lb.className = yes ? 'lb' : 'lb off';
+  if (!yes) {
+    /* 置灰期间一律按「保留双语」走：别用上一个文件留下的选择去改新文件的内容 */
+    sel.value = 'keep';
+    S.bi = 'keep';
+  }
+  if (el) {
+    if (!has) { el.style.display = 'none'; return; }
+    el.setAttribute('data-i18n', yes ? 'biHint' : 'biNone');
+    el.textContent = t(yes ? 'biHint' : 'biNone');
+    el.className = 'chip ' + (yes ? 'mut' : 'warn');
+    el.style.display = '';
+  }
+}
+
+function pathUiLang() {
+  var m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/convert\.html/);
+  if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
+  return null;
+}
+function initLang() {
+  TP_ADD_LANGS(LANGS);
+  var sel = $('#langSel');
+  sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
+  var saved = 'zh-CN';
+  try { saved = localStorage.getItem('srt_convert_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
+  if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
+  LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'convert'); if (__tp) I18N[LANG] = __tp; }
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'convert')) return;
+    try { localStorage.setItem('srt_convert_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
+    applyI18n();
+    render();
+  });
+}
+
+/* ---------------- 输入 ---------------- */
+/* 文本入口对外暴露，方便自动化冒烟；页面自身的上传与粘贴都走这里 */
+function setSrc(text, fname) {
+  S.src = String(text || '');
+  S.fname = fname || S.fname || '';
+  S.fmt = window.ConvertCore.detect(S.src, S.fname);
+  if ($('#paste') && $('#paste').value !== S.src) $('#paste').value = S.src;
+  $('#fname').textContent = S.fname;
+  renderSrcFmt();
+  refreshBiHint();
+  hideMsg();
+}
+function renderSrcFmt() {
+  var el = $('#srcFmt');
+  if (!S.src.trim()) { el.className = 'chip mut'; el.textContent = '—'; return; }
+  if (!S.fmt) { el.className = 'chip mut'; el.textContent = t('errFmt'); return; }
+  el.className = 'chip';
+  el.textContent = S.fmt.toUpperCase();
+}
+function readFile(f) {
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () { setSrc(String(r.result || ''), f.name); };
+  r.readAsText(f, 'utf-8');
+}
+function clearAll() {
+  S = { fname: '', src: '', fmt: null, cues: [], out: '', outFmt: S.outFmt, bi: S.bi };
+  $('#paste').value = '';
+  $('#fname').textContent = '';
+  $('#out').value = '';
+  $('#file').value = '';
+  $('#repCard').style.display = 'none';
+  renderSrcFmt();
+  refreshBiHint();
+  hideMsg();
+}
+
+/* ---------------- 转换 ---------------- */
+function fmtDur(ms) {
+  var t2 = Math.max(0, Math.round(ms / 1000));
+  var h = Math.floor(t2 / 3600), m = Math.floor(t2 % 3600 / 60), s = t2 % 60;
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return (h ? h + ':' + p(m) : String(m)) + ':' + p(s);
+}
+function showMsg(text, kind) {
+  var el = $('#msg');
+  el.textContent = text;
+  el.className = 'msg' + (kind ? ' ' + kind : '');
+  el.style.display = 'block';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+
+function render() {
+  var cues = S.cues;
+  var statEl = $('#statRow').querySelector('[data-i18n="statCues"]');
+  if (statEl) statEl.textContent = tpl('statCues', cues.length);
+  $('#statRow').style.display = cues.length ? '' : 'none';
+  var last = cues.length ? cues[cues.length - 1].end : 0;
+  var first = cues.length ? cues[0].start : 0;
+  $('#durWrap').innerHTML = '<span data-i18n="statDur">' + tpl('statDur', fmtDur(last - first)) + '</span>';
+}
+
+/* ---------------- v0.9.308：使用埋点 ----------------
+   本页是纯前端工具：解析与格式转换全在浏览器里做，请求根本不过服务端 ——
+   不主动上报，后台永远不知道这一页有多少人在用、转化到哪一步流失。
+   ⚠️ 只报元数据（动作 + 条数 + 导出格式），**一个字的字幕内容都不带**。
+   ⚠️ act 必须与服务端 server.js 的 TOOL_ACT 白名单对齐，对不上号服务端整条丢弃。
+   ⚠️ 去重：同一份内容 30 分钟内反复点只算一次（条数变了 body 才会变）。 */
+/* ⚠️ 去重窗口直接写毫秒字面量，不写成「分钟 × 60 × 1000」那种算式 ——
+   shift 页有一条「阈值换算只在引擎一处，页面不许出现 ×1000」的回归断言，
+   它管的是**字幕时间**的秒→毫秒换算（必须走引擎），跟这个上报去重窗口没关系，
+   但没必要留一个长得像的写法去绊它。1800000 = 30 分钟，60000 = 1 分钟。 */
+var TOOL_DEDUP_MS = { convert: 1800000, export: 60000 };
+var _tlLast = { body: '', t: 0 };
+function reportTool(act, extra) {
+  try {
+    var e = extra || {};
+    var body = JSON.stringify({
+      page: 'convert', act: act,
+      cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || ''
+    });
+    var now = Date.now();
+    if (body === _tlLast.body && now - _tlLast.t < (TOOL_DEDUP_MS[act] || 0)) return;
+    _tlLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+    }
+    fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () { });
+  } catch (err) { }
+}
+
+function convert() {
+  var C = window.ConvertCore;
+  if (!S.src.trim()) { showMsg(t('errEmpty'), 'err'); return; }
+  var fmt = S.fmt || C.detect(S.src, S.fname);
+  if (!fmt) { showMsg(t('errFmt'), 'err'); return; }
+  var cues = C.parse(S.src, fmt);
+  if (!cues || !cues.length) { showMsg(t('errFmt'), 'err'); return; }
+  S.fmt = fmt;
+  S.bi = $('#biMode').value || 'keep';
+  /* 双语处理：默认 keep 原样不动，选了别的才过滤 / 合并 */
+  cues = C.applyBilingual(cues, S.bi);
+  if (!cues.length) { showMsg(t('errFmt'), 'err'); return; }
+  S.cues = cues;
+  S.outFmt = $('#outFmt').value;
+  S.out = C.dump(cues, S.outFmt);
+  $('#out').value = S.out;
+  $('#repCard').style.display = '';
+  render();
+  reportTool('convert', { cues: S.cues.length });
+  showMsg(t('msgDone'), '');
+}
+
+function download() {
+  if (!S.out) return;
+  reportTool('export', { cues: S.cues.length, fmt: S.outFmt });
+  var C = window.ConvertCore;
+  var name = C.outName(S.fname || 'subtitle', S.outFmt);
+  var blob = new Blob([S.out], { type: 'text/plain;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function copyOut() {
+  var ta = $('#out');
+  if (!ta.value) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(ta.value).then(function () { showMsg(t('msgDone'), ''); }, function () { ta.select(); });
+    return;
+  }
+  ta.select();
+  try { document.execCommand('copy'); showMsg(t('msgDone'), ''); } catch (e) { /* 复制不了就算了 */ }
+}
+
+function bind() {
+  var dz = $('#dz');
+  dz.addEventListener('click', function () { $('#file').click(); });
+  dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', function () { dz.classList.remove('over'); });
+  dz.addEventListener('drop', function (e) {
+    e.preventDefault(); dz.classList.remove('over');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+  });
+  $('#file').addEventListener('change', function (e) {
+    if (e.target.files && e.target.files[0]) readFile(e.target.files[0]);
+  });
+  $('#paste').addEventListener('input', function (e) { setSrc(e.target.value, S.fname); });
+  $('#btnClear').addEventListener('click', clearAll);
+  $('#outFmt').addEventListener('change', function () { S.outFmt = $('#outFmt').value; if (S.cues.length) convert(); });
+  $('#biMode').addEventListener('change', function () { S.bi = $('#biMode').value; if (S.src.trim()) convert(); });
+  $('#btnGo').addEventListener('click', convert);
+  $('#btnDl').addEventListener('click', download);
+  $('#btnCopy').addEventListener('click', copyOut);
+}
+
+(function main() {
+  initLang();
+  renderOutFmtOptions();
+  applyI18n();
+  bind();
+  render();
+  window.setSrc = setSrc;   /* 自动化冒烟用的文本入口 */
+})();
+</script>
+
+<!-- v0.9.288：SEO 静态文案（按语言路由替换；直接开文件时显示简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕格式转换 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>SRT、VTT、ASS、SBV、LRC、TXT 互相转换，时间轴原样保留。</strong></p>
+    <p style="margin-top:8px;">自动识别输入格式，导出时按目标格式重排时间码；ASS 的特效标记与强制换行在导出成普通字幕时会自动还原成可读文本；歌词文件没有小时位，超过一小时的内容按分钟累计。</p>
+    <p style="margin-top:8px;">拿到字幕但播放器不认的人、要在剪辑软件与网页播放器之间来回倒素材的人。</p>
+  </section>
+<!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.341" data-tool="cv"></script>
+</body>
+</html>

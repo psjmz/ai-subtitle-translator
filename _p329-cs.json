@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "cs": {
+      "seo": {
+        "title": "Jak používat efektové titulky a slučování dvojjazyčných – Sloučení – AI-SRTSub",
+        "desc": "Sloučení dvou souborů titulků do dvojjazyčného, úprava pořadí a stylu hotového souboru, efekty pro jednojazyčné titulky. Volba párování, úprava šablon ASS a VTT, výběr formátu exportu.",
+        "h1": "Jak používat efektové titulky a slučování dvojjazyčných",
+        "intro": "Sloučte dva soubory titulků do dvojjazyčného, nebo titulkům rovnou nasaďte styl: písmo, barvu, obrys, pozici — co vidíte v náhledu, to se exportuje.",
+        "ctaText": "Otevřít nástroj efektových titulků"
+      },
+      "body": [
+        {
+          "h2": "Co tento nástroj řeší",
+          "ps": [
+            "Na jedné stránce jsou ve skutečnosti tři práce: sloučit originál a překlad do jednoho dvojjazyčného souboru, upravit pořadí a styl už dvojjazyčných titulků a přidat efekty jednojazyčným titulkům. Všechny tři sdílejí stejnou sadu parametrů stylu a stejný náhled."
+          ],
+          "ul": [
+            "**Sloučit dva soubory titulků** —— máte originál a překlad, sloučíte je do jednoho dvojjazyčného souboru k exportu.",
+            "**Upravit dvojjazyčné titulky** —— už dvojjazyčné jsou, ale pořadí nebo styl nesedí, přeskládáte je.",
+            "**Jednojazyčné titulky** —— jen jeden soubor, nasadíte mu písmo, obrys, pozici.",
+            "Všechny tři přepínáte kartami vlevo, oblast stylu a náhledu je společná."
+          ]
+        },
+        {
+          "h2": "Tři práce, jedna stránka",
+          "ps": [
+            "Nahoře jsou tři karty: **Sloučit dva soubory titulků**, **Upravit dvojjazyčné titulky**, **Jednojazyčné titulky**. Volba karty určuje, kolik sloupců pro vstup je vlevo.",
+            "Při slučování dvou souborů jsou vlevo dva sloupce „1 Původní titulky“ a „2 Přeložené titulky“, každý umožňuje nahrát soubor i vložit text titulků přímo. Úprava dvojjazyčných a jednojazyčných má jen jeden sloupec."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Tři karty nahoře v nástroji efektových titulků a oblast vstupu vlevo",
+            "cap": "Tři karty nahoře; po volbě „Sloučit dva soubory titulků“ se vlevo objeví sloupce originálu a překladu"
+          }
+        },
+        {
+          "h2": "Jak se dva soubory spárují",
+          "ps": [
+            "První položka v „3 Nastavení sloučení“ je způsob párování: **Párovat podle pořadí · časová osa originálu**, **Párovat podle časové osy · časová osa originálu**, **Párovat podle pořadí · časová osa překladu**.",
+            "Když oba soubory mají stejný počet položek a stejné pořadí, párování podle pořadí je nejstabilnější; když počet nesedí (jedna strana položky sloučila, druhá je rozdělila), párujte podle časové osy, nástroj hledá podle nejbližšího času. Čí časovou osu použít záleží na tom, která je přesnější — obvykle je přesnější originál.",
+            "Pod tím je struktura textu (automaticky / jedna položka dva řádky / střídavě po dvojicích) a pořadí (originál nahoře / překlad nahoře)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Způsob párování, struktura textu a pořadí v nastavení sloučení",
+            "cap": "Způsob párování určuje, kdo se s kým spojí, časovou osu originálu nebo překladu volíte také zde"
+          }
+        },
+        {
+          "h2": "Styl po jednotlivých položkách",
+          "ps": [
+            "Vpravo je oblast stylu. Při exportu ASS platí „Vzhled ASS“: rozvržení (rozdělená obrazovka · odděleně nahoře a dole / vrstvené · dva řádky dole), velikost písma, barva, neprůhlednost, písmo, tučné, kurzíva, prostrkání, obrys, barva obrysu, stín/podklad (žádný / stín / podklad), hloubka, barva hrany, neprůhlednost barvy hrany, vodorovné zarovnání (dole · vlevo / dole · na střed / dole · vpravo), vzdálenost ode dna u překladu (hlavní), a u originálu (vedlejší) písmo, stín/podklad a okraje vlevo a vpravo.",
+            "Při exportu dvojjazyčného stylu VTT platí „Styl WebVTT“: nad šesti předvolbami (Standardní / Kompaktní / Filmový / Nahoře / Přístupný / Na výšku) lze měnit svislý line, kotvu (u dna / u horního okraje / na střed), vodorovný position, šířku size, zarovnání align, výšku řádku celé položky a také barvu podkladu, neprůhlednost podkladu a tloušťku obrysu řádku překladu; řádek originálu může převzít hlavní styl nebo mít vlastní.",
+            "Po úpravě lze „Uložit jako schéma“; příště ho vyberete v „Z uložených schémat“ a kliknete na „Použít“."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Jednotlivé parametry v oblasti stylu Vzhled ASS vpravo",
+            "cap": "Velikost písma, barva, obrys, stín/podklad i zarovnání jdou nastavit po jedné položce; po úpravě uložte jako schéma"
+          }
+        },
+        {
+          "h2": "Před exportem se podívejte na náhled",
+          "ps": [
+            "„Náhled sloučení“ je tabulka: #, čas, originál, překlad, styl. Nahoře lze filtrovat podezřelé řádky podle „Obsahuje zvukový efekt“, „Má předponu mluvčího“, „Trvání < 1 sekundy“, „Více než dva řádky“, „Rychlost čtení překračuje limit“, nebo zadat klíčové slovo.",
+            "Kliknutím na slot stylu u řádku se otevře úprava toho slotu a vypíše jen řádky, které ho používají; „Zrušit všechna přepsání“ vrátí všechna ruční přepsání na šablonu. Oblast úpravy časové osy dole umožňuje posunout celek (od určité položky) a proporčně škálovat.",
+            "Po potvrzení přejděte na „4 Export“: stáhnout soubor titulků, nebo zkopírovat obsah."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Tabulka náhledu sloučení a lišta filtrů",
+            "cap": "Náhled je výsledek exportu, lze filtrovat podezřelé řádky podle typu a otevřít jednotlivý slot stylu"
+          }
+        },
+        {
+          "h2": "Co zůstává nedotčeno",
+          "ps": [
+            "Styl mění jen vzhled, ne dialog. Text originálu ani překladu se při slučování nemění ani o jedno písmeno; časová osa zůstává ta, kterou jste zvolili, pokud ji sami neupravíte v oblasti úprav pod náhledem.",
+            "Při exportu SRT nebo „VTT bez stylu“ se informace o stylu do souboru nezapisuje — stránka upozorní, že exportuje VTT bez stylu, bez bloku STYLE, přehrávač použije výchozí vzhled. Chcete-li styl, zvolte dvojjazyčné VTT nebo ASS."
+          ]
+        },
+        {
+          "h2": "Časté otázky",
+          "ps": [
+            "**Co když mají soubory jiný počet položek?** Použijte „Párovat podle časové osy“, nástroj páruje podle nejbližšího času; nespárované položky se nevytvářejí uměle.",
+            "**Přehrávač nezná styl exportovaný z ASS?** Styl ASS je zapsán v souboru, ale podpora ASS se u přehrávačů liší. Chcete-li univerzálnější vzhled, exportujte dvojjazyčné VTT.",
+            "**Šablona se rozladila, jak se vrátit na začátek?** „Obnovit výchozí parametry“ v oblasti ASS a „Obnovit výchozí šablonu“ v oblasti VTT vrátí obě části.",
+            "**Co je těch sedm řádků ve vzorku?** Je to ukázka zabudovaná ve stránce, slouží jen k pohledu na výsledek po sloučení, ukázku exportovat nelze; po nahrání vlastních titulků a kliknutí na náhled se automaticky nahradí."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Titulky se zpracovávají celé v prohlížeči, nenahrávají se a nejdou přes server. Po zavření prohlížeče obsah zpracování zmizí."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Potřebujete rozdělit dvojjazyčné na dvě stopy, použijte [[Oddělení dvojjazyčných|/bilingual.html]]; naopak z jednojazyčných udělat dvojjazyčné najdete v [[Dva způsoby, jak udělat dvojjazyčné titulky|/guides/make-bilingual-subtitles.html]]; po sloučení projděte [[Kontrola titulků|/qc.html]]; na celou sérii použijte [[Hromadná konverze|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "cs": {
+      "seo": {
+        "title": "Jak extrahovat prostý text z titulků – Dvě rozvržení a pět čištění – AI-SRTSub",
+        "desc": "Volba rozvržení souvislý odstavec nebo jeden řádek na položku, pět přepínačů čištění co odstraňují, a šest formátů SRT / VTT / ASS / SBV / LRC / TXT.",
+        "h1": "Jak extrahovat prostý text z titulků",
+        "intro": "Vytáhněte dialogy z titulků do čistého prostého textu: časová osa, čísla i značky stylu se odstraní samy, výsledek se dá číst jako článek nebo použít jako seznam dialogů.",
+        "ctaText": "Otevřít extrakci prostého textu"
+      },
+      "body": [
+        {
+          "h2": "Co tento nástroj řeší",
+          "ps": [
+            "V souboru titulků je užitečný jen dialog, zbytek je struktura pro přehrávač: čísla, časová osa, značky stylu. Tato stránka strukturu odstraní a nechá jen text."
+          ],
+          "ul": [
+            "**Čtení jako článek** —— výstup souvislých odstavců, dělených podle pauz a koncové interpunkce.",
+            "**Použití jako seznam** —— výstup řádek po položce, jedna položka titulků na řádek, vhodné pro tabulku dialogů nebo pro jiný nástroj.",
+            "**Rovnou vyčistit** —— popisky pro neslyšící, vodoznaky a reklamy, sousední duplicity se ve výchozím stavu odstraní.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** šest formátů je rozpoznáno."
+          ]
+        },
+        {
+          "h2": "Vložte, neřešte jen nahrávání",
+          "ps": [
+            "Sloupec „1 Vložit titulky“ vlevo podporuje nahrání souboru i vložení obsahu titulků přímo do textového pole. Při omylu klikněte na „Vymazat“ a začněte znovu.",
+            "Stránka čte soubor jako UTF-8. Pokud se titulky otevřou plné otazníků nebo čtverečků, je to rozbité kódování, jděte na [[Oprava kódování|/repair.html]] převést na UTF-8 a vraťte se."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Oblast vložení titulků na stránce extrakce prostého textu",
+            "cap": "Nahrajte soubor, nebo vložte obsah titulků přímo do textového pole"
+          }
+        },
+        {
+          "h2": "Jaké rozvržení zvolit",
+          "ps": [
+            "Nahoře v „2 Možnosti extrakce“ je rozvržení: **Souvislé odstavce** dělí automaticky podle pauz a koncové interpunkce, čte se jako článek; **Řádek po položce** jedna položka titulků na řádek, přesně odpovídá položkám v původním souboru.",
+            "Chcete opisovat dialogy do poznámek, trénovat překlad, číst jako článek, použijte souvislé odstavce; chcete seznam dialogů, porovnání po položkách s originálem, předání jinému nástroji, použijte řádek po položce."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Rozvržení a přepínače čištění v možnostech extrakce",
+            "cap": "Zvolte jedno rozvržení; pět přepínačů níže určuje, který typ obsahu se odstraní"
+          }
+        },
+        {
+          "h2": "Co jednotlivá čištění odstraňují",
+          "ps": [
+            "**Odstranit popisky pro neslyšící**: smaže závorky popisující zvuk jako „(kroky)“, „[hudba]“, dialog zůstane.",
+            "**Odstranit vodoznaky a reklamy**: vyřadí řádky jako jméno překladatelské skupiny, adresa webu, účet na sociální síti.",
+            "**Odstranit sousední duplicity**: stejná věta dvakrát těsně po sobě (chyba přehrávání) zůstane jen jednou; duplicity vzdálené od sebe mají význam, těch se nedotýká.",
+            "**Odstranit předponu mluvčího**: z „JOHN: Ahoj“ zůstane „Ahoj“. Ve výchozím stavu se zachovává — text ve stylu scénáře potřebuje rozpoznat, kdo mluví.",
+            "**Přeskočit řádky textu písně**: přeskočí řádky, které jsou celé „♪ … ♪“. Ve výchozím stavu se zachovávají — text písně je také slovo."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Pět přepínačů čištění a jejich popis v možnostech extrakce",
+            "cap": "U každého přepínače je napsáno, co přesně odstraňuje, zaškrtněte podle potřeby"
+          }
+        },
+        {
+          "h2": "Jak výsledek odebrat",
+          "ps": [
+            "Sloupec „3 Výsledek“ vpravo zobrazuje text po extrakci v reálném čase, změna možností ho hned přepočítá.",
+            "Po potvrzení klikněte na „Stáhnout“ pro uložení jako .txt, nebo na „Kopírovat“. U jazyků, které nedělí slova mezerou, jako čínština a japonština, se pravidla spojování řádků liší od angličtiny, nástroj to řeší podle jazyka."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Oblast výsledku extrakce s tlačítky stáhnout a kopírovat",
+            "cap": "Výsledek se aktualizuje v reálném čase, stáhne se jako txt nebo zkopíruje"
+          }
+        },
+        {
+          "h2": "Co zůstává nedotčeno",
+          "ps": [
+            "Samotný dialog se nepřepisuje. Přepínače čištění jen určují, který typ se odstraní celý řádek nebo celý odstavec, nemění slova v položce.",
+            "Časová osa a čísla se „nevypisují“, nikoli „nejdřív se změní a pak vypíšou“ — původní soubor zůstává nedotčen, tato stránka nenabízí export s časovou osou, to patří do [[Konverze formátu|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Časté otázky",
+          "ps": [
+            "**Zůstanou v textu značky stylu ASS?** Ne. Přepisovací značky stylu `{}` v ASS se odstraní, zůstane jen text dialogu.",
+            "**Dvojjazyčné titulky se extrahují jako dva řádky, nebo jeden?** Kolik řádků má původní položka, tolik jich zůstane, stránka ani neslučuje ani nedělí — potřebujete rozdělit, použijte [[Oddělení dvojjazyčných|/bilingual.html]].",
+            "**Proč se předpona mluvčího ve výchozím stavu zachovává?** Jméno v „JOHN: Ahoj“ bývá užitečná informace (scénář, tabulka dialogů), po odstranění snadno nepoznáte, kdo mluví, proto je rozhodnutí na vás.",
+            "**Lze extrahovat i soubor LRC?** Ano. Časové značky LRC se odstraní a zůstanou řádky textu; nechcete-li text písně, zaškrtněte „Přeskočit řádky textu písně“."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Titulky se zpracovávají celé v prohlížeči, nenahrávají se a nejdou přes server. Text zůstává jen na této stránce, obnovením se vymaže."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Chcete vědět, co soubor titulků skutečně obsahuje, viz [[Co skutečně obsahuje soubor SRT|/guides/srt-file-format.html]]; extrahované dialogy potřebují překlad, jděte do [[Překlad titulků|/translate.html]]; potřebujete tabulku, použijte [[Titulky do Excel/CSV|/guides/srt-to-excel.html]]; před předáním projděte [[Kontrola titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "cs": {
+      "seo": {
+        "title": "Jak rozdělit a spojit titulky – Dělení po úsecích · Spojení v pořadí – AI-SRTSub",
+        "desc": "Rozdělit soubor na úseky podle délky nebo počtu položek, každý úsek může počítat od nuly; spojit soubory v pořadí nebo proložit podle času. Číslování se přeskládá, dialogy zůstávají.",
+        "h1": "Jak rozdělit a spojit titulky",
+        "intro": "Jeden dlouhý soubor titulků rozdělíte na několik úseků, nebo několik samostatných souborů spojíte v jeden. Stříhá se jen na hranici položek, věta se nikdy nerozdělí.",
+        "ctaText": "Otevřít dělení a spojování"
+      },
+      "body": [
+        {
+          "h2": "Co tento nástroj řeší",
+          "ps": [
+            "Dělení na epizody, dělení na úseky, spojování zdrojů — všude narazíte na to, že úseky titulků nesedí: buď je třeba jeden soubor rozdělit, nebo několik souborů spojit v jeden. Tato stránka řeší obojí, dělení a spojování má každé svou kartu."
+          ],
+          "ul": [
+            "**Dělení** —— jeden dlouhý soubor titulků rozdělíte na úseky podle délky nebo počtu položek.",
+            "**Spojování** —— několik souborů spojíte v pořadí do jedné epizody, nebo proložíte podle času.",
+            "**Střih jen na hranici položek** —— věta se nerozdělí na půl.",
+            "**Číslování se přeskládá samo** —— po spojení nemusíte čísla opravovat, dialogy zůstávají beze změny."
+          ]
+        },
+        {
+          "h2": "Nejdřív zvolte dělení, nebo spojování",
+          "ps": [
+            "Dvě karty nahoře: **Dělení: jeden soubor na více úseků** a **Spojování: více souborů v jeden**. Po volbě se druhý krok níže změní.",
+            "V „1 Vložit titulky“ lze nahrát soubor nebo vložit text, při omylu klikněte na „Vymazat“. Stránka čte jen UTF-8 — rozbité kódování (plno otazníků nebo čtverečků) řešte nejdřív v [[Oprava kódování|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Dvě karty nahoře na stránce dělení a spojování",
+            "cap": "Dělení a spojování jsou dvě karty, po volbě se možnosti druhého kroku změní"
+          }
+        },
+        {
+          "h2": "Jak dělit",
+          "ps": [
+            "V „2 Jak dělit“ zvolte základ: **Délka** (každých X minut jeden úsek) nebo **Počet položek** (každých X položek jeden úsek), zadejte číslo.",
+            "Zaškrtněte „Každý úsek počítat znovu od 0:00“, pak se každý vzniklý úsek počítá od začátku — hodí se při nahrávání po epizodách, kdy každý úsek dostane přehrávač zvlášť. Nezaškrtnuté zachová původní časové značky, úseky stále odpovídají pozici v původním filmu.",
+            "Stříhá se jen na hranici položky titulků: položka, která je mimořádně dlouhá a přechází přes časovou linii, zůstane celá v předchozím úseku."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Možnosti délky/počtu položek a počítání od nuly na stránce dělení",
+            "cap": "Dělte podle délky nebo počtu položek, každý úsek může začínat od 0:00"
+          }
+        },
+        {
+          "h2": "Jak spojovat",
+          "ps": [
+            "V „2 Jak spojovat“ zvolte způsob: **Spojit v pořadí** posune celý následující soubor za konec předchozího, úseky se nepřekrývají; **Proložit podle času** zachová původní časové značky každého souboru a seřadí podle času začátku.",
+            "Několik souborů je první a druhá polovina téže epizody, nebo byly rozděleny ke kontrole a je třeba je vrátit, použijte spojení v pořadí; soubory, které mají být na obrazovce současně (například stopa originálu a překladu), použijte proložení podle času.",
+            "Po spojení se číslování přeskládá samo, dialogy zůstávají beze změny."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Možnosti spojení v pořadí a proložení podle času na stránce spojování",
+            "cap": "Spojení v pořadí se hodí pro první/druhou polovinu, proložení podle času pro stopu originálu a překladu"
+          }
+        },
+        {
+          "h2": "Jak výsledek odebrat",
+          "ps": [
+            "Sloupec „3 Výsledek“ vpravo podporuje export **SRT** a **VTT**, klikněte na „Stáhnout“ nebo „Kopírovat“.",
+            "Při dělení lze „Stáhnout všechny úseky“, uložíte všechny vzniklé úseky najednou, nemusíte klikat po jednom."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Volba formátu SRT/VTT a tlačítka stáhnout, stáhnout všechny úseky v oblasti výsledku",
+            "cap": "Výsledek dělení lze stáhnout po úsecích, po spojení rovnou stáhnout nebo kopírovat"
+          }
+        },
+        {
+          "h2": "Co zůstává nedotčeno",
+          "ps": [
+            "Dialog se nemění ani o slovo. Stránka se dotýká jen „které položky patří do kterého úseku“ a „jak se seřadí čísla“, obsah položek nemění.",
+            "Při volbě „Spojit v pořadí“ se časové značky následujících souborů posunou jako celek — to spojování samo vyžaduje; při volbě „Proložit podle času“ zůstávají původní časové značky všech souborů."
+          ]
+        },
+        {
+          "h2": "Časté otázky",
+          "ps": [
+            "**Poslední úsek je hodně krátký, je to problém?** Ne. Zbytek, který nestačí na plnou délku, tvoří vlastní úsek, nic se nedohání.",
+            "**Přesekne se věta, která leží přesně na hranici?** Ne. Stříhá se jen na hranici položek, položka přecházející časovou linii zůstane v předchozím úseku.",
+            "**Jak se seřadí dvě položky se stejnou dobou po proložení?** Podle času začátku, při stejné době začátku zůstává pořadí, v jakém jste je vložili.",
+            "**Lze dělit ASS?** Stránka podporuje SRT a VTT. ASS nejdřív převeďte v [[Konverze formátu|/convert.html]] na SRT nebo VTT a pak zpracujte."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Titulky se zpracovávají celé v prohlížeči, nenahrávají se a nejdou přes server. Po zavření stránky obsah zmizí."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Dva soubory, které se mají spojit dvojjazyčně (ne spojit v jednu epizodu), řešte v [[Efektové titulky a slučování dvojjazyčných|/guides/merge.html]]; celkově posunutou časovou osu řešte v [[Úprava časové osy|/shift.html]]; objem celé série v [[Hromadná konverze|/batch.html]]; po zpracování projděte [[Kontrola titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "cs": {
+      "seo": {
+        "title": "Jak používat časování textu písně – Přehrát · Vložit – AI-SRTSub",
+        "desc": "Vložit hudbu, vložit text, poslouchat a klepat čas u každého řádku, export LRC nebo SRT. Mezerník přehrát/pauza, Enter označit řádek, Z zpět — ruce neopouštějí klávesnici.",
+        "h1": "Jak používat časování textu písně",
+        "intro": "Vložte hudbu, vložte text, poslouchejte a klepejte čas u každé věty, exportujte standardní LRC nebo SRT. Zvuk se přehrává jen na zařízení, nenahrává se.",
+        "ctaText": "Otevřít časování textu písně"
+      },
+      "body": [
+        {
+          "h2": "Co tento nástroj řeší",
+          "ps": [
+            "Dejte písni soubor textu, podle kterého se dá zpívat: jedna věta na řádek, každý řádek má jeden časový bod. Přehrávač zná LRC, stopa titulků zná SRT, exportovat lze obojí."
+          ],
+          "ul": [
+            "**Označit od nuly** —— vložte text jako prostý text, poslouchejte a klepejte.",
+            "**Upravit hotové** —— importujte existující LRC, pokračujte od prvního řádku bez času.",
+            "**Export dvou formátů** —— LRC pro přehrávač, SRT pro stopu titulků ve videu.",
+            "**Celé z klávesnice** —— mezerník přehrát/pauza, Enter označit větu, Z zpět."
+          ]
+        },
+        {
+          "h2": "1 Vložit hudbu",
+          "ps": [
+            "První sloupec vlevo slouží k nahrání zvuku, **MP3, M4A, FLAC, WAV, OGG** všechny jdou. Zvuk se přehrává jen na zařízení, nenahrává se.",
+            "Kvalita zvuku neovlivňuje přesnost označování, ale zdroj s jasným zpěvem se poslouchá lépe; live verze a verze s příliš hlasitým doprovodem se trefují výrazně obtížněji."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Oblast vložení hudby v nástroji časování textu písně",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG všechny jdou, zvuk se přehrává jen na zařízení"
+          }
+        },
+        {
+          "h2": "2 Vložit text",
+          "ps": [
+            "Do druhého sloupce vložte text, **jedna věta na řádek**, prázdné řádky se přeskakují. Po vložení klikněte na „Zpracovat text“.",
+            "Vložit lze i hotové LRC — jeho časové značky `[mm:ss.xx]` se rozpoznají, po importu pokračujete od prvního řádku bez času, věty s časem nemusíte dělat znovu."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Oblast vložení textu a tlačítko zpracovat text",
+            "cap": "Vložte jednu větu na řádek, nebo celé LRC, aby nástroj přečetl existující časy"
+          }
+        },
+        {
+          "h2": "3 Poslouchat a označovat",
+          "ps": [
+            "Přehrajte hudbu, ve chvíli, kdy věta začíná, stiskněte Enter (nebo klikněte na „Označit tuto větu“), čas se zapíše a kurzor skočí na další větu.",
+            "Zkratky: **mezerník** přehrát/pauza, **Enter** označit aktuální větu, **Z** vrátit jednu větu. Během přehrávání je Enter nejpohodlnější, nemusíte přecházet mezi myší a klávesnicí.",
+            "Při omylu stiskněte Z a větu označte znovu; větu, kterou označovat nechcete (mezihra, čistě instrumentální část), přeskočte tlačítkem „Přeskočit tuto větu“, do exportu se nedostane."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Oblast poslouchání a označování: přehrát, označit tuto větu, vrátit, přeskočit tuto větu",
+            "cap": "Mezerník přehrát/pauza, Enter označit větu, Z vrátit, ruce neopouštějí klávesnici"
+          }
+        },
+        {
+          "h2": "4 Export",
+          "ps": [
+            "Po dokončení přejděte do čtvrtého sloupce: **Stáhnout LRC** pro přehrávač, **Stáhnout SRT** pro stopu titulků ve videu, lze i „Kopírovat“.",
+            "Exportují se jen věty s časem; přeskočené věty do souboru nejdou. Při exportu SRT každá věta trvá do začátku další, poslední věta má 2 sekundy jako zálohu."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Oblast exportu se stáhnout LRC, stáhnout SRT a tlačítkem kopírovat",
+            "cap": "LRC pro přehrávač, SRT pro video; exportují se jen věty s označeným časem"
+          }
+        },
+        {
+          "h2": "Co zůstává nedotčeno",
+          "ps": [
+            "Text písně se nepřepisuje. Označování jen přidá každému řádku jeden časový bod, na vložená slova nesahá.",
+            "Při importu hotového LRC zůstávají řádky s časovou značkou beze změny, pokračuje se jen od prvního řádku bez času."
+          ]
+        },
+        {
+          "h2": "Časté otázky",
+          "ps": [
+            "**V exportu chybí několik vět?** Přeskočené věty a věty bez času do souboru nejdou. Vraťte se do třetího kroku a doplňte je, nebo ověřte, že se opravdu přeskočit měly.",
+            "**Lze změnit čas v JSON?** Po dokončení chcete celek posunout, exportujte SRT a v [[Úprava časové osy|/shift.html]] posuňte nebo proporčně škálujte.",
+            "**Mám exportovat LRC, nebo SRT?** Pro hudební přehrávače (foobar2000, různé aplikace, všechny přehrávače) LRC; pro video nebo další zpracování v nástroji na titulky SRT.",
+            "**Jak dlouho jedna píseň trvá?** Podle počtu řádků a požadované přesnosti. Píseň o třiceti čtyřiceti řádcích zvládnete po zaučení za pár minut; přesnost na jednotlivá slova je pomalejší."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Zvuk i text se zpracovávají celé v prohlížeči, nenahrávají se a nejdou přes server. Zvuk se dekóduje a přehrává jen na zařízení."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Máte LRC a chcete titulky, viz [[LRC na SRT|/guides/lrc-to-srt.html]]; jak o časování přemýšlet a kde jsou pasti, viz [[Jak načasovat text písně do LRC|/guides/how-to-make-lrc-file.html]]; exportované SRT má nepřesný čas, použijte [[Úprava časové osy|/shift.html]]; hotové projděte [[Kontrola titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "cs": {
+      "seo": {
+        "title": "Jak extrahovat titulky zapečené ve videu – AI-SRTSub",
+        "desc": "Číst přímo stopy titulků zapečené v MKV, WebM, MP4, MOV, export SRT / VTT / ASS / TXT. Video se nenahrává, nepřekóduje, vícejazyčné stopy se vypíšou jednotlivě.",
+        "h1": "Jak extrahovat titulky zapečené ve videu",
+        "intro": "Přečtěte přímo stopu titulků zapečenou v MKV / MP4 a exportujte ji jako SRT — video se nenahrává, zpracování probíhá v prohlížeči.",
+        "ctaText": "Otevřít extrakci titulků z videa"
+      },
+      "body": [
+        {
+          "h2": "Co tento nástroj řeší",
+          "ps": [
+            "Titulky mohou být zapečené v souboru videa, nemusí stát jako samostatný soubor. Chcete je upravit, přeložit, udělat dvojjazyčné — nejdřív je musíte dostat ven. Tato stránka dělá právě to."
+          ],
+          "ul": [
+            "**Zná čtyři kontejnery** —— MKV / WebM a MP4 / MOV.",
+            "**Zná čtyři typy stop** —— textová stopa, stopa ASS, stopa WebVTT, stopa mov_text / tx3g v MP4.",
+            "**Export čtyř formátů** —— SRT / VTT / ASS / TXT.",
+            "**Bez nahrávání, bez překódování** —— čte po úsecích podle offsetu, soubor o několika GB nezabere paměť."
+          ]
+        },
+        {
+          "h2": "1 Vložit video",
+          "ps": [
+            "Do prvního sloupce přetáhněte soubor videa nebo klikněte a vyberte. Zná jen **MKV / WebM** a **MP4 / MOV**, jiné kontejnery stopu nepřečtou.",
+            "Soubor neopouští váš počítač — žádné nahrávání. Nástroj čte po úsecích podle offsetu, film o několika GB nezabere paměť, ale první čtení musí počkat, než projde informace o stopách."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Oblast vložení videa na stránce extrakce zapečených titulků",
+            "cap": "Podporuje MKV / WebM a MP4 / MOV, soubor neopouští zařízení"
+          }
+        },
+        {
+          "h2": "2 Zapečené stopy titulků",
+          "ps": [
+            "Po přečtení druhý sloupec vypíše stopy titulků v souboru, **jedna stopa na řádek**, obvykle s jazykem a názvem stopy (například „Chinese“, „English“, „Povinné titulky“). Kliknutím na stopu ji extrahujete.",
+            "Pokud má soubor jen jednu stopu titulků, extrakce začne sama, není třeba klikat.",
+            "**Obrázkové titulky extrahovat nelze**: PGS z Blu-ray a titulky DVD jsou vypálené obrázky, není z čeho vzít text — stránka to výslovně uvede, tam je potřeba OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Seznam zapečených stop titulků, jedna stopa na řádek",
+            "cap": "Jedna stopa na řádek; při jediné stopě se extrakce spustí sama"
+          }
+        },
+        {
+          "h2": "3 Výsledek",
+          "ps": [
+            "Sloupec „3 Výsledek“ vpravo ukáže extrahovaný text titulků, nahoře zvolte formát exportu: **SRT / VTT / ASS / TXT**, klikněte na „Stáhnout“ nebo „Kopírovat“.",
+            "Pokud je zdrojová stopa ASS, její hlavička stylu a rozlišení se přenesou beze změny — export ASS tyto informace zachová, export SRT přenese jen text."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Oblast výsledku a volba formátu SRT / VTT / ASS / TXT",
+            "cap": "Čtyři formáty exportu; hlavička stylu a rozlišení stopy ASS zůstávají"
+          }
+        },
+        {
+          "h2": "Co zůstává nedotčeno",
+          "ps": [
+            "Soubor videa se vůbec nemění — jen se čte, nezapisuje, nepřekóduje ani se nepřebaluje.",
+            "Obsah titulků se bere tak, jak je, nehádá se kódování, neopravuje se časová osa. Pokud jsou extrahované titulky rozbité, jde o kódování zdrojové stopy, řešte v [[Oprava kódování|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Časté otázky",
+          "ps": [
+            "**Obrázkové titulky (PGS / DVD) opravdu nejdou?** Na této stránce ne — jsou to obrázky bez textové vrstvy. Nejdřív je potřeba OCR, to tato stránka nedělá.",
+            "**Extrahované titulky mají špatný čas?** Stránka časovou osu neopravuje, výsledek je takový, jaký je. Celkový posun nebo proporční problém řešte v [[Úprava časové osy|/shift.html]].",
+            "**Proč trvá dlouho, než se něco stane?** Velký soubor se musí projít po úsecích podle offsetu, čím větší, tím déle; celé to běží lokálně, nezávisle na rychlosti sítě.",
+            "**Lze použít externí soubory titulků?** Není třeba — externí .srt / .ass jdou přímo do [[Konverze formátu|/convert.html]] nebo jiného nástroje, tato stránka je pro titulky „zapečené ve videu“."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Video se čte celé lokálně v prohlížeči, nenahrává se, nepřekóduje, nejde přes server. Po zavření stránky se načtený obsah uvolní."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Po extrakci potřebujete překlad, jděte do [[Překlad titulků|/translate.html]], dvojjazyčné řešte v [[Dva způsoby, jak udělat dvojjazyčné titulky|/guides/make-bilingual-subtitles.html]]; rozdíl mezi zapečenými a externími a co lze vytáhnout, viz [[Jak dostat titulky zapečené ve videu|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "cs": {
+      "seo": {
+        "title": "Jak hromadně nahradit terminologii titulků – AI-SRTSub",
+        "desc": "Tabulka termínů jeden řádek na pravidlo, oddělte starý a nový výraz pomocí ->, =>, → nebo Tab, řádek od # je komentář. Shoda celého slova, změny se vypíšou a lze je vrátit.",
+        "h1": "Jak hromadně nahradit terminologii titulků",
+        "intro": "Jedna tabulka termínů sjednotí výrazy v celém souboru titulků najednou — časová osa, styl ASS ani blok NOTE ve VTT se nemění ani o znak.",
+        "ctaText": "Otevřít nahrazování termínů"
+      },
+      "body": [
+        {
+          "h2": "Co tento nástroj řeší",
+          "ps": [
+            "V titulcích se stejné slovo překládá různě, jména osob a míst jdou podle strojového překladu, převzaté titulky je třeba převést na vlastní zvyklosti — tyto změny mají společný rys: mění slovo, ne strukturu. Tato stránka mění jen slova."
+          ],
+          "ul": [
+            "**Sjednotit překlad jmen** —— jména osob, míst a vlastní názvy jsou od začátku do konce stejné.",
+            "**Hromadná oprava** —— jedno slovo, které strojový překlad přeložil špatně, vyměníte v celém souboru.",
+            "**Převzít zvyklosti** —— titulky někoho jiného přeskládáte podle svého úzu.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** šest formátů je rozpoznáno."
+          ]
+        },
+        {
+          "h2": "Dvě věci: titulky a tabulka termínů",
+          "ps": [
+            "Sloupec „1 Vložit titulky“ vlevo nahraje soubor titulků, lze i vložit obsah titulků přímo; při omylu klikněte na „Vymazat“.",
+            "Do sloupce „2 Tabulka termínů“ vpravo píšete pravidla. **Jeden řádek na pravidlo**, starý a nový výraz oddělte pomocí `->`, `=>`, `→` nebo Tab, všechny čtyři způsoby jsou rozpoznány; řádek začínající `#` je komentář a nahrazování se neúčastní.",
+            "Nejste si jistí formátem, klikněte na „Vyplnit příklad“ a upravte podle něj."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Oblast vložení titulků a oblast zadání tabulky termínů na stránce nahrazování",
+            "cap": "Vlevo titulky, vpravo pravidla; jeden řádek na pravidlo, oddělené pomocí ->"
+          }
+        },
+        {
+          "h2": "Jak tabulku termínů psát",
+          "ps": [
+            "Jeden řádek jedno pravidlo, vlevo současný výraz, vpravo, na co se má změnit. Například `Thor -> Thór` nahradí „Thor“ v celém souboru za „Thór“.",
+            "Komentář začíná `#`, hodí se pro popis skupiny pravidel (například „# Sjednocení jmen v první sérii“) i pro dočasné vypnutí pravidla — stačí před něj přidat `#`, nemusíte ho mazat.",
+            "Pravidla se provádějí shora dolů; slovo vytvořené jedním pravidlem projdou ještě další pravidla. Když na pořadí záleží (nejdřív změnit A na B, pak B na C), je třeba to mít na paměti."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Jednotlivé řádky nahrazovacích pravidel v poli tabulky termínů",
+            "cap": "Jeden řádek na pravidlo; řádek od # je komentář, lze jím pravidlo dočasně vypnout"
+          }
+        },
+        {
+          "h2": "Co které ze tří voleb řídí",
+          "ps": [
+            "**Rozsah**: `Vše` / `Jen 1. řádek` / `Jen 2. řádek`. U dvojjazyčných titulků, kde chcete měnit jen překlad, zvolte „Jen 2. řádek“; položky s jediným řádkem se v těchto dvou jednořádkových režimech nemění — nástroj nehádá, která strana je originál.",
+            "**Shoda celého slova**: mění jen tam, kde slovo stojí samostatně, `art` nezasáhne `start`. U jazyků bez dělení mezerou, jako čínština a japonština, tato volba nefunguje — nahrazuje se podle podřetězce.",
+            "**Rozlišovat velikost písmen**: ve výchozím stavu nerozlišuje, `CEO` i `ceo` se změní spolu; po zaškrtnutí jen přesně stejný zápis."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Volby rozsah, shoda celého slova a rozlišovat velikost písmen pod tabulkou termínů",
+            "cap": "Rozsah určuje, který řádek se mění, shoda celého slova a velikost písmen určují, jak přísně se páruje"
+          }
+        },
+        {
+          "h2": "Co se změnilo, lze vrátit po položkách",
+          "ps": [
+            "„3 Výsledek“ kromě titulků po nahrazení také **vypíše každou změnu**: která položka, který řádek, z čeho na co.",
+            "Položku, kterou měnit nechcete, kliknutím v seznamu vrátíte, nemusíte upravovat tabulku a spouštět znovu. Po potvrzení klikněte na „Stáhnout“ nebo „Kopírovat“."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Oblast výsledku a seznam změn po položkách",
+            "cap": "Změny jsou vypsané po položkách, nechtěnou stačí kliknout a vrátí se"
+          }
+        },
+        {
+          "h2": "Co zůstává nedotčeno",
+          "ps": [
+            "**Časová osa, řádky stylu ASS a blok `NOTE` ve VTT se nemění ani o znak.** Nahrazování působí jen na text dialogu, na strukturní řádky nesahá.",
+            "Tabulka termínů sama neupravuje váš soubor titulků — výsledkem je nový výstup, původní soubor zůstává."
+          ]
+        },
+        {
+          "h2": "Časté otázky",
+          "ps": [
+            "**Proč se některé slovo nezměnilo?** Nejdřív zkontrolujte rozsah: při „Jen 2. řádek“ se položky s jediným řádkem nemění; pak shodu celého slova, po zaškrtnutí se výskyty, které netvoří slovo, nemění.",
+            "**Čínština má zaškrtnutou shodu celého slova, přesto se nahrazuje podle podřetězce?** To je správně. Čínština a japonština nedělí slova mezerou, nástroj nemá jak určit hranici slova, tato volba nefunguje.",
+            "**Změnilo se to špatně, jak vrátit vše?** Vracejte po položkách v seznamu změn; chcete začít znovu, vymažte tabulku termínů a vložte titulky znovu.",
+            "**Může se změnit i řádek stylu ASS?** Ne. Řádky stylu a blok `NOTE` nejsou v rozsahu nahrazování, účastní se jen text dialogu."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Titulky i tabulka termínů se zpracovávají celé v prohlížeči, nenahrávají se a nejdou přes server. Tabulka se neukládá, příště bude prázdná."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Zda glosář založit a jak ho udržovat celou sérii, viz [[Glosář: stejná terminologie po celou sérii|/guides/subtitle-glossary.html]]; špinavý obsah (vodoznaky, popisky pro neslyšící) nejdřív projděte [[Čištění titulků|/clean.html]]; po sjednocení jmen potřebujete překlad do dalšího jazyka, jděte do [[Překlad titulků|/translate.html]]; hotové projděte [[Kontrola titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "cs": {
+      "seo": {
+        "title": "Jak dostat titulky zapečené ve videu – Rozdíl zapečených a externích – AI-SRTSub",
+        "desc": "Když jsou titulky zapečené ve videu, jak je dostat: co obsahují MKV / WebM / MP4 / MOV, čím se liší stopa textu, ASS, WebVTT, mov_text, a proč z obrázků text nedostanete.",
+        "h1": "Jak dostat titulky zapečené ve videu",
+        "intro": "Titulky mohou být uvnitř souboru videa, mohou také stát samostatně venku. Když jsou uvnitř, jsou jednou ze stop kontejneru — jejich vytažení nesouvisí s překódováním.",
+        "ctaText": "Otevřít extrakci titulků z videa"
+      },
+      "body": [
+        {
+          "h2": "Kde titulky jsou: zapečené a externí",
+          "ps": [
+            "Soubor videa (MKV, MP4) je kontejner, uvnitř současně nese stopu videa, stopu zvuku a stopu titulků. Když jsou titulky uvnitř, mluvíme o **zapečených** nebo **vložených** titulcích; samostatný soubor .srt / .ass venku je **externí**.",
+            "Externí titulky lze použít rovnou. Problém je u zapečených: chcete je upravit, přeložit, použít původní stopu pro dvojjazyčné, ale nemáte žádný soubor titulků — nejdřív musíte stopu přečíst z kontejneru. Tento krok není překódování, video se znovu nekóduje, jen se vytáhne část dat, která už v kontejneru jsou."
+          ]
+        },
+        {
+          "h2": "Co který kontejner unese",
+          "ps": [
+            "Různé kontejnery unesou různé formáty titulků, i obtížnost vytažení je různá:"
+          ],
+          "ul": [
+            "**MKV / WebM** —— nejvolnější, unese textovou stopu, stopu ASS, stopu WebVTT, často i vícejazyčné stopy.",
+            "**MP4 / MOV** —— obvykle stopa `mov_text` / `tx3g`, prostý text s málo informacemi o stylu.",
+            "**Textová stopa** —— vytažením vznikne text, rovnou SRT.",
+            "**Stopa ASS** —— nese hlavičku stylu a rozlišení, export ASS je zachová, export SRT nechá jen text.",
+            "**Obrázkové titulky (PGS Blu-ray, titulky DVD)** —— ukládají obrázky, ne text, text z nich nedostanete."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Stopy titulků vypsané na stránce extrakce zapečených titulků",
+            "cap": "Jedna stopa na řádek, obvykle s jazykem a názvem; při jediné stopě se extrakce spustí sama"
+          }
+        },
+        {
+          "h2": "Proč z obrázkových titulků text nedostanete",
+          "ps": [
+            "PGS Blu-ray a titulky DVD neukládají znaky, ale jednotlivé obrázky s průhlednostním kanálem. Když je přehrávač zobrazí, „lepí obrázek“, ne „vykresluje text“.",
+            "Proto v takové stopě není žádný text ke čtení — není to tím, že by nástroj nepodporoval, ale tím, že tam žádný text není. Stránka u takové stopy výslovně uvede, že ji extrahovat nelze.",
+            "Jak dostat text, je jediná cesta: nejdřív rozpoznat text v obrázku (OCR), pak udělat titulky. To je jiná operace než „vytáhnout stopu“."
+          ]
+        },
+        {
+          "h2": "Po vytažení obvykle následuje další zpracování",
+          "ps": [
+            "Vytažené titulky jsou „tak, jak jsou“, nástroj nehádá kódování ani neopravuje časovou osu. Proto jsou dvě věci velmi časté:",
+            "Za prvé **rozbitý text** — problém kódování samotné zdrojové stopy, vytažené zůstane rozbité, je třeba v [[Jak opravit kódování|/guides/repair.html]] určit kódování; za druhé **špatný čas** — zdroj s logem na začátku nebo bez, nesouhlasící snímková frekvence, výsledek je posunutý jako celek, použijte [[Úprava časové osy|/shift.html]] k posunu nebo proporčnímu škálování.",
+            "Potom potřebujete překlad, jděte do [[Překlad titulků|/translate.html]], dvojjazyčné řešte v [[Dva způsoby, jak udělat dvojjazyčné titulky|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Oblast výsledku a čtyři formáty exportu SRT / VTT / ASS / TXT",
+            "cap": "Vytažené titulky lze exportovat do čtyř formátů, hlavička stylu a rozlišení stopy ASS zůstávají"
+          }
+        },
+        {
+          "h2": "Několik snadno špatně pochopitelných věcí",
+          "ps": [
+            "**Vytažení titulků není hardsub.** Video se nepřekóduje, kvalita obrazu ani zvukové stopy se vůbec nemění.",
+            "**Vytažení neovlivní původní soubor.** Jen čtení, žádný zápis, soubor videa se nemění ani o bajt.",
+            "**Velký soubor je pomalý kvůli velikosti, ne kvůli síti.** Nástroj prochází informace o stopách po úsecích podle offsetu, čím větší soubor, tím déle, vše běží lokálně.",
+            "**Externí titulky touto stránkou neprocházejí.** Máte-li .srt / .ass, jděte přímo do [[Konverze formátu|/convert.html]], jen titulky zapečené ve videu potřebují nejdřív vytáhnout stopu."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Kompletní postup viz [[Jak extrahovat titulky zapečené ve videu|/guides/videosub.html]]; po vytažení potřebujete překlad, jděte do [[Překlad titulků|/translate.html]], dvojjazyčné řešte v [[Dva způsoby, jak udělat dvojjazyčné titulky|/guides/make-bilingual-subtitles.html]]; rozbitý text nejdřív v [[Oprava kódování|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "cs": {
+      "seo": {
+        "title": "Jak načasovat text písně do LRC – AI-SRTSub",
+        "desc": "Jak vytvořit soubor LRC od nuly: vložit jeden řádek na větu, poslouchat a klepat čas, tři obvyklé zkratky, kdy řádek přeskočit a co dělat, když se čas posune.",
+        "h1": "Jak načasovat text písně do LRC",
+        "intro": "LRC je „jedna věta textu + jeden časový bod“. Proces jeho výroby se nazývá časování: zaznamenat okamžik, kdy každá věta začíná.",
+        "ctaText": "Otevřít časování textu písně"
+      },
+      "body": [
+        {
+          "h2": "Co při časování vlastně děláte",
+          "ps": [
+            "Struktura souboru LRC je velmi jednoduchá: jeden řádek jedna věta textu, vpředu časová značka `[mm:ss.xx]`. Přehrávač dojde k řádku a v ten okamžik větu zobrazí.",
+            "Celá práce „udělat soubor LRC“ tedy spočívá v přiřazení jednoho časového bodu každé větě — to za vás stroj neudělá, protože musí posoudit „odkud se tato věta začíná zpívat“, a to jde jen poslechem."
+          ]
+        },
+        {
+          "h2": "Kolik průchodů jedna píseň potřebuje",
+          "ps": [
+            "Vyplatí se nejdřív minutu přemýšlet, ušetří to většinu přerábění:"
+          ],
+          "ul": [
+            "**Jeden průchod** —— jasný zpěv, málo řádků, stačí přibližně stačit tempu, přehrát a označit jednou.",
+            "**Dva průchody** —— první hrubě, druhý větu po větě zkontrolovat, obvyklý postup při požadavku na přesnost.",
+            "**Import a úprava** —— hotové LRC, jen pár vět nesedí, po importu pokračujte od prvního řádku bez času.",
+            "**Mezihry a čistě instrumentální části** označovat netřeba —— klikněte na „Přeskočit tuto větu“, do exportu se nedostanou.",
+            "**Sbor a překrývání** —— zaznamenat lze jen jeden začátek, překrytá část se počítá podle věty hlavního zpěvu."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Oblast poslouchání a označování: přehrát, označit tuto větu, vrátit, přeskočit tuto větu",
+            "cap": "Během přehrávání je Enter nejpohodlnější; při omylu stiskněte Z a větu označte znovu"
+          }
+        },
+        {
+          "h2": "Krok vložení textu rozhoduje o plynulosti",
+          "ps": [
+            "Text vložte jednu větu na řádek, prázdné řádky se přeskakují. Dělení řádků v tomto kroku jsou řádky, které budete označovat — když při vkládání přidáte řádky navíc, při označování budete muset klikat navíc.",
+            "Vložit lze i hotové LRC: časové značky `[mm:ss.xx]` se rozpoznají, po importu **pokračujete od prvního řádku bez času**, věty s časem nemusíte dělat znovu.",
+            "Proto lze napůl hotové LRC uložit a příště ho vložit a pokračovat."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Oblast vložení textu a tlačítko zpracovat text",
+            "cap": "Jedna věta na řádek; vložením celého LRC nástroj přečte existující časy a pokračujete níž"
+          }
+        },
+        {
+          "h2": "Exportovat LRC, nebo SRT",
+          "ps": [
+            "**Pro hudební přehrávač exportujte LRC.** foobar2000, různé přehrávače i zařízení se zobrazením textu ho znají.",
+            "**Pro video nebo další zpracování exportujte SRT.** Stopa titulků ve videu, nástroje na titulky a střihový software znají SRT. Při exportu každá věta trvá do začátku další, poslední věta má 2 sekundy jako zálohu.",
+            "Oba formáty exportují jen věty s časem — přeskočené věty do souboru nejdou."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Oblast exportu se stáhnout LRC, stáhnout SRT a tlačítkem kopírovat",
+            "cap": "LRC pro přehrávač, SRT pro video; exportují se jen věty s označeným časem"
+          }
+        },
+        {
+          "h2": "Několik snadno špatně pochopitelných věcí",
+          "ps": [
+            "**Po dokončení je celek mírně posunutý, použijte posun.** Exportujte SRT a v [[Úprava časové osy|/shift.html]] posuňte celek, je to mnohem rychlejší než označovat znovu.",
+            "**Čím dál tím větší posun je problém rychlosti.** Když se rychlost přehrávání zvuku neshoduje s nahrávkou, čím dál, tím větší posun, tam je třeba proporčně škálovat, ne posouvat.",
+            "**Zkratky je třeba používat plynule.** Mezerník přehrát/pauza, Enter označit větu, Z vrátit větu — během přehrávání rovnou Enter, nemusíte přecházet mezi myší a klávesnicí.",
+            "**Kvalita zvuku ovlivňuje přesnost.** Zdroj s jasným zpěvem se poslouchá přesněji; live verze a verze s příliš hlasitým doprovodem se trefují výrazně obtížněji."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Kompletní postup viz [[Jak používat časování textu písně|/guides/lrc.html]]; hotové LRC chcete jako titulky, viz [[LRC na SRT|/guides/lrc-to-srt.html]]; exportované SRT má nepřesný čas, použijte [[Úprava časové osy|/shift.html]]; hotové projděte [[Kontrola titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "cs": {
+      "seo": {
+        "title": "Glosář: stejná terminologie po celou sérii – AI-SRTSub",
+        "desc": "Glosář titulků řeší „stejné slovo pokaždé jinak“: kdy se vyplatí ho založit, jak jeden glosář používat celou sérii, proč shoda celého slova nefunguje u čínštiny.",
+        "h1": "Glosář: stejná terminologie po celou sérii",
+        "intro": "Postava se v prvním díle jmenuje A, v sedmém B, divák bude myslet, že jde o dvě postavy. Glosář tomu brání — fixuje, „jak se to má jmenovat“.",
+        "ctaText": "Otevřít nahrazování termínů"
+      },
+      "body": [
+        {
+          "h2": "Glosář řeší „nekonzistenci“",
+          "ps": [
+            "Chyby ve výrazech v titulcích jsou dvojího druhu: jedno je „toto slovo je přeloženo špatně“, druhé je „stejné slovo je pokaždé přeloženo jinak“. První vyžaduje opravu slovníku, druhé je věcí glosáře.",
+            "Druhý případ je častější a hůř se nachází: v prvním díle je `Thor` přeložen jako „Thór“, v sedmém jako „Thor“, jednotlivě se žádný díl nezdá špatný, v celku si divák bude myslet, že se objevila nová postava. Glosář udělá z „v tomto filmu se to jmenuje jednotně Thór“ spustitelné pravidlo a naráz ho aplikuje na celý soubor titulků."
+          ]
+        },
+        {
+          "h2": "Kdy se vyplatí glosář založit",
+          "ps": [
+            "Ne každý soubor titulků glosář potřebuje. Vyplatí se obvykle v těchto případech:"
+          ],
+          "ul": [
+            "**Celá série / jeden seriál** —— čím více dílů, tím vyšší pravděpodobnost nekonzistence.",
+            "**Husté vlastní názvy** —— jména osob, míst, organizací, vymyšlená slova v díle.",
+            "**Více lidí spolupracuje** —— několik lidí si dělí díly, každý má jiné zvyky.",
+            "**Převzetí titulků od jiného** —— je třeba převést na vlastní (nebo klientovy) zvyklosti.",
+            "**Sjednocení po strojovém překladu** —— strojový překlad může pro stejné slovo dát různé verze."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Nahrazovací pravidla seskupená podle typu v tabulce termínů",
+            "cap": "Komentářem od # seskupujete pravidla, zároveň jím lze pravidlo dočasně vypnout"
+          }
+        },
+        {
+          "h2": "Jak udržet jeden glosář celou sérii",
+          "ps": [
+            "Glosář je třeba **průběžně doplňovat**: v prvním díle se dohodnou jména, dál se při každém novém slově přidá řádek, po dokončení série je tabulka úplná. Příště u druhé série téhož seriálu ji vezmete jako výchozí bod.",
+            "Pravidla psát šířeji je praktičtější — když se rozhodne jednotné „Thór“, přidejte i „Thor -> Thór“, takže při převzetí cizích titulků je srovnáte také.",
+            "Po úpravě vždy zkontrolujte **seznam změn**: vypíše každou položku, který řádek, z čeho na co. Seznam je jediné místo, kde potvrdíte „změněno správně, ne přehnaně“, nechtěnou položku kliknutím vrátíte."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Seznam změn po položkách v oblasti výsledku",
+            "cap": "Změny jsou vypsané po položkách, nechtěnou stačí kliknout a vrátí se"
+          }
+        },
+        {
+          "h2": "Které změny glosáři nesvěřovat",
+          "ps": [
+            "Glosář mění **slova**. Tyto tři věci neřeší a ani by neměl:",
+            "**Gramatika a stavba věty** —— jedno slovo se nezmění ve větu, úpravy na úrovni věty patří do [[Překlad titulků|/translate.html]] nebo ruční práci.",
+            "**Čištění obsahu** —— vodoznaky a reklamy, popisky pro neslyšící patří k odstranění celého řádku, to je [[Čištění titulků|/clean.html]], pravidla glosáře slouží k nahrazení, ne k mazání řádků.",
+            "**Časová osa** —— glosář na čas nesahá. Celkový posun nebo proporční problém řešte v [[Úprava časové osy|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Několik snadno špatně pochopitelných věcí",
+          "ps": [
+            "**Čínština má zaškrtnutou shodu celého slova, přesto se nahrazuje podle podřetězce — to je správně.** Čínština a japonština nedělí slova mezerou, nástroj nemá jak určit hranici slova, tato volba nefunguje, ochrana typu `art` nezasáhne `start` platí jen pro angličtinu.",
+            "**Pořadí ovlivňuje výsledek.** Pravidla se provádějí shora dolů, slovo vzniklé jedním pravidlem projdou další pravidla. Nejdřív A na B, pak B na C, nakonec dostanete C.",
+            "**Měnit jen překlad znamená zvolit rozsah.** U dvojjazyčných titulků měnit jen druhý řádek, zvolte „Jen 2. řádek“; položky s jediným řádkem se v těchto režimech nemění — nástroj nehádá, která strana je originál.",
+            "**Glosář se neukládá.** Při každém otevření je prázdný, je třeba si ukládat textový soubor a předávat ho dál."
+          ]
+        },
+        {
+          "h2": "Související nástroje a návody",
+          "ps": [
+            "Kompletní postup viz [[Jak hromadně nahradit terminologii titulků|/guides/glossary.html]]; špinavý obsah nejdřív v [[Čištění titulků|/clean.html]]; po sjednocení jmen potřebujete překlad do dalšího jazyka, jděte do [[Překlad titulků|/translate.html]]; hotové projděte [[Kontrola titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,310 @@
+{
+ "SEO_TRANSLATE": {
+  "fi": {
+   "desc": "Lataa SRT / VTT / ASS -tekstitys, valitse kieli ja saat tekstityksen omallasi: lukittu aikajana, yhtenäinen sanasto. Ilmainen, ei rekisteröitymistä."
+  },
+  "fr": {
+   "desc": "Déposez un SRT / VTT / ASS, choisissez la langue et recevez des sous-titres synchronisés, au vocabulaire cohérent et bien découpés. Gratuit, sans inscription."
+  },
+  "sv": {
+   "desc": "Ladda upp en SRT / VTT / ASS-fil, välj målspråk och få undertexter på ditt språk: tidslinjejustering, enhetlig terminologi. Gratis, ingen registrering."
+  }
+ },
+ "SEO_CLEAN": {
+  "cs": {
+   "desc": "Bezplatný čistič titulků: odstraní vodoznaky, reklamu, SDH, HTML tagy a ASS efekty; opraví VELKÁ PÍSMENA a rozbité znaky. 13 pravidel, vrátit po jedné."
+  },
+  "da": {
+   "desc": "Gratis renser: fjerner vandmærker, reklamer, SDH, HTML-tags og ASS-effekter; retter VERSALER og ødelagte tegn. 13 regler at slå til/fra, fortryd enkeltvis."
+  },
+  "de": {
+   "desc": "Untertitel reinigen: Wasserzeichen, Werbung, SDH, HTML-Tags und ASS-Effekte entfernen; Großschreibung und kaputte Zeichen korrigieren. 13 schaltbare Regeln."
+  },
+  "el": {
+   "desc": "Δωρεάν καθαριστής υποτίτλων: αφαιρεί υδατογραφήματα, διαφημίσεις, SDH, ετικέτες HTML και εφέ ASS· διορθώνει ΚΕΦΑΛΑΙΑ και χαλασμένους χαρακτήρες. 13 κανόνες."
+  },
+  "fi": {
+   "desc": "Ilmainen tekstitysten puhdistus: poistaa vesileimat, SDH-merkinnät, HTML-tagit ja ASS-tehosteet; korjaa ISOILLA kirjoitetun ja rikkinäiset merkit. 13 sääntöä."
+  },
+  "fr": {
+   "desc": "Nettoyeur de sous-titres gratuit : supprime filigranes, pubs, SDH, balises HTML et effets ASS; corrige majuscules et caractères cassés. 13 règles réversibles."
+  },
+  "id": {
+   "desc": "Pembersih subtitle gratis: hapus watermark, iklan, penanda SDH, tag HTML dan efek ASS; perbaiki karakter rusak. 13 aturan, batalkan satu per satu."
+  },
+  "it": {
+   "desc": "Pulitore di sottotitoli gratuito: rimuove filigrane, pubblicità, SDH, tag HTML ed effetti ASS; sistema maiuscole e caratteri rotti. 13 regole, annullabile."
+  },
+  "nl": {
+   "desc": "Gratis ondertitel-schoonmaker: verwijdert watermerken, reclame, SDH, HTML- en ASS-tags; herstelt hoofdletters en kapotte tekens. 13 regels, terug te draaien."
+  },
+  "pt": {
+   "desc": "Limpador de legendas grátis: remove marcas d'água, SDH, tags HTML e efeitos ASS; corrige maiúsculas e caracteres corrompidos. 13 regras, desfaça por item."
+  },
+  "ro": {
+   "desc": "Curățător de subtitrări gratuit: elimină filigrane, SDH, taguri HTML și efecte ASS; corectează MAJUSCULE și caractere stricate. 13 reguli, revert individual."
+  },
+  "sv": {
+   "desc": "Gratis rensning av undertexter: tar bort vattenmärken, reklam, SDH, HTML-taggar och ASS-effekter; åtgärdar VERSALER, trasiga tecken. 13 regler, ångra enskilt."
+  },
+  "tr": {
+   "desc": "Ücretsiz altyazı temizleyici: filigranları, reklamları, SDH, HTML ve ASS etiketlerini siler; büyük harf, bozuk karakterleri düzeltir. 13 kural, geri alınabilir."
+  },
+  "uk": {
+   "desc": "Безплатний очищувач субтитрів: видаляє водяні знаки, рекламу, SDH, HTML-теги й ефекти ASS; виправляє ВЕЛИКІ ЛІТЕРИ та кракозябри. 13 правил, скасування окремо."
+  }
+ },
+ "SEO_GLOSSARY": {
+  "cs": {
+   "desc": "Vyměňujte pojmy v titulcích zdarma online: zapište „starý → nový\" a celý soubor se aktualizuje. Časování, styly a bloky NOTE zůstávají, každý řádek jde vrátit."
+  },
+  "da": {
+   "desc": "Erstat termer i undertekster gratis: skriv \"gammel → ny\" og hele filen bliver opdateret. Timing, typografier og NOTE-blokke røres ikke; fortryd pr. linje."
+  },
+  "de": {
+   "desc": "Begriffe in Untertiteln kostenlos ersetzen: «alt → neu» notieren, das ganze File wird aktualisiert. Zeiten, Stile und NOTE-Blöcke bleiben, rücknehmbar."
+  },
+  "el": {
+   "desc": "Αντικαταστήστε όρους σε υπότιτλους δωρεάν: γράψτε «παλιός → νέος» και όλο το αρχείο ενημερώνεται. Χρονισμός, στυλ και μπλοκ NOTE δεν αλλάζουν."
+  },
+  "es": {
+   "desc": "Reemplaza términos en subtítulos gratis: escribe «original → nuevo» y se actualiza el archivo. Tiempos, estilos y bloques NOTE no cambian; deshacer por línea."
+  },
+  "fi": {
+   "desc": "Vaihda termejä tekstityksissä ilmaiseksi: kirjoita \"vanha → uusi\" ja koko tiedosto päivittyy. Ajoitus, tyylit ja NOTE-lohkot pysyvät, palautus rivikohtaisesti."
+  },
+  "fr": {
+   "desc": "Remplacez des termes dans les sous-titres gratuitement : notez « ancien → nouveau » et tout le fichier est mis à jour. Temps, styles et blocs NOTE restent."
+  },
+  "id": {
+   "desc": "Ganti istilah di subtitle gratis: tulis \"istilah lama → baru\" sekali, seluruh berkas berubah. Garis waktu, gaya dan blok NOTE utuh, kembalikan per baris."
+  },
+  "it": {
+   "desc": "Sostituisci i termini nei sottotitoli gratis: scrivi «vecchio → nuovo» e si aggiorna tutto il file. Tempi, stili e NOTE restano identici; ripristino per riga."
+  },
+  "nl": {
+   "desc": "Vervang termen in ondertitels gratis: schrijf \"oude → nieuwe\" en het hele bestand verandert. Timing, stijlen en NOTE-blokken blijven; per regel terug te zetten."
+  },
+  "pt": {
+   "desc": "Substitua termos nas legendas grátis: escreva «original → novo» e atualize todo o arquivo. Tempos, estilos e blocos NOTE não mudam; desfazer por linha."
+  },
+  "ro": {
+   "desc": "Înlocuiți termeni în subtitrări gratuit: scrieți „vechi → nou\" și se actualizează tot fișierul. Timpul, stilurile și blocurile NOTE rămân; anulare pe rând."
+  },
+  "sv": {
+   "desc": "Ersätt termer i undertexter gratis: skriv \"gammal → ny term\" så uppdateras hela filen. Tidsättning, stilar och NOTE-block lämnas orörda, återställ rad för rad."
+  },
+  "tr": {
+   "desc": "Altyazıdaki terimleri ücretsiz değiştirin: \"eski → yeni\" yazın, tüm dosya güncellensin. Zamanlama, stiller ve NOTE blokları değişmez, geri alma satır bazlı."
+  },
+  "uk": {
+   "desc": "Замінюйте терміни в субтитрах безкоштовно: запишіть «старий → новий термін» — весь файл оновиться. Таймінг, стилі та блоки NOTE без змін, скасування порядково."
+  },
+  "vi": {
+   "desc": "Thay thuật ngữ trong phụ đề miễn phí: ghi \"cũ → mới\" một lần, toàn bộ tệp được cập nhật. Trục thời gian, kiểu và khối NOTE giữ nguyên, hoàn tác từng dòng."
+  }
+ },
+ "SEO_HANCONV": {
+  "cs": {
+   "desc": "Zdarma převeďte čínské titulky mezi zjednodušenou a tradiční čínštinou (Tchaj-wan, Hongkong) a zpět. Mění se jen repliky — časové kódy a ASS značky zůstávají."
+  },
+  "da": {
+   "desc": "Konvertér gratis kinesiske undertekster: forenklet ⇄ traditionelt (Taiwan/Hongkong) og tilbage. Kun replikkerne ændres — tidskoder og ASS-koder forbliver."
+  },
+  "de": {
+   "desc": "Kostenloser chinesischer Untertitel-Konverter: vereinfacht ⇄ traditionell (Taiwan/Hongkong). Nur die Dialoge ändern sich — Zeitcodes und ASS-Stile bleiben."
+  },
+  "el": {
+   "desc": "Δωρεάν μετατροπέας κινεζικών υποτίτλων: απλοποιημένα ⇄ παραδοσιακά (Ταϊβάν/Χονγκ Κονγκ). Αλλάζουν μόνο οι διάλογοι — χρονικοί κωδικοί και ετικέτες ASS μένουν."
+  },
+  "es": {
+   "desc": "Conversor gratuito de chino para subtítulos: simplificado ⇄ tradicional (Taiwán/Hong Kong). Solo cambian los diálogos; códigos y etiquetas ASS intactos."
+  },
+  "fi": {
+   "desc": "Muunna ilmaiseksi kiinalaiset tekstitykset: yksinkertaistettu ⇄ perinteinen (Taiwan/Hongkong). Vain repliikit muuttuvat — aikakoodit ja ASS-tyylit pysyvät."
+  },
+  "fr": {
+   "desc": "Convertisseur gratuit pour sous-titres chinois : simplifié ⇄ traditionnel (Taïwan/Hong Kong). Seuls les dialogues changent — codes et balises ASS intacts."
+  },
+  "id": {
+   "desc": "Konverter gratis untuk subtitle bahasa Mandarin: Hanzi sederhana ⇄ tradisional (Taiwan/Hongkong). Hanya dialog yang berubah — kode waktu dan tag ASS tetap."
+  },
+  "it": {
+   "desc": "Convertitore gratuito di cinese per sottotitoli: semplificato ⇄ tradizionale (Taiwan/Hongkong). Cambiano solo i dialoghi; codici di tempo e tag ASS restano."
+  },
+  "nl": {
+   "desc": "Gratis converter voor Chinese ondertitels: vereenvoudigd ⇄ traditioneel (Taiwan/Hongkong). Alleen de dialogen veranderen — tijdscodes en ASS-stijltags blijven."
+  },
+  "pl": {
+   "desc": "Darmowy konwerter chińskiego dla napisów: uproszczony ⇄ tradycyjny (Tajwan/Hongkong) i z powrotem. Zmieniają się tylko dialogi — kody czasu i tagi ASS zostają."
+  },
+  "pt": {
+   "desc": "Conversor gratuito de chinês para legendas: simplificado ⇄ tradicional (Taiwan/Hong Kong). Só os diálogos mudam; códigos de tempo e tags ASS ficam intactos."
+  },
+  "ro": {
+   "desc": "Convertor gratuit pentru subtitrări chinezești: simplificat ⇄ tradițional (Taiwan/Hongkong). Se schimbă doar replicile — codurile și etichetele ASS rămân."
+  },
+  "ru": {
+   "desc": "Бесплатный конвертер китайского для субтитров: упрощённый ⇄ традиционный (Тайвань/Гонконг) и обратно. Меняются только реплики — таймкоды и теги ASS остаются."
+  },
+  "sv": {
+   "desc": "Gratis omvandlare för kinesiska undertexter: förenklad ⇄ traditionell (Taiwan/Hongkong). Bara replikerna ändras — tidskoder och ASS-koder förblir."
+  },
+  "tr": {
+   "desc": "Ücretsiz Çince altyazı dönüştürücü: basitleştirilmiş ⇄ geleneksel (Tayvan/Hong Kong). Yalnızca diyaloglar değişir — zaman kodları ve ASS etiketleri kalır."
+  },
+  "uk": {
+   "desc": "Безкоштовний конвертер китайських субтитрів: спрощена ⇄ традиційна (Тайвань або Гонконг) і назад. Змінюються лише репліки — часові коди та ASS-теги лишаються."
+  },
+  "vi": {
+   "desc": "Công cụ chuyển tiếng Trung cho phụ đề: giản thể ⇄ phồn thể (Đài Loan hoặc Hồng Kông) và ngược lại. Chỉ lời thoại thay đổi — mã thời gian và thẻ ASS giữ nguyên."
+  }
+ },
+ "SEO_MERGE": {
+  "cs": {
+   "desc": "Bezplatný nástroj pro titulky se stylem: spojte dva soubory do dvojjazyčných nebo přestylujte dvojjazyčnou stopu. 5 šablon ASS / 6 VTT, výstup SRT / VTT / ASS."
+  },
+  "da": {
+   "desc": "Gratis værktøj til undertekster med stil: sæt to filer sammen til tosproget eller omstil et tosproget spor. 5 ASS- / 6 VTT-skabeloner, output SRT / VTT / ASS."
+  },
+  "de": {
+   "desc": "Kostenloses Tool für Untertitel mit Stil: zwei Dateien zweisprachig zusammenführen, eine Spur umgestalten. 5 ASS- / 6 VTT-Vorlagen, Ausgabe SRT / VTT / ASS."
+  },
+  "el": {
+   "desc": "Δωρεάν εργαλείο για υπότιτλους με στυλ: ενώστε δύο αρχεία σε δίγλωσσο ή αλλάξτε στυλ δίγλωσσου κομματιού. 5 πρότυπα ASS / 6 VTT, εξαγωγή σε SRT / VTT / ASS."
+  },
+  "es": {
+   "desc": "Herramienta gratis de subtítulos con estilo: une dos archivos en bilingüe o reestiliza una pista bilingüe. 5 plantillas ASS / 6 VTT, exporta a SRT / VTT / ASS."
+  },
+  "fi": {
+   "desc": "Ilmainen tyyliteltyjen tekstitysten työkalu: yhdistä tiedostot kaksikieliseksi tai muotoile raita uudelleen. 5 ASS- / 6 VTT-mallia, vienti SRT / VTT / ASS."
+  },
+  "hi": {
+   "desc": "मुफ़्त स्टाइल टूल: दो फ़ाइलों को द्विभाषी बनाएँ, द्विभाषी ट्रैक को नया स्टाइल दें या इफ़ेक्ट जोड़ें। ASS 5 / VTT 6 टेम्पलेट, SRT / VTT / ASS में निर्यात।"
+  },
+  "it": {
+   "desc": "Strumento gratuito per sottotitoli con stile: unisci due file in bilingue o ristilizza una traccia bilingue. 5 modelli ASS / 6 VTT, esporta in SRT / VTT / ASS."
+  },
+  "nl": {
+   "desc": "Gratis tool voor gestylede ondertitels: voeg twee bestanden samen tot tweetalig of herstijl een tweetalig spoor. 5 ASS- / 6 VTT-sjablonen, uitvoer SRT/VTT/ASS."
+  },
+  "pl": {
+   "desc": "Darmowe narzędzie do napisów ze stylem: połącz dwa pliki w dwujęzyczne lub zmień styl ścieżki dwujęzycznej. 5 szablonów ASS / 6 VTT, zapis do SRT / VTT / ASS."
+  },
+  "pt": {
+   "desc": "Ferramenta grátis de legendas com estilo: una dois arquivos em bilíngue ou reestilize uma faixa bilíngue. 5 modelos ASS / 6 VTT, exporta SRT / VTT / ASS."
+  },
+  "ru": {
+   "desc": "Бесплатный инструмент для субтитров: объедините два файла в двуязычные или переоформите двуязычную дорожку. 5 шаблонов ASS / 6 VTT, вывод в SRT / VTT / ASS."
+  },
+  "sv": {
+   "desc": "Gratis verktyg för undertexter med stil: slå ihop två filer till tvåspråkig eller forma om tvåspråkigt spår. 5 ASS- / 6 VTT-mallar, export till SRT / VTT / ASS."
+  },
+  "tr": {
+   "desc": "Ücretsiz stil altyazı aracı: iki dosyayı iki dilli hale getirin veya iki dilli altyazıyı yeniden biçimlendirin. 5 ASS / 6 VTT şablonu, SRT / VTT / ASS çıktısı."
+  },
+  "uk": {
+   "desc": "Безплатний інструмент для субтитрів: об'єднайте два файли в двомовні або переоформіть двомовну доріжку. 5 шаблонів ASS / 6 VTT, вивід у SRT / VTT / ASS."
+  }
+ },
+ "SEO_REPAIR": {
+  "cs": {
+   "desc": "Bezplatná online oprava nečitelných titulků: zjistí, zda soubor byl UTF-8, GBK, Big5, Shift_JIS nebo EUC-KR, a vrátí špatně přečtené znaky."
+  },
+  "da": {
+   "desc": "Gratis online reparation af ulæselige undertekster: registrerer om filen var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, sætter tegnene på plads."
+  },
+  "de": {
+   "desc": "Kostenlose Online-Reparatur für unlesbare Untertitel: erkennt, ob die Datei UTF-8, GBK, Big5, Shift_JIS oder EUC-KR war, macht falsch gelesene Zeichen lesbar."
+  },
+  "el": {
+   "desc": "Δωρεάν online επιδιόρθωση μη αναγνώσιμων υπότιτλων: εντοπίζει αν το αρχείο ήταν UTF-8, GBK, Big5, Shift_JIS ή EUC-KR, επαναφέρει τους λάθος χαρακτήρες."
+  },
+  "es": {
+   "desc": "Reparación online gratuita de subtítulos ilegibles: detecta si el archivo era UTF-8, GBK, Big5, Shift_JIS o EUC-KR, devuelve el texto a su forma correcta."
+  },
+  "fi": {
+   "desc": "Ilmainen verkkokorjaus lukukelvottomille tekstityksille: tunnistaa, oliko tiedosto UTF-8, GBK, Big5, Shift_JIS vai EUC-KR, palauttaa väärin luetut merkit."
+  },
+  "fr": {
+   "desc": "Réparation en ligne gratuite des sous-titres illisibles : détecte si le fichier était en UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, remet les caractères en forme."
+  },
+  "hi": {
+   "desc": "गड़बड़ सबटाइटल की मुफ़्त मरम्मत: पता लगाता है कि फ़ाइल UTF-8, GBK, Big5, Shift_JIS या EUC-KR में थी और गलत पढ़े अक्षर वापस लाता है।"
+  },
+  "id": {
+   "desc": "Perbaikan online gratis untuk subtitle yang rusak: mendeteksi apakah berkas UTF-8, GBK, Big5, Shift_JIS atau EUC-KR, mengembalikan teks yang salah dibaca."
+  },
+  "it": {
+   "desc": "Riparazione online gratuita dei sottotitoli illeggibili: rileva se il file era in UTF-8, GBK, Big5, Shift_JIS o EUC-KR, riporta i caratteri a posto."
+  },
+  "nl": {
+   "desc": "Gratis online herstel voor onleesbare ondertitels: detecteert of het bestand UTF-8, GBK, Big5, Shift_JIS of EUC-KR was, zet verkeerd gelezen tekens terug."
+  },
+  "pl": {
+   "desc": "Darmowa naprawa nieczytelnych napisów online: wykrywa, czy plik był w UTF-8, GBK, Big5, Shift_JIS czy EUC-KR, przywraca źle odczytane znaki."
+  },
+  "pt": {
+   "desc": "Reparo online gratuito de legendas ilegíveis: detecta se o arquivo era UTF-8, GBK, Big5, Shift_JIS ou EUC-KR, devolve o texto à forma correta."
+  },
+  "ro": {
+   "desc": "Reparare online gratuită pentru subtitrări ilizibile: detectează dacă fișierul era UTF-8, GBK, Big5, Shift_JIS sau EUC-KR, readuce caracterele citite greșit."
+  },
+  "ru": {
+   "desc": "Бесплатное онлайн-исправление нечитаемых субтитров: определяет, был ли файл в UTF-8, GBK, Big5, Shift_JIS или EUC-KR, возвращает неверно прочитанные символы."
+  },
+  "sv": {
+   "desc": "Gratis online-reparation för oläsbara undertexter: känner av om filen var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, återställer fellästa tecken."
+  },
+  "th": {
+   "desc": "ซ่อมซับไตเติลที่อ่านไม่ได้ฟรีออนไลน์: ตรวจว่าไฟล์เป็น UTF-8, GBK, Big5, Shift_JIS หรือ EUC-KR เปลี่ยนตัวอักษรที่อ่านผิดกลับเป็นข้อความที่อ่านได้"
+  },
+  "tr": {
+   "desc": "Okunamayan altyazılar için ücretsiz çevrimiçi onarım: dosyanın UTF-8, GBK, Big5, Shift_JIS veya EUC-KR olduğunu saptar, yanlış okunan karakterleri düzeltir."
+  },
+  "uk": {
+   "desc": "Безкоштовне онлайн-виправлення нерозбірливих субтитрів: визначає, чи був файл у UTF-8, GBK, Big5, Shift_JIS чи EUC-KR, повертає неправильно прочитані символи."
+  }
+ },
+ "SEO_VIDEOSUB": {
+  "de": {
+   "desc": "Extrahieren Sie kostenlos Untertitelspuren aus MKV, MP4, MOV und exportieren als SRT, VTT, ASS oder TXT. Kein Upload — Dateien werden im Browser gelesen."
+  },
+  "es": {
+   "desc": "Extrae gratis las pistas de subtítulos incrustadas en MKV, MP4 y MOV y expórtalas a SRT, VTT, ASS o TXT. Sin subida ni recodificación: se lee en tu navegador."
+  },
+  "fr": {
+   "desc": "Extrayez gratuitement la piste de sous-titres d'un MKV, MP4 ou MOV; export en SRT, VTT, ASS ou TXT. Aucun envoi ni réencodage : lu dans votre navigateur."
+  },
+  "hi": {
+   "desc": "MKV, WebM, MP4 और MOV के अंदर बंद सबटाइटल ट्रैक मुफ़्त में निकालें और SRT / VTT / ASS / TXT में एक्सपोर्ट करें। अपलोड नहीं: फ़ाइल ब्राउज़र में पढ़ी जाती है।"
+  },
+  "id": {
+   "desc": "Ekstrak gratis trek subtitle yang tertanam di MKV, WebM, MP4 dan MOV lalu ekspor ke SRT, VTT, ASS atau TXT. Tanpa upload: berkas dibaca di browser."
+  },
+  "it": {
+   "desc": "Estraete gratis la traccia di sottotitoli da MKV, WebM, MP4 e MOV ed esportatela in SRT, VTT, ASS o TXT. Nessun upload: il file si legge nel browser."
+  },
+  "nl": {
+   "desc": "Haal gratis het ondertitelspoor uit MKV, WebM, MP4 en MOV en exporteer als SRT, VTT, ASS of TXT. Geen upload: het bestand wordt in je browser gelezen."
+  },
+  "pl": {
+   "desc": "Wyciągnij za darmo ścieżkę napisów z MKV, WebM, MP4 i MOV i wyeksportuj jako SRT, VTT, ASS lub TXT. Bez wysyłania i rekompresji: plik czytany w przeglądarce."
+  },
+  "pt": {
+   "desc": "Extraia grátis as faixas de legenda embutidas em MKV, WebM, MP4 e MOV e exporte para SRT, VTT, ASS ou TXT. Sem upload nem recodificação: lido no navegador."
+  },
+  "ru": {
+   "desc": "Извлеките дорожку субтитров из MKV, WebM, MP4, MOV и экспортируйте в SRT, VTT, ASS или TXT. Без загрузки и перекодирования: файл читается в браузере."
+  },
+  "sv": {
+   "desc": "Extrahera gratis textspåret i MKV, WebM, MP4 och MOV och exportera som SRT, VTT, ASS eller TXT. Ingen uppladdning eller omkodning: filen läses i webbläsaren."
+  },
+  "tr": {
+   "desc": "MKV, WebM, MP4 ve MOV içindeki altyazı parçasını ücretsiz çıkarıp SRT, VTT, ASS veya TXT olarak dışa aktarın. Yükleme yok: dosya tarayıcınızda okunur."
+  },
+  "vi": {
+   "desc": "Trích miễn phí phụ đề nằm trong MKV, WebM, MP4 và MOV rồi xuất ra SRT / VTT / ASS / TXT. Không tải lên, không mã hóa lại: tệp được đọc trong trình duyệt."
+  }
+ }
+}

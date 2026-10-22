@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "ro": {
+      "seo": {
+        "title": "Cum se folosesc subtitrările cu efecte și îmbinarea bilingvă – AI-SRTSub",
+        "desc": "Îmbină două fișiere de subtitrare într-unul bilingv, rearanjează ordinea și stilul, aplică efecte subtitrărilor monolingve. Alegerea perechilor, șabloane ASS și VTT, formatul de export.",
+        "h1": "Cum se folosesc subtitrările cu efecte și îmbinarea bilingvă",
+        "intro": "Îmbină două fișiere de subtitrare într-unul bilingv sau aplică stil direct subtitrărilor: font, culoare, contur, poziție — ce vezi în previzualizare ajunge în export.",
+        "ctaText": "Deschide instrumentul de subtitrări cu efecte"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă acest instrument",
+          "ps": [
+            "Într-o singură pagină sunt de fapt trei lucrări: îmbinarea originalului și a traducerii într-un fișier bilingv, rearanjarea ordinii și a stilului la subtitrările deja bilingve și aplicarea de efecte subtitrărilor monolingve. Toate trei împart același set de parametri de stil și aceeași previzualizare."
+          ],
+          "ul": [
+            "**Îmbină două fișiere** —— ai originalul și traducerea, le unești într-un fișier bilingv pentru export.",
+            "**Ajustează subtitrările bilingve** —— sunt deja bilingve, dar ordinea sau stilul nu e potrivit, le rearanjezi.",
+            "**Subtitrări monolingve** —— un singur fișier, îi aplici font, contur, poziție.",
+            "Toate trei se schimbă din filele din stânga, zona de stil și previzualizarea sunt comune."
+          ]
+        },
+        {
+          "h2": "Trei lucrări, o pagină",
+          "ps": [
+            "Sus sunt trei file: **Îmbină două fișiere de subtitrare**, **Ajustează subtitrările bilingve**, **Subtitrări monolingve**. Filă aleasă decide câte coloane de intrare sunt în stânga.",
+            "La îmbinarea a două fișiere, în stânga sunt două coloane „1 Subtitrări originale” și „2 Subtitrări traduse”, fiecare permite încărcarea unui fișier și lipirea textului direct. Ajustarea bilingvă și monolingvă are o singură coloană."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Trei file sus în instrumentul de subtitrări cu efecte și zona de intrare din stânga",
+            "cap": "Trei file sus; la „Îmbină două fișiere de subtitrare” apar în stânga coloanele original și traducere"
+          }
+        },
+        {
+          "h2": "Cum se împerechează două fișiere",
+          "ps": [
+            "Prima opțiune din „3 Setări de îmbinare” este modul de împerechere: **Împerechează în ordine · cronologia originalului**, **Împerechează după cronologie · cronologia originalului**, **Împerechează în ordine · cronologia traducerii**.",
+            "Când ambele fișiere au același număr de intrări și aceeași ordine, împerecherea în ordine este cea mai stabilă; când numărul diferă (o parte a unit intrări, cealaltă le-a despărțit), împerechează după cronologie, instrumentul caută după cel mai apropiat moment. A cui cronologie se folosește depinde de care e mai precisă — de obicei originalul.",
+            "Dedesubt sunt structura textului (automat / o intrare două rânduri / alternativ în perechi) și ordinea (originalul sus / traducerea sus)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Modul de împerechere, structura textului și ordinea în setările de îmbinare",
+            "cap": "Modul de împerechere decide cine se unește cu cine, cronologia originalului sau a traducerii se alege tot aici"
+          }
+        },
+        {
+          "h2": "Stilul, opțiune cu opțiune",
+          "ps": [
+            "În dreapta este zona de stil. La exportul ASS se aplică „Aspect ASS”: aspectul (ecran divizat · separat sus-jos / suprapus · două rânduri jos), mărimea fontului, culoarea, opacitatea, fontul, aldine, cursive, spațierea literelor, conturul, culoarea conturului, umbra/fundalul (fără / umbră / fundal), adâncimea, culoarea marginii, opacitatea culorii marginii, alinierea orizontală (jos · stânga / jos · centru / jos · dreapta), distanța de jos pentru traducere (principală), iar pentru original (secundară) fontul, umbra/fundalul și marginile stânga-dreapta.",
+            "La exportul stilului bilingv VTT se aplică „Stil WebVTT”: peste șase presetări (Standard / Compact / Cinematografic / Sus / Accesibil / Vertical), se pot schimba line vertical, ancorarea (lipit de jos / lipit de sus / centru), position orizontal, lățimea size, alinierea align, înălțimea rândului pentru toată intrarea, plus culoarea fundalului, opacitatea fundalului și grosimea conturului rândului tradus; rândul original poate prelua stilul principal sau poate avea unul propriu.",
+            "După ajustări poți „Salva ca schemă”; data viitoare o alegi din „Din scheme salvate” și apeși „Aplică”."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Parametrii din zona de stil Aspect ASS din dreapta",
+            "cap": "Mărimea fontului, culoarea, conturul, umbra/fundalul și alinierea se reglează pe fiecare opțiune; la final salvează ca schemă"
+          }
+        },
+        {
+          "h2": "Privește previzualizarea înainte de export",
+          "ps": [
+            "„Previzualizare îmbinare” este un tabel: #, timp, original, traducere, stil. Sus poți filtra rândurile suspecte după „Are efect sonor”, „Are prefix de vorbitor”, „Durată < 1 secundă”, „Mai mult de două rânduri”, „Viteza de citire depășește limita”, sau poți scrie un cuvânt-cheie.",
+            "Clic pe slotul de stil al unui rând deschide editarea acelui slot și listează doar rândurile care îl folosesc; „Elimină toate suprascrierile” readuce suprascrierile manuale la șablon. Zona de ajustare a cronologiei de dedesubt permite deplasarea întregului (de la o intrare anume) și scalarea proporțională.",
+            "După confirmare treci la „4 Export”: descarci fișierul de subtitrare sau copiezi conținutul."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Tabelul de previzualizare a îmbinării și bara de filtre",
+            "cap": "Previzualizarea este rezultatul exportului, poți filtra rânduri suspecte după tip și deschide un slot de stil"
+          }
+        },
+        {
+          "h2": "Ce rămâne neatins",
+          "ps": [
+            "Stilul schimbă doar aspectul, nu dialogul. Textul originalului și al traducerii nu se schimbă nici cu o literă în timpul îmbinării; cronologia rămâne cea aleasă, dacă nu o modifici tu în zona de ajustare de sub previzualizare.",
+            "La exportul SRT sau „VTT fără stil”, informația de stil nu se scrie în fișier — pagina te anunță că exportă VTT fără stil, fără bloc STYLE, iar playerul folosește aspectul implicit. Vrei stil, alege VTT bilingv sau ASS."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**Fișierele au număr diferit de intrări, ce fac?** Folosește „Împerechează după cronologie”, instrumentul potrivește după cel mai apropiat moment; intrările nepotrivite nu se inventează.",
+            "**Playerul nu recunoaște stilul exportat ASS?** Stilul ASS este scris în fișier, dar suportul ASS diferă între playere. Vrei un aspect mai universal, exportă VTT bilingv.",
+            "**Șablonul s-a stricat, cum revin la început?** „Resetează parametrii impliciți” în zona ASS și „Resetează șablonul implicit” în zona VTT readuc ambele părți.",
+            "**Ce sunt cele șapte rânduri din exemplu?** Este exemplul inclus în pagină, doar pentru a vedea cum arată după îmbinare, exemplul nu se poate exporta; după ce încarci subtitrările tale și apeși previzualizare, se înlocuiește automat."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Subtitrările sunt prelucrate complet în browser, nu se încarcă și nu trec prin server. Închizi browserul, conținutul prelucrat dispare."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Dacă vrei să desparți bilingvul în două piste, folosește [[Separare bilingvă|/bilingual.html]]; invers, din monolingv să faci bilingv, vezi [[Două metode de a face subtitrări bilingve|/guides/make-bilingual-subtitles.html]]; după îmbinare treci prin [[Verificare subtitrări|/qc.html]]; pentru un sezon întreg folosește [[Conversie în bloc|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "ro": {
+      "seo": {
+        "title": "Cum extragi text simplu din subtitrări – AI-SRTSub",
+        "desc": "Alegerea machetei paragrafe continue sau o linie pe intrare, cinci comutatoare de curățare ce elimină, și șase formate SRT / VTT / ASS / SBV / LRC / TXT — toate recunoscute.",
+        "h1": "Cum extragi text simplu din subtitrări",
+        "intro": "Scoate replicile din subtitrări într-un text simplu curat: cronologia, numerele și marcajele de stil dispar automat, rezultatul se citește ca un articol sau se folosește ca listă de dialoguri.",
+        "ctaText": "Deschide extragerea textului simplu"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă acest instrument",
+          "ps": [
+            "Într-un fișier de subtitrare cu adevărat util este doar dialogul, restul este structură pentru player: numere, cronologie, marcaje de stil. Pagina asta elimină structura și lasă doar textul."
+          ],
+          "ul": [
+            "**Citit ca articol** —— rezultat în paragrafe continue, împărțite după pauze și punctuația de final.",
+            "**Folosit ca listă** —— rezultat cu o linie pe intrare, o intrare de subtitrare pe linie, comod pentru tabel de dialoguri sau pentru alt instrument.",
+            "**Curățat din treacăt** —— descrierile pentru surzi, watermark-urile și reclamele, repetițiile alăturate se elimină implicit.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** șase formate sunt recunoscute."
+          ]
+        },
+        {
+          "h2": "Pune-l, nu te gândi doar la încărcare",
+          "ps": [
+            "Coloana „1 Pune subtitrările” din stânga permite încărcarea unui fișier și lipirea conținutului direct în caseta de text. Ai greșit, apasă „Golește” și ia de la început.",
+            "Pagina citește fișierul ca UTF-8. Dacă subtitrările se deschid pline de semne de întrebare sau pătrățele, codificarea e stricată, mergi la [[Reparare codificare|/repair.html]] și schimbă în UTF-8, apoi revino."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Zona de introducere a subtitrărilor pe pagina de extragere a textului simplu",
+            "cap": "Încarcă un fișier sau lipește conținutul subtitrărilor direct în caseta de text"
+          }
+        },
+        {
+          "h2": "Ce machetă alegi",
+          "ps": [
+            "Sus în „2 Opțiuni de extragere” este macheta: **Paragrafe continue** împarte automat după pauze și punctuația de final, se citește ca un articol; **O linie pe intrare** o intrare de subtitrare pe linie, corespunde exact intrărilor din fișierul original.",
+            "Vrei să copiezi replici pentru notițe, să exersezi traducerea, să citești ca articol — folosește paragrafe continue; vrei listă de dialoguri, comparație intrare cu intrare cu originalul, predare la alt instrument — folosește o linie pe intrare."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Macheta și comutatoarele de curățare din opțiunile de extragere",
+            "cap": "Alege o machetă; cele cinci comutatoare de dedesubt decid ce tip de conținut se elimină"
+          }
+        },
+        {
+          "h2": "Ce elimină fiecare dintre cele cinci curățări",
+          "ps": [
+            "**Elimină descrierile pentru surzi**: șterge parantezele care descriu sunetul, ca „(pași)”, „[muzică]”, dialogul rămâne.",
+            "**Elimină watermark-urile și reclamele**: scoate rânduri precum numele echipei de traducere, adresa site-ului, contul de social media.",
+            "**Elimină repetițiile alăturate**: aceeași replică de două ori la rând (erroare de redare) rămâne o singură dată; repetițiile depărtate au sens, pe acelea nu le atinge.",
+            "**Elimină prefixul vorbitorului**: din „JOHN: Salut” rămâne „Salut”. Implicit se păstrează — textul în stil scenariu are nevoie să recunoască cine vorbește.",
+            "**Sari peste rândurile de versuri**: sare rândurile care sunt în întregime „♪ … ♪”. Implicit se păstrează — versurile sunt tot vorbe."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Cele cinci comutatoare de curățare și explicațiile lor din opțiunile de extragere",
+            "cap": "La fiecare comutator scrie exact ce elimină, bifează după nevoie"
+          }
+        },
+        {
+          "h2": "Cum iei rezultatul",
+          "ps": [
+            "Coloana „3 Rezultat” din dreapta arată textul extras în timp real, schimbarea opțiunilor îl recalculează imediat.",
+            "După confirmare apasă „Descarcă” pentru a salva ca .txt, sau „Copiază”. La limbile care nu despart cuvintele prin spațiu, ca chineza și japoneza, regulile de unire a rândurilor diferă de engleză, instrumentul le tratează automat după limbă."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Zona de rezultat al extragerii cu butoanele descarcă și copiază",
+            "cap": "Rezultatul se actualizează în timp real, se descarcă în txt sau se copiază direct"
+          }
+        },
+        {
+          "h2": "Ce rămâne neatins",
+          "ps": [
+            "Dialogul în sine nu este rescris. Comutatoarele de curățare decid doar ce tip se elimină în întregime ca rând sau paragraf, nu schimbă cuvintele din intrare.",
+            "Cronologia și numerele sunt „neexportate”, nu „modificate apoi exportate” — fișierul original rămâne neatins, pagina nu oferă export cu cronologie, asta ține de [[Conversie de format|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**Marcajele de stil ASS rămân în text?** Nu. Marcajele de suprascriere a stilului `{}` din ASS se elimină, rămâne doar textul dialogului.",
+            "**Subtitrările bilingve ies pe două rânduri sau pe unul?** Câte rânduri are intrarea originală, atâtea rămân, pagina nici nu unește, nici nu desparte — vrei să desparți, folosește [[Separare bilingvă|/bilingual.html]].",
+            "**De ce prefixul vorbitorului se păstrează implicit?** Numele din „JOHN: Salut” este adesea informație utilă (scenariu, tabel de dialoguri), eliminat e ușor să nu mai știi cine vorbește, deci decizia îți revine.",
+            "**Se poate extrage și un fișier LRC?** Da. Marcajele de timp LRC se elimină, rămân rândurile de versuri; nu vrei versuri, bifează „Sari peste rândurile de versuri”."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Subtitrările sunt prelucrate complet în browser, nu se încarcă și nu trec prin server. Textul rămâne doar pe pagina curentă, reîmprospătarea îl golește."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Vrei să afli ce conține de fapt un fișier de subtitrare, vezi [[Ce conține de fapt un fișier SRT|/guides/srt-file-format.html]]; replicile extrase au nevoie de traducere, intră în [[Traducere subtitrări|/translate.html]]; ai nevoie de tabel, folosește [[Subtitrări în Excel/CSV|/guides/srt-to-excel.html]]; înainte de predare treci prin [[Verificare subtitrări|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "ro": {
+      "seo": {
+        "title": "Cum divizezi și unești subtitrări – Tăiere pe segmente – AI-SRTSub",
+        "desc": "Împarte un fișier în segmente după durată sau număr de intrări, fiecare poate porni de la zero; unește în ordine sau întrepătrunde după timp. Numerotarea se reface, dialogurile rămân.",
+        "h1": "Cum divizezi și unești subtitrări",
+        "intro": "Un fișier lung de subtitrări se taie în mai multe segmente, sau mai multe fișiere separate se unesc într-unul. Se taie doar la granița intrărilor, o propoziție nu se desparte niciodată.",
+        "ctaText": "Deschide divizarea și unirea"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă acest instrument",
+          "ps": [
+            "Împărțirea pe episoade, împărțirea pe segmente, unirea surselor — peste tot apar subtitrări care nu se potrivesc pe segmente: fie un fișier trebuie tăiat, fie câteva trebuie unite într-unul. Pagina asta se ocupă de amândouă, tăierea și unirea au fiecare fila sa."
+          ],
+          "ul": [
+            "**Divizare** —— un fișier lung de subtitrări se taie în segmente după durată sau număr de intrări.",
+            "**Unire** —— mai multe fișiere se unesc în ordine într-un episod, sau se întrepătrund după timp.",
+            "**Tăiere doar la granița intrărilor** —— o propoziție nu se taie în două.",
+            "**Numerotarea se reface automat** —— după unire nu trebuie să corectezi numerele, dialogurile rămân neschimbate."
+          ]
+        },
+        {
+          "h2": "Alege mai întâi tăierea sau unirea",
+          "ps": [
+            "Două file sus: **Divizare: un fișier în mai multe segmente** și **Unire: mai multe fișiere într-unul**. După alegere, pasul doi de dedesubt se schimbă.",
+            "În „1 Pune subtitrările” poți încărca un fișier sau lipi text, ai greșit apasă „Golește”. Pagina citește doar UTF-8 — codificare stricată (pline de semne de întrebare sau pătrățele) rezolvă întâi în [[Reparare codificare|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Două file sus pe pagina de divizare și unire",
+            "cap": "Divizarea și unirea sunt două file, după alegere opțiunile pasului doi se schimbă"
+          }
+        },
+        {
+          "h2": "Cum tai",
+          "ps": [
+            "În „2 Cum tai” alege baza: **Durată** (la fiecare X minute un segment) sau **Număr de intrări** (la fiecare X intrări un segment), scrie un număr.",
+            "Bifează „Fiecare segment pornește de la 0:00”, atunci fiecare segment rezultat pornește de la început — util la încărcarea pe episoade, când fiecare segment merge separat la player. Nebifat, marcajele de timp originale se păstrează, segmentele corespund în continuare poziției din filmul original.",
+            "Se taie doar la granița intrării de subtitrare: o intrare foarte lungă care trece de linia de timp rămâne întreagă în segmentul anterior."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Opțiunile de durată/număr de intrări și pornire de la zero pe pagina de divizare",
+            "cap": "Taie după durată sau număr de intrări, fiecare segment poate începe de la 0:00"
+          }
+        },
+        {
+          "h2": "Cum unești",
+          "ps": [
+            "În „2 Cum unești” alege modul: **Unește în ordine** deplasează tot fișierul următor după sfârșitul celui precedent, segmentele nu se suprapun; **Întrepătrunde după timp** păstrează marcajele de timp originale ale fiecărui fișier și le ordonează după momentul de început.",
+            "Câteva fișiere sunt prima și a doua jumătate a aceluiași episod, sau au fost separate pentru verificare și trebuie puse la loc, folosește unirea în ordine; fișiere care trebuie să fie simultan pe ecran (de exemplu pista originalului și a traducerii) folosesc întrepătrunderea după timp.",
+            "După unire numerotarea se reface automat, dialogurile rămân neschimbate."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Opțiunile de unire în ordine și întrepătrundere după timp pe pagina de unire",
+            "cap": "Unirea în ordine se potrivește pentru prima/a doua jumătate, întrepătrunderea pentru pista originalului și a traducerii"
+          }
+        },
+        {
+          "h2": "Cum iei rezultatul",
+          "ps": [
+            "Coloana „3 Rezultat” din dreapta permite export **SRT** și **VTT**, apasă „Descarcă” sau „Copiază”.",
+            "La divizare poți „Descarcă toate segmentele”, salvezi toate segmentele rezultate dintr-o dată, fără să apeși pe fiecare."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Alegerea formatului SRT/VTT și butoanele descarcă, descarcă toate segmentele în zona de rezultat",
+            "cap": "Rezultatul divizării se poate descărca pe segmente, după unire se descarcă sau se copiază direct"
+          }
+        },
+        {
+          "h2": "Ce rămâne neatins",
+          "ps": [
+            "Dialogul nu se schimbă nici cu un cuvânt. Pagina atinge doar „ce intrări aparțin cărui segment” și „cum se ordonează numerele”, nu atinge conținutul intrărilor.",
+            "La alegerea „Unește în ordine”, marcajele de timp ale fișierelor următoare se deplasează în bloc — asta cere unirea în sine; la „Întrepătrunde după timp” marcajele originale ale tuturor fișierelor se păstrează."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**Ultimul segment e foarte scurt, e o problemă?** Nu. Restul care nu ajunge la o durată întreagă formează un segment propriu, nu se forțează.",
+            "**O propoziție exact pe graniță se taie?** Nu. Se taie doar la granița intrărilor, intrarea care trece de linia de timp rămâne în segmentul anterior.",
+            "**Cum se ordonează două intrări cu timp identic după întrepătrundere?** După momentul de început, la moment identic se păstrează ordinea în care le-ai pus.",
+            "**ASS se poate tăia?** Pagina suportă SRT și VTT. ASS se transformă întâi cu [[Conversie de format|/convert.html]] în SRT sau VTT, apoi se prelucrează."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Subtitrările sunt prelucrate complet în browser, nu se încarcă și nu trec prin server. Închizi pagina, conținutul dispare."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Două fișiere care trebuie unite bilingv (nu ca un episod) se rezolvă în [[Subtitrări cu efecte și îmbinare bilingvă|/guides/merge.html]]; cronologia deplasată în bloc se corectează în [[Ajustarea cronologiei|/shift.html]]; volumul unui sezon în [[Conversie în bloc|/batch.html]]; după prelucrare treci prin [[Verificare subtitrări|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "ro": {
+      "seo": {
+        "title": "Cum folosești marcarea timpilor pentru versuri – Redare · Lipire – AI-SRTSub",
+        "desc": "Adaugă muzica și versurile, ascultă și marchează timpul fiecărei linii, exportă LRC sau SRT. Spațiu redare/pauză, Enter marchează linia, Z anulează — mâinile stau pe tastatură.",
+        "h1": "Cum folosești marcarea timpilor pentru versuri",
+        "intro": "Pune muzica, lipește versurile, ascultă și marchează timpul fiecărei replici, exportă LRC standard sau SRT. Audio se redă doar local, nu se încarcă.",
+        "ctaText": "Deschide marcarea timpilor"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă acest instrument",
+          "ps": [
+            "Dă unei piese un fișier de versuri după care se poate cânta: o replică pe linie, fiecare linie cu un punct de timp. Playerul recunoaște LRC, pista de subtitrare recunoaște SRT, ambele se pot exporta."
+          ],
+          "ul": [
+            "**Marchează de la zero** —— lipește versurile ca text simplu, ascultă și bate.",
+            "**Corectează un fișier existent** —— importă un LRC existent, continuă de la prima linie fără timp.",
+            "**Export două formate** —— LRC pentru player, SRT pentru pista de subtitrare din video.",
+            "**Totul din tastatură** —— spațiu redare/pauză, Enter marchează replica, Z anulează."
+          ]
+        },
+        {
+          "h2": "1 Pune muzica",
+          "ps": [
+            "Prima coloană din stânga încarcă audio, **MP3, M4A, FLAC, WAV, OGG** merg toate. Audio se redă doar local, nu se încarcă.",
+            "Calitatea sunetului nu afectează precizia marcării, dar o sursă cu voce clară se aude mai bine; versiunile live și cele cu acompaniament prea tare se potrivesc vizibil mai greu."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Zona de adăugare a muzicii în instrumentul de marcare a timpilor",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG merg toate, audio se redă doar local"
+          }
+        },
+        {
+          "h2": "2 Lipește versurile",
+          "ps": [
+            "În a doua coloană lipește versurile, **o replică pe linie**, rândurile goale se sar automat. După lipire apasă „Procesează versurile”.",
+            "Poți lipi și un LRC existent — marcajele lui `[mm:ss.xx]` sunt recunoscute automat, după import continui de la prima linie fără timp, replicile cu timp nu se refac."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Zona de lipire a versurilor și butonul procesează versurile",
+            "cap": "Lipește o replică pe linie, sau tot fișierul LRC ca instrumentul să citească timpii existenți"
+          }
+        },
+        {
+          "h2": "3 Ascultă și marchează",
+          "ps": [
+            "Pornește muzica, când auzi începutul unei replici apasă Enter (sau clic pe „Marchează replica”), timpul se înregistrează, cursorul trece la următoarea.",
+            "Scurtături: **spațiu** redare/pauză, **Enter** marchează replica curentă, **Z** anulează o replică. În timpul redării Enter e cel mai comod, nu trebuie să treci între mouse și tastatură.",
+            "Ai greșit, apasă Z să anulezi replica și marchează din nou; replica pe care nu vrei să o marchezi (interludiu, parte instrumentală) o sari cu „Sari peste replica”, nu ajunge în export."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Zona ascultă și marchează: redare, marchează replica, anulează, sari peste replica",
+            "cap": "Spațiu redare/pauză, Enter marchează replica, Z anulează, mâinile nu părăsesc tastatura"
+          }
+        },
+        {
+          "h2": "4 Export",
+          "ps": [
+            "După terminare treci la a patra coloană: **Descarcă LRC** pentru player, **Descarcă SRT** pentru pista de subtitrare din video, poți și „Copiază”.",
+            "Se exportă doar replicile cu timp; replicile sărite nu intră în fișier. La exportul SRT fiecare replică ține până la începutul următoarei, ultima are 2 secunde ca rezervă."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Zona de export cu descarcă LRC, descarcă SRT și butonul copiază",
+            "cap": "LRC pentru player, SRT pentru video; se exportă doar replicile cu timp marcat"
+          }
+        },
+        {
+          "h2": "Ce rămâne neatins",
+          "ps": [
+            "Textul versurilor nu este rescris. Marcarea adaugă doar un punct de timp fiecărei linii, nu atinge cuvintele lipite.",
+            "La importul unui LRC existent, liniile cu marcaj de timp își păstrează timpul, continuarea începe de la prima linie fără timp."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**În export lipsesc câteva replici?** Replicile sărite și cele fără timp nu intră în fișier. Revino la pasul trei și completează, sau confirmă că trebuiau sărite.",
+            "**Se poate modifica timpul din JSON?** După terminare vrei să deplasezi totul puțin, exportă SRT și în [[Ajustarea cronologiei|/shift.html]] deplasează sau scalează proporțional.",
+            "**Export LRC sau SRT?** Pentru playere de muzică (foobar2000, diverse aplicații, orice player) LRC; pentru video sau prelucrare ulterioară în instrumente de subtitrare SRT.",
+            "**Cât durează o piesă?** Depinde de numărul de linii și de precizia dorită. O piesă de treizeci-patruzeci de linii, după ce prinzi fluxul, se face în câteva minute; precizia pe fiecare cuvânt e mai lentă."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Audio și versurile sunt prelucrate complet în browser, nu se încarcă și nu trec prin server. Audio este decodat și redat doar local."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Ai deja LRC și vrei subtitrări, vezi [[LRC în SRT|/guides/lrc-to-srt.html]]; cum să gândești marcarea și unde sunt capcanele, vezi [[Cum marchezi timpii versurilor în LRC|/guides/how-to-make-lrc-file.html]]; SRT-ul exportat are timpul deplasat, folosește [[Ajustarea cronologiei|/shift.html]]; rezultatul final trece prin [[Verificare subtitrări|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "ro": {
+      "seo": {
+        "title": "Cum extragi subtitrările încapsulate în video – AI-SRTSub",
+        "desc": "Citește direct pistele de subtitrare din MKV, WebM, MP4, MOV și exportă SRT / VTT / ASS / TXT. Videoul nu se încarcă, nu se reconcodează, pistele multilingve sunt listate separat.",
+        "h1": "Cum extragi subtitrările încapsulate în video",
+        "intro": "Citește direct pista de subtitrare încapsulată în MKV / MP4 și exportă-o ca SRT — videoul nu se încarcă, totul se întâmplă în browser.",
+        "ctaText": "Deschide extragerea subtitrărilor din video"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă acest instrument",
+          "ps": [
+            "Subtitrările pot fi încapsulate în fișierul video, fără să existe ca fișier separat. Ca să le modifici, traduci, face bilingve, trebuie mai întâi să le scoți — pagina asta face exact asta."
+          ],
+          "ul": [
+            "**Recunoaște patru containere** —— MKV / WebM și MP4 / MOV.",
+            "**Recunoaște patru tipuri de piste** —— pistă text simplu, pistă ASS, pistă WebVTT, pistă mov_text / tx3g din MP4.",
+            "**Export patru formate** —— SRT / VTT / ASS / TXT.",
+            "**Fără încărcare, fără reconcodare** —— citește pe bucăți după offset, un fișier de câțiva GB nu ocupă memorie."
+          ]
+        },
+        {
+          "h2": "1 Pune videoul",
+          "ps": [
+            "În prima coloană trage fișierul video sau apasă să alegi. Recunoaște doar **MKV / WebM** și **MP4 / MOV**, alte containere nu vor da pistă.",
+            "Fișierul nu părăsește calculatorul — nu există pas de încărcare. Instrumentul citește pe bucăți după offset, un film de câțiva GB nu ocupă memorie, dar prima citire trebuie să aștepte scanarea informațiilor despre piste."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Zona de adăugare a videoului pe pagina de extragere a subtitrărilor încapsulate",
+            "cap": "Suportă MKV / WebM și MP4 / MOV, fișierul nu părăsește dispozitivul"
+          }
+        },
+        {
+          "h2": "2 Pistele de subtitrare încapsulate",
+          "ps": [
+            "După citire, a doua coloană listează pistele de subtitrare din fișier, **o pistă pe linie**, de obicei cu limba și numele (de exemplu „Chinese”, „English”, „Subtitrări obligatorii”). Clic pe o pistă o extrage.",
+            "Dacă fișierul are o singură pistă de subtitrare, extragerea începe singură, fără clic.",
+            "**Subtitrările imagine nu pot fi extrase**: PGS de pe Blu-ray și subtitrările DVD sunt imagini arse, nu există text de luat — pagina o spune clar, acolo e nevoie de OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Lista pistelor de subtitrare încapsulate, o pistă pe linie",
+            "cap": "O pistă pe linie; la o singură pistă extragerea pornește singură"
+          }
+        },
+        {
+          "h2": "3 Rezultat",
+          "ps": [
+            "Coloana „3 Rezultat” din dreapta arată textul extras, sus alegi formatul de export: **SRT / VTT / ASS / TXT**, apeși „Descarcă” sau „Copiază”.",
+            "Când pista sursă este ASS, antetul de stil și rezoluția ei se păstrează exact — exportul ASS le păstrează, exportul SRT duce doar textul."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Zona de rezultat și alegerea formatului SRT / VTT / ASS / TXT",
+            "cap": "Patru formate de export; antetul de stil și rezoluția pistei ASS se păstrează"
+          }
+        },
+        {
+          "h2": "Ce rămâne neatins",
+          "ps": [
+            "Fișierul video în sine nu se schimbă deloc — doar citire, fără scriere, fără reconcodare, fără remuxare.",
+            "Conținutul subtitrărilor se ia așa cum este, fără ghicirea codificării, fără corectarea cronologiei. Dacă subtitrările extrase ies stricate, e problema codificării pistei sursă, mergi la [[Reparare codificare|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**Subtitrările imagine (PGS / DVD) chiar nu se pot?** Pe pagina asta nu — sunt imagini fără strat de text. Trebuie OCR mai întâi, pagina asta nu face asta.",
+            "**Subtitrările extrase au timpul greșit?** Pagina nu corectează cronologia, rezultatul e ce este. Deplasarea în bloc sau problema de proporție se rezolvă în [[Ajustarea cronologiei|/shift.html]].",
+            "**De ce durează până apare ceva?** Un fișier mare trebuie scanat pe bucăți după offset, cu cât e mai mare, cu atât mai mult; totul se întâmplă local, independent de viteza internetului.",
+            "**Fișierele externe de subtitrare merg aici?** Nu e nevoie — .srt / .ass externe intră direct în [[Conversie de format|/convert.html]] sau alt instrument, pagina asta e pentru subtitrările „încapsulate în video”."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Videoul este citit complet local în browser, nu se încarcă, nu se reconcodează și nu trece prin server. Închizi pagina, conținutul citit se eliberează."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "După extragere ai nevoie de traducere, intră în [[Traducere subtitrări|/translate.html]], pentru bilingv vezi [[Două metode de a face subtitrări bilingve|/guides/make-bilingual-subtitles.html]]; diferența dintre încapsulat și extern și ce se poate scoate, vezi [[Cum scoți subtitrările încapsulate în video|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "ro": {
+      "seo": {
+        "title": "Cum înlocuiești în bloc terminologia subtitrărilor – AI-SRTSub",
+        "desc": "Tabelul de termeni, o linie pe regulă, separă termenul vechi și nou prin ->, =>, → sau Tab, linia cu # e comentariu. Potrivire pe cuvânt întreg, modificările se listează.",
+        "h1": "Cum înlocuiești în bloc terminologia subtitrărilor",
+        "intro": "Un singur tabel de termeni uniformizează formulările din tot fișierul de subtitrare — cronologia, stilul ASS și blocul NOTE din VTT nu se schimbă nici cu un caracter.",
+        "ctaText": "Deschide înlocuirea termenilor"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă acest instrument",
+          "ps": [
+            "În subtitrări, același cuvânt e tradus diferit, numele de oameni și locuri urmează traducerea automată, subtitrările preluate trebuie aduse la obiceiurile tale — aceste modificări au o trăsătură comună: schimbă cuvântul, nu structura. Pagina asta schimbă doar cuvinte."
+          ],
+          "ul": [
+            "**Uniformizează numele traduse** —— nume de oameni, locuri, termeni proprii consecvenți de la început la sfârșit.",
+            "**Corectură în bloc** —— un cuvânt tradus greșit de mașină, schimbat în tot fișierul dintr-o dată.",
+            "**Preluarea obiceiurilor** —— subtitrările altcuiva rearanjate după uzul tău.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** șase formate sunt recunoscute."
+          ]
+        },
+        {
+          "h2": "Două lucruri: subtitrările și tabelul de termeni",
+          "ps": [
+            "Coloana „1 Pune subtitrările” din stânga încarcă fișierul de subtitrare, poți și lipi conținutul direct; ai greșit apasă „Golește”.",
+            "În coloana „2 Tabelul de termeni” din dreapta scrii regulile. **O linie pe regulă**, separă termenul vechi și cel nou prin `->`, `=>`, `→` sau Tab, toate patru variantele sunt recunoscute; linia care începe cu `#` e comentariu, nu participă la înlocuire.",
+            "Nu ești sigur de format, apasă „Completează un exemplu” și modifică după el."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Zona de adăugare a subtitrărilor și zona de scriere a tabelului de termeni",
+            "cap": "În stânga subtitrările, în dreapta regulile; o linie pe regulă, separate prin ->"
+          }
+        },
+        {
+          "h2": "Cum se scrie tabelul de termeni",
+          "ps": [
+            "O linie o regulă, în stânga termenul actual, în dreapta ce vrei să devină. De exemplu `Thor -> Thór` schimbă „Thor” din tot fișierul în „Thór”.",
+            "Comentariul începe cu `#`, util pentru a descrie un grup de reguli (de exemplu „# Uniformizarea numelor în sezonul unu”) și pentru a opri temporar o regulă — adaugi `#` în față, nu trebuie să o ștergi.",
+            "Regulile se execută de sus în jos; cuvântul produs de o regulă trece din nou prin regulile următoare. Când ordinea contează (mai întâi A în B, apoi B în C), trebuie să ții cont de asta."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Liniile de reguli de înlocuire din caseta tabelului de termeni",
+            "cap": "O linie pe regulă; linia cu # e comentariu, poate opri temporar o regulă"
+          }
+        },
+        {
+          "h2": "Ce controlează fiecare dintre cele trei comutatoare",
+          "ps": [
+            "**Domeniu**: `Tot` / `Doar linia 1` / `Doar linia 2`. La subtitrările bilingve, dacă vrei să schimbi doar traducerea, alege „Doar linia 2”; intrările cu o singură linie nu se schimbă în aceste două moduri — instrumentul nu ghicește care parte e originalul.",
+            "**Potrivire pe cuvânt întreg**: schimbă doar unde cuvântul stă singur, `art` nu atinge `start`. La limbile fără spații, ca chineza și japoneza, opțiunea nu funcționează — se înlocuiește după subșir.",
+            "**Distinge majusculele**: implicit nu distinge, `CEO` și `ceo` se schimbă împreună; bifat, doar scrierea identică."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Comutatoarele domeniu, potrivire pe cuvânt întreg și majuscule sub tabelul de termeni",
+            "cap": "Domeniul decide ce linie se schimbă, potrivirea și majusculele decid cât de strict se potrivește"
+          }
+        },
+        {
+          "h2": "Ce s-a schimbat, se poate anula pe fiecare intrare",
+          "ps": [
+            "„3 Rezultat” pe lângă subtitrările după înlocuire și **listează fiecare modificare**: care intrare, care linie, din ce în ce.",
+            "Intrarea pe care nu vrei să o schimbi se readuce cu un clic în listă, nu trebuie să modifici tabelul și să rulezi din nou. După confirmare apasă „Descarcă” sau „Copiază”."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Zona de rezultat și lista modificărilor pe fiecare intrare",
+            "cap": "Modificările sunt listate pe intrări, cea nedorită se readuce cu un clic"
+          }
+        },
+        {
+          "h2": "Ce rămâne neatins",
+          "ps": [
+            "**Cronologia, liniile de stil ASS și blocul `NOTE` din VTT nu se schimbă nici cu un caracter.** Înlocuirea acționează doar asupra textului dialogului, nu atinge liniile de structură.",
+            "Tabelul de termeni nu modifică singur fișierul tău de subtitrare — rezultatul e o ieșire nouă, fișierul original rămâne."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**De ce unele cuvinte nu s-au schimbat?** Verifică întâi domeniul: la „Doar linia 2”, intrările cu o singură linie nu se schimbă; apoi potrivirea pe cuvânt întreg, bifată, aparițiile care nu formează cuvânt nu se schimbă.",
+            "**Chineza are bifată potrivirea pe cuvânt întreg, dar tot se înlocuiește după subșir?** E normal. Chineza și japoneza nu despart cuvintele prin spațiu, instrumentul nu are cum să determine granița cuvântului, modul nu funcționează.",
+            "**S-a schimbat greșit, cum revin complet?** Revino pe fiecare intrare în lista modificărilor; vrei de la zero, golește tabelul și pune subtitrările din nou.",
+            "**Linia de stil ASS se poate schimba din greșeală?** Nu. Liniile de stil și blocul `NOTE` nu sunt în domeniul înlocuirii, participă doar textul dialogului."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Subtitrările și tabelul de termeni sunt prelucrate complet în browser, nu se încarcă și nu trec prin server. Tabelul nu se salvează, data viitoare va fi gol."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Dacă merită un tabel de termeni și cum îl întreții un sezon întreg, vezi [[Glosar: terminologie unitară pe tot sezonul|/guides/subtitle-glossary.html]]; conținut murdar (watermark, descrieri pentru surzi) trece întâi prin [[Curățare subtitrări|/clean.html]]; după uniformizarea numelor ai nevoie de traducere în altă limbă, intră în [[Traducere subtitrări|/translate.html]]; rezultatul final trece prin [[Verificare subtitrări|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "ro": {
+      "seo": {
+        "title": "Cum scoți subtitrările încapsulate în video – AI-SRTSub",
+        "desc": "Când subtitrările sunt încapsulate în video, cum le scoți: ce conțin MKV / WebM / MP4 / MOV, prin ce diferă pista text, ASS, WebVTT, mov_text, și de ce din imagini nu iese text.",
+        "h1": "Cum scoți subtitrările încapsulate în video",
+        "intro": "Subtitrările pot fi în fișierul video, pot sta și separat în afara lui. Când sunt înăuntru, sunt o pistă a containerului — scoaterea lor nu are legătură cu reconcodarea.",
+        "ctaText": "Deschide extragerea subtitrărilor din video"
+      },
+      "body": [
+        {
+          "h2": "Unde sunt subtitrările: încapsulate și externe",
+          "ps": [
+            "Fișierul video (MKV, MP4) este un container, înăuntru ține simultan pista video, pista audio și pista de subtitrare. Când subtitrările sunt înăuntru se numesc **încapsulate** sau **încorporate**; un fișier .srt / .ass separat, afară, se numește **extern**.",
+            "Subtitrările externe se folosesc direct. Problema e la cele încapsulate: vrei să le modifici, să le traduci, să folosești pista originală pentru bilingv, dar nu ai niciun fișier de subtitrare — trebuie mai întâi să citești pista din container. Pasul ăsta nu e reconcodare, videoul nu se reencodează, doar se scoate bucata de date care există deja în container."
+          ]
+        },
+        {
+          "h2": "Ce container ține ce",
+          "ps": [
+            "Containerele diferite țin formate diferite de subtitrare, iar dificultatea scoaterii diferă:"
+          ],
+          "ul": [
+            "**MKV / WebM** —— cel mai permisiv, ține pistă text simplu, pistă ASS, pistă WebVTT, des și piste multilingve.",
+            "**MP4 / MOV** —— de obicei pistă `mov_text` / `tx3g`, text simplu, cu puține informații de stil.",
+            "**Pistă text simplu** —— scoasă e text, devine direct SRT.",
+            "**Pistă ASS** —— are antet de stil și rezoluție, exportul ASS le păstrează, exportul SRT lasă doar textul.",
+            "**Subtitrări imagine (PGS Blu-ray, subtitrări DVD)** —— stochează imagine, nu text, nu se poate scoate text."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Pistele de subtitrare listate pe pagina de extragere a subtitrărilor încapsulate",
+            "cap": "O pistă pe linie, de obicei cu limba și numele; la o singură pistă extragerea pornește singură"
+          }
+        },
+        {
+          "h2": "De ce din subtitrările imagine nu iese text",
+          "ps": [
+            "PGS de pe Blu-ray și subtitrările DVD nu stochează caractere, ci imagini cu canal de transparență. Când playerul le afișează, „lipește imaginea”, nu „randează text”.",
+            "De aceea în astfel de piste nu există text de citit — nu pentru că instrumentul nu suportă, ci pentru că acolo nu există text. Pagina spune clar când întâlnește o astfel de pistă.",
+            "Ca să obții text există o singură cale: recunoști mai întâi textul din imagine (OCR), apoi faci subtitrările. Este altă operație decât „scoaterea pistei”."
+          ]
+        },
+        {
+          "h2": "După scoatere de obicei mai trebuie prelucrat",
+          "ps": [
+            "Subtitrările scoase sunt „ca atare”, instrumentul nu ghicește codificarea și nu corectează cronologia. De aceea două lucruri sunt foarte frecvente:",
+            "Unu, **text stricat** — problema codificării pistei sursă, scos iese tot stricat, trebuie în [[Cum repari codificarea|/guides/repair.html]] să recunoști codificarea; doi, **timp greșit** — sursa cu sau fără logo la început, rata de cadre nepotrivită, rezultatul e deplasat în bloc, folosește [[Ajustarea cronologiei|/shift.html]] pentru deplasare sau scalare proporțională.",
+            "După asta ai nevoie de traducere, intră în [[Traducere subtitrări|/translate.html]], pentru bilingv vezi [[Două metode de a face subtitrări bilingve|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Zona de rezultat și cele patru formate de export SRT / VTT / ASS / TXT",
+            "cap": "Subtitrările scoase se pot exporta în patru formate, antetul de stil și rezoluția pistei ASS se păstrează"
+          }
+        },
+        {
+          "h2": "Câteva lucruri ușor de înțeles greșit",
+          "ps": [
+            "**Scoaterea subtitrărilor nu e hardsub.** Videoul nu se reconcodează, calitatea imaginii și pista audio nu sunt afectate deloc.",
+            "**Scoaterea nu afectează fișierul original.** Doar citire, fără scriere, fișierul video nu se schimbă nici cu un byte.",
+            "**Fișierul mare e lent din cauza mărimii, nu a internetului.** Instrumentul scanează informațiile pistelor pe bucăți după offset, cu cât e mai mare, cu atât mai mult, totul local.",
+            "**Subtitrările externe nu trec pe pagina asta.** Ai .srt / .ass, intră direct în [[Conversie de format|/convert.html]], doar cele încapsulate în video au nevoie de scoaterea pistei."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Procedura completă în [[Cum extragi subtitrările încapsulate în video|/guides/videosub.html]]; după extragere ai nevoie de traducere, intră în [[Traducere subtitrări|/translate.html]], pentru bilingv vezi [[Două metode de a face subtitrări bilingve|/guides/make-bilingual-subtitles.html]]; text stricat, întâi în [[Reparare codificare|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "ro": {
+      "seo": {
+        "title": "Cum marchezi timpii versurilor în LRC – AI-SRTSub",
+        "desc": "Cum faci un fișier LRC de la zero: lipește o linie pe frază, ascultă și marchează timpul, trei scurtături uzuale, când sari o linie și ce faci când timpul s-a deplasat.",
+        "h1": "Cum marchezi timpii versurilor în LRC",
+        "intro": "LRC este „o frază de vers + un punct de timp”. Procesul de a-l face se numește marcarea timpilor: notezi momentul în care începe fiecare frază.",
+        "ctaText": "Deschide marcarea timpilor"
+      },
+      "body": [
+        {
+          "h2": "Ce faci de fapt când marchezi timpi",
+          "ps": [
+            "Structura fișierului LRC e foarte simplă: o linie o frază de vers, în față un marcaj de timp `[mm:ss.xx]`. Playerul ajunge la o linie și afișează fraza în acel moment.",
+            "Toată munca „fac un fișier LRC” înseamnă deci să dai fiecărei fraze un punct de timp — asta mașina nu poate face în locul tău, pentru că trebuie să judece „de unde începe fraza asta”, iar asta se poate doar ascultând."
+          ]
+        },
+        {
+          "h2": "Câte treceri are nevoie o piesă",
+          "ps": [
+            "Merită să te gândești un minut înainte, economisești cea mai mare parte a refacerilor:"
+          ],
+          "ul": [
+            "**O trecere** —— voce clară, puține linii, doar să ții aproximativ ritmul, o redare și o marcare ajung.",
+            "**Două treceri** —— prima grosier, a doua verifici frază cu frază, metoda obișnuită când vrei precizie.",
+            "**Import și corectare** —— ai deja LRC, doar câteva fraze nu se potrivesc, importi și continui de la prima linie fără timp.",
+            "**Interludiile și părțile instrumentale** nu trebuie marcate —— apasă „Sari peste fraza asta”, nu intră în export.",
+            "**Corul suprapus** —— se poate nota un singur început, partea suprapusă se socotește după fraza vocii principale."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Zona ascultă și marchează: redare, marchează fraza, anulează, sari peste frază",
+            "cap": "În timpul redării Enter e cel mai comod; ai greșit, apasă Z și marchează fraza din nou"
+          }
+        },
+        {
+          "h2": "Pasul de lipire decide cât de lin merge restul",
+          "ps": [
+            "Versurile se lipesc o frază pe linie, rândurile goale se sar. Împărțirea pe linii din pasul ăsta sunt liniile pe care le vei marca — dacă lipești cu linii în plus, la marcare apeși de mai multe ori.",
+            "Poți lipi și un LRC existent: marcajele `[mm:ss.xx]` sunt recunoscute automat, după import **continui de la prima linie fără timp**, frazele cu timp nu se refac.",
+            "Deci un LRC făcut pe jumătate se poate salva, data viitoare îl lipești și continui."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Zona de lipire a versurilor și butonul procesează versurile",
+            "cap": "O frază pe linie; lipind tot LRC-ul instrumentul citește timpii existenți și continui mai jos"
+          }
+        },
+        {
+          "h2": "Export LRC sau SRT",
+          "ps": [
+            "**Pentru player de muzică exportă LRC.** foobar2000, diverse playere, dispozitive cu afișarea versurilor îl recunosc.",
+            "**Pentru video sau prelucrare ulterioară exportă SRT.** Pista de subtitrare din video, instrumentele de subtitrare și programele de montaj recunosc SRT. La export fiecare frază ține până la începutul următoarei, ultima are 2 secunde ca rezervă.",
+            "Ambele exportă doar frazele cu timp — frazele sărite nu intră în fișier."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Zona de export cu descarcă LRC, descarcă SRT și butonul copiază",
+            "cap": "LRC pentru player, SRT pentru video; se exportă doar frazele cu timp marcat"
+          }
+        },
+        {
+          "h2": "Câteva lucruri ușor de înțeles greșit",
+          "ps": [
+            "**După terminare totul e puțin deplasat, folosește deplasarea.** Exportă SRT și în [[Ajustarea cronologiei|/shift.html]] deplasează în bloc, mult mai rapid decât să remarci fiecare frază.",
+            "**Cu cât mai spre final, cu atât mai mare deplasarea — e problemă de viteză.** Când viteza de redare a audio-ului nu se potrivește cu înregistrarea, cu cât înaintezi, cu atât deplasarea crește, acolo trebuie scalare proporțională, nu deplasare.",
+            "**Scurtăturile trebuie folosite cursiv.** Spațiu redare/pauză, Enter marchează fraza, Z anulează fraza — în timpul redării apasă direct Enter, fără să treci între mouse și tastatură.",
+            "**Calitatea audio afectează precizia.** O sursă cu voce clară se aude mai exact; versiunile live și cele cu acompaniament prea tare se potrivesc vizibil mai greu."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Procedura completă în [[Cum folosești marcarea timpilor pentru versuri|/guides/lrc.html]]; ai LRC și vrei subtitrări, vezi [[LRC în SRT|/guides/lrc-to-srt.html]]; SRT-ul exportat are timpul deplasat, folosește [[Ajustarea cronologiei|/shift.html]]; rezultatul final trece prin [[Verificare subtitrări|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "ro": {
+      "seo": {
+        "title": "Glosar: terminologie unitară pe tot sezonul – AI-SRTSub",
+        "desc": "Glosarul rezolvă „același cuvânt, altfel de fiecare dată”: când merită făcut, cum folosești unul pe tot sezonul, de ce potrivirea pe cuvânt întreg nu merge la chineză.",
+        "h1": "Glosar: terminologie unitară pe tot sezonul",
+        "intro": "Un personaj în episodul 1 se numește A, în episodul 7 B, spectatorul va crede că sunt două personaje. Glosarul împiedică asta — fixează „cum trebuie să se numească”.",
+        "ctaText": "Deschide înlocuirea termenilor"
+      },
+      "body": [
+        {
+          "h2": "Glosarul rezolvă „inconsecvența”",
+          "ps": [
+            "Greșelile de formulare din subtitrări sunt de două feluri: una „cuvântul ăsta e tradus greșit”, alta „același cuvânt e tradus diferit de fiecare dată”. Prima cere corectarea dicționarului, a doua e treaba glosarului.",
+            "A doua e mai frecventă și mai greu de observat: în episodul 1 `Thor` e tradus „Thór”, în episodul 7 devine „Thor”, luat separat niciun episod nu pare greșit, luate la rând spectatorul va crede că a apărut un personaj nou. Glosarul transformă „în filmul ăsta se spune unitar Thór” într-o regulă executabilă și o aplică o dată pe tot fișierul de subtitrare."
+          ]
+        },
+        {
+          "h2": "Când merită făcut un glosar",
+          "ps": [
+            "Nu orice fișier de subtitrare are nevoie de glosar. Merită de obicei în aceste cazuri:"
+          ],
+          "ul": [
+            "**Un sezon întreg / un serial** —— cu cât mai multe episoade, cu atât mai mare șansa de inconsecvență.",
+            "**Termeni proprii deși** —— nume de oameni, locuri, organizații, cuvinte inventate în operă.",
+            "**Mai mulți oameni lucrează** —— câțiva își împart episoadele, fiecare cu obiceiuri diferite.",
+            "**Preluarea subtitrărilor altcuiva** —— trebuie aduse la obiceiurile tale (sau ale clientului).",
+            "**Uniformizare după traducere automată** —— traducerea automată poate da mai multe variante pentru același cuvânt."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Regulile de înlocuire grupate pe categorii în tabelul de termeni",
+            "cap": "Cu comentarii care încep cu # grupezi regulile, totodată poți opri temporar o regulă"
+          }
+        },
+        {
+          "h2": "Cum păstrezi un singur glosar pe tot sezonul",
+          "ps": [
+            "Glosarul trebuie **întreținut incremental**: în episodul 1 se fixează numele, apoi la fiecare cuvânt nou adaugi o linie, la finalul sezonului tabelul e complet. Data viitoare, la sezonul doi al aceluiași serial, îl iei ca punct de plecare.",
+            "Regulile scrise mai larg sunt mai utile — după ce decizi „Thór” unitar, scrie și „Thor -> Thór”, astfel când preiei subtitrările altcuiva le aliniezi și pe acelea.",
+            "După modificare uită-te obligatoriu la **lista modificărilor**: listează fiecare intrare, ce linie, din ce în ce. Lista e singurul loc unde confirmi „s-a schimbat corect, nu prea mult”, intrarea nedorită se readuce cu un clic."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Lista modificărilor pe fiecare intrare în zona de rezultat",
+            "cap": "Modificările sunt listate pe intrări, cea nedorită se readuce cu un clic"
+          }
+        },
+        {
+          "h2": "Ce modificări nu se dau glosarului",
+          "ps": [
+            "Glosarul schimbă **cuvinte**. Aceste trei lucruri nu le face și nici nu ar trebui:",
+            "**Gramatica și structura frazei** —— un cuvânt nu devine o frază, corecturile la nivel de frază se fac în [[Traducere subtitrări|/translate.html]] sau manual.",
+            "**Curățarea conținutului** —— watermark-urile și reclamele, descrierile pentru surzi țin de eliminarea rândului întreg, de [[Curățare subtitrări|/clean.html]], regulile glosarului sunt pentru înlocuire, nu pentru ștergerea rândurilor.",
+            "**Cronologia** —— glosarul nu atinge timpul. Deplasarea în bloc sau problema de proporție se rezolvă în [[Ajustarea cronologiei|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Câteva lucruri ușor de înțeles greșit",
+          "ps": [
+            "**Chineza are bifată potrivirea pe cuvânt întreg, dar tot se înlocuiește după subșir — e normal.** Chineza și japoneza nu despart cuvintele prin spațiu, instrumentul nu are cum să determine granița, modul nu funcționează, protecția de tipul `art` nu atinge `start` funcționează doar la engleză.",
+            "**Ordinea influențează rezultatul.** Regulile se execută de sus în jos, cuvântul produs de o regulă trece prin regulile următoare. Mai întâi A în B, apoi B în C, la final obții C.",
+            "**Dacă schimbi doar traducerea, alege domeniul.** La subtitrările bilingve, doar linia 2 înseamnă „Doar linia 2”; intrările cu o singură linie nu se schimbă în aceste moduri — instrumentul nu ghicește care parte e originalul.",
+            "**Glosarul nu se salvează.** La fiecare deschidere e gol, trebuie să salvezi singur un fișier text și să îl transmiți."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri conexe",
+          "ps": [
+            "Procedura completă în [[Cum înlocuiești în bloc terminologia subtitrărilor|/guides/glossary.html]]; conținut murdar trece întâi prin [[Curățare subtitrări|/clean.html]]; după uniformizarea numelor ai nevoie de traducere în altă limbă, intră în [[Traducere subtitrări|/translate.html]]; rezultatul final trece prin [[Verificare subtitrări|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -41,7 +41,7 @@
   .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
     display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
   a.brand{color:inherit;text-decoration:none}
-  .lnav{margin-left:auto}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
   .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
     border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
   .hero{padding:22px 0 4px;text-align:center}
@@ -137,7 +137,7 @@
 <div class="wrap">
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <div class="lnav"><select id="langSel" aria-label="interface language"></select></div>
+    <div class="lnav"><span id="topNav"></span><select id="langSel" aria-label="interface language"></select></div>
   </header>
 
   <div class="hero">
@@ -263,8 +263,9 @@
   </section>
 <!--SEO-COPY-END-->
 
-<script src="ocrsub-i18n.js?v=0.9.363"></script>
-<script src="ocrsub-core.js?v=0.9.363"></script>
+<script src="ocrsub-i18n.js?v=0.9.365"></script>
+<script src="/i18n/tp-boot.js?v=0.9.365"></script>
+<script src="ocrsub-core.js?v=0.9.365"></script>
 <script>
 (function () {
   'use strict';
@@ -275,18 +276,36 @@
   var RTL = ['ar', 'fa', 'he', 'ur', 'ps', 'ku', 'ug', 'sd', 'yi'];
 
   var curLang = 'zh-CN';
+  /* v0.9.364：73 种新语言的词条（tp 分片里 page='ocrsub' 那块）。27 个内置语恒为 null。 */
+  var PACK = null;
   var state = { file: null, duration: 0, fps: 2, cues: null, busy: false, frames: 0, stopped: false };
   var tessWorker = null, tessLang = '';
   var TESS_CDN = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
 
   function T(k) {
-    var d = DICT[curLang] || {};
+    var d = (PACK && PACK[k] != null) ? PACK : (DICT[curLang] || {});
     if (d[k] != null) return d[k];
     var e = DICT['en'] || {};
     if (e[k] != null) return e[k];
     var z = DICT['zh-CN'] || {};
     return z[k] != null ? z[k] : k;
   }
+
+  /* v0.9.364：标题是两段拼的（heroA + heroEm）。中文里直接挨着，西文/阿拉伯文
+     必须留一个空格 —— 否则英文页会显示成「Turn audio intosubtitles」。 */
+  function fixHero() {
+    var h1 = document.querySelector('.hero h1');
+    if (!h1) return;
+    var a = h1.querySelector('[data-i18n="heroA"]');
+    var b = h1.querySelector('[data-i18n="heroEm"]');
+    if (!a || !b) return;
+    var x = String(a.textContent || '').replace(/\s+$/, '');
+    var y = String(b.textContent || '').replace(/^\s+/, '');
+    if (/^(zh|ja|yue)/.test(curLang)) { a.textContent = x; b.textContent = y; return; }
+    a.textContent = x + (/^[,.;:!?…]/.test(y) ? '' : ' ');
+    b.textContent = y;
+  }
+
   function $(id) { return document.getElementById(id); }
   function tpl(s, map) {
     return String(s).replace(/\{(\w+)\}/g, function (m, k) { return map[k] != null ? map[k] : m; });
@@ -320,6 +339,8 @@
     return null;
   }
   function initLang() {
+    /* v0.9.364：与 autosub 同口径 —— 下拉补到 100 语，24 个死选项不再留着。 */
+    if (window.TP_ADD_LANGS) TP_ADD_LANGS(UI);
     var sel = $('langSel');
     sel.innerHTML = '';
     UI.forEach(function (p) {
@@ -330,9 +351,13 @@
     var saved = null;
     try { saved = localStorage.getItem('sitesub_lang'); } catch (e) { }
     curLang = pathUiLang() || ((saved && UI.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+    if (!DICT[curLang] && window.TP_LOAD) PACK = TP_LOAD(curLang, 'ocrsub');
     sel.value = curLang;
     sel.addEventListener('change', function () {
       curLang = sel.value;
+      if (window.TP_SWITCH && TP_SWITCH(curLang, 'ocrsub')) return;
+      /* 同 autosub：切回 URL 这一语言时要把分片重新挂上，不能清成 null。 */
+      PACK = (!DICT[curLang] && window.TP_LOAD) ? TP_LOAD(curLang, 'ocrsub') : null;
       try { localStorage.setItem('sitesub_lang', curLang); } catch (e) { }
       applyI18n();
     });
@@ -344,13 +369,16 @@
       var v = T(k);
       if (v && v !== k) nodes[i].textContent = v;
     }
-    document.documentElement.lang = curLang;
-    document.documentElement.dir = RTL.indexOf(curLang) >= 0 ? 'rtl' : 'ltr';
+    if (DICT[curLang] || PACK) {
+      document.documentElement.lang = curLang;
+      document.documentElement.dir = RTL.indexOf(curLang) >= 0 ? 'rtl' : 'ltr';
+    }
     var pre = (curLang === 'zh-CN') ? '' : '/' + curLang;
     ['/qc.html', '/clean.html', '/ytfix.html', '/translate.html'].forEach(function (p) {
       var a = document.querySelector('.next a[href="' + p + '"]');
       if (a) a.setAttribute('href', pre + p);
     });
+    fixHero();
     if (state.cues) renderResult();
   }
 
@@ -726,6 +754,6 @@
   bind();
 })();
 </script>
-<script src="site-topnav.js?v=0.9.363" data-tool=""></script>
+<script src="site-topnav.js?v=0.9.365" data-tool="oc"></script>
 </body>
 </html>

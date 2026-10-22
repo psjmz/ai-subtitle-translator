@@ -189,13 +189,14 @@
   /* 句末标点有的是 8 个以上（中文带 ASCII 兜底），允许换行别撑破卡片 */
   #ruleSent{white-space:normal;word-break:break-all}
 </style>
-<script src="ui-codes.js?v=0.9.363"></script>
+<script src="ui-codes.js?v=0.9.365"></script>
 </head>
 <body>
 <div class="wrap">
   <header class="hd">
     <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
     <div class="lnav">
+      <span id="topNav"></span>
       <select id="langSel" aria-label="interface language"></select>
     </div>
   </header>
@@ -328,13 +329,13 @@
   <footer>
     <span data-i18n="footNote">全程在浏览器本地完成，字幕不上传服务器</span>
     <a href="/guides/" id="goGuide" style="color:var(--sub)" data-i18n="navGuide">看怎么用</a>
-    <span class="ver">v0.9.363</span>
+    <span class="ver">v0.9.365</span>
   </footer>
 </div>
 
-<script src="ytfix-i18n.js?v=0.9.363"></script>
-<script src="/i18n/tp-boot.js?v=0.9.363"></script>
-<script src="ytfix-core.js?v=0.9.363"></script>
+<script src="ytfix-i18n.js?v=0.9.365"></script>
+<script src="/i18n/tp-boot.js?v=0.9.365"></script>
+<script src="ytfix-core.js?v=0.9.365"></script>
 <script>
 (function () {
   'use strict';
@@ -379,6 +380,22 @@
     var z = DICT['zh-CN'] || {};
     return z[k] != null ? z[k] : k;
   }
+
+  /* v0.9.364：标题是两段拼的（heroA + heroEm）。中文里直接挨着，西文/阿拉伯文
+     必须留一个空格 —— 否则英文页会显示成「Turn audio intosubtitles」。 */
+  function fixHero() {
+    var h1 = document.querySelector('.hero h1');
+    if (!h1) return;
+    var a = h1.querySelector('[data-i18n="heroA"]');
+    var b = h1.querySelector('[data-i18n="heroEm"]');
+    if (!a || !b) return;
+    var x = String(a.textContent || '').replace(/\s+$/, '');
+    var y = String(b.textContent || '').replace(/^\s+/, '');
+    if (/^(zh|ja|yue)/.test(curLang)) { a.textContent = x; b.textContent = y; return; }
+    a.textContent = x + (/^[,.;:!?…]/.test(y) ? '' : ' ');
+    b.textContent = y;
+  }
+
   function $(id) { return document.getElementById(id); }
 
   /* ---------------- 界面语言 ----------------
@@ -442,6 +459,7 @@
     }
     document.documentElement.lang = curLang;
     document.documentElement.dir = RTL.indexOf(curLang) >= 0 ? 'rtl' : 'ltr';
+    fixHero();
     /* 站内链接跟着界面语言走：语言版访客点 logo 不该掉回中文首页 */
     var pre = (curLang === 'zh-CN') ? '' : '/' + curLang;
     var lg = $('logoHome'); if (lg) lg.setAttribute('href', pre + '/');
@@ -936,6 +954,6 @@
   </section>
 <!--SEO-COPY-END-->
 
-<script src="site-topnav.js?v=0.9.363" data-tool="yt"></script>
+<script src="site-topnav.js?v=0.9.365" data-tool="yt"></script>
 </body>
 </html>

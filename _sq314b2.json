@@ -1,0 +1,26 @@
+{
+  "SEO_CLEAN": {
+    "ar": { "desc": "منظّف ترجمة مجاني: يزيل العلامات المائية والإعلانات وإشارات SDH ووسوم HTML وتأثيرات ASS؛ ويصلح الكتابة بأحرف كبيرة والأحرف التالفة. 13 قاعدة، تراجع فردي." },
+    "cs": { "desc": "Bezplatný online čistič titulků: odstraní vodoznaky, reklamu, SDH, HTML tagy a ASS efekty; opraví VELKÁ PÍSMENA a rozbité znaky. 13 přepínatelných pravidel, vrátit po jedné." },
+    "da": { "desc": "Gratis online renser: fjerner vandmærker, reklamer, SDH, HTML-tags og ASS-effekter; retter VERSALER og ødelagte tegn. 13 regler at slå til/fra, fortryd enkeltvis." },
+    "de": { "desc": "Kostenloser Online-Reiniger für Untertitel: entfernt Wasserzeichen, Werbung, SDH, HTML-Tags und ASS-Effekte; korrigiert Großschreibung und kaputte Zeichen. 13 Regeln, einzeln rückgängig." },
+    "el": { "desc": "Δωρεάν online καθαριστής υποτίτλων: αφαιρεί υδατογραφήματα, διαφημίσεις, SDH, ετικέτες HTML και εφέ ASS· διορθώνει ΚΕΦΑΛΑΙΑ και χαλασμένους χαρακτήρες. 13 κανόνες, αναίρεση μία-μία." },
+    "en": { "desc": "Free online subtitle cleaner: strip watermarks, ads, SDH, HTML tags, ASS effects; fix caps, mojibake. 13 switchable rules, undo per change, timeline untouched." },
+    "es": { "desc": "Limpiador de subtítulos gratis: quita marcas de agua, anuncios, SDH, etiquetas HTML, efectos ASS; corrige mayúsculas y mojibake. 13 reglas, deshacer por cambio." },
+    "fi": { "desc": "Ilmainen tekstitysten puhdistus: poistaa vesileimat, mainokset, SDH-merkinnät, HTML-tagit ja ASS-tehosteet; korjaa ISOILLA kirjoitetun ja rikkinäiset merkit. 13 sääntöä, kaikki kytettävissä." },
+    "fr": { "desc": "Nettoyeur de sous-titres en ligne gratuit : supprime filigranes, pubs, SDH, balises HTML et effets ASS; corrige majuscules et caractères cassés. 13 règles, annulation une à une." },
+    "hi": { "desc": "मुफ़्त ऑनलाइन सबटाइटल क्लीनर: वॉटरमार्क, विज्ञापन, SDH, HTML टैग और ASS इफ़ेक्ट हटाता है; ऑल-कैप्स और गड़बड़ अक्षर ठीक करता है। 13 नियम, हर बदलाव अलग से वापस।" },
+    "id": { "desc": "Pembersih subtitle online gratis: hapus watermark, iklan, penanda SDH, tag HTML dan efek ASS; perbaiki huruf kapital semua dan karakter rusak. 13 aturan, batalkan satu per satu." },
+    "it": { "desc": "Pulitore di sottotitoli online gratuito: rimuove filigrane, pubblicità, SDH, tag HTML ed effetti ASS; sistema maiuscole e caratteri rotti. 13 regole, annulla una per una." },
+    "nl": { "desc": "Gratis online ondertitel-schoonmaker: verwijdert watermerken, reclame, SDH, HTML-tags en ASS-effecten; herstelt hoofdletters en kapotte tekens. 13 regels, apart terug te draaien." },
+    "pl": { "desc": "Darmowy czyścik napisów online: usuwa znaki wodne, reklamy, SDH, tagi HTML i efekty ASS; naprawia WIELKIE LITERY i krzaki. 13 reguł, cofaj po jednej." },
+    "pt": { "desc": "Limpador de legendas online grátis: remove marcas d'água, anúncios, SDH, tags HTML e efeitos ASS; corrige maiúsculas e caracteres corrompidos. 13 regras, desfaça por item." },
+    "ro": { "desc": "Curățător de subtitrări online gratuit: elimină filigrane, reclame, SDH, taguri HTML și efecte ASS; corectează MAJUSCULE și caractere stricate. 13 reguli, revert individual." },
+    "ru": { "desc": "Бесплатный онлайн-очиститель субтитров: удаляет водяные знаки, рекламу, SDH, HTML-теги и эффекты ASS; исправляет КАПС и кракозябры. 13 правил, откат по одному." },
+    "sv": { "desc": "Gratis onlineverktyg som rensar undertexter: tar bort vattenmärken, reklam, SDH, HTML-taggar och ASS-effekter; åtgärdar VERSALER och trasiga tecken. 13 regler, ångra enskilt." },
+    "th": { "desc": "เครื่องมือล้างซับออนไลน์ฟรี: ลบลายน้ำ โฆษณา ป้าย SDH แท็ก HTML และเอฟเฟกต์ ASS แก้ตัวพิมพ์ใหญ่และตัวอักษรเพี้ยน 13 กฎเปิดปิดได้ ย้อนกลับทีละจุด ไม่แตะไทม์ไลน์" },
+    "tr": { "desc": "Ücretsiz online altyazı temizleyici: filigranları, reklamları, SDH işaretlerini, HTML etiketlerini ve ASS efektlerini siler; büyük harf ve bozuk karakterleri düzeltir. 13 kural, geri alınabilir." },
+    "uk": { "desc": "Безплатний онлайн-очищувач субтитрів: видаляє водяні знаки, рекламу, SDH, HTML-теги й ефекти ASS; виправляє ВЕЛИКІ ЛІТЕРИ та кракозябри. 13 правил, скасування окремо." },
+    "vi": { "desc": "Công cụ làm sạch phụ đề online miễn phí: xóa watermark, quảng cáo, SDH, thẻ HTML và hiệu ứng ASS; sửa chữ viết hoa và ký tự lỗi. 13 quy tắc, hoàn tác riêng." }
+  }
+}

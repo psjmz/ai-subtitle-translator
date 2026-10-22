@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Da audio a sottotitoli — crea SRT nel browser | AI-SRTSub",
+    "desc": "Converti audio o video in sottotitoli SRT/VTT nel browser. Riconoscimento vocale locale, segmentazione automatica e nessuna necessità di upload.",
+    "kw": "audio in srt,da parlato a sottotitoli,generatore automatico sottotitoli,trascrizione audio srt,sottotitoli whisper,riconoscimento vocale browser,generazione sottotitoli offline",
+    "intro": "Trascina un file audio o video, seleziona lingua e modello per avviare il riconoscimento direttamente nel tuo browser. Ottieni una bozza di sottotitoli temporizzati, già segmentati e formattati correttamente.",
+    "feat": "Questo strumento elabora il flusso di parole del riconoscimento vocale, segmentando le frasi in base alla punteggiatura, ottimizzando la lunghezza delle righe e garantendo una velocità di lettura costante senza sovrapposizioni.",
+    "who": "Creatori di contenuti, team che lavorano su podcast o corsi e chiunque necessiti di una bozza di sottotitoli pronta per la revisione."
+  },
+  "ocrsub": {
+    "title": "OCR per sottotitoli impressi — estrai testo da video | AI-SRTSub",
+    "desc": "Estrai sottotitoli impressi nel video tramite OCR. Seleziona l'area, leggi fotogramma per fotogramma e ottieni file SRT o VTT gratuitamente.",
+    "kw": "estrarre sottotitoli impressi,ocr sottotitoli,estrazione sottotitoli video,sottotitoli hardcoded,ocr video in srt,sottotitoli da video,ocr per sottotitoli",
+    "intro": "Carica il video, delimita l'area dei sottotitoli e lo strumento leggerà fotogramma per fotogramma, unendo le sequenze identiche in un unico sottotitolo temporizzato.",
+    "feat": "Il software isola la striscia dei sottotitoli, applica una binarizzazione per separare il testo dallo sfondo e raggruppa i fotogrammi consecutivi per generare file SRT precisi.",
+    "who": "Team di localizzazione, editor video e chiunque debba recuperare sottotitoli da file video privi di tracce di testo originali."
+  }
+}

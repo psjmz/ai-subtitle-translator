@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio zu Untertiteln — Sprache zu SRT im Browser | AI-SRTSub",
+    "desc": "Audio oder Video hochladen, Untertitel erhalten: Spracherkennung läuft im Browser, schneidet Text in Cues und exportiert SRT / VTT. Kein Upload, kostenlos.",
+    "kw": "audio zu srt, sprache zu untertitel, untertitel generieren, automatischer untertitel generator, audio zu srt transkribieren, whisper untertitel, browser spracherkennung, offline untertitel erstellung",
+    "intro": "Ziehen Sie eine Audio- oder Videodatei hinein, wählen Sie Sprache und Modell, und die Erkennung läuft direkt in Ihrem Browser. Das Ergebnis ist ein Untertitel-Entwurf mit Timing, der bereits in Sätze unterteilt ist.",
+    "feat": "Das Tool verarbeitet den Stream der Spracherkennung, schneidet Sätze an Satzzeichen, bricht Zeilen gemäß der Schriftsprache um und optimiert die Anzeigedauer basierend auf der Lesegeschwindigkeit ohne Überlappungen.",
+    "who": "Content-Ersteller, Podcast-Teams und Personen, die für Videomaterial ohne Untertitel schnell einen bearbeitbaren Entwurf benötigen."
+  },
+  "ocrsub": {
+    "title": "Hardcoded Untertitel OCR — Eingebrannte Untertitel lesen | AI-SRTSub",
+    "desc": "Eingebrannte Untertitel haben keine extrahierbare Spur. Markieren Sie den Bereich, das Tool liest Bild für Bild und erstellt SRT / VTT. Kostenlos.",
+    "kw": "eingebrannte untertitel extrahieren, untertitel ocr, video untertitel extraktion, hardcoded untertitel, ocr untertitel aus video, video zu srt, untertitel aus video, hardcoded caption ocr",
+    "intro": "Laden Sie ein Video hoch, markieren Sie den Bereich der Untertitel, und das Tool liest Bild für Bild, um identische Sequenzen zu einem zeitgesteuerten Cue zusammenzuführen.",
+    "feat": "Der Bereich wird zugeschnitten und nach Helligkeit binarisiert, sodass der Hintergrund verschwindet und die Texterkennung nur die Formen der Untertitel verarbeitet.",
+    "who": "Lokalisierungsteams, Editoren bei der Neu-Untertitelung und Personen, die nur das fertige Video ohne separate Untertiteldatei besitzen."
+  }
+}

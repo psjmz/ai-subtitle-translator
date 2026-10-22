@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "en": {
+      "seo": {
+        "title": "How to Repair Mojibake Subtitles – Detect the Encoding – AI-SRTSub",
+        "desc": "Walkthrough: detect the original encoding (GBK / Big5 / Shift_JIS / EUC-KR), rank repairs by what reads most like language, then save UTF-8 with BOM or GBK. Timings and index numbers never change.",
+        "h1": "How to repair mojibake subtitles",
+        "intro": "A subtitle file full of garbage characters is rarely corrupted — it was just read with the wrong encoding. The repair tool detects the original encoding and puts the right characters back, leaving index numbers and timings alone.",
+        "ctaText": "Open the mojibake repair tool"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "The same bytes read as UTF-8 and read as GBK produce two completely different sets of characters — the file is not damaged, it was decoded with the wrong encoding. Here is what the repair tool does:"
+          ],
+          "ul": [
+            "Works out which encoding the file was written in and re-reads the characters correctly",
+            "Tells you exactly how the text broke: replacement characters, control characters, currency symbols, runs of accented letters, walls of obscure characters",
+            "Ranks repair candidates by **which one reads most like real language**, then you pick one and save",
+            "When your player cannot detect the encoding, saves a copy as UTF-8 with BOM or as GBK for it"
+          ]
+        },
+        {
+          "h2": "Upload the file, don't paste it",
+          "ps": [
+            "The two entry points can repair different amounts of damage, so **upload the file if you can**. With a file, the original bytes are still there: the tool tries one encoding after another, and once it recognises GBK it decodes as GBK — nothing has to be guessed. Text that arrives by paste is no longer raw bytes. By the time the browser hands over the string, the mistake has already happened, so the tool can only work backwards and take what it can get.",
+            "If pasted text already contains the replacement character (that boxed question mark `�`), the original bytes are long gone and nothing can bring them back. The page says so outright: go back up and use \"Choose file\" to upload the original."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Repair page upload area: drop zone and paste box, with the detected encoding shown above",
+            "cap": "Drag the file in or browse for it; the paste box sits below and can repair much less"
+          }
+        },
+        {
+          "h2": "What the diagnosis is telling you",
+          "ps": [
+            "Once you upload, the diagnosis card gives a verdict. **No mojibake found**: the content reads fine as it is; if your player still shows garbage, the player used the wrong encoding — go down to \"Save as\", pick a different one and hand it that file. When it **looks like mojibake**, the card lists which trace it found:"
+          ],
+          "ul": [
+            "It contains replacement characters — the original bytes are already lost",
+            "Control characters have crept in",
+            "It is sprinkled with currency and mathematical symbols",
+            "Accented letters appear in clumps — as if UTF-8 had been read one byte at a time (`ä½ å¥½` is that type)",
+            "Runs of CJK characters with not one common character among them — as if UTF-8 had been read as GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosis card: verdict plus each mojibake trace listed line by line",
+            "cap": "Diagnosis lists traces by type instead of just saying \"it's mojibake\""
+          }
+        },
+        {
+          "h2": "How candidates are ranked, and how to choose",
+          "ps": [
+            "Under \"Ways to fix this\", candidates are listed in **most-like-real-language-first** order, up to 12 of them, each labelled with the pair of encodings it was read from and to. Click one to see how it looks, pick it, then scroll down to save. Not happy? Use \"Keep as is\" to fall back to the original.",
+            "The order comes from a score: share of common characters, strings of accents, strings of symbols, walls of obscure characters, all weighted in. **If no score is clearly better, nothing is recommended** — it will not push a half-plausible candidate at you just to have one. Text that was mangled twice (saved wrong once, then repaired wrong once) gets one extra round of back-solving on the top candidates, so anything within two layers can still be rescued."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Candidate repair list ranked by how much it reads like real language, each labelled with its encoding pair",
+            "cap": "Candidates ranked by \"most like real language\", each showing the encodings involved"
+          }
+        },
+        {
+          "h2": "Saving correctly is the last step",
+          "ps": [
+            "A repaired result still has to be saved correctly. When a player cannot detect UTF-8, saving as **UTF-8 with BOM** (Windows players rely on the BOM) or as **GBK** usually settles it. You can save as UTF-8, UTF-8 (with BOM), GBK, Big5, Shift_JIS or EUC-KR; if something does not fit, you are told to pick another (GBK cannot hold Korean). Downloaded files get `-fixed` added to the name.",
+            "When the detected encoding is not UTF-8, \"Save as\" is already preset to UTF-8 with BOM for you. Once you touch the dropdown yourself, it stops second-guessing you."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Result area: text box with save-as dropdown and download button",
+            "cap": "Pick an encoding, then download — the filename gets -fixed added"
+          }
+        },
+        {
+          "h2": "What never gets touched",
+          "ps": [
+            "Only the mis-read characters are replaced. Index numbers, timings and ASS style lines are not altered in any way."
+          ]
+        },
+        {
+          "h2": "FAQ",
+          "ps": [
+            "**I uploaded the file, so why do I still have to save it again?** The file itself is usually fine; what is broken is the player reading it with the wrong encoding. In that case no character in the text needs changing — just save a copy as UTF-8 with BOM or GBK and give that to the player.",
+            "**Why can't pasted text be repaired?** Once the replacement character shows up in pasted content, the original bytes are gone and there is nothing to reason backwards from. Go back up and use \"Choose file\" to upload the original.",
+            "**The candidate I want isn't listed?** Nothing is recommended unless it scores clearly better than what you already have. Try switching the detected encoding to another one and let it re-rank.",
+            "**How many files at once?** One at a time. Download the repair, then feed in the next file."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Detection and repair run entirely in your browser. No subtitle content is ever sent to a server."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "Where mojibake comes from and why it ends up looking like that — see [[Where subtitle mojibake comes from|/guides/subtitle-garbled-characters.html]]; the encoding is fine but the content is dirty — use [[Subtitle cleanup|/clean.html]]; to check timing and reading speed — [[Subtitle QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "en": {
+      "seo": {
+        "title": "Where Subtitle Mojibake Comes From – Spot It, Fix It – AI-SRTSub",
+        "desc": "Mojibake means a wrong read, not a damaged file. Replacement characters, walls of accented letters and runs of obscure characters each point to a cause — learn which recover and which never do.",
+        "h1": "Where subtitle mojibake comes from",
+        "intro": "The same bytes read as UTF-8 and read as GBK come out as two completely different sets of characters. How the garbage text looks is direct evidence of which step went wrong.",
+        "ctaText": "Open the mojibake repair tool"
+      },
+      "body": [
+        {
+          "h2": "The file is fine — it was read wrong",
+          "ps": [
+            "What a subtitle file stores is bytes. Turning bytes into characters requires knowing which encoding they were written in — get that wrong and you get mojibake. Not one byte is missing from the file; read it again with the right encoding and the characters come back.",
+            "That splits the job in two: **working out what encoding it started as**, and **saving it as an encoding your player can detect**. The first comes from trial decoding and scoring, the second from saving a copy. They solve different problems."
+          ]
+        },
+        {
+          "h2": "Five looks, five causes",
+          "ps": [
+            "Mojibake is not random — how it looks gives away what caused it:"
+          ],
+          "ul": [
+            "**Clumps of accented letters** (`ä½ å¥½`): UTF-8 Chinese read as a single-byte encoding — Chinese takes three bytes per character in UTF-8, and reading one byte at a time turns each byte into its own letter",
+            "**Runs of CJK characters with not one common one among them**: UTF-8 read as GBK — the bytes get regrouped in pairs and every pair lands on some obscure character",
+            "**A pile of currency and maths symbols**: bytes landed in the symbol range, typical of being read as Mac Roman or some Latin-1 variant",
+            "**Control characters mixed in**: bytes landed in the invisible control range, showing up on screen as blanks or boxes",
+            "**The boxed question mark `�`**: that is the **replacement character**, not mojibake — it means \"there was a character here, and it was already lost when this was read\""
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosis card listing each type of mojibake trace",
+            "cap": "Diagnosis sorts mojibake by cause rather than lumping it together"
+          }
+        },
+        {
+          "h2": "Why the replacement character cannot be repaired",
+          "ps": [
+            "The replacement character is the dividing line. A `�` means the bytes were already thrown away **at an earlier step** (usually some program reading the file and saving it again), and nothing was recorded about what got dropped. At that point there is nothing to reason backwards from — nobody can repair it.",
+            "So the repair page handles two cases differently. Upload a file and the original bytes are intact, letting it try each encoding; if pasted text already contains the replacement character, it says so plainly: \"cannot be repaired, please upload the original file\".",
+            "There is also the reverse case: the content reads perfectly well but your player still shows garbage. The file is not at fault — **the player picked the wrong encoding**. Editing the text will not help; save a copy as UTF-8 with BOM or GBK and hand it that."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Upload area: drag-and-drop and paste as two entry points",
+            "cap": "Upload the file if you can — bytes intact means something to repair"
+          }
+        },
+        {
+          "h2": "What it is comparing while repairing",
+          "ps": [
+            "The tool tries every plausible encoding, then scores each result: how much of it is made of common characters, whether there are strings of accents, strings of symbols, whether the CJK runs are walls of obscure characters. The best-scoring result goes to the top of the list.",
+            "**If no score is clearly better, nothing is recommended** — better to tell you \"this reads fine as it is\" than to fob you off with something that only vaguely resembles language. Text mangled twice (saved wrong once, then repaired wrong once) gets one extra round of back-solving on the top candidates."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Candidate list sorted by score, each labelled with its encoding pair",
+            "cap": "Candidates ranked by score — no clear winner, no recommendation"
+          }
+        },
+        {
+          "h2": "Saving the right encoding finishes the job",
+          "ps": [
+            "Repaired text still has to be saved as an encoding your player recognises. Players on Windows usually rely on the BOM to detect encoding, so **UTF-8 with BOM** is the least fuss; older hardware and some regional players want GBK. You can pick UTF-8, UTF-8 (with BOM), GBK, Big5, Shift_JIS or EUC-KR, and you will be told to choose another if something does not fit (GBK cannot hold Korean)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Result area: save-as encoding dropdown and download button",
+            "cap": "Save it as something the player recognises and mojibake is truly solved"
+          }
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "The full walkthrough — [[How to repair mojibake subtitles|/guides/repair.html]]; what an SRT file actually stores — [[What is inside an SRT file|/guides/srt-file-format.html]]; the encoding is fine but the content is dirty (watermarks, ads, hearing-impaired tags) — [[Subtitle cleanup|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "en": {
+      "seo": {
+        "title": "Simplified–Traditional Subtitle Conversion – Taiwan vs Hong Kong – AI-SRTSub",
+        "desc": "Walkthrough of the nine directions: Taiwanese with or without regional vocabulary, Hong Kong as its own flavour, all of it convertible back to simplified. Only dialogue changes; timings stay put.",
+        "h1": "How to convert simplified and traditional Chinese subtitles",
+        "intro": "Whether a subtitle goes to Taiwan, Hong Kong or the mainland changes both wording and character shapes. Nine directions to choose from, and only dialogue is converted — timings, index numbers and ASS style lines are never touched.",
+        "ctaText": "Open the converter"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "Converting between simplified and traditional is not just writing each character differently. The same simplified word corresponds to different words in different regions — the word for \"software\" differs between Taiwan and the mainland, and Hong Kong has yet another version. The converter keeps these apart:"
+          ],
+          "ul": [
+            "Simplified to traditional (generic / Taiwan / Hong Kong)",
+            "Traditional to simplified (generic / from Taiwan / from Hong Kong)",
+            "Switching character forms between traditional varieties (Taiwan forms / Hong Kong forms)",
+            "One-to-many mappings resolved correctly (resolved by word, not by blindly swapping each character)"
+          ]
+        },
+        {
+          "h2": "Upload and detection",
+          "ps": [
+            "Drag a file in or browse for one — SRT, VTT, ASS and TXT are supported — or paste subtitle content straight into the box. The format is detected automatically and shown next to \"Detected format\"."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Converter upload area: drop zone and paste box, with the detected format above",
+            "cap": "SRT / VTT / ASS / TXT, format detected automatically"
+          }
+        },
+        {
+          "h2": "Choosing among the nine directions",
+          "ps": [
+            "The nine directions under \"Convert to\" fall into three groups. **Simplified → traditional**: generic traditional, Taiwanese (change wording), Taiwanese (glyphs only), Hong Kong. **Traditional → simplified**: generic, from Taiwanese, from Hong Kong. **Traditional to traditional**: Taiwan forms, Hong Kong forms.",
+            "Choosing \"Taiwan wording\" swaps regional vocabulary as well: the word for \"software\" becomes the Taiwanese one and so does the word for \"information\"; \"Taiwan glyphs\" changes only how characters are written and leaves your wording alone. Hong Kong is another case entirely and uses yet another word for \"software\". To convert back to simplified, use the group below — you have to say which traditional variety you are coming from, because Taiwanese and Hong Kong text take different routes back."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Convert to card: destination dropdown showing \"Simplified → Taiwanese traditional (change wording)\" selected",
+            "cap": "Directions live in the \"Convert to\" dropdown in three groups; this one is Taiwanese with wording changes"
+          }
+        },
+        {
+          "h2": "Result and export",
+          "ps": [
+            "The result area shows the converted subtitle immediately, with a stat bar giving the total line count and how many lines changed. If nothing changed at all you get a hint that the file may contain no Chinese characters — only Han characters are converted, so an all-Latin or all-numeric subtitle stays exactly as it was.",
+            "Then download or copy. A language tag is inserted into the filename — `demo.srt` becomes `demo.zh-TW.srt` for Taiwanese traditional, `.zh-Hant` for generic traditional, and `.zh-Hans` when converting back to simplified."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Result area: converted subtitle and stat bar",
+            "cap": "The stat bar shows total and changed line counts; download or copy from here"
+          }
+        },
+        {
+          "h2": "What never gets touched",
+          "ps": [
+            "Only dialogue is converted. Timings, index numbers and ASS style lines are not touched at all — the result is ready to use without redoing any formatting."
+          ]
+        },
+        {
+          "h2": "FAQ",
+          "ps": [
+            "**Why didn't the converter change the word for \"clean\"?** One-to-many mappings are resolved by word: the \"clean\" sense and the \"dry\" sense share one traditional form, while the \"tree trunk\" sense uses a different one. The tables come from OpenCC, matching whole phrases rather than single characters.",
+            "**What is the difference between Taiwanese and Hong Kong traditional?** The vocabulary: the word for \"software\" differs between the two. Pick the direction for the region you are delivering to.",
+            "**The character count changed after conversion?** Only Han characters are swapped — no entries are added or removed and no timing is moved. If the line count changed, check whether the format was detected correctly.",
+            "**The dictionary failed to load?** The page tells you to refresh and retry. It loads locally, so there is no need to upload subtitles anywhere."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Conversion runs entirely in your browser. No subtitle content is ever sent to a server."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "If all you need is simplified to traditional, see [[Convert simplified subtitles to traditional|/guides/srt-simplified-to-traditional.html]]; why it is about more than swapping characters, see [[Simplified vs traditional is not a character swap|/guides/simplified-traditional-chinese.html]]; to translate into another language, [[Subtitle translation|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "en": {
+      "seo": {
+        "title": "Convert Simplified Subtitles to Traditional – Taiwan or Hong Kong – AI-SRTSub",
+        "desc": "Turn simplified Chinese subtitles into traditional: pick Taiwanese (with or without regional vocabulary) or Hong Kong. One-to-many mappings resolve by word. Only dialogue changes; timings stay put.",
+        "h1": "Convert simplified subtitles to traditional",
+        "intro": "A simplified Chinese subtitle headed for a Taiwanese or Hong Kong audience only needs converting — but the two regions want different things, and picking the wrong direction gives you wording locals do not use.",
+        "ctaText": "Convert this subtitle"
+      },
+      "body": [
+        {
+          "h2": "The need",
+          "ps": [
+            "Your subtitles are simplified Chinese and have to reach viewers in Taiwan or Hong Kong. Fixing the characters one by one is not realistic — a single episode has hundreds of cues — and the two regions do not want the same traditional text: the vocabulary differs, and the wrong direction produces wording no local would use."
+          ]
+        },
+        {
+          "h2": "Where to do it",
+          "ps": [
+            "Open [[Simplified–traditional conversion|/hanconv.html]], drag the subtitle in, and pick one of the simplified → traditional direction under \"Convert to\": generic traditional, Taiwanese (change wording), Taiwanese (glyphs only) or Hong Kong. Conversion happens instantly and the result area shows the finished subtitle, ready to download.",
+            "**For a Taiwanese audience**: choose \"Taiwanese (change wording)\" if regional vocabulary should change too — \"software\" and \"information\" become their Taiwanese equivalents — or \"Taiwanese (glyphs only)\" if you want the character shapes changed while keeping your original wording. **For a Hong Kong audience**: choose \"Hong Kong\", where \"software\" is written with yet another form."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Convert to card: destination dropdown showing \"Simplified → Taiwanese traditional (change wording)\"",
+            "cap": "Taiwan and Hong Kong are separate directions with different vocabulary"
+          }
+        },
+        {
+          "h2": "Common pitfalls",
+          "ps": [
+            "**Do not fear one-to-many mappings**: the same simplified character in the words for \"clean\", \"dry\" and \"tree trunk\" maps to different traditional characters. The tables resolve this by phrase, so everything is not flattened into one character.",
+            "**Only dialogue is converted**: timings, index numbers and ASS style lines are untouched, so the result is ready to use.",
+            "**Nothing changed? Check before you panic**: if the stat bar reports 0 changed lines, either the file has no Chinese characters or the format was mis-detected — check that \"Detected format\" matches what you uploaded."
+          ]
+        },
+        {
+          "h2": "Related",
+          "ps": [
+            "The full explanation of all nine directions — [[How to convert simplified and traditional subtitles|/guides/hanconv.html]]; why it is more than swapping characters — [[Simplified vs traditional is not a character swap|/guides/simplified-traditional-chinese.html]]; traditional back to simplified also lives in [[Simplified–traditional conversion|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "en": {
+      "seo": {
+        "title": "Not a Character Swap – One-to-Many and Regional Words – AI-SRTSub",
+        "desc": "Three things make this hard: one-to-many mappings resolved by word, different Taiwan and Hong Kong vocabulary, and converting dialogue only. Get all three right and no human rework follows.",
+        "h1": "Simplified vs traditional is not a character swap",
+        "intro": "Which traditional character replaces a simplified one depends on the character next to it. That is why this conversion cannot be done by blindly swapping one character at a time.",
+        "ctaText": "Open the converter"
+      },
+      "body": [
+        {
+          "h2": "First: one simplified form, several traditional ones",
+          "ps": [
+            "Simplification collapsed several traditional characters into one simplified form. Going back the other way, one simplified character corresponds to several traditional ones, and choosing between them depends on what it is paired with:",
+            "Swapping character by character collapses them all into the same one and gets every instance wrong. Resolving **by word** is what separates them — the tables come from OpenCC, matching phrases before single characters. For example:"
+          ],
+          "ul": [
+            "The \"clean\" sense maps to one traditional character, the \"tree trunk\" sense to another",
+            "The \"hair\" sense and the \"development\" sense of one simplified character go to two different traditional ones",
+            "The \"behind\" sense takes one traditional form, while \"empress\" keeps the character it already has"
+          ]
+        },
+        {
+          "h2": "Second: Taiwan and Hong Kong are not the same thing",
+          "ps": [
+            "There is one more layer after converting to traditional: the same word is written differently in Taiwan and Hong Kong. The word for \"software\" is one thing in Taiwan and another in Hong Kong, and Taiwan uses its own word for \"information\".",
+            "Hence the separate directions. Taiwanese traditional even splits into \"change wording\" and \"glyphs only\" — glyphs only keeps your existing vocabulary, while change wording swaps regional terms too. Hong Kong gets a direction of its own."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Convert to card: destination dropdown showing \"Simplified → Taiwanese traditional (change wording)\"",
+            "cap": "Taiwan offers wording changes or glyphs only; Hong Kong has its own direction"
+          }
+        },
+        {
+          "h2": "Third: only dialogue should be touched",
+          "ps": [
+            "A subtitle file is not only dialogue. Index numbers, timings and ASS style lines are in there too, and not one character of those should be converted — ASS style lines especially, since they contain English directive names that break the moment they are treated as dialogue.",
+            "So conversion happens after parsing by format: SRT, VTT, ASS and TXT each identify which part is dialogue, and only the characters inside it are converted. Timings and styles survive untouched, with no formatting to redo."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Result area: converted subtitle and stat bar showing changed line count",
+            "cap": "The stat bar shows how many lines changed; formatting is preserved as is"
+          }
+        },
+        {
+          "h2": "Going back to simplified: watch out",
+          "ps": [
+            "Converting traditional to simplified also needs you to say **which traditional variety you are coming from**: generic, Taiwanese and Hong Kong are three different routes, because regional vocabulary has to be restored to the generic word before it can be converted. Pick the wrong direction and regional vocabulary survives into the simplified output.",
+            "The lower group of the nine directions is the one that converts back: traditional → simplified, Taiwanese → simplified, Hong Kong → simplified."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "The full walkthrough — [[How to convert simplified and traditional subtitles|/guides/hanconv.html]]; if all you need is simplified to traditional — [[Convert simplified subtitles to traditional|/guides/srt-simplified-to-traditional.html]]; to translate into another language, [[Subtitle translation|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "en": {
+      "seo": {
+        "title": "Subtitle to Excel / CSV Conversion – Both Directions – AI-SRTSub",
+        "desc": "Two-way walkthrough: export SRT/VTT to Excel or CSV for row-by-row proofreading, then import the edited sheet back as subtitles. Three columns needed, any order; time kept as text.",
+        "h1": "How to convert subtitles to Excel / CSV",
+        "intro": "Proofreading and translating are easier in a spreadsheet. Export subtitles to Excel or CSV, edit row by row, then convert back — time columns stay text, and line breaks inside dialogue are preserved.",
+        "ctaText": "Open the table converter"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "Subtitles are rows of cues and spreadsheets are rows of records — once it is a sheet, proofreading, commenting and bulk translation can all be done with tools you already know. Both directions are supported:"
+          ],
+          "ul": [
+            "**To table**: export SRT or VTT to Excel (.xlsx) or CSV, one row per cue with index, start, end and text",
+            "**To subtitle**: convert the edited sheet back to SRT or VTT",
+            "Time stays as text, so spreadsheet software cannot reinterpret it as a number or a date",
+            "Line breaks inside dialogue are preserved, right down to the original wrapping"
+          ]
+        },
+        {
+          "h2": "Upload and pick a direction",
+          "ps": [
+            "Drag a file in or browse for one. Each direction needs a different kind of file: **to table** takes subtitle files (SRT / VTT), **to subtitle** takes spreadsheet files (CSV / Excel, both .xlsx and .xls). Pick the wrong mode and the page tells you which file type that mode wants.",
+            "⚠️ This page reads UTF-8 only. If your subtitle opens as a screenful of question marks or boxes, run it through [[Mojibake repair|/repair.html]] first — broken encoding reads as nothing but replacement characters here."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Table converter upload area: drop zone and the two mode switches",
+            "cap": "Each mode wants a different file: subtitles in, spreadsheet out — and back"
+          }
+        },
+        {
+          "h2": "Exporting subtitles to a table",
+          "ps": [
+            "Choose \"to table\", drop in a subtitle, and the preview lists every cue: index, start, end, text. The stat bar gives the cue count and total duration. Then hit \"Download Excel (.xlsx)\" or \"Download CSV\".",
+            "The difference between the two: .xlsx is a real spreadsheet file where Excel cannot reformat your time column behind your back; CSV is more portable, but Excel may interpret the time column as something else when opening it. If that happens, select the time column and set its format to \"Text\" — or just use .xlsx."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Table preview: index, start, end and text columns with the stat bar",
+            "cap": "Every cue previewed; the stat bar gives cue count and total duration"
+          }
+        },
+        {
+          "h2": "Importing a table back to subtitles",
+          "ps": [
+            "Choose \"to subtitle\", drop in the sheet, and here is the column rule: it needs three columns for **start, end and text** (English headers Start / End / Text work too), in **any order**. `00:00:01,500` and `00:00:01.500` are both accepted; rows that cannot be parsed are skipped rather than condemning the whole file.",
+            "The result is listed cue by cue in the preview; confirm, then download SRT or VTT. If those three columns are missing you get a message telling you to check the headers — usually because a different naming was used on export, or the header row is not row one."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Subtitle result area: imported subtitles listed cue by cue",
+            "cap": "Unrecognised columns are reported, never silently ignored"
+          }
+        },
+        {
+          "h2": "FAQ",
+          "ps": [
+            "**Excel shows the time column wrong?** Use .xlsx and it never happens. If you must use CSV: select the time column and set the cell format to \"Text\" before opening.",
+            "**Do the column headers have to be English?** No. Start / End / Text are recognised in any language this page supports, and case does not matter.",
+            "**Are my line breaks still there after importing?** Yes. Line breaks inside dialogue are preserved, right down to the original wrapping.",
+            "**Is ASS supported?** This page handles SRT and VTT only. ASS carries style directives — convert it to SRT with [[Format converter|/convert.html]] first.",
+            "**How many files at once?** One. To process dozens or hundreds, use [[Batch conversion|/batch.html]] (which only converts formats and does not go through a table)."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Conversion runs entirely in your browser. No subtitle content is ever sent to a server."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "If all you want is the subtitle-to-Excel step, see [[Convert subtitles to Excel|/guides/srt-to-excel.html]]; to translate into another language afterwards, [[Subtitle translation|/translate.html]]; dozens of files at once — [[Batch conversion|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "en": {
+      "seo": {
+        "title": "Convert Subtitles to Excel – Proofread Row by Row – AI-SRTSub",
+        "desc": "Export SRT subtitles to Excel: one row per cue across four columns — index, start, end and text. Time kept as text, line breaks intact, and the edited sheet can be converted back to subtitles.",
+        "h1": "Convert subtitles to Excel",
+        "intro": "Proofreading hundreds of cues in a text editor is exhausting. In Excel each cue is a row, so filtering, commenting and find-and-replace all become available — and the edits go back into your SRT.",
+        "ctaText": "Export to Excel"
+      },
+      "body": [
+        {
+          "h2": "The need",
+          "ps": [
+            "Proofreading, bulk word changes, or splitting the job between several people — all of that moves much faster in a sheet than in plain text. SRT itself is plain text, but its cue structure (index, timing, dialogue) maps neatly onto four spreadsheet columns."
+          ]
+        },
+        {
+          "h2": "Where to do it",
+          "ps": [
+            "Open [[Subtitle ⇄ table conversion|/table.html]], switch to \"to table\", drag in the SRT, and the preview fills with one row per cue across four columns — index, start, end, text. Hit \"Download Excel (.xlsx)\" and it is yours. VTT is supported the same way.",
+            "When you are done editing: switch the mode to \"to subtitle\", put the sheet back in, and you get an SRT again. The rule is three columns for start, end and text (English Start / End / Text work too), in any order."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Table preview: every SRT cue as a row across four columns, with the stat bar",
+            "cap": "SRT laid out as four columns, convertible back the same way"
+          }
+        },
+        {
+          "h2": "Common pitfalls",
+          "ps": [
+            "**Fix broken encoding first**: this page reads UTF-8 only. A screenful of question marks or boxes means a trip to [[Mojibake repair|/repair.html]] first.",
+            "**CSV or xlsx**: choose .xlsx when the file is going into Excel, so the time column cannot be reformatted; CSV is more portable but Excel may read it as something else — set the time column to \"Text\" if that happens.",
+            "**ASS does not work**: ASS carries style directives, so convert it to SRT before putting it in a table."
+          ]
+        },
+        {
+          "h2": "Related",
+          "ps": [
+            "The full two-way walkthrough — [[How to convert subtitles to Excel / CSV|/guides/table.html]]; translating afterwards — [[Subtitle translation|/translate.html]]; a last pass before delivery — [[Subtitle QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "en": {
+      "seo": {
+        "title": "How to Batch Convert Subtitles – Hundreds into One ZIP – AI-SRTSub",
+        "desc": "Walkthrough: drop in dozens of SRT/VTT files, convert them to one format, download a single ZIP. Renumbered, timestamps normalised, unparsed files flagged instead of sneaking into the archive.",
+        "h1": "How to batch convert subtitles",
+        "intro": "A whole season of subtitles usually has to end up in one format, and uploading them one by one takes forever. Drop them all in here, convert them together and download one ZIP — files that cannot be parsed are flagged, never quietly bundled in as if they had worked.",
+        "ctaText": "Open batch conversion"
+      },
+      "body": [
+        {
+          "h2": "What this tool does",
+          "ps": [
+            "Subtitles for a whole season or a box set usually have to be uniform before anything else can be done with them. Here is what the batch page does:"
+          ],
+          "ul": [
+            "Take dozens of SRT or VTT files in one go (multi-select is supported)",
+            "Convert them all to SRT or VTT, renumbering cues and normalising timestamps to the target format",
+            "Pack everything into one ZIP for download, keeping original filenames and changing only the extension",
+            "Flag files with no recognisable cues and leave them out of the archive"
+          ]
+        },
+        {
+          "h2": "Adding files",
+          "ps": [
+            "Drag several subtitle files into the dashed box together, or click and multi-select in one go. The file list shows each one: parsed files display their cue count, unparsed ones are marked simply as not recognised. The top bar totals the file count, cue count and how many went unrecognised.",
+            "⚠️ This page reads UTF-8 only. Anything with broken encoding (a screenful of question marks or boxes) should go through [[Mojibake repair|/repair.html]] first."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "File list: name and cue count per file, unrecognised ones marked in red",
+            "cap": "Each file listed, and unrecognised ones flagged on the spot"
+          }
+        },
+        {
+          "h2": "What to convert everything to",
+          "ps": [
+            "Pick the target format under \"Convert all to\" — SRT or VTT. Every file in the list is then regenerated in that format: cue numbers renumbered from the top, timestamps normalised to the target (SRT separates milliseconds with a comma, VTT with a dot).",
+            "**Original filenames are kept and only the extension changes**; duplicate names get a number appended so nothing overwrites anything."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Target format picker and list state, with the stat bar showing file and cue counts",
+            "cap": "Pick a target format and every file regenerates; filenames only change extension"
+          }
+        },
+        {
+          "h2": "Packing and downloading",
+          "ps": [
+            "Click \"Pack into one ZIP and download\" and the archive contains every converted file. **Files with no recognisable cues stay out of the archive** — they remain in the list, flagged, rather than being mixed in as though they had succeeded. Once packed, you get a count of how many files are inside."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Packing area: ZIP download button and packing result message",
+            "cap": "Unrecognised files stay out of the archive and stay flagged in the list"
+          }
+        },
+        {
+          "h2": "Why a file gets flagged as unrecognised",
+          "ps": [
+            "A file is flagged when no cues can be read out of it. Three usual reasons: it is not a subtitle at all (say a stray .txt readme), the encoding is not UTF-8 (so it reads as nothing but replacement characters), or the content has been flattened into one block with no timestamps.",
+            "Flagged files can be dealt with individually: encoding problems go to [[Mojibake repair|/repair.html]], format problems to [[Format converter|/convert.html]] for a solo conversion before going back into the list."
+          ]
+        },
+        {
+          "h2": "FAQ",
+          "ps": [
+            "**How many files can I add?** There is no hard limit; it depends on your browser's memory, and a few hundred SRT files are usually fine.",
+            "**Does it change my dialogue?** No. Batch conversion only changes the container format — renumbering cues and normalising timestamps — never a word of dialogue.",
+            "**What if I need to change the content?** This page only converts formats. To change timing in bulk use [[Timing adjustment|/shift.html]]; to change wording use [[Term replacement|/glossary.html]]; both work file by file.",
+            "**Is ASS supported?** This page converts between SRT and VTT only. ASS carries styling — use [[Format converter|/convert.html]] on it individually."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Conversion and packing run entirely in your browser. No subtitle content is ever sent to a server."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "What to change for a whole season and in what order — [[Batch editing a whole season of subtitles|/guides/batch-convert-srt.html]]; more formats for a single file — [[Format converter|/convert.html]]; proofreading in a spreadsheet — [[Subtitle ⇄ table|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "en": {
+      "seo": {
+        "title": "Batch Editing a Whole Season – What Scales, What Doesn't – AI-SRTSub",
+        "desc": "A season usually needs the same change everywhere: uniform format, timing offset, terminology. Here is what finishes in one pass, what cannot, and how to handle files that fail to parse.",
+        "h1": "Batch editing a whole season of subtitles",
+        "intro": "When dozens of subtitle files need changing, it is usually the same change every time. Knowing which parts can be done in one pass saves far more time than grinding through them one by one.",
+        "ctaText": "Open batch conversion"
+      },
+      "body": [
+        {
+          "h2": "It is usually the same change everywhere",
+          "ps": [
+            "When subtitles go wrong for a whole season, each episode rarely has its own private problem — it is usually one cause landing on every episode: the same release group encoded all of them (so format and watermarks match), all of them were timed to the same video version (so the offset direction and amount agree), or transliterations drifted apart across the season.",
+            "Spot-check two episodes first — one early, one late — and confirm it really is **the same problem** before batching anything. If the two disagree, this is not something batching can fix."
+          ]
+        },
+        {
+          "h2": "What can be done in one pass",
+          "ps": [
+            "**Unifying the format** is the only thing that genuinely finishes in one pass: drag dozens of SRT and VTT files into [[Batch conversion|/batch.html]] together, pick the target format and download one ZIP. Renumbering and timestamp normalisation happen in that same step, and not one word of dialogue changes."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Batch page file list: cue count per file, unrecognised ones marked in red",
+            "cap": "Uniform format is the one thing that truly finishes in a single pass"
+          }
+        },
+        {
+          "h2": "What has to be done file by file",
+          "ps": [
+            "These have no batch entry point and need a pass per file — though there is usually an equivalent that **only has to be done once and then applies to the whole season**:"
+          ],
+          "ul": [
+            "**Uniform timing offset**: if every episode drifts by the same amount, measure one episode in [[Timing adjustment|/shift.html]], write the number down and fill the same number into the rest",
+            "**Uniform terminology**: configure the glossary once in [[Term replacement|/glossary.html]] and apply the same glossary to each subtitle",
+            "**Uniform watermark removal**: watermark patterns are fixed, and [[Subtitle cleanup|/clean.html]] already covers the common ones by default — drag each file through it"
+          ]
+        },
+        {
+          "h2": "Get the order right",
+          "ps": [
+            "When several things need doing, the wrong order means rework. Go in this order:",
+            "**Fix encoding** → **unify format** → **change content** (watermarks, terminology, timing) → **QC last**. Converting formats before fixing encoding just gives you mojibake in a different container; changing content before formats are unified means working with inconsistent tool support."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Packing area: ZIP download button and result message",
+            "cap": "Unify formats first, change content afterwards"
+          }
+        },
+        {
+          "h2": "Handling files that were not recognised",
+          "ps": [
+            "Files flagged as unrecognised in batch conversion are left out of the ZIP and stay in the list. Three usual reasons: it is not a subtitle file (a stray readme), the encoding is not UTF-8, or the content was flattened into one block without timestamps.",
+            "Encoding problems go to [[Mojibake repair|/repair.html]] individually; format problems to [[Format converter|/convert.html]] before putting them back in the list. **Do not force unrecognised files into the archive just to bump the count** — discovering a missing episode in your player costs far more than the minute this saves."
+          ]
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "The full batch walkthrough — [[How to batch convert subtitles|/guides/batch.html]]; uniform timing offsets — [[How to adjust subtitle timing|/guides/shift.html]]; a last pass before delivery — [[Subtitle QC|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "en": {
+      "seo": {
+        "title": "What 23.976 / 24 / 25 / 30 fps Really Mean – Subtitle Timing – AI-SRTSub",
+        "desc": "23.976 is not 24 and 29.97 is not 30 — the missing 0.1% comes from NTSC colour, while PAL runs films 4% fast. How these shift your subtitle timing, and how to convert between them.",
+        "h1": "What 23.976 / 24 / 25 / 30 fps really mean",
+        "intro": "The 0.1% gap between 23.976 and 24 is a leftover from television history. Together with PAL's 4%, it is the reason subtitles drift further out of sync as a film goes on.",
+        "ctaText": "Open timing adjustment"
+      },
+      "body": [
+        {
+          "h2": "What each number is",
+          "ps": [
+            "Frame rate is how many pictures are shown in one second. The four you meet most often:"
+          ],
+          "ul": [
+            "**24 fps** — the rate films are shot and projected at; cinemas run at 24",
+            "**23.976 fps** — the rate once a film enters NTSC television, 0.1% slower than 24",
+            "**25 fps** — the television rate for PAL regions (Europe, China, Australia and other 50 Hz mains countries)",
+            "**29.97 fps / 30 fps** — the rate for NTSC television programmes, carrying that same 0.1% gap"
+          ]
+        },
+        {
+          "h2": "Where the 0.1% comes from",
+          "ps": [
+            "23.976 = 24 × 1000/1001, and 29.97 = 30 × 1000/1001. That 1000/1001 is a leftover from adding colour to NTSC: to squeeze the colour subcarrier in without breaking existing black-and-white receivers, the field rate was dropped from 60 Hz to 59.94 Hz (60 × 1000/1001), and frame rate went down with it.",
+            "The result: films air at 23.976 in NTSC regions instead of 24. The difference is 0.1%, or 3.6 seconds over an hour — barely noticeable on its own, but do not confuse it with the 4% below and never combine the two in one calculation."
+          ]
+        },
+        {
+          "h2": "Where the 4% comes from",
+          "ps": [
+            "PAL regions screen at 25 fps. Films are shot at 24 fps and simply played at 25 — not one frame added or removed, so playback runs 4% faster (25/24 ≈ 1.0417). A 100-minute film runs 96 minutes in its PAL version.",
+            "That is the root of **progressive drift**: subtitles made against the original and video in the PAL version match exactly at the start and are four minutes apart by the credits. No global shift can save that; it has to be rescaled by ratio."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Timing page speed section: the ratio input box",
+            "cap": "Rescale by ratio — one value covers the whole film"
+          }
+        },
+        {
+          "h2": "How to convert",
+          "ps": [
+            "Conversion means multiplying by a single ratio that applies across the whole film:"
+          ],
+          "ul": [
+            "**24 → 25** (PAL speed-up): × 0.96",
+            "**23.976 → 25**: × 0.959 (the exact value is 23.976/25 = 0.95904)",
+            "**25 → 23.976**: × 1.0427",
+            "**23.976 ↔ 24**: × 1.001 or × 0.999 — only 0.1% either way",
+            "0.96 and 0.959 differ by 0.1%, under 6 seconds across a whole film — if you cannot tell whether your source is 24 or 23.976, 0.96 works and two-point anchoring cleans up the rest"
+          ]
+        },
+        {
+          "h2": "Telling which one you have",
+          "ps": [
+            "Rather than guessing the ratio, find two moments whose correct timing you are sure of — usually the first and last lines of dialogue — and tell the tool \"this line should be at 00:00:12 and that one at 01:35:40\"; it stretches the whole film linearly between those two points. That is \"two-point anchoring\", and it needs no frame rate arithmetic from you.",
+            "To confirm the frame rate yourself, check your player or a media info tool. When a filename like `1080p.WEB` carries no frame rate hint, two-point anchoring is the safer route."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Timing page two-point anchor section: two rows of timestamp inputs",
+            "cap": "Two-point anchoring needs no frame rate — just two timestamps"
+          }
+        },
+        {
+          "h2": "Related tools and guides",
+          "ps": [
+            "Frame rate conversion itself — [[Subtitle frame rate conversion|/guides/srt-fps-converter.html]]; speed adjustment — [[Subtitle speed conversion|/guides/subtitle-speed-converter.html]]; unsure whether it is a global offset or progressive drift — [[Subtitles drifting further out of sync|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

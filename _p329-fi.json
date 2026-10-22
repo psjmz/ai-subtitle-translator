@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "fi": {
+      "seo": {
+        "title": "Näin käytät tehostetekstityksiä ja kaksikielistä yhdistämistä – AI-SRTSub",
+        "desc": "Yhdistä kaksi tekstitystiedostoa kaksikieliseksi, järjestä uudelleen järjestys ja tyyli, lisää tehosteet yksikielisille. Paritustapa, viisi ASS- ja kuusi VTT-mallia, vientimuoto.",
+        "h1": "Näin käytät tehostetekstityksiä ja kaksikielistä yhdistämistä",
+        "intro": "Yhdistä kaksi tekstitystiedostoa kaksikieliseksi tai anna tekstityksille tyyli suoraan: fontti, väri, ääriviiva, sijainti — se mitä esikatselussa näet, viedään.",
+        "ctaText": "Avaa tehostetekstitysten työkalu"
+      },
+      "body": [
+        {
+          "h2": "Mitä tämä työkalu ratkaisee",
+          "ps": [
+            "Yhdellä sivulla on oikeastaan kolme työtä: alkuperäisen ja käännöksen yhdistäminen yhdeksi kaksikieliseksi tiedostoksi, jo kaksikielisten tekstitysten järjestyksen ja tyylin järjestäminen sekä tehosteiden lisääminen yksikielisille tekstityksille. Kaikki kolme jakavat samat tyyliparametrit ja saman esikatselun."
+          ],
+          "ul": [
+            "**Yhdistä kaksi tiedostoa** —— sinulla on alkuperäinen ja käännös, yhdistät ne yhdeksi kaksikieliseksi tiedostoksi vietäväksi.",
+            "**Säädä kaksikielisiä** —— ne ovat jo kaksikielisiä, mutta järjestys tai tyyli ei sovi, järjestät ne uudelleen.",
+            "**Yksikieliset tekstitykset** —— vain yksi tiedosto, sille fontti, ääriviiva, sijainti.",
+            "Kaikki kolme vaihdetaan välilehdillä vasemmalla, tyyli- ja esikatselualueet ovat yhteisiä."
+          ]
+        },
+        {
+          "h2": "Kolme työtä, yksi sivu",
+          "ps": [
+            "Ylhäällä on kolme välilehteä: **Yhdistä kaksi tekstitystiedostoa**, **Säädä kaksikielisiä tekstityksiä**, **Yksikieliset tekstitykset**. Välilehti määrää, montako syöttösaraketta vasemmalla on.",
+            "Kahden tiedoston yhdistämisessä vasemmalla on kaksi saraketta ”1 Alkuperäiset tekstitykset” ja ”2 Käännetyt tekstitykset”, kumpaankin voi ladata tiedoston ja liittää tekstiä suoraan. Kaksikielisten ja yksikielisten säädössä on yksi sarake."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Kolme välilehteä tehostetekstitysten työkalun yläreunassa ja syöttöalue vasemmalla",
+            "cap": "Kolme välilehteä ylhäällä; valittaessa ”Yhdistä kaksi tekstitystiedostoa” vasemmalle tulevat alkuperäinen ja käännös"
+          }
+        },
+        {
+          "h2": "Miten kaksi tiedostoa paritetaan",
+          "ps": [
+            "Kohdan ”3 Yhdistämisasetukset” ensimmäinen kohta on paritustapa: **Parita järjestyksessä · alkuperäisen aikajana**, **Parita aikajanan mukaan · alkuperäisen aikajana**, **Parita järjestyksessä · käännöksen aikajana**.",
+            "Kun molemmissa tiedostoissa on sama määrä merkintöjä ja sama järjestys, paritus järjestyksessä on vakain; kun määrä eroaa (toinen osapuoli on yhdistänyt merkintöjä, toinen jakanut), parita aikajanan mukaan, työkalu etsii lähimmän ajan mukaan. Kummankin aikajanaa käytetään sen mukaan, kumpi on tarkempi — yleensä alkuperäinen.",
+            "Alla on tekstin rakenne (automaattinen / yksi merkintä kaksi riviä / vuorotellen pareittain) ja järjestys (alkuperäinen ylhäällä / käännös ylhäällä)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Paritustapa, tekstin rakenne ja järjestys yhdistämisasetuksissa",
+            "cap": "Paritustapa määrää, mikä liittyy mihin, alkuperäisen vai käännöksen aikajana valitaan myös tässä"
+          }
+        },
+        {
+          "h2": "Tyyli kohta kohdalta",
+          "ps": [
+            "Oikealla on tyylialue. ASS-viennissä vaikuttaa ”ASS-ulkoasu”: asettelu (jaettu näyttö · erikseen ylös-alas / pinottu · kaksi riviä alhaalla), fontin koko, väri, peittävyys, fontti, lihavointi, kursiivi, kirjainväli, ääriviiva, ääriviivan väri, varjo/tausta (ei / varjo / tausta), syvyys, reunan väri, reunan värin peittävyys, vaakasuuntainen tasaus (alas · vasen / alas · keski / alas · oikea), etäisyys alareunasta käännökselle (ensisijainen), sekä alkuperäiselle (toissijainen) fontti, varjo/tausta ja vasen-oikea marginaali.",
+            "Kaksikielisen VTT-tyylin viennissä vaikuttaa ”WebVTT-tyyli”: kuuden valmiin asetuksen (Vakio / Tiivis / Elokuvamainen / Ylhäällä / Saavutettava / Pysty) päälle voi muuttaa pystysuoraa line-arvoa, ankkuria (alareunassa / yläreunassa / keskellä), vaakasuoraa position-arvoa, leveyttä size, tasausta align, koko merkinnän rivikorkeutta sekä käännösrivin taustaväriä, taustan peittävyyttä ja ääriviivan paksuutta; alkuperäinen rivi voi käyttää päätyyliä tai omaa tyyliä.",
+            "Säätöjen jälkeen voi ”Tallenna malliksi”; seuraavalla kerralla valitset sen kohdasta ”Tallennetuista malleista” ja painat ”Käytä”."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "ASS-ulkoasun tyylialueen parametrit oikealla",
+            "cap": "Fontin koko, väri, ääriviiva, varjo/tausta ja tasaus säädetään kohta kohdalta; lopuksi tallenna malliksi"
+          }
+        },
+        {
+          "h2": "Katso esikatselu ennen vientiä",
+          "ps": [
+            "”Yhdistämisen esikatselu” on taulukko: #, aika, alkuperäinen, käännös, tyyli. Ylhäällä voi suodattaa epäilyttäviä rivejä kohdista ”Sisältää äänitehosteen”, ”Sisältää puhujan etuliitteen”, ”Kesto < 1 sekunti”, ”Yli kaksi riviä”, ”Lukunopeus ylittää rajan”, tai kirjoittaa hakusanan.",
+            "Rivin tyylikohdan klikkaus avaa kyseisen kohdan muokkauksen ja listaa vain ne rivit, jotka sitä käyttävät; ”Poista kaikki ohitukset” palauttaa manuaaliset ohitukset mallille. Alla oleva aikajanan säätöalue mahdollistaa koko sisällön siirron (tietystä merkinnästä alkaen) ja suhteellisen skaalauksen.",
+            "Vahvistuksen jälkeen siirry kohtaan ”4 Vienti”: lataa tekstitystiedosto tai kopioi sisältö."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Yhdistämisen esikatselutaulukko ja suodatinpalkki",
+            "cap": "Esikatselu on vientitulos, epäilyttäviä rivejä voi suodattaa tyypin mukaan ja avata yksittäisen tyylikohdan"
+          }
+        },
+        {
+          "h2": "Mikä pysyy koskemattomana",
+          "ps": [
+            "Tyyli muuttaa vain ulkoasua, ei dialogia. Alkuperäisen ja käännöksen teksti ei muutu kirjaintakaan yhdistämisen aikana; aikajana pysyy valitsemanasi, ellet itse muuta sitä esikatselun alla olevalla säätöalueella.",
+            "Viennissä SRT:nä tai ”VTT ilman tyyliä” tyylitietoja ei kirjoiteta tiedostoon — sivu ilmoittaa, että viedään VTT ilman tyyliä, ilman STYLE-lohkoa, ja soitin käyttää oletusulkoasua. Jos haluat tyylin, valitse kaksikielinen VTT tai ASS."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Tiedostoissa on eri määrä merkintöjä, mitä teen?** Käytä ”Parita aikajanan mukaan”, työkalu täsmäyttää lähimmän ajan mukaan; täsmäämättömiä merkintöjä ei luoda tyhjästä.",
+            "**Soitin ei tunnista ASS-viennin tyyliä?** ASS-tyyli on kirjoitettu tiedostoon, mutta ASS-tuki vaihtelee soittimittain. Yleispätevämpään ulkoasuun vie kaksikielinen VTT.",
+            "**Malli meni sekaisin, miten palaan alkuun?** ”Palauta oletusparametrit” ASS-alueella ja ”Palauta oletusmalli” VTT-alueella palauttavat molemmat osat.",
+            "**Mitä esimerkin seitsemän riviä ovat?** Ne ovat sivulle sisäänrakennettu esimerkki, vain yhdistämisen jälkeisen ulkoasun katsomiseen, esimerkkiä ei voi viedä; kun lataat omat tekstityksesi ja painat esikatselua, se korvautuu automaattisesti."
+          ]
+        },
+        {
+          "h2": "Tietosuoja",
+          "ps": [
+            "Tekstitykset käsitellään kokonaan selaimessa, niitä ei ladata palvelimelle eikä käsitellä palvelimella. Kun suljet selaimen, käsittelyn sisältö katoaa."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Jos haluat jakaa kaksikielisen kahdeksi raidaksi, käytä [[Kaksikielisen erottelu|/bilingual.html]]; päinvastoin, yksikielisestä kaksikielinen, katso [[Kaksi tapaa tehdä kaksikieliset tekstitykset|/guides/make-bilingual-subtitles.html]]; yhdistämisen jälkeen käy läpi [[Tekstitysten tarkistus|/qc.html]]; koko kausi [[Massamuunnos|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "fi": {
+      "seo": {
+        "title": "Näin poimit pelkän tekstin tekstityksistä – AI-SRTSub",
+        "desc": "Valitse asettelu yhtenäiset kappaleet tai yksi rivi per merkintä, viisi siivouskytkintä mitä ne poistavat, ja kuusi muotoa SRT / VTT / ASS / SBV / LRC / TXT.",
+        "h1": "Näin poimit pelkän tekstin tekstityksistä",
+        "intro": "Poimi dialogi tekstityksistä puhtaaksi tekstiksi: aikajana, numerot ja tyylimerkinnät poistuvat automaattisesti, ja tulos on luettavissa artikkelina tai käytettävissä dialogiluettelona.",
+        "ctaText": "Avaa pelkän tekstin poiminta"
+      },
+      "body": [
+        {
+          "h2": "Mitä tämä työkalu ratkaisee",
+          "ps": [
+            "Tekstitystiedostossa todella hyödyllistä on vain dialogi, loput on rakennetta soitinta varten: numerot, aikajana, tyylimerkinnät. Tämä sivu poistaa rakenteen ja jättää vain tekstin."
+          ],
+          "ul": [
+            "**Luettavaksi artikkelina** —— tuloste yhtenäisinä kappaleina, jaettuna taukojen ja loppuvälimerkkien mukaan.",
+            "**Käytettäväksi luettelona** —— tuloste rivi per merkintä, yksi tekstitysmerkintä per rivi, kätevä dialogitaulukkoon tai toiseen työkaluun.",
+            "**Siivoa samalla** —— kuulovammaisten kuvaukset, vesileimat ja mainokset, vierekkäiset toistot poistetaan oletuksena.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** kuusi muotoa tunnistetaan."
+          ]
+        },
+        {
+          "h2": "Syötä, älä ajattele vain lataamista",
+          "ps": [
+            "Sarakkeessa ”1 Syötä tekstitykset” vasemmalla voi ladata tiedoston ja liittää tekstityksen sisällön suoraan tekstikenttään. Jos meni väärin, paina ”Tyhjennä” ja aloita uudelleen.",
+            "Sivu lukee tiedoston UTF-8-muodossa. Jos tekstitykset avautuvat täynnä kysymysmerkkejä tai neliöitä, merkistökoodaus on rikki, mene [[Merkistön korjaus|/repair.html]] ja vaihda UTF-8:aan, tule sitten takaisin."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Tekstitysten syöttöalue pelkän tekstin poiminnan sivulla",
+            "cap": "Lataa tiedosto tai liitä tekstityksen sisältö suoraan tekstikenttään"
+          }
+        },
+        {
+          "h2": "Minkä asettelun valitset",
+          "ps": [
+            "Kohdan ”2 Poiminnan asetukset” yläosassa on asettelu: **Yhtenäiset kappaleet** jakaa automaattisesti taukojen ja loppuvälimerkkien mukaan, luetaan kuin artikkeli; **Yksi rivi per merkintä** yksi tekstitysmerkintä per rivi, vastaa täsmälleen alkuperäisen tiedoston merkintöjä.",
+            "Jos haluat kopioida dialogia muistiinpanoihin, harjoitella kääntämistä, lukea kuin artikkelia — yhtenäiset kappaleet; jos haluat dialogiluettelon, merkintä merkinnältä vertailun alkuperäiseen, siirron toiseen työkaluun — yksi rivi per merkintä."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Asettelu ja siivouskytkimet poiminnan asetuksissa",
+            "cap": "Valitse yksi asettelu; viisi kytkintä alla määräävät, minkä tyyppinen sisältö poistetaan"
+          }
+        },
+        {
+          "h2": "Mitä kukin viidestä siivouksesta poistaa",
+          "ps": [
+            "**Poista kuulovammaisten kuvaukset**: poistaa ääntä kuvaavat sulkeet kuten ”(askeleet)”, ”[musiikki]”, dialogi jää.",
+            "**Poista vesileimat ja mainokset**: poistaa rivit kuten käännösryhmän nimi, verkkosivun osoite, sosiaalisen median tili.",
+            "**Poista vierekkäiset toistot**: sama lause kahdesti peräkkäin (toistovirhe) jää kerran; kauempana olevat toistot ovat merkityksellisiä, niihin ei kosketa.",
+            "**Poista puhujan etuliite**: ”JOHN: Hei” jää ”Hei”. Oletuksena säilytetään — käsikirjoitusmaisessa tekstissä pitää tunnistaa puhuja.",
+            "**Ohita sanoitusrivit**: ohittaa rivit, jotka ovat kokonaan ”♪ … ♪”. Oletuksena säilytetään — sanoituksetkin ovat sanoja."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Viisi siivouskytkintä ja niiden selitykset poiminnan asetuksissa",
+            "cap": "Jokaisen kytkimen vieressä lukee, mitä se tarkalleen poistaa, rastita tarpeen mukaan"
+          }
+        },
+        {
+          "h2": "Miten tuloksen saa mukaan",
+          "ps": [
+            "Sarake ”3 Tulos” oikealla näyttää poimitun tekstin reaaliajassa, asetusten muutos laskee sen heti uudelleen.",
+            "Vahvistuksen jälkeen paina ”Lataa” tallentaaksesi .txt-tiedostona, tai ”Kopioi”. Kielissä, jotka eivät erota sanoja välilyönnillä, kuten kiina ja japani, rivien yhdistämissäännöt eroavat englannista, työkalu hoitaa sen kielen mukaan."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Poiminnan tulosalue sekä lataa- ja kopioi-painikkeet",
+            "cap": "Tulos päivittyy reaaliajassa, ladataan txt-tiedostona tai kopioidaan suoraan"
+          }
+        },
+        {
+          "h2": "Mikä pysyy koskemattomana",
+          "ps": [
+            "Itse dialogia ei kirjoiteta uudelleen. Siivouskytkimet määräävät vain, minkä tyyppi poistetaan kokonaan rivinä tai kappaleena, ne eivät muuta merkinnän sanoja.",
+            "Aikajana ja numerot ”jätetään viemättä”, ei ”muuteta ja sitten viedä” — alkuperäinen tiedosto ei muutu, sivu ei tarjoa vientiä aikajanan kanssa, se kuuluu [[Muunnos muotoon|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Jäävätkö ASS-tyylimerkinnät tekstiin?** Ei. ASS:n tyylin ohitusmerkinnät `{}` poistetaan, jäljelle jää vain dialogin teksti.",
+            "**Tulevatko kaksikieliset tekstitykset kahtena rivinä vai yhtenä?** Niin monta riviä kuin alkuperäisessä merkinnässä on, niin monta jää, sivu ei yhdistä eikä jaa — jos haluat jakaa, käytä [[Kaksikielisen erottelu|/bilingual.html]].",
+            "**Miksi puhujan etuliite säilytetään oletuksena?** Nimi kohdassa ”JOHN: Hei” on usein hyödyllistä tietoa (käsikirjoitus, dialogitaulukko), poistettuna on helppo olla tietämättä kuka puhuu, joten päätös on sinun.",
+            "**Voiko LRC-tiedostonkin poimia?** Voi. LRC:n aikaleimat poistetaan, sanoitusrivit jäävät; jos et halua sanoituksia, rastita ”Ohita sanoitusrivit”."
+          ]
+        },
+        {
+          "h2": "Tietosuoja",
+          "ps": [
+            "Tekstitykset käsitellään kokonaan selaimessa, niitä ei ladata palvelimelle eikä käsitellä palvelimella. Teksti jää vain tälle sivulle, päivitys tyhjentää sen."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Jos haluat tietää, mitä tekstitystiedosto oikeasti sisältää, katso [[Mitä SRT-tiedosto oikeasti sisältää|/guides/srt-file-format.html]]; poimitut dialogit tarvitsevat käännöksen, mene [[Tekstitysten käännös|/translate.html]]; jos tarvitset taulukon, käytä [[Tekstitykset Excel/CSV:hen|/guides/srt-to-excel.html]]; ennen luovutusta käy läpi [[Tekstitysten tarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "fi": {
+      "seo": {
+        "title": "Näin jaat ja liität tekstityksiä – Leikkaus jaksoihin – AI-SRTSub",
+        "desc": "Jaa tiedosto jaksoihin keston tai merkintämäärän mukaan, jokainen jakso voi alkaa nollasta; liitä tiedostot järjestyksessä tai limitä ajan mukaan. Numerointi järjestyy itsestään.",
+        "h1": "Näin jaat ja liität tekstityksiä",
+        "intro": "Pitkä tekstitystiedosto leikataan useaan jaksoon, tai useat erilliset tiedostot liitetään yhdeksi. Leikkaus tehdään vain merkintöjen rajalla, lausetta ei koskaan leikata kahtia.",
+        "ctaText": "Avaa jako ja liittäminen"
+      },
+      "body": [
+        {
+          "h2": "Mitä tämä työkalu ratkaisee",
+          "ps": [
+            "Jakaminen jaksoihin, jakaminen osiin, lähteiden liittäminen — kaikkialla tekstitysten jaksot eivät täsmää: joko yksi tiedosto pitää leikata, tai useat pitää liittää yhdeksi. Tämä sivu hoitaa molemmat, leikkauksella ja liittämisellä on omat välilehtensä."
+          ],
+          "ul": [
+            "**Jako** —— pitkä tekstitystiedosto leikataan jaksoihin keston tai merkintämäärän mukaan.",
+            "**Liittäminen** —— useat tiedostot liitetään järjestyksessä yhdeksi jaksoksi, tai limitetään ajan mukaan.",
+            "**Leikkaus vain merkintöjen rajalla** —— lause ei leikkaannu kahtia.",
+            "**Numerointi järjestyy itsestään** —— liittämisen jälkeen numeroita ei tarvitse korjata, dialogit pysyvät samoina."
+          ]
+        },
+        {
+          "h2": "Valitse ensin jako vai liittäminen",
+          "ps": [
+            "Kaksi välilehteä ylhäällä: **Jako: yksi tiedosto useaan jaksoon** ja **Liittäminen: useat tiedostot yhdeksi**. Valinnan jälkeen toinen vaihe alla muuttuu.",
+            "Kohdassa ”1 Syötä tekstitykset” voi ladata tiedoston tai liittää tekstiä, jos meni väärin paina ”Tyhjennä”. Sivu lukee vain UTF-8:aa — rikkinäinen merkistö (täynnä kysymysmerkkejä tai neliöitä) ensin kohdassa [[Merkistön korjaus|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Kaksi välilehteä jaon ja liittämisen sivun yläreunassa",
+            "cap": "Jako ja liittäminen ovat kaksi välilehteä, valinnan jälkeen toisen vaiheen asetukset muuttuvat"
+          }
+        },
+        {
+          "h2": "Miten leikkaat",
+          "ps": [
+            "Kohdassa ”2 Miten leikkaat” valitse peruste: **Kesto** (joka X minuutti yksi jakso) tai **Merkintämäärä** (joka X merkintä yksi jakso), syötä luku.",
+            "Rastita ”Jokainen jakso alkaa 0:00:sta”, jolloin jokainen syntyvä jakso lasketaan alusta — hyödyllistä ladattaessa jaksoittain, kun jokainen jakso annetaan erikseen soittimelle. Ilman rastia alkuperäiset aikaleimat säilyvät, jaksot vastaavat edelleen alkuperäisen elokuvan kohtia.",
+            "Leikataan vain tekstitysmerkinnän rajalla: erittäin pitkä merkintä, joka ylittää aikaviivan, jää kokonaan edelliseen jaksoon."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Keston/merkintämäärän ja nollasta laskennan asetukset jaon sivulla",
+            "cap": "Leikkaa keston tai merkintämäärän mukaan, jokainen jakso voi alkaa 0:00:sta"
+          }
+        },
+        {
+          "h2": "Miten liität",
+          "ps": [
+            "Kohdassa ”2 Miten liität” valitse tapa: **Liitä järjestyksessä** siirtää koko seuraavan tiedoston edellisen loppumisen jälkeen, jaksot eivät mene päällekkäin; **Limitä ajan mukaan** säilyttää kunkin tiedoston alkuperäiset aikaleimat ja järjestää alkamisajan mukaan.",
+            "Useat tiedostot ovat saman jakson ensimmäinen ja toinen puolisko, tai ne on jaettu tarkistusta varten ja pitää liittää takaisin — käytä liittämistä järjestyksessä; tiedostot, joiden pitää olla yhtä aikaa ruudulla (esimerkiksi alkuperäisraita ja käännösraita), käytä limittymistä ajan mukaan.",
+            "Liittämisen jälkeen numerointi järjestyy itsestään, dialogit pysyvät samoina."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Järjestyksessä liittämisen ja ajan mukaan limittymisen asetukset liittämisen sivulla",
+            "cap": "Liittäminen järjestyksessä sopii ensimmäiselle/toiselle puoliskolle, limittyminen alkuperäis- ja käännösraidalle"
+          }
+        },
+        {
+          "h2": "Miten tuloksen saa mukaan",
+          "ps": [
+            "Sarake ”3 Tulos” oikealla tukee vientiä **SRT** ja **VTT**, paina ”Lataa” tai ”Kopioi”.",
+            "Jaossa voi ”Lataa kaikki jaksot”, tallennat kaikki syntyneet jaksot kerralla, ilman yksittäisiä klikkauksia."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Muodon SRT/VTT valinta ja lataa-painikkeet, lataa kaikki jaksot tulosalueella",
+            "cap": "Jaon tulos voidaan ladata jaksoittain, liittämisen jälkeen ladataan tai kopioidaan suoraan"
+          }
+        },
+        {
+          "h2": "Mikä pysyy koskemattomana",
+          "ps": [
+            "Dialogi ei muutu sanaakaan. Sivu koskee vain siihen, ”mitkä merkinnät kuuluvat mihinkin jaksoon” ja ”miten numerot järjestyvät”, ei merkintöjen sisältöön.",
+            "Valittaessa ”Liitä järjestyksessä” seuraavien tiedostojen aikaleimat siirretään kokonaisuutena — sitä itse liittäminen vaatii; valittaessa ”Limitä ajan mukaan” kaikkien tiedostojen alkuperäiset aikaleimat säilyvät."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Viimeinen jakso on hyvin lyhyt, onko se ongelma?** Ei. Jäännös, joka ei riitä täyteen pituuteen, muodostaa oman jaksonsa, mitään ei pakoteta.",
+            "**Leikkaantuuko lause, joka on täsmälleen rajalla?** Ei. Leikataan vain merkintöjen rajalla, aikaviivan ylittävä merkintä jää edelliseen jaksoon.",
+            "**Miten kaksi täsmälleen saman ajan merkintää järjestetään limittymisen jälkeen?** Alkamisajan mukaan, samalla alkamisajalla säilyy syöttöjärjestys.",
+            "**Voiko ASS:n jakaa?** Sivu tukee SRT- ja VTT-muotoja. ASS muunnetaan ensin kohdassa [[Muunnos muotoon|/convert.html]] SRT:ksi tai VTT:ksi ja käsitellään sitten."
+          ]
+        },
+        {
+          "h2": "Tietosuoja",
+          "ps": [
+            "Tekstitykset käsitellään kokonaan selaimessa, niitä ei ladata palvelimelle eikä käsitellä palvelimella. Kun suljet sivun, sisältö katoaa."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Kaksi tiedostoa, jotka pitää liittää kaksikielisesti (ei yhdeksi jaksoksi), hoituu kohdassa [[Tehostetekstitykset ja kaksikielinen yhdistäminen|/guides/merge.html]]; kokonaan siirtynyt aikajana kohdassa [[Aikajanan säätö|/shift.html]]; koko kauden määrä kohdassa [[Massamuunnos|/batch.html]]; käsittelyn jälkeen käy läpi [[Tekstitysten tarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "fi": {
+      "seo": {
+        "title": "Näin käytät sanoitusten tahdistusta – Toista · Liitä – AI-SRTSub",
+        "desc": "Lisää musiikki ja sanat, kuuntele ja napauta jokaisen rivin aika, vie LRC tai SRT. Välilyönti toista/tauko, Enter merkitsee rivin, Z peruu — kädet pysyvät näppäimistöllä.",
+        "h1": "Näin käytät sanoitusten tahdistusta",
+        "intro": "Lisää musiikki, liitä sanat, kuuntele ja napauta jokaisen lauseen aika, vie tavallinen LRC tai SRT. Ääni toistetaan vain laitteessa, sitä ei ladata palvelimelle.",
+        "ctaText": "Avaa sanoitusten tahdistus"
+      },
+      "body": [
+        {
+          "h2": "Mitä tämä työkalu ratkaisee",
+          "ps": [
+            "Anna kappaleelle sanoitustiedosto, jonka mukaan voi laulaa: yksi lause per rivi, jokaisella rivillä yksi aikapiste. Soitin tunnistaa LRC:n, tekstitysraita tunnistaa SRT:n, molemmat voi viedä."
+          ],
+          "ul": [
+            "**Tahdista alusta** —— liitä sanat pelkkänä tekstinä, kuuntele ja napauta.",
+            "**Korjaa valmis** —— tuo olemassa oleva LRC, jatka ensimmäisestä rivistä ilman aikaa.",
+            "**Vie kaksi muotoa** —— LRC soittimelle, SRT videon tekstitysraidalle.",
+            "**Kaikki näppäimistöltä** —— välilyönti toista/tauko, Enter merkitsee rivin, Z peruu."
+          ]
+        },
+        {
+          "h2": "1 Lisää musiikki",
+          "ps": [
+            "Ensimmäinen sarake vasemmalla lataa äänen, **MP3, M4A, FLAC, WAV, OGG** kaikki käyvät. Ääni toistetaan vain laitteessa, sitä ei ladata palvelimelle.",
+            "Äänenlaatu ei vaikuta tahdistuksen tarkkuuteen, mutta selkeä lauluääni on helpompi kuunnella; live-versiot ja liian kova taustamusiikki vaikeuttavat täsmäytystä selvästi."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Musiikin lisäysalue sanoitusten tahdistustyökalussa",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG kaikki käyvät, ääni toistetaan vain laitteessa"
+          }
+        },
+        {
+          "h2": "2 Liitä sanat",
+          "ps": [
+            "Liitä sanat toiseen sarakkeeseen, **yksi lause per rivi**, tyhjät rivit ohitetaan. Liittämisen jälkeen paina ”Jäsennä sanat”.",
+            "Voit liittää myös valmiin LRC:n — sen aikaleimat `[mm:ss.xx]` tunnistetaan automaattisesti, tuonnin jälkeen jatkat ensimmäisestä rivistä ilman aikaa, rivit joilla on jo aika, eivät toistu."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Sanoitusten liittämisalue ja jäsennä sanat -painike",
+            "cap": "Liitä yksi lause per rivi, tai koko LRC, jolloin työkalu lukee olemassa olevat ajat"
+          }
+        },
+        {
+          "h2": "3 Kuuntele ja tahdista",
+          "ps": [
+            "Toista musiikki, kun kuulet lauseen alkavan, paina Enter (tai klikkaa ”Merkitse tämä rivi”), aika tallentuu ja kursori siirtyy seuraavaan.",
+            "Pikanäppäimet: **välilyönti** toista/tauko, **Enter** merkitse nykyinen rivi, **Z** peru yksi rivi. Toiston aikana Enter on kätevin, ei tarvitse vaihtaa hiiren ja näppäimistön välillä.",
+            "Jos meni väärin, paina Z peruaksesi rivin ja merkitse uudelleen; rivin, jota et halua tahdistaa (välisoitto, puhtaasti instrumentaalinen osa), ohitat painikkeella ”Ohita tämä rivi”, se ei tule vientiin."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Kuuntele ja tahdista -alue: toista, merkitse rivi, peru, ohita rivi",
+            "cap": "Välilyönti toista/tauko, Enter merkitsee lauseen, Z peruu, kädet eivät irtoa näppäimistöstä"
+          }
+        },
+        {
+          "h2": "4 Vienti",
+          "ps": [
+            "Kun olet valmis, siirry neljänteen sarakkeeseen: **Lataa LRC** soittimelle, **Lataa SRT** videon tekstitysraidalle, myös ”Kopioi” käy.",
+            "Viedään vain rivit, joilla on aika; ohitetut rivit eivät tule tiedostoon. SRT-viennissä jokainen rivi kestää seuraavan alkuun, viimeisellä on 2 sekuntia varaa."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Vientialue: lataa LRC, lataa SRT ja kopioi-painike",
+            "cap": "LRC soittimelle, SRT videolle; viedään vain rivit, joilla on merkitty aika"
+          }
+        },
+        {
+          "h2": "Mikä pysyy koskemattomana",
+          "ps": [
+            "Sanoitusten tekstiä ei kirjoiteta uudelleen. Tahdistus lisää vain yhden aikapisteen jokaiselle riville, se ei koske liitettyihin sanoihin.",
+            "Tuotaessa valmis LRC, aikaleimalliset rivit säilyttävät aikansa, jatko alkaa ensimmäisestä rivistä ilman aikaa."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Viennistä puuttuu muutama rivi?** Ohitetut rivit ja rivit ilman aikaa eivät tule tiedostoon. Palaa kolmanteen vaiheeseen ja täydennä, tai varmista, että ne piti ohittaa.",
+            "**Voiko JSONin aikaa muuttaa?** Jos haluat siirtää koko sisältöä hieman valmistumisen jälkeen, vie SRT ja siirrä tai skaalaa suhteellisesti kohdassa [[Aikajanan säätö|/shift.html]].",
+            "**Viedäkö LRC vai SRT?** Musiikkisoittimille (foobar2000, eri sovellukset, kaikki soittimet) LRC; videoon tai jatkokäsittelyyn tekstitystyökalussa SRT.",
+            "**Kuinka kauan yksi kappale kestää?** Riippuu rivien määrästä ja halutusta tarkkuudesta. Kolmenkymmenen-neljänkymmenen rivin kappale sujuu harjaannuttua muutamassa minuutissa; tarkkuus sanaa kohden on hitaampaa."
+          ]
+        },
+        {
+          "h2": "Tietosuoja",
+          "ps": [
+            "Ääni ja sanat käsitellään kokonaan selaimessa, niitä ei ladata palvelimelle eikä käsitellä palvelimella. Ääni dekoodataan ja toistetaan vain laitteessa."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Jos sinulla on LRC ja haluat tekstitykset, katso [[LRC SRT:ksi|/guides/lrc-to-srt.html]]; miten tahdistusta kannattaa ajatella ja missä ovat sudenkuopat, katso [[Näin tahdistat sanoitukset LRC-tiedostoon|/guides/how-to-make-lrc-file.html]]; viedyn SRT:n aika on pielessä, käytä [[Aikajanan säätö|/shift.html]]; lopputuote käy läpi [[Tekstitysten tarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "fi": {
+      "seo": {
+        "title": "Näin poimit videoon upotetut tekstitykset – AI-SRTSub",
+        "desc": "Lue suoraan videoon upotetut tekstitysraidat tiedostosta MKV, WebM, MP4, MOV ja vie SRT / VTT / ASS / TXT. Videota ei ladata palvelimelle eikä transkoodata.",
+        "h1": "Näin poimit videoon upotetut tekstitykset",
+        "intro": "Lue suoraan MKV / MP4 -tiedostoon upotettu tekstitysraita ja vie se SRT:nä — videota ei ladata palvelimelle, kaikki tapahtuu selaimessa.",
+        "ctaText": "Avaa tekstitysten poiminta videosta"
+      },
+      "body": [
+        {
+          "h2": "Mitä tämä työkalu ratkaisee",
+          "ps": [
+            "Tekstitykset voivat olla upotettuina videotiedostoon, ilman omaa tiedostoa. Jotta niitä voi muuttaa, kääntää, tehdä kaksikielisiksi, ne pitää ensin saada ulos — tämä sivu tekee juuri sen."
+          ],
+          "ul": [
+            "**Tunnistaa neljä säiliötä** —— MKV / WebM ja MP4 / MOV.",
+            "**Tunnistaa neljä raidatyyppiä** —— pelkän tekstin raita, ASS-raita, WebVTT-raita, MP4:n mov_text / tx3g -raita.",
+            "**Vie neljä muotoa** —— SRT / VTT / ASS / TXT.",
+            "**Ei latausta palvelimelle, ei transkoodausta** —— lukee paloina offsetin mukaan, usean GB:n tiedosto ei vie muistia."
+          ]
+        },
+        {
+          "h2": "1 Lisää video",
+          "ps": [
+            "Vedä videotiedosto ensimmäiseen sarakkeeseen tai klikkaa ja valitse. Tunnistaa vain **MKV / WebM** ja **MP4 / MOV**, muut säiliöt eivät anna raitaa.",
+            "Tiedosto ei poistu koneeltasi — latausvaihetta ei ole. Työkalu lukee paloina offsetin mukaan, usean GB:n elokuva ei vie muistia, mutta ensimmäinen luku odottaa raitatietojen skannauksen."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Videon lisäysalue upotettujen tekstitysten poiminnan sivulla",
+            "cap": "Tukee MKV / WebM ja MP4 / MOV, tiedosto ei poistu laitteesta"
+          }
+        },
+        {
+          "h2": "2 Upotetut tekstitysraidat",
+          "ps": [
+            "Lukemisen jälkeen toinen sarake listaa tiedoston tekstitysraidat, **yksi raita per rivi**, yleensä kielellä ja nimellä (esimerkiksi ”Chinese”, ”English”, ”Pakolliset tekstitykset”). Klikkaus raidalla poimii sen.",
+            "Jos tiedostossa on vain yksi tekstitysraita, poiminta alkaa itsestään, ilman klikkausta.",
+            "**Kuvatekstityksiä ei voi poimia**: Blu-ray PGS ja DVD-tekstitykset ovat poltettuja kuvia, ei ole tekstiä otettavaksi — sivu sanoo sen selvästi, siellä tarvitaan OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Luettelo upotetuista tekstitysraidoista, yksi raita per rivi",
+            "cap": "Yksi raita per rivi; yhdellä raidalla poiminta alkaa itsestään"
+          }
+        },
+        {
+          "h2": "3 Tulos",
+          "ps": [
+            "Sarake ”3 Tulos” oikealla näyttää poimitun tekstitystekstin, ylhäällä valitaan vientimuoto: **SRT / VTT / ASS / TXT**, paina ”Lataa” tai ”Kopioi”.",
+            "Kun lähderaiders on ASS, sen tyylin otsake ja resoluutio tuodaan sellaisinaan — ASS-vienti säilyttää ne, SRT-vienti tuo vain tekstin."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Tulosalue ja muodon valinta SRT / VTT / ASS / TXT",
+            "cap": "Neljä vientimuotoa; ASS-raiderin tyylin otsake ja resoluutio säilyvät"
+          }
+        },
+        {
+          "h2": "Mikä pysyy koskemattomana",
+          "ps": [
+            "Itse videotiedosto ei muutu lainkaan — vain lukemista, ei kirjoitusta, ei transkoodausta eikä uudelleenpakkausta.",
+            "Tekstityksen sisältö otetaan sellaisenaan, merkistöä ei arvailla eikä aikajanaa korjata. Jos poimitut tekstitykset ovat rikki, se on lähderaiderin merkistöongelma, mene [[Merkistön korjaus|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Eikö kuvatekstityksille (PGS / DVD) todella ole keinoa?** Tällä sivulla ei — ne ovat kuvia ilman tekstikerrosta. Ensin tarvitaan OCR, tämä sivu ei tee sitä.",
+            "**Poimituissa tekstityksissä on väärä aika?** Sivu ei korjaa aikajanaa, tulos on mikä on. Kokonaissiirto tai suhdeongelma kohdassa [[Aikajanan säätö|/shift.html]].",
+            "**Miksi kestää kauan ennen kuin jotain tapahtuu?** Suuri tiedosto pitää skannata paloina offsetin mukaan, mitä suurempi, sitä kauemmin; kaikki tapahtuu paikallisesti, ei liity verkon nopeuteen.",
+            "**Toimivatko ulkoiset tekstitystiedostot täällä?** Ei tarvitse — ulkoiset .srt / .ass menevät suoraan kohtaan [[Muunnos muotoon|/convert.html]] tai toiseen työkaluun, tämä sivu on videoon upotetuille."
+          ]
+        },
+        {
+          "h2": "Tietosuoja",
+          "ps": [
+            "Video luetaan kokonaan paikallisesti selaimessa, sitä ei ladata palvelimelle, ei transkoodata eikä käsitellä palvelimella. Kun suljet sivun, luettu sisältö vapautuu."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Poiminnan jälkeen tarvitset käännöksen, mene [[Tekstitysten käännös|/translate.html]], kaksikieliseen katso [[Kaksi tapaa tehdä kaksikieliset tekstitykset|/guides/make-bilingual-subtitles.html]]; ero upotetun ja ulkoisen välillä ja mitä voi saada, katso [[Näin saat videoon upotetut tekstitykset ulos|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "fi": {
+      "seo": {
+        "title": "Näin korvaat tekstitysten terminologian massana – AI-SRTSub",
+        "desc": "Sanastotaulukko, yksi rivi per sääntö, erota vanha ja uusi termi merkillä ->, =>, → tai Tab, #-alkuinen rivi on kommentti. Koko sanan vastaavuus, muutokset listataan.",
+        "h1": "Näin korvaat tekstitysten terminologian massana",
+        "intro": "Yksi sanastotaulukko yhtenäistää ilmaisun koko tekstitystiedostossa kerralla — aikajana, ASS-tyyli ja VTT:n NOTE-lohko eivät muutu merkkiäkään.",
+        "ctaText": "Avaa termien korvaus"
+      },
+      "body": [
+        {
+          "h2": "Mitä tämä työkalu ratkaisee",
+          "ps": [
+            "Tekstityksissä sama sana käännetään eri tavalla, henkilöiden ja paikkojen nimet seuraavat konekäännöstä, toisten tekstityksiä pitää sovittaa omiin tapoihin — näillä muutoksilla on yhteinen piirre: muutetaan sanaa, ei rakennetta. Tämä sivu muuttaa vain sanoja."
+          ],
+          "ul": [
+            "**Yhtenäistä käännösnimet** —— henkilöiden nimet, paikat, erisnimet johdonmukaisesti alusta loppuun.",
+            "**Massakorjaus** —— yksi koneen väärin kääntämä sana vaihdetaan koko tiedostosta kerralla.",
+            "**Ota tavat käyttöön** —— toisen tekstitykset järjestetään oman käytön mukaan.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** kuusi muotoa tunnistetaan."
+          ]
+        },
+        {
+          "h2": "Kaksi asiaa: tekstitykset ja sanastotaulukko",
+          "ps": [
+            "Sarake ”1 Syötä tekstitykset” vasemmalla lataa tekstitystiedoston, myös sisällön liittäminen suoraan onnistuu; jos meni väärin, paina ”Tyhjennä”.",
+            "Sarakkeeseen ”2 Sanastotaulukko” oikealla kirjoitat säännöt. **Yksi rivi per sääntö**, erota vanha ja uusi termi merkillä `->`, `=>`, `→` tai Tab, kaikki neljä tapaa tunnistetaan; rivin alussa oleva `#` on kommentti, se ei osallistu korvaukseen.",
+            "Jos et ole varma muodosta, paina ”Täytä esimerkki” ja muokkaa sen mukaan."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Tekstitysten syöttöalue ja sanastotaulukon kirjoitusalue korvaussivulla",
+            "cap": "Vasemmalla tekstitykset, oikealla säännöt; yksi rivi per sääntö, erotettuna merkillä ->"
+          }
+        },
+        {
+          "h2": "Miten sanastotaulukko kirjoitetaan",
+          "ps": [
+            "Yksi rivi, yksi sääntö, vasemmalla nykyinen termi, oikealla mihin se vaihdetaan. Esimerkiksi `Thor -> Ukkonen` vaihtaa ”Thor”-esiintymät koko tiedostossa muotoon ”Ukkonen”.",
+            "Kommentti alkaa `#`-merkillä, kätevä säännöstön ryhmittelyyn (esimerkiksi ”# Ensimmäisen kauden nimien yhtenäistys”) ja säännön väliaikaiseen poistamiseen käytöstä — lisää `#` eteen, ei tarvitse poistaa.",
+            "Säännöt suoritetaan ylhäältä alas; yhden säännön tuottama sana käy läpi myös seuraavat säännöt. Kun järjestyksellä on väliä (ensin A:sta B:ksi, sitten B:stä C:ksi), se pitää huomioida."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Korvaussääntöjen rivit sanastotaulukon kentässä",
+            "cap": "Yksi rivi per sääntö; #-alkuinen rivi on kommentti, sillä voi poistaa säännön väliaikaisesti käytöstä"
+          }
+        },
+        {
+          "h2": "Mitä kukin kolmesta kytkimestä ohjaa",
+          "ps": [
+            "**Laajuus**: `Kaikki` / `Vain rivi 1` / `Vain rivi 2`. Kaksikielisissä tekstityksissä, jos haluat muuttaa vain käännöstä, valitse ”Vain rivi 2”; yhden rivin merkinnät eivät muutu näissä kahdessa tilassa — työkalu ei arvaa, kumpi puoli on alkuperäinen.",
+            "**Koko sanan vastaavuus**: vaihtaa vain siellä, missä sana seisoo yksin, `art` ei koske sanaan `start`. Kielissä ilman välilyöntejä, kuten kiinassa ja japanissa, kytkin ei toimi — korvaus tehdään merkkijonon mukaan.",
+            "**Erota isot ja pienet kirjaimet**: oletuksena ei erota, `CEO` ja `ceo` vaihtuvat yhdessä; rastitettuna vain täsmälleen sama kirjoitusasu."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Laajuus-, koko sanan vastaavuus- ja kirjainkoko-kytkimet sanastotaulukon alla",
+            "cap": "Laajuus määrää, mikä rivi muuttuu, sanavastaavuus ja kirjainkoko sen, miten tiukasti täsmäytetään"
+          }
+        },
+        {
+          "h2": "Mitä muuttui, voi perua merkintä kerrallaan",
+          "ps": [
+            "”3 Tulos” korvauksen jälkeisten tekstitysten lisäksi myös **listaa jokaisen muutoksen**: mikä merkintä, mikä rivi, mistä mihin.",
+            "Merkinnän, jota et halua muuttaa, palautat yhdellä klikkauksella listassa, ei tarvitse muuttaa taulukkoa ja ajaa uudelleen. Vahvistuksen jälkeen paina ”Lataa” tai ”Kopioi”."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Tulosalue ja muutosluettelo merkinnöittäin",
+            "cap": "Muutokset listataan merkinnöittäin, ei-toivottu palautuu yhdellä klikkauksella"
+          }
+        },
+        {
+          "h2": "Mikä pysyy koskemattomana",
+          "ps": [
+            "**Aikajana, ASS:n tyylirivit ja VTT:n `NOTE`-lohko eivät muutu merkkiäkään.** Korvaus vaikuttaa vain dialogin tekstiin, ei rakenn eriveihin.",
+            "Sanastotaulukko ei itse muuta tekstitystiedostoasi — tulos on uusi tuloste, alkuperäinen tiedosto pysyy."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Miksi jokin sana ei vaihtunut?** Tarkista ensin laajuus: valinnalla ”Vain rivi 2” yhden rivin merkinnät eivät muutu; sitten koko sanan vastaavuus, rastitettuna esiintymät, jotka eivät muodosta sanaa, eivät vaihdu.",
+            "**Kiinassa on koko sanan vastaavuus rastitettu, mutta silti korvataan merkkijonon mukaan?** Se on normaalia. Kiina ja japani eivät erota sanoja välilyönnillä, työkalulla ei ole tapaa määrittää sanan rajaa, tila ei toimi.",
+            "**Menikö väärin, miten palautan kaiken?** Palauta merkintä kerrallaan muutosluettelossa; jos haluat alusta, tyhjennä taulukko ja syötä tekstitykset uudelleen.",
+            "**Voiko ASS:n tyylirivi muuttua vahingossa?** Ei. Tyylirivit ja `NOTE`-lohko eivät ole korvauksen laajuudessa, vain dialogin teksti osallistuu."
+          ]
+        },
+        {
+          "h2": "Tietosuoja",
+          "ps": [
+            "Tekstitykset ja sanastotaulukko käsitellään kokonaan selaimessa, niitä ei ladata palvelimelle eikä käsitellä palvelimella. Taulukkoa ei tallenneta, seuraavalla kerralla se on tyhjä."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Kannattaako sanasto perustaa ja miten sitä ylläpidetään koko kausi, katso [[Sanasto: yhtenäinen terminologia koko kauden|/guides/subtitle-glossary.html]]; likainen sisältö (vesileimat, kuulovammaisten kuvaukset) ensin kohdassa [[Tekstitysten siivous|/clean.html]]; kun nimet on yhtenäistetty ja tarvitset käännöksen toiselle kielelle, mene [[Tekstitysten käännös|/translate.html]]; lopputuote käy läpi [[Tekstitysten tarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "fi": {
+      "seo": {
+        "title": "Näin saat videoon upotetut tekstitykset ulos – AI-SRTSub",
+        "desc": "Kun tekstitykset on upotettu videoon, miten ne saa ulos: mitä MKV / WebM / MP4 / MOV sisältävät, miten tekstiraita, ASS, WebVTT ja mov_text eroavat, miksi kuvista ei saa tekstiä.",
+        "h1": "Näin saat videoon upotetut tekstitykset ulos",
+        "intro": "Tekstitykset voivat olla videotiedoston sisällä tai seisoa erikseen ulkona. Sisällä ollessaan ne ovat yksi säiliön raita — ulosotto ei liity transkoodaukseen.",
+        "ctaText": "Avaa tekstitysten poiminta videosta"
+      },
+      "body": [
+        {
+          "h2": "Missä tekstitykset ovat: upotetut ja ulkoiset",
+          "ps": [
+            "Videotiedosto (MKV, MP4) on säiliö, joka sisältää samanaikaisesti videoraidan, ääniraidan ja tekstitysraidan. Kun tekstitykset ovat sisällä, niitä kutsutaan **upotetuiksi** tai **sisäänkoodatuiksi**; erillinen .srt / .ass -tiedosto ulkona on **ulkoinen**.",
+            "Ulkoisia tekstityksiä voi käyttää suoraan. Ongelma on upotetuissa: haluat muuttaa, kääntää, käyttää alkuperäisraitaa kaksikieliseen, mutta sinulla ei ole yhtään tekstitystiedostoa — raita pitää ensin lukea säiliöstä. Tämä vaihe ei ole transkoodausta, videota ei koodata uudelleen, vain otetaan se datan pala, joka säiliössä jo on."
+          ]
+        },
+        {
+          "h2": "Mitä kukin säiliö sisältää",
+          "ps": [
+            "Eri säiliöt sisältävät eri tekstitysmuotoja, ja ulosoton vaikeus vaihtelee:"
+          ],
+          "ul": [
+            "**MKV / WebM** —— sallivin, sisältää pelkän tekstin raidan, ASS-raidan, WebVTT-raidan, usein myös monikielisiä raitoja.",
+            "**MP4 / MOV** —— yleensä `mov_text` / `tx3g` -raita, pelkkää tekstiä vähäisin tyylitiedoin.",
+            "**Pelkän tekstin raita** —— ulos tulee tekstiä, suoraan SRT.",
+            "**ASS-raita** —— sisältää tyylin otsakkeen ja resoluution, ASS-vienti säilyttää ne, SRT-vienti jättää vain tekstin.",
+            "**Kuvatekstitykset (Blu-ray PGS, DVD-tekstitykset)** —— tallentavat kuvaa, ei tekstiä, tekstiä ei saa ulos."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Upotettujen tekstitysten sivulla listatut tekstitysraidat",
+            "cap": "Yksi raita per rivi, yleensä kielellä ja nimellä; yhdellä raidalla poiminta alkaa itsestään"
+          }
+        },
+        {
+          "h2": "Miksi kuvatekstityksistä ei saa tekstiä",
+          "ps": [
+            "Blu-ray PGS ja DVD-tekstitykset eivät tallenna merkkejä, vaan kuvia, joissa on läpinäkyvyyskanava. Kun soitin näyttää ne, se ”liimaa kuvaa”, ei ”renderöi tekstiä”.",
+            "Siksi sellaisessa raidassa ei ole tekstiä luettavaksi — ei siksi, ettei työkalu tukisi, vaan koska siellä ei yksinkertaisesti ole tekstiä. Sivu sanoo sen selvästi kohdatessaan tällaisen raidan.",
+            "Tekstin saamiseksi on yksi reitti: tunnista ensin kuvan teksti (OCR), sitten tee tekstitykset. Se on eri työvaihe kuin ”raidan ottaminen ulos”."
+          ]
+        },
+        {
+          "h2": "Ulosoton jälkeen yleensä vielä käsitellään",
+          "ps": [
+            "Ulos otetut tekstitykset ovat ”sellaisinaan”, työkalu ei arvaa merkistöä eikä korjaa aikajanaa. Siksi kaksi asiaa on hyvin yleisiä:",
+            "Ensinnäkin **rikkinäinen teksti** — lähderaiderin oma merkistöongelma, ulos tulee rikkinäisenä, pitää kohdassa [[Miten merkistön korjaat|/guides/repair.html]] tunnistaa merkistö; toiseksi **väärä aika** — lähde logoineen tai ilman, kuvataajuus ei täsmää, tulos on siirtynyt kokonaan, käytä [[Aikajanan säätö|/shift.html]] siirtoon tai suhteelliseen skaalaukseen.",
+            "Sen jälkeen jos tarvitset käännöksen, mene [[Tekstitysten käännös|/translate.html]], kaksikieliseen katso [[Kaksi tapaa tehdä kaksikieliset tekstitykset|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Tulosalue ja neljä vientimuotoa SRT / VTT / ASS / TXT",
+            "cap": "Ulos otetut tekstitykset voi viedä neljässä muodossa, ASS-raiderin tyylin otsake ja resoluutio säilyvät"
+          }
+        },
+        {
+          "h2": "Muutama helposti väärin ymmärretty asia",
+          "ps": [
+            "**Tekstitysten ottaminen ulos ei ole hardsub.** Videota ei transkoodata, kuvan laatu ja ääniraita eivät muutu lainkaan.",
+            "**Ulosotto ei vaikuta alkuperäiseen tiedostoon.** Vain lukemista, ei kirjoitusta, videotiedosto ei muutu tavuakaan.",
+            "**Suuri tiedosto on hidas kokonsa takia, ei verkon.** Työkalu skannaa raitatiedot paloina offsetin mukaan, mitä suurempi tiedosto, sitä kauemmin, kaikki paikallisesti.",
+            "**Ulkoiset tekstitykset eivät kulje tämän sivun kautta.** Jos sinulla on .srt / .ass, mene suoraan kohtaan [[Muunnos muotoon|/convert.html]], vain videoon upotetut tarvitsevat raidan ulosoton ensin."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Koko työvaihe kohdassa [[Näin poimit videoon upotetut tekstitykset|/guides/videosub.html]]; ulosoton jälkeen tarvitset käännöksen, mene [[Tekstitysten käännös|/translate.html]], kaksikieliseen katso [[Kaksi tapaa tehdä kaksikieliset tekstitykset|/guides/make-bilingual-subtitles.html]]; rikkinäinen teksti ensin kohdassa [[Merkistön korjaus|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "fi": {
+      "seo": {
+        "title": "Näin tahdistat sanoitukset LRC-tiedostoon – AI-SRTSub",
+        "desc": "Näin teet LRC-tiedoston alusta: liitä yksi rivi per lause, kuuntele ja napauta aika, kolme tavallista pikanäppäintä, milloin ohittaa rivi ja mitä tehdä kun aika siirtyy.",
+        "h1": "Näin tahdistat sanoitukset LRC-tiedostoon",
+        "intro": "LRC on ”yksi sanoitusrivi + yksi aikapiste”. Sen tekemistä kutsutaan tahdistukseksi: kirjaat hetken, jolloin kukin lause alkaa.",
+        "ctaText": "Avaa sanoitusten tahdistus"
+      },
+      "body": [
+        {
+          "h2": "Mitä tahdistuksessa tehdään",
+          "ps": [
+            "LRC-tiedoston rakenne on hyvin yksinkertainen: yksi rivi, yksi sanoituslause, edessä aikaleima `[mm:ss.xx]`. Soitin saapuu riville ja näyttää lauseen juuri sillä hetkellä.",
+            "Koko työ ”tee LRC-tiedosto” on siis antaa jokaiselle lauseelle yksi aikapiste — sitä kone ei voi tehdä puolestasi, koska sen pitää arvioida ”mistä tämä lause alkaa laulaa”, ja se onnistuu vain kuuntelemalla."
+          ]
+        },
+        {
+          "h2": "Montako kierrosta kappale tarvitsee",
+          "ps": [
+            "Kannattaa miettiä minuutti ennen aloitusta, se säästää suurimman osan uudelleen tekemisestä:"
+          ],
+          "ul": [
+            "**Yksi kierros** —— selkeä lauluääni, vähän rivejä, riittää suurin piirtein tahdissa pysyminen, yksi toisto ja merkintä riittää.",
+            "**Kaksi kierrosta** —— ensimmäinen karkea, toinen lause kerrallaan tarkistus, tavallinen tapa kun halutaan tarkkuutta.",
+            "**Tuonti ja korjaus** —— valmis LRC, vain muutama lause ei täsmää, tuodaan ja jatketaan ensimmäisestä rivistä ilman aikaa.",
+            "**Välisoitot ja puhtaasti instrumentaaliset osat** —— ei tarvitse tahdistaa, paina ”Ohita tämä rivi”, se ei tule vientiin.",
+            "**Päällekkäinen laulu** —— vain yksi alku voidaan merkitä, päällekkäinen osa lasketaan päälaulun rivin mukaan."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Kuuntele ja tahdista -alue: toista, merkitse rivi, peru, ohita rivi",
+            "cap": "Toiston aikana Enter on kätevin; jos meni väärin, paina Z ja merkitse rivi uudelleen"
+          }
+        },
+        {
+          "h2": "Liittämisvaihe ratkaisee sujuvuuden",
+          "ps": [
+            "Sanat liitetään yksi lause per rivi, tyhjät rivit ohitetaan. Tämän vaiheen rivijako on se, mitä myöhemmin tahdistat — jos liität ylimääräisiä rivejä, tahdistuksessa klikkaat useammin.",
+            "Voit liittää myös valmiin LRC:n: aikaleimat `[mm:ss.xx]` tunnistetaan automaattisesti, tuonnin jälkeen **jatkat ensimmäisestä rivistä ilman aikaa**, rivit joilla on aika, eivät toistu.",
+            "Siksi puolivalmis LRC voidaan tallentaa, seuraavalla kerralla liittää ja jatkaa."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Sanoitusten liittämisalue ja jäsennä sanat -painike",
+            "cap": "Yksi lause per rivi; koko LRC:n liittäminen lukee olemassa olevat ajat ja jatkaa alaspäin"
+          }
+        },
+        {
+          "h2": "Vie LRC vai SRT",
+          "ps": [
+            "**Musiikkisoittimelle vie LRC.** foobar2000, eri soittimet ja sanoituksia näyttävät laitteet tunnistavat sen.",
+            "**Videoon tai jatkokäsittelyyn vie SRT.** Videon tekstitysraita, tekstitystyökalut ja leikkausohjelmat tunnistavat SRT:n. Viennissä jokainen rivi kestää seuraavan alkuun, viimeisellä on 2 sekuntia varaa.",
+            "Molemmat vievät vain rivit, joilla on aika — ohitetut rivit eivät tule tiedostoon."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Vientialue: lataa LRC, lataa SRT ja kopioi-painike",
+            "cap": "LRC soittimelle, SRT videolle; viedään vain rivit, joilla on merkitty aika"
+          }
+        },
+        {
+          "h2": "Muutama helposti väärin ymmärretty asia",
+          "ps": [
+            "**Valmistumisen jälkeen koko sisältö siirtyi hieman, käytä siirtoa.** Vie SRT ja siirrä koko sisältöä kohdassa [[Aikajanan säätö|/shift.html]], paljon nopeampaa kuin tahdistaa uudelleen rivi kerrallaan.",
+            "**Mitä pidemmälle, sitä suurempi siirtymä — se on nopeusongelma.** Kun äänen toistonopeus ei vastaa tallennusta, mitä pidemmälle mennään, sitä enemmän siirtymä kasvaa, siihen tarvitaan suhteellinen skaalaus, ei siirto.",
+            "**Pikanäppäimiä pitää käyttää sujuvasti.** Välilyönti toista/tauko, Enter merkitse rivi, Z peru rivi — toiston aikana paina suoraan Enter, ei tarvitse vaihtaa hiiren ja näppäimistön välillä.",
+            "**Äänenlaatu vaikuttaa tarkkuuteen.** Selkeä lauluääni kuuluu tarkemmin; live-versiot ja liian kova taustamusiikki vaikeuttavat täsmäytystä selvästi."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Koko työvaihe kohdassa [[Näin käytät sanoitusten tahdistusta|/guides/lrc.html]]; jos sinulla on LRC ja haluat tekstitykset, katso [[LRC SRT:ksi|/guides/lrc-to-srt.html]]; viedyn SRT:n aika on pielessä, käytä [[Aikajanan säätö|/shift.html]]; lopputuote käy läpi [[Tekstitysten tarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "fi": {
+      "seo": {
+        "title": "Sanasto: yhtenäinen terminologia koko kauden – AI-SRTSub",
+        "desc": "Sanasto ratkaisee ”sama sana joka kerta eri tavalla”: milloin kannattaa perustaa, miten käytät yhtä koko kauden, miksi koko sanan vastaavuus ei toimi kiinassa.",
+        "h1": "Sanasto: yhtenäinen terminologia koko kauden",
+        "intro": "Hahmo on jaksossa 1 nimeltään A, jaksossa 7 nimeltään B, katsoja luulee niitä kahdeksi hahmoksi. Sanasto estää sen — se kiinnittää, ”miksi sitä pitää kutsua”.",
+        "ctaText": "Avaa termien korvaus"
+      },
+      "body": [
+        {
+          "h2": "Sanasto ratkaisee ”epäjohdonmukaisuuden”",
+          "ps": [
+            "Tekstitysten sanastovirheet ovat kahdenlaisia: toinen ”tämä sana on käännetty väärin”, toinen ”sama sana käännetään joka kerta eri tavalla”. Ensimmäinen vaatii sanakirjan korjausta, toinen on sanaston asia.",
+            "Jälkimmäinen on yleisempi ja vaikeampi huomata: jaksossa 1 `Thor` käännetään ”Ukkonen”, jaksossa 7 siitä tulee ”Thor”, yksittäin mikään jakso ei näytä väärältä, peräkkäin katsoja luulee, että uusi hahmo ilmestyi. Sanasto tekee ”tässä elokuvassa sanotaan yhtenäisesti Ukkonen” -säännöstä suoritettavan ja soveltaa sitä kerran koko tekstitystiedostoon."
+          ]
+        },
+        {
+          "h2": "Milloin sanasto kannattaa perustaa",
+          "ps": [
+            "Jokainen tekstitystiedosto ei tarvitse sanastoa. Se kannattaa yleensä näissä tapauksissa:"
+          ],
+          "ul": [
+            "**Koko kausi / sarja** —— mitä enemmän jaksoja, sitä suurempi epäjohdonmukaisuuden todennäköisyys.",
+            "**Tiheästi erisnimiä** —— henkilöiden nimet, paikat, organisaatiot, teoksen keksityt sanat.",
+            "**Useampi tekijä** —— muutama jakaa jaksot, jokaisella omat tapansa.",
+            "**Toisen tekstitysten vastaanotto** —— pitää sovittaa omiin (tai asiakkaan) tapoihin.",
+            "**Yhtenäistys konekäännöksen jälkeen** —— konekäännös voi antaa samalle sanalle useita versioita."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Sanastotaulukon korvaussäännöt tyypeittäin ryhmiteltyinä",
+            "cap": "Komentoinneilla #-merkillä ryhmittelet säännöt, samalla voit poistaa säännön väliaikaisesti käytöstä"
+          }
+        },
+        {
+          "h2": "Miten yksi sanasto säilyy koko kauden",
+          "ps": [
+            "Sanastoa **ylläpidetään vaiheittain**: jaksossa 1 sovitaan nimet, myöhemmin jokaisesta uudesta sanasta lisätään rivi, kauden lopussa taulukko on täydellinen. Seuraavalla kerralla saman sarjan toisella kaudella otat sen lähtökohdaksi.",
+            "Väljemmin kirjoitetut säännöt ovat käytännöllisempiä — kun olet päättänyt yhtenäisestä ”Ukkonen”-muodosta, kirjoita myös ”Thor -> Ukkonen”, niin toisten tekstityksiä vastaanottaessa nekin tasataan.",
+            "Muutoksen jälkeen katso ehdottomasti **muutosluettelo**: se listaa jokaisen merkinnän, minkä rivin, mistä mihin. Luettelo on ainoa paikka vahvistaa ”muutettu oikein, ei liikaa”, merkinnän, jota et halua, palautat yhdellä klikkauksella."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Muutosluettelo merkinnöittäin tulosalueella",
+            "cap": "Muutokset listataan merkinnöittäin, ei-toivottu palautuu yhdellä klikkauksella"
+          }
+        },
+        {
+          "h2": "Mitkä muutokset eivät kuulu sanastolle",
+          "ps": [
+            "Sanasto muuttaa **sanoja**. Näitä kolmea se ei hoida eikä pitäisi hoitaa:",
+            "**Kielioppi ja lauserakenne** —— yksi sana ei muutu lauseeksi, lausetason korjaukset menevät kohtaan [[Tekstitysten käännös|/translate.html]] tai tehdään käsin.",
+            "**Sisällön siivous** —— vesileimat ja mainokset, kuulovammaisten kuvaukset kuuluvat kokonaisen rivin poistoon, kohtaan [[Tekstitysten siivous|/clean.html]], sanaston säännöt ovat korvaamista varten, eivät rivien poistamiseen.",
+            "**Aikajana** —— sanasto ei koske aikaan. Kokonaissiirto tai suhdeongelma kohdassa [[Aikajanan säätö|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Muutama helposti väärin ymmärretty asia",
+          "ps": [
+            "**Kiinassa on koko sanan vastaavuus rastitettu, mutta silti korvataan merkkijonon mukaan — se on normaalia.** Kiina ja japani eivät erota sanoja välilyönnillä, työkalulla ei ole tapaa määrittää sanan rajaa, tila ei toimi, suojaus tyyppiä `art` ei koske sanaan `start` toimii vain englannissa.",
+            "**Järjestys vaikuttaa tulokseen.** Säännöt suoritetaan ylhäältä alas, yhden säännön tuottama sana käy läpi seuraavat. Ensin A:sta B:ksi, sitten B:stä C:ksi, lopuksi saat C:n.",
+            "**Vain käännöksen muuttaminen vaatii laajuuden valinnan.** Kaksikielisissä vain rivi 2 tarkoittaa ”Vain rivi 2”; yhden rivin merkinnät eivät muutu näissä tiloissa — työkalu ei arvaa, kumpi puoli on alkuperäinen.",
+            "**Sanastoa ei tallenneta.** Joka avauksella se on tyhjä, sinun pitää itse tallentaa tekstitiedosto ja välittää se eteenpäin."
+          ]
+        },
+        {
+          "h2": "Liittyvät työkalut ja oppaat",
+          "ps": [
+            "Koko työvaihe kohdassa [[Näin korvaat tekstitysten terminologian massana|/guides/glossary.html]]; likainen sisältö ensin kohdassa [[Tekstitysten siivous|/clean.html]]; kun nimet on yhtenäistetty ja tarvitset käännöksen toiselle kielelle, mene [[Tekstitysten käännös|/translate.html]]; lopputuote käy läpi [[Tekstitysten tarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

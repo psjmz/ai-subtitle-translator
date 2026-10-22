@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Ses Dosyasından SRT Altyazı Oluşturma | AI-SRTSub",
+    "desc": "Tarayıcınızda konuşmayı metne dönüştürün, cümleleri zamanlayın ve SRT/VTT olarak dışa aktarın. Dosya yükleme gerektirmez, tamamen ücretsizdir.",
+    "kw": "sesi srt yapma,konuşmayı altyazıya çevirme,otomatik altyazı oluşturucu,sesi metne dökme,whisper altyazı,tarayıcı tabanlı konuşma tanıma,çevrimdışı altyazı oluşturma",
+    "intro": "Ses veya video dosyasını sürükleyip bırakın, dili ve modeli seçin; konuşma tanıma işlemi doğrudan tarayıcınızda gerçekleşir. Sonuç, zamanlaması ayarlanmış ve cümle yapısına göre bölünmüş bir altyazı taslağıdır.",
+    "feat": "Bu araç, ham konuşma verisini cümle yapısına, satır genişliğine ve okuma hızına göre optimize edilmiş profesyonel altyazı bloklarına dönüştürür.",
+    "who": "Kendi videolarına altyazı eklemek isteyen içerik üreticileri, podcast ve eğitim videolarını metne dönüştüren ekipler ve altyazı taslağına ihtiyaç duyan herkes içindir."
+  },
+  "ocrsub": {
+    "title": "Gömülü Altyazı OCR — Videodan Altyazı Çıkarma | AI-SRTSub",
+    "desc": "Videoya gömülü altyazıları OCR ile okuyun ve SRT/VTT olarak kaydedin. Alanı seçin, araç kare kare okusun. Tamamen ücretsiz ve tarayıcı tabanlıdır.",
+    "kw": "gömülü altyazı çıkarma,altyazı ocr,videodan altyazı alma,hardcoded altyazı ocr,video srt dönüştürücü,altyazı ayıklama,görüntüden metne altyazı",
+    "intro": "Videoyu yükleyin, altyazıların bulunduğu alanı işaretleyin; araç kare kare okuma yaparak aynı metinleri zamanlanmış tek bir altyazı bloğunda birleştirir.",
+    "feat": "Gömülü altyazılar, ekranın alt kısmındaki sabit bir alandan parlaklık farkı kullanılarak ayrıştırılır ve OCR teknolojisi ile metne dönüştürülür.",
+    "who": "Yabancı videoları yerelleştiren altyazı ekipleri, eski sürümleri yeniden altyazılayanlar ve orijinal altyazı dosyası olmayan editörler içindir."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "SEO": {
+    "en": { "desc": "Free AI subtitle translator — no signup, no limits, no watermark. Turn subtitles of foreign films, series and documentaries into your language in one click." },
+    "fr": { "desc": "Traducteur de sous-titres IA gratuit — sans inscription. Traduisez en un clic les sous-titres de films étrangers, séries et documentaires dans votre langue." },
+    "ro": { "title": "AI-SRTSub - Traducător AI subtitrări, filme și seriale" }
+  },
+  "SEO_BILINGUAL": {
+    "de": { "title": "Zweisprachige Untertitel trennen - nur eine Sprache behalten" },
+    "fr": { "title": "Séparer les sous-titres bilingues - ne garder qu'une langue" },
+    "ro": { "title": "Separă subtitrările bilingve - păstrează o singură limbă" }
+  },
+  "SEO_CONVERT": {
+    "es": { "title": "Conversor de subtítulos - SRT / VTT / ASS / SBV / LRC / TXT" },
+    "fr": { "title": "Convertisseur de sous-titres - SRT, VTT, ASS, SBV, LRC, TXT" },
+    "it": { "title": "Convertitore di sottotitoli - SRT, VTT, ASS, SBV, LRC, TXT" },
+    "ro": { "title": "Convertor de subtitrări - SRT / VTT / ASS / SBV / LRC / TXT" }
+  },
+  "SEO_TRANSLATE": {
+    "fi": { "desc": "Lataa SRT / VTT / ASS -tekstitys, valitse kieli ja saat tekstityksen omallasi: lukittu aikajana, yhtenäinen sanasto, automaattiset rivinvaihdot. 75 kieltä, ilmainen, ei rekisteröitymistä." },
+    "fr": { "desc": "Déposez un fichier SRT / VTT / ASS, choisissez la langue cible et obtenez des sous-titres dans votre langue : synchronisation automatique, glossaire cohérent, retours à la ligne automatiques. 75 langues, gratuit, sans inscription." },
+    "sv": { "desc": "Ladda upp en SRT / VTT / ASS-fil, välj målspråk och få undertexter på ditt språk: automatisk tidslinjejustering, enhetlig terminologi, automatiska radbrytningar. 75 språk, gratis, ingen registrering." }
+  },
+  "SEO_SHIFT": {
+    "hi": { "desc": "पूरी समय रेखा खिसकाएँ, गुणक से स्केल करें, या दो बिंदुओं से ठीक करें। छोटी पंक्तियाँ मिलाई और लंबी बाँटी जा सकती हैं; SRT, VTT, ASS, SBV, LRC, TXT सब चलते हैं।", "title": "सबटाइटल समय समायोजन - खिसकाएँ, स्केल करें, मिलाएँ और बाँटें" },
+    "id": { "title": "Penyesuaian waktu subtitle - geser, skala, gabung dan pisah" },
+    "th": { "desc": "เลื่อนทั้งไทม์ไลน์ ปรับสัดส่วนด้วยอัตรา หรือแก้ด้วยจุดอ้างอิงสองจุด รวมบรรทัดเล็กและแบ่งบรรทัดยาวได้ ใช้ได้กับ SRT, VTT, ASS, SBV, LRC และ TXT" }
+  },
+  "SEO_VIDEOSUB": {
+    "fi": { "title": "Pura upotetut tekstitykset MKV/MP4-tiedostosta SRT-muotoon" }
+  }
+}

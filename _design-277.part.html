@@ -1,0 +1,349 @@
+<style>
+/* ============================================================================
+   v0.9.277 首页改版样张：顶部四张工具小卡 + 每个工具一段图文详解
+   配色沿用 v0.9.276 的三色线，新增第四条「视频下载」线（--dl，蓝）。
+   全站禁渐变；按钮无 emoji；图标一律内联 SVG。
+   ============================================================================ */
+:root{
+  --dl:#2563C9; --dl-ink:#1E52A8; --dl-weak:#E8EFFC; --dl-line:#C6D8F6;
+}
+.vh{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---------------- 顶部：四张工具小卡 ---------------- */
+.tools{position:relative;z-index:1;max-width:1080px;margin:30px auto 0;padding:0 24px}
+.tools-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tc{--k:var(--tr);--kw:var(--tr-weak);--ki:var(--tr-ink);--kl:var(--tr-line);
+  position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:14px 15px 13px;text-decoration:none;color:inherit;overflow:hidden;
+  box-shadow:0 1px 2px rgba(18,18,24,.04);transition:border-color .15s,box-shadow .15s,transform .15s}
+.tc.cl{--k:var(--cl);--kw:var(--cl-weak);--ki:var(--cl-ink);--kl:var(--cl-line)}
+.tc.fx{--k:var(--fx);--kw:var(--fx-weak);--ki:var(--fx-ink);--kl:var(--fx-line)}
+.tc.dl{--k:var(--dl);--kw:var(--dl-weak);--ki:var(--dl-ink);--kl:var(--dl-line)}
+.tc:hover{border-color:var(--kl);box-shadow:0 8px 22px -16px rgba(18,18,24,.42);transform:translateY(-1px)}
+.tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--k);opacity:0;transition:opacity .15s}
+.tc:hover::before{opacity:1}
+.tc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:11px}
+.tc-ic{width:32px;height:32px;border-radius:9px;background:var(--kw);color:var(--ki);display:flex;align-items:center;justify-content:center;flex:none}
+.tc-ic svg{width:17px;height:17px}
+.tc-go{font-size:11px;font-weight:600;color:var(--ki);opacity:.8;padding-top:2px;white-space:nowrap}
+.tc-n{font-size:14px;font-weight:650;letter-spacing:-.1px;color:var(--ink);display:flex;align-items:center;gap:6px}
+.tc-d{margin:6px 0 0;font-size:11.8px;line-height:1.62;color:var(--sub)}
+@media (max-width:1000px){.tools-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.tools-row{grid-template-columns:1fr}}
+
+/* ---------------- 工具详解：左右交替 ---------------- */
+.det{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px}
+.det-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);gap:52px;align-items:center;
+  padding:46px 0;border-top:1px solid var(--line)}
+.det.first .det-in{border-top:0;padding-top:54px}
+.det.rev .det-tx{order:2}
+.det-tx{--k:var(--tr);--kw:var(--tr-weak);--ki:var(--tr-ink);--kl:var(--tr-line)}
+.det-tx.cl{--k:var(--cl);--kw:var(--cl-weak);--ki:var(--cl-ink);--kl:var(--cl-line)}
+.det-tx.fx{--k:var(--fx);--kw:var(--fx-weak);--ki:var(--fx-ink);--kl:var(--fx-line)}
+.det-tx.dl{--k:var(--dl);--kw:var(--dl-weak);--ki:var(--dl-ink);--kl:var(--dl-line)}
+.det-eye{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.3px;
+  padding:4px 12px;border-radius:99px;background:var(--kw);color:var(--ki)}
+.det h2{margin:15px 0 0;font-size:25px;font-weight:850;letter-spacing:-.5px;line-height:1.35;color:var(--ink)}
+.det-lead{margin:13px 0 0;font-size:13.8px;line-height:1.85;color:var(--sub)}
+.det-list{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.det-list li{position:relative;padding-left:23px;font-size:13px;line-height:1.7;color:var(--sub)}
+.det-list li::before{content:'';position:absolute;left:1px;top:.48em;width:10px;height:5px;
+  border-left:2px solid var(--k);border-bottom:2px solid var(--k);transform:rotate(-45deg)}
+.det-cta{display:inline-flex;align-items:center;gap:7px;margin-top:22px;height:40px;padding:0 18px;
+  border-radius:11px;background:var(--k);color:#fff;font-size:13.5px;font-weight:650;text-decoration:none;
+  transition:filter .15s,transform .15s}
+.det-cta:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.det-cta svg{width:14px;height:14px}
+.det-fig{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:22px;
+  box-shadow:0 12px 32px -26px rgba(18,18,24,.55)}
+@media (max-width:900px){
+  .det-in{grid-template-columns:1fr;gap:26px}
+  .det.rev .det-tx{order:0}
+  .det h2{font-size:21px}
+  .det-fig{padding:16px}
+}
+
+/* ---------------- 示意图（纯 CSS，无图片） ---------------- */
+.mk-note{margin:14px 0 0;font-size:11.5px;line-height:1.6;color:var(--mut);text-align:center}
+/* ① 翻译：播放器 + 两条时间轴 */
+.mk-play{background:#2F2D33;border-radius:12px;padding:18px 14px 15px;text-align:center}
+.mk-play .l1{display:block;font-size:12px;color:#B9B7C2;font-weight:600}
+.mk-play .l2{display:block;margin-top:6px;font-size:13.5px;color:#fff;font-weight:700}
+.mk-legend{display:flex;gap:14px;justify-content:flex-end;margin:16px 0 7px;font-size:10.5px;color:var(--mut)}
+.mk-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.mk-tl{position:relative;display:flex;flex-direction:column;gap:7px}
+.mk-tl-row{position:relative;height:12px}
+.mk-tl-row i{position:absolute;top:0;bottom:0;border-radius:3px;background:#C9C7D2}
+.mk-tl-row.d i{background:var(--tr);opacity:.42}
+.mk-tl::after{content:'';position:absolute;left:35%;top:-5px;bottom:-5px;border-left:1px dashed var(--line-strong)}
+/* ② 清洗：前后对照 */
+.mk-doc{border:1px solid var(--line);border-radius:12px;padding:13px 14px 9px;background:var(--card-2)}
+.mk-doc.ok{background:var(--cl-weak);border-color:var(--cl-line)}
+.mk-doc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.mk-doc-h .d{font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;background:#EFEFF3;color:var(--sub)}
+.mk-doc-h .d.bad{background:#F4F4F6;color:var(--sub)}
+.mk-doc-h .d.good{background:#fff;color:var(--cl-ink)}
+.mk-hit{font-size:10.5px;color:var(--mut)}
+.mk-p{margin:0 0 6px;font-size:12.3px;line-height:1.7;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-p s{color:var(--mut);text-decoration:line-through;text-decoration-thickness:1px}
+.mk-arrow{text-align:center;margin:10px 0;color:var(--mut);font-size:14px;line-height:1}
+/* ③ 特效：播放器 + 样式槽 */
+.mk-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mk-cap{display:block;font-size:10.5px;color:var(--mut);text-align:center;margin-bottom:6px}
+.mk-screen{position:relative;height:88px;border-radius:12px;background:#2F2D33;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;padding-bottom:14px;gap:5px}
+.mk-screen .l1{font-size:11px;color:#B9B7C2;font-weight:600}
+.mk-screen .l2{font-size:12.5px;color:#fff;font-weight:700}
+.mk-screen .l2.only{font-size:14px}
+.mk-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.mk-slot{--c:#6D5BD0;text-align:center;font-size:11px;font-weight:600;color:var(--sub);
+  border:1.5px solid var(--line);border-radius:9px;padding:7px 4px;background:var(--card)}
+.mk-slot::before{content:'';display:block;width:16px;height:16px;border-radius:5px;background:var(--c);margin:0 auto 5px}
+.mk-slot.on{border-color:var(--fx-line);background:var(--fx-weak);color:var(--fx-ink)}
+/* ④ 下载：客户端窗口 */
+.mk-win{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.mk-winbar{display:flex;align-items:center;gap:6px;padding:9px 11px;background:var(--card-2);border-bottom:1px solid var(--line)}
+.mk-winbar i{width:8px;height:8px;border-radius:50%;background:var(--line-strong);flex:none}
+.mk-url{margin-left:6px;flex:1;font-size:10.5px;color:var(--mut);background:#fff;border:1px solid var(--line);
+  border-radius:99px;padding:3px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-items{padding:4px 0}
+.mk-it{display:flex;align-items:center;gap:11px;padding:9px 12px;border-bottom:1px solid var(--line-soft,#F1F1F5)}
+.mk-it:last-child{border-bottom:0}
+.mk-thumb{width:34px;height:26px;border-radius:6px;background:var(--dl-weak);border:1px solid var(--dl-line);flex:none}
+.mk-it-tx{flex:1;min-width:0}
+.mk-it-tx b{display:block;font-size:12px;font-weight:650;color:var(--ink)}
+.mk-it-tx em{display:block;font-style:normal;font-size:10.5px;color:var(--mut);margin-top:2px}
+.mk-prog{display:block;height:3px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}
+.mk-prog i{display:block;height:100%;width:62%;background:var(--dl);border-radius:2px}
+.mk-st{font-size:11px;font-weight:700;color:var(--ok,#10B981);flex:none}
+.mk-st.run{color:var(--dl-ink)}
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     v0.9.277 首页（样张）：营销落地页
+     ================================================================ -->
+<div id="viewLanding">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+  <div class="wrap">
+    <nav class="lnav">
+      <div class="logo"><div class="logo-mark">字</div><span>随心字幕 AI</span> <span class="ver">v0.9.277</span></div>
+      <div class="spacer"></div>
+      <select id="uiLang2" aria-label="UI language"></select>
+    </nav>
+
+    <div class="hero">
+      <span class="spark s1">✨</span><span class="spark s2">🎬</span><span class="spark s3">💜</span>
+      <h1>字幕的活儿，<br><em>交给 AI</em></h1>
+      <p>翻译、清洗、特效字幕、视频下载——四个工具各干各的，想用哪个点哪个。<br>免费 · 免注册 · 隐私安全</p>
+    </div>
+  </div>
+
+  <!-- 顶部：四张工具小卡 -->
+  <section class="tools" aria-labelledby="toolsTitle">
+    <h2 class="vh" id="toolsTitle">四个工具</h2>
+    <div class="tools-row">
+
+      <a class="tc tr" href="/translate.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h11"/></svg></div>
+          <span class="tc-go">进入 →</span>
+        </div>
+        <div class="tc-n">字幕翻译</div>
+        <p class="tc-d">75 种语言互译，自动配轴、自动折行</p>
+      </a>
+
+      <a class="tc cl" href="/clean.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-7 8v6l-4-2v-4z"/></svg></div>
+          <span class="tc-go">进入 →</span>
+        </div>
+        <div class="tc-n">字幕清洗</div>
+        <p class="tc-d">去广告水印、听障提示，13 条规则可开关</p>
+      </a>
+
+      <a class="tc fx" href="/merge.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10M7 11.5h10"/></svg></div>
+          <span class="tc-go">进入 →</span>
+        </div>
+        <div class="tc-n">特效字幕</div>
+        <p class="tc-d">单语双语都能做特技：字体、颜色、描边、位置所见即所得</p>
+      </a>
+
+      <a class="tc dl" id="dlCard" href="https://risekol.com/video" target="_blank" rel="noopener">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></svg></div>
+          <span class="tc-go">前往 ↗</span>
+        </div>
+        <div class="tc-n">视频下载工具</div>
+        <p class="tc-d">RiseKol 下载器：视频、音频、字幕一起存到本地</p>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ① 字幕翻译 -->
+  <section class="det first" aria-labelledby="detTrTitle">
+    <div class="det-in">
+      <div class="det-tx tr">
+        <span class="det-eye">字幕翻译</span>
+        <h2 id="detTrTitle">把一整份外文字幕，翻成你的语言</h2>
+        <p class="det-lead">选好目标语言丢进来，句级合并、术语统一、折行排版一次做完。译文严格贴合原时间轴，导出的时间轴一条都不漂。</p>
+        <ul class="det-list">
+          <li>75 种语言互译，句级合并后按时长回填</li>
+          <li>自动提取专名生成术语表，全片译法一致</li>
+          <li>超长自动折行，按标点与词边界走，不劈词</li>
+          <li>导出单语 / 双语，SRT / VTT / ASS / SBV / TXT</li>
+        </ul>
+        <a class="det-cta" href="/translate.html">打开字幕翻译
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-play">
+          <span class="l1">Where are you going?</span>
+          <span class="l2">你要去哪儿？</span>
+        </div>
+        <div class="mk-legend">
+          <span><i style="background:#C9C7D2"></i>原文轴</span>
+          <span><i style="background:#D4206A;opacity:.42"></i>译文轴</span>
+        </div>
+        <div class="mk-tl">
+          <div class="mk-tl-row"><i style="left:0;width:31%"></i><i style="left:35%;width:24%"></i><i style="left:63%;width:37%"></i></div>
+          <div class="mk-tl-row d"><i style="left:0;width:31%"></i><i style="left:35%;width:24%"></i><i style="left:63%;width:37%"></i></div>
+        </div>
+        <p class="mk-note">一条对一条；需要合并拆分时按时长智能分配</p>
+      </div>
+    </div>
+  </section>
+
+<!--INSERT-ABILITIES-->
+
+  <!-- ② 字幕清洗 -->
+  <section class="det rev" aria-labelledby="detClTitle">
+    <div class="det-in">
+      <div class="det-tx cl">
+        <span class="det-eye">字幕清洗</span>
+        <h2 id="detClTitle">字幕拿到手，先过一遍水</h2>
+        <p class="det-lead">从网站扒下来的字幕总带着广告、水印和听障提示。13 条规则按需开关，改了什么逐条列给你看，还能一条条撤回——时间轴一动不动。</p>
+        <ul class="det-list">
+          <li>去水印广告、听障提示、HTML 标签与 ASS 特效标记</li>
+          <li>全大写、乱码、多余空行一并修掉</li>
+          <li>改动对照表逐条可还原，只改文本不动时间</li>
+          <li>源文件是双语 ASS 时，合并与翻转也在这做</li>
+        </ul>
+        <a class="det-cta" href="/clean.html">打开字幕清洗
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad">清洗前</span><span class="mk-hit">命中 4 处</span></div>
+          <p class="mk-p"><s>订阅我的频道 · 关注 Telegram 群</s></p>
+          <p class="mk-p">你今天看起来不错 <s>[笑声]</s></p>
+          <p class="mk-p"><s>&lt;font color="#fff"&gt;</s>我们走吧<s>&lt;/font&gt;</s></p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">清洗后</span><span class="mk-hit">时间轴未动</span></div>
+          <p class="mk-p">你今天看起来不错</p>
+          <p class="mk-p">我们走吧</p>
+        </div>
+        <p class="mk-note">逐条列出改了什么，可一条条还原</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ 特效字幕 -->
+  <section class="det" aria-labelledby="detFxTitle">
+    <div class="det-in">
+      <div class="det-tx fx">
+        <span class="det-eye">特效字幕制作</span>
+        <h2 id="detFxTitle">单语双语，都能做出片级特效</h2>
+        <p class="det-lead">手上是一条单语字幕，还是已经排好的双语，都能在这里定型：字体、字号、颜色、描边、位置、边距逐项调，预览就是你导出拿到的那一份。</p>
+        <ul class="det-list">
+          <li>单语整饰 / 调整已有双语 / 两份合成双语，三种模式</li>
+          <li>ASS 与 VTT 各一套模板，样式槽逐项微调</li>
+          <li>字体、颜色、描边、位置、安全边距全部可视调节</li>
+          <li>时间轴就地精修：整体偏移、比例缩放、重叠体检</li>
+        </ul>
+        <a class="det-cta" href="/merge.html">打开特效字幕制作
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-pair">
+          <div>
+            <span class="mk-cap">单语</span>
+            <div class="mk-screen"><span class="l2 only">♪ 爱在空中飘荡 ♪</span></div>
+          </div>
+          <div>
+            <span class="mk-cap">双语</span>
+            <div class="mk-screen"><span class="l1">♪ Love is in the air ♪</span><span class="l2">♪ 爱在空中飘荡 ♪</span></div>
+          </div>
+        </div>
+        <div class="mk-slots">
+          <span class="mk-slot on" style="--c:#6D5BD0">叙事</span>
+          <span class="mk-slot" style="--c:#0B7A5C">歌词</span>
+          <span class="mk-slot" style="--c:#D4206A">重点</span>
+          <span class="mk-slot" style="--c:#2563C9">自定义</span>
+        </div>
+        <p class="mk-note">预览 = 导出；样式槽改一项，整片跟着变</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ 视频下载 -->
+  <section class="det rev" aria-labelledby="detDlTitle">
+    <div class="det-in">
+      <div class="det-tx dl">
+        <span class="det-eye">视频下载工具</span>
+        <h2 id="detDlTitle">看到想要的视频，直接存下来</h2>
+        <p class="det-lead">RiseKol 视频下载器：粘个链接就能把视频、音频和原文字幕存到本地。桌面客户端，macOS 与 Windows 都有。</p>
+        <ul class="det-list">
+          <li>粘个链接就能下：视频、音频、字幕</li>
+          <li>macOS 与 Windows 桌面客户端</li>
+          <li>客户端自己下载，不依赖浏览器插件</li>
+        </ul>
+        <a class="det-cta" href="https://risekol.com/video" target="_blank" rel="noopener">前往下载
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-win">
+          <div class="mk-winbar"><i></i><i></i><i></i><span class="mk-url">https://www.youtube.com/watch?v=…</span></div>
+          <div class="mk-items">
+            <div class="mk-it">
+              <span class="mk-thumb"></span>
+              <span class="mk-it-tx"><b>视频 1080p</b><em>.mp4 · 已保存到「下载」</em></span>
+              <span class="mk-st">✓</span>
+            </div>
+            <div class="mk-it">
+              <span class="mk-thumb"></span>
+              <span class="mk-it-tx"><b>原文字幕</b><em>.srt</em></span>
+              <span class="mk-st">✓</span>
+            </div>
+            <div class="mk-it">
+              <span class="mk-thumb"></span>
+              <span class="mk-it-tx"><b>音轨</b><em>.m4a</em><span class="mk-prog"><i></i></span></span>
+              <span class="mk-st run">62%</span>
+            </div>
+          </div>
+        </div>
+        <p class="mk-note">视频、音轨、字幕分轨下载</p>
+      </div>
+    </div>
+  </section>
+
+<!--INSERT-TAIL-->
+
+</div>
+</body>
+</html>

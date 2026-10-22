@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Lyd til undertekster — lav tale til SRT i browseren | AI-SRTSub",
+    "desc": "Lyd eller video ind, undertekster ud: talegenkendelse kører i din browser, opdeler resultatet i cues og eksporterer SRT / VTT. Intet uploades, gratis.",
+    "kw": "lyd til srt,tale til undertekster,generer undertekster fra lyd,automatisk undertekstgenerator,transkriber lyd til srt,whisper undertekster,browser talegenkendelse,offline undertekstgenerering",
+    "intro": "Drop en lyd- eller videofil, vælg sprog og model, og genkendelsen kører direkte i din browser. Resultatet er et udkast til undertekster med timing, der allerede er opdelt i sætninger.",
+    "feat": "Værktøjet tager en strøm af ord og opdeler dem i korrekt formaterede undertekst-cues med linjebrydning, læsehastighedsoptimering og uden overlap.",
+    "who": "Indholdsskabere der tekster egne videoer, teams der omdanner podcasts til tekst, og alle der har brug for et redigerbart udkast til undertekster."
+  },
+  "ocrsub": {
+    "title": "OCR af indbrændte undertekster — læs tekst i video | AI-SRTSub",
+    "desc": "Indbrændte undertekster har intet spor at udtrække. Marker området, og værktøjet læser det billede for billede. SRT / VTT ud, gratis.",
+    "kw": "udtræk indbrændte undertekster,undertekst ocr,video undertekst udtrækning,indbrændte undertekster,ocr undertekster fra video,video til srt,undertekst fra video,ocr af indbrændte tekster",
+    "intro": "Drop en video, marker det område hvor underteksterne er placeret, og værktøjet læser billederne og samler identiske rammer til ét tidsbestemt cue.",
+    "feat": "Værktøjet beskærer undertekstområdet, binariserer pixels baseret på lysstyrke og genkender teksten for at skabe et tidsbestemt SRT-udkast fra indbrændte undertekster.",
+    "who": "Undertekstteams der lokaliserer korte udenlandske videoer, folk der gen-tekster gamle udgivelser, og redaktører uden adgang til originale undertekstfiler."
+  }
+}

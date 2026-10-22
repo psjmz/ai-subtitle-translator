@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 指南页模板（v0.9.325）：文章页与索引页共用，服务端按语言注入全部内容。
+     v0.9.325 版式重做（用户定案「照 Astro Starlight 做」+ 左分组导航）：
+       版心 1200 = 左分组导航 232 + 正文 668 + 右「本页内容」192；
+       顶栏与页脚同宽 1200；正文与 h1/导语/行动带/相关卡同一条左轴线（1280 视口实测 320）。
+       底部一条深色行动带是整页唯一的「重物」（页面其余全浅色，缺视觉落点）。
+     v0.9.323 视觉对齐主站的部分继续保留：挂全站统一导航 site-topnav.js、
+       页头/logo 与工具页同款、主色用 shift 的品牌紫 #4F46E5。
+     ⚠️ 不引 site-i18n / 任何 -core.js —— 界面语言由 URL 前缀决定（服务端已注入），不烧 API 钱。
+     ⚠️ 本页自身零版本位；唯一带 ?v= 的是 site-topnav.js 引用（与主站 16 页同一缓存键惯例）。
+     ⚠️ 默认标题放在 GUIDE-HEAD 标记内部：服务端整块替换（不会出现双标题），
+        直接用文件管理器打开时仍有兜底标题。 -->
+<!--GUIDE-HEAD-START-->
+<title>Guides – AI-SRTSub</title>
+<!--GUIDE-HEAD-END-->
+<style>
+  :root{
+    --ink:#16161A; --body:#3F3F49; --sub:#6B6B76; --mut:#8E8E99;
+    --line:#E7E7EE; --bd:#DADAE2; --soft:#F7F7F9; --card:#FFFFFF; --bg:#FFFFFF;
+    --acc:#4F46E5; --acc-dk:#4338CA; --acc-ink:#3B34B8; --tint:#EEF0FE; --deep:#17172B;
+    --sh:0 1px 2px rgba(18,18,24,.04);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+  a{color:var(--acc);text-decoration:none}
+  a:hover{text-decoration:underline}
+  img{max-width:100%}
+  :focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:6px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+  /* 页头（与工具页同款：brand 圆角方块 logo + 统一导航 + 语言下拉）；长文页吸顶 */
+  .gtop{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);background:var(--card)}
+  .gtop-in{max-width:1200px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px}
+  .gbrand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;
+    letter-spacing:-.2px;color:var(--ink);text-decoration:none;flex:none}
+  .gbrand:hover .dot{filter:brightness(1.08)}
+  .gbrand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .gtop select{height:34px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    font-size:13px;padding:0 8px;border-radius:8px;max-width:46vw;margin-inline-start:auto;flex:none}
+  html[dir="rtl"] .gtop-in{flex-direction:row-reverse}
+  html[dir="rtl"] .gtop select{margin-inline-start:0;margin-inline-end:auto}
+
+  /* 版心：三栏。⚠️ 顶栏/页脚同宽 1200，别留 1080 的旧宽（v0.9.323 就是这里不齐） */
+  .shell{max-width:1200px;margin:0 auto;padding:0 24px;display:grid;
+    grid-template-columns:232px minmax(0,1fr);column-gap:24px;align-items:start}
+  /* 索引页（cls=gidx）：没有正文小节，右栏「本页内容」整块收掉，正文占满整行 */
+  .gidx .cols{grid-template-columns:1fr}
+  .gidx .rail{display:none}
+
+  /* 左：分组导航（Starlight 骨架） */
+  .snav{position:sticky;top:60px;max-height:calc(100vh - 76px);overflow-y:auto;
+    padding:30px 20px 40px 0;border-inline-end:1px solid var(--line)}
+  html[dir="rtl"] .snav{padding:30px 0 40px 20px}
+  .snav-h{font-size:11.5px;font-weight:700;letter-spacing:.08em;color:var(--mut);margin:0 0 20px}
+  .snav-h a{color:var(--mut)}
+  .snav-h a:hover{color:var(--acc-ink)}
+  .snav-grp+.snav-grp{margin-top:22px}
+  .snav-grp h3{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--mut);margin:0 0 7px}
+  .snav ul{list-style:none;margin:0;padding:0}
+  .snav li{margin:1px 0}
+  .snav a{display:block;font-size:13.5px;line-height:1.45;color:var(--sub);padding:6px 10px;border-radius:8px}
+  .snav a:hover{color:var(--ink);background:var(--soft);text-decoration:none}
+  /* 当前项：实心紫底白字（照 Starlight，是首屏唯一的彩色块） */
+  .snav a[aria-current="page"]{color:#fff;background:var(--acc);font-weight:600}
+  .snav a[aria-current="page"]:hover{background:var(--acc-dk);color:#fff}
+
+  /* 中：正文 + 右：本页内容 */
+  .main{min-width:0;padding:34px 0 76px}
+  .ahead{padding-bottom:26px;border-bottom:1px solid var(--line)}
+  h1{font-size:32px;line-height:1.3;letter-spacing:-.022em;font-weight:700;margin:0 0 14px}
+  .gintro{font-size:18px;line-height:1.7;color:var(--sub);margin:0}
+  .ameta{margin-top:18px;font-size:13px;color:var(--mut);display:flex;gap:18px;flex-wrap:wrap}
+  .ameta:empty{display:none}   /* 索引页没有更新时间/分组，别留一道空 margin */
+  .ameta a{color:var(--acc-ink);font-weight:600}
+  .cols{display:grid;grid-template-columns:minmax(0,1fr) 192px;column-gap:36px;align-items:start}
+  .doc{min-width:0;padding-top:22px}
+  .doc p{color:var(--body);margin:16px 0;font-size:16.5px;line-height:1.78}
+  h2{font-size:24px;font-weight:650;letter-spacing:-.014em;line-height:1.36;margin:46px 0 14px}
+  .doc h2:first-child{margin-top:22px}
+  .doc ul{padding:0;margin:16px 0;list-style:none}
+  .doc li{position:relative;padding-inline-start:20px;margin:9px 0;color:var(--body)}
+  .doc li::before{content:"";position:absolute;inset-inline-start:2px;top:.72em;width:6px;height:6px;
+    border-radius:99px;background:#B9BEF9}
+  .gfig{margin:30px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px}
+  .gfig img{display:block;width:100%;height:auto;border-radius:6px}
+  .gfig figcaption{font-size:13px;color:var(--sub);padding:10px 2px 0;line-height:1.65}
+  strong{font-weight:700}
+
+  .rail{position:sticky;top:76px;padding-top:28px}
+  .rail h3{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--mut);margin:0 0 12px}
+  .toc a{display:block;font-size:13px;line-height:1.5;color:var(--sub);padding:5px 0 5px 12px;
+    border-inline-start:1px solid var(--line)}
+  html[dir="rtl"] .toc a{padding:5px 12px 5px 0}
+  .toc a:hover{color:var(--acc-ink);border-inline-start-color:var(--acc);text-decoration:none}
+  .toc a.on{color:var(--acc-ink);font-weight:600;border-inline-start-color:var(--acc)}
+
+  /* 底部：深色行动带 —— 整页唯一「重物」 */
+  .gcta{margin-top:60px;background:var(--deep);border-radius:14px;padding:30px 34px;
+    display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
+  .gcta p{margin:0;color:#fff;font-size:17px;font-weight:650;letter-spacing:-.012em;flex:1 1 260px}
+  .gcta p em{display:block;font-style:normal;font-size:13.5px;font-weight:400;
+    color:rgba(255,255,255,.66);margin-top:7px;letter-spacing:0}
+  .gbtn{display:inline-block;background:#fff;color:var(--deep);font-weight:650;font-size:15px;
+    padding:12px 26px;border-radius:9px;white-space:nowrap;transition:transform .2s ease-out,background-color .2s ease-out}
+  .gbtn:hover{background:#EDEDF4;text-decoration:none;transform:translateY(-1px)}
+  .gbtn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+  /* 相关指南 / 索引页分组卡片 */
+  .grelnav{font-size:20px;font-weight:650;margin:56px 0 14px;letter-spacing:-.012em}
+  .grel{list-style:none;padding:0;margin:0;display:grid;gap:10px;
+    grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+  .grel a{display:block;border:1px solid var(--line);border-radius:10px;padding:14px 16px;height:100%;
+    font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.5;
+    transition:border-color .2s ease-out,background-color .2s ease-out}
+  .grel a:hover{border-color:#C3C8FB;background:var(--tint);color:var(--acc-ink);text-decoration:none}
+  .ggrp{margin-bottom:44px}
+  .ghd{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .ggrp h2{font-size:20px;font-weight:650;margin:0;letter-spacing:-.012em}
+  /* 篇数做成小胶囊（数字 + 底色），比裸数字顶一行干净，且不用翻译单位。
+     ⚠️ 底色用 --soft(#F7F7F9) 太浅，实拍像一个浮着的小数字；改 --tint 淡紫才看得出是徽章 */
+  .ggrp em{font-style:normal;font-size:12px;font-weight:600;line-height:1.7;color:var(--acc-ink);
+    background:var(--tint);border-radius:99px;padding:2px 9px}
+  /* ⚠️ .glist 在 .doc 里面，会吃到 .doc li 的圆点与缩进 —— 索引卡要显式清掉 */
+  /* ⚠️ 上限不能写死 px：auto-fill 算列数时用的是轨道的「上限」，
+     minmax(276px,320px) 在 896 宽里只排得下 2 列（896+10 / 320+10 = 2）。
+     要 1fr 才会按 276 下限算成 3 列；单张卡不拉满整行靠 li 的 max-width 管。 */
+  .glist{list-style:none;padding:0;margin:0;display:grid;gap:10px;
+    grid-template-columns:repeat(auto-fill,minmax(276px,1fr))}
+  .glist li{padding:0;margin:0;max-width:400px}
+  .glist li::before{display:none}
+  .glist a{display:block;border:1px solid var(--line);border-radius:10px;padding:16px 18px;height:100%}
+  .glist b{display:block;font-size:15.5px;font-weight:650;color:var(--ink);letter-spacing:-.01em;line-height:1.45}
+  .glist span{display:block;font-size:13px;color:var(--sub);margin-top:6px;line-height:1.6}
+  .glist a:hover{border-color:#C3C8FB;background:var(--tint);text-decoration:none}
+  .glist a:hover b{color:var(--acc-ink)}
+
+  /* 页脚：与版心同宽 1200 */
+  .gfoot{border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
+  .gfoot-in{max-width:1200px;margin:0 auto;padding:22px 24px}
+  .gfoot a{color:var(--sub);margin-inline-end:14px}
+  .gfoot a:hover{color:var(--acc)}
+
+  @media (max-width:1080px){
+    .shell{grid-template-columns:1fr;column-gap:0}
+    .snav{position:static;max-height:262px;overflow-y:auto;border-inline-end:0;
+      border-bottom:1px solid var(--line);padding:20px 0}
+    html[dir="rtl"] .snav{padding:20px 0}
+    .cols{grid-template-columns:1fr}
+    .rail{display:none}
+    .main{padding-top:26px}
+  }
+  @media (max-width:576px){
+    .shell{padding:0 16px}
+    .gtop-in{padding:12px 16px}
+    h1{font-size:26px}.gintro{font-size:16.5px}h2{font-size:21px}
+    .doc p{font-size:16px}
+    .gcta{padding:24px;border-radius:12px}.gcta p{font-size:16px}
+    .gbtn{width:100%;text-align:center}
+    .grel{grid-template-columns:1fr}
+  }
+</style>
+<!--ANALYTICS-->
+</head>
+<body>
+  <header class="gtop">
+    <div class="gtop-in">
+      <!-- 品牌写死双语外的外语统一名（AI-SRTSub）；zh-CN/zh-TW 由下面内联脚本换 -->
+      <a class="gbrand" href="/" data-brand-zh="随心字幕 AI" data-brand-zhtw="隨心字幕 AI">
+        <span class="dot">字</span>
+        <span id="gbrandName">AI-SRTSub</span>
+      </a>
+      <!-- 全站统一导航（site-topnav.js 渲染，data-tool=gd → 顶栏「使用指南」高亮） -->
+      <span id="topNav"></span>
+      <select id="glang" aria-label="Language"><!--GUIDE-LANGS--></select>
+    </div>
+  </header>
+
+  <!-- ⚠️ GUIDE-CLS 是 class 属性里的占位符：文章页替换成空串、索引页替换成「 gidx」。
+       服务端一定会 replace，浏览器永远看不到占位符本身。 -->
+  <div class="shell<!--GUIDE-CLS-->">
+    <!-- 左：全站指南分组导航（按 kind 三组，当前篇 aria-current 高亮） -->
+    <nav class="snav" aria-label="Guides"><!--GUIDE-NAV-START--><!--GUIDE-NAV-END--></nav>
+
+    <div class="main">
+      <header class="ahead">
+        <h1><!--GUIDE-H1-START-->Guides<!--GUIDE-H1-END--></h1>
+        <p class="gintro"><!--GUIDE-INTRO-START--><!--GUIDE-INTRO-END--></p>
+        <div class="ameta"><!--GUIDE-META-START--><!--GUIDE-META-END--></div>
+      </header>
+
+      <div class="cols">
+        <article class="doc"><!--GUIDE-BODY-START--><!--GUIDE-BODY-END--></article>
+        <aside class="rail">
+          <h3><!--GUIDE-TOCH-START--><!--GUIDE-TOCH-END--></h3>
+          <nav class="toc"><!--GUIDE-TOC-START--><!--GUIDE-TOC-END--></nav>
+        </aside>
+      </div>
+
+      <!--GUIDE-CTA-START--><!--GUIDE-CTA-END-->
+      <!--GUIDE-REL-START--><!--GUIDE-REL-END-->
+    </div>
+  </div>
+
+  <footer class="gfoot">
+    <nav class="gfoot-in">
+      <a href="/guides/">Guides</a>
+      <a href="/translate.html">Translate</a>
+      <a href="/convert.html">Convert</a>
+      <a href="/shift.html">Shift</a>
+    </nav>
+  </footer>
+
+<script>
+(function () {
+  'use strict';
+  /* 界面语言 = URL 前缀（服务端已按它注入全部内容），客户端只做两件事：
+     ① 品牌名随语言换（zh-CN/zh-TW 专属写法）；② 语言下拉跳转同路径的其他语言版 */
+  var LS = ['zh-CN','zh-TW','en','ja','es','pt','ko','de','fr','id','hi','th','vi','ru','it','ar','tr','nl','pl','sv','cs','uk','da','fi','el','he','ro'];
+  var m = location.pathname.match(/^\/([^\/]+)(\/.*)?$/);
+  var pre = (m && LS.indexOf(m[1]) >= 0) ? m[1] : 'zh-CN';
+  /* zh-CN 的页面没有语言前缀，整条 pathname 才是「换语言时要保住的路径」；带前缀的语言版只取前缀后面的部分 */
+  var rest = (pre === 'zh-CN') ? location.pathname : m[2];
+  var brand = document.querySelector('.gbrand');
+  if (brand) {
+    if (pre === 'zh-CN') document.getElementById('gbrandName').textContent = brand.getAttribute('data-brand-zh');
+    else if (pre === 'zh-TW') document.getElementById('gbrandName').textContent = brand.getAttribute('data-brand-zhtw');
+  }
+  var sel = document.getElementById('glang');
+  /* option 由服务端按当前语言注入并选中；这里只管「换语言 = 同路径换前缀」 */
+  sel.addEventListener('change', function () {
+    var v = sel.value;
+    if (!v || v === pre) return;
+    location.href = (v === 'zh-CN' ? '' : '/' + v) + rest;
+  });
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  /* 右栏「本页内容」滚动跟随：当前视口内最靠上的小节加 .on（Starlight 同款 scrollspy）。
+     纯视觉增强，脚本失效时目录仍是普通锚点列表，不影响可用。 */
+  var links = document.querySelectorAll('.toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var map = {};
+  links.forEach(function (a) {
+    var id = (a.getAttribute('href') || '').slice(1);
+    var h = id && document.getElementById(id);
+    if (h) map[id] = a;
+  });
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      var a = map[e.target.id];
+      if (!a) return;
+      if (e.isIntersecting) {
+        links.forEach(function (x) { x.classList.remove('on'); });
+        a.classList.add('on');
+      }
+    });
+  }, { rootMargin: '-80px 0px -70% 0px' });
+  Object.keys(map).forEach(function (id) { obs.observe(document.getElementById(id)); });
+})();
+</script>
+<script src="/site-topnav.js?v=0.9.341" data-tool="gd"></script>
+</body>
+</html>

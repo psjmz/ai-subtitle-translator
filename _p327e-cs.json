@@ -1,0 +1,435 @@
+{
+  "translate": {
+    "cs": [
+      {
+        "h2": "Co nástroj řeší",
+        "ps": [
+          "Přeloží titulky z jednoho jazyka do druhého a hned je můžete exportovat jako hotový titulkový soubor. Typické případy použití:"
+        ],
+        "ul": [
+          "Cizojazyčné video s českými titulky, nebo český obsah s titulky v jiném jazyce",
+          "Překlad má tvořit dvojjazyčné titulky s originálem (originál nahoře nebo překlad nahoře)",
+          "Sjednocení jmen a místopisných názvů v celé sérii (glosář)",
+          "Doladění časové osy po překladu (posun nebo změna měřítka)"
+        ]
+      },
+      {
+        "h2": "Nahrání titulků",
+        "ps": [
+          "Klikněte na „Vybrat titulkový soubor“ nebo vložte text titulků přímo do pole v levém sloupci. Podporováno je šest formátů: SRT, VTT, ASS, SSA, SBV a TXT. Pokud soubor nemáte, klikněte na „Načíst ukázku“. Po úspěšném načtení se v prostředním sloupci objeví tabulka titulků s číslem, časovou osou a originálním textem u každé položky."
+        ],
+        "img": {
+          "file": "translate-upload",
+          "alt": "Import v překladovém nástroji: výběr titulkového souboru, pole pro vložení textu a tlačítko pro načtení ukázky",
+          "cap": "Levý sloupec „Import titulků“: vyberte soubor, vložte text nebo načtěte ukázku"
+        }
+      },
+      {
+        "h2": "Volba jazyka a stylu",
+        "ps": [
+          "„Zdrojový jazyk“ můžete nechat na automatickém rozpoznání, „cílový jazyk“ vybíráte ze 75 jazyků. K dispozici je pět stylů překladu: vyvážený (výchozí), přirozený mluvený, formální psaný, dabingový a vlastní. „Dabingový“ se hodí pro filmové dialogy, „formální psaný“ pro dokumenty a kurzy."
+        ],
+        "img": {
+          "file": "translate-lang",
+          "alt": "Nastavení jazyka a stylu překladu: zdrojový jazyk, cílový jazyk a pět stylů",
+          "cap": "„Jazyk“ a „styl překladu“: zdrojový jazyk lze rozpoznat automaticky, cílový vybíráte ze 75"
+        }
+      },
+      {
+        "h2": "Glosář: jednotná jména v celém filmu",
+        "ps": [
+          "AI překládá po dávkách a stejné jméno může v různých dávkách dopadnout dvakrát jinak. Zapište do glosáře „originál → jak se to musí přeložit“; před každou dávkou se v ní hledá a nalezené výrazy se použijí. Jeden záznam na řádek, jako šipka se uznává `->`, `=>`, `→` a Tab. Pokud uvedete jen originál, znamená to nechat bez překladu; několik podob téhož výrazu může sdílet jeden překlad pomocí `|`. Kliknutím na „✨ AI extrakce“ necháte AI nejdřív vytáhnout vlastní jména z filmu a vyplnit je do tabulky, pak je upravíte a přeložíte."
+        ],
+        "img": {
+          "file": "translate-glossary",
+          "alt": "Oblast termínů a vlastních jmen: pole glosáře a tlačítka AI extrakce a uložení",
+          "cap": "Glosář „Jednotná jména“: AI vytáhne vlastní jména, po uložení se načte automaticky"
+        }
+      },
+      {
+        "h2": "Průběh překladu",
+        "ps": [
+          "Klikněte na „▶ Spustit překlad“ v horní liště. Statistický pruh v prostředním sloupci v reálném čase ukazuje počet položek, přeložené, odstraněná výplňová slova a skupiny vět přes více položek; ukazatel průběhu uvádí odhad zbývajícího času a spotřebu tokenů. Během překladu můžete kdykoli kliknout na buňku překladu v tabulce a text opravit – změny se ukládají lokálně a po obnovení stránky se neztratí. Pokud stránku zavřete uprostřed, příště se nabídne pokračování tam, kde jste skončili. Když je celá věta rozdělená do několika titulků, skupina vět se přeloží jako celek a potom se rozdělí zpět podle délky jednotlivých položek."
+        ],
+        "img": {
+          "file": "translate-workspace",
+          "alt": "Pracovní plocha překladu: statistický pruh, ukazatel průběhu a upravitelná tabulka titulků",
+          "cap": "Prostřední sloupec: statistiky + průběh + tabulka titulků k editaci"
+        }
+      },
+      {
+        "h2": "Export",
+        "ps": [
+          "V pravém sloupci nejprve zvolte formu obsahu: jen překlad (jednojazyčně), dvojjazyčně s originálem nahoře, nebo dvojjazyčně s překladem nahoře. Potom formát souboru: SRT, WebVTT, SBV, ASS nebo TXT. Pro ASS jsou navíc k dispozici dvě rozvržení: „dvě obrazovky nad sebou“ a „dva řádky dole“. Obsah a formát lze libovolně kombinovat, celkem 14 variant exportu. Šířku řádku pro dvojjazyčné titulky nastavíte zvlášť. Kliknutím na „Stáhnout titulky“ soubor uložíte, „Kopírovat do schránky“ jej vezmete rovnou."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Panel exportu: tři formy obsahu, pět formátů souborů a nastavení šířky dvojjazyčného řádku",
+          "cap": "Export vpravo: nejdřív forma obsahu, potom formát souboru"
+        }
+      },
+      {
+        "h2": "Cena a soukromí",
+        "ps": [
+          "Výchozí model nevyžaduje registraci ani klíč a funguje hned, s limitem podle počtu požadavků: každá IP má denní limit a celý web má navíc společnou denní kvótu. Při větších objemech doporučujeme zadat vlastní API klíč v „Překladový engine“. Ochrana soukromí se řídí upozorněním na stránce: titulky překládané výchozím modelem se přes server webu předávají poskytovateli, zatímco vlastní API zpracovává přímo zvolený poskytovatel a klíč zůstává jen ve vašem prohlížeči. Načtení, zalamování řádků i dvojjazyčné rozvržení probíhají celé lokálně v prohlížeči."
+        ]
+      },
+      {
+        "h2": "Časté otázky",
+        "ps": [
+          "**Míchají se do překladu jiné jazyky?** Nástroj pozná, když překlad sklouzne do jiného jazyka, a automaticky jej přeloží znovu. Pokud i tak zůstane jedna položka špatně, klikněte na buňku a opravte ji ručně.",
+          "**Jak se zpracovávají řádky s textem písně?** V „Filtru obsahu“ jsou tři možnosti: text písně přeložit, ponechat originál, nebo text písně odstranit.",
+          "**Jsou jména nekonzistentní?** Doplňte odchylné podoby do glosáře a přeložte znovu; glosář má přednost před globálním nastavením „Zpracování vlastních jmen“.",
+          "**Chcete angličtinu nahoře a češtinu dole?** Při exportu zvolte „dvojjazyčně · originál nahoře“. Chcete-li češtinu nahoře, zvolte „dvojjazyčně · překlad nahoře“."
+        ]
+      },
+      {
+        "h2": "Související nástroje a návody",
+        "ps": [
+          "Když nesedí formát, jděte nejdřív na [[Převod formátů|/convert.html]]; když je špatná časová osa, použijte [[Úprava časové osy|/shift.html]]; než titulky odevzdáte, projděte je v [[Kontrola titulků|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  },
+  "clean": {
+    "cs": [
+      {
+        "h2": "Co nástroj řeší",
+        "ps": [
+          "Stažené titulky často obsahují věci, které tam nepatří. Čistič je odstraní podle pravidel na jeden průchod:"
+        ],
+        "ul": [
+          "Vodoznaky titulkových skupin, webové adresy a reklamní položky",
+          "Označení pro neslyšící (např. [kroky], (hudba)) a značky mluvčího",
+          "ASS efekty, HTML značky a řídicí znaky",
+          "Duplicitní položky, prázdné položky a nepořádek v interpunkci a mezerách"
+        ]
+      },
+      {
+        "h2": "Nahrání a rozpoznání",
+        "ps": [
+          "Soubor přetáhněte nebo vyberte, podporovány jsou SRT, VTT, ASS, SSA a TXT, případně vložte text titulků přímo. Kódování se rozpozná automaticky: když UTF-8 vrátí náhradní znaky, nástroj se vrátí ke GBK nebo Big5 a stránka oznámí „kódování opraveno podle {encoding}“. Pokud nahrajete dvojjazyčné titulky ve dvou stopách (dvě položky se zcela shodnou časovou osou, jedna čínská a jedna anglická), automaticky se sloučí do jednoho dvojjazyčného záznamu a objeví se přepínač „originál nahoře / překlad nahoře“."
+        ]
+      },
+      {
+        "h2": "Jak nastavit 13 pravidel",
+        "ps": [
+          "Rozhraní má 13 zaškrtávacích polí ve čtyřech skupinách: **značky a formát** (ASS efekty, HTML značky, řídicí znaky, řazení a přečíslování), **neslyšící a zvuky** (označení pro neslyšící, značky mluvčího, čistě písňové řádky), **vodoznaky a nepotřebné položky** (vodoznaky a reklama, duplicitní položky, prázdné položky) a **opravy textu** (interpunkce a mezery, oprava velkých písmen, spojování krátkých vět). Ve výchozím stavu jsou zapnuté jen bezpečné volby bez ztráty obsahu; ty, které mohou obsah ztratit (písňové řádky, oprava velkých písmen, spojování), jsou vypnuté a zapnete je podle potřeby. Každé pravidlo má po najetí myší vysvětlení ⓘ a každá změna zaškrtnutí se přepočítá okamžitě."
+        ],
+        "img": {
+          "file": "clean-opts",
+          "alt": "Nastavení čištění: 13 zaškrtávacích polí ve čtyřech skupinách, nahoře počet zapnutých",
+          "cap": "13 pravidel ve čtyřech skupinách, ve výchozím stavu jen ta bez ztráty obsahu, změny platí okamžitě"
+        }
+      },
+      {
+        "h2": "Srovnání změn a vrácení",
+        "ps": [
+          "Výsledek se nepřepisuje napřímo: každá změna je uvedena ve srovnávací tabulce se štítkem pravidla, které ji způsobilo. Pokud některou nechcete, klikněte na „Vrátit“ a vraťte ji samostatně; „Vrátit vše“ obnoví vše jedním kliknutím a dalším kliknutím se čištění zase použije. Statistický pruh uvádí počty původních, vyčištěných, odstraněných, změněných a vrácených položek."
+        ],
+        "img": {
+          "file": "clean-diff",
+          "alt": "Srovnávací tabulka: číslo, čas, originál proti vyčištěnému textu, každý řádek se štítkem pravidla",
+          "cap": "Každá změna má štítek pravidla a lze ji vrátit samostatně nebo všechny najednou"
+        }
+      },
+      {
+        "h2": "Náhled a export",
+        "ps": [
+          "Přepínejte mezi náhledy „vyčištěné“ a „originál“. V náhledu originálu jsou odstraněné položky přeškrtnuté a označené jako „odstraněno“. Exportovaný obsah je přesně ten, který vidíte v náhledu. Formáty exportu: SRT (výchozí), VTT, ASS (volitelné, pokud je zdrojový soubor ASS, sekce stylů zůstane beze změny) a čistý text TXT bez časové osy. Název souboru automaticky dostane značku `.clean`."
+        ],
+        "img": {
+          "file": "clean-preview",
+          "alt": "Náhled celého textu: přepínání mezi vyčištěnou verzí a originálem, počty ve statistickém pruhu",
+          "cap": "Dva náhledy k přepínání, co vidíte, to dostanete"
+        }
+      },
+      {
+        "h2": "Časté otázky",
+        "ps": [
+          "**Nesmaže omylem normální dialogy?** Pravidlo pro vodoznaky nejdřív odstraňuje vodoznakové řádky po řádcích (dialog ve dvojjazyčné položce zůstane) a celou položku smaže, jen pokud po odstranění zůstanou stopy. Označení pro neslyšící se maže jen tehdy, když závorka obsahuje označení a má nejvýše 40 znaků; běžný dialog v závorce zůstává.",
+          "**Jak rozeznat čistě písňový řádek od písně v dialogu?** Mažou se jen položky, kde je každý řádek obalený ♪ nebo tvořený značkami jako [music]; dialog s textem písně zůstává.",
+          "**Neublíží značky mluvčího čínštině?** Odpovídají jen jménu z velkých písmen a číslic na začátku řádku následovanému dvojtečkou (např. `GEORGE:`); čínské věty s dvojtečkou neodpovídají.",
+          "**Lze vyčistit více souborů najednou?** Ne, vždy jeden soubor; po vyčištění stáhněte výsledek a nahrajte další."
+        ]
+      },
+      {
+        "h2": "Soukromí",
+        "ps": [
+          "Čištění probíhá celé lokálně v prohlížeči, žádný obsah titulků se neposílá na server."
+        ]
+      },
+      {
+        "h2": "Související nástroje a návody",
+        "ps": [
+          "Krátký postup jen pro vodoznaky a reklamu najdete v [[Odstranění reklam a vodoznaků|/guides/remove-subtitle-ads.html]]; než titulky odevzdáte, projděte je v [[Kontrola titulků|/guides/subtitle-quality-check.html]]; potřebujete-li jiný formát, použijte [[Převod formátů|/convert.html]]."
+        ]
+      }
+    ]
+  },
+  "bilingual": {
+    "cs": [
+      {
+        "h2": "Co nástroj řeší",
+        "ps": [
+          "Máte dvojjazyčné titulky, ale chcete jen jednu stopu – nebo naopak chcete obě stopy rozdělit či sloučit:"
+        ],
+        "ul": [
+          "Jen stopu s originálem, nebo jen stopu s překladem",
+          "Rozdělit na dva samostatné soubory „originál“ a „překlad“",
+          "Sloučit dvě dvojjazyčné položky na stejné časové ose do jednoho záznamu o dvou řádcích",
+          "Při tom změnit formát (načíst ASS a exportovat SRT apod.)"
+        ]
+      },
+      {
+        "h2": "Jak pozná dvojjazyčnost",
+        "ps": [
+          "Dvojjazyčné titulky mají dvě časté podoby a nástroj je rozlišuje, **aniž by hádal jazyk**: **Podoba A (jeden titulek o dvou řádcích)** dělí stopy podle písma – deset systémů, například kana, hangul, hanzi a latinka. Dvojjazyčné to je, jen když se objeví dva z nich; první je považován za originál. Pokud je zastoupen jen jeden (např. dlouhá čínská věta zalomená do dvou řádků), zůstane záznam jednojazyčný. **Podoba B (dvě samostatné položky se zcela shodnou časovou osou)** dělí stopy podle pozice – dvě položky se stejným časem tvoří skupinu, první je originál, a kombinace jako angličtina s francouzštinou nebo angličtina s němčinou se rozeznají také, protože leží na samostatných řádcích. Když se dvojjazyčný obsah nenajde, volba režimu i tlačítko startu se zašednou s jasným upozorněním – nástroj nikdy nerozděluje naslepo."
+        ]
+      },
+      {
+        "h2": "Čtyři režimy",
+        "ps": [
+          "Rozbalovací nabídka „Kterou chcete“ má čtyři volby: **jen originál** a **jen překlad** vrátí po jednom souboru; **rozdělit na dva soubory** vytvoří soubor s originálem a soubor s překladem, jejichž názvy automaticky dostanou `.orig` / `.dst`, aby se nepřepsaly; **sloučit do dvou řádků** spojí každou skupinu do dvojjazyčné položky s originálem na jednom řádku a překladem na dalším, jednojazyčné skupiny zůstanou beze změny a druhý řádek se nevymýšlí. Při změně režimu nebo výstupního formátu se stávající obsah okamžitě přepočítá, není třeba znovu klikat na start."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Volba režimu v nástroji pro rozdělení dvojjazyčných titulků: jen originál, jen překlad, rozdělit na dva soubory, sloučit do dvou řádků",
+          "cap": "Čtyři režimy: ponechat jednu stopu, rozdělit na dva soubory, nebo sloučit do dvou řádků"
+        }
+      },
+      {
+        "h2": "Vstup a výstup",
+        "ps": [
+          "Načítá sedm formátů: SRT, VTT, ASS, SSA, SBV, LRC a TXT (nejdřív podle přípony, jinak podle obsahu). Exportuje čtyři: SRT, VTT, ASS a TXT. Vstup a výstup lze libovolně kombinovat, převod mezi formáty je součástí. Zalomení `\\N` v ASS se převede na skutečné zalomení, efektové značky se při exportu do jiných formátů odstraní."
+        ]
+      },
+      {
+        "h2": "Výsledek a export",
+        "ps": [
+          "Výsledek se zobrazí celý v textovém poli jen pro čtení, u každého souboru je počet položek a celková délka; tlačítka „Stáhnout“ a „Kopírovat“ jej převezmou. Oblast výsledku je jen náhled a neumožňuje měnit text ani časovou osu – nejdřív exportujte a pak upravujte v příslušném nástroji."
+        ],
+        "img": {
+          "file": "bilingual-result",
+          "alt": "Oblast výsledku: náhled jen pro čtení, počet položek a tlačítka stáhnout a kopírovat",
+          "cap": "Celý výsledek v náhledu + počet položek a celková délka + stažení a kopírování"
+        }
+      },
+      {
+        "h2": "Časté otázky",
+        "ps": [
+          "**Proč nejde oddělit angličtinu a francouzštinu na jednom řádku?** Podoba A dělí podle písma a dva jazyky se stejným písmem v jednom řádku oddělit nelze. Uložte takový obsah jako podobu B (dvě položky na stejné časové ose), pak se oddělí podle pozice.",
+          "**Stáhl se jen jeden soubor?** „Jen originál“, „jen překlad“ a „sloučit do dvou řádků“ vždy vracejí jeden soubor; dva dává jen „rozdělit na dva soubory“, s `.orig` / `.dst` v názvu.",
+          "**Jde to dávkově?** Jeden soubor najednou, bez fronty.",
+          "**Nahrávají se moje titulky na server?** Ne, načtení i export probíhají celé lokálně v prohlížeči."
+        ]
+      },
+      {
+        "h2": "Související návody",
+        "ps": [
+          "Krátký postup rozdělení na dvě stopy najdete v [[Rozdělení dvojjazyčných titulků na dvě stopy|/guides/split-bilingual-subtitles.html]]; jak dvojjazyčné titulky vznikají, popisuje [[Dva způsoby, jak vytvořit dvojjazyčné titulky|/guides/make-bilingual-subtitles.html]]; pro strojový překlad použijte [[AI překlad titulků|/translate.html]]."
+        ]
+      }
+    ]
+  },
+  "make-bilingual-subtitles": {
+    "cs": [
+      {
+        "h2": "Jak obě podoby vypadají",
+        "ps": [
+          "**Podoba B: dvě položky na stejné časové ose.** Stejná věta je rozdělená do dvou samostatných titulkových položek se zcela shodnou časovou osou, jedna anglicky a jedna čínsky, a přehrávají se přes sebe. Tak se dvojjazyčné ASS dělá nejčastěji."
+        ],
+        "ul": [
+          "`What are you waiting for?`",
+          "`你还在等什么？`"
+        ]
+      },
+      {
+        "h2": "Každá má své slabiny",
+        "ps": [
+          "Podoba A má úskalí v **rozpoznání**: rozdělení stojí na písmu, takže čínština s angličtinou nebo japonština s angličtinou se rozeznají snadno, ale kombinace, které **sdílejí jedno písmo** – angličtina s francouzštinou nebo čínština s japonskými kandži – oddělit nelze. Podoba B má úskalí ve **výrobě**: obě časové osy musí být přesně shodné a ruční srovnávání je únavné; navíc některé přehrávače kreslí obě položky a text se na obrazovce tlačí. Zkušenost: hotové titulky pro diváky se dělají spíš v podobě A; pokud chcete každou stopu dál zpracovávat, podoba B se rozděluje nejsnadněji."
+        ]
+      },
+      {
+        "h2": "Dvě cesty",
+        "ps": [
+          "**Vytvořit dvojjazyčné z originálu**: použijte [[AI překlad titulků|/translate.html]] a při exportu zvolte „dvojjazyčně · originál nahoře“ nebo „dvojjazyčně · překlad nahoře“, vznikne rovnou podoba A. Při volbě formátu ASS jsou navíc k dispozici rozvržení „dvě obrazovky nad sebou“ a „dva řádky dole“.",
+          "**Sloučení a převod stop**: v [[Rozdělení dvojjazyčných titulků|/bilingual.html]] použijte „sloučit do dvou řádků“ – podoba B dovnitř, podoba A ven. Naopak „rozdělit na dva soubory“ dá dvě samostatné stopy, ať už nahrajete podobu A nebo B."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Čtyři režimy nástroje pro rozdělení dvojjazyčných titulků, kde sloučení do dvou řádků spojí dvě položky na stejné časové ose",
+          "cap": "„Sloučit do dvou řádků“: podoba B na podobu A"
+        }
+      },
+      {
+        "h2": "Na jakém zařízení se bude přehrávat",
+        "ps": [
+          "Webové přehrávače (HTML5 `<track>`) a většina mobilních přehrávačů zvládá podobu A spolehlivěji; profesionální desktopové přehrávače (VLC, mpv, PotPlayer) umí obě a navíc mohou každé z obou položek nastavit jinou barvu a umístění. Když si nejste jistí, zvolte podobu A ve formátu SRT, je nejuniverzálnější. Rozdíly mezi formáty najdete v [[SRT, VTT, nebo ASS – který použít|/guides/subtitle-format-comparison.html]]."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Volby dvojjazyčného stylu v panelu exportu překladového nástroje",
+          "cap": "Pořadí dvojjazyčných řádků zvolíte přímo při exportu"
+        }
+      },
+      {
+        "h2": "Časté otázky",
+        "ps": [
+          "**Dvojjazyčné titulky jsou moc natěsnané, co s tím?** Omezte šířku řádku: panel exportu překladového nástroje má nastavení „šířka dvojjazyčného řádku“; užší řádek znamená méně znaků a čistší obrazovku.",
+          "**Chci jen jednu stopu?** „Jen originál / jen překlad“ v nástroji pro rozdělení dvojjazyčných titulků to vyřeší jedním kliknutím, viz [[Rozdělení dvojjazyčných titulků na dvě stopy|/guides/split-bilingual-subtitles.html]]."
+        ]
+      }
+    ]
+  },
+  "qc": {
+    "cs": [
+      {
+        "h2": "Co nástroj řeší",
+        "ps": [
+          "Titulkům na pohled nic není, a teprve při odevzdání se ukáže překryv časové osy, příliš široký řádek nebo příliš rychlé čtení. Kontrolní stránka tyto problémy vypíše jeden po druhém:"
+        ],
+        "ul": [
+          "Časová osa: překryv, konec dřív než začátek, příliš krátká nebo dlouhá doba zobrazení, špatné číslování",
+          "Sazba: příliš široký řádek, více než dva řádky, nevhodné zalomení, mezery na začátku a konci",
+          "Jazykové detaily: chybějící mezera mezi latinkou a čínštinou, interpunkce proti pravidlům jazyka, směr písma",
+          "Vážné vady: mojibake nebo řídicí znaky, špatný formát časové značky"
+        ]
+      },
+      {
+        "h2": "Nejdřív zvolte pravidla jazyka",
+        "ps": [
+          "V části „Podle jakých pravidel kontrolovat“ je pět prahů: **maximální šířka řádku** (vodorovně 42 půlšířek, na čtverci 36, na výšku 28), **horní hranice rychlosti čtení** (18 šířek/s pro čínštinu, japonštinu a korejštinu, 20 pro ostatní jazyky), **nejkratší zobrazení 833 milisekund**, **nejdelší zobrazení 7000 milisekund** a **nejvýše 2 řádky**. Jazyk titulků lze rozpoznat automaticky nebo zvolit ručně z 27 jazyků; orientace obrazu mění jen šířku řádku, rychlost čtení, doba zobrazení ani počet řádků se nemění. Půlšířka je jednotné měřítko: jeden čínský znak se počítá jako 2 a jedno latinské písmeno jako 1 – šířka 42 tedy znamená 21 čínských znaků nebo 42 písmen."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Nastavení kontroly: pět polí prahů a nabídky jazyka titulků a orientace obrazu",
+          "cap": "Pět prahů + jazyk + orientace obrazu, výchozí hodnoty odpovídají běžné praxi"
+        }
+      },
+      {
+        "h2": "Čtení zprávy",
+        "ps": [
+          "17 pravidel dává výsledky ve třech úrovních: **chyby** (mojibake, formát časové značky, konec dřív než začátek, špatné číslování), **varování** (prázdné položky, překryv, příliš krátká nebo dlouhá doba zobrazení, překročená rychlost čtení, příliš široký řádek, více než dva řádky) a **upozornění** (zalomení, mezery na začátku a konci, chybějící mezera, interpunkce apod.). Každá položka má číslo a údaj „naměřeno X, práh Y“ a lze filtrovat podle úrovně. Dvojjazyčné položky mají výjimky: obě podoby se rozpoznají automaticky, kontrola překryvu se u celé dvojice přeskočí a rychlost čtení se počítá jen na řádku v cílovém jazyce."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Kontrolní zpráva: problémy po úrovních chyba, varování a upozornění, s číslem položky a naměřenými hodnotami",
+          "cap": "Zpráva ve třech úrovních: každý problém má číslo položky a naměřenou hodnotu proti prahu"
+        }
+      },
+      {
+        "h2": "Opravy a export",
+        "ps": [
+          "Karta „Opravy a export“ uvádí jen to, co **lze opravit automaticky**: přelomení řádků, odstranění prázdných položek, doplnění mezer, interpunkce podle jazyka a oprava číslování – to, co nemění časovou osu, je ve výchozím stavu zaškrtnuté. To, co **mění časovou osu** (prohození začátku a konce, posun při překryvu, zkrácení či prodloužení zobrazení), je ve výchozím stavu vypnuté a zaškrtnete to po vlastním posouzení. Kliknutím na „Použít opravy“ se vše znovu zkontroluje a počítadlo zahrne jen skutečně opravené – řádky, které nešlo přelomit, se nevykazují jako opravené. **Překročená rychlost čtení se automaticky neopravuje**: stroj neví, které slovo vypustit, takže zkraťte překlad nebo upravte časovou osu ručně. Potom exportujte SRT nebo VTT, případně klikněte na „Stáhnout zprávu“ a uložte čistě textovou zprávu jako `.qc.txt`."
+        ],
+        "img": {
+          "file": "qc-fix",
+          "alt": "Karta oprav: zaškrtávací pole automaticky opravitelných položek a tlačítko použít opravy",
+          "cap": "Do seznamu se dostane jen to, co lze opravit automaticky; změny časové osy jsou ve výchozím stavu vypnuté"
+        }
+      },
+      {
+        "h2": "Časté otázky",
+        "ps": [
+          "**Proč nemůžu exportovat ASS?** Kontrola exportuje jen SRT a VTT; ASS lze načíst, ale ne vypsat. Pokud chcete zachovat ASS efekty, jděte nejdřív na [[Převod formátů|/convert.html]] a vše si rozmyslete.",
+          "**Co znamená rychlost čtení 18?** Pro čínštinu, japonštinu a korejštinu se počítá nejvýše 9 plnošířkových znaků za sekundu (18 půlšířek), pro ostatní jazyky 20 půlšířek za sekundu. Je to běžná úroveň pro pohodlné čtení a pole lze změnit.",
+          "**Lze zkontrolovat soubor s poškozeným kódováním?** Kontrola čte jen UTF-8, takže soubor se špatným kódováním nejdřív projde stránkou pro opravu mojibake.",
+          "**Sáhne mi to na časovou osu?** Ne, pokud necháte skupinu „mění časovou osu“ vypnutou; když ji zapnete, před opravou se to výslovně oznámí."
+        ]
+      },
+      {
+        "h2": "Související návody",
+        "ps": [
+          "Titulkům, které bliknou a jsou pryč, se věnuje samostatný návod [[Titulky, které se nedají přečíst|/guides/subtitle-too-fast.html]]; co zkontrolovat před odevzdáním, shrnuje [[Co zkontrolovat před odevzdáním|/guides/subtitle-quality-check.html]]; posunutá časová osa je jiný problém, viz [[Titulky, které ke konci nesedí|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-quality-check": {
+    "cs": [
+      {
+        "h2": "Proč problémy sami nevidíte",
+        "ps": [
+          "Kdo titulky dělá, zná obsah příliš dobře – u každé repliky ví, co přijde v další sekundě, a žádná rychlost mu nepřipadá rychlá; po stovkách přečtení oko sazbu automaticky přehlíží. Kontrola před odevzdáním proto nemůže být „ještě jednou to celé projít“, ale **měření podle ukazatelů**: rychlost čtení, šířka řádku, doba zobrazení, překryv – rozhodují čísla."
+        ]
+      },
+      {
+        "h2": "Šest nejčastějších selhání",
+        "ps": [
+          "Seřazeno podle toho, jak často při odevzdání selžou:"
+        ],
+        "ul": [
+          "**Příliš rychlé čtení**: divák nestihne přečíst a text zmizí, celkový dojem se hroutí",
+          "**Překryv časové osy**: dvě položky na obrazovce současně, obvykle pozůstatek střihu nebo sloučení",
+          "**Příliš široký řádek**: přes 42 půlšířek ve vodorovném obraze přeteče na malých displejích",
+          "**Více než dva řádky**: blok o třech a více řádcích zabere půlku mobilu",
+          "**Neukázněná interpunkce**: chybějící mezera mezi latinkou a čínštinou a záměna plné a půlšířky působí levně",
+          "**Špatné číslování a prázdné položky**: po mazání či slučování se zapomnělo přečíslovat"
+        ]
+      },
+      {
+        "h2": "Jak kontrolovat",
+        "ps": [
+          "Otevřete [[Kontrola titulků|/qc.html]], přetáhněte titulky a nechte jazyk rozpoznat automaticky (pravidla jsou rozdělena pro 27 jazyků). Zpráva je rozdělená na tři úrovně – **chyby / varování / upozornění** – a každá položka má číslo a naměřenou hodnotu. Chyby je nutné řešit (mojibake, formát časové značky, konec dřív než začátek, špatné číslování); varování podle situace (překryv, rychlost čtení, šířka řádku, doba zobrazení); upozornění jsou dolazení (zalomení, mezery, interpunkce)."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Kontrolní zpráva: seznam problémů ve třech úrovních, každý s číslem položky a srovnáním naměřené hodnoty s prahem",
+          "cap": "Zpráva ve třech úrovních, každý problém má číslo položky a naměřenou hodnotu"
+        }
+      },
+      {
+        "h2": "Co lze opravit jedním kliknutím",
+        "ps": [
+          "Číslování, prázdné položky, zalomení, mezery a interpunkci – tedy to, co **nemění časovou osu** – lze opravit automaticky. Opravy, které **mění časovou osu** (prohození začátku a konce, posun při překryvu, zkrácení či prodloužení zobrazení), jsou ve výchozím stavu vypnuté a zaškrtněte je po posouzení dopadu. **Překročená rychlost čtení se automaticky neopravuje** – stroj neví, které slovo vypustit, takže buď zkraťte překlad, nebo časové ose trochu povolte; podrobně v [[Titulky, které se nedají přečíst|/guides/subtitle-too-fast.html]]. Po opravě proběhne nová kontrola a zpráva počítá jen skutečně opravené."
+        ]
+      },
+      {
+        "h2": "Co udělat hned potom",
+        "ps": [
+          "Ze stránky zprávy lze stáhnout čistě textovou zprávu `.qc.txt` – přiložte ji při odevzdání, aby protistrana hned viděla, co jste zkontrolovali. Právě dokončený překlad projděte kontrolou před odevzdáním; posunutá časová osa je jiný problém, a pokud potíže s rychlostí čtení přetrvávají, podívejte se na [[Titulky, které ke konci nesedí|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-too-fast": {
+    "cs": [
+      {
+        "h2": "Co je rychlost čtení",
+        "ps": [
+          "Rychlost čtení je **jestli divák stihne přečíst text během doby, po kterou je titulek na obrazovce**. Výpočet je přímočarý: šířka textu dělená dobou zobrazení v sekundách. Běžné oborové limity: 9 plnošířkových znaků za sekundu pro čínštinu, japonštinu a korejštinu (18 půlšířek) a 20 půlšířek za sekundu pro ostatní jazyky. Čínská položka o 20 znacích zobrazená 1 sekundu má 40 šířek/s – více než dvojnásobek limitu, a to divák nikdy nepřečte."
+        ]
+      },
+      {
+        "h2": "Nejdřív rozlište, o jakou rychlost jde",
+        "ps": [
+          "„Nestíhám číst“ mohou být dva různé problémy: **příliš krátké zobrazení** – položka zmizí po pár stovkách milisekund, obvykle chyba časování nebo pozůstatek střihu; nebo **příliš dlouhý text** – doba zobrazení je normální, ale řádek má 30 čínských znaků a sebepomalejší čtení nestačí. Opravy jsou přesně opačné, takže nejdřív zjistěte, který případ nastal."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Nastavení horní hranice rychlosti čtení na kontrolní stránce, ve výchozím stavu 18 pro čínštinu, japonštinu a korejštinu a 20 pro ostatní jazyky",
+          "cap": "Práh rychlosti čtení: 18 šířek/s pro čínštinu, japonštinu a korejštinu, 20 pro ostatní jazyky"
+        }
+      },
+      {
+        "h2": "Jak kontrolovat",
+        "ps": [
+          "Otevřete [[Kontrola titulků|/qc.html]] a přetáhněte titulky. Ve zprávě je „příliš krátké zobrazení“ na úrovni varování a uvádí naměřené milisekundy (práh 833 milisekund); „rychlost, kterou nelze přečíst“ je samostatná položka s naměřenými šířkami za sekundu. U dvojjazyčných titulků se počítá jen řádek v cílovém jazyce, oba jazyky se nesčítají."
+        ]
+      },
+      {
+        "h2": "Jak opravit",
+        "ps": [
+          "**Příliš krátké zobrazení**: jde opravit jedním kliknutím – automaticky se prodlouží na 833 milisekund a nepřekročí začátek následující položky (oprava nesmí vytvořit nový překryv). **Příliš dlouhý text**: automatická oprava neexistuje, stroj neví, které slovo vypustit. Vyberte si: zkraťte překlad (v překladovém nástroji stačí kliknout na buňku), nebo prodlužte dobu zobrazení (za předpokladu, že před další položkou je mezera; pokud je špatná celá časová osa, použijte [[Úprava časové osy|/shift.html]]). Potom kontrolu zopakujte a ověřte, že se rychlost čtení vrátila pod práh."
+        ]
+      },
+      {
+        "h2": "Nepřehánějte to",
+        "ps": [
+          "Splnit rychlost čtení neznamená, že je to pohodlné: když každou položku vyšponujete na 9 znaků/s, celý film se čte těžko. Zkušenost říká držet se běžně kolem sedmdesáti procent prahu a v dialogově hustých pasážích občasné překročení snést. Příliš časté střídání titulkových bloků je samo o sobě problém, takže před odevzdáním projděte celou sadu ukazatelů, viz [[Co zkontrolovat před odevzdáním|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  }
+}

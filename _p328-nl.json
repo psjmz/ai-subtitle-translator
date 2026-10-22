@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "nl": {
+      "seo": {
+        "title": "Reparatie van onleesbare ondertitels gebruiken – herken de codering – AI-SRTSub",
+        "desc": "Reparatie van onleesbare tekens: herken de oorspronkelijke codering (GBK / Big5 / Shift_JIS / EUC-KR), zet kandidaten op wat het meest op gewone taal lijkt en sla op als UTF-8 met BOM of GBK.",
+        "h1": "Reparatie van onleesbare ondertitels gebruiken",
+        "intro": "Staat een ondertitel bij openen vol onleesbare tekens, dan is het bestand meestal niet kapot: het is met de verkeerde codering gelezen. De reparatie herkent de oorspronkelijke codering en zet de verkeerd gelezen tekens terug; volgnummers en tijdlijn blijven onaangeroerd.",
+        "ctaText": "Open de reparatie"
+      },
+      "body": [
+        {
+          "h2": "Wat dit gereedschap oplost",
+          "ps": [
+            "Dezelfde bytes gelezen als UTF-8 en als GBK leveren twee totaal verschillende tekenreeksen op — het bestand is niet kapot, er is bij het lezen de verkeerde codering gekozen. Wat de reparatie doet:"
+          ],
+          "ul": [
+            "Herkennen met welke codering dit bestand oorspronkelijk is geschreven en de tekens met de juiste set terugzetten",
+            "Uitleggen waar het misgaat: vervangingsteken, besturingsteken, valutateken, reeksen letters met accenten, aaneengesloten zeldzame tekens",
+            "Kandidaten ordenen op wat het meest op gewone taal lijkt, zodat je er een kiest en opslaat",
+            "Als de speler de codering niet herkent, een kopie opslaan als UTF-8 met BOM of GBK en die aan de speler geven"
+          ]
+        },
+        {
+          "h2": "Upload een bestand, plak niet",
+          "ps": [
+            "De twee ingangen kunnen niet evenveel repareren, **kun je een bestand uploaden, doe dat dan**. Bij uploaden zijn de oorspronkelijke bytes er nog: het gereedschap kan elke codering om beurten proberen, herkent dat het GBK is en decodeert als GBK, zonder iets te hoeven raden. Wat je plakt zijn geen oorspronkelijke bytes meer — zodra de browser de tekst aanlevert, is de verkeerde stap al gezet; alleen terugredeneren blijft over en het wordt zo goed als het kan.",
+            "Staat in de geplakte tekst al het vervangingsteken (dat vierkante vraagteken `�`), dan zijn de oorspronkelijke bytes al weg en kan niemand ze terughalen. De pagina zegt dat dan ronduit: ga terug naar boven en upload het oorspronkelijke bestand met “Bestand kiezen”."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Uploadzone van de reparatiepagina: sleepzone en plakvak, daarboven de herkende codering",
+            "cap": "Sleep het bestand of kies het; het plakvak staat eronder en kan veel minder repareren"
+          }
+        },
+        {
+          "h2": "Wat de diagnose zegt",
+          "ps": [
+            "Na het uploaden geeft het diagnosevak een conclusie. **Geen onleesbare tekens gevonden**: deze inhoud leest normaal; als je in de speler nog steeds onleesbare tekens ziet, heeft de speler de verkeerde codering gekozen — ga naar “Opslaan als” hieronder, zet om naar een andere codering en geef die. Bij **lijkt op onleesbare tekst** wordt precies opgesomd welke sporen:"
+          ],
+          "ul": [
+            "Er staat een vervangingsteken in — de oorspronkelijke bytes zijn al weg",
+            "Er zijn besturingstekens tussengekomen",
+            "Er zitten een hoop valuta- en wiskundige symbolen in",
+            "Letters met accenten verschijnen in reeksen — alsof UTF-8 als één byte per keer is gelezen (`ä½ å¥½` is die soort)",
+            "De tekens staan aaneengesloten maar er zit geen enkel alledaags teken bij — alsof UTF-8 als GBK is gelezen"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosekaart: conclusie en de een voor een opgesomde sporen",
+            "cap": "De diagnose somt sporen per type op, niet alleen de zin dat het onleesbaar is"
+          }
+        },
+        {
+          "h2": "Hoe kandidaten worden geordend en gekozen",
+          "ps": [
+            "Onder “Zo kan het gerepareerd worden” staan de kandidaten op **wat het meest op gewone taal lijkt**, maximaal 12 stuks, elk met de codering waarmee ze gelezen zijn. Klik er een om het resultaat te zien; bevalt het, sla dan hieronder op; zo niet, klik “Laat zoals het is” om terug te gaan naar het origineel.",
+            "De volgorde komt van een score: aandeel alledaagse tekens, reeksen accenten, reeksen symbolen en zeldzame tekens tellen allemaal mee. **Is de score niet duidelijk beter, dan wordt niets aanbevolen** — er wordt geen kandidaat geforceerd om er maar één te kunnen tonen. Bij bestanden die twee keer verkeerd zijn behandeld (één keer verkeerd opgeslagen, één keer verkeerd gerepareerd) redeneert het gereedschap bij de eerste kandidaten nog een laag terug; wat binnen twee lagen valt, kan nog worden gered."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Lijst met reparatiekandidaten: geordend op hoeveel ze op gewone taal lijken, elk met coderingspaar",
+            "cap": "Kandidaten staan op wat het meest op gewone taal lijkt, elk met de codering waarmee gelezen is"
+          }
+        },
+        {
+          "h2": "Opslaan is de laatste stap",
+          "ps": [
+            "Na repareren moet je ook goed opslaan. Herkent de speler UTF-8 niet, sla dan **UTF-8 met BOM** op (Windows-spelers herkennen de codering aan de BOM) of **GBK**, meestal is het dan goed. Opslaan kan als UTF-8, UTF-8 (met BOM), GBK, Big5, Shift_JIS, EUC-KR; past het niet, dan krijg je de melding een andere te kiezen (GBK kan bijvoorbeeld geen Koreaans bevatten). Aan de gedownloade bestandsnaam wordt automatisch `-fixed` toegevoegd.",
+            "Is de herkende codering geen UTF-8, dan wijst “Opslaan als” alvast naar “UTF-8 met BOM”; zodra je de keuzelijst zelf hebt aangepast, wordt die niet meer voor je teruggezet."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Resultaatvak: tekstvak, keuzelijst Opslaan als en downloadknop",
+            "cap": "Kies de codering en download; aan de bestandsnaam wordt automatisch -fixed toegevoegd"
+          }
+        },
+        {
+          "h2": "Wat niet wordt aangeraakt",
+          "ps": [
+            "Alleen de verkeerd gelezen tekens worden vervangen. Volgnummers, tijdlijn en de stijlopdrachten van ASS blijven onaangeroerd."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Ik heb een bestand geüpload, waarom moet ik nog opslaan?** Het bestand zelf is meestal niet kapot; wat misgaat is dat de speler het met de verkeerde codering leest. Je hoeft dan geen enkel teken in de tekst te wijzigen: geef de speler een kopie die als UTF-8 met BOM of GBK is opgeslagen.",
+            "**Waarom kan geplakte tekst niet worden gerepareerd?** Zodra in geplakte tekst het vervangingsteken staat, zijn de oorspronkelijke bytes weg en heeft terugredeneren geen grond. Ga terug naar boven en upload het oorspronkelijke bestand met “Bestand kiezen”.",
+            "**De kandidaat die ik wil staat er niet bij?** Is de score niet duidelijk beter dan de huidige, dan beveelt het gereedschap niets aan. Zet “Herkende codering” eerst op een andere en laat opnieuw ordenen.",
+            "**Hoeveel kan ik er per keer repareren?** Eén. Repareer, download, upload dan de volgende."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Herkenning en reparatie gebeuren volledig lokaal in de browser; er wordt geen enkele ondertitelinhoud naar de server gestuurd."
+          ]
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "Waar onleesbare tekens vandaan komen, zie [[Waar komen onleesbare ondertitels vandaan|/guides/subtitle-garbled-characters.html]]; is de codering goed maar de inhoud rommelig, gebruik [[Ondertitels opschonen|/clean.html]]; wil je tijdlijn en tekstlengte controleren, gebruik [[Ondertitelkwaliteitscontrole|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "nl": {
+      "seo": {
+        "title": "Waar komen onleesbare tekens vandaan – herkenbaar is repareerbaar – AI-SRTSub",
+        "desc": "Onleesbare ondertitels zijn geen kapot bestand maar bytes die met de verkeerde codering gelezen zijn. Vervangingsteken, reeksen letters met accenten en zeldzame tekens wijzen elk op een eigen oorzaak.",
+        "h1": "Waar komen onleesbare ondertitels vandaan",
+        "intro": "Dezelfde bytes gelezen als UTF-8 en als GBK leveren twee totaal verschillende tekenreeksen op. Hoe de onleesbare tekst eruitziet, is het directe bewijs van welke stap verkeerd ging.",
+        "ctaText": "Open de reparatie"
+      },
+      "body": [
+        {
+          "h2": "Het bestand is niet kapot, het lezen is verkeerd",
+          "ps": [
+            "In een ondertitelbestand staan bytes. Om bytes tot tekst te maken moet je weten met welke codering ze geschreven zijn — kies je daarin verkeerd, dan komt er onleesbare tekst uit. Het bestand zelf is geen byte kwijt; lees je het met een andere codering opnieuw, dan zijn de tekens terug.",
+            "Onleesbare tekst is dus twee dingen: **herkennen met welke codering het oorspronkelijk is geschreven** en **opslaan in een codering die de speler herkent**. Het eerste gebeurt door te proeflezen en te scoren, het tweede door op te slaan als. Het zijn twee verschillende problemen."
+          ]
+        },
+        {
+          "h2": "Vijf verschijningsvormen, vijf oorzaken",
+          "ps": [
+            "Onleesbare tekst ontstaat niet willekeurig; hoe hij eruitziet verraadt direct de oorzaak:"
+          ],
+          "ul": [
+            "**Reeksen letters met accenten** (`ä½ å¥½`): tekst in UTF-8 is als een codering van één byte per keer gelezen — in UTF-8 is een teken drie bytes, bij één byte per keer wordt elke byte een eigen letter",
+            "**Aaneengesloten tekens maar geen enkel alledaags teken**: UTF-8 is als GBK gelezen — telkens twee bytes worden opnieuw gekoppeld en er komen alleen zeldzame tekens uit",
+            "**Een hoop valuta- en wiskundige symbolen**: de bytes zijn in het symboolgebied terechtgekomen, vaak gelezen als Mac Roman of de Latin-1-familie",
+            "**Besturingstekens ertussen**: de bytes zijn in het onzichtbare besturingsgebied terechtgekomen, op het scherm leegte of een blokje",
+            "**Het vierkante vraagteken `�`**: dit is een **vervangingsteken**, geen onleesbare tekst — het betekent dat hier een teken stond dat bij het lezen al kwijtgeraakt is"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosekaart: de sporen van onleesbare tekst een voor een opgesomd",
+            "cap": "De diagnose deelt onleesbare tekst in naar oorzaak, niet één vaag oordeel"
+          }
+        },
+        {
+          "h2": "Waarom een vervangingsteken niet te repareren is",
+          "ps": [
+            "Het vervangingsteken is de belangrijke scheidslijn. Staat er `�`, dan zijn de bytes al in **een eerdere stap** weggegooid (meestal heeft een programma het bestand één keer gelezen en één keer opgeslagen); van het weggegooide deel is geen enkel spoor. Terugredeneren heeft dan geen grond — niemand kan het repareren.",
+            "Daarom behandelt de reparatiepagina twee gevallen apart: bij uploaden zijn de oorspronkelijke bytes er nog en kan elke codering om beurten worden geprobeerd; staat in geplakte tekst al een vervangingsteken, dan wordt ronduit gezegd dat het niet te repareren is en het oorspronkelijke bestand geüpload moet worden.",
+            "Er is ook een omgekeerd geval: de inhoud leest volledig normaal, maar in de speler is het nog steeds onleesbaar. Dat is niet de fout van het bestand maar van de **speler die de verkeerde codering koos**. Het bestand wijzigen helpt niet; geef de speler een kopie die als UTF-8 met BOM of GBK is opgeslagen."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Uploadzone: twee ingangen, slepen en plakken",
+            "cap": "Upload een bestand als dat kan — alleen met de bytes erbij valt er iets te repareren"
+          }
+        },
+        {
+          "h2": "Wat er bij repareren wordt vergeleken",
+          "ps": [
+            "Het gereedschap probeert elke mogelijke codering om beurten en geeft elk resultaat een score: hoeveel alledaagse tekens, zijn er reeksen accenten, zijn er reeksen symbolen, zijn de tekens aaneengesloten zeldzaam. Wat het hoogst scoort staat bovenaan.",
+            "**Is de score niet duidelijk beter, dan wordt niets aanbevolen** — liever zeggen dat dit bestand normaal leest dan je afschepen met een halfslachtig resultaat. Bij bestanden die twee keer verkeerd zijn behandeld, wordt bij de eerste paar kandidaten nog een laag teruggedacht."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Kandidatenlijst: op score geordend, elk met coderingspaar",
+            "cap": "Kandidaten staan op score; is de score niet beter, dan wordt niets aanbevolen"
+          }
+        },
+        {
+          "h2": "In de juiste codering opslaan maakt het af",
+          "ps": [
+            "De gerepareerde tekst moet ook in een codering worden opgeslagen die de speler herkent. Spelers onder Windows herkennen de codering vaak aan de BOM, dus **UTF-8 met BOM** opslaan is het makkelijkst; oudere apparaten of lokale spelers herkennen GBK. Kiesbare coderingen: UTF-8, UTF-8 (met BOM), GBK, Big5, Shift_JIS, EUC-KR; past het niet, dan wordt gevraagd een andere te kiezen (GBK kan bijvoorbeeld geen Koreaans bevatten)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Resultaatvak: keuzelijst Opslaan als en downloadknop",
+            "cap": "Opslaan in een codering die de speler herkent, pas dan is het echt opgelost"
+          }
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "De volledige werkwijze zie [[Reparatie van onleesbare ondertitels gebruiken|/guides/repair.html]]; wat er precies in een SRT-bestand staat zie [[Wat staat er in een SRT-bestand|/guides/srt-file-format.html]]; is de codering goed maar de inhoud rommelig (watermerk, reclame, aanduidingen voor slechthorenden) gebruik [[Ondertitels opschonen|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "nl": {
+      "seo": {
+        "title": "Omzetting vereenvoudigd-traditioneel – Taiwan en Hongkong – AI-SRTSub",
+        "desc": "Omzetting vereenvoudigd-traditioneel: negen richtingen, voor Taiwan woordkeus of alleen vorm, Hongkong een eigen set. Alleen de gesproken tekst verandert; tijdlijn en volgnummers blijven onaangeroerd.",
+        "h1": "Omzetting vereenvoudigd-traditioneel gebruiken",
+        "intro": "Gaat dezelfde ondertitel naar Taiwan, Hongkong of het vasteland van China, dan zijn woordkeus en tekenvorm anders. Op de omzettingspagina kies je uit negen richtingen; alleen de gesproken tekst verandert — tijdlijn, volgnummers en ASS-stijlopdrachten blijven onaangeroerd.",
+        "ctaText": "Open de omzetting"
+      },
+      "body": [
+        {
+          "h2": "Wat dit gereedschap oplost",
+          "ps": [
+            "Omzetting vereenvoudigd-traditioneel is niet elk teken een andere schrijfwijze geven en klaar. Hetzelfde vereenvoudigde woord heeft per gebied een ander woord. De omzettingspagina behandelt die apart:"
+          ],
+          "ul": [
+            "Vereenvoudigd naar traditioneel (algemeen / Taiwan / Hongkong)",
+            "Traditioneel naar vereenvoudigd (algemeen / uit Taiwan-traditioneel / uit Hongkong-traditioneel)",
+            "Vorm wisselen tussen traditionele vormen (naar Taiwan-vorm / naar Hongkong-vorm)",
+            "Eén vereenvoudigd teken met meerdere traditionele wordt niet verkeerd omgezet (beslist op woord, niet blind per teken)"
+          ]
+        },
+        {
+          "h2": "Uploaden en herkennen",
+          "ps": [
+            "Sleep het bestand erin of kies het; SRT, VTT, ASS en TXT worden ondersteund, je kunt de ondertitel ook direct plakken. Na uploaden wordt de indeling automatisch herkend en bij “Herkende indeling” getoond."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Uploadzone van de omzettingspagina: sleepzone en plakvak, daarboven de herkende indeling",
+            "cap": "SRT / VTT / ASS / TXT, de indeling wordt automatisch herkend"
+          }
+        },
+        {
+          "h2": "Hoe kies je uit de negen richtingen",
+          "ps": [
+            "De negen richtingen onder “Omzettingsrichting” vallen in drie groepen. **Vereenvoudigd naar traditioneel**: algemeen traditioneel, Taiwan-traditioneel (woorden wisselen), Taiwan-traditioneel (alleen vorm), Hongkong-traditioneel. **Traditioneel naar vereenvoudigd**: algemeen, uit Taiwan-traditioneel, uit Hongkong-traditioneel. **Vorm wisselen tussen traditionele vormen**: naar Taiwan-vorm, naar Hongkong-vorm.",
+            "“Taiwan-woorden” zet ook de regionale termen mee om; “Taiwan-vorm” verandert alleen de schrijfwijze en houdt je woorden. Hongkong is een eigen set: dezelfde term wordt daar anders geschreven. Wil je terug naar vereenvoudigd, kies dan de groep hieronder — je moet aangeven uit welke traditionele vorm je terugkomt, want de weg van Taiwan- en Hongkong-traditioneel naar vereenvoudigd is niet dezelfde."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kaart Omzettingsrichting: keuzelijst omzetten naar, nu Vereenvoudigd naar Taiwan-traditioneel (woorden wisselen) gekozen",
+            "cap": "De richting kies je in de keuzelijst omzetten naar, negen in drie groepen; hier staat Taiwan met woordwissel"
+          }
+        },
+        {
+          "h2": "Resultaat en exporteren",
+          "ps": [
+            "Het resultaatvak geeft direct de omgezette ondertitel, de statistiekbalk laat zien hoeveel regels er zijn en hoeveel er veranderd zijn. Is er geen enkel teken veranderd, dan verschijnt de melding dat deze ondertitel misschien geen Chinese tekens bevat — de omzetting raakt alleen het Chinese deel, een ondertitel van alleen Engels of cijfers verandert niet.",
+            "Na bevestigen downloaden of kopiëren. Aan de gedownloade bestandsnaam wordt een taallabel toegevoegd — `demo.srt` wordt na omzetting naar Taiwan-traditioneel `demo.zh-TW.srt`, algemeen traditioneel `.zh-Hant`, terug naar vereenvoudigd `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Resultaatvak: de omgezette ondertitel en de statistiekbalk",
+            "cap": "De statistiekbalk geeft totaal en aantal gewijzigde regels; direct downloaden of doorsturen naar vertaling"
+          }
+        },
+        {
+          "h2": "Wat niet wordt aangeraakt",
+          "ps": [
+            "Alleen de gesproken tekst verandert. Tijdlijn, volgnummers en de stijlopdrachten van ASS blijven onaangeroerd — na omzetten meteen bruikbaar, je hoeft de opmaak niet opnieuw in te stellen."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Waarom is niet elk teken omgezet zoals ik verwachtte?** Staan er meerdere traditionele tekens tegenover één vereenvoudigd teken, dan beslist het woord: hetzelfde teken gaat in verschillende woorden naar een ander traditioneel teken. De woordenlijst komt van OpenCC, op woordgroepen en niet per los teken.",
+            "**Wat is het verschil tussen Taiwan- en Hongkong-traditioneel?** De woordkeus: dezelfde term wordt in Taiwan en in Hongkong anders geschreven. Kies de richting van het gebied waar je naartoe stuurt.",
+            "**Is mijn aantal regels na omzetting veranderd?** Er veranderen alleen Chinese tekens, er worden geen items toegevoegd of weggehaald en de tijdlijn blijft gelijk. Is het aantal regels toch veranderd, kijk dan of de indeling bij het uploaden verkeerd herkend is.",
+            "**Wat als de woordenlijst niet laadt?** De pagina vraagt te vernieuwen en het opnieuw te proberen. De woordenlijst wordt lokaal geladen; je hoeft de ondertitel niet te uploaden."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "De omzetting gebeurt volledig lokaal in de browser; er wordt geen enkele ondertitelinhoud naar de server gestuurd."
+          ]
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "Wil je alleen vereenvoudigd naar traditioneel, zie [[Vereenvoudigde ondertitel naar traditioneel|/guides/srt-simplified-to-traditional.html]]; waarom het meer is dan een ander teken, zie [[Omzetting vereenvoudigd-traditioneel is geen ander teken|/guides/simplified-traditional-chinese.html]]; naar een andere taal vertalen doe je met [[Ondertitelvertaling|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "nl": {
+      "seo": {
+        "title": "Vereenvoudigde ondertitel naar traditioneel – Taiwan en Hongkong – AI-SRTSub",
+        "desc": "Zet een vereenvoudigde ondertitel om naar traditioneel: kies Taiwan (woorden wisselen of alleen vorm) of Hongkong. Bij één vereenvoudigd teken met meerdere traditionele beslist het woord.",
+        "h1": "Vereenvoudigde ondertitel naar traditioneel",
+        "intro": "Moet een vereenvoudigd Chinese ondertitel naar kijkers in Taiwan of Hongkong, dan volstaat één omzetting — Taiwan en Hongkong zijn twee sets; kies je de verkeerde richting, dan zegt men het daar zo niet.",
+        "ctaText": "Zet deze ondertitel om"
+      },
+      "body": [
+        {
+          "h2": "Deze vraag",
+          "ps": [
+            "De ondertitel is vereenvoudigd Chinees en moet naar kijkers in Taiwan of Hongkong. Teken voor teken aanpassen is niet te doen, een aflevering heeft honderden items. Bovendien is het traditionele Chinees van Taiwan en Hongkong niet hetzelfde — de woordkeus verschilt, en met de verkeerde richting komt er een woord uit dat daar niemand zo gebruikt."
+          ]
+        },
+        {
+          "h2": "Waar doe je het",
+          "ps": [
+            "Open [[Omzetting vereenvoudigd-traditioneel|/hanconv.html]], sleep de ondertitel erin en kies onder “Omzettingsrichting” een richting van vereenvoudigd naar traditioneel: algemeen traditioneel, Taiwan-traditioneel (woorden wisselen), Taiwan-traditioneel (alleen vorm), Hongkong-traditioneel. De omzetting is direct klaar, het resultaatvak geeft de omgezette ondertitel, downloaden volstaat.",
+            "**Voor kijkers in Taiwan**: wil je de woorden meenemen, kies “Taiwan-traditioneel (woorden wisselen)”, dan gaan regionale termen mee om; wil je alleen de vorm en je eigen woorden houden, kies “Taiwan-traditioneel (alleen vorm)”. **Voor kijkers in Hongkong**: kies “Hongkong-traditioneel”."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kaart Omzettingsrichting: keuzelijst omzetten naar, nu Vereenvoudigd naar Taiwan-traditioneel (woorden wisselen) gekozen",
+            "cap": "Taiwan en Hongkong zijn in de keuzelijst twee richtingen, met verschillende woordkeus"
+          }
+        },
+        {
+          "h2": "Veelvoorkomende valkuilen",
+          "ps": [
+            "**Eén vereenvoudigd teken met meerdere traditionele is geen probleem**: hetzelfde vereenvoudigde teken gaat in verschillende woorden naar een ander traditioneel teken; de woordenlijst beslist op woordgroep en zet niet alles om in één teken.",
+            "**Alleen de gesproken tekst verandert**: tijdlijn, volgnummers en ASS-stijlopdrachten blijven onaangeroerd, na omzetten meteen bruikbaar.",
+            "**Is niets veranderd, raak dan niet meteen in paniek**: staat bij de statistiekbalk 0 gewijzigde regels, dan bevat deze ondertitel misschien geen Chinese tekens, of de indeling is verkeerd herkend — kijk of “Herkende indeling” overeenkomt met wat je hebt geüpload."
+          ]
+        },
+        {
+          "h2": "Gerelateerd",
+          "ps": [
+            "De volledige uitleg van de negen richtingen zie [[Omzetting vereenvoudigd-traditioneel gebruiken|/guides/hanconv.html]]; waarom het meer is dan een ander teken zie [[Omzetting vereenvoudigd-traditioneel is geen ander teken|/guides/simplified-traditional-chinese.html]]; de omgekeerde weg van traditioneel naar vereenvoudigd zit ook in [[Omzetting vereenvoudigd-traditioneel|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "nl": {
+      "seo": {
+        "title": "Vereenvoudigd-traditioneel: geen ander teken – AI-SRTSub",
+        "desc": "Omzetting vereenvoudigd-traditioneel is lastig op drie punten: één vereenvoudigd teken met meerdere traditionele beslist op woord, Taiwan en Hongkong gebruiken andere woorden.",
+        "h1": "Omzetting vereenvoudigd-traditioneel is geen ander teken",
+        "intro": "Naar welk traditioneel teken een teken wordt omgezet hangt af van het teken ervoor. Daarom kan omzetting niet per los teken worden afgedwongen.",
+        "ctaText": "Open de omzetting"
+      },
+      "body": [
+        {
+          "h2": "Eén: één vereenvoudigd teken, meerdere traditionele",
+          "ps": [
+            "Vereenvoudiging heeft meerdere traditionele tekens tot één vereenvoudigd teken samengevoegd. Ga je terug, dan horen bij één vereenvoudigd teken meerdere traditionele; welke je kiest hangt af van waarmee het samengaat:",
+            "Blind per teken omzetten zet alles om in hetzelfde teken en de hele tekst staat vol fouten. **Op woord beslissen** maakt het verschil — de woordenlijst komt van OpenCC en matcht eerst woordgroepen, dan losse tekens. Bijvoorbeeld:"
+          ],
+          "ul": [
+            "Hetzelfde vereenvoudigde teken gaat in het woord voor schoon naar het ene traditionele teken, in het woord voor boomstam naar een ander",
+            "In het woord voor haar naar het ene teken, in het woord voor ontwikkeling naar een ander",
+            "In de betekenis achter en na naar het ene teken, in het woord voor koningin naar een ander"
+          ]
+        },
+        {
+          "h2": "Twee: Taiwan en Hongkong zijn niet hetzelfde",
+          "ps": [
+            "Naar traditioneel omzetten kent nog een laag: hetzelfde woord wordt in Taiwan en in Hongkong niet gelijk geschreven. Een alledaagse informaticaterm heeft in Taiwan de ene schrijfwijze en in Hongkong een andere.",
+            "Daarom zijn de richtingen gescheiden: binnen Taiwan-traditioneel zijn er twee opties, woorden wisselen en alleen vorm — alleen vorm houdt je bestaande woorden, woorden wisselen zet ook regionale termen om. Hongkong is een richting op zich."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kaart Omzettingsrichting: keuzelijst omzetten naar, nu Vereenvoudigd naar Taiwan-traditioneel (woorden wisselen) gekozen",
+            "cap": "Bij Taiwan kun je woorden wisselen of alleen de vorm, Hongkong heeft een eigen richting"
+          }
+        },
+        {
+          "h2": "Drie: alleen de gesproken tekst mag veranderen",
+          "ps": [
+            "Een ondertitelbestand is niet alleen gesproken tekst. Volgnummers, tijdlijn en de stijlopdrachten van ASS staan er ook in, en daarvan mag niets worden omgezet — zeker in de stijlregels van ASS staan Engelse opdrachtnamen tussen de tekst; worden die als gesproken tekst behandeld, dan gaat het stuk.",
+            "Daarom gebeurt de omzetting na het ontleden van de indeling: bij SRT, VTT, ASS en TXT wordt het tekstdeel apart herkend en veranderen alleen de Chinese tekens daarin. Na omzetting blijven tijdlijn en stijlen gelijk, je hoeft de opmaak niet opnieuw in te stellen."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Resultaatvak: de omgezette ondertitel en de statistiekbalk met het aantal gewijzigde regels",
+            "cap": "De statistiekbalk geeft het aantal gewijzigde regels, het opmaakdeel blijft gelijk"
+          }
+        },
+        {
+          "h2": "Terug naar vereenvoudigd: waar moet je op letten",
+          "ps": [
+            "Ook bij terugzetten naar vereenvoudigd moet je **aangeven uit welke traditionele vorm je komt**: algemeen traditioneel, Taiwan-traditioneel en Hongkong-traditioneel zijn drie wegen, want de regionale woorden van Taiwan en Hongkong worden bij de terugweg eerst tot het algemene woord herleid. Kies je de verkeerde richting, dan blijven er regionale woorden in het vereenvoudigde resultaat achter.",
+            "De onderste groep van de negen richtingen is die van de terugweg naar vereenvoudigd: traditioneel naar vereenvoudigd, Taiwan-traditioneel naar vereenvoudigd, Hongkong-traditioneel naar vereenvoudigd."
+          ]
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "De volledige werkwijze zie [[Omzetting vereenvoudigd-traditioneel gebruiken|/guides/hanconv.html]]; alleen vereenvoudigd naar traditioneel zie [[Vereenvoudigde ondertitel naar traditioneel|/guides/srt-simplified-to-traditional.html]]; naar een andere taal vertalen doe je met [[Ondertitelvertaling|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "nl": {
+      "seo": {
+        "title": "Ondertitel naar Excel/CSV gebruiken – twee richtingen – AI-SRTSub",
+        "desc": "Ondertitel en tabel heen en terug: SRT/VTT exporteren naar Excel of CSV, per regel nalopen en terugzetten naar ondertitel. De tabel herkent drie kolommen begin, eind en tekst.",
+        "h1": "Ondertitel naar Excel/CSV gebruiken",
+        "intro": "Nalezen en vertalen gaat het makkelijkst in een tabel. De ondertitel gaat naar Excel of CSV, je past per regel aan en zet hem terug naar ondertitel — de tijdskolom blijft tekst en de regeleinden in de gesproken tekst blijven behouden.",
+        "ctaText": "Open de tabelomzetting"
+      },
+      "body": [
+        {
+          "h2": "Wat dit gereedschap oplost",
+          "ps": [
+            "Een ondertitel bestaat uit regel voor regel items, een tabel ook uit regel voor regel records — eenmaal in tabelvorm kun je voor nalezen, aantekenen en in bulk vertalen de vertrouwde tabelfuncties gebruiken. Beide richtingen worden ondersteund:"
+          ],
+          "ul": [
+            "**Naar tabel**: SRT en VTT exporteren naar Excel (.xlsx) of CSV, één regel per item, met volgnummer, begin, eind en tekst",
+            "**Naar ondertitel**: de aangepaste tabel terugzetten naar SRT of VTT",
+            "De tijdskolom blijft tekst, het tabelsprogramma zet hem niet om naar getal of datum",
+            "De regeleinden in de gesproken tekst blijven behouden, bij terugzetten staan ze er nog net zo"
+          ]
+        },
+        {
+          "h2": "Uploaden en richting kiezen",
+          "ps": [
+            "Sleep het bestand erin of kies het. De twee richtingen vragen een ander bestand: **naar tabel** wil een ondertitelbestand (SRT / VTT), **naar ondertitel** wil een tabelbestand (CSV / Excel, xlsx en xls inbegrepen). Kies je de verkeerde modus, dan wordt direct gezegd welke soort bestand die modus wil.",
+            "⚠️ Deze pagina leest alleen als UTF-8. Staat de ondertitel bij openen vol vraagtekens of blokjes, repareer de codering dan eerst bij [[Reparatie onleesbare tekens|/repair.html]] — met een kapotte codering leest dit hier een hoop vervangingstekens."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Uploadzone van de tabelpagina: sleepzone en de schakelaar voor twee modi",
+            "cap": "De twee modi vragen verschillende bestanden: naar tabel een ondertitel, naar ondertitel een tabel"
+          }
+        },
+        {
+          "h2": "Ondertitel naar tabel",
+          "ps": [
+            "Kies “naar tabel”, zet de ondertitel erin en het voorbeeldvak somt elk item op: volgnummer, begin, eind, tekst. De statistiekbalk geeft het aantal items en de totale duur. Na bevestigen klik je op Download Excel (.xlsx) of Download CSV.",
+            "Het verschil tussen de twee exportvormen: xlsx is een echt tabelbestand, Excel kan de tijdskolom niet op eigen houtje van opmaak veranderen; CSV is algemener maar bij openen in Excel kan de tijdskolom als iets anders worden getoond — komt dat voor, zet de tijdskolom dan op de opmaak Tekst, of gebruik direct xlsx."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Voorbeeldvak van de tabel: vier kolommen volgnummer, begin, eind en tekst plus statistiekbalk",
+            "cap": "Het voorbeeld somt op, de statistiekbalk geeft aantal items en totale duur"
+          }
+        },
+        {
+          "h2": "Tabel terug naar ondertitel",
+          "ps": [
+            "Kies “naar ondertitel”, zet de tabel erin en de regel voor kolomnamen is: de tabel moet **begin, eind en tekst** hebben (Engelse namen Start / End / Text worden ook herkend), **de volgorde van de kolommen maakt niet uit**. Tijd mag als `00:00:01,500` of `00:00:01.500`; regels die niet herkend worden, worden overgeslagen en de hele tabel wordt niet afgekeurd.",
+            "Het teruggezette resultaat staat in het voorbeeldvak, na bevestigen download je SRT of VTT. Ontbreken die drie kolommen, dan wordt gevraagd de kolomnamen te controleren — veel voorkomende oorzaak is dat bij exporteren andere kolomnamen zijn gebruikt, of dat de kop niet op de eerste regel staat."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Resultaatvak ondertitel: de teruggezette ondertitel een voor een opgesomd",
+            "cap": "Worden drie kolommen niet herkend, dan wordt dat direct gezegd; er wordt niet stilletjes gefaald"
+          }
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**De tijdskolom staat verkeerd in Excel, wat nu?** Gebruik in plaats van CSV direct xlsx, dan is er geen probleem. Moet het CSV zijn: selecteer de tijdskolom, zet de celopmaak op Tekst en open dan.",
+            "**Moeten de kolomnamen in de tabel Chinees zijn?** Nee. Begin, eind en tekst en Start / End / Text worden beide herkend, hoofdletters tellen niet.",
+            "**Blijven de regeleinden na terugzetten behouden?** Ja. De regeleinden in de gesproken tekst blijven gelijk, bij terugzetten staan ze er nog net zo.",
+            "**Wordt ASS ondersteund?** Deze pagina doet alleen SRT en VTT. ASS heeft stijlopdrachten, zet het eerst met [[Indelingsomzetting|/convert.html]] om naar SRT en ga dan naar de tabel.",
+            "**Hoeveel per keer?** Eén. Voor tientallen tot honderden tegelijk gebruik je [[Bulkconversie|/batch.html]] (die doet alleen indeling, geen tabel)."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "De omzetting gebeurt volledig lokaal in de browser; er wordt geen enkele ondertitelinhoud naar de server gestuurd."
+          ]
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "Alleen de stap ondertitel naar Excel zie [[Ondertitel naar Excel|/guides/srt-to-excel.html]]; na aanpassen naar een andere taal vertalen doe je met [[Ondertitelvertaling|/translate.html]]; tientallen bestanden in één keer van indeling veranderen gaat met [[Bulkconversie|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "nl": {
+      "seo": {
+        "title": "Ondertitel naar Excel – SRT als xlsx per regel nalopen – AI-SRTSub",
+        "desc": "Zet een SRT-ondertitel om naar Excel: één regel per item, vier kolommen volgnummer, begin, eind en tekst; tijden blijven tekst en de regeleinden blijven behouden.",
+        "h1": "Ondertitel naar Excel",
+        "intro": "Honderden ondertitelitems een voor een nalezen in een teksteditor is vermoeiend; in Excel is één regel één item en kun je filteren, aantekenen en in bulk vervangen. Klaar? Dan terug naar SRT.",
+        "ctaText": "Exporteren naar Excel"
+      },
+      "body": [
+        {
+          "h2": "Deze vraag",
+          "ps": [
+            "Je moet de ondertitel nalezen, in bulk woorden vervangen, of een paar mensen elk een stuk laten doen — dat gaat in een tabel veel sneller dan in tekst. SRT zelf is platte tekst, maar de structuur van de items (volgnummer, tijd, gesproken tekst) laat zich precies over vier kolommen uitspreiden."
+          ]
+        },
+        {
+          "h2": "Waar doe je het",
+          "ps": [
+            "Open [[Tabelomzetting|/table.html]], kies de modus naar tabel, sleep de SRT erin en het voorbeeldvak somt meteen elk item op — vier kolommen volgnummer, begin, eind, tekst. Klik op Download Excel (.xlsx) en je hebt het. VTT wordt ook ondersteund.",
+            "Klaar met aanpassen: zet de modus op naar ondertitel, zet deze tabel terug en je hebt weer SRT. De regel voor kolomnamen is dat begin, eind en tekst aanwezig zijn (ook Start / End / Text wordt herkend) en de volgorde maakt niet uit."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Tabelvoorbeeld: elk SRT-item wordt een regel, vier kolommen en statistiekbalk",
+            "cap": "SRT spreidt direct uit over vier kolommen, na aanpassen gaat hij dezelfde weg terug"
+          }
+        },
+        {
+          "h2": "Veelvoorkomende valkuilen",
+          "ps": [
+            "**Repareer eerst een kapotte codering**: deze pagina leest alleen als UTF-8. Staat de ondertitel vol vraagtekens of blokjes, ga dan eerst naar [[Reparatie onleesbare tekens|/repair.html]].",
+            "**CSV of xlsx**: gaat het naar Excel, kies xlsx, dan blijft de tijdskolom goed; CSV is algemener maar Excel kan het als iets anders zien — zet de tijdskolom dan op Tekst.",
+            "**ASS kan niet**: ASS met stijlopdrachten gaat eerst naar SRT en dan pas de tabel in."
+          ]
+        },
+        {
+          "h2": "Gerelateerd",
+          "ps": [
+            "De volledige uitleg in twee richtingen zie [[Ondertitel naar Excel/CSV gebruiken|/guides/table.html]]; na aanpassen naar een andere taal vertalen doe je met [[Ondertitelvertaling|/translate.html]]; voor je het weggeeft, loop het nog na met [[Ondertitelkwaliteitscontrole|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "nl": {
+      "seo": {
+        "title": "Bulkconversie van ondertitels gebruiken – honderden in één ZIP – AI-SRTSub",
+        "desc": "Bulkconversie: sleep tientallen tot honderden SRT/VTT erin, zet ze om naar één doelindeling en krijg ze als één ZIP. Niet-herkende bestanden blijven apart staan.",
+        "h1": "Bulkconversie van ondertitels gebruiken",
+        "intro": "Moeten tientallen ondertitels van een seizoen dezelfde indeling krijgen, dan is één voor één uploaden te traag. Op de bulkpagina sleep je ze er in één keer in, zet ze om naar de doelindeling en krijgt ze als één ZIP — niet-herkende bestanden worden apart gemarkeerd en komen niet in het pakket.",
+        "ctaText": "Open bulkconversie"
+      },
+      "body": [
+        {
+          "h2": "Wat dit gereedschap oplost",
+          "ps": [
+            "Ondertitels van een heel seizoen of een hele verzameling moeten vaak eerst naar één indeling voordat ze bruikbaar zijn. Wat de bulkpagina doet:"
+          ],
+          "ul": [
+            "Tientallen tot honderden SRT en VTT in één keer erin slepen (meervoudige keuze in één keer)",
+            "Omzetten naar één indeling: SRT of VTT, volgnummers opnieuw, tijdstempels volgens de doelindeling genormaliseerd",
+            "Downloaden als één ZIP, de bestandsnamen blijven gelijk en alleen de extensie verandert",
+            "Bestanden waaruit geen ondertitelitem te lezen is, worden apart gemarkeerd en gaan niet in het pakket"
+          ]
+        },
+        {
+          "h2": "Bestanden erin zetten",
+          "ps": [
+            "Sleep meerdere ondertitelbestanden samen in het gestreepte vak, of klik en kies er in één keer meerdere. De bestandslijst somt ze een voor een op: bij herkende staat het aantal items, niet-herkende krijgen niet herkend. De statistiek bovenaan geeft het aantal bestanden, het totaal aantal items en hoeveel er niet herkend zijn.",
+            "⚠️ Deze pagina leest alleen als UTF-8. Ondertitels met een kapotte codering (scherm vol vraagtekens of blokjes) repareer je eerst bij [[Reparatie onleesbare tekens|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Bestandslijst: bestandsnamen en aantallen items een voor een, niet-herkende in rood",
+            "cap": "De lijst somt een voor een op, niet-herkende worden meteen gemarkeerd"
+          }
+        },
+        {
+          "h2": "Naar welke indeling",
+          "ps": [
+            "Kies bij Omzetten naar de doelindeling — SRT of VTT. Na kiezen wordt elk bestand in de lijst volgens de doelindeling opnieuw opgebouwd: volgnummers van voren af aan, tijdstempels volgens de doelindeling genormaliseerd (SRT scheidt milliseconden met een komma, VTT met een punt).",
+            "**De bestandsnaam blijft gelijk, alleen de extensie verandert**; bij dezelfde naam wordt automatisch een volgnummer toegevoegd, ze overschrijven elkaar niet."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Keuze van doelindeling en de status van de lijst, statistiekbalk met aantal bestanden en items",
+            "cap": "Na kiezen van de doelindeling wordt de lijst opnieuw opgebouwd; alleen de extensie van de bestandsnaam verandert"
+          }
+        },
+        {
+          "h2": "Inpakken en downloaden",
+          "ps": [
+            "Klik op Downloaden als één ZIP en in het archief zitten alle omgezette bestanden. **Bestanden waaruit geen ondertitelitem te lezen is, gaan niet in het pakket** — ze blijven gemarkeerd in de lijst en glippen er niet in alsof het gelukt is. Zodra het pakket klaar is, wordt gezegd hoeveel bestanden erin zitten."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Inpakvak: ZIP-downloadknop en melding van het inpakresultaat",
+            "cap": "Niet-herkende bestanden gaan niet in het pakket en blijven in de lijst staan"
+          }
+        },
+        {
+          "h2": "Wanneer komt er niet herkend te staan",
+          "ps": [
+            "Is uit een bestand geen enkel ondertitelitem te lezen, dan komt er niet herkend. Drie veelvoorkomende oorzaken: het is geen ondertitel (bijvoorbeeld een .txt-bestand met uitleg ertussen), de codering is geen UTF-8 (alles wat gelezen wordt is vervangingsteken), of de inhoud is tot één alinea zonder tijdstempels samengedrukt.",
+            "Gemarkeerde bestanden kun je apart behandelen: voor een coderingsprobleem naar [[Reparatie onleesbare tekens|/repair.html]], voor een indelingsprobleem met [[Indelingsomzetting|/convert.html]] één keer apart omzetten en dan terugzetten in de lijst."
+          ]
+        },
+        {
+          "h2": "Veelgestelde vragen",
+          "ps": [
+            "**Hoeveel kunnen er in één keer in?** Er is geen vaste bovengrens, het hangt van het geheugen van de browser af; een paar honderd SRT is meestal geen probleem.",
+            "**Verandert mijn gesproken tekst?** Nee. Bulkconversie wisselt alleen de containerindeling, zet volgnummers opnieuw en normaliseert tijdstempels; aan de gesproken tekst wordt niet geraakt.",
+            "**Ik wil de inhoud wijzigen, wat dan?** Deze pagina doet alleen indeling. Voor tijdlijn in bulk gebruik [[Tijdlijn aanpassen|/shift.html]], voor tekst in bulk [[Termvervanging|/glossary.html]]; beide werken op hun eigen pagina per bestand.",
+            "**Wordt ASS ondersteund?** Deze pagina zet alleen om tussen SRT en VTT. ASS heeft stijl, zet het met [[Indelingsomzetting|/convert.html]] apart om."
+          ]
+        },
+        {
+          "h2": "Privacy",
+          "ps": [
+            "Omzetten en inpakken gebeuren volledig lokaal in de browser; er wordt geen enkele ondertitelinhoud naar de server gestuurd."
+          ]
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "Wat je in een heel seizoen moet wijzigen en waar je begint, zie [[Ondertitels van een heel seizoen in bulk aanpassen|/guides/batch-convert-srt.html]]; meer indelingen voor één bestand bij [[Indelingsomzetting|/convert.html]]; nalezen in een tabel gaat met [[Tabelomzetting|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "nl": {
+      "seo": {
+        "title": "Ondertitels van een heel seizoen in bulk – wat wel en niet kan – AI-SRTSub",
+        "desc": "Wat je in een heel seizoen aanpast is meestal één ding: dezelfde indeling, dezelfde tijdlijnverschuiving, dezelfde termen. Wat in één keer kan en wat per bestand moet.",
+        "h1": "Ondertitels van een heel seizoen in bulk aanpassen",
+        "intro": "In tientallen ondertitels van een seizoen is meestal steeds hetzelfde aan de hand. Uitzoeken wat in één keer kan en wat per bestand moet, scheelt veel meer dan alles één voor één doen.",
+        "ctaText": "Open bulkconversie"
+      },
+      "body": [
+        {
+          "h2": "Meestal is het steeds hetzelfde",
+          "ps": [
+            "Gaat er iets mis in de ondertitels van een seizoen, dan heeft zelden elke aflevering een eigen probleem — meestal is dezelfde oorzaak op elke aflevering gevallen: het hele seizoen is door dezelfde ondertitelgroep gecomprimeerd (indeling gelijk, watermerk gelijk), het hele seizoen hoort bij dezelfde videoversie (richting en grootte van de verschuiving gelijk), of de vertaalde namen zijn door het seizoen heen niet consistent.",
+            "Pak er eerst twee afleveringen (een van voren, een van achteren) en kijk of het **hetzelfde probleem** is voor je in bulk gaat. Verschilt het probleem tussen de eerste en de laatste, dan is het niets voor bulk."
+          ]
+        },
+        {
+          "h2": "Wat in één keer kan",
+          "ps": [
+            "**De indeling gelijktrekken** is het enige wat echt in één keer kan: tientallen tot honderden SRT en VTT gaan samen [[Bulkconversie|/batch.html]] in, je kiest de doelindeling en krijgt één ZIP. Volgnummers opnieuw en tijdstempels normaliseren gebeuren in die stap, aan de gesproken tekst wordt niet geraakt."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Bestandslijst van de bulkpagina: aantallen items een voor een, niet-herkende in rood",
+            "cap": "De indeling gelijktrekken is het enige wat in één keer kan"
+          }
+        },
+        {
+          "h2": "Wat per bestand moet",
+          "ps": [
+            "Voor het volgende is er geen bulkingang, dat moet je per bestand doen — maar meestal bestaat er een gelijkwaardige handeling die **één keer wordt gedaan en dan op het hele seizoen wordt toegepast**:"
+          ],
+          "ul": [
+            "**De tijdlijnverschuiving gelijktrekken**: is de verschuiving per aflevering gelijk, meet die dan bij één aflevering in [[Tijdlijn aanpassen|/shift.html]], noteer het getal en vul bij de rest hetzelfde getal in",
+            "**Termen gelijktrekken**: de termenlijst wordt in [[Termvervanging|/glossary.html]] één keer ingesteld, elke ondertitel gebruikt dezelfde lijst",
+            "**Watermerken gelijktrekken**: de watermerkregel ligt vast, de standaardvinkjes in [[Ondertitels opschonen|/clean.html]] dekken de gebruikelijke watermerken; je hoeft de bestanden alleen één voor één erin te slepen"
+          ]
+        },
+        {
+          "h2": "Zet de volgorde niet om",
+          "ps": [
+            "Moet er meer dan één ding gebeuren, dan kost een verkeerde volgorde dubbel werk. Ga in deze volgorde:",
+            "**Eerst de codering repareren** → **dan de indeling gelijktrekken** → **dan de inhoud wijzigen** (watermerk, termen, tijdlijn) → **als laatste de kwaliteitscontrole**. Zonder de codering te repareren van indeling veranderen levert nog steeds onleesbare tekst op; zonder de indeling gelijk te trekken de inhoud wijzigen werkt niet, want gereedschappen ondersteunen niet dezelfde indelingen."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Inpakvak: ZIP-downloadknop en resultaatmelding",
+            "cap": "De indeling gelijktrekken gaat vooraan, de inhoud wijzigen erna"
+          }
+        },
+        {
+          "h2": "Wat doe je met niet-herkende bestanden",
+          "ps": [
+            "Bestanden die in bulkconversie niet herkend krijgen, gaan niet in de ZIP en blijven in de lijst staan. Drie veelvoorkomende oorzaken: het is geen ondertitelbestand (een uitlegbestand ertussen), de codering is geen UTF-8, of de inhoud is tot één alinea zonder tijdstempels samengedrukt.",
+            "Repareer een coderingsprobleem apart bij [[Reparatie onleesbare tekens|/repair.html]]; zet een indelingsprobleem apart om met [[Indelingsomzetting|/convert.html]] en zet het terug in de lijst. **Duw niet-herkende bestanden er niet met geweld in om het aantal vol te maken** — in de speler merken dat er een aflevering ontbreekt, is veel lastiger dan nu een minuut extra."
+          ]
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "Het volledige gebruik van bulkconversie zie [[Bulkconversie van ondertitels gebruiken|/guides/batch.html]]; de tijdlijn op één verschuiving trekken zie [[Tijdlijn aanpassen gebruiken|/guides/shift.html]]; voor je het weggeeft, loop het nog na met [[Ondertitelkwaliteitscontrole|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "nl": {
+      "seo": {
+        "title": "Wat is 23.976 / 24 / 25 / 30 fps – tijdlijn van ondertitels – AI-SRTSub",
+        "desc": "23.976 is geen 24 en 29.97 is geen 30: die 0,1 procent komt van de kleurentelevisie van NTSC. In PAL-gebieden wordt film met 25 versneld met 4 procent.",
+        "h1": "Wat is 23.976 / 24 / 25 / 30 fps",
+        "intro": "Die 0,1 procent tussen 23.976 en 24 is een staartje uit de televisiegeschiedenis. Samen met de 4 procent van PAL is dat de oorzaak dat ondertitels steeds verder gaan lopen.",
+        "ctaText": "Open tijdlijn aanpassen"
+      },
+      "body": [
+        {
+          "h2": "Wat zijn deze vier getallen",
+          "ps": [
+            "Beeldfrequentie is hoeveel beelden er per seconde worden getoond. De vier gebruikelijke:"
+          ],
+          "ul": [
+            "**24 fps** — opname- en vertoningssnelheid van film, de bioscoop draait op 24",
+            "**23.976 fps** — snelheid van film na overgang naar NTSC-televisie, 0,1 procent langzamer dan 24",
+            "**25 fps** — televisiesnelheid van PAL (Europa, China, Australië en andere 50 Hz-gebieden)",
+            "**29.97 fps / 30 fps** — snelheid van NTSC-televisieprogramma's, weer datzelfde verschil van 0,1 procent"
+          ]
+        },
+        {
+          "h2": "Waar komt die 0,1 procent vandaan",
+          "ps": [
+            "23.976 = 24 × 1000/1001, 29.97 = 30 × 1000/1001. Die 1000/1001 stamt uit de kleurenovergang van NTSC: om de kleurendragolf in te passen zonder bestaande zwart-witontvangers aan te passen, werd de beeldfrequentie van 60 Hz naar 59,94 Hz (60 × 1000/1001) gebracht, en de framerate zakte mee.",
+            "Het gevolg: film wordt in NTSC-gebieden uitgezonden op 23.976 in plaats van 24. Het verschil van 0,1 procent is bij een film van een uur 3,6 seconde — op zichzelf bijna niet te merken, maar het is niet hetzelfde als de 4 procent hieronder; reken ze niet door elkaar."
+          ]
+        },
+        {
+          "h2": "En die 4 procent",
+          "ps": [
+            "In PAL-gebieden wordt op 25 fps uitgezonden. Film is op 24 fps opgenomen en wordt direct op 25 afgespeeld — het aantal beelden verandert niet, de afspeelsnelheid wordt 4 procent hoger (25/24 ≈ 1,0417). Een film van 100 minuten is in de PAL-versie 96 minuten.",
+            "Dat is de oorzaak van de **geleidelijke afwijking**: de ondertitel is op het origineel gemaakt en het video is de PAL-versie; in het begin klopt het tot op de seconde, aan het eind loopt het 4 minuten uit. De hele boel verschuiven helpt niet, het moet naar verhouding worden omgerekend."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Snelheidsvak van de tijdlijnpagina: invoerveld voor de verhouding",
+            "cap": "Omrekenen naar verhouding, één verhoudingswaarde voor de hele film"
+          }
+        },
+        {
+          "h2": "Hoe reken je om",
+          "ps": [
+            "Omrekenen is vermenigvuldigen met één verhoudingsgetal, geldig voor de hele film:"
+          ],
+          "ul": [
+            "**24 → 25** (PAL-versnelling): × 0,96",
+            "**23.976 → 25**: × 0,959 (nauwkeurige waarde 23.976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 of × 0,999, maar 0,1 procent verschil",
+            "Tussen 0,96 en 0,959 zit 0,1 procent, over een hele film minder dan 6 seconden — weet je niet zeker of de bron 24 of 23.976 is, dan werkt 0,96 ook; het resterende verschil vang je op met verankeren op twee punten"
+          ]
+        },
+        {
+          "h2": "Hoe weet je welke je hebt",
+          "ps": [
+            "Wil je de verhouding niet raden, zoek dan twee tijdstippen waarvan je zeker weet dat ze kloppen — meestal de eerste en de laatste gesproken regel — en zeg tegen het gereedschap dat deze regel op 00:00:12 hoort en die op 01:35:40; dan trekt het de hele film lineair naar die twee punten. Dat is verankeren op twee punten en je hoeft geen framerate uit te rekenen.",
+            "Wil je de framerate van je bron zelf bevestigen: die staat in de speler of in een mediainfo-programma. Bevat de bestandsnaam geen framerate, zoals `1080p.WEB`, dan is verankeren op twee punten veiliger."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Verankeren op twee punten op de tijdlijnpagina: twee invoervelden voor tijdstippen",
+            "cap": "Verankeren op twee punten vraagt geen framerateberekening, twee tijdstippen zijn genoeg"
+          }
+        },
+        {
+          "h2": "Gerelateerde gereedschappen en gidsen",
+          "ps": [
+            "Framerate direct omrekenen doe je bij [[Framerate van ondertitels omzetten|/guides/srt-fps-converter.html]]; snelheid aanpassen bij [[Snelheid van ondertitels aanpassen|/guides/subtitle-speed-converter.html]]; is het een verschuiving van alles of een geleidelijke afwijking, zie [[Ondertitels lopen steeds verder uit de pas|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

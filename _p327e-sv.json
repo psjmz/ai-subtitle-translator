@@ -1,0 +1,435 @@
+{
+  "translate": {
+    "sv": [
+      {
+        "h2": "Vad verktyget löser",
+        "ps": [
+          "Översätt undertexter från ett språk till ett annat och exportera en färdig undertextsfil direkt. Typiska behov:"
+        ],
+        "ul": [
+          "Utländskt material med kinesiska undertexter, eller kinesiskt innehåll med undertexter på ett annat språk",
+          "Översättningen ska bli tvåspråkiga undertexter tillsammans med originalet (original överst eller översättning överst)",
+          "Enhetliga namn och ortsnamn för en hel säsong (ordlista)",
+          "Finjustera tidsaxeln efter översättningen (förskjutning eller skalning)"
+        ]
+      },
+      {
+        "h2": "Ladda upp undertexter",
+        "ps": [
+          "Klicka på ”Välj undertextfil” eller klistra in undertexttexten direkt i inmatningsfältet till vänster. Sex format stöds: SRT, VTT, ASS, SSA, SBV och TXT. Saknar du en fil kan du klicka på ”Ladda exempel” för att se hur det fungerar. När tolkningen lyckas visas undertexttabellen i mittkolumnen, med nummer, tidsaxel och originaltext för varje rad."
+        ],
+        "img": {
+          "file": "translate-upload",
+          "alt": "Importområdet i översättningsverktyget: välj undertextfil, inklistringsfält och knappen för att ladda exempel",
+          "cap": "Vänsterkolumnen ”Importera undertexter”: välj fil, klistra in text eller ladda exempel"
+        }
+      },
+      {
+        "h2": "Välj språk och stil",
+        "ps": [
+          "”Källspråk” kan lämnas på automatisk igenkänning och ”målspråk” väljs bland 75 språk. Det finns fem översättningsstilar: balanserad (standard), naturligt tal, formellt skriftligt, dubbningsstil och anpassad. ”Dubbningsstil” passar filmdialog och ”formellt skriftligt” passar dokumentärer och kurser."
+        ],
+        "img": {
+          "file": "translate-lang",
+          "alt": "Inställningar för språk och översättningsstil: källspråk, målspråk och fem stilar",
+          "cap": "”Språk” och ”översättningsstil”: källspråket kan identifieras automatiskt, målspråk väljs bland 75"
+        }
+      },
+      {
+        "h2": "Ordlista: enhetliga namn genom hela filmen",
+        "ps": [
+          "AI översätter i omgångar, och samma namn kan få två olika stavningar i olika omgångar. Skriv in ”original → vad det måste heta” i ordlistan, så letas varje omgång igenom innan översättningen och träffarna följs. En post per rad; som pil godtas `->`, `=>`, `→` och Tab. Anger du bara originalet betyder det att det ska lämnas orört; flera stavningar kan dela en översättning med `|`. Klicka på ”✨ AI-utdrag” för att låta AI plocka ut egennamnen ur filmen och fylla i listan först, justera och översätt sedan."
+        ],
+        "img": {
+          "file": "translate-glossary",
+          "alt": "Området för termer och egennamn: ordlistans fält samt knapparna för AI-utdrag och spara",
+          "cap": "Ordlistan ”Enhetliga namn”: AI plockar ut egennamn, och listan laddas automatiskt nästa gång"
+        }
+      },
+      {
+        "h2": "Översättningsprocessen",
+        "ps": [
+          "Klicka på ”▶ Börja översätta” i översta raden. Statistikraden i mittkolumnen visar i realtid antal rader, översatta rader, borttagna utfyllnadsord och meningsgrupper över flera rader; förloppsindikatorn visar beräknad återstående tid och antalet token som gått åt. Under översättningen kan du när som helst klicka på en översättningscell i tabellen och ändra texten – ändringarna sparas lokalt och försvinner inte vid omladdning. Stänger du sidan mitt i visas nästa gång en fråga om att fortsätta där du slutade. När en hel mening är uppdelad på flera undertexter översätts meningsgruppen som en enhet och fylls sedan tillbaka efter varje rads varaktighet."
+        ],
+        "img": {
+          "file": "translate-workspace",
+          "alt": "Översättningsarbetsytan: statistikrad, förloppsindikator och redigerbar undertexttabell",
+          "cap": "Mittkolumnens arbetsyta: statistikrad + förloppsindikator + klickbar undertexttabell"
+        }
+      },
+      {
+        "h2": "Export",
+        "ps": [
+          "Välj först innehållsform i högerkolumnen: endast översättning (enspråkigt), tvåspråkigt med original överst eller tvåspråkigt med översättning överst. Välj sedan filformat: SRT, WebVTT, SBV, ASS eller TXT. För ASS finns dessutom två layouter: ”två skärmar ovan och under” och ”två rader längst ner”. Innehåll och format kombineras fritt, vilket ger 14 exportvarianter. Radbredden för tvåspråkiga undertexter ställs separat. Klicka på ”Ladda ner undertexter” för att spara filen eller ”Kopiera till urklipp” för att klistra in den direkt."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Exportpanelen: tre innehållsformer, fem filformat och inställning för tvåspråkig radbredd",
+          "cap": "Export i högerkolumnen: välj innehållsform först, sedan filformat"
+        }
+      },
+      {
+        "h2": "Kostnad och integritet",
+        "ps": [
+          "Standardmodellen kräver ingen registrering och ingen nyckel – den fungerar direkt, med en gräns per antal förfrågningar: varje IP har ett visst antal per dag och hela sajten har dessutom en gemensam dygnskvot. Vid stora volymer bör du fylla i din egen API-nyckel under ”Översättningsmotor”. Integritetsvillkoren följer informationen på sidan: undertexter som översätts med standardmodellen skickas via sajtens server vidare till leverantören, medan ett eget API hanteras direkt av den leverantör du anger och nyckeln sparas bara i din webbläsare. Tolkning, radbrytning och tvåspråkig layout sker helt och hållet lokalt i webbläsaren."
+        ]
+      },
+      {
+        "h2": "Vanliga frågor",
+        "ps": [
+          "**Blandas andra språk in i översättningen?** Verktyget upptäcker när översättningen hamnar på fel språk och översätter om automatiskt. Stämmer en enstaka rad fortfarande inte kan du klicka i cellen och rätta den för hand.",
+          "**Hur hanteras sångrader?** Under ”Innehållsfilter” finns tre val för sångtext: översätt sångtexten, behåll originalet eller ta bort sångtexten.",
+          "**Är namnen inkonsekventa?** Lägg till de avvikande stavningarna i ordlistan och översätt igen; ordlistan har företräde framför den globala inställningen ”Hantering av egennamn”.",
+          "**Vill du ha engelska överst och kinesiska under?** Välj ”tvåspråkigt · original överst” vid export. Vill du ha kinesiska överst väljer du ”tvåspråkigt · översättning överst”."
+        ]
+      },
+      {
+        "h2": "Relaterade verktyg och guider",
+        "ps": [
+          "Stämmer inte formatet går du först till [[Formatkonvertering|/convert.html]]; är tidsaxeln fel använder du [[Justera tidsaxel|/shift.html]]; innan du lämnar ifrån dig filen kör du [[Undertextkontroll|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  },
+  "clean": {
+    "sv": [
+      {
+        "h2": "Vad verktyget löser",
+        "ps": [
+          "Nedladdade undertexter innehåller ofta saker som inte hör dit. Rengöraren tar bort dem enligt regler i ett svep:"
+        ],
+        "ul": [
+          "Vattenstämplar från undertextgrupper, webbadresser och reklamrader",
+          "Hörselhjälpmarkeringar (som [fotsteg] och (musik)) och talaretiketter",
+          "ASS-effekter, HTML-taggar och styrtecken",
+          "Dubbla rader, tomma rader och rörig interpunktion och blanksteg"
+        ]
+      },
+      {
+        "h2": "Uppladdning och igenkänning",
+        "ps": [
+          "Dra in filen eller välj den för uppladdning – SRT, VTT, ASS, SSA och TXT stöds, och du kan också klistra in undertexttexten direkt. Teckenkodningen identifieras automatiskt: om UTF-8 ger ersättningstecken faller verktyget tillbaka på GBK eller Big5 och sidan meddelar ”kodningen har rättats enligt {encoding}”. Om du laddar upp tvåspråkiga dubbelspår (två rader med exakt samma tidsaxel, en på kinesiska och en på engelska) slås de automatiskt ihop till en tvåspråkig rad och du får en växel för ”gör om till original överst / översättning överst”."
+        ]
+      },
+      {
+        "h2": "Så ställer du in de 13 reglerna",
+        "ps": [
+          "Gränssnittet har 13 kryssrutor i fyra grupper: **taggar och format** (ASS-effekter, HTML-taggar, styrtecken, sortering och numrering), **hörselhjälp och ljudeffekter** (hörselhjälpmarkeringar, talaretiketter, rena sångrader), **vattenstämplar och skräprader** (vattenstämplar och reklam, dubbla rader, tomma rader) samt **texträttning** (interpunktion och blanksteg, versalrättning, sammanslagning av korta meningar). Som standard är bara de förlustfria och säkra alternativen på; de som kan tappa innehåll (sångrader, versalrättning, sammanslagning) är avstängda och får slås på vid behov. Varje regel har en ⓘ med förklaring vid hovring, och varje ändring körs om direkt."
+        ],
+        "img": {
+          "file": "clean-opts",
+          "alt": "Rengöringsinställningarna: 13 kryssrutor i fyra grupper, med antalet aktiva högst upp",
+          "cap": "13 regler i fyra grupper – bara de förlustfria är på från början, ändringar slår igenom direkt"
+        }
+      },
+      {
+        "h2": "Jämförelse och återställning",
+        "ps": [
+          "Resultatet skriver inte över något direkt: varje ändring listas i en jämförelsetabell med en etikett som visar vilken regel som ligger bakom ändringen eller borttagningen. Vill du behålla en rad klickar du på ”Återställ” för just den; ”Återställ allt” tar tillbaka allt i ett steg, och ett klick till kör rengöringen igen. Statistikraden visar antal före, efter, borttagna, ändrade och återställda."
+        ],
+        "img": {
+          "file": "clean-diff",
+          "alt": "Jämförelsetabellen: nummer, tid, original mot rengjord text, med en regeletikett på varje rad",
+          "cap": "Varje ändring har en regeletikett och kan återställas enstaka eller alla på en gång"
+        }
+      },
+      {
+        "h2": "Förhandsgranskning och export",
+        "ps": [
+          "Växla mellan vyerna ”rengjord” och ”original”. I originalvyn stryks borttagna rader över och markeras som ”borttagna”. Innehållet som exporteras är exakt det du ser i förhandsgranskningen. Exportformat: SRT (standard), VTT, ASS (valbart när källfilen är ASS, då stilavsnittet behålls oförändrat) samt ren text i TXT utan tidsaxel. Filnamnet får automatiskt markeringen `.clean`."
+        ],
+        "img": {
+          "file": "clean-preview",
+          "alt": "Förhandsgranskning av hela texten: växling mellan rengjord och original, med antal i statistikraden",
+          "cap": "Två vyer att växla mellan – det du ser är det du får"
+        }
+      },
+      {
+        "h2": "Vanliga frågor",
+        "ps": [
+          "**Kan vanlig dialog raderas av misstag?** Vattenstämpelregeln tar först bort vattenstämpelrader rad för rad (dialogen i tvåspråkiga rader behålls) och tar bara bort hela raden om spår finns kvar efteråt. Hörselhjälpmarkeringar tas bara bort när parentesen innehåller en markör och är högst 40 tecken lång; vanlig dialog inom parentes rörs inte.",
+          "**Hur skiljs rena sångrader från sång i dialogen?** Bara rader där varje rad omges av ♪ eller består av markeringar som [music] tas bort; dialog med sångtext behålls.",
+          "**Kan talaretiketterna skada kinesisk text?** De matchar bara ett namn i versaler och siffror i början av raden följt av kolon (som `GEORGE:`); kinesiska meningar med kolon matchar inte.",
+          "**Kan man rengöra flera filer samtidigt?** Nej, en fil i taget; ladda ner den färdiga och lägg in nästa."
+        ]
+      },
+      {
+        "h2": "Integritet",
+        "ps": [
+          "Rengöringen sker helt lokalt i webbläsaren, och inget undertextinnehåll skickas till någon server."
+        ]
+      },
+      {
+        "h2": "Relaterade verktyg och guider",
+        "ps": [
+          "En kort genomgång av just vattenstämplar och reklam finns i [[Ta bort reklam och vattenstämplar|/guides/remove-subtitle-ads.html]]; innan du lämnar ifrån dig filen kör du [[Undertextkontroll|/guides/subtitle-quality-check.html]]; behöver du byta format använder du [[Formatkonvertering|/convert.html]]."
+        ]
+      }
+    ]
+  },
+  "bilingual": {
+    "sv": [
+      {
+        "h2": "Vad verktyget löser",
+        "ps": [
+          "Du har tvåspråkiga undertexter men vill bara ha ett av spåren – eller tvärtom dela upp eller slå ihop de två spåren:"
+        ],
+        "ul": [
+          "Bara originalspåret eller bara översättningsspåret",
+          "Dela upp i två separata filer, ”original” och ”översättning”",
+          "Slå ihop två tvåspråkiga rader på samma tidsaxel till en rad med två textrader",
+          "Byt format samtidigt (läs ASS och exportera SRT, till exempel)"
+        ]
+      },
+      {
+        "h2": "Hur den känner igen tvåspråkighet",
+        "ps": [
+          "Tvåspråkiga undertexter förekommer i två vanliga former som verktyget skiljer på, **utan att gissa språk**: **Form A (en undertext med två rader)** delas upp efter skriftsystem – tio system som kana, hangul, hanzi och latinsk skrift. Det krävs två av dem för att räknas som tvåspråkigt, och det som kommer först räknas som original; finns bara ett system (till exempel en lång kinesisk mening som brutits) behålls raden som enspråkig. **Form B (två separata undertexter med exakt samma tidsaxel)** delas upp efter position – två rader med samma tid bildar en grupp, den första räknas som original, och kombinationer som engelska med franska eller engelska med tyska går också att skilja åt eftersom de ligger på varsin rad. Hittas inget tvåspråkigt innehåll gråas både lägesvalet och startknappen ut med ett tydligt besked – verktyget delar aldrig upp något på måfå."
+        ]
+      },
+      {
+        "h2": "Fyra lägen",
+        "ps": [
+          "Listan ”Vilket vill du ha” har fyra val: **endast original** och **endast översättning** ger en fil var; **dela i två filer** ger en originalfil och en översättningsfil, där filnamnen automatiskt får `.orig` / `.dst` så att de inte skriver över varandra; **slå ihop till en rad med två textrader** gör varje grupp till en tvåspråkig rad med originalet på en rad och översättningen på nästa, medan enspråkiga grupper lämnas som de är utan att en andra rad hittas på. Byter du läge eller utformat körs det befintliga innehållet om direkt, utan att du behöver klicka på start igen."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Lägesvalet i verktyget för att separera tvåspråkiga undertexter: endast original, endast översättning, dela i två filer, slå ihop till en rad med två textrader",
+          "cap": "Fyra lägen: behåll ett spår, dela i två filer eller slå ihop till två textrader"
+        }
+      },
+      {
+        "h2": "Indata och utdata",
+        "ps": [
+          "Läser sju format: SRT, VTT, ASS, SSA, SBV, LRC och TXT (först efter filändelse, annars efter innehåll). Exporterar fyra: SRT, VTT, ASS och TXT. Indata och utdata kan kombineras fritt, så formatbyte ingår. Radbrytningen `\\N` i ASS blir en riktig radbrytning, och effekttaggar tas bort vid export till andra format."
+        ]
+      },
+      {
+        "h2": "Resultat och export",
+        "ps": [
+          "Resultatet visas i sin helhet i ett skrivskyddat textfält, med antal rader och total längd för varje fil, och knapparna ”Ladda ner” och ”Kopiera” tar hand om resten. Resultatytan är bara en förhandsgranskning och låter dig inte ändra text eller tidsaxel – exportera först och redigera sedan i rätt verktyg."
+        ],
+        "img": {
+          "file": "bilingual-result",
+          "alt": "Resultatytan: skrivskyddad förhandsgranskning, radantal och knappar för nedladdning och kopiering",
+          "cap": "Hela resultatet i förhandsgranskning + antal rader och total längd + nedladdning och kopiering"
+        }
+      },
+      {
+        "h2": "Vanliga frågor",
+        "ps": [
+          "**Varför går det inte att skilja engelska och franska åt när de ligger på samma rad?** Form A delar upp efter skriftsystem, och två språk med samma skriftsystem går inte att skilja inom en rad. Lägg i stället upp innehållet som form B (två rader på samma tidsaxel), då skiljs de åt efter position.",
+          "**Fick jag bara en fil?** ”Endast original”, ”endast översättning” och ”slå ihop till två textrader” ger alltid en fil; bara ”dela i två filer” ger två, med `.orig` / `.dst` i filnamnet.",
+          "**Går det att köra flera filer samtidigt?** En fil i taget, ingen kö.",
+          "**Laddas mina undertexter upp?** Nej, tolkning och export sker helt lokalt i webbläsaren."
+        ]
+      },
+      {
+        "h2": "Relaterade guider",
+        "ps": [
+          "En kort genomgång av att dela upp i två spår finns i [[Dela tvåspråkiga undertexter i två spår|/guides/split-bilingual-subtitles.html]]; hur tvåspråkiga undertexter skapas beskrivs i [[Två sätt att göra tvåspråkiga undertexter|/guides/make-bilingual-subtitles.html]]; för maskinöversättning använder du [[AI-undertextöversättning|/translate.html]]."
+        ]
+      }
+    ]
+  },
+  "make-bilingual-subtitles": {
+    "sv": [
+      {
+        "h2": "Hur de två formerna ser ut",
+        "ps": [
+          "**Form B: två rader på samma tidsaxel.** Samma mening ligger som två separata undertextrader med exakt samma tidsaxel, en på engelska och en på kinesiska, och spelas upp ovanpå varandra. Det här är det vanligaste sättet att göra tvåspråkiga ASS-filer."
+        ],
+        "ul": [
+          "`What are you waiting for?`",
+          "`你还在等什么？`"
+        ]
+      },
+      {
+        "h2": "Varje form har sina svagheter",
+        "ps": [
+          "Form A har en fallgrop i **igenkänningen**: uppdelningen bygger på skriftsystem, och kombinationer som kinesiska med engelska eller japanska med engelska går lätt att skilja – men engelska med franska eller kinesiska med japanska kanji, som **delar samma skriftsystem**, går inte att skilja åt. Form B har en fallgrop i **produktionen**: de två tidsaxlarna måste stämma exakt, och manuell justering är mödosam; dessutom ritar en del spelare upp båda raderna och då trängs texten på skärmen. Tumregel: färdiga filer för tittare görs oftast i form A; ska varje spår användas separat i efterarbetet är form B enklast att dela upp."
+        ]
+      },
+      {
+        "h2": "De två vägarna",
+        "ps": [
+          "**Gör tvåspråkigt av originalet**: använd [[AI-undertextöversättning|/translate.html]] och välj ”tvåspråkigt · original överst” eller ”tvåspråkigt · översättning överst” vid export, så får du form A direkt. Väljer du ASS-format finns dessutom layouterna ”två skärmar ovan och under” och ”två rader längst ner”.",
+          "**Slå ihop eller konvertera spåren**: använd ”slå ihop till en rad med två textrader” i [[Separera tvåspråkiga undertexter|/bilingual.html]] – form B in, form A ut. Tvärtom ger ”dela i två filer” två separata spår ut, oavsett om du matar in form A eller B."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "De fyra lägena i verktyget för att separera tvåspråkiga undertexter, där slå ihop till två textrader kan slå samman två rader på samma tidsaxel",
+          "cap": "”Slå ihop till två textrader”: form B blir form A"
+        }
+      },
+      {
+        "h2": "Vilken enhet ska visa den",
+        "ps": [
+          "Webbspelare (HTML5 `<track>`) och de flesta mobilspelare hanterar form A mer stabilt; professionella skrivbordsspelare (VLC, mpv, PotPlayer) klarar båda och kan dessutom ge de två raderna olika färg och placering. Är du osäker är form A som SRT det mest universella valet. Skillnaderna mellan formaten i sig finns i [[SRT, VTT eller ASS – vilket ska du välja|/guides/subtitle-format-comparison.html]]."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "De tvåspråkiga stilvalen i översättningsverktygets exportpanel",
+          "cap": "Välj ordning för de tvåspråkiga raderna direkt vid export"
+        }
+      },
+      {
+        "h2": "Vanliga frågor",
+        "ps": [
+          "**Vad gör man om de tvåspråkiga undertexterna känns trånga?** Begränsa radbredden: exportpanelen i översättningsverktyget har inställningen ”tvåspråkig radbredd”, och smalare rader ger färre tecken per rad och en renare skärm.",
+          "**Vill du bara behålla ett spår?** ”Endast original / endast översättning” i verktyget för att separera tvåspråkiga undertexter fixar det med ett klick – se [[Dela tvåspråkiga undertexter i två spår|/guides/split-bilingual-subtitles.html]]."
+        ]
+      }
+    ]
+  },
+  "qc": {
+    "sv": [
+      {
+        "h2": "Vad verktyget löser",
+        "ps": [
+          "Undertexterna ser felfria ut för blotta ögat, och först när de är levererade upptäcker man överlappande tidsaxlar, för breda rader eller för hög läshastighet. Kontrollsidan listar varje sådant problem rad för rad:"
+        ],
+        "ul": [
+          "Tidsaxel: överlapp, slut före start, för kort eller för lång visningstid, felaktig numrering",
+          "Layout: för bred rad, fler än två rader, olämplig radbrytning, blanksteg i början eller slutet",
+          "Språkdetaljer: saknat mellanslag mellan latinsk och kinesisk text, interpunktion som bryter mot språkets regler, skrivriktning",
+          "Grova fel: mojibake eller styrtecken, felaktigt tidsstämpelformat"
+        ]
+      },
+      {
+        "h2": "Börja med att välja språkregler",
+        "ps": [
+          "Under ”Vilka språkregler ska gälla” finns fem tröskelvärden: **största radbredd** (42 halvbredder som standard i liggande bild, 36 i kvadratiskt och 28 i stående), **högsta läshastighet** (18 bredder/sekund för kinesiska, japanska och koreanska, 20 för övriga språk), **kortaste visningstid 833 millisekunder**, **längsta visningstid 7000 millisekunder** och **högst 2 rader**. Undertextspråket kan identifieras automatiskt eller anges manuellt bland 27 språk; bildriktningen ändrar bara radbredden – läshastighet, visningstid och radantal påverkas inte. Halvbredd är ett enhetligt mått: ett kinesiskt tecken räknas som 2 och en latinsk bokstav som 1, så en radbredd på 42 motsvarar 21 kinesiska tecken eller 42 bokstäver."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Kontrollinställningarna: fem tröskelfält samt listor för undertextspråk och bildriktning",
+          "cap": "Fem trösklar + språk + bildriktning, med branschvanliga standardvärden"
+        }
+      },
+      {
+        "h2": "Läs rapporten",
+        "ps": [
+          "De 17 reglerna ger resultat på tre nivåer: **fel** (mojibake, tidsstämpelformat, slut före start, felaktig numrering), **varningar** (tomma rader, överlapp, för kort eller för lång visningstid, överskriden läshastighet, för bred rad, fler än två rader) och **tips** (radbrytning, blanksteg i början eller slutet, saknat mellanslag, interpunktion med mera). Varje post har radnummer och uppgiften ”uppmätt X, tröskel Y” och kan filtreras per nivå. Tvåspråkiga rader har undantag: de två formerna känns igen automatiskt, överlappskontrollen hoppar över hela paret och läshastigheten räknas bara på den rad som står på målspråket."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Kontrollrapporten: poster grupperade som fel, varningar och tips, med radnummer och uppmätta värden",
+          "cap": "Rapport i tre nivåer: varje problem har radnummer och uppmätt värde mot tröskel"
+        }
+      },
+      {
+        "h2": "Rätta och exportera",
+        "ps": [
+          "Kortet ”Rätta och exportera” listar bara det som **kan rättas automatiskt**: ombrytning av rader, borttagning av tomma rader, tillägg av mellanslag, interpunktion enligt språkets regler och rättad numrering – sådant som inte rör tidsaxeln och är förvalt. Det som **ändrar tidsaxeln** (byta start och slut, skjuta fram överlapp, klippa eller förlänga visningstid) är avstängt från början och får slås på efter egen bedömning. Klicka på ”Tillämpa rättningar” så kontrolleras allt igen, och räknaren tar bara upp det som verkligen blev rättat – rader som inte gick att bryta om rapporteras inte som fixade. **Överskriden läshastighet rättas inte automatiskt**: maskinen vet inte vilket ord som ska bort, så du får korta översättningen eller justera tidsaxeln för hand. Exportera sedan som SRT eller VTT, eller klicka på ”Ladda ner rapport” för att spara en ren textrapport som `.qc.txt`."
+        ],
+        "img": {
+          "file": "qc-fix",
+          "alt": "Rättningskortet: kryssrutor för automatiskt rättbara poster och knappen för att tillämpa",
+          "cap": "Bara automatiskt rättbara poster hamnar i listan; sådant som ändrar tidsaxeln är avstängt från början"
+        }
+      },
+      {
+        "h2": "Vanliga frågor",
+        "ps": [
+          "**Varför kan jag inte exportera min ASS-fil?** Kontrollen exporterar bara SRT och VTT; ASS kan läsas in men inte skrivas ut. Ska ASS-effekterna bevaras bör du gå till [[Formatkonvertering|/convert.html]] och tänka igenom saken först.",
+          "**Vad betyder läshastighet 18?** För kinesiska, japanska och koreanska räknas högst 9 fullbreddstecken per sekund (18 halvbredder), och för övriga språk 20 halvbredder per sekund. Det är en vanlig nivå för behaglig läsning, och fältet går att ändra.",
+          "**Går det att kontrollera en fil med trasig teckenkodning?** Kontrollen läser bara UTF-8, så en fil med fel kodning bör först gå via sidan för mojibake-reparation.",
+          "**Rör den min tidsaxel?** Inte om du låter gruppen ”ändrar tidsaxeln” vara avstängd; slår du på den visas en tydlig varning före rättningen."
+        ]
+      },
+      {
+        "h2": "Relaterade guider",
+        "ps": [
+          "För undertexter som blixtrar förbi finns en egen guide: [[Undertexter som går för fort att läsa|/guides/subtitle-too-fast.html]]. Vilka punkter du bör kontrollera före leverans står i [[Det här bör du kontrollera före leverans|/guides/subtitle-quality-check.html]]. En tidsaxel som glider iväg är ett annat problem – se [[Undertexter som inte stämmer längre fram|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-quality-check": {
+    "sv": [
+      {
+        "h2": "Varför man inte ser felen själv",
+        "ps": [
+          "Den som gör undertexterna kan innehållet för väl – man vet vad som sägs i nästa sekund och upplever aldrig att det går för fort att läsa, och efter hundratals genomläsningar har ögat slutat se layoutfelen. Därför kan kontrollen före leverans inte bestå i ”att läsa igenom allt en gång till”, utan måste ske genom **att mäta mot riktvärden**: läshastighet, radbredd, visningstid och överlapp – siffrorna avgör."
+        ]
+      },
+      {
+        "h2": "De sex vanligaste fallgroparna",
+        "ps": [
+          "Rangordnade efter hur ofta de ställer till problem vid leverans:"
+        ],
+        "ul": [
+          "**För hög läshastighet**: texten försvinner innan tittaren hinner läsa, och helhetsintrycket rasar",
+          "**Överlappande tidsaxlar**: två rader ligger samtidigt på skärmen, oftast rester av klippning eller sammanslagning",
+          "**För bred rad**: över 42 halvbredder i liggande bild rinner ut utanför på små skärmar",
+          "**Fler än två rader**: block med tre rader eller mer tar upp halva mobilskärmen",
+          "**Slarvig interpunktion**: saknat mellanslag mellan latinsk och kinesisk text och fel fullbredd eller halvbredd ger ett billigt intryck",
+          "**Felaktig numrering och tomma rader**: man glömde numrera om efter att ha tagit bort eller slagit ihop rader"
+        ]
+      },
+      {
+        "h2": "Så kontrollerar du",
+        "ps": [
+          "Öppna [[Undertextkontroll|/qc.html]], dra in undertexterna och låt språket identifieras automatiskt (reglerna är indelade efter 27 språk). Rapporten listas på tre nivåer – **fel / varningar / tips** – och varje post har radnummer och uppmätt värde. Felnivån måste åtgärdas (mojibake, tidsstämpelformat, slut före start, felaktig numrering); varningarna bedöms från fall till fall (överlapp, läshastighet, radbredd, visningstid); tipsen är finputs (radbrytning, blanksteg, interpunktion)."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Kontrollrapporten: problem i tre nivåer, med radnummer och uppmätt värde mot tröskel",
+          "cap": "Rapport i tre nivåer där varje problem får radnummer och uppmätt värde"
+        }
+      },
+      {
+        "h2": "Vad som går att rätta med ett klick",
+        "ps": [
+          "Numrering, tomma rader, radbrytning, blanksteg och interpunktion – sådant som **inte rör tidsaxeln** – rättas automatiskt. Rättningar som **ändrar tidsaxeln** (byta start och slut, skjuta fram överlapp, klippa eller förlänga visningstid) är avstängda från början och slås på först när du bedömt effekten. **Överskriden läshastighet rättas inte automatiskt** – maskinen vet inte vilket ord som passar att ta bort, så du får korta översättningen själv eller ge tidsaxeln lite mer utrymme; se [[Undertexter som går för fort att läsa|/guides/subtitle-too-fast.html]]. Efter rättningen kontrolleras allt igen, och rapporten räknar bara det som verkligen blev rättat."
+        ]
+      },
+      {
+        "h2": "Gör det här direkt efteråt",
+        "ps": [
+          "Rapportsidan kan ladda ner en ren textrapport som `.qc.txt` – bifoga den vid leverans så ser mottagaren direkt vad du har kontrollerat. Har översättningen just blivit klar är det bättre att köra kontrollen före leverans. En tidsaxel som glider iväg är ett annat problem, och har du fortfarande problem med läshastigheten efter kontrollen kan du läsa [[Undertexter som inte stämmer längre fram|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-too-fast": {
+    "sv": [
+      {
+        "h2": "Vad läshastighet är",
+        "ps": [
+          "Läshastighet handlar om **huruvida tittaren hinner läsa texten under den tid raden visas**. Beräkningen är enkel: textbredden delad med visningstiden i sekunder. Vanliga branschgränser: 9 fullbreddstecken per sekund för kinesiska, japanska och koreanska (18 halvbredder) och 20 halvbredder per sekund för övriga språk. En kinesisk rad med 20 tecken som visas i 1 sekund hamnar på 40 bredder/sekund – mer än dubbelt över gränsen, och då hinner tittaren aldrig läsa."
+        ]
+      },
+      {
+        "h2": "Ta reda på vilken sorts snabbhet det är",
+        "ps": [
+          "”Hinner inte läsa” kan vara två helt olika problem: **för kort visningstid** – raden försvinner efter ett par hundra millisekunder, oftast en tajmningsmiss eller en rest från klippningen; eller **för lång text** – visningstiden är normal men raden har 30 kinesiska tecken, och hur långsamt man än läser räcker det inte. Åtgärderna är varandras motsatser, så ta reda på vilket problem du har först."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Inställningen för högsta läshastighet i kontrollsidan, med 18 för kinesiska, japanska och koreanska och 20 för övriga språk som standard",
+          "cap": "Läshastighetströskel: 18 bredder/sekund för kinesiska, japanska och koreanska, 20 för övriga språk"
+        }
+      },
+      {
+        "h2": "Så kontrollerar du",
+        "ps": [
+          "Öppna [[Undertextkontroll|/qc.html]] och dra in undertexterna. I rapporten ligger ”för kort visningstid” på varningsnivån och anger uppmätt antal millisekunder (tröskel 833 millisekunder); ”hastighet som inte går att läsa” är en egen post som anger uppmätta bredder/sekund. För tvåspråkiga undertexter räknas bara raden på målspråket – de två språken adderas inte."
+        ]
+      },
+      {
+        "h2": "Så rättar du",
+        "ps": [
+          "**För kort visningstid**: går att rätta med ett klick – raden förlängs automatiskt till 833 millisekunder utan att gå förbi nästa rads starttid (rättningen får inte skapa nya överlapp). **För lång text**: ingen automatisk rättning, eftersom maskinen inte vet vilket ord som ska bort. Du väljer själv: korta översättningen (klicka på cellen i översättningsverktyget) eller förläng visningstiden för raden (förutsatt att det finns en lucka före nästa rad; är hela tidsaxeln fel använder du [[Justera tidsaxel|/shift.html]]). Kör kontrollen igen efteråt och bekräfta att läshastigheten ligger inom tröskeln."
+        ]
+      },
+      {
+        "h2": "Överdriv inte",
+        "ps": [
+          "Att klara läshastigheten betyder inte att det är bekvämt: lägger man varje rad precis på 9 tecken/sekund blir hela filmen jobbig att läsa. Tumregeln är att ligga runt sjuttio procent av tröskeln i normala fall, och att ligga något över i dialogtäta partier går bra. Alltför täta byten mellan undertextblock är också ett problem i sig, så gå igenom alla riktvärden före leverans – se [[Det här bör du kontrollera före leverans|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  }
+}

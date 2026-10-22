@@ -1,0 +1,837 @@
+{
+  "merge": {
+    "pl": {
+      "seo": {
+        "title": "Jak używać napisów efektowych i scalania dwujęzycznych – Scalenie – AI-SRTSub",
+        "desc": "Scalenie dwóch plików napisów w dwujęzyczne, zmiana kolejności i stylu gotowych napisów, efekty dla jednojęzycznych. Wybór parowania, dostrojenie szablonów ASS i VTT, format eksportu.",
+        "h1": "Jak używać napisów efektowych i scalania dwujęzycznych",
+        "intro": "Scal dwa pliki napisów w dwujęzyczny albo nadaj napisom styl od razu: czcionka, kolor, obrys, pozycja — to, co widzisz w podglądzie, trafia do eksportu.",
+        "ctaText": "Otwórz narzędzie napisów efektowych"
+      },
+      "body": [
+        {
+          "h2": "Co to narzędzie rozwiązuje",
+          "ps": [
+            "Na jednej stronie są właściwie trzy zadania: scalenie oryginału i tłumaczenia w jeden plik dwujęzyczny, uporządkowanie kolejności i stylu napisów już dwujęzycznych oraz dodanie efektów napisom jednojęzycznym. Wszystkie trzy dzielą ten sam zestaw parametrów stylu i ten sam podgląd."
+          ],
+          "ul": [
+            "**Scal dwa pliki napisów** —— masz oryginał i tłumaczenie, scalasz je w jeden plik dwujęzyczny do eksportu.",
+            "**Dostrój napisy dwujęzyczne** —— są już dwujęzyczne, ale kolejność lub styl nie pasuje, układasz je od nowa.",
+            "**Napisy jednojęzyczne** —— tylko jeden plik, nadajesz mu czcionkę, obrys, pozycję.",
+            "Wszystkie trzy przełączasz kartami po lewej, obszar stylu i podglądu jest wspólny."
+          ]
+        },
+        {
+          "h2": "Trzy zadania, jedna strona",
+          "ps": [
+            "Na górze są trzy karty: **Scal dwa pliki napisów**, **Dostrój napisy dwujęzyczne**, **Napisy jednojęzyczne**. Wybór karty decyduje, ile kolumn wejściowych jest po lewej.",
+            "Przy scalaniu dwóch plików po lewej są dwie kolumny „1 Napisy oryginalne” i „2 Napisy przetłumaczone”, każda pozwala wgrać plik i wkleić tekst napisów bezpośrednio. Dostrajanie dwujęzycznych i jednojęzycznych ma tylko jedną kolumnę."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Trzy karty na górze narzędzia napisów efektowych i obszar wejściowy po lewej",
+            "cap": "Trzy karty u góry; po wybraniu „Scal dwa pliki napisów” po lewej pojawiają się kolumny oryginału i tłumaczenia"
+          }
+        },
+        {
+          "h2": "Jak dwa pliki się parują",
+          "ps": [
+            "Pierwsza pozycja w „3 Ustawienia scalania” to sposób parowania: **Paruj w kolejności · os czasu oryginału**, **Paruj według osi czasu · os czasu oryginału**, **Paruj w kolejności · os czasu tłumaczenia**.",
+            "Gdy oba pliki mają tyle samo pozycji i tę samą kolejność, parowanie w kolejności jest najstabilniejsze; gdy liczba się różni (jedna strona scaliła pozycje, druga je rozdzieliła), paruj według osi czasu, narzędzie szuka według najbliższego czasu. Czyją oś czasu użyć, zależy od tego, która jest dokładniejsza — zwykle dokładniejszy jest oryginał.",
+            "Poniżej jest struktura tekstu (automatycznie / jedna pozycja dwa wiersze / naprzemiennie parami) i kolejność (oryginał u góry / tłumaczenie u góry)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Sposób parowania, struktura tekstu i kolejność w ustawieniach scalania",
+            "cap": "Sposób parowania decyduje, co z czym się łączy, oś czasu oryginału czy tłumaczenia też wybierasz tutaj"
+          }
+        },
+        {
+          "h2": "Styl pozycja po pozycji",
+          "ps": [
+            "Po prawej jest obszar stylu. Przy eksporcie ASS działa „Wygląd ASS”: układ (dzielony ekran · osobno góra i dół / warstwowo · dwa wiersze na dole), rozmiar czcionki, kolor, krycie, czcionka, pogrubienie, kursywa, odstępy między literami, obrys, kolor obrysu, cień/podkład (brak / cień / podkład), głębokość, kolor krawędzi, krycie koloru krawędzi, wyrównanie poziome (dół · lewo / dół · środek / dół · prawo), odległość od dołu dla tłumaczenia (główne), a dla oryginału (dodatkowe) czcionka, cień/podkład i marginesy lewy i prawy.",
+            "Przy eksporcie dwujęzycznego stylu VTT działa „Styl WebVTT”: ponad sześcioma ustawieniami wstępnymi (Standardowy / Zwarty / Filmowy / U góry / Dostępny / Pionowy) można zmienić pionowy line, kotwicę (przy dole / przy górze / na środku), poziomy position, szerokość size, wyrównanie align, wysokość wiersza całej pozycji oraz kolor podkładu, krycie podkładu i grubość obrysu wiersza tłumaczenia; wiersz oryginału może przejąć styl główny albo mieć własny.",
+            "Po zmianach można „Zapisz jako schemat”; następnym razem wybierasz go w „Z zapisanych schematów” i klikasz „Zastosuj”."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Poszczególne parametry w obszarze stylu Wygląd ASS po prawej",
+            "cap": "Rozmiar czcionki, kolor, obrys, cień/podkład i wyrównanie ustawisz pozycja po pozycji; po zmianach zapisz jako schemat"
+          }
+        },
+        {
+          "h2": "Przed eksportem zajrzyj do podglądu",
+          "ps": [
+            "„Podgląd scalania” to tabela: #, czas, oryginał, tłumaczenie, styl. U góry można filtrować podejrzane wiersze według „Ma efekt dźwiękowy”, „Ma prefiks mówiącego”, „Czas trwania < 1 sekundy”, „Więcej niż dwa wiersze”, „Prędkość czytania przekracza limit” albo wpisać słowo kluczowe.",
+            "Kliknięcie slotu stylu w wierszu otwiera edycję tego slotu i pokazuje tylko wiersze, które go używają; „Usuń wszystkie nadpisania” przywraca ręczne nadpisania do szablonu. Obszar korekty osi czasu poniżej pozwala przesunąć całość (od wybranej pozycji) i przeskalować proporcjonalnie.",
+            "Po potwierdzeniu przejdź do „4 Eksport”: pobierz plik napisów albo skopiuj treść."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "Tabela podglądu scalania i pasek filtrów",
+            "cap": "Podgląd to wynik eksportu, można filtrować podejrzane wiersze według typu i otwierać pojedynczy slot stylu"
+          }
+        },
+        {
+          "h2": "Co pozostaje nietknięte",
+          "ps": [
+            "Styl zmienia tylko wygląd, nie dialog. Treść oryginału i tłumaczenia nie zmienia się ani o literę podczas scalania; oś czasu zostaje ta, którą wybrałeś, chyba że sam ją zmienisz w obszarze korekty pod podglądem.",
+            "Przy eksporcie SRT lub „VTT bez stylu” informacja o stylu nie trafia do pliku — strona poinformuje, że eksportuje VTT bez stylu, bez bloku STYLE, odtwarzacz użyje wyglądu domyślnego. Chcesz styl, wybierz dwujęzyczne VTT albo ASS."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Co, jeśli pliki mają różną liczbę pozycji?** Użyj „Paruj według osi czasu”, narzędzie dopasowuje według najbliższego czasu; niedopasowane pozycje nie są tworzone sztucznie.",
+            "**Odtwarzacz nie zna stylu z eksportu ASS?** Styl ASS jest zapisany w pliku, ale obsługa ASS w odtwarzaczach bywa różna. Chcesz uniwersalniejszy wygląd, eksportuj dwujęzyczne VTT.",
+            "**Szablon się rozjechał, jak wrócić do początku?** „Przywróć domyślne parametry” w obszarze ASS i „Przywróć domyślny szablon” w obszarze VTT przywracają obie części.",
+            "**Czym jest siedem wierszy w przykładzie?** To przykład wbudowany w stronę, służy tylko do obejrzenia wyniku po scaleniu, przykładu nie da się wyeksportować; po wgraniu własnych napisów i kliknięciu podglądu zostanie zastąpiony."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Napisy są przetwarzane w całości w przeglądarce, nie są wysyłane i nie przechodzą przez serwer. Po zamknięciu przeglądarki treść przetwarzania znika."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Potrzebujesz rozdzielić dwujęzyczne na dwie ścieżki, użyj [[Rozdzielenie dwujęzycznych|/bilingual.html]]; odwrotnie, z jednojęzycznych zrobić dwujęzyczne — zobacz [[Dwa sposoby na napisy dwujęzyczne|/guides/make-bilingual-subtitles.html]]; po scaleniu przepuść przez [[Kontrola napisów|/qc.html]]; na cały sezon użyj [[Konwersja masowa|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "pl": {
+      "seo": {
+        "title": "Jak wyciągnąć czysty tekst z napisów – Dwa układy i pięć czyści – AI-SRTSub",
+        "desc": "Wybór układu ciągłe akapity lub jedna linia na wpis, pięć przełączników czyszczenia co usuwają, i sześć formatów SRT / VTT / ASS / SBV / LRC / TXT — wszystkie rozpoznawane.",
+        "h1": "Jak wyciągnąć czysty tekst z napisów",
+        "intro": "Wyciągnij dialogi z napisów do czystego tekstu: oś czasu, numery i znaczniki stylu znikają same, wynik czyta się jak artykuł albo służy jako lista dialogów.",
+        "ctaText": "Otwórz wyciąganie czystego tekstu"
+      },
+      "body": [
+        {
+          "h2": "Co to narzędzie rozwiązuje",
+          "ps": [
+            "W pliku napisów naprawdę przydaje się tylko dialog, reszta to struktura dla odtwarzacza: numery, oś czasu, znaczniki stylu. Ta strona usuwa strukturę i zostawia sam tekst."
+          ],
+          "ul": [
+            "**Czytanie jak artykuł** —— wynik to ciągłe akapity, dzielone według pauz i interpunkcji końcowej.",
+            "**Użycie jako lista** —— wynik wiersz po pozycji, jedna pozycja napisów na wiersz, wygodne do tabeli dialogów lub dla innego narzędzia.",
+            "**Od razu wyczyść** —— opisy dla niesłyszących, znaki wodne i reklamy, sąsiednie powtórzenia są domyślnie usuwane.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** sześć formatów jest rozpoznawanych."
+          ]
+        },
+        {
+          "h2": "Wklej, nie myśl tylko o wgrywaniu",
+          "ps": [
+            "Kolumna „1 Wstaw napisy” po lewej obsługuje wgranie pliku i wklejenie treści napisów wprost do pola tekstowego. Pomyłka — kliknij „Wyczyść” i zacznij od nowa.",
+            "Strona czyta plik jako UTF-8. Jeśli napisy otwierają się pełne znaków zapytania lub kwadratów, to zepsute kodowanie, przejdź do [[Naprawa kodowania|/repair.html]] i zmień na UTF-8, potem wróć."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "Obszar wstawiania napisów na stronie wyciągania czystego tekstu",
+            "cap": "Wgraj plik albo wklej treść napisów bezpośrednio do pola tekstowego"
+          }
+        },
+        {
+          "h2": "Który układ wybrać",
+          "ps": [
+            "Na górze „2 Opcje wyciągania” jest układ: **Ciągłe akapity** dzieli automatycznie według pauz i interpunkcji końcowej, czyta się jak artykuł; **Wiersz po pozycji** jedna pozycja napisów na wiersz, dokładnie odpowiada pozycjom w pliku źródłowym.",
+            "Chcesz przepisywać dialogi do notatek, ćwiczyć tłumaczenie, czytać jak artykuł — użyj ciągłych akapitów; chcesz listę dialogów, porównanie pozycja po pozycji z oryginałem, przekazanie innemu narzędziu — użyj wiersza po pozycji."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "Układ i przełączniki czyszczenia w opcjach wyciągania",
+            "cap": "Wybierz jeden układ; pięć przełączników poniżej decyduje, jaki typ treści zostanie usunięty"
+          }
+        },
+        {
+          "h2": "Co usuwają poszczególne pięć czyści",
+          "ps": [
+            "**Usuń opisy dla niesłyszących**: usuwa nawiasy opisujące dźwięk, jak „(kroki)”, „[muzyka]”, dialog zostaje.",
+            "**Usuń znaki wodne i reklamy**: wyrzuca wiersze typu nazwa grupy tłumaczącej, adres strony, konto w mediach społecznościowych.",
+            "**Usuń sąsiednie powtórzenia**: ta sama fraza dwa razy pod rząd (błąd odtwarzania) zostaje tylko raz; powtórzenia oddalone od siebie mają znaczenie, tych nie rusza.",
+            "**Usuń prefiks mówiącego**: z „JOHN: Cześć” zostaje „Cześć”. Domyślnie zachowywany — tekst w stylu scenariusza potrzebuje rozpoznać, kto mówi.",
+            "**Pomiń wiersze tekstu piosenki**: pomija wiersze, które w całości są „♪ … ♪”. Domyślnie zachowywane — tekst piosenki to też słowa."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "Pięć przełączników czyszczenia i ich opis w opcjach wyciągania",
+            "cap": "Przy każdym przełączniku jest napisane, co dokładnie usuwa, zaznacz według potrzeby"
+          }
+        },
+        {
+          "h2": "Jak odebrać wynik",
+          "ps": [
+            "Kolumna „3 Wynik” po prawej pokazuje tekst po wyciągnięciu na bieżąco, zmiana opcji od razu przelicza.",
+            "Po potwierdzeniu kliknij „Pobierz”, aby zapisać jako .txt, albo „Kopiuj”. W językach, które nie dzielą słów spacją, jak chiński i japoński, zasady łączenia wierszy różnią się od angielskiego, narzędzie robi to automatycznie według języka."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "Obszar wyniku wyciągania z przyciskami pobierz i kopiuj",
+            "cap": "Wynik aktualizuje się na bieżąco, pobierz jako txt albo skopiuj"
+          }
+        },
+        {
+          "h2": "Co pozostaje nietknięte",
+          "ps": [
+            "Sam dialog nie jest przepisywany. Przełączniki czyszczenia tylko decydują, który typ jest usuwany w całości jako wiersz lub akapit, nie zmieniają słów w pozycji.",
+            "Oś czasu i numery są „nieeksportowane”, a nie „najpierw zmieniane, potem eksportowane” — plik źródłowy zostaje nietknięty, ta strona nie oferuje eksportu z osią czasu, to należy do [[Konwersja formatu|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Czy znaczniki stylu ASS zostają w tekście?** Nie. Znaczniki nadpisywania stylu `{}` w ASS są usuwane, zostaje tylko tekst dialogu.",
+            "**Napisy dwujęzyczne wychodzą jako dwa wiersze czy jeden?** Ile wierszy ma pozycja źródłowa, tyle zostaje, strona ani nie scala, ani nie dzieli — chcesz rozdzielić, użyj [[Rozdzielenie dwujęzycznych|/bilingual.html]].",
+            "**Dlaczego prefiks mówiącego jest domyślnie zachowany?** Imię w „JOHN: Cześć” bywa użyteczną informacją (scenariusz, tabela dialogów), po usunięciu łatwo nie poznać, kto mówi, więc decyzja jest twoja.",
+            "**Czy plik LRC też da się wyciągnąć?** Tak. Znaczniki czasu LRC są usuwane, zostają wiersze tekstu; nie chcesz tekstu piosenki, zaznacz „Pomiń wiersze tekstu piosenki”."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Napisy są przetwarzane w całości w przeglądarce, nie są wysyłane i nie przechodzą przez serwer. Tekst zostaje tylko na tej stronie, odświeżenie go czyści."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Chcesz wiedzieć, co naprawdę zawiera plik napisów, zobacz [[Co naprawdę zawiera plik SRT|/guides/srt-file-format.html]]; wyciągnięte dialogi do tłumaczenia — wejdź w [[Tłumaczenie napisów|/translate.html]]; potrzebujesz tabeli, użyj [[Napisy do Excel/CSV|/guides/srt-to-excel.html]]; przed przekazaniem przepuść przez [[Kontrola napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "pl": {
+      "seo": {
+        "title": "Jak dzielić i łączyć napisy – Cięcie po segmentach – AI-SRTSub",
+        "desc": "Podział pliku na segmenty według długości lub liczby wpisów, każdy może liczyć od zera; łączenie w kolejności lub przeplatanie według czasu. Numeracja układa się sama, dialogi bez zmian.",
+        "h1": "Jak dzielić i łączyć napisy",
+        "intro": "Jeden długi plik napisów dzielisz na kilka segmentów albo kilka osobnych plików łączysz w jeden. Cięcie tylko na granicy pozycji, zdanie nigdy nie zostaje przecięte.",
+        "ctaText": "Otwórz dzielenie i łączenie"
+      },
+      "body": [
+        {
+          "h2": "Co to narzędzie rozwiązuje",
+          "ps": [
+            "Podział na odcinki, podział na segmenty, łączenie źródeł — wszędzie napisy nie zgadzają się segmentami: albo jeden plik trzeba rozciąć, albo kilka połączyć w jeden. Ta strona zajmuje się oboma, dzielenie i łączenie ma własną kartę."
+          ],
+          "ul": [
+            "**Dzielenie** —— jeden długi plik napisów dzielisz na segmenty według długości lub liczby pozycji.",
+            "**Łączenie** —— kilka plików łączysz w kolejności w jeden odcinek albo przeplatasz według czasu.",
+            "**Cięcie tylko na granicy pozycji** —— zdanie nie zostanie przecięte na pół.",
+            "**Numeracja układa się sama** —— po połączeniu nie musisz poprawiać numerów, dialogi bez zmian."
+          ]
+        },
+        {
+          "h2": "Najpierw wybierz dzielenie albo łączenie",
+          "ps": [
+            "Dwie karty u góry: **Dzielenie: jeden plik na kilka segmentów** i **Łączenie: kilka plików w jeden**. Po wyborze drugi krok poniżej się zmienia.",
+            "W „1 Wstaw napisy” można wgrać plik albo wkleić tekst, pomyłka — kliknij „Wyczyść”. Strona czyta tylko UTF-8 — zepsute kodowanie (pełno znaków zapytania lub kwadratów) najpierw w [[Naprawa kodowania|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Dwie karty u góry strony dzielenia i łączenia",
+            "cap": "Dzielenie i łączenie to dwie karty, po wyborze opcje drugiego kroku się zmieniają"
+          }
+        },
+        {
+          "h2": "Jak ciąć",
+          "ps": [
+            "W „2 Jak ciąć” wybierz podstawę: **Długość** (co X minut jeden segment) albo **Liczba pozycji** (co X pozycji jeden segment), wpisz liczbę.",
+            "Zaznacz „Każdy segment licz od 0:00”, wtedy każdy powstały segment liczy od początku — przydaje się przy wgrywaniu po odcinkach, gdy każdy segment dostaje osobno odtwarzacz. Bez zaznaczenia zachowane są oryginalne znaczniki czasu, segmenty nadal pasują do pozycji w oryginalnym filmie.",
+            "Cięcie tylko na granicy pozycji napisów: pozycja wyjątkowo długa, przechodząca przez linię czasu, zostaje w całości w poprzednim segmencie."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "Opcje długości/liczby pozycji i liczenia od zera na stronie dzielenia",
+            "cap": "Dziel według długości lub liczby pozycji, każdy segment może zaczynać się od 0:00"
+          }
+        },
+        {
+          "h2": "Jak łączyć",
+          "ps": [
+            "W „2 Jak łączyć” wybierz sposób: **Połącz w kolejności** przesuwa cały następny plik za koniec poprzedniego, segmenty się nie nakładają; **Przeplataj według czasu** zachowuje oryginalne znaczniki czasu każdego pliku i układa według czasu rozpoczęcia.",
+            "Kilka plików to pierwsza i druga połowa tego samego odcinka albo zostały rozdzielone do sprawdzenia i trzeba je z powrotem połączyć — użyj łączenia w kolejności; pliki, które mają być na ekranie jednocześnie (np. ścieżka oryginału i tłumaczenia), użyj przeplatania według czasu.",
+            "Po połączeniu numeracja układa się sama, dialogi bez zmian."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "Opcje łączenia w kolejności i przeplatania według czasu na stronie łączenia",
+            "cap": "Łączenie w kolejności pasuje do pierwszej/drugiej połowy, przeplatanie do ścieżki oryginału i tłumaczenia"
+          }
+        },
+        {
+          "h2": "Jak odebrać wynik",
+          "ps": [
+            "Kolumna „3 Wynik” po prawej obsługuje eksport **SRT** i **VTT**, kliknij „Pobierz” albo „Kopiuj”.",
+            "Przy dzieleniu można „Pobierz wszystkie segmenty”, zapiszesz wszystkie powstałe segmenty naraz, bez klikania po kolei."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "Wybór formatu SRT/VTT i przyciski pobierz, pobierz wszystkie segmenty w obszarze wyniku",
+            "cap": "Wynik dzielenia można pobrać segmentami, po połączeniu od razu pobrać lub skopiować"
+          }
+        },
+        {
+          "h2": "Co pozostaje nietknięte",
+          "ps": [
+            "Dialog nie zmienia się ani o słowo. Strona dotyka tylko „które pozycje należą do którego segmentu” i „jak ułożą się numery”, treści pozycji nie zmienia.",
+            "Przy wyborze „Połącz w kolejności” znaczniki czasu następnych plików są przesuwane jako całość — tego wymaga samo łączenie; przy „Przeplataj według czasu” oryginalne znaczniki czasu wszystkich plików zostają."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Ostatni segment jest bardzo krótki, to błąd?** Nie. Reszta, która nie wystarcza na pełną długość, tworzy własny segment, nic nie jest dociągane.",
+            "**Czy zdanie leżące dokładnie na granicy zostanie przecięte?** Nie. Cięcie tylko na granicy pozycji, pozycja przechodząca przez linię czasu zostaje w poprzednim segmencie.",
+            "**Jak ułożą się dwie pozycje z identycznym czasem po przeplataniu?** Według czasu rozpoczęcia, przy identycznym czasie zostaje kolejność wklejenia.",
+            "**Czy ASS da się dzielić?** Strona obsługuje SRT i VTT. ASS najpierw przekształć w [[Konwersja formatu|/convert.html]] na SRT lub VTT, potem przetwarzaj."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Napisy są przetwarzane w całości w przeglądarce, nie są wysyłane i nie przechodzą przez serwer. Po zamknięciu strony treść znika."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Dwa pliki, które mają się połączyć dwujęzycznie (nie w jeden odcinek), załatw w [[Napisy efektowe i scalanie dwujęzycznych|/guides/merge.html]]; przesuniętą całą oś czasu popraw w [[Korekta osi czasu|/shift.html]]; objętość całego sezonu w [[Konwersja masowa|/batch.html]]; po obróbce przepuść przez [[Kontrola napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "pl": {
+      "seo": {
+        "title": "Jak używać taktowania tekstu piosenki – Odtwórz · Wklej – AI-SRTSub",
+        "desc": "Wklej muzykę i tekst, słuchaj i stukaj czas każdej linii, eksportuj LRC lub SRT. Spacja odtwarzanie/pauza, Enter oznacza linię, Z cofa — ręce nie schodzą z klawiatury.",
+        "h1": "Jak używać taktowania tekstu piosenki",
+        "intro": "Wstaw muzykę, wklej tekst, słuchaj i stukaj czas każdej frazy, eksportuj standardowy LRC albo SRT. Dźwięk gra tylko lokalnie, nie jest wysyłany.",
+        "ctaText": "Otwórz taktowanie tekstu piosenki"
+      },
+      "body": [
+        {
+          "h2": "Co to narzędzie rozwiązuje",
+          "ps": [
+            "Daj piosence plik tekstu, z którym da się śpiewać: jedna fraza na wiersz, każdy wiersz ma jeden punkt czasu. Odtwarzacz zna LRC, ścieżka napisów zna SRT, oba formaty można wyeksportować."
+          ],
+          "ul": [
+            "**Taktuj od zera** —— wklej tekst jako czysty tekst, słuchaj i stukaj.",
+            "**Popraw gotowy** —— zaimportuj istniejący LRC, kontynuuj od pierwszego wiersza bez czasu.",
+            "**Eksport dwóch formatów** —— LRC dla odtwarzacza, SRT dla ścieżki napisów w wideo.",
+            "**Całkowicie z klawiatury** —— spacja odtwarzanie/pauza, Enter oznacza frazę, Z cofa."
+          ]
+        },
+        {
+          "h2": "1 Wstaw muzykę",
+          "ps": [
+            "Pierwsza kolumna po lewej służy do wgrania dźwięku, **MP3, M4A, FLAC, WAV, OGG** wszystkie działają. Dźwięk gra tylko lokalnie, nie jest wysyłany.",
+            "Jakość dźwięku nie wpływa na dokładność taktowania, ale źródło z wyraźnym wokalem słucha się łatwiej; wersje koncertowe i zbyt głośny podkład wyraźnie utrudniają trafienie."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "Obszar wstawiania muzyki w narzędziu taktowania tekstu piosenki",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG wszystkie działają, dźwięk gra tylko lokalnie"
+          }
+        },
+        {
+          "h2": "2 Wklej tekst",
+          "ps": [
+            "W drugą kolumnę wklej tekst, **jedna fraza na wiersz**, puste wiersze są pomijane. Po wklejeniu kliknij „Przetwórz tekst”.",
+            "Można wkleić gotowy LRC — jego znaczniki czasu `[mm:ss.xx]` są rozpoznawane, po imporcie kontynuujesz od pierwszego wiersza bez czasu, frazy z czasem nie wymagają powtórki."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "Obszar wklejania tekstu i przycisk przetwórz tekst",
+            "cap": "Wklej jedną frazę na wiersz albo cały plik LRC, aby narzędzie odczytało istniejące czasy"
+          }
+        },
+        {
+          "h2": "3 Słuchaj i taktuj",
+          "ps": [
+            "Odtwórz muzykę, w momencie rozpoczęcia frazy naciśnij Enter (albo kliknij „Oznacz tę frazę”), czas zostaje zapisany, kursor przechodzi do następnej frazy.",
+            "Skróty: **spacja** odtwarzanie/pauza, **Enter** oznacz bieżącą frazę, **Z** cofnij jedną frazę. Podczas odtwarzania Enter jest najwygodniejszy, nie trzeba przenosić się między myszą a klawiaturą.",
+            "Pomyłka — naciśnij Z, oznacz frazę ponownie; frazę, której nie chcesz taktować (przerywnik, część instrumentalna), pomiń przyciskiem „Pomiń tę frazę”, nie trafi do eksportu."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Obszar słuchania i taktowania: odtwórz, oznacz tę frazę, cofnij, pomiń tę frazę",
+            "cap": "Spacja odtwarzanie/pauza, Enter oznacza frazę, Z cofa, ręce nie schodzą z klawiatury"
+          }
+        },
+        {
+          "h2": "4 Eksport",
+          "ps": [
+            "Po zakończeniu przejdź do czwartej kolumny: **Pobierz LRC** dla odtwarzacza, **Pobierz SRT** dla ścieżki napisów w wideo, można też „Kopiuj”.",
+            "Eksportowane są tylko frazy z czasem; pominięte frazy nie trafiają do pliku. Przy eksporcie SRT każda fraza trwa do początku następnej, ostatnia ma 2 sekundy zapasu."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Obszar eksportu z pobierz LRC, pobierz SRT i przyciskiem kopiuj",
+            "cap": "LRC dla odtwarzacza, SRT dla wideo; eksportowane są tylko frazy z oznaczonym czasem"
+          }
+        },
+        {
+          "h2": "Co pozostaje nietknięte",
+          "ps": [
+            "Tekst piosenki nie jest przepisywany. Taktowanie tylko dodaje każdemu wierszowi punkt czasu, nie rusza wklejonych słów.",
+            "Przy imporcie gotowego LRC wiersze ze znacznikiem czasu zachowują czas, kontynuacja zaczyna się od pierwszego wiersza bez czasu."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**W eksporcie brakuje kilku fraz?** Pominięte frazy i frazy bez czasu nie trafiają do pliku. Wróć do trzeciego kroku i uzupełnij albo potwierdź, że miały być pominięte.",
+            "**Czy czas w JSON da się zmienić?** Po zakończeniu chcesz przesunąć całość, wyeksportuj SRT i w [[Korekta osi czasu|/shift.html]] przesuń lub przeskaluj proporcjonalnie.",
+            "**Eksportować LRC czy SRT?** Do odtwarzaczy muzyki (foobar2000, różne aplikacje, wszelkie odtwarzacze) LRC; do wideo lub dalszej obróbki w narzędziu do napisów SRT.",
+            "**Ile trwa jedna piosenka?** Zależy od liczby wierszy i oczekiwanej dokładności. Piosenkę na trzydzieści czterdzieści wierszy po wprawie zrobisz w kilka minut; dokładność co do słowa jest wolniejsza."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Dźwięk i tekst są przetwarzane w całości w przeglądarce, nie są wysyłane i nie przechodzą przez serwer. Dźwięk jest dekodowany i odtwarzany tylko lokalnie."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Masz LRC i chcesz napisy, zobacz [[LRC na SRT|/guides/lrc-to-srt.html]]; jak myśleć o taktowaniu i gdzie są pułapki, zobacz [[Jak taktować tekst piosenki do LRC|/guides/how-to-make-lrc-file.html]]; wyeksportowane SRT ma zły czas, użyj [[Korekta osi czasu|/shift.html]]; gotowe przepuść przez [[Kontrola napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "pl": {
+      "seo": {
+        "title": "Jak wyciągnąć napisy osadzone w wideo – AI-SRTSub",
+        "desc": "Odczytaj ścieżki napisów osadzone w MKV, WebM, MP4, MOV i eksportuj SRT / VTT / ASS / TXT. Wideo nie jest wysyłane ani przekodowywane, ścieżki wielojęzyczne listowane osobno.",
+        "h1": "Jak wyciągnąć napisy osadzone w wideo",
+        "intro": "Odczytaj bezpośrednio ścieżkę napisów osadzoną w MKV / MP4 i wyeksportuj ją jako SRT — wideo nie jest wysyłane, wszystko dzieje się w przeglądarce.",
+        "ctaText": "Otwórz wyciąganie napisów z wideo"
+      },
+      "body": [
+        {
+          "h2": "Co to narzędzie rozwiązuje",
+          "ps": [
+            "Napisy mogą być osadzone w pliku wideo i nie istnieć jako osobny plik. Aby je zmienić, przetłumaczyć, zrobić dwujęzyczne, najpierw trzeba je wydobyć — ta strona robi dokładnie to."
+          ],
+          "ul": [
+            "**Zna cztery kontenery** —— MKV / WebM oraz MP4 / MOV.",
+            "**Zna cztery typy ścieżek** —— ścieżka tekstowa, ścieżka ASS, ścieżka WebVTT, ścieżka mov_text / tx3g w MP4.",
+            "**Eksport czterech formatów** —— SRT / VTT / ASS / TXT.",
+            "**Bez wysyłania, bez przekodowania** —— czyta fragmentami według offsetu, plik kilku GB nie zajmuje pamięci."
+          ]
+        },
+        {
+          "h2": "1 Wstaw wideo",
+          "ps": [
+            "Do pierwszej kolumny przeciągnij plik wideo albo kliknij i wybierz. Rozpoznaje tylko **MKV / WebM** i **MP4 / MOV**, inne kontenery nie odczytają ścieżki.",
+            "Plik nie opuszcza komputera — nie ma etapu wysyłania. Narzędzie czyta fragmentami według offsetu, film kilku GB nie zajmuje pamięci, ale pierwsze czytanie musi poczekać na przeskanowanie informacji o ścieżkach."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "Obszar wstawiania wideo na stronie wyciągania osadzonych napisów",
+            "cap": "Obsługuje MKV / WebM i MP4 / MOV, plik nie opuszcza urządzenia"
+          }
+        },
+        {
+          "h2": "2 Osadzone ścieżki napisów",
+          "ps": [
+            "Po odczytaniu druga kolumna wypisuje ścieżki napisów w pliku, **jedna ścieżka na wiersz**, zwykle z językiem i nazwą (np. „Chinese”, „English”, „Napisy wymuszone”). Kliknięcie ścieżki ją wyciąga.",
+            "Jeśli plik ma tylko jedną ścieżkę napisów, wyciąganie zaczyna się samo, bez klikania.",
+            "**Napisów obrazkowych wyciągnąć nie można**: PGS z Blu-ray i napisy DVD to wypalone obrazy, nie ma tekstu do pobrania — strona powie to wprost, tam potrzebne jest OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "Lista osadzonych ścieżek napisów, jedna ścieżka na wiersz",
+            "cap": "Jedna ścieżka na wiersz; przy jednej ścieżce wyciąganie startuje samo"
+          }
+        },
+        {
+          "h2": "3 Wynik",
+          "ps": [
+            "Kolumna „3 Wynik” po prawej pokazuje wyciągnięty tekst napisów, u góry wybierz format eksportu: **SRT / VTT / ASS / TXT**, kliknij „Pobierz” albo „Kopiuj”.",
+            "Gdy ścieżka źródłowa to ASS, jej nagłówek stylu i rozdzielczość są przenoszone bez zmian — eksport ASS je zachowuje, eksport SRT przenosi tylko tekst."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "Obszar wyniku i wybór formatu SRT / VTT / ASS / TXT",
+            "cap": "Cztery formaty eksportu; nagłówek stylu i rozdzielczość ścieżki ASS zostają"
+          }
+        },
+        {
+          "h2": "Co pozostaje nietknięte",
+          "ps": [
+            "Sam plik wideo się nie zmienia — tylko odczyt, bez zapisu, bez przekodowania i bez ponownego pakowania.",
+            "Treść napisów jest brana tak, jak jest, bez zgadywania kodowania i bez poprawiania osi czasu. Jeśli wyciągnięte napisy są zepsute, to problem kodowania ścieżki źródłowej, przejdź do [[Naprawa kodowania|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Napisy obrazkowe (PGS / DVD) naprawdę nie da się?** Na tej stronie nie — to obrazy bez warstwy tekstu. Najpierw trzeba OCR, ta strona tego nie robi.",
+            "**Wyciągnięte napisy mają zły czas?** Strona nie poprawia osi czasu, wynik jest taki, jaki jest. Przesunięcie całości lub problem proporcji rozwiąż w [[Korekta osi czasu|/shift.html]].",
+            "**Dlaczego długo nic się nie dzieje?** Duży plik trzeba przeskanować fragmentami według offsetu, im większy, tym dłużej; wszystko dzieje się lokalnie, niezależnie od szybkości sieci.",
+            "**Czy zewnętrzne pliki napisów też tu zadziałają?** Nie trzeba — zewnętrzne .srt / .ass idą prosto do [[Konwersja formatu|/convert.html]] lub innego narzędzia, ta strona jest dla napisów „osadzonych w wideo”."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Wideo jest czytane w całości lokalnie w przeglądarce, nie jest wysyłane, nie jest przekodowywane i nie przechodzi przez serwer. Po zamknięciu strony odczytana treść jest zwalniana."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Po wyciągnięciu potrzebujesz tłumaczenia — wejdź w [[Tłumaczenie napisów|/translate.html]], dwujęzyczne załatw w [[Dwa sposoby na napisy dwujęzyczne|/guides/make-bilingual-subtitles.html]]; różnica między osadzonymi a zewnętrznymi i co da się wyciągnąć, zobacz [[Jak wydobyć napisy osadzone w wideo|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "pl": {
+      "seo": {
+        "title": "Jak masowo zamienić terminologię napisów – AI-SRTSub",
+        "desc": "Tabela terminów jedna linia na regułę, oddziel stary i nowy termin przez ->, =>, → lub Tab, linia od # to komentarz. Dopasowanie całego słowa, zmiany listowane i odwracalne.",
+        "h1": "Jak masowo zamienić terminologię napisów",
+        "intro": "Jedna tabela terminów ujednolica słownictwo w całym pliku napisów naraz — oś czasu, styl ASS i blok NOTE w VTT nie zmieniają się ani o znak.",
+        "ctaText": "Otwórz zamianę terminów"
+      },
+      "body": [
+        {
+          "h2": "Co to narzędzie rozwiązuje",
+          "ps": [
+            "W napisach to samo słowo bywa tłumaczone różnie, imiona i nazwy miejsc idą za tłumaczeniem maszynowym, przejęte napisy trzeba przestawić na własne zwyczaje — te zmiany mają wspólną cechę: zmieniają słowo, nie strukturę. Ta strona zmienia tylko słowa."
+          ],
+          "ul": [
+            "**Ujednolić tłumaczenie nazw** —— imiona, nazwy miejsc, nazwy własne są spójne od początku do końca.",
+            "**Masowa poprawka** —— jedno słowo źle przetłumaczone przez maszynę zamieniasz w całym pliku.",
+            "**Przejąć zwyczaje** —— napisy kogoś innego układasz według własnego użycia.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** sześć formatów jest rozpoznawanych."
+          ]
+        },
+        {
+          "h2": "Dwie rzeczy: napisy i tabela terminów",
+          "ps": [
+            "Kolumna „1 Wstaw napisy” po lewej wgrywa plik napisów, można też wkleić treść napisów bezpośrednio; pomyłka — kliknij „Wyczyść”.",
+            "W kolumnie „2 Tabela terminów” po prawej piszesz reguły. **Jedna linia na regułę**, oddziel stary i nowy termin przez `->`, `=>`, `→` lub Tab, wszystkie cztery sposoby są rozpoznawane; linia zaczynająca się od `#` to komentarz, nie bierze udziału w zamianie.",
+            "Nie jesteś pewien formatu — kliknij „Wypełnij przykład” i popraw według niego."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "Obszar wstawiania napisów i obszar wpisywania tabeli terminów na stronie zamiany",
+            "cap": "Po lewej napisy, po prawej reguły; jedna linia na regułę, oddzielone przez ->"
+          }
+        },
+        {
+          "h2": "Jak pisać tabelę terminów",
+          "ps": [
+            "Jedna linia jedna reguła, po lewej obecny termin, po prawej, na co go zmienić. Na przykład `Thor -> Thór` zamieni „Thor” w całym pliku na „Thór”.",
+            "Komentarz zaczyna się od `#`, przydaje się do opisania grupy reguł (np. „# Ujednolicenie imion w pierwszym sezonie”) i do tymczasowego wyłączenia reguły — wystarczy dodać `#` na początku, nie trzeba usuwać.",
+            "Reguły wykonują się od góry do dołu; słowo powstałe w jednej regule przechodzi jeszcze przez kolejne. Gdy kolejność ma znaczenie (najpierw A na B, potem B na C), trzeba o tym pamiętać."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Poszczególne linie reguł zamiany w polu tabeli terminów",
+            "cap": "Jedna linia na regułę; linia od # to komentarz, można nią tymczasowo wyłączyć regułę"
+          }
+        },
+        {
+          "h2": "Co kontroluje każdy z trzech przełączników",
+          "ps": [
+            "**Zakres**: `Wszystko` / `Tylko linia 1` / `Tylko linia 2`. W napisach dwujęzycznych, gdy chcesz zmienić tylko tłumaczenie, wybierz „Tylko linia 2”; pozycje z jednym wierszem nie są w tych trybach zmieniane — narzędzie nie zgaduje, która strona jest oryginałem.",
+            "**Dopasowanie całego słowa**: zamienia tylko tam, gdzie słowo stoi osobno, `art` nie ruszy `start`. W językach bez spacji, jak chiński i japoński, ten przełącznik nie działa — zamiana idzie po fragmencie tekstu.",
+            "**Rozróżniaj wielkość liter**: domyślnie nie rozróżnia, `CEO` i `ceo` zmieniają się razem; po zaznaczeniu tylko dokładnie taki sam zapis."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "Przełączniki zakres, dopasowanie całego słowa i wielkość liter pod tabelą terminów",
+            "cap": "Zakres decyduje, który wiersz się zmienia, dopasowanie słowa i wielkość liter — jak ściśle się dopasowuje"
+          }
+        },
+        {
+          "h2": "Co się zmieniło, można cofnąć pozycja po pozycji",
+          "ps": [
+            "„3 Wynik” poza napisami po zamianie także **wypisuje każdą zmianę**: która pozycja, który wiersz, z czego na co.",
+            "Pozycję, której nie chcesz zmieniać, kliknięciem na liście przywracasz, nie musisz zmieniać tabeli i uruchamiać ponownie. Po potwierdzeniu kliknij „Pobierz” albo „Kopiuj”."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "Obszar wyniku i lista zmian pozycja po pozycji",
+            "cap": "Zmiany są wypisane pozycja po pozycji, niechcianą wystarczy kliknąć i wróci"
+          }
+        },
+        {
+          "h2": "Co pozostaje nietknięte",
+          "ps": [
+            "**Oś czasu, wiersze stylu ASS i blok `NOTE` w VTT nie zmieniają się ani o znak.** Zamiana działa tylko na tekście dialogu, nie rusza wierszy struktury.",
+            "Tabela terminów sama nie zmienia pliku napisów — wynikiem jest nowe wyjście, plik źródłowy zostaje."
+          ]
+        },
+        {
+          "h2": "Częste pytania",
+          "ps": [
+            "**Dlaczego jakieś słowo się nie zmieniło?** Sprawdź najpierw zakres: przy „Tylko linia 2” pozycje z jednym wierszem nie są zmieniane; potem dopasowanie całego słowa, po zaznaczeniu wystąpienia, które nie tworzą słowa, nie są zmieniane.",
+            "**Chiński ma zaznaczone dopasowanie całego słowa, a nadal zamienia po fragmencie?** To normalne. Chiński i japoński nie dzielą słów spacją, narzędzie nie ma jak ustalić granicy słowa, ten tryb nie działa.",
+            "**Zmieniło się źle, jak cofnąć wszystko?** Cofaj pozycja po pozycji na liście zmian; chcesz zacząć od nowa, wyczyść tabelę terminów i wstaw napisy jeszcze raz.",
+            "**Czy wiersz stylu ASS może się zmienić?** Nie. Wiersze stylu i blok `NOTE` nie są w zakresie zamiany, bierze w niej udział tylko tekst dialogu."
+          ]
+        },
+        {
+          "h2": "Prywatność",
+          "ps": [
+            "Napisy i tabela terminów są przetwarzane w całości w przeglądarce, nie są wysyłane i nie przechodzą przez serwer. Tabela nie jest zapisywana, następnym razem będzie pusta."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Czy zakładać tabelę terminów i jak ją utrzymywać przez sezon, zobacz [[Glosariusz: spójna terminologia przez cały sezon|/guides/subtitle-glossary.html]]; brudna treść (znaki wodne, opisy dla niesłyszących) najpierw przez [[Czyszczenie napisów|/clean.html]]; po ujednoliceniu nazw potrzebujesz tłumaczenia na inny język — wejdź w [[Tłumaczenie napisów|/translate.html]]; gotowe przepuść przez [[Kontrola napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "pl": {
+      "seo": {
+        "title": "Jak wydobyć napisy osadzone w wideo – AI-SRTSub",
+        "desc": "Gdy napisy są osadzone w wideo, jak je wydobyć: co zawierają MKV / WebM / MP4 / MOV, czym różni się ścieżka tekstowa, ASS, WebVTT, mov_text, i dlaczego z obrazków nie ma tekstu.",
+        "h1": "Jak wydobyć napisy osadzone w wideo",
+        "intro": "Napisy mogą być w pliku wideo, mogą też stać osobno na zewnątrz. Gdy są w środku, są jedną ze ścieżek kontenera — wydobycie ich nie ma nic wspólnego z przekodowaniem.",
+        "ctaText": "Otwórz wyciąganie napisów z wideo"
+      },
+      "body": [
+        {
+          "h2": "Gdzie są napisy: osadzone i zewnętrzne",
+          "ps": [
+            "Plik wideo (MKV, MP4) to kontener, w środku niesie jednocześnie ścieżkę wideo, ścieżkę dźwięku i ścieżkę napisów. Gdy napisy są w środku, mówimy o **napisach osadzonych** lub **napisach wbudowanych**; osobny plik .srt / .ass na zewnątrz to **napisy zewnętrzne**.",
+            "Napisy zewnętrzne można użyć od razu. Problem jest z osadzonymi: chcesz je zmienić, przetłumaczyć, użyć ścieżki oryginału do dwujęzycznych, ale nie masz żadnego pliku napisów — najpierw trzeba odczytać ścieżkę z kontenera. Ten krok nie jest przekodowaniem, wideo nie jest kodowane ponownie, tylko wyciągany jest fragment danych, który już w kontenerze jest."
+          ]
+        },
+        {
+          "h2": "Co który kontener mieści",
+          "ps": [
+            "Różne kontenery mieszczą różne formaty napisów, trudność wydobycia też jest różna:"
+          ],
+          "ul": [
+            "**MKV / WebM** —— najswobodniejszy, mieści ścieżkę tekstową, ścieżkę ASS, ścieżkę WebVTT, często też ścieżki wielojęzyczne.",
+            "**MP4 / MOV** —— zwykle ścieżka `mov_text` / `tx3g`, czysty tekst z niewielką ilością informacji o stylu.",
+            "**Ścieżka tekstowa** —— po wyciągnięciu jest tekst, od razu SRT.",
+            "**Ścieżka ASS** —— niesie nagłówek stylu i rozdzielczość, eksport ASS je zachowuje, eksport SRT zostawia tylko tekst.",
+            "**Napisy obrazkowe (PGS Blu-ray, napisy DVD)** —— przechowują obraz, nie tekst, tekstu z nich nie wydobędziesz."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "Ścieżki napisów wypisane na stronie wyciągania osadzonych napisów",
+            "cap": "Jedna ścieżka na wiersz, zwykle z językiem i nazwą; przy jednej ścieżce wyciąganie startuje samo"
+          }
+        },
+        {
+          "h2": "Dlaczego z napisów obrazkowych nie ma tekstu",
+          "ps": [
+            "PGS Blu-ray i napisy DVD przechowują nie znaki, ale pojedyncze obrazy z kanałem przezroczystości. Gdy odtwarzacz je pokazuje, „przykleja obraz”, a nie „renderuje tekst”.",
+            "Dlatego w takiej ścieżce nie ma tekstu do odczytania — nie chodzi o to, że narzędzie nie obsługuje, ale o to, że tekstu tam po prostu nie ma. Strona przy takiej ścieżce wprost powie, że nie da się wyciągnąć.",
+            "Aby dostać tekst, jest tylko jedna droga: najpierw rozpoznać tekst w obrazie (OCR), potem zrobić napisy. To inna operacja niż „wyciągnięcie ścieżki”."
+          ]
+        },
+        {
+          "h2": "Po wyciągnięciu zwykle trzeba jeszcze obrobić",
+          "ps": [
+            "Wyciągnięte napisy są „takie, jakie są”, narzędzie nie zgaduje kodowania ani nie poprawia osi czasu. Dlatego dwie rzeczy są bardzo częste:",
+            "Po pierwsze **zepsuty tekst** — problem kodowania samej ścieżki źródłowej, wyciągnięte zostaje zepsute, trzeba w [[Jak naprawić kodowanie|/guides/repair.html]] rozpoznać kodowanie; po drugie **zły czas** — źródło z logo na początku lub bez, niezgodna liczba klatek, wynik jest przesunięty jako całość, użyj [[Korekta osi czasu|/shift.html]] do przesunięcia lub skalowania proporcjonalnego.",
+            "Potem potrzebujesz tłumaczenia — wejdź w [[Tłumaczenie napisów|/translate.html]], dwujęzyczne załatw w [[Dwa sposoby na napisy dwujęzyczne|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "Obszar wyniku i cztery formaty eksportu SRT / VTT / ASS / TXT",
+            "cap": "Wyciągnięte napisy można wyeksportować w czterech formatach, nagłówek stylu i rozdzielczość ścieżki ASS zostają"
+          }
+        },
+        {
+          "h2": "Kilka rzeczy łatwych do błędnego zrozumienia",
+          "ps": [
+            "**Wyciągnięcie napisów to nie hardsub.** Wideo nie jest przekodowywane, jakość obrazu i ścieżka dźwiękowa w ogóle się nie zmieniają.",
+            "**Wyciągnięcie nie wpływa na plik źródłowy.** Tylko odczyt, bez zapisu, plik wideo nie zmienia się ani o bajt.",
+            "**Duży plik jest wolny z powodu rozmiaru, nie sieci.** Narzędzie skanuje informacje o ścieżkach fragmentami według offsetu, im większy plik, tym dłużej, wszystko lokalnie.",
+            "**Napisy zewnętrzne nie przechodzą przez tę stronę.** Masz .srt / .ass, idź prosto do [[Konwersja formatu|/convert.html]], tylko napisy osadzone w wideo wymagają najpierw wyciągnięcia ścieżki."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Pełna procedura w [[Jak wyciągnąć napisy osadzone w wideo|/guides/videosub.html]]; po wyciągnięciu potrzebujesz tłumaczenia — wejdź w [[Tłumaczenie napisów|/translate.html]], dwujęzyczne załatw w [[Dwa sposoby na napisy dwujęzyczne|/guides/make-bilingual-subtitles.html]]; zepsuty tekst najpierw w [[Naprawa kodowania|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "pl": {
+      "seo": {
+        "title": "Jak taktować tekst piosenki do LRC – AI-SRTSub",
+        "desc": "Jak zrobić plik LRC od zera: wklej jedną linię na frazę, słuchaj i stukaj czas, trzy zwykłe skróty, kiedy pominąć linię i co zrobić, gdy czas się przesunie.",
+        "h1": "Jak taktować tekst piosenki do LRC",
+        "intro": "LRC to „jedna fraza tekstu + jeden punkt czasu”. Proces jego tworzenia nazywa się taktowaniem: zapisanie momentu, w którym zaczyna się każda fraza.",
+        "ctaText": "Otwórz taktowanie tekstu piosenki"
+      },
+      "body": [
+        {
+          "h2": "Czym jest taktowanie",
+          "ps": [
+            "Struktura pliku LRC jest bardzo prosta: jedna linia jedna fraza tekstu, z przodu znacznik czasu `[mm:ss.xx]`. Odtwarzacz dochodzi do linii i w tym momencie pokazuje frazę.",
+            "Cała praca „zrobić plik LRC” polega więc na przypisaniu każdej frazie jednego punktu czasu — tego maszyna za ciebie nie zrobi, bo musi ocenić „od którego miejsca ta fraza się zaczyna”, a to da się tylko ze słuchu."
+          ]
+        },
+        {
+          "h2": "Ile przejść potrzebuje jedna piosenka",
+          "ps": [
+            "Warto najpierw minutę pomyśleć, oszczędzi to większość przerabiania:"
+          ],
+          "ul": [
+            "**Jedno przejście** —— wyraźny wokal, mało linii, wystarczy mniej więcej nadążać, odtworzyć i oznaczyć raz.",
+            "**Dwa przejścia** —— pierwsze zgrubnie, drugie linia po linii sprawdzić, zwykły sposób przy wymaganej dokładności.",
+            "**Import i poprawa** —— gotowy LRC, tylko kilka fraz nie pasuje, po imporcie kontynuuj od pierwszej linii bez czasu.",
+            "**Przerywniki i części instrumentalne** nie wymagają taktowania —— kliknij „Pomiń tę frazę”, nie trafią do eksportu.",
+            "**Chórek i nakładanie** —— zapisać można tylko jeden początek, nakładająca się część liczy się według frazy głównego wokalu."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Obszar słuchania i taktowania: odtwórz, oznacz tę frazę, cofnij, pomiń tę frazę",
+            "cap": "Podczas odtwarzania najwygodniejszy jest Enter; przy pomyłce naciśnij Z i oznacz frazę ponownie"
+          }
+        },
+        {
+          "h2": "Krok wklejenia tekstu decyduje o płynności",
+          "ps": [
+            "Tekst wklej jedną frazę na linię, puste linie są pomijane. Podział na linie w tym kroku to linie, które będziesz taktować — jeśli przy wklejaniu dodasz linie, przy taktowaniu będziesz musiał klikać więcej.",
+            "Można wkleić gotowy LRC: znaczniki czasu `[mm:ss.xx]` są rozpoznawane, po imporcie **kontynuujesz od pierwszej linii bez czasu**, frazy z czasem nie wymagają powtórki.",
+            "Dlatego na wpół zrobiony LRC można zapisać, następnym razem wkleić i kontynuować."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "Obszar wklejania tekstu i przycisk przetwórz tekst",
+            "cap": "Jedna fraza na linię; wklejenie całego LRC pozwala odczytać istniejące czasy i kontynuować niżej"
+          }
+        },
+        {
+          "h2": "Eksportować LRC czy SRT",
+          "ps": [
+            "**Do odtwarzacza muzyki eksportuj LRC.** foobar2000, różne odtwarzacze i urządzenia z wyświetlaniem tekstu go znają.",
+            "**Do wideo lub dalszej obróbki eksportuj SRT.** Ścieżka napisów w wideo, narzędzia do napisów i programy do montażu znają SRT. Przy eksporcie każda fraza trwa do początku następnej, ostatnia ma 2 sekundy zapasu.",
+            "Oba formaty eksportują tylko frazy z czasem — pominięte frazy nie trafiają do pliku."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Obszar eksportu z pobierz LRC, pobierz SRT i przyciskiem kopiuj",
+            "cap": "LRC dla odtwarzacza, SRT dla wideo; eksportowane są tylko frazy z oznaczonym czasem"
+          }
+        },
+        {
+          "h2": "Kilka rzeczy łatwych do błędnego zrozumienia",
+          "ps": [
+            "**Po zakończeniu całość lekko się przesunęła — użyj przesunięcia.** Wyeksportuj SRT i w [[Korekta osi czasu|/shift.html]] przesuń całość, to znacznie szybsze niż ponowne taktowanie.",
+            "**Im dalej, tym większe przesunięcie — to problem tempa.** Gdy szybkość odtwarzania dźwięku nie zgadza się z nagraniem, im dalej, tym większe przesunięcie, tam trzeba skalowania proporcjonalnego, nie przesunięcia.",
+            "**Skróty trzeba używać płynnie.** Spacja odtwarzanie/pauza, Enter oznacz frazę, Z cofnij frazę — podczas odtwarzania od razu Enter, bez przenoszenia między myszą a klawiaturą.",
+            "**Jakość dźwięku wpływa na dokładność.** Źródło z wyraźnym wokalem słucha się dokładniej; wersje koncertowe i zbyt głośny podkład wyraźnie utrudniają trafienie."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Pełna procedura w [[Jak używać taktowania tekstu piosenki|/guides/lrc.html]]; masz LRC i chcesz napisy, zobacz [[LRC na SRT|/guides/lrc-to-srt.html]]; wyeksportowane SRT ma zły czas, użyj [[Korekta osi czasu|/shift.html]]; gotowe przepuść przez [[Kontrola napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "pl": {
+      "seo": {
+        "title": "Glosariusz: spójna terminologia przez cały sezon – AI-SRTSub",
+        "desc": "Glosariusz napisów rozwiązuje „to samo słowo inaczej”: kiedy warto go założyć, jak używać jednego przez sezon, dlaczego dopasowanie całego słowa nie działa w chińskim.",
+        "h1": "Glosariusz: spójna terminologia przez cały sezon",
+        "intro": "Postać w pierwszym odcinku nazywa się A, w siódmym B, widz pomyśli, że to dwie postacie. Glosariusz temu zapobiega — ustala, „jak ma być nazwane”.",
+        "ctaText": "Otwórz zamianę terminów"
+      },
+      "body": [
+        {
+          "h2": "Glosariusz rozwiązuje „niespójność”",
+          "ps": [
+            "Błędy słownictwa w napisach są dwojakie: jedno to „to słowo jest źle przetłumaczone”, drugie to „to samo słowo jest za każdym razem tłumaczone inaczej”. Pierwsze wymaga poprawy słownika, drugie jest sprawą glosariusza.",
+            "Drugi przypadek jest częstszy i trudniej go zauważyć: w pierwszym odcinku `Thor` jest przetłumaczony jako „Thór”, w siódmym jako „Thor”, osobno żaden odcinek nie wygląda źle, w całości widz pomyśli, że pojawiła się nowa postać. Glosariusz zamienia „w tym filmie mówimy jednolicie Thór” w regułę do wykonania i stosuje ją naraz do całego pliku napisów."
+          ]
+        },
+        {
+          "h2": "Kiedy warto założyć glosariusz",
+          "ps": [
+            "Nie każdy plik napisów potrzebuje glosariusza. Warto zwykle w tych przypadkach:"
+          ],
+          "ul": [
+            "**Cały sezon / jeden serial** —— im więcej odcinków, tym większa szansa na niespójność.",
+            "**Gęste nazwy własne** —— imiona, nazwy miejsc, organizacji, słowa wymyślone w dziele.",
+            "**Praca zespołowa** —— kilka osób dzieli się odcinkami, każda ma inne nawyki.",
+            "**Przejęcie cudzych napisów** —— trzeba przestawić na własne (lub klienta) zwyczaje.",
+            "**Ujednolicenie po tłumaczeniu maszynowym** —— tłumaczenie maszynowe może dać różne wersje tego samego słowa."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Reguły zamiany pogrupowane według typu w tabeli terminów",
+            "cap": "Komentarzem od # grupujesz reguły, jednocześnie można nim tymczasowo wyłączyć regułę"
+          }
+        },
+        {
+          "h2": "Jak utrzymać jeden glosariusz przez sezon",
+          "ps": [
+            "Glosariusz trzeba **uzupełniać na bieżąco**: w pierwszym odcinku ustala się imiona, dalej przy każdym nowym słowie dodaje się linię, po sezonie tabela jest pełna. Następnym razem przy drugim sezonie tego samego serialu bierzesz ją jako punkt wyjścia.",
+            "Reguły pisane szerzej są praktyczniejsze — po ustaleniu jednolitego „Thór” dopisz też „Thor -> Thór”, wtedy przy przejmowaniu cudzych napisów też je wyrównasz.",
+            "Po zmianach zawsze sprawdź **listę zmian**: wypisuje każdą pozycję, który wiersz, z czego na co. Lista to jedyne miejsce, gdzie potwierdzisz „zmienione dobrze, nie za dużo”, niechcianą pozycję kliknięciem przywrócisz."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "Lista zmian pozycja po pozycji w obszarze wyniku",
+            "cap": "Zmiany są wypisane pozycja po pozycji, niechcianą wystarczy kliknąć i wróci"
+          }
+        },
+        {
+          "h2": "Których zmian nie oddawać glosariuszowi",
+          "ps": [
+            "Glosariusz zmienia **słowa**. Tych trzech rzeczy nie obsługuje i nie powinien:",
+            "**Gramatyka i budowa zdania** —— jedno słowo nie zmieni się w zdanie, poprawki na poziomie zdania należą do [[Tłumaczenie napisów|/translate.html]] lub pracy ręcznej.",
+            "**Czyszczenie treści** —— znaki wodne i reklamy, opisy dla niesłyszących należą do usuwania całego wiersza, to [[Czyszczenie napisów|/clean.html]], reguły glosariusza służą do zamiany, nie do kasowania wierszy.",
+            "**Oś czasu** —— glosariusz nie dotyka czasu. Przesunięcie całości lub problem proporcji rozwiąż w [[Korekta osi czasu|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Kilka rzeczy łatwych do błędnego zrozumienia",
+          "ps": [
+            "**Chiński ma zaznaczone dopasowanie całego słowa, a nadal zamienia po fragmencie — to normalne.** Chiński i japoński nie dzielą słów spacją, narzędzie nie ma jak ustalić granicy słowa, ten tryb nie działa, ochrona typu `art` nie ruszy `start` działa tylko w angielskim.",
+            "**Kolejność wpływa na wynik.** Reguły wykonują się od góry do dołu, słowo powstałe w jednej regule przechodzi jeszcze kolejne. Najpierw A na B, potem B na C, w końcu dostaniesz C.",
+            "**Zmiana tylko tłumaczenia wymaga wyboru zakresu.** W napisach dwujęzycznych zmiana tylko drugiej linii to „Tylko linia 2”; pozycje z jednym wierszem nie są w tych trybach zmieniane — narzędzie nie zgaduje, która strona jest oryginałem.",
+            "**Glosariusz nie jest zapisywany.** Przy każdym otwarciu jest pusty, trzeba samemu zapisywać plik tekstowy i przekazywać dalej."
+          ]
+        },
+        {
+          "h2": "Powiązane narzędzia i poradniki",
+          "ps": [
+            "Pełna procedura w [[Jak masowo zamienić terminologię napisów|/guides/glossary.html]]; brudna treść najpierw w [[Czyszczenie napisów|/clean.html]]; po ujednoliceniu nazw potrzebujesz tłumaczenia na inny język — wejdź w [[Tłumaczenie napisów|/translate.html]]; gotowe przepuść przez [[Kontrola napisów|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,435 @@
+{
+  "translate": {
+    "ro": [
+      {
+        "h2": "Ce rezolvă acest instrument",
+        "ps": [
+          "Traduce subtitrările dintr-o limbă în alta și îți dă imediat un fișier de subtitrări gata de folosit. Nevoi tipice:"
+        ],
+        "ul": [
+          "Film străin cu subtitrări în română, sau conținut românesc cu subtitrări în altă limbă",
+          "Traducerea trebuie livrată bilingv, împreună cu originalul (originalul sus sau traducerea sus)",
+          "Aceleași nume de personaje și de locuri pe tot sezonul (glosar)",
+          "Ajustări fine ale timeline-ului după traducere (decalare globală, scalare)"
+        ]
+      },
+      {
+        "h2": "Încărcarea subtitrărilor",
+        "ps": [
+          "Apasă „Alege fișierul de subtitrări” sau lipește direct textul în caseta din coloana stângă. Sunt acceptate șase formate: SRT, VTT, ASS, SSA, SBV și TXT. Dacă nu ai un fișier, apasă „Încarcă exemplu” ca să vezi cum arată. După parsare, în coloana din mijloc apare tabelul de subtitrări, fiecare intrare cu număr, timeline și textul original."
+        ],
+        "img": {
+          "file": "translate-upload",
+          "alt": "Zona de import a instrumentului de traducere: alegerea fișierului, caseta de lipire și butonul de exemplu",
+          "cap": "Coloana stângă „Importă subtitrări”: alege fișier, lipește text sau încarcă un exemplu"
+        }
+      },
+      {
+        "h2": "Alegerea limbilor și a stilului",
+        "ps": [
+          "„Limba sursă” poate rămâne pe detectare automată, iar „limba țintă” se alege dintre 75 de limbi. Sunt cinci stiluri de traducere: echilibrat (implicit), colocvial natural, scris profesional, limbaj de dublaj și personalizat. „Limbajul de dublaj” se potrivește dialogului din film, iar „scrisul profesional” documentarelor și cursurilor."
+        ],
+        "img": {
+          "file": "translate-lang",
+          "alt": "Setările de limbă și stil: limba sursă, lista de limbi țintă și cele cinci stiluri",
+          "cap": "„Limbă” și „stil de traducere”: sursa poate fi detectată automat, limba țintă se alege dintre 75"
+        }
+      },
+      {
+        "h2": "Glosarul: același nume pe tot filmul",
+        "ps": [
+          "AI-ul traduce pe loturi, așa că același nume poate ajunge scris în două feluri în loturi diferite. Scrie în glosar „originalul → cum trebuie tradus”; înainte de fiecare lot, instrumentul caută termenii în lot și îi traduce exact așa. Un termen pe linie, iar săgeata poate fi `->`, `=>`, `→` sau Tab. Dacă scrii doar originalul, termenul rămâne netradus; mai multe variante de scriere se leagă cu `|` la aceeași traducere. Butonul „✨ Extragere AI” lasă AI-ul să scoată întâi numele proprii din film și să le completeze în tabel; le corectezi, apoi traduci."
+        ],
+        "img": {
+          "file": "translate-glossary",
+          "alt": "Secțiunea de termeni: caseta glosarului și butoanele de extragere AI și salvare",
+          "cap": "Glosarul „nume unificate”: extragere AI a numelor proprii, încărcare automată la filmul următor după salvare"
+        }
+      },
+      {
+        "h2": "Procesul de traducere",
+        "ps": [
+          "Apasă „▶ Începe traducerea” în bara de sus. Banda de statistici din coloana din mijloc arată în timp real câte intrări sunt, câte sunt traduse, câte cuvinte de umplutură au fost curățate și câte grupuri de fraze traversează mai multe intrări; bara de progres afișează timpul rămas estimat și tokenii consumați. În timpul traducerii poți edita oricând celula cu traducerea, iar modificările rămân local și nu se pierd la reîncărcare. Dacă închizi pagina la mijloc, la următoarea vizită primești oferta de a continua de unde ai rămas. Când o propoziție întreagă e împărțită pe mai multe intrări, grupul se traduce împreună și se redistribuie pe durate."
+        ],
+        "img": {
+          "file": "translate-workspace",
+          "alt": "Spațiul de lucru: banda de statistici, bara de progres și tabelul editabil de subtitrări",
+          "cap": "Coloana din mijloc: statistici + progres + tabel editabil cu un clic"
+        }
+      },
+      {
+        "h2": "Exportul",
+        "ps": [
+          "În coloana din dreapta alegi mai întâi forma conținutului: doar traducerea (monolingv), bilingv cu originalul sus, bilingv cu traducerea sus; apoi formatul fișierului: SRT, WebVTT, SBV, ASS, TXT. La ASS ai în plus două machete: „două ecrane sus-jos” și „două rânduri jos”. Conținutul și formatul se combină liber — 14 variante de export. La bilingv poți seta separat lățimea rândului. „Descarcă subtitrările” salvează fișierul, iar „Copiază” îl pune direct în clipboard."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Panoul de export: trei forme de conținut, cinci formate de fișier și lățimea rândului bilingv",
+          "cap": "Export în coloana dreaptă: întâi forma conținutului, apoi formatul fișierului"
+        }
+      },
+      {
+        "h2": "Cost și confidențialitate",
+        "ps": [
+          "Modelul implicit merge fără cont și fără cheie, cu limită pe număr de cereri: un anumit număr pe zi pentru fiecare IP, plus un plafon zilnic la nivel de site; pentru volume mari, pune propria cheie API în „Motor de traducere”. Regulile de confidențialitate sunt cele afișate în pagină: la modelul implicit, subtitrările trec prin serverul nostru către furnizor; cu cheia proprie, datele ajung direct la furnizorul ales, iar cheia rămâne doar în browserul tău. Parsarea, ruperea rândurilor și așezarea bilingvă se fac integral local, în browser."
+        ]
+      },
+      {
+        "h2": "Întrebări frecvente",
+        "ps": [
+          "**Traducerea conține și altă limbă?** Instrumentul detectează abaterile de limbă și retraduce automat; dacă tot rămâne o intrare greșită, o corectezi cu un clic în celulă.",
+          "**Cum tratez versurile?** În „Filtrarea conținutului” ai trei opțiuni: traduce versurile, păstrează originalul, șterge versurile.",
+          "**Numele diferă de la o scenă la alta?** Adaugă variantele în glosar și retraduce; glosarul are prioritate față de setarea globală „tratarea numelor proprii”.",
+          "**Vreau engleza sus și româna jos?** La export alege „bilingv · originalul sus”; pentru română sus și engleză jos alege „bilingv · traducerea sus”."
+        ]
+      },
+      {
+        "h2": "Instrumente și ghiduri conexe",
+        "ps": [
+          "Dacă formatul nu se potrivește, începe cu [[Conversia formatelor|/convert.html]]; dacă timeline-ul e decalat, folosește [[Ajustarea timeline-ului|/shift.html]]; înainte de predare treci prin [[Controlul de calitate|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  },
+  "clean": {
+    "ro": [
+      {
+        "h2": "Ce rezolvă acest instrument",
+        "ps": [
+          "Subtitrările descărcate vin adesea cu lucruri care nu ar trebui să fie acolo; curățătorul le elimină pe rând, după reguli:"
+        ],
+        "ul": [
+          "Filigrane ale grupurilor de subtitrare, adrese web, replici publicitare",
+          "Descrieri SDH („[pași]”, „(muzică)”) și etichete de vorbitor",
+          "Efecte ASS, etichete HTML, caractere de control",
+          "Intrări duplicate, intrări goale, punctuație și spații greșite"
+        ]
+      },
+      {
+        "h2": "Încărcare și detectare",
+        "ps": [
+          "Trage fișierul în zonă sau alege-l — sunt acceptate SRT, VTT, ASS, SSA și TXT — ori lipește direct textul subtitrării. Codificarea e detectată automat: dacă UTF-8 produce caractere de înlocuire, se trece pe GBK sau Big5, iar pagina afișează „Codificarea a fost reparată ca {encoding}”. Dacă încarci o pistă dublă bilingvă (două timeline-uri identice, una în chineză și una în engleză), intrările se unesc automat într-una bilingvă, cu comutatorul „originalul sus / traducerea sus”."
+        ]
+      },
+      {
+        "h2": "Cum se configurează cele 13 reguli",
+        "ps": [
+          "Interfața are patru grupuri, 13 bife: **Etichete și format** (efecte ASS, etichete HTML, caractere de control, sortare și renumerotare), **SDH și efecte sonore** (descrieri SDH, etichete de vorbitor, replici care sunt doar versuri), **Filigrane și intrări inutile** (filigrane și reclame, intrări duplicate, intrări goale), **Corecturi de text** (punctuație și spații, repararea majusculelor, unirea propozițiilor scurte). Implicit sunt bifate doar regulile sigure, care nu pierd conținut; cele care pot pierde text (versuri, majuscule, unire) sunt oprite, iar tu le activezi când ai nevoie. Fiecare regulă are o explicație la hover pe ⓘ, iar orice bifă declanșează imediat o nouă trecere."
+        ],
+        "img": {
+          "file": "clean-opts",
+          "alt": "Opțiunile de curățare: patru grupuri cu 13 bife și numărul de reguli active afișat sus",
+          "cap": "Patru grupuri, 13 reguli; implicit doar cele fără pierderi, aplicate instant"
+        }
+      },
+      {
+        "h2": "Comparația modificărilor și anularea",
+        "ps": [
+          "Rezultatul nu se aplică peste original: fiecare modificare apare în tabelul de comparație, cu eticheta regulii care arată de ce a fost schimbată sau ștearsă intrarea. Ce nu vrei să atingi, readuci cu „Anulează” doar pe acea intrare; „Anulează tot” readuce totul, iar încă un clic reaplică toată curățarea. Banda de statistici arată câte intrări erau la început, câte au rămas, câte au fost șterse, modificate și anulate."
+        ],
+        "img": {
+          "file": "clean-diff",
+          "alt": "Tabelul de comparație: număr, timp, original și rezultat, fiecare cu eticheta regulii",
+          "cap": "Fiecare modificare are eticheta regulii și poate fi anulată individual sau integral"
+        }
+      },
+      {
+        "h2": "Previzualizare și export",
+        "ps": [
+          "Comută între „după curățare” și „original”; în vizualizarea originală intrările șterse apar tăiate și marcate „șters”. Ce vezi în previzualizare este exact ce se exportă. Formate: SRT (implicit), VTT, ASS (dacă fișierul sursă e ASS, cu secțiunea de stiluri păstrată neschimbată) și TXT fără timeline. Numele fișierului primește automat sufixul `.clean`."
+        ],
+        "img": {
+          "file": "clean-preview",
+          "alt": "Previzualizarea textului: comutare între rezultat și original, cu banda de statistici",
+          "cap": "Două vizualizări comutabile; exact ce vezi este ce exporți"
+        }
+      },
+      {
+        "h2": "Întrebări frecvente",
+        "ps": [
+          "**Se pot șterge replici normale din greșeală?** Regula de filigran scoate mai întâi linia cu filigran, păstrând replica din intrarea bilingvă; doar dacă rămân urme se șterge toată intrarea. La SDH se șterg doar parantezele cu termenul de indicație și maximum 40 de caractere, iar replicile obișnuite între paranteze rămân.",
+          "**Cum se distinge o replică doar cu versuri de un dialog care conține versuri?** Se șterge doar dacă fiecare rând al intrării e încadrat în note ♪ sau marcat ca [music]; dialogul cu versuri rămâne.",
+          "**Etichetele de vorbitor nu strică textul chinezesc?** Se potrivesc doar numele scrise integral cu majuscule, litere și cifre, urmate de două puncte (de exemplu `GEORGE:`); propozițiile cu două puncte chinezești nu se potrivesc.",
+          "**Pot curăța mai multe fișiere deodată?** Nu, un fișier pe rând; după descărcare îl încarci pe următorul."
+        ]
+      },
+      {
+        "h2": "Confidențialitate",
+        "ps": [
+          "Toată curățarea se face local, în browser; niciun conținut de subtitrare nu pleacă spre server."
+        ]
+      },
+      {
+        "h2": "Instrumente și ghiduri conexe",
+        "ps": [
+          "Pentru operația scurtă de eliminare a filigranelor și reclamelor vezi [[Ștergeți reclamele și filigranele din subtitrări|/guides/remove-subtitle-ads.html]]; înainte de predare treci prin [[Controlul de calitate|/guides/subtitle-quality-check.html]]; dacă vrei alt format, folosește [[Conversia formatelor|/convert.html]]."
+        ]
+      }
+    ]
+  },
+  "bilingual": {
+    "ro": [
+      {
+        "h2": "Ce rezolvă acest instrument",
+        "ps": [
+          "Ai subtitrări bilingve, dar vrei doar una dintre piste sau, dimpotrivă, vrei să le separi ori să le unești:"
+        ],
+        "ul": [
+          "Doar pista originală sau doar pista tradusă",
+          "Două fișiere separate, „original” și „traducere”",
+          "Două piste suprapuse unite într-o singură intrare pe două rânduri",
+          "Schimbarea formatului în treacăt (citește ASS, exportă SRT și așa mai departe)"
+        ]
+      },
+      {
+        "h2": "Cum detectează bilingvul",
+        "ps": [
+          "Pistele duble bilingve apar în două forme uzuale, iar instrumentul le detectează separat, **fără să ghicească limba**: **forma A (o intrare pe două rânduri)** separă după sistemul de scriere — kana, hangul, hanzi, latină și alte zece sisteme; e bilingv doar dacă apar două, primul apărut e considerat originalul, iar o singură scriere (de exemplu o propoziție chinezească lungă împărțită pe rânduri) rămâne monolingvă, neatinsă. **Forma B (două intrări independente, cu timeline identic)** separă după poziție — cele două intrări cu același timp formează o pereche, prima e originalul, iar combinații ca engleză-franceză sau engleză-germană, care folosesc același alfabet, se despart totuși corect. Dacă nu se detectează conținut bilingv, alegerea modului și butonul de start se dezactivează, cu un mesaj clar — nu se produce o separare greșită."
+        ]
+      },
+      {
+        "h2": "Cele patru moduri",
+        "ps": [
+          "Lista „Ce vrei” are patru opțiuni: **doar originalul** și **doar traducerea**, fiecare cu un singur fișier; **separă în două fișiere**, care dă originalul și traducerea separat, cu sufixele `.orig` / `.dst` ca să nu se suprascrie; **unește într-o intrare pe două rânduri**, care transformă fiecare pereche în „un rând original, un rând traducere”, păstrând neschimbate intrările monolingve, fără să inventeze un al doilea rând. Când schimbi modul sau formatul de ieșire, rezultatul se recalculează imediat, fără să mai apeși start."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Alegerea modului: doar originalul, doar traducerea, separă în două fișiere, unește pe două rânduri",
+          "cap": "Patru moduri: o singură pistă, două fișiere sau o intrare pe două rânduri"
+        }
+      },
+      {
+        "h2": "Intrare și ieșire",
+        "ps": [
+          "Citește șapte formate — SRT, VTT, ASS, SSA, SBV, LRC și TXT (întâi după extensie, apoi după conținut); exportă patru — SRT, VTT, ASS și TXT. Orice combinație intrare-ieșire e validă, deci conversia între formate vine la pachet. În ASS, `\\N` devine un rând nou real, iar etichetele de efecte se elimină la exportul în alt format."
+        ]
+      },
+      {
+        "h2": "Rezultat și export",
+        "ps": [
+          "Rezultatul apare integral într-o casetă doar-citire, cu numărul de intrări și durata totală pentru fiecare fișier; „Descarcă” și „Copiază” îl preiau direct. Zona de rezultat e doar o previzualizare, fără editare de text sau timeline — pentru modificări exporți întâi și lucrezi în instrumentul potrivit."
+        ],
+        "img": {
+          "file": "bilingual-result",
+          "alt": "Zona de rezultat: previzualizare doar-citire, statistici de intrări și butoanele de descărcare și copiere",
+          "cap": "Previzualizare integrală + număr de intrări și durată + descărcare și copiere"
+        }
+      },
+      {
+        "h2": "Întrebări frecvente",
+        "ps": [
+          "**Am engleză și franceză pe două rânduri, de ce nu se separă?** Forma A separă după sistemul de scriere, iar două limbi cu aceeași scriere nu se pot despărți într-o singură intrare; dacă materialul e în forma B (două piste suprapuse), separarea după poziție funcționează.",
+          "**La descărcare primesc un singur fișier?** „Doar originalul”, „doar traducerea” și „unește pe două rânduri” produc un singur fișier; doar „separă în două fișiere” produce două, cu sufixele `.orig` / `.dst`.",
+          "**Se poate în lot?** Un fișier pe rând, fără coadă.",
+          "**Subtitrările mele se încarcă undeva?** Nu, parsarea și exportul rulează integral în browser."
+        ]
+      },
+      {
+        "h2": "Ghiduri conexe",
+        "ps": [
+          "Pentru operația scurtă de separare în două piste vezi [[Despărțește subtitrările bilingve în două piste|/guides/split-bilingual-subtitles.html]]; cum se produc subtitrările bilingve vezi [[Două moduri de a face subtitrări bilingve|/guides/make-bilingual-subtitles.html]]; pentru traducere automată folosește [[Traducerea subtitrărilor cu AI|/translate.html]]."
+        ]
+      }
+    ]
+  },
+  "make-bilingual-subtitles": {
+    "ro": [
+      {
+        "h2": "Cum arată cele două forme",
+        "ps": [
+          "**Forma B: două piste suprapuse.** Aceeași replică apare ca două intrări independente, cu timeline identic, una în engleză și una în chineză, afișate simultan. E cea mai răspândită abordare la ASS-ul bilingv."
+        ],
+        "ul": [
+          "`What are you waiting for?`",
+          "`你还在等什么？`"
+        ]
+      },
+      {
+        "h2": "Fiecare are hibele ei",
+        "ps": [
+          "Hiba formei A e la **detectare**: separarea se bazează pe sistemul de scriere, deci chineză-engleză sau japoneză-engleză se despart ușor, dar engleză-franceză ori chineză-hanzi japonezi, care **folosesc același alfabet**, nu se pot despărți. Hiba formei B e la **producție**: cele două timeline-uri trebuie să coincidă exact, iar alinierea manuală e obositoare; în plus, unele playere afișează ambele piste deodată, aglomerând ecranul. Regula practică: pentru produsul final vizionat de oameni se folosește forma A; pentru a lua o pistă și a o prelucra mai departe, forma B e cea mai comodă de separat."
+        ]
+      },
+      {
+        "h2": "Cum se trece de la una la alta",
+        "ps": [
+          "**Din original faci bilingv**: folosește [[Traducerea subtitrărilor cu AI|/translate.html]] și alege la export „bilingv · originalul sus” sau „bilingv · traducerea sus” — rezultă direct forma A. La formatul ASS ai în plus machetele „două ecrane sus-jos” și „două rânduri jos”.",
+          "**Unești piste sau convertești între ele**: folosește „unește într-o intrare pe două rânduri” din [[Separatorul de subtitrări bilingve|/bilingual.html]] — intrare formă B, ieșire formă A; invers, „separă în două fișiere” ia forma A sau B și dă două piste independente."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Cele patru moduri ale separatorului, dintre care unirea pe două rânduri transformă forma B în forma A",
+          "cap": "„Unește pe două rânduri”: din forma B în forma A"
+        }
+      },
+      {
+        "h2": "Pentru ce dispozitiv",
+        "ps": [
+          "Playerele web (HTML5 `<track>`) și majoritatea playerelor de pe telefon suportă mai stabil forma A; playerele desktop profesionale (VLC, mpv, PotPlayer) acceptă ambele și pot da culori și poziții diferite celor două piste. Dacă nu ești sigur, exportă SRT în forma A — are cea mai bună compatibilitate. Diferențele dintre formate sunt în [[Alegerea formatului de subtitrări|/guides/subtitle-format-comparison.html]]."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Opțiunile de stil bilingv din panoul de export al instrumentului de traducere",
+          "cap": "La exportul din traducere alegi direct ordinea bilingvă, într-un singur pas"
+        }
+      },
+      {
+        "h2": "Întrebări frecvente",
+        "ps": [
+          "**Subtitrările bilingve sunt prea încărcate, ce fac?** Controlează lățimea rândului: panoul de export are setarea „lățimea rândului bilingv”; rânduri mai înguste înseamnă mai puține caractere pe intrare și un ecran mai curat.",
+          "**Vreau doar o pistă?** „Doar originalul / doar traducerea” din separatorul bilingv rezolvă într-un clic; vezi [[Despărțește subtitrările bilingve în două piste|/guides/split-bilingual-subtitles.html]]."
+        ]
+      }
+    ]
+  },
+  "qc": {
+    "ro": [
+      {
+        "h2": "Ce rezolvă acest instrument",
+        "ps": [
+          "Cu ochiul liber subtitrările par în regulă, dar la predare apar suprapuneri de timeline, rânduri prea late și viteze de citire prea mari. Pagina de control le listează pe fiecare:"
+        ],
+        "ul": [
+          "Timeline: suprapuneri, sfârșit înainte de început, durată prea mică sau prea mare, numerotare greșită",
+          "Așezare: rând prea lat, peste două rânduri, rupere nepotrivită, spații la capete",
+          "Detalii de limbă: spațiu lipsă între CJK și latină, punctuație neconformă, direcția de scriere",
+          "Defecte grave: caractere corupte sau de control, format de timp invalid"
+        ]
+      },
+      {
+        "h2": "Alege întâi regulile limbii",
+        "ps": [
+          "În „după ce reguli se verifică” sunt cinci praguri: **lățimea maximă a unui rând** (implicit 42 de jumătăți de caracter la ecran orizontal, 36 la pătrat, 28 la vertical), **viteza maximă de citire** (CJK 18 unități/s, alte limbi 20), **durată minimă 833 ms**, **durată maximă 7000 ms**, **maximum 2 rânduri**. Limba subtitrărilor se detectează automat sau se alege manual dintre cele 27; orientarea ecranului schimbă doar lățimea rândului, nu viteza, duratele sau numărul de rânduri. Unitatea de măsură e jumătatea de caracter: un hanzi contează 2, o literă latină 1 — deci 42 înseamnă 21 de hanzi sau 42 de litere."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Setările de control: cinci casete de prag, limba subtitrărilor și orientarea ecranului",
+          "cap": "Cinci praguri + limbă + orientare; valorile implicite sunt cele uzuale în domeniu"
+        }
+      },
+      {
+        "h2": "Cum se citește raportul",
+        "ps": [
+          "Cele 17 reguli dau rezultate pe trei niveluri: **erori** (caractere corupte, format de timp, sfârșit înainte de început, numerotare greșită), **avertismente** (intrări goale, suprapuneri, durată prea mică sau mare, viteză depășită, rând prea lat, peste două rânduri) și **sugestii** (ruperea rândului, spații la capete, spațiu lipsă, punctuație). Fiecare are numărul intrării și detaliul „măsurat X, prag Y”, iar lista se poate filtra pe nivel. Intrările bilingve au excepții: ambele forme se detectează automat, verificarea suprapunerii se face pe pereche, iar viteza se calculează doar pe rândul scris în limba țintă."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Raportul de control: probleme grupate pe erori, avertismente și sugestii, cu numărul intrării și valoarea măsurată",
+          "cap": "Raport pe trei niveluri: fiecare problemă are numărul intrării și valoarea măsurată față de prag"
+        }
+      },
+      {
+        "h2": "Reparare și export",
+        "ps": [
+          "Cardul „Repară și exportă” listează doar ce se **poate repara automat**: ruperea rândurilor, ștergerea intrărilor goale, spațiile lipsă, punctuația conform limbii și numerotarea sunt bifate implicit, pentru că nu ating timeline-ul; cele **care modifică timeline-ul** (inversarea început-sfârșit, mutarea suprapunerilor, scurtarea sau prelungirea duratei) sunt nebifate și le activezi după ce verifici. „Aplică reparațiile” reverifică automat, iar contorul numără doar ce s-a reparat efectiv — rândurile care nu pot fi rupte nu sunt raportate fals. **Viteza peste limită nu are reparație automată**: mașina nu știe ce caracter să scoată, așa că scurtezi traducerea sau ajustezi timeline-ul manual. La final exporți SRT sau VTT, ori apeși „Descarcă raportul” pentru un fișier text `.qc.txt`."
+        ],
+        "img": {
+          "file": "qc-fix",
+          "alt": "Cardul de reparare: bife pentru reparațiile automate și butonul de aplicare",
+          "cap": "Doar reparațiile automate intră în listă; cele care ating timeline-ul sunt nebifate implicit"
+        }
+      },
+      {
+        "h2": "Întrebări frecvente",
+        "ps": [
+          "**De ce nu pot exporta ASS?** Controlul exportă doar SRT și VTT; ASS intră, dar nu iese — dacă vrei să păstrezi efectele ASS, gândește întâi la [[Conversia formatelor|/convert.html]].",
+          "**Ce înseamnă viteza 18?** Pentru CJK limita e 9 caractere full-width pe secundă (18 jumătăți), pentru alte limbi 20 de jumătăți pe secundă; e nivelul uzual de confort la citit, iar valoarea se poate schimba în casetă.",
+          "**Se poate verifica un fișier cu codificare stricată?** Controlul citește doar UTF-8; dacă ai caractere corupte, treci întâi prin pagina de reparare a textului.",
+          "**Îmi modifică timeline-ul?** Dacă nu bifezi grupul „modifică timeline-ul”, nu; iar dacă îl bifezi, modificările sunt anunțate înainte de aplicare."
+        ]
+      },
+      {
+        "h2": "Ghiduri conexe",
+        "ps": [
+          "Pentru subtitrările care trec prea repede vezi [[Subtitrări prea rapide pentru a fi citite|/guides/subtitle-too-fast.html]]; ce anume verifici înainte de predare găsești în [[Ce să verificați înainte de predare|/guides/subtitle-quality-check.html]]; timeline-ul care se decalează e altă problemă — vezi [[Subtitrări tot mai dezinchegate|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-quality-check": {
+    "ro": [
+      {
+        "h2": "De ce nu vezi singur problemele",
+        "ps": [
+          "Cine face subtitrări cunoaște prea bine materialul: știe ce urmează în fiecare replică, așa că citește repede fără să simtă viteza; așezarea a văzut-o de sute de ori, iar ochiul ignoră automat defectele. De aceea verificarea înainte de predare nu poate fi „mai citesc o dată tot”, ci **măsurare pe indicatori**: viteza de citire, lățimea rândului, durata, suprapunerile — cifrele decid."
+        ]
+      },
+      {
+        "h2": "Cele șase puncte care cad cel mai des",
+        "ps": [
+          "În ordinea frecvenței problemelor la predare:"
+        ],
+        "ul": [
+          "**Viteză prea mare**: spectatorul nu apucă să citească înainte de schimbare, iar impresia generală scade",
+          "**Timeline suprapus**: două replici pe ecran deodată, de obicei rămase după montaj sau după unire",
+          "**Rând prea lat**: peste 42 de jumătăți la ecran orizontal, depășește ecranul pe dispozitive mici",
+          "**Peste două rânduri**: blocurile de trei rânduri și mai mult ocupă jumătate de ecran pe telefon",
+          "**Punctuație neconformă**: spațiu lipsă între CJK și latină, full-width și half-width încurcate — arată ieftin",
+          "**Numerotare greșită și intrări goale**: renumerotarea uitată după ștergeri sau uniri"
+        ]
+      },
+      {
+        "h2": "Cum se verifică",
+        "ps": [
+          "Deschide [[Controlul de calitate|/qc.html]], trage subtitrările înăuntru, lasă limba pe detectare automată (reguli pe categorii pentru 27 de limbi); raportul e împărțit pe **erori / avertismente / sugestii**, fiecare cu numărul intrării și valoarea măsurată. Erorile trebuie rezolvate obligatoriu (caractere corupte, format de timp, sfârșit înainte de început, numerotare); avertismentele, după caz (suprapunere, viteză, lățime, durată); sugestiile sunt de finisaj (ruperea rândului, spații, punctuație)."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Raportul de control: listă pe trei niveluri, fiecare cu numărul intrării și comparația cu pragul",
+          "cap": "Raport pe trei niveluri; fiecare problemă are numărul intrării și valoarea măsurată"
+        }
+      },
+      {
+        "h2": "Ce se repară cu un clic",
+        "ps": [
+          "Numerotarea, intrările goale, ruperea rândurilor, spațiile și punctuația — ce **nu atinge timeline-ul** — se repară automat; reparațiile **care modifică timeline-ul** (inversarea început-sfârșit, mutarea suprapunerilor, ajustarea duratei) sunt nebifate implicit și le activezi după ce înțelegi efectul. **Viteza peste limită nu se repară automat** — mașina nu știe ce caracter să scoată, așa că scurtezi traducerea sau lărgești puțin durata; detalii în [[Subtitrări prea rapide pentru a fi citite|/guides/subtitle-too-fast.html]]. După reparare se face o reverificare, iar raportul numără doar ce s-a reparat efectiv."
+        ]
+      },
+      {
+        "h2": "Ce faci imediat după",
+        "ps": [
+          "Pagina raportului permite descărcarea unui fișier text `.qc.txt`; anexează-l la predare, ca beneficiarul să vadă exact ce ai verificat. Dacă traducerea e proaspătă, verifică înainte de a preda; un timeline decalat global e alt tip de problemă, iar dacă viteza rămâne problematică după verificare vezi [[Subtitrări tot mai dezinchegate|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-too-fast": {
+    "ro": [
+      {
+        "h2": "Ce este viteza de citire",
+        "ps": [
+          "Viteza de citire înseamnă **dacă spectatorul poate termina textul în timpul cât stă subtitrarea pe ecran**. Calculul e simplu: lățimea textului împărțită la durata în secunde. Limite uzuale: CJK 9 caractere full-width pe secundă (18 jumătăți), alte limbi 20 de jumătăți pe secundă. O replică de 20 de hanzi care stă o secundă înseamnă 40 de unități/s — de peste două ori peste limită, deci imposibil de citit."
+        ]
+      },
+      {
+        "h2": "Întâi stabilește care e problema",
+        "ps": [
+          "„Nu apuc să citesc” ascunde două probleme diferite: **durată prea mică** — 100–200 ms și dispare, de obicei o eroare de timing sau un rest de montaj; **text prea lung** — durata e normală, dar un rând are 30 de hanzi, iar nicio încetinire nu ajunge. Reparațiile sunt opuse, așa că stabilește întâi care e cazul."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Pragul de viteză din pagina de control: 18 pentru CJK, 20 pentru alte limbi",
+          "cap": "Pragul de viteză: 18 unități/s pentru CJK, 20 pentru alte limbi"
+        }
+      },
+      {
+        "h2": "Cum se verifică",
+        "ps": [
+          "Deschide [[Controlul de calitate|/qc.html]] și trage subtitrările. În raport, „durată prea mică” e avertisment și dă milisecundele măsurate (prag 833 ms); „viteză peste limită” apare separat, cu unitățile pe secundă măsurate. La subtitrările bilingve se calculează doar rândul scris în limba țintă; cele două limbi nu se adună."
+        ]
+      },
+      {
+        "h2": "Cum se repară",
+        "ps": [
+          "**Durată prea mică**: se repară cu un clic — se prelungește automat la 833 ms, fără a depăși începutul intrării următoare (o reparație nu are voie să creeze o suprapunere nouă). **Text prea lung**: nu există reparație automată, mașina nu știe ce caracter să scoată. Ai două căi: scurtezi traducerea (în instrumentul de traducere editezi direct celula) sau prelungești durata acestei intrări (cu condiția să existe spațiu până la următoarea; dacă problema e timeline-ul global, vezi [[Ajustarea timeline-ului|/shift.html]]). După modificări rulează din nou controlul, ca să confirmi că viteza a revenit sub prag."
+        ]
+      },
+      {
+        "h2": "Nu exagera în sens invers",
+        "ps": [
+          "Încadrarea în limită nu înseamnă confort: dacă aduci fiecare intrare exact la 9 caractere/s, tot filmul se citește obositor. Regula practică e să stai în jur de 70% din prag, iar în secvențele dense de dialog o depășire mică e acceptabilă; schimbarea prea frecventă a blocurilor e și ea o problemă, așa că înainte de predare treci prin toți indicatorii — vezi [[Ce să verificați înainte de predare|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  }
+}

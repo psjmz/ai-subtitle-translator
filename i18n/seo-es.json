@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio a subtítulos — convierte voz a SRT en tu navegador | AI-SRTSub",
+    "desc": "Convierte audio o video a subtítulos: el reconocimiento de voz se ejecuta en tu navegador, segmenta el resultado y exporta SRT / VTT. Gratis y local.",
+    "kw": "audio a srt,voz a subtítulo,generar subtítulos desde audio,generador de subtítulos automático,transcribir audio a srt,subtítulos whisper,reconocimiento de voz en navegador,generación de subtítulos offline",
+    "intro": "Arrastra un archivo de audio o video, elige un idioma y un modelo para iniciar el reconocimiento en tu navegador. Obtendrás un borrador de subtítulos con tiempos, segmentado por frases y ajustado a la longitud de línea.",
+    "feat": "Esta herramienta procesa el flujo de palabras del reconocimiento de voz, segmentando las frases según la puntuación, ajustando la longitud de línea según el sistema de escritura y optimizando los tiempos de lectura para evitar solapamientos. El modelo se descarga y almacena en caché localmente, garantizando que el audio nunca se suba a un servidor.",
+    "who": "Creadores que subtitulan sus videos, equipos que transcriben podcasts o cursos, y cualquier persona que necesite un borrador de subtítulos editable."
+  },
+  "ocrsub": {
+    "title": "OCR de subtítulos incrustados — extrae subtítulos de video | AI-SRTSub",
+    "desc": "Los subtítulos quemados en la imagen no tienen pista extraíble. Marca el área y la herramienta lee cuadro a cuadro, fusionando frames en un SRT / VTT.",
+    "kw": "extraer subtítulos incrustados,ocr de subtítulos,extracción de subtítulos de video,subtítulos quemados,ocr subtítulos desde video,video a srt,subtítulo desde video,ocr de subtítulos hardcoded",
+    "intro": "Sube un video, marca la franja donde aparecen los subtítulos y la herramienta leerá cuadro a cuadro, fusionando los frames idénticos en un solo bloque con su tiempo.",
+    "feat": "La herramienta recorta la franja de subtítulos y utiliza binarización por brillo para aislar el texto del fondo, convirtiendo los frames consecutivos en un único cue con su duración exacta. Al procesar el video localmente, se obtienen los tiempos de inicio y fin, permitiendo una edición posterior para corregir posibles errores de lectura de caracteres.",
+    "who": "Equipos de subtitulado que localizan videos extranjeros, personas que re-subtitulan lanzamientos antiguos y editores que solo poseen el video final sin el archivo original."
+  }
+}

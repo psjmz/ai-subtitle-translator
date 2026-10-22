@@ -1,0 +1,226 @@
+{
+ "merge": {
+  "es": {
+   "edHintTm": "h:mm:ss,mmm",
+   "vttTplSocial": "Vertical",
+   "vttOptNormal": "Normal",
+   "lblVttColor": "Color",
+   "lblColor": "Color",
+   "colSrc": "Original",
+   "pvViewMovie": "Final",
+   "slotPrmColor": "Color"
+  },
+  "pt": {
+   "edHintTm": "h:mm:ss,mmm",
+   "lblLayout": "Layout",
+   "assTplCinema": "Cinema",
+   "vttTplSocial": "Vertical",
+   "monoTplCinema": "Cinema",
+   "vttOptNormal": "Normal",
+   "colSrc": "Original",
+   "pvViewMovie": "Final"
+  },
+  "de": {
+   "edStart": "Start",
+   "edHintTm": "h:mm:ss,mmm",
+   "lblLayout": "Layout",
+   "assGrpText": "Text",
+   "assGrpPos": "Position",
+   "vttTplStd": "Standard",
+   "vttGrpText": "Text",
+   "vttOptNormal": "Normal",
+   "lblVttSrcBg": "Hintergrund",
+   "edgeBox": "Hintergrund",
+   "colSrc": "Original",
+   "expTitle": "Exportieren",
+   "slotGrpText": "Text"
+  },
+  "fr": {
+   "edHintTm": "h:mm:ss,mmm",
+   "assGrpPos": "Position",
+   "vttTplStd": "Standard",
+   "vttTplCompact": "Compact",
+   "vttTplA11y": "Accessible",
+   "vttTplSocial": "Vertical",
+   "vttOptNormal": "Normal",
+   "colSrc": "Original",
+   "pvViewMovie": "Final",
+   "slotNarration": "Narration",
+   "colSlot": "Style"
+  },
+  "id": {
+   "vttOptNormal": "Normal",
+   "lblVttSrcFont": "Huruf",
+   "lblVttFont": "Huruf",
+   "lblFont": "Huruf",
+   "monoCol": "Subtitel",
+   "slotEdit": "Slot edit",
+   "slotOverride": "Timpa",
+   "slotDefault": "Bawaan",
+   "slotPrmFont": "Huruf"
+  },
+  "hi": {
+   "edHintTm": "घंटा:मिनट:सेकंड,मिलीसेकंड"
+  },
+  "ru": {
+   "vttPresetCustom": "Свой",
+   "vttPresetTop": "Двуязычный сверху",
+   "vttPresetA11y": "Доступный двуязычный",
+   "vttPresetSocial": "Вертикальный двуязычный",
+   "vttGrpPos": "Положение (%)",
+   "vttGrpText": "Текст",
+   "vttGrpSrc": "Строка оригинала",
+   "vttGrpFx": "Подложка / обводка",
+   "vttGrpAll": "Вся реплика (обе строки)",
+   "vttGrpDst": "Перевод (основной стиль)",
+   "lblOneCol": "Субтитр",
+   "vttGrpAllMono": "Вся реплика",
+   "vttGrpOne": "Строка субтитра",
+   "vttPanelTitleMono": "Стиль WebVTT (при экспорте стиля VTT)",
+   "vttPresetStdMono": "Стандарт · две строки снизу",
+   "vttTipStdMono": "Стандарт · две строки снизу: белый текст + полупрозрачная подложка — самый надёжный вариант.",
+   "monoTplStream": "Стандарт стриминга",
+   "monoTplA11y": "Высокий контраст",
+   "monoTplCinema": "Кино",
+   "monoTplSocial": "Соцсети вертикально",
+   "vttTipStreamMono": "Ориентир Netflix / BBC: белый текст с чёрной обводкой. Макс. 42 символа в строке (латиница), 16 для китайского, 13 для японского.",
+   "vttTipA11yMono": "WCAG AAA: белый на чёрной подложке 85% = 21:1. Для ярких сцен, слабослышащих и пожилых зрителей.",
+   "vttTipCinemaMono": "Кино-традиция: без подложки, тёплый белый на размер меньше, ближе к нижнему краю.",
+   "vttTipSocialMono": "Соцсети: нижние 20–35% закрыты интерфейсом, поэтому субтитры поднимают и увеличивают.",
+   "vttSrcTip": "Каждый элемент строки оригинала может «наследовать» строку перевода — унаследованные не попадают в ::cue(.src). Наследуйте всё — обе строки будут одинаковыми (без разметки и правил).",
+   "vttInherit": "Наследовать",
+   "vttOptSet": "Отдельно",
+   "vttOptNormal": "Обычный",
+   "vttOptOff": "Выкл.",
+   "lblVttSrcFont": "Шрифт",
+   "lblVttSrcBold": "Жирный",
+   "lblVttSrcItalic": "Курсив",
+   "lblVttSrcBg": "Подложка",
+   "lblVttSrcBgColor": "Цвет подложки",
+   "lblVttSrcBgAlpha": "Непрозрачность подложки",
+   "lblVttSrcShadow": "Обводка",
+   "lblVttSrcShadowW": "Толщина",
+   "lblVttSrcShadowColor": "Цвет обводки",
+   "lblVttLine": "Вертикальная линия"
+  },
+  "it": {
+   "edHintTm": "h:mm:ss,mmm",
+   "lblLayout": "Disposizione",
+   "tplSegSplit": "ASS diviso",
+   "assTplSplit": "Diviso",
+   "assTplCinema": "Cinema",
+   "vttTplStd": "Standard",
+   "monoTplCinema": "Cinema",
+   "lblVttSrcFont": "Font",
+   "slotPrmFont": "Font"
+  },
+  "tr": {
+   "vttOptNormal": "Normal",
+   "pvViewMovie": "Nihai"
+  },
+  "nl": {
+   "assTplCinema": "Filmisch",
+   "vttTplCompact": "Compact",
+   "monoTplCinema": "Filmisch"
+  },
+  "sv": {
+   "edStart": "Start",
+   "edHintTm": "h:mm:ss,mmm",
+   "lblLayout": "Layout",
+   "assGrpText": "Text",
+   "assGrpPos": "Position",
+   "vttTplStd": "Standard",
+   "vttGrpText": "Text",
+   "vttOptNormal": "Normal",
+   "colSrc": "Original",
+   "slotGrpText": "Text"
+  },
+  "cs": {
+   "edHintTm": "h:mm:ss,mmm",
+   "assGrpText": "Text",
+   "vttGrpText": "Text",
+   "expTitle": "Exportovat",
+   "slotGrpText": "Text"
+  },
+  "da": {
+   "edStart": "Start",
+   "lblLayout": "Layout",
+   "assGrpPos": "Placering",
+   "vttTplStd": "Standard",
+   "vttTplTop": "Øverst",
+   "vttOptNormal": "Normal",
+   "colSrc": "Original",
+   "optTitleMono": "Typografi"
+  },
+  "el": {
+   "edHintTm": "ω:λλ:δδ,χχχ"
+  },
+  "he": {
+   "edHintTm": "ש:ד:ש,אלפיות"
+  },
+  "ro": {
+   "edHintTm": "h:mm:ss,mmm",
+   "lblLayout": "Aspect",
+   "assTplCinema": "Cinema",
+   "assTplSocial": "Vertical social",
+   "assGrpText": "Text",
+   "vttTplStd": "Standard",
+   "vttTplCompact": "Compact",
+   "vttTplCinema": "Cinematic",
+   "vttTplSocial": "Vertical",
+   "vttGrpText": "Text",
+   "monoTplCinema": "Cinema",
+   "vttOptNormal": "Normal",
+   "lblVttSrcFont": "Font",
+   "lblVttFont": "Font",
+   "lblFont": "Font",
+   "colSrc": "Original",
+   "expTitle": "Export",
+   "pvViewMovie": "Final",
+   "slotPrmFont": "Font",
+   "slotGrpText": "Text"
+  }
+ },
+ "clean": {
+  "es": {
+   "stRaw": "Original",
+   "pvRaw": "Texto original"
+  },
+  "pt": {
+   "stRaw": "Original",
+   "pvRaw": "Original"
+  },
+  "de": {
+   "stRaw": "Original",
+   "pvRaw": "Originaltext"
+  },
+  "fr": {
+   "stRaw": "Brut",
+   "pvRaw": "Original"
+  },
+  "id": {
+   "heroA": "Subjudul"
+  },
+  "ru": {
+   "footHome": "Перевести субтитры →",
+   "footMerge": "Объединить субтитры →",
+   "heroA": "Субтитры",
+   "heroEm": "Очистка",
+   "heroSub": "Убирает HTML-теги, ASS-эффекты, пометки SDH, метки говорящих и водяные знаки релиз-групп, исправляет капс и кракозябры. Всё работает в браузере — файл не загружается на сервер.",
+   "footBrand": "AI-SRTSub · Очистка субтитров"
+  },
+  "sv": {
+   "stRaw": "Original",
+   "pvRaw": "Original"
+  },
+  "da": {
+   "stRaw": "Original",
+   "btnDownload": "Hent",
+   "pvRaw": "Original"
+  },
+  "ro": {
+   "stRaw": "Original",
+   "pvRaw": "Original"
+  }
+ }
+}

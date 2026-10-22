@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "de": {
+      "seo": {
+        "title": "Untertitel mit Zeichensalat reparieren – Kodierung erkennen – AI-SRTSub",
+        "desc": "Der Ablauf: ursprüngliche Kodierung erkennen (GBK / Big5 / Shift_JIS / EUC-KR), Reparaturen danach sortieren, was sich wie Sprache liest, und als UTF-8 mit BOM oder GBK speichern.",
+        "h1": "Untertitel mit Zeichensalat reparieren",
+        "intro": "Ein Untertitel voller Zeichensalat ist selten beschädigt – er wurde nur mit der falschen Kodierung gelesen. Das Werkzeug findet die ursprüngliche Kodierung und setzt die richtigen Zeichen zurück. Nummern und Zeiten bleiben unangetastet.",
+        "ctaText": "Reparaturwerkzeug öffnen"
+      },
+      "body": [
+        {
+          "h2": "Was dieses Werkzeug tut",
+          "ps": [
+            "Dieselben Bytes ergeben als UTF-8 und als GBK gelesen zwei völlig verschiedene Zeichen – die Datei ist nicht beschädigt, sie wurde nur mit der falschen Kodierung dekodiert. Das tut das Reparaturwerkzeug:"
+          ],
+          "ul": [
+            "Herausfinden, in welcher Kodierung die Datei geschrieben wurde, und die Zeichen damit neu lesen",
+            "Genau sagen, wie der Text zerbrochen ist: Ersetzungszeichen, Steuerzeichen, Währungssymbole, Ballungen von Akzentbuchstaben, Wände aus seltenen Zeichen",
+            "Reparaturen danach sortieren, **was sich am ehesten wie Sprache liest**, dann eine auswählen und speichern",
+            "Wenn der Player die Kodierung nicht erkennt, eine Kopie als UTF-8 mit BOM oder als GBK weitergeben"
+          ]
+        },
+        {
+          "h2": "Datei hochladen, nicht einfügen",
+          "ps": [
+            "Die beiden Zugänge können nicht gleich viel reparieren, deshalb **lade die Datei hoch, wenn möglich**. Bei einer Datei sind die ursprünglichen Bytes noch da: Das Werkzeug probiert eine Kodierung nach der anderen und dekodiert als GBK, sobald es GBK erkennt – ohne zu raten. Eingefügter Text sind keine rohen Bytes mehr. Wenn der Browser die Zeichenkette übergibt, ist der Fehler längst passiert; es bleibt nur das Rückwärtsrechnen, soviel eben geht.",
+            "Wenn der eingefügte Text schon Ersetzungszeichen enthält (das Fragezeichen im Kästchen `�`), sind die ursprünglichen Bytes längst verloren und nichts bringt sie zurück. Die Seite sagt das geradeheraus: geh zurück und lade die Originaldatei mit „Datei auswählen\" hoch."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Uploadbereich der Reparaturseite: Ablagefläche und Einfügefeld, darüber die erkannte Kodierung",
+            "cap": "Datei hierher ziehen oder auswählen; das Einfügefeld darunter kann viel weniger reparieren"
+          }
+        },
+        {
+          "h2": "Was die Diagnose dir sagt",
+          "ps": [
+            "Nach dem Upload gibt die Diagnosekarte ein Urteil aus. **Kein Zeichensalat gefunden**: Der Inhalt liest sich so schon richtig; wenn dein Player trotzdem Müll zeigt, hat er die falsche Kodierung benutzt – geh zu „Speichern unter\", wähle eine andere und gib ihm diese Datei. Wenn es **wie Zeichensalat aussieht**, listet sie auf, welche Spur gefunden wurde:"
+          ],
+          "ul": [
+            "Sie enthält Ersetzungszeichen – die ursprünglichen Bytes sind schon verloren",
+            "Steuerzeichen haben sich eingeschlichen",
+            "Sie ist mit Währungs- und Mathematiksymbolen gespickt",
+            "Akzentbuchstaben treten in Klumpen auf – als wäre UTF-8 Byte für Byte gelesen worden (`ä½ å¥½` ist dieser Typ)",
+            "Reihen von CJK-Zeichen, aber kein einziges häufiges darunter – als wäre UTF-8 als GBK gelesen worden"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosekarte: Urteil und jede Zeichensalat-Spur einzeln aufgelistet",
+            "cap": "Die Diagnose listet Spuren nach Typ, statt nur „es ist Zeichensalat\" zu sagen"
+          }
+        },
+        {
+          "h2": "Wie Kandidaten sortiert werden und wie du wählst",
+          "ps": [
+            "Unter „So lässt es sich reparieren\" stehen bis zu 12 Kandidaten in der Reihenfolge **was sich am ehesten wie Sprache liest**, jeder mit dem Kodierungspaar beschriftet, aus dem er gelesen wurde. Klick einen an, sieh dir das Ergebnis an, wähle ihn und speichre unten. Nicht überzeugt? Mit „So belassen\" geht es zurück zum Original.",
+            "Die Reihenfolge kommt aus einer Wertung: Anteil häufiger Zeichen, Ketten von Akzenten, Ketten von Symbolen, Wände seltener Zeichen – alles fließt ein. **Ist keine Wertung klar besser, wird nichts empfohlen** – es drückt dir keinen halbgaren Kandidaten auf, nur damit einer dasteht. Zwei Mal falsch behandelter Text (einmal falsch gespeichert, einmal falsch repariert) bekommt für die ersten Kandidaten eine Runde Rückwärtsrechnung extra; innerhalb von zwei Schichten ist noch Rettung möglich."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Liste der Reparaturkandidaten, sortiert danach, was sich wie Sprache liest, jeder mit Kodierungspaar",
+            "cap": "Kandidaten nach „liest sich am ehesten wie Sprache\" sortiert, jeder mit seinen Kodierungen"
+          }
+        },
+        {
+          "h2": "Richtig speichern ist der letzte Schritt",
+          "ps": [
+            "Ein repariertes Ergebnis muss trotzdem noch richtig gespeichert werden. Wenn ein Player UTF-8 nicht erkennt, hilft meist **UTF-8 mit BOM** (Windows-Player verlassen sich auf das BOM) oder **GBK**. Speicherbar sind UTF-8, UTF-8 (mit BOM), GBK, Big5, Shift_JIS und EUC-KR; passt etwas nicht hinein, wirst du aufgefordert, ein anderes zu wählen (GBK fasst kein Koreanisch). Heruntergeladene Dateien bekommen `-fixed` im Namen.",
+            "Ist die erkannte Kodierung nicht UTF-8, zeigt „Speichern unter\" schon auf UTF-8 mit BOM. Sobald du das Menü selbst anfasst, legt es sich nicht mehr quer."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Ergebnisbereich: Textfeld mit Menü „Speichern unter\" und Download-Schaltfläche",
+            "cap": "Kodierung wählen und herunterladen; der Name bekommt -fixed"
+          }
+        },
+        {
+          "h2": "Was nie angetastet wird",
+          "ps": [
+            "Nur falsch gelesene Zeichen werden ersetzt. Nummern, Zeiten und ASS-Formatbefehle werden in keiner Weise verändert."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Ich habe die Datei hochgeladen, warum soll ich trotzdem speichern?** Die Datei ist meist in Ordnung; kaputt ist, dass der Player sie mit der falschen Kodierung liest. Dann muss kein einziges Zeichen im Text geändert werden – speichre eine Kopie als UTF-8 mit BOM oder GBK und gib sie dem Player.",
+            "**Warum lässt sich Eingefügtes nicht reparieren?** Sobald im eingefügten Text Ersetzungszeichen auftauchen, sind die ursprünglichen Bytes weg und es gibt nichts, woraus sich schließen ließe. Geh zurück und lade mit „Datei auswählen\" das Original hoch.",
+            "**Der Kandidat, den ich will, ist nicht dabei?** Es wird nichts empfohlen, solange es nicht klar besser wertet als das Vorliegende. Stell die erkannte Kodierung auf eine andere und lass neu sortieren.",
+            "**Wie viele Dateien auf einmal?** Eine nach der anderen. Reparatur herunterladen, dann die nächste Datei einlesen."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Erkennung und Reparatur laufen vollständig im Browser ab. Kein Untertitelinhalt wird an einen Server gesendet."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Woher Zeichensalat kommt und warum er so aussieht, steht in [[Woher Zeichensalat in Untertiteln kommt|/guides/subtitle-garbled-characters.html]]; Kodierung in Ordnung, aber Inhalt schmutzig – [[Untertitel säubern|/clean.html]]; Zeiten und Lesetempo prüfen – [[Untertitel-Prüfung|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "de": {
+      "seo": {
+        "title": "Woher Zeichensalat in Untertiteln kommt – Erkennen, Reparieren – AI-SRTSub",
+        "desc": "Zeichensalat heißt falsch gelesen, nicht beschädigt. Ersetzungszeichen, Akzentballungen und Reihen seltener Zeichen weisen je auf eine andere Ursache – erkenne, was sich retten lässt.",
+        "h1": "Woher Zeichensalat in Untertiteln kommt",
+        "intro": "Dieselben Bytes kommen als UTF-8 und als GBK gelesen als zwei völlig verschiedene Zeichen heraus. Wie der Zeichensalat aussieht, ist der unmittelbare Beweis, welcher Schritt schiefging.",
+        "ctaText": "Reparaturwerkzeug öffnen"
+      },
+      "body": [
+        {
+          "h2": "Die Datei ist in Ordnung, sie wurde falsch gelesen",
+          "ps": [
+            "Eine Untertiteldatei speichert Bytes. Aus Bytes Zeichen zu machen, verlangt zu wissen, in welcher Kodierung sie geschrieben wurden – liegt man falsch, kommt Zeichensalat heraus. Kein einziges Byte der Datei fehlt; mit der richtigen Kodierung noch einmal gelesen, kommen die Zeichen zurück.",
+            "Das teilt die Arbeit in zwei Teile: **herausfinden, mit welcher Kodierung es anfing**, und **als Kodierung speichern, die dein Player erkennt**. Ersteres kommt aus Probelesen und Bewerten, Letzteres aus neu Speichern. Beide lösen verschiedene Probleme."
+          ]
+        },
+        {
+          "h2": "Fünf Erscheinungen, fünf Ursachen",
+          "ps": [
+            "Zeichensalat entsteht nicht zufällig – sein Aussehen verrät die Ursache:"
+          ],
+          "ul": [
+            "**Klumpen von Akzentbuchstaben** (`ä½ å¥½`): UTF-8-Chinesisch als 1-Byte-Kodierung gelesen – Chinesisch belegt in UTF-8 drei Bytes pro Zeichen, und Byte für Byte gelesen wird jedes Byte zum eigenen Buchstaben",
+            "**Reihen von CJK-Zeichen, kein einziges häufiges darunter**: UTF-8 als GBK gelesen – die Bytes werden paarweise neu gruppiert und jedes Paar landet auf einem seltenen Zeichen",
+            "**Ein Haufen Währungs- und Mathematiksymbole**: Bytes sind im Symbolbereich gelandet, typisch für Mac Roman oder eine Latin-1-Variante",
+            "**Steuerzeichen eingestreut**: Bytes sind im unsichtbaren Steuerbereich gelandet und zeigen sich als Leerräume oder Kästchen",
+            "**Das Fragezeichen im Kästchen `�`**: Das ist das **Ersetzungszeichen**, kein Zeichensalat – es heißt „hier stand ein Zeichen, und es war beim Lesen schon verloren\""
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosekarte mit jedem Typ von Zeichensalat-Spur aufgelistet",
+            "cap": "Die Diagnose sortiert nach Ursache statt alles in einen Topf zu werfen"
+          }
+        },
+        {
+          "h2": "Warum das Ersetzungszeichen nicht reparierbar ist",
+          "ps": [
+            "Das Ersetzungszeichen ist die Grenzlinie. Ein `�` heißt, dass die Bytes **in einem früheren Schritt** weggeworfen wurden (meist hat ein Programm die Datei gelesen und neu gespeichert) und nichts davon festgehalten wurde. Dann gibt es nichts, woraus sich schließen ließe – niemand kann das reparieren.",
+            "Deshalb behandelt die Reparaturseite zwei Fälle verschieden. Bei hochgeladener Datei sind die ursprünglichen Bytes intakt und jede Kodierung lässt sich durchprobieren; enthält eingefügter Text schon Ersetzungszeichen, sagt sie klar: „nicht reparierbar, bitte Originaldatei hochladen\".",
+            "Dazu der umgekehrte Fall: Der Inhalt liest sich völlig normal, aber dein Player zeigt weiter Müll. Die Datei ist nicht schuld, **der Player hat die falsche Kodierung gewählt**. Am Text zu schrauben hilft nicht; speichre eine Kopie als UTF-8 mit BOM oder GBK und gib sie ihm."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Uploadbereich: Ziehen und Ablegen sowie Einfügen als zwei Zugänge",
+            "cap": "Datei hochladen, wenn möglich – nur mit intakten Bytes gibt es etwas zu reparieren"
+          }
+        },
+        {
+          "h2": "Was beim Reparieren verglichen wird",
+          "ps": [
+            "Das Werkzeug probiert jede mögliche Kodierung und bewertet dann jedes Ergebnis: Anteil häufiger Zeichen, Ketten von Akzenten, Ketten von Symbolen, ob die CJK-Reihen Wände aus seltenen Zeichen sind. Das bestbewertete Ergebnis steht oben.",
+            "**Ist keine Wertung klar besser, wird nichts empfohlen** – lieber „das liest sich so schon richtig\" sagen, als dir etwas aufzudrängen, das nur entfernt nach Sprache aussieht. Zwei Mal falsch behandelter Text (einmal falsch gespeichert, einmal falsch repariert) bekommt für die ersten Kandidaten eine Runde Rückwärtsrechnung extra."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Kandidatenliste nach Wertung sortiert, jeder mit seinem Kodierungspaar",
+            "cap": "Kandidaten nach Wertung; ohne klaren Sieger auch keine Empfehlung"
+          }
+        },
+        {
+          "h2": "Die richtige Kodierung zu speichern beendet die Arbeit",
+          "ps": [
+            "Reparierter Text muss trotzdem als Kodierung gespeichert werden, die dein Player erkennt. Player unter Windows verlassen sich meist auf das BOM, deshalb ist **UTF-8 mit BOM** am unkompliziertesten; alte Geräte und manche regionalen Player wollen GBK. Wählbar sind UTF-8, UTF-8 (mit BOM), GBK, Big5, Shift_JIS und EUC-KR, und passt etwas nicht hinein, wirst du aufgefordert, ein anderes zu nehmen (GBK fasst kein Koreanisch)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Ergebnisbereich: Menü für die Speicher-Kodierung und Download-Schaltfläche",
+            "cap": "Als etwas speichern, das der Player erkennt – dann ist der Zeichensalat wirklich weg"
+          }
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Der komplette Ablauf in [[Untertitel mit Zeichensalat reparieren|/guides/repair.html]]; was in einer SRT-Datei wirklich steht, in [[Was in einer SRT-Datei steht|/guides/srt-file-format.html]]; Kodierung in Ordnung, aber Inhalt schmutzig (Wasserzeichen, Werbung, Hörgeschädigt-Hinweise) – [[Untertitel säubern|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "de": {
+      "seo": {
+        "title": "Kurz- und Langzeichen umwandeln – Taiwan und Hongkong – AI-SRTSub",
+        "desc": "Die neun Richtungen: Taiwanisch mit oder ohne Regionalwortschatz, Hongkong als eigene Variante, alles zurück in Kurzzeichen wandelbar. Nur der Dialog ändert sich.",
+        "h1": "Untertitel zwischen Kurz- und Langzeichen umwandeln",
+        "intro": "Ob ein Untertitel nach Taiwan, Hongkong oder Festlandchina geht, ändert Wortschatz und Zeichenform gleichermaßen. Neun Richtungen zur Auswahl, und nur der Dialog wird umgewandelt – Zeiten, Nummern und ASS-Formatbefehle bleiben unangetastet.",
+        "ctaText": "Umwandler öffnen"
+      },
+      "body": [
+        {
+          "h2": "Was dieses Werkzeug tut",
+          "ps": [
+            "Zwischen Kurz- und Langzeichen zu wandeln heißt nicht, jedes Zeichen nur anders zu schreiben. Dasselbe Kurzzeichen-Wort entspricht je Region einem anderen Wort: das Wort für „Software\" unterscheidet sich zwischen Taiwan und dem Festland, und Hongkong hat noch eine eigene Version. Der Umwandler hält das auseinander:"
+          ],
+          "ul": [
+            "Kurzzeichen → Langzeichen (allgemein / Taiwan / Hongkong)",
+            "Langzeichen → Kurzzeichen (allgemein / aus Taiwan / aus Hongkong)",
+            "Nur die Zeichenform zwischen Langzeichen-Varianten wechseln (Taiwan-Form / Hongkong-Form)",
+            "Eins-zu-viele-Zuordnungen werden richtig aufgelöst (nach Wort, nicht blind Zeichen für Zeichen)"
+          ]
+        },
+        {
+          "h2": "Hochladen und Erkennen",
+          "ps": [
+            "Datei hierher ziehen oder auswählen – SRT, VTT, ASS und TXT werden unterstützt – oder den Untertitelinhalt direkt einfügen. Das Format wird automatisch erkannt und neben „Erkanntes Format\" angezeigt."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Uploadbereich des Umwandlers: Ablagefläche und Einfügefeld, darüber das erkannte Format",
+            "cap": "SRT / VTT / ASS / TXT, Format wird automatisch erkannt"
+          }
+        },
+        {
+          "h2": "Wie man unter den neun Richtungen wählt",
+          "ps": [
+            "Die neun Richtungen im Menü verteilen sich auf drei Gruppen. **Kurzzeichen → Langzeichen**: allgemeines Langzeichen, Taiwanisch (Wortschatz ändern), Taiwanisch (nur Zeichenform), Hongkong. **Langzeichen → Kurzzeichen**: allgemein, aus Taiwanisch, aus Hongkong. **Langzeichen untereinander**: Taiwan-Form, Hongkong-Form.",
+            "„Wortschatz Taiwan\" tauscht auch Regionalbegriffe: das Wort für „Software\" wird das taiwanische, beim Wort für „Information\" genauso; „Zeichenform Taiwan\" ändert nur die Schreibweise und lässt deinen Wortschatz stehen. Hongkong ist ein eigener Fall und benutzt noch ein weiteres Wort für „Software\". Zurück zu Kurzzeichen geht über die untere Gruppe – du musst sagen, aus welcher Langzeichen-Variante du kommst, weil taiwanischer und Hongkong-Text verschiedene Wege zurück nehmen."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Umwandlungskarte: Zielmenü zeigt „Kurzzeichen → Taiwanisches Langzeichen (Wortschatz ändern)\" ausgewählt",
+            "cap": "Die Richtungen stehen in drei Gruppen im Zielmenü; dies ist Taiwanisch mit Wortschatzwechsel"
+          }
+        },
+        {
+          "h2": "Ergebnis und Export",
+          "ps": [
+            "Der Ergebnisbereich zeigt den fertigen Untertitel sofort, und die Statistikleiste nennt die Gesamtzeilenzahl und wie viele Zeilen sich geändert haben. Ändert sich gar nichts, erscheint der Hinweis, dass die Datei womöglich keine chinesischen Zeichen enthält – es werden nur Han-Zeichen gewandelt, ein rein lateinischer oder numerischer Untertitel bleibt unverändert.",
+            "Danach herunterladen oder kopieren. In den Dateinamen wird ein Sprachkennzeichen eingefügt: `demo.srt` wird zu `demo.zh-TW.srt` für Taiwanisches Langzeichen, `.zh-Hant` für allgemeines Langzeichen und `.zh-Hans` beim Rückweg zu Kurzzeichen."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Ergebnisbereich: umgewandelter Untertitel und Statistikleiste",
+            "cap": "Die Statistikleiste nennt Gesamt- und Änderungszahl; von hier geht es zum Download"
+          }
+        },
+        {
+          "h2": "Was nie angetastet wird",
+          "ps": [
+            "Nur der Dialog wird umgewandelt. Zeiten, Nummern und ASS-Formatbefehle werden nicht berührt – das Ergebnis ist sofort einsatzbereit, ohne Formatierung nachzubessern."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Warum wurde das Wort für „sauber\" nicht umgewandelt?** Eins-zu-viele-Zuordnungen werden nach Wort aufgelöst: die Bedeutung „sauber\" und die Bedeutung „trocken\" teilen sich ein Langzeichen, während die Bedeutung „Baumstamm\" ein anderes benutzt. Die Tabellen stammen von OpenCC und gleichen ganze Wortgruppen ab, nicht Einzelzeichen.",
+            "**Worin unterscheiden sich taiwanisches und Hongkong-Langzeichen?** Im Wortschatz: das Wort für „Software\" ist nicht dasselbe. Wähle die Richtung der Region, für die du auslieferst.",
+            "**Hat sich die Zeichenzahl verändert?** Es werden nur Han-Zeichen getauscht – keine Einträge hinzugefügt, entfernt oder Zeiten verschoben. Hat sich die Zeilenzahl geändert, prüfe, ob das Format richtig erkannt wurde.",
+            "**Das Wörterbuch lädt nicht?** Die Seite bittet um Neuladen. Es lädt lokal, es muss also kein Untertitel irgendwo hochgeladen werden."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Die Umwandlung läuft vollständig im Browser ab. Kein Untertitelinhalt wird an einen Server gesendet."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Wenn du nur Kurz- in Langzeichen brauchst: [[Untertitel von Kurz- in Langzeichen umwandeln|/guides/srt-simplified-to-traditional.html]]; warum mehr dahintersteckt als Zeichen zu tauschen: [[Kurz- und Langzeichen sind kein Zeichentausch|/guides/simplified-traditional-chinese.html]]; für die Übersetzung in eine Fremdsprache: [[Untertitel übersetzen|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "de": {
+      "seo": {
+        "title": "Untertitel von Kurz- in Langzeichen umwandeln – Taiwan oder Hongkong – AI-SRTSub",
+        "desc": "Kurzzeichen-Untertitel in Langzeichen wandeln: Taiwanisch (mit oder ohne Regionalwortschatz) oder Hongkong, eins-zu-viele nach Wort aufgelöst. Zeiten bleiben stehen.",
+        "h1": "Untertitel von Kurz- in Langzeichen umwandeln",
+        "intro": "Ein Untertitel in Kurzzeichen für Zuschauer in Taiwan oder Hongkong braucht nur eine Umwandlung – aber beide Regionen wollen Unterschiedliches, und die falsche Richtung ergibt Wortschatz, den dort niemand benutzt.",
+        "ctaText": "Diesen Untertitel umwandeln"
+      },
+      "body": [
+        {
+          "h2": "Dieser Bedarf",
+          "ps": [
+            "Deine Untertitel sind Kurzzeichen-Chinesisch und sollen Zuschauer in Taiwan oder Hongkong erreichen. Zeichen für Zeichen zu ändern ist unmöglich – eine Folge hat mehrere hundert Einträge. Und beide Regionen wollen nicht denselben Langzeichen-Text: Der Wortschatz unterscheidet sich, und die falsche Richtung erzeugt Wörter, die dort niemand sagt."
+          ]
+        },
+        {
+          "h2": "Wo man es macht",
+          "ps": [
+            "[[Kurz- und Langzeichen umwandeln|/hanconv.html]] öffnen, den Untertitel hineinziehen und unter „Umwandeln in\" eine Richtung Kurzzeichen → Langzeichen wählen: allgemeines Langzeichen, Taiwanisch (Wortschatz ändern), Taiwanisch (nur Zeichenform) oder Hongkong. Die Umwandlung passiert sofort und der Ergebnisbereich zeigt den fertigen Untertitel zum Herunterladen.",
+            "**Für Zuschauer in Taiwan**: Wenn auch der Wortschatz wechseln soll, nimm „Taiwanisch (Wortschatz ändern)\" – für „Software\" und „Information\" stehen dann die taiwanischen Entsprechungen; wenn du nur die Zeichenform ändern und deinen Wortschatz behalten willst, nimm „Taiwanisch (nur Zeichenform)\". **Für Zuschauer in Hongkong**: nimm „Hongkong\" – dort wird „Software\" mit einer weiteren Form geschrieben."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Umwandlungskarte: Zielmenü zeigt „Kurzzeichen → Taiwanisches Langzeichen (Wortschatz ändern)\"",
+            "cap": "Taiwan und Hongkong sind zwei Richtungen mit unterschiedlichem Wortschatz"
+          }
+        },
+        {
+          "h2": "Häufige Fallen",
+          "ps": [
+            "**Keine Angst vor Eins-zu-viele**: Dasselbe Kurzzeichen in den Wörtern für „sauber\", „trocken\" und „Baumstamm\" entspricht verschiedenen Langzeichen. Die Tabellen lösen das wortweise, es wird also nicht alles auf ein Zeichen plattgewalzt.",
+            "**Nur der Dialog wird umgewandelt**: Zeiten, Nummern und ASS-Formatbefehle bleiben unangetastet, das Ergebnis ist direkt verwendbar.",
+            "**Nichts hat sich geändert? Erst prüfen**: Zeigt die Statistikleiste 0 geänderte Zeilen, enthält die Datei womöglich keine chinesischen Zeichen, oder das Format wurde falsch erkannt – vergleiche „Erkanntes Format\" mit dem, was du hochgeladen hast."
+          ]
+        },
+        {
+          "h2": "Verwandtes",
+          "ps": [
+            "Die vollständige Erklärung aller neun Richtungen: [[Untertitel zwischen Kurz- und Langzeichen umwandeln|/guides/hanconv.html]]; warum mehr dahintersteckt: [[Kurz- und Langzeichen sind kein Zeichentausch|/guides/simplified-traditional-chinese.html]]; der Rückweg von Lang- zu Kurzzeichen liegt ebenfalls in [[Kurz- und Langzeichen umwandeln|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "de": {
+      "seo": {
+        "title": "Kurz- und Langzeichen – kein Zeichentausch – AI-SRTSub",
+        "desc": "Drei Dinge machen es schwer: eins-zu-viele nach Wort auflösen, anderer Wortschatz in Taiwan und Hongkong, und nur den Dialog zu wandeln.",
+        "h1": "Kurz- und Langzeichen sind kein Zeichentausch",
+        "intro": "Welches Langzeichen ein Kurzzeichen ersetzt, hängt vom Zeichen daneben ab. Darum lässt sich diese Umwandlung nicht Zeichen für Zeichen blind erledigen.",
+        "ctaText": "Umwandler öffnen"
+      },
+      "body": [
+        {
+          "h2": "Erstens: Ein Kurzzeichen, mehrere Langzeichen",
+          "ps": [
+            "Die Kürzung hat mehrere Langzeichen zu einem Kurzzeichen zusammengefasst. Auf dem Rückweg entspricht ein Kurzzeichen mehreren Langzeichen, und die Wahl hängt davon ab, womit es auftritt:",
+            "Zeichen für Zeichen blind zu tauschen wirft alles auf dasselbe zusammen und trifft überall daneben. Nur die Auflösung **nach Wort** trennt sie – die Tabellen stammen von OpenCC und gleichen Wortgruppen vor Einzelzeichen ab. Zum Beispiel:"
+          ],
+          "ul": [
+            "Die Bedeutung „sauber\" nimmt ein Langzeichen, die Bedeutung „Baumstamm\" ein anderes",
+            "Die Bedeutungen „Haar\" und „Entwicklung\" desselben Kurzzeichens gehen auf zwei verschiedene Langzeichen",
+            "Die Bedeutung „hinter\" nimmt eine Langzeichen-Form, während „Kaiserin\" das Zeichen behält, das es schon hat"
+          ]
+        },
+        {
+          "h2": "Zweitens: Taiwan und Hongkong sind nicht dasselbe",
+          "ps": [
+            "Nach der Umwandlung in Langzeichen kommt noch eine Schicht dazu: Dasselbe Wort wird in Taiwan und Hongkong unterschiedlich geschrieben. Das Wort für „Software\" ist in Taiwan etwas anderes als in Hongkong, und Taiwan benutzt für „Information\" sein eigenes Wort.",
+            "Daher die getrennten Richtungen. Taiwanisches Langzeichen teilt sich sogar in „Wortschatz ändern\" und „nur Zeichenform\": Bei nur Zeichenform bleibt dein Wortschatz stehen, bei Wortschatz ändern werden auch Regionalbegriffe getauscht. Hongkong hat eine eigene Richtung."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Umwandlungskarte: Zielmenü zeigt „Kurzzeichen → Taiwanisches Langzeichen (Wortschatz ändern)\"",
+            "cap": "Taiwan bietet Wortschatzwechsel oder nur Zeichenform; Hongkong hat eine eigene Richtung"
+          }
+        },
+        {
+          "h2": "Drittens: Nur der Dialog darf sich ändern",
+          "ps": [
+            "Eine Untertiteldatei ist nicht nur Dialog. Nummern, Zeiten und ASS-Formatbefehle stehen ebenfalls darin, und kein einziges Zeichen davon darf gewandelt werden – vor allem die ASS-Formatzeilen nicht, weil darin englische Befehlsnamen stecken, die kaputtgehen, sowie sie als Dialog behandelt werden.",
+            "Deshalb wird erst nach Format geparst und dann gewandelt: SRT, VTT, ASS und TXT erkennen je ihren Dialogteil, und nur die Zeichen darin werden getauscht. Zeiten und Stile bleiben unversehrt, ohne dass Formatierung nachgebessert werden muss."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Ergebnisbereich: umgewandelter Untertitel und Statistikleiste mit Änderungszahl",
+            "cap": "Die Statistikleiste nennt die Zahl geänderter Zeilen; das Format bleibt erhalten"
+          }
+        },
+        {
+          "h2": "Der Rückweg zu Kurzzeichen: Vorsicht",
+          "ps": [
+            "Auch die Umwandlung von Lang- zu Kurzzeichen verlangt die Angabe, **aus welcher Langzeichen-Variante** du kommst: allgemein, taiwanisch und Hongkong sind drei verschiedene Wege, weil Regionalwortschatz erst auf das allgemeine Wort zurückgeführt werden muss, bevor er gewandelt werden kann. Die falsche Richtung lässt Regionalwortschatz im Kurzzeichen-Ergebnis stehen.",
+            "Die untere Gruppe der neun Richtungen ist die für den Rückweg: Langzeichen → Kurzzeichen, Taiwanisch → Kurzzeichen, Hongkong → Kurzzeichen."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Der komplette Ablauf in [[Untertitel zwischen Kurz- und Langzeichen umwandeln|/guides/hanconv.html]]; wenn du nur Kurz- in Langzeichen brauchst: [[Untertitel von Kurz- in Langzeichen umwandeln|/guides/srt-simplified-to-traditional.html]]; für die Übersetzung in eine Fremdsprache: [[Untertitel übersetzen|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "de": {
+      "seo": {
+        "title": "Untertitel in Excel/CSV umwandeln – In beide Richtungen – AI-SRTSub",
+        "desc": "Umwandlung in beide Richtungen: SRT/VTT als Excel oder CSV exportieren, Zeile für Zeile korrigieren und die Tabelle als Untertitel zurückführen.",
+        "h1": "Untertitel in Excel/CSV umwandeln",
+        "intro": "Korrigieren und Übersetzen geht in einer Tabelle am besten. Untertitel als Excel oder CSV exportieren, Zeile für Zeile bearbeiten und zurückwandeln – Zeitspalten bleiben Text, Zeilenumbrüche im Dialog gehen nicht verloren.",
+        "ctaText": "Tabellenumwandlung öffnen"
+      },
+      "body": [
+        {
+          "h2": "Was dieses Werkzeug tut",
+          "ps": [
+            "Untertitel sind Reihen von Einträgen und eine Tabelle ist Reihen von Datensätzen – sobald es eine Tabelle ist, gehen Korrigieren, Kommentieren und Massenübersetzung mit Werkzeugen, die du schon kennst. Beide Richtungen werden unterstützt:"
+          ],
+          "ul": [
+            "**In Tabelle**: SRT und VTT als Excel (.xlsx) oder CSV exportieren, eine Zeile pro Eintrag mit Nummer, Start, Ende und Text",
+            "**In Untertitel**: die bearbeitete Tabelle zurück nach SRT oder VTT",
+            "Zeiten bleiben Text, die Tabellensoftware kann sie also nicht als Zahl oder Datum umdeuten",
+            "Zeilenumbrüche im Dialog bleiben erhalten, bis hin zum ursprünglichen Umbruch"
+          ]
+        },
+        {
+          "h2": "Hochladen und Richtung wählen",
+          "ps": [
+            "Datei hierher ziehen oder auswählen. Jede Richtung braucht eine andere Dateiart: **In Tabelle** nimmt Untertiteldateien (SRT / VTT), **in Untertitel** nimmt Tabellendateien (CSV / Excel, sowohl .xlsx als auch .xls). Im falschen Modus sagt die Seite sofort, welche Dateiart dieser Modus erwartet.",
+            "⚠️ Diese Seite liest nur UTF-8. Öffnet sich dein Untertitel als Bildschirm voller Fragezeichen oder Kästchen, schick ihn zuerst durch [[Zeichensalat reparieren|/repair.html]] – bei kaputter Kodierung liest sie hier nichts als Ersetzungszeichen."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Uploadbereich: Ablagefläche und die beiden Modi",
+            "cap": "Jeder Modus will eine andere Datei: Untertitel rein, Tabelle raus"
+          }
+        },
+        {
+          "h2": "Untertitel als Tabelle exportieren",
+          "ps": [
+            "„In Tabelle\" wählen, Untertitel hinein, und die Vorschau listet jeden Eintrag: Nummer, Start, Ende, Text. Die Statistikleiste nennt Eintragszahl und Gesamtdauer. Dann „Excel (.xlsx) herunterladen\" oder „CSV herunterladen\" drücken.",
+            "Der Unterschied der beiden: .xlsx ist eine echte Tabellendatei, in der Excel deine Zeitspalte nicht hinterrücks umformatieren kann; CSV ist universeller, aber Excel deutet die Zeitspalte beim Öffnen womöglich als etwas anderes. Passiert das, Spalte markieren und als Format „Text“ festlegen – oder gleich .xlsx nehmen."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Tabellenvorschau: Spalten Nummer, Start, Ende, Text und die Statistikleiste",
+            "cap": "Vorschau Eintrag für Eintrag; die Leiste nennt Anzahl und Gesamtdauer"
+          }
+        },
+        {
+          "h2": "Tabelle zurück in Untertitel",
+          "ps": [
+            "„In Untertitel\" wählen, Tabelle hinein, und das ist die Spaltenregel: nötig sind drei Spalten für **Start, Ende und Text** (englische Spaltennamen Start / End / Text gelten genauso), in **beliebiger Reihenfolge**. Sowohl `00:00:01,500` als auch `00:00:01.500` gehen; Zeilen, die nicht geparst werden können, werden übersprungen, statt die ganze Datei zu verdammen.",
+            "Das Ergebnis erscheint Eintrag für Eintrag in der Vorschau; bestätigen und SRT oder VTT herunterladen. Fehlen die drei Spalten, kommt der Hinweis, die Spaltennamen zu prüfen – meist wurde beim Export ein anderer Name verwendet, oder die Kopfzeile steht nicht in Zeile eins."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Ergebnisbereich: zurückgeführte Untertitel Eintrag für Eintrag gelistet",
+            "cap": "Nicht erkannte Spalten werden gemeldet, nie stillschweigend übergangen"
+          }
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Excel zeigt die Zeitspalte falsch an?** Mit .xlsx passiert das nie. Muss es CSV sein: Zeitspalte markieren und das Zellformat vor dem Öffnen auf „Text“ setzen.",
+            "**Müssen Spaltennamen in einer bestimmten Sprache sein?** Nein. Start / Ende / Text werden in jeder von dieser Seite unterstützten Sprache erkannt, Groß- und Kleinschreibung ist egal.",
+            "**Sind die Zeilenumbrüche nach dem Rückführen noch da?** Ja. Umbrüche im Dialog bleiben erhalten, bis hin zum ursprünglichen Umbruch.",
+            "**Wird ASS unterstützt?** Diese Seite arbeitet nur mit SRT und VTT. ASS trägt Formatbefehle – wandle es zuerst mit [[Formatumwandlung|/convert.html]] in SRT.",
+            "**Wie viele Dateien auf einmal?** Eine. Für Dutzende oder Hunderte nimm [[Stapelumwandlung|/batch.html]] (die wandelt nur Formate und geht nicht durch eine Tabelle)."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Die Umwandlung läuft vollständig im Browser ab. Kein Untertitelinhalt wird an einen Server gesendet."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Wenn du nur den Schritt Untertitel → Excel willst: [[Untertitel in Excel umwandeln|/guides/srt-to-excel.html]]; danach in eine Fremdsprache übersetzen: [[Untertitel übersetzen|/translate.html]]; Dutzende auf einmal umwandeln: [[Stapelumwandlung|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "de": {
+      "seo": {
+        "title": "Untertitel in Excel umwandeln – Zeile für Zeile korrigieren – AI-SRTSub",
+        "desc": "SRT-Untertitel als Excel exportieren: eine Zeile pro Eintrag in vier Spalten, Zeiten als Text und Zeilenumbrüche unversehrt. Die bearbeitete Tabelle lässt sich zurück in Untertitel verwandeln.",
+        "h1": "Untertitel in Excel umwandeln",
+        "intro": "Hunderte Einträge im Texteditor zu korrigieren ist ermüdend. In Excel ist jeder Eintrag eine Zeile, womit Filtern, Kommentieren und Suchen-und-Ersetzen verfügbar werden – und die Änderungen gehen zurück in dein SRT.",
+        "ctaText": "Als Excel exportieren"
+      },
+      "body": [
+        {
+          "h2": "Dieser Bedarf",
+          "ps": [
+            "Korrigieren, Wörter massenhaft ändern oder die Arbeit auf mehrere Leute verteilen – all das geht in einer Tabelle viel schneller als in Klartext. SRT selbst ist Klartext, aber seine Eintragsstruktur (Nummer, Zeit, Dialog) passt genau auf vier Tabellenspalten."
+          ]
+        },
+        {
+          "h2": "Wo man es macht",
+          "ps": [
+            "[[Untertitel ⇄ Tabelle|/table.html]] öffnen, Modus auf „In Tabelle\" stellen, das SRT hineinziehen, und die Vorschau füllt sich mit einer Zeile pro Eintrag über vier Spalten: Nummer, Start, Ende, Text. „Excel (.xlsx) herunterladen\" drücken und es ist deins. VTT geht genauso.",
+            "Nach dem Bearbeiten: Modus auf „In Untertitel\" umstellen, die Tabelle zurück hinein, und du hast wieder ein SRT. Die Regel sind drei Spalten für Start, Ende und Text (englisch Start / End / Text gilt auch), in beliebiger Reihenfolge."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Tabellenvorschau: jeder SRT-Eintrag als Zeile über vier Spalten, mit Statistikleiste",
+            "cap": "SRT auf vier Spalten gelegt und auf demselben Weg zurückführbar"
+          }
+        },
+        {
+          "h2": "Häufige Fallen",
+          "ps": [
+            "**Erst die Kodierung reparieren**: Diese Seite liest nur UTF-8. Ein Bildschirm voller Fragezeichen oder Kästchen heißt: vorher zu [[Zeichensalat reparieren|/repair.html]].",
+            "**CSV oder xlsx**: Soll es in Excel, nimm .xlsx – dann kann die Zeitspalte nicht umformatiert werden; CSV ist universeller, wird aber womöglich als etwas anderes gelesen, dann die Zeitspalte auf „Text“ stellen.",
+            "**ASS geht nicht**: ASS trägt Formatbefehle, wandle es also erst in SRT, bevor es in eine Tabelle kommt."
+          ]
+        },
+        {
+          "h2": "Verwandtes",
+          "ps": [
+            "Der komplette Ablauf in beide Richtungen: [[Untertitel in Excel/CSV umwandeln|/guides/table.html]]; danach übersetzen: [[Untertitel übersetzen|/translate.html]]; vor der Abgabe ein letzter Durchgang: [[Untertitel-Prüfung|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "de": {
+      "seo": {
+        "title": "Untertitel stapelweise umwandeln – Hunderte in ein ZIP – AI-SRTSub",
+        "desc": "Dutzende SRT/VTT auf einmal hinein, alle in ein Zielformat wandeln, ein ZIP herunterladen. Neu nummeriert, Zeitstempel normalisiert, unlesbare Dateien markiert.",
+        "h1": "Untertitel stapelweise umwandeln",
+        "intro": "Eine ganze Staffel Untertitel muss meist in dasselbe Format, und sie einzeln hochzuladen dauert ewig. Wirf sie hier alle hinein, wandle sie gemeinsam und lade ein ZIP herunter – Dateien, die nicht geparst werden können, werden markiert und schleichen sich nie als Erfolg getarnt mit ein.",
+        "ctaText": "Stapelumwandlung öffnen"
+      },
+      "body": [
+        {
+          "h2": "Was dieses Werkzeug tut",
+          "ps": [
+            "Untertitel einer ganzen Staffel oder eines Boxsets müssen meist erst einheitlich sein, bevor irgendetwas Weiteres damit geht. Das tut die Stapelseite:"
+          ],
+          "ul": [
+            "Dutzende SRT oder VTT auf einmal aufnehmen (Mehrfachauswahl möglich)",
+            "Alle nach SRT oder VTT wandeln, Einträge neu nummerieren und Zeitstempel auf das Zielformat normalisieren",
+            "Alles in ein ZIP packen, Originaldateinamen behalten und nur die Endung ändern",
+            "Dateien ohne erkennbare Einträge markieren und aus dem Paket lassen"
+          ]
+        },
+        {
+          "h2": "Dateien hineinlegen",
+          "ps": [
+            "Mehrere Untertiteldateien gemeinsam in das gestrichelte Feld ziehen oder klicken und auf einmal mehrfach auswählen. Die Dateiliste führt jede einzeln: erkannte zeigen ihre Eintragszahl, nicht erkannte sind schlicht als nicht erkannt markiert. Die Leiste oben zählt Dateien, Einträge und wie viele nicht erkannt wurden.",
+            "⚠️ Diese Seite liest nur UTF-8. Untertitel mit kaputter Kodierung (Bildschirm voller Fragezeichen oder Kästchen) sollten zuerst zu [[Zeichensalat reparieren|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Dateiliste: Name und Eintragszahl je Datei, nicht erkannte rot markiert",
+            "cap": "Jede Datei gelistet und nicht erkannte sofort markiert"
+          }
+        },
+        {
+          "h2": "In was alles umwandeln",
+          "ps": [
+            "Unter „Alle umwandeln in\" das Zielformat wählen – SRT oder VTT. Danach wird jede Datei der Liste im Zielformat neu erzeugt: Nummern werden von vorn durchgezählt und Zeitstempel dem Ziel angepasst (SRT trennt Millisekunden mit Komma, VTT mit Punkt).",
+            "**Die Originaldateinamen bleiben und nur die Endung ändert sich**; gleiche Namen bekommen eine Nummer angehängt, nichts überschreibt sich."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Zielformatwahl und Zustand der Liste, Statistikleiste zeigt Datei- und Eintragszahl",
+            "cap": "Nach der Zielwahl wird die Liste neu erzeugt; der Name ändert nur die Endung"
+          }
+        },
+        {
+          "h2": "Packen und Herunterladen",
+          "ps": [
+            "Auf „In ein ZIP packen und herunterladen\" klicken, und das Archiv enthält alle umgewandelten Dateien. **Dateien ohne erkennbare Einträge kommen nicht ins Paket** – sie bleiben markiert in der Liste, statt untergemischt zu werden, als hätten sie funktioniert. Nach dem Packen erscheint die Zahl der enthaltenen Dateien."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Packbereich: ZIP-Download-Schaltfläche und Ergebnismeldung",
+            "cap": "Nicht erkannte Dateien bleiben aus dem Paket und markiert in der Liste"
+          }
+        },
+        {
+          "h2": "Warum eine Datei als nicht erkannt gilt",
+          "ps": [
+            "Eine Datei wird so markiert, wenn kein einziger Eintrag aus ihr gelesen werden kann. Drei übliche Gründe: Es ist kein Untertitel (etwa eine mitgeschleppte .txt-Anleitung), die Kodierung ist nicht UTF-8 (dann liest sich alles als Ersetzungszeichen), oder der Inhalt wurde zu einem Block ohne Zeitstempel plattgedrückt.",
+            "Markierte Dateien lassen sich einzeln behandeln: Kodierungsprobleme gehen zu [[Zeichensalat reparieren|/repair.html]], Formatprobleme zu [[Formatumwandlung|/convert.html]] für eine Einzelumwandlung, bevor sie zurück in die Liste kommen."
+          ]
+        },
+        {
+          "h2": "Häufige Fragen",
+          "ps": [
+            "**Wie viele Dateien kann ich hineinlegen?** Keine feste Grenze; es hängt vom Speicher des Browsers ab, und ein paar hundert SRT sind meist kein Problem.",
+            "**Ändert sich mein Dialog?** Nein. Die Stapelumwandlung ändert nur das Containerformat – neu nummerieren und Zeitstempel normalisieren –, kein einziges Wort.",
+            "**Und wenn ich den Inhalt ändern muss?** Diese Seite wandelt nur Formate. Zeiten im Stapel ändern geht mit [[Zeitanpassung|/shift.html]], Text mit [[Begriffsersetzung|/glossary.html]]; beides arbeitet in den jeweiligen Seiten Datei für Datei.",
+            "**Wird ASS unterstützt?** Diese Seite wandelt nur zwischen SRT und VTT. ASS trägt Stile – nimm dafür [[Formatumwandlung|/convert.html]] einzeln."
+          ]
+        },
+        {
+          "h2": "Datenschutz",
+          "ps": [
+            "Umwandlung und Packen laufen vollständig im Browser ab. Kein Untertitelinhalt wird an einen Server gesendet."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Was du an einer Staffel änderst und in welcher Reihenfolge: [[Eine ganze Staffel Untertitel stapelweise bearbeiten|/guides/batch-convert-srt.html]]; mehr Formate für eine einzelne Datei: [[Formatumwandlung|/convert.html]]; Korrektur in der Tabelle: [[Untertitel ⇄ Tabelle|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "de": {
+      "seo": {
+        "title": "Eine ganze Staffel Untertitel stapelweise – Was im Stapel geht – AI-SRTSub",
+        "desc": "Eine Staffel braucht meist überall dieselbe Änderung: Format, Versatz, Terminologie. Was in einem Durchgang geht, was Datei für Datei muss, und was nicht geparst wird.",
+        "h1": "Eine ganze Staffel Untertitel stapelweise bearbeiten",
+        "intro": "Wenn Dutzende Untertitel geändert werden müssen, ist es meist immer dieselbe Änderung. Zu wissen, was in einem Durchgang geht, spart weit mehr, als sich einzeln durchzukämpfen.",
+        "ctaText": "Stapelumwandlung öffnen"
+      },
+      "body": [
+        {
+          "h2": "Es ist meist dieselbe Änderung überall",
+          "ps": [
+            "Wenn die Untertitel einer ganzen Staffel schief sind, hat selten jede Folge ihr eigenes Leiden – meist ist es eine Ursache, die auf jede Folge fällt: dieselbe Release-Gruppe hat alle encodiert (Format und Wasserzeichen identisch), alle wurden zu derselben Videoversion erstellt (Richtung und Betrag der Verschiebung stimmen überein), oder die Umschreibungen haben über die Staffel hinweg gedriftet.",
+            "Sieh dir zuerst zwei Folgen an (eine frühe, eine späte) und bestätige, dass es **derselbe Fehler** ist, bevor du stapelweise irgendetwas anstellst. Wichen die beiden voneinander ab, ist das nichts für den Stapel."
+          ]
+        },
+        {
+          "h2": "Was in einem Durchgang geht",
+          "ps": [
+            "**Das Format zu vereinheitlichen** ist das Einzige, was wirklich in einem Durchgang fertig wird: Dutzende SRT und VTT gemeinsam in [[Stapelumwandlung|/batch.html]] ziehen, Zielformat wählen und ein ZIP herunterladen. Neu nummerieren und Zeitstempel normalisieren passieren in demselben Schritt, und kein Wort des Dialogs ändert sich."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Stapelseite Dateiliste: Eintragszahl je Datei, nicht erkannte rot markiert",
+            "cap": "Das Format zu vereinheitlichen ist das Einzige, was ein Durchgang schafft"
+          }
+        },
+        {
+          "h2": "Was Datei für Datei erfordert",
+          "ps": [
+            "Diese haben keinen Stapelzugang und brauchen einen Durchgang pro Datei – auch wenn es meist ein Äquivalent gibt, das **nur einmal gemacht und dann auf die ganze Staffel angewendet** wird:"
+          ],
+          "ul": [
+            "**Einheitliche Zeitverschiebung**: Driften alle Folgen um denselben Betrag, miss eine Folge in [[Zeitanpassung|/shift.html]], notiere die Zahl und trage dieselbe Zahl in die übrigen ein",
+            "**Einheitliche Terminologie**: Das Glossar wird einmal in [[Begriffsersetzung|/glossary.html]] eingerichtet und auf jeden Untertitel angewendet",
+            "**Einheitlich Wasserzeichen entfernen**: Wasserzeichen folgen festen Mustern, und [[Untertitel säubern|/clean.html]] deckt die gängigen schon standardmäßig ab – jede Datei durchziehen"
+          ]
+        },
+        {
+          "h2": "Die Reihenfolge nicht verkehrt herum",
+          "ps": [
+            "Sind mehrere Dinge nötig, bedeutet die falsche Reihenfolge Nacharbeit. Geh in dieser Reihenfolge vor:",
+            "**Erst die Kodierung reparieren** → **dann das Format vereinheitlichen** → **dann den Inhalt ändern** (Wasserzeichen, Terminologie, Zeiten) → **zuletzt die Prüfung**. Formate wandeln, bevor die Kodierung stimmt, gibt dir Zeichensalat in einem anderen Behälter; den Inhalt vor der Formatvereinheitlichung zu ändern, heißt mit uneinheitlicher Werkzeugunterstützung zu arbeiten."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Packbereich: ZIP-Download-Schaltfläche und Ergebnismeldung",
+            "cap": "Erst das Format vereinheitlichen, dann den Inhalt ändern"
+          }
+        },
+        {
+          "h2": "Umgang mit nicht erkannten Dateien",
+          "ps": [
+            "In der Stapelumwandlung als nicht erkannt markierte Dateien kommen nicht ins ZIP, sondern bleiben in der Liste. Drei übliche Gründe: Es ist keine Untertiteldatei (eine mitgeschleppte Anleitung), die Kodierung ist nicht UTF-8, oder der Inhalt wurde zu einem Block ohne Zeitstempel plattgedrückt.",
+            "Kodierungsprobleme gehen einzeln zu [[Zeichensalat reparieren|/repair.html]]; Formatprobleme zu [[Formatumwandlung|/convert.html]], bevor sie zurück in die Liste kommen. **Zwing nicht erkannte Dateien nur der Zahl wegen ins Paket** – im Player eine fehlende Folge zu entdecken, ist weit lästiger als die Minute, die du damit sparst."
+          ]
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Der komplette Ablauf der Stapelumwandlung: [[Untertitel stapelweise umwandeln|/guides/batch.html]]; einheitliche Zeitverschiebung: [[Untertitel-Zeiten anpassen|/guides/shift.html]]; vor der Abgabe ein letzter Durchgang: [[Untertitel-Prüfung|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "de": {
+      "seo": {
+        "title": "Was 23,976 / 24 / 25 / 30 fps bedeuten – Untertitel-Zeiten – AI-SRTSub",
+        "desc": "23,976 ist nicht 24 und 29,97 nicht 30: Das fehlende 0,1 % kommt von NTSC, PAL rechnet 4 % dazu. Wie diese Zahlen deine Zeiten verschieben und wie du umrechnest.",
+        "h1": "Was 23,976 / 24 / 25 / 30 fps bedeuten",
+        "intro": "Die 0,1 % Unterschied zwischen 23,976 und 24 sind ein Überrest der Fernsehgeschichte. Zusammen mit den 4 % von PAL sind sie der Grund, warum Untertitel zum Ende hin immer weiter abweichen.",
+        "ctaText": "Zeitanpassung öffnen"
+      },
+      "body": [
+        {
+          "h2": "Was die vier Zahlen je bedeuten",
+          "ps": [
+            "Die Bildrate ist, wie viele Bilder in einer Sekunde gezeigt werden. Die vier, die dir am häufigsten begegnen:"
+          ],
+          "ul": [
+            "**24 fps** — die Rate, in der Filme gedreht und vorgeführt werden; Kinos laufen mit 24",
+            "**23,976 fps** — die Rate eines Films, sobald er ins NTSC-Fernsehen kommt, 0,1 % langsamer als 24",
+            "**25 fps** — die Fernsehrate der PAL-Regionen (Europa, China, Australien und andere Länder mit 50-Hz-Netz)",
+            "**29,97 fps / 30 fps** — die Rate von NTSC-Sendungen, mit demselben Unterschied von 0,1 %"
+          ]
+        },
+        {
+          "h2": "Woher die 0,1 % kommen",
+          "ps": [
+            "23,976 = 24 × 1000/1001 und 29,97 = 30 × 1000/1001. Dieses 1000/1001 ist ein Überrest der Farbeinführung bei NTSC: Um den Farbhilfsträger unterzubringen, ohne vorhandene Schwarz-Weiß-Empfänger zu stören, wurde die Feldfrequenz von 60 Hz auf 59,94 Hz (60 × 1000/1001) gesenkt, und die Bildrate ging mit herunter.",
+            "Ergebnis: Filme laufen in NTSC-Regionen mit 23,976 statt mit 24. Der Unterschied beträgt 0,1 % oder 3,6 Sekunden pro Stunde – für sich allein kaum merklich, aber verwechsle ihn nicht mit den 4 % weiter unten und rechne nie beides in einem Gang zusammen."
+          ]
+        },
+        {
+          "h2": "Und die 4 %, woher kommen die",
+          "ps": [
+            "PAL-Regionen geben mit 25 fps wieder. Filme werden mit 24 fps gedreht und einfach mit 25 abgespielt – kein einziges Bild kommt hinzu oder weg, darum läuft die Wiedergabe 4 % schneller (25/24 ≈ 1,0417). Ein 100-Minuten-Film dauert in der PAL-Fassung nur 96 Minuten.",
+            "Das ist die Wurzel der **fortschreitenden Abweichung**: Untertitel nach dem Original gemacht und Video in der PAL-Fassung passen am Anfang auf die Sekunde und liegen beim Abspann vier Minuten auseinander. Kein globales Verschieben rettet das, es muss verhältnismäßig umgerechnet werden."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Geschwindigkeitsbereich der Zeitanpassung: Eingabefeld für das Verhältnis",
+            "cap": "Verhältnismäßig umrechnen – ein Wert gilt für den ganzen Film"
+          }
+        },
+        {
+          "h2": "Wie man umrechnet",
+          "ps": [
+            "Umrechnen heißt, mit einem Verhältnis zu multiplizieren, das für den ganzen Film gilt:"
+          ],
+          "ul": [
+            "**24 → 25** (PAL-Beschleunigung): × 0,96",
+            "**23,976 → 25**: × 0,959 (der genaue Wert ist 23,976/25 = 0,95904)",
+            "**25 → 23,976**: × 1,0427",
+            "**23,976 ↔ 24**: × 1,001 oder × 0,999, nur je 0,1 % Unterschied",
+            "0,96 und 0,959 unterscheiden sich um 0,1 %, über einen ganzen Film keine 6 Sekunden – weißt du nicht, ob deine Quelle 24 oder 23,976 ist, geht auch 0,96, und den Rest räumt die Zwei-Punkt-Verankerung auf"
+          ]
+        },
+        {
+          "h2": "Herausfinden, welche du vorliegen hast",
+          "ps": [
+            "Statt das Verhältnis zu raten, such zwei Stellen, deren richtige Zeit du sicher weißt – meist die erste und die letzte Dialogzeile – und sag dem Werkzeug „diese Zeile gehört auf 00:00:12 und jene auf 01:35:40\"; es streckt den ganzen Film linear zwischen diesen zwei Punkten. Das ist die „Zwei-Punkt-Verankerung“ und braucht keine Bildratenrechnung von dir.",
+            "Um die Bildrate selbst zu bestätigen: Player oder Medieninfo-Werkzeuge weisen sie aus. Trägt ein Name wie `1080p.WEB` keinen Hinweis auf die Rate, ist die Zwei-Punkt-Verankerung der sicherere Weg."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Zwei-Punkt-Verankerung der Zeitanpassung: zwei Zeilen mit Zeiteingaben",
+            "cap": "Die Zwei-Punkt-Verankerung braucht keine Bildrate – nur zwei Zeiten"
+          }
+        },
+        {
+          "h2": "Verwandte Werkzeuge und Ratgeber",
+          "ps": [
+            "Die Bildratenumrechnung selbst: [[Untertitel-Bildrate umrechnen|/guides/srt-fps-converter.html]]; Geschwindigkeitsanpassung: [[Untertitel-Geschwindigkeit umrechnen|/guides/subtitle-speed-converter.html]]; unklar, ob globale Verschiebung oder fortschreitende Abweichung: [[Untertitel driften zum Ende hin auseinander|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

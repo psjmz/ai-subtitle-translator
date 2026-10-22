@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "ro": {
+      "seo": {
+        "title": "Repararea caracterelor stricate – recunoaște codificarea – AI-SRTSub",
+        "desc": "Repararea caracterelor stricate: recunoaște codificarea originală (GBK / Big5 / Shift_JIS / EUC-KR), ordonează candidații după ce seamănă cu o limbă, salvează ca UTF-8 cu BOM sau GBK.",
+        "h1": "Cum folosești repararea caracterelor stricate",
+        "intro": "Când subtitrările se deschid pline de caractere stricate, de obicei fișierul nu e distrus – doar a fost citit cu o codificare greșită. Unealta recunoaște codificarea originală și pune înapoi caracterele citite greșit.",
+        "ctaText": "Deschide reparatorul"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă unealta asta",
+          "ps": [
+            "Aceiași octeți citiți ca UTF-8 și ca GBK dau două seturi de caractere complet diferite – fișierul nu e distrus, doar la citire s-a ales o codificare greșită. Ce face reparatorul:"
+          ],
+          "ul": [
+            "Recunoaște în ce codificare a fost scris fișierul și pune caracterele înapoi după setul corect",
+            "Spune unde e stricăciunea: caracter de înlocuire, caracter de control, simbol de monedă, litere cu diacritice în șir, caractere chinezești rare în blocuri",
+            "Ordonează candidații după ce seamănă cel mai mult cu o limbă – alegi unul și salvezi",
+            "Când playerul nu recunoaște codificarea, salvează o copie ca UTF-8 cu BOM sau GBK și i-o dai"
+          ]
+        },
+        {
+          "h2": "Trimite fișierul, nu lipi",
+          "ps": [
+            "Cele două intrări repară alt interval, **dacă poți trimite fișierul, trimite fișierul**. Când trimiți fișierul octeții originali sunt încă acolo: unealta poate încerca fiecare codificare pe rând, recunoaște că e GBK și îl decodează ca GBK, fără să ghicească nimic. Ce lipești nu mai sunt octeții originali – când browserul predă șirul de caractere, pasul greșit s-a întâmplat deja; rămâne doar deducerea inversă și se repară cât se repară.",
+            "Dacă în conținutul lipit apare deja caracterul de înlocuire (semnul de întrebare pătrat `�`), octeții originali s-au pierdut și nu-i mai aduce nimeni înapoi. Pagina o spune direct: urcă și trimite fișierul original prin „Alege fișierul”."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Zona de încărcare de pe pagina de reparare: zona de glisare și câmpul de lipire, deasupra apare codificarea recunoscută",
+            "cap": "Glisează fișierul sau alege-l; câmpul de lipire e mai jos și repară mult mai puțin"
+          }
+        },
+        {
+          "h2": "Ce spune diagnosticul",
+          "ps": [
+            "După încărcare zona de diagnostic dă concluzia. **Nu s-au găsit caractere stricate**: conținutul se citește normal – dacă playerul tot arată stricat, atunci playerul a ales o codificare greșită, așa că salvează mai jos cu altă codificare și dă-i aia. Când rezultatul **arată ca stricat**, enumeră exact ce urmă este:"
+          ],
+          "ul": [
+            "Conține caracter de înlocuire – octeții originali s-au pierdut deja",
+            "Au intrat caractere de control",
+            "Sunt amestecate simboluri de monedă și simboluri matematice",
+            "Litere cu diacritice apar în șir – ca și cum UTF-8 ar fi fost citit ca pe un singur octet (`ä½ å¥½`)",
+            "Caractere chinezești în blocuri fără niciun caracter comun – ca și cum UTF-8 ar fi fost citit ca GBK (`浣犲ソ`)"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Cardul de diagnostic: concluzia și urmele caracterelor stricate enumerate una câte una",
+            "cap": "Diagnosticul enumeră urmele pe tipuri, nu aruncă o singură frază generală"
+          }
+        },
+        {
+          "h2": "Cum sunt ordonați și aleși candidații",
+          "ps": [
+            "Sub „Așa se poate repara” candidații sunt ordonați după **ce seamănă cel mai mult cu o limbă**, cel mult 12, fiecare notat cu codificarea din care în care a fost citit. Apasă unul ca să vezi rezultatul, după alegere salvezi mai jos; dacă nu îți convine, alege „păstrează ca atare” ca să revii la original.",
+            "Ordonarea se bazează pe punctaj: ponderea caracterelor comune, șirurile de diacritice, șirurile de simboluri și caracterele chinezești rare se iau toate în calcul. **Dacă punctajul nu e clar mai bun, nu se recomandă nimic** – nu se inventează un candidat doar ca să existe. Pentru cele stricate de două ori (o dată salvate greșit, o dată reparate greșit), unealta mai deduce un strat înapoi pentru primii candidați."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Lista candidaților de reparare: ordonată după cât de mult seamănă cu o limbă, fiecare cu perechea de codificări",
+            "cap": "Candidații sunt ordonați după ce seamănă cel mai mult cu o limbă"
+          }
+        },
+        {
+          "h2": "Salvarea e ultimul pas",
+          "ps": [
+            "Textul reparat trebuie și salvat corect. Când playerul nu recunoaște UTF-8, salvează **UTF-8 cu BOM** (playerele de Windows recunosc codificarea după BOM) sau **GBK**, de obicei ajunge. Opțiunile sunt UTF-8, UTF-8 (cu BOM), GBK, Big5, Shift_JIS, EUC-KR; dacă nu încape, se propune alta (de exemplu GBK nu încape coreeană). La numele fișierului descărcat se adaugă `-fixed`.",
+            "Când codificarea recunoscută nu e UTF-8, salvarea e deja îndreptată spre „UTF-8 cu BOM”; dacă ai umblat tu la listă, nu se mai schimbă în locul tău."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Zona de rezultat: câmpul de text, lista de salvare ca și butonul de descărcare",
+            "cap": "Alege codificarea și descarcă – la nume se adaugă automat -fixed"
+          }
+        },
+        {
+          "h2": "Ce nu se schimbă",
+          "ps": [
+            "Se schimbă doar caracterele citite greșit. Numerotarea, axa de timp și comenzile de stil din ASS nu se schimbă nici cu un caracter."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**Am trimis fișierul, de ce trebuie să și salvez?** De obicei fișierul nu e distrus – playerul a ales o codificare greșită. Nu trebuie schimbat niciun caracter din text: salvezi o copie ca UTF-8 cu BOM sau GBK și i-o dai playerului.",
+            "**De ce nu se poate repara ce am lipit?** Imediat ce în conținutul lipit apare caracterul de înlocuire, octeții originali au dispărut și deducerea inversă nu are pe ce să se sprijine. Urcă și trimite fișierul original prin „Alege fișierul”.",
+            "**Nu e ce vreau printre candidați?** Când punctajul nu e clar mai bun decât cel curent, unealta nu recomandă nimic. Schimbă mai întâi „codificarea recunoscută” în alta și las-o să ordoneze din nou.",
+            "**Câte deodată?** Una. După ce descarci reparația, o trimiți pe următoarea."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Recunoașterea și repararea se fac în întregime local în browser; niciun conținut de subtitrări nu e trimis pe server."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "De unde vin caracterele stricate, pe pagina [[De unde vin caracterele stricate|/guides/subtitle-garbled-characters.html]]; dacă codificarea e bună dar conținutul e murdar, folosește [[Curățarea subtitrărilor|/clean.html]]; pentru verificarea axei de timp și a lungimii textului [[Controlul de calitate al subtitrărilor|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "ro": {
+      "seo": {
+        "title": "De unde vin caracterele stricate – dacă le recunoști, le repari – AI-SRTSub",
+        "desc": "Caracterele stricate nu sunt un fișier distrus, ci octeți citiți cu o codificare greșită. Caracterul de înlocuire, literele cu diacritice în șir și caracterele rare au fiecare altă cauză.",
+        "h1": "De unde vin caracterele stricate",
+        "intro": "Aceiași octeți citiți ca UTF-8 și ca GBK dau două seturi de caractere complet diferite. Cum arată textul stricat e dovada directă a pasului care a mers prost.",
+        "ctaText": "Deschide reparatorul"
+      },
+      "body": [
+        {
+          "h2": "Fișierul nu e distrus, a fost citit greșit",
+          "ps": [
+            "În fișierul de subtitrări sunt stocați octeți. Ca octeții să devină caractere, trebuie să știi în ce codificare au fost scriși – dacă alegerea asta merge prost, rezultatul sunt caractere stricate. Din fișier nu lipsește niciun octet: citește-l cu altă codificare și caracterele vin înapoi.",
+            "Deci în caracterele stricate sunt două lucruri: **să recunoști în ce codificare au fost scrise** și **să salvezi într-o codificare pe care playerul o recunoaște**. Primul se face prin citire de probă și punctaj, al doilea prin salvare. Rezolvă probleme diferite."
+          ]
+        },
+        {
+          "h2": "Cinci înfățișări, cinci cauze",
+          "ps": [
+            "Caracterele stricate nu apar la întâmplare – înfățișarea lor trădează direct cauza:"
+          ],
+          "ul": [
+            "**Litere cu diacritice în șir** (`ä½ å¥½`): chineza din UTF-8 a fost citită ca și cum ar fi o codificare pe un octet – în UTF-8 chineza are trei octeți pe caracter, iar citirea pe un octet ia fiecare octet drept literă separată",
+            "**Caractere chinezești în șir fără niciun caracter comun** (`浣犲ソ`): UTF-8 a fost citit ca GBK – octeții au fost reîmperecheați câte doi și au ieșit caractere rare",
+            "**Simboluri de monedă și simboluri matematice**: octeții au căzut în zona de simboluri, obișnuit când fișierul e citit ca Mac Roman sau Latin-1",
+            "**Caractere de control amestecate**: octeții au căzut în zona invizibilă de control, pe ecran apar ca spații sau pătrate",
+            "**Semnul de întrebare pătrat `�`**: acesta e **caracterul de înlocuire**, nu text stricat – spune că aici era un caracter care a fost pierdut deja la citire"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Cardul de diagnostic: urmele caracterelor stricate enumerate una câte una",
+            "cap": "Diagnosticul împarte caracterele stricate după cauză, nu le pune pe toate într-o singură oală"
+          }
+        },
+        {
+          "h2": "De ce caracterul de înlocuire nu se poate repara",
+          "ps": [
+            "Caracterul de înlocuire e linia critică. Când apare `�`, octeții au fost pierduți **la un pas anterior** (de obicei vreun program a citit fișierul și l-a salvat din nou), iar despre partea pierdută nu există nicio înregistrare. Atunci deducerea inversă n-are pe ce să se sprijine – nimeni nu-l mai aduce înapoi.",
+            "De asta pagina de reparare tratează două situații în mod diferit: când trimiți fișierul octeții originali sunt acolo și se pot încerca toate codificările; dacă în conținutul lipit apare deja caracterul de înlocuire, se spune direct că nu se poate repara și se cere fișierul original.",
+            "Și invers, o situație care merită notată: conținutul se citește perfect normal, dar în player tot apar caractere stricate. Nu e vina fișierului, ci **playerul a ales o codificare greșită**. Să modifici fișierul nu ajută – salvează o copie ca UTF-8 cu BOM sau GBK și dă-i-o."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Zona de încărcare: două intrări, glisare și lipire",
+            "cap": "Trimite fișierul dacă poți – sunt octeți, deci e ceva de reparat"
+          }
+        },
+        {
+          "h2": "Ce se compară la reparare",
+          "ps": [
+            "Unealta încearcă fiecare codificare posibilă și dă fiecărui rezultat un punctaj: câte caractere comune sunt, sunt șiruri de diacritice, sunt șiruri de simboluri, sunt caracterele chinezești rare și în blocuri. Rezultatul cu cel mai mare punctaj stă primul.",
+            "**Dacă punctajul nu e clar mai bun, nu se recomandă nimic** – mai degrabă spune că ăsta se citește normal decât să dea un rezultat forțat. Pentru cele stricate de două ori se mai deduce un strat înapoi."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Lista de candidați: ordonată după punctaj, fiecare cu perechea de codificări",
+            "cap": "Candidații sunt ordonați după punctaj; fără un avantaj clar nu se recomandă nimic"
+          }
+        },
+        {
+          "h2": "Numai codificarea potrivită încheie treaba",
+          "ps": [
+            "Textul reparat trebuie salvat într-o codificare pe care playerul o recunoaște. Playerele de Windows recunosc de obicei codificarea după BOM, așa că **UTF-8 cu BOM** e cel mai simplu; aparatele vechi și playerele chinezești recunosc GBK. Opțiunile sunt UTF-8, UTF-8 (cu BOM), GBK, Big5, Shift_JIS, EUC-KR; dacă nu încape, se propune alta."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Zona de rezultat: lista de salvare ca și butonul de descărcare",
+            "cap": "Salvează într-o codificare pe care playerul o recunoaște – abia atunci problema e rezolvată"
+          }
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "Întregul proces pe pagina [[Cum folosești repararea caracterelor stricate|/guides/repair.html]]; ce conține de fapt un fișier SRT pe pagina [[Ce scrie într-un fișier SRT|/guides/srt-file-format.html]]; dacă codificarea e bună dar conținutul e murdar (filigrane, reclame, note pentru surzi) folosește [[Curățarea subtitrărilor|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "ro": {
+      "seo": {
+        "title": "Conversia simplificat-tradițional – Taiwan și Hong Kong – AI-SRTSub",
+        "desc": "Nouă direcții: tradițional taiwanez cu schimbarea cuvintelor sau doar a formei, Hong Kong are setul lui, și întoarcere la simplificat. Se schimbă doar textul replicilor.",
+        "h1": "Cum folosești conversia simplificat-tradițional",
+        "intro": "Aceleași subtitrări merg în Taiwan, Hong Kong sau China continentală – cuvintele și forma scrisului diferă. Pagina de conversie are nouă direcții și schimbă doar textul replicilor.",
+        "ctaText": "Deschide conversia"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă unealta asta",
+          "ps": [
+            "Conversia simplificat-tradițional nu înseamnă doar să schimbi scrierea fiecărui caracter. Același cuvânt simplificat corespunde la cuvinte diferite în regiuni diferite – termenul pentru software e un cuvânt în Taiwan și altul în Hong Kong, iar cuvântul pentru informație e altul în Taiwan. Pagina de conversie le tratează separat:"
+          ],
+          "ul": [
+            "Simplificat → tradițional (general / Taiwan / Hong Kong)",
+            "Tradițional → simplificat (general / din tradiționalul taiwanez / din tradiționalul din Hong Kong)",
+            "Schimbarea formei între tradiționale (în forma taiwaneză / în forma din Hong Kong)",
+            "Un caracter simplificat cu mai multe tradiționale nu e convertit greșit – decizia se ia după cuvânt, nu caracter cu caracter"
+          ]
+        },
+        {
+          "h2": "Încărcare și recunoaștere",
+          "ps": [
+            "Glisează fișierul sau alege-l; sunt acceptate SRT, VTT, ASS și TXT, și poți de asemenea lipi direct conținutul subtitrărilor. După încărcare formatul e recunoscut automat și afișat la „Formatul recunoscut”."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Zona de încărcare de pe pagina de conversie: zona de glisare și câmpul de lipire, deasupra apare formatul recunoscut",
+            "cap": "SRT / VTT / ASS / TXT, formatul e recunoscut automat"
+          }
+        },
+        {
+          "h2": "Cum alegi cele nouă direcții",
+          "ps": [
+            "Cele nouă direcții din „Direcția conversiei” se împart în trei grupe. **Simplificat → tradițional**: tradițional general, tradițional taiwanez (cu schimbarea cuvintelor), tradițional taiwanez (doar forma), tradițional din Hong Kong. **Tradițional → simplificat**: general, din tradiționalul taiwanez, din tradiționalul din Hong Kong. **Schimbarea formei între tradiționale**: în forma taiwaneză, în forma din Hong Kong.",
+            "„Cuvintele taiwaneze” schimbă și termenul pentru software și pe cel pentru informație în cuvintele locale; „forma taiwaneză” schimbă doar scrierea și lasă cuvintele tale. Hong Kong e un set separat: același termen se scrie altfel acolo. Pentru întoarcerea la simplificat alegi grupa de jos – trebuie spus din ce tradițional te întorci, pentru că drumul din Taiwan și din Hong Kong spre simplificat e diferit."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Cardul direcției de conversie: lista „convertește în”, selectat simplificat → tradițional taiwanez (cu schimbarea cuvintelor)",
+            "cap": "Direcția se alege din listă, cele nouă sunt în trei grupe; aici e tradițional taiwanez cu schimbarea cuvintelor"
+          }
+        },
+        {
+          "h2": "Rezultat și export",
+          "ps": [
+            "Zona de rezultat dă imediat subtitrările convertite, iar bara de statistici arată câte rânduri sunt în total și câte s-au schimbat. Dacă nu s-a schimbat niciun caracter apare nota că în aceste subtitrări s-ar putea să nu fie caractere chinezești – conversia atinge doar partea chinezească, deci subtitrările doar în engleză sau cu numere nu se schimbă.",
+            "După confirmare descarcă sau copiază. În numele fișierului descărcat se inserează o etichetă de limbă – `demo.srt` convertit în tradițional taiwanez devine `demo.zh-TW.srt`, în tradițional general `.zh-Hant`, iar la întoarcerea la simplificat `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Zona de rezultat: subtitrările convertite și bara de statistici",
+            "cap": "Bara de statistici dă numărul total de rânduri și pe cele schimbate"
+          }
+        },
+        {
+          "h2": "Ce nu se schimbă",
+          "ps": [
+            "Se schimbă doar textul replicilor. Axa de timp, numerotarea și comenzile de stil din ASS nu se schimbă nici cu un caracter – după conversie e gata de folosit, nu trebuie refăcut formatul."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**De ce nu s-a convertit cum mă așteptam?** Când unui caracter simplificat îi corespund mai multe tradiționale, decizia se ia după cuvânt: același caracter merge în alt caracter tradițional în cuvinte diferite. Dicționarul vine din OpenCC și convertește pe grupuri de cuvinte, nu caracter cu caracter.",
+            "**Cu ce se deosebesc tradiționalul taiwanez și cel din Hong Kong?** Prin vocabular: același termen se scrie altfel în Taiwan și în Hong Kong. Alege direcția regiunii unde trimiți.",
+            "**S-a schimbat numărul de rânduri?** Se schimbă doar caracterele chinezești; nu se adaugă și nu se scot înregistrări și axa de timp rămâne. Dacă s-a schimbat numărul de rânduri, verifică dacă formatul a fost recunoscut greșit la încărcare.",
+            "**Ce fac dacă dicționarul nu s-a încărcat?** Pagina cere reîmprospătare și o nouă încercare. Dicționarul se încarcă local, nu trebuie trimise subtitrările pe net."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Conversia se face în întregime local în browser; niciun conținut de subtitrări nu e trimis pe server."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "Dacă ai nevoie doar de simplificat spre tradițional, vezi [[Subtitrări simplificate în tradiționale|/guides/srt-simplified-to-traditional.html]]; de ce nu e doar schimbarea unui caracter, pe pagina [[Conversia nu e schimbarea unui caracter|/guides/simplified-traditional-chinese.html]]; pentru traducere într-o limbă străină folosește [[Traducerea subtitrărilor|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "ro": {
+      "seo": {
+        "title": "Subtitrări simplificate în tradiționale – Taiwan și Hong Kong – AI-SRTSub",
+        "desc": "Transformă subtitrările simplificate în tradiționale: Taiwan (schimbarea cuvintelor sau doar a formei) sau Hong Kong. Un caracter cu mai multe tradiționale se decide după cuvânt.",
+        "h1": "Subtitrări simplificate în tradiționale",
+        "intro": "Subtitrările în chineză simplificată merg către publicul din Taiwan sau Hong Kong – o singură conversie ajunge. Taiwan și Hong Kong sunt două seturi diferite; cu direcția greșită cuvintele nu se spun așa acolo.",
+        "ctaText": "Convertește aceste subtitrări"
+      },
+      "body": [
+        {
+          "h2": "Nevoia asta",
+          "ps": [
+            "Subtitrările sunt în chineză simplificată și merg către publicul din Taiwan sau Hong Kong. Să schimbi caracter cu caracter nu e realist – un episod are sute de înregistrări. Și Taiwan și Hong Kong nu vor același tradițional: vocabularul diferă, iar cu direcția greșită rezultatul nu se spune așa acolo."
+          ]
+        },
+        {
+          "h2": "Unde se face",
+          "ps": [
+            "Deschide [[Conversia simplificat-tradițional|/hanconv.html]], glisează subtitrările și în „Direcția conversiei” alege una din direcțiile simplificat spre tradițional: tradițional general, tradițional taiwanez (cu schimbarea cuvintelor), tradițional taiwanez (doar forma) sau tradițional din Hong Kong. Conversia se termină imediat, iar zona de rezultat dă subtitrările gata – descarcă-le.",
+            "**Pentru publicul din Taiwan**: dacă vrei să se schimbe și cuvintele, alege „tradițional taiwanez (cu schimbarea cuvintelor)” – termenul pentru software și cel pentru informație devin cuvintele locale; dacă vrei doar forma și să păstrezi cuvintele tale, alege „tradițional taiwanez (doar forma)”. **Pentru publicul din Hong Kong**: alege „tradițional din Hong Kong”, unde termenul pentru software se scrie altfel."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Cardul direcției de conversie: lista „convertește în”, selectat simplificat → tradițional taiwanez (cu schimbarea cuvintelor)",
+            "cap": "Taiwan și Hong Kong sunt două direcții în listă, cu vocabular diferit"
+          }
+        },
+        {
+          "h2": "Capcane obișnuite",
+          "ps": [
+            "**Un caracter, mai multe tradiționale – nu e o problemă**: același caracter simplificat merge în alt caracter tradițional în cuvinte diferite; dicționarul decide pe grupul de cuvinte și nu transformă totul în același caracter.",
+            "**Doar textul replicilor**: axa de timp, numerotarea și comenzile de stil din ASS nu se schimbă deloc, deci e gata de folosit imediat.",
+            "**Dacă nu s-a schimbat nimic**: dacă bara de statistici arată 0 rânduri schimbate, s-ar putea ca în aceste subtitrări să nu fie caractere chinezești sau formatul să fi fost recunoscut greșit – verifică la „Formatul recunoscut” dacă e cel pe care l-ai trimis."
+          ]
+        },
+        {
+          "h2": "Asociate",
+          "ps": [
+            "Explicația completă a celor nouă direcții pe pagina [[Cum folosești conversia simplificat-tradițional|/guides/hanconv.html]]; de ce nu e doar schimbarea unui caracter, pe pagina [[Conversia nu e schimbarea unui caracter|/guides/simplified-traditional-chinese.html]]; și invers, din tradițional în simplificat, se face tot pe pagina [[Conversia simplificat-tradițional|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "ro": {
+      "seo": {
+        "title": "Conversia nu e schimbarea unui caracter – AI-SRTSub",
+        "desc": "Conversia se împiedică în trei lucruri: un caracter are mai multe tradiționale, Taiwan și Hong Kong diferă, și doar replicile trebuie schimbate.",
+        "h1": "Conversia nu e schimbarea unui caracter",
+        "intro": "În ce caracter tradițional se transformă unul simplificat depinde de caracterul dinainte. De asta conversia nu se poate face caracter cu caracter.",
+        "ctaText": "Deschide conversia"
+      },
+      "body": [
+        {
+          "h2": "Primul lucru: un caracter, mai multe tradiționale",
+          "ps": [
+            "Simplificarea a unit mai multe caractere tradiționale într-unul simplificat. La întoarcere, unui caracter simplificat îi corespund mai multe tradiționale, și care se alege depinde de ce caracter îl însoțește:",
+            "Schimbarea oarbă, caracter cu caracter, le transformă pe toate în același caracter și tot textul e plin de greșeli. Numai **decizia după cuvânt** le separă – dicționarul vine din OpenCC și potrivește întâi grupurile de cuvinte, apoi caracterele izolate. De exemplu:"
+          ],
+          "ul": [
+            "Același caracter în cuvântul care înseamnă curat merge într-un caracter tradițional, în cel care înseamnă trunchi de copac în altul",
+            "În cuvântul care înseamnă păr într-unul, în cel care înseamnă dezvoltare în altul",
+            "În cuvântul care înseamnă în spate într-unul, în cel care înseamnă regină în altul"
+          ]
+        },
+        {
+          "h2": "Al doilea lucru: Taiwan și Hong Kong nu sunt același lucru",
+          "ps": [
+            "După conversia în tradițional mai e o diferență: același cuvânt se scrie altfel în Taiwan și în Hong Kong. Termenul obișnuit pentru software se scrie în Taiwan într-un fel și în Hong Kong în altul; cuvântul pentru informație e altul în Taiwan.",
+            "De asta direcțiile sunt separate: în tradiționalul taiwanez sunt două opțiuni, schimbarea cuvintelor și doar forma – doar forma lasă cuvintele tale, schimbarea cuvintelor schimbă și termenii regionali. Hong Kong e o direcție separată."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Cardul direcției de conversie: lista „convertește în”, selectat simplificat → tradițional taiwanez (cu schimbarea cuvintelor)",
+            "cap": "Pentru Taiwan poți schimba cuvintele sau doar forma, Hong Kong are o direcție separată"
+          }
+        },
+        {
+          "h2": "Al treilea lucru: doar textul replicilor trebuie să se schimbe",
+          "ps": [
+            "Fișierul de subtitrări nu e doar replici. În el sunt și numerotarea, axa de timp și comenzile de stil din ASS, și din astea nu trebuie schimbat niciun caracter – mai ales în rândurile de stil din ASS sunt amestecate nume de comenzi în engleză, care se strică dacă sunt tratate ca text.",
+            "De asta conversia se face după despărțirea formatului: în SRT, VTT, ASS și TXT se recunoaște separat partea de text și se schimbă doar caracterele chinezești din ea. După conversie axa de timp și stilurile rămân neschimbate, nu trebuie refăcut formatul."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Zona de rezultat: subtitrările convertite și bara de statistici cu numărul de rânduri schimbate",
+            "cap": "Bara de statistici dă rândurile schimbate, partea de format rămâne neschimbată"
+          }
+        },
+        {
+          "h2": "La întoarcerea la simplificat, de ce să ții cont",
+          "ps": [
+            "Și la conversia din tradițional în simplificat trebuie spus **din ce tradițional te întorci**: tradiționalul general, cel taiwanez și cel din Hong Kong sunt trei drumuri diferite, pentru că termenii regionali din Taiwan și Hong Kong trebuie întâi readuși la cuvinte generale și apoi convertiți. Cu direcția greșită rămân termeni regionali în simplificat.",
+            "Grupa de jos din cele nouă direcții e cea care se întoarce la simplificat: tradițional → simplificat, tradițional taiwanez → simplificat, tradițional din Hong Kong → simplificat."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "Întregul proces pe pagina [[Cum folosești conversia simplificat-tradițional|/guides/hanconv.html]]; dacă ai nevoie doar de simplificat spre tradițional, vezi [[Subtitrări simplificate în tradiționale|/guides/srt-simplified-to-traditional.html]]; pentru traducere într-o limbă străină folosește [[Traducerea subtitrărilor|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "ro": {
+      "seo": {
+        "title": "Subtitrări în Excel/CSV și înapoi – conversie în două sensuri – AI-SRTSub",
+        "desc": "SRT sau VTT în Excel sau CSV și înapoi în subtitrări. Tabelul recunoaște coloanele început, sfârșit și text în orice ordine. Timpul rămâne text.",
+        "h1": "Subtitrări în Excel/CSV și înapoi",
+        "intro": "Corectarea și traducerea merg mai bine în tabel. Subtitrările se exportă în Excel sau CSV, se corectează rând cu rând și se întorc în subtitrări – timpul rămâne text și rândurile noi din replici nu se pierd.",
+        "ctaText": "Deschide conversia în tabel"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă unealta asta",
+          "ps": [
+            "Subtitrările sunt înregistrări una sub alta, iar tabelul e tot rânduri – în format de tabel, corectarea, comentariile și traducerea în bloc se fac cu funcții cunoscute. Ambele sensuri sunt acceptate:"
+          ],
+          "ul": [
+            "**În tabel**: SRT și VTT se exportă în Excel (.xlsx) sau CSV, un rând pentru fiecare, cu coloanele număr, început, sfârșit și text",
+            "**În subtitrări**: tabelul corectat se întoarce în SRT sau VTT",
+            "Coloanele de timp rămân text – programul de tabel nu le transformă în numere sau date",
+            "Rândurile noi din replici se păstrează și se întorc la fel"
+          ]
+        },
+        {
+          "h2": "Încărcare și alegerea sensului",
+          "ps": [
+            "Glisează fișierul sau alege-l. Cele două sensuri cer alt fișier: **în tabel** trebuie un fișier de subtitrări (SRT / VTT), **în subtitrări** un fișier de tabel (CSV / Excel, atât xlsx cât și xls). Dacă sensul e greșit, pagina spune imediat ce fișier cere modul ăsta.",
+            "⚠️ Pagina asta citește doar UTF-8. Dacă subtitrările se deschid pline de semne de întrebare sau pătrate, repară mai întâi codificarea pe pagina [[Repararea caracterelor stricate|/repair.html]] – cu codificarea stricată aici se citesc numai caractere de înlocuire."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Zona de încărcare de pe pagina de tabel: zona de glisare și comutarea între două moduri",
+            "cap": "Cele două moduri cer alt fișier: în tabel subtitrări, în subtitrări tabel"
+          }
+        },
+        {
+          "h2": "Subtitrări în tabel",
+          "ps": [
+            "Alege „În tabel”, glisează subtitrările și zona de previzualizare enumeră fiecare înregistrare: număr, început, sfârșit, text. Bara de statistici dă numărul de înregistrări și durata totală. După confirmare apasă „Descarcă Excel (.xlsx)” sau „Descarcă CSV”.",
+            "Diferența dintre cele două formate de export: xlsx e un fișier de tabel adevărat, în care formatul coloanei de timp nu se schimbă singur; CSV e mai universal, dar când e deschis în Excel coloana de timp poate fi afișată altfel – dacă se întâmplă, setează formatul coloanei la „Text” sau folosește direct xlsx."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Zona de previzualizare a tabelului: patru coloane număr, început, sfârșit, text și bara de statistici",
+            "cap": "Previzualizarea enumeră înregistrările, bara dă numărul și durata totală"
+          }
+        },
+        {
+          "h2": "Tabel înapoi în subtitrări",
+          "ps": [
+            "Alege „În subtitrări”, glisează tabelul. Regula de recunoaștere a coloanelor: tabelul trebuie să aibă coloanele **început, sfârșit și text** (și Start / End / Text în engleză sunt acceptate), **ordinea coloanelor nu contează**. Timpul se scrie fie `00:00:01,500`, fie `00:00:01.500`; rândurile care nu sunt recunoscute sunt sărite și nu e respins tot fișierul.",
+            "Rezultatul întoarcerii apare în previzualizare înregistrare cu înregistrare, după care descarci SRT sau VTT. Dacă cele trei coloane lipsesc, pagina cere să verifici numele coloanelor – de obicei vinovatul e că la export s-au folosit alte nume sau că rândul de antet nu e primul."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Zona de rezultat a subtitrărilor: subtitrările întoarse, enumerate înregistrare cu înregistrare",
+            "cap": "Dacă cele trei coloane nu sunt recunoscute, se spune direct – nu e un eșec tăcut"
+          }
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**Excel afișează greșit coloana de timp; ce fac?** Cu xlsx nu există problema asta. Dacă vrei CSV: selectează coloana de timp și setează formatul celulei la „Text” înainte de deschidere.",
+            "**Numele coloanelor trebuie să fie în chineză?** Nu. început / sfârșit / text și Start / End / Text sunt toate acceptate, și nici literele mari sau mici nu contează.",
+            "**După întoarcere, rândurile noi sunt acolo?** Da. Rândurile noi din replici se păstrează și se întorc la fel.",
+            "**Și ASS?** Pagina asta se ocupă doar de SRT și VTT. ASS are comenzi de stil – convertește-l întâi în SRT pe pagina [[Conversia de format|/convert.html]].",
+            "**Câte deodată?** Una. Pentru zeci sau sute folosește [[Conversia în bloc|/batch.html]] – aia schimbă doar formatul, nu trece prin tabel."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Conversia se face în întregime local în browser; niciun conținut de subtitrări nu e trimis pe server."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "Dacă ai nevoie doar de pasul „subtitrări în Excel”, vezi [[Subtitrări în Excel|/guides/srt-to-excel.html]]; după corectări, pentru traducere într-o limbă străină folosește [[Traducerea subtitrărilor|/translate.html]]; pentru schimbarea formatului la zeci de fișiere [[Conversia în bloc|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "ro": {
+      "seo": {
+        "title": "Subtitrări în Excel – SRT în xlsx pentru corectare rând cu rând – AI-SRTSub",
+        "desc": "Exportă subtitrările SRT în Excel: un rând pentru fiecare, cu coloanele număr, început, sfârșit și text. Timpul rămâne text și rândurile noi din replici nu se pierd.",
+        "h1": "Subtitrări în Excel",
+        "intro": "Să corectezi sute de subtitrări într-un editor de text e obositor. În Excel fiecare e un rând: filtrele, comentariile și înlocuirile în bloc funcționează. După corectări se întorc în SRT.",
+        "ctaText": "Exportă în Excel"
+      },
+      "body": [
+        {
+          "h2": "Nevoia asta",
+          "ps": [
+            "Vrei să corectezi subtitrări, să schimbi cuvinte în bloc sau să împarți bucăți la mai mulți oameni – toate astea merg mult mai repede în tabel decât în text. SRT e text simplu, dar structura înregistrărilor lui (număr, timp, replică) se așază exact în patru coloane de tabel."
+          ]
+        },
+        {
+          "h2": "Unde se face",
+          "ps": [
+            "Deschide [[Conversia în tabel|/table.html]], alege modul „În tabel”, glisează SRT-ul și previzualizarea enumeră imediat fiecare înregistrare – număr, început, sfârșit, text. Ia fișierul cu butonul „Descarcă Excel (.xlsx)”. VTT e acceptat și el.",
+            "După corectări: treci în modul „În subtitrări”, glisezi tabelul înapoi și se întoarce în SRT. Regula de recunoaștere cere coloanele început, sfârșit și text (și Start / End / Text sunt acceptate), în orice ordine."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Previzualizarea tabelului: fiecare înregistrare SRT pe un rând, patru coloane și bara de statistici",
+            "cap": "SRT se așază direct în patru coloane, și după corectări se întoarce pe același drum"
+          }
+        },
+        {
+          "h2": "Capcane obișnuite",
+          "ps": [
+            "**Repară întâi codificarea**: pagina asta citește doar UTF-8. Dacă în subtitrări sunt semne de întrebare sau pătrate, mergi pe pagina [[Repararea caracterelor stricate|/repair.html]].",
+            "**CSV sau xlsx**: pentru lucru în Excel alege xlsx, unde formatul coloanei de timp nu se schimbă; CSV e mai universal, dar Excel îl poate interpreta altfel – atunci setează coloana de timp ca „Text”.",
+            "**ASS nu merge**: ASS cu comenzi de stil se convertește întâi în SRT și abia apoi trece în tabel."
+          ]
+        },
+        {
+          "h2": "Asociate",
+          "ps": [
+            "Explicația completă în ambele sensuri pe pagina [[Subtitrări în Excel/CSV și înapoi|/guides/table.html]]; după corectări, pentru traducere într-o limbă străină folosește [[Traducerea subtitrărilor|/translate.html]]; înainte de predare trece-le prin [[Controlul de calitate al subtitrărilor|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "ro": {
+      "seo": {
+        "title": "Cum folosești conversia în bloc – sute deodată într-un singur ZIP – AI-SRTSub",
+        "desc": "Trage zeci sau sute de SRT/VTT deodată, convertește-le într-un singur format și ia-le într-un ZIP. Numerotarea se reface, fișierele nerecunoscute rămân afară din pachet.",
+        "h1": "Cum folosești conversia în bloc",
+        "intro": "Să uniformizezi formatul unei sezoane întregi, fișier cu fișier, e lent. Pagina le ia pe toate deodată, le convertește într-un singur format și le împachetează într-un ZIP – cele nerecunoscute sunt marcate separat, nu ascunse în pachet.",
+        "ctaText": "Deschide conversia în bloc"
+      },
+      "body": [
+        {
+          "h2": "Ce rezolvă unealta asta",
+          "ps": [
+            "Subtitrările unei sezoane întregi sau ale unei colecții trebuie de obicei aduse la același format ca să poată fi folosite. Pagina de conversie în bloc face asta:"
+          ],
+          "ul": [
+            "Trage deodată zeci sau sute de SRT și VTT (se poate selecta mai multe o dată)",
+            "Convertește-le pe toate în SRT sau VTT, numerotarea se reface și marcajele de timp sunt normalizate în formatul țintă",
+            "Împachetează într-un singur ZIP, numele fișierelor rămân și se schimbă doar extensia",
+            "Fișierele din care nu se recunosc înregistrări de subtitrări sunt marcate separat și nu intră în pachet"
+          ]
+        },
+        {
+          "h2": "Pune fișierele",
+          "ps": [
+            "Glisează mai multe fișiere de subtitrări deodată în cadrul cu linie întreruptă sau apasă și alege-le cu selecție multiplă. Lista de fișiere le enumeră pe fiecare: la cele recunoscute apare numărul de înregistrări, la restul nota „nerecunoscut”. Sus sunt numărul de fișiere, totalul înregistrărilor și câte n-au fost recunoscute.",
+            "⚠️ Pagina asta citește doar UTF-8. Subtitrările cu codificarea stricată (semne de întrebare sau pătrate) se repară întâi pe pagina [[Repararea caracterelor stricate|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Lista de fișiere: nume și numere de înregistrări unul câte unul, nerecunoscutele cu roșu",
+            "cap": "Lista le trece una câte una, nerecunoscutele sunt marcate pe loc"
+          }
+        },
+        {
+          "h2": "În ce se convertesc toate",
+          "ps": [
+            "Alege formatul țintă în „Convertește tot în” – SRT sau VTT. După alegere fiecare fișier e refăcut în formatul țintă: numerotarea reîncepe de la capăt și marcajele de timp sunt normalizate după formatul țintă (SRT folosește virgulă pentru miimi, VTT punct).",
+            "**Numele fișierului rămâne, se schimbă doar extensia**; la numele identice se adaugă un număr consecutiv, deci nu se suprascriu unul pe altul."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Alegerea formatului țintă și starea listei, bara de statistici cu numărul de fișiere și înregistrări",
+            "cap": "După alegerea formatului lista e refăcută; din numele fișierului se schimbă doar extensia"
+          }
+        },
+        {
+          "h2": "Împachetare și descărcare",
+          "ps": [
+            "Apasă „Împachetează într-un ZIP și descarcă” – în arhiva pe care o primești sunt toate fișierele convertite. **Fișierele din care nu s-au recunoscut înregistrări de subtitrări nu intră în pachet** – rămân marcate în listă și nu sunt prezentate ca reușite. Când pachetul e gata se spune câte fișiere are."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Zona de împachetare: butonul de descărcare ZIP și mesajul cu rezultatul",
+            "cap": "Nerecunoscutele nu intră în pachet, rămân marcate în listă"
+          }
+        },
+        {
+          "h2": "Când apare nota „nerecunoscut”",
+          "ps": [
+            "Când dintr-un fișier nu se citește nicio înregistrare de subtitrare, e marcat ca nerecunoscut. Trei cauze obișnuite: fișierul nu e subtitrare (de exemplu a intrat din greșeală un .txt cu instrucțiuni), codificarea nu e UTF-8 (se citesc numai caractere de înlocuire) sau conținutul e comprimat într-un singur bloc fără marcaje de timp.",
+            "Fișierele marcate pot fi tratate separat: problema de codificare pe pagina [[Repararea caracterelor stricate|/repair.html]], cea de format cu o conversie pe pagina [[Conversia de format|/convert.html]] și apoi înapoi în listă."
+          ]
+        },
+        {
+          "h2": "Întrebări frecvente",
+          "ps": [
+            "**Câte pot pune deodată?** Nu e o limită fixă, depinde de memoria browserului; câteva sute de SRT merg de obicei fără probleme.",
+            "**Îmi schimbă replicile?** Nu. Conversia în bloc schimbă doar formatul recipientului, reface numerotarea și normalizează marcajele de timp – replicile nu se schimbă nici cu un caracter.",
+            "**Și dacă vreau să schimb conținutul?** Pagina asta face doar conversie de format. Pentru schimbarea în bloc a axei de timp folosește [[Reglajul axei de timp|/shift.html]], pentru schimbarea textului [[Înlocuirea termenilor|/glossary.html]] – în ambele se lucrează fișier cu fișier.",
+            "**Și ASS?** Pagina asta convertește doar între SRT și VTT. ASS are stiluri – folosește pagina [[Conversia de format|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Confidențialitate",
+          "ps": [
+            "Conversia și împachetarea se fac în întregime local în browser; niciun conținut de subtitrări nu e trimis pe server."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "Ce se schimbă într-o sezon întreagă și în ce ordine, pe pagina [[Un sezon întreg de subtitrări deodată|/guides/batch-convert-srt.html]]; mai multe formate pentru un singur fișier pe pagina [[Conversia de format|/convert.html]]; pentru corectare în tabel [[Conversia în tabel|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "ro": {
+      "seo": {
+        "title": "Un sezon întreg de subtitrări deodată – ce se poate și ce nu – AI-SRTSub",
+        "desc": "Într-un sezon se schimbă de obicei un singur lucru: formatul, decalajul de timp sau termenii. Ce se poate face deodată, ce trebuie făcut fișier cu fișier, și cum tratezi nerecunoscutele.",
+        "h1": "Un sezon întreg de subtitrări deodată",
+        "intro": "Într-un sezon întreg ce trebuie schimbat e de obicei același lucru. Să separi ce se poate face deodată de ce trebuie făcut fișier cu fișier scutește multă muncă.",
+        "ctaText": "Deschide conversia în bloc"
+      },
+      "body": [
+        {
+          "h2": "Ce trebuie schimbat e de obicei același lucru",
+          "ps": [
+            "Problemele dintr-un sezon întreg sunt rareori diferite în fiecare episod – de obicei aceeași cauză cade pe toate: tot sezonul a fost comprimat de aceeași echipă de subtitrări (același format, același filigran), tot sezonul a fost făcut pentru aceeași versiune de video (aceeași direcție și același decalaj) sau traducerile numelor nu sunt consecvente de-a lungul sezonului.",
+            "Uită-te întâi la două episoade (primul și ultimul) și confirmă că e vorba de **aceeași defecțiune** înainte să te apuci de treabă în bloc. Dacă la primul și la ultimul defecțiunea e alta, nu e ceva ce se rezolvă în bloc."
+          ]
+        },
+        {
+          "h2": "Ce se poate face deodată",
+          "ps": [
+            "**Uniformizarea formatului** e singurul lucru care se termină cu adevărat dintr-o mișcare: zeci sau sute de SRT și VTT se trag împreună pe pagina [[Conversia în bloc|/batch.html]], alegi formatul țintă și le iei într-un ZIP. Refacerea numerotării și normalizarea marcajelor de timp se fac în acest pas, replicile nu se schimbă."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Lista de fișiere de pe pagina de conversie în bloc: numerele de înregistrări unul câte unul, nerecunoscutele cu roșu",
+            "cap": "Uniformizarea formatului e singurul lucru care se face dintr-o mișcare"
+          }
+        },
+        {
+          "h2": "Ce trebuie făcut fișier cu fișier",
+          "ps": [
+            "Astea n-au intrare în bloc și se trec fișier cu fișier – dar de obicei **se fac o singură dată și apoi se aplică pe tot sezonul**:"
+          ],
+          "ul": [
+            "**Decalaj uniform al axei de timp**: dacă decalajul e același în fiecare episod, măsoară-l într-un episod pe pagina [[Reglajul axei de timp|/shift.html]], notează numărul și pune același număr în restul",
+            "**Uniformizarea termenilor**: tabelul de termeni se face o dată pe pagina [[Înlocuirea termenilor|/glossary.html]] și același tabel se aplică fiecărui fișier",
+            "**Înlăturarea uniformă a filigranului**: regulile filigranului sunt fixe, iar bifările implicite de pe pagina [[Curățarea subtitrărilor|/clean.html]] acoperă cele obișnuite – tragi fișierele acolo unul câte unul"
+          ]
+        },
+        {
+          "h2": "Nu le face în ordine inversă",
+          "ps": [
+            "Când sunt mai multe treburi, ordinea greșită aduce refacere. Fă-le în ordinea asta:",
+            "**Întâi repară codificarea** → **apoi uniformizează formatul** → **apoi fă schimbările de conținut** (filigrane, termeni, axa de timp) → **la final controlul de calitate**. Dacă schimbi formatul fără să fi reparat codificarea, ce se citește e tot stricat; dacă schimbi conținutul înainte să fi uniformizat formatul, formatele acceptate de unelte diferă."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Zona de împachetare: butonul de descărcare ZIP și mesajul cu rezultatul",
+            "cap": "Uniformizarea formatului întâi, schimbările de conținut după"
+          }
+        },
+        {
+          "h2": "Cum tratezi nerecunoscutele",
+          "ps": [
+            "În conversia în bloc, fișierele marcate ca nerecunoscute nu intră în ZIP, rămân în listă. Trei cauze obișnuite: fișierul nu e subtitrare (a intrat din greșeală un fișier cu instrucțiuni), codificarea nu e UTF-8 sau conținutul e un singur bloc fără marcaje de timp.",
+            "Problema de codificare se repară separat pe pagina [[Repararea caracterelor stricate|/repair.html]]; cea de format se convertește o dată pe pagina [[Conversia de format|/convert.html]] și apoi înapoi în listă. **Nu umple pachetul cu forța cu nerecunoscutele** – să descoperi în player că lipsește un episod e mult mai multă bătaie de cap decât un minut acum."
+          ]
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "Utilizarea completă a conversiei în bloc pe pagina [[Cum folosești conversia în bloc|/guides/batch.html]]; decalajul uniform al axei de timp pe pagina [[Cum folosești reglajul axei de timp|/guides/shift.html]]; înainte de predare trece-le prin [[Controlul de calitate al subtitrărilor|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "ro": {
+      "seo": {
+        "title": "Ce sunt 23.976 / 24 / 25 / 30 fps – axa de timp a subtitrărilor – AI-SRTSub",
+        "desc": "23.976 nu e 24 și 29.97 nu e 30: cei 0,1 % vin de la trecerea la culori a NTSC. Cele 25 fps din PAL fac filmul cu 4 % mai rapid. Cum ajung cifrele în axa de timp.",
+        "h1": "Ce sunt 23.976 / 24 / 25 / 30 fps",
+        "intro": "Cei 0,1 % dintre 23.976 și 24 sunt o rămășiță din istoria televiziunii. Împreună cu cei 4 % ai PAL sunt rădăcina faptului că subtitrările se decalează spre final.",
+        "ctaText": "Deschide reglajul axei de timp"
+      },
+      "body": [
+        {
+          "h2": "Ce sunt aceste patru cifre",
+          "ps": [
+            "Rata de cadre spune câte imagini se afișează într-o secundă. Patru sunt obișnuite:"
+          ],
+          "ul": [
+            "**24 fps** – rata de filmare și de proiecție a filmului, în cinematograf e 24",
+            "**23.976 fps** – rata filmului după ce intră în televiziunea cu sistemul NTSC, cu 0,1 % mai lent decât 24",
+            "**25 fps** – rata televiziunii în sistemul PAL (Europa, China, Australia și celelalte regiuni cu rețea de 50 Hz)",
+            "**29.97 fps / 30 fps** – rata emisiunilor de televiziune NTSC, cu aceeași diferență de 0,1 %"
+          ]
+        },
+        {
+          "h2": "De unde vin cei 0,1 %",
+          "ps": [
+            "23.976 = 24 × 1000/1001 și 29.97 = 30 × 1000/1001. Acest 1000/1001 a rămas de la trecerea la culori a NTSC: ca să încapă purtătoarea auxiliară de culoare fără să fie schimbate receptoarele alb-negru deja existente, frecvența de câmp a fost coborâtă de la 60 Hz la 59,94 Hz (60 × 1000/1001), iar rata de cadre a venit după ea.",
+            "Rezultatul: filmul e difuzat în regiunile NTSC la 23.976, nu la 24. Diferența e de 0,1 % – la un film de o oră, 3,6 secunde. Singură abia se observă, dar nu e același lucru cu cei 4 % de mai jos; nu le aduna."
+          ]
+        },
+        {
+          "h2": "Și de unde vin cei 4 %",
+          "ps": [
+            "În regiunile PAL se difuzează la 25 fps. Filmul e turnat la 24 fps și e difuzat așa cum e la 25 – numărul de cadre nu se schimbă, dar viteza de redare crește cu 4 % (25/24 ≈ 1,0417). Un film de 100 de minute are în versiunea PAL 96 de minute.",
+            "Asta e rădăcina **derivarii treptate**: subtitrările sunt făcute după versiunea originală și video e versiunea PAL – la început totul coincide, la final diferența ajunge la patru minute. O deplasare generală nu o salvează, trebuie calculată proporțional."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Zona de schimbare a vitezei de pe pagina axei de timp: câmpul pentru raport",
+            "cap": "Calcul proporțional – o singură valoare de raport e valabilă pentru tot filmul"
+          }
+        },
+        {
+          "h2": "Cum se convertește",
+          "ps": [
+            "Conversia e înmulțirea cu un singur raport, valabil pentru tot filmul:"
+          ],
+          "ul": [
+            "**24 → 25** (accelerarea PAL): × 0,96",
+            "**23.976 → 25**: × 0,959 (valoarea exactă 23,976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 sau × 0,999, diferență de numai 0,1 %",
+            "0,96 și 0,959 diferă cu 0,1 % – într-un film întreg, mai puțin de 6 secunde. Dacă nu ești sigur dacă sursa e 24 sau 23.976, merge și 0,96, iar diferența rămasă se închide prin ancorarea în două puncte"
+          ]
+        },
+        {
+          "h2": "Cum afli care ai în mână",
+          "ps": [
+            "Dacă nu vrei să ghicești raportul, găsește două momente ale căror timpuri le știi sigur – de obicei prima și ultima replică – și spune-i uneltei că replica asta ar trebui să fie la 00:00:12 și aia la 01:35:40. Unealta întinde tot filmul liniar după aceste două puncte. Asta e ancorarea în două puncte și nu trebuie să calculezi rata de cadre.",
+            "Dacă vrei să confirmi singur rata de cadre: o scrie playerul sau o unealtă de informații media. Când numele fișierului e de tipul `1080p.WEB` și nu conține informația despre rată, ancorarea în două puncte e mai sigură."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Zona de ancorare în două puncte de pe pagina axei de timp: două câmpuri pentru momente",
+            "cap": "Ancorarea în două puncte nu cere calcularea ratei de cadre – două momente ajung"
+          }
+        },
+        {
+          "h2": "Instrumente și ghiduri asociate",
+          "ps": [
+            "Conversia ratei de cadre direct pe pagina [[Conversia ratei de cadre a subtitrărilor|/guides/srt-fps-converter.html]]; schimbarea vitezei pe pagina [[Schimbarea vitezei subtitrărilor|/guides/subtitle-speed-converter.html]]; dacă nu deosebești deplasarea generală de derivarea treptată, vezi [[Subtitrările se decalează spre final|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -49,6 +49,12 @@
     tnG3: 'Masa & Pembersihan',
     tnG4: 'Ekstrak & Kelompok',
     tnAll: 'Semua alat',
-    tcClD: 'Buang iklan, tera air dan isyarat SDH — 13 peraturan boleh togol'
+    tcClD: 'Buang iklan, tera air dan isyarat SDH — 13 peraturan boleh togol',
+    navYt: 'Kapsyen YT',
+    tcYtD: 'Alihkan pemecahan baris kembali ke tempat ayat sebenar berakhir',
+    navAu: 'Audio ke Sarikata',
+    tcAuD: 'Pengecaman pertuturan dalam pelayar anda: audio atau video masuk, SRT keluar',
+    navOc: 'OCR Video',
+    tcOcD: 'Baca sarikata yang tertanam dalam gambar, bingkai demi bingkai'
   };
 })();

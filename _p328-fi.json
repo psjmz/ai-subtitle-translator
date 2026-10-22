@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "fi": {
+      "seo": {
+        "title": "Merkkisotkun korjaus käytössä – tunnista koodaus – AI-SRTSub",
+        "desc": "Merkkisotkun korjaus: tunnista alkuperäinen koodaus (GBK / Big5 / Shift_JIS / EUC-KR), lajittele ehdokkaat sen mukaan mikä näyttää eniten kieleltä, tallenna UTF-8:na BOM:in kanssa tai GBK:na.",
+        "h1": "Merkkisotkun korjaus käytössä",
+        "intro": "Kun tekstitys aukeaa pelkkänä merkkisotkuna, tiedosto ei yleensä ole rikki – se on luettu väärällä koodauksella. Korjain tunnistaa alkuperäisen koodauksen ja vaihtaa väärin luetut merkit takaisin.",
+        "ctaText": "Avaa merkkisotkun korjain"
+      },
+      "body": [
+        {
+          "h2": "Minkä ongelman työkalu ratkaisee",
+          "ps": [
+            "Samat tavut luettuna UTF-8:na ja GBK:na tuottavat kaksi täysin eri merkkijoukkoa – tiedosto ei ole rikki, lukuvaiheessa valittiin väärä koodaus. Mitä korjain tekee:"
+          ],
+          "ul": [
+            "Tunnistaa millä koodauksella tiedosto on kirjoitettu ja vaihtaa merkit takaisin oikean joukon mukaan",
+            "Kertoo missä vika on: korvausmerkki, ohjausmerkki, valuuttamerkki, tarkemerkillisiä kirjaimia rivikaupalla, harvinaisia kiinalaisia merkkejä putkina",
+            "Lajittelee ehdokkaat sen mukaan mikä näyttää eniten kieleltä – valitse yksi ja tallenna",
+            "Jos soitin ei tunnista koodausta, tallenna kopio UTF-8:na BOM:in kanssa tai GBK:na ja anna se soittimelle"
+          ]
+        },
+        {
+          "h2": "Lähetä tiedosto, älä liitä",
+          "ps": [
+            "Kaksi sisäänkäyntiä korjaavat eri laajuuden, **lähetä tiedosto jos voit**. Tiedostoa lähetettäessä alkuperäiset tavut ovat tallella: työkalu voi kokeilla jokaista koodausta, tunnistaa GBK:n ja purkaa sen GBK:na – mitään ei tarvitse arvata. Liitetty teksti ei ole enää alkuperäisiä tavuja: kun selain antaa merkkijonon, väärä askel on jo tapahtunut, jäljellä on vain päättely taaksepäin ja korjautuu sen verran kuin korjautuu.",
+            "Jos liitetyssä sisällössä on jo korvausmerkki (se neliönmuotoinen kysymysmerkki `�`), alkuperäiset tavut ovat kadonneet eikä kukaan saa niitä takaisin. Silloin sivu sanoo suoraan: palaa ylös ja lähetä alkuperäinen tiedosto kohdasta „Valitse tiedosto”."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Korjaussivun latausalue: pudotusala ja liittämiskenttä, yllä näkyy tunnistettu koodaus",
+            "cap": "Pudota tiedosto tai valitse se; liittämiskenttä on alempana ja korjaa paljon vähemmän"
+          }
+        },
+        {
+          "h2": "Mitä diagnoosi kertoo",
+          "ps": [
+            "Latauksen jälkeen diagnoosialue antaa johtopäätöksen. **Merkkisotkua ei löytynyt**: sisältö luetaan normaalisti – jos soitin näyttää yhä sotkua, soitin on valinnut väärän koodauksen, jolloin tallenna alla toisella koodauksella ja anna se soittimelle. Kun tulos **näyttää merkkisotkulta**, se listaa minkä jäljen:"
+          ],
+          "ul": [
+            "Sisällä on korvausmerkki – alkuperäiset tavut ovat jo kadonneet",
+            "Mukana on ohjausmerkkejä",
+            "Sekassa on valuutta- ja matematiikkasymboleita",
+            "Tarkemerkillisiä kirjaimia rivikaupalla – kuin UTF-8 olisi luettu yksitavuisena (`ä½ å¥½`)",
+            "Kiinalaisia merkkejä putkina ilman yhtään yleistä merkkiä – kuin UTF-8 olisi luettu GBK:na (`浣犲ソ`)"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnoosikortti: johtopäätös ja sotkun jäljet lueteltuna rivi riviltä",
+            "cap": "Diagnoosi listaa jäljet tyypeittäin, ei vain yhtä lausetta „on sotkua”"
+          }
+        },
+        {
+          "h2": "Miten ehdokkaat lajitellaan ja valitaan",
+          "ps": [
+            "Kohdan „Näin voi korjata” alla ehdokkaat on lajiteltu sen mukaan **mikä näyttää eniten kieleltä**, enintään 12 kappaletta, jokainen merkittynä sillä mistä koodauksesta mihin se luettiin. Klikkaa yhtä ja katso tulos, valinnan jälkeen tallenna alla; jos et ole tyytyväinen, valitse „jätä ennalleen” ja palaat alkuperäiseen.",
+            "Lajittelu perustuu pisteisiin: yleisten merkkien osuus, tarkemerkkien jonot, symbolijonot ja harvinaiset kiinalaiset merkit lasketaan mukaan. **Jos pisteet eivät ole selvästi paremmat, mitään ei suositella** – ehdokasta ei keksitä väkisin. Kahdesti väärin tallennetuille (kerran tallennettu väärin, kerran korjattu väärin) työkalu päättelee ensimmäisille ehdokkaille vielä yhden kerroksen taaksepäin, kahden kerroksen sisällä on mahdollisuus pelastua."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Korjausehdokkaiden lista: lajiteltu sen mukaan mikä näyttää kieleltä, jokainen merkitty koodausparilla",
+            "cap": "Ehdokkaat lajitellaan sen mukaan mikä näyttää eniten kieleltä, jokainen merkitty koodausparilla"
+          }
+        },
+        {
+          "h2": "Tallennus on viimeinen askel",
+          "ps": [
+            "Korjattu teksti pitää myös tallentaa oikein. Jos soitin ei tunnista UTF-8:aa, tallenna **UTF-8 BOM:in kanssa** (Windowsin soittimet tunnistavat koodauksen BOM:ista) tai **GBK**, yleensä se riittää. Tallennusmuotoja ovat UTF-8, UTF-8 (BOM), GBK, Big5, Shift_JIS ja EUC-KR; jos teksti ei mahdu, työkalu kehottaa vaihtamaan toiseen (esimerkiksi GBK ei mahdu koreaa). Ladattuun tiedostonimeen lisätään `-fixed`.",
+            "Kun tunnistettu koodaus ei ole UTF-8, tallennus on jo valmiiksi asetettu „UTF-8:aan BOM:in kanssa”; jos itse kosket pudotusvalikkoon, sitä ei enää muuteta puolestasi."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Tulosalue: tekstikenttä, tallennusmuodon pudotusvalikko ja latauspainike",
+            "cap": "Valitse koodaus ja lataa – tiedostonimeen lisätään automaattisesti -fixed"
+          }
+        },
+        {
+          "h2": "Mikä ei muutu",
+          "ps": [
+            "Vain väärin luetut merkit vaihtuvat. Numerointi, aikajana ja ASS:n tyyliohjeet eivät muudu yhdeltäkään merkiltä."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Lähetin tiedoston, miksi pitää vielä tallentaa?** Tiedosto ei useinkaan ole rikki – soitin valitsi väärän koodauksen. Tällöin tekstistä ei tarvitse muuttaa mitään: tallenna kopio UTF-8:na BOM:in kanssa tai GBK:na ja anna se soittimelle.",
+            "**Miksi liitettyä ei saa korjattua?** Kun liitetyssä sisällössä on korvausmerkki, alkuperäiset tavut ovat poissa eikä taaksepäin päättelylle ole perustetta. Palaa ylös ja lähetä alkuperäinen tiedosto kohdasta „Valitse tiedosto”.",
+            "**Ehdokkaissa ei ole sitä mitä haluan?** Jos pisteet eivät ole selvästi parempia kuin nykyisessä, työkalu ei suosittele mitään. Vaihda ensin „tunnistettu koodaus” toiseksi ja anna sen lajitella uudelleen.",
+            "**Montako kerrallaan?** Yhden. Kun korjaus on ladattu, lähetä seuraava."
+          ]
+        },
+        {
+          "h2": "Yksityisyys",
+          "ps": [
+            "Tunnistus ja korjaus tapahtuvat kokonaan paikallisesti selaimessa; tekstitysten sisältöä ei lähetetä palvelimelle."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Mistä merkkisotku tulee, kerrotaan sivulla [[Mistä tekstitysten merkkisotku tulee|/guides/subtitle-garbled-characters.html]]; jos koodaus on kunnossa mutta sisältö on likaista, käytä [[Tekstitysten puhdistus|/clean.html]]; aikajanan ja merkkimäärien tarkistukseen [[Tekstitysten laaduntarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "fi": {
+      "seo": {
+        "title": "Mistä tekstitysten merkkisotku tulee – tunnistettu on korjattu – AI-SRTSub",
+        "desc": "Merkkisotku ei ole rikkinäinen tiedosto vaan tavuja luettuna väärällä koodauksella. Korvausmerkki, tarkemerkkijonot ja harvinaiset merkit kertovat kukin eri syystä.",
+        "h1": "Mistä tekstitysten merkkisotku tulee",
+        "intro": "Samat tavut luettuna UTF-8:na ja GBK:na tuottavat kaksi täysin eri merkkijoukkoa. Miltä sotku näyttää, on suora todiste siitä missä vaiheessa mentiin pieleen.",
+        "ctaText": "Avaa merkkisotkun korjain"
+      },
+      "body": [
+        {
+          "h2": "Tiedosto ei ole rikki, se luettiin väärin",
+          "ps": [
+            "Tekstitystiedostossa on tavuja. Jotta tavuista tulee merkkejä, on tiedettävä millä koodauksella ne on kirjoitettu – jos tämä valinta menee pieleen, tuloksena on merkkisotkua. Tiedostosta ei puutu yhtään tavua: lue se toisella koodauksella, niin merkit tulevat takaisin.",
+            "Siksi sotkussa on kaksi eri asiaa: **tunnistaa millä koodauksella se on kirjoitettu** ja **tallentaa koodauksella jonka soitin tunnistaa**. Edellinen perustuu koelukuun ja pisteisiin, jälkimmäinen tallennukseen. Ne korjaavat eri ongelman."
+          ]
+        },
+        {
+          "h2": "Viisi ulkonäköä, viisi syytä",
+          "ps": [
+            "Merkkisotku ei synny sattumalta – sen ulkonäkö paljastaa syyn suoraan:"
+          ],
+          "ul": [
+            "**Tarkemerkillisiä kirjaimia putkina** (`ä½ å¥½`): UTF-8:n kiina luettiin yksitavuisena koodauksena – kiina on UTF-8:ssa kolme tavua per merkki ja yksitavuinen luku tulkitsee jokaisen tavun omaksi kirjaimekseen",
+            "**Kiinalaisia merkkejä putkina ilman yhtään yleistä merkkiä** (`浣犲ソ`): UTF-8 luettiin GBK:na – tavut paritettiin uudelleen kahden ryhmissä ja tuloksena on harvinaisia merkkejä",
+            "**Valuutta- ja matematiikkasymboleita**: tavut osuivat symbolialueelle, tyypillistä kun tiedosto on luettu Mac Roman tai Latin-1 -koodauksena",
+            "**Ohjausmerkkejä seassa**: tavut osuivat näkymättömälle ohjausalueelle, näkyy ruudulla tyhjinä tai neliöinä",
+            "**Neliömäinen kysymysmerkki `�`**: tämä on **korvausmerkki**, ei merkkisotkua – se kertoo että tässä oli merkki, joka katosi jo lukuvaiheessa"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnoosikortti: merkkisotkun jäljet lueteltuna rivi riviltä",
+            "cap": "Diagnoosi jakaa sotkun syihin, ei sulje kaikkea yhteen lauseeseen"
+          }
+        },
+        {
+          "h2": "Miksi korvausmerkkiä ei voi korjata",
+          "ps": [
+            "Korvausmerkki on ratkaiseva raja. Kun `�` ilmestyy, tavut katosivat **aiemmassa vaiheessa** – yleensä jokin ohjelma luki tiedoston ja tallensi sen uudelleen – eikä kadonneesta osasta ole mitään tietoa. Silloin taaksepäin päättelylle ei ole perustetta ja kukaan ei saa sitä takaisin.",
+            "Siksi korjaussivu käsittelee kahta tilannetta eri tavalla: tiedostoa lähetettäessä alkuperäiset tavut ovat tallella ja jokaista koodausta voi kokeilla; jos liitetyssä sisällössä on jo korvausmerkki, sanotaan suoraan että korjaus ei onnistu ja pyydetään alkuperäistä tiedostoa.",
+            "Samalla kannattaa huomata päinvastainen tilanne: sisältö luetaan täysin normaalisti, mutta soittimessa näkyy yhä sotkua. Se ei ole tiedoston vika vaan **soitin valitsi väärän koodauksen**. Tiedoston muuttaminen ei auta – tallenna kopio UTF-8:na BOM:in kanssa tai GBK:na ja anna se soittimelle."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Latausalue: pudottamalla lataaminen ja liittäminen",
+            "cap": "Lähetä tiedosto jos voit – vasta tavut tekevät korjauksen mahdolliseksi"
+          }
+        },
+        {
+          "h2": "Mitä korjauksessa verrataan",
+          "ps": [
+            "Työkalu kokeilee jokaisen mahdollisen koodauksen ja antaa jokaiselle tulokselle pisteet: kuinka paljon yleisiä merkkejä, onko tarkemerkkien jonoja, onko symbolijonoja, ovatko kiinalaiset merkit putkina harvinaisia. Eniten pisteitä saanut tulos on ensimmäisenä.",
+            "**Jos pisteet eivät ole selvästi paremmat, mitään ei suositella** – mieluummin sanotaan suoraan että tämä luetaan normaalisti kuin tarjotaan väkinäinen tulos. Kahdesti väärin tallennetuille päätellään vielä yksi kerros taaksepäin."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Ehdokaslista: lajiteltu pisteiden mukaan, jokainen merkitty koodausparilla",
+            "cap": "Ehdokkaat lajitellaan pisteillä; ilman selvää paremmuutta mitään ei suositella"
+          }
+        },
+        {
+          "h2": "Vasta oikea koodaus viimeistelee",
+          "ps": [
+            "Korjattu teksti pitää tallentaa koodauksella jonka soitin tunnistaa. Windowsin soittimet tunnistavat koodauksen usein BOM:ista, joten **UTF-8 BOM:in kanssa** on vaivattomin; vanhat laitteet ja kiinalaiset soittimet tunnistavat GBK:n. Vaihtoehdot ovat UTF-8, UTF-8 (BOM), GBK, Big5, Shift_JIS ja EUC-KR; jos teksti ei mahdu, työkalu kehottaa vaihtamaan toiseen."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Tulosalue: tallennusmuodon pudotusvalikko ja latauspainike",
+            "cap": "Tallenna koodauksella jonka soitin tunnistaa – vasta sitten sotku on oikeasti selvitetty"
+          }
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Koko toimenpide on sivulla [[Merkkisotkun korjaus käytössä|/guides/repair.html]]; mitä SRT-tiedostossa oikein on, kerrotaan sivulla [[Mitä SRT-tiedostossa on|/guides/srt-file-format.html]]; jos koodaus on kunnossa mutta sisältö on likaista (vesileimat, mainokset, kuulovammaisille tarkoitetut merkinnät), käytä [[Tekstitysten puhdistus|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "fi": {
+      "seo": {
+        "title": "Muunnos yksinkertainen–perinteinen – Taiwan ja Hongkong – AI-SRTSub",
+        "desc": "Yhdeksän muunnossuuntaa: Taiwanin perinteinen joko sanat vaihtamalla tai vain merkkimuotona, Hongkongille oma joukkonsa, myös takaisin yksinkertaiseen. Vain repliikit muuttuvat.",
+        "h1": "Yksinkertaisen ja perinteisen muunnos käytössä",
+        "intro": "Sama tekstitys menee Taiwaniin, Hongkongiin tai Manner-Kiinaan – sanat ja merkkimuodot ovat eri. Muunnossivulla on yhdeksän suuntaa, ja vain repliikkien teksti muuttuu.",
+        "ctaText": "Avaa muunnos"
+      },
+      "body": [
+        {
+          "h2": "Minkä ongelman työkalu ratkaisee",
+          "ps": [
+            "Yksinkertaisen ja perinteisen muunnos ei ole vain jokaisen merkin vaihtamista. Sama yksinkertainen sana vastaa eri sanoja eri alueilla – ohjelmisto on Taiwanissa yksi sana ja Hongkongissa toinen, tieto on Taiwanissa eri sana. Muunnossivu käsittelee nämä erikseen:"
+          ],
+          "ul": [
+            "Yksinkertainen → perinteinen (yleinen / Taiwan / Hongkong)",
+            "Perinteinen → yksinkertainen (yleinen / Taiwanin perinteisestä / Hongkongin perinteisestä)",
+            "Perinteisten välinen merkkimuodon vaihto (Taiwanin muotoon / Hongkongin muotoon)",
+            "Yksi yksinkertainen merkki, monta perinteistä – ratkaistaan sanan mukaan, ei merkki kerrallaan"
+          ]
+        },
+        {
+          "h2": "Lataaminen ja tunnistus",
+          "ps": [
+            "Pudota tiedosto tai valitse se; tuettuja ovat SRT, VTT, ASS ja TXT, ja voit myös liittää tekstityksen sisällön suoraan. Latauksen jälkeen formaatti tunnistetaan automaattisesti ja näytetään kohdassa „Tunnistettu formaatti”."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Muunnossivun latausalue: pudotusala ja liittämiskenttä, yllä näkyy tunnistettu formaatti",
+            "cap": "SRT / VTT / ASS / TXT, formaatti tunnistetaan automaattisesti"
+          }
+        },
+        {
+          "h2": "Miten yhdeksän suuntaa valitaan",
+          "ps": [
+            "Kohdan „Muunnossuunta” yhdeksän suuntaa jakautuvat kolmeen ryhmään. **Yksinkertainen → perinteinen**: yleinen perinteinen, Taiwanin perinteinen (sanat vaihtaen), Taiwanin perinteinen (vain merkkimuoto), Hongkongin perinteinen. **Perinteinen → yksinkertainen**: yleinen, Taiwanin perinteisestä, Hongkongin perinteisestä. **Perinteisten välinen merkkimuodon vaihto**: Taiwanin muotoon, Hongkongin muotoon.",
+            "„Taiwanin sanat” vaihtaa ohjelmisto-sanan taiwanilaiseen muotoon ja tieto-sanan vastaavaan paikalliseen sanaan; „Taiwanin merkkimuoto” vaihtaa vain kirjoitusasun eikä koske sanoihin. Hongkong on oma joukkonsa: ohjelmisto kirjoitetaan siellä toisin. Takaisin yksinkertaiseen valitaan alempi ryhmä – mistä perinteisestä palataan on sanottava tarkasti, koska Taiwanin ja Hongkongin reitti yksinkertaiseen on eri."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Muunnossuuntakortti: pudotusvalikko „muunna muotoon”, valittuna yksinkertainen → Taiwanin perinteinen (sanat vaihtaen)",
+            "cap": "Suunta valitaan pudotusvalikosta, yhdeksän suuntaa on ryhmitelty kolmeen; tässä on Taiwanin perinteinen sanat vaihtaen"
+          }
+        },
+        {
+          "h2": "Tulos ja vienti",
+          "ps": [
+            "Tulosalue antaa heti muunnetut tekstitykset ja tilastopalkki näyttää rivien kokonaismäärän ja muutettujen rivien määrän. Jos yksikään merkki ei muutu, tulee huomautus että näissä tekstityksissä ei ehkä ole kiinalaisia merkkejä – muunnos koskee vain kiinalaisia merkkejä, joten pelkkä englanti tai numerot eivät muutu.",
+            "Vahvistuksen jälkeen lataa tai kopioi. Ladattuun tiedostonimeen lisätään kielitunniste – `demo.srt` muunnettuna Taiwanin perinteiseksi on `demo.zh-TW.srt`, yleiseksi perinteiseksi `.zh-Hant` ja takaisin yksinkertaiseksi `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Tulosalue: muunnetut tekstitykset ja tilastopalkki",
+            "cap": "Tilastopalkki antaa rivien kokonaismäärän ja muutettujen rivien määrän"
+          }
+        },
+        {
+          "h2": "Mikä ei muutu",
+          "ps": [
+            "Vain repliikkien teksti muuttuu. Aikajana, numerot ja ASS:n tyyliohjeet eivät muudu yhdeltäkään merkiltä – muunnoksen jälkeen tiedosto on heti käyttövalmis, formaattia ei tarvitse säätää uudelleen."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Miksi sanaa ei muunnettu niin kuin odotin?** Kun yhdelle yksinkertaiselle merkille on useita perinteisiä, ratkaisu tehdään sanan mukaan: sama merkki menee eri sanoissa eri perinteiseen merkkiin. Sanasto on peräisin OpenCC:stä ja muuntaa sanaryhmittäin, ei merkki kerrallaan.",
+            "**Miten Taiwanin ja Hongkongin perinteinen eroavat?** Sanastoltaan: sama termi kirjoitetaan Taiwanissa ja Hongkongissa eri tavalla. Valitse sen alueen suunta johon tekstitys lähetetään.",
+            "**Muuttuiko merkkimäärä?** Vain kiinalaiset merkit vaihtuvat, tekstityksiä ei lisätä eikä poisteta eikä aikajanaa muuteta. Jos rivimäärä muuttui, tarkista tunnistettiinko formaatti väärin latausvaiheessa.",
+            "**Mitä jos sanasto ei lataudu?** Sivu kehottaa päivittämään ja yrittämään uudelleen. Sanasto latautuu paikallisesti, tekstityksiä ei tarvitse lähettää mihinkään."
+          ]
+        },
+        {
+          "h2": "Yksityisyys",
+          "ps": [
+            "Muunnos tapahtuu kokonaan paikallisesti selaimessa; tekstitysten sisältöä ei lähetetä palvelimelle."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Jos tarvitset vain yksinkertaisesta perinteiseen -muunnoksen, katso [[Yksinkertaiset tekstitykset perinteisiksi|/guides/srt-simplified-to-traditional.html]]; miksi muunnos ei ole vain merkin vaihtoa, kerrotaan sivulla [[Muunnos ei ole merkin vaihto|/guides/simplified-traditional-chinese.html]]; vieraille kielille kääntämiseen käytä [[Tekstitysten kääntäminen|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "fi": {
+      "seo": {
+        "title": "Yksinkertaiset tekstitykset perinteisiksi – Taiwan ja Hongkong – AI-SRTSub",
+        "desc": "Muunna yksinkertaiset tekstitykset perinteisiksi: Taiwan (sanat vaihtaen tai vain merkkimuoto) tai Hongkong. Yhdellä merkillä monta perinteistä ratkaistaan sanan mukaan. Vain repliikit muuttuvat.",
+        "h1": "Yksinkertaiset tekstitykset perinteisiksi",
+        "intro": "Yksinkertaiset kiinalaiset tekstitykset menevät Taiwanin tai Hongkongin yleisölle – yksi muunnos riittää. Taiwan ja Hongkong ovat kaksi eri joukkoa; väärällä suunnalla sanat ovat paikallisesti vääriä.",
+        "ctaText": "Muunna nämä tekstitykset"
+      },
+      "body": [
+        {
+          "h2": "Tämä tarve",
+          "ps": [
+            "Tekstitykset ovat yksinkertaista kiinaa ja ne menevät Taiwanin tai Hongkongin yleisölle. Merkki merkiltä muuttaminen ei ole realistista – yhdessä jaksossa on satoja tekstityksiä. Lisäksi Taiwan ja Hongkong eivät halua samaa perinteistä: sanasto on eri, ja väärällä suunnalla tulos ei ole sellaista kuin siellä puhutaan."
+          ]
+        },
+        {
+          "h2": "Missä sen tekee",
+          "ps": [
+            "Avaa [[Muunnos yksinkertainen–perinteinen|/hanconv.html]], pudota tekstitykset ja valitse kohdasta „Muunnossuunta” jokin suunta yksinkertaisesta perinteiseen: yleinen perinteinen, Taiwanin perinteinen (sanat vaihtaen), Taiwanin perinteinen (vain merkkimuoto) tai Hongkongin perinteinen. Muunnos valmistuu heti ja tulosalue antaa valmiit tekstitykset – lataa ne.",
+            "**Taiwanin yleisölle**: jos sanatkin saa vaihtua, valitse „Taiwanin perinteinen (sanat vaihtaen)” – ohjelmisto ja tieto muuttuvat paikallisiksi sanoiksi; jos haluat vain merkkimuodon ja pitää omat sanasi, valitse „Taiwanin perinteinen (vain merkkimuoto)”. **Hongkongin yleisölle**: valitse „Hongkongin perinteinen”, jossa ohjelmisto kirjoitetaan toisin."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Muunnossuuntakortti: pudotusvalikko „muunna muotoon”, valittuna yksinkertainen → Taiwanin perinteinen (sanat vaihtaen)",
+            "cap": "Taiwan ja Hongkong ovat pudotusvalikossa kaksi suuntaa, sanasto on eri"
+          }
+        },
+        {
+          "h2": "Yleiset sudenkuopat",
+          "ps": [
+            "**Yksi merkki, monta perinteistä – älä huoli**: samalla yksinkertaisella merkillä on eri sanoissa eri perinteinen vastine; sanasto ratkaisee sanaryhmän mukaan eikä muuta kaikkea samaksi merkiksi.",
+            "**Vain repliikkien teksti**: aikajana, numerot ja ASS:n tyyliohjeet eivät muutu lainkaan, muunnoksen jälkeen tiedosto on heti käyttövalmis.",
+            "**Jos mikään ei muuttunut**: jos tilastopalkki näyttää 0 muutettua riviä, näissä tekstityksissä ei ehkä ole kiinalaisia merkkejä tai formaatti on tunnistettu väärin – tarkista kohdasta „Tunnistettu formaatti” onko se se jonka lähetit."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät",
+          "ps": [
+            "Yhdeksän suunnan koko selitys on sivulla [[Yksinkertaisen ja perinteisen muunnos käytössä|/guides/hanconv.html]]; miksi muunnos ei ole vain merkin vaihtoa, kerrotaan sivulla [[Muunnos ei ole merkin vaihto|/guides/simplified-traditional-chinese.html]]; myös perinteisestä yksinkertaiseen tehdään sivulla [[Muunnos yksinkertainen–perinteinen|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "fi": {
+      "seo": {
+        "title": "Muunnos ei ole merkin vaihto – yhdellä monta – AI-SRTSub",
+        "desc": "Muunnos kaatuu kolmeen asiaan: yhdellä merkillä on monta perinteistä, Taiwan ja Hongkong käyttävät eri sanoja, ja vain repliikkien teksti saa muuttua.",
+        "h1": "Muunnos ei ole merkin vaihto",
+        "intro": "Mihin perinteiseen merkkiin yksinkertainen merkki vaihtuu, riippuu sitä edeltävästä merkistä. Siksi muunnosta ei voi tehdä merkki kerrallaan.",
+        "ctaText": "Avaa muunnos"
+      },
+      "body": [
+        {
+          "h2": "Ensimmäinen asia: yksi merkki, monta perinteistä",
+          "ps": [
+            "Yksinkertaistaminen yhdisti useita perinteisiä merkkejä yhdeksi yksinkertaiseksi. Takaisin muunnettaessa yhdellä yksinkertaisella merkillä on useita perinteisiä vastineita, ja valinta riippuu siitä minkä merkin kanssa se esiintyy:",
+            "Merkki kerrallaan vaihtaminen muuttaa kaiken samaksi merkiksi ja koko teksti on väärin. Vasta **sanan mukaan ratkaiseminen** erottaa ne – sanasto on peräisin OpenCC:stä ja täsmää ensin sanaryhmään, vasta sitten yksittäiseen merkkiin. Esimerkiksi:"
+          ],
+          "ul": [
+            "Sama merkki sanassa joka tarkoittaa puhdasta menee yhteen perinteiseen merkkiin, sanassa joka tarkoittaa puunrunkoa toiseen",
+            "Sanassa joka tarkoittaa hiuksia yhteen merkkiin, sanassa joka tarkoittaa kehitystä toiseen",
+            "Sanassa joka tarkoittaa takana yhteen merkkiin, sanassa joka tarkoittaa kuningatarta toiseen"
+          ]
+        },
+        {
+          "h2": "Toinen asia: Taiwan ja Hongkong eivät ole sama",
+          "ps": [
+            "Perinteiseksi muuntamisen jälkeen on vielä yksi ero: sama sana kirjoitetaan Taiwanissa ja Hongkongissa eri merkeillä. Tavallinen ohjelmisto-sana kirjoitetaan Taiwanissa yhdellä tavalla ja Hongkongissa toisella; tieto-sana on Taiwanissa eri sana.",
+            "Siksi muunnossuunnat on eroteltu: Taiwanin perinteisessä on kaksi vaihtoehtoa, sanat vaihtaen ja vain merkkimuoto – vain merkkimuoto säilyttää omat sanasi, sanat vaihtaen muuttaa myös alueelliset termit. Hongkong on oma suuntansa."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Muunnossuuntakortti: pudotusvalikko „muunna muotoon”, valittuna yksinkertainen → Taiwanin perinteinen (sanat vaihtaen)",
+            "cap": "Taiwanille voi vaihtaa sanat tai vain merkkimuodon, Hongkongilla on oma suuntansa"
+          }
+        },
+        {
+          "h2": "Kolmas asia: vain repliikkien teksti saa muuttua",
+          "ps": [
+            "Tekstitystiedosto ei ole pelkkiä repliikkejä. Siinä on myös numerot, aikajana ja ASS:n tyyliohjeet, eikä niistä saa muuttaa yhtään merkkiä – erityisesti ASS:n tyyliriveillä on seassa englanninkielisiä ohjeiden nimiä, jotka rikkoutuvat jos niitä käsitellään tekstinä.",
+            "Siksi muunnos tehdään formaatin purkamisen jälkeen: SRT:stä, VTT:stä, ASS:sta ja TXT:stä tunnistetaan erikseen tekstiosa ja vain sen kiinalaiset merkit vaihdetaan. Muunnoksen jälkeen aikajana ja tyylit säilyvät ennallaan eikä formaattia tarvitse säätää uudelleen."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Tulosalue: muunnetut tekstitykset ja tilastopalkki, jossa näkyy muutettujen rivien määrä",
+            "cap": "Tilastopalkki antaa muutettujen rivien määrän, formaattiosa säilyy ennallaan"
+          }
+        },
+        {
+          "h2": "Takaisin yksinkertaiseen – mitä huomioida",
+          "ps": [
+            "Myös perinteisestä yksinkertaiseen muunnettaessa pitää kertoa **mistä perinteisestä palataan**: yleinen perinteinen, Taiwanin perinteinen ja Hongkongin perinteinen ovat kolme eri reittiä, koska Taiwanin ja Hongkongin alueelliset sanat palautetaan yleisiksi sanoiksi ennen muunnosta. Väärällä suunnalla yksinkertaiseen jää alueellisia sanoja.",
+            "Yhdeksästä suunnasta alempi ryhmä on ne jotka palaavat yksinkertaiseen: perinteinen → yksinkertainen, Taiwanin perinteinen → yksinkertainen, Hongkongin perinteinen → yksinkertainen."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Koko toimenpide on sivulla [[Yksinkertaisen ja perinteisen muunnos käytössä|/guides/hanconv.html]]; jos tarvitset vain yksinkertaisesta perinteiseen -muunnoksen, katso [[Yksinkertaiset tekstitykset perinteisiksi|/guides/srt-simplified-to-traditional.html]]; vieraille kielille kääntämiseen käytä [[Tekstitysten kääntäminen|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "fi": {
+      "seo": {
+        "title": "Tekstitykset Excel/CSV-muotoon ja takaisin – kaksisuuntainen muunnos – AI-SRTSub",
+        "desc": "SRT tai VTT Exceliksi tai CSV:ksi ja takaisin tekstitykseksi. Taulusta tunnistetaan alku-, loppu- ja tekstisarake, järjestys on vapaa. Aika säilyy tekstinä.",
+        "h1": "Tekstitykset Excel/CSV-muotoon ja takaisin",
+        "intro": "Tarkistus ja kääntäminen sujuvat parhaiten taulukossa. Tekstitys viedään Exceliin tai CSV:hen, rivit korjataan ja tuodaan takaisin – aika säilyy tekstinä ja repliikkien rivinvaihdot eivät katoa.",
+        "ctaText": "Avaa taulukkomuunnos"
+      },
+      "body": [
+        {
+          "h2": "Minkä ongelman työkalu ratkaisee",
+          "ps": [
+            "Tekstitys on rivi riviltä eteneviä merkintöjä ja taulukkokin on rivi riviltä – taulukkomuodossa tarkistus, kommentointi ja joukkokääntäminen hoituvat tutuilla taulukkotoiminnoilla. Molemmat suunnat ovat tuettuja:"
+          ],
+          "ul": [
+            "**Taulukoksi**: SRT ja VTT viedään Exceliin (.xlsx) tai CSV:hen, yksi rivi per tekstitys, sarakkeina numero, alku, loppu ja teksti",
+            "**Tekstitykseksi**: korjattu taulukko tuodaan takaisin SRT:ksi tai VTT:ksi",
+            "Aikasarakkeet säilyvät tekstinä – taulukko-ohjelma ei muuta niitä numeroiksi tai päivämääriksi",
+            "Repliikkien rivinvaihdot säilyvät ja palaavat ennalleen tuonnissa"
+          ]
+        },
+        {
+          "h2": "Lataaminen ja suunnan valinta",
+          "ps": [
+            "Pudota tiedosto tai valitse se. Kaksi suuntaa tarvitsevat eri tiedoston: **taulukoksi** tarvitaan tekstitys (SRT / VTT), **tekstitykseksi** taulukko (CSV / Excel, myös xlsx ja xls). Jos suunta on valittu väärin, sivu kertoo suoraan mitä tämä tila tarvitsee.",
+            "⚠️ Tämä sivu lukee vain UTF-8:na. Jos tekstitys aukeaa kysymysmerkkeinä tai neliöinä, korjaa koodaus ensin sivulla [[Merkkisotkun korjaus|/repair.html]] – rikkinäinen koodaus näkyy täällä pelkkinä korvausmerkkeinä."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Taulukkomuunnossivun latausalue: pudotusala ja kahden tilan vaihto",
+            "cap": "Kaksi tilaa tarvitsevat eri tiedoston: taulukoksi tekstitys, tekstitykseksi taulukko"
+          }
+        },
+        {
+          "h2": "Tekstitys taulukoksi",
+          "ps": [
+            "Valitse „Taulukoksi” ja pudota tekstitys – esikatselu listaa jokaisen merkinnän: numero, alku, loppu, teksti. Tilastopalkki antaa merkintöjen määrän ja kokonaisajan. Vahvista ja valitse „Lataa Excel (.xlsx)” tai „Lataa CSV”.",
+            "Kahden vientimuodon ero: xlsx on oikea taulukkotiedosto, jossa Excel ei muuta aikasarakkeen muotoa omatoimisesti; CSV on yleisempi, mutta Excelissä avattaessa aikasarake saatetaan näyttää toisin – jos näin käy, aseta sarakkeen muodoksi „Teksti” tai käytä suoraan xlsx:ää."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Taulukon esikatselu: sarakkeet numero, alku, loppu ja teksti sekä tilastopalkki",
+            "cap": "Esikatselu listaa merkinnät, tilastopalkki antaa määrän ja kokonaisajan"
+          }
+        },
+        {
+          "h2": "Taulukko takaisin tekstitykseksi",
+          "ps": [
+            "Valitse „Tekstitykseksi” ja pudota taulukko. Sarakkeiden tunnistus: taulussa pitää olla **alku-, loppu- ja tekstisarake** (myös englanninkieliset Start / End / Text käyvät), **sarakkeiden järjestys on vapaa**. Aika käy muodossa `00:00:01,500` tai `00:00:01.500`; tunnistamattomat rivit ohitetaan eikä koko tiedostoa hylätä.",
+            "Tuonnin tulos listataan esikatselussa merkintä kerrallaan, minkä jälkeen ladataan SRT tai VTT. Jos kolmea saraketta ei löydy, sivu kehottaa tarkistamaan sarakkeiden nimet – yleensä syynä on viennissä käytetyt toiset nimet tai otsikkorivi joka ei ole ensimmäinen."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Tekstityksen tulosalue: tuodut tekstitykset listattuna merkintä kerrallaan",
+            "cap": "Jos kolmea saraketta ei tunnisteta, siitä kerrotaan suoraan – ei hiljaista epäonnistumista"
+          }
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Excel näyttää aikasarakkeen väärin?** Valitse CSV:n sijaan xlsx, jolloin ongelmaa ei ole. Jos käytät CSV:tä: valitse aikasarake ja aseta sen muodoksi „Teksti” ennen avaamista.",
+            "**Pitääkö sarakkeiden nimet olla kiinaksi?** Ei. alku / loppu / teksti ja Start / End / Text käyvät kaikki, kirjainkoolla ei ole väliä.",
+            "**Säilyvätkö rivinvaihdot tuonnissa?** Kyllä. Repliikkien rivinvaihdot säilyvät ja palaavat ennalleen.",
+            "**Entä ASS?** Tämä sivu käsittelee vain SRT:n ja VTT:n. ASS:ssa on tyyliohjeita – muunna se ensin SRT:ksi sivulla [[Formaattimuunnos|/convert.html]].",
+            "**Montako kerrallaan?** Yhden. Jos haluat käsitellä kymmeniä tai satoja, käytä [[Hurttamuunnos|/batch.html]] – se vain muuntaa formaatin, ei vie taulukkoon."
+          ]
+        },
+        {
+          "h2": "Yksityisyys",
+          "ps": [
+            "Muunnos tapahtuu kokonaan paikallisesti selaimessa; tekstitysten sisältöä ei lähetetä palvelimelle."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Jos tarvitset vain vaiheen „tekstitys Exceliin”, katso [[Tekstitykset Exceliin|/guides/srt-to-excel.html]]; korjausten jälkeen vieraille kielille kääntämiseen käytä [[Tekstitysten kääntäminen|/translate.html]]; kymmenien tiedostojen formaatin vaihtoon [[Hurttamuunnos|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "fi": {
+      "seo": {
+        "title": "Tekstitykset Exceliin – SRT xlsx:ksi rivittäin tarkistettavaksi – AI-SRTSub",
+        "desc": "Vie SRT-tekstitykset Exceliin: yksi rivi per tekstitys, sarakkeina numero, alku, loppu ja teksti. Aika säilyy tekstinä eikä repliikkien rivinvaihto katoa.",
+        "h1": "Tekstitykset Exceliin",
+        "intro": "Satojen tekstitysten tarkistaminen tekstieditorissa on raskasta. Excelissä jokainen on yksi rivi: suodatus, kommentit ja joukkokorvaus toimivat. Korjausten jälkeen tuonti takaisin SRT:ksi.",
+        "ctaText": "Vie Exceliin"
+      },
+      "body": [
+        {
+          "h2": "Tämä tarve",
+          "ps": [
+            "Tekstityksiä pitää tarkistaa, sanoja vaihtaa joukkona tai jakaa useammalle ihmiselle oma osansa – nämä käyvät taulukossa huomattavasti nopeammin kuin tekstissä. SRT on sinänsä pelkkää tekstiä, mutta sen merkintärakenne (numero, aika, repliikki) taipuu suoraan taulukon neljäksi sarakkeeksi."
+          ]
+        },
+        {
+          "h2": "Missä sen tekee",
+          "ps": [
+            "Avaa [[Taulukkomuunnos|/table.html]], valitse tila „Taulukoksi”, pudota SRT ja esikatselu listaa heti jokaisen merkinnän – numero, alku, loppu, teksti. Ota tiedosto painikkeella „Lataa Excel (.xlsx)”. Myös VTT käy.",
+            "Korjausten jälkeen: vaihda tilaan „Tekstitykseksi”, pudota taulukko takaisin ja se tuodaan SRT:ksi. Sarakkeiden tunnistus vaatii alku-, loppu- ja tekstisarakkeen (myös Start / End / Text käy), sarakkeiden järjestys on vapaa."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Taulukon esikatselu: jokainen SRT-merkintä yhdellä rivillä, neljä saraketta ja tilastopalkki",
+            "cap": "SRT levittyy suoraan neljäksi sarakkeeksi ja korjausten jälkeen kulkee samaa reittiä takaisin"
+          }
+        },
+        {
+          "h2": "Yleiset sudenkuopat",
+          "ps": [
+            "**Korjaa koodaus ensin**: tämä sivu lukee vain UTF-8:na. Jos tekstityksessä on kysymysmerkkejä tai neliöitä, mene sivulle [[Merkkisotkun korjaus|/repair.html]].",
+            "**CSV vai xlsx**: Exceliin vietäessä valitse xlsx, jolloin aikasarakkeen muoto ei muutu; CSV on yleisempi, mutta Excel saattaa tulkita sen toisin – aseta silloin aikasarakkeen muodoksi „Teksti”.",
+            "**ASS ei käy**: tyyliohjeita sisältävä ASS muunnetaan ensin SRT:ksi ja vasta sitten viedään taulukkoon."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät",
+          "ps": [
+            "Kaksisuuntainen koko selitys on sivulla [[Tekstitykset Excel/CSV-muotoon ja takaisin|/guides/table.html]]; korjausten jälkeen vieraille kielille kääntämiseen käytä [[Tekstitysten kääntäminen|/translate.html]]; ennen luovutusta aja läpi [[Tekstitysten laaduntarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "fi": {
+      "seo": {
+        "title": "Hurttamuunnos käytössä – kerralla sadoista yksi ZIP – AI-SRTSub",
+        "desc": "Pudota kerralla kymmeniä tai satoja SRT/VTT-tiedostoja, muunna yhteen formaattiin ja ota yhtenä ZIP:inä. Numerointi järjestetään, tunnistamattomat jäävät pois paketista.",
+        "h1": "Hurttamuunnos käytössä",
+        "intro": "Kokonaisen kauden formaatin yhtenäistäminen tiedosto kerrallaan on hidasta. Hurttamuunnossivulle ne saa kerralla, muunnos yhteen formaattiin ja pakkaus yhdeksi ZIP:iksi – tunnistamattomat merkitään erikseen eikä niitä piiloteta pakettiin.",
+        "ctaText": "Avaa hurttamuunnos"
+      },
+      "body": [
+        {
+          "h2": "Minkä ongelman työkalu ratkaisee",
+          "ps": [
+            "Kokonaisen kauden tai kokoelman tekstitykset pitää yleensä saada samaan formaattiin ennen kuin ne kelpaavat. Hurttamuunnossivu tekee tämän:"
+          ],
+          "ul": [
+            "Pudota kerralla kymmeniä tai satoja SRT- ja VTT-tiedostoja (monivalinta käy)",
+            "Muunna kaikki SRT:ksi tai VTT:ksi, numerointi järjestetään ja aikaleimat yhtenäistetään kohdeformaatissa",
+            "Pakkaa yhdeksi ZIP:iksi, tiedostonimet säilyvät ja vain pääte vaihtuu",
+            "Tiedostot joista ei löydy tekstityksiä merkitään erikseen eivätkä mene pakettiin"
+          ]
+        },
+        {
+          "h2": "Tiedostojen lisääminen",
+          "ps": [
+            "Pudota useita tekstitystiedostoja kerralla katkoviivaruutuun tai klikkaa ja valitse ne monivalinnalla. Tiedostolista listaa jokaisen erikseen: tunnistetuille näytetään merkintöjen määrä, tunnistamattomille tulee merkintä „ei tunnistettu”. Ylälaidassa on tiedostojen määrä, merkintöjen kokonaismäärä ja tunnistamattomien lukumäärä.",
+            "⚠️ Tämä sivu lukee vain UTF-8:na. Rikkinäisen koodauksen tekstitykset (kysymysmerkkejä tai neliöitä) korjataan ensin sivulla [[Merkkisotkun korjaus|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Tiedostolista: tiedostonimet ja merkintöjen määrät yksi kerrallaan, tunnistamattomat punaisella",
+            "cap": "Lista käy tiedostot läpi yksi kerrallaan, tunnistamattomat merkitään heti"
+          }
+        },
+        {
+          "h2": "Mihin kaikki muunnetaan",
+          "ps": [
+            "Valitse kohdeformaatti kohdasta „Muunna kaikki” – SRT tai VTT. Valinnan jälkeen jokainen tiedosto luodaan uudelleen kohdeformaatissa: numerointi järjestetään alusta ja aikaleimat yhtenäistetään kohdeformaatin mukaan (SRT käyttää pilkkua millisekuntien erottimena, VTT pistettä).",
+            "**Tiedostonimi säilyy, vain pääte vaihtuu**; samannimisille tiedostoille lisätään juokseva numero, joten ne eivät ylikirjoita toisiaan."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Kohdeformaatin valinta ja listan tila, tilastopalkissa tiedostojen ja merkintöjen määrä",
+            "cap": "Kohdeformaatin valinnan jälkeen lista luodaan uudelleen, tiedostonimestä vaihtuu vain pääte"
+          }
+        },
+        {
+          "h2": "Pakkaus ja lataus",
+          "ps": [
+            "Paina „Pakkaa yhdeksi ZIP:iksi ja lataa” – paketissa on kaikki muunnetut tiedostot. **Tiedostot joista ei tunnistettu tekstityksiä eivät mene pakettiin** – ne jäävät listalle merkittyinä eikä niitä esitetä onnistuneina. Pakkauksen valmistuttua kerrotaan kuinka monta tiedostoa paketissa on."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Pakkausalue: ZIP-latauspainike ja pakkauksen tulosilmoitus",
+            "cap": "Tunnistamattomat eivät mene pakettiin vaan jäävät merkityiksi listalle"
+          }
+        },
+        {
+          "h2": "Milloin tulee merkintä „ei tunnistettu”",
+          "ps": [
+            "Jos tiedostosta ei löydy yhtään tekstitysmerkintää, se merkitään tunnistamattomaksi. Kolme yleistä syytä: tiedosto ei ole tekstitys (esimerkiksi joukkoon eksynyt .txt-selitetiedosto), koodaus ei ole UTF-8 (tulos on pelkkiä korvausmerkkejä) tai sisältö on puristettu yhdeksi pätkäksi ilman aikaleimoja.",
+            "Merkityt tiedostot voi käsitellä erikseen: koodausongelma sivulla [[Merkkisotkun korjaus|/repair.html]], formaattiongelma muunnetaan kerran sivulla [[Formaattimuunnos|/convert.html]] ja palautetaan listalle."
+          ]
+        },
+        {
+          "h2": "Usein kysytyt kysymykset",
+          "ps": [
+            "**Montako voi laittaa kerralla?** Ei ole kovaa ylärajaa, se riippuu selaimen muistista; useita satoja SRT:tä menee yleensä hyvin.",
+            "**Muuttaako tämä repliikkejä?** Ei. Hurttamuunnos vaihtaa vain säiliöformaatin, järjestää numeroinnin ja yhtenäistää aikaleimat – repliikit eivät muutu yhdeltäkään merkiltä.",
+            "**Miten muutan sisältöä?** Tämä sivu muuntaa vain formaatin. Aikajanan muutoksiin käytä [[Aikajanan säätö|/shift.html]], tekstin muutoksiin [[Termien korvaus|/glossary.html]] – molemmissa käsitellään tiedosto kerrallaan.",
+            "**Entä ASS?** Tämä sivu muuntaa vain SRT:n ja VTT:n välillä. ASS:ssa on tyylejä – muunna se sivulla [[Formaattimuunnos|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Yksityisyys",
+          "ps": [
+            "Muunnos ja pakkaus tapahtuvat kokonaan paikallisesti selaimessa; tekstitysten sisältöä ei lähetetä palvelimelle."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Mitä kokonaisessa kaudessa muutetaan ja missä järjestyksessä, kerrotaan sivulla [[Kokonaisen kauden tekstitykset kerralla|/guides/batch-convert-srt.html]]; useampi formaatti yhdelle tiedostolle sivulla [[Formaattimuunnos|/convert.html]]; taulukkotarkistukseen [[Taulukkomuunnos|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "fi": {
+      "seo": {
+        "title": "Kokonaisen kauden tekstitykset kerralla – mikä hoituu ja mikä ei – AI-SRTSub",
+        "desc": "Kaudessa muutetaan yleensä yhtä asiaa: formaatti, aikajanan siirto tai termit. Mikä hoituu kerralla, mikä tiedosto kerrallaan ja miten tunnistamattomat hoidetaan.",
+        "h1": "Kokonaisen kauden tekstitykset kerralla",
+        "intro": "Kokonaisessa kaudessa muutettava on yleensä sama asia. Ero siinä mikä hoituu kerralla ja mikä vaatii tiedoston kerrallaan säästää paljon vaivaa.",
+        "ctaText": "Avaa hurttamuunnos"
+      },
+      "body": [
+        {
+          "h2": "Muutettava on yleensä sama asia",
+          "ps": [
+            "Kokonaisen kauden ongelmat ovat harvoin jokaisessa jaksossa erilaisia – yleensä sama syy osuu jokaiseen: koko kauden on pakannut sama tekstitysryhmä (formaatti ja vesileima samat), koko kausi on tehty samaan videoversioon (siirron suunta ja määrä samat) tai nimien käännökset vaihtelevat kauden mittaan.",
+            "Katso ensin kaksi jaksoa (ensimmäinen ja viimeinen) ja varmista että kyse on **samasta viasta** ennen kuin ryhdyt hurttamuunnokseen. Jos ensimmäisessä ja viimeisessä on eri vika, kyse ei ole hurttatyöstä."
+          ]
+        },
+        {
+          "h2": "Mikä hoituu kerralla",
+          "ps": [
+            "**Formaatin yhtenäistäminen** on ainoa joka todella hoituu yhdellä kertaa: kymmenet tai sadat SRT- ja VTT-tiedostot pudotetaan sivulle [[Hurttamuunnos|/batch.html]], valitaan kohdeformaatti ja tulos otetaan yhtenä ZIP:inä. Numeroiden järjestäminen ja aikaleimojen yhtenäistäminen hoituvat samassa vaiheessa, repliikit eivät muutu."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Hurttamuunnossivun tiedostolista: merkintöjen määrät yksi kerrallaan, tunnistamattomat punaisella",
+            "cap": "Formaatin yhtenäistäminen on ainoa joka hoituu yhdellä kertaa"
+          }
+        },
+        {
+          "h2": "Mikä vaatii tiedoston kerrallaan",
+          "ps": [
+            "Näillä ei ole hurttamuunnosta vaan ne käydään läpi tiedosto kerrallaan – mutta ne **tehdään yleensä kerran ja sovelletaan koko kauteen**:"
+          ],
+          "ul": [
+            "**Aikajanan siirto**: jos siirto on sama joka jaksossa, mittaa se yhdessä jaksossa sivulla [[Aikajanan säätö|/shift.html]], ota luku ylös ja syötä sama luku muihin jaksoihin",
+            "**Termien yhtenäistäminen**: termitaulu tehdään kerran sivulla [[Termien korvaus|/glossary.html]] ja sama taulu otetaan joka tiedostoon",
+            "**Vesileimojen poisto**: vesileimasäännöt ovat kiinteitä ja [[Tekstitysten puhdistus|/clean.html]] kattaa yleisimmät oletuksena – pudota tiedostot sinne yksi kerrallaan"
+          ]
+        },
+        {
+          "h2": "Älä tee väärässä järjestyksessä",
+          "ps": [
+            "Kun tehtäviä on useita, väärä järjestys tuottaa uusiksi tekemistä. Tee tässä järjestyksessä:",
+            "**Korjaa koodaus** → **yhtenäistä formaatti** → **tee sisältömuutokset** (vesileimat, termit, aikajana) → **laaduntarkistus**. Jos koodausta ei korjata ennen formaatin vaihtoa, tulos on yhä merkkisotkua; jos formaattia ei yhtenäistetä ennen sisältöä, työkalujen tukemat formaatit vaihtelevat."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Pakkausalue: ZIP-latauspainike ja tulosilmoitus",
+            "cap": "Formaatin yhtenäistäminen ensin, sisältömuutokset vasta sen jälkeen"
+          }
+        },
+        {
+          "h2": "Miten tunnistamattomat hoidetaan",
+          "ps": [
+            "Hurttamuunnoksessa tunnistamattomaksi merkityt tiedostot eivät mene ZIP:iin vaan jäävät listalle. Kolme yleistä syytä: tiedosto ei ole tekstitys (joukkoon eksynyt selitetiedosto), koodaus ei ole UTF-8 tai sisältö on yhtenä pätkänä ilman aikaleimoja.",
+            "Koodausongelma korjataan erikseen sivulla [[Merkkisotkun korjaus|/repair.html]]; formaattiongelma muunnetaan kerran sivulla [[Formaattimuunnos|/convert.html]] ja palautetaan listalle. **Älä täytä pakettia väkisin tunnistamattomilla** – jakson puuttuminen huomataan vasta soittimessa, ja se on paljon hankalampaa kuin yksi minuutti nyt."
+          ]
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Hurttamuunnoksen koko käyttö on sivulla [[Hurttamuunnos käytössä|/guides/batch.html]]; aikajanan yhtenäinen siirto sivulla [[Aikajanan säätö käytössä|/guides/shift.html]]; ennen luovutusta aja läpi [[Tekstitysten laaduntarkistus|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "fi": {
+      "seo": {
+        "title": "Mitä 23.976 / 24 / 25 / 30 fps tarkoittaa – tekstityksen aikajana – AI-SRTSub",
+        "desc": "23.976 ei ole 24 eikä 29.97 ole 30: 0,1 % on peräisin NTSC:n värillistämisestä. PAL-alueen 25 fps nopeuttaa elokuvaa 4 %. Miten luvut vaikuttavat aikajanaan.",
+        "h1": "Mitä 23.976 / 24 / 25 / 30 fps tarkoittaa",
+        "intro": "23.976:n ja 24:n välinen 0,1 % on televisiohistorian jäänne. Se yhdessä PAL:n 4 prosentin kanssa on syy siihen että tekstitys lipuu loppua kohti.",
+        "ctaText": "Avaa aikajanan säätö"
+      },
+      "body": [
+        {
+          "h2": "Mitä nämä neljä lukua ovat",
+          "ps": [
+            "Kuvataajuus kertoo montako kuvaa näytetään sekunnissa. Neljä yleistä:"
+          ],
+          "ul": [
+            "**24 fps** – elokuvan kuvaus- ja esitysnopeus, elokuvateatteri on 24",
+            "**23.976 fps** – elokuvan nopeus NTSC-järjestelmän televisiossa, 0,1 % hitaampi kuin 24",
+            "**25 fps** – PAL-järjestelmän (Eurooppa, Kiina, Australia ja muut 50 Hz verkkoalueet) televisionopeus",
+            "**29.97 fps / 30 fps** – NTSC-televisio-ohjelmien nopeus, sama 0,1 % ero"
+          ]
+        },
+        {
+          "h2": "Mistä 0,1 % tulee",
+          "ps": [
+            "23.976 = 24 × 1000/1001 ja 29.97 = 30 × 1000/1001. Tämä 1000/1001 on peräisin NTSC:n värillistämisestä: jotta värin apukantoaalto mahtui mukaan muuttamatta jo olemassa olevia mustavalkovastaanottimia, pystytaajuus laskettiin 60 Hz:sta 59,94 Hz:iin (60 × 1000/1001) ja kuvataajuus tuli mukana.",
+            "Seuraus on: elokuva esitetään NTSC-alueella nopeudella 23.976 eikä 24. Ero on 0,1 % – tunnin elokuvassa 3,6 sekuntia. Yksinään sitä tuskin huomaa, mutta se ei ole sama asia kuin alla oleva 4 %, älä laske niitä yhteen."
+          ]
+        },
+        {
+          "h2": "Mistä 4 % tulee",
+          "ps": [
+            "PAL-alueella esitetään 25 fps:llä. Elokuva on kuvattu 24 fps:llä ja se esitetään sellaisenaan 25:llä – ruutujen määrä ei muutu, mutta toistonopeus kasvaa 4 % (25/24 ≈ 1,0417). Sadan minuutin elokuva on PAL-versiona 96 minuuttia.",
+            "Tämä on **vähittäisen lipsumisen** juuri: tekstitys on tehty alkuperäiseen versioon ja video on PAL-versio, alussa kaikki täsmää ja lopussa ero on neljä minuuttia. Koko aikajanan siirtäminen ei auta, on laskettava suhteessa."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Aikajanasivun nopeudenmuutosalue: suhdeluvun syöttökenttä",
+            "cap": "Lasketaan suhteessa – yksi suhdeluku käy koko elokuvaan"
+          }
+        },
+        {
+          "h2": "Miten muunnetaan",
+          "ps": [
+            "Muunnos on yhden suhdeluvun kertominen, sama koko elokuvalle:"
+          ],
+          "ul": [
+            "**24 → 25** (PAL-nopeutus): × 0,96",
+            "**23.976 → 25**: × 0,959 (tarkka arvo 23,976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 tai × 0,999, ero vain 0,1 %",
+            "0,96 ja 0,959 eroavat 0,1 % – koko elokuvassa alle 6 sekuntia. Jos et tiedä onko lähde 24 vai 23.976, myös 0,96 toimii ja loppuero hoidetaan kahden pisteen ankkuroinnilla"
+          ]
+        },
+        {
+          "h2": "Miten selvität kumpi sinulla on",
+          "ps": [
+            "Jos et halua arvata suhdetta, etsi kaksi kohtaa joiden ajan tiedät varmasti – yleensä ensimmäinen ja viimeinen repliikki – ja kerro työkalulle että tämän pitäisi olla kohdassa 00:00:12 ja tuon kohdassa 01:35:40. Työkalu venyttää koko elokuvan lineaarisesti näiden kahden pisteen mukaan. Tämä on kahden pisteen ankkurointi, eikä kuvataajuutta tarvitse laskea.",
+            "Jos haluat varmistaa kuvataajuuden itse: soitin tai median tietotyökalu kertoo sen. Kun tiedostonimi on tyyliin `1080p.WEB` eikä sisällä kuvataajuutta, kahden pisteen ankkurointi on varmempi."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Aikajanasivun kahden pisteen ankkurointi: kaksi ajankohdan syöttökenttää",
+            "cap": "Kahden pisteen ankkurointi ei vaadi kuvataajuuden laskemista – kaksi ajankohtaa riittää"
+          }
+        },
+        {
+          "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+          "ps": [
+            "Kuvataajuusmuunnos suoraan sivulla [[Tekstityksen kuvataajuusmuunnos|/guides/srt-fps-converter.html]]; nopeuden muuttaminen sivulla [[Tekstityksen nopeuden muuttaminen|/guides/subtitle-speed-converter.html]]; jos et erota koko aikajanan siirtoa ja vähittäistä lipsumista, katso [[Tekstitys lipuu loppua kohti|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

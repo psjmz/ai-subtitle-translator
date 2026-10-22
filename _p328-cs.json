@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "cs": {
+      "seo": {
+        "title": "Jak používat opravu rozbitých znaků – poznej kódování – AI-SRTSub",
+        "desc": "Oprava rozbitých znaků: poznej původní kódování (GBK / Big5 / Shift_JIS / EUC-KR), seřaď kandidáty podle toho, co nejvíc připomíná lidský text, ulož jako UTF-8 s BOM nebo GBK.",
+        "h1": "Jak používat opravu rozbitých znaků",
+        "intro": "Když se titulky po otevření zobrazí jako samé rozbité znaky, soubor většinou není poškozený — jen byl přečten se špatným kódováním. Opravovač pozná původní kódování a vrátí špatně přečtené znaky zpět.",
+        "ctaText": "Otevřít opravu"
+      },
+      "body": [
+        {
+          "h2": "Co nástroj řeší",
+          "ps": [
+            "Stejné byty přečtené jako UTF-8 a jako GBK dají dvě naprosto odlišné sady znaků — soubor není poškozený, při čtení bylo vybráno špatné kódování. Co opravovač dělá:"
+          ],
+          "ul": [
+            "Pozná, v jakém kódování byl soubor původně napsán, a vrátí znaky podle správné sady",
+            "Řekne, kde je chyba: náhradní znak, řídicí znak, symbol měny, řady písmen s diakritikou, souvislé vzácné znaky",
+            "Seřadí kandidáty podle toho, co nejvíc připomíná lidský text, aby sis jeden vybral a uložil",
+            "Když přehrávač kódování nepozná, uloží kopii jako UTF-8 s BOM nebo GBK a předá ji přehrávači"
+          ]
+        },
+        {
+          "h2": "Nahraj soubor, nevkládej",
+          "ps": [
+            "Dva vstupy nedokážou opravit totéž, **můžeš-li nahrát soubor, nahraj ho**. Při nahrávání jsou původní byty pořád k dispozici: nástroj může zkoušet každé kódování postupně, poznat, že jde o GBK, a dekódovat jako GBK, aniž by musel cokoli hádat. Co vkládáš, už nejsou původní byty — když prohlížeč předává text, chybný krok se už stal; zbývá jen odvozování zpět.",
+            "Je-li ve vloženém textu už náhradní znak (ten čtvercový otazník `�`), původní byty jsou pryč a nikdo je nevrátí. Stránka to řekne rovnou: vrať se nahoru a nahraj původní soubor přes „Vybrat soubor“."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Zóna pro nahrání na stránce opravy: oblast pro přetažení a pole pro vložení, nad nimi poznané kódování",
+            "cap": "Přetáhni soubor nebo ho vyber; pole pro vložení je níž a opraví mnohem míň"
+          }
+        },
+        {
+          "h2": "Co říká diagnostika",
+          "ps": [
+            "Po nahrání dá diagnostická oblast verdikt. **Nebyly nalezeny rozbité znaky**: tento obsah se čte normálně; vidíš-li v přehrávači pořád rozbité znaky, vybral špatné kódování přehrávač — jdi na „Uložit jako“ níže a převeď na jiné kódování. Při **vypadá to na rozbité znaky** vypíše konkrétně, jaká stopa:"
+          ],
+          "ul": [
+            "Je v něm náhradní znak — původní byty už jsou pryč",
+            "Vmíchaly se řídicí znaky",
+            "Je plný symbolů měn a matematických symbolů",
+            "Písmena s diakritikou se objevují v řadách — jako by se UTF-8 četlo po jednom bytu (`ä½ å¥½` je ten případ)",
+            "Znaky stojí v řadách, ale není mezi nimi jediný běžný — jako by se UTF-8 četlo jako GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnostická karta: verdikt a postupně vypsané stopy rozbitých znaků",
+            "cap": "Diagnostika vypisuje stopy podle typu, nehodí jen jednu větu o rozbitých znacích"
+          }
+        },
+        {
+          "h2": "Jak se kandidáti řadí",
+          "ps": [
+            "Pod „Takto lze opravit“ jsou kandidáti seřazeni podle **toho, co nejvíc připomíná lidský text**, nejvýš 12 položek, každá označená, z jakého kódování do jakého byla přečtena. Klikni na jednu a podívej se na výsledek; sedí-li, ulož níže; ne-li, klikni „Ponechat původní“.",
+            "Pořadí vychází ze skóre: podíl běžných znaků, řady diakritiky, řady symbolů a vzácné znaky se všechny počítají. **Není-li skóre výrazně lepší, nic se nedoporučuje** — kandidát se nevymýšlí naslepo, aby tam aspoň jeden byl. U souborů zpracovaných špatně dvakrát odvozuje nástroj o jednu vrstvu zpět."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Seznam kandidátů opravy: podle podobnosti s lidským textem, každý s dvojicí kódování",
+            "cap": "Kandidáti podle toho, co nejvíc připomíná lidský text, každý označený dvojicí kódování"
+          }
+        },
+        {
+          "h2": "Uložení je poslední krok",
+          "ps": [
+            "Po opravě musíš také správně uložit. Nepozná-li přehrávač UTF-8, ulož **UTF-8 s BOM** (přehrávače ve Windows poznají kódování podle BOM) nebo **GBK**, většinou to pomůže. Uložit lze jako UTF-8, UTF-8 (s BOM), GBK, Big5, Shift_JIS, EUC-KR; nevejde-li se to, vyzve tě zvolit jiné. K názvu se přidá `-fixed`.",
+            "Není-li poznané kódování UTF-8, ukazuje „Uložit jako“ už na „UTF-8 s BOM“; jakmile změníš seznam sám, nevrací se ti zpět."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Oblast výsledku: textové pole, seznam Uložit jako a tlačítko stažení",
+            "cap": "Vyber kódování a stáhni; k názvu souboru se přidá -fixed"
+          }
+        },
+        {
+          "h2": "Co se nezmění",
+          "ps": [
+            "Mění se jen špatně přečtené znaky. Čísla, časová osa a příkazy stylů ASS se nezmění ani o znak."
+          ]
+        },
+        {
+          "h2": "Časté dotazy",
+          "ps": [
+            "**Nahrál jsem soubor, proč musím ještě ukládat?** Samotný soubor většinou není poškozený; chyba je v tom, že přehrávač ho čte se špatným kódováním. Nemusíš pak změnit ani jediný znak v textu: stačí dát přehrávači kopii uloženou jako UTF-8 s BOM nebo GBK.",
+            "**Proč nejde opravit vložený text?** Jakmile se ve vloženém textu objeví náhradní znak, původní byty jsou už ztracené a odvozování zpět nemá oporu. Vrať se nahoru a nahraj původní soubor.",
+            "**Kandidát, který chci, tam není?** Není-li skóre výrazně lepší než u současného, nástroj nic nedoporučuje. Můžeš nejdřív změnit „Poznané kódování“ na jiné a nechat seřadit znovu.",
+            "**Kolik najednou lze opravit?** Jeden. Oprav, stáhni, nahraj další."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Rozpoznání i oprava probíhají zcela lokálně v prohlížeči; žádný obsah titulků se neposílá na server."
+          ]
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Odkud se rozbité znaky berou, najdeš v [[Odkud se berou rozbité znaky v titulcích|/guides/subtitle-garbled-characters.html]]; je-li kódování v pořádku, ale obsah znečištěný, použij [[Čištění titulků|/clean.html]]; chceš-li zkontrolovat časovou osu, použij [[Kontrola kvality titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "cs": {
+      "seo": {
+        "title": "Odkud se berou rozbité znaky v titulcích – poznané lze opravit – AI-SRTSub",
+        "desc": "Rozbité znaky nejsou poškozený soubor, ale byty přečtené se špatným kódováním. Náhradní znak, řady písmen s diakritikou a souvislé vzácné znaky odpovídají jiným příčinám.",
+        "h1": "Odkud se berou rozbité znaky v titulcích",
+        "intro": "Stejné byty přečtené jako UTF-8 a jako GBK dají dvě naprosto odlišné sady znaků. To, jak rozbité znaky vypadají, je přímý důkaz, který krok se nepovedl.",
+        "ctaText": "Otevřít opravu"
+      },
+      "body": [
+        {
+          "h2": "Soubor není poškozený, čtení je špatné",
+          "ps": [
+            "V souboru titulků jsou byty. Aby se z bytů stal text, musíš vědět, v jakém kódování byly napsány — vybereš-li špatně, vyjdou rozbité znaky. Samotný soubor neztratil ani jeden byte; přečteš-li ho jiným kódováním, znaky se vrátí.",
+            "Rozbité znaky jsou tedy dvě věci: **poznat původní kódování** a **uložit v kódování, které přehrávač pozná**. První řeší zkušební čtení a skóre, druhé uložení jako."
+          ]
+        },
+        {
+          "h2": "Pět podob, pět příčin",
+          "ps": [
+            "Rozbité znaky nevznikají náhodně; jejich vzhled prozradí příčinu:"
+          ],
+          "ul": [
+            "**Řady písmen s diakritikou** (`ä½ å¥½`): text v UTF-8 byl přečten jako kódování po jednom bytu — v UTF-8 je znak tři byty, při čtení po jednom bytu se každý byte stane vlastním písmenem",
+            "**Znaky v řadách, ale ani jeden běžný**: UTF-8 bylo přečteno jako GBK — po dvou bytech se znovu spárují a vycházejí samé vzácné znaky",
+            "**Spousta symbolů měn a matematických symbolů**: byty spadly do oblasti symbolů, často při čtení jako Mac Roman nebo rodina Latin-1",
+            "**Vmíchaly se řídicí znaky**: byty spadly do neviditelné řídicí oblasti, na obrazovce je mezera nebo čtvereček",
+            "**Čtvercový otazník `�`**: to je **náhradní znak**, ne rozbité znaky — znamená to, že tu byl znak, který se při čtení už ztratil"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnostická karta: stopy rozbitých znaků vypsané jedna po druhé",
+            "cap": "Diagnostika dělí rozbité znaky podle příčiny, nehodí vše do jedné věty"
+          }
+        },
+        {
+          "h2": "Proč náhradní znak nejde opravit",
+          "ps": [
+            "Náhradní znak je klíčová hranice. Ukazuje-li se `�`, byty byly zahozeny už v **dřívějším kroku** (většinou nějaký program soubor jednou přečetl a jednou uložil); po zahozené části není žádná stopa. Odvozování zpět pak nemá oporu — nikdo to neopraví.",
+            "Proto stránka opravy řeší dva případy odděleně: při nahrávání jsou původní byty pořád k dispozici a každé kódování lze zkusit postupně; je-li ve vloženém textu už náhradní znak, řekne se rovnou, že to nejde a má se nahrát původní soubor.",
+            "Existuje i opačný případ: obsah se čte zcela normálně, ale v přehrávači je pořád rozbitý. To není chyba souboru, ale **přehrávače, který vybral špatné kódování**. Změna souboru nepomůže; stačí dát mu kopii uloženou jako UTF-8 s BOM nebo GBK."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Zóna pro nahrání: dva vstupy, přetažení a vložení",
+            "cap": "Nahraj soubor, můžeš-li — jsou-li byty, je co opravovat"
+          }
+        },
+        {
+          "h2": "Co se při opravě porovnává",
+          "ps": [
+            "Nástroj zkusí každé možné kódování postupně a pak dá každému výsledku skóre: kolik běžných znaků, jsou řady diakritiky, jsou řady symbolů, jsou znaky souvisle vzácné. Nejvýše ohodnocený je nahoře.",
+            "**Není-li skóre výrazně lepší, nic se nedoporučuje** — raději říct, že se tento soubor čte normálně, než tě odbýt natahovaným výsledkem. U souborů zpracovaných špatně dvakrát se odvozuje ještě o jednu vrstvu zpět."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Seznam kandidátů: podle skóre, každý s dvojicí kódování",
+            "cap": "Kandidáti podle skóre; bez výrazné převahy se nic nedoporučuje"
+          }
+        },
+        {
+          "h2": "Uložení ve správném kódování to dokončí",
+          "ps": [
+            "Opravený text musíš také uložit v kódování, které přehrávač pozná. Přehrávače ve Windows poznají kódování obvykle podle BOM, takže **UTF-8 s BOM** je nejjednodušší; starší zařízení a lokální přehrávače poznají GBK. Kódování k výběru: UTF-8, UTF-8 (s BOM), GBK, Big5, Shift_JIS, EUC-KR; nevejde-li se to, vyzve tě zvolit jiné."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Oblast výsledku: seznam kódování Uložit jako a tlačítko stažení",
+            "cap": "Ulož v kódování, které přehrávač pozná, teprve pak jsou rozbité znaky opravdu vyřešené"
+          }
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Celý postup v [[Jak používat opravu rozbitých znaků|/guides/repair.html]]; co vlastně je v souboru SRT v [[Co je v souboru SRT|/guides/srt-file-format.html]]; je-li kódování v pořádku, ale obsah znečištěný (vodoznak, reklama, označení pro neslyšící), použij [[Čištění titulků|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "cs": {
+      "seo": {
+        "title": "Převod zjednodušená-tradiční – Tchaj-wan a Hongkong zvlášť – AI-SRTSub",
+        "desc": "Převod zjednodušená-tradiční: devět směrů, pro Tchaj-wan výměna slov nebo jen tvar, Hongkong vlastní sada. Mění se jen text replik; časová osa, čísla a příkazy stylů ASS se nezmění.",
+        "h1": "Jak používat převod zjednodušená-tradiční",
+        "intro": "Míří stejné titulky na Tchaj-wan, do Hongkongu nebo na pevninu, liší se slovní zásoba i tvar znaků. Na stránce převodu vybíráš z devíti směrů; mění se jen text replik.",
+        "ctaText": "Otevřít převod"
+      },
+      "body": [
+        {
+          "h2": "Co nástroj řeší",
+          "ps": [
+            "Převod zjednodušená-tradiční není dát každému znaku jiný způsob psaní a hotovo. Stejné zjednodušené slovo má v různých regionech jiné slovo. Stránka převodu to řeší odděleně:"
+          ],
+          "ul": [
+            "Zjednodušená na tradiční (obecná / Tchaj-wan / Hongkong)",
+            "Tradiční na zjednodušenou (obecná / z tchajwanské tradiční / z hongkongské tradiční)",
+            "Výměna tvaru mezi tradičními (na tchajwanský tvar / na hongkongský tvar)",
+            "Jeden zjednodušený znak s více tradičními se nepřevede špatně (rozhoduje slovo, ne jednotlivý znak)"
+          ]
+        },
+        {
+          "h2": "Nahrání a rozpoznání",
+          "ps": [
+            "Přetáhni soubor nebo ho vyber; podporovány jsou SRT, VTT, ASS, TXT, můžeš také vložit obsah titulků přímo. Po nahrání se formát rozpozná automaticky a ukáže u „Rozpoznaný formát“."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Zóna pro nahrání na stránce převodu: oblast pro přetažení a pole pro vložení, nad nimi rozpoznaný formát",
+            "cap": "SRT / VTT / ASS / TXT, formát se rozpozná automaticky"
+          }
+        },
+        {
+          "h2": "Jak vybrat z devíti směrů",
+          "ps": [
+            "Devět směrů v „Směru převodu“ se dělí do tří skupin. **Zjednodušená na tradiční**: obecná tradiční, tchajwanská tradiční (výměna slov), tchajwanská tradiční (jen tvar), hongkongská tradiční. **Tradiční na zjednodušenou**: obecná, z tchajwanské tradiční, z hongkongské tradiční. **Výměna tvaru mezi tradičními**: na tchajwanský tvar, na hongkongský tvar.",
+            "„Tchajwanská slova“ mění i regionální termíny; „tchajwanský tvar“ mění jen způsob psaní a ponechá tvá slova. Hongkong je vlastní sada: stejný termín se tam píše jinak. Chceš-li se vrátit ke zjednodušené, vyber skupinu níže — musíš říct, z jaké tradiční se vracíš."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Karta směru převodu: seznam převést na, nyní vybrána zjednodušená na tchajwanskou tradiční (výměna slov)",
+            "cap": "Směr se vybírá v seznamu převést na, devět ve třech skupinách; zde tchajwanská tradiční s výměnou slov"
+          }
+        },
+        {
+          "h2": "Výsledek a export",
+          "ps": [
+            "Oblast výsledku dá rovnou převedené titulky, statistický pruh ukáže, kolik je řádků a kolik se jich změnilo. Nezmění-li se ani jeden znak, objeví se upozornění, že v těchto titulcích možná nejsou čínské znaky.",
+            "Po potvrzení stáhni nebo zkopíruj. Ke staženému názvu se přidá jazyková značka — `demo.srt` se po převodu na tchajwanskou tradiční stane `demo.zh-TW.srt`, obecná tradiční `.zh-Hant`, návrat ke zjednodušené `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Oblast výsledku: převedené titulky a statistický pruh",
+            "cap": "Statistický pruh dá počet řádků a změněných řádků; lze stáhnout nebo poslat na překlad"
+          }
+        },
+        {
+          "h2": "Co se nezmění",
+          "ps": [
+            "Mění se jen text replik. Časová osa, čísla a příkazy stylů ASS se nezmění ani o znak — po převodu jde použít rovnou."
+          ]
+        },
+        {
+          "h2": "Časté dotazy",
+          "ps": [
+            "**Proč se ne každý znak převedl, jak jsem čekal?** Má-li jeden zjednodušený znak více tradičních, rozhoduje slovo: stejný znak jde v různých slovech do jiného tradičního znaku. Slovník pochází z OpenCC.",
+            "**Čím se liší tchajwanská a hongkongská tradiční?** Slovní zásobou: stejný termín se na Tchaj-wanu a v Hongkongu píše jinak. Vyber směr regionu, kam posíláš.",
+            "**Změnilo se mi číslo řádků?** Mění se jen čínské znaky, položky se nepřidávají ani neubírají a časová osa zůstává. Změnilo-li se přesto, zkontroluj, zda nebyl formát rozpoznán špatně.",
+            "**Co když se slovník nenačte?** Stránka tě vyzve k obnovení a novému pokusu. Slovník se načítá lokálně, titulky není třeba nahrávat."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Převod probíhá zcela lokálně v prohlížeči; žádný obsah titulků se neposílá na server."
+          ]
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Potřebuješ-li jen zjednodušenou na tradiční, viz [[Zjednodušené titulky na tradiční|/guides/srt-simplified-to-traditional.html]]; proč to není jen jiný znak, viz [[Převod zjednodušená-tradiční není jiný znak|/guides/simplified-traditional-chinese.html]]; chceš-li přeložit do cizího jazyka, použij [[Překlad titulků|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "cs": {
+      "seo": {
+        "title": "Zjednodušené titulky na tradiční – Tchaj-wan a Hongkong zvlášť – AI-SRTSub",
+        "desc": "Převeď zjednodušené titulky na tradiční: na výběr Tchaj-wan (výměna slov nebo jen tvar) a Hongkong. Má-li znak více tradičních, rozhoduje slovo. Mění se jen text replik.",
+        "h1": "Zjednodušené titulky na tradiční",
+        "intro": "Mají zjednodušené čínské titulky k divákům na Tchaj-wanu nebo v Hongkongu? Stačí jeden převod — Tchaj-wan a Hongkong jsou dvě sady; vybereš-li špatný směr, nikdo tam tak nemluví.",
+        "ctaText": "Převést tyto titulky"
+      },
+      "body": [
+        {
+          "h2": "Tato potřeba",
+          "ps": [
+            "Titulky jsou ve zjednodušené čínštině a mají jít k divákům na Tchaj-wanu nebo v Hongkongu. Měnit znak po znaku nepřipadá v úvahu, jeden díl má stovky položek. Navíc Tchaj-wan a Hongkong nechtějí stejnou tradiční — slovní zásoba se liší."
+          ]
+        },
+        {
+          "h2": "Kde to udělat",
+          "ps": [
+            "Otevři [[Převod zjednodušená-tradiční|/hanconv.html]], přetáhni titulky a v „Směru převodu“ vyber jeden ze směrů zjednodušená na tradiční: obecná tradiční, tchajwanská tradiční (výměna slov), tchajwanská tradiční (jen tvar), hongkongská tradiční. Převod je hotov okamžitě.",
+            "**Pro diváky na Tchaj-wanu**: chceš-li vzít i slova, vyber „tchajwanská tradiční (výměna slov)“; chceš-li jen tvar a ponechat svá slova, vyber „tchajwanská tradiční (jen tvar)“. **Pro diváky v Hongkongu**: vyber „hongkongská tradiční“."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Karta směru převodu: seznam převést na, nyní vybrána zjednodušená na tchajwanskou tradiční (výměna slov)",
+            "cap": "Tchaj-wan a Hongkong jsou v seznamu dva směry, s jinou slovní zásobou"
+          }
+        },
+        {
+          "h2": "Časté nástrahy",
+          "ps": [
+            "**Jeden znak s více tradičními není problém**: stejný zjednodušený znak jde v různých slovech do jiného tradičního znaku; slovník rozhoduje podle skupiny slov a nepřevede vše na jeden znak.",
+            "**Mění se jen text replik**: časová osa, čísla a příkazy stylů ASS se nezmění ani o znak, jde použít rovnou.",
+            "**Nic se nezměnilo — hned nepanikař**: ukazuje-li statistický pruh 0 změněných řádků, možná v těchto titulcích nejsou čínské znaky, nebo byl formát rozpoznán špatně — zkontroluj „Rozpoznaný formát“."
+          ]
+        },
+        {
+          "h2": "Související",
+          "ps": [
+            "Celý popis devíti směrů v [[Jak používat převod zjednodušená-tradiční|/guides/hanconv.html]]; proč to není jen jiný znak v [[Převod zjednodušená-tradiční není jiný znak|/guides/simplified-traditional-chinese.html]]; cesta zpět je také v [[Převod zjednodušená-tradiční|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "cs": {
+      "seo": {
+        "title": "Převod zjednodušená-tradiční není jiný znak – jeden k více – AI-SRTSub",
+        "desc": "Převod zjednodušená-tradiční je těžký na třech místech: jeden znak s více tradičními rozhoduje slovo, Tchaj-wan a Hongkong mají jiná slova a měnit se smí jen text replik.",
+        "h1": "Převod zjednodušená-tradiční není jiný znak",
+        "intro": "Na který tradiční znak se znak převede závisí na znaku před ním. Proto převod nejde provádět naslepo, znak po znaku.",
+        "ctaText": "Otevřít převod"
+      },
+      "body": [
+        {
+          "h2": "Za prvé: jeden znak, více tradičních",
+          "ps": [
+            "Zjednodušení sloučilo více tradičních znaků do jednoho zjednodušeného. Jdeš-li zpět, jednomu zjednodušenému znaku odpovídá více tradičních; který vybrat závisí na tom, s čím stojí:",
+            "Výměna naslepo, znak po znaku, převede vše na tentýž znak a celý text bude plný chyb. **Rozhodnutí podle slova** je odliší — slovník pochází z OpenCC a nejdřív porovnává skupiny slov. Například:"
+          ],
+          "ul": [
+            "Týž zjednodušený znak jde ve slově pro čistý do jednoho tradičního znaku, ve slově pro kmen stromu do jiného",
+            "Ve slově pro vlasy do jednoho znaku, ve slově pro rozvoj do jiného",
+            "Ve významu za, po do jednoho znaku, ve slově pro královnu do jiného"
+          ]
+        },
+        {
+          "h2": "Za druhé: Tchaj-wan a Hongkong nejsou totéž",
+          "ps": [
+            "Po převodu na tradiční je tu ještě jedna vrstva: stejné slovo se na Tchaj-wanu a v Hongkongu nepíše stejně. Běžný výpočetní termín má na Tchaj-wanu jeden způsob psaní a v Hongkongu jiný.",
+            "Proto jsou směry oddělené: v tchajwanské tradiční jsou dvě možnosti, výměna slov a jen tvar — jen tvar ponechá tvá slova, výměna slov mění i regionální termíny. Hongkong je směr sám pro sebe."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Karta směru převodu: seznam převést na, nyní vybrána zjednodušená na tchajwanskou tradiční (výměna slov)",
+            "cap": "Na Tchaj-wanu lze měnit slova nebo jen tvar, Hongkong má vlastní směr"
+          }
+        },
+        {
+          "h2": "Za třetí: jen text replik",
+          "ps": [
+            "Soubor titulků není jen text replik. Jsou v něm i čísla, časová osa a příkazy stylů ASS, a z nich se nemá změnit ani znak — zejména v řádcích stylů ASS se míchají anglické názvy příkazů; zachází-li se s nimi jako s textem replik, rozbijí se.",
+            "Proto převod probíhá po rozboru formátu: u SRT, VTT, ASS a TXT se rozpozná textová část zvlášť a mění se jen čínské znaky v ní. Po převodu zůstanou časová osa a styly stejné."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Oblast výsledku: převedené titulky a statistický pruh s počtem změněných řádků",
+            "cap": "Statistický pruh dá počet změněných řádků, část formátu zůstane stejná"
+          }
+        },
+        {
+          "h2": "Zpět ke zjednodušené: na co si dát pozor",
+          "ps": [
+            "I při návratu ke zjednodušené musíš říct, **z jaké tradiční se vracíš**: obecná tradiční, tchajwanská tradiční a hongkongská tradiční jsou tři různé cesty, protože regionální slova Tchaj-wanu a Hongkongu se při návratu nejdřív převedou na obecné slovo.",
+            "Dolní skupina z devíti směrů je ta vracející se ke zjednodušené: tradiční na zjednodušenou, tchajwanská tradiční na zjednodušenou, hongkongská tradiční na zjednodušenou."
+          ]
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Celý postup v [[Jak používat převod zjednodušená-tradiční|/guides/hanconv.html]]; potřebuješ-li jen zjednodušenou na tradiční, viz [[Zjednodušené titulky na tradiční|/guides/srt-simplified-to-traditional.html]]; chceš-li přeložit do cizího jazyka, použij [[Překlad titulků|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "cs": {
+      "seo": {
+        "title": "Jak používat titulky do Excel/CSV – oběma směry – AI-SRTSub",
+        "desc": "Titulky a tabulka oběma směry: SRT/VTT se exportují do Excelu nebo CSV, opravují se řádek po řádku a vracejí zpět do titulků. Tabulka rozpozná tři sloupce: začátek, konec a text.",
+        "h1": "Jak používat titulky do Excel/CSV",
+        "intro": "Korektura a překlad jdou nejlépe v tabulce. Titulky se exportují do Excelu nebo CSV, opravíš je řádek po řádku a vrátíš zpět do titulků — sloupec času zůstane textem.",
+        "ctaText": "Otevřít převod tabulky"
+      },
+      "body": [
+        {
+          "h2": "Co nástroj řeší",
+          "ps": [
+            "Titulky jsou položka za položkou, tabulka taky záznam za záznamem — jakmile jsi v tabulce, můžeš pro korekturu, poznámky a hromadný překlad použít známé funkce. Podporovány jsou oba směry:"
+          ],
+          "ul": [
+            "**Do tabulky**: SRT a VTT se exportují do Excelu (.xlsx) nebo CSV, jeden řádek je jedna položka",
+            "**Do titulků**: opravená tabulka se vrací do SRT nebo VTT",
+            "Sloupec času zůstane textem, tabulkový program ho nezmění na číslo ani datum",
+            "Zalomení řádků v replikách nezmizí, při návratu jsou stejná"
+          ]
+        },
+        {
+          "h2": "Nahrání a volba směru",
+          "ps": [
+            "Přetáhni soubor nebo ho vyber. Dva směry chtějí jiný soubor: **do tabulky** chce soubor titulků (SRT / VTT), **do titulků** chce soubor tabulky (CSV / Excel, včetně xlsx a xls). Zvolíš-li špatný režim, rovnou se řekne, jaký soubor ten režim chce.",
+            "⚠️ Tato stránka čte jen jako UTF-8. Vidíš-li po otevření titulků samé otazníky nebo čtverečky, nejdřív oprav kódování v [[Oprava rozbitých znaků|/repair.html]] — s rozbitým kódováním se tu načte hromada náhradních znaků."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Zóna pro nahrání na stránce tabulky: oblast pro přetažení a přepínač dvou režimů",
+            "cap": "Dva režimy chtějí jiné soubory: do tabulky titulky, do titulků tabulku"
+          }
+        },
+        {
+          "h2": "Z titulků do tabulky",
+          "ps": [
+            "Vyber „do tabulky“, vlož titulky a oblast náhledu vypíše každou položku: číslo, začátek, konec, text. Statistický pruh dá počet položek a celkovou délku. Po potvrzení klikni na Stáhnout Excel (.xlsx) nebo Stáhnout CSV.",
+            "Rozdíl mezi dvěma formami exportu: xlsx je skutečný soubor tabulky, Excel nemůže svévolně změnit formát sloupce času; CSV je univerzálnější, ale při otevření v Excelu se sloupec času může zobrazit jako něco jiného — stane-li se to, označ sloupec a nastav formát Text."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Oblast náhledu tabulky: čtyři sloupce číslo, začátek, konec, text a statistický pruh",
+            "cap": "Náhled vypisuje položky, statistický pruh dá počet položek a celkovou délku"
+          }
+        },
+        {
+          "h2": "Z tabulky zpět do titulků",
+          "ps": [
+            "Vyber „do titulků“, vlož tabulku, a pravidlo pro rozpoznání názvů sloupců je: tabulka musí mít **začátek, konec a text** (anglické Start / End / Text se také rozpozná), **pořadí sloupců nevadí**. Čas může být zapsán jako `00:00:01,500` nebo `00:00:01.500`; řádky, které nejdou rozpoznat, se přeskočí.",
+            "Výsledek návratu je vypsán v oblasti náhledu, po potvrzení stáhneš SRT nebo VTT. Chybějí-li tyto tři sloupce, vyzve tě zkontrolovat názvy — častou příčinou je použití jiných názvů při exportu."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Oblast výsledku titulků: titulky po návratu vypsané položka po položce",
+            "cap": "Nelze-li rozpoznat tři sloupce, řekne se to rovnou, neselže to potichu"
+          }
+        },
+        {
+          "h2": "Časté dotazy",
+          "ps": [
+            "**Sloupec času se v Excelu zobrazuje špatně, co dělat?** Místo CSV použij rovnou xlsx a problém není. Musí to být CSV: označ sloupec času, nastav formát buněk na Text a pak otevři.",
+            "**Musí být názvy sloupců čínsky?** Ne. Začátek, konec a text i Start / End / Text se rozpoznají, velikost písmen nevadí.",
+            "**Zůstanou po návratu zalomení řádků?** Ano. Zalomení v replikách zůstanou stejná a po návratu jsou stejná.",
+            "**Je podporováno ASS?** Tato stránka dělá jen SRT a VTT. ASS má příkazy stylů, nejdřív ho převeď v [[Převod formátu|/convert.html]] na SRT.",
+            "**Kolik najednou?** Jeden. Pro desítky a stovky najednou je [[Hromadný převod|/batch.html]] (tam jen formát, ne tabulka)."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Převod probíhá zcela lokálně v prohlížeči; žádný obsah titulků se neposílá na server."
+          ]
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Potřebuješ-li jen krok titulky do Excelu, viz [[Titulky do Excelu|/guides/srt-to-excel.html]]; po opravě, pro překlad do cizího jazyka, použij [[Překlad titulků|/translate.html]]; pro hromadnou změnu formátu použij [[Hromadný převod|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "cs": {
+      "seo": {
+        "title": "Titulky do Excelu – SRT jako xlsx po řádcích – AI-SRTSub",
+        "desc": "Přenést titulky SRT do Excelu: jeden řádek je jedna položka, čtyři sloupce číslo, začátek, konec a text; časy zůstanou textem a zalomení v replikách nezmizí. Po opravě jdou vrátit.",
+        "h1": "Titulky do Excelu",
+        "intro": "Opravovat stovky položek jednu po druhé v textovém editoru je únavné; v Excelu je jeden řádek jedna položka a jsou tu filtry, poznámky a hromadné nahrazení. Hotovo? Zpátky do SRT.",
+        "ctaText": "Exportovat do Excelu"
+      },
+      "body": [
+        {
+          "h2": "Tato potřeba",
+          "ps": [
+            "Musíš zkontrolovat titulky, hromadně změnit slova nebo dát několika lidem každému kus — to všechno jde v tabulce mnohem rychleji než v textu. SRT je samo o sobě prostý text, ale struktura položek se přesně rozloží na čtyři sloupce tabulky."
+          ]
+        },
+        {
+          "h2": "Kde to udělat",
+          "ps": [
+            "Otevři [[Převod tabulky|/table.html]], vyber režim do tabulky, přetáhni SRT a oblast náhledu hned vypíše každou položku — čtyři sloupce číslo, začátek, konec, text. Klikni na Stáhnout Excel (.xlsx) a máš to. VTT je také podporováno.",
+            "Po opravě: přepni režim na do titulků, vrať tuto tabulku a máš zase SRT. Pravidlo pro názvy sloupců: musí být začátek, konec a text (i Start / End / Text), pořadí nevadí."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Náhled tabulky: každá položka SRT se stane řádkem, čtyři sloupce a statistický pruh",
+            "cap": "SRT se rozloží rovnou na čtyři sloupce, po opravě jde stejnou cestou zpět"
+          }
+        },
+        {
+          "h2": "Časté nástrahy",
+          "ps": [
+            "**Nejdřív oprav kódování**: tato stránka čte jen jako UTF-8. Jsou-li titulky plné otazníků nebo čtverečků, jdi nejdřív na [[Oprava rozbitých znaků|/repair.html]].",
+            "**CSV nebo xlsx**: má-li to jít do Excelu, vyber xlsx, sloupec času nezmění formát; CSV je univerzálnější, ale Excel si ho může vyložit jinak — nastav pak sloupec času na Text.",
+            "**ASS neprojde**: ASS s příkazy stylů nejdřív na SRT, pak do tabulky."
+          ]
+        },
+        {
+          "h2": "Související",
+          "ps": [
+            "Celý popis oběma směry v [[Jak používat titulky do Excel/CSV|/guides/table.html]]; po opravě, pro překlad do cizího jazyka, použij [[Překlad titulků|/translate.html]]; než to odevzdáš, projdi to ještě [[Kontrola kvality titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "cs": {
+      "seo": {
+        "title": "Jak používat hromadný převod titulků – stovky v jednom ZIP – AI-SRTSub",
+        "desc": "Hromadný převod: přetáhni desítky až stovky SRT/VTT najednou, převeď na jeden cílový formát a vezmi si je jako jeden ZIP. Čísla se přečíslují, časové značky normalizují.",
+        "h1": "Jak používat hromadný převod titulků",
+        "intro": "Mají desítky titulků ze sezóny dostat jeden formát? Nahrávat po jedné je pomalé. Na hromadné stránce je přetáhneš najednou a vezmeš jako jeden ZIP — nerozpoznané soubory do balíčku nejdou.",
+        "ctaText": "Otevřít hromadný převod"
+      },
+      "body": [
+        {
+          "h2": "Co nástroj řeší",
+          "ps": [
+            "Titulky z celé sezóny nebo celé sbírky musí často nejdřív do jednoho formátu, než se dají použít. Co dělá hromadná stránka:"
+          ],
+          "ul": [
+            "Přijme desítky až stovky SRT a VTT najednou (více souborů lze označit najednou)",
+            "Převede na jeden formát: SRT nebo VTT, čísla se přečíslují, časové značky normalizují",
+            "Stáhne se jako jeden ZIP, názvy souborů zůstanou, změní se jen přípona",
+            "Soubory, ze kterých nelze přečíst žádnou položku, se označí zvlášť a do balíčku nejdou"
+          ]
+        },
+        {
+          "h2": "Vkládání souborů",
+          "ps": [
+            "Přetáhni několik souborů titulků najednou do přerušovaného rámečku, nebo klikni a označ několik najednou. Seznam souborů je vypíše jeden po druhém: u rozpoznaných je vidět počet položek, nerozpoznané dostanou „nerozpoznáno“. Statistika nahoře dá počet souborů a počet položek.",
+            "⚠️ Tato stránka čte jen jako UTF-8. Titulky s rozbitým kódováním (obrazovka plná otazníků nebo čtverečků) nejdřív oprav v [[Oprava rozbitých znaků|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Seznam souborů: názvy a počty položek jeden po druhém, nerozpoznané červeně",
+            "cap": "Seznam vypisuje jeden po druhém, nerozpoznané se označí hned"
+          }
+        },
+        {
+          "h2": "Do jakého formátu",
+          "ps": [
+            "V „Převést na jeden formát“ vyber cílový formát — SRT nebo VTT. Po výběru se každý soubor v seznamu znovu sestaví podle cílového formátu: čísla se přečíslují od začátku, časové značky se normalizují (SRT odděluje milisekundy čárkou, VTT tečkou).",
+            "**Název souboru zůstane, změní se jen přípona**; při stejném názvu se přidá pořadové číslo, nepřepisují se navzájem."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Volba cílového formátu a stav seznamu, statistický pruh s počtem souborů a položek",
+            "cap": "Po výběru cílového formátu se seznam sestaví znovu; změní se jen přípona názvu"
+          }
+        },
+        {
+          "h2": "Zabalení a stažení",
+          "ps": [
+            "Klikni na Stáhnout jako jeden ZIP a v archivu jsou všechny převedené soubory. **Soubory, ze kterých nelze přečíst žádnou položku, do balíčku nejdou** — zůstanou označené v seznamu a nevsunou se dovnitř jen naoko. Až je balíček hotový, řekne se, kolik souborů je uvnitř."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Oblast balení: tlačítko stažení ZIP a zpráva o výsledku balení",
+            "cap": "Nerozpoznané soubory do balíčku nejdou, zůstanou označené v seznamu"
+          }
+        },
+        {
+          "h2": "Kdy se objeví nerozpoznáno",
+          "ps": [
+            "Nelze-li ze souboru přečíst žádnou položku titulků, objeví se „nerozpoznáno“. Tři časté příčiny: soubor nejsou titulky (například přimíchaný soubor .txt), kódování není UTF-8, nebo byl obsah stlačen do jednoho odstavce bez časových značek.",
+            "Označené soubory můžeš řešit zvlášť: problém s kódováním patří do [[Oprava rozbitých znaků|/repair.html]], problém s formátem do [[Převod formátu|/convert.html]] — převeď zvlášť a vrať do seznamu."
+          ]
+        },
+        {
+          "h2": "Časté dotazy",
+          "ps": [
+            "**Kolik najednou lze vložit?** Pevný horní limit není, záleží na paměti prohlížeče; několik set SRT většinou nevadí.",
+            "**Změní se mi text replik?** Ne. Hromadný převod mění jen formát obalu, přečísluje čísla a normalizuje časové značky; replik se nedotkne.",
+            "**Chci změnit obsah, co pak?** Tato stránka dělá jen formát. Pro hromadnou změnu časové osy je [[Úprava časové osy|/shift.html]], pro hromadnou změnu textu [[Nahrazení termínů|/glossary.html]]; obojí funguje na své stránce.",
+            "**Je podporováno ASS?** Tato stránka převádí jen mezi SRT a VTT. ASS má styly, převeď ho zvlášť v [[Převod formátu|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Soukromí",
+          "ps": [
+            "Převod i balení probíhají zcela lokálně v prohlížeči; žádný obsah titulků se neposílá na server."
+          ]
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Co měnit v celé sezóně a kterým krokem začít, najdeš v [[Jak hromadně opravit titulky z celé sezóny|/guides/batch-convert-srt.html]]; více formátů pro jeden soubor v [[Převod formátu|/convert.html]]; korektura v tabulce je [[Převod tabulky|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "cs": {
+      "seo": {
+        "title": "Jak hromadně opravit titulky z celé sezóny – co jde hromadně – AI-SRTSub",
+        "desc": "V celé sezóně se většinou mění jedna věc: stejný formát, stejné posunutí časové osy, stejné termíny. Co jde najednou, co soubor po souboru a jak řešit nerozpoznané soubory.",
+        "h1": "Jak hromadně opravit titulky z celé sezóny",
+        "intro": "V desítkách titulků z jedné sezóny se většinou děje pořád totéž. Oddělit to, co jde najednou, od toho, co musí soubor po souboru, ušetří víc než projít všechno jednotlivě.",
+        "ctaText": "Otevřít hromadný převod"
+      },
+      "body": [
+        {
+          "h2": "Většinou se mění jedna věc",
+          "ps": [
+            "Když je v titulcích ze sezóny něco špatně, málokdy má každý díl vlastní závadu — většinou stejná příčina zasáhla každý díl: celou sezónu komprimovala stejná skupina (formát stejný, vodoznak stejný), celá sezóna je dělaná pro stejnou verzi videa, nebo jsou názvy překladu nejednotné.",
+            "Nejdřív vytáhni dva díly (jeden ze začátku, jeden z konce) a ověř, že jde o **stejnou závadu**, než půjdeš hromadně. Liší-li se závada na začátku a na konci, není to věc pro hromadné řešení."
+          ]
+        },
+        {
+          "h2": "Co jde najednou",
+          "ps": [
+            "**Sjednotit formát** je jediná věc, kterou opravdu jde udělat najednou: desítky až stovky SRT a VTT jdou společně do [[Hromadný převod|/batch.html]], vybereš cílový formát a vezmeš si jeden ZIP. Přečíslování a normalizace časových značek proběhnou v tomto kroku."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Seznam souborů na hromadné stránce: počty položek jeden po druhém, nerozpoznané červeně",
+            "cap": "Sjednotit formát je jediná věc, kterou jde udělat najednou"
+          }
+        },
+        {
+          "h2": "Co soubor po souboru",
+          "ps": [
+            "Na následující není hromadný vstup, musí se projít soubor po souboru — ale většinou existuje rovnocenný úkon, který **se udělá jednou a použije na celou sezónu**:"
+          ],
+          "ul": [
+            "**Sjednotit posun časové osy**: je-li posun v každém dílu stejný, změř ho u jednoho dílu v [[Úprava časové osy|/shift.html]], poznamenej si číslo a do ostatních vepiš stejné",
+            "**Sjednotit termíny**: seznam termínů se nastaví jednou v [[Nahrazení termínů|/glossary.html]], každé titulky použijí stejný seznam",
+            "**Sjednotit odstranění vodoznaku**: pravidlo vodoznaku je dané, výchozí zaškrtnutí v [[Čištění titulků|/clean.html]] pokrývá běžné vodoznaky"
+          ]
+        },
+        {
+          "h2": "Nepřevracej pořadí",
+          "ps": [
+            "Má-li se udělat víc věcí, špatné pořadí znamená práci navíc. Jdi v tomto pořadí:",
+            "**Nejdřív oprav kódování** → **pak sjednoť formát** → **pak změň obsah** (vodoznak, termíny, časová osa) → **nakonec kontrola kvality**. Bez opravy kódování změna formátu dál dává rozbité znaky; bez sjednocení formátu změna obsahu nefunguje, protože nástroje nepodporují stejné formáty."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Oblast balení: tlačítko stažení ZIP a zpráva o výsledku",
+            "cap": "Sjednocení formátu patří dopředu, změna obsahu potom"
+          }
+        },
+        {
+          "h2": "Co s nerozpoznanými soubory",
+          "ps": [
+            "Soubory, které v hromadném převodu dostanou „nerozpoznáno“, do ZIPu nejdou a zůstanou v seznamu. Tři časté příčiny: není to soubor titulků, kódování není UTF-8, nebo byl obsah stlačen do jednoho odstavce bez časových značek.",
+            "Problém s kódováním oprav zvlášť v [[Oprava rozbitých znaků|/repair.html]]; problém s formátem převeď zvlášť v [[Převod formátu|/convert.html]] a vrať do seznamu. **Nevsouvej nerozpoznané násilím, aby byl počet** — zjistit v přehrávači, že chybí díl, je mnohem horší než minutu navíc teď."
+          ]
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Celé použití hromadného převodu v [[Jak používat hromadný převod titulků|/guides/batch.html]]; sjednocení časové osy na jeden posun v [[Jak používat úpravu časové osy|/guides/shift.html]]; než to odevzdáš, projdi to ještě [[Kontrola kvality titulků|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "cs": {
+      "seo": {
+        "title": "Co je 23.976 / 24 / 25 / 30 fps – časová osa titulků – AI-SRTSub",
+        "desc": "23.976 není 24 a 29.97 není 30: těch 0,1 procenta pochází z barevné úpravy NTSC. V oblastech PAL se film pouští jako 25 a zrychlí o 4 procenta. Jak čísla ovlivňují časovou osu.",
+        "h1": "Co je 23.976 / 24 / 25 / 30 fps",
+        "intro": "Těch 0,1 procenta mezi 23.976 a 24 je ocas z historie televize. Spolu se 4 procenty PAL je to původ toho, že titulky čím dál víc ujíždějí.",
+        "ctaText": "Otevřít úpravu časové osy"
+      },
+      "body": [
+        {
+          "h2": "Co jsou tato čtyři čísla",
+          "ps": [
+            "Snímková frekvence je, kolik snímků se ukáže za sekundu. Čtyři nejčastější:"
+          ],
+          "ul": [
+            "**24 fps** — rychlost natáčení a promítání filmu, kino jede na 24",
+            "**23.976 fps** — rychlost filmu po přechodu na televizi NTSC, o 0,1 procenta pomalejší než 24",
+            "**25 fps** — televizní rychlost PAL (Evropa, Čína, Austrálie a další oblasti 50 Hz)",
+            "**29.97 fps / 30 fps** — rychlost televizních pořadů NTSC, zase tentýž rozdíl 0,1 procenta"
+          ]
+        },
+        {
+          "h2": "Odkud se vzalo 0,1 procenta",
+          "ps": [
+            "23.976 = 24 × 1000/1001, 29.97 = 30 × 1000/1001. Těch 1000/1001 zůstalo z doby, kdy NTSC přecházel na barvu: aby se do existujících černobílých přijímačů vešla barevná pomocná nosná, snížil se kmitočet pole z 60 Hz na 59,94 Hz (60 × 1000/1001).",
+            "Důsledek: film se v oblastech NTSC vysílá na 23.976, ne na 24. Rozdíl 0,1 procenta je u hodinového filmu 3,6 sekundy — sám o sobě téměř neznatelný, ale není to totéž co 4 procenta níže."
+          ]
+        },
+        {
+          "h2": "A 4 procenta",
+          "ps": [
+            "V oblastech PAL se vysílá na 25 fps. Film se natáčí na 24 fps a pouští se rovnou na 25 — počet snímků se nezmění, rychlost přehrávání stoupne o 4 procenta (25/24 ≈ 1,0417). Stominutový film má v PAL verzi 96 minut.",
+            "To je původ **postupného ujíždění**: titulky jsou dělané podle originálu a video je PAL verze; na začátku to sedí na vteřinu, na konci chybí 4 minuty. Posunout všechno nepomůže, musí se přepočítat podle poměru."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Oblast změny rychlosti na stránce časové osy: vstupní pole pro poměr",
+            "cap": "Přepočítat podle poměru, jedna hodnota poměru platí pro celý film"
+          }
+        },
+        {
+          "h2": "Jak přepočítat",
+          "ps": [
+            "Přepočítat znamená vynásobit jednou hodnotou poměru, platnou pro celý film:"
+          ],
+          "ul": [
+            "**24 → 25** (zrychlení PAL): × 0,96",
+            "**23.976 → 25**: × 0,959 (přesná hodnota 23.976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 nebo × 0,999, rozdíl jen 0,1 procenta",
+            "Mezi 0,96 a 0,959 je 0,1 procenta, u celého filmu méně než 6 sekund — nevíš-li jistě, zda zdroj je 24 nebo 23.976, funguje i 0,96 a zbytek dorovná ukotvení na dvou bodech"
+          ]
+        },
+        {
+          "h2": "Jak poznat, kterou máš",
+          "ps": [
+            "Nechceš-li odhadovat poměr, najdi dva časy, u kterých jsi si jistý, že jsou správné — většinou první a poslední replika — a řekni nástroji, že tato replika má být na 00:00:12 a tamta na 01:35:40; podle těch dvou bodů celý film lineárně roztáhne. Tomu se říká ukotvení na dvou bodech.",
+            "Chceš-li si snímkovou frekvenci zdroje potvrdit sám: je uvedená v přehrávači nebo v nástroji s informacemi o médiích. Neobsahuje-li název souboru snímkovou frekvenci, jako `1080p.WEB`, je ukotvení na dvou bodech bezpečnější."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Ukotvení na dvou bodech na stránce časové osy: dvě vstupní pole pro časy",
+            "cap": "Ukotvení na dvou bodech nevyžaduje počítání frekvence, stačí dva časy"
+          }
+        },
+        {
+          "h2": "Související nástroje a průvodci",
+          "ps": [
+            "Přepočet snímkové frekvence přímo v [[Převod snímkové frekvence titulků|/guides/srt-fps-converter.html]]; úprava rychlosti v [[Úprava rychlosti titulků|/guides/subtitle-speed-converter.html]]; je-li posunuté všechno nebo to postupně ujíždí, viz [[Titulky čím dál víc ujíždějí|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

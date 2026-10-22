@@ -1,0 +1,233 @@
+<!-- ================================================================
+     v0.9.277 首页：营销落地页
+     顶部四张工具小卡 + 每个工具一段图文详解。
+     ⚠️ data-i18n 一律挂在「没有子元素」的节点上：
+        applyI18n 是 el.textContent = t(key)，挂在有子元素的容器上会把子元素整个抹掉
+        （v0.9.276 首页「当前页」标签就是这么没的）。
+        需要同时放文案和图标的地方（如 CTA 里的箭头 SVG），文案包一层 <span>。
+     ================================================================ -->
+<div id="viewLanding">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+
+  <div class="wrap">
+    <nav class="lnav">
+      <div class="logo"><div class="logo-mark">字</div><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.277</span></div>
+      <div class="spacer"></div>
+      <select id="uiLang2" aria-label="UI language"></select>
+    </nav>
+
+    <div class="hero">
+      <span class="spark s1">✨</span><span class="spark s2">🎬</span><span class="spark s3">💜</span>
+      <h1 data-i18n-html="heroTitle">字幕的活儿，<br><em>交给 AI</em></h1>
+      <p data-i18n="heroSub">翻译、清洗、特效字幕、视频下载——四个工具各干各的，想用哪个点哪个。<br>免费 · 免注册 · 隐私安全</p>
+    </div>
+  </div>
+
+  <!-- 顶部：四张工具小卡 -->
+  <section class="tools" aria-labelledby="toolsTitle">
+    <h2 class="vh" id="toolsTitle" data-i18n="toolsTitle">四个工具</h2>
+    <div class="tools-row">
+
+      <a class="tc tr" href="/translate.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h11"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcTrN">字幕翻译</div>
+        <p class="tc-d" data-i18n="tcTrD">75 种语言互译，自动配轴、自动折行</p>
+      </a>
+
+      <a class="tc cl" href="/clean.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18l-7 8v6l-4-2v-4z"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcClN">字幕清洗</div>
+        <p class="tc-d" data-i18n="tcClD">去广告水印、听障提示，13 条规则可开关</p>
+      </a>
+
+      <a class="tc fx" href="/merge.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 15h10M7 11.5h10"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcFxN">特效字幕</div>
+        <p class="tc-d" data-i18n="tcFxD">单语双语都能做特技：字体、颜色、描边、位置</p>
+      </a>
+
+      <!-- v0.9.277：视频下载工具。默认隐藏，仅官方域名由落地页脚本显示
+           （开源版/自部署不挂外链 —— 否则等于给别人的站白送外链）。 -->
+      <a class="tc dl" id="dlCard" href="https://risekol.com/video" target="_blank" rel="noopener" style="display:none">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></svg></div>
+          <span class="tc-go" data-i18n="tcGoOut">前往 ↗</span>
+        </div>
+        <div class="tc-n" data-i18n="tcDlN">视频下载工具</div>
+        <p class="tc-d" data-i18n="tcDlD">RiseKol 下载器：视频、音频、字幕一起存到本地</p>
+      </a>
+
+    </div>
+  </section>
+
+<!--INSERT-HEAD-->
+
+  <!-- ① 字幕翻译 -->
+  <section class="det first" aria-labelledby="detTrTitle">
+    <div class="det-in">
+      <div class="det-tx tr">
+        <span class="det-eye" data-i18n="tcTrN">字幕翻译</span>
+        <h2 id="detTrTitle" data-i18n="detTrT">把一整份外文字幕，翻成你的语言</h2>
+        <p class="det-lead" data-i18n="detTrL">选好目标语言丢进来，句级合并、术语统一、折行排版一次做完。译文严格贴合原时间轴，导出的时间轴一条都不漂。</p>
+        <ul class="det-list">
+          <li data-i18n="detTr1">75 种语言互译，句级合并后按时长回填</li>
+          <li data-i18n="detTr2">自动提取专名生成术语表，全片译法一致</li>
+          <li data-i18n="detTr3">超长自动折行，按标点与词边界走，不劈词</li>
+          <li data-i18n="detTr4">导出单语 / 双语，SRT / VTT / ASS / SBV / TXT</li>
+        </ul>
+        <a class="det-cta" href="/translate.html"><span data-i18n="detTrCta">打开字幕翻译</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-play">
+          <span class="l1">Where are you going?</span>
+          <span class="l2">你要去哪儿？</span>
+        </div>
+        <div class="mk-legend">
+          <span><i style="background:#C9C7D2"></i><span data-i18n="mkSrcAxis">原文轴</span></span>
+          <span><i style="background:#D4206A;opacity:.42"></i><span data-i18n="mkDstAxis">译文轴</span></span>
+        </div>
+        <div class="mk-tl">
+          <div class="mk-tl-row"><i style="left:0;width:31%"></i><i style="left:35%;width:24%"></i><i style="left:63%;width:37%"></i></div>
+          <div class="mk-tl-row d"><i style="left:0;width:31%"></i><i style="left:35%;width:24%"></i><i style="left:63%;width:37%"></i></div>
+        </div>
+        <p class="mk-note" data-i18n="mkN1">一条对一条；需要合并拆分时按时长智能分配</p>
+      </div>
+    </div>
+  </section>
+
+<!--INSERT-ABILITIES-->
+
+  <!-- ② 字幕清洗 -->
+  <section class="det rev" aria-labelledby="detClTitle">
+    <div class="det-in">
+      <div class="det-tx cl">
+        <span class="det-eye" data-i18n="tcClN">字幕清洗</span>
+        <h2 id="detClTitle" data-i18n="detClT">字幕拿到手，先过一遍水</h2>
+        <p class="det-lead" data-i18n="detClL">从网站扒下来的字幕总带着广告、水印和听障提示。13 条规则按需开关，改了什么逐条列给你看，还能一条条撤回——时间轴一动不动。</p>
+        <ul class="det-list">
+          <li data-i18n="detCl1">去水印广告、听障提示、HTML 标签与 ASS 特效标记</li>
+          <li data-i18n="detCl2">全大写、乱码、多余空行一并修掉</li>
+          <li data-i18n="detCl3">改动对照表逐条可还原，只改文本不动时间</li>
+          <li data-i18n="detCl4">源文件是双语 ASS 时，合并与翻转也在这做</li>
+        </ul>
+        <a class="det-cta" href="/clean.html"><span data-i18n="detClCta">打开字幕清洗</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad" data-i18n="mkBefore">清洗前</span><span class="mk-hit" data-i18n="mkHits">命中 4 处</span></div>
+          <p class="mk-p"><s>订阅我的频道 · 关注 Telegram 群</s></p>
+          <p class="mk-p">你今天看起来不错 <s>[笑声]</s></p>
+          <p class="mk-p"><s>&lt;font color="#fff"&gt;</s>我们走吧<s>&lt;/font&gt;</s></p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good" data-i18n="mkAfter">清洗后</span><span class="mk-hit" data-i18n="mkTiming">时间轴未动</span></div>
+          <p class="mk-p">你今天看起来不错</p>
+          <p class="mk-p">我们走吧</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN2">逐条列出改了什么，可一条条还原</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ 特效字幕制作 -->
+  <section class="det" aria-labelledby="detFxTitle">
+    <div class="det-in">
+      <div class="det-tx fx">
+        <span class="det-eye" data-i18n="tcFxN">特效字幕</span>
+        <h2 id="detFxTitle" data-i18n="detFxT">单语双语，都能做出片级特效</h2>
+        <p class="det-lead" data-i18n="detFxL">手上是一条单语字幕，还是已经排好的双语，都能在这里定型：字体、字号、颜色、描边、位置、边距逐项调，预览就是你导出拿到的那一份。</p>
+        <ul class="det-list">
+          <li data-i18n="detFx1">单语整饰 / 调整已有双语 / 两份合成双语，三种模式</li>
+          <li data-i18n="detFx2">ASS 与 VTT 各一套模板，样式槽逐项微调</li>
+          <li data-i18n="detFx3">字体、颜色、描边、位置、安全边距全部可视调节</li>
+          <li data-i18n="detFx4">时间轴就地精修：整体偏移、比例缩放、重叠体检</li>
+        </ul>
+        <a class="det-cta" href="/merge.html"><span data-i18n="detFxCta">打开特效字幕制作</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-pair">
+          <div>
+            <span class="mk-cap" data-i18n="mkMono">单语</span>
+            <div class="mk-screen"><span class="l2 only">♪ 爱在空中飘荡 ♪</span></div>
+          </div>
+          <div>
+            <span class="mk-cap" data-i18n="mkBi">双语</span>
+            <div class="mk-screen"><span class="l1">♪ Love is in the air ♪</span><span class="l2">♪ 爱在空中飘荡 ♪</span></div>
+          </div>
+        </div>
+        <div class="mk-slots">
+          <span class="mk-slot on" style="--c:#6D5BD0" data-i18n="mkSlot1">叙事</span>
+          <span class="mk-slot" style="--c:#0B7A5C" data-i18n="mkSlot2">歌词</span>
+          <span class="mk-slot" style="--c:#D4206A" data-i18n="mkSlot3">重点</span>
+          <span class="mk-slot" style="--c:#2563C9" data-i18n="mkSlot4">自定义</span>
+        </div>
+        <p class="mk-note" data-i18n="mkN3">预览 = 导出；样式槽改一项，整片跟着变</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ 视频下载工具（同上：只在官方域名显示） -->
+  <section class="det rev" id="dlSec" aria-labelledby="detDlTitle" style="display:none">
+    <div class="det-in">
+      <div class="det-tx dl">
+        <span class="det-eye" data-i18n="tcDlN">视频下载工具</span>
+        <h2 id="detDlTitle" data-i18n="detDlT">看到想要的视频，直接存下来</h2>
+        <p class="det-lead" data-i18n="detDlL">RiseKol 视频下载器：粘个链接就能把视频、音频和原文字幕存到本地。桌面客户端，macOS 与 Windows 都有。</p>
+        <ul class="det-list">
+          <li data-i18n="detDl1">粘个链接就能下：视频、音频、字幕</li>
+          <li data-i18n="detDl2">macOS 与 Windows 桌面客户端</li>
+          <li data-i18n="detDl3">客户端自己下载，不依赖浏览器插件</li>
+        </ul>
+        <a class="det-cta" href="https://risekol.com/video" target="_blank" rel="noopener"><span data-i18n="detDlCta">前往下载</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig">
+        <div class="mk-win">
+          <div class="mk-winbar"><i></i><i></i><i></i><span class="mk-url">https://www.youtube.com/watch?v=…</span></div>
+          <div class="mk-items">
+            <div class="mk-it">
+              <span class="mk-thumb"></span>
+              <span class="mk-it-tx"><b data-i18n="mkVideo">视频 1080p</b><em>.mp4 · <span data-i18n="mkSaved">已保存到「下载」</span></em></span>
+              <span class="mk-st">✓</span>
+            </div>
+            <div class="mk-it">
+              <span class="mk-thumb"></span>
+              <span class="mk-it-tx"><b data-i18n="mkSubs">原文字幕</b><em>.srt</em></span>
+              <span class="mk-st">✓</span>
+            </div>
+            <div class="mk-it">
+              <span class="mk-thumb"></span>
+              <span class="mk-it-tx"><b data-i18n="mkAudio">音轨</b><em>.m4a</em><span class="mk-prog"><i></i></span></span>
+              <span class="mk-st run">62%</span>
+            </div>
+          </div>
+        </div>
+        <p class="mk-note" data-i18n="mkN4">视频、音轨、字幕分轨下载</p>
+      </div>
+    </div>
+  </section>
+
+<!--INSERT-TAIL-->
+
+</div>

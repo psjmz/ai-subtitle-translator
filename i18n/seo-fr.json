@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio en SRT - convertissez la voix en sous-titres | AI-SRTSub",
+    "desc": "Audio ou vidéo en entrée, sous-titres en sortie : la reconnaissance vocale s'exécute dans votre navigateur sans rien téléverser. Exportez en SRT / VTT gratuitement.",
+    "kw": "audio en srt,parole en sous-titre,générer des sous-titres à partir de l'audio,générateur de sous-titres automatique,transcrire l'audio en srt,whisper subtitles,reconnaissance vocale dans le navigateur,génération de sous-titres hors ligne,audio vers sous-titre",
+    "intro": "Glissez un fichier audio ou vidéo, choisissez une langue et un modèle, et la reconnaissance s'exécute dans votre navigateur pour produire un projet de sous-titres chronométré, déjà découpé par phrases et adapté à la largeur de ligne.",
+    "feat": "Un reconnaisseur vocal renvoie un flux de mots avec des heures de début et de fin réelles, sans savoir ce qu'est un bloc de sous-titres. Cet outil ajoute cette couche en découpant les phrases selon la ponctuation réelle, en rajustant les blocs trop longs au niveau des virgules et des mots, et en adaptant la largeur de ligne (16 caractères pour le chinois, 42 pour les alphabets latins) ainsi que le minutage à la vitesse de lecture sans chevauchement. Trois tailles de modèle sont disponibles, téléchargées lors de la première utilisation puis mises en cache par le navigateur. La reconnaissance s'exécute localement et l'audio n'est jamais téléversé. La sortie en chinois utilise souvent des caractères traditionnels, qu'un simple interrupteur permet de convertir en caractères simplifiés lors de l'exportation.",
+    "who": "Pour les créateurs sous-titrant leurs propres vidéos, les équipes convertissant des podcasts et des cours en texte, ainsi que toute personne disposant de séquences sans sous-titres recherchant un projet modifiable."
+  },
+  "ocrsub": {
+    "title": "OCR de sous-titres - lisez les textes incrustés dans l'image | AI-SRTSub",
+    "desc": "Les sous-titres incrustés n'ont pas de piste à extraire. Sélectionnez la bande pour que l'outil lise image par image et fusionne les blocs identiques. SRT / VTT gratuits.",
+    "kw": "extraire les sous-titres incrustés,ocr de sous-titres,extraction de sous-titres vidéo,sous-titres gravés,ocr des sous-titres de vidéos,video to srt,sous-titre de vidéo,hardcoded caption ocr,subtitle ocr",
+    "intro": "Déposez une vidéo, délimitez la bande des sous-titres, et l'outil lit image par image pour fusionner les cadres consécutifs identiques en un seul bloc chronométré.",
+    "feat": "Les sous-titres incrustés dans l'image n'ont aucune piste extractible, mais possèdent trois propriétés utiles : ce sont les pixels les plus lumineux, ils restent dans une bande fixe en bas, et une ligne s'affiche pendant une à trois secondes. La bande est donc recadrée et binarisée selon la luminosité pour faire disparaître l'arrière-plan et ne laisser que les formes à lire. Le texte identique sur des images consécutives forme un bloc unique, chronométré de la première à la dernière image. Un recadrage plus serré et un meilleur seuil réduisent les erreurs de lecture. Le résultat est un projet brut qui peut ensuite être nettoyé et vérifié plus rapidement que correction bloc par bloc.",
+    "who": "Pour les équipes de sous-titrage localisant de courtes vidéos étrangères, toute personne recréant les sous-titres d'une ancienne sortie, et les monteurs disposant uniquement de la vidéo finie sans fichier de sous-titres d'origine."
+  }
+}

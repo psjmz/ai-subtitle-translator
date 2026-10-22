@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "da": {
+      "seo": {
+        "title": "Sådan bruger du reparation af ødelagte tegn – genkend kodningen – AI-SRTSub",
+        "desc": "Reparation af ødelagte tegn: genkend den oprindelige kodning (GBK / Big5 / Shift_JIS / EUC-KR), sæt kandidaterne i rækkefølge efter hvad der mest ligner almindeligt sprog, gem som UTF-8 med BOM.",
+        "h1": "Sådan bruger du reparation af ødelagte tegn",
+        "intro": "Er underteksten fuld af ødelagte tegn når du åbner den, er filen som regel ikke ødelagt — den er bare læst med den forkerte kodning. Reparatoren genkender den oprindelige kodning og sætter tegnene tilbage.",
+        "ctaText": "Åbn reparationen"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "De samme bytes læst som UTF-8 og som GBK giver to helt forskellige sæt tegn — filen er ikke ødelagt, der blev valgt forkert kodning ved læsningen. Det her gør reparatoren:"
+          ],
+          "ul": [
+            "Genkender hvilken kodning filen oprindeligt blev skrevet i, og sætter tegnene tilbage efter det rigtige sæt",
+            "Fortæller hvor fejlen er: erstatningstegn, kontroltegn, valutasymbol, rækker af bogstaver med accenter, sammenhængende sjældne tegn",
+            "Sætter kandidaterne i rækkefølge efter hvad der mest ligner almindeligt sprog, så du kan vælge en og gemme",
+            "Når afspilleren ikke genkender kodningen, gemmes en kopi som UTF-8 med BOM eller GBK og gives til afspilleren"
+          ]
+        },
+        {
+          "h2": "Upload en fil, indsæt ikke",
+          "ps": [
+            "De to indgange kan ikke reparere lige meget, **kan du uploade en fil, så gør det**. Ved upload er de oprindelige bytes stadig til stede: værktøjet kan prøve hver kodning efter tur, genkende at det er GBK og afkode som GBK uden at gætte på noget. Det du indsætter er ikke længere oprindelige bytes — når browseren afleverer teksten, er det forkerte skridt allerede sket.",
+            "Er erstatningstegnet (det firkantede spørgsmålstegn `�`) allerede i den indsatte tekst, er de oprindelige bytes væk, og ingen kan få dem tilbage. Siden siger det rent ud: gå tilbage op og upload originalfilen med „Vælg fil“."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Uploadzonen på reparationssiden: slip-område og indsætningsfelt, ovenover ses den genkendte kodning",
+            "cap": "Slip filen eller vælg den; indsætningsfeltet er nedenunder og kan reparere meget mindre"
+          }
+        },
+        {
+          "h2": "Hvad diagnosen siger",
+          "ps": [
+            "Efter upload giver diagnosefeltet en konklusion. **Ingen ødelagte tegn fundet**: dette indhold læses normalt; ser du stadig ødelagte tegn i afspilleren, har afspilleren valgt forkert kodning — gå til „Gem som“ nedenfor og skift til en anden kodning. Ved **ligner ødelagte tegn** regnes præcist op hvilket spor:"
+          ],
+          "ul": [
+            "Der er et erstatningstegn i den — de oprindelige bytes er allerede væk",
+            "Der er kommet kontroltegn ind imellem",
+            "Der er en masse valuta- og matematiske symboler",
+            "Bogstaver med accenter optræder i rækker — som om UTF-8 blev læst en byte ad gangen (`ä½ å¥½` er den slags)",
+            "Tegnene står i rækker men der er ikke ét eneste almindeligt — som om UTF-8 blev læst som GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosekort: konklusion og de ødelagte-tegn-spor regnet op ét efter ét",
+            "cap": "Diagnosen regner spor op efter type, ikke bare én sætning om ødelagte tegn"
+          }
+        },
+        {
+          "h2": "Hvordan kandidaterne sættes i rækkefølge",
+          "ps": [
+            "Under „Sådan kan det repareres“ står kandidaterne i rækkefølge efter **hvad der mest ligner almindeligt sprog**, højst 12 poster, hver mærket med hvilken kodning den er læst fra og til. Klik på en og se resultatet; passer den, gemmer du nedenfor; gør den ikke, klikker du „Behold som det er“.",
+            "Rækkefølgen kommer fra en score: andel almindelige tegn, rækker af accenter, rækker af symboler og sjældne tegn tæller alle med. **Er scoren ikke tydeligt bedre, anbefales ingenting** — der findes ikke på en kandidat for at der skal være én. Ved filer der er behandlet forkert to gange, ræsonnerer værktøjet et lag mere baglæns."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Liste over reparationskandidater: efter hvor meget de ligner almindeligt sprog, hver med kodningspar",
+            "cap": "Kandidater efter hvad der mest ligner almindeligt sprog, hver mærket med kodningspar"
+          }
+        },
+        {
+          "h2": "Gem er det sidste skridt",
+          "ps": [
+            "Efter reparationen skal du også gemme rigtigt. Genkender afspilleren ikke UTF-8, så gem **UTF-8 med BOM** (Windows-afspillere genkender kodningen på BOM'en) eller **GBK**, som regel bliver det godt så. Der kan gemmes som UTF-8, UTF-8 (med BOM), GBK, Big5, Shift_JIS, EUC-KR; er der ikke plads, bliver du bedt om at vælge en anden. Filnavnet får `-fixed` lagt til.",
+            "Er den genkendte kodning ikke UTF-8, peger „Gem som“ allerede på „UTF-8 med BOM“; når du selv har ændret listen, sættes den ikke tilbage for dig."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Resultatfelt: tekstfelt, listen Gem som og downloadknappen",
+            "cap": "Vælg kodning og download; -fixed lægges til filnavnet"
+          }
+        },
+        {
+          "h2": "Hvad der ikke ændres",
+          "ps": [
+            "Kun de forkert læste tegn erstattes. Numre, tidslinje og ASS' stilkommandoer ændres ikke med ét tegn."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Jeg uploadede en fil, hvorfor skal jeg stadig gemme?** Selve filen er som regel ikke ødelagt; det der går galt er at afspilleren læser den med forkert kodning. Du skal ikke ændre ét eneste tegn i teksten: giv afspilleren en kopi gemt som UTF-8 med BOM eller GBK.",
+            "**Hvorfor kan indsat tekst ikke repareres?** Så snart erstatningstegnet optræder i indsat tekst, er de oprindelige bytes tabt og baglæns ræsonnement har intet grundlag. Gå tilbage op og upload originalfilen.",
+            "**Den kandidat jeg vil have er ikke med?** Er scoren ikke tydeligt bedre end den nuværende, anbefaler værktøjet ingenting. Du kan først skifte „Genkendt kodning“ til en anden og lade den sætte i rækkefølge igen.",
+            "**Hvor mange kan repareres ad gangen?** Én. Reparer, download, upload så den næste."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Genkendelse og reparation foregår helt lokalt i browseren; intet undertekstindhold sendes til serveren."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Hvor ødelagte tegn kommer fra, se [[Hvor kommer ødelagte tegn i undertekster fra|/guides/subtitle-garbled-characters.html]]; er kodningen fin men indholdet beskidt, brug [[Rens undertekster|/clean.html]]; vil du kontrollere tidslinje og tekstlængde, brug [[Kvalitetskontrol af undertekster|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "da": {
+      "seo": {
+        "title": "Hvor kommer ødelagte tegn fra – genkendt kan repareres – AI-SRTSub",
+        "desc": "Ødelagte tegn er ikke en ødelagt fil men bytes læst med forkert kodning. Erstatningstegn, rækker af bogstaver med accenter og sammenhængende sjældne tegn svarer til hver sin årsag.",
+        "h1": "Hvor kommer ødelagte tegn i undertekster fra",
+        "intro": "De samme bytes læst som UTF-8 og som GBK giver to helt forskellige sæt tegn. Hvordan de ødelagte tegn ser ud, er det direkte bevis på hvilket skridt der gik galt.",
+        "ctaText": "Åbn reparationen"
+      },
+      "body": [
+        {
+          "h2": "Filen er ikke ødelagt, læsningen er forkert",
+          "ps": [
+            "I en undertekstfil ligger bytes. For at gøre bytes til tegn skal du vide hvilken kodning de er skrevet i — vælger du forkert, bliver det ødelagte tegn. Selve filen har ikke mistet én byte; læser du den med en anden kodning, kommer tegnene tilbage.",
+            "Ødelagte tegn er altså to ting: **genkende den oprindelige kodning** og **gemme i en kodning afspilleren genkender**. Det første klares ved prøvelæsning og score, det andet ved Gem som."
+          ]
+        },
+        {
+          "h2": "Fem udseender, fem årsager",
+          "ps": [
+            "Ødelagte tegn opstår ikke tilfældigt; udseendet afslører årsagen med det samme:"
+          ],
+          "ul": [
+            "**Rækker af bogstaver med accenter** (`ä½ å¥½`): tekst i UTF-8 er læst som en kodning med én byte ad gangen — i UTF-8 er et tegn tre bytes, ved læsning én byte ad gangen bliver hver byte sit eget bogstav",
+            "**Tegn i rækker men ikke ét almindeligt**: UTF-8 er læst som GBK — to bytes ad gangen sættes sammen på ny og der kommer kun sjældne tegn ud",
+            "**En masse valuta- og matematiske symboler**: bytes er havnet i symbolområdet, ofte ved læsning som Mac Roman eller Latin-1-familien",
+            "**Der er kommet kontroltegn ind imellem**: bytes er havnet i det usynlige kontrolområde, på skærmen vises tomrum eller en firkant",
+            "**Det firkantede spørgsmålstegn `�`**: det er et **erstatningstegn**, ikke ødelagte tegn — det betyder at her var et tegn som allerede gik tabt"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Diagnosekort: sporene af ødelagte tegn regnet op ét efter ét",
+            "cap": "Diagnosen deler ødelagte tegn op efter årsag, ikke én vag dom"
+          }
+        },
+        {
+          "h2": "Hvorfor erstatningstegn ikke kan repareres",
+          "ps": [
+            "Erstatningstegnet er den vigtige grænse. Ses `�`, er bytes blevet kasseret allerede i **et tidligere skridt** (typisk har et program læst filen én gang og gemt den én gang); der er ikke noget spor af den kasserede del. Baglæns ræsonnement har så intet grundlag — ingen kan reparere det.",
+            "Derfor behandler reparationssiden to tilfælde hver for sig: ved upload er de oprindelige bytes stadig til stede og hver kodning kan prøves efter tur; er erstatningstegnet allerede i indsat tekst, siges det rent ud at det ikke kan lade sig gøre.",
+            "Der er også et omvendt tilfælde: indholdet læses helt normalt, men i afspilleren er det stadig ødelagt. Det er ikke filens fejl men **afspilleren der valgte forkert kodning**. At ændre filen hjælper ikke; giv den en kopi gemt som UTF-8 med BOM eller GBK."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Uploadzonen: to indgange, slip og indsæt",
+            "cap": "Upload en fil hvis du kan — er bytes der, er der noget at reparere"
+          }
+        },
+        {
+          "h2": "Hvad der sammenlignes ved reparation",
+          "ps": [
+            "Værktøjet prøver hver mulig kodning efter tur og giver så hvert resultat en score: hvor mange almindelige tegn, er der rækker af accenter, er der rækker af symboler, er tegnene sammenhængende sjældne. Den med højest score står øverst.",
+            "**Er scoren ikke tydeligt bedre, anbefales ingenting** — hellere sige at denne fil læses normalt end at spise dig af med et tyndt resultat. Ved filer behandlet forkert to gange ræsonneres et lag mere baglæns."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Kandidatliste: efter score, hver med kodningspar",
+            "cap": "Kandidater efter score; uden tydelig fordel anbefales ingenting"
+          }
+        },
+        {
+          "h2": "Gem i den rigtige kodning gør det færdigt",
+          "ps": [
+            "Den reparerede tekst skal også gemmes i en kodning afspilleren genkender. Afspillere i Windows genkender kodningen som regel på BOM'en, så **UTF-8 med BOM** er nemmest; ældre apparater og lokale afspillere genkender GBK. Kodninger at vælge: UTF-8, UTF-8 (med BOM), GBK, Big5, Shift_JIS, EUC-KR; er der ikke plads, bliver du bedt om at vælge en anden."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Resultatfelt: listen med kodninger til Gem som og downloadknappen",
+            "cap": "Gem i en kodning afspilleren genkender, først da er de ødelagte tegn virkelig løst"
+          }
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Hele fremgangsmåden i [[Sådan bruger du reparation af ødelagte tegn|/guides/repair.html]]; hvad der egentlig står i en SRT-fil i [[Hvad står der i en SRT-fil|/guides/srt-file-format.html]]; er kodningen fin men indholdet beskidt (vandmærke, reklame, hørehæmmede-markeringer), brug [[Rens undertekster|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "da": {
+      "seo": {
+        "title": "Konvertering forenklet-traditionel – Taiwan og Hongkong hver for sig – AI-SRTSub",
+        "desc": "Konvertering forenklet-traditionel: ni retninger, for Taiwan ordskift eller kun form, Hongkong sit eget sæt. Kun replikteksten ændres; tidslinje, numre og ASS' stilkommandoer røres ikke.",
+        "h1": "Sådan bruger du konvertering forenklet-traditionel",
+        "intro": "Samme undertekst til Taiwan, Hongkong eller fastlandet har forskelligt ordforråd og tegnform. På konverteringssiden vælger du mellem ni retninger; kun replikteksten ændres.",
+        "ctaText": "Åbn konverteringen"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Konvertering forenklet-traditionel er ikke at give hvert tegn en anden skrivemåde og så være færdig. Det samme forenklede ord har et andet ord i forskellige regioner. Konverteringssiden behandler det hver for sig:"
+          ],
+          "ul": [
+            "Forenklet til traditionel (almindelig / Taiwan / Hongkong)",
+            "Traditionel til forenklet (almindelig / fra taiwansk traditionel / fra hongkongsk traditionel)",
+            "Formskift mellem traditionelle (til taiwansk form / til hongkongsk form)",
+            "Ét forenklet tegn med flere traditionelle bliver ikke forkert konverteret (ordet afgør, ikke det enkelte tegn)"
+          ]
+        },
+        {
+          "h2": "Upload og genkendelse",
+          "ps": [
+            "Slip filen ind eller vælg den; SRT, VTT, ASS og TXT understøttes, du kan også indsætte underteksten direkte. Efter upload genkendes formatet automatisk og vises ved „Genkendt format“."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Uploadzonen på konverteringssiden: slip-område og indsætningsfelt, ovenover ses det genkendte format",
+            "cap": "SRT / VTT / ASS / TXT, formatet genkendes automatisk"
+          }
+        },
+        {
+          "h2": "Hvordan du vælger mellem de ni retninger",
+          "ps": [
+            "De ni retninger under „Konverteringsretning“ deles i tre grupper. **Forenklet til traditionel**: almindelig traditionel, taiwansk traditionel (ordskift), taiwansk traditionel (kun form), hongkongsk traditionel. **Traditionel til forenklet**: almindelig, fra taiwansk traditionel, fra hongkongsk traditionel. **Formskift mellem traditionelle**: til taiwansk form, til hongkongsk form.",
+            "„Taiwanske ord“ skifter også de regionale termer; „taiwansk form“ ændrer kun skrivemåden og beholder dine ord. Hongkong er sit eget sæt: samme term skrives anderledes der. Vil du tilbage til forenklet, vælger du gruppen nedenfor — du skal sige hvilken traditionel du kommer fra."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kort for konverteringsretning: listen konverter til, nu valgt forenklet til taiwansk traditionel (ordskift)",
+            "cap": "Retningen vælges i listen konverter til, ni i tre grupper; her taiwansk traditionel med ordskift"
+          }
+        },
+        {
+          "h2": "Resultat og eksport",
+          "ps": [
+            "Resultatfeltet giver direkte den konverterede undertekst, statistikbjælken viser hvor mange linjer der er og hvor mange der blev ændret. Er ikke ét tegn ændret, kommer der en bemærkning om at denne undertekst måske ikke indeholder kinesiske tegn.",
+            "Efter bekræftelse downloader eller kopierer du. Det downloadede filnavn får en sprogmærkat lagt til — `demo.srt` bliver efter konvertering til taiwansk traditionel til `demo.zh-TW.srt`, almindelig traditionel `.zh-Hant`, tilbage til forenklet `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Resultatfelt: den konverterede undertekst og statistikbjælken",
+            "cap": "Statistikbjælken giver antal linjer og ændrede linjer; download direkte eller send videre til oversættelse"
+          }
+        },
+        {
+          "h2": "Hvad der ikke ændres",
+          "ps": [
+            "Kun replikteksten ændres. Tidslinje, numre og ASS' stilkommandoer ændres ikke med ét tegn — efter konvertering kan den bruges med det samme."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Hvorfor blev ikke hvert tegn som jeg ventede?** Har ét forenklet tegn flere traditionelle, afgør ordet: samme tegn går i forskellige ord til forskellige traditionelle tegn. Ordbogen kommer fra OpenCC.",
+            "**Hvad er forskellen på taiwansk og hongkongsk traditionel?** Ordforrådet: samme term skrives forskelligt i Taiwan og Hongkong. Vælg retningen for den region du sender til.",
+            "**Blev mit antal linjer ændret?** Kun kinesiske tegn ændres, der lægges ikke poster til eller tages fra, og tidslinjen forbliver den samme. Blev antallet ændret alligevel, så tjek om formatet blev genkendt forkert.",
+            "**Hvad hvis ordbogen ikke indlæses?** Siden beder dig genindlæse og prøve igen. Ordbogen indlæses lokalt, du behøver ikke uploade underteksten."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Konverteringen foregår helt lokalt i browseren; intet undertekstindhold sendes til serveren."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Behøver du kun forenklet til traditionel, se [[Forenklede undertekster til traditionel|/guides/srt-simplified-to-traditional.html]]; hvorfor det er mere end et andet tegn, se [[Konvertering forenklet-traditionel er ikke et andet tegn|/guides/simplified-traditional-chinese.html]]; vil du oversætte til et fremmedsprog, brug [[Oversættelse af undertekster|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "da": {
+      "seo": {
+        "title": "Forenklede undertekster til traditionel – Taiwan og Hongkong – AI-SRTSub",
+        "desc": "Konverter forenklede undertekster til traditionel: vælg Taiwan (ordskift eller kun form) eller Hongkong. Har tegnet flere traditionelle, afgør ordet. Kun replikteksten ændres.",
+        "h1": "Forenklede undertekster til traditionel",
+        "intro": "Forenklede kinesiske undertekster skal til seere i Taiwan eller Hongkong — én konvertering er nok. Taiwan og Hongkong er to sæt; vælger du forkert retning, siger ingen det sådan der.",
+        "ctaText": "Konverter denne undertekst"
+      },
+      "body": [
+        {
+          "h2": "Dette behov",
+          "ps": [
+            "Underteksterne er på forenklet kinesisk og skal til seere i Taiwan eller Hongkong. At ændre tegn for tegn er ikke realistisk, ét afsnit har hundredvis af poster. Desuden vil Taiwan og Hongkong ikke have den samme traditionelle — ordforrådet er forskelligt."
+          ]
+        },
+        {
+          "h2": "Hvor du gør det",
+          "ps": [
+            "Åbn [[Konvertering forenklet-traditionel|/hanconv.html]], slip underteksterne ind og vælg under „Konverteringsretning“ en af retningerne fra forenklet til traditionel: almindelig traditionel, taiwansk traditionel (ordskift), taiwansk traditionel (kun form), hongkongsk traditionel. Konverteringen er færdig med det samme.",
+            "**Til seere i Taiwan**: vil du have ordene med, vælg „taiwansk traditionel (ordskift)“; vil du kun skifte form og beholde dine ord, vælg „taiwansk traditionel (kun form)“. **Til seere i Hongkong**: vælg „hongkongsk traditionel“."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kort for konverteringsretning: listen konverter til, nu valgt forenklet til taiwansk traditionel (ordskift)",
+            "cap": "Taiwan og Hongkong er to retninger i listen, med forskelligt ordforråd"
+          }
+        },
+        {
+          "h2": "Almindelige faldgruber",
+          "ps": [
+            "**Ét tegn med flere traditionelle er ikke et problem**: samme forenklede tegn går i forskellige ord til forskellige traditionelle tegn; ordbogen afgør efter ordgruppe og konverterer ikke alt til ét tegn.",
+            "**Kun replikteksten ændres**: tidslinje, numre og ASS' stilkommandoer ændres ikke med ét tegn, den kan bruges med det samme.",
+            "**Intet blev ændret — gå ikke straks i panik**: viser statistikbjælken 0 ændrede linjer, er der måske ingen kinesiske tegn i disse undertekster, eller også blev formatet genkendt forkert — tjek „Genkendt format“."
+          ]
+        },
+        {
+          "h2": "Relateret",
+          "ps": [
+            "Den fulde beskrivelse af de ni retninger i [[Sådan bruger du konvertering forenklet-traditionel|/guides/hanconv.html]]; hvorfor det er mere end et andet tegn i [[Konvertering forenklet-traditionel er ikke et andet tegn|/guides/simplified-traditional-chinese.html]]; vejen tilbage er også i [[Konvertering forenklet-traditionel|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "da": {
+      "seo": {
+        "title": "Forenklet-traditionel er ikke et andet tegn – en til flere – AI-SRTSub",
+        "desc": "Konvertering forenklet-traditionel er svær tre steder: ét tegn med flere traditionelle afgøres af ordet, Taiwan og Hongkong har forskellige ord, og kun replikteksten må ændres.",
+        "h1": "Konvertering forenklet-traditionel er ikke et andet tegn",
+        "intro": "Hvilket traditionelt tegn et tegn bliver til afhænger af tegnet foran. Derfor kan konvertering ikke gøres blindt, tegn for tegn.",
+        "ctaText": "Åbn konverteringen"
+      },
+      "body": [
+        {
+          "h2": "For det første: ét tegn, flere traditionelle",
+          "ps": [
+            "Forenklingen slog flere traditionelle tegn sammen til ét forenklet. Går du tilbage, svarer ét forenklet tegn til flere traditionelle; hvilket du vælger afhænger af hvad det står sammen med:",
+            "At skifte blindt, tegn for tegn, gør alt til det samme tegn og hele teksten kommer til at vrimle med fejl. **At afgøre efter ordet** skiller dem ad — ordbogen kommer fra OpenCC og matcher ordgrupper først. For eksempel:"
+          ],
+          "ul": [
+            "Samme forenklede tegn går i ordet for ren til ét traditionelt tegn, i ordet for træstamme til et andet",
+            "I ordet for hår til ét tegn, i ordet for udvikling til et andet",
+            "I betydningen bagved, efter til ét tegn, i ordet for dronning til et andet"
+          ]
+        },
+        {
+          "h2": "For det andet: Taiwan og Hongkong er ikke det samme",
+          "ps": [
+            "Efter konvertering til traditionel er der endnu et lag: samme ord skrives ikke ens i Taiwan og Hongkong. En almindelig it-term har én skrivemåde i Taiwan og en anden i Hongkong.",
+            "Derfor holdes retningerne adskilt: inden for taiwansk traditionel er der to muligheder, ordskift og kun form — kun form beholder dine ord, ordskift skifter også regionale termer. Hongkong er en retning for sig."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kort for konverteringsretning: listen konverter til, nu valgt forenklet til taiwansk traditionel (ordskift)",
+            "cap": "For Taiwan kan du skifte ord eller kun form, Hongkong har sin egen retning"
+          }
+        },
+        {
+          "h2": "For det tredje: kun replikteksten",
+          "ps": [
+            "En undertekstfil er ikke kun replikker. Numre, tidslinje og ASS' stilkommandoer er også der, og af dem må ikke ét tegn ændres — især i ASS' stillinjer blandes engelske kommandonavne ind; behandles de som repliktekst, går de i stykker.",
+            "Derfor sker konverteringen efter at formatet er tolket: i SRT, VTT, ASS og TXT genkendes tekstdelen særskilt og kun de kinesiske tegn i den ændres. Efter konvertering forbliver tidslinje og stilarter de samme."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Resultatfelt: den konverterede undertekst og statistikbjælken med antal ændrede linjer",
+            "cap": "Statistikbjælken giver antal ændrede linjer, formatdelen forbliver den samme"
+          }
+        },
+        {
+          "h2": "Tilbage til forenklet: hvad du skal passe på",
+          "ps": [
+            "Også på vejen tilbage til forenklet skal du sige, **hvilken traditionel du kommer fra**: almindelig traditionel, taiwansk traditionel og hongkongsk traditionel er tre forskellige veje, for de regionale ord fra Taiwan og Hongkong føres først tilbage til det almindelige ord.",
+            "Den nederste gruppe af de ni retninger er dem der går tilbage til forenklet: traditionel til forenklet, taiwansk traditionel til forenklet, hongkongsk traditionel til forenklet."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Hele fremgangsmåden i [[Sådan bruger du konvertering forenklet-traditionel|/guides/hanconv.html]]; behøver du kun forenklet til traditionel, se [[Forenklede undertekster til traditionel|/guides/srt-simplified-to-traditional.html]]; vil du oversætte til et fremmedsprog, brug [[Oversættelse af undertekster|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "da": {
+      "seo": {
+        "title": "Sådan bruger du undertekster til Excel/CSV – begge veje – AI-SRTSub",
+        "desc": "Undertekster og tabel begge veje: SRT/VTT eksporteres til Excel eller CSV, rettes linje for linje og føres tilbage til undertekster. Tabellen genkender tre kolonner: begyndelse, slutning og tekst.",
+        "h1": "Sådan bruger du undertekster til Excel/CSV",
+        "intro": "Korrektur og oversættelse går nemmest i en tabel. Underteksterne eksporteres til Excel eller CSV, du retter linje for linje og fører dem tilbage til undertekster — tidskolonnen forbliver tekst.",
+        "ctaText": "Åbn tabelkonverteringen"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Undertekster er post efter post, en tabel også række efter række — er du først i tabellen, kan du bruge de vante funktioner til korrektur, noter og oversættelse i store mængder. Begge retninger understøttes:"
+          ],
+          "ul": [
+            "**Til tabel**: SRT og VTT eksporteres til Excel (.xlsx) eller CSV, én række per post",
+            "**Til undertekster**: den rettede tabel føres tilbage til SRT eller VTT",
+            "Tidskolonnen forbliver tekst, tabellprogrammet laver den ikke om til tal eller dato",
+            "Linjeskift i replikkerne forsvinder ikke, ved tilbageførslen ser de ens ud"
+          ]
+        },
+        {
+          "h2": "Upload og valg af retning",
+          "ps": [
+            "Slip filen ind eller vælg den. De to retninger vil have forskellige filer: **til tabel** vil have en undertekstfil (SRT / VTT), **til undertekster** vil have en tabelfil (CSV / Excel, også xlsx og xls). Vælger du forkert tilstand, siges det med det samme hvilken fil tilstanden vil have.",
+            "⚠️ Denne side læser kun som UTF-8. Ser du kun spørgsmålstegn eller firkanter når du åbner underteksterne, reparer kodningen først i [[Reparation af ødelagte tegn|/repair.html]] — med en ødelagt kodning læses her en bunke erstatningstegn."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Uploadzonen på tabsiden: slip-område og kontakten til to tilstande",
+            "cap": "De to tilstande vil have forskellige filer: til tabel undertekster, til undertekster en tabel"
+          }
+        },
+        {
+          "h2": "Fra undertekster til tabel",
+          "ps": [
+            "Vælg „til tabel“, læg underteksterne i, og forhåndsvisningen regner hver post op: nummer, begyndelse, slutning, tekst. Statistikbjælken giver antal poster og samlet varighed. Efter bekræftelse klikker du på Download Excel (.xlsx) eller Download CSV.",
+            "Forskellen på de to eksportformer: xlsx er en rigtig tabelfil, Excel kan ikke på egen hånd ændre formatet på tidskolonnen; CSV er mere universel men ved åbning i Excel kan tidskolonnen vise sig som noget andet — sker det, markerer du tidskolonnen og sætter formatet Tekst."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Forhåndsvisning af tabellen: fire kolonner nummer, begyndelse, slutning, tekst og statistikbjælke",
+            "cap": "Forhåndsvisningen regner op, statistikbjælken giver antal poster og varighed"
+          }
+        },
+        {
+          "h2": "Fra tabel tilbage til undertekster",
+          "ps": [
+            "Vælg „til undertekster“, læg tabellen i, og reglen for at genkende kolonnenavne er: tabellen skal have **begyndelse, slutning og tekst** (engelske Start / End / Text genkendes også), **kolonnernes rækkefølge betyder ikke noget**. Tiden må skrives som `00:00:01,500` eller `00:00:01.500`; rækker der ikke kan genkendes springes over.",
+            "Resultatet af tilbageførslen er regnet op i forhåndsvisningen, efter bekræftelse downloader du SRT eller VTT. Mangler de tre kolonner, bliver du bedt om at tjekke navnene — almindelig årsag er at der blev brugt andre navne ved eksporten."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Resultatfelt for undertekster: underteksterne efter tilbageførslen regnet op post for post",
+            "cap": "Kan tre kolonner ikke genkendes, siges det direkte, det fejler ikke stille"
+          }
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Tidskolonnen vises forkert i Excel, hvad gør jeg?** Brug xlsx direkte i stedet for CSV, så er der ikke noget problem. Skal det være CSV: marker tidskolonnen, sæt celleformatet til Tekst og åbn så.",
+            "**Skal kolonnenavnene være på kinesisk?** Nej. Begyndelse, slutning og tekst samt Start / End / Text genkendes, store og små bogstaver betyder ikke noget.",
+            "**Er linjeskiftene der stadig efter tilbageførslen?** Ja. Linjeskift i replikkerne forbliver de samme og ser ens ud efter tilbageførslen.",
+            "**Understøttes ASS?** Denne side laver kun SRT og VTT. ASS har stilkommandoer, konverter det først med [[Formatkonvertering|/convert.html]] til SRT.",
+            "**Hvor mange ad gangen?** Én. Til titals og hundredvis ad gangen er der [[Massekonvertering|/batch.html]] (den laver kun format, ikke tabel)."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Konverteringen foregår helt lokalt i browseren; intet undertekstindhold sendes til serveren."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Behøver du kun trinnet undertekster til Excel, se [[Undertekster til Excel|/guides/srt-to-excel.html]]; efter rettelsen, for at oversætte til et fremmedsprog, brug [[Oversættelse af undertekster|/translate.html]]; for at skifte format på titals filer på én gang brug [[Massekonvertering|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "da": {
+      "seo": {
+        "title": "Undertekster til Excel – SRT som xlsx til korrektur linje for linje – AI-SRTSub",
+        "desc": "Flyt SRT-undertekster til Excel: én række per post, fire kolonner nummer, begyndelse, slutning og tekst; tiderne forbliver tekst og linjeskift i replikkerne forsvinder ikke.",
+        "h1": "Undertekster til Excel",
+        "intro": "At rette hundredvis af undertekstposter én efter én i en teksteditor er trættende; i Excel er én række én post, og filtre, noter og erstatning i store mængder er klar. Færdig? Tilbage til SRT.",
+        "ctaText": "Eksporter til Excel"
+      },
+      "body": [
+        {
+          "h2": "Dette behov",
+          "ps": [
+            "Du skal rette underteksterne, skifte ord i store mængder eller give et par personer hver sit stykke — alt det går meget hurtigere i en tabel end i tekst. SRT er i sig selv almindelig tekst, men posternes struktur lægger sig præcist over tabellens fire kolonner."
+          ]
+        },
+        {
+          "h2": "Hvor du gør det",
+          "ps": [
+            "Åbn [[Tabelkonvertering|/table.html]], vælg tilstanden til tabel, slip SRT'en ind, og forhåndsvisningen regner med det samme hver post op — fire kolonner nummer, begyndelse, slutning, tekst. Klik på Download Excel (.xlsx) og du har den. VTT understøttes også.",
+            "Færdig med rettelsen: skift tilstanden til til undertekster, læg denne tabel tilbage, og du har SRT igen. Reglen for kolonnenavne: begyndelse, slutning og tekst skal være der (Start / End / Text også), rækkefølgen betyder ikke noget."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Tabelvisning: hver SRT-post bliver en række, fire kolonner og statistikbjælke",
+            "cap": "SRT lægger sig direkte over fire kolonner, efter rettelsen går den samme vej tilbage"
+          }
+        },
+        {
+          "h2": "Almindelige faldgruber",
+          "ps": [
+            "**Reparer kodningen først**: denne side læser kun som UTF-8. Er underteksterne fulde af spørgsmålstegn eller firkanter, gå først til [[Reparation af ødelagte tegn|/repair.html]].",
+            "**CSV eller xlsx**: skal den ind i Excel, vælg xlsx, tidskolonnen skifter ikke format; CSV er mere universel men Excel kan tage den for noget andet — sæt så tidskolonnen til Tekst.",
+            "**ASS går ikke**: ASS med stilkommandoer først til SRT, så ind i tabellen."
+          ]
+        },
+        {
+          "h2": "Relateret",
+          "ps": [
+            "Den fulde beskrivelse begge veje i [[Sådan bruger du undertekster til Excel/CSV|/guides/table.html]]; efter rettelsen, for at oversætte til et fremmedsprog, brug [[Oversættelse af undertekster|/translate.html]]; inden du giver den fra dig, gå den igennem med [[Kvalitetskontrol af undertekster|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "da": {
+      "seo": {
+        "title": "Massekonvertering af undertekster – hundredvis i én ZIP – AI-SRTSub",
+        "desc": "Massekonvertering: slip titals eller hundredvis af SRT/VTT ind på én gang, konverter til ét målformat og få dem som én ZIP. Numrene sættes om, ikke-genkendte filer står for sig.",
+        "h1": "Sådan bruger du massekonvertering af undertekster",
+        "intro": "Skal titals undertekster fra en sæson have samme format, er det for langsomt at uploade én ad gangen. På massesiden slipper du dem ind på én gang og får dem som én ZIP — ikke-genkendte filer kommer ikke med i pakken.",
+        "ctaText": "Åbn massekonverteringen"
+      },
+      "body": [
+        {
+          "h2": "Hvad værktøjet løser",
+          "ps": [
+            "Undertekster fra en hel sæson eller en hel samling skal ofte først til ét format før de kan bruges. Det her gør massesiden:"
+          ],
+          "ul": [
+            "Tager imod titals og hundredvis af SRT og VTT på én gang (flere kan markeres på én gang)",
+            "Konverterer til ét format: SRT eller VTT, numrene sættes om, tidsstempler normaliseres",
+            "Downloades som én ZIP, filnavnene forbliver de samme, kun filendelsen ændres",
+            "Filer hvor ingen undertekstpost kan læses, markeres for sig og kommer ikke i pakken"
+          ]
+        },
+        {
+          "h2": "Lægge filer i",
+          "ps": [
+            "Slip flere undertekstfiler sammen ind i den stiplede ramme, eller klik og markér flere på én gang. Fillisten regner dem op én efter én: ved genkendte ses antal poster, ikke-genkendte får „ikke genkendt“. Statistikken øverst giver antal filer og samlet antal poster.",
+            "⚠️ Denne side læser kun som UTF-8. Undertekster med ødelagt kodning (skærmen fuld af spørgsmålstegn eller firkanter) reparerer du først i [[Reparation af ødelagte tegn|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Filliste: filnavne og antal poster én efter én, ikke-genkendte i rødt",
+            "cap": "Listen regner op én efter én, ikke-genkendte markeres med det samme"
+          }
+        },
+        {
+          "h2": "Til hvilket format",
+          "ps": [
+            "Vælg målformatet under „Konverter til ét format“ — SRT eller VTT. Efter valget bygges hver fil i listen op på ny efter målformatet: numrene sættes om fra begyndelsen, tidsstempler normaliseres (SRT adskiller millisekunder med komma, VTT med punktum).",
+            "**Filnavnet forbliver det samme, kun filendelsen ændres**; ved ens navne lægges et løbenummer til, de overskriver ikke hinanden."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Valg af målformat og listens tilstand, statistikbjælke med antal filer og poster",
+            "cap": "Efter valg af målformat bygges listen op på ny; kun filendelsen i filnavnet ændres"
+          }
+        },
+        {
+          "h2": "Pak og download",
+          "ps": [
+            "Klik på Download som én ZIP, og i arkivet ligger alle de konverterede filer. **Filer hvor ingen undertekstpost kan læses, kommer ikke i pakken** — de står markerede i listen og smutter ikke ind som om det var lykkedes. Når pakken er klar, siges det hvor mange filer der er i den."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Pakkefelt: ZIP-downloadknap og besked om pakkeresultatet",
+            "cap": "Ikke-genkendte filer kommer ikke i pakken, de står markerede i listen"
+          }
+        },
+        {
+          "h2": "Hvornår der sættes ikke genkendt",
+          "ps": [
+            "Kan ikke én undertekstpost læses ud af en fil, sættes der „ikke genkendt“. Tre almindelige årsager: filen er ikke undertekster (for eksempel en .txt-fil der er kommet med), kodningen er ikke UTF-8, eller indholdet er presset sammen til ét afsnit uden tidsstempler.",
+            "Markerede filer kan tages sig af hver for sig: kodningsproblemet hører til [[Reparation af ødelagte tegn|/repair.html]], formatproblemet til [[Formatkonvertering|/convert.html]] — konverter særskilt og læg tilbage i listen."
+          ]
+        },
+        {
+          "h2": "Ofte stillede spørgsmål",
+          "ps": [
+            "**Hvor mange kan lægges i ad gangen?** Der er ingen fast øvre grænse, det afhænger af browserens hukommelse; et par hundrede SRT er som regel ikke noget problem.",
+            "**Bliver min repliktekst ændret?** Nej. Massekonvertering skifter kun beholderformatet, sætter numrene om og normaliserer tidsstempler; replikkerne røres ikke.",
+            "**Jeg vil ændre indholdet, hvad så?** Denne side laver kun format. Til tidslinje i store mængder er der [[Tidslinjejustering|/shift.html]], til tekst i store mængder [[Termudskiftning|/glossary.html]]; begge arbejder på deres egne sider.",
+            "**Understøttes ASS?** Denne side konverterer kun mellem SRT og VTT. ASS har stilarter, konverter det særskilt i [[Formatkonvertering|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Privatliv",
+          "ps": [
+            "Konvertering og pakning foregår helt lokalt i browseren; intet undertekstindhold sendes til serveren."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Hvad der skal ændres i en hel sæson og hvilket skridt der kommer først, se [[Sådan retter du undertekster fra en hel sæson i store mængder|/guides/batch-convert-srt.html]]; flere formater til én fil i [[Formatkonvertering|/convert.html]]; korrektur i tabel er [[Tabelkonvertering|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "da": {
+      "seo": {
+        "title": "Undertekster fra en hel sæson i store mængder – hvad der kan gøres – AI-SRTSub",
+        "desc": "I en hel sæson ændres som regel én ting: samme format, samme tidslinjeforskydning, samme termer. Hvad der kan gøres på én gang, og hvad der må tages fil for fil.",
+        "h1": "Sådan retter du undertekster fra en hel sæson i store mængder",
+        "intro": "I titals undertekster fra én sæson er det som regel det samme der er galt. At skille det der kan gøres på én gang fra det der må tages fil for fil, sparer mere end at gå alt igennem én ad gangen.",
+        "ctaText": "Åbn massekonverteringen"
+      },
+      "body": [
+        {
+          "h2": "Som regel er det den samme ting",
+          "ps": [
+            "Når noget er galt i underteksterne fra en sæson, har sjældent hvert afsnit sin egen fejl — som regel har den samme årsag ramt hvert afsnit: hele sæsonen er pakket af den samme undertekstgruppe (format ens, vandmærke ens), hele sæsonen er lavet til den samme videoversion, eller de oversatte navne er inkonsekvente gennem sæsonen.",
+            "Tag først to afsnit (ét fra begyndelsen, ét fra slutningen) og se om det er **den samme fejl**, før du går i gang i store mængder. Er fejlen forskellig i begyndelsen og slutningen, er det ikke noget for store mængder."
+          ]
+        },
+        {
+          "h2": "Hvad der kan gøres på én gang",
+          "ps": [
+            "**At få formatet ens** er det eneste der virkelig kan gøres på én gang: titals og hundredvis af SRT og VTT går sammen ind i [[Massekonvertering|/batch.html]], du vælger målformat og får én ZIP. Omnumrering og normalisering af tidsstempler sker i dette skridt, replikkerne røres ikke."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Fillisten på massesiden: antal poster én efter én, ikke-genkendte i rødt",
+            "cap": "At få formatet ens er det eneste der kan gøres på én gang"
+          }
+        },
+        {
+          "h2": "Hvad der må tages fil for fil",
+          "ps": [
+            "Til det følgende er der ikke nogen masseindgang, det må gås igennem fil for fil — men som regel findes en tilsvarende handling der **gøres én gang og så bruges på hele sæsonen**:"
+          ],
+          "ul": [
+            "**Ens tidslinjeforskydning**: er forskydningen den samme i hvert afsnit, måler du den ved ét afsnit i [[Tidslinjejustering|/shift.html]], skriver tallet ned og skriver det samme tal ved resten",
+            "**Ens termer**: termlisten sættes op én gang i [[Termudskiftning|/glossary.html]], hver undertekst bruger den samme liste",
+            "**Ens fjernelse af vandmærke**: reglen for vandmærket ligger fast, standardafkrydsningerne i [[Rens undertekster|/clean.html]] dækker almindelige vandmærker"
+          ]
+        },
+        {
+          "h2": "Vend ikke rækkefølgen om",
+          "ps": [
+            "Skal flere ting gøres, betyder forkert rækkefølge ekstra arbejde. Gå i denne rækkefølge:",
+            "**Reparer kodningen først** → **så få formatet ens** → **så ændr indholdet** (vandmærke, termer, tidslinje) → **til sidst kvalitetskontrol**. Uden reparation af kodningen giver formatskift stadig ødelagte tegn; uden ens format virker indholdsændring ikke, for værktøjerne understøtter ikke de samme formater."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Pakkefelt: ZIP-downloadknap og besked om resultatet",
+            "cap": "At få formatet ens kommer først, indholdsændringer bagefter"
+          }
+        },
+        {
+          "h2": "Hvad du gør med ikke-genkendte filer",
+          "ps": [
+            "Filer der får „ikke genkendt“ i massekonverteringen kommer ikke i ZIP'en, de bliver i listen. Tre almindelige årsager: det er ikke en undertekstfil (en forklaringsfil der er kommet med), kodningen er ikke UTF-8, eller indholdet er presset sammen til ét afsnit uden tidsstempler.",
+            "Reparer kodningsproblemet særskilt i [[Reparation af ødelagte tegn|/repair.html]]; konverter formatproblemet særskilt i [[Formatkonvertering|/convert.html]] og læg tilbage i listen. **Pres ikke ikke-genkendte ind med magt for at få antallet til at passe** — at opdage i afspilleren at et afsnit mangler, er meget værre end et minut ekstra nu."
+          ]
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Hele brugen af massekonvertering i [[Sådan bruger du massekonvertering af undertekster|/guides/batch.html]]; tidslinjen til én forskydning i [[Sådan bruger du tidslinjejustering|/guides/shift.html]]; inden du giver den fra dig, gå den igennem med [[Kvalitetskontrol af undertekster|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "da": {
+      "seo": {
+        "title": "Hvad er 23.976 / 24 / 25 / 30 fps – underteksters tidslinje – AI-SRTSub",
+        "desc": "23.976 er ikke 24 og 29.97 er ikke 30: de 0,1 procent kommer fra NTSC's farvegørelse. I PAL-områder spilles film som 25 og bliver 4 procent hurtigere. Hvordan tallene påvirker tidslinjen.",
+        "h1": "Hvad er 23.976 / 24 / 25 / 30 fps",
+        "intro": "De 0,1 procent mellem 23.976 og 24 er en hale fra fjernsynets historie. Sammen med PAL's 4 procent er det roden til at undertekster glider mere og mere.",
+        "ctaText": "Åbn tidslinjejusteringen"
+      },
+      "body": [
+        {
+          "h2": "Hvad de fire tal er",
+          "ps": [
+            "Billedfrekvensen er hvor mange billeder der vises på et sekund. De fire hyppigste:"
+          ],
+          "ul": [
+            "**24 fps** — filmens optagelses- og visningshastighed, biografen kører på 24",
+            "**23.976 fps** — filmens hastighed efter overgangen til NTSC-fjernsyn, 0,1 procent langsommere end 24",
+            "**25 fps** — fjernsynshastigheden i PAL (Europa, Kina, Australien og andre 50 Hz-områder)",
+            "**29.97 fps / 30 fps** — hastigheden for NTSC-fjernsynsudsendelser, igen den samme forskel på 0,1 procent"
+          ]
+        },
+        {
+          "h2": "Hvor de 0,1 procent kommer fra",
+          "ps": [
+            "23.976 = 24 × 1000/1001, 29.97 = 30 × 1000/1001. De 1000/1001 er blevet hængende fra NTSC's farvegørelse: for at få farvebærebølgen ind uden at ændre de eksisterende sort-hvide modtagere, blev feltfrekvensen sænket fra 60 Hz til 59,94 Hz (60 × 1000/1001), og billedfrekvensen fulgte med.",
+            "Konsekvensen: film sendes i NTSC-områder på 23.976 og ikke på 24. Forskellen på 0,1 procent er ved en times film 3,6 sekunder — i sig selv næsten umærkelig, men det er ikke det samme som de 4 procent nedenfor."
+          ]
+        },
+        {
+          "h2": "Og de 4 procent",
+          "ps": [
+            "I PAL-områder sendes der på 25 fps. Film er optaget på 24 fps og spilles direkte på 25 — antallet af billeder ændres ikke, afspilningshastigheden bliver 4 procent højere (25/24 ≈ 1,0417). En film på 100 minutter er 96 minutter i PAL-udgaven.",
+            "Det er roden til den **gradvise glidning**: underteksterne er lavet efter originalen og videoen er PAL-udgaven; i begyndelsen passer det på sekundet, til sidst mangler der 4 minutter. At flytte det hele hjælper ikke, det skal regnes om efter forholdet."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Hastighedsfeltet på tidslinjesiden: indtastningsfelt til forholdet",
+            "cap": "Regn om efter forholdet, én forholdsværdi gælder hele filmen"
+          }
+        },
+        {
+          "h2": "Hvordan du regner om",
+          "ps": [
+            "At regne om er at gange med én forholdsværdi, gældende for hele filmen:"
+          ],
+          "ul": [
+            "**24 → 25** (PAL-hastighed): × 0,96",
+            "**23.976 → 25**: × 0,959 (den nøjagtige værdi 23.976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 eller × 0,999, kun 0,1 procents forskel",
+            "Mellem 0,96 og 0,959 er der 0,1 procent, på en hel film under 6 sekunder — er du ikke sikker på om kilden er 24 eller 23.976, virker 0,96 også, resten tages af forankring i to punkter"
+          ]
+        },
+        {
+          "h2": "Hvordan du ved hvilken du har",
+          "ps": [
+            "Vil du ikke gætte forholdet, så find to tidspunkter du er sikker på er rigtige — som regel første og sidste replik — og sig til værktøjet at denne replik skal ligge på 00:00:12 og den på 01:35:40; så strækker det hele filmen lineært efter de to punkter. Det kaldes forankring i to punkter.",
+            "Vil du selv bekræfte kildens billedfrekvens: den står i afspilleren eller i et mediainfo-værktøj. Indeholder filnavnet ikke billedfrekvens, som `1080p.WEB`, er forankring i to punkter sikrere."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Forankring i to punkter på tidslinjesiden: to indtastningsfelter til tidspunkter",
+            "cap": "Forankring i to punkter kræver ingen beregning af billedfrekvens, to tidspunkter er nok"
+          }
+        },
+        {
+          "h2": "Relaterede værktøjer og guides",
+          "ps": [
+            "Billedfrekvens regnet om direkte i [[Billedfrekvens for undertekster|/guides/srt-fps-converter.html]]; hastighedsjustering i [[Hastighedsjustering af undertekster|/guides/subtitle-speed-converter.html]]; om alt er forskudt eller det glider gradvist, se [[Undertekster glider mere og mere|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

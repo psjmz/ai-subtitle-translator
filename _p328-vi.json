@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "vi": {
+      "seo": {
+        "title": "Cách dùng công cụ sửa lỗi ký tự phụ đề – Nhận đúng bảng mã – AI-SRTSub",
+        "desc": "Cách sửa phụ đề lỗi ký tự đầy đủ: nhận bảng mã gốc (GBK / Big5 / Shift_JIS / EUC-KR), chọn bản giống ngôn ngữ người nhất, rồi lưu thành UTF-8 có BOM hoặc GBK. Số thứ tự và mốc thời gian không đổi.",
+        "h1": "Cách dùng công cụ sửa lỗi ký tự phụ đề",
+        "intro": "Mở phụ đề ra toàn ký tự lỗi, phần lớn không phải file hỏng mà là bị đọc sai bảng mã. Công cụ sửa nhận ra bảng mã gốc, đổi lại những chữ bị đọc sai; số thứ tự và mốc thời gian không đổi một ký tự nào.",
+        "ctaText": "Mở công cụ sửa lỗi ký tự"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết gì",
+          "ps": [
+            "Cùng một đoạn byte, đọc theo UTF-8 và đọc theo GBK ra hai bộ ký tự hoàn toàn khác — file không hỏng, chỉ là lúc đọc chọn sai bảng mã. Việc công cụ sửa làm là:"
+          ],
+          "ul": [
+            "Nhận ra file này vốn dùng bảng mã nào, đổi chữ về bộ đúng",
+            "Nói rõ lỗi ở đâu: ký tự thay thế, ký tự điều khiển, ký hiệu tiền tệ, chữ cái có dấu thành dải, chữ Hán hiếm đứng liền nhau",
+            "Xếp hạng các phương án theo bản nào giống ngôn ngữ người nhất, chọn một rồi lưu",
+            "Khi trình phát không nhận bảng mã, lưu một bản UTF-8 có BOM hoặc GBK đưa cho nó"
+          ]
+        },
+        {
+          "h2": "Tải file lên, đừng dán",
+          "ps": [
+            "Hai cửa vào sửa được phạm vi khác nhau, **có thể tải file lên thì cứ tải lên**. Khi tải file lên, byte gốc còn nguyên, công cụ thử đọc từng bảng mã một, nhận ra là GBK thì giải theo GBK, không phải đoán một chữ nào. Còn nội dung dán vào đã không phải byte gốc — lúc trình duyệt đưa chuỗi qua, bước sai đã xảy ra rồi, chỉ có thể suy ngược lại, được bao nhiêu hay bấy nhiêu.",
+            "Nếu trong nội dung dán đã xuất hiện ký tự thay thế (dấu hỏi trong ô vuông `�`), nghĩa là byte gốc đã mất từ lâu, không ai khôi phục được. Trang sẽ nói thẳng: quay lên trên, tải file gốc lên bằng \"Chọn file\"."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Vùng tải lên của trang sửa lỗi ký tự: vùng kéo thả và ô dán, phía trên hiện bảng mã đã nhận ra",
+            "cap": "Kéo file hoặc bấm chọn để tải lên; ô dán ở dưới và phạm vi sửa nhỏ hơn nhiều"
+          }
+        },
+        {
+          "h2": "Chẩn đoán nói gì",
+          "ps": [
+            "Sau khi tải lên, vùng chẩn đoán đưa ra kết luận. **Không thấy lỗi ký tự**: nội dung đọc bình thường; nếu trong trình phát vẫn lỗi, nghĩa là trình phát chọn sai bảng mã — xuống phần \"Lưu thành\", đổi bảng mã khác rồi đưa file đó cho nó. Khi **trông giống lỗi ký tự**, sẽ liệt kê cụ thể là dấu vết nào:"
+          ],
+          "ul": [
+            "Có ký tự thay thế — byte gốc đã mất rồi",
+            "Ký tự điều khiển lẫn vào",
+            "Lẫn đầy ký hiệu tiền tệ, ký hiệu toán học",
+            "Chữ cái có dấu xuất hiện thành dải — như thể UTF-8 bị đọc theo kiểu một byte (`ä½ å¥½` là dạng này)",
+            "Chữ Hán đứng liền nhau mà không có chữ nào thông dụng — như thể UTF-8 bị đọc theo GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Thẻ chẩn đoán: kết luận và dấu vết lỗi ký tự được liệt kê từng dòng",
+            "cap": "Vùng chẩn đoán liệt kê dấu vết theo loại, không chỉ đưa một câu \"nó lỗi\""
+          }
+        },
+        {
+          "h2": "Các phương án được xếp thế nào, chọn thế nào",
+          "ps": [
+            "Dưới \"Có thể sửa như thế này\", các phương án được xếp theo **bản nào giống ngôn ngữ người nhất**, tối đa 12 mục, mỗi mục ghi rõ đọc từ bảng mã nào sang bảng mã nào. Bấm một cái xem thử, chọn xong thì lưu ở dưới; không ưng thì bấm \"Giữ nguyên\" để về bản gốc.",
+            "Việc xếp hạng dựa trên điểm: tỷ lệ chữ thông dụng, dải dấu, dải ký hiệu, chữ Hán hiếm đều được tính. **Điểm không tốt hơn rõ rệt thì không đề xuất** — sẽ không nhét một phương án vào chỉ để cho có. Với file bị sai hai lần (lưu sai một lần, rồi sửa sai thêm lần nữa), vài phương án đầu sẽ được suy ngược thêm một lớp; sai trong hai lớp vẫn có cơ hội cứu được."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Danh sách phương án sửa: xếp theo mức giống ngôn ngữ người, mỗi mục ghi cặp bảng mã",
+            "cap": "Phương án xếp theo \"giống ngôn ngữ người nhất\", mỗi mục ghi từ bảng mã nào sang bảng mã nào"
+          }
+        },
+        {
+          "h2": "Lưu mới là bước cuối",
+          "ps": [
+            "Sửa xong còn phải lưu cho đúng. Khi trình phát không nhận UTF-8, lưu thành **UTF-8 có BOM** (trình phát Windows nhận bảng mã nhờ BOM) hoặc **GBK**, thường là xong. Tùy chọn lưu: UTF-8, UTF-8 (có BOM), GBK, Big5, Shift_JIS, EUC-KR; không chứa được sẽ nhắc đổi (ví dụ GBK không chứa được tiếng Hàn). Tên file tải về tự thêm `-fixed`.",
+            "Khi bảng mã nhận ra không phải UTF-8, tùy chọn lưu đã được chỉ sẵn vào \"UTF-8 có BOM\"; sau khi bạn tự đổi dropdown thì sẽ không được đổi lại nữa."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Vùng kết quả: ô văn bản với dropdown lưu thành và nút tải về",
+            "cap": "Chọn bảng mã rồi tải về; tên file tự thêm -fixed"
+          }
+        },
+        {
+          "h2": "Cái gì sẽ không bị đụng tới",
+          "ps": [
+            "Chỉ đổi những chữ bị đọc sai. Số thứ tự, mốc thời gian và lệnh style của ASS không đổi một ký tự nào."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Đã tải file lên, sao vẫn bảo lưu?** Bản thân file phần lớn không hỏng; cái sai là trình phát đọc nó bằng bảng mã sai. Trường hợp này không cần sửa một chữ nào trong nội dung — lưu một bản UTF-8 có BOM hoặc GBK đưa cho trình phát là được.",
+            "**Sao nội dung dán không khôi phục được?** Một khi đã có ký tự thay thế trong nội dung dán, byte gốc đã mất, suy ngược cũng không có chỗ bám. Quay lên trên, tải file gốc lên bằng \"Chọn file\".",
+            "**Không có phương án tôi muốn?** Khi điểm không tốt hơn rõ rệt so với bản hiện tại, công cụ không đề xuất. Hãy đổi \"bảng mã đã nhận ra\" sang cái khác, rồi bảo nó xếp lại.",
+            "**Một lần được mấy file?** Một. Tải về xong rồi tải file tiếp theo lên."
+          ]
+        },
+        {
+          "h2": "Riêng tư",
+          "ps": [
+            "Nhận diện và sửa đều chạy hoàn toàn trong trình duyệt; không gửi nội dung phụ đề lên máy chủ nào."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Lỗi ký tự từ đâu mà ra, vì sao lại có dạng như vậy, xem [[Lỗi ký tự phụ đề từ đâu mà ra|/guides/subtitle-garbled-characters.html]]; bảng mã bình thường nhưng nội dung bẩn, dùng [[Làm sạch phụ đề|/clean.html]]; muốn kiểm tra mốc thời gian và số chữ, dùng [[Kiểm tra chất lượng phụ đề|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "vi": {
+      "seo": {
+        "title": "Lỗi ký tự phụ đề từ đâu mà ra – Nhận ra được là sửa được – AI-SRTSub",
+        "desc": "Lỗi ký tự không phải file hỏng, mà là byte bị đọc sai bảng mã. Ký tự thay thế, chữ cái có dấu đứng thành dải và chữ Hán hiếm, mỗi dạng có một nguyên nhân; dạng nào sửa được, nhìn là biết ngay.",
+        "h1": "Lỗi ký tự phụ đề từ đâu mà ra",
+        "intro": "Cùng một đoạn byte, đọc theo UTF-8 và theo GBK ra hai bộ ký tự hoàn toàn khác. Dạng của lỗi ký tự chính là bằng chứng trực tiếp cho bước nào bị sai.",
+        "ctaText": "Mở công cụ sửa lỗi ký tự"
+      },
+      "body": [
+        {
+          "h2": "File không hỏng, đọc sai mới đúng",
+          "ps": [
+            "Trong file phụ đề lưu là byte. Muốn biến byte thành chữ phải biết nó viết theo bảng mã nào — bước này chọn sai thì kết quả là lỗi ký tự. File không mất một byte nào; đọc lại bằng bảng mã khác, chữ trả về.",
+            "Tức là có hai việc khác nhau: **nhận ra bảng mã gốc là gì**, và **lưu thành bảng mã mà trình phát nhận được**. Việc đầu nhờ thử đọc rồi chấm điểm, việc sau nhờ lưu thành. Hai việc này sửa hai vấn đề khác nhau."
+          ]
+        },
+        {
+          "h2": "Năm dạng, năm nguyên nhân",
+          "ps": [
+            "Lỗi ký tự không mọc ngẫu nhiên; dạng của nó lộ ngay nguyên nhân:"
+          ],
+          "ul": [
+            "**Chữ cái có dấu đứng thành dải** (`ä½ å¥½`): tiếng Trung UTF-8 bị đọc theo kiểu một byte — trong UTF-8 một chữ Hán chiếm ba byte, đọc từng byte thì mỗi byte hóa thành một chữ cái riêng",
+            "**Chữ Hán đứng liền nhau mà không có chữ nào thông dụng**: UTF-8 bị đọc theo GBK — byte được ghép lại từng cặp, và mỗi cặp rơi vào một chữ hiếm",
+            "**Đống ký hiệu tiền tệ, ký hiệu toán học**: byte rơi vào vùng ký hiệu, hay gặp khi bị đọc theo Mac Roman hoặc họ Latin-1",
+            "**Ký tự điều khiển lẫn vào**: byte lọt vào vùng điều khiển không nhìn thấy, trên màn hiện thành chỗ trống hoặc ô vuông",
+            "**Dấu hỏi trong ô vuông `�`**: đây là **ký tự thay thế**, không phải lỗi ký tự — nó nghĩa là \"ở đây từng có một chữ, nhưng đã mất khi đọc\""
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Thẻ chẩn đoán: liệt kê loại dấu vết lỗi ký tự theo từng dòng",
+            "cap": "Chẩn đoán chia lỗi ký tự theo nguyên nhân, không gộp lại thành một câu \"nó lỗi\""
+          }
+        },
+        {
+          "h2": "Vì sao ký tự thay thế không sửa được",
+          "ps": [
+            "Ký tự thay thế là đường ranh giới. Việc `�` xuất hiện nghĩa là byte đã bị bỏ đi **ở bước xảy ra trước đó** (thường là có chương trình đọc rồi lưu lại), và phần bị bỏ không được ghi lại chút nào. Lúc đó không có cơ sở để suy ngược — không ai sửa được.",
+            "Vì vậy trang sửa xử lý hai tình huống khác nhau: tải file lên thì byte gốc còn nguyên, có thể thử từng bảng mã; nếu nội dung dán đã có ký tự thay thế, sẽ nói thẳng \"không sửa được, hãy tải file gốc lên\".",
+            "Có cả tình huống ngược lại: nội dung đọc hoàn toàn bình thường, nhưng trong trình phát vẫn lỗi. Đây không phải lỗi của file, mà là **trình phát chọn sai bảng mã**. Sửa file vô ích; lưu một bản UTF-8 có BOM hoặc GBK đưa cho nó là xong."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Vùng tải lên: kéo thả để tải lên và dán — hai cửa vào",
+            "cap": "Có thể tải file lên thì cứ tải lên — còn byte thì mới có cái để sửa"
+          }
+        },
+        {
+          "h2": "Khi sửa, đang so sánh cái gì",
+          "ps": [
+            "Công cụ thử hết mọi bảng mã có thể, rồi chấm điểm từng kết quả: tỷ lệ chữ thông dụng là bao nhiêu, có dải dấu không, có dải ký hiệu không, chữ Hán có phải dải chữ hiếm không. Bản điểm cao nhất đứng trên cùng.",
+            "**Điểm không tốt hơn rõ rệt thì không đề xuất** — thà bảo \"bản này đọc bình thường\" còn hơn đưa một kết quả chỉ hơi giống ngôn ngữ người. Với bản bị sai hai lần, vài phương án đầu sẽ được suy ngược thêm một lớp."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Danh sách phương án: xếp theo điểm, mỗi mục ghi cặp bảng mã",
+            "cap": "Phương án xếp theo điểm; điểm không vượt trội thì không đề xuất"
+          }
+        },
+        {
+          "h2": "Lưu đúng bảng mã mới tính xong",
+          "ps": [
+            "Đoạn văn đã sửa vẫn phải lưu thành bảng mã trình phát nhận được. Trình phát trên Windows thường nhận bảng mã nhờ BOM, nên lưu thành **UTF-8 có BOM** là tiện nhất; thiết bị cũ hoặc trình phát nội địa nhận GBK. Tùy chọn: UTF-8, UTF-8 (có BOM), GBK, Big5, Shift_JIS, EUC-KR; không chứa được sẽ nhắc đổi (ví dụ GBK không chứa được tiếng Hàn)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Vùng kết quả: dropdown bảng mã lưu thành và nút tải về",
+            "cap": "Lưu thành bảng mã trình phát nhận được, lỗi ký tự mới thật sự xong"
+          }
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Các bước đầy đủ xem [[Cách sửa phụ đề lỗi ký tự|/guides/repair.html]]; trong file SRT rốt cuộc chứa gì xem [[Trong file SRT viết những gì|/guides/srt-file-format.html]]; bảng mã bình thường nhưng nội dung bẩn (hình mờ quảng cáo, chỉ dẫn cho người khiếm thính) dùng [[Làm sạch phụ đề|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "vi": {
+      "seo": {
+        "title": "Chuyển đổi giản thể – phồn thể – Từ ngữ Đài Loan và Hồng Kông – AI-SRTSub",
+        "desc": "Chín hướng: phồn thể Đài Loan có thể đổi từ ngữ hoặc chỉ đổi nét chữ, Hồng Kông là kiểu khác, cũng có thể chuyển ngược về giản thể. Chỉ đổi phần lời thoại; mốc thời gian và số thứ tự không bị đụng.",
+        "h1": "Cách dùng chuyển đổi giản thể – phồn thể",
+        "intro": "Cùng một phụ đề gửi cho Đài Loan, Hồng Kông hay Trung Quốc đại lục — từ ngữ và cách viết khác nhau. Trang chuyển đổi có chín hướng tùy chọn, và chỉ đổi phần lời thoại; mốc thời gian, số thứ tự và lệnh style của ASS không bị đụng một chữ nào.",
+        "ctaText": "Mở chuyển đổi giản thể – phồn thể"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết gì",
+          "ps": [
+            "Chuyển đổi giản thể – phồn thể không phải đổi cách viết của từng chữ là xong. Một từ giản thể ở mỗi vùng lại tương ứng với một từ khác — từ chỉ phần mềm ở Đài Loan, từ chỉ thông tin ở Đài Loan, không giống chỗ khác dùng, Hồng Kông lại là kiểu khác. Trang chuyển đổi tách ra xử lý:"
+          ],
+          "ul": [
+            "Giản thể sang phồn thể (thông dụng / Đài Loan / Hồng Kông)",
+            "Phồn thể sang giản thể (thông dụng / từ phồn thể Đài Loan / từ phồn thể Hồng Kông)",
+            "Đổi nét chữ giữa các kiểu phồn thể (sang nét Đài Loan / sang nét Hồng Kông)",
+            "Một chữ giản thể có nhiều chữ phồn thể sẽ không chuyển sai (những từ như sạch sẽ và tóc được quyết định theo từ, không đổi cứng theo từng chữ)"
+          ]
+        },
+        {
+          "h2": "Tải lên và nhận diện",
+          "ps": [
+            "Kéo file vào hoặc chọn để tải lên, hỗ trợ SRT, VTT, ASS, TXT, cũng có thể dán nội dung phụ đề trực tiếp. Sau khi tải lên, định dạng được nhận tự động và hiện ở \"Định dạng đã nhận\"."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Vùng tải lên của trang chuyển đổi giản thể – phồn thể: vùng kéo thả và ô dán, phía trên hiện định dạng đã nhận",
+            "cap": "Hỗ trợ SRT / VTT / ASS / TXT, định dạng được nhận tự động"
+          }
+        },
+        {
+          "h2": "Chọn thế nào trong chín hướng",
+          "ps": [
+            "Chín hướng trong \"Hướng chuyển đổi\" chia thành ba nhóm. **Giản thể → phồn thể**: phồn thể thông dụng, phồn thể Đài Loan (đổi từ ngữ), phồn thể Đài Loan (chỉ đổi nét chữ), phồn thể Hồng Kông. **Phồn thể → giản thể**: thông dụng, từ phồn thể Đài Loan, từ phồn thể Hồng Kông. **Đổi nét giữa các kiểu phồn thể**: sang nét Đài Loan, sang nét Hồng Kông.",
+            "\"Từ ngữ Đài Loan\" sẽ đổi từ chỉ phần mềm và từ chỉ thông tin sang từ của Đài Loan; \"nét chữ Đài Loan\" chỉ đổi cách viết chứ không đổi từ. Hồng Kông là chuyện khác: ở đó phần mềm được viết bằng từ riêng. Muốn chuyển ngược về giản thể thì chọn nhóm dưới — phải nói rõ từ kiểu phồn thể nào, vì đường về giản thể của phồn thể Đài Loan và Hồng Kông khác nhau."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Thẻ hướng chuyển đổi: dropdown \"chuyển thành\" đang chọn \"Giản thể → phồn thể Đài Loan (đổi từ ngữ)\"",
+            "cap": "Hướng được chọn trong dropdown \"chuyển thành\", chín hướng xếp thành ba nhóm; ảnh này là phồn thể Đài Loan đổi từ ngữ"
+          }
+        },
+        {
+          "h2": "Kết quả và xuất",
+          "ps": [
+            "Vùng kết quả hiện ngay phụ đề đã chuyển, thanh thống kê cho biết tổng số dòng và số dòng đã đổi. Nếu không có một chữ nào đổi, sẽ hiện thông báo \"có thể phụ đề này không có chữ Hán\" — chuyển đổi chỉ đụng vào phần chữ Hán, phụ đề toàn tiếng Anh hoặc toàn số sẽ không đổi.",
+            "Chắc chắn rồi thì tải về hoặc copy. Tên file tải về được chèn nhãn ngôn ngữ — `demo.srt` sau khi thành phồn thể Đài Loan là `demo.zh-TW.srt`, phồn thể thông dụng là `.zh-Hant`, về giản thể là `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Vùng kết quả: phụ đề đã chuyển và thanh thống kê",
+            "cap": "Thanh thống kê cho tổng số dòng và số dòng đã đổi; có thể tải về hoặc đưa đi dịch"
+          }
+        },
+        {
+          "h2": "Cái gì sẽ không bị đụng tới",
+          "ps": [
+            "Chỉ đổi phần lời thoại. Mốc thời gian, số thứ tự và lệnh style của ASS không đổi một chữ nào — chuyển xong dùng ngay, không cần chỉnh lại định dạng."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Sao từ chỉ \"sạch sẽ\" không được chuyển?** Ánh xạ một-nhiều được quyết định theo từ: nghĩa \"sạch\" và nghĩa \"khô\" dùng chung một nét phồn thể, còn nghĩa \"thân cây\" dùng nét khác. Bảng từ lấy từ OpenCC, khớp cụm từ trước rồi mới tới chữ đơn.",
+            "**Phồn thể Đài Loan và Hồng Kông khác nhau ở đâu?** Ở từ vựng: từ chỉ phần mềm của hai nơi khác nhau. Chọn hướng theo vùng bạn gửi tới.",
+            "**Số chữ thay đổi sau khi chuyển?** Chỉ chữ Hán được đổi; không có mục nào được thêm bớt và mốc thời gian không dịch. Nếu số dòng thay đổi, kiểm tra xem định dạng có được nhận đúng không.",
+            "**Bảng từ không tải được?** Trang sẽ nhắc tải lại thử. Bảng từ tải cục bộ, không cần tải phụ đề lên đâu cả."
+          ]
+        },
+        {
+          "h2": "Riêng tư",
+          "ps": [
+            "Chuyển đổi chạy hoàn toàn trong trình duyệt; không gửi nội dung phụ đề lên máy chủ nào."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Chỉ cần việc giản thể sang phồn thể, xem [[Chuyển phụ đề giản thể sang phồn thể|/guides/srt-simplified-to-traditional.html]]; vì sao giản thể phồn thể không chỉ là đổi chữ, xem [[Giản thể phồn thể không chỉ là đổi chữ|/guides/simplified-traditional-chinese.html]]; muốn dịch sang tiếng nước ngoài dùng [[Dịch phụ đề|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "vi": {
+      "seo": {
+        "title": "Chuyển phụ đề giản thể sang phồn thể – Đài Loan và Hồng Kông – AI-SRTSub",
+        "desc": "Chuyển phụ đề giản thể sang phồn thể: chọn phồn thể Đài Loan (đổi từ ngữ hoặc chỉ đổi nét chữ) hoặc kiểu Hồng Kông. Chỉ đổi lời thoại; mốc thời gian và số thứ tự không đổi, xử lý trong trình duyệt.",
+        "h1": "Chuyển phụ đề giản thể sang phồn thể",
+        "intro": "Phụ đề tiếng Trung giản thể cần gửi cho khán giả Đài Loan hoặc Hồng Kông — chuyển một lần là xong. Đài Loan và Hồng Kông là hai bộ khác nhau; chọn sai hướng thì từ ngữ sẽ không đúng như người bản xứ nói.",
+        "ctaText": "Chuyển phụ đề này"
+      },
+      "body": [
+        {
+          "h2": "Nhu cầu này",
+          "ps": [
+            "Phụ đề là tiếng Trung giản thể, cần gửi cho khán giả Đài Loan hoặc Hồng Kông. Đổi từng chữ thì không khả thi — một tập có hàng trăm dòng. Hơn nữa phồn thể mà Đài Loan và Hồng Kông cần không phải cùng một bộ — từ vựng khác nhau, chọn sai hướng thì từ tạo ra sẽ không phải cách người địa phương nói."
+          ]
+        },
+        {
+          "h2": "Làm ở đâu",
+          "ps": [
+            "Mở [[Chuyển đổi giản thể – phồn thể|/hanconv.html]], kéo phụ đề vào, rồi chọn một hướng giản thể → phồn thể trong \"Hướng chuyển đổi\": phồn thể thông dụng, phồn thể Đài Loan (đổi từ ngữ), phồn thể Đài Loan (chỉ đổi nét chữ), phồn thể Hồng Kông. Chuyển xong ngay lập tức, vùng kết quả đưa phụ đề đã chuyển, chỉ việc tải về.",
+            "**Cho khán giả Đài Loan**: muốn đổi cả từ ngữ thì chọn \"phồn thể Đài Loan (đổi từ ngữ)\" — từ chỉ phần mềm và từ chỉ thông tin sẽ thành từ của Đài Loan; chỉ muốn đổi nét chữ và giữ từ cũ thì chọn \"phồn thể Đài Loan (chỉ đổi nét chữ)\". **Cho khán giả Hồng Kông**: chọn \"phồn thể Hồng Kông\", từ chỉ phần mềm được viết bằng từ địa phương."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Thẻ hướng chuyển đổi: dropdown \"chuyển thành\" đang chọn \"Giản thể → phồn thể Đài Loan (đổi từ ngữ)\"",
+            "cap": "Đài Loan và Hồng Kông là hai hướng khác nhau trong dropdown, từ vựng không giống nhau"
+          }
+        },
+        {
+          "h2": "Mấy chỗ hay vấp",
+          "ps": [
+            "**Một giản thể có nhiều phồn thể, đừng sợ**: chữ trong \"sạch\", \"khô\" và \"thân cây\" có phồn thể khác nhau; bảng từ quyết định theo cụm từ, nên không biến tất cả thành một chữ.",
+            "**Chỉ đổi phần lời thoại**: mốc thời gian, số thứ tự và lệnh style của ASS không bị đụng một chữ nào; chuyển xong dùng ngay.",
+            "**Không có chữ nào đổi thì đừng vội lo**: nếu thanh thống kê hiện 0 dòng đổi, có thể phụ đề này không có chữ Hán, hoặc định dạng bị nhận sai — kiểm tra xem \"định dạng đã nhận\" có đúng với thứ bạn tải lên không."
+          ]
+        },
+        {
+          "h2": "Liên quan",
+          "ps": [
+            "Giải thích đầy đủ chín hướng xem [[Cách dùng chuyển đổi giản thể – phồn thể|/guides/hanconv.html]]; vì sao giản thể phồn thể không chỉ là đổi chữ xem [[Giản thể phồn thể không chỉ là đổi chữ|/guides/simplified-traditional-chinese.html]]; ngược lại phồn thể sang giản thể cũng có trong [[Chuyển đổi giản thể – phồn thể|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "vi": {
+      "seo": {
+        "title": "Giản thể phồn thể không chỉ là đổi chữ – AI-SRTSub",
+        "desc": "Khó ở ba chỗ: một-nhiều phải quyết định theo từ, từ ngữ Đài Loan và Hồng Kông khác nhau, và chuyển đổi chỉ nên đụng vào lời thoại chứ không đụng mốc thời gian. Ba chỗ đều đúng mới không phải sửa tay.",
+        "h1": "Giản thể phồn thể không chỉ là đổi chữ",
+        "intro": "Đổi một chữ giản thể thành chữ phồn thể nào, phụ thuộc vào chữ đứng trước nó. Đó là lý do chuyển đổi giản thể phồn thể không thể đổi cứng theo từng chữ.",
+        "ctaText": "Mở chuyển đổi giản thể – phồn thể"
+      },
+      "body": [
+        {
+          "h2": "Thứ nhất: một giản thể, nhiều phồn thể",
+          "ps": [
+            "Việc giản hóa gom nhiều chữ phồn thể thành một chữ giản thể. Khi đi ngược lại, một chữ giản thể tương ứng với vài chữ phồn thể, và chọn chữ nào phụ thuộc vào nó đi cùng chữ gì:",
+            "Đổi cứng theo từng chữ sẽ biến tất cả thành một chữ và sai toàn bộ. Chỉ **quyết định theo từ** mới tách ra được — bảng từ lấy từ OpenCC, khớp cụm từ trước rồi mới tới chữ đơn. Ví dụ:"
+          ],
+          "ul": [
+            "Nghĩa \"sạch\" → một nét; nghĩa \"thân cây\" → nét khác",
+            "Nghĩa \"tóc\" và nghĩa \"phát triển\" của cùng một chữ giản thể đi tới hai chữ phồn thể khác nhau",
+            "Nghĩa \"phía sau\" dùng một nét phồn thể, còn \"hoàng hậu\" giữ nguyên chữ vốn có"
+          ]
+        },
+        {
+          "h2": "Thứ hai: Đài Loan và Hồng Kông không phải một",
+          "ps": [
+            "Sau khi thành phồn thể vẫn còn một lớp khác biệt nữa: cùng một từ, Đài Loan và Hồng Kông viết khác nhau. Từ chỉ phần mềm viết thế này ở Đài Loan và thế khác ở Hồng Kông; Đài Loan còn có từ riêng cho thông tin.",
+            "Vì vậy các hướng chuyển đổi được tách ra. Phồn thể Đài Loan thậm chí chia thành \"đổi từ ngữ\" và \"chỉ đổi nét chữ\" — chỉ đổi nét chữ giữ nguyên từ vựng của bạn, còn đổi từ ngữ thì cả những từ vùng miền như phần mềm cũng đổi theo. Hồng Kông có hướng riêng."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Thẻ hướng chuyển đổi: dropdown \"chuyển thành\" đang chọn \"Giản thể → phồn thể Đài Loan (đổi từ ngữ)\"",
+            "cap": "Đài Loan có thể chọn đổi từ ngữ hoặc chỉ đổi nét chữ; Hồng Kông có hướng riêng"
+          }
+        },
+        {
+          "h2": "Thứ ba: thứ được phép đụng chỉ là lời thoại",
+          "ps": [
+            "File phụ đề không chỉ có lời thoại. Số thứ tự, mốc thời gian và lệnh style của ASS đều ở trong đó, và những thứ này không được đổi dù chỉ một chữ — nhất là dòng style của ASS có lẫn tên lệnh tiếng Anh, nếu bị xử lý như lời thoại sẽ hỏng.",
+            "Vì vậy chuyển đổi được thực hiện sau khi phân tích định dạng: SRT, VTT, ASS, TXT mỗi loại nhận ra phần lời thoại, rồi chỉ đổi chữ Hán bên trong đó. Mốc thời gian và style giữ nguyên, không cần chỉnh lại định dạng."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Vùng kết quả: phụ đề đã chuyển và thanh thống kê hiện số dòng đã đổi",
+            "cap": "Thanh thống kê cho số dòng đã đổi; phần định dạng giữ nguyên"
+          }
+        },
+        {
+          "h2": "Điều cần lưu ý khi chuyển ngược về giản thể",
+          "ps": [
+            "Phồn thể sang giản thể cũng cần nói rõ **từ kiểu phồn thể nào**: phồn thể thông dụng, phồn thể Đài Loan, phồn thể Hồng Kông là ba đường khác nhau, vì từ vùng miền của Đài Loan và Hồng Kông phải được trả về từ thông dụng trước khi chuyển. Chọn sai hướng, giản thể tạo ra sẽ còn sót từ vùng miền.",
+            "Nhóm dưới trong chín hướng chính là nhóm về giản thể: phồn thể → giản thể, phồn thể Đài Loan → giản thể, phồn thể Hồng Kông → giản thể."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Các bước đầy đủ xem [[Cách dùng chuyển đổi giản thể – phồn thể|/guides/hanconv.html]]; chỉ cần giản thể sang phồn thể xem [[Chuyển phụ đề giản thể sang phồn thể|/guides/srt-simplified-to-traditional.html]]; muốn dịch sang tiếng nước ngoài dùng [[Dịch phụ đề|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "vi": {
+      "seo": {
+        "title": "Cách dùng chuyển phụ đề sang Excel/CSV – Đi lại hai chiều – AI-SRTSub",
+        "desc": "Chuyển đổi hai chiều giữa phụ đề và bảng tính: xuất SRT/VTT thành Excel hoặc CSV để soát từng dòng, rồi nhập ngược lại thành phụ đề. Bảng cần ba cột bắt đầu, kết thúc, văn bản.",
+        "h1": "Cách dùng chuyển phụ đề sang Excel/CSV",
+        "intro": "Soát và dịch làm trong bảng tính là tiện nhất. Xuất phụ đề thành Excel hoặc CSV, sửa từng dòng rồi nhập ngược lại thành phụ đề — cột thời gian giữ nguyên dạng văn bản, chỗ xuống dòng trong lời thoại không mất cái nào.",
+        "ctaText": "Mở chuyển đổi bảng tính"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết gì",
+          "ps": [
+            "Phụ đề là các mục xếp từng dòng, bảng tính cũng là các bản ghi xếp từng dòng — thành bảng rồi thì soát, chú thích và dịch hàng loạt đều làm được bằng những tính năng bảng tính quen thuộc. Cả hai chiều đều hỗ trợ:"
+          ],
+          "ul": [
+            "**Sang bảng**: xuất SRT, VTT thành Excel (.xlsx) hoặc CSV, mỗi dòng một mục, kèm số thứ tự, bắt đầu, kết thúc, văn bản",
+            "**Sang phụ đề**: nhập bảng đã sửa ngược lại thành SRT hoặc VTT",
+            "Cột thời gian giữ nguyên dạng văn bản, không bị phần mềm bảng tính đổi thành số hay ngày tháng",
+            "Chỗ xuống dòng trong lời thoại không mất cái nào, khi nhập ngược lại vẫn là chỗ xuống dòng cũ"
+          ]
+        },
+        {
+          "h2": "Tải lên và chọn chiều",
+          "ps": [
+            "Kéo file vào hoặc chọn để tải lên. Hai chiều cần file khác nhau: **sang bảng** cần file phụ đề (SRT / VTT), **sang phụ đề** cần file bảng (CSV / Excel, gồm cả xlsx và xls). Chọn sai chế độ sẽ được nói thẳng là chế độ này cần file loại nào.",
+            "⚠️ Trang này chỉ đọc theo UTF-8. Nếu mở phụ đề ra đầy dấu hỏi hoặc ô vuông, hãy sửa bảng mã ở [[Sửa lỗi ký tự|/repair.html]] rồi quay lại — bảng mã hỏng thì đọc ở đây chỉ được đống ký tự thay thế."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Vùng tải lên của trang chuyển đổi bảng tính: vùng kéo thả và công tắc hai chế độ",
+            "cap": "Hai chế độ cần file khác nhau: sang bảng thì đưa phụ đề, sang phụ đề thì đưa bảng"
+          }
+        },
+        {
+          "h2": "Xuất phụ đề thành bảng",
+          "ps": [
+            "Chọn \"sang bảng\" rồi đưa phụ đề vào, vùng xem trước liệt kê ngay từng mục: số thứ tự, bắt đầu, kết thúc, văn bản. Thanh thống kê cho số mục và tổng thời lượng. Chắc chắn rồi bấm \"Tải Excel (.xlsx)\" hoặc \"Tải CSV\".",
+            "Khác nhau giữa hai định dạng xuất: xlsx là file bảng tính thật sự, Excel sẽ không tự ý đổi định dạng cột thời gian; CSV phổ dụng hơn, nhưng mở bằng Excel thì cột thời gian có thể bị hiểu thành thứ khác — nếu gặp vậy, chọn cột thời gian và đặt định dạng thành \"Văn bản\", hoặc dùng luôn xlsx."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Vùng xem trước bảng: bốn cột số thứ tự, bắt đầu, kết thúc, văn bản và thanh thống kê",
+            "cap": "Xem trước liệt kê từng mục; thanh thống kê cho số mục và tổng thời lượng"
+          }
+        },
+        {
+          "h2": "Nhập bảng ngược lại thành phụ đề",
+          "ps": [
+            "Chọn \"sang phụ đề\" rồi đưa bảng vào; quy tắc nhận tên cột là bảng phải có ba cột **bắt đầu, kết thúc, văn bản** (tên tiếng Anh Start / End / Text cũng nhận), và **thứ tự cột không quan trọng**. Thời gian viết `00:00:01,500` hay `00:00:01.500` đều được; dòng không nhận ra được tự bỏ qua, không làm cả file bỏ đi.",
+            "Kết quả nhập ngược được liệt kê từng mục trong vùng xem trước; chắc chắn rồi tải SRT hoặc VTT. Khi không có ba cột này sẽ nhắc kiểm tra tên cột — nguyên nhân hay gặp là lúc xuất dùng tên cột khác, hoặc dòng tiêu đề không nằm ở dòng đầu."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Vùng kết quả phụ đề: phụ đề được nhập ngược lại liệt kê từng mục",
+            "cap": "Không nhận ra ba cột thì sẽ báo ngay, không thất bại lặng lẽ"
+          }
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Cột thời gian trong Excel hiện sai thì sao?** Dùng luôn xlsx, không có vấn đề này. Nếu bắt buộc dùng CSV: chọn cột thời gian, đặt định dạng ô thành \"Văn bản\" rồi mở.",
+            "**Tên cột trong bảng có bắt buộc là tiếng Trung không?** Không. Bắt đầu / kết thúc / văn bản và Start / End / Text đều nhận, viết hoa viết thường cũng không sao.",
+            "**Sửa xong nhập ngược lại, chỗ xuống dòng còn không?** Còn. Chỗ xuống dòng trong lời thoại giữ nguyên, khi nhập ngược lại vẫn là chỗ xuống dòng cũ.",
+            "**Có hỗ trợ ASS không?** Trang này chỉ xử lý SRT và VTT. ASS có lệnh style, hãy chuyển sang SRT ở [[Chuyển định dạng|/convert.html]] rồi mới vào bảng.",
+            "**Một lần được mấy file?** Một. Muốn làm vài chục đến vài trăm cùng lúc, dùng [[Chuyển hàng loạt|/batch.html]] (cái đó chỉ đổi định dạng, không vào bảng)."
+          ]
+        },
+        {
+          "h2": "Riêng tư",
+          "ps": [
+            "Chuyển đổi chạy hoàn toàn trong trình duyệt; không gửi nội dung phụ đề lên máy chủ nào."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Chỉ cần bước \"phụ đề sang Excel\", xem [[Phụ đề sang Excel|/guides/srt-to-excel.html]]; sửa xong muốn dịch sang tiếng nước ngoài dùng [[Dịch phụ đề|/translate.html]]; đổi định dạng vài chục file cùng lúc dùng [[Chuyển hàng loạt|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "vi": {
+      "seo": {
+        "title": "Phụ đề sang Excel – Xuất SRT thành xlsx để soát từng dòng – AI-SRTSub",
+        "desc": "Xuất phụ đề SRT thành Excel: mỗi dòng một mục, bốn cột số thứ tự, bắt đầu, kết thúc, văn bản; thời gian giữ nguyên dạng văn bản, chỗ xuống dòng trong lời thoại không mất. Sửa xong nhập ngược lại được.",
+        "h1": "Phụ đề sang Excel",
+        "intro": "Soát hàng trăm mục từng cái một trong trình soạn thảo văn bản rất mệt; trong Excel mỗi dòng một mục, lọc, chú thích và thay thế hàng loạt đều dùng được. Xong xuôi thì nhập ngược lại thành SRT.",
+        "ctaText": "Xuất thành Excel"
+      },
+      "body": [
+        {
+          "h2": "Nhu cầu này",
+          "ps": [
+            "Cần soát phụ đề, thay từ hàng loạt, hoặc chia cho vài người mỗi người sửa một đoạn — những việc này trong bảng tính nhanh hơn trong văn bản rất nhiều. Bản thân SRT là văn bản thuần, nhưng cấu trúc mục của nó (số thứ tự, thời gian, lời thoại) vừa vặn trải thành bốn cột của bảng."
+          ]
+        },
+        {
+          "h2": "Làm ở đâu",
+          "ps": [
+            "Mở [[Chuyển đổi bảng tính|/table.html]], chọn chế độ \"sang bảng\", kéo SRT vào, vùng xem trước liệt kê ngay từng mục — bốn cột số thứ tự, bắt đầu, kết thúc, văn bản. Bấm \"Tải Excel (.xlsx)\" để mang đi. VTT cũng hỗ trợ.",
+            "Sau khi sửa: chuyển chế độ sang \"sang phụ đề\", đưa bảng này vào lại, là có SRT. Quy tắc nhận tên cột là phải có ba cột bắt đầu, kết thúc, văn bản (tiếng Anh Start / End / Text cũng nhận), thứ tự cột không quan trọng."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Xem trước bảng: mỗi mục của SRT trải thành một dòng, bốn cột và thanh thống kê",
+            "cap": "SRT trải thẳng thành bốn cột, sửa xong đi ngược lại bằng chính đường đó"
+          }
+        },
+        {
+          "h2": "Mấy chỗ hay vấp",
+          "ps": [
+            "**Bảng mã hỏng thì sửa trước**: trang này chỉ đọc theo UTF-8. Mở phụ đề ra đầy dấu hỏi hoặc ô vuông thì qua [[Sửa lỗi ký tự|/repair.html]] trước.",
+            "**CSV hay xlsx, chọn cái nào**: mang vào Excel thì chọn xlsx, cột thời gian không bị đổi định dạng; CSV phổ dụng hơn nhưng có thể bị Excel hiểu thành định dạng khác, gặp vậy thì đặt cột thời gian thành \"Văn bản\".",
+            "**ASS không được**: ASS có lệnh style phải chuyển thành SRT trước rồi mới vào bảng."
+          ]
+        },
+        {
+          "h2": "Liên quan",
+          "ps": [
+            "Giải thích đầy đủ hai chiều xem [[Cách dùng chuyển phụ đề sang Excel/CSV|/guides/table.html]]; sửa xong muốn dịch tiếng nước ngoài dùng [[Dịch phụ đề|/translate.html]]; trước khi giao, qua [[Kiểm tra chất lượng phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "vi": {
+      "seo": {
+        "title": "Cách dùng chuyển phụ đề hàng loạt – Vài trăm file gộp thành một ZIP – AI-SRTSub",
+        "desc": "Kéo vài chục đến vài trăm SRT/VTT vào cùng lúc, thống nhất về một định dạng đích, rồi mang về một ZIP. Số thứ tự xếp lại, mốc thời gian chuẩn hóa; file không nhận ra được không lẫn vào gói.",
+        "h1": "Cách dùng chuyển phụ đề hàng loạt",
+        "intro": "Cả một mùa vài chục phụ đề cần thống nhất định dạng, tải lên từng cái một thì quá chậm. Trang chuyển hàng loạt kéo vào một lần, thống nhất về định dạng đích, rồi mang về một ZIP — file không nhận ra được đánh dấu riêng, không có chuyện lẫn vào gói rồi làm như đã thành công.",
+        "ctaText": "Mở chuyển hàng loạt"
+      },
+      "body": [
+        {
+          "h2": "Công cụ này giải quyết gì",
+          "ps": [
+            "Phụ đề của cả một mùa hay cả một bộ sưu tập thường phải thống nhất về một định dạng mới dùng được. Việc trang chuyển hàng loạt làm là:"
+          ],
+          "ul": [
+            "Kéo vài chục đến vài trăm SRT, VTT vào cùng lúc (chọn nhiều file một lần được)",
+            "Thống nhất về SRT hoặc VTT, số thứ tự xếp lại, mốc thời gian chuẩn hóa theo định dạng đích",
+            "Gộp thành một ZIP để tải về, tên file giữ nguyên chỉ đổi phần mở rộng",
+            "File không nhận ra được mục phụ đề nào sẽ bị đánh dấu riêng, không vào gói"
+          ]
+        },
+        {
+          "h2": "Đưa file vào",
+          "ps": [
+            "Kéo nhiều file phụ đề vào khung nét đứt cùng lúc, hoặc bấm rồi chọn nhiều file một lần. Danh sách file liệt kê từng cái: cái nhận ra được hiện số mục, cái không nhận ra được gắn nhãn \"không nhận ra\". Thống kê phía trên cho số file, tổng số mục và bao nhiêu cái không nhận ra.",
+            "⚠️ Trang này chỉ đọc theo UTF-8. Phụ đề nào bảng mã hỏng (đầy dấu hỏi hoặc ô vuông) nên sửa ở [[Sửa lỗi ký tự|/repair.html]] trước."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Danh sách file: liệt kê tên file và số mục từng cái, cái không nhận ra được đánh dấu đỏ",
+            "cap": "Danh sách liệt kê từng cái; cái không nhận ra được đánh dấu ngay tại chỗ"
+          }
+        },
+        {
+          "h2": "Thống nhất thành cái gì",
+          "ps": [
+            "Chọn định dạng đích trong \"Thống nhất thành\" — SRT hoặc VTT. Chọn xong, từng file trong danh sách được tạo lại theo định dạng đích: số thứ tự xếp lại từ đầu, mốc thời gian chuẩn hóa theo định dạng đích (SRT dùng dấu phẩy ngăn mili-giây, VTT dùng dấu chấm).",
+            "**Tên file giữ nguyên, chỉ đổi phần mở rộng**; tên trùng nhau tự được thêm số, không ghi đè lên nhau."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Chọn định dạng đích và trạng thái danh sách, thanh thống kê hiện số file và số mục",
+            "cap": "Chọn định dạng đích xong, danh sách được tạo lại theo định dạng mới; tên file chỉ đổi phần mở rộng"
+          }
+        },
+        {
+          "h2": "Đóng gói và tải về",
+          "ps": [
+            "Bấm \"gộp thành một ZIP để tải về\", trong kho lưu trữ nhận được là tất cả file đã chuyển. **File không nhận ra được mục phụ đề sẽ không vào gói** — chúng ở lại trong danh sách cùng nhãn của mình, không bị trộn vào làm như thành công. Gói xong sẽ báo tổng cộng bao nhiêu file."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Vùng đóng gói: nút tải ZIP và thông báo kết quả đóng gói",
+            "cap": "File không nhận ra được không vào gói, ở lại danh sách cùng nhãn của nó"
+          }
+        },
+        {
+          "h2": "Khi nào bị gắn nhãn \"không nhận ra\"",
+          "ps": [
+            "Khi từ file không đọc ra được mục phụ đề nào, nó bị gắn nhãn \"không nhận ra\". Ba nguyên nhân hay gặp: file không phải phụ đề (ví dụ lẫn một file .txt thông báo), bảng mã không phải UTF-8 (đọc ra toàn ký tự thay thế), hoặc nội dung bị nén thành một đoạn văn không có mốc thời gian.",
+            "File bị gắn nhãn có thể xử lý riêng: vấn đề bảng mã qua [[Sửa lỗi ký tự|/repair.html]], vấn đề định dạng qua [[Chuyển định dạng|/convert.html]] chuyển một lần rồi đưa lại vào danh sách."
+          ]
+        },
+        {
+          "h2": "Câu hỏi thường gặp",
+          "ps": [
+            "**Một lần đưa được bao nhiêu?** Không có giới hạn cứng, tùy bộ nhớ trình duyệt; vài trăm SRT thường không vấn đề gì.",
+            "**Có sửa nội dung lời thoại của tôi không?** Không. Chuyển hàng loạt chỉ đổi cái vỏ định dạng, xếp lại số thứ tự, chuẩn hóa mốc thời gian; lời thoại không đổi một chữ nào.",
+            "**Muốn sửa nội dung thì sao?** Trang này chỉ đổi định dạng. Muốn chỉnh thời gian hàng loạt dùng [[Điều chỉnh thời gian|/shift.html]], muốn sửa văn bản hàng loạt dùng [[Thay thế thuật ngữ|/glossary.html]], cả hai xử lý từng file ở trang của nó.",
+            "**Có hỗ trợ ASS không?** Trang này chỉ chuyển qua lại giữa SRT và VTT. ASS có style, dùng [[Chuyển định dạng|/convert.html]] chuyển riêng."
+          ]
+        },
+        {
+          "h2": "Riêng tư",
+          "ps": [
+            "Chuyển đổi và đóng gói chạy hoàn toàn trong trình duyệt; không gửi nội dung phụ đề lên máy chủ nào."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Cả một mùa cần sửa gì, bắt đầu từ bước nào, xem [[Cách sửa phụ đề cả mùa theo lô|/guides/batch-convert-srt.html]]; một file sang nhiều định dạng dùng [[Chuyển định dạng|/convert.html]]; muốn vào bảng để soát dùng [[Chuyển đổi bảng tính|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "vi": {
+      "seo": {
+        "title": "Sửa phụ đề cả mùa theo lô – Cái gì làm được, cái gì không – AI-SRTSub",
+        "desc": "Cả mùa thường cần sửa cùng một việc: thống nhất định dạng, độ lệch thời gian, thuật ngữ. Cái nào xong trong một lần, cái nào phải làm từng file, và xử lý file không nhận ra thế nào.",
+        "h1": "Cách sửa phụ đề cả mùa theo lô",
+        "intro": "Cả một mùa vài chục file phụ đề, thứ cần sửa thường là cùng một việc. Phân biệt được cái nào xong trong một lần và cái nào phải làm từng file, đỡ vất vả hơn nhiều so với việc còng lưng làm từng cái.",
+        "ctaText": "Mở chuyển hàng loạt"
+      },
+      "body": [
+        {
+          "h2": "Thứ cần sửa thường là cùng một việc",
+          "ps": [
+            "Phụ đề cả mùa có vấn đề, hiếm khi mỗi tập có lỗi riêng — thường là cùng một nguyên nhân rơi xuống mọi tập: cả mùa do cùng một nhóm phụ đề nén (định dạng đồng nhất, hình mờ đồng nhất), cả mùa khớp với cùng một bản video (hướng và độ lệch thời gian như nhau), hoặc cách dịch tên trong cả mùa không thống nhất.",
+            "Lấy thử hai tập (một tập đầu, một tập cuối) xem trước, chắc chắn là **cùng một lỗi** rồi hẵng làm theo lô. Tập đầu và tập cuối lỗi khác nhau thì đây không phải việc giải quyết bằng lô được."
+          ]
+        },
+        {
+          "h2": "Cái xong được trong một lần",
+          "ps": [
+            "**Thống nhất định dạng** là việc duy nhất thật sự xong trong một lần: kéo vài chục đến vài trăm SRT, VTT vào [[Chuyển hàng loạt|/batch.html]], chọn định dạng đích, rồi mang về một ZIP. Xếp lại số thứ tự và chuẩn hóa mốc thời gian đều xong trong bước này; lời thoại không đổi một chữ nào."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Danh sách file của trang chuyển hàng loạt: liệt kê số mục từng cái, cái không nhận ra được đánh dấu đỏ",
+            "cap": "Thống nhất định dạng là việc duy nhất xong được trong một lần"
+          }
+        },
+        {
+          "h2": "Cái phải làm từng file",
+          "ps": [
+            "Những việc dưới đây không có cửa làm theo lô, phải qua từng file một — nhưng thường **chỉ cần làm một lần rồi áp dụng cho cả mùa** qua thao tác tương đương:"
+          ],
+          "ul": [
+            "**Thống nhất độ lệch thời gian**: nếu độ lệch mỗi tập như nhau, đo độ lệch của một tập trong [[Điều chỉnh thời gian|/shift.html]], ghi con số đó lại, rồi điền cùng con số đó ở các tập còn lại",
+            "**Thống nhất thuật ngữ**: bảng thuật ngữ cấu hình một lần trong [[Thay thế thuật ngữ|/glossary.html]], từng phụ đề dùng chung một bảng",
+            "**Thống nhất việc xóa hình mờ**: quy tắc hình mờ là cố định, và các ô tích mặc định trong [[Làm sạch phụ đề|/clean.html]] đã bao phủ hình mờ hay gặp, chỉ việc kéo vào từng file"
+          ]
+        },
+        {
+          "h2": "Đừng để ngược thứ tự",
+          "ps": [
+            "Khi phải làm nhiều việc, sai thứ tự sẽ phải làm lại. Cứ theo thứ tự này:",
+            "**Sửa bảng mã trước** → **rồi thống nhất định dạng** → **rồi sửa nội dung** (xóa hình mờ, thuật ngữ, thời gian) → **kiểm tra chất lượng cuối cùng**. Bảng mã chưa sửa đã đổi định dạng thì đọc ra vẫn là lỗi; định dạng chưa thống nhất đã sửa nội dung thì phạm vi hỗ trợ định dạng của mỗi công cụ khác nhau."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Vùng đóng gói: nút tải ZIP và thông báo kết quả",
+            "cap": "Thống nhất định dạng để phía trước, sửa nội dung để phía sau"
+          }
+        },
+        {
+          "h2": "Xử lý file không nhận ra thế nào",
+          "ps": [
+            "Trong chuyển hàng loạt, file bị gắn nhãn \"không nhận ra\" không vào ZIP, ở lại trong danh sách. Ba nguyên nhân hay gặp: không phải file phụ đề (lẫn một file thông báo), bảng mã không phải UTF-8, hoặc nội dung bị nén thành một đoạn văn không có mốc thời gian.",
+            "Vấn đề bảng mã qua [[Sửa lỗi ký tự|/repair.html]] sửa riêng; vấn đề định dạng qua [[Chuyển định dạng|/convert.html]] chuyển một lần rồi đưa lại vào danh sách. **Đừng nhét file không nhận ra vào gói chỉ để cho đủ số** — đến lúc phát trong trình phát mới biết thiếu một tập, phiền hơn nhiều so với việc bỏ ra một phút ngay bây giờ."
+          ]
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Cách dùng chuyển hàng loạt đầy đủ xem [[Cách dùng chuyển phụ đề hàng loạt|/guides/batch.html]]; độ lệch thời gian thống nhất xem [[Cách dùng điều chỉnh thời gian|/guides/shift.html]]; trước khi giao, qua [[Kiểm tra chất lượng phụ đề|/qc.html]] một lượt."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "vi": {
+      "seo": {
+        "title": "23.976 / 24 / 25 / 30 fps là gì – Mốc thời gian phụ đề – AI-SRTSub",
+        "desc": "23.976 không phải 24, 29.97 không phải 30: chênh 0,1% đó đến từ việc đưa màu vào NTSC. Vùng PAL phát ở 25 lại làm phim nhanh hơn 4%. Những con số này ảnh hưởng thế nào tới mốc thời gian phụ đề.",
+        "h1": "23.976 / 24 / 25 / 30 fps là gì",
+        "intro": "Chênh 0,1% giữa 23.976 và 24 là cái đuôi còn sót lại của lịch sử truyền hình. Cộng với 4% của PAL, đó là gốc rễ của việc phụ đề càng về sau càng lệch.",
+        "ctaText": "Mở điều chỉnh thời gian"
+      },
+      "body": [
+        {
+          "h2": "Bốn con số này là gì",
+          "ps": [
+            "Tốc độ khung hình là số hình ảnh phát trong một giây. Hay gặp có bốn:"
+          ],
+          "ul": [
+            "**24 fps** — tốc độ quay và chiếu của phim; rạp chiếu đúng là 24",
+            "**23.976 fps** — tốc độ của phim sau khi vào truyền hình hệ NTSC, chậm hơn 24 khoảng 0,1%",
+            "**25 fps** — tốc độ truyền hình hệ PAL (châu Âu, Trung Quốc, Úc và các vùng điện 50Hz khác)",
+            "**29.97 fps / 30 fps** — tốc độ chương trình truyền hình NTSC, cũng chênh đúng 0,1% đó"
+          ]
+        },
+        {
+          "h2": "0,1% từ đâu ra",
+          "ps": [
+            "23.976 = 24 × 1000/1001, và 29.97 = 30 × 1000/1001. Con số 1000/1001 này là di tích của việc đưa màu vào NTSC: để nhét sóng mang phụ màu vào mà không phải thay đổi máy thu đen trắng đã có, tần số trường bị hạ từ 60 Hz xuống 59,94 Hz (60 × 1000/1001), tốc độ khung hình hạ theo.",
+            "Kết quả là: phim phát ở vùng NTSC chạy 23.976 chứ không phải 24. Chênh 0,1% — một tiếng phim lệch 3,6 giây; xem riêng thì hầu như không nhận ra, nhưng nó khác với 4% ở dưới, đừng gộp lại mà tính."
+          ]
+        },
+        {
+          "h2": "Thế còn 4% từ đâu",
+          "ps": [
+            "Vùng PAL phát ở 25 fps. Phim quay ở 24 fps, rồi đem phát thẳng ở 25 — số khung không đổi một khung nào, tốc độ phát nhanh lên 4% (25/24 ≈ 1,0417). Phim 100 phút, bản PAL chỉ còn 96 phút.",
+            "Đây là gốc của **trôi dần**: phụ đề làm từ bản gốc, video là bản PAL, đầu phim không lệch một giây mà cuối phim lệch tới 4 phút. Dời cả cục không cứu được, phải quy đổi theo tỷ lệ."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Vùng điều chỉnh tốc độ trong trang điều chỉnh thời gian: ô nhập tỷ lệ",
+            "cap": "Quy đổi theo tỷ lệ, một giá trị tỷ lệ dùng cho cả phim"
+          }
+        },
+        {
+          "h2": "Quy đổi thế nào",
+          "ps": [
+            "Quy đổi chỉ là nhân với một giá trị tỷ lệ, dùng cho cả phim:"
+          ],
+          "ul": [
+            "**24 → 25** (tăng tốc PAL): × 0,96",
+            "**23.976 → 25**: × 0,959 (giá trị chính xác 23.976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 hoặc × 0,999, chỉ chênh 0,1%",
+            "0,96 và 0,959 chênh 0,1%, cả bộ phim chênh chưa tới 6 giây — không chắc nguồn là 24 hay 23.976 thì dùng 0,96 cũng được, phần còn lại dọn bằng neo hai điểm"
+          ]
+        },
+        {
+          "h2": "Biết bản đang cầm là loại nào bằng cách nào",
+          "ps": [
+            "Thay vì đoán tỷ lệ, hãy tìm hai mốc thời gian mà bạn chắc chắn đúng — thường là câu thoại đầu tiên và câu thoại cuối cùng — rồi bảo công cụ \"câu này phải ở 00:00:12, câu kia ở 01:35:40\"; nó kéo cả phim theo đường thẳng giữa hai điểm đó. Đây là \"neo hai điểm\", không cần bạn tính tốc độ khung hình.",
+            "Muốn tự xác nhận tốc độ khung hình của nguồn: trình phát hoặc công cụ xem thông tin media sẽ ghi rõ. Khi tên file kiểu `1080p.WEB` không cho gợi ý gì về tốc độ khung hình, neo hai điểm chắc chắn hơn."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Vùng neo hai điểm trong trang điều chỉnh thời gian: hai hàng nhập mốc thời gian",
+            "cap": "Neo hai điểm không cần tính tốc độ khung hình, chỉ cần hai mốc thời gian"
+          }
+        },
+        {
+          "h2": "Công cụ và hướng dẫn liên quan",
+          "ps": [
+            "Quy đổi tốc độ khung hình trực tiếp xem [[Chuyển đổi tốc độ khung hình phụ đề|/guides/srt-fps-converter.html]]; điều chỉnh tốc độ xem [[Điều chỉnh tốc độ phụ đề|/guides/subtitle-speed-converter.html]]; không phân biệt được là lệch cả cục hay trôi dần, xem [[Vì sao phụ đề càng về sau càng lệch|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

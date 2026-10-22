@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "id": {
+      "seo": {
+        "title": "Cara Memakai Perbaikan Subtitle Berantakan – Kenali Encodingnya – AI-SRTSub",
+        "desc": "Panduan perbaikan subtitle berantakan: kenali encoding aslinya (GBK / Big5 / Shift_JIS / EUC-KR), pilih kandidat yang paling mirip bahasa manusia, lalu simpan sebagai UTF-8 dengan BOM atau GBK.",
+        "h1": "Cara memakai perbaikan subtitle berantakan",
+        "intro": "Subtitle yang terbuka penuh karakter berantakan biasanya bukan file yang rusak, melainkan salah encoding saat dibaca. Alat perbaikan mengenali encoding aslinya dan mengembalikan karakter yang salah terbaca; nomor dan timestamp tidak berubah sedikit pun.",
+        "ctaText": "Buka perbaikan karakter berantakan"
+      },
+      "body": [
+        {
+          "h2": "Apa yang diselesaikan alat ini",
+          "ps": [
+            "Byte yang sama dibaca sebagai UTF-8 dan sebagai GBK menghasilkan dua set karakter yang sama sekali berbeda — filenya tidak rusak, hanya encoding yang dipakai saat membaca yang salah. Yang dilakukan alat perbaikan:"
+          ],
+          "ul": [
+            "Mengenali encoding asli file ini dan mengembalikan karakternya ke set yang benar",
+            "Menjelaskan di mana kerusakannya: karakter pengganti, karakter kontrol, simbol mata uang, kumpulan huruf beraksen, deretan karakter CJK yang langka",
+            "Mengurutkan kandidat menurut mana yang paling mirip bahasa manusia, lalu pilih satu untuk disimpan",
+            "Saat pemutar tidak mengenali encodingnya, simpan satu salinan UTF-8 dengan BOM atau GBK untuk diberikan kepadanya"
+          ]
+        },
+        {
+          "h2": "Unggah file, jangan tempel",
+          "ps": [
+            "Dua pintu masuk ini memperbaiki hal yang berbeda cakupannya, **unggah file kalau bisa**. Saat file diunggah, byte aslinya masih ada, alat bisa mencoba membacanya encoding demi encoding, dan begitu teridentifikasi sebagai GBK langsung didekode sebagai GBK — tidak perlu menebak satu karakter pun. Yang ditempel sudah bukan byte asli lagi — saat browser menyerahkan string itu, langkah yang salah sudah terjadi, jadi hanya bisa ditebak mundur dan hasilnya seberapa saja.",
+            "Kalau di dalam teks yang ditempel sudah muncul karakter pengganti (tanda tanya kotak `�`), berarti byte aslinya sudah hilang dan siapa pun tidak bisa mengembalikannya. Halaman ini akan terus terang: kembali ke atas dan unggah file aslinya lewat \"Pilih file\"."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Area unggah halaman perbaikan: area seret-taruh dan kotak tempel, dengan encoding yang dikenali di atasnya",
+            "cap": "Seret file atau pilih untuk mengunggah; kotak tempel ada di bawah dan cakupannya jauh lebih kecil"
+          }
+        },
+        {
+          "h2": "Apa yang dikatakan diagnosis",
+          "ps": [
+            "Setelah diunggah, area diagnosis memberi kesimpulan. **Tidak ada karakter berantakan**: isinya terbaca normal; kalau di pemutar masih terlihat berantakan, berarti pemutar yang salah encoding — turun ke \"Simpan sebagai\", ganti encodingnya, lalu berikan file itu. Kalau **terlihat seperti berantakan**, akan disebutkan jejak yang mana persisnya:"
+          ],
+          "ul": [
+            "Isinya mengandung karakter pengganti — byte aslinya sudah hilang",
+            "Karakter kontrol ikut masuk",
+            "Diselingi segunung simbol mata uang dan matematika",
+            "Huruf beraksen muncul berderet-deret — seperti UTF-8 yang dibaca per byte tunggal (`ä½ å¥½` yang ini)",
+            "Karakter CJK berderet tanpa satu pun yang umum — seperti UTF-8 yang dibaca sebagai GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Kartu diagnosis: kesimpulan dan jejak karakter berantakan yang dicantumkan per baris",
+            "cap": "Area diagnosis mencantumkan jejak per jenis, bukan cuma satu kalimat \"ini berantakan\""
+          }
+        },
+        {
+          "h2": "Bagaimana kandidat diurutkan dan dipilih",
+          "ps": [
+            "Di bawah \"Bisa diperbaiki seperti ini\" kandidat diurutkan menurut **mana yang paling mirip bahasa manusia**, maksimal 12 entri, masing-masing diberi label dari encoding apa ke encoding apa. Klik salah satu untuk melihat hasilnya, pilih lalu simpan di bawah; kalau tidak puas klik \"Biarkan apa adanya\" untuk kembali ke versi aslinya.",
+            "Urutannya memakai skor: proporsi karakter umum, deretan huruf beraksen, deretan simbol, karakter CJK langka ikut dihitung. **Kalau skornya tidak jelas lebih baik, tidak direkomendasikan** — tidak akan memaksakan satu kandidat hanya supaya ada. Yang salah dua kali berturut-turut (tersimpan salah, lalu diperbaiki salah), beberapa kandidat teratas akan ditebak mundur satu lapis lagi; yang masih dalam dua lapis punya peluang diselamatkan."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Daftar kandidat perbaikan: diurutkan menurut tingkat kemiripan dengan bahasa manusia, tiap entri diberi label pasangan encoding",
+            "cap": "Kandidat diurutkan menurut \"paling mirip bahasa manusia\", tiap entri diberi label dari encoding apa ke encoding apa"
+          }
+        },
+        {
+          "h2": "Menyimpan adalah langkah terakhir",
+          "ps": [
+            "Sudah benar pun harus disimpan dengan benar. Saat pemutar tidak mengenali UTF-8, simpan sebagai **UTF-8 dengan BOM** (pemutar Windows mengenali encoding dari BOM) atau **GBK**, biasanya langsung beres. Pilihan simpan: UTF-8, UTF-8 (dengan BOM), GBK, Big5, Shift_JIS, EUC-KR; kalau tidak muat akan diminta ganti (misalnya GBK tidak muat untuk teks Korea). Nama file unduhan otomatis ditambahi `-fixed`.",
+            "Kalau encoding yang dikenali bukan UTF-8, pilihan simpan sudah diarahkan ke \"UTF-8 dengan BOM\" untuk Anda; setelah Anda mengubah dropdown sendiri, tidak akan diubah lagi."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Area hasil: kotak teks dengan dropdown simpan sebagai dan tombol unduh",
+            "cap": "Pilih encoding lalu unduh; nama file otomatis ditambahi -fixed"
+          }
+        },
+        {
+          "h2": "Apa yang tidak akan disentuh",
+          "ps": [
+            "Hanya karakter yang salah dibaca yang diganti. Nomor, timestamp, dan perintah gaya ASS tidak berubah sedikit pun."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Sudah unggah file, kenapa masih disuruh menyimpan?** Filenya sendiri biasanya tidak rusak; yang salah adalah pemutar yang membacanya dengan encoding yang keliru. Untuk kasus ini tidak perlu mengubah satu karakter pun di teks — simpan satu salinan UTF-8 dengan BOM atau GBK dan berikan ke pemutar.",
+            "**Kenapa yang ditempel tidak bisa dikembalikan?** Begitu karakter pengganti muncul di teks yang ditempel, byte aslinya sudah hilang dan menebak mundur pun tidak punya dasar. Kembali ke atas dan unggah file aslinya lewat \"Pilih file\".",
+            "**Kandidat yang saya mau tidak ada?** Kalau skornya tidak jelas lebih baik dari yang sekarang, alat tidak merekomendasikan. Ganti dulu \"encoding yang dikenali\" ke yang lain, lalu minta diurutkan ulang.",
+            "**Berapa file sekali jalan?** Satu. Unduh hasilnya, lalu unggah yang berikutnya."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Identifikasi dan perbaikan seluruhnya dilakukan lokal di browser; tidak ada isi subtitle yang dikirim ke server."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Dari mana karakter berantakan berasal dan kenapa bentuknya bisa begitu, lihat [[Dari mana subtitle berantakan berasal|/guides/subtitle-garbled-characters.html]]; encoding normal tapi isinya kotor, pakai [[Pembersihan subtitle|/clean.html]]; mau cek timestamp dan jumlah karakter, pakai [[Pemeriksaan kualitas subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "id": {
+      "seo": {
+        "title": "Dari Mana Subtitle Berantakan – Yang Dikenali Bisa Diperbaiki – AI-SRTSub",
+        "desc": "Subtitle berantakan bukan file rusak, melainkan byte yang dibaca dengan encoding salah. Karakter pengganti, huruf beraksen berderet, dan karakter CJK langka masing-masing punya penyebab sendiri.",
+        "h1": "Dari mana subtitle berantakan berasal",
+        "intro": "Byte yang sama dibaca sebagai UTF-8 dan sebagai GBK menghasilkan dua set karakter yang berbeda. Bentuk karakter berantakan adalah bukti langsung langkah mana yang salah.",
+        "ctaText": "Buka perbaikan karakter berantakan"
+      },
+      "body": [
+        {
+          "h2": "Filnya tidak rusak, yang salah cara membacanya",
+          "ps": [
+            "Yang tersimpan di file subtitle adalah byte. Untuk mengubah byte menjadi karakter, harus diketahui encoding apa yang dipakai saat menulisnya — kalau langkah ini salah, yang keluar adalah karakter berantakan. Filenya tidak kehilangan satu byte pun; baca ulang dengan encoding lain, karakternya kembali.",
+            "Jadi ada dua urusan terpisah: **mengenali encoding aslinya**, dan **menyimpan dengan encoding yang dikenali pemutar**. Yang pertama lewat skor pencobaan pembacaan, yang kedua lewat simpan sebagai. Keduanya memperbaiki masalah yang berbeda."
+          ]
+        },
+        {
+          "h2": "Lima rupa, lima penyebab",
+          "ps": [
+            "Karakter berantakan tidak tumbuh acak; rupanya membocorkan penyebabnya:"
+          ],
+          "ul": [
+            "**Kumpulan huruf beraksen** (`ä½ å¥½`): teks CJK UTF-8 dibaca sebagai encoding satu byte — dalam UTF-8 satu karakter CJK tiga byte, dan dibaca per byte masing-masing jadi satu huruf",
+            "**Deretan karakter CJK tanpa satu pun yang umum**: UTF-8 dibaca sebagai GBK — byte dikelompokkan ulang berpasangan dan tiap pasangan mendarat di karakter langka",
+            "**Tumpukan simbol mata uang dan matematika**: byte mendarat di area simbol, biasa terjadi kalau dibaca sebagai Mac Roman atau turunan Latin-1",
+            "**Karakter kontrol ikut masuk**: byte masuk ke area kontrol tak terlihat, di layar tampil sebagai spasi kosong atau kotak",
+            "**Tanda tanya kotak `�`**: ini **karakter pengganti**, bukan karakter berantakan — artinya \"di sini tadinya ada karakter, tapi sudah hilang saat dibaca\""
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Kartu diagnosis: mencantumkan jenis jejak karakter berantakan per baris",
+            "cap": "Diagnosis membagi karakter berantakan menurut penyebab, bukan melulu satu kalimat \"ini berantakan\""
+          }
+        },
+        {
+          "h2": "Kenapa karakter pengganti tidak bisa diperbaiki",
+          "ps": [
+            "Karakter pengganti adalah garis batasnya. Munculnya `�` berarti byte sudah dibuang **pada langkah yang lebih awal** (biasanya ada program yang membaca lalu menyimpan ulang), dan bagian yang dibuang tidak tercatat sedikit pun. Saat itu tidak ada dasar untuk menebak mundur — siapa pun tidak bisa memperbaikinya.",
+            "Karena itu halaman perbaikan menangani dua keadaan berbeda: unggah file dan byte aslinya masih utuh, sehingga bisa dicoba encoding demi encoding; kalau teks yang ditempel sudah berisi karakter pengganti, akan dikatakan terus terang \"tidak bisa diperbaiki, unggah file aslinya\".",
+            "Ada juga keadaan sebaliknya: isinya terbaca benar-benar normal, tapi di pemutar tetap berantakan. Ini bukan salah file, melainkan **pemutar yang salah encoding**. Mengubah file tidak ada gunanya; simpan satu salinan UTF-8 dengan BOM atau GBK dan berikan itu."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Area unggah: seret-taruh unggah dan tempel sebagai dua pintu masuk",
+            "cap": "Unggah file kalau bisa — byte-nya ada, baru ada yang bisa diperbaiki"
+          }
+        },
+        {
+          "h2": "Saat memperbaiki, apa yang dibandingkan",
+          "ps": [
+            "Alat mencoba setiap encoding yang mungkin, lalu memberi skor pada tiap hasil: berapa proporsi karakter umum, ada tidak deretan huruf beraksen, ada tidak deretan simbol, apakah karakter CJK-nya deretan langka. Yang skornya tertinggi ada di paling atas.",
+            "**Kalau skornya tidak jelas lebih baik, tidak direkomendasikan** — lebih baik diberi tahu \"yang ini terbaca normal\" daripada diberi hasil yang cuma sedikit mirip bahasa manusia. Yang salah dua kali berturut-turut akan ditebak mundur satu lapis lagi untuk beberapa kandidat teratas."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Daftar kandidat: diurutkan menurut skor, tiap entri diberi label pasangan encoding",
+            "cap": "Kandidat diurutkan menurut skor; kalau skornya tidak unggul, tidak direkomendasikan"
+          }
+        },
+        {
+          "h2": "Menyimpan dengan encoding yang benar baru selesai",
+          "ps": [
+            "Teks yang sudah diperbaiki masih harus disimpan dengan encoding yang dikenali pemutar. Pemutar di Windows sering mengenali encoding dari BOM, jadi menyimpan **UTF-8 dengan BOM** paling praktis; perangkat lama atau pemutar buatan dalam negeri mengenali GBK. Pilihan encoding: UTF-8, UTF-8 (dengan BOM), GBK, Big5, Shift_JIS, EUC-KR; kalau tidak muat akan diminta ganti (misalnya GBK tidak muat untuk teks Korea)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Area hasil: dropdown encoding simpan sebagai dan tombol unduh",
+            "cap": "Simpan dengan encoding yang dikenali pemutar, baru karakter berantakan benar-benar selesai"
+          }
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Langkah lengkapnya lihat [[Cara memperbaiki subtitle berantakan|/guides/repair.html]]; apa sebenarnya yang tersimpan di file SRT lihat [[Apa yang tertulis di file SRT|/guides/srt-file-format.html]]; encoding normal tapi isinya kotor (watermark iklan, penanda untuk tunarungu) pakai [[Pembersihan subtitle|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "id": {
+      "seo": {
+        "title": "Konversi Subtitle Sederhana–Tradisional – Taiwan dan Hong Kong – AI-SRTSub",
+        "desc": "Sembilan arah: tradisional Taiwan bisa ganti pilihan kata atau hanya bentuk huruf, Hong Kong lain lagi, dan bisa dibalik ke sederhana. Hanya dialog yang diganti; timestamp dan nomor tidak tersentuh.",
+        "h1": "Cara memakai konversi sederhana–tradisional",
+        "intro": "Subtitle yang sama mau dikirim ke Taiwan, Hong Kong, atau Tiongkok daratan — pilihan kata dan bentuk hurufnya berbeda. Halaman konversi punya sembilan arah, dan hanya mengganti teks dialog; timestamp, nomor, dan perintah gaya ASS tidak tersentuh.",
+        "ctaText": "Buka konversi sederhana–tradisional"
+      },
+      "body": [
+        {
+          "h2": "Apa yang diselesaikan alat ini",
+          "ps": [
+            "Konversi sederhana–tradisional bukan sekadar mengganti bentuk tiap huruf. Satu kata sederhana bisa punya padanan berbeda di tiap wilayah — kata untuk software di Taiwan dan kata untuk information di Taiwan tidak sama dengan yang dipakai di tempat lain, dan Hong Kong lain lagi. Halaman konversi memisahkan semuanya:"
+          ],
+          "ul": [
+            "Sederhana ke tradisional (umum / Taiwan / Hong Kong)",
+            "Tradisional ke sederhana (umum / dari tradisional Taiwan / dari tradisional Hong Kong)",
+            "Ganti bentuk huruf antar tradisional (ke bentuk Taiwan / ke bentuk Hong Kong)",
+            "Satu sederhana untuk banyak tradisional tidak akan salah (kata seperti \"bersih\" dan \"rambut\" diputus per kata, bukan diganti paksa per huruf)"
+          ]
+        },
+        {
+          "h2": "Unggah dan pengenalan",
+          "ps": [
+            "Tarik file ke dalamnya atau pilih untuk diunggah; SRT, VTT, ASS, dan TXT didukung, dan isi subtitle juga bisa ditempel langsung. Setelah diunggah formatnya dikenali otomatis dan ditampilkan di \"Format yang dikenali\"."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Area unggah halaman konversi sederhana–tradisional: area seret-taruh dan kotak tempel, dengan format yang dikenali di atasnya",
+            "cap": "SRT / VTT / ASS / TXT didukung, formatnya dikenali otomatis"
+          }
+        },
+        {
+          "h2": "Memilih di antara sembilan arah",
+          "ps": [
+            "Sembilan arah di \"Arah konversi\" terbagi jadi tiga kelompok. **Sederhana → tradisional**: tradisional umum, tradisional Taiwan (ganti pilihan kata), tradisional Taiwan (hanya bentuk huruf), tradisional Hong Kong. **Tradisional → sederhana**: umum, dari tradisional Taiwan, dari tradisional Hong Kong. **Ganti bentuk antar tradisional**: ke bentuk Taiwan, ke bentuk Hong Kong.",
+            "\"Pilihan kata Taiwan\" mengubah kata untuk software dan kata untuk information jadi padanan Taiwannya; \"bentuk huruf Taiwan\" hanya mengganti cara tulis tanpa mengganti kata. Hong Kong lain lagi: software di sana ditulis dengan kata sendiri. Untuk membalik kembali ke sederhana, pilih kelompok di bawah — harus disebutkan dari tradisional yang mana, karena jalur tradisional Taiwan dan Hong Kong kembali ke sederhana berbeda."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kartu arah konversi: dropdown \"konversi ke\" dengan pilihan yang sedang aktif \"Sederhana → tradisional Taiwan (ganti pilihan kata)\"",
+            "cap": "Arahnya dipilih di dropdown \"konversi ke\", sembilan arah dikelompokkan jadi tiga; yang ini tradisional Taiwan ganti pilihan kata"
+          }
+        },
+        {
+          "h2": "Hasil dan ekspor",
+          "ps": [
+            "Area hasil langsung menampilkan subtitle yang sudah dikonversi, dan bilah statistik menunjukkan total berapa baris dan berapa yang diubah. Kalau tidak ada satu karakter pun yang berubah, akan muncul peringatan \"mungkin tidak ada karakter Han di subtitle ini\" — konversi hanya menyentuh bagian Han, jadi subtitle murni bahasa Inggris atau angka tidak akan berubah.",
+            "Setelah yakin, unduh atau salin. Nama file unduhan disisipi label bahasa — `demo.srt` setelah jadi tradisional Taiwan menjadi `demo.zh-TW.srt`, tradisional umum `.zh-Hant`, dan kembali ke sederhana `.zh-Hans`."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Area hasil: subtitle yang sudah dikonversi dan bilah statistik",
+            "cap": "Bilah statistik memberi total baris dan jumlah baris yang diubah; bisa langsung diunduh atau dikirim ke penerjemahan"
+          }
+        },
+        {
+          "h2": "Apa yang tidak akan disentuh",
+          "ps": [
+            "Hanya teks dialog yang diganti. Timestamp, nomor, dan perintah gaya ASS tidak berubah sedikit pun — setelah konversi langsung bisa dipakai, tidak perlu merapikan format ulang."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Kenapa kata untuk \"bersih\" tidak ikut berubah?** Pemetaan satu ke banyak diputus per kata: makna \"bersih\" dan makna \"kering\" memakai satu bentuk tradisional yang sama, sedangkan makna \"batang pohon\" memakai bentuk lain. Kamusnya dari OpenCC, mencocokkan frasa dulu baru huruf tunggal.",
+            "**Apa beda tradisional Taiwan dan Hong Kong?** Pilihan katanya: kata untuk software berbeda di keduanya. Pilih arah sesuai wilayah tujuan.",
+            "**Jumlah karakter berubah setelah konversi?** Hanya karakter Han yang diganti; tidak ada entri ditambah atau dihapus dan timestamp tidak digeser. Kalau jumlah baris berubah, cek apakah formatnya terdeteksi benar.",
+            "**Kamus tidak berhasil dimuat?** Halaman akan menyuruh refresh dan coba lagi. Kamus dimuat secara lokal, jadi subtitle tidak perlu diunggah ke mana pun."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Konversi seluruhnya dilakukan lokal di browser; tidak ada isi subtitle yang dikirim ke server."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Kalau hanya perlu sederhana ke tradisional, lihat [[Subtitle sederhana ke tradisional|/guides/srt-simplified-to-traditional.html]]; kenapa sederhana–tradisional bukan sekadar ganti huruf, lihat [[Konversi sederhana–tradisional bukan sekadar ganti huruf|/guides/simplified-traditional-chinese.html]]; mau diterjemahkan ke bahasa asing pakai [[Penerjemahan subtitle|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "id": {
+      "seo": {
+        "title": "Subtitle Sederhana ke Tradisional – Taiwan dan Hong Kong – AI-SRTSub",
+        "desc": "Ubah subtitle sederhana jadi tradisional: pilih tradisional Taiwan (ganti pilihan kata atau hanya bentuk huruf) atau Hong Kong. Hanya dialog yang diganti; timestamp dan nomor tidak tersentuh.",
+        "h1": "Subtitle sederhana ke tradisional",
+        "intro": "Subtitle bahasa Tionghoa sederhana mau dikirim ke penonton Taiwan atau Hong Kong — tinggal dikonversi. Taiwan dan Hong Kong dua set yang berbeda; salah arah, pilihan katanya jadi tidak tepat.",
+        "ctaText": "Konversi subtitle ini"
+      },
+      "body": [
+        {
+          "h2": "Kebutuhan ini",
+          "ps": [
+            "Subtitle berbahasa Tionghoa sederhana, mau dikirim ke penonton Taiwan atau Hong Kong. Mengubah per huruf tidak masuk akal — satu episode bisa ratusan baris. Lagipula tradisional yang diminta Taiwan dan Hong Kong bukan yang sama — pilihan katanya berbeda, dan salah arah akan menghasilkan kata yang tidak dipakai orang setempat."
+          ]
+        },
+        {
+          "h2": "Di mana mengerjakannya",
+          "ps": [
+            "Buka [[Konversi sederhana–tradisional|/hanconv.html]], tarik subtitle ke dalamnya, lalu pilih salah satu arah sederhana → tradisional di \"Arah konversi\": tradisional umum, tradisional Taiwan (ganti pilihan kata), tradisional Taiwan (hanya bentuk huruf), tradisional Hong Kong. Konversi langsung selesai, area hasil menampilkan hasilnya, tinggal unduh.",
+            "**Untuk penonton Taiwan**: kalau pilihan kata ikut diganti, pilih \"tradisional Taiwan (ganti pilihan kata)\" — kata untuk software dan kata untuk information jadi padanan Taiwannya; kalau hanya mau ganti bentuk huruf dan mempertahankan kata yang ada, pilih \"tradisional Taiwan (hanya bentuk huruf)\". **Untuk penonton Hong Kong**: pilih \"tradisional Hong Kong\", kata untuk software ditulis dengan kata setempat."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kartu arah konversi: dropdown \"konversi ke\" dengan pilihan yang sedang aktif \"Sederhana → tradisional Taiwan (ganti pilihan kata)\"",
+            "cap": "Taiwan dan Hong Kong dua arah berbeda di dropdown, pilihan katanya tidak sama"
+          }
+        },
+        {
+          "h2": "Jebakan yang biasa",
+          "ps": [
+            "**Satu sederhana ke banyak tradisional, jangan takut**: huruf untuk \"bersih\", \"kering\", dan \"batang pohon\" punya padanan tradisional yang berbeda; kamus memutus per frasa, jadi tidak semuanya jadi satu huruf yang sama.",
+            "**Hanya teks dialog yang diganti**: timestamp, nomor, dan perintah gaya ASS tidak tersentuh sedikit pun; setelah konversi langsung dipakai.",
+            "**Tidak ada satu karakter pun yang berubah, jangan panik dulu**: kalau bilah statistik menunjukkan 0 baris berubah, mungkin tidak ada karakter Han di subtitle ini, atau formatnya salah terdeteksi — cek apakah \"format yang dikenali\" sesuai dengan yang Anda unggah."
+          ]
+        },
+        {
+          "h2": "Terkait",
+          "ps": [
+            "Penjelasan lengkap sembilan arah lihat [[Cara memakai konversi sederhana–tradisional|/guides/hanconv.html]]; kenapa sederhana–tradisional bukan sekadar ganti huruf lihat [[Konversi sederhana–tradisional bukan sekadar ganti huruf|/guides/simplified-traditional-chinese.html]]; sebaliknya tradisional ke sederhana juga ada di [[Konversi sederhana–tradisional|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "id": {
+      "seo": {
+        "title": "Konversi Bukan Sekadar Ganti Huruf – Satu-ke-Banyak – AI-SRTSub",
+        "desc": "Tiga hal membuatnya sulit: satu sederhana ke banyak tradisional diputus per kata, pilihan kata Taiwan dan Hong Kong berbeda, dan yang boleh disentuh hanya teks dialog, bukan timestamp.",
+        "h1": "Konversi sederhana–tradisional bukan sekadar ganti huruf",
+        "intro": "Huruf tradisional mana yang dipakai untuk menggantinya bergantung pada huruf di depannya. Itu sebabnya konversi sederhana–tradisional tidak bisa diganti paksa per huruf.",
+        "ctaText": "Buka konversi sederhana–tradisional"
+      },
+      "body": [
+        {
+          "h2": "Pertama: satu sederhana, banyak tradisional",
+          "ps": [
+            "Penyederhanaan menggabungkan beberapa huruf tradisional jadi satu huruf sederhana. Saat dibalik ke arah sebaliknya, satu huruf sederhana berpadanan dengan beberapa huruf tradisional, dan pilihannya bergantung pada huruf apa yang mendampinginya:",
+            "Mengganti paksa per huruf akan menjadikan semuanya satu huruf yang sama dan salah di seluruh teks. Baru dengan **diputus per kata** bisa dibedakan — kamusnya dari OpenCC, mencocokkan frasa dulu baru huruf tunggal. Misalnya:"
+          ],
+          "ul": [
+            "Makna \"bersih\" → satu bentuk; makna \"batang pohon\" → bentuk lain",
+            "Makna \"rambut\" dan makna \"berkembang\" dari satu huruf sederhana pergi ke dua huruf tradisional yang berbeda",
+            "Makna \"belakang\" memakai satu bentuk tradisional, sedangkan \"permaisuri\" mempertahankan huruf yang sudah ada"
+          ]
+        },
+        {
+          "h2": "Kedua: Taiwan dan Hong Kong bukan hal yang sama",
+          "ps": [
+            "Setelah jadi tradisional masih ada satu lapis beda lagi: kata yang sama ditulis berbeda di Taiwan dan Hong Kong. Kata untuk software ditulis begini di Taiwan dan begitu di Hong Kong; Taiwan juga punya kata sendiri untuk information.",
+            "Karena itu arah konversinya dipisah. Tradisional Taiwan bahkan terbagi jadi \"ganti pilihan kata\" dan \"hanya bentuk huruf\" — hanya bentuk huruf mempertahankan pilihan kata Anda, sedangkan ganti pilihan kata juga menukar kata wilayah seperti software. Hong Kong punya arah sendiri."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Kartu arah konversi: dropdown \"konversi ke\" dengan pilihan yang sedang aktif \"Sederhana → tradisional Taiwan (ganti pilihan kata)\"",
+            "cap": "Taiwan bisa pilih ganti kata atau hanya bentuk huruf; Hong Kong punya arah sendiri"
+          }
+        },
+        {
+          "h2": "Ketiga: yang boleh disentuh hanya teks dialog",
+          "ps": [
+            "File subtitle bukan cuma dialog. Nomor, timestamp, dan perintah gaya ASS ada di dalamnya, dan semuanya tidak boleh ikut dikonversi — khususnya baris gaya ASS yang berisi nama perintah bahasa Inggris, yang akan rusak kalau diperlakukan sebagai teks dialog.",
+            "Karena itu konversi dilakukan setelah formatnya diurai: SRT, VTT, ASS, dan TXT masing-masing dikenali bagian dialognya, dan hanya karakter Han di situ yang diganti. Timestamp dan gaya tetap utuh, tidak perlu merapikan format ulang."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Area hasil: subtitle yang sudah dikonversi dan bilah statistik yang menampilkan jumlah baris yang diubah",
+            "cap": "Bilah statistik memberi jumlah baris yang diubah; bagian format tetap utuh"
+          }
+        },
+        {
+          "h2": "Yang perlu diperhatikan saat membalik ke sederhana",
+          "ps": [
+            "Tradisional ke sederhana juga perlu menyebut **dari tradisional yang mana**: tradisional umum, tradisional Taiwan, dan tradisional Hong Kong tiga jalur berbeda, karena pilihan kata wilayah Taiwan dan Hong Kong harus dikembalikan ke kata umum dulu sebelum dikonversi. Salah arah, kata wilayah akan tersisa di hasil sederhana.",
+            "Kelompok bawah di sembilan arah adalah yang kembali ke sederhana: tradisional → sederhana, tradisional Taiwan → sederhana, tradisional Hong Kong → sederhana."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Langkah lengkapnya lihat [[Cara memakai konversi sederhana–tradisional|/guides/hanconv.html]]; kalau hanya perlu sederhana ke tradisional lihat [[Subtitle sederhana ke tradisional|/guides/srt-simplified-to-traditional.html]]; mau diterjemahkan ke bahasa asing pakai [[Penerjemahan subtitle|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "id": {
+      "seo": {
+        "title": "Cara Memakai Konversi Subtitle ke Excel/CSV – Dua Arah – AI-SRTSub",
+        "desc": "Ekspor SRT/VTT ke Excel atau CSV untuk diperiksa per baris, lalu impor kembali jadi subtitle. Tabel mengenali tiga kolom mulai, selesai, dan teks; kolom waktu dipertahankan sebagai teks.",
+        "h1": "Cara memakai konversi subtitle ke Excel/CSV",
+        "intro": "Pemeriksaan dan penerjemahan paling enak dikerjakan di tabel. Ekspor subtitle ke Excel atau CSV, perbaiki per baris, lalu impor kembali jadi subtitle — kolom waktu dipertahankan apa adanya sebagai teks, dan baris baru di dalam dialog tidak ada yang hilang.",
+        "ctaText": "Buka konversi tabel"
+      },
+      "body": [
+        {
+          "h2": "Apa yang diselesaikan alat ini",
+          "ps": [
+            "Subtitle berupa entri per baris, dan tabel juga berupa rekaman per baris — setelah jadi tabel, pemeriksaan, catatan, dan penerjemahan massal bisa dikerjakan dengan fitur tabel yang sudah akrab. Dua arah didukung:"
+          ],
+          "ul": [
+            "**Ke tabel**: SRT dan VTT diekspor ke Excel (.xlsx) atau CSV, satu baris satu entri, lengkap dengan nomor, mulai, selesai, teks",
+            "**Ke subtitle**: tabel yang sudah diedit diimpor kembali jadi SRT atau VTT",
+            "Kolom waktu dipertahankan apa adanya sebagai teks, tidak akan diubah jadi angka atau tanggal oleh perangkat lunak tabel",
+            "Baris baru di dalam dialog tidak ada yang hilang; saat diimpor kembali lipatannya tetap seperti semula"
+          ]
+        },
+        {
+          "h2": "Unggah dan pilih arah",
+          "ps": [
+            "Tarik file ke dalamnya atau pilih untuk diunggah. Dua arahnya minta file yang berbeda: **ke tabel** minta file subtitle (SRT / VTT), **ke subtitle** minta file tabel (CSV / Excel, termasuk xlsx dan xls). Kalau modenya salah, langsung diberi tahu mode ini butuh file yang mana.",
+            "⚠️ Halaman ini hanya membaca sebagai UTF-8. Kalau subtitle terbuka penuh tanda tanya atau kotak, perbaiki dulu encodingnya di [[Perbaikan karakter berantakan|/repair.html]] — kalau encodingnya rusak, yang terbaca di sini cuma tumpukan karakter pengganti."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Area unggah halaman konversi tabel: area seret-taruh dan sakelar dua mode",
+            "cap": "Dua modenya minta file yang berbeda: ke tabel masukkan subtitle, ke subtitle masukkan tabel"
+          }
+        },
+        {
+          "h2": "Ekspor subtitle jadi tabel",
+          "ps": [
+            "Pilih \"ke tabel\" dan masukkan subtitle; area pratinjau langsung mencantumkan tiap entri: nomor, mulai, selesai, teks. Bilah statistik memberi jumlah entri dan total durasi. Setelah yakin, klik \"Unduh Excel (.xlsx)\" atau \"Unduh CSV\".",
+            "Bedanya dua format ekspor: xlsx benar-benar file tabel, jadi kolom waktu tidak akan diubah formatnya oleh Excel seenaknya; CSV lebih umum, tapi saat dibuka di Excel kolom waktu bisa ditampilkan sebagai hal lain — kalau itu terjadi, pilih kolom waktu dan set formatnya jadi \"Teks\", atau langsung pakai xlsx saja."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Area pratinjau tabel: empat kolom nomor, mulai, selesai, teks dan bilah statistik",
+            "cap": "Pratinjau mencantumkan per entri; bilah statistik memberi jumlah entri dan total durasi"
+          }
+        },
+        {
+          "h2": "Impor tabel kembali jadi subtitle",
+          "ps": [
+            "Pilih \"ke subtitle\" dan masukkan tabel; aturan pengenalan namanya: tabel harus punya tiga kolom **mulai, selesai, teks** (nama kolom Inggris Start / End / Text juga dikenali), dan **urutan kolom bebas**. Waktu boleh ditulis `00:00:01,500` atau `00:00:01.500`; baris yang tidak dikenali dilewati otomatis tanpa membuat seluruh file gagal.",
+            "Hasil impornya dicantumkan per entri di area pratinjau; setelah yakin, unduh SRT atau VTT. Kalau tiga kolom itu tidak ada, akan diminta cek nama kolom — penyebabnya biasanya memakai nama kolom lain saat ekspor, atau baris judul tidak ada di baris pertama."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Area hasil subtitle: subtitle yang diimpor kembali dicantumkan per entri",
+            "cap": "Kalau tiga kolom tidak dikenali akan diberi tahu langsung, tidak gagal diam-diam"
+          }
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Kolom waktu tampil salah di Excel, bagaimana?** Pakai xlsx langsung, masalahnya tidak ada. Kalau harus pakai CSV: pilih kolom waktu, set format selnya jadi \"Teks\" lalu buka.",
+            "**Nama kolom di tabel harus bahasa Mandarin?** Tidak. Mulai / selesai / teks dan Start / End / Text sama-sama dikenali, huruf besar kecil juga bebas.",
+            "**Setelah diedit dan diimpor kembali, baris barunya masih ada?** Masih. Baris baru di dalam dialog dipertahankan apa adanya, dan saat diimpor kembali lipatannya tetap sama.",
+            "**ASS didukung?** Halaman ini hanya menangani SRT dan VTT. ASS punya perintah gaya, jadi konversi dulu ke SRT di [[Konversi format|/convert.html]] sebelum masuk tabel.",
+            "**Berapa file sekali jalan?** Satu. Untuk puluhan sampai ratusan sekaligus, pakai [[Konversi massal|/batch.html]] (yang itu hanya mengganti format, tidak masuk tabel)."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Konversi seluruhnya dilakukan lokal di browser; tidak ada isi subtitle yang dikirim ke server."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Kalau hanya perlu langkah \"subtitle ke Excel\", lihat [[Subtitle ke Excel|/guides/srt-to-excel.html]]; setelah diedit mau diterjemahkan ke bahasa asing pakai [[Penerjemahan subtitle|/translate.html]]; puluhan file sekaligus ganti format pakai [[Konversi massal|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "id": {
+      "seo": {
+        "title": "Subtitle ke Excel – Ekspor SRT ke xlsx untuk Pemeriksaan per Baris – AI-SRTSub",
+        "desc": "Ekspor SRT ke Excel: satu baris satu entri, empat kolom nomor, mulai, selesai, teks; waktu dipertahankan sebagai teks dan baris baru di dialog tidak hilang. Setelah diedit bisa diimpor kembali.",
+        "h1": "Subtitle ke Excel",
+        "intro": "Memeriksa ratusan entri satu per satu di editor teks melelahkan; di Excel satu entri satu baris, dan penyaringan, catatan, serta penggantian massal bisa dipakai. Setelah selesai, impor kembali jadi SRT.",
+        "ctaText": "Ekspor ke Excel"
+      },
+      "body": [
+        {
+          "h2": "Kebutuhan ini",
+          "ps": [
+            "Mau memeriksa subtitle, mengganti kata secara massal, atau membaginya ke beberapa orang yang masing-masing mengerjakan satu bagian — semua itu jauh lebih cepat di tabel daripada di teks. SRT sendiri teks biasa, tapi struktur entrinya (nomor, waktu, dialog) kebetulan bisa dibentangkan jadi empat kolom tabel."
+          ]
+        },
+        {
+          "h2": "Di mana mengerjakannya",
+          "ps": [
+            "Buka [[Konversi tabel|/table.html]], pilih mode \"ke tabel\", tarik SRT ke dalamnya, dan area pratinjau langsung mencantumkan tiap entri — empat kolom nomor, mulai, selesai, teks. Klik \"Unduh Excel (.xlsx)\" untuk mengambilnya. VTT juga didukung.",
+            "Setelah diedit: ganti mode ke \"ke subtitle\", masukkan tabel ini kembali, dan jadilah SRT lagi. Aturan pengenalan namanya: harus ada tiga kolom mulai, selesai, teks (Start / End / Text bahasa Inggris juga dikenali), dan urutan kolom bebas."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Pratinjau tabel: tiap entri SRT dibentangkan jadi satu baris, empat kolom dan bilah statistik",
+            "cap": "SRT langsung dibentangkan jadi empat kolom, dan setelah diedit bisa diimpor kembali lewat jalur yang sama"
+          }
+        },
+        {
+          "h2": "Jebakan yang biasa",
+          "ps": [
+            "**Encoding rusak, perbaiki dulu**: halaman ini hanya membaca sebagai UTF-8. Kalau subtitle terbuka penuh tanda tanya atau kotak, ke [[Perbaikan karakter berantakan|/repair.html]] dulu.",
+            "**CSV atau xlsx, pilih yang mana**: kalau mau dibuka di Excel, pilih xlsx supaya kolom waktu tidak diubah formatnya; CSV lebih umum tapi bisa dikenali Excel sebagai format lain, dan kalau itu terjadi set kolom waktu jadi \"Teks\".",
+            "**ASS tidak bisa**: ASS yang punya perintah gaya harus dikonversi ke SRT dulu sebelum masuk tabel."
+          ]
+        },
+        {
+          "h2": "Terkait",
+          "ps": [
+            "Penjelasan lengkap dua arah lihat [[Cara memakai konversi subtitle ke Excel/CSV|/guides/table.html]]; setelah diedit mau diterjemahkan ke bahasa asing pakai [[Penerjemahan subtitle|/translate.html]]; sebelum diserahkan, lewati dulu [[Pemeriksaan kualitas subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "id": {
+      "seo": {
+        "title": "Cara Memakai Konversi Massal Subtitle – Ratusan Jadi Satu ZIP – AI-SRTSub",
+        "desc": "Tarik puluhan sampai ratusan SRT/VTT sekaligus, seragamkan ke satu format target, lalu bawa pulang satu ZIP. Nomor diurut ulang, timestamp dinormalisasi, dan yang tidak dikenali ditandai tersendiri.",
+        "h1": "Cara memakai konversi massal subtitle",
+        "intro": "Satu musim penuh yang puluhan subtitle harus diseragamkan formatnya; mengunggah satu per satu terlalu lambat. Di halaman konversi massal, tarik semuanya sekaligus, seragamkan ke format target, dan bawa pulang satu ZIP — file yang tidak dikenali ditandai tersendiri dan tidak akan ikut masuk paket seolah-olah berhasil.",
+        "ctaText": "Buka konversi massal"
+      },
+      "body": [
+        {
+          "h2": "Apa yang diselesaikan alat ini",
+          "ps": [
+            "Subtitle satu musim penuh atau satu kumpulan sering harus diseragamkan ke satu format dulu baru bisa dipakai. Yang dilakukan halaman konversi massal:"
+          ],
+          "ul": [
+            "Tarik puluhan sampai ratusan SRT dan VTT sekaligus (bisa pilih banyak sekaligus)",
+            "Seragamkan ke SRT atau VTT, nomor diurut ulang, timestamp dinormalisasi sesuai format target",
+            "Dikemas jadi satu ZIP untuk diunduh, nama file tetap asli hanya ekstensinya yang ganti",
+            "File yang tidak dikenali entrinya ditandai tersendiri dan tidak masuk paket"
+          ]
+        },
+        {
+          "h2": "Masukkan file",
+          "ps": [
+            "Tarik beberapa file subtitle sekaligus ke dalam kotak putus-putus, atau klik lalu pilih banyak sekaligus. Daftar file mencantumkan semuanya satu per satu: yang dikenali menampilkan jumlah entri, yang tidak dikenali ditandai \"tidak dikenali\". Statistik di atas memberi jumlah file, total entri, dan berapa yang tidak dikenali.",
+            "⚠️ Halaman ini hanya membaca sebagai UTF-8. Subtitle yang encodingnya rusak (penuh tanda tanya atau kotak) sebaiknya diperbaiki dulu di [[Perbaikan karakter berantakan|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Daftar file: mencantumkan nama file dan jumlah entri satu per satu, yang tidak dikenali ditandai merah",
+            "cap": "Daftar mencantumkan satu per satu; yang tidak dikenali langsung ditandai di tempat"
+          }
+        },
+        {
+          "h2": "Diseragamkan jadi apa",
+          "ps": [
+            "Pilih format target di \"Seragamkan jadi\" — SRT atau VTT. Begitu dipilih, tiap file di daftar dibuat ulang sesuai format target: nomor diurut ulang dari awal, timestamp dinormalisasi sesuai format target (SRT memakai koma untuk milidetik, VTT memakai titik).",
+            "**Nama file tetap asli, hanya ekstensinya yang ganti**; yang namanya bentrok otomatis diberi nomor, jadi tidak saling menimpa."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Pilihan format target dan status daftar, bilah statistik menampilkan jumlah file dan jumlah entri",
+            "cap": "Setelah format target dipilih, daftar dibuat ulang sesuai format baru; nama file hanya ganti ekstensi"
+          }
+        },
+        {
+          "h2": "Kemas dan unduh",
+          "ps": [
+            "Klik \"kemas jadi satu ZIP untuk diunduh\", dan di dalam arsip yang diterima ada semua file yang sudah dikonversi. **File yang entrinya tidak dikenali tidak masuk paket** — mereka tetap di daftar dengan tandanya, tidak dicampur masuk seolah-olah berhasil. Setelah paket siap, diberi tahu jumlah filenya."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Area pengemasan: tombol unduh ZIP dan keterangan hasil pengemasan",
+            "cap": "File yang tidak dikenali tidak masuk paket, tetap di daftar dengan tandanya"
+          }
+        },
+        {
+          "h2": "Kapan ditandai \"tidak dikenali\"",
+          "ps": [
+            "Kalau dari file tidak terbaca satu entri subtitle pun, ia ditandai \"tidak dikenali\". Tiga penyebab umum: filenya bukan subtitle (misalnya satu file .txt penjelasan ikut terbawa), encodingnya bukan UTF-8 (yang terbaca cuma karakter pengganti), atau isinya sudah ditekan jadi satu paragraf tanpa timestamp.",
+            "File yang ditandai bisa dikerjakan sendiri-sendiri: masalah encoding ke [[Perbaikan karakter berantakan|/repair.html]], masalah format ke [[Konversi format|/convert.html]] untuk dikonversi sekali lalu dimasukkan lagi ke daftar."
+          ]
+        },
+        {
+          "h2": "Pertanyaan umum",
+          "ps": [
+            "**Berapa banyak yang bisa dimasukkan sekaligus?** Tidak ada batas keras, bergantung memori browser; ratusan SRT biasanya tidak masalah.",
+            "**Apakah isi dialog saya diubah?** Tidak. Konversi massal hanya mengganti wadah formatnya, mengurut ulang nomor, dan menormalisasi timestamp; dialog tidak berubah satu karakter pun.",
+            "**Kalau mau mengubah isinya?** Halaman ini hanya mengganti format. Untuk mengubah timestamp massal pakai [[Penyesuaian timestamp|/shift.html]], untuk mengubah teks massal pakai [[Penggantian istilah|/glossary.html]], keduanya dikerjakan per file di halamannya masing-masing.",
+            "**ASS didukung?** Halaman ini hanya menangani konversi SRT dan VTT. ASS punya gaya, pakai [[Konversi format|/convert.html]] untuk mengonversinya sendiri."
+          ]
+        },
+        {
+          "h2": "Privasi",
+          "ps": [
+            "Konversi dan pengemasan seluruhnya dilakukan lokal di browser; tidak ada isi subtitle yang dikirim ke server."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Apa yang perlu diubah di satu musim penuh dan mulai dari langkah mana, lihat [[Cara mengubah subtitle satu musim secara massal|/guides/batch-convert-srt.html]]; satu file ke lebih banyak format pakai [[Konversi format|/convert.html]]; mau masuk tabel untuk pemeriksaan pakai [[Konversi tabel|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "id": {
+      "seo": {
+        "title": "Ubah Subtitle Satu Musim Massal – Yang Bisa Dibatch dan Tidak – AI-SRTSub",
+        "desc": "Satu musim biasanya perlu diubah untuk hal yang sama: seragamkan format, geseran timestamp, dan istilah. Mana yang bisa selesai sekali jalan dan mana yang harus per file.",
+        "h1": "Cara mengubah subtitle satu musim secara massal",
+        "intro": "Satu musim yang puluhan subtitle biasanya perlu diubah untuk hal yang sama. Memisahkan mana yang bisa selesai sekali jalan dan mana yang harus per file jauh lebih hemat daripada mengerjakannya satu per satu.",
+        "ctaText": "Buka konversi massal"
+      },
+      "body": [
+        {
+          "h2": "Yang perlu diubah biasanya hal yang sama",
+          "ps": [
+            "Kalau subtitle satu musim bermasalah, jarang tiap episode punya masalah sendiri-sendiri — biasanya satu penyebab yang sama jatuh di tiap episode: seluruh musim dikompres oleh kelompok subtitle yang sama (format seragam, watermark seragam), seluruh musim dipasangkan ke versi video yang sama (arah dan besar geserannya sama), atau terjemahan nama di seluruh musim tidak konsisten.",
+            "Ambil dua episode dulu (satu di awal, satu di akhir) untuk dilihat, dan pastikan **masalahnya sama** sebelum mulai mengerjakan massal. Kalau episode awal dan akhir masalahnya berbeda, berarti ini bukan urusan yang bisa diselesaikan dengan batch."
+          ]
+        },
+        {
+          "h2": "Yang bisa selesai sekali jalan",
+          "ps": [
+            "**Seragamkan format** satu-satunya yang benar-benar bisa selesai sekali jalan: tarik puluhan sampai ratusan SRT dan VTT ke [[Konversi massal|/batch.html]], pilih format target, dan bawa pulang satu ZIP. Nomor diurut ulang dan timestamp dinormalisasi di langkah ini; dialog tidak berubah satu karakter pun."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Daftar file halaman konversi massal: mencantumkan jumlah entri satu per satu, yang tidak dikenali ditandai merah",
+            "cap": "Seragamkan format satu-satunya yang bisa selesai sekali jalan"
+          }
+        },
+        {
+          "h2": "Yang harus per file",
+          "ps": [
+            "Yang di bawah ini tidak punya pintu masuk massal dan harus dilewati satu per satu — tapi biasanya **cukup dikerjakan sekali lalu diterapkan ke seluruh musim** lewat operasi yang setara:"
+          ],
+          "ul": [
+            "**Seragamkan geseran timestamp**: kalau besar geseran tiap episode sama, ukur geseran satu episode di [[Penyesuaian timestamp|/shift.html]], catat angkanya, lalu isi angka yang sama di episode lainnya",
+            "**Seragamkan istilah**: daftar istilah dikonfigurasi sekali di [[Penggantian istilah|/glossary.html]], lalu tiap subtitle memakai daftar istilah yang sama",
+            "**Seragamkan penghapusan watermark**: aturan watermarknya tetap, dan centang bawaan di [[Pembersihan subtitle|/clean.html]] sudah mencakup watermark yang umum, tinggal tarik masuk satu per satu"
+          ]
+        },
+        {
+          "h2": "Jangan sampai urutannya terbalik",
+          "ps": [
+            "Kalau beberapa hal harus dikerjakan, urutan yang salah akan membuat Anda mengulang. Ikuti urutan ini:",
+            "**Perbaiki encoding dulu** → **baru seragamkan format** → **baru kerjakan perubahan isi** (hapus watermark, istilah, timestamp) → **terakhir pemeriksaan kualitas**. Kalau encoding belum diperbaiki sudah ganti format, yang terbaca tetap berantakan; kalau format belum seragam sudah mengubah isi, dukungan format tiap alat berbeda-beda."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Area pengemasan: tombol unduh ZIP dan keterangan hasil",
+            "cap": "Seragamkan format di depan, perubahan isi di belakang"
+          }
+        },
+        {
+          "h2": "Cara menangani file yang tidak dikenali",
+          "ps": [
+            "Di konversi massal, file yang ditandai \"tidak dikenali\" tidak masuk ZIP dan tetap di daftar. Tiga penyebab umum: bukan file subtitle (file penjelasan yang ikut terbawa), encodingnya bukan UTF-8, atau isinya ditekan jadi satu paragraf tanpa timestamp.",
+            "Masalah encoding ke [[Perbaikan karakter berantakan|/repair.html]] untuk diperbaiki sendiri; masalah format ke [[Konversi format|/convert.html]] untuk dikonversi sekali lalu dimasukkan lagi ke daftar. **Jangan memaksakan file yang tidak dikenali masuk paket demi mengejar jumlah** — baru sadar ada satu episode yang hilang saat diputar jauh lebih merepotkan daripada meluangkan satu menit sekarang."
+          ]
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Cara lengkap konversi massal lihat [[Cara memakai konversi massal|/guides/batch.html]]; geseran timestamp yang seragam lihat [[Cara memakai penyesuaian timestamp|/guides/shift.html]]; sebelum diserahkan, lewati dulu [[Pemeriksaan kualitas subtitle|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "id": {
+      "seo": {
+        "title": "Apa Itu 23.976 / 24 / 25 / 30 fps – Timestamp Subtitle – AI-SRTSub",
+        "desc": "23.976 bukan 24 dan 29.97 bukan 30: selisih 0,1% itu peninggalan pewarnaan NTSC. Wilayah PAL yang menayangkan di 25 membuat film 4% lebih cepat. Bagaimana angka ini memengaruhi timestamp subtitle.",
+        "h1": "Apa itu 23.976 / 24 / 25 / 30 fps",
+        "intro": "Selisih 0,1% antara 23.976 dan 24 adalah sisa dari sejarah televisi. Ditambah 4%-nya PAL, itulah pangkal mengapa subtitle makin ke belakang makin tidak pas.",
+        "ctaText": "Buka penyesuaian timestamp"
+      },
+      "body": [
+        {
+          "h2": "Apa keempat angka ini",
+          "ps": [
+            "Frame rate adalah berapa gambar yang diputar dalam satu detik. Yang umum ada empat:"
+          ],
+          "ul": [
+            "**24 fps** — kecepatan pengambilan dan pemutaran film; bioskop memang 24",
+            "**23.976 fps** — kecepatan film setelah masuk televisi sistem NTSC, 0,1% lebih lambat dari 24",
+            "**25 fps** — kecepatan televisi sistem PAL (Eropa, Tiongkok, Australia, dan wilayah listrik 50Hz lainnya)",
+            "**29.97 fps / 30 fps** — kecepatan acara televisi NTSC, dengan selisih 0,1% yang sama"
+          ]
+        },
+        {
+          "h2": "Dari mana 0,1% itu",
+          "ps": [
+            "23.976 = 24 × 1000/1001, dan 29.97 = 30 × 1000/1001. Angka 1000/1001 ini peninggalan pewarnaan NTSC: supaya subcarrier warna bisa disisipkan tanpa mengubah penerima hitam-putih yang sudah ada, frekuensi field diturunkan dari 60 Hz ke 59,94 Hz (60 × 1000/1001), dan frame rate ikut turun.",
+            "Hasilnya: saat film ditayangkan di wilayah NTSC, kecepatannya 23.976 bukan 24. Selisih 0,1% berarti beda 3,6 detik untuk film satu jam — dilihat sendiri hampir tidak terasa, tapi ini bukan hal yang sama dengan 4% di bawah, jangan dicampur."
+          ]
+        },
+        {
+          "h2": "Terus 4% dari mana",
+          "ps": [
+            "Wilayah PAL menayangkan di 25 fps. Film diambil pada 24 fps, lalu diputar langsung di 25 — jumlah framenya tidak berubah, jadi kecepatan putarnya naik 4% (25/24 ≈ 1,0417). Film 100 menit versi PAL-nya cuma 96 menit.",
+            "Inilah pangkal **pergeseran bertahap**: subtitle dibuat dari versi asli sedangkan videonya versi PAL, di awal tidak meleset sedikit pun tapi di akhir meleset 4 menit. Menggeser keseluruhan tidak akan menyelesaikannya; harus dikonversi proporsional."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Area penyesuaian kecepatan di halaman penyesuaian timestamp: kotak isi rasio",
+            "cap": "Konversi proporsional, satu nilai rasio berlaku untuk seluruh film"
+          }
+        },
+        {
+          "h2": "Cara mengonversi",
+          "ps": [
+            "Konversi tinggal mengalikan satu nilai rasio yang berlaku untuk seluruh film:"
+          ],
+          "ul": [
+            "**24 → 25** (percepatan PAL): × 0,96",
+            "**23.976 → 25**: × 0,959 (nilai tepat 23.976/25 = 0,95904)",
+            "**25 → 23.976**: × 1,0427",
+            "**23.976 ↔ 24**: × 1,001 atau × 0,999, hanya beda 0,1%",
+            "0,96 dan 0,959 beda 0,1%, untuk satu film penuh bedanya kurang dari 6 detik — kalau tidak yakin sumbernya 24 atau 23.976, memakai 0,96 juga bisa, dan sisanya dirapikan dengan dua titik jangkar"
+          ]
+        },
+        {
+          "h2": "Cara mengetahui yang mana yang Anda pegang",
+          "ps": [
+            "Kalau tidak mau menebak rasio, cari dua titik waktu yang Anda yakin benar — biasanya dialog pertama dan dialog terakhir — lalu beri tahu alat \"yang ini seharusnya di 00:00:12 dan yang itu di 01:35:40\"; ia meregangkan seluruh film secara linear di antara dua titik itu. Ini \"dua titik jangkar\", dan Anda tidak perlu menghitung frame rate.",
+            "Untuk memastikan sendiri frame rate sumbernya: pemutar atau alat info media akan menuliskannya. Kalau nama file seperti `1080p.WEB` tidak memberi petunjuk frame rate, dua titik jangkar lebih aman."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Area dua titik jangkar di halaman penyesuaian timestamp: dua baris isian titik waktu",
+            "cap": "Dua titik jangkar tidak perlu menghitung frame rate, dua titik waktu saja cukup"
+          }
+        },
+        {
+          "h2": "Alat dan panduan terkait",
+          "ps": [
+            "Untuk konversi frame rate langsung lihat [[Konversi frame rate subtitle|/guides/srt-fps-converter.html]]; penyesuaian kecepatan lihat [[Penyesuaian kecepatan subtitle|/guides/subtitle-speed-converter.html]]; kalau bingung membedakan geseran keseluruhan dan pergeseran bertahap, lihat [[Subtitle makin ke belakang makin tidak pas|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

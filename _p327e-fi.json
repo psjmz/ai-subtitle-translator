@@ -1,0 +1,435 @@
+{
+  "translate": {
+    "fi": [
+      {
+        "h2": "Mitä työkalu ratkaisee",
+        "ps": [
+          "Kääntää tekstitykset kieleltä toiselle ja antaa viedä valmiin tekstitystiedoston heti. Tyypillisiä tarpeita:"
+        ],
+        "ul": [
+          "Vieraskielinen video suomenkielisillä tekstityksillä tai suomenkielinen sisältö toisella kielellä tekstitettynä",
+          "Käännöksestä pitää tehdä kaksikieliset tekstitykset alkuperäisen kanssa (alkuperäinen ylhäällä tai käännös ylhäällä)",
+          "Yhtenäiset nimet ja paikannimet koko kaudelle (sanasto)",
+          "Aikajanan hienosäätö käännöksen jälkeen (siirto tai skaalaus)"
+        ]
+      },
+      {
+        "h2": "Tekstityksen lataaminen",
+        "ps": [
+          "Napsauta ”Valitse tekstitystiedosto” tai liitä tekstityksen teksti suoraan vasemman sarakkeen kenttään. Tuetaan kuutta muotoa: SRT, VTT, ASS, SSA, SBV ja TXT. Jos tiedostoa ei ole, napsauta ”Lataa esimerkki”. Kun jäsennys onnistuu, keskisarakkeeseen ilmestyy tekstitystaulukko, jossa on jokaisella rivillä numero, aikajana ja alkuperäinen teksti."
+        ],
+        "img": {
+          "file": "translate-upload",
+          "alt": "Käännöstyökalun tuontialue: tekstitystiedoston valinta, liittämiskenttä ja esimerkin latauspainike",
+          "cap": "Vasen sarake ”Tekstityksen tuonti”: valitse tiedosto, liitä teksti tai lataa esimerkki"
+        }
+      },
+      {
+        "h2": "Kielen ja tyylin valinta",
+        "ps": [
+          "”Lähdekieli” voi jäädä automaattiseen tunnistukseen, ja ”kohdekieli” valitaan 75 kielestä. Käännöstyylejä on viisi: tasapainoinen (oletus), luonnollinen puhekieli, muodollinen kirjakieli, dubbausmainen ja mukautettu. ”Dubbausmainen” sopii elokuvavuoropuheluun ja ”muodollinen kirjakieli” dokumentteihin ja kursseihin."
+        ],
+        "img": {
+          "file": "translate-lang",
+          "alt": "Kielen ja käännöstyylin asetukset: lähdekieli, kohdekieli ja viisi tyyliä",
+          "cap": "”Kieli” ja ”käännöstyyli”: lähdekieli voidaan tunnistaa automaattisesti, kohdekieli valitaan 75 joukosta"
+        }
+      },
+      {
+        "h2": "Sanasto: yhtenäiset nimet koko elokuvaan",
+        "ps": [
+          "AI kääntää erissä, ja sama nimi voi eri erissä päätyä kahdeksi eri kirjoitusasuksi. Kirjoita sanastoon ”alkuperäinen → miten se on käännettävä”. Ennen jokaista erää työkalu etsii nämä rivit ja noudattaa niitä. Yksi merkintä riville; nuolena hyväksytään `->`, `=>`, `→` ja Tab. Jos kirjoitat vain alkuperäisen, se tarkoittaa, ettei sitä käännetä; useat kirjoitusasut voivat jakaa yhden käännöksen merkillä `|`. Napsauta ”✨ AI-poiminta”, niin AI poimii ensin elokuvan erisnimet taulukkoon – muokkaa ja käännä sen jälkeen."
+        ],
+        "img": {
+          "file": "translate-glossary",
+          "alt": "Termien ja erisnimien alue: sanaston kenttä sekä AI-poiminnan ja tallennuksen painikkeet",
+          "cap": "Sanasto ”Yhtenäiset nimet”: AI poimii erisnimet, ja sanasto latautuu automaattisesti seuraavalla kerralla"
+        }
+      },
+      {
+        "h2": "Käännöksen kulku",
+        "ps": [
+          "Napsauta yläpalkin ”▶ Aloita käännös”. Keskisarakkeen tilastopalkki näyttää reaaliajassa rivien määrän, käännetyt rivit, poistetut täytesanat ja usean rivin lauseryhmät; edistymispalkki näyttää arvioidun jäljellä olevan ajan ja kuluneet tokenit. Käännöksen aikana voit milloin tahansa napsauttaa taulukon käännössolua ja korjata tekstiä – muutokset tallentuvat paikallisesti eivätkä katoa sivun päivityksessä. Jos suljet sivun kesken, seuraavalla kerralla tarjotaan mahdollisuutta jatkaa siitä, mihin jäit. Kun kokonainen lause on jaettu usealle tekstitysriville, lauseryhmä käännetään yhtenä kokonaisuutena ja jaetaan sitten takaisin rivien kestojen mukaan."
+        ],
+        "img": {
+          "file": "translate-workspace",
+          "alt": "Käännön työtila: tilastopalkki, edistymispalkki ja muokattava tekstitystaulukko",
+          "cap": "Keskisarake: tilastopalkki + edistymispalkki + napsautettava tekstitystaulukko"
+        }
+      },
+      {
+        "h2": "Vienti",
+        "ps": [
+          "Valitse oikeasta sarakkeesta ensin sisältömuoto: vain käännös (yksikielinen), kaksikielinen alkuperäinen ylhäällä tai kaksikielinen käännös ylhäällä. Valitse sitten tiedostomuoto: SRT, WebVTT, SBV, ASS tai TXT. ASS-muodossa on lisäksi kaksi asettelua: ”kaksi ruutua päällekkäin” ja ”kaksi riviä alhaalla”. Sisältö ja muoto yhdistyvät vapaasti, yhteensä 14 vientiversiota. Kaksikielisen rivin leveys asetetaan erikseen. Napsauta ”Lataa tekstitys” tallentaaksesi tiedoston tai ”Kopioi leikepöydälle” ottaaksesi sen heti mukaan."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Vientipaneeli: kolme sisältömuotoa, viisi tiedostomuotoa ja kaksikielisen rivin leveyden asetus",
+          "cap": "Vienti oikealla: valitse ensin sisältömuoto, sitten tiedostomuoto"
+        }
+      },
+      {
+        "h2": "Hinta ja tietosuoja",
+        "ps": [
+          "Oletusmalli ei vaadi rekisteröitymistä eikä avainta ja toimii heti, pyyntömäärään perustuvalla rajalla: jokaisella IP-osoitteella on päiväkohtainen kiintiö, ja koko sivustolla on lisäksi yhteinen päiväkiintiö. Suurilla määrillä kannattaa syöttää oma API-avain kohtaan ”Käännösmoottori”. Tietosuojassa noudata sivun ilmoitusta: oletusmallilla käännettävät tekstitykset välitetään sivuston palvelimen kautta palveluntarjoajalle, kun taas oman API:n käsittelee suoraan valitsemasi palveluntarjoaja ja avain säilyy vain selaimessasi. Jäsennys, rivien taitto ja kaksikielinen asettelu tehdään kokonaan selaimessa paikallisesti."
+        ]
+      },
+      {
+        "h2": "Usein kysytyt kysymykset",
+        "ps": [
+          "**Käännökseen tulee muita kieliä?** Työkalu havaitsee, jos käännös luisuu väärälle kielelle, ja kääntää uudelleen. Jos jokin rivi on silti väärin, napsauta solua ja korjaa käsin.",
+          "**Miten laulurivit käsitellään?** ”Sisältösuodattimessa” on kolme vaihtoehtoa: käännä laulun teksti, säilytä alkuperäinen tai poista laulun teksti.",
+          "**Nimet ovat epäjohdonmukaisia?** Lisää poikkeavat kirjoitusasut sanastoon ja käännä uudelleen; sanasto menee globaalin asetuksen ”Erisnimien käsittely” edelle.",
+          "**Haluatko englannin ylös ja suomen alas?** Valitse viennissä ”kaksikielinen · alkuperäinen ylhäällä”. Jos haluat suomen ylös, valitse ”kaksikielinen · käännös ylhäällä”."
+        ]
+      },
+      {
+        "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+        "ps": [
+          "Jos muoto ei sovi, aloita työkalusta [[Muunnin|/convert.html]]; jos aikajana on vinossa, käytä toimintoa [[Aikajanan säätö|/shift.html]]; ennen luovutusta käy läpi [[Tekstityksen tarkistus|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  },
+  "clean": {
+    "fi": [
+      {
+        "h2": "Mitä työkalu ratkaisee",
+        "ps": [
+          "Ladatuissa tekstityksissä on usein sinne kuulumatonta. Puhdistin poistaa sen sääntöjen mukaan yhdellä kerralla:"
+        ],
+        "ul": [
+          "Tekstitysryhmien vesileimat, verkko-osoitteet ja mainosrivit",
+          "Kuulovammaisille tarkoitetut merkinnät (kuten [askeleita], (musiikkia)) ja puhujatunnisteet",
+          "ASS-tehosteet, HTML-tagit ja ohjausmerkit",
+          "Toistorivit, tyhjät rivit sekä välimerkkien ja välilyöntien sekasorto"
+        ]
+      },
+      {
+        "h2": "Lataus ja tunnistus",
+        "ps": [
+          "Vedä tiedosto sisään tai valitse se – tuetaan muotoja SRT, VTT, ASS, SSA ja TXT, ja tekstityksen voi myös liittää suoraan. Merkistökoodaus tunnistetaan automaattisesti: jos UTF-8 tuottaa korvausmerkkejä, työkalu palaa GBK- tai Big5-koodaukseen ja sivu ilmoittaa ”koodaus korjattu muotoon {encoding}”. Jos lataat kaksikielisen tekstityksen kahtena raitana (kaksi riviä täsmälleen samalla aikajanalla, toinen kiinaksi ja toinen englanniksi), ne yhdistetään automaattisesti yhdeksi kaksikieliseksi riviksi ja näkyviin tulee vaihtokytkin ”alkuperäinen ylhäälle / käännös ylhäälle”."
+        ]
+      },
+      {
+        "h2": "Näin 13 sääntöä asetetaan",
+        "ps": [
+          "Käyttöliittymässä on 13 valintaruutua neljässä ryhmässä: **tagit ja muoto** (ASS-tehosteet, HTML-tagit, ohjausmerkit, lajittelu ja uudelleennumerointi), **kuulovammaiset ja äänet** (kuulovammaismerkinnät, puhujatunnisteet, puhtaat laulurivit), **vesileimat ja turhat rivit** (vesileimat ja mainokset, toistorivit, tyhjät rivit) sekä **tekstinkorjaukset** (välimerkit ja välilyönnit, isojen kirjaimien korjaus, lyhyiden virkkeiden yhdistäminen). Oletuksena päällä ovat vain häviöttömät ja varmat vaihtoehdot; ne, jotka voivat hävittää sisältöä (laulurivit, isojen kirjaimien korjaus, yhdistäminen), ovat pois päältä ja kytketään tarpeen mukaan. Jokaisessa säännössä on ⓘ-selitys hiiren päälle vietäessä, ja jokainen valinnan muutos lasketaan heti uudelleen."
+        ],
+        "img": {
+          "file": "clean-opts",
+          "alt": "Puhdistuksen asetukset: 13 valintaruutua neljässä ryhmässä, ylhäällä päällä olevien määrä",
+          "cap": "13 sääntöä neljässä ryhmässä, oletuksena vain häviöttömät, muutokset astuvat voimaan heti"
+        }
+      },
+      {
+        "h2": "Muutosten vertailu ja palautus",
+        "ps": [
+          "Tulos ei korvaa mitään suoraan: jokainen muutos luetellaan vertailutaulukossa, jossa on säännön tunniste (miksi rivi muuttui tai poistui). Jos et halua koskea johonkin riviin, napsauta sen kohdalla ”Palauta”; ”Palauta kaikki” palauttaa kaiken yhdellä napsautuksella, ja seuraava napsautus ottaa puhdistuksen taas käyttöön. Tilastopalkki näyttää alkuperäisten, puhdistettujen, poistettujen, muutettujen ja palautettujen rivien määrät."
+        ],
+        "img": {
+          "file": "clean-diff",
+          "alt": "Vertailutaulukko: numero, aika, alkuperäinen ja puhdistettu teksti, jokaisella rivillä säännön tunniste",
+          "cap": "Jokaisella muutoksella on säännön tunniste, ja sen voi palauttaa yksin tai kaikki kerralla"
+        }
+      },
+      {
+        "h2": "Esikatselu ja vienti",
+        "ps": [
+          "Vaihda näkymien ”puhdistettu” ja ”alkuperäinen” välillä. Alkuperäisnäkymässä poistetut rivit on yliviivattu ja merkitty ”poistettu”. Viety sisältö on täsmälleen se, mitä näet. Vientimuodot: SRT (oletus), VTT, ASS (valittavissa, kun lähdetiedosto on ASS – silloin tyyliosio säilyy ennallaan) sekä puhdas teksti TXT ilman aikajanaa. Tiedostonimeen lisätään automaattisesti merkintä `.clean`."
+        ],
+        "img": {
+          "file": "clean-preview",
+          "alt": "Koko tekstin esikatselu: vaihto puhdistetun ja alkuperäisen välillä, määrät tilastopalkissa",
+          "cap": "Kaksi näkymää vaihdettavana – se mitä näet, on se mitä saat"
+        }
+      },
+      {
+        "h2": "Usein kysytyt kysymykset",
+        "ps": [
+          "**Poistaako se vahingossa tavallista dialogia?** Vesileimasääntö poistaa ensin vesileimarivit rivi riviltä (kaksikielisen rivin dialogi säilyy) ja poistaa koko rivin vain, jos jälkiä jää sen jälkeen. Kuulovammaismerkinnät poistetaan vain, kun suluissa on merkintä ja enintään 40 merkkiä; tavallinen dialogi suluissa jää rauhaan.",
+          "**Miten puhtaat laulurivit erotetaan dialogin laulusta?** Vain rivit, joissa jokainen rivi on ♪-merkkien ympäröimä tai koostuu merkinnöistä kuten [music], poistetaan; dialogi, jossa on laulun sanoja, säilyy.",
+          "**Voivatko puhujatunnisteet vahingoittaa kiinaa?** Ne täsmäävät vain rivin alussa olevaan isoin kirjaimin ja numeroin kirjoitettuun nimeen ja kaksoispisteeseen (esim. `GEORGE:`); kiinankieliset virkkeet kaksoispisteineen eivät täsmää.",
+          "**Voiko useita tiedostoja puhdistaa kerralla?** Ei, yksi tiedosto kerrallaan; lataa valmis tulos ja syötä seuraava."
+        ]
+      },
+      {
+        "h2": "Tietosuoja",
+        "ps": [
+          "Puhdistus tehdään kokonaan selaimessa paikallisesti, eikä tekstityksen sisältöä lähetetä palvelimelle."
+        ]
+      },
+      {
+        "h2": "Aiheeseen liittyvät työkalut ja oppaat",
+        "ps": [
+          "Lyhyt ohje juuri vesileimoihin ja mainoksiin on sivulla [[Mainosten ja vesileimojen poisto|/guides/remove-subtitle-ads.html]]; ennen luovutusta käy läpi [[Tekstityksen tarkistus|/guides/subtitle-quality-check.html]]; jos tarvitset toista muotoa, käytä työkalua [[Muunnin|/convert.html]]."
+        ]
+      }
+    ]
+  },
+  "bilingual": {
+    "fi": [
+      {
+        "h2": "Mitä työkalu ratkaisee",
+        "ps": [
+          "Sinulla on kaksikielinen tekstitys, mutta haluat vain toisen raidan – tai päinvastoin haluat jakaa tai yhdistää raiteet:"
+        ],
+        "ul": [
+          "Vain alkuperäisraita tai vain käännösraita",
+          "Jaa kahdeksi erilliseksi tiedostoksi ”alkuperäinen” ja ”käännös”",
+          "Yhdistä kaksi kaksikielistä riviä samalla aikajanalla yhdeksi riviksi, jossa on kaksi tekstiriviä",
+          "Vaihda samalla muoto (lue ASS ja vie SRT tms.)"
+        ]
+      },
+      {
+        "h2": "Miten se tunnistaa kaksikielisyyden",
+        "ps": [
+          "Kaksikielisiä tekstityksiä on kahta yleistä muotoa, ja työkalu erottaa ne **arvaamatta kieltä**: **Muoto A (yksi tekstitys, kaksi riviä)** jakaa raiteet kirjoitusjärjestelmän mukaan – kymmenen järjestelmää, kuten kana, hangul, hanzi ja latinalainen kirjaimisto. Kaksikieliseksi katsotaan vasta, kun niitä on kaksi; ensimmäisenä tuleva tulkitaan alkuperäiseksi. Jos järjestelmiä on vain yksi (esim. pitkä kiinankielinen virke kahdelle riville taitettuna), rivi säilyy yksikielisenä. **Muoto B (kaksi erillistä riviä täsmälleen samalla aikajanalla)** jakaa raiteet sijainnin mukaan – kaksi samanaikaista riviä muodostaa ryhmän, ensimmäinen tulkitaan alkuperäiseksi, ja yhdistelmät kuten englanti ja ranska tai englanti ja saksa erottuvat myös, koska ne ovat omilla riveillään. Jos kaksikielistä sisältöä ei löydy, tilan valinta ja aloituspainike harmaantuvat ja asiasta kerrotaan selvästi – työkalu ei koskaan jaa sokkona."
+        ]
+      },
+      {
+        "h2": "Neljä tilaa",
+        "ps": [
+          "Valikossa ”Kumman haluat” on neljä vaihtoehtoa: **vain alkuperäinen** ja **vain käännös** antavat kumpikin yhden tiedoston; **jaa kahteen tiedostoon** tuottaa alkuperäistiedoston ja käännöstiedoston, joiden nimiin lisätään automaattisesti `.orig` / `.dst`, etteivät ne kirjoita toisiaan yli; **yhdistä kahdeksi riviksi** tekee jokaisesta ryhmästä kaksikielisen rivin, jossa alkuperäinen on yhdellä rivillä ja käännös seuraavalla, kun taas yksikieliset ryhmät jäävät sellaisiksi kuin ne ovat – toista riviä ei keksitä. Tilan tai vientimuodon vaihto laskee olemassa olevan sisällön heti uudelleen, eikä aloitusta tarvitse napsauttaa uudestaan."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Tilan valinta kaksikielisen tekstityksen jakotyökalussa: vain alkuperäinen, vain käännös, jaa kahteen tiedostoon, yhdistä kahdeksi riviksi",
+          "cap": "Neljä tilaa: pidä yksi raita, jaa kahteen tiedostoon tai yhdistä kahdeksi riviksi"
+        }
+      },
+      {
+        "h2": "Tulo ja lähtö",
+        "ps": [
+          "Lukee seitsemän muotoa: SRT, VTT, ASS, SSA, SBV, LRC ja TXT (ensin tiedostopäätteen, sitten sisällön mukaan). Vie neljä: SRT, VTT, ASS ja TXT. Tulo ja lähtö yhdistyvät vapaasti, joten muodon vaihto hoituu samalla. ASS:n `\\N`-rivinvaihdosta tulee oikea rivinvaihto, ja tehostetagit poistetaan vietäessä muihin muotoihin."
+        ]
+      },
+      {
+        "h2": "Tulos ja vienti",
+        "ps": [
+          "Tulos näytetään kokonaan vain luku -tekstikentässä, ja jokaisella tiedostolla on rivimäärä ja kokonaiskesto; painikkeet ”Lataa” ja ”Kopioi” hoitavat loput. Tulosalue on vain esikatselu, eikä siinä voi muuttaa tekstiä tai aikajanaa – vie ensin ja muokkaa sitten oikeassa työkalussa."
+        ],
+        "img": {
+          "file": "bilingual-result",
+          "alt": "Tulosalue: vain luku -esikatselu, rivimäärä sekä lataus- ja kopiointipainikkeet",
+          "cap": "Koko tulos esikatselussa + rivimäärä ja kokonaiskesto + lataus ja kopiointi"
+        }
+      },
+      {
+        "h2": "Usein kysytyt kysymykset",
+        "ps": [
+          "**Miksi englantia ja ranskaa ei voi erottaa samalta riviltä?** Muoto A jakaa kirjoitusjärjestelmän mukaan, eikä kahta saman järjestelmän kieltä voi erottaa yhden rivin sisällä. Syötä sisältö muotona B (kaksi riviä samalla aikajanalla), niin ne erottuvat sijainnin mukaan.",
+          "**Sain vain yhden tiedoston?** ”Vain alkuperäinen”, ”vain käännös” ja ”yhdistä kahdeksi riviksi” antavat aina yhden tiedoston; kaksi antaa vain ”jaa kahteen tiedostoon”, ja nimessä on `.orig` / `.dst`.",
+          "**Voiko eränä?** Yksi tiedosto kerrallaan, ei jonoa.",
+          "**Lähetetäänkö tekstitykseni palvelimelle?** Ei, jäsennys ja vienti tehdään kokonaan selaimessa paikallisesti."
+        ]
+      },
+      {
+        "h2": "Aiheeseen liittyvät oppaat",
+        "ps": [
+          "Lyhyt ohje kahdeksi raiteeksi jakamiseen on sivulla [[Kaksikielisen tekstityksen jakaminen kahdeksi raiteeksi|/guides/split-bilingual-subtitles.html]]; miten kaksikielinen tekstitys tehdään, kerrotaan sivulla [[Kaksi tapaa tehdä kaksikielinen tekstitys|/guides/make-bilingual-subtitles.html]]; konekäännökseen käytä toimintoa [[AI-tekstityksen käännös|/translate.html]]."
+        ]
+      }
+    ]
+  },
+  "make-bilingual-subtitles": {
+    "fi": [
+      {
+        "h2": "Miltä kaksi muotoa näyttävät",
+        "ps": [
+          "**Muoto B: kaksi riviä samalla aikajanalla.** Sama virke on kahtena erillisenä tekstitysrivinä täsmälleen samalla aikajanalla, toinen englanniksi ja toinen kiinaksi, ja ne toistetaan päällekkäin. Juuri näin kaksikielinen ASS yleisimmin tehdään."
+        ],
+        "ul": [
+          "`What are you waiting for?`",
+          "`你还在等什么？`"
+        ]
+      },
+      {
+        "h2": "Kummallakin on heikkoutensa",
+        "ps": [
+          "Muodon A sudenkuoppa on **tunnistus**: jako perustuu kirjoitusjärjestelmään, joten kiina ja englanti tai japani ja englanti erottuvat helposti – mutta yhdistelmät, jotka **jakavat saman kirjoitusjärjestelmän** – englanti ja ranska tai kiina ja japanilaiset kanjit – eivät erotu. Muodon B sudenkuoppa on **valmistus**: molempien aikajanojen on oltava täsmälleen samat, ja käsin kohdistaminen on raskasta; lisäksi jotkin soittimet piirtävät molemmat rivit, jolloin teksti ahtautuu ruudulle. Kokemus: valmiit tekstitykset katsojille tehdään useimmiten muodossa A; jos kumpaakin raitaa pitää jatkokäsitellä, muoto B on helpoin jakaa."
+        ]
+      },
+      {
+        "h2": "Kaksi tietä",
+        "ps": [
+          "**Tee kaksikielinen alkuperäisestä**: käytä toimintoa [[AI-tekstityksen käännös|/translate.html]] ja valitse viennissä ”kaksikielinen · alkuperäinen ylhäällä” tai ”kaksikielinen · käännös ylhäällä”, niin saat suoraan muodon A. Jos valitset ASS-muodon, käytettävissä ovat lisäksi asettelut ”kaksi ruutua päällekkäin” ja ”kaksi riviä alhaalla”.",
+          "**Raiteiden yhdistäminen ja muuntaminen**: käytä työkalun [[Kaksikielisen tekstityksen jako|/bilingual.html]] toimintoa ”yhdistä kahdeksi riviksi” – muoto B sisään, muoto A ulos. Päinvastoin ”jaa kahteen tiedostoon” antaa kaksi erillistä raidatiedostoa riippumatta siitä, syötätkö muodon A vai B."
+        ],
+        "img": {
+          "file": "bilingual-modes",
+          "alt": "Kaksikielisen tekstityksen jakotyökalun neljä tilaa, joista yhdistä kahdeksi riviksi voi yhdistää kaksi samalla aikajanalla olevaa riviä",
+          "cap": "”Yhdistä kahdeksi riviksi”: muodosta B tulee muoto A"
+        }
+      },
+      {
+        "h2": "Millä laitteella se katsotaan",
+        "ps": [
+          "Verkkosoittimet (HTML5 `<track>`) ja useimmat mobiilisointimet käsittelevät muotoa A vakaammin; ammattimaiset työpöytäsoittimet (VLC, mpv, PotPlayer) ymmärtävät molemmat ja voivat lisäksi antaa kahdelle riville eri värit ja sijainnit. Jos olet epävarma, tee muoto A SRT:nä – se on yleispätevin. Itse muotojen erot löydät sivulta [[SRT, VTT vai ASS – minkä valitset|/guides/subtitle-format-comparison.html]]."
+        ],
+        "img": {
+          "file": "translate-export",
+          "alt": "Kaksikielisen tyylin valinnat käännöstyökalun vientipaneelissa",
+          "cap": "Kaksikielisten rivien järjestys valitaan suoraan viennissä"
+        }
+      },
+      {
+        "h2": "Usein kysytyt kysymykset",
+        "ps": [
+          "**Kaksikielinen tekstitys tuntuu ahtaalta – mitä tehdä?** Rajoita rivin leveyttä: käännöstyökalun vientipaneelissa on asetus ”kaksikielisen rivin leveys”, ja kapeampi rivi tarkoittaa vähemmän merkkejä ja siistimpää ruutua.",
+          "**Haluatko vain yhden raidan?** ”Vain alkuperäinen / vain käännös” kaksikielisen tekstityksen jakotyökalussa hoitaa sen yhdellä napsautuksella, ks. [[Kaksikielisen tekstityksen jakaminen kahdeksi raiteeksi|/guides/split-bilingual-subtitles.html]]."
+        ]
+      }
+    ]
+  },
+  "qc": {
+    "fi": [
+      {
+        "h2": "Mitä työkalu ratkaisee",
+        "ps": [
+          "Silmämääräisesti tekstitys näyttää virheettömältä, ja vasta luovutuksessa huomaa aikajanojen päällekkäisyyden, liian leveän rivin tai liian nopean lukunopeuden. Tarkistussivu listaa tällaiset ongelmat rivi riviltä:"
+        ],
+        "ul": [
+          "Aikajana: päällekkäisyys, loppu ennen alkua, liian lyhyt tai pitkä näyttöaika, väärä numerointi",
+          "Asettelu: liian leveä rivi, yli kaksi riviä, huono rivinvaihtokohta, välilyönnit alussa ja lopussa",
+          "Kieliyksityiskohdat: puuttuva välilyönti latinalaisen ja kiinan välillä, kielen sääntöjen vastainen välimerkitys, kirjoitussuunta",
+          "Vakavat viat: mojibake tai ohjausmerkit, väärä aikaleiman muoto"
+        ]
+      },
+      {
+        "h2": "Valitse ensin kielen säännöt",
+        "ps": [
+          "Kohdassa ”Minkä kielen sääntöjen mukaan tarkistetaan” on viisi kynnysarvoa: **rivin enimmäisleveys** (vaakakuvassa oletuksena 42 puolileveyttä, neliössä 36 ja pystykuvassa 28), **lukunopeuden yläraja** (18 leveyttä/s kiinalle, japanille ja korealle, muille kielille 20), **lyhin näyttöaika 833 millisekuntia**, **pisin näyttöaika 7000 millisekuntia** ja **enintään 2 riviä**. Tekstityksen kieli voidaan tunnistaa automaattisesti tai valita käsin 27 kielestä; kuvan suunta muuttaa vain rivin leveyttä – lukunopeus, kesto ja rivimäärä eivät muutu. Puolileveys on yhtenäinen mitta: yksi kiinanmerkki lasketaan kahdeksi ja yksi latinalainen kirjain yhdeksi, joten leveys 42 tarkoittaa 21 kiinanmerkkiä tai 42 kirjainta."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Tarkistuksen asetukset: viisi kynnyskenttää sekä tekstityksen kielen ja kuvan suunnan valikot",
+          "cap": "Viisi kynnystä + kieli + kuvan suunta, oletusarvot ovat alan vakiintuneita"
+        }
+      },
+      {
+        "h2": "Raportin lukeminen",
+        "ps": [
+          "17 sääntöä antavat tuloksen kolmella tasolla: **virheet** (mojibake, aikaleiman muoto, loppu ennen alkua, väärä numerointi), **varoitukset** (tyhjät rivit, päällekkäisyys, liian lyhyt tai pitkä näyttöaika, ylitetty lukunopeus, liian leveä rivi, yli kaksi riviä) ja **vihjeet** (rivinvaihtokohta, välilyönnit alussa ja lopussa, puuttuva välilyönti, välimerkitys ym.). Jokaisessa kohdassa on rivinumero ja tieto ”mitattu X, kynnys Y”, ja niitä voi suodattaa tason mukaan. Kaksikielisillä riveillä on poikkeukset: molemmat muodot tunnistetaan automaattisesti, päällekkäisyystarkistus ohittaa koko parin ja lukunopeus lasketaan vain kohdekieliseltä riviltä."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Tarkistusraportti: kohdat tasoittain virheisiin, varoituksiin ja vihjeisiin, rivinumeroineen ja mittausarvoineen",
+          "cap": "Raportti kolmella tasolla: jokaisessa ongelmassa rivinumero ja mitattu arvo kynnystä vasten"
+        }
+      },
+      {
+        "h2": "Korjaus ja vienti",
+        "ps": [
+          "Kortissa ”Korjaus ja vienti” luetellaan vain se, mikä **voidaan korjata automaattisesti**: rivien uudelleentaitto, tyhjien rivien poisto, välilyöntien lisäys, kielen sääntöjen mukainen välimerkitys ja numeroinnin korjaus – aikajanaan koskemattomat kohdat ovat oletuksena valittuina. Ne, jotka **muuttavat aikajanaa** (alku ja loppu vaihtoon, päällekkäisyyden siirto, näyttöajan lyhennys tai pidennys), ovat oletuksena pois päältä ja kytketään päälle oman harkinnan jälkeen. Napsauta ”Käytä korjaukset”, niin kaikki tarkistetaan uudelleen, ja laskuri huomioi vain todella korjatut – rivejä, joita ei voitu taitaa, ei ilmoiteta korjatuiksi. **Ylitettyä lukunopeutta ei korjata automaattisesti**: kone ei tiedä, mikä sana pitäisi poistaa, joten lyhennä käännöstä tai säädä aikajanaa käsin. Vie sitten SRT:nä tai VTT:nä tai napsauta ”Lataa raportti” ja tallenna puhdas tekstiraportti muodossa `.qc.txt`."
+        ],
+        "img": {
+          "file": "qc-fix",
+          "alt": "Korjauskortti: automaattisesti korjattavien kohtien valintaruudut ja käyttöpainike",
+          "cap": "Listaan pääsevät vain automaattisesti korjattavat; aikajanaa muuttavat ovat oletuksena pois päältä"
+        }
+      },
+      {
+        "h2": "Usein kysytyt kysymykset",
+        "ps": [
+          "**Miksi ASS-tiedostoani ei voi viedä?** Tarkistus vie vain SRT:n ja VTT:n; ASS voidaan lukea mutta ei kirjoittaa. Jos haluat säilyttää ASS-tehosteet, käy ensin sivulla [[Muunnin|/convert.html]] ja mieti asia loppuun.",
+          "**Mitä lukunopeus 18 tarkoittaa?** Kiinalle, japanille ja korealle yläraja on 9 täysileveää merkkiä sekunnissa (18 puolileveyttä), muille kielille 20 puolileveyttä sekunnissa. Se on tavallinen taso mukavaan lukemiseen, ja kenttää voi muuttaa.",
+          "**Voiko rikkinäisellä merkistöllä varustetun tiedoston tarkistaa?** Tarkistus lukee vain UTF-8:aa, joten väärällä merkistöllä oleva tiedosto kannattaa ensin käyttää mojibaken korjaussivulla.",
+          "**Koskeeko se aikajanaani?** Ei, jos jätät ”muuttaa aikajanaa” -ryhmän pois päältä; jos kytket sen päälle, siitä ilmoitetaan selvästi ennen korjausta."
+        ]
+      },
+      {
+        "h2": "Aiheeseen liittyvät oppaat",
+        "ps": [
+          "Vilkahtaville tekstityksille on oma oppaansa: [[Tekstitys, jota ei ehdi lukea|/guides/subtitle-too-fast.html]]. Mitkä kohdat kannattaa tarkistaa ennen luovutusta, kerrotaan sivulla [[Mitä tarkistaa ennen luovutusta|/guides/subtitle-quality-check.html]]. Vinossa oleva aikajana on eri ongelma – ks. [[Tekstitys, joka ei enää täsmää myöhemmin|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-quality-check": {
+    "fi": [
+      {
+        "h2": "Miksi omia virheitä ei näe",
+        "ps": [
+          "Tekstityksen tekijä tuntee sisällön liian hyvin – tietää jokaisesta repliikistä, mitä seuraavalla sekunnilla sanotaan, eikä mikään nopeus tunnu nopealta; satojen lukukertojen jälkeen silmä on jo lakannut näkemästä asetteluvirheitä. Siksi luovutusta edeltävä tarkistus ei voi olla ”koko jutun lukeminen vielä kerran” vaan **mittaamista tunnuslukuja vasten**: lukunopeus, rivin leveys, näyttöaika ja päällekkäisyys – luvut ratkaisevat."
+        ]
+      },
+      {
+        "h2": "Kuusi yleisintä kompastuskiveä",
+        "ps": [
+          "Järjestetty sen mukaan, kuinka usein ne pettävät luovutuksessa:"
+        ],
+        "ul": [
+          "**Liian suuri lukunopeus**: katsoja ei ehdi lukea ja teksti katoaa, koko elämyksen taso romahtaa",
+          "**Aikajanojen päällekkäisyys**: kaksi riviä ruudulla yhtä aikaa, yleensä leikkauksen tai yhdistämisen jäänne",
+          "**Liian leveä rivi**: yli 42 puolileveyttä vaakakuvassa valuu yli pieniltä näytöiltä",
+          "**Yli kaksi riviä**: kolmen rivin tai sitä suuremmat lohkot vievät puolet puhelimen ruudusta",
+          "**Huolimaton välimerkitys**: puuttuva välilyönti latinalaisen ja kiinan välillä sekä täysi- ja puolileveyden sekoittaminen näyttävät halvalta",
+          "**Väärä numerointi ja tyhjät rivit**: poistamisen tai yhdistämisen jälkeen unohdettiin numeroida uudelleen"
+        ]
+      },
+      {
+        "h2": "Näin tarkistat",
+        "ps": [
+          "Avaa [[Tekstityksen tarkistus|/qc.html]], vedä tekstitys sisään ja anna kielen tunnistua automaattisesti (säännöt on jaettu 27 kielelle). Raportti esitetään kolmella tasolla – **virheet / varoitukset / vihjeet** – ja jokaisessa kohdassa on rivinumero ja mitattu arvo. Virheet on hoidettava (mojibake, aikaleiman muoto, loppu ennen alkua, väärä numerointi); varoitukset tapauskohtaisesti (päällekkäisyys, lukunopeus, rivin leveys, näyttöaika); vihjeet ovat viimeistelyä (rivinvaihtokohta, välilyönnit, välimerkitys)."
+        ],
+        "img": {
+          "file": "qc-report",
+          "alt": "Tarkistusraportti: ongelmaluettelo kolmella tasolla, jokaisessa rivinumero ja mitatun arvon vertailu kynnykseen",
+          "cap": "Raportti kolmella tasolla, jokaisessa ongelmassa rivinumero ja mitattu arvo"
+        }
+      },
+      {
+        "h2": "Mikä korjautuu yhdellä napsautuksella",
+        "ps": [
+          "Numeroinnin, tyhjät rivit, rivien taiton, välilyönnit ja välimerkityksen – siis sen, mikä **ei koske aikajanaan** – voi korjata automaattisesti. Korjaukset, jotka **muuttavat aikajanaa** (alun ja lopun vaihto, päällekkäisyyden siirto, näyttöajan lyhennys tai pidennys), ovat oletuksena pois päältä ja kytketään päälle vasta vaikutuksen arvioinnin jälkeen. **Ylitettyä lukunopeutta ei korjata automaattisesti** – kone ei tiedä, mikä sana pitäisi poistaa, joten joko lyhennä käännöstä tai anna aikajanalle hieman enemmän tilaa; katso [[Tekstitys, jota ei ehdi lukea|/guides/subtitle-too-fast.html]]. Korjauksen jälkeen kaikki tarkistetaan uudelleen, ja raportti laskee vain todella korjatut."
+        ]
+      },
+      {
+        "h2": "Tee tämä heti perään",
+        "ps": [
+          "Raporttisivulta voi ladata puhtaan tekstiraportin `.qc.txt` – liitä se luovutukseen, niin vastaanottaja näkee heti, mitä olet tarkistanut. Juuri valmistunut käännös kannattaa tarkistaa ennen luovutusta; vinossa oleva aikajana on eri ongelma, ja jos lukunopeusongelmia jää, katso [[Tekstitys, joka ei enää täsmää myöhemmin|/guides/subtitles-out-of-sync.html]]."
+        ]
+      }
+    ]
+  },
+  "subtitle-too-fast": {
+    "fi": [
+      {
+        "h2": "Mitä lukunopeus on",
+        "ps": [
+          "Lukunopeus tarkoittaa **sitä, ehtiikö katsoja lukea tekstin sinä aikana, kun rivi on ruudulla**. Laskenta on suoraviivainen: tekstin leveys jaettuna näyttöajalla sekunteina. Tavalliset alan rajat: 9 täysileveää merkkiä sekunnissa kiinalle, japanille ja korealle (18 puolileveyttä) sekä 20 puolileveyttä sekunnissa muille kielille. Kiinankielinen rivi, jossa on 20 merkkiä ja joka näkyy 1 sekunnin, on 40 leveyttä/s – yli kaksinkertaisesti yli rajan, eikä katsoja ehdi lukea sitä."
+        ]
+      },
+      {
+        "h2": "Selvitä ensin, kumpi nopeus on kyseessä",
+        "ps": [
+          "”En ehdi lukea” voi olla kaksi täysin eri ongelmaa: **liian lyhyt näyttöaika** – rivi katoaa parissa sadassa millisekunnissa, yleensä ajoitusvirhe tai leikkauksen jäänne; tai **liian pitkä teksti** – näyttöaika on normaali, mutta rivillä on 30 kiinanmerkkiä, eikä hidastaminen riitä mitenkään. Korjaukset ovat vastakkaiset, joten selvitä ensin kumpi tapaus on kyseessä."
+        ],
+        "img": {
+          "file": "qc-rules",
+          "alt": "Lukunopeuden ylärajan asetus tarkistussivulla, oletuksena 18 kiinalle, japanille ja korealle sekä 20 muille kielille",
+          "cap": "Lukunopeuden kynnys: 18 leveyttä/s kiinalle, japanille ja korealle, 20 muille kielille"
+        }
+      },
+      {
+        "h2": "Näin tarkistat",
+        "ps": [
+          "Avaa [[Tekstityksen tarkistus|/qc.html]] ja vedä tekstitys sisään. Raportissa ”liian lyhyt näyttöaika” on varoitustasolla ja ilmoittaa mitatut millisekunnit (kynnys 833 millisekuntia); ”nopeus, jota ei ehdi lukea” on oma kohtansa, jossa ilmoitetaan mitatut leveydet sekunnissa. Kaksikielisistä tekstityksistä lasketaan vain kohdekielinen rivi – kahta kieltä ei lasketa yhteen."
+        ]
+      },
+      {
+        "h2": "Näin korjaat",
+        "ps": [
+          "**Liian lyhyt näyttöaika**: korjautuu yhdellä napsautuksella – riviä pidennetään automaattisesti 833 millisekuntiin eikä se ylitä seuraavan rivin alkuaikaa (korjaus ei saa luoda uutta päällekkäisyyttä). **Liian pitkä teksti**: automaattista korjausta ei ole, koska kone ei tiedä, mikä sana pitäisi poistaa. Valitse itse: lyhennä käännöstä (käännöstyökalussa riittää solun napsautus) tai pidennä tämän rivin näyttöaikaa (edellyttäen, että seuraavaan riviin on rako; jos koko aikajana on vinossa, käytä toimintoa [[Aikajanan säätö|/shift.html]]). Aja tarkistus sen jälkeen uudelleen ja varmista, että lukunopeus on palannut kynnyksen alle."
+        ]
+      },
+      {
+        "h2": "Älä ylikorjaa",
+        "ps": [
+          "Lukunopeuden täyttäminen ei tarkoita, että lukeminen olisi mukavaa: jos jokainen rivi viedään tarkalleen 9 merkkiin sekunnissa, koko elokuvaa on raskas lukea. Kokemus sanoo, että normaalisti kannattaa pysyä noin seitsemässäkymmenessä prosentissa kynnyksestä ja dialogirikkaissa kohdissa pieni ylitys on hyväksyttävää. Liian tiheä tekstityslohkojen vaihtuminen on itsessään ongelma, joten käy koko tunnuslukujen sarja läpi ennen luovutusta – ks. [[Mitä tarkistaa ennen luovutusta|/guides/subtitle-quality-check.html]]."
+        ]
+      }
+    ]
+  }
+}

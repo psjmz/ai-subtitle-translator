@@ -1,0 +1,82 @@
+{
+  "pl": {
+    "title": "Napraw napisy z krzakami - Złe kodowanie | AI-SRTSub",
+    "desc": "Darmowa naprawa nieczytelnych napisów online: wykrywa, czy plik był naprawdę w UTF-8, GBK, Big5, Shift_JIS czy EUC-KR, przywraca źle odczytane znaki i może zapisać go w kodowaniu, które rozumie twój odtwarzacz.",
+    "kw": "napraw napisy krzaki,napisy dziwne znaki,srt krzaki,napraw kodowanie napisów,utf8 na gbk napisy,napisy nieczytelne,wykryj kodowanie napisów,ass krzaki,vtt krzaki",
+    "intro": "Napisy, które po otwarciu wyglądają jak ściana bezsensownych znaków, prawie zawsze zostały odczytane w złym kodowaniu. Wrzuć plik: narzędzie ustali właściwe kodowanie i przywróci źle odczytane znaki.",
+    "feat": "Pliki są dekodowane ponownie z oryginalnych bajtów, więc nic nie ginie: jeśli to GBK, zostanie to powiedziane, a jeśli to twój odtwarzacz się myli, zwykle wystarczy zapisać kopię jako „UTF-8 z BOM”. Wklejony tekst nie jest już oryginalnymi bajtami, więc da się odzyskać znacznie mniej; jeśli zawiera już znaki zastępcze, nie da się go odzyskać i narzędzie mówi to wprost, zamiast udawać. Numery linii i kody czasu pozostają nietknięte, a znaczniki stylów ASS zostają dokładnie takie, jakie były.",
+    "who": "Każdy, kto pobrał napisy otwierające się jako dziwne znaki, widzi kwadraciki zamiast chińskich znaków w odtwarzaczu albo dostał plik o nieznanym kodowaniu.",
+    "alt": "Naprawa kodowania napisów"
+  },
+  "sv": {
+    "title": "Reparera undertexter med konstiga tecken - Fel kodning | AI-SRTSub",
+    "desc": "Gratis online-reparation för oläsbara undertexter: känner av om filen egentligen var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, återställer fellästa tecken och kan spara den i en kodning som din spelare förstår.",
+    "kw": "reparera undertexter konstiga tecken,undertext fel kodning,srt konstiga tecken,åtgärda kodning undertexter,utf8 till gbk undertexter,undertexter oläsbara,upptäck kodning undertexter,ass konstiga tecken,vtt konstiga tecken",
+    "intro": "Undertexter som öppnas som en vägg av meningslösa tecken har nästan alltid lästs med fel kodning. Lägg in filen: den tar reda på vilken kodning den faktiskt skrevs i och sätter tillbaka de fellästa tecknen.",
+    "feat": "Filer avkodas om från originalbyten, så inget går förlorat: är det GBK säger den det, och om det är din spelare som läser fel räcker det oftast att spara en kopia som \"UTF-8 med BOM\". Inklistrad text är inte längre originalbytena, så mycket mindre kan räddas; om den redan innehåller ersättningstecken går den inte att återställa, och verktyget säger det rakt ut i stället för att låtsas. Radnummer och tidskoder rörs inte, och ASS-formatkoder lämnas precis som de var.",
+    "who": "Den som laddat ner undertexter som öppnas som konstiga tecken, ser fyrkanter i stället för kinesiska tecken i spelaren, eller fått en fil med okänd kodning.",
+    "alt": "Reparation av undertextkodning"
+  },
+  "cs": {
+    "title": "Opravit titulky s rozbitými znaky - Špatné kódování | AI-SRTSub",
+    "desc": "Bezplatná online oprava nečitelných titulků: zjistí, zda soubor byl ve skutečnosti UTF-8, GBK, Big5, Shift_JIS nebo EUC-KR, vrátí špatně přečtené znaky a může ho uložit v kódování, kterému váš přehrávač rozumí.",
+    "kw": "opravit titulky rozbité znaky,titulky špatné kódování,srt rozbité znaky,opravit kódování titulků,utf8 na gbk titulky,titulky nečitelné,zjistit kódování titulků,ass rozbité znaky,vtt rozbité znaky",
+    "intro": "Titulky, které se po otevření změní v zeď nesmyslných znaků, byly téměř vždy přečteny ve špatném kódování. Vložte soubor: nástroj zjistí skutečné kódování a vrátí špatně přečtené znaky na místo.",
+    "feat": "Soubory se dekódují znovu z původních bajtů, takže se nic neztratí: jde-li o GBK, nástroj to sdělí, a pokud se mýlí váš přehrávač, obvykle stačí uložit kopii jako „UTF-8 s BOM“. Vložený text už nejsou původní bajty, takže toho lze zachránit mnohem méně; pokud už obsahuje náhradní znaky, nelze ho obnovit a nástroj to řekne rovnou, místo aby to zastíral. Čísla řádků a časové kódy zůstanou nedotčené a značky stylů ASS se ponechají přesně tak, jak byly.",
+    "who": "Kdokoli, kdo si stáhl titulky, které se otevřou jako podivné znaky, vidí v přehrávači čtverečky místo čínských znaků, nebo dostal soubor s neznámým kódováním.",
+    "alt": "Oprava kódování titulků"
+  },
+  "uk": {
+    "title": "Виправити «кракозябри» в субтитрах - Неправильне кодування | AI-SRTSub",
+    "desc": "Безкоштовне онлайн-виправлення нерозбірливих субтитрів: визначає, чи був файл насправді в UTF-8, GBK, Big5, Shift_JIS чи EUC-KR, повертає неправильно прочитані символи і може зберегти його в кодуванні, яке розуміє ваш програвач.",
+    "kw": "виправити кракозябри субтитри,субтитри неправильне кодування,srt кракозябри,виправити кодування субтитрів,utf8 у gbk субтитри,субтитри не читаються,визначити кодування субтитрів,ass кракозябри,vtt кракозябри",
+    "intro": "Субтитри, які відкриваються як стіна безглуздих символів, майже завжди прочитані в неправильному кодуванні. Завантажте файл: він визначить справжнє кодування і поверне символи на місце.",
+    "feat": "Файли перекодовуються з вихідних байтів, тож нічого не втрачається: якщо це GBK, про це повідомляється, а якщо помиляється ваш програвач, зазвичай досить зберегти копію як «UTF-8 з BOM». Вставлений текст уже не є вихідними байтами, тому відновлюється набагато менше; якщо в ньому вже є символи-замінники, відновлення неможливе, і інструмент каже це прямо, а не вдає інше. Номери рядків і таймкоди не чіпаються, а теги оформлення ASS залишаються без змін.",
+    "who": "Ті, хто завантажив субтитри, які відкриваються як дивні символи, бачить квадратики замість китайських ієрогліфів у програвачі, або отримав файл з невідомим кодуванням.",
+    "alt": "Виправлення кодування субтитрів"
+  },
+  "da": {
+    "title": "Reparer undertekster med mærkelige tegn - Forkert kodning | AI-SRTSub",
+    "desc": "Gratis online reparation af ulæselige undertekster: registrerer om filen egentlig var UTF-8, GBK, Big5, Shift_JIS eller EUC-KR, sætter forkert læste tegn på plads igen og kan gemme den i en kodning, din afspiller forstår.",
+    "kw": "reparer undertekster mærkelige tegn,undertekster forkert kodning,srt mærkelige tegn,ret undertekster kodning,utf8 til gbk undertekster,undertekster ulæselige,registrer undertekster kodning,ass mærkelige tegn,vtt mærkelige tegn",
+    "intro": "Undertekster, der åbner som en mur af meningsløse tegn, er næsten altid læst med forkert kodning. Smid filen ind: den finder ud af, hvilken kodning den faktisk blev skrevet i, og sætter de forkert læste tegn tilbage.",
+    "feat": "Filer afkodes igen fra de oprindelige bytes, så intet går tabt: er det GBK, siger den det, og hvis det er din afspiller, der læser forkert, er det som regel nok at gemme en kopi som \"UTF-8 med BOM\". Indsat tekst er ikke længere de oprindelige bytes, så der er meget mindre at redde; indeholder den allerede erstatningstegn, kan den ikke gendannes, og værktøjet siger det rent ud i stedet for at lade som om. Linjenumre og tidskoder røres ikke, og ASS-formateringskoder bevares nøjagtigt, som de var.",
+    "who": "Alle der har downloadet undertekster, der åbner som mærkelige tegn, ser firkanter i stedet for kinesiske tegn i afspilleren, eller har fået en fil med ukendt kodning.",
+    "alt": "Reparation af undertekstkodning"
+  },
+  "fi": {
+    "title": "Korjaa tekstityksen outo merkistö - Väärä koodaus | AI-SRTSub",
+    "desc": "Ilmainen verkkokorjaus lukukelvottomille tekstityksille: tunnistaa, oliko tiedosto oikeasti UTF-8, GBK, Big5, Shift_JIS vai EUC-KR, palauttaa väärin luetut merkit ja voi tallentaa sen koodauksella, jonka soittimesi ymmärtää.",
+    "kw": "korjaa tekstitys outo merkistö,tekstitys väärä koodaus,srt outoja merkkejä,korjaa tekstityksen koodaus,utf8 gbk tekstitys,tekstitys ei lukukelpoinen,tunnista tekstityksen koodaus,ass outoja merkkejä,vtt outoja merkkejä",
+    "intro": "Tekstitykset, jotka avautuvat merkityksettömien merkkien muurina, on lähes aina luettu väärällä merkistöllä. Pudota tiedosto: se selvittää, millä merkistöllä se oikeasti kirjoitettiin, ja palauttaa väärin luetut merkit.",
+    "feat": "Tiedostot puretaan uudelleen alkuperäisistä tavuista, joten mitään ei katoa: jos kyseessä on GBK, se kerrotaan, ja jos soittimesi lukee väärin, kopion tallentaminen \"UTF-8 BOM:illa\" riittää yleensä. Liitetty teksti ei ole enää alkuperäisiä tavuja, joten palautettavaa on paljon vähemmän; jos siinä on jo korvausmerkkejä, sitä ei voi palauttaa, ja työkalu sanoo tämän suoraan sen sijaan että teeskentelisi. Rivi­numeroita ja aikakoodeja ei kosketa, ja ASS-tyylimerkit jätetään täsmälleen ennalleen.",
+    "who": "Kaikille, jotka lataavat tekstityksiä jotka avautuvat outoina merkkeinä, näkevät ruutuja kiinalaisten merkkien sijasta soittimessa, tai saivat tiedoston tuntemattomalla merkistöllä.",
+    "alt": "Tekstityksen koodauksen korjaus"
+  },
+  "el": {
+    "title": "Διόρθωση υποτίτλων με περίεργα σύμβολα - Λάθος κωδικοποίηση | AI-SRTSub",
+    "desc": "Δωρεάν διαδικτυακή επιδιόρθωση για μη αναγνώσιμους υπότιτλους: εντοπίζει αν το αρχείο ήταν πραγματικά UTF-8, GBK, Big5, Shift_JIS ή EUC-KR, επαναφέρει τους χαρακτήρες που διαβάστηκαν λάθος και μπορεί να το αποθηκεύσει σε κωδικοποίηση που καταλαβαίνει ο αναπαραγωγέας σας.",
+    "kw": "διόρθωση υποτίτλων περίεργα σύμβολα,υπότιτλοι λάθος κωδικοποίηση,srt περίεργα σύμβολα,διόρθωση κωδικοποίησης υποτίτλων,utf8 σε gbk υπότιτλοι,υπότιτλοι μη αναγνώσιμοι,εντοπισμός κωδικοποίησης υποτίτλων,ass περίεργα σύμβολα,vtt περίεργα σύμβολα",
+    "intro": "Υπότιτλοι που ανοίγουν ως ένας τοίχος από ακατανόητα σύμβολα έχουν σχεδόν πάντα διαβαστεί με λάθος κωδικοποίηση. Ρίξτε το αρχείο: βρίσκει σε ποια κωδικοποίηση γράφτηκε πραγματικά και επαναφέρει τους χαρακτήρες.",
+    "feat": "Τα αρχεία αποκωδικοποιούνται ξανά από τα πρωτότυπα bytes, οπότε δεν χάνεται τίποτα: αν είναι GBK το λέει, κι αν αυτός που κάνει λάθος είναι ο αναπαραγωγέας σας, συνήθως αρκεί να αποθηκεύσετε ένα αντίγραφο ως «UTF-8 με BOM». Το κείμενο που επικολλάται δεν είναι πλέον τα πρωτότυπα bytes, οπότε ανακτάται πολύ λιγότερο· αν περιέχει ήδη χαρακτήρες αντικατάστασης, δεν ανακτάται και το εργαλείο το λέει ξεκάθαρα αντί να το αποκρύπτει. Οι αριθμοί γραμμών και οι κωδικοί χρόνου δεν πειράζονται, και οι ετικέτες μορφοποίησης ASS μένουν ακριβώς όπως ήταν.",
+    "who": "Όποιος κατέβασε υπότιτλους που ανοίγουν ως περίεργα σύμβολα, βλέπει τετραγωνάκια αντί για κινεζικούς χαρακτήρες στον αναπαραγωγέα, ή έλαβε αρχείο με άγνωστη κωδικοποίηση.",
+    "alt": "Διόρθωση κωδικοποίησης υποτίτλων"
+  },
+  "he": {
+    "title": "תיקון כתוביות עם סימנים מוזרים - קידוד שגוי | AI-SRTSub",
+    "desc": "תיקון מקוון חינם לכתוביות בלתי קריאות: מזהה אם הקובץ היה באמת UTF-8, GBK, Big5, Shift_JIS או EUC-KR, מחזיר תווים שנקראו לא נכון ויכול לשמור אותו בקידוד שהנגן שלכם מבין.",
+    "kw": "תיקון כתוביות סימנים מוזרים,כתוביות קידוד שגוי,srt סימנים מוזרים,תיקון קידוד כתוביות,המרת utf8 ל-gbk כתוביות,כתוביות לא קריאות,זיהוי קידוד כתוביות,ass סימנים מוזרים,vtt סימנים מוזרים",
+    "intro": "כתוביות שנפתחות כקיר של סימנים חסרי משמעות נקראו כמעט תמיד בקידוד הלא נכון. הכניסו את הקובץ: הוא יגלה באיזה קידוד הוא נכתב באמת ויחזיר את התווים שנקראו לא נכון למקומם.",
+    "feat": "הקבצים מפוענחים מחדש מהבתים המקוריים, כך ששום דבר לא אובד: אם זה GBK הוא יאמר זאת, ואם הנגן שלכם הוא זה שטועה, בדרך כלל מספיק לשמור עותק כ\"UTF-8 עם BOM\". טקסט מודבק אינו הבתים המקוריים עוד, ולכן ניתן לשחזר הרבה פחות; אם הוא כבר מכיל תווי החלפה, לא ניתן לשחזרו והכלי אומר זאת בגלוי במקום להעמיד פנים. מספרי השורות וקודי הזמן אינם נוגעים, ותגיות העיצוב של ASS נשארות בדיוק כפי שהיו.",
+    "who": "מי שהוריד כתוביות שנפתחות כסימנים מוזרים, רואה ריבועים במקום תווים סיניים בנגן, או קיבל קובץ עם קידוד לא ידוע."
+  },
+  "ro": {
+    "title": "Repară subtitrări cu caractere ciudate - Codare greșită | AI-SRTSub",
+    "desc": "Reparare online gratuită pentru subtitrări ilizibile: detectează dacă fișierul a fost de fapt UTF-8, GBK, Big5, Shift_JIS sau EUC-KR, readuce caracterele citite greșit și îl poate salva într-o codare pe care playerul tău o înțelege.",
+    "kw": "repară subtitrări caractere ciudate,subtitrări codare greșită,srt caractere ciudate,corectează codare subtitrări,utf8 în gbk subtitrări,subtitrări ilizibile,detectează codare subtitrări,ass caractere ciudate,vtt caractere ciudate",
+    "intro": "Subtitrările care se deschid ca un zid de caractere fără sens au fost aproape mereu citite cu codarea greșită. Pune fișierul: află în ce codare a fost scris de fapt și readuce caracterele citite greșit.",
+    "feat": "Fișierele sunt decodificate din nou din octeții originali, deci nu se pierde nimic: dacă este GBK, spune asta, iar dacă playerul tău este cel care greșește, de obicei ajunge să salvezi o copie ca „UTF-8 cu BOM”. Textul lipit nu mai este octeții originali, așa că se recuperează mult mai puțin; dacă deja conține caractere de înlocuire, nu se mai poate recupera și unealta o spune clar în loc să prefacă. Numerele de linie și codurile de timp nu sunt atinse, iar etichetele de stil ASS rămân exact cum erau.",
+    "who": "Oricine a descărcat subtitrări care se deschid ca un talmeș-balmeș de caractere, vede pătrate în loc de caractere chinezești în player sau a primit un fișier cu codare necunoscută.",
+    "alt": "Reparare codare subtitrări"
+  }
+}

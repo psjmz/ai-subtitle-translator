@@ -1,0 +1,3342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/clean.html 与 /en/clean.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>字幕清洗器 - 随心字幕 AI (AI-SRTSub)</title>
+<meta name="description" content="免费在线字幕清洗工具：去掉 HTML 标签、ASS 特效、听障提示、说话人标签、字幕组水印与广告，修复全大写和乱码，导出干净的字幕。">
+<meta name="keywords" content="字幕清洗,srt清洗,去字幕水印,去听障字幕,SDH字幕,去说话人,字幕去广告,字幕乱码修复,subtitle cleaner">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0B7A5C">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<style>
+  /* ================= 视觉系统沿用 v0.9.249「收敛精修」 =================
+     ⚠️ 与 merge.html 同源：冷中性灰阶 + 品牌粉实色 + 禁渐变 + 禁 emoji 图标。
+        清洗器是第三个独立页面，视觉必须和双语页一致，不能另起一套。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    /* v0.9.276：清洗页认领「绿」这条色线（首页=粉、特效页=紫）。
+       品牌用深墨绿 #0B7A5C（白字 5.31:1），成功态 --ok 是亮翠绿 #0E9F6E ——
+       两者同族但一深一亮，加上形态不同（品牌是实心底白字、成功是浅底彩字）能分开。
+       ⚠️ 别把 --ok 并进 --acc：那样「修好了」和「品牌色」就彻底分不清了。 */
+    --acc:#0B7A5C; --acc-weak:#E6F6EF; --acc-line:#BFE6D7; --acc-ink:#0B7A5C;
+    --grad:#0B7A5C; --acc2:#0B7A5C;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(11,122,92,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  /* v0.9.280：logo 整块可点回首页 —— 布局沿用上面两条，只补链接态 */
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    padding:18px 20px 16px;box-shadow:var(--sh-card);margin-top:16px}
+  .card h2{font-size:13.5px;font-weight:650;letter-spacing:-.1px;margin:0 0 14px;display:flex;align-items:center;gap:9px}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:none}
+  .card h2 .cnt{margin-left:auto;font-size:11.5px;font-weight:500;color:var(--mut)}
+
+  .drop-zone{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:var(--r-ctl);text-align:left;
+    border:1px dashed var(--line-strong);background:var(--card-2);cursor:pointer;
+    transition:border-color .14s,background .14s}
+  .drop-zone .dz-ico{flex:none;color:var(--acc-ink);width:16px;height:16px;
+    -webkit-mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 16V4'/%3E%3Cpath d='M7 9l5-5 5 5'/%3E%3Cpath d='M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 16V4'/%3E%3Cpath d='M7 9l5-5 5 5'/%3E%3Cpath d='M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2'/%3E%3C/svg%3E");
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain;
+    background:currentColor}
+  .drop-zone .dz-txt{font-size:12.5px;font-weight:500;color:var(--body)}
+  .drop-zone .dz-fmt{margin:0 0 0 auto;color:var(--mut);font-size:11.5px}
+  .drop-zone:hover{border-color:var(--acc);background:var(--acc-weak)}
+  .drop-zone.has{border-style:solid;border-color:var(--acc);background:var(--acc-weak)}
+  .drop-zone.has .dz-txt{color:var(--acc-ink)}
+  .up-row{display:flex;align-items:center;gap:8px;margin-top:9px}
+  .up-row .dz-file{font-size:11.5px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+  textarea.paste-box{width:100%;margin-top:9px;min-height:82px;border:1px solid var(--line-strong);
+    border-radius:var(--r-ctl);padding:9px 11px;font:12px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    resize:vertical;color:var(--ink);background:var(--card)}
+  textarea.paste-box:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-weak)}
+  .parse-ok{margin-top:9px;font-size:12px;color:var(--ok-ink);background:var(--ok-weak);
+    border-radius:8px;padding:6px 10px;display:none}
+  .parse-bad{margin-top:9px;font-size:12px;color:var(--del);background:var(--del-weak);
+    border-radius:8px;padding:6px 10px;display:none;white-space:pre-wrap}
+
+  .cgrp{margin-top:2px}
+  .cgrp-t{font-size:11.5px;color:var(--mut);margin:12px 0 6px;padding-left:2px}
+  .cgrp:first-child .cgrp-t{margin-top:0}
+  .cbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px 18px}
+  .chk-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;color:var(--body);cursor:pointer;min-width:0}
+  .chk-row input{width:15px;height:15px;accent-color:var(--acc);flex:none;margin:0}
+  .chk-row span{min-width:0}
+  .chk-row:hover{color:var(--ink)}
+  .chk-row.off{color:var(--mut)}
+
+  /* ⓘ 悬停说明：与双语页同口径，说明不列在界面上 */
+  .info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;flex:none;
+    margin-left:4px;border-radius:50%;border:1px solid var(--line-strong);color:var(--mut);
+    font-size:9.5px;font-style:normal;line-height:1;cursor:help;transition:color .14s,border-color .14s}
+  .info:hover,.info.pin{color:var(--acc-ink);border-color:var(--acc)}
+  .info.note{color:var(--warn);border-color:var(--warn)}
+  #tipLayer{position:fixed;z-index:120;max-width:330px;display:none;background:#15151A;color:#F5F5F7;
+    font-size:12px;line-height:1.65;padding:9px 12px;border-radius:9px;box-shadow:0 8px 24px -8px rgba(18,18,24,.5)}
+  #tipLayer.show{display:block}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:var(--ctl-h);
+    padding:0 15px;border-radius:var(--r-btn);border:1px solid var(--acc);background:var(--acc);color:#fff;
+    font-size:13px;font-weight:600;cursor:pointer;box-shadow:var(--sh-btn);transition:filter .14s}
+  .btn:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;filter:none}
+  .btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line-strong);box-shadow:none;font-weight:550}
+  .btn.ghost:hover{border-color:var(--acc-line);color:var(--acc-ink);filter:none}
+  .btn.sm{height:30px;padding:0 11px;font-size:12px}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12.5px;color:var(--body)}
+  .pill{background:var(--card-2);border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:12px;color:var(--sub)}
+  .pill b{color:var(--acc-ink);font-weight:650}
+  .pill.del b{color:var(--del)}
+  .pill.ok b{color:var(--ok-ink)}
+
+  .tbl-wrap{margin-top:12px;border:1px solid var(--line);border-radius:var(--r-card);overflow:auto;
+    max-height:430px;background:var(--card)}
+  table.tbl{border-collapse:collapse;width:100%;font-size:12.5px}
+  .tbl th{position:sticky;top:0;background:var(--card-2);color:var(--sub);font-weight:600;text-align:left;
+    padding:9px 10px;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;z-index:2}
+  .tbl td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--body)}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl tbody tr:hover{background:var(--card-2)}
+  .tbl td.no{color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums;width:44px}
+  .tbl td.tm{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:11.5px;width:96px}
+  .tbl td.old{color:var(--mut);text-decoration:line-through;text-decoration-color:var(--line-strong)}
+  .tbl td.old i{font-style:normal;text-decoration:none;font-size:11.5px;color:var(--mut)}
+  .tbl td.new{color:var(--ink)}
+  .tbl tr.undone td{opacity:.5}
+  .tbl td.act{width:74px;text-align:right;white-space:nowrap}
+  .tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:6px;margin-left:6px;vertical-align:1px;
+    background:var(--card-2);border:1px solid var(--line);color:var(--mut)}
+  .tag.del{background:var(--del-weak);border-color:transparent;color:var(--del)}
+  .empty-note{padding:26px 12px;text-align:center;color:var(--mut);font-size:12.5px}
+
+  /* v0.9.268：清洗后字幕全文预览（此前结果区只列「改了哪几条」，整篇字幕必须下载才看得到） */
+  .pv-wrap{margin-top:12px;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;background:var(--card)}
+  .pv-head{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--card-2);
+    border-bottom:1px solid var(--line)}
+  .pv-t{font-size:11.5px;font-weight:600;color:var(--sub)}
+  .pv-t b{color:var(--acc-ink);font-weight:650}
+  .pv-seg{margin-left:auto;display:flex;gap:2px;background:var(--card);border:1px solid var(--line);
+    border-radius:99px;padding:2px;flex:none}
+  .pv-seg button{height:24px;padding:0 11px;border:none;background:none;border-radius:99px;
+    font-size:11.5px;color:var(--sub);cursor:pointer;transition:background .14s,color .14s}
+  .pv-seg button:hover{color:var(--ink)}
+  .pv-seg button.on{background:var(--acc-weak);color:var(--acc-ink);font-weight:600}
+  .pv-box{max-height:340px;overflow:auto;padding:5px 0;
+    font:12px/1.65 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .pv-line{display:grid;grid-template-columns:46px 88px minmax(0,1fr);gap:10px;padding:4px 12px;color:var(--body)}
+  .pv-line:hover{background:var(--card-2)}
+  .pv-line .n{color:var(--mut);font-variant-numeric:tabular-nums;text-align:right}
+  .pv-line .t{color:var(--sub);font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pv-line .x{color:var(--ink);word-break:break-word;white-space:pre-wrap}
+  .pv-line.gone{opacity:.5}
+  .pv-line.gone .x{text-decoration:line-through;text-decoration-color:var(--line-strong)}
+  .pv-line.gone .x em{font-style:normal;text-decoration:none;color:var(--del);font-size:11px;margin-left:6px}
+  .pv-line .x i{font-style:normal;color:var(--mut);font-size:11px}
+  .pv-more{padding:9px 12px;text-align:center;color:var(--mut);font-size:11.5px;
+    border-top:1px solid var(--line);background:var(--card-2)}
+  @media (max-width:640px){
+    .pv-line{grid-template-columns:38px 74px minmax(0,1fr);gap:8px;padding:4px 9px}
+  }
+
+  /* v0.9.271：双轨双语提示条 + 导出格式三选 */
+  .bi-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px;padding:9px 12px;
+    border:1px solid var(--acc-line);background:var(--acc-weak);border-radius:10px;
+    font-size:12.5px;line-height:1.6;color:var(--acc-ink)}
+  .bi-bar .bi-t{flex:1;min-width:180px}
+  .bi-bar b{font-weight:600}
+  .out-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;
+    font-size:12.5px;color:var(--sub)}
+  .out-row .out-note{color:var(--mut);font-size:11.5px}
+  .out-seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:99px;
+    overflow:hidden;background:var(--card);flex:none}
+  .out-seg button{height:26px;padding:0 14px;border:none;background:none;font-family:inherit;
+    font-size:12px;color:var(--sub);cursor:pointer;transition:background .14s,color .14s}
+  .out-seg button:hover:not([disabled]){color:var(--ink);background:var(--card-2)}
+  .out-seg button.on{background:var(--acc);color:#fff;font-weight:600}
+  .out-seg button[disabled]{opacity:.35;cursor:not-allowed}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:#15151A;color:#F5F5F7;
+    padding:9px 18px;border-radius:99px;font-size:12.5px;opacity:0;pointer-events:none;transition:all .2s;z-index:99;
+    box-shadow:0 8px 24px -8px rgba(18,18,24,.5)}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  footer{padding:34px 0 26px;text-align:center;color:var(--mut);font-size:12px}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+  footer a:hover{color:var(--acc-ink)}
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .cbox{grid-template-columns:1fr}
+  }
+</style>
+<script src="ui-codes.js?v=0.9.341"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 LANG 走。 -->
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span id="topNav"></span>
+      <select id="langSel" aria-label="界面语言"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">字幕</span><em data-i18n="heroEm">清洗器</em></h1>
+    <p data-i18n="heroSub">去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。</p>
+  </div>
+
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">上传字幕</span></h2>
+    <div class="drop-zone" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-txt" data-i18n="dzTxt">拖到这里，或点击选择文件</span>
+      <span class="dz-fmt">.srt / .vtt / .ass</span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.txt" hidden>
+    <div class="up-row">
+      <span class="dz-file" id="fname"></span>
+      <button class="btn ghost sm" id="btnClear" style="display:none" data-i18n="btnClear">清除</button>
+    </div>
+    <textarea class="paste-box" id="paste" data-i18n-ph="pastePh" placeholder="也可以直接把字幕内容粘贴到这里"></textarea>
+    <div class="parse-ok" id="ok"></div>
+    <div class="parse-bad" id="bad"></div>
+    <!-- v0.9.271：检测到双轨双语时的提示条（ASS 双语最常见的排法） -->
+    <div class="bi-bar" id="biBar" style="display:none">
+      <span class="bi-t" id="biTxt"></span>
+      <button type="button" class="btn ghost sm" id="biFlip"></button>
+    </div>
+  </div>
+
+  <div class="card" id="optCard">
+    <h2><span class="n">2</span><span data-i18n="optTitle">清洗项</span><span class="cnt" id="optCnt"></span></h2>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpTag">标签与格式</div>
+      <div class="cbox" id="grpTag-box"></div>
+    </div>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpSdh">听障与音效</div>
+      <div class="cbox" id="grpSdh-box"></div>
+    </div>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpJunk">水印与废条目</div>
+      <div class="cbox" id="grpJunk-box"></div>
+    </div>
+    <div class="cgrp">
+      <div class="cgrp-t" data-i18n="grpText">文字修正</div>
+      <div class="cbox" id="grpText-box"></div>
+    </div>
+  </div>
+
+  <div class="card" id="repCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="repTitle">结果与导出</span></h2>
+    <div class="stat-row" id="statRow"></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th class="no">#</th>
+          <th class="tm" data-i18n="thTime">时间</th>
+          <th data-i18n="thOld">原文</th>
+          <th data-i18n="thNew">清洗后</th>
+          <th class="act"></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty-note" id="emptyNote" style="display:none" data-i18n="noChange">没有需要清洗的地方，这份字幕已经是干净的。</div>
+    </div>
+    <!-- v0.9.268：清洗后字幕全文预览 -->
+    <div class="pv-wrap">
+      <div class="pv-head">
+        <span class="pv-t" id="pvTitle"></span>
+        <div class="pv-seg" id="pvSeg">
+          <button type="button" data-v="out" class="on" data-i18n="pvOut">清洗后</button>
+          <button type="button" data-v="raw" data-i18n="pvRaw">原文</button>
+        </div>
+      </div>
+      <div class="pv-box" id="pvBox"></div>
+    </div>
+    <!-- v0.9.271：导出格式三选。ASS 只在源文件就是 ASS 时可选（要拿原文件的样式段） -->
+    <div class="out-row">
+      <span data-i18n="outFmt">导出格式</span>
+      <div class="out-seg" id="outSeg">
+        <button type="button" data-f="srt" class="on">SRT</button>
+        <button type="button" data-f="vtt">VTT</button>
+        <button type="button" data-f="ass">ASS</button>
+      </div>
+      <span class="out-note" id="outNote"></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btnDownload"><span data-i18n="btnDownload">下载字幕</span><span class="dl-ext" id="dlExt">.srt</span></button>
+      <button class="btn ghost" id="btnCopy" data-i18n="btnCopy">复制内容</button>
+      <button class="btn ghost" id="btnTxt" data-i18n="btnTxt">导出纯文本</button>
+      <button class="btn ghost" id="btnUndoAll" data-i18n="btnUndoAll">全部还原</button>
+    </div>
+  </div>
+
+  <footer>
+    <span data-i18n="footBrand">随心字幕 AI · 字幕清洗工具</span> ·
+    <a href="/" data-i18n="footHome">去翻译字幕 →</a>
+    <a href="/merge.html" data-i18n="footMerge">去特效字幕 →</a>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+<div id="tipLayer"></div>
+
+<script src="clean-core.js?v=0.9.341"></script>
+<script>
+'use strict';
+/* =====================================================================
+   字幕清洗器 clean.html（v0.9.257 新增的第三个独立页面）
+   ⚠️ 与主站 index.html（翻译）、merge.html（双语/特效）三页硬隔离：
+      解析与清洗规则全部走 clean-core.js（从 srt-core.js **复制后另写**的一份），
+      既不引用也不修改共用引擎 —— 改清洗不会影响翻译与双语的任何行为。
+   ⚠️ 全部处理在本地完成，不向服务器发送任何字幕内容。
+   ===================================================================== */
+const C = window.CleanCore;
+const $ = function (s) { return document.querySelector(s); };
+
+/* ---------------- 状态 ---------------- */
+const S = {
+  raw: [],            // 解析后的原始条目 [{no,start,end,text}]（v0.9.271 起可能已合并过双轨）
+  fmt: 'srt',
+  outFmt: 'srt',      // v0.9.271：改成用户可三选（srt / vtt / ass），源格式只定默认值
+  fname: '',
+  changes: [],        // 每条 = {i, before, after, tags:[], del:bool}
+  off: new Set(),     // 被用户「还原」的 change 下标
+  /* v0.9.271 双语相关 */
+  srcText: '',        // 源文件全文（ASS 输出要照着它的骨架写回）
+  rawSrc: [],         // 未合并的原始条目（翻转双轨顺序 / 算 ASS 要删哪些行，都靠它）
+  bi: null,           // detectBilingual 的结果
+  biFlip: false       // 是否把两条轨道的顺序倒过来（译文在上）
+};
+
+/* v0.9.268：结果区那块全文预览看的是「清洗后」还是「原文」 */
+let PV_VIEW = 'out';
+/* ⚠️ 大文件不能整篇渲染进 DOM —— 几千条会把页面拖死。
+      只画前 500 条，剩下的用一行提示交代清楚（完整内容本来就该走下载）。 */
+const PV_CAP = 500;
+
+/* ---------------- 清洗项定义 ----------------
+   ⚠️ grp 决定落在哪个分组；def = 默认是否勾选。
+      默认口径：只勾「无损且确定」的，可能丢内容的（歌词行、大写修复、合并短句）默认关。 */
+const OPT = [
+  { id:'assFx',    grp:'Tag',  def:true,  i18n:'oAssFx' },
+  { id:'html',     grp:'Tag',  def:true,  i18n:'oHtml' },
+  { id:'ctrl',     grp:'Tag',  def:true,  i18n:'oCtrl' },
+  { id:'sort',     grp:'Tag',  def:true,  i18n:'oSort' },
+  { id:'sdh',      grp:'Sdh',  def:true,  i18n:'oSdh' },
+  { id:'speaker',  grp:'Sdh',  def:false, i18n:'oSpeaker' },
+  { id:'music',    grp:'Sdh',  def:false, i18n:'oMusic' },
+  { id:'wm',       grp:'Junk', def:true,  i18n:'oWm' },
+  { id:'dup',      grp:'Junk', def:true,  i18n:'oDup' },
+  { id:'empty',    grp:'Junk', def:true,  i18n:'oEmpty' },
+  { id:'punct',    grp:'Text', def:true,  i18n:'oPunct' },
+  { id:'upper',    grp:'Text', def:false, i18n:'oUpper' },
+  { id:'merge',    grp:'Text', def:false, i18n:'oMerge' }
+];
+
+const TAG_LABEL = {
+  assFx:'ASS特效', html:'HTML标签', ctrl:'控制符', sort:'排序', sdh:'听障提示',
+  speaker:'说话人', music:'歌词', wm:'水印', dup:'重复', empty:'空条目',
+  punct:'标点', upper:'大写', merge:'合并'
+};
+
+/* =====================================================================
+   清洗主流程
+   ⚠️ 规则一条都不在这里：全部在 clean-core.js（隔离出来的那份）。
+      页面只负责把选项传进去、把返回的 changes 渲染出来。
+   ===================================================================== */
+function runClean() {
+  S.off.clear();
+  if (!S.raw.length) { S.changes = []; S.order = []; return; }
+  /* v0.9.271：把「这个文件是双轨双语」告诉引擎 —— 去重规则要靠它
+     避免把原文与译文恰好相同的两条（2024 / OK）当成重复项删掉。 */
+  const o = optVal();
+  o.bi = !!(S.bi && S.bi.bi);
+  const r = C.clean(S.raw, o);
+  S.changes = r.changes;
+  S.order = r.order;
+}
+
+/* ---------------- 导出：把未被还原的 change 应用到原文 ---------------- */
+function resolve() {
+  const map = new Map();
+  S.changes.forEach(function (ch, ci) {
+    if (!S.off.has(ci)) map.set(ch.i, ch);
+  });
+  const out = [];
+  S.order.forEach(function (i) {
+    const it = S.raw[i];
+    const ch = map.get(i);
+    if (ch && ch.del) return;
+    /* v0.9.271：change 可能带着新的时间轴（「合并短句」会把结束时间往后延），
+       此前一律读 S.raw[i] 的旧值 → 合并出来的那条尾巴被生生截掉一截。 */
+    const st = (ch && ch.start != null) ? ch.start : it.start;
+    const en = (ch && ch.end != null) ? ch.end : it.end;
+    out.push({ no: 0, start: st, end: en, text: ch ? ch.after : String(it.text),
+               srcIdx: it.srcIdx, srcIdxB: it.srcIdxB, flip: it.flip });
+  });
+  return out;
+}
+function outSrt() {
+  const items = resolve();
+  C.renumber(items);
+  return C.formatSrt(items);
+}
+function outTxt() {
+  return resolve().map(function (it) { return it.text; }).join('\n') + '\n';
+}
+/* v0.9.271：ASS 输出 —— 把清洗后的文本写回原文件的 Dialogue 行，其余段落一字不动。
+   ⚠️ 双轨双语在这个通道里要**拆回两条**：ASS 的两条轨各有自己的 Style，
+      合并成一条的话译文会用原文的字体和位置显示，等于把排版弄坏了。 */
+function expandForAss(items) {
+  const out = [];
+  items.forEach(function (it) {
+    if (it.srcIdxB == null) { out.push(it); return; }
+    const ls = String(it.text == null ? '' : it.text).split('\n');
+    /* ⚠️ 拆回两条：位置跟着轨道走（写回原来那条 Dialogue 行的 Style / MarginV），
+       只有文本换了位置 —— 这样「译文在上」才真的显示在上面。 */
+    out.push({ no: it.no, start: it.start, end: it.end, srcIdx: it.srcIdx, text: ls[0] || '' });
+    const rest = ls.slice(1).join('\n').trim();
+    if (rest) out.push({ no: it.no, start: it.start, end: it.end, srcIdx: it.srcIdxB, text: rest });
+  });
+  return out;
+}
+function outAss() {
+  const items = expandForAss(resolve());
+  /* 被用到的行之外，剩下的原始 Dialogue 行全部整行移除：
+     被清洗规则删掉的条目、以及被合并掉的第二条轨道。 */
+  const used = new Set();
+  items.forEach(function (it) { if (it.srcIdx != null) used.add(it.srcIdx); });
+  const drop = new Set();
+  (S.rawSrc || []).forEach(function (it) {
+    if (it.srcIdx != null && !used.has(it.srcIdx)) drop.add(it.srcIdx);
+  });
+  return C.rewriteAss(S.srcText, items, drop);
+}
+/* v0.9.258 建的三选：vtt 源默认 vtt 出、其余默认 srt 出。
+   v0.9.271：改成**用户可三选**（SRT / VTT / ASS），源格式只决定默认值 ——
+   用户要拿什么格式是他自己的事，不该由源文件替他决定。 */
+function outMain() {
+  if (S.outFmt === 'ass') return outAss();
+  const items = resolve();
+  C.renumber(items);
+  return (S.outFmt === 'vtt') ? C.formatVtt(items) : C.formatSrt(items);
+}
+function outExt() {
+  return S.outFmt === 'ass' ? '.ass' : (S.outFmt === 'vtt' ? '.vtt' : '.srt');
+}
+
+/* ---------------- 渲染 ---------------- */
+function optVal() {
+  const o = {};
+  OPT.forEach(function (d) {
+    const el = $('#o_' + d.id);
+    o[d.id] = el ? el.checked : d.def;
+  });
+  return o;
+}
+function buildOpts() {
+  ['Tag', 'Sdh', 'Junk', 'Text'].forEach(function (g) {
+    const box = $('#grp' + g + '-box');
+    box.innerHTML = '';
+    OPT.filter(function (d) { return d.grp === g; }).forEach(function (d) {
+      const lab = document.createElement('label');
+      lab.className = 'chk-row';
+      lab.innerHTML = '<input type="checkbox" id="o_' + d.id + '"' + (d.def ? ' checked' : '') + '>' +
+        '<span data-i18n="' + d.i18n + '"></span>' +
+        '<i class="info" tabindex="0" data-tip-i18n="tip_' + d.id + '">i</i>';
+      box.appendChild(lab);
+    });
+  });
+  OPT.forEach(function (d) {
+    $('#o_' + d.id).addEventListener('change', function () {
+      if (S.raw.length) { runClean(); render(); }
+      syncOptCnt();
+    });
+  });
+}
+function syncOptCnt() {
+  const n = OPT.filter(function (d) { const el = $('#o_' + d.id); return el && el.checked; }).length;
+  $('#optCnt').textContent = t('optOn').replace('{n}', n).replace('{t}', OPT.length);
+}
+
+function render() {
+  const card = $('#repCard');
+  if (!S.raw.length) { card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  const delN = S.changes.filter(function (c, i) { return c.del && !S.off.has(i); }).length;
+  const modN = S.changes.filter(function (c, i) { return !c.del && !S.off.has(i); }).length;
+  const offN = S.off.size;
+  const outN = resolve().length;
+
+  $('#statRow').innerHTML =
+    '<span class="pill">' + t('stRaw') + ' <b>' + S.raw.length + '</b></span>' +
+    '<span class="pill">' + t('stOut') + ' <b>' + outN + '</b></span>' +
+    '<span class="pill del">' + t('stDel') + ' <b>' + delN + '</b></span>' +
+    '<span class="pill ok">' + t('stMod') + ' <b>' + modN + '</b></span>' +
+    (offN ? '<span class="pill">' + t('stOff') + ' <b>' + offN + '</b></span>' : '');
+
+  const tb = $('#tbody');
+  tb.innerHTML = '';
+  const rows = [];
+  S.changes.forEach(function (ch, ci) { rows.push({ ch: ch, ci: ci }); });
+  /* ⚠️ 按条目号排：changes 是按「规则产生的先后」攒的，直接列会出现 1、2、3、6、7、5、9
+     这种跳号 —— 原文里的顺序被打乱了，用户对着字幕找不着北。 */
+  rows.sort(function (a, b) { return a.ch.i - b.ch.i; });
+  $('#emptyNote').style.display = rows.length ? 'none' : '';
+
+  rows.forEach(function (r) {
+    const ch = r.ch, ci = r.ci;
+    const it = S.raw[ch.i];
+    const undone = S.off.has(ci);
+    const tr = document.createElement('tr');
+    if (undone) tr.className = 'undone';
+    const tags = ch.tags.map(function (k) {
+      const lab = TAG_LABEL[k] || k;
+      return '<span class="tag' + (ch.del ? ' del' : '') + '">' + lab + '</span>';
+    }).join('');
+    tr.innerHTML =
+      '<td class="no">' + it.no + '</td>' +
+      '<td class="tm">' + C.fmtTime(it.start).replace(/,\d+$/, '') + '</td>' +
+      '<td class="old">' + (ch.before.replace(/\s/g, '') ? esc(ch.before) : '<i class="mut">' + t('emptyRow') + '</i>') + '</td>' +
+      '<td class="new">' + (ch.del ? '<span class="tag del">' + t('removed') + '</span>' : esc(ch.after)) + tags + '</td>' +
+      '<td class="act"><button class="btn ghost sm" data-undo="' + ci + '">' + (undone ? t('btnAdopt') : t('btnUndo')) + '</button></td>';
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('[data-undo]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      const ci = +b.getAttribute('data-undo');
+      if (S.off.has(ci)) S.off.delete(ci); else S.off.add(ci);
+      render();
+    });
+  });
+  renderPv();   /* v0.9.268：整篇字幕预览（跟着改动/还原一起重画） */
+}
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
+/* ---------------- v0.9.268：清洗后字幕全文预览 ----------------
+   此前结果区只有一张「改了哪几条」的对照表 —— 字幕本来就干净时连一行都没有，
+   用户只能先下载才看得见整篇。现在把整篇直接摊在这里。
+   ⚠️ 「清洗后」视图的数据源就是 resolve()（下载按钮用的同一份）→ 所见即所得，不会跟导出不一致。
+   ⚠️ 「原文」视图保留被删掉的条目并划掉、标「已移除」，方便核对到底删了什么。 */
+function pvItems() {
+  const map = new Map();
+  S.changes.forEach(function (ch, ci) { if (!S.off.has(ci)) map.set(ch.i, ch); });
+  const raw = [];
+  S.order.forEach(function (i) {
+    const it = S.raw[i], ch = map.get(i);
+    raw.push({ no: it.no, start: it.start, end: it.end, text: String(it.text), gone: !!(ch && ch.del) });
+  });
+  const out = resolve();
+  C.renumber(out);
+  return { raw: raw, out: out };
+}
+function renderPv() {
+  const box = $('#pvBox');
+  if (!box) return;
+  box.innerHTML = '';
+  const all = pvItems();
+  const isRaw = (PV_VIEW === 'raw');
+  const list = isRaw ? all.raw : all.out;
+  const ttl = $('#pvTitle');
+  if (ttl) ttl.innerHTML = t(isRaw ? 'pvTitleRaw' : 'pvTitle') + ' <b>' + list.length + '</b> ' + t('pvUnit');
+  if (!list.length) {
+    box.innerHTML = '<div class="pv-more">' + t('pvNone') + '</div>';
+    return;
+  }
+  const n = Math.min(list.length, PV_CAP);
+  const frag = document.createDocumentFragment();
+  for (let k = 0; k < n; k++) {
+    const it = list[k];
+    const d = document.createElement('div');
+    d.className = 'pv-line' + (it.gone ? ' gone' : '');
+    const txt = String(it.text || '').replace(/\s/g, '') ? esc(it.text) : '<i>' + t('emptyRow') + '</i>';
+    d.innerHTML =
+      '<span class="n">' + it.no + '</span>' +
+      '<span class="t">' + C.fmtTime(it.start).replace(/,\d+$/, '') + '</span>' +
+      '<span class="x">' + txt + (it.gone ? '<em>' + t('removed') + '</em>' : '') + '</span>';
+    frag.appendChild(d);
+  }
+  box.appendChild(frag);
+  if (list.length > n) {
+    const m = document.createElement('div');
+    m.className = 'pv-more';
+    m.textContent = t('pvMore').replace('{n}', n).replace('{t}', list.length);
+    box.appendChild(m);
+  }
+}
+function bindPv() {
+  const seg = $('#pvSeg');
+  if (!seg) return;
+  seg.querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      PV_VIEW = b.getAttribute('data-v');
+      seg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      renderPv();
+    });
+  });
+}
+
+/* ---------------- 解析 ---------------- */
+function setSource(text, name, enc) {
+  const src = String(text || '').replace(/^\uFEFF/, '').replace(/\r/g, '');
+  if (!src.trim()) { toast(t('errEmpty')); return; }
+  let res = null, fmt = 'srt';
+  if (/^\s*(WEBVTT|1\s*\n\s*00:)/i.test(src)) {
+    const v = C.parseVtt(src);
+    if (v.items && v.items.length) { res = v; fmt = 'vtt'; }
+  }
+  /* v0.9.258：ASS / SSA 直接解析。此前这里是一道「明确拒绝 + 让用户先转成 SRT」的拦截，
+     理由是「ASS 自带样式，清洗没意义」——但清洗要的本就是「把样式扒掉只留文本」，
+     拒收反而让用户白跑一趟。现在照收：样式交给「去 ASS 特效」那条规则处理，
+     导出统一成 SRT（清洗产不出有意义的 ASS，这一点在提示里明说）。 */
+  if (!res && /\[Script Info\]|\[V4\+ Styles\]|^\s*Dialogue\s*:/im.test(src)) {
+    const a = C.parseAss(src);
+    if (a.items && a.items.length) { res = a; fmt = 'ass'; }
+  }
+  if (!res) res = C.parseSrt(src);
+  if (!res.items || !res.items.length) {
+    $('#bad').style.display = '';
+    $('#bad').textContent = t('errParse');
+    $('#ok').style.display = 'none';
+    return;
+  }
+  S.fmt = fmt;
+  S.srcText = src;
+  /* ⚠️ 原始条目必须单独存一份：合并双轨是可逆操作（用户能一键翻转顺序），
+     没有这份「未合并的原件」就只能重新解析一遍文件。 */
+  S.rawSrc = res.items;
+  /* v0.9.271：双轨双语合并。ASS 双语最普遍的排法不是「一条里用 \N 换行」，
+     而是两条 Dialogue 时间轴完全相同、靠 Style 区分。不并回一条就直接导出 SRT，
+     会变成两条时间轴一模一样的独立字幕 —— 播放器要么叠字，要么只认第一条。 */
+  S.biFlip = false;
+  S.bi = C.detectBilingual(res.items);
+  S.raw = S.bi.bi ? C.mergeBilingual(res.items, S.bi.pairs, S.biFlip) : res.items;
+
+  /* 源格式只决定**默认**导出格式，用户可以再改。 */
+  S.outFmt = (fmt === 'vtt') ? 'vtt' : 'srt';
+  S.fname = name || '';
+  $('#bad').style.display = 'none';
+  $('#ok').style.display = '';
+  $('#ok').textContent = t('okParse').replace('{n}', res.items.length).replace('{f}', fmt.toUpperCase()) +
+    (enc && enc !== 'utf-8' ? ' · ' + t('okEnc').replace('{e}', enc) : '');
+  $('#fname').textContent = name || t('pasteSrc');
+  renderBiBar();
+  renderOutSeg();
+  $('#dlExt').textContent = outExt();
+  runClean();
+  render();
+  reportClean('clean');   /* v0.9.275：清洗使用记录（后台「字幕清洗记录」） */
+}
+
+/* ---------------- v0.9.271：双语提示条 ---------------- */
+function renderBiBar() {
+  const bar = $('#biBar');
+  if (!bar) return;
+  const on = !!(S.bi && S.bi.bi);
+  bar.style.display = on ? 'flex' : 'none';
+  if (!on) return;
+  const n = S.bi.pairs.size;
+  const tgtFirst = S.biFlip ? !S.bi.tgtFirst : S.bi.tgtFirst;
+  $('#biTxt').innerHTML = t('biFound').replace('{n}', n) + '　' +
+    (tgtFirst ? t('biOrderTgt') : t('biOrderSrc'));
+  const fb = $('#biFlip');
+  fb.textContent = tgtFirst ? t('biFlipSrc') : t('biFlipTgt');
+}
+/* ---------------- v0.9.271：导出格式三选 ---------------- */
+function renderOutSeg() {
+  const seg = $('#outSeg');
+  if (!seg) return;
+  const canAss = (S.fmt === 'ass');
+  seg.querySelectorAll('button').forEach(function (b) {
+    const f = b.getAttribute('data-f');
+    if (f === 'ass') {
+      b.disabled = !canAss;
+      b.title = canAss ? '' : t('outAssOff');
+    }
+    b.classList.toggle('on', f === S.outFmt);
+  });
+  if (!canAss && S.outFmt === 'ass') S.outFmt = 'srt';
+  const note = $('#outNote');
+  if (note) note.textContent = (S.outFmt === 'ass') ? t('outAssNote') : '';
+}
+/* 翻转「原文在上 / 译文在上」：从原始条目重新合并一遍，再重跑清洗。 */
+function reMerge() {
+  if (!(S.bi && S.bi.bi) || !S.rawSrc) return;
+  S.raw = C.mergeBilingual(S.rawSrc, S.bi.pairs, S.biFlip);
+  renderBiBar();
+  runClean();
+  render();
+}
+
+/* ---------------- 交互 ---------------- */
+let toastT = 0;
+function toast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(function () { el.classList.remove('show'); }, 2200);
+}
+/* ---------------- v0.9.275：清洗页使用记录上报 ----------------
+   清洗页是纯前端工具，请求不过服务端，此前后台看不到这个模块谁在用、
+   清洗出多少改动、命中哪几条规则、最终导成什么格式。
+   只报元数据，**绝不报字幕内容**（不带上 before/after 任何一个字）。
+
+   ⚠️ 客户端去重的必要性：勾一个复选框就重跑一次 runClean，不去重的话
+      同一份字幕会在后台刷出几十条一模一样的记录。
+      窗口按 kind 分开：clean 30 分钟（同一份文件的反复调整算一次），
+      export 60 秒（防连点下载）。 */
+const CL_DEDUP_MS = { clean: 30 * 60 * 1000, export: 60 * 1000 };
+let _clLast = { body: '', t: 0 };
+/* 改动条数：del=true 是整条删掉（这类单独看，因为它意味着条目数会变少） */
+function chgN(del) {
+  var n = 0;
+  S.changes.forEach(function (c, i) {
+    if (S.off.has(i)) return;                  /* 被用户「还原」的不算 */
+    if (del ? c.del : !c.del) n++;
+  });
+  return n;
+}
+/* 命中了哪几条规则：tags 是逐次-patch 的反查结果（见 clean-core.js），非空才算命中 */
+function hitRules() {
+  var set = [];
+  S.changes.forEach(function (c, i) {
+    if (S.off.has(i)) return;
+    (c.tags || []).forEach(function (g) { if (set.indexOf(g) < 0) set.push(g); });
+  });
+  return set;
+}
+function reportClean(kind) {
+  try {
+    var k = (kind === 'export') ? 'export' : 'clean';
+    var body = JSON.stringify({
+      kind: k,
+      src: S.fname || '',
+      cues: S.raw.length,
+      mod: chgN(false),
+      del: chgN(true),
+      rules: hitRules(),
+      fmt: k === 'export' ? S.outFmt : ''
+    });
+    var now = Date.now();
+    if (body === _clLast.body && now - _clLast.t < (CL_DEDUP_MS[k] || 0)) return;
+    _clLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/clean-event', new Blob([body], { type: 'application/json' }))) return; } catch (e) {}
+    }
+    fetch('/api/clean-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () {});
+  } catch (e) {}
+}
+
+/* v0.9.271：不再写 BOM。此前给每个文件都加了 \uFEFF，本意是帮 Windows 认出 UTF-8，
+   代价是第一个序号变成了「\uFEFF1」—— 不少字幕解析器（含部分播放器与剪辑软件）
+   认不出这个序号，整份字幕直接判为无效。UTF-8 已经是事实标准，不值得为极少数
+   老编辑器冒这个险。 */
+function download(name, text) {
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 400);
+}
+function baseName() {
+  let n = (S.fname || 'subtitle').replace(/\.[^.]+$/, '');
+  return n + '.clean';
+}
+
+function bind() {
+  const dz = $('#dz'), fi = $('#file');
+  dz.addEventListener('click', function () { fi.click(); });
+  fi.addEventListener('change', function () {
+    const f = fi.files && fi.files[0];
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = function () {
+      const d = C.decodeBuf(fr.result);
+      $('#paste').value = '';
+      dz.classList.add('has');
+      $('#btnClear').style.display = '';
+      setSource(d.text, f.name, d.enc);
+    };
+    fr.readAsArrayBuffer(f);
+  });
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('has'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    dz.addEventListener(ev, function (e) { e.preventDefault(); if (!S.fname) dz.classList.remove('has'); });
+  });
+  dz.addEventListener('drop', function (e) {
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = function () {
+      const d = C.decodeBuf(fr.result);
+      $('#paste').value = '';
+      setSource(d.text, f.name, d.enc);
+    };
+    fr.readAsArrayBuffer(f);
+  });
+
+  $('#paste').addEventListener('input', debounce(function () {
+    const v = $('#paste').value;
+    if (v.trim().length > 10) setSource(v, '', '');
+  }, 500));
+
+  $('#btnClear').addEventListener('click', function () {
+    S.raw = []; S.rawSrc = []; S.changes = []; S.off.clear(); S.fname = '';
+    S.fmt = 'srt'; S.outFmt = 'srt'; S.srcText = '';
+    S.bi = null; S.biFlip = false;
+    $('#dlExt').textContent = '.srt';
+    $('#file').value = '';
+    $('#paste').value = '';
+    $('#fname').textContent = '';
+    $('#ok').style.display = 'none';
+    $('#bad').style.display = 'none';
+    $('#biBar').style.display = 'none';
+    dz.classList.remove('has');
+    $('#btnClear').style.display = 'none';
+    render();
+  });
+
+  /* v0.9.271：导出格式三选 + 双轨顺序翻转 */
+  $('#outSeg').addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-f]');
+    if (!b || b.disabled) return;
+    S.outFmt = b.getAttribute('data-f');
+    renderOutSeg();
+    $('#dlExt').textContent = outExt();
+  });
+  $('#biFlip').addEventListener('click', function () {
+    S.biFlip = !S.biFlip;
+    reMerge();
+  });
+
+  $('#btnDownload').addEventListener('click', function () {
+    if (!S.raw.length) return toast(t('noFile'));
+    download(baseName() + outExt(), outMain());
+    reportClean('export');   /* v0.9.275：导出格式上报（后台「字幕清洗记录」） */
+    toast(t('okDl'));
+  });
+  $('#btnTxt').addEventListener('click', function () {
+    if (!S.raw.length) return toast(t('noFile'));
+    download(baseName() + '.txt', outTxt());
+    toast(t('okDl'));
+  });
+  $('#btnCopy').addEventListener('click', function () {
+    if (!S.raw.length) return toast(t('noFile'));
+    const s = outMain();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(s).then(function () { toast(t('okCopy')); }, function () { fallbackCopy(s); });
+    } else fallbackCopy(s);
+  });
+  $('#btnUndoAll').addEventListener('click', function () {
+    if (!S.changes.length) return;
+    if (S.off.size === S.changes.length) {
+      S.off.clear();
+    } else {
+      S.changes.forEach(function (c, i) { S.off.add(i); });
+    }
+    render();
+  });
+}
+function fallbackCopy(s) {
+  const ta = document.createElement('textarea');
+  ta.value = s;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast(t('okCopy')); } catch (e) { toast(t('errCopy')); }
+  ta.remove();
+}
+function debounce(fn, ms) {
+  let tid = 0;
+  return function () {
+    const args = arguments, self = this;
+    clearTimeout(tid);
+    tid = setTimeout(function () { fn.apply(self, args); }, ms);
+  };
+}
+
+/* ---------------- i18n ----------------
+   ⚠️ 与双语页同口径：一个词条必须在**每个语块里都写一遍**，
+      漏一个的词条会静默回退到英文，而且没有任何报错。 */
+const I18N = {
+  'zh-CN': {
+    brandName: '随心字幕 AI', upTitle: '上传字幕', dzTxt: '拖到这里，或点击选择文件', pastePh: '也可以直接把字幕内容粘贴到这里',
+    btnClear: '清除', optTitle: '清洗项', repTitle: '结果与导出',
+    grpTag: '标签与格式', grpSdh: '听障与音效', grpJunk: '水印与废条目', grpText: '文字修正',
+    oAssFx: '去掉 ASS 特效', oHtml: '去掉 HTML 标签', oCtrl: '去掉控制符', oSort: '按时间排序并重编号',
+    oSdh: '去掉听障提示', oSpeaker: '去掉说话人标签', oMusic: '删除纯歌词行',
+    oWm: '去掉水印与广告', oDup: '去掉重复条目', oEmpty: '去掉空条目',
+    oPunct: '标点与空白规范化', oUpper: '全大写转正常大小写', oMerge: '合并过短的相邻条目',
+    tip_assFx: '去掉 {\\an8}、{\\f4} 这类 SubStation 特效标记。这些标记在 SRT 里不生效，播放器会把它们当字显示出来。',
+    tip_html: '去掉 <i>、<b>、<font> 这类标签，只保留里面的文字。很多播放器不支持这些标签，会原样显示成一串乱码。',
+    tip_ctrl: '去掉看不见的控制字符、零宽字符和软连字符。它们不影响显示，但会破坏搜索和字数统计。',
+    tip_sort: '按开始时间重新排序并重编号。不改变任何文字，只调整顺序。',
+    tip_sdh: '去掉 [脚步声]、[音乐]、(咳嗽) 这类给听障观众看的音效描述。只去掉提示部分，对白原文保留。',
+    tip_speaker: '去掉行首的「GEORGE:」这类说话人名字。注意：正片里出现「注意：」这种中文提示不会被误删。',
+    tip_music: '删掉整条都是 ♪…♪ 的歌词行。带歌词的对白不受影响。开之前先想清楚：有些片子靠歌词传达信息。',
+    tip_wm: '去掉字幕组水印、网址、邮箱、求关注和「仅供学习交流」这类广告。短条目里才判定，长台词不会被误伤。',
+    tip_dup: '去掉时间轴和文字完全相同的重复条目，只保留第一条。',
+    tip_empty: '去掉没有任何文字的空条目。',
+    tip_punct: '清理多余空格、行尾空格和连续句点，不改动全角半角，也不重排引号。',
+    tip_upper: '把整条全大写的字幕转成正常大小写，句首会自动大写。人名地名这类专有名词恢复不了，导出的英文片建议人工过一遍。',
+    tip_merge: '把时长不足 1.2 秒、且间隔不到 0.4 秒的相邻两条合并成一条。字幕跳得太快时用它。',
+    thTime: '时间', thOld: '原文', thNew: '清洗后',
+    stRaw: '原始', stOut: '清洗后', stDel: '删除', stMod: '修改', stOff: '已还原',
+    removed: '已删除', emptyRow: '（源文件里的空行）', btnUndo: '还原', btnAdopt: '采纳',
+    btnDownload: '下载字幕', btnCopy: '复制内容', btnTxt: '导出纯文本', btnUndoAll: '全部还原',
+    noChange: '没有需要清洗的地方，这份字幕已经是干净的。',
+    /* v0.9.268：结果区的整篇预览 */
+    pvTitle: '清洗后字幕', pvTitleRaw: '原始字幕', pvUnit: '条',
+    pvOut: '清洗后', pvRaw: '原文', pvNone: '这份字幕没有内容',
+    pvMore: '只显示前 {n} 条，共 {t} 条 —— 完整内容请点「下载字幕」',
+    okParse: '解析到 {n} 条 · 源格式 {f}', okEnc: '编码已按 {e} 修复',
+    assNote: 'ASS 样式按内容处理，导出为 SRT',
+    /* v0.9.271：双轨双语 + 导出格式三选 */
+    outFmt: '导出格式', outAssOff: '源文件是 ASS 时才能导出 ASS',
+    outAssNote: '样式与分辨率原样保留，只替换文字',
+    biFound: '检测到 {n} 组双语双轨，已合并成一条',
+    biOrderSrc: '当前：原文在上', biOrderTgt: '当前：译文在上',
+    biFlipSrc: '改成原文在上', biFlipTgt: '改成译文在上',
+    errParse: '没能解析出字幕内容。支持 SRT / VTT / ASS（含 SSA）。',
+    errEmpty: '文件是空的', noFile: '先上传一份字幕',
+    okDl: '已下载', okCopy: '已复制', errCopy: '复制失败，请手动选中复制',
+    optOn: '已开启 {n} / {t} 项', pasteSrc: '粘贴的内容',
+    footHome: '去翻译字幕 →', footMerge: '去特效字幕 →',
+    heroA: '字幕', heroEm: '清洗器',
+    heroSub: '去掉 HTML 标签、ASS 特效、听障提示、说话人和字幕组水印，修好全大写与乱码。',
+    footBrand: '随心字幕 AI · 字幕清洗工具'
+  },
+  'en': {
+    brandName: 'AI-SRTSub', upTitle: 'Upload subtitles', dzTxt: 'Drop a file here, or click to choose', pastePh: 'Or paste your subtitle text here',
+    btnClear: 'Clear', optTitle: 'Cleaning rules', repTitle: 'Result and export',
+    grpTag: 'Tags and formatting', grpSdh: 'Hearing impaired', grpJunk: 'Watermarks and junk', grpText: 'Text fixes',
+    oAssFx: 'Strip ASS effect tags', oHtml: 'Strip HTML tags', oCtrl: 'Strip control characters', oSort: 'Sort by time and renumber',
+    oSdh: 'Remove hearing-impaired cues', oSpeaker: 'Remove speaker labels', oMusic: 'Delete lyric-only lines',
+    oWm: 'Remove watermarks and ads', oDup: 'Remove duplicate cues', oEmpty: 'Remove empty cues',
+    oPunct: 'Normalize punctuation', oUpper: 'Fix ALL CAPS lines', oMerge: 'Merge very short neighbours',
+    tip_assFx: 'Removes SubStation effect markers like {\\an8}. They do nothing in SRT and show up as literal text.',
+    tip_html: 'Removes <i>, <b>, <font> and keeps the text inside. Most players do not support them.',
+    tip_ctrl: 'Removes invisible control, zero-width and soft-hyphen characters that break search and counting.',
+    tip_sort: 'Re-sorts by start time and renumbers. Text is untouched.',
+    tip_sdh: 'Removes sound descriptions for deaf viewers, such as [footsteps] or (coughs). Dialogue is kept.',
+    tip_speaker: 'Removes leading speaker names like GEORGE:. Normal lines are not affected.',
+    tip_music: 'Deletes cues that are nothing but ♪ lyrics ♪. Dialogue that quotes a lyric is kept.',
+    tip_wm: 'Removes release-group watermarks, URLs, emails and ads. Only short cues are judged, so long dialogue is safe.',
+    tip_dup: 'Removes cues with identical timing and text, keeping the first one.',
+    tip_empty: 'Removes cues that contain no text at all.',
+    tip_punct: 'Trims extra spaces and repeated dots. Never changes quotes or full-width forms.',
+    tip_upper: 'Turns fully upper-case cues into normal case. Proper nouns cannot be restored, so proofread names.',
+    tip_merge: 'Joins neighbours shorter than 1.2s with a gap under 0.4s. Useful when subtitles flicker.',
+    thTime: 'Time', thOld: 'Before', thNew: 'After',
+    stRaw: 'Original', stOut: 'Cleaned', stDel: 'Deleted', stMod: 'Modified', stOff: 'Reverted',
+    removed: 'removed', emptyRow: 'empty cue in the source', btnUndo: 'Revert', btnAdopt: 'Apply',
+    btnDownload: 'Download', btnCopy: 'Copy', btnTxt: 'Plain text', btnUndoAll: 'Revert all',
+    noChange: 'Nothing to clean. This file is already tidy.',
+    pvTitle: 'Cleaned subtitles', pvTitleRaw: 'Original subtitles', pvUnit: 'lines',
+    pvOut: 'Cleaned', pvRaw: 'Original', pvNone: 'No content in this file',
+    pvMore: 'Showing first {n} of {t} lines — download for the full file',
+    okParse: '{n} cues parsed · source {f}', okEnc: 'encoding fixed as {e}',
+    assNote: 'ASS styling is treated as content; exports as SRT',
+    outFmt: 'Export as', outAssOff: 'ASS output needs an ASS source',
+    outAssNote: 'Styles and resolution kept, only the text is replaced',
+    biFound: 'Found {n} bilingual pairs, merged into one cue each',
+    biOrderSrc: 'Original line on top', biOrderTgt: 'Translation on top',
+    biFlipSrc: 'Put original on top', biFlipTgt: 'Put translation on top',
+    errParse: 'Could not parse any cues. Supported: SRT, VTT, ASS (and SSA).',
+    errEmpty: 'That file is empty', noFile: 'Upload a subtitle file first',
+    okDl: 'Downloaded', okCopy: 'Copied', errCopy: 'Copy failed, please select and copy manually',
+    optOn: '{n} of {t} rules on', pasteSrc: 'pasted content',
+    footHome: 'Translate subtitles', footMerge: 'Merge subtitles',
+    heroA: 'Subtitle', heroEm: 'Cleaner',
+    heroSub: 'Strip HTML tags, ASS effects, SDH cues, speaker labels and group watermarks, then fix all-caps and mojibake.',
+    footBrand: 'AI-SRTSub · Subtitle Cleaner',
+  },
+  'zh-TW': {
+    brandName: '隨心字幕 AI',
+    btnDownload: '下載字幕',
+    upTitle: '上傳字幕',
+    dzTxt: '拖到這裡，或點擊選擇檔案',
+    pastePh: '也可以直接把字幕內容貼到這裡',
+    btnClear: '清除',
+    optTitle: '清理項目',
+    repTitle: '結果與匯出',
+    grpTag: '標籤與格式',
+    grpSdh: '聽障與音效',
+    grpJunk: '浮水印與廢條目',
+    grpText: '文字修正',
+    oAssFx: '移除 ASS 特效標記',
+    oHtml: '移除 HTML 標籤',
+    oCtrl: '移除控制字元',
+    oSort: '依時間排序並重新編號',
+    oSdh: '移除聽障提示',
+    oSpeaker: '移除說話者標籤',
+    oMusic: '刪除純歌詞行',
+    oWm: '移除浮水印與廣告',
+    oDup: '移除重複條目',
+    oEmpty: '移除空條目',
+    oPunct: '標點與空白正規化',
+    oUpper: '全大寫轉正常大小寫',
+    oMerge: '合併過短的相鄰條目',
+    tip_assFx: '移除 {\\an8}、{\\f4} 這類 SubStation 特效標記。這些標記在 SRT 裡不會生效，播放器會把它們當成文字顯示出來。',
+    tip_html: '移除 <i>、<b>、<font> 這類標籤，只保留裡面的文字。很多播放器不支援這些標籤，會原樣顯示成一串亂碼。',
+    tip_ctrl: '移除看不見的控制字元、零寬字元和軟連字號。它們不影響顯示，但會破壞搜尋和字數統計。',
+    tip_sort: '依開始時間重新排序並重新編號。不改變任何文字，只調整順序。',
+    tip_sdh: '移除 [腳步聲]、[音樂]、(咳嗽) 這類給聽障觀眾看的音效描述。只移除提示部分，對白原文保留。',
+    tip_speaker: '移除行首的「GEORGE:」這類說話者名字。注意：正片裡出現「注意：」這種中文提示不會被誤刪。',
+    tip_music: '刪掉整條都是 ♪…♪ 的歌詞行。帶歌詞的對白不受影響。開之前先想清楚：有些片子靠歌詞傳達訊息。',
+    tip_wm: '移除字幕組浮水印、網址、電子信箱、求關注和「僅供學習交流」這類廣告。只有短條目才會判定，長台詞不會被誤傷。',
+    tip_dup: '移除時間軸和文字完全相同的重複條目，只保留第一條。',
+    tip_empty: '移除沒有任何文字的空條目。',
+    tip_punct: '清理多餘空格、行尾空格和連續句點，不改動全形半形，也不重排引號。',
+    tip_upper: '把整條全大寫的字幕轉成正常大小寫，句首會自動大寫。人名地名這類專有名詞恢復不了，匯出的英文片建議人工再檢查一遍。',
+    tip_merge: '把時長不足 1.2 秒、且間隔不到 0.4 秒的相鄰兩條合併成一條。字幕跳得太快時用它。',
+    thTime: '時間',
+    thOld: '原文',
+    thNew: '清理後',
+    stRaw: '原始',
+    stOut: '清洗後',
+    stDel: '刪除',
+    stMod: '修改',
+    stOff: '已還原',
+    removed: '已刪除',
+    emptyRow: '（來源檔中的空行）',
+    btnUndo: '還原',
+    btnAdopt: '採納',
+    btnCopy: '複製內容',
+    btnTxt: '匯出純文字',
+    btnUndoAll: '全部還原',
+    noChange: '沒有需要清洗的地方，這份字幕已經很乾淨了。',
+    pvTitle: '清洗後字幕',
+    pvTitleRaw: '原始字幕',
+    pvUnit: '條',
+    pvOut: '清洗後',
+    pvRaw: '原文',
+    pvNone: '這份字幕沒有內容',
+    pvMore: '只顯示前 {n} 條，共 {t} 條 —— 完整內容請點「下載字幕」',
+    okParse: '解析到 {n} 條 · 來源格式 {f}',
+    okEnc: '編碼已依 {e} 修復',
+    assNote: 'ASS 樣式視為內容處理，匯出為 SRT',
+    outFmt: '匯出格式',
+    outAssOff: '來源檔案是 ASS 時才能匯出 ASS',
+    outAssNote: '樣式與解析度原樣保留，只替換文字',
+    biFound: '偵測到 {n} 組雙語雙軌，已合併成一條',
+    biOrderSrc: '目前：原文在上',
+    biOrderTgt: '目前：譯文在上',
+    biFlipSrc: '改為原文在上',
+    biFlipTgt: '改為譯文在上',
+    errParse: '無法解析出字幕內容。支援 SRT / VTT / ASS（含 SSA）。',
+    errEmpty: '檔案是空的',
+    noFile: '請先上傳一份字幕',
+    okDl: '已下載',
+    okCopy: '已複製',
+    errCopy: '複製失敗，請手動選取複製',
+    optOn: '已開啟 {n} / {t} 項',
+    pasteSrc: '貼上的內容',
+    footHome: '去翻譯字幕 →',
+    footMerge: '去特效字幕 →',
+    heroA: '字幕',
+    heroEm: '清洗器',
+    heroSub: '去除 HTML 標籤、ASS 特效、聽障提示、說話人標籤和字幕組浮水印，並修正全大寫與亂碼。',
+    footBrand: 'AI-SRTSub · 字幕清洗工具'
+  },
+  'ja': {
+    brandName: 'AI-SRTSub',
+    btnDownload: '字幕をダウンロード',
+    upTitle: '字幕をアップロード',
+    dzTxt: 'ここにドロップ、またはクリックで選択',
+    pastePh: '字幕テキストをここに直接貼り付けも可',
+    btnClear: 'クリア',
+    optTitle: 'クリーニング項目',
+    repTitle: '結果とエクスポート',
+    grpTag: 'タグと書式',
+    grpSdh: '聴覚障害向け情報',
+    grpJunk: 'ウォーターマークと不要項目',
+    grpText: 'テキスト修正',
+    oAssFx: 'ASS 効果タグを除去',
+    oHtml: 'HTML タグを除去',
+    oCtrl: '制御文字を除去',
+    oSort: '時間順に並べ替えて番号を振り直す',
+    oSdh: '聴覚障害向けヒントを除去',
+    oSpeaker: '話者ラベルを除去',
+    oMusic: '歌詞のみの行を削除',
+    oWm: 'ウォーターマークと広告を除去',
+    oDup: '重複項目を除去',
+    oEmpty: '空の項目を除去',
+    oPunct: '句読点と空白を正規化',
+    oUpper: '全大文字を通常の大小文字に',
+    oMerge: '短すぎる隣接項目を結合',
+    tip_assFx: '{\\an8} や {\\f4} のような SubStation の効果タグを除去します。SRT では無効で、そのまま文字として表示されます。',
+    tip_html: '<i>、<b>、<font> などのタグを除去し、中のテキストだけ残します。多くのプレイヤーはこれらに対応しておらず、そのまま文字として表示されます。',
+    tip_ctrl: '見えない制御文字、ゼロ幅文字、ソフトハイフンを除去します。表示には影響しませんが、検索や文字数カウントを壊します。',
+    tip_sort: '開始時間で並べ替えて番号を振り直します。テキストは変更せず、順序だけを調整します。',
+    tip_sdh: '[足音] や [音楽]、(咳) のような聴覚障害者向けの音効説明を除去します。ヒント部分だけを除去し、セリフ本体は残します。',
+    tip_speaker: '行頭の「GEORGE:」のような話者名を除去します。通常の「注意：」のような行は削除されません。',
+    tip_music: '♪…♪ だけの歌詞行を削除します。歌詞を含むセリフは影響を受けません。有効にする前にご注意：歌詞で情報を伝える作品もあります。',
+    tip_wm: '字幕グループのウォーターマーク、URL、メールアドレス、フォロー依頼、「学習・交流用」などの広告を除去します。短い項目のみ判定するので、長いセリフは誤って消されません。',
+    tip_dup: '時間軸とテキストが完全に同じ重複項目を除去し、最初の1件だけ残します。',
+    tip_empty: 'テキストがまったくない空の項目を除去します。',
+    tip_punct: '余分なスペース、行末の空白、連続するピリオドを整理します。全角・半角は変更せず、引用符の並べ替えも行いません。',
+    tip_upper: '全大文字の字幕を通常の大小文字に変換し、文頭は自動で大文字になります。人名や地名などの固有名詞は復元できないため、英語の書き出しは目視確認をおすすめします。',
+    tip_merge: '長さ 1.2 秒未満で間隔が 0.4 秒未満の隣接する2件を1件に結合します。字幕の切り替わりが速すぎるときに使います。',
+    thTime: '時間',
+    thOld: '原文',
+    thNew: 'クリーニング後',
+    stRaw: 'オリジナル',
+    stOut: 'クリーニング後',
+    stDel: '削除',
+    stMod: '変更',
+    stOff: '復元済み',
+    removed: '削除済み',
+    emptyRow: '（元ファイルの空行）',
+    btnUndo: '復元',
+    btnAdopt: '適用',
+    btnCopy: '内容をコピー',
+    btnTxt: 'プレーンテキスト',
+    btnUndoAll: 'すべて復元',
+    noChange: 'クリーニングが必要な箇所はありません。この字幕はすでに整っています。',
+    pvTitle: 'クリーニング後の字幕',
+    pvTitleRaw: '元の字幕',
+    pvUnit: '件',
+    pvOut: 'クリーニング後',
+    pvRaw: '原文',
+    pvNone: 'この字幕に内容がありません',
+    pvMore: '先頭 {n} 件のみ表示（全 {t} 件）—— 全体は「字幕をダウンロード」から',
+    okParse: '{n} 件を解析 · 元形式 {f}',
+    okEnc: 'エンコーディングを {e} として修正しました',
+    assNote: 'ASS のスタイルは内容として扱い、SRT で書き出します',
+    outFmt: '書き出し形式',
+    outAssOff: 'ASS で書き出すには元ファイルが ASS である必要があります',
+    outAssNote: 'スタイルと解像度はそのまま保持し、テキストのみ置換します',
+    biFound: '{n} 組のバイリンガルペアを検出し、1 件に統合しました',
+    biOrderSrc: '現在：原文が上',
+    biOrderTgt: '現在：訳文が上',
+    biFlipSrc: '原文を上にする',
+    biFlipTgt: '訳文を上にする',
+    errParse: '字幕の内容を解析できませんでした。対応形式：SRT / VTT / ASS（SSA 含む）。',
+    errEmpty: 'ファイルが空です',
+    noFile: '先に字幕ファイルをアップロードしてください',
+    okDl: 'ダウンロードしました',
+    okCopy: 'コピーしました',
+    errCopy: 'コピーに失敗しました。手動で選択してコピーしてください',
+    optOn: '{n} / {t} 項目がオン',
+    pasteSrc: '貼り付けた内容',
+    footHome: '字幕を翻訳 →',
+    footMerge: '字幕を合成 →',
+    heroA: '字幕',
+    heroEm: 'クリーナー',
+    heroSub: 'HTMLタグ、ASSエフェクト、SDH字幕、話者ラベル、グループのウォーターマークを除去し、全大文字と文字化けを修正します。',
+    footBrand: 'AI-SRTSub · 字幕クリーナー'
+  },
+  'es': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Subir subtítulos',
+    dzTxt: 'Suelta un archivo aquí o haz clic para elegir',
+    pastePh: 'O pega aquí el texto de los subtítulos',
+    btnClear: 'Borrar',
+    optTitle: 'Reglas de limpieza',
+    repTitle: 'Resultado y exportación',
+    grpTag: 'Etiquetas y formato',
+    grpSdh: 'Discapacidad auditiva',
+    grpJunk: 'Marcas de agua y basura',
+    grpText: 'Correcciones de texto',
+    oAssFx: 'Quitar etiquetas de efectos ASS',
+    oHtml: 'Quitar etiquetas HTML',
+    oCtrl: 'Quitar caracteres de control',
+    oSort: 'Ordenar por tiempo y renumerar',
+    oSdh: 'Quitar subtítulos SDH',
+    oSpeaker: 'Quitar etiquetas de hablante',
+    oMusic: 'Eliminar líneas solo de letra',
+    oWm: 'Quitar marcas de agua y anuncios',
+    oDup: 'Quitar subtítulos duplicados',
+    oEmpty: 'Quitar subtítulos vacíos',
+    oPunct: 'Normalizar puntuación y espacios',
+    oUpper: 'Corregir líneas en MAYÚSCULAS',
+    oMerge: 'Unir subtítulos muy cortos contiguos',
+    tip_assFx: 'Elimina marcadores de efectos SubStation como {\\an8}. No hacen nada en SRT y aparecen como texto literal.',
+    tip_html: 'Elimina <i>, <b>, <font> y conserva el texto interior. La mayoría de reproductores no los admite.',
+    tip_ctrl: 'Elimina caracteres invisibles de control, de ancho cero y guiones suaves que rompen la búsqueda y el recuento.',
+    tip_sort: 'Reordena por hora de inicio y renumera. El texto no se toca.',
+    tip_sdh: 'Elimina descripciones sonoras para espectadores sordos, como [pasos] o (tos). El diálogo se conserva.',
+    tip_speaker: 'Elimina nombres de hablante al inicio, como GEORGE:. Las líneas normales no se ven afectadas.',
+    tip_music: 'Elimina los subtítulos que solo contienen ♪ letra ♪. El diálogo que cita una letra se conserva.',
+    tip_wm: 'Elimina marcas de agua de grupos, URL, correos y anuncios. Solo se evalúan los subtítulos cortos, así que los diálogos largos están a salvo.',
+    tip_dup: 'Elimina los subtítulos con el mismo tiempo y texto y conserva el primero.',
+    tip_empty: 'Elimina los subtítulos que no contienen ningún texto.',
+    tip_punct: 'Recorta espacios sobrantes y puntos repetidos. No cambia las comillas ni los caracteres de ancho completo.',
+    tip_upper: 'Convierte los subtítulos todo en mayúsculas a mayúsculas y minúsculas. Los nombres propios no se pueden restaurar, así que revísalos.',
+    tip_merge: 'Une subtítulos contiguos de menos de 1,2 s con un intervalo inferior a 0,4 s. Útil cuando los subtítulos parpadean.',
+    thTime: 'Tiempo',
+    thOld: 'Antes',
+    thNew: 'Después',
+    stRaw: 'Original',
+    stOut: 'Limpiado',
+    stDel: 'Eliminado',
+    stMod: 'Modificado',
+    stOff: 'Revertido',
+    removed: 'eliminado',
+    emptyRow: 'entrada vacía en el origen',
+    btnUndo: 'Revertir',
+    btnAdopt: 'Aplicar',
+    btnDownload: 'Descargar',
+    btnCopy: 'Copiar',
+    btnTxt: 'Texto plano',
+    btnUndoAll: 'Revertir todo',
+    noChange: 'No hay nada que limpiar. Este archivo ya está limpio.',
+    pvTitle: 'Subtítulos limpios',
+    pvTitleRaw: 'Subtítulos originales',
+    pvUnit: 'líneas',
+    pvOut: 'Limpiado',
+    pvRaw: 'Texto original',
+    pvNone: 'Este archivo no tiene contenido',
+    pvMore: 'Mostrando las primeras {n} de {t} líneas — descarga para ver el archivo completo',
+    okParse: '{n} entradas analizadas · origen {f}',
+    okEnc: 'codificación corregida a {e}',
+    assNote: 'El estilo ASS se trata como contenido; se exporta como SRT',
+    outFmt: 'Exportar como',
+    outAssOff: 'La salida ASS requiere un origen ASS',
+    outAssNote: 'Se conservan estilos y resolución; solo se reemplaza el texto',
+    biFound: 'Se detectaron {n} pares bilingües, combinados en una entrada cada uno',
+    biOrderSrc: 'Original arriba',
+    biOrderTgt: 'Traducción arriba',
+    biFlipSrc: 'Poner el original arriba',
+    biFlipTgt: 'Poner la traducción arriba',
+    errParse: 'No se pudo analizar ningún subtítulo. Compatibles: SRT, VTT, ASS (y SSA).',
+    errEmpty: 'Ese archivo está vacío',
+    noFile: 'Sube primero un archivo de subtítulos',
+    okDl: 'Descargado',
+    okCopy: 'Copiado',
+    errCopy: 'No se pudo copiar; selecciona y copia manualmente',
+    optOn: '{n} de {t} reglas activas',
+    pasteSrc: 'contenido pegado',
+    footHome: 'Traducir subtítulos',
+    footMerge: 'Combinar subtítulos',
+    heroA: 'Subtítulo',
+    heroEm: 'Limpiador',
+    heroSub: 'Elimina etiquetas HTML, efectos ASS, subtítulos SDH, etiquetas de hablante y marcas de agua de grupos, y luego corrige mayúsculas y caracteres corruptos.',
+    footBrand: 'AI-SRTSub · Limpiador de subtítulos'
+  },
+  'pt': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Carregar legendas',
+    dzTxt: 'Solte um arquivo aqui ou clique para escolher',
+    pastePh: 'Ou cole o texto da legenda aqui',
+    btnClear: 'Limpar',
+    optTitle: 'Regras de limpeza',
+    repTitle: 'Resultado e exportação',
+    grpTag: 'Tags e formatação',
+    grpSdh: 'Deficiência auditiva',
+    grpJunk: 'Marcas d\'água e lixo',
+    grpText: 'Correções de texto',
+    oAssFx: 'Remover tags de efeito ASS',
+    oHtml: 'Remover tags HTML',
+    oCtrl: 'Remover caracteres de controle',
+    oSort: 'Ordenar por tempo e renumerar',
+    oSdh: 'Remover descrições sonoras',
+    oSpeaker: 'Remover rótulos de falante',
+    oMusic: 'Excluir linhas só de letras',
+    oWm: 'Remover marcas d\'água e anúncios',
+    oDup: 'Remover legendas duplicadas',
+    oEmpty: 'Remover legendas vazias',
+    oPunct: 'Normalizar pontuação',
+    oUpper: 'Corrigir linhas em CAIXA ALTA',
+    oMerge: 'Mesclar legendas muito curtas',
+    tip_assFx: 'Remove marcadores de efeito SubStation como {\\an8}. Eles não funcionam em SRT e aparecem como texto literal.',
+    tip_html: 'Remove tags como <i>, <b>, <font> e mantém o texto interno. A maioria dos players não as suporta.',
+    tip_ctrl: 'Remove caracteres invisíveis de controle, de largura zero e hífens suaves que quebram a busca e a contagem.',
+    tip_sort: 'Reordena pelo tempo de início e renumera. O texto não muda.',
+    tip_sdh: 'Remove descrições sonoras para surdos, como [passos] ou (tosse). O diálogo é mantido.',
+    tip_speaker: 'Remove nomes de falante no início, como GEORGE:. Linhas normais não são afetadas.',
+    tip_music: 'Exclui legendas que são só ♪ letras ♪. Diálogos que citam uma letra são mantidos.',
+    tip_wm: 'Remove marcas d\'água de grupos de legenda, URLs, e-mails e anúncios. Só legendas curtas são avaliadas, então diálogos longos estão seguros.',
+    tip_dup: 'Remove legendas com tempo e texto idênticos, mantendo a primeira.',
+    tip_empty: 'Remove legendas sem nenhum texto.',
+    tip_punct: 'Remove espaços extras e pontos repetidos. Não altera aspas nem caracteres de largura total.',
+    tip_upper: 'Converte legendas em CAIXA ALTA para caixa normal. Nomes próprios não são restaurados, então revise os nomes.',
+    tip_merge: 'Junta legendas vizinhas com menos de 1,2s e intervalo abaixo de 0,4s. Útil quando as legendas piscam.',
+    thTime: 'Tempo',
+    thOld: 'Antes',
+    thNew: 'Depois',
+    stRaw: 'Original',
+    stOut: 'Limpo',
+    stDel: 'Excluído',
+    stMod: 'Modificado',
+    stOff: 'Revertido',
+    removed: 'removido',
+    emptyRow: 'cue vazio na origem',
+    btnUndo: 'Reverter',
+    btnAdopt: 'Aplicar',
+    btnDownload: 'Baixar',
+    btnCopy: 'Copiar',
+    btnTxt: 'Texto simples',
+    btnUndoAll: 'Reverter tudo',
+    noChange: 'Nada a limpar. Este arquivo já está limpo.',
+    pvTitle: 'Legendas limpas',
+    pvTitleRaw: 'Legendas originais',
+    pvUnit: 'linhas',
+    pvOut: 'Limpo',
+    pvRaw: 'Original',
+    pvNone: 'Este arquivo não tem conteúdo',
+    pvMore: 'Mostrando as primeiras {n} de {t} linhas — baixe para o arquivo completo',
+    okParse: '{n} cues analisados · origem {f}',
+    okEnc: 'codificação corrigida para {e}',
+    assNote: 'O estilo ASS é tratado como conteúdo; exporta como SRT',
+    outFmt: 'Exportar como',
+    outAssOff: 'A saída ASS exige um arquivo de origem ASS',
+    outAssNote: 'Estilos e resolução mantidos, só o texto é substituído',
+    biFound: '{n} pares bilíngues encontrados, mesclados em um cue cada',
+    biOrderSrc: 'Original em cima',
+    biOrderTgt: 'Tradução em cima',
+    biFlipSrc: 'Pôr o original em cima',
+    biFlipTgt: 'Pôr a tradução em cima',
+    errParse: 'Não foi possível analisar nenhum cue. Suportados: SRT, VTT, ASS (e SSA).',
+    errEmpty: 'Esse arquivo está vazio',
+    noFile: 'Envie um arquivo de legenda primeiro',
+    okDl: 'Baixado',
+    okCopy: 'Copiado',
+    errCopy: 'Falha ao copiar, selecione e copie manualmente',
+    optOn: '{n} de {t} regras ativas',
+    pasteSrc: 'conteúdo colado',
+    footHome: 'Traduzir legendas',
+    footMerge: 'Mesclar legendas',
+    heroA: 'Limpeza de',
+    heroEm: 'legendas',
+    heroSub: 'Remova tags HTML, efeitos ASS, legendas SDH, identificadores de falante e marcas d\'água de grupos, e corrija CAIXA ALTA e caracteres corrompidos.',
+    footBrand: 'AI-SRTSub · Limpador de Legendas'
+  },
+  'ko': {
+    brandName: 'AI-SRTSub',
+    upTitle: '자막 업로드',
+    dzTxt: '파일을 여기에 놓거나 클릭해 선택하세요',
+    pastePh: '또는 자막 내용을 여기에 붙여넣으세요',
+    btnClear: '지우기',
+    optTitle: '정리 항목',
+    repTitle: '결과 및 내보내기',
+    grpTag: '태그 및 서식',
+    grpSdh: '청각장애인용 자막',
+    grpJunk: '워터마크 및 불필요 항목',
+    grpText: '텍스트 교정',
+    oAssFx: 'ASS 효과 태그 제거',
+    oHtml: 'HTML 태그 제거',
+    oCtrl: '제어 문자 제거',
+    oSort: '시간순 정렬 및 번호 재지정',
+    oSdh: '청각장애인용 자막 제거',
+    oSpeaker: '화자 라벨 제거',
+    oMusic: '가사만 있는 줄 삭제',
+    oWm: '워터마크 및 광고 제거',
+    oDup: '중복 항목 제거',
+    oEmpty: '빈 항목 제거',
+    oPunct: '구두점 및 공백 정리',
+    oUpper: '전체 대문자 줄 교정',
+    oMerge: '지나치게 짧은 인접 항목 병합',
+    tip_assFx: '{\\an8}, {\\f4} 같은 SubStation 효과 표시를 제거합니다. SRT에서는 동작하지 않고 글자로 표시됩니다.',
+    tip_html: '<i>, <b>, <font> 같은 태그를 제거하고 안의 텍스트만 남깁니다. 대부분의 플레이어가 지원하지 않아 그대로 표시됩니다.',
+    tip_ctrl: '보이지 않는 제어 문자, 제로폭 문자, 소프트 하이픈을 제거합니다. 표시에는 영향이 없지만 검색과 글자 수 계산을 망칩니다.',
+    tip_sort: '시작 시간 기준으로 다시 정렬하고 번호를 매깁니다. 텍스트는 그대로입니다.',
+    tip_sdh: '[발소리], [음악], (기침) 같은 청각장애인용 음향 설명을 제거합니다. 대사는 유지됩니다.',
+    tip_speaker: '줄 앞의 \'GEORGE:\' 같은 화자 이름을 제거합니다. 참고: \'주의:\' 같은 일반 텍스트는 삭제되지 않습니다.',
+    tip_music: '♪…♪ 만 있는 가사 줄을 삭제합니다. 가사가 포함된 대사는 영향을 받지 않습니다. 일부 작품은 가사로 정보를 전달하니 주의하세요.',
+    tip_wm: '자막 제작팀 워터마크, URL, 이메일, 구독 요청, \'학습용\' 광고를 제거합니다. 짧은 항목만 판정하므로 긴 대사는 안전합니다.',
+    tip_dup: '타임코드와 텍스트가 완전히 같은 중복 항목을 제거하고 첫 번째만 남깁니다.',
+    tip_empty: '텍스트가 전혀 없는 빈 항목을 제거합니다.',
+    tip_punct: '여분의 공백, 줄 끝 공백, 연속 마침표를 정리합니다. 전각/반각이나 따옴표는 바꾸지 않습니다.',
+    tip_upper: '전체 대문자인 자막을 일반 대소문자로 바꾸고 문장 첫 글자는 대문자로 만듭니다. 고유명사는 복원되지 않으니 확인하세요.',
+    tip_merge: '길이가 1.2초 미만이고 간격이 0.4초 미만인 인접 항목을 하나로 합칩니다. 자막이 너무 빨리 넘어갈 때 사용하세요.',
+    thTime: '시간',
+    thOld: '원문',
+    thNew: '정리 후',
+    stRaw: '원본',
+    stOut: '정리됨',
+    stDel: '삭제',
+    stMod: '수정',
+    stOff: '복원됨',
+    removed: '삭제됨',
+    emptyRow: '원본의 빈 큐',
+    btnUndo: '복원',
+    btnAdopt: '적용',
+    btnDownload: '다운로드',
+    btnCopy: '복사',
+    btnTxt: '일반 텍스트',
+    btnUndoAll: '모두 복원',
+    noChange: '정리할 것이 없습니다. 이 파일은 이미 깔끔합니다.',
+    pvTitle: '정리된 자막',
+    pvTitleRaw: '원본 자막',
+    pvUnit: '줄',
+    pvOut: '정리 후',
+    pvRaw: '원본',
+    pvNone: '이 파일에는 내용이 없습니다',
+    pvMore: '{t}줄 중 처음 {n}줄만 표시 — 전체 내용은 「다운로드」를 누르세요',
+    okParse: '{n}개 큐 파싱 · 원본 형식 {f}',
+    okEnc: '인코딩을 {e}로 수정했습니다',
+    assNote: 'ASS 스타일은 내용으로 처리되며 SRT로 내보냅니다',
+    outFmt: '내보내기 형식',
+    outAssOff: '원본이 ASS일 때만 ASS로 내보낼 수 있습니다',
+    outAssNote: '스타일과 해상도는 그대로 유지되고 텍스트만 교체됩니다',
+    biFound: '이중 언어 {n}쌍을 찾아 각각 하나의 큐로 병합했습니다',
+    biOrderSrc: '현재: 원문이 위',
+    biOrderTgt: '현재: 번역이 위',
+    biFlipSrc: '원문을 위로',
+    biFlipTgt: '번역을 위로',
+    errParse: '자막 내용을 파싱하지 못했습니다. 지원 형식: SRT / VTT / ASS(SSA 포함).',
+    errEmpty: '파일이 비어 있습니다',
+    noFile: '먼저 자막 파일을 업로드하세요',
+    okDl: '다운로드 완료',
+    okCopy: '복사됨',
+    errCopy: '복사에 실패했습니다. 직접 선택해 복사해 주세요',
+    optOn: '{t}개 규칙 중 {n}개 켜짐',
+    pasteSrc: '붙여넣은 내용',
+    footHome: '자막 번역하기 →',
+    footMerge: '자막 병합하기 →',
+    heroA: '자막',
+    heroEm: '클리너',
+    heroSub: 'HTML 태그, ASS 효과, SDH 자막, 화자 라벨, 자막팀 워터마크를 제거하고 전부 대문자와 깨진 문자를 수정합니다.',
+    footBrand: 'AI-SRTSub · 자막 클리너'
+  },
+  'de': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Untertitel hochladen',
+    dzTxt: 'Datei hierher ziehen oder klicken zum Auswählen',
+    pastePh: 'Oder Untertiteltext hier einfügen',
+    btnClear: 'Löschen',
+    optTitle: 'Bereinigungsregeln',
+    repTitle: 'Ergebnis und Export',
+    grpTag: 'Tags und Formatierung',
+    grpSdh: 'Hörgeschädigte',
+    grpJunk: 'Wasserzeichen und Müll',
+    grpText: 'Textkorrekturen',
+    oAssFx: 'ASS-Effekt-Tags entfernen',
+    oHtml: 'HTML-Tags entfernen',
+    oCtrl: 'Steuerzeichen entfernen',
+    oSort: 'Nach Zeit sortieren und neu nummerieren',
+    oSdh: 'Hörgeschädigten-Hinweise entfernen',
+    oSpeaker: 'Sprecherlabels entfernen',
+    oMusic: 'Reine Liedzeilen löschen',
+    oWm: 'Wasserzeichen und Werbung entfernen',
+    oDup: 'Doppelte Einträge entfernen',
+    oEmpty: 'Leere Einträge entfernen',
+    oPunct: 'Interpunktion und Leerraum normalisieren',
+    oUpper: 'GROSSBUCHSTABEN korrigieren',
+    oMerge: 'Sehr kurze Nachbarn zusammenführen',
+    tip_assFx: 'Entfernt SubStation-Effektmarker wie {\\an8} oder {\\f4}. In SRT bewirken sie nichts und erscheinen als Text.',
+    tip_html: 'Entfernt Tags wie <i>, <b>, <font> und behält nur den Text darin. Viele Player unterstützen sie nicht.',
+    tip_ctrl: 'Entfernt unsichtbare Steuer-, Nullbreiten- und weiche Trennzeichen, die Suche und Zählung stören.',
+    tip_sort: 'Sortiert nach Startzeit neu und nummeriert neu. Der Text bleibt unverändert.',
+    tip_sdh: 'Entfernt Geräuschbeschreibungen für Hörgeschädigte wie [Schritte] oder (hustet). Dialog bleibt erhalten.',
+    tip_speaker: 'Entfernt Sprechernamen am Zeilenanfang wie GEORGE:. Normale Zeilen sind nicht betroffen.',
+    tip_music: 'Löscht Einträge, die nur aus ♪ Liedtext ♪ bestehen. Dialog mit Liedzeilen bleibt erhalten.',
+    tip_wm: 'Entfernt Wasserzeichen von FanSub-Gruppen, URLs, E-Mails und Werbung. Nur kurze Einträge werden geprüft, langer Dialog bleibt sicher.',
+    tip_dup: 'Entfernt Einträge mit identischem Timing und Text; der erste bleibt erhalten.',
+    tip_empty: 'Entfernt Einträge ohne jeglichen Text.',
+    tip_punct: 'Entfernt überflüssige Leerzeichen und wiederholte Punkte. Anführungszeichen und Vollbreite bleiben unverändert.',
+    tip_upper: 'Wandelt komplett großgeschriebene Einträge in normale Schreibweise um. Eigennamen lassen sich nicht wiederherstellen, daher Namen prüfen.',
+    tip_merge: 'Fügt Nachbarn unter 1,2 s mit Abstand unter 0,4 s zusammen. Nützlich bei schnell springenden Untertiteln.',
+    thTime: 'Zeit',
+    thOld: 'Vorher',
+    thNew: 'Nachher',
+    stRaw: 'Original',
+    stOut: 'Bereinigt',
+    stDel: 'Gelöscht',
+    stMod: 'Geändert',
+    stOff: 'Zurückgesetzt',
+    removed: 'entfernt',
+    emptyRow: 'leerer Cue in der Quelle',
+    btnUndo: 'Zurücksetzen',
+    btnAdopt: 'Übernehmen',
+    btnDownload: 'Herunterladen',
+    btnCopy: 'Kopieren',
+    btnTxt: 'Nur Text',
+    btnUndoAll: 'Alle zurücksetzen',
+    noChange: 'Nichts zu bereinigen. Diese Datei ist bereits sauber.',
+    pvTitle: 'Bereinigte Untertitel',
+    pvTitleRaw: 'Original-Untertitel',
+    pvUnit: 'Zeilen',
+    pvOut: 'Bereinigt',
+    pvRaw: 'Originaltext',
+    pvNone: 'Kein Inhalt in dieser Datei',
+    pvMore: 'Zeige erste {n} von {t} Zeilen — für die komplette Datei herunterladen',
+    okParse: '{n} Cues geparst · Quelle {f}',
+    okEnc: 'Kodierung als {e} korrigiert',
+    assNote: 'ASS-Stil wird als Inhalt behandelt; Export als SRT',
+    outFmt: 'Exportieren als',
+    outAssOff: 'ASS-Ausgabe erfordert eine ASS-Quelle',
+    outAssNote: 'Stile und Auflösung bleiben erhalten, nur der Text wird ersetzt',
+    biFound: '{n} zweisprachige Paare gefunden, zu je einem Cue zusammengeführt',
+    biOrderSrc: 'Originalzeile oben',
+    biOrderTgt: 'Übersetzung oben',
+    biFlipSrc: 'Original nach oben',
+    biFlipTgt: 'Übersetzung nach oben',
+    errParse: 'Keine Cues erkannt. Unterstützt: SRT, VTT, ASS (und SSA).',
+    errEmpty: 'Diese Datei ist leer',
+    noFile: 'Zuerst eine Untertiteldatei hochladen',
+    okDl: 'Heruntergeladen',
+    okCopy: 'Kopiert',
+    errCopy: 'Kopieren fehlgeschlagen, bitte manuell markieren und kopieren',
+    optOn: '{n} von {t} Regeln aktiv',
+    pasteSrc: 'Eingefügter Inhalt',
+    footHome: 'Untertitel übersetzen',
+    footMerge: 'Untertitel zusammenführen',
+    heroA: 'Untertitel',
+    heroEm: 'Reiniger',
+    heroSub: 'HTML-Tags, ASS-Effekte, SDH-Hinweise, Sprecherangaben und Gruppen-Wasserzeichen entfernen, dann Großschreibung und Mojibake korrigieren.',
+    footBrand: 'AI-SRTSub · Untertitel-Reiniger'
+  },
+  'fr': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Importer des sous-titres',
+    dzTxt: 'Déposez un fichier ici ou cliquez pour choisir',
+    pastePh: 'Ou collez votre texte de sous-titres ici',
+    btnClear: 'Effacer',
+    optTitle: 'Règles de nettoyage',
+    repTitle: 'Résultat et export',
+    grpTag: 'Balises et mise en forme',
+    grpSdh: 'Sourds et malentendants',
+    grpJunk: 'Filigranes et indésirables',
+    grpText: 'Corrections de texte',
+    oAssFx: 'Supprimer les balises d\'effet ASS',
+    oHtml: 'Supprimer les balises HTML',
+    oCtrl: 'Supprimer les caractères de contrôle',
+    oSort: 'Trier par timecode et renuméroter',
+    oSdh: 'Supprimer les indications pour malentendants',
+    oSpeaker: 'Supprimer les noms de locuteurs',
+    oMusic: 'Supprimer les lignes uniquement de paroles',
+    oWm: 'Supprimer les filigranes et publicités',
+    oDup: 'Supprimer les doublons',
+    oEmpty: 'Supprimer les sous-titres vides',
+    oPunct: 'Normaliser la ponctuation',
+    oUpper: 'Corriger les lignes en majuscules',
+    oMerge: 'Fusionner les sous-titres voisins trop courts',
+    tip_assFx: 'Supprime les marqueurs d\'effet SubStation comme {\\an8}. Ils ne servent à rien en SRT et s\'affichent comme du texte brut.',
+    tip_html: 'Supprime les balises <i>, <b>, <font> et conserve le texte à l\'intérieur. La plupart des lecteurs ne les prennent pas en charge.',
+    tip_ctrl: 'Supprime les caractères de contrôle invisibles, les caractères de largeur nulle et les traits d\'union conditionnels. Ils n\'affectent pas l\'affichage, mais cassent la recherche et le comptage.',
+    tip_sort: 'Trie à nouveau par heure de début et renumérote. Le texte n\'est pas modifié.',
+    tip_sdh: 'Supprime les descriptions sonores pour les spectateurs sourds ou malentendants, comme [bruits de pas] ou (toux). Les dialogues sont conservés.',
+    tip_speaker: 'Supprime les noms de locuteurs en début de ligne comme GEORGE:. Les lignes normales ne sont pas touchées.',
+    tip_music: 'Supprime les sous-titres qui ne contiennent que des ♪ paroles ♪. Les dialogues qui citent des paroles sont conservés.',
+    tip_wm: 'Supprime les filigranes de groupes de sous-titres, les URL, les e-mails et les publicités. Seuls les sous-titres courts sont examinés, les longs dialogues sont protégés.',
+    tip_dup: 'Supprime les sous-titres dont le minutage et le texte sont identiques, en conservant le premier.',
+    tip_empty: 'Supprime les sous-titres ne contenant aucun texte.',
+    tip_punct: 'Supprime les espaces superflus et les points répétés. Ne modifie jamais les guillemets ni les caractères pleine chasse.',
+    tip_upper: 'Convertit les sous-titres tout en majuscules en casse normale. Les noms propres ne peuvent pas être restaurés, relisez les noms.',
+    tip_merge: 'Fusionne les sous-titres voisins de moins de 1,2 s avec un écart inférieur à 0,4 s. Utile quand les sous-titres clignotent.',
+    thTime: 'Temps',
+    thOld: 'Avant',
+    thNew: 'Après',
+    stRaw: 'Brut',
+    stOut: 'Nettoyé',
+    stDel: 'Supprimé',
+    stMod: 'Modifié',
+    stOff: 'Restauré',
+    removed: 'supprimé',
+    emptyRow: 'sous-titre vide dans la source',
+    btnUndo: 'Restaurer',
+    btnAdopt: 'Appliquer',
+    btnDownload: 'Télécharger',
+    btnCopy: 'Copier',
+    btnTxt: 'Texte brut',
+    btnUndoAll: 'Tout restaurer',
+    noChange: 'Rien à nettoyer. Ce fichier est déjà propre.',
+    pvTitle: 'Sous-titres nettoyés',
+    pvTitleRaw: 'Sous-titres originaux',
+    pvUnit: 'lignes',
+    pvOut: 'Nettoyé',
+    pvRaw: 'Original',
+    pvNone: 'Aucun contenu dans ce fichier',
+    pvMore: 'Affichage des {n} premières lignes sur {t} — téléchargez pour le fichier complet',
+    okParse: '{n} sous-titres analysés · source {f}',
+    okEnc: 'encodage corrigé en {e}',
+    assNote: 'Le style ASS est traité comme du contenu ; export en SRT',
+    outFmt: 'Format d\'export',
+    outAssOff: 'L\'export ASS nécessite une source ASS',
+    outAssNote: 'Styles et résolution conservés, seul le texte est remplacé',
+    biFound: '{n} paires bilingues détectées, fusionnées en un sous-titre',
+    biOrderSrc: 'Ligne originale en haut',
+    biOrderTgt: 'Traduction en haut',
+    biFlipSrc: 'Mettre l\'original en haut',
+    biFlipTgt: 'Mettre la traduction en haut',
+    errParse: 'Aucun sous-titre analysé. Formats pris en charge : SRT, VTT, ASS (et SSA).',
+    errEmpty: 'Ce fichier est vide',
+    noFile: 'Importez d\'abord un fichier de sous-titres',
+    okDl: 'Téléchargé',
+    okCopy: 'Copié',
+    errCopy: 'Échec de la copie, sélectionnez et copiez manuellement',
+    optOn: '{n} règles sur {t} activées',
+    pasteSrc: 'contenu collé',
+    footHome: 'Traduire les sous-titres',
+    footMerge: 'Fusionner les sous-titres',
+    heroA: 'Sous-titre',
+    heroEm: 'Nettoyeur',
+    heroSub: 'Supprimez les balises HTML, les effets ASS, les indications SDH, les mentions de locuteur et les filigranes de teams, puis corrigez les majuscules et les caractères mal encodés.',
+    footBrand: 'AI-SRTSub · Nettoyeur de sous-titres'
+  },
+  'id': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Unggah subtitle',
+    dzTxt: 'Letakkan file di sini, atau klik untuk memilih',
+    pastePh: 'Atau tempel teks subtitle di sini',
+    btnClear: 'Bersihkan',
+    optTitle: 'Aturan pembersihan',
+    repTitle: 'Hasil dan ekspor',
+    grpTag: 'Tag dan format',
+    grpSdh: 'Tuna rungu',
+    grpJunk: 'Watermark dan sampah',
+    grpText: 'Perbaikan teks',
+    oAssFx: 'Hapus tag efek ASS',
+    oHtml: 'Hapus tag HTML',
+    oCtrl: 'Hapus karakter kontrol',
+    oSort: 'Urutkan per waktu dan nomori ulang',
+    oSdh: 'Hapus cue tuna rungu',
+    oSpeaker: 'Hapus label pembicara',
+    oMusic: 'Hapus baris khusus lirik',
+    oWm: 'Hapus watermark dan iklan',
+    oDup: 'Hapus cue duplikat',
+    oEmpty: 'Hapus cue kosong',
+    oPunct: 'Normalkan tanda baca',
+    oUpper: 'Perbaiki baris HURUF BESAR',
+    oMerge: 'Gabung cue pendek bersebelahan',
+    tip_assFx: 'Menghapus penanda efek SubStation seperti {\\an8}. Tidak berfungsi di SRT dan tampil sebagai teks biasa.',
+    tip_html: 'Menghapus tag seperti <i>, <b>, <font> dan menyisakan teksnya. Sebagian besar pemutar tidak mendukungnya.',
+    tip_ctrl: 'Menghapus karakter kontrol tak terlihat, zero-width, dan soft hyphen yang merusak pencarian dan penghitungan.',
+    tip_sort: 'Mengurutkan ulang berdasarkan waktu mulai dan menomori ulang. Teks tidak diubah.',
+    tip_sdh: 'Menghapus deskripsi suara untuk penonton tuna rungu, seperti [langkah kaki] atau (batuk). Dialog tetap dipertahankan.',
+    tip_speaker: 'Menghapus nama pembicara di awal baris seperti GEORGE:. Baris biasa tidak terpengaruh.',
+    tip_music: 'Menghapus cue yang isinya hanya lirik ♪…♪. Dialog yang mengutip lirik tetap dipertahankan.',
+    tip_wm: 'Menghapus watermark grup rilis, URL, email, dan iklan. Hanya cue pendek yang dinilai, jadi dialog panjang aman.',
+    tip_dup: 'Menghapus cue dengan waktu dan teks yang persis sama, menyisakan yang pertama.',
+    tip_empty: 'Menghapus cue yang tidak berisi teks sama sekali.',
+    tip_punct: 'Merapikan spasi berlebih dan titik berulang. Tanda kutip dan bentuk lebar tidak diubah.',
+    tip_upper: 'Mengubah cue huruf besar semua menjadi huruf normal. Nama diri tidak bisa dipulihkan, jadi periksa kembali nama.',
+    tip_merge: 'Menggabung cue bersebelahan yang lebih pendek dari 1,2 detik dengan jeda di bawah 0,4 detik. Berguna saat subtitle berkedip.',
+    thTime: 'Waktu',
+    thOld: 'Sebelum',
+    thNew: 'Sesudah',
+    stRaw: 'Asli',
+    stOut: 'Dibersihkan',
+    stDel: 'Dihapus',
+    stMod: 'Diubah',
+    stOff: 'Dipulihkan',
+    removed: 'dihapus',
+    emptyRow: '(cue kosong di file sumber)',
+    btnUndo: 'Pulihkan',
+    btnAdopt: 'Terapkan',
+    btnDownload: 'Unduh',
+    btnCopy: 'Salin',
+    btnTxt: 'Teks biasa',
+    btnUndoAll: 'Pulihkan semua',
+    noChange: 'Tidak ada yang perlu dibersihkan. File ini sudah rapi.',
+    pvTitle: 'Subtitle bersih',
+    pvTitleRaw: 'Subtitle asli',
+    pvUnit: 'baris',
+    pvOut: 'Bersih',
+    pvRaw: 'Asli',
+    pvNone: 'Tidak ada konten di file ini',
+    pvMore: 'Menampilkan {n} dari {t} baris pertama — unduh untuk file lengkap',
+    okParse: '{n} cue berhasil diurai · sumber {f}',
+    okEnc: 'encoding diperbaiki menjadi {e}',
+    assNote: 'Gaya ASS diperlakukan sebagai konten; diekspor sebagai SRT',
+    outFmt: 'Ekspor sebagai',
+    outAssOff: 'Output ASS butuh sumber ASS',
+    outAssNote: 'Gaya dan resolusi dipertahankan, hanya teks yang diganti',
+    biFound: 'Ditemukan {n} pasangan bilingual, digabung jadi satu cue',
+    biOrderSrc: 'Baris asli di atas',
+    biOrderTgt: 'Terjemahan di atas',
+    biFlipSrc: 'Jadikan asli di atas',
+    biFlipTgt: 'Jadikan terjemahan di atas',
+    errParse: 'Tidak bisa mengurai cue. Didukung: SRT, VTT, ASS (dan SSA).',
+    errEmpty: 'File itu kosong',
+    noFile: 'Unggah file subtitle dulu',
+    okDl: 'Terunduh',
+    okCopy: 'Tersalin',
+    errCopy: 'Gagal menyalin, pilih dan salin secara manual',
+    optOn: '{n} dari {t} aturan aktif',
+    pasteSrc: 'konten yang ditempel',
+    footHome: 'Terjemahkan subtitle',
+    footMerge: 'Gabungkan subtitle',
+    heroA: 'Subjudul',
+    heroEm: 'Pembersih',
+    heroSub: 'Hapus tag HTML, efek ASS, cue SDH, label pembicara, dan watermark grup, lalu perbaiki huruf kapital semua dan mojibake.',
+    footBrand: 'AI-SRTSub · Pembersih Subtitle'
+  },
+  'hi': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'सबटाइटल अपलोड करें',
+    dzTxt: 'फ़ाइल यहाँ ड्रॉप करें, या चुनने के लिए क्लिक करें',
+    pastePh: 'या अपना सबटाइटल टेक्स्ट यहाँ पेस्ट करें',
+    btnClear: 'साफ़ करें',
+    optTitle: 'सफ़ाई नियम',
+    repTitle: 'परिणाम और एक्सपोर्ट',
+    grpTag: 'टैग और फ़ॉर्मैटिंग',
+    grpSdh: 'श्रवण-बाधित',
+    grpJunk: 'वॉटरमार्क और कचरा',
+    grpText: 'टेक्स्ट सुधार',
+    oAssFx: 'ASS इफ़ेक्ट टैग हटाएँ',
+    oHtml: 'HTML टैग हटाएँ',
+    oCtrl: 'कंट्रोल कैरेक्टर हटाएँ',
+    oSort: 'समय से क्रमबद्ध करें और पुनः क्रमांकित करें',
+    oSdh: 'श्रवण-बाधित क्यू हटाएँ',
+    oSpeaker: 'स्पीकर लेबल हटाएँ',
+    oMusic: 'सिर्फ़ लिरिक्स वाली पंक्तियाँ हटाएँ',
+    oWm: 'वॉटरमार्क और विज्ञापन हटाएँ',
+    oDup: 'डुप्लिकेट क्यू हटाएँ',
+    oEmpty: 'खाली क्यू हटाएँ',
+    oPunct: 'विराम चिह्न सामान्य करें',
+    oUpper: 'सभी कैपिटल पंक्तियाँ ठीक करें',
+    oMerge: 'बहुत छोटी आसन्न क्यू मर्ज करें',
+    tip_assFx: '{\\an8} जैसे SubStation प्रभाव मार्कर हटाता है। SRT में ये कुछ नहीं करते और सामान्य टेक्स्ट के रूप में दिखाई देते हैं।',
+    tip_html: '<i>, <b>, <font> जैसे टैग हटाता है और अंदर का टेक्स्ट रखता है। ज़्यादातर प्लेयर्स इन्हें सपोर्ट नहीं करते।',
+    tip_ctrl: 'अदृश्य कंट्रोल, ज़ीरो-विड्थ और सॉफ़्ट-हाइफ़न कैरेक्टर हटाता है, जो खोज और गिनती खराब करते हैं।',
+    tip_sort: 'शुरू समय से फिर क्रमबद्ध करता है और पुनः क्रमांकित करता है। टेक्स्ट नहीं बदलता।',
+    tip_sdh: 'बधिर दर्शकों के लिए ध्वनि विवरण हटाता है, जैसे [कदमों की आवाज़] या (खाँसी)। संवाद सुरक्षित रहता है।',
+    tip_speaker: 'GEORGE: जैसे शुरुआती स्पीकर नाम हटाता है। सामान्य पंक्तियाँ प्रभावित नहीं होतीं।',
+    tip_music: 'ऐसी क्यू हटाता है जिनमें सिर्फ़ ♪ लिरिक्स ♪ हों। संवाद जिसमें लिरिक्स का हवाला हो, रखा जाता है।',
+    tip_wm: 'रिलीज़-ग्रुप वॉटरमार्क, URL, ईमेल और विज्ञापन हटाता है। केवल छोटी क्यू जाँची जाती हैं, इसलिए लंबा संवाद सुरक्षित रहता है।',
+    tip_dup: 'समान समय और टेक्स्ट वाली क्यू हटाता है, पहली को रखता है।',
+    tip_empty: 'ऐसी क्यू हटाता है जिनमें कोई टेक्स्ट नहीं होता।',
+    tip_punct: 'अतिरिक्त स्पेस और दोहराए गए डॉट हटाता है। कोट्स या फुल-विड्थ रूपों को कभी नहीं बदलता।',
+    tip_upper: 'पूरी तरह अपरकेस क्यू को सामान्य केस में बदलता है। व्यक्तिवाचक संज्ञाएँ बहाल नहीं की जा सकतीं, इसलिए नामों को प्रूफ़रीड करें।',
+    tip_merge: '1.2s से छोटी और 0.4s से कम अंतराल वाली आसन्न क्यू जोड़ता है। जब सबटाइटल तेज़ी से बदलते हों तो उपयोगी।',
+    thTime: 'समय',
+    thOld: 'पहले',
+    thNew: 'बाद',
+    stRaw: 'मूल',
+    stOut: 'साफ़ किया',
+    stDel: 'हटाया गया',
+    stMod: 'संशोधित',
+    stOff: 'पूर्ववत किया गया',
+    removed: 'हटाया गया',
+    emptyRow: 'स्रोत में खाली क्यू',
+    btnUndo: 'पूर्ववत करें',
+    btnAdopt: 'लागू करें',
+    btnDownload: 'डाउनलोड',
+    btnCopy: 'कॉपी करें',
+    btnTxt: 'सादा टेक्स्ट',
+    btnUndoAll: 'सभी पूर्ववत करें',
+    noChange: 'साफ़ करने के लिए कुछ नहीं है। यह फ़ाइल पहले से ही साफ़ है।',
+    pvTitle: 'साफ़ किए गए उपशीर्षक',
+    pvTitleRaw: 'मूल उपशीर्षक',
+    pvUnit: 'पंक्तियाँ',
+    pvOut: 'साफ़ किया गया',
+    pvRaw: 'मूल',
+    pvNone: 'इस फ़ाइल में कोई सामग्री नहीं है',
+    pvMore: '{t} में से पहली {n} पंक्तियाँ दिखाई जा रही हैं — पूरी फ़ाइल के लिए डाउनलोड करें',
+    okParse: '{n} क्यू पार्स किए गए · स्रोत {f}',
+    okEnc: 'एन्कोडिंग {e} के रूप में ठीक की गई',
+    assNote: 'ASS स्टाइल को सामग्री माना जाता है; SRT के रूप में निर्यात होता है',
+    outFmt: 'इस रूप में निर्यात करें',
+    outAssOff: 'ASS निर्यात के लिए ASS स्रोत चाहिए',
+    outAssNote: 'स्टाइल और रिज़ॉल्यूशन वैसे ही रहते हैं, केवल टेक्स्ट बदला जाता है',
+    biFound: '{n} द्विभाषी जोड़े मिले, हर जोड़े को एक क्यू में मिला दिया गया',
+    biOrderSrc: 'मूल पंक्ति ऊपर',
+    biOrderTgt: 'अनुवाद ऊपर',
+    biFlipSrc: 'मूल को ऊपर रखें',
+    biFlipTgt: 'अनुवाद को ऊपर रखें',
+    errParse: 'कोई क्यू पार्स नहीं हो सका। समर्थित: SRT, VTT, ASS (और SSA)।',
+    errEmpty: 'वह फ़ाइल खाली है',
+    noFile: 'पहले एक उपशीर्षक फ़ाइल अपलोड करें',
+    okDl: 'डाउनलोड हो गया',
+    okCopy: 'कॉपी हो गया',
+    errCopy: 'कॉपी विफल रही, कृपया मैन्युअल रूप से चुनकर कॉपी करें',
+    optOn: '{t} में से {n} नियम चालू',
+    pasteSrc: 'पेस्ट की गई सामग्री',
+    footHome: 'उपशीर्षक अनुवाद करें →',
+    footMerge: 'उपशीर्षक मर्ज करें →',
+    heroA: 'उपशीर्षक',
+    heroEm: 'क्लीनर',
+    heroSub: 'HTML टैग, ASS इफ़ेक्ट, SDH क्यू, स्पीकर लेबल और ग्रुप वॉटरमार्क हटाएँ, साथ ही ऑल-कैप्स और मोजिबेक ठीक करें',
+    footBrand: 'AI-SRTSub · उपशीर्षक क्लीनर'
+  },
+  'th': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'อัปโหลดคำบรรยาย',
+    dzTxt: 'ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือก',
+    pastePh: 'หรือวางข้อความคำบรรยายที่นี่',
+    btnClear: 'ล้าง',
+    optTitle: 'กฎการล้างข้อมูล',
+    repTitle: 'ผลลัพธ์และการส่งออก',
+    grpTag: 'แท็กและการจัดรูปแบบ',
+    grpSdh: 'ผู้บกพร่องทางการได้ยิน',
+    grpJunk: 'ลายน้ำและรายการขยะ',
+    grpText: 'การแก้ไขข้อความ',
+    oAssFx: 'ลบแท็กเอฟเฟกต์ ASS',
+    oHtml: 'ลบแท็ก HTML',
+    oCtrl: 'ลบอักขระควบคุม',
+    oSort: 'เรียงตามเวลาและกำหนดเลขใหม่',
+    oSdh: 'ลบคำบรรยายสำหรับผู้บกพร่องทางการได้ยิน',
+    oSpeaker: 'ลบป้ายชื่อผู้พูด',
+    oMusic: 'ลบบรรทัดที่มีแต่เนื้อเพลง',
+    oWm: 'ลบลายน้ำและโฆษณา',
+    oDup: 'ลบคำบรรยายที่ซ้ำกัน',
+    oEmpty: 'ลบคำบรรยายที่ว่างเปล่า',
+    oPunct: 'จัดมาตรฐานเครื่องหมายวรรคตอน',
+    oUpper: 'แก้บรรทัดที่พิมพ์ใหญ่ทั้งหมด',
+    oMerge: 'รวมคำบรรยายสั้นที่ติดกัน',
+    tip_assFx: 'ลบเครื่องหมายเอฟเฟกต์ SubStation เช่น {\\an8}, {\\f4} เครื่องหมายเหล่านี้ไม่มีผลใน SRT และโปรแกรมเล่นจะแสดงเป็นข้อความธรรมดา',
+    tip_html: 'ลบแท็กเช่น <i>, <b>, <font> โดยเก็บข้อความข้างในไว้ โปรแกรมเล่นส่วนใหญ่ไม่รองรับแท็กเหล่านี้',
+    tip_ctrl: 'ลบอักขระควบคุมที่มองไม่เห็น อักขระความกว้างศูนย์ และยัติภังค์อ่อน ที่ทำให้การค้นหาและการนับตัวอักษรผิดพลาด',
+    tip_sort: 'เรียงลำดับใหม่ตามเวลาเริ่มและกำหนดเลขใหม่ ข้อความไม่ถูกแก้ไข แค่สลับลำดับ',
+    tip_sdh: 'ลบคำอธิบายเสียงสำหรับผู้ชมที่บกพร่องทางการได้ยิน เช่น [เสียงฝีเท้า] หรือ (เสียงไอ) โดยเก็บบทสนทนาไว้',
+    tip_speaker: 'ลบชื่อผู้พูดที่อยู่ต้นบรรทัด เช่น GEORGE: บรรทัดปกติจะไม่ถูกลบ',
+    tip_music: 'ลบคำบรรยายที่มีแต่เนื้อเพลง ♪…♪ บทสนทนาที่อ้างเนื้อเพลงจะถูกเก็บไว้',
+    tip_wm: 'ลบลายน้ำของกลุ่มทำซับ URL อีเมล และโฆษณา ตรวจเฉพาะคำบรรยายสั้น บทสนทนายาวจะไม่ถูกลบ',
+    tip_dup: 'ลบคำบรรยายที่มีเวลาและข้อความเหมือนกันทั้งหมด โดยเก็บรายการแรกไว้',
+    tip_empty: 'ลบคำบรรยายที่ไม่มีข้อความใด ๆ',
+    tip_punct: 'ตัดช่องว่างเกิน ช่องว่างท้ายบรรทัด และจุดซ้ำ โดยไม่แก้รูปแบบเต็มความกว้างหรือเครื่องหมายคำพูด',
+    tip_upper: 'แปลงคำบรรยายที่พิมพ์ใหญ่ทั้งหมดเป็นตัวพิมพ์ปกติ โดยตัวแรกของประโยคจะเป็นตัวใหญ่ ชื่อเฉพาะจะกู้คืนไม่ได้ ควรตรวจทานชื่อ',
+    tip_merge: 'รวมคำบรรยายที่ติดกันซึ่งสั้นกว่า 1.2 วินาที และมีช่องว่างน้อยกว่า 0.4 วินาที ให้เป็นรายการเดียว ใช้เมื่อคำบรรยายตัดเร็วเกินไป',
+    thTime: 'เวลา',
+    thOld: 'ก่อน',
+    thNew: 'หลัง',
+    stRaw: 'ต้นฉบับ',
+    stOut: 'ล้างแล้ว',
+    stDel: 'ลบแล้ว',
+    stMod: 'แก้ไขแล้ว',
+    stOff: 'ย้อนกลับแล้ว',
+    removed: 'ลบแล้ว',
+    emptyRow: 'คิวว่างในไฟล์ต้นฉบับ',
+    btnUndo: 'ย้อนกลับ',
+    btnAdopt: 'นำไปใช้',
+    btnDownload: 'ดาวน์โหลด',
+    btnCopy: 'คัดลอก',
+    btnTxt: 'ข้อความล้วน',
+    btnUndoAll: 'ย้อนกลับทั้งหมด',
+    noChange: 'ไม่มีอะไรต้องล้าง ไฟล์นี้สะอาดอยู่แล้ว',
+    pvTitle: 'คำบรรยายที่ล้างแล้ว',
+    pvTitleRaw: 'คำบรรยายต้นฉบับ',
+    pvUnit: 'บรรทัด',
+    pvOut: 'ล้างแล้ว',
+    pvRaw: 'ต้นฉบับ',
+    pvNone: 'ไฟล์นี้ไม่มีเนื้อหา',
+    pvMore: 'แสดง {n} จาก {t} บรรทัดแรก — ดาวน์โหลดเพื่อดูไฟล์ทั้งหมด',
+    okParse: 'แยกได้ {n} คิว · ต้นฉบับ {f}',
+    okEnc: 'แก้ไขการเข้ารหัสเป็น {e}',
+    assNote: 'สไตล์ ASS ถือเป็นเนื้อหา ส่งออกเป็น SRT',
+    outFmt: 'ส่งออกเป็น',
+    outAssOff: 'ส่งออก ASS ต้องมีต้นฉบับ ASS',
+    outAssNote: 'เก็บสไตล์และความละเอียดไว้ เปลี่ยนเฉพาะข้อความ',
+    biFound: 'พบคู่สองภาษา {n} คู่ รวมเป็นคิวเดียว',
+    biOrderSrc: 'บรรทัดต้นฉบับอยู่บน',
+    biOrderTgt: 'คำแปลอยู่บน',
+    biFlipSrc: 'ตั้งต้นฉบับไว้บน',
+    biFlipTgt: 'ตั้งคำแปลไว้บน',
+    errParse: 'แยกคิวไม่ได้ รองรับ SRT / VTT / ASS (และ SSA)',
+    errEmpty: 'ไฟล์นั้นว่างเปล่า',
+    noFile: 'อัปโหลดไฟล์คำบรรยายก่อน',
+    okDl: 'ดาวน์โหลดแล้ว',
+    okCopy: 'คัดลอกแล้ว',
+    errCopy: 'คัดลอกไม่สำเร็จ กรุณาเลือกและคัดลอกเอง',
+    optOn: 'เปิด {n} จาก {t} กฎ',
+    pasteSrc: 'เนื้อหาที่วาง',
+    footHome: 'แปลซับไทเทิล',
+    footMerge: 'รวมซับไทเทิล',
+    heroA: 'ซับไทเทิล',
+    heroEm: 'คลีนเนอร์',
+    heroSub: 'ลบแท็ก HTML, เอฟเฟกต์ ASS, คิว SDH, ป้ายผู้พูด และลายน้ำกลุ่ม พร้อมแก้ตัวพิมพ์ใหญ่ทั้งหมดและอักขระเพี้ยน',
+    footBrand: 'AI-SRTSub · ซับไทเทิลคลีนเนอร์'
+  },
+  'vi': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Tải phụ đề lên',
+    dzTxt: 'Kéo tệp vào đây, hoặc bấm để chọn',
+    pastePh: 'Hoặc dán nội dung phụ đề vào đây',
+    btnClear: 'Xóa',
+    optTitle: 'Quy tắc làm sạch',
+    repTitle: 'Kết quả và xuất',
+    grpTag: 'Thẻ và định dạng',
+    grpSdh: 'Khiếm thính và âm thanh',
+    grpJunk: 'Watermark và mục rác',
+    grpText: 'Sửa văn bản',
+    oAssFx: 'Bỏ thẻ hiệu ứng ASS',
+    oHtml: 'Bỏ thẻ HTML',
+    oCtrl: 'Bỏ ký tự điều khiển',
+    oSort: 'Sắp xếp theo thời gian và đánh số lại',
+    oSdh: 'Bỏ chú thích khiếm thính',
+    oSpeaker: 'Bỏ nhãn người nói',
+    oMusic: 'Xóa dòng chỉ có lời nhạc',
+    oWm: 'Bỏ watermark và quảng cáo',
+    oDup: 'Bỏ mục trùng lặp',
+    oEmpty: 'Bỏ mục rỗng',
+    oPunct: 'Chuẩn hóa dấu câu và khoảng trắng',
+    oUpper: 'Sửa dòng viết HOA toàn bộ',
+    oMerge: 'Gộp các mục ngắn liền kề',
+    tip_assFx: 'Loại bỏ các thẻ hiệu ứng SubStation như {\\an8}. Chúng không có tác dụng trong SRT và sẽ hiện ra thành chữ.',
+    tip_html: 'Loại bỏ các thẻ như <i>, <b>, <font> và giữ lại phần chữ bên trong. Hầu hết trình phát không hỗ trợ các thẻ này.',
+    tip_ctrl: 'Loại bỏ ký tự điều khiển vô hình, ký tự độ rộng bằng không và gạch nối mềm, vốn phá vỡ tìm kiếm và đếm ký tự.',
+    tip_sort: 'Sắp xếp lại theo thời gian bắt đầu và đánh số lại. Không thay đổi nội dung.',
+    tip_sdh: 'Loại bỏ các mô tả âm thanh dành cho người khiếm thính như [tiếng bước chân] hay (tiếng ho). Phần lời thoại được giữ nguyên.',
+    tip_speaker: 'Loại bỏ tên người nói ở đầu dòng như GEORGE:. Các dòng thông thường không bị ảnh hưởng.',
+    tip_music: 'Xóa các mục chỉ toàn ♪ lời nhạc ♪. Lời thoại có trích dẫn lời nhạc vẫn được giữ.',
+    tip_wm: 'Loại bỏ watermark của nhóm dịch, URL, email và quảng cáo. Chỉ xét các mục ngắn nên lời thoại dài vẫn an toàn.',
+    tip_dup: 'Loại bỏ các mục trùng hoàn toàn về thời gian và nội dung, chỉ giữ mục đầu tiên.',
+    tip_empty: 'Loại bỏ các mục không có nội dung nào.',
+    tip_punct: 'Cắt khoảng trắng thừa và dấu chấm lặp. Không bao giờ thay đổi dấu ngoặc hay dạng toàn rộng.',
+    tip_upper: 'Chuyển các mục viết hoa toàn bộ về chữ thường. Không khôi phục được danh từ riêng, nên hãy kiểm tra lại tên riêng.',
+    tip_merge: 'Gộp hai mục liền kề ngắn hơn 1,2 giây với khoảng cách dưới 0,4 giây. Dùng khi phụ đề nhấp nháy quá nhanh.',
+    thTime: 'Thời gian',
+    thOld: 'Trước',
+    thNew: 'Sau',
+    stRaw: 'Gốc',
+    stOut: 'Đã làm sạch',
+    stDel: 'Đã xóa',
+    stMod: 'Đã sửa',
+    stOff: 'Đã khôi phục',
+    removed: 'đã xóa',
+    emptyRow: '(dòng trống trong tệp nguồn)',
+    btnUndo: 'Khôi phục',
+    btnAdopt: 'Áp dụng',
+    btnDownload: 'Tải xuống',
+    btnCopy: 'Sao chép',
+    btnTxt: 'Văn bản thuần',
+    btnUndoAll: 'Khôi phục tất cả',
+    noChange: 'Không có gì cần làm sạch. Tệp này vốn đã sạch.',
+    pvTitle: 'Phụ đề đã làm sạch',
+    pvTitleRaw: 'Phụ đề gốc',
+    pvUnit: 'dòng',
+    pvOut: 'Đã làm sạch',
+    pvRaw: 'Gốc',
+    pvNone: 'Tệp này không có nội dung',
+    pvMore: 'Chỉ hiển thị {n} trong {t} dòng — tải xuống để xem toàn bộ',
+    okParse: 'Đã phân tích {n} phụ đề · định dạng nguồn {f}',
+    okEnc: 'đã sửa mã hóa thành {e}',
+    assNote: 'Kiểu dáng ASS được coi là nội dung; xuất ra SRT',
+    outFmt: 'Xuất dưới dạng',
+    outAssOff: 'Chỉ xuất được ASS khi nguồn là ASS',
+    outAssNote: 'Giữ nguyên kiểu dáng và độ phân giải, chỉ thay văn bản',
+    biFound: 'Đã tìm thấy {n} cặp song ngữ, gộp thành một dòng mỗi cặp',
+    biOrderSrc: 'Hiện tại: bản gốc ở trên',
+    biOrderTgt: 'Hiện tại: bản dịch ở trên',
+    biFlipSrc: 'Đặt bản gốc lên trên',
+    biFlipTgt: 'Đặt bản dịch lên trên',
+    errParse: 'Không phân tích được phụ đề. Hỗ trợ: SRT, VTT, ASS (và SSA).',
+    errEmpty: 'Tệp trống',
+    noFile: 'Hãy tải lên tệp phụ đề trước',
+    okDl: 'Đã tải xuống',
+    okCopy: 'Đã sao chép',
+    errCopy: 'Sao chép thất bại, vui lòng chọn và sao chép thủ công',
+    optOn: 'Đang bật {n}/{t} quy tắc',
+    pasteSrc: 'nội dung đã dán',
+    footHome: 'Dịch phụ đề',
+    footMerge: 'Gộp phụ đề',
+    heroA: 'Phụ đề',
+    heroEm: 'Làm sạch',
+    heroSub: 'Loại bỏ thẻ HTML, hiệu ứng ASS, phụ đề SDH, nhãn người nói và watermark nhóm dịch, sau đó sửa chữ in hoa toàn bộ và lỗi mã hóa.',
+    footBrand: 'AI-SRTSub · Trình làm sạch phụ đề'
+  },
+  'ru': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Загрузить субтитры',
+    dzTxt: 'Перетащите файл сюда или нажмите, чтобы выбрать',
+    pastePh: 'Или вставьте текст субтитров сюда',
+    btnClear: 'Очистить',
+    optTitle: 'Правила очистки',
+    repTitle: 'Результат и экспорт',
+    grpTag: 'Теги и форматирование',
+    grpSdh: 'Для слабослышащих',
+    grpJunk: 'Водяные знаки и мусор',
+    grpText: 'Исправление текста',
+    oAssFx: 'Убрать ASS-эффекты',
+    oHtml: 'Убрать HTML-теги',
+    oCtrl: 'Убрать управляющие символы',
+    oSort: 'Сортировать по времени и перенумеровать',
+    oSdh: 'Убрать реплики для слабослышащих',
+    oSpeaker: 'Убрать имена говорящих',
+    oMusic: 'Удалить строки только с текстом песни',
+    oWm: 'Убрать водяные знаки и рекламу',
+    oDup: 'Убрать дубликаты реплик',
+    oEmpty: 'Убрать пустые реплики',
+    oPunct: 'Нормализовать пунктуацию и пробелы',
+    oUpper: 'Исправить ВЕРХНИЙ РЕГИСТР',
+    oMerge: 'Объединять очень короткие соседние реплики',
+    tip_assFx: 'Удаляет маркеры эффектов SubStation вроде {\\an8}. В SRT они не работают и отображаются как текст.',
+    tip_html: 'Удаляет теги вроде <i>, <b>, <font>, оставляя текст внутри. Большинство плееров их не поддерживает.',
+    tip_ctrl: 'Удаляет невидимые управляющие символы, символы нулевой ширины и мягкие дефисы, которые ломают поиск и подсчёт.',
+    tip_sort: 'Пересортировывает по времени начала и перенумеровывает. Текст не меняется.',
+    tip_sdh: 'Удаляет звуковые описания для слабослышащих, вроде [шаги] или (кашель). Диалоги сохраняются.',
+    tip_speaker: 'Удаляет имена говорящих в начале строки, например GEORGE:. Обычные строки не затрагиваются.',
+    tip_music: 'Удаляет реплики, состоящие только из ♪ текста песни ♪. Диалоги с цитатой из песни сохраняются.',
+    tip_wm: 'Удаляет водяные знаки релиз-групп, ссылки, e-mail и рекламу. Проверяются только короткие реплики, длинные диалоги не затрагиваются.',
+    tip_dup: 'Удаляет реплики с полностью совпадающими таймингом и текстом, оставляя первую.',
+    tip_empty: 'Удаляет реплики, в которых вообще нет текста.',
+    tip_punct: 'Убирает лишние пробелы и повторяющиеся точки. Не меняет кавычки и полноширинные формы.',
+    tip_upper: 'Преобразует реплики, целиком набранные в верхнем регистре, в обычный регистр. Имена собственные не восстановятся, поэтому проверьте имена.',
+    tip_merge: 'Объединяет соседние реплики короче 1,2 с, если между ними промежуток меньше 0,4 с. Полезно, когда субтитры мигают.',
+    thTime: 'Время',
+    thOld: 'До',
+    thNew: 'После',
+    stRaw: 'Оригинал',
+    stOut: 'Очищено',
+    stDel: 'Удалено',
+    stMod: 'Изменено',
+    stOff: 'Возвращено',
+    removed: 'удалено',
+    emptyRow: '(пустая реплика в исходном файле)',
+    btnUndo: 'Вернуть',
+    btnAdopt: 'Применить',
+    btnDownload: 'Скачать',
+    btnCopy: 'Копировать',
+    btnTxt: 'Текст',
+    btnUndoAll: 'Вернуть всё',
+    noChange: 'Нечего чистить. Этот файл уже чистый.',
+    pvTitle: 'Очищенные субтитры',
+    pvTitleRaw: 'Исходные субтитры',
+    pvUnit: 'строк',
+    pvOut: 'Очищено',
+    pvRaw: 'Оригинал',
+    pvNone: 'В этом файле нет содержимого',
+    pvMore: 'Показаны первые {n} из {t} строк — скачайте файл, чтобы увидеть все',
+    okParse: 'Разобрано {n} реплик · исходный формат {f}',
+    okEnc: 'кодировка исправлена на {e}',
+    assNote: 'Стили ASS обрабатываются как содержимое; экспорт в SRT',
+    outFmt: 'Формат экспорта',
+    outAssOff: 'Экспорт в ASS возможен только из ASS',
+    outAssNote: 'Стили и разрешение сохраняются, заменяется только текст',
+    biFound: 'Найдено {n} двуязычных пар, каждая объединена в одну реплику',
+    biOrderSrc: 'Оригинал сверху',
+    biOrderTgt: 'Перевод сверху',
+    biFlipSrc: 'Оригинал наверх',
+    biFlipTgt: 'Перевод наверх',
+    errParse: 'Не удалось разобрать субтитры. Поддерживаются: SRT, VTT, ASS (и SSA).',
+    errEmpty: 'Файл пустой',
+    noFile: 'Сначала загрузите файл субтитров',
+    okDl: 'Скачано',
+    okCopy: 'Скопировано',
+    errCopy: 'Не удалось скопировать, выделите и скопируйте вручную',
+    optOn: 'Включено {n} из {t} правил',
+    pasteSrc: 'вставленный текст',
+    footHome: 'Перевести субтитры →',
+    footMerge: 'Объединить субтитры →',
+    heroA: 'Субтитры',
+    heroEm: 'Очистка',
+    heroSub: 'Убирает HTML-теги, ASS-эффекты, пометки SDH, метки говорящих и водяные знаки релиз-групп, исправляет капс и кракозябры.',
+    footBrand: 'AI-SRTSub · Очистка субтитров'
+  },
+  'it': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Carica sottotitoli',
+    dzTxt: 'Trascina qui un file o fai clic per sceglierne uno',
+    pastePh: 'Oppure incolla qui il testo dei sottotitoli',
+    btnClear: 'Cancella',
+    optTitle: 'Regole di pulizia',
+    repTitle: 'Risultato ed esportazione',
+    grpTag: 'Tag e formattazione',
+    grpSdh: 'Non udenti',
+    grpJunk: 'Watermark e scarti',
+    grpText: 'Correzioni testo',
+    oAssFx: 'Rimuovi tag effetto ASS',
+    oHtml: 'Rimuovi tag HTML',
+    oCtrl: 'Rimuovi caratteri di controllo',
+    oSort: 'Ordina per tempo e rinumera',
+    oSdh: 'Rimuovi cue per non udenti',
+    oSpeaker: 'Rimuovi nomi dei parlanti',
+    oMusic: 'Elimina righe di soli testi',
+    oWm: 'Rimuovi watermark e pubblicità',
+    oDup: 'Rimuovi cue duplicati',
+    oEmpty: 'Rimuovi cue vuoti',
+    oPunct: 'Normalizza punteggiatura e spazi',
+    oUpper: 'Correggi righe TUTTO MAIUSCOLO',
+    oMerge: 'Unisci cue vicini troppo brevi',
+    tip_assFx: 'Rimuove marcatori di effetto SubStation come {\\an8}. In SRT non hanno effetto e appaiono come testo.',
+    tip_html: 'Rimuove tag come <i>, <b>, <font> mantenendo il testo interno. Molti player non li supportano.',
+    tip_ctrl: 'Rimuove caratteri di controllo invisibili, a larghezza zero e trattini soft che rompono ricerca e conteggio.',
+    tip_sort: 'Riordina per ora di inizio e rinumera. Il testo non viene toccato.',
+    tip_sdh: 'Rimuove le descrizioni sonore per non udenti, come [passi] o (tossisce). I dialoghi restano.',
+    tip_speaker: 'Rimuove i nomi dei parlanti a inizio riga, come GEORGE:. Le righe normali non vengono toccate.',
+    tip_music: 'Elimina i cue composti solo da ♪ testo ♪. I dialoghi che citano un testo restano.',
+    tip_wm: 'Rimuove watermark di gruppi, URL, email e pubblicità. Solo i cue brevi vengono valutati, i dialoghi lunghi sono al sicuro.',
+    tip_dup: 'Rimuove i cue con tempi e testo identici, mantenendo il primo.',
+    tip_empty: 'Rimuove i cue che non contengono alcun testo.',
+    tip_punct: 'Elimina spazi in eccesso, spazi a fine riga e punti ripetuti. Non tocca virgolette o forme a larghezza piena.',
+    tip_upper: 'Riporta i cue TUTTO MAIUSCOLO a una capitalizzazione normale. I nomi propri non si recuperano: rileggili.',
+    tip_merge: 'Unisce cue adiacenti sotto 1,2s con intervallo inferiore a 0,4s. Utile quando i sottotitoli sfarfallano.',
+    thTime: 'Tempo',
+    thOld: 'Prima',
+    thNew: 'Dopo',
+    stRaw: 'Originale',
+    stOut: 'Pulito',
+    stDel: 'Eliminato',
+    stMod: 'Modificato',
+    stOff: 'Ripristinato',
+    removed: 'rimosso',
+    emptyRow: 'battuta vuota nel file di origine',
+    btnUndo: 'Ripristina',
+    btnAdopt: 'Applica',
+    btnDownload: 'Scarica',
+    btnCopy: 'Copia',
+    btnTxt: 'Testo semplice',
+    btnUndoAll: 'Ripristina tutto',
+    noChange: 'Niente da pulire. Il file è già a posto.',
+    pvTitle: 'Sottotitoli puliti',
+    pvTitleRaw: 'Sottotitoli originali',
+    pvUnit: 'righe',
+    pvOut: 'Pulito',
+    pvRaw: 'Originale',
+    pvNone: 'Nessun contenuto in questo file',
+    pvMore: 'Prime {n} di {t} righe — scarica per il file completo',
+    okParse: '{n} battute analizzate · origine {f}',
+    okEnc: 'codifica corretta come {e}',
+    assNote: 'Lo stile ASS è trattato come contenuto; esporta in SRT',
+    outFmt: 'Esporta come',
+    outAssOff: 'L\'output ASS richiede un\'origine ASS',
+    outAssNote: 'Stili e risoluzione invariati, si sostituisce solo il testo',
+    biFound: 'Trovate {n} coppie bilingui, unite in una battuta ciascuna',
+    biOrderSrc: 'Originale in alto',
+    biOrderTgt: 'Traduzione in alto',
+    biFlipSrc: 'Metti l\'originale in alto',
+    biFlipTgt: 'Metti la traduzione in alto',
+    errParse: 'Impossibile analizzare le battute. Formati supportati: SRT, VTT, ASS (e SSA).',
+    errEmpty: 'Il file è vuoto',
+    noFile: 'Carica prima un file di sottotitoli',
+    okDl: 'Scaricato',
+    okCopy: 'Copiato',
+    errCopy: 'Copia non riuscita, seleziona e copia manualmente',
+    optOn: '{n} di {t} regole attive',
+    pasteSrc: 'contenuto incollato',
+    footHome: 'Traduci sottotitoli →',
+    footMerge: 'Unisci sottotitoli →',
+    heroA: 'Pulizia',
+    heroEm: 'sottotitoli',
+    heroSub: 'Rimuovi tag HTML, effetti ASS, didascalie SDH, etichette del parlante e watermark di gruppo, poi correggi il testo tutto in maiuscolo e i caratteri corrotti.',
+    footBrand: 'AI-SRTSub · Pulizia sottotitoli'
+  },
+  'ar': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'رفع الترجمات',
+    dzTxt: 'أفلت ملفًا هنا، أو انقر للاختيار',
+    pastePh: 'أو الصق نص الترجمة هنا',
+    btnClear: 'مسح',
+    optTitle: 'قواعد التنظيف',
+    repTitle: 'النتيجة والتصدير',
+    grpTag: 'الوسوم والتنسيق',
+    grpSdh: 'الإعاقة السمعية',
+    grpJunk: 'العلامات المائية والشوائب',
+    grpText: 'تصحيحات النص',
+    oAssFx: 'إزالة وسوم تأثيرات ASS',
+    oHtml: 'إزالة وسوم HTML',
+    oCtrl: 'إزالة أحرف التحكم',
+    oSort: 'الترتيب حسب الوقت وإعادة الترقيم',
+    oSdh: 'إزالة تلميحات ضعاف السمع',
+    oSpeaker: 'إزالة أسماء المتحدثين',
+    oMusic: 'حذف أسطر الكلمات فقط',
+    oWm: 'إزالة العلامات المائية والإعلانات',
+    oDup: 'إزالة المدخلات المكررة',
+    oEmpty: 'إزالة المدخلات الفارغة',
+    oPunct: 'توحيد علامات الترقيم والمسافات',
+    oUpper: 'تصحيح الأسطر بأحرف كبيرة',
+    oMerge: 'دمج المدخلات القصيرة المتجاورة',
+    tip_assFx: 'يزيل وسوم تأثيرات SubStation مثل {\\an8} و{\\f4}. لا تأثير لها في SRT وتظهر كنص حرفي.',
+    tip_html: 'يزيل وسوم <i> و<b> و<font> ويبقي النص داخلها. معظم المشغلات لا تدعمها وتظهرها كنص.',
+    tip_ctrl: 'يزيل أحرف التحكم غير المرئية والأحرف صفرية العرض والواصلات الناعمة التي تعطل البحث والعدّ.',
+    tip_sort: 'يعيد الترتيب حسب وقت البداية ويعيد الترقيم. لا يمس النص.',
+    tip_sdh: 'يزيل أوصاف الأصوات المخصصة لضعاف السمع مثل [خطوات] أو (سعال). يبقى الحوار كما هو.',
+    tip_speaker: 'يزيل أسماء المتحدثين في بداية السطر مثل GEORGE:. الأسطر العادية لا تتأثر.',
+    tip_music: 'يحذف المدخلات التي لا تحتوي إلا على كلمات أغنية ♪. الحوار الذي يقتبس كلمات يبقى.',
+    tip_wm: 'يزيل العلامات المائية وروابط المواقع والبريد والإعلانات. تُفحص المدخلات القصيرة فقط، فلا يضر الحوار الطويل.',
+    tip_dup: 'يزيل المدخلات المتطابقة في التوقيت والنص، ويبقي الأول فقط.',
+    tip_empty: 'يزيل المدخلات التي لا تحتوي أي نص.',
+    tip_punct: 'يزيل المسافات الزائدة والنقاط المتكررة. لا يغيّر علامات الاقتباس أو المحارف كاملة العرض.',
+    tip_upper: 'يحوّل المدخلات المكتوبة كلها بأحرف كبيرة إلى حالة طبيعية. لا يمكن استعادة أسماء الأعلام، فراجع الأسماء يدويًا.',
+    tip_merge: 'يدمج المدخلات المتجاورة الأقصر من 1.2 ثانية والفاصل بينها أقل من 0.4 ثانية. مفيد عند تسارع الترجمة.',
+    thTime: 'الوقت',
+    thOld: 'قبل',
+    thNew: 'بعد',
+    stRaw: 'الأصلي',
+    stOut: 'بعد التنظيف',
+    stDel: 'محذوف',
+    stMod: 'معدّل',
+    stOff: 'مُستعاد',
+    removed: 'محذوف',
+    emptyRow: 'سطر فارغ في الملف المصدر',
+    btnUndo: 'استعادة',
+    btnAdopt: 'تطبيق',
+    btnDownload: 'تنزيل',
+    btnCopy: 'نسخ',
+    btnTxt: 'نص عادي',
+    btnUndoAll: 'استعادة الكل',
+    noChange: 'لا شيء لتنظيفه. هذا الملف مرتّب بالفعل.',
+    pvTitle: 'الترجمات بعد التنظيف',
+    pvTitleRaw: 'الترجمات الأصلية',
+    pvUnit: 'سطر',
+    pvOut: 'بعد التنظيف',
+    pvRaw: 'الأصل',
+    pvNone: 'لا يوجد محتوى في هذا الملف',
+    pvMore: 'عرض أول {n} من {t} سطرًا — نزّل الملف كاملًا',
+    okParse: 'تم تحليل {n} ترجمة · الصيغة المصدر {f}',
+    okEnc: 'تم إصلاح الترميز إلى {e}',
+    assNote: 'تنسيق ASS يُعامل كمحتوى؛ يُصدَّر بصيغة SRT',
+    outFmt: 'التصدير بصيغة',
+    outAssOff: 'إخراج ASS يتطلب ملف مصدر ASS',
+    outAssNote: 'الأنماط والدقة محفوظة، ويُستبدل النص فقط',
+    biFound: 'تم العثور على {n} زوج ثنائي اللغة، ودُمج كل زوج في ترجمة واحدة',
+    biOrderSrc: 'السطر الأصلي في الأعلى',
+    biOrderTgt: 'الترجمة في الأعلى',
+    biFlipSrc: 'اجعل الأصل في الأعلى',
+    biFlipTgt: 'اجعل الترجمة في الأعلى',
+    errParse: 'تعذّر تحليل أي ترجمات. المدعوم: SRT وVTT وASS (وSSA).',
+    errEmpty: 'هذا الملف فارغ',
+    noFile: 'ارفع ملف ترجمة أولًا',
+    okDl: 'تم التنزيل',
+    okCopy: 'تم النسخ',
+    errCopy: 'فشل النسخ، يرجى التحديد والنسخ يدويًا',
+    optOn: '{n} من {t} قاعدة مفعّلة',
+    pasteSrc: 'المحتوى الملصق',
+    footHome: 'ترجمة الترجمات →',
+    footMerge: 'دمج الترجمات →',
+    heroA: 'ترجمة',
+    heroEm: 'منظّف',
+    heroSub: 'أزِل وسوم HTML وتأثيرات ASS وإشارات الصم وضعاف السمع وتسميات المتحدثين والعلامات المائية لفرق الترجمة، ثم صحّح الكتابة بالأحرف الكبيرة والنص المشوّه.',
+    footBrand: 'AI-SRTSub · منظّف الترجمة'
+  },
+  'tr': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Altyazı yükle',
+    dzTxt: 'Dosyayı buraya bırakın veya seçmek için tıklayın',
+    pastePh: 'Ya da altyazı metnini buraya yapıştırın',
+    btnClear: 'Temizle',
+    optTitle: 'Temizleme kuralları',
+    repTitle: 'Sonuç ve dışa aktarma',
+    grpTag: 'Etiketler ve biçimlendirme',
+    grpSdh: 'İşitme engelli',
+    grpJunk: 'Filigranlar ve gereksiz öğeler',
+    grpText: 'Metin düzeltmeleri',
+    oAssFx: 'ASS efekt etiketlerini kaldır',
+    oHtml: 'HTML etiketlerini kaldır',
+    oCtrl: 'Kontrol karakterlerini kaldır',
+    oSort: 'Zamana göre sırala ve yeniden numaralandır',
+    oSdh: 'İşitme engelli açıklamalarını kaldır',
+    oSpeaker: 'Konuşmacı etiketlerini kaldır',
+    oMusic: 'Sadece şarkı sözü satırlarını sil',
+    oWm: 'Filigran ve reklamları kaldır',
+    oDup: 'Yinelenen altyazıları kaldır',
+    oEmpty: 'Boş altyazıları kaldır',
+    oPunct: 'Noktalama ve boşlukları normalleştir',
+    oUpper: 'TÜMÜ BÜYÜK satırları düzelt',
+    oMerge: 'Çok kısa komşu altyazıları birleştir',
+    tip_assFx: '{\\an8}, {\\f4} gibi SubStation efekt işaretlerini kaldırır. SRT\'de işe yaramazlar ve düz metin olarak görünürler.',
+    tip_html: '<i>, <b>, <font> gibi etiketleri kaldırır, içindeki metni korur. Çoğu oynatıcı bu etiketleri desteklemez ve olduğu gibi gösterir.',
+    tip_ctrl: 'Görünmez kontrol karakterlerini, sıfır genişlikli karakterleri ve yumuşak tireleri kaldırır. Aramayı ve sayımı bozarlar.',
+    tip_sort: 'Başlangıç zamanına göre yeniden sıralar ve numaralandırır. Metne dokunmaz.',
+    tip_sdh: '[ayak sesleri] veya (öksürük) gibi işitme engelliler için ses açıklamalarını kaldırır. Diyalog korunur.',
+    tip_speaker: 'Satır başındaki GEORGE: gibi konuşmacı adlarını kaldırır. Normal satırlar etkilenmez.',
+    tip_music: 'Tamamen ♪ şarkı sözü ♪ olan altyazıları siler. İçinde şarkı sözü geçen diyalog korunur.',
+    tip_wm: 'Altyazı grubu filigranlarını, adresleri, e-postaları ve reklamları kaldırır. Yalnızca kısa altyazılar değerlendirilir, uzun diyaloglar güvende.',
+    tip_dup: 'Zamanlaması ve metni tamamen aynı olan yinelenen altyazıları kaldırır, ilkini korur.',
+    tip_empty: 'Hiç metin içermeyen boş altyazıları kaldırır.',
+    tip_punct: 'Fazla boşlukları, satır sonu boşluklarını ve ardışık noktaları temizler. Tırnakları ve tam genişlik biçimleri değiştirmez.',
+    tip_upper: 'Tümü büyük harfli altyazıları normal hâle çevirir. Özel adlar geri gelmez, İngilizce çıktılarda elle kontrol edin.',
+    tip_merge: '1,2 saniyeden kısa ve arası 0,4 saniyeden az olan komşu altyazıları birleştirir. Altyazılar çok hızlı geçtiğinde kullanışlıdır.',
+    thTime: 'Zaman',
+    thOld: 'Önce',
+    thNew: 'Sonra',
+    stRaw: 'Orijinal',
+    stOut: 'Temizlenmiş',
+    stDel: 'Silindi',
+    stMod: 'Değiştirildi',
+    stOff: 'Geri alındı',
+    removed: 'kaldırıldı',
+    emptyRow: 'kaynak dosyadaki boş satır',
+    btnUndo: 'Geri al',
+    btnAdopt: 'Uygula',
+    btnDownload: 'İndir',
+    btnCopy: 'Kopyala',
+    btnTxt: 'Düz metin',
+    btnUndoAll: 'Tümünü geri al',
+    noChange: 'Temizlenecek bir şey yok. Bu dosya zaten düzenli.',
+    pvTitle: 'Temizlenmiş altyazılar',
+    pvTitleRaw: 'Orijinal altyazılar',
+    pvUnit: 'satır',
+    pvOut: 'Temizlenmiş',
+    pvRaw: 'Orijinal',
+    pvNone: 'Bu dosyada içerik yok',
+    pvMore: 'İlk {n} / {t} satır gösteriliyor — tamamı için indirin',
+    okParse: '{n} altyazı ayrıştırıldı · kaynak {f}',
+    okEnc: 'Kodlama {e} olarak düzeltildi',
+    assNote: 'ASS stilleri içerik olarak işlenir; SRT olarak dışa aktarılır',
+    outFmt: 'Dışa aktarma biçimi',
+    outAssOff: 'ASS çıktısı için kaynak ASS olmalı',
+    outAssNote: 'Stiller ve çözünürlük korunur, yalnızca metin değiştirilir',
+    biFound: '{n} iki dilli çift bulundu, her biri tek altyazıda birleştirildi',
+    biOrderSrc: 'Şu an: orijinal üstte',
+    biOrderTgt: 'Şu an: çeviri üstte',
+    biFlipSrc: 'Orijinali üste koy',
+    biFlipTgt: 'Çeviriyi üste koy',
+    errParse: 'Hiçbir altyazı ayrıştırılamadı. Desteklenen: SRT, VTT, ASS (ve SSA).',
+    errEmpty: 'Bu dosya boş',
+    noFile: 'Önce bir altyazı dosyası yükleyin',
+    okDl: 'İndirildi',
+    okCopy: 'Kopyalandı',
+    errCopy: 'Kopyalama başarısız, lütfen elle seçip kopyalayın',
+    optOn: '{t} kuraldan {n} tanesi açık',
+    pasteSrc: 'yapıştırılan içerik',
+    footHome: 'Altyazıları çevir',
+    footMerge: 'Altyazıları birleştir',
+    heroA: 'Altyazı',
+    heroEm: 'Temizleyici',
+    heroSub: 'HTML etiketlerini, ASS efektlerini, SDH altyazılarını, konuşmacı etiketlerini ve grup filigranlarını kaldırın, ardından tümü büyük harf ve bozuk karakterleri düzeltin.',
+    footBrand: 'AI-SRTSub · Altyazı Temizleyici'
+  },
+  'nl': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Ondertitels uploaden',
+    dzTxt: 'Sleep hier een bestand naartoe of klik om te kiezen',
+    pastePh: 'Of plak hier je ondertiteltekst',
+    btnClear: 'Wissen',
+    optTitle: 'Opschoonregels',
+    repTitle: 'Resultaat en export',
+    grpTag: 'Tags en opmaak',
+    grpSdh: 'Slechthorenden',
+    grpJunk: 'Watermerken en rommel',
+    grpText: 'Tekstcorrecties',
+    oAssFx: 'ASS-effecttags verwijderen',
+    oHtml: 'HTML-tags verwijderen',
+    oCtrl: 'Stuurtekens verwijderen',
+    oSort: 'Sorteren op tijd en hernummeren',
+    oSdh: 'SDH-ondertitels verwijderen',
+    oSpeaker: 'Sprekerlabels verwijderen',
+    oMusic: 'Regels met alleen songtekst verwijderen',
+    oWm: 'Watermerken en advertenties verwijderen',
+    oDup: 'Dubbele ondertitels verwijderen',
+    oEmpty: 'Lege ondertitels verwijderen',
+    oPunct: 'Interpunctie normaliseren',
+    oUpper: 'ALLE CAPS-regels corrigeren',
+    oMerge: 'Korte opeenvolgende ondertitels samenvoegen',
+    tip_assFx: 'Verwijdert SubStation-effectmarkeringen zoals {\\an8}. Die doen niets in SRT en verschijnen als platte tekst.',
+    tip_html: 'Verwijdert tags zoals <i>, <b> en <font> en houdt de tekst erin. De meeste spelers ondersteunen ze niet.',
+    tip_ctrl: 'Verwijdert onzichtbare stuur-, nulbreedte- en zachte-streepjestekens die zoeken en tellen verstoren.',
+    tip_sort: 'Sorteert opnieuw op starttijd en hernummert. De tekst blijft ongewijzigd.',
+    tip_sdh: 'Verwijdert geluidsbeschrijvingen voor slechthorenden, zoals [voetstappen] of (hoesten). Dialoog blijft behouden.',
+    tip_speaker: 'Verwijdert namen aan het begin zoals GEORGE:. Gewone regels blijven intact.',
+    tip_music: 'Verwijdert ondertitels die enkel ♪ songtekst ♪ bevatten. Dialoog met een liedtekst blijft behouden.',
+    tip_wm: 'Verwijdert watermerken van releasegroepen, URL\'s, e-mails en advertenties. Alleen korte ondertitels worden beoordeeld, lange dialoog blijft veilig.',
+    tip_dup: 'Verwijdert ondertitels met identieke timing en tekst; de eerste blijft behouden.',
+    tip_empty: 'Verwijdert ondertitels zonder enige tekst.',
+    tip_punct: 'Haalt extra spaties en herhaalde punten weg. Wijzigt nooit aanhalingstekens of tekens in volle breedte.',
+    tip_upper: 'Zet volledig hoofdletter-ondertitels om naar normale schrijfwijze. Eigennamen kunnen niet worden hersteld, dus lees namen na.',
+    tip_merge: 'Voegt opeenvolgende ondertitels korter dan 1,2 s met een gat onder 0,4 s samen. Handig bij flikkerende ondertitels.',
+    thTime: 'Tijd',
+    thOld: 'Voor',
+    thNew: 'Na',
+    stRaw: 'Origineel',
+    stOut: 'Opgeschoond',
+    stDel: 'Verwijderd',
+    stMod: 'Gewijzigd',
+    stOff: 'Hersteld',
+    removed: 'verwijderd',
+    emptyRow: 'lege cue in het bronbestand',
+    btnUndo: 'Herstel',
+    btnAdopt: 'Toepassen',
+    btnDownload: 'Downloaden',
+    btnCopy: 'Kopiëren',
+    btnTxt: 'Platte tekst',
+    btnUndoAll: 'Alles herstellen',
+    noChange: 'Niets op te schonen. Dit bestand is al netjes.',
+    pvTitle: 'Opgeschoonde ondertitels',
+    pvTitleRaw: 'Originele ondertitels',
+    pvUnit: 'regels',
+    pvOut: 'Opgeschoond',
+    pvRaw: 'Origineel',
+    pvNone: 'Geen inhoud in dit bestand',
+    pvMore: 'Eerste {n} van {t} regels — download voor het volledige bestand',
+    okParse: '{n} cues verwerkt · bron {f}',
+    okEnc: 'codering hersteld naar {e}',
+    assNote: 'ASS-stijlen worden als inhoud behandeld; exporteert als SRT',
+    outFmt: 'Exporteren als',
+    outAssOff: 'ASS-export vereist een ASS-bron',
+    outAssNote: 'Stijlen en resolutie behouden, alleen de tekst wordt vervangen',
+    biFound: '{n} tweetalige paren gevonden, per paar samengevoegd tot één cue',
+    biOrderSrc: 'Originele regel bovenaan',
+    biOrderTgt: 'Vertaling bovenaan',
+    biFlipSrc: 'Origineel bovenaan zetten',
+    biFlipTgt: 'Vertaling bovenaan zetten',
+    errParse: 'Geen cues kunnen parsen. Ondersteund: SRT, VTT, ASS (en SSA).',
+    errEmpty: 'Dat bestand is leeg',
+    noFile: 'Upload eerst een ondertitelbestand',
+    okDl: 'Gedownload',
+    okCopy: 'Gekopieerd',
+    errCopy: 'Kopiëren mislukt, selecteer en kopieer handmatig',
+    optOn: '{n} van {t} regels aan',
+    pasteSrc: 'geplakte inhoud',
+    footHome: 'Ondertitels vertalen',
+    footMerge: 'Ondertitels samenvoegen',
+    heroA: 'Ondertitel',
+    heroEm: 'Schoonmaker',
+    heroSub: 'Verwijder HTML-tags, ASS-effecten, SDH-cues, sprekerlabels en groepswatermerken, en corrigeer alles-in-hoofdletters en mojibake.',
+    footBrand: 'AI-SRTSub · Ondertitel Schoonmaker'
+  },
+  'pl': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Wgraj napisy',
+    dzTxt: 'Przeciągnij plik tutaj lub kliknij, aby wybrać',
+    pastePh: 'Możesz też wkleić tekst napisów tutaj',
+    btnClear: 'Wyczyść',
+    optTitle: 'Reguły czyszczenia',
+    repTitle: 'Wynik i eksport',
+    grpTag: 'Tagi i formatowanie',
+    grpSdh: 'Dla niesłyszących',
+    grpJunk: 'Znaki wodne i śmieci',
+    grpText: 'Poprawki tekstu',
+    oAssFx: 'Usuń tagi efektów ASS',
+    oHtml: 'Usuń tagi HTML',
+    oCtrl: 'Usuń znaki sterujące',
+    oSort: 'Sortuj po czasie i przenumeruj',
+    oSdh: 'Usuń napisy dla niesłyszących',
+    oSpeaker: 'Usuń etykiety mówcy',
+    oMusic: 'Usuń linie z samym tekstem piosenki',
+    oWm: 'Usuń znaki wodne i reklamy',
+    oDup: 'Usuń zduplikowane wpisy',
+    oEmpty: 'Usuń puste wpisy',
+    oPunct: 'Normalizuj interpunkcję',
+    oUpper: 'Popraw linie WIELKIMI LITERAMI',
+    oMerge: 'Scal bardzo krótkie sąsiednie wpisy',
+    tip_assFx: 'Usuwa znaczniki efektów SubStation, takie jak {\\an8}. W SRT nic nie robią i wyświetlają się jako zwykły tekst.',
+    tip_html: 'Usuwa tagi <i>, <b>, <font>, zostawiając tekst w środku. Większość odtwarzaczy ich nie obsługuje.',
+    tip_ctrl: 'Usuwa niewidoczne znaki sterujące, znaki o zerowej szerokości i miękkie łączniki, które psują wyszukiwanie i liczenie znaków.',
+    tip_sort: 'Sortuje ponownie po czasie początku i przenumerowuje. Tekst pozostaje bez zmian.',
+    tip_sdh: 'Usuwa opisy dźwięków dla niesłyszących, takie jak [kroki] czy (kaszel). Dialog zostaje.',
+    tip_speaker: 'Usuwa nazwy mówiących na początku linii, takie jak GEORGE:. Zwykłe linie pozostają bez zmian.',
+    tip_music: 'Usuwa wpisy zawierające wyłącznie ♪ tekst piosenki ♪. Dialog cytujący piosenkę zostaje.',
+    tip_wm: 'Usuwa znaki wodne grup fanowskich, adresy URL, e-maile i reklamy. Sprawdzane są tylko krótkie wpisy, więc długi dialog jest bezpieczny.',
+    tip_dup: 'Usuwa wpisy o identycznym czasie i tekście, zostawiając pierwszy.',
+    tip_empty: 'Usuwa wpisy niezawierające żadnego tekstu.',
+    tip_punct: 'Usuwa zbędne spacje i powtórzone kropki. Nigdy nie zmienia cudzysłowów ani znaków pełnej szerokości.',
+    tip_upper: 'Zamienia wpisy pisane w całości wielkimi literami na normalną wielkość. Nazw własnych nie da się przywrócić, więc sprawdź je ręcznie.',
+    tip_merge: 'Łączy sąsiednie wpisy krótsze niż 1,2 s z przerwą poniżej 0,4 s. Przydatne, gdy napisy migają.',
+    thTime: 'Czas',
+    thOld: 'Przed',
+    thNew: 'Po',
+    stRaw: 'Oryginał',
+    stOut: 'Po czyszczeniu',
+    stDel: 'Usunięte',
+    stMod: 'Zmienione',
+    stOff: 'Przywrócone',
+    removed: 'usunięto',
+    emptyRow: '(pusty napis w pliku źródłowym)',
+    btnUndo: 'Przywróć',
+    btnAdopt: 'Zastosuj',
+    btnDownload: 'Pobierz',
+    btnCopy: 'Kopiuj',
+    btnTxt: 'Czysty tekst',
+    btnUndoAll: 'Przywróć wszystko',
+    noChange: 'Nie ma nic do czyszczenia. Ten plik jest już uporządkowany.',
+    pvTitle: 'Napisy po czyszczeniu',
+    pvTitleRaw: 'Napisy oryginalne',
+    pvUnit: 'linii',
+    pvOut: 'Po czyszczeniu',
+    pvRaw: 'Oryginał',
+    pvNone: 'Brak treści w tym pliku',
+    pvMore: 'Pokazano pierwsze {n} z {t} linii — pełna treść po kliknięciu Pobierz',
+    okParse: 'Rozpoznano {n} napisów · format źródłowy {f}',
+    okEnc: 'Kodowanie poprawione na {e}',
+    assNote: 'Styl ASS traktowany jako treść, eksport do SRT',
+    outFmt: 'Format eksportu',
+    outAssOff: 'Eksport ASS wymaga źródła w formacie ASS',
+    outAssNote: 'Style i rozdzielczość zachowane, podmieniany jest tylko tekst',
+    biFound: 'Wykryto {n} par dwujęzycznych, każda scalona w jeden napis',
+    biOrderSrc: 'Teraz: oryginał na górze',
+    biOrderTgt: 'Teraz: tłumaczenie na górze',
+    biFlipSrc: 'Ustaw oryginał na górze',
+    biFlipTgt: 'Ustaw tłumaczenie na górze',
+    errParse: 'Nie udało się rozpoznać napisów. Obsługiwane: SRT, VTT, ASS (i SSA).',
+    errEmpty: 'Plik jest pusty',
+    noFile: 'Najpierw wgraj plik z napisami',
+    okDl: 'Pobrano',
+    okCopy: 'Skopiowano',
+    errCopy: 'Kopiowanie nie udało się, zaznacz i skopiuj ręcznie',
+    optOn: 'Włączone reguły: {n} z {t}',
+    pasteSrc: 'wklejona treść',
+    footHome: 'Przetłumacz napisy',
+    footMerge: 'Scal napisy',
+    heroA: 'Napisy',
+    heroEm: 'Czyszczenie',
+    heroSub: 'Usuwa tagi HTML, efekty ASS, napisy SDH, oznaczenia mówców i znaki wodne grup, a potem naprawia WIELKIE LITERY i zniekształcone znaki.',
+    footBrand: 'AI-SRTSub · Czyszczenie napisów'
+  },
+  'sv': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Ladda upp undertexter',
+    dzTxt: 'Släpp en fil här eller klicka för att välja',
+    pastePh: 'Eller klistra in undertexten här',
+    btnClear: 'Rensa',
+    optTitle: 'Rensningsregler',
+    repTitle: 'Resultat och export',
+    grpTag: 'Taggar och formatering',
+    grpSdh: 'Hörselskadade',
+    grpJunk: 'Vattenstämplar och skräp',
+    grpText: 'Textkorrigeringar',
+    oAssFx: 'Ta bort ASS-effekttaggar',
+    oHtml: 'Ta bort HTML-taggar',
+    oCtrl: 'Ta bort kontrolltecken',
+    oSort: 'Sortera efter tid och numrera om',
+    oSdh: 'Ta bort ljudbeskrivningar',
+    oSpeaker: 'Ta bort talaretiketter',
+    oMusic: 'Ta bort enbart sångtextrader',
+    oWm: 'Ta bort vattenstämplar och reklam',
+    oDup: 'Ta bort dubbletter',
+    oEmpty: 'Ta bort tomma cues',
+    oPunct: 'Normalisera skiljetecken',
+    oUpper: 'Rätta versala rader',
+    oMerge: 'Slå ihop korta närliggande cues',
+    tip_assFx: 'Tar bort SubStation-effektmarkeringar som {\\an8}. De har ingen effekt i SRT och visas som vanlig text.',
+    tip_html: 'Tar bort <i>, <b>, <font> och behåller texten inuti. De flesta spelare stöder dem inte.',
+    tip_ctrl: 'Tar bort osynliga kontroll-, nollbredds- och mjukbindestreckstecken som förstör sökning och ordräkning.',
+    tip_sort: 'Sorterar om efter starttid och numrerar om. Texten ändras inte.',
+    tip_sdh: 'Tar bort ljudbeskrivningar för hörselskadade, som [fotsteg] eller (hostar). Dialogen behålls.',
+    tip_speaker: 'Tar bort talarnamn i början av raden, som GEORGE:. Vanliga rader påverkas inte.',
+    tip_music: 'Tar bort cues som bara består av ♪ sångtext ♪. Dialog som citerar en textrad behålls.',
+    tip_wm: 'Tar bort gruppvattenstämplar, webbadresser, e-post och reklam. Endast korta cues bedöms, så lång dialog är säker.',
+    tip_dup: 'Tar bort cues med identisk tid och text och behåller den första.',
+    tip_empty: 'Tar bort cues som inte innehåller någon text alls.',
+    tip_punct: 'Tar bort extra mellanslag och upprepade punkter. Ändrar aldrig citattecken eller helbreddsformer.',
+    tip_upper: 'Gör helt versala cues till normal skrift. Egennamn kan inte återställas, så korrekturläs namn.',
+    tip_merge: 'Slår ihop grannar kortare än 1,2 s med mindre än 0,4 s mellanrum. Användbart när undertexten flimrar.',
+    thTime: 'Tid',
+    thOld: 'Före',
+    thNew: 'Efter',
+    stRaw: 'Original',
+    stOut: 'Rensad',
+    stDel: 'Borttagen',
+    stMod: 'Ändrad',
+    stOff: 'Återställd',
+    removed: 'borttagen',
+    emptyRow: 'tom cue i källfilen',
+    btnUndo: 'Återställ',
+    btnAdopt: 'Använd',
+    btnDownload: 'Ladda ner',
+    btnCopy: 'Kopiera',
+    btnTxt: 'Ren text',
+    btnUndoAll: 'Återställ allt',
+    noChange: 'Inget att rensa. Filen är redan städad.',
+    pvTitle: 'Rensade undertexter',
+    pvTitleRaw: 'Ursprungliga undertexter',
+    pvUnit: 'rader',
+    pvOut: 'Rensad',
+    pvRaw: 'Original',
+    pvNone: 'Filen har inget innehåll',
+    pvMore: 'Visar första {n} av {t} rader — ladda ner för hela filen',
+    okParse: '{n} cues tolkade · källa {f}',
+    okEnc: 'kodning fixad som {e}',
+    assNote: 'ASS-stil hanteras som innehåll; exporteras som SRT',
+    outFmt: 'Exportera som',
+    outAssOff: 'ASS-export kräver en ASS-källa',
+    outAssNote: 'Stilar och upplösning behålls, bara texten byts ut',
+    biFound: 'Hittade {n} tvåspråkiga par, sammanslagna till en cue vardera',
+    biOrderSrc: 'Originalraden överst',
+    biOrderTgt: 'Översättningen överst',
+    biFlipSrc: 'Sätt originalet överst',
+    biFlipTgt: 'Sätt översättningen överst',
+    errParse: 'Kunde inte tolka några cues. Format som stöds: SRT, VTT, ASS (och SSA).',
+    errEmpty: 'Filen är tom',
+    noFile: 'Ladda upp en undertextfil först',
+    okDl: 'Nedladdad',
+    okCopy: 'Kopierat',
+    errCopy: 'Kopiering misslyckades, markera och kopiera manuellt',
+    optOn: '{n} av {t} regler på',
+    pasteSrc: 'inklistrat innehåll',
+    footHome: 'Översätt undertexter',
+    footMerge: 'Slå samman undertexter',
+    heroA: 'Undertext',
+    heroEm: 'Rengörare',
+    heroSub: 'Ta bort HTML-taggar, ASS-effekter, SDH-cues, talar-etiketter och gruppvatttenstämplar, fixa sedan VERSALER och teckenfel.',
+    footBrand: 'AI-SRTSub · Undertextrengörare'
+  },
+  'cs': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Nahrát titulky',
+    dzTxt: 'Přetáhněte soubor sem, nebo klikněte',
+    pastePh: 'Nebo sem vložte text titulků',
+    btnClear: 'Vymazat',
+    optTitle: 'Pravidla čištění',
+    repTitle: 'Výsledek a export',
+    grpTag: 'Tagy a formátování',
+    grpSdh: 'Pro sluchově postižené',
+    grpJunk: 'Vodoznaky a smetí',
+    grpText: 'Opravy textu',
+    oAssFx: 'Odstranit ASS efekty',
+    oHtml: 'Odstranit HTML tagy',
+    oCtrl: 'Odstranit řídicí znaky',
+    oSort: 'Seřadit podle času a přečíslovat',
+    oSdh: 'Odstranit popisy pro neslyšící',
+    oSpeaker: 'Odstranit jména mluvčích',
+    oMusic: 'Smazat řádky jen s textem písně',
+    oWm: 'Odstranit vodoznaky a reklamy',
+    oDup: 'Odstranit duplicitní titulky',
+    oEmpty: 'Odstranit prázdné titulky',
+    oPunct: 'Normalizovat interpunkci a mezery',
+    oUpper: 'Opravit VERZÁLKY',
+    oMerge: 'Sloučit příliš krátké sousední titulky',
+    tip_assFx: 'Odstraní značky efektů SubStation jako {\\an8} nebo {\\f4}. V SRT nic nedělají a zobrazují se jako text.',
+    tip_html: 'Odstraní tagy jako <i>, <b> nebo <font> a ponechá jen text uvnitř. Většina přehrávačů je nepodporuje a zobrazí je jako text.',
+    tip_ctrl: 'Odstraní neviditelné řídicí znaky, znaky nulové šířky a měkké spojovníky. Zobrazení nemění, ale kazí vyhledávání a počítání znaků.',
+    tip_sort: 'Znovu seřadí podle času začátku a přečísluje. Text se nemění, jen pořadí.',
+    tip_sdh: 'Odstraní zvukové popisy pro neslyšící, jako [kroky] nebo (kašel). Dialogy zůstávají.',
+    tip_speaker: 'Odstraní jména mluvčích na začátku řádku jako GEORGE:. Běžné řádky se nemění.',
+    tip_music: 'Smaže titulky, které obsahují jen ♪ text písně ♪. Dialogy s citovaným textem písně zůstávají.',
+    tip_wm: 'Odstraní vodoznaky skupin, URL, e-maily a reklamy. Posuzují se jen krátké titulky, dlouhé dialogy zůstávají.',
+    tip_dup: 'Odstraní titulky se stejnými časy i textem, ponechá první z nich.',
+    tip_empty: 'Odstraní titulky, které neobsahují žádný text.',
+    tip_punct: 'Vyčistí přebytečné mezery, mezery na konci řádku a opakované tečky. Nemění uvozovky ani plnou šířku znaků.',
+    tip_upper: 'Převede titulky psané celé velkými písmeny na běžnou velikost, začátek věty se doplní velkým písmenem. Vlastní jména nelze obnovit, u exportovaných anglických titulků doporučujeme kontrolu.',
+    tip_merge: 'Spojí sousední titulky kratší než 1,2 s s mezerou do 0,4 s. Hodí se, když titulky blikají.',
+    thTime: 'Čas',
+    thOld: 'Před',
+    thNew: 'Po',
+    stRaw: 'Původní',
+    stOut: 'Vyčištěné',
+    stDel: 'Smazané',
+    stMod: 'Změněné',
+    stOff: 'Vrácené',
+    removed: 'odstraněno',
+    emptyRow: '(prázdný titulek ve zdroji)',
+    btnUndo: 'Vrátit',
+    btnAdopt: 'Použít',
+    btnDownload: 'Stáhnout',
+    btnCopy: 'Kopírovat',
+    btnTxt: 'Čistý text',
+    btnUndoAll: 'Vrátit vše',
+    noChange: 'Není co čistit. Tento soubor je už v pořádku.',
+    pvTitle: 'Vyčištěné titulky',
+    pvTitleRaw: 'Původní titulky',
+    pvUnit: 'řádků',
+    pvOut: 'Vyčištěné',
+    pvRaw: 'Původní',
+    pvNone: 'Tento soubor nemá obsah',
+    pvMore: 'Zobrazeno prvních {n} z {t} řádků — pro celý soubor stáhněte',
+    okParse: 'Načteno {n} titulků · zdroj {f}',
+    okEnc: 'kódování opraveno na {e}',
+    assNote: 'Styly ASS se berou jako obsah; export do SRT',
+    outFmt: 'Formát exportu',
+    outAssOff: 'Export do ASS vyžaduje zdrojový ASS',
+    outAssNote: 'Styly a rozlišení zůstávají, nahrazuje se jen text',
+    biFound: 'Nalezeno {n} dvojjazyčných dvojic, sloučeno do jednoho titulku',
+    biOrderSrc: 'Originál nahoře',
+    biOrderTgt: 'Překlad nahoře',
+    biFlipSrc: 'Dát originál nahoru',
+    biFlipTgt: 'Dát překlad nahoru',
+    errParse: 'Nepodařilo se rozpoznat žádné titulky. Podporováno: SRT, VTT, ASS (a SSA).',
+    errEmpty: 'Soubor je prázdný',
+    noFile: 'Nejdřív nahrajte soubor s titulky',
+    okDl: 'Staženo',
+    okCopy: 'Zkopírováno',
+    errCopy: 'Kopírování se nezdařilo, vyberte a zkopírujte ručně',
+    optOn: 'Zapnuto {n} z {t} pravidel',
+    pasteSrc: 'vložený obsah',
+    footHome: 'Přeložit titulky',
+    footMerge: 'Sloučit titulky',
+    heroA: 'Titulky',
+    heroEm: 'Čistič',
+    heroSub: 'Odstraní HTML značky, ASS efekty, SDH stopy, označení mluvčích a vodoznaky skupin, poté opraví velká písmena a mojibake.',
+    footBrand: 'AI-SRTSub · Čistič titulků'
+  },
+  'uk': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Завантаження субтитрів',
+    dzTxt: 'Перетягніть файл сюди або натисніть, щоб вибрати',
+    pastePh: 'Або вставте текст субтитрів просто тут',
+    btnClear: 'Очистити',
+    optTitle: 'Правила очищення',
+    repTitle: 'Результат і експорт',
+    grpTag: 'Теги та форматування',
+    grpSdh: 'Для слабочуючих',
+    grpJunk: 'Водяні знаки та сміття',
+    grpText: 'Виправлення тексту',
+    oAssFx: 'Прибрати теги ефектів ASS',
+    oHtml: 'Прибрати теги HTML',
+    oCtrl: 'Прибрати керуючі символи',
+    oSort: 'Сортувати за часом і перенумерувати',
+    oSdh: 'Прибрати репліки для слабочуючих',
+    oSpeaker: 'Прибрати позначки мовця',
+    oMusic: 'Видалити рядки лише з текстом пісні',
+    oWm: 'Прибрати водяні знаки та рекламу',
+    oDup: 'Прибрати дублікати реплік',
+    oEmpty: 'Прибрати порожні репліки',
+    oPunct: 'Нормалізувати пунктуацію',
+    oUpper: 'Виправити рядки з великих літер',
+    oMerge: 'Об\'єднати дуже короткі сусідні репліки',
+    tip_assFx: 'Прибирає маркери ефектів SubStation на кшталт {\\an8}. У SRT вони не діють і показуються як звичайний текст.',
+    tip_html: 'Прибирає теги <i>, <b>, <font>, залишаючи текст усередині. Більшість плеєрів їх не підтримує.',
+    tip_ctrl: 'Прибирає невидимі керуючі символи, символи нульової ширини та м\'які переноси, які ламають пошук і підрахунок.',
+    tip_sort: 'Пересортовує за часом початку й перенумеровує. Текст не змінюється.',
+    tip_sdh: 'Прибирає описи звуків для слабочуючих, як-от [кроки] чи (кашель). Діалог залишається.',
+    tip_speaker: 'Прибирає імена мовців на початку рядка, як-от GEORGE:. Звичайні рядки не зачіпає.',
+    tip_music: 'Видаляє репліки, що складаються лише з ♪ тексту пісні ♪. Діалог із цитатою пісні залишається.',
+    tip_wm: 'Прибирає водяні знаки реліз-груп, URL, email та рекламу. Перевіряються лише короткі репліки, тож довгий діалог не постраждає.',
+    tip_dup: 'Прибирає репліки з однаковим часом і текстом, залишаючи першу.',
+    tip_empty: 'Прибирає репліки, що не містять жодного тексту.',
+    tip_punct: 'Прибирає зайві пробіли та повторювані крапки. Не змінює лапки чи повноширинні символи.',
+    tip_upper: 'Перетворює репліки, повністю написані великими літерами, на звичайний регістр. Власні назви не відновлюються, тож перевірте імена.',
+    tip_merge: 'Об\'єднує сусідні репліки, коротші за 1,2 с, із проміжком менш ніж 0,4 с. Стане в пригоді, коли субтитри мерехтять.',
+    thTime: 'Час',
+    thOld: 'Було',
+    thNew: 'Стало',
+    stRaw: 'Оригінал',
+    stOut: 'Очищено',
+    stDel: 'Видалено',
+    stMod: 'Змінено',
+    stOff: 'Повернуто',
+    removed: 'видалено',
+    emptyRow: 'порожня репліка у вихідному файлі',
+    btnUndo: 'Повернути',
+    btnAdopt: 'Застосувати',
+    btnDownload: 'Завантажити',
+    btnCopy: 'Копіювати',
+    btnTxt: 'Простий текст',
+    btnUndoAll: 'Повернути все',
+    noChange: 'Немає чого очищати. Цей файл уже чистий.',
+    pvTitle: 'Очищені субтитри',
+    pvTitleRaw: 'Оригінальні субтитри',
+    pvUnit: 'рядків',
+    pvOut: 'Очищено',
+    pvRaw: 'Оригінал',
+    pvNone: 'У цьому файлі немає вмісту',
+    pvMore: 'Показано перші {n} з {t} рядків — завантажте повний файл',
+    okParse: 'Розібрано {n} реплік · вихідний формат {f}',
+    okEnc: 'Кодування виправлено на {e}',
+    assNote: 'Стилі ASS обробляються як вміст; експорт у SRT',
+    outFmt: 'Експортувати як',
+    outAssOff: 'Експорт ASS можливий лише з ASS-джерела',
+    outAssNote: 'Стилі та роздільна здатність збережено, замінюється лише текст',
+    biFound: 'Знайдено {n} двомовних пар, кожну об’єднано в одну репліку',
+    biOrderSrc: 'Зараз: оригінал зверху',
+    biOrderTgt: 'Зараз: переклад зверху',
+    biFlipSrc: 'Поставити оригінал зверху',
+    biFlipTgt: 'Поставити переклад зверху',
+    errParse: 'Не вдалося розібрати жодної репліки. Підтримуються: SRT, VTT, ASS (і SSA).',
+    errEmpty: 'Цей файл порожній',
+    noFile: 'Спочатку завантажте файл субтитрів',
+    okDl: 'Завантажено',
+    okCopy: 'Скопійовано',
+    errCopy: 'Не вдалося скопіювати, виділіть і скопіюйте вручну',
+    optOn: 'Увімкнено {n} з {t} правил',
+    pasteSrc: 'вставлений вміст',
+    footHome: 'Перекласти субтитри',
+    footMerge: 'Об’єднати субтитри',
+    heroA: 'Субтитри',
+    heroEm: 'Очищувач',
+    heroSub: 'Видаляє HTML-теги, ASS-ефекти, SDH-репліки, позначки мовців і водяні знаки груп, а потім виправляє суцільний верхній регістр і кракозябри.',
+    footBrand: 'AI-SRTSub · Очищувач субтитрів'
+  },
+  'da': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Upload undertekster',
+    dzTxt: 'Træk en fil hertil, eller klik for at vælge',
+    pastePh: 'Eller indsæt undertekstteksten her',
+    btnClear: 'Ryd',
+    optTitle: 'Rensningsregler',
+    repTitle: 'Resultat og eksport',
+    grpTag: 'Tags og formatering',
+    grpSdh: 'Hørehæmmede',
+    grpJunk: 'Vandmærker og skrald',
+    grpText: 'Tekstrettelser',
+    oAssFx: 'Fjern ASS-effekttags',
+    oHtml: 'Fjern HTML-tags',
+    oCtrl: 'Fjern kontroltegn',
+    oSort: 'Sortér efter tid og omnummerér',
+    oSdh: 'Fjern tekster for hørehæmmede',
+    oSpeaker: 'Fjern taleretiketter',
+    oMusic: 'Slet linjer med kun sangtekst',
+    oWm: 'Fjern vandmærker og reklamer',
+    oDup: 'Fjern dublerede tekster',
+    oEmpty: 'Fjern tomme tekster',
+    oPunct: 'Normalisér tegnsætning',
+    oUpper: 'Ret VERSALER',
+    oMerge: 'Sammenlæg meget korte nabotekster',
+    tip_assFx: 'Fjerner SubStation-effektmarkeringer som {\\an8}. De virker ikke i SRT og vises som almindelig tekst.',
+    tip_html: 'Fjerner tags som <i>, <b> og <font> og beholder teksten indeni. De fleste afspillere understøtter dem ikke.',
+    tip_ctrl: 'Fjerner usynlige kontroltegn, nulbreddetegn og bløde bindestreger, der ødelægger søgning og optælling.',
+    tip_sort: 'Sorterer igen efter starttid og omnummererer. Teksten ændres ikke.',
+    tip_sdh: 'Fjerner lydbeskrivelser for hørehæmmede, fx [fodtrin] eller (hosten). Dialogen bevares.',
+    tip_speaker: 'Fjerner talernavne i starten som GEORGE:. Almindelige linjer påvirkes ikke.',
+    tip_music: 'Sletter tekster, der kun består af ♪ sangtekst ♪. Dialog med sangtekst bevares.',
+    tip_wm: 'Fjerner vandmærker fra undertekstgrupper, URL\'er, e-mails og reklamer. Kun korte tekster vurderes, så lang dialog er sikker.',
+    tip_dup: 'Fjerner tekster med identisk timing og tekst og beholder den første.',
+    tip_empty: 'Fjerner tekster, der slet ikke indeholder noget.',
+    tip_punct: 'Fjerner ekstra mellemrum og gentagne punktummer. Ændrer aldrig citationstegn eller fuldbredde.',
+    tip_upper: 'Laver VERSALER om til normal skrift. Egennavne kan ikke gendannes, så korrekturlæs navne.',
+    tip_merge: 'Slår nabotekster kortere end 1,2 s med under 0,4 s imellem sammen. Nyttigt, når undertekster flimrer.',
+    thTime: 'Tid',
+    thOld: 'Før',
+    thNew: 'Efter',
+    stRaw: 'Original',
+    stOut: 'Renset',
+    stDel: 'Slettet',
+    stMod: 'Ændret',
+    stOff: 'Gendannet',
+    removed: 'fjernet',
+    emptyRow: '(tom cue i kildefilen)',
+    btnUndo: 'Gendan',
+    btnAdopt: 'Anvend',
+    btnDownload: 'Hent',
+    btnCopy: 'Kopiér',
+    btnTxt: 'Ren tekst',
+    btnUndoAll: 'Gendan alle',
+    noChange: 'Der er intet at rense. Filen er allerede ren.',
+    pvTitle: 'Rensede undertekster',
+    pvTitleRaw: 'Originale undertekster',
+    pvUnit: 'linjer',
+    pvOut: 'Renset',
+    pvRaw: 'Original',
+    pvNone: 'Intet indhold i denne fil',
+    pvMore: 'Viser de første {n} af {t} linjer — download for hele filen',
+    okParse: '{n} cue\'er parset · kilde {f}',
+    okEnc: 'Kodning rettet til {e}',
+    assNote: 'ASS-stil behandles som indhold; eksporteres som SRT',
+    outFmt: 'Eksportér som',
+    outAssOff: 'ASS-eksport kræver en ASS-kilde',
+    outAssNote: 'Stil og opløsning bevares, kun teksten udskiftes',
+    biFound: 'Fandt {n} tosprogede par, slået sammen til ét cue hver',
+    biOrderSrc: 'Originalen øverst',
+    biOrderTgt: 'Oversættelsen øverst',
+    biFlipSrc: 'Sæt originalen øverst',
+    biFlipTgt: 'Sæt oversættelsen øverst',
+    errParse: 'Kunne ikke parse nogen cue\'er. Understøtter: SRT, VTT, ASS (og SSA).',
+    errEmpty: 'Filen er tom',
+    noFile: 'Upload en undertekstfil først',
+    okDl: 'Downloadet',
+    okCopy: 'Kopieret',
+    errCopy: 'Kopiering mislykkedes, vælg og kopiér manuelt',
+    optOn: '{n} af {t} regler slået til',
+    pasteSrc: 'indsat indhold',
+    footHome: 'Oversæt undertekster',
+    footMerge: 'Flet undertekster',
+    heroA: 'Undertekst',
+    heroEm: 'Renser',
+    heroSub: 'Fjern HTML-tags, ASS-effekter, SDH-undertekster, taleretiketter og gruppe-vandmærker, og ret derefter VERSALER og mojibake.',
+    footBrand: 'AI-SRTSub · Undertekstrenser'
+  },
+  'fi': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Lataa tekstitykset',
+    dzTxt: 'Pudota tiedosto tähän tai valitse napsauttamalla',
+    pastePh: 'Tai liitä tekstitys tähän',
+    btnClear: 'Tyhjennä',
+    optTitle: 'Puhdistussäännöt',
+    repTitle: 'Tulos ja vienti',
+    grpTag: 'Tunnisteet ja muotoilu',
+    grpSdh: 'Kuulovammaisten',
+    grpJunk: 'Vesileimat ja roskat',
+    grpText: 'Tekstikorjaukset',
+    oAssFx: 'Poista ASS-tehostetunnisteet',
+    oHtml: 'Poista HTML-tunnisteet',
+    oCtrl: 'Poista ohjausmerkit',
+    oSort: 'Järjestä ajan mukaan ja numeroi uudelleen',
+    oSdh: 'Poista kuulovammaisten repliikit',
+    oSpeaker: 'Poista puhujatunnisteet',
+    oMusic: 'Poista pelkät sanoitusrivit',
+    oWm: 'Poista vesileimat ja mainokset',
+    oDup: 'Poista toistuvat repliikit',
+    oEmpty: 'Poista tyhjät repliikit',
+    oPunct: 'Normalisoi välimerkit',
+    oUpper: 'Korjaa versaalirivit',
+    oMerge: 'Yhdistä hyvin lyhyet vierekkäiset',
+    tip_assFx: 'Poistaa SubStation-tehostemerkit, kuten {\\an8}. Ne eivät toimi SRT:ssä ja näkyvät tekstinä.',
+    tip_html: 'Poistaa tunnisteet <i>, <b> ja <font> ja säilyttää niiden sisällä olevan tekstin. Useimmat soittimet eivät tue niitä.',
+    tip_ctrl: 'Poistaa näkymättömät ohjausmerkit, nollaleveysmerkit ja pehmeät yhdysmerkit, jotka rikkovat haun ja laskennan.',
+    tip_sort: 'Järjestää uudelleen alkamisajan mukaan ja numeroi uudelleen. Tekstiin ei kosketa.',
+    tip_sdh: 'Poistaa kuulovammaisille tarkoitetut äänikuvaukset, kuten [askeleita] tai (yskii). Dialogi säilyy.',
+    tip_speaker: 'Poistaa rivin alussa olevat puhujan nimet, kuten GEORGE:. Tavalliset rivit eivät muutu.',
+    tip_music: 'Poistaa repliikit, jotka ovat pelkkää ♪ sanoitusta ♪. Sanoitusta lainaava dialogi säilyy.',
+    tip_wm: 'Poistaa julkaisuryhmien vesileimat, verkko-osoitteet, sähköpostit ja mainokset. Vain lyhyet repliikit arvioidaan, joten pitkä dialogi on turvassa.',
+    tip_dup: 'Poistaa repliikit, joissa ajoitus ja teksti ovat täysin samat; ensimmäinen säilytetään.',
+    tip_empty: 'Poistaa repliikit, joissa ei ole lainkaan tekstiä.',
+    tip_punct: 'Karsii ylimääräiset välilyönnit ja toistuvat pisteet. Ei muuta lainausmerkkejä eikä täysleveitä merkkejä.',
+    tip_upper: 'Muuttaa kokonaan isokirjaimiset repliikit normaaleiksi. Erisnimiä ei voi palauttaa, joten tarkista nimet.',
+    tip_merge: 'Yhdistää alle 1,2 s pitkät vierekkäiset repliikit, joiden väli on alle 0,4 s. Hyödyllinen, kun tekstitys välkkyy.',
+    thTime: 'Aika',
+    thOld: 'Ennen',
+    thNew: 'Jälkeen',
+    stRaw: 'Alkuperäinen',
+    stOut: 'Siivottu',
+    stDel: 'Poistettu',
+    stMod: 'Muokattu',
+    stOff: 'Palautettu',
+    removed: 'poistettu',
+    emptyRow: 'tyhjä repliikki lähteessä',
+    btnUndo: 'Palauta',
+    btnAdopt: 'Ota käyttöön',
+    btnDownload: 'Lataa',
+    btnCopy: 'Kopioi',
+    btnTxt: 'Pelkkä teksti',
+    btnUndoAll: 'Palauta kaikki',
+    noChange: 'Ei siivottavaa. Tiedosto on jo siisti.',
+    pvTitle: 'Siivottu tekstitys',
+    pvTitleRaw: 'Alkuperäinen tekstitys',
+    pvUnit: 'riviä',
+    pvOut: 'Siivottu',
+    pvRaw: 'Alkuperäinen',
+    pvNone: 'Tässä tiedostossa ei ole sisältöä',
+    pvMore: 'Näytetään ensimmäiset {n} / {t} riviä — lataa koko tiedosto',
+    okParse: '{n} repliikkiä jäsennetty · lähde {f}',
+    okEnc: 'koodaus korjattu muotoon {e}',
+    assNote: 'ASS-tyylit käsitellään sisältönä; viedään SRT:nä',
+    outFmt: 'Vie muodossa',
+    outAssOff: 'ASS-vienti vaatii ASS-lähteen',
+    outAssNote: 'Tyylit ja resoluutio säilyvät, vain teksti korvataan',
+    biFound: 'Löytyi {n} kaksikielistä paria, yhdistetty yhdeksi repliikiksi',
+    biOrderSrc: 'Alkuperäinen ylhäällä',
+    biOrderTgt: 'Käännös ylhäällä',
+    biFlipSrc: 'Laita alkuperäinen ylös',
+    biFlipTgt: 'Laita käännös ylös',
+    errParse: 'Repliikkejä ei voitu jäsentää. Tuetut: SRT, VTT, ASS (ja SSA).',
+    errEmpty: 'Tiedosto on tyhjä',
+    noFile: 'Lataa ensin tekstitystiedosto',
+    okDl: 'Ladattu',
+    okCopy: 'Kopioitu',
+    errCopy: 'Kopiointi epäonnistui, valitse ja kopioi manuaalisesti',
+    optOn: '{n} / {t} sääntöä käytössä',
+    pasteSrc: 'liitetty sisältö',
+    footHome: 'Käännä tekstitykset',
+    footMerge: 'Yhdistä tekstitykset',
+    heroA: 'Tekstitys',
+    heroEm: 'Puhdistin',
+    heroSub: 'Poista HTML-tagit, ASS-tehosteet, SDH-tekstitykset, puhujamerkinnät ja ryhmävesileimat, ja korjaa sitten versaalit ja mojibake.',
+    footBrand: 'AI-SRTSub · Tekstitysten puhdistin'
+  },
+  'el': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Μεταφόρτωση υποτίτλων',
+    dzTxt: 'Αποθέστε ένα αρχείο εδώ ή κάντε κλικ για επιλογή',
+    pastePh: 'Ή επικολλήστε το κείμενο των υποτίτλων εδώ',
+    btnClear: 'Καθαρισμός',
+    optTitle: 'Κανόνες καθαρισμού',
+    repTitle: 'Αποτέλεσμα και εξαγωγή',
+    grpTag: 'Ετικέτες και μορφοποίηση',
+    grpSdh: 'Βαρήκοοι',
+    grpJunk: 'Υδατογραφήματα και άχρηστα στοιχεία',
+    grpText: 'Διορθώσεις κειμένου',
+    oAssFx: 'Αφαίρεση ετικετών εφέ ASS',
+    oHtml: 'Αφαίρεση ετικετών HTML',
+    oCtrl: 'Αφαίρεση χαρακτήρων ελέγχου',
+    oSort: 'Ταξινόμηση κατά χρόνο και επαναρίθμηση',
+    oSdh: 'Αφαίρεση υποδείξεων για βαρήκοους',
+    oSpeaker: 'Αφαίρεση ετικετών ομιλητή',
+    oMusic: 'Διαγραφή γραμμών μόνο με στίχους',
+    oWm: 'Αφαίρεση υδατογραφημάτων και διαφημίσεων',
+    oDup: 'Αφαίρεση διπλότυπων υποτίτλων',
+    oEmpty: 'Αφαίρεση κενών υποτίτλων',
+    oPunct: 'Κανονικοποίηση στίξης και κενών',
+    oUpper: 'Διόρθωση γραμμών σε ΟΛΑ ΚΕΦΑΛΑΙΑ',
+    oMerge: 'Συγχώνευση πολύ σύντομων γειτονικών υποτίτλων',
+    tip_assFx: 'Αφαιρεί δείκτες εφέ SubStation όπως {\\an8}. Δεν κάνουν τίποτα σε SRT και εμφανίζονται ως κυριολεκτικό κείμενο.',
+    tip_html: 'Αφαιρεί ετικέτες όπως <i>, <b>, <font> και κρατά το κείμενο μέσα τους. Οι περισσότεροι players δεν τις υποστηρίζουν.',
+    tip_ctrl: 'Αφαιρεί αόρατους χαρακτήρες ελέγχου, μηδενικού πλάτους και μαλακές παύλες που χαλάνε την αναζήτηση και τη μέτρηση.',
+    tip_sort: 'Επαναταξινομεί κατά ώρα έναρξης και επαναριθμεί. Το κείμενο μένει αμετάβλητο.',
+    tip_sdh: 'Αφαιρεί περιγραφές ήχων για βαρήκοους, όπως [βήματα] ή (βήχας). Ο διάλογος διατηρείται.',
+    tip_speaker: 'Αφαιρεί ονόματα ομιλητών στην αρχή της γραμμής, όπως GEORGE:. Οι κανονικές γραμμές δεν επηρεάζονται.',
+    tip_music: 'Διαγράφει υποτίτλους που είναι μόνο ♪ στίχοι ♪. Διάλογος που παραθέτει στίχο διατηρείται.',
+    tip_wm: 'Αφαιρεί υδατογραφήματα ομάδων, URL, email και διαφημίσεις. Ελέγχονται μόνο οι σύντομοι υπότιτλοι, ώστε ο μεγάλος διάλογος να μένει ασφαλής.',
+    tip_dup: 'Αφαιρεί υποτίτλους με πανομοιότυπο χρόνο και κείμενο, κρατώντας τον πρώτο.',
+    tip_empty: 'Αφαιρεί υποτίτλους που δεν περιέχουν καθόλου κείμενο.',
+    tip_punct: 'Κόβει περιττά κενά και επαναλαμβανόμενες τελείες. Δεν αλλάζει ποτέ εισαγωγικά ή χαρακτήρες πλήρους πλάτους.',
+    tip_upper: 'Μετατρέπει υποτίτλους σε ΟΛΑ ΚΕΦΑΛΑΙΑ σε κανονική γραφή. Τα κύρια ονόματα δεν αποκαθίστανται, οπότε ελέγξτε τα.',
+    tip_merge: 'Ενώνει γειτονικούς υπότιτλους κάτω από 1,2 δευτ. με κενό κάτω από 0,4 δευτ. Χρήσιμο όταν οι υπότιτλοι τρεμοπαίζουν.',
+    thTime: 'Χρόνος',
+    thOld: 'Πριν',
+    thNew: 'Μετά',
+    stRaw: 'Αρχικό',
+    stOut: 'Καθαρισμένο',
+    stDel: 'Διαγραμμένο',
+    stMod: 'Τροποποιημένο',
+    stOff: 'Επαναφέρθηκε',
+    removed: 'αφαιρέθηκε',
+    emptyRow: 'κενός υπότιτλος στην πηγή',
+    btnUndo: 'Επαναφορά',
+    btnAdopt: 'Εφαρμογή',
+    btnDownload: 'Λήψη',
+    btnCopy: 'Αντιγραφή',
+    btnTxt: 'Απλό κείμενο',
+    btnUndoAll: 'Επαναφορά όλων',
+    noChange: 'Δεν υπάρχει τίποτα να καθαριστεί. Το αρχείο είναι ήδη καθαρό.',
+    pvTitle: 'Καθαρισμένοι υπότιτλοι',
+    pvTitleRaw: 'Αρχικοί υπότιτλοι',
+    pvUnit: 'γραμμές',
+    pvOut: 'Καθαρισμένο',
+    pvRaw: 'Αρχικό',
+    pvNone: 'Δεν υπάρχει περιεχόμενο σε αυτό το αρχείο',
+    pvMore: 'Εμφάνιση των πρώτων {n} από {t} γραμμές — κάντε λήψη για το πλήρες αρχείο',
+    okParse: 'Αναλύθηκαν {n} υπότιτλοι · πηγή {f}',
+    okEnc: 'Η κωδικοποίηση διορθώθηκε ως {e}',
+    assNote: 'Το στυλ ASS αντιμετωπίζεται ως περιεχόμενο· εξάγεται ως SRT',
+    outFmt: 'Εξαγωγή ως',
+    outAssOff: 'Η έξοδος ASS απαιτεί πηγή ASS',
+    outAssNote: 'Τα στυλ και η ανάλυση διατηρούνται, αντικαθίσταται μόνο το κείμενο',
+    biFound: 'Βρέθηκαν {n} δίγλωσσα ζεύγη, συγχωνεύτηκαν σε έναν υπότιτλο το καθένα',
+    biOrderSrc: 'Η πρωτότυπη γραμμή πάνω',
+    biOrderTgt: 'Η μετάφραση πάνω',
+    biFlipSrc: 'Βάλε το πρωτότυπο πάνω',
+    biFlipTgt: 'Βάλε τη μετάφραση πάνω',
+    errParse: 'Δεν αναλύθηκε κανένας υπότιτλος. Υποστηρίζονται: SRT, VTT, ASS (και SSA).',
+    errEmpty: 'Το αρχείο είναι άδειο',
+    noFile: 'Ανεβάστε πρώτα ένα αρχείο υποτίτλων',
+    okDl: 'Έγινε λήψη',
+    okCopy: 'Αντιγράφηκε',
+    errCopy: 'Η αντιγραφή απέτυχε, επιλέξτε και αντιγράψτε χειροκίνητα',
+    optOn: '{n} από {t} κανόνες ενεργοί',
+    pasteSrc: 'επικολλημένο περιεχόμενο',
+    footHome: 'Μετάφραση υποτίτλων',
+    footMerge: 'Συγχώνευση υποτίτλων',
+    heroA: 'Υπότιτλοι',
+    heroEm: 'Καθαρισμός',
+    heroSub: 'Αφαιρέστε ετικέτες HTML, εφέ ASS, ενδείξεις SDH, ονόματα ομιλητών και υδατογραφήματα ομάδων και διορθώστε τα κεφαλαία και τα λάθη κωδικοποίησης.',
+    footBrand: 'AI-SRTSub · Καθαρισμός υποτίτλων'
+  },
+  'he': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'העלאת כתוביות',
+    dzTxt: 'גרור קובץ לכאן, או לחץ לבחירה',
+    pastePh: 'או הדבק כאן את טקסט הכתוביות',
+    btnClear: 'נקה',
+    optTitle: 'כללי ניקוי',
+    repTitle: 'תוצאה וייצוא',
+    grpTag: 'תגיות ועיצוב',
+    grpSdh: 'לקויי שמיעה',
+    grpJunk: 'סימני מים ופסולת',
+    grpText: 'תיקוני טקסט',
+    oAssFx: 'הסר תגי אפקט של ASS',
+    oHtml: 'הסר תגיות HTML',
+    oCtrl: 'הסר תווי בקרה',
+    oSort: 'מיין לפי זמן ומספר מחדש',
+    oSdh: 'הסר כתוביות ללקויי שמיעה',
+    oSpeaker: 'הסר תגיות דובר',
+    oMusic: 'מחק שורות מילים בלבד',
+    oWm: 'הסר סימני מים ופרסומות',
+    oDup: 'הסר כתוביות כפולות',
+    oEmpty: 'הסר כתוביות ריקות',
+    oPunct: 'נרמל פיסוק ורווחים',
+    oUpper: 'תקן שורות באותיות גדולות',
+    oMerge: 'מזג שכנות קצרות מאוד',
+    tip_assFx: 'מסיר סימני אפקט של SubStation כמו {\\an8}. הם חסרי משמעות ב-SRT ומוצגים כטקסט רגיל.',
+    tip_html: 'מסיר תגיות כמו <i>, <b>, <font> ומשאיר את הטקסט שבתוכן. רוב הנגנים לא תומכים בהן.',
+    tip_ctrl: 'מסיר תווי בקרה נסתרים, תווי רוחב אפס ומקפים רכים שפוגעים בחיפוש ובספירת תווים.',
+    tip_sort: 'ממיין מחדש לפי זמן ההתחלה וממספר מחדש. הטקסט לא משתנה.',
+    tip_sdh: 'מסיר תיאורי צליל ללקויי שמיעה, כמו [צעדים] או (שיעול). הדיאלוג נשמר.',
+    tip_speaker: 'מסיר שמות דובר בראש השורה, כמו GEORGE:. שורות רגילות לא נפגעות.',
+    tip_music: 'מוחק כתוביות שהן כולן ♪ מילות שיר ♪. דיאלוג שמצטט שיר נשמר.',
+    tip_wm: 'מסיר סימני מים של קבוצות תרגום, כתובות URL, דואר אלקטרוני ופרסומות. נבדקות רק כתוביות קצרות, כך שדיאלוג ארוך בטוח.',
+    tip_dup: 'מסיר כתוביות עם זמן וטקסט זהים, ומשאיר את הראשונה.',
+    tip_empty: 'מסיר כתוביות ללא טקסט כלל.',
+    tip_punct: 'מסיר רווחים מיותרים ונקודות כפולות. לא נוגע במרכאות או בתווי רוחב מלא.',
+    tip_upper: 'הופך כתוביות באותיות גדולות בלבד לאותיות רגילות. שמות פרטיים לא משוחזרים, לכן כדאי לעבור על השמות.',
+    tip_merge: 'מאחד כתוביות שכנות קצרות מ-1.2 שניות עם מרווח מתחת ל-0.4 שניות. שימושי כשהכתוביות מהבהבות.',
+    thTime: 'זמן',
+    thOld: 'לפני',
+    thNew: 'אחרי',
+    stRaw: 'מקורי',
+    stOut: 'מנוקה',
+    stDel: 'נמחק',
+    stMod: 'שונה',
+    stOff: 'הוחזר',
+    removed: 'הוסר',
+    emptyRow: 'כתובית ריקה במקור',
+    btnUndo: 'החזר',
+    btnAdopt: 'החל',
+    btnDownload: 'הורד',
+    btnCopy: 'העתק',
+    btnTxt: 'טקסט פשוט',
+    btnUndoAll: 'החזר הכול',
+    noChange: 'אין מה לנקות. הקובץ הזה כבר נקי.',
+    pvTitle: 'כתוביות מנוקות',
+    pvTitleRaw: 'כתוביות מקור',
+    pvUnit: 'שורות',
+    pvOut: 'מנוקה',
+    pvRaw: 'מקור',
+    pvNone: 'אין תוכן בקובץ הזה',
+    pvMore: 'מציג {n} מתוך {t} שורות — להורדת הקובץ המלא',
+    okParse: '{n} כתוביות נותחו · מקור {f}',
+    okEnc: 'הקידוד תוקן ל-{e}',
+    assNote: 'סגנון ASS מטופל כתוכן; מיוצא כ-SRT',
+    outFmt: 'ייצוא כ',
+    outAssOff: 'ייצוא ASS דורש מקור ASS',
+    outAssNote: 'הסגנונות והרזולוציה נשמרים, רק הטקסט מוחלף',
+    biFound: 'נמצאו {n} זוגות דו-לשוניים, מוזגו לכתובית אחת',
+    biOrderSrc: 'מקור למעלה',
+    biOrderTgt: 'תרגום למעלה',
+    biFlipSrc: 'העבר מקור למעלה',
+    biFlipTgt: 'העבר תרגום למעלה',
+    errParse: 'לא ניתן לנתח כתוביות. נתמכים: SRT, VTT, ASS (ו-SSA).',
+    errEmpty: 'הקובץ הזה ריק',
+    noFile: 'העלה תחילה קובץ כתוביות',
+    okDl: 'הורד',
+    okCopy: 'הועתק',
+    errCopy: 'ההעתקה נכשלה, יש לבחור ולהעתיק ידנית',
+    optOn: '{n} מתוך {t} כללים פעילים',
+    pasteSrc: 'תוכן שהודבק',
+    footHome: 'תרגם כתוביות',
+    footMerge: 'מיזוג כתוביות',
+    heroA: 'כתוביות',
+    heroEm: 'מנקה',
+    heroSub: 'הסרת תגי HTML, אפקטי ASS, רמזי SDH, תוויות דובר וסימני מים של קבוצות, ותיקון אותיות גדולות ותווים משובשים.',
+    footBrand: 'AI-SRTSub · מנקה כתוביות'
+  },
+  'ro': {
+    brandName: 'AI-SRTSub',
+    upTitle: 'Încarcă subtitrări',
+    dzTxt: 'Trage un fișier aici sau dă clic pentru a alege',
+    pastePh: 'Sau lipește textul subtitrării aici',
+    btnClear: 'Golește',
+    optTitle: 'Reguli de curățare',
+    repTitle: 'Rezultat și export',
+    grpTag: 'Etichete și formatare',
+    grpSdh: 'Deficiențe de auz',
+    grpJunk: 'Filigrane și elemente inutile',
+    grpText: 'Corectări de text',
+    oAssFx: 'Elimină etichetele de efect ASS',
+    oHtml: 'Elimină etichetele HTML',
+    oCtrl: 'Elimină caracterele de control',
+    oSort: 'Sortează după timp și renumerotează',
+    oSdh: 'Elimină replicile pentru deficiențe de auz',
+    oSpeaker: 'Elimină etichetele de vorbitor',
+    oMusic: 'Șterge liniile doar cu versuri',
+    oWm: 'Elimină filigranele și reclamele',
+    oDup: 'Elimină replicile duplicate',
+    oEmpty: 'Elimină replicile goale',
+    oPunct: 'Normalizează punctuația',
+    oUpper: 'Corectează liniile cu majuscule',
+    oMerge: 'Combină replicile vecine foarte scurte',
+    tip_assFx: 'Elimină marcajele de efect SubStation precum {\\an8}. Nu au efect în SRT și apar ca text literal.',
+    tip_html: 'Elimină etichetele <i>, <b>, <font> și păstrează textul din interior. Majoritatea playerelor nu le suportă.',
+    tip_ctrl: 'Elimină caracterele de control, cu lățime zero și cratimele invizibile care strică căutarea și numărătoarea.',
+    tip_sort: 'Resortează după timpul de început și renumerotează. Textul rămâne neschimbat.',
+    tip_sdh: 'Elimină descrierile de sunet pentru spectatorii cu deficiențe de auz, precum [pași] sau (tuse). Dialogul este păstrat.',
+    tip_speaker: 'Elimină numele vorbitorului de la început, precum GEORGE:. Liniile normale nu sunt afectate.',
+    tip_music: 'Șterge replicile care conțin doar versuri ♪…♪. Dialogul care citează un vers este păstrat.',
+    tip_wm: 'Elimină filigranele grupurilor de subtitrare, URL-urile, e-mailurile și reclamele. Se verifică doar replicile scurte, dialogul lung e în siguranță.',
+    tip_dup: 'Elimină replicile cu timp și text identice, păstrând-o pe prima.',
+    tip_empty: 'Elimină replicile care nu conțin deloc text.',
+    tip_punct: 'Elimină spațiile în plus și punctele repetate. Nu modifică niciodată ghilimelele sau formele full-width.',
+    tip_upper: 'Transformă replicile scrise integral cu majuscule în minuscule normale. Numele proprii nu pot fi recuperate, așa că verifică-le manual.',
+    tip_merge: 'Unește replicile vecine mai scurte de 1,2 s cu un interval sub 0,4 s. Util când subtitrările clipesc.',
+    thTime: 'Timp',
+    thOld: 'Înainte',
+    thNew: 'După',
+    stRaw: 'Original',
+    stOut: 'Curățat',
+    stDel: 'Șters',
+    stMod: 'Modificat',
+    stOff: 'Restaurat',
+    removed: 'eliminat',
+    emptyRow: 'replică goală în sursă',
+    btnUndo: 'Restaurează',
+    btnAdopt: 'Aplică',
+    btnDownload: 'Descarcă',
+    btnCopy: 'Copiază',
+    btnTxt: 'Text simplu',
+    btnUndoAll: 'Restaurează tot',
+    noChange: 'Nimic de curățat. Fișierul este deja curat.',
+    pvTitle: 'Subtitrări curățate',
+    pvTitleRaw: 'Subtitrări originale',
+    pvUnit: 'linii',
+    pvOut: 'Curățat',
+    pvRaw: 'Original',
+    pvNone: 'Acest fișier nu are conținut',
+    pvMore: 'Se afișează primele {n} din {t} linii — descarcă pentru fișierul complet',
+    okParse: '{n} replici analizate · sursă {f}',
+    okEnc: 'codificare corectată ca {e}',
+    assNote: 'Stilul ASS este tratat ca conținut; se exportă ca SRT',
+    outFmt: 'Exportă ca',
+    outAssOff: 'Exportul ASS necesită o sursă ASS',
+    outAssNote: 'Stilurile și rezoluția se păstrează, doar textul este înlocuit',
+    biFound: 'S-au găsit {n} perechi bilingve, fiecare combinată într-o replică',
+    biOrderSrc: 'Originalul deasupra',
+    biOrderTgt: 'Traducerea deasupra',
+    biFlipSrc: 'Pune originalul deasupra',
+    biFlipTgt: 'Pune traducerea deasupra',
+    errParse: 'Nu s-a putut analiza nicio replică. Formate acceptate: SRT, VTT, ASS (și SSA).',
+    errEmpty: 'Fișierul este gol',
+    noFile: 'Încarcă mai întâi un fișier de subtitrare',
+    okDl: 'Descărcat',
+    okCopy: 'Copiat',
+    errCopy: 'Copierea a eșuat, selectează și copiază manual',
+    optOn: '{n} din {t} reguli active',
+    pasteSrc: 'conținut lipit',
+    footHome: 'Tradu subtitrările',
+    footMerge: 'Combină subtitrările',
+    heroA: 'Curățare',
+    heroEm: 'subtitrări',
+    heroSub: 'Elimină etichetele HTML, efectele ASS, replicile SDH, etichetele de vorbitor și watermark-urile de grup, apoi corectează majusculele și caracterele corupte.',
+    footBrand: 'AI-SRTSub · Curățare subtitrări'
+  }
+};
+let LANG = 'zh-CN';
+function t(k) {
+  const d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    const k = el.getAttribute('data-i18n');
+    const v = t(k);
+    if (v !== k || LANG === 'zh-CN') el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  document.querySelectorAll('[data-tip-i18n]').forEach(function (el) {
+    el.setAttribute('data-tip', t(el.getAttribute('data-tip-i18n')));
+  });
+  document.documentElement.lang = LANG;
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「SubtitleCleaner」。
+     v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
+  if ($('#fname').textContent && S.fname) $('#fname').textContent = S.fname;
+  syncOptCnt();
+  syncLogoHome();   /* v0.9.280：左上 logo 的回首页地址跟着界面语言走 */
+}
+/* v0.9.280：logo 整块可点，回「当前界面语言的首页」（/en/clean.html → /en/，不掉语言）。
+   ⚠️ 页内切语言不重建 DOM，所以挂在 applyI18n 末尾每次重算。 */
+function syncLogoHome() {
+  const el = document.getElementById('logoHome');
+  if (!el) return;
+  el.href = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
+}
+syncLogoHome();
+
+/* ---------------- ⓘ 浮层 ----------------
+   ⚠️ 挂在 body 上、position:fixed —— 气泡不能放卡片里，会被 overflow 裁掉。 */
+const TIP = { el: null, pin: false };
+function initTips() {
+  const layer = $('#tipLayer');
+  document.addEventListener('mouseover', function (e) {
+    const i = e.target.closest && e.target.closest('.info');
+    if (!i) return;
+    showTip(i);
+  });
+  document.addEventListener('mouseout', function (e) {
+    const i = e.target.closest && e.target.closest('.info');
+    if (!i || TIP.pin) return;
+    hideTip();
+  });
+  document.addEventListener('click', function (e) {
+    const i = e.target.closest && e.target.closest('.info');
+    if (i) {
+      e.preventDefault();
+      if (TIP.el === i && TIP.pin) { TIP.pin = false; hideTip(); }
+      else { TIP.pin = true; showTip(i); }
+      return;
+    }
+    if (TIP.pin) { TIP.pin = false; hideTip(); }
+  });
+  window.addEventListener('scroll', function () { if (!TIP.pin) hideTip(); }, true);
+}
+function showTip(i) {
+  const layer = $('#tipLayer');
+  const txt = i.getAttribute('data-tip') || '';
+  if (!txt) return;
+  layer.textContent = txt;
+  layer.classList.add('show');
+  const r = i.getBoundingClientRect();
+  const w = layer.offsetWidth, h = layer.offsetHeight;
+  let x = r.left + r.width / 2 - w / 2;
+  let y = r.bottom + 7;
+  if (y + h > window.innerHeight - 8) y = r.top - h - 7;
+  x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+  layer.style.left = x + 'px';
+  layer.style.top = y + 'px';
+  TIP.el = i;
+}
+function hideTip() {
+  $('#tipLayer').classList.remove('show');
+  TIP.el = null;
+}
+
+/* ---------------- 启动 ----------------
+   v0.9.273：界面语言从 2 语扩到与全站同口径的 27 语。
+   ⚠️ 词典目前只有 zh-CN / en 两份 —— t() 的回退链会在缺词时给英文，
+   所以放出来不会白屏，但也不会是「德语界面」。先把语言通道打通，
+   词条再按语言逐个补，比一次塞进 25 份没校对过的机器翻译诚实。 */
+const CLEAN_UI_LANGS = [['zh-CN', '简体中文'], ['zh-TW', '繁體中文'], ['en', 'English'], ['ja', '日本語'], ['es', 'Español'], ['pt', 'Português'], ['ko', '한국어'], ['de', 'Deutsch'], ['fr', 'Français'], ['id', 'Bahasa Indonesia'], ['hi', 'हिन्दी'], ['th', 'ไทย'], ['vi', 'Tiếng Việt'], ['ru', 'Русский'], ['it', 'Italiano'], ['ar', 'العربية'], ['tr', 'Türkçe'], ['nl', 'Nederlands'], ['pl', 'Polski'], ['sv', 'Svenska'], ['cs', 'Čeština'], ['uk', 'Українська'], ['da', 'Dansk'], ['fi', 'Suomi'], ['el', 'Ελληνικά'], ['he', 'עברית'], ['ro', 'Română']];
+/* URL 语言优先（/en/clean.html 就该是英文界面），其次上次手动选的，最后浏览器语言 */
+function pathUiLang() {
+  const m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:merge|clean)\.html/);
+  if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : CLEAN_UI_LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
+  return null;
+}
+function initLang() {
+  const sel = $('#langSel');
+  sel.innerHTML = CLEAN_UI_LANGS.map(function (p) {
+    return '<option value="' + p[0] + '">' + p[1] + '</option>';
+  }).join('');
+  let saved = 'zh-CN';
+  try { saved = localStorage.getItem('srt_clean_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
+  if (!CLEAN_UI_LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
+  LANG = pathUiLang() || saved;
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    try { localStorage.setItem('srt_clean_lang', LANG); } catch (e) { /* 隐私模式下写不了，忽略 */ }
+    applyI18n();
+    render();
+  });
+}
+(function main() {
+  buildOpts();
+  initLang();
+  applyI18n();
+  initTips();
+  bind();
+  bindPv();     /* v0.9.268：预览的「清洗后 / 原文」切换 */
+  render();
+})();
+</script>
+<script src="site-topnav.js?v=0.9.341" data-tool="cl"></script>
+
+<!-- v0.9.273：SEO 静态文案（同上，按语言路由替换；直接开文件时显示简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">字幕清洗器 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>下载来的字幕先过一遍：水印、广告、听障提示、HTML 标签一次剔干净。</strong></p>
+    <p style="margin-top:8px;">13 条规则分四类（默认开 9 条）、去水印广告与听障提示、修全大写与乱码、逐条列出改了什么并可单独还原、时间轴一律不动。</p>
+    <p style="margin-top:8px;">拿到现成字幕想直接用的人、要批量整理素材的字幕组。</p>
+  </section>
+<!--SEO-COPY-END-->
+</body>
+</html>

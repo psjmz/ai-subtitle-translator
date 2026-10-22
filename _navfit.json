@@ -1,0 +1,602 @@
+[
+ {
+  "l": "bg",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 768
+ },
+ {
+  "l": "my",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 758
+ },
+ {
+  "l": "kn",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 776
+ },
+ {
+  "l": "ml",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 769
+ },
+ {
+  "l": "kk",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 764
+ },
+ {
+  "l": "uz",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 763
+ },
+ {
+  "l": "zu",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 765
+ },
+ {
+  "l": "be",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 767
+ },
+ {
+  "l": "hy",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 776
+ },
+ {
+  "l": "ka",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 761
+ },
+ {
+  "l": "ti",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 765
+ },
+ {
+  "l": "mg",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 769
+ },
+ {
+  "l": "sn",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 764
+ },
+ {
+  "l": "mi",
+  "h": 61,
+  "cls": "tnav-tight tnav-tight2 tnav-wrapped",
+  "avail": 759
+ },
+ {
+  "l": "en",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "zh-TW",
+  "h": 31,
+  "cls": "",
+  "avail": 762
+ },
+ {
+  "l": "ja",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ko",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "fr",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "de",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "es",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "pt",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "it",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ru",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "ar",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "th",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "vi",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "id",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "hi",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "tr",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "pl",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "nl",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ms",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "fil",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "fa",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "sv",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "da",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "fi",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "nb",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "cs",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "sk",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "hu",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "ro",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "ca",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "hr",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "el",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "uk",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "sr",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "he",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ur",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "bn",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ta",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "te",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "mr",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ne",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "si",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "km",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "lo",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "sw",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "gu",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "pa",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "or",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "as",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "mn",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "az",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "is",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "et",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "lv",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "lt",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "sl",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "sq",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "mk",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "eu",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "gl",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "am",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "ha",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "yo",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "so",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "ps",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ku",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "af",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "yue",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "tg",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "ky",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "tk",
+  "h": 31,
+  "cls": "tnav-tight tnav-tight2",
+  "avail": 758
+ },
+ {
+  "l": "bs",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "mt",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "cy",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ga",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "bo",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ug",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "sd",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "yi",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "jv",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "su",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "ceb",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "ig",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "xh",
+  "h": 31,
+  "cls": "tnav-tight",
+  "avail": 758
+ },
+ {
+  "l": "ny",
+  "h": 31,
+  "cls": "",
+  "avail": 758
+ },
+ {
+  "l": "zh-CN",
+  "h": 0,
+  "need": 0,
+  "avail": 0
+ }
+]

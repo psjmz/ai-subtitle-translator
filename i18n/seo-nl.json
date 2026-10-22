@@ -1,0 +1,18 @@
+{
+  "autosub": {
+    "title": "Audio naar ondertiteling — SRT maken in de browser | AI-SRTSub",
+    "desc": "Audio of video naar SRT of VTT in de browser. Automatische spraakherkenning zet spraak om in ondertitels zonder uploads. Gratis en volledig lokaal.",
+    "kw": "audio naar srt,spraak naar ondertiteling,ondertitels genereren,automatische ondertitel generator,audio transcriberen naar srt,whisper ondertitels,browser spraakherkenning,offline ondertitels maken",
+    "intro": "Sleep een audio- of videobestand in de browser, kies een taal en een model om de herkenning direct te starten. Het resultaat is een ondertitelbestand met tijdscodes, automatisch gesegmenteerd en opgemaakt.",
+    "feat": "Deze tool zet spraak om in tekst en verdeelt deze in ondertitelblokken die voldoen aan leesbaarheidseisen, zoals regelbreedte en minimale leestijd, zonder dat audio wordt geüpload.",
+    "who": "Contentmakers die hun video's willen ondertitelen, teams die podcasts omzetten naar tekst en iedereen die snel een concept-ondertitelbestand nodig heeft."
+  },
+  "ocrsub": {
+    "title": "Hardcoded ondertiteling OCR — lees ingebrande tekst | AI-SRTSub",
+    "desc": "Extraheer ingebrande ondertitels uit video's met OCR. Markeer het tekstgebied, de tool leest frame voor frame en exporteert naar SRT of VTT. Gratis.",
+    "kw": "hardcoded ondertitels extraheren,ondertitel ocr,video ondertitel extractie,ingebrande ondertitels,ocr ondertitels uit video,video naar srt,ondertiteling uit video,hardcoded caption ocr",
+    "intro": "Sleep een video in de tool, markeer het gebied waar de ondertitels staan en de tool leest frame voor frame om identieke tekstblokken samen te voegen tot één tijdcode.",
+    "feat": "De tool isoleert de ondertitelstrook, past binarisatie toe op basis van helderheid en herkent tekst die over meerdere frames wordt weergegeven als één enkel ondertitelblok.",
+    "who": "Ondertitelteams die buitenlandse video's lokaliseren, editors die oude releases opnieuw ondertitelen en iedereen zonder toegang tot het originele ondertitelbestand."
+  }
+}

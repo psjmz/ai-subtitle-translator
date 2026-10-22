@@ -1,0 +1,739 @@
+1	pureMTMode	检测到纯翻译模型（{0}）：改用逐组直译（共 {1} 组，并行 4 路，成功的组有缓存）…	Pure translation model detected ({0}): switching to per-group direct translation ({1} groups, 4 in parallel, successful groups are cached)…
+2	pureMTDone	逐组直译完成：成功 {0}/{1} 组	Per-group translation finished: {0}/{1} groups succeeded
+3	gotClick	已收到「开始翻译」的请求，正在准备…	Received “start translation” — preparing…
+4	reqSent	第 {0} 批请求已发出（{1} 个句组），正在等待模型响应…	Batch {0} request sent ({1} groups) — waiting for the model…
+5	waitSec	已等待 {0} 秒，仍在等待模型的响应…	Waited {0} s — still no reply from the model…
+6	errTimeout	等待 {0} 秒仍无响应，已放弃本次请求（超时）。建议：把「每批字符」调小以缩小批次，或换一个响应更快的模型；若所用模型会先思考再回答（Qwen3 / GLM 等），在「附加请求参数」里填 {"enable_thinking":false}	No response after {0} s — request abandoned (timeout). Try lowering the per-batch character budget, or switch to a faster model; if the model reasons before answering (Qwen3, GLM…), put {"enable_thinking":false} in Extra request parameters
+7	alreadyRunning	上一轮翻译尚未结束（可能仍在等待某次请求的响应），已请求停止——请等当前批次收尾后再重新开始	The previous run has not finished yet — a stop has been requested. Please wait for the current batch to wrap up before starting again
+8	modeMismatch	注意：下方已填写自定义 API（{0}），但当前是「默认模型」模式，本次不会用到它——要使用请先在上方切换到「自定义 API」	Heads up: custom API fields are filled in below ({0}), but the mode above is “Default model”, so none of them will be used. Switch the mode to “Custom API” to actually use it
+9	errTruncOut	模型输出被长度上限截断（没生成完就结束了）——请在「附加请求参数」里加大 max_tokens，例如 {"max_tokens":8192}	Model output hit the token limit and was cut off before finishing — raise max_tokens in Extra request parameters, e.g. {"max_tokens":8192}
+10	lblExtra	附加请求参数（JSON，可选）	Extra request parameters (JSON, optional)
+11	extraTip	随每次自定义 API 请求一起发送。例：{"enable_thinking":false} 关闭模型思考；{"response_format":{"type":"json_object"}} 强制 JSON 输出。model / messages / temperature / stream 不可覆盖。	Merged into every custom-API request body. Examples: {"enable_thinking":false} to turn off reasoning; {"response_format":{"type":"json_object"}} to force JSON output. model / messages / temperature / stream cannot be overridden.
+12	fbRoute	注意：模型 B（{0}）调用失败，本次已改用模型 A（{1}）。原因：{2}	Note: model B ({0}) failed, so this batch was translated by model A ({1}). Reason: {2}
+13	navMerge	双语合并	Bilingual Merge
+14	docTitle	随心字幕 AI (AI-SRTSub) - 全球好剧随心看，一键生成专属母语字幕	AI-SRTSub - Global Movies & Series, Subtitles in Your Language
+15	appTitle	🎬 随心字幕 AI	🎬 AI Subtitle Translator
+16	uiLangTag	界面语言	UI
+17	rule1	① 翻译风格可选（均衡/口语自然/自定义）	① Choose translation style (Balanced/Natural/Custom)
+18	rule2	② 时间轴对齐	② Timeline aligned
+19	rule3	③ 听写纠错	③ Auto-fix transcription errors
+20	rule4	④ 专名可保留或翻译	④ Keep or translate proper nouns
+21	rule5	⑤ 去水词	⑤ Remove filler cues
+22	rule6	⑥ 超过<b>行宽阈值</b>自动折行	⑥ Auto-wrap lines over the <b>width threshold</b>
+23	step1	导入字幕（支持多语言）	Import subtitles (any language)
+24	btnFile	📂 选择字幕文件	📂 Choose subtitle file
+25	btnDemo	载入示例	Load sample
+26	pastePh	或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）	…or paste subtitle text here… (SRT / VTT / ASS)
+27	btnParse	解析字幕	Parse subtitles
+28	stepReq	翻译要求	Translation requirements
+29	stepEngine	翻译引擎	Translation engine
+30	lblMode	工作模式	Mode
+31	optBuiltin	默认模型（站点提供，无需 Key）	Default model (site-provided, no key needed)
+32	optApi	自定义 API（OpenAI 兼容）	Custom API (OpenAI-compatible)
+33	optDemo	规则演练（无翻译，仅演示折行/水词/重排）	Dry run (no translation; shows wrapping/filler/renumber)
+34	builtinOn	默认模型已就绪：{0}。开箱即用；单 IP 每日限 {1} 次请求，大批量建议用自己的 API。	Default model ready: {0}. Works out of the box; {1} requests per IP per day — for large files prefer your own API.
+35	builtinOff	管理员尚未配置默认模型，当前不可用 → 请改用「自定义 API」或「规则演练」。	The admin has not configured a default model yet → please use "Custom API" or "Dry run".
+36	lblSrcLang	源字幕语言（选“自动检测”则让模型识别）	Source language ("Auto-detect" lets the model decide)
+37	autoDetect	自动检测	Auto-detect
+38	lblDstLang	翻译为目标语言	Translate into
+39	lblStyle	翻译风格	Translation style
+40	styleElegant	均衡（默认）	Balanced (default)
+41	stylePlain	口语自然	Natural & conversational
+42	styleFormal	书面专业	Formal & professional
+43	styleDubbed	译制腔	Dubbed-film flair
+44	styleCustom	自定义…	Custom…
+45	styleCustomPh	描述你想要的口吻，如：轻松幽默、像给朋友讲故事	Describe the tone you want, e.g. light-hearted, like telling a story to a friend
+46	hintElegant	均衡：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯。	Balanced: accurate, fluent and graceful, following the target language's natural expression.
+47	hintPlain	口语自然：口语化、直白易懂，像日常对话；多用短句与常用词，保留说话人语气。	Natural & conversational: colloquial and easy to understand, like everyday conversation; short sentences, common words, keep the speaker's tone.
+48	hintCustom	自定义：下面的描述将原样作为“翻译风格”要求发给模型。	Custom: the description below is sent to the model verbatim as the style requirement.
+49	optCustom	自定义…	Custom…
+50	btnTest	⚡ 测试连接	⚡ Test connection
+51	testRun	测试中…	Testing…
+52	testOk	✓ 连接成功	✓ Connected
+53	testFail	✗ 失败：{0}	✗ Failed: {0}
+54	getKey	获取 API Key ↗	Get API Key ↗
+55	noteDoubao	豆包需在火山方舟控制台开通模型服务；「模型」填 doubao-seed-… 或接入点 ID（ep- 开头）	Doubao requires enabling model service in the Volcano Ark console; Model = doubao-seed-… or endpoint ID (ep-…)
+56	noteOpenRouter	模型名格式为 厂商/模型（如 anthropic/claude-sonnet-4.6）；一个 Key 可调用数百款模型	Model names use vendor/model format (e.g. anthropic/claude-sonnet-4.6); one key unlocks hundreds of models
+57	lblProvider	服务商	Provider
+58	lblBase	Base URL（自动拼接 /chat/completions）	Base URL (/chat/completions appended automatically)
+59	lblModel	模型	Model
+60	lblBatch	单批字符预算	Chars per batch
+61	batchTip	每次请求送模型的字幕字符数。按长度自动分批——短句多装、长句少装，每批输出量稳定。越大总耗时略短，但过大可能降低翻译质量；默认 3000 适合大多数视频。	Characters of subtitles sent to the model per request. Batches are cut by length automatically: short lines fill more, long lines fewer, keeping each output stable. Larger values finish slightly faster, but too large may reduce quality; the default 3000 suits most videos.
+62	lblKey	API Key（仅保存在本机浏览器）	API Key (stored only in this browser)
+63	lblTemp	温度（0–2，默认 0.2）	Temperature (0–2, default 0.2)
+64	tempTip	与后台模型设置的「温度」同一含义：越小越稳定、越大越发散；字幕翻译建议 0.2 或更低。留空则按 0.2。	Same field as Temperature in the admin model settings: lower is steadier, higher is more varied. For subtitles 0.2 or lower is recommended; leave empty for 0.2.
+65	lblViaSrv	由本站服务器转发	Relay through this site
+66	viaSrvTip	默认关闭：浏览器直连你填的服务商，字幕与 Key 不经本站。部分端点（如 api.z.ai）不放行浏览器跨域，直连必然报 Failed to fetch——勾选后改由本站服务器代发即可连通，此时请求会经过本站（不保存、不记录）。	Off by default: your browser talks directly to the endpoint you entered, so subtitles and your key never pass through this site. Some endpoints (e.g. api.z.ai) refuse browser cross-origin requests and always fail with "Failed to fetch" — tick this to let the site server send requests instead. They then pass through this site (never stored or logged).
+67	errCors	浏览器直连被拒绝（该端点多半不允许跨域，或本机网络不通）。可勾选「由本站服务器转发」再试。	Direct browser connection refused (the endpoint usually disallows cross-origin calls, or your network cannot reach it). Tick "Relay through this site" and retry.
+68	errRelay	经本站转发仍失败：{0}	Relay still failed: {0}
+69	chkKeepTerms	专有名词（人名/机构/产品/术语）保留原文，不翻译	Keep proper nouns (names/brands/products/terms) untranslated
+70	termsHintOn	人名/机构/品牌一律保留原文写法，不翻译。术语表中指定的词条仍以术语表为准。	Names, organizations and brands keep their original spelling and are not translated. Entries in the glossary below still take precedence.
+71	termsHintOff	人名/机构/品牌一律译成目标语言译名。术语表中指定的词条仍以术语表为准。	Names, organizations and brands are all translated into the target language. Entries in the glossary below still take precedence.
+72	pnKeep	保留原文	Keep original
+73	pnTrans	全部译出	Translate all
+74	btnGlossFile	📂 上传术语表	📂 Upload glossary
+75	glossHit	术语表 {0} 条：本片命中 {1} 条，{2} 行无法识别	Glossary: {0} entries, {1} matched in this file, {2} lines unrecognized
+76	wsRkSub	支持 YouTube / B站 / 抖音等 1750+ 站点，下载到本地	YouTube, Bilibili, Douyin and 1750+ more sites — all downloads stay local
+77	rkTx	需要下载视频？试试 <b>RiseKol 视频下载器</b>	Need to download videos? Try <b>RiseKol Video Downloader</b>
+78	rkGo	去看看 →	Take a look →
+79	glossHelpTitle	格式说明	Format guide
+80	glossHelp1	只写来源 → 保留原文	Source only → keep original
+81	glossHelp2	指定译法，也认 -> => =	Set a translation; also accepts -> => =
+82	glossHelp3	逗号或 Tab 分隔，第三列是备注	Comma or tab separated; third column is a note
+83	glossHelp4	尾部括号是注释，不进译法	Trailing brackets are a comment, not the translation
+84	glossHelp5	形变（如复数 Whoppers）需单独写一条	Inflected forms (e.g. plural Whoppers) need their own line
+85	glossHelp6	上传支持 .txt/.csv/.tsv/.json：追加 = 并入现有，替换 = 清空后写入	Upload accepts .txt/.csv/.tsv/.json: append = merge, replace = clear then write
+86	btnGlossAppend	📥 追加	📥 Append
+87	btnGlossReplace	🔄 替换	🔄 Replace
+88	btnGlossTpl	📄 CSV 模板	📄 CSV template
+89	glossHelp7	字段含逗号时用双引号包裹（Excel 会自动加）	Wrap fields containing commas in double quotes (Excel does it automatically)
+90	glossHelpLead	让同一个专名从片头到片尾只用一种译法。这里的条目<b>优先于上方的「专名处理」</b>——写进来的按这里走，没写到的才按全局设置。	Keep one rendering for a term from start to finish. Entries here <b>override the Proper nouns setting above</b> — listed terms follow this table, everything else follows the global choice.
+91	glossHelpFmt	写法 · 一行一条	Format · one per line
+92	glossHelpS1	只写原文，表示保留原文不译	Source only — keeps the original untranslated
+93	glossHelpS2	原文 → 译法	Source → rendering
+94	glossHelpS3	逗号 / Tab / 箭头都认	Comma / tab / arrow all work
+95	glossHelpS4	行尾括号是备注，不进译法	Trailing brackets are a note, not part of the rendering
+96	glossHelpArrow	箭头也认 ->  =>  =	Arrows also accept ->  =>  =
+97	glossHelpMatch	怎么匹配	How matching works
+98	glossHelpM1	忽略大小写	Case-insensitive
+99	glossHelpM2	整个词匹配，不误伤相近词	Whole word — similar words are not affected
+100	glossHelpM3	中日韩按片段匹配	CJK matches by substring
+101	glossHelpM4	变形要另写一行	Inflected forms need their own line
+102	glossHelpUp	上传	Upload
+103	glossHelpU1	支持 .txt / .csv / .tsv / .json，需 UTF-8	Accepts .txt / .csv / .tsv / .json, must be UTF-8
+104	glossHelpU2	追加 = 并入现有（同名以文件为准）；替换 = 清空后写入	Append = merge into existing (same name uses the file); Replace = clear then write
+105	glossHelpU3	首行可以是表头，自动跳过	First line may be a header, skipped automatically
+106	glossHelpU4	字段含逗号时用双引号包住（Excel 会自动加）	Wrap fields containing commas in double quotes (Excel does it automatically)
+107	autoTermsKeepNote	当前为「保留原文」，抽出的专名会保持原文；要指定译法请手动改，或切成「全部译出」。	Proper nouns are set to keep original, so extracted ones stay in the source spelling. Edit them here for a specific rendering, or switch to translate all.
+108	btnGlossAI	✨ AI 抽取	✨ Extract with AI
+109	glossAiRun	正在抽取…	Extracting…
+110	glossAiDone	AI 抽出 {0} 条已填入下方，可直接修改	{0} terms added below — edit them before you translate
+111	glossAiNone	没抽出新条目，可能都已在你的表里	No new terms found; they may already be in your list
+112	glossAiNeedFile	先上传字幕，再点抽取	Upload a subtitle file first, then extract
+113	glossMiss	未命中 {0} 条：{1}（改这些不生效）	{0} not matched: {1} (editing these has no effect)
+114	glossAiCleared	已清除上一份字幕 AI 抽取的 {0} 条（你手写的已保留）	Removed {0} AI-extracted entries from the previous file (your own entries kept)
+115	glossVariant	拼写变体	spelling variant
+116	glossVerifyOk	术语表核对通过：指定的译法都在成片译文里出现了	Glossary check passed: every specified rendering appears in the finished subtitles
+117	glossVerifyMiss	术语表核对：{0} 条的指定译法没出现在成片译文里（模型没照做）：{1}	Glossary check: {0} entries never appear with the specified rendering in the finished subtitles (the model did not follow them): {1}
+118	glossHelpS5	几种拼写用 | 并排，共用一个译法	Several spellings side by side with | share one rendering
+119	glossUseTitle	这个表怎么用	How to use this table
+120	glossWhy	AI 是分批翻译的，同一个名字在不同批次里可能译成两种写法。写进这里的「原文 → 必须译成什么」，每批翻译前会先在这一批字幕里找一遍：找得到就交给 AI 照译，找不到这条就不提交——改它不会影响结果。没写进来的，按上面「专名处理」走。	AI translates in batches, so the same name can end up with two different renderings. What you write here ("source → must be rendered as") is looked up inside each batch before that batch is translated: found → the AI is told to use your rendering; not found → the entry is not submitted, so editing it changes nothing. Anything you leave out follows the "Proper nouns" setting above.
+121	glossHelpSep	箭头 -> => = 、逗号、Tab 都认	Arrows -> => = , commas and tabs all work as separators
+122	glossNoEffT	改了没生效？	Edited it and nothing changed?
+123	glossNoEffB	只有一种可能：你写的原文在字幕里没逐字出现过（多一个标点、少个 s 都配不上）。这时下方那行提示会变橙色，并点名是哪几条。	There is only one reason: the source term you wrote does not appear verbatim in the subtitles (one extra punctuation mark or a missing s is enough). The hint below turns orange and names the entries affected.
+124	glossUpOne	上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。	Upload accepts .txt / .csv / .tsv / .json (UTF-8); append = merge into what you have, replace = clear and write; a header row is skipped automatically.
+125	btnGlossDemo	📝 填入示例	📝 Fill in examples
+126	glossDemoOk	已填入 {0} 条示例，可直接修改	Filled in {0} example entries, edit them as you like
+127	glossDemoNone	示例里的写法都已经有了	These example forms are already in the table
+128	termsPh3	SpaceX
+Burger King → 汉堡王
+Whopper|Whoppers → 华堡	SpaceX
+Outlaw 1 → Renegade 1
+St. Paul|St Paul → Saint Paul
+129	glossClearedAll	换了新字幕，已清空术语表 {0} 条	New subtitle loaded — cleared {0} glossary entries
+130	btnGlossSave	💾 保存	💾 Save
+131	btnGlossClear	✕ 清空	✕ Clear
+132	glossLibHint	已保存 {0} 条术语（{1}）· 换片时自动载入	Saved {0} terms ({1}) · loaded automatically for the next file
+133	glossSaveEmpty	术语表是空的，没有可保存的内容。	The glossary is empty — nothing to save.
+134	glossSaveTooBig	术语表太长（{0} 字，上限 {1} 字），请先精简再保存。	The glossary is too long ({0} characters, limit {1}). Shorten it before saving.
+135	glossSaved	已保存 {0} 条术语（目标语言：{1}）。	Saved {0} terms (target language: {1}).
+136	glossClearTitle	清空术语表？	Clear the glossary?
+137	glossClearBody	将清空当前 {0} 条术语，并删除已保存的术语库（{1} 条）。之后翻译不会再用到它们。	This clears the {0} terms below and deletes the saved glossary ({1} terms). They will no longer be used in later translations.
+138	glossClearGo	清空	Clear
+139	glossCleared	已清空术语表与已保存的术语库。	Cleared the glossary and the saved term library.
+140	glossClearNone	术语表和已保存的术语库都是空的。	Both the glossary and the saved term library are already empty.
+141	glossLibTitle	术语库的语言对不上	The saved glossary targets another language
+142	glossLibBody	保存的术语库是翻译到 {0} 时存的，这次的目标是 {1}。里面的译法可能不适用，仍要载入吗？	The saved glossary was created for {0}, but this run targets {1}. Its translations may not fit — still load it?
+143	glossLibGo	仍要载入	Load anyway
+144	glossLibLoaded	已载入保存的术语库：{0} 条。	Loaded the saved glossary: {0} terms.
+145	glossLibSkip	术语库是翻译到 {0} 时保存的，当前目标语言是 {1}，没有自动载入。	The glossary was saved for {0}, but the target language is now {1}, so it was not loaded automatically.
+146	glossLangRunBody	保存的术语库是翻译到 {0} 时存的，这次的目标是 {1}。里面的译法可能不适用，仍要继续吗？	The saved glossary was created for {0}, but this run targets {1}. Its translations may not fit. Continue anyway?
+147	glossLangRunGo	继续进行	Continue
+148	lblTerms	统一译名（术语表，每行一条）	Unified glossary (one term per line)
+149	lblTermsShort	统一译名	Unified glossary
+150	termsPh	每行一条：原文 → 译法；只写原文表示保留原文	One per line: source → rendering; a line with only the source term keeps the original
+151	lblMaxW	折行宽度（单位=全角宽，不是字数：1 个汉字/假名/韩文音节=1；拉丁·西里尔·泰文·阿拉伯字母=0.5，即半角文字 1 单位≈2 字符）。作用于单语折行，以及双语的「- A - B」双说话人行。默认随目标语言按 Netflix 规范推荐（中/韩 16、日 13、其余 21）。调大 → 一行更长、行数和切分更少。	Single-language width in full-width UNITS, not characters: 1 CJK char = 1; Latin, Cyrillic, Thai and Arabic letters = 0.5, so 1 unit is about 2 characters for half-width scripts. Governs monolingual wrapping and "- A - B" dual-speaker lines in bilingual export. Default follows the Netflix spec per language (zh/ko 16, ja 13, others 21). Larger = longer lines, fewer line breaks and cue splits.
+152	lblBiMaxW	双语导出时【译文行】的宽度上限（同为全角宽单位，不是字数：同样 32，中文≈32 字，泰文≈64 字符）。只约束译文行，源文行跟随语义断点、不限宽；双说话人行走上方「单语行宽」。只有译文超出才拆时间轴。此值不随语言变化。调大 → 拆分更少但译文行更长。	Max width of the TRANSLATED line in bilingual export (same full-width unit, not characters: the same 32 is about 32 Chinese characters but about 64 Thai characters). Constrains the translated line only; the source line follows semantic breaks and is not width-limited, and dual-speaker lines use "Single-language width" above. Exceeding it is the only thing that splits the timeline. This value does NOT change per language. Larger = fewer splits but longer translated lines.
+153	btnGo	▶ 开始翻译	▶ Start translation
+154	btnGoStop	翻译中…点击可停止	Translating… click to stop
+155	lyricTip	歌词行的处理方式：翻译／保留原文（不翻译）／删除（整组移除）。判断依据是「歌词标记」里的字符。	How to handle lyric lines: translate / keep the original text / remove them entirely. Lines are matched by the characters in “Lyric markers”.
+156	marksTip	含这些字符的字幕行视为歌词。默认 ♪♫♬♩，可增删；留空自动恢复默认。若源文件歌词不带任何符号，可加入该字幕独有的标记。一行内歌词与对白混排时，删除档会自动降级为保留原文，不会误删对白。	Subtitle lines containing any of these characters are treated as lyrics. Default ♪♫♬♩ — add or remove freely; leave empty to restore the default. If your file uses no music symbols, add the marker it does use. When a line mixes lyrics with dialogue, “Remove” falls back to keeping the original so dialogue is never deleted.
+157	lyricSkipKeep	歌词 {0} 组按设置保留原文（未翻译）	{0} lyric group(s) kept in the original language (not translated)
+158	lyricSkipDrop	歌词 {0} 组按设置移除	{0} lyric group(s) removed per your setting
+159	lyricWarn	注意：{0}% 的字幕行被判定为歌词，可能是「歌词标记」设置过宽，请确认后重跑	Heads up: {0}% of lines were classified as lyrics — the marker set may be too broad. Please check and re-run.
+160	dropFillersTip	开启：本地判定的纯水词字幕（um、uh、无实义哼唱等）直接移除，不送模型，结果确定。关闭：全部送模型，由模型逐条判断该翻、该留还是该删。默认开启。	On: lines that the local rule judges to be pure filler (um, uh, meaningless humming) are removed outright and never sent to the model, so the result is deterministic. Off: every line goes to the model, which decides case by case whether to translate, keep or drop it. On by default.
+161	btnPost	↻ 仅后处理（折行/清提示词）	↻ Post-process only (wrap/clean tags)
+162	hintPrivacy	默认模型：字幕会经本站服务器转发给管理员配置的服务商；自定义 API：由你填入的服务商直接处理，不经本站。	Default model: subtitles are relayed through this site's server to the admin-configured provider; Custom API: your chosen provider processes them directly, not via this site.
+163	stepExport	导出译文	Export translation
+164	btnDownload	下载字幕	Download subtitles
+165	btnCopy	复制到剪贴板	Copy to clipboard
+166	lblExpStyle	导出字幕样式	Export style
+167	assSplit	上下双屏	Top + bottom
+168	assStack	底部双行	Two lines, bottom
+169	fmtSubSrt	最通用	Most common
+170	fmtSubVtt	网页播放	Web players
+171	fmtSubSbv	YouTube	YouTube
+172	fmtSubTxt	纯文本	Plain text
+173	lblFileFmt	文件格式	File format
+174	lblExpFmt	导出格式	Export format
+175	fmtMono	仅译文（单语）	Translated only
+176	secAssStyle	ASS 字幕样式	ASS style
+177	lblSizeShort	字号	Size
+178	lblColorShort	颜色	Colour
+179	lblMVShort	离底	Bottom
+180	colDstShort	译文	Translation
+181	colSrcShort	原文	Original
+182	lblAssDstSize	译文字号	Translation size
+183	lblAssSrcSize	原文字号	Original size
+184	lblAssDstColor	译文颜色	Translation colour
+185	lblAssSrcColor	原文颜色	Original colour
+186	lblAssDstMarginV	译文离底距离	Translation bottom margin
+187	lblAssSrcMarginV	原文离底距离	Original bottom margin
+188	assDstMVTip	译文行距画面底边的距离（像素，1080p 基准）。默认值随「分屏/双行」和「谁在上」自动变化；手动修改后固定不变。	Distance from the translation line to the bottom edge (px, 1080p). The default follows the split/stacked mode and which line is on top; once you edit it, the value is kept.
+189	assSrcMVTip	原文行距画面底边的距离（像素，1080p 基准）。分屏模式下原文在画面上方时，同样按距底边计算；手动修改后固定不变。	Distance from the original line to the bottom edge (px, 1080p). In split mode, when the original sits at the top it is still measured from the bottom edge; once you edit it, the value is kept.
+190	assSizeRec	推荐 	Recommended 
+191	assApply	应用	Apply
+192	assUndo	撤销	Undo
+193	assKept	你的	yours
+194	assAutoReset	已按新布局重置	Reset for new layout
+195	assMVRec	推荐 	Recommended 
+196	assSizeFollow	按行业推荐值自动填充，可任意修改	Prefilled from industry reference values — edit freely
+197	assSizeLocked	已用你的设置；上方为行业推荐值，仅供参考	Using your value — the industry reference above is only a guide
+198	assColorTip	填 #RRGGBB 十六进制色值，例如 #FFFFFF 白、#FFD700 金黄。	Enter a hex colour #RRGGBB, e.g. #FFFFFF (white) or #FFD700 (gold).
+199	lblOutlineShort	描边	Outline
+200	lblFontShort	字体	Font
+201	lblAlphaShort	不透明	Opacity
+202	assOutlineTip	文字轮廓的粗细与颜色。设为 0 可得到无描边字幕。	Thickness and colour of the text outline. Set 0 for no outline.
+203	assFontTip	字体名称在对方设备上解析，缺字体会自动回退。	The font is resolved on the viewer device; missing fonts fall back automatically.
+204	assAlphaTip	数值越小字幕越透明，常用于纪录片或访谈类字幕。	Lower values make subtitles more transparent — common in documentaries and interviews.
+205	secVttStyle	WebVTT 字幕样式	WebVTT subtitle style
+206	vttStyleTip	样式写在文件头的 STYLE 块里，由播放器按 WebVTT 规范渲染。	Styles are written into the STYLE block at the top of the file and rendered by the player per the WebVTT spec.
+207	vttGrpPos	位置（百分比，随分辨率自适应）	Position (percent, scales with resolution)
+208	lblVttLine	垂直 line	Vertical line
+209	vttAnchorBottom	贴底	Bottom
+210	vttAnchorTop	贴顶	Top
+211	vttAnchorMid	居中	Middle
+212	lblVttPos	水平 position	Horizontal position
+213	lblVttWidth	宽度 size	Width size
+214	lblVttAlign	对齐 align	Align
+215	vttAlignCenter	居中	Center
+216	vttAlignStart	左	Left
+217	vttAlignEnd	右	Right
+218	vttGrpText	文字	Text
+219	lblVttSize	字号	Font size
+220	vttSizeTip	相对播放器默认字号（100% 即默认大小）。VTT 没有像素单位，用百分比才不受分辨率影响。	Relative to the player default (100% = default). WebVTT has no pixel unit — percentages survive any resolution.
+221	lblVttColor	颜色	Color
+222	lblVttFont	字体	Font
+223	vttFontSans	默认无衬线	Default sans-serif
+224	vttFontSerif	衬线	Serif
+225	vttFontMono	等宽	Monospace
+226	lblVttLH	行高	Line height
+227	lblVttWeight	字形	Weight
+228	vttBold	粗体	Bold
+229	vttItalic	斜体	Italic
+230	vttGrpSrc	原文行	Source line
+231	vttInherit	沿用	Inherit
+232	vttOptSet	单独设	Custom
+233	vttSrcDiffTip	每一项都能「沿用」译文行（沿用就不写进 ::cue(.src)）；全部沿用＝两行完全一样。Firefox 不支持带参选择器 ::cue(.src)，会整片同色。	Every item can inherit the translation line (inherited items are not written to ::cue(.src)); inherit everything and both lines look identical. Firefox does not support the parameterized ::cue(.src) selector, so the whole cue turns one color.
+234	lblVttSrcColor	颜色	Color
+235	lblVttSrcSize	字号	Font size
+236	vttGrpDeco	底衬与描边	Background and outline
+237	lblVttBg	底衬	Background
+238	lblVttShadow	描边	Outline
+239	vttShadowTip	VTT 没有真正的描边属性，这里用 text-shadow 八向模拟。	WebVTT has no real outline property — this fakes one with an eight-direction text-shadow.
+240	vttFxTip	原文区分色用 ::cue(.src)，Firefox 不支持带参选择器，会整片同色。	The source line color uses ::cue(.src); Firefox ignores parameterized selectors, so all text turns one color.
+241	vttGrpScheme	样式方案	Style presets
+242	vttSchemeApply	套用	Apply
+243	vttSchemeSave	保存	Save
+244	vttSchemeDel	删除	Delete
+245	vttSchemeNone	（暂无方案）	(no presets)
+246	vttSchemeAskName	给这套样式起个名字：	Name this style preset:
+247	vttSchemeSaved	已保存方案「{0}」	Preset saved: {0}
+248	vttSchemeApplied	已套用方案「{0}」	Preset applied: {0}
+249	vttSchemePick	请先选一个方案	Pick a preset first
+250	vttSchemeDelAsk	删除方案「{0}」？不可撤销。	Delete preset {0}? This cannot be undone.
+251	vttSchemeDeleted	已删除方案「{0}」	Preset deleted: {0}
+252	vttStyleImported	已从导入的 VTT 载入样式（{0} 项）	Style loaded from the imported VTT ({0} fields)
+253	vttLineNumNote	文件里的 line 是「第几行」写法（如 line:3），不是百分比，无法换算成面板的值，已跳过，位置请自行确认。	The file uses line numbers (e.g. line:3) instead of percentages. Those cannot be converted to panel values, so they were skipped. Please check the position yourself.
+254	vttNativeT	原生对照预览	Native reference preview
+255	vttNativeReplay	重播	Replay
+256	vttNativeTip	把当前样式交给浏览器自己的 WebVTT 渲染器 —— 与上面预览同一份样式和设定，只是渲染器不同。不同播放器可能略有差异，这里以此刻这个浏览器为准。	Hands the current style to the WebVTT renderer built into this browser — same style and settings as the preview above, just a different renderer. Other players may differ slightly; this reflects this browser right now.
+257	fxGoto	去特效字幕处理	Styled subtitles
+258	fxGotoHint	需要字体、颜色、样式槽或 ASS / VTT 精细样式？把这份字幕带过去继续调。	Need fonts, colours, style slots or fine ASS / VTT styling? Take this subtitle along and keep tweaking.
+259	fxGotoSub	字体 · 颜色 · 样式槽 · ASS / VTT	Fonts · Colours · Style slots · ASS / VTT
+260	fxNoZh	还没有译文可以带过去，先完成翻译。	No translation to take over yet — finish translating first.
+261	fxFail	字幕没能带过去，请先下载，再到特效页上传。	Could not carry the subtitles over — download them and upload on the styled page.
+262	showTitle	一个字幕文件，导出花样这么多	One subtitle file, so many ways to export
+263	showSub	译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式	Mix translation and original freely: 4 formats × 5 layouts, 14 export styles
+264	showMono	仅译文	Translation only
+265	showBi	双语双行 · SRT/VTT	Bilingual lines · SRT/VTT
+266	showSplit	上下分屏 · ASS	Split screen · ASS
+267	showStack	双语双行 · ASS · 样式可控	Stacked lines · ASS · styled
+268	showNote	原文在上 / 译文在上自由切换，还能导出 TXT 对照稿	Original on top or translation on top, plus TXT transcript export
+269	showLineDst	♪ 爱在空中飘荡 ♪	♪ Love is in the air ♪
+270	fmtBiSrc	双语 · 原文在上	Bilingual · source on top
+271	fmtBiDst	双语 · 译文在上	Bilingual · translation on top
+272	logTitle	运行日志	Log
+273	logReady	就绪。导入字幕或载入示例开始。	Ready. Import subtitles or load the sample.
+274	stTotal	条数	Cues
+275	stDone	已译	Done
+276	stDrop	水词清空	Fillers cleared
+277	stMerge	跨条句组	Multi-cue groups
+278	stWrap	折行	Wrapped
+279	stIssues	待处理	Pending
+280	fAll	全部	All
+281	fTodo	仅待译	Pending only
+282	fDone	仅已译	Done only
+283	fFlag	仅特殊处理	Flagged only
+284	colSrc	{0}原文	{0} source
+285	colDst	{0}译文（可点击编辑）	{0} translation (click to edit)
+286	pending	待翻译…	Pending…
+287	dropNote	（已删除：纯水词/提示词条目）	(removed: pure filler/sound cue)
+288	emptyNote	（空字幕：无需翻译）	(empty cue: no translation needed)
+289	emptyRows	还没有字幕。左侧「导入」→ 选文件 / 粘贴 / 载入示例。	No subtitles yet. Import on the left → choose a file / paste / load sample.
+290	emptyFilter	当前筛选无内容	Nothing under this filter
+291	filterAria	筛选字幕	Filter subtitles
+292	tcFix	一键修	Fix all
+293	tcSnapNext	收到下一条开始	Pull back to next start
+294	edEdited	手工改过	Edited by hand
+295	edHintEdit	点击可编辑	Click to edit
+296	edStart	开始	Start
+297	edEnd	结束	End
+298	edTmHint	也认 +1.5s / -500	Also accepts +1.5s / -500
+299	edBadTime	时间格式认不出来，已保留原值	Time format not recognised, kept the old value
+300	edBarCount	已手工改 {0} 处	Edited {0} lines by hand
+301	edBarKeep	刷新页面不会丢	Safe after a page refresh
+302	edClear	全部还原	Revert all
+303	edCleared	已还原 {0} 处	Reverted {0} lines
+304	edRestored	已恢复上次 {0} 处编辑	Restored {0} edits from last time
+305	tcTitle	时间轴	Timing
+306	tcShiftAll	整体偏移	Shift all
+307	tcShiftFrom	从某条起	Shift from line
+308	tcScale	比例缩放	Rescale
+309	tcScaleHint	首尾各对一次，中间按比例校准	Set the first and last line, the rest adjusts proportionally
+310	tcCheck	时长体检	Duration check
+311	tcFixed	已修 {0} 处	Fixed {0} issues
+312	tcOk	时间轴没问题	No timing problems found
+313	tcSnapPrev	吸到上一条结束	Snap to previous end
+314	tcPushNext	把后面顺推	Push the following lines
+315	tcKeepOv	保持重叠	Keep the overlap
+316	tcAskMs	偏移多少毫秒（负号=提前）	Shift by how many milliseconds (negative = earlier)
+317	tcAskFrom	从第几条开始	Start from which line
+318	tcAskCur	现在 {0}	Now {0}
+319	tcAskShould	应为	Should be
+320	tcEditTip	改完自动进导出	Edits flow straight into the export
+321	reportSummary	导出前校验报告	Pre-export validation report
+322	footer	随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你	AI-SRTSub · Open source AGPL-3.0 · Your subtitles always belong to you
+323	bDrop	水词·已删	filler·removed
+324	bMerge	并入下行	merged
+325	bLong	超长	long
+326	parseOk	✅ 解析成功：{0} 条字幕。	✅ Parsed OK: {0} cues.
+327	parseWarn	⚠ 解析到 {0} 条，{1} 个格式问题：	⚠ Parsed {0} cues with {1} format issues:
+328	imported	已导入 {0}：{1} 条。	Imported {0}: {1} cues.
+329	paste	粘贴内容	pasted text
+330	noSrc	请先导入并解析字幕。	Import and parse subtitles first.
+331	langSame	源语言与目标语言相同（{0}），请选择不同的目标语言。	Source and target language are the same ({0}); choose a different target.
+332	customNeed	已选“自定义”风格，请填写风格描述；或改选其他风格。	"Custom" style needs a description; or pick another style.
+333	degradeDemo	API 模式缺少 Base URL / Key / 模型 → 已自动降级为【规则演练】。	API mode missing Base URL / Key / Model → fell back to dry run.
+334	demoNote	【规则演练】无翻译引擎：仅演示 句组划分 / 水词清空 / 按时长分配 / 折行。译文列保留源语句，仅用于查看规则效果。	[Dry run] No translation engine: demonstrates sentence grouping / filler clearing / duration-based split / wrapping. The translation column keeps source text.
+335	groupInfo	已按句子分组：{0} 个句组，其中 {1} 组跨多条字幕——短句组将合并为单条字幕，长句组按各条时长切分回填。	Grouped into {0} sentences; {1} span multiple cues — short groups merge into a single cue, long groups split back by duration.
+336	mergeInfo	跨条句组 {0} 组：{1} 组已合并为单条字幕，其余 {2} 组按时长切分回填。	Multi-cue groups: {0}; {1} merged into single cues, {2} split back by duration.
+337	mergedNote	已并入上一条字幕（时间轴合并）	Merged into the previous cue (timeline merged)
+338	startT	开始整片翻译：{0} → {1}，共 {2} 条，每批约 {3} 字符。	Translating: {0} → {1}, {2} cues, ~{3} chars per batch.
+339	batchProg	第 {0}/{1} 批（句组 {2}–{3}）…	Batch {0}/{1} (sentences {2}–{3})…
+340	pgRun	翻译中	Translating
+341	pgEta	预计剩余 {0}	ETA {0}
+342	pgWait	排队中	Queued
+343	pgWaitSec	{0} 秒后继续	resumes in {0}s
+344	pgTok	本次消耗 {0} token	{0} tokens used
+345	pgGiveUp	排队超时，本批先跳过	Queue timed out, skipping this batch
+346	busyTitle	上游繁忙，请稍后再试	Upstream busy, please try again later
+347	busyBody	本任务排队等待超过 90 秒仍未轮到，翻译已停止，也不再重试——此刻重试只会让队列更长。已翻好的部分已存入断点，稍后打开同一文件可直接从断点继续。	This task waited over 90 seconds in the queue without getting a turn, so translation stopped and will not retry — retrying now would only make the queue longer. What is already translated is kept as a checkpoint; reopen the same file later to resume from it.
+348	pgDone	✓ 完成 · 用时 {0}	✓ Done · {0}
+349	resumeTitle	发现未完成的翻译	Unfinished translation found
+350	resumeBody	这份文件上次翻译到第 {0}/{1} 批就中断了。可以接着上次的进度继续（已完成的 {0} 批不会重跑），也可以从头重新翻译。	This file stopped at batch {0}/{1} last time. You can continue where it left off (the {0} finished batches will not be re-run), or start over from the beginning.
+351	resumeGo	继续上次	Continue
+352	resumeNew	从头重来	Start over
+353	resumeLog	已从断点继续：跳过前 {0} 批，从第 {1} 批开始。	Resumed: skipped {0} batches, starting from batch {1}.
+354	resumeHint	（翻译进度已存在本机，中途关掉页面也能接着翻）	(Progress is saved on this device, so you can close the page and carry on later.)
+355	reuseTitle	上次的结果还在	Previous result still available
+356	reuseBody	{0}（{1} 行 · {2}）翻译完成于 {3}，还没有导出。可以直接载入，不用再翻译一次。	{0} ({1} lines · {2}) finished translating at {3} and has not been exported yet. You can load it directly without translating again.
+357	reuseGo	用上次的结果	Use previous result
+358	reuseLog	已载入上次的翻译结果（未调用模型）。	Loaded the previous result (no model request was made).
+359	reuseCancel	取消	Cancel
+360	reuseNote	注：这份结果保存在你自己的这台设备上，不会上传到服务器。	Note: this result is stored in the browser on your own device. It is never uploaded to the server.
+361	resumeQuota	断点保存失败（本机存储已满），本次不再保存进度，翻译继续。	Could not save progress (local storage is full). Translation continues without saving.
+362	chkAutoTerms	自动术语表：翻译前自动提取专名与歧义词，统一全片译法	Auto glossary: extract proper nouns & ambiguous terms before translating for file-wide consistency
+363	autoTermsRun	正在提取术语表（专名/歧义词）…	Extracting glossary (proper nouns / ambiguous terms)…
+364	autoTermsDone	自动术语表就绪：{0} 个术语已统一译法	Auto glossary ready: {0} terms unified
+365	autoTermsSkip	术语提取失败，跳过后继续翻译：{0}	Glossary extraction failed, continuing without it: {0}
+366	batchRescue	第 {0} 批多次失败，已拆单组补救：成功 {1}/{2} 组	Batch {0} failed repeatedly; rescued {1}/{2} groups individually
+367	batchDone	批 {0}/{1} 完成{2}。	Batch {0}/{1} done{2}.
+368	retried	（重试{0}次后成功）	 (after {0} retries)
+369	anchorKeep	⚠️ 句组 {0} 译文可能不是{1}，已按原样保留	⚠️ Groups {0}: translation may not be in {1}; kept as is
+370	anchorRefix	{0} 个句组译文语言跑偏，已通过单组重译全部恢复	{0} drifted group(s) fully recovered via isolated re-translation
+371	musicDropSaved	{0} 个被判为水词的句组，重译后已救回	{0} group(s) judged as filler were rescued by re-translation
+372	musicDropKept	句组 {0} 重译后仍判为水词，按删除处理	Group(s) {0} still judged as filler after re-translation; removed
+373	cueAlignFallback	句组 {0} cue 对齐结构错误，已按传统切分回填	Groups {0}: invalid cue-aligned structure; fell back to duration split
+374	cueAlignRefix	{0} 个句组 cue 对齐结构错误，单组重发已修复	{0} cue-aligned structure error(s) fixed via isolated re-send
+375	overCapStart	检测到 {0} 个句组译文过长（超出该时长内可显示的 2 行容量），压缩重译中…	Detected {0} group(s) with translations too long for the screen (over 2 lines), re-translating more concisely…
+376	overCapDone	超容压缩完成：{0}/{1} 个句组已收进容量。	Length compression done: {0}/{1} group(s) now fit.
+377	overCapFail	超容压缩重译失败，过长句组按原样保留。	Length compression failed; over-long groups kept as-is.
+378	overCapCallFail	压缩重译第 {0} 次失败：{1}	Compression attempt {0} failed: {1}
+379	batchFail	批 {0} 第 {1} 次失败：{2}	Batch {0} attempt {1} failed: {2}
+380	batchSkip	该批跳过，可在完成后整篇重试。	Batch skipped; you can re-run the whole file later.
+381	ratePace	免费模型限流中，{0} 秒后继续…	Free-model rate limit, continuing in {0}s…
+382	rateWait	遇到限流（429），等待 20 秒后重试…	Rate limited (429), waiting 20s before retry…
+383	userStop	已由用户停止。	Stopped by user.
+384	postEnd	翻译结束，应用 去水词 / 折行 …	Translation finished, applying filler removal / wrapping…
+385	allDone	全部完成：删除水词 {0} 条，并入 {1} 条，折行 {2} 条。	All done: {0} fillers removed, {1} merged, {2} wrapped.
+386	warnManyDrop	⚠️ 异常丢弃率：{0}/{1} 个句组被判为 drop（{2}）——请检查模型配置或在「翻译引擎」更换模型后重试。	⚠️ Abnormal drop rate: {0}/{1} groups marked as drop ({2}). Please check your model configuration or switch models under "Translation Engine" and retry.
+387	warnManyMissing	⚠️ {0}/{1} 个句组翻译失败（{2}）——多为模型 Key 失效/限流/网络问题，请检查「翻译引擎」配置后重试。	⚠️ {0}/{1} groups failed to translate ({2}) — usually a key/quota/network issue. Check "Translation Engine" and retry.
+388	postDone	后处理完成：清除提示词 + 折行（每条 ≤ {0} 字）。	Post-processing done: tags cleaned + wrapped (each line ≤ {0} units).
+389	errOccur	发生错误：{0}	Error: {0}
+390	errModalTitle	大模型暂时不能工作	The AI model is temporarily unavailable
+391	errModalBody	翻译已停止：模型服务没有响应，可能是网络不稳、服务繁忙或配置失效。可稍等几分钟再试，或在「翻译引擎」中切换自定义 API（可先用「测试连接」验证）。	Translation stopped: the model service is not responding — the network may be unstable, the service busy, or the configuration invalid. Wait a few minutes and retry, or switch to a custom API under "Translation engine" (verify with "Test connection" first).
+392	errModalGo	自己设置翻译引擎设置	Open engine settings
+393	errModalLater	稍后再试	Try later
+394	errModalFatal	翻译出错	Translation error
+395	noExport	没有可导出的字幕。	Nothing to export.
+396	exported	已导出：{0}（{1} 条）	Exported: {0} ({1} cues)
+397	noCopy	没有内容可复制。	Nothing to copy.
+398	copied	已复制到剪贴板。	Copied to clipboard.
+399	copiedCompat	已复制（兼容模式）。	Copied (compat mode).
+400	copyFail	复制失败，请改用下载按钮。	Copy failed. Please use the download button.
+401	seoTitle	关于随心字幕 AI	Free AI Auto Subtitle Translator
+402	seoIntro	本工具是一款<strong>基于 AI 大模型的免费在线字幕翻译服务</strong>，支持 SRT / VTT / ASS 等主流字幕格式与中文、英文、日文等 100 种语言互译。无需注册、无需下载客户端，浏览器打开即可使用，字幕数据全程不上传服务器（除非你勾选了云端翻译）。	This is a <strong>free online subtitle translation tool powered by large language models</strong>. Upload SRT, VTT or ASS files and translate subtitles between English, Chinese, Japanese, Korean, Spanish, French and 65+ other languages. No signup, no installation, no watermark — open it in a browser and start translating. Subtitle data stays in your browser unless you enable cloud translation.
+403	seoFeatures	<strong>主要功能：</strong>SRT / VTT / ASS 字幕解析与翻译、句级智能合并（一个完整句子分布在多条字幕时合并翻译后按时长回填）、时间轴对齐、自动折行（支持 CJK 与西文混合宽度）、去水词、专有名词保留或翻译、可选翻译风格（均衡 / 口语自然 / 书面专业 / 译制腔 / 自定义）。译文可直接导出为 SRT / VTT / ASS / TXT 等格式压制视频。	<strong>Key features:</strong> SRT, VTT and ASS parsing and AI translation, smart sentence merging (when one sentence spans multiple cues, cues are merged, translated, then split back across the original timeline), timeline alignment, automatic line wrapping for CJK and Western text, filler-word removal, custom terminology handling, and selectable translation styles. Export standard SRT, VTT, ASS or TXT files ready to hard-sub onto your video.
+404	seoWho	<strong>适用人群：</strong>视频翻译从业者、自媒体创作者、外语学习者、字幕组、需要快速本地化视频内容的团队。	<strong>Who uses it:</strong> video translators, YouTube creators and localizers, language learners, subtitle groups and teams that need to localize video content quickly.
+405	seoNoscript	本工具需要启用 JavaScript 才能使用。请在浏览器中启用 JavaScript，然后上传 SRT / VTT / ASS 字幕文件即可使用 AI 免费字幕翻译。	This tool requires JavaScript. Please enable JavaScript in your browser, then upload a subtitle file (SRT / VTT / ASS) to translate subtitles with AI for free.
+406	verifyOk	✅ 校验通过：{0} 条，编号连续、时间轴无重叠、无空行。	✅ Validation passed: {0} cues, sequential numbering, no overlaps, no empty cues.
+407	pasteEmpty	粘贴区为空。	Paste area is empty.
+408	issCps	阅读速度 {0} 字/秒（建议 ≤{1}）	Reading speed {0} chars/s (limit {1})
+409	issShortDur	显示时长仅 {0} 秒（建议 ≥0.83）	On screen only {0}s (min 0.83)
+410	cpsSummary	阅读速度检查：{0} 条超速、{1} 条过短（时间轴来自源文件，仅提示，不阻断导出）	Reading speed check: {0} too fast, {1} too short (timing comes from the source file — advisory only, export is not blocked)
+411	colTc	时间轴	Timeline
+412	fnSub	字幕	subtitles
+413	fnBi	双语字幕	bilingual
+414	demoFile	9月3日_示例.srt	demo.srt
+415	noteDeepSeek	推荐：性价比高、速度快，适合字幕批量翻译	Recommended: fast and cost-effective, ideal for batch subtitle translation
+416	errNotCfg	管理员尚未配置默认模型，请改用自定义 API。	The site admin has not configured a default model. Please use your own API instead.
+417	errIpLimit	今日该 IP 的免费翻译额度（{0} 次请求）已用完，可填写自己的 API Key 继续使用。	Today's free translation quota for this IP ({0} requests) is used up. Enter your own API key to continue.
+418	errGlobalLimit	本站今日免费翻译总额度已用完，可填写自己的 API Key 继续使用。	Today's site-wide free translation quota is used up. Enter your own API key to continue.
+419	errBadJson	请求体不是合法 JSON	Request body is not valid JSON
+420	errNoMsgs	缺少 messages	Missing messages
+421	errUpstream	默认模型调用失败：{0}	Default model call failed: {0}
+422	errNotJson	返回内容不是 JSON	Response is not JSON
+423	errEmpty	返回为空	Response is empty
+424	errNoGroups	JSON 缺少 groups	JSON is missing groups
+425	errNoGno	JSON 条目缺少 gno	JSON item is missing gno
+426	errMissGroup	缺少句组 {0} 的结果	Missing result for group {0}
+427	errNoArray	JSON 缺少数组	JSON is missing the array
+428	anchorFail	锚定校验未过（句组 {0} 译文非{1}）	Anchor check failed (group {0} translation is not {1})
+429	issBlkNoNumTs	无法解析该块（缺编号或时间轴）	Cannot parse block (missing index or timeline)
+430	issBlkNoTs	无法解析该块（缺时间轴）	Cannot parse block (missing timeline)
+431	issBadTs	时间轴格式不正确	Invalid timeline format
+432	issNumInc	编号未递增	Index not increasing
+433	issEndLtStart	结束时间早于开始时间	End time earlier than start time
+434	issOverlap	与上一条时间轴重叠	Overlaps previous timeline
+435	issNoBlocks	没有解析到任何字幕块	No subtitle blocks parsed
+436	issZeroDur	零时长	Zero duration
+437	issEmptyCue	空内容	Empty content
+438	issNoUsable	没有可用的字幕块	No usable subtitle blocks
+439	brandName	随心字幕 AI	AI-SRTSub
+440	navGuide	使用指南	Guide
+441	navRepo	开源仓库	GitHub
+442	heroTitle	字幕的活儿，<em>交给 AI</em>	Whatever your subtitles need, <em>let AI handle it</em>
+443	heroSub	翻译、清洗、特效、格式转换、双语剥离、时间轴、乱码修复、提取文本——工具各干各的，想用哪个点哪个。免费 · 免注册 · 隐私安全	Translate, clean up, style, convert, split bilingual, shift timings, fix garbled text, extract dialogue—each tool does its own job. Free · No sign-up · Private
+444	dropTitle	点这里选文件，或直接拖进来 🎬	Click to choose a file, or just drag it here 🎬
+445	dropSub	SRT · VTT · ASS · TXT · 100 种语言互译	SRT · VTT · ASS · TXT · 100 languages
+446	altNoFile	手边没文件？	No file at hand?
+447	altPaste	直接粘贴字幕文本	Paste subtitle text
+448	altDemo	载入示例，先逛逛工作台 →	Load a sample & explore the studio →
+449	enterHint	上传后自动进入<b>字幕工作台</b>——语言、风格、导出样式都在那里配置	After upload you will land in the <b>subtitle studio</b> — language, style and export options all live there
+450	statLangs	语言互译	languages
+451	statStyles	种导出样式	export styles
+452	statAlign	时间轴对齐	timeline aligned
+453	statPrivacy	字幕上传服务器	subtitles uploaded
+454	whyTag	✦ WHY US · 为什么选我们	✦ WHY US
+455	whyTitle	别人叫它「机翻」，我们叫它字幕级翻译	Not “machine translation” — subtitle-grade translation
+456	whySub	每一项能力，都为「压进视频就能用」而设计	Every capability is designed for “drop it into your video and it just works”
+457	feat1T	时间轴精准对齐	Precise timeline alignment
+458	feat1D	译文严格贴合原字幕时间轴，一条对一条；需要合并拆分时按时长智能分配，绝不漂移、不串行。	Translations follow the original cue timing one-to-one; merges and splits are distributed by duration — no drift, no shifting.
+459	feat2T	全片术语统一	Consistent terminology
+460	feat2D	翻译前自动提取专名与歧义词生成术语表，第 1 条和第 300 条译法保证一致；还能强制保留指定专名。	Proper nouns and ambiguous words are extracted into a glossary before translating, so cue 1 and cue 300 stay consistent; force-keep any term you like.
+461	feat3T	智能折行	Smart line wrapping
+462	feat3D	超过行宽自动按标点与词边界折行，符合 Netflix 各语言规范，绝不把单词劈成两半。	Lines that exceed the width wrap at punctuation and word boundaries following Netflix language standards — never splitting a word in half.
+463	feat4T	去水词 · 听写纠错	Filler removal · ASR fixes
+464	feat4D	「嗯、啊、you know」自动清除，源字幕的听写错误一并修正——译文干净到可以直接压片。	“Um, uh, you know” are cleaned automatically, and transcription errors in the source are fixed along the way — clean enough to burn straight in.
+465	feat5T	双语字幕随心排	Bilingual layouts galore
+466	feat5D	原文译文双行、堆叠、分屏随意切换，还能导出 TXT 对照稿，字幕组级的花样全都有。	Dual-line, stacked or top/bottom split — switch freely, export TXT side-by-side scripts, all the fansub-grade tricks.
+467	feat6T	隐私安全	Private by default
+468	feat6D	字幕在你的浏览器里处理，默认不经任何第三方服务器；API Key 只存在本机。	Subtitles are processed in your browser and never touch third-party servers; API keys stay on your device.
+469	expTag	✦ EXPORT · 导出花样	✦ EXPORT STYLES
+470	aboutTitle	关于随心字幕 AI	About AI-SRTSub
+471	aboutBody	随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。	AI-SRTSub is an open-source AI subtitle translator. We believe a good subtitle tool should be free, clean and privacy-respecting — no ads, no sign-up, no touching your files. Self-host it, file requests, polish it together.
+472	aboutRepo	GitHub 开源仓库	GitHub repository
+473	aboutLicense	AGPL-3.0 开源	AGPL-3.0 open source
+474	wsBackHome	首页	Home
+475	wsUploadNew	上传新字幕	New subtitle
+476	projEmpty	未导入字幕	No subtitle loaded
+477	statUsers	位用户	Users
+478	tickServed	已服务 {0} 位用户	Served {0} users
+479	tickSubs	已译制 {0} 份字幕	{0} subtitles translated
+480	tickToken	累计消耗 {0} Token	{0} tokens used
+481	statSubs	份字幕	Subtitles
+482	statTokens	Token	Token
+483	secImport	导入字幕	Import
+484	secLang	语言	Languages
+485	secStyle	翻译风格	Style
+486	secTerms	术语与专名	Terms & Names
+487	secFilter	内容过滤	Filtering
+488	secEngine	翻译引擎	Engine
+489	lblSrcShort	原文语言	Source language
+490	lblDstShort	目标语言	Target language
+491	lblKeepTermsShort	专名处理	Proper nouns
+492	lblAutoTermsShort	自动术语表	Auto glossary
+493	secWrap	折行设置	Line wrapping
+494	splitWarn	{0} 条字幕过长被切成 {1} 条，时间轴随之拆分。把单语行宽调到 {2} 以上即可保留原时间轴。	{0} long lines were split into {1}, which breaks up the timing. Raise the line width to {2} or more to keep the original timing.
+495	splitWarnBi	{0} 条双语字幕过长被切成 {1} 条，时间轴随之拆分。把双语行宽调到 {2} 以上即可保留原时间轴。	{0} bilingual lines were too long and split into {1}, which breaks up the timing. Raise the bilingual line width to {2} or more to keep the original timing.
+496	wrapTip	修改设置，无须重新翻译，可在编辑区查看单语字幕的折行效果。	No re-translation needed — the wrapping of the monolingual subtitles updates in the editor right away.
+497	wrapTipBi	修改设置，无须重新翻译，可在编辑区查看双语字幕的折行效果。	No re-translation needed — the wrapping of the bilingual subtitles updates in the editor right away.
+498	lblMaxWShort	单语行宽	Single-language width
+499	lblBiMaxWShort	双语行宽	Bilingual width
+500	wUnit	字符	characters
+501	lblLyric	歌词处理	Lyrics
+502	lyricTrans	翻译歌词	Translate
+503	lyricKeep	保留原文	Keep original
+504	lyricDrop	删除歌词	Remove
+505	lblMarks	歌词标记	Lyric markers
+506	lblDropFillers	去除水词	Remove fillers
+507	modSecTitle	三个工具	Three tools
+508	modSecSub	三个各自独立的字幕工具，各做各的事。用哪一个、什么时候用，看手上的活儿。	Three standalone subtitle tools, each with its own job. Use whichever one fits the task in front of you.
+509	modCur	当前页	You are here
+510	modFix	解决什么	What it fixes
+511	modWho	适合谁	Who it is for
+512	modGo	进入	Open
+513	modTrName	字幕翻译	Translate
+514	modTrLead	把一整份外文字幕翻成你的语言，顺手把时间轴和折行一起收拾好。	Turn a whole foreign subtitle file into your language — timeline and line breaks handled along the way.
+515	modTrDo1	100 种语言互译，句级合并翻译后按时长回填	100 languages; sentences are merged, translated, then split back across the original timing
+516	modTrDo2	自动折行、去口语水词、统一专名与术语	Automatic line wrapping, filler-word removal, consistent names and terminology
+517	modTrDo3	导出单语 / 双语，SRT / VTT / ASS / SBV / TXT	Export single- or bilingual SRT / VTT / ASS / SBV / TXT
+518	modTrFix	一整句话被切成好几条、翻出来对不上画面；译文字数爆掉一行放不下；同一个人名前后三种译法。	One sentence chopped across five cues so the translation never lines up; lines too long to fit; the same name translated three different ways.
+519	modTrWho	追剧的人、字幕组、自媒体与本地化团队、外语学习者。	Series fans, subtitle groups, creators and localization teams, language learners.
+520	modClName	字幕清洗	Clean Up
+521	modClLead	字幕拿到手先过一遍：广告、水印、听障提示这些脏东西一次剔干净。	Run a subtitle through here first: ads, watermarks and SDH cues stripped in one pass.
+522	modClDo1	13 条规则分四类，默认开 9 条，随手开关	13 rules in four groups, 9 on by default, toggle any of them
+523	modClDo2	去水印广告、听障提示、HTML 标签，修全大写与乱码	Strip watermarks, ads, SDH cues and HTML tags; fix all-caps and mojibake
+524	modClDo3	逐条列出改了什么，可一条条还原，不动时间轴	Every change listed cue by cue and revertible — timing never moves
+525	modClFix	下载来的字幕夹着「本字幕由 XX 字幕组提供」；整份全大写看得累；编码错乱一片方块字。	Downloaded subs stuffed with "subtitles by group X"; a whole file in ALL CAPS; a screen of garbled boxes.
+526	modClWho	拿到现成字幕想直接用的人、要批量整理素材的字幕组。	Anyone who grabbed an existing subtitle and just wants it usable, plus groups batch-cleaning material.
+527	modFxName	特效字幕	Styled Subtitles
+528	modFxLead	双语合并 + 上样式：字体、颜色、描边、位置所见即所得，导出就能压片。	Merge two tracks, then style them: font, colour, outline and position, all WYSIWYG and ready to burn in.
+529	modFxDo1	两份字幕合并成双语，或调整已有双语的顺序与样式	Merge two files into bilingual, or restyle a bilingual file you already have
+530	modFxDo2	ASS 5 套 / VTT 6 套行业模板，样式槽逐项微调	5 ASS and 6 VTT industry presets, with per-value style slots to fine-tune
+531	modFxDo3	实时预览 = 导出结果，时间轴也能就地精修与批量校正	Live preview equals the exported file; the timeline can be tweaked in place or fixed in bulk
+532	modFxFix	想做双语字幕却要手工对轨；ASS 参数改完看不到效果；导出来和预览对不上。	Bilingual subs that have to be aligned by hand; ASS values whose effect you cannot see; exports that do not match the preview.
+533	modFxWho	要做双语或特效字幕的创作者、压制组、需要无障碍字幕的团队。	Creators making bilingual or styled subtitles, encoding groups, teams that need accessible captions.
+534	modTrTag1	100 种语言	100 languages
+535	modTrTag2	SRT / VTT / ASS	SRT / VTT / ASS
+536	modClTag1	13 条规则	13 rules
+537	modClTag2	不改时间轴	Timing untouched
+538	modFxTag1	双语合并	Bilingual merge
+539	modFxTag2	样式槽	Style slots
+540	toolsTitle	全部工具	All tools
+541	tcTrN	字幕翻译	Subtitle Translator
+542	tcClN	字幕清洗	Subtitle Cleaner
+543	tcFxN	特效字幕	Styled Subtitles
+544	tcDlN	视频下载工具	Video Downloader
+545	tcAsN	AI 营销视频	AI Marketing Video
+546	tcTrD	100 种语言互译，自动配轴、自动折行	100 languages, auto-timed and auto-wrapped
+547	tcClD	去广告水印、听障提示，13 条规则可开关	Strip ads, watermarks and SDH cues — 13 switchable rules
+548	tcFxD	单语双语都能做特技：字体、颜色、描边、位置	Mono or bilingual: font, colour, outline, position
+549	tcDlD	RiseKol 下载器：视频、音频、字幕一起存到本地	RiseKol downloader: video, audio and subtitles to your disk
+550	tcAsD	跨境投放素材：脚本、商品图、成片、字幕	Cross-border ad assets: scripts, product images, finished cuts, subtitles
+551	tcGo	进入 →	Open →
+552	tcGoOut	前往 ↗	Visit ↗
+553	detTrT	把一整份外文字幕，翻成你的语言	Turn a whole foreign subtitle file into your language
+554	detClT	字幕拿到手，先过一遍水	Subtitles off the web deserve a rinse first
+555	detFxT	单语双语，都能做出片级特效	Mono or bilingual — either way, ready for the screen
+556	detDlT	看到想要的视频，直接存下来	See a video you want? Save it right there
+557	detTrL	选好目标语言丢进来，句级合并、术语统一、折行排版一次做完。译文严格贴合原时间轴，导出的时间轴一条都不漂。	Pick your target language and drop the file in: sentence merging, glossary consistency and line wrapping all happen in one pass. The translation stays locked to the original timing — not a single cue drifts.
+558	detClL	从网站扒下来的字幕总带着广告、水印和听障提示。13 条规则按需开关，改了什么逐条列给你看，还能一条条撤回——时间轴一动不动。	Scraped subtitles come with ads, watermarks and hearing-impaired tags. Thirteen rules you can switch on and off, every change listed line by line and undoable one at a time — the timing never moves.
+559	detFxL	手上是一条单语字幕，还是已经排好的双语，都能在这里定型：字体、字号、颜色、描边、位置、边距逐项调，预览就是你导出拿到的那一份。	Whether you start from a single track or an already-paired bilingual one, this is where it gets its final look: font, size, colour, outline, position and margins, tuned one by one. The preview is exactly what you export.
+560	detDlL	RiseKol 视频下载器：粘个链接就能把视频、音频和原文字幕存到本地。桌面客户端，macOS 与 Windows 都有。	RiseKol video downloader: paste a link and save the video, audio and original subtitles to your machine. A desktop app for macOS and Windows.
+561	detTr1	100 种语言互译，句级合并后按时长回填	Translate between 100 languages; merged sentences are re-timed by duration
+562	detTr2	自动提取专名生成术语表，全片译法一致	Proper nouns are collected into a glossary, so the whole file stays consistent
+563	detTr3	超长自动折行，按标点与词边界走，不劈词	Long lines wrap at punctuation and word edges — no words split in half
+564	detTr4	导出单语 / 双语，SRT / VTT / ASS / SBV / TXT	Export mono or bilingual: SRT / VTT / ASS / SBV / TXT
+565	detCl1	去水印广告、听障提示、HTML 标签与 ASS 特效标记	Strip watermarks, ads, SDH cues, HTML tags and ASS effect codes
+566	detCl2	全大写、乱码、多余空行一并修掉	Fix all-caps, mojibake and stray blank lines in the same pass
+567	detCl3	改动对照表逐条可还原，只改文本不动时间	Each change is listed and revertible; only text is touched
+568	detCl4	源文件是双语 ASS 时，合并与翻转也在这做	Source is a bilingual ASS? Merge and flip it here too
+569	detFx1	单语整饰 / 调整已有双语 / 两份合成双语，三种模式	Three modes: style a single track, adjust bilingual rows, or merge two files
+570	detFx2	ASS 与 VTT 各一套模板，样式槽逐项微调	Templates for ASS and VTT each, with style slots for fine-tuning
+571	detFx3	字体、颜色、描边、位置、安全边距全部可视调节	Font, colour, outline, position and safe margins — all visual
+572	detFx4	时间轴就地精修：整体偏移、比例缩放、重叠体检	Retiming on the spot: global shift, proportional scale, overlap check
+573	detDl1	粘个链接就能下：视频、音频、字幕	Paste a link: video, audio and subtitles
+574	detDl2	macOS 与 Windows 桌面客户端	Desktop app for macOS and Windows
+575	detDl3	客户端自己下载，不依赖浏览器插件	Downloads run in the app itself — no browser extension needed
+576	detTrCta	打开字幕翻译	Open Subtitle Translator
+577	detClCta	打开字幕清洗	Open Subtitle Cleaner
+578	detFxCta	打开特效字幕制作	Open Styled Subtitles
+579	detDlCta	前往下载	Go to download
+580	mkSrcAxis	原文轴	Source timing
+581	mkDstAxis	译文轴	Translated timing
+582	mkBefore	清洗前	Before
+583	mkAfter	清洗后	After
+584	mkHits	命中 4 处	4 hits
+585	mkTiming	时间轴未动	Timing untouched
+586	mkMono	单语	Mono
+587	mkBi	双语	Bilingual
+588	mkSlot1	叙事	Narration
+589	mkSlot2	歌词	Lyrics
+590	mkSlot3	重点	Emphasis
+591	mkSlot4	自定义	Custom
+592	mkN1	一条对一条；需要合并拆分时按时长智能分配	One cue to one cue; merges and splits share their duration by length
+593	mkN2	逐条列出改了什么，可一条条还原	Every change is listed, and each one can be undone
+594	mkN3	预览 = 导出；样式槽改一项，整片跟着变	Preview = export; tweak a slot and the whole file follows
+595	mkN4	视频、音轨、字幕分轨下载	Video, audio and subtitles download as separate tracks
+596	mkVideo	视频 1080p	Video 1080p
+597	mkSaved	已保存到「下载」	Saved to Downloads
+598	mkSubs	原文字幕	Original subtitles
+599	mkAudio	音轨	Audio track
+600	wsDocTitle	字幕翻译 - SRT / VTT / ASS 在线翻译成母语 | 随心字幕 AI	Subtitle Translator — Turn SRT / VTT / ASS into Your Language
+601	pgBusyTip	因AI算力紧张，请你耐心等几分钟^^	AI capacity is tight right now — your results will be ready in a moment
+602	tcCvN	格式转换	Format Converter
+603	tcCvD	SRT / VTT / ASS 等 7 种格式互转	Convert between 7 formats: SRT / VTT / ASS and more
+604	tcBiN	双语剥离	Bilingual Splitter
+605	tcBiD	把双语字幕拆成原文轨和译文轨	Split bilingual subtitles into source and translation tracks
+606	tcShN	时间轴调整	Timeline Shift
+607	tcShD	整体偏移、缩放、合并拆分、逐条微调	Global offset, rescale, merge, split, cue-by-cue tweak
+608	tcRpN	乱码修复	Garbled Text Fix
+609	tcRpD	认出认错的编码，把乱码倒回原样	Detect the misread encoding and undo the garble
+610	tcExN	提取文本	Text Extractor
+611	tcExD	从字幕里提取纯台词，两种排版	Pull plain dialogue out of subtitles, two layouts
+612	detCvT	字幕格式，随手一转就好	Convert subtitle formats in one step
+613	detCvL	SRT、VTT、ASS、SBV、LRC——手里这份放不进播放器，转一下就好。时间轴和文本逐字保留，同轴双语转出来不会叠成两行。	SRT, VTT, ASS, SBV, LRC—if the file will not load in your player, just convert it. Timings and text are kept character for character, and same-timeline bilingual pairs never stack into two lines.
+614	detCv1	读 SRT / VTT / ASS / SSA / SBV / LRC / TXT，共 7 种	Reads SRT / VTT / ASS / SSA / SBV / LRC / TXT — 7 formats
+615	detCv2	导出 SRT / VTT / ASS / SBV / LRC / TXT，共 6 种	Exports SRT / VTT / ASS / SBV / LRC / TXT — 6 formats
+616	detCv3	时间轴与文本逐字保留，不重排不丢条	Timings and text preserved verbatim; nothing re-ordered or dropped
+617	detCv4	双语处理四档：保留 / 只留原文 / 只留译文 / 智能去重	Four bilingual modes: keep / source only / translation only / smart dedupe
+618	detCvCta	打开格式转换	Open Format Converter
+619	detBiT	双语字幕，拆成干净的两轨	Split bilingual subtitles into two clean tracks
+620	detBiL	一条字幕里挤着原文和译文，或者双语 ASS 转出来两条叠在一起——四种模式拆开：整份保留、只留原文、只留译文、拆成两份各带各的时间轴。	Source and translation crammed into one cue, or a bilingual ASS that converts into two stacked lines—four modes take it apart: keep both, source only, translation only, or split into two files with their own timelines.
+621	detBi1	一条里两行：按文字系统判断哪行是原文	Two lines in one cue: the source line is told by writing system
+622	detBi2	同轴两条：按出现先后分出原文轨与译文轨	Two cues on the same timeline: tracks are separated by order of appearance
+623	detBi3	不假设译文一定是中文：英日、英法照样拆	Never assumes the translation is Chinese—English-Japanese, English-French all work
+624	detBi4	只处理文本，时间轴一条不动	Text only is touched; the timeline stays untouched
+625	detBiCta	打开双语剥离	Open Bilingual Splitter
+626	detShT	时间轴不对？拉一下就好	Timings off? Just shift them
+627	detShL	字幕早半秒晚半秒、帧率对不上、想合并拆分、单条微调，都在一个页里做完。改完还是原来的格式，文件头一样不少。	Subtitles half a second early or late, frame-rate mismatch, merging and splitting, cue-by-cue fine-tuning—all in one page. The output keeps the original format, file header and all.
+628	detSh1	整体偏移：+1.5s、-500ms、纯数字毫秒都认	Global offset: accepts +1.5s, -500ms, or plain milliseconds
+629	detSh2	比例缩放：23.976 与 25 的帧率错位一键拉正	Rescale: fix 23.976 vs 25 frame-rate drift in one click
+630	detSh3	合并 / 拆分：相邻条目随手并，长句按词边界切	Merge / split: join neighboring cues freely; long lines split on word boundaries
+631	detSh4	时间轴体检：四把尺子扫一遍，只标建议不乱改	Timeline checkup: four rulers scan the file, flagging suggestions without touching anything
+632	detShCta	打开时间轴调整	Open Timeline Shift
+633	detRpT	字幕乱码，认出它本来的样子	Garbled subtitles, restored to what they really are
+634	detRpL	打开是「æ—¥æœ¬èªž」这种天书？多半是编码认错了。认出它原本是 GBK 还是 Shift_JIS，把读错的字倒回去，另存成想要的编码。	Opened the file and got gibberish like "æ—¥æœ¬èªž"? The encoding was most likely misread. Detect whether it was GBK or Shift_JIS, undo the misreading, and save it in the encoding you want.
+635	detRp1	认得 UTF-8 / GBK / Big5 / Shift_JIS / EUC-KR / Latin-1	Recognizes UTF-8 / GBK / Big5 / Shift_JIS / EUC-KR / Latin-1
+636	detRp2	粘贴的文本也能试；替换符太多会直说修不回来	Pasted text works too; if too much is lost, it says so honestly
+637	detRp3	文件往往没坏——结果卡永远可用，默认另存 UTF-8	The file is usually fine—the result card is always there, saving UTF-8 by default
+638	detRp4	另存六档编码，认出错编码时默认带 BOM	Save as six encodings; a detected mismatch defaults to BOM
+639	detRpCta	打开乱码修复	Open Garbled Text Fix
+640	detExT	把台词从字幕里提出来	Pull the dialogue out of your subtitles
+641	detExL	做笔记、发文章、喂模型，要的是纯文本不是时间码。连续段落像一篇文章，逐条一行像一份清单；听障提示、水印、重复句顺手去掉。	For notes, articles, or feeding a model, you want plain text, not timecodes. Continuous paragraphs read like an article; one line per cue reads like a list. Hearing-impaired captions, watermarks and repeated lines are dropped along the way.
+642	detEx1	读 SRT / VTT / ASS / SBV / LRC / TXT	Reads SRT / VTT / ASS / SBV / LRC / TXT
+643	detEx2	两种排版：按停顿句读拼成段落，或一行一条	Two layouts: paragraphs by pause and punctuation, or one line per cue
+644	detEx3	可选去听障提示、水印行、相邻重复句	Optionally remove SDH captions, watermark lines, and adjacent duplicates
+645	detEx4	说话人前缀与歌词行默认保留，可一键关掉	Speaker prefixes and lyric lines are kept by default, one click to drop
+646	detExCta	打开文本提取	Open Text Extractor
+647	mkN5	逗号变点、序号褪掉，内容一个字不差	Commas become dots, cue numbers fade—content untouched
+648	mkN6	拆完两份各自独立，时间轴原样带走	Two independent files, timelines carried over intact
+649	mkN7	整体偏移 0.5s：每一条一起挪，间隙不变	Global 0.5s shift: every cue moves together, gaps unchanged
+650	mkN8	认出它本来的编码，把读错的字倒回去	Detect the original encoding and undo the misreading
+651	mkN9	时间码褪掉，只剩台词本身	Timecodes fade away; only the dialogue remains
+652	mkWas	原来	Before
+653	mkNow	现在	After
+654	mkGarbled	乱码	Garbled
+655	mkFixed	修复后	Fixed
+656	tcGlN	术语替换	Term Replace
+657	tcGlD	按术语表批量改词，逐条可还原	One glossary rewrites the whole file
+658	detGlT	整片字幕的用词，一次改统一	One wording, right through the whole file
+659	detGlL	人名地名前后不一致、专有名词各家叫法不同、机器翻译留下的错词 —— 写一份术语表，剩下的交给它。时间轴、ASS 样式、VTT 的 NOTE 块一个字符都不动。	Character names drifting between episodes, proper nouns spelled three ways, odd words left behind by machine translation — write a glossary and let it run. Timing, ASS styles and VTT note blocks stay byte-identical.
+660	detGl1	每行一条规则：原词 -> 新词，# 开头是注释	One rule per line: old term -> new term; # starts a comment
+661	detGl2	整词匹配、区分大小写，双语条目可只改一行	Whole-word matching, case sensitivity, bilingual cues can be limited to one line
+662	detGl3	SRT / VTT / ASS / SBV / LRC / TXT 都支持	Works with SRT / VTT / ASS / SBV / LRC / TXT
+663	detGl4	改动逐条列出，哪一条不想改点一下就退回	Every change is listed; any line you regret goes back with one click
+664	detGlCta	打开术语替换	Open term replace
+665	mkN10	术语表一改，整片跟着改	Change the glossary, the whole file follows
+666	tcVsN	视频提取字幕	Video Subtitle Rip
+667	tcVsD	把 MKV / MP4 里的内封字幕轨抽成 SRT	Pull the embedded subtitle track out of MKV / MP4
+668	detVsT	视频里封着的字幕轨，直接抽出来	The subtitle track sealed inside your video, pulled straight out
+669	detVsL	MKV、MP4 里常常埋着一条现成的字幕轨，播放器能开，却拿不到文本。把它整条抽出来存成 SRT / VTT / ASS / TXT —— 不上传、不重编码，文件就在你自己的浏览器里读。	MKV and MP4 files often carry a finished subtitle track — your player can show it, but you cannot get at the text. Rip the whole track out to SRT / VTT / ASS / TXT. Nothing is uploaded and nothing is re-encoded: the file is read inside your own browser.
+670	detVs1	认 MKV / WebM 的 SRT、ASS、WebVTT 轨，也认 MP4 的 mov_text / tx3g	Reads SRT, ASS and WebVTT tracks in MKV / WebM, plus mov_text / tx3g in MP4
+671	detVs2	ASS 轨连原文件的样式头和分辨率一起带回，不是重新生成一套	ASS tracks come back with the original style header and resolution, not a regenerated one
+672	detVs3	按文件位置小段读取，几个 G 的电影也不会把内存吃满	Reads in small slices by file offset, so a multi-gigabyte movie never fills up memory
+673	detVs4	图形字幕（DVD / 蓝光 PGS）没有文字可抽，会直说 —— 那需要 OCR	Image-based subtitles (DVD / Blu-ray PGS) have no text to rip, and it says so plainly — those need OCR
+674	detVsCta	打开视频提取字幕	Open video subtitle rip
+675	mkN11	不上传、不重编码	No upload, no re-encode
+676	tcHcN	繁简转换	Han Converter
+677	tcHcD	简繁互转，可选台湾 / 香港用法	Simplified ⇄ Traditional, Taiwan / Hong Kong aware
+678	detHcT	简繁互转，只改字不改别的	Between Simplified and Traditional — the words change, nothing else does
+679	detHcL	整份字幕在简体与繁体之间互转，九个方向：通用繁体、台湾用词、台湾字形、香港用法，以及繁体转回简体。时间码、序号和 ASS 样式标签一个字节都不动。	Convert a whole subtitle file across nine directions: general Traditional, Taiwan vocabulary, Taiwan forms, Hong Kong, and back to Simplified. Timecodes, cue numbers and ASS style tags stay byte-identical.
+680	detHc1	一简对多繁按词决定：同一个简体字该用哪个繁体，由前后的字决定	One Simplified character can map to several Traditional ones — the right one is picked by phrase
+681	detHc2	台湾档连用词一起换，不只是换字形	Taiwan mode swaps the vocabulary too, not just the shape of the character
+682	detHc3	SRT / VTT / ASS / TXT 都支持，VTT 的 NOTE 与 STYLE 块不动	Works on SRT / VTT / ASS / TXT; VTT NOTE and STYLE blocks are left alone
+683	detHc4	词库取自 OpenCC，长词优先匹配	Dictionary from OpenCC, with longest-match-first phrase resolution
+684	detHcCta	打开繁简转换	Open Han converter
+685	mkN12	只换字，时间轴不动	Only the words change — the timeline does not
+686	tcSpN	字幕拆分拼接	Split & Merge
+687	tcSpD	按时长条数切开，多份合一	Cut by duration or count, join many into one
+688	detSpT	一份切多段，多段拼一份	Cut one file into parts, or many into one
+689	detSpL	长字幕按时长或条数切成几段，每段可以从零重新计时；散落的多份按顺序接成一集，或按时间戳交织合并。序号自动重排，台词一个字不改。	Cut a long subtitle into parts by duration or count, each starting from zero if you like; join scattered files into an episode in order, or interleave them by original timestamps. Renumbering is automatic; dialogue stays untouched.
+690	detSp1	只按字幕条边界切，绝不把一条台词从中间腰斩	Cuts only at cue boundaries — never mid-line
+691	detSp2	拼接保留每段内部的节奏，段间隔自己定	Joining keeps the rhythm inside each part; the gap is yours to set
+692	detSp3	交织模式按原始时间轴排序，重叠如实保留并提醒	Interleave mode sorts by original timeline and warns about overlaps
+693	detSp4	SRT 与 VTT 都支持，拆完逐段下载	SRT and VTT both supported; download part by part
+694	detSpCta	打开字幕拆分拼接	Open subtitle splitter
+695	mkN13	按条切，不腰斩	Cue-boundary cuts only
+696	tcTbN	字幕转表格	Subtitles ⇄ Spreadsheet
+697	tcTbD	Excel 里逐行校对，改完导回	Review line by line in Excel, import back
+698	detTbT	字幕搬进 Excel，改完再搬回来	Move subtitles into Excel, and back again
+699	detTbL	把 SRT / VTT 导出成 Excel 或 CSV，在表格里逐行校对、翻译、写批注，然后整表导回字幕。时间列按文本保真不丢毫秒，台词换行原样进单元格。	Export SRT / VTT to Excel or CSV, review, translate and annotate line by line in the sheet, then bring the whole table back as subtitles. Time columns stay text-exact; line breaks survive the round trip.
+700	detTb1	时间列保持 00:00:01,000 原样文本，毫秒不丢	Time columns keep 00:00:01,000 as-is — milliseconds intact
+701	detTb2	单元格里的换行导回字幕时原样还原	Line breaks inside cells are restored verbatim
+702	detTb3	中英文列头都认，识别不了的行自动跳过	Chinese and English headers both work; unparseable rows are skipped
+703	detTb4	表格发出去审稿，收回来直接导回字幕	Send the sheet out for review, import it back when it returns
+704	detTbCta	打开字幕转表格	Open subtitle spreadsheet tool
+705	mkN14	时间不丢毫秒	Milliseconds stay intact
+706	tcBtN	批量转格式	Batch Convert
+707	tcBtD	几百个文件一次转，打包 ZIP	Convert hundreds of files into one ZIP
+708	detBtT	整个文件夹的字幕，一次换完格式	A whole folder of subtitles, one format change
+709	detBtL	几十上百个 SRT / VTT 拖进来，统一转成目标格式，打成一个 ZIP 拿走。序号重排、时间戳规范化，认不出的文件单独标出来不含糊。	Drag in dozens or hundreds of SRT / VTT files, convert them all to the target format and take away one ZIP. Renumbering and timestamp normalization included; unreadable files are flagged, not hidden.
+710	detBt1	文件名保持原名只换扩展名，重名自动加序号	Original filenames kept — only the extension changes; collisions get a suffix
+711	detBt2	全程在浏览器里完成，几百个文件也不上传	Everything runs in your browser; hundreds of files, zero uploads
+712	detBt3	认不出的文件单独列出、不进包，不静默丢弃	Unreadable files are listed and left out of the ZIP, never silently dropped
+713	detBt4	剧集整季目录拖进来，格式立刻统一	Drop a whole season folder in and unify the format
+714	detBtCta	打开批量转换	Open batch converter
+715	mkN15	一次几百个，一个 ZIP	Hundreds at once, one ZIP
+716	tcLrN	歌词打轴	Lyric Timing
+717	tcLrD	听歌逐句点时间，导出 LRC	Tap each line while listening, export LRC
+718	detLrT	边听边敲，一首歌的 LRC 就出来了	Listen and tap — an LRC takes shape
+719	detLrL	放入音乐、贴入歌词，播放的同时逐句敲下时间点，导出标准 LRC 或 SRT。已有的 LRC 也能导入微调。空格播放暂停、回车打轴、Z 撤销，双手不离键盘。	Load the music, paste the lyrics, and stamp each line while it plays; export standard LRC or SRT. Existing LRC files can be imported for fine-tuning. Space to play/pause, Enter to stamp, Z to undo — hands stay on the keyboard.
+720	detLr1	支持 MP3 / M4A / FLAC / WAV / OGG 常见音频	MP3 / M4A / FLAC / WAV / OGG supported
+721	detLr2	快捷键打轴，双手不离键盘	Keyboard-driven timing
+722	detLr3	已有 LRC 导入微调，一句一句对	Import an existing LRC and adjust line by line
+723	detLr4	导出 LRC 给播放器，导出 SRT 给剪辑软件	LRC for players, SRT for editors
+724	detLrCta	打开歌词打轴	Open lyric timing tool
+725	mkN16	空格播放，回车打轴	Space plays, Enter stamps
+726	tcQcN	字幕质检	Subtitle QC
+727	tcQcD	按这门语言的规矩查时间轴与排版	Check timing and layout by that language's rules
+728	detQcT	字幕交出去之前，过一遍体检	Run a check before you hand it over
+729	detQcL	上传字幕，选它是哪门语言，17 条规则逐条查：时间戳倒挂、序号断号、条目重叠、太快太慢、行太长、断行断错位置、全角半角标点，还有这门语言才有的规矩——西语的倒问号、法语的不换行空格、希腊语与阿拉伯语的问号。每处问题都附上实测值和门槛，能自动修的勾一下就修好。	Upload a subtitle, tell it which language it is, and 17 rules go through it one by one: reversed timestamps, gaps in the numbering, overlapping cues, too fast or too slow, lines too long, breaks in the wrong place, wrong punctuation — plus the rules only that language has: Spanish inverted question marks, French non-breaking spaces, Greek and Arabic question marks. Every finding carries the measured value next to the threshold, and whatever can be fixed is fixed with a checkbox.
+730	detQc1	17 条规则各自可开关，每处都标出实测值	17 rules, each switchable, each showing the measured value
+731	detQc2	门槛跟着文字系统走，中文不按 42 个字符算	Thresholds follow the writing system: Chinese is not counted as 42 characters
+732	detQc3	语言专属的标点规矩，只在该有的语言上启用	Language-specific punctuation rules only switch on where they exist
+733	detQc4	能自动修的单独列出，会动时间轴的默认不勾	Auto-fixable items are listed apart; anything moving the timeline starts unchecked
+734	detQcCta	打开字幕质检	Open subtitle QC
+735	mkN17	查得出，也修得动	Find it, then fix it

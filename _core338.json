@@ -1,0 +1,1350 @@
+{
+ "docTitle": {
+  "zh": "随心字幕 AI (AI-SRTSub) - 全球好剧随心看，一键生成专属母语字幕",
+  "en": "AI-SRTSub - Global Movies & Series, Subtitles in Your Language"
+ },
+ "appTitle": {
+  "zh": "🎬 随心字幕 AI",
+  "en": "🎬 AI Subtitle Translator"
+ },
+ "uiLangTag": {
+  "zh": "界面语言",
+  "en": "UI"
+ },
+ "brandName": {
+  "zh": "随心字幕 AI",
+  "en": "AI-SRTSub"
+ },
+ "navMerge": {
+  "zh": "双语合并",
+  "en": "Bilingual Merge"
+ },
+ "navGuide": {
+  "zh": "使用指南",
+  "en": "Guide"
+ },
+ "navRepo": {
+  "zh": "开源仓库",
+  "en": "GitHub"
+ },
+ "footer": {
+  "zh": "随心字幕 AI · 开源 AGPL-3.0 · 你的字幕永远属于你",
+  "en": "AI-SRTSub · Open source AGPL-3.0 · Your subtitles always belong to you"
+ },
+ "rule1": {
+  "zh": "① 翻译风格可选（均衡/口语自然/自定义）",
+  "en": "① Choose translation style (Balanced/Natural/Custom)"
+ },
+ "rule2": {
+  "zh": "② 时间轴对齐",
+  "en": "② Timeline aligned"
+ },
+ "rule3": {
+  "zh": "③ 听写纠错",
+  "en": "③ Auto-fix transcription errors"
+ },
+ "rule4": {
+  "zh": "④ 专名可保留或翻译",
+  "en": "④ Keep or translate proper nouns"
+ },
+ "rule5": {
+  "zh": "⑤ 去水词",
+  "en": "⑤ Remove filler cues"
+ },
+ "rule6": {
+  "zh": "⑥ 超过<b>行宽阈值</b>自动折行",
+  "en": "⑥ Auto-wrap lines over the <b>width threshold</b>"
+ },
+ "step1": {
+  "zh": "导入字幕（支持多语言）",
+  "en": "Import subtitles (any language)"
+ },
+ "btnFile": {
+  "zh": "📂 选择字幕文件",
+  "en": "📂 Choose subtitle file"
+ },
+ "btnDemo": {
+  "zh": "载入示例",
+  "en": "Load sample"
+ },
+ "pastePh": {
+  "zh": "或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）",
+  "en": "…or paste subtitle text here… (SRT / VTT / ASS)"
+ },
+ "btnParse": {
+  "zh": "解析字幕",
+  "en": "Parse subtitles"
+ },
+ "secImport": {
+  "zh": "导入字幕",
+  "en": "Import"
+ },
+ "dropTitle": {
+  "zh": "点这里选文件，或直接拖进来 🎬",
+  "en": "Click to choose a file, or just drag it here 🎬"
+ },
+ "dropSub": {
+  "zh": "SRT · VTT · ASS · TXT · 100 种语言互译",
+  "en": "SRT · VTT · ASS · TXT · 100 languages"
+ },
+ "altNoFile": {
+  "zh": "手边没文件？",
+  "en": "No file at hand?"
+ },
+ "altPaste": {
+  "zh": "直接粘贴字幕文本",
+  "en": "Paste subtitle text"
+ },
+ "altDemo": {
+  "zh": "载入示例，先逛逛工作台 →",
+  "en": "Load a sample & explore the studio →"
+ },
+ "enterHint": {
+  "zh": "上传后自动进入<b>字幕工作台</b>——语言、风格、导出样式都在那里配置",
+  "en": "After upload you will land in the <b>subtitle studio</b> — language, style and export options all live there"
+ },
+ "wsBackHome": {
+  "zh": "首页",
+  "en": "Home"
+ },
+ "wsUploadNew": {
+  "zh": "上传新字幕",
+  "en": "New subtitle"
+ },
+ "projEmpty": {
+  "zh": "未导入字幕",
+  "en": "No subtitle loaded"
+ },
+ "stepReq": {
+  "zh": "翻译要求",
+  "en": "Translation requirements"
+ },
+ "secLang": {
+  "zh": "语言",
+  "en": "Languages"
+ },
+ "secStyle": {
+  "zh": "翻译风格",
+  "en": "Style"
+ },
+ "secTerms": {
+  "zh": "术语与专名",
+  "en": "Terms & Names"
+ },
+ "secFilter": {
+  "zh": "内容过滤",
+  "en": "Filtering"
+ },
+ "secEngine": {
+  "zh": "翻译引擎",
+  "en": "Engine"
+ },
+ "secWrap": {
+  "zh": "折行设置",
+  "en": "Line wrapping"
+ },
+ "lblMode": {
+  "zh": "工作模式",
+  "en": "Mode"
+ },
+ "optBuiltin": {
+  "zh": "默认模型（站点提供，无需 Key）",
+  "en": "Default model (site-provided, no key needed)"
+ },
+ "optApi": {
+  "zh": "自定义 API（OpenAI 兼容）",
+  "en": "Custom API (OpenAI-compatible)"
+ },
+ "optDemo": {
+  "zh": "规则演练（无翻译，仅演示折行/水词/重排）",
+  "en": "Dry run (no translation; shows wrapping/filler/renumber)"
+ },
+ "builtinOn": {
+  "zh": "默认模型已就绪：{0}。开箱即用；单 IP 每日限 {1} 次请求，大批量建议用自己的 API。",
+  "en": "Default model ready: {0}. Works out of the box; {1} requests per IP per day — for large files prefer your own API."
+ },
+ "builtinOff": {
+  "zh": "管理员尚未配置默认模型，当前不可用 → 请改用「自定义 API」或「规则演练」。",
+  "en": "The admin has not configured a default model yet → please use \"Custom API\" or \"Dry run\"."
+ },
+ "lblSrcLang": {
+  "zh": "源字幕语言（选“自动检测”则让模型识别）",
+  "en": "Source language (\"Auto-detect\" lets the model decide)"
+ },
+ "autoDetect": {
+  "zh": "自动检测",
+  "en": "Auto-detect"
+ },
+ "lblDstLang": {
+  "zh": "翻译为目标语言",
+  "en": "Translate into"
+ },
+ "lblSrcShort": {
+  "zh": "原文语言",
+  "en": "Source language"
+ },
+ "lblDstShort": {
+  "zh": "目标语言",
+  "en": "Target language"
+ },
+ "lblStyle": {
+  "zh": "翻译风格",
+  "en": "Translation style"
+ },
+ "styleElegant": {
+  "zh": "均衡（默认）",
+  "en": "Balanced (default)"
+ },
+ "stylePlain": {
+  "zh": "口语自然",
+  "en": "Natural & conversational"
+ },
+ "styleFormal": {
+  "zh": "书面专业",
+  "en": "Formal & professional"
+ },
+ "styleDubbed": {
+  "zh": "译制腔",
+  "en": "Dubbed-film flair"
+ },
+ "styleCustom": {
+  "zh": "自定义…",
+  "en": "Custom…"
+ },
+ "styleCustomPh": {
+  "zh": "描述你想要的口吻，如：轻松幽默、像给朋友讲故事",
+  "en": "Describe the tone you want, e.g. light-hearted, like telling a story to a friend"
+ },
+ "hintElegant": {
+  "zh": "均衡：准确传达原意、通顺流畅、用词得体，贴合目标语言表达习惯。",
+  "en": "Balanced: accurate, fluent and graceful, following the target language's natural expression."
+ },
+ "hintPlain": {
+  "zh": "口语自然：口语化、直白易懂，像日常对话；多用短句与常用词，保留说话人语气。",
+  "en": "Natural & conversational: colloquial and easy to understand, like everyday conversation; short sentences, common words, keep the speaker's tone."
+ },
+ "hintCustom": {
+  "zh": "自定义：下面的描述将原样作为“翻译风格”要求发给模型。",
+  "en": "Custom: the description below is sent to the model verbatim as the style requirement."
+ },
+ "optCustom": {
+  "zh": "自定义…",
+  "en": "Custom…"
+ },
+ "lblProvider": {
+  "zh": "服务商",
+  "en": "Provider"
+ },
+ "lblBase": {
+  "zh": "Base URL（自动拼接 /chat/completions）",
+  "en": "Base URL (/chat/completions appended automatically)"
+ },
+ "lblModel": {
+  "zh": "模型",
+  "en": "Model"
+ },
+ "lblBatch": {
+  "zh": "单批字符预算",
+  "en": "Chars per batch"
+ },
+ "batchTip": {
+  "zh": "每次请求送模型的字幕字符数。按长度自动分批——短句多装、长句少装，每批输出量稳定。越大总耗时略短，但过大可能降低翻译质量；默认 3000 适合大多数视频。",
+  "en": "Characters of subtitles sent to the model per request. Batches are cut by length automatically: short lines fill more, long lines fewer, keeping each output stable. Larger values finish slightly faster, but too large may reduce quality; the default 3000 suits most videos."
+ },
+ "lblKey": {
+  "zh": "API Key（仅保存在本机浏览器）",
+  "en": "API Key (stored only in this browser)"
+ },
+ "lblTemp": {
+  "zh": "温度（0–2，默认 0.2）",
+  "en": "Temperature (0–2, default 0.2)"
+ },
+ "tempTip": {
+  "zh": "与后台模型设置的「温度」同一含义：越小越稳定、越大越发散；字幕翻译建议 0.2 或更低。留空则按 0.2。",
+  "en": "Same field as Temperature in the admin model settings: lower is steadier, higher is more varied. For subtitles 0.2 or lower is recommended; leave empty for 0.2."
+ },
+ "btnTest": {
+  "zh": "⚡ 测试连接",
+  "en": "⚡ Test connection"
+ },
+ "testRun": {
+  "zh": "测试中…",
+  "en": "Testing…"
+ },
+ "testOk": {
+  "zh": "✓ 连接成功",
+  "en": "✓ Connected"
+ },
+ "testFail": {
+  "zh": "✗ 失败：{0}",
+  "en": "✗ Failed: {0}"
+ },
+ "getKey": {
+  "zh": "获取 API Key ↗",
+  "en": "Get API Key ↗"
+ },
+ "lblViaSrv": {
+  "zh": "由本站服务器转发",
+  "en": "Relay through this site"
+ },
+ "errCors": {
+  "zh": "浏览器直连被拒绝（该端点多半不允许跨域，或本机网络不通）。可勾选「由本站服务器转发」再试。",
+  "en": "Direct browser connection refused (the endpoint usually disallows cross-origin calls, or your network cannot reach it). Tick \"Relay through this site\" and retry."
+ },
+ "errRelay": {
+  "zh": "经本站转发仍失败：{0}",
+  "en": "Relay still failed: {0}"
+ },
+ "noteDeepSeek": {
+  "zh": "推荐：性价比高、速度快，适合字幕批量翻译",
+  "en": "Recommended: fast and cost-effective, ideal for batch subtitle translation"
+ },
+ "chkKeepTerms": {
+  "zh": "专有名词（人名/机构/产品/术语）保留原文，不翻译",
+  "en": "Keep proper nouns (names/brands/products/terms) untranslated"
+ },
+ "lblKeepTermsShort": {
+  "zh": "专名处理",
+  "en": "Proper nouns"
+ },
+ "lblAutoTermsShort": {
+  "zh": "自动术语表",
+  "en": "Auto glossary"
+ },
+ "pnKeep": {
+  "zh": "保留原文",
+  "en": "Keep original"
+ },
+ "pnTrans": {
+  "zh": "全部译出",
+  "en": "Translate all"
+ },
+ "lblTerms": {
+  "zh": "统一译名（术语表，每行一条）",
+  "en": "Unified glossary (one term per line)"
+ },
+ "lblTermsShort": {
+  "zh": "统一译名",
+  "en": "Unified glossary"
+ },
+ "termsPh": {
+  "zh": "每行一条：原文 → 译法；只写原文表示保留原文",
+  "en": "One per line: source → rendering; a line with only the source term keeps the original"
+ },
+ "btnGlossFile": {
+  "zh": "📂 上传术语表",
+  "en": "📂 Upload glossary"
+ },
+ "chkAutoTerms": {
+  "zh": "自动术语表：翻译前自动提取专名与歧义词，统一全片译法",
+  "en": "Auto glossary: extract proper nouns & ambiguous terms before translating for file-wide consistency"
+ },
+ "lblDropFillers": {
+  "zh": "去除水词",
+  "en": "Remove fillers"
+ },
+ "lblLyric": {
+  "zh": "歌词处理",
+  "en": "Lyrics"
+ },
+ "lyricTrans": {
+  "zh": "翻译歌词",
+  "en": "Translate"
+ },
+ "lyricKeep": {
+  "zh": "保留原文",
+  "en": "Keep original"
+ },
+ "lyricDrop": {
+  "zh": "删除歌词",
+  "en": "Remove"
+ },
+ "lblMarks": {
+  "zh": "歌词标记",
+  "en": "Lyric markers"
+ },
+ "lblMaxW": {
+  "zh": "折行宽度（单位=全角宽，不是字数：1 个汉字/假名/韩文音节=1；拉丁·西里尔·泰文·阿拉伯字母=0.5，即半角文字 1 单位≈2 字符）。作用于单语折行，以及双语的「- A - B」双说话人行。默认随目标语言按 Netflix 规范推荐（中/韩 16、日 13、其余 21）。调大 → 一行更长、行数和切分更少。",
+  "en": "Single-language width in full-width UNITS, not characters: 1 CJK char = 1; Latin, Cyrillic, Thai and Arabic letters = 0.5, so 1 unit is about 2 characters for half-width scripts. Governs monolingual wrapping and \"- A - B\" dual-speaker lines in bilingual export. Default follows the Netflix spec per language (zh/ko 16, ja 13, others 21). Larger = longer lines, fewer line breaks and cue splits."
+ },
+ "lblBiMaxW": {
+  "zh": "双语导出时【译文行】的宽度上限（同为全角宽单位，不是字数：同样 32，中文≈32 字，泰文≈64 字符）。只约束译文行，源文行跟随语义断点、不限宽；双说话人行走上方「单语行宽」。只有译文超出才拆时间轴。此值不随语言变化。调大 → 拆分更少但译文行更长。",
+  "en": "Max width of the TRANSLATED line in bilingual export (same full-width unit, not characters: the same 32 is about 32 Chinese characters but about 64 Thai characters). Constrains the translated line only; the source line follows semantic breaks and is not width-limited, and dual-speaker lines use \"Single-language width\" above. Exceeding it is the only thing that splits the timeline. This value does NOT change per language. Larger = fewer splits but longer translated lines."
+ },
+ "lblMaxWShort": {
+  "zh": "单语行宽",
+  "en": "Single-language width"
+ },
+ "lblBiMaxWShort": {
+  "zh": "双语行宽",
+  "en": "Bilingual width"
+ },
+ "wUnit": {
+  "zh": "字符",
+  "en": "characters"
+ },
+ "splitWarn": {
+  "zh": "{0} 条字幕过长被切成 {1} 条，时间轴随之拆分。把单语行宽调到 {2} 以上即可保留原时间轴。",
+  "en": "{0} long lines were split into {1}, which breaks up the timing. Raise the line width to {2} or more to keep the original timing."
+ },
+ "splitWarnBi": {
+  "zh": "{0} 条双语字幕过长被切成 {1} 条，时间轴随之拆分。把双语行宽调到 {2} 以上即可保留原时间轴。",
+  "en": "{0} bilingual lines were too long and split into {1}, which breaks up the timing. Raise the bilingual line width to {2} or more to keep the original timing."
+ },
+ "wrapTip": {
+  "zh": "修改设置，无须重新翻译，可在编辑区查看单语字幕的折行效果。",
+  "en": "No re-translation needed — the wrapping of the monolingual subtitles updates in the editor right away."
+ },
+ "wrapTipBi": {
+  "zh": "修改设置，无须重新翻译，可在编辑区查看双语字幕的折行效果。",
+  "en": "No re-translation needed — the wrapping of the bilingual subtitles updates in the editor right away."
+ },
+ "btnGo": {
+  "zh": "▶ 开始翻译",
+  "en": "▶ Start translation"
+ },
+ "btnGoStop": {
+  "zh": "翻译中…点击可停止",
+  "en": "Translating… click to stop"
+ },
+ "btnPost": {
+  "zh": "↻ 仅后处理（折行/清提示词）",
+  "en": "↻ Post-process only (wrap/clean tags)"
+ },
+ "logTitle": {
+  "zh": "运行日志",
+  "en": "Log"
+ },
+ "logReady": {
+  "zh": "就绪。导入字幕或载入示例开始。",
+  "en": "Ready. Import subtitles or load the sample."
+ },
+ "gotClick": {
+  "zh": "已收到「开始翻译」的请求，正在准备…",
+  "en": "Received “start translation” — preparing…"
+ },
+ "reqSent": {
+  "zh": "第 {0} 批请求已发出（{1} 个句组），正在等待模型响应…",
+  "en": "Batch {0} request sent ({1} groups) — waiting for the model…"
+ },
+ "waitSec": {
+  "zh": "已等待 {0} 秒，仍在等待模型的响应…",
+  "en": "Waited {0} s — still no reply from the model…"
+ },
+ "startT": {
+  "zh": "开始整片翻译：{0} → {1}，共 {2} 条，每批约 {3} 字符。",
+  "en": "Translating: {0} → {1}, {2} cues, ~{3} chars per batch."
+ },
+ "batchProg": {
+  "zh": "第 {0}/{1} 批（句组 {2}–{3}）…",
+  "en": "Batch {0}/{1} (sentences {2}–{3})…"
+ },
+ "batchDone": {
+  "zh": "批 {0}/{1} 完成{2}。",
+  "en": "Batch {0}/{1} done{2}."
+ },
+ "pgRun": {
+  "zh": "翻译中",
+  "en": "Translating"
+ },
+ "pgEta": {
+  "zh": "预计剩余 {0}",
+  "en": "ETA {0}"
+ },
+ "pgWait": {
+  "zh": "排队中",
+  "en": "Queued"
+ },
+ "pgDone": {
+  "zh": "✓ 完成 · 用时 {0}",
+  "en": "✓ Done · {0}"
+ },
+ "allDone": {
+  "zh": "全部完成：删除水词 {0} 条，并入 {1} 条，折行 {2} 条。",
+  "en": "All done: {0} fillers removed, {1} merged, {2} wrapped."
+ },
+ "postDone": {
+  "zh": "后处理完成：清除提示词 + 折行（每条 ≤ {0} 字）。",
+  "en": "Post-processing done: tags cleaned + wrapped (each line ≤ {0} units)."
+ },
+ "userStop": {
+  "zh": "已由用户停止。",
+  "en": "Stopped by user."
+ },
+ "errOccur": {
+  "zh": "发生错误：{0}",
+  "en": "Error: {0}"
+ },
+ "stTotal": {
+  "zh": "条数",
+  "en": "Cues"
+ },
+ "stDone": {
+  "zh": "已译",
+  "en": "Done"
+ },
+ "stDrop": {
+  "zh": "水词清空",
+  "en": "Fillers cleared"
+ },
+ "stMerge": {
+  "zh": "跨条句组",
+  "en": "Multi-cue groups"
+ },
+ "stWrap": {
+  "zh": "折行",
+  "en": "Wrapped"
+ },
+ "stIssues": {
+  "zh": "待处理",
+  "en": "Pending"
+ },
+ "fAll": {
+  "zh": "全部",
+  "en": "All"
+ },
+ "fTodo": {
+  "zh": "仅待译",
+  "en": "Pending only"
+ },
+ "fDone": {
+  "zh": "仅已译",
+  "en": "Done only"
+ },
+ "fFlag": {
+  "zh": "仅特殊处理",
+  "en": "Flagged only"
+ },
+ "colSrc": {
+  "zh": "{0}原文",
+  "en": "{0} source"
+ },
+ "colDst": {
+  "zh": "{0}译文（可点击编辑）",
+  "en": "{0} translation (click to edit)"
+ },
+ "pending": {
+  "zh": "待翻译…",
+  "en": "Pending…"
+ },
+ "emptyRows": {
+  "zh": "还没有字幕。左侧「导入」→ 选文件 / 粘贴 / 载入示例。",
+  "en": "No subtitles yet. Import on the left → choose a file / paste / load sample."
+ },
+ "emptyFilter": {
+  "zh": "当前筛选无内容",
+  "en": "Nothing under this filter"
+ },
+ "filterAria": {
+  "zh": "筛选字幕",
+  "en": "Filter subtitles"
+ },
+ "tcTitle": {
+  "zh": "时间轴",
+  "en": "Timing"
+ },
+ "tcShiftAll": {
+  "zh": "整体偏移",
+  "en": "Shift all"
+ },
+ "tcShiftFrom": {
+  "zh": "从某条起",
+  "en": "Shift from line"
+ },
+ "tcScale": {
+  "zh": "比例缩放",
+  "en": "Rescale"
+ },
+ "tcCheck": {
+  "zh": "时长体检",
+  "en": "Duration check"
+ },
+ "tcOk": {
+  "zh": "时间轴没问题",
+  "en": "No timing problems found"
+ },
+ "tcFixed": {
+  "zh": "已修 {0} 处",
+  "en": "Fixed {0} issues"
+ },
+ "tcEditTip": {
+  "zh": "改完自动进导出",
+  "en": "Edits flow straight into the export"
+ },
+ "stepExport": {
+  "zh": "导出译文",
+  "en": "Export translation"
+ },
+ "btnDownload": {
+  "zh": "下载字幕",
+  "en": "Download subtitles"
+ },
+ "btnCopy": {
+  "zh": "复制到剪贴板",
+  "en": "Copy to clipboard"
+ },
+ "lblExpStyle": {
+  "zh": "导出字幕样式",
+  "en": "Export style"
+ },
+ "lblFileFmt": {
+  "zh": "文件格式",
+  "en": "File format"
+ },
+ "lblExpFmt": {
+  "zh": "导出格式",
+  "en": "Export format"
+ },
+ "fmtMono": {
+  "zh": "仅译文（单语）",
+  "en": "Translated only"
+ },
+ "fmtSubSrt": {
+  "zh": "最通用",
+  "en": "Most common"
+ },
+ "fmtSubVtt": {
+  "zh": "网页播放",
+  "en": "Web players"
+ },
+ "fmtSubSbv": {
+  "zh": "YouTube",
+  "en": "YouTube"
+ },
+ "fmtSubTxt": {
+  "zh": "纯文本",
+  "en": "Plain text"
+ },
+ "assSplit": {
+  "zh": "上下双屏",
+  "en": "Top + bottom"
+ },
+ "assStack": {
+  "zh": "底部双行",
+  "en": "Two lines, bottom"
+ },
+ "secAssStyle": {
+  "zh": "ASS 字幕样式",
+  "en": "ASS style"
+ },
+ "lblSizeShort": {
+  "zh": "字号",
+  "en": "Size"
+ },
+ "lblColorShort": {
+  "zh": "颜色",
+  "en": "Colour"
+ },
+ "lblMVShort": {
+  "zh": "离底",
+  "en": "Bottom"
+ },
+ "colDstShort": {
+  "zh": "译文",
+  "en": "Translation"
+ },
+ "colSrcShort": {
+  "zh": "原文",
+  "en": "Original"
+ },
+ "lblAssDstSize": {
+  "zh": "译文字号",
+  "en": "Translation size"
+ },
+ "lblAssSrcSize": {
+  "zh": "原文字号",
+  "en": "Original size"
+ },
+ "lblAssDstColor": {
+  "zh": "译文颜色",
+  "en": "Translation colour"
+ },
+ "lblAssSrcColor": {
+  "zh": "原文颜色",
+  "en": "Original colour"
+ },
+ "assApply": {
+  "zh": "应用",
+  "en": "Apply"
+ },
+ "assUndo": {
+  "zh": "撤销",
+  "en": "Undo"
+ },
+ "lblOutlineShort": {
+  "zh": "描边",
+  "en": "Outline"
+ },
+ "lblFontShort": {
+  "zh": "字体",
+  "en": "Font"
+ },
+ "lblAlphaShort": {
+  "zh": "不透明",
+  "en": "Opacity"
+ },
+ "secVttStyle": {
+  "zh": "WebVTT 字幕样式",
+  "en": "WebVTT subtitle style"
+ },
+ "lblVttLine": {
+  "zh": "垂直 line",
+  "en": "Vertical line"
+ },
+ "lblVttPos": {
+  "zh": "水平 position",
+  "en": "Horizontal position"
+ },
+ "lblVttWidth": {
+  "zh": "宽度 size",
+  "en": "Width size"
+ },
+ "lblVttAlign": {
+  "zh": "对齐 align",
+  "en": "Align"
+ },
+ "vttAlignCenter": {
+  "zh": "居中",
+  "en": "Center"
+ },
+ "vttAlignStart": {
+  "zh": "左",
+  "en": "Left"
+ },
+ "vttAlignEnd": {
+  "zh": "右",
+  "en": "Right"
+ },
+ "vttGrpText": {
+  "zh": "文字",
+  "en": "Text"
+ },
+ "lblVttSize": {
+  "zh": "字号",
+  "en": "Font size"
+ },
+ "lblVttColor": {
+  "zh": "颜色",
+  "en": "Color"
+ },
+ "lblVttFont": {
+  "zh": "字体",
+  "en": "Font"
+ },
+ "lblVttLH": {
+  "zh": "行高",
+  "en": "Line height"
+ },
+ "lblVttWeight": {
+  "zh": "字形",
+  "en": "Weight"
+ },
+ "vttBold": {
+  "zh": "粗体",
+  "en": "Bold"
+ },
+ "vttItalic": {
+  "zh": "斜体",
+  "en": "Italic"
+ },
+ "vttAnchorBottom": {
+  "zh": "贴底",
+  "en": "Bottom"
+ },
+ "vttAnchorTop": {
+  "zh": "贴顶",
+  "en": "Top"
+ },
+ "vttAnchorMid": {
+  "zh": "居中",
+  "en": "Middle"
+ },
+ "vttSchemeApply": {
+  "zh": "套用",
+  "en": "Apply"
+ },
+ "vttSchemeSave": {
+  "zh": "保存",
+  "en": "Save"
+ },
+ "vttSchemeDel": {
+  "zh": "删除",
+  "en": "Delete"
+ },
+ "parseOk": {
+  "zh": "✅ 解析成功：{0} 条字幕。",
+  "en": "✅ Parsed OK: {0} cues."
+ },
+ "imported": {
+  "zh": "已导入 {0}：{1} 条。",
+  "en": "Imported {0}: {1} cues."
+ },
+ "noSrc": {
+  "zh": "请先导入并解析字幕。",
+  "en": "Import and parse subtitles first."
+ },
+ "langSame": {
+  "zh": "源语言与目标语言相同（{0}），请选择不同的目标语言。",
+  "en": "Source and target language are the same ({0}); choose a different target."
+ },
+ "customNeed": {
+  "zh": "已选“自定义”风格，请填写风格描述；或改选其他风格。",
+  "en": "\"Custom\" style needs a description; or pick another style."
+ },
+ "degradeDemo": {
+  "zh": "API 模式缺少 Base URL / Key / 模型 → 已自动降级为【规则演练】。",
+  "en": "API mode missing Base URL / Key / Model → fell back to dry run."
+ },
+ "demoNote": {
+  "zh": "【规则演练】无翻译引擎：仅演示 句组划分 / 水词清空 / 按时长分配 / 折行。译文列保留源语句，仅用于查看规则效果。",
+  "en": "[Dry run] No translation engine: demonstrates sentence grouping / filler clearing / duration-based split / wrapping. The translation column keeps source text."
+ },
+ "groupInfo": {
+  "zh": "已按句子分组：{0} 个句组，其中 {1} 组跨多条字幕——短句组将合并为单条字幕，长句组按各条时长切分回填。",
+  "en": "Grouped into {0} sentences; {1} span multiple cues — short groups merge into a single cue, long groups split back by duration."
+ },
+ "mergeInfo": {
+  "zh": "跨条句组 {0} 组：{1} 组已合并为单条字幕，其余 {2} 组按时长切分回填。",
+  "en": "Multi-cue groups: {0}; {1} merged into single cues, {2} split back by duration."
+ },
+ "exported": {
+  "zh": "已导出：{0}（{1} 条）",
+  "en": "Exported: {0} ({1} cues)"
+ },
+ "noExport": {
+  "zh": "没有可导出的字幕。",
+  "en": "Nothing to export."
+ },
+ "copied": {
+  "zh": "已复制到剪贴板。",
+  "en": "Copied to clipboard."
+ },
+ "noCopy": {
+  "zh": "没有内容可复制。",
+  "en": "Nothing to copy."
+ },
+ "copyFail": {
+  "zh": "复制失败，请改用下载按钮。",
+  "en": "Copy failed. Please use the download button."
+ },
+ "errModalTitle": {
+  "zh": "大模型暂时不能工作",
+  "en": "The AI model is temporarily unavailable"
+ },
+ "errModalBody": {
+  "zh": "翻译已停止：模型服务没有响应，可能是网络不稳、服务繁忙或配置失效。可稍等几分钟再试，或在「翻译引擎」中切换自定义 API（可先用「测试连接」验证）。",
+  "en": "Translation stopped: the model service is not responding — the network may be unstable, the service busy, or the configuration invalid. Wait a few minutes and retry, or switch to a custom API under \"Translation engine\" (verify with \"Test connection\" first)."
+ },
+ "errModalGo": {
+  "zh": "自己设置翻译引擎设置",
+  "en": "Open engine settings"
+ },
+ "errModalLater": {
+  "zh": "稍后再试",
+  "en": "Try later"
+ },
+ "errModalFatal": {
+  "zh": "翻译出错",
+  "en": "Translation error"
+ },
+ "errNotCfg": {
+  "zh": "管理员尚未配置默认模型，请改用自定义 API。",
+  "en": "The site admin has not configured a default model. Please use your own API instead."
+ },
+ "errIpLimit": {
+  "zh": "今日该 IP 的免费翻译额度（{0} 次请求）已用完，可填写自己的 API Key 继续使用。",
+  "en": "Today's free translation quota for this IP ({0} requests) is used up. Enter your own API key to continue."
+ },
+ "errGlobalLimit": {
+  "zh": "本站今日免费翻译总额度已用完，可填写自己的 API Key 继续使用。",
+  "en": "Today's site-wide free translation quota is used up. Enter your own API key to continue."
+ },
+ "rateWait": {
+  "zh": "遇到限流（429），等待 20 秒后重试…",
+  "en": "Rate limited (429), waiting 20s before retry…"
+ },
+ "ratePace": {
+  "zh": "免费模型限流中，{0} 秒后继续…",
+  "en": "Free-model rate limit, continuing in {0}s…"
+ },
+ "heroTitle": {
+  "zh": "字幕的活儿，<em>交给 AI</em>",
+  "en": "Whatever your subtitles need, <em>let AI handle it</em>"
+ },
+ "heroSub": {
+  "zh": "翻译、清洗、特效、格式转换、双语剥离、时间轴、乱码修复、提取文本——工具各干各的，想用哪个点哪个。免费 · 免注册 · 隐私安全",
+  "en": "Translate, clean up, style, convert, split bilingual, shift timings, fix garbled text, extract dialogue—each tool does its own job. Free · No sign-up · Private"
+ },
+ "statLangs": {
+  "zh": "语言互译",
+  "en": "languages"
+ },
+ "statStyles": {
+  "zh": "种导出样式",
+  "en": "export styles"
+ },
+ "statAlign": {
+  "zh": "时间轴对齐",
+  "en": "timeline aligned"
+ },
+ "statPrivacy": {
+  "zh": "字幕上传服务器",
+  "en": "subtitles uploaded"
+ },
+ "statUsers": {
+  "zh": "位用户",
+  "en": "Users"
+ },
+ "statSubs": {
+  "zh": "份字幕",
+  "en": "Subtitles"
+ },
+ "statTokens": {
+  "zh": "Token",
+  "en": "Token"
+ },
+ "tickServed": {
+  "zh": "已服务 {0} 位用户",
+  "en": "Served {0} users"
+ },
+ "tickSubs": {
+  "zh": "已译制 {0} 份字幕",
+  "en": "{0} subtitles translated"
+ },
+ "tickToken": {
+  "zh": "累计消耗 {0} Token",
+  "en": "{0} tokens used"
+ },
+ "whyTag": {
+  "zh": "✦ WHY US · 为什么选我们",
+  "en": "✦ WHY US"
+ },
+ "whyTitle": {
+  "zh": "别人叫它「机翻」，我们叫它字幕级翻译",
+  "en": "Not “machine translation” — subtitle-grade translation"
+ },
+ "whySub": {
+  "zh": "每一项能力，都为「压进视频就能用」而设计",
+  "en": "Every capability is designed for “drop it into your video and it just works”"
+ },
+ "feat1T": {
+  "zh": "时间轴精准对齐",
+  "en": "Precise timeline alignment"
+ },
+ "feat1D": {
+  "zh": "译文严格贴合原字幕时间轴，一条对一条；需要合并拆分时按时长智能分配，绝不漂移、不串行。",
+  "en": "Translations follow the original cue timing one-to-one; merges and splits are distributed by duration — no drift, no shifting."
+ },
+ "feat2T": {
+  "zh": "全片术语统一",
+  "en": "Consistent terminology"
+ },
+ "feat2D": {
+  "zh": "翻译前自动提取专名与歧义词生成术语表，第 1 条和第 300 条译法保证一致；还能强制保留指定专名。",
+  "en": "Proper nouns and ambiguous words are extracted into a glossary before translating, so cue 1 and cue 300 stay consistent; force-keep any term you like."
+ },
+ "feat3T": {
+  "zh": "智能折行",
+  "en": "Smart line wrapping"
+ },
+ "feat3D": {
+  "zh": "超过行宽自动按标点与词边界折行，符合 Netflix 各语言规范，绝不把单词劈成两半。",
+  "en": "Lines that exceed the width wrap at punctuation and word boundaries following Netflix language standards — never splitting a word in half."
+ },
+ "feat4T": {
+  "zh": "去水词 · 听写纠错",
+  "en": "Filler removal · ASR fixes"
+ },
+ "feat4D": {
+  "zh": "「嗯、啊、you know」自动清除，源字幕的听写错误一并修正——译文干净到可以直接压片。",
+  "en": "“Um, uh, you know” are cleaned automatically, and transcription errors in the source are fixed along the way — clean enough to burn straight in."
+ },
+ "feat5T": {
+  "zh": "双语字幕随心排",
+  "en": "Bilingual layouts galore"
+ },
+ "feat5D": {
+  "zh": "原文译文双行、堆叠、分屏随意切换，还能导出 TXT 对照稿，字幕组级的花样全都有。",
+  "en": "Dual-line, stacked or top/bottom split — switch freely, export TXT side-by-side scripts, all the fansub-grade tricks."
+ },
+ "feat6T": {
+  "zh": "隐私安全",
+  "en": "Private by default"
+ },
+ "feat6D": {
+  "zh": "字幕在你的浏览器里处理，默认不经任何第三方服务器；API Key 只存在本机。",
+  "en": "Subtitles are processed in your browser and never touch third-party servers; API keys stay on your device."
+ },
+ "expTag": {
+  "zh": "✦ EXPORT · 导出花样",
+  "en": "✦ EXPORT STYLES"
+ },
+ "aboutTitle": {
+  "zh": "关于随心字幕 AI",
+  "en": "About AI-SRTSub"
+ },
+ "aboutBody": {
+  "zh": "随心字幕 AI 是一款开源的 AI 字幕翻译工具。我们相信好的字幕工具应该免费、干净、尊重隐私——不塞广告、不要注册、不动你的文件。欢迎自部署、提需求、一起打磨。",
+  "en": "AI-SRTSub is an open-source AI subtitle translator. We believe a good subtitle tool should be free, clean and privacy-respecting — no ads, no sign-up, no touching your files. Self-host it, file requests, polish it together."
+ },
+ "aboutRepo": {
+  "zh": "GitHub 开源仓库",
+  "en": "GitHub repository"
+ },
+ "aboutLicense": {
+  "zh": "AGPL-3.0 开源",
+  "en": "AGPL-3.0 open source"
+ },
+ "modSecTitle": {
+  "zh": "三个工具",
+  "en": "Three tools"
+ },
+ "modSecSub": {
+  "zh": "三个各自独立的字幕工具，各做各的事。用哪一个、什么时候用，看手上的活儿。",
+  "en": "Three standalone subtitle tools, each with its own job. Use whichever one fits the task in front of you."
+ },
+ "modCur": {
+  "zh": "当前页",
+  "en": "You are here"
+ },
+ "modFix": {
+  "zh": "解决什么",
+  "en": "What it fixes"
+ },
+ "modWho": {
+  "zh": "适合谁",
+  "en": "Who it is for"
+ },
+ "modGo": {
+  "zh": "进入",
+  "en": "Open"
+ },
+ "modTrName": {
+  "zh": "字幕翻译",
+  "en": "Translate"
+ },
+ "modTrLead": {
+  "zh": "把一整份外文字幕翻成你的语言，顺手把时间轴和折行一起收拾好。",
+  "en": "Turn a whole foreign subtitle file into your language — timeline and line breaks handled along the way."
+ },
+ "modTrDo1": {
+  "zh": "100 种语言互译，句级合并翻译后按时长回填",
+  "en": "100 languages; sentences are merged, translated, then split back across the original timing"
+ },
+ "modTrDo2": {
+  "zh": "自动折行、去口语水词、统一专名与术语",
+  "en": "Automatic line wrapping, filler-word removal, consistent names and terminology"
+ },
+ "modTrDo3": {
+  "zh": "导出单语 / 双语，SRT / VTT / ASS / SBV / TXT",
+  "en": "Export single- or bilingual SRT / VTT / ASS / SBV / TXT"
+ },
+ "modTrFix": {
+  "zh": "一整句话被切成好几条、翻出来对不上画面；译文字数爆掉一行放不下；同一个人名前后三种译法。",
+  "en": "One sentence chopped across five cues so the translation never lines up; lines too long to fit; the same name translated three different ways."
+ },
+ "modTrWho": {
+  "zh": "追剧的人、字幕组、自媒体与本地化团队、外语学习者。",
+  "en": "Series fans, subtitle groups, creators and localization teams, language learners."
+ },
+ "modClName": {
+  "zh": "字幕清洗",
+  "en": "Clean Up"
+ },
+ "modClLead": {
+  "zh": "字幕拿到手先过一遍：广告、水印、听障提示这些脏东西一次剔干净。",
+  "en": "Run a subtitle through here first: ads, watermarks and SDH cues stripped in one pass."
+ },
+ "modClDo1": {
+  "zh": "13 条规则分四类，默认开 9 条，随手开关",
+  "en": "13 rules in four groups, 9 on by default, toggle any of them"
+ },
+ "modClDo2": {
+  "zh": "去水印广告、听障提示、HTML 标签，修全大写与乱码",
+  "en": "Strip watermarks, ads, SDH cues and HTML tags; fix all-caps and mojibake"
+ },
+ "modClDo3": {
+  "zh": "逐条列出改了什么，可一条条还原，不动时间轴",
+  "en": "Every change listed cue by cue and revertible — timing never moves"
+ },
+ "modClFix": {
+  "zh": "下载来的字幕夹着「本字幕由 XX 字幕组提供」；整份全大写看得累；编码错乱一片方块字。",
+  "en": "Downloaded subs stuffed with \"subtitles by group X\"; a whole file in ALL CAPS; a screen of garbled boxes."
+ },
+ "modClWho": {
+  "zh": "拿到现成字幕想直接用的人、要批量整理素材的字幕组。",
+  "en": "Anyone who grabbed an existing subtitle and just wants it usable, plus groups batch-cleaning material."
+ },
+ "modFxName": {
+  "zh": "特效字幕",
+  "en": "Styled Subtitles"
+ },
+ "modFxLead": {
+  "zh": "双语合并 + 上样式：字体、颜色、描边、位置所见即所得，导出就能压片。",
+  "en": "Merge two tracks, then style them: font, colour, outline and position, all WYSIWYG and ready to burn in."
+ },
+ "modFxDo1": {
+  "zh": "两份字幕合并成双语，或调整已有双语的顺序与样式",
+  "en": "Merge two files into bilingual, or restyle a bilingual file you already have"
+ },
+ "modFxDo2": {
+  "zh": "ASS 5 套 / VTT 6 套行业模板，样式槽逐项微调",
+  "en": "5 ASS and 6 VTT industry presets, with per-value style slots to fine-tune"
+ },
+ "modFxDo3": {
+  "zh": "实时预览 = 导出结果，时间轴也能就地精修与批量校正",
+  "en": "Live preview equals the exported file; the timeline can be tweaked in place or fixed in bulk"
+ },
+ "modFxFix": {
+  "zh": "想做双语字幕却要手工对轨；ASS 参数改完看不到效果；导出来和预览对不上。",
+  "en": "Bilingual subs that have to be aligned by hand; ASS values whose effect you cannot see; exports that do not match the preview."
+ },
+ "modFxWho": {
+  "zh": "要做双语或特效字幕的创作者、压制组、需要无障碍字幕的团队。",
+  "en": "Creators making bilingual or styled subtitles, encoding groups, teams that need accessible captions."
+ },
+ "modTrTag1": {
+  "zh": "100 种语言",
+  "en": "100 languages"
+ },
+ "modTrTag2": {
+  "zh": "SRT / VTT / ASS",
+  "en": "SRT / VTT / ASS"
+ },
+ "modClTag1": {
+  "zh": "13 条规则",
+  "en": "13 rules"
+ },
+ "modClTag2": {
+  "zh": "不改时间轴",
+  "en": "Timing untouched"
+ },
+ "modFxTag1": {
+  "zh": "双语合并",
+  "en": "Bilingual merge"
+ },
+ "modFxTag2": {
+  "zh": "样式槽",
+  "en": "Style slots"
+ },
+ "toolsTitle": {
+  "zh": "全部工具",
+  "en": "All tools"
+ },
+ "tcTrN": {
+  "zh": "字幕翻译",
+  "en": "Subtitle Translator"
+ },
+ "tcClN": {
+  "zh": "字幕清洗",
+  "en": "Subtitle Cleaner"
+ },
+ "tcFxN": {
+  "zh": "特效字幕",
+  "en": "Styled Subtitles"
+ },
+ "tcDlN": {
+  "zh": "视频下载工具",
+  "en": "Video Downloader"
+ },
+ "tcAsN": {
+  "zh": "AI 营销视频",
+  "en": "AI Marketing Video"
+ },
+ "tcTrD": {
+  "zh": "100 种语言互译，自动配轴、自动折行",
+  "en": "100 languages, auto-timed and auto-wrapped"
+ },
+ "tcClD": {
+  "zh": "去广告水印、听障提示，13 条规则可开关",
+  "en": "Strip ads, watermarks and SDH cues — 13 switchable rules"
+ },
+ "tcFxD": {
+  "zh": "单语双语都能做特技：字体、颜色、描边、位置",
+  "en": "Mono or bilingual: font, colour, outline, position"
+ },
+ "tcDlD": {
+  "zh": "RiseKol 下载器：视频、音频、字幕一起存到本地",
+  "en": "RiseKol downloader: video, audio and subtitles to your disk"
+ },
+ "tcAsD": {
+  "zh": "跨境投放素材：脚本、商品图、成片、字幕",
+  "en": "Cross-border ad assets: scripts, product images, finished cuts, subtitles"
+ },
+ "tcGo": {
+  "zh": "进入 →",
+  "en": "Open →"
+ },
+ "tcGoOut": {
+  "zh": "前往 ↗",
+  "en": "Visit ↗"
+ },
+ "detTrT": {
+  "zh": "把一整份外文字幕，翻成你的语言",
+  "en": "Turn a whole foreign subtitle file into your language"
+ },
+ "detClT": {
+  "zh": "字幕拿到手，先过一遍水",
+  "en": "Subtitles off the web deserve a rinse first"
+ },
+ "detFxT": {
+  "zh": "单语双语，都能做出片级特效",
+  "en": "Mono or bilingual — either way, ready for the screen"
+ },
+ "detDlT": {
+  "zh": "看到想要的视频，直接存下来",
+  "en": "See a video you want? Save it right there"
+ },
+ "detTrL": {
+  "zh": "选好目标语言丢进来，句级合并、术语统一、折行排版一次做完。译文严格贴合原时间轴，导出的时间轴一条都不漂。",
+  "en": "Pick your target language and drop the file in: sentence merging, glossary consistency and line wrapping all happen in one pass. The translation stays locked to the original timing — not a single cue drifts."
+ },
+ "detClL": {
+  "zh": "从网站扒下来的字幕总带着广告、水印和听障提示。13 条规则按需开关，改了什么逐条列给你看，还能一条条撤回——时间轴一动不动。",
+  "en": "Scraped subtitles come with ads, watermarks and hearing-impaired tags. Thirteen rules you can switch on and off, every change listed line by line and undoable one at a time — the timing never moves."
+ },
+ "detFxL": {
+  "zh": "手上是一条单语字幕，还是已经排好的双语，都能在这里定型：字体、字号、颜色、描边、位置、边距逐项调，预览就是你导出拿到的那一份。",
+  "en": "Whether you start from a single track or an already-paired bilingual one, this is where it gets its final look: font, size, colour, outline, position and margins, tuned one by one. The preview is exactly what you export."
+ },
+ "detDlL": {
+  "zh": "RiseKol 视频下载器：粘个链接就能把视频、音频和原文字幕存到本地。桌面客户端，macOS 与 Windows 都有。",
+  "en": "RiseKol video downloader: paste a link and save the video, audio and original subtitles to your machine. A desktop app for macOS and Windows."
+ },
+ "detTr1": {
+  "zh": "100 种语言互译，句级合并后按时长回填",
+  "en": "Translate between 100 languages; merged sentences are re-timed by duration"
+ },
+ "detTr2": {
+  "zh": "自动提取专名生成术语表，全片译法一致",
+  "en": "Proper nouns are collected into a glossary, so the whole file stays consistent"
+ },
+ "detTr3": {
+  "zh": "超长自动折行，按标点与词边界走，不劈词",
+  "en": "Long lines wrap at punctuation and word edges — no words split in half"
+ },
+ "detTr4": {
+  "zh": "导出单语 / 双语，SRT / VTT / ASS / SBV / TXT",
+  "en": "Export mono or bilingual: SRT / VTT / ASS / SBV / TXT"
+ },
+ "detCl1": {
+  "zh": "去水印广告、听障提示、HTML 标签与 ASS 特效标记",
+  "en": "Strip watermarks, ads, SDH cues, HTML tags and ASS effect codes"
+ },
+ "detCl2": {
+  "zh": "全大写、乱码、多余空行一并修掉",
+  "en": "Fix all-caps, mojibake and stray blank lines in the same pass"
+ },
+ "detCl3": {
+  "zh": "改动对照表逐条可还原，只改文本不动时间",
+  "en": "Each change is listed and revertible; only text is touched"
+ },
+ "detCl4": {
+  "zh": "源文件是双语 ASS 时，合并与翻转也在这做",
+  "en": "Source is a bilingual ASS? Merge and flip it here too"
+ },
+ "detFx1": {
+  "zh": "单语整饰 / 调整已有双语 / 两份合成双语，三种模式",
+  "en": "Three modes: style a single track, adjust bilingual rows, or merge two files"
+ },
+ "detFx2": {
+  "zh": "ASS 与 VTT 各一套模板，样式槽逐项微调",
+  "en": "Templates for ASS and VTT each, with style slots for fine-tuning"
+ },
+ "detFx3": {
+  "zh": "字体、颜色、描边、位置、安全边距全部可视调节",
+  "en": "Font, colour, outline, position and safe margins — all visual"
+ },
+ "detFx4": {
+  "zh": "时间轴就地精修：整体偏移、比例缩放、重叠体检",
+  "en": "Retiming on the spot: global shift, proportional scale, overlap check"
+ },
+ "detDl1": {
+  "zh": "粘个链接就能下：视频、音频、字幕",
+  "en": "Paste a link: video, audio and subtitles"
+ },
+ "detDl2": {
+  "zh": "macOS 与 Windows 桌面客户端",
+  "en": "Desktop app for macOS and Windows"
+ },
+ "detDl3": {
+  "zh": "客户端自己下载，不依赖浏览器插件",
+  "en": "Downloads run in the app itself — no browser extension needed"
+ },
+ "wsRkSub": {
+  "zh": "支持 YouTube / B站 / 抖音等 1750+ 站点，下载到本地",
+  "en": "YouTube, Bilibili, Douyin and 1750+ more sites — all downloads stay local"
+ },
+ "rkTx": {
+  "zh": "需要下载视频？试试 <b>RiseKol 视频下载器</b>",
+  "en": "Need to download videos? Try <b>RiseKol Video Downloader</b>"
+ },
+ "rkGo": {
+  "zh": "去看看 →",
+  "en": "Take a look →"
+ },
+ "fxGoto": {
+  "zh": "去特效字幕处理",
+  "en": "Styled subtitles"
+ },
+ "fxGotoSub": {
+  "zh": "字体 · 颜色 · 样式槽 · ASS / VTT",
+  "en": "Fonts · Colours · Style slots · ASS / VTT"
+ },
+ "showTitle": {
+  "zh": "一个字幕文件，导出花样这么多",
+  "en": "One subtitle file, so many ways to export"
+ },
+ "showSub": {
+  "zh": "译文 + 原文随心排版：4 种格式 × 5 种排版，共 14 种导出样式",
+  "en": "Mix translation and original freely: 4 formats × 5 layouts, 14 export styles"
+ },
+ "showMono": {
+  "zh": "仅译文",
+  "en": "Translation only"
+ },
+ "showBi": {
+  "zh": "双语双行 · SRT/VTT",
+  "en": "Bilingual lines · SRT/VTT"
+ },
+ "showSplit": {
+  "zh": "上下分屏 · ASS",
+  "en": "Split screen · ASS"
+ },
+ "showStack": {
+  "zh": "双语双行 · ASS · 样式可控",
+  "en": "Stacked lines · ASS · styled"
+ },
+ "showNote": {
+  "zh": "原文在上 / 译文在上自由切换，还能导出 TXT 对照稿",
+  "en": "Original on top or translation on top, plus TXT transcript export"
+ },
+ "fmtBiSrc": {
+  "zh": "双语 · 原文在上",
+  "en": "Bilingual · source on top"
+ },
+ "fmtBiDst": {
+  "zh": "双语 · 译文在上",
+  "en": "Bilingual · translation on top"
+ },
+ "colTc": {
+  "zh": "时间轴",
+  "en": "Timeline"
+ },
+ "fnSub": {
+  "zh": "字幕",
+  "en": "subtitles"
+ },
+ "fnBi": {
+  "zh": "双语字幕",
+  "en": "bilingual"
+ },
+ "seoTitle": {
+  "zh": "关于随心字幕 AI",
+  "en": "Free AI Auto Subtitle Translator"
+ },
+ "verifyOk": {
+  "zh": "✅ 校验通过：{0} 条，编号连续、时间轴无重叠、无空行。",
+  "en": "✅ Validation passed: {0} cues, sequential numbering, no overlaps, no empty cues."
+ }
+}

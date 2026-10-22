@@ -1,0 +1,740 @@
+{
+  "repair": {
+    "pt": {
+      "seo": {
+        "title": "Corrigir legendas com caracteres ilegíveis – Detetar a codificação – AI-SRTSub",
+        "desc": "Percurso: deteta a codificação original (GBK / Big5 / Shift_JIS / EUC-KR), ordena as reparações pelo que mais parece linguagem real e grava em UTF-8 com BOM ou GBK.",
+        "h1": "Como corrigir legendas com caracteres ilegíveis",
+        "intro": "Uma legenda cheia de caracteres ilegíveis raramente está danificada: apenas foi lida com a codificação errada. A ferramenta deteta a codificação original e devolve os caracteres certos, sem mexer em índices nem em tempos.",
+        "ctaText": "Abrir o corretor"
+      },
+      "body": [
+        {
+          "h2": "O que esta ferramenta faz",
+          "ps": [
+            "Os mesmos bytes lidos como UTF-8 e como GBK dão dois conjuntos de caracteres completamente diferentes: o ficheiro não está danificado, foi descodificado com a codificação errada. É isto que o corretor faz:"
+          ],
+          "ul": [
+            "Descobre em que codificação o ficheiro foi escrito e volta a ler os caracteres corretamente",
+            "Diz-te exatamente como o texto se partiu: caracteres de substituição, caracteres de controlo, símbolos de moeda, filas de letras acentuadas, muralhas de caracteres raros",
+            "Ordena as reparações por **aquela que mais parece linguagem real**, escolhes uma e gravas",
+            "Quando o teu leitor não deteta a codificação, grava uma cópia em UTF-8 com BOM ou em GBK para lhe dar"
+          ]
+        },
+        {
+          "h2": "Envia o ficheiro, não o colem",
+          "ps": [
+            "Os dois acessos não conseguem reparar o mesmo, por isso **envia o ficheiro se puderes**. Com um ficheiro, os bytes originais continuam lá: a ferramenta experimenta uma codificação atrás da outra e, assim que reconhece GBK, descodifica como GBK, sem adivinhar nada. O texto que chega colado já não são bytes em bruto: quando o navegador entrega a cadeia, o erro já aconteceu, por isso só resta trabalhar para trás e salvar o que der.",
+            "Se o texto colado já contém o caráter de substituição (aquele ponto de interrogação numa caixa `�`), os bytes originais perderam-se há muito e ninguém os recupera. A página diz isso sem rodeios: volta acima e usa «Escolher ficheiro» para enviar o original."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Área de envio da página de correção: zona de arrastar e caixa de colar, com a codificação detetada em cima",
+            "cap": "Arrasta o ficheiro ou procura-o; a caixa de colar fica em baixo e repara muito menos"
+          }
+        },
+        {
+          "h2": "O que o diagnóstico te está a dizer",
+          "ps": [
+            "Ao enviar, o cartão de diagnóstico dá um veredicto. **Sem caracteres ilegíveis**: o conteúdo lê-se bem como está; se o teu leitor ainda mostra lixo, usou a codificação errada: desce a «Guardar como», escolhe outra e dá-lhe esse ficheiro. Quando **parece ilegível**, enumera que rasto encontrou:"
+          ],
+          "ul": [
+            "Contém caracteres de substituição — os bytes originais já se perderam",
+            "Meteram-se caracteres de controlo",
+            "Está salpicado de símbolos de moeda e matemáticos",
+            "Letras acentuadas aparecem em blocos — como se o UTF-8 tivesse sido lido byte a byte (`ä½ å¥½` é desse tipo)",
+            "Filas de caracteres CJK sem um único que seja comum — como se o UTF-8 tivesse sido lido como GBK"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Cartão de diagnóstico: veredicto e cada rasto de ilegibilidade listado linha a linha",
+            "cap": "O diagnóstico lista os rastos por tipo em vez de dizer só «é ilegível»"
+          }
+        },
+        {
+          "h2": "Como se ordenam e como escolher",
+          "ps": [
+            "Em «Podes corrigir assim» listam-se até 12 candidatos por ordem de **aquela que mais parece linguagem real**, cada um com o par de codificações de que foi lido. Clica num para ver como fica, escolhe-o e desce para gravar. Não convence? Usa «Manter como está» para voltar ao original.",
+            "A ordem vem de uma pontuação: proporção de caracteres comuns, filas de acentos, filas de símbolos, muralhas de caracteres raros, tudo ponderado. **Se nenhuma pontuação for claramente melhor, nada é recomendado**: não te vai empurrar um candidato a meio só para ter um. O texto estragado duas vezes (gravado mal uma vez e corrigido mal outra) recebe uma volta extra de dedução inversa sobre os primeiros candidatos."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Lista de reparações candidatas ordenada pelo que mais parece linguagem real, cada uma com o seu par de codificações",
+            "cap": "Candidatos ordenados por «mais parece linguagem real», cada um com as suas codificações"
+          }
+        },
+        {
+          "h2": "Gravar bem é o último passo",
+          "ps": [
+            "Um resultado corrigido ainda tem de ser gravado bem. Quando um leitor não deteta UTF-8, gravar em **UTF-8 com BOM** (os leitores do Windows confiam no BOM) ou em **GBK** costuma resolver. Podes gravar em UTF-8, UTF-8 (com BOM), GBK, Big5, Shift_JIS ou EUC-KR; se algo não couber, és avisado para escolher outra (GBK não leva coreano). O ficheiro descarregado leva `-fixed` acrescentado ao nome.",
+            "Quando a codificação detetada não é UTF-8, «Guardar como» já vem pré-definida em UTF-8 com BOM. Assim que tocas no menu, deixa de decidir por ti."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Área de resultado: caixa de texto com o menu de guardar como e o botão de descarga",
+            "cap": "Escolhe a codificação e descarrega; o nome leva -fixed acrescentado"
+          }
+        },
+        {
+          "h2": "O que nunca é mexido",
+          "ps": [
+            "Só se substituem os caracteres mal lidos. Índices, tempos e linhas de estilo ASS não são alterados de forma alguma."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**Enviei o ficheiro, porque tenho de gravar outra vez?** O ficheiro costuma estar bem; o que está estragado é o leitor que o leu com a codificação errada. Nesse caso não é preciso mudar um único caráter do texto: basta gravar uma cópia em UTF-8 com BOM ou GBK e dar-lha.",
+            "**Porque é que o texto colado não se corrige?** Assim que aparece o caráter de substituição no conteúdo colado, os bytes originais já lá não estão e não há nada de onde deduzir. Volta acima e usa «Escolher ficheiro» para enviar o original.",
+            "**O candidato que quero não aparece?** Nada é recomendado a não ser que pontue claramente melhor do que o que já tens. Tenta mudar a codificação detetada para outra e deixa reordenar.",
+            "**Quantos ficheiros de cada vez?** Um de cada vez. Descarrega a correção e mete o seguinte."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "A deteção e a correção correm inteiramente no teu navegador. Nenhum conteúdo de legendas é enviado para um servidor."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "De onde vêm os caracteres ilegíveis e porque acabam com esse aspeto, em [[De onde vêm os caracteres ilegíveis|/guides/subtitle-garbled-characters.html]]; a codificação está bem mas o conteúdo está sujo, usa [[Limpeza de legendas|/clean.html]]; para rever tempos e velocidade de leitura, [[Controlo de qualidade|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-garbled-characters": {
+    "pt": {
+      "seo": {
+        "title": "De onde vêm os caracteres ilegíveis – Reconhecer, corrigir – AI-SRTSub",
+        "desc": "Ilegível significa mal lido, não ficheiro danificado. Caracteres de substituição, acentos em bloco e filas de caracteres raros apontam cada um a uma causa: aprende quais se recuperam e quais nunca.",
+        "h1": "De onde vêm os caracteres ilegíveis",
+        "intro": "Os mesmos bytes lidos como UTF-8 e como GBK saem como dois conjuntos de caracteres diferentes. O aspeto do lixo é prova direta de que passo falhou.",
+        "ctaText": "Abrir o corretor"
+      },
+      "body": [
+        {
+          "h2": "O ficheiro está bem, foi lido mal",
+          "ps": [
+            "O que um ficheiro de legendas guarda são bytes. Transformar bytes em caracteres exige saber em que codificação foram escritos: erras isso e saem caracteres ilegíveis. Não falta nem um byte ao ficheiro; lê-lo outra vez com a codificação certa e os caracteres voltam.",
+            "Isso divide o trabalho em dois: **descobrir com que codificação começou** e **gravá-lo numa codificação que o teu leitor detete**. O primeiro vem de descodificar a tentar e pontuar, o segundo de gravar uma cópia. Resolvem problemas diferentes."
+          ]
+        },
+        {
+          "h2": "Cinco aspetos, cinco causas",
+          "ps": [
+            "Os caracteres ilegíveis não nascem ao acaso: o aspeto entrega a causa:"
+          ],
+          "ul": [
+            "**Blocos de letras acentuadas** (`ä½ å¥½`): chinês em UTF-8 lido como codificação de um byte — o chinês leva três bytes por caráter em UTF-8, e ler byte a byte transforma cada byte na sua própria letra",
+            "**Filas de caracteres CJK sem um único comum**: UTF-8 lido como GBK — os bytes reagrupam-se aos pares e cada par cai nalgum caráter raro",
+            "**Um monte de símbolos de moeda e matemáticos**: os bytes caíram na zona dos símbolos, típico de ser lido como Mac Roman ou alguma variante de Latin-1",
+            "**Caracteres de controlo misturados**: os bytes caíram na zona de controlo invisível e no ecrá aparecem como espaços vazios ou caixas",
+            "**O ponto de interrogação numa caixa `�`**: esse é o **caráter de substituição**, não texto ilegível — significa «aqui havia um caráter e já se perdeu ao ler»"
+          ],
+          "img": {
+            "file": "repair-diag",
+            "alt": "Cartão de diagnóstico com cada tipo de rasto listado",
+            "cap": "O diagnóstico classifica por causa em vez de meter tudo no mesmo saco"
+          }
+        },
+        {
+          "h2": "Porque o caráter de substituição não se corrige",
+          "ps": [
+            "O caráter de substituição é a linha divisória. Um `�` significa que os bytes já foram deitados fora **num passo anterior** (normalmente algum programa que leu o ficheiro e voltou a gravá-lo), e não ficou registo do que se perdeu. Aí não há nada de onde deduzir: ninguém consegue corrigir.",
+            "Por isso a página de correção trata dois casos de forma diferente. Envias um ficheiro e os bytes originais continuam intactos, o que permite experimentar cada codificação; se o texto colado já contém o caráter de substituição, diz-se claro: «não se pode corrigir, envia o ficheiro original».",
+            "E há o caso inverso: o conteúdo lê-se perfeitamente, mas o teu leitor continua a mostrar lixo. A culpa não é do ficheiro: **o leitor escolheu mal a codificação**. Editar o texto não serve de nada; grava uma cópia em UTF-8 com BOM ou GBK e dá-lhe essa."
+          ],
+          "img": {
+            "file": "repair-up",
+            "alt": "Área de envio: arrastar e soltar, e colar, como dois acessos",
+            "cap": "Envia o ficheiro se puderes: com os bytes intactos há algo para corrigir"
+          }
+        },
+        {
+          "h2": "O que se está a comparar ao corrigir",
+          "ps": [
+            "A ferramenta experimenta todas as codificações plausíveis e pontua cada resultado: quanto há de caracteres comuns, se há filas de acentos, filas de símbolos, se as filas CJK são muralhas de caracteres raros. O resultado com melhor pontuação sobe ao topo da lista.",
+            "**Se nenhuma pontuação for claramente melhor, nada é recomendado**: antes dizer-te «isto lê-se bem como está» do que empurrar-te algo que só vagamente parece uma língua. O texto estragado duas vezes (gravado mal uma vez e corrigido mal outra) recebe uma volta extra de dedução inversa sobre os primeiros candidatos."
+          ],
+          "img": {
+            "file": "repair-fix",
+            "alt": "Lista de candidatos ordenada por pontuação, cada um com o seu par de codificações",
+            "cap": "Candidatos por pontuação; sem vencedor claro, sem recomendação"
+          }
+        },
+        {
+          "h2": "Gravar a codificação certa acaba o trabalho",
+          "ps": [
+            "O texto corrigido ainda tem de ser gravado numa codificação que o teu leitor reconheça. Os leitores no Windows costumam confiar no BOM para detetar a codificação, por isso **UTF-8 com BOM** é o que dá menos trabalho; hardware antigo e alguns leitores regionais querem GBK. Podes escolher UTF-8, UTF-8 (com BOM), GBK, Big5, Shift_JIS ou EUC-KR, e serás avisado se algo não couber (GBK não leva coreano)."
+          ],
+          "img": {
+            "file": "repair-out",
+            "alt": "Área de resultado: menu de codificação e botão de descarga",
+            "cap": "Grava em algo que o leitor reconheça e o problema fica resolvido"
+          }
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "O percurso completo, em [[Como corrigir legendas com caracteres ilegíveis|/guides/repair.html]]; o que um ficheiro SRT guarda realmente, em [[O que há dentro de um ficheiro SRT|/guides/srt-file-format.html]]; a codificação está bem mas o conteúdo está sujo (marcas de água, anúncios, indicações para surdos), [[Limpeza de legendas|/clean.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "hanconv": {
+    "pt": {
+      "seo": {
+        "title": "Conversão de chinês simplificado e tradicional – Taiwan e Hong Kong – AI-SRTSub",
+        "desc": "Percurso das nove direções: chinês de Taiwan com ou sem vocabulário regional, Hong Kong como variante própria e tudo convertível de volta a simplificado. Só mudam os diálogos; os tempos ficam iguais.",
+        "h1": "Como converter legendas entre chinês simplificado e tradicional",
+        "intro": "Uma legenda para Taiwan, Hong Kong ou a China continental muda tanto no vocabulário como na forma dos caracteres. Nove direções à escolha, e só se convertem os diálogos: tempos, índices e linhas de estilo ASS ficam intactos.",
+        "ctaText": "Abrir o conversor"
+      },
+      "body": [
+        {
+          "h2": "O que esta ferramenta faz",
+          "ps": [
+            "Converter entre simplificado e tradicional não é só escrever cada caráter de outra forma. A mesma palavra simplificada corresponde a palavras diferentes conforme a região: a palavra para «software» não é igual em Taiwan e na China continental, e Hong Kong tem mais uma versão. O conversor mantém-nas separadas:"
+          ],
+          "ul": [
+            "Simplificado para tradicional (genérico / Taiwan / Hong Kong)",
+            "Tradicional para simplificado (genérico / de Taiwan / de Hong Kong)",
+            "Trocar a forma dos caracteres entre variedades tradicionais (formas de Taiwan / formas de Hong Kong)",
+            "As correspondências de um para vários resolvem-se bem (por palavra, não trocando cada caráter às cegas)"
+          ]
+        },
+        {
+          "h2": "Envio e deteção",
+          "ps": [
+            "Arrasta um ficheiro ou procura-o: aceitam-se SRT, VTT, ASS e TXT; também podes colar o conteúdo da legenda diretamente. O formato é detetado sozinho e aparece ao lado de «Formato detetado»."
+          ],
+          "img": {
+            "file": "hanconv-up",
+            "alt": "Área de envio do conversor: zona de arrastar e caixa de colar, com o formato detetado em cima",
+            "cap": "SRT / VTT / ASS / TXT, com o formato detetado automaticamente"
+          }
+        },
+        {
+          "h2": "Como escolher entre as nove direções",
+          "ps": [
+            "As nove direções do menu repartem-se em três grupos. **Simplificado → tradicional**: tradicional genérico, de Taiwan (mudar vocabulário), de Taiwan (só formas), Hong Kong. **Tradicional → simplificado**: genérico, de Taiwan, de Hong Kong. **Entre tradicionais**: formas de Taiwan, formas de Hong Kong.",
+            "Escolher «vocabulário de Taiwan» também troca as palavras regionais: a palavra para «software» passa à taiwanesa e a de «informação» igual; escolher «formas de Taiwan» só muda a escrita e mantém o teu vocabulário. Hong Kong é outro caso e usa ainda outra palavra para «software». Para voltar ao simplificado, usa o grupo de baixo: tens de dizer de que variedade tradicional vens, porque o texto de Taiwan e o de Hong Kong seguem caminhos diferentes de volta."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Cartão de conversão: menu de destino com «Simplificado → tradicional de Taiwan (mudar vocabulário)» selecionado",
+            "cap": "As direções vivem no menu em três grupos; esta é a taiwanesa com mudança de vocabulário"
+          }
+        },
+        {
+          "h2": "Resultado e exportação",
+          "ps": [
+            "A área de resultado mostra a legenda convertida na hora, com uma barra de estatísticas que dá o total de linhas e quantas mudaram. Se não mudou nada, aparece um aviso de que o ficheiro talvez não tenha caracteres chineses: só se convertem os caracteres han, por isso uma legenda em latim ou em números fica exatamente igual.",
+            "Depois, descarrega ou copia. É inserida uma etiqueta de idioma no nome: `demo.srt` passa a `demo.zh-TW.srt` com tradicional de Taiwan, `.zh-Hant` com tradicional genérico e `.zh-Hans` ao voltar ao simplificado."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Área de resultado: legenda convertida e barra de estatísticas",
+            "cap": "A barra dá o total e as linhas mudadas; daqui descarregas ou copias"
+          }
+        },
+        {
+          "h2": "O que nunca é mexido",
+          "ps": [
+            "Só se convertem os diálogos. Tempos, índices e linhas de estilo ASS não são tocados: o resultado fica pronto a usar sem refazer o formato."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**Porque não converteu a palavra de «limpo»?** As correspondências de um para vários resolvem-se por palavra: o sentido de «limpo» e o de «seco» partilham uma forma tradicional, enquanto o de «tronco» usa outra. As tabelas vêm do OpenCC e comparam frases inteiras antes de caracteres soltos.",
+            "**Em que diferem o tradicional de Taiwan e o de Hong Kong?** No vocabulário: a palavra para «software» não é a mesma. Escolhe a direção da região a que entregas.",
+            "**Mudou o número de caracteres?** Só se trocam caracteres han: não se acrescentam nem retiram entradas, não se mexe em nenhum tempo. Se mudou o número de linhas, revê se o formato foi bem detetado.",
+            "**O dicionário não carregou?** A página pede para recarregar e tentar de novo. Carrega em local, por isso não é preciso enviar as legendas para lado nenhum."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "A conversão corre inteiramente no teu navegador. Nenhum conteúdo de legendas é enviado para um servidor."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "Se só precisas de passar de simplificado a tradicional, vê [[Converter legendas de simplificado a tradicional|/guides/srt-simplified-to-traditional.html]]; porque é mais do que trocar caracteres, [[Simplificado e tradicional não é trocar caracteres|/guides/simplified-traditional-chinese.html]]; para traduzir para outra língua, [[Tradução de legendas|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-simplified-to-traditional": {
+    "pt": {
+      "seo": {
+        "title": "Converter legendas a tradicional – Taiwan ou Hong Kong – AI-SRTSub",
+        "desc": "Passa legendas de chinês simplificado a tradicional: escolhe o de Taiwan (com ou sem vocabulário regional) ou o de Hong Kong, com correspondências um para vários por palavra.",
+        "h1": "Converter legendas de simplificado a tradicional",
+        "intro": "Uma legenda em chinês simplificado que vai para público de Taiwan ou Hong Kong só precisa de conversão, mas as duas regiões querem coisas diferentes e escolher mal dá um vocabulário que lá não se usa.",
+        "ctaText": "Converter esta legenda"
+      },
+      "body": [
+        {
+          "h2": "A necessidade",
+          "ps": [
+            "As tuas legendas estão em chinês simplificado e têm de chegar a público de Taiwan ou Hong Kong. Mudar os caracteres um a um não é realista: um episódio tem centenas de entradas. E as duas regiões não querem o mesmo texto tradicional: o vocabulário difere e a direção errada dá palavras que lá ninguém diria."
+          ]
+        },
+        {
+          "h2": "Onde fazer",
+          "ps": [
+            "Abre [[Conversão de simplificado e tradicional|/hanconv.html]], arrasta a legenda e escolhe uma direção de simplificado → tradicional: tradicional genérico, de Taiwan (mudar vocabulário), de Taiwan (só formas) ou Hong Kong. A conversão é imediata e a área de resultado mostra a legenda pronta a descarregar.",
+            "**Para público de Taiwan**: se o vocabulário também deve mudar, escolhe «de Taiwan (mudar vocabulário)»: «software» e «informação» passam aos equivalentes taiwaneses; se só queres mudar a forma dos caracteres e manter o teu vocabulário, escolhe «de Taiwan (só formas)». **Para público de Hong Kong**: escolhe «Hong Kong», onde «software» se escreve com outra forma."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Cartão de conversão: menu com «Simplificado → tradicional de Taiwan (mudar vocabulário)»",
+            "cap": "Taiwan e Hong Kong são duas direções com vocabulário diferente"
+          }
+        },
+        {
+          "h2": "Erros habituais",
+          "ps": [
+            "**Não tenhas medo das correspondências de um para vários**: o mesmo caráter simplificado nas palavras de «limpo», «seco» e «tronco» corresponde a caracteres tradicionais diferentes. As tabelas resolvem por frase, por isso nada se achata num só.",
+            "**Só se convertem os diálogos**: tempos, índices e linhas de estilo ASS ficam intactos, o resultado usa-se como está.",
+            "**Se nada mudou, revê antes de entrares em pânico**: se a barra de estatísticas diz 0 linhas mudadas, pode ser que o ficheiro não tenha caracteres chineses ou que o formato tenha sido mal detetado; confirma se «Formato detetado» coincide com o que enviaste."
+          ]
+        },
+        {
+          "h2": "Relacionado",
+          "ps": [
+            "A explicação completa das nove direções, em [[Como converter entre simplificado e tradicional|/guides/hanconv.html]]; porque é mais do que trocar caracteres, [[Simplificado e tradicional não é trocar caracteres|/guides/simplified-traditional-chinese.html]]; a volta de tradicional a simplificado também está em [[Conversão de simplificado e tradicional|/hanconv.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "simplified-traditional-chinese": {
+    "pt": {
+      "seo": {
+        "title": "Simplificado e tradicional: não é trocar caracteres – AI-SRTSub",
+        "desc": "Três coisas complicam: correspondências de um para vários por palavra, vocabulário diferente em Taiwan e Hong Kong, e só converter os diálogos. Com as três certas, não há que rever à mão.",
+        "h1": "Simplificado e tradicional não é trocar caracteres",
+        "intro": "Que caráter tradicional substitui um simplificado depende do caráter que está ao lado. É por isso que esta conversão não se faz trocando um caráter por outro às cegas.",
+        "ctaText": "Abrir o conversor"
+      },
+      "body": [
+        {
+          "h2": "Primeiro: um simplificado, vários tradicionais",
+          "ps": [
+            "A simplificação juntou vários caracteres tradicionais num só simplificado. Na volta, um caráter simplificado corresponde a vários tradicionais e escolher entre eles depende do que vem junto:",
+            "Trocar caráter a caráter unifica-os todos num e erra tudo. Resolver **por palavra** é o que os separa: as tabelas vêm do OpenCC e comparam frases antes de caracteres soltos. Por exemplo:"
+          ],
+          "ul": [
+            "O sentido de «limpo» vai a um caráter tradicional e o de «tronco» a outro",
+            "Os sentidos de «cabelo» e de «desenvolvimento» do mesmo caráter simplificado vão a dois tradicionais diferentes",
+            "O sentido de «atrás» leva uma forma tradicional, enquanto «imperatriz» mantém o caráter que já tem"
+          ]
+        },
+        {
+          "h2": "Segundo: Taiwan e Hong Kong não são a mesma coisa",
+          "ps": [
+            "Depois de converter a tradicional ainda há outra camada: a mesma palavra escreve-se de forma diferente em Taiwan e em Hong Kong. A palavra para «software» é uma coisa em Taiwan e outra em Hong Kong, e Taiwan usa a sua palavra para «informação».",
+            "Daí as direções separadas. Até o tradicional de Taiwan se divide em «mudar vocabulário» e «só formas»: com só formas manténs o teu vocabulário, enquanto mudar vocabulário também substitui os termos regionais. Hong Kong tem direção própria."
+          ],
+          "img": {
+            "file": "hanconv-dir",
+            "alt": "Cartão de conversão: menu com «Simplificado → tradicional de Taiwan (mudar vocabulário)»",
+            "cap": "Taiwan oferece mudar vocabulário ou só formas; Hong Kong tem direção própria"
+          }
+        },
+        {
+          "h2": "Terceiro: só os diálogos devem ser tocados",
+          "ps": [
+            "Um ficheiro de legendas não é só diálogo. Também lá estão índices, tempos e linhas de estilo ASS, e nem um caráter disso deve ser convertido: sobretudo as linhas de estilo ASS, que levam nomes de diretivas em inglês que se partem assim que são tratadas como diálogo.",
+            "Por isso a conversão acontece depois de analisar o formato: SRT, VTT, ASS e TXT identificam cada um que parte é diálogo e só se convertem os caracteres lá dentro. Os tempos e os estilos sobrevivem intactos, sem refazer o formato."
+          ],
+          "img": {
+            "file": "hanconv-out",
+            "alt": "Área de resultado: legenda convertida e barra de estatísticas com as linhas mudadas",
+            "cap": "A barra indica quantas linhas mudaram; o formato mantém-se como está"
+          }
+        },
+        {
+          "h2": "A volta ao simplificado: com cuidado",
+          "ps": [
+            "Converter de tradicional para simplificado também exige dizer **de que variedade tradicional vens**: genérico, de Taiwan e de Hong Kong são três caminhos diferentes, porque o vocabulário regional tem de voltar à palavra genérica antes de ser convertido. Se escolheres mal a direção, o vocabulário regional sobrevive na saída simplificada.",
+            "O grupo de baixo das nove direções é o que converte de volta: tradicional → simplificado, de Taiwan → simplificado, de Hong Kong → simplificado."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "O percurso completo, em [[Como converter entre simplificado e tradicional|/guides/hanconv.html]]; se só precisas de passar a tradicional, [[Converter legendas de simplificado a tradicional|/guides/srt-simplified-to-traditional.html]]; para traduzir para outra língua, [[Tradução de legendas|/translate.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "pt": {
+      "seo": {
+        "title": "Conversão de legendas para Excel/CSV – Nos dois sentidos – AI-SRTSub",
+        "desc": "Conversão nos dois sentidos: exporta SRT/VTT para Excel ou CSV para rever linha a linha e volta a importar a folha editada como legendas. Três colunas em qualquer ordem; o tempo fica como texto.",
+        "h1": "Como converter legendas para Excel/CSV",
+        "intro": "Rever e traduzir é mais cómodo numa folha de cálculo. Exporta as legendas para Excel ou CSV, edita linha a linha e converte de volta: as colunas de tempo continuam texto e as quebras de linha mantêm-se.",
+        "ctaText": "Abrir a conversão para tabela"
+      },
+      "body": [
+        {
+          "h2": "O que esta ferramenta faz",
+          "ps": [
+            "Legendas são filas de entradas e uma folha de cálculo é filas de registos: depois de estar em tabela, rever, comentar e traduzir em bloco faz-se com ferramentas que já conheces. Aceitam-se os dois sentidos:"
+          ],
+          "ul": [
+            "**Para tabela**: exporta SRT ou VTT para Excel (.xlsx) ou CSV, uma fila por entrada com índice, início, fim e texto",
+            "**Para legenda**: converte a folha editada de volta a SRT ou VTT",
+            "O tempo fica como texto, por isso a folha de cálculo não pode reinterpretá-lo como número ou data",
+            "As quebras de linha dentro do diálogo conservam-se, com a mesma distribuição de linhas"
+          ]
+        },
+        {
+          "h2": "Enviar e escolher o sentido",
+          "ps": [
+            "Arrasta um ficheiro ou procura-o. Cada sentido precisa de um tipo de ficheiro diferente: **para tabela** leva ficheiros de legendas (SRT / VTT), **para legenda** leva ficheiros de folha de cálculo (CSV / Excel, tanto .xlsx como .xls). Se te enganares no modo, a página diz que tipo de ficheiro esse modo quer.",
+            "⚠️ Esta página só lê UTF-8. Se a tua legenda abre como um ecrã de pontos de interrogação ou caixas, passa-a antes por [[Corrigir caracteres ilegíveis|/repair.html]]: com a codificação estragada, aqui só lês caracteres de substituição."
+          ],
+          "img": {
+            "file": "table-up",
+            "alt": "Área de envio: zona de arrastar e os dois modos",
+            "cap": "Cada modo quer um ficheiro: entra legenda, sai folha"
+          }
+        },
+        {
+          "h2": "Exportar legendas para uma tabela",
+          "ps": [
+            "Escolhe «para tabela», mete a legenda e a pré-visualização lista cada entrada: índice, início, fim e texto. A barra de estatísticas dá o número de entradas e a duração total. Depois carrega em «Descarregar Excel (.xlsx)» ou «Descarregar CSV».",
+            "A diferença entre os dois: .xlsx é um ficheiro de folha de cálculo a sério, onde o Excel não te pode reformar a coluna do tempo pelas costas; CSV é mais universal, mas o Excel pode interpretar a coluna do tempo como outra coisa ao abrir. Se acontecer, seleciona a coluna e põe-lhe o formato «Texto», ou usa logo .xlsx."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Pré-visualização da tabela: colunas de índice, início, fim e texto, com a barra de estatísticas",
+            "cap": "Cada entrada em pré-visualização; a barra dá entradas e duração"
+          }
+        },
+        {
+          "h2": "Importar uma folha de volta a legendas",
+          "ps": [
+            "Escolhe «para legenda», mete a folha e esta é a regra das colunas: são precisas três colunas para **início, fim e texto** (também valem os cabeçalhos ingleses Start / End / Text), em **qualquer ordem**. Tanto `00:00:01,500` como `00:00:01.500` servem; as filas que não se conseguem analisar são saltadas em vez de condenar o ficheiro todo.",
+            "O resultado aparece entrada a entrada na pré-visualização; confirma e descarrega SRT ou VTT. Se faltarem aquelas três colunas, aparece um aviso para reveres os cabeçalhos: normalmente é por outro nome na exportação ou por a linha de cabeçalho não ser a primeira."
+          ],
+          "img": {
+            "file": "table-back",
+            "alt": "Área de resultado: a legenda importada listada entrada a entrada",
+            "cap": "Se não reconhece as colunas, diz; nunca falha em silêncio"
+          }
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**O Excel mostra mal a coluna do tempo?** Com .xlsx nunca acontece. Se tens de usar CSV: seleciona a coluna do tempo e põe-lhe o formato «Texto» antes de abrir.",
+            "**Os cabeçalhos têm de estar numa língua específica?** Não. Início / fim / texto e Start / End / Text reconhecem-se igual, e maiúsculas ou minúsculas tanto faz.",
+            "**As quebras de linha continuam lá depois de importar?** Sim. As quebras dentro do diálogo conservam-se, com a mesma distribuição de linhas.",
+            "**Aceita ASS?** Esta página só trabalha com SRT e VTT. ASS leva diretivas de estilo: passa-o antes por [[Conversor de formatos|/convert.html]].",
+            "**Quantos ficheiros de cada vez?** Um. Para processar dezenas ou centenas, usa [[Conversão em lote|/batch.html]] (que só converte formatos e não passa por uma tabela)."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "A conversão corre inteiramente no teu navegador. Nenhum conteúdo de legendas é enviado para um servidor."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "Se só queres o passo de legenda para Excel, vê [[Converter legendas para Excel|/guides/srt-to-excel.html]]; para traduzir depois para outra língua, [[Tradução de legendas|/translate.html]]; dezenas de ficheiros de uma vez, [[Conversão em lote|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "srt-to-excel": {
+    "pt": {
+      "seo": {
+        "title": "Converter legendas para Excel – Rever linha a linha – AI-SRTSub",
+        "desc": "Exporta legendas SRT para Excel: uma fila por entrada em quatro colunas, com o tempo como texto e as quebras de linha intactas. A folha editada volta a converter-se em legendas.",
+        "h1": "Converter legendas para Excel",
+        "intro": "Rever centenas de entradas num editor de texto cansa. No Excel cada entrada é uma fila: filtrar, comentar e localizar e substituir passam a estar disponíveis, e as alterações voltam para o teu SRT.",
+        "ctaText": "Exportar para Excel"
+      },
+      "body": [
+        {
+          "h2": "A necessidade",
+          "ps": [
+            "Rever, mudar palavras em bloco ou repartir o trabalho por várias pessoas: tudo isso corre muito mais depressa numa folha do que em texto simples. O próprio SRT é texto simples, mas a sua estrutura de entradas (índice, tempo, diálogo) encaixa de forma natural em quatro colunas."
+          ]
+        },
+        {
+          "h2": "Onde fazer",
+          "ps": [
+            "Abre [[Conversão de legendas para tabela|/table.html]], muda para «para tabela», arrasta o SRT e a pré-visualização enche-se com uma fila por entrada em quatro colunas: índice, início, fim e texto. Carrega em «Descarregar Excel (.xlsx)» e é teu. VTT funciona igual.",
+            "Quando acabares de editar: muda o modo para «para legenda», volta a meter a folha e tens outra vez um SRT. A regra são três colunas para início, fim e texto (também valem Start / End / Text), em qualquer ordem."
+          ],
+          "img": {
+            "file": "table-prev",
+            "alt": "Pré-visualização da tabela: cada entrada SRT como uma fila de quatro colunas, com a barra de estatísticas",
+            "cap": "O SRT fica em quatro colunas e volta pelo mesmo caminho"
+          }
+        },
+        {
+          "h2": "Erros habituais",
+          "ps": [
+            "**Trata a codificação primeiro**: esta página só lê UTF-8. Um ecrã cheio de pontos de interrogação ou caixas significa passar antes por [[Corrigir caracteres ilegíveis|/repair.html]].",
+            "**CSV ou xlsx?**: se vai entrar no Excel, escolhe .xlsx para a coluna do tempo não ser reformada; CSV é mais universal, mas o Excel pode lê-lo como outra coisa; se acontecer, põe a coluna do tempo como «Texto».",
+            "**ASS não dá**: ASS leva diretivas de estilo, por isso converte-o a SRT antes de o meteres numa tabela."
+          ]
+        },
+        {
+          "h2": "Relacionado",
+          "ps": [
+            "O percurso completo nos dois sentidos, em [[Como converter legendas para Excel/CSV|/guides/table.html]]; para traduzir depois, [[Tradução de legendas|/translate.html]]; uma última passagem antes de entregar, [[Controlo de qualidade|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch": {
+    "pt": {
+      "seo": {
+        "title": "Como converter legendas em lote – Centenas num ZIP – AI-SRTSub",
+        "desc": "Percurso: mete dezenas de SRT/VTT, converte-os para um formato e descarrega um único ZIP. Índices renumerados, marcas de tempo normalizadas e os ilegíveis assinalados, fora do pacote.",
+        "h1": "Como converter legendas em lote",
+        "intro": "Uma temporada inteira de legendas costuma ter de acabar num mesmo formato, e enviá-las uma a uma leva uma eternidade. Mete-as todas aqui, converte-as juntas e descarrega um ZIP: as que não se conseguem analisar ficam assinaladas, nunca se metem no pacote como se tivessem corrido bem.",
+        "ctaText": "Abrir a conversão em lote"
+      },
+      "body": [
+        {
+          "h2": "O que esta ferramenta faz",
+          "ps": [
+            "As legendas de uma temporada ou de um pack costumam ter de ser uniformes antes de se fazer mais alguma coisa com elas. É isto que a página de lotes faz:"
+          ],
+          "ul": [
+            "Aceitar dezenas de ficheiros SRT ou VTT de uma vez (podes selecionar vários)",
+            "Convertê-los todos a SRT ou VTT, renumerando as entradas e normalizando as marcas de tempo para o formato de destino",
+            "Empacotar tudo num ZIP, mantendo os nomes originais e mudando só a extensão",
+            "Assinalar os ficheiros sem entradas reconhecíveis e deixá-los fora do pacote"
+          ]
+        },
+        {
+          "h2": "Juntar os ficheiros",
+          "ps": [
+            "Arrasta vários ficheiros de legendas juntos para o retângulo tracejado, ou clica e seleciona vários. A lista mostra cada um: os analisados com o número de entradas, os que não deram, marcados como não reconhecidos. A barra de cima totaliza ficheiros, entradas e quantos não foram reconhecidos.",
+            "⚠️ Esta página só lê UTF-8. As legendas com a codificação estragada (um ecrã de pontos de interrogação ou caixas) deviam passar antes por [[Corrigir caracteres ilegíveis|/repair.html]]."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Lista de ficheiros: nome e número de entradas, com os não reconhecidos a vermelho",
+            "cap": "Cada ficheiro na lista e os não reconhecidos assinalados logo"
+          }
+        },
+        {
+          "h2": "Para que formato converter tudo",
+          "ps": [
+            "Escolhe o formato de destino em «Converter tudo para»: SRT ou VTT. Cada ficheiro da lista é regenerado nesse formato: os índices são renumerados do princípio e as marcas de tempo normalizadas para o destino (o SRT separa os milissegundos com vírgula, o VTT com ponto).",
+            "**Os nomes originais mantêm-se e só a extensão muda**; os nomes repetidos recebem um número, por isso nada sobrescreve nada."
+          ],
+          "img": {
+            "file": "batch-up",
+            "alt": "Seletor de formato de destino e estado da lista, com a barra de ficheiros e entradas",
+            "cap": "Ao escolher destino, a lista regenera-se; o nome só muda de extensão"
+          }
+        },
+        {
+          "h2": "Empacotar e descarregar",
+          "ps": [
+            "Carrega em «Empacotar num ZIP e descarregar» e o arquivo traz todos os ficheiros convertidos. **Os ficheiros sem entradas reconhecíveis não entram no pacote**: ficam na lista, assinalados, em vez de se misturarem como se tivessem corrido bem. Ao acabar, é indicado quantos ficheiros vão dentro."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Zona de empacotamento: botão de descarregar o ZIP e aviso do resultado",
+            "cap": "Os não reconhecidos não entram no pacote e continuam assinalados na lista"
+          }
+        },
+        {
+          "h2": "Porque um ficheiro fica como não reconhecido",
+          "ps": [
+            "Um ficheiro é assinalado assim quando não se lhe consegue tirar nenhuma entrada. Três motivos habituais: não é uma legenda (por exemplo um .txt de instruções metido no meio), a codificação não é UTF-8 (por isso lê-se como puros caracteres de substituição), ou o conteúdo ficou achatado num bloco sem marcas de tempo.",
+            "Os ficheiros assinalados podem ser tratados à parte: problemas de codificação vão para [[Corrigir caracteres ilegíveis|/repair.html]], problemas de formato para [[Conversor de formatos|/convert.html]] para uma conversão individual antes de voltarem à lista."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**Quantos ficheiros posso meter?** Não há limite fixo; depende da memória do navegador, e umas centenas de SRT costumam correr bem.",
+            "**Muda-me os diálogos?** Não. A conversão em lote só muda o formato contentor: renumera e normaliza marcas de tempo, sem tocar numa palavra.",
+            "**E se preciso de mudar o conteúdo?** Esta página só converte formatos. Para mudar tempos em bloco usa [[Ajuste de tempos|/shift.html]]; para mudar o texto, [[Substituição de termos|/glossary.html]]; ambas funcionam ficheiro a ficheiro.",
+            "**Aceita ASS?** Esta página só converte entre SRT e VTT. ASS leva estilos: usa [[Conversor de formatos|/convert.html]] com cada um."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "A conversão e o empacotamento correm inteiramente no teu navegador. Nenhum conteúdo de legendas é enviado para um servidor."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "O que mudar numa temporada e em que ordem, em [[Editar em lote uma temporada de legendas|/guides/batch-convert-srt.html]]; mais formatos para um ficheiro só, [[Conversor de formatos|/convert.html]]; rever numa folha, [[Conversão para tabela|/table.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "batch-convert-srt": {
+    "pt": {
+      "seo": {
+        "title": "Editar em lote uma temporada de legendas – O que dá e o que não dá – AI-SRTSub",
+        "desc": "Uma temporada costuma precisar da mesma mudança: formato, desfasamento e terminologia uniformes. O que se faz numa passagem, o que tem de ir ficheiro a ficheiro e como tratar os que não se analisam.",
+        "h1": "Editar em lote uma temporada de legendas",
+        "intro": "Quando há dezenas de legendas para mudar, costuma ser sempre a mesma mudança. Saber o que se faz numa passagem poupa muito mais do que as enfrentar uma a uma.",
+        "ctaText": "Abrir a conversão em lote"
+      },
+      "body": [
+        {
+          "h2": "Costuma ser sempre a mesma mudança",
+          "ps": [
+            "Quando as legendas falham numa temporada inteira, raramente cada episódio tem o seu problema: normalmente é uma só causa a cair sobre todos os episódios: o mesmo grupo as codificou todas (por isso formato e marcas de água coincidem), todas foram feitas para a mesma versão do vídeo (por isso o sentido e a quantidade do desfasamento também coincidem), ou as transliterações foram divergindo ao longo da temporada.",
+            "Vê dois episódios primeiro (um do princípio e outro do fim) e confirma que é **o mesmo problema** antes de fazeres nada em lote. Se os dois não coincidirem, isto não é coisa que o lote resolva."
+          ]
+        },
+        {
+          "h2": "O que se faz numa passagem",
+          "ps": [
+            "**Uniformizar o formato** é a única coisa que de verdade acaba numa passagem: arrasta dezenas de SRT e VTT para [[Conversão em lote|/batch.html]], escolhe o formato de destino e descarrega um ZIP. A renumeração e a normalização das marcas de tempo acontecem nesse mesmo passo, e não muda uma palavra do diálogo."
+          ],
+          "img": {
+            "file": "batch-list",
+            "alt": "Página de lotes: lista de ficheiros com número de entradas e os não reconhecidos a vermelho",
+            "cap": "Uniformizar o formato é a única coisa que se acaba numa passagem"
+          }
+        },
+        {
+          "h2": "O que tem de ir ficheiro a ficheiro",
+          "ps": [
+            "Estes não têm entrada em lote e há de passá-los um a um, embora costume existir um equivalente que **só tem de ser feito uma vez e depois se aplica à temporada toda**:"
+          ],
+          "ul": [
+            "**Desfasamento uniforme de tempos**: se todos os episódios se desfasaram o mesmo, mede o desfasamento de um em [[Ajuste de tempos|/shift.html]], aponta esse número e mete o mesmo nos outros",
+            "**Terminologia uniforme**: configura o glossário uma vez em [[Substituição de termos|/glossary.html]] e aplica-o a cada legenda",
+            "**Tirar marcas de água de forma uniforme**: as marcas de água são padrões fixos e [[Limpeza de legendas|/clean.html]] já cobre as habituais por omissão: arrasta cada ficheiro"
+          ]
+        },
+        {
+          "h2": "Não te enganes na ordem",
+          "ps": [
+            "Quando há várias coisas para fazer, a ordem errada significa repetir trabalho. Faz por esta ordem:",
+            "**Primeiro trata a codificação** → **depois uniformiza o formato** → **depois muda o conteúdo** (marcas de água, terminologia, tempos) → **por fim o controlo de qualidade**. Converter formatos antes de tratar a codificação só te dá ilegibilidade noutro contentor; mudar o conteúdo antes de uniformizar formatos é trabalhar com suporte de ferramentas inconsistente."
+          ],
+          "img": {
+            "file": "batch-zip",
+            "alt": "Zona de empacotamento: botão de descarregar o ZIP e aviso do resultado",
+            "cap": "Primeiro uniformiza formatos, depois muda o conteúdo"
+          }
+        },
+        {
+          "h2": "O que fazer com os ficheiros não reconhecidos",
+          "ps": [
+            "Os ficheiros assinalados como não reconhecidos ficam fora do ZIP e continuam na lista. Três motivos habituais: não é um ficheiro de legendas (um readme metido no meio), a codificação não é UTF-8, ou o conteúdo ficou achatado num bloco sem marcas de tempo.",
+            "Problemas de codificação vão para [[Corrigir caracteres ilegíveis|/repair.html]] um a um; problemas de formato, para [[Conversor de formatos|/convert.html]] antes de voltarem à lista. **Não metas os não reconhecidos à força só para subir o número**: descobrir que falta um episódio no leitor custa muito mais do que o minuto que isto te poupa."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "O percurso completo da conversão em lote, em [[Como converter legendas em lote|/guides/batch.html]]; desfasamentos uniformes de tempo, [[Como ajustar os tempos|/guides/shift.html]]; uma última passagem antes de entregar, [[Controlo de qualidade|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "fps-23-976-vs-25": {
+    "pt": {
+      "seo": {
+        "title": "O que significam 23,976 / 24 / 25 / 30 fps – Tempos de legendas – AI-SRTSub",
+        "desc": "23,976 não é 24 e 29,97 não é 30: esse 0,1% vem da colorização NTSC. E as regiões PAL, ao emitirem a 25, aceleram o filme 4%. Como tudo isto mexe nos teus tempos e como converter.",
+        "h1": "O que significam 23,976 / 24 / 25 / 30 fps",
+        "intro": "Os 0,1% que separam 23,976 de 24 são um resto da história da televisão. Somados aos 4% do PAL, são a razão de as legendas se dessincronizarem mais quanto mais o filme avança.",
+        "ctaText": "Abrir o ajuste de tempos"
+      },
+      "body": [
+        {
+          "h2": "O que é cada número",
+          "ps": [
+            "A taxa de fotogramas é quantas imagens são mostradas num segundo. Os quatro que mais vês:"
+          ],
+          "ul": [
+            "**24 fps** — a velocidade a que um filme é rodado e projetado; os cinemas vão a 24",
+            "**23,976 fps** — a velocidade de um filme ao entrar na televisão NTSC, 0,1% mais lenta que 24",
+            "**25 fps** — a velocidade de televisão nas regiões PAL (Europa, China, Austrália e outros países de rede de 50 Hz)",
+            "**29,97 fps / 30 fps** — a velocidade dos programas de televisão NTSC, com essa mesma diferença de 0,1%"
+          ]
+        },
+        {
+          "h2": "De onde vêm os 0,1%",
+          "ps": [
+            "23,976 = 24 × 1000/1001 e 29,97 = 30 × 1000/1001. Esse 1000/1001 é um resto de juntar a cor ao NTSC: para meter a subportadora de cor sem partir os recetores a preto e branco já existentes, a frequência de campo desceu de 60 Hz para 59,94 Hz (60 × 1000/1001), e a taxa de fotogramas desceu com ela.",
+            "Resultado: os filmes emitem-se a 23,976 nas regiões NTSC em vez de a 24. A diferença é de 0,1%, ou 3,6 segundos por hora: quase impercetível sozinha, mas não a confundas com os 4% abaixo e nunca juntes as duas num mesmo cálculo."
+          ]
+        },
+        {
+          "h2": "E os 4%, de onde vêm",
+          "ps": [
+            "As regiões PAL emitem a 25 fps. Os filmes rodam-se a 24 fps e são reproduzidos diretamente a 25: não se acrescenta nem se tira um fotograma, por isso a reprodução vai 4% mais rápida (25/24 ≈ 1,0417). Um filme de 100 minutos dura 96 na versão PAL.",
+            "Essa é a raiz da **deriva progressiva**: as legendas feitas sobre o original e o vídeo em versão PAL coincidem no início e levam quatro minutos nos créditos. Nenhum deslocamento global resolve isso: tem de ser reescalado por proporção."
+          ],
+          "img": {
+            "file": "shift-step-rate",
+            "alt": "Secção de velocidade da página de tempos: a caixa do fator",
+            "cap": "Reescala por proporção: um valor serve para o filme todo"
+          }
+        },
+        {
+          "h2": "Como converter",
+          "ps": [
+            "Converter é multiplicar por um fator que serve para o filme todo:"
+          ],
+          "ul": [
+            "**24 → 25** (aceleração PAL): × 0,96",
+            "**23,976 → 25**: × 0,959 (o valor exato é 23,976/25 = 0,95904)",
+            "**25 → 23,976**: × 1,0427",
+            "**23,976 ↔ 24**: × 1,001 ou × 0,999, só 0,1% num sentido ou noutro",
+            "0,96 e 0,959 diferem 0,1%, menos de 6 segundos num filme inteiro: se não sabes se a tua fonte é 24 ou 23,976, 0,96 serve e a ancoragem de dois pontos limpa o resto"
+          ]
+        },
+        {
+          "h2": "Como saber qual tens nas mãos",
+          "ps": [
+            "Em vez de adivinhar o fator, procura dois momentos cujo tempo correto te conste —normalmente a primeira e a última fala— e diz à ferramenta «esta fala devia estar em 00:00:12 e aquela em 01:35:40»; ela estica o filme linearmente entre esses dois pontos. Isso é a «ancoragem de dois pontos» e não precisa que calcules taxas de fotogramas.",
+            "Para confirmares a taxa tu mesmo: o teu leitor ou uma ferramenta de informação de média indicam-na. Quando um nome como `1080p.WEB` não traz pista da taxa, a ancoragem de dois pontos é o caminho mais seguro."
+          ],
+          "img": {
+            "file": "shift-step-two",
+            "alt": "Secção de ancoragem de dois pontos: duas filas de campos de tempo",
+            "cap": "A ancoragem de dois pontos não precisa da taxa: bastam dois tempos"
+          }
+        },
+        {
+          "h2": "Ferramentas e guias relacionadas",
+          "ps": [
+            "A conversão de fotogramas em si, em [[Conversão de taxa de fotogramas|/guides/srt-fps-converter.html]]; ajuste de velocidade, [[Conversão de velocidade de legendas|/guides/subtitle-speed-converter.html]]; se não sabes se é um deslocamento global ou uma deriva progressiva, [[Legendas cada vez mais dessincronizadas|/guides/subtitles-out-of-sync.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}

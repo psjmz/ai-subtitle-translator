@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/bilingual.html 与 /en/bilingual.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<!-- v0.9.290：文案不再写死「中文」—— 译文可能是英文 / 日文 / 法文；kw 里保留「只留中文」这条真实搜索词 -->
+<title>双语字幕剥离 - 只留译文 / 只留原文 / 拆成两份 | 随心字幕 AI</title>
+<meta name="description" content="免费在线双语字幕剥离：把双语字幕拆成原文一份、译文一份，或者只留其中一种。">
+<meta name="keywords" content="双语字幕剥离,双语字幕只留译文,双语字幕只留中文,双语字幕只保留一种语言,双语字幕提取原文,双语字幕拆分,srt双语分离,ass双语字幕拆分,bilingual subtitle splitter,remove second language subtitle">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0E7490">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* ================= 视觉系统沿用 v0.9.249「收敛精修」 =================
+     与其他页同源：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.289：剥离页认领「青」这条色线（首页=粉、特效页=紫、清洗页=绿、转换页=蓝）。
+     与转换页刻意不同色：两页都处理字幕文件，同色会让用户分不清自己在哪一页。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#0E7490; --acc-weak:#E3F2F7; --acc-line:#A5D8E6; --acc-ink:#0B5B72;
+    --grad:#0E7490; --acc2:#0E7490;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(14,116,144,.20);
+    --ctl-h:34px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+  /* 顶部胶囊导航：本页自带一份，不引入 site-nav.js（那三页的导航清单不该被新页牵动） */
+  .pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    border:1px solid var(--line-strong);background:var(--card);color:var(--sub);font-size:12.5px;
+    text-decoration:none;white-space:nowrap}
+  .pill:hover{border-color:var(--acc-line);color:var(--acc-ink);background:var(--acc-weak)}
+  .navpills{display:flex;gap:6px;flex-wrap:wrap}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-ico{display:block;width:30px;height:30px;margin:0 auto 8px;border-radius:9px;background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+  textarea{width:100%;min-height:120px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical;background:var(--card);color:var(--ink)}
+  textarea:focus{outline:none;border-color:var(--acc-line)}
+  textarea[readonly]{background:var(--card-2);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  select.fmt{height:var(--ctl-h);border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:13px;min-width:190px}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+  /* v0.9.290：没检测到双语时置灰的样子 */
+  .chip.warn{background:var(--stage);color:var(--sub);font-weight:400}
+  select.fmt:disabled{opacity:.45;cursor:not-allowed;background:var(--card-2);color:var(--sub)}
+  button.pri:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .part{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .part:first-child{border-top:0;padding-top:0;margin-top:0}
+  .part-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .part-hd b{font-size:13.5px}
+  .part-hd .cnt{font-size:12.5px;color:var(--mut);font-weight:400}
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+  .note{margin-top:12px;font-size:12px;color:var(--mut)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .navpills{display:none}
+  }
+</style>
+<script src="ui-codes.js?v=0.9.341"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span id="topNav"></span>
+      <select id="langSel" aria-label="界面语言"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">双语字幕</span><em data-i18n="heroEm">剥离</em></h1>
+    <p data-i18n="heroSub">把双语字幕拆成原文一份、译文一份，或者只留其中一种。</p>
+  </div>
+
+  <div class="card" id="upCard">
+    <h2><span class="n">1</span><span data-i18n="upTitle">放入字幕</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-ico"></span>
+      <span class="dz-t" data-i18n="dzTxt">把文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="fname"></span>
+    </div>
+    <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.sbv,.lrc,.txt,text/*" style="display:none">
+    <div class="row">
+      <span class="lb" data-i18n="lblSrc">识别到的格式</span>
+      <span class="chip mut" id="srcFmt">—</span>
+      <button id="btnClear" type="button" data-i18n="btnClear">清除</button>
+    </div>
+    <div style="margin-top:12px">
+      <textarea id="paste" data-i18n-ph="pastePh" placeholder="也可以直接把字幕内容粘贴到这里"></textarea>
+    </div>
+  </div>
+
+  <div class="card" id="optCard">
+    <h2><span class="n">2</span><span data-i18n="lblMode">要哪一种</span></h2>
+    <!-- v0.9.290：没检测到双语时，模式下拉与「开始」一起置灰，并给出说明 ——
+         免得用户选了半天其实这份字幕没有双语可剥。 -->
+    <div class="row" id="modeRow">
+      <select class="fmt" id="mode"></select>
+      <span class="chip mut" id="biState" style="display:none" data-i18n="mNone">未检测到双语字幕</span>
+    </div>
+    <div class="row">
+      <span class="lb" data-i18n="lblOut">输出格式</span>
+      <select class="fmt" id="outFmt" style="min-width:170px"></select>
+      <button class="pri" id="btnGo" type="button" data-i18n="btnGo">开始</button>
+    </div>
+  </div>
+
+  <div class="card" id="repCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="repTitle">结果</span></h2>
+    <div id="parts"></div>
+    <div class="msg" id="msg" style="display:none"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="footBrand">随心字幕 AI · 双语字幕剥离</span>
+  </footer>
+</div>
+
+<script src="bilingual-i18n.js?v=0.9.341"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="/i18n/tp-boot.js?v=0.9.341"></script>
+<script src="bilingual-core.js?v=0.9.341"></script>
+<script>
+'use strict';
+var I18N = window.BILINGUAL_I18N.DICT, LANGS = window.BILINGUAL_I18N.LANGS;
+var LANG = 'zh-CN';
+var S = { fname: '', src: '', fmt: null, cues: [], parts: [], outFmt: 'srt', mode: 'src' };
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function tpl(k, a) { return String(t(k)).replace('{0}', a); }
+
+/* v0.9.317：顶部胶囊换全站统一导航 site-topnav.js（渲染进 #topNav，本页只留占位）。 */
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  document.documentElement.lang = LANG;
+  /* 阿拉伯语 / 希伯来语 / 波斯语等整页从右往左排 */
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
+  /* ⚠️ 标题是「两段拼一句」：heroA 与 heroEm 两个 span 紧挨着，中间没有空白节点。
+     中文直接连写没问题，西文必须留一个空格 —— 不留的话英文 h1 会连成「BilingualSubtitle Splitter」。
+     v0.9.314：repair/extract/glossary 等页早已补上，本页照抄。 */
+  var ha = document.querySelector('.hero h1 [data-i18n="heroA"]');
+  if (ha) ha.textContent = t('heroA') + (/^(zh-CN|zh-TW|ja)$/.test(LANG) ? '' : ' ');
+  syncLogoHome();
+  renderOptions();
+}
+function syncLogoHome() {
+  var el = document.getElementById('logoHome');
+  if (el) el.href = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
+}
+
+/* 下拉：格式名是通用缩写不翻译；模式名走词典 */
+function renderOptions() {
+  var C = window.BilingualCore;
+  var ms = $('#mode'), curM = ms.value || S.mode;
+  ms.innerHTML = C.MODES.map(function (m) { return '<option value="' + m.id + '">' + t(m.key) + '</option>'; }).join('');
+  ms.value = curM; S.mode = ms.value;
+
+  var os = $('#outFmt'), curO = os.value || S.outFmt;
+  os.innerHTML = C.FORMATS.map(function (f) { return '<option value="' + f.id + '">' + f.name + ' · ' + f.note + '</option>'; }).join('');
+  os.value = curO; S.outFmt = os.value;
+  refreshBiState();   /* 首次进页面：没内容时控件就该是锁着的 */
+}
+
+function pathUiLang() {
+  var m = String(location.pathname || '').match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/bilingual\.html/);
+  if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
+  return null;
+}
+function initLang() {
+  TP_ADD_LANGS(LANGS);
+  var sel = $('#langSel');
+  sel.innerHTML = LANGS.map(function (p) { return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
+  var saved = 'zh-CN';
+  try { saved = localStorage.getItem('srt_bilingual_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
+  if (!LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
+  LANG = pathUiLang() || saved;
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'bilingual'); if (__tp) I18N[LANG] = __tp; }
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'bilingual')) return;
+    try { localStorage.setItem('srt_bilingual_lang', LANG); } catch (e) { /* 隐私模式写不了，忽略 */ }
+    applyI18n();
+    render();
+  });
+}
+
+/* ---------------- 输入 ---------------- */
+/* 文本入口对外暴露，方便自动化冒烟；页面自身的上传与粘贴都走这里 */
+function setSrc(text, fname) {
+  S.src = String(text || '');
+  S.fname = fname || S.fname || '';
+  S.fmt = window.BilingualCore.detect(S.src, S.fname);
+  if ($('#paste') && $('#paste').value !== S.src) $('#paste').value = S.src;
+  $('#fname').textContent = S.fname;
+  renderSrcFmt();
+  refreshBiState();
+  hideMsg();
+}
+/* 这份字幕里有没有双语：没有就把模式下拉和「开始」一起置灰 + 说明。
+   空输入时什么都不说（还没得判），但控件一样锁着，免得空点。 */
+function refreshBiState() {
+  var ms = $('#mode'), go = $('#btnGo'), chip = $('#biState');
+  if (!ms) return;
+  var has = !!S.src.trim(), yes = false;
+  if (has && S.fmt) {
+    try { yes = window.BilingualCore.hasBilingual(window.BilingualCore.parse(S.src, S.fmt)); } catch (e) { yes = false; }
+  }
+  ms.disabled = !yes;
+  if (go) go.disabled = !yes;
+  if (!yes) { ms.value = 'src'; S.mode = 'src'; }
+  if (chip) {
+    if (!has) { chip.style.display = 'none'; return; }
+    chip.className = 'chip ' + (yes ? 'mut' : 'warn');
+    chip.setAttribute('data-i18n', yes ? 'mOk' : 'mNone');
+    chip.textContent = t(yes ? 'mOk' : 'mNone');
+    chip.style.display = '';
+  }
+}
+function renderSrcFmt() {
+  var el = $('#srcFmt');
+  if (!S.src.trim()) { el.className = 'chip mut'; el.textContent = '—'; return; }
+  if (!S.fmt) { el.className = 'chip mut'; el.textContent = t('errFmt'); return; }
+  el.className = 'chip';
+  el.textContent = S.fmt.toUpperCase();
+}
+function readFile(f) {
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function () { setSrc(String(r.result || ''), f.name); };
+  r.readAsText(f, 'utf-8');
+}
+function clearAll() {
+  S = { fname: '', src: '', fmt: null, cues: [], parts: [], outFmt: S.outFmt, mode: S.mode };
+  $('#paste').value = '';
+  $('#fname').textContent = '';
+  $('#file').value = '';
+  $('#parts').innerHTML = '';
+  $('#repCard').style.display = 'none';
+  renderSrcFmt();
+  refreshBiState();
+  hideMsg();
+}
+
+/* ---------------- 结果 ---------------- */
+function fmtDur(ms) {
+  var t2 = Math.max(0, Math.round(ms / 1000));
+  var h = Math.floor(t2 / 3600), m = Math.floor(t2 % 3600 / 60), s = t2 % 60;
+  function p(n) { return (n < 10 ? '0' : '') + n; }
+  return (h ? h + ':' + p(m) : String(m)) + ':' + p(s);
+}
+function showMsg(text, kind) {
+  var el = $('#msg');
+  el.textContent = text;
+  el.className = 'msg' + (kind ? ' ' + kind : '');
+  el.style.display = 'block';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+/* 拆成两份时文件名加标记，免得两份同名互相覆盖 */
+function tagOf(key) {
+  if (key === 'partSrc') return 'orig';
+  if (key === 'partDst') return 'dst';
+  return '';
+}
+function render() {
+  var box = $('#parts');
+  box.innerHTML = '';
+  if (!S.parts.length) { $('#repCard').style.display = 'none'; return; }
+  S.parts.forEach(function (p, i) {
+    var div = document.createElement('div');
+    div.className = 'part';
+    var head = document.createElement('div');
+    head.className = 'part-hd';
+    var b = document.createElement('b'); b.textContent = t(p.key);
+    var c = document.createElement('span'); c.className = 'cnt';
+    c.textContent = tpl('statCues', p.count) + ' · ' + tpl('statDur', p.dur);
+    head.appendChild(b); head.appendChild(c);
+    var ta = document.createElement('textarea');
+    ta.readOnly = true; ta.value = p.text;
+    var row = document.createElement('div');
+    row.className = 'row';
+    var dl = document.createElement('button'); dl.className = 'pri'; dl.type = 'button'; dl.textContent = t('btnDl');
+    var cp = document.createElement('button'); cp.type = 'button'; cp.textContent = t('btnCopy');
+    dl.addEventListener('click', function () { download(i); });
+    cp.addEventListener('click', function () { copyPart(i); });
+    row.appendChild(dl); row.appendChild(cp);
+    div.appendChild(head); div.appendChild(ta); div.appendChild(row);
+    box.appendChild(div);
+  });
+  $('#repCard').style.display = '';
+}
+/* ---------------- v0.9.308：使用埋点 ----------------
+   本页是纯前端工具：拆轨与导出全在浏览器里做，请求根本不过服务端 ——
+   不主动上报，后台永远不知道这一页有多少人在用、用户是拆了还是合了。
+   ⚠️ 只报元数据（动作 + 条数 + 导出格式），**一个字的字幕内容都不带**。
+   ⚠️ act 必须与服务端 server.js 的 TOOL_ACT 白名单对齐，对不上号服务端整条丢弃。
+      split 档记 'split'、其余三档（取原文/取译文/合并）记 'merge'。
+   ⚠️ 去重：同一份内容 30 分钟内反复点只算一次（条数变了 body 才会变）。 */
+/* ⚠️ 去重窗口直接写毫秒字面量，不写成「分钟 × 60 × 1000」那种算式 ——
+   shift 页有一条「阈值换算只在引擎一处，页面不许出现 ×1000」的回归断言，
+   它管的是**字幕时间**的秒→毫秒换算（必须走引擎），跟这个上报去重窗口没关系，
+   但没必要留一个长得像的写法去绊它。1800000 = 30 分钟，60000 = 1 分钟。 */
+var TOOL_DEDUP_MS = { merge: 1800000, split: 1800000, export: 60000 };
+var _tlLast = { body: '', t: 0 };
+function reportTool(act, extra) {
+  try {
+    var e = extra || {};
+    var body = JSON.stringify({
+      page: 'bilingual', act: act,
+      cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || ''
+    });
+    var now = Date.now();
+    if (body === _tlLast.body && now - _tlLast.t < (TOOL_DEDUP_MS[act] || 0)) return;
+    _tlLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+    }
+    fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () { });
+  } catch (err) { }
+}
+
+function run() {
+  var C = window.BilingualCore;
+  if (!S.src.trim()) { showMsg(t('errEmpty'), 'err'); return; }
+  var fmt = S.fmt || C.detect(S.src, S.fname);
+  if (!fmt) { showMsg(t('errFmt'), 'err'); return; }
+  var cues = C.parse(S.src, fmt);
+  if (!cues || !cues.length) { showMsg(t('errFmt'), 'err'); return; }
+  S.fmt = fmt; S.cues = cues;
+  S.mode = $('#mode').value || 'src';
+  S.outFmt = $('#outFmt').value;
+  var parts = C.transform(cues, S.mode);
+  if (!parts.length || !parts[0].cues.length) { showMsg(t('errFmt'), 'err'); return; }
+  S.parts = parts.map(function (p) {
+    var first = p.cues.length ? p.cues[0].start : 0;
+    var last = p.cues.length ? p.cues[p.cues.length - 1].end : 0;
+    return { key: p.key, text: C.dump(p.cues, S.outFmt), count: p.cues.length, dur: fmtDur(last - first) };
+  });
+  render();
+  reportTool(S.mode === 'split' ? 'split' : 'merge', { cues: S.cues.length, n: S.parts.length });
+  if (!C.hasBilingual(cues)) showMsg(t('errNoBi'), 'warn');
+  else showMsg(t('msgDone'), '');
+}
+function download(i) {
+  var p = S.parts[i];
+  if (!p) return;
+  reportTool('export', { cues: p.count, fmt: S.outFmt });
+  var name = window.BilingualCore.outName(S.fname || 'subtitle', S.outFmt, tagOf(p.key));
+  var blob = new Blob([p.text], { type: 'text/plain;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function copyPart(i) {
+  var p = S.parts[i];
+  if (!p) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(p.text).then(function () { showMsg(t('msgDone'), ''); }, function () { });
+    return;
+  }
+  var ta = document.createElement('textarea');
+  ta.value = p.text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showMsg(t('msgDone'), ''); } catch (e) { /* 复制不了就算了 */ }
+  ta.remove();
+}
+
+function bind() {
+  var dz = $('#dz');
+  dz.addEventListener('click', function () { $('#file').click(); });
+  dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', function () { dz.classList.remove('over'); });
+  dz.addEventListener('drop', function (e) {
+    e.preventDefault(); dz.classList.remove('over');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+  });
+  $('#file').addEventListener('change', function (e) {
+    if (e.target.files && e.target.files[0]) readFile(e.target.files[0]);
+  });
+  $('#paste').addEventListener('input', function (e) { setSrc(e.target.value, S.fname); });
+  $('#btnClear').addEventListener('click', clearAll);
+  $('#mode').addEventListener('change', function () { S.mode = $('#mode').value; if (S.src.trim()) run(); });
+  $('#outFmt').addEventListener('change', function () { S.outFmt = $('#outFmt').value; if (S.cues.length) run(); });
+  $('#btnGo').addEventListener('click', run);
+}
+
+(function main() {
+  initLang();
+  renderOptions();
+  applyI18n();
+  bind();
+  render();
+  window.setSrc = setSrc;   /* 自动化冒烟用的文本入口 */
+})();
+</script>
+
+<!-- v0.9.289：SEO 静态文案（按语言路由替换；直接开文件时显示简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">双语字幕剥离 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>把双语字幕拆成原文一份、译文一份，或者只留其中一种。</strong></p>
+    <p style="margin-top:8px;">支持「一条字幕两行」和「两条字幕同一时间轴」两种双语写法；按先后与文字系统分轨，译文是英文、日文还是法文都成立；时间轴原样保留；整片只有一种语言的字幕会给出提示，不会悄悄删内容。</p>
+    <p style="margin-top:8px;">拿到别人做的双语字幕、只想留一种语言的人，以及要把原文和译文分开存档的字幕组。</p>
+  </section>
+<!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.341" data-tool="bi"></script>
+</body>
+</html>

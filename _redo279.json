@@ -1,0 +1,222 @@
+{
+ "merge/es": [
+  "edHintTm",
+  "vttTplSocial",
+  "vttOptNormal",
+  "lblVttColor",
+  "lblColor",
+  "colSrc",
+  "pvViewMovie",
+  "slotPrmColor"
+ ],
+ "merge/pt": [
+  "edHintTm",
+  "lblLayout",
+  "assTplCinema",
+  "vttTplSocial",
+  "monoTplCinema",
+  "vttOptNormal",
+  "colSrc",
+  "pvViewMovie"
+ ],
+ "merge/de": [
+  "edStart",
+  "edHintTm",
+  "lblLayout",
+  "assGrpText",
+  "assGrpPos",
+  "vttTplStd",
+  "vttGrpText",
+  "vttOptNormal",
+  "lblVttSrcBg",
+  "edgeBox",
+  "colSrc",
+  "expTitle",
+  "slotGrpText"
+ ],
+ "merge/fr": [
+  "edHintTm",
+  "assGrpPos",
+  "vttTplStd",
+  "vttTplCompact",
+  "vttTplA11y",
+  "vttTplSocial",
+  "vttOptNormal",
+  "colSrc",
+  "pvViewMovie",
+  "slotNarration",
+  "colSlot"
+ ],
+ "merge/id": [
+  "vttOptNormal",
+  "lblVttSrcFont",
+  "lblVttFont",
+  "lblFont",
+  "monoCol",
+  "slotEdit",
+  "slotOverride",
+  "slotDefault",
+  "slotPrmFont"
+ ],
+ "merge/hi": [
+  "edHintTm"
+ ],
+ "merge/ru": [
+  "vttPresetCustom",
+  "vttPresetTop",
+  "vttPresetA11y",
+  "vttPresetSocial",
+  "vttGrpPos",
+  "vttGrpText",
+  "vttGrpSrc",
+  "vttGrpFx",
+  "vttGrpAll",
+  "vttGrpDst",
+  "lblOneCol",
+  "vttGrpAllMono",
+  "vttGrpOne",
+  "vttPanelTitleMono",
+  "vttPresetStdMono",
+  "vttTipStdMono",
+  "monoTplStream",
+  "monoTplA11y",
+  "monoTplCinema",
+  "monoTplSocial",
+  "vttTipStreamMono",
+  "vttTipA11yMono",
+  "vttTipCinemaMono",
+  "vttTipSocialMono",
+  "vttSrcTip",
+  "vttInherit",
+  "vttOptSet",
+  "vttOptNormal",
+  "vttOptOff",
+  "lblVttSrcFont",
+  "lblVttSrcBold",
+  "lblVttSrcItalic",
+  "lblVttSrcBg",
+  "lblVttSrcBgColor",
+  "lblVttSrcBgAlpha",
+  "lblVttSrcShadow",
+  "lblVttSrcShadowW",
+  "lblVttSrcShadowColor",
+  "lblVttLine"
+ ],
+ "merge/it": [
+  "edHintTm",
+  "lblLayout",
+  "tplSegSplit",
+  "assTplSplit",
+  "assTplCinema",
+  "vttTplStd",
+  "monoTplCinema",
+  "lblVttSrcFont",
+  "slotPrmFont"
+ ],
+ "merge/tr": [
+  "vttOptNormal",
+  "pvViewMovie"
+ ],
+ "merge/nl": [
+  "assTplCinema",
+  "vttTplCompact",
+  "monoTplCinema"
+ ],
+ "merge/sv": [
+  "edStart",
+  "edHintTm",
+  "lblLayout",
+  "assGrpText",
+  "assGrpPos",
+  "vttTplStd",
+  "vttGrpText",
+  "vttOptNormal",
+  "colSrc",
+  "slotGrpText"
+ ],
+ "merge/cs": [
+  "edHintTm",
+  "assGrpText",
+  "vttGrpText",
+  "expTitle",
+  "slotGrpText"
+ ],
+ "merge/da": [
+  "edStart",
+  "lblLayout",
+  "assGrpPos",
+  "vttTplStd",
+  "vttTplTop",
+  "vttOptNormal",
+  "colSrc",
+  "optTitleMono"
+ ],
+ "merge/el": [
+  "edHintTm"
+ ],
+ "merge/he": [
+  "edHintTm"
+ ],
+ "merge/ro": [
+  "edHintTm",
+  "lblLayout",
+  "assTplCinema",
+  "assTplSocial",
+  "assGrpText",
+  "vttTplStd",
+  "vttTplCompact",
+  "vttTplCinema",
+  "vttTplSocial",
+  "vttGrpText",
+  "monoTplCinema",
+  "vttOptNormal",
+  "lblVttSrcFont",
+  "lblVttFont",
+  "lblFont",
+  "colSrc",
+  "expTitle",
+  "pvViewMovie",
+  "slotPrmFont",
+  "slotGrpText"
+ ],
+ "clean/es": [
+  "stRaw",
+  "pvRaw"
+ ],
+ "clean/pt": [
+  "stRaw",
+  "pvRaw"
+ ],
+ "clean/de": [
+  "stRaw",
+  "pvRaw"
+ ],
+ "clean/fr": [
+  "stRaw",
+  "pvRaw"
+ ],
+ "clean/id": [
+  "heroA"
+ ],
+ "clean/ru": [
+  "footHome",
+  "footMerge",
+  "heroA",
+  "heroEm",
+  "heroSub",
+  "footBrand"
+ ],
+ "clean/sv": [
+  "stRaw",
+  "pvRaw"
+ ],
+ "clean/da": [
+  "stRaw",
+  "btnDownload",
+  "pvRaw"
+ ],
+ "clean/ro": [
+  "stRaw",
+  "pvRaw"
+ ]
+}

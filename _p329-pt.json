@@ -1,0 +1,838 @@
+{
+  "merge": {
+    "pt": {
+      "seo": {
+        "title": "Juntar e estilizar legendas – Fusão, estilo, exportação – AI-SRTSub",
+        "desc": "Juntar dois ficheiros numa faixa bilingue, refazer um ficheiro bilingue existente ou dar estilo a um monolingue: modos de emparelhamento, modelos ASS e VTT e formato de exportação.",
+        "h1": "Como juntar legendas bilingues e aplicar efeitos",
+        "intro": "Una dois ficheiros numa faixa bilingue ou dê estilo diretamente às legendas: tipo de letra, cor, contorno e posição em WYSIWYG, e a pré-visualização corresponde à exportação.",
+        "ctaText": "Abrir a ferramenta de legendas com efeitos"
+      },
+      "body": [
+        {
+          "h2": "Para que serve esta ferramenta",
+          "ps": [
+            "Esta única página cobre três tarefas: juntar um original e uma tradução num ficheiro bilingue, ajustar a ordem e o estilo de um ficheiro já bilingue e dar efeitos a um ficheiro monolingue. As três partilham os mesmos parâmetros de estilo e a mesma pré-visualização."
+          ],
+          "ul": [
+            "**Juntar dois ficheiros** — tem o original e a tradução; una-os num ficheiro bilingue e exporte.",
+            "**Ajustar um ficheiro bilingue** — já é bilingue mas a ordem ou o estilo não estão bem; volte a montá-lo.",
+            "**Ficheiro monolingue** — só um; dê-lhe tipo de letra, contorno e posição.",
+            "Passa-se de uma para outra com os separadores à esquerda; a área de estilo e a pré-visualização são comuns."
+          ]
+        },
+        {
+          "h2": "Três tarefas, uma página",
+          "ps": [
+            "No topo há três separadores: **Juntar dois ficheiros**, **Ajustar um ficheiro bilingue**, **Ficheiro monolingue**. A escolha decide quantas colunas de entrada aparecem à esquerda.",
+            "Ao juntar, a esquerda mostra duas colunas, «1 Legendas originais» e «2 Legendas traduzidas»; cada uma aceita um ficheiro carregado ou texto colado diretamente. Ajustar e dar estilo precisam só de uma coluna."
+          ],
+          "img": {
+            "file": "merge-mode",
+            "alt": "Os três separadores no topo da ferramenta de legendas com efeitos e a área de entrada à esquerda",
+            "cap": "Três separadores no topo; ao escolher «Juntar dois ficheiros» aparecem à esquerda uma coluna de original e outra de tradução"
+          }
+        },
+        {
+          "h2": "Como dois ficheiros são emparelhados",
+          "ps": [
+            "O primeiro item de «3 Definições de junção» é o modo de emparelhamento: **Por ordem · linha de tempo do original**, **Por linha de tempo · linha de tempo do original**, **Por ordem · linha de tempo da tradução**.",
+            "Quando os dois ficheiros têm o mesmo número de entradas na mesma ordem, emparelhar por ordem é o mais seguro. Quando os números diferem (um lado juntou entradas, o outro dividiu-as), emparelhe por linha de tempo e deixe a ferramenta aproximar por proximidade. Qual linha de tempo usar depende de qual é mais precisa, normalmente a do original.",
+            "Abaixo estão a estrutura do texto (deteção automática / duas linhas por entrada / pares alternados) e a ordem (original em cima / tradução em cima)."
+          ],
+          "img": {
+            "file": "merge-pair",
+            "alt": "Modo de emparelhamento, estrutura do texto e ordem nas definições de junção",
+            "cap": "O modo de emparelhamento decide o que vai com o quê, e aqui também se escolhe a linha de tempo"
+          }
+        },
+        {
+          "h2": "Ajustar o estilo item a item",
+          "ps": [
+            "A área de estilo está à direita. Ao exportar ASS aplica-se «Aparência ASS»: disposição (dividido · cima e baixo separados / empilhado · duas linhas em baixo), tamanho, cor, opacidade, tipo de letra, negrito, itálico, espaçamento entre letras, contorno, cor do contorno, sombra/fundo (nenhum / sombra / fundo), profundidade, cor da borda, opacidade da borda, alinhamento horizontal (baixo · esquerda / baixo · centro / baixo · direita) e distância ao fundo da linha de tradução (principal), mais tipo de letra, sombra/fundo e margens esquerda e direita da linha original (secundária).",
+            "Ao exportar estilos VTT bilingues aplica-se «Estilo WebVTT»: sobre seis predefinições (padrão / compacto / cinematográfico / topo / acessível / vertical) pode alterar a linha vertical, a âncora (baixo / topo / centro), a posição horizontal, a largura size, o alinhamento align e a altura de linha da legenda inteira, além da cor de fundo, da opacidade do fundo e da espessura do contorno da linha de tradução; a linha original pode herdar o estilo principal ou ser definida à parte.",
+            "O resultado pode ser guardado como predefinição e reutilizado depois em «A partir de predefinições guardadas» com «Aplicar»."
+          ],
+          "img": {
+            "file": "merge-style",
+            "alt": "Os parâmetros da área Aparência ASS à direita",
+            "cap": "Tamanho, cor, contorno, sombra/fundo e alinhamento ajustam-se individualmente, e o resultado pode ser guardado como predefinição"
+          }
+        },
+        {
+          "h2": "Ver a pré-visualização antes de exportar",
+          "ps": [
+            "«Pré-visualização da junção» é uma tabela: n.º, tempo, original, tradução, estilo. A barra acima filtra linhas suspeitas por «com efeitos sonoros», «com prefixo de falante», «menos de 1 segundo», «mais de duas linhas» e «velocidade de leitura excedida», ou por uma palavra-chave escrita.",
+            "Clicar na ranhura de estilo de uma linha abre o editor dessa ranhura e lista só as linhas que a usam; «Anular todas as substituições» devolve cada alteração manual ao modelo. A área de linha de tempo abaixo permite um desvio global (a partir de uma entrada) e um escalonamento proporcional.",
+            "Quando estiver bem, passe a «4 Exportar»: descarregar o ficheiro ou copiar o conteúdo."
+          ],
+          "img": {
+            "file": "merge-preview",
+            "alt": "A tabela da pré-visualização da junção e a barra de filtros",
+            "cap": "A pré-visualização é a exportação; filtre linhas suspeitas por tipo ou abra uma ranhura de estilo"
+          }
+        },
+        {
+          "h2": "O que não é tocado",
+          "ps": [
+            "O estilo muda apenas a aparência, nunca o diálogo. O texto do original e da tradução não é alterado num único caractere durante a junção; salvo se o alterar de propósito na área abaixo da pré-visualização, a linha de tempo vem do ficheiro escolhido.",
+            "Ao exportar SRT ou «VTT sem estilo», nenhuma informação de estilo é escrita no ficheiro — a página avisa que o VTT não tem bloco STYLE e que o leitor usará a aparência predefinida. Se quer estilo, escolha VTT bilingue ou ASS."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**E se os dois ficheiros tiverem números de entradas diferentes?** Use «Por linha de tempo»; a ferramenta aproxima por proximidade e não inventa as entradas que não consegue emparelhar.",
+            "**E se um leitor ignorar o estilo de um ASS exportado?** Os estilos estão no ficheiro, mas o suporte de ASS varia. Para uma aparência mais portátil, exporte VTT bilingue.",
+            "**Como volto ao modelo inicial depois de o desarrumar?** «Restaurar parâmetros predefinidos» na área ASS e «Restaurar valores do modelo» na área VTT repõem cada secção.",
+            "**O que são as sete linhas do exemplo?** Um exemplo integrado, só para ver como fica uma junção; não é exportável. Carregue as suas legendas e clique na pré-visualização para que seja substituído automaticamente."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "As legendas são processadas inteiramente no navegador: nada é enviado e nada passa por um servidor. Feche o navegador e tudo o que era daquela sessão desaparece."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Para separar um ficheiro bilingue em duas faixas use [[Separação bilingue|/bilingual.html]]; para o caminho inverso, de uma língua para bilingue, veja [[Duas formas de fazer legendas bilingues|/guides/make-bilingual-subtitles.html]]; passe o resultado pelo [[Controlo de qualidade de legendas|/qc.html]]; para uma temporada inteira, [[Conversão em lote|/batch.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract": {
+    "pt": {
+      "seo": {
+        "title": "Extrair texto simples das legendas – Dois esquemas, cinco limpezas – AI-SRTSub",
+        "desc": "O extrator de texto simples em detalhe: parágrafos contínuos ou uma linha por entrada, e o que removem as cinco opções de indicações sonoras, marcas de água, duplicados, prefixos e letras.",
+        "h1": "Como extrair texto simples das legendas",
+        "intro": "Retire o diálogo de um ficheiro de legendas como texto simples limpo: números, linhas de tempo e marcas de estilo desaparecem sozinhos, e o resultado lê-se como um artigo ou serve de lista de falas.",
+        "ctaText": "Abrir o extrator de texto simples"
+      },
+      "body": [
+        {
+          "h2": "Para que serve esta ferramenta",
+          "ps": [
+            "De um ficheiro de legendas só o diálogo interessa ao leitor; o resto é estrutura para o leitor multimédia: números, linhas de tempo e marcas de estilo. Esta página remove a estrutura e guarda as palavras."
+          ],
+          "ul": [
+            "**Ler como artigo** — parágrafos contínuos, cortados nas pausas e na pontuação final.",
+            "**Usar como lista** — uma linha por entrada, uma legenda por linha, prático para uma folha de diálogo ou para alimentar outra ferramenta.",
+            "**Limpar de passagem** — indicações sonoras, marcas de água e duplicados consecutivos saem por predefinição.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — os seis formatos são reconhecidos."
+          ]
+        },
+        {
+          "h2": "Colocar dentro, não só carregar",
+          "ps": [
+            "A coluna «1 Adicionar legendas» à esquerda aceita um ficheiro carregado, e também pode colar o conteúdo diretamente na caixa de texto. Ficheiro errado? Clique em «Limpar» e recomece.",
+            "Esta página lê os ficheiros como UTF-8. Se as legendas abrirem como uma parede de pontos de interrogação ou quadrados, a codificação está quebrada — converta-a para UTF-8 em [[Reparação de texto ilegível|/repair.html]] e volte."
+          ],
+          "img": {
+            "file": "extract-up",
+            "alt": "A área de adicionar legendas do extrator de texto simples",
+            "cap": "Carregue um ficheiro, ou cole o conteúdo das legendas diretamente na caixa"
+          }
+        },
+        {
+          "h2": "Escolher entre os dois esquemas",
+          "ps": [
+            "No topo de «2 Opções de extração» está o esquema: **Parágrafos contínuos** corta o texto nas pausas e na pontuação final, e lê-se como um artigo; **Uma linha por entrada** dá uma linha por legenda, em correspondência um a um com as entradas do ficheiro original.",
+            "Copiar o diálogo para notas, praticar tradução ou ler como prosa pede parágrafos contínuos; montar uma folha de diálogo, comparar linha a linha com o original ou alimentar outra ferramenta pede uma linha por entrada."
+          ],
+          "img": {
+            "file": "extract-opt",
+            "alt": "O esquema e as opções de limpeza sob as opções de extração",
+            "cap": "Escolha um esquema; as cinco opções abaixo decidem que tipo de conteúdo é removido"
+          }
+        },
+        {
+          "h2": "O que cada uma das cinco limpezas remove",
+          "ps": [
+            "**Remover indicações sonoras**: apaga descrições entre parênteses como «(passos)» ou «[música]» e mantém o diálogo.",
+            "**Remover marcas de água e anúncios**: descarta linhas como créditos de fansub, URL e nomes de canal.",
+            "**Remover duplicados consecutivos**: quando a mesma frase aparece duas vezes seguidas (uma falha de reprodução) fica só uma; duplicados mais afastados têm sentido e ficam.",
+            "**Remover prefixos de falante**: «JOHN: Olá» passa a «Olá». Desativado por predefinição: um texto tipo guião precisa de saber quem fala.",
+            "**Saltar linhas de letra**: linhas só com «♪ … ♪» são saltadas. Desativado por predefinição: as letras também são palavras."
+          ],
+          "img": {
+            "file": "extract-clean",
+            "alt": "As cinco opções de limpeza e as suas descrições sob as opções de extração",
+            "cap": "Cada opção indica à direita o que remove; marque as que precisar"
+          }
+        },
+        {
+          "h2": "Levar o resultado",
+          "ps": [
+            "A coluna «3 Resultado» à direita mostra o texto extraído em tempo real e recalcula assim que muda uma opção.",
+            "Quando estiver bem, clique em «Transferir» para um .txt ou «Copiar». Em línguas que não separam palavras com espaços, como o chinês e o japonês, a junção de linhas segue outras regras, e a ferramenta trata disso por língua automaticamente."
+          ],
+          "img": {
+            "file": "extract-out",
+            "alt": "A área de resultado com os botões de transferência e cópia",
+            "cap": "O resultado atualiza em tempo real; transfira-o como txt ou copie diretamente"
+          }
+        },
+        {
+          "h2": "O que não é tocado",
+          "ps": [
+            "O diálogo em si não é reescrito. As opções de limpeza apenas decidem que linhas ou blocos inteiros são descartados; nunca mudam a redação de uma entrada.",
+            "As linhas de tempo e os números simplesmente não são emitidos, não são alterados e depois emitidos — o ficheiro original fica intacto, e esta página não oferece exportação com linhas de tempo. Isso é tarefa da [[Conversão de formato|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**As marcas de estilo ASS ficam no texto?** Não. Os blocos de substituição `{}` do ASS são removidos e fica só o diálogo.",
+            "**Um ficheiro bilingue sai em duas linhas ou numa?** Com tantas linhas quantas a entrada tinha; esta página não junta nem divide — para separar, [[Separação bilingue|/bilingual.html]].",
+            "**Porque é que os prefixos de falante ficam por predefinição?** O nome em «JOHN: Olá» é muitas vezes informação útil (guiões, folhas de diálogo); retirá-lo dificulta saber quem fala, por isso a decisão é sua.",
+            "**Também se podem extrair ficheiros de letra LRC?** Sim. As marcas de tempo LRC são removidas e ficam as linhas de letra; se não quiser letras, marque «Saltar linhas de letra»."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "As legendas são processadas inteiramente no navegador: nada é enviado e nada passa por um servidor. O texto fica apenas na página atual e desaparece ao atualizar."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Para entender o que um ficheiro de legendas contém realmente veja [[O que há dentro de um ficheiro SRT|/guides/srt-file-format.html]]; para traduzir o diálogo extraído vá a [[Tradução de legendas|/translate.html]]; para o transformar numa tabela, [[Legendas para Excel/CSV|/guides/srt-to-excel.html]]; e passe o [[Controlo de qualidade de legendas|/qc.html]] antes de entregar."
+          ]
+        }
+      ]
+    }
+  },
+  "split": {
+    "pt": {
+      "seo": {
+        "title": "Dividir e juntar legendas – Cortar por bloco, encadear – AI-SRTSub",
+        "desc": "Dividir e juntar em detalhe: cortar um ficheiro em segmentos por duração ou número de entradas, reiniciar cada um em zero, encadear vários ficheiros por ordem ou entrelaçá-los por linha de tempo.",
+        "h1": "Como dividir e juntar legendas",
+        "intro": "Corte um ficheiro longo em segmentos, ou junte vários ficheiros soltos num só. O corte cai sempre num limite de entrada — uma frase nunca é partida ao meio.",
+        "ctaText": "Abrir dividir e juntar"
+      },
+      "body": [
+        {
+          "h2": "Para que serve esta ferramenta",
+          "ps": [
+            "Ao dividir episódios, segmentar e combinar fontes, os blocos de legendas nunca coincidem com os blocos de vídeo: ou é preciso cortar um ficheiro ou juntar vários. Esta página resolve as duas coisas, um separador cada."
+          ],
+          "ul": [
+            "**Dividir** — cortar um ficheiro longo em segmentos por duração ou por número de entradas.",
+            "**Juntar** — encadear vários ficheiros num episódio ou entrelaçá-los por linha de tempo.",
+            "**Cortar só em limites de entrada** — uma frase nunca é partida ao meio.",
+            "**Números renumerados automaticamente** — nada para renumerar à mão após juntar, e nem uma palavra do diálogo muda."
+          ]
+        },
+        {
+          "h2": "Primeiro escolher: dividir ou juntar",
+          "ps": [
+            "Dois separadores no topo: **Dividir: um ficheiro em segmentos** e **Juntar: vários ficheiros num só**. As opções do passo dois mudam com a escolha.",
+            "Em «1 Adicionar legendas» carrega um ficheiro ou cola texto; errado? «Limpar». Esta página só lê UTF-8: se a codificação estiver quebrada (uma parede de pontos de interrogação ou quadrados) vá primeiro a [[Reparação de texto ilegível|/repair.html]]."
+          ],
+          "img": {
+            "file": "split-mode",
+            "alt": "Os dois separadores no topo da página dividir e juntar",
+            "cap": "Dividir e juntar são dois separadores; as opções do passo dois seguem a escolha"
+          }
+        },
+        {
+          "h2": "Como cortar",
+          "ps": [
+            "Em «2 Como dividir» escolha a base: **duração** (um segmento a cada X minutos) ou **número de entradas** (um segmento a cada X entradas), e introduza um número.",
+            "Marque «Reiniciar cada segmento em 0:00» e cada segmento conta do zero — útil ao carregar episódios e entregar cada segmento separadamente a um leitor. Sem marcar, ficam as marcas de tempo originais e cada segmento continua a corresponder à sua posição no vídeo de origem.",
+            "O corte cai só em limites de entrada: quando uma legenda muito longa atravessa o ponto de corte, a entrada inteira fica no segmento anterior."
+          ],
+          "img": {
+            "file": "split-cut",
+            "alt": "As opções de duração e número de entradas com a reinicialização em zero",
+            "cap": "Corte por duração ou por número de entradas, e opcionalmente reinicie cada segmento em 0:00"
+          }
+        },
+        {
+          "h2": "Como juntar",
+          "ps": [
+            "Em «2 Como juntar» escolha o método: **Encadear por ordem** desloca o ficheiro seguinte para começar depois do fim do anterior, sem sobreposição; **Entrelaçar por linha de tempo** mantém as marcas de tempo originais de cada ficheiro e ordena por hora de início.",
+            "Use encadear quando os ficheiros são a primeira e a segunda metade de um episódio, ou quando metades revistas em separado têm de voltar a juntar-se; use entrelaçar quando os ficheiros devem estar juntos no ecrã, como uma faixa original e uma traduzida.",
+            "Após juntar, os números são renumerados automaticamente e nem uma palavra do diálogo muda."
+          ],
+          "img": {
+            "file": "split-join",
+            "alt": "As opções Encadear por ordem e Entrelaçar por linha de tempo da página juntar",
+            "cap": "Encadear serve para as duas metades de um episódio; entrelaçar, para uma faixa original e uma traduzida"
+          }
+        },
+        {
+          "h2": "Levar o resultado",
+          "ps": [
+            "«3 Resultado» à direita exporta **SRT** e **VTT**; clique em «Transferir» ou «Copiar».",
+            "Ao dividir existe «Transferir todos os segmentos», que guarda cada segmento de uma vez em vez de um clique por segmento."
+          ],
+          "img": {
+            "file": "split-out",
+            "alt": "A escolha de formato SRT/VTT com os botões de transferência e de todos os segmentos",
+            "cap": "Os resultados de divisão transferem-se segmento a segmento; um ficheiro junto transfere-se ou copia-se diretamente"
+          }
+        },
+        {
+          "h2": "O que não é tocado",
+          "ps": [
+            "Nem um caractere do diálogo muda. Esta página só muda a que segmento pertence cada entrada e como é numerada; o conteúdo das entradas fica como está.",
+            "Com «Encadear por ordem» as marcas de tempo dos ficheiros seguintes são deslocadas em bloco — é o que a junção exige; com «Entrelaçar por linha de tempo» todas as marcas originais ficam."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**E se o último segmento ficar muito curto?** É normal. O resto que não enche um segmento completo torna-se um segmento próprio em vez de ser completado.",
+            "**Uma frase sobre o ponto de corte é cortada?** Não. Os cortes caem só em limites de entrada, e uma entrada que atravessa a linha fica no segmento anterior.",
+            "**Após entrelaçar, como se ordenam duas entradas com a mesma hora?** Por hora de início; havendo empate, mantém-se a ordem em que adicionou os ficheiros.",
+            "**Pode dividir-se ASS?** Esta página trata SRT e VTT. Converta primeiro o ASS em SRT ou VTT com a [[Conversão de formato|/convert.html]]."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "As legendas são processadas inteiramente no navegador: nada é enviado e nada passa por um servidor. Feche a página e o conteúdo desaparece."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Para juntar dois ficheiros numa faixa bilingue (e não num episódio) use [[Junção bilingue e efeitos|/guides/merge.html]]; se toda a linha de tempo estiver deslocada, [[Ajuste da linha de tempo|/shift.html]]; para uma temporada inteira, [[Conversão em lote|/batch.html]]; e passe o [[Controlo de qualidade de legendas|/qc.html]] no fim."
+          ]
+        }
+      ]
+    }
+  },
+  "lrc": {
+    "pt": {
+      "seo": {
+        "title": "Sincronizar letras LRC – Carregar, colar, marcar o tempo – AI-SRTSub",
+        "desc": "A ferramenta de sincronização em detalhe: carregar uma música, colar a letra, marcar um tempo por linha enquanto ouve e exportar LRC ou SRT. Espaço reproduz, Enter marca, Z anula.",
+        "h1": "Como usar a ferramenta de sincronização de letras",
+        "intro": "Carregue uma música, cole a letra, marque um tempo por linha enquanto ouve e exporte LRC padrão ou SRT. O áudio é reproduzido localmente e nunca é enviado.",
+        "ctaText": "Abrir a ferramenta de sincronização"
+      },
+      "body": [
+        {
+          "h2": "Para que serve esta ferramenta",
+          "ps": [
+            "Dar a uma música um ficheiro de letra que se possa acompanhar a cantar: uma linha por letra, cada uma com um instante. Os leitores leem LRC, as faixas de legendas leem SRT, e ambos se exportam aqui."
+          ],
+          "ul": [
+            "**Começar do zero** — cole a letra em texto simples e marque o tempo enquanto ouve.",
+            "**Corrigir o existente** — importe um LRC existente e continue a partir da primeira linha sem tempo.",
+            "**Exportar dois formatos** — LRC para leitores, SRT para faixas de vídeo.",
+            "**Tudo por teclado** — espaço reproduz e pausa, Enter marca a linha atual, Z anula."
+          ]
+        },
+        {
+          "h2": "1 Carregar a música",
+          "ps": [
+            "A primeira coluna à esquerda aceita um ficheiro de áudio: **MP3, M4A, FLAC, WAV e OGG** funcionam. O áudio é reproduzido localmente e nunca é enviado.",
+            "A qualidade do áudio não afeta a precisão, mas uma fonte com voz clara é mais fácil de seguir; versões ao vivo e fontes com acompanhamento muito alto são bastante mais difíceis de sincronizar."
+          ],
+          "img": {
+            "file": "lrc-up",
+            "alt": "A área de carregar a música da ferramenta de sincronização",
+            "cap": "MP3 / M4A / FLAC / WAV / OGG funcionam, e o áudio só é reproduzido localmente"
+          }
+        },
+        {
+          "h2": "2 Colar a letra",
+          "ps": [
+            "Cole a letra na segunda coluna, **uma linha por letra**; linhas vazias são saltadas. Depois clique em «Analisar letra».",
+            "Colar um LRC existente também funciona — as suas marcas `[mm:ss.xx]` são reconhecidas e, após importar, continua a partir da primeira linha sem tempo, pelo que as linhas já marcadas não têm de ser refeitas."
+          ],
+          "img": {
+            "file": "lrc-paste",
+            "alt": "A área de colar a letra e o botão de analisar",
+            "cap": "Cole uma linha por letra, ou cole um LRC inteiro e deixe a ferramenta ler os tempos existentes"
+          }
+        },
+        {
+          "h2": "3 Marcar o tempo enquanto ouve",
+          "ps": [
+            "Reproduza a música e prima Enter no momento em que uma linha começa (ou clique em «Marcar esta linha»); o tempo fica registado e o cursor salta para a seguinte.",
+            "Atalhos: **espaço** reproduz e pausa, **Enter** marca a linha atual, **Z** anula uma linha. Premir Enter durante a reprodução é o mais fluido — sem andar entre rato e teclado.",
+            "Linha errada? Prima Z para a anular e marque de novo. Se não quiser marcar uma linha (um interlúdio, um trecho só musical), clique em «Saltar esta linha» e não aparecerá na exportação."
+          ],
+          "img": {
+            "file": "lrc-tap",
+            "alt": "Os controlos reproduzir, marcar esta linha, anular uma linha e saltar esta linha",
+            "cap": "Espaço reproduz e pausa, Enter marca a linha atual, Z anula: as mãos ficam no teclado"
+          }
+        },
+        {
+          "h2": "4 Exportar",
+          "ps": [
+            "A quarta coluna exporta: **Transferir LRC** para leitores, **Transferir SRT** para faixas de vídeo, ou «Copiar» para levar o texto diretamente.",
+            "Só são exportadas as linhas com tempo; as saltadas nunca entram no ficheiro. Na exportação SRT cada linha dura até começar a seguinte, e a última recorre a 2 segundos."
+          ],
+          "img": {
+            "file": "lrc-out",
+            "alt": "Os botões Transferir LRC, Transferir SRT e Copiar da área de exportação",
+            "cap": "LRC para leitores, SRT para vídeo; só são exportadas as linhas com tempo"
+          }
+        },
+        {
+          "h2": "O que não é tocado",
+          "ps": [
+            "O texto da letra não é reescrito. A sincronização só acrescenta um instante por linha e não toca nas palavras coladas.",
+            "Ao importar um LRC existente, as linhas com marca de tempo mantêm o tempo original e só marca a partir da primeira linha sem tempo."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**Porque faltam linhas na exportação?** As linhas saltadas e as que não têm tempo nunca entram no ficheiro. Volte ao passo três para as acrescentar, ou confirme que deviam ser saltadas.",
+            "**Pode mudar-se os tempos depois?** Se quiser deslocar tudo um pouco após marcar, exporte SRT e use [[Ajuste da linha de tempo|/shift.html]] para deslocar ou escalar em conjunto.",
+            "**LRC ou SRT?** LRC para leitores de música (foobar2000, clientes de streaming, vários leitores); SRT quando a letra tem de ficar sobre vídeo ou ser trabalhada com ferramentas de legendas.",
+            "**Quanto tempo leva uma música?** Depende do número de linhas e da precisão desejada. Para trinta ou quarenta linhas, alguns minutos por passagem depois de apanhar o ritmo; procurar precisão palavra a palavra leva mais."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "O áudio e a letra são processados inteiramente no navegador: nada é enviado e nada passa por um servidor. O áudio só é descodificado e reproduzido localmente."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Se já tem um LRC e quer legendas veja [[LRC para SRT|/guides/lrc-to-srt.html]]; para o método e as armadilhas da sincronização, [[Como sincronizar letras LRC|/guides/how-to-make-lrc-file.html]]; se o SRT exportado estiver desfasado, [[Ajuste da linha de tempo|/shift.html]]; e passe o resultado pelo [[Controlo de qualidade de legendas|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "videosub": {
+    "pt": {
+      "seo": {
+        "title": "Extrair legendas incorporadas no vídeo – Faixas MKV / MP4 – AI-SRTSub",
+        "desc": "Extrair legendas incorporadas em detalhe: ler as faixas dentro de MKV, WebM, MP4 e MOV e exportar SRT / VTT / ASS / TXT. Sem envio, sem transcodificação, todas as faixas listadas.",
+        "h1": "Como extrair legendas incorporadas num vídeo",
+        "intro": "Leia diretamente como SRT a faixa de legendas fechada num MKV / MP4 — o vídeo nunca é enviado, tudo acontece no navegador.",
+        "ctaText": "Abrir a extração de legendas de vídeo"
+      },
+      "body": [
+        {
+          "h2": "Para que serve esta ferramenta",
+          "ps": [
+            "As legendas podem estar fechadas num ficheiro de vídeo em vez de existirem sozinhas. Para as editar, traduzir ou emparelhar é preciso tirá-las primeiro — é a única coisa que esta página faz."
+          ],
+          "ul": [
+            "**Quatro contentores** — MKV / WebM e MP4 / MOV.",
+            "**Quatro tipos de faixa** — texto simples, ASS, WebVTT e as faixas `mov_text` / `tx3g` dos MP4.",
+            "**Quatro formatos de exportação** — SRT / VTT / ASS / TXT.",
+            "**Sem envio nem transcodificação** — leitura em blocos pequenos por offset, para um ficheiro de vários GB não encher a memória."
+          ]
+        },
+        {
+          "h2": "1 Adicionar o vídeo",
+          "ps": [
+            "Arraste um ficheiro de vídeo para a primeira coluna ou clique para escolher. Só são reconhecidos **MKV / WebM** e **MP4 / MOV**; outros contentores não darão faixa nenhuma.",
+            "O ficheiro nunca sai do seu computador — não há passo de envio. A ferramenta lê em blocos pequenos por offset, para um filme de vários GB não encher a memória, mas a primeira leitura tem de percorrer uma vez a informação das faixas."
+          ],
+          "img": {
+            "file": "videosub-up",
+            "alt": "A área de adicionar vídeo da página de extração de legendas incorporadas",
+            "cap": "São suportados MKV / WebM e MP4 / MOV, e o ficheiro nunca sai da sua máquina"
+          }
+        },
+        {
+          "h2": "2 As faixas de legendas incorporadas",
+          "ps": [
+            "Terminada a leitura, a segunda coluna lista as faixas de legendas do ficheiro **uma por linha**, normalmente com idioma e nome da faixa (por exemplo «Chinês», «Inglês», «Forçado»). Clique numa linha para extrair essa faixa.",
+            "Quando o ficheiro só tem uma faixa de legendas, a extração começa automaticamente — sem clicar.",
+            "**As legendas de imagem não se extraem**: os PGS de Blu-ray e as legendas de DVD são imagens gravadas no fluxo, sem texto a retirar, e a página di-lo claramente; para isso é preciso OCR."
+          ],
+          "img": {
+            "file": "videosub-track",
+            "alt": "A lista das faixas de legendas incorporadas, uma por linha",
+            "cap": "Uma faixa por linha; quando só há uma, a extração começa automaticamente"
+          }
+        },
+        {
+          "h2": "3 O resultado",
+          "ps": [
+            "«3 Resultado» à direita mostra o texto extraído, com o formato de exportação acima: SRT / VTT / ASS / TXT. Clique em «Transferir» ou «Copiar».",
+            "«3 Resultado» à direita mostra o texto extraído, com o formato de exportação acima: **SRT / VTT / ASS / TXT**. Clique em «Transferir» ou «Copiar».",
+            "Quando a faixa de origem é ASS, o seu cabeçalho de estilo e a resolução voltam tal e qual — exportar em ASS conserva-os, exportar em SRT leva só o texto."
+          ],
+          "img": {
+            "file": "videosub-out",
+            "alt": "A área de resultado com a escolha de formato SRT / VTT / ASS / TXT",
+            "cap": "Quatro formatos de exportação; uma origem ASS conserva cabeçalho de estilo e resolução"
+          }
+        },
+        {
+          "h2": "O que não é tocado",
+          "ps": [
+            "O ficheiro de vídeo em si não é tocado de todo — só leitura, sem escrita, sem transcodificação, sem remuxagem.",
+            "O conteúdo das legendas sai tal como está: sem adivinhar codificações, sem corrigir linhas de tempo. Se as legendas extraídas saírem ilegíveis, é um problema de codificação da faixa de origem — leve-o a [[Reparação de texto ilegível|/repair.html]]."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**Não há mesmo forma com as legendas de imagem (PGS / DVD)?** Não nesta página — são imagens sem camada de texto. Primeiro é preciso OCR, e esta página não o faz.",
+            "**As legendas extraídas estão desfasadas, porquê?** Esta página não corrige linhas de tempo; sai o que lá estava. Para um desvio global ou um problema de velocidade, [[Ajuste da linha de tempo|/shift.html]].",
+            "**Porque demora tanto até acontecer algo?** Um ficheiro grande tem de ser percorrido bloco a bloco à procura da informação das faixas, e quanto maior, mais demora; acontece localmente e não tem a ver com a ligação.",
+            "**Posso usar esta página para legendas externas?** Não é preciso — um .srt / .ass externo vai direto para a [[Conversão de formato|/convert.html]] ou outra ferramenta. Esta página é para legendas fechadas dentro de um vídeo."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "O vídeo é lido inteiramente no navegador: nada é enviado, nada é transcodificado, nada passa por um servidor. Feche a página e os dados lidos são libertados."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Para traduzir o que extraiu vá a [[Tradução de legendas|/translate.html]], para o tornar bilingue veja [[Duas formas de fazer legendas bilingues|/guides/make-bilingual-subtitles.html]]; para a diferença entre faixa incorporada e externa, e o que se consegue extrair, veja [[Tirar as legendas de um vídeo|/guides/extract-subtitles-from-video.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "glossary": {
+    "pt": {
+      "seo": {
+        "title": "Substituir termos nas legendas – Uma tabela resolve um ficheiro – AI-SRTSub",
+        "desc": "A substituição de termos em detalhe: uma regra por linha, separada por -> , => , → ou Tab, com # para comentários. Palavra inteira, maiúsculas, primeira ou segunda linha, cada alteração listada.",
+        "h1": "Como substituir termos em lote nas legendas",
+        "intro": "Uma tabela de termos uniformiza de uma vez o vocabulário de todo um ficheiro de legendas — linhas de tempo, estilos ASS e blocos NOTE de VTT não se mexem um caractere.",
+        "ctaText": "Abrir a substituição de termos"
+      },
+      "body": [
+        {
+          "h2": "Para que serve esta ferramenta",
+          "ps": [
+            "A mesma palavra traduzida de duas formas, nomes e lugares que seguem a tradução automática, legendas de outros a adaptar às suas convenções — tudo isto partilha um traço: muda-se uma palavra, não a estrutura. Esta página só muda palavras."
+          ],
+          "ul": [
+            "**Uniformizar nomes** — pessoas, lugares e nomes próprios ficam coerentes do princípio ao fim.",
+            "**Corrigir erros da máquina** — um termo mal traduzido é substituído em todo o ficheiro.",
+            "**Adotar o seu uso** — refazer as legendas de outros com o seu vocabulário.",
+            "**SRT / VTT / ASS / SBV / LRC / TXT** — os seis formatos são reconhecidos."
+          ]
+        },
+        {
+          "h2": "Duas entradas: as legendas e a tabela",
+          "ps": [
+            "A coluna «1 Adicionar legendas» à esquerda aceita um ficheiro, ou cola o conteúdo diretamente; errado? «Limpar».",
+            "A coluna «2 Tabela de termos» à direita contém as regras. **Uma regra por linha**, com o termo antigo e o novo separados por `->` , `=>` , `→` ou um tabulador — as quatro formas valem. As linhas que começam por `#` são comentários e não participam na substituição.",
+            "Se duvidar do formato, clique em «Inserir um exemplo» e adapte-o."
+          ],
+          "img": {
+            "file": "glossary-up",
+            "alt": "A área de adicionar legendas e a tabela de termos da página de substituição",
+            "cap": "Legendas à esquerda, regras à direita; uma regra por linha, termo antigo e novo separados por ->"
+          }
+        },
+        {
+          "h2": "Como escrever a tabela de termos",
+          "ps": [
+            "Uma regra por linha: o termo atual à esquerda, o que deve tornar-se à direita. Por exemplo `Thor -> Donar` substitui cada «Thor» do ficheiro por «Donar».",
+            "Os comentários começam por `#` e servem para etiquetar um grupo de regras (por exemplo «# nomes temporada 1») e para desativar uma regra temporariamente — basta pôr um `#` à frente em vez de a apagar.",
+            "As regras executam-se de cima para baixo; o texto produzido por uma regra é percorrido de novo pelas regras seguintes. Quando a ordem importa (por exemplo substituir A por B e depois B por C), há que ter isso em conta."
+          ],
+          "img": {
+            "file": "glossary-table",
+            "alt": "Linhas de regras de substituição no campo da tabela de termos",
+            "cap": "Uma regra por linha; as linhas com # são comentários e podem desativar uma regra temporariamente"
+          }
+        },
+        {
+          "h2": "O que as três opções fazem",
+          "ps": [
+            "**Âmbito**: `tudo` / `só 1.ª linha` / `só 2.ª linha`. Num ficheiro bilingue escolha «só 2.ª linha» se quiser mudar apenas a tradução; as entradas com uma só linha ficam intactas em qualquer das definições de linha única — a ferramenta não adivinha que lado é o original.",
+            "**Palavra inteira**: só substitui termos que formam palavra por si, pelo que `art` não toca em `start`. Em línguas que não separam palavras com espaços, como o chinês e o japonês, esta opção não tem efeito — aí substitui-se por subcadeia.",
+            "**Distinguir maiúsculas**: desativada por predefinição, `CEO` e `ceo` são ambos substituídos; marcada, só a grafia exatamente igual."
+          ],
+          "img": {
+            "file": "glossary-opt",
+            "alt": "As opções de âmbito, palavra inteira e maiúsculas sob a tabela de termos",
+            "cap": "O âmbito decide que linha muda; palavra inteira e maiúsculas, quão estrita é a correspondência"
+          }
+        },
+        {
+          "h2": "Cada alteração listada, cada alteração reversível",
+          "ps": [
+            "«3 Resultado» mostra as legendas substituídas e ainda **lista cada alteração**: que entrada, que linha, de quê para quê.",
+            "Se não quiser uma, clique nela na lista para reverter só essa entrada, sem editar a tabela e voltar a correr. Quando estiver bem, clique em «Transferir» ou «Copiar»."
+          ],
+          "img": {
+            "file": "glossary-out",
+            "alt": "A área de resultado com a lista das alterações individuais",
+            "cap": "Cada alteração está listada; clique numa que não quer para a reverter"
+          }
+        },
+        {
+          "h2": "O que não é tocado",
+          "ps": [
+            "**As linhas de tempo, as linhas de estilo ASS e os blocos `NOTE` de VTT não se mexem um caractere.** A substituição aplica-se só ao texto do diálogo, nunca às linhas de estrutura.",
+            "A tabela de termos não modifica automaticamente o seu ficheiro — o resultado é uma saída nova e o original fica como está."
+          ]
+        },
+        {
+          "h2": "Perguntas frequentes",
+          "ps": [
+            "**Porque é que um termo não foi substituído?** Verifique primeiro o âmbito: com «só 2.ª linha», as entradas com uma só linha ficam intactas. Depois verifique palavra inteira, que bloqueia correspondências que não são palavras autónomas.",
+            "**Porque é que o chinês continua a substituir subcadeias com palavra inteira marcada?** É o esperado. Chinês e japonês não separam palavras com espaços, a ferramenta não consegue determinar limites e palavra inteira não tem efeito aí.",
+            "**Como reverto tudo após um erro?** Reverta entrada a entrada na lista; para recomeçar do zero, limpe a tabela e volte a adicionar as legendas.",
+            "**As linhas de estilo ASS podem ser alteradas por engano?** Não. As linhas de estilo e os blocos `NOTE` ficam fora do âmbito; só participa o texto do diálogo."
+          ]
+        },
+        {
+          "h2": "Privacidade",
+          "ps": [
+            "As legendas e a tabela de termos são processadas inteiramente no navegador: nada é enviado e nada passa por um servidor. A tabela não é guardada, por isso estará vazia da próxima vez."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Se vale a pena criar uma tabela de termos e como a manter durante uma temporada, veja [[Tabelas de termos: um vocabulário por temporada|/guides/subtitle-glossary.html]]; se o conteúdo estiver sujo (marcas de água, indicações sonoras) passe primeiro por [[Limpeza de legendas|/clean.html]]; com os nomes fixados, para outras línguas vá a [[Tradução de legendas|/translate.html]]; e passe o resultado pelo [[Controlo de qualidade de legendas|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "extract-subtitles-from-video": {
+    "pt": {
+      "seo": {
+        "title": "Tirar as legendas de um vídeo – Incorporadas ou externas – AI-SRTSub",
+        "desc": "Como tirar legendas fechadas num vídeo: o que cada MKV / WebM / MP4 / MOV transporta, a diferença entre faixas de texto, ASS, WebVTT e mov_text, e porque a imagem não tem texto.",
+        "h1": "Tirar as legendas de um vídeo",
+        "intro": "As legendas podem viver dentro de um ficheiro de vídeo ou ao lado, sozinhas. Lá dentro são uma faixa do contentor — tirá-las não tem nada a ver com transcodificação.",
+        "ctaText": "Abrir a extração de legendas de vídeo"
+      },
+      "body": [
+        {
+          "h2": "Onde vivem as legendas: incorporadas e externas",
+          "ps": [
+            "Um ficheiro de vídeo (MKV, MP4) é um contentor que reúne uma faixa de vídeo, uma de áudio e faixas de legendas. As legendas fechadas lá dentro chamam-se **incorporadas**; um ficheiro .srt / .ass separado ao lado chama-se **externo**, e uma faixa incorporada também se diz **multiplexada**.",
+            "As legendas externas usam-se tal e qual. O problema são as incorporadas: para as editar, traduzir ou construir uma faixa bilingue a partir do original não tem nenhum ficheiro de legendas na mão — é preciso ler primeiro a faixa do contentor. Este passo não é transcodificação: o vídeo não é recodificado, apenas se extraem os dados que já estavam guardados no contentor."
+          ]
+        },
+        {
+          "h2": "Que contentor transporta o quê",
+          "ps": [
+            "Contentores diferentes aceitam formatos de legendas diferentes, e a dificuldade de extração também varia:"
+          ],
+          "ul": [
+            "**MKV / WebM** — o mais permissivo: texto simples, ASS e WebVTT cabem todos, e as faixas multilingues são comuns.",
+            "**MP4 / MOV** — normalmente uma faixa `mov_text` / `tx3g`: texto simples com alguma informação de estilo.",
+            "**Faixa de texto simples** — sai como texto e torna-se SRT diretamente.",
+            "**Faixa ASS** — traz cabeçalho de estilo e resolução; exportar em ASS conserva-os, exportar em SRT deixa só o texto.",
+            "**Legendas de imagem (PGS de Blu-ray, legendas de DVD)** — guardam imagens, não caracteres: não se pode extrair texto."
+          ],
+          "img": {
+            "file": "videosub-which",
+            "alt": "As faixas de legendas listadas pela página de extração",
+            "cap": "Uma faixa por linha, normalmente com idioma e nome; quando só há uma é extraída automaticamente"
+          }
+        },
+        {
+          "h2": "Porque as legendas de imagem não se extraem",
+          "ps": [
+            "Os PGS de Blu-ray e as legendas de DVD não guardam caracteres, mas uma série de imagens com canal alfa. Quando um leitor as mostra, cola uma imagem, não compõe texto.",
+            "Numa faixa dessas não há, portanto, texto legível — não porque a ferramenta não o suporte, mas porque ali não há caracteres. A página di-lo claramente quando encontra uma.",
+            "A única forma de obter palavras é reconhecer primeiro os caracteres dessas imagens (OCR) e depois montar legendas. É um processo diferente de tirar uma faixa."
+          ]
+        },
+        {
+          "h2": "O que costuma vir depois da extração",
+          "ps": [
+            "O que sai é a faixa tal como estava: a ferramenta não adivinha codificações nem corrige linhas de tempo. Por isso acontecem duas coisas com frequência:",
+            "Uma é o **texto ilegível** — um problema de codificação da faixa de origem que sai ilegível na mesma; vá a [[Reparação de texto ilegível|/guides/repair.html]] para identificar a codificação. A outra é o **desfasamento** — quer a fonte tenha logótipo de introdução, quer as velocidades de fotogramas não batam certo, o resultado sai deslocado em bloco; use [[Ajuste da linha de tempo|/shift.html]] para deslocar ou escalar.",
+            "Depois, para traduzir vá a [[Tradução de legendas|/translate.html]], e para tornar bilingue veja [[Duas formas de fazer legendas bilingues|/guides/make-bilingual-subtitles.html]]."
+          ],
+          "img": {
+            "file": "videosub-formats",
+            "alt": "A área de resultado com os formatos de exportação SRT / VTT / ASS / TXT",
+            "cap": "As legendas extraídas exportam-se em quatro formatos; uma origem ASS conserva cabeçalho de estilo e resolução"
+          }
+        },
+        {
+          "h2": "Alguns pontos fáceis de confundir",
+          "ps": [
+            "**Extrair legendas não é gravá-las na imagem.** O vídeo não é recodificado: qualidade de imagem e áudio não são afetadas.",
+            "**A extração não afeta o ficheiro original.** Só leitura, nunca escrita, e nem um byte do vídeo muda.",
+            "**Um ficheiro grande lento não é problema de ligação.** A ferramenta percorre a informação das faixas bloco a bloco, e quanto maior o ficheiro mais demora; tudo acontece localmente.",
+            "**As legendas externas não precisam desta página.** Com um .srt / .ass vá direto à [[Conversão de formato|/convert.html]]; só as legendas fechadas num vídeo precisam de extração."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Para o guia completo veja [[Como extrair legendas incorporadas num vídeo|/guides/videosub.html]]; para traduzir o que extraiu vá a [[Tradução de legendas|/translate.html]], para o bilingue [[Duas formas de fazer legendas bilingues|/guides/make-bilingual-subtitles.html]]; com texto ilegível comece por [[Reparação de texto ilegível|/repair.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "how-to-make-lrc-file": {
+    "pt": {
+      "seo": {
+        "title": "Como sincronizar letras LRC – Uma linha, um instante – AI-SRTSub",
+        "desc": "Criar um ficheiro LRC do zero: colar uma letra por linha, marcar o tempo a ouvir, os três atalhos que importam, quando saltar uma linha, exportar LRC ou SRT e o que fazer se o tempo derivar.",
+        "h1": "Como sincronizar letras LRC",
+        "intro": "Um LRC é só «uma linha de letra mais um instante». Fazê-lo chama-se sincronizar: captar o momento em que cada linha começa.",
+        "ctaText": "Abrir a ferramenta de sincronização"
+      },
+      "body": [
+        {
+          "h2": "O que é sincronizar",
+          "ps": [
+            "A estrutura de um ficheiro LRC é o mais simples possível: uma linha de letra por linha, precedida de uma marca `[mm:ss.xx]`. Quando um leitor chega a uma linha, mostra essa letra nesse instante.",
+            "Todo o trabalho de fazer um LRC consiste, portanto, em atribuir um instante a cada linha — e nenhuma máquina o pode fazer por si, porque decidir onde uma linha começa a ser cantada exige ouvir."
+          ]
+        },
+        {
+          "h2": "Quantas passagens precisa uma música",
+          "ps": [
+            "Vale a pena pensar um minuto antes de começar; poupa a maior parte do retrabalho:"
+          ],
+          "ul": [
+            "**Uma passagem** — voz clara, poucas linhas, mais ou menos certo: marcar de ponta a ponta basta.",
+            "**Duas passagens** — uma passagem grosseira e depois verificação linha a linha; o habitual quando a precisão conta.",
+            "**Importar e corrigir** — já há um LRC e só falham algumas linhas; importe e continue a partir da primeira sem tempo.",
+            "**Interlúdios e trechos só musicais** não precisam de sincronização — clique em «Saltar esta linha» e ficam fora da exportação.",
+            "**Refrões e sobreposições** só podem registar um ponto de início; as partes sobrepostas contam-se com a voz principal."
+          ],
+          "img": {
+            "file": "lrc-tap2",
+            "alt": "Os controlos reproduzir, marcar esta linha, anular uma linha e saltar esta linha",
+            "cap": "Premir Enter durante a reprodução é o mais fluido; linha errada? Z para anular e marcar de novo"
+          }
+        },
+        {
+          "h2": "O colar decide o resto",
+          "ps": [
+            "Cole a letra uma linha por letra; as linhas vazias são saltadas. As quebras que cola são as linhas que marcará depois — mais cortes agora, mais cliques depois.",
+            "Colar um LRC existente também funciona: as marcas `[mm:ss.xx]` são reconhecidas e, após importar, **continua a partir da primeira linha sem tempo**, pelo que as linhas já marcadas não têm de ser refeitas.",
+            "Um LRC a meio pode, portanto, ser guardado e recolado mais tarde para continuar."
+          ],
+          "img": {
+            "file": "lrc-paste2",
+            "alt": "A área de colar a letra e o botão de analisar",
+            "cap": "Uma linha por letra; colar um LRC inteiro lê os tempos existentes para continuar"
+          }
+        },
+        {
+          "h2": "Exportar LRC ou SRT",
+          "ps": [
+            "**Para um leitor de música, exporte LRC.** foobar2000, vários leitores e aparelhos com visualização de letras leem-no.",
+            "**Para pôr a letra sobre vídeo ou processá-la, exporte SRT.** As faixas de legendas de vídeo, as ferramentas de legendas e o software de edição leem SRT. Na exportação cada linha dura até começar a seguinte, e a última recorre a 2 segundos.",
+            "Ambos exportam só as linhas com tempo — as saltadas nunca entram no ficheiro."
+          ],
+          "img": {
+            "file": "lrc-export",
+            "alt": "Os botões Transferir LRC, Transferir SRT e Copiar da área de exportação",
+            "cap": "LRC para leitores, SRT para vídeo; só são exportadas as linhas com tempo"
+          }
+        },
+        {
+          "h2": "Alguns pontos fáceis de confundir",
+          "ps": [
+            "**Ficou tudo ligeiramente deslocado após sincronizar? Use um desvio.** Exporte SRT e desloque o conjunto com [[Ajuste da linha de tempo|/shift.html]]; muito mais rápido do que remarcar linha a linha.",
+            "**O desvio cresce ao longo da música? É um problema de velocidade.** Quando a velocidade de reprodução e a da gravação diferem, o erro cresce para o fim, e isso pede escalonamento proporcional, não desvio.",
+            "**Os atalhos só são naturais usados em conjunto.** Espaço reproduz e pausa, Enter marca a linha atual, Z anula uma linha — prima Enter durante a reprodução em vez de andar entre rato e teclado.",
+            "**A qualidade do áudio afeta a precisão.** Uma fonte com voz clara é mais fácil de seguir; versões ao vivo e acompanhamentos muito altos são bastante mais difíceis."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Para o guia completo veja [[Como usar a ferramenta de sincronização de letras|/guides/lrc.html]]; para transformar um LRC existente em legendas, [[LRC para SRT|/guides/lrc-to-srt.html]]; se o SRT exportado estiver desfasado, [[Ajuste da linha de tempo|/shift.html]]; e passe o resultado pelo [[Controlo de qualidade de legendas|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  },
+  "subtitle-glossary": {
+    "pt": {
+      "seo": {
+        "title": "Tabelas de termos: um vocabulário por temporada – Quando criar – AI-SRTSub",
+        "desc": "Uma tabela de termos resolve um problema: a mesma palavra traduzida de formas diferentes. Quando vale a pena, como a reutilizar numa temporada e porque palavra inteira não faz nada em chinês.",
+        "h1": "Tabelas de termos: um vocabulário por temporada",
+        "intro": "Quando um nome é A no episódio 1 e B no 7, o público pensa que são duas personagens. Uma tabela de termos evita exatamente isso — fixa como cada coisa se chama.",
+        "ctaText": "Abrir a substituição de termos"
+      },
+      "body": [
+        {
+          "h2": "Uma tabela de termos resolve a incoerência",
+          "ps": [
+            "Os erros de vocabulário nas legendas são de dois tipos: «esta palavra está mal traduzida» e «a mesma palavra está traduzida de forma diferente de um sítio para outro». O primeiro é um problema de dicionário; o segundo é o que uma tabela de termos resolve.",
+            "O segundo é mais frequente e mais difícil de detetar: `Thor` aparece como «Thor» no episódio 1 e como «Donar» no 7, cada episódio por si parece correto e a série dá a impressão de ter surgido uma personagem nova. Uma tabela de termos transforma «nesta produção chama-se Thor» numa regra executável aplicada a todo o ficheiro de uma vez."
+          ]
+        },
+        {
+          "h2": "Quando vale a pena criar uma",
+          "ps": [
+            "Nem todos os ficheiros de legendas precisam de uma tabela de termos. Os casos que a justificam são normalmente estes:"
+          ],
+          "ul": [
+            "**Uma temporada ou uma série inteira** — quanto mais episódios, maior a probabilidade de desvio.",
+            "**Nomes próprios densos** — pessoas, lugares, organizações, termos inventados na obra.",
+            "**Várias pessoas a trabalhar** — episódios divididos por tradutores com hábitos diferentes.",
+            "**Recolher legendas de outros** — alinhá-las com o seu uso (ou o do cliente).",
+            "**Limpar após a tradução automática** — a máquina pode dar várias versões do mesmo termo."
+          ],
+          "img": {
+            "file": "glossary-rules",
+            "alt": "Regras de substituição agrupadas por categoria numa tabela de termos",
+            "cap": "Os comentários com # agrupam regras e permitem desativar uma temporariamente"
+          }
+        },
+        {
+          "h2": "Manter uma tabela durante uma temporada",
+          "ps": [
+            "Uma tabela de termos mantém-se **de forma incremental**: fixe os nomes no episódio 1, acrescente uma regra sempre que aparecer um termo novo, e no fim da temporada a tabela está completa. Para a temporada seguinte da mesma série, parta dela.",
+            "Escreva as regras um pouco mais largas do que o necessário — decidido «Thor», acrescente também «Donar -> Thor», para alinhar as legendas de outros na mesma passagem.",
+            "Veja sempre a **lista de alterações** depois: nomeia cada entrada, cada linha e o que se tornou o quê. É o único sítio onde confirmar que a alteração foi certa e não foi longe demais, e qualquer entrada indesejada reverte-se com um clique."
+          ],
+          "img": {
+            "file": "glossary-diff",
+            "alt": "A lista das alterações individuais na área de resultado",
+            "cap": "Cada alteração está listada; clique numa que não quer para a reverter"
+          }
+        },
+        {
+          "h2": "O que não confiar a uma tabela de termos",
+          "ps": [
+            "Uma tabela de termos muda **palavras**. Estas três coisas ficam fora do seu papel, e devem ficar:",
+            "**Gramática e sintaxe** — uma palavra não se transforma numa frase; o trabalho ao nível da frase volta à [[Tradução de legendas|/translate.html]] ou a uma pessoa.",
+            "**Limpeza de conteúdo** — remover linhas inteiras como marcas de água, publicidade e indicações sonoras é da [[Limpeza de legendas|/clean.html]]; as regras substituem, não apagam linhas.",
+            "**Linhas de tempo** — uma tabela de termos não toca no tempo. Para um desvio global ou um problema de velocidade, [[Ajuste da linha de tempo|/shift.html]]."
+          ]
+        },
+        {
+          "h2": "Alguns pontos fáceis de confundir",
+          "ps": [
+            "**O chinês continua a substituir subcadeias com palavra inteira marcada — é normal.** Chinês e japonês não separam palavras com espaços, a ferramenta não consegue determinar limites e palavra inteira não tem efeito; a proteção `art` que poupa `start` só vale para inglês.",
+            "**A ordem muda o resultado.** As regras executam-se de cima para baixo e o texto produzido por uma regra é revisto pelas seguintes. Substituir A por B e depois B por C acaba em C.",
+            "**Para mudar só a tradução, defina o âmbito.** Num ficheiro bilingue escolha «só 2.ª linha»; as entradas com uma só linha ficam intactas em qualquer das definições — a ferramenta não adivinha que lado é o original.",
+            "**A tabela de termos não é guardada.** Está vazia cada vez que abre a página, por isso guarde o seu próprio ficheiro de texto e passe-o."
+          ]
+        },
+        {
+          "h2": "Ferramentas e guias relacionados",
+          "ps": [
+            "Para o guia completo veja [[Como substituir termos em lote nas legendas|/guides/glossary.html]]; se o conteúdo estiver sujo passe primeiro por [[Limpeza de legendas|/clean.html]]; com os nomes fixados, para outras línguas vá a [[Tradução de legendas|/translate.html]]; e passe o resultado pelo [[Controlo de qualidade de legendas|/qc.html]]."
+          ]
+        }
+      ]
+    }
+  }
+}
