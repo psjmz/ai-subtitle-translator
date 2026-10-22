@@ -204,7 +204,7 @@
     .cbox{grid-template-columns:1fr}
   }
 </style>
-<script src="ui-codes.js?v=0.9.361"></script>
+<script src="ui-codes.js?v=0.9.362"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -320,7 +320,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.361"></script>
+<script src="clean-core.js?v=0.9.362"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -751,7 +751,7 @@ function hitRules() {
   });
   return set;
 }
-function reportClean(kind) {
+function reportClean(kind, fmtOverride) {
   try {
     var k = (kind === 'export') ? 'export' : 'clean';
     var body = JSON.stringify({
@@ -761,7 +761,9 @@ function reportClean(kind) {
       mod: chgN(false),
       del: chgN(true),
       rules: hitRules(),
-      fmt: k === 'export' ? S.outFmt : ''
+      /* v0.9.362：「导出纯文本」拿到的不是字幕格式，得显式传 txt；
+         不传就按界面选的字幕格式记（S.outFmt） */
+      fmt: k === 'export' ? (fmtOverride || S.outFmt) : ''
     });
     var now = Date.now();
     if (body === _clLast.body && now - _clLast.t < (CL_DEDUP_MS[k] || 0)) return;
@@ -869,6 +871,7 @@ function bind() {
   $('#btnTxt').addEventListener('click', function () {
     if (!S.raw.length) return toast(t('noFile'));
     download(baseName() + '.txt', outTxt());
+    reportClean('export', 'txt');   /* v0.9.362：导出纯文本也是导出，以前只下载不上报 */
     toast(t('okDl'));
   });
   $('#btnCopy').addEventListener('click', function () {
@@ -3327,7 +3330,7 @@ function initLang() {
   render();
 })();
 </script>
-<script src="site-topnav.js?v=0.9.361" data-tool="cl"></script>
+<script src="site-topnav.js?v=0.9.362" data-tool="cl"></script>
 
 <!-- v0.9.273：SEO 静态文案（同上，按语言路由替换；直接开文件时显示简体中文默认版） -->
 <!--SEO-COPY-START-->

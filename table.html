@@ -130,7 +130,7 @@
     .tbl td.ttx{max-width:200px}
   }
 </style>
-<script src="ui-codes.js?v=0.9.361"></script>
+<script src="ui-codes.js?v=0.9.362"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -211,10 +211,10 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="xlsx.full.min.js?v=0.9.361"></script>
-<script src="table-i18n.js?v=0.9.361"></script>
-<script src="/i18n/tp-boot.js?v=0.9.361"></script>
-<script src="table-core.js?v=0.9.361"></script>
+<script src="xlsx.full.min.js?v=0.9.362"></script>
+<script src="table-i18n.js?v=0.9.362"></script>
+<script src="/i18n/tp-boot.js?v=0.9.362"></script>
+<script src="table-core.js?v=0.9.362"></script>
 <script>
 'use strict';
 var I18N = window.TABLE_I18N.DICT, LANGS = window.TABLE_I18N.LANGS;
@@ -385,7 +385,12 @@ function setFmt(f) {
 }
 
 /* v0.9.316：tool-events 埋点（口径与 convert/shift 等页一致：page/act 双白名单、
-   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：convert=字幕转表格 / merge=表格转回字幕 */
+   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。
+   ⚠️ v0.9.362 修正口径：三个按钮点下去就是「下载文件」，必须记 act='export'。
+      原来记成 convert / merge，后台导出色只认 act==='export'（server.js 按这个字段累加），
+      于是这一页的「导出」永远是 0 —— 用户明明下载了，后台看着像一个人都没导出。
+      方向不丢：fmt 自带（csv/xlsx = 字幕转表格，srt/vtt = 表格转字幕），后台按 fmt 就能分开看。
+      fmt 只有 export 才落库（server.js 的 appendTEvent），这也是必须改动作名的原因之一。 */
 var _tlLast = { body: '', t: 0 };
 function reportTool(act, extra) {
   try {
@@ -440,15 +445,16 @@ function dlText(text, name) {
 }
 $('#btnCsv').addEventListener('click', function () {
   if (!S.sub) return;
-  reportTool('convert', { cues: S.sub.length, n: 1, fmt: 'csv' });
+  reportTool('export', { cues: S.sub.length, n: 1, fmt: 'csv' });
   dlText('\uFEFF' + C.toCsv(S.sub), 'subtitles.csv');   /* BOM：让 Excel 直接认 UTF-8 */
   showMsg('msgDone', '');
 });
 $('#btnXlsx').addEventListener('click', function () {
   if (!S.sub) return;
   try {
-    reportTool('convert', { cues: S.sub.length, n: 1, fmt: 'xlsx' });
     var buf = C.toXlsx(S.sub);
+    /* 记账放在生成之后：toXlsx 抛异常时 showMsg('msgBadTable')，那一次不该算「导出成功」 */
+    reportTool('export', { cues: S.sub.length, n: 1, fmt: 'xlsx' });
     var b = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     var u = URL.createObjectURL(b);
     var a = document.createElement('a');
@@ -460,7 +466,7 @@ $('#btnXlsx').addEventListener('click', function () {
 });
 $('#btnDl').addEventListener('click', function () {
   if (!$('#out').value) { showMsg('msgEmpty', 'err'); return; }
-  reportTool('merge', { cues: S.items.length, n: 1, fmt: S.fmt });
+  reportTool('export', { cues: S.items.length, n: 1, fmt: S.fmt });
   dlText($('#out').value, 'subtitles.' + S.fmt);
   showMsg('msgDone', '');
 });
@@ -494,6 +500,6 @@ applyI18n();
     <p style="margin-top:8px;">要做翻译校对、团队协作审稿、批量修改字幕的译者、译制组、剪辑师。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.361" data-tool="tb"></script>
+<script src="site-topnav.js?v=0.9.362" data-tool="tb"></script>
 </body>
 </html>

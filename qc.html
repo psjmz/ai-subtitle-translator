@@ -151,7 +151,7 @@
     .iss .rn{min-width:0}
   }
 </style>
-<script src="ui-codes.js?v=0.9.361"></script>
+<script src="ui-codes.js?v=0.9.362"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -257,9 +257,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="qc-i18n.js?v=0.9.361"></script>
-<script src="/i18n/tp-boot.js?v=0.9.361"></script>
-<script src="qc-core.js?v=0.9.361"></script>
+<script src="qc-i18n.js?v=0.9.362"></script>
+<script src="/i18n/tp-boot.js?v=0.9.362"></script>
+<script src="qc-core.js?v=0.9.362"></script>
 <script>
 'use strict';
 var I18N = window.QC_I18N.DICT, LANGS = window.QC_I18N.LANGS;
@@ -493,6 +493,7 @@ function dlText(text, name) {
 }
 $('#btnDl').addEventListener('click', function () {
   if (!$('#out').value) { showMsg('msgNoFile', 'err'); return; }
+  reportTool('export', { cues: (S.items ? S.items.length : 0), n: 1, fmt: S.out });
   dlText($('#out').value, baseName() + '.' + S.out);
 });
 $('#btnDlRep').addEventListener('click', function () {
@@ -524,7 +525,9 @@ function reportText() {
 }
 
 /* v0.9.321：tool-events 埋点（口径与 split/shift 等页一致：page/act 双白名单、
-   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：check=执行质检 / fix=应用修复 */
+   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：check=执行质检 / fix=应用修复
+   ⚠️ v0.9.362：修好的字幕点下载要记 act='export'（后台导出色只认这个动作）。
+      质检报告（btnDlRep，.qc.txt）不记 —— 那是报告，不是产出字幕，混进导出色会把漏斗算歪。 */
 var _tlLast = { body: '', t: 0 };
 function reportTool(act, extra) {
   try {
@@ -675,6 +678,6 @@ applyI18n();
     <p style="margin-top:8px;">给译制组、字幕组、剪辑师和本地化团队，在交付前把字幕过一遍。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.361" data-tool="qc"></script>
+<script src="site-topnav.js?v=0.9.362" data-tool="qc"></script>
 </body>
 </html>

@@ -143,7 +143,7 @@
     input[type=number]{width:90px}
   }
 </style>
-<script src="ui-codes.js?v=0.9.361"></script>
+<script src="ui-codes.js?v=0.9.362"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -261,9 +261,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="split-i18n.js?v=0.9.361"></script>
-<script src="/i18n/tp-boot.js?v=0.9.361"></script>
-<script src="split-core.js?v=0.9.361"></script>
+<script src="split-i18n.js?v=0.9.362"></script>
+<script src="/i18n/tp-boot.js?v=0.9.362"></script>
+<script src="split-core.js?v=0.9.362"></script>
 <script>
 'use strict';
 var I18N = window.SPLIT_I18N.DICT, LANGS = window.SPLIT_I18N.LANGS;
@@ -487,7 +487,10 @@ function rerender() {
 }
 
 /* v0.9.316：tool-events 埋点（口径与 convert/shift 等页一致：page/act 双白名单、
-   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：split=执行拆分 / merge=执行拼接 */
+   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：split=执行拆分 / merge=执行拼接
+   ⚠️ v0.9.362：拆分/拼接是「算了一次」，下载文件是另一件事，必须单独记 act='export'
+      （后台的导出色只认 export）。三条下载路径各记一次：单段下载 n=1、全部下载 n=段数、
+      拼接结果下载 n=1；全部下载循环里逐段调用 dlSeg 时传 silent=true，避免一次点击灌 N 条。 */
 var _tlLast = { body: '', t: 0 };
 function reportTool(act, extra) {
   try {
@@ -534,12 +537,16 @@ function segText(i) {
   var seg = S.segs[i];
   return (S.fmt === 'vtt') ? C.formatVtt(seg) : C.formatSrt(seg);
 }
-function dlSeg(i) {
+function dlSeg(i, silent) {
   var base = (S.single.name || 'subtitle.srt').replace(/\.[^.]+$/, '');
+  if (!silent) reportTool('export', { cues: S.segs[i].length, n: 1, fmt: S.fmt });
   dlText(segText(i), base + '.part' + (i + 1) + '.' + S.fmt);
 }
 $('#btnDlAll').addEventListener('click', function () {
-  S.segs.forEach(function (_, i) { setTimeout(function () { dlSeg(i); }, i * 350); });
+  if (!S.segs || !S.segs.length) return;
+  /* 一次点击 = 一次导出，n 记段数；循环里的 dlSeg 用 silent 跳过逐段上报 */
+  reportTool('export', { cues: (S.single ? S.single.items.length : 0), n: S.segs.length, fmt: S.fmt });
+  S.segs.forEach(function (_, i) { setTimeout(function () { dlSeg(i, true); }, i * 350); });
 });
 
 function renderFileList() {
@@ -563,6 +570,7 @@ function doJoin() {
   var st = C.statOf(items);
   $('#statChip').textContent = t('statJoin').replace('{0}', S.files.length).replace('{1}', items.length).replace('{2}', fmtDur(st.duration));
   $('#out').value = (S.fmt === 'vtt') ? C.formatVtt(items) : C.formatSrt(items);
+  S.joined = items;   /* v0.9.362：下载时要用条数记账，拼接结果得留个引用 */
   reportTool('merge', { cues: items.length, n: S.files.length, fmt: S.fmt });
   if (S.way === 'sort') {
     /* 交织模式如实保留重叠，给一句说明就行（要不要处理是别页的事） */
@@ -584,6 +592,7 @@ function dlText(text, name) {
 }
 $('#btnDl').addEventListener('click', function () {
   if (!$('#out').value) { showMsg('msgEmpty', 'err'); return; }
+  reportTool('export', { cues: (S.joined ? S.joined.length : 0), n: 1, fmt: S.fmt });
   dlText($('#out').value, 'joined.' + S.fmt);
   showMsg('msgDone', '');
 });
@@ -617,6 +626,6 @@ applyI18n();
     <p style="margin-top:8px;">要做分集上传、分段校对、多段字幕合并的创作者、译制组、剪辑师。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.361" data-tool="sp"></script>
+<script src="site-topnav.js?v=0.9.362" data-tool="sp"></script>
 </body>
 </html>

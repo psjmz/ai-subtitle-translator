@@ -1098,7 +1098,7 @@ $('btnRefreshMerge').addEventListener('click', loadMergeEvents);
 
 /* v0.9.275：字幕清洗页使用记录（第三张独立卡片，与前两张互不干扰） */
 let clPage = 1;
-const CL_FMT_TXT = { srt: 'SRT', vtt: 'VTT', ass: 'ASS' };
+const CL_FMT_TXT = { srt: 'SRT', vtt: 'VTT', ass: 'ASS', txt: 'TXT' };
 /* 规则码 → 中文名。后台是中文界面，别把 assFx / sdh 这种内部 id 直接甩给站长看。
    ⚠️ 与 clean.html 的 OPT[].id 一一对应，加规则时必须同步这里和 server.js 的 CLEAN_RULE。 */
 const CL_RULE_TXT = {

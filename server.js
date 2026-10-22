@@ -618,7 +618,8 @@ function countTop(arr, key, n){
    只记元数据（文件名 / 条数 / 改动数 / 删除数 / 命中规则 / 导出格式），绝不记字幕内容。 */
 const CEVENTS_PATH = path.join(DATA_DIR, 'clean-events.json');
 const CEVENTS_MAX = 2000;
-const CLEAN_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass' };
+/* v0.9.362：补 txt —— 清洗页的「导出纯文本」也是一次真实导出，不认这个格式就会被丢掉 */
+const CLEAN_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt' };
 /* 清洗规则白名单：与 clean.html 的 OPT[].id 一一对应（13 条）。
    ⚠️ 加减规则必须同步这里，否则新规则命中了后台却记成空值——
       等于「用户在用这条规则，但站长看不见」，统计直接失真。 */

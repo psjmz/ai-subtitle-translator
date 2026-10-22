@@ -121,7 +121,7 @@
     .fitem .meta{display:none}
   }
 </style>
-<script src="ui-codes.js?v=0.9.361"></script>
+<script src="ui-codes.js?v=0.9.362"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -186,10 +186,10 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="jszip.min.js?v=0.9.361"></script>
-<script src="batch-i18n.js?v=0.9.361"></script>
-<script src="/i18n/tp-boot.js?v=0.9.361"></script>
-<script src="batch-core.js?v=0.9.361"></script>
+<script src="jszip.min.js?v=0.9.362"></script>
+<script src="batch-i18n.js?v=0.9.362"></script>
+<script src="/i18n/tp-boot.js?v=0.9.362"></script>
+<script src="batch-core.js?v=0.9.362"></script>
 <script>
 'use strict';
 var I18N = window.BATCH_I18N.DICT, LANGS = window.BATCH_I18N.LANGS;
@@ -352,7 +352,10 @@ function renderList() {
 }
 
 /* v0.9.316：tool-events 埋点（口径与 convert/shift 等页一致：page/act 双白名单、
-   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：convert=批量转格式并打包 */
+   sendBeacon 优先、去重窗口 60 秒、只记条数不记内容）。act 复用现有白名单：convert=批量转格式并打包
+   ⚠️ v0.9.362：这一页「转换」和「下载」是同一次点击，动作名必须记 act='export'，
+      否则后台导出色（只认 export）永远是 0。记账点也挪到 zip 真正生成成功之后 ——
+      原来写在 zipFiles 之前，打包失败也会记一笔，等于虚报导出。 */
 var _tlLast = { body: '', t: 0 };
 function reportTool(act, extra) {
   try {
@@ -382,8 +385,9 @@ $('#btnZip').addEventListener('click', function () {
     var tx = (S.to === 'vtt') ? C.formatVtt(f.items) : C.formatSrt(f.items);
     entries.push({ name: nm, text: tx });
   }
-  reportTool('convert', { cues: good.reduce(function (a, x) { return a + x.items.length; }, 0), n: entries.length, fmt: S.to });
+  var cuesTotal = good.reduce(function (a, x) { return a + x.items.length; }, 0);
   C.zipFiles(entries).then(function (buf) {
+    reportTool('export', { cues: cuesTotal, n: entries.length, fmt: S.to });
     var b = new Blob([buf], { type: 'application/zip' });
     var u = URL.createObjectURL(b);
     var a = document.createElement('a');
@@ -418,6 +422,6 @@ applyI18n();
     <p style="margin-top:8px;">要给整个剧集目录换格式、给播放器统一喂 VTT 的剪辑师、字幕组、站长。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.361" data-tool="bt"></script>
+<script src="site-topnav.js?v=0.9.362" data-tool="bt"></script>
 </body>
 </html>
