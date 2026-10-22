@@ -8408,7 +8408,11 @@ const server = http.createServer(async (req, res) => {
         try {
           // v0.9.44：max_tokens 从 10 提到 256——Gemini 等思考型模型在 10 token 限额下 0 completion，
           //  message.content 字段直接缺失，前端拿到 undefined（误判"模型返回空"）。
-          const out = await callModel(slot, [{ role: 'user', content: 'Reply with exactly: OK' }], 256, { timeoutMs: 30000 });
+          /* v0.9.358：E 走网页桥接，单次实测 17~66 秒，30 秒测试预算必然超时 ——
+             后台点「测试」就报 502「连通失败」，看着像通道挂了，其实只是预算太短。
+             按槽位给预算：E 用 90 秒（与正式调用的 CALL_BUDGET_MS 一致），A/B/C 维持 30 秒。 */
+          const testBudget = which === 'E' ? 90000 : 30000;
+          const out = await callModel(slot, [{ role: 'user', content: 'Reply with exactly: OK' }], 256, { timeoutMs: testBudget });
           const choice = out.choices && out.choices[0];
           const sample = choice && choice.message ? choice.message.content : '';
           const reason = choice ? choice.finish_reason : null;

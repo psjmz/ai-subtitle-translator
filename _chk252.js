@@ -109,10 +109,10 @@ const ok = (c, m, extra) => { c ? P++ : F++; console.log((c ? '  ✓ ' : '  ✗ 
   ok(RW.同一行 === true, '下载 / 复制在同一行（删掉那排键后不再折行）');
 
   console.log('\n— ⑥ 预览标签仍然说得出「现在是哪种格式」—');
-  const t1 = await ev("document.getElementById('assPvTag').textContent");
+  const t1 = await ev("document.getElementById('pvTag').textContent");
   ok(/ASS/i.test(String(t1)), 'ASS 双行下预览标签带格式名', t1);
   await ev("(function(){var s=document.getElementById('expFmt');s.value='vttStyle';s.dispatchEvent(new Event('change',{bubbles:true}));})()"); await wait(500);
-  const t2 = await ev("JSON.stringify({tag:document.getElementById('mVttPvTag').textContent, ext:document.getElementById('dlExt').textContent})");
+  const t2 = await ev("JSON.stringify({tag:document.getElementById('pvTag').textContent, ext:document.getElementById('dlExt').textContent})");
   ok(/VTT|vtt/i.test(t2), 'VTT 下预览标签带格式名', t2);
 
   console.log('\n— ⑦ SRT 的已知代价（记录下来）：预览整块收起，只剩两个按钮 —');

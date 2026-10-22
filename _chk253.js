@@ -80,7 +80,7 @@ const ok = (c, m, extra) => { c ? P++ : F++; console.log((c ? '  ✓ ' : '  ✗ 
     on胶囊: (document.querySelector('#slotBar .slot-chip.on')||{}).getAttribute ? document.querySelector('#slotBar .slot-chip.on').getAttribute('data-slot') : '',
     filt胶囊: (document.querySelector('#slotBar .slot-chip.filt')||{}).getAttribute ? document.querySelector('#slotBar .slot-chip.filt').getAttribute('data-slot') : '',
     可见行: document.querySelectorAll('#repRows tr').length,
-    预览标签: document.getElementById('slotPvTag').textContent })`));
+    预览标签: document.getElementById('pvTag').textContent })`));
 
   console.log('\n— ① 改前的症状：点胶囊，编辑目标必须跟着切 —');
   const before = await state();
@@ -95,7 +95,21 @@ const ok = (c, m, extra) => { c ? P++ : F++; console.log((c ? '  ✓ ' : '  ✗ 
   ok(after.可见行 === 2, '④ 表格只剩该槽的 2 行', after.可见行);
   ok(after.on胶囊 === 'lyric' && after.filt胶囊 === 'lyric', '⑤ 胶囊高亮与筛选态都在同一个胶囊上', after.on胶囊 + '/' + after.filt胶囊);
   ok(after.面板展开 === true, '⑥ 面板原本展开 → 切目标后仍然展开（没被关掉）');
-  ok(/歌词/.test(String(after.预览标签)) && !/强调/.test(String(after.预览标签)), '⑦ 面板里的效果预览也切到了新槽', after.预览标签);
+  /* v0.9.256：点胶囊 = 选中这个槽 → 右侧画面**直接切过去**（用户拍板）。
+     所以这一条从「停在成片不贴槽名」翻转成「贴的就是被点的那个槽」——
+     别再改回去：257 若又变成不贴，那是「点槽不联动」的老毛病复发。 */
+  ok(/歌词/.test(String(after.预览标签)) && !/强调/.test(String(after.预览标签)),
+    '⑦ ⭐ 点胶囊 → 右侧画面切到歌词槽（v0.9.256 联动）', after.预览标签);
+  /* 面板入口那条要单独立得住：先手动切回「成片」，再点入口 */
+  await ev("setPvView('movie');1"); await wait(300);
+  ok(await ev("pvView()") === 'movie', '⑦a 手动切回「成片」', await ev("pvView()"));
+  const gv = await ev(`(function(){document.getElementById('slotPvGoto').click();
+    return JSON.stringify({视角:pvView(), 标签:document.getElementById('pvTag').textContent});})()`);
+  await wait(500);
+  const GV = JSON.parse(gv);
+  ok(GV.视角 === 'slot' && /歌词/.test(GV.标签) && !/强调/.test(GV.标签),
+    '⑦b 点面板里的「在预览里看这个槽」→ 画面切到正在编辑的歌词槽', gv);
+  await ev("setPvView('movie');1"); await wait(300);
 
   console.log('\n— ② 切目标不许顺手把面板展开 —');
   await ev("(function(){document.getElementById('slotEdit').open=false;})()"); await wait(400);

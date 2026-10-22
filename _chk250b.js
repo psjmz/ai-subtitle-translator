@@ -29,7 +29,7 @@ const ok=(c,m,x)=>{if(c){pass++;console.log('  ✓ '+m);}else{fail++;console.log
   const rows=await ev('S.rows.length'); ok(Number(rows)===20,'合并 20 行',rows);
   await ev("var s=document.getElementById('expFmt');s.value='split';s.dispatchEvent(new Event('change',{bubbles:true}));1"); await wait(600);
 
-  console.log('— ① ↑ 标记（歌词槽带 dMV:70）—');
+  console.log('— ① ↑ 标记（歌词槽带 dMV:36，v0.9.251 起）—');
   const up=await ev(`JSON.stringify({upN:document.querySelectorAll('#slotBar .slot-aa-up').length,
     chips:[...document.querySelectorAll('#slotBar .slot-chip')].map(function(c){return c.textContent.replace(/\\s+/g,' ').trim();}).slice(0,5)})`);
   console.log('  ',up);
@@ -49,13 +49,14 @@ const ok=(c,m,x)=>{if(c){pass++;console.log('  ✓ '+m);}else{fail++;console.log
   ok(L.主==='italic','歌词槽 → 主预览译文行变斜体',L.主);
   ok(L.导出斜===true,'导出里 Italic 也是 -1（预览与导出同源）',L.导出斜);
 
-  console.log('— ③ 面板预览同样画斜体 —');
-  await ev("(function(){S.pv={base:false};document.getElementById('slotEdit').open=true;renderSlots();renderSlotPvMini();})()"); await wait(600);
-  const mini=await ev(`getComputedStyle(document.getElementById('slotPvLine2')).fontStyle`);
-  ok(mini==='italic','✎ 面板预览也画斜体',mini);
-  await ev("document.getElementById('slotPvBaseBtn').click();1"); await wait(600);
-  const mini2=await ev(`getComputedStyle(document.getElementById('slotPvLine2')).fontStyle`);
-  ok(mini2==='normal','切基础样式 → 面板预览回正',mini2);
+  console.log('— ③ 视角「这个槽 / 基础样式」同样画斜体 —');
+  await ev("(function(){ensureStyle();S.style.cur='lyric';setPvView('slot');})()"); await wait(600);
+  const mini=await ev(`getComputedStyle(document.getElementById('assPvLine2')).fontStyle`);
+  ok(mini==='italic','视角「这个槽」画斜体',mini);
+  await ev("setPvView('base');1"); await wait(600);
+  const mini2=await ev(`getComputedStyle(document.getElementById('assPvLine2')).fontStyle`);
+  ok(mini2==='normal','切「基础样式」→ 回正',mini2);
+  await ev("setPvView('movie');1"); await wait(300);
 
   console.log('— ④ 贴底条：主操作在最右 —');
   await ev("(function(){var cbs=document.querySelectorAll('#repRows input[data-ri]');[0,1,2].forEach(i=>{if(cbs[i])cbs[i].click();});return 1})()"); await wait(600);

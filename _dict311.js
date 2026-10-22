@@ -1,9 +1,10 @@
-/* v0.9.310 复查·词典篇：全站 9 份界面词典逐一审 27 语完整性
+/* v0.9.310 复查·词典篇：全站 11 份界面词典逐一审 27 语完整性（v0.9.313 起加两份）
    词典源：
      1. site-i18n.js（index + translate 用，const I18N）
      2. merge.html 内嵌（const I18N，约 11272 行）
      3. clean.html 内嵌（const I18N，约 913 行）
    4~9. convert/bilingual/shift/repair/extract/glossary-i18n.js（var DICT，导出 root.XXX_I18N）
+10~11. videosub/hanconv-i18n.js（v0.9.313，形态同上）
    检查项（对应各词典文件头的三条硬规矩 + 27 语全齐）：
      ① 语言块数 = 27 且名单与全站一致
      ② 每个语言块的键集合与 zh-CN 基准完全一致（缺键静默回退、多键多半是拼错）
@@ -29,6 +30,8 @@ const SOURCES = [
   { name: 'repair-i18n.js',     file: 'repair-i18n.js', kind: 'DICT' },
   { name: 'extract-i18n.js',    file: 'extract-i18n.js', kind: 'DICT' },
   { name: 'glossary-i18n.js',   file: 'glossary-i18n.js', kind: 'DICT' },
+  { name: 'videosub-i18n.js',  file: 'videosub-i18n.js', kind: 'DICT' }, /* v0.9.313 新增 */
+  { name: 'hanconv-i18n.js',   file: 'hanconv-i18n.js',  kind: 'DICT' }, /* v0.9.313 新增 */
 ];
 const LANGS = ['zh-CN', 'zh-TW', 'en', 'ja', 'es', 'pt', 'ko', 'de', 'fr', 'id', 'hi', 'th', 'vi', 'ru', 'it', 'ar', 'tr', 'nl', 'pl', 'sv', 'cs', 'uk', 'da', 'fi', 'el', 'he', 'ro'];
 const CJK_OK = new Set(['zh-CN', 'zh-TW', 'ja', 'ko']);

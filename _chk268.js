@@ -74,7 +74,8 @@ const BIG = (function () {
   ok(JSON.stringify(pvOut) === JSON.stringify(expOut), '预览每条文本与导出结果逐字相同', JSON.stringify(pvOut) + ' vs ' + JSON.stringify(expOut));
   const dlSame = await ev(`(function(){
     var pv=[].map.call(document.querySelectorAll('#pvBox .pv-line .x'),function(e){return e.textContent;});
-    var dl=outMain().split('\\n').filter(function(l){return l && !/^\\d+$/.test(l) && l.indexOf('-->')<0;});
+    /* v0.9.271：SRT 改成 CRLF 了（规范行尾），切分要认 \\r\\n */
+    var dl=outMain().split(/\\r?\\n/).filter(function(l){return l && !/^\\d+$/.test(l) && l.indexOf('-->')<0;});
     return JSON.stringify(pv)===JSON.stringify(dl);})()`);
   ok(dlSame, '与「下载字幕」拿到的文本也一致', dlSame);
 

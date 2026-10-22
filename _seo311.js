@@ -8,7 +8,7 @@
      E. 跨语言重复：同一页 27 个语言的 title / desc 两两对比，完全一样 = 疑似没翻译
      F. 非拉丁语言必须出现本地文字（ja 韩彦文 / ko 谚文 / ru·uk 西里尔 / ar / he / th / el / hi / zh 汉字）
         —— title 和 desc 全是 ASCII 拉丁字母 = 这条文案八成没翻译
-     G. 跨页面区分度：同一语言 10 个页面的 title 前 40 字符两两不完全相同
+     G. 跨页面区分度：同一语言 12 个页面的 title 前 40 字符两两不完全相同（v0.9.313 起十二页）
      H. keywords 质量：非空、逗号拆开后无空段、无重复词
      I. HTML 转义验证：meta 值里没有裸 & （后面不跟合法实体 = ea() 失效的信号）
      J. 静态文案块字数分布：每页 27 语的 copy 长度列分布，异常短（< 250）单独点名
@@ -23,7 +23,7 @@ const http = require('http');
 const ROOT = __dirname;
 const SRV = Number(process.env.SRV || 3412);
 const BASE = 'http://127.0.0.1:' + SRV;
-const PAGES = ['index', 'translate', 'merge', 'clean', 'convert', 'bilingual', 'shift', 'repair', 'extract', 'glossary'];
+const PAGES = ['index', 'translate', 'merge', 'clean', 'convert', 'bilingual', 'shift', 'repair', 'extract', 'glossary', 'videosub', 'hanconv']; /* v0.9.313 起十二页 */
 const LANGS = ['zh-CN', 'zh-TW', 'en', 'ja', 'es', 'pt', 'ko', 'de', 'fr', 'id', 'hi', 'th', 'vi', 'ru', 'it', 'ar', 'tr', 'nl', 'pl', 'sv', 'cs', 'uk', 'da', 'fi', 'el', 'he', 'ro'];
 const OG_LOCALE = { 'zh-CN': 'zh_CN', 'zh-TW': 'zh_TW', en: 'en_US', ja: 'ja_JP', es: 'es_ES', pt: 'pt_BR', ko: 'ko_KR', de: 'de_DE', fr: 'fr_FR', id: 'id_ID', hi: 'hi_IN', th: 'th_TH', vi: 'vi_VN', ru: 'ru_RU', it: 'it_IT', ar: 'ar_AR', tr: 'tr_TR', nl: 'nl_NL', pl: 'pl_PL', sv: 'sv_SE', cs: 'cs_CZ', uk: 'uk_UA', da: 'da_DK', fi: 'fi_FI', el: 'el_GR', he: 'he_IL', ro: 'ro_RO' };
 /* F. 每种非拉丁语言的特征文字区段（title+desc 里至少出现一个） */

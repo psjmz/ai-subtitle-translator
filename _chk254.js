@@ -52,68 +52,71 @@ function J(p){ return new Promise((res, rej) => { const r = http.request({ host:
   ok(A.every(a => a.数字 !== null && a.数字 !== ''), '每个胶囊都有数字（0 也要显示，不许藏）', JSON.stringify(A.map(a=>a.数字)));
   await shot('merge254-A-胶囊数字.png', '#slotBar', 90, 2);
 
-  console.log('\n— ② 歌词槽：面板对照预览里译文行与原文行不许重合 —');
+  console.log('\n— ② 歌词槽：视角「这个槽」下译文行与原文行不许重合 —');
   const geo = await ev(`(function(){ensureStyle();
     document.getElementById('slotEdit').open=true;
-    S.style.cur='lyric'; S.pv={base:false};
-    renderSlots(); renderSlotPvMini();
-    var l1=document.getElementById('slotPvLine1').getBoundingClientRect();
-    var l2=document.getElementById('slotPvLine2').getBoundingClientRect();
-    var add=document.getElementById('slotPvAdd')||null;
-    var scr=document.getElementById('slotPvScreen').getBoundingClientRect();
+    S.style.cur='lyric';
+    setPvView('slot');
+    var l1=document.getElementById('assPvLine1').getBoundingClientRect();
+    var l2=document.getElementById('assPvLine2').getBoundingClientRect();
+    var scr=document.getElementById('assPvScreen').getBoundingClientRect();
     var r1=l1,r2=l2;
     var ov=Math.min(r1.bottom,r2.bottom)-Math.max(r1.top,r2.top);
     return JSON.stringify({屏高:Math.round(scr.height), 原文:['top',Math.round(r1.top-scr.top),'bottom',Math.round(r1.bottom-scr.top)],
       译文:['top',Math.round(l2.top-scr.top),'bottom',Math.round(l2.bottom-scr.top)],
       行盒重叠px:Math.round(ov), 两行间隙px:Math.round(Math.abs(l2.top-r1.bottom)),
-      标签:document.getElementById('slotPvTag').textContent});})()`);
+      标签:document.getElementById('pvTag').textContent});})()`);
   console.log('   ', geo);
   let G = {}; try { G = JSON.parse(geo); } catch(e){}
   ok(Number(G.行盒重叠px) <= 0, '⭐ 译文行盒与原文行盒**不重叠**（重叠 ' + G.行盒重叠px + 'px）', geo);
-  ok(/歌词/.test(String(G.标签)), '面板预览标的确实是歌词槽', G.标签);
+  ok(/歌词/.test(String(G.标签)), '预览标的确实是歌词槽', G.标签);
   ok(Number(G.屏高) > 100, '预览屏有真实高度', G.屏高);
-  await shot('merge254-B-歌词槽不重合.png', '#slotEdit', 460, 2);
+  await shot('merge254-B-歌词槽不重合.png', '#pvCard', 420, 2);
 
-  console.log('\n— ②b 面板预览的文本随槽区分（歌词 ♪ / 音效方括号 / 主预览不许换字）—');
-  const tx = await ev(`(function(){ensureStyle();S.style.cur='lyric';S.pv={base:false};
-    document.getElementById('slotEdit').open=true; renderSlots(); renderSlotPvMini();
-    var o={面板原文:document.getElementById('slotPvLine1').textContent,
-           面板译文:document.getElementById('slotPvLine2').textContent,
-           主原文:document.getElementById('assPvLine1').textContent,
-           主译文:document.getElementById('assPvLine2').textContent};
-    S.style.cur='sfx'; renderSlots(); renderSlotPvMini();
-    o.音效原文=document.getElementById('slotPvLine1').textContent;
-    o.音效译文=document.getElementById('slotPvLine2').textContent;
-    S.style.cur='narration'; renderSlots(); renderSlotPvMini();
-    o.旁白原文=document.getElementById('slotPvLine1').textContent;
+  console.log('\n— ②b 预览文本随槽区分（歌词 ♪ / 音效方括号 / 成片视角不许换字）—');
+  const tx = await ev(`(function(){ensureStyle();
+    document.getElementById('slotEdit').open=true;
+    var o={};
+    S.style.cur='lyric'; setPvView('slot');
+    o.槽原文=document.getElementById('assPvLine1').textContent;
+    o.槽译文=document.getElementById('assPvLine2').textContent;
+    setPvView('movie');
+    o.成片原文=document.getElementById('assPvLine1').textContent;
+    o.成片译文=document.getElementById('assPvLine2').textContent;
+    S.style.cur='sfx'; setPvView('slot');
+    o.音效原文=document.getElementById('assPvLine1').textContent;
+    o.音效译文=document.getElementById('assPvLine2').textContent;
+    S.style.cur='narration'; setPvView('slot');
+    o.旁白原文=document.getElementById('assPvLine1').textContent;
     return JSON.stringify(o);})()`);
   console.log('   ', tx);
   let X = {}; try { X = JSON.parse(tx); } catch(e){}
-  ok(/♪/.test(String(X.面板原文)) && /♪/.test(String(X.面板译文)), '歌词槽预览里出现 ♪ 符号', X.面板原文 + ' / ' + X.面板译文);
-  ok(/^\[|\s\[/.test(String(X.音效原文)) && /\[/.test(String(X.音效译文)), '音效槽预览是方括号内容', X.音效原文);
-  ok(/Narrator/.test(String(X.旁白原文)), '旁白槽预览是 Narrator 那种旁白口吻', X.旁白原文);
-  ok(!/♪/.test(String(X.主原文)) && !/♪/.test(String(X.主译文)), '⭐ 右侧主预览仍是用户自己的字幕，没被换字',
-    X.主原文 + ' / ' + X.主译文);
-  ok(String(X.面板原文) !== String(X.音效原文), '两个槽的预览内容确实不同', X.面板原文 + ' vs ' + X.音效原文);
-  const txV = await ev(`(function(){S.style.cur='lyric'; renderSlots(); setFmtSilently('vttStyle'); renderVttPv();
-    var t=document.getElementById('slotPvCue').textContent;
-    setFmtSilently('stack'); renderSlots(); renderSlotPvMini();
-    return JSON.stringify({VTT面板:t, 格式回来了:tplVal()});})()`);
+  ok(/♪/.test(String(X.槽原文)) && /♪/.test(String(X.槽译文)), '歌词槽视角里出现 ♪ 符号', X.槽原文 + ' / ' + X.槽译文);
+  ok(/^\[|\s\[/.test(String(X.音效原文)) && /\[/.test(String(X.音效译文)), '音效槽视角是方括号内容', X.音效原文);
+  ok(/Narrator/.test(String(X.旁白原文)), '旁白槽视角是 Narrator 那种旁白口吻', X.旁白原文);
+  ok(!/♪/.test(String(X.成片原文)) && !/♪/.test(String(X.成片译文)), '⭐ 视角「成片」仍是用户自己的字幕，没被换字',
+    X.成片原文 + ' / ' + X.成片译文);
+  ok(String(X.槽原文) !== String(X.音效原文), '两个槽的预览内容确实不同', X.槽原文 + ' vs ' + X.音效原文);
+  const txV = await ev(`(function(){S.style.cur='lyric'; renderSlots(); setFmtSilently('vttStyle'); setPvView('slot');
+    var t=document.getElementById('mVttPvCue').textContent;
+    setFmtSilently('stack'); setPvView('movie');
+    return JSON.stringify({VTT槽:t, 格式回来了:tplVal()});})()`);
   console.log('   ', txV);
   let XV = {}; try { XV = JSON.parse(txV); } catch(e){}
-  ok(/♪/.test(String(XV.VTT面板)), 'VTT 面板预览也换成歌词示意文本', String(XV.VTT面板).replace(/\s+/g,' ').trim());
+  ok(/♪/.test(String(XV.VTT槽)), 'VTT 的「这个槽」视角也换成歌词示意文本', String(XV.VTT槽).replace(/\s+/g,' ').trim());
   ok(XV.格式回来了 === 'stack', '测完把导出格式还回底部双行', XV.格式回来了);
 
-  console.log('\n— ③ 基础样式那条对照组：也不重叠（口径一致）—');
-  const geoB = await ev(`(function(){document.getElementById('slotPvBaseBtn').click();
-    var l1=document.getElementById('slotPvLine1').getBoundingClientRect();
-    var l2=document.getElementById('slotPvLine2').getBoundingClientRect();
-    var scr=document.getElementById('slotPvScreen').getBoundingClientRect();
+  console.log('\n— ③ 视角「基础样式」：也不重叠（口径一致）—');
+  const geoB = await ev(`(function(){setPvView('base');
+    var l1=document.getElementById('assPvLine1').getBoundingClientRect();
+    var l2=document.getElementById('assPvLine2').getBoundingClientRect();
+    var scr=document.getElementById('assPvScreen').getBoundingClientRect();
     var ov=Math.min(l1.bottom,l2.bottom)-Math.max(l1.top,l2.top);
-    return JSON.stringify({行盒重叠px:Math.round(ov), 标签:document.getElementById('slotPvTag').textContent});})()`);
+    return JSON.stringify({行盒重叠px:Math.round(ov), 标签:document.getElementById('pvTag').textContent});})()`);
   console.log('   ', geoB);
   let GB = {}; try { GB = JSON.parse(geoB); } catch(e){}
   ok(Number(GB.行盒重叠px) <= 0, '基础样式两行也不重叠', geoB);
+  await ev("setPvView('movie');1"); await wait(300);
 
   console.log('\n— ④ 导出 ASS：歌词槽的译文行与原文行加**同一个**偏移 —');
   const asExp = await ev(`(function(){S.style.assign={};setRowSlot(0,'lyric');

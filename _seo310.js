@@ -1,4 +1,5 @@
-/* v0.9.310 多语言 SEO 全量审计：十页 × 27 语 = 270 条 URL 一条条取回来核对
+/* v0.9.310 多语言 SEO 全量审计：十七页 × 27 语 = 459 条 URL 一条条取回来核对
+   （v0.9.313 加 videosub / hanconv，v0.9.316 加 split/table/batch/lrc，v0.9.321 加 qc）
    检查项（凡是爬虫/搜索引擎真会看的）：
      ① HTTP 200 + <html lang> 对得上 + ar/he 整页 dir="rtl"
      ② canonical 自指、hreflang 全集（27 语 + x-default）且**互指完整**（含自己）
@@ -12,7 +13,7 @@
            350 是各家工具（Yoast / SEMrush）公认的硬上限，超过这个才是真超长。
            同理 title：60 是「显示不截断」的经验值，80 以上才算真的太长。
      ⑧ 爬虫可读的静态文案块在（不执行 JS 也能读到正文）
-     ⑨ sitemap.xml：270 条、无重复、每条带 28 个 alternates
+     ⑨ sitemap.xml：459 条、无重复、每条带 28 个 alternates
      ⑩ robots.txt：有 User-agent / 有 Sitemap 指向
    用法：node _seo309.js          （自带本地服务，端口随机；SRV=xxxx 可指定）
 */
@@ -26,7 +27,7 @@ const path = require('path');
 const ROOT = __dirname;
 const SRV = Number(process.env.SRV || 3410);
 const BASE = 'http://127.0.0.1:' + SRV;
-const PAGES = ['index', 'translate', 'merge', 'clean', 'convert', 'bilingual', 'shift', 'repair', 'extract', 'glossary'];
+const PAGES = ['index', 'translate', 'merge', 'clean', 'convert', 'bilingual', 'shift', 'repair', 'extract', 'glossary', 'videosub', 'hanconv', 'split', 'table', 'batch', 'lrc', 'qc']; /* v0.9.321 起十七页 */
 const LANGS = ['zh-CN', 'zh-TW', 'en', 'ja', 'es', 'pt', 'ko', 'de', 'fr', 'id', 'hi', 'th', 'vi', 'ru', 'it', 'ar', 'tr', 'nl', 'pl', 'sv', 'cs', 'uk', 'da', 'fi', 'el', 'he', 'ro'];
 const CJK_OK = ['zh-CN', 'zh-TW', 'ja', 'ko'];          // 这四种允许出现汉字
 const RTL = ['ar', 'he'];
@@ -65,7 +66,7 @@ const HAN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
   const uniq = [...new Set(locs)];
   console.log('  HTTP ' + sm.code + '  <url> 条目 ' + (sm.body.match(/<url>/g) || []).length + ' 条，去重后 ' + uniq.length + ' 个 loc');
   if (sm.code !== 200) push('严重', 'sitemap.xml', 'HTTP ' + sm.code);
-  if (uniq.length !== 270) push('严重', 'sitemap.xml', 'loc 数 ' + uniq.length + '（应为 270）');
+  if (uniq.length !== 459) push('严重', 'sitemap.xml', 'loc 数 ' + uniq.length + '（应为 459）');
   if (uniq.length !== locs.length) push('严重', 'sitemap.xml', '有重复 loc（' + (locs.length - uniq.length) + ' 个重复）');
   const perUrl = (sm.body.match(/<xhtml:link/g) || []).length / (uniq.length || 1);
   console.log('  每条平均 alternates：' + perUrl.toFixed(1) + '（应为 28 = 27 语 + x-default）');
@@ -89,7 +90,7 @@ const HAN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
   if (/Disallow:\s*\/\s*$/m.test(rb.body)) push('严重', 'robots.txt', 'Disallow: / —— 整站禁止抓取');
 
   /* ---------- ①~⑧ 逐条 ---------- */
-  console.log('\n— 270 条 URL 逐项核对 —');
+  console.log('\n— 459 条 URL 逐项核对 —');
   let okCount = 0, checked = 0;
   for (const p of PAGES) {
     const rowBad = { lang: 0, canon: 0, alt: 0, meta: 0, han: 0, trunc: 0, len: 0, ld: 0, copy: 0 };

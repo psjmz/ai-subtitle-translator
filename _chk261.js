@@ -55,7 +55,7 @@ const SEED = `(function(){S.rows=[
   ok(await ev("[...document.querySelectorAll('#fmtRowKind .fmt-btn')].map(b=>b.textContent).join('|')") === '仅译文（单语）|双语 · 原文在上|双语 · 译文在上',
     '内容按钮文案', await ev("[...document.querySelectorAll('#fmtRowKind .fmt-btn')].map(b=>b.textContent).join('|')"));
 
-  console.log('\n— ①b v0.9.260 重设计：分组分段 + 两行式标签 + 选中态分级 + focus 接管 —');
+  console.log('\n— ①b v0.9.261 重设计：分组分段 + 两行式标签 + 选中态分级 + focus 接管 —');
   const rd = JSON.parse(await ev(`(function(){
     setFmt('bi-src','ass');
     var rows=document.querySelectorAll('.fmt-row'), kr=document.getElementById('fmtRowKind'), fr=document.getElementById('fmtRowFile');
@@ -138,10 +138,11 @@ const SEED = `(function(){S.rows=[
 
   console.log('\n— ③ 折行设置：保留，且跟着内容格式联动 —');
   ok(await ev("!!document.getElementById('maxW') && !!document.getElementById('biMaxW')"), '两个行宽输入框都在');
-  let w = JSON.parse(await ev("(function(){setFmt('mono','srt');return JSON.stringify({a:document.getElementById('wcellMaxW').hidden,b:document.getElementById('wcellBiMaxW').hidden,tip:document.getElementById('wrapTipEl').dataset.i18n})})()"));
+  /* v0.9.297：说明从常驻正文收进了 ⓘ —— 取词口由 data-i18n 换成 data-tip-i18n */
+  let w = JSON.parse(await ev("(function(){setFmt('mono','srt');return JSON.stringify({a:document.getElementById('wcellMaxW').hidden,b:document.getElementById('wcellBiMaxW').hidden,tip:document.getElementById('wrapTipEl').getAttribute('data-tip-i18n')})})()"));
   ok(w.a === false && w.b === true, '单语 → 只显示「单语行宽」', JSON.stringify(w));
   ok(w.tip === 'wrapTip', '说明文案也跟着换成单语口径', w.tip);
-  w = JSON.parse(await ev("(function(){setFmt('bi-src','srt');return JSON.stringify({a:document.getElementById('wcellMaxW').hidden,b:document.getElementById('wcellBiMaxW').hidden,tip:document.getElementById('wrapTipEl').dataset.i18n})})()"));
+  w = JSON.parse(await ev("(function(){setFmt('bi-src','srt');return JSON.stringify({a:document.getElementById('wcellMaxW').hidden,b:document.getElementById('wcellBiMaxW').hidden,tip:document.getElementById('wrapTipEl').getAttribute('data-tip-i18n')})})()"));
   ok(w.a === true && w.b === false, '双语 → 换成「双语行宽」', JSON.stringify(w));
   ok(w.tip === 'wrapTipBi', '说明文案换成双语口径', w.tip);
   ok(await ev("(function(){setFmt('bi-src','ass-stack');return document.getElementById('wcellBiMaxW').hidden})()") === false, '换成 ASS 双行后折行设置仍在');

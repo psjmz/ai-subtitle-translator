@@ -189,7 +189,7 @@
     if (!/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(l0)) return;
     /* ⚠️ 这里的版号要跟整站版号一起升（?v= 是缓存键）。_bumpNNN.py 只改交付文件、
            不改本脚本（_ 开头一律跳过），所以升版时记得顺手改这一行 + 下面第 0 行。 */
-    d.write('<script src="/i18n/tnav-' + l0 + '.js?v=0.9.355"><\/script>');
+    d.write('<script src="/i18n/tnav-' + l0 + '.js?v=0.9.356"><\/script>');
   })();
 
   /* ---------- 语言：URL 前缀 → 语言下拉 → html[lang] → navigator，逐级兜底 ----------
@@ -492,7 +492,7 @@
     if (pendingShard[lang]) { pendingShard[lang].push(fire); return; }
     pendingShard[lang] = [fire];
     var el = d.createElement('script');
-    el.src = '/i18n/tnav-' + lang + '.js?v=0.9.355';    /* ⚠️ 整站升版时同步改（缓存键） */
+    el.src = '/i18n/tnav-' + lang + '.js?v=0.9.356';    /* ⚠️ 整站升版时同步改（缓存键） */
     el.async = false;
     el.onload = el.onerror = function () {
       var q = pendingShard[lang] || [];
