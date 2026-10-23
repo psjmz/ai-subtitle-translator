@@ -28,6 +28,10 @@ const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : pat
 const CONFIG_PATH = path.join(DATA_DIR, 'config.json');
 const USAGE_PATH = path.join(DATA_DIR, 'usage.json');
 const PORT = Number(process.env.PORT) || 3000;
+/* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
+   以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
+   单测会校验它与 index.html 里的 ?v= 一致。 */
+const ASSET_VER = '0.9.368';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -5558,6 +5562,34 @@ function seoCopy(page, lang){
     '  </section>';
 }
 
+/* v0.9.368：中文页（无前缀 URL）多带一份英文正文 + 英文标题，给界面语言不是中文的访客。
+   为什么需要：界面语言从 v0.9.136 起按浏览器语言自动切换（不认识的语言落英文），
+   但这段正文与 <title> 是服务端按 **URL 语言** 注入的 —— 无前缀 URL 恒为中文，
+   于是英文/卢森堡语访客拿到的是「英文界面 + 中文正文 + 中文标签页标题」。
+   为什么藏进 <template>：模板内容不渲染、不进正文流、不参与可访问性树，
+   禁用 JS 时页面与今天完全一样；只有 seo-alt.js 判定界面语言不是中文时才取出来换上。
+   为什么只给 zh 路由：另外 99 个语言路由的正文本来就是该语言，不需要第二份。
+   ⚠️ 首页/工作台那段 copy 末尾还带一个 <noscript>，不属于正文 —— 客户端只取 section.seo。 */
+function seoAltBlock(page){
+  const P = SEO_PAGES[page];
+  if (!P || !P.table['en']) return '';
+  const en = (page === 'index' || page === 'translate')
+    ? (SEO['en'] && SEO['en'].copy)
+    : seoCopy(page, 'en');
+  if (!en || String(en).indexOf('<section class="seo"') < 0) return '';
+  const esc = (v) => String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  /* v0.9.310 那条规矩照旧：剥掉 data-i18n，这一段归 URL/界面语言管，别再被 applyI18n 改一遍 */
+  const body = String(en).replace(/\s+data-i18n(?:-html)?="[^"]*"/g, '');
+  /* data-zh-title：页面此刻的 <title> 原文。客户端拿它判断「标题归谁管」——
+     7 个页面（qc/lrc/split/table/batch/translate/index）自己的 applyI18n 里就写
+     document.title = t('docTitle')，标题本来就跟着界面语言走，别去覆盖它们
+     （改了会跟页面自己那份措辞打架）。只有标题仍是服务端这份中文原样时，才由我们代管。 */
+  return '<template id="seo-alt-en" data-title="' + esc(P.table['en'].title) + '"'
+    + ' data-zh-title="' + esc(P.table['zh-CN'] ? P.table['zh-CN'].title : '') + '">\n' + body + '\n</template>\n'
+    + '<script src="/seo-alt.js?v=' + ASSET_VER + '" defer></script>';
+}
+
 function seoHead(lang, base, page){
   page = page || 'index';
   const P = SEO_PAGES[page];
@@ -5719,6 +5751,14 @@ function serveIndexLang(req, res, lang, page){
       const copyHtml = String(copy).replace(/\s+data-i18n(?:-html)?="[^"]*"/g, '');
       html = html.replace(/<!--SEO-COPY-START-->[\s\S]*?<!--SEO-COPY-END-->/,
         '<!--SEO-COPY-START-->\n  ' + copyHtml + '\n  <!--SEO-COPY-END-->');
+    }
+    /* v0.9.368：中文页额外带一份英文正文（藏在 <template> 里），界面语言非中文时由
+       seo-alt.js 换上 —— 否则英文访客看到的是英文界面配中文正文与中文标题。 */
+    if (lang === 'zh-CN') {
+      const alt = seoAltBlock(page);
+      /* 函数式 replacement：文案里若出现 $& / $' / $` 这类字符，字符串替换会当成替换模式，
+         把整段正文换成别的东西（英文文案里 $ 不算罕见）。 */
+      if (alt) html = html.replace('<!--SEO-COPY-END-->', function () { return '<!--SEO-COPY-END-->\n' + alt; });
     }
     const htmlLang = (page === 'index' && SEO[lang]) ? SEO[lang].htmlLang : lang;
     html = html.replace('<html lang="zh-CN"', '<html lang="' + htmlLang + '"' + (RTL_LANGS.indexOf(htmlLang) >= 0 ? ' dir="rtl"' : ''));

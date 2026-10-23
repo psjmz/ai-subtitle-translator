@@ -316,9 +316,12 @@ console.log('\n— v0.9.271：页面契约 —');
 {
   const fs = require('fs');
   const html = fs.readFileSync(__dirname + '/clean.html', 'utf8');
-  /* ⚠️ 升版时这里两处都要动：正则里的 0\.9\.NNN **和** 提示文字里的 NNN。
-     只改正则不改文字，看输出会以为还是上一版（10/14 v0.9.302 实证）。 */
-  ok(/clean-core\.js\?v=0\.9\.348/.test(html), 'clean.html 版号已升 348');
+  /* v0.9.368：原来写死成 `0\.9\.348`，之后每次升号都没人回来改（347→348 那版起就红了），
+     380 版以后它就是一条永远红着的假警报。改成跟首页的版号比 —— 全站 ?v= 恒等于当前版号，
+     以后升号不用再回来动这里。 */
+  const idxV = (/site-i18n\.js\?v=([0-9.]+)/.exec(fs.readFileSync(__dirname + '/index.html', 'utf8')) || [])[1];
+  ok(!!idxV && html.indexOf('clean-core.js?v=' + idxV) >= 0,
+    'clean.html 引擎版号与全站一致（' + idxV + '）');
   /* v0.9.280：左上 logo 整块可点回首页（清洗页这条也核一遍，别只靠主站那条） */
   ok(/<a class="brand" id="logoHome" href="\/">/.test(html), '左上 logo 是指向首页的链接');
   ok(/function syncLogoHome\s*\(/.test(html) && /'\s*\+\s*LANG\s*\+\s*'\/'/.test(html),
