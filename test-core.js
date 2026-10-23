@@ -26,10 +26,28 @@ const DICT_SRC = readT('site-i18n.js');
    凡是「查 merge 页 JS 里有没有某段逻辑」的老用例，一律读 MERGE_SRC（HTML + 外链 JS 的拼接），
    别再单独读 merge.html —— 那里已经没有脚本了。查 HTML 结构的用例才用 MERGE_HTML。 */
 const MERGE_HTML = readT('merge.html');
-const MERGE_UI = readT('merge-ui.js');
+/* v0.9.370：merge 词典按语言拆片 —— 内置 27 语留在 merge-ui.js，
+   其余 73 语是 i18n/mg-<lang>.js。凡是「每个词条必须有 100 语」的断言，
+   必须看「主文件 + 全部分片」；只看主文件会数到 27，全红。
+   ⚠️ 不要用 fs.readdirSync 的原始顺序（各平台不一致），sort 一次。 */
+const MERGE_UI_CORE = readT('merge-ui.js');
+/* v0.9.370：解析期的分片注入在 merge-boot.js（独立文件，夹在 core 与 ui 之间）——
+   document.write 写进去的 <script> 要等当前脚本结束后才解析，放进 merge-ui.js
+   就会赶不上同一脚本里的 init()。 */
+const MERGE_BOOT = readT('merge-boot.js');
+const MERGE_SHARDS = (function () {
+  const d = pathT.join(__dirname, 'i18n');
+  if (!fsT.existsSync(d)) return '';
+  return fsT.readdirSync(d)
+    .filter(f => /^mg-[a-z]{2,3}(-[A-Za-z]{2,4})?\.js$/.test(f))
+    .sort()
+    .map(f => fsT.readFileSync(pathT.join(d, f), 'utf8'))
+    .join('\n');
+})();
+const MERGE_UI = MERGE_UI_CORE + '\n' + MERGE_SHARDS;
 const MERGE_SRC = MERGE_HTML + '\n' + MERGE_UI;
 /* merge 页词典现在有多少种语言：从 UI_LANGS 数出来，别写死 ——
-   v0.9.369 之前是 27，补到 100 之后，凡是「每个词条必须有 N 语」的断言都要跟着走。 */
+   v0.9.370 之前是 27，补到 100 之后，凡是「每个词条必须有 N 语」的断言都要跟着走。 */
 const MG_LANGS = (function () {
   const m = /const UI_LANGS = \[([\s\S]*?)\];/.exec(MERGE_UI);
   return m ? (m[1].match(/\['/g) || []).length : 0;
@@ -5549,9 +5567,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   const mgcSrc  = fsM.readFileSync(pathM.join(__dirname,'merge-core.js'),'utf8');
   const html = WS_SRC;   /* v0.9.277：原读 index.html，现为「工作台 + 字典」 */
   /* v0.9.369：merge 页的脚本已拆到 merge-ui.js —— 这一批用例查的是「JS 里有没有某段逻辑」，
-     所以 mg 必须是 HTML + 外链 JS 的拼接，只读 HTML 会全部落空。 */
+     所以 mg 必须是 HTML + 外链 JS 的拼接，只读 HTML 会全部落空。
+     v0.9.370：73 语词典又拆到 i18n/mg-*.js —— 查「每个词条有 100 语」必须带上分片。 */
   const mg = (fsM.existsSync(pathM.join(__dirname,'merge.html')) ? fsM.readFileSync(pathM.join(__dirname,'merge.html'),'utf8') : '') +
-    (fsM.existsSync(pathM.join(__dirname,'merge-ui.js')) ? fsM.readFileSync(pathM.join(__dirname,'merge-ui.js'),'utf8') : '');
+    (fsM.existsSync(pathM.join(__dirname,'merge-ui.js')) ? fsM.readFileSync(pathM.join(__dirname,'merge-ui.js'),'utf8') : '') +
+    MERGE_SHARDS;
 
   t('alignRows·order：同条数逐条配对，多出侧记 onlySrc/onlyDst', () => {
     const r = M.alignRows(mk([[0,1000,'a'],[2000,3000,'b']]), mk([[0,1000,'甲'],[2000,3000,'乙']]), 'order');
@@ -5651,7 +5671,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0.9.369/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0.9.370/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5700,9 +5720,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.369</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.369</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0.9.369/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.370</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.370</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0.9.370/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5896,8 +5916,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, MG_LANGS, k + ' 应有 ' + MG_LANGS + ' 种语言（词典语言数），实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.369</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0.9.369/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.370</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0.9.370/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -6726,9 +6746,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
      用户 10-06 定案的原则是全站通用的：用户填什么就是什么，不许偷偷改。 */
   const fsE = require('fs'), pathE = require('path');
   const ME  = require('./merge-core.js');
-  /* v0.9.369：脚本已拆到 merge-ui.js，这批用例查的是 JS，必须拼接 */
+  /* v0.9.369：脚本已拆到 merge-ui.js，这批用例查的是 JS，必须拼接
+     v0.9.370：73 语词典在 i18n/mg-*.js 分片里，拼上才数得到 100 语 */
   const mgE = fsE.readFileSync(pathE.join(__dirname, 'merge.html'), 'utf8') +
-    fsE.readFileSync(pathE.join(__dirname, 'merge-ui.js'), 'utf8');
+    fsE.readFileSync(pathE.join(__dirname, 'merge-ui.js'), 'utf8') +
+    MERGE_SHARDS;
   const mcE = fsE.readFileSync(pathE.join(__dirname, 'merge-core.js'), 'utf8');
   const mStyleMV = (out, name) => {
     const l = out.split('\n').filter(x => x.indexOf('Style: ') === 0)
@@ -7761,11 +7783,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.369/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0.9.369/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.369/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.369/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0.9.369/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.370/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0.9.370/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.370/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.370/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0.9.370/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -8534,8 +8556,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
        示例数据装不上、预览全空，而**所有「源码里有这段字」的断言照样是绿的**。
        所以这里不认字、只认层级：顶格写的 function 定义，在大括号里就算错。 */
     /* v0.9.369：脚本已外链到 merge-ui.js，没有内联块了 —— 直接查外链文件全文，
-       同一个事故（函数被误插进别的函数肚子里）在外链文件里一样会发生。 */
-    const body = MERGE_UI;
+       同一个事故（函数被误插进别的函数肚子里）在外链文件里一样会发生。
+       v0.9.370：只查主文件 —— 分片是纯词条数据，混进来只会稀释「顶格 function」的判据。 */
+    const body = MERGE_UI_CORE;
     assert.ok(body.length > 1000, 'merge-ui.js 读不到内容');
     let depth = 0;
     const bad = [];
@@ -9273,14 +9296,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.369/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0.9.369/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.370/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0.9.370/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.369/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.369/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0.9.369/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.370/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.370/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0.9.370/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0.9.369/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0.9.370/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9787,13 +9810,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.369/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.369/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0.9.369/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.369/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0.9.369/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.370/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.370/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0.9.370/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.370/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0.9.370/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0.9.369/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0.9.370/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9815,7 +9838,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0.9.369">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0.9.370">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9826,7 +9849,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.369') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.370') > 0, p[0] + ' 没引 site-i18n.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -9887,7 +9910,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.279：特效页 / 清洗页补齐真 27 语（下拉不再骗人）', () => {
     const rd = f => require('fs').readFileSync(require('path').join(__dirname, f), 'utf8');
-    const mg = rd('merge.html') + rd('merge-ui.js'), cln = rd('clean.html'), sv = rd('server.js');   /* 词典在 merge-ui.js */
+    const mg = rd('merge.html') + MERGE_UI, cln = rd('clean.html'), sv = rd('server.js');   /* 词典在 merge-ui.js + i18n/mg-*.js 分片 */
     const ws = rd('translate.html'), home = HOME_SRC;
     /* 体检发现的头号问题：两页下拉都列 27 项，词典却只有 4 / 2 块，
        选西语、俄语…界面纹丝不动，同时给爬虫产出 46 条「西语标题 + 英文正文」的重复页面。
@@ -9901,7 +9924,10 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       const seg = src.slice(i, close < 0 ? i + 800000 : close);
       return (seg.match(/\n[ \t]*'[a-zA-Z\-]{2,10}':\s*\{/g) || []).length;
     };
-    const mN = blockN(mg), cN = blockN(cln);
+    /* v0.9.370：73 语已拆到 i18n/mg-*.js 分片 —— 块数 = 主文件块数 + 分片数。
+       blockN 只认 `\n  'xx': {`（主文件格式），分片是 `I18N['xx'] = {`，单独数。 */
+    const shardN = (MERGE_SHARDS.match(/\nwindow\.MG_SHARD\['[a-zA-Z\-]{2,10}'\] = \{/g) || []).length;
+    const mN = blockN(mg) + shardN, cN = blockN(cln);
     /* v0.9.369：merge 词典补到 100 语（下拉也跟着到 100 项），判据改成「块数 == 下拉项数」；
        清洗页没动过，仍是 27。 */
     assert.strictEqual(mN, MG_LANGS, 'merge.html 词典语言块应为 ' + MG_LANGS + '，实际 ' + mN);
@@ -10076,7 +10102,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   t('v0.9.280：左上 logo 整块可点回首页（各语言回各自语言的首页）', () => {
     const rd = f => require('fs').readFileSync(require('path').join(__dirname, f), 'utf8');
     const pages = [['index.html', HOME_SRC], ['translate.html', rd('translate.html')],
-                   ['merge.html', rd('merge.html') + rd('merge-ui.js')], ['clean.html', rd('clean.html')]];
+                   ['merge.html', rd('merge.html') + MERGE_UI], ['clean.html', rd('clean.html')]];
     pages.forEach(function (p) {
       const name = p[0], src = p[1];
       /* ① 左上 logo 是 <a>、带 id、初始 href 指向站点根（JS 再按界面语言改写） */
@@ -10546,7 +10572,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/<script[^>]+site-nav\.js/.test(h), '转换页不许引入 site-nav.js（那是另外三页共用的导航）');
     assert.ok(!/<script[^>]+site-i18n\.js/.test(h), '转换页不许引入 site-i18n.js（那是另外三页共用的词典）');
     assert.ok(/convert-i18n\.js/.test(h), '转换页应加载自己的词典');
-    assert.ok(/convert-core\.js\?v=0.9.369/.test(h), '转换页引擎没带版本号');
+    assert.ok(/convert-core\.js\?v=0.9.370/.test(h), '转换页引擎没带版本号');
     assert.strictEqual((h.match(/<h1/g) || []).length, 1, '转换页只应有一个 h1');
     assert.ok(/<!--SEO-HEAD-START-->/.test(h) && /<!--SEO-COPY-START-->/.test(h),
       '缺 SEO 占位块，服务端按语言注入会失效');
@@ -12117,14 +12143,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.296：版号升到 296，缓存 bust 跟着走', () => {
     const h = readT('repair.html');
-    assert.ok(/repair-i18n\.js\?v=0.9.369/.test(h), 'repair-i18n.js 没带 296 版本号');
-    assert.ok(/repair-core\.js\?v=0.9.369/.test(h), 'repair-core.js 没带 296 版本号');
+    assert.ok(/repair-i18n\.js\?v=0.9.370/.test(h), 'repair-i18n.js 没带 296 版本号');
+    assert.ok(/repair-core\.js\?v=0.9.370/.test(h), 'repair-core.js 没带 296 版本号');
     /* 老页的版本号这轮统一抬一次，否则改过 SEO 的老页在 CDN 上还是旧的 */
-    assert.ok(/class="ver">v0\.9\.369/.test(readT('index.html')), 'index.html 顶栏版号没升');
-    assert.ok(/ver-tag">v0\.9\.369/.test(readT('translate.html')), 'translate.html 页脚版号没升');
-    assert.ok(/class="ver">v0\.9\.369/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
+    assert.ok(/class="ver">v0\.9\.370/.test(readT('index.html')), 'index.html 顶栏版号没升');
+    assert.ok(/ver-tag">v0\.9\.370/.test(readT('translate.html')), 'translate.html 页脚版号没升');
+    assert.ok(/class="ver">v0\.9\.370/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
     ['clean.html', 'convert.html', 'bilingual.html', 'shift.html'].forEach(f => {
-      assert.ok(/\?v=0.9.369/.test(readT(f)), f + ' 的脚本没带 296 版本号');
+      assert.ok(/\?v=0.9.370/.test(readT(f)), f + ' 的脚本没带 296 版本号');
     });
   });
 
@@ -12438,7 +12464,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/EXTRACT_I18N/.test(ep) && /ExtractCore/.test(ep), 'extract.html 没用自己的全局出口');
     assert.ok(!/ShiftCore|ConvertCore|BilingualCore|RepairCore/.test(ec), 'extract-core.js 依赖了别的引擎');
     /* 三件套脚本带 ?v= 缓存参数并升到 299 */
-    assert.ok(/extract-core\.js\?v=0.9.369/.test(ep) && /extract-i18n\.js\?v=0.9.369/.test(ep),
+    assert.ok(/extract-core\.js\?v=0.9.370/.test(ep) && /extract-i18n\.js\?v=0.9.370/.test(ep),
       '三件套的 ?v= 缓存参数没带上或没升到 299');
     /* 老页面不许被塞进新页链接 —— 首页卡片 v0.9.300 起是正门，index 不在名单里 */
     ['translate.html', 'merge.html', 'clean.html', 'convert.html',
@@ -12971,14 +12997,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.302：版号升到 302，三件套缓存 bust 跟着走', () => {
     const h = readT('glossary.html');
-    assert.ok(/glossary-i18n\.js\?v=0.9.369/.test(h), 'glossary-i18n.js 没带 302 版本号');
-    assert.ok(/glossary-core\.js\?v=0.9.369/.test(h), 'glossary-core.js 没带 302 版本号');
-    assert.ok(/class="ver">v0\.9\.369/.test(readT('index.html')), 'index.html 顶栏版号没升');
-    assert.ok(/ver-tag">v0\.9\.369/.test(readT('translate.html')), 'translate.html 页脚版号没升');
-    assert.ok(/class="ver">v0\.9\.369/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
+    assert.ok(/glossary-i18n\.js\?v=0.9.370/.test(h), 'glossary-i18n.js 没带 302 版本号');
+    assert.ok(/glossary-core\.js\?v=0.9.370/.test(h), 'glossary-core.js 没带 302 版本号');
+    assert.ok(/class="ver">v0\.9\.370/.test(readT('index.html')), 'index.html 顶栏版号没升');
+    assert.ok(/ver-tag">v0\.9\.370/.test(readT('translate.html')), 'translate.html 页脚版号没升');
+    assert.ok(/class="ver">v0\.9\.370/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
     ['clean.html', 'convert.html', 'bilingual.html', 'shift.html', 'repair.html', 'extract.html']
       .forEach(f => {
-        assert.ok(/\?v=0.9.369/.test(readT(f)), f + ' 的脚本没带 302 版本号');
+        assert.ok(/\?v=0.9.370/.test(readT(f)), f + ' 的脚本没带 302 版本号');
       });
   });
 
@@ -13421,24 +13447,24 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.306：版号升到 306，shift 的两个缓存键跟着走', () => {
     const SH = readT('shift.html');
-    assert.ok(/shift-core\.js\?v=0.9.369/.test(SH),
+    assert.ok(/shift-core\.js\?v=0.9.370/.test(SH),
       'shift.html 的引擎缓存键没升（改了引擎不发版 = 老访客吃旧引擎）');
-    assert.ok(/shift-i18n\.js\?v=0.9.369/.test(SH),
+    assert.ok(/shift-i18n\.js\?v=0.9.370/.test(SH),
       'shift.html 的词典缓存键没升（改了词条不发版 = 老访客看键名）');
-    assert.ok(/class="ver">v0\.9\.369/.test(readT('index.html')), '首页版号没升');
-    assert.ok(/ver-tag">v0\.9\.369/.test(readT('translate.html')), '工作台版号没升');
-    assert.ok(/class="ver">v0\.9\.369/.test(MERGE_SRC), 'merge.html 版号没升');
+    assert.ok(/class="ver">v0\.9\.370/.test(readT('index.html')), '首页版号没升');
+    assert.ok(/ver-tag">v0\.9\.370/.test(readT('translate.html')), '工作台版号没升');
+    assert.ok(/class="ver">v0\.9\.370/.test(MERGE_SRC), 'merge.html 版号没升');
   });
 
   t('v0.9.304：版号升到 304，shift 的两个缓存键跟着走', () => {
     const SH = readT('shift.html');
-    assert.ok(/shift-core\.js\?v=0.9.369/.test(SH),
+    assert.ok(/shift-core\.js\?v=0.9.370/.test(SH),
       'shift.html 的引擎缓存键没升（改了引擎不发版 = 老访客吃旧引擎）');
-    assert.ok(/shift-i18n\.js\?v=0.9.369/.test(SH),
+    assert.ok(/shift-i18n\.js\?v=0.9.370/.test(SH),
       'shift.html 的词典缓存键没升（改了词条不发版 = 老访客看键名）');
-    assert.ok(/class="ver">v0\.9\.369/.test(readT('index.html')), '首页版号没升');
-    assert.ok(/ver-tag">v0\.9\.369/.test(readT('translate.html')), '工作台版号没升');
-    assert.ok(/class="ver">v0\.9\.369/.test(MERGE_SRC), 'merge.html 版号没升');
+    assert.ok(/class="ver">v0\.9\.370/.test(readT('index.html')), '首页版号没升');
+    assert.ok(/ver-tag">v0\.9\.370/.test(readT('translate.html')), '工作台版号没升');
+    assert.ok(/class="ver">v0\.9\.370/.test(MERGE_SRC), 'merge.html 版号没升');
   });
 
   /* ---------------- v0.9.308：六个垂直工具页的埋点 + 后台分 tab ----------------
@@ -13568,14 +13594,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.308：版号升到 308，全站十页的缓存键跟着走', () => {
-    const V = /0\.9\.369/;
+    const V = /0\.9\.370/;
     assert.ok(V.test(readT('index.html')), '首页没升');
     ['translate', 'merge', 'clean', 'convert', 'bilingual', 'shift', 'repair', 'extract', 'glossary']
       .forEach(f => assert.ok(V.test(readT(f + '.html')), f + '.html 没升'));
     /* 六个页都改了（加了埋点），六页的引擎缓存键必须跟着走，否则老访客吃旧页 */
     ['convert', 'bilingual', 'repair', 'extract', 'glossary'].forEach(f => {
       const h = readT(f + '.html');
-      assert.ok(new RegExp(f + '-core\\.js\\?v=0\\.9\\.369').test(h), f + ' 页的引擎缓存键没升');
+      assert.ok(new RegExp(f + '-core\\.js\\?v=0\\.9\\.370').test(h), f + ' 页的引擎缓存键没升');
     });
   });
 
@@ -14534,8 +14560,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         const h = readT(p + '.html');
         assert.ok(/function reportTool\(/.test(h), p + ' 页没有 reportTool 定义');
         /* 首发缓存键：四页的 core/i18n 引用必须带当前版号（发版即换缓存） */
-        assert.ok(new RegExp(p + '-core\\.js\\?v=0\\.9\\.369').test(h), p + ' 页的 core 缓存键不是当前版号');
-        assert.ok(new RegExp(p + '-i18n\\.js\\?v=0\\.9\\.369').test(h), p + ' 页的 i18n 缓存键不是当前版号');
+        assert.ok(new RegExp(p + '-core\\.js\\?v=0\\.9\\.370').test(h), p + ' 页的 core 缓存键不是当前版号');
+        assert.ok(new RegExp(p + '-i18n\\.js\\?v=0\\.9\\.370').test(h), p + ' 页的 i18n 缓存键不是当前版号');
         assert.ok(new RegExp("page: '" + p + "'").test(h), p + ' 页的 page 名与文件名对不上');
         assert.ok(/navigator\.sendBeacon\('\/api\/tool-event'/.test(h), p + ' 页没走 sendBeacon');
         assert.ok(/fetch\('\/api\/tool-event'/.test(h), p + ' 页没有 fetch 兜底（没有 sendBeacon 的浏览器就丢了）');
@@ -15536,7 +15562,7 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
     assert.ok(/if \(soft\) \{\s*const cd = eCooldownMs\(readConfig\(\)\);\s*if \(cd > 0\) E_COOLDOWN\.until = Date\.now\(\) \+ cd;\s*\}/.test(tf),
       '冷却没绑在软失败判死分支里（硬失败冷却会白白停用通道）');
     assert.ok(/eTaskFail\(dTaskId, e\)/.test(tf) || /eTaskFail\(dTaskId, e\)/.test(sv), 'eTaskFail 调用签名被改了');
-    assert.ok(/E_COOLDOWN\.until = 0;\s*\/\/ v0\.9\.369：成功一次立刻解除/.test(sv) ||
+    assert.ok(/E_COOLDOWN\.until = 0;\s*\/\/ v0\.9\.370：成功一次立刻解除/.test(sv) ||
               /E_COOLDOWN\.until = 0;.*成功一次立刻解除全局冷却/.test(sv),
       'E 成功时没解除全局冷却（通道已恢复却还在停用）');
     const ca = sv.slice(sv.indexOf('function eClearAll'), sv.indexOf('function eStatus'));
@@ -16191,7 +16217,7 @@ const eqV = (a, b, m) => { if (a !== b) throw new Error((m || '') + ' 期望 ' +
 
 
 /* ============================================================================
-   v0.9.369：中文页（无前缀 URL）的英文正文兜底
+   v0.9.370：中文页（无前缀 URL）的英文正文兜底
    —— 界面语言按浏览器语言切换（不支持的语言落英文），但底部 SEO 正文与 <title>
       是服务端按 URL 语言注入的，无前缀 URL 恒为中文 → 英文访客看到中文正文。
       服务端在 zh 路由多塞一份英文进 <template>，seo-alt.js 按 <html lang> 换上/换回。
@@ -16237,7 +16263,7 @@ t('v0.9.368：ASSET_VER 与全站版号一致', () => {
 });
 
 /* ============================================================================
-   v0.9.369：merge 页 728KB 内联脚本拆成外链
+   v0.9.370：merge 页 728KB 内联脚本拆成外链
    —— merge.html 原来是 987KB，其中 728KB 是一个内联 <script>（525KB 是界面词典）。
       静态 JS 线上是 max-age=14400，HTML 是 no-cache，所以内联等于「每次回访都重下」；
       拆成 merge-ui.js 后回访 4 小时内 0 请求，首访体积不变。
@@ -16261,12 +16287,41 @@ t('v0.9.369：merge.html 不再内联大段脚本', () => {
 });
 
 t('v0.9.369：merge-ui.js 为严格模式且词典完整', () => {
-  const js = readT('merge-ui.js');
+  /* v0.9.370：词典拆成「主文件 27 语 + i18n/mg-*.js 73 片」，完整性要看全部。
+     ⚠️ 不能拿「\n  'xx': {」数总数：主文件里还有示例数据这类同缩进对象，
+        会多出几条假语言（实测多 4 条）。主文件用括号配对只认 I18N 的顶层键。 */
+  const js = MERGE_UI_CORE;
   assert.ok(/^\s*('use strict'|"use strict")/.test(js.replace(/^\/\*[\s\S]*?\*\/\s*/, '')),
     'merge-ui.js 顶部丢了 use strict（原内联是严格模式）');
   assert.ok(/const I18N = \{/.test(js), '缺 I18N 词典');
-  const langs = [...js.matchAll(/(?:^|\n)  '([a-zA-Z-]+)':\s*\{/g)].map(x => x[1]);
-  assert.ok(langs.length >= 27, '词典语言只剩 ' + langs.length + ' 种');
+  const coreLangs = (function () {
+    const i = js.indexOf('const I18N = {');
+    if (i < 0) return [];
+    const out = [];
+    let dep = 0, q = null, esc = false;
+    for (let p = js.indexOf('{', i); p < js.length; p++) {
+      const ch = js[p];
+      if (q) { if (esc) esc = false; else if (ch === '\\') esc = true; else if (ch === q) q = null; continue; }
+      if (ch === "'" || ch === '"' || ch === '`') { q = ch; continue; }
+      if (ch === '{') {
+        dep++;
+        if (dep === 2) {
+          const ls = js.lastIndexOf('\n', p) + 1;
+          const m = /^\s*'([a-zA-Z-]{2,7})'\s*:\s*$/.exec(js.slice(ls, p));
+          if (m) out.push(m[1]);
+        }
+        continue;
+      }
+      if (ch === '}') { dep--; if (dep === 0) break; }
+    }
+    return out;
+  })();
+  const shardLangs = [...MERGE_SHARDS.matchAll(/^window\.MG_SHARD\['([a-zA-Z-]{2,7})'\] = \{/gm)].map(x => x[1]);
+  const langs = coreLangs.concat(shardLangs);
+  assert.strictEqual(coreLangs.length, 27, '主文件应内置 27 语，实际 ' + coreLangs.length);
+  assert.strictEqual(langs.length, MG_LANGS, '词典语言 ' + langs.length + ' 种，UI_LANGS 列了 ' + MG_LANGS + ' 种');
+  const dupL = langs.filter((x, i) => langs.indexOf(x) !== i);
+  assert.strictEqual(dupL.length, 0, '语言重复定义（主文件与分片撞车）: ' + dupL.join(','));
   ['zh-CN', 'en', 'ja', 'de'].forEach(l => assert.ok(langs.indexOf(l) >= 0, '缺语言 ' + l));
   /* 403 个键是每语的基准；少一个就会出现「某按钮回退英文」 */
   const block = /(?:^|\n)  'en':\s*\{([\s\S]*?)\n  \}/.exec(js);
@@ -16274,3 +16329,145 @@ t('v0.9.369：merge-ui.js 为严格模式且词典完整', () => {
   const nKeys = (block[1].match(/(?:^|\n)\s{4}[a-zA-Z_][a-zA-Z0-9_]*\s*:/g) || []).length;
   assert.ok(nKeys >= 400, 'en 只有 ' + nKeys + ' 个键');
 });
+
+
+/* ============================================================================
+   v0.9.370：merge 词典按语言拆片
+   —— 369 把内联脚本拆成 merge-ui.js，省下了「回访」；但 100 语整包让首访从
+      291KB 涨到 966KB。这里照主站 i18n/ui-*.js + ui-boot.js 的做法再拆一层：
+      27 语内置（回访仍是 0 请求），73 语各一片，只加载当前这一份。
+   ============================================================================ */
+console.log('\n— merge 词典分片 —');
+
+t('v0.9.370：73 个非内置语言各有分片，与 UI_LANGS 严格一一对应', () => {
+  const m27 = /const MG_UI27 = \[([\s\S]*?)\];/.exec(MERGE_UI_CORE);
+  assert.ok(m27, '缺 MG_UI27（内置语言白名单）');
+  const core = [...m27[1].matchAll(/'([a-zA-Z-]+)'/g)].map(x => x[1]);
+  assert.strictEqual(core.length, 27, 'MG_UI27 应为 27 个，实际 ' + core.length);
+  /* 与主站 site-i18n.js 的 UI27 必须同集合，否则同一语言在主页和本页会错位 */
+  const ui27 = /const UI27 = \[([\s\S]*?)\];/.exec(DICT_SRC);
+  assert.ok(ui27, 'site-i18n.js 缺 UI27');
+  const siteCore = [...ui27[1].matchAll(/'([a-zA-Z-]+)'/g)].map(x => x[1]);
+  assert.strictEqual(core.slice().sort().join(','), siteCore.slice().sort().join(','),
+    'MG_UI27 与主站 UI27 不一致（本页与主页的语言覆盖会错位）');
+
+  const u = /const UI_LANGS = \[([\s\S]*?)\];/.exec(MERGE_UI_CORE);
+  assert.ok(u, '缺 UI_LANGS');
+  const listed = [...u[1].matchAll(/\['([a-zA-Z-]+)'/g)].map(x => x[1]);
+  const want = listed.filter(l => core.indexOf(l) < 0).sort();
+  const dir = pathT.join(__dirname, 'i18n');
+  const got = fsT.readdirSync(dir)
+    .filter(f => /^mg-[a-z]{2,3}(-[A-Za-z]{2,4})?\.js$/.test(f))
+    .map(f => f.replace(/^mg-/, '').replace(/\.js$/, '')).sort();
+  assert.strictEqual(got.length, 73, '分片数应为 73，实际 ' + got.length);
+  assert.strictEqual(got.join(','), want.join(','),
+    '分片与「UI_LANGS − MG_UI27」不一致\n  多出来的: ' + got.filter(x => want.indexOf(x) < 0).join(',') +
+    '\n  缺的: ' + want.filter(x => got.indexOf(x) < 0).join(','));
+});
+
+t('v0.9.370：每片都是 403 条，键集与英文逐键相同', () => {
+  const vmT = require('vm');
+  /* 主文件里的 27 语求值，拿 en 当基准 */
+  const at = MERGE_UI_CORE.indexOf('{', MERGE_UI_CORE.indexOf('const I18N = {'));
+  let dep = 0, q = null, esc = false, end = -1;
+  for (let p = at; p < MERGE_UI_CORE.length; p++) {
+    const ch = MERGE_UI_CORE[p];
+    if (q) { if (esc) esc = false; else if (ch === '\\') esc = true; else if (ch === q) q = null; continue; }
+    if (ch === "'" || ch === '"' || ch === '`') { q = ch; continue; }
+    if (ch === '{') dep++;
+    else if (ch === '}') { dep--; if (dep === 0) { end = p; break; } }
+  }
+  assert.ok(end > 0, '主文件 I18N 对象没闭合');
+  const I18N = vmT.runInNewContext('(' + MERGE_UI_CORE.slice(at, end + 1) + ')', Object.create(null));
+  const enKeys = Object.keys(I18N.en).sort();
+  assert.strictEqual(enKeys.length, 403, '英文基准应为 403 条，实际 ' + enKeys.length);
+
+  const dir = pathT.join(__dirname, 'i18n');
+  const files = fsT.readdirSync(dir).filter(f => /^mg-[a-z]{2,3}(-[A-Za-z]{2,4})?\.js$/.test(f));
+  /* ⚠️ 分片必须挂 window.MG_SHARD，不能像主站那样直接写 I18N['xx'] = {...}：
+     本页的分片由 merge-boot.js 在解析期注入，执行时早于 merge-ui.js，const I18N
+     还不存在 —— 直接写会 ReferenceError（实测分片 line 11 抛 Uncaught，首屏停在英文）。 */
+  files.forEach(f => {
+    const code = fsT.readFileSync(pathT.join(dir, f), 'utf8');
+    assert.ok(/^window\.MG_SHARD = window\.MG_SHARD \|\| \{\};/m.test(code),
+      f + ' 没有初始化 window.MG_SHARD');
+    assert.ok(!/^I18N\[/m.test(code), f + ' 直接写 I18N[...]，会因时序问题 ReferenceError');
+  });
+  const bad = [];
+  files.forEach(f => {
+    const lang = f.replace(/^mg-/, '').replace(/\.js$/, '');
+    const box = { window: {} };
+    try { vmT.runInNewContext(fsT.readFileSync(pathT.join(dir, f), 'utf8'), box); }
+    catch (e) { bad.push(lang + ': 求值失败 ' + e.message); return; }
+    const d = box.window.MG_SHARD && box.window.MG_SHARD[lang];
+    if (!d) { bad.push(lang + ': 没挂到 window.MG_SHARD[\'' + lang + '\']'); return; }
+    const ks = Object.keys(d).sort();
+    const miss = enKeys.filter(k => ks.indexOf(k) < 0);
+    const extra = ks.filter(k => enKeys.indexOf(k) < 0);
+    if (miss.length || extra.length) {
+      bad.push(lang + ': 缺 ' + miss.length + ' / 多 ' + extra.length +
+        (miss.length ? '（如 ' + miss[0] + '）' : '') + (extra.length ? '（如 ' + extra[0] + '）' : ''));
+    }
+  });
+  assert.strictEqual(bad.length, 0, '分片键集不全（会回落英文）:\n  ' + bad.slice(0, 10).join('\n  '));
+});
+
+t('v0.9.370：解析期同步注入 + 运行时按需加载', () => {
+  const js = MERGE_UI_CORE, bt = MERGE_BOOT;
+  /* 解析期注入必须在 merge-boot.js 里，且用 document.write 同步写：
+     异步、或写在 merge-ui.js 内部，init() 都会先跑，首屏先闪一遍英文（实测踩过：
+     h1 出来是 "Style effects and bilingual merge"）。 */
+  assert.ok(/document\.write\('<script src="\/i18n\/mg-' \+ lang \+ '\.js\?v=' \+ VER/.test(bt),
+    'merge-boot.js 缺 document.write 同步注入');
+  assert.ok(!/document\.write\(/.test(js), 'merge-ui.js 里不该再有 document.write 调用（时序来不及）');
+  assert.ok(!/MergeI18N\.boot/.test(js), 'merge-ui.js 里不该再调 boot（那是 merge-boot.js 的活）');
+  /* 顺序必须是 core → boot → ui：boot 要 document.write，ui 里的 init() 要读词典 */
+  const html = MERGE_HTML;
+  const iCore = html.indexOf('merge-core.js?v=');
+  const iBoot = html.indexOf('merge-boot.js?v=');
+  const iUi = html.indexOf('merge-ui.js?v=');
+  assert.ok(iCore > 0 && iBoot > 0 && iUi > 0, 'merge.html 缺 merge-core / merge-boot / merge-ui 之一');
+  assert.ok(iCore < iBoot && iBoot < iUi,
+    '脚本顺序必须是 core → boot → ui（实际 core=' + iCore + ' boot=' + iBoot + ' ui=' + iUi + '）');
+
+  /* 运行时切语言：并发切同一语言要合并成一次请求，否则会插两个同 src 的 script */
+  assert.ok(/MG_PENDING\[lang\]\.push\(fire\)/.test(js), 'loadShard 没做并发合并');
+  assert.ok(/el\.onload = el\.onerror = function\(\)/.test(js),
+    '分片加载失败没有回调（404 时界面会卡在旧语言）');
+  /* 切语言必须等分片到位再重画 */
+  assert.ok(/window\.MergeI18N\.loadShard\(UI\.lang, \(\)=>\{[\s\S]{0,140}applyI18n\(\);/.test(js),
+    '切语言没等分片加载完就 applyI18n（会停在上一种语言）');
+  /* 内置语言不得触发任何请求 */
+  assert.ok(/if \(!lang \|\| I18N\[lang\] \|\| MG_UI27\.indexOf\(lang\) >= 0\) \{ fire\(\); return; \}/.test(js),
+    '内置语言没走短路（会给 27 语用户白发请求）');
+
+  /* boot 算出来的语言必须被界面采用，不能两边各算一次 */
+  assert.ok(/window\.MG_BOOT_LANG/.test(js), 'merge-ui.js 没采用 MG_BOOT_LANG（两边各算一次会错位）');
+  assert.ok(/window\.MG_BOOT_LANG = lang;/.test(bt), 'merge-boot.js 没把判定结果写进 MG_BOOT_LANG');
+
+  /* 三处 UI27 必须同集合：site-i18n.js / merge-ui.js / merge-boot.js */
+  const grab = (s, name) => {
+    const m = new RegExp('(?:const|let|var) ' + name + ' = \\[([\\s\\S]*?)\\];').exec(s);
+    return m ? [...m[1].matchAll(/'([a-zA-Z-]+)'/g)].map(x => x[1]).sort().join(',') : '';
+  };
+  const a = grab(DICT_SRC, 'UI27');
+  const b = grab(js, 'MG_UI27');
+  const c = grab(bt, 'UI27');
+  assert.ok(a && b && c, 'UI27 三处没找齐：site=' + !!a + ' ui=' + !!b + ' boot=' + !!c);
+  assert.strictEqual(b, a, 'merge-ui.js 的 MG_UI27 与 site-i18n.js 的 UI27 不一致');
+  assert.strictEqual(c, a, 'merge-boot.js 的 UI27 与 site-i18n.js 的 UI27 不一致');
+});
+
+t('v0.9.370：主文件不再夹带 73 语词典（首访体积回归）', () => {
+  const bytes = Buffer.byteLength(MERGE_UI_CORE, 'utf8');
+  assert.ok(bytes < 1024 * 1024,
+    'merge-ui.js 仍有 ' + (bytes / 1024).toFixed(0) + 'KB（拆片后应 <1MB，否则等于没拆）');
+  /* 只在分片里出现的语言，主文件里连词典块都不该有 */
+  ['mi', 'mg', 'ceb', 'ny', 'sn'].forEach(l => {
+    assert.ok(MERGE_UI_CORE.indexOf("  '" + l + "': {") < 0, '主文件里还留着 ' + l + ' 的词典块');
+  });
+  const shardAll = Buffer.byteLength(MERGE_SHARDS, 'utf8');
+  assert.ok(shardAll > 1.5 * 1024 * 1024,
+    '分片合计只有 ' + (shardAll / 1024).toFixed(0) + 'KB，像没拆出来');
+});
+
