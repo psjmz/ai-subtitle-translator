@@ -204,7 +204,7 @@
     .cbox{grid-template-columns:1fr}
   }
 </style>
-<script src="ui-codes.js?v=0.9.366"></script>
+<script src="ui-codes.js?v=0.9.367"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -320,7 +320,7 @@ crossorigin="anonymous"></script>
 <div class="toast" id="toast"></div>
 <div id="tipLayer"></div>
 
-<script src="clean-core.js?v=0.9.366"></script>
+<script src="clean-core.js?v=0.9.367"></script>
 <script>
 'use strict';
 /* =====================================================================
@@ -3307,15 +3307,38 @@ function pathUiLang() {
   if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : CLEAN_UI_LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
   return null;
 }
+function detectUiLang() {
+  /* v0.9.367：与 site-i18n.js / merge.html 统一口径 ——
+     ① 遍历 navigator.languages 的全部候选：原来只看 [0]，
+        ['fo-FO','de-DE'] 这种首项不认识、次项认识的情况会误判；
+     ② 一个都不匹配时兜底英文。原先兜底 zh-CN，非中文访客等于没本地化
+        （v0.9.136 只改了 site-i18n.js 那一份，各页副本漏了）。
+        zh 系浏览器不受影响，仍按简繁分流。 */
+  var prefs;
+  try {
+    prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+    for (var p = 0; p < prefs.length; p++) {
+      var l = String(prefs[p]).toLowerCase();
+      if (l === 'zh' || l.indexOf('zh-') === 0) return /tw|hk|mo|hant/.test(l) ? 'zh-TW' : 'zh-CN';
+      for (var i = 0; i < CLEAN_UI_LANGS.length; i++) {
+        var c = String(CLEAN_UI_LANGS[i][0]).toLowerCase();
+        if (l === c || l.indexOf(c + '-') === 0) return CLEAN_UI_LANGS[i][0];
+      }
+    }
+  } catch (e) { }
+  return 'en';
+}
 function initLang() {
   const sel = $('#langSel');
   sel.innerHTML = CLEAN_UI_LANGS.map(function (p) {
     return '<option value="' + p[0] + '">' + p[1] + '</option>';
   }).join('');
-  let saved = 'zh-CN';
-  try { saved = localStorage.getItem('srt_clean_lang') || 'zh-CN'; } catch (e) { saved = 'zh-CN'; }
-  if (!CLEAN_UI_LANGS.some(function (x) { return x[0] === saved; })) saved = 'zh-CN';
-  LANG = pathUiLang() || saved;
+  let saved = null;
+  try { saved = localStorage.getItem('srt_clean_lang'); } catch (e) { saved = null; }
+  /* v0.9.367：没存过选择时才看浏览器语言，最后兜底英文（原先缺省直接中文，
+     连「已支持」的语言（如波兰语）都会落中文，因为这里根本没读 navigator）。 */
+  if (saved && !CLEAN_UI_LANGS.some(function (x) { return x[0] === saved; })) saved = null;
+  LANG = pathUiLang() || saved || detectUiLang();
   sel.value = LANG;
   sel.addEventListener('change', function () {
     LANG = sel.value;
@@ -3334,7 +3357,7 @@ function initLang() {
   render();
 })();
 </script>
-<script src="site-topnav.js?v=0.9.366" data-tool="cl"></script>
+<script src="site-topnav.js?v=0.9.367" data-tool="cl"></script>
 
 <!-- v0.9.273：SEO 静态文案（同上，按语言路由替换；直接开文件时显示简体中文默认版） -->
 <!--SEO-COPY-START-->

@@ -189,7 +189,7 @@
   /* 句末标点有的是 8 个以上（中文带 ASCII 兜底），允许换行别撑破卡片 */
   #ruleSent{white-space:normal;word-break:break-all}
 </style>
-<script src="ui-codes.js?v=0.9.366"></script>
+<script src="ui-codes.js?v=0.9.367"></script>
 </head>
 <body>
 <div class="wrap">
@@ -329,13 +329,13 @@
   <footer>
     <span data-i18n="footNote">全程在浏览器本地完成，字幕不上传服务器</span>
     <a href="/guides/" id="goGuide" style="color:var(--sub)" data-i18n="navGuide">看怎么用</a>
-    <span class="ver">v0.9.366</span>
+    <span class="ver">v0.9.367</span>
   </footer>
 </div>
 
-<script src="ytfix-i18n.js?v=0.9.366"></script>
-<script src="/i18n/tp-boot.js?v=0.9.366"></script>
-<script src="ytfix-core.js?v=0.9.366"></script>
+<script src="ytfix-i18n.js?v=0.9.367"></script>
+<script src="/i18n/tp-boot.js?v=0.9.367"></script>
+<script src="ytfix-core.js?v=0.9.367"></script>
 <script>
 (function () {
   'use strict';
@@ -409,14 +409,25 @@
   var PACK = null;   /* tp 分片里本页的词条（73 语才有） */
 
   function detectUiLang() {
+    /* v0.9.367：与 site-i18n.js / merge.html 统一口径 ——
+       ① 遍历 navigator.languages 的全部候选：原来只看 [0]，
+          ['fo-FO','de-DE'] 这种首项不认识、次项认识的情况会误判；
+       ② 一个都不匹配时兜底英文。原先兜底 zh-CN，非中文访客等于没本地化
+          （v0.9.136 只改了 site-i18n.js 那一份，各页副本漏了）。
+          zh 系浏览器不受影响，仍按简繁分流。 */
+    var prefs;
     try {
-      var ls = String((navigator.languages && navigator.languages[0]) || navigator.language || 'zh-CN').toLowerCase();
-      if (ls.indexOf('zh') === 0) return /tw|hk|hant/.test(ls) ? 'zh-TW' : 'zh-CN';
-      for (var i = 0; i < UI.length; i++) {
-        if (ls.indexOf(String(UI[i][0]).toLowerCase()) === 0) return UI[i][0];
+      prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+      for (var p = 0; p < prefs.length; p++) {
+        var l = String(prefs[p]).toLowerCase();
+        if (l === 'zh' || l.indexOf('zh-') === 0) return /tw|hk|mo|hant/.test(l) ? 'zh-TW' : 'zh-CN';
+        for (var i = 0; i < UI.length; i++) {
+          var c = String(UI[i][0]).toLowerCase();
+          if (l === c || l.indexOf(c + '-') === 0) return UI[i][0];
+        }
       }
     } catch (e) { }
-    return 'zh-CN';
+    return 'en';
   }
   function pathUiLang() {
     try {
@@ -954,6 +965,6 @@
   </section>
 <!--SEO-COPY-END-->
 
-<script src="site-topnav.js?v=0.9.366" data-tool="yt"></script>
+<script src="site-topnav.js?v=0.9.367" data-tool="yt"></script>
 </body>
 </html>
