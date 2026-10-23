@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "AI-SRTSub - Pomeranje vremenske linije titla - Pomerajte, skalirajte, spajajte i razdvajajte",
+    "title": "Pomeranje vremenske linije titla - Pomerajte i skalirajte | AI-SRTSub",
     "desc": "Besplatni mrežni alat za tajming titlova: pomerite sve odjednom, skalirajte po srazmeri ili popravite kašnjenje pomoću dve sidrene tačke. Radi sa SRT, VTT, ASS, SBV, LRC i TXT formatima.",
     "kw": "pomeranje tajminga titla,pomeri srt tajming,podešavanje sinhronizacije titla,skaliraj tajming titla,popravi kašnjenje titla,srt vremenski pomak,popravka kašnjenja titla,spajanje titlova,razdvajanje titlova,kombinuj srt,razdvoji dugi titl",
     "intro": "Kada titlovi nisu u sinhronizaciji, pomestite celu vremensku liniju, skalirajte je srazmerno ili je popravite sa dve sidrene tačke. Takođe može spojiti linije koje su bile razdvojene i razdvojiti one koje traju predugo.",

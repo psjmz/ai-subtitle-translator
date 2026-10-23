@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Mabadiliko ya Ratiba ya Muda ya Manukuu - Sogeza, Pima Upya, Unganisha na Gawanya | AI-SRTSub",
+    "title": "Badilisha Muda wa Manukuu: Sogeza, Pima, Unganisha | AI-SRTSub",
     "desc": "Chombo cha muda wa manukuu mtandaoni cha bure: sogeza kila kitu kwa mara moja, pima upya kwa uwiano, au rekebisha mteremko kwa pointi mbili za nanga. Inafanya kazi na SRT, VTT, ASS, SBV, LRC na TXT.",
     "kw": "mabadiliko ya muda wa manukuu,sogeza muda wa srt,rekebisha usawazishaji wa manukuu,pima upya muda wa manukuu,rekebisha kuchelewa kwa manukuu,kukosekana kwa muda wa srt,rekebisha mteremko wa manukuu,unganisha manukuu,gawanya manukuu,changanya srt,gawanya manukuu marefu",
     "intro": "Wakati manukuu hayajasawazishwa, sogeza ratiba nzima ya muda, ipime upya kwa uwiano, au irekebishe kwa pointi mbili za nanga. Inaweza pia kuunganisha mistari iliyotenganishwa, na kugawanya ile inayokaa kwa muda mrefu sana.",
@@ -178,7 +178,7 @@
     "jsonldAlt": "LRC Lyric Timing Editor"
   },
   "ytfix": {
-    "title": "Kirekebishaji cha Manukuu ya YouTube - Unganisha Sentensi Zilizokatika | AI-SRTSub",
+    "title": "Kirekebishaji Manukuu ya YouTube: Unganisha Sentensi | AI-SRTSub",
     "desc": "YouTube auto-captions hukata sentensi kila sekunde 3-4. Zana hii huweka maneno yote na kurekebisha mipaka ya vichwa hadi mwisho halisi wa sentensi. Bure kabisa, lugha 100.",
     "kw": "kurekebisha manukuu ya youtube,manukuu ya kiotomatiki ya youtube,kupanga upya manukuu,upangaji wa sentensi za manukuu,kurekebisha manukuu yaliyovunjika,upangaji wa sentensi za srt,kugawanya upya manukuu,kurekebisha manukuu ya youtube,manukuu yanayotambua sentensi",
     "intro": "Weka faili ya manukuu ya YouTube, chagua lugha, na zana hii itaunganisha sentensi zilizokatika na kuzikata upya kulingana na sentensi. Hakuna neno linalobadilishwa, na nyakati za manukuu hubaki karibu iwezekanavyo na zile za asili.",

@@ -42,7 +42,7 @@
     "jsonldAlt": "Subtitle Glossary Batch Replace"
   },
   "qc": {
-    "title": "Control de qualitat de subtítols - Comprova el temps i el disseny per idioma | AI-SRTSub",
+    "title": "Control de qualitat de subtítols: revisa temps i disseny | AI-SRTSub",
     "desc": "Control de qualitat de subtítols en línia gratuït: puja SRT, VTT o ASS i comprova superposicions, durada, velocitat de lectura, amplada de línia, salts de línia, numeració i codificació segons les regles d'aquell idioma. 27 idiomes, 27 conjunts de llindars, a més de regles específiques de l'idioma.",
     "kw": "verificador de subtítols,control de qualitat de subtítols,validador srt,comprovació de qualitat de subtítols,comprovació srt,comprovació de temps de subtítols,validador de subtítols,comprovar fitxer srt,correcció de subtítols,linter de subtítols",
     "intro": "Puja un fitxer de subtítols i comprova'l segons les regles del seu propi idioma: cada troballa inclou el valor mesurat i el llindar. S'executa completament al teu navegador, no es puja res.",
@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Desplaçament de la línia de temps de subtítols - Mou, reescala, fusiona i divideix | AI-SRTSub",
+    "title": "Desplaçament de subtítols: mou, reescala, fusiona i divideix | AI-SRTSub",
     "desc": "Eina de temporització de subtítols en línia gratuïta: desplaça-ho tot alhora, reescala segons una ràtio o corregeix el desfasament amb dos punts d'ancoratge. Funciona amb SRT, VTT, ASS, SBV, LRC i TXT.",
     "kw": "desplaçament de temps de subtítols,desplaçar temporització srt,ajust de sincronització de subtítols,reescalar temporització de subtítols,corregir retard de subtítols,desplaçament de temps srt,correcció de desfasament de subtítols,fusionar subtítols,dividir subtítols,combinar srt,dividir subtítol llarg",
     "intro": "Quan els subtítols estan desincronitzats, mou tota la línia de temps, reescala-la segons una ràtio o corregeix-la amb dos punts d'ancoratge. També pot fusionar línies que es van separar i dividir les que duren massa.",

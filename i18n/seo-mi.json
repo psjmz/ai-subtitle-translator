@@ -15,7 +15,7 @@
     "copy": "<section class=\"seo\" aria-label=\"Mō tēnei taputapu\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Kaiwhakamāori Taitara Matua Aunoa AI Koreutu</h2>\n    <p data-i18n-html=\"seoIntro\">He <strong>taputapu whakamāori taitara matua ipurangi koreutu e whakakahangia ana e ngā tauira reo nui</strong>. Tukuake i ngā kōnae SRT, VTT rānei ASS me te whakamāori taitara matua i waenga i te reo Pākehā, Hainamana, Hapanihi, Kōhia, Pāniora, Wīwī me ētahi atu reo 15+. Kāore he rārangi ingoa, kāore he tāutanga, kāore he waitohu wai — whakatuwheratia ki te pūtirotiro ka tīmata ki te whakamāori. Ka noho tonu ngā raraunga taitara matua ki tō pūtirotiro mā te kore koe e whakaae ki te whakamāori kapua.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Ngā āhuatanga matua:</strong> te tātari SRT, VTT me ASS me te whakamāori AI, te whakakotahi rerenga kōrero atamai (ka whakakotahihia ngā tohu, ka whakamāorihia, kātahi ka wawaehia anō ki te rārangi wā taketake), te whakahāngai rārangi wā, te takai rārangi aunoa mō te kuputuhi CJK me te Tai Hauāuru, te tango kupu kī, te whakahaere kupu ritenga, me ngā kāhua whakamāori ka taea te kōwhiri. Kaweake i ngā kōnae SRT, VTT, ASS rānei TXT kua rite ki te tuhi mārō ki runga i tō ataata.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Ko wai e whakamahi ana:</strong> ngā kaiwhakamāori ataata, ngā kaihanga YouTube me ngā kaiwhakamāori rohe, ngā ākonga reo, ngā rōpū taitara matua me ngā tīma e hiahia ana ki te whakarōpū wawe i ngā ihirangi ataata.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Kei te hiahia tēnei taputapu i a JavaScript. Whakahohea a JavaScript ki tō pūtirotiro, kātahi ka tukuake i tētahi kōnae taitara matua (SRT / VTT / ASS) hei whakamāori taitara matua ki te AI mō te koreutu.</p>\n  </noscript>"
   },
   "merge": {
-    "title": "Kaihanga Taitara Matua Whakapaipai - Whakakotahi Reo Rua, ASS me ngā Pānga VTT",
+    "title": "Kaihanga Taitara: Whakakotahi Reo Rua, ASS me VTT | AI-SRTSub",
     "desc": "Taputapu koreutu mō ngā taitara matua whakapaipai: whakakotahi i ngā kōnae e rua ki te reo rua, whakahou i tētahi ara reo rua, tāpiri pānga rānei. 5 ngā tautuhinga mua ASS / 6 VTT; kaweake hei SRT / VTT / ASS.",
     "kw": "whakakotahi taitara matua,taitara matua reo rua,whakakotahi kōnae taitara matua,taitara matua whakapaipai,kāhua taitara matua ASS,kāhua taitara matua VTT,pānga taitara matua,kaihanga taitara matua takirua,rautaki ASS,tauira taitara matua,taputapu taitara matua koreutu",
     "intro": "Whakakotahihia ngā kōnae taitara matua e rua ki te reo rua, whakahou rānei i tētahi ara: momotuhi, tae, rārangi waho me te tūranga, he WYSIWYG katoa.",
@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Nekehanga Rārangi Wā Taitara - Neke, Tauine, Whakakotahi me te Wehea | AI-SRTSub",
+    "title": "Nekehanga Rārangi Wā: Neke, Tauine, Wehea me te Whakakotahi | AI-SRTSub",
     "desc": "Taputapu wā taitara ipurangi koreutu: nekehia ngā mea katoa i te wā kotahi, tauine mā te ōwehenga, whakatika rānei i te rereketanga me ngā ira punga e rua. Ka mahi ki te SRT, VTT, ASS, SBV, LRC me te TXT.",
     "kw": "nekehanga wā taitara,neke wā srt,whakatika tukutahi taitara,tauine wā taitara,whakatika taro taitara,utu wā srt,whakatika rerekē taitara,whakakotahi taitara,wehea taitara,whakakotahi srt,wehea taitara roa",
     "intro": "Ina puta ngā taitara i te tukutahi, nekehia te rārangi wā katoa, tauinehia mā te ōwehenga, whakatika rānei ki ngā ira punga e rua. Ka taea hoki te whakakotahi i ngā rārangi i wehea, me te wehea i ngā mea e rere roa ana.",
@@ -178,7 +178,7 @@
     "jsonldAlt": "LRC Lyric Timing Editor"
   },
   "ytfix": {
-    "title": "Kaiwhakatika Sara YouTube - Whakahokia ngā rerenga kōrero kua pakaru | AI-SRTSub",
+    "title": "Kaiwhakatika Sara YouTube: Whakahokia ngā Rerenga Kōrero | AI-SRTSub",
     "desc": "Ka tapahia e ngā tapanga aunoa a YouTube ngā rerenga kōrero i ia hēkona 3 ki te 4. Mā tēnei taputapu e neke ngā rohe ki te mutunga tūturu o te rerenga kōrero. He koreutu, 100 ngā reo.",
     "kw": "whakatika sara youtube,sara aunoa youtube,whakahāngai sara,whakahāngai rerenga kōrero sara,whakatika sara pakaru,whakahāngai rerenga kōrero srt,wehewehe anō i te sara,whakatika sara youtube,sara mōhio ki te rerenga kōrero",
     "intro": "Takaia he kōnae sara i hangaia aunoatia e YouTube, kōwhiria te reo, ā, mā te taputapu e tuitui ngā rerenga kōrero puta noa i ngā wāhanga, kātahi ka tapahi anō i te kōnae ia rerenga kōrero. Kāore tētahi kupu e huri, ā, ka noho ngā wā o ngā wāhanga kia tata ki ngā tohu wā taketake.",

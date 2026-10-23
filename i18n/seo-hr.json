@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Pomak vremenske trake titlova – Pomaknite, promijenite ljestvicu, spojite i razdvojite | AI-SRTSub",
+    "title": "Pomak vremenske trake titlova – Sinkronizacija i uređivanje | AI-SRTSub",
     "desc": "Besplatni mrežni alat za tajming titlova: pomaknite sve odjednom, promijenite ljestvicu prema omjeru ili ispravite odstupanje s dvije sidrišne točke. Radi sa SRT, VTT, ASS, SBV, LRC i TXT formatima.",
     "kw": "pomak tajminga titlova,pomakni srt tajming,prilagodba sinkronizacije titlova,promijeni ljestvicu tajminga titlova,ispravi kašnjenje titlova,srt vremenski pomak,ispravak odstupanja titlova,spoji titlove,razdvoji titlove,kombiniraj srt,razdvoji dugi titl",
     "intro": "Kada titl nije sinkroniziran, pomaknite cijelu vremensku traku, promijenite joj ljestvicu prema omjeru ili je ispravite s dvjema sidrišnim točkama. Također može spojiti retke koji su bili razdvojeni i razdvojiti one koji traju predugo.",

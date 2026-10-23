@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Titrų laiko juostos poslinkis – perkėlimas, keitimas, sujungimas ir skaidymas | AI-SRTSub",
+    "title": "Titrų laiko poslinkis: keitimas, sujungimas ir skaidymas | AI-SRTSub",
     "desc": "Nemokamas internetinis titrų laiko įrankis: paslinkite viską iš karto, perkeiskite mastelį santykiu arba ištaisykite slydimą naudodami du atskaitos taškus. Veikia su SRT, VTT, ASS, SBV, LRC ir TXT.",
     "kw": "titrų laiko poslinkis,paslinkti srt laiką,titrų sinchronizavimo koregavimas,keisti titrų laiko mastelį,ištaisyti titrų vėlavimą,srt laiko poslinkis,titrų slydimo taisymas,sujungti titrus,skaidyti titrus,apjungti srt,skaidyti ilgus titrus",
     "intro": "Kai titrai nesusigrupiuoti, perkelkite visą laiko juostą, pakeiskite jos mastelį santykiu arba pataisykite naudodami du atskaitos taškus. Tai taip pat gali sujungti atskirai padalytas eilutes ir padalyti per ilgai veikiančias.",
@@ -90,7 +90,7 @@
     "jsonldAlt": "Subtitle Timeline Shift"
   },
   "repair": {
-    "title": "Ištaisykite sugadintus titrus – sutaisykite „mojibake“ / neteisingą kodavimą | AI-SRTSub",
+    "title": "Ištaisykite sugadintus titrus – sutaisykite kodavimą | AI-SRTSub",
     "desc": "Nemokamas internetinis sugadintų titrų taisymas: aptinka, ar failas yra UTF-8, GBK, Big5, Shift_JIS arba EUC-KR, atkuria neteisingai perskaitytą tekstą ir iš naujo įrašo jūsų leistuvui.",
     "kw": "taisyti sugadintus titrus,titrų mojibake,srt kodavimo taisymas,taisyti titrų kodavimą,utf8 į gbk titrai,srt rodo keistus simbolius,neteisingas titrų kodavimas,ass sugadintas,vtt sugadintas,aptikti titrų kodavimą",
     "intro": "Titrai, kurie atsidaro kaip nesąmonių siena, beveik visada nuskaitomi naudojant neteisingą kodavimą. Įkelkite failą, o sistema nustatys, koks kodavimas buvo iš tikrųjų naudojamas, ir sugrąžins neteisingai perskaitytus simbolius.",

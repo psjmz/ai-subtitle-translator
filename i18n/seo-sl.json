@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Zamec časovnice podnapisov – Premik, ponovno merjenje, združevanje in razdeljevanje | AI-SRTSub",
+    "title": "Zamik podnapisov: premik, merjenje in urejanje | AI-SRTSub",
     "desc": "Brezplačno spletno orodje za časovnice podnapisov: hkratni premik vsega, ponovno merjenje po razmerju ali odpravljanje zamika z dvema sidrnima točkama. Deluje s formati SRT, VTT, ASS, SBV, LRC in TXT.",
     "kw": "premik časovnice podnapisov,premakni časovnico srt,prilagoditev sinhronizacije podnapisov,ponovno merjenje časovnice podnapisov,popravi zakasnitev podnapisov,časovni zamik srt,popravek zamika podnapisov,združi podnapise,razdeli podnapise,združi srt,razdeli dolge podnapise",
     "intro": "Ko podnapisi niso sinhronizirani, premaknite celotno časovnico, jo ponovno izmerite po razmerju ali jo popravite z dvema sidrnima točkama. Prav tako lahko združuje ločene vrstice in razdeli tiste, ki trajajo predolgo.",

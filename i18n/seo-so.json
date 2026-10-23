@@ -3,10 +3,10 @@
     "htmlLang": "so",
     "ogLocale": "so_SO",
     "siteName": "AI-SRTSub",
-    "title": "AI-SRTSub - Filimada Caalamiga ah iyo Taxanaha, Qoraal-hoosaadyada Luqaddaada",
+    "title": "Filimada iyo Taxanaha: Qoraal-hoosaadyo Luqaddaada | AI-SRTSub",
     "desc": "Turjumaan qoraal-hoosaad AI ah oo lacag la'aan ah — diiwaangelin la'aan, xadidnayn, astaamayn la'aan. Ku turjumi luqaddaada qoraal-hoosaadyada filimada, taxanaha iyo dukumentiyada adduunka hal guji.",
     "kw": "turjumaan qoraal-hoosaad AI,turjumi qoraal-hoosaadyada,turjumaan qoraal-hoosaad lacag la'aan ah,turjumi faylka SRT,turjumi VTT,turjumi ASS,turjumaada qoraal-hoosaadka filimada,qoraal-hoosaadka taxanaha TV,qoraal-hoosaadka Netflix,qoraal-hoosaadka KDrama,qoraal-hoosaadka anime,qoraal-hoosaad laba luqadood ah,qoraal-hoosaadka filimada shisheeye,turjumi qoraal-hoosaadyada online,qoraal-hoosaadka YouTube,qalabka turjumaada qoraal-hoosaadka lacag la'aan ah,turjumi qoraal-hoosaadyada lacag la'aan,turjumaan SRT oo lacag la'aan ah",
-    "ogTitle": "AI-SRTSub - Filimada Caalamiga ah iyo Taxanaha, Qoraal-hoosaadyada Luqaddaada",
+    "ogTitle": "Filimada iyo Taxanaha: Qoraal-hoosaadyo Luqaddaada | AI-SRTSub",
     "ogDesc": "Turjumaan qoraal-hoosaad AI oo 100% lacag la'aan ah taageerayaasha filimada: hal guji ayaa qoraal-hoosaadka filimada, taxanaha iyo dukumentiyada shisheeyaha ugu beddelaysa luqaddaada hooyo, iyadoo waqtigooda si toos ah loo waafajinayo. Ku raaxayso nuxurka caalamiga ah caqabad la'aan.",
     "jsonldName": "AI-SRTSub",
     "jsonldAlt": "随心字幕 AI",
@@ -23,7 +23,7 @@
     "who": "Abuurayaasha sameeya qoraal-hoosaad laba luqadood ah ama la qaabeeyey, kooxaha crypting-ka, iyo kooxaha u baahan xarfaha la heli karo."
   },
   "clean": {
-    "title": "Nadiifiyaha Qoraal-hoosaadka — Ka saar Calaamadaha Biyaha, Cue-yada SDH & Calaamadaha HTML",
+    "title": "Nadiifiyaha Qoraal-hoosaadka: Ka saar Calaamadaha & HTML",
     "desc": "Nadiifiyaha qoraal-hoosaadka online-ka ah ee lacag la'aan ah: ka saar calaamadaha biyaha, xayeysiisyada, SDH, calaamadaha HTML, saamaynta ASS; hagaaji xarfaha waaweyn, mojibake. 13 xeer oo la beddeli karo, celin beddel kasta ah, waqtiga oo aan la taaban.",
     "kw": "nadiifiyaha qoraal-hoosaadka,nadiifi faylka srt,ka saar calaamadda biyaha qoraal-hoosaadka,ka saar qoraal-hoosaadka SDH,ka saar calaamadaha HTML ee qoraal-hoosaadka,hagaaji qoraal-hoosaadka xarfaha waaweyn oo dhan,hagaaji mojibake,ka saar qoraal-hoosaadka dadka maqalkoodu liito,ka saar saamaynta ASS",
     "intro": "Soo geli qoraal-hoosaad la soo dejiyay halkan marka hore: calaamadaha biyaha, xayeysiisyada, cue-yada SDH iyo calaamadaha HTML, hal mar ayay meesha uga baxayaan.",
@@ -31,7 +31,7 @@
     "who": "Qof kasta oo qaatay qoraal-hoosaad jira oo doonaya inuu isticmaalo, iyo kooxaha wax ku nadiifiya koox ahaan."
   },
   "glossary": {
-    "title": "Beddelidda Erayada Qoraal-hoosaadka - Hal Qaamuus, Faylka Oo Dhan | AI-SRTSub",
+    "title": "Beddelidda Erayada Qoraal-hoosaadka: Hal Qaamuus | AI-SRTSub",
     "desc": "Eray-bixiye beddelka qoraal-hoosaadka: qor \"kii hore → cusub\" hal mar waxaana cusbooneysamaya faylka oo dhan ee SRT / VTT / ASS / TXT. Waqtiga, qaababka iyo xannibaadaha NOTE way sugnaanayaan; celin sadar kasta ah.",
     "kw": "eray-bixiyaha qoraal-hoosaadka,beddelka batch ee srt,hel oo beddel qoraal-hoosaadka,beddelka erayga qoraal-hoosaadka,tifaftirka batch ee srt,beddel erayada qoraal-hoosaadka,midabee magacyada qoraal-hoosaadka,eray-bixinta qoraal-hoosaadka,beddel qoraalka vtt,qalabka eray-bixiyaha srt,beddelka eray-bixinta batch",
     "intro": "Eray-bixiye ka kooban xeerarka \"eraygii hore → eraygii cusub\" oo lagu dabaqay faylka qoraal-hoosaadka oo dhan hal mar, iyadoo waqtiga, qaababka ASS iyo xannibaadaha qoraalka VTT ay ahaanayaan kuwo isku mid ah.",
@@ -68,7 +68,7 @@
     "jsonldAlt": "Subtitle Converter"
   },
   "bilingual": {
-    "title": "Qaybiyaha Qoraal-hoosaadka Laba-luqadood ah — Hayso Hal Luqad oo Keliya | AI-SRTSub",
+    "title": "Qaybiyaha Qoraal-hoosaadka Laba-luqadood | AI-SRTSub",
     "desc": "Qaybiyaha qoraal-hoosaadka laba-luqadood ah ee online-ka ah ee lacag la'aan ah: u qaybi faylka qoraal-hoosaadka laba-luqadood ah waddo asal ah iyo waddo la turjumay, ama hayso mid keliya.",
     "kw": "qaybiyaha qoraal-hoosaadka laba-luqadood ah,u qaybi srt laba-luqadood ah,ka saar qoraal-hoosaadka luqadda labaad,hayso qoraal-hoosaadka Ingiriiska oo keliya,soo saar qoraal-hoosaadka la turjumay,qaybinta srt laba-luqadood ah,qaybinta ass laba-luqadood ah",
     "intro": "U qaybi faylka qoraal-hoosaadka laba-luqadood ah waddo asal ah iyo waddo la turjumay, ama hayso mid ka mid ah oo keliya.",
@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Beddelka Waqtiga Qoraal-hoosaadka - Dhaqaaq, Dib u cabbir, Mideey oo Kala qaybi | AI-SRTSub",
+    "title": "Beddelka Waqtiga Qoraal-hoosaadka: Dhaqaaq & Mideey | AI-SRTSub",
     "desc": "Qalabka wakhtiga qoraal-hoosaadka online-ka ah ee lacag la'aan ah: u dhaqaaq wax walba hal mar, ku dib-u-cabbir saamayn, ama ku hagaaji dib u dhaca laba dhibcood oo saldhig ah. Wuxuu la shaqeeyaa SRT, VTT, ASS, SBV, LRC iyo TXT.",
     "kw": "beddelka wakhtiga qoraal-hoosaadka,dhaqaaq wakhtiga srt,hagaajinta is waafajinta qoraal-hoosaadka,dib u cabbir wakhtiga qoraal-hoosaadka,hagaaji daahitaanka qoraal-hoosaadka,magdhowga wakhtiga srt,hagaajinta leexashada qoraal-hoosaadka,isku dar qoraal-hoosaadka,kala qaybi qoraal-hoosaadka,isku dar srt,kala qaybi qoraal-hoosaadka dheer",
     "intro": "Marka qoraal-hoosaadyadu aanay iswaafaqsanayn, u dhaqaaq wakhtiga oo dhan, ku dib-u-cabbir saamayn ahaan, ama ku hagaaji laba dhibcood oo saldhig ah. Waxa kale oo uu midayn karaa sadarrada kala qaybsamay, oo uu kala qaybin karaa kuwa dheeraada.",
@@ -90,7 +90,7 @@
     "jsonldAlt": "Subtitle Timeline Shift"
   },
   "repair": {
-    "title": "Hagaaji Qoraal-hoosaadyada Khaldan — Hagaaji Mojibake / Koodaynta Khaladka ah | AI-SRTSub",
+    "title": "Hagaaji Qoraal-hoosaadyada: Hagaaji Koodaynta | AI-SRTSub",
     "desc": "Dayactir online ah oo lacag la'aan ah oo loogu talagalay qoraal-hoosaadyada khaldan: wuxuu ogaadaa haddii faylku yahay UTF-8, GBK, Big5, Shift_JIS ama EUC-KR, wuxuu soo celiyaa qoraalka si khaldan loo akhriyey, wuxuuna dib u badbaadiyaa ciyaaryahankaaga.",
     "kw": "hagaaji qoraal-hoosaadyada khaldan,mojibake qoraal-hoosaadka,hagaajinta koodaynta srt,hagaaji koodaynta qoraal-hoosaadka,utf8 to gbk subtitle,srt wuxuu muujiyaa xarfo yaab leh,koodaynta khaldan ee qoraal-hoosaadka,ass garbled,vtt garbled,ogaanshaha koodaynta qoraal-hoosaadka",
     "intro": "Qoraal-hoosaadyada u furma sida derbi aan macno lahayn inta badan waxaa lagu akhriyaa koodayn khaldan. Geli faylka, oo wuxuu ogaadaa koodaynta dhabta ah ee faylka lagu qoray wuxuuna soo celiyaa xarfaha si khaldan loo akhriyey.",
@@ -101,7 +101,7 @@
     "jsonldAlt": "Subtitle Mojibake Repair"
   },
   "extract": {
-    "title": "Kala Soo Bax Qoraalka Qoraal-hoosaadyada — SRT/ASS/VTT oo loo beddelo Qoraal Caadi ah | AI-SRTSub",
+    "title": "Kala Soo Bax Qoraalka Qoraal-hoosaadyada | AI-SRTSub",
     "desc": "Kala-baxaha qoraal-hoosaad-ilaa-qoraal ee online-ka ah ee lacag la'aan ah: wuxuu akhriyaa SRT, VTT, ASS, SBV, LRC iyo TXT, wuxuu ka saarayaa koodhka waqtiga iyo lambarka sadarka, wuxuuna soo saarayaa wada-hadal nadiif ah oo ah cutubyo ama hal sadar oo ah cue kasta.",
     "kw": "kala soo bax qoraalka qoraal-hoosaadka,qoraal-hoosaad ilaa qoraal,srt ilaa txt,srt ilaa qoraal caadi ah,ass ilaa txt,vtt ilaa txt,qoraalka qoraal-hoosaadka,ka soo saar wada-hadalka srt,srt ka saar koodhka waqtiga,soo saaraha qoraalka qoraal-hoosaadka",
     "intro": "Kala soo bax wada-hadalka SRT / VTT / ASS / SBV / LRC / TXT qoraal-hoosaadyada adoo ka dhigaya qoraal caadi ah oo nadiif ah: koodhka waqtiga, lambarrada cue iyo calaamadaha qaabka waa la iska saaraa si otomaatig ah.",

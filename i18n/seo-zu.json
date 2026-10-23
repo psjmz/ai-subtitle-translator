@@ -15,7 +15,7 @@
     "copy": "<section class=\"seo\" aria-label=\"Mayelana naleli thuluzi\" style=\"max-width:1360px;margin:32px auto 0;padding:20px 24px 0;border-top:1px solid var(--line);color:var(--sub);font-size:13px;line-height:1.8;\">\n    <h2 data-i18n=\"seoTitle\" style=\"font-size:15px;color:var(--ink);margin:0 0 10px;font-weight:600;\">Umhumushi Wemibhalo Enezansi We-AI Wamahhala Womzamo</h2>\n    <p data-i18n-html=\"seoIntro\">Leli <strong>ithuluzi lokuhumusha imibhalo engezansi ku-inthanethi elamahhala elinamandla amamodeli ezilimi ezinkulu</strong>. Layisha amafayela e-SRT, VTT noma e-ASS bese uhumusha imibhalo engezansi phakathi kwesiNgisi, isiShayina, isiJapane, isiKoria, isiPanishi, isiFulentshi nezinye izilimi ezingu-15+. Akukho ukubhalisa, akukho ukufakwa, akukho uphawu lwamanzi — livule kusiphequluli bese uqala ukuhumusha. Idatha yemibhalo engezansi ihlala kusiphequluli sakho ngaphandle uma unika amandla ukuhumusha kwamafu.</p>\n    <p data-i18n-html=\"seoFeatures\" style=\"margin-top:8px;\"><strong>Izici ezibalulekile:</strong> ukuhlaziywa nokuhunyushwa kwe-AI kwe-SRT, VTT ne-ASS, ukuhlanganiswa kwemisho ehlakaniphile (lapho umusho owodwa ubandakanya imithetho eminingi, imithetho ihlanganiswa, ihunyushwe, bese ihlukaniswa futhi phezu komugqa wesikhathi wokuqala), ukuvumelanisa komugqa wesikhathi, ukugoqwa kwemigqa okuzenzakalelayo kombhalo we-CJK kanye nowaseNtshonalanga, ukususwa kwamagama agcwalisayo, ukusingathwa kwetemu yangokwezifiso, nezitayela zokuhumusha ezikhethekayo. Khipha amafayela ajwayelekile e-SRT, VTT, ASS noma TXT alungele ukubethela kanzima kuvidiyo yakho.</p>\n    <p data-i18n-html=\"seoWho\" style=\"margin-top:8px;\"><strong>Ubani owusebenzisayo:</strong> abahumushi bamavidiyo, abadali beYouTube nabasebenzi bokuqondanisa, abafundi bezilimi, amaqembu emibhalo engezansi namaqembu adinga ukuqondanisa okuqukethwe kwevidiyo ngokushesha.</p>\n  </section>\n  <noscript>\n    <p data-i18n=\"seoNoscript\" style=\"max-width:1360px;margin:24px auto;padding:0 24px;color:#1C2E2B;\">Leli thuluzi lidinga iJavaScript. Sicela unike amandla iJavaScript kusiphequluli sakho, bese ulayisha ifayela lemibhalo engezansi (SRT / VTT / ASS) ukuze uhumushe imibhalo engezansi nge-AI mahhala.</p>\n  </noscript>"
   },
   "merge": {
-    "title": "Umenzi Wemibhalo Enezansi Onesitayela - Hlanganisa Ulimi Olubili, Umphumela we-ASS & VTT",
+    "title": "Umenzi Wemibhalo Enezansi - Hlanganisa Ulimi Olubili, ASS & VTT",
     "desc": "Ithuluzi lamahhala lemibhalo engezansi onesitayela: hlanganisa amafayela amabili abe ulimi olubili, phinda ufake isitayela sethrekhi yezilimi ezimbili, noma engeza imiphumela. Izilungiselelo zangaphambili ezingu-5 ze-ASS / ezingu-6 ze-VTT; khipha njenge-SRT / VTT / ASS.",
     "kw": "hlanganisa imibhalo engezansi,imibhalo engezansi yezilimi ezimbili,hlanganisa amafayela emibhalo engezansi,imibhalo engezansi onesitayela,isitayela semibhalo engezansi se-ASS,isitayela semibhalo engezansi se-VTT,imiphumela yemibhalo engezansi,umenzi wemibhalo engezansi emibili,izilungiselelo zangaphambili ze-ASS,isibonelo semibhalo engezansi,ithuluzi lemibhalo engezansi lamahhala",
     "intro": "Hlanganisa amafayela amabili emibhalo engezansi abe ulimi olubili, noma ufake isitayela sethrekhi: ifonti, umbala, umugqa ongaphandle nendawo, konke ku-WYSIWYG.",
@@ -23,7 +23,7 @@
     "who": "Abadali abenza imibhalo engezansi yezilimi ezimbili noma enesitayela, amaqembu abethela, namaqembu adinga amagama acashunwe afinyeleleka kalula."
   },
   "clean": {
-    "title": "Isihlanzi Sesihlokwana - Susa Izimpawu Zamanzi, Amacici e-SDH namathegi e-HTML",
+    "title": "Isihlanzi Semibhalo Enezansi - Susa Amathegi, Izimpawu & SDH",
     "desc": "Umhlanzisi wemibhalo engezansi ku-inthanethi wamahhala: susa izimpawu zamanzi, izikhangiso, i-SDH, amathegi e-HTML, imiphumela ye-ASS; lungisa izinhlamvu ezinkulu, i-mojibake. Imithetho engu-13 eshintshekayo, hlehlisa ngoguquko ngalunye, umugqa wesikhathi awuthintwanga.",
     "kw": "umhlanzisi wemibhalo engezansi,hlanzisa ifayela le-srt,susa uphawu lwamanzi lwemibhalo engezansi,susa imibhalo engezansi ye-SDH,susa amathegi e-HTML emibhalweni engezansi,lungisa imibhalo engezansi yezinhlamvu ezinkulu zonke,lungisa i-mojibake,susa imibhalo engezansi enezinkinga zokuzwa,khipha imiphumela ye-ASS",
     "intro": "Sebenzisa imibhalo engezansi elandiwe lapha kuqala: izimpawu zamanzi, izikhangiso, izimpawu ze-SDH namathegi e-HTML, sekuphumile ngemizamo eyodwa.",
@@ -68,7 +68,7 @@
     "jsonldAlt": "Subtitle Converter"
   },
   "bilingual": {
-    "title": "Isihlukanisi Semibhalo Enezansi Yezilimi Ezimbili - Gcina Ulimi Olukodwa Nje | AI-SRTSub",
+    "title": "Isihlukanisi Semibhalo Enezili Ezimbili - Gcina Ulimi Olulodwa | AI-SRTSub",
     "desc": "Isihlukanisi semibhalo engezansi yezilimi ezimbili ku-inthanethi wamahhala: hlukanisa ifayela lemibhalo engezansi yezilimi ezimbili libe ithrekhi yasekuqaleni nethrekhi ehunyshiwe, noma gcina eyodwa nje.",
     "kw": "isihlukanisi semibhalo engezansi yezilimi ezimbili,hlukanisa i-srt yezilimi ezimbili,susa umbhalo engezansi wesibili,gcina umbhalo engezansi wesiNgisi kuphela,khipha umbhalo engezansi ohunyshiwe,ukuhlukana kwe-srt yezilimi ezimbili,ukuhlukana kwe-ass yezilimi ezimbili",
     "intro": "Hlukanisa ifayela lemibhalo engezansi yezilimi ezimbili libe ithrekhi yasekuqaleni nethrekhi ehunyshiwe, noma gcina eyodwa yazo.",
@@ -79,7 +79,7 @@
     "jsonldAlt": "Bilingual Subtitle Splitter"
   },
   "shift": {
-    "title": "Ukushintshwa Komugqa Wesikhathi Semibhalo Enezansi - Hambisa, Linganisela Kabusha, Hlanganisa futhi Uhlukanise | AI-SRTSub",
+    "title": "Ukushintsha Isikhathi Semibhalo Enezansi - Hambisa & Linganisa | AI-SRTSub",
     "desc": "Ithuluzi lesikhathi semibhalo engezansi ku-inthanethi wamahhala: hambisa konke ngesikhathi esisodwa, linganisela kabusha ngesilinganiso, noma ulungise ukukhanya ngamaphuzu amabili. Lisebenza nge-SRT, VTT, ASS, SBV, LRC kanye ne-TXT.",
     "kw": "ukushintshwa kwesikhathi semibhalo engezansi,hambisa isikhathi se-srt,ukuchibiyela ukuvumelanisa kwemibhalo engezansi,linganisela kabusha isikhathi semibhalo engezansi,lungisa ukubambezeleka kwemibhalo engezansi,isikhala sesikhathi se-srt,ukucaca kokukhanya kwemibhalo engezansi,hlanganisa imibhalo engezansi,hlukanisa imibhalo engezansi,hlanganisa i-srt,hlukanisa umbhalo engezansi omude",
     "intro": "Lapho imibhalo engezansi ingasebenzi ngokuvumelanisa, hambisa wonke umugqa wesikhathi, ulinganisele kabusha ngesilinganiso, noma ulungise ngamaphuzu amabili ayisisekelo. Kuhlanganisa nemigqa ehlukanisiwe, futhi kuhlukanise leyo ehamba isikhathi eside kakhulu.",
@@ -90,7 +90,7 @@
     "jsonldAlt": "Subtitle Timeline Shift"
   },
   "repair": {
-    "title": "Lungisa Imibhalo Enezansi Ehlanganisiwe - Lungisa i-Mojibake / Ukufakwa Ikhodi Okungalungile | AI-SRTSub",
+    "title": "Lungisa Imibhalo Enezansi Ehlanganisiwe - Lungisa Ikhodi | AI-SRTSub",
     "desc": "Ukulungisa ku-inthanethi wamahhala kwemibhalo engezansi ehlanganisiwe: kuthola ukuthi ifayela lingabe liyi-UTF-8, GBK, Big5, Shift_JIS noma i-EUC-KR, kubuyisela umbhalo ofundwe kabi, kuwulondoloza kabusha ukuze kusetshenziswe umdlali wakho.",
     "kw": "lungisa imibhalo engezansi ehlanganisiwe,mojibake yemibhalo engezansi,ukuchibiyela ukufakwa ikhodi kwe-srt,lungisa ukufakwa ikhodi kwemibhalo engezansi,utf8 ukuya ku-gbk wesibili,i-srt ibonisa izinhlamvu ezingajwayelekile,ukufakwa ikhodi okungalungile kwemibhalo engezansi,i-ass ehlanganisiwe,i-vtt ehlanganisiwe,thola ukufakwa ikhodi kwemibhalo engezansi",
     "intro": "Imibhalo engezansi evuleka njengodonga lwezinto ezingenamqondo cishe ihlezi ifundwa ngokufakwa ikhodi okungalungile. Faka ifayela phakathi, bese kutholakala ukuthi ifayela lalibhalwe ngaluphi uflani lokufakwa ikhodi futhi kubuyiselwa izinhlamvu ezifundwe kabi.",

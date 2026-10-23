@@ -31,7 +31,7 @@
     "who": "Kushdo që ka marrë një nëtitull ekzistues dhe thjesht e do të përdorshëm, si dhe grupe që pastrojnë material në masë."
   },
   "glossary": {
-    "title": "Zëvendësim i Termave të Nëntitujve në Masë - Një Fjalor, I Gjithë Skedari | AI-SRTSub",
+    "title": "Zëvendësim Masiv i Termave në Nëntituj - Fjalor AI-SRTSub",
     "desc": "Zëvendësim fjalori për nëtitujt: listoni \"e vjetër → e re\" një herë dhe i gjithë skedari SRT / VTT / ASS / TXT përditësohet. Koha, stilet dhe blloqet NOTE mbeten; zhbërje për çdo rresht.",
     "kw": "fjalor i nëtitujve,zëvendësim në masë i srt,gjej dhe zëvendëso nëtitujt,zëvendësim i termave të nëtitujve,redaktim në masë i srt,zëvendëso fjalët në nëtituj,unifiko emrat e nëtitujve,terminologji e nëtitujve,zëvendëso tekstin në vtt,mjet fjalori srt,zëvendësim i terminologjisë në masë",
     "intro": "Një fjalor me rregulla \"term i vjetër → term i ri\" të zbatueshme në të gjithë skedarin e nëtitujve menjëherë, me kohën, stilet ASS dhe blloqet e shënimeve VTT të paprekura në nivel bajti.",
@@ -42,7 +42,7 @@
     "jsonldAlt": "Subtitle Glossary Batch Replace"
   },
   "qc": {
-    "title": "Kontrolli i Cilësisë së Nëntitujve - Kontrollo Kohën dhe Elipsën sipas Gjuhës | AI-SRTSub",
+    "title": "Kontrolli i Cilësisë së Nëntitujve - Koha dhe Elipsa | AI-SRTSub",
     "desc": "Kontroll i cilësisë së nëtitujve falas në internet: ngarkoni SRT, VTT ose ASS dhe kontrolloni mbivendosjet, kohëzgjatjen, shpejtësinë e leximit, gjerësinë e rreshtit, ndarjet e rreshtave, numërimin dhe kodimin kundrejt rregullave të asaj gjuhe. 27 gjuhë, 27 grupe pragjesh, plus rregulla specifike për gjuhën.",
     "kw": "kontrollues i nëtitujve,kontroll i cilësisë së nëtitujve,validues srt,kontroll i cilësisë së nëtitujve,kontroll srt,kontroll i kohës së nëtitujve,validues i nëtitujve,kontrollo skedarin srt,korrigjim i nëtitujve,linter i nëtitujve",
     "intro": "Ngarkoni një skedar nëtitujsh dhe kontrollojeni atë kundrejt rregullave të gjuhës së tij - çdo gjetje vjen me vlerën e matur dhe pragun. Ekzekutohet plotësisht në shfletuesin tuaj, asgjë nuk ngarkohet.",
