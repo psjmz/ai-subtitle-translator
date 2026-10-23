@@ -114,7 +114,7 @@
     .navpills{display:none}
   }
 </style>
-<script src="ui-codes.js?v=0.9.365"></script>
+<script src="ui-codes.js?v=0.9.366"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -187,9 +187,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="convert-i18n.js?v=0.9.365"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
-<script src="/i18n/tp-boot.js?v=0.9.365"></script>
-<script src="convert-core.js?v=0.9.365"></script>
+<script src="convert-i18n.js?v=0.9.366"></script><!-- v0.9.290：词典也要带版本号，否则改词条后老访客吃缓存 -->
+<script src="/i18n/tp-boot.js?v=0.9.366"></script>
+<script src="convert-core.js?v=0.9.366"></script>
 <script>
 'use strict';
 var I18N = window.CONVERT_I18N.DICT, LANGS = window.CONVERT_I18N.LANGS;
@@ -231,12 +231,25 @@ function syncLogoHome() {
   if (el) el.href = (LANG === 'zh-CN') ? '/' : '/' + LANG + '/';
 }
 
-/* 输出格式下拉：名称是通用缩写，不翻译 */
+/* v0.9.366：格式下拉只有中文说明，英文 / 泰文 / 日文站里整页是当地语言、
+   唯独这 6 个选项写着「VTT · WebVTT · 网页播放器」（v0.9.365 实测）。
+   缩写本身各语言通用，说明补一套英文即可 —— 非中文界面一律走英文说明。 */
+var FMT_NOTE_EN = {
+  srt: 'SubRip · universal',
+  vtt: 'WebVTT · web player',
+  ass: 'Advanced SubStation · effects',
+  sbv: 'YouTube captions',
+  lrc: 'Lyrics',
+  txt: 'Plain text · no timing'
+};
+/* 输出格式下拉：缩写不翻译，说明按界面语言在中/英之间选一套 */
 function renderOutFmtOptions() {
   var sel = $('#outFmt');
   var cur = sel.value || S.outFmt;
+  var zh = /^zh/.test(LANG);
   sel.innerHTML = window.ConvertCore.FORMATS.map(function (f) {
-    return '<option value="' + f.id + '">' + f.name + ' · ' + f.note + '</option>';
+    var note = zh ? f.note : (FMT_NOTE_EN[f.id] || f.name);
+    return '<option value="' + f.id + '">' + f.name + ' · ' + note + '</option>';
   }).join('');
   sel.value = cur;
   S.outFmt = sel.value;
@@ -315,16 +328,46 @@ function setSrc(text, fname) {
 }
 function renderSrcFmt() {
   var el = $('#srcFmt');
-  if (!S.src.trim()) { el.className = 'chip mut'; el.textContent = '—'; return; }
-  if (!S.fmt) { el.className = 'chip mut'; el.textContent = t('errFmt'); return; }
+  /* v0.9.366：空态别再摆一个只有「—」的灰胶囊 —— 什么都没上传时它看着像识别失败 */
+  if (!S.src.trim()) { el.style.display = 'none'; el.textContent = ''; syncClearBtn(); return; }
+  el.style.display = '';
+  if (!S.fmt) { el.className = 'chip mut'; el.textContent = t('errFmt'); syncClearBtn(); return; }
   el.className = 'chip';
   el.textContent = S.fmt.toUpperCase();
+  syncClearBtn();
+}
+/* v0.9.366：没内容时「清除」点了也确实没变化 —— 直接置灰，别让人白点 */
+function syncClearBtn() {
+  var b = $('#btnClear'), o = $('#out');
+  if (!b) return;
+  b.disabled = !S.src.trim() && !(o && o.value);
+}
+/* v0.9.366：老字幕里 GBK / Big5 很常见。以前按 UTF-8 硬读，整篇变成 U+FFFD 乱码，
+   页面还一句提示都没有（v0.9.365 实测）。这里照 clean 页 decodeBuf 的做法：
+   按字节读 → 先解 UTF-8 → 出现多个替换字符就再试 GBK / Big5，能用就用。
+   ⚠️ 与 clean-core.js 的 decodeBuf 同一套判据，不另发明一种。 */
+function decodeBuf(buf) {
+  var u8 = new Uint8Array(buf);
+  if (u8[0] === 0xEF && u8[1] === 0xBB && u8[2] === 0xBF) {
+    return new TextDecoder('utf-8').decode(u8.subarray(3));
+  }
+  var s = new TextDecoder('utf-8', { fatal: false }).decode(u8);
+  if ((s.match(/\uFFFD/g) || []).length > 1) {
+    var list = ['gbk', 'big5'];
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var x = new TextDecoder(list[i]).decode(u8);
+        if (!/\uFFFD/.test(x)) return x;
+      } catch (e) { /* 该浏览器不支持这种旧编码，换下一个 */ }
+    }
+  }
+  return s;
 }
 function readFile(f) {
   if (!f) return;
   var r = new FileReader();
-  r.onload = function () { setSrc(String(r.result || ''), f.name); };
-  r.readAsText(f, 'utf-8');
+  r.onload = function () { setSrc(decodeBuf(r.result), f.name); };
+  r.readAsArrayBuffer(f);
 }
 function clearAll() {
   S = { fname: '', src: '', fmt: null, cues: [], out: '', outFmt: S.outFmt, bi: S.bi };
@@ -453,7 +496,10 @@ function bind() {
   });
   $('#paste').addEventListener('input', function (e) { setSrc(e.target.value, S.fname); });
   $('#btnClear').addEventListener('click', clearAll);
-  $('#outFmt').addEventListener('change', function () { S.outFmt = $('#outFmt').value; if (S.cues.length) convert(); });
+  /* v0.9.366：判据与下面「双语处理」统一用「有没有源文本」。
+     以前这里看 S.cues.length —— 上传只写 S.src，cues 要等第一次点「转换」才有值，
+     于是上传后直接改输出格式一点反应都没有，改双语处理却立刻出结果，同排两个下拉行为不一致。 */
+  $('#outFmt').addEventListener('change', function () { S.outFmt = $('#outFmt').value; if (S.src.trim()) convert(); });
   $('#biMode').addEventListener('change', function () { S.bi = $('#biMode').value; if (S.src.trim()) convert(); });
   $('#btnGo').addEventListener('click', convert);
   $('#btnDl').addEventListener('click', download);
@@ -466,6 +512,7 @@ function bind() {
   applyI18n();
   bind();
   render();
+  renderSrcFmt();   /* v0.9.366：进页面就把空态的「—」胶囊和「清除」收好 */
   window.setSrc = setSrc;   /* 自动化冒烟用的文本入口 */
 })();
 </script>
@@ -479,6 +526,6 @@ function bind() {
     <p style="margin-top:8px;">拿到字幕但播放器不认的人、要在剪辑软件与网页播放器之间来回倒素材的人。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.365" data-tool="cv"></script>
+<script src="site-topnav.js?v=0.9.366" data-tool="cv"></script>
 </body>
 </html>

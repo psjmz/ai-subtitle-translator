@@ -121,7 +121,7 @@
     .fitem .meta{display:none}
   }
 </style>
-<script src="ui-codes.js?v=0.9.365"></script>
+<script src="ui-codes.js?v=0.9.366"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -186,10 +186,10 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="jszip.min.js?v=0.9.365"></script>
-<script src="batch-i18n.js?v=0.9.365"></script>
-<script src="/i18n/tp-boot.js?v=0.9.365"></script>
-<script src="batch-core.js?v=0.9.365"></script>
+<script src="jszip.min.js?v=0.9.366"></script>
+<script src="batch-i18n.js?v=0.9.366"></script>
+<script src="/i18n/tp-boot.js?v=0.9.366"></script>
+<script src="batch-core.js?v=0.9.366"></script>
 <script>
 'use strict';
 var I18N = window.BATCH_I18N.DICT, LANGS = window.BATCH_I18N.LANGS;
@@ -281,10 +281,37 @@ dz.addEventListener('drop', function (e) {
 });
 $('#file').addEventListener('change', function () { if (this.files.length) readFiles(this.files); this.value = ''; });
 
+/* v0.9.366：编码嗅探照 clean 页 decodeBuf 的判据（UTF-8 优先，乱码回退 GBK / Big5）——
+   批量转换里老字幕最常见，按 UTF-8 硬读等于直接把乱码转一份出去。 */
+function decodeBuf(buf) {
+  var u8 = new Uint8Array(buf);
+  if (u8[0] === 0xEF && u8[1] === 0xBB && u8[2] === 0xBF) {
+    return new TextDecoder('utf-8').decode(u8.subarray(3));
+  }
+  var s = new TextDecoder('utf-8', { fatal: false }).decode(u8);
+  if ((s.match(/\uFFFD/g) || []).length > 1) {
+    var list = ['gbk', 'big5'];
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var x = new TextDecoder(list[i]).decode(u8);
+        if (!/\uFFFD/.test(x)) return x;
+      } catch (e) { /* 该浏览器不支持这种旧编码，换下一个 */ }
+    }
+  }
+  return s;
+}
+function readAsText(f) {
+  return new Promise(function (res) {
+    var fr = new FileReader();
+    fr.onload = function () { res(decodeBuf(fr.result)); };
+    fr.onerror = function () { res(''); };
+    fr.readAsArrayBuffer(f);
+  });
+}
 function readFiles(fs) {
   var arr = Array.prototype.slice.call(fs);
   var jobs = arr.map(function (f) {
-    return f.text().then(function (tx) {
+    return readAsText(f).then(function (tx) {
       var fmt = C.detectFmt(f.name, tx);
       var items = C.parse(tx, fmt);
       return { name: f.name, fmt: fmt, items: items, ok: items.length > 0 };
@@ -422,6 +449,6 @@ applyI18n();
     <p style="margin-top:8px;">要给整个剧集目录换格式、给播放器统一喂 VTT 的剪辑师、字幕组、站长。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.365" data-tool="bt"></script>
+<script src="site-topnav.js?v=0.9.366" data-tool="bt"></script>
 </body>
 </html>

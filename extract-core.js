@@ -270,11 +270,25 @@
   var RE_NOSPACE = /[\u3040-\u30FF\u31F0-\u31FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u0E00-\u0E7F\u0E80-\u0EFF\u1000-\u109F\u1780-\u17FF\u0F00-\u0FFF]/;
   /* 一段文本连接时用不用空格：以「无空格字符 vs 空格书写字符」的占比判断（混排取多数） */
   var RE_SPACED = /[A-Za-z\u0400-\u04FF\u0370-\u03FF\u0590-\u05FF\u0600-\u06FF\uAC00-\uD7AF\u1100-\u11FF\u1E00-\u1EFF]/;
+  /* v0.9.366：接缝判定改成「看两侧最靠边的那一个**文字字符**」——
+     只要有一侧属于「词间要写空格」的文字（拉丁 / 西里尔 / 谚文 …）就补空格，
+     两侧都是中日泰这类本来就不断词的文字才直接连。
+     旧写法是拿两侧各 4 个字符去比「哪种字符多」：英文那半长一点短一点结论就翻，
+     同一份文件里第 1、3 条有空格、第 2、4 条没有（v0.9.365 实测）。
+     判定要跳过标点、数字、空格：句末是「。」「%」「）」时都不算数，得往里找到真正的字。 */
+  function scriptOf(s, fromEnd) {
+    s = String(s == null ? '' : s);
+    for (var i = fromEnd ? s.length - 1 : 0; fromEnd ? i >= 0 : i < s.length; fromEnd ? i-- : i++) {
+      var c = s.charAt(i);
+      if (RE_NOSPACE.test(c)) return 'ns';
+      if (RE_SPACED.test(c)) return 'sp';
+    }
+    return '';
+  }
   function nospaceJoin(a, b) {
-    var s = String(a) + String(b);
-    var ns = (s.match(new RegExp(RE_NOSPACE.source, 'g')) || []).length;
-    var sp = (s.match(new RegExp(RE_SPACED.source, 'g')) || []).length;
-    return ns > sp;   /* 无空格字符占多 → 直接连；否则加空格 */
+    /* 返回 true = 直接连（不加空格）。两侧找不到文字字符时按「要空格」处理，
+       比把数字串 / 纯标点误判成中文安全。 */
+    return scriptOf(a, true) === 'ns' && scriptOf(b, false) === 'ns';
   }
   function joinParts(parts) {
     var out = '';

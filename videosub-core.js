@@ -747,25 +747,55 @@
   /* =====================================================================
      四、渲染（SRT / VTT / ASS / TXT）
      ===================================================================== */
+  /* v0.9.366：ASS 正文里带覆写标签（{\i1}斜体{\i0}、{\b1}、{\pos(…)} …）。
+     导出 ASS 时原样保留（那是原片作者定的版式，本页铁律：只搬不改）；
+     但导出 SRT / VTT / TXT 时播放器不认花括号，会把 {\i1} 当正文显示出来
+     （v0.9.365 实测：抽出来的 SRT 正文中夹着 {\i1}）。
+     这里做一次映射：斜体 → <i>、粗体 → <b>、下划线 → <u>（SRT/VTT 认这套），其余标签丢弃。 */
+  var RE_ASS_TAG = /\{\\[^}]*\}/g;
+  var RE_ASS_STYLE = /\\(i|b|u)(\d+)/g;
+  function assTagsToPlain(s) {
+    var t = nl(s);
+    if (t.indexOf('{') < 0) return t;
+    t = t.replace(RE_ASS_TAG, function (m) {
+      /* 一个 {\…} 里可能同时写好几个开关（{\i1\b1}），也可能混着 \pos / \fn 这类
+         没有对应 HTML 标签的参数 —— 只挑能映射的那几个，其余整段丢掉。 */
+      var out = '', mm;
+      RE_ASS_STYLE.lastIndex = 0;
+      while ((mm = RE_ASS_STYLE.exec(m))) {
+        var tag = mm[1] === 'i' ? 'i' : (mm[1] === 'b' ? 'b' : 'u');
+        out += (mm[2] === '0') ? ('</' + tag + '>') : ('<' + tag + '>');
+      }
+      return out;
+    });
+    /* \h = ASS 的不换行空格，\N = 换行：这两种在纯文本里也留着反斜杠，一并还原 */
+    return t.replace(/\\h/g, ' ').replace(/\\N/gi, '\n');
+  }
+  function plainCues(cues) {
+    return (cues || []).map(function (c) {
+      var t = assTagsToPlain(c.text);
+      return (t === String(c.text)) ? c : { start: c.start, end: c.end, text: t };
+    });
+  }
   function renderSrt(cues) {
     var out = [];
-    cues.forEach(function (c, i) {
+    plainCues(cues).forEach(function (c, i) {
       var a = msClock(c.start), b = msClock(Math.max(c.end, c.start + 1));
       out.push(String(i + 1));
       out.push(pad(a.h, 2) + ':' + pad(a.m, 2) + ':' + pad(a.s, 2) + ',' + pad(a.ms, 3) + ' --> ' +
         pad(b.h, 2) + ':' + pad(b.m, 2) + ':' + pad(b.s, 2) + ',' + pad(b.ms, 3));
-      out.push(nl(c.text));
+      out.push(c.text);
       out.push('');
     });
     return out.join('\n');
   }
   function renderVtt(cues) {
     var out = ['WEBVTT', ''];
-    cues.forEach(function (c) {
+    plainCues(cues).forEach(function (c) {
       var a = msClock(c.start), b = msClock(Math.max(c.end, c.start + 1));
       out.push(pad(a.h, 2) + ':' + pad(a.m, 2) + ':' + pad(a.s, 2) + '.' + pad(a.ms, 3) + ' --> ' +
         pad(b.h, 2) + ':' + pad(b.m, 2) + ':' + pad(b.s, 2) + '.' + pad(b.ms, 3));
-      out.push(nl(c.text));
+      out.push(c.text);
       out.push('');
     });
     return out.join('\n');
@@ -801,7 +831,8 @@
     return head + body.join('\n') + (body.length ? '\n' : '');
   }
   function renderTxt(cues) {
-    return cues.map(function (c) { return nl(c.text); }).join('\n') + (cues.length ? '\n' : '');
+    /* v0.9.366：纯文本同样不该留 {\i1} */
+    return plainCues(cues).map(function (c) { return c.text; }).join('\n') + (cues.length ? '\n' : '');
   }
   function render(cues, fmt, opt) {
     opt = opt || {};

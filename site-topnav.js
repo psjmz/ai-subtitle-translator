@@ -442,6 +442,23 @@
     'width:min(460px,calc(100vw - 28px))}}',
     '@media (max-width:640px){#topNav .tnav-menu{grid-template-columns:1fr;',
     'width:calc(100vw - 24px);max-height:calc(100vh - 76px);overflow-y:auto}}',
+    /* v0.9.366：窄屏一级导航。以前只靠 flex-wrap 硬折行 —— 390px 下折成 4 行、吃掉
+       167px 高，英文站更把 .lnav 撑到 417px、横向溢出 27px，语言选择器被切掉一半
+       （v0.9.365 实测）。改成不折行 + 横向滚动：
+         · 高度从 4 行压回 1 行，正文不再被顶下去；
+         · #topNav 自身 overflow-x:auto → 作为 flex 子项的自动最小尺寸归零，
+           父级 .lnav 就不再被它撑出视口，语言选择器也不再被切。
+       ⚠️ 横向滚动条本身要藏掉：露出一条灰条比折行还难看。 */
+    /* ⚠️ 必须用 flex:1 1 0（不是 max-width:100%）：父级 .lnav 的宽度是 auto，
+       百分比最大宽度解析不出来，自己的 min-content 又会一路把 .lnav 顶宽，
+       实测撑到 536px / 溢出 276px。flex-basis 归零才能真正让它可压。 */
+    /* 导航占满 .lnav 一整行：语言选择器另起一行，别把导航挤成 100px 的窄条 */
+    '@media (max-width:640px){.lnav{flex-wrap:wrap}}',
+    '@media (max-width:640px){#topNav{flex:1 1 100%;flex-wrap:nowrap;min-width:0;max-width:none;',
+    'overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none}',
+    '@media (max-width:640px){.lnav{min-width:0}}',
+    '#topNav::-webkit-scrollbar{display:none}',
+    '#topNav .tnav-lnk,#topNav .tnav-btn,#topNav .tnav-promo,#topNav .tnav-more{flex:none}}',
     '@media (prefers-reduced-motion:reduce){#topNav .tnav-menu{animation:none}',
     '#topNav .tnav-promo{transition:none}}'
   ].join('');

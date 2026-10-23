@@ -179,7 +179,7 @@
   },
   "ytfix": {
     "title": "YouTube texti-leiðrétting - Sameina brotnar setningar | AI-SRTSub",
-    "desc": "Ókeypis netverkfæri fyrir YouTube sjálfvirkan texta: sjálfvirkur texti er skorinn í 3-4 sekúndna búta án tillits til setningaskila. Þetta tól breytir engum orðum - það færir aðeins mörkin þar sem setningar enda, með upprunalegum tímastimplum sem viðmið. Virkar fyrir 100 tungumál, algjörlega í vafranum þínum.",
+    "desc": "YouTube sjálfvirkirtextar klippa setningar á 3-4 sekúndna fresti. Þetta tól heldur öllum orðum og færir mörkin þangað sem setningar enda. Ókeypis, 100 tungumál.",
     "kw": "youtube texti lagfæring,youtube sjálfvirkur texti,texti samstilling,texti setninga samstilling,laga brotinn texta,srt setninga samstilling,texti endurhlutun,youtube texta viðgerð,setninga-meðvitaður texti",
     "intro": "Settu inn sjálfvirkan YouTube textaskrá, veldu tungumál og tólið sameinar setningar yfir mörk bútanna og endurskiptir skránni eftir setningum. Ekkert orð er breytt og tímastimplar haldast eins nálægt upprunalegu tímasetningunum og hægt er.",
     "feat": "YouTube sjálfvirkur texti er skorinn í 3-4 sekúndna búta án tillits til setningaskila. Tólið notar upprunalega tímastimpla sem viðmið - það eru raunveruleg mörk orða frá talgreiningunni - ákveður hvar setningar enda út frá greinarmerkjum og notar kvik forritun til að finna besta brotpunktinn. Hvert af 100 tungumálunum hefur sínar reglur: Kínverska og japanska hafa engin bil, taílenska markar varla orðamörk, hindí notar । og arabíska ؟. Línubreidd og lestrarhraði fylgja ritkerfinu - 16 fullbreið tákn fyrir kínversku, 42 tákn fyrir latneskt letur. Fyrir útflutning er textinn borinn saman tákn fyrir tákn og öll töpuð eða bætt orð eru auðkennd.",

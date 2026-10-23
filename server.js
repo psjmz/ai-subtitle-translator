@@ -861,6 +861,17 @@ const MIME = {
 };
 function serveStatic(req, res, urlPath){
   let p = decodeURIComponent(urlPath.split('?')[0]);
+  /* v0.9.366：/zh 与 /zh/* 301 到无前缀形态（/zh/ → /，/zh/autosub.html → /autosub.html，
+     /zh/guides/ → /guides/）。zh 是外链和浏览器最常见的短代码写法，但中文是默认语言：
+     根路径直接服务、hreflang 里 zh-CN 指向 /。此前这类链接一律 404，外链流量全落空。
+     ⚠️ 只接 zh 这一个；zh-CN 故意不接（继续 404），否则同一种语言会有两个可访问地址，
+         canonical 与实际 URL 就对不上了。 */
+  if (p === '/zh' || p === '/zh/' || p.indexOf('/zh/') === 0) {
+    const rest = (p === '/zh' || p === '/zh/') ? '/' : p.slice(3);
+    const qi = req.url.indexOf('?');
+    res.writeHead(301, { Location: rest + (qi >= 0 ? req.url.slice(qi) : '') });
+    return res.end();
+  }
   // SEO：robots.txt / sitemap.xml 按当前访问域名动态生成（换域名/部署环境自动适配）
   const baseUrl = publicBase(req);
   if (p === '/robots.txt' && baseUrl) {
@@ -935,6 +946,14 @@ function serveStatic(req, res, urlPath){
   if (gm && SEO_ROUTE['/' + gm[1]] && GUIDE_PAGES[gm[2]]) { serveGuide(req, res, SEO_ROUTE['/' + gm[1]], gm[2]); return; }
   gm = p.match(/^\/([a-zA-Z][a-zA-Z\-]*)\/guides\/?$/);
   if (gm && SEO_ROUTE['/' + gm[1]]) { serveGuideIndex(req, res, SEO_ROUTE['/' + gm[1]]); return; }
+  /* v0.9.366：guides.html 是**模板**，里面的 H1 / 正文 / 语言下拉都是占位符，
+     只有 /guides/ 这条路由会替换。直接静态访问它会拿到一个「H1 是英文 Guides、
+     正文空白、语言下拉是个白框」的空壳页（v0.9.365 实测）。301 到真正渲染过的索引页。 */
+  gm = p.match(/^(?:\/([a-zA-Z][a-zA-Z\-]*))?\/guides\.html$/);
+  if (gm && (!gm[1] || SEO_ROUTE['/' + gm[1]])) {
+    res.writeHead(301, { Location: (gm[1] ? '/' + gm[1] : '') + '/guides/', 'Cache-Control': 'no-cache' });
+    res.end(); return;
+  }
   /* v0.9.33：语言路由下的静态资源（/en/srt-core.js 等）回退到根目录同名文件——
      修复语言路由页面相对引用 404 导致整页 JS 失效的预存 bug */
   const lm = p.match(/^\/([a-zA-Z][a-zA-Z-]*)\/(.+)$/);
@@ -2371,7 +2390,7 @@ const SEO_YTFIX = {
   },
   'es': {
     title: "Optimizador de subtítulos de YouTube - recomponer frases cortadas | AI-SRTSub",
-    desc: "Arregla gratis los subtítulos automáticos de YouTube: se cortan cada 3 o 4 segundos sin mirar dónde acaba la frase, así que la cola de una frase aparece al inicio del siguiente subtítulo. Esta herramienta no cambia ni una palabra: solo devuelve los cortes al final real de cada frase y usa las marcas de tiempo originales como anclas. Funciona con 100 idiomas y todo se ejecuta en tu navegador.",
+    desc: "Los subtítulos automáticos de YouTube cortan cada 3-4 segundos. Esta herramienta mantiene tus palabras y ajusta las marcas al final real de las frases. Gratis, 100 idiomas.",
     kw: "arreglar subtítulos youtube,subtítulos automáticos youtube,realinear subtítulos,cortes de subtítulos,unir frases subtítulos,alinear frases srt,subtítulos por frases,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Carga un subtítulo generado automáticamente por YouTube, elige el idioma y la herramienta vuelve a unir las frases que quedaron partidas entre subtítulos y recorta el archivo frase por frase. Ni una palabra cambia y los tiempos se quedan lo más cerca posible de las marcas originales.",
     feat: "Los subtítulos automáticos de YouTube se cortan en tramos de 3 o 4 segundos sin atender a las frases, así que un subtítulo suele llevar la cola de la frase anterior y el arranque de la siguiente. La herramienta toma las marcas de tiempo originales como anclas —son los límites reales de palabra que dio el reconocedor—, decide dónde termina cada frase por la puntuación y usa programación dinámica para elegir el corte más barato entre fin de frase, coma, conjunción y corte forzado; después alarga el tiempo en pantalla según la velocidad de lectura. Cada uno de los 100 idiomas tiene sus reglas: el chino y el japonés no separan palabras con espacios, el tailandés apenas marca límites, el hindi cierra con ।, el árabe con ؟ y el armenio con ։. El ancho de línea y la velocidad de lectura dependen del sistema de escritura: 16 caracteres de ancho completo por línea en chino y 42 caracteres en alfabetos latinos. Antes de exportar se compara el texto carácter a carácter y cualquier palabra perdida o añadida se avisa al momento.",
@@ -2380,7 +2399,7 @@ const SEO_YTFIX = {
   },
   'pt': {
     title: "Otimizador de legendas do YouTube - recompor frases cortadas | AI-SRTSub",
-    desc: "Corrija de graça as legendas automáticas do YouTube: elas são cortadas a cada 3 ou 4 segundos sem olhar onde a frase termina, então o rabo de uma frase cai no começo da legenda seguinte. Esta ferramenta não muda uma palavra: só devolve os cortes ao fim real de cada frase, usando os tempos originais como âncoras. Funciona com 100 idiomas e roda inteiramente no navegador.",
+    desc: "As legendas automáticas do YouTube cortam a cada 3-4 segundos. Esta ferramenta mantém as palavras e ajusta as marcas para o fim real das frases. Grátis, 100 idiomas.",
     kw: "corrigir legendas youtube,legendas automáticas youtube,realinhar legendas,cortes de legendas,juntar frases legendas,alinhar frases srt,legendas por frase,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Coloque uma legenda gerada automaticamente pelo YouTube, escolha o idioma e a ferramenta volta a unir as frases que ficaram partidas entre legendas e recorta o arquivo frase por frase. Nenhuma palavra muda e os tempos ficam o mais próximo possível das marcações originais.",
     feat: "As legendas automáticas do YouTube são cortadas em blocos de 3 a 4 segundos sem considerar as frases, então um bloco costuma levar o rabo da frase anterior e o começo da seguinte. A ferramenta usa os tempos originais como âncoras — são os limites reais de palavra que o reconhecedor produziu —, decide onde cada frase termina pela pontuação e usa programação dinâmica para escolher o corte de menor custo entre fim de frase, vírgula, conjunção e corte forçado; depois estende o tempo em tela conforme a velocidade de leitura. Cada um dos 100 idiomas tem suas regras: chinês e japonês não separam palavras com espaço, o tailandês quase não marca limites, o híndi fecha com ।, o árabe com ؟ e o armênio com ։. A largura de linha e a velocidade de leitura seguem o sistema de escrita: 16 caracteres de largura total por linha em chinês e 42 caracteres em alfabetos latinos. Antes de exportar, o texto é comparado caractere por caractere e qualquer palavra perdida ou acrescentada é avisada na hora.",
@@ -2389,7 +2408,7 @@ const SEO_YTFIX = {
   },
   'de': {
     title: "YouTube-Untertitel optimieren - angeschnittene Sätze neu zusammensetzen | AI-SRTSub",
-    desc: "YouTube-Untertitel kostenlos online reparieren: Die automatischen Untertitel werden alle 3 bis 4 Sekunden stumpf geschnitten, ohne auf das Satzende zu achten. So landet der Rest eines Satzes am Anfang des nächsten Untertitels. Dieses Werkzeug ändert kein einziges Wort - es schiebt nur die Grenzen dorthin zurück, wo die Sätze wirklich enden, und nutzt die ursprünglichen Zeitstempel als Anker. Für 100 Sprachen, komplett im Browser.",
+    desc: "YouTube-Autocaptions trennen Sätze starr alle 3-4 Sekunden. Dieses Tool ändert kein Wort, sondern setzt die Grenzen dorthin, wo Sätze wirklich enden. Kostenlos, 100 Sprachen.",
     kw: "youtube untertitel reparieren,automatische untertitel youtube,untertitel neu schneiden,untertitel satzgrenzen,sätze zusammenführen untertitel,untertitel zeitachse,srt satzgrenzen,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Automatisch erzeugte YouTube-Untertitel hineinlegen, Sprache wählen - das Werkzeug fügt über Untertitelgrenzen zerrissene Sätze wieder zusammen und schneidet die Datei anschließend satzweise neu. Kein Wort wird verändert, die Zeiten bleiben so nah wie möglich an den Originalstempeln.",
     feat: "Automatische YouTube-Untertitel werden in fast feste Blöcke von 3 bis 4 Sekunden geschnitten, unabhängig vom Satz. Ein Block enthält deshalb oft das Ende des vorigen und den Anfang des nächsten Satzes. Das Werkzeug nimmt die Originalzeitstempel als Anker - das sind die echten Wortgrenzen der Spracherkennung -, entscheidet anhand der Satzzeichen, wo ein Satz endet, und wählt per dynamischer Programmierung die günstigste Schnittstelle zwischen Satzende, Komma, Konjunktion und hartem Schnitt. Danach wird die Anzeigedauer an die Lesegeschwindigkeit angepasst. Jede der 100 Sprachen hat eigene Regeln: Chinesisch und Japanisch trennen Wörter nicht mit Leerzeichen, Thai markiert Wortgrenzen kaum, Hindi endet mit ।, Arabisch mit ؟, Armenisch mit ։. Zeilenbreite und Lesetempo richten sich nach der Schrift: 16 Vollbreite-Zeichen pro Zeile im Chinesischen, 42 Zeichen bei lateinischen Schriften. Vor dem Export wird der Text Zeichen für Zeichen verglichen; fehlende oder zusätzliche Wörter werden sofort gemeldet.",
@@ -2398,7 +2417,7 @@ const SEO_YTFIX = {
   },
   'fr': {
     title: "Optimiseur de sous-titres YouTube - recomposer les phrases coupées | AI-SRTSub",
-    desc: "Réparez gratuitement les sous-titres automatiques de YouTube : ils sont découpés toutes les 3 ou 4 secondes sans tenir compte des phrases, si bien que la fin d'une phrase se retrouve au début du sous-titre suivant. Cet outil ne change pas un mot : il replace seulement les frontières là où les phrases se terminent vraiment, en gardant les horodatages d'origine comme ancrages. 100 langues, tout dans le navigateur.",
+    desc: "Les sous-titres auto de YouTube coupent toutes les 3-4 secondes. Cet outil garde vos mots et replace les limites là où les phrases se finissent vraiment. Gratuit, 100 langues.",
     kw: "réparer sous-titres youtube,sous-titres automatiques youtube,réaligner sous-titres,découpage sous-titres,regrouper phrases sous-titres,synchroniser phrases srt,sous-titres par phrase,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Déposez un sous-titre généré automatiquement par YouTube, choisissez la langue : l'outil recolle les phrases séparées par un changement de sous-titre, puis redécoupe le fichier phrase par phrase. Aucun mot ne change et les temps restent au plus près des horodatages d'origine.",
     feat: "Les sous-titres automatiques de YouTube sont découpés en blocs de 3 à 4 secondes sans égard pour les phrases : un bloc contient donc souvent la fin de la phrase précédente et le début de la suivante. L'outil prend les horodatages d'origine comme ancrages - ce sont les véritables frontières de mots fournies par la reconnaissance vocale -, déduit de la ponctuation où chaque phrase se termine et choisit par programmation dynamique la coupure la moins coûteuse entre fin de phrase, virgule, conjonction et coupe forcée, puis allonge le temps d'affichage selon la vitesse de lecture. Chacune des 100 langues a ses règles : le chinois et le japonais n'espacent pas les mots, le thaï marque à peine les frontières, l'hindi termine par ।, l'arabe par ؟, l'arménien par ։. La largeur de ligne et la vitesse de lecture suivent le système d'écriture : 16 caractères pleine chasse par ligne en chinois, 42 caractères pour les alphabets latins. Avant l'export, le texte est comparé caractère par caractère et tout mot perdu ou ajouté est signalé sur-le-champ.",
@@ -2407,7 +2426,7 @@ const SEO_YTFIX = {
   },
   'it': {
     title: "Ottimizzatore di sottotitoli YouTube - ricomporre le frasi spezzate | AI-SRTSub",
-    desc: "Ripara gratis i sottotitoli automatici di YouTube: vengono tagliati ogni 3 o 4 secondi senza guardare dove finisce la frase, così la coda di una frase finisce all'inizio del sottotitolo successivo. Questo strumento non cambia una parola: riporta solo i confini dove le frasi finiscono davvero, usando i timecode originali come ancore. 100 lingue, tutto nel browser.",
+    desc: "I sottotitoli auto di YouTube tagliano ogni 3-4 secondi. Questo strumento tiene le tue parole e sposta i confini dove le frasi finiscono davvero. Gratis, 100 lingue.",
     kw: "riparare sottotitoli youtube,sottotitoli automatici youtube,riallineare sottotitoli,divisione sottotitoli,unire frasi sottotitoli,allineare frasi srt,sottotitoli per frase,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Carica un sottotitolo generato automaticamente da YouTube, scegli la lingua e lo strumento ricuce le frasi spezzate tra un sottotitolo e l'altro, poi ritaglia il file frase per frase. Nessuna parola cambia e i tempi restano il più vicino possibile ai timecode originali.",
     feat: "I sottotitoli automatici di YouTube sono tagliati in blocchi di 3-4 secondi senza badare alle frasi, quindi un blocco porta spesso la coda della frase precedente e l'inizio della successiva. Lo strumento usa i timecode originali come ancore - sono i confini reali di parola prodotti dal riconoscimento vocale -, capisce dalla punteggiatura dove finisce ogni frase e con la programmazione dinamica sceglie il taglio meno costoso tra fine frase, virgola, congiunzione e taglio forzato, poi allunga la permanenza a schermo in base alla velocità di lettura. Ognuna delle 100 lingue ha le sue regole: cinese e giapponese non separano le parole con spazi, il thai segna a malapena i confini, l'hindi chiude con ।, l'arabo con ؟, l'armeno con ։. Larghezza di riga e velocità di lettura seguono il sistema di scrittura: 16 caratteri a larghezza piena per riga in cinese, 42 caratteri per gli alfabeti latini. Prima dell'esportazione il testo viene confrontato carattere per carattere e ogni parola persa o aggiunta viene segnalata subito.",
@@ -2416,7 +2435,7 @@ const SEO_YTFIX = {
   },
   'nl': {
     title: "YouTube-ondertitels optimaliseren - afgebroken zinnen weer heel maken | AI-SRTSub",
-    desc: "Repareer gratis automatische YouTube-ondertitels: die worden elke 3 of 4 seconden botweg geknipt zonder naar het zinseinde te kijken, waardoor de staart van een zin bovenaan de volgende ondertitel belandt. Deze tool verandert geen enkel woord, maar schuift alleen de grenzen terug naar waar de zinnen echt eindigen, met de originele tijdstippen als anker. 100 talen, alles in je browser.",
+    desc: "YouTube-autocaptions breken zinnen na 3-4 seconden. Deze tool behoudt elk woord en verplaatst grenzen naar echte zine-einden. Gratis, 100 talen.",
     kw: "youtube ondertitels repareren,automatische ondertitels youtube,ondertitels opnieuw knippen,zinsegrenzen ondertitels,zinnen samenvoegen ondertitels,tijdlijn ondertitels,srt zinsplitsing,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Sleep een automatisch gegenereerde YouTube-ondertitel erin, kies de taal en de tool lijmt zinnen die over ondertitels heen waren gesplitst weer aan elkaar, waarna het bestand per zin opnieuw wordt geknipt. Geen woord verandert en de tijden blijven zo dicht mogelijk bij de originele tijdstippen.",
     feat: "Automatische YouTube-ondertitels worden in blokken van 3 tot 4 seconden geknipt, ongeacht de zinnen. Eén blok bevat daardoor vaak de staart van de vorige en het begin van de volgende zin. De tool gebruikt de originele tijdstippen als anker - dat zijn de echte woordgrenzen van de spraakherkenning -, bepaalt aan de leestekens waar een zin eindigt en kiest met dynamisch programmeren de goedkoopste knip tussen zinseinde, komma, voegwoord en harde knip. Daarna wordt de leesduur op het leestempo aangepast. Elk van de 100 talen heeft eigen regels: Chinees en Japans zetten geen spaties tussen woorden, Thai markeert woordgrenzen nauwelijks, Hindi eindigt met ।, Arabisch met ؟, Armeens met ։. Regelbreedte en leessnelheid volgen het schriftsysteem: 16 volledige tekens per regel in het Chinees, 42 tekens bij Latijnse schriften. Voor het exporteren wordt de tekst teken voor teken vergeleken en elk weggevallen of toegevoegd woord wordt meteen gemeld.",
@@ -2425,7 +2444,7 @@ const SEO_YTFIX = {
   },
   'id': {
     title: "Pengoptimal Subtitle YouTube - menyambung kalimat yang terpotong | AI-SRTSub",
-    desc: "Perbaiki subtitle otomatis YouTube gratis di browser: subtitle otomatis dipotong tiap 3-4 detik tanpa melihat akhir kalimat, jadi ekor satu kalimat menempel di awal subtitle berikutnya. Alat ini tidak mengubah satu kata pun, hanya memindahkan batas ke tempat kalimat benar-benar berakhir, dengan stempel waktu asli sebagai jangkar. Mendukung 100 bahasa.",
+    desc: "Auto-caption YouTube memotong kalimat tiap 3-4 detik. Alat ini pertahankan kata & pindahkan batas ke akhir kalimat asli. Gratis, 100 bahasa.",
     kw: "perbaiki subtitle youtube,subtitle otomatis youtube,menyambung subtitle,pembagian kalimat subtitle,menggabungkan kalimat subtitle,menyejajarkan waktu srt,subtitle per kalimat,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Masukkan subtitle hasil otomatis YouTube, pilih bahasanya, dan alat ini menyambung kembali kalimat yang terpisah antar-subtitle lalu memotong ulang per kalimat. Tidak ada kata yang diubah, dan waktu tetap sedekat mungkin dengan stempel waktu asli.",
     feat: "Subtitle otomatis YouTube dipotong dalam blok nyaris tetap 3-4 detik tanpa peduli batas kalimat, sehingga satu blok sering memuat ekor kalimat sebelumnya sekaligus awal kalimat berikutnya. Alat ini memakai stempel waktu asli sebagai jangkar - itulah batas kata sebenarnya dari pengenalan suara -, menentukan akhir kalimat dari tanda baca, lalu memakai pemrograman dinamis untuk memilih titik potong paling murah di antara akhir kalimat, koma, kata sambung, dan potong paksa, kemudian memperpanjang durasi tampil sesuai kecepatan baca. Setiap dari 100 bahasa punya aturannya sendiri: Mandarin dan Jepang tidak memakai spasi antar kata, Thai hampir tidak menandai batas kata, Hindi menutup dengan ।, Arab dengan ؟, Armenia dengan ։. Lebar baris dan kecepatan baca mengikuti sistem tulisan: 16 karakter lebar penuh per baris untuk Mandarin, 42 karakter untuk aksara Latin. Sebelum ekspor, teks dibandingkan karakter demi karakter dan kata yang hilang atau bertambah langsung diperingatkan.",
@@ -2434,7 +2453,7 @@ const SEO_YTFIX = {
   },
   'hi': {
     title: "YouTube सबटाइटल ऑप्टिमाइज़र - आधे कटे वाक्य फिर से जोड़ें | AI-SRTSub",
-    desc: "YouTube के ऑटो सबटाइटल मुफ़्त में ठीक करें: ऑटो सबटाइटल हर 3-4 सेकंड पर यंत्रवत काटे जाते हैं, वाक्य कहाँ ख़त्म होता है इसकी परवाह नहीं होती, इसलिए एक वाक्य की पूँछ अगले सबटाइटल के शुरू में चली जाती है। यह टूल एक शब्द भी नहीं बदलता, सिर्फ़ कट को वहाँ लौटाता है जहाँ वाक्य सचमुच ख़त्म होता है, और मूल टाइमस्टैम्प को एंकर मानता है। 100 भाषाएँ, पूरा काम ब्राउज़र में।",
+    desc: "यूट्यूब ऑटो-कैप्शन 3-4 सेकंड पर वाक्य तोड़ते हैं। यह टूल शब्द रखता है और सीमाएं वाक्य अंत पर ले जाता है। मुफ्त, 100 भाषाएं।",
     kw: "youtube सबटाइटल ठीक करें,ऑटो सबटाइटल youtube,सबटाइटल रीअलाइन,सबटाइटल वाक्य विभाजन,वाक्य जोड़ना सबटाइटल,srt वाक्य विभाजन,सबटाइटल टाइमिंग,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "YouTube से अपने आप बने सबटाइटल डालें, भाषा चुनें - टूल सबटाइटल के बीच बँटे वाक्यों को फिर जोड़ता है और फिर वाक्य के हिसाब से फ़ाइल दोबारा काटता है। कोई शब्द नहीं बदलता और समय मूल टाइमस्टैम्प के जितना क़रीब हो सके उतना ही रहता है।",
     feat: "YouTube के ऑटो सबटाइटल लगभग तय 3-4 सेकंड के टुकड़ों में काटे जाते हैं, कट वाक्य से कोई संबंध नहीं रखता, इसलिए एक ही टुकड़े में पिछले वाक्य की पूँछ और अगले वाक्य की शुरुआत साथ आ जाती है। यह टूल मूल टाइमस्टैम्प को एंकर बनाता है - वे असल में स्पीच रिकग्निशन के दिए हुए सच्चे शब्द-बिंदु हैं -, विराम चिह्नों से तय करता है कि वाक्य कहाँ ख़त्म होता है, और डायनैमिक प्रोग्रामिंग से वाक्यांत, अल्पविराम, संयोजक और ज़बरदस्ती कट के बीच सबसे कम क़ीमत वाला कट चुनता है, फिर पढ़ने की गति के हिसाब से स्क्रीन पर रहने का समय बढ़ाता है। 100 भाषाओं में से हर एक के अपने नियम हैं: चीनी और जापानी में शब्दों के बीच स्पेस नहीं होता, थाई में शब्द की सीमा भी धुँधली है, हिन्दी में वाक्य । पर ख़त्म होता है, अरबी में ؟, आर्मेनियाई में ։। पंक्ति की चौड़ाई और पढ़ने की गति लिपि के हिसाब से तय होती है: चीनी में 16 पूर्ण-चौड़ाई अक्षर प्रति पंक्ति, लातिनी लिपियों में 42 अक्षर। निर्यात से पहले पाठ की अक्षर-दर-अक्षर तुलना होती है और कोई शब्द छूटा या बढ़ा हो तो तुरंत चेतावनी मिलती है।",
@@ -2443,7 +2462,7 @@ const SEO_YTFIX = {
   },
   'th': {
     title: "ปรับซับไตเติล YouTube - ต่อประโยคที่ถูกตัดครึ่งให้สมบูรณ์ | AI-SRTSub",
-    desc: "ซ่อมซับอัตโนมัติของ YouTube ฟรีทางออนไลน์: ซับอัตโนมัติถูกตัดทุก 3-4 วินาทีโดยไม่สนว่าประโยคจบตรงไหน ทำให้หางประโยคหนึ่งไปโผล่ต้นซับถัดไป เครื่องมือนี้ไม่แก้สักคำ แค่ย้ายขอบกลับไปที่จุดที่ประโยคจบจริง โดยใช้เวลาเดิมเป็นจุดยึด รองรับ 100 ภาษา ทำงานในเบราว์เซอร์ทั้งหมด",
+    desc: "คำบรรยายอัตโนมัติของ YouTube ตัดประโยคทุก 3-4 วินาที เครื่องนี้คงทุกคำและย้ายขอบเขตไปยังจุดสิ้นสุดจริง ฟรี 100 ภาษา",
     kw: "ซ่อมซับ youtube,ซับอัตโนมัติ youtube,จัดซับใหม่,แบ่งซับตามประโยค,รวมประโยคซับ,จัดเวลา srt,ซับแยกตามประโยค,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "วางไฟล์ซับที่ YouTube สร้างอัตโนมัติ เลือกภาษา แล้วเครื่องมือจะต่อประโยคที่ขาดออกจากกันข้ามซับให้กลับมาเป็นประโยคเดียว แล้วตัดไฟล์ใหม่ทีละประโยค ไม่มีการแก้ข้อความแม้แต่คำเดียว และเวลายังใกล้เคียงเวลาเดิมมากที่สุด",
     feat: "ซับอัตโนมัติของ YouTube ถูกตัดเป็นท่อนละประมาณ 3-4 วินาทีโดยไม่เกี่ยวกับประโยค ดังนั้นหนึ่งท่อนมักมีทั้งหางประโยคก่อนหน้าและต้นประโยคถัดไปปนกัน เครื่องมือนี้ใช้เวลาเดิมเป็นจุดยึด ซึ่งเป็นขอบเขตคำจริงที่ระบบรู้จำเสียงให้มา ตัดสินว่าประโยคจบตรงไหนจากเครื่องหมายวรรคตอน แล้วใช้การโปรแกรมแบบพลวัตเลือกจุดตัดที่ต้นทุนต่ำที่สุดระหว่างท้ายประโยค จุลภาค คำเชื่อม และการตัดกลางประโยค จากนั้นขยายเวลาที่แสดงตามความเร็วในการอ่าน แต่ละภาษาจาก 100 ภาษามีกฎต่างกัน จีนและญี่ปุ่นไม่เว้นวรรคระหว่างคำ ไทยแทบไม่แสดงขอบเขตคำ ฮินดีจบประโยคด้วย । อาหรับด้วย ؟ อาร์เมเนียด้วย ։ ความกว้างบรรทัดและความเร็วในการอ่านแบ่งตามระบบตัวอักษร จีนบรรทัดละ 16 ตัวอักษรเต็มความกว้าง อักษรละติน 42 ตัวอักษร ก่อนส่งออกจะเทียบข้อความทีละตัวอักษร ถ้ามีคำหายหรือเกินจะเตือนทันที",
@@ -2452,7 +2471,7 @@ const SEO_YTFIX = {
   },
   'vi': {
     title: "Tối ưu phụ đề YouTube - nối lại câu bị cắt giữa chừng | AI-SRTSub",
-    desc: "Sửa phụ đề tự động của YouTube miễn phí ngay trên trình duyệt: phụ đề tự động bị cắt mỗi 3-4 giây mà không cần biết câu kết thúc ở đâu, nên đuôi câu trước rơi vào đầu phụ đề sau. Công cụ này không đổi một chữ nào, chỉ đưa ranh giới về đúng chỗ câu kết thúc, dùng mốc thời gian gốc làm điểm neo. Hỗ trợ 100 ngôn ngữ.",
+    desc: "Phụ đề tự động YouTube cắt câu mỗi 3-4 giây. Công cụ này giữ nguyên từ và chỉnh lại ranh giới phụ đề chuẩn xác theo câu. Miễn phí với 100 ngôn ngữ.",
     kw: "sửa phụ đề youtube,phụ đề tự động youtube,nối lại phụ đề,chia phụ đề theo câu,gộp câu phụ đề,căn thời gian srt,phụ đề theo câu,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Đưa vào tệp phụ đề do YouTube tạo tự động, chọn ngôn ngữ, công cụ sẽ nối lại những câu bị tách qua nhiều dòng rồi cắt lại theo từng câu. Không chữ nào bị sửa và thời gian vẫn bám sát mốc gốc nhất có thể.",
     feat: "Phụ đề tự động của YouTube bị cắt thành từng khối gần như cố định 3-4 giây, không quan tâm câu kết thúc ở đâu, nên một khối thường chứa cả đuôi câu trước lẫn đầu câu sau. Công cụ lấy mốc thời gian gốc làm điểm neo - đó chính là ranh giới từ thật do nhận dạng giọng nói trả về -, dựa vào dấu câu để xác định câu kết thúc ở đâu, rồi dùng quy hoạch động chọn điểm cắt rẻ nhất trong bốn khả năng: cuối câu, dấu phẩy, liên từ và cắt cứng; sau đó kéo dài thời gian hiển thị theo tốc độ đọc. Mỗi ngôn ngữ trong 100 ngôn ngữ có bộ quy tắc riêng: tiếng Trung và tiếng Nhật không có dấu cách giữa từ, tiếng Thái gần như không đánh dấu ranh giới từ, tiếng Hindi kết câu bằng ।, tiếng Ả Rập bằng ؟, tiếng Armenia bằng ։. Độ rộng dòng và tốc độ đọc tính theo hệ chữ: tiếng Trung 16 ký tự toàn khổ mỗi dòng, chữ Latinh 42 ký tự. Trước khi xuất, văn bản được đối chiếu từng ký tự, thiếu hay thừa chữ đều cảnh báo ngay.",
@@ -2461,7 +2480,7 @@ const SEO_YTFIX = {
   },
   'ru': {
     title: "Оптимизация субтитров YouTube — склеить разрезанные фразы | AI-SRTSub",
-    desc: "Бесплатно исправьте автоматические субтитры YouTube: они нарезаются каждые 3-4 секунды без оглядки на границы фраз, поэтому хвост одной фразы оказывается в начале следующего субтитра. Инструмент не меняет ни слова — он лишь возвращает границы туда, где фразы действительно заканчиваются, и использует исходные таймкоды как опорные точки. 100 языков, всё в браузере.",
+    desc: "Автосубтитры YouTube режут текст каждые 3-4 секунды. Этот инструмент сохраняет слова и двигает границы туда, где реально кончаются фразы. Бесплатно, 100 языков.",
     kw: "исправить субтитры youtube,автоматические субтитры youtube,переразбить субтитры,границы фраз субтитры,склеить фразы субтитры,выровнять таймкоды srt,субтитры по фразам,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Загрузите субтитры, созданные YouTube автоматически, выберите язык — инструмент склеит фразы, разорванные между субтитрами, и заново нарежет файл по фразам. Ни одно слово не меняется, а время остаётся как можно ближе к исходным таймкодам.",
     feat: "Автоматические субтитры YouTube нарезаются почти ровными кусками по 3-4 секунды, не считаясь с фразами, поэтому в одном субтитре часто оказываются хвост предыдущей фразы и начало следующей. Инструмент берёт исходные таймкоды за опорные точки — это настоящие границы слов, которые выдало распознавание речи, — определяет конец фразы по знакам препинания и с помощью динамического программирования выбирает самый дешёвый разрез среди конца фразы, запятой, союза и принудительного разрыва, а затем продлевает показ по скорости чтения. У каждого из 100 языков свои правила: в китайском и японском нет пробелов между словами, в тайском границы слов почти не размечены, хинди заканчивает фразу на ।, арабский на ؟, армянский на ։. Ширина строки и скорость чтения зависят от письменности: 16 полноширинных знаков в строке для китайского, 42 знака для латиницы. Перед экспортом текст сверяется посимвольно, и о любом потерянном или лишнем слове сразу сообщается.",
@@ -2470,7 +2489,7 @@ const SEO_YTFIX = {
   },
   'ar': {
     title: "تحسين ترجمات يوتيوب — إعادة ضبط الجمل المقطوعة | AI-SRTSub",
-    desc: "أصلح الترجمات التلقائية ليوتيوب مجاناً في المتصفح: تُقطع الترجمات التلقائية كل 3-4 ثوانٍ دون نظر إلى نهاية الجملة، فيظهر ذيل جملة في بداية الترجمة التالية. هذه الأداة لا تغيّر كلمة واحدة، بل تعيد الحدود إلى المكان الذي تنتهي فيه الجملة فعلاً، وتتخذ الطوابع الزمنية الأصلية مراسٍ لها. تدعم 100 لغة، وكل شيء يجري داخل المتصفح.",
+    desc: "الترجمة التلقائية في YouTube تقطع الجمل كل ٣-٤ ثوانٍ. هذه الأداة تحافظ على الكلمات وتنقل حدود الترجمة لنهاية الجمل الحقيقية. مجانية وبـ ١٠٠ لغة.",
     kw: "إصلاح ترجمات يوتيوب,الترجمة التلقائية يوتيوب,إعادة تقسيم الترجمات,حدود الجمل في الترجمة,دمج الجمل في الترجمة,ضبط توقيت srt,ترجمة حسب الجملة,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "أدخل ملف ترجمة أنشأه يوتيوب تلقائياً، واختر اللغة، فتعيد الأداة وصل الجمل التي انقسمت بين الترجمات ثم تقطع الملف من جديد جملةً جملة. لا تتغيّر أي كلمة، ويبقى التوقيت أقرب ما يمكن إلى الطوابع الأصلية.",
     feat: "تُقطع الترجمات التلقائية في يوتيوب إلى مقاطع شبه ثابتة من 3 إلى 4 ثوانٍ دون اعتبار للجمل، فيحمل المقطع الواحد ذيل الجملة السابقة وبداية الجملة التالية. تتخذ الأداة الطوابع الزمنية الأصلية مراسٍ لها، وهي حدود الكلمات الحقيقية التي أعطاها التعرّف على الكلام، وتستدل من علامات الترقيم على نهاية الجملة، ثم تستخدم البرمجة الديناميكية لاختيار أقل نقطة قطع كلفة بين نهاية الجملة والفاصلة وحرف العطف والقطع الاضطراري، وبعدها تمدّد زمن العرض بحسب سرعة القراءة. ولكل لغة من اللغات المئة قواعدها: الصينية واليابانية بلا فراغ بين الكلمات، والتايلاندية تكاد لا تعلّم حدود الكلمات، والهندية تنهي الجملة بـ ।، والعربية بـ ؟، والأرمنية بـ ։. ويُحسب عرض السطر وسرعة القراءة بحسب نظام الكتابة: 16 حرفاً كامل العرض في السطر للصينية، و42 حرفاً للكتابات اللاتينية. وقبل التصدير يُقارن النص حرفاً بحرف، ويُنبَّه فوراً إلى أي كلمة سقطت أو زادت.",
@@ -2479,7 +2498,7 @@ const SEO_YTFIX = {
   },
   'tr': {
     title: "YouTube altyazı iyileştirme - yarıda kesilen cümleleri toparlayın | AI-SRTSub",
-    desc: "YouTube otomatik altyazılarını tarayıcıda ücretsiz onarın: otomatik altyazılar cümlenin nerede bittiğine bakılmadan 3-4 saniyede bir kesilir, bu yüzden bir cümlenin kuyruğu sonraki altyazının başına düşer. Bu araç tek kelime değiştirmez; yalnızca sınırları cümlenin gerçekten bittiği yere taşır ve özgün zaman damgalarını çapa olarak kullanır. 100 dil desteklenir.",
+    desc: "YouTube otomatik altyazıları 3-4 saniyede bir keser. Bu araç kelimeleri korur ve sınırları cümlelerin bittiği yere taşır. Ücretsiz ve 100 dil desteğiyle.",
     kw: "youtube altyazı onarma,youtube otomatik altyazı,altyazı yeniden bölme,altyazı cümle sınırı,altyazı cümle birleştirme,altyazı zaman çizelgesi,srt cümle bölme,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "YouTube'un otomatik oluşturduğu altyazıyı yükleyin, dili seçin; araç altyazılar arasında bölünmüş cümleleri yeniden birleştirir, sonra dosyayı cümle cümle yeniden keser. Hiçbir kelime değişmez, zamanlar özgün damgalara olabildiğince yakın kalır.",
     feat: "YouTube otomatik altyazıları neredeyse sabit 3-4 saniyelik parçalara bölünür ve kesim noktası cümleyle ilgili değildir; bu yüzden bir parçada önceki cümlenin kuyruğu ile sonrakinin başı birlikte bulunur. Araç özgün zaman damgalarını çapa alır - bunlar konuşma tanımanın verdiği gerçek kelime sınırlarıdır -, cümlenin nerede bittiğini noktalama işaretlerinden çıkarır ve dinamik programlamayla cümle sonu, virgül, bağlaç ve zorunlu kesme arasından en düşük maliyetli noktayı seçer; ardından okuma hızına göre ekranda kalma süresini uzatır. 100 dilin her birinin kendi kuralı var: Çince ve Japonca sözcükler arasına boşluk koymaz, Tayca sözcük sınırlarını neredeyse hiç belirtmez, Hintçe cümleyi । ile, Arapça ؟ ile, Ermenice ։ ile bitirir. Satır genişliği ve okuma hızı yazı sistemine göre belirlenir: Çincede satır başına 16 tam genişlikli karakter, Latin alfabelerinde 42 karakter. Dışa aktarmadan önce metin karakter karakter karşılaştırılır; eksilen ya da eklenen kelime anında bildirilir.",
@@ -2488,7 +2507,7 @@ const SEO_YTFIX = {
   },
   'pl': {
     title: "Optymalizacja napisów YouTube - scalanie przeciętych zdań | AI-SRTSub",
-    desc: "Napraw automatyczne napisy YouTube bezpłatnie w przeglądarce: automatyczne napisy są cięte co 3-4 sekundy bez względu na koniec zdania, więc ogon jednego zdania trafia na początek następnego napisu. To narzędzie nie zmienia ani jednego słowa - przesuwa tylko granice tam, gdzie zdania naprawdę się kończą, wykorzystując oryginalne znaczniki czasu jako punkty zaczepienia. 100 języków.",
+    desc: "Automatyczne napisy YouTube dzielą zdanie co 3-4 sekundy. Narzędzie zachowuje każde słowo i przesuwa granice tam, gdzie kończą się zdania. Darmowe, 100 języków.",
     kw: "naprawa napisów youtube,automatyczne napisy youtube,ponowne cięcie napisów,granice zdań napisy,scalanie zdań napisy,wyrównanie czasu srt,napisy według zdań,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Wrzuć napisy wygenerowane automatycznie przez YouTube, wybierz język, a narzędzie połączy zdania rozdzielone między napisami i przetnie plik od nowa, zdanie po zdaniu. Żadne słowo się nie zmienia, a czasy pozostają jak najbliżej oryginalnych znaczników.",
     feat: "Automatyczne napisy YouTube są cięte na bloki o prawie stałej długości 3-4 sekund, bez oglądania się na zdania, więc jeden blok często zawiera ogon poprzedniego zdania i początek następnego. Narzędzie przyjmuje oryginalne znaczniki czasu za punkty zaczepienia - to rzeczywiste granice słów zwrócone przez rozpoznawanie mowy - rozpoznaje koniec zdania po interpunkcji i za pomocą programowania dynamicznego wybiera najtańsze cięcie spośród końca zdania, przecinka, spójnika i cięcia wymuszonego, a potem wydłuża czas na ekranie zgodnie z tempem czytania. Każdy ze 100 języków ma własne zasady: chiński i japoński nie oddzielają słów spacjami, tajski prawie nie znaczy granic słów, hindi kończy zdanie znakiem ।, arabski ؟, ormiański ։. Szerokość wiersza i tempo czytania zależą od systemu pisma: 16 znaków pełnej szerokości w wierszu po chińsku, 42 znaki przy alfabetach łacińskich. Przed eksportem tekst jest porównywany znak po znaku, a każde brakujące lub dodane słowo jest natychmiast zgłaszane.",
@@ -2497,7 +2516,7 @@ const SEO_YTFIX = {
   },
   'sv': {
     title: "Optimera YouTube-undertexter - sätt ihop avhuggna meningar | AI-SRTSub",
-    desc: "Reparera YouTubes automatiska undertexter gratis i webbläsaren: de klipps var 3-4 sekund utan hänsyn till var meningen slutar, så svansen av en mening hamnar i början av nästa undertext. Verktyget ändrar inte ett enda ord - det flyttar bara gränserna dit meningarna faktiskt tar slut och använder originaltidsstämplarna som ankare. 100 språk.",
+    desc: "YouTube-undertexter bryter meningar var 3-4 sekund. Verktyget behåller orden och flyttar tidsgränserna dit meningarna slutar. Gratis, 100 språk.",
     kw: "reparera undertexter youtube,automatiska undertexter youtube,klippa om undertexter,meninggränser undertexter,slå ihop meningar undertexter,justera tidslinje srt,undertexter per mening,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Lägg in en undertext som YouTube skapat automatiskt, välj språk, och verktyget fogar ihop meningar som delats mellan undertexter och klipper sedan om filen mening för mening. Inte ett ord ändras och tiderna ligger så nära originaltidsstämplarna som möjligt.",
     feat: "YouTubes automatiska undertexter klipps i nästan fasta block på 3-4 sekunder utan att bry sig om meningarna, så ett block innehåller ofta både slutet av föregående mening och början av nästa. Verktyget tar originaltidsstämplarna som ankare - det är de verkliga ordgränser taligenkänningen gav - avgör var meningen slutar utifrån skiljetecken och väljer med dynamisk programmering det billigaste klippet bland meningsslut, komma, konjunktion och påtvingat klipp, och förlänger sedan visningstiden efter läshastigheten. Var och en av de 100 språken har egna regler: kinesiska och japanska sätter inga mellanslag mellan ord, thailändska markerar knappt ordgränser, hindi avslutar med ।, arabiska med ؟, armeniska med ։. Radbredd och läshastighet följer skriftsystemet: 16 helbreddstecken per rad på kinesiska, 42 tecken för latinska skrifter. Före export jämförs texten tecken för tecken och varje förlorat eller tillagt ord larmas direkt.",
@@ -2506,7 +2525,7 @@ const SEO_YTFIX = {
   },
   'cs': {
     title: "Optimalizace titulků YouTube - spojení přeťatých vět | AI-SRTSub",
-    desc: "Opravte automatické titulky YouTube zdarma v prohlížeči: automatické titulky se stříhají každé 3-4 sekundy bez ohledu na konec věty, takže konec jedné věty skončí na začátku dalšího titulku. Tento nástroj nemění ani jedno slovo - jen vrací hranice tam, kde věty skutečně končí, a původní časové značky používá jako kotvy. 100 jazyků.",
+    desc: "Automatické titulky YouTube dělí věty po 3-4 sekundách. Nástroj zachovává každé slovo a posouvá hranice tam, kde věty končí. Zdarma, 100 jazyků.",
     kw: "oprava titulků youtube,automatické titulky youtube,přestřižení titulků,hranice vět titulky,spojování vět titulky,zarovnání času srt,titulky podle vět,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Vložte titulky, které YouTube vytvořil automaticky, vyberte jazyk a nástroj znovu spojí věty rozdělené mezi titulky a pak soubor přestřihne větu po větě. Nemění se žádné slovo a časy zůstávají co nejblíž původním značkám.",
     feat: "Automatické titulky YouTube se stříhají do bloků o téměř pevné délce 3-4 sekundy bez ohledu na věty, takže jeden blok často nese konec předchozí věty i začátek následující. Nástroj bere původní časové značky jako kotvy - to jsou skutečné hranice slov z rozpoznávání řeči -, podle interpunkce určí, kde věta končí, a pomocí dynamického programování vybere nejlevnější řez mezi koncem věty, čárkou, spojkou a vynuceným řezem; poté prodlouží dobu na obrazovce podle tempa čtení. Každý ze 100 jazyků má svá pravidla: čínština a japonština neoddělují slova mezerami, thajština hranice slov téměř neznačí, hindština končí větu znakem ।, arabština ؟, arménština ։. Šířka řádku a tempo čtení se řídí písmem: 16 znaků plné šířky na řádek v čínštině, 42 znaků u latinek. Před exportem se text porovnává znak po znaku a každé chybějící či přidané slovo se okamžitě ohlásí.",
@@ -2515,7 +2534,7 @@ const SEO_YTFIX = {
   },
   'uk': {
     title: "Оптимізація субтитрів YouTube — зшивання розірваних фраз | AI-SRTSub",
-    desc: "Виправте автоматичні субтитри YouTube безкоштовно в браузері: вони нарізаються кожні 3-4 секунди без огляду на межі фраз, тому хвіст однієї фрази потрапляє на початок наступного субтитра. Інструмент не змінює жодного слова — лише повертає межі туди, де фрази справді закінчуються, а оригінальні таймкоди править за опорні точки. 100 мов.",
+    desc: "Автосубтитри YouTube обрізають рядки кожні 3-4 секунди. Цей інструмент не чіпає слова, а переносить межі туди, де справді кінець. Безкоштовно, 100 мов.",
     kw: "виправити субтитри youtube,автоматичні субтитри youtube,перерозбити субтитри,межі фраз субтитри,зшити фрази субтитри,вирівняти таймкоди srt,субтитри за фразами,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Завантажте субтитри, створені YouTube автоматично, виберіть мову — інструмент зшиє фрази, розірвані між субтитрами, і заново наріже файл по фразах. Жодне слово не змінюється, а час залишається якнайближче до оригінальних таймкодів.",
     feat: "Автоматичні субтитри YouTube нарізаються майже рівними шматками по 3-4 секунди, не зважаючи на фрази, тому в одному субтитрі часто опиняються хвіст попередньої фрази й початок наступної. Інструмент бере оригінальні таймкоди за опорні точки — це справжні межі слів, які видало розпізнавання мовлення, — визначає кінець фрази за розділовими знаками і за допомогою динамічного програмування обирає найдешевший розріз серед кінця фрази, коми, сполучника та примусового розриву, а потім подовжує показ за темпом читання. Кожна зі 100 мов має власні правила: у китайській та японській немає пробілів між словами, тайська майже не позначає межі слів, гінді завершує фразу знаком ।, арабська — ؟, вірменська — ։. Ширина рядка й темп читання залежать від письма: 16 повноширинних знаків у рядку для китайської, 42 знаки для латинки. Перед експортом текст звіряється символ за символом, і про кожне загублене чи зайве слово одразу повідомляється.",
@@ -2524,7 +2543,7 @@ const SEO_YTFIX = {
   },
   'da': {
     title: "Optimer YouTube-undertekster - sæt afskårne sætninger sammen | AI-SRTSub",
-    desc: "Ret YouTubes automatiske undertekster gratis i browseren: de klippes hvert 3-4 sekund uden hensyn til, hvor sætningen slutter, så halen af en sætning havner i starten af den næste undertekst. Værktøjet ændrer ikke ét eneste ord - det flytter kun grænserne hen, hvor sætningerne faktisk slutter, og bruger de oprindelige tidsstempler som ankre. 100 sprog.",
+    desc: "YouTube-undertitler deler sætninger ved faste 3-4 sekunder. Dette værktøj flytter tidsgrænserne til ægte sætningsslutninger. Gratis, 100 sprog, fjern alle ordfejl.",
     kw: "ret undertekster youtube,automatiske undertekster youtube,kap undertekster om,sætningsgrænser undertekster,flet sætninger undertekster,juster tidslinje srt,undertekster per sætning,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Læg en undertekst ind, som YouTube har lavet automatisk, vælg sprog, og værktøjet syr sætninger sammen igen på tværs af undertekster og klipper derefter filen om sætning for sætning. Ikke ét ord ændres, og tiderne ligger så tæt på de oprindelige tidsstempler som muligt.",
     feat: "YouTubes automatiske undertekster klippes i næsten faste blokke på 3-4 sekunder uden at se på sætningerne, så en blok ofte rummer både halen af den foregående sætning og starten af den næste. Værktøjet bruger de oprindelige tidsstempler som ankre - det er de rigtige ordgrænser, som talegenkendelsen gav - afgør ud fra tegnsætningen, hvor sætningen slutter, og vælger med dynamisk programmering det billigste klip blandt sætningsslut, komma, bindeord og tvunget klip, hvorefter visningstiden forlænges efter læsehastigheden. Hvert af de 100 sprog har sine egne regler: kinesisk og japansk sætter ikke mellemrum mellem ord, thai markerer næsten ikke ordgrænser, hindi slutter med ।, arabisk med ؟, armensk med ։. Linjebredde og læsehastighed følger skriftsystemet: 16 fuldbreddetegn per linje på kinesisk, 42 tegn for latinske skrifter. Før eksport sammenlignes teksten tegn for tegn, og hvert tabt eller tilføjet ord varsles med det samme.",
@@ -2533,7 +2552,7 @@ const SEO_YTFIX = {
   },
   'fi': {
     title: "YouTube-tekstityksen optimointi - katkaistut lauseet takaisin yhteen | AI-SRTSub",
-    desc: "Korjaa YouTuben automaattiset tekstitykset ilmaiseksi selaimessa: ne leikataan 3-4 sekunnin välein piittaamatta lauseen lopusta, joten lauseen häntä päätyy seuraavan tekstityksen alkuun. Tämä työkalu ei muuta sanaakaan - se siirtää vain rajat sinne, mihin lauseet oikeasti loppuvat, ja käyttää alkuperäisiä aikaleimoja ankkureina. 100 kieltä.",
+    desc: "YouTube-tekstitykset katkaisevat lauseet 3-4 sekunnin välein. Tämä työkalu siirtää rajat oikeisiin lauseiden loppuihin. Ilmainen, 100 kieltä, sanoja poistamatta.",
     kw: "korjaa youtube tekstitys,automaattinen tekstitys youtube,leikkaa tekstitys uudelleen,lauserajat tekstitys,yhdistä lauseet tekstitys,aikalinjan tasaus srt,tekstitys lauseittain,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Lataa YouTuben automaattisesti luoma tekstitys, valitse kieli, niin työkalu ompelee tekstitysten väliin jakautuneet lauseet takaisin yhteen ja leikkaa tiedoston uudelleen lause kerrallaan. Yksikään sana ei muutu ja ajat pysyvät mahdollisimman lähellä alkuperäisiä aikaleimoja.",
     feat: "YouTuben automaattiset tekstitykset leikataan lähes kiinteisiin 3-4 sekunnin pätkiin lauseista välittämättä, joten yhdessä pätkässä on usein sekä edellisen lauseen häntä että seuraavan alku. Työkalu ottaa alkuperäiset aikaleimat ankkureiksi - ne ovat puheentunnistuksen antamia todellisia sanarajoja -, päättelee välimerkeistä, mihin lause loppuu, ja valitsee dynaamisella ohjelmoinnilla halvimman leikkauskohdan lauseen lopun, pilkun, konjunktion ja pakkoleikkauksen joukosta sekä pidentää näyttöaikaa lukuvauhdin mukaan. Jokaisella 100 kielestä on omat sääntönsä: kiinassa ja japanissa sanojen välissä ei ole välilyöntejä, thaissa sanarajat ovat lähes näkymättömiä, hindi päättää lauseen merkkiin ।, arabia merkkiin ؟, armenia merkkiin ։. Rivin leveys ja lukuvauhti riippuvat kirjoitusjärjestelmästä: kiinassa 16 täysleveää merkkiä riville, latinalaisissa kirjaimissa 42 merkkiä. Ennen vientiä teksti vertaillaan merkki merkiltä ja jokaisesta kadonneesta tai lisätystä sanasta varoitetaan heti.",
@@ -2542,7 +2561,7 @@ const SEO_YTFIX = {
   },
   'el': {
     title: "Βελτιστοποίηση υποτίτλων YouTube - ξανά ενωμένες κομμένες προτάσεις | AI-SRTSub",
-    desc: "Διορθώστε δωρεάν τους αυτόματους υπότιτλους του YouTube στον περιηγητή: κόβονται κάθε 3-4 δευτερόλεπτα χωρίς να κοιτάζουν πού τελειώνει η πρόταση, οπότε η ουρά μιας πρότασης καταλήγει στην αρχή του επόμενου υποτίτλου. Το εργαλείο δεν αλλάζει ούτε λέξη - μόνο μεταφέρει τα όρια εκεί που τελειώνουν πραγματικά οι προτάσεις, με τα αρχικά timecodes ως άγκυρες. 100 γλώσσες.",
+    desc: "Οι αυτόματοι υπότιτλοι του YouTube κόβουν φράσεις ανά 3-4 δευτερόλεπτα. Αυτό το εργαλείο διορθώνει τα όρια εκεί που τελειώνουν οι προτάσεις. Δωρεάν, 100 γλώσσες.",
     kw: "διόρθωση υποτίτλων youtube,αυτόματοι υπότιτλοι youtube,επανακοπή υποτίτλων,όρια προτάσεων υπότιτλοι,ένωση προτάσεων υπότιτλοι,ευθυγράμμιση χρόνου srt,υπότιτλοι ανά πρόταση,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Φορτώστε έναν υπότιτλο που δημιούργησε αυτόματα το YouTube, διαλέξτε γλώσσα και το εργαλείο ράβει ξανά τις προτάσεις που είχαν σπάσει ανάμεσα σε υπότιτλους και κόβει το αρχείο από την αρχή, πρόταση-πρόταση. Καμία λέξη δεν αλλάζει και οι χρόνοι μένουν όσο πιο κοντά γίνεται στα αρχικά timecodes.",
     feat: "Οι αυτόματοι υπότιτλοι του YouTube κόβονται σε σχεδόν σταθερά κομμάτια 3-4 δευτερολέπτων χωρίς να υπολογίζουν τις προτάσεις, οπότε ένα κομμάτι κρατά συχνά την ουρά της προηγούμενης πρότασης και την αρχή της επόμενης. Το εργαλείο παίρνει τα αρχικά timecodes ως άγκυρες - είναι τα πραγματικά όρια λέξεων που έδωσε η αναγνώριση ομιλίας -, βρίσκει από τη στίξη πού τελειώνει η πρόταση και με δυναμικό προγραμματισμό διαλέγει την πιο φθηνή κοπή ανάμεσα σε τέλος πρότασης, κόμμα, σύνδεσμο και αναγκαστική κοπή, έπειτα επιμηκύνει τον χρόνο προβολής ανάλογα με την ταχύτητα ανάγνωσης. Κάθε μία από τις 100 γλώσσες έχει τους κανόνες της: τα κινεζικά και τα ιαπωνικά δεν χωρίζουν λέξεις με κενά, τα ταϊλανδικά σχεδόν δεν σημαδεύουν όρια λέξεων, τα χίντι κλείνουν με ।, τα αραβικά με ؟, τα αρμενικά με ։. Το πλάτος γραμμής και η ταχύτητα ανάγνωσης ακολουθούν το σύστημα γραφής: 16 χαρακτήρες πλήρους πλάτους ανά γραμμή στα κινεζικά, 42 χαρακτήρες στα λατινικά αλφάβητα. Πριν την εξαγωγή το κείμενο συγκρίνεται χαρακτήρα προς χαρακτήρα και κάθε χαμένη ή πρόσθετη λέξη ειδοποιεί αμέσως.",
@@ -2551,7 +2570,7 @@ const SEO_YTFIX = {
   },
   'he': {
     title: "אופטימיזציית כתוביות יוטיוב - חיבור מחדש של משפטים קטועים | AI-SRTSub",
-    desc: "תיקון חינם של הכתוביות האוטומטיות ביוטיוב בדפדפן: הכתוביות נחתכות כל 3-4 שניות בלי להתחשב בסוף המשפט, ולכן הזנב של משפט אחד נוחת בפתח הכתובית הבאה. הכלי הזה לא משנה אף מילה - הוא רק מחזיר את הגבולות למקום שבו המשפטים באמת נגמרים, ומשתמש בחותמות הזמן המקוריות כעוגנים. 100 שפות.",
+    desc: "הכתוביות האוטומטיות של YouTube חותכות משפטים כל 3-4 שניות. כלי זה מתקן את גבולות המקטעים לסוף המשפטים האמיתי. חינם, 100 שפות, ללא מילים אבודות.",
     kw: "תיקון כתוביות יוטיוב,כתוביות אוטומטיות יוטיוב,חיתוך כתוביות מחדש,גבולות משפטים בכתוביות,חיבור משפטים בכתוביות,יישור ציר זמן srt,כתוביות לפי משפט,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "טענו קובץ כתוביות שיוטיוב יצר אוטומטית, בחרו שפה, והכלי מחבר חזרה משפטים שנחתכו בין כתוביות ואז חותך את הקובץ מחדש משפט אחר משפט. אף מילה לא משתנה, והזמנים נשארים קרובים ככל האפשר לחותמות המקוריות.",
     feat: "הכתוביות האוטומטיות של יוטיוב נחתכות למקטעים באורך כמעט קבוע של 3-4 שניות, בלי קשר למשפטים, ולכן מקטע אחד נושא לעתים קרובות גם את סוף המשפט הקודם וגם את תחילת המשפט הבא. הכלי מתייחס לחותמות הזמן המקוריות כעוגנים - אלה גבולות המילים האמיתיים שזיהוי הדיבור החזיר -, קובע לפי הפיסוק היכן המשפט נגמר, ובוחר בתכנות דינמי את נקודת החיתוך הזולה ביותר מבין סוף משפט, פסיק, מילת חיבור וחיתוך כפוי, ואחר כך מאריך את זמן התצוגה לפי קצב הקריאה. לכל אחת מ-100 השפות כללים משלה: בסינית וביפנית אין רווחים בין מילים, בתאית כמעט אין סימון לגבולות מילים, בהינדי המשפט נגמר ב-।, בערבית ב-؟, בארמנית ב-։. רוחב השורה וקצב הקריאה נקבעים לפי מערכת הכתב: 16 תווים ברוחב מלא בשורה בסינית, 42 תווים בכתב לטיני. לפני הייצוא הטקסט מושווה תו אחר תו, וכל מילה שנעלמה או נוספה מדווחת מיד.",
@@ -2560,7 +2579,7 @@ const SEO_YTFIX = {
   },
   'ro': {
     title: "Optimizare subtitrări YouTube - recompune propozițiile tăiate | AI-SRTSub",
-    desc: "Repară gratuit subtitrările automate din YouTube, în browser: acestea sunt tăiate la fiecare 3-4 secunde fără să țină cont de unde se termină propoziția, așa că finalul unei propoziții apare la începutul subtitrării următoare. Instrumentul nu schimbă niciun cuvânt - mută doar granițele acolo unde se termină propozițiile cu adevărat, folosind marcajele de timp originale ca ancore. 100 de limbi.",
+    desc: "YouTube taie subtitrările la fiecare 3-4 secunde. Această unealtă păstrează cuvintele și mută limitele la finalul real al propozițiilor. Gratuit, 100 limbi.",
     kw: "reparare subtitrări youtube,subtitrări automate youtube,retăiere subtitrări,granițe de propoziție subtitrări,unire propoziții subtitrări,aliniere timp srt,subtitrări pe propoziții,subtitle realign,youtube subtitle fix,sentence alignment",
     intro: "Încarcă o subtitrare generată automat de YouTube, alege limba, iar instrumentul reunește propozițiile rupte între subtitrări și retaie fișierul propoziție cu propoziție. Niciun cuvânt nu se schimbă, iar timpii rămân cât mai aproape de marcajele originale.",
     feat: "Subtitrările automate din YouTube sunt tăiate în blocuri aproape fixe de 3-4 secunde, fără legătură cu propozițiile, așa că un bloc conține des și finalul propoziției anterioare, și începutul celei următoare. Instrumentul ia marcajele de timp originale ca ancore - acelea sunt granițele reale de cuvânt date de recunoașterea vocală -, deduce din punctuație unde se termină propoziția și, prin programare dinamică, alege tăietura cu cel mai mic cost între sfârșit de propoziție, virgulă, conjuncție și tăiere forțată, apoi prelungește durata pe ecran după ritmul de citire. Fiecare dintre cele 100 de limbi are regulile ei: chineza și japoneza nu despart cuvintele cu spații, thai aproape nu marchează granițele, hindi încheie cu ।, araba cu ؟, armenește cu ։. Lățimea rândului și ritmul de citire depind de sistemul de scriere: 16 caractere de lățime întreagă pe rând în chineză, 42 de caractere la alfabetele latine. Înainte de export textul este comparat caracter cu caracter, iar orice cuvânt pierdut sau adăugat este semnalat imediat.",
@@ -5715,6 +5734,13 @@ function serveIndexLang(req, res, lang, page){
     if (lang !== 'zh-CN') {
       const lp = '/' + lang;
       html = html.replace(/href="(\/(?:[a-z-]+\.html)?(?:[?#][^"]*)?)"/g, 'href="' + lp + '$1"');
+      /* v0.9.366：指南入口单独一条。上面那条只认 "/" 与 "/xxx.html"，认不出
+         href="/guides/"，于是 ytfix 页的「看怎么用」在 73 个语言版的静态 HTML 里
+         全指向中文指南索引（JS 起来后 applyI18n 会改成 /<lang>/guides/，爬虫和
+         禁用 JS 的访客只看得到静态值）。
+         照这个文件的既有规矩新开一条，不去动上面那条老正则 —— 它有单测逐字校验，
+         改一个字符就会红。指南页那条同款正则在 v0.9.323 时就已含 guides\/。 */
+      html = html.replace(/href="(\/(?:guides\/[a-z0-9-]+\.html|guides\/)(?:[?#][^"]*)?)"/g, 'href="' + lp + '$1"');
     }
     /* GA4 统计：配置了 analyticsId 才注入（fork 部署者用自己的 ID，避免统计进原作者账号） */
     const ga = (readConfig().analyticsId || '').trim();
@@ -6178,6 +6204,18 @@ function serveGuideHtml(req, res, lang, parts) {
 function serveGuide(req, res, lang, slug) {
   const g = GUIDE_PAGES[slug];
   if (!g || !gdSeo(g, lang) || !gdBody(g, lang)) {
+    /* v0.9.366：这篇在该语言没有译文时，别直接 404。
+       现状：44 篇里 27 个内置语齐全，73 个新语言是 43/44 —— 缺的都是
+       youtube-auto-caption-sentences，合计 73 个 404，白丢一条活链接。
+       英文版一定在（27 语含 en，且 seo/body 成对），先把它顶上去。
+       ⚠️ 用 302 不用 301：这一条是等 73 语译文补齐的临时出口，译文一落地
+          就该恢复原 URL 自己出内容。301 会被浏览器和 Google 长期缓存，
+          到时候反而把修复锁死 —— 与 ?lang=xx 那条 301 的取舍不同，
+          那条的终点 URL 是永久的，这条不是。 */
+    if (g && lang !== 'en' && gdSeo(g, 'en') && gdBody(g, 'en')) {
+      res.writeHead(302, { Location: '/en/guides/' + slug + '.html' });
+      return res.end();
+    }
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Not Found'); return;
   }

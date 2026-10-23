@@ -130,7 +130,7 @@
     .tbl td.ttx{max-width:200px}
   }
 </style>
-<script src="ui-codes.js?v=0.9.365"></script>
+<script src="ui-codes.js?v=0.9.366"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -211,10 +211,10 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="xlsx.full.min.js?v=0.9.365"></script>
-<script src="table-i18n.js?v=0.9.365"></script>
-<script src="/i18n/tp-boot.js?v=0.9.365"></script>
-<script src="table-core.js?v=0.9.365"></script>
+<script src="xlsx.full.min.js?v=0.9.366"></script>
+<script src="table-i18n.js?v=0.9.366"></script>
+<script src="/i18n/tp-boot.js?v=0.9.366"></script>
+<script src="table-core.js?v=0.9.366"></script>
 <script>
 'use strict';
 var I18N = window.TABLE_I18N.DICT, LANGS = window.TABLE_I18N.LANGS;
@@ -330,13 +330,25 @@ dz.addEventListener('drop', function (e) {
 });
 $('#file').addEventListener('change', function () { if (this.files.length) readFile(this.files[0]); this.value = ''; });
 
+/* v0.9.366：导入失败时把上一次的结果一起清掉。
+   以前只弹一句红字，下面的输出框还留着上一份的字幕、下载按钮也还亮着 ——
+   用户很容易当成「这次导入的结果」直接下载走（v0.9.365 实测：先导入正常 CSV，
+   再导入一份时间格式不支持的，红字出来了，输出框里仍是上一份那 2 条）。 */
+function failImport(key) {
+  S.sub = null; S.items = null;
+  $('#fmtChip').textContent = '—'; $('#fname').textContent = '';
+  var o = $('#out'); if (o) o.value = '';
+  var p = $('#prev'); if (p) p.innerHTML = '';
+  rerender();
+  showMsg(key, 'err');
+}
 function readFile(f) {
   var fmt = C.detectFmt(f.name);
   if (S.mode === 'toTable') {
-    if (fmt !== 'srt' && fmt !== 'vtt') { showMsg('msgNoSub', 'err'); return; }
+    if (fmt !== 'srt' && fmt !== 'vtt') { failImport('msgNoSub'); return; }
     f.text().then(function (tx) {
       var items = C.parse(tx, fmt);
-      if (!items.length) { showMsg('msgNoCue', 'err'); return; }
+      if (!items.length) { failImport('msgNoCue'); return; }
       S.sub = items;
       $('#fmtChip').textContent = fmt.toUpperCase() + ' · ' + items.length;
       $('#fname').textContent = f.name;
@@ -350,16 +362,16 @@ function readFile(f) {
       var fr = new FileReader();
       fr.onload = function () {
         try { takeRows(C.fromXlsx(fr.result), f.name, 'XLSX'); }
-        catch (e) { showMsg('msgBadTable', 'err'); }
+        catch (e) { failImport('msgBadTable'); }
       };
-      fr.onerror = function () { showMsg('msgBadTable', 'err'); };
+      fr.onerror = function () { failImport('msgBadTable'); };
       fr.readAsArrayBuffer(f);
-    } else { showMsg('msgNoTable', 'err'); return; }
+    } else { failImport('msgNoTable'); return; }
   }
 }
 function takeRows(rows, name, kind) {
   var r = C.fromRows(rows);
-  if (!r.items.length) { showMsg('msgBadTable', 'err'); return; }
+  if (!r.items.length) { failImport('msgBadTable'); return; }
   S.items = r.items;
   $('#fmtChip').textContent = kind + ' · ' + r.items.length;
   $('#fname').textContent = name;
@@ -500,6 +512,6 @@ applyI18n();
     <p style="margin-top:8px;">要做翻译校对、团队协作审稿、批量修改字幕的译者、译制组、剪辑师。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.365" data-tool="tb"></script>
+<script src="site-topnav.js?v=0.9.366" data-tool="tb"></script>
 </body>
 </html>

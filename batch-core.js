@@ -104,12 +104,16 @@
     if (!L) throw new Error('JSZip lib not loaded');
     return L;
   }
-  /* entries: [{ name, text }] → Promise<ArrayBuffer> */
+  /* entries: [{ name, text }] → Promise<Uint8Array>
+     v0.9.366：原来是 type:'array'，JSZip 3.10 出来的是**真 JS 数组**，
+     batch.html 里 new Blob([buf]) 会走 String(array) → 整个 ZIP 被写成
+     "80,75,3,4,..." 的逗号文本，下载下来 unzip 直接报签名错误。
+     改成 uint8array：Blob / Uint8Array 都能直接吃，字节原样落盘。 */
   function zipFiles(entries, lib) {
     var L = lib || zipLib();
     var z = new L();
     (entries || []).forEach(function (e) { z.file(e.name, e.text); });
-    return z.generateAsync({ type: 'array', compression: 'DEFLATE' });
+    return z.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
   }
 
   function statOf(items) {

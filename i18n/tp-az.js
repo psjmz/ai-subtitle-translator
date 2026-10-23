@@ -783,7 +783,7 @@
     "msgRunning": "İşləyir…",
     "msgCopy": "Kopyalandı",
     "msgCopyFail": "Kopyalama alınmadı — mətni seçin və əllə kopyalayın",
-    "msgTextLost": "Xəbərdarlıq: mətn orijinala uyğun gөлmir — bu çıxışdan istifadə etməyin",
+    "msgTextLost": "Xəbərdarlıq: mətn orijinala uyğun gəlmir — bu çıxışdan istifadə etməyin",
     "uBlocks": "bloklar",
     "uCues": "işarələr",
     "pbTitle": "Endirilmiş subtitrlərdə nə səhvdir",

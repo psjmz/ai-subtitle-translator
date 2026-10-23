@@ -741,7 +741,7 @@
     "lblMinDur": "Najmanj na zaslonu",
     "uSec2": "s",
     "lblGap": "Presledek med karticami",
-    "paramHint": "To so zgornje meje. Orodje izbira samo znotraj njih in nikoli ne ureja vaših besed, da bi se kartica prilegла. Kitajščina privzeto uporablja 16 znakov na vrstico (v skladu s prakso televizijskih podnaslovov); latinične pisave privzeto uporabljajo 42 znakov.",
+    "paramHint": "To so zgornje meje. Orodje izbira samo znotraj njih in nikoli ne ureja vaših besed, da bi se kartica prilegla. Kitajščina privzeto uporablja 16 znakov na vrstico (v skladu s prakso televizijskih podnaslovov); latinične pisave privzeto uporabljajo 42 znakov.",
     "btnRun": "Ponovno uskladi",
     "btnReset": "Ponastavi na privzeto",
     "statTitle": "Kaj se je spremenilo",

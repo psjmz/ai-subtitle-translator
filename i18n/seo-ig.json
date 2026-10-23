@@ -45,7 +45,7 @@
     "title": "Nleba QC Ndebiri Okwu - Lelee Oge na Nhazi kwa Asụsụ",
     "desc": "Nleba QC ndebiri okwu n'ịntanetị n'efu: bulite SRT, VTT ma ọ bụ ASS ma lelee mkpuchi, oge, ọsọ ọgụgụ, obosara ahịrị, mgbawa ahịrị na koodu megide iwu asụsụ ahụ. Asụsụ 27, usoro 27, gbakwunyere iwu pụrụ iche.",
     "kw": "onye nleba ndebiri okwu,qc ndebiri okwu,onye nyocha srt,nleba ogo ndebiri okwu,nleba srt,nleba oge ndebiri okwu,onye nyocha ndebiri okwu,lelee faịlụ srt,mgbazi ndebiri okwu,linta ndebiri okwu",
-    "intro": "Bulite faịlụ ndebiri okwu ma lelee ya megide iwu asụsụ nke ya - nchoputa ọ bụla na-abịa na uru a tụrụ atụ na ọnụ ụzọ ámá. Na-arụ ọrụ n'ime ihe nchọgharị gị, ọ dị പാലiri a na-ebute.",
+    "intro": "Bulite faịlụ ndebiri okwu ma lelee ya megide iwu asụsụ nke ya - nchoputa ọ bụla na-abịa na uru a tụrụ atụ na ọnụ ụzọ ámá. Na-arụ ọrụ n'ime ihe nchọgharị gị, ọ dị mfeiri a na-ebute.",
     "feat": "Na-elele ihe ngosi na-agbaba n'onwe ha, nke dị mkpirikpi ma ọ bụ ogologo na ihuenyo, ọsọ ọgụgụ, obosara ahịrị, ọnụ ọgụgụ ahịrị, mgbawa ahịrị na-adịghị mma, ọnụ ọgụgụ, ihe ngosi efu, mojibake na mkpụrụedemede nchịkwa. Obosara na ọsọ ọgụgụ na-eso usoro ide ihe: a na-atụ Chinese n'ihe ngosi obosara zuru oke, Thai na Arabic na-agụnye efu. Iwu akọwapụtara n'asụsụ na-ekpuchi mkpụrụedemede Spanish, oghere French, akara ajụjụ Greek, mkpụrụedemede zuru oke na Chinese na Japanese. Ihe nwere enwere idozi ozugbo ka edepụtara iche, ma ihe ọ bụla na-ebugharị oge adịghị na ndabara.",
     "who": "Otu ndebiri okwu, ndị na-ere ahịa obodo, ndị nchịkọta akụkọ na onye ọ bụla chọrọ iji nyochaa faịlụ tupu e nyefee ya.",
     "siteName": "AI-SRTSub",
@@ -179,7 +179,7 @@
   },
   "ytfix": {
     "title": "YouTube Subtitle Realigner - Jikọọ Ahịrịokwu ndị gbajiri agbaji | AI-SRTSub",
-    "desc": "Ihe eji edozi YouTube auto-captions n'efu: a na-egbutu okwu ndị ahụ n'ime 3-4 sekọnd na-enweghị nlebara anya na ahịrịokwu. Ngwa a anaghị agbanwe okwu ọ bụla - ọ na-agbanwe naanị ebe ahịrịokwu kwụsịrị, na-eji oge mbụ eme ihe. Ọ na-arụ ọrụ na asụsụ 100, kpamkpam na ihe nchọgharị gị.",
+    "desc": "Ihe onyonyo YouTube na-ebipụ ahịrịokwu na sekọnd 3-4. Ngwá ọrụ a na-ebugharị naanị oke ya n'ebe ahịrịokwu gwụrụ. Ọ bụ n'efu ma na-arụ ọrụ n'asụsụ 100.",
     "kw": "mmezi ndepụta okwu youtube,okwu akpaaka youtube,nhazi ndepụta okwu,nhazi ahịrịokwu ndepụta okwu,mmezi ndepụta okwu mebiri emebi,nhazi ahịrịokwu srt,nkewa ndepụta okwu ọzọ,mmezi okwu youtube,ndepụta okwu nwere nghọta ahịrịokwu",
     "intro": "Tinye faịlụ YouTube auto-generated, họrọ asụsụ ahụ, ngwa a ga-ejikọta ahịrịokwu ọnụ wee gbutuo faịlụ ahụ ọzọ. Agbanweghị otu okwu, oge cue na-anọkwa nso na oge mbụ.",
     "feat": "A na-egbutu YouTube auto-captions n'ime 3-4 sekọnd n'agbanyeghị ebe ahịrịokwu kwụsịrị. Ngwa a na-eji oge mbụ eme ihe dị ka ntọala - oge ndị ahụ bụ ebe okwu kwụsịrị n'ezie - na-ekpebi ebe ahịrịokwu ọ bụla kwụsịrị site na akara edemede, ma na-eji usoro dị ike ahọrọ ebe kacha mma maka nkwụsị, wee gbatịa oge ngosi iji kwekọọ na ọsọ ịgụ. Asụsụ 100 ọ bụla nwere iwu nke ya: Chinese na Japanese enweghị oghere n'etiti okwu, Thai anaghị akara oke okwu nke ọma, Hindi na-eji । emechi ahịrịokwu, Arabic na-eji ؟, Armenian na-eji ։. Obosara ahịrị na ọsọ ịgụ na-agbaso usoro edemede - 16 mkpụrụedemede maka Chinese, 42 mkpụrụedemede maka Latin. Tupu mbupụ, a na-atụnyere ederede mkpụrụedemede site na mkpụrụedemede, a na-akara okwu ọ bụla furu efu ma ọ bụ gbakwunyere ozugbo.",

@@ -724,7 +724,7 @@
     "brandName": "AI-SRTSub",
     "heroA": "Subtitél YouTube,",
     "heroEm": "diparékaké manèh",
-    "heroSub": "Teks otomatis YouTube dipotong dadi jendhela 3–4 detik sing tetep tanpa peduli ing endi ukara rampung, dadi buntut siji ukara kasambung menyang sirah ukara sabanjur. Piranti iki ora nolak utawa ngowahi temبر — mung mindhah wates bali menyang ing endi ukara asliné pedhot. Bisa digunakake ing 100 basa, kabeh ana ing browser panjenengan.",
+    "heroSub": "Teks otomatis YouTube dipotong dadi jendhela 3–4 detik sing tetep tanpa peduli ing endi ukara rampung, dadi buntut siji ukara kasambung menyang sirah ukara sabanjur. Piranti iki ora nolak utawa ngowahi tembung — mung mindhah wates bali menyang ing endi ukara asliné pedhot. Bisa digunakake ing 100 basa, kabeh ana ing browser panjenengan.",
     "upTitle": "Muat subtitél",
     "dzTxt": "Seret berkas subtitél ing kéné, utawa klik kanggo milih siji",
     "btnPaste": "Tempel teks",

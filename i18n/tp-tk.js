@@ -730,7 +730,7 @@
     "btnPaste": "Teksti ýapyşdyrmak",
     "btnSample": "Nusgany görkezmek",
     "btnClear": "Arassalamak",
-    "upHint": "Diňe tekst — hiç hili wideo ýüklenip alyndyrylmaýan we surata degilmeýär. Çykyş форматы girizmä laýyk gelýär: SRT girdi, SRT çykdy.",
+    "upHint": "Diňe tekst — hiç hili wideo ýüklenip alyndyrylmaýan we surata degilmeýär. Çykyş görnüşi girizmä laýyk gelýär: SRT girdi, SRT çykdy.",
     "langTitle": "Dil we bölmek düzgünleri",
     "lblLang": "Subtitr dili",
     "langHint": "Sözlemleri bölmek ýazuw belgilerine baglydyr, ýazuw belgileri bolsa dillere görä üýtgeýär: hytaý dili 。！？, hindi dili ।, Arap dili ؟ ulanýar, taý dilinde bolsa nokat düýbünden ýok. Dili çalyşmak düzgünler toplumyny we setir ini üýtgedýär. Eger awto-anyklaýyş ýalňyş görünse, özüňiz saýlaň.",

@@ -151,7 +151,7 @@
     .iss .rn{min-width:0}
   }
 </style>
-<script src="ui-codes.js?v=0.9.365"></script>
+<script src="ui-codes.js?v=0.9.366"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -257,9 +257,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="qc-i18n.js?v=0.9.365"></script>
-<script src="/i18n/tp-boot.js?v=0.9.365"></script>
-<script src="qc-core.js?v=0.9.365"></script>
+<script src="qc-i18n.js?v=0.9.366"></script>
+<script src="/i18n/tp-boot.js?v=0.9.366"></script>
+<script src="qc-core.js?v=0.9.366"></script>
 <script>
 'use strict';
 var I18N = window.QC_I18N.DICT, LANGS = window.QC_I18N.LANGS;
@@ -383,22 +383,44 @@ dz.addEventListener('click', function () { $('#file').click(); });
 dz.addEventListener('drop', function (e) { if (e.dataTransfer.files && e.dataTransfer.files.length) readFile(e.dataTransfer.files[0]); });
 $('#file').addEventListener('change', function () { if (this.files.length) readFile(this.files[0]); this.value = ''; });
 
+/* v0.9.366：老字幕里 GBK / Big5 很常见，按 UTF-8 硬读整篇都是 U+FFFD 且页面无提示。
+   编码嗅探照 clean 页 decodeBuf 的判据（UTF-8 优先，出乱码再试 GBK / Big5），不另发明一套。 */
+function decodeBuf(buf) {
+  var u8 = new Uint8Array(buf);
+  if (u8[0] === 0xEF && u8[1] === 0xBB && u8[2] === 0xBF) {
+    return new TextDecoder('utf-8').decode(u8.subarray(3));
+  }
+  var s = new TextDecoder('utf-8', { fatal: false }).decode(u8);
+  if ((s.match(/\uFFFD/g) || []).length > 1) {
+    var list = ['gbk', 'big5'];
+    for (var i = 0; i < list.length; i++) {
+      try {
+        var x = new TextDecoder(list[i]).decode(u8);
+        if (!/\uFFFD/.test(x)) return x;
+      } catch (e) { /* 该浏览器不支持这种旧编码，换下一个 */ }
+    }
+  }
+  return s;
+}
 function readFile(f) {
-  f.text().then(function (tx) {
-    var fmt = C.detectFmt(f.name, tx);
-    var items = C.parse(tx, fmt);
-    if (!items.length) { showMsg('msgNoCue', 'err'); return; }
-    S.items = items; S.name = f.name; S.fmt = fmt; S.res = null; S.fixed = null;
-    $('#fmtChip').textContent = fmt.toUpperCase() + ' · ' + items.length;
-    $('#fname').textContent = f.name;
-    $('#repCard').style.display = 'none';
-    $('#fixCard').style.display = 'none';
-    hideMsg();
-    /* ⚠️ 自动识别模式下，识别结果要回头刷新阈值 —— 否则上传中文却按英文的 20 宽/秒查
-       （手动选过语言的场合 effLang 没变，别去覆盖用户改过的数字） */
-    if (S.subLang === 'auto') loadTh();
-    renderRules();
-  });
+  var fr = new FileReader();
+  fr.onload = function () { takeText(decodeBuf(fr.result), f.name); };
+  fr.readAsArrayBuffer(f);
+}
+function takeText(tx, name) {
+  var fmt = C.detectFmt(name, tx);
+  var items = C.parse(tx, fmt);
+  if (!items.length) { showMsg('msgNoCue', 'err'); return; }
+  S.items = items; S.name = name; S.fmt = fmt; S.res = null; S.fixed = null;
+  $('#fmtChip').textContent = fmt.toUpperCase() + ' · ' + items.length;
+  $('#fname').textContent = name;
+  $('#repCard').style.display = 'none';
+  $('#fixCard').style.display = 'none';
+  hideMsg();
+  /* ⚠️ 自动识别模式下，识别结果要回头刷新阈值 —— 否则上传中文却按英文的 20 宽/秒查
+     （手动选过语言的场合 effLang 没变，别去覆盖用户改过的数字） */
+  if (S.subLang === 'auto') loadTh();
+  renderRules();
 }
 $('#btnClear').addEventListener('click', function () {
   S.items = []; S.name = ''; S.res = null; S.fixed = null;
@@ -678,6 +700,6 @@ applyI18n();
     <p style="margin-top:8px;">给译制组、字幕组、剪辑师和本地化团队，在交付前把字幕过一遍。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.365" data-tool="qc"></script>
+<script src="site-topnav.js?v=0.9.366" data-tool="qc"></script>
 </body>
 </html>

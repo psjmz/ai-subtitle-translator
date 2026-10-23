@@ -179,7 +179,7 @@
   },
   "ytfix": {
     "title": "Rirreshtuesi i titrave të YouTube - Bashkoni fjalitë e thyera | AI-SRTSub",
-    "desc": "Zgjidhje falas për titrat automatike të YouTube: ato ndahen në blloqe 3-4 sekondëshe pa marrë parasysh fjalitë. Ky mjet nuk ndryshon asnjë fjalë, vetëm zhvendos kufijtë e blloqeve aty ku mbarojnë fjalitë, duke përdorur vulat kohore origjinale. Punon me 100 gjuhë, tërësisht në shfletuesin tuaj.",
+    "desc": "Titrat automatike të YouTube i presin fjalitë çdo 3-4 sekonda. Ky mjet i mban fjalët dhe i lëviz kufijtë atje ku mbarojnë fjalitë. Falas, 100 gjuhë.",
     "kw": "rregullim titrash youtube,titra automatike youtube,rirreshtim titrash,bashkim fjalish në titra,rregullim titrash të thyera,rreshtim srt,ri-segmentim titrash,riparim titrash youtube,titra me ndërgjegjësim fjalie",
     "intro": "Ngarkoni një skedar titrash të YouTube, zgjidhni gjuhën dhe mjeti do t'i bashkojë fjalitë nëpër blloqe, duke i prerë ato sërish fjali për fjali. Asnjë fjalë nuk ndryshohet dhe kohët e blloqeve mbeten sa më afër vulave kohore origjinale.",
     "feat": "Titrat automatike të YouTube ndahen në blloqe 3-4 sekondëshe pa marrë parasysh fjalitë. Mjeti përdor vulat kohore si spiranca, përcakton fundin e fjalisë nga shenjat e pikësimit dhe përdor programim dinamik për të gjetur pikën më të mirë të ndarjes, duke përshtatur kohën e shfaqjes me shpejtësinë e leximit. Secila nga 100 gjuhët ka rregulla të veçanta: kinezishtja dhe japonishtja nuk kanë hapësira, tajlandishtja i shënon rrallë kufijtë, hindishtja përdor . dhe arabishtja ؟ . Gjerësia e rreshtit ndjek sistemin e shkrimit: 16 karaktere për kinezishten, 42 për alfabetet latine. Para eksportimit, teksti krahasohet karakter për karakter për të shmangur humbjen e fjalëve.",

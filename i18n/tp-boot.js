@@ -3,7 +3,7 @@
  * 由 _mktp.js 生成，别手改。
  *
  * 怎么用（13 个工具页，每页两处）：
- *   1) <script src="/i18n/tp-boot.js?v=0.9.365"></script> 放在页面 *-i18n.js 之后
+ *   1) <script src="/i18n/tp-boot.js?v=0.9.366"></script> 放在页面 *-i18n.js 之后
  *   2) initLang() 第一行 TP_ADD_LANGS(LANGS)（语言下拉补到 100）；
  *      LANG 算完后 if (!I18N[LANG]) I18N[LANG] = TP_LOAD(LANG, '<page>')。
  *
@@ -33,7 +33,7 @@
 
   /* 解析期同步取分片：27 个内置语言不发请求，缺片（还没翻）自然回落英文 */
   if (code) {
-    document.write('<script src="/i18n/tp-' + code + '.js?v=0.9.365"><\/script>');
+    document.write('<script src="/i18n/tp-' + code + '.js?v=0.9.366"><\/script>');
   }
 
   /* 把 73 种新语言补进页面自己的 LANGS（27 语数组），

@@ -179,7 +179,7 @@
   },
   "ytfix": {
     "title": "YouTube undertekstrealigner - Sett ødelagte setninger sammen igjen | AI-SRTSub",
-    "desc": "Gratis nettbasert fiks for YouTube-autotekster: de automatiske tekstene er delt inn i faste tidsintervaller på 3-4 sekunder uten hensyn til setninger. Dette verktøyet endrer ikke en eneste auksjon – det flytter bare grensene mellom tekstblokkene dit setningene faktisk slutter. Fungerer med 100 språk, helt i nettleseren din.",
+    "desc": "YouTube-teksting kutter setninger hvert 3-4 sekund. Dette verktøyet flytter grensene dit setningene faktisk slutter. Gratis på 100 språk.",
     "kw": "youtube undertekst fiks,youtube autotekster,undertekst realign,undertekst setningsjustering,fiks ødelagte undertekster,srt setningsjustering,undertekst omsegmentering,youtube tekster reparasjon,setningsbevisste undertekster",
     "intro": "Slipp inn en auto-generert YouTube-undertekstfil, velg språk, og verktøyet setter setninger sammen igjen på tvers av blokker, for deretter å dele opp filen på nytt setning for setning. Ikke et eneste ord endres, og blokktidene holdes så nær de opprinnelige tidsstemplene som mulig.",
     "feat": "YouTube-autotekster kuttes i nær-faste 3-4 sekunders blokker uavhengig av hvor setninger slutter, slik at en blokk ofte bærer på halen av forrige setning pluss starten på den neste. Verktøyet behandler de opprinnelige tidsstemplene som ankre, og bruker dynamisk programmering for å finne det beste delepunktet. Hvert av de 100 språkene har sine egne setningsregler, og før eksport sammenlignes teksten tegn for tegn.",

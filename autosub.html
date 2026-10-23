@@ -246,9 +246,9 @@
   </section>
 <!--SEO-COPY-END-->
 
-<script src="autosub-i18n.js?v=0.9.365"></script>
-<script src="/i18n/tp-boot.js?v=0.9.365"></script>
-<script src="autosub-core.js?v=0.9.365"></script>
+<script src="autosub-i18n.js?v=0.9.366"></script>
+<script src="/i18n/tp-boot.js?v=0.9.366"></script>
+<script src="autosub-core.js?v=0.9.366"></script>
 <script>
 (function () {
   'use strict';
@@ -617,8 +617,8 @@
           document.head.appendChild(s);
         });
       }
-      load('hanconv-data.js?v=0.9.365')
-        .then(function () { return load('hanconv-core.js?v=0.9.365'); })
+      load('hanconv-data.js?v=0.9.366')
+        .then(function () { return load('hanconv-core.js?v=0.9.366'); })
         .then(function () {
           if (!window.HanConvCore) throw new Error('no engine');
           window.HanConvCore.setData(window.HanConvData);
@@ -640,8 +640,13 @@
     if ($('tradChk').checked) {
       try {
         var hc = await ensureHanConv();
+        /* v0.9.366：HanConvCore.convert() 直接返回**字符串**（hanconv-core.js 的 convert），
+           不是 { text } 对象 —— 旧代码多取了一层 .text，中文界面下「中文转简体」又默认勾上，
+           于是导出/复制的每一行都变成 undefined。这里按字符串取，并兼容万一返回对象的情况。 */
         cues = cues.map(function (c) {
-          return { start: c.start, end: c.end, text: hc.convert(c.text, 't2s').text };
+          var r = hc.convert(c.text, 't2s');
+          var s = (r && typeof r === 'object' && typeof r.text === 'string') ? r.text : String(r == null ? c.text : r);
+          return { start: c.start, end: c.end, text: s };
         });
       } catch (e) { /* 转换失败就按原文导出，不阻断 */ }
     }
@@ -776,6 +781,6 @@
   bind();
 })();
 </script>
-<script src="site-topnav.js?v=0.9.365" data-tool="au"></script>
+<script src="site-topnav.js?v=0.9.366" data-tool="au"></script>
 </body>
 </html>
