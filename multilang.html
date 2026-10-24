@@ -1341,11 +1341,11 @@ crossorigin="anonymous"></script>
      ⚠️ 引擎（srt-core.js）与下面的内联脚本一字未改，只是少了首页那半边 DOM。
      ================================================================ -->
 <div id="viewWorkspace">
-  <h1 class="sr-only" data-i18n="tcMlN">多语字幕一次出</h1>
+  <h1 class="sr-only" data-i18n="tcMlN">一次出多语</h1>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.373</span>
+    <span class="ver-tag">v0.9.374</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -2017,10 +2017,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.373"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.373"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.373"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.373"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.374"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.374"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.374"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.374"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4918,15 +4918,18 @@ async function extractGlossary(base,key,model,cfg,srcText){
    ev: 'finish' 翻译完成 | 'download' 下载字幕 | 'copy' 复制到剪贴板（v0.9.298，与下载同口径）；model：自带 Key 模式带用户填的模型名
    v0.9.244：fmt = 本次导出（下载）的字幕文件格式（srt/vtt/sbv/ass/txt），仅 download 时传。
      后台此前只有「下载了几次」，看不出用户到底把字幕导成什么格式；只传格式码，
-     不带文件名以外的任何内容，认不出的值由服务端白名单丢弃。 */
-function reportEvent(ev, extra, fmt){
-  if(!S.trMeta) return;
+     不带文件名以外的任何内容，认不出的值由服务端白名单丢弃。
+   v0.9.374：meta 可选。本页一次 zip 能装下整季的结果，下载上报要按「每一格自己的任务」记账，
+     不能只认全局 S.trMeta（那永远是最后一个跑完的任务）。不传时行为与以前完全一致。 */
+function reportEvent(ev, extra, fmt, meta){
+  var m = meta || S.trMeta;
+  if(!m) return;
   try{
     // v0.9.86：捎带丢弃遥测——dropN 被删总行数、subDrop 其中「源文仍有实义」的行数（纯统计，不影响任何行为）
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,stopped:(ev==='finish'&&S.stop)?1:0});
+    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,stopped:(ev==='finish'&&S.stop)?1:0});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
     if(navigator.sendBeacon && typeof Blob==='function'){
       try{ if(navigator.sendBeacon('/api/event', new Blob([body],{type:'application/json'}))) return; }catch(_){}
@@ -5837,8 +5840,8 @@ var MLT = {
     nozip:'打包库没加载成功，刷新页面再试', zipok:'已打包 {0} 个文件：{1}',
     sumOk:'✔ 全部完成：{0}/{1} 个任务，点「下载」一次拿走 zip。',
     sumPart:'完成 {0}/{1} 种；失败：{2}（再点一次「开始翻译」只会重跑失败的语言，已完成的不再花钱）',
-    rm:'从队列移除', titleRun:'{0} 翻译中 · 多语字幕一次出',
-    docTitle:'多语字幕一次出 - 一份字幕翻成多种语言，打包下载', sep:'、'
+    rm:'从队列移除', titleRun:'{0} 翻译中 · 一次出多语',
+    docTitle:'一次出多语 - 整季字幕一次上传，多种语言排队跑完 | 随心字幕 AI', sep:'、'
   },
   'zh-TW': {
     need1:'先新增至少一種目標語言', same:'目標語言不能和原文語言相同', sameLangAdd:'{0} 是原文語言，不能當目標語言', sameLangDrop:'{0} 是原文語言，已從目標佇列移出',
@@ -5869,8 +5872,8 @@ var MLT = {
     nozip:'打包庫沒載入成功，重新整理頁面再試', zipok:'已打包 {0} 個檔案：{1}',
     sumOk:'✔ 全部完成：{0}/{1} 個任務，點「下載」一次拿走 zip。',
     sumPart:'完成 {0}/{1} 種；失敗：{2}（再點一次「開始翻譯」只會重跑失敗的語言，已完成的不再花錢）',
-    rm:'從佇列移除', titleRun:'{0} 翻譯中 · 多語字幕一次出',
-    docTitle:'多語字幕一次出 - 一份字幕翻成多種語言，打包下載', sep:'、'
+    rm:'從佇列移除', titleRun:'{0} 翻譯中 · 一次出多語',
+    docTitle:'一次出多語 - 整季字幕一次上傳，多種語言排隊跑完 | 隨心字幕 AI', sep:'、'
   },
   'en': {
     need1:'Add at least one target language first.', same:'A target language cannot be the source language.', sameLangAdd:'{0} is the source language — it cannot be a target', sameLangDrop:'{0} is the source language; removed from the target queue',
@@ -5902,7 +5905,7 @@ var MLT = {
     sumOk:'✔ All {0}/{1} tasks done — Download gets you one zip.',
     sumPart:'Done {0}/{1}; failed: {2} (running it again only retries the failed ones, finished ones cost nothing)',
     rm:'Remove from queue', titleRun:'{0} translating · Multi-language subtitles',
-    docTitle:'Multi-language subtitles - one file, many languages, one zip', sep:', '
+    docTitle:'Many languages at once — upload a whole season, queue up every target language | AI-SRTSub', sep:', '
   },
   'ja': {
     need1:'先に対象言語を1つ以上追加してください', same:'対象言語は原文の言語と同じにできません', sameLangAdd:'{0} は原文の言語なので、翻訳先にはできません', sameLangDrop:'{0} は原文の言語です。翻訳先から外しました',
@@ -5935,7 +5938,7 @@ var MLT = {
     sumOk:'✔ {0}/{1} タスクすべて完了。「ダウンロード」で zip を一度に取得できます。',
     sumPart:'完了 {0}/{1}、失敗：{2}（もう一度押すと失敗した言語だけ再実行します。完了分は課金されません）',
     rm:'キューから削除', titleRun:'{0} 翻訳中 · 多言語字幕',
-    docTitle:'多言語字幕 - 1つのファイルを多言語へ、zip でまとめてダウンロード', sep:'、'
+    docTitle:'多言語を一度に - シーズン全話をまとめてアップ、各言語を順番に処理 | 随心字幕 AI', sep:'、'
   },
   'ko': {
     need1:'먼저 대상 언어를 하나 이상 추가하세요', same:'대상 언어는 원문 언어와 같을 수 없습니다', sameLangAdd:'{0}은(는) 원문 언어라 대상 언어로 쓸 수 없습니다', sameLangDrop:'{0}은(는) 원문 언어라 대상 목록에서 뺐습니다',
@@ -5968,7 +5971,7 @@ var MLT = {
     sumOk:'✔ {0}/{1}개 작업 모두 완료 — 「다운로드」로 zip을 한 번에 받으세요.',
     sumPart:'완료 {0}/{1}, 실패: {2} (다시 누르면 실패한 언어만 재실행하며 완료분은 과금되지 않습니다)',
     rm:'대기열에서 제거', titleRun:'{0} 번역 중 · 다국어 자막',
-    docTitle:'다국어 자막 - 한 파일을 여러 언어로, zip으로 한 번에', sep:', '
+    docTitle:'한 번에 여러 언어로 - 시즌 전체를 한 번에 업로드, 언어별로 차례로 처리 | 随心字幕 AI', sep:', '
   },
   'es': {
     need1:'Añade al menos un idioma de destino.', same:'El idioma de destino no puede ser el mismo que el original.', sameLangAdd:'{0} es el idioma de origen y no puede ser idioma de destino', sameLangDrop:'{0} es el idioma de origen; se quitó de la cola de destino',
@@ -6001,7 +6004,7 @@ var MLT = {
     sumOk:'✔ {0}/{1} tareas listas: Descargar te da un solo zip.',
     sumPart:'Hechos {0}/{1}; fallaron: {2} (si vuelves a pulsar Traducir solo se repiten los fallidos, los terminados no cuestan nada)',
     rm:'Quitar de la cola', titleRun:'{0} traduciendo · Subtítulos multilingües',
-    docTitle:'Subtítulos multilingües: un archivo, muchos idiomas, un zip', sep:', '
+    docTitle:'Muchos idiomas a la vez — sube toda la temporada y procesa cada idioma en cola | AI-SRTSub', sep:', '
   },
   'pt': {
     need1:'Adicione pelo menos um idioma de destino.', same:'O idioma de destino não pode ser igual ao original.', sameLangAdd:'{0} é o idioma de origem e não pode ser idioma de destino', sameLangDrop:'{0} é o idioma de origem; foi removido da fila de destino',
@@ -6034,7 +6037,7 @@ var MLT = {
     sumOk:'✔ {0}/{1} tarefas prontas — Baixar entrega um único zip.',
     sumPart:'Feitos {0}/{1}; falharam: {2} (clicar em Traduzir de novo repete só os que falharam; os prontos não custam nada)',
     rm:'Remover da fila', titleRun:'{0} traduzindo · Legendas multilíngues',
-    docTitle:'Legendas multilíngues: um arquivo, vários idiomas, um zip', sep:', '
+    docTitle:'Vários idiomas de uma vez — envie a temporada inteira e processe cada idioma na fila | AI-SRTSub', sep:', '
   },
   'de': {
     need1:'Füge zuerst mindestens eine Zielsprache hinzu.', same:'Die Zielsprache darf nicht die Ausgangssprache sein.', sameLangAdd:'{0} ist die Ausgangssprache und kann nicht Zielsprache sein', sameLangDrop:'{0} ist die Ausgangssprache und wurde aus der Zielliste entfernt',
@@ -6067,7 +6070,7 @@ var MLT = {
     sumOk:'✔ Alle {0}/{1} Aufgaben fertig – „Herunterladen“ liefert ein einziges Zip.',
     sumPart:'Fertig {0}/{1}; fehlgeschlagen: {2} (erneutes Übersetzen wiederholt nur die fehlgeschlagenen, fertige kosten nichts)',
     rm:'Aus der Warteschlange entfernen', titleRun:'{0} übersetzt · Mehrsprachige Untertitel',
-    docTitle:'Mehrsprachige Untertitel – eine Datei, viele Sprachen, ein Zip', sep:', '
+    docTitle:'Viele Sprachen auf einmal — die ganze Staffel hochladen, jede Sprache nacheinander | AI-SRTSub', sep:', '
   },
   'fr': {
     need1:'Ajoutez au moins une langue cible.', same:'La langue cible ne peut pas être la langue source.', sameLangAdd:'{0} est la langue source et ne peut pas être une langue cible', sameLangDrop:'{0} est la langue source ; retiré de la file des cibles',
@@ -6100,7 +6103,7 @@ var MLT = {
     sumOk:'✔ {0}/{1} tâches terminées — Télécharger donne un seul zip.',
     sumPart:'Terminé {0}/{1} ; échecs : {2} (relancer ne refait que les échecs, les langues terminées ne coûtent rien)',
     rm:'Retirer de la file', titleRun:'{0} en traduction · Sous-titres multilingues',
-    docTitle:'Sous-titres multilingues — un fichier, plusieurs langues, un zip', sep:', '
+    docTitle:'Plusieurs langues à la fois — importez toute la saison, chaque langue traitée à la suite | AI-SRTSub', sep:', '
   },
   'ru': {
     need1:'Сначала добавьте хотя бы один целевой язык.', same:'Целевой язык не может совпадать с исходным.', sameLangAdd:'{0} — язык оригинала, его нельзя выбрать как целевой', sameLangDrop:'{0} — язык оригинала, удалён из списка целевых',
@@ -6133,7 +6136,7 @@ var MLT = {
     sumOk:'✔ Все задачи {0}/{1} готовы — «Скачать» отдаст один zip.',
     sumPart:'Готово {0}/{1}; с ошибкой: {2} (повторный запуск переведёт только неудачные, готовые не тратят токены)',
     rm:'Убрать из очереди', titleRun:'{0} — перевод · Многоязычные субтитры',
-    docTitle:'Многоязычные субтитры — один файл, много языков, один zip', sep:', '
+    docTitle:'Много языков сразу — загрузите весь сезон, языки обрабатываются по очереди | AI-SRTSub', sep:', '
   },
   'id': {
     need1:'Tambahkan setidaknya satu bahasa tujuan dulu.', same:'Bahasa tujuan tidak boleh sama dengan bahasa sumber.', sameLangAdd:'{0} adalah bahasa sumber dan tidak bisa jadi bahasa target', sameLangDrop:'{0} adalah bahasa sumber; dihapus dari antrean target',
@@ -6166,7 +6169,7 @@ var MLT = {
     sumOk:'✔ Semua {0}/{1} tugas selesai — Unduh memberi satu zip.',
     sumPart:'Selesai {0}/{1}; gagal: {2} (menekan Terjemahkan lagi hanya mengulang yang gagal, yang selesai tidak memakan biaya)',
     rm:'Hapus dari antrean', titleRun:'{0} menerjemahkan · Subtitle multibahasa',
-    docTitle:'Subtitle multibahasa — satu berkas, banyak bahasa, satu zip', sep:', '
+    docTitle:'Banyak bahasa sekaligus — unggah satu musim penuh, setiap bahasa diproses bergiliran | AI-SRTSub', sep:', '
   },
   'ar': {
     need1:'أضف لغة هدف واحدة على الأقل أولًا.', same:'لا يمكن أن تكون لغة الهدف هي لغة المصدر نفسها.', sameLangAdd:'{0} هي لغة المصدر ولا يمكن أن تكون لغة هدف', sameLangDrop:'{0} هي لغة المصدر، وقد أُزيلت من قائمة الأهداف',
@@ -6199,7 +6202,7 @@ var MLT = {
     sumOk:'✔ اكتملت {0}/{1} مهمة — زر التنزيل يعطيك ملف zip واحدًا.',
     sumPart:'تم {0}/{1}؛ فشل: {2} (الضغط مرة أخرى يعيد اللغات الفاشلة فقط، والمكتملة لا تكلّف شيئًا)',
     rm:'إزالة من القائمة', titleRun:'{0} قيد الترجمة · ترجمات متعددة اللغات',
-    docTitle:'ترجمات متعددة اللغات — ملف واحد، لغات كثيرة، ملف zip واحد', sep:'، '
+    docTitle:'لغات متعددة دفعة واحدة — ارفع الموسم كاملًا وعالج كل لغة بالتتابع | AI-SRTSub', sep:'، '
   }
 };
 /* 取一条本页文案：命中当前界面语言 → 英文 → key 本身。
@@ -6650,7 +6653,13 @@ async function runMulti(){
     }
     if(S.rows && S.rows.length){
       try{
-        ML.results[k] = { text: buildExport(), name: mlUniqueName(autoOutNameStr()) };
+        ML.results[k] = { text: buildExport(), name: mlUniqueName(autoOutNameStr()),
+          /* v0.9.374：连「这一格属于哪个任务、导成什么格式」一起留在结果里。
+             zip 是一次点击拿走整季，下载上报得逐格记到各自的 taskId 上，
+             否则除最后一格外，其余任务的「下载」永远为 0，后台会把它们当成「完成未拿走」。 */
+          fmt: expFileFmt(),
+          meta: S.trMeta ? { file: S.trMeta.file, lang: S.trMeta.lang, model: S.trMeta.model,
+                            taskId: S.trMeta.taskId, src: S.trMeta.src } : null };
         okN++;
         log(mlt('langOk', mlTaskName(k), S.rows.length), 'okc');
       }catch(e){
@@ -6685,6 +6694,15 @@ async function mlDownloadZip(){
     + '_' + keys.length + 'tasks.zip';
   document.body.appendChild(a); a.click();
   setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 200);
+  /* v0.9.374：这一包里的每个任务都算「被下载了一次」。
+     此前这里一行上报都没有 —— 整季打完包，后台一条 download 都收不到，
+     「完成未下载」全是误判，导出格式分布也永远缺这一页。
+     口径：按格记（不是整包记 1 次），因为每格对应一个独立任务，
+     只记 1 条会让其余 N-1 个任务的 downloads 永远停在 0。 */
+  keys.forEach(function(v){
+    var r = ML.results[v];
+    if(r && r.meta) reportEvent('download', '', r.fmt || expFileFmt(), r.meta);
+  });
   log(mlt('zipok', keys.length, keys.map(function(v){ return ML.results[v].name; }).join(mlt('sep'))), 'okc');
 }
 /* ---------- 多文件导入 ----------
@@ -9300,13 +9318,12 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       (rows||[]).forEach(function(r){ if(r && r.zh) tr++; });
       meta.textContent = n + ' 条' + (tr ? ' · 已有译文 ' + tr : '');
     }
-    /* 这一格还没有译文时，下载键置灰 —— 点了也只会拿到原文 */
+    /* v0.9.374：下载键只认「有没有打包好的结果」，不再认「当前这格能不能预览」。
+       此前按「这一格有没有译文」判断 —— 而回填译文时一律按 SRT 解析结果文本，
+       导出格式选 ASS / VTT 时必然解析不出 cue，于是整季跑完、结果都在 ML.results 里，
+       下载键却是灰的，用户只能干瞪眼。预览归预览，下载归下载。 */
     var bd = $('btnDownload');
-    if(bd){
-      var hasZh = false;
-      (rows||[]).forEach(function(r){ if(r && r.zh) hasZh = true; });
-      bd.disabled = !hasZh;
-    }
+    if(bd) bd.disabled = !Object.keys(ML.results).length;
   }
 
   function mxPick(fk, lang){
@@ -9323,8 +9340,14 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
     if(res && res.text){
       try{
         /* ⚠️ C.parseSrt 返回的是 { items, issues }，不是数组 —— 直接当数组用会拿到 undefined，
-           译文一条都填不回去（改版时踩过一次）。 */
-        var out = (C && C.parseSrt) ? C.parseSrt(res.text) : null;
+           译文一条都填不回去（改版时踩过一次）。
+           v0.9.374：按这一格真实的导出格式选解析器。此前一律用 parseSrt，
+           ASS / VTT / SBV 的结果文本解析出来是空的，查看条于是显示「没有译文」。 */
+        var pf = (res.fmt === 'vtt' && C.parseVtt) ? C.parseVtt
+               : (res.fmt === 'ass' && C.parseAss) ? C.parseAss
+               : (res.fmt === 'sbv' && C.parseSbv) ? C.parseSbv
+               : (C && C.parseSrt) ? C.parseSrt : null;
+        var out = pf ? pf(res.text) : null;
         var cues = out ? (out.items || (Array.isArray(out) ? out : [])) : [];
         var byNo = {}, i;
         for(i=0;i<cues.length;i++) byNo[cues[i].no] = cues[i].text;

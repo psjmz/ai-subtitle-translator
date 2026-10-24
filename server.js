@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.373';
+const ASSET_VER = '0.9.374';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -8729,6 +8729,13 @@ const server = http.createServer(async (req, res) => {
           topSrcs: cnt(all.filter(e => e.src), 'src'),   // v0.9.179: auto vs manually-picked source language
           topModels: cnt(all.filter(e => e.model), 'model'),
           topFails: cnt(all.filter(e => e.failMsg), 'failMsg'),
+          /* v0.9.374：全时段的「下载/复制次数」（事件上的累计计数）。
+             ⚠️ today.downloaded 是**任务数**（今天有过下载动作的记录条数），
+                同一任务今天下 3 次只算 1 —— 它统计不了「次数」：
+                事件只存最后一次 downloadedAt，无法把累计数按天拆开。
+                所以后台文案必须写「N 个任务」，次数看这两个字段。 */
+          dlTotal: all.reduce((s, e) => s + (Number(e.downloads) || 0), 0),
+          cpTotal: all.reduce((s, e) => s + (Number(e.copies) || 0), 0),
           /* v0.9.244：导出格式分布。⚠️ 不能对 dlFmt 做 cnt —— dlFmt 只是「最后一次」，
              同一任务先下 srt 再下 ass 会被覆盖成一条；分布必须读累计计数（dlSrt/dlVtt/…）。 */
           dlFmts: Object.keys(DL_FMT)
