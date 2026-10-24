@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.371';
+const ASSET_VER = '0.9.372';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -7489,6 +7489,9 @@ function eOffReason(cfg, lang, meta){
       而原来的逻辑是「一次失败 → 整集后续批次全部弃用 E」，代价太大。
       现在：超时类（软失败）连着 2 次才判死，中间保持认领、下批继续用 E；连接拒绝 / DNS
       这类硬失败仍是一次判死（那种不会自愈，多试一次纯浪费 90 秒）。
+   v0.9.366：上游 5xx / 405 / 429 / redirect 循环（Google 风控、/sorry/ 拦截）虽判死条件
+      同硬失败（一次即死），但**进全局冷却** —— 风控会自愈，冷却正好对症；
+      10-24 双出口风控时硬失败不冷却曾让每个新任务都重撞一次 502。
    ⚠️ 只有真判死才释放 E_OWN —— 软失败期间把占用放掉，别的任务抢走后就轮到本任务 lost。
    ⚠️ 计数在成功时清零（见下方 E_OK 更新处），所以「连续」是真的连续。 */
 function eTaskFail(taskId, err){
@@ -7503,16 +7506,23 @@ function eTaskFail(taskId, err){
   if (!rec) return;
   rec.at = Date.now();
   rec.fail = (rec.fail || 0) + 1;
-  /* 超时 / 被前端放弃 = 软失败；桥接没起来、DNS 挂了 = 硬失败 */
+  /* 超时 / 被前端放弃 = 软失败；桥接没起来、DNS 挂了 = 硬失败。
+     v0.9.366：上游 5xx / 405 / 429 / 重定向循环（Google 风控、/sorry/ 拦截）= 会自愈的失败，
+     与「cookie 掉了等不来」分开对待 —— 一次判死但走全局冷却（等得住，对症）。 */
   const soft = (err && err.name === 'AbortError') || /timeout|timed? ?out|abort|ETIMEDOUT|EAI_AGAIN/i.test(msg);
+  const rate = /\b(?:405|429|5\d\d)\b|upstream|redirect|sorry|rate.?limit/i.test(msg);
   const need = soft ? 2 : 1;
   if (rec.fail >= need) {
     rec.on = -1; rec.why = 'dead';
     if (E_OWN.task === tid) { E_OWN.task = ''; E_OWN.at = 0; }
     /* v0.9.365：软失败（晚高峰拥堵超时）判死 → 全局冷却，后面的任务直接走 D，
        不再每个新任务重交一遍学费。硬失败不冷却：cookie 掉了等不来，对症是换 cookie。
+       v0.9.366：风控类（上游 5xx/405/redirect，msg 命中 rate）同样进冷却 ——
+       10-24 实证：Google 双出口风控时，不冷却导致每个新任务都重撞一次 502
+       （当日 10 个任务白交 10 次学费）。风控会自愈，冷却正好对症；
+       连接拒绝 / DNS / 401 仍不冷却（那类等不来，多等只会误伤调度）。
        cfg 现读而非传参 —— eTaskFail 的签名被 354 断言钉死，且这里一天也走不到几次。 */
-    if (soft) {
+    if (soft || rate) {
       const cd = eCooldownMs(readConfig());
       if (cd > 0) E_COOLDOWN.until = Date.now() + cd;
     }
@@ -8052,7 +8062,21 @@ const server = http.createServer(async (req, res) => {
          不再出现「客户端早走了、服务端还在傻等，上游跑完照样扣 token」。
          res 'close' 且响应未写完 = 客户端提前断开；正常结束也会触发 close，须用 writableFinished 区分。 */
       const cliAc = new AbortController();
-      res.on('close', () => { if (!res.writableFinished) cliAc.abort(); });
+      /* v0.9.369：客户端走了（关页面 / 断网 / 崩掉），除了中止上游 fetch（省钱），
+         还要**当场**把这一轮占的 D / E 任务槽放掉。原来只靠前端 pagehide 的 sendBeacon，
+         浏览器被强杀或断网时那一发发不出去，槽位就一直占到 3 分钟闲置兜底为止 ——
+         多集批量跑到一半被关掉时，用户重开页面会看到「任务还在跑」，别人也被挤在外面。
+         ⚠️ 正常结束也会触发 close，用 writableFinished 区分，别把正常收尾当成断开。 */
+      let cliTaskId = '';
+      res.on('close', () => {
+        if (!res.writableFinished) {
+          cliAc.abort();
+          if (cliTaskId) {
+            try { dReleaseTask(cliTaskId); } catch (e) {}
+            try { eRelease(cliTaskId); } catch (e) {}
+          }
+        }
+      });
       const CALL_BUDGET_MS = 90000;   /* 与前端「90 秒模型预算 + 15 秒排队冗余」对齐；回退链每级各拿一份 */
       /* v0.9.365：E 走网页桥接，正常单批 6~66 秒，90 秒预算贴着上限 —— 晚高峰前段（还没拥堵到
          200 秒）的批会被误杀。给 E 单独放宽到 120 秒（用户定案）；回退链每级仍是 90 秒。 */
@@ -8084,6 +8108,7 @@ const server = http.createServer(async (req, res) => {
       /* 任务号与 pickRoute 内部用的是同一套清洗规则（脏字符去掉、截 24 字），
          否则「选路时锁定 A 档」和「调用时读粘性档位」会读到两个不同的 key。 */
       const dTaskId = String((body.meta && body.meta.taskId) || '').replace(/[\x00-\x1f]/g, '').slice(0, 24);
+      cliTaskId = dTaskId;   /* 交给上面的 close 处理：客户端断开时据此释放槽位 */
       const pick = pickRoute(cfg, lang, body.meta, ip);
       /* D 的额度还在、只是这一分钟 RPM 满了：让前端等几十秒重发同一批，**不降级**。
          免费额度一分钟后就回来，降到 C/B/A 等于白扔。复用既有 {wait} 回执

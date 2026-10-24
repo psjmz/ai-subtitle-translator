@@ -8,7 +8,7 @@
       只看它会把日语用户判成中文。
 
    页面侧只需一行：
-     <script src="site-feedback.js?v=0.9.371" defer></script>
+     <script src="site-feedback.js?v=0.9.372" defer></script>
 
    只挂首页（10-23 用户定案：不必每页都有，首页一个浮窗就够）：
      · 右下角浮窗入口（桌面胶囊、移动端圆钮），点开是抽屉
