@@ -7839,7 +7839,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const DL_FMT_KEYS = \[\['srt','dlSrt'\]/.test(adm244), '后台表格缺格式计数字段表');
     assert.ok(/e\[x\[1\]\] > 1 \? ' ×' \+ e\[x\[1\]\] : ''/.test(adm244), '后台没显示各格式次数');
     assert.ok(/<th>导出格式<\/th>/.test(adm244), '后台表格缺「导出格式」列');
-    assert.ok(/colspan="11"/.test(adm244), '表格加了列但 colspan 没跟着加');
+    /* v0.9.373：列数不再写死 11 —— 加「槽」列时这条会误报。
+       直接数「开始时间」到 tbody 之间的 <th>，再要求空表行 colspan 与它一致。 */
+    const iTh = adm244.indexOf('<th>开始时间</th>');
+    const iBody = adm244.indexOf('<tbody id="evRows">');
+    assert.ok(iTh > 0 && iBody > iTh, '找不到使用记录的表头');
+    const thN = (adm244.slice(iTh, iBody).match(/<th>/g) || []).length;
+    assert.ok(new RegExp('<td colspan="' + thN + '"').test(adm244),
+      '表格加了列但 colspan 没跟着加（表头 ' + thN + ' 列）');
   });
 
   t('v0.9.244：双语合并页上报接进「合并」与「导出」两条路径', () => {
@@ -16789,4 +16796,79 @@ t('v0.9.373：「原文语言」相关文案 12 语齐全', () => {
     const n = (dict.match(new RegExp('\\b' + p[0] + ':', 'g')) || []).length;
     assert.strictEqual(n, p[1], p[0] + ' 只有 ' + n + ' 语（应 ' + p[1] + ' 语）');
   });
+});
+
+console.log('\n— v0.9.373：使用记录加「槽」列 —');
+/* 从 server.js 里抠出 evSlotMix 真跑一遍：这一列的取值直接决定「钱花在哪个槽」，
+   光靠正则查源码存在不够 —— 出错时是「显示成别的槽」，不是报错。 */
+function loadEvSlotMix() {
+  const S = readT('server.js');
+  const a = S.indexOf("const SLOT_ORDER = ['E', 'D', 'C', 'B', 'A'];");
+  assert.ok(a > 0, 'server.js 里找不到 SLOT_ORDER');
+  const b = S.indexOf('function slotTally(', a);
+  assert.ok(b > a, 'server.js 里找不到 slotTally（evSlotMix 的结束位置）');
+  const code = S.slice(a, b);
+  assert.ok(/function evSlotMix\(e\)/.test(code), '抠出来的片段里没有 evSlotMix');
+  return new Function(code + '\nreturn evSlotMix;')();
+}
+
+t('v0.9.373：evSlotMix 按批次给槽位，跨槽按 E>D>C>B>A 排', () => {
+  const mix = loadEvSlotMix();
+  const one = mix({ sbD: 12 });
+  assert.deepStrictEqual(one.mix, [{ s: 'D', n: 12 }], '单槽记录被算错');
+  assert.strictEqual(one.exact, 1, '有 sb 计数却不是 exact');
+  const cross = mix({ sbD: 12, sbC: 3, viaD: 0, viaC: 1 });
+  assert.deepStrictEqual(cross.mix, [{ s: 'D', n: 12 }, { s: 'C', n: 3 }],
+    '跨槽记录没把两个槽都列出来（只覆盖写 via* 就是这个后果）');
+});
+
+t('v0.9.373：老记录只能看 via*，A 槽靠四个 0 判定，自带 Key / 更老的记录一律留空', () => {
+  const mix = loadEvSlotMix();
+  const old = mix({ viaB: 0, viaC: 0, viaD: 0, viaE: 1, batches: 6 });
+  assert.deepStrictEqual(old.mix, [{ s: 'E', n: 1 }], '老记录的 via 标记没认出来');
+  assert.strictEqual(old.exact, 0, '老记录不该冒充逐批计数');
+  assert.deepStrictEqual(mix({ viaB: 0, viaC: 0, viaD: 0, viaE: 0 }).mix, [{ s: 'A', n: 1 }],
+    '四个 0 应该认成 A 槽');
+  assert.deepStrictEqual(mix({ byok: true, model: 'gpt-4o' }).mix, [],
+    '自带 Key 记录被猜出了槽位（它根本没走本站槽）');
+  assert.deepStrictEqual(mix({ model: 'gemini-3.1-flash-lite' }).mix, [],
+    '没有槽位标记的老记录被按模型名猜了槽位（同名模型可以挂两个槽，猜错比空着糟）');
+});
+
+t('v0.9.373：两代数据并存 —— sb 计数优先，via* 只做兜底', () => {
+  const mix = loadEvSlotMix();
+  const both = mix({ sbE: 4, viaD: 1, viaB: 0, viaC: 0, viaE: 0 });
+  assert.deepStrictEqual(both.mix, [{ s: 'E', n: 4 }], '有新计数时还在读旧的 via*');
+  assert.strictEqual(both.exact, 1);
+});
+
+t('v0.9.373：appendEvent 两条路径都记槽位，且拒绝把空 extra 记成 A', () => {
+  const S = readT('server.js');
+  assert.ok(/function bumpSlotUse\(ev, extra\)\{/.test(S), '缺 bumpSlotUse');
+  assert.ok(/if \(!ev \|\| !extra \|\| typeof extra !== 'object'\) return;/.test(S),
+    'bumpSlotUse 没挡住空参数（空对象会被记成 A）');
+  assert.ok(/'viaB' in extra[\s\S]{0,120}return;/.test(S),
+    '没校验 extra 里有没有 via 键 —— 老调用方传空对象会被当成 A 槽');
+  /* 定义 1 处 + 会话去重 1 处 + 新建事件 1 处；只挂一处会漏掉一半批次 */
+  const n = (S.match(/bumpSlotUse\(/g) || []).length;
+  assert.strictEqual(n, 3, 'bumpSlotUse 调用点应 3 处（定义 + 去重 + 新建），实际 ' + n);
+  assert.ok(/bumpSlotUse\(e, extra\);/.test(S), '会话去重路径没累加（第 2 批起全丢）');
+  assert.ok(/bumpSlotUse\(ev, extra\);/.test(S), '新建事件路径没累加（首批丢）');
+});
+
+t('v0.9.373：接口把槽位算好再下发，后台不再自己算一遍', () => {
+  const S = readT('server.js'), A = readT('admin.html');
+  assert.ok(/slots: slotTally\(todays\)/.test(S), '今日汇总没带各槽批次数（顶部 chip 没数据）');
+  assert.ok(/slot: m\.mix, slotExact: m\.exact/.test(S), '事件没有附带槽位字段');
+  assert.ok(/events: withSlot\(newest\.slice/.test(S), '分页/limit 两条出口没走 withSlot');
+  assert.ok(/function slotCell\(e\)/.test(A), '后台缺 slotCell');
+  assert.ok(/<th>槽<\/th>/.test(A), '使用记录表头没有「槽」');
+  assert.ok(/slotCell\(e\)/.test(A), '行里没渲染槽位');
+  assert.ok(/colspan="12"/.test(A), '空表行 colspan 没跟着加一（表格会错位）');
+  assert.ok(!/e\.via[BCDE]/.test(A), '后台又自己按 via* 算了一遍槽位（应与服务端同一套口径）');
+  assert.ok(/slotByok/.test(A), '自带 Key 没有单独标（会被误读成没走槽）');
+  /* 12 列在 640 版心下必须横滚才看得到「槽」，等于没加 —— 统计页单独放宽 */
+  assert.ok(/body\[data-pane="stats"\] \.wrap\{max-width:1180px\}/.test(A),
+    '统计页没放宽版心（槽列会被挤到横向滚动区外）');
+  assert.ok(/document\.body\.dataset\.pane = key/.test(A), 'switchTab 没打 pane 标记（宽版心不生效）');
 });

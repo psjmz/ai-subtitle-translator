@@ -335,6 +335,19 @@ function pickWL(map, v){
   const k = String(v == null ? '' : v);
   return Object.prototype.hasOwnProperty.call(map, k) ? map[k] : '';
 }
+/* v0.9.373：按批次累加「这一批落在哪个槽」。
+   为什么不只靠 viaB/viaC/viaD/viaE：那四个是**覆盖写**，只留最后一批。
+   而一个任务中途会换槽（D 的日额度 / 小时名额耗尽 → 降到 C/B；E 失败 → 降级），
+   后台「这一单到底用了谁」就只剩最后一格。故另记 sbA..sbE（每批 +1），
+   与 via* 共存：老记录看 via*，新记录看计数，互不覆盖。
+   ⚠️ A 槽没有 via 标记（四个 0），所以必须由「extra 里四个键都在」判定；
+      调用方传空对象 / 老调用方不传时一律不记，免得把未知记成 A。 */
+function bumpSlotUse(ev, extra){
+  if (!ev || !extra || typeof extra !== 'object') return;
+  if (!('viaB' in extra) && !('viaC' in extra) && !('viaD' in extra) && !('viaE' in extra)) return;
+  const s = extra.viaE ? 'E' : extra.viaD ? 'D' : extra.viaC ? 'C' : extra.viaB ? 'B' : 'A';
+  ev['sb' + s] = (ev['sb' + s] || 0) + 1;
+}
 function appendEvent(ip, meta, model, extra){
   if (!meta || typeof meta !== 'object') return;
   const now = Date.now();
@@ -373,6 +386,7 @@ function appendEvent(ip, meta, model, extra){
       if (e.ip !== ip) e.ipSwap = (e.ipSwap || 0) + 1;
       if (src) e.src = src;   // v0.9.179: keep the newest known source language on the record
       if (extra && typeof extra === 'object') Object.assign(e, extra);
+      bumpSlotUse(e, extra);   // v0.9.373：这一批走的槽累加到 sbA..sbE
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
     }
@@ -382,6 +396,7 @@ function appendEvent(ip, meta, model, extra){
   if (src) ev.src = src;        // v0.9.179
   if (task) ev.taskId = task;   // v0.9.159：存任务号，后续批次才能归到这一条
   if (extra && typeof extra === 'object') Object.assign(ev, extra);
+  bumpSlotUse(ev, extra);       // v0.9.373：首批也要记，否则只显示「最后一批」
   bumpRetry(ev, meta.rt);
   if (meta.fwhy) bumpFail(ev, meta.fwhy);
   /* v0.9.337：先查这个任务号有没有计过数（见 subsCounted）。
@@ -479,6 +494,42 @@ function markEvent(ip, meta, ev){
   if (db.events.length > EVENTS_MAX) db.events = db.events.slice(-EVENTS_MAX);
   fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
   return true;
+}
+/* v0.9.373：把一单的「槽位用量」整理成 [{s,n}]，后台那一列直接渲染。
+   两代数据：
+     ① sbA..sbE —— v0.9.373 起按批次累加，能看出整单跨了哪几个槽（exact=1）；
+     ② viaB/viaC/viaD/viaE —— 更早的记录只有「最后一批」的归属（exact=0）。
+   两代都没有（v0.9.157 之前的老记录、自带 Key 记录）→ 空数组，后台显示「-」。
+   ⚠️ 绝不按模型名反推槽位：同一个模型名可以挂在不同槽上（D 的池子里也有 gemini 系），
+      猜测错比空着更糟 —— 后台是要拿来判断「钱花在哪个槽」的。 */
+const SLOT_ORDER = ['E', 'D', 'C', 'B', 'A'];   // 与 pickRoute 的优先级一致（E > D > C > B > A）
+function evSlotMix(e){
+  const mix = [];
+  let total = 0;
+  for (const s of SLOT_ORDER) {
+    const n = Number(e['sb' + s]) || 0;
+    if (n > 0) { mix.push({ s: s, n: n }); total += n; }
+  }
+  if (total) return { mix: mix, exact: 1 };
+  const hasFlag = ('viaB' in e) || ('viaC' in e) || ('viaD' in e) || ('viaE' in e);
+  if (!hasFlag) return { mix: [], exact: 0 };
+  for (const s of SLOT_ORDER) {
+    /* A 槽没有标记位（四个键全 0 就是 A），放在最后兜底 */
+    if (s === 'A' || Number(e['via' + s]) === 1) return { mix: [{ s: s, n: 1 }], exact: 0 };
+  }
+  return { mix: [], exact: 0 };
+}
+/* 今日汇总条的「槽位」chip：按**批次**统计（与「N 次请求」同口径）。
+   老记录只有最后一批的归属 → 把它的 batches 整笔记到那一格，宁可少看跨槽，也不虚增。 */
+function slotTally(arr){
+  const o = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+  for (const e of arr) {
+    const m = evSlotMix(e);
+    if (!m.mix.length) continue;
+    if (m.exact) { for (const x of m.mix) o[x.s] += x.n; continue; }
+    o[m.mix[0].s] += Math.max(1, Number(e.batches) || 1);
+  }
+  return o;
 }
 /* v0.9.145：token 用量埋点。上游返回 usage 之后，把 prompt/completion tokens 累加到「同一条」任务事件上。
    只累加已存在的记录，找不到就丢弃——绝不新建记录（否则会给自带 Key 用户凭空造出带 token 的脏数据）。
@@ -8622,7 +8673,9 @@ const server = http.createServer(async (req, res) => {
             finished: todays.filter(e => e.finishedAt && dateOfTs(e.finishedAt) === today).length,
             downloaded: todays.filter(e => e.downloadedAt && dateOfTs(e.downloadedAt) === today).length,
             copied: todays.filter(e => e.copiedAt && dateOfTs(e.copiedAt) === today).length,   // v0.9.298：复制也是拿到结果
-            failed: todays.filter(e => e.failedAt && dateOfTs(e.failedAt) === today).length
+            failed: todays.filter(e => e.failedAt && dateOfTs(e.failedAt) === today).length,
+            /* v0.9.373：今日各槽的批次数（后台顶部 chip）。自带 Key 的记录不进这本账（没走本站槽位）。 */
+            slots: slotTally(todays)
           },
           topFiles: cnt(all, 'file'),
           topLangs: cnt(all, 'lang'),
@@ -8636,17 +8689,23 @@ const server = http.createServer(async (req, res) => {
             .filter(x => x.n > 0).sort((a, b) => b.n - a.n)
         };
         const newest = all.slice().reverse(); // 最新在前（倒序拷贝，不动存储的追加序数组）
+        /* v0.9.373：每条带上「用了哪些槽、各几批」。派生只在这里做一次，后台只负责上色 —— 
+           两边各算一遍迟早会漂（后台按 via*、服务端按 sb*，同一行能看出两个答案）。 */
+        const withSlot = list => list.map(e => {
+          const m = evSlotMix(e);
+          return Object.assign({}, e, { slot: m.mix, slotExact: m.exact });
+        });
         if (q.page !== undefined) {
           const size = Math.min(100, Math.max(1, parseInt(q.size, 10) || 20));
           const pages = Math.max(1, Math.ceil(all.length / size));
           const page = Math.min(pages, Math.max(1, parseInt(q.page, 10) || 1));
           return sendJson(res, 200, Object.assign(base, {
             page, size, pages,
-            events: newest.slice((page - 1) * size, page * size)
+            events: withSlot(newest.slice((page - 1) * size, page * size))
           }));
         }
         const qLimit = Math.min(500, Math.max(1, parseInt(q.limit, 10) || 100));
-        return sendJson(res, 200, Object.assign(base, { events: newest.slice(0, qLimit) }));
+        return sendJson(res, 200, Object.assign(base, { events: withSlot(newest.slice(0, qLimit)) }));
       }
 
       /* v0.9.244：双语合并页使用记录（独立卡片，与翻译事件分开统计）

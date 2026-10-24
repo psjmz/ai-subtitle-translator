@@ -16,6 +16,10 @@
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
   .wrap{max-width:640px;margin:32px auto;padding:0 16px}
+  /* v0.9.373：统计页是宽表（使用记录现在 12 列），640 版心下必须横向滚才能看到
+     「模型 / 槽」——这一列的意义就是一眼扫过去，藏起来等于没加。
+     只放宽统计页，配置页（表单）保持窄版心，输入框不会被拉成一整行。 */
+  body[data-pane="stats"] .wrap{max-width:1180px}
   h1{font-size:20px;margin:0 0 4px}
   .sub{color:var(--mut);font-size:13px;margin-bottom:20px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
@@ -48,6 +52,16 @@
   .tbl th,.tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
   .tbl th{color:var(--mut);font-weight:500;font-size:12px}
   .tbl tr:hover td{background:#f8fafc}
+  /* v0.9.373：使用记录的「槽」列。A/B/C/D/E 五种底色的唯一目的是一眼分辨，
+     不是装饰 —— 这一列的用途是回答「这单在吃谁的额度」。 */
+  .slot{display:inline-block;min-width:17px;padding:0 4px;border-radius:4px;font:600 11px/16px ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center;border:1px solid transparent}
+  .slotA{color:#5b6470;background:#f0f2f5;border-color:#dfe3e8}
+  .slotB{color:#8a5a00;background:#fff4e0;border-color:#f0dcb8}
+  .slotC{color:#1c5bb8;background:#eaf2ff;border-color:#c9dcf8}
+  .slotD{color:#1a7f4b;background:#e9f6ee;border-color:#c4e3d1}
+  .slotE{color:#6b3fa0;background:#f3ecfb;border-color:#ddcdf0}
+  .slotn{color:var(--mut);font-size:11px;margin:0 4px 0 2px}
+  .slotByok{color:var(--mut);background:#f4f6f9;border-color:#e4e7ec;font-weight:400;font-family:inherit}
   textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;min-height:54px;background:#fff;color:var(--txt)}
   textarea:focus{outline:2px solid #bcd3fb;border-color:var(--pri)}
   /* v0.9.119：语言分流 chips */
@@ -458,12 +472,12 @@
       <div class="stats" id="evStats"></div>
       <div style="overflow-x:auto">
         <table class="tbl">
-          <thead><tr><th>开始时间</th><th>结束时间</th><th>时长</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th><th>模型</th><th>下载</th><th>导出格式</th></tr></thead>
+          <thead><tr><th>开始时间</th><th>结束时间</th><th>时长</th><th>IP</th><th>文件名</th><th>目标语言</th><th>字幕条数</th><th>批次</th><th>模型</th><th>槽</th><th>下载</th><th>导出格式</th></tr></thead>
           <tbody id="evRows"></tbody>
         </table>
       </div>
       <div class="pager" id="evPager"></div>
-      <div class="note">记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数、所用模型、完成/下载状态；不记录字幕内容。自带 API Key 的翻译直连服务商，仅在完成/下载时上报轻量记录（模型/语言/下载状态可统计，批次与时长不适用）。同 IP 同文件同语言 30 分钟内算一次会话。「导出格式」读的是各格式的累计次数（同一任务先下 SRT 再下 ASS 会记两次）。</div>
+      <div class="note">记录走站点默认模型（云端翻译）的会话元数据：文件名、目标语言、字幕条数、所用模型、完成/下载状态；不记录字幕内容。自带 API Key 的翻译直连服务商，仅在完成/下载时上报轻量记录（模型/语言/下载状态可统计，批次与时长不适用）。同 IP 同文件同语言 30 分钟内算一次会话。「导出格式」读的是各格式的累计次数（同一任务先下 SRT 再下 ASS 会记两次）。<b>「槽」</b>是这单由哪个模型槽承担（E 网页 Gemini → D 免费池 → C → B → A 兜底），数字是<b>批次数</b>；一单中途额度耗尽会换槽，换过就并排列出（如 D×12 C×3）。<b>自带 Key 不占本站槽位</b>，早期记录没有槽位标记，显示「-」。</div>
       <div class="btns"><button id="btnRefreshEvents">刷新</button></div>
     </div>
 
@@ -1061,6 +1075,14 @@ async function loadEvents(){
     if (j.topFiles && j.topFiles[0]) chips.push('最常翻译：<b>' + esc(j.topFiles[0].name) + '</b> ×' + j.topFiles[0].n);
     if (j.topLangs && j.topLangs[0]) chips.push('最热目标语：<b>' + esc(j.topLangs[0].name) + '</b> ×' + j.topLangs[0].n);
     if (j.topModels && j.topModels[0]) chips.push('最常用模型：<b>' + esc(j.topModels[0].name) + '</b> ×' + j.topModels[0].n);
+    /* v0.9.373：今日各槽各扛了多少批 —— 不用逐行数就能看出「主要靠谁在跑」 */
+    if (j.today && j.today.slots) {
+      const S = j.today.slots;
+      const parts = ['E', 'D', 'C', 'B', 'A'].filter(s => S[s] > 0)
+        .sort((a, b) => S[b] - S[a])
+        .map(s => '<b>' + s + '</b> ' + S[s]);
+      if (parts.length) chips.push('槽位（今日按批次）：' + parts.join(' · '));
+    }
     if (j.topFails && j.topFails[0]) chips.push('<span style="color:#c00">失败原因：<b>' + esc(j.topFails[0].name) + '</b> ×' + j.topFails[0].n + '</span>');
     /* v0.9.244：导出格式分布（读累计计数，不是「最后一次」） */
     if (j.dlFmts && j.dlFmts.length) chips.push('导出格式：<b>' + esc(j.dlFmts.slice(0, 3).map(x => x.name.toUpperCase() + '×' + x.n).join(' ')) + '</b>');
@@ -1086,8 +1108,8 @@ async function loadEvents(){
         : '';
       return '<tr><td>' + evTime(e.t) + lastTd + '</td><td>' + endTd + '</td><td>' + durTd + '</td><td>' + esc(e.ip) +
         '</td><td title="' + esc(e.file) + '">' + esc(e.file) +
-        '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + dlTd + '</td><td>' + dlFmtCell(e) + '</td></tr>';
-    }).join('') || '<tr><td colspan="11" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
+        '</td><td>' + esc(e.lang) + '</td><td>' + (e.cues || '-') + '</td><td>' + (e.batches || (e.byok ? '-' : 1)) + '</td><td>' + mdlTd + '</td><td>' + slotCell(e) + '</td><td>' + dlTd + '</td><td>' + dlFmtCell(e) + '</td></tr>';
+    }).join('') || '<tr><td colspan="12" style="color:var(--mut)">暂无记录（用户用默认模型翻译后会出现在这里）</td></tr>';
     renderPager(j, 'evPager', evPage);
   }
   catch (e) { /* 记录区加载失败不影响主配置页 */ }
@@ -1102,6 +1124,26 @@ function dlFmtCell(e){
     .map(x => x[0].toUpperCase() + (e[x[1]] > 1 ? ' ×' + e[x[1]] : ''));
   if (!parts.length) return '<span style="color:var(--mut)">-</span>';
   return '<span title="本任务各格式的导出次数">' + esc(parts.join('，')) + '</span>';
+}
+/* v0.9.373：模型槽列。服务端已经把「这单用了哪些槽、各几批」算好放进 e.slot
+   （见 server.js 的 evSlotMix），这里只上色排版：
+     · 单槽     → D×12（×N 是批次数，不是次数记录数）
+     · 中途换槽 → 按批次从多到少并排，如 D×12 C×3（D 的额度耗尽会降到 C/B）
+     · 自带 Key → 浏览器直连服务商，不占本站任何槽位
+     · 早期记录 → 「-」，不按模型名猜槽（同名模型可以挂在两个槽上，猜错比空着糟） */
+const SLOT_TXT = { E: 'E（网页 Gemini）', D: 'D（Gemini 免费池）', C: 'C', B: 'B', A: 'A（兜底）' };
+function slotCell(e){
+  if (e.byok) return '<span class="slot slotByok" title="自带 Key：浏览器直连服务商，不占本站模型槽">自带Key</span>';
+  const mix = Array.isArray(e.slot) ? e.slot.slice() : [];
+  if (!mix.length) return '<span style="color:var(--mut)" title="早期记录没有槽位标记（v0.9.157 起才有），不按模型名猜">-</span>';
+  const ord = { E: 0, D: 1, C: 2, B: 3, A: 4 };
+  mix.sort((a, b) => (b.n - a.n) || (ord[a.s] - ord[b.s]));
+  const title = '按批次统计：' + mix.map(x => SLOT_TXT[x.s] + ' ' + x.n + ' 批').join(' · ')
+    + (e.slotExact === 1 ? '' : '（旧记录只记了最后一批的槽位，看不出中途是否换过）');
+  return '<span title="' + esc(title) + '">' + mix.map(x =>
+    '<b class="slot slot' + x.s + '">' + x.s + '</b>' +
+    (x.n > 1 || mix.length > 1 ? '<span class="slotn">×' + x.n + '</span>' : '')
+  ).join('') + '</span>';
 }
 /* 分页条：上一页/下一页 + 窗口化页码（首末页 + 当前页前后各 1，超过间隔用 …）
    v0.9.244：加 elId / cur 两个参数 —— 翻译记录与双语合并记录是两张表各翻各的页，
@@ -1552,6 +1594,9 @@ $('btnExportFb').addEventListener('click', async () => {
 const PANES = { model: 'paneModel', stats: 'paneStats', fb: 'paneFb', acct: 'paneAcct' };
 function switchTab(name, silent){
   const key = PANES[name] ? name : 'model';
+  /* v0.9.373：统计页放宽版心（见 CSS），其余页保持 640 —— 用 body 上的标记切。
+     属性名用 data-pane 而不是 data-tab：后者会被「tab 顺序」那条用例当成第五个 tab。 */
+  try { document.body.dataset.pane = key; } catch (e) {}
   Object.keys(PANES).forEach(k => {
     show(PANES[k], k === key);
     const btn = document.querySelector('#adminTabs button[data-tab="' + k + '"]');
