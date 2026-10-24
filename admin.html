@@ -122,6 +122,36 @@
     .mops{gap:2px}
     .mops button{padding:2px 3px;font-size:11px}
   }
+  /* v0.9.371：用户反馈 tab —— 未读徽章、筛选条、反馈卡片 */
+  .tabbadge{display:inline-block;margin-left:5px;min-width:16px;padding:0 5px;border-radius:9px;background:var(--err);color:#fff;font-size:11px;line-height:16px;text-align:center;vertical-align:1px}
+  .fbtools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}
+  .fbseg{display:flex;gap:2px;background:#f1f3f6;border-radius:8px;padding:2px}
+  .fbseg button{border:0;background:transparent;padding:5px 10px;font-size:12.5px;border-radius:6px;color:var(--mut)}
+  .fbseg button.on{background:#fff;color:var(--txt);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .fbtools input{flex:1;min-width:150px;padding:6px 10px;font-size:13px}
+  .fbrow{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff}
+  .fbhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .fbt{font-size:12px;color:var(--mut);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .fbno{font-size:11px;color:var(--mut);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .fbtag{font-size:12px;padding:1px 8px;border-radius:10px;background:#f1f3f6;color:var(--mut)}
+  .fbtag.bug{background:#fdecea;color:#a02a2a}
+  .fbtag.idea{background:#e8f0fe;color:#1a56b3}
+  .fbtag.quality{background:#fff4e5;color:#9a6700}
+  .fbst{font-size:12px;padding:1px 8px;border-radius:10px}
+  .fbst.new{background:#fdecea;color:var(--err)}
+  .fbst.doing{background:#fff4e5;color:#9a6700}
+  .fbst.done{background:#eaf5ee;color:var(--ok)}
+  .fbst.spam{background:#f1f2f4;color:var(--mut)}
+  .fbmsg{font-size:13px;line-height:1.7;margin-top:8px;word-break:break-word}
+  .fbmeta{font-size:12px;color:var(--mut);margin-top:6px;word-break:break-all}
+  .fbnear{font-size:12px;color:#9a6700;margin-top:5px}
+  .fbacts{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .fbacts button{padding:4px 10px;font-size:12px;border-radius:6px}
+  .fbnotebox{display:none;margin-top:8px}
+  .fbnotebox textarea{min-height:44px;font-family:inherit;font-size:12.5px}
+  .fbnote{font-size:12px;color:var(--mut);margin-left:4px}
+  .fbempty{padding:28px;text-align:center;color:var(--mut);font-size:13px}
+  .fbdetail{font-size:12px;color:var(--mut);margin-top:6px;line-height:1.6;word-break:break-all}
 </style>
 </head>
 <body>
@@ -144,6 +174,7 @@
     <div class="tabs" id="adminTabs">
       <button type="button" data-tab="model" aria-selected="true">模型配置</button>
       <button type="button" data-tab="stats" aria-selected="false">统计</button>
+      <button type="button" data-tab="fb" aria-selected="false">反馈<span class="tabbadge" id="fbTabBadge" style="display:none">0</span></button>
       <button type="button" data-tab="acct" aria-selected="false">账户安全</button>
     </div>
 
@@ -511,7 +542,32 @@
       <div class="note">修改后下次登录用新密码，本页面仍保持登录状态。</div>
     </div>
 
-    <div class="note">提示：配置保存后立即生效（前端刷新即可看到新模型）；用户侧的「默认模型」开箱即用，高级用户仍可自带 Key。</div>
+      <div class="note">提示：配置保存后立即生效（前端刷新即可看到新模型）；用户侧的「默认模型」开箱即用，高级用户仍可自带 Key。</div>
+    </div>
+
+    <!-- v0.9.371：用户反馈。站内右下角那个入口提交的内容全落在这里。
+         反馈是「用户主动说的话」，与统计 tab 里的行为记录不是一回事 —— 单独一档，
+         免得埋在一堆表格里没人看。 -->
+    <div id="paneFb" style="display:none">
+      <div class="card">
+        <h2>💬 用户反馈</h2>
+        <div class="stats" id="fbStats"></div>
+        <div class="fbtools">
+          <div class="fbseg" id="fbSeg">
+            <button type="button" data-st="all" class="on">全部</button>
+            <button type="button" data-st="new">待处理</button>
+            <button type="button" data-st="doing">处理中</button>
+            <button type="button" data-st="done">已回复</button>
+            <button type="button" data-st="spam">垃圾</button>
+          </div>
+          <input type="text" id="fbQ" placeholder="搜索内容 / 邮箱 / 页面" spellcheck="false">
+          <button type="button" id="btnRefreshFb">刷新</button>
+          <button type="button" id="btnExportFb">导出 CSV</button>
+        </div>
+        <div id="fbList"></div>
+        <div class="pager" id="fbPager"></div>
+        <div class="note">用户在站内右下角「反馈」里提交的内容（翻译页是翻完之后才出现入口）。附带信息只有页面、界面语言、版本号、UA、视口宽——<b>不含字幕内容</b>。IP 打码显示，原值只用于限流与去重。「同 IP ±30 分钟」那行是自动关联的翻译记录：反馈说卡住/报错时，先看这一行有没有对应失败，比问用户快。</div>
+      </div>
     </div>
   </div>
 </div>
@@ -971,6 +1027,13 @@ async function enterAdmin(){
   /* v0.9.308：不再一进来就把四张统计表全拉一遍 —— 大多数时候进来只是改个 Key。
      按 hash 落到对应 tab，切到「统计」时才加载（switchTab 里负责）。 */
   switchTab((location.hash || '').replace(/^#/, ''), true);
+  /* v0.9.371：进来先探一次未读；之后每分钟一次（标签页隐藏时跳过，别在后台白耗） */
+  refreshFbBadge();
+  if (!enterAdmin._poll) {
+    enterAdmin._poll = setInterval(function () {
+      if (!document.hidden) refreshFbBadge();
+    }, 60000);
+  }
   try { await loadConfig(); }
   catch (e) { msg('cfgMsg', '读取配置失败：' + e.message, 'err'); }
 }
@@ -1274,10 +1337,219 @@ $('tlPager').addEventListener('click', e => {
 });
 $('btnRefreshTool').addEventListener('click', loadToolEvents);
 
+/* ============================================================================
+   v0.9.371：用户反馈
+   · 列表按「最新在前」拉，状态四档：待处理 / 处理中 / 已回复 / 垃圾
+   · 每条都能就地改状态、写备注、复制邮箱；备注覆盖式保存（一个文本框，不做历史版本）
+   · 导出走前端拼 CSV：接口不需要为导出再开一个「带 token 的下载地址」，
+     token 放进 URL 会进 nginx 日志，得不偿失
+   ============================================================================ */
+let fbPage = 1, fbStatus = 'all', fbQ = '';
+const FB_TYPE_TXT = { bug: '问题报错', idea: '功能建议', quality: '翻译质量', other: '其他' };
+const FB_ST_TXT = { new: '待处理', doing: '处理中', done: '已回复', spam: '垃圾' };
+
+async function refreshFbBadge(){
+  try {
+    const j = await api('/api/admin/feedback/badge');
+    const b = $('fbTabBadge');
+    if (!b) return;
+    if (j.unread > 0) {
+      b.textContent = j.unread > 99 ? '99+' : String(j.unread);
+      b.style.display = '';
+    } else {
+      b.style.display = 'none';
+    }
+    /* 后台不常开着，标题里带未读数是最省事的提醒：切回标签页一眼就能看到 */
+    document.title = (j.unread ? '(' + j.unread + ') ' : '') + 'AI 字幕工具 · 管理后台';
+  } catch (e) { /* 未登录或网络问题：徽章保持原样，不打断当前操作 */ }
+}
+
+/* UA 压成「系统 · 浏览器 版本」：整串 UA 在表格里又长又没人看，
+   但排查兼容问题时又确实要 —— 原文塞进 title，鼠标一停就能看到。 */
+function fbUA(ua){
+  const s = String(ua || '');
+  if (!s) return '';
+  const m = /(HeadlessChrome|Chrome|Edg|Firefox|Safari)\/(\d+)/.exec(s);
+  const os = /Windows NT/.test(s) ? 'Windows'
+    : /Mac OS X/.test(s) ? 'macOS'
+    : /Android/.test(s) ? 'Android'
+    : /iPhone|iPad/.test(s) ? 'iOS'
+    : /Linux/.test(s) ? 'Linux' : '';
+  const br = m ? (m[1] === 'HeadlessChrome' ? 'Chrome' : m[1]) + ' ' + m[2] : '';
+  return [os, br].filter(Boolean).join(' · ') || s.slice(0, 40);
+}
+
+async function loadFeedback(){
+  try {
+    const qs = '?page=' + fbPage + '&size=20&status=' + encodeURIComponent(fbStatus) + '&q=' + encodeURIComponent(fbQ);
+    const j = await api('/api/admin/feedback' + qs);
+    const chips = [];
+    chips.push('待处理 <b>' + j.unread + '</b>');
+    chips.push('今日 <b>' + j.today + '</b>');
+    chips.push('累计 <b>' + j.all + '</b>');
+    Object.keys(FB_TYPE_TXT).forEach(k => {
+      if (j.byType && j.byType[k]) chips.push(FB_TYPE_TXT[k] + ' <b>' + j.byType[k] + '</b>');
+    });
+    $('fbStats').innerHTML = chips.map(c => '<span class="chip">' + c + '</span>').join('');
+
+    $('fbList').innerHTML = (j.items || []).map(e => {
+      const meta = [
+        e.page ? esc(e.page) : '未附带页面',
+        e.lang ? esc(e.lang) : '',
+        e.contact ? esc(e.contact) : '未留邮箱',
+        e.ver ? 'v' + esc(e.ver) : ''
+      ].filter(Boolean).join(' · ');
+      const near = e.near
+        ? '<div class="fbnear">同 IP ±30 分钟：' + e.near + ' 条翻译记录'
+          + (e.nearFail ? '（失败：' + esc(e.nearFail) + '）' : '') + '</div>'
+        : '';
+      const detail = [
+        e.vw ? '视口 ' + e.vw + 'px' : '',
+        e.ip ? 'IP ' + esc(e.ip) : '',
+        e.ua ? esc(fbUA(e.ua)) : ''
+      ].filter(Boolean).join(' · ');
+      return '<div class="fbrow" data-id="' + esc(e.id) + '" data-contact="' + esc(e.contact || '') + '">'
+        + '<div class="fbhead">'
+        + '<span class="fbt">' + evTime(e.t) + '</span>'
+        + '<span class="fbtag ' + esc(e.type) + '">' + esc(FB_TYPE_TXT[e.type] || e.type) + '</span>'
+        + '<span class="fbno">#F-' + esc(String(e.no)) + '</span>'
+        + '<span style="margin-left:auto" class="fbst ' + esc(e.status) + '">' + esc(FB_ST_TXT[e.status] || e.status) + '</span>'
+        + '</div>'
+        + '<div class="fbmsg">' + esc(e.msg).replace(/\n/g, '<br>') + '</div>'
+        + '<div class="fbmeta">' + meta + '</div>'
+        + (detail ? '<div class="fbdetail" title="' + esc(e.ua || '') + '">' + detail + '</div>' : '')
+        + near
+        + '<div class="fbacts">'
+        + '<button type="button" data-act="done">标记已回复</button>'
+        + '<button type="button" data-act="doing">处理中</button>'
+        + '<button type="button" data-act="spam">标记垃圾</button>'
+        + (e.contact ? '<button type="button" data-act="copy">复制邮箱</button>' : '')
+        + '<button type="button" data-act="note">备注</button>'
+        + (e.note ? '<span class="fbnote">备注：' + esc(e.note) + '</span>' : '')
+        + '</div>'
+        + '<div class="fbnotebox"><textarea placeholder="内部备注，用户看不到（如：已回邮件 / 等模型侧修复）">' + esc(e.note || '') + '</textarea>'
+        + '<div class="btns" style="margin-top:6px"><button type="button" data-act="savenote">保存备注</button></div></div>'
+        + '</div>';
+    }).join('') || '<div class="fbempty">还没有反馈。用户在站内右下角提交后会出现在这里。</div>';
+
+    renderPager(j, 'fbPager', fbPage);
+  } catch (e) {
+    $('fbList').innerHTML = '<div class="fbempty">读取失败：' + esc(e.message) + '</div>';
+  }
+}
+
+$('fbList').addEventListener('click', async ev => {
+  const b = ev.target.closest('button[data-act]');
+  if (!b) return;
+  const row = b.closest('.fbrow');
+  if (!row) return;
+  const id = row.getAttribute('data-id');
+  const act = b.getAttribute('data-act');
+
+  if (act === 'note') {
+    const box = row.querySelector('.fbnotebox');
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    if (box.style.display === 'block') { const ta = box.querySelector('textarea'); ta.focus(); }
+    return;
+  }
+  if (act === 'copy') {
+    const mail = row.getAttribute('data-contact') || '';
+    try { await navigator.clipboard.writeText(mail); b.textContent = '已复制'; }
+    catch (e) { b.textContent = '复制失败'; }
+    setTimeout(() => { b.textContent = '复制邮箱'; }, 1500);
+    return;
+  }
+  if (act === 'savenote') {
+    /* 只改备注、不动状态：把当前状态原样传回去（服务端要求一个合法值） */
+    const cur = (row.querySelector('.fbst') || {}).textContent || '';
+    const map = { '待处理': 'new', '处理中': 'doing', '已回复': 'done', '垃圾': 'spam' };
+    const note = row.querySelector('.fbnotebox textarea').value;
+    try {
+      await api('/api/admin/feedback/status', 'POST', { id: id, status: map[cur] || 'new', note: note });
+      await loadFeedback();
+      refreshFbBadge();
+    } catch (e) {
+      alert('保存备注失败：' + e.message);
+    }
+    return;
+  }
+  try {
+    await api('/api/admin/feedback/status', 'POST', { id: id, status: act });
+    await loadFeedback();
+    refreshFbBadge();
+  } catch (e) {
+    alert('操作失败：' + e.message);
+  }
+});
+$('fbPager').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (!b || b.disabled) return;
+  const p = +b.dataset.p;
+  if (p < 1 || p === fbPage) return;
+  fbPage = p;
+  loadFeedback();
+});
+$('fbSeg').addEventListener('click', e => {
+  const b = e.target.closest('button[data-st]');
+  if (!b) return;
+  fbStatus = b.getAttribute('data-st');
+  fbPage = 1;
+  Array.prototype.forEach.call($('fbSeg').children, x => { x.className = x === b ? 'on' : ''; });
+  loadFeedback();
+});
+let fbQTimer = null;
+$('fbQ').addEventListener('input', () => {
+  clearTimeout(fbQTimer);
+  fbQTimer = setTimeout(() => { fbQ = $('fbQ').value.trim(); fbPage = 1; loadFeedback(); }, 350);
+});
+$('btnRefreshFb').addEventListener('click', () => { loadFeedback(); refreshFbBadge(); });
+
+/* CSV 导出：BOM + 全字段加引号 + 公式注入防护（以 = + - @ 开头的单元格前面补 '） */
+function fbCsvCell(v){
+  let s = String(v == null ? '' : v);
+  if (/^[=+\-@]/.test(s)) s = "'" + s;
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+$('btnExportFb').addEventListener('click', async () => {
+  const btn = $('btnExportFb');
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = '导出中…';
+  try {
+    let page = 1, all = [];
+    for (;;) {
+      const j = await api('/api/admin/feedback?page=' + page + '&size=100&status=' + encodeURIComponent(fbStatus) + '&q=' + encodeURIComponent(fbQ));
+      all = all.concat(j.items || []);
+      if (page >= (j.pages || 1) || page >= 50) break;
+      page++;
+    }
+    const head = ['编号', '时间', '类型', '状态', '内容', '联系方式', '页面', '语言', '版本', '备注'];
+    const rows = all.map(e => [
+      'F-' + e.no,
+      new Date(e.t).toLocaleString('zh-CN'),
+      FB_TYPE_TXT[e.type] || e.type,
+      FB_ST_TXT[e.status] || e.status,
+      e.msg, e.contact, e.page, e.lang, e.ver, e.note
+    ]);
+    const csv = [head].concat(rows).map(r => r.map(fbCsvCell).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'feedback-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  } catch (e) {
+    alert('导出失败：' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = old;
+  }
+});
+
+
 /* v0.9.308：tab 切换。三块内容此前平铺在一页，改一次 Key 要往下滚很久。
    ⚠️ 切过来时才去拉数据 —— 后台一进来就拉四张表没必要，而统计也是最常被打开的那个 tab。
-   ⚠️ 当前 tab 记进 location.hash：刷新后还在原来那一页。hash 认不出来就回落 model。 */
-const PANES = { model: 'paneModel', stats: 'paneStats', acct: 'paneAcct' };
+   ⚠️ 当前 tab 记进 location.hash：刷新后还在原来那一页。hash 认不出来就回落 model。
+   v0.9.371：加第四档「反馈」，切过来时才拉列表。 */
+const PANES = { model: 'paneModel', stats: 'paneStats', fb: 'paneFb', acct: 'paneAcct' };
 function switchTab(name, silent){
   const key = PANES[name] ? name : 'model';
   Object.keys(PANES).forEach(k => {
@@ -1289,6 +1561,7 @@ function switchTab(name, silent){
     try { history.replaceState(null, '', '#' + key); } catch (e) { location.hash = key; }
   }
   if (key === 'stats') { loadEvents(); loadMergeEvents(); loadCleanEvents(); loadToolEvents(); }
+  if (key === 'fb') loadFeedback();
 }
 $('adminTabs').addEventListener('click', e => {
   const b = e.target.closest('button[data-tab]');

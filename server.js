@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.370';
+const ASSET_VER = '0.9.371';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -775,6 +775,145 @@ function appendTEvent(ip, body){
     if (db.events.length > TEVENTS_MAX) db.events = db.events.slice(-TEVENTS_MAX);
     fs.writeFileSync(TEVENTS_PATH, JSON.stringify(db), 'utf8');
   } catch (e) {}
+}
+
+/* ---------------- v0.9.371：用户反馈 ----------------
+   与 events / merge-events / clean-events / tool-events 四本账并列的第五本，但性质不同：
+   前四本是**统计账**（丢一条还能从别的记录推回来），这本是**用户的原始提交**——
+   丢了就是丢了，用户不会重发。所以这一个是原子写（tmp + rename），且不参与任何聚合换算。
+
+   字段口径：
+     · msg 上限 500 字（用户定案 10-23），前后空白与换行外的控制符清掉；
+     · type 只认四类，认不出来的整条拒收（不落成 (空) 污染统计）；
+     · ip 原值只留服务端，后台默认打码；ipHash 用于「同 IP 同内容」去重；
+     · 不记任何字幕内容 —— 前端也只发页面路径、语言、版本、UA、视口宽。 */
+const FB_PATH = path.join(DATA_DIR, 'feedback.json');
+const FB_MAX = 3000;
+const FB_TXT_MAX = 500;
+const FB_CTX_MAX = 80;
+const FB_TYPES = { bug: 'bug', idea: 'idea', quality: 'quality', other: 'other' };
+const FB_STATUS = { new: 'new', doing: 'doing', done: 'done', spam: 'spam' };
+
+function readFB(){
+  try {
+    const j = JSON.parse(fs.readFileSync(FB_PATH, 'utf8'));
+    if (j && Array.isArray(j.items)) return j;
+  } catch (e) {}
+  return { v: 1, seq: 0, items: [] };
+}
+function writeFB(db){
+  const tmp = FB_PATH + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(db), 'utf8');
+  fs.renameSync(tmp, FB_PATH);
+}
+/* 控制符清掉但保留换行：用户可能分条写，压成一行反而难读。
+   \x09(Tab) 留成空格，\x0b \x0c 与其它控制符一律清掉。 */
+function fbClean(s, max){
+  return String(s == null ? '' : s)
+    .replace(/\r\n/g, '\n')
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, ' ')
+    .replace(/\t/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+/* 后台展示用的打码 IP：1.2.*.* / 2408:8207:*。原值只在服务端内存里用于反滥用。 */
+function fbMaskIp(ip){
+  const s = String(ip || '');
+  if (!s) return '';
+  if (s.indexOf('.') > 0) {
+    const p = s.split('.');
+    if (p.length === 4) return p[0] + '.' + p[1] + '.*.*';
+  }
+  if (s.indexOf(':') >= 0) return s.split(':').slice(0, 2).join(':') + ':*';
+  return '*';
+}
+
+/* 限流：1 分钟 1 条 / 1 小时 5 条 / 1 天 10 条，按 IP（CF-Connecting-IP）。
+   ⚠️ 只存内存：重启即清零。对反馈这种低频入口足够，也不值得为它落盘。 */
+const FB_HITS = new Map();
+const FB_WIN = { min: 60 * 1000, hour: 60 * 60 * 1000, day: 24 * 60 * 60 * 1000 };
+function fbRate(ip, now){
+  const arr = (FB_HITS.get(ip) || []).filter(t => now - t < FB_WIN.day);
+  const last = arr.length ? arr[arr.length - 1] : 0;
+  if (last && now - last < FB_WIN.min) return false;
+  if (arr.filter(t => now - t < FB_WIN.hour).length >= 5) return false;
+  if (arr.length >= 10) return false;
+  arr.push(now);
+  FB_HITS.set(ip, arr);
+  return true;
+}
+(function(){
+  const h = setInterval(function(){
+    try {
+      const now = Date.now();
+      for (const [k, v] of FB_HITS) {
+        const keep = v.filter(t => now - t < FB_WIN.day);
+        if (keep.length) FB_HITS.set(k, keep); else FB_HITS.delete(k);
+      }
+    } catch (e) {}
+  }, 30 * 60 * 1000);
+  if (h && typeof h.unref === 'function') h.unref();
+})();
+
+function appendFeedback(ip, body){
+  const b = (body && typeof body === 'object') ? body : {};
+  const type = Object.prototype.hasOwnProperty.call(FB_TYPES, b.type) ? b.type : '';
+  if (!type) return { ok: false, code: 'bad_type' };
+  const msg = fbClean(b.msg, FB_TXT_MAX + 1);
+  /* 超长一律拒（不是截断）：截断会把用户最后半句悄悄吃掉，看着像我们没读懂。 */
+  if (msg.length > FB_TXT_MAX) return { ok: false, code: 'too_long' };
+  if (msg.length < 5) return { ok: false, code: 'too_short' };
+
+  const now = Date.now();
+  const iph = sha256(ip).slice(0, 12);
+  const db = readFB();
+
+  /* 同 IP + 同内容 10 分钟内视为重复提交（连点两次 / 网络重试）：回原编号，不新增。 */
+  for (let i = db.items.length - 1; i >= 0; i--) {
+    const e = db.items[i];
+    if (!e || now - (e.t || 0) > 10 * 60 * 1000) break;
+    if (e.ipHash === iph && e.msg === msg) return { ok: true, no: e.no, dup: true };
+  }
+
+  db.seq = (Number(db.seq) || 0) + 1;
+  const page = fbClean(b.page, FB_CTX_MAX);
+  const item = {
+    id: 'f_' + db.seq,
+    no: db.seq,
+    t: now,
+    type: type,
+    msg: msg,
+    contact: fbClean(b.contact, 120),
+    /* 页面只留路径：带 query 的链接可能含 token/文件名，不该进后台 */
+    page: /^\//.test(page) ? page.split('?')[0].split('#')[0] : '',
+    lang: /^[A-Za-z-]{2,12}$/.test(String(b.lang || '')) ? String(b.lang) : '',
+    ver: /^[0-9.]{1,16}$/.test(String(b.ver || '')) ? String(b.ver) : '',
+    ua: fbClean(b.ua, 200),
+    vw: Math.max(0, Math.min(10000, Math.floor(Number(b.vw) || 0))),
+    ip: String(ip || ''),
+    ipHash: iph,
+    status: 'new',
+    note: '',
+    repliedAt: 0
+  };
+  db.items.push(item);
+  if (db.items.length > FB_MAX) db.items = db.items.slice(-FB_MAX);
+  writeFB(db);
+  return { ok: true, no: item.no };
+}
+
+/* 反馈与埋点的关联：同 IP ±30 分钟内有没有翻译事件、有没有失败。
+   反馈说「翻到一半卡住」时，这一行比让用户复述十遍都管用。
+   ⚠️ 只读，不写任何账本。 */
+function fbNear(evs, ip, ts){
+  let n = 0, fail = '';
+  for (const e of evs) {
+    if (e.ip !== ip) continue;
+    if (Math.abs((e.t || 0) - ts) > 30 * 60 * 1000) continue;
+    n++;
+    if (e.failMsg && !fail) fail = String(e.failMsg);
+  }
+  return { n: n, fail: fail };
 }
 
 /* ---------------- 管理会话（内存 token） ---------------- */
@@ -8231,6 +8370,32 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { ok: true });
     }
 
+    /* v0.9.371：用户反馈（公开轻接口，与上面几个埋点同规格：fire-and-forget）。
+       body: {type:'bug'|'idea'|'quality'|'other', msg, contact?, page?, lang?, ver?, ua?, vw?, hp?}
+       ⚠️ hp 是蜜罐字段：正常用户看不见它（前端永远传空串），机器人会把隐藏字段填满。
+          填了就直接回 200 假成功 —— 不落盘、也不告诉对方「你被识破了」。
+       ⚠️ 限流在内容校验之前扣：宁可让一条格式错的请求也占一次配额，也不给刷子试错的空间。 */
+    if (req.method === 'POST' && u === '/api/feedback') {
+      let fbody;
+      try { fbody = JSON.parse(await readBody(req, 16 * 1024)); } catch (e) {
+        return sendJson(res, 400, { error: { code: 'bad_json', message: 'Request body is not valid JSON' } });
+      }
+      if (fbody && String(fbody.hp || '').trim()) return sendJson(res, 200, { ok: true, no: 0 });
+      const fip = clientIp(req);
+      if (!fbRate(fip, Date.now())) {
+        return sendJson(res, 429, { error: { code: 'rate', message: 'Too many feedback submissions. Please try again later.' } });
+      }
+      let out;
+      try { out = appendFeedback(fip, fbody); } catch (e) { out = { ok: false, code: 'io' }; }
+      if (!out.ok) {
+        if (out.code === 'too_short') return sendJson(res, 400, { error: { code: 'too_short', message: 'Feedback is too short.' } });
+        if (out.code === 'too_long') return sendJson(res, 400, { error: { code: 'too_long', message: 'Feedback is too long.' } });
+        if (out.code === 'bad_type') return sendJson(res, 400, { error: { code: 'bad_type', message: 'Unknown feedback type.' } });
+        return sendJson(res, 500, { error: { code: 'io', message: 'Could not save feedback.' } });
+      }
+      return sendJson(res, 200, { ok: true, no: out.no, dup: !!out.dup });
+    }
+
     /* 管理登录 */
     if (req.method === 'POST' && u === '/api/admin/login') {
       let body;
@@ -8275,6 +8440,86 @@ const server = http.createServer(async (req, res) => {
     /* 以下管理接口需 token */
     if (u.startsWith('/api/admin/')) {
       if (!authed(req)) return sendJson(res, 401, { error: { message: '未登录或会话已过期，请重新登录' } });
+
+      /* v0.9.371：后台未读徽章。单独一个极轻接口 —— 后台每 60 秒探一次，
+         只读 feedback.json 算两个数，不扫 events。 */
+      if (req.method === 'GET' && u === '/api/admin/feedback/badge') {
+        const items = readFB().items;
+        const today = todayStr();
+        return sendJson(res, 200, {
+          unread: items.filter(e => e.status === 'new').length,
+          today: items.filter(e => dateOfTs(e.t) === today).length
+        });
+      }
+
+      /* v0.9.371：反馈列表（?status=&q=&page=&size=）
+         · status 只认四档白名单，认不出按「全部」处理（不报错，后台切错档不该白屏）
+         · q 在内容 / 联系方式 / 页面上做不区分大小写的包含匹配
+         · ip 一律打码返回，原值只有服务端有 */
+      if (req.method === 'GET' && u === '/api/admin/feedback') {
+        let q = {};
+        try { q = Object.fromEntries(new URL('http://x' + req.url).searchParams); } catch (e) {}
+        const all = readFB().items;
+        const st = String(q.status || 'all');
+        const kw = String(q.q || '').trim().toLowerCase();
+        let rows = all.slice().reverse();
+        if (Object.prototype.hasOwnProperty.call(FB_STATUS, st)) rows = rows.filter(e => e.status === st);
+        if (kw) {
+          rows = rows.filter(e => ((e.msg || '') + '\n' + (e.contact || '') + '\n' + (e.page || ''))
+            .toLowerCase().indexOf(kw) >= 0);
+        }
+        const total = rows.length;
+        const size = Math.min(100, Math.max(1, parseInt(q.size, 10) || 20));
+        const pages = Math.max(1, Math.ceil(total / size));
+        const page = Math.min(pages, Math.max(1, parseInt(q.page, 10) || 1));
+        const today = todayStr();
+
+        let evs = [];
+        try { evs = readEvents().events; } catch (e) {}
+        const items = rows.slice((page - 1) * size, page * size).map(e => {
+          const near = fbNear(evs, e.ip, e.t || 0);
+          return {
+            id: e.id, no: e.no, t: e.t, type: e.type, msg: e.msg, contact: e.contact,
+            page: e.page, lang: e.lang, ver: e.ver, vw: e.vw, ua: e.ua,
+            ip: fbMaskIp(e.ip), status: e.status, note: e.note, repliedAt: e.repliedAt,
+            near: near.n, nearFail: near.fail
+          };
+        });
+
+        const byType = {};
+        Object.keys(FB_TYPES).forEach(k => { byType[k] = all.filter(e => e.type === k).length; });
+        return sendJson(res, 200, {
+          total: total, all: all.length,
+          unread: all.filter(e => e.status === 'new').length,
+          today: all.filter(e => dateOfTs(e.t) === today).length,
+          done: all.filter(e => e.status === 'done').length,
+          spam: all.filter(e => e.status === 'spam').length,
+          byType: byType,
+          page: page, size: size, pages: pages,
+          items: items
+        });
+      }
+
+      /* v0.9.371：改状态 / 写备注。status 只认四档；note 覆盖式写入（后台是一个文本框）。 */
+      if (req.method === 'POST' && u === '/api/admin/feedback/status') {
+        let sbody;
+        try { sbody = JSON.parse(await readBody(req, 16 * 1024)); } catch (e) {
+          return sendJson(res, 400, { error: { code: 'bad_json', message: '请求体不是合法 JSON' } });
+        }
+        const id = String((sbody && sbody.id) || '');
+        const to = String((sbody && sbody.status) || '');
+        if (!Object.prototype.hasOwnProperty.call(FB_STATUS, to)) {
+          return sendJson(res, 400, { error: { code: 'bad_status', message: '未知状态' } });
+        }
+        const db = readFB();
+        const it = db.items.find(x => x.id === id);
+        if (!it) return sendJson(res, 404, { error: { code: 'not_found', message: '反馈不存在（可能已被归档）' } });
+        it.status = to;
+        if (sbody.note !== undefined) it.note = fbClean(sbody.note, 300);
+        if (to === 'done' || to === 'doing') it.repliedAt = Date.now();
+        writeFB(db);
+        return sendJson(res, 200, { ok: true, unread: db.items.filter(e => e.status === 'new').length });
+      }
 
       if (req.method === 'GET' && u === '/api/admin/config') {
         const cfg = readConfig();

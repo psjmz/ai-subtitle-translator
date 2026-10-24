@@ -10095,7 +10095,7 @@ mergeShards();
       classic script 跨文件可见；不要改成 window.I18N，t() 读的是 const 那个绑定。 */
 const MG_UI27 = ['zh-CN','zh-TW','en','ja','es','pt','ko','de','fr','id','hi','th','vi','ru','it','ar','tr','nl','pl','sv','cs','uk','da','fi','el','he','ro'];
 /* 版号与分片 src 的 ?v= 必须同源：merge-boot.js 已经写过一次，这里以它为准确保一致 */
-const MG_VER = window.MG_VER || '0.9.370';
+const MG_VER = window.MG_VER || '0.9.371';
 const MG_PENDING = {};
 window.MergeI18N = {
   isBuiltin(lang){ return MG_UI27.indexOf(lang) >= 0; },

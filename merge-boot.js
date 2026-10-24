@@ -22,7 +22,7 @@
      这三个地方任意一处走样，同一语言在主页和本页就会出现「一处有分片、一处没有」的错位。 */
   var UI27 = ['zh-CN', 'zh-TW', 'en', 'ja', 'es', 'pt', 'ko', 'de', 'fr', 'id', 'hi', 'th', 'vi',
     'ru', 'it', 'ar', 'tr', 'nl', 'pl', 'sv', 'cs', 'uk', 'da', 'fi', 'el', 'he', 'ro'];
-  var VER = '0.9.370';
+  var VER = '0.9.371';
   window.MG_VER = VER;
 
   /* 全部 100 个语言代码：优先用 ui-codes.js 的（单一数据源），没加载就用内置 27 语兜底 */
