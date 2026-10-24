@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.375';
+const ASSET_VER = '0.9.376';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -7318,7 +7318,10 @@ function dKeyDead(e){
 /* 标记一次失败。kind='key' 连坐该 key 的所有模型；'rpm' 只冷静 60 秒；其余按当日耗尽。 */
 function dMarkErr(cfg, i, model, err){
   const q = dRead();
-  const msg = String((err && err.message) || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 120);
+  /* 10-24：120 → 800，与 callModel 的截断对齐（存储层不再二次截断）。
+     上游 429 是 pretty-print 的 JSON，quotaId 落在 500~600 字符之间，截 120 会让后台卡片
+     永远只看到「You exceeded your current quota…」这半句，分不出分钟限流还是日额度。 */
+  const msg = String((err && err.message) || '').replace(/[\x00-\x1f]/g, ' ').slice(0, 800);
   if (dKeyDead(err)) {
     /* v0.9.361：只连坐**这把 key 自己的**模型。以前遍历全局模型池，
        会把别的 key 上同名的格子也一起判死（新结构下每把 key 的模型可以完全不同）。 */
@@ -8082,7 +8085,10 @@ async function callModel(cfg, messages, maxTokens, opts){
     const rl = rateHeaders(r.headers);
     const text = await r.text();
     if (!r.ok) {
-      const err = new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 200));
+      /* 10-24：200 → 800。Google 的 429 原文是 pretty-print 的 JSON，`details[].quotaId`
+         （…PerMinute… / …PerDay…）在 300 字符之后才出现，截 200 等于把「到底撞的是分钟线
+         还是日线」这个唯一的判据砍掉，归因只能靠猜。 */
+      const err = new Error('Upstream HTTP ' + r.status + ' ' + text.slice(0, 800));
       err._rl = rl; err._status = r.status; err._ra = retryAfterMs(r.headers);
       throw err;
     }

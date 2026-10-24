@@ -785,9 +785,14 @@ function renderDKeySlots(){
     }
     const day = k.used || 0, cap = k.rpd || 0;
     /* 没配 key / 没勾启用 / 一档都没启用 → 这行没有意义（分母是 0），干脆不显示 */
+    /* 10-24：原来切 48 字符，正好把 429 的最后一位切掉（显示成 code 42，看着像另一个错误码）。
+       改成行内 120 + title 挂全文 —— 429 的 quotaId 在 300 字符之后，鼠标悬停才看得到。 */
+    const errTxt = k.err ? String(k.err) : '';
+    const errTitle = esc(errTxt).replace(/"/g, '&quot;');
     const stat = (!k.set || !k.ready) ? '' :
       '<div class="kstat">今日 <b>' + day + '</b> / ' + cap + ' 次 · 本分钟 <b>' + (k.rpmUsed || 0) + '</b> / ' + (k.rpm || 15) +
-      (k.err ? ' · <span style="color:var(--err)">' + esc(String(k.err).slice(0, 48)) + '</span>' : '') + '</div>';
+      (errTxt ? ' · <span style="color:var(--err)" title="' + errTitle + '">' +
+        esc(errTxt.slice(0, 120)) + (errTxt.length > 120 ? '…' : '') + '</span>' : '') + '</div>';
     const rows = k.models.map((m, j) => {
       const pct = m.rpd ? Math.min(100, Math.round((m.used || 0) / m.rpd * 100)) : 0;
       const cls = pct >= 100 ? ' bad' : '';
