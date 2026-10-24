@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.374';
+const ASSET_VER = '0.9.375';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -441,7 +441,12 @@ function markEvent(ip, meta, ev){
            dropAiFiller（模型声明的水词）、dropAiDrop（模型显式判 drop）。
            前端保证每行只按第一个把它标记为 drop 的原因计一次，故三项之和 ≤ dropN。
            纯统计，不影响任何行为。 */
-        Object.assign(e, dropFields(meta), cueErrFields(meta));
+        /* v0.9.375：样本单独拿出来算一次 —— 重译后这次没样本（错误清零）时必须把上一次的
+           删掉，否则会出现「cueMissing=0 却挂着 UNKNOWN 样本」的记录，分析时自相矛盾。
+           Object.assign 不会删键，只能显式 delete。 */
+        const cs = cueSampleField(meta);
+        Object.assign(e, dropFields(meta), cueErrFields(meta), cs);
+        if (!cs.cueSample) delete e.cueSample;
         /* v0.9.351：用户点停止也会走到 finish（批次循环 break 后照常收尾），
            以前后台看不出「真跑完」和「被停掉」。续跑真跑完后要能清掉旧标记。 */
         if (meta.stopped) e.stopped = 1; else delete e.stopped;
@@ -480,7 +485,7 @@ function markEvent(ip, meta, ev){
      （典型是「完成」之后「下载」）匹配不到自己那条，又新建一条：后台看到两条同任务的记录、
      下载次数恒为 1，v0.9.244 新加的导出格式计数也被拆到两条里（同一单导了 SRT 又导 ASS 看不出来）。 */
   if (f.task) lite.taskId = f.task;
-  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta)); if (meta.stopped) lite.stopped = 1; }
+  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta), cueSampleField(meta)); if (meta.stopped) lite.stopped = 1; }
   /* v0.9.244：自带 Key 用户同样记导出格式（这条记录是本次上报新建的，计数从 1 起） */
   else if (ev === 'download') {
     lite.downloads = 1; lite.downloadedAt = now;
@@ -595,13 +600,69 @@ function dropFields(meta){
    字段列表写死为白名单——绝不按前端传来的字符串动态建字段。
    用途：retryCue 只有一个总数，分不清「模型漏条目 MISSING」与「译文被判空 EMPTY」，
    两者解法相反（调小批次 vs 扩充 fillers 白名单），必须先有类型分布才能定性。 */
-const CUE_ERR_FIELDS = ['cueEmpty','cueMissing','cueDup','cueUnknown','cueBadEntry','cueNoArr','cueOther'];
+/* v0.9.375：末两项是「重试修复率」的分子分母（重试过的组数 / 其中修好的组数），
+   与 cue 错误计数同一套清洗口径。有了它才能算出「这一类结构错重试到底值不值」。 */
+const CUE_ERR_FIELDS = ['cueEmpty','cueMissing','cueDup','cueUnknown','cueBadEntry','cueNoArr','cueOther','cueRetryN','cueRetryFix'];
 function cueErrFields(meta){
   const o = {};
   for (const k of CUE_ERR_FIELDS) {
     if (meta[k] != null) o[k] = Math.max(0, Math.min(100000, Math.floor(+meta[k] || 0)));
   }
   return o;
+}
+/* v0.9.375：cue 结构错的「编号级」样本（前端 noteCueSample 产生）。
+   为什么需要：只有计数时，「编号串组」（本组缺 n、邻组多 n，内容都对，可零重试救回）
+   与「编号写错」（本组真少一条，照搬会把译文搬错位）长得一模一样，离线验证的收益
+   只能给到 5.9%~40.8% 的区间。有了编号才能收敛成一个数，再决定要不要上归位规则。
+   ⚠️ 只收编号与错误码，绝不收字幕文本；前端传来的数组一律**重新拼装**（不落原始对象，
+      不认任何未知键），逐层限量后再校验整包大小 —— 遥测入口绝不能成为写脏数据的通道。 */
+const CUE_SAMPLE_MAX = 3;             // 每单最多几批（与前端 CUE_SAMPLE_MAX 对齐）
+const CUE_SAMPLE_CHARS = 6000;        // 整包序列化上限（前端单批 2000，三批留余量）
+const CUE_ERR_RE = /^(?:MISSING_[\d,]+|EMPTY_\d+|DUP_\d+|UNKNOWN_\d+|BAD_ENTRY|NO_CUES_ARRAY)$/;
+function cueSampleField(meta){
+  if (!Array.isArray(meta.cueSample) || !meta.cueSample.length) return {};
+  const out = [];
+  for (const s of meta.cueSample.slice(0, CUE_SAMPLE_MAX)) {
+    if (!s || typeof s !== 'object') continue;
+    const i = Math.max(0, Math.min(100000, Math.floor(+s.i || 0)));
+    const b = [];
+    if (Array.isArray(s.b)) {
+      for (const pair of s.b.slice(0, 40)) {
+        if (!Array.isArray(pair)) continue;
+        const gno = Math.floor(+pair[0]);
+        if (!isFinite(gno) || gno < 0) continue;
+        const errs = [];
+        if (Array.isArray(pair[1])) {
+          for (const e of pair[1].slice(0, 20)) {
+            const str = String(e == null ? '' : e);
+            if (CUE_ERR_RE.test(str)) errs.push(str);
+          }
+        }
+        /* 第三位：「本该搬走、但只是本组自己那条的重复」的条数（归位规则的判据），只收整数 */
+        const dupN = Math.max(0, Math.min(1000, Math.floor(+pair[2] || 0)));
+        if (errs.length) b.push([gno, errs, dupN]);
+      }
+    }
+    if (!b.length) continue;
+    const one = { i, b };
+    if (Array.isArray(s.m)) {
+      const m = [];
+      for (const pair of s.m.slice(0, 60)) {
+        if (!Array.isArray(pair)) continue;
+        const gno = Math.floor(+pair[0]);
+        if (!isFinite(gno) || gno < 0) continue;
+        const nums = String(pair[1] == null ? '' : pair[1]).replace(/[^\d,]/g, '').slice(0, 240);
+        if (!nums) continue;
+        m.push([gno, nums]);
+      }
+      if (m.length) one.m = m;
+    }
+    out.push(one);
+  }
+  if (!out.length) return {};
+  /* 超限整包丢弃，不存半截：半截样本会让「这批有几组」这种判断建立在残缺数据上 */
+  if (JSON.stringify(out).length > CUE_SAMPLE_CHARS) return {};
+  return { cueSample: out };
 }
 function dateOfTs(ts){
   const d = new Date(ts);

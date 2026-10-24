@@ -1345,7 +1345,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.374</span>
+    <span class="ver-tag">v0.9.375</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -2017,10 +2017,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.374"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.374"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.374"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.374"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.375"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.375"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.375"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.375"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4929,7 +4929,9 @@ function reportEvent(ev, extra, fmt, meta){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,stopped:(ev==='finish'&&S.stop)?1:0});
+    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,stopped:(ev==='finish'&&S.stop)?1:0,
+      /* v0.9.375：编号级样本只在 finish 带一次 */
+      cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
     if(navigator.sendBeacon && typeof Blob==='function'){
       try{ if(navigator.sendBeacon('/api/event', new Blob([body],{type:'application/json'}))) return; }catch(_){}
@@ -4964,6 +4966,83 @@ function bumpCueErrs(list){
       S[k] = (S[k] || 0) + Math.max(1, Math.min(1000, Math.floor(+n || 1)));
     }
   }
+}
+
+/* v0.9.375：cue 结构错的「编号级」样本（纯统计；只记编号与错误码，不记任何原文/译文）。
+   与 translate.html 同名同构的一份副本（两页各自独立、不共用模块）。为什么需要：
+   只有计数时「编号串组」（本组缺 n、邻组多 n，内容都对，可零重试救回）与「编号写错」
+   （本组真少一条，照搬会把译文搬错位）长得一模一样，离线验证的收益只能给到 5.9%~40.8%。
+   只记四样：坏组+错误码、本批各组占哪几个号（**仅当出现 UNKNOWN 才记**）、
+   本组「多的那条其实是自己这条的重复」的条数、批序号。 */
+const CUE_SAMPLE_MAX = 3;        // 每个任务最多留几批
+const CUE_SAMPLE_CHARS = 1200;   // 单批样本序列化后的字符上限
+const CUE_SAMPLE_TOTAL = 2400;   // 整包上限（⚠️ /api/event 的请求体只收 4KB，超了整条 finish 报不上去）
+const CUE_ERR_RE = /^(?:MISSING_[\d,]+|EMPTY_\d+|DUP_\d+|UNKNOWN_\d+|BAD_ENTRY|NO_CUES_ARRAY)$/;
+/* 「本该搬走、但内容只是本组自己那条的重复」的条数 —— 归位规则最后一道路障靠它，只记个数 */
+function dupOfOwnN(group, entryList){
+  try{
+    const own = new Set((group && Array.isArray(group.cues) ? group.cues : [])
+      .map(c => Math.floor(+(c && c.no))).filter(n => isFinite(n)));
+    const norm = t => String(t == null ? '' : t).replace(/\s+/g, ' ').trim();
+    const arr = Array.isArray(entryList) ? entryList : [];
+    let n = 0;
+    for(const e of arr){
+      if(!e) continue;
+      const no = Math.floor(+e.no);
+      if(own.has(no)) continue;                 // 自己的号，不在「该搬」之列
+      const tx = norm(e.text);
+      if(!tx) continue;
+      if(arr.some(x => x && x !== e && own.has(Math.floor(+x.no)) && norm(x.text) === tx)) n++;
+    }
+    return n;
+  }catch(e){ return 0; }
+}
+function noteCueSample(batchGroups, badList, bi, byGno){
+  try{
+    if(!Array.isArray(badList) || !badList.length) return;
+    if(!Array.isArray(S.cueSamples)) S.cueSamples = [];
+    if(S.cueSamples.length >= CUE_SAMPLE_MAX) return;
+    const bad = [];
+    let hasUnknown = false;
+    for(const cb of badList.slice(0, 40)){
+      if(!cb) continue;
+      const gno = Math.floor(+cb.gno);
+      if(!isFinite(gno) || gno < 0) continue;
+      /* 错误码走白名单：模型/未来改动带进来奇怪字符串时，别原样进遥测 */
+      const errs = (Array.isArray(cb.errs) ? cb.errs : [])
+        .map(s => String(s == null ? '' : s))
+        .filter(s => CUE_ERR_RE.test(s))
+        .slice(0, 20);
+      if(!errs.length) continue;
+      if(errs.some(s => s.indexOf('UNKNOWN_') === 0)) hasUnknown = true;
+      const g = (batchGroups || []).find(x => x && Math.floor(+x.gno) === gno);
+      const o = byGno && byGno[gno];
+      bad.push([gno, errs, dupOfOwnN(g, o && o.cues)]);
+    }
+    if(!bad.length) return;
+    const one = { i: Math.max(0, Math.floor(+bi || 0)), b: bad };
+    if(hasUnknown){
+      /* 只有出现 UNKNOWN 才需要「这批有哪些组、每组占哪几个号」：分析要据此判断那个多出来
+         的号属于同批的某一组（串组，可救），还是压根不在本批（跨批串号，只能丢）。 */
+      const map = [];
+      for(const g of (batchGroups || []).slice(0, 60)){
+        if(!g || !Array.isArray(g.cues)) continue;
+        const gno = Math.floor(+g.gno);
+        if(!isFinite(gno) || gno < 0) continue;
+        const nos = g.cues.map(c => Math.floor(+(c && c.no))).filter(n => isFinite(n) && n > 0);
+        if(nos.length) map.push([gno, nos.join(',')]);
+      }
+      if(map.length) one.m = map;
+    }
+    const s1 = JSON.stringify(one);
+    if(s1.length > CUE_SAMPLE_CHARS) return;
+    /* 整包预算：/api/event 的 readBody 只收 4KB，超了不是「少一份样本」，而是整条 finish
+       被 400 掉（完成时间、cue 计数、槽位全都记不上）。宁可少留一批。 */
+    let used = 0;
+    for(const x of S.cueSamples) used += JSON.stringify(x).length + 1;
+    if(used + s1.length > CUE_SAMPLE_TOTAL) return;
+    S.cueSamples.push(one);
+  }catch(e){}
 }
 
 async function runTranslate(){
@@ -5048,6 +5127,7 @@ async function runTranslate(){
   S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.locale=cfg.dst;
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0;   // v0.9.375：编号样本与重试修复率随任务重置
   $('btnGo').disabled=true;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -5348,6 +5428,7 @@ async function runTranslate(){
           // 也能走旧回填路径；两者皆无 → missing（与批失败组同待遇，可见可后处理）。
           if(out.cueBadGnos && out.cueBadGnos.length){
             bumpCueErrs(out.cueBadGnos);   // v0.9.151：类型归因（只在此处计一次，单组重译的返回不再计）
+            noteCueSample(gBatch, out.cueBadGnos, bi+1, out.byGno);   // v0.9.375：编号级样本
             const remainCue=[];
             /* v0.9.72：并行化（并发3）——组间独立并行；组内 a<2 两次仍串行（第 2 次带结构错误反馈） */
             await poolMap(out.cueBadGnos, S.multi ? 1 : 3, async cb=>{
@@ -5375,6 +5456,9 @@ async function runTranslate(){
               }
               if(!fixed) remainCue.push(cb.gno);
             });
+            /* v0.9.375：重试修复率（分母=重试过的组数，一组最多发 2 次） */
+            S.cueRetryN = (S.cueRetryN||0) + out.cueBadGnos.length;
+            S.cueRetryFix = (S.cueRetryFix||0) + (out.cueBadGnos.length - remainCue.length);
             if(remainCue.length){
               log(t('cueAlignFallback', remainCue.slice(0,5).join(',')+(remainCue.length>5?'…':'')),'err');
             } else {
@@ -7005,6 +7089,7 @@ function setSrc(text, fileName){
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0;   // v0.9.375：换片即清
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }
