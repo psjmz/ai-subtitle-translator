@@ -1100,7 +1100,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.381</span>
+    <span class="ver-tag">v0.9.382</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1715,9 +1715,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.381"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.381"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.381"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.382"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.382"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.382"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -3843,8 +3843,12 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
      变成「吃掉模型调用的时间」，排队结束后只剩几十秒就 abort。
      v0.9.365：105s → 135s。E 槽（网页桥接）的模型预算放宽到 120 秒（服务端 CALL_BUDGET_E_MS），
      外层 HTTP 超时同步跟上（120 + 15 秒排队冗余）。非 E 槽位服务端仍是 90 秒预算，
-     这里只是上限，对它们没有影响。 */
-  const ms = timeoutMs>0 ? timeoutMs : (builtin?135000:300000);
+     这里只是上限，对它们没有影响。
+     v0.9.381：135s → 255s。服务端回退链改为共享 240 秒总预算（CHAIN_BUDGET_MS）后，
+     一次请求最坏 = 240 秒；此前每级各拿一份、最坏 390 秒，而这里 135 秒就放弃 ——
+     服务端还在算、连接已经断，用户只看到失败，算力全白烧，接着还重试一次。
+     240 + 15 秒排队冗余 = 255。不回退时仍是 90~120 秒返回，放宽的只是上限。 */
+  const ms = timeoutMs>0 ? timeoutMs : (builtin?270000:300000);
   let timer=setTimeout(()=>ctl.abort(), ms);
   /* v0.9.185：排队等待期间暂停计时。排队是「上游额度不够、晚点再来」，不是模型在计算——
      此前它照样扣模型调用的超时预算，于是出现「排了 60 秒、只剩 30 秒就 abort」：
@@ -5604,26 +5608,37 @@ async function runTranslate(){
           // v0.9.58：补救通道同样过语言锚定——跑偏结果不再静默溜过；第 1 次跑偏 → 第 2 次带
           // 纠错反馈重译（与主通道 v0.9.57 同武器）；第 2 次仍跑偏 → 与主通道 anchorKeep 同策略带病接受
           let badTexts=[];
-          for(let a=0;a<2 && !got1;a++){
+          /* v0.9.381：RC=3（≤3 组一请求）是 380 改的，但退出条件仍是 `some` + `!got1`——
+             3 组里只要有 1 组成功就整块收工，另 2 组再也不重试，等于白送，且不报错、日志上看不出来。
+             改成与 5518 行分类重译同形的 todo 模式：每轮只重发本 chunk 里还没救回的组。
+             顺带接住「部分成功」：第 1 次跑偏的组单独留给第 2 次带反馈重译，已经成功的不再重发
+             （原来 `continue` 会把成功的一起丢掉，等于拿一遍重试换一遍重算）。 */
+          for(let a=0;a<2;a++){
+            const todo=chunk.filter(g=>!res.has(g.gno));
+            if(!todo.length) break;
             try{
               lastCall=Date.now();
               const fbArr=(a>0&&badTexts.length)?badTexts:null;
               /* v0.9.146：rt 由 2 改 4——这是「整批请求失败后的逐组补救」，不是语言跑偏。
                  此前混用 rt=2，统计把网络/截断造成的补救全算进 retryAnchor，排查方向被带偏。 */
-              const o2=await translateBatch(effBase,effKey,effModel,chunk,bi+1,totalB,sysB,fbArr,ctx,4);
-              const bad=(o2.badAnchor||[]).filter(gno=>chunk.some(g=>g.gno===gno));
+              const o2=await translateBatch(effBase,effKey,effModel,todo,bi+1,totalB,sysB,fbArr,ctx,4);
+              const bad=(o2.badAnchor||[]).filter(gno=>todo.some(g=>g.gno===gno));
               if(bad.length){
                 bad.forEach(gno=>{
                   const bt=String((o2.byGno[gno]||{}).text||'').trim();
                   if(bt && !badTexts.some(x=>x.text===bt)) badTexts.push({gno:gno,text:bt});
                 });
-                if(a===0){ await new Promise(r=>setTimeout(r,1200)); continue; }
-                drifted.push(...bad);
+                if(a>0) drifted.push(...bad);   // 第 1 次跑偏不记账：留给下一轮带反馈重译
               }
-              Object.keys(o2.byGno).forEach(k=>res.set(Number(k), o2.byGno[k]));
+              Object.keys(o2.byGno).forEach(k=>{
+                const no=Number(k);
+                if(a===0 && bad.indexOf(no)>=0) return;  // 跑偏的不落地，下一轮重来
+                res.set(no, o2.byGno[k]);
+              });
               o2.fillers.forEach(no=>fillerSet.add(no));
-              got1 = chunk.some(g=>res.has(g.gno));
-            }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+              if(chunk.some(g=>res.has(g.gno))) got1=true;
+            }catch(e2){ /* 下一轮前统一退避 */ }
+            if(a===0 && chunk.some(g=>!res.has(g.gno))) await new Promise(r=>setTimeout(r,1200));
           }
           // v0.9.56 熔断：连续 3 批补救全败 → 判定模型无响应，立即停止整片翻译
           //（否则整片每批都空转一轮，最坏几十分钟才轮到下一批重复同样的失败）

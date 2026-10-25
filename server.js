@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.381';
+const ASSET_VER = '0.9.382';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -8301,6 +8301,12 @@ const server = http.createServer(async (req, res) => {
       /* v0.9.365：E 走网页桥接，正常单批 6~66 秒，90 秒预算贴着上限 —— 晚高峰前段（还没拥堵到
          200 秒）的批会被误杀。给 E 单独放宽到 120 秒（用户定案）；回退链每级仍是 90 秒。 */
       const CALL_BUDGET_E_MS = 120000;
+      /* v0.9.382：回退链共享一份总预算。此前每级各拿一份独立预算（E 120 + C/B/A 各 90 = 最坏 390s），
+         而前端内置通道 135s 就把连接断了 —— 服务端还在算、用户早已看到失败，这段算力纯白烧，
+         用户还会重试，把同一个死循环再走一遍。
+         总预算取 240s：够 E 跑满（120）+ 至少一级完整回退（90），还剩 30s 余量。
+         每级实拿 = min(该级预算, 剩余)；剩余不足 15s 就不再往下回退，直接把首个错误交给前端。 */
+      const CHAIN_BUDGET_MS = 240000;
       const cfg = readConfig();
       if (!(cfg.base && cfg.model && cfg.key)) {
         return sendJson(res, 503, { error: { code: 'not_configured', message: 'Default model is not configured by the site admin. Use your own API instead.' } });
@@ -8455,12 +8461,16 @@ const server = http.createServer(async (req, res) => {
           E_RPM.push(E_LAST.at);
         }
       }
+      /* v0.9.382：回退链总预算的起算点 —— 从「本请求第一次真正发出模型调用」算起。
+         排队与批间隔的空档不计入（那是等待不是计算，与 v0.9.185「排队期间暂停计时」同一原则）。 */
+      const chainT0 = Date.now();
+      const chainLeft = () => CHAIN_BUDGET_MS - (Date.now() - chainT0);
       try {
         /* v0.9.345：D 走 callModelD —— 它在槽内换 key（额度类错误就换下一个重发同一批，
            前端完全无感）。注意它吃的是**同一份** 90 秒预算，不会因为换 key 就多拿时间。 */
         const out = pick.which === 'D'
-          ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }), dTaskId)
-          : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: pick.which === 'E' ? CALL_BUDGET_E_MS : CALL_BUDGET_MS }));
+          ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: Math.min(CALL_BUDGET_MS, chainLeft()) }), dTaskId)
+          : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: Math.min(pick.which === 'E' ? CALL_BUDGET_E_MS : CALL_BUDGET_MS, chainLeft()) }));
         /* v0.9.380：空正文一律当失败 —— 必须排在下面「E 成功」记账之前。
            否则空响应会被记成 E 健康（E_OK / 冷却清零 / 失败计数归零），
            链路明明不出货，调度却一直往它身上派任务，就是这个顺序造成的。
@@ -8538,9 +8548,12 @@ const server = http.createServer(async (req, res) => {
         if (cfg.fallbackToA && pick.which !== 'A') {
           let lastErr = e;
           for (const fb of fallbackChain(cfg, pick.which, lang)) {
+            /* v0.9.381：剩余预算不够跑完一级 → 不再往下回退，把首个错误原样交给前端。
+               继续下去只会让「服务端 390 秒 / 前端 135 秒」的错配把这次调用注定丢弃。 */
+            if (chainLeft() < 15000) break;
             try {
               const slotFb = slotCfg(cfg, fb);
-              const outF = await callModel(slotFb, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
+              const outF = await callModel(slotFb, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: Math.min(CALL_BUDGET_MS, chainLeft()) }));
               /* v0.9.380：回退这一级也可能返空。不判的话会把这个「空成功」当成回退成功发给前端，
                  于是一边记着「已回退到 B」，一边让用户去看一批空内容。 */
               if (modelOutEmpty(outF)) {
