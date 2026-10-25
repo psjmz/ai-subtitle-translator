@@ -1100,7 +1100,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.376</span>
+    <span class="ver-tag">v0.9.380</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1715,9 +1715,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.376"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.376"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.376"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.380"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.380"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.380"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -3180,8 +3180,9 @@ function systemPromptEn(cfg){
        没有术语表时这一行根本不存在，提示词与 v0.9.137 逐字节一致（回归面为零）。 */
     + (cfg.glossary ? '[Glossary precedence] The glossary in rule 4.5 has the highest priority of all: every term listed there must be rendered exactly as the glossary specifies, overriding rule 4 (the proper-noun policy) and any other rule — including when the glossary requires translating a name that rule 4 would otherwise keep in the original.\n' : '')
     + (cfg.synopsis ? 'Film context (background for your understanding only): ' + cfg.synopsis + '\n' : '')
-    + 'The input contains several "sentence groups": a complete sentence may be split across multiple subtitle cues (already merged into one merged text), or may be a single cue. Each group lists its cues with cue number (no), on-screen duration in seconds (dur), and source text.\n'
-    + 'Task: translate each group into ' + dstNative + ' and distribute the translation across its cues cue-by-cue (cue-aligned translation), so that reading the cues of a group in order yields one complete, fluent sentence.\n'
+    /* v0.9.377：与中文版同一改动的英文侧（提示词中英两套，改文案必须两处都改，只改一处等于没改） */
+    + 'The input is a flat list of subtitle cues: each entry gives its cue number (no), on-screen duration in seconds (dur), and source text (src). A complete sentence may be split across several cues — any cue that continues the previous one carries a "p":"c" marker and must be read together with it; a cue without that marker is a sentence of its own.\n'
+    + 'Task: translate the source text of every cue into ' + dstNative + ' and give the translation cue by cue; when several cues belong to one sentence, their translations read in order must form one complete, fluent sentence, distributed in the word order natural for ' + dstNative + ' (not necessarily the source order).\n'
     + 'Content genre (film/TV dialogue, documentary narration, interviews, lectures, anime, etc.) is for you to infer from the source text; keep the register and tone consistent with that genre throughout — colloquial for dialogue, formal for narration, never mixed.\n'
     + 'Rules you must follow:\n'
     + '1. [Translation style] ' + styleEn + '\n'
@@ -3189,10 +3190,10 @@ function systemPromptEn(cfg){
        远多于 MISSING 12 / EMPTY 7；原文案只禁了合并、跳过、改号、发明编号，唯独漏了「重复」，
        模型在「一句拆多条」时会把同一句的两条 cue 写成同一个编号。
        后半句的解释从句不可省——只加一个 repeat 会被理解成「别重复内容」而不是「别复用编号」。 */
-    + '2. [Cue-aligned output] For every group, return a "cues" array: for EVERY cue number in that group\'s input, exactly one entry {"no":<cue number>,"text":"<' + dstNative + ' text>"} — never merge, skip, renumber, repeat, or invent cue numbers; even when two cues belong to the same sentence, each keeps its own number and appears exactly once.\n'
-    + '   [Duration-aware distribution] Each cue has "dur" (on-screen seconds): a cue can comfortably hold at most about ' + C.cpsLimitOf(cfg.dst) + ' character-widths per second of dur and at most two lines of text. On a very short cue (e.g. dur 0.4s) put only a short word and carry the rest of the sentence on the longer neighboring cues; the group must still read as one coherent sentence in order. Distribute the content across cues in the word order natural for ' + dstNative + ' (not necessarily the source order) — e.g. move a trailing adverbial clause of the source sentence to an earlier cue when the target language prefers it.\n'
+    + '2. [Output format] Return an object {"c":{...}}: the keys are the input cue numbers (copied verbatim) and the values are the ' + dstNative + ' translation of that cue. Every input cue number must appear exactly once — never merge, skip, renumber, repeat, or invent cue numbers; even when two cues belong to the same sentence, each keeps its own number and appears exactly once.\n'
+    + '   [Length control] The translation of a cue carries only the part of the meaning that belongs to that cue\'s own source text, and stays within two lines (generally no more than 20 character-widths); even when it is only half a sentence, translate just that half — never fold it into a neighboring cue, never pad it out into a full sentence.\n'
     + '   [Word-boundary splits] The split between adjacent cues must fall between words: never break a single word, fixed phrase, or inflected form in the middle (e.g. splitting Japanese なり|たい apart), never detach a bound particle or affix from the word it depends on; it is far better for one cue to run slightly longer or shorter than to split a word.\n'
-    + '   [Lyrics exception] If the group\'s merged text contains lyric segment numbers like [1] [2], do NOT use the cues array — translate the merged text as a whole into a single "text" field exactly as before.\n'
+    + '   [Lyrics exception] When a lyric cue\'s source text carries segment numbers like [1] [2], keep every number exactly as-is in the translation — [1] stays [1]: never translate, renumber, add, or drop segments. If the input also carries a "lyric" array (a whole lyric group already numbered), return that group as one single text via {"lyric":[{"g":<group id>,"type":"text","text":"[1] … [2] …"}]}.\n'
     + '3. [Transcription fixes] The source text may come from speech transcription and may contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (' + fixSpellEn + '), then translate. Proper names are spelling-corrected the same way before handling them per rule 4' + (cfg.keepTerms ? ' (keep the corrected original spelling, still untransliterated)' : ' (render the corrected form in ' + dstNative + ')') + '.\n'
     + '   [Guardrail — never over-correct] Correct only when the error is obvious and you are confident it is one. Dialect, accent, slang, deliberate colloquial contraction, stylized or artistic spelling, and legitimate spelling variants of proper names are NOT errors — never \"fix\" them. Never rewrite lyric wording or the markers [inaudible] / [unintelligible]. When one pronunciation maps to several legitimate spellings and you cannot tell which is right, keep the source form untouched and translate it as it stands.\n'
     + '   [Typical cases] a proper name spelled the way it sounds (Mennerbrigitte→Brigitte), and numbers misheard across a run-on (\"1:00 37 Ventures\"→\"137 Ventures\"). These only illustrate the type of error — judge the same way whatever the source language is.\n'
@@ -3222,10 +3223,10 @@ function systemPromptEn(cfg){
        + cfg.glossary.split('\n').map(l=>'  - '+l).join('\n') + '\n';
   }
   s += '5. [Filler handling — the default behavior is to translate]\n'
-   + '   - Normal sentences (any group with substantive content) must be output as type:"text" with a complete translation; this is the default and the vast majority of cases.\n'
-   + '   - Only when a cue consists entirely of filler words or sound tags (e.g. "Um.", "[music]") should its cue number be listed in the fillers array; the program will clear that cue (its entry in the cues array may be omitted or left empty).\n'
-   + '   - Only when a group\'s entire merged text is pure filler/sound tags with no substantive content may that group be output as type:"drop" with an empty text; this is a rare exception.\n'
-   + '   - Note: type "drop" does not make the translation disappear — it only tells the program to clear that cue. Do not set everything to drop to be "safe".\n'
+   + '   - Normal sentences (any cue with substantive content) must receive a complete translation; this is the default and the vast majority of cases.\n'
+   + '   - Only when a cue consists entirely of filler words or sound tags (e.g. "Um.", "[music]") should its cue number be listed in the fillers array; the program will clear that cue (its entry in "c" may be left empty).\n'
+   + '   - Only when every cue of one sentence is pure filler/sound tags with no substantive content should all of those cue numbers be listed in fillers; this is a rare exception.\n'
+   + '   - Note: listing a cue in fillers does not make the translation disappear — it only tells the program to clear that cue. Do not list everything in fillers to be "safe".\n'
    + '   - Repetitions: when the same speaker repeats a word or phrase in a row (e.g. "No, no, no"), translating it once is usually enough; keep the repetition only when it is plot/emotion-pertinent (stuttering, emphasis, comedic rhythm).\n'
    + '   - Straddling phrases translate once: when a phrase is split across two adjacent cues (e.g. one cue ends with "people who" and the next starts with "do that"), it must appear only once in the translation — never render it on both sides of the cue boundary as an echo. Translate the full sentence as one coherent unit.\n'
    + '   - Ellipses are for fading lyrics only: never end or pause a dialogue line with an ellipsis (……/…) — let the next cue continue the sentence naturally; use a comma or a dash for unfinished speech.\n'
@@ -3242,12 +3243,13 @@ function systemPromptEn(cfg){
    + '   - If the target language has honorific registers (Japanese, Korean, etc.), pick the level appropriate to the relationship between the speakers and keep it consistent across the whole file — never oscillate.\n'
    + '   - Preserve numeric precision: never round numbers and never convert currency amounts into another currency ($50 stays 50 in the target currency word, same value).\n'
    + '8.5 [Punctuation belongs to the target language] Punctuation is part of the language you are writing: always use the marks and spacing conventions of the TARGET language, never carry the source\'s punctuation marks through.\n'
-   + '9. [Output example] Cue-aligned groups return a "cues" array (one entry per input cue number); lyric groups keep segment numbers in a single text; dash-speaker structure keeps "- " per line joined by \\n; pure-filler cue numbers go to the fillers array. The sample translations below are written in ' + dstNative + ' — your output text fields must be in the same language as these samples:\n'
-   + 'Input (excerpt): {"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"dur":1.8,"src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"dur":2.4,"src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"dur":0.5,"src":"Um."},{"no":18,"dur":2.2,"src":"See you tomorrow."}]}]}\n'
-   + 'Output: {"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"' + ex.dash + '"}]},{"gno":2,"type":"text","text":"' + ex.lyric + '"},{"gno":3,"type":"text","cues":[{"no":18,"text":"' + ex.plain + '"}]}],"fillers":[17]}\n'
+   + '9. [Output example] Return {"c":{...}} keyed by input cue number; lyric groups return one single text via the "lyric" array; dash-speaker structure keeps "- " per line joined by \\n; pure-filler cue numbers go to the fillers array. The sample translations below are written in ' + dstNative + ' — your output must be in the same language as these samples:\n'
+   + 'Input (excerpt): {"cues":[{"no":3,"dur":1.8,"src":"- You coming?\\n- Right behind you."},{"no":17,"dur":0.5,"src":"Um."},{"no":18,"dur":2.2,"src":"See you tomorrow.","p":"c"}],"lyric":[{"g":2,"src":"[1] Take me home [2] tonight"}]}\n'
+   + 'Output: {"c":{"3":"' + ex.dash + '","18":"' + ex.plain + '"},"lyric":[{"g":2,"type":"text","text":"' + ex.lyric + '"}],"fillers":[17]}\n'
    + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
-   + '{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"…"}]},{"gno":2,"type":"text","text":"[1] … [2] …"},{"gno":4,"type":"drop"}],"fillers":[17,23]}\n'
-   + 'Once more: every text field must be written in ' + dstNative + '; keep each text single-line (except the "- " dash-speaker structure); cue-aligned groups must cover every input cue number exactly once (lyric groups with [N] markers use a single text instead); keep the groups array one-to-one with the input gno; output JSON only, no markdown.';
+   + '{"c":{"3":"…","18":"…"},"lyric":[{"g":2,"type":"text","text":"[1] … [2] …"}],"fillers":[17,23]}\n'
+   + 'Once more: every translation must be written in ' + dstNative + '; keep each text single-line (except the "- " dash-speaker structure); the keys of "c" must cover every input cue number exactly once; output JSON only, no markdown.\n'
+   + '10. [Per-cue hard constraint] Even when several cues belong to one sentence, each cue keeps its own number and appears exactly once; never fold the translation of consecutive cues into one number, never omit numbers because the sentence is unfinished. Before returning, check yourself: the number of keys in "c" must equal the number of input cues.';
   return s;
 }
 function systemPrompt(cfg){
@@ -3266,17 +3268,25 @@ function systemPrompt(cfg){
   /* v0.9.138 方案 C：同英文版，只在有术语表时出现，没填术语表时提示词一字不变 */
   + (cfg.glossary ? '【术语表优先】规则4.5的术语表具有最高优先级：表中列出的词必须严格按给定译法处理，优先于规则4（专名处理）以及其他任何规则——即使术语表要求译出一个本规则本会保留原文的名字。\n' : '')
   + (cfg.synopsis ? '【影片背景】' + cfg.synopsis + '（仅供理解语境）\n' : '')
-  + '输入是若干「句组」：一个完整句子可能被拆在多条字幕里（已合并为 merged 一句），也可能就是单条字幕。每组列出各 cue 的编号（no）、屏显秒数（dur）和原文。\n'
-  + '任务：把每个句组翻译成' + dstNative + '，并按 cue 逐条分配译文（cue 对齐翻译）——组内各条 cue 的译文按顺序连起来是一个完整、通顺的句子。\n'
+  /* v0.9.377：输入改为平铺 cue 列表（去掉 merged 嵌套）。句组信息用 "p":"c" 编码：
+     与上一条同属一句的 cue 带该标记——与 groupSentences 的组边界 100% 等价，体积只有 2.3%。
+     实证见「报告-四臂干净对照」：D1（平铺+p）与线上原样 A 结构质量打平（4/594 vs 4/594，Fisher p=1.0），
+     输入 token −20%、输出 −46%，输出自身两遍逐字相同率 45.9%→58.9%。省 token 是它唯一被证实的收益。 */
+  + '输入是一批字幕 cue 的平铺列表：每条给出编号（no）、屏显秒数（dur）和原文（src）。一个完整句子可能被拆在多条 cue 里——凡与上一条同属一句的 cue 都带 "p":"c" 标记，要连着上一条一起理解；不带该标记的 cue 自己就是一句。\n'
+  + '任务：把每条 cue 的原文翻译成' + dstNative + '并逐条给出译文；同属一句的多条 cue，其译文按顺序连起来必须是一个完整、通顺的句子，各条内容的分配顺序遵循' + dstNative + '的自然语序（不必沿用原文语序）。\n'
   + '内容体裁（影视对白、纪录片解说、访谈、讲座、动漫等）由你根据原文自行判断，并全程保持该体裁的语域与语气一致——对白用口语，解说用书面语，不得混用。\n'
   + '必须遵守：\n'
   + '1.【翻译风格】' + styleDesc(cfg) + '\n'
   /* v0.9.163：同英文版，补「重复」禁令——实测结构错里 DUP 是大宗（详见 systemPromptEn 同处注释）。
      提示词有中英两套，改文案必须两处都改，只改一处等于没改。 */
-  + '2.【cue 对齐输出】每个句组返回一个 cues 数组：组内每个输入 cue 编号恰好对应一条 {"no":编号,"text":"<' + dstNative + '译文>"}，严禁合并、跳过、改号、重复或发明编号；即使两条 cue 属于同一个句子，也各用各的编号、各出现一次。\n'
-  + '   【时长感知分配】每条 cue 有 dur（屏显秒数）：每秒最多承载约 ' + C.cpsLimitOf(cfg.dst) + ' 个字符宽度、至多两行。很短的 cue（如 dur 0.4s）只放一个短词，句子其余部分放到时长充裕的相邻 cue 上；整组按顺序读必须是一句连贯完整的话。各条内容的分配顺序应遵循' + dstNative + '的自然语序（不必沿用原文语序）——例如原文句尾的状语从句，目标语习惯前置时可挪到更早的 cue 上。\n'
+  + '2.【输出格式】返回一个对象 {"c":{…}}：键是输入里的 cue 编号（原样照抄），值是该条的' + dstNative + '译文。每个输入编号必须恰好出现一次，严禁合并、跳过、改号、重复或发明编号；即使两条 cue 属于同一个句子，也各用各的编号、各出现一次。\n'
+  /* v0.9.377：【时长感知分配】→【长度控制】。旧措辞「很短的 cue 只放一个短词，句子其余部分放到时长
+     充裕的相邻 cue 上」是在教模型把内容挪走，执行过头就是整条被并掉——四臂实验里四个臂的并条
+     全部长在批尾与长句组，与此同源。dur 字段保留（不同秒数=独立条目的锚点，去掉会引发批尾整体错位），
+     但不再拿它教模型挪内容。措辞与实验 D1 臂逐字一致。 */
+  + '   【长度控制】每条 cue 的译文只承担本条原文对应的那部分意思，控制在两行以内（一般不超过 20 个字符宽度）；即使它只是半句话，也只翻这半句，不得并进相邻 cue，也不得靠补词把句子补完整。\n'
   + '   【词边界切分】相邻 cue 之间的切分点必须落在词与词之间：严禁把一个词、固定词组或活用形从中间劈开（如日语「なり｜たい」这类活用形被劈成两半），严禁把助词、词缀与它所依附的词拆到两条 cue 上；宁可某条 cue 的译文略长或略短，也绝不劈词。\n'
-  + '   【歌词例外】若句组的 merged 含歌词分段编号（如 [1] [2]），不要用 cues 数组——照旧把 merged 整体翻译成一个 text 字段。\n'
+  + '   【歌词例外】歌词分段的 cue 原文里带分段编号（如 [1] [2]）时，译文里这些编号必须原样保留——[1] 还是 [1]，严禁翻译编号、改写数字、增删或重排分段。输入里若另有 lyric 数组（整组歌词已编号的纯正文），按 {"lyric":[{"g":组号,"type":"text","text":"[1] … [2] …"}]} 返回整组一个译文。\n'
   + '3.【听写纠错】原文可能来自语音听写，可能含明显听写错误（人名、地名、机构、术语、数字、同音词等），识别后先纠正（' + fixSpellZh + '）再翻译。专名同样先纠正拼写，再按规则4处理（' + (cfg.keepTerms ? '保留纠正后的原文写法、仍不音译' : '把纠正后的形式译成' + dstNative) + '）。\n'
   + '   【护栏——严禁过度纠错】只在错误明显且你有把握时纠正；方言、口音、俚语、有意的口语省略、风格化或艺术化的拼写、专名的合法拼写变体都不是错误，严禁「改正」。歌词措辞与 [听不清]、[无法辨认] 等标记严禁改写。当同一发音对应多个合法写法且无法判定时，保留原文形式不动、照原文翻译。\n'
   + '   【典型情形】专名被按发音写成近形拼写（Mennerbrigitte→Brigitte）、连读导致数字听错（1:00 37 Ventures→137 Ventures）；这些只是错误类型的举例，源语言不同时按同理判断。\n'
@@ -3302,10 +3312,13 @@ function systemPrompt(cfg){
        + cfg.glossary.split('\n').map(l=>'- '+l).join('\n') + '\n';
   }
 s += '5.【水词处理——默认行为是翻译】\n'
-   + '   - 正常句子（含实义内容的任何句组）一律输出 type:"text" 并提供完整译文；这是默认与绝大多数情况。\n'
-   + '   - 仅当某条 cue 整条都只是纯语气词或纯提示词（如 "Um."、"[music]"、"[音乐]"），把该 cue 编号列入 fillers 数组，程序会清空该条字幕（该条在 cues 数组里的条目可省略或留空）。\n'
-   + '   - 仅当整个句组的 merged 全部是水词/提示词（无任何实义内容）时，该组才输出 type:"drop" 且 text 留空；这是极少数例外。\n'
-   + '   - 注意：类型 "drop" 不会让译文消失，只是程序据此清空字幕；不要为了"安全"而把所有句组都设 drop。\n'
+   + '   - 正常句子（含实义内容的任何 cue）一律给出完整译文；这是默认与绝大多数情况。\n'
+   + '   - 仅当某条 cue 整条都只是纯语气词或纯提示词（如 "Um."、"[music]"、"[音乐]"），把该 cue 编号列入 fillers 数组，程序会清空该条字幕（该条在 c 里的译文留空即可）。\n'
+   /* v0.9.377：句组级 type:"drop" 随句组协议一并退场——平铺后没有组可 drop。
+      语义改由 fillers 承载：一个句子的 cue 全被列进 fillers ⇔ 旧协议里该组 drop。
+      本地重建时按此映射回 m.type='drop'，下游 v0.9.76 纯哼唱 / v0.9.90 实义组救援通道完全不动。 */
+   + '   - 仅当同一个句子的全部 cue 都是水词/提示词（无任何实义内容）时，把这些 cue 编号全部列入 fillers；这是极少数例外。\n'
+   + '   - 注意：列入 fillers 不会让译文消失，只是程序据此清空该条字幕；不要为了"安全"而把所有 cue 都列进 fillers。\n'
   + '   - 重复词：同一说话人连续重复的词或短语（如 "No, no, no"）通常译一次即可；但若重复本身有情绪或剧情作用（结巴、强调、喜剧节奏），应按语境保留。\n'
   + '   - 跨条短语只译一次：源文短语拆在相邻两条 cue 之间（如一条以 "people who" 收尾、下一条以 "do that" 开头）时，该短语在译文中只出现一次，严禁在两侧各译一遍造成机械复读；按完整语义把整句作为整体翻译。\n'
   + '   - 省略号仅限歌词淡出场景：对白译文严禁用省略号（……/…）收尾或表达句中停顿——半句话的延续交给下一条字幕自然承接，未说完的话用逗号或破折号处理。\n'
@@ -3322,12 +3335,16 @@ s += '5.【水词处理——默认行为是翻译】\n'
   + '   - 目标语言有敬语体系（日语、韩语等）时，按说话人之间的关系确定敬体级别并全片一致，不得忽上忽下。\n'
   + '   - 数字保持原文精度：严禁四舍五入，严禁货币金额换算成其他币种（$50 译作 50 美元，数值不变）。\n'
   + '8.5【标点跟随目标语言】标点属于你正在书写的语言：始终使用目标语言自己的标点与空格习惯，不要把源文的标点字形搬过来。\n'
-  + '9.【输出示例】普通句组返回 cues 数组（每个输入 cue 编号一条）；歌词组保留分段编号输出单个 text；双说话人保持「- 」结构与换行；纯水词 cue 编号进 fillers：\n'
-  + '输入（节选）：{"groups":[{"gno":1,"merged":"- You coming?\\n- Right behind you.","cues":[{"no":3,"dur":1.8,"src":"- You coming?\\n- Right behind you."}]},{"gno":2,"merged":"[1] Take me home [2] tonight","cues":[{"no":4,"dur":2.4,"src":"♪ Take me home, tonight ♪"}]},{"gno":3,"merged":"Um. See you tomorrow.","cues":[{"no":17,"dur":0.5,"src":"Um."},{"no":18,"dur":2.2,"src":"See you tomorrow."}]}]}\n'
-  + '输出：{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"' + ex.dash + '"}]},{"gno":2,"type":"text","text":"' + ex.lyric + '"},{"gno":3,"type":"text","cues":[{"no":18,"text":"' + ex.plain + '"}]}],"fillers":[17]}\n'
+  + '9.【输出示例】返回 {"c":{…}}，键是输入 cue 编号；歌词组用 lyric 数组返回整组单个 text；双说话人保持「- 」结构与换行；纯水词 cue 编号进 fillers：\n'
+  + '输入（节选）：{"cues":[{"no":3,"dur":1.8,"src":"- You coming?\\n- Right behind you."},{"no":17,"dur":0.5,"src":"Um."},{"no":18,"dur":2.2,"src":"See you tomorrow.","p":"c"}],"lyric":[{"g":2,"src":"[1] Take me home [2] tonight"}]}\n'
+  + '输出：{"c":{"3":"' + ex.dash + '","18":"' + ex.plain + '"},"lyric":[{"g":2,"type":"text","text":"' + ex.lyric + '"}],"fillers":[17]}\n'
   + '只输出 JSON（不要 markdown 代码块、不要多余解释）：\n'
-  + '{"groups":[{"gno":1,"type":"text","cues":[{"no":3,"text":"…"}]},{"gno":2,"type":"text","text":"[1] … [2] …"},{"gno":4,"type":"drop"}],"fillers":[17,23]}\n'
-  + '再次强调：所有 text 字段必须用' + dstNative + '书写；text 一律单行（「- 」双说话人结构除外）；cue 对齐组必须恰好覆盖每个输入 cue 编号各一次（含 [N] 编号的歌词组改用单个 text）；groups 数组与输入句组 gno 一一对应；只输出 JSON，不要 markdown 代码块。';
+  + '{"c":{"3":"…","18":"…"},"lyric":[{"g":2,"type":"text","text":"[1] … [2] …"}],"fillers":[17,23]}\n'
+  + '再次强调：所有译文必须用' + dstNative + '书写；译文一律单行（「- 」双说话人结构除外）；c 的键必须恰好覆盖每个输入 cue 编号各一次；只输出 JSON，不要 markdown 代码块。\n'
+  /* v0.9.377：第 10 条与实验 D1 臂逐字一致（D1 = 平铺+p+改L9+本条硬约束，是与线上 A 打平的那一臂）。
+     四臂实验里凡是「只改提示词、保留句组」的臂（G/G2/G3）全部显著更差，而平铺臂带的这条约束
+     是 D1 配置的组成部分，不能只抄一半。 */
+  + '10.【逐条硬约束】即使多条 cue 属于同一句，也必须一条 cue 对应一个编号、各返回一次；严禁把连续多条 cue 的译文合并到其中一个编号上，也严禁因为句子没说完就少返回编号。返回前请自查：c 的键数必须等于输入 cues 的条数。';
   return s;
 }
 
@@ -3457,6 +3474,84 @@ function unescStr(v){ try{ return JSON.parse('"'+v+'"'); }catch(e){ return v; } 
    该组既无 cues 也无 text，下游会当作空译文。此处把它搬回 text。
    正常输出的 type 只会是 text/drop/music/song/lyric，所以对其他模型零触发。 */
 const KNOWN_GTYPE={text:1,drop:1,music:1,song:1,lyric:1};
+/* v0.9.377：平铺协议 {"c":{"编号":"译文"},"lyric":[{"g":组号,"text":"…"}],"fillers":[…]} 的三个适配器。
+   ① flatCueMap → {no:译文}。容忍三种回落形态：c 对象（标准）、cues 数组、groups 数组（模型照旧
+     输出旧协议时也能收下，不至于整批作废）。
+   ② flatLyricMap → {gno:{type,text}}，键名 lyric / ly 都认。
+   ③ salvageFlat：结构级抢救的平铺版（严格解析 + 双策略字符修复全败后的最后一档）。
+   三者只做形状收敛、不判对错——对错仍由 validateCueAlign 与锚定校验裁定。 */
+function flatCueMap(obj){
+  const out={};
+  if(!obj||typeof obj!=='object') return out;
+  const c=obj.c;
+  if(c&&typeof c==='object'&&!Array.isArray(c)){
+    Object.keys(c).forEach(k=>{
+      const n=Number(k); if(!isFinite(n)) return;
+      const v=c[k];
+      out[n]=(v&&typeof v==='object')?String(v.text==null?'':v.text):String(v==null?'':v);
+    });
+  }
+  [obj.cues,obj.groups].forEach(arr=>{
+    if(!Array.isArray(arr)) return;
+    arr.forEach(x=>{
+      if(!x||typeof x!=='object') return;
+      if(Array.isArray(x.cues)) x.cues.forEach(y=>{
+        if(!y||y.no==null) return;
+        const n=Number(y.no); if(!isFinite(n)||(n in out)) return;
+        out[n]=String(y.text==null?(y.zh==null?'':y.zh):y.text);
+      });
+      else if(x.no!=null){
+        const n=Number(x.no); if(!isFinite(n)||(n in out)) return;
+        out[n]=String(x.text==null?(x.zh==null?'':x.zh):x.text);
+      }
+    });
+  });
+  return out;
+}
+function flatLyricMap(obj){
+  const out={};
+  if(!obj||typeof obj!=='object') return out;
+  const arr=Array.isArray(obj.lyric)?obj.lyric:(Array.isArray(obj.ly)?obj.ly:null);
+  if(!arr) return out;
+  arr.forEach(x=>{
+    if(!x) return;
+    const g=Number(x.g!=null?x.g:x.gno);
+    if(!isFinite(g)||out[g]) return;
+    out[g]={ type:x.type||'text', text:String(x.text==null?(x.zh==null?'':x.zh):x.text) };
+  });
+  return out;
+}
+function normalizeFlatShape(o){
+  if(!o||typeof o!=='object') return o;
+  if(o.c&&typeof o.c==='object'&&!Array.isArray(o.c)){
+    const n={};
+    Object.keys(o.c).forEach(k=>{ const kk=String(Number(k)); if(isFinite(Number(k))) n[kk]=o.c[k]; });
+    o.c=n;
+  }
+  if(Array.isArray(o.lyric)) o.lyric.forEach(x=>{ if(x&&typeof x.g==='string'&&/^-?\d+$/.test(x.g.trim())) x.g=+x.g.trim(); });
+  return o;
+}
+function salvageFlat(s){
+  if(!s||typeof s!=='string') return null;
+  /* 平铺协议才有 c / lyric 键；纯旧协议串（{"groups":[{"gno":…}]}）一律不接，
+     否则 "gno":N …"text":"…" 会被误当成 lyric 组收下——那部分归 salvageGroups 管。 */
+  if(!/"c"\s*:\s*\{/.test(s) && !/"lyric"\s*:\s*\[/.test(s) && !/"ly"\s*:\s*\[/.test(s)) return null;
+  const out={ c:{}, lyric:{} };
+  /* c 段：从 "c":{ 起按花括号栈截到配对的 }，再逐条扫 "编号":"译文" */
+  const ci=s.search(/"c"\s*:\s*\{/);
+  if(ci>=0){
+    const i=s.indexOf('{',ci); let d=0,j=i;
+    for(;j<s.length;j++){ const ch=s[j]; if(ch==='{')d++; else if(ch==='}'){ d--; if(!d) break; } }
+    const seg=s.slice(i,j+1);
+    const re=/"?(\d+)"?\s*:\s*"((?:[^"\\]|\\.)*)"/g; let m;
+    while((m=re.exec(seg))){ const n=+m[1]; if(!(n in out.c)) out.c[n]=unescStr(m[2]); }
+  }
+  /* lyric 段："g" 与它后面紧跟的 text（容忍中间夹 type 等字段） */
+  const lre=/"(?:g|gno)"\s*:\s*"?(-?\d+)"?[^}]{0,200}?"(?:text|zh)"\s*:\s*"((?:[^"\\]|\\.)*)"/g; let lm;
+  while((lm=lre.exec(s))){ const g=+lm[1]; if(!out.lyric[g]) out.lyric[g]={type:'text',text:unescStr(lm[2])}; }
+  if(!Object.keys(out.c).length && !Object.keys(out.lyric).length) return null;
+  return out;
+}
 function normalizeGroupsShape(o){
   if(!o||!Array.isArray(o.groups)) return o;
   o.groups.forEach(function(g){
@@ -3507,17 +3602,22 @@ function salvageGroups(s){
 function parseWithRepair(str){
   let firstErr=null;
   const cands=[str];
-  const anchor=/\{\s*"groups"\s*:/g;let m,cnt=0;
+  /* v0.9.377：锚点加上平铺协议的三个入口键（groups 保留，模型回落旧协议时仍能截断/解析） */
+  const anchor=/\{\s*"(?:groups|cues|c|lyric)"\s*:/g;let m,cnt=0;
   while((m=anchor.exec(str))){ cnt++; if(cnt===2){ if(m.index>0)cands.push(str.slice(0,m.index).replace(/[\s,]+$/,'')); break; } }
   for(const cd of cands){
-    try{ return normalizeGroupsShape(JSON.parse(cd)); }
+    try{ return normalizeFlatShape(normalizeGroupsShape(JSON.parse(cd))); }
     catch(e){ if(firstErr===null)firstErr=e; }
     for(const fixed of [repairLlmJson(cd),repairLlmJson(cd,true)]){
-      if(fixed!==null){ try{ return normalizeGroupsShape(JSON.parse(fixed)); }catch(e2){} }
+      if(fixed!==null){ try{ return normalizeFlatShape(normalizeGroupsShape(JSON.parse(fixed))); }catch(e2){} }
     }
   }
-  /* v0.9.123 最后一档：结构级抢救（对数组型 payload 返回 null，不影响术语表等场景） */
-  for(const cd of cands){ const sv=salvageGroups(cd); if(sv) return sv; }
+  /* v0.9.123 最后一档：结构级抢救（对数组型 payload 返回 null，不影响术语表等场景）
+     v0.9.377：平铺协议走 salvageFlat——salvageGroups 只认 "gno"，平铺输出里根本没有。 */
+  for(const cd of cands){
+    const sv=salvageGroups(cd); if(sv) return sv;
+    const sf=salvageFlat(cd); if(sf) return sf;
+  }
   const e=firstErr||new Error('JSON parse failed');
   const m2=/position (\d+)/.exec(String(e.message||''));
   const p=m2?Math.min(+m2[1],str.length):0;
@@ -3538,7 +3638,9 @@ function parseLlmJson(raw){
   }
   /* v0.9.120：对象路径优先从 {"groups": 锚点起切——部分模型会在正文里先复述输入/示例再给答案，
      首个 { 可能落在复述段里；锚不中再回落旧逻辑（首 {），对正常输出零影响 */
-  const ga=s.search(/\{\s*"groups"\s*:/);
+  /* v0.9.377：锚点同 parseWithRepair——平铺输出的首个 { 可能是 "c"|"cues"|"lyric"，
+     术语表等 {synopsis,terms} 形态匹配不到，仍回落首 {（与旧行为一致）。 */
+  const ga=s.search(/\{\s*"(?:groups|cues|c|lyric)"\s*:/);
   const a=(ga>=0?ga:s.indexOf('{')), b=s.lastIndexOf('}');
   if (a<0||b<=a) throw new Error(t('errNotJson'));
   const slice=s.slice(a,b+1);
@@ -3703,6 +3805,10 @@ let LAST_FINISH='';   // v0.9.125：上一次 chatOnce 拿到 finish_reason（'l
 /* v0.9.146：整批失败原因的一次性上报标记。声明必须在 chatOnce（下方 6674 处读取它）之前，
    否则若将来有人在脚本求值阶段就触发请求，let 的暂时性死区会直接抛 ReferenceError。 */
 let _failWhy = null;
+/* v0.9.380：补救通道（rt=4）专属的失败原因。全局那个 _failWhy 会被并发的 cue 重译请求
+   先一步吃掉（mkBody 里谁先发谁消费），10-25 实测 367 次补救只记到 7 条原因。
+   补救标记单独一份、只让 rt=4 的请求消费，条数才对得上「失败了几批」。 */
+let _failWhy4 = null;
 /* v0.9.185：单个请求的排队总预算（毫秒）。此前是「最多排 8 轮」，而服务端每轮最多让等 60 秒
    → 一批最多干等 480 秒，等于原地打转；而且耗尽后会掉进 errEmpty，
    埋点把「排队超时」记成「上游返回空」，统计口径全错。改成按秒计的预算，耗尽抛独立错误。 */
@@ -3791,8 +3897,9 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         /* v0.9.183：pace=1 = 告诉服务端「我认得 {wait:N} 这种回执」。旧服务端不认识这个字段，
       直接忽略，行为不变；反过来，服务端也只对带这个标记的请求才可能返回 wait——
       否则旧版本的前端收到一个没有 choices 的响应，会当成「上游返回空」去走降级重试。 */
-      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
+      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (rt===4&&_failWhy4)?{fwhy:_failWhy4}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
         _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
+        if(rt===4) _failWhy4=null; /* v0.9.380：补救标记只让补救请求消费 */
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
       const rf=(plan.rf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
@@ -3878,7 +3985,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
            此前回退完全静默，加上后台记账又记着 A 的名字，用户只能判定「分流没生效」。 */
         try{ if(builtin && j && j._fb){ log(t('fbRoute', String(j._fb.from||''), String(j._fb.to||''), String(j._fb.msg||'').slice(0,80)), 'warn'); } }catch(e){}
         let out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-        if(!out) throw new Error(t('errEmpty'));
+        if(!out) throw emptyErr();
         /* v0.9.120：思考型模型（如 SiliconFlow 上的 Qwen3/GLM 系）在非流式响应里会把 <think>…</think>
            推理文本混进 content，思考文本中的 { 会把下游「首 { 到尾 }」的 JSON 提取切进思考段
            （实测表象：批 1 三连败 Expected ',' or '}' after property value）。出口统一剥掉；
@@ -3886,6 +3993,8 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         out=String(out).replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi,'');
         const openTag=String(out).match(/<think(?:ing)?>/i);
         if(openTag) out=String(out).slice(0, openTag.index);
+        /* v0.9.380：剥掉思考段后只剩空白，同样算空响应（否则下游会拿空串去解析 JSON） */
+        if(!String(out).trim()) throw emptyErr();
         return out;
       }
     };
@@ -3926,8 +4035,44 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
   } finally { clearTimeout(timer); clearTimeout(hbT); if(hbI) clearInterval(hbI); }
 }
 
+/* v0.9.378：同语言任务判定 —— 纯函数，便于单测。
+   背景（线上实证 10-25）：目标语言 = 原文语言时，正确译文必然等于原文，
+   sameAsSource 会把整批长句全判成「照抄原文」，于是进逐组隔离重译通道、
+   每组两次，产物还是原文。81 条英文字幕·目标英语那次烧了 30 次重译、4 分 38 秒，
+   最后是用户手动停的 —— 看起来就是「一直在排队」（每次重译都要重新排队拿槽位名额）。
+   判据：可判组（骨架 ≥8 字符，正是 sameAsSource 的生效门槛）里 70% 以上被判照抄。
+   正常翻译里模型不可能把七成长句原样返回（那等于整批没翻），所以误判概率极低；
+   即便真碰上整批偷懒，接受原文也比再烧 2N 次请求强 —— 现在那 2N 次之后本来也是带病接受。
+   至少 4 组才判：小批样本太少，宁可继续走原来的重译通道。 */
+function sameLangHit(judgedN, badSameN){
+  return judgedN >= 4 && badSameN >= Math.ceil(judgedN * 0.7);
+}
+
 /* v0.9.72：受限并发映射——隔离重译并行用（各重译是独立的单组重发，结果与串行一致；
    worker 自行 try/catch，此处不拦截异常） */
+/* v0.9.377：把坏组切成 ≤n 个小批——按 cue 条数均衡，保持原顺序（相邻坏组留在同一小批，
+   跨批衔接不因此被打乱）。条数而不是组数当砝码：一个 6 条的长句组和三个 1 条的短组
+   不该被算成同等重量。n 大于组数时每组自成一个小批（等价于旧行为，隔离度最高）。 */
+function splitBadChunks(gs, n){
+  const list=(gs||[]).filter(Boolean);
+  if(!list.length) return [];
+  const w=g=>(g.cues?g.cues.length:1);
+  const k=Math.max(1, Math.min(+n||1, list.length));
+  if(k===1) return [list];
+  const per=list.reduce((s,g)=>s+w(g),0)/k;
+  const out=[]; let cur=[], curN=0;
+  for(let i=0;i<list.length;i++){
+    cur.push(list[i]); curN+=w(list[i]);
+    if(out.length>=k-1) continue;              // 已是最后一批：剩下的全归它
+    const next=list[i+1];
+    if(!next) break;
+    /* 贪心：加上下一条若更接近目标条数就继续攒，否则就在这里切 */
+    if(Math.abs(curN+w(next)-per) <= Math.abs(curN-per)) continue;
+    out.push(cur); cur=[]; curN=0;
+  }
+  if(cur.length) out.push(cur);
+  return out;
+}
 async function poolMap(items, limit, worker){
   const n = items.length; if(!n) return;
   let idx = 0;
@@ -3959,6 +4104,9 @@ function describeCueErrs(errs, zh){
   });
   return out;
 }
+/* v0.9.380：空响应的统一出口。带 _empty 机器标记 —— 文案走 t('errEmpty')（多语言），
+   标记本身固定，供 failWhyOf 与下游熔断判断使用。 */
+function emptyErr(){ const e0=new Error(t('errEmpty')); e0._empty=1; return e0; }
 /* v0.9.146：整批请求失败原因分类——只用于统计，不参与任何流程判断。
    events 此前只记「重试了几次」，看不出整批为什么失败（截断 / JSON 畸形 / 网络），只能靠猜。
    _failWhy 为一次性标记（声明在 LAST_FINISH 旁）：随补救通道的第一个请求上报后立即清除，
@@ -3966,6 +4114,9 @@ function describeCueErrs(errs, zh){
    判据：LAST_FINISH==='length' 是服务端回填的确切截断信号，优先于错误消息文本（后者随界面语言变化）。 */
 function failWhyOf(msg){
   const s = String(msg == null ? '' : msg);
+  /* v0.9.380：空响应单列一类。判据只认两个稳定标识 —— 客户端自己打的 _empty 标记，
+     以及服务端回执里的 upstream_empty 机器码。文案（errEmpty）多语言，不能当判据。 */
+  if ((msg && msg._empty) || /upstream_empty/.test(s)) return 'empty';
   if (LAST_FINISH === 'length') return 'trunc';
   if (/HTTP\s*(5\d\d|429)/.test(s) || /Failed to fetch|NetworkError|ETIMEDOUT|timeout/i.test(s)) return 'net';
   if (/JSON|Unexpected|errNoGroups|errNoGno|组/i.test(s)) return 'json';
@@ -3975,13 +4126,35 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
   const send = groups.filter(g=>!g.pureMusic && !g.lyricLocal && !g.fillerLocal);
-  /* v0.9.124：抽成函数——补译缺失句组时复用同一套输入格式 */
-  const toArr = arr=>arr.map(g=>({
-    gno: g.gno,
-    merged: g.mFrames ? g.mFrames.plainText : g.text,
-    cues: g.cues.map(c=>({no:c.no, dur:+((c.end-c.start)/1000).toFixed(2), src:c.text}))
-  }));
-  const garr = toArr(send);
+  /* v0.9.377：输入改为平铺 cue 列表（原 toArr 的句组嵌套：merged 与各 cue 原文高度重复，
+     是输入体积的大头）。
+     句组信息不再靠嵌套表达，改用 p:"c" 编码——组内非首条带该标记，与 groupSentences 的组边界
+     100% 等价（本素材实测与「按标点反推」分叉 0 条）。
+     音乐帧组（mFrames）单独走 lyric 数组：♪ 依旧一个都不进模型（v0.9.45 语义原样保留），
+     整组以 [N] 编号纯正文发送，译文按整组一个 text 回收。
+     v0.9.124 的「抽成函数供补译复用」保留：onlyNos 用于只补缺失的那几条。 */
+  const toFlat = (arr, onlyNos)=>{
+    const cues=[], lyric=[];
+    for(const g of arr){
+      /* 音乐帧组只能整组发（一个 text 覆盖整组，没有逐条可切的东西），所以不受 onlyNos 过滤——
+         调用方（缺号补译）只会把「整组缺失」的帧组放进 arr，不会重复翻译已成功的组。 */
+      if(g.mFrames){ lyric.push({ g:g.gno, src:g.mFrames.plainText }); continue; }
+      /* v0.9.379：onlyNos（缺号补译）模式下改成「按句组整体取舍」——组内任一条命中缺口，
+         就把这一组全部 cue 都发出去。
+         此前是逐条过滤：句内第 1 条没缺、第 2/3 条缺时，发出的第一条原本带着 p:"c"
+         （"与上一条同句"），可它参照的那条压根没被发出 —— 整个请求里一个句首都没有，
+         模型拿到的是没有头的半截句子，既不知道这句还剩多少内容，也不知该给这条分配多少词。
+         与 v0.9.377 为 splitBadChunks 定的原则同源：同一句的各条要留在同一个请求里，别拆开。
+         多发几条邻居 cue 的成本远小于重新翻一轮整批。 */
+      if(onlyNos && !g.cues.some(c=>onlyNos.has(c.no))) continue;
+      g.cues.forEach((c,i)=>{
+        const o={ no:c.no, dur:+((c.end-c.start)/1000).toFixed(2), src:c.text };
+        if(i>0) o.p='c';      // 与上一条同属一句（组边界 = groupSentences 的边界，不是标点猜的）
+        cues.push(o);
+      });
+    }
+    return { cues, lyric };
+  };
   const dstN = LBY($('dstLang').value);
   // v0.9.22：用户消息与系统提示词同语言（非中文目标用英文，防指令语言泄漏）
   const zhDst = $('dstLang').value==='zh-CN' || $('dstLang').value==='zh-TW';
@@ -3990,12 +4163,12 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // 批级重试 + 单组盲重发 ×2 全部复现同样的混合输出）
   const fb = (Array.isArray(feedback) && feedback.length)
     ? (zhDst
-        ? '\n【纠错重试】你上次的翻译语言跑偏了——下列句组的 text 混入了非' + dstN.zh + '的字符，这是错误的：\n'
+        ? '\n【纠错重试】你上次的翻译语言跑偏了——下列 cue 的译文混入了非' + dstN.zh + '的字符，这是错误的：\n'
           + JSON.stringify(feedback)
-          + '\n请重新翻译这些句组：text 必须从头到尾完整使用' + dstN.zh + '书写，严禁混入任何其他语言的文字。'
-        : '\n[CORRECTION RETRY] Your previous attempt drifted into the wrong language — the text fields below contain characters that are NOT ' + dstN.prompt + ':\n'
+          + '\n请重新翻译这些 cue：译文必须从头到尾完整使用' + dstN.zh + '书写，严禁混入任何其他语言的文字。'
+        : '\n[CORRECTION RETRY] Your previous attempt drifted into the wrong language — the translations below contain characters that are NOT ' + dstN.prompt + ':\n'
           + JSON.stringify(feedback)
-          + '\nThese translations are WRONG. Re-translate these groups: every text field must be written ENTIRELY in ' + dstN.prompt + ', with no characters from any other language.')
+          + '\nThese translations are WRONG. Re-translate these cues: every translation must be written ENTIRELY in ' + dstN.prompt + ', with no characters from any other language.')
     : '';
   // v0.9.66：cue 对齐结构纠错反馈——重发时把上一轮的结构错误清单喂回模型（实验实证一次即可修复）
   const cueFb = (feedback && Array.isArray(feedback.cueErrs) && feedback.cueErrs.length)
@@ -4008,15 +4181,53 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.62：跨批上下文——前批末尾句组的原文+已定译文（只读参考，防模型重复输出/改写）
   const ctxBlk = (Array.isArray(ctx) && ctx.length)
     ? (zhDst
-        ? '【前文衔接】此前句组的原文与已定译文（仅供语境衔接参考，不得重复输出、不得修改、不得重新翻译）：\n'+JSON.stringify(ctx)+'\n'
-        : '[PREVIOUS CONTEXT] Source text and final translation of preceding groups (for continuity only — do NOT re-output, modify, or re-translate them):\n'+JSON.stringify(ctx)+'\n')
+        ? '【前文衔接】此前字幕的原文与已定译文（仅供语境衔接参考，不得重复输出、不得修改、不得重新翻译）：\n'+JSON.stringify(ctx)+'\n'
+        : '[PREVIOUS CONTEXT] Source text and final translation of preceding subtitles (for continuity only — do NOT re-output, modify, or re-translate them):\n'+JSON.stringify(ctx)+'\n')
     : '';
   /* v0.9.124：mkMsg(arr) 只依赖 arr——主请求拼 fb+cueFb，补译缺失句组时单独用（更小的请求更容易成功） */
-  const mkMsg = arr => zhDst
-    ? ctxBlk+'句组（第 '+batchNo+'/'+totalBatch+' 批）：\n'+JSON.stringify({groups:toArr(arr)})
-      +'\n请把每个句组翻译成'+dstLangLabel(dstN,true)+'并按 cue 分配——每个句组返回 cues 数组（每个输入 cue 编号一条 {"no":…,"text":…}）；含 [N] 歌词编号的句组照旧返回单个 text。text 字段必须用'+dstN.zh+'书写。只输出 JSON。'
-    : ctxBlk+'Groups (batch '+batchNo+'/'+totalBatch+'):\n'+JSON.stringify({groups:toArr(arr)})
-      + '\nTranslate each group into '+dstLangLabel(dstN,false)+' and distribute across its cues — return a "cues" array per group (one entry {"no":…,"text":…} for every input cue number); groups whose merged text contains lyric [N] markers return a single "text" as before. The text fields must be written in '+dstN.zh+'. Output JSON only.';
+  const mkMsg = arr => {
+    const f = toFlat(arr);
+    const body = JSON.stringify(f.lyric.length ? { cues:f.cues, lyric:f.lyric } : { cues:f.cues });
+    return zhDst
+      ? ctxBlk+'字幕 cue（第 '+batchNo+'/'+totalBatch+' 批）：\n'+body
+        +'\n请把每条 cue 翻译成'+dstLangLabel(dstN,true)+'，按 {"c":{"编号":"译文"}} 返回——键必须原样照抄输入里的每个 cue 编号、每个恰好一次；lyric 数组的组按 {"lyric":[{"g":组号,"type":"text","text":"译文"}]} 返回整组一个译文；整条纯水词的 cue 编号进 fillers。译文必须用'+dstN.zh+'书写。只输出 JSON。'
+      : ctxBlk+'Subtitle cues (batch '+batchNo+'/'+totalBatch+'):\n'+body
+        + '\nTranslate every cue into '+dstLangLabel(dstN,false)+' and return {"c":{"<cue number>":"<translation>"}} — copy every input cue number verbatim as a key, each exactly once; lyric groups return one single text via {"lyric":[{"g":<group id>,"type":"text","text":"…"}]}; pure-filler cue numbers go to fillers. Write the translations in '+dstN.zh+'. Output JSON only.';
+  };
+  /* 补译用（onlyNos = 真正缺译文的 cue 编号集合）。
+     v0.9.124 的做法是保证命中率（请求越小越容易成功）；v0.9.379 只改了一件事：
+     不再把缺失条目从句子里摘出来单独发，而是连同它所在句组的邻居 cue 一起发（见 toFlat），
+     为此文案要额外说清「哪些编号才需要产出」——否则模型会把整句又回一遍，
+     白白重翻已经翻好的那几条。 */
+  const mkMsgSome = (arr, onlyNos)=>{
+    const f = toFlat(arr);
+    const body = JSON.stringify(f.lyric.length ? { cues:f.cues, lyric:f.lyric } : { cues:f.cues });
+    const need = onlyNos ? f.cues.filter(c=>onlyNos.has(c.no)).map(c=>c.no) : f.cues.map(c=>c.no);
+    const needTxt = need.length ? need.join(', ') : '';
+    /* v0.9.379：lyric 组的输出格式此前一个字都没写进补译指令——请求体带了 lyric 数组，
+       指令却只教 {"c":{…}}，模型即使翻了歌词也不知道往哪儿放，这组就永久缺着，
+       最后以「缺少句组 N」抛错，整个批次重发一遍。
+       措辞与 systemPrompt 的【歌词例外】（本文件 3289 行）同口径，尤其要带上分段编号约束：
+       mFrames.plainText 是 "[1] … [2] …" 形态，回填靠编号映射到各行 ♪ 段，
+       编号一旦被翻译/篡改/增删/重排，歌词行就会错行或整段丢失。 */
+    const lyricHint = f.lyric.length
+      ? (zhDst
+          ? '\n歌词组（输入里的 lyric 数组，整组歌词已编号的纯正文）按 {"lyric":[{"g":组号,"type":"text","text":"[1] … [2] …"}]} 返回整组一个译文：译文里的 [1] [2] 等分段编号必须原样照抄，严禁翻译编号、改写数字、增删或重排分段。'
+          : '\nLyric groups (the "lyric" array — one numbered plain-text line per group) return one single text per group via {"lyric":[{"g":<group id>,"type":"text","text":"[1] … [2] …"}]}: copy the [1] [2] segment numbers verbatim — never translate, renumber, drop or reorder them.')
+      : '';
+    const needHint = needTxt
+      ? (zhDst
+          ? '上面这些 cue 是为了给你完整的上下文（一句有时横跨多条）；其中只有编号 '+needTxt+' 缺译文，请只产出这几条，不要重复输出其余编号。'
+          : 'The cues above are listed so you have the full sentence context (a sentence may span several cues); only cue number(s) '+needTxt+' still lack a translation — produce ONLY those, do not repeat the others.')
+      : '';
+    return zhDst
+      ? ctxBlk+'字幕 cue（第 '+batchNo+'/'+totalBatch+' 批，补译缺失编号）：\n'+body
+        +'\n'+(needHint||'请翻译上面列出的 cue。')+'请按 {"c":{"编号":"译文"}} 返回——键必须原样照抄、每个恰好一次。译文必须用'+dstN.zh+'书写。只输出 JSON。'
+        +lyricHint
+      : ctxBlk+'Subtitle cues (batch '+batchNo+'/'+totalBatch+', re-translating the missing numbers):\n'+body
+        + '\n'+(needHint||'Translate the cues listed above.')+' Return {"c":{"<cue number>":"<translation>"}} — copy every listed cue number verbatim as a key, each exactly once. Write the translations in '+dstN.zh+'. Output JSON only.'
+        + lyricHint;
+  };
   const userMsg = mkMsg(send) + fb + cueFb;
   /* v0.9.127：纯翻译模型专用分流。Hunyuan-MT 系列是纯机器翻译模型：输入文本 → 输出译文，
      完全不理会 JSON 句组协议——返回的是把 JSON 当正文翻译出来的东西，解析后恒缺几个组，
@@ -4044,54 +4255,133 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     if(LAST_FINISH==='length') throw new Error(t('errTruncOut'));
     obj=parseLlmJson(raw);
   }
-  if(!obj||!Array.isArray(obj.groups)) throw new Error(t('errNoGroups'));
-  const byGno={};
-  obj.groups.forEach(x=>{
-    if(!x||x.gno==null) throw new Error(t('errNoGno'));
-    // v0.9.66：cue 对齐输出——保留 cues 数组供组级校验；旧格式（仅 text）优雅兼容
-    byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
+  /* v0.9.377：平铺协议的解析 + 组级重建。
+     下游三十余处（锚定校验、drop 救援、单组隔离重译、回填、断点续传快照）一律按组工作，
+     这里把 {"c":{…},"lyric":[…]} 映射回原来的 {gno:{type,text,cues}} 契约——那些代码一行都不用改。
+     errNoGroups 的判定同步改为「一个 cue 编号都没捞到」（send 为空时不抛，与旧行为一致）。 */
+  if(!obj) throw new Error(t('errNoGroups'));
+  /* v0.9.127 的纯翻译模型通道（Hunyuan-MT 系列）返回的是组级 [{gno,text}]，与平铺协议无关：
+     整组一个 text，由 backfillGroup 按时长切分回填。这里单独收下，其余一律走平铺重建。 */
+  const pmMap = {};
+  if(pureMT && Array.isArray(obj.groups)) obj.groups.forEach(x=>{
+    if(x&&x.gno!=null) pmMap[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh) };
   });
-  /* v0.9.123：解析成功但丢组（字符级修复可能吞掉个别句组，表现为「缺少句组 N 的结果」）
-     → 用结构级抢救把缺的组补回来；只补缺失的 gno，已有结果一律不动（零回归） */
-  if(send.some(g=>!byGno[g.gno])){
-    const sv=salvageGroups(String(raw||''));
-    if(sv&&Array.isArray(sv.groups)) sv.groups.forEach(x=>{
-      if(!x||x.gno==null||byGno[x.gno]) return;
-      byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
+  const cMap = flatCueMap(obj);
+  const lyMap = flatLyricMap(obj);
+  if(!pureMT && send.length && !Object.keys(cMap).length && !Object.keys(lyMap).length) throw new Error(t('errNoGroups'));
+  /* fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）。
+     v0.9.379：从 4351 行提到这里——必须在 buildByGno / gapSet 之前算出来。
+     「译文为空」在协议里有两种完全相反的合法含义：
+       ① 该编号在 fillers 里 → 模型按约定把它当水词删掉，这是正确结果；
+       ② 不在 fillers 里 → 模型漏翻了，属于违规，必须追回来的那种。
+     此前 fillers 比这两处晚了一百多行，区分不了 ① 和 ②，只好一律当作"已经翻好了"（见 gapPair）。 */
+  const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
+  const fillers=new Set((Array.isArray(obj.fillers)?obj.fillers:[]).map(Number).filter(no=>known.has(no)));
+  const buildByGno = ()=>{
+    const o={};
+    for(const g of send){
+      if(pureMT){
+        const pm=pmMap[g.gno];
+        if(pm) o[g.gno]={ type:pm.type||'text', text:pm.text, cues:null };
+        continue;
+      }
+      if(g.mFrames){
+        const m=lyMap[g.gno];
+        if(m) o[g.gno]={ type:m.type||'text', text:(m.text!=null?m.text:m.zh), cues:null };
+        continue;
+      }
+      const cues=g.cues.map(c=>({ no:c.no, text:String(cMap[c.no]==null?'':cMap[c.no]) }));
+      /* 整组全空 ⇔ 旧协议里该组 type:"drop"（提示词已要求模型把这些编号列进 fillers）。
+         下游 v0.9.76 纯哼唱豁免 / v0.9.90 实义组救援照旧按 m.type==='drop' 分流，语义不丢。 */
+      o[g.gno] = cues.every(x=>!String(x.text||'').trim())
+        ? { type:'drop', text:'', cues:null }
+        : { type:'text', text:'', cues };
+    }
+    return o;
+  };
+  let byGno = buildByGno();
+  /* v0.9.123 的结构级抢救照旧，只是换平铺版：字符级修复搞不定时直接扫编号捞译文。
+     缺口判定下沉到 cue 级——平铺输出缺的是编号，不是组。 */
+  /* v0.9.379：缺口拆成硬软两档，此前只有硬的那档。
+     hard = 模型压根没输出这个编号（cMap[no]==null）——必须补回来，补不回就抛错让外层整批重来；
+     soft = 模型输出了空译文，却没把这个编号列进 fillers。协议只承诺「列入 fillers 的可以留空」，
+            没列还留空属于违规，值得追一次，但**追不回来就维持原样**（继续走水词同路径），
+            绝不因此把整批判死——它很可能本来就是句水词。
+     此前 flatCueMap 会把空值归一成空串（3491 行），而 ''==null 是 false，
+     于是 soft 这一类连补译都进不去，直接由 buildByGno 归成整组 drop 静默删掉：
+     用户看到的症状是「字幕少了一句，日志干干净净」，追都不知道从哪儿追。 */
+  const gapPair = ()=>{
+    const hard=new Set(), soft=new Set();
+    if(pureMT) return {hard, soft};   // 纯翻译模型通道不做编号级补译（它本就不参与 cue 分配）
+    for(const g of send){
+      if(g.mFrames){ if(!byGno[g.gno]) hard.add('g'+g.gno); continue; }
+      g.cues.forEach(c=>{
+        if(cMap[c.no]==null){ hard.add(c.no); return; }
+        if(!String(cMap[c.no]).trim() && !fillers.has(c.no)) soft.add(c.no);
+      });
+    }
+    return {hard, soft};
+  };
+  // 拼 request 用的补译清单：hard 与 soft 都要发给模型试一次
+  const gapSet = ()=>{ const p=gapPair(); return new Set([...p.hard, ...p.soft]); };
+  const totalUnits = send.reduce((n,g)=>n+(g.mFrames?1:g.cues.length),0);
+  const mergeFlat = o=>{
+    if(!o) return false;
+    let hit=false;
+    Object.keys(o.c||{}).forEach(k=>{
+      if(cMap[k]==null){ cMap[k]=o.c[k]; hit=true; }
+      /* soft 缺口原来占着的是空串，补译给回非空才算补上 */
+      else if(!String(cMap[k]).trim() && String(o.c[k]||'').trim()){ cMap[k]=o.c[k]; hit=true; }
     });
-  }
-  /* v0.9.124：缺组自动补译——弱模型最典型的失败不是语法错，而是「少输出了几个句组」
+    Object.keys(o.lyric||{}).forEach(k=>{
+      if(!lyMap[k]){ lyMap[k]=o.lyric[k]; hit=true; return; }
+      if(!String(lyMap[k].text||'').trim() && String((o.lyric[k]||{}).text||'').trim()){ lyMap[k]=o.lyric[k]; hit=true; }
+    });
+    if(hit){ byGno=buildByGno(); }
+    return hit;
+  };
+  if(gapSet().size) mergeFlat(salvageFlat(String(raw||'')));
+  /* v0.9.124：缺号自动补译——弱模型最典型的失败不是语法错，而是「少输出了几个编号」
      （v0.9.123 解决掉解析后暴露出来：三连败全是「缺少句组 N 的结果」）。
      这里只对缺的那几条发一个小请求（输入更少 → 命中率显著更高，成本远低于整批重发），
-     最多补一次；仍有缺才抛错交给外层重试。正常模型永远走不到这里。 */
-  let missing = send.filter(g=>!byGno[g.gno]);
-  if(missing.length && missing.length < send.length){
+     最多补一次；仍有缺才抛错交给外层重试。正常模型永远走不到这里。
+     v0.9.377：粒度从句组改成 cue 编号——平铺输出缺的就是编号，补译也只发这些编号。
+     v0.9.379：① 触发条件从 missing.length 放宽成 missSet.size —— 只有 soft（空译文）缺口时
+          此前压根不发补译（missing 只看 hard），那条通道形同虚设；
+          ② 发出的不再是孤立的缺失编号，而是它所在的整个句组（见 toFlat 的注释）。
+     —— 注意 missing 的口径没变，仍然只认 hard：soft 补不回来不判死这一批。 */
+  let missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(c=>cMap[c.no]==null));
+  let missSet = gapSet();
+  if(missSet.size && missSet.size < totalUnits){
     try{
-      const raw2 = await chatOnce(base,key,model,[{role:'system',content:sys},{role:'user',content:mkMsg(missing)}],undefined,rt,{json:1});
+      /* v0.9.379：埋点。此前这条通道触发多少次、救回多少条完全没有记录，
+         所有关于"要不要继续投入"的判断只能靠猜。三个数回答三件事：
+         gapTryN=尝试补的条数、gapFixN=补回来的条数、gapGiveUpN=最终判死的批数。 */
+      const tryN = missSet.size;
+      S.gapTryN = (S.gapTryN||0) + tryN;
+      const arr2 = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(c=>missSet.has(c.no)));
+      const raw2 = await chatOnce(base,key,model,[{role:'system',content:sys},{role:'user',content:mkMsgSome(arr2, missSet)}],undefined,rt,{json:1});
       const obj2 = parseLlmJson(raw2);
-      if(obj2&&Array.isArray(obj2.groups)) obj2.groups.forEach(x=>{
-        if(!x||x.gno==null) return;
-        const gn=(typeof x.gno==='string'&&/^-?\d+$/.test(x.gno.trim()))?+x.gno.trim():x.gno;
-        if(byGno[gn]) return;
-        byGno[gn]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
-      });
-      // 补译结果同样做结构级抢救（这批模型的畸形率不会因为请求变小而下降）
-      const sv2=salvageGroups(String(raw2||''));
-      if(sv2&&Array.isArray(sv2.groups)) sv2.groups.forEach(x=>{
-        if(!x||x.gno==null||byGno[x.gno]) return;
-        byGno[x.gno]={ type:x.type||'text', text:(x.text!=null?x.text:x.zh), cues:Array.isArray(x.cues)?x.cues:null };
-      });
-      missing = send.filter(g=>!byGno[g.gno]);
+      if(obj2){
+        mergeFlat({ c: flatCueMap(obj2), lyric: flatLyricMap(obj2) });
+        // 补译结果同样做结构级抢救（这批模型的畸形率不会因为请求变小而下降）
+        mergeFlat(salvageFlat(String(raw2||'')));
+      }
+      S.gapFixN = (S.gapFixN||0) + (tryN - gapSet().size);
+      missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(c=>cMap[c.no]==null));
     }catch(e){ /* 补译失败：保持 missing 原样，走下面抛错 */ }
   }
-  // 校验齐全：每个输入句组必须有结果（v0.9.45：只校验真正发给模型的 send 集）
-  if(missing.length) throw new Error(t('errMissGroup',missing[0].gno));
+  // 校验齐全：每个输入 cue 必须有结果（v0.9.45：只校验真正发给模型的 send 集）
+  if(missing.length){ S.gapGiveUpN=(S.gapGiveUpN||0)+1; throw new Error(t('errMissGroup',missing[0].gno)); }
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
   const dstV = $('dstLang').value;
   // v0.9.149：专名处理 = 「保留原文」时告诉锚定校验——源语言专名原样留在译文里是用户要的结果，
   // 别再按「外来字符」判跑偏（否则保留专名会被批量误伤成重试）
   const keepPN = (document.querySelector('input[name=pnMode]:checked')||{}).value === 'keep';
   const badAnchor = [];
+  /* v0.9.378：另记一份「只因译文 == 源文被拦」的组。badAnchor 的成员与改前完全一致
+     （下面两处 push 的条件一字未动），badSame 只是它的一个子集，专供同语言判定用。 */
+  const badSame = [];
   const musicDropGnos = [];
   const subDropGnos = [];
   for(const g of send){
@@ -4116,23 +4406,29 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
        （防专名误伤），实测英文源·中文目标时模型把两条 cue 并成一条翻译、后一条原样返回
        英文，两道质检全放行。sameAsSource 不依赖语言知识，英→法这类同字母体系也能抓。 */
     const srcAll = g.mFrames ? g.mFrames.plainText : g.text;
-    if(txt && (C.sameAsSource(txt, srcAll) || !C.anchorOk(txt, dstV, keepPN))) badAnchor.push(g.gno);
+    /* v0.9.378：「照抄源文」单独记一份（badSame），判定式整体不变 ——
+       badAnchor 里该有的编号一个不少，老的重译通道行为零变化。 */
+    const sameTxt = !!txt && C.sameAsSource(txt, srcAll);
+    if(sameTxt) badSame.push(g.gno);
+    if(txt && (sameTxt || !C.anchorOk(txt, dstV, keepPN))) badAnchor.push(g.gno);
     // v0.9.66：cue 对齐组锚定——组 text 为空时逐 cue 文本查 anchorOk（任一跑偏即整组进重试通道）
     // v0.9.348：逐 cue 也要比源文，否则「整组里只有一条照抄原文」会被组级均值淹没
     else if(!txt && m.cues){
       for(const oc of m.cues){
         const tt = String(oc && oc.text || '').trim();
         const sc = (g.cues||[]).find(c => Number(c && c.no) === Number(oc && oc.no));
-        if(tt && (C.sameAsSource(tt, sc && sc.text) || !C.anchorOk(tt, dstV, keepPN))){ badAnchor.push(g.gno); break; }
+        if(tt){
+          const sameCue = C.sameAsSource(tt, sc && sc.text);
+          if(sameCue) badSame.push(g.gno);
+          if(sameCue || !C.anchorOk(tt, dstV, keepPN)){ badAnchor.push(g.gno); break; }
+        }
       }
     }
     // v0.9.37：音乐行丢词（源有歌词而译文只剩 ♪ 符号）——纯符号可通过 anchorOk，必须单查；并入锚定重试通道
     // v0.9.45：音乐帧组输出为 [N] 编号正文，musicLost 对编号数字不敏感，需比对纯正文
     else if(txt && C.musicLost(txt, g.mFrames ? g.mFrames.plainText : g.text) && !badAnchor.includes(g.gno)) badAnchor.push(g.gno);
   }
-  // fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）
-  const known=new Set(); groups.forEach(g=>g.cues.forEach(c=>known.add(c.no)));
-  const fillers=new Set((Array.isArray(obj.fillers)?obj.fillers:[]).map(Number).filter(no=>known.has(no)));
+  // （fillers 已于 v0.9.379 提到 buildByGno 之前计算，此处不再重复声明）
   // v0.9.66：cue 对齐结构校验——非音乐/非纯符号组带 cues 数组时逐组校验；
   // 通过 → m.cueTexts 直写回填；结构错 → cueBadGnos（外层单组重发）；模型未采用 cues（旧格式 text）→ 照旧路径
   // v0.9.67：① 移除 speaker 豁免（提示词从未豁免 dash 组，代码侧豁免属口径不一致）；
@@ -4149,7 +4445,11 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     if(v.ok){ m.cueTexts = v.texts; m.cpsWarns = v.cpsWarns; m.cues = null; }
     else { cueBadGnos.push({ gno: g.gno, errs: v.errs }); }
   }
-  return { byGno, fillers, badAnchor, musicDropGnos, subDropGnos, cueBadGnos };
+  /* v0.9.378：同语言任务识别。只统计「可判组」——sameAsSource 对骨架 <8 字符的短句
+     本来就不判（专名豁免），拿它们当分母会把命中率压下去，反而漏判。 */
+  const judged = send.filter(g => C.effChars(g.mFrames ? g.mFrames.plainText : g.text) >= 8).length;
+  const sameLang = sameLangHit(judged, badSame.length);
+  return { byGno, fillers, badAnchor, badSame, sameLang, musicDropGnos, subDropGnos, cueBadGnos };
 }
 
 /* v0.9.127：纯翻译模型（Hunyuan-MT 系列）逐组直译通道。
@@ -4810,7 +5110,7 @@ async function runTranslate(){
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
   /* v0.9.375：编号级样本与重试修复率同口径随任务重置（跨任务不累加） */
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0;
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0;
   $('btnGo').disabled=true;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -5010,6 +5310,16 @@ async function runTranslate(){
              单组隔离通道（a=0 盲发一次、a=1 把跑偏译文喂回模型做纠错）。
              成本：单批从最多 3 个整批请求降到 1 个整批 + 少量单组请求。
              注意：网络错误 / 429 的重试在下方 catch 分支，与此处无关，保持原样。 */
+          /* v0.9.378：同语言任务 → 「照抄源文」这些组不进重译队列。
+             它们不是模型偷懒，是目标语言本来就跟原文一样，重译一万次产物还是原文。
+             只摘掉 badSame 子集；同一批里真有语言跑偏（anchorOk 失败）的组照旧重译。 */
+          if(out.sameLang && out.badAnchor && out.badAnchor.length){
+            const sameSet=new Set(out.badSame||[]);
+            const before=out.badAnchor.length;
+            out.badAnchor=out.badAnchor.filter(gno=>!sameSet.has(gno));
+            const skipN=before-out.badAnchor.length;
+            if(skipN>0) log(t('sameLangSkip', skipN), 'warn');
+          }
           if(out.badAnchor && out.badAnchor.length){
             log(t('batchFail',bi+1,1,t('anchorFail',out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':''),LBY(cfg.dst).zh)),'err');
           }
@@ -5057,12 +5367,14 @@ async function runTranslate(){
                    （校验通过时 m.cues 被清空、只留 cueTexts，m.text 恒为空），此前 badTexts 取
                    不到任何内容，于是 a=1 的纠错反馈永远为空，"第 2 次纠错重译"实际又是一次盲发，
                    正解释了 v0.9.57 注释里「单组盲重发 ×2 全部复现同样输出」的现象。 */
+                /* v0.9.377：badTexts 带上 cue 编号——平铺协议里喂回模型的「跑偏译文」要能定位到条，
+                   否则模型只能看到一串无主译文，纠错反馈等于没给。 */
                 const badTexts=[];
                 (function(m){
                   if(!m) return;
-                  const t=String(m.text||'').trim(); if(t) badTexts.push(t);
-                  if(m.cueTexts && m.cueTexts.size) m.cueTexts.forEach(v=>{ const x=String(v||'').trim(); if(x) badTexts.push(x); });
-                  else if(Array.isArray(m.cues)) m.cues.forEach(c=>{ const x=String((c&&c.text)||'').trim(); if(x) badTexts.push(x); });
+                  const t=String(m.text||'').trim(); if(t) badTexts.push({no:null,text:t});
+                  if(m.cueTexts && m.cueTexts.size) m.cueTexts.forEach((v,no)=>{ const x=String(v||'').trim(); if(x) badTexts.push({no:no,text:x}); });
+                  else if(Array.isArray(m.cues)) m.cues.forEach(c=>{ const x=String((c&&c.text)||'').trim(); if(x) badTexts.push({no:(c&&c.no),text:x}); });
                 })(out.byGno[gno]);
                 /* v0.9.150：顺序反转——第 1 次就带纠错反馈（强的那次），失败才盲发兜底。
                    此前 a=0 盲发、a=1 才带反馈，等于每组固定先烧一次几乎无效的请求：反馈素材
@@ -5072,7 +5384,7 @@ async function runTranslate(){
                    两种成因并存见 v0.9.22 注释（隔离即恢复 5/5）与 v0.9.57 注释（盲发零效果）。 */
                 for(let a=0;a<2 && !fixed;a++){
                   try{
-                    const fbArr=(a===0&&badTexts.length)?badTexts.map(x=>({gno:gno,text:x})):null;
+                    const fbArr=(a===0&&badTexts.length)?badTexts:null;
                     const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,2);
                     // v0.9.47：drop 不再进 badAnchor——此处须同时要求非空译文，防止把跑偏组的隔离重译
                     // 结果（drop）误当"已修复"接受，否则该组会被静默当水词删除
@@ -5090,10 +5402,10 @@ async function runTranslate(){
                       }
                     } else {
                       const bm=(o2.byGno||{})[gno]||{};
-                      const bt=String(bm.text||'').trim();
-                      if(bt && !badTexts.includes(bt)) badTexts.push(bt);
-                      if(bm.cueTexts && bm.cueTexts.size) bm.cueTexts.forEach(v=>{ const x=String(v||'').trim(); if(x && !badTexts.includes(x)) badTexts.push(x); });
-                      else if(Array.isArray(bm.cues)) bm.cues.forEach(c=>{ const x=String((c&&c.text)||'').trim(); if(x && !badTexts.includes(x)) badTexts.push(x); });
+                      const pushBad=(n,t)=>{ const x=String(t||'').trim(); if(x && !badTexts.some(b=>b.text===x)) badTexts.push({no:(n==null?null:n),text:x}); };
+                      pushBad(null, bm.text);
+                      if(bm.cueTexts && bm.cueTexts.size) bm.cueTexts.forEach((v,no)=>pushBad(no, v));
+                      else if(Array.isArray(bm.cues)) bm.cues.forEach(c=>pushBad(c&&c.no, c&&c.text));
                     }
                   }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
                 }
@@ -5114,31 +5426,44 @@ async function runTranslate(){
             /* v0.9.375：编号级样本 —— 计数分不出「串组」和「编号写错」，要靠这批编号定性 */
             noteCueSample(gBatch, out.cueBadGnos, bi+1, out.byGno);
             const remainCue=[];
-            /* v0.9.72：并行化（并发3）——组间独立并行；组内 a<2 两次仍串行（第 2 次带结构错误反馈） */
-            await poolMap(out.cueBadGnos, 3, async cb=>{
-              if(S.stop){ remainCue.push(cb.gno); return; }
-              const g1=gBatch.find(x=>x.gno===cb.gno);
-              let fixed=false;
-              if(g1){
-                /* v0.9.150：与跑偏通道同理——第 1 次就带结构纠错反馈，失败再盲发兜底 */
-                for(let a=0;a<2 && !fixed;a++){
-                  try{
-                    const fbCue=(a===0)?{cueErrs:cb.errs}:null;
-                    const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbCue,ctx,3);
-                    const m2=o2.byGno && o2.byGno[cb.gno];
-                    if(m2 && m2.cueTexts && m2.cueTexts.size && !(o2.badAnchor||[]).includes(cb.gno)){
-                      out.byGno[cb.gno]=m2;
+            /* v0.9.377：坏组不再「一组一请求」，改为切成 ≤3 个小批各发一次。
+               此前 N 个坏组最多 2N 次请求，而每次请求都要重发整份系统提示词（约 2.5k token）——
+               重试成本的大头从来不是字幕内容，是这份固定开销（实测重试占输入 token 的 35~43%）。
+               切 3 批后请求数从 2N 降到 ≤6；每小批仍远小于原批（十几条 vs 几十条），
+               v0.9.22/v0.9.66 实证的「隔离 + 缩小规模」修复机理没有丢。
+               份数上限取 3：坏组 ≤3 个时仍一组一批，保持最强的隔离度。 */
+            const badGs = out.cueBadGnos.map(cb=>gBatch.find(x=>x.gno===cb.gno)).filter(Boolean);
+            const badErrs = new Map(out.cueBadGnos.map(cb=>[cb.gno, cb.errs||[]]));
+            /* v0.9.72：并行化（并发3）——小批之间独立并行；批内 a<2 两次仍串行（第 2 次盲发兜底） */
+            await poolMap(splitBadChunks(badGs, 3), 3, async chunk=>{
+              if(S.stop){ chunk.forEach(g=>remainCue.push(g.gno)); return; }
+              const fixedSet=new Set();
+              for(let a=0;a<2;a++){
+                const todo=chunk.filter(g=>!fixedSet.has(g.gno));
+                if(!todo.length) break;
+                try{
+                  /* v0.9.150：第 1 次就带结构纠错反馈，失败再盲发兜底。
+                     打包后反馈 = 这一小批里所有坏组的错误清单（错误码自带编号，模型能定位） */
+                  const errs=[];
+                  todo.forEach(g=>{ (badErrs.get(g.gno)||[]).forEach(e=>errs.push(e)); });
+                  const fbCue=(a===0&&errs.length)?{cueErrs:errs}:null;
+                  const o2=await translateBatch(effBase,effKey,effModel,todo,bi+1,totalB,sysB,fbCue,ctx,3);
+                  for(const g of todo){
+                    const m2=o2.byGno && o2.byGno[g.gno];
+                    if(!m2 || (o2.badAnchor||[]).includes(g.gno)) continue;
+                    if(m2.cueTexts && m2.cueTexts.size){
+                      out.byGno[g.gno]=m2;
                       o2.fillers.forEach(no=>fillerSet.add(no));
-                      fixed=true;
-                    } else if(m2 && String(m2.text||'').trim() && !(o2.badAnchor||[]).includes(cb.gno)){
-                      out.byGno[cb.gno]=m2; // 模型回落旧格式：有完整组译文也可用
+                      fixedSet.add(g.gno);
+                    } else if(String(m2.text||'').trim()){
+                      out.byGno[g.gno]=m2; // 模型回落旧格式：有完整组译文也可用
                       o2.fillers.forEach(no=>fillerSet.add(no));
-                      fixed=true;
+                      fixedSet.add(g.gno);
                     }
-                  }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
-                }
+                  }
+                }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
               }
-              if(!fixed) remainCue.push(cb.gno);
+              chunk.forEach(g=>{ if(!fixedSet.has(g.gno)) remainCue.push(g.gno); });
             });
             /* v0.9.375：重试修复率 —— 只加两个整数。分母是「重试过的组数」而不是请求数
                （一组最多发 2 次），用来回答「这一类结构错到底值不值得再问模型一遍」。 */
@@ -5182,18 +5507,23 @@ async function runTranslate(){
           }
         }
       }
-      // v0.9.29：批次重试全败 → 拆单组逐个补救（Apple Fold 评测实证：fa 语言批 8 三连败导致 3 句组 missing，
-      // 同批其他句组本身无问题，隔离单组重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
+      // v0.9.29：批次重试全败 → 拆成小组单独补救（Apple Fold 评测实证：fa 语言批 8 三连败导致 3 句组 missing，
+      // 同批其他句组本身无问题，隔离重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
       if(!ok && !S.stop){
-        let saved=0, consecFail=0, drifted=[];
-        /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留） */
-        _failWhy = lastWhy || null;
-        for(const g1 of gBatch){
+        let consecFail=0, drifted=[];
+        /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留）
+           v0.9.380：改用补救专属标记 _failWhy4 —— 全局那个会被并发的 cue 重译请求先一步吃掉。 */
+        _failWhy4 = lastWhy || null;
+        /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
+           此前会连同这些组一起补救，白白多烧请求（语义与上方 v0.9.77「整批已有结果则跳过」一致）。 */
+        const pend = gBatch.filter(g=>!res.has(g.gno));
+        /* v0.9.380：一组一请求 → ≤3 组一请求。此前一批 9 组就是 9 次请求，上游返空时整片能刷出
+           74 次补救，全部打在同一条不出货的链路上；而请求越小越容易成功，3 组一批正好兼顾。
+           （v0.9.377 已给 cue 重译做过同样的切批，这条补救通道当时没跟上。） */
+        const RC = 3;
+        for(let ci=0; ci<pend.length; ci+=RC){
           if(S.stop) break;
-          /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
-             此前会连同这些组一起逐组补救，白白多烧请求。纯统计外的唯一行为改动，
-             语义与上方「整批已有结果则跳过」（v0.9.77）一致。 */
-          if(res.has(g1.gno)){ saved++; continue; }
+          const chunk = pend.slice(ci, ci+RC);
           let got1=false;
           // v0.9.58：补救通道同样过语言锚定——跑偏结果不再静默溜过；第 1 次跑偏 → 第 2 次带
           // 纠错反馈重译（与主通道 v0.9.57 同武器）；第 2 次仍跑偏 → 与主通道 anchorKeep 同策略带病接受
@@ -5201,26 +5531,30 @@ async function runTranslate(){
           for(let a=0;a<2 && !got1;a++){
             try{
               lastCall=Date.now();
-              const fbArr=(a>0&&badTexts.length)?badTexts.map(x=>({gno:g1.gno,text:x})):null;
+              const fbArr=(a>0&&badTexts.length)?badTexts:null;
               /* v0.9.146：rt 由 2 改 4——这是「整批请求失败后的逐组补救」，不是语言跑偏。
                  此前混用 rt=2，统计把网络/截断造成的补救全算进 retryAnchor，排查方向被带偏。 */
-              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,4);
-              if((o2.badAnchor||[]).includes(g1.gno)){
-                const bt=String((o2.byGno[g1.gno]||{}).text||'').trim();
-                if(bt && !badTexts.includes(bt)) badTexts.push(bt);
+              const o2=await translateBatch(effBase,effKey,effModel,chunk,bi+1,totalB,sysB,fbArr,ctx,4);
+              const bad=(o2.badAnchor||[]).filter(gno=>chunk.some(g=>g.gno===gno));
+              if(bad.length){
+                bad.forEach(gno=>{
+                  const bt=String((o2.byGno[gno]||{}).text||'').trim();
+                  if(bt && !badTexts.some(x=>x.text===bt)) badTexts.push({gno:gno,text:bt});
+                });
                 if(a===0){ await new Promise(r=>setTimeout(r,1200)); continue; }
-                drifted.push(g1.gno);
+                drifted.push(...bad);
               }
               Object.keys(o2.byGno).forEach(k=>res.set(Number(k), o2.byGno[k]));
               o2.fillers.forEach(no=>fillerSet.add(no));
-              saved++; got1=true;
+              got1 = chunk.some(g=>res.has(g.gno));
             }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
           }
-          // v0.9.56 熔断：连续 3 组补救全败 → 判定模型无响应，立即停止整片翻译
-          //（否则 24 组 × 2 次空转，最坏几十分钟才轮到下一批重复同样的失败）
+          // v0.9.56 熔断：连续 3 批补救全败 → 判定模型无响应，立即停止整片翻译
+          //（否则整片每批都空转一轮，最坏几十分钟才轮到下一批重复同样的失败）
           if(!got1){ if(++consecFail>=3){ S.modelDead=true; S.stop=true; break; } }
           else consecFail=0;
         }
+        const saved = gBatch.filter(g=>res.has(g.gno)).length;
         if(drifted.length) log(t('anchorKeep', drifted.slice(0,5).join(',')+(drifted.length>5?'…':''), LBY(cfg.dst).zh),'err');
         log(t('batchRescue',bi+1,saved,gBatch.length), saved===gBatch.length?'okc':'err');
         // v0.9.56：首批即全军覆没，或连续 2 批零成功 → 模型不工作，停止并弹窗（小批次凑不满 3 连败走此兜底）
@@ -5773,7 +6107,7 @@ function setSrc(text, fileName){
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0;   // v0.9.375：换片即清，样本不跨文件混
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0;   // v0.9.375：换片即清，样本不跨文件混
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }

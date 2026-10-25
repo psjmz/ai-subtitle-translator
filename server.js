@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.376';
+const ASSET_VER = '0.9.380';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -271,7 +271,10 @@ function bumpRetry(ev, rt){
 /* v0.9.146：整批请求失败的原因分类。此前 events 只记「重试了几次」，看不出整批为什么失败，
    无法区分「输出被截断」「JSON 畸形」「网络/上游错误」，只能靠猜。
    白名单映射——未收录的原因一律落到 failOther，绝不按前端字符串动态建字段。 */
-const FAIL_FIELD = { trunc: 'failTrunc', json: 'failJson', net: 'failNet', other: 'failOther' };
+const FAIL_FIELD = { trunc: 'failTrunc', json: 'failJson', net: 'failNet', other: 'failOther',
+  /* v0.9.380：上游 200 但正文为空，单列一类 —— 此前它落进 other/json，
+     与「JSON 畸形」「其它」混在一起，排查时看不出「模型压根没回话」。 */
+  empty: 'failEmpty' };
 function bumpFail(ev, why){
   /* 必须用 hasOwnProperty 而非直接取键：FAIL_FIELD['__proto__'] / ['constructor'] 会命中原型链
      返回 Object.prototype / Object 构造函数（均为 truthy），于是把计数写进 '[object Object]'
@@ -7486,10 +7489,10 @@ const E_OK   = { at: 0, model: '' }; // 最近一次成功调用（后台健康�
    看不出「试了几次、错在哪一条」。这里纯统计，不参与任何选路判断。
    ⚠️ 不做熔断：线上 30 小时只 dead 过 1 次、日流量 4~10 个任务，加状态机不划算（10-21 定案）。
    按 PT 日滚动，与配额重置同步 —— 用本地日会在下午三点错位一天。 */
-const E_DIAG = { day: '', fail: 0, lastErr: '', lastErrAt: 0 };
+const E_DIAG = { day: '', fail: 0, empty: 0, lastErr: '', lastErrAt: 0 };
 function eDiagRoll(){
   const d = ptDateStr();
-  if (E_DIAG.day !== d) { E_DIAG.day = d; E_DIAG.fail = 0; }
+  if (E_DIAG.day !== d) { E_DIAG.day = d; E_DIAG.fail = 0; E_DIAG.empty = 0; }
 }
 const E_TTL  = 3 * 60 * 1000;        // 闲置多久视为任务已结束（与 D_TIER_TTL 同一取舍）
 const E_RPM_WIN = 60000;
@@ -7576,7 +7579,7 @@ function eClearAll(){
   E_OK.at = 0; E_OK.model = '';
   E_COOLDOWN.until = 0;   // v0.9.365：冷却一起清（配置换了，旧冷却的归因已失效）
   /* v0.9.354：清配置就是「当它没配过」，旧失败计数留着会让新配置一上来就顶着红灯 */
-  E_DIAG.day = ''; E_DIAG.fail = 0; E_DIAG.lastErr = ''; E_DIAG.lastErrAt = 0;
+  E_DIAG.day = ''; E_DIAG.fail = 0; E_DIAG.empty = 0; E_DIAG.lastErr = ''; E_DIAG.lastErrAt = 0;
 }
 /* 后台状态灯：当前占用 / 最近成功 / 本分钟已发几次（只给已鉴权的 /api/admin/config 用）
    v0.9.365：带 cfg —— 顺带算「此刻在不在晚高峰窗口」与冷却剩余；E 配齐时探一次桥接活性。 */
@@ -7592,7 +7595,7 @@ function eStatus(cfg){
   /* v0.9.354：带上失败次数与最后一条错误（后台健康灯的第二个判据）
      v0.9.365：加 offHours / coolUntil / bridge（E 槽自己的节奏，后台一眼看全） */
   return { busy: E_OWN.task || '', okAt: E_OK.at || 0, okModel: E_OK.model || '', rpm: n, lastAt: E_LAST.at || 0,
-           fail: E_DIAG.fail || 0, lastErr: E_DIAG.lastErr || '', lastErrAt: E_DIAG.lastErrAt || 0,
+           fail: E_DIAG.fail || 0, empty: E_DIAG.empty || 0, lastErr: E_DIAG.lastErr || '', lastErrAt: E_DIAG.lastErrAt || 0,
            offHours: eOffHoursHit(cfg) ? 1 : 0, coolUntil: E_COOLDOWN.until || 0,
            bridge: bridge ? { ok: !!bridge.ok, ms: bridge.ms || 0, pending: !!bridge.pending } : null };
 }
@@ -7673,6 +7676,10 @@ function eTaskFail(taskId, err){
      与「cookie 掉了等不来」分开对待 —— 一次判死但走全局冷却（等得住，对症）。 */
   const soft = (err && err.name === 'AbortError') || /timeout|timed? ?out|abort|ETIMEDOUT|EAI_AGAIN/i.test(msg);
   const rate = /\b(?:405|429|5\d\d)\b|upstream|redirect|sorry|rate.?limit/i.test(msg);
+  /* v0.9.380：空正文。一次即判死 —— 它不像超时那样「再等等可能就好」，
+     而是这条链路此刻压根不出货；本批已由回退链接住，继续给它机会只会再空转一轮。 */
+  const empty = !!(err && err._empty);
+  if (empty) { try { eDiagRoll(); E_DIAG.empty++; } catch (e0) {} }
   const need = soft ? 2 : 1;
   if (rec.fail >= need) {
     rec.on = -1; rec.why = 'dead';
@@ -7684,7 +7691,7 @@ function eTaskFail(taskId, err){
        （当日 10 个任务白交 10 次学费）。风控会自愈，冷却正好对症；
        连接拒绝 / DNS / 401 仍不冷却（那类等不来，多等只会误伤调度）。
        cfg 现读而非传参 —— eTaskFail 的签名被 354 断言钉死，且这里一天也走不到几次。 */
-    if (soft || rate) {
+    if (soft || rate || empty) {
       const cd = eCooldownMs(readConfig());
       if (cd > 0) E_COOLDOWN.until = Date.now() + cd;
     }
@@ -8121,6 +8128,21 @@ async function callModel(cfg, messages, maxTokens, opts){
   throw lastErr;
 }
 
+/* v0.9.380：上游回 200 但正文为空 —— 网页桥接（E）最典型的失败形态，其它槽也可能遇到。
+   此前这种响应当「成功」原样透传给前端：服务端顺手把 E 记成健康（E_OK 更新、冷却清零、
+   连续失败计数归零），前端拿到空串只能整批重试，3 次全空后再逐组补救 ——
+   一次空响应被放大成 N 个请求。10-25 实测：E 连撞 3 小时、367 次补救，源头就是这条路径。
+   ⚠️ 判定放在这里而不是 callModel 里：只有路由知道「这批该不该继续」以及回退链怎么走。 */
+function modelOutEmpty(out){
+  if (!out || typeof out !== 'object') return true;
+  if (out.wait) return false;                       // v0.9.183 的排队回执，不是空响应
+  const ch = out.choices;
+  if (!Array.isArray(ch) || !ch.length) return true;
+  const m = ch[0] && ch[0].message;
+  const c = m && m.content;
+  return !String(c == null ? '' : c).trim();
+}
+
 /* ---------------- 路由 ---------------- */
 const server = http.createServer(async (req, res) => {
   /* v0.9.284：基础安全响应头，对所有响应统一生效。
@@ -8406,6 +8428,15 @@ const server = http.createServer(async (req, res) => {
         const out = pick.which === 'D'
           ? await callModelD(cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }), dTaskId)
           : await callModel(pick.cfg, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: pick.which === 'E' ? CALL_BUDGET_E_MS : CALL_BUDGET_MS }));
+        /* v0.9.380：空正文一律当失败 —— 必须排在下面「E 成功」记账之前。
+           否则空响应会被记成 E 健康（E_OK / 冷却清零 / 失败计数归零），
+           链路明明不出货，调度却一直往它身上派任务，就是这个顺序造成的。
+           抛进 catch 后：E 侧 markDead → 本批由回退链（C→B→A）接住，用户无感。 */
+        if (modelOutEmpty(out)) {
+          const e0 = new Error('Upstream empty content (' + pick.which + ' ' + String(slotModelName || '') + ')');
+          e0._empty = 1; e0._status = 200; e0._rl = out && out._rl;
+          throw e0;
+        }
         /* v0.9.350：E 的成功时间只用于后台健康灯（cookie 掉了要能一眼看出）
            v0.9.357：成功一次就把该任务的连续失败计数清零 —— 否则「2 次才判死」会变成
            「历史上失败过 2 次就死」，跑一整天必然误杀。 */
@@ -8477,6 +8508,14 @@ const server = http.createServer(async (req, res) => {
             try {
               const slotFb = slotCfg(cfg, fb);
               const outF = await callModel(slotFb, body.messages, undefined, Object.assign({}, jsonOpts, { signal: cliAc.signal, timeoutMs: CALL_BUDGET_MS }));
+              /* v0.9.380：回退这一级也可能返空。不判的话会把这个「空成功」当成回退成功发给前端，
+                 于是一边记着「已回退到 B」，一边让用户去看一批空内容。 */
+              if (modelOutEmpty(outF)) {
+                const eF = new Error('Upstream empty content (' + fb + ' ' + String(slotFb.model || '') + ')');
+                eF._empty = 1;
+                lastErr = eF;
+                continue;
+              }
               try {
                 markEvent(ip, Object.assign({}, body.meta || {}, {
                   model: slotModelName, usedModel: slotFb.model, msg: String(e.message || '').slice(0, 200)
@@ -8497,9 +8536,11 @@ const server = http.createServer(async (req, res) => {
               return sendJson(res, 200, outF);
             } catch (e3) { lastErr = e3; }
           }
-          return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + lastErr.message } });
+          /* v0.9.380：空正文用独立错误码 —— 前端据此把它单列成 failEmpty，
+             而不是靠散文文案匹配（errEmpty 是多语言文案，非中文界面永远匹配不上）。 */
+          return sendJson(res, 502, { error: { code: (lastErr && lastErr._empty) ? 'upstream_empty' : 'upstream_error', message: 'Default model call failed: ' + lastErr.message } });
         }
-        return sendJson(res, 502, { error: { code: 'upstream_error', message: 'Default model call failed: ' + e.message } });
+        return sendJson(res, 502, { error: { code: (e && e._empty) ? 'upstream_empty' : 'upstream_error', message: 'Default model call failed: ' + e.message } });
       } finally {
         if (tookInflight) inflightFree(ip); // 成功 / 回退 / 失败，都要把在途名额还回去
       }
