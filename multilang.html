@@ -1345,7 +1345,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.382</span>
+    <span class="ver-tag">v0.9.384</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1403,6 +1403,8 @@ crossorigin="anonymous"></script>
         <button class="btn sm" id="mlAddBtn" type="button">+ 加入队列</button>
       </div>
       <div class="ml-chips" id="mlChips"></div>
+      <!-- v0.9.383：源语言 == 目标语言的常驻提示（非阻塞，只是提醒，不改动任何流程） -->
+      <div class="hint" id="langSameHint" style="display:none"></div>
             </div>
 
       <!-- ===== 任务矩阵 ===== -->
@@ -2017,10 +2019,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.382"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.382"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.382"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.382"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.384"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.384"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.384"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.384"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2378,6 +2380,8 @@ function applyI18n(){
   if (typeof buildProviderOptions === 'function') buildProviderOptions(); // 服务商分组的组标签跟随界面语言
   const ao = document.querySelector('#srcLang option[value=auto]');
   if (ao) ao.textContent = t('autoDetect');
+  /* v0.9.383：换界面语言时这句提示要跟着换（它不在 data-i18n 体系里，得手动刷） */
+  if (typeof sameLangHintSync==='function') sameLangHintSync();
   if (typeof renderRows==='function') renderRows();
   if (typeof styleUI==='function') styleUI();
   if (typeof termsUI==='function') termsUI();
@@ -3436,29 +3440,29 @@ const EX_SAMPLE = {
   'as':{dash:'- আহিছা?\\n- ঠিক পিছতে আছোঁ।', lyric:'[1] মোক ঘরলৈ লৈ যা [2] আজি রাতি', plain:'কাইলৈ দেখা হ’ব।'},
   'kk':{dash:'- Келесің бе?\\n- Дәл артыңдамын.', lyric:'[1] Мені үйге апар [2] бүгін кешке', plain:'Ертең кездесеміз.'},
   'uz':{dash:'- Kelyapsanmi?\\n- Aynan orqangdaman.', lyric:'[1] Meni uyga olib ket [2] bugun kechqurun', plain:'Ertaga ko‘rishguncha.'},
-  'mn':{dash:'- Ирж байна уу?\\n- Яг ард чинь байна.', lyric:'[1] Намайг гүрт минь хүргээд өг [2] өнөө орой', plain:'Маргааш уулзая.'},
+  'mn':{dash:'- Ирж байна уу?\\n- Яг ард чинь байна.', lyric:'[1] Намайг гэрт минь хүргээд өг [2] өнөө орой', plain:'Маргааш уулзая.'},
   'az':{dash:'- Gəlirsən?\\n- Düz arxandayam.', lyric:'[1] Məni evə apar [2] bu gecə', plain:'Sabah görüşərik.'},
   'is':{dash:'- Kemurðu?\\n- Rétt á eftir þér.', lyric:'[1] Farðu með mig heim [2] í kvöld', plain:'Sjáumst á morgun.'},
   'et':{dash:'- Tuled?\\n- Otse su taga.', lyric:'[1] Vii mind koju [2] täna õhtul', plain:'Näeme homme.'},
   'lv':{dash:'- Nāc?\\n- Tūlīt aiz tevis.', lyric:'[1] Aizved mani mājās [2] šovakar', plain:'Tiksimies rīt.'},
-  'lt':{dash:'- Ateini?\\n- Tuoj pat už tavęs.', lyric:'[1] Parsivežk mane namo [2] šįvakar', plain:'Iki rytojaus.'},
+  'lt':{dash:'- Ateini?\\n- Tuoj pat už tavęs.', lyric:'[1] Parsivešk mane namo [2] šįvakar', plain:'Iki rytojaus.'},
   'sl':{dash:'- Prideš?\\n- Takoj za tabo.', lyric:'[1] Pelji me domov [2] nocoj', plain:'Se vidimo jutri.'},
   'sq':{dash:'- Vjen?\\n- Menjëherë pas teje.', lyric:'[1] Më ço në shtëpi [2] sonte', plain:'Shihemi nesër.'},
   'mk':{dash:'- Доаѓаш?\\n- Веднаш зад тебе.', lyric:'[1] Однеси ме дома [2] вечерва', plain:'Се гледаме утре.'},
   'eu':{dash:'- Etorriko zara?\\n- Zure atzean bertan.', lyric:'[1] Eraman nazazu etxera [2] gaur gauean', plain:'Bihar arte.'},
   'gl':{dash:'- Vés?\\n- Xusto detrás de ti.', lyric:'[1] Levaime á casa [2] esta noite', plain:'Vémonos mañá.'},
-  'am':{dash:'- ትመጣለህ?\\n- ከዋላህ ነን።', lyric:'[1] ወደ ቤት ውሰደኛ [2] ዝረ ማታ', plain:'ነገ እንገናኝ።'},
-  'ha':{dash:'- Kana zuwa?\\n- Daidai bayanka.', lyric:'[1] Kai ni gida [2] daren nan', plain:'Sai gobe.'},
+  'am':{dash:'- ትመጣለህ?\\n- ከኋላህ ነኝ።', lyric:'[1] ወደ ቤት ውሰደኝ [2] ዛሬ ማታ', plain:'ነገ እንገናኝ።'},
+  'ha':{dash:'- Kana zuwa?\\n- Daidai bayanka.', lyric:'[1] Mai da ni gida [2] a daren nan', plain:'Sai gobe.'},
   'yo':{dash:'- Ṣe o n bọ?\\n- Lẹ́sẹ̀kẹ́sẹ̀ lẹ́yìn rẹ.', lyric:'[1] Mú mi lọ sílé [2] lálẹ́ yíí', plain:'A ó pàdé lọ́la.'},
-  'zu':{dash:'- Uyeza?\\n- Ngemuva kwakho nje.', lyric:'[1] Ngise ekhaya [2] kulobu busuku', plain:'Sizobonana kusasa.'},
+  'zu':{dash:'- Uyeza?\\n- Ngemuva kwakho nje.', lyric:'[1] Ngihambise ekhaya [2] namuhla ebusuku', plain:'Sizobonana kusasa.'},
   'so':{dash:'- Ma imanaysaa?\\n- Waxaan ahay gadaashaada.', lyric:'[1] Guriga i gee [2] caawa', plain:'Berri ayaan kulmi doonaa.'},
   'ps':{dash:'- راځې؟\\n- ستا په شا کې یم.', lyric:'[1] ما کور ته یوسه [2] نن شپه', plain:'سبا به سره وګورو.'},
-  'ku':{dash:'- دێیت؟\\n- ڕاست لە دواوەتەوەم.', lyric:'[1] بمبەرەوە ماٵەوە [2] ئەم شەوە', plain:'سبەی دەبینینەوە.'},
+  'ku':{dash:'- دێیت؟\\n- ڕاست لە دواوەتەوەم.', lyric:'[1] بمبەرەوە ماڵەوە [2] ئەم شەوە', plain:'سبەی دەبینینەوە.'},
   'af':{dash:'- Kom jy?\\n- Net agter jou.', lyric:'[1] Vat my huis toe [2] vanaand', plain:'Sien jou môre.'},
   // v0.9.338 新增 25 种：对白 / 歌词 / 普通句 三条真实译文样本（与上面三批同口径）
   'yue':{dash:'- 你嚟唔嚟？\\n- 就喺你後面。', lyric:'[1] 帶我返屋企 [2] 今晚', plain:'聽日見。'},
   'be':{dash:'- Ідзеш?\\n- Адразу за табой.', lyric:'[1] Забяры мяне дамоў [2] сёння ўвечары', plain:'Да заўтра.'},
-  'tg':{dash:'- Меоед?\\n- Рост дар паси шумо.', lyric:'[1] Маро ба хона бар [2] имшаб', plain:'Пагоҳ мебинем.'},
+  'tg':{dash:'- Меоӣ?\\n- Рост дар паси ту.', lyric:'[1] Маро ба хона бар [2] имшаб', plain:'Пагоҳ вомехӯрем.'},
   'ky':{dash:'- Келесиңби?\\n- Дароо артыңдамын.', lyric:'[1] Мени үйгө алып бар [2] бүгүн кечинде', plain:'Эртең көрүшкөнчө.'},
   'tk':{dash:'- Gelýäňmi?\\n- Göni yzyňda.', lyric:'[1] Meni öýe äkit [2] şu gije', plain:'Ertir görüşeris.'},
   'bs':{dash:'- Dolaziš?\\n- Tačno iza tebe.', lyric:'[1] Vodi me kući [2] večeras', plain:'Vidimo se sutra.'},
@@ -3474,11 +3478,11 @@ const EX_SAMPLE = {
   'yi':{dash:'- קומסטו?\\n- גלייך הינטער דיר.', lyric:'[1] נעם מיך אהיים [2] היינט ביי נאכט', plain:'זען מיר זיך מארגן.'},
   'jv':{dash:'- Arep melu?\\n- Tepak ing mburimu.', lyric:'[1] Gawa aku mulih [2] bengi iki', plain:'Ketemu sesuk.'},
   'su':{dash:'- Arek indit?\\n- Persis di tukangeun anjeun.', lyric:'[1] Bawa ka imah [2] peuting ieu', plain:'Patepang isukan.'},
-  'ceb':{dash:'- Moanhi ka?\\n- Tuo ra sa imong likod.', lyric:'[1] Dad-a ko sa balay [2] karong gabhiona', plain:'Magkita ta ugma.'},
+  'ceb':{dash:'- Moanhi ka?\\n- Ania ra sa imong likod.', lyric:'[1] Dad-a ko sa balay [2] karong gabhiona', plain:'Magkita ta ugma.'},
   'mg':{dash:'- Ho avy ve ianao?\\n- Eo aorianao ihany.', lyric:'[1] Ento mody aho [2] anio alina', plain:'Mifankahita rahampitso.'},
   'ig':{dash:'- Ị na-abịa?\\n- N\'azụ gị kpọmkwem.', lyric:'[1] Kpọla m laa n\'ụlọ [2] n\'abalị a', plain:'Ka anyị zute echi.'},
-  'xh':{dash:'- Uyeza?\\n- Ndikanye emva kwakho.', lyric:'[1] Ndise ekhaya [2] ngobu busuku', plain:'Sobonana ngomso.'},
-  'sn':{dash:'- Uri kuuya here?\\n- Ndakarurama shure kwako.', lyric:'[1] Ndisvitsa kumba [2] nhasi manheru', plain:'Tichaonana mangwana.'},
+  'xh':{dash:'- Uyeza?\\n- Ndikanye emva kwakho.', lyric:'[1] Ndihambise ekhaya [2] ngobu busuku', plain:'Sobonana ngomso.'},
+  'sn':{dash:'- Uri kuuya here?\\n- Ndiri kumashure kwako.', lyric:'[1] Ndisvitsa kumba [2] nhasi manheru', plain:'Tichaonana mangwana.'},
   'ny':{dash:'- Uli kubwera?\\n- Ndili pompopo kumbuyo kwako.', lyric:'[1] Nditengere kunyumba [2] usiku uno', plain:'Tidzaonana mawa.'},
   'mi':{dash:'- Kei te haere mai koe?\\n- Kei muri tonu i a koe.', lyric:'[1] Haria ahau ki te kāinga [2] i tēnei pō', plain:'Ka kite anō āpōpō.'},
 };
@@ -4428,6 +4432,13 @@ function failWhyOf(msg){
   if (/JSON|Unexpected|errNoGroups|errNoGno|组/i.test(s)) return 'json';
   return 'other';
 }
+/* v0.9.383：缺号补译的止损阈值。**任务级**，不是批级 —— 单批最多补一次，
+   单批数据看不出效率，只有跨批累计的「尝试 / 救回」比值才说明这条路走不走得通。
+   两数怎么定：线上 381 埋点里正常任务补译修复率 93%（30 试 28 中），
+   而一个 276 句的 en→en 任务 172 试只中 3 条（1.7%）。15% 落在两者中间的空档里，
+   留足余量；15 次是让比值有统计意义的最小样本（低于它宁可不动手）。 */
+const GAP_TRY_MIN = 15;    /* 累计补译尝试达到这么多次才开始评估 */
+const GAP_EFF = 0.15;      /* 修复率低于此值 → 判定补译对本任务无效 */
 async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
@@ -4638,7 +4649,8 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
      v0.9.377：粒度从句组改成 cue 编号——平铺输出缺的就是编号，补译也只发这些编号。 */
   let missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(c=>cMap[c.no]==null));
   let missSet = gapSet();
-  if(missSet.size && missSet.size < totalUnits){
+  // v0.9.383：止损后不再发补译请求——已经证明补了也补不回来，再问只是纯烧钱
+  if(missSet.size && missSet.size < totalUnits && !S.gapAbort){
     try{
       /* v0.9.379：埋点。此前这条通道触发多少次、救回多少条完全没有记录，
          所有关于"要不要继续投入"的判断只能靠猜。三个数回答三件事：
@@ -5238,7 +5250,7 @@ function reportEvent(ev, extra, fmt, meta){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
       /* v0.9.375：编号级样本只在 finish 带一次 */
       cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
@@ -5436,7 +5448,7 @@ async function runTranslate(){
   S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.locale=cfg.dst;
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：编号样本与重试修复率随任务重置
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：编号样本与重试修复率随任务重置
   $('btnGo').disabled=true;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -5877,6 +5889,21 @@ async function runTranslate(){
           if(bi===0 || deadStreak>=2){ S.modelDead=true; S.stop=true; }
         } else if(saved>0) deadStreak=0;
       }
+      /* v0.9.383：补译止损。缺号补译成立的前提是「再问一次模型就能把编号补上」。
+         源语言 == 目标语言时这个前提系统性失效：模型认为原文无需翻译，编号永远补不齐，
+         于是每批都「补译 → 仍缺 → 判死 → 整批重发 → 再补译」无限空转，
+         而**每批都有部分组成功**，正是这一点让它绕开了全部既有熔断 ——
+         上面 5645 的 consecFail 与 5652 的 deadStreak 判的都是「整批零成功」，
+         这里 got1 / saved>0 恒为真，两个计数器一直被清零，熔断永远不触发。
+         线上实测（v0.9.381 埋点）：276 句的 en→en 任务 172 次补译尝试只救回 3 条（1.7%），
+         最后是用户手动停的；同期正常任务修复率 93%（30 试 28 中）。
+         到阈值就停：继续跑下去每批都会重复同样的失败，早停早告诉用户原因。 */
+      if(!S.stop && !S.gapAbort && (S.gapTryN||0) >= GAP_TRY_MIN
+         && (S.gapFixN||0) < (S.gapTryN||0)*GAP_EFF){
+        S.gapAbort=1;
+        log(t('gapAbort', S.gapTryN, S.gapFixN), 'err');
+        S.stop=true; break;
+      }
       // v0.9.62：批末更新跨批上下文——取本批末尾最多 3 个有实义译文的句组（截到 300 字控 token）
       // v0.9.74：2 → 3 组。字符预算切批后长句素材（120字/条）批数变多、衔接链条变长，
       //   每批多带一句前文的代价极小，可缓解语气/称谓在长链条上缓慢漂移
@@ -6163,6 +6190,15 @@ async function runTranslate(){
       S.modelDead=false;
       log(t('errModalTitle'),'err');
       try{ showErrModal(t('errModalTitle'), t('errModalBody')); }catch(_){}
+    }
+    /* v0.9.383：补译止损 —— 与 modelDead 分开，两件事的处理建议完全不同：
+       那边是模型压根不响应（建议换 API / 稍后再试），这边是模型有响应、
+       但它认为原文无需翻译（最可能就是源语言 == 目标语言，建议去检查语言设置）。
+       共用一套文案会把人往错误的方向带。 */
+    if(S.gapAbort){
+      S.gapAbort=0;
+      log(t('gapAbortTitle'),'err');
+      try{ showErrModal(t('gapAbortTitle'), t('gapAbortBody')); }catch(_){}
     }
   }
 }
@@ -6736,6 +6772,8 @@ function mlRender(){
     /* 队列落盘：下次打开页面语言还在（配合按语言分槽的断点，才算真的「接着做」） */
     try{ localStorage.setItem('srt_ml_langs', JSON.stringify(ML.langs)); }catch(e){}
   }
+  /* v0.9.383：目标语言队列变了要重算「源 == 目标」提示（ chips 增删都走这里） */
+  if(typeof sameLangHintSync==='function') sameLangHintSync();
   mlRenderFiles();
 }
 /* 文件队列：多集时用户必须看得见「一共几集、每集几条、哪集已经跑完」。 */
@@ -7422,7 +7460,7 @@ function setSrc(text, fileName){
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }
@@ -9348,8 +9386,34 @@ ASS_CTX.layout = assLayoutCtx(); ASS_CTX.lang = assLangCtx();
 syncColorSw('assDstColor'); syncColorSw('assSrcColor');
 /* v0.9.220：描边色方块初始同步（回填的存档值也要显色；此前 id 写错导致这里压根没绑上） */
 syncColorSw('assDstOutlineColor'); syncColorSw('assSrcOutlineColor');
-$('srcLang').addEventListener('change',()=>{ setColLabels(); save(); });
-$('dstLang').addEventListener('change',()=>{ UI.dstManual=true; setColLabels(); save(); });
+/* v0.9.383：源语言 == 目标语言 → 在语言选择器下面常驻提示一句（非阻塞，不拦人）。
+   为什么不做自动识别：franc 那类统计法拿项目自带的真实语料（100 语 × 3 句短字幕）实测，
+   限定候选后仍有 25% 会被判成别的语言（hi→mar、bg→bos、nl→afr、ms→ind…），
+   而且它**从不返回「我不知道」**——一个四分之一概率瞎说的提示，不如不给。
+   但「用户自己选了源 = 目标」这条信息 100% 准确，不需要猜，值得直接说出来。
+   为什么不拦：用户可能就是想同语言润色/改写，觉得没错继续就行，流程一步不改。 */
+function sameLangHintSync(){
+  var el=document.getElementById('langSameHint'); if(!el) return;
+  var s=(document.getElementById('srcLang')||{}).value||'';
+  var msg='', warn=false;
+  if(s && s!=='auto'){
+    /* 多语言页的目标是 chips 队列（ML.langs），单语页是 dstLang 下拉 —— 两页共用这一段 */
+    var hit=(typeof ML!=='undefined' && ML && Array.isArray(ML.langs))
+      ? ML.langs.indexOf(s)>=0
+      : (s===((document.getElementById('dstLang')||{}).value||''));
+    if(hit){ msg=t('sameLangHint', LBY(s).zh||s); warn=true; }
+  } else if(s==='auto'){
+    /* 自动检测时无从判断是否同语言，退一步提醒「建议手动指定」：
+       手动选了才谈得上准确提醒，也才谈得上后面那一串省下来的无效重译。 */
+    msg=t('srcAutoHint');
+  }
+  el.textContent=msg;
+  el.style.display=msg?'':'none';
+  el.className='hint'+(warn?' alert':'');
+}
+$('srcLang').addEventListener('change',()=>{ setColLabels(); sameLangHintSync(); save(); });
+$('dstLang').addEventListener('change',()=>{ UI.dstManual=true; setColLabels(); sameLangHintSync(); save(); });
+sameLangHintSync();
 
 /* 其余字段自动保存 */
 /* v0.9.232：温度与转发开关也要跟着存档（此前只有 base/model/key/extra/terms/mode/maxW） */

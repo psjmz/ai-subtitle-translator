@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.382';
+const ASSET_VER = '0.9.384';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -616,7 +616,9 @@ const CUE_ERR_FIELDS = ['cueEmpty','cueMissing','cueDup','cueUnknown','cueBadEnt
    与 CUE_ERR_FIELDS 同为写死白名单：绝不按前端传来的字符串动态建字段。 */
 /* v0.9.381：thinN = 分配失衡条数（跨条语序重排后某条只剩虚词/符号）。
    与 CUE_ERR_FIELDS 同为写死白名单：绝不按前端传来的字符串动态建字段。 */
-const GAP_FIELDS = ['gapTryN','gapFixN','gapGiveUpN','shortDropKeepN','lyricShortN','thinN'];
+/* v0.9.383：gapAbortN = 补译止损是否触发（1/0）。有了它才能回答「线上到底有没有再出现
+   那种试到 235 次才停的任务」，以及止损阈值定得对不对。 */
+const GAP_FIELDS = ['gapTryN','gapFixN','gapGiveUpN','shortDropKeepN','lyricShortN','thinN','gapAbortN'];
 function gapFields(meta){
   const o = {};
   for (const k of GAP_FIELDS) {
