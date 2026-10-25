@@ -1341,6 +1341,37 @@
     return false;
   }
 
+  /* v0.9.381：译文「被掏空」判定——整句内容跨条重新分配后，某条只分到虚词、或只剩符号。
+     ⚠️ 这不是错误：跨条重排本身是目标语言语序的必然结果（「因为下雨／所以我们没去」→
+        「We didn't go／because it rained」），必须放过。这里只抓「分配失衡」——某条被搬到
+        几乎没有内容，字幕一闪而过读不出东西。
+     判据刻意保守，只认两种：① 去掉标点/符号后为空；② 整条全部由功能词构成（≤3 个词）。
+     不用「长度 ≤2」这类数值判据：会误杀 "No." / "好。" / "是的" 这些正常短答。 */
+  const FUNC_WORDS = new Set([
+    /* en —— 不含 no/yes/i/you 等单独成句也正常的词 */
+    'the', 'a', 'an', 'of', 'and', 'or', 'to', 'in', 'on', 'at', 'it', 'is', 'are', 'was', 'were',
+    'be', 'been', 'that', 'this', 'but', 'so', 'if', 'as', 'by', 'for', 'with', 'from',
+    'do', 'does', 'did', 'will', 'would', 'can', 'could',
+    /* zh —— 不含 是/对/好/行 等单独作回答的词（「是的」是正常回答，不能判空壳） */
+    '的', '了', '和', '与', '就', '都', '也', '在', '吗', '呢', '吧', '着', '过', '把', '被',
+    '给', '而', '且', '则', '之', '其',
+    /* ja */
+    'の', 'は', 'が', 'を', 'に', 'で', 'と', 'も', 'や', 'へ', 'から', 'まで', 'より',
+    'です', 'ます', 'だ', 'た', 'て', 'し', 'な', 'ね', 'よ', 'か'
+  ]);
+  function thinCue(text) {
+    const t = String(text == null ? '' : text).trim();
+    if (!t) return false;
+    const bare = t.replace(/[\s\p{P}\p{S}]/gu, '');
+    if (!bare) return true;                       // 只剩标点 / 符号
+    const toks = t.toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+    if (!toks.length) return true;
+    if (toks.length <= 3 && toks.every((w) => FUNC_WORDS.has(w))) return true;
+    /* 中日韩无空格，整条被当成 1 个 token —— 逐字判（仅 ≤2 字时启用，避免长句误判） */
+    if (bare.length <= 2 && Array.from(bare).every((ch) => FUNC_WORDS.has(ch))) return true;
+    return false;
+  }
+
   // 去掉文本内嵌的 [音乐] 等提示词
   function stripSoundTags(text) {
     const re = new RegExp('\\s*[\\[【\\(（][^\\]】\\)）]*(?:' + SOUND_HINTS.join('|') + ')[^\\[【\\(（]*[\\]】\\)）]\\s*', 'g');
@@ -2865,7 +2896,7 @@
     opts = opts || {};
     const errs = [];
     const texts = new Map();
-    const cpsWarns = [], wideWarns = [];
+    const cpsWarns = [], wideWarns = [], thinWarns = [];
     const fillerSet = opts.fillerSet || new Set();
     const maxW = opts.maxW || 21;
     if (!Array.isArray(outCues)) return { ok: false, errs: ['NO_CUES_ARRAY'], texts, cpsWarns, wideWarns };
@@ -2900,12 +2931,18 @@
         }
         const w = textWidth(text);
         if (w > maxW * 2) wideWarns.push({ no, w: +w.toFixed(1) });
+        /* v0.9.381：分配失衡软统计——原文这条有实义（去标点 ≥6 字符）而译文只剩功能词。
+           只记不判错：ok 不看 thinWarns，不会因此触发重译。 */
+        if (thinCue(text)) {
+          const sb = String(src.text == null ? '' : src.text).replace(/[\s\p{P}\p{S}]/gu, '');
+          if (sb.length >= 6) thinWarns.push({ no, srcLen: sb.length, out: text });
+        }
       }
     }
     const missing = [];
     for (const c of cues) if (!seen.has(c.no) && !fillerSet.has(c.no)) missing.push(c.no);
     if (missing.length) errs.push('MISSING_' + missing.join(','));
-    return { ok: errs.length === 0, errs, texts, cpsWarns, wideWarns };
+    return { ok: errs.length === 0, errs, texts, cpsWarns, wideWarns, thinWarns };
   }
 
   return {
@@ -2923,7 +2960,7 @@
     groupSentences, splitByDuration, mergeableGroup,
     splitTextNatural, splitAligned, splitSrcByOwnLines, splitCues, buildBilingual, buildBilingualParts, isSpeakerText,
     buildMonoParts, collapseThinTail, joinSeg, effChars, foldSpeakerLines,
-    validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign,
+    validateItems, anchorOk, fixMixedChars, panguSpace, validateCueAlign, thinCue,
     cpsOf, cpsLimitOf, readingSpeedIssues, CPS_LIMITS, MIN_DUR_MS,
     musicLost, isPureHumming, normalizeMusic, splitMusicLines, RE_MUSIC, repairSpeakerLines, mirrorSpeakerLines,
     setMusicMarks, getMusicMarks, musicRe, balanceInlineTags,   // v0.9.129

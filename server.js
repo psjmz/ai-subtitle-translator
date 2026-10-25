@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.380';
+const ASSET_VER = '0.9.381';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -448,8 +448,11 @@ function markEvent(ip, meta, ev){
            删掉，否则会出现「cueMissing=0 却挂着 UNKNOWN 样本」的记录，分析时自相矛盾。
            Object.assign 不会删键，只能显式 delete。 */
         const cs = cueSampleField(meta);
-        Object.assign(e, dropFields(meta), cueErrFields(meta), cs);
+        /* v0.9.381：分配失衡样本同口径——本次没有就得删旧键，否则会出现「thinN=0 还挂着样本」 */
+        const th = thinSampleField(meta);
+        Object.assign(e, dropFields(meta), cueErrFields(meta), gapFields(meta), cs, th);
         if (!cs.cueSample) delete e.cueSample;
+        if (!th.thinSample) delete e.thinSample;
         /* v0.9.351：用户点停止也会走到 finish（批次循环 break 后照常收尾），
            以前后台看不出「真跑完」和「被停掉」。续跑真跑完后要能清掉旧标记。 */
         if (meta.stopped) e.stopped = 1; else delete e.stopped;
@@ -488,7 +491,7 @@ function markEvent(ip, meta, ev){
      （典型是「完成」之后「下载」）匹配不到自己那条，又新建一条：后台看到两条同任务的记录、
      下载次数恒为 1，v0.9.244 新加的导出格式计数也被拆到两条里（同一单导了 SRT 又导 ASS 看不出来）。 */
   if (f.task) lite.taskId = f.task;
-  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta), cueSampleField(meta)); if (meta.stopped) lite.stopped = 1; }
+  if (ev === 'finish') { lite.finishedAt = now; Object.assign(lite, dropFields(meta), cueErrFields(meta), cueSampleField(meta), thinSampleField(meta)); if (meta.stopped) lite.stopped = 1; }
   /* v0.9.244：自带 Key 用户同样记导出格式（这条记录是本次上报新建的，计数从 1 起） */
   else if (ev === 'download') {
     lite.downloads = 1; lite.downloadedAt = now;
@@ -606,6 +609,21 @@ function dropFields(meta){
 /* v0.9.375：末两项是「重试修复率」的分子分母（重试过的组数 / 其中修好的组数），
    与 cue 错误计数同一套清洗口径。有了它才能算出「这一类结构错重试到底值不值」。 */
 const CUE_ERR_FIELDS = ['cueEmpty','cueMissing','cueDup','cueUnknown','cueBadEntry','cueNoArr','cueOther','cueRetryN','cueRetryFix'];
+/* v0.9.380：编号级补译 + 漏句保底的字段。
+   gapTryN/gapFixN/gapGiveUpN 是前端 v0.9.379 埋的，但当时没进 reportEvent 的 body ——
+   等于只累加不上报，后台一条都看不到，本次一并接上。
+   shortDropKeepN / lyricShortN 是本次新增的两条「静默丢内容」兜底的计数。
+   与 CUE_ERR_FIELDS 同为写死白名单：绝不按前端传来的字符串动态建字段。 */
+/* v0.9.381：thinN = 分配失衡条数（跨条语序重排后某条只剩虚词/符号）。
+   与 CUE_ERR_FIELDS 同为写死白名单：绝不按前端传来的字符串动态建字段。 */
+const GAP_FIELDS = ['gapTryN','gapFixN','gapGiveUpN','shortDropKeepN','lyricShortN','thinN'];
+function gapFields(meta){
+  const o = {};
+  for (const k of GAP_FIELDS) {
+    if (meta[k] != null) o[k] = Math.max(0, Math.min(100000, Math.floor(+meta[k] || 0)));
+  }
+  return o;
+}
 function cueErrFields(meta){
   const o = {};
   for (const k of CUE_ERR_FIELDS) {
@@ -666,6 +684,21 @@ function cueSampleField(meta){
   /* 超限整包丢弃，不存半截：半截样本会让「这批有几组」这种判断建立在残缺数据上 */
   if (JSON.stringify(out).length > CUE_SAMPLE_CHARS) return {};
   return { cueSample: out };
+}
+/* v0.9.381：分配失衡样本——跨条语序重排后某条只剩虚词/符号。
+   只收 [组号, cue编号, 原文实义长度]，**绝不收字幕文本**（与 cueSample 同口径，遥测入口不当写数据通道）。 */
+const THIN_SAMPLE_MAX = 8;
+function thinSampleField(meta){
+  if (!Array.isArray(meta.thinSample) || !meta.thinSample.length) return {};
+  const out = [];
+  for (const s of meta.thinSample.slice(0, THIN_SAMPLE_MAX)) {
+    if (!s || typeof s !== 'object') continue;
+    const g = Math.floor(+s.g), no = Math.floor(+s.no), src = Math.floor(+s.src);
+    if (!isFinite(g) || g < 0 || !isFinite(no) || no < 0) continue;
+    out.push([g, no, Math.max(0, Math.min(10000, isFinite(src) ? src : 0))]);
+  }
+  if (!out.length) return {};
+  return { thinSample: out };
 }
 function dateOfTs(ts){
   const d = new Date(ts);

@@ -1100,7 +1100,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.380</span>
+    <span class="ver-tag">v0.9.381</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1715,9 +1715,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.380"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.380"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.380"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.381"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.381"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.381"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -3182,7 +3182,10 @@ function systemPromptEn(cfg){
     + (cfg.synopsis ? 'Film context (background for your understanding only): ' + cfg.synopsis + '\n' : '')
     /* v0.9.377：与中文版同一改动的英文侧（提示词中英两套，改文案必须两处都改，只改一处等于没改） */
     + 'The input is a flat list of subtitle cues: each entry gives its cue number (no), on-screen duration in seconds (dur), and source text (src). A complete sentence may be split across several cues — any cue that continues the previous one carries a "p":"c" marker and must be read together with it; a cue without that marker is a sentence of its own.\n'
-    + 'Task: translate the source text of every cue into ' + dstNative + ' and give the translation cue by cue; when several cues belong to one sentence, their translations read in order must form one complete, fluent sentence, distributed in the word order natural for ' + dstNative + ' (not necessarily the source order).\n'
+    + 'Task: translate the source text of every cue into ' + dstNative + ' and give the translation cue by cue; when several cues belong to one sentence, their translations read in order must form one complete, fluent sentence.\n'
+    /* v0.9.381：与中文版【语序与条数】逐条对应（提示词中英两套，改文案必须两处都改）。
+       跨条重排必须保留，缺口的真正成因是「重排后没有重新切回 N 条」。 */
+    + '[Word order vs. cue count] To follow the natural expression of ' + dstNative + ', you MAY redistribute the content among the cues of that sentence and change its order — this is allowed and often necessary. But after redistributing, you must re-split the whole sentence according to the new word order into exactly N pieces, where N is the number of input cues, and every piece must carry readable, substantive content: never fold two cues into one, and never leave a cue empty or holding only a function word (the / of / and / to / の / は etc.) just to fill the count.\n'
     + 'Content genre (film/TV dialogue, documentary narration, interviews, lectures, anime, etc.) is for you to infer from the source text; keep the register and tone consistent with that genre throughout — colloquial for dialogue, formal for narration, never mixed.\n'
     + 'Rules you must follow:\n'
     + '1. [Translation style] ' + styleEn + '\n'
@@ -3191,7 +3194,9 @@ function systemPromptEn(cfg){
        模型在「一句拆多条」时会把同一句的两条 cue 写成同一个编号。
        后半句的解释从句不可省——只加一个 repeat 会被理解成「别重复内容」而不是「别复用编号」。 */
     + '2. [Output format] Return an object {"c":{...}}: the keys are the input cue numbers (copied verbatim) and the values are the ' + dstNative + ' translation of that cue. Every input cue number must appear exactly once — never merge, skip, renumber, repeat, or invent cue numbers; even when two cues belong to the same sentence, each keeps its own number and appears exactly once.\n'
-    + '   [Length control] The translation of a cue carries only the part of the meaning that belongs to that cue\'s own source text, and stays within two lines (generally no more than 20 character-widths); even when it is only half a sentence, translate just that half — never fold it into a neighboring cue, never pad it out into a full sentence.\n'
+    /* v0.9.381：与中文版【长度控制】同步——删掉「每条只承载自己那段」「never fold into a neighboring cue」，
+       它们把合法的跨条语序重排一起禁掉了。 */
+    + '   [Length control] Keep the translation of a cue within two lines (generally no more than 20 character-widths); even when it is only half a sentence, do not pad it out into a full sentence. When the sentence\'s content is redistributed across cues, every cue must still get a readable share — none may be left empty or holding only a function word.\n'
     + '   [Word-boundary splits] The split between adjacent cues must fall between words: never break a single word, fixed phrase, or inflected form in the middle (e.g. splitting Japanese なり|たい apart), never detach a bound particle or affix from the word it depends on; it is far better for one cue to run slightly longer or shorter than to split a word.\n'
     + '   [Lyrics exception] When a lyric cue\'s source text carries segment numbers like [1] [2], keep every number exactly as-is in the translation — [1] stays [1]: never translate, renumber, add, or drop segments. If the input also carries a "lyric" array (a whole lyric group already numbered), return that group as one single text via {"lyric":[{"g":<group id>,"type":"text","text":"[1] … [2] …"}]}.\n'
     + '3. [Transcription fixes] The source text may come from speech transcription and may contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (' + fixSpellEn + '), then translate. Proper names are spelling-corrected the same way before handling them per rule 4' + (cfg.keepTerms ? ' (keep the corrected original spelling, still untransliterated)' : ' (render the corrected form in ' + dstNative + ')') + '.\n'
@@ -3249,7 +3254,7 @@ function systemPromptEn(cfg){
    + 'Output only JSON (no markdown code blocks, no extra explanation):\n'
    + '{"c":{"3":"…","18":"…"},"lyric":[{"g":2,"type":"text","text":"[1] … [2] …"}],"fillers":[17,23]}\n'
    + 'Once more: every translation must be written in ' + dstNative + '; keep each text single-line (except the "- " dash-speaker structure); the keys of "c" must cover every input cue number exactly once; output JSON only, no markdown.\n'
-   + '10. [Per-cue hard constraint] Even when several cues belong to one sentence, each cue keeps its own number and appears exactly once; never fold the translation of consecutive cues into one number, never omit numbers because the sentence is unfinished. Before returning, check yourself: the number of keys in "c" must equal the number of input cues.';
+   + '10. [Per-cue hard constraint] Even when several cues belong to one sentence, each cue keeps its own number and appears exactly once; never fold the translation of consecutive cues into one number, never omit numbers because the sentence is unfinished. Before returning, check yourself on two things: (1) the number of keys in "c" must equal the number of input cues; (2) every value must contain a content word — none may be empty or consist only of function words.';
   return s;
 }
 function systemPrompt(cfg){
@@ -3273,7 +3278,12 @@ function systemPrompt(cfg){
      实证见「报告-四臂干净对照」：D1（平铺+p）与线上原样 A 结构质量打平（4/594 vs 4/594，Fisher p=1.0），
      输入 token −20%、输出 −46%，输出自身两遍逐字相同率 45.9%→58.9%。省 token 是它唯一被证实的收益。 */
   + '输入是一批字幕 cue 的平铺列表：每条给出编号（no）、屏显秒数（dur）和原文（src）。一个完整句子可能被拆在多条 cue 里——凡与上一条同属一句的 cue 都带 "p":"c" 标记，要连着上一条一起理解；不带该标记的 cue 自己就是一句。\n'
-  + '任务：把每条 cue 的原文翻译成' + dstNative + '并逐条给出译文；同属一句的多条 cue，其译文按顺序连起来必须是一个完整、通顺的句子，各条内容的分配顺序遵循' + dstNative + '的自然语序（不必沿用原文语序）。\n'
+  + '任务：把每条 cue 的原文翻译成' + dstNative + '并逐条给出译文；同属一句的多条 cue，其译文按顺序连起来必须是一个完整、通顺的句子。\n'
+  /* v0.9.381：【语序与条数】跨条重排是目标语言语序的必然结果（例：「因为下雨／所以我们没去」→ 英文
+     「We didn't go／because it rained」），禁止它会让译文生硬，所以必须保留。缺号与「某条被掏空」的真正
+     成因不是重排本身，而是旧文案只许重排、没说重排后要把整句按新语序**重新切回 N 条**——模型搬完内容
+     边界就散了。补上「重排后重新切」这一步，两个压力才有执行路径。 */
+  + '【语序与条数】为符合' + dstNative + '的表达习惯，你可以在这一组的各条 cue 之间重新分配内容、调整先后顺序——这是允许的，必要时应这样做。但重新分配之后，必须按新的语序把整句重新切成与输入条数完全相同的 N 条，每条都要有可读的实义内容：既不许把两条并成一条，也不许为了凑数把某条留空、或只放一个虚词（the / of / and / to / の / は 之类）。\n'
   + '内容体裁（影视对白、纪录片解说、访谈、讲座、动漫等）由你根据原文自行判断，并全程保持该体裁的语域与语气一致——对白用口语，解说用书面语，不得混用。\n'
   + '必须遵守：\n'
   + '1.【翻译风格】' + styleDesc(cfg) + '\n'
@@ -3284,7 +3294,11 @@ function systemPrompt(cfg){
      充裕的相邻 cue 上」是在教模型把内容挪走，执行过头就是整条被并掉——四臂实验里四个臂的并条
      全部长在批尾与长句组，与此同源。dur 字段保留（不同秒数=独立条目的锚点，去掉会引发批尾整体错位），
      但不再拿它教模型挪内容。措辞与实验 D1 臂逐字一致。 */
-  + '   【长度控制】每条 cue 的译文只承担本条原文对应的那部分意思，控制在两行以内（一般不超过 20 个字符宽度）；即使它只是半句话，也只翻这半句，不得并进相邻 cue，也不得靠补词把句子补完整。\n'
+  /* v0.9.381：【长度控制】去掉「只承担本条原文对应的那部分意思」「不得并进相邻 cue」两句——
+     它们与上面【语序与条数】的跨条重排直接对立（v0.9.377 那轮把「时长感知分配」改成这两句，
+     本意是防模型把整条内容挪走，但连合法的语序重排一起禁掉了）。改为：长度上限保留，底线改成
+     「每条都要分到可读的一部分」。 */
+  + '   【长度控制】每条 cue 的译文尽量控制在两行以内（一般不超过 20 个字符宽度）；即使它只是半句话，也不要靠补词把句子补完整。整句内容跨条重新分配后，仍要保证每条都分到可读的一部分——不允许某条被清空、或只剩虚词。\n'
   + '   【词边界切分】相邻 cue 之间的切分点必须落在词与词之间：严禁把一个词、固定词组或活用形从中间劈开（如日语「なり｜たい」这类活用形被劈成两半），严禁把助词、词缀与它所依附的词拆到两条 cue 上；宁可某条 cue 的译文略长或略短，也绝不劈词。\n'
   + '   【歌词例外】歌词分段的 cue 原文里带分段编号（如 [1] [2]）时，译文里这些编号必须原样保留——[1] 还是 [1]，严禁翻译编号、改写数字、增删或重排分段。输入里若另有 lyric 数组（整组歌词已编号的纯正文），按 {"lyric":[{"g":组号,"type":"text","text":"[1] … [2] …"}]} 返回整组一个译文。\n'
   + '3.【听写纠错】原文可能来自语音听写，可能含明显听写错误（人名、地名、机构、术语、数字、同音词等），识别后先纠正（' + fixSpellZh + '）再翻译。专名同样先纠正拼写，再按规则4处理（' + (cfg.keepTerms ? '保留纠正后的原文写法、仍不音译' : '把纠正后的形式译成' + dstNative) + '）。\n'
@@ -3344,7 +3358,7 @@ s += '5.【水词处理——默认行为是翻译】\n'
   /* v0.9.377：第 10 条与实验 D1 臂逐字一致（D1 = 平铺+p+改L9+本条硬约束，是与线上 A 打平的那一臂）。
      四臂实验里凡是「只改提示词、保留句组」的臂（G/G2/G3）全部显著更差，而平铺臂带的这条约束
      是 D1 配置的组成部分，不能只抄一半。 */
-  + '10.【逐条硬约束】即使多条 cue 属于同一句，也必须一条 cue 对应一个编号、各返回一次；严禁把连续多条 cue 的译文合并到其中一个编号上，也严禁因为句子没说完就少返回编号。返回前请自查：c 的键数必须等于输入 cues 的条数。';
+  + '10.【逐条硬约束】即使多条 cue 属于同一句，也必须一条 cue 对应一个编号、各返回一次；严禁把连续多条 cue 的译文合并到其中一个编号上，也严禁因为句子没说完就少返回编号。返回前请自查两件事：① c 的键数必须等于输入 cues 的条数；② 每条译文都含实义词，没有任何一条是空的、或只剩虚词。';
   return s;
 }
 
@@ -4399,12 +4413,52 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
       const eff = C.effChars(dropSrc);
       if(C.musicRe().test(String(g.text)) && eff > 0 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
       else if(eff >= 6 && !C.isPureHumming(g.text)) subDropGnos.push(g.gno);
+      /* v0.9.380：eff<6 但确有实词 → 保留原文，不再静默删帧。
+         上面两档都不成立时，此前是 continue 掉什么都不做 → 回填层按 explicitDrop 整组删除，
+         rows 里连 dropAiDrop 都不加（那行记的是 m.type==='drop' 才有），日志一片干净。
+         实测 effChars("Okay.")=4、"Wait!"=4 —— 这类短实义句跨不过 6 的门槛，被删就是丢帧。
+         判据用项目自有的 isFillerCue（「去除水词」开关的同一口径）：组内只要有一条 cue
+         不被判成水词，就不该删。纯水词组（Um./Yeah.）照旧删——那是用户勾这个开关的本意。
+         注意是「保留原文」而非「进救援」：救援要发一次请求，而这里原文就是完全可接受的答案。 */
+      else if(eff > 0 && !C.isPureHumming(g.text)){
+        const realCue = g.mFrames
+          ? (g.mFrames.segs||[]).some(sg=>String(sg&&sg.text||'').trim() && !C.isFillerCue(sg.text))
+          : (g.cues||[]).some(c=>String(c&&c.text||'').trim() && !C.isFillerCue(c.text));
+        if(realCue){
+          m.type='text'; m.text=dropSrc; m.cues=null;
+          /* 光改 m.type 还不够：这份 fillers 返回给外层后会并进 fillerSet，
+             最终由「应用去水词」那一遍按编号统一把行 flag='drop' 删掉——
+             编号不摘出来，前面改得再对也白改（线上实测：Wait! 照删）。
+             只摘 cue 级编号：mFrames 组本来就不进 fillers（它是整组一个 text）。 */
+          if(!g.mFrames) (g.cues||[]).forEach(c=>fillers.delete(c.no));
+          S.shortDropKeepN=(S.shortDropKeepN||0)+1;
+        }
+      }
       continue;
     }
     const txt = String(m.text||'').trim();
+    /* v0.9.380：歌词缺号检测。mFrames 组从不进 cueBadGnos 的结构校验（下方循环跳过），
+       模型少译一行时编号就缺一个，而 reassembleMusic 在「编号不全」时会改走按权重切分：
+       实测源 3 段歌词、模型只返回 [1][2] 时产出 `♪ 也许我只是想成 ♪ ♪ 为那个人 ♪ ♪ …`——
+       第 1 句被从中间劈开归到第 2 行，第 3 段源歌词彻底消失，全程没有任何通道察觉。
+       判据：只有在译文里解得出编号时才检查。不带编号 → 走权重兜底，实测把整段完整译文
+       切回 3 行是准的，不去打扰；能解出编号 → 编号必须覆盖 1..segs.length 且各自非空。
+       （全角 ［１］／【２】等变体 parseSegMarkers 已兼容。） */
     /* v0.9.348：先查「译文 = 源文」。纯拉丁译文在 CJK 目标下曾被 anchorOk 无条件放行
        （防专名误伤），实测英文源·中文目标时模型把两条 cue 并成一条翻译、后一条原样返回
        英文，两道质检全放行。sameAsSource 不依赖语言知识，英→法这类同字母体系也能抓。 */
+    if(g.mFrames && txt){
+      const want=(g.mFrames.segs||[]).length;
+      const map=C.parseSegMarkers(txt);
+      if(map && want){
+        const miss=[];
+        for(let i=1;i<=want;i++){ const v=map[i]; if(v==null||!String(v).trim()) miss.push(i); }
+        if(miss.length){
+          if(!badAnchor.includes(g.gno)) badAnchor.push(g.gno);
+          S.lyricShortN=(S.lyricShortN||0)+1;
+        }
+      }
+    }
     const srcAll = g.mFrames ? g.mFrames.plainText : g.text;
     /* v0.9.378：「照抄源文」单独记一份（badSame），判定式整体不变 ——
        badAnchor 里该有的编号一个不少，老的重译通道行为零变化。 */
@@ -4434,6 +4488,9 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.67：① 移除 speaker 豁免（提示词从未豁免 dash 组，代码侧豁免属口径不一致）；
   // ② 校验失败不再清空 m.cues——保留给回填层抢救拼接（模型部分 cue 缺文时好过整组 missing）
   const cueBadGnos = [];
+  /* v0.9.381：分配失衡软统计——跨条语序重排是允许的，但重排后某条只剩虚词/符号就是读不出内容。
+     只累加计数，不进 errs、不触发重译（重译会把合法的语序重排改坏）。先观察命中率再决定是否接拦截。 */
+  let thinN = 0; const thinSample = [];
   for(const g of send){
     if(g.mFrames || g.pureMusic || g.filler) continue;
     const m = byGno[g.gno];
@@ -4442,14 +4499,20 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     const v = C.validateCueAlign(g.cues, m.cues, {
       maxW: (S.maxW||21), cpsLimit: C.cpsLimitOf(dstV), fillerSet: fillers
     });
-    if(v.ok){ m.cueTexts = v.texts; m.cpsWarns = v.cpsWarns; m.cues = null; }
+    if(v.ok){
+      m.cueTexts = v.texts; m.cpsWarns = v.cpsWarns; m.cues = null;
+      if(v.thinWarns && v.thinWarns.length){
+        thinN += v.thinWarns.length;
+        if(thinSample.length < 8) v.thinWarns.forEach(w=>{ if(thinSample.length<8) thinSample.push({g:g.gno, no:w.no, src:w.srcLen}); });
+      }
+    }
     else { cueBadGnos.push({ gno: g.gno, errs: v.errs }); }
   }
   /* v0.9.378：同语言任务识别。只统计「可判组」——sameAsSource 对骨架 <8 字符的短句
      本来就不判（专名豁免），拿它们当分母会把命中率压下去，反而漏判。 */
   const judged = send.filter(g => C.effChars(g.mFrames ? g.mFrames.plainText : g.text) >= 8).length;
   const sameLang = sameLangHit(judged, badSame.length);
-  return { byGno, fillers, badAnchor, badSame, sameLang, musicDropGnos, subDropGnos, cueBadGnos };
+  return { byGno, fillers, badAnchor, badSame, sameLang, musicDropGnos, subDropGnos, cueBadGnos, thinN, thinSample };
 }
 
 /* v0.9.127：纯翻译模型（Hunyuan-MT 系列）逐组直译通道。
@@ -4906,7 +4969,13 @@ function reportEvent(ev, extra, fmt){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    /* v0.9.380：补号冤魂（v0.9.379 埋的三个 gap* 计数此前只累加、没上报，等于没埋）+ v0.9.380 新增
+       短实义组保底、歌词缺号。与既有 drop* 和 cue* 同为纯统计，服务端白名单读取（见 server.js GAP_FIELDS）。
+       gapTryN/gapFixN = 缺号补译的分子分母（值不值得再做第二轮，靠这个比）；gapGiveUpN = 最终判死的批数；
+       shortDropKeepN = 差点被静默删掉、改为保留原文的组数；lyricShortN = 检出歌词缺号的次数。 */
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+      /* v0.9.381：分配失衡样本（某条只剩虚词/符号）——与 cueSample 一样只在 finish 带一次 */
+      thinSample:(ev==='finish'&&S.thinSamples&&S.thinSamples.length)?S.thinSamples:undefined,
       /* v0.9.375：编号级样本只在 finish 带一次（download/copy 再带就是同一份数据重复传） */
       cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
@@ -5110,7 +5179,7 @@ async function runTranslate(){
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
   /* v0.9.375：编号级样本与重试修复率同口径随任务重置（跨任务不累加） */
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0;
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];
   $('btnGo').disabled=true;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -5417,6 +5486,13 @@ async function runTranslate(){
             } else {
               log(t('anchorRefix', out.badAnchor.length),'okc');
             }
+          }
+          /* v0.9.381：分配失衡软统计——每批校验通过后累加（跨条重排合法，只记「某条被掏空」的条数）。
+             不参与任何判定，接不接拦截等这批数据出来再说。 */
+          if(out.thinN){
+            S.thinN=(S.thinN||0)+out.thinN;
+            if(!S.thinSamples) S.thinSamples=[];
+            (out.thinSample||[]).forEach(x=>{ if(S.thinSamples.length<8) S.thinSamples.push(x); });
           }
           // v0.9.66：cue 对齐结构错组——单组隔离重发 ×2（第 2 次带结构错误反馈；实验实证一次可修复，
           // hi 天城文 2 结构错 → 重试清零）。仍败则该组按旧格式回落：重发结果若无 cueTexts 但有 text
@@ -6107,7 +6183,7 @@ function setSrc(text, fileName){
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0;   // v0.9.375：换片即清，样本不跨文件混
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清，样本不跨文件混
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }
