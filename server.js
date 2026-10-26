@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.389';
+const ASSET_VER = '0.9.390';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -260,7 +260,14 @@ function readEvents(){
    retries 保留为三类之和（与 v0.9.72 的总量口径一致）；rt=0（主批）累加 batches。 */
 /* v0.9.146：4=整批失败后的逐组补救（此前误用 rt=2，与「语言跑偏」混在同一计数里，
    导致统计把网络/截断造成的补救全赖给语言检测，排查方向被带偏）。 */
-const RT_FIELD = { 1: 'retryMusic', 2: 'retryAnchor', 3: 'retryCue', 4: 'retryRescue' };
+/* v0.9.390：rt=2 与 rt=5 的分工 —— 两个号不再互相污染。
+   rt=2 → retryAnchor：历史号，只有 386 及更早的页面还在发。那时 badAnchor 装的是「语言跑偏」，
+     所以历史记录里 retryAnchor 的语义是真的语言跑偏，不能洗成别的意思。
+   rt=5 → retryLyric：387 起语言跑偏检测整套摘掉，badAnchor 只剩「歌词缺词」一类（与语言无关），
+     但它仍在借 rt=2 上报，于是 retryAnchor 这个桶里装的全是歌词缺词，名不副实。
+     390 起歌词缺词改走 rt=5，与语言跑偏彻底分开。
+   副作用（正是想要的）：新记录里 retryAnchor 恒为 0。哪天它又不是 0，说明有人把语言检测加回来了。 */
+const RT_FIELD = { 1: 'retryMusic', 2: 'retryAnchor', 3: 'retryCue', 4: 'retryRescue', 5: 'retryLyric' };
 function bumpRetry(ev, rt){
   const n = Number(rt) || 0;
   if (!n) { ev.batches = (ev.batches || 0) + 1; return; }
