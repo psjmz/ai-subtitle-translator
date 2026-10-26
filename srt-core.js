@@ -2782,6 +2782,41 @@
     for (let i = 0; i < words.length; i++) if (RE_FUNC_WORD.test(words[i])) return true;
     return false;
   }
+  /* v0.9.386：源文本身「没有可译内容」时，原样返回是唯一正确行为，不该判照抄。
+     实测语料（mayday 17 语言 + 6 份中文译文）：原样保留的专名/网址被 sameAsSource 拦下后，
+     要白跑 2 次单组重译，模型两次都返回同一串，最后仍按原样接受 —— 纯亏请求与延迟。
+     判据（都不依赖语言识别，只看形状）：
+       · 无字母且无 CJK（3.1415926 / 1,234.56）→ 没有可译内容
+       · 整条是网址/邮箱（www.example.com）→ 没有可译内容
+       · 每个字母词都首字母大写且没有全小写词（Manchester United / The Beatles / New York City）
+         → 专名或标题，原样返回是常规做法
+     注意：句子里的词总有全小写的（Damn it / Stay back / Thank you very much），不会被豁免。 */
+  const RE_URLISH = /(?:https?:\/\/|www\.)[^\s，。、；]+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+/gi;
+  function hasTranslatableContent(src){
+    const s = String(src == null ? '' : src);
+    if (!s.trim()) return false;
+    const hasLatin = /[A-Za-z\u00C0-\u024F\u0400-\u04FF]/.test(s);
+    const hasCJK = RE_HAN.test(s) || RE_KANA.test(s) || RE_HANGUL.test(s);
+    if (!hasLatin && !hasCJK) return false;
+    if (!hasLatin || hasCJK) return true;             // 含 CJK：仍由骨架长度门槛把关
+    // 网址/邮箱：剥掉之后没有成词的字母 → 整条就是地址
+    const stripped = s.replace(RE_URLISH, ' ').trim();
+    if (!/[A-Za-z\u00C0-\u024F\u0400-\u04FF]{2,}/.test(stripped)) return false;
+    // 专名/标题：没有全小写词
+    const words = stripped.match(RE_LATIN_WORD) || [];
+    if (!words.length) return false;
+    let lower = 0, funcAfterFirst = 0;
+    for (let i = 0; i < words.length; i++) {
+      if (/^[a-z\u00C0-\u024F]/.test(words[i])) lower++;
+      /* 全大写行（喊叫/标牌，字幕里很常见）没有任何小写词可依，只能看功能词位置：
+         GET OUT OF HERE NOW / I LOVE YOU 里的 OF、HERE、YOU 说明它是一句话；
+         THE ROLLING STONES 只有首位的 THE，按专名处理。不加这条，全大写台词
+         会被当成「无需翻译」整句放过 —— 那是静默漏翻，比多跑两次重译糟得多。 */
+      else if (i > 0 && RE_FUNC_WORD.test(words[i])) funcAfterFirst++;
+    }
+    if (lower > 0) return true;
+    return funcAfterFirst > 0;
+  }
   /* v0.9.348：译文与源文「实质相同」= 100% 没翻译。比语言锚定更直接，而且不依赖语言知识
      —— 英→法这种同字母体系的也能抓（anchorOk 对拉丁目标根本无从判断）。
      只比对去掉空白/标点/符号后的骨架；短文本不判，避免误伤专名组：
@@ -2792,17 +2827,32 @@
     const norm = (s) => String(s == null ? '' : s).toLowerCase().replace(/[\s\p{P}\p{S}]/gu, '');
     const a = norm(out), b = norm(src);
     if (!a || !b) return false;
+    if (!hasTranslatableContent(src)) return false;   // v0.9.386：无可译内容的源文，原样返回不算照抄
     if (a === b) return b.length >= 8;
     /* 模型偶尔在译文前后多留一个字母/数字（编号、"..."），长度差 ≤2 且互相包含也算照抄 */
     if (Math.abs(a.length - b.length) <= 2 && b.length >= 8 &&
         (a.indexOf(b) >= 0 || b.indexOf(a) >= 0)) return true;
     return false;
   }
+  /* v0.9.386：引号/括号里是「引用」，不是译文主体——里面的外来字符不算跑偏证据。
+     实测误报：zh 目标「他说了声「ありがとう」」假名 5/9 = 55% > 阈值 35%，被判中文跑偏；
+     模型重译两次返回同一句（它本来就该这么写），白跑两次请求后照样接受。
+     兜底：整条都被引号包住时剥完没有正文，退回原文判定 —— 整段日语的台词照旧拦。 */
+  const RE_QUOTED = /「[^」]*」|『[^』]*』|“[^”]*”|"[^"\n]*"|（[^）]*）|\([^)\n]*\)|【[^】]*】/g;
+  function stripQuoted(s){
+    const t = String(s == null ? '' : s);
+    const stripped = t.replace(RE_QUOTED, ' ').trim();
+    if (/[\u3400-\u9fff\u3040-\u30ff\u1100-\ud7af]/.test(stripped)) return stripped;
+    return t;   // 剥完没有 CJK 正文（整条都在引号里）→ 退回原文，别把整段日语放过去
+  }
   function anchorForeignOk(s, foreignRe, keepNames, cjkDst){
-    const cjk = s.match(RE_ALL_CJK);
+    /* 引用豁免只对 CJK 目标启用：非 CJK 目标的判据是「骨架里还有没有目标文字」，
+       剥引号反而会让只剩两个汉字的整句被放过（实测中文→英文多漏 2 行/761）。 */
+    const body = cjkDst ? stripQuoted(s) : s;
+    const cjk = body.match(RE_ALL_CJK);
     /* v0.9.348：CJK 目标不能无条件放行 —— 见上面 looksUntranslatedLatin 的注释。
        非 CJK 目标（英/法/…) 的目标文字本身就是拉丁，这里必须照旧放行。 */
-    if (!cjk || !cjk.length) return cjkDst ? !looksUntranslatedLatin(s) : true;
+    if (!cjk || !cjk.length) return cjkDst ? !looksUntranslatedLatin(body) : true;
     let bad = 0;
     for (let i = 0; i < cjk.length; i++) if (foreignRe.test(cjk[i])) bad++;
     if (!bad) return true;
@@ -2815,7 +2865,7 @@
            主体仍是目标语言就放行，只有整段都是源语言 CJK 才拦 */
     if (keepNames){
       if (cjkDst) return !(cjk.length >= ANCHOR_KEEP_MIN && bad / cjk.length >= ANCHOR_KEEP_MAX);
-      return anchorNonCjkBody(s);
+      return anchorNonCjkBody(body);
     }
     /* CJK 只有一两个字符 → 不足以判定「整段跑偏」，一律放行。
        场景：非 CJK 目标 + 勾选「保留原文」时，中文地名/人名（北京、张三）会原样留在译文里，
@@ -2826,7 +2876,7 @@
     if (bad <= ANCHOR_FOREIGN_ABS) return true;   // 零星几个：专名/引用/菜名
     return bad / cjk.length <= ANCHOR_FOREIGN_MAX;
   }
-  function anchorOk(text, dst, keepNames) {
+  function anchorOk(text, dst, keepNames, src) {
     const s = String(text == null ? '' : text);
     if (!s.trim()) return true;
     const han = RE_HAN.test(s), kana = RE_KANA.test(s), hangul = RE_HANGUL.test(s);
@@ -2847,6 +2897,12 @@
       if (!han) return !looksUntranslatedLatin(s);
       // 纯汉字无假名：
       if (RE_ZH_MARK.test(s)) return false;             // ① 含中文虚词 → 中文跑偏
+      /* v0.9.386：宽度闸只在「源文本本身是中文」时启用。
+         中文漂进日语的前提是源文为中文；源文是英文或其他非汉字语言时，纯汉字输出是合法日语
+         （实测 mayday 日语语料 61 行里 5 行被旧规则误判 = 8.2%：「録画開始。戦闘開始。」
+         「Outlaw 1、2機編隊、」「敵機2機確認、1時方向。」「-MiG 1機撃墜。」）。
+         源文取不到（旧调用方只传 3 个参数）时按「非中文源」处理——宁可少拦，不误伤。 */
+      if (!RE_HAN.test(String(src == null ? '' : src))) return true;
       return textWidth(s) <= JA_HAN_SHORT_W;            // ② 短名词放行，长句判跑偏
     }
     /* v0.9.147：同上放宽——韩译目标里的汉字专名、其他语言里的零星 CJK 不再整组判跑偏 */

@@ -881,6 +881,9 @@
   .b-long{background:var(--acc-weak);color:var(--acc);border:1px solid var(--acc-line)}
   .empty{padding:30px;text-align:center;color:var(--mut);font-size:13px}
   .drop-note{color:var(--del);font-size:12px;font-style:italic}
+  /* v0.9.385：补译最终没救回来的条目。占位文字用琥珀色，跟「还没轮到翻译」的灰色占位分开——
+     用户一眼能看出「这条翻失败了」，而不是以为还没轮到。行本身保持可编辑，可直接补写译文。 */
+  .zh.ph-miss{color:var(--warn);font-style:italic}
 
   /* v0.9.270 字幕区就地编辑：时间轴 / 原文 / 译文 —— 改完直接进导出 */
   .cuegrid.ed{background:#FDF7F9}
@@ -1100,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.384</span>
+    <span class="ver-tag">v0.9.389</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1344,6 +1347,9 @@ crossorigin="anonymous"></script>
           <option value="todo" data-i18n="fTodo">仅待译</option>
           <option value="done" data-i18n="fDone">仅已译</option>
           <option value="flag" data-i18n="fFlag">仅特殊处理</option>
+          <!-- v0.9.385：翻译跑完后仍没有译文的条目——不是水词（那是主动删除），
+               是模型漏了、补译也没救回来。集中列出来给用户逐条检查/补写。 -->
+          <option value="miss" data-i18n="fMiss">仅待检查</option>
         </select>
       </div>
       <!-- v0.9.270：时间轴工具栏。整片不同步靠这里修，单行精修在表格里点时间码 -->
@@ -1717,9 +1723,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.384"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.384"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.384"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.389"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.389"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.389"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2514,11 +2520,15 @@ function setColLabels(){
 
 function updateStats(){
   const total=S.rows.length;
-  let done=0, handled=0;
+  let done=0, handled=0, miss=0;
   S.rows.forEach(r=>{
+    /* v0.9.385：翻译跑完了但这条没拿到译文——不是水词（那是主动删除），
+       是模型漏输出、补译也没救回来。单独计数，收尾弹窗与筛选都读它。 */
+    if(r.flag==='missing'){ miss++; return; }
     if(r.flag==='drop'||r.flag==='merged'||r.noText) handled++;       // 水词清空 / 已并入上条 / 空字幕无需翻译
     else if(r.zh && r.zh.trim()) done++;
   });
+  S.missN=miss;
   $('stTotal').innerHTML=t('stTotal')+' <b>'+total+'</b>';
   $('stDone').innerHTML=t('stDone')+' <b>'+done+'</b>';
   $('stDrop').innerHTML=t('stDrop')+' <b>'+S.dropN+'</b>';
@@ -2548,9 +2558,13 @@ function renderRows(){
   setColLabels();
   const box=$('rows'), f=$('filter').value;
   const list = S.rows.filter(r=>{
-    if (f==='todo') return !(r.zh && r.zh.trim()) && r.flag!=='drop' && r.flag!=='merged' && !r.noText;
+    /* v0.9.385：翻失败的条目从「仅待译」里摘出去——它们不是「还没轮到」，是翻过了没成，
+       混在待译里会让人以为引擎还会再翻一遍。各自有各自的入口。 */
+    if (f==='todo') return !(r.zh && r.zh.trim()) && r.flag!=='drop' && r.flag!=='merged' && r.flag!=='missing' && !r.noText;
     if (f==='done') return !!(r.zh && r.zh.trim());
     if (f==='flag') return !!r.flag;
+    /* v0.9.385：仅待检查——模型漏输出、补译也没救回来的那些，集中列出来给用户逐条处理 */
+    if (f==='miss') return r.flag==='missing';
     return true;
   });
   if (!S.rows.length){ box.innerHTML='<div class="empty">'+t('emptyRows')+'</div>'; updateStats(); renderEdBar(); renderTcBar(); return; }
@@ -2572,7 +2586,9 @@ function renderRows(){
             ? '<div class="drop-note">'+t('mergedNote')+'</div>'
             : r.noText
               ? '<div class="drop-note">'+t('emptyNote')+'</div>'
-              : '<div class="zh'+(zh?'':' placeholder')+'" contenteditable="true" spellcheck="false">'+(zh||t('pending'))+'</div>'+zhBadge(r)+issB)
+              /* v0.9.385：翻失败的条目标出来。占位文字用琥珀色（ph-miss）而非普通灰色，
+                 一眼分得清「这条没翻出来」与「这条还没轮到」；仍然可编辑，用户能直接补写。 */
+              : '<div class="zh'+(zh?'':' placeholder'+(r.flag==='missing'?' ph-miss':''))+'" contenteditable="true" spellcheck="false">'+(zh||(r.flag==='missing'?t('missNote'):t('pending')))+'</div>'+zhBadge(r)+issB)
       + (OV_ROW===r.id ? ovHtml(r) : '')
       + '</div>';
   });
@@ -3204,7 +3220,7 @@ function systemPromptEn(cfg){
     + '   [Word-boundary splits] The split between adjacent cues must fall between words: never break a single word, fixed phrase, or inflected form in the middle (e.g. splitting Japanese なり|たい apart), never detach a bound particle or affix from the word it depends on; it is far better for one cue to run slightly longer or shorter than to split a word.\n'
     + '   [Lyrics exception] When a lyric cue\'s source text carries segment numbers like [1] [2], keep every number exactly as-is in the translation — [1] stays [1]: never translate, renumber, add, or drop segments. If the input also carries a "lyric" array (a whole lyric group already numbered), return that group as one single text via {"lyric":[{"g":<group id>,"type":"text","text":"[1] … [2] …"}]}.\n'
     + '3. [Transcription fixes] The source text may come from speech transcription and may contain obvious transcription errors (names, places, organizations, terms, numbers, homophones, etc.). Identify and correct them first (' + fixSpellEn + '), then translate. Proper names are spelling-corrected the same way before handling them per rule 4' + (cfg.keepTerms ? ' (keep the corrected original spelling, still untransliterated)' : ' (render the corrected form in ' + dstNative + ')') + '.\n'
-    + '   [Guardrail — never over-correct] Correct only when the error is obvious and you are confident it is one. Dialect, accent, slang, deliberate colloquial contraction, stylized or artistic spelling, and legitimate spelling variants of proper names are NOT errors — never \"fix\" them. Never rewrite lyric wording or the markers [inaudible] / [unintelligible]. When one pronunciation maps to several legitimate spellings and you cannot tell which is right, keep the source form untouched and translate it as it stands.\n'
+    + '   [Guardrail — never over-correct] Correct only when the error is obvious and you are confident it is one. Dialect, accent, slang, deliberate colloquial contraction, stylized or artistic spelling, and legitimate spelling variants of proper names are NOT errors — never \"fix\" them. Never rewrite lyric wording or the markers [inaudible] / [unintelligible]. When one pronunciation maps to several legitimate spellings and you cannot tell which is right, keep the source form untouched. Note: this guardrail decides only whether to ALTER THE SOURCE SPELLING — it never decides whether to translate; whatever you conclude about the spelling, render the whole line in ' + dstNative + '. Never leave a line untranslated just because one spelling is uncertain.\n'
     + '   [Typical cases] a proper name spelled the way it sounds (Mennerbrigitte→Brigitte), and numbers misheard across a run-on (\"1:00 37 Ventures\"→\"137 Ventures\"). These only illustrate the type of error — judge the same way whatever the source language is.\n'
     + '   [Glossary interaction] If a form matches a glossary entry (rule 4.5) exactly, apply that entry as-is and do NOT correct it; only when it matches no entry verbatim does this rule apply — then correct the spelling first and apply that entry\'s rendering to the corrected form.\n'
   if (cfg.keepTerms){
@@ -3215,16 +3231,16 @@ function systemPromptEn(cfg){
        但规则 4 措辞更强、反例更多，仍有小概率倒向规则 4，把用户指定的译法丢掉且界面零提示。
        改为：有术语表时输出豁免声明，把冲突在规则 4 内部就消解掉；
        没有术语表时仍是 '(none)'，提示词与 v0.9.137 逐字节一致（回归面为零）。 */
-    s += '4. [Keep proper nouns] Personal names, organizations, products, brands, and technical terms must keep their original spelling — never render them in ' + dstNative
+    s += '4. [Keep proper nouns] Personal names, organizations, products, and brands must keep their original spelling — never render them in ' + dstNative
        + ': even widely known ' + dstNative + ' renderings must not be used (e.g. Elon Musk stays Elon Musk, SpaceX stays SpaceX, Taylor Swift stays Taylor Swift).'
        + ' Even if the target language normally transliterates names (katakana, hangul, Cyrillic transliteration, Devanagari, etc.), Latin-script names and brands must keep their exact Latin spelling, letter for letter (Bobbi Thompson stays Bobbi Thompson — never 博比·汤普森 / 보비 톰슨 / Бобби Томпсон).'
-       + ' Generic place names (e.g. the White House) should be translated following ' + dstNative        + ' conventions.'
+       + ' Generic place names (e.g. the White House) should be translated following ' + dstNative        + ' conventions. Technical terms, jargon, and ordinary nouns are NOT proper nouns: they are outside this rule and must be rendered in ' + dstNative + ' like any other content.'
        + (cfg.glossary
            ? ' Exempt from this rule: the terms listed in the glossary (rule 4.5) are NOT covered by it — render each of them exactly as the glossary specifies, even when that means translating a name this rule would otherwise keep in the original.\n'
            : ' User-specified terms that must stay in the original: (none).\n');
   } else {
-    s += '4. [Translate proper nouns] Personal names, organizations, products, brands, and technical terms must be translated into their established ' + dstNative
-       + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists. Use an established rendering only for genuinely well-known names; whenever you are unsure whether an established rendering exists, keep the original spelling rather than inventing a transliteration.'
+    s += '4. [Translate proper nouns] Personal names, organizations, products, and brands must be translated into their established ' + dstNative
+       + ' renderings — never keep the original spelling: even very famous brands or people must be translated (e.g. Elon Musk, SpaceX, NASA, Google); only keep the original when no established ' + dstNative + ' rendering exists. Use an established rendering only for genuinely well-known names; whenever you are unsure whether an established rendering exists, keep the original spelling rather than inventing a transliteration. Technical terms, jargon, and ordinary nouns are NOT proper nouns: render them in ' + dstNative + ' like any other content.'
        + '\n';
   }
   if (cfg.glossary){
@@ -3306,23 +3322,23 @@ function systemPrompt(cfg){
   + '   【词边界切分】相邻 cue 之间的切分点必须落在词与词之间：严禁把一个词、固定词组或活用形从中间劈开（如日语「なり｜たい」这类活用形被劈成两半），严禁把助词、词缀与它所依附的词拆到两条 cue 上；宁可某条 cue 的译文略长或略短，也绝不劈词。\n'
   + '   【歌词例外】歌词分段的 cue 原文里带分段编号（如 [1] [2]）时，译文里这些编号必须原样保留——[1] 还是 [1]，严禁翻译编号、改写数字、增删或重排分段。输入里若另有 lyric 数组（整组歌词已编号的纯正文），按 {"lyric":[{"g":组号,"type":"text","text":"[1] … [2] …"}]} 返回整组一个译文。\n'
   + '3.【听写纠错】原文可能来自语音听写，可能含明显听写错误（人名、地名、机构、术语、数字、同音词等），识别后先纠正（' + fixSpellZh + '）再翻译。专名同样先纠正拼写，再按规则4处理（' + (cfg.keepTerms ? '保留纠正后的原文写法、仍不音译' : '把纠正后的形式译成' + dstNative) + '）。\n'
-  + '   【护栏——严禁过度纠错】只在错误明显且你有把握时纠正；方言、口音、俚语、有意的口语省略、风格化或艺术化的拼写、专名的合法拼写变体都不是错误，严禁「改正」。歌词措辞与 [听不清]、[无法辨认] 等标记严禁改写。当同一发音对应多个合法写法且无法判定时，保留原文形式不动、照原文翻译。\n'
+  + '   【护栏——严禁过度纠错】只在错误明显且你有把握时纠正；方言、口音、俚语、有意的口语省略、风格化或艺术化的拼写、专名的合法拼写变体都不是错误，严禁「改正」。歌词措辞与 [听不清]、[无法辨认] 等标记严禁改写。当同一发音对应多个合法写法且无法判定时，保留原文的拼写形式不再改动。注意：本护栏只决定「要不要改动原文的拼写」，并不决定「译不译」——无论拼写存疑与否，整句都要译成' + dstNative + '；不得因为某一处写法拿不准，就把整句原样保留不译。\n'
   + '   【典型情形】专名被按发音写成近形拼写（Mennerbrigitte→Brigitte）、连读导致数字听错（1:00 37 Ventures→137 Ventures）；这些只是错误类型的举例，源语言不同时按同理判断。\n'
   + '   【与术语表的关系】若某写法与术语表（规则4.5）条目完全一致，直接按该条目处理、不再纠错；只有在无法原样命中时才适用本规则——先纠正拼写，再按该条目的统一译法处理纠正后的形式。\n'
   if (cfg.keepTerms){
     /* v0.9.134 迁走用户术语列表后这里固定输出 '（无）'；
        v0.9.138 方案 B：填了术语表时这句与 4.5 自相矛盾（详见英文版同处注释），
        改为有术语表时输出豁免声明，无术语表时仍为 '（无）'——回归面为零。 */
-    s += '4.【专名保留】人名、机构、产品、品牌、技术术语一律保留原文写法、严禁译成' + dstNative
+    s += '4.【专名保留】人名、机构、产品、品牌一律保留原文写法、严禁译成' + dstNative
        + '：即使有广为人知的' + dstNative + '译名也保持原文，如 Elon Musk 保持 Elon Musk（严禁写成 埃隆·马斯克）、SpaceX 保持 SpaceX、Taylor Swift 保持 Taylor Swift（严禁写成 泰勒·斯威夫特）。'
        + '即使目标语言习惯音译人名（片假名、谚文、西里尔字母转写、天城文等），拉丁字母的人名/品牌也必须保持拉丁字母原文写法、一个字母都不改（Bobbi Thompson 保持 Bobbi Thompson，严禁写成 博比·汤普森/보비 톰슨）。'
-       + '国家城市等通用地名（如 the White House→白宫）按' + dstNative + '习惯译出。'
+       + '国家城市等通用地名（如 the White House→白宫）按' + dstNative + '习惯译出。技术术语、行业用语、普通名词不属于专名，不受本规则约束，一律按' + dstNative + '译出。'
        + (cfg.glossary
            ? '本规则的例外：术语表（规则4.5）中列出的词不受本规则约束——严格按术语表给定的译法处理，即使那意味着要译出一个本规则本会保留原文的名字。\n'
            : '用户指定必须保留原文的术语：（无）。\n');
   } else {
-    s += '4.【专名翻译】人名、机构、产品、品牌、技术术语一律译成' + dstNative
-       + '的通行译名，严禁保留原文写法：如 Elon Musk→埃隆·马斯克、SpaceX→太空探索技术公司、NASA→美国宇航局、Google→谷歌；即使是很知名的品牌或人名也必须译出；确实没有通行译名、或不确定是否存在通行译名的，一律保留原文拼写——只对确实广为人知的专名使用通行译名，拿不准就保留原文，严禁生造音译。'
+    s += '4.【专名翻译】人名、机构、产品、品牌一律译成' + dstNative
+       + '的通行译名，严禁保留原文写法：如 Elon Musk→埃隆·马斯克、SpaceX→太空探索技术公司、NASA→美国宇航局、Google→谷歌；即使是很知名的品牌或人名也必须译出；确实没有通行译名、或不确定是否存在通行译名的，一律保留原文拼写——只对确实广为人知的专名使用通行译名，拿不准就保留原文，严禁生造音译。技术术语、行业用语、普通名词不属于专名，按普通内容译成' + dstNative + '即可。'
        + '\n';
   }
   if (cfg.glossary){
@@ -4057,18 +4073,9 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
   } finally { clearTimeout(timer); clearTimeout(hbT); if(hbI) clearInterval(hbI); }
 }
 
-/* v0.9.378：同语言任务判定 —— 纯函数，便于单测。
-   背景（线上实证 10-25）：目标语言 = 原文语言时，正确译文必然等于原文，
-   sameAsSource 会把整批长句全判成「照抄原文」，于是进逐组隔离重译通道、
-   每组两次，产物还是原文。81 条英文字幕·目标英语那次烧了 30 次重译、4 分 38 秒，
-   最后是用户手动停的 —— 看起来就是「一直在排队」（每次重译都要重新排队拿槽位名额）。
-   判据：可判组（骨架 ≥8 字符，正是 sameAsSource 的生效门槛）里 70% 以上被判照抄。
-   正常翻译里模型不可能把七成长句原样返回（那等于整批没翻），所以误判概率极低；
-   即便真碰上整批偷懒，接受原文也比再烧 2N 次请求强 —— 现在那 2N 次之后本来也是带病接受。
-   至少 4 组才判：小批样本太少，宁可继续走原来的重译通道。 */
-function sameLangHit(judgedN, badSameN){
-  return judgedN >= 4 && badSameN >= Math.ceil(judgedN * 0.7);
-}
+/* v0.9.387：sameLangHit（同语言任务判定）随语言跑偏检测一并移除——
+   它存在的唯一理由是「照抄源文的组会被判跑偏、进而重译」；那条通道没了，它也就没有输入。
+   v0.9.383 的「源语言 == 目标语言」非阻塞提示不走这里，仍然有效。 */
 
 /* v0.9.72：受限并发映射——隔离重译并行用（各重译是独立的单组重发，结果与串行一致；
    worker 自行 try/catch，此处不拦截异常） */
@@ -4227,12 +4234,15 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
      v0.9.124 的做法是保证命中率（请求越小越容易成功）；v0.9.379 只改了一件事：
      不再把缺失条目从句子里摘出来单独发，而是连同它所在句组的邻居 cue 一起发（见 toFlat），
      为此文案要额外说清「哪些编号才需要产出」——否则模型会把整句又回一遍，
-     白白重翻已经翻好的那几条。 */
+     白白重翻已经翻好的那几条。
+     v0.9.385：上面那句文案整个作废——指令从「只产出缺失的那几条」改成「整组重新翻译」。
+     实证（_probe-merge.js 四档对照）：模型把相邻 cue 合并成一条时，「只补缺失」即便补成功
+     结果也更糟——合并的那条留着三句合起来的长译文，补回来的两条又把同样内容各说一遍，
+     行数全对、内容重复三遍。根因是任务给错了：「补编号 2」在模型看来 2 就不该单独存在，
+     于是继续合并；「整组三条各给一份」是硬要求，照做就干净，不照做当场露馅（还是缺号）。 */
   const mkMsgSome = (arr, onlyNos)=>{
     const f = toFlat(arr);
     const body = JSON.stringify(f.lyric.length ? { cues:f.cues, lyric:f.lyric } : { cues:f.cues });
-    const need = onlyNos ? f.cues.filter(c=>onlyNos.has(c.no)).map(c=>c.no) : f.cues.map(c=>c.no);
-    const needTxt = need.length ? need.join(', ') : '';
     /* v0.9.379：lyric 组的输出格式此前一个字都没写进补译指令——请求体带了 lyric 数组，
        指令却只教 {"c":{…}}，模型即使翻了歌词也不知道往哪儿放，这组就永久缺着，
        最后以「缺少句组 N」抛错，整个批次重发一遍。
@@ -4244,17 +4254,17 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
           ? '\n歌词组（输入里的 lyric 数组，整组歌词已编号的纯正文）按 {"lyric":[{"g":组号,"type":"text","text":"[1] … [2] …"}]} 返回整组一个译文：译文里的 [1] [2] 等分段编号必须原样照抄，严禁翻译编号、改写数字、增删或重排分段。'
           : '\nLyric groups (the "lyric" array — one numbered plain-text line per group) return one single text per group via {"lyric":[{"g":<group id>,"type":"text","text":"[1] … [2] …"}]}: copy the [1] [2] segment numbers verbatim — never translate, renumber, drop or reorder them.')
       : '';
-    const needHint = needTxt
-      ? (zhDst
-          ? '上面这些 cue 是为了给你完整的上下文（一句有时横跨多条）；其中只有编号 '+needTxt+' 缺译文，请只产出这几条，不要重复输出其余编号。'
-          : 'The cues above are listed so you have the full sentence context (a sentence may span several cues); only cue number(s) '+needTxt+' still lack a translation — produce ONLY those, do not repeat the others.')
-      : '';
+    /* v0.9.385：整组重出指令。注意它不再逐个点名缺失编号——点名等于暗示「别的编号不用管」，
+       与整组重出自相矛盾。组内每个编号都必须给一条，一条都不能合并、不能漏。 */
+    const needHint = zhDst
+      ? '上面是若干个完整的句子组（一句常横跨多条 cue）。请把这些句组全部重新翻译，按编号逐条返回，每个编号恰好一条译文；严禁把相邻编号合并成一条，也严禁漏掉任何一个编号。'
+      : 'The cues above form complete sentence groups (a sentence often spans several cues). Re-translate ALL of them and return one translation per cue number, each number exactly once: never merge adjacent numbers into a single entry, and never omit any number.';
     return zhDst
       ? ctxBlk+'字幕 cue（第 '+batchNo+'/'+totalBatch+' 批，补译缺失编号）：\n'+body
-        +'\n'+(needHint||'请翻译上面列出的 cue。')+'请按 {"c":{"编号":"译文"}} 返回——键必须原样照抄、每个恰好一次。译文必须用'+dstN.zh+'书写。只输出 JSON。'
+        +'\n'+needHint+'请按 {"c":{"编号":"译文"}} 返回——键必须原样照抄、每个恰好一次。译文必须用'+dstN.zh+'书写。只输出 JSON。'
         +lyricHint
       : ctxBlk+'Subtitle cues (batch '+batchNo+'/'+totalBatch+', re-translating the missing numbers):\n'+body
-        + '\n'+(needHint||'Translate the cues listed above.')+' Return {"c":{"<cue number>":"<translation>"}} — copy every listed cue number verbatim as a key, each exactly once. Write the translations in '+dstN.zh+'. Output JSON only.'
+        + '\n'+needHint+' Return {"c":{"<cue number>":"<translation>"}} — copy every listed cue number verbatim as a key, each exactly once. Write the translations in '+dstN.zh+'. Output JSON only.'
         + lyricHint;
   };
   const userMsg = mkMsg(send) + fb + cueFb;
@@ -4369,6 +4379,37 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     if(hit){ byGno=buildByGno(); }
     return hit;
   };
+  /* v0.9.385：补译结果按「整组采纳」落地——与 mkMsgSome 的整组重出必须成对，
+     只改指令不改落地等于白改（新翻的两条会被「先到的赢」挡在门外，组内一半新一半旧）。
+     mergeFlat 那条「先到的赢」是对的：补译视野窄（只看那几个组），不该拿它的输出盖住
+     主请求在全局视野下产出的译文。但整组重出改的是前提——这些组是被明确要求重翻的，
+     组内要么全新要么全旧，绝不留半新半旧。
+     三道安全阀：① 新值非空才覆盖（绝不把翻好的冲成空白）
+                 ② 新值缺失/为空 → 保留旧值（模型漏给的格子不背锅）
+                 ③ 范围严格限于本次补译发出的组（groups 参数），组外一条不碰 */
+  const mergeGroups = (o, groups)=>{
+    if(!o) return false;
+    let hit=false;
+    (groups||[]).forEach(g=>{
+      if(g.mFrames){
+        const m=(o.lyric||{})[g.gno];
+        if(m && String(m.text||'').trim()){
+          const ov=lyMap[g.gno];
+          if(!ov || String(ov.text||'').trim()!==String(m.text).trim()){ lyMap[g.gno]=m; hit=true; S.gapCoverN=(S.gapCoverN||0)+1; }
+        }
+        return;
+      }
+      (g.cues||[]).forEach(c=>{
+        const v=(o.c||{})[c.no];
+        if(v==null) return;
+        const nv=String(v).trim();
+        if(!nv) return;
+        if(String(cMap[c.no]==null?'':cMap[c.no]).trim()!==nv){ cMap[c.no]=nv; hit=true; S.gapCoverN=(S.gapCoverN||0)+1; }
+      });
+    });
+    if(hit){ byGno=buildByGno(); }
+    return hit;
+  };
   if(gapSet().size) mergeFlat(salvageFlat(String(raw||'')));
   /* v0.9.124：缺号自动补译——弱模型最典型的失败不是语法错，而是「少输出了几个编号」
      （v0.9.123 解决掉解析后暴露出来：三连败全是「缺少句组 N 的结果」）。
@@ -4393,7 +4434,10 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
       const raw2 = await chatOnce(base,key,model,[{role:'system',content:sys},{role:'user',content:mkMsgSome(arr2, missSet)}],undefined,rt,{json:1});
       const obj2 = parseLlmJson(raw2);
       if(obj2){
-        mergeFlat({ c: flatCueMap(obj2), lyric: flatLyricMap(obj2) });
+        const flat2 = { c: flatCueMap(obj2), lyric: flatLyricMap(obj2) };
+        // v0.9.385：整组采纳先跑（覆盖），再让 mergeFlat 填空补漏（组内新值缺的格子）
+        mergeGroups(flat2, arr2);
+        mergeFlat(flat2);
         // 补译结果同样做结构级抢救（这批模型的畸形率不会因为请求变小而下降）
         mergeFlat(salvageFlat(String(raw2||'')));
       }
@@ -4405,13 +4449,9 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   if(missing.length){ S.gapGiveUpN=(S.gapGiveUpN||0)+1; throw new Error(t('errMissGroup',missing[0].gno)); }
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
   const dstV = $('dstLang').value;
-  // v0.9.149：专名处理 = 「保留原文」时告诉锚定校验——源语言专名原样留在译文里是用户要的结果，
-  // 别再按「外来字符」判跑偏（否则保留专名会被批量误伤成重试）
-  const keepPN = (document.querySelector('input[name=pnMode]:checked')||{}).value === 'keep';
+  /* v0.9.387：语言跑偏检测已移除（误报代价 > 漏报收益，用户决策：让用户自己看）。
+     badAnchor 现在只剩「歌词缺词」这一类与语言无关的成员。 */
   const badAnchor = [];
-  /* v0.9.378：另记一份「只因译文 == 源文被拦」的组。badAnchor 的成员与改前完全一致
-     （下面两处 push 的条件一字未动），badSame 只是它的一个子集，专供同语言判定用。 */
-  const badSame = [];
   const musicDropGnos = [];
   const subDropGnos = [];
   for(const g of send){
@@ -4460,9 +4500,6 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
        判据：只有在译文里解得出编号时才检查。不带编号 → 走权重兜底，实测把整段完整译文
        切回 3 行是准的，不去打扰；能解出编号 → 编号必须覆盖 1..segs.length 且各自非空。
        （全角 ［１］／【２】等变体 parseSegMarkers 已兼容。） */
-    /* v0.9.348：先查「译文 = 源文」。纯拉丁译文在 CJK 目标下曾被 anchorOk 无条件放行
-       （防专名误伤），实测英文源·中文目标时模型把两条 cue 并成一条翻译、后一条原样返回
-       英文，两道质检全放行。sameAsSource 不依赖语言知识，英→法这类同字母体系也能抓。 */
     if(g.mFrames && txt){
       const want=(g.mFrames.segs||[]).length;
       const map=C.parseSegMarkers(txt);
@@ -4475,28 +4512,10 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
         }
       }
     }
-    const srcAll = g.mFrames ? g.mFrames.plainText : g.text;
-    /* v0.9.378：「照抄源文」单独记一份（badSame），判定式整体不变 ——
-       badAnchor 里该有的编号一个不少，老的重译通道行为零变化。 */
-    const sameTxt = !!txt && C.sameAsSource(txt, srcAll);
-    if(sameTxt) badSame.push(g.gno);
-    if(txt && (sameTxt || !C.anchorOk(txt, dstV, keepPN))) badAnchor.push(g.gno);
-    // v0.9.66：cue 对齐组锚定——组 text 为空时逐 cue 文本查 anchorOk（任一跑偏即整组进重试通道）
-    // v0.9.348：逐 cue 也要比源文，否则「整组里只有一条照抄原文」会被组级均值淹没
-    else if(!txt && m.cues){
-      for(const oc of m.cues){
-        const tt = String(oc && oc.text || '').trim();
-        const sc = (g.cues||[]).find(c => Number(c && c.no) === Number(oc && oc.no));
-        if(tt){
-          const sameCue = C.sameAsSource(tt, sc && sc.text);
-          if(sameCue) badSame.push(g.gno);
-          if(sameCue || !C.anchorOk(tt, dstV, keepPN)){ badAnchor.push(g.gno); break; }
-        }
-      }
-    }
-    // v0.9.37：音乐行丢词（源有歌词而译文只剩 ♪ 符号）——纯符号可通过 anchorOk，必须单查；并入锚定重试通道
-    // v0.9.45：音乐帧组输出为 [N] 编号正文，musicLost 对编号数字不敏感，需比对纯正文
-    else if(txt && C.musicLost(txt, g.mFrames ? g.mFrames.plainText : g.text) && !badAnchor.includes(g.gno)) badAnchor.push(g.gno);
+    /* v0.9.387：语言跑偏检测整体移除（用户决策：误报 → 每组白跑 2 次请求，代价高于漏报，
+       译文语言交给用户自己看）。anchorOk / sameAsSource 不再参与本通道，
+       badAnchor 只剩这条与语言无关的「歌词丢词」检查。 */
+    if(txt && C.musicLost(txt, g.mFrames ? g.mFrames.plainText : g.text) && !badAnchor.includes(g.gno)) badAnchor.push(g.gno);
   }
   // （fillers 已于 v0.9.379 提到 buildByGno 之前计算，此处不再重复声明）
   // v0.9.66：cue 对齐结构校验——非音乐/非纯符号组带 cues 数组时逐组校验；
@@ -4524,11 +4543,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     }
     else { cueBadGnos.push({ gno: g.gno, errs: v.errs }); }
   }
-  /* v0.9.378：同语言任务识别。只统计「可判组」——sameAsSource 对骨架 <8 字符的短句
-     本来就不判（专名豁免），拿它们当分母会把命中率压下去，反而漏判。 */
-  const judged = send.filter(g => C.effChars(g.mFrames ? g.mFrames.plainText : g.text) >= 8).length;
-  const sameLang = sameLangHit(judged, badSame.length);
-  return { byGno, fillers, badAnchor, badSame, sameLang, musicDropGnos, subDropGnos, cueBadGnos, thinN, thinSample };
+  return { byGno, fillers, badAnchor, musicDropGnos, subDropGnos, cueBadGnos, thinN, thinSample };
 }
 
 /* v0.9.127：纯翻译模型（Hunyuan-MT 系列）逐组直译通道。
@@ -4989,7 +5004,7 @@ function reportEvent(ev, extra, fmt){
        短实义组保底、歌词缺号。与既有 drop* 和 cue* 同为纯统计，服务端白名单读取（见 server.js GAP_FIELDS）。
        gapTryN/gapFixN = 缺号补译的分子分母（值不值得再做第二轮，靠这个比）；gapGiveUpN = 最终判死的批数；
        shortDropKeepN = 差点被静默删掉、改为保留原文的组数；lyricShortN = 检出歌词缺号的次数。 */
-    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    const body=JSON.stringify({file:S.trMeta.file,lang:S.trMeta.lang,model:S.trMeta.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:S.taskId||'',src:S.trMeta.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
       /* v0.9.381：分配失衡样本（某条只剩虚词/符号）——与 cueSample 一样只在 finish 带一次 */
       thinSample:(ev==='finish'&&S.thinSamples&&S.thinSamples.length)?S.thinSamples:undefined,
       /* v0.9.375：编号级样本只在 finish 带一次（download/copy 再带就是同一份数据重复传） */
@@ -5195,7 +5210,7 @@ async function runTranslate(){
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
   /* v0.9.375：编号级样本与重试修复率同口径随任务重置（跨任务不累加） */
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];
   $('btnGo').disabled=true;
   $('btnGo').textContent=t('btnGoStop');
 
@@ -5395,16 +5410,6 @@ async function runTranslate(){
              单组隔离通道（a=0 盲发一次、a=1 把跑偏译文喂回模型做纠错）。
              成本：单批从最多 3 个整批请求降到 1 个整批 + 少量单组请求。
              注意：网络错误 / 429 的重试在下方 catch 分支，与此处无关，保持原样。 */
-          /* v0.9.378：同语言任务 → 「照抄源文」这些组不进重译队列。
-             它们不是模型偷懒，是目标语言本来就跟原文一样，重译一万次产物还是原文。
-             只摘掉 badSame 子集；同一批里真有语言跑偏（anchorOk 失败）的组照旧重译。 */
-          if(out.sameLang && out.badAnchor && out.badAnchor.length){
-            const sameSet=new Set(out.badSame||[]);
-            const before=out.badAnchor.length;
-            out.badAnchor=out.badAnchor.filter(gno=>!sameSet.has(gno));
-            const skipN=before-out.badAnchor.length;
-            if(skipN>0) log(t('sameLangSkip', skipN), 'warn');
-          }
           if(out.badAnchor && out.badAnchor.length){
             log(t('batchFail',bi+1,1,t('anchorFail',out.badAnchor.slice(0,3).join(',')+(out.badAnchor.length>3?'…':''),LBY(cfg.dst).zh)),'err');
           }
@@ -5891,7 +5896,11 @@ async function runTranslate(){
           // v0.9.37：压缩改写后的译文同样归一化音乐符号（压缩可能把首尾 ♪ 压掉）
           const txt=nt ? C.normalizeMusic(String(nt.text||'').trim(), oc.g.text) : '';
           const cap=oc.active.length*2*cfg.maxW;
-          if(txt && C.anchorOk(txt,cfg.dst,cfg.keepTerms) && C.textWidth(C.stripSoundTags(txt))<=cap && fitsCapacity(txt,oc.active,cfg)){
+          /* v0.9.388：这里原本还有一道 C.anchorOk 语言锚定——语言检测已在 387 整套摘掉，
+             译文语言交给用户自查。留着它等于在压缩通道里复活了半个已被移除的判定：
+             压缩成果仅因为「语言不符」被丢弃，用户拿到的仍是原来那句超长译文，
+             一次请求白烧。压缩要守的是长度与容量，这两道闸本来就在。 */
+          if(txt && C.textWidth(C.stripSoundTags(txt))<=cap && fitsCapacity(txt,oc.active,cfg)){
             backfillGroup(oc.active, txt, cfg);
             fixed++;
           }
@@ -5964,7 +5973,7 @@ async function runTranslate(){
     }
     // v0.9.56：模型无响应熔断 → 弹窗告知（稍后再试 / 打开引擎设置换自定义模型）
     if(S.modelDead){
-      S.modelDead=false;
+      S.modelDead=false; S.gapAbort=0; S.missN=0;
       log(t('errModalTitle'),'err');
       try{ showErrModal(t('errModalTitle'), t('errModalBody')); }catch(_){}
     }
@@ -5972,10 +5981,20 @@ async function runTranslate(){
        那边是模型压根不响应（建议换 API / 稍后再试），这边是模型有响应、
        但它认为原文无需翻译（最可能就是源语言 == 目标语言，建议去检查语言设置）。
        共用一套文案会把人往错误的方向带。 */
-    if(S.gapAbort){
-      S.gapAbort=0;
+    else if(S.gapAbort){
+      S.gapAbort=0; S.missN=0;
       log(t('gapAbortTitle'),'err');
       try{ showErrModal(t('gapAbortTitle'), t('gapAbortBody')); }catch(_){}
+    }
+    /* v0.9.385：绝大多数正常收尾的情况——模型全程正常、任务也跑完了，
+       只是零星的几条始终没拿到译文（模型漏输出、补译也没问回来）。
+       此前这些条目虽然内部打了 missing 标记，界面上却和「还没轮到翻译」长得一模一样，
+       用户只觉得"有几行空着"，不知道它们是翻失败了还是没翻。
+       现在：日志给一行、弹窗告诉用户去哪儿看、表格里这几条自己变色。 */
+    else if(S.missN){
+      const mn=S.missN; S.missN=0;
+      log(t('missLog', mn));
+      try{ showErrModal(t('missTitle'), t('missBody', mn)); }catch(_){}
     }
   }
 }
@@ -6234,7 +6253,7 @@ function setSrc(text, fileName){
   S.rows=items.map(it=>({id:it.no-1, no:it.no, start:it.start, end:it.end, en:it.text, zh:null, flag:'', mergeTo:null, mergeText:null}));
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
-  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清，样本不跨文件混
+  S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清，样本不跨文件混
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }
