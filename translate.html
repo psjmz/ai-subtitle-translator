@@ -1103,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.390</span>
+    <span class="ver-tag">v0.9.391</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1723,9 +1723,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.390"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.390"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.390"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.391"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.391"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.391"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4197,14 +4197,26 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.57：纠错重试——顽固跑偏组盲重发（同输入→同输出）零效果，把上次跑偏的译文
   // 明确喂回给模型让它自我纠正（Qualcomm CFO 访谈泰文版实测案例：整句前半漂成中文，
   // 批级重试 + 单组盲重发 ×2 全部复现同样的混合输出）
+  /* v0.9.391：纠错文案按通道分派。387 起语言跑偏检测已整套移除，badAnchor 只剩「歌词缺词」两类
+     （缺号 parseSegMarkers 覆盖不全 / 丢词 musicLost），可 rt=5 这条通道的反馈仍写着「语言跑偏」——
+     等于把模型往错的方向推：它会去纠正语言，而真正的问题是少了一段歌词，改完照样缺段。
+     rt=4（整批失败后的逐组补救）保留原有文案：它取的是组级 m.text，cue 对齐格式下恒为空，实际不触发。 */
   const fb = (Array.isArray(feedback) && feedback.length)
-    ? (zhDst
-        ? '\n【纠错重试】你上次的翻译语言跑偏了——下列 cue 的译文混入了非' + dstN.zh + '的字符，这是错误的：\n'
-          + JSON.stringify(feedback)
-          + '\n请重新翻译这些 cue：译文必须从头到尾完整使用' + dstN.zh + '书写，严禁混入任何其他语言的文字。'
-        : '\n[CORRECTION RETRY] Your previous attempt drifted into the wrong language — the translations below contain characters that are NOT ' + dstN.prompt + ':\n'
-          + JSON.stringify(feedback)
-          + '\nThese translations are WRONG. Re-translate these cues: every translation must be written ENTIRELY in ' + dstN.prompt + ', with no characters from any other language.')
+    ? (rt===5
+        ? (zhDst
+            ? '\n【歌词纠错】你上次的歌词译文缺了分段——下列歌词的分段编号没有全部覆盖，或有分段的内容是空的：\n'
+              + JSON.stringify(feedback)
+              + '\n请把这组歌词重新翻译一遍：译文里每个 [1] [2] 等分段编号必须原样保留、各自后面跟着一句非空的歌词正文；严禁漏段、合并分段、改写或重排编号。'
+            : '\n[LYRIC RETRY] Your previous lyric translation was missing segments — the segment numbers below are not all covered, or some segment came back empty:\n'
+              + JSON.stringify(feedback)
+              + '\nRe-translate this lyric group: keep every [1] [2] … segment number verbatim, each followed by a non-empty line of lyric text — never drop a segment, merge segments, renumber, or reorder them.')
+        : (zhDst
+            ? '\n【纠错重试】你上次的翻译语言跑偏了——下列 cue 的译文混入了非' + dstN.zh + '的字符，这是错误的：\n'
+              + JSON.stringify(feedback)
+              + '\n请重新翻译这些 cue：译文必须从头到尾完整使用' + dstN.zh + '书写，严禁混入任何其他语言的文字。'
+            : '\n[CORRECTION RETRY] Your previous attempt drifted into the wrong language — the translations below contain characters that are NOT ' + dstN.prompt + ':\n'
+              + JSON.stringify(feedback)
+              + '\nThese translations are WRONG. Re-translate these cues: every translation must be written ENTIRELY in ' + dstN.prompt + ', with no characters from any other language.'))
     : '';
   // v0.9.66：cue 对齐结构纠错反馈——重发时把上一轮的结构错误清单喂回模型（实验实证一次即可修复）
   const cueFb = (feedback && Array.isArray(feedback.cueErrs) && feedback.cueErrs.length)
