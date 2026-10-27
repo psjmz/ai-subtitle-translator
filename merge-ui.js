@@ -37,8 +37,7 @@ const I18N = {
     tcShiftAll:'整体偏移', tcShiftFrom:'从某条起', tcScale:'比例缩放', tcCheck:'时长体检',
     tcAskMs:'偏移毫秒（正数延后、负数提前，例如 -500）', tcAskFrom:'从第几条开始（1 起）',
     tcAskCur:'第 {0} 条现在的开始时间', tcScaleHint:'填第 1 条与最后一条「应该是」的开始时间，中间按同一比例缩放（时长一起跟着缩）',
-    tcOk:'时间轴没问题', tcFix:'一键修', tcFixed:'已修 {0} 处',
-    tcOvTitle:'与第 {0} 条重叠', tcSnapPrev:'吸附到上一条结束', tcSnapNext:'收到下一条开始',
+    tcOk:'时间轴没问题', tcOvTitle:'与第 {0} 条重叠', tcSnapPrev:'吸附到上一条结束', tcSnapNext:'收到下一条开始',
     tcPushNext:'顺推后面所有', tcKeepOv:'保留不动', tcCancel:'取消', tcApply:'应用',
     tcRelHint:'也认 +1.5s / -500 / +2m 这类相对值',
     edBarCount:'已手工改 {0} 处', edBarKeep:'刷新页面不会丢', edClear:'全部还原',
@@ -223,8 +222,7 @@ const I18N = {
     tcShiftAll:'整體偏移', tcShiftFrom:'從某條起', tcScale:'比例縮放', tcCheck:'時長體檢',
     tcAskMs:'偏移毫秒（正數延後、負數提前，例如 -500）', tcAskFrom:'從第幾條開始（1 起）',
     tcAskCur:'第 {0} 條現在的開始時間', tcScaleHint:'填第 1 條與最後一條「應該是」的開始時間，中間按同一比例縮放（時長一起跟著縮）',
-    tcOk:'時間軸沒問題', tcFix:'一鍵修', tcFixed:'已修 {0} 處',
-    tcOvTitle:'與第 {0} 條重疊', tcSnapPrev:'吸附到上一條結束', tcSnapNext:'收到下一條開始',
+    tcOk:'時間軸沒問題', tcOvTitle:'與第 {0} 條重疊', tcSnapPrev:'吸附到上一條結束', tcSnapNext:'收到下一條開始',
     tcPushNext:'順推後面所有', tcKeepOv:'保留不動', tcCancel:'取消', tcApply:'套用',
     tcRelHint:'也認 +1.5s / -500 / +2m 這類相對值',
     edBarCount:'已手動改 {0} 處', edBarKeep:'重新整理不會丟', edClear:'全部還原',
@@ -408,8 +406,7 @@ const I18N = {
     tcShiftAll:'Shift all', tcShiftFrom:'Shift from cue', tcScale:'Rescale', tcCheck:'Duration check',
     tcAskMs:'Shift in ms (positive = later, negative = earlier, e.g. -500)', tcAskFrom:'From cue number (1-based)',
     tcAskCur:'Cue {0} — current start', tcScaleHint:'Give the start times cue 1 and the last cue should have; everything in between scales by the same ratio (durations scale too)',
-    tcOk:'Timeline looks fine', tcFix:'Fix all', tcFixed:'Fixed {0} cue(s)',
-    tcOvTitle:'Overlaps cue {0}', tcSnapPrev:'Snap to previous end', tcSnapNext:'Snap to next start',
+    tcOk:'Timeline looks fine', tcOvTitle:'Overlaps cue {0}', tcSnapPrev:'Snap to previous end', tcSnapNext:'Snap to next start',
     tcPushNext:'Push everything after it', tcKeepOv:'Leave as is', tcCancel:'Cancel', tcApply:'Apply',
     tcRelHint:'Relative values work too: +1.5s / -500 / +2m',
     edBarCount:'{0} lines edited by hand', edBarKeep:'kept across page reloads', edClear:'Revert all',
@@ -593,8 +590,7 @@ const I18N = {
     tcShiftAll:'全体をずらす', tcShiftFrom:'途中からずらす', tcScale:'比率で伸縮', tcCheck:'表示時間チェック',
     tcAskMs:'ずらすミリ秒（正=後に、負=前に。例 -500）', tcAskFrom:'何番目から（1 始まり）',
     tcAskCur:'{0} 番目の現在の開始時刻', tcScaleHint:'1 番目と最後の「あるべき開始時刻」を入力。間は同じ比率で伸縮します（表示時間も一緒に）',
-    tcOk:'タイムラインに問題ありません', tcFix:'一括修正', tcFixed:'{0} 件を修正しました',
-    tcOvTitle:'{0} 番目と重複', tcSnapPrev:'前の終わりに合わせる', tcSnapNext:'次の始まりに合わせる',
+    tcOk:'タイムラインに問題ありません', tcOvTitle:'{0} 番目と重複', tcSnapPrev:'前の終わりに合わせる', tcSnapNext:'次の始まりに合わせる',
     tcPushNext:'後ろをまとめて押す', tcKeepOv:'そのままにする', tcCancel:'キャンセル', tcApply:'適用',
     tcRelHint:'+1.5s / -500 / +2m のような相対値も使えます',
     edBarCount:'{0} 行を手動で編集', edBarKeep:'再読み込みしても残ります', edClear:'すべて元に戻す',
@@ -806,8 +802,6 @@ const I18N = {
     tcAskCur: 'Subtítulo {0} — inicio actual',
     tcScaleHint: 'Indica los tiempos de inicio que deberían tener el subtítulo 1 y el último; lo de en medio se escala con la misma proporción (las duraciones también)',
     tcOk: 'La línea de tiempo está bien',
-    tcFix: 'Corregir todo',
-    tcFixed: 'Corregidos {0} subtítulos',
     tcOvTitle: 'Se solapa con el subtítulo {0}',
     tcSnapPrev: 'Ajustar al final del anterior',
     tcSnapNext: 'Ajustar al inicio del siguiente',
@@ -1211,8 +1205,6 @@ const I18N = {
     tcAskCur: 'Legenda {0} — início atual',
     tcScaleHint: 'Informe os inícios que a legenda 1 e a última deveriam ter; tudo entre elas escala na mesma proporção (as durações também)',
     tcOk: 'Linha do tempo OK',
-    tcFix: 'Corrigir tudo',
-    tcFixed: 'Corrigidas {0} legendas',
     tcOvTitle: 'Sobreposto à legenda {0}',
     tcSnapPrev: 'Colar no fim da anterior',
     tcSnapNext: 'Colar no início da seguinte',
@@ -1616,8 +1608,6 @@ const I18N = {
     tcAskCur: '{0}번 큐의 현재 시작 시간',
     tcScaleHint: '1번째와 마지막 큐의 \'목표\' 시작 시간을 입력하면 중간은 같은 비율로 조정됩니다 (길이도 함께 조정됨)',
     tcOk: '타임라인 이상 없음',
-    tcFix: '모두 수정',
-    tcFixed: '{0}개 큐 수정됨',
     tcOvTitle: '{0}번 큐와 겹침',
     tcSnapPrev: '이전 큐 끝에 맞춤',
     tcSnapNext: '다음 큐 시작에 맞춤',
@@ -2021,8 +2011,6 @@ const I18N = {
     tcAskCur: 'Cue {0} – aktueller Start',
     tcScaleHint: 'Startzeiten für Cue 1 und den letzten Cue angeben; alles dazwischen wird im selben Verhältnis skaliert (Dauern ebenso)',
     tcOk: 'Zeitleiste ist in Ordnung',
-    tcFix: 'Alle korrigieren',
-    tcFixed: '{0} Cue(s) korrigiert',
     tcOvTitle: 'Überlappt mit Cue {0}',
     tcSnapPrev: 'An vorheriges Ende anfügen',
     tcSnapNext: 'An nächsten Start anfügen',
@@ -2426,8 +2414,6 @@ const I18N = {
     tcAskCur: 'Sous-titre {0} — début actuel',
     tcScaleHint: 'Indiquez les débuts attendus du 1er et du dernier sous-titre ; tout ce qui est entre est mis à l\'échelle dans le même rapport (les durées aussi)',
     tcOk: 'Chronologie correcte',
-    tcFix: 'Tout corriger',
-    tcFixed: '{0} sous-titre(s) corrigé(s)',
     tcOvTitle: 'Chevauche le sous-titre {0}',
     tcSnapPrev: 'Aligner sur la fin précédente',
     tcSnapNext: 'Aligner sur le début suivant',
@@ -2831,8 +2817,6 @@ const I18N = {
     tcAskCur: 'Cue {0} — waktu mulai saat ini',
     tcScaleHint: 'Isi waktu mulai yang seharusnya dimiliki cue 1 dan cue terakhir; bagian di antaranya diskalakan dengan rasio yang sama (durasi ikut menyesuaikan)',
     tcOk: 'Garis waktu sudah benar',
-    tcFix: 'Perbaiki semua',
-    tcFixed: '{0} cue diperbaiki',
     tcOvTitle: 'Tumpang tindih dengan cue {0}',
     tcSnapPrev: 'Tempel ke akhir sebelumnya',
     tcSnapNext: 'Tempel ke awal berikutnya',
@@ -3236,8 +3220,6 @@ const I18N = {
     tcAskCur: 'क्यू {0} — वर्तमान शुरुआत',
     tcScaleHint: 'क्यू 1 और अंतिम क्यू का जो शुरुआती समय होना चाहिए वह दें; बीच का सब उसी अनुपात में स्केल होगा (अवधि भी स्केल होगी)',
     tcOk: 'टाइमलाइन ठीक है',
-    tcFix: 'सब ठीक करें',
-    tcFixed: '{0} क्यू ठीक किए',
     tcOvTitle: 'क्यू {0} से ओवरलैप',
     tcSnapPrev: 'पिछले के अंत पर स्नैप करें',
     tcSnapNext: 'अगले की शुरुआत पर स्नैप करें',
@@ -3641,8 +3623,6 @@ const I18N = {
     tcAskCur: 'บรรทัดที่ {0} — เวลาเริ่มปัจจุบัน',
     tcScaleHint: 'ใส่เวลาเริ่มที่บรรทัดแรกและบรรทัดสุดท้ายควรเป็น ส่วนที่อยู่ระหว่างกลางจะถูกปรับสัดส่วนด้วยอัตราเดียวกัน (ความยาวก็ปรับตามด้วย)',
     tcOk: 'ไทม์ไลน์ไม่มีปัญหา',
-    tcFix: 'แก้ทั้งหมด',
-    tcFixed: 'แก้แล้ว {0} บรรทัด',
     tcOvTitle: 'ทับกับบรรทัดที่ {0}',
     tcSnapPrev: 'ดูดไปต่อท้ายบรรทัดก่อนหน้า',
     tcSnapNext: 'ดูดไปเริ่มที่บรรทัดถัดไป',
@@ -4046,8 +4026,6 @@ const I18N = {
     tcAskCur: 'Thời điểm bắt đầu hiện tại của dòng {0}',
     tcScaleHint: 'Nhập thời điểm bắt đầu mà dòng 1 và dòng cuối “nên có”; phần ở giữa được chỉnh theo cùng tỉ lệ (thời lượng cũng theo đó)',
     tcOk: 'Dòng thời gian ổn',
-    tcFix: 'Sửa hết',
-    tcFixed: 'Đã sửa {0} chỗ',
     tcOvTitle: 'Trùng với dòng {0}',
     tcSnapPrev: 'Gắn vào cuối dòng trước',
     tcSnapNext: 'Gắn vào đầu dòng sau',
@@ -4451,8 +4429,6 @@ const I18N = {
     tcAskCur: 'Субтитр {0} — текущее начало',
     tcScaleHint: 'Укажите время начала, которое должно быть у субтитра 1 и у последнего; всё между ними масштабируется с тем же коэффициентом (длительности тоже)',
     tcOk: 'С таймингом всё в порядке',
-    tcFix: 'Исправить всё',
-    tcFixed: 'Исправлено субтитров: {0}',
     tcOvTitle: 'Пересекается с субтитром {0}',
     tcSnapPrev: 'Привязать к концу предыдущего',
     tcSnapNext: 'Привязать к началу следующего',
@@ -4856,8 +4832,6 @@ const I18N = {
     tcAskCur: 'Riga {0} — inizio attuale',
     tcScaleHint: 'Indica l\'inizio che devono avere la riga 1 e l\'ultima; tutto ciò che sta in mezzo si riscala con lo stesso rapporto (anche le durate)',
     tcOk: 'La linea temporale è a posto',
-    tcFix: 'Correggi tutto',
-    tcFixed: 'Corrette {0} righe',
     tcOvTitle: 'Si sovrappone alla riga {0}',
     tcSnapPrev: 'Aggancia alla fine precedente',
     tcSnapNext: 'Aggancia all\'inizio successivo',
@@ -5261,8 +5235,6 @@ const I18N = {
     tcAskCur: 'المقطع {0} — البداية الحالية',
     tcScaleHint: 'أدخل وقت البداية المفترض للمقطع الأول والأخير؛ يُقاس ما بينهما بالنسبة نفسها (وتُقاس المدد معها)',
     tcOk: 'الخط الزمني سليم',
-    tcFix: 'إصلاح الكل',
-    tcFixed: 'أُصلح {0} مقطع',
     tcOvTitle: 'يتقاطع مع المقطع {0}',
     tcSnapPrev: 'إلصاق بنهاية السابق',
     tcSnapNext: 'إلصاق ببداية التالي',
@@ -5666,8 +5638,6 @@ const I18N = {
     tcAskCur: '{0}. altyazı — mevcut başlangıç',
     tcScaleHint: '1. ve son altyazının olması gereken başlangıç zamanlarını girin; aradakiler aynı oranda ölçeklenir (süreler de ölçeklenir)',
     tcOk: 'Zaman çizelgesi sorunsuz',
-    tcFix: 'Tümünü düzelt',
-    tcFixed: '{0} altyazı düzeltildi',
     tcOvTitle: '{0}. altyazı ile çakışıyor',
     tcSnapPrev: 'Önceki altyazının bitişine yapıştır',
     tcSnapNext: 'Sonraki altyazının başlangıcına yapıştır',
@@ -6071,8 +6041,6 @@ const I18N = {
     tcAskCur: 'Cue {0} — huidige start',
     tcScaleHint: 'Vul de starttijden in die cue 1 en de laatste cue zouden moeten hebben; alles ertussen schaalt met dezelfde verhouding (duren schalen mee)',
     tcOk: 'Tijdlijn is in orde',
-    tcFix: 'Alles repareren',
-    tcFixed: '{0} cue(s) gerepareerd',
     tcOvTitle: 'Overlapt met cue {0}',
     tcSnapPrev: 'Vastklikken aan vorige einde',
     tcSnapNext: 'Vastklikken aan volgende start',
@@ -6476,8 +6444,6 @@ const I18N = {
     tcAskCur: 'Napis {0} — bieżący początek',
     tcScaleHint: 'Podaj czasy początku, jakie powinien mieć napis 1 i ostatni napis; wszystko pomiędzy przeskaluje się o ten sam współczynnik (długości też)',
     tcOk: 'Oś czasu wygląda dobrze',
-    tcFix: 'Napraw wszystko',
-    tcFixed: 'Naprawiono {0} napisów',
     tcOvTitle: 'Nakłada się na napis {0}',
     tcSnapPrev: 'Przyciągnij do końca poprzedniego',
     tcSnapNext: 'Przyciągnij do początku następnego',
@@ -6881,8 +6847,6 @@ const I18N = {
     tcAskCur: 'Replik {0} — aktuell start',
     tcScaleHint: 'Ange de starttider som replik 1 och sista repliken bör ha; allt däremellan skalas med samma förhållande (längder skalas också)',
     tcOk: 'Tidslinjen ser bra ut',
-    tcFix: 'Fixa alla',
-    tcFixed: 'Åtgärdade {0} replik(er)',
     tcOvTitle: 'Överlappar replik {0}',
     tcSnapPrev: 'Fäst vid föregående slut',
     tcSnapNext: 'Fäst vid nästa start',
@@ -7286,8 +7250,6 @@ const I18N = {
     tcAskCur: 'Titulek {0} — aktuální začátek',
     tcScaleHint: 'Zadejte časy začátku, které by měl mít 1. titulek a poslední titulek; vše mezi tím se přepočítá stejným poměrem (délky se přepočítají také)',
     tcOk: 'Časová osa je v pořádku',
-    tcFix: 'Opravit vše',
-    tcFixed: 'Opraveno {0} titulků',
     tcOvTitle: 'Překrývá se s titulkem {0}',
     tcSnapPrev: 'Přichytit ke konci předchozího',
     tcSnapNext: 'Přichytit k začátku následujícího',
@@ -7691,8 +7653,6 @@ const I18N = {
     tcAskCur: 'Субтитр {0} — поточний початок',
     tcScaleHint: 'Вкажіть початковий час, який мають мати перший і останній субтитр; усе між ними масштабується з тим самим коефіцієнтом (тривалість теж)',
     tcOk: 'Таймлайн у порядку',
-    tcFix: 'Виправити все',
-    tcFixed: 'Виправлено {0} субтитр(ів)',
     tcOvTitle: 'Перетинається із субтитром {0}',
     tcSnapPrev: 'Прив\'язати до кінця попереднього',
     tcSnapNext: 'Прив\'язати до початку наступного',
@@ -8096,8 +8056,6 @@ const I18N = {
     tcAskCur: 'Cue {0} — nuværende start',
     tcScaleHint: 'Angiv de starttider, cue 1 og sidste cue bør have; alt derimellem skaleres med samme forhold (varigheder skaleres også)',
     tcOk: 'Tidslinjen ser fin ud',
-    tcFix: 'Ret alle',
-    tcFixed: 'Rettede {0} cue(s)',
     tcOvTitle: 'Overlapper cue {0}',
     tcSnapPrev: 'Snap til forriges slutning',
     tcSnapNext: 'Snap til næstes start',
@@ -8501,8 +8459,6 @@ const I18N = {
     tcAskCur: 'Repliikki {0} — nykyinen alku',
     tcScaleHint: 'Anna repliikin 1 ja viimeisen repliikin "oletetut" alkuajat; välissä olevat skaalataan samalla suhteella (kestot skaalautuvat mukana)',
     tcOk: 'Aikajana on kunnossa',
-    tcFix: 'Korjaa kaikki',
-    tcFixed: 'Korjattu {0} repliikkiä',
     tcOvTitle: 'Lomittuu repliikin {0} kanssa',
     tcSnapPrev: 'Kiinnitä edellisen loppuun',
     tcSnapNext: 'Kiinnitä seuraavan alkuun',
@@ -8906,8 +8862,6 @@ const I18N = {
     tcAskCur: 'Υπότιτλος {0} — τρέχουσα έναρξη',
     tcScaleHint: 'Δώσε τους χρόνους έναρξης που «θα έπρεπε» να έχουν ο 1ος και ο τελευταίος υπότιτλος· ό,τι είναι ενδιάμεσα κλιμακώνεται με την ίδια αναλογία (μαζί και οι διάρκειες)',
     tcOk: 'Η χρονογραμμή είναι εντάξει',
-    tcFix: 'Διόρθωση όλων',
-    tcFixed: 'Διορθώθηκαν {0} υπότιτλοι',
     tcOvTitle: 'Επικαλύπτεται με τον υπότιτλο {0}',
     tcSnapPrev: 'Προσκόλληση στο τέλος του προηγούμενου',
     tcSnapNext: 'Προσκόλληση στην έναρξη του επόμενου',
@@ -9311,8 +9265,6 @@ const I18N = {
     tcAskCur: 'כתובית {0} — התחלה נוכחית',
     tcScaleHint: 'הזן את זמני ההתחלה שאמורים להיות לכתובית 1 ולכתובית האחרונה; כל מה שביניהן מותאם באותו יחס (גם המשכים משתנים בהתאם)',
     tcOk: 'ציר הזמן תקין',
-    tcFix: 'תקן הכל',
-    tcFixed: 'תוקנו {0} כתוביות',
     tcOvTitle: 'חופף לכתובית {0}',
     tcSnapPrev: 'הצמד לסוף הקודמת',
     tcSnapNext: 'הצמד להתחלת הבאה',
@@ -9716,8 +9668,6 @@ const I18N = {
     tcAskCur: 'Replica {0} — începutul actual',
     tcScaleHint: 'Dă timpii de început pe care ar trebui să îi aibă prima și ultima replică; tot ce e între se scalează cu același raport (și duratele se scalează)',
     tcOk: 'Cronologia arată bine',
-    tcFix: 'Repară tot',
-    tcFixed: 'Reparate {0} replici',
     tcOvTitle: 'Se suprapune cu replica {0}',
     tcSnapPrev: 'Aliniază la sfârșitul precedentei',
     tcSnapNext: 'Aliniază la începutul următoarei',
@@ -10837,12 +10787,10 @@ function renderEdBar(){
      ① 精修：点「时间」格直接改，认 +1.5s / -500 这类相对值（base = 改动前那个值）
      ② 吸附：改完或点开时若与邻居重叠，当场三选（吸附 / 顺推后面所有 / 保留不动）
      ③ 批量：整体偏移 / 从某条起 / 比例缩放（缩放连时长一起缩，不是只挪起点）
-     ④ 体检：只修「轴本身站不住」的三类（负起点 / 重叠 / 短于 0.83s）；
-        CPS 过快与字幕过长要改的是文案，只报出来，一键修绝不碰。
+     ④ 体检：报出「轴本身站不住」的三类（负起点 / 重叠 / 短于 0.83s），只报不自动修。
    ⚠️ 一律走 markEdited + saveEdits：改动实时进导出，刷新不丢（复用 269 那套快照）。
    ⚠️ 不动 merge-core.js 一个字：改的只是 S.rows 上的 start / end。
    ===================================================================== */
-const FX_MIN_DUR = 833;        /* 与 merge-core 的 MIN_DUR_MS 一致（Netflix 最短显示时长） */
 let FX_OV = -1;                /* 当前摊开「重叠三选」的行下标；-1 = 没有 */
 /* 时间码解析：相对 +1.5s / -500 / +2m（base = 改动前的值），其余写法沿用 strToMs。
    ⚠️ 另写一份，不去改 strToMs —— 那是「认不出就整格拒绝」的老口径，本页别处还在用。 */
@@ -10943,29 +10891,9 @@ function fxIssues(){
   if (monoMode()) iss = iss.filter(x => x.kind !== 'no-src' && x.kind !== 'no-dst' && x.kind !== 'empty');
   return iss;
 }
-/* 一键修：只动「轴本身站不住」的三类 —— 负起点、前后重叠、短于 0.83 秒。
-   ⚠️ 顺序不能换：先解重叠再补时长。补时长可能重新压过下一条，
-      所以补完要顺推后续 —— 只补不推，改完立刻又是一条新的重叠。 */
-function fxFix(){
-  const rows = (S.rows || []).filter(r => r && r.flag !== 'drop' && r.flag !== 'merged');
-  if (!rows.length) return 0;
-  let n = 0;
-  const pushFrom = (i, d) => { for (let k = i; k < rows.length; k++){ const x = rows[k]; markEdited(x); x.start += d; x.end += d; } };
-  for (let i = 0; i < rows.length; i++){ if (rows[i].start < 0){ pushFrom(i, -rows[i].start); n++; } }
-  for (let i = 1; i < rows.length; i++){
-    const r = rows[i], pv = rows[i - 1];
-    if (r.start < pv.end - 1){ pushFrom(i, pv.end - r.start); n++; }
-  }
-  for (let i = 0; i < rows.length; i++){
-    const r = rows[i], nx = rows[i + 1];
-    if ((r.end - r.start) < FX_MIN_DUR){
-      markEdited(r); r.end = r.start + FX_MIN_DUR; n++;
-      if (nx && r.end > nx.start){ pushFrom(i + 1, r.end - nx.start); n++; }
-    }
-  }
-  saveEdits(); FX_OV = -1; afterEdit(); renderEdBar();
-  return n;
-}
+/* v0.9.392：这里原本是「一键修」（自动修负起点 / 解重叠 / 补最短时长），已下架。
+   理由同上：顺推会连带后面所有条一起挪，补时长会把该短的地方强行拉长，
+   机器替用户拍板，改出来的往往比原来更难收拾。体检只报，不自动改。 */
 /* 带输入框的小弹窗：本页自有一份，不去复用首页的 askFields（那份样式与首页耦合） */
 function fxAsk(title, fields, okTxt){
   return new Promise(resolve => {
@@ -11040,12 +10968,7 @@ function fxBindTc(){
     const n = fxIssues().length, out = $('fxTcIssN');
     if (!out) return;
     if (!n){ out.textContent = t('tcOk'); toast(t('tcOk')); return; }
-    out.innerHTML = '';
-    out.appendChild(document.createTextNode(n + ' · '));
-    const fx = document.createElement('button');
-    fx.type = 'button'; fx.className = 'btn ghost btn-sm'; fx.textContent = t('tcFix');
-    fx.onclick = () => { const k = fxFix(); toast(t('tcFixed', k)); };
-    out.appendChild(fx);
+    out.textContent = String(n); out.title = t('repIssues');
   });
 }
 /* v0.9.248：勾选行之后，槽就在眼皮底下 —— 这条贴在表格底部，滚表格也跟着走。

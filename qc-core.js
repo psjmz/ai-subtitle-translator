@@ -6,7 +6,9 @@
  *  2) 统一计量单位「半角宽度」：ASCII/拉丁=1，汉字·假名·谚文·全角标点=2；
  *     组合记号（泰文元音、阿拉伯语音符、天城体符号）计 0 —— 否则泰语/阿拉伯语会被严重高估。
  *     这样 42 宽度 = 拉丁 42 字符 = 中文 21 全角字，与本站既有体检口径（maxLine 21）对齐。
- *  3) 阅读速度同样按宽度/秒：中文 18（=9 全角字/秒，与既有 maxCps 9 对齐），拉丁等 20。
+ *  3) 阅读速度同样按宽度/秒，数值来自 Netflix TTSG 各语言阅读速度表（见 DEF 上方注释）：
+ *     中文 18（=9 全角字/秒）· 日文 8（=4 全角字/秒）· 韩文 22（≈12 音节/秒）· 英/阿 20 ·
+ *     印地 18 · 德/芬/西/葡等在册未单列的按 17。与翻译页 srt-core.js 的 CPS_LIMITS 同一标准。
  *  4) 双语条目（形态 A：一条两行分属两种文字；形态 B：两条同轴）识别出来，
  *     阅读速度只算写着这门语言的那一行，重叠检查整对豁免 —— 否则每条双语都误报。
  *
@@ -44,20 +46,38 @@
     'hi': 'deva'
   };
 
-  /* ---------- 各文字系统的默认阈值（页面上可改；不是任何机构的认证值） ----------
+  /* ---------- 各文字系统的默认阈值（页面上可改） ----------
      maxLineW 单行最大宽度（半角单位）
      maxCpsW  阅读速度上限（半角宽度/秒）
-     minDur / maxDur 单条停留时长（毫秒） */
+     minDur / maxDur 单条停留时长（毫秒）
+
+     v0.9.394：读速按 Netflix TTSG 各语言阅读速度表收口（成人档、非 SDH）——
+     以前是「英语 20 套所有语言」，日文因此松了 2.2 倍、韩文反倒严了 25%，和翻译页
+     srt-core.js 的 CPS_LIMITS 给出的结论对不上。TTSG 值 → 本页半角宽度：
+       en 20 · ar 20（原样，拉丁/阿拉伯一字一宽）
+       ja 4 全角字/秒 → 8        zh-TW/zh-CN 9 → 18        ko 12 音节/秒 → 22
+       hi 22 → 18（天城文组合记号计 0，实测 0.83 宽/字符）
+       未单列的语言按 TTSG「其他 17」→ 17（德/芬/西/葡在 TTSG 里正是 17，对得上）
+     ⚠️ 数值来源是 TTSG 原文，页面上的输入框仍可改；改的是默认值，不是上限。 */
   var DEF = {
     cjk:    { maxLineW: 42, maxCpsW: 18, minDur: 833,  maxDur: 7000, maxLines: 2 },
-    hangul: { maxLineW: 42, maxCpsW: 18, minDur: 833,  maxDur: 7000, maxLines: 2 },
-    nospc:  { maxLineW: 42, maxCpsW: 20, minDur: 833,  maxDur: 7000, maxLines: 2 },
-    lat:    { maxLineW: 42, maxCpsW: 20, minDur: 833,  maxDur: 7000, maxLines: 2 },
-    cyr:    { maxLineW: 42, maxCpsW: 20, minDur: 833,  maxDur: 7000, maxLines: 2 },
-    gre:    { maxLineW: 42, maxCpsW: 20, minDur: 833,  maxDur: 7000, maxLines: 2 },
+    hangul: { maxLineW: 42, maxCpsW: 22, minDur: 833,  maxDur: 7000, maxLines: 2 },
+    nospc:  { maxLineW: 42, maxCpsW: 17, minDur: 833,  maxDur: 7000, maxLines: 2 },
+    lat:    { maxLineW: 42, maxCpsW: 17, minDur: 833,  maxDur: 7000, maxLines: 2 },
+    cyr:    { maxLineW: 42, maxCpsW: 17, minDur: 833,  maxDur: 7000, maxLines: 2 },
+    gre:    { maxLineW: 42, maxCpsW: 17, minDur: 833,  maxDur: 7000, maxLines: 2 },
     arab:   { maxLineW: 42, maxCpsW: 20, minDur: 833,  maxDur: 7000, maxLines: 2 },
-    hebr:   { maxLineW: 42, maxCpsW: 20, minDur: 833,  maxDur: 7000, maxLines: 2 },
-    deva:   { maxLineW: 42, maxCpsW: 20, minDur: 833,  maxDur: 7000, maxLines: 2 }
+    hebr:   { maxLineW: 42, maxCpsW: 17, minDur: 833,  maxDur: 7000, maxLines: 2 },
+    deva:   { maxLineW: 42, maxCpsW: 18, minDur: 833,  maxDur: 7000, maxLines: 2 }
+  };
+  /* 与所属文字系统不同档的语言（TTSG 有单独规定的那几个）。
+     en 在 lat 档里要抬到 20；ja 写汉字但按 4 全角字/秒；yue 没有 SYS 映射会落到 lat，
+     但它写的是汉字，读速跟中文同档。 */
+  var CPS_LANG = {
+    'en': 20, 'ja': 8, 'yue': 18,
+    /* 这 6 种被 sysOf 当成拉丁（一字一宽），实际每字符只有 0.81~0.86 宽（孟加拉/奥里亚/
+       尼泊尔/马拉地/阿萨姆的元音符与连写多），按 17 字符/秒 × 实测宽度写 */
+    'or': 14.0, 'mr': 14.6, 'ne': 14.3, 'bn': 14.5, 'as': 14.4, 'th': 13.8
   };
 
   /* 规则表：id → 级别 / 是否可修 / 修的时候动不动时间轴 */
@@ -162,6 +182,7 @@
   function paramsFor(lang, frame) {
     var s = sysOf(lang), d = DEF[s] || DEF.lat, o = {};
     for (var k in d) o[k] = d[k];
+    if (CPS_LANG[lang]) o.maxCpsW = CPS_LANG[lang];   /* v0.9.394：TTSG 单列语种覆盖文字系统默认档 */
     o.maxLineW = (FRAME[frame] && frame !== 'land') ? lineWFor(s, frame) : d.maxLineW;
     o.sys = s;
     o.frame = frameOf(frame);
@@ -665,7 +686,7 @@
   }
 
   g.QCCore = {
-    SYS: SYS, DEF: DEF, RULES: RULES, PUNCT: PUNCT, FRAME: FRAME,
+    SYS: SYS, DEF: DEF, CPS_LANG: CPS_LANG, RULES: RULES, PUNCT: PUNCT, FRAME: FRAME,
     sysOf: sysOf, paramsFor: paramsFor, widthOf: widthOf, mainScript: mainScript,
     scriptSys: scriptSys, lineSys: lineSys, lineWFor: lineWFor, frameOf: frameOf,
     detectFmt: detectFmt, parse: parse, formatSrt: formatSrt, formatVtt: formatVtt,

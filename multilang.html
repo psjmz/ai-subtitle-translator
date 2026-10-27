@@ -1307,6 +1307,47 @@
     color:#5A4300;border-radius:4px;padding:1px 6px;margin:0 4px 4px 0}
   .dr-pane .flbl-row{margin-top:13px}
 
+  /* ---------- v0.9.392：主页就地展开的「设置卡片」 ----------
+     抽屉的入口深到「顶栏 → 抽屉 → 页签」三跳，多任务下每改一次设置都要走一遍，
+     用户实测找不到翻译设置在哪。改法：把抽屉里的「翻译设置」「导出」两块搬到主页，
+     做成默认收起的一行摘要卡片 —— 收起时只占一行，展开后就是原来那套控件。
+     ⚠️ 这里只写容器外观，内部控件的 id / class / 事件绑定一个都不动，
+     所以搬过去以后 JS（getElementById 取值的那些）零改动照样能用。 */
+  .cfgcard{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .cfg-hd{display:flex;align-items:center;gap:9px;width:100%;padding:11px 14px;border:none;
+    background:none;text-align:left;cursor:pointer;font:inherit;color:inherit}
+  .cfg-hd:hover{background:#F7F9FD}
+  .cfg-n{flex:none;font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.01em}
+  .cfg-s{flex:1;min-width:0;font-size:11.5px;color:#6B7488;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cfg-ar{flex:none;width:20px;height:20px;border-radius:6px;background:#F2F5FC;color:#6B7488;
+    display:flex;align-items:center;justify-content:center;transition:transform .18s ease}
+  .cfg-hd[aria-expanded="true"] .cfg-ar{transform:rotate(180deg);background:#EEF1FE;color:#2C3AC0}
+  .cfg-bd{display:none;padding:0 14px 14px}
+  .cfgcard.open .cfg-bd{display:block}
+  /* v0.9.392：卡片是通栏的（要跟投放区、矩阵对齐），但里面的控件别跟着拉满 ——
+     两列 chip 在 1000px 宽下每个都 500px，字居中悬在中间，既难扫也显得没做完。
+     内容限到 780px 左对齐，卡片边框仍是通栏。 */
+  .cfg-bd>*{max-width:780px}
+  /* 下面三条与 .dr-pane 内的三条同口径：搬出来的内容原本靠它们定间距，不复制就会贴边 */
+  .cfg-bd>.sec-title:first-child{margin-top:0}
+  /* v0.9.392：导出预览原来是右栏 300px 宽的小窗（16:9 ≈ 169px 高）。
+     搬进通栏卡片后 aspect-ratio 会把 980px 撑成 551px 的黑板 —— 预览要的是「看一眼样式对不对」，
+     不是占半屏。这里只限宽、居中，不改它自己的比例与内部定位。 */
+  .cfg-bd .exp-preview{max-width:380px;margin-left:0;margin-right:auto}
+  .cfg-bd .param-blk{margin-top:10px}
+  .cfg-bd .flbl-row{margin-top:13px}
+  /* 折行检查结果（多任务汇总版）。单听觉实例沿用原来的 .hint.alert，
+     只有「整季多格」时才到这里 —— 结果≤2 行是常态、>2 行才是要报的事。 */
+  .wrapsum{margin-top:8px;font-size:11.5px;line-height:1.6;color:#6B7488}
+  .wrapsum b{font-family:var(--mono);font-weight:700;color:var(--ink)}
+  .wrapsum .ws-w{color:#8A6A00;font-weight:600}
+  .wrapsum .ws-w b{color:#8A6A00}
+  .ws-lang{margin-top:3px;color:#8A6A00}
+  .ws-lang span{display:inline-block;font-size:11px;background:#FFFBF0;border:1px solid #F2E3BE;
+    border-radius:5px;padding:0 6px;margin:0 4px 4px 0}
+  .ws-lang i{font-style:normal;color:#A98A3D}
+
   /* ---------- 窄屏 ---------- */
   @media (max-width:640px){
     .appbar{padding:8px 10px;height:auto;min-height:48px;flex-wrap:wrap;row-gap:8px}
@@ -1348,7 +1389,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.391</span>
+    <span class="ver-tag">v0.9.392</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1395,142 +1436,19 @@ crossorigin="anonymous"></script>
 
             </div>
 
-      <!-- ===== 语言 ===== -->
-      <div class="qbar">
-<div class="sec-title"><i class="sec-ic c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg></i><span data-i18n="secLang">语言</span></div>
-      <label class="flbl" for="srcLang"><span data-i18n="lblSrcShort">原文语言</span><i class="info" tabindex="0" data-tip-i18n="lblSrcLang">i</i></label>
-      <select id="srcLang"></select>
-      <label class="flbl" for="mlAdd" data-i18n="lblDstShort">目标语言</label>
-      <div class="ml-pick">
-        <select id="mlAdd" aria-label="添加目标语言"></select>
-        <button class="btn sm" id="mlAddBtn" type="button">+ 加入队列</button>
-      </div>
-      <div class="ml-chips" id="mlChips"></div>
-      <!-- v0.9.383：源语言 == 目标语言的常驻提示（非阻塞，只是提醒，不改动任何流程） -->
-      <div class="hint" id="langSameHint" style="display:none"></div>
-            </div>
 
-      <!-- ===== 任务矩阵 ===== -->
-      <div class="mx" id="mxWrap"></div>
+      <!-- ===== v0.9.392：翻译设置（原抽屉页签，搬到主页就地展开） =====
+           抽屉的入口在「顶栏 → 抽屉 → 页签」三跳之后，多任务实测找不到；
+           这里做成默认收起的一行摘要卡片：收起只占一行，展开就是原封不动的那套控件。
+           ⚠️ 搬运只动位置 —— 内部 id / class / 事件绑定一个没改，JS 零改动。 -->
+      <section class="cfgcard" id="cfgTrans">
+        <button class="cfg-hd" id="cfgTransHd" type="button" aria-expanded="false" aria-controls="cfgTransBd">
+          <span class="cfg-n">翻译设置</span>
+          <span class="cfg-s" id="cfgTransSum"></span>
+          <span class="cfg-ar"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <div class="cfg-bd" id="cfgTransBd">
 
-      <!-- ===== 单格查看（原编辑区，默认收起） ===== -->
-      <section class="viewer" id="viewer">
-        <div class="vbar" id="vBar">
-          <span class="vb-k">查看</span>
-          <span class="vb-cur" id="vCur">未选择</span>
-          <span class="vb-meta" id="vMeta"></span>
-          <span class="vb-sp"></span>
-<div class="exp-actions">
-        <button class="btn primary" id="btnDownload" data-i18n="btnDownload" type="button">下载字幕</button>
-        <button class="btn ghost" id="btnCopy" data-i18n="btnCopy" type="button">复制到剪贴板</button>
-      </div>
-          <button class="vb-btn" id="vToggle" type="button" aria-expanded="false">展开</button>
-        </div>
-        <div class="vbody" id="vBody">
-<section class="center">
-      <div class="metrics">
-        <span class="metric" id="stTotal">条数 <b>0</b></span>
-        <span class="metric ok" id="stDone">已译 <b>0</b></span>
-        <span class="metric del" id="stDrop">水词清空 <b>0</b></span>
-        <span class="metric warn" id="stMerge">跨条句组 <b>0</b></span>
-        <span class="metric ok" id="stWrap">折行 <b>0</b></span>
-        <span class="metric warn" id="stIssues">待处理 <b>0</b></span>
-      </div>
-      <div class="progwrap" id="progWrap">
-        <span class="pg-badge"><i class="pg-dot"></i><span id="pgState">…</span></span>
-        <div class="pg-main">
-          <div class="pg-row">
-            <span class="pg-pct" id="pgPct">0%</span>
-            <span class="pg-info" id="prText"></span>
-            <!-- v0.9.297 加的那句宽心话；v0.9.298 按用户定案挪进 pg-row、跟在「第 x/y 批」后面。
-                 默认 hidden，由 pgBusy() 在 pgStart / pgFinish / setProg(…,false) 三处开关 ——
-                 和任务条同生共死。data-i18n 让切界面语言时自动跟着换，不用额外接线。 -->
-            <span class="pg-busy" id="pgBusy" data-i18n="pgBusyTip" hidden>因AI算力紧张，请你耐心等几分钟^^</span>
-            <span class="pg-eta" id="pgEta"></span>
-          </div>
-          <div class="prog" id="prog"><i></i></div>
-        </div>
-      </div>
-      <!-- v0.9.262：任务条下方广告位。懒加载——首次随任务条（#progWrap.show）出现才 push，
-           之后常驻。加载器脚本已在 <head>（v0.9.258 接入），此处不重复引入。
-           v0.9.263：data-ad-format 由 auto 改 horizontal——auto 由 Google 自由决定形状，
-           桌面端常见 90~280px 高，不一定是细横条；horizontal 固定水平横幅（728x90 一族），
-           配合 full-width-responsive 撑满内容宽度，高度稳定，正是要的「横屏广告」。 -->
-      <div class="adbox" id="adBox">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-8352564748755277"
-             data-ad-slot="2593336254"
-             data-ad-format="horizontal"
-             data-full-width-responsive="true"></ins>
-      </div>
-      <div class="toolbar">
-        <!-- v0.9.199：工具栏这个筛选框没有任何可见标签（左右邻居都是按钮），
-             读屏只会念「组合框 全部」，不知道在筛什么。补一个 aria-label。 -->
-        <select id="filter" data-i18n-aria="filterAria">
-          <option value="all" data-i18n="fAll">全部</option>
-          <option value="todo" data-i18n="fTodo">仅待译</option>
-          <option value="done" data-i18n="fDone">仅已译</option>
-          <option value="flag" data-i18n="fFlag">仅特殊处理</option>
-          <!-- v0.9.385：翻译跑完后仍没有译文的条目——不是水词（那是主动删除），
-               是模型漏了、补译也没救回来。集中列出来给用户逐条检查/补写。 -->
-          <option value="miss" data-i18n="fMiss">仅待检查</option>
-        </select>
-      </div>
-      <!-- v0.9.270：时间轴工具栏。整片不同步靠这里修，单行精修在表格里点时间码 -->
-      <div class="tc-bar" id="tcBar" style="display:none">
-        <span data-i18n="tcTitle">时间轴</span>
-        <button type="button" class="btn" id="tcShiftAll" data-i18n="tcShiftAll">整体偏移</button>
-        <button type="button" class="btn" id="tcShiftFrom" data-i18n="tcShiftFrom">从某条起</button>
-        <button type="button" class="btn" id="tcScale" data-i18n="tcScale">比例缩放</button>
-        <span class="sep"></span>
-        <button type="button" class="btn" id="tcCheck" data-i18n="tcCheck">时长体检</button>
-        <span class="n" id="tcIssN"></span>
-      </div>
-      <div class="lst">
-        <div class="cuegrid head">
-          <span>#</span><span data-i18n="colTc">时间轴</span><span id="hSrc">英文原文</span><span id="hDst">中文译文（可点击编辑）</span>
-        </div>
-        <div class="inner" id="rows"></div>
-      </div>
-      <div class="ed-bar" id="edBar" style="display:none"></div>
-      <details class="report" id="reportBox" style="display:none">
-        <summary data-i18n="reportSummary">导出前校验报告</summary>
-        <div id="report"></div>
-      </details>
-      <!-- v0.9.162：中栏底部的 risekol 引流卡。排在「校验报告」之后——报告是导出前校验的结果区，
-           插在它和字幕表之间会切断两者的视觉关联（报告一展开就看得出来）。
-           默认隐藏，与首页那条共用 rkBanner() 的域名判定，开源版/自部署不挂外链。 -->
-      <a class="ws-rk" id="rkBannerWs" href="https://risekol.com/video" target="_blank" rel="noopener">
-        <span class="wr-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></svg></span>
-        <span class="wr-tx">
-          <span class="wr-t" data-i18n-html="rkTx"></span>
-          <span class="wr-s" data-i18n="wsRkSub"></span>
-        </span>
-        <span class="wr-go" data-i18n="rkGo"></span>
-      </a>
-    </section>
-
-            </div>
-      </section>
-
-    </div>
-  </div>
-
-  <!-- ===== 设置抽屉 ===== -->
-  <div class="dr-mask" id="drMask"></div>
-  <aside class="dr" id="setDrawer" aria-hidden="true" aria-label="设置">
-    <div class="dr-hd">
-      <span class="dr-title">设置</span>
-      <button class="dr-x" id="drClose" type="button" aria-label="关闭">&#10005;</button>
-    </div>
-    <div class="dr-tabs" role="tablist">
-      <button class="dr-tab on" type="button" data-pane="trans" role="tab">翻译设置</button>
-      <button class="dr-tab" type="button" data-pane="gloss" role="tab">术语表<i id="drGlossCnt"></i></button>
-      <button class="dr-tab" type="button" data-pane="export" role="tab">导出</button>
-    </div>
-    <div class="dr-panes">
-      <div class="dr-pane on" data-pane="trans">
 <div class="sec-title"><i class="sec-ic c3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></i><span id="secStyleLbl" data-i18n="secStyle">翻译风格</span></div>
       <div class="style-chips" role="radiogroup" aria-labelledby="secStyleLbl">
         <label class="schip"><input type="radio" name="style" value="elegant" checked><span data-i18n="styleElegant">均衡</span></label>
@@ -1629,68 +1547,50 @@ crossorigin="anonymous"></script>
         <summary><i class="sec-ic" style="width:20px;height:20px;border-radius:6px;background:#ECEAE8;color:#8B888F"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></i><span data-i18n="logTitle">运行日志</span></summary>
         <div class="log" id="log" data-i18n="logReady">就绪。导入字幕或载入示例开始。</div>
       </details>
-      </div>
-      <div class="dr-pane" data-pane="gloss">
-        <div class="gl-stats" id="glStats"></div>
-<div class="flbl-row">
-        <label class="flbl" for="terms"><span data-i18n="lblTermsShort">统一译名</span><i class="info" tabindex="0" data-tip-i18n="lblTerms">i</i></label>
-        <button class="btn xs ghost" id="btnGlossAI" type="button" data-i18n="btnGlossAI">✨ AI 抽取</button>
-      </div>
-      <div class="hint" id="glossAiHint"></div>
-      <textarea id="terms" rows="4" spellcheck="false"
-        placeholder="SpaceX&#10;Burger King → 汉堡王&#10;Whopper|Whoppers → 华堡" data-i18n-ph="termsPh3"></textarea>
-      <div class="gloss-ops">
-        <button class="btn sm ghost" id="btnGlossAppend" type="button" data-i18n="btnGlossAppend">📥 追加</button>
-        <button class="btn sm ghost" id="btnGlossReplace" type="button" data-i18n="btnGlossReplace">🔄 替换</button>
-        <button class="btn sm ghost" id="btnGlossSave" type="button" data-i18n="btnGlossSave">💾 保存</button>
-        <button class="btn sm ghost" id="btnGlossClear" type="button" data-i18n="btnGlossClear">✕ 清空</button>
-        <!-- v0.9.168：术语库「保存 / 清空」。与上面的上传按钮是两回事：
-             上传管的是「这张表从哪来」，保存/清空管的是「这张表要不要留到下一部片」。
-             v0.9.201：「📄 CSV 模板」不是这张表的操作（它不改内容），挪进下方「这个表怎么用」。 -->
-      </div>
-      <div class="hint" id="glossLibHint"></div>
-      <input type="file" id="glossFile" accept=".txt,.csv,.tsv,.json" hidden>
-      <div class="hint" id="glossHint"></div>
-      <details id="glossHelp" class="ghelp">
-        <summary data-i18n="glossUseTitle">这个表怎么用</summary>
-        <div class="gh-body">
-          <!-- v0.9.142：按「为什么需要 → 怎么解决 → 怎么写」重写。
-               此前整块在讲「支持哪些符号」（内部实现），而用户真正要问的是「我写了为什么不生效」；
-               「怎么匹配」那节还是在讲算法，且第 4 条与 | 写法自相矛盾，已整节删除。 -->
-          <p class="gh-lead" data-i18n="glossWhy">AI 是分批翻译的，同一个名字在不同批次里可能译成两种写法。写进这里的「原文 → 必须译成什么」，每批翻译前会先在这一批字幕里找一遍：找得到就交给 AI 照译，找不到这条就不提交——改它不会影响结果。没写进来的，按上面「专名处理」走。</p>
-
-          <p class="gh-h" data-i18n="glossHelpFmt">写法 · 一行一条</p>
-          <div class="gh-row"><code>SpaceX</code><i data-i18n="glossHelpS1">只写原文，表示保留原文不译</i></div>
-          <div class="gh-row"><code>Burger King → 汉堡王</code><i data-i18n="glossHelpS2">原文 → 译法</i></div>
-          <div class="gh-row"><code>Whopper|Whoppers → 华堡</code><i data-i18n="glossHelpS5">几种拼写用 | 并排，共用一个译法</i></div>
-          <div class="gh-row"><code>Outlaw 1 → 亡命徒1（呼号）</code><i data-i18n="glossHelpS4">行尾括号是备注，不进译法</i></div>
-          <p class="gh-tip" data-i18n="glossHelpSep">箭头 -&gt; =&gt; = 、逗号、Tab 都认</p>
-
-          <p class="gh-warn"><b data-i18n="glossNoEffT">改了没生效？</b><span data-i18n="glossNoEffB">只有一种可能：你写的原文在字幕里没逐字出现过（多一个标点、少个 s 都配不上）。这时下方那行提示会变橙色，并点名是哪几条。</span></p>
-
-          <p class="gh-tip" data-i18n="glossUpOne">上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。</p>
-          <!-- v0.9.201：从上面那排操作按钮挪来。它不改变这张表的内容，
-               只是下载一份空白模板给用户照着填，属于「怎么用」而不是「怎么操作」。 -->
-          <div class="gh-ops">
-            <button class="btn sm ghost" id="btnGlossTpl" type="button" data-i18n="btnGlossTpl">📄 CSV 模板</button>
-          </div>
+      
         </div>
-      </details>
-      <!-- v0.9.189：折行阈值 / 双语行宽两项已移到右侧「导出译文」面板（见那里的说明）。
-           折行是翻译完成后的排版处理，不属于翻译设置，放左栏会让用户以为它影响翻译结果。 -->
+      </section>
 
-      <!-- v0.9.194：ASS 字幕样式（字号/颜色/离底距离）已移到右侧「导出译文」面板，
-           紧跟在「导出字幕样式」下面。它本来就由右边那个下拉框控制（选 ASS 才出现），
-           是导出期的外观设置、不是翻译参数，放左栏会让用户以为它影响翻译结果。
-           搬运只动位置：id 与 data-i18n 全保留，控制逻辑（syncAssStyleBox）不变。 -->
-
-      <!-- v0.9.201：歌词 / 水词从「处理规则」里拆出来，自成一节「内容过滤」。
-           原「处理规则」一节高 670px，占左栏 41%——它其实装了两类完全不同的事：
-           「哪些词要怎么译」（专名处理 + 术语表）和「哪些内容要不要留下」（歌词 + 水词）。
-           混在一节里，用户想关歌词时得先穿过整块术语表。拆开后两节各管一件事，
-           标题也能说人话（「处理规则」没有告诉用户这里面有什么）。 -->
+      <!-- ===== 语言 ===== -->
+      <div class="qbar">
+<div class="sec-title"><i class="sec-ic c2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg></i><span data-i18n="secLang">语言</span></div>
+      <label class="flbl" for="srcLang"><span data-i18n="lblSrcShort">原文语言</span><i class="info" tabindex="0" data-tip-i18n="lblSrcLang">i</i></label>
+      <select id="srcLang"></select>
+      <label class="flbl" for="mlAdd" data-i18n="lblDstShort">目标语言</label>
+      <div class="ml-pick">
+        <select id="mlAdd" aria-label="添加目标语言"></select>
+        <button class="btn sm" id="mlAddBtn" type="button">+ 加入队列</button>
+      </div>
+      <div class="ml-chips" id="mlChips"></div>
+      <!-- v0.9.383：源语言 == 目标语言的常驻提示（非阻塞，只是提醒，不改动任何流程） -->
+      <div class="hint" id="langSameHint" style="display:none"></div>
             </div>
-      <div class="dr-pane" data-pane="export">
+
+      <!-- ===== 任务矩阵 ===== -->
+      <div class="mx" id="mxWrap"></div>
+
+      <!-- v0.9.392：全队列的折行检查。
+           位置紧贴任务矩阵，不放在导出设置里：导出设置默认收起，而这份汇总正是「跑完之后
+           抬头要看的那一眼」——藏进折叠卡片里等于没做。
+           上面那条 splitWarnHint 只查「当前这一集」；多任务下折行的原料是每一格的译文，
+           只报当前格会把整季的隐患漏掉，所以这里按全部已完成格汇总、按语言分列
+           （每种语言的行宽本来就不同，挤成一个总数就不知道该调哪一个）。
+           ML.results 为空时不出声，仍由上面那条负责。 -->
+      <div class="wrapsum" id="wrapSumHint" hidden></div>
+
+
+      <!-- ===== v0.9.392：导出设置（原抽屉页签，搬到主页就地展开） =====
+           抽屉的入口在「顶栏 → 抽屉 → 页签」三跳之后，多任务实测找不到；
+           这里做成默认收起的一行摘要卡片：收起只占一行，展开就是原封不动的那套控件。
+           ⚠️ 搬运只动位置 —— 内部 id / class / 事件绑定一个没改，JS 零改动。 -->
+      <section class="cfgcard" id="cfgExport">
+        <button class="cfg-hd" id="cfgExportHd" type="button" aria-expanded="false" aria-controls="cfgExportBd">
+          <span class="cfg-n">导出设置</span>
+          <span class="cfg-s" id="cfgExportSum"></span>
+          <span class="cfg-ar"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <div class="cfg-bd" id="cfgExportBd">
+
       <div class="sec-title"><i class="sec-ic c1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></i><span data-i18n="stepExport">导出译文</span></div>
       <div class="exp-preview">
         <div class="ep-line ep-dst" data-i18n="showLineDst">♪ 爱在空中飘荡 ♪</div>
@@ -1998,7 +1898,184 @@ crossorigin="anonymous"></script>
           <div class="hint">图个快乐，多少随意</div>
         </div>
       </div>
+          
+        </div>
+      </section>
+
+      <!-- ===== 单格查看（原编辑区，默认收起） ===== -->
+      <section class="viewer" id="viewer">
+        <div class="vbar" id="vBar">
+          <span class="vb-k">查看</span>
+          <span class="vb-cur" id="vCur">未选择</span>
+          <span class="vb-meta" id="vMeta"></span>
+          <span class="vb-sp"></span>
+<div class="exp-actions">
+        <button class="btn primary" id="btnDownload" data-i18n="btnDownload" type="button">下载字幕</button>
+        <button class="btn ghost" id="btnCopy" data-i18n="btnCopy" type="button">复制到剪贴板</button>
+      </div>
+          <button class="vb-btn" id="vToggle" type="button" aria-expanded="false">展开</button>
+        </div>
+        <div class="vbody" id="vBody">
+<section class="center">
+      <div class="metrics">
+        <span class="metric" id="stTotal">条数 <b>0</b></span>
+        <span class="metric ok" id="stDone">已译 <b>0</b></span>
+        <span class="metric del" id="stDrop">水词清空 <b>0</b></span>
+        <span class="metric warn" id="stMerge">跨条句组 <b>0</b></span>
+        <span class="metric ok" id="stWrap">折行 <b>0</b></span>
+        <span class="metric warn" id="stIssues">待处理 <b>0</b></span>
+      </div>
+      <div class="progwrap" id="progWrap">
+        <span class="pg-badge"><i class="pg-dot"></i><span id="pgState">…</span></span>
+        <div class="pg-main">
+          <div class="pg-row">
+            <span class="pg-pct" id="pgPct">0%</span>
+            <span class="pg-info" id="prText"></span>
+            <!-- v0.9.297 加的那句宽心话；v0.9.298 按用户定案挪进 pg-row、跟在「第 x/y 批」后面。
+                 默认 hidden，由 pgBusy() 在 pgStart / pgFinish / setProg(…,false) 三处开关 ——
+                 和任务条同生共死。data-i18n 让切界面语言时自动跟着换，不用额外接线。 -->
+            <span class="pg-busy" id="pgBusy" data-i18n="pgBusyTip" hidden>因AI算力紧张，请你耐心等几分钟^^</span>
+            <span class="pg-eta" id="pgEta"></span>
           </div>
+          <div class="prog" id="prog"><i></i></div>
+        </div>
+      </div>
+      <!-- v0.9.262：任务条下方广告位。懒加载——首次随任务条（#progWrap.show）出现才 push，
+           之后常驻。加载器脚本已在 <head>（v0.9.258 接入），此处不重复引入。
+           v0.9.263：data-ad-format 由 auto 改 horizontal——auto 由 Google 自由决定形状，
+           桌面端常见 90~280px 高，不一定是细横条；horizontal 固定水平横幅（728x90 一族），
+           配合 full-width-responsive 撑满内容宽度，高度稳定，正是要的「横屏广告」。 -->
+      <div class="adbox" id="adBox">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-8352564748755277"
+             data-ad-slot="2593336254"
+             data-ad-format="horizontal"
+             data-full-width-responsive="true"></ins>
+      </div>
+      <div class="toolbar">
+        <!-- v0.9.199：工具栏这个筛选框没有任何可见标签（左右邻居都是按钮），
+             读屏只会念「组合框 全部」，不知道在筛什么。补一个 aria-label。 -->
+        <select id="filter" data-i18n-aria="filterAria">
+          <option value="all" data-i18n="fAll">全部</option>
+          <option value="todo" data-i18n="fTodo">仅待译</option>
+          <option value="done" data-i18n="fDone">仅已译</option>
+          <option value="flag" data-i18n="fFlag">仅特殊处理</option>
+          <!-- v0.9.385：翻译跑完后仍没有译文的条目——不是水词（那是主动删除），
+               是模型漏了、补译也没救回来。集中列出来给用户逐条检查/补写。 -->
+          <option value="miss" data-i18n="fMiss">仅待检查</option>
+        </select>
+      </div>
+      <!-- v0.9.270：时间轴工具栏。整片不同步靠这里修，单行精修在表格里点时间码 -->
+      <div class="tc-bar" id="tcBar" style="display:none">
+        <span data-i18n="tcTitle">时间轴</span>
+        <button type="button" class="btn" id="tcShiftAll" data-i18n="tcShiftAll">整体偏移</button>
+        <button type="button" class="btn" id="tcShiftFrom" data-i18n="tcShiftFrom">从某条起</button>
+        <button type="button" class="btn" id="tcScale" data-i18n="tcScale">比例缩放</button>
+        <span class="sep"></span>
+        <button type="button" class="btn" id="tcCheck" data-i18n="tcCheck">时长体检</button>
+        <span class="n" id="tcIssN"></span>
+      </div>
+      <div class="lst">
+        <div class="cuegrid head">
+          <span>#</span><span data-i18n="colTc">时间轴</span><span id="hSrc">英文原文</span><span id="hDst">中文译文（可点击编辑）</span>
+        </div>
+        <div class="inner" id="rows"></div>
+      </div>
+      <div class="ed-bar" id="edBar" style="display:none"></div>
+      <details class="report" id="reportBox" style="display:none">
+        <summary data-i18n="reportSummary">导出前校验报告</summary>
+        <div id="report"></div>
+      </details>
+      <!-- v0.9.162：中栏底部的 risekol 引流卡。排在「校验报告」之后——报告是导出前校验的结果区，
+           插在它和字幕表之间会切断两者的视觉关联（报告一展开就看得出来）。
+           默认隐藏，与首页那条共用 rkBanner() 的域名判定，开源版/自部署不挂外链。 -->
+      <a class="ws-rk" id="rkBannerWs" href="https://risekol.com/video" target="_blank" rel="noopener">
+        <span class="wr-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></svg></span>
+        <span class="wr-tx">
+          <span class="wr-t" data-i18n-html="rkTx"></span>
+          <span class="wr-s" data-i18n="wsRkSub"></span>
+        </span>
+        <span class="wr-go" data-i18n="rkGo"></span>
+      </a>
+    </section>
+
+            </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ===== 设置抽屉 ===== -->
+  <div class="dr-mask" id="drMask"></div>
+  <aside class="dr" id="setDrawer" aria-hidden="true" aria-label="术语表">
+    <div class="dr-hd">
+      <span class="dr-title">术语表</span>
+      <button class="dr-x" id="drClose" type="button" aria-label="关闭">&#10005;</button>
+    </div>
+    <div class="dr-panes">
+      
+      <div class="dr-pane on" data-pane="gloss">
+        <div class="gl-stats" id="glStats"></div>
+<div class="flbl-row">
+        <label class="flbl" for="terms"><span data-i18n="lblTermsShort">统一译名</span><i class="info" tabindex="0" data-tip-i18n="lblTerms">i</i></label>
+        <button class="btn xs ghost" id="btnGlossAI" type="button" data-i18n="btnGlossAI">✨ AI 抽取</button>
+      </div>
+      <div class="hint" id="glossAiHint"></div>
+      <textarea id="terms" rows="4" spellcheck="false"
+        placeholder="SpaceX&#10;Burger King → 汉堡王&#10;Whopper|Whoppers → 华堡" data-i18n-ph="termsPh3"></textarea>
+      <div class="gloss-ops">
+        <button class="btn sm ghost" id="btnGlossAppend" type="button" data-i18n="btnGlossAppend">📥 追加</button>
+        <button class="btn sm ghost" id="btnGlossReplace" type="button" data-i18n="btnGlossReplace">🔄 替换</button>
+        <button class="btn sm ghost" id="btnGlossSave" type="button" data-i18n="btnGlossSave">💾 保存</button>
+        <button class="btn sm ghost" id="btnGlossClear" type="button" data-i18n="btnGlossClear">✕ 清空</button>
+        <!-- v0.9.168：术语库「保存 / 清空」。与上面的上传按钮是两回事：
+             上传管的是「这张表从哪来」，保存/清空管的是「这张表要不要留到下一部片」。
+             v0.9.201：「📄 CSV 模板」不是这张表的操作（它不改内容），挪进下方「这个表怎么用」。 -->
+      </div>
+      <div class="hint" id="glossLibHint"></div>
+      <input type="file" id="glossFile" accept=".txt,.csv,.tsv,.json" hidden>
+      <div class="hint" id="glossHint"></div>
+      <details id="glossHelp" class="ghelp">
+        <summary data-i18n="glossUseTitle">这个表怎么用</summary>
+        <div class="gh-body">
+          <!-- v0.9.142：按「为什么需要 → 怎么解决 → 怎么写」重写。
+               此前整块在讲「支持哪些符号」（内部实现），而用户真正要问的是「我写了为什么不生效」；
+               「怎么匹配」那节还是在讲算法，且第 4 条与 | 写法自相矛盾，已整节删除。 -->
+          <p class="gh-lead" data-i18n="glossWhy">AI 是分批翻译的，同一个名字在不同批次里可能译成两种写法。写进这里的「原文 → 必须译成什么」，每批翻译前会先在这一批字幕里找一遍：找得到就交给 AI 照译，找不到这条就不提交——改它不会影响结果。没写进来的，按上面「专名处理」走。</p>
+
+          <p class="gh-h" data-i18n="glossHelpFmt">写法 · 一行一条</p>
+          <div class="gh-row"><code>SpaceX</code><i data-i18n="glossHelpS1">只写原文，表示保留原文不译</i></div>
+          <div class="gh-row"><code>Burger King → 汉堡王</code><i data-i18n="glossHelpS2">原文 → 译法</i></div>
+          <div class="gh-row"><code>Whopper|Whoppers → 华堡</code><i data-i18n="glossHelpS5">几种拼写用 | 并排，共用一个译法</i></div>
+          <div class="gh-row"><code>Outlaw 1 → 亡命徒1（呼号）</code><i data-i18n="glossHelpS4">行尾括号是备注，不进译法</i></div>
+          <p class="gh-tip" data-i18n="glossHelpSep">箭头 -&gt; =&gt; = 、逗号、Tab 都认</p>
+
+          <p class="gh-warn"><b data-i18n="glossNoEffT">改了没生效？</b><span data-i18n="glossNoEffB">只有一种可能：你写的原文在字幕里没逐字出现过（多一个标点、少个 s 都配不上）。这时下方那行提示会变橙色，并点名是哪几条。</span></p>
+
+          <p class="gh-tip" data-i18n="glossUpOne">上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。</p>
+          <!-- v0.9.201：从上面那排操作按钮挪来。它不改变这张表的内容，
+               只是下载一份空白模板给用户照着填，属于「怎么用」而不是「怎么操作」。 -->
+          <div class="gh-ops">
+            <button class="btn sm ghost" id="btnGlossTpl" type="button" data-i18n="btnGlossTpl">📄 CSV 模板</button>
+          </div>
+        </div>
+      </details>
+      <!-- v0.9.189：折行阈值 / 双语行宽两项已移到右侧「导出译文」面板（见那里的说明）。
+           折行是翻译完成后的排版处理，不属于翻译设置，放左栏会让用户以为它影响翻译结果。 -->
+
+      <!-- v0.9.194：ASS 字幕样式（字号/颜色/离底距离）已移到右侧「导出译文」面板，
+           紧跟在「导出字幕样式」下面。它本来就由右边那个下拉框控制（选 ASS 才出现），
+           是导出期的外观设置、不是翻译参数，放左栏会让用户以为它影响翻译结果。
+           搬运只动位置：id 与 data-i18n 全保留，控制逻辑（syncAssStyleBox）不变。 -->
+
+      <!-- v0.9.201：歌词 / 水词从「处理规则」里拆出来，自成一节「内容过滤」。
+           原「处理规则」一节高 670px，占左栏 41%——它其实装了两类完全不同的事：
+           「哪些词要怎么译」（专名处理 + 术语表）和「哪些内容要不要留下」（歌词 + 水词）。
+           混在一节里，用户想关歌词时得先穿过整块术语表。拆开后两节各管一件事，
+           标题也能说人话（「处理规则」没有告诉用户这里面有什么）。 -->
+            </div>
+      
     </div>
   </aside>
 </div>
@@ -2025,10 +2102,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.391"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.391"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.391"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.391"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.392"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.392"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.392"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.392"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2918,6 +2995,10 @@ function renderRows(){
 
 // 从 DOM 读回人工编辑的译文
 function collectZh(){
+  /* v0.9.392：多格重排（mlRebuild）会把 S.rows 临时换成另一格的快照，而表格 DOM 上还是当前这一格。
+     此时「把 DOM 读回来」等于拿这一格的字去盖那一格，导出的全是串了行的东西。
+     重排期间挂 S.noCollect，告诉它：这次别读 DOM，S.rows 里就是当次要导出的内容。 */
+  if(S.noCollect) return;
   document.querySelectorAll('#rows .zh').forEach(el=>{
     if(el.classList.contains('placeholder')) return;  // v0.9.67：占位符（待翻译…）不是译文，绝不回读——否则 missing 行导出字面占位符
     const id=+el.closest('.cuegrid').dataset.id;
@@ -2964,6 +3045,11 @@ function applyPost(){
     const o = reflowOne(r);
     if (o.changed) wrapN++;
     r.zh = o.text;
+    /* v0.9.392：折行前的整段也在这儿留一份。
+       改行宽后要按新行宽重排（见 mlRebuild），而 buildMonoParts 的 R0 是「尊重已有折行」——
+       喂已经折过行的 r.zh，旧的断点就原样留下，改成多少都一个样。喂折行前的这条才重排得动。
+       手工改过译文的行（上面 return 掉了）没有这份，于是它们的手工折行会被保留 —— 正合心意。 */
+    r.rawZh = o.rawZh;
   });
   S.wrapN=wrapN;
   renderRows();
@@ -3129,6 +3215,7 @@ function renderEdBar(){
 }
 /* 原文回读（译文的回读是 collectZh，两个都要在导出/重排前跑） */
 function collectEn(){
+  if(S.noCollect) return;   // v0.9.392：理由同 collectZh —— 重排期间 S.rows 是别人的快照
   document.querySelectorAll('#rows .en.ed').forEach(function(el){
     const grid=el.closest('.cuegrid'); if(!grid) return;
     const r=S.rows.find(function(x){ return x.id===+grid.dataset.id; }); if(!r) return;
@@ -3243,33 +3330,10 @@ function paintIssues(){
   });
   return iss.length;
 }
-/* 一键修：只动「时间轴本身站不住」的两类——前后重叠、显示时长不足 0.83 秒。
-   CPS 过快要改的是文案，字幕过长的多半是有意为之（长对白、歌词），都不动，只在体检里报出来。
-   ⚠️ 两趟顺序不能换：先解重叠再补时长。补时长可能重新越过下一条，
-      所以补完要顺推后续——只补不推，改完立刻又是一条新的重叠。 */
-function fixTimeIssues(){
-  const rows=(S.rows||[]).filter(function(r){ return r.flag!=='drop'&&r.flag!=='merged'; });
-  const min=C.MIN_DUR_MS||833; let n=0;
-  const pushFrom=function(i,d){
-    for(let k=i;k<rows.length;k++){ const x=rows[k]; markEdited(x); x.start+=d; x.end+=d; syncToSrc(x); }
-  };
-  for(let i=0;i<rows.length;i++){
-    if(rows[i].start<0){ pushFrom(i,-rows[i].start); n++; }
-  }
-  for(let i=1;i<rows.length;i++){
-    const r=rows[i], pv=rows[i-1];
-    if(r.start<pv.end-1){ pushFrom(i, pv.end-r.start); n++; }
-  }
-  for(let i=0;i<rows.length;i++){
-    const r=rows[i], nx=rows[i+1];
-    if(r.end-r.start<min){
-      markEdited(r); r.end=r.start+min; syncToSrc(r); n++;
-      if(nx && r.end>nx.start){ pushFrom(i+1, r.end-nx.start); n++; }
-    }
-  }
-  saveEdits(); OV_ROW=null; renderRows();
-  return n;
-}
+/* v0.9.392：这里原本是「一键修」（自动解重叠 + 补最短时长），已下架。
+   理由：时间轴该怎么修取决于片子本身——顺推会连带后面几十条一起挪，
+   补时长会把该短的地方强行拉长。机器替用户拍板，改出来的往往比原来更难收拾。
+   现在体检只负责把问题报到每一行上（行内标红 + 条数），交给用户自己判断。 */
 /* 带输入框的小弹窗：沿用 askReuse 的样式与「点遮罩 = 取消」约定 */
 function askFields(title, fields, okTxt){
   return new Promise(function(resolve){
@@ -3355,12 +3419,7 @@ function bindEdit(){
     renderRows();
     const el=$('tcIssN');
     if(!n){ el.textContent=t('tcOk'); log(t('tcOk'),'okc'); return; }
-    el.innerHTML='';
-    el.appendChild(document.createTextNode(n+' · '));
-    const fx=document.createElement('button');
-    fx.type='button'; fx.className='btn'; fx.textContent=t('tcFix');
-    fx.onclick=function(){ const k=fixTimeIssues(); paintIssues(); renderRows(); log(t('tcFixed',k),'okc'); };
-    el.appendChild(fx);
+    el.textContent=String(n); el.title=t('stIssues');
   });
 }
 
@@ -4487,7 +4546,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.57：纠错重试——顽固跑偏组盲重发（同输入→同输出）零效果，把上次跑偏的译文
   // 明确喂回给模型让它自我纠正（Qualcomm CFO 访谈泰文版实测案例：整句前半漂成中文，
   // 批级重试 + 单组盲重发 ×2 全部复现同样的混合输出）
-  /* v0.9.391：纠错文案按通道分派。387 起语言跑偏检测已整套移除，badAnchor 只剩「歌词缺词」两类
+  /* v0.9.392：纠错文案按通道分派。387 起语言跑偏检测已整套移除，badAnchor 只剩「歌词缺词」两类
      （缺号 parseSegMarkers 覆盖不全 / 丢词 musicLost），可 rt=5 这条通道的反馈仍写着「语言跑偏」——
      等于把模型往错的方向推：它会去纠正语言，而真正的问题是少了一段歌词，改完照样缺段。
      rt=4（整批失败后的逐组补救）保留原有文案：它取的是组级 m.text，cue 对齐格式下恒为空，实际不触发。 */
@@ -6809,6 +6868,9 @@ function mlRender(){
   }
   /* v0.9.383：目标语言队列变了要重算「源 == 目标」提示（ chips 增删都走这里） */
   if(typeof sameLangHintSync==='function') sameLangHintSync();
+  /* v0.9.392：语言 / 文件队列变了，或又跑完一格 —— 折行检查的汇总跟着刷新。
+     挂在 mlRender 里是因为队列的任何变化都会走到这里，不用逐个入口去补调用。 */
+  try{ paintWrapSummary(); }catch(e){}
   mlRenderFiles();
 }
 /* 文件队列：多集时用户必须看得见「一共几集、每集几条、哪集已经跑完」。 */
@@ -6920,9 +6982,11 @@ function mlSummary(okN, total){
 }
 /* 同名产物加序号：同一套剧里两集都叫 01.srt、或同一集导两种格式时，
    zip 里重名会被后一个覆盖，用户拿到的文件数对不上。 */
-function mlUniqueName(n){
+/* v0.9.392：加了可选的 exclude —— 某一格「原地重算名字」时，它自己占着的那个名字不该算作被占用，
+   否则每次重排都平白多出一个 _2 / _3。不传这个参数时行为与以前完全一致。 */
+function mlUniqueName(n, exclude){
   var used = {};
-  Object.keys(ML.results).forEach(function(k){ used[ML.results[k].name] = 1; });
+  Object.keys(ML.results).forEach(function(k){ if(ML.results[k].name !== exclude) used[ML.results[k].name] = 1; });
   if(!used[n]) return n;
   var dot = n.lastIndexOf('.');
   var base = dot > 0 ? n.slice(0, dot) : n, ext = dot > 0 ? n.slice(dot) : '';
@@ -7148,8 +7212,21 @@ async function runMulti(){
              zip 是一次点击拿走整季，下载上报得逐格记到各自的 taskId 上，
              否则除最后一格外，其余任务的「下载」永远为 0，后台会把它们当成「完成未拿走」。 */
           fmt: expFileFmt(),
+          /* v0.9.392：连「这一格当初是用什么排出来的」一起留下 —— 语言、行宽、原文/译文。
+             ① 折行检查必须按每格自己语言的行宽逐条算（日语 13 / 中文 16 / 英文 21 不是一个数），
+                事后拿界面上当前那个值去套，会把别的语言算错；
+             ② 用户改完行宽再来打包时，要用这批条目重新走一遍排版（见 mlRebuild）——
+                只存成品 text 的话，改了等于没改。
+             ⚠️ 只拷 buildMonoParts 真正读的那五个字段（flag / start / end / zh / en），
+                整行数以万计，带时间轴原文译文全量深拷是几十 MB 的白开销。
+             ⚠️ zh 优先取 applyPost 留下的折行前原文（r.rawZh），没有（手工改过译文的行）才用它在表格里的样子。 */
+          lang: tk.v, fk: tk.f.fk, base: tk.f.base, srcLang: ($('srcLang')||{}).value || 'auto',
+          maxW: +$('maxW').value || 21, biMaxW: +$('biMaxW').value || 32, fmtTop: expFmtOf(),
+          rows: S.rows.map(function(r){ return { flag: r.flag, start: r.start, end: r.end,
+                 zh: (r.rawZh !== undefined && r.rawZh !== null) ? r.rawZh : r.zh, en: r.en }; }),
           meta: S.trMeta ? { file: S.trMeta.file, lang: S.trMeta.lang, model: S.trMeta.model,
                             taskId: S.trMeta.taskId, src: S.trMeta.src } : null };
+        try{ mlStatCell(ML.results[k]); }catch(e){}
         okN++;
         log(mlt('langOk', mlTaskName(k), S.rows.length), 'okc');
       }catch(e){
@@ -7170,10 +7247,171 @@ async function runMulti(){
   if(!ML.stopReq) mlSummary(okN, total);
   else log(mlt('stopped'),'err');
 }
+/* ============ v0.9.392：全队列的折行检查 + 打包前重排 ============
+
+   折行检查的原料是「已经翻好的译文」，所以它的范围天然是全部已完成的格子 ——
+   此前只有当前这一集，多任务下等于没查。这里改按格算、按语言汇总。
+   两个约定（都写死在实现里，不是 UI 上的措辞）：
+     ① 每格用它自己语言的那一套行宽，不是界面上当前显示的那个值 —— 日语 13 /
+        中文 16 / 英文 21 是三个数，拿一个数去套所有格，结论必然错；
+     ② 没跑完的格子没有译文可查，所以 B 是「已完成 N/M 格」，跑完一格并进一格。 */
+/* v0.9.392：外层取外壳文案的统一入口。
+   mxt() 和它的 MXT 词典长在多语那个 IIFE 里，外层（这里的汇总 / 重排）拿不到，
+   直接调用会 ReferenceError —— 汇总画不出来还是小事，抛异常会把整个打包流程打断。
+   所以这里做一层安全的转发：拿到就用，拿不到就返回空串（摘要少一块字，流程照样走完）。
+   ⚠️ 只读转发，不复制词典 —— mxt() 内部会按 UI.lang 现取，复制一份反而会停在初次的语言上。 */
+function mlShell(){
+  var f = (typeof window !== 'undefined' && typeof window.mlTxt === 'function') ? window.mlTxt : null;
+  if(!f) return '';
+  try{ return f.apply(null, arguments); }catch(e){ return ''; }
+}
+function mlStatCell(cell){
+  if(!cell || !cell.rows || !cell.rows.length){ cell.stat = null; return null; }
+  try{
+    /* 走的是导出那条真通道（不是另写一套折行），算出来的就是用户最终拿到的那个文件 */
+    var out = (cell.fmtTop === 'mono')
+      ? C.buildMonoParts(cell.rows, { maxW: cell.maxW, dstLocale: cell.lang })
+      : C.buildBilingual(cell.rows, { maxW: cell.maxW, biMaxW: cell.biMaxW,
+          srcLocale: cell.srcLang && cell.srcLang !== 'auto' ? cell.srcLang : '',
+          dstLocale: cell.lang, order: cell.fmtTop === 'bi-dst' ? 'dst-first' : 'src-first' });
+    var l1 = 0, l2 = 0, l3 = 0;
+    (out || []).forEach(function(it){
+      /* 双语的 text 是原文行 + 译文行叠在一起，数行数会把原文也算进去，
+         所以双语只认切分一项（下面 si），行数分布留空 —— UI 上相应地不显示。 */
+      var n = String((it && it.text) || '').split('\n').filter(Boolean).length;
+      if(n <= 1) l1++; else if(n === 2) l2++; else l3++;
+    });
+    var si = out && out.splitInfo || {};
+    /* 「超标」只能认「被切开的条数」，不能认「折成了几行」：
+       buildMonoParts 的 R3 会把塞不下的那条切成多条（时间轴按宽度占比瓜分），
+       于是最终文件里每一条都 ≤2 行 —— 按行数判超标，结果永远是 0。
+       真正让人头疼的是「这一条怎么变成两条了」，那就是下面的 srcs。 */
+    cell.stat = { rows: cell.rows.length, items: (out || []).length,
+      l1: l1, l2: l2, l3: l3, over: si.srcs || 0, srcs: si.srcs || 0, need: si.need || 0,
+      splitItems: si.items || 0, bi: cell.fmtTop !== 'mono', lang: cell.lang };
+  }catch(e){ cell.stat = null; }
+  return cell.stat;
+}
+/* 按「这一格自己语言现在的行宽」重排一次。
+   为什么要这一层：跑完之后改行宽不用重翻（行宽不进提示词），但每一格的成品 text 是跑完当时生成的，
+   改完行宽直接打包，包里还是旧折行 —— 用户改了个寂寞。这一步让包跟着当前设置走。 */
+function mlRebuild(k){
+  var cell = ML.results[k];
+  if(!cell || !cell.rows || !cell.rows.length) return false;   // 老快照（升级前的）没有 rows，原样放过
+  var mw = $('maxW'), bw = $('biMaxW'), dl = $('dstLang'), sl = $('srcLang');
+  if(!mw || !cell.lang) return false;
+  var om = mw.value, ob = bw ? bw.value : '', od = dl ? dl.value : '', os = sl ? sl.value : '';
+  var oRows = S.rows, oBase = S.fileBase, oMaxW = S.maxW, oMulti = S.multi;
+  var ok = false;
+  try{
+    /* ⚠️ 只改 value、不派发 change：这两个输入框的 change 会带起行宽换算提示、切分提示、
+       ASS 字号推荐一连串联动，而那些联动读的是 DOM 上「当前这一格」的东西。
+       这里只是临时借用一下这两个输入框的取值，不是真的在切换语言。 */
+    try{ mw.value = (typeof window.mwForLang === 'function') ? window.mwForLang(cell.lang) : cell.maxW; }catch(e){ mw.value = cell.maxW; }
+    if(bw && cell.biMaxW) bw.value = cell.biMaxW;
+    if(dl) dl.value = cell.lang;
+    if(sl && cell.srcLang) sl.value = cell.srcLang;
+    S.noCollect = true;              // collectZh/collectEn 别再来读 DOM：S.rows 现在是这一格的快照
+    S.rows = cell.rows;
+    S.fileBase = cell.base || S.fileBase;
+    S.maxW = +mw.value || cell.maxW;
+    S.multi = true;
+    try{
+      cell.text = buildExport();
+      cell.fmt = expFileFmt();
+      cell.maxW = +mw.value || cell.maxW;
+      /* 名字也重算：导出格式变了（srt → ass）后缀得跟着变。
+         传自己的旧名字让它被排除在「已被占用」之外，否则原地重算会平白多出一个 _2。 */
+      cell.name = mlUniqueName(autoOutNameStr(), cell.name);
+    }catch(e){ ok = false; }
+    cell.stat = mlStatCell(cell);
+    ok = true;
+  }catch(e){ ok = false; }
+  finally{
+    mw.value = om; if(bw) bw.value = ob; if(dl) dl.value = od; if(sl) sl.value = os;
+    S.rows = oRows; S.fileBase = oBase; S.maxW = oMaxW; S.multi = oMulti;
+    S.noCollect = false;
+  }
+  return ok;
+}
+function mlStatByLang(lv){
+  if(!lv) return;
+  var w = (typeof window.mwForLang === 'function') ? window.mwForLang(lv) : null;
+  if(!w) return;
+  Object.keys(ML.results).forEach(function(k){
+    var c = ML.results[k];
+    if(!c || c.lang !== lv || !c.rows) return;
+    c.maxW = w;
+    mlStatCell(c);      /* 行宽按语言分别记忆，改一个值只该影响这一种语言的格子 */
+  });
+}
+/* 把汇总结果画出来。只读 + 只画 —— 这里不替用户放宽任何阈值，
+   把「调到多少就不超标」摆出来，决定权留给他（与上面 splitWarnHint 同一个原则）。 */
+function paintWrapSummary(){
+  var el = $('wrapSumHint'); if(!el) return;
+  if(!Object.keys(ML.results).length){ el.hidden = true; return; }
+  var s;
+  try{ s = mlWrapSummary(); }catch(e){ el.hidden = true; return; }
+  if(!s || !s.cells){ el.hidden = true; return; }
+  var doneCells = s.cells - s.pending;
+  if(!doneCells){ el.hidden = true; return; }
+  var plan = Math.max(s.plan, s.cells);
+  var html = '<div>' + mlShell('wrapSum', doneCells, plan, s.rows) + '</div>';
+  if(s.l1 || s.l2) html += '<div>' + mlShell('wrapLine', s.l1, s.l2) + '</div>';
+  /* 被切开的那些单独说一句，并给出「调到多少就不用切」——
+     决定权留给用户，不替他偷偷放宽阈值（与上面 splitWarnHint 同一个原则）。 */
+  if(s.over) html += '<div class="ws-w">' + mlShell('wrapCut', s.over, s.cutItems) + '</div>';
+  var keys = Object.keys(s.langs || {});
+  if(keys.length){
+    var chips = [];
+    keys.forEach(function(lv){
+      var g = s.langs[lv] || {};
+      /* 把「这一种语言现在用的是多少」也写出来：行宽按语言分别记忆，
+         只说「调到 21 就不用切」会让人以为调了全场生效。 */
+      chips.push('<span>' + mlShell('wrapLangOne', mlName(lv), g.n, g.w, g.need) + '</span>');
+    });
+    html += '<div class="ws-lang">' + chips.join('') + '</div>';
+  }
+  if(s.pending) html += '<div>' + mlShell('wrapWait', s.pending) + '</div>';
+  el.innerHTML = html;
+  el.hidden = false;
+}
+function mlRebuildAll(){
+  var ks = Object.keys(ML.results), n = 0;
+  for(var i = 0; i < ks.length; i++){ if(mlRebuild(ks[i])) n++; }
+  return n;
+}
+/* 汇总：把所有已完成的格子算到一起。只汇总 stat，不重新排版（那是 mlRebuild 的事）。 */
+function mlWrapSummary(){
+  var langs = {}, cells = 0, doneRows = 0, pending = 0, l1 = 0, l2 = 0, over = 0, cutItems = 0;
+  var plan = (ML.files.length * ML.langs.length) || 0;
+  Object.keys(ML.results).forEach(function(k){
+    var c = ML.results[k]; if(!c) return;
+    cells++;
+    var s = c.stat;
+    if(!s){ pending++; return; }
+    doneRows += s.rows;
+    /* 双语的 text 是原文行 + 译文行叠着，数行数算不出「这条折了几行」，
+       所以双语那一格只贡献切分一项、不贡献行数分布。 */
+    if(!s.bi){ l1 += s.l1; l2 += s.l2; }
+    if(s.over){
+      over += s.over; cutItems += s.splitItems;
+      if(!langs[c.lang]) langs[c.lang] = { n: 0, need: 0, w: c.maxW, bi: s.bi ? 1 : 0 };
+      langs[c.lang].n += s.over;
+      langs[c.lang].need = Math.max(langs[c.lang].need, s.need);
+    }
+  });
+  return { cells: cells, plan: plan, pending: pending, rows: doneRows,
+    l1: l1, l2: l2, over: over, cutItems: cutItems, langs: langs };
+}
 async function mlDownloadZip(){
   if(typeof JSZip === 'undefined'){ log(mlt('nozip'),'err'); return; }
   var keys = Object.keys(ML.results);
   if(!keys.length){ log(mlt('nothing'),'err'); return; }
+  /* v0.9.392：打包前先把每一格按它自己语言「现在的行宽」重排。
+     这一帧之前用户很可能调过行宽（调行 width 不用重翻），而成品 text 是跑完那一格时生成的。
+     不重排的话，包里装的还是旧折行 —— 用户改了等于没改。 */
+  try{ mlRebuildAll(); }catch(e){}
   var zip = new JSZip();
   keys.forEach(function(v){ zip.file(ML.results[v].name, ML.results[v].text); });
   var u8 = await zip.generateAsync({type:'uint8array'});
@@ -7984,6 +8222,28 @@ function runReport(){
 $('btnDownload').addEventListener('click', ()=>{
   /* 多语队列跑过 ≥2 种语言 → 直接打 zip，不再让用户一个个点 */
   if(Object.keys(ML.results).length > 1){ mlDownloadZip(); return; }
+  /* 只剩一格时也要先重排：跑完那一格之后用户很可能调过行宽 / 导出格式。
+     v0.9.392 之前这里直接 buildExport()，导出的还是跑完当时的旧排版。 */
+  if(Object.keys(ML.results).length === 1){
+    try{ mlRebuildAll(); }catch(e){}
+    var _k = Object.keys(ML.results)[0], _c = ML.results[_k];
+    runReport();
+    const name=(_c.name || autoOutNameStr());
+    const blob=new Blob([_c.text],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=name;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
+    /* v0.9.244：连导出格式一起上报（expFileFmt() 已把 ass-stack 归一为 ass，与服务端白名单一致）
+       v0.9.392：带上这一格自己的 meta —— 单格查看时 S.trMeta 还停在最后跑完的那一集，
+       不传就会把这笔下载记到别人头上（后台的「下载」与实际拿走的那一集对不上）。 */
+    reportEvent('download', '', _c.fmt || expFileFmt(), _c.meta);
+    try{ localStorage.setItem('srtDonateV1','1'); }catch(e){}
+    if(window.__donateReveal) window.__donateReveal();
+    log(t('exported',name,(_c.rows||[]).length),'okc');
+    return;
+  }
   if(!S.rows.length){ log(t('noExport'),'err'); return; }
   runReport();
   /* v0.9.190：文件名输入框已删——直接按「源文件名 + 目标语言 + 样式」现算，不再读 DOM */
@@ -8002,9 +8262,19 @@ $('btnDownload').addEventListener('click', ()=>{
   log(t('exported',name,buildExportItems().length),'okc');
 });
 $('btnCopy').addEventListener('click', async ()=>{
+  /* 与下载同口径：有打包好的成果时，按那一格（或全部格）当前的行宽重排后再复制。 */
+  var _ks = Object.keys(ML.results);
+  if(_ks.length > 1){ mlRebuildAll(); await copyText(Object.keys(ML.results).map(function(k){ return ML.results[k].text; }).join('\n\n')); return; }
+  if(_ks.length === 1){
+    try{ mlRebuildAll(); }catch(e){}
+    await copyText(ML.results[_ks[0]].text);
+    return;
+  }
   if(!S.rows.length){ log(t('noCopy'),'err'); return; }
   runReport();
-  const txt=buildExport();
+  await copyText(buildExport());
+});
+async function copyText(txt){
   let copied=false;
   try{ await navigator.clipboard.writeText(txt); copied=true; log(t('copied'),'okc'); }
   catch(e){
@@ -8020,7 +8290,7 @@ $('btnCopy').addEventListener('click', async ()=>{
      下载率被系统性低估；补 copy 事件补上这块盲区。
      v0.9.299：只在真复制成功时上报（见上 copied 标记）。 */
   if(copied) reportEvent('copy', '', expFileFmt());
-});
+}
 
 /* v0.9.258：去特效字幕处理 —— 把这份译文带到特效页继续调样式。
    ⚠️ 双语一律用「原文在上」(bi-src) 生成：特效页拆分双语时按「第 1 行 = 原文、第 2 行 = 译文」
@@ -8305,6 +8575,16 @@ if(!sv.expStyle && sv.expFmt && sv.expFileFmt && ['mono','bi-src','bi-dst'].incl
   };
   $('dstLang').addEventListener('change', syncMaxW);
   syncMaxW();
+  /* v0.9.392：把「某个语言现在的行宽」导出成一个函数。
+     多格重排（mlRebuild）要按每一格各自语言的行宽重算一遍，而记忆表 mwMemo 和
+     推荐表 MAXW_BY_LANG 都在这个闭包里。外面的替代办法只有「切 select + 派发 change」——
+     那一路会把行宽换算提示、切分提示、ASS 字号推荐一串联动全带起来，
+     而那些联动读的是 DOM 上「当前这一格」的内容，重排另一格时是错的。
+     这里只做只读查询，不写任何状态。 */
+  try{ window.mwForLang = function(lv){
+    if(!lv) return (mwMemo[''] !== undefined) ? mwMemo[''] : 21;
+    return (mwMemo[lv] !== undefined) ? mwMemo[lv] : (MAXW_BY_LANG[lv] || 21);
+  }; }catch(e){}
 })();
 
 /* v0.9.110：ASS 字号 / 离底距离的「上下文感知联动」。
@@ -9763,7 +10043,14 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       drop:'整季字幕拖到这里', dropSub:'多集一次传入，每集一条独立任务线；只传一集也行',
       cues:'本批字幕', hit:'命中', miss:'未出现', missTip:'这 {0} 条在本批字幕里一次都没出现，可能是拼写不一致：',
       pickTip:'点矩阵里的格子查看该集该语的译文', busyView:'翻译进行中，先停止再切换查看',
-      noTask:'还没有任务：先拖入字幕，再加目标语言' },
+      noTask:'还没有任务：先拖入字幕，再加目标语言',
+      /* v0.9.392：主页两张设置卡片的摘要，以及全队列的折行检查结果 */
+      expCfg:'导出设置', termsCnt:'术语 {0} 条', wrapAt:'折行 {0} 字',
+      wrapSum:'折行检查 · 已完成 {0}/{1} 格 · 共 {2} 条',
+      wrapLine:'单行 {0} · 2 行 {1}',
+      wrapCut:'其中 {0} 条太长被切开（拼出 {1} 条）',
+      wrapLangOne:'{0} {1} 条 · 现在 {2}，调到 {3} 就不用切',
+      wrapWait:'还有 {0} 格没跑，跑完会自己并进来' },
     /* v0.9.373：补繁中。缺这一块时 mxt() 会跌到 en —— 繁中访客看到的是
        「Settings / Task matrix / Download all」，而页面主体文案（MLT 12 语）
        又是繁中，一屏两种语言。 */
@@ -9772,16 +10059,32 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       drop:'整季字幕拖到這裡', dropSub:'多集一次傳入，每集一條獨立任務線；只傳一集也行',
       cues:'本批字幕', hit:'命中', miss:'未出現', missTip:'這 {0} 條在本批字幕裡一次都沒出現，可能是拼寫不一致：',
       pickTip:'點矩陣裡的格子檢視該集該語的譯文', busyView:'翻譯進行中，先停止再切換檢視',
-      noTask:'還沒有任務：先拖入字幕，再加目標語言' },
+      noTask:'還沒有任務：先拖入字幕，再加目標語言',
+      expCfg:'匯出設定', termsCnt:'術語 {0} 條', wrapAt:'折行 {0} 字',
+      wrapSum:'折行檢查 · 已完成 {0}/{1} 格 · 共 {2} 條',
+      wrapLine:'單行 {0} · 2 行 {1}',
+      wrapCut:'其中 {0} 條太長被切開（拼出 {1} 條）',
+      wrapLangOne:'{0} {1} 條 · 現在 {2}，調到 {3} 就不用切',
+      wrapWait:'還有 {0} 格沒跑，跑完會自己併進來' },
     'en': { set:'Settings', trans:'Translation', gloss:'Glossary', export:'Export', matrix:'Task matrix',
       close:'Close', view:'Viewing', none:'Nothing selected', expand:'Expand', collapse:'Collapse', zip:'Download all',
       drop:'Drop the whole season here', dropSub:'Many episodes at once, one task line each',
       cues:'Cues in batch', hit:'Matched', miss:'Not found', missTip:'{0} entries never appear in this batch — check the spelling:',
       pickTip:'Click any cell to inspect that episode in that language', busyView:'Translation running — stop it before switching',
-      noTask:'No tasks yet: drop subtitles, then add target languages' }
+      noTask:'No tasks yet: drop subtitles, then add target languages',
+      expCfg:'Export settings', termsCnt:'{0} terms', wrapAt:'wrap {0} cols',
+      wrapSum:'Line breaks · {0}/{1} cells done · {2} cues',
+      wrapLine:'1 line {0} · 2 lines {1}',
+      wrapCut:'{0} of them too long: split into {1}',
+      wrapLangOne:'{0}: {1} cues · now {2}, raise to {3} to avoid splitting',
+      wrapWait:'{0} cells not run yet — they fold in when done' }
   };
   function mxt(k){
     var l = (typeof UI !== 'undefined' && UI && UI.lang) ? UI.lang : 'zh-CN';
+    /* v0.9.392：mxt 连同 MXT 词典长在这个 IIFE 里，而外层（折行汇总 paintWrapSummary 等）
+       也需要说中文/英文——它直接调用会 ReferenceError。这里只读地导出一份，
+       外层统一走 mlShell()，取不到就返回空串，宁可少一块字也不让整个流程崩。 */
+    try{ if(typeof window !== 'undefined') window.mlTxt = mxt; }catch(e){}
     var d = MXT[l] || MXT['en'] || MXT['zh-CN'];
     var s = d[k] != null ? d[k] : (MXT['zh-CN'][k] || k);
     for(var i=1;i<arguments.length;i++) s = s.split('{'+(i-1)+'}').join(String(arguments[i]));
@@ -9805,7 +10108,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
     dr.classList.toggle('on', drOpenFlag);
     if(mask) mask.classList.toggle('on', drOpenFlag);
     dr.setAttribute('aria-hidden', drOpenFlag ? 'false' : 'true');
-    if(drOpenFlag) drPane('trans');
+    if(drOpenFlag) drPane('gloss');
   }
   if($('btnSettings')) $('btnSettings').addEventListener('click', function(){ drShow(true); });
   if($('drClose')) $('drClose').addEventListener('click', function(){ drShow(false); });
@@ -10089,21 +10392,18 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
        但没接到 DOM 上，于是英文版里只剩这一块还是中文（「整季字幕拖到这里」）。 */
     var dt = document.querySelector('.drop-tx b'); if(dt) dt.textContent = mxt('drop');
     var ds = document.querySelector('.drop-tx i'); if(ds) ds.textContent = mxt('dropSub');
-    /* v0.9.373：设置抽屉的标题与三个页签也是写死的。translate.html 没有这排页签，
-       所以这四处是复制过来时新长出来的，翻译页那边一个同款都没有。
-       术语表页签里挂着 <i id="drGlossCnt"> 计数，只能改第一个文本节点，不能 textContent 整体覆盖。 */
-    var dtt = document.querySelector('.dr-title'); if(dtt) dtt.textContent = mxt('set');
-    var dTabs = document.querySelectorAll('.dr-tab');
-    for(var ti = 0; ti < dTabs.length; ti++){
-      var pane = dTabs[ti].getAttribute('data-pane');
-      if(pane === 'gloss'){
-        if(dTabs[ti].firstChild && dTabs[ti].firstChild.nodeType === 3) dTabs[ti].firstChild.nodeValue = mxt('gloss');
-      } else if(pane === 'trans'){ dTabs[ti].textContent = mxt('trans'); }
-      else if(pane === 'export'){ dTabs[ti].textContent = mxt('export'); }
-    }
-    if(dr) dr.setAttribute('aria-label', mxt('set'));
-    if($('drClose')) $('drClose').setAttribute('aria-label', mxt('close'));
-    var s1 = document.querySelector('#btnSettings span'); if(s1) s1.textContent = mxt('set');
+      /* v0.9.392：只剩术语表一个面板后，页签那排失去了意义（三个入口变一个入口），
+         标题与 aria 也跟着从「设置」改成「术语表」——顶栏按钮同理，见下面 #btnSettings。 */
+      var dtt = document.querySelector('.dr-title'); if(dtt) dtt.textContent = mxt('gloss');
+      if(dr) dr.setAttribute('aria-label', mxt('gloss'));
+      if($('drClose')) $('drClose').setAttribute('aria-label', mxt('close'));
+      /* v0.9.392：顶栏那颗按钮改叫「术语表」。抽屉里现在只有术语表，
+         继续叫「设置」的话，点开是个术语表 —— 名字和东西对不上。 */
+      var s1 = document.querySelector('#btnSettings span'); if(s1) s1.textContent = mxt('gloss');
+      /* 主页两张设置卡片的标题走 MXT（同 drop/dropSub 一路），不占 data-i18n 词典 */
+      var cnT = document.querySelector('#cfgTransHd .cfg-n'); if(cnT) cnT.textContent = mxt('trans');
+      var cnE = document.querySelector('#cfgExportHd .cfg-n'); if(cnE) cnE.textContent = mxt('expCfg');
+      try{ cfgSummary(); }catch(e){}
     var s2 = document.querySelector('#btnZip span'); if(s2) s2.textContent = mxt('zip');
     var k = document.querySelector('.vb-k'); if(k) k.textContent = mxt('view');
     var v = $('viewer'), vt = $('vToggle');
@@ -10112,6 +10412,91 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
     if(cur && !ML.selKey) cur.textContent = mxt('none');
   }
   if($('uiLang')) $('uiLang').addEventListener('change', function(){ setTimeout(syncShellText, 30); });
+
+  /* ---------- v0.9.392：主页设置卡片（折叠 + 一行摘要） ----------
+     抽屉的入口在「顶栏 → 抽屉 → 页签」三跳之后，多任务实测被当成「没有翻译设置」。
+     搬到主页后再全铺开会把任务矩阵挤到要滚动（翻译设置五组 40 多个控件），
+     所以做成：收起时一行摘要（当前是什么样，一眼可见），点开就地展开原封不动的那套控件。
+     ⚠️ 摘要和折行检查结果一样，只是读数——动写操作的仍然只有控件本身，这里一个字都不回写。 */
+  function cfgToggle(id, force){
+    var c = $(id); if(!c) return;
+    var on = (force === undefined) ? !c.classList.contains('open') : !!force;
+    c.classList.toggle('open', on);
+    var hd = $(id + 'Hd');
+    if(hd) hd.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if(on){ try{ cfgSummary(); }catch(e){} }
+  }
+  function cfgSummary(){
+    /* 翻译设置：翻译风格 + 引擎 + 术语条数。这三个决定了「这一季会翻成什么样」。 */
+    var s1 = $('cfgTransSum');
+    if(s1){
+      var b1 = [];
+      var st = document.querySelector('input[name=style]:checked');
+      if(st){
+        var sp = (st.parentNode && st.parentNode.querySelector) ? st.parentNode.querySelector('span') : null;
+        b1.push(sp ? sp.textContent : String(st.value || ''));
+      }
+      var md = $('mode');
+      if(md && md.options[md.selectedIndex]){
+        /* option 原文是「默认模型（站点提供，无需 Key）」，摘要里留到第一个括号为止就够认了 */
+        b1.push(md.options[md.selectedIndex].textContent.split('（')[0].split('(')[0].trim());
+      }
+      var tx = $('terms'), n = 0;
+      if(tx) String(tx.value || '').split('\n').forEach(function(l){ if(l.trim()) n++; });
+      if(n) b1.push(mxt('termsCnt', n));
+      s1.textContent = b1.join(' · ');
+    }
+    /* 导出设置：导出样式 + 折行行宽。这是「跑完之后怎么给你」的那两个开关。 */
+    var s2 = $('cfgExportSum');
+    if(s2){
+      var b2 = [];
+      var es = $('expStyle');
+      if(es && es.options[es.selectedIndex]) b2.push(String(es.options[es.selectedIndex].textContent).replace(/\s+/g,' ').trim());
+      try{
+        var mono = (typeof expFmtOf === 'function') ? (expFmtOf() === 'mono') : true;
+        var we = $(mono ? 'maxW' : 'biMaxW');
+        /* v0.9.392：顺手把按语言分别记忆这件事写进摘要 —— 行宽是「当前目标语言」的行宽，
+           队列里别的语言各有自己的记忆值，不明说会被当成「改了没生效」。 */
+        if(we && we.value) b2.push(mxt('wrapAt', we.value));
+      }catch(e){}
+      s2.textContent = b2.join(' · ');
+    }
+  }
+  ['cfgTrans','cfgExport'].forEach(function(id){
+    var hd = $(id + 'Hd');
+    if(hd) hd.addEventListener('click', function(){ cfgToggle(id); });
+  });
+  /* 摘要跟着界面上的任何一次改动走。用委托而不是逐个绑定：这些控件分散在两张卡片里，
+     逐个绑会把「新加一个控件忘了绑摘要」变成一种常态故障。 */
+  var _stage = document.querySelector('.stage');
+  var _wrTimer = 0;
+  if(_stage){
+    _stage.addEventListener('change', function(e){
+      try{ cfgSummary(); }catch(err){}
+      var id = (e && e.target && e.target.id) || '';
+      /* 行宽改了要把「这一种语言」所有格子的统计重算 —— 行宽按语言分别记忆，
+         界面上那一个输入框代表的是当前目标语言，队列里别的语言的值不受它影响。 */
+      if(id === 'maxW' || id === 'biMaxW'){
+        try{ mlStatByLang(($('dstLang') || {}).value); }catch(err){}
+      }
+      try{ paintWrapSummary(); }catch(err){}
+    });
+    _stage.addEventListener('input', function(e){
+      try{ cfgSummary(); }catch(err){}
+      var id = (e && e.target && e.target.id) || '';
+      /* 行宽是「边打边算」的：每敲一位就重排一遍整季的格子太贵（每格都要跑一次导出通道），
+         所以压一个 180ms 的尾巴 —— 停手才重算，打字过程中界面不卡。 */
+      if(id === 'maxW' || id === 'biMaxW'){
+        clearTimeout(_wrTimer);
+        _wrTimer = setTimeout(function(){
+          try{ mlStatByLang(($('dstLang') || {}).value); }catch(err){}
+          try{ paintWrapSummary(); }catch(err){}
+        }, 180);
+        return;
+      }
+      try{ paintWrapSummary(); }catch(err){}
+    });
+  }
 
   /* 「选择文件 / 载入示例」提到投放头右侧 —— 只搬节点，原有的 click 监听跟着节点走，
      事件绑定一行都不用改。原来的按钮行空掉后由 :empty 隐藏。 */

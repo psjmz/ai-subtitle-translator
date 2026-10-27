@@ -1103,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.391</span>
+    <span class="ver-tag">v0.9.392</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1723,9 +1723,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.391"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.391"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.391"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.392"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.392"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.392"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2925,33 +2925,10 @@ function paintIssues(){
   });
   return iss.length;
 }
-/* 一键修：只动「时间轴本身站不住」的两类——前后重叠、显示时长不足 0.83 秒。
-   CPS 过快要改的是文案，字幕过长的多半是有意为之（长对白、歌词），都不动，只在体检里报出来。
-   ⚠️ 两趟顺序不能换：先解重叠再补时长。补时长可能重新越过下一条，
-      所以补完要顺推后续——只补不推，改完立刻又是一条新的重叠。 */
-function fixTimeIssues(){
-  const rows=(S.rows||[]).filter(function(r){ return r.flag!=='drop'&&r.flag!=='merged'; });
-  const min=C.MIN_DUR_MS||833; let n=0;
-  const pushFrom=function(i,d){
-    for(let k=i;k<rows.length;k++){ const x=rows[k]; markEdited(x); x.start+=d; x.end+=d; syncToSrc(x); }
-  };
-  for(let i=0;i<rows.length;i++){
-    if(rows[i].start<0){ pushFrom(i,-rows[i].start); n++; }
-  }
-  for(let i=1;i<rows.length;i++){
-    const r=rows[i], pv=rows[i-1];
-    if(r.start<pv.end-1){ pushFrom(i, pv.end-r.start); n++; }
-  }
-  for(let i=0;i<rows.length;i++){
-    const r=rows[i], nx=rows[i+1];
-    if(r.end-r.start<min){
-      markEdited(r); r.end=r.start+min; syncToSrc(r); n++;
-      if(nx && r.end>nx.start){ pushFrom(i+1, r.end-nx.start); n++; }
-    }
-  }
-  saveEdits(); OV_ROW=null; renderRows();
-  return n;
-}
+/* v0.9.392：这里原本是「一键修」（自动解重叠 + 补最短时长），已下架。
+   理由：时间轴该怎么修取决于片子本身——顺推会连带后面几十条一起挪，
+   补时长会把该短的地方强行拉长。机器替用户拍板，改出来的往往比原来更难收拾。
+   现在体检只负责把问题报到每一行上（行内标红 + 条数），交给用户自己判断。 */
 /* 带输入框的小弹窗：沿用 askReuse 的样式与「点遮罩 = 取消」约定 */
 function askFields(title, fields, okTxt){
   return new Promise(function(resolve){
@@ -3037,12 +3014,7 @@ function bindEdit(){
     renderRows();
     const el=$('tcIssN');
     if(!n){ el.textContent=t('tcOk'); log(t('tcOk'),'okc'); return; }
-    el.innerHTML='';
-    el.appendChild(document.createTextNode(n+' · '));
-    const fx=document.createElement('button');
-    fx.type='button'; fx.className='btn'; fx.textContent=t('tcFix');
-    fx.onclick=function(){ const k=fixTimeIssues(); paintIssues(); renderRows(); log(t('tcFixed',k),'okc'); };
-    el.appendChild(fx);
+    el.textContent=String(n); el.title=t('stIssues');
   });
 }
 
@@ -4197,7 +4169,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   // v0.9.57：纠错重试——顽固跑偏组盲重发（同输入→同输出）零效果，把上次跑偏的译文
   // 明确喂回给模型让它自我纠正（Qualcomm CFO 访谈泰文版实测案例：整句前半漂成中文，
   // 批级重试 + 单组盲重发 ×2 全部复现同样的混合输出）
-  /* v0.9.391：纠错文案按通道分派。387 起语言跑偏检测已整套移除，badAnchor 只剩「歌词缺词」两类
+  /* v0.9.392：纠错文案按通道分派。387 起语言跑偏检测已整套移除，badAnchor 只剩「歌词缺词」两类
      （缺号 parseSegMarkers 覆盖不全 / 丢词 musicLost），可 rt=5 这条通道的反馈仍写着「语言跑偏」——
      等于把模型往错的方向推：它会去纠正语言，而真正的问题是少了一段歌词，改完照样缺段。
      rt=4（整批失败后的逐组补救）保留原有文案：它取的是组级 m.text，cue 对齐格式下恒为空，实际不触发。 */
