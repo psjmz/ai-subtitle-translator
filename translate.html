@@ -1103,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.401</span>
+    <span class="ver-tag">v0.9.402</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1723,9 +1723,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.401"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.401"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.401"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.402"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.402"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.402"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4432,13 +4432,29 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
      此前 flatCueMap 会把空值归一成空串（3491 行），而 ''==null 是 false，
      于是 soft 这一类连补译都进不去，直接由 buildByGno 归成整组 drop 静默删掉：
      用户看到的症状是「字幕少了一句，日志干干净净」，追都不知道从哪儿追。 */
+  /* v0.9.402：硬缺口的唯一判定入口——「模型没给这个编号」不等于「模型漏翻了」。
+     只认本地判定：整条无实义（纯音效标注 / 纯语气词）的 cue，模型不给译文不算缺口。
+     成因：提示词规则 5 明写「列入 fillers 的条目，在 c 里的译文留空即可」，规则 9 的输出示例
+     就是 {"c":{"3":"…","18":"…"},"fillers":[17]}——17 压根不在 c 里。模型照示例做，
+     这里却判硬缺口 → 补译（模型仍返回 fillers）→ 三连败 → errMissGroup 抛错整批判死。
+     实测（Mayday.2026.en.SDH / da，v0.9.401）：gno 905 = "[car engine rumbles]"，
+     导出结果该行被 fillers 正确删除、全篇 0 空译文，却为此多发 27 个请求（gapGiveUpN=3）。
+     为什么不拿「编号在 fillers 里」当条件：模型若把实义句误列进 fillers，那等于静默删行；
+     漏一行必须可查，不能由模型单方面说了算。isSrcMeaningless 的判据很紧：Yes./No./Go!/
+     Help me! 这类短实义句全部判 false（已逐条验证），只有纯音效标注与纯语气词为 true；
+     本片 135 条被删音效行里 134 条判 true（唯一例外 "[sighs] Why… [stammers]" 含实义词，
+     判 false 是正确的）。
+     已知取舍：模型若漏翻 [inaudible] 这类「必须保留」的标记，也会被放过——宁可少一行标记，
+     不要为它把整批重发三次。
+     两处 missing 重算（主请求后 / 补译后）必须共用这个函数，否则口径一漂就白改。 */
+  const isHardGap = c => cMap[c.no]==null && !C.isSrcMeaningless(c.text);
   const gapPair = ()=>{
     const hard=new Set(), soft=new Set();
     if(pureMT) return {hard, soft};   // 纯翻译模型通道不做编号级补译（它本就不参与 cue 分配）
     for(const g of send){
       if(g.mFrames){ if(!byGno[g.gno]) hard.add('g'+g.gno); continue; }
       g.cues.forEach(c=>{
-        if(cMap[c.no]==null){ hard.add(c.no); return; }
+        if(cMap[c.no]==null){ if(isHardGap(c)) hard.add(c.no); return; }
         if(!String(cMap[c.no]).trim() && !fillers.has(c.no)) soft.add(c.no);
       });
     }
@@ -4503,7 +4519,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
           此前压根不发补译（missing 只看 hard），那条通道形同虚设；
           ② 发出的不再是孤立的缺失编号，而是它所在的整个句组（见 toFlat 的注释）。
      —— 注意 missing 的口径没变，仍然只认 hard：soft 补不回来不判死这一批。 */
-  let missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(c=>cMap[c.no]==null));
+  let missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(isHardGap));
   let missSet = gapSet();
   // v0.9.383：止损后不再发补译请求——已经证明补了也补不回来，再问只是纯烧钱
   if(missSet.size && missSet.size < totalUnits && !S.gapAbort){
@@ -4525,7 +4541,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
         mergeFlat(salvageFlat(String(raw2||'')));
       }
       S.gapFixN = (S.gapFixN||0) + (tryN - gapSet().size);
-      missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(c=>cMap[c.no]==null));
+      missing = send.filter(g=>g.mFrames ? !byGno[g.gno] : g.cues.some(isHardGap));
     }catch(e){ /* 补译失败：保持 missing 原样，走下面抛错 */ }
   }
   // 校验齐全：每个输入 cue 必须有结果（v0.9.45：只校验真正发给模型的 send 集）
