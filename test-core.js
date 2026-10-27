@@ -18328,3 +18328,24 @@ t('v0.9.400：版号与缓存 bust 五处一致', () => {
   assert.ok(/srt-core\.js\?v=0\.9\.400/.test(tr), '工作台 srt-core 缓存 bust 未升');
   assert.ok(/site-i18n\.js\?v=0\.9\.400/.test(idx), '首页 site-i18n 缓存 bust 未升');
 });
+
+/* ============================================================================
+   2026-10-27：后台「槽」列一律显示批次数（含 ×1）
+   —— 用户原话：「很多数据有槽的名称，但没请求次数」。查下来不是统计缺失：
+      数据里 sbD=1 是存着的，只是渲染时把「单槽单批」的 ×1 省了。
+      这属于后台显示口径，只改 admin.html（该页没有版号、服务端 no-cache），
+      所以公共页面版号仍是 v0.9.400，这里也不用跟版号断言。
+   ============================================================================ */
+console.log('\n— 后台槽列：批次一律显示 —');
+
+t('后台槽列：单批也标 ×N，别再省略', () => {
+  const a = readT('admin.html');
+  assert.ok(/function slotCell\(e\)\{/.test(a), 'admin.html 找不到 slotCell');
+  assert.ok(/'<span class="slotn">×' \+ x\.n \+ '<\/span>'/.test(a),
+    '槽列没有无条件渲染 ×N');
+  assert.ok(!/x\.n > 1 \|\| mix\.length > 1 \?/.test(a),
+    '还留着「多批才显示 ×N」的旧条件——单批会退回只有字母');
+  /* 自带 Key / 早期记录两条兜底不能被顺手改掉 */
+  assert.ok(/if \(e\.byok\) return '<span class="slot slotByok"/.test(a), '自带 Key 的槽显示丢了');
+  assert.ok(/if \(!mix\.length\) return '<span style="color:var\(--mut\)"/.test(a), '早期无标记记录该显示「-」');
+});
