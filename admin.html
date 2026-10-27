@@ -1148,9 +1148,12 @@ function slotCell(e){
   /* 2026-10-27（用户定案）：批次一律标 ×N，含 ×1。此前「单槽且只有 1 批」只显示字母，
      后台一列看下去像「有槽名、没次数」，容易被当成统计缺失。
      这次只动后台页（admin.html 没有版号、服务端 no-cache），公共页面版号仍是 v0.9.400。 */
+  /* 只有精确计数（v0.9.373 起按批累加）才显示 ×N；更早的记录只知道最后一批的槽，
+     n 恒为 1，写成 ×1 会谎报「只跑了一批」，所以那种保持只有字母。 */
+  const exact = e.slotExact === 1;
   return '<span title="' + esc(title) + '">' + mix.map(x =>
     '<b class="slot slot' + x.s + '">' + x.s + '</b>' +
-    '<span class="slotn">×' + x.n + '</span>'
+    (exact ? '<span class="slotn">×' + x.n + '</span>' : '')
   ).join('') + '</span>';
 }
 /* 分页条：上一页/下一页 + 窗口化页码（首末页 + 当前页前后各 1，超过间隔用 …）

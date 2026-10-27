@@ -18338,14 +18338,18 @@ t('v0.9.400：版号与缓存 bust 五处一致', () => {
    ============================================================================ */
 console.log('\n— 后台槽列：批次一律显示 —');
 
-t('后台槽列：单批也标 ×N，别再省略', () => {
+t('后台槽列：单批也标 ×N，旧记录不许谎报', () => {
   const a = readT('admin.html');
   assert.ok(/function slotCell\(e\)\{/.test(a), 'admin.html 找不到 slotCell');
-  assert.ok(/'<span class="slotn">×' \+ x\.n \+ '<\/span>'/.test(a),
-    '槽列没有无条件渲染 ×N');
+  /* 精确计数一律带 ×N（含 ×1）—— 用户 10-27 点名要的 */
+  assert.ok(/const exact = e\.slotExact === 1;/.test(a), '槽列没有区分精确计数与旧记录');
+  assert.ok(/\(exact \? '<span class="slotn">×' \+ x\.n \+ '<\/span>' : ''\)/.test(a),
+    '槽列的 ×N 没有按 exact 渲染');
   assert.ok(!/x\.n > 1 \|\| mix\.length > 1 \?/.test(a),
     '还留着「多批才显示 ×N」的旧条件——单批会退回只有字母');
   /* 自带 Key / 早期记录两条兜底不能被顺手改掉 */
   assert.ok(/if \(e\.byok\) return '<span class="slot slotByok"/.test(a), '自带 Key 的槽显示丢了');
   assert.ok(/if \(!mix\.length\) return '<span style="color:var\(--mut\)"/.test(a), '早期无标记记录该显示「-」');
+  /* 旧记录的 n 恒为 1（只知道最后一批），写成 ×1 就是谎报 */
+  assert.ok(/看不出中途是否换过/.test(a), '旧记录的 tooltip 说明丢了');
 });
