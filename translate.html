@@ -1103,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.397</span>
+    <span class="ver-tag">v0.9.398</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1723,9 +1723,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.397"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.397"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.397"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.398"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.398"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.398"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2478,6 +2478,88 @@ function askReuse(file, lines, langName, ts){
     ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('cancel'); } });
     document.body.appendChild(ov);
   });
+}
+
+/* ================= v0.9.398：开跑前的统一体检 =================
+   用户反馈：「在翻译风格中选择了自定义，但没填写内容，也不弹窗引导用户去填写，
+   而是直接卡住」。查下来这条路只有一个 log(t('customNeed')) + return：
+   按钮闪一下就恢复、日志滚在页面下方，用户侧就是「点了没反应」。
+   这里把它升级成显式选择：去填写 / 改用内置风格继续 / 取消。
+   与 multilang.html 的同名函数是一对手抄副本（两页不共用 js），改一边记得改另一边。 */
+function preflightCfg(cfg){
+  if(!cfg) return { ok:true };
+  if(cfg.src === cfg.dst) return { ok:false, code:'langSame' };
+  if(cfg.styleMode === 'custom' && !cfg.styleCustom) return { ok:false, code:'customEmpty' };
+  return { ok:true };
+}
+/* 三按钮弹窗：稍后再说 / 改用「均衡」/ 去填写。返回 'fill' | 'default' | false */
+function askStyleEmpty(){
+  return new Promise(function(resolve){
+    const old = document.getElementById('styleNeedModal');
+    if(old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'styleNeedModal';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:470px;width:100%;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.18);';
+    const h = document.createElement('div');
+    h.style.cssText = 'font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+    h.textContent = t('pfStyleTitle');
+    const b = document.createElement('div');
+    b.style.cssText = 'color:var(--ink);font-size:13.5px;line-height:1.75;white-space:pre-wrap;';
+    /* 两句都复用已有词条，不为这一处新增翻译：
+       customNeed 说明「缺什么」，styleCustomPh 正好是输入框的占位提示（该填什么）。 */
+    b.textContent = t('customNeed');
+    const n = document.createElement('div');
+    n.style.cssText = 'color:var(--sub);font-size:12.5px;line-height:1.7;margin-top:8px;white-space:pre-wrap;';
+    n.textContent = t('styleCustomPh');
+    const btns = document.createElement('div');
+    btns.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;';
+    const mk = function(txt, primary, val){
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn'; btn.textContent = txt;
+      if(primary) btn.style.cssText = 'background:var(--acc);color:#fff;border-color:var(--acc);';
+      btn.onclick = function(){ ov.remove(); resolve(val); };
+      btns.appendChild(btn);
+    };
+    mk(t('errModalLater'), false, false);
+    mk(t('pfUseDefault'), false, 'default');
+    mk(t('pfGoFill'), true, 'fill');
+    box.appendChild(h); box.appendChild(b); box.appendChild(n); box.appendChild(btns);
+    ov.appendChild(box);
+    ov.addEventListener('click', function(e){ if(e.target === ov){ ov.remove(); resolve(false); } });
+    document.body.appendChild(ov);
+    try{ btns.lastChild.focus(); }catch(e){}
+  });
+}
+/* 返回 true = 可以继续（用户可能刚把「自定义」改成「均衡」） */
+async function preflightGuard(){
+  const cfg = getCfg();
+  const pf = preflightCfg(cfg);
+  if(pf.ok) return true;
+  if(pf.code === 'langSame'){
+    log(t('langSame', LBY(cfg.src).zh), 'err');
+    return false;
+  }
+  if(pf.code === 'customEmpty'){
+    const r = await askStyleEmpty();
+    if(r === 'default'){
+      const el = document.querySelector('input[name=style][value=elegant]');
+      if(el){ el.checked = true; try{ el.dispatchEvent(new Event('change', { bubbles:true })); }catch(e){} }
+      log(t('pfSwitched'), 'okc');
+      return true;
+    }
+    if(r === 'fill'){
+      const box = $('styleCustom');
+      if(box){
+        box.style.display = 'block';
+        try{ box.scrollIntoView({ behavior:'smooth', block:'center' }); }catch(e){}
+        setTimeout(function(){ try{ box.focus(); box.select(); }catch(e){} }, 380);
+      }
+    }
+    return false;
+  }
+  return false;
 }
 
 // 读取左侧全部设置 → 配置对象（含校验用的错误信息）
@@ -5122,9 +5204,12 @@ async function runTranslate(){
   let btnText=$('btnGo').textContent;
   try{
   glossRefresh();   // v0.9.134：以输入框的当前内容为准重建术语表快照（用户可能刚改过还没失焦）
+  /* v0.9.398：这两条原先只 log 一行就 return —— 按钮闪一下就恢复、日志滚在下面，
+     用户侧就是「点了没反应」。现在统一走 preflightGuard：弹窗说清楚缺什么，
+     还能一键改用内置风格继续跑。守卫要排在取配置之前（它自己读一遍 getCfg），
+     用户若在那里改成「均衡」，下面的 cfg 自然是改后的值。 */
+  if(!(await preflightGuard())) return false;
   const cfg = getCfg();
-  if (cfg.src === cfg.dst){ log(t('langSame',LBY(cfg.src).zh),'err'); return; }
-  if (cfg.styleMode === 'custom' && !cfg.styleCustom){ log(t('customNeed'),'err'); try{$('styleCustom').focus();}catch(e){} return; }
   S.maxW = cfg.maxW;
   /* v0.9.170：开翻前统一拦一次。换片那条路只覆盖「换了文件」，同一部片改目标语言不会触发，
      而术语表真正在用的时刻是开翻这一刻，守在这里最准。false = 用户取消，直接返回不动任何东西。 */

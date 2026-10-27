@@ -1357,7 +1357,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.397</span>
+    <span class="ver-tag">v0.9.398</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -2060,10 +2060,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.397"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.397"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.397"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.397"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.398"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.398"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.398"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.398"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -5458,7 +5458,9 @@ async function runTranslate(){
   glossRefresh();   // v0.9.134：以输入框的当前内容为准重建术语表快照（用户可能刚改过还没失焦）
   const cfg = getCfg();
   if (cfg.src === cfg.dst){ log(t('langSame',LBY(cfg.src).zh),'err'); return; }
-  if (cfg.styleMode === 'custom' && !cfg.styleCustom){ log(t('customNeed'),'err'); try{$('styleCustom').focus();}catch(e){} return; }
+  /* v0.9.398：这里是第二道闸（第一道在 runMulti 开头，会弹窗引导并阻止整队开跑）。
+     单独调 runTranslate 时也不静默：返回 false，让调用方能区分「跑完了」和「根本没跑」。 */
+  if (cfg.styleMode === 'custom' && !cfg.styleCustom){ log(t('customNeed'),'err'); try{$('styleCustom').focus();}catch(e){} return false; }
   S.maxW = cfg.maxW;
   /* v0.9.170：开翻前统一拦一次。换片那条路只覆盖「换了文件」，同一部片改目标语言不会触发，
      而术语表真正在用的时刻是开翻这一刻，守在这里最准。false = 用户取消，直接返回不动任何东西。 */
@@ -6386,6 +6388,14 @@ var MLT = {
     histNote:'记录只存在这台电脑的浏览器里，不会上传。选「全部重新翻译」会先把它们清掉。',
     histResume:'继续翻译', histRedo:'全部重新翻译', histCancel:'取消',
     histRedoLog:'已清掉 {0} 格的历史记录，这次全部从头翻。',
+    pfStyleTitle:'还差一步',
+    pfStyleBody:'你选了「自定义」翻译风格，但风格描述是空的。没有描述，模型不知道该用什么口吻翻。',
+    pfStyleNote:'可以现在填一句（比如「轻松幽默，像给朋友讲故事」），也可以改用内置风格。',
+    pfGoFill:'去填写',
+    pfUseDefault:'改用「均衡」',
+    pfSwitched:'已改用「均衡」风格，继续开始翻译。',
+    pfNoResult:'这一格没产出译文（翻译没有真正开始）',
+    styleEmptyTag:'（未填写）',
   },
   'zh-TW': {
     need1:'先新增至少一種目標語言', same:'目標語言不能和原文語言相同', sameLangAdd:'{0} 是原文語言，不能當目標語言', sameLangDrop:'{0} 是原文語言，已從目標佇列移出',
@@ -6424,6 +6434,14 @@ var MLT = {
     histNote:'記錄只存在這台電腦的瀏覽器裡，不會上傳。選「全部重新翻譯」會先把它們清掉。',
     histResume:'繼續翻譯', histRedo:'全部重新翻譯', histCancel:'取消',
     histRedoLog:'已清掉 {0} 格的歷史記錄，這次全部從頭翻。',
+    pfStyleTitle:'還差一步',
+    pfStyleBody:'你選了「自訂」翻譯風格，但風格描述是空的。沒有描述，模型不知道該用什麼口吻翻。',
+    pfStyleNote:'可以現在填一句（例如「輕鬆幽默，像在跟朋友說故事」），也可以改用內建風格。',
+    pfGoFill:'去填寫',
+    pfUseDefault:'改用「均衡」',
+    pfSwitched:'已改用「均衡」風格，繼續開始翻譯。',
+    pfNoResult:'這一格沒有產出譯文（翻譯沒有真正開始）',
+    styleEmptyTag:'（未填寫）',
   },
   'en': {
     need1:'Add at least one target language first.', same:'A target language cannot be the source language.', sameLangAdd:'{0} is the source language — it cannot be a target', sameLangDrop:'{0} is the source language; removed from the target queue',
@@ -6462,6 +6480,14 @@ var MLT = {
     histNote:'These records live only in this browser and are never uploaded. "Translate again" clears them first.',
     histResume:'Resume', histRedo:'Translate again', histCancel:'Cancel',
     histRedoLog:'Cleared {0} saved run(s) — starting from scratch.',
+    pfStyleTitle:'One more step',
+    pfStyleBody:'You picked the "Custom" translation style but left the description empty. Without it the model has no idea what tone to use.',
+    pfStyleNote:'Fill in a line now (e.g. "light and funny, like telling a friend a story"), or switch to a built-in style.',
+    pfGoFill:'Fill it in',
+    pfUseDefault:'Use "Balanced"',
+    pfSwitched:'Switched to the "Balanced" style — starting the translation.',
+    pfNoResult:'no translation produced (the run never really started)',
+    styleEmptyTag:' (empty)',
   },
   'ja': {
     need1:'先に対象言語を1つ以上追加してください', same:'対象言語は原文の言語と同じにできません', sameLangAdd:'{0} は原文の言語なので、翻訳先にはできません', sameLangDrop:'{0} は原文の言語です。翻訳先から外しました',
@@ -6501,6 +6527,14 @@ var MLT = {
     histNote:'記録はこのブラウザにのみ保存され、送信されません。「すべて翻訳し直す」を選ぶと先に削除します。',
     histResume:'翻訳を続ける', histRedo:'すべて翻訳し直す', histCancel:'キャンセル',
     histRedoLog:'{0} 件の記録を削除しました。最初から翻訳します。',
+    pfStyleTitle:'あと一歩です',
+    pfStyleBody:'翻訳スタイルで「カスタム」を選んでいますが、説明が空です。説明がないと、モデルはどんな口調で訳すべきか分かりません。',
+    pfStyleNote:'ここで一言入力する（例:「軽くてユーモラス、友達に話すように」）か、内蔵スタイルに切り替えてください。',
+    pfGoFill:'入力する',
+    pfUseDefault:'「バランス」に切り替え',
+    pfSwitched:'「バランス」スタイルに切り替えました。翻訳を開始します。',
+    pfNoResult:'このセルは訳文が作られませんでした（翻訳が始まっていません）',
+    styleEmptyTag:'（未入力）',
   },
   'ko': {
     need1:'먼저 대상 언어를 하나 이상 추가하세요', same:'대상 언어는 원문 언어와 같을 수 없습니다', sameLangAdd:'{0}은(는) 원문 언어라 대상 언어로 쓸 수 없습니다', sameLangDrop:'{0}은(는) 원문 언어라 대상 목록에서 뺐습니다',
@@ -6540,6 +6574,14 @@ var MLT = {
     histNote:'기록은 이 브라우저에만 저장되며 업로드되지 않습니다. "모두 다시 번역"을 고르면 먼저 삭제합니다.',
     histResume:'이어서 번역', histRedo:'모두 다시 번역', histCancel:'취소',
     histRedoLog:'기록 {0}칸을 삭제했습니다. 처음부터 번역합니다.',
+    pfStyleTitle:'한 단계 남았습니다',
+    pfStyleBody:'번역 스타일에서 "사용자 정의"를 골랐지만 설명이 비어 있습니다. 설명이 없으면 모델이 어떤 말투로 번역할지 알 수 없습니다.',
+    pfStyleNote:'지금 한 줄 입력하거나(예: "가볍고 유머러스하게, 친구에게 이야기하듯"), 기본 스타일로 바꾸세요.',
+    pfGoFill:'입력하기',
+    pfUseDefault:'"균형"으로 변경',
+    pfSwitched:'"균형" 스타일로 변경했습니다. 번역을 시작합니다.',
+    pfNoResult:'이 칸은 번역문이 생성되지 않았습니다 (번역이 시작되지 않음)',
+    styleEmptyTag:' (미입력)',
   },
   'es': {
     need1:'Añade al menos un idioma de destino.', same:'El idioma de destino no puede ser el mismo que el original.', sameLangAdd:'{0} es el idioma de origen y no puede ser idioma de destino', sameLangDrop:'{0} es el idioma de origen; se quitó de la cola de destino',
@@ -6579,6 +6621,14 @@ var MLT = {
     histNote:'Estos registros solo están en este navegador y no se suben. «Traducir de nuevo» los borra primero.',
     histResume:'Continuar', histRedo:'Traducir de nuevo', histCancel:'Cancelar',
     histRedoLog:'Se borraron {0} registro(s); se empieza de cero.',
+    pfStyleTitle:'Falta un paso',
+    pfStyleBody:'Elegiste el estilo «Personalizado» pero la descripción está vacía. Sin ella, el modelo no sabe qué tono usar.',
+    pfStyleNote:'Escribe una línea ahora (p. ej. «ligero y divertido, como contándoselo a un amigo») o cambia a un estilo integrado.',
+    pfGoFill:'Escribirla',
+    pfUseDefault:'Usar «Equilibrado»',
+    pfSwitched:'Se cambió al estilo «Equilibrado»; empezando la traducción.',
+    pfNoResult:'esta celda no produjo traducción (la ejecución no llegó a empezar)',
+    styleEmptyTag:' (vacío)',
   },
   'pt': {
     need1:'Adicione pelo menos um idioma de destino.', same:'O idioma de destino não pode ser igual ao original.', sameLangAdd:'{0} é o idioma de origem e não pode ser idioma de destino', sameLangDrop:'{0} é o idioma de origem; foi removido da fila de destino',
@@ -6618,6 +6668,14 @@ var MLT = {
     histNote:'Esses registros ficam só neste navegador e não são enviados. «Traduzir de novo» apaga primeiro.',
     histResume:'Continuar', histRedo:'Traduzir de novo', histCancel:'Cancelar',
     histRedoLog:'{0} registro(s) apagado(s); recomeçando do zero.',
+    pfStyleTitle:'Falta um passo',
+    pfStyleBody:'Você escolheu o estilo «Personalizado», mas a descrição está vazia. Sem ela, o modelo não sabe que tom usar.',
+    pfStyleNote:'Escreva uma linha agora (por exemplo «leve e divertido, como contando a um amigo») ou mude para um estilo pronto.',
+    pfGoFill:'Escrever',
+    pfUseDefault:'Usar «Equilibrado»',
+    pfSwitched:'Mudou para o estilo «Equilibrado»; a iniciar a tradução.',
+    pfNoResult:'esta célula não gerou tradução (a execução não chegou a começar)',
+    styleEmptyTag:' (vazio)',
   },
   'de': {
     need1:'Füge zuerst mindestens eine Zielsprache hinzu.', same:'Die Zielsprache darf nicht die Ausgangssprache sein.', sameLangAdd:'{0} ist die Ausgangssprache und kann nicht Zielsprache sein', sameLangDrop:'{0} ist die Ausgangssprache und wurde aus der Zielliste entfernt',
@@ -6657,6 +6715,14 @@ var MLT = {
     histNote:'Diese Einträge liegen nur in diesem Browser und werden nicht hochgeladen. „Neu übersetzen“ löscht sie vorher.',
     histResume:'Fortsetzen', histRedo:'Neu übersetzen', histCancel:'Abbrechen',
     histRedoLog:'{0} gespeicherte(r) Lauf/Läufe gelöscht – es geht von vorn los.',
+    pfStyleTitle:'Noch ein Schritt',
+    pfStyleBody:'Du hast den Stil „Eigene“ gewählt, aber die Beschreibung ist leer. Ohne sie weiß das Modell nicht, welcher Ton gewünscht ist.',
+    pfStyleNote:'Schreib jetzt eine Zeile (z. B. „locker und humorvoll, wie einem Freund erzählt“) oder nimm einen eingebauten Stil.',
+    pfGoFill:'Jetzt ausfüllen',
+    pfUseDefault:'„Ausgewogen“ nehmen',
+    pfSwitched:'Auf „Ausgewogen“ umgestellt – die Übersetzung startet.',
+    pfNoResult:'diese Zelle hat keine Übersetzung erzeugt (der Lauf begann gar nicht)',
+    styleEmptyTag:' (leer)',
   },
   'fr': {
     need1:'Ajoutez au moins une langue cible.', same:'La langue cible ne peut pas être la langue source.', sameLangAdd:'{0} est la langue source et ne peut pas être une langue cible', sameLangDrop:'{0} est la langue source ; retiré de la file des cibles',
@@ -6696,6 +6762,14 @@ var MLT = {
     histNote:'Ces enregistrements ne sont que dans ce navigateur et ne sont jamais envoyés. « Tout retraduire » les efface d’abord.',
     histResume:'Reprendre', histRedo:'Tout retraduire', histCancel:'Annuler',
     histRedoLog:'{0} exécution(s) enregistrée(s) effacée(s) ; on repart de zéro.',
+    pfStyleTitle:'Encore une étape',
+    pfStyleBody:'Vous avez choisi le style « Personnalisé » mais la description est vide. Sans elle, le modèle ne sait pas quel ton adopter.',
+    pfStyleNote:'Saisissez une ligne maintenant (par ex. « léger et drôle, comme si vous racontiez à un ami »), ou passez à un style intégré.',
+    pfGoFill:'La saisir',
+    pfUseDefault:'Utiliser « Équilibré »',
+    pfSwitched:'Passé au style « Équilibré » ; démarrage de la traduction.',
+    pfNoResult:'cette cellule n’a produit aucune traduction (le traitement n’a pas démarré)',
+    styleEmptyTag:' (vide)',
   },
   'ru': {
     need1:'Сначала добавьте хотя бы один целевой язык.', same:'Целевой язык не может совпадать с исходным.', sameLangAdd:'{0} — язык оригинала, его нельзя выбрать как целевой', sameLangDrop:'{0} — язык оригинала, удалён из списка целевых',
@@ -6735,6 +6809,14 @@ var MLT = {
     histNote:'Записи хранятся только в этом браузере и никуда не отправляются. «Перевести заново» сначала удалит их.',
     histResume:'Продолжить', histRedo:'Перевести заново', histCancel:'Отмена',
     histRedoLog:'Удалено записей: {0}. Начинаем с нуля.',
+    pfStyleTitle:'Ещё один шаг',
+    pfStyleBody:'Вы выбрали стиль «Свой», но описание пустое. Без него модель не знает, какой тон использовать.',
+    pfStyleNote:'Впишите строку сейчас (например, «легко и с юмором, как рассказ другу») или выберите встроенный стиль.',
+    pfGoFill:'Заполнить',
+    pfUseDefault:'Взять «Сбалансированный»',
+    pfSwitched:'Переключено на стиль «Сбалансированный»; начинаем перевод.',
+    pfNoResult:'эта ячейка не дала перевода (запуск так и не начался)',
+    styleEmptyTag:' (пусто)',
   },
   'id': {
     need1:'Tambahkan setidaknya satu bahasa tujuan dulu.', same:'Bahasa tujuan tidak boleh sama dengan bahasa sumber.', sameLangAdd:'{0} adalah bahasa sumber dan tidak bisa jadi bahasa target', sameLangDrop:'{0} adalah bahasa sumber; dihapus dari antrean target',
@@ -6774,6 +6856,14 @@ var MLT = {
     histNote:'Catatan ini hanya tersimpan di browser ini dan tidak diunggah. "Terjemahkan ulang" menghapusnya lebih dulu.',
     histResume:'Lanjutkan', histRedo:'Terjemahkan ulang', histCancel:'Batal',
     histRedoLog:'{0} catatan dihapus; mulai dari awal.',
+    pfStyleTitle:'Tinggal satu langkah',
+    pfStyleBody:'Anda memilih gaya "Kustom" tetapi deskripsinya kosong. Tanpa itu model tidak tahu nada apa yang dipakai.',
+    pfStyleNote:'Isi satu baris sekarang (mis. "ringan dan lucu, seperti bercerita ke teman") atau pilih gaya bawaan.',
+    pfGoFill:'Isi sekarang',
+    pfUseDefault:'Pakai "Seimbang"',
+    pfSwitched:'Beralih ke gaya "Seimbang"; mulai menerjemahkan.',
+    pfNoResult:'sel ini tidak menghasilkan terjemahan (prosesnya tidak pernah mulai)',
+    styleEmptyTag:' (kosong)',
   },
   'ar': {
     need1:'أضف لغة هدف واحدة على الأقل أولًا.', same:'لا يمكن أن تكون لغة الهدف هي لغة المصدر نفسها.', sameLangAdd:'{0} هي لغة المصدر ولا يمكن أن تكون لغة هدف', sameLangDrop:'{0} هي لغة المصدر، وقد أُزيلت من قائمة الأهداف',
@@ -6813,6 +6903,14 @@ var MLT = {
     histNote:'هذه السجلات محفوظة في هذا المتصفح فقط ولا تُرفع. اختيار «إعادة الترجمة» يحذفها أولًا.',
     histResume:'متابعة', histRedo:'إعادة الترجمة', histCancel:'إلغاء',
     histRedoLog:'تم حذف {0} سجلًا؛ البدء من جديد.',
+    pfStyleTitle:'بقيت خطوة',
+    pfStyleBody:'اخترت أسلوب «مخصص» لكن الوصف فارغ. بدونه لا يعرف النموذج أي نبرة يستخدم.',
+    pfStyleNote:'اكتب سطرًا الآن (مثل «خفيف وطريف، كأنك تحكي لصديق») أو اختر أسلوبًا جاهزًا.',
+    pfGoFill:'سأكتبه',
+    pfUseDefault:'استخدام «متوازن»',
+    pfSwitched:'تم التبديل إلى أسلوب «متوازن»؛ بدء الترجمة.',
+    pfNoResult:'هذه الخلية لم تُنتج ترجمة (لم تبدأ العملية فعليًا)',
+    styleEmptyTag:' (فارغ)',
   }
 };
 /* 取一条本页文案：命中当前界面语言 → 英文 → key 本身。
@@ -7160,6 +7258,59 @@ function mlConfirm(title, body, note, okTxt, cancelTxt, extraTxt){
   });
 }
 
+/* ---------- v0.9.398：开跑前的统一体检 ----------
+   用户反馈：「在翻译风格中选择了自定义，但没填写内容，也不弹窗引导用户去填写，
+   而是直接卡住（同时多语的时候却报成功）」。
+   查下来是两件事叠在一起：
+     ① 校验只在 runTranslate 里 log 一行就 return —— 按钮闪一下就恢复，
+        日志滚在页面下方，用户侧就是「点了没反应」；
+     ② 队列循环拿 S.rows.length 判成功，而 S.rows 在 mlUseFile 里早被原文填满
+        （zh 全是 null），于是早退也被记成「✓ 完成」，最后「✔ 全部完成」但每格都是原文。
+   这里提前拦一次：一个请求都不发，并把用户带到该填的地方。 */
+function preflightCfg(cfg){
+  if(!cfg) return { ok:true };
+  if(cfg.src === cfg.dst) return { ok:false, code:'langSame' };
+  if(cfg.styleMode === 'custom' && !cfg.styleCustom) return { ok:false, code:'customEmpty' };
+  return { ok:true };
+}
+/* 返回 'go' = 已改用默认风格，可以继续跑；'stop' = 中止（用户去填写 / 取消） */
+async function preflightAsk(pf){
+  if(pf.code === 'customEmpty'){
+    var r = await mlConfirm(mlt('pfStyleTitle'), mlt('pfStyleBody'), mlt('pfStyleNote'),
+                            mlt('pfGoFill'), mlt('confirmCancel'), mlt('pfUseDefault'));
+    if(r === 'extra'){
+      var el = document.querySelector('input[name=style][value=elegant]');
+      if(el){ el.checked = true; try{ el.dispatchEvent(new Event('change', { bubbles:true })); }catch(e){} }
+      log(mlt('pfSwitched'), 'okc');
+      return 'go';
+    }
+    if(r === 'ok'){
+      /* 翻译设置是折叠卡片，不展开的话用户根本看不到那个输入框。
+         ⚠️ 不能调 cfgToggle —— 它长在下面的 IIFE 里，这里（全局作用域）拿不到，
+         调用会抛 ReferenceError 并被外层 catch 吞掉，表现就是「点了没反应」。
+         直接加 class + 同步 aria 即可，和 cfgToggle 的效果一致（见 .cfgcard.open 的 CSS）。 */
+      try{
+        var card = document.getElementById('cfgTrans');
+        if(card) card.classList.add('open');
+        var hd = document.getElementById('cfgTransHd');
+        if(hd) hd.setAttribute('aria-expanded', 'true');
+      }catch(e){}
+      var box = document.getElementById('styleCustom');
+      if(box){
+        try{ box.style.display = 'block'; }catch(e){}
+        try{ box.scrollIntoView({ behavior:'smooth', block:'center' }); }catch(e){}
+        setTimeout(function(){ try{ box.focus(); box.select(); }catch(e){} }, 380);
+      }
+    }
+    return 'stop';
+  }
+  if(pf.code === 'langSame'){
+    log(t('langSame', LBY(getCfg().src).zh), 'err');
+    return 'stop';
+  }
+  return 'stop';
+}
+
 async function runMulti(){
   mlInit();
   /* 粘贴 / 示例这条路不进文件队列，但同样要能跑：把当前这份字幕补登记成一集 */
@@ -7171,6 +7322,17 @@ async function runMulti(){
   }
   if(!ML.files.length){ log(mlt('noFiles'),'err'); return; }
   if(!ML.langs.length){ log(mlt('need1'),'err'); return; }
+
+  /* ---------- v0.9.398：开跑前统一体检（放在算批数之前，用户不必先看一眼假耗时） ----------
+     以前这类问题只在每个 runTranslate 里各 log 一行，队列循环又把早退当成功，
+     结果「自定义风格没填」能一路跑到「✔ 全部完成」，每格却是原文。 */
+  {
+    var pf = preflightCfg(getCfg());
+    if(!pf.ok){
+      var pfAct = await preflightAsk(pf);
+      if(pfAct !== 'go') return;
+    }
+  }
 
   /* 兜底：无论原文语言是从下拉改的、从 localStorage 恢复的还是别处改的，
      开跑前都把「原文语言」从队列里摘掉。正常路径在 srcLang 的 change 里已经摘过，
@@ -7322,7 +7484,14 @@ async function runMulti(){
       var s0 = 0; PG.durs.forEach(function(d){ s0 += d; });
       ML.avgSec = s0 / PG.durs.length;
     }
-    if(S.rows && S.rows.length){
+    /* v0.9.398：成功判据从「表格里有没有行」改成「有没有真的翻出译文」。
+       S.rows 在 mlUseFile() 里就被原文填满（zh 全是 null），
+       拿 S.rows.length 判成功，会把 runTranslate 的早退（自定义风格为空、无字幕等）
+       也记成「✓ 完成」—— 矩阵全绿、汇总「全部完成」，下载出来却是原文。 */
+    var okZh = !!(S.rows && S.rows.length && S.rows.some(function(r){
+      return String(r.zh == null ? '' : r.zh).trim();
+    }));
+    if(okZh){
       try{
         ML.results[k] = { text: buildExport(), name: mlUniqueName(autoOutNameStr()),
           /* v0.9.374：连「这一格属于哪个任务、导成什么格式」一起留在结果里。
@@ -7352,6 +7521,9 @@ async function runMulti(){
       }
     }else if(!ML.stopReq){
       ML.failed.push(k);
+      /* 之前这里静默 push 就完了 —— 用户看不到这一格为什么没结果。
+         现在写清楚：不是模型失败，而是这一轮压根没产出译文。 */
+      log(mlt('langErr', mlTaskName(k), mlt('pfNoResult')), 'err');
     }
     mlRender();
   }
@@ -10522,7 +10694,11 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       var st = document.querySelector('input[name=style]:checked');
       if(st){
         var sp = (st.parentNode && st.parentNode.querySelector) ? st.parentNode.querySelector('span') : null;
-        b1.push(sp ? sp.textContent : String(st.value || ''));
+        var sLab = sp ? sp.textContent : String(st.value || '');
+        /* v0.9.398：选了「自定义」却没填，摘要上直接标出来 —— 别等点了开始才拦 */
+        var sBox = document.getElementById('styleCustom');
+        if(String(st.value) === 'custom' && !String(sBox ? sBox.value : '').trim()) sLab += mlt('styleEmptyTag');
+        b1.push(sLab);
       }
       var md = $('mode');
       if(md && md.options[md.selectedIndex]){
