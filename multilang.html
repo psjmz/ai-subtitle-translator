@@ -1250,6 +1250,12 @@
   .viewer .exp-actions .btn.ghost:hover{border-color:#CBD3FA;color:#2C3AC0}
   /* 没选中格子 / 这一格还没译文时，下载键是死的，别让它看起来能点 */
   .viewer .exp-actions .btn.primary:disabled{background:#C9D0E2;border-color:#C9D0E2;color:#fff;cursor:default}
+  /* 2026-10-27：「下载全部」是描边键，一样要有死态 —— 空矩阵时它看起来能点、点了只在日志里报一句，
+     用户会以为是坏了。.appbar .topbtn 那条同理（顶栏那个快捷下载）。 */
+  .viewer .exp-actions .btn.ghost:disabled{color:#AEB7C9;border-color:#E6EAF3;background:#F7F9FD;cursor:default}
+  .viewer .exp-actions .btn.ghost:disabled:hover{color:#AEB7C9;border-color:#E6EAF3;background:#F7F9FD}
+  .appbar .topbtn:disabled{opacity:.45;cursor:default}
+  .appbar .topbtn:disabled:hover{background:rgba(255,255,255,.07);color:#CBD3E4}
   .vbody{display:none;border-top:1px solid var(--line);background:#F7F9FD;padding:10px}
   .viewer.open .vbody{display:block}
   .vbody>section.center{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -1357,7 +1363,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.400</span>
+    <span class="ver-tag">v0.9.401</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1940,7 +1946,11 @@ crossorigin="anonymous"></script>
           <span class="vb-meta" id="vMeta"></span>
           <span class="vb-sp"></span>
 <div class="exp-actions">
-        <button class="btn primary" id="btnDownload" data-i18n="btnDownload" type="button">下载字幕</button>
+        <!-- 2026-10-27（用户定案）：下载拆成「选中 / 全部」两键。
+             此前同一个键有三种含义 —— 结果 >1 自动打 zip、==1 下单个、==0 落到编辑器内容，
+             用户点下去之前根本不知道会拿到什么。 -->
+        <button class="btn primary" id="btnDownload" data-i18n="btnDlSel" type="button">下载选中字幕</button>
+        <button class="btn ghost" id="btnDownloadAll" data-i18n="btnDlAll" type="button">下载全部字幕</button>
         <button class="btn ghost" id="btnCopy" data-i18n="btnCopy" type="button">复制到剪贴板</button>
       </div>
           <button class="vb-btn" id="vToggle" type="button" aria-expanded="false">展开</button>
@@ -2060,10 +2070,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.400"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.400"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.400"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.400"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.401"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.401"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.401"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.401"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -5339,8 +5349,11 @@ async function extractGlossary(base,key,model,cfg,srcText){
      后台此前只有「下载了几次」，看不出用户到底把字幕导成什么格式；只传格式码，
      不带文件名以外的任何内容，认不出的值由服务端白名单丢弃。
    v0.9.374：meta 可选。本页一次 zip 能装下整季的结果，下载上报要按「每一格自己的任务」记账，
-     不能只认全局 S.trMeta（那永远是最后一个跑完的任务）。不传时行为与以前完全一致。 */
-function reportEvent(ev, extra, fmt, meta){
+     不能只认全局 S.trMeta（那永远是最后一个跑完的任务）。不传时行为与以前完全一致。
+   2026-10-27：新增 scope —— 'sel' 下载选中字幕 / 'all' 下载全部字幕。
+     两键的可用性与口径都不同，后台要能分清「用户是一格一格拿，还是整季打包」；
+     服务端只认白名单（dlSel / dlAll 两个累计计数），认不出就不记。 */
+function reportEvent(ev, extra, fmt, meta, scope){
   var m = meta || S.trMeta;
   if(!m) return;
   try{
@@ -5348,7 +5361,7 @@ function reportEvent(ev, extra, fmt, meta){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',scope:scope||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
       /* v0.9.375：编号级样本只在 finish 带一次 */
       cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
@@ -6327,7 +6340,16 @@ $('btnGo').addEventListener('click', ()=>{
     ML.stopReq=true;
     return;
   }
-  runMulti();
+  /* 2026-10-27：防连点。确认弹窗关掉之后、ML.running 置位之前有一段窗口期
+     （await mlConfirm 返回后还有几行同步代码），这段时间里再点一次「开始翻译」
+     会起第二条队列 —— 两条队列各自跑同一批任务，请求量翻倍、后台还会看到两套 taskId。
+     实测（本地 2 集 × 3 语）确实能复现：点了两下就出现两轮一模一样的记录。 */
+  if(ML.starting) { try{ log(t('alreadyRunning'),'err'); }catch(e){} return; }
+  ML.starting = true;
+  try{
+    runMulti().catch(function(e){ try{ log((e&&e.message)||String(e),'err'); }catch(_){} })
+             .then(function(){ ML.starting = false; });
+  }catch(e){ ML.starting = false; }
 });
 
 /* ==================== 多语队列 ====================
@@ -6337,7 +6359,8 @@ $('btnGo').addEventListener('click', ()=>{
    ⚠️ 与 translate.html 的差别只有这些：多选 UI、runMulti、mlDownloadZip，
       以及四个「一部片一种语言」假设的短路（saveSnap / askResume / askReuse / glossLangGuard）。
       改翻译逻辑请改 translate.html，然后把这一层原样带过来。 */
-var ML = { files: [], langs: [], results: {}, failed: [], cur: '', curFile: '', running: false, stopReq: false, avgSec: 0 };
+var ML = { files: [], langs: [], results: {}, failed: [], cur: '', curFile: '', running: false, starting: false, stopReq: false, avgSec: 0 };
+/* starting：确认弹窗关掉 → running 置位之间有一段空窗，用来挡连点双击起两条队列。 */
 /* 一个任务 = 一集 × 一种语言。results / failed 的键都是 fk|lang：
    同一集的不同语言互不覆盖，不同集的同一语言也互不覆盖。 */
 function mlKey(fk, lang){ return fk + '|' + lang; }
@@ -6372,6 +6395,7 @@ function mlDoneTasks(){
       补翻译时只在本表加行、不要动下面的调用代码。 */
 var MLT = {
   'zh-CN': {
+    gapNote:'任务之间自动间隔 {0} 秒（避免批量任务被挤到付费模型）。',
     need1:'先添加至少一种目标语言', same:'目标语言不能和原文语言相同', sameLangAdd:'{0} 是原文语言，不能当目标语言', sameLangDrop:'{0} 是原文语言，已从目标队列移出',
     addAria:'添加目标语言', addBtn:'+ 加入队列',
     hint:'可以加多种语言，点一次「开始翻译」按顺序全部跑完，结果打成一个 zip。',
@@ -6418,6 +6442,7 @@ var MLT = {
     styleEmptyTag:'（未填写）',
   },
   'zh-TW': {
+    gapNote:'任務之間自動間隔 {0} 秒（避免批次任務被擠到付費模型）。',
     need1:'先新增至少一種目標語言', same:'目標語言不能和原文語言相同', sameLangAdd:'{0} 是原文語言，不能當目標語言', sameLangDrop:'{0} 是原文語言，已從目標佇列移出',
     addAria:'新增目標語言', addBtn:'+ 加入佇列',
     hint:'可以加多種語言，點一次「開始翻譯」依序全部跑完，結果打成一個 zip。',
@@ -6464,6 +6489,7 @@ var MLT = {
     styleEmptyTag:'（未填寫）',
   },
   'en': {
+    gapNote:'Tasks are spaced {0}s apart so the batch queue stays off the paid model slots.',
     need1:'Add at least one target language first.', same:'A target language cannot be the source language.', sameLangAdd:'{0} is the source language — it cannot be a target', sameLangDrop:'{0} is the source language; removed from the target queue',
     addAria:'Add a target language', addBtn:'+ Add to queue',
     hint:'Add as many languages as you like: one click runs them one after another and packs every result into a single zip.',
@@ -6510,6 +6536,7 @@ var MLT = {
     styleEmptyTag:' (empty)',
   },
   'ja': {
+    gapNote:'タスク間に {0} 秒の間隔を空けます（有料モデルに回されないように）。',
     need1:'先に対象言語を1つ以上追加してください', same:'対象言語は原文の言語と同じにできません', sameLangAdd:'{0} は原文の言語なので、翻訳先にはできません', sameLangDrop:'{0} は原文の言語です。翻訳先から外しました',
     addAria:'対象言語を追加', addBtn:'+ キューに追加',
     hint:'複数言語を追加できます。「翻訳開始」を1回押すと順番に実行し、結果を1つの zip にまとめます。',
@@ -6557,6 +6584,7 @@ var MLT = {
     styleEmptyTag:'（未入力）',
   },
   'ko': {
+    gapNote:'작업 사이에 {0}초 간격을 둡니다(유료 모델로 밀리지 않도록).',
     need1:'먼저 대상 언어를 하나 이상 추가하세요', same:'대상 언어는 원문 언어와 같을 수 없습니다', sameLangAdd:'{0}은(는) 원문 언어라 대상 언어로 쓸 수 없습니다', sameLangDrop:'{0}은(는) 원문 언어라 대상 목록에서 뺐습니다',
     addAria:'대상 언어 추가', addBtn:'+ 대기열에 추가',
     hint:'여러 언어를 추가할 수 있습니다. 「번역 시작」을 한 번 누르면 순서대로 실행하고 결과를 zip 하나로 묶습니다.',
@@ -6604,6 +6632,7 @@ var MLT = {
     styleEmptyTag:' (미입력)',
   },
   'es': {
+    gapNote:'Se dejan {0} s entre tareas para no saturar la cola y caer al modelo de pago.',
     need1:'Añade al menos un idioma de destino.', same:'El idioma de destino no puede ser el mismo que el original.', sameLangAdd:'{0} es el idioma de origen y no puede ser idioma de destino', sameLangDrop:'{0} es el idioma de origen; se quitó de la cola de destino',
     addAria:'Añadir idioma de destino', addBtn:'+ Añadir a la cola',
     hint:'Puedes añadir varios idiomas: un clic los ejecuta en orden y empaqueta todo en un solo zip.',
@@ -6651,6 +6680,7 @@ var MLT = {
     styleEmptyTag:' (vacío)',
   },
   'pt': {
+    gapNote:'Intervalo de {0} s entre tarefas para não sobrecarregar a fila e cair no modelo pago.',
     need1:'Adicione pelo menos um idioma de destino.', same:'O idioma de destino não pode ser igual ao original.', sameLangAdd:'{0} é o idioma de origem e não pode ser idioma de destino', sameLangDrop:'{0} é o idioma de origem; foi removido da fila de destino',
     addAria:'Adicionar idioma de destino', addBtn:'+ Adicionar à fila',
     hint:'Pode adicionar vários idiomas: um clique executa em ordem e empacota tudo num único zip.',
@@ -6698,6 +6728,7 @@ var MLT = {
     styleEmptyTag:' (vazio)',
   },
   'de': {
+    gapNote:'{0} s Pause zwischen Aufgaben, damit die Warteschlange nicht auf das kostenpflichtige Modell ausweicht.',
     need1:'Füge zuerst mindestens eine Zielsprache hinzu.', same:'Die Zielsprache darf nicht die Ausgangssprache sein.', sameLangAdd:'{0} ist die Ausgangssprache und kann nicht Zielsprache sein', sameLangDrop:'{0} ist die Ausgangssprache und wurde aus der Zielliste entfernt',
     addAria:'Zielsprache hinzufügen', addBtn:'+ Zur Warteschlange',
     hint:'Du kannst beliebig viele Sprachen hinzufügen: ein Klick führt sie nacheinander aus und packt alles in ein Zip.',
@@ -6745,6 +6776,7 @@ var MLT = {
     styleEmptyTag:' (leer)',
   },
   'fr': {
+    gapNote:'{0} s entre chaque tâche pour éviter que la file bascule sur le modèle payant.',
     need1:'Ajoutez au moins une langue cible.', same:'La langue cible ne peut pas être la langue source.', sameLangAdd:'{0} est la langue source et ne peut pas être une langue cible', sameLangDrop:'{0} est la langue source ; retiré de la file des cibles',
     addAria:'Ajouter une langue cible', addBtn:'+ Ajouter à la file',
     hint:'Ajoutez autant de langues que vous voulez : un clic les exécute l’une après l’autre et tout est empaqueté dans un seul zip.',
@@ -6792,6 +6824,7 @@ var MLT = {
     styleEmptyTag:' (vide)',
   },
   'ru': {
+    gapNote:'Пауза {0} с между задачами, чтобы очередь не уходила на платную модель.',
     need1:'Сначала добавьте хотя бы один целевой язык.', same:'Целевой язык не может совпадать с исходным.', sameLangAdd:'{0} — язык оригинала, его нельзя выбрать как целевой', sameLangDrop:'{0} — язык оригинала, удалён из списка целевых',
     addAria:'Добавить целевой язык', addBtn:'+ В очередь',
     hint:'Можно добавить сколько угодно языков: один клик запускает их по очереди и упаковывает всё в один zip.',
@@ -6839,6 +6872,7 @@ var MLT = {
     styleEmptyTag:' (пусто)',
   },
   'id': {
+    gapNote:'Jeda {0} detik antar tugas agar antrean tidak terlempar ke model berbayar.',
     need1:'Tambahkan setidaknya satu bahasa tujuan dulu.', same:'Bahasa tujuan tidak boleh sama dengan bahasa sumber.', sameLangAdd:'{0} adalah bahasa sumber dan tidak bisa jadi bahasa target', sameLangDrop:'{0} adalah bahasa sumber; dihapus dari antrean target',
     addAria:'Tambah bahasa tujuan', addBtn:'+ Tambah ke antrean',
     hint:'Bisa tambah banyak bahasa: sekali klik dijalankan berurutan dan semua hasilnya dikemas jadi satu zip.',
@@ -6886,6 +6920,7 @@ var MLT = {
     styleEmptyTag:' (kosong)',
   },
   'ar': {
+    gapNote:'فاصل {0} ثانية بين المهام حتى لا تنتقل القائمة إلى النموذج المدفوع.',
     need1:'أضف لغة هدف واحدة على الأقل أولًا.', same:'لا يمكن أن تكون لغة الهدف هي لغة المصدر نفسها.', sameLangAdd:'{0} هي لغة المصدر ولا يمكن أن تكون لغة هدف', sameLangDrop:'{0} هي لغة المصدر، وقد أُزيلت من قائمة الأهداف',
     addAria:'إضافة لغة هدف', addBtn:'+ أضف إلى القائمة',
     hint:'يمكنك إضافة أي عدد من اللغات: ضغطة واحدة تنفّذها بالتتابع وتضم كل النتائج في ملف zip واحد.',
@@ -7331,6 +7366,26 @@ async function preflightAsk(pf){
   return 'stop';
 }
 
+/* ============ 2026-10-27（用户提议）：任务之间空 5 秒再开下一个 ============
+   起因：10-27 那批 17 集 × 6 语实测约 3 秒一个任务（≈20 个/分钟），
+   远超 D 池 rpmD=10，于是每隔一格就被挤到付费槽 B —— 97 单里 48 单落在 B 上，
+   用户体感「挺快」，成本却有一半是付费模型。
+   这 5 秒加在「上一任务已收尾（mlSettle 拿到释放回执）+ 400ms」之后，是纯空闲，
+   不占模型请求；单批任务本身 2~3 秒，加上它就是 7~8 秒一个，正好压在 10/分钟以下。
+   ⚠️ 只在「后面还有任务」时等；最后一个任务结束不等。
+   ⚠️ 等待期间每 250ms 看一眼停止标记 —— 用户点了停止不该再干等 5 秒。
+   ⚠️ 值写死在这里而不是进配置：这是「排队节奏」不是翻译参数，站点统一口径更省心。 */
+var ML_TASK_GAP_MS = 5000;
+function mlTaskGap(ms){
+  return new Promise(function(res){
+    var t0 = Date.now();
+    (function tick(){
+      if(ML.stopReq || Date.now() - t0 >= ms) return res();
+      setTimeout(tick, Math.min(250, ms - (Date.now() - t0)));
+    })();
+  });
+}
+
 async function runMulti(){
   mlInit();
   /* 粘贴 / 示例这条路不进文件队列，但同样要能跑：把当前这份字幕补登记成一集 */
@@ -7389,6 +7444,9 @@ async function runMulti(){
   if(savedBatches){
     etaSec = Math.max(avgSec, (totalBatches - savedBatches) * avgSec);
   }
+  /* 2026-10-27：任务之间的 5 秒也算进预计耗时 —— 不然用户按旧 ETA 等，
+     会发现「明明说 5 分钟，实际 8 分钟」，以为卡住了。 */
+  etaSec += Math.max(0, tasks.length - 1) * (ML_TASK_GAP_MS / 1000);
   log(mlt('plan', tasks.length, totalBatches,
     savedBatches ? mlt('planReuse', savedBatches) : '',
     fmtDur(Math.round(etaSec))), 'okc');
@@ -7399,6 +7457,7 @@ async function runMulti(){
         + mlt('paren', s.done ? mlt('resumeDone') : mlt('resumeBatch', s.bi, s.totalB));
     }).join(mlt('sep'))), 'okc');
   }
+  log(mlt('gapNote', ML_TASK_GAP_MS / 1000), 'okc');
   log(mlt('leave'), 'okc');
 
   /* ---------- 站点额度预检 ----------
@@ -7499,6 +7558,10 @@ async function runMulti(){
        fire-and-forget（不等回执），服务端可能还挂着这个任务占的槽位/在途名额。
        这里同步等一次释放回执，再留 400ms 让服务端把账记完，才允许下一个任务发请求。 */
     await mlSettle();
+    /* 2026-10-27：任务之间空 5 秒再开下一个（见上方 ML_TASK_GAP_MS 的说明）。
+       放在 mlSettle 之后：先等服务端确认这一单已释放槽位，再空转 5 秒，
+       下一种语言的请求就是「干净入场」，不会被在途闸弹回、也不会被挤到弱槽。 */
+    if(i < total - 1 && !ML.stopReq) await mlTaskGap(ML_TASK_GAP_MS);
     /* 用这一轮的真实节奏刷新平均批耗时，后面的 ETA 会越报越准 */
     if(PG.durs && PG.durs.length){
       var s0 = 0; PG.durs.forEach(function(d){ s0 += d; });
@@ -7724,21 +7787,19 @@ async function mlDownloadZip(){
   var zip = new JSZip();
   keys.forEach(function(v){ zip.file(ML.results[v].name, ML.results[v].text); });
   var u8 = await zip.generateAsync({type:'uint8array'});
-  var blob = new Blob([u8], {type:'application/zip'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = (ML.files.length > 1 ? 'subtitles_' + ML.files.length + 'files' : (ML.files[0] ? ML.files[0].base : 'subtitles'))
-    + '_' + keys.length + 'tasks.zip';
-  document.body.appendChild(a); a.click();
-  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 200);
+  dlSaveFile(new Blob([u8], {type:'application/zip'}),
+    (ML.files.length > 1 ? 'subtitles_' + ML.files.length + 'files' : (ML.files[0] ? ML.files[0].base : 'subtitles'))
+    + '_' + keys.length + 'tasks.zip');
   /* v0.9.374：这一包里的每个任务都算「被下载了一次」。
      此前这里一行上报都没有 —— 整季打完包，后台一条 download 都收不到，
      「完成未下载」全是误判，导出格式分布也永远缺这一页。
      口径：按格记（不是整包记 1 次），因为每格对应一个独立任务，
      只记 1 条会让其余 N-1 个任务的 downloads 永远停在 0。 */
+  /* 2026-10-27：补两处 —— ① 老结果没有 meta 也要记（走 dlMetaOf 兜底），
+     否则后台永远把那一格算成「完成未下载」；② 带 scope='all'，与「选中」分开计数。 */
   keys.forEach(function(v){
     var r = ML.results[v];
-    if(r && r.meta) reportEvent('download', '', r.fmt || expFileFmt(), r.meta);
+    reportEvent('download', '', (r && r.fmt) || expFileFmt(), dlMetaOf(v), 'all');
   });
   log(mlt('zipok', keys.length, keys.map(function(v){ return ML.results[v].name; }).join(mlt('sep'))), 'okc');
 }
@@ -8528,62 +8589,119 @@ function runReport(){
     $('report').innerHTML=t('verifyOk',count);
   }
 }
+/* ============ 2026-10-27（用户定案）：下载拆成「选中 / 全部」 ============
+   此前一个键三种含义：结果 >1 打 zip、==1 下单个、==0 落到编辑器内容 ——
+   点下去之前不知道会拿到什么；只想拿这一格的时候，被迫连整季一起下。
+   现在两键分工明确，可用性只看「任务矩阵里有没有已完成的格子」，与预览/展开状态无关：
+     · 下载选中字幕：矩阵里选中的那一格（没选但只有一格成品时，就用那一格）
+     · 下载全部字幕：所有已完成格子打成一个 zip
+   两键都按「格」上报（每格对应一个独立任务），后台的「下载」才不会只落在最后一格上。 */
+
+/* 某一格的上报身份：优先用它自己的 meta（带 taskId，服务端按任务号精确匹配）。
+   老结果没有 meta 时用「文件基名 + 语言」兜底 —— 服务端在无任务号时按 IP + 文件名 + 语言 匹配，
+   仍能记上；不兜底的话这一笔会彻底丢失，后台就把这一格永远算成「完成未下载」。 */
+function dlMetaOf(k){
+  var c = ML.results[k] || {};
+  if(c.meta && (c.meta.file || c.meta.lang)) return c.meta;
+  return { file: c.base || '', lang: c.lang || '' };
+}
+/* 选中键的落点：选中格有成品就用它；没有选中但只有一格成品（单任务场景）就用那一格。 */
+function dlTargetKey(){
+  if(ML.selKey && ML.results[ML.selKey]) return ML.selKey;
+  var ks = Object.keys(ML.results);
+  return ks.length === 1 ? ks[0] : '';
+}
+/* 编辑器里有没有「已经翻出来的行」—— 一格成品都没有时，下载选中键退回导出编辑器内容（老路径）。 */
+function dlDraftReady(){
+  var rows = S.rows || [];
+  for(var i = 0; i < rows.length; i++){
+    if(String((rows[i] && rows[i].zh) || '').trim()) return true;
+  }
+  return false;
+}
+/* 两键 + 顶栏「下载全部」的可用性，统一在这里算。
+   ⚠️ 不能用「当前这一格能不能预览」判断：回填译文一律按 SRT 解析，
+      导出格式选 ASS / VTT 时解析不出 cue，整季跑完下载键却是灰的（v0.9.374 踩过）。
+   用户要求：只要矩阵里有一个已完成的任务，就必须能下载 —— 所以主判据是 ML.results，不是查看区。 */
+function syncDlBtns(){
+  var n = Object.keys(ML.results).length;
+  var bd = $('btnDownload'), ba = $('btnDownloadAll'), bz = $('btnZip');
+  var ok = !!dlTargetKey() || (!n && dlDraftReady());
+  if(bd){
+    bd.disabled = !ok;
+    /* 死态的说明走 title：MXT 长在下面的 IIFE 里，外层只能经 mlShell 转发（拿不到就空串） */
+    bd.title = ok ? '' : mlShell('dlSelTip');
+  }
+  if(ba) ba.disabled = !n;
+  /* 顶栏那个是同一件事的快捷入口，口径必须一致，否则会出现「一个能点、一个不能」 */
+  if(bz) bz.disabled = !n;
+}
+function dlSaveFile(blob, name){
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 200);
+}
+/* 下载选中字幕 */
 $('btnDownload').addEventListener('click', ()=>{
-  /* 多语队列跑过 ≥2 种语言 → 直接打 zip，不再让用户一个个点 */
-  if(Object.keys(ML.results).length > 1){ mlDownloadZip(); return; }
-  /* 只剩一格时也要先重排：跑完那一格之后用户很可能调过行宽 / 导出格式。
-     v0.9.392 之前这里直接 buildExport()，导出的还是跑完当时的旧排版。 */
-  if(Object.keys(ML.results).length === 1){
-    try{ mlRebuildAll(); }catch(e){}
-    var _k = Object.keys(ML.results)[0], _c = ML.results[_k];
+  var k = dlTargetKey();
+  if(k){
+    var c = ML.results[k];
+    if(!c || !c.text){ log(t('noExport'),'err'); return; }
+    /* 打包前按这一格自己语言「现在的行宽」重排：行宽不进提示词、改它不用重翻，
+       但成品 text 是跑完那一格时生成的 —— 不重排，用户改了行宽等于没改。 */
+    try{ mlRebuild(k); }catch(e){}
+    c = ML.results[k] || c;
     runReport();
-    const name=(_c.name || autoOutNameStr());
-    const blob=new Blob([_c.text],{type:'text/plain;charset=utf-8'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=name;
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
-    /* v0.9.244：连导出格式一起上报（expFileFmt() 已把 ass-stack 归一为 ass，与服务端白名单一致）
-       v0.9.392：带上这一格自己的 meta —— 单格查看时 S.trMeta 还停在最后跑完的那一集，
-       不传就会把这笔下载记到别人头上（后台的「下载」与实际拿走的那一集对不上）。 */
-    reportEvent('download', '', _c.fmt || expFileFmt(), _c.meta);
+    /* ⚠️ 变量名不能叫 name：下面"退回编辑器内容"那支在函数体里还有一个 const name，
+       同作用域下 var 与 const 撞名会直接 SyntaxError（整块脚本失效）。 */
+    var dlName = c.name || autoOutNameStr();
+    dlSaveFile(new Blob([c.text], {type:'text/plain;charset=utf-8'}), dlName);
+    /* 按格上报：meta 带这一格自己的 taskId，这笔下载才落得到这一格上 */
+    reportEvent('download', '', c.fmt || expFileFmt(), dlMetaOf(k), 'sel');
     try{ localStorage.setItem('srtDonateV1','1'); }catch(e){}
     if(window.__donateReveal) window.__donateReveal();
-    log(t('exported',name,(_c.rows||[]).length),'okc');
+    log(t('exported', dlName, (c.rows||[]).length), 'okc');
     return;
   }
+  /* 一格成品都没有：退回编辑器当前内容（单文件老路径，行为与以前完全一致） */
   if(!S.rows.length){ log(t('noExport'),'err'); return; }
   runReport();
-  /* v0.9.190：文件名输入框已删——直接按「源文件名 + 目标语言 + 样式」现算，不再读 DOM */
   const name=(S.fileBase?autoOutNameStr():('translated.'+expFileFmt()));
-  const blob=new Blob([buildExport()],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=name;
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
-  /* v0.9.244：连导出格式一起上报（expFileFmt() 已把 ass-stack 归一为 ass，与服务端白名单一致） */
-  reportEvent('download', '', expFileFmt());   // 下载成功上报（仅云端模式有效）
-  /* v0.9.204：导出成功 = 用户真的拿到了成果（也真的烧过 token）。到这一刻才解锁赞助入口。 */
+  dlSaveFile(new Blob([buildExport()],{type:'text/plain;charset=utf-8'}), name);
+  reportEvent('download', '', expFileFmt(), null, 'sel');   // null → 用 S.trMeta
   try{ localStorage.setItem('srtDonateV1','1'); }catch(e){}
   if(window.__donateReveal) window.__donateReveal();
   log(t('exported',name,buildExportItems().length),'okc');
 });
+/* 下载全部字幕（与顶栏「下载全部」同一个实现，两个入口共用一套口径） */
+$('btnDownloadAll').addEventListener('click', function(){
+  if(!Object.keys(ML.results).length){ log(mlt('nothing'),'err'); return; }
+  try{ mlDownloadZip(); }catch(e){}
+});
 $('btnCopy').addEventListener('click', async ()=>{
   /* 与下载同口径：有打包好的成果时，按那一格（或全部格）当前的行宽重排后再复制。 */
   var _ks = Object.keys(ML.results);
-  if(_ks.length > 1){ mlRebuildAll(); await copyText(Object.keys(ML.results).map(function(k){ return ML.results[k].text; }).join('\n\n')); return; }
+  /* 2026-10-27：复制也按「格」上报。此前整季复制只记一次、且 meta 用全局 S.trMeta，
+     除最后一个任务外其余全部显示「完成未下载」—— 与 zip 的按格口径不一致。
+     （用户原话：下载打点要全面。复制是同一个「拿到结果」的出口，口径必须对齐。） */
+  if(_ks.length > 1){
+    mlRebuildAll();
+    await copyText(Object.keys(ML.results).map(function(k){ return ML.results[k].text; }).join('\n\n'),
+      _ks.map(dlMetaOf));
+    return;
+  }
   if(_ks.length === 1){
     try{ mlRebuildAll(); }catch(e){}
-    await copyText(ML.results[_ks[0]].text);
+    await copyText(ML.results[_ks[0]].text, [dlMetaOf(_ks[0])]);
     return;
   }
   if(!S.rows.length){ log(t('noCopy'),'err'); return; }
   runReport();
   await copyText(buildExport());
 });
-async function copyText(txt){
+async function copyText(txt, metas){
   let copied=false;
   try{ await navigator.clipboard.writeText(txt); copied=true; log(t('copied'),'okc'); }
   catch(e){
@@ -8598,7 +8716,12 @@ async function copyText(txt){
      背景（10-13 分析）：后台只有 download 计数，走复制拿结果的用户在账本里是「完成未下载」，
      下载率被系统性低估；补 copy 事件补上这块盲区。
      v0.9.299：只在真复制成功时上报（见上 copied 标记）。 */
-  if(copied) reportEvent('copy', '', expFileFmt());
+  /* 2026-10-27：metas 有值时按格逐条上报（整季复制 = 每个任务各记一次，与 zip 同口径）；
+     不传时沿用全局 S.trMeta，老路径行为不变。 */
+  if(copied){
+    if(metas && metas.length){ metas.forEach(function(m){ reportEvent('copy', '', '', m); }); }
+    else reportEvent('copy', '', expFileFmt());
+  }
 }
 
 /* v0.9.258：去特效字幕处理 —— 把这份译文带到特效页继续调样式。
@@ -10352,6 +10475,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       drop:'整季字幕拖到这里', dropSub:'多集一次传入，每集一条独立任务线；只传一集也行',
       cues:'本批字幕', hit:'命中', miss:'未出现', missTip:'这 {0} 条在本批字幕里一次都没出现，可能是拼写不一致：',
       pickTip:'点矩阵里的格子查看该集该语的译文', busyView:'翻译进行中，先停止再切换查看',
+      dlSelTip:'先在任务矩阵里点一个已完成的格子，或直接点「下载全部字幕」',
       noTask:'还没有任务：先拖入字幕，再加目标语言',
       /* v0.9.392：主页两张设置卡片的摘要，以及全队列的折行检查结果 */
       expCfg:'导出设置', termsCnt:'术语 {0} 条', wrapAt:'折行 {0} 字',
@@ -10369,6 +10493,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       drop:'整季字幕拖到這裡', dropSub:'多集一次傳入，每集一條獨立任務線；只傳一集也行',
       cues:'本批字幕', hit:'命中', miss:'未出現', missTip:'這 {0} 條在本批字幕裡一次都沒出現，可能是拼寫不一致：',
       pickTip:'點矩陣裡的格子檢視該集該語的譯文', busyView:'翻譯進行中，先停止再切換檢視',
+      dlSelTip:'先在任務矩陣裡點一個已完成的格子，或直接點「下載全部字幕」',
       noTask:'還沒有任務：先拖入字幕，再加目標語言',
       expCfg:'匯出設定', termsCnt:'術語 {0} 條', wrapAt:'折行 {0} 字',
       glosSumNone:'還沒填 · 譯名由 AI 自己統一', glosSumHit:'命中 {0}/{1}', glosSumMiss:'{0} 條本片沒出現',
@@ -10382,6 +10507,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       drop:'Drop the whole season here', dropSub:'Many episodes at once, one task line each',
       cues:'Cues in batch', hit:'Matched', miss:'Not found', missTip:'{0} entries never appear in this batch — check the spelling:',
       pickTip:'Click any cell to inspect that episode in that language', busyView:'Translation running — stop it before switching',
+      dlSelTip:'Pick a finished cell in the task matrix, or just download all.',
       noTask:'No tasks yet: drop subtitles, then add target languages',
       expCfg:'Export settings', termsCnt:'{0} terms', wrapAt:'wrap {0} cols',
       glosSumNone:'Empty — AI picks the names', glosSumHit:'{0}/{1} matched', glosSumMiss:'{0} not in this batch',
@@ -10412,7 +10538,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
     if(!f){
       cur.textContent = mxt('none');
       if(meta) meta.textContent = mxt('pickTip');
-      var bd0 = $('btnDownload'); if(bd0) bd0.disabled = true;
+      syncDlBtns();   // 2026-10-27：不再在这里写死 disabled —— 由 ML.results 决定
       return;
     }
     cur.textContent = f.name + ' · ' + (typeof mlName==='function' ? mlName(lang) : lang);
@@ -10425,8 +10551,8 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
        此前按「这一格有没有译文」判断 —— 而回填译文时一律按 SRT 解析结果文本，
        导出格式选 ASS / VTT 时必然解析不出 cue，于是整季跑完、结果都在 ML.results 里，
        下载键却是灰的，用户只能干瞪眼。预览归预览，下载归下载。 */
-    var bd = $('btnDownload');
-    if(bd) bd.disabled = !Object.keys(ML.results).length;
+    /* 2026-10-27：两键的可用性统一交给 syncDlBtns（含「全部」键与顶栏快捷键） */
+    syncDlBtns();
   }
 
   function mxPick(fk, lang){
@@ -10485,6 +10611,9 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
   function mxRender(){
     var box = $('mxWrap'); if(!box) return;
     syncGlossAI();
+    /* 矩阵每次重画都同步一次下载键：任务跑完 / 结果被删 / 切了选中格都走这里，
+       保证「矩阵里有成品 = 下载键可用」这条恒成立。 */
+    try{ syncDlBtns(); }catch(e){}
     if(!ML.files.length || !ML.langs.length){
       box.innerHTML = '<div class="mx-head"><span class="mx-title">' + mxt('matrix') + '</span>'
         + '<span class="mx-sub">' + mxt('noTask') + '</span></div>';

@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.400';
+const ASSET_VER = '0.9.401';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -344,6 +344,10 @@ function subsCounted(db, task, now){
       故另配一组累计计数（dlSrt/dlVtt/…），分布统计一律读累计值。 */
 const DL_FMT = { srt: 'srt', vtt: 'vtt', sbv: 'sbv', ass: 'ass', txt: 'txt' };
 const DL_FMT_FIELD = { srt: 'dlSrt', vtt: 'dlVtt', sbv: 'dlSbv', ass: 'dlAss', txt: 'dlTxt' };
+/* v0.9.401：下载方式。多语批量页把「下载字幕」拆成「下载选中 / 下载全部」两键后，
+   后台要能分清用户是一格一格拿、还是整季打包 —— 前者说明他只要某几语，
+   后者说明整季交付。与格式同口径：只认白名单，认不出就不记。 */
+const DL_SCOPE = { sel: 'dlSel', all: 'dlAll' };
 /* 白名单取值（与上面 FAIL_FIELD 同口径：必须 hasOwnProperty，否则 '__proto__' 会命中原型链）。
    不在表里一律返回 '' —— 宁可这一笔不记，也绝不按前端字符串动态建字段。 */
 function pickWL(map, v){
@@ -433,6 +437,11 @@ function appendEvent(ip, meta, model, extra){
    匹配窗口放宽到 3 小时（大文件翻译+用户迟些下载都算同一次会话），取最新一条。
    匹配不到但带了 model（自带 Key 用户，翻译不经服务器）→ 创建轻量记录，模型也能统计。 */
 const EVENT_LIFE_MS = 3 * 60 * 60 * 1000;
+/* v0.9.401：下载 / 复制可能发生在整季跑完很久之后（大季几小时、用户隔天回来打包）。
+   带任务号时按任务号精确匹配、窗口放宽到 24 小时 —— 任务号是一次任务随机生成且唯一的，
+   放长不会有歧义；不带任务号的老页面仍按 3 小时 + IP/文件名/语言 匹配，行为完全不变。
+   不这么改的后果：早于 3 小时跑完的那些格，打包下载一律记不上（后台误判成「完成未下载」）。 */
+const EVENT_DL_MS = 24 * 60 * 60 * 1000;
 /* v0.9.80：失败上报的错误消息清洗——去控制字符、截断 200 字，防止脏数据撑大 events.json */
 function cleanMsg(s){ return String(s || '').replace(/[\x00-\x1f]/g, ' ').trim().slice(0, 200); }
 function markEvent(ip, meta, ev){
@@ -446,10 +455,12 @@ function markEvent(ip, meta, ev){
   if (!file && !lang) return false;
   /* v0.9.159：完成/下载上报同样按任务号匹配——否则同一文件连翻两次，
      第二次的完成时间会被记到第一条上。老前端不带任务号时回退旧口径。 */
+  const dlLong = (ev === 'download' || ev === 'copy') && !!f.task;
+  const life = dlLong ? EVENT_DL_MS : EVENT_LIFE_MS;
   const db = readEvents();
   for (let i = db.events.length - 1; i >= 0; i--) {
     const e = db.events[i];
-    if (now - e.t >= EVENT_LIFE_MS) break; // 更早的必不在窗口内
+    if (now - e.t >= life) break; // 更早的必不在窗口内（下载/复制带任务号时是 24 小时）
     if (evHit(e, ip, f)) {
       if (ev === 'finish') {
         e.finishedAt = now;                    // 完成时间（重译后再完成取最新；开始时间即 e.t）
@@ -476,6 +487,9 @@ function markEvent(ip, meta, ev){
         /* v0.9.244：导出格式。只在白名单内记账，认不出就不写（绝不信前端字符串）。 */
         const df = pickWL(DL_FMT, meta.fmt);
         if (df) { e.dlFmt = df; e[DL_FMT_FIELD[df]] = (e[DL_FMT_FIELD[df]] || 0) + 1; }
+        /* v0.9.401：这一笔是「下载选中」还是「下载全部」 */
+        const dsc = pickWL(DL_SCOPE, meta.scope);
+        if (dsc) e[dsc] = (e[dsc] || 0) + 1;
       } else if (ev === 'copy') {
         /* v0.9.298：复制到剪贴板也是「拿到结果」—— 与 download 同口径（点击计数，不去重），
            补上「完成未下载」里复制党的统计盲区。fmt 不另记：格式分布只看下载口径，避免混淆。 */
@@ -511,6 +525,8 @@ function markEvent(ip, meta, ev){
     lite.downloads = 1; lite.downloadedAt = now;
     const lf = pickWL(DL_FMT, meta.fmt);
     if (lf) { lite.dlFmt = lf; lite[DL_FMT_FIELD[lf]] = 1; }
+    const ls = pickWL(DL_SCOPE, meta.scope);   // v0.9.401：自带 Key 用户同样记下载方式
+    if (ls) lite[ls] = 1;
   }
   else if (ev === 'copy') { lite.copies = 1; lite.copiedAt = now; }   // v0.9.298：自带 Key 用户的复制同样记账
   else if (ev === 'fail') { lite.failedAt = now; lite.failMsg = cleanMsg(meta.msg); }
@@ -8905,6 +8921,10 @@ const server = http.createServer(async (req, res) => {
                 事件只存最后一次 downloadedAt，无法把累计数按天拆开。
                 所以后台文案必须写「N 个任务」，次数看这两个字段。 */
           dlTotal: all.reduce((s, e) => s + (Number(e.downloads) || 0), 0),
+          /* v0.9.401：按下载方式拆开（选中 / 全部）。两键的可用性都是「矩阵里有没有成品」，
+             分开看才知道用户是「一格一格拿」还是「整季打包」。 */
+          dlSelTotal: all.reduce((s, e) => s + (Number(e.dlSel) || 0), 0),
+          dlAllTotal: all.reduce((s, e) => s + (Number(e.dlAll) || 0), 0),
           cpTotal: all.reduce((s, e) => s + (Number(e.copies) || 0), 0),
           /* v0.9.244：导出格式分布。⚠️ 不能对 dlFmt 做 cnt —— dlFmt 只是「最后一次」，
              同一任务先下 srt 再下 ass 会被覆盖成一条；分布必须读累计计数（dlSrt/dlVtt/…）。 */
