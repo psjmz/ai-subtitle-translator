@@ -1258,37 +1258,6 @@
   .vbody .metrics{padding:8px 12px 0;flex-wrap:wrap;gap:6px}
   @media (max-width:760px){ .vbody .lst{max-height:none} }
 
-  /* ---------- ⑤ 设置抽屉 ---------- */
-  .dr-mask{position:fixed;inset:0;background:rgba(10,16,36,.38);z-index:80;opacity:0;
-    pointer-events:none;transition:opacity .18s}
-  .dr-mask.on{opacity:1;pointer-events:auto}
-  .dr{position:fixed;top:0;right:0;bottom:0;width:min(560px,96vw);background:var(--card);z-index:81;
-    border-left:1px solid var(--line);display:flex;flex-direction:column;
-    transform:translateX(102%);visibility:hidden;transition:transform .22s ease,visibility 0s linear .22s}
-  .dr.on{transform:none;visibility:visible;transition:transform .22s ease,visibility 0s}
-  .dr-hd{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line);flex:none}
-  .dr-title{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:.02em}
-  .dr-x{margin-left:auto;width:26px;height:26px;border:none;border-radius:7px;background:#F2F5FC;
-    color:#5E6678;cursor:pointer;font-size:11px;line-height:1}
-  .dr-x:hover{background:#EEF1FE;color:#2C3AC0}
-  .dr-tabs{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);flex:none}
-  .dr-tab{border:none;background:none;border-bottom:2px solid transparent;border-radius:6px 6px 0 0;
-    padding:7px 12px 8px;font-size:12px;color:#6B7488;cursor:pointer;transition:.15s}
-  .dr-tab:hover{color:#131A2E;background:#F7F9FD}
-  .dr-tab.on{color:#2C3AC0;border-bottom-color:#3D4FE0;font-weight:700}
-  .dr-tab i{font-style:normal;font-size:10px;color:#9AA3B6;margin-left:4px;font-family:var(--mono)}
-  .dr-tab.on i{color:#3D4FE0}
-  /* 术语条数做成小徽章，空的时候不占位 */
-  #drGlossCnt{display:inline-block;min-width:15px;text-align:center;background:#EEF1FE;
-    color:#2C3AC0;border-radius:5px;font-size:10px;line-height:15px;padding:0 4px;margin-left:5px;
-    font-family:var(--mono);vertical-align:1px}
-  #drGlossCnt:empty{display:none}
-  .dr-panes{flex:1;overflow:auto;padding:16px 20px 30px;scrollbar-width:thin}
-  .dr-pane{display:none}
-  .dr-pane.on{display:block}
-  .dr-pane>.sec-title:first-child{margin-top:0}
-  .dr-pane .param-blk{margin-top:10px}
-
   /* ---------- 术语表统计 ---------- */
   .gl-stats{margin-bottom:14px}
   .gl-stats:empty{display:none}
@@ -1305,7 +1274,6 @@
   .gl-miss p{margin:0 0 6px;font-size:11px;color:#6B5200;line-height:1.55}
   .gl-miss span{display:inline-block;font-family:var(--mono);font-size:10.5px;background:#FFF5DE;
     color:#5A4300;border-radius:4px;padding:1px 6px;margin:0 4px 4px 0}
-  .dr-pane .flbl-row{margin-top:13px}
 
   /* ---------- v0.9.392：主页就地展开的「设置卡片」 ----------
      抽屉的入口深到「顶栏 → 抽屉 → 页签」三跳，多任务下每改一次设置都要走一遍，
@@ -1389,7 +1357,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.392</span>
+    <span class="ver-tag">v0.9.394</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1404,7 +1372,8 @@ crossorigin="anonymous"></script>
          工作台顶栏本来就满（项目名 + 播报 + 上传/开始翻译/语言），再塞三个胶囊会折行；
          跨工具入口交给落地页的四张工具卡，本页保留「首页」返回键即可。 -->
     <div class="spacer"></div>
-    <button class="topbtn" id="btnSettings" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>设置</span></button><button class="topbtn" id="btnZip" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></svg><span>下载全部</span></button><button class="topbtn" id="btnUploadNew" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="wsUploadNew">上传新字幕</span></button>
+    <button class="topbtn" id="btnZip" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 20h16"/></svg><span>下载全部</span></button>
+    <button class="topbtn" id="btnUploadNew" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="wsUploadNew">上传新字幕</span></button>
     <button class="topbtn primary" id="btnGo" data-i18n="btnGo" type="button">▶ 开始翻译</button>
     <select id="uiLang" class="appbar-lang" aria-label="UI language"></select>
   </div>
@@ -1548,6 +1517,67 @@ crossorigin="anonymous"></script>
         <div class="log" id="log" data-i18n="logReady">就绪。导入字幕或载入示例开始。</div>
       </details>
       
+        </div>
+      </section>
+
+      <!-- ===== v0.9.394：术语表 · 和翻译设置平级的第三张卡片 =====
+           用户原话：「你应该把术语表放在和翻译设置同等重要的位置。你收拢到最上面，用户会忽略的。」
+           上一版把它留在顶栏抽屉里（顶栏 → 抽屉 → 页签，三跳），实际就是没人点。
+           译名一致性和翻译风格一样，是「这一季会翻成什么样」的决定项，不是高级设置。
+           现在挂在主页、就排在翻译设置后面，同款一行摘要：几条术语 · 命中几条。
+           ⚠️ 只动位置：内部 id / class / 事件绑定一个没改。 -->
+      <section class="cfgcard" id="cfgGloss">
+        <button class="cfg-hd" id="cfgGlossHd" type="button" aria-expanded="false" aria-controls="cfgGlossBd">
+          <span class="cfg-n">术语表</span>
+          <span class="cfg-s" id="cfgGlossSum"></span>
+          <span class="cfg-ar"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+        </button>
+        <div class="cfg-bd" id="cfgGlossBd">
+          <div class="gl-stats" id="glStats"></div>
+          <div class="flbl-row">
+            <label class="flbl" for="terms"><span data-i18n="lblTermsShort">统一译名</span><i class="info" tabindex="0" data-tip-i18n="lblTerms">i</i></label>
+            <button class="btn xs ghost" id="btnGlossAI" type="button" data-i18n="btnGlossAI">✨ AI 抽取</button>
+          </div>
+          <div class="hint" id="glossAiHint"></div>
+          <textarea id="terms" rows="4" spellcheck="false"
+            placeholder="SpaceX&#10;Burger King → 汉堡王&#10;Whopper|Whoppers → 华堡" data-i18n-ph="termsPh3"></textarea>
+          <div class="gloss-ops">
+            <button class="btn sm ghost" id="btnGlossAppend" type="button" data-i18n="btnGlossAppend">📥 追加</button>
+            <button class="btn sm ghost" id="btnGlossReplace" type="button" data-i18n="btnGlossReplace">🔄 替换</button>
+            <button class="btn sm ghost" id="btnGlossSave" type="button" data-i18n="btnGlossSave">💾 保存</button>
+            <button class="btn sm ghost" id="btnGlossClear" type="button" data-i18n="btnGlossClear">✕ 清空</button>
+            <!-- v0.9.168：术语库「保存 / 清空」。与上面的上传按钮是两回事：
+            上传管的是「这张表从哪来」，保存/清空管的是「这张表要不要留到下一部片」。
+            v0.9.201：「📄 CSV 模板」不是这张表的操作（它不改内容），挪进下方「这个表怎么用」。 -->
+          </div>
+          <div class="hint" id="glossLibHint"></div>
+          <input type="file" id="glossFile" accept=".txt,.csv,.tsv,.json" hidden>
+          <div class="hint" id="glossHint"></div>
+          <details id="glossHelp" class="ghelp">
+            <summary data-i18n="glossUseTitle">这个表怎么用</summary>
+            <div class="gh-body">
+              <!-- v0.9.142：按「为什么需要 → 怎么解决 → 怎么写」重写。
+              此前整块在讲「支持哪些符号」（内部实现），而用户真正要问的是「我写了为什么不生效」；
+              「怎么匹配」那节还是在讲算法，且第 4 条与 | 写法自相矛盾，已整节删除。 -->
+              <p class="gh-lead" data-i18n="glossWhy">AI 是分批翻译的，同一个名字在不同批次里可能译成两种写法。写进这里的「原文 → 必须译成什么」，每批翻译前会先在这一批字幕里找一遍：找得到就交给 AI 照译，找不到这条就不提交——改它不会影响结果。没写进来的，按上面「专名处理」走。</p>
+
+              <p class="gh-h" data-i18n="glossHelpFmt">写法 · 一行一条</p>
+              <div class="gh-row"><code>SpaceX</code><i data-i18n="glossHelpS1">只写原文，表示保留原文不译</i></div>
+              <div class="gh-row"><code>Burger King → 汉堡王</code><i data-i18n="glossHelpS2">原文 → 译法</i></div>
+              <div class="gh-row"><code>Whopper|Whoppers → 华堡</code><i data-i18n="glossHelpS5">几种拼写用 | 并排，共用一个译法</i></div>
+              <div class="gh-row"><code>Outlaw 1 → 亡命徒1（呼号）</code><i data-i18n="glossHelpS4">行尾括号是备注，不进译法</i></div>
+              <p class="gh-tip" data-i18n="glossHelpSep">箭头 -&gt; =&gt; = 、逗号、Tab 都认</p>
+
+              <p class="gh-warn"><b data-i18n="glossNoEffT">改了没生效？</b><span data-i18n="glossNoEffB">只有一种可能：你写的原文在字幕里没逐字出现过（多一个标点、少个 s 都配不上）。这时下方那行提示会变橙色，并点名是哪几条。</span></p>
+
+              <p class="gh-tip" data-i18n="glossUpOne">上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。</p>
+              <!-- v0.9.201：从上面那排操作按钮挪来。它不改变这张表的内容，
+              只是下载一份空白模板给用户照着填，属于「怎么用」而不是「怎么操作」。 -->
+              <div class="gh-ops">
+                <button class="btn sm ghost" id="btnGlossTpl" type="button" data-i18n="btnGlossTpl">📄 CSV 模板</button>
+              </div>
+            </div>
+          </details>
         </div>
       </section>
 
@@ -2006,78 +2036,6 @@ crossorigin="anonymous"></script>
     </div>
   </div>
 
-  <!-- ===== 设置抽屉 ===== -->
-  <div class="dr-mask" id="drMask"></div>
-  <aside class="dr" id="setDrawer" aria-hidden="true" aria-label="术语表">
-    <div class="dr-hd">
-      <span class="dr-title">术语表</span>
-      <button class="dr-x" id="drClose" type="button" aria-label="关闭">&#10005;</button>
-    </div>
-    <div class="dr-panes">
-      
-      <div class="dr-pane on" data-pane="gloss">
-        <div class="gl-stats" id="glStats"></div>
-<div class="flbl-row">
-        <label class="flbl" for="terms"><span data-i18n="lblTermsShort">统一译名</span><i class="info" tabindex="0" data-tip-i18n="lblTerms">i</i></label>
-        <button class="btn xs ghost" id="btnGlossAI" type="button" data-i18n="btnGlossAI">✨ AI 抽取</button>
-      </div>
-      <div class="hint" id="glossAiHint"></div>
-      <textarea id="terms" rows="4" spellcheck="false"
-        placeholder="SpaceX&#10;Burger King → 汉堡王&#10;Whopper|Whoppers → 华堡" data-i18n-ph="termsPh3"></textarea>
-      <div class="gloss-ops">
-        <button class="btn sm ghost" id="btnGlossAppend" type="button" data-i18n="btnGlossAppend">📥 追加</button>
-        <button class="btn sm ghost" id="btnGlossReplace" type="button" data-i18n="btnGlossReplace">🔄 替换</button>
-        <button class="btn sm ghost" id="btnGlossSave" type="button" data-i18n="btnGlossSave">💾 保存</button>
-        <button class="btn sm ghost" id="btnGlossClear" type="button" data-i18n="btnGlossClear">✕ 清空</button>
-        <!-- v0.9.168：术语库「保存 / 清空」。与上面的上传按钮是两回事：
-             上传管的是「这张表从哪来」，保存/清空管的是「这张表要不要留到下一部片」。
-             v0.9.201：「📄 CSV 模板」不是这张表的操作（它不改内容），挪进下方「这个表怎么用」。 -->
-      </div>
-      <div class="hint" id="glossLibHint"></div>
-      <input type="file" id="glossFile" accept=".txt,.csv,.tsv,.json" hidden>
-      <div class="hint" id="glossHint"></div>
-      <details id="glossHelp" class="ghelp">
-        <summary data-i18n="glossUseTitle">这个表怎么用</summary>
-        <div class="gh-body">
-          <!-- v0.9.142：按「为什么需要 → 怎么解决 → 怎么写」重写。
-               此前整块在讲「支持哪些符号」（内部实现），而用户真正要问的是「我写了为什么不生效」；
-               「怎么匹配」那节还是在讲算法，且第 4 条与 | 写法自相矛盾，已整节删除。 -->
-          <p class="gh-lead" data-i18n="glossWhy">AI 是分批翻译的，同一个名字在不同批次里可能译成两种写法。写进这里的「原文 → 必须译成什么」，每批翻译前会先在这一批字幕里找一遍：找得到就交给 AI 照译，找不到这条就不提交——改它不会影响结果。没写进来的，按上面「专名处理」走。</p>
-
-          <p class="gh-h" data-i18n="glossHelpFmt">写法 · 一行一条</p>
-          <div class="gh-row"><code>SpaceX</code><i data-i18n="glossHelpS1">只写原文，表示保留原文不译</i></div>
-          <div class="gh-row"><code>Burger King → 汉堡王</code><i data-i18n="glossHelpS2">原文 → 译法</i></div>
-          <div class="gh-row"><code>Whopper|Whoppers → 华堡</code><i data-i18n="glossHelpS5">几种拼写用 | 并排，共用一个译法</i></div>
-          <div class="gh-row"><code>Outlaw 1 → 亡命徒1（呼号）</code><i data-i18n="glossHelpS4">行尾括号是备注，不进译法</i></div>
-          <p class="gh-tip" data-i18n="glossHelpSep">箭头 -&gt; =&gt; = 、逗号、Tab 都认</p>
-
-          <p class="gh-warn"><b data-i18n="glossNoEffT">改了没生效？</b><span data-i18n="glossNoEffB">只有一种可能：你写的原文在字幕里没逐字出现过（多一个标点、少个 s 都配不上）。这时下方那行提示会变橙色，并点名是哪几条。</span></p>
-
-          <p class="gh-tip" data-i18n="glossUpOne">上传支持 .txt / .csv / .tsv / .json（UTF-8）；追加 = 并入现有，替换 = 清空后写入；首行是表头会自动跳过。</p>
-          <!-- v0.9.201：从上面那排操作按钮挪来。它不改变这张表的内容，
-               只是下载一份空白模板给用户照着填，属于「怎么用」而不是「怎么操作」。 -->
-          <div class="gh-ops">
-            <button class="btn sm ghost" id="btnGlossTpl" type="button" data-i18n="btnGlossTpl">📄 CSV 模板</button>
-          </div>
-        </div>
-      </details>
-      <!-- v0.9.189：折行阈值 / 双语行宽两项已移到右侧「导出译文」面板（见那里的说明）。
-           折行是翻译完成后的排版处理，不属于翻译设置，放左栏会让用户以为它影响翻译结果。 -->
-
-      <!-- v0.9.194：ASS 字幕样式（字号/颜色/离底距离）已移到右侧「导出译文」面板，
-           紧跟在「导出字幕样式」下面。它本来就由右边那个下拉框控制（选 ASS 才出现），
-           是导出期的外观设置、不是翻译参数，放左栏会让用户以为它影响翻译结果。
-           搬运只动位置：id 与 data-i18n 全保留，控制逻辑（syncAssStyleBox）不变。 -->
-
-      <!-- v0.9.201：歌词 / 水词从「处理规则」里拆出来，自成一节「内容过滤」。
-           原「处理规则」一节高 670px，占左栏 41%——它其实装了两类完全不同的事：
-           「哪些词要怎么译」（专名处理 + 术语表）和「哪些内容要不要留下」（歌词 + 水词）。
-           混在一节里，用户想关歌词时得先穿过整块术语表。拆开后两节各管一件事，
-           标题也能说人话（「处理规则」没有告诉用户这里面有什么）。 -->
-            </div>
-      
-    </div>
-  </aside>
 </div>
 
 
@@ -2102,10 +2060,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.392"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.392"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.392"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.392"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.394"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.394"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.394"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.394"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2134,10 +2092,6 @@ const PROVIDERS = [
 ];
 /* 站点内置免费模型（后台配置）：免 Key、OpenAI 兼容；匿名有速率限制 */
 /* 默认模型（站点后端 /api/translate 代理，管理员在 admin.html 配置） */
-const BUILTIN_API = '/api/translate';
-/* v0.9.232：自定义 API 的「服务端转发」端点。勾选「由本站服务器转发」后，
-   请求不再由浏览器直连第三方端点，而是发到本站、由 server.js 用与内置通道同一套
-   callModel 代发（解决端点不放行 CORS 预检 / 用户网络不通两类死局）。 */
 const RELAY_API = '/api/proxy';
 let BUILTIN_INFO = { configured: false, label: '', perIpDaily: 0, globalDaily: 0, usedToday: 0 };
 async function refreshBuiltinHint(){
@@ -10046,6 +10000,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       noTask:'还没有任务：先拖入字幕，再加目标语言',
       /* v0.9.392：主页两张设置卡片的摘要，以及全队列的折行检查结果 */
       expCfg:'导出设置', termsCnt:'术语 {0} 条', wrapAt:'折行 {0} 字',
+      glosSumNone:'还没填 · 译名由 AI 自己统一', glosSumHit:'命中 {0}/{1}', glosSumMiss:'{0} 条本片没出现',
       wrapSum:'折行检查 · 已完成 {0}/{1} 格 · 共 {2} 条',
       wrapLine:'单行 {0} · 2 行 {1}',
       wrapCut:'其中 {0} 条太长被切开（拼出 {1} 条）',
@@ -10061,6 +10016,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       pickTip:'點矩陣裡的格子檢視該集該語的譯文', busyView:'翻譯進行中，先停止再切換檢視',
       noTask:'還沒有任務：先拖入字幕，再加目標語言',
       expCfg:'匯出設定', termsCnt:'術語 {0} 條', wrapAt:'折行 {0} 字',
+      glosSumNone:'還沒填 · 譯名由 AI 自己統一', glosSumHit:'命中 {0}/{1}', glosSumMiss:'{0} 條本片沒出現',
       wrapSum:'折行檢查 · 已完成 {0}/{1} 格 · 共 {2} 條',
       wrapLine:'單行 {0} · 2 行 {1}',
       wrapCut:'其中 {0} 條太長被切開（拼出 {1} 條）',
@@ -10073,6 +10029,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       pickTip:'Click any cell to inspect that episode in that language', busyView:'Translation running — stop it before switching',
       noTask:'No tasks yet: drop subtitles, then add target languages',
       expCfg:'Export settings', termsCnt:'{0} terms', wrapAt:'wrap {0} cols',
+      glosSumNone:'Empty — AI picks the names', glosSumHit:'{0}/{1} matched', glosSumMiss:'{0} not in this batch',
       wrapSum:'Line breaks · {0}/{1} cells done · {2} cues',
       wrapLine:'1 line {0} · 2 lines {1}',
       wrapCut:'{0} of them too long: split into {1}',
@@ -10092,35 +10049,6 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
   }
   var $ = function(id){ return document.getElementById(id); };
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
-
-  /* ---------- 抽屉 ---------- */
-  var dr = $('setDrawer'), mask = $('drMask'), drOpenFlag = false;
-  function drPane(name){
-    var tabs = document.querySelectorAll('.dr-tab');
-    for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle('on', tabs[i].getAttribute('data-pane')===name);
-    var panes = document.querySelectorAll('.dr-pane');
-    for(var j=0;j<panes.length;j++) panes[j].classList.toggle('on', panes[j].getAttribute('data-pane')===name);
-    if(name==='gloss') glStats(true);
-  }
-  function drShow(on){
-    if(!dr) return;
-    drOpenFlag = !!on;
-    dr.classList.toggle('on', drOpenFlag);
-    if(mask) mask.classList.toggle('on', drOpenFlag);
-    dr.setAttribute('aria-hidden', drOpenFlag ? 'false' : 'true');
-    if(drOpenFlag) drPane('gloss');
-  }
-  if($('btnSettings')) $('btnSettings').addEventListener('click', function(){ drShow(true); });
-  if($('drClose')) $('drClose').addEventListener('click', function(){ drShow(false); });
-  if(mask) mask.addEventListener('click', function(){ drShow(false); });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape' && drOpenFlag) drShow(false);
-  });
-  var tabBox = document.querySelector('.dr-tabs');
-  if(tabBox) tabBox.addEventListener('click', function(e){
-    var t = e.target.closest ? e.target.closest('.dr-tab') : null;
-    if(t) drPane(t.getAttribute('data-pane'));
-  });
 
   /* ---------- 单格查看 ---------- */
   function viewerSet(f, lang, rows){
@@ -10289,6 +10217,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
     });
     return out;
   }
+  var glSigStat = null;   /* v0.9.394：最近一次术语统计快照，供卡片摘要使用 */
   function glStats(force){
     var box = $('glStats'); if(!box) return;
     var ta = $('terms');
@@ -10318,9 +10247,8 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
     }
     var hit = 0, miss = [];
     entries.forEach(function(src){ if(hitAny(src)) hit++; else miss.push(src); });
-
-    var cnt = $('drGlossCnt');
-    if(cnt) cnt.textContent = entries.length ? entries.length : '';
+    /* v0.9.394：卡片摘要要用这份统计，存一份快照（不额外跑第二遍匹配） */
+    glSigStat = { entries: entries.length, hit: hit, miss: miss.length, files: ML.files.length };
 
     if(!entries.length && !ML.files.length){ box.innerHTML = ''; return; }
     var pct = entries.length ? Math.round(hit*100/entries.length) : 0;
@@ -10336,6 +10264,8 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       h += '</div>';
     }
     box.innerHTML = h;
+    /* v0.9.394：术语表搬到主页后，卡片摘要要跟着统计走（几条术语 · 命中几条） */
+    try{ cfgSummary(); }catch(e){}
   }
   if($('terms')) $('terms').addEventListener('input', function(){ glSig=''; glStats(); });
   if($('btnGlossAppend')) $('btnGlossAppend').addEventListener('click', function(){ glSig=''; setTimeout(glStats, 60); });
@@ -10392,18 +10322,11 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
        但没接到 DOM 上，于是英文版里只剩这一块还是中文（「整季字幕拖到这里」）。 */
     var dt = document.querySelector('.drop-tx b'); if(dt) dt.textContent = mxt('drop');
     var ds = document.querySelector('.drop-tx i'); if(ds) ds.textContent = mxt('dropSub');
-      /* v0.9.392：只剩术语表一个面板后，页签那排失去了意义（三个入口变一个入口），
-         标题与 aria 也跟着从「设置」改成「术语表」——顶栏按钮同理，见下面 #btnSettings。 */
-      var dtt = document.querySelector('.dr-title'); if(dtt) dtt.textContent = mxt('gloss');
-      if(dr) dr.setAttribute('aria-label', mxt('gloss'));
-      if($('drClose')) $('drClose').setAttribute('aria-label', mxt('close'));
-      /* v0.9.392：顶栏那颗按钮改叫「术语表」。抽屉里现在只有术语表，
-         继续叫「设置」的话，点开是个术语表 —— 名字和东西对不上。 */
-      var s1 = document.querySelector('#btnSettings span'); if(s1) s1.textContent = mxt('gloss');
-      /* 主页两张设置卡片的标题走 MXT（同 drop/dropSub 一路），不占 data-i18n 词典 */
-      var cnT = document.querySelector('#cfgTransHd .cfg-n'); if(cnT) cnT.textContent = mxt('trans');
-      var cnE = document.querySelector('#cfgExportHd .cfg-n'); if(cnE) cnE.textContent = mxt('expCfg');
-      try{ cfgSummary(); }catch(e){}
+    /* v0.9.394：抽屉拆掉后，术语表也成了一行摘要卡片，标题同样走 MXT。 */
+    var cnT = document.querySelector('#cfgTransHd .cfg-n'); if(cnT) cnT.textContent = mxt('trans');
+    var cnG = document.querySelector('#cfgGlossHd .cfg-n'); if(cnG) cnG.textContent = mxt('gloss');
+    var cnE = document.querySelector('#cfgExportHd .cfg-n'); if(cnE) cnE.textContent = mxt('expCfg');
+    try{ cfgSummary(); }catch(e){}
     var s2 = document.querySelector('#btnZip span'); if(s2) s2.textContent = mxt('zip');
     var k = document.querySelector('.vb-k'); if(k) k.textContent = mxt('view');
     var v = $('viewer'), vt = $('vToggle');
@@ -10427,7 +10350,9 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
     if(on){ try{ cfgSummary(); }catch(e){} }
   }
   function cfgSummary(){
-    /* 翻译设置：翻译风格 + 引擎 + 术语条数。这三个决定了「这一季会翻成什么样」。 */
+    /* 翻译设置：翻译风格 + 引擎。这两个决定了「这一季会翻成什么样」。
+       v0.9.394：术语条数挪到自己那张卡片的摘要里 —— 术语表已经是独立卡片，
+       再在翻译设置里重复一次，用户会以为那两块是同一件事。 */
     var s1 = $('cfgTransSum');
     if(s1){
       var b1 = [];
@@ -10441,10 +10366,25 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
         /* option 原文是「默认模型（站点提供，无需 Key）」，摘要里留到第一个括号为止就够认了 */
         b1.push(md.options[md.selectedIndex].textContent.split('（')[0].split('(')[0].trim());
       }
+      s1.textContent = b1.join(' · ');
+    }
+    /* 术语表：几条术语 + 在本批字幕里命中几条。命中率是这个表唯一的「有没有用」指标，
+       没有它，用户只能靠展开卡片去看那三格统计。 */
+    var s3 = $('cfgGlossSum');
+    if(s3){
       var tx = $('terms'), n = 0;
       if(tx) String(tx.value || '').split('\n').forEach(function(l){ if(l.trim()) n++; });
-      if(n) b1.push(mxt('termsCnt', n));
-      s1.textContent = b1.join(' · ');
+      if(!n){ s3.textContent = mxt('glosSumNone'); }
+      else{
+        var parts = [mxt('termsCnt', n)];
+        var st2 = null;
+        try{ st2 = glSigStat; }catch(e){}
+        if(st2 && st2.entries === n && ML.files.length){
+          parts.push(mxt('glosSumHit', st2.hit, st2.entries));
+          if(st2.miss) parts.push(mxt('glosSumMiss', st2.miss));
+        }
+        s3.textContent = parts.join(' · ');
+      }
     }
     /* 导出设置：导出样式 + 折行行宽。这是「跑完之后怎么给你」的那两个开关。 */
     var s2 = $('cfgExportSum');
@@ -10462,7 +10402,7 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       s2.textContent = b2.join(' · ');
     }
   }
-  ['cfgTrans','cfgExport'].forEach(function(id){
+  ['cfgTrans','cfgGloss','cfgExport'].forEach(function(id){
     var hd = $(id + 'Hd');
     if(hd) hd.addEventListener('click', function(){ cfgToggle(id); });
   });
