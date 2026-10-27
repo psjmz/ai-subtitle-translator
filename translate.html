@@ -1103,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.399</span>
+    <span class="ver-tag">v0.9.400</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1723,9 +1723,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.399"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.399"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.399"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.400"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.400"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.400"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2123,6 +2123,23 @@ const S = {
 const $ = id => document.getElementById(id);
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
   .replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* v0.9.400：可原地更新的日志行。整批重发最多 3 次，原来是「每失败一次打一行」——
+   一次任务光重发就能刷出十几行，用户分不清哪条是结论。现在同一批共用一行：
+   「请求已发出」→「第 k 次失败」→「完成（重试 k 次后成功）」，始终只有一条。
+   按 key 分组：主通道 b<批号>-0、音乐组 -1、逐组补救 -4，互不覆盖。
+   ⚠️ 别的日志会插到它后面，所以每次更新都把它拉回面板底部（appendChild 自带移动）。 */
+const _stickyMap = new Map();
+function logSticky(key, msg, cls){
+  if(cls==='err'){ const d=document.querySelector('details.logbox'); if(d && !d.open) d.open=true; }
+  let el=_stickyMap.get(key);
+  if(!el || !el.parentNode){ el=document.createElement('div'); $('log').appendChild(el); }
+  else if(el!==$('log').lastElementChild){ $('log').appendChild(el); }
+  _stickyMap.set(key, el);
+  el.className = cls || '';
+  el.textContent = msg;
+  $('log').scrollTop = 1e9;
+}
+function logStickyEnd(key){ _stickyMap.delete(key); }
 function log(msg, cls){
   // v0.9.88：err 级日志自动展开折叠的日志面板——启动前校验（无文件/语言相同/自定义空值）
   // 的报错此前写进默认折叠的 details 里，用户表现为"点了没反应"
@@ -2133,7 +2150,7 @@ function log(msg, cls){
   $('log').appendChild(d);
   $('log').scrollTop = 1e9;
 }
-function clearLog(){ $('log').innerHTML = ''; }
+function clearLog(){ $('log').innerHTML = ''; _stickyMap.clear(); }
 
 // v0.9.56：错误弹窗（模型无响应 / 致命错误）——不再只沉底日志，用户必须能看见。
 // opts.settings !== false 时显示「自己设置翻译引擎设置」主按钮（平滑滚动到 mode 下拉并聚焦）
@@ -3939,18 +3956,16 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
      30 秒后才开始每 60 秒报一次已等待秒数——能从日志上区分「请求已发出、平台没回来」。 */
   const t0=Date.now();
   let hbI=null;
+  /* v0.9.400：把「放开停止按钮」与「打印等待心跳」拆成两个定时器。
+     原来 30 秒就写一行「已等待 N 秒」，而 E 槽正常单批就要 40~66 秒 —— 每批必刷一行，
+     一次任务白刷十几行。现在 30 秒只放开按钮（平台不回话时用户要能停），心跳推到 90 秒，
+     那之后才是真的「卡住了」。排队中不报：进度条右侧正在倒数「N 秒后继续」，
+     两条文案同时出现会让用户以为卡了两遍（v0.9.185 的结论，保留）。 */
+  const hbZ=setTimeout(()=>{ try{ var b=$('btnGo'); if(b) b.disabled=false; }catch(e){} }, 30000);
   const hbT=setTimeout(()=>{
-    /* 立刻报一次再转周期——若这里只启动 setInterval，第一次心跳要等到 90 秒才出现，
-       等于最需要反馈的那半分钟仍然空白。 */
     try{ if(!pacing) log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){}
-    /* 恢复按钮可点：翻译期间 $('btnGo') 一直是 disabled，而按钮文案写着「翻译中…点击可停止」——
-       平台迟迟不回话时用户既不能停止、也收不到任何反馈，界面跟死了没两样。
-       停滞 30 秒即放开（正常批次早在此之前返回，不影响常规操作）。 */
-    try{ var b=$('btnGo'); if(b) b.disabled=false; }catch(e){}
-    /* v0.9.185：排队中不报「已等待 N 秒」——进度条右侧正在倒数「N 秒后继续」，
-       两条文案同时出现会让用户以为卡了两遍。 */
     hbI=setInterval(()=>{ try{ if(!pacing) log(t('waitSec', Math.round((Date.now()-t0)/1000))); }catch(e){} }, 60000);
-  }, 30000);
+  }, 90000);
   try{
     const url = builtin ? BUILTIN_API : (relay ? RELAY_API : base.replace(/\/+$/,'')+'/chat/completions');
     const headers={'Content-Type':'application/json'};
@@ -4124,7 +4139,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
       throw new Error(t('errTimeout', Math.round(ms/1000)));
     }
     throw e;
-  } finally { clearTimeout(timer); clearTimeout(hbT); if(hbI) clearInterval(hbI); }
+  } finally { clearTimeout(timer); clearTimeout(hbT); clearTimeout(hbZ); if(hbI) clearInterval(hbI); }
 }
 
 /* v0.9.387：sameLangHit（同语言任务判定）随语言跑偏检测一并移除——
@@ -4349,7 +4364,9 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   }else{
     /* v0.9.126：请求发出前留痕。此前日志停在「开始整片翻译」，平台几秒到几分钟不回话时，
        用户无法区分是「请求没发出」还是「平台没回来」——两者处理方式完全不同。 */
-    log(t('reqSent', batchNo, send.length));
+    /* v0.9.400：rt=6 是主通道的「重发」，与首批共用同一条日志行（key 归到 0），
+       否则同一批会拆成「首批一行、重发一行」，又回到一行一条。 */
+    logSticky('b'+batchNo+'-'+((rt===6||!rt)?0:rt), t('reqSent', batchNo, send.length));
     raw=await chatOnce(base,key,model,[
       {role:'system',content:sys},
       {role:'user',content:userMsg}
@@ -5471,7 +5488,9 @@ async function runTranslate(){
         if(S.stop) break;
         try{
           lastCall=Date.now();
-          const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sysB,null,ctx);
+          /* v0.9.400：重发带 rt=6。以前整批重发只落进 batches，后台根本看不出「重发了几次」；
+             现在单独进 retryBatch 桶，batches 只统计首批与补译请求。 */
+          const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sysB,null,ctx, attempt?6:0);
           /* v0.9.97：锚定失败不再整批盲重发，只记录一次，随即落到下方「单组隔离重译」通道。
              理由：批级三次调用的 feedback 参数恒为 null（本文件 3550 行），三次请求体完全一致，
              模型根本不知道自己上一轮跑偏了；v0.9.57 的实测注释（3088 行）记录「批级重试 +
@@ -5644,9 +5663,10 @@ async function runTranslate(){
           Object.keys(out.byGno).forEach(k=>res.set(Number(k), out.byGno[k]));
           out.fillers.forEach(no=>fillerSet.add(no));
           ok=true;
-          log(t('batchDone',bi+1,totalB, attempt?t('retried',attempt):''),'okc');
+          logSticky('b'+(bi+1)+'-0', t('batchDone',bi+1,totalB, attempt?t('retried',attempt):''),'okc');
+          logStickyEnd('b'+(bi+1)+'-0');
         }catch(e){
-          log(t('batchFail',bi+1,attempt+1,e.message),'err');
+          logSticky('b'+(bi+1)+'-0', t('batchFail',bi+1,attempt+1,e.message),'err');
           lastWhy=failWhyOf(e); /* v0.9.146：记下整批失败原因，供下方补救通道上报 */
           if(S.stop) break;
           /* v0.9.186：排队超时不再重试本批，也不再走下面的「逐组隔离补救」。

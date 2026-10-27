@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.399';
+const ASSET_VER = '0.9.400';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -249,6 +249,11 @@ function backfillStats(){
 const EVENTS_PATH = path.join(DATA_DIR, 'events.json');
 const EVENTS_MAX = 3000;             // 最多保留条数（防无限增长，超出裁掉最旧的）
 const EVENT_DEDUP_MS = 30 * 60 * 1000; // 同 IP 同文件同语言 30 分钟内视为同一会话（批次累加）
+/* v0.9.400：带任务号的记录改按任务号合并，窗口拉到 12 小时。
+   30 分钟的会话窗口本是给「无任务号的老页面」防刷条用的；有任务号时它反而把长任务劈开 ——
+   10-27 实证：10395 条的大文件跑 1 小时，同一个任务被切成 07:47 / 08:17 / 08:47 三条，
+   后台看着像用户点了三次。任务号由前端一次点击生成、整段任务不变，比时间可靠。 */
+const EVENT_TASK_MS = 12 * 60 * 60 * 1000;
 function readEvents(){
   try {
     const j = JSON.parse(fs.readFileSync(EVENTS_PATH, 'utf8'));
@@ -267,7 +272,7 @@ function readEvents(){
      但它仍在借 rt=2 上报，于是 retryAnchor 这个桶里装的全是歌词缺词，名不副实。
      390 起歌词缺词改走 rt=5，与语言跑偏彻底分开。
    副作用（正是想要的）：新记录里 retryAnchor 恒为 0。哪天它又不是 0，说明有人把语言检测加回来了。 */
-const RT_FIELD = { 1: 'retryMusic', 2: 'retryAnchor', 3: 'retryCue', 4: 'retryRescue', 5: 'retryLyric' };
+const RT_FIELD = { 1: 'retryMusic', 2: 'retryAnchor', 3: 'retryCue', 4: 'retryRescue', 5: 'retryLyric', 6: 'retryBatch' };
 function bumpRetry(ev, rt){
   const n = Number(rt) || 0;
   if (!n) { ev.batches = (ev.batches || 0) + 1; return; }
@@ -372,10 +377,12 @@ function appendEvent(ip, meta, model, extra){
   const src = String(meta.src || '').replace(/[\x00-\x1f]/g, '').slice(0, 10);
   const db = readEvents();
   // 会话去重：从尾部找同 ip + 同任务号（或同文件名+语言）且时间窗口内的记录 → 批次 +1
+  // v0.9.400：窗口按「有没有任务号」分开 —— 有任务号 → EVENT_TASK_MS（12h），无 → 仍是 30 分钟
+  const win = f.task ? EVENT_TASK_MS : EVENT_DEDUP_MS;
   for (let i = db.events.length - 1; i >= 0; i--) {
     const e = db.events[i];
     /* 不带任务号（老版本页面）时完全沿用旧口径，行为不变——否则老页面一次任务会刷出十几条 */
-    if (evHit(e, ip, f) && now - e.t < EVENT_DEDUP_MS) {
+    if (evHit(e, ip, f) && now - e.t < win) {
       /* v0.9.73：meta.rt 是前端隔离重译调用类型——1=音乐误删 2=语言跑偏 3=cue 结构错。
          重译不计入 batches，按类型分别累加，站长一眼看出「主批 / 哪类重译最多」 */
       bumpRetry(e, meta.rt);
@@ -400,7 +407,7 @@ function appendEvent(ip, meta, model, extra){
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
     }
-    if (now - e.t >= EVENT_DEDUP_MS) break; // 事件按时间序，更早的必不在窗口内
+    if (now - e.t >= win) break; // 事件按时间序，更早的必不在窗口内
   }
   const ev = { t: now, ip, file, lang, cues, batches: 0, retries: 0, model: mdl };
   if (src) ev.src = src;        // v0.9.179
