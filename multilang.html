@@ -1357,7 +1357,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.398</span>
+    <span class="ver-tag">v0.9.399</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -2060,10 +2060,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.398"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.398"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.398"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.398"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.399"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.399"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.399"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="jszip.min.js?v=0.9.399"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -10502,7 +10502,15 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
       for(var lj=0; lj<langs.length; lj++){
         var lang = langs[lj], k = mlKey(f.fk, lang), res = ML.results[k];
         var st = 'wait', label = '排队', meta2 = '', pct = 0;
-        if(res){ st='done'; label='完成'; meta2 = mxCount(res.text) + ' 条'; }
+        if(res){
+          st='done'; label='完成';
+          /* v0.9.399：条数一律用「这一格实际排出来的行数」。
+             以前是 mxCount(res.text) 数导出文本里的 "-->"，而 ASS / SBV / TXT 三种格式
+             根本没有箭头 —— 导出格式一换，整张矩阵全变「0 条」，看着像没翻出来。
+             只有 392 之前存的老结果没有 rows 字段，才回落到数箭头。 */
+          var cnt = Array.isArray(res.rows) ? res.rows.length : mxCount(res.text);
+          meta2 = cnt + ' 条';
+        }
         else if(ML.failed.indexOf(k) >= 0){ st='err'; label='失败'; meta2='可重跑'; }
         else if(ML.running && ML.curFile===f.fk && ML.cur===lang){
           st='run'; label='翻译中';
@@ -10511,8 +10519,13 @@ try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e
           meta2 = tr + '/' + n + ' 条'; pct = n ? Math.round(tr*100/n) : 0;
         }
         var sel = (ML.selKey === k) ? ' sel' : '';
+        /* v0.9.399：格子里是「导出后有几行」，左侧是「原文有几条」。
+           折行切分（R3）会把一条拆成多条，两者对不上是正常的 —— 悬停时说明白，
+           免得用户看到「81 条 → 83 条」以为哪里错了。 */
+        var mxTip = f.name + ' · ' + (typeof mlName==='function'?mlName(lang):lang);
+        if(res && cnt !== f.items.length) mxTip += ' · 导出 ' + cnt + ' 行（原文 ' + f.items.length + ' 条）';
         h += '<div class="mx-c s-' + st + sel + '" data-fk="' + esc(f.fk) + '" data-lang="' + esc(lang) + '"'
-           + ' role="button" tabindex="0" title="' + esc(f.name + ' · ' + (typeof mlName==='function'?mlName(lang):lang)) + '">'
+           + ' role="button" tabindex="0" title="' + esc(mxTip) + '">'
            + '<span class="mx-st">' + mxIcon(st) + label + '</span>';
         if(st==='run') h += '<span class="mx-bar"><i style="width:' + pct + '%"></i></span>';
         if(meta2) h += '<span class="mx-meta">' + esc(meta2) + '</span>';
