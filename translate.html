@@ -1103,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.403</span>
+    <span class="ver-tag">v0.9.404</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1130,6 +1130,10 @@ crossorigin="anonymous"></script>
       <div class="btns mt0">
         <button class="btn sm" id="btnFile" data-i18n="btnFile" type="button">📂 选择字幕文件</button>
         <button class="btn sm ghost" id="btnDemo" data-i18n="btnDemo" type="button">载入示例</button>
+        <!-- v0.9.404：本机存着的翻译进度（每部片各一格）的查看/清理入口。
+             ⚠️ 不放顶栏：v0.9.319 实测顶栏已占满，再塞按钮会折行。放在导入区，
+             用户选字幕时正好看得到「本机还有哪些没翻完的」。 -->
+        <button class="btn sm ghost" id="btnSnap" data-i18n="snapBtn" type="button">🕘 本机记录</button>
       </div>
       <input type="file" id="file" accept=".srt,.vtt,.ass,.ssa,.sbv,.txt" hidden>
       <textarea id="paste" rows="3" placeholder="或直接把字幕文本粘贴到这里…（支持 SRT / VTT / ASS）" data-i18n-ph="pastePh" data-i18n-aria="pastePh"></textarea>
@@ -1723,9 +1727,10 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.403"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.403"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.403"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.404"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.404"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.404"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="snap-store.js?v=0.9.404"></script><!-- v0.9.404：断点快照存储层，翻译页与多语页共用一份 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2341,11 +2346,29 @@ function setPrText(t){ $('prText').textContent=t||''; }
    下次打开同一份文件按同样参数开翻时，询问是否从断点继续（已完成的批不再重发）。
    指纹 = 文件名 + 条数 + 语言对 + 切批参数 + 源文内容哈希，任一变化即作废，绝不串片。
    只存译文与进度，不存任何 Key / 原文。 */
-const SNAP_KEY='srt_resume_v1', SNAP_TTL=7*24*3600*1000;
-/* v0.9.167：整片跑完的快照不再删除（可让二次运行的同一文件免于重译），但它只在「最近一次」有意义——
-   隔一周再翻同一部片通常是想要新译文。故给已完成的快照单独一个短时限；
-   未跑完的仍是 7 天：用户可能隔天才回来接着翻，那是 SNAP_TTL 原本的用途。 */
-const FIN_SNAP_TTL=24*3600*1000;
+/* v0.9.404 兜底：snap-store.js 是本版新增的外链文件。万一部署漏了它（或 CDN 抽风没取到），
+   下面这几行顶层声明会直接 ReferenceError —— 整页脚本跟着全崩，用户看到的是一个死页面。
+   这与 v0.9.394 的 BUILTIN_API 血案是同一类：一个缺失的定义放倒整页。
+   这里备一份同名的空壳：功能降级为「没有断点」，但页面照常能用。
+   ⚠️ 正常加载时这段不会执行（snap-store.js 在前，SnapStore 已定义）。 */
+if (typeof SnapStore === 'undefined') {
+  var SnapStore = { K_BASE:'srt_resume_v1', K_LEGACY:'srt_resume_v1',
+    SNAP_TTL:30*24*3600*1000, FIN_SNAP_TTL:14*24*3600*1000, BUDGET:3*1024*1024,
+    keyFor:function(fk,lang){ return 'srt_resume_v1:'+fk+':'+lang; },
+    read:function(){ return null; }, write:function(){ return false; },
+    finish:function(){ return false; }, remove:function(){}, list:function(){ return []; },
+    gc:function(){ return 0; }, bytes:function(){ return 0; }, evict:function(){},
+    snapHasText:function(){ return false; }, usable:function(){ return false; },
+    valid:function(){ return false; }, expired:function(){ return false; } };
+}
+const SNAP_KEY_LEGACY='srt_resume_v1';   // v0.9.403 及以前的老单键，仅用于迁移
+let   SNAP_KEY=SnapStore.K_BASE;         // 当前槽键，开翻时按「内容哈希 + 目标语言」重算
+let   SNAP_META={src:'',dst:'',lines:0}; // 进索引的展示信息（文件名/条数/语言对）
+const SNAP_TTL = SnapStore.SNAP_TTL;
+const FIN_SNAP_TTL = SnapStore.FIN_SNAP_TTL;
+/* v0.9.167：整片跑完的快照不再删除（可让二次运行的同一文件免于重译）。
+   v0.9.404：两个时限统一由 snap-store.js 给出（未完成 30 天 / 已完成 14 天），
+   此处不再各写一份 —— 以前只在「一个槽、随时被下一部片挤掉」的前提下才需要压得那么短。 */
 function srcFingerprint(items){
   let h=5381;
   for(let i=0;i<items.length;i++){
@@ -2363,17 +2386,11 @@ function snapFp(cfg, budget, cap){
           cfg.dropFillers!==false?1:0,
           srcFingerprint(S.srcItems)].join('|');
 }
+/* v0.9.404：校验与迁移全部下沉到 snap-store.js（与多语页同一份），本页只管传键。
+   顺带补上此前缺失的「空译文校验」——多语页 v0.9.397 因 394 事故加了这道闸，翻译页一直没加，
+   于是空快照会被 askReuse 当成「上次的结果」摆给用户，一点取回就是空白字幕。 */
 function loadSnap(fp){
-  try{
-    const raw=localStorage.getItem(SNAP_KEY); if(!raw) return null;
-    const o=JSON.parse(raw);
-    if(!o || o.fp!==fp || !o.done || typeof o.done!=='object') return null;
-    if(!o.ts || Date.now()-o.ts>(o.fin?FIN_SNAP_TTL:SNAP_TTL)){ localStorage.removeItem(SNAP_KEY); return null; }
-    /* v0.9.167：已跑满（bi===totalB）的快照不再作废——它是「整片译完」的那份，用来免二次翻译。
-       未跑完的（bi<totalB）走下方断点续传逻辑，行为完全不变。 */
-    if(!(o.bi>0) || !(o.totalB>0) || o.bi>o.totalB) return null;
-    return o;
-  }catch(e){ return null; }
+  try{ return SnapStore.read(SNAP_KEY, fp, SNAP_KEY_LEGACY); }catch(e){ return null; }
 }
 function serRes(res){
   const o={};
@@ -2385,17 +2402,15 @@ function serRes(res){
 }
 function saveSnap(fp, res, fillerSet, ctx, bi, totalB, durs, file){
   if(S.snapOff) return;
-  try{
-    localStorage.setItem(SNAP_KEY, JSON.stringify({
-      v:1, ts:Date.now(), fp:fp, file:file||'', bi:bi, totalB:totalB,
-      done:serRes(res), fillers:Array.from(fillerSet), ctx:ctx||[], durs:(durs||[]).slice(-5)
-    }));
-  }catch(e){
-    // 存储写满 / 隐私模式禁用：只降级「不再存」，绝不影响正在跑的翻译
-    if(!S.snapOff){ S.snapOff=true; try{ log(t('resumeQuota'),'err'); }catch(_){} }
-  }
+  /* v0.9.404：写槽 + 更新索引 + 容量治理都在 snap-store.js 里。
+     返回 false 表示确实存不下（清过一轮 LRU 仍然失败），此时才降级为「本次不再存」。 */
+  const ok=SnapStore.write(SNAP_KEY, fp,
+    { fp:fp, file:file||'', bi:bi, totalB:totalB,
+      done:serRes(res), fillers:Array.from(fillerSet), ctx:ctx||[], durs:(durs||[]).slice(-5) },
+    SNAP_META);
+  if(!ok && !S.snapOff){ S.snapOff=true; try{ log(t('resumeQuota'),'err'); }catch(_){} }
 }
-function rmSnap(){ try{ localStorage.removeItem(SNAP_KEY); }catch(e){} }
+function rmSnap(){ try{ SnapStore.remove(SNAP_KEY); }catch(e){} }
 /* v0.9.167：任务整片跑完时「不再删除」快照，只把它标成已完成（fin=1）并刷新时间戳——
    下次同一文件 + 同一套参数再点翻译，可以弹窗让用户直接取回这份结果，一个模型请求都不发。
    此前这里直接 rmSnap()，结果是：用户翻完没导出、回头刷新页面或重传一次再跑，
@@ -2404,13 +2419,8 @@ function rmSnap(){ try{ localStorage.removeItem(SNAP_KEY); }catch(e){} }
    仍然保留为「未完成」状态，走原来的断点续传，行为不变。 */
 function markSnapDone(){
   if(S.snapOff) return;
-  try{
-    const raw=localStorage.getItem(SNAP_KEY); if(!raw) return;
-    const o=JSON.parse(raw);
-    if(!o || typeof o!=='object') return;
-    o.fin=1; o.ts=Date.now();
-    localStorage.setItem(SNAP_KEY, JSON.stringify(o));
-  }catch(e){ /* 存不下就算了：最坏结果是下次照常重翻，不影响任何东西 */ }
+  try{ SnapStore.finish(SNAP_KEY); }
+  catch(e){ /* 存不下就算了：最坏结果是下次照常重翻，不影响任何东西 */ }
 }
 /* v0.9.167：把快照里的译文还原进本次运行的容器（两条路径共用，避免还原逻辑漂移）。
    值与当初 saveSnap 存进去的完全一致——cueTexts 这个 Map 已序列化成数组，这里原样还原。 */
@@ -2495,6 +2505,77 @@ function askReuse(file, lines, langName, ts){
     ov.addEventListener('click',function(ev){ if(ev.target===ov){ ov.remove(); resolve('cancel'); } });
     document.body.appendChild(ov);
   });
+}
+
+/* ---------------- v0.9.404：本机记录面板 ----------------
+   以前断点只有一个槽、用户也看不见，于是「翻 A 到一半去翻 B，A 就没了」这件事
+   既无法避免、也无法察觉。分槽之后每部片（每种目标语言）各占一格，
+   这里就是查看与清理的入口——能看见才谈得上管理。
+   ⚠️ 只提供「看 + 删」，不提供「点一下就恢复」：本机只存译文不存原文，
+      拿回进度必须重新选同一份字幕文件（选完会自动弹「继续 / 取回」）。 */
+function openSnapPanel(){
+  const ov=document.createElement('div');
+  ov.id='snapPanel';   // v0.9.404：给面板一个 id，便于自动化点开后定位与关闭
+  ov.style.cssText='position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box=document.createElement('div');
+  box.style.cssText='background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:560px;width:100%;max-height:80vh;display:flex;flex-direction:column;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+  const h=document.createElement('div');
+  h.style.cssText='font-weight:700;font-size:16px;color:var(--acc);margin-bottom:4px;';
+  h.textContent=t('snapTitle');
+  const listBox=document.createElement('div');
+  listBox.style.cssText='overflow:auto;flex:1;margin-bottom:12px;';
+  function fmtTs(ts){
+    const d=new Date(ts||Date.now()), now=new Date();
+    const hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    return (d.toDateString()===now.toDateString())?hh:((d.getMonth()+1)+'/'+d.getDate()+' '+hh);
+  }
+  function render(){
+    const items=SnapStore.list();
+    listBox.textContent='';
+    if(!items.length){
+      const e=document.createElement('div');
+      e.style.cssText='color:var(--sub);font-size:13.5px;line-height:1.75;white-space:pre-wrap;padding:6px 0;';
+      e.textContent=t('snapEmpty');
+      listBox.appendChild(e);
+      return;
+    }
+    items.forEach(function(it){
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);';
+      const main=document.createElement('div');
+      main.style.cssText='flex:1;min-width:0;';
+      const nm=document.createElement('div');
+      nm.style.cssText='font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      nm.textContent=it.file||'(untitled)';
+      const sub=document.createElement('div');
+      sub.style.cssText='color:var(--sub);font-size:12px;margin-top:3px;';
+      sub.textContent=[it.lines?t('snapLines',it.lines):'', (it.src&&it.dst)?(it.src+'\u2192'+it.dst):'',
+                       it.fin?t('snapDone'):t('snapPart',it.bi,it.totalB), fmtTs(it.ts),
+                       Math.max(1,Math.round(it.sz/1024))+' KB'].filter(Boolean).join(' \u00b7 ');
+      main.appendChild(nm); main.appendChild(sub);
+      /* 删除用 ✕ 符号：这个词各国都一样认，不值得为它再补 27 语词条 */
+      const del=document.createElement('button');
+      del.type='button'; del.className='btn xs ghost'; del.textContent='\u2715';
+      del.onclick=function(){ SnapStore.remove(it.k); render(); };
+      row.appendChild(main); row.appendChild(del);
+      listBox.appendChild(row);
+    });
+  }
+  render();
+  const note=document.createElement('div');
+  note.style.cssText='color:var(--sub);font-size:12px;line-height:1.6;';
+  note.textContent=t('snapNote');
+  const btns=document.createElement('div');
+  btns.style.cssText='display:flex;gap:10px;justify-content:flex-end;margin-top:14px;';
+  const close=document.createElement('button');
+  close.type='button'; close.className='btn'; close.textContent=t('reuseCancel');
+  close.style.cssText='background:var(--acc);color:#fff;border-color:var(--acc);';
+  close.onclick=function(){ ov.remove(); };
+  btns.appendChild(close);
+  box.appendChild(h); box.appendChild(listBox); box.appendChild(note); box.appendChild(btns);
+  ov.appendChild(box);
+  ov.addEventListener('click',function(ev){ if(ev.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
 }
 
 /* ================= v0.9.398：开跑前的统一体检 =================
@@ -5480,6 +5561,15 @@ async function runTranslate(){
     let ctx=[]; // v0.9.62：跨批上下文（前批末尾 ≤2 组的原文+已定译文，随批发给模型做衔接参考）
     // v0.9.77 断点续传：同一文件 + 同语言对 + 同切批参数才认；批数对不上说明参数变了，旧快照作废
     const snapFpStr=snapFp(cfg, CHAR_BUDGET, CUE_CAP);
+    /* v0.9.404：槽键 = 源文内容哈希 + 目标语言。
+       以前整页共用一个固定键，结果是「翻 A 到一半去翻 B，A 的进度被挤掉」；
+       分槽之后每部片（每种目标语言）各占一格，互不干扰。
+       ⚠️ 键里只放内容哈希与语言对，不放文件名与参数：
+         · 文件名改了（重命名/重新导出）不该丢进度，靠内容哈希认片；
+         · 参数（风格、行宽、术语表、歌词设置、切批）仍进上面的 snapFpStr 由 loadSnap 校验，
+           改了参数就不复用旧译文，但槽还在，改回来还能接着用。 */
+    SNAP_KEY = SnapStore.keyFor(srcFingerprint(S.srcItems), cfg.dst);
+    SNAP_META = { src:cfg.src, dst:cfg.dst, lines:S.srcItems.length };
     let startBi=0;
     const snap=loadSnap(snapFpStr);
     if(snap && snap.totalB===totalB){
@@ -6469,6 +6559,9 @@ $('btnParse').addEventListener('click', ()=>{
   setSrc(txt,'');
 });
 $('btnDemo').addEventListener('click', ()=>{ $('paste').value=DEMO; setSrc(DEMO,t('demoFile')); });
+/* v0.9.404：本机记录。打开前先清一遍过期的——过期槽只有在这里才会被真正删掉，
+   不清理的话索引会一直带着它们，面板上出现「点了没反应」的条目。 */
+$('btnSnap').addEventListener('click', ()=>{ try{ SnapStore.gc(); }catch(e){} openSnapPanel(); });
 
 const DEMO=`1
 00:00:00,200 --> 00:00:00,600

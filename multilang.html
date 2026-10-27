@@ -1363,7 +1363,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.403</span>
+    <span class="ver-tag">v0.9.404</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1601,6 +1601,13 @@ crossorigin="anonymous"></script>
       <!-- v0.9.383：源语言 == 目标语言的常驻提示（非阻塞，只是提醒，不改动任何流程） -->
       <div class="hint" id="langSameHint" style="display:none"></div>
             </div>
+
+      <!-- ===== v0.9.404：本机记录 =====
+           多语页的槽本来就是「文件 × 语言」一格，但用户既看不见也管不了：
+           存满了会静默失败，翻旧的片子也不知道还剩多少。这里给出查看与清理的入口。
+           ⚠️ 与翻译页一样只提供「看 + 删」：本机只存译文不存原文，
+              拿回进度必须重新选同一份字幕文件（开跑时会自动弹「继续 / 全部重翻」）。 -->
+      <div style="text-align:right;margin:8px 0 6px"><button class="btn xs ghost" id="mlSnapBtn" data-i18n="snapBtn" type="button">🕘 本机记录</button></div>
 
       <!-- ===== 任务矩阵 ===== -->
       <div class="mx" id="mxWrap"></div>
@@ -2070,10 +2077,11 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.403"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.403"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.403"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="jszip.min.js?v=0.9.403"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.404"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.404"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.404"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="snap-store.js?v=0.9.404"></script><!-- v0.9.404：断点快照存储层，翻译页与多语页共用一份 -->
+<script src="jszip.min.js?v=0.9.404"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2697,12 +2705,28 @@ function setPrText(t){ $('prText').textContent=t||''; }
    ⚠️ 这是本页唯一改动引擎存储口径的地方，理由：原设计一部片只有一个快照槽，
       连跑 N 种语言时后一种会把前一种覆盖掉，下次回来只剩最后一语的进度。
       分槽后每种语言各自续跑，互不干扰；指纹里本来就含 dst，跨语言不可能误用。 */
-const SNAP_KEY_BASE='srt_resume_v1';
-let SNAP_KEY=SNAP_KEY_BASE, SNAP_TTL=7*24*3600*1000;
-/* v0.9.167：整片跑完的快照不再删除（可让二次运行的同一文件免于重译），但它只在「最近一次」有意义——
-   隔一周再翻同一部片通常是想要新译文。故给已完成的快照单独一个短时限；
-   未跑完的仍是 7 天：用户可能隔天才回来接着翻，那是 SNAP_TTL 原本的用途。 */
-const FIN_SNAP_TTL=24*3600*1000;
+/* v0.9.404 兜底：snap-store.js 是本版新增的外链文件。万一部署漏了它，下面这几行顶层声明
+   会直接 ReferenceError —— 整页脚本全崩，用户看到死页面（v0.9.394 BUILTIN_API 血案同类）。
+   备一份同名空壳：功能降级为「没有断点」，页面照常可用。
+   ⚠️ 正常加载时这段不会执行（snap-store.js 在前，SnapStore 已定义）。 */
+if (typeof SnapStore === 'undefined') {
+  var SnapStore = { K_BASE:'srt_resume_v1', K_LEGACY:'srt_resume_v1',
+    SNAP_TTL:30*24*3600*1000, FIN_SNAP_TTL:14*24*3600*1000, BUDGET:3*1024*1024,
+    keyFor:function(fk,lang){ return 'srt_resume_v1:'+fk+':'+lang; },
+    read:function(){ return null; }, write:function(){ return false; },
+    finish:function(){ return false; }, remove:function(){}, list:function(){ return []; },
+    gc:function(){ return 0; }, bytes:function(){ return 0; }, evict:function(){},
+    snapHasText:function(){ return false; }, usable:function(){ return false; },
+    valid:function(){ return false; }, expired:function(){ return false; } };
+}
+/* v0.9.404：槽键与两个时限统一由 snap-store.js 给出，本页不再各写一份。
+   键格式一字未改（srt_resume_v1:<fk>:<lang>），所以老进度原样接得上、不需要迁移。 */
+const SNAP_KEY_BASE = SnapStore.K_BASE;
+const SNAP_KEY_LEGACY = SnapStore.K_LEGACY;
+let SNAP_KEY = SnapStore.K_BASE;
+let SNAP_META = { src:'', dst:'', lines:0 };
+const SNAP_TTL = SnapStore.SNAP_TTL;
+const FIN_SNAP_TTL = SnapStore.FIN_SNAP_TTL;
 function srcFingerprint(items){
   let h=5381;
   for(let i=0;i<items.length;i++){
@@ -2727,43 +2751,12 @@ function snapFp(cfg, budget, cap){
    早期版本只判 length，于是把它当成有效结果复用，用户下载到空白字幕。
    这条函数同时供 loadSnap（要不要复用）与 mlSnapInfo（界面上怎么显示）使用，
    保证「界面说有结果」和「引擎真的会用」是同一个口径。 */
-function snapHasText(o){
-  try{
-    if(!o || !o.done || typeof o.done !== 'object') return false;
-    const ks = Object.keys(o.done);
-    for(let i=0;i<ks.length;i++){
-      const v = o.done[ks[i]];
-      if(!v || typeof v !== 'object') continue;
-      if(String(v.text == null ? '' : v.text).trim()) return true;
-      if(!Array.isArray(v.cueTexts)) continue;
-      /* cueTexts 是 Map 的序列化：[编号, 译文][] */
-      for(let j=0;j<v.cueTexts.length;j++){
-        const p = v.cueTexts[j];
-        if(Array.isArray(p) && String(p[1] == null ? '' : p[1]).trim()) return true;
-      }
-    }
-  }catch(e){}
-  return false;
-}
+/* v0.9.404：实现下沉到 snap-store.js，翻译页用同一份（此前翻译页压根没有这道闸）。
+   本页保留这个名字只是个转发：mlSnapInfo 等处还在直接调它，且既有用例按函数名锁定。 */
+function snapHasText(o){ return SnapStore.snapHasText(o); }
+/* v0.9.404：校验与迁移全部下沉到 snap-store.js（与翻译页同一份），本页只管传键。 */
 function loadSnap(fp){
-  try{
-    const raw=localStorage.getItem(SNAP_KEY); if(!raw) return null;
-    const o=JSON.parse(raw);
-    if(!o || o.fp!==fp || !o.done || typeof o.done!=='object') return null;
-    if(!o.ts || Date.now()-o.ts>(o.fin?FIN_SNAP_TTL:SNAP_TTL)){ localStorage.removeItem(SNAP_KEY); return null; }
-    /* v0.9.167：已跑满（bi===totalB）的快照不再作废——它是「整片译完」的那份，用来免二次翻译。
-       未跑完的（bi<totalB）走下方断点续传逻辑，行为完全不变。 */
-    if(!(o.bi>0) || !(o.totalB>0) || o.bi>o.totalB) return null;
-    /* v0.9.396 / v0.9.397：快照必须真的含译文，否则作废。
-       真实事故：v0.9.394 内置通道全线 ReferenceError（BUILTIN_API 未定义）期间，
-       每批都「失败 → 跳过」，但批次计数照样推进、整片跑完 fin 照样置位，
-       快照于是记成「已完成 · 零译文」。而多语队列的 askReuse 不弹窗、直接返回 reuse
-       （if(S.multi) return Promise.resolve('reuse')），重跑会零请求秒完成、
-       下载出来是空白字幕，用户只会觉得「翻译没了」，根本想不到是上次的坏断点被复用了。
-       空快照没有任何保留价值：删掉重跑才是唯一正确的结果。 */
-    if(!snapHasText(o)){ localStorage.removeItem(SNAP_KEY); return null; }
-    return o;
-  }catch(e){ return null; }
+  try{ return SnapStore.read(SNAP_KEY, fp, SNAP_KEY_LEGACY); }catch(e){ return null; }
 }
 function serRes(res){
   const o={};
@@ -2775,17 +2768,15 @@ function serRes(res){
 }
 function saveSnap(fp, res, fillerSet, ctx, bi, totalB, durs, file){
   if(S.snapOff) return;
-  try{
-    localStorage.setItem(SNAP_KEY, JSON.stringify({
-      v:1, ts:Date.now(), fp:fp, file:file||'', bi:bi, totalB:totalB,
-      done:serRes(res), fillers:Array.from(fillerSet), ctx:ctx||[], durs:(durs||[]).slice(-5)
-    }));
-  }catch(e){
-    // 存储写满 / 隐私模式禁用：只降级「不再存」，绝不影响正在跑的翻译
-    if(!S.snapOff){ S.snapOff=true; try{ log(t('resumeQuota'),'err'); }catch(_){} }
-  }
+  /* v0.9.404：写槽 + 更新索引 + 容量治理都在 snap-store.js 里。
+     返回 false 表示确实存不下（清过一轮 LRU 仍然失败），此时才降级为「本次不再存」。 */
+  const ok=SnapStore.write(SNAP_KEY, fp,
+    { fp:fp, file:file||'', bi:bi, totalB:totalB,
+      done:serRes(res), fillers:Array.from(fillerSet), ctx:ctx||[], durs:(durs||[]).slice(-5) },
+    SNAP_META);
+  if(!ok && !S.snapOff){ S.snapOff=true; try{ log(t('resumeQuota'),'err'); }catch(_){} }
 }
-function rmSnap(){ try{ localStorage.removeItem(SNAP_KEY); }catch(e){} }
+function rmSnap(){ try{ SnapStore.remove(SNAP_KEY); }catch(e){} }
 /* v0.9.167：任务整片跑完时「不再删除」快照，只把它标成已完成（fin=1）并刷新时间戳——
    下次同一文件 + 同一套参数再点翻译，可以弹窗让用户直接取回这份结果，一个模型请求都不发。
    此前这里直接 rmSnap()，结果是：用户翻完没导出、回头刷新页面或重传一次再跑，
@@ -2794,13 +2785,8 @@ function rmSnap(){ try{ localStorage.removeItem(SNAP_KEY); }catch(e){} }
    仍然保留为「未完成」状态，走原来的断点续传，行为不变。 */
 function markSnapDone(){
   if(S.snapOff) return;
-  try{
-    const raw=localStorage.getItem(SNAP_KEY); if(!raw) return;
-    const o=JSON.parse(raw);
-    if(!o || typeof o!=='object') return;
-    o.fin=1; o.ts=Date.now();
-    localStorage.setItem(SNAP_KEY, JSON.stringify(o));
-  }catch(e){ /* 存不下就算了：最坏结果是下次照常重翻，不影响任何东西 */ }
+  try{ SnapStore.finish(SNAP_KEY); }
+  catch(e){ /* 存不下就算了：最坏结果是下次照常重翻，不影响任何东西 */ }
 }
 /* v0.9.167：把快照里的译文还原进本次运行的容器（两条路径共用，避免还原逻辑漂移）。
    值与当初 saveSnap 存进去的完全一致——cueTexts 这个 Map 已序列化成数组，这里原样还原。 */
@@ -7007,7 +6993,7 @@ function mlAvgBatchSec(){
    key 必须与轮次里设置的 SNAP_KEY 完全一致，否则会读到别的语言。 */
 function mlSnapInfo(fk, lang){
   try{
-    var raw = localStorage.getItem(SNAP_KEY_BASE + ':' + fk + ':' + lang);
+    var raw = localStorage.getItem(SnapStore.keyFor(fk, lang));
     if(!raw) return null;
     var o = JSON.parse(raw);
     if(!o || !o.bi || !o.totalB) return null;
@@ -7015,6 +7001,9 @@ function mlSnapInfo(fk, lang){
        否则界面会在运行日志里写「（已译完）」、历史弹窗会说「N 格已完成」，
        而引擎侧的 loadSnap 又把它作废重跑 —— 两边口径对不上，用户被来回骗。 */
     if(!snapHasText(o)) return null;
+    /* v0.9.404：过期的别再报给界面。以前这里只判有没有译文，于是「界面说 N 格已完成、
+       引擎 loadSnap 判过期作废」两边会互相打脸（与 397 想消除的是同一类不一致）。 */
+    if(SnapStore.expired(o)) return null;
     return { bi: o.bi, totalB: o.totalB, done: !!o.fin, ts: o.ts || 0 };
   }catch(e){ return null; }
 }
@@ -7034,10 +7023,76 @@ function mlHistStat(tasks){
   });
   return { total: cells.length, doneN: doneN, partN: partN, leftB: leftB, cells: cells };
 }
+/* v0.9.404：本机记录面板（与翻译页同一个意图、同一套词条，只是多显示一列目标语言）。
+   多语页一格 = 一部片 × 一种语言，条目会比单语页多，所以列表必须能滚。 */
+function mlOpenSnapPanel(){
+  var ov = document.createElement('div');
+  ov.id = 'mlSnapPanel';   // v0.9.404：给面板一个 id，便于自动化点开后定位与关闭
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(16,30,27,.48);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:var(--card);border:1px solid var(--line-strong);border-radius:14px;max-width:560px;width:100%;max-height:80vh;display:flex;flex-direction:column;padding:22px 24px 18px;box-shadow:0 14px 44px rgba(0,0,0,.22);';
+  var h = document.createElement('div');
+  h.style.cssText = 'font-weight:700;font-size:16px;color:var(--acc);margin-bottom:10px;';
+  h.textContent = t('snapTitle');
+  var listBox = document.createElement('div');
+  listBox.style.cssText = 'overflow:auto;flex:1;margin-bottom:12px;';
+  function fmtTs(ts){
+    var d = new Date(ts || Date.now()), now = new Date();
+    var hh = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    return (d.toDateString() === now.toDateString()) ? hh : ((d.getMonth()+1) + '/' + d.getDate() + ' ' + hh);
+  }
+  function render(){
+    var items = SnapStore.list();
+    listBox.textContent = '';
+    if(!items.length){
+      var e = document.createElement('div');
+      e.style.cssText = 'color:var(--sub);font-size:13.5px;line-height:1.75;white-space:pre-wrap;padding:6px 0;';
+      e.textContent = t('snapEmpty');
+      listBox.appendChild(e);
+      return;
+    }
+    items.forEach(function(it){
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);';
+      var main = document.createElement('div');
+      main.style.cssText = 'flex:1;min-width:0;';
+      var nm = document.createElement('div');
+      nm.style.cssText = 'font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      nm.textContent = it.file || '(untitled)';
+      var sub = document.createElement('div');
+      sub.style.cssText = 'color:var(--sub);font-size:12px;margin-top:3px;';
+      sub.textContent = [it.lines ? t('snapLines', it.lines) : '', (it.src && it.dst) ? (it.src + '\u2192' + it.dst) : '',
+                         it.fin ? t('snapDone') : t('snapPart', it.bi, it.totalB), fmtTs(it.ts),
+                         Math.max(1, Math.round(it.sz/1024)) + ' KB'].filter(Boolean).join(' \u00b7 ');
+      main.appendChild(nm); main.appendChild(sub);
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'btn xs ghost'; del.textContent = '\u2715';
+      del.onclick = function(){ SnapStore.remove(it.k); render(); };
+      row.appendChild(main); row.appendChild(del);
+      listBox.appendChild(row);
+    });
+  }
+  render();
+  var note = document.createElement('div');
+  note.style.cssText = 'color:var(--sub);font-size:12px;line-height:1.6;';
+  note.textContent = t('snapNote');
+  var btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;margin-top:14px;';
+  var close = document.createElement('button');
+  close.type = 'button'; close.className = 'btn'; close.textContent = t('reuseCancel');
+  close.style.cssText = 'background:var(--acc);color:#fff;border-color:var(--acc);';
+  close.onclick = function(){ ov.remove(); };
+  btns.appendChild(close);
+  box.appendChild(h); box.appendChild(listBox); box.appendChild(note); box.appendChild(btns);
+  ov.appendChild(box);
+  ov.addEventListener('click', function(ev){ if(ev.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
 /* 用户选了「全部重新翻译」：把这些格的历史快照删掉，否则引擎内部 still 会静默复用 */
 function mlDropSnaps(cells){
   (cells || []).forEach(function(c){
-    try{ localStorage.removeItem(SNAP_KEY_BASE + ':' + c.fk + ':' + c.v); }catch(e){}
+    /* v0.9.404：走 SnapStore.remove，槽与索引一起清（以前只删槽，索引里会留幽灵条目） */
+    try{ SnapStore.remove(SnapStore.keyFor(c.fk, c.v)); }catch(e){}
   });
 }
 /* 页面标题带上进度：批量跑的时候用户多半切到别的标签页去了，回来一眼能看到跑到第几种。 */
@@ -7537,7 +7592,9 @@ async function runMulti(){
     mlUseFile(tk.f);
     /* 快照按 集+语言 分槽：同一集的不同语言、不同集的同一语言都互不覆盖。
        ⚠️ 必须在 runTranslate 之前设好 —— loadSnap 在它开头就执行。 */
-    SNAP_KEY = SNAP_KEY_BASE + ':' + tk.f.fk + ':' + tk.v;
+    SNAP_KEY = SnapStore.keyFor(tk.f.fk, tk.v);
+    /* v0.9.404：进索引的展示信息（文件名/条数/语言对），「本机记录」面板靠它列出存了什么 */
+    SNAP_META = { src: ($('srcLang')||{}).value || 'auto', dst: tk.v, lines: (S.srcItems||[]).length };
     var dl = document.getElementById('dstLang');
     dl.value = tk.v;
     /* 必须派发 change：行宽（maxW）是按语言联动的，不触发事件会拿上一种语言的行宽去翻 CJK */
@@ -7846,6 +7903,11 @@ async function mlAddFiles(list){
   if(skipped) log(mlt('filesSkipped', skipped), 'err');
 }
 document.getElementById('mlAddBtn').addEventListener('click', mlAddLang);
+document.getElementById('mlSnapBtn').addEventListener('click', function(){
+  /* 打开前先清一遍过期的：过期槽只有在这里才会被真正删掉 */
+  try{ SnapStore.gc(); }catch(e){}
+  mlOpenSnapPanel();
+});
 /* 语言下拉在 6400 行那段 IIFE 里才填 option，这里必须等 DOM 就绪再初始化，
    否则读到的 #dstLang 还是空的，队列会一开始就没有默认语言。 */
 document.addEventListener('DOMContentLoaded', mlInit);
