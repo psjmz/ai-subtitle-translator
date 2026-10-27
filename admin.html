@@ -1145,9 +1145,12 @@ function slotCell(e){
   mix.sort((a, b) => (b.n - a.n) || (ord[a.s] - ord[b.s]));
   const title = '按批次统计：' + mix.map(x => SLOT_TXT[x.s] + ' ' + x.n + ' 批').join(' · ')
     + (e.slotExact === 1 ? '' : '（旧记录只记了最后一批的槽位，看不出中途是否换过）');
+  /* 2026-10-27（用户定案）：批次一律标 ×N，含 ×1。此前「单槽且只有 1 批」只显示字母，
+     后台一列看下去像「有槽名、没次数」，容易被当成统计缺失。
+     这次只动后台页（admin.html 没有版号、服务端 no-cache），公共页面版号仍是 v0.9.400。 */
   return '<span title="' + esc(title) + '">' + mix.map(x =>
     '<b class="slot slot' + x.s + '">' + x.s + '</b>' +
-    (x.n > 1 || mix.length > 1 ? '<span class="slotn">×' + x.n + '</span>' : '')
+    '<span class="slotn">×' + x.n + '</span>'
   ).join('') + '</span>';
 }
 /* 分页条：上一页/下一页 + 窗口化页码（首末页 + 当前页前后各 1，超过间隔用 …）
