@@ -1103,7 +1103,7 @@ crossorigin="anonymous"></script>
   <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.402</span>
+    <span class="ver-tag">v0.9.403</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -1723,9 +1723,9 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.402"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.402"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.402"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="site-i18n.js?v=0.9.403"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.403"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.403"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -4645,6 +4645,25 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   return { byGno, fillers, badAnchor, musicDropGnos, subDropGnos, cueBadGnos, thinN, thinSample };
 }
 
+/* v0.9.403：拆半重发的结果合并。两半各自返回一份 {byGno,fillers,badAnchor,...}，
+   必须并成一份再交给外层那套统一后处理（drop 救援 / 歌词隔离 / cue 重译），
+   否则这些通道会对半批各跑一遍，日志、计数和请求数都会翻倍。
+   fillers 是 Set（4401 行），不能直接 concat，用 Set 去重合并。 */
+function mergeBatchOut(a,b){
+  if(!a) return b;
+  if(!b) return a;
+  return {
+    byGno: Object.assign({}, a.byGno, b.byGno),
+    fillers: new Set([...(a.fillers||[]), ...(b.fillers||[])]),
+    badAnchor: (a.badAnchor||[]).concat(b.badAnchor||[]),
+    musicDropGnos: (a.musicDropGnos||[]).concat(b.musicDropGnos||[]),
+    subDropGnos: (a.subDropGnos||[]).concat(b.subDropGnos||[]),
+    cueBadGnos: (a.cueBadGnos||[]).concat(b.cueBadGnos||[]),
+    thinN: (a.thinN||0)+(b.thinN||0),
+    thinSample: (a.thinSample||[]).concat(b.thinSample||[]),
+  };
+}
+
 /* v0.9.127：纯翻译模型（Hunyuan-MT 系列）逐组直译通道。
    协议：一组一个小请求——官方推荐模板的 system + 组原文，只要纯译文。
    多 cue 组返回单个 text，由既有 backfillGroup 按时长切分回填（与旧格式同路径，零新机制）。
@@ -5286,7 +5305,15 @@ async function runTranslate(){
   const effBase = cfg.mode==='builtin' ? BUILTIN_API : cfg.base;
   const effKey  = cfg.mode==='builtin' ? '' : cfg.key;
   const effModel= cfg.mode==='builtin' ? '' : cfg.model;
-  const maxTry  = 3;
+  /* v0.9.403：整批重发从「同一请求连发 3 次」改成「1 次整批 + 1 轮拆半」。
+     原来 attempt 1、2 的请求体逐字节相同（sysB / ctx / feedback 全不变），只对网络抖动、
+     上游返空这类偶发失败有效；对「模型稳定地这么输出」零效果——三次会截在同一个位置。
+     线上实测（10-27 全天）：retryBatch 只触发 18 次 / 2041 批，是六条通道里最少的一条，
+     而这 18 次全是「再抽一次同样的签」。改拆半后请求数不变（1 整批 + 2 半批 = 3 个），
+     但每次尝试的规模减半、命中率显著提高，「换动作」也终于比「重复同一动作」有意义。
+     两半里只要有一半成功就先落库，失败的半边交下方逐组补救（≤3 组一请求）接手——
+     补救粒度比半批更细，等于把第三次机会让给了修复率更高的通道。 */
+  const maxTry  = 2;
   let lastCall = 0;
   let deadStreak = 0;   // v0.9.56：连续整批零成功计数（熔断判定用）
   // 会话元数据（仅 文件名/目标语言/条数/模型名，不含字幕内容），供站点运营统计。
@@ -5506,7 +5533,48 @@ async function runTranslate(){
           lastCall=Date.now();
           /* v0.9.400：重发带 rt=6。以前整批重发只落进 batches，后台根本看不出「重发了几次」；
              现在单独进 retryBatch 桶，batches 只统计首批与补译请求。 */
-          const out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sysB,null,ctx, attempt?6:0);
+          let out;
+          if(attempt===0){
+            out=await translateBatch(effBase,effKey,effModel,gBatch,bi+1,totalB,sysB,null,ctx,0);
+          }else{
+            /* v0.9.403：第二次机会改成拆半——把本批一分为二，各发一次。
+               整批重发之所以没效果，是因为请求体与上一次完全相同（v0.9.97 已就此把「跑偏」类
+               重发改成单组隔离）；真正还会整批失败的只剩网络 / 返空 / 截断，而这三类里
+               「批太大、输出太长被截」恰恰是缩小规模能直接缓解的。
+               两半串行发（不并发）：可停在半途（用户点停 / paceGiveOut），也不会同时压两个请求。
+               ctx 与 sysB 仍用整批那一份——术语表按半批重算会让两半的译名不一致，宁可多带几个词。 */
+            const mid=Math.ceil(gBatch.length/2);
+            const halves=[gBatch.slice(0,mid), gBatch.slice(mid)].filter(h=>h.length>0);
+            let acc=null, halfErr=null;
+            for(const h of halves){
+              if(S.stop) break;
+              try{
+                acc=mergeBatchOut(acc, await translateBatch(effBase,effKey,effModel,h,bi+1,totalB,sysB,null,ctx,6));
+              }catch(e2){
+                halfErr=e2;
+                /* 排队超时是真该停的信号：外层的 catch 会把它翻成 S.stop，但要等这轮拆半跑完。
+                   这里就地置位，第二半不再发——上游已经挤到排不进来，再补一个请求只会更挤。 */
+                if(e2 && e2.paceGiveUp){ S.paceOut=true; S.stop=true; break; }
+              }
+            }
+            if(!acc) throw halfErr || new Error('half retry failed');
+            if(halfErr){
+              /* 一成一败：成功那半先落库，再抛出去走下方逐组补救。
+                 落库后 pend=gBatch.filter(!res.has) 只会捞失败那半，不会把已翻好的组重发一遍。
+                 但「本来要走专用救援通道」的组必须先剔出来——它们各自的就地重译（drop 救援 /
+                 歌词隔离 / cue 重译）全写在接下来这段 try 里，这里已经 throw，一步都跑不到；
+                 若让它们落库，就会带着 drop、歌词缺词或结构错直接过关。剔出去交补救通道重翻，
+                 补救粒度是 ≤3 组一请求，比半批更小。 */
+              const skip=new Set(acc.badAnchor||[]);
+              (acc.cueBadGnos||[]).forEach(x=>skip.add(x.gno));
+              (acc.musicDropGnos||[]).forEach(gno=>skip.add(gno));
+              (acc.subDropGnos||[]).forEach(gno=>skip.add(gno));
+              Object.keys(acc.byGno).forEach(k=>{ if(!skip.has(Number(k))) res.set(Number(k), acc.byGno[k]); });
+              acc.fillers.forEach(no=>fillerSet.add(no));
+              throw halfErr;
+            }
+            out=acc;
+          }
           /* v0.9.97：锚定失败不再整批盲重发，只记录一次，随即落到下方「单组隔离重译」通道。
              理由：批级三次调用的 feedback 参数恒为 null（本文件 3550 行），三次请求体完全一致，
              模型根本不知道自己上一轮跑偏了；v0.9.57 的实测注释（3088 行）记录「批级重试 +

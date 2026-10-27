@@ -1,6 +1,8 @@
 # Runtime data (admin password hash, model API key, usage counters) - NEVER commit
 data/
 *.bak*
+# 部署前的页面备份（v0.9.402/403 期间手工留下的副本，不进仓库）
+_bak-*.html
 
 # OS / editor
 .DS_Store
