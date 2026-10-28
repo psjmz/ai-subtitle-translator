@@ -9943,18 +9943,22 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/btnBackHome'\)\.addEventListener\('click', function\(\)\{ location\.href='\/'; \}\)/.test(ws),
       '「返回首页」没有指向 /');
 
-    /* ③ 字典抽成公共文件：两页都引、顺序在引擎之前、都不许重复声明 */
+    /* ③ 字典抽成公共文件：两页都引、顺序在引擎之前、都不许重复声明
+       v0.9.407：页面不再直接引 site-i18n.js（1.73MB），改引 /i18n/core.js 骨架，
+       字典由 I18NBoot 按语言分片取；site-i18n.js 仍是字典唯一来源，内容断言不变。 */
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('site-i18n.js?v=0.9.406') > 0, p[0] + ' 没引 site-i18n.js');
+      assert.ok(p[1].indexOf('/i18n/core.js?v=0.9.406') > 0, p[0] + ' 没引 /i18n/core.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
-      const i18 = p[1].indexOf('<script src="site-i18n.js'), core = p[1].indexOf('<script src="srt-core.js');
-      assert.ok(i18 >= 0, p[0] + ' 没有 site-i18n.js 的 script 标签');
+      const i18 = p[1].indexOf('<script src="/i18n/core.js'), core = p[1].indexOf('<script src="srt-core.js');
+      assert.ok(i18 >= 0, p[0] + ' 没有 core.js 的 script 标签');
       assert.ok(core < 0 || i18 < core, p[0] + ' 的字典加载顺序在引擎之后（会 ReferenceError）');
       assert.ok(!/const UI_LANGS = |const I18N = |const UI = \{/.test(p[1]),
         p[0] + ' 重复声明了字典（顶层重复 const 是 SyntaxError，整段脚本会失效）');
+      /* 骨架引入还不够：必须在 UI.lang 定下来之后同步取片，否则首屏全是键名 */
+      assert.ok(/I18NBoot\.sync\(UI\.lang\)/.test(p[1]), p[0] + ' 没在 UI.lang 之后调 I18NBoot.sync');
     });
 
     /* ④ 工作台切语言不许被踢回落地页：URL 改写要带上文件名 */
@@ -16405,9 +16409,9 @@ t('v0.9.368：切语言只认 <html lang>，且能换回中文', () => {
 t('v0.9.368：ASSET_VER 与全站版号一致', () => {
   const m = /const ASSET_VER = '([0-9.]+)';/.exec(readT('server.js'));
   assert.ok(m, 'server.js 里缺 ASSET_VER');
-  /* 首页本身不挂 srt-core.js（它是落地页），拿它自己的 site-i18n.js 版号做基准 */
-  const v = /site-i18n\.js\?v=([0-9.]+)/.exec(readT('index.html'));
-  assert.ok(v, 'index.html 没引 site-i18n.js?v=');
+  /* 首页本身不挂 srt-core.js（它是落地页），拿它自己的字典骨架版号做基准 */
+  const v = /\/i18n\/core\.js\?v=([0-9.]+)/.exec(readT('index.html'));
+  assert.ok(v, 'index.html 没引 /i18n/core.js?v=');
   assert.strictEqual(m[1], v[1], 'ASSET_VER(' + m[1] + ') 与 index.html 的 ?v=(' + v[1] + ') 对不上');
 });
 
@@ -18332,7 +18336,8 @@ t('v0.9.400：版号与缓存 bust 五处一致', () => {
   assert.ok(/class="ver-tag">v0\.9\.406</.test(readT('translate.html')), '工作台版号未升');
   assert.ok(/class="ver">v0\.9\.406</.test(idx), '首页版号未升');
   assert.ok(/srt-core\.js\?v=0\.9\.406/.test(tr), '工作台 srt-core 缓存 bust 未升');
-  assert.ok(/site-i18n\.js\?v=0\.9\.406/.test(idx), '首页 site-i18n 缓存 bust 未升');
+  /* v0.9.407：首页的字典入口从 site-i18n.js 换成 /i18n/core.js（字典按语言分片） */
+  assert.ok(/\/i18n\/core\.js\?v=0\.9\.406/.test(idx), '首页字典骨架缓存 bust 未升');
 });
 
 /* ============================================================================
@@ -18779,3 +18784,84 @@ t('v0.9.406：救援遥测字段进账本白名单，27 语词条齐', () => {
     assert.ok(n >= 27, k + ' 只有 ' + n + ' 个语言块（要求 27 语齐全）');
   });
 });
+
+/* ============================================================================
+   v0.9.407：界面字典按语言拆分（i18n/core.js + i18n/dict.<lang>.js）
+   —— site-i18n.js 1.73MB（gz ≈ 640KB）曾占首屏 67% 的字节，而一次只用一种语言。
+   这里钉住四件事：骨架足够小、27 片齐、页面确实同步取片、生成物没跟源文件脱节。
+   ========================================================================== */
+{
+  const fsD = require('fs'), pathD = require('path'), cryptoD = require('crypto');
+  const p = f => pathD.join(__dirname, f);
+  const md5 = f => cryptoD.createHash('md5').update(fsD.readFileSync(p(f))).digest('hex');
+  const core = readT('i18n/core.js');
+  const info = JSON.parse(readT('i18n/BUILD-INFO.json'));
+
+  t('v0.9.407 字典骨架：core.js 只留骨架，字典不在里面', () => {
+    const kb = fsD.statSync(p('i18n/core.js')).size / 1024;
+    assert.ok(kb < 40, 'core.js 已 ' + kb.toFixed(1) + 'KB，骨架不该这么大');
+    assert.ok(/const UI_LANGS = \[/.test(core), 'core.js 少了 UI_LANGS');
+    assert.ok(/const I18N = \{\};/.test(core), 'core.js 的 I18N 不是空表（字典该在分片里）');
+    assert.ok(/function t\(k\)/.test(core) && /function detectUiLang\(\)/.test(core), 'core.js 少了 t/detectUiLang');
+    assert.ok(/window\.I18NBoot/.test(core), 'core.js 没导出 I18NBoot');
+    assert.ok(/document\.write\('<scr' \+ 'ipt src="' \+ urlOf\(l\)/.test(core), 'sync 没用 document.write 同步取片');
+    assert.ok(/function has\(l\)\{ return !!I18N\[l\]; \}/.test(core), '没有「这片到没到」的判断');
+    /* 100 语覆盖：核心 27 走 dict.*，其余 73 走既有的 ui-*.js 分片，两条路都得在 */
+    assert.ok(/CORE_BASE  = '\/i18n\/dict\.'/.test(core), 'core.js 缺核心分片路径');
+    assert.ok(/SHARD_BASE = '\/i18n\/ui-'/.test(core), 'core.js 缺 73 语分片路径');
+    assert.ok(/function isCore\(l\)\{ return UI27\.indexOf\(l\) >= 0; \}/.test(core), '没按 UI27 区分两类语言');
+    assert.ok(/window\.SiteI18N\.loadShard = function\(lang, cb\)\{ API\.ensure\(lang, cb\); \}/.test(core),
+      '缺 loadShard 兼容层（三个页面切语言还在调它）');
+  });
+
+  t('v0.9.407 字典分片：27 片齐全、每片只装一种语言、体积可控', () => {
+    const langs = Object.keys(info.dicts).sort();
+    assert.strictEqual(langs.length, 27, '分片数不对：' + langs.length);
+    let kbAll = 0;
+    langs.forEach(l => {
+      const f = 'i18n/dict.' + l + '.js';
+      assert.ok(fsD.existsSync(p(f)), '缺分片 ' + f);
+      const s = readT(f);
+      assert.ok(s.indexOf("I18N['" + l + "'] = {") >= 0, f + ' 没定义 I18N[' + l + ']');
+      const kb = fsD.statSync(p(f)).size / 1024;
+      kbAll += kb;
+      assert.ok(kb < 120, f + ' 单语言分片 ' + kb.toFixed(0) + 'KB 过大');
+    });
+    assert.ok(kbAll / 1024 < 2.2, '分片合计 ' + (kbAll / 1024).toFixed(2) + 'MB，比整本字典还大');
+    /* zh-CN 是 t() 的最终回落，必须有；en 是 73 种新界面语言的兜底 */
+    assert.ok(langs.indexOf('zh-CN') >= 0 && langs.indexOf('en') >= 0, 'zh-CN / en 分片缺一');
+  });
+
+  t('v0.9.407 生成物没跟源文件脱节（改了 site-i18n.js 必须重跑 build-i18n-split.py）', () => {
+    assert.strictEqual(info.source_md5, md5('site-i18n.js'),
+      'site-i18n.js 变了但分片没重新生成 —— 跑 python3 build-i18n-split.py');
+    assert.strictEqual(info.core_md5, md5('i18n/core.js'), 'core.js 被手改过（重新生成）');
+    Object.keys(info.dicts).forEach(l => {
+      assert.strictEqual(info.dicts[l], md5('i18n/dict.' + l + '.js'), 'i18n/dict.' + l + '.js 被手改过');
+    });
+  });
+
+  t('v0.9.407 三个页面都引骨架且同步取片（漏一个就整页显示键名）', () => {
+    ['index.html', 'translate.html', 'multilang.html'].forEach(f => {
+      const s = readT(f);
+      assert.ok(/<script src="\/i18n\/core\.js\?v=/.test(s), f + ' 没引 /i18n/core.js');
+      const at = s.indexOf('I18NBoot.sync(UI.lang)');
+      assert.ok(at > 0, f + ' 没调 I18NBoot.sync(UI.lang)');
+      const ui = s.indexOf('UI.lang =');
+      assert.ok(ui >= 0 && ui < at, f + ' 的 sync 调用在 UI.lang 赋值之前（会取错语言）');
+      /* ui-boot.js 与 I18NBoot 都往 I18N 里塞字典，同时存在会互相把对方当成「已加载」 */
+      assert.ok(!/ui-boot\.js/.test(s), f + ' 还挂着 i18n/ui-boot.js（与 I18NBoot 冲突）');
+    });
+  });
+
+  t('v0.9.407 100 语都有片可加载：73 个 ui-*.js 分片齐全', () => {
+    const shards = fsD.readdirSync(p('i18n')).filter(f => /^ui-[a-z]{2,3}(-[A-Za-z]{2,4})?\.js$/.test(f));
+    assert.ok(shards.length >= 73, 'i18n/ui-*.js 只有 ' + shards.length + ' 个（73 语应有 ≥73）');
+    /* 抽查三种新语言，确认文件真的存在且是「差异分片」（比核心分片小一个量级） */
+    ['af', 'ms', 'fil'].forEach(l => {
+      const f = 'i18n/ui-' + l + '.js';
+      assert.ok(fsD.existsSync(p(f)), '缺 73 语分片 ' + f);
+      assert.ok(fsD.statSync(p(f)).size < 60 * 1024, f + ' 体积异常（差异分片不该这么大）');
+    });
+  });
+}
