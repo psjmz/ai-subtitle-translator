@@ -4129,34 +4129,22 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     });
   });
 
-  t('2026-10-28 广告位常驻：translate.html 的 #adBox 不再靠 .show 才显示', () => {
-    assert.ok(!/\.adbox\{display:none/.test(html), '广告位还是初始 display:none（会等任务条才出现）');
-    assert.ok(!/\.adbox\.show/.test(html), '残留 .adbox.show 开关');
-    assert.ok(/<div class="adbox" id="adBox">/.test(html), '广告位容器不见了');
-    assert.ok(/de2e5b52b36d97247e27a7579fa77c7e/.test(html), 'bauval 投放码 key 丢了');
-    assert.ok(!/function showAd\(/.test(html), 'showAd 懒显示逻辑没删干净');
-  });
-
-  /* 2026-10-28：广告是附属内容，浏览器不该停下来等它。
-     原来那段同步 <script src="https://bauval.org/…"> 在解析路径上，实测白卡 2.2s。
-     现在必须是「空容器 + 解析完之后创建独立 iframe」。 */
-  t('2026-10-28 广告不阻塞解析：没有同步外链，投放码写进 load 后的独立 iframe', () => {
-    assert.ok(!/<script[^>]+src="https:\/\/bauval\.org/.test(html),
-      'bauval 还是同步 <script src>（解析会被它卡住）');
-    assert.ok(!/\batOptions\s*=\s*\{[^}]*'key'\s*:/.test(html),
-      'atOptions 还挂在主文档里（应只在 iframe 内拼）');
-    assert.ok(/<div class="adbox" id="adBox"><\/div>/.test(html), 'adBox 不是空容器');
-    assert.ok(/document\.addEventListener\('DOMContentLoaded', schedule/.test(html),
-      '没等 DOMContentLoaded 就挂广告');
-    assert.ok(/requestIdleCallback\(function\(\)\{ setTimeout\(mount,0\); \}/.test(html),
-      '没有空闲档挂载（会跟首屏资源抢带宽）');
-    assert.ok(/f\.contentDocument/.test(html), '没写进 iframe 自己的 document');
-    assert.ok(/de2e5b52b36d97247e27a7579fa77c7e/.test(html), 'bauval 投放 key 丢了');
+  /* 2026-10-28：广告位整体下线（用户决定不再挂广告）。
+     先把同步外链挪出解析路径，再整块删掉 —— 现在两个工作台都不该有任何广告痕迹：
+     加载器 / 投放码 / 容器 / CSS / 挂载脚本 / RO 观察点，一个都不许回来。 */
+  t('2026-10-28 广告位已下线：translate.html 无加载器 / 无容器 / 无投放码 / 无挂载脚本', () => {
+    assert.ok(!/adsbygoogle|pagead2|googlesyndication|ca-pub-/.test(html), '还留着 AdSense 痕迹');
+    assert.ok(!/bauval|atOptions|de2e5b52b36d97247e27a7579fa77c7e/.test(html), '还留着 bauval 投放码');
+    assert.ok(!/id="adBox"|class="adbox"/.test(html), '还留着广告位容器');
+    assert.ok(!/\.adbox/.test(html), '还留着 .adbox 样式');
+    assert.ok(!/function showAd\(|AD_PUSHED/.test(html), '还留着旧的懒加载逻辑');
+    assert.ok(!/contentDocument/.test(html), '还留着往 iframe 写投放码的挂载脚本');
+    assert.ok(!/getElementById\('adBox'\)/.test(html), '还在找 #adBox（RO 观察点没清）');
   });
 
   /* 踩过的坑：server.js 的页脚互链注入是 html.replace('</body>', 导航+它)，替换**第一处**。
-     广告脚本里如果出现字面量 body 闭合标签（哪怕在 JS 字符串里），导航会被塞进字符串中间，
-     整段脚本 SyntaxError、广告挂不上。这条钉住「全页面只能有一个」。 */
+     内联脚本里如果出现字面量 body 闭合标签（哪怕在 JS 字符串里），导航会被塞进字符串中间，
+     整段脚本 SyntaxError。这条钉住「全页面只能有一个」。 */
   t('2026-10-28 页脚注入不会插进脚本：字面量 body 闭合标签恰好 1 个', () => {
     const n = (html.match(/<\/body>/g) || []).length;
     assert.strictEqual(n, 1, 'body 闭合标签出现 ' + n + ' 次（多出来的会被注入导航、写坏脚本）');
