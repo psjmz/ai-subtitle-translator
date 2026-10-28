@@ -1363,7 +1363,7 @@ crossorigin="anonymous"></script>
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.405</span>
+    <span class="ver-tag">v0.9.406</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -2077,11 +2077,11 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="site-i18n.js?v=0.9.405"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
-<script src="i18n/ui-boot.js?v=0.9.405"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
-<script src="srt-core.js?v=0.9.405"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="snap-store.js?v=0.9.405"></script><!-- v0.9.404：断点快照存储层，翻译页与多语页共用一份 -->
-<script src="jszip.min.js?v=0.9.405"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="site-i18n.js?v=0.9.406"></script><!-- v0.9.277：27 语界面字典，与落地页共用一份 -->
+<script src="i18n/ui-boot.js?v=0.9.406"></script><!-- v0.9.339：73 种新界面语言按语言分片加载；老 27 语不发请求 -->
+<script src="srt-core.js?v=0.9.406"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="snap-store.js?v=0.9.406"></script><!-- v0.9.404：断点快照存储层，翻译页与多语页共用一份 -->
+<script src="jszip.min.js?v=0.9.406"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -2477,6 +2477,11 @@ const S = {
   multi: false,
   snapOff: false,  // v0.9.77：localStorage 写满/被禁用时置 true，之后不再尝试存断点
   dropN: 0, mergeN: 0, wrapN: 0, dropLocal: 0, dropAiFiller: 0, dropAiDrop: 0,
+  /* v0.9.406：模型判「不用翻译」的救援遥测——试过几条 / 救回几条 / 因已试过而跳过几条 /
+     连续零收获次数 / 是否已关闭救援（1=关） / 跳过提示是否已打过 */
+  dropRescueTryN: 0, dropRescueFixN: 0, dropSkipN: 0, dropRescueFail: 0, dropRescueOff: 0, dropSkipLogged: 0,
+  dropSdhN: 0,
+  dropTried: null,
 };
 
 /* ---------------- 工具函数 ---------------- */
@@ -2715,7 +2720,7 @@ if (typeof SnapStore === 'undefined') {
     keyFor:function(fk,lang){ return 'srt_resume_v1:'+fk+':'+lang; },
     read:function(){ return null; }, write:function(){ return false; },
     finish:function(){ return false; }, remove:function(){}, list:function(){ return []; },
-    /* v0.9.405：导出也备空壳（同翻译页） */
+    /* v0.9.406：导出也备空壳（同翻译页） */
     peek:function(){ return null; }, toSrt:function(){ return null; }, fmtMs:function(){ return ''; },
     gc:function(){ return 0; }, bytes:function(){ return 0; }, evict:function(){},
     snapHasText:function(){ return false; }, usable:function(){ return false; },
@@ -2727,7 +2732,7 @@ const SNAP_KEY_BASE = SnapStore.K_BASE;
 const SNAP_KEY_LEGACY = SnapStore.K_LEGACY;
 let SNAP_KEY = SnapStore.K_BASE;
 let SNAP_META = { src:'', dst:'', lines:0 };
-/* v0.9.405：时间轴快照 —— 有了它才能从「本机记录」里直接把译文下载成成品 srt。
+/* v0.9.406：时间轴快照 —— 有了它才能从「本机记录」里直接把译文下载成成品 srt。
    tl = 扁平数组 [起1,止1,起2,止2,…]（第 n 条在 tl[(n-1)*2]，单位毫秒）；
    gs = [ 每个句组各含几条 ]（按 gno 顺序）。
    ⚠️ 只有时间与分句，不含任何原文 —— 要双语仍然得重选字幕文件。 */
@@ -4526,6 +4531,17 @@ function failWhyOf(msg){
    留足余量；15 次是让比值有统计意义的最小样本（低于它宁可不动手）。 */
 const GAP_TRY_MIN = 15;    /* 累计补译尝试达到这么多次才开始评估 */
 const GAP_EFF = 0.15;      /* 修复率低于此值 → 判定补译对本任务无效 */
+/* v0.9.406：SDH 画面/声音标注行（[speaking in French] / [door creaks open] / (laughs)）。
+   它们不是对白，模型判「不用翻译」并删除属于正确判断——不该进救援（白付一次请求），
+   也不该算进 subDrop 告警（那个数原意是「有实义的对白被删」，被这类标注撑大后就不准了）。
+   判据：剔掉 [..]、（..）片段与所有标点/符号后，不剩任何实义字符。
+   括号里带对白的仍算对白：\"(in French) Ferme la porte.\" 去掉前缀后正文还在 → 返回 false。 */
+function isScreenAnno(s){
+  const t=String(s||'').replace(/[\u2669\u266a\u266b\u266c]/g,' ');
+  const rest=t.replace(/\[[^\]]*\]/g,' ').replace(/\([^\)]*\)/g,' ').replace(/（[^）]*）/g,' ')
+              .replace(/[\s\p{P}\p{S}]/gu,'');
+  return rest.length===0;
+}
 async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedback,ctx,rt){
   // v0.9.45：纯符号音乐组（只有 ♪ 无歌词）不进模型，主循环直接原文回填；
   // 音乐帧组的 merged 换成 [1][2]… 编号的纯正文（模型见不到 ♪）
@@ -4830,8 +4846,18 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     if(m.type==='drop' && !String(m.text||'').trim()){
       const dropSrc = g.mFrames ? g.mFrames.plainText : g.text;
       const eff = C.effChars(dropSrc);
-      if(C.musicRe().test(String(g.text)) && eff > 0 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
-      else if(eff >= 6 && !C.isPureHumming(g.text)) subDropGnos.push(g.gno);
+      /* v0.9.406：歌词组同样要有「实义」才救。用户取消勾选「去除水词」只是不再在提示词里
+         要求省略迟疑词——歌词里的水词（♪ Oh-oh, oh-oh ♪ / ♪ Hey baby ♪）依旧由模型自己判断，
+         模型整组判不译正是它该有的判断，救一次纯属白花钱（且救不回来）。
+         门槛与 subDrop 同口径（有效字符 ≥6 且非纯哼唱）：真歌词行「♪ Hold me where the river bends ♪」
+         远高于这条线，仍会救；只有 oh/ah/la 这类才落在线下。 */
+      if(C.musicRe().test(String(g.text)) && eff >= 6 && !C.isPureHumming(g.text)) musicDropGnos.push(g.gno);
+      else if(eff >= 6 && !C.isPureHumming(g.text)){
+        /* v0.9.406：SDH 标注（[speaking in French] 这类画面/声音提示）不算对白——模型删它是对的。
+           不进救援、单独计 dropSdhN；subDrop 那个「实义对白被删」的告警也就不再被它撑大。 */
+        if(isScreenAnno(dropSrc)) S.dropSdhN=(S.dropSdhN||0)+1;
+        else subDropGnos.push(g.gno);
+      }
       /* v0.9.380：eff<6 但确有实词 → 保留原文，不再静默删帧。
          上面两档都不成立时，此前是 continue 掉什么都不做 → 回填层按 explicitDrop 整组删除，
          rows 里连 dropAiDrop 都不加（那行记的是 m.type==='drop' 才有），日志一片干净。
@@ -5364,7 +5390,7 @@ function reportEvent(ev, extra, fmt, meta, scope){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',scope:scope||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',scope:scope||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,dropRescueTryN:S.dropRescueTryN||0,dropRescueFixN:S.dropRescueFixN||0,dropSkipN:S.dropSkipN||0,dropRescueOff:S.dropRescueOff||0,dropSdhN:S.dropSdhN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
       /* v0.9.375：编号级样本只在 finish 带一次 */
       cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
@@ -5538,6 +5564,10 @@ async function runTranslate(){
   const effKey  = cfg.mode==='builtin' ? '' : cfg.key;
   const effModel= cfg.mode==='builtin' ? '' : cfg.model;
   const maxTry  = 3;
+  /* v0.9.406：模型判「不用翻译」的救援，连续几次零收获就停手。
+     取 3 而不是 1：单次零收获可能只是那批内容恰好都该删（例如整批都是 [music] 标注）；
+     连续 3 次说明这次任务里模型就是铁了心判水词，再问也只是白付系统提示词的固定开销。 */
+  const DROP_RESCUE_FAIL_LIMIT = 3;
   let lastCall = 0;
   let deadStreak = 0;   // v0.9.56：连续整批零成功计数（熔断判定用）
   // 会话元数据（仅 文件名/目标语言/条数/模型名，不含字幕内容），供站点运营统计。
@@ -5561,7 +5591,7 @@ async function runTranslate(){
      实际这些值一个都不会被使用（切模式不清空输入框，值一直留着）。此前零提示。
      ⚠️ 必须在 clearLog 之后才写，否则会被同一轮的开场清屏擦掉。 */
   if(cfg.mode!=='api' && cfg.base && cfg.key && cfg.model) log(t('modeMismatch', cfg.base),'err');
-  S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.locale=cfg.dst;
+  S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0; S.locale=cfg.dst;
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
   S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：编号样本与重试修复率随任务重置
@@ -5578,7 +5608,7 @@ async function runTranslate(){
 
     // 句子级分组：跨多条字幕的句子合并为句组，译文将按各条时长比例切分回填
     const groups = C.groupSentences(S.srcItems);
-    /* v0.9.405：把「时间轴 + 每句组条数」记进快照，供「本机记录」导出成品 srt 用。
+    /* v0.9.406：把「时间轴 + 每句组条数」记进快照，供「本机记录」导出成品 srt 用。
        必须在第一批 saveSnap 之前设好（本函数下面才开始跑批）。两个数组都只与源文有关，
        与语言无关 —— 同一集不同语言的槽各存一份，内容一致、体积也就几千字节。 */
     SNAP_GEO = { tl:snapTimeline(S.srcItems), gs:groups.map(function(g){ return g.cues.length; }) };
@@ -5782,13 +5812,28 @@ async function runTranslate(){
           if(!dropFillers && out.musicDropGnos) rescueGnos.push(...out.musicDropGnos);
           if(out.subDropGnos) rescueGnos.push(...out.subDropGnos);
           if(rescueGnos.length){
-            const g1s=rescueGnos.map(gno=>gBatch.find(x=>x.gno===gno)).filter(Boolean);
-            const stillDrop=rescueGnos.slice();
+            /* v0.9.406：模型判「不用翻译」，只救一次。
+               依据：线上 04:23 那单（1780 条 / 44 批）有 39 个批次各触发一次救援，救回的条数
+               远不抵请求成本；用户决策——模型说不用翻，试一次不行就算了，不必反复试。
+               两条约束：
+               ① 本次任务内记下试过的句组（S.dropTried），批次重发后同一组不再被救第二次；
+               ② 连续 DROP_RESCUE_FAIL_LIMIT 次救援零收获 → 本次任务关闭救援通道，
+                  后面再有 drop 直接按模型判断处理（不再付钱去问）。 */
+            const tried=S.dropTried||(S.dropTried=new Set());
+            const skipped=rescueGnos.filter(g=>tried.has(g)).length;
+            if(skipped){
+              S.dropSkipN=(S.dropSkipN||0)+skipped;
+              if(!S.dropSkipLogged){ S.dropSkipLogged=1; log(t('dropSkipNote',skipped),'warn'); }
+            }
+            const todo=S.dropRescueOff?[]:rescueGnos.filter(g=>!tried.has(g));
+            const g1s=todo.map(gno=>gBatch.find(x=>x.gno===gno)).filter(Boolean);
+            const stillDrop=todo.slice();
             if(g1s.length && !S.stop){
+              S.dropRescueTryN=(S.dropRescueTryN||0)+todo.length;
               try{
                 const o2=await translateBatch(effBase,effKey,effModel,g1s,bi+1,totalB,sysB,null,ctx,1);
                 stillDrop.length=0;
-                for(const gno of rescueGnos){
+                for(const gno of todo){
                   const m2=o2.byGno&&o2.byGno[gno];
                   // 救回标准：非空组译文（音乐/旧格式）或 cue 对齐有文（cueTexts / cues），且该组未触发语言跑偏锚定
                   const cueAny = m2 && ((m2.cueTexts && m2.cueTexts.size) || (Array.isArray(m2.cues) && m2.cues.some(c=>String((c&&c.text)||'').trim())));
@@ -5797,11 +5842,24 @@ async function runTranslate(){
                     o2.fillers.forEach(no=>fillerSet.add(no));
                   } else stillDrop.push(gno);
                 }
+                todo.forEach(g=>tried.add(g));
               }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+              const savedN=todo.length-stillDrop.length;
+              S.dropRescueFixN=(S.dropRescueFixN||0)+savedN;
+              /* 连败计数只算「真去救过」的批次；救回任意一条即清零 */
+              if(savedN>0) S.dropRescueFail=0;
+              else {
+                S.dropRescueFail=(S.dropRescueFail||0)+1;
+                if(S.dropRescueFail>=DROP_RESCUE_FAIL_LIMIT && !S.dropRescueOff){
+                  S.dropRescueOff=1;
+                  log(t('dropRescueOff',DROP_RESCUE_FAIL_LIMIT),'warn');
+                }
+              }
+              if(savedN>0) log(t('musicDropSaved',savedN),'okc');
+              if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
+            } else {
+              todo.forEach(g=>tried.add(g));
             }
-            const savedN=rescueGnos.length-stillDrop.length;
-            if(savedN>0) log(t('musicDropSaved',savedN),'okc');
-            if(stillDrop.length) log(t('musicDropKept',stillDrop.slice(0,5).join(',')+(stillDrop.length>5?'…':'')));
           }
           if(out.badAnchor && out.badAnchor.length){
             // v0.9.22：终检失败拆单组重译——整批上下文偶发触发模型跑偏，隔离单组重发通常即恢复（评测实证 5/5）
@@ -6245,7 +6303,7 @@ async function runTranslate(){
     /* v0.9.86：静默清空遥测（纯统计，不改任何行为）——统计被删行里「源文仍有实义」的行数。
        判定：有效字符 ≥6（排除 Um./Yeah./Mm-hmm 这类真水词）且非纯哼唱（Oh-oh 之类）。
        用途：判断要不要把合并救援通道从「有 ♪ 标记」放宽到「源文有实义」，先攒数据再定。 */
-    S.subDrop = S.rows.filter(r=>r.flag==='drop' && C.effChars(String(r.en||''))>=6 && !C.isPureHumming(String(r.en||''))).length;
+    S.subDrop = S.rows.filter(r=>r.flag==='drop' && C.effChars(String(r.en||''))>=6 && !C.isPureHumming(String(r.en||'')) && !isScreenAnno(String(r.en||''))).length;
     S.mergeN = gMulti;
     S.mergedN = mG;
     log(t('mergeInfo', gMulti, mG, gMulti-mG));
@@ -7044,7 +7102,7 @@ function mlHistStat(tasks){
   });
   return { total: cells.length, doneN: doneN, partN: partN, leftB: leftB, cells: cells };
 }
-/* v0.9.405：翻到一半的记录先问一句再导 —— 拿到的是「已译完的那部分」。
+/* v0.9.406：翻到一半的记录先问一句再导 —— 拿到的是「已译完的那部分」。
    文案全部复用已有词条（snapPart 说明进度、snapDl 作按钮），不再补 27 语。 */
 function mlAskPartialExport(it){
   return new Promise(function(resolve){
@@ -7076,7 +7134,7 @@ function mlAskPartialExport(it){
     document.body.appendChild(ov);
   });
 }
-/* v0.9.405：导出文件名跟正常导出保持一致（<原名>_<语言名>字幕.srt）——
+/* v0.9.406：导出文件名跟正常导出保持一致（<原名>_<语言名>字幕.srt）——
    与翻译页同一套命名，别让同一个片子在不同入口导出成两个名字。 */
 function mlSnapOutName(it){
   var base = String(it.file || 'subtitles').replace(/\.(srt|vtt|ass|ssa|txt)$/i, '');
@@ -7086,7 +7144,7 @@ function mlSnapOutName(it){
     return base + '_' + (zhUI ? L.file : L.en) + (zhUI ? '字幕' : '_' + t('fnSub')) + '.srt';
   }catch(e){ return base + '.' + (it.dst || 'out') + '.srt'; }
 }
-/* v0.9.405：把一条记录导出成该目标的成品 srt 并下载。
+/* v0.9.406：把一条记录导出成该目标的成品 srt 并下载。
    ⚠️ 只出译文 —— 本机没存原文，双语必须重选字幕文件走正常导出。 */
 async function mlDownloadSnap(it){
   if(!it.fin && !(await mlAskPartialExport(it))) return;
@@ -7141,7 +7199,7 @@ function mlOpenSnapPanel(){
                          it.fin ? t('snapDone') : t('snapPart', it.bi, it.totalB), fmtTs(it.ts),
                          Math.max(1, Math.round(it.sz/1024)) + ' KB'].filter(Boolean).join(' \u00b7 ');
       main.appendChild(nm); main.appendChild(sub);
-      /* v0.9.405：下载按钮。没有时间轴的老快照（v0.9.404 及以前存的）置灰并说明原因 */
+      /* v0.9.406：下载按钮。没有时间轴的老快照（v0.9.404 及以前存的）置灰并说明原因 */
       var dl = document.createElement('button');
       dl.type = 'button'; dl.className = 'btn xs ghost'; dl.textContent = '\u2b07';
       if(it.hasTl){ dl.title = t('snapDl'); dl.onclick = function(){ mlDownloadSnap(it); }; }
@@ -8247,6 +8305,7 @@ function setSrc(text, fileName){
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
   S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清
+  S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0;   // v0.9.406：换片清掉落救援计数
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }

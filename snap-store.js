@@ -188,7 +188,7 @@ var SnapStore = (function(){
 
   /* 写一份快照。payload = {fp,file,bi,totalB,done,fillers,ctx,durs,tl,gs}（页面里已序列化好的那一份），
      meta = {src,dst,lines}（进索引的展示信息）。返回 true/false —— false 表示确实存不下。
-     v0.9.405：payload 多了 tl / gs 两项时间轴快照 —— 有了它，用户才能从「本机记录」里
+     v0.9.406：payload 多了 tl / gs 两项时间轴快照 —— 有了它，用户才能从「本机记录」里
      直接把译文下载成成品 srt，不必再重选一次字幕文件。
        tl = { 字幕编号: [起始毫秒, 结束毫秒] }，逐条；
        gs = [ 每个句组各含几条字幕 ]，按 gno 顺序 —— 用它把 gno 还原成编号区间。
@@ -215,7 +215,7 @@ var SnapStore = (function(){
     idxUpsert({ k:key, file:o.file, lines:((meta&&meta.lines)||0)|0,
                 src:(meta&&meta.src)||'', dst:(meta&&meta.dst)||'',
                 bi:o.bi, totalB:o.totalB, fin:0, ts:o.ts, sz:raw.length*2,
-                /* v0.9.405：有没有时间轴决定「能不能直接下载」。v0.9.404 及以前存的快照没有，
+                /* v0.9.406：有没有时间轴决定「能不能直接下载」。v0.9.404 及以前存的快照没有，
                    面板上对它们要把下载按钮置灰，并说明原因，而不是点了没反应。 */
                 hasTl:(o.tl && o.gs) ? 1 : 0 });
     evict(BUDGET, key);
@@ -238,7 +238,7 @@ var SnapStore = (function(){
 
   function remove(key){ dropKey(key); }
 
-  /* ---------- v0.9.405：把快照导出成成品字幕 ---------- */
+  /* ---------- v0.9.406：把快照导出成成品字幕 ---------- */
   /* 读原始快照，**不做任何校验也不删槽** —— 导出与「参数对不对得上」无关，
      用户要的就是他翻出来的那些译文。走 read() 反而会因为参数变了 / 过期而把槽删掉。 */
   function peek(key){ return getObj(key); }
@@ -366,7 +366,7 @@ var SnapStore = (function(){
       if(!has){ changed = true; continue; }
       out.push({ k:it.k, file:it.file||'', lines:it.lines||0, src:it.src||'', dst:it.dst||'',
                  bi:it.bi||0, totalB:it.totalB||0, fin:it.fin?1:0, ts:it.ts||0, seq:it.seq||0,
-                 /* v0.9.405：面板据此决定「能不能直接下载」。老索引没有这个字段 → 0，
+                 /* v0.9.406：面板据此决定「能不能直接下载」。老索引没有这个字段 → 0，
                     正好对应「v0.9.404 及以前存的快照没有时间轴」的事实。 */
                  hasTl:it.hasTl?1:0, sz:it.sz||0, expired: expired(it) });
     }

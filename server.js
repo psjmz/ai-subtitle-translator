@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.405';
+const ASSET_VER = '0.9.406';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -648,7 +648,15 @@ const CUE_ERR_FIELDS = ['cueEmpty','cueMissing','cueDup','cueUnknown','cueBadEnt
    与 CUE_ERR_FIELDS 同为写死白名单：绝不按前端传来的字符串动态建字段。 */
 /* v0.9.383：gapAbortN = 补译止损是否触发（1/0）。有了它才能回答「线上到底有没有再出现
    那种试到 235 次才停的任务」，以及止损阈值定得对不对。 */
-const GAP_FIELDS = ['gapTryN','gapFixN','gapGiveUpN','shortDropKeepN','lyricShortN','thinN','gapAbortN','gapCoverN','missN'];
+const GAP_FIELDS = ['gapTryN','gapFixN','gapGiveUpN','shortDropKeepN','lyricShortN','thinN','gapAbortN','gapCoverN','missN',
+  /* v0.9.406：模型判「不用翻译」的救援账。以前只有客户端日志，后台看不到「救了几条、花了几次」，
+     也就无从判断这条通道值不值——现在能直接算救回率（dropRescueFixN / dropRescueTryN），
+     dropRescueOff=1 表示本次任务已熔断停手。 */
+  'dropRescueTryN','dropRescueFixN','dropSkipN','dropRescueOff',
+  /* v0.9.406：dropSdhN = 被删的 SDH 画面/声音标注条数（[speaking in French] 这类）。
+     单列一项是为了让 subDrop 恢复本意：subDrop 只数「有实义的对白被删」，
+     标注行既不该进救援，也不该把告警数字撑大。 */
+  'dropSdhN'];
 function gapFields(meta){
   const o = {};
   for (const k of GAP_FIELDS) {
@@ -902,7 +910,11 @@ const TOOL_PAGE = {
   ytfix: 'ytfix',
   /* v0.9.356：自动生成字幕页与画面硬字幕提取页。
      act 复用现有动作：run=真跑了一次识别，apply=出了结果，export=真下载了文件。 */
-  autosub: 'autosub', ocrsub: 'ocrsub'
+  autosub: 'autosub', ocrsub: 'ocrsub',
+  /* v0.9.406：KTV 逐字歌词页。前端从第一版起就在发 page:'ktv'，
+     但这里没有它 —— pickWL 认不出来，整条记录被直接丢弃，后台永远是 0。
+     与 v0.9.355 的 ytfix 是同一类漏登记。 */
+  ktv: 'ktv'
 };
 /* ⚠️ 动作白名单：与六页各自埋点处传的 act 一一对应（逐页对齐，共 14 个）。
       加减动作两边必须同步，否则新动作被记成空值 —— 用户明明用了，后台却看不到。
@@ -930,7 +942,10 @@ const TOOL_ACT = {
 };
 const TOOL_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt', json: 'json',
   /* v0.9.316：table 页 xlsx/csv、batch 页 zip、lrc 页 lrc */
-  xlsx: 'xlsx', csv: 'csv', zip: 'zip', lrc: 'lrc' };
+  xlsx: 'xlsx', csv: 'csv', zip: 'zip', lrc: 'lrc',
+  /* v0.9.406：KTV 页的「下载增强 LRC」——逐字 LRC 与普通 lrc 不是同一种东西，
+     分开记才能看出用户到底要哪一种。此前不在白名单，这个格式的导出数一直是 0。 */
+  'enh-lrc': 'enh-lrc' };
 function readTEvents(){
   try {
     const j = JSON.parse(fs.readFileSync(TEVENTS_PATH, 'utf8'));
