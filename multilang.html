@@ -1327,7 +1327,7 @@
 <div class="appbar">
     <!-- v0.9.280：logo 整块可点，回当前界面语言的首页（用户定案）。href 由 syncLogoHome() 跟着 UI.lang 走。 -->
     <a class="logo-sm" id="logoHome" href="/"><span class="mark">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
-    <span class="ver-tag">v0.9.406</span>
+    <span class="ver-tag">v0.9.407</span>
     <button class="back" id="btnBackHome" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg><span data-i18n="wsBackHome">首页</span></button>
     <!-- v0.9.319：工作台顶栏撤掉统一导航（318 挂过一版，实测太挤：项目名 + 播报 +
          上传/开始翻译 + 语言本来就占满，再塞四个主项会折行）。回到 278 的定案：
@@ -2014,10 +2014,10 @@
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="/i18n/core.js?v=0.9.406"></script><!-- v0.9.407：字典骨架（27 语字典已按语言拆到 i18n/dict.*.js，只取当前语言） -->
-<script src="srt-core.js?v=0.9.406"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
-<script src="snap-store.js?v=0.9.406"></script><!-- v0.9.404：断点快照存储层，翻译页与多语页共用一份 -->
-<script src="jszip.min.js?v=0.9.406"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
+<script src="/i18n/core.js?v=0.9.407"></script><!-- v0.9.407：字典骨架（27 语字典已按语言拆到 i18n/dict.*.js，只取当前语言） -->
+<script src="srt-core.js?v=0.9.407"></script><!-- v0.9.75：URL 带版本参数，发版即换缓存 -->
+<script src="snap-store.js?v=0.9.407"></script><!-- v0.9.404：断点快照存储层，翻译页与多语页共用一份 -->
+<script src="jszip.min.js?v=0.9.407"></script><!-- 多语结果打包下载；与 batch.html 同一个库、同一版号 -->
 <script>
 'use strict';
 const C = window.SrtCore;
@@ -5310,7 +5310,7 @@ function reportEvent(ev, extra, fmt, meta, scope){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',scope:scope||'',taskId:m.taskId||'',src:m.src||'',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,dropRescueTryN:S.dropRescueTryN||0,dropRescueFixN:S.dropRescueFixN||0,dropSkipN:S.dropSkipN||0,dropRescueOff:S.dropRescueOff||0,dropSdhN:S.dropSdhN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',scope:scope||'',taskId:m.taskId||'',src:m.src||'',pg:'multilang',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,dropRescueTryN:S.dropRescueTryN||0,dropRescueFixN:S.dropRescueFixN||0,dropSkipN:S.dropSkipN||0,dropRescueOff:S.dropRescueOff||0,dropSdhN:S.dropSdhN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
       /* v0.9.375：编号级样本只在 finish 带一次 */
       cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
@@ -5500,7 +5500,9 @@ async function runTranslate(){
      此前只记目标语言 lang，无法回答「源语言默认改成 auto 之后翻译质量是变好还是变差」——
      重试率、cue 结构错这些指标只能按 lang 分组，看不出 auto 组与手动指定组的差异。
      纯统计字段，不参与任何判定（分批 CUE_CAP 只看 dst，分词方言由 srcLocaleForExport 单独处理）。 */
-  S.trMeta = { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length, model: cfg.mode==='api' ? cfg.model : '', taskId: S.taskId, src: cfg.src || '' };
+  /* v0.9.407：pg=任务来源。本页是「批量多语」（一次上传整季 × 多语言），与翻译页
+     共用 /api/translate；不标记的话后台把两类任务算成一笔账，看不出多语业务的真实量。 */
+  S.trMeta = { file: S.fileBase||'', lang: cfg.dst, cues: S.srcItems.length, model: cfg.mode==='api' ? cfg.model : '', taskId: S.taskId, src: cfg.src || '', pg: 'multilang' };
   /* 多语队列不清屏：清掉的话，第二语言一开始就把「第一种已完成」的记录擦没了，
      用户回头看不到全貌（单语翻译保持原行为）。 */
   if(!S.multi) clearLog();

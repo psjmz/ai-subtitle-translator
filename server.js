@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.406';
+const ASSET_VER = '0.9.407';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -348,6 +348,13 @@ const DL_FMT_FIELD = { srt: 'dlSrt', vtt: 'dlVtt', sbv: 'dlSbv', ass: 'dlAss', t
    后台要能分清用户是一格一格拿、还是整季打包 —— 前者说明他只要某几语，
    后者说明整季交付。与格式同口径：只认白名单，认不出就不记。 */
 const DL_SCOPE = { sel: 'dlSel', all: 'dlAll' };
+/* v0.9.407：任务来源。两个入口跑的是同一套 /api/translate，只靠文件名/语言/批次
+   分不出「主翻译页翻一个文件」和「批量多语页一次跑整季 × 多语言」——两条链路的
+   单价、语言数、用户预期完全不同，后台必须能分开算。
+   ⚠️ 只认白名单（同 DL_SCOPE）：前端传别的值一律丢弃，不按字符串动态建字段。
+   ⚠️ 本版之前的老页面不传这个字段 → 记录上没有 pg，后台归「未标记」；
+      绝不按文件名/语言去猜来源（猜错会把两页的量算混，比空着糟）。 */
+const EV_PAGE = { translate: 'translate', multilang: 'multilang' };
 /* 白名单取值（与上面 FAIL_FIELD 同口径：必须 hasOwnProperty，否则 '__proto__' 会命中原型链）。
    不在表里一律返回 '' —— 宁可这一笔不记，也绝不按前端字符串动态建字段。 */
 function pickWL(map, v){
@@ -379,6 +386,8 @@ function appendEvent(ip, meta, model, extra){
      matching or routing (batching reads dst; bilingual wrapping has its own guessing helper).
      Needed to tell whether the v0.9.177 "default to auto" change helped or hurt. */
   const src = String(meta.src || '').replace(/[\x00-\x1f]/g, '').slice(0, 10);
+  /* v0.9.407：任务来源（translate=主翻译页 / multilang=批量多语）。只认白名单。 */
+  const pg = pickWL(EV_PAGE, meta.pg);
   const db = readEvents();
   // 会话去重：从尾部找同 ip + 同任务号（或同文件名+语言）且时间窗口内的记录 → 批次 +1
   // v0.9.400：窗口按「有没有任务号」分开 —— 有任务号 → EVENT_TASK_MS（12h），无 → 仍是 30 分钟
@@ -407,6 +416,9 @@ function appendEvent(ip, meta, model, extra){
       if (e.ip !== ip) e.ipSwap = (e.ipSwap || 0) + 1;
       if (src) e.src = src;   // v0.9.179: keep the newest known source language on the record
       if (extra && typeof extra === 'object') Object.assign(e, extra);
+      /* v0.9.407：来源只在第一次落库时定型（任务号随页面生成，一条任务不可能中途换页）。
+         老记录没有 pg 时才补 —— 不覆盖已有值，避免一条任务被后续批次改写来源。 */
+      if (pg && !e.pg) e.pg = pg;
       bumpSlotUse(e, extra);   // v0.9.373：这一批走的槽累加到 sbA..sbE
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return;
@@ -415,6 +427,7 @@ function appendEvent(ip, meta, model, extra){
   }
   const ev = { t: now, ip, file, lang, cues, batches: 0, retries: 0, model: mdl };
   if (src) ev.src = src;        // v0.9.179
+  if (pg) ev.pg = pg;           // v0.9.407：任务来源（translate / multilang）
   if (task) ev.taskId = task;   // v0.9.159：存任务号，后续批次才能归到这一条
   if (extra && typeof extra === 'object') Object.assign(ev, extra);
   bumpSlotUse(ev, extra);       // v0.9.373：首批也要记，否则只显示「最后一批」
@@ -452,6 +465,9 @@ function markEvent(ip, meta, ev){
   const mdl = String(meta.model || '').replace(/[\x00-\x1f]/g, '').slice(0, 60);
   /* v0.9.179: BYOK users never hit appendEvent, so src only arrives via the finish/download report. */
   const src = String(meta.src || '').replace(/[\x00-\x1f]/g, '').slice(0, 10);
+  /* v0.9.407：来源同样只在这里读 —— 自带 Key 用户的整单只有 finish/download 两条上报，
+     没有 appendEvent 那条，缺了它这批人的任务在后台就永远是「未标记」。 */
+  const pg = pickWL(EV_PAGE, meta.pg);
   if (!file && !lang) return false;
   /* v0.9.159：完成/下载上报同样按任务号匹配——否则同一文件连翻两次，
      第二次的完成时间会被记到第一条上。老前端不带任务号时回退旧口径。 */
@@ -507,6 +523,7 @@ function markEvent(ip, meta, ev){
       } else return false;
       if (mdl && !e.model) e.model = mdl;
       if (src && !e.src) e.src = src;   // v0.9.179
+      if (pg && !e.pg) e.pg = pg;       // v0.9.407：老记录（或首条落在本函数）补来源，不覆盖
       fs.writeFileSync(EVENTS_PATH, JSON.stringify(db), 'utf8');
       return true;
     }
@@ -515,6 +532,7 @@ function markEvent(ip, meta, ev){
   if (!mdl) return false;
   const lite = { t: now, ip, file, lang, cues: 0, batches: 0, model: mdl, byok: true };
   if (src) lite.src = src;              // v0.9.179
+  if (pg) lite.pg = pg;                 // v0.9.407：自带 Key 的整单只有这里能记上来源
   /* v0.9.244：自带 Key 用户的轻量记录也必须存任务号。此前没存 → 同一任务的第二次上报
      （典型是「完成」之后「下载」）匹配不到自己那条，又新建一条：后台看到两条同任务的记录、
      下载次数恒为 1，v0.9.244 新加的导出格式计数也被拆到两条里（同一单导了 SRT 又导 ASS 看不出来）。 */
@@ -8912,6 +8930,19 @@ const server = http.createServer(async (req, res) => {
           for (const e of arr) { const k = e[key] || '(空)'; m.set(k, (m.get(k) || 0) + 1); }
           return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, n]) => ({ name, n }));
         };
+        /* v0.9.407：任务来源分布。一条事件 = 一个任务号（v0.9.400 起按任务号合并），
+           所以数事件条数就是数任务数，与「今日会话数」同口径。
+           ⚠️ 老记录没有 pg（本版之前的前端不上报）→ 单列 untagged，绝不并进两页任何一边：
+              历史量通常远大于新增，混进去会把「翻译页 / 批量多语」的比例直接算歪。 */
+        const pageTally = arr => {
+          const o = { translate: 0, multilang: 0, untagged: 0 };
+          for (const e of arr) {
+            if (e.pg === 'translate') o.translate++;
+            else if (e.pg === 'multilang') o.multilang++;
+            else o.untagged++;
+          }
+          return o;
+        };
         const base = {
           total: all.length,
           today: {
@@ -8923,8 +8954,11 @@ const server = http.createServer(async (req, res) => {
             copied: todays.filter(e => e.copiedAt && dateOfTs(e.copiedAt) === today).length,   // v0.9.298：复制也是拿到结果
             failed: todays.filter(e => e.failedAt && dateOfTs(e.failedAt) === today).length,
             /* v0.9.373：今日各槽的批次数（后台顶部 chip）。自带 Key 的记录不进这本账（没走本站槽位）。 */
-            slots: slotTally(todays)
+            slots: slotTally(todays),
+            /* v0.9.407：今日按来源拆开的任务数（翻译页 / 批量多语 / 未标记） */
+            byPage: pageTally(todays)
           },
+          byPage: pageTally(all),   // v0.9.407：全时段来源分布
           topFiles: cnt(all, 'file'),
           topLangs: cnt(all, 'lang'),
           topSrcs: cnt(all.filter(e => e.src), 'src'),   // v0.9.179: auto vs manually-picked source language

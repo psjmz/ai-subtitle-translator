@@ -5713,7 +5713,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('merge.html：存在、引对独立引擎、内联脚本可解析、关键 id 齐全', () => {
     assert.ok(mg, 'merge.html 不存在');
-    assert.ok(/merge-core\.js\?v=0.9.406/.test(mg), 'merge.html 未引用当前版号的 merge-core');
+    assert.ok(/merge-core\.js\?v=0.9.407/.test(mg), 'merge.html 未引用当前版号的 merge-core');
     const blocks = mg.match(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g) || [];
     let checked = 0;
     for (const b of blocks) {
@@ -5762,9 +5762,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     const n = (html.match(/navMerge\s*:\s*'/g) || []).length;
     assert.strictEqual(n, 27, 'navMerge 只有 ' + n + ' 种语言');
     /* v0.9.277：`class="ver">` 只在落地页（HOME_SRC）；ver-tag 在工作台（html） */
-    assert.ok(/class="ver">v0\.9\.406</.test(HOME_SRC), '首页版本号未升当前版号');
-    assert.ok(/class="ver-tag">v0\.9\.406</.test(html), '工作台版本号未升当前版号');
-    assert.ok(/srt-core\.js\?v=0.9.406/.test(html), 'srt-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.407</.test(HOME_SRC), '首页版本号未升当前版号');
+    assert.ok(/class="ver-tag">v0\.9\.407</.test(html), '工作台版本号未升当前版号');
+    assert.ok(/srt-core\.js\?v=0.9.407/.test(html), 'srt-core.js?v 未升当前版号');
     /* v0.9.257：首页不再写死 merge.html 链接 —— 三个工具入口统一由 site-nav.js 渲染，
        页面只留占位 #siteNav（顶部胶囊）/ #toolCards（主页三卡）。所以这里改校验挂载：
        占位在、脚本挂对、数据源里三个工具齐全（少一个就是导航少一格）。 */
@@ -5958,8 +5958,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       .forEach(k => { const c = (mg.match(new RegExp("\\b" + k + ":", 'g')) || []).length;
         assert.strictEqual(c, MG_LANGS, k + ' 应有 ' + MG_LANGS + ' 种语言（词典语言数），实际 ' + c); });
     /* 版本与缓存参数 */
-    assert.ok(/class="ver">v0\.9\.406</.test(mg), 'merge.html 版本未升当前版号');
-    assert.ok(/merge-core\.js\?v=0.9.406/.test(mg), 'merge-core.js?v 未升当前版号');
+    assert.ok(/class="ver">v0\.9\.407</.test(mg), 'merge.html 版本未升当前版号');
+    assert.ok(/merge-core\.js\?v=0.9.407/.test(mg), 'merge-core.js?v 未升当前版号');
   });
 
   /* ================= v0.9.223：模板参数 / 堆叠间距 / ASS 预览 / 对齐措辞 ================= */
@@ -7825,11 +7825,11 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.245：版号两页同步升到当前版号（merge 2 处 + index 3 处）', () => {
-    assert.ok(/class="ver">v0\.9\.406/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0.9.406/.test(mg), 'merge.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.406/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/ver-tag">v0\.9\.406/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0.9.406/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.407/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0.9.407/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.407/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/ver-tag">v0\.9\.407/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0.9.407/.test(html), 'index.html 缓存 bust 未升');
     /* 上一版的版号不许还挂在显示位上 */
     assert.ok(!/class="ver">v0\.9\.254/.test(mg) && !/class="ver">v0\.9\.254/.test(html), '还留着上一版的显示版号');
   });
@@ -9345,14 +9345,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.269：版号升到当前版号（只改显示版号与缓存 bust 两处）', () => {
-    assert.ok(/class="ver">v0\.9\.406/.test(mg), 'merge.html 显示版号未升');
-    assert.ok(/merge-core\.js\?v=0.9.406/.test(mg), 'merge.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.407/.test(mg), 'merge.html 显示版号未升');
+    assert.ok(/merge-core\.js\?v=0.9.407/.test(mg), 'merge.html 缓存 bust 未升');
     /* ⚠️ 三页共用一个版号（index 3 处 + merge 2 处 + clean 1 处），漏一处线上就会显示两个版本 */
-    assert.ok(/class="ver">v0\.9\.406/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
-    assert.ok(/class="ver-tag">v0\.9\.406/.test(html), 'index.html 页脚版号没跟上');
-    assert.ok(/srt-core\.js\?v=0.9.406/.test(html), 'index.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.407/.test(HOME_SRC), 'index.html 顶栏版号没跟上');
+    assert.ok(/class="ver-tag">v0\.9\.407/.test(html), 'index.html 页脚版号没跟上');
+    assert.ok(/srt-core\.js\?v=0.9.407/.test(html), 'index.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0.9.406/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0.9.407/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   t('v0.9.270：主站字幕区就地编辑（原文 / 时间轴），改动实时进导出', () => {
@@ -9908,13 +9908,13 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.272：版号升到当前版号（三页共用一个版号，漏一处线上就显示两个版本）', () => {
-    assert.ok(/class="ver">v0\.9\.406/.test(HOME_SRC), 'index.html 顶栏版号未升');
-    assert.ok(/class="ver-tag">v0\.9\.406/.test(html), 'index.html 页脚版号未升');
-    assert.ok(/srt-core\.js\?v=0.9.406/.test(html), 'index.html 缓存 bust 未升');
-    assert.ok(/class="ver">v0\.9\.406/.test(mg), 'merge.html 版号没跟上');
-    assert.ok(/merge-core\.js\?v=0.9.406/.test(mg), 'merge.html 缓存 bust 没跟上');
+    assert.ok(/class="ver">v0\.9\.407/.test(HOME_SRC), 'index.html 顶栏版号未升');
+    assert.ok(/class="ver-tag">v0\.9\.407/.test(html), 'index.html 页脚版号未升');
+    assert.ok(/srt-core\.js\?v=0.9.407/.test(html), 'index.html 缓存 bust 未升');
+    assert.ok(/class="ver">v0\.9\.407/.test(mg), 'merge.html 版号没跟上');
+    assert.ok(/merge-core\.js\?v=0.9.407/.test(mg), 'merge.html 缓存 bust 没跟上');
     const cln = require('fs').readFileSync(require('path').join(__dirname, 'clean.html'), 'utf8');
-    assert.ok(/clean-core\.js\?v=0.9.406/.test(cln), 'clean.html 缓存 bust 没跟上');
+    assert.ok(/clean-core\.js\?v=0.9.407/.test(cln), 'clean.html 缓存 bust 没跟上');
   });
 
   /* ==========================================================================
@@ -9936,7 +9936,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
     /* ② 工作台独立成页：视图在、引擎在、首页那一半不在、默认就展开 */
     assert.ok(/id="viewWorkspace"/.test(ws), 'translate.html 没有工作台 DOM');
-    assert.ok(/<script src="srt-core\.js\?v=0.9.406">/.test(ws), 'translate.html 没挂 srt-core.js');
+    assert.ok(/<script src="srt-core\.js\?v=0.9.407">/.test(ws), 'translate.html 没挂 srt-core.js');
     assert.ok(!/id="viewLanding"/.test(ws), 'translate.html 还带着首页那一半');
     assert.ok(/#viewWorkspace\{display:flex\}/.test(ws), '工作台默认没展开（CSS 还压着 display:none）');
     /* 返回首页 = 回站根，而不是切回本页那个不存在的视图 */
@@ -9949,7 +9949,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/const UI_LANGS = \[/.test(dict) && /const I18N = \{/.test(dict), 'site-i18n.js 没装字典');
     assert.ok(dict.indexOf('window.SiteI18N') > 0, 'site-i18n.js 没留出口');
     [['index.html', home, true], ['translate.html', ws, false]].forEach(function (p) {
-      assert.ok(p[1].indexOf('/i18n/core.js?v=0.9.406') > 0, p[0] + ' 没引 /i18n/core.js');
+      assert.ok(p[1].indexOf('/i18n/core.js?v=0.9.407') > 0, p[0] + ' 没引 /i18n/core.js');
       /* ⚠️ 只认真的 <script> 标签：注释里也会提到 srt-core.js（落地页就写了一句
          「本页不加载 srt-core.js」），按裸字符串找会把注释当成引擎，永远假红。 */
       const i18 = p[1].indexOf('<script src="/i18n/core.js'), core = p[1].indexOf('<script src="srt-core.js');
@@ -10681,7 +10681,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(!/<script[^>]+site-nav\.js/.test(h), '转换页不许引入 site-nav.js（那是另外三页共用的导航）');
     assert.ok(!/<script[^>]+site-i18n\.js/.test(h), '转换页不许引入 site-i18n.js（那是另外三页共用的词典）');
     assert.ok(/convert-i18n\.js/.test(h), '转换页应加载自己的词典');
-    assert.ok(/convert-core\.js\?v=0.9.406/.test(h), '转换页引擎没带版本号');
+    assert.ok(/convert-core\.js\?v=0.9.407/.test(h), '转换页引擎没带版本号');
     assert.strictEqual((h.match(/<h1/g) || []).length, 1, '转换页只应有一个 h1');
     assert.ok(/<!--SEO-HEAD-START-->/.test(h) && /<!--SEO-COPY-START-->/.test(h),
       '缺 SEO 占位块，服务端按语言注入会失效');
@@ -12254,14 +12254,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.296：版号升到 296，缓存 bust 跟着走', () => {
     const h = readT('repair.html');
-    assert.ok(/repair-i18n\.js\?v=0.9.406/.test(h), 'repair-i18n.js 没带 296 版本号');
-    assert.ok(/repair-core\.js\?v=0.9.406/.test(h), 'repair-core.js 没带 296 版本号');
+    assert.ok(/repair-i18n\.js\?v=0.9.407/.test(h), 'repair-i18n.js 没带 296 版本号');
+    assert.ok(/repair-core\.js\?v=0.9.407/.test(h), 'repair-core.js 没带 296 版本号');
     /* 老页的版本号这轮统一抬一次，否则改过 SEO 的老页在 CDN 上还是旧的 */
-    assert.ok(/class="ver">v0\.9\.406/.test(readT('index.html')), 'index.html 顶栏版号没升');
-    assert.ok(/ver-tag">v0\.9\.406/.test(readT('translate.html')), 'translate.html 页脚版号没升');
-    assert.ok(/class="ver">v0\.9\.406/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
+    assert.ok(/class="ver">v0\.9\.407/.test(readT('index.html')), 'index.html 顶栏版号没升');
+    assert.ok(/ver-tag">v0\.9\.407/.test(readT('translate.html')), 'translate.html 页脚版号没升');
+    assert.ok(/class="ver">v0\.9\.407/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
     ['clean.html', 'convert.html', 'bilingual.html', 'shift.html'].forEach(f => {
-      assert.ok(/\?v=0.9.406/.test(readT(f)), f + ' 的脚本没带 296 版本号');
+      assert.ok(/\?v=0.9.407/.test(readT(f)), f + ' 的脚本没带 296 版本号');
     });
   });
 
@@ -12575,7 +12575,7 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     assert.ok(/EXTRACT_I18N/.test(ep) && /ExtractCore/.test(ep), 'extract.html 没用自己的全局出口');
     assert.ok(!/ShiftCore|ConvertCore|BilingualCore|RepairCore/.test(ec), 'extract-core.js 依赖了别的引擎');
     /* 三件套脚本带 ?v= 缓存参数并升到 299 */
-    assert.ok(/extract-core\.js\?v=0.9.406/.test(ep) && /extract-i18n\.js\?v=0.9.406/.test(ep),
+    assert.ok(/extract-core\.js\?v=0.9.407/.test(ep) && /extract-i18n\.js\?v=0.9.407/.test(ep),
       '三件套的 ?v= 缓存参数没带上或没升到 299');
     /* 老页面不许被塞进新页链接 —— 首页卡片 v0.9.300 起是正门，index 不在名单里 */
     ['translate.html', 'merge.html', 'clean.html', 'convert.html',
@@ -13108,14 +13108,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.302：版号升到 302，三件套缓存 bust 跟着走', () => {
     const h = readT('glossary.html');
-    assert.ok(/glossary-i18n\.js\?v=0.9.406/.test(h), 'glossary-i18n.js 没带 302 版本号');
-    assert.ok(/glossary-core\.js\?v=0.9.406/.test(h), 'glossary-core.js 没带 302 版本号');
-    assert.ok(/class="ver">v0\.9\.406/.test(readT('index.html')), 'index.html 顶栏版号没升');
-    assert.ok(/ver-tag">v0\.9\.406/.test(readT('translate.html')), 'translate.html 页脚版号没升');
-    assert.ok(/class="ver">v0\.9\.406/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
+    assert.ok(/glossary-i18n\.js\?v=0.9.407/.test(h), 'glossary-i18n.js 没带 302 版本号');
+    assert.ok(/glossary-core\.js\?v=0.9.407/.test(h), 'glossary-core.js 没带 302 版本号');
+    assert.ok(/class="ver">v0\.9\.407/.test(readT('index.html')), 'index.html 顶栏版号没升');
+    assert.ok(/ver-tag">v0\.9\.407/.test(readT('translate.html')), 'translate.html 页脚版号没升');
+    assert.ok(/class="ver">v0\.9\.407/.test(MERGE_SRC), 'merge.html 顶栏版号没升');
     ['clean.html', 'convert.html', 'bilingual.html', 'shift.html', 'repair.html', 'extract.html']
       .forEach(f => {
-        assert.ok(/\?v=0.9.406/.test(readT(f)), f + ' 的脚本没带 302 版本号');
+        assert.ok(/\?v=0.9.407/.test(readT(f)), f + ' 的脚本没带 302 版本号');
       });
   });
 
@@ -13558,24 +13558,24 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
 
   t('v0.9.306：版号升到 306，shift 的两个缓存键跟着走', () => {
     const SH = readT('shift.html');
-    assert.ok(/shift-core\.js\?v=0.9.406/.test(SH),
+    assert.ok(/shift-core\.js\?v=0.9.407/.test(SH),
       'shift.html 的引擎缓存键没升（改了引擎不发版 = 老访客吃旧引擎）');
-    assert.ok(/shift-i18n\.js\?v=0.9.406/.test(SH),
+    assert.ok(/shift-i18n\.js\?v=0.9.407/.test(SH),
       'shift.html 的词典缓存键没升（改了词条不发版 = 老访客看键名）');
-    assert.ok(/class="ver">v0\.9\.406/.test(readT('index.html')), '首页版号没升');
-    assert.ok(/ver-tag">v0\.9\.406/.test(readT('translate.html')), '工作台版号没升');
-    assert.ok(/class="ver">v0\.9\.406/.test(MERGE_SRC), 'merge.html 版号没升');
+    assert.ok(/class="ver">v0\.9\.407/.test(readT('index.html')), '首页版号没升');
+    assert.ok(/ver-tag">v0\.9\.407/.test(readT('translate.html')), '工作台版号没升');
+    assert.ok(/class="ver">v0\.9\.407/.test(MERGE_SRC), 'merge.html 版号没升');
   });
 
   t('v0.9.304：版号升到 304，shift 的两个缓存键跟着走', () => {
     const SH = readT('shift.html');
-    assert.ok(/shift-core\.js\?v=0.9.406/.test(SH),
+    assert.ok(/shift-core\.js\?v=0.9.407/.test(SH),
       'shift.html 的引擎缓存键没升（改了引擎不发版 = 老访客吃旧引擎）');
-    assert.ok(/shift-i18n\.js\?v=0.9.406/.test(SH),
+    assert.ok(/shift-i18n\.js\?v=0.9.407/.test(SH),
       'shift.html 的词典缓存键没升（改了词条不发版 = 老访客看键名）');
-    assert.ok(/class="ver">v0\.9\.406/.test(readT('index.html')), '首页版号没升');
-    assert.ok(/ver-tag">v0\.9\.406/.test(readT('translate.html')), '工作台版号没升');
-    assert.ok(/class="ver">v0\.9\.406/.test(MERGE_SRC), 'merge.html 版号没升');
+    assert.ok(/class="ver">v0\.9\.407/.test(readT('index.html')), '首页版号没升');
+    assert.ok(/ver-tag">v0\.9\.407/.test(readT('translate.html')), '工作台版号没升');
+    assert.ok(/class="ver">v0\.9\.407/.test(MERGE_SRC), 'merge.html 版号没升');
   });
 
   /* ---------------- v0.9.308：六个垂直工具页的埋点 + 后台分 tab ----------------
@@ -13705,14 +13705,14 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
   });
 
   t('v0.9.308：版号升到 308，全站十页的缓存键跟着走', () => {
-    const V = /0\.9\.406/;
+    const V = /0\.9\.407/;
     assert.ok(V.test(readT('index.html')), '首页没升');
     ['translate', 'merge', 'clean', 'convert', 'bilingual', 'shift', 'repair', 'extract', 'glossary']
       .forEach(f => assert.ok(V.test(readT(f + '.html')), f + '.html 没升'));
     /* 六个页都改了（加了埋点），六页的引擎缓存键必须跟着走，否则老访客吃旧页 */
     ['convert', 'bilingual', 'repair', 'extract', 'glossary'].forEach(f => {
       const h = readT(f + '.html');
-      assert.ok(new RegExp(f + '-core\\.js\\?v=0\\.9\\.406').test(h), f + ' 页的引擎缓存键没升');
+      assert.ok(new RegExp(f + '-core\\.js\\?v=0\\.9\\.407').test(h), f + ' 页的引擎缓存键没升');
     });
   });
 
@@ -14671,8 +14671,8 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
         const h = readT(p + '.html');
         assert.ok(/function reportTool\(/.test(h), p + ' 页没有 reportTool 定义');
         /* 首发缓存键：四页的 core/i18n 引用必须带当前版号（发版即换缓存） */
-        assert.ok(new RegExp(p + '-core\\.js\\?v=0\\.9\\.406').test(h), p + ' 页的 core 缓存键不是当前版号');
-        assert.ok(new RegExp(p + '-i18n\\.js\\?v=0\\.9\\.406').test(h), p + ' 页的 i18n 缓存键不是当前版号');
+        assert.ok(new RegExp(p + '-core\\.js\\?v=0\\.9\\.407').test(h), p + ' 页的 core 缓存键不是当前版号');
+        assert.ok(new RegExp(p + '-i18n\\.js\\?v=0\\.9\\.407').test(h), p + ' 页的 i18n 缓存键不是当前版号');
         assert.ok(new RegExp("page: '" + p + "'").test(h), p + ' 页的 page 名与文件名对不上');
         assert.ok(/navigator\.sendBeacon\('\/api\/tool-event'/.test(h), p + ' 页没走 sendBeacon');
         assert.ok(/fetch\('\/api\/tool-event'/.test(h), p + ' 页没有 fetch 兜底（没有 sendBeacon 的浏览器就丢了）');
@@ -16646,7 +16646,7 @@ t('v0.9.371：反馈模块只做中/英两套文案，不接全站字典', () =>
 });
 
 t('v0.9.371：只有首页挂反馈入口，其他页与后台都不挂', () => {
-  assert.ok(/<script src="site-feedback\.js\?v=0\.9\.406" defer><\/script>/.test(readT('index.html')),
+  assert.ok(/<script src="site-feedback\.js\?v=0\.9\.407" defer><\/script>/.test(readT('index.html')),
     '首页没挂反馈入口');
   const pages = fsT.readdirSync(__dirname)
     .filter(f => f.endsWith('.html') && !f.startsWith('_') && f !== 'index.html');
@@ -17329,7 +17329,10 @@ t('v0.9.373：接口把槽位算好再下发，后台不再自己算一遍', () 
   assert.ok(/function slotCell\(e\)/.test(A), '后台缺 slotCell');
   assert.ok(/<th>槽<\/th>/.test(A), '使用记录表头没有「槽」');
   assert.ok(/slotCell\(e\)/.test(A), '行里没渲染槽位');
-  assert.ok(/colspan="12"/.test(A), '空表行 colspan 没跟着加一（表格会错位）');
+  /* v0.9.407：又加了「来源」列 —— 别再写死数字，直接数表头，下次加列不用改这里 */
+  const iB373 = A.indexOf('<tbody id="evRows">');
+  const thN373 = (A.slice(A.lastIndexOf('<thead><tr>', iB373), iB373).match(/<th>/g) || []).length;
+  assert.ok(new RegExp('colspan="' + thN373 + '"').test(A), '空表行 colspan 没跟着加一（表格会错位）');
   assert.ok(!/e\.via[BCDE]/.test(A), '后台又自己按 via* 算了一遍槽位（应与服务端同一套口径）');
   assert.ok(/slotByok/.test(A), '自带 Key 没有单独标（会被误读成没走槽）');
   /* 12 列在 640 版心下必须横滚才看得到「槽」，等于没加 —— 统计页单独放宽 */
@@ -18332,12 +18335,12 @@ t('v0.9.400：同一任务号不再被 30 分钟窗口切成多条', () => {
 
 t('v0.9.400：版号与缓存 bust 五处一致', () => {
   const idx = readT('index.html'), tr = readT('translate.html');
-  assert.ok(/const ASSET_VER = '0\.9\.406';/.test(readT('server.js')), 'ASSET_VER 未升');
-  assert.ok(/class="ver-tag">v0\.9\.406</.test(readT('translate.html')), '工作台版号未升');
-  assert.ok(/class="ver">v0\.9\.406</.test(idx), '首页版号未升');
-  assert.ok(/srt-core\.js\?v=0\.9\.406/.test(tr), '工作台 srt-core 缓存 bust 未升');
+  assert.ok(/const ASSET_VER = '0\.9\.407';/.test(readT('server.js')), 'ASSET_VER 未升');
+  assert.ok(/class="ver-tag">v0\.9\.407</.test(readT('translate.html')), '工作台版号未升');
+  assert.ok(/class="ver">v0\.9\.407</.test(idx), '首页版号未升');
+  assert.ok(/srt-core\.js\?v=0\.9\.407/.test(tr), '工作台 srt-core 缓存 bust 未升');
   /* v0.9.407：首页的字典入口从 site-i18n.js 换成 /i18n/core.js（字典按语言分片） */
-  assert.ok(/\/i18n\/core\.js\?v=0\.9\.406/.test(idx), '首页字典骨架缓存 bust 未升');
+  assert.ok(/\/i18n\/core\.js\?v=0\.9\.407/.test(idx), '首页字典骨架缓存 bust 未升');
 });
 
 /* ============================================================================
@@ -18553,8 +18556,8 @@ t('v0.9.401：确认弹窗关掉后的空窗期挡连点', () => {
    ============================================================================ */
 t('v0.9.404：两页的快照读写都走 snap-store.js，不再各写一份', () => {
   const ws = readT('translate.html'), ml = readT('multilang.html');
-  assert.ok(/<script src="snap-store\.js\?v=0\.9\.406">/.test(ws), '翻译页没引入快照存储层');
-  assert.ok(/<script src="snap-store\.js\?v=0\.9\.406">/.test(ml), '多语页没引入快照存储层');
+  assert.ok(/<script src="snap-store\.js\?v=0\.9\.407">/.test(ws), '翻译页没引入快照存储层');
+  assert.ok(/<script src="snap-store\.js\?v=0\.9\.407">/.test(ml), '多语页没引入快照存储层');
   [['translate', ws], ['multilang', ml]].forEach(p => {
     const nm = p[0], s = p[1];
     assert.ok(/SnapStore\.write\(SNAP_KEY, fp,/.test(s), nm + ' 的 saveSnap 没走存储层（会绕过索引与容量治理）');
@@ -18863,5 +18866,54 @@ t('v0.9.406：救援遥测字段进账本白名单，27 语词条齐', () => {
       assert.ok(fsD.existsSync(p(f)), '缺 73 语分片 ' + f);
       assert.ok(fsD.statSync(p(f)).size < 60 * 1024, f + ' 体积异常（差异分片不该这么大）');
     });
+  });
+
+  /* ---------------- v0.9.407：任务来源（翻译页 / 批量多语） ----------------
+     两条链路共用同一套 /api/translate，光看文件名/语言/批次分不出来。
+     守四件事：
+       ① 两个页面各自上报来源，且 meta（云端翻译）与 /api/event（自带 Key 的
+          finish/download）两处都要带 —— 少一处就有半单没有标记；
+       ② 服务端只认白名单，appendEvent（云端）与 markEvent（自带 Key）都要落库；
+       ③ 来源只在首次落库时定型，后续批次不许改写（同一任务号不会中途换页）；
+       ④ 统计接口按来源拆开，老记录单列 untagged，绝不并进任何一边。 */
+  t('v0.9.407 任务来源：两个翻译页都上报，meta 与生命周期两处都带', () => {
+    const TR = readT('translate.html'), ML = readT('multilang.html');
+    assert.ok(/S\.trMeta\s*=\s*\{[^}]*pg:\s*'translate'/.test(TR), 'translate.html 的 trMeta 没带 pg（云端翻译不会标记来源）');
+    assert.ok(/S\.trMeta\s*=\s*\{[^}]*pg:\s*'multilang'/.test(ML), 'multilang.html 的 trMeta 没带 pg（批量多语不会标记来源）');
+    assert.ok(/pg:'translate'/.test(TR), 'translate.html 的 reportEvent 没带 pg（自带 Key 用户不会标记来源）');
+    assert.ok(/pg:'multilang'/.test(ML), 'multilang.html 的 reportEvent 没带 pg（自带 Key 用户不会标记来源）');
+    /* 两页是各自独立的两份实现（不共用模块），互抄时最容易只改一边 */
+    assert.ok(!/pg:'translate'/.test(ML), 'multilang.html 误抄成了 translate 的来源值');
+    assert.ok(!/pg:'multilang'/.test(TR), 'translate.html 误抄成了 multilang 的来源值');
+  });
+
+  t('v0.9.407 任务来源：服务端白名单 + 两条落库路径 + 首次定型', () => {
+    const S = readT('server.js');
+    assert.ok(/const EV_PAGE = \{ translate: 'translate', multilang: 'multilang' \};/.test(S), '缺来源白名单');
+    /* 只认白名单：前端传 'evil' / '__proto__' 必须落空，不许按字符串动态建字段 */
+    const reads = S.match(/pickWL\(EV_PAGE, meta\.pg\)/g) || [];
+    assert.strictEqual(reads.length, 2, 'appendEvent / markEvent 应各读一次来源，实际 ' + reads.length);
+    assert.ok(/if \(pg\) ev\.pg = pg;/.test(S), 'appendEvent 新建记录没落 pg');
+    assert.ok(/if \(pg && !e\.pg\) e\.pg = pg;/.test(S), '来源没做「首次定型」（后续批次会改写）');
+    assert.ok(/if \(pg\) lite\.pg = pg;/.test(S), '自带 Key 轻量记录没落 pg');
+    /* 匹配口径不能跟着动：pg 一旦进 evFields，任务号缺失时的旧口径会被悄悄改变 */
+    assert.ok(!/pg: String\(m\.pg/.test(S), 'pg 绝不能进 evFields（会改变事件匹配口径）');
+    /* 统计：今日 + 全时段都要拆，且必须有 untagged 桶 */
+    assert.ok(/byPage: pageTally\(todays\)/.test(S), '今日没按来源拆开');
+    assert.ok(/byPage: pageTally\(all\)/.test(S), '全时段没按来源拆开');
+    assert.ok(/untagged: 0/.test(S), '来源统计没有「未标记」桶（老记录会被算进某一页）');
+  });
+
+  t('v0.9.407 任务来源：后台有 chip 与「来源」列，列数与 colspan 一致', () => {
+    const A = readT('admin.html');
+    assert.ok(/来源（今日）：/.test(A), '统计 chip 没有今日来源分布');
+    assert.ok(/来源（全时段）：/.test(A), '统计 chip 没有全时段来源分布');
+    assert.ok(/<th>来源<\/th>/.test(A), '使用记录表头没有「来源」列');
+    assert.ok(/class="pg pgMl"/.test(A) && /class="pg pgTr"/.test(A), '来源列没按翻译页/批量多语上色');
+    /* 未标记必须显示「-」而不是被写成某一页 */
+    assert.ok(/v0\.9\.407 之前的记录没有来源标记/.test(A), '未标记没有说明来源（会被当成缺失数据）');
+    const iB = A.indexOf('<tbody id="evRows">');
+    const thN = (A.slice(A.lastIndexOf('<thead><tr>', iB), iB).match(/<th>/g) || []).length;
+    assert.strictEqual(thN, 13, '使用记录应为 13 列（v0.9.407 加「来源」），实际 ' + thN);
   });
 }
