@@ -1040,6 +1040,8 @@
          --tb:#4D7C0F; --tb-ink:#3F660C; --tb-weak:#F1F7E8; --tb-line:#CBDFA6;
          --bt:#334155; --bt-ink:#263549; --bt-weak:#EEF1F5; --bt-line:#C3CBD6;
          --lr:#9D174D; --lr-ink:#7F1140; --lr-weak:#FBEBF1; --lr-line:#EFAEC6;
+         /* v0.9.408：KTV 字幕 = 霓虹洋红（全站未占用；与歌词打轴的酒红拉开） */
+         --ktv:#DB2777; --ktv-ink:#9D174D; --ktv-weak:#FDECF4; --ktv-line:#F6BCD2;
          /* v0.9.321：第十七张工具卡 qc=字幕质检，深绿（与清洗页绿松 --cl 刻意区分） */
          --qc:#166534; --qc-ink:#11543F; --qc-weak:#E9F7EE; --qc-line:#A7D8B8;
          /* v0.9.352：第十八张工具卡 yt=YouTube 字幕优化，油管红（与乱码修复页砖红 --rp 区分） */
@@ -1081,6 +1083,7 @@
   .tc.tb{--k:var(--tb);--kw:var(--tb-weak);--ki:var(--tb-ink);--kl:var(--tb-line)}
   .tc.bt{--k:var(--bt);--kw:var(--bt-weak);--ki:var(--bt-ink);--kl:var(--bt-line)}
   .tc.lr{--k:var(--lr);--kw:var(--lr-weak);--ki:var(--lr-ink);--kl:var(--lr-line)}
+  .tc.ktv{--k:var(--ktv);--kw:var(--ktv-weak);--ki:var(--ktv-ink);--kl:var(--ktv-line)}
   /* v0.9.321：第十七张工具卡 */
   .tc.qc{--k:var(--qc);--kw:var(--qc-weak);--ki:var(--qc-ink);--kl:var(--qc-line)}
   /* v0.9.352：第十八张工具卡 */
@@ -1127,6 +1130,7 @@
   .det-tx.tb{--k:var(--tb);--kw:var(--tb-weak);--ki:var(--tb-ink);--kl:var(--tb-line)}
   .det-tx.bt{--k:var(--bt);--kw:var(--bt-weak);--ki:var(--bt-ink);--kl:var(--bt-line)}
   .det-tx.lr{--k:var(--lr);--kw:var(--lr-weak);--ki:var(--lr-ink);--kl:var(--lr-line)}
+  .det-tx.ktv{--k:var(--ktv);--kw:var(--ktv-weak);--ki:var(--ktv-ink);--kl:var(--ktv-line)}
   .det-tx.qc{--k:var(--qc);--kw:var(--qc-weak);--ki:var(--qc-ink);--kl:var(--qc-line)}
   .det-eye{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.3px;
     padding:4px 12px;border-radius:99px;background:var(--kw);color:var(--ki)}
@@ -1229,6 +1233,8 @@
   .bt-fig .mk-doc-h .d.good{color:var(--bt-ink)}
   .lr-fig .mk-doc.ok{background:var(--lr-weak);border-color:var(--lr-line)}
   .lr-fig .mk-doc-h .d.good{color:var(--lr-ink)}
+  .ktv-fig .mk-doc.ok{background:var(--ktv-weak);border-color:var(--ktv-line)}
+  .ktv-fig .mk-doc-h .d.good{color:var(--ktv-ink)}
   /* v0.9.321 */
   .qc-fig .mk-doc.ok{background:var(--qc-weak);border-color:var(--qc-line)}
   .qc-fig .mk-doc-h .d.good{color:var(--qc-ink)}
@@ -1255,7 +1261,7 @@ crossorigin="anonymous"></script>
     <nav class="lnav">
       <!-- v0.9.280：logo 整块做成「回首页」的入口（用户定案）。href 由 syncLogoHome() 跟着界面语言重算 ——
            /ja/ 点回来还是 /ja/，不掉语言。⚠️ 里面不放 <div>：<a> 的内容模型是「透明」，改成 span 更干净。 -->
-      <a class="logo" id="logoHome" href="/"><span class="logo-mark" data-keep-han>字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.407</span></a>
+      <a class="logo" id="logoHome" href="/"><span class="logo-mark" data-keep-han>字</span><span data-i18n="brandName">随心字幕 AI</span> <span class="ver">v0.9.408</span></a>
       <div class="spacer"></div>
       <!-- v0.9.317：全站统一导航（渲染进 #topNav）。site-nav.js 同版退役：首页早已没有
            #siteNav/#toolCards 挂载点（276/277 撤的），它在首页一直是空转的死引用，删。 -->
@@ -1416,6 +1422,16 @@ crossorigin="anonymous"></script>
         </div>
         <div class="tc-n" data-i18n="tcLrN">歌词打轴</div>
         <p class="tc-d" data-i18n="tcLrD">听歌逐句点时间，导出 LRC</p>
+      </a>
+
+      <!-- v0.9.408：第二十二张内部工具卡 —— ktv=KTV 字幕制作（逐字扫色，导出带 \\kf 的 ASS） -->
+      <a class="tc ktv" href="/ktv.html">
+        <div class="tc-top">
+          <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 11v1a7 7 0 0 1-14 0v-1"/><path d="M12 19v3"/><path d="M8 22h8"/></svg></div>
+          <span class="tc-go" data-i18n="tcGo">进入 →</span>
+        </div>
+        <div class="tc-n" data-i18n="tcKtvN">KTV字幕</div>
+        <p class="tc-d" data-i18n="tcKtvD">跟着伴奏逐字扫色，导出卡拉OK字幕</p>
       </a>
 
       <!-- v0.9.321：第十七张内部工具卡 —— qc=字幕质检（按语言的规矩查，17 条规则）。 -->
@@ -2127,6 +2143,41 @@ crossorigin="anonymous"></script>
     </div>
   </section>
 
+  <!-- v0.9.408：KTV 字幕制作详解 —— 与歌词打轴相邻但不是一个活儿：那句是「一行一个时间点」，这句是「一个字一个时长」。 -->
+  <section class="det" aria-labelledby="detKtvTitle">
+    <div class="det-in">
+      <div class="det-tx ktv">
+        <span class="det-eye" data-i18n="tcKtvN">KTV字幕</span>
+        <h2 id="detKtvTitle" data-i18n="detKtvT">每个字唱多久，跟着歌标出来</h2>
+        <p class="det-lead" data-i18n="detKtvL">放入音乐、贴入歌词，先用空格逐句打轴，再把每句摊到每个字上——按字宽自动分，也能跟着音乐逐字敲，还可以直接拖字块之间的边界微调。播放时看着唱到的字一个个变色，最后导出带 \kf 标签的 ASS，剪映、Premiere、Aegisub 都能逐字扫色。</p>
+        <ul class="det-list">
+          <li data-i18n="detKtv1">三种办法给每个字定时长：均分、逐字敲、拖边界</li>
+          <li data-i18n="detKtv2">中文按字切、英文按词切，标点跟着前一个字</li>
+          <li data-i18n="detKtv3">句尾留白可调，避免最后一个字追不上歌声</li>
+          <li data-i18n="detKtv4">导出 ASS 逐字扫色、增强 LRC 逐字、SRT 整句兜底</li>
+        </ul>
+        <a class="det-cta" href="/ktv.html"><span data-i18n="detKtvCta">打开 KTV 字幕</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="det-fig ktv-fig">
+        <div class="mk-doc">
+          <div class="mk-doc-h"><span class="d bad" data-i18n="demoLyrics">歌词</span></div>
+          <p class="mk-p" data-i18n="demoKtv1">我手一杯品尝你的美</p>
+          <p class="mk-p" data-i18n="demoKtv2">（只有整句的时间）</p>
+        </div>
+        <div class="mk-arrow">↓</div>
+        <div class="mk-doc ok">
+          <div class="mk-doc-h"><span class="d good">ASS</span></div>
+          <p class="mk-p" data-i18n="demoKtv3">{\kf33}我{\\kf30}手{\\kf28}一{\\kf41}杯</p>
+          <p class="mk-p" data-i18n="demoKtv4">每个字自带时长，视频里逐字扫色</p>
+        </div>
+        <p class="mk-note" data-i18n="mkN18">边播边看，预览即成品</p>
+      </div>
+    </div>
+  </section>
+
   <!-- v0.9.321：第十七段详解 —— 字幕质检。 -->
   <section class="det rev" aria-labelledby="detQcTitle">
     <div class="det-in">
@@ -2242,7 +2293,7 @@ crossorigin="anonymous"></script>
 <div class="footer-oss"><a href="https://github.com/psjmz/ai-subtitle-translator" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>Open Source · AGPL-3.0 · Self-host on GitHub</a></div>
 
 
-<script src="/i18n/core.js?v=0.9.407"></script><!-- v0.9.407：字典骨架（27 语字典已按语言拆到 i18n/dict.*.js） -->
+<script src="/i18n/core.js?v=0.9.408"></script><!-- v0.9.407：字典骨架（27 语字典已按语言拆到 i18n/dict.*.js） -->
 <script src="demo-i18n.js?v=0.9.333"></script><!-- v0.9.333：首页演示区样例文案 27 语，独立一份，不动 site-i18n.js --><!-- v0.9.277：27 语界面字典，与 /translate.html 共用一份 -->
 <script>
 /* =============================================================================
@@ -2449,9 +2500,9 @@ function repaintStats() { if (statsRaw) paintStats(statsRaw); }
 </script>
 <!-- v0.9.317：site-nav.js 退役 —— 首页 276/277 起就没有 #siteNav/#toolCards 挂载点，
      它在这里一直是空转的死引用；统一导航由下面的 site-topnav.js 接管（文件保留，历史回归测试还读它） -->
-<script src="site-topnav.js?v=0.9.407"></script>
+<script src="site-topnav.js?v=0.9.408"></script>
 <!-- v0.9.371：右下角反馈浮窗。只挂首页（10-23 定案，别的页不挂），
      抽屉组件自带中/英两套文案，不跟 27 语字典走 -->
-<script src="site-feedback.js?v=0.9.407" defer></script>
+<script src="site-feedback.js?v=0.9.408" defer></script>
 </body>
 </html>

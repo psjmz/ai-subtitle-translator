@@ -9,26 +9,27 @@
 <meta name="description" content="免费在线 KTV 字幕制作：放入音乐、贴入歌词，逐句打轴后自动切到每个字，边拖边调，实时看扫色效果，导出带 \kf 标签的 ASS 给剪映与 Premiere，也能导出逐字增强 LRC。纯浏览器制作，音频不上传。">
 <meta name="keywords" content="KTV字幕,卡拉OK字幕制作,逐字歌词,ASS字幕下载,karaoke subtitles,ass karaoke maker,lrc逐字,歌词扫色,视频字幕生成">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#5B21B6">
+<meta name="theme-color" content="#DB2777">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!--SEO-HEAD-END-->
 <!--ANALYTICS-->
 <style>
   /* 视觉系统沿用 v0.9.249「收敛精修」：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
-     v0.9.406：本页认领「靛紫」色线 #5B21B6 ——
-     歌词打轴页是酒红、歌词相关若同色会让用户分不清自己在哪一页；
-     KTV 是「把歌词再切到字」，与打轴页相邻但不是一个活儿，故另起一色。 */
+     v0.9.406：本页认领「霓虹洋红」色线 #DB2777 ——
+     最初选的靛紫 #5B21B6 已被「简繁转换」页占用，同色会让两张卡片分不清；
+     洋红在全站没人用，且与本页默认的金色扫色（--sung）是卡拉OK 霓虹灯的经典搭配。
+     歌词打轴页是酒红 #9D174D（暗桑葚），本页是亮洋红，同屏不会混。 */
   :root{
     --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
     --line:#E9E9EF; --line-strong:#DEDEE5;
     --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
-    --acc:#5B21B6; --acc-weak:#F4F0FD; --acc-line:#CDBBF2; --acc-ink:#4C1D95;
+    --acc:#DB2777; --acc-weak:#FDECF4; --acc-line:#F6BCD2; --acc-ink:#9D174D;
     --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
     --warn:#B4700A; --warn-weak:#FEF6E7;
     --del:#DC2626; --del-weak:#FEF2F2;
     --r-card:14px; --r-ctl:9px; --r-btn:10px;
     --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
-    --sh-btn:0 2px 8px rgba(91,33,182,.22);
+    --sh-btn:0 2px 8px rgba(219,39,119,.22);
     --ctl-h:34px;
     /* 卡拉OK双色：默认未唱白、已唱金 —— 导出时会写进 ASS 样式 */
     --sung:#FFD54A; --unsung:#FFFFFF;
@@ -157,7 +158,7 @@
     .cutbar{height:50px}
   }
 </style>
-<script src="ui-codes.js?v=0.9.407"></script>
+<script src="ui-codes.js?v=0.9.408"></script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
 crossorigin="anonymous"></script>
 </head>
@@ -282,9 +283,9 @@ crossorigin="anonymous"></script>
   </footer>
 </div>
 
-<script src="ktv-i18n.js?v=0.9.407"></script>
-<script src="/i18n/tp-boot.js?v=0.9.407"></script>
-<script src="ktv-core.js?v=0.9.407"></script>
+<script src="ktv-i18n.js?v=0.9.408"></script>
+<script src="/i18n/tp-boot.js?v=0.9.408"></script>
+<script src="ktv-core.js?v=0.9.408"></script>
 <script>
 'use strict';
 var I18N = window.KTV_I18N.DICT, LANGS = window.KTV_I18N.LANGS;
@@ -401,7 +402,7 @@ $('#btnParse').addEventListener('click', function () {
   else if (/\d\d:\d\d:\d\d[,.]/.test(tx)) parsed = C.parseSrt(tx);
   else parsed = C.parseLyrics(tx);
   if (!parsed.length) { showMsg('msgNoLy', 'err'); return; }
-  S.lines = parsed.map(function (l) { return { text: l.text, t: l.t, end: null, units: null, geo: null }; });
+  S.lines = parsed.map(function (l) { return { text: l.text, t: l.t, end: null, units: null, geo: null, touched: 0 }; });
   /* 先补全句子结束时间，再给打了轴的句子直接均分 */
   C.computeEnds(S.lines, 3000);
   S.lines.forEach(function (l) { if (l.t != null) cutLine(l); });
@@ -433,6 +434,14 @@ function tapLine() {
   /* 打完马上补 ends 并给这句切字，用户可以立刻去第 4 步调 */
   C.computeEnds(S.lines, 3000);
   cutLine(l);
+  /* ⚠️ 补切上一句：这一句一敲，上一句的 end 就被顶到这里的 t —— 而上一句的 geo
+     是按「t+3000」这个旧 end 切的。不重切的话最后几个字会提前收色、句末空一大段
+     （实测：3500ms 的行只切出 2560ms，末尾 940ms 是死的）。
+     用户手动拖过 / 逐字敲过 / 缩放过的句子不重切 —— 那会把他们调好的比例冲掉。 */
+  S.lines.forEach(function (x) {
+    if (x !== l && x.t != null && x.geo && !x.touched) cutLine(x);
+  });
+  reportTool('tap', { cues: S.lines.filter(function (x) { return x.t != null; }).length, n: S.lines.length });
   syncCards();
 }
 function undoLine() {
@@ -440,7 +449,7 @@ function undoLine() {
   if (i < 0) return;
   while (i >= 0 && S.lines[i].t == null) i--;
   if (i < 0) return;
-  S.lines[i].t = null; S.lines[i].end = null; S.lines[i].geo = null;
+  S.lines[i].t = null; S.lines[i].end = null; S.lines[i].geo = null; S.lines[i].touched = 0;
   S.cur = i;
   C.computeEnds(S.lines, 3000);
   syncCards();
@@ -499,6 +508,8 @@ function applyTaps() {
   if (!S.tapMode) return;
   var l = S.lines[S.tapMode.i];
   l.geo = C.fromTaps(l, S.tapMode.taps, { tailRatio: currentTail() });
+  l.touched = 1;   /* 用户亲手敲出来的比例，后续打轴不许重切覆盖 */
+  reportTool('retap', { cues: S.tapMode.taps.length, n: S.lines.length });
   syncCards();
 }
 function endTapMode(keep) {
@@ -518,6 +529,8 @@ function renderTapTip() {
 $('#btnEven').addEventListener('click', function () {
   var l = cur(); if (!l || l.t == null) { showMsg('msgNeedAxis', 'warn'); return; }
   l.geo = C.distribute(l, { tailRatio: currentTail() });
+  l.touched = 0;   /* 均分出来的就是自动值，后续打轴可以继续重切 */
+  reportTool('even', { cues: l.units.length, n: S.lines.length });
   syncCards();
 });
 $('#btnRetap').addEventListener('click', function () {
@@ -530,11 +543,12 @@ $('#btnRetap').addEventListener('click', function () {
 $('#btnReset1').addEventListener('click', function () {
   var l = cur(); if (!l || l.t == null) return;
   l.geo = C.distribute(l, { tailRatio: currentTail() });
+  l.touched = 0;
   syncCards();
 });
 $('#tailSel').addEventListener('change', function () {
   var tail = currentTail();
-  S.lines.forEach(function (l) { if (l.t != null) l.geo = C.distribute(l, { tailRatio: tail }); });
+  S.lines.forEach(function (l) { if (l.t != null) { l.geo = C.distribute(l, { tailRatio: tail }); l.touched = 0; } });
   syncCards();
 });
 $('#btnScale9').addEventListener('click', function () { scaleSel(0.9); });
@@ -542,6 +556,7 @@ $('#btnScale11').addEventListener('click', function () { scaleSel(1.1); });
 function scaleSel(k) {
   var l = cur(); if (!l || !l.geo) return;
   l.geo = C.scaleLine(l.geo, l, k);
+  l.touched = 1;   /* 整体快/慢改的是比例，别被后续打轴重切掉 */
   syncCards();
 }
 
@@ -563,9 +578,16 @@ document.addEventListener('mousemove', function (e) {
   var dx = e.clientX - S.drag.x0;
   var dms = Math.round(dx / S.drag.w * S.drag.spanMs);
   l.geo = C.setEdge(l.geo, S.drag.idx, S.drag.orig + dms);
+  l.touched = 1;   /* 手动拖过的边界，后续打轴不许重切覆盖 */
   renderCut();
 });
-document.addEventListener('mouseup', function () { S.drag = null; renderCut(); });
+document.addEventListener('mouseup', function () {
+  /* 只有真拖过（S.drag 还在）才报 —— 普通点击也会走 mouseup */
+  if (!S.drag) return;
+  S.drag = null;
+  reportTool('drag', { n: S.lines.length });
+  renderCut();
+});
 
 function cur() { return (S.sel >= 0 && S.sel < S.lines.length) ? S.lines[S.sel] : null; }
 
@@ -776,6 +798,6 @@ applyI18n();
     <p style="margin-top:8px;">适合给翻唱视频配字幕、给演唱会录像上歌词、自制音乐 MV、以及卡拉OK视频的字幕制作。</p>
   </section>
 <!--SEO-COPY-END-->
-<script src="site-topnav.js?v=0.9.407" data-tool="ktv"></script>
+<script src="site-topnav.js?v=0.9.408" data-tool="ktv"></script>
 </body>
 </html>

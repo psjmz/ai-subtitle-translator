@@ -31,7 +31,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.407';
+const ASSET_VER = '0.9.408';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -929,9 +929,8 @@ const TOOL_PAGE = {
   /* v0.9.356：自动生成字幕页与画面硬字幕提取页。
      act 复用现有动作：run=真跑了一次识别，apply=出了结果，export=真下载了文件。 */
   autosub: 'autosub', ocrsub: 'ocrsub',
-  /* v0.9.406：KTV 逐字歌词页。前端从第一版起就在发 page:'ktv'，
-     但这里没有它 —— pickWL 认不出来，整条记录被直接丢弃，后台永远是 0。
-     与 v0.9.355 的 ytfix 是同一类漏登记。 */
+  /* v0.9.408：KTV 字幕制作页。与 v0.9.355 的 ytfix 是同一类漏登记 ——
+     pickWL 认不出来会整条丢弃，后台永远是 0。 */
   ktv: 'ktv'
 };
 /* ⚠️ 动作白名单：与六页各自埋点处传的 act 一一对应（逐页对齐，共 14 个）。
@@ -956,13 +955,15 @@ const TOOL_ACT = {
   /* v0.9.356：autosub 页的「真跑完一次识别」。
      不复用 check —— 那一档在后台记的是「体检」，跟识别不是一回事；
      漏在这里的话，这一页的上报会被下面那道「page/act 对不上就整条丢」的闸全丢掉。 */
-  run: 'run'
+  run: 'run',
+  /* v0.9.408：KTV 页动作 —— 打轴 / 切字（均分·逐字敲·拖动）/ 导出 */
+  tap: 'tap', even: 'even', retap: 'retap', drag: 'drag'
 };
 const TOOL_FMT = { srt: 'srt', vtt: 'vtt', ass: 'ass', txt: 'txt', json: 'json',
   /* v0.9.316：table 页 xlsx/csv、batch 页 zip、lrc 页 lrc */
   xlsx: 'xlsx', csv: 'csv', zip: 'zip', lrc: 'lrc',
-  /* v0.9.406：KTV 页的「下载增强 LRC」——逐字 LRC 与普通 lrc 不是同一种东西，
-     分开记才能看出用户到底要哪一种。此前不在白名单，这个格式的导出数一直是 0。 */
+  /* v0.9.408：KTV 页的「下载增强 LRC」——逐字 LRC 与普通 lrc 不是同一种东西，
+     分开记才能看出用户到底要哪一种。ASS 与 SRT 复用上面的 ass / srt。 */
   'enh-lrc': 'enh-lrc' };
 function readTEvents(){
   try {
@@ -1294,6 +1295,14 @@ function serveStatic(req, res, urlPath){
   const mlm = p.match(/^\/(?:([a-zA-Z][a-zA-Z\-]*)\/)?multilang\.html$/);
   if (mlm && (!mlm[1] || SEO_ROUTE['/' + mlm[1]])) {
     serveIndexLang(req, res, mlm[1] ? SEO_ROUTE['/' + mlm[1]] : 'zh-CN', 'multilang'); return;
+  }
+
+  /* v0.9.408：KTV 字幕制作页路由（/ktv.html 与 /<lang>/ktv.html）。
+     不并进上面那个十七页共用正则——那条正则每加一页都要改一次，历史上有工具
+     就是因为漏改而整页 404，这里照 v0.9.373  multilang 的做法单独挂一条。 */
+  const ktvm = p.match(/^\/(?:([a-zA-Z][a-zA-Z\-]*)\/)?ktv\.html$/);
+  if (ktvm && (!ktvm[1] || SEO_ROUTE['/' + ktvm[1]])) {
+    serveIndexLang(req, res, ktvm[1] ? SEO_ROUTE['/' + ktvm[1]] : 'zh-CN', 'ktv'); return;
   }
   /* v0.9.323：内容页（指南）路由 —— 独立分支，不动上面那条 16 页白名单正则。
      URL 形态：/guides/<slug>.html（简中）与 /<lang>/guides/<slug>.html（语言版）；
@@ -2952,7 +2961,7 @@ const SEO_YTFIX = {
 };
 
 /* zh-CN 走站点根路径（/merge.html），其余语言挂在自己的语言目录（/en/merge.html） */
-const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {}, SPLIT_PATH = {}, TABLE_PATH = {}, BATCH_PATH = {}, LRC_PATH = {}, QC_PATH = {}, YTFIX_PATH = {}, AUTOSUB_PATH = {}, OCRSUB_PATH = {}, MULTILANG_PATH = {};
+const MERGE_PATH = {}, CLEAN_PATH = {}, TRANSLATE_PATH = {}, CONVERT_PATH = {}, BILINGUAL_PATH = {}, SHIFT_PATH = {}, REPAIR_PATH = {}, EXTRACT_PATH = {}, GLOSSARY_PATH = {}, VIDEOSUB_PATH = {}, HANCONV_PATH = {}, SPLIT_PATH = {}, TABLE_PATH = {}, BATCH_PATH = {}, LRC_PATH = {}, QC_PATH = {}, YTFIX_PATH = {}, AUTOSUB_PATH = {}, OCRSUB_PATH = {}, MULTILANG_PATH = {}, KTV_PATH = {};
 
 SEO_LANGS.forEach(function (l) {
   MERGE_PATH[l] = (l === 'zh-CN') ? '/merge.html' : '/' + l + '/merge.html';
@@ -2979,6 +2988,8 @@ SEO_LANGS.forEach(function (l) {
   TABLE_PATH[l] = (l === 'zh-CN') ? '/table.html' : '/' + l + '/table.html';
   BATCH_PATH[l] = (l === 'zh-CN') ? '/batch.html' : '/' + l + '/batch.html';
   LRC_PATH[l] = (l === 'zh-CN') ? '/lrc.html' : '/' + l + '/lrc.html';
+  /* v0.9.408：KTV 字幕制作页 */
+  KTV_PATH[l] = (l === 'zh-CN') ? '/ktv.html' : '/' + l + '/ktv.html';
   /* v0.9.321：字幕质检页 */
   QC_PATH[l] = (l === 'zh-CN') ? '/qc.html' : '/' + l + '/qc.html';
   /* v0.9.352：YouTube 字幕优化页 */
@@ -5608,6 +5619,257 @@ const SEO_BATCH = {
   },
 };
 
+/* v0.9.408：第二十二个页面 —— KTV 字幕制作（逐字扫色卡拉OK，导出带 \kf 标签的 ASS）。
+   title / desc / kw 是 SEO head 三件套，intro / feat / who 是爬虫唯一能读到的
+   静态正文三段（seoCopy 注入 <!--SEO-COPY-START-->），siteName / jsonldName 走品牌口径。
+   \kf 的单位是百分秒不是毫秒，且颜色是倒着写的 BGR —— 这两条由 ktv-core.js 内部兜住，
+   页面与导出层都不直接拼字符串。 */
+const SEO_KTV = {
+  'zh-CN': {
+    title: 'KTV字幕制作：跟着伴奏逐字打轴，导出卡拉OK字幕 ASS/LRC - 在线免费 | 随心字幕 AI',
+    desc: '免费在线 KTV 字幕制作：放入音乐、贴入歌词，逐句打轴后自动切到每个字，也能跟着音乐逐字敲、或拖边界微调，实时看扫色效果，导出带 \\\\kf 标签的 ASS 给剪映与 Premiere，另有逐字增强 LRC。',
+    kw: 'KTV字幕,卡拉OK字幕制作,逐字歌词,ASS字幕下载,karaoke subtitles,ass karaoke maker,lrc逐字,歌词扫色,视频字幕生成',
+    intro: '放入音乐、贴入歌词，逐句打轴之后把每句摊到每个字上——按字宽自动分、跟着音乐逐字敲、或直接拖字块之间的边界微调。播放时看着唱到的字一个个变色，最后导出卡拉OK字幕。',
+    feat: '中文按字切、英文按词切，标点跟着前一个字走；句尾留白可以调，避免最后一个字追不上歌声。导出 ASS 给剪映 / Premiere / Aegisub（带 \\\\kf 逐字标签），增强 LRC 给支持逐字歌词的播放器，SRT 整句兜底。全程在浏览器里完成，音频不上传。',
+    who: '给翻唱视频配字幕、给演唱会录像上歌词、自制音乐 MV、以及卡拉OK视频的字幕制作者。',
+    siteName: '随心字幕 AI', jsonldName: '随心字幕 AI', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'zh-TW': {
+    title: 'KTV字幕製作：跟著伴奏逐字打軸，匯出卡拉OK字幕 ASS/LRC - 線上免費 | 隨心字幕 AI',
+    desc: '免費線上 KTV 字幕製作：放入音樂、貼入歌詞，逐句打軸後自動切到每個字，也能跟著音樂逐字敲、或拖邊界微調，即時看掃色效果，匯出帶 \\\\kf 標籤的 ASS 給剪映與 Premiere，另有逐字增強 LRC。',
+    kw: 'KTV字幕,卡拉OK字幕製作,逐字歌詞,ASS字幕下載,karaoke subtitles,ass karaoke maker,lrc逐字,歌詞掃色,影片字幕產生',
+    intro: '放入音樂、貼入歌詞，逐句打軸之後把每句攤到每個字上——按字寬自動分、跟著音樂逐字敲、或直接拖字塊之間的邊界微調。播放時看著唱到的字一個個變色，最後匯出卡拉OK字幕。',
+    feat: '中文按字切、英文按詞切，標點跟著前一個字走；句尾留白可以調，避免最後一個字追不上歌聲。匯出 ASS 給剪映 / Premiere / Aegisub（帶 \\\\kf 逐字標籤），增強 LRC 給支援逐字歌詞的播放器，SRT 整句兜底。全程在瀏覽器裡完成，音訊不上傳。',
+    who: '給翻唱影片配字幕、給演唱會錄影上歌詞、自製音樂 MV、以及卡拉OK影片的字幕製作者。',
+    siteName: '隨心字幕 AI', jsonldName: '隨心字幕 AI', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'en': {
+    title: 'KTV Karaoke Subtitle Maker - Time Every Character, Export ASS | AI-SRTSub',
+    desc: 'Free online karaoke subtitle maker: load a song, paste the lyrics, tap each line, then split it into characters automatically or tap them with the music and fine-tune by dragging. Export ASS with \\\\kf tags for CapCut and Premiere, or word-level enhanced LRC.',
+    kw: 'karaoke subtitle maker,ass karaoke,word level lyrics,kf tags,karaoke lrc,lyric sweep,ass karaoke maker,ai srtsub',
+    intro: 'Load a song, paste the lyrics, tap each line, then spread every line across its characters - automatically by width, tapping along with the music, or dragging boundaries. Watch words light up as they are sung.',
+    feat: 'Chinese splits per character, English per word, punctuation rides along. A tunable tail gap keeps the last character from overrunning the vocal. Export ASS for CapCut / Premiere / Aegisub with \\\\kf tags, enhanced LRC for word-level players, or whole-line SRT as a fallback. Everything runs in your browser - no uploads.',
+    who: 'Creators adding lyrics to cover videos and concert footage, makers of music MVs, and anyone producing karaoke subtitles.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'ja': {
+    title: 'KTV カラオケ字幕作成 - 1文字ずつタイミングを打って ASS に書き出し | AI-SRTSub',
+    desc: '無料オンラインのカラオケ字幕作成ツール：曲を入れて歌詞を貼り、行ごとに打刻したら自動で1文字単位に分割。音楽に合わせて1文字ずつ叩いたり、境界線をドラッグして微調整もできます。\\\\kf タグ付きの ASS を CapCut や Premiere へ、逐語の拡張 LRC にも書き出せます。',
+    kw: 'カラオケ字幕,ass カラオケ,逐語歌詞,kf タグ,karaoke subtitle maker,lyric sweep,歌詞アニメーション',
+    intro: '曲を入れて歌詞を貼り、行ごとにタイミングを打ったら、それを1文字単位に割り振ります。文字幅での自動分割、音楽に合わせた逐字タップ、境界線のドラッグ調整が選べます。',
+    feat: '日本語は1文字単位、英語は単語単位で分割され、句読点は前の要素に付きます。行末の余白も調整でき、最後の1文字が歌に追いつかなくなるのを防げます。\\\\kf タグ付きの ASS は CapCut / Premiere / Aegisub 向け、拡張 LRC は逐語対応プレイヤー向け、SRT は保険として行単位。すべてブラウザ内で処理されます。',
+    who: 'カバー動画に歌詞を入れる人、ライブ映像に字幕を付ける人、音楽 MV やカラオケ動画を作る人。',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'es': {
+    title: 'Creador de subtítulos KTV: tiempo por carácter, exporta ASS | AI-SRTSub',
+    desc: 'Creador de subtítulos de karaoke gratis en línea: carga la canción, pega la letra, marca cada verso y divídelo en caracteres automáticamente, o márcalos con la música y ajústalos arrastrando. Exporta ASS con etiquetas \\\\kf para CapCut y Premiere, o LRC palabra por palabra.',
+    kw: 'creador subtitulos karaoke,ass karaoke,letra palabra por palabra,etiquetas kf,karaoke lrc,barrido de letra',
+    intro: 'Carga la canción, pega la letra, marca cada verso y reparte cada línea entre sus caracteres: por ancho automáticamente, pulsando con la música o arrastrando fronteras.',
+    feat: 'El chino se divide por carácter y el inglés por palabra; la puntuación se anexa al anterior. La cola final es ajustable para que el último carácter no se pase de la voz. Exporta ASS para CapCut / Premiere / Aegisub con etiquetas \\\\kf, LRC mejorado o SRT por versos. Todo en el navegador, sin subidas.',
+    who: 'Creadores que ponen letra a vídeos de versiones y conciertos, autores de videoclips y quienes hacen subtítulos de karaoke.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'pt': {
+    title: 'Criador de legendas KTV: tempo por caractere, exporte ASS | AI-SRTSub',
+    desc: 'Criador de legendas de karaokê grátis online: carregue a música, cole a letra, marque cada verso e divida em caracteres automaticamente, ou marque com a música e ajuste arrastando. Exporte ASS com etiquetas \\\\kf para CapCut e Premiere, ou LRC palavra por palavra.',
+    kw: 'criador legendas karaoke,ass karaoke,letra palavra por palavra,etiquetas kf,karaoke lrc,varredura de letra',
+    intro: 'Carregue a música, cole a letra, marque cada verso e distribua cada linha pelos seus caracteres: automaticamente pela largura, batendo com a música ou arrastando as fronteiras.',
+    feat: 'O chinês divide por caractere e o inglês por palavra; a pontuação acompanha o anterior. A folga final é ajustável para o último caractere não passar da voz. Exporte ASS para CapCut / Premiere / Aegisub com etiquetas \\\\kf, LRC avançado ou SRT por versos. Tudo no navegador, sem envios.',
+    who: 'Criadores que colocam letra em vídeos de covers e shows, autores de videoclipes e quem produz legendas de karaokê.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'ko': {
+    title: 'KTV 자막 제작기 - 글자마다 시간을 주고 ASS로 내보내기 | AI-SRTSub',
+    desc: '무료 온라인 KTV 자막 제작기: 노래를 넣고 가사를 붙인 뒤 줄마다 찍으면 자동으로 글자 단위로 나뉩니다. 음악에 맞춰 직접 찍거나 경계선을 끌어 조정할 수도 있습니다. \\\\kf 태그가 든 ASS를 CapCut·Premiere로, 확장 LRC로도 내보낼 수 있습니다.',
+    kw: 'KTV 자막,카라오케 자막,글자별 가사,ass karaoke,kf 태그,가사 스윕,자막 제작',
+    intro: '노래를 넣고 가사를 붙인 뒤 줄마다 찍으면, 각 줄이 글자 단위로 펼쳐집니다. 글자 너비自动 배분, 음악에 맞춘 탭, 경계선 드래그 중 고를 수 있습니다.',
+    feat: '중국어는 글자 단위, 영어는 단어 단위로 나뉘고 문장부호는 앞에 붙습니다. 끝 여백도 조절해 마지막 글자가 노래보다 길어지지 않게 할 수 있습니다. \\\\kf 태그 ASS는 CapCut / Premiere / Aegisub용, 확장 LRC는逐語 대응 플레이어용, SRT는 줄 단위 예비용. 모두 브라우저에서 처리됩니다.',
+    who: '커버 영상에 가사를 넣는 사람, 공연 영상에 자막을 다는 사람, 음악 MV와 노래방 영상을 만드는 사람.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'de': {
+    title: 'KTV-Untertitel erstellen: Zeit pro Zeichen, ASS exportieren | AI-SRTSub',
+    desc: 'Kostenloser Karaoke-Untertitel-Maker online: Lied laden, Text einfügen, Zeilen antippen und automatisch in Zeichen zerlegen - oder im Takt mitklopfen und per Ziehen verfeinern. Export als ASS mit \\\\kf-Tags für CapCut und Premiere oder als wortweises LRC.',
+    kw: 'karaoke untertitel erstellen,ass karaoke,zeichenweise lyrics,kf tags,karaoke lrc,textdurchlauf,untertitel maker',
+    intro: 'Lied laden, Text einfügen, Zeilen antippen - danach wird jede Zeile auf ihre Zeichen verteilt: automatisch nach Breite, im Takt mitgeklopft oder durch Ziehen der Grenzen.',
+    feat: 'Chinesisch wird zeichenweise geteilt, Englisch wortweise; Satzzeichen hängen am vorigen Zeichen. Der Schlussabstand ist einstellbar, damit das letzte Zeichen die Stimme nicht überläuft. Export als ASS mit \\\\kf-Tags für CapCut / Premiere / Aegisub, erweitertes LRC oder zeilenweises SRT. Alles im Browser, ohne Upload.',
+    who: 'Creator, die Cover- und Konzertvideos mit Text versehen, Macher von Musikvideos und alle, die Karaoke-Untertitel brauchen.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'fr': {
+    title: 'Créateur de sous-titres KTV : temps par caractère, export ASS | AI-SRTSub',
+    desc: 'Créateur de sous-titres karaoké gratuit en ligne : chargez la chanson, collez les paroles, marquez chaque ligne et découpez-la en caractères automatiquement, ou tapez-les en rythme et ajustez en glissant. Exportez un ASS à balises \\\\kf pour CapCut et Premiere, ou un LRC mot à mot.',
+    kw: 'creer sous titres karaoke,ass karaoke,paroles mot a mot,balises kf,karaoke lrc,balayage paroles',
+    intro: 'Chargez la chanson, collez les paroles, marquez chaque ligne puis répartissez chaque ligne sur ses caractères : automatiquement selon la largeur, en tapant avec la musique ou en glissant les frontières.',
+    feat: 'Le chinois se coupe par caractère, l\'anglais par mot ; la ponctuation suit le précédent. La marge finale est réglable pour que le dernier caractère ne dépasse pas la voix. Exportez l\'ASS à balises \\\\kf pour CapCut / Premiere / Aegisub, le LRC enrichi ou le SRT par lignes. Tout dans le navigateur, aucun envoi.',
+    who: 'Créateurs qui ajoutent des paroles à des reprises et des concerts, auteurs de clips et personnes qui font des sous-titres karaoké.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'id': {
+    title: 'Pembuat Subtitle KTV: waktu per karakter, ekspor ASS | AI-SRTSub',
+    desc: 'Pembuat subtitle karaoke gratis online: masukkan lagu, tempel lirik, tandai setiap baris lalu bagi otomatis ke tingkat karakter, atau ketik mengikuti musik dan sesuaikan dengan menggeser. Ekspor ASS dengan tag \\\\kf untuk CapCut dan Premiere, atau LRC tingkat kata.',
+    kw: 'pembuat subtitle karaoke,ass karaoke,lirik per kata,tag kf,karaoke lrc,sapuan lirik',
+    intro: 'Masukkan lagu, tempel lirik, tandai setiap baris lalu sebarkan setiap baris ke karakter-karakternya: otomatis menurut lebar, diketik mengikuti musik, atau digeser batasnya.',
+    feat: 'Bahasa Mandarin dipotong per karakter, bahasa Inggris per kata; tanda baca ikut dengan karakter sebelumnya. Jeda akhir bisa diatur agar karakter terakhir tidak melebihi suara. Ekspor ASS dengan tag \\\\kf untuk CapCut / Premiere / Aegisub, LRC yang diperkaya, atau SRT per baris. Semua di browser, tanpa unggahan.',
+    who: 'Kreator yang memberi lirik pada video cover dan konser, pembuat video musik, serta pembuat subtitle karaoke.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'hi': {
+    title: 'KTV सबटाइटल मेकर - हर अक्षर का समय, ASS निर्यात | AI-SRTSub',
+    desc: 'मुफ़्त ऑनलाइन कैराओके सबटाइटल मेकर: गाना डालें, बोल पेस्ट करें, हर पंक्ति चिह्नित करें और उसे अपने आप अक्षरों में बाँट लें, या संगीत के साथ टैप करें और खींचकर सुधारें। CapCut और Premiere के लिए \\\\kf टैग वाला ASS, या शब्द-स्तरीय LRC निर्यात करें।',
+    kw: 'कैराओके सबटाइटल,ass karaoke,अक्षर स्तर बोल,kf टैग,karaoke lrc,बोल स्कैन',
+    intro: 'गाना डालें, बोल पेस्ट करें और हर पंक्ति पर टैप करें - फिर हर पंक्ति अपने अक्षरों में बँट जाती है: चौड़ाई के अनुसार स्वतः, संगीत के साथ टैप करके, या सीमाएँ खींचकर।',
+    feat: 'चीनी अक्षर-दर-अक्षर और अंग्रेज़ी शब्द-दर-शब्द बँटती है; विराम चिह्न पिछले के साथ जाता है। अंतिम खाली भाग बदला जा सकता है ताकि आख़िरी अक्षर आवाज़ से आगे न बढ़े। \\\\kf टैग वाला ASS CapCut / Premiere / Aegisub के लिए, बेहतर LRC शब्द-स्तर के लिए, SRT पंक्ति-स्तर का बैकअप। सब कुछ ब्राउज़र में।',
+    who: 'कवर वीडियो और कॉन्सर्ट फ़ुटेज में बोल जोड़ने वाले, म्यूज़िक वीडियो बनाने वाले और कैराओके सबटाइटल बनाने वाले।',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'th': {
+    title: 'โปรแกรมทำซับไตเติล KTV - จับเวลาทุกตัวอักษร ส่งออก ASS | AI-SRTSub',
+    desc: 'เครื่องมือทำซับไตเติลคาราโอเกะฟรีออนไลน์: ใส่เพลง วางเนื้อร้อง เคาะแต่ละบรรทัด แล้ว系统会 แบ่งลงไปถึงระดับตัวอักษรให้เอง หรือเคาะตามจังหวะแล้วลากปรับก็ได้ ส่งออก ASS ที่มีแท็ก \\\\kf สำหรับ CapCut และ Premiere หรือ LRC ระดับคำ',
+    kw: 'ทำซับไตเติลคาราโอเกะ,ass karaoke,เนื้อร้องระดับคำ,แท็ก kf,karaoke lrc,สวีปเนื้อร้อง',
+    intro: 'ใส่เพลง วางเนื้อร้อง เคาะแต่ละบรรทัด แล้วแต่ละบรรทัดจะถูกแบ่งลงไปถึงระดับตัวอักษร: อัตโนมัติตามความกว้าง เคาะตามจังหวะเพลง หรือลากเส้นแบ่ง',
+    feat: 'ภาษาจีนแบ่งตามตัวอักษร ภาษาอังกฤษแบ่งตามคำ เครื่องหมายวรรคตอนติดตามตัวก่อนหน้า ระยะเว้นท้ายปรับได้เพื่อไม่ให้ตัวสุดท้ายยาวเกินเสียงร้อง ส่งออก ASS แท็ก \\\\kf สำหรับ CapCut / Premiere / Aegisub, LRC แบบขยาย หรือ SRT ระดับบรรทัด ทั้งหมดทำในเบราว์เซอร์',
+    who: 'ผู้สร้างที่ใส่เนื้อร้องในวิดีโอคัฟเวอร์และคอนเสิร์ต ผู้ทำ MV เพลง และผู้ทำซับไตเติลคาราโอเกะ',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'vi': {
+    title: 'Trình tạo phụ đề KTV: thời gian từng ký tự, xuất ASS | AI-SRTSub',
+    desc: 'Trình tạo phụ đề karaoke miễn phí trực tuyến: thả bài hát, dán lời, gõ nhịp từng dòng rồi tự động chia đến từng ký tự, hoặc gõ theo nhạc và kéo để chỉnh. Xuất ASS có thẻ \\\\kf cho CapCut và Premiere, hoặc LRC cấp độ từ.',
+    kw: 'tao phu de karaoke,ass karaoke,loi bai hat tung tu,the kf,karaoke lrc,quet mau loi',
+    intro: 'Thả bài hát vào, dán lời, gõ nhịp từng dòng - sau đó mỗi dòng được chia xuống từng ký tự: tự động theo độ rộng, gõ theo nhạc hoặc kéo ranh giới.',
+    feat: 'Tiếng Trung chia theo ký tự, tiếng Anh theo từ; dấu câu đi kèm ký tự trước. Khoảng trống cuối có thể chỉnh để ký tự cuối không vượt quá giọng hát. Xuất ASS thẻ \\\\kf cho CapCut / Premiere / Aegisub, LRC nâng cao hoặc SRT theo dòng. Tất cả trong trình duyệt, không tải lên.',
+    who: 'Người sáng tạo thêm lời cho video cover và quay concert, người làm MV âm nhạc và người làm phụ đề karaoke.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'ru': {
+    title: 'KTV-редактор субтитров: время каждого символа, экспорт ASS | AI-SRTSub',
+    desc: 'Бесплатный онлайн-редактор субтитров караоке: загрузите песню, вставьте текст, отметьте строки и автоматически разбейте их на символы — либо отбейте по музыке и подправьте перетаскиванием. Экспорт ASS с тегами \\\\kf для CapCut и Premiere или LRC пословно.',
+    kw: 'субтитры караоке,ass karaoke,текст пословно,теги kf,karaoke lrc,заливка текста',
+    intro: 'Загрузите песню, вставьте текст, отметьте строки — затем каждая строка распределится по своим символам: автоматически по ширине, отбивкой под музыку или перетаскиванием границ.',
+    feat: 'Китайский делится по символам, английский — по словам; знаки примыкают к предыдущему. Отступ в конце настраивается, чтобы последний символ не обгонял вокал. Экспорт ASS с тегами \\\\kf для CapCut / Premiere / Aegisub, улучшенного LRC или построчного SRT. Всё в браузере, без загрузки.',
+    who: 'Авторы, добавляющие текст к каверам и концертным записям, создатели клипов и все, кто делает субтитры караоке.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'it': {
+    title: 'Creatore di sottotitoli KTV: tempo per carattere, esporta ASS | AI-SRTSub',
+    desc: 'Creatore di sottotitoli karaoke gratuito online: carica la canzone, incolla il testo, batti ogni riga e dividila automaticamente in caratteri, oppure battili a tempo e rifinisci trascinando. Esporta ASS con tag \\\\kf per CapCut e Premiere o LRC parola per parola.',
+    kw: 'creare sottotitoli karaoke,ass karaoke,testo parola per parola,tag kf,karaoke lrc,scorrimento testo',
+    intro: 'Carica la canzone, incolla il testo, batti ogni riga: ogni riga si distribuisce poi sui propri caratteri, automaticamente per larghezza, battendo a tempo o trascinando i confini.',
+    feat: 'Il cinese si divide per carattere, l\'inglese per parola; la punteggiatura segue il precedente. Lo spazio finale è regolabile perché l\'ultimo carattere non superi la voce. Esporta ASS con tag \\\\kf per CapCut / Premiere / Aegisub, LRC avanzato o SRT per righe. Tutto nel browser, nessun caricamento.',
+    who: 'Creator che aggiungono testi a cover e concerti, autori di videoclip e chi realizza sottotitoli karaoke.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'ar': {
+    title: 'صانع ترجمات KTV: وقت لكل حرف، تصدير ASS | AI-SRTSub',
+    desc: 'صانع ترجمات كاريوكي مجاني عبر الإنترنت: حمّل الأغنية، والصق الكلمات، وحدّد كل سطر ليُقسَّم تلقائياً إلى حروف، أو اضغط مع الموسيقى واضبط بالسحب. صدّر ASS بوسوم \\\\kf لبرنامجي CapCut و Premiere، أو LRC على مستوى الكلمة.',
+    kw: 'صناعة ترجمات كاريوكي,ass karaoke,كلمات حرف بحرف,وسوم kf,karaoke lrc,انزلاق الكلمات',
+    intro: 'حمّل الأغنية، والصق الكلمات، وحدّد كل سطر - ثم يُوزَّع كل سطر على حروفه: تلقائياً حسب العرض، أو بالضغط مع الموسيقى، أو بسحب الحدود.',
+    feat: 'الصينية تُقسَّم حرفاً بحرف والإنجليزية كلمة كلمة، وتلحق علامات الترقيم بما قبلها. والفراغ الأخير قابل للضبط حتى لا يتجاوز آخر حرف صوت الغناء. التصدير: ASS بوسوم \\\\kf لبرامج CapCut / Premiere / Aegisub، أو LRC مُحسَّن، أو SRT على مستوى السطر. كل شيء في المتصفح دون رفع.',
+    who: 'صنّاع المحتوى الذين يضيفون الكلمات إلى فيديوهات الغلاف والحفلات، وصانعو الفيديوهات الموسيقية، وكل من يصنع ترجمات الكاريوكي.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'tr': {
+    title: 'KTV Altyazı Aracı: Karaktere Göre Süre, ASS Dışa Aktarma | AI-SRTSub',
+    desc: 'Ücretsiz çevrimiçi karaoke altyazı aracı: şarkıyı yükleyin, sözleri yapıştırın, her satırı işaretleyin ve karakterlere otomatik bölün; ya da müzikle vurup sürükleyerek ince ayar yapın. CapCut ve Premiere için \\\\kf etiketli ASS veya kelime bazlı LRC dışa aktarın.',
+    kw: 'karaoke altyazi olusturma,ass karaoke,kelime kelime sozler,kf etiketleri,karaoke lrc,soz renklendirme',
+    intro: 'Şarkıyı yükleyin, sözleri yapıştırın, her satırı işaretleyin - ardından her satır kendi karakterlerine dağıtılır: genişliğe göre otomatik, müzikle vurarak veya sınırları sürükleyerek.',
+    feat: 'Çince karakter karakter, İngilizce kelime kelime bölünür; noktalama işaretleri öncekine bağlanır. Son karakterin sesi aşmaması için sonda boşluk ayarlanabilir. \\\\kf etiketli ASS CapCut / Premiere / Aegisub için, gelişmiş LRC kelime bazlı, SRT satır bazlı yedek. Her şey tarayıcıda.',
+    who: 'Cover ve konser videolarına söz ekleyenler, müzik videosu yapanlar ve karaoke altyazısı hazırlayanlar.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'nl': {
+    title: 'KTV-ondertitelmaker: tijd per teken, ASS exporteren | AI-SRTSub',
+    desc: 'Gratis online karaoke-ondertitelmaker: zet het nummer erin, plak de songtekst, tik elke regel en laat hem automatisch in tekens verdelen, of tik mee met de muziek en sleep voor de fijnafstelling. Exporteer ASS met \\\\kf-tags voor CapCut en Premiere of LRC per woord.',
+    kw: 'karaoke ondertiteling maken,ass karaoke,songtekst per woord,kf tags,karaoke lrc,tekstscan',
+    intro: 'Zet het nummer erin, plak de songtekst en tik elke regel aan - daarna verdeelt elke regel zich over zijn tekens: automatisch op breedte, meetikkend met de muziek of door grenzen te slepen.',
+    feat: 'Chinees deelt per teken, Engels per woord; leestekens volgen het vorige teken. De ruimte aan het eind is instelbaar zodat het laatste teken de zang niet voorbijschiet. Exporteer ASS met \\\\kf-tags voor CapCut / Premiere / Aegisub, uitgebreid LRC of SRT per regel. Alles in de browser, zonder upload.',
+    who: 'Makers die songteksten toevoegen aan cover- en concertvideo\'s, makers van muziekvideo\'s en iedereen die karaoke-ondertiteling maakt.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'pl': {
+    title: 'Twórca napisów KTV: czas dla każdego znaku, eksport ASS | AI-SRTSub',
+    desc: 'Darmowy twórca napisów karaoke online: wrzuć utwór, wklej tekst, stuknij każdą linijkę i podziel ją automatycznie na znaki, albo wystukuj z muzyką i poprawiaj przesuwaniem. Eksportuj ASS ze znacznikami \\\\kf dla CapCuta i Premiere albo LRC słowo po słowie.',
+    kw: 'tworzenie napisow karaoke,ass karaoke,tekst slowo po slowie,znaczniki kf,karaoke lrc,przebieg tekstu',
+    intro: 'Wrzucasz utwór, wklejasz tekst, stukasz każdą linijkę - potem każda linijka rozkłada się na swoje znaki: automatycznie według szerokości, wystukiwana z muzyką lub przesuwana.',
+    feat: 'Chiński dzieli się na znaki, angielski na słowa; interpunkcja idzie z poprzednim. Odstęp na końcu jest regulowany, żeby ostatni znak nie wyprzedził głosu. Eksportuj ASS ze znacznikami \\\\kf dla CapCut / Premiere / Aegisub, rozszerzone LRC lub SRT linijka po linijce. Wszystko w przeglądarce.',
+    who: 'Twórcy dodający teksty do coverów i nagrań z koncertów, autorzy teledysków i wszyscy, którzy robią napisy karaoke.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'sv': {
+    title: 'KTV-undertextverktyg: tid per tecken, exportera ASS | AI-SRTSub',
+    desc: 'Gratis karaoke-undertextverktyg online: lägg in låten, klistra in texten, slå på varje rad och låt den delas upp i tecken automatiskt, eller slå i takt med musiken och finjustera genom att dra. Exportera ASS med \\\\kf-taggar för CapCut och Premiere eller LRC ord för ord.',
+    kw: 'skapa karaokeundertexter,ass karaoke,sangtext ord for ord,kf taggar,karaoke lrc,textsvep',
+    intro: 'Lägg in låten, klistra in texten och slå på varje rad - sedan fördelas varje rad på sina tecken: automatiskt efter bredd, genom att slå i takt eller dra gränser.',
+    feat: 'Kinesiska delas per tecken, engelska per ord; skiljetecken följer det föregående. Avståndet i slutet går att ställa in så att sista tecknet inte springer ifrån sången. Exportera ASS med \\\\kf-taggar för CapCut / Premiere / Aegisub, utökat LRC eller SRT rad för rad. Allt i webbläsaren.',
+    who: 'Skapare som lägger till sångtext i cover- och konsertfilmer, musikvideoskapare och alla som gör karaokeundertexter.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'cs': {
+    title: 'Tvůrce titulků KTV: čas pro každý znak, export ASS | AI-SRTSub',
+    desc: 'Bezplatný online tvůrce karaoke titulků: vložte píseň, nalepte text, ťukněte každý řádek a nechte jej automaticky rozdělit na znaky, nebo ťukejte s hudbou a dolaďte tažením. Exportujte ASS se značkami \\\\kf pro CapCut a Premiere nebo LRC slovo od slova.',
+    kw: 'tvurce titulku karaoke,ass karaoke,text slovo od slova,znacky kf,karaoke lrc,prubeh textu',
+    intro: 'Vložte píseň, nalepte text a ťukněte každý řádek - potom se každý řádek rozdělí na své znaky: automaticky podle šířky, vyťukáním s hudbou nebo posouváním hranic.',
+    feat: 'Čínština se dělí po znacích, angličtina po slovech; interpunkce patří k předchozímu. Mezeru na konci lze nastavit, aby poslední znak nepředběhl zpěv. Exportujte ASS se značkami \\\\kf pro CapCut / Premiere / Aegisub, rozšířené LRC nebo SRT řádek po řádku. Vše v prohlížeči.',
+    who: 'Tvůrci přidávající texty k cover verzím a koncertním záznamům, autoři hudebních videí a všichni, kdo dělají titulky karaoke.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'uk': {
+    title: 'KTV-редактор субтитрів: час кожного символу, експорт ASS | AI-SRTSub',
+    desc: 'Безкоштовний онлайн-редактор субтитрів караоке: додайте пісню, вставте текст, позначте рядки й автоматично розбийте їх на символи — або відбийте під музику й підправте перетягуванням. Експорт ASS із тегами \\\\kf для CapCut і Premiere або послівного LRC.',
+    kw: 'субтитри караоке,ass karaoke,текст послівно,теги kf,karaoke lrc,заливка тексту',
+    intro: 'Додайте пісню, вставте текст, позначте рядки - і кожен рядок розподілиться по своїх символах: автоматично за шириною, відбиванням під музику або перетягуванням меж.',
+    feat: 'Китайська ділиться за символами, англійська — за словами; розділові знаки йдуть за попереднім. Відступ у кінці настроюється, щоб останній символ не випередив вокал. Експорт ASS із тегами \\\\kf для CapCut / Premiere / Aegisub, покращеного LRC або рядкового SRT. Усе в браузері.',
+    who: 'Автори, що додають слова до каверів і концертних записів, творці музичних кліпів і всі, хто робить субтитри караоке.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'da': {
+    title: 'KTV-undertekstværktøj: tid pr. tegn, eksporter ASS | AI-SRTSub',
+    desc: 'Gratis online karaoke-undertekstværktøj: læg sangen ind, indsæt teksten, slå an på hver linje og lad den dele sig i tegn automatisk, eller slå an i takt med musikken og finjuster ved at trække. Eksporter ASS med \\\\kf-tags til CapCut og Premiere eller LRC ord for ord.',
+    kw: 'lav karaoke undertekster,ass karaoke,sangtekst ord for ord,kf tags,karaoke lrc,tekstgennemlob',
+    intro: 'Læg sangen ind, indsæt teksten og slå an på hver linje - derefter fordeles hver linje på sine tegn: automatisk efter bredde, ved at slå an i takt eller ved at trække grænser.',
+    feat: 'Kinesisk deles pr. tegn, engelsk pr. ord; tegnsætning følger det forrige. Slutmellemrummet kan justeres, så det sidste tegn ikke løber fra sangen. Eksporter ASS med \\\\kf-tags til CapCut / Premiere / Aegisub, udvidet LRC eller SRT linje for linje. Alt i browseren.',
+    who: 'Skabere, der lægger sangtekst på cover- og koncertvideoer, musikvideoskabere og alle, der laver karaoke-undertekster.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'fi': {
+    title: 'KTV-tekstitystyökalu: aika jokaiselle merkille, ASS-vienti | AI-SRTSub',
+    desc: 'Ilmainen verkossa toimiva karaoketekstitystyökalu: lisää kappale, liitä sanat, napauta jokainen rivi ja anna sen jakautua merkeiksi automaattisesti, tai naputa musiikin tahdissa ja hienosäädä vetämällä. Vie \\\\kf-tunnisteinen ASS CapCutiin ja Premiereen tai sanatason LRC.',
+    kw: 'karaoketekstitys,ass karaoke,sanat sanatasolla,kf tunnisteet,karaoke lrc,tekstin pyyhkaisy',
+    intro: 'Lisää kappale, liitä sanat ja napauta jokainen rivi - sitten jokainen rivi jakautuu merkeilleen: automaattisesti leveyden mukaan, musiikin tahdissa naputtamalla tai rajoja vetämällä.',
+    feat: 'Kiina jaetaan merkeittäin, englanti sanoittain; välimerkit seuraavat edellistä. Loppuväli on säädettävissä, ettei viimeinen merkki karkaa laulusta. Vie \\\\kf-tunnisteinen ASS CapCutiin / Premiereen / Aegisubiin, laajennettu LRC tai SRT rivi riviltä. Kaikki selaimessa.',
+    who: 'Tekijät, jotka lisäävät sanoja cover- ja konserttivideoihin, musiikkivideoiden tekijät ja kaikki, jotka tekevät karaoketekstityksiä.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'el': {
+    title: 'Δημιουργός υποτίτλων KTV: χρόνος ανά χαρακτήρα, εξαγωγή ASS | AI-SRTSub',
+    desc: 'Δωρεάν online δημιουργός υποτίτλων καραόκε: βάλτε το τραγούδι, επικολλήστε τους στίχους, χτυπήστε κάθε σειρά και αφήστε τη να χωριστεί αυτόματα σε χαρακτήρες, ή χτυπήστε τη με τη μουσική και ρυθμίστε τη σέρνοντας. Εξαγάγετε ASS με ετικέτες \\\\kf για τα CapCut και Premiere ή LRC ανά λέξη.',
+    kw: 'δημιουργια υποτιτλων καραοκε,ass karaoke,στιχοι λεξη λεξη,ετικετες kf,karaoke lrc,σαρωση κειμενου',
+    intro: 'Βάλτε το τραγούδι, επικολλήστε τους στίχους και χτυπήστε κάθε σειρά - στη συνέχεια κάθε σειρά μοιράζεται στους χαρακτήρες της: αυτόματα κατά πλάτος, χτυπώντας με τη μουσική ή σέρνοντας τα όρια.',
+    feat: 'Τα κινέζικα χωρίζονται ανά χαρακτήρα, τα αγγλικά ανά λέξη· η στίξη ακολουθεί το προηγούμενο. Το κενό στο τέλος ρυθμίζεται ώστε ο τελευταίος χαρακτήρας να μην ξεπερνά τη φωνή. Εξαγάγετε ASS με ετικέτες \\\\kf για CapCut / Premiere / Aegisub, ενισχυμένο LRC ή SRT ανά σειρά. Όλα στον περιηγητή.',
+    who: 'Δημιουργοί που προσθέτουν στίχους σε βίντεο διασκευών και συναυλιών, δημιουργοί μουσικών βίντεο και όσοι φτιάχνουν υπότιτλους καραόκε.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'he': {
+    title: 'יוצר כתוביות KTV: זמן לכל תו, ייצוא ASS | AI-SRTSub',
+    desc: 'יוצר כתוביות קריוקי חינמי באינטרנט: מכניסים את השיר, מדביקים את המילים, מסמנים כל שורה והיא מתחלקת אוטומטית לתווים, או מקישים עם המוזיקה ומכוונים בגרירה. ייצוא ASS עם תגיות \\\\kf ל-CapCut ול-Premiere או LRC ברמת מילה.',
+    kw: 'יצירת כתוביות קריוקי,ass karaoke,מילים מילה אחר מילה,תגיות kf,karaoke lrc,סריקת טקסט',
+    intro: 'מכניסים את השיר, מדביקים את המילים ומקישים על כל שורה - ואז כל שורה מתחלקת לתווים שלה: אוטומטית לפי רוחב, בהקשה עם המוזיקה או בגרירת הגבולות.',
+    feat: 'סינית מתחלקת לפי תווים ואנגלית לפי מילים; סימני הפיסוק צמודים לקודם. את הרווח בסוף אפשר לכוונן כדי שהתו האחרון לא יקדים את השירה. ייצוא ASS עם תגיות \\\\kf ל-CapCut / Premiere / Aegisub, LRC מורחב או SRT שורה אחר שורה. הכול בדפדפן.',
+    who: 'יוצרים שמוסיפים מילים לסרטוני קאבר ולהופעות, יוצרי קליפים וכל מי שמכין כתוביות קריוקי.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  },
+  'ro': {
+    title: 'Creator de subtitrări KTV: timp pentru fiecare caracter, export ASS | AI-SRTSub',
+    desc: 'Creator gratuit de subtitrări karaoke online: puneți melodia, lipiți versurile, apăsați Spațiu pentru fiecare rând și lăsați-l să se împartă automat în caractere, sau bateți pe ritm și reglați prin tragere. Exportați ASS cu etichete \\\\kf pentru CapCut și Premiere sau LRC la nivel de cuvânt.',
+    kw: 'creare subtitrari karaoke,ass karaoke,versuri cuvant cu cuvant,etichete kf,karaoke lrc,scanare text',
+    intro: 'Puneți melodia, lipiți versurile și apăsați Spațiu pentru fiecare rând - apoi fiecare rând se împarte pe caracterele lui: automat după lățime, bătând pe ritm sau trăgând granițele.',
+    feat: 'Chineza se împarte pe caractere, engleza pe cuvinte; punctuația merge cu cel din față. Spațiul final se poate regla pentru ca ultimul caracter să nu depășească vocea. Exportați ASS cu etichete \\\\kf pentru CapCut / Premiere / Aegisub, LRC îmbunătățit sau SRT pe rânduri. Totul în browser.',
+    who: 'Creatori care adaugă versuri la coveruri și înregistrări de concert, realizatori de videoclipuri și toți cei care fac subtitrări karaoke.',
+    siteName: 'AI-SRTSub', jsonldName: 'AI-SRTSub', jsonldAlt: 'KTV Karaoke Subtitle Maker'
+  }
+};
+
 /* v0.9.316：第十六个页面 —— 歌词打轴 /lrc.html 的 SEO 表。与既有十二张表同规格。 */
 const SEO_LRC = {
   'zh-CN': {
@@ -5892,7 +6154,9 @@ const SEO_PAGES = {
   autosub: { file: 'autosub.html', table: SEO_AUTOSUB, path: AUTOSUB_PATH, jsonldType: 'WebApplication' },
   ocrsub: { file: 'ocrsub.html', table: SEO_OCRSUB, path: OCRSUB_PATH, jsonldType: 'WebApplication' },
   /* v0.9.373：第二十一个页面 —— 一次出多语 / 多集批量 */
-  multilang: { file: 'multilang.html', table: SEO_MULTILANG, path: MULTILANG_PATH, jsonldType: 'WebApplication' }
+  multilang: { file: 'multilang.html', table: SEO_MULTILANG, path: MULTILANG_PATH, jsonldType: 'WebApplication' },
+  /* v0.9.408：第二十二个页面 —— KTV 字幕制作 */
+  ktv: { file: 'ktv.html', table: SEO_KTV, path: KTV_PATH, jsonldType: 'WebApplication' }
 };
 
 /* __SEO_SHARDS__ */
