@@ -4137,6 +4137,31 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(!/function showAd\(/.test(html), 'showAd 懒显示逻辑没删干净');
   });
 
+  /* 2026-10-28：广告是附属内容，浏览器不该停下来等它。
+     原来那段同步 <script src="https://bauval.org/…"> 在解析路径上，实测白卡 2.2s。
+     现在必须是「空容器 + 解析完之后创建独立 iframe」。 */
+  t('2026-10-28 广告不阻塞解析：没有同步外链，投放码写进 load 后的独立 iframe', () => {
+    assert.ok(!/<script[^>]+src="https:\/\/bauval\.org/.test(html),
+      'bauval 还是同步 <script src>（解析会被它卡住）');
+    assert.ok(!/\batOptions\s*=\s*\{[^}]*'key'\s*:/.test(html),
+      'atOptions 还挂在主文档里（应只在 iframe 内拼）');
+    assert.ok(/<div class="adbox" id="adBox"><\/div>/.test(html), 'adBox 不是空容器');
+    assert.ok(/document\.addEventListener\('DOMContentLoaded', schedule/.test(html),
+      '没等 DOMContentLoaded 就挂广告');
+    assert.ok(/requestIdleCallback\(function\(\)\{ setTimeout\(mount,0\); \}/.test(html),
+      '没有空闲档挂载（会跟首屏资源抢带宽）');
+    assert.ok(/f\.contentDocument/.test(html), '没写进 iframe 自己的 document');
+    assert.ok(/de2e5b52b36d97247e27a7579fa77c7e/.test(html), 'bauval 投放 key 丢了');
+  });
+
+  /* 踩过的坑：server.js 的页脚互链注入是 html.replace('</body>', 导航+它)，替换**第一处**。
+     广告脚本里如果出现字面量 body 闭合标签（哪怕在 JS 字符串里），导航会被塞进字符串中间，
+     整段脚本 SyntaxError、广告挂不上。这条钉住「全页面只能有一个」。 */
+  t('2026-10-28 页脚注入不会插进脚本：字面量 body 闭合标签恰好 1 个', () => {
+    const n = (html.match(/<\/body>/g) || []).length;
+    assert.strictEqual(n, 1, 'body 闭合标签出现 ' + n + ' 次（多出来的会被注入导航、写坏脚本）');
+  });
+
   /* 2026-10-28：多语台的广告位整块下线。原因不是「广告没用」，而是多语台的任务进度
      逻辑与工作台不同（分卷/多语并跑，任务条出现时机不唯一），广告位在这里无效。
      反向钉住：加载器、ins、容器、showAd 一律不许回来。 */

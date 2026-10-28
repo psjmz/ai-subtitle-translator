@@ -1297,22 +1297,63 @@
           <div class="prog" id="prog"><i></i></div>
         </div>
       </div>
-      <!-- v0.9.262：任务条下方广告位。懒加载——首次随任务条（#progWrap.show）出现才显示，之后常驻。
-           2026-10-28：原来的 Google AdSense 广告位整体换成 bauval 的 728x90 iframe 投放码。
-           atOptions 必须在加载器之前赋值，两段脚本不能拆开，也不能挪进 <head>——
-           投放码按脚本所在位置写入 iframe。 -->
-      <div class="adbox" id="adBox">
-        <script>
-        atOptions = {
-          'key' : 'de2e5b52b36d97247e27a7579fa77c7e',
-          'format' : 'iframe',
-          'height' : 90,
-          'width' : 728,
-          'params' : {}
-        };
-        </script>
-        <script src="https://bauval.org/22/de2e5b52b36d97247e27a7579fa77c7e"></script>
-      </div>
+      <!-- v0.9.262：任务条下方广告位。
+           2026-10-28：AdSense 换成 bauval 的 728x90 投放码。
+           2026-10-28（二次）：改成「解析完再挂」。原来那段 bauval 外链脚本是同步的，
+           浏览器解析到它就得停下来等——实测白卡 2.2 秒，首屏 FCP 被推后两秒多。
+           广告是附属内容，绝不能拖住页面：这里只留空容器，页面解析完（DOMContentLoaded + 空闲）
+           才创建独立 iframe，把投放码写进 iframe 自己的 document —— 它内部 document.write
+           怎么写都碰不到主页。广告侧再慢、挂掉、被墙，页面都照常渲染。 -->
+      <div class="adbox" id="adBox"></div>
+      <script>
+      /* 广告挂载：与主文档完全解耦，主文档不等它。
+         KEY / W / H 就是投放码里那三个值，改尺寸时三处一起改。 */
+      (function(){
+        var BOX='adBox', KEY='de2e5b52b36d97247e27a7579fa77c7e', W=728, H=90;
+        var mounted=false;
+        function mount(){
+          if(mounted) return; mounted=true;
+          var box=document.getElementById(BOX); if(!box) return;
+          var f=document.createElement('iframe');
+          f.width=String(W); f.height=String(H); f.scrolling='no';
+          f.setAttribute('frameborder','0'); f.setAttribute('title','广告');
+          f.style.cssText='display:block;border:0;margin:10px auto 0;max-width:100%';
+          box.appendChild(f);
+          var d=null;
+          try{ d=f.contentDocument||(f.contentWindow&&f.contentWindow.document); }catch(e){}
+          if(!d){ box.removeChild(f); return; }
+          /* 拼投放码：闭合标签不能以字面量出现在本段源码里（会提前结束 script 块），拆成 S + E。
+             ⚠️ iframe 文档里也别写 body / html 的闭合标签 —— server.js 的页脚注入是
+             html.replace(第一个 body 闭合标签, 导航 + 它)，替换的是**第一处**；本段源码里只要出现
+             一个字面量的 body 闭合标签（哪怕在 JS 字符串里），导航就会被塞进字符串中间，脚本语法崩。
+             只写 doctype + meta + style + 两个 script，浏览器自己补全文档结构。 */
+          var S='<'+'script', E='<'+'/script>';
+          d.open();
+          d.write('<!doctype html><meta charset="utf-8">'
+            + '<style>html,body{margin:0;padding:0;overflow:hidden;background:transparent}</style>'
+            + S+'>atOptions={key:"'+KEY+'",format:"iframe",height:'+H+',width:'+W+',params:{}};'+E
+            + S+' src="https://bauval.org/22/'+KEY+'">'+E);
+          d.close();
+          /* 没填充就收起：投放码在有些地区/来源不返回内容，iframe 会留一条 90px 空白带。
+             给 5 秒填充时间，之后 body 里还是只有 script 没有广告元素，就把 iframe 收掉
+             （display:none，保留节点以便以后重试，也不影响布局）。 */
+          setTimeout(function(){
+            try{
+              var bd=d.body;
+              if(bd && !bd.querySelector('iframe,img,ins,div,object,embed')) f.style.display='none';
+            }catch(e){}
+          }, 5000);
+        }
+        function schedule(){
+          if(window.requestIdleCallback){
+            window.requestIdleCallback(function(){ setTimeout(mount,0); }, {timeout:2500});
+          } else { setTimeout(mount, 1200); }
+        }
+        if(document.readyState==='loading'){
+          document.addEventListener('DOMContentLoaded', schedule, {passive:true});
+        } else { schedule(); }
+      })();
+      </script>
       <div class="toolbar">
         <!-- v0.9.199：工具栏这个筛选框没有任何可见标签（左右邻居都是按钮），
              读屏只会念「组合框 全部」，不知道在筛什么。补一个 aria-label。 -->
