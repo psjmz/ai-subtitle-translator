@@ -267,5 +267,79 @@ it('存储不可用（隐私模式）时全部返回 null/false，不抛异常',
   SnapStore.setStore(null);
 });
 
+/* ---------------- 11. v0.9.405：从快照导出成品 srt ---------------- */
+/* 6 条字幕、3 个句组（每组 2 条），时间轴每秒一条 —— 数字好核对。
+   tl 是扁平数组：[起1,止1,起2,止2,…]，第 n 条在 (n-1)*2。 */
+const TL = [1000,2000, 2000,3000, 3000,4000, 4000,5000, 5000,6000, 6000,7000];
+const GS = [2,2,2];
+function geoPayload(done, fillers){
+  return { fp:'FP', file:'Movie.srt', bi:3, totalB:3, done:done,
+           fillers:fillers||[], ctx:[], durs:[40], tl:TL, gs:GS };
+}
+it('整组一条译文：时间轴取该组首条 start 到末条 end', function(){
+  const srt = SnapStore.toSrt(geoPayload({ 1:{ type:'text', text:'第一组', cueTexts:null } }));
+  assert.strictEqual(srt, '1\n00:00:01,000 --> 00:00:03,000\n第一组\n');
+});
+it('逐条 cueTexts 形态：每条各用自己那条的时间轴', function(){
+  const srt = SnapStore.toSrt(geoPayload({ 2:{ type:'text', text:'', cueTexts:[[5,'第五条'],[6,'第六条']] } }));
+  assert.strictEqual(srt, '1\n00:00:05,000 --> 00:00:06,000\n第五条\n'
+                       + '\n2\n00:00:06,000 --> 00:00:07,000\n第六条\n');
+});
+it('水词行不导出（与正常导出同口径）', function(){
+  const srt = SnapStore.toSrt(geoPayload({
+    1:{ type:'text', text:'留下', cueTexts:null },
+    2:{ type:'text', text:'被删的', cueTexts:null }
+  }, [3]));   // 句组 2 的首条是 3 → 整组按水词处理
+  assert.strictEqual(srt, '1\n00:00:01,000 --> 00:00:03,000\n留下\n');
+});
+it('type=drop 与空译文都不导出', function(){
+  const srt = SnapStore.toSrt(geoPayload({
+    1:{ type:'drop', text:'删掉', cueTexts:null },
+    2:{ type:'text', text:'   ', cueTexts:null },
+    3:{ type:'text', text:'真正的译文', cueTexts:null }
+  }));
+  assert.strictEqual(srt, '1\n00:00:05,000 --> 00:00:07,000\n真正的译文\n');
+});
+it('按起始时间排序，且编号从 1 连续重排', function(){
+  const srt = SnapStore.toSrt(geoPayload({
+    3:{ type:'text', text:'后', cueTexts:null },     // 5–6s
+    1:{ type:'text', text:'先', cueTexts:null }      // 1–2s
+  }));
+  assert.strictEqual(srt.indexOf('先') < srt.indexOf('后'), true, '顺序反了');
+  assert.ok(/^1\n/.test(srt) && /\n2\n/.test(srt), '编号没有重排成 1,2');
+});
+it('老快照（没有时间轴）返回 null，不抛异常', function(){
+  assert.strictEqual(SnapStore.toSrt(payload(3,3)), null);
+  assert.strictEqual(SnapStore.toSrt(null), null);
+  assert.strictEqual(SnapStore.toSrt({ done:{1:{text:'x'}}, tl:TL }), null);   // 缺 gs
+});
+it('时间码格式化：补零、进位、超一小时都对', function(){
+  assert.strictEqual(SnapStore.fmtMs(0), '00:00:00,000');
+  assert.strictEqual(SnapStore.fmtMs(5007), '00:00:05,007');
+  assert.strictEqual(SnapStore.fmtMs(3661000), '01:01:01,000');
+  assert.strictEqual(SnapStore.fmtMs(-5), '00:00:00,000');
+  assert.strictEqual(SnapStore.fmtMs('2500'), '00:00:02,500');
+});
+it('写快照带时间轴 → 列表显示可导出；不带 → 不可导出', function(){
+  reset(makeLS());
+  const k1 = SnapStore.keyFor('fkGeo', 'zh-CN');
+  const k2 = SnapStore.keyFor('fkOld', 'zh-CN');
+  SnapStore.write(k1, 'FP', geoPayload({ 1:{ type:'text', text:'x', cueTexts:null } }), META);
+  SnapStore.write(k2, 'FP', payload(3,3), META);
+  const m = {};
+  SnapStore.list().forEach(function(x){ m[x.k] = x.hasTl; });
+  assert.strictEqual(m[k1], 1, '带时间轴的应标 1');
+  assert.strictEqual(m[k2], 0, '老快照应为 0（面板据此置灰）');
+});
+it('peek 只读不校验：过期快照 peek 拿得到、read 会作废', function(){
+  const ls = makeLS(); reset(ls);
+  const k = SnapStore.keyFor('fkPeek', 'zh-CN');
+  SnapStore.write(k, 'FP', geoPayload({ 1:{ type:'text', text:'x', cueTexts:null } }), META);
+  backdate(ls, k, 40*DAY);           // 40 天前：超过未完成快照的 30 天
+  assert.ok(SnapStore.peek(k), 'peek 不应该因为过期就返回 null');
+  assert.strictEqual(SnapStore.read(k, 'FP'), null, 'read 应该把过期的作废');
+  assert.strictEqual(ls._has(k), false, '作废要真的删掉槽');
+});
+
 console.log('\nsnap-store: ' + pass + ' 通过 / ' + fail + ' 失败');
 process.exit(fail ? 1 : 0);

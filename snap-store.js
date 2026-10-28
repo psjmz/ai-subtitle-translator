@@ -186,8 +186,13 @@ var SnapStore = (function(){
     return o;
   }
 
-  /* 写一份快照。payload = {fp,file,bi,totalB,done,fillers,ctx,durs}（页面里已序列化好的那一份），
+  /* 写一份快照。payload = {fp,file,bi,totalB,done,fillers,ctx,durs,tl,gs}（页面里已序列化好的那一份），
      meta = {src,dst,lines}（进索引的展示信息）。返回 true/false —— false 表示确实存不下。
+     v0.9.405：payload 多了 tl / gs 两项时间轴快照 —— 有了它，用户才能从「本机记录」里
+     直接把译文下载成成品 srt，不必再重选一次字幕文件。
+       tl = { 字幕编号: [起始毫秒, 结束毫秒] }，逐条；
+       gs = [ 每个句组各含几条字幕 ]，按 gno 顺序 —— 用它把 gno 还原成编号区间。
+       ⚠️ 仍然不存原文。要双语就得重选文件，那是另一条路（见页面里的说明）。
      写不下的处理与以前不同：先按 LRU 清出空间再试一次，仍失败才认输（以前是直接放弃本次运行）。 */
   function write(key, fp, payload, meta){
     var s = store();
@@ -195,7 +200,8 @@ var SnapStore = (function(){
     var o = { v:1, ts:now(), fp:fp, file:(payload&&payload.file)||'',
               bi:(payload&&payload.bi)||0, totalB:(payload&&payload.totalB)||0,
               done:(payload&&payload.done)||{}, fillers:(payload&&payload.fillers)||[],
-              ctx:(payload&&payload.ctx)||[], durs:(payload&&payload.durs)||[] };
+              ctx:(payload&&payload.ctx)||[], durs:(payload&&payload.durs)||[],
+              tl:(payload&&payload.tl)||null, gs:(payload&&payload.gs)||null };
     var raw = '';
     try{ raw = JSON.stringify(o); }catch(e){ return false; }
     var ok = false;
@@ -208,7 +214,10 @@ var SnapStore = (function(){
     if(!ok) return false;
     idxUpsert({ k:key, file:o.file, lines:((meta&&meta.lines)||0)|0,
                 src:(meta&&meta.src)||'', dst:(meta&&meta.dst)||'',
-                bi:o.bi, totalB:o.totalB, fin:0, ts:o.ts, sz:raw.length*2 });
+                bi:o.bi, totalB:o.totalB, fin:0, ts:o.ts, sz:raw.length*2,
+                /* v0.9.405：有没有时间轴决定「能不能直接下载」。v0.9.404 及以前存的快照没有，
+                   面板上对它们要把下载按钮置灰，并说明原因，而不是点了没反应。 */
+                hasTl:(o.tl && o.gs) ? 1 : 0 });
     evict(BUDGET, key);
     return true;
   }
@@ -228,6 +237,84 @@ var SnapStore = (function(){
   }
 
   function remove(key){ dropKey(key); }
+
+  /* ---------- v0.9.405：把快照导出成成品字幕 ---------- */
+  /* 读原始快照，**不做任何校验也不删槽** —— 导出与「参数对不对得上」无关，
+     用户要的就是他翻出来的那些译文。走 read() 反而会因为参数变了 / 过期而把槽删掉。 */
+  function peek(key){ return getObj(key); }
+
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+  function pad3(n){ return (n < 100 ? '0' : '') + (n < 10 ? '0' : '') + n; }
+  /* 毫秒 → SRT 时间码 00:00:00,000 */
+  function fmtMs(ms){
+    var t = Math.max(0, Math.round(Number(ms) || 0));
+    return pad2(Math.floor(t/3600000)) + ':' + pad2(Math.floor(t/60000) % 60) + ':'
+         + pad2(Math.floor(t/1000) % 60) + ',' + pad3(t % 1000);
+  }
+  /* 快照 → 目标语言成品 srt 文本。
+     ⚠️ 只出译文，不出原文：本机本来就没存原文，硬要双语只能让用户重选字幕文件。
+     两种译文形态都要认（与页面回填逻辑同源，别只顾一种）：
+       · m.text      —— 整组一条译文：时间轴取该组首条的 start 到末条的 end（与正常导出的合并一致）
+       · m.cueTexts  —— 模型按 cue 逐条对齐：每条各用自己的时间轴，一条一行
+     跳过：type==='drop' 的、被判水词（fillers）的、译文为空的、时间轴缺失的。
+     返回 null 表示这份快照导不出（老快照没存时间轴）。 */
+  function toSrt(o){
+    if(!o || !o.done || !o.tl || !o.gs) return null;
+    /* tl 是扁平数组：第 n 条字幕的时间轴在 tl[(n-1)*2] 与 tl[(n-1)*2+1]。
+       用扁平数组而不是 {编号:[起,止]} 的映射，纯为省字节 —— 键名"1234": 在 1200 条时
+       要白占 7 个字符，扁平数组直接省掉约 45% 的时间轴体积（实测 1200 条：132KB → 113KB）。 */
+    var tl = o.tl, gs = o.gs, fill = {};
+    var tc = function(no){                        // 取第 no 条的 [起, 止]，缺则 null
+      var i = (Number(no) - 1) * 2;
+      if(!(i >= 0)) return null;
+      var a = tl[i], b = tl[i + 1];
+      if(a == null || b == null) return null;
+      return [a, b];
+    };
+    (o.fillers || []).forEach(function(n){ fill[Number(n)] = 1; });
+    /* gno → 编号区间。groupSentences 按字幕顺序切组、每条恰好属于一组，
+       所以组是连续编号块：gs 里存每组条数，累加即可还原首末编号。编号从 1 起（解析时重排过）。 */
+    var gb = {}, cum = 1, i;
+    for(i = 0; i < gs.length; i++){
+      var c = Math.max(1, Number(gs[i]) || 1);
+      gb[i + 1] = [cum, cum + c - 1];
+      cum += c;
+    }
+    var rows = [];
+    var keys = Object.keys(o.done);
+    for(i = 0; i < keys.length; i++){
+      var m = o.done[keys[i]];
+      if(!m || m.type === 'drop') continue;
+      if(Array.isArray(m.cueTexts) && m.cueTexts.length){
+        for(var j = 0; j < m.cueTexts.length; j++){
+          var p = m.cueTexts[j];
+          if(!Array.isArray(p)) continue;
+          var no = Number(p[0]), tx = String(p[1] == null ? '' : p[1]).trim();
+          if(!tx || fill[no]) continue;
+          var tc1 = tc(no); if(!tc1) continue;
+          rows.push({ s:tc1[0], e:tc1[1], text:tx });
+        }
+        continue;
+      }
+      var txt = String(m.text == null ? '' : m.text).trim();
+      if(!txt) continue;
+      var b = gb[Number(keys[i])];
+      if(!b || fill[b[0]]) continue;
+      var t1 = tc(b[0]), t2 = tc(b[1]);
+      if(!t1 || !t2) continue;
+      rows.push({ s:t1[0], e:t2[1], text:txt });
+    }
+    if(!rows.length) return null;
+    rows.sort(function(a, b2){ return (a.s - b2.s) || (a.e - b2.e); });
+    var out = [];
+    for(i = 0; i < rows.length; i++){
+      out.push(String(i + 1));
+      out.push(fmtMs(rows[i].s) + ' --> ' + fmtMs(rows[i].e));
+      out.push(String(rows[i].text).replace(/\r/g, ''));
+      out.push('');
+    }
+    return out.join('\n');
+  }
 
   /* ---------- 容量治理 ---------- */
   function bytes(){
@@ -279,10 +366,13 @@ var SnapStore = (function(){
       if(!has){ changed = true; continue; }
       out.push({ k:it.k, file:it.file||'', lines:it.lines||0, src:it.src||'', dst:it.dst||'',
                  bi:it.bi||0, totalB:it.totalB||0, fin:it.fin?1:0, ts:it.ts||0, seq:it.seq||0,
-                 sz:it.sz||0, expired: expired(it) });
+                 /* v0.9.405：面板据此决定「能不能直接下载」。老索引没有这个字段 → 0，
+                    正好对应「v0.9.404 及以前存的快照没有时间轴」的事实。 */
+                 hasTl:it.hasTl?1:0, sz:it.sz||0, expired: expired(it) });
     }
     if(changed){ idx.items = out.map(function(x){ return { k:x.k, file:x.file, lines:x.lines, src:x.src,
-                 dst:x.dst, bi:x.bi, totalB:x.totalB, fin:x.fin, ts:x.ts, sz:x.sz, seq:x.seq }; }); saveIdx(idx); }
+                 dst:x.dst, bi:x.bi, totalB:x.totalB, fin:x.fin, ts:x.ts, sz:x.sz, seq:x.seq,
+                 hasTl:x.hasTl }; }); saveIdx(idx); }
     /* ts 相同时用 seq 兜底：同一毫秒内连写两条也要让「最近写过」的排在最前 */
     out.sort(function(a,b){ return (b.ts - a.ts) || ((b.seq||0) - (a.seq||0)); });
     return out;
@@ -302,7 +392,7 @@ var SnapStore = (function(){
     K_IDX: K_IDX, K_BASE: K_BASE, K_LEGACY: K_BASE,   // K_LEGACY：v0.9.403 及以前的老单键
     SNAP_TTL: SNAP_TTL, FIN_SNAP_TTL: FIN_SNAP_TTL, BUDGET: BUDGET,
     setStore: setStore, keyFor: keyFor,
-    read: read, write: write, finish: finish, remove: remove,
+    read: read, write: write, finish: finish, remove: remove, peek: peek, toSrt: toSrt, fmtMs: fmtMs,
     list: list, gc: gc, bytes: bytes, evict: evict,
     snapHasText: snapHasText, valid: valid, usable: usable, expired: expired
   };
