@@ -2308,18 +2308,25 @@ syncLogoHome();   /* 首屏先落一次；之后每次 applyI18n 再跟着语言
 function applyI18n() {
   document.documentElement.lang = UI.lang;
   document.documentElement.dir = (RTL_UI.indexOf(UI.lang) >= 0) ? 'rtl' : 'ltr';
-  document.title = t('docTitle');
+  /* v0.9.407：字典分片没到（404 / 断网 / 爬虫不取子资源）时 t() 返回键名，
+     直接写进 DOM 等于把「btnParse」印在页面上。赋前比一下，等于键名就跳过，
+     保留服务端渲染的默认文案 —— 对 SEO 与可读性都更安全。 */
+  var _dt = t('docTitle'); if (_dt !== 'docTitle') document.title = _dt;
   Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) {
-    el.textContent = t(el.getAttribute('data-i18n'));
+    var _s = t(el.getAttribute('data-i18n'));
+    if (_s !== el.getAttribute('data-i18n')) el.textContent = _s;
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-html]'), function (el) {
-    el.innerHTML = t(el.getAttribute('data-i18n-html'));
+    var _s = t(el.getAttribute('data-i18n-html'));
+    if (_s !== el.getAttribute('data-i18n-html')) el.innerHTML = _s;
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-ph]'), function (el) {
-    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+    var _s = t(el.getAttribute('data-i18n-ph'));
+    if (_s !== el.getAttribute('data-i18n-ph')) el.placeholder = _s;
   });
   Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-aria]'), function (el) {
-    el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+    var _s = t(el.getAttribute('data-i18n-aria'));
+    if (_s !== el.getAttribute('data-i18n-aria')) el.setAttribute('aria-label', _s);
   });
   var u2 = document.getElementById('uiLang2');
   if (u2) u2.value = UI.lang;

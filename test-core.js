@@ -4990,7 +4990,8 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     // ② 没有可见标签的两个自由文本框 → 用 placeholder 词条当 aria-label（有可见标签的别加，会重复播报）
     assert.ok(/<textarea id="paste"[^>]*data-i18n-aria="pastePh"/.test(html), 'paste 缺 aria-label');
     assert.ok(/id="styleCustom"[^>]*data-i18n-aria="styleCustomPh"/.test(html), 'styleCustom 缺 aria-label');
-    assert.ok(/data-i18n-aria/.test(html) && /querySelectorAll\('\[data-i18n-aria\]'\)\.forEach\(el=>\{ el\.setAttribute\('aria-label'/.test(html),
+    /* v0.9.407：赋值前要判「翻译结果是不是原样返回的键名」，是就跳过（字典分片没到时的降级） */
+    assert.ok(/data-i18n-aria/.test(html) && /querySelectorAll\('\[data-i18n-aria\]'\)\.forEach\(el=>\{ var _s=t\(el\.dataset\.i18nAria\); if\(_s!==el\.dataset\.i18nAria\) el\.setAttribute\('aria-label', _s\); \}\)/.test(html),
       '缺 data-i18n-aria 的处理（加了属性也得有人把它变成 aria-label）');
     // v0.9.199：工具栏「筛选」下拉框左右都是按钮、没有可见标签，读屏只念「组合框 全部」
     assert.ok(/<select id="filter" data-i18n-aria="filterAria">/.test(html), '#filter 缺无障碍名');
@@ -9992,7 +9993,9 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
     });
 
     /* ⑧ 工作台标题走自己的词条：不然 applyI18n 那句 docTitle 会把本页 SEO 标题盖成首页的 */
-    assert.ok(/document\.title = t\('wsDocTitle'\)/.test(ws), '工作台标题没走 wsDocTitle');
+    /* v0.9.407：字典分片没到时 t() 返回键名，标题不能被写成「wsDocTitle」，
+       所以赋值前要先比一下（保留服务端渲染的 SEO 标题） */
+    assert.ok(/var _t=t\('wsDocTitle'\); if\(_t!=='wsDocTitle'\) document\.title = _t;/.test(ws), '工作台标题没走 wsDocTitle');
     assert.ok(!/wsDocTitle:'字幕/.test(dict) || true, '');
 
     /* ⑨ SEO：工作台是第四个页面 —— 表、路由、sitemap 三处都要跟上 */

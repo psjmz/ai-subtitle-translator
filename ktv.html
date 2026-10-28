@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 以下 SEO head 区块由 server.js 按语言路由（/ktv.html 与 /en/ktv.html 等）注入对应语言版本；直接以文件方式打开时显示简体中文默认版 -->
+<!--SEO-HEAD-START-->
+<title>KTV字幕制作：逐字扫色卡拉OK，导出 ASS / 增强LRC - 在线免费 | 随心字幕 AI</title>
+<meta name="description" content="免费在线 KTV 字幕制作：放入音乐、贴入歌词，逐句打轴后自动切到每个字，边拖边调，实时看扫色效果，导出带 \kf 标签的 ASS 给剪映与 Premiere，也能导出逐字增强 LRC。纯浏览器制作，音频不上传。">
+<meta name="keywords" content="KTV字幕,卡拉OK字幕制作,逐字歌词,ASS字幕下载,karaoke subtitles,ass karaoke maker,lrc逐字,歌词扫色,视频字幕生成">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#5B21B6">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!--SEO-HEAD-END-->
+<!--ANALYTICS-->
+<style>
+  /* 视觉系统沿用 v0.9.249「收敛精修」：冷中性灰阶 + 品牌实色 + 禁渐变 + 禁 emoji 图标。
+     v0.9.406：本页认领「靛紫」色线 #5B21B6 ——
+     歌词打轴页是酒红、歌词相关若同色会让用户分不清自己在哪一页；
+     KTV 是「把歌词再切到字」，与打轴页相邻但不是一个活儿，故另起一色。 */
+  :root{
+    --bg:#F6F6F8; --card:#FFFFFF; --card-2:#FAFAFC; --stage:#EFEFF3;
+    --line:#E9E9EF; --line-strong:#DEDEE5;
+    --ink:#15151A; --body:#4B4B56; --sub:#767680; --mut:#A3A3AD;
+    --acc:#5B21B6; --acc-weak:#F4F0FD; --acc-line:#CDBBF2; --acc-ink:#4C1D95;
+    --ok:#0E9F6E; --ok-weak:#E6F6EF; --ok-ink:#0B7A5C;
+    --warn:#B4700A; --warn-weak:#FEF6E7;
+    --del:#DC2626; --del-weak:#FEF2F2;
+    --r-card:14px; --r-ctl:9px; --r-btn:10px;
+    --sh-card:0 1px 2px rgba(18,18,24,.04),0 8px 24px -20px rgba(18,18,24,.28);
+    --sh-btn:0 2px 8px rgba(91,33,182,.22);
+    --ctl-h:34px;
+    /* 卡拉OK双色：默认未唱白、已唱金 —— 导出时会写进 ASS 样式 */
+    --sung:#FFD54A; --unsung:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  .hd{display:flex;align-items:center;gap:12px;padding:16px 0 0}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:14.5px;letter-spacing:-.2px}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--acc);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+  a.brand{color:inherit;text-decoration:none;cursor:pointer;border-radius:8px}
+  a.brand:hover .dot{filter:brightness(1.08)}
+  a.brand:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+  .lnav{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .lnav select{height:32px;border:1px solid var(--line-strong);background:var(--card);color:var(--ink);
+    border-radius:var(--r-ctl);padding:0 8px;font-size:12.5px}
+
+  .hero{padding:22px 0 4px;text-align:center}
+  .hero h1{font-size:29px;line-height:1.25;margin:0 0 9px;letter-spacing:-.9px;font-weight:700}
+  .hero h1 em{font-style:normal;color:var(--acc-ink)}
+  .hero p{color:var(--sub);margin:0 auto;font-size:13.5px;max-width:760px;line-height:1.7;text-wrap:balance}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
+    box-shadow:var(--sh-card);padding:18px 20px;margin-top:16px}
+  .card h2{font-size:14.5px;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:650}
+  .card h2 .n{width:20px;height:20px;border-radius:6px;background:var(--acc-weak);color:var(--acc-ink);
+    font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+
+  .dz{border:1.5px dashed var(--line-strong);border-radius:12px;background:var(--card-2);
+    padding:20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .dz:hover,.dz.over{border-color:var(--acc-line);background:var(--acc-weak)}
+  .dz-t{font-size:13.5px;color:var(--body)}
+  .dz-f{font-size:12.5px;color:var(--mut);margin-top:4px;min-height:16px}
+
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row .lb{font-size:12.5px;color:var(--sub)}
+  .chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+    background:var(--acc-weak);color:var(--acc-ink);font-size:12.5px;font-weight:600}
+  .chip.mut{background:var(--stage);color:var(--sub);font-weight:400}
+
+  button{height:var(--ctl-h);padding:0 16px;border-radius:var(--r-btn);border:1px solid var(--line-strong);
+    background:var(--card);color:var(--ink);font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--acc-line)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:var(--sh-btn);font-weight:600}
+  button.pri:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.mini{height:26px;padding:0 10px;font-size:12px;border-radius:7px}
+  button.big{height:52px;font-size:15.5px;font-weight:700;padding:0 30px;border-radius:12px}
+  button.on{background:var(--acc-weak);border-color:var(--acc-line);color:var(--acc-ink);font-weight:600}
+
+  textarea{width:100%;min-height:150px;border:1px solid var(--line-strong);border-radius:10px;
+    background:var(--card-2);color:var(--ink);padding:10px 12px;font-size:13px;line-height:1.7;resize:vertical}
+  textarea:focus{outline:2px solid var(--acc-line);border-color:var(--acc-line)}
+  input[type=number],input[type=text],select{border:1px solid var(--line-strong);border-radius:var(--r-ctl);
+    background:var(--card);color:var(--ink);padding:0 8px;font-size:13px}
+  input[type=number],input[type=text]{height:var(--ctl-h);width:100px}
+
+  .player{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;
+    background:var(--card-2);padding:12px 14px;flex-wrap:wrap}
+  .player .tm{font-variant-numeric:tabular-nums;font-size:13px;color:var(--body);min-width:96px}
+
+  /* 歌词列表 */
+  .llist{margin-top:12px;display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto;padding-right:4px}
+  .lline{display:flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:9px;
+    background:var(--card-2);padding:7px 12px;font-size:13.5px;cursor:pointer;transition:background .12s}
+  .lline:hover{border-color:var(--acc-line)}
+  .lline .no{width:24px;height:22px;border-radius:7px;background:var(--stage);color:var(--sub);
+    display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:none}
+  .lline .tstamp{font-variant-numeric:tabular-nums;font-size:12px;color:var(--mut);min-width:64px;flex:none}
+  .lline .tx{flex:1;min-width:0;color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lline.done .no{background:var(--ok-weak);color:var(--ok-ink)}
+  .lline.done .tstamp{color:var(--ok-ink);font-weight:600}
+  .lline.cur{border-color:var(--acc);background:var(--acc-weak)}
+  .lline.cur .tx{color:var(--acc-ink);font-weight:650}
+
+  /* ---------- 逐字切分条：宽度 = 时长，所见即所得 ---------- */
+  .cutwrap{border:1px solid var(--line);border-radius:12px;background:var(--card-2);padding:14px;margin-top:12px}
+  .cutbar{display:flex;align-items:stretch;width:100%;gap:0;height:56px;user-select:none}
+  .ublock{position:relative;min-width:22px;overflow:hidden;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;border-radius:6px;background:var(--acc-weak);
+    border:1px solid var(--acc-line);padding:0 2px}
+  .ublock.cur{background:var(--acc);border-color:var(--acc)}
+  .ublock .uch{font-size:14px;font-weight:600;color:var(--acc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .ublock.cur .uch{color:#fff}
+  .ublock .ums{font-size:10.5px;color:var(--sub);font-variant-numeric:tabular-nums;margin-top:1px}
+  .ublock.cur .ums{color:#F0E7FF}
+  /* 边界手柄：拖它就能改左右两个字的时长（相邻共享边界，不会出缝） */
+  .uh{position:relative;flex:0 0 7px;cursor:col-resize;background:transparent}
+  .uh::after{content:"";position:absolute;left:2px;top:14%;height:72%;width:3px;border-radius:2px;
+    background:var(--line-strong);transition:background .12s}
+  .uh:hover::after,.uh.drag::after{background:var(--acc);width:5px;left:1px}
+  .cutmeta{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12.5px;color:var(--sub)}
+
+  /* ---------- 卡拉OK预览舞台 ---------- */
+  .stage{position:relative;background:#15151A;border-radius:12px;padding:34px 20px;text-align:center;
+    margin-top:12px;min-height:118px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .stage .line{font-weight:700;line-height:1.45;letter-spacing:.5px;color:var(--unsung);
+    text-shadow:0 2px 12px rgba(0,0,0,.55)}
+  .stage .u{display:inline-block;white-space:pre}
+  .stage .u.sung{color:var(--sung)}
+  /* 正在唱的那个字：linear-gradient + background-clip:text 做出「从左往右扫」的效果 */
+  .stage .u.part{background-image:linear-gradient(90deg,var(--sung) 0%,var(--sung) var(--p,0%),var(--unsung) var(--p,0%));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .stage .tip{position:absolute;left:0;right:0;bottom:8px;font-size:11.5px;color:#6E6E78}
+  .stage:empty::after{content:"";}
+
+  .hint{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.7}
+  .msg{margin-top:10px;font-size:12.5px;color:var(--ok-ink)}
+  .msg.err{color:var(--del)}
+  .msg.warn{color:var(--warn)}
+
+  footer{margin:26px 0 30px;text-align:center;font-size:12.5px;color:var(--mut)}
+  footer a{color:var(--sub);text-decoration:none;margin:0 6px}
+
+  @media (max-width:640px){
+    .wrap{padding:0 14px}
+    .hero h1{font-size:24px}
+    .lline .tstamp{display:none}
+    button.big{width:100%}
+    .cutbar{height:50px}
+  }
+</style>
+<script src="ui-codes.js?v=0.9.407"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
+crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <a class="brand" id="logoHome" href="/"><span class="dot">字</span><span data-i18n="brandName">随心字幕 AI</span></a>
+    <div class="lnav">
+      <span id="topNav"></span>
+      <select id="langSel" aria-label="UI language"></select>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1><span data-i18n="heroA">KTV</span><em data-i18n="heroEm">字幕制作</em></h1>
+    <p data-i18n="heroSub">放入音乐、贴入歌词，逐句打完轴以后，每个字的时长会自动切好，还能一个个拖着调。边播边看字被逐一点亮的感觉，最后导出带 \kf 标签的 ASS，剪映、Premiere、Aegisub 都能直接用。全程在浏览器里完成，音频不上传。</p>
+  </div>
+
+  <!-- 1. 放入音乐 -->
+  <div class="card" id="audCard">
+    <h2><span class="n">1</span><span data-i18n="audTitle">放入音乐</span></h2>
+    <div class="dz" id="dz">
+      <span class="dz-t" data-i18n="dzTxt">把音频文件拖到这里，或点击选择文件</span>
+      <span class="dz-f" id="aname"></span>
+    </div>
+    <input type="file" id="afile" accept="audio/*" style="display:none">
+    <div class="hint" data-i18n="audHint">MP3、M4A、FLAC、WAV、OGG 都行；音频只在本机播放，不上传。</div>
+  </div>
+
+  <!-- 2. 贴入歌词 -->
+  <div class="card" id="lyCard">
+    <h2><span class="n">2</span><span data-i18n="lyTitle">贴入歌词</span></h2>
+    <textarea id="lyText" data-i18n-ph="lyPh" placeholder="一行一句，空行自动跳过&#10;贴已有的 LRC 也行（时间会被读出来）"></textarea>
+    <div class="row">
+      <button class="pri" id="btnParse" type="button" data-i18n="btnParse">解析歌词</button>
+      <span class="chip mut" id="lyChip">—</span>
+    </div>
+    <div class="hint" data-i18n="lyHint">纯文本按行解析；LRC 的 [mm:ss.xx] 时间标签会自动读出来，句子直接从它原本的时间开始。</div>
+  </div>
+
+  <!-- 3. 逐句打轴 -->
+  <div class="card" id="axisCard" style="display:none">
+    <h2><span class="n">3</span><span data-i18n="axisTitle">逐句打轴</span></h2>
+    <div class="player">
+      <button class="pri" id="btnPlay" type="button" data-i18n="btnPlay">播放</button>
+      <span class="tm" id="tmNow">0:00.0</span>
+      <audio id="au" preload="auto" style="display:none"></audio>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="pri big" id="btnTap" type="button" data-i18n="btnTap">打这句</button>
+      <button id="btnUndo" type="button" data-i18n="btnUndo">撤销一句</button>
+      <button id="btnSkip" type="button" data-i18n="btnSkip">跳过这句</button>
+      <span class="chip mut" id="axisChip">—</span>
+    </div>
+    <div class="hint" data-i18n="axisHint">空格 = 播放/暂停，回车 = 打当前句并跳下一句，Z = 撤销。打完所有句子后，每句的时长按「唱到下一句开始」算。</div>
+    <div class="llist" id="llist"></div>
+  </div>
+
+  <!-- 4. 切字 -->
+  <div class="card" id="cutCard" style="display:none">
+    <h2><span class="n">4</span><span data-i18n="cutTitle">把句子切到每个字</span></h2>
+    <div class="row" style="margin-top:0">
+      <button id="btnEven" type="button" data-i18n="btnEven">按字宽均分</button>
+      <button id="btnRetap" type="button" data-i18n="btnRetap">这句改成逐字敲</button>
+      <button id="btnReset1" type="button" data-i18n="btnReset1">重来这句</button>
+      <span class="chip mut" id="cutChip">—</span>
+    </div>
+    <div class="cutwrap">
+      <div class="cutbar" id="cutBar"></div>
+      <div class="cutmeta">
+        <span id="cutMeta">—</span>
+        <span style="margin-left:auto"></span>
+        <label class="lb" style="display:inline-flex;align-items:center;gap:6px">
+          <span data-i18n="tailLb">句尾留白</span>
+          <select id="tailSel" style="height:26px;font-size:12px">
+            <option value="0">0%</option><option value="0.08">8%</option>
+            <option value="0.15" selected>15%</option><option value="0.25">25%</option>
+          </select>
+        </label>
+        <button class="mini" id="btnScale9" type="button" data-i18n="btnScale9">整体快 10%</button>
+        <button class="mini" id="btnScale11" type="button" data-i18n="btnScale11">整体慢 10%</button>
+      </div>
+    </div>
+    <div class="hint" data-i18n="cutHint">拖动字块之间的竖条可以改左右两个字各自的时长；两个相邻字共用一条边界，所以永远不会有缝也不会重叠。「这句改成逐字敲」会让你跟着音乐把这句每个字敲一遍，比均分准得多。中文按字切、英文按词切，标点跟着前一个字走。</div>
+    <div class="msg" id="tapTip" style="display:none"></div>
+  </div>
+
+  <!-- 5. 预览 -->
+  <div class="card" id="pvCard" style="display:none">
+    <h2><span class="n">5</span><span data-i18n="pvTitle">扫色预览</span></h2>
+    <div class="stage" id="stage"><div class="line" id="stageLine"></div><span class="tip" id="stageTip"></span></div>
+    <div class="hint" data-i18n="pvHint">播放时看着这一段：唱到的字会变成上面的「已唱色」，当前那个字从左往右一点点铺过去 —— 导出的 ASS 就是同样的效果。</div>
+  </div>
+
+  <!-- 6. 导出 -->
+  <div class="card" id="outCard" style="display:none">
+    <h2><span class="n">6</span><span data-i18n="outTitle">导出</span></h2>
+    <div class="row" style="margin-top:0">
+      <button class="pri" id="btnAss" type="button" data-i18n="btnAss">下载 ASS（逐字）</button>
+      <button id="btnEnh" type="button" data-i18n="btnEnh">下载增强 LRC</button>
+      <button id="btnSrt" type="button" data-i18n="btnSrt">下载 SRT</button>
+      <button id="btnCopy" type="button" data-i18n="btnCopy">复制 ASS</button>
+    </div>
+    <div class="row">
+      <label class="lb" style="display:inline-flex;align-items:center;gap:6px"><span data-i18n="sungLb">已唱色</span>
+        <input type="color" id="cSung" value="#FFD54A" style="width:34px;height:26px;padding:0;border:1px solid var(--line-strong);border-radius:5px"></label>
+      <label class="lb" style="display:inline-flex;align-items:center;gap:6px"><span data-i18n="unsungLb">未唱色</span>
+        <input type="color" id="cUnsung" value="#FFFFFF" style="width:34px;height:26px;padding:0;border:1px solid var(--line-strong);border-radius:5px"></label>
+      <label class="lb" style="display:inline-flex;align-items:center;gap:6px"><span data-i18n="fontLb">字体</span>
+        <input type="text" id="iFont" value="Source Han Sans SC" style="width:170px"></label>
+      <label class="lb" style="display:inline-flex;align-items:center;gap:6px"><span data-i18n="sizeLb">字号</span>
+        <input type="number" id="iSize" value="72" min="12" max="200" style="width:74px"></label>
+      <label class="lb" style="display:inline-flex;align-items:center;gap:6px"><span data-i18n="marginLb">离底边</span>
+        <input type="number" id="iMargin" value="90" min="0" max="600" style="width:74px"></label>
+    </div>
+    <div class="hint" data-i18n="outHint">ASS 给剪映 / Premiere / Aegisub（带 \kf 逐字标签，能够在视频里逐字扫色）；增强 LRC 给支持逐字歌词的播放器；SRT 只保留整句，给不支持卡拉OK的场合兜底。</div>
+    <div class="msg" id="msg" style="display:none"></div>
+  </div>
+
+  <footer>
+    <span data-i18n="brandName">随心字幕 AI</span> · <span data-i18n="heroEm">字幕制作</span>
+  </footer>
+</div>
+
+<script src="ktv-i18n.js?v=0.9.407"></script>
+<script src="/i18n/tp-boot.js?v=0.9.407"></script>
+<script src="ktv-core.js?v=0.9.407"></script>
+<script>
+'use strict';
+var I18N = window.KTV_I18N.DICT, LANGS = window.KTV_I18N.LANGS;
+var LANG = 'zh-CN';
+var C = window.KtvCore;
+
+var S = {
+  audio: null,        /* File */
+  lines: [],          /* [{text,t,end,units,geo}] */
+  cur: 0,             /* 当前待打轴的行 */
+  sel: -1,            /* 当前编辑的行 */
+  drag: null,         /* 拖动中的边界 {idx, x, orig, spanMs, w} */
+  tapMode: null       /* 逐字连打状态 {i, taps} */
+};
+
+function $(s) { return document.querySelector(s); }
+function t(k) {
+  var d = I18N[LANG] || I18N['en'];
+  return (d && d[k] !== undefined) ? d[k] : (I18N['zh-CN'][k] !== undefined ? I18N['zh-CN'][k] : k);
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* ---------- i18n ---------- */
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = (['ar','fa','he','ur','ps','ku','ug','sd','yi'].indexOf(LANG) >= 0) ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+  document.title = t('docTitle');
+  var seg = $('#langSel');
+  if (seg && seg.value !== LANG) seg.value = LANG;
+}
+function detectUiLang() {
+  var prefs;
+  try {
+    prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+    for (var p = 0; p < prefs.length; p++) {
+      var l = String(prefs[p]).toLowerCase();
+      if (l === 'zh' || l.indexOf('zh-') === 0) return /tw|hk|mo|hant/.test(l) ? 'zh-TW' : 'zh-CN';
+      for (var i = 0; i < LANGS.length; i++) {
+        var c = String(LANGS[i][0]).toLowerCase();
+        if (l === c || l.indexOf(c + '-') === 0) return LANGS[i][0];
+      }
+    }
+  } catch (e) { }
+  return 'en';
+}
+function pathUiLang() {
+  try {
+    var m = location.pathname.match(/^\/([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)\/(?:ktv\.html)?$/);
+    if (m && (window.UI_CODES ? UI_CODES.indexOf(m[1]) >= 0 : LANGS.some(function (x) { return x[0] === m[1]; }))) return m[1];
+  } catch (e) { }
+  return null;
+}
+function updateLangLinks() {
+  var pre = (LANG === 'zh-CN') ? '' : '/' + LANG;
+  $('#logoHome').href = pre + '/';
+}
+function initLang() {
+  TP_ADD_LANGS(LANGS);
+  var sel = $('#langSel');
+  LANGS.forEach(function (pair) { var o = document.createElement('option'); o.value = pair[0]; o.textContent = pair[1]; sel.appendChild(o); });
+  var saved = null;
+  try { saved = localStorage.getItem('ktvUiLang'); } catch (e) { }
+  var pLang = pathUiLang();
+  LANG = pLang || ((saved && LANGS.some(function (x) { return x[0] === saved; })) ? saved : detectUiLang());
+  if (!I18N[LANG] && window.TP_LOAD) { var __tp = TP_LOAD(LANG, 'ktv'); if (__tp) I18N[LANG] = __tp; }
+  sel.value = LANG;
+  sel.addEventListener('change', function () {
+    LANG = sel.value;
+    if (window.TP_SWITCH && TP_SWITCH(LANG, 'ktv')) return;
+    try { localStorage.setItem('ktvUiLang', LANG); } catch (e) { }
+    applyI18n(); updateLangLinks(); rerender();
+  });
+  updateLangLinks();
+}
+
+/* ---------- 音频 ---------- */
+var dz = $('#dz');
+dz.addEventListener('click', function () { $('#afile').click(); });
+['dragover', 'dragenter'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('over'); }); });
+['dragleave', 'drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove('over'); }); });
+dz.addEventListener('drop', function (e) {
+  var fs = e.dataTransfer.files;
+  if (fs && fs.length) loadAudio(fs[0]);
+});
+$('#afile').addEventListener('change', function () { if (this.files.length) loadAudio(this.files[0]); this.value = ''; });
+
+function loadAudio(f) {
+  if (!/^audio\//.test(f.type) && !/\.(mp3|m4a|flac|wav|ogg|oga|aac|opus)$/i.test(f.name)) {
+    showMsg('msgNoAud', 'err'); return;
+  }
+  S.audio = f;
+  $('#aname').textContent = f.name;
+  var au = $('#au');
+  if (au.src) { try { URL.revokeObjectURL(au.src); } catch (e) { } }
+  au.src = URL.createObjectURL(f);
+  hideMsg();
+}
+
+/* ---------- 歌词解析 ---------- */
+$('#btnParse').addEventListener('click', function () {
+  var tx = $('#lyText').value;
+  if (!tx.replace(/\s/g, '')) { showMsg('msgNoLy', 'err'); return; }
+  var parsed;
+  if (/\[\d+:\d{1,2}(?:[.:]\d{1,3})?\]/.test(tx)) parsed = C.parseLrc(tx);
+  else if (/\d\d:\d\d:\d\d[,.]/.test(tx)) parsed = C.parseSrt(tx);
+  else parsed = C.parseLyrics(tx);
+  if (!parsed.length) { showMsg('msgNoLy', 'err'); return; }
+  S.lines = parsed.map(function (l) { return { text: l.text, t: l.t, end: null, units: null, geo: null }; });
+  /* 先补全句子结束时间，再给打了轴的句子直接均分 */
+  C.computeEnds(S.lines, 3000);
+  S.lines.forEach(function (l) { if (l.t != null) cutLine(l); });
+  S.cur = 0;
+  for (var i = 0; i < S.lines.length; i++) { if (S.lines[i].t == null) { S.cur = i; break; } }
+  S.sel = S.lines.length ? 0 : -1;
+  hideMsg(); syncCards();
+});
+
+/* 给一句生成 units + 初始 geo（按字宽均分） */
+function cutLine(l) {
+  if (l.t == null) { l.units = l.units || C.splitUnits(l.text); return l; }
+  l.units = C.splitUnits(l.text);
+  l.geo = C.distribute(l, { tailRatio: currentTail() });
+  return l;
+}
+function currentTail() { return parseFloat($('#tailSel').value || '0') || 0; }
+
+/* ---------- 打轴 ---------- */
+function tapNow() {
+  var au = $('#au');
+  return Math.round((au.currentTime || 0) * 1000);
+}
+function tapLine() {
+  if (!S.lines.length || S.cur >= S.lines.length) return;
+  var l = S.lines[S.cur];
+  l.t = tapNow();
+  S.cur++;
+  /* 打完马上补 ends 并给这句切字，用户可以立刻去第 4 步调 */
+  C.computeEnds(S.lines, 3000);
+  cutLine(l);
+  syncCards();
+}
+function undoLine() {
+  var i = S.cur - 1;
+  if (i < 0) return;
+  while (i >= 0 && S.lines[i].t == null) i--;
+  if (i < 0) return;
+  S.lines[i].t = null; S.lines[i].end = null; S.lines[i].geo = null;
+  S.cur = i;
+  C.computeEnds(S.lines, 3000);
+  syncCards();
+}
+function skipLine() { if (S.cur < S.lines.length) S.cur++; rerender(); }
+$('#btnTap').addEventListener('click', tapLine);
+$('#btnUndo').addEventListener('click', undoLine);
+$('#btnSkip').addEventListener('click', skipLine);
+
+$('#btnPlay').addEventListener('click', togglePlay);
+function togglePlay() {
+  var au = $('#au');
+  if (!S.audio) { showMsg('msgNoAud', 'err'); return; }
+  if (au.paused) au.play(); else au.pause();
+}
+$('#au').addEventListener('play', function () { $('#btnPlay').textContent = t('btnPause'); });
+$('#au').addEventListener('pause', function () { $('#btnPlay').textContent = t('btnPlay'); });
+
+document.addEventListener('keydown', function (e) {
+  var tag = (e.target && e.target.tagName) || '';
+  if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+  if (S.tapMode) {
+    /* 逐字连打模式：空格敲一个字，退格撤一个，Esc 收工 */
+    if (e.code === 'Space') { e.preventDefault(); tapOne(); }
+    else if (e.key === 'Enter') { e.preventDefault(); tapOne(); }
+    else if (e.key === 'Backspace') { e.preventDefault(); untapOne(); }
+    else if (e.key === 'Escape') { e.preventDefault(); endTapMode(1); }
+    return;
+  }
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'Enter') { e.preventDefault(); tapLine(); }
+  else if (e.key === 'z' || e.key === 'Z') { e.preventDefault(); undoLine(); }
+});
+
+/* ---------- 逐字连打 ---------- */
+function startTapMode(i) {
+  if (S.lines[i].t == null) { showMsg('msgNeedAxis', 'warn'); return; }
+  S.sel = i;
+  S.tapMode = { i: i, taps: [] };
+  $('#tapTip').style.display = '';
+  renderTapTip();
+  rerender();
+  showMsgRaw(t('tapTip'), '');
+}
+function tapOne() {
+  if (!S.tapMode) return;
+  var l = S.lines[S.tapMode.i];
+  S.tapMode.taps.push(tapNow());
+  if (S.tapMode.taps.length >= l.units.length) { applyTaps(); endTapMode(1); return; }
+  renderTapTip();
+}
+function untapOne() {
+  if (S.tapMode && S.tapMode.taps.length) { S.tapMode.taps.pop(); renderTapTip(); }
+}
+function applyTaps() {
+  if (!S.tapMode) return;
+  var l = S.lines[S.tapMode.i];
+  l.geo = C.fromTaps(l, S.tapMode.taps, { tailRatio: currentTail() });
+  syncCards();
+}
+function endTapMode(keep) {
+  if (!S.tapMode) return;
+  if (!keep) S.tapMode = null;
+  else S.tapMode = null;
+  $('#tapTip').style.display = 'none';
+  rerender();
+}
+function renderTapTip() {
+  if (!S.tapMode) return;
+  var l = S.lines[S.tapMode.i];
+  showMsgRaw(t('tapProgress').replace('{0}', String(S.tapMode.taps.length)).replace('{1}', String(l.units.length)), '');
+}
+
+/* ---------- 切字：三种互不依赖的生成方式 ---------- */
+$('#btnEven').addEventListener('click', function () {
+  var l = cur(); if (!l || l.t == null) { showMsg('msgNeedAxis', 'warn'); return; }
+  l.geo = C.distribute(l, { tailRatio: currentTail() });
+  syncCards();
+});
+$('#btnRetap').addEventListener('click', function () {
+  if (S.sel < 0) return;
+  var au = $('#au');
+  if (au.currentTime) au.currentTime = Math.max(0, S.lines[S.sel].t / 1000 - 0.4);
+  startTapMode(S.sel);
+  if (S.audio && au.paused) au.play();
+});
+$('#btnReset1').addEventListener('click', function () {
+  var l = cur(); if (!l || l.t == null) return;
+  l.geo = C.distribute(l, { tailRatio: currentTail() });
+  syncCards();
+});
+$('#tailSel').addEventListener('change', function () {
+  var tail = currentTail();
+  S.lines.forEach(function (l) { if (l.t != null) l.geo = C.distribute(l, { tailRatio: tail }); });
+  syncCards();
+});
+$('#btnScale9').addEventListener('click', function () { scaleSel(0.9); });
+$('#btnScale11').addEventListener('click', function () { scaleSel(1.1); });
+function scaleSel(k) {
+  var l = cur(); if (!l || !l.geo) return;
+  l.geo = C.scaleLine(l.geo, l, k);
+  syncCards();
+}
+
+/* 拖动边界 */
+var cutBar = $('#cutBar');
+cutBar.addEventListener('mousedown', function (e) {
+  var h = e.target.closest ? e.target.closest('.uh') : null;
+  if (!h) return;
+  var l = cur(); if (!l || !l.geo) return;
+  var idx = +h.getAttribute('data-edge');
+  var spanMs = (l.end == null ? l.t + 3000 : l.end) - l.t;
+  S.drag = { idx: idx, x0: e.clientX, orig: l.geo.edges[idx], spanMs: spanMs, w: cutBar.clientWidth || 1 };
+  h.classList.add('drag');
+  e.preventDefault();
+});
+document.addEventListener('mousemove', function (e) {
+  if (!S.drag) return;
+  var l = cur(); if (!l || !l.geo) return;
+  var dx = e.clientX - S.drag.x0;
+  var dms = Math.round(dx / S.drag.w * S.drag.spanMs);
+  l.geo = C.setEdge(l.geo, S.drag.idx, S.drag.orig + dms);
+  renderCut();
+});
+document.addEventListener('mouseup', function () { S.drag = null; renderCut(); });
+
+function cur() { return (S.sel >= 0 && S.sel < S.lines.length) ? S.lines[S.sel] : null; }
+
+/* ---------- 渲染 ---------- */
+function syncCards() {
+  var has = S.lines.length > 0;
+  $('#axisCard').style.display = has ? '' : 'none';
+  $('#pvCard').style.display = has ? '' : 'none';
+  $('#outCard').style.display = has ? '' : 'none';
+  $('#cutCard').style.display = has ? '' : 'none';
+  rerender();
+}
+function rerender() {
+  if (!S.lines.length) return;
+  var st = C.statOf(S.lines);
+  var timed = S.lines.filter(function (l) { return l.t != null; }).length;
+  $('#lyChip').textContent = t('statLyrics').replace('{0}', S.lines.length);
+  $('#axisChip').textContent = t('statAxis').replace('{0}', timed).replace('{1}', S.lines.length);
+  $('#cutChip').textContent = t('statCut').replace('{0}', timed);
+  renderList();
+  renderCut();
+  var noExport = timed === 0;
+  ['btnAss', 'btnEnh', 'btnSrt', 'btnCopy'].forEach(function (id) { $('#' + id).disabled = noExport; });
+  applyStageColors();
+}
+function renderList() {
+  $('#llist').innerHTML = S.lines.map(function (ln, i) {
+    var cls = 'lline' + (ln.t != null ? ' done' : '') + (i === S.cur ? ' cur' : '') + (i === S.sel ? ' sel' : '');
+    var ts = ln.t != null ? C.fmtLrc(ln.t) : '--:--.--';
+    return '<div class="' + cls + '" data-ln="' + i + '">' +
+      '<span class="no">' + (i + 1) + '</span><span class="tstamp">' + esc(ts) + '</span>' +
+      '<span class="tx">' + esc(ln.text) + '</span></div>';
+  }).join('');
+  $('#llist').querySelectorAll('[data-ln]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var i = +el.getAttribute('data-ln');
+      S.sel = i;
+      rerender();
+    });
+  });
+  var curEl = $('#llist .lline.cur');
+  if (curEl && curEl.scrollIntoView) { try { curEl.scrollIntoView({ block: 'nearest' }); } catch (e) { } }
+}
+function renderCut() {
+  var l = cur();
+  var bar = $('#cutBar');
+  if (!l || l.t == null || !l.geo || !l.geo.units.length) {
+    bar.innerHTML = '';
+    $('#cutMeta').textContent = '—';
+    return;
+  }
+  var units = l.geo.units, edges = l.geo.edges;
+  var total = 0, html = '';
+  for (var i = 0; i < units.length; i++) {
+    var dur = Math.max(1, edges[i + 1] - edges[i]);
+    total += dur;
+    html += '<div class="ublock" style="flex:' + dur + ' 1 0">' +
+      '<span class="uch">' + esc(units[i]) + '</span>' +
+      '<span class="ums">' + dur + '</span></div>';
+    if (i < units.length - 1) html += '<i class="uh" data-edge="' + (i + 1) + '"></i>';
+  }
+  bar.innerHTML = html;
+  var tailMs = Math.max(0, (l.end == null ? 0 : l.end) - edges[edges.length - 1]);
+  $('#cutMeta').textContent = t('cutMeta').replace('{0}', units.length).replace('{1}', total).replace('{2}', tailMs);
+  if (S.drag) {
+    var hEl = bar.querySelector('.uh[data-edge="' + S.drag.idx + '"]');
+    if (hEl) hEl.classList.add('drag');
+  }
+}
+
+/* ---------- 卡拉OK预览 ---------- */
+function applyStageColors() {
+  $('#stage').style.setProperty('--sung', $('#cSung').value);
+  $('#stage').style.setProperty('--unsung', $('#cUnsung').value);
+  document.documentElement.style.setProperty('--sung', $('#cSung').value);
+  document.documentElement.style.setProperty('--unsung', $('#cUnsung').value);
+}
+$('#cSung').addEventListener('input', applyStageColors);
+$('#cUnsung').addEventListener('input', applyStageColors);
+$('#iSize').addEventListener('input', function () {
+  $('#stageLine').style.fontSize = Math.max(10, Math.min(72, Math.round(+this.value / 2.4))) + 'px';
+});
+
+function tickStage() {
+  var l = cur();
+  var line = $('#stageLine'), tip = $('#stageTip');
+  if (!S.lines.length) { line.innerHTML = ''; tip.textContent = ''; return; }
+  var now = tapNow();
+  /* 优先显示「正在放的那句」：没有 geo 的句子也能看得到 */
+  var show = null;
+  for (var i = 0; i < S.lines.length; i++) {
+    var L = S.lines[i];
+    if (L.t == null || L.end == null) continue;
+    if (now >= L.t - 900 && now <= (L.end == null ? L.t + 3000 : L.end)) { show = L; break; }
+  }
+  if (!show) show = cur();
+  if (!show) { line.innerHTML = ''; return; }
+  if (!show.geo || !show.geo.units.length) {
+    line.innerHTML = esc(show.text);
+    tip.textContent = t('pvNotCut');
+    return;
+  }
+  var u = show.geo.units, e = show.geo.edges, h = '';
+  for (var j = 0; j < u.length; j++) {
+    var cls = 'u', stl = '';
+    if (now >= e[j + 1]) cls += ' sung';
+    else if (now >= e[j]) {
+      var p = Math.max(0, Math.min(100, (now - e[j]) / Math.max(1, e[j + 1] - e[j]) * 100));
+      cls += ' part'; stl = ' style="--p:' + p.toFixed(1) + '%"';
+    }
+    h += '<span class="' + cls + '"' + stl + '>' + esc(u[j]) + '</span>';
+  }
+  line.innerHTML = h;
+  tip.textContent = '';
+}
+setInterval(tickStage, 60);
+setInterval(function () { $('#tmNow').textContent = fmtPos(tapNow()); }, 100);
+function fmtPos(ms) {
+  ms = Math.max(0, ms);
+  var m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000), d = Math.floor((ms % 1000) / 100);
+  return m + ':' + (s < 10 ? '0' : '') + s + '.' + d;
+}
+
+/* ---------- 埋点（口径与其它工具页一致） ---------- */
+var _tlLast = { body: '', t: 0 };
+function reportTool(act, extra) {
+  try {
+    var e = extra || {};
+    var body = JSON.stringify({ page: 'ktv', act: act, cues: e.cues || 0, n: e.n || 0, fmt: e.fmt || '' });
+    var now = Date.now();
+    if (body === _tlLast.body && now - _tlLast.t < 60000) return;
+    _tlLast = { body: body, t: now };
+    if (navigator.sendBeacon && typeof Blob === 'function') {
+      try { if (navigator.sendBeacon('/api/tool-event', new Blob([body], { type: 'application/json' }))) return; } catch (err) { }
+    }
+    fetch('/api/tool-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+      .catch(function () { });
+  } catch (err) { }
+}
+
+/* ---------- 导出 ---------- */
+function dl(name, text, mime) {
+  var b = new Blob([text], { type: mime || 'text/plain;charset=utf-8' });
+  var u = URL.createObjectURL(b);
+  var a = document.createElement('a');
+  a.href = u; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+}
+function baseName() {
+  return (S.audio && S.audio.name) ? S.audio.name.replace(/\.[^.]+$/, '') : 'karaoke';
+}
+function styleNow() {
+  return {
+    font: ($('#iFont').value || 'Source Han Sans SC').trim(),
+    size: Math.max(12, Math.min(200, +$('#iSize').value || 72)),
+    sung: $('#cSung').value,
+    unsung: $('#cUnsung').value,
+    marginV: Math.max(0, Math.min(600, +$('#iMargin').value || 90))
+  };
+}
+function exportLines() {
+  return S.lines.filter(function (l) { return l.t != null && l.geo && l.geo.units.length; });
+}
+$('#btnAss').addEventListener('click', function () {
+  var ls = exportLines();
+  reportTool('export', { cues: ls.length, n: S.lines.length, fmt: 'ass' });
+  dl(baseName() + '.ass', C.toAss(ls, styleNow()), 'text/plain;charset=utf-8');
+});
+$('#btnEnh').addEventListener('click', function () {
+  var ls = exportLines();
+  reportTool('export', { cues: ls.length, n: S.lines.length, fmt: 'enh-lrc' });
+  dl(baseName() + '.lrc', C.toEnhLrc(ls));
+});
+$('#btnSrt').addEventListener('click', function () {
+  var ls = S.lines.filter(function (l) { return l.t != null; });
+  reportTool('export', { cues: ls.length, n: S.lines.length, fmt: 'srt' });
+  dl(baseName() + '.srt', C.toSrt(ls));
+});
+$('#btnCopy').addEventListener('click', function () {
+  var tx = C.toAss(exportLines(), styleNow());
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tx).then(function () { showMsg('msgCopy', ''); },
+      function () { showMsg('msgCopyFail', 'err'); });
+  } else { showMsg('msgCopyFail', 'err'); }
+});
+
+function showMsg(k, cls) { showMsgRaw(t(k), cls); }
+function showMsgRaw(txt, cls) {
+  var el = $('#msg');
+  el.textContent = txt; el.className = 'msg' + (cls ? ' ' + cls : ''); el.style.display = '';
+}
+function hideMsg() { $('#msg').style.display = 'none'; }
+
+/* ---------- 启动 ---------- */
+initLang();
+applyI18n();
+</script>
+
+<!-- v0.9.406：SEO 静态文案（页面主体由 JS 渲染，这一段是爬虫唯一能读到的正文；
+     server.js 按语言路由替换成对应语言，直接开文件时显示下面的简体中文默认版） -->
+<!--SEO-COPY-START-->
+  <section class="seo" style="max-width:1080px;margin:28px auto 0;padding:18px 24px 0;border-top:1px solid var(--line,#E9E9EF);color:var(--sub,#767680);font-size:13px;line-height:1.8;">
+    <h2 style="font-size:15px;color:var(--ink,#15151A);margin:0 0 10px;font-weight:600;">KTV 卡拉OK字幕制作工具 - 随心字幕 AI (AI-SRTSub)</h2>
+    <p><strong>放入音乐、贴入歌词，逐句打轴后自动切到每个字， Drag 着调，实时看扫色效果，导出带 \kf 标签的 ASS。全程在浏览器里完成，音频不上传。</strong></p>
+    <p style="margin-top:8px;">支持 MP3、M4A、FLAC、WAV、OGG 等常见音频；歌词一行一句贴进来即可，已有的 LRC 或 SRT 也能当底稿。逐句打轴用空格播放、回车打点；切字有三种办法——按字宽自动均分、跟着音乐逐字敲、或者直接拖动字块之间的边界。</p>
+    <p style="margin-top:8px;">中文按字切、英文按词切，标点跟着前一个字走。句尾留白可以调，避免最后一个字追不上歌声。导出的 ASS 在剪映、Premiere、Aegisub 里能逐字扫色，也可以导出增强 LRC 给支持逐字歌词的播放器，或 SRT 整句兜底。</p>
+    <p style="margin-top:8px;">适合给翻唱视频配字幕、给演唱会录像上歌词、自制音乐 MV、以及卡拉OK视频的字幕制作。</p>
+  </section>
+<!--SEO-COPY-END-->
+<script src="site-topnav.js?v=0.9.407" data-tool="ktv"></script>
+</body>
+</html>

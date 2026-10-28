@@ -2363,14 +2363,17 @@ function rkBanner(){
 function applyI18n(){
   document.documentElement.lang = UI.lang;
   document.documentElement.dir = (RTL_UI.indexOf(UI.lang) >= 0) ? 'rtl' : 'ltr'; // v0.9.113：阿拉伯语、希伯来语界面从右向左
-  document.title = t('docTitle');
-  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
-  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = t(el.dataset.i18nHtml); });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPh); });
+  /* v0.9.407：字典分片没到（404 / 断网 / 爬虫不取子资源）时 t() 会返回键名，
+     直接写进 DOM 就等于把「btnParse」印在页面上。赋值前比一下，等于键名就跳过，
+     保留服务端渲染的默认文案。 */
+  var _dt = t('docTitle'); if (_dt !== 'docTitle') document.title = _dt;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ var _s=t(el.dataset.i18n); if(_s!==el.dataset.i18n) el.textContent=_s; });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{ var _s=t(el.dataset.i18nHtml); if(_s!==el.dataset.i18nHtml) el.innerHTML=_s; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ var _s=t(el.dataset.i18nPh); if(_s!==el.dataset.i18nPh) el.placeholder=_s; });
   /* v0.9.199：这两个框没有可见 label（标题是「导入」整节，不是字段标签），读屏进来只知道是个编辑框。
      复用它自己那句 placeholder 当 aria-label——零新增词条，且跟着界面语言走。
      有可见 label 的字段一律不在这加：label 的 for 已能关联，再挂 aria-label 会覆盖掉 label 文案、造成重复播报。 */
-  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{ el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{ var _s=t(el.dataset.i18nAria); if(_s!==el.dataset.i18nAria) el.setAttribute('aria-label', _s); });
   if (typeof buildStyleOptions === 'function') buildStyleOptions(); // 导出样式选项的组标签跟随界面语言
   if (typeof buildProviderOptions === 'function') buildProviderOptions(); // 服务商分组的组标签跟随界面语言
   const ao = document.querySelector('#srcLang option[value=auto]');
