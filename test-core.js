@@ -4137,6 +4137,21 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(!/function showAd\(/.test(html), 'showAd 懒显示逻辑没删干净');
   });
 
+  /* 2026-10-28：多语台的广告位整块下线。原因不是「广告没用」，而是多语台的任务进度
+     逻辑与工作台不同（分卷/多语并跑，任务条出现时机不唯一），广告位在这里无效。
+     反向钉住：加载器、ins、容器、showAd 一律不许回来。 */
+  t('2026-10-28 多语台广告位已下线：无加载器 / 无容器 / 无 showAd', () => {
+    const ml = readT('multilang.html');
+    assert.ok(!/pagead2|adsbygoogle|ca-pub-|atOptions|bauval/.test(ml),
+      '多语台还留着广告加载器或投放码');
+    assert.ok(!/id="adBox"/.test(ml), '多语台还留着广告位容器 #adBox');
+    assert.ok(!/class="adbox"/.test(ml), '多语台还留着 .adbox 容器');
+    assert.ok(!/function showAd\(/.test(ml), '多语台还留着 showAd');
+    assert.ok(!/AD_PUSHED/.test(ml), '多语台还留着 AD_PUSHED');
+    /* 广告位删了，ResizeObserver 也不该再观察它（否则永远空转一个不存在的节点） */
+    assert.ok(!/getElementById\('adBox'\)/.test(ml), '多语台还在找 #adBox（RO 观察点没清）');
+  });
+
   t('v0.9.177 源语言默认「自动检测」：未手动选过不再默认 en', () => {
     const fill = html.slice(html.indexOf('/* 语言选择填充 */'), html.indexOf('/* 语言选择填充 */') + 1400);
     assert.ok(/src\.value = okSrc\(sv\.srcLang\) \? sv\.srcLang : 'auto';/.test(fill), '源语言默认值必须是 auto（不是 en）');

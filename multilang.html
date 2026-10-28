@@ -792,16 +792,7 @@
   .pg-busy::before{content:'';position:absolute;left:9px;top:50%;width:6px;height:6px;margin-top:-3px;
     border-radius:50%;background:var(--tr);animation:pgblink 1.4s ease-in-out infinite}
 
-  /* v0.9.262：任务条下方的 AdSense 广告位（懒加载）。
-     初始 display:none——页面加载时不 push：容器不可见时 availableWidth=0，
-     push 会报「No slot size for availableWidth=0」且不填充。首次随任务条出现时才 push，之后常驻。
-     data-ad-status="unfilled"（无广告可投）时整体收起，不留空白高度。 */
-  .adbox{display:none;margin:0}
-  .adbox.show{display:block}
-  /* v0.9.263：上间距挂在 ins 上而不是容器上——ins 被 unfilled 收起时 display:none，
-     间距一并消失，未投放时不留空档；真投上时才与任务条拉开 10px。 */
-  .adbox ins.adsbygoogle{display:block;margin-top:10px}
-  .adbox ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important}
+  /* 2026-10-28：多语台的广告位整块下线（任务进度逻辑与工作台不同，这里的广告位无效）。 */
 
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 8px}
   .toolbar select{width:auto;font-size:12.5px}
@@ -1322,8 +1313,6 @@
     .gl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
 </style>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8352564748755277"
-crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -1947,19 +1936,7 @@ crossorigin="anonymous"></script>
           <div class="prog" id="prog"><i></i></div>
         </div>
       </div>
-      <!-- v0.9.262：任务条下方广告位。懒加载——首次随任务条（#progWrap.show）出现才 push，
-           之后常驻。加载器脚本已在 <head>（v0.9.258 接入），此处不重复引入。
-           v0.9.263：data-ad-format 由 auto 改 horizontal——auto 由 Google 自由决定形状，
-           桌面端常见 90~280px 高，不一定是细横条；horizontal 固定水平横幅（728x90 一族），
-           配合 full-width-responsive 撑满内容宽度，高度稳定，正是要的「横屏广告」。 -->
-      <div class="adbox" id="adBox">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-8352564748755277"
-             data-ad-slot="2593336254"
-             data-ad-format="horizontal"
-             data-full-width-responsive="true"></ins>
-      </div>
+      <!-- 2026-10-28：原 AdSense 广告位已下线，容器与 ins 一并移除。 -->
       <div class="toolbar">
         <!-- v0.9.199：工具栏这个筛选框没有任何可见标签（左右邻居都是按钮），
              读屏只会念「组合框 全部」，不知道在筛什么。补一个 aria-label。 -->
@@ -2535,22 +2512,7 @@ function fmtDur(sec){
   const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;
   return h>0 ? h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0') : m+':'+String(s).padStart(2,'0');
 }
-/* ---------------- v0.9.262 任务条下方广告位 ----------------
-   懒加载：页面加载时容器 display:none，不 push（宽度为 0 会失败且不填充）。
-   首次随任务条出现才 push；此后常驻、不重复 push（同一个 ins 重复 push 会报
-   "All ins elements in the DOM with class=adsbygoogle already have ads in them."）。 */
-var AD_PUSHED=false;
-function showAd(){
-  var box=document.getElementById('adBox');
-  if(!box || box.classList.contains('show')) return;
-  box.classList.add('show');            /* 先显示：push 时 ins 必须有实际宽度 */
-  if(window.syncLstQueue) window.syncLstQueue();
-  if(AD_PUSHED) return;
-  AD_PUSHED=true;
-  requestAnimationFrame(function(){
-    try{ (window.adsbygoogle = window.adsbygoogle || []).push({}); }catch(e){}
-  });
-}
+/* 2026-10-28：原「任务条下方广告位」的懒加载逻辑随广告位一并删除。 */
 /* v0.9.297：任务条下方那句宽心话的开关。只有一个调用点原则会漂 ——
    所以集中到这里，三处（pgStart 开、pgFinish 关、setProg(…,false) 关）都走它。
    文案本身不在这里：走 data-i18n="pgBusyTip"，applyI18n 负责 27 语。 */
@@ -2562,8 +2524,7 @@ function setProg(p, show){
   const w=$('progWrap'); if(!w) return;
   if(!show){ w.classList.remove('show','done'); $('prog').classList.remove('run'); pgBusy(false); document.title=BASE_TITLE; return; }
   w.classList.add('show');
-  showAd();   /* v0.9.262：任务条出现即唤起广告位（内部幂等）
-                 v0.9.263：任务条本身提前到 pgStart（点翻译那一刻）出现，广告随之提前 */
+  /* 2026-10-28：广告位已下线，此处不再唤起广告。 */
   $('pgPct').textContent=p+'%';
   $('prog').firstChild.style.width=p+'%';
   document.title = (p>0 && p<100) ? (p+'% · '+BASE_TITLE) : BASE_TITLE;
@@ -10503,8 +10464,6 @@ function syncListHeight(){
     var l=main&&main.querySelector('aside.panel'); if(l) ro.observe(l);
     var pw=document.getElementById('progWrap'); if(pw) ro.observe(pw);
     var mt=document.querySelector('.metrics'); if(mt) ro.observe(mt);
-    /* v0.9.262：广告位高度是异步变化的（广告填充后才撑开），跟着重算字幕表高度 */
-    var ab=document.getElementById('adBox'); if(ab) ro.observe(ab);
   }
 })();
 /* 悬停解释跟随界面语言：applyI18n 不认识 data-tip-i18n，这里包一层补上 */
