@@ -4110,49 +4110,31 @@ console.log('— 专名策略与术语表（v0.9.134）—');
   });
  }
 
-/* v0.9.173：赞助入口 —— 仅简中显示、收起态零请求。三条防线：
-   ① JS 按语言裁剪（非 zh-CN 连 DOM 都不留）② 图片懒加载 ③ 二维码图实体随包发布 */
+/* 2026-10-28：右下角的支付宝赞助入口（#donateBox 按钮 + 收款码）整块下线 —— 用户要求
+   页面挂广告之后不再要打赏。DOM / CSS / JS 三处一并删除，这里改成反向断言钉住，
+   免得哪天从旧备份里合并回来又悄悄冒出来。 */
 {
   const fsD = require('fs'), pathD = require('path');
   const html = WS_SRC;   /* v0.9.277：赞助入口 DOM 在 translate.html */
 
-  t('v0.9.173 赞助入口：默认隐藏 + 仅 zh-CN 渲染', () => {
-    assert.ok(/<div id="donateBox" hidden>/.test(html), 'donateBox 必须默认 hidden');
-    /* ⚠️ 用 lastIndexOf：样式区还有一条同名 CSS 注释，indexOf 会切错位置。
-       ⚠️ v0.9.277：WS_SRC 尾部还拼了整本词典（1.1MB），切片必须自己封顶，
-       否则「切到文件尾」= 把词典也算进去，长度断言会假红。 */
-    const _di = html.lastIndexOf('/* v0.9.173：赞助入口');
-    const init = _di < 0 ? '' : html.slice(_di, _di + 1600);
-    assert.ok(init.length > 100 && init.length < 2000, '赞助初始化代码找不到');
-    assert.ok(/if\(UI\.lang!=='zh-CN'\)\{/.test(init), '缺少语言裁剪判断');
-    assert.ok(/removeChild\(box\)/.test(init), '非简中必须把节点整个移除');
-    assert.ok(/box\.hidden=false;/.test(init), '简中没解除 hidden');
+  t('2026-10-28 赞助入口已下线：工作台与多语台都不再有按钮 / 收款码 / 揭幕回调', () => {
+    const ml = readT('multilang.html');
+    [['translate.html', html], ['multilang.html', ml]].forEach(p => {
+      assert.ok(!/id="donateBox"/.test(p[1]), p[0] + ' 里还留着 donateBox');
+      assert.ok(!/id="btnDonate"/.test(p[1]), p[0] + ' 里还留着赞助按钮');
+      assert.ok(!/#btnDonate\{/.test(p[1]), p[0] + ' 里还留着赞助按钮的 CSS');
+      assert.ok(!/id="donateQr"/.test(p[1]), p[0] + ' 里还留着收款码容器');
+      assert.ok(!/__donateReveal/.test(p[1]), p[0] + ' 里还留着揭幕回调');
+      assert.ok(!/支付宝收款码/.test(p[1]), p[0] + ' 里还留着支付宝图注');
+    });
   });
 
-  t('v0.9.173 赞助二维码懒加载：首次展开才赋 src', () => {
-    const init = html.slice(html.indexOf('/* v0.9.173：赞助入口'));
-    assert.ok(!/<img id="donateImg" alt="支付宝收款码" src=/i.test(html), 'img 不许带静态 src（收起态会偷跑请求）');
-    assert.ok(/donate-qr-square\.png\?v=/.test(init), '展开时没赋图片 src');
-    assert.ok(/var opening=qr\.hidden;/.test(init), '展开/收起切换逻辑找不到');
-    assert.strictEqual((html.match(/🌹工具不错，支持网站运营❤️/g) || []).length, 2,
-      '文案应恰好出现 2 次（按钮默认 + 收起态要还原的那份）');
-    /* v0.9.319：判据不能再写 'AI算力紧张' —— 任务条那句新文案里就带这四个字（无空格），
-       拿它当「旧文案残留」的尺子会自己踩自己。改用旧赞助文案独有的尾巴。 */
-    assert.ok(html.indexOf('给网站支持点 Token费') < 0, '旧文案「AI算力紧张…Token费」还残留');
-  });
-
-  t('v0.9.173 二维码图片实体存在且体积可控', () => {
-    const p = pathD.join(__dirname, 'donate-qr.jpg');
-    assert.ok(fsD.existsSync(p), 'donate-qr.jpg 不在站点根目录');
-    const sz = fsD.statSync(p).size;
-    /* 上限 200KB：v0.9.175 换高清裁剪版（1200×1440 q87 ≈ 118KB），清晰度优先 */
-    assert.ok(sz > 5000 && sz < 200 * 1024, 'donate-qr.jpg 体积异常: ' + sz);
-    /* v0.9.204：页面改用方形裁切版。原图是一整张亮蓝底 + 大字宣传的海报，
-       贴进暖色卡片里会整块跳出来；方形裁切只留二维码本体，暖色卡片才包得住。 */
-    const q = pathD.join(__dirname, 'donate-qr-square.png');
-    assert.ok(fsD.existsSync(q), 'donate-qr-square.png 不在站点根目录');
-    const qz = fsD.statSync(q).size;
-    assert.ok(qz > 5000 && qz < 200 * 1024, 'donate-qr-square.png 体积异常: ' + qz);
+  t('2026-10-28 广告位常驻：translate.html 的 #adBox 不再靠 .show 才显示', () => {
+    assert.ok(!/\.adbox\{display:none/.test(html), '广告位还是初始 display:none（会等任务条才出现）');
+    assert.ok(!/\.adbox\.show/.test(html), '残留 .adbox.show 开关');
+    assert.ok(/<div class="adbox" id="adBox">/.test(html), '广告位容器不见了');
+    assert.ok(/de2e5b52b36d97247e27a7579fa77c7e/.test(html), 'bauval 投放码 key 丢了');
+    assert.ok(!/function showAd\(/.test(html), 'showAd 懒显示逻辑没删干净');
   });
 
   t('v0.9.177 源语言默认「自动检测」：未手动选过不再默认 en', () => {
@@ -4958,7 +4940,7 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '右栏区块 div 不配对（净 ' + (opens - closes) + '，应为 -2）——多半是多写/漏写了一个 </div>');
     assert.strictEqual((seg.match(/<\/aside>/g) || []).length, 1, '右栏 aside 没有恰好闭合一次');
     const iAside = seg.indexOf('</aside>');
-    [['<div class="exp-actions">', '下载/复制按钮区'], ['id="donateBox"', '赞助入口'],
+    [['<div class="exp-actions">', '下载/复制按钮区'],
      ['id="splitWarnHint"', '切分提示'], ['id="maxW"', '折行设置']].forEach(p => {
       const i = seg.indexOf(p[0]);
       assert.ok(i > 0 && i < iAside, p[1] + '跑到 aside.panel 外面去了（会变成整页宽的区块）');
@@ -5012,10 +4994,6 @@ console.log('— 专名策略与术语表（v0.9.134）—');
     assert.ok(/\.exp-actions \.btn\.primary\{flex:1 1 auto;min-width:0\}/.test(html),
       '主 CTA 没有自适应吃掉剩余宽度');
     assert.ok(/class="btn ghost" id="btnCopy"/.test(html), '复制没有降级为白底描边按钮');
-    // 赞助：可点击元素必须过 4.5:1；也绝不能上主色（会比下载按钮还重）
-    assert.ok(/#btnDonate\{[^}]*color:#633806/.test(html),
-      '赞助按钮字色不是 #633806（在 #FAEEDA 底上对比度 6.9:1）');
-    assert.ok(!/#btnDonate\{[^}]*background:var\(--acc\)/.test(html), '赞助按钮还是实心主色（比下载还重）');
   });
 
   t('v0.9.320：折行块内衬压紧（只压这一块，ASS/VTT 面板不跟着变）', () => {
@@ -5335,32 +5313,6 @@ console.log('— 专名策略与术语表（v0.9.134）—');
       '下载按钮的箭头没换成 SVG');
     assert.strictEqual((html.match(/>⬇ 下载字幕</g) || []).length, 0, '按钮里还留着 ⬇ emoji 文本');
     assert.strictEqual((html.match(/btnDownload:'⬇ /g) || []).length, 0, '还有语言词条带着 ⬇ 前缀');
-    /* 赞助入口：暖色胶囊自成一路——既不抢主 CTA，也不至于像文字链那样被忽略 */
-    assert.ok(/#btnDonate\{[^}]*background:#FAEEDA/.test(html), '赞助入口不是暖色胶囊底');
-    assert.ok(/#btnDonate\{[^}]*text-decoration:none/.test(html), '赞助入口还挂着静态下划线');
-    assert.ok(!/#btnDonate\{[^}]*text-decoration:underline/.test(html), '赞助入口的静态下划线没去掉');
-    assert.ok(/#donateBox\{text-align:center/.test(html), '赞助入口没居中');
-    assert.ok(/#donateQr\{[^}]*background:#FFF9F0/.test(html), '展开的收款码没跟着换暖色系');
-  });
-
-  t('v0.9.206 赞助入口常驻（撤掉 v0.9.204 的「导出过才露出」门槛）', () => {
-    /* v0.9.204 曾加门槛：还没拿到成果的人看到「充点 token」只会觉得在要钱。
-       v0.9.206 用户要求撤掉 → 恢复常驻。srtDonateV1 标记照写不误：
-       它不再决定显不显示，但将来要做「导出过的人换一句文案」时还能直接读。 */
-    const init = html.slice(html.indexOf('/* v0.9.173：赞助入口'));
-    assert.ok(/window\.__donateReveal=function\(\)\{ box\.hidden=false; \};/.test(init),
-      '揭幕函数还没改成常驻（仍带门槛判定）');
-    assert.ok(/^\s*box\.hidden=false;$/m.test(init), '初始化没有无条件显示（赞助入口应常驻）');
-    assert.ok(!/if\(eligible\(\)\)/.test(init) && !/function eligible\(\)/.test(init),
-      '「导出过才露出」的门槛还在');
-    assert.ok(/localStorage\.setItem\('srtDonateV1','1'\)/.test(html),
-      '导出标记仍应照写（留给将来按「导出过」换文案用）');
-    assert.ok(/if\(window\.__donateReveal\) window\.__donateReveal\(\);/.test(html), '导出成功后的回调没了');
-    assert.ok(/🌹工具不错，支持网站运营❤️/.test(html), '主文案丢了');
-    assert.ok(/<div class="hint">图个快乐，多少随意<\/div>/.test(html), '展开态的「图个快乐，多少随意」丢了');
-    /* 收起态的按钮必须能原样回到主文案，否则点一次就回不来了 */
-    assert.ok(/图个快乐，多少随意/.test(html) && /🌹工具不错，支持网站运营❤️/.test(html),
-      '赞助文案不全（展开态与主文案得都有）');
   });
 
   t('v0.9.204 字幕预览两行不再重叠（行盒高要「量」，不能按系数「猜」）', () => {
@@ -10247,25 +10199,6 @@ console.log('— 双语合并工具（v0.9.219，独立引擎）—');
       assert.ok(/\.(?:logo|logo-sm|brand)\{[^}]*display:(?:flex|inline-flex)/.test(src),
         name + ' 的 logo 原有 flex 布局不见了');
     });
-  });
-
-  t('v0.9.281：赞助文案换成长句（右栏 320px 放不下，得能折行且不溢出）', () => {
-    /* v0.9.319：文案改成「🌹工具不错，支持网站运营❤️」（用户定案，带 emoji 是特意要的）；
-       短了不等于能松绑 —— 折行、限宽、行距那套规矩照样得在，右栏窄时仍可能折两行。 */
-    const TXT = '🌹工具不错，支持网站运营❤️';
-    /* ① 新文案恰好 2 处：按钮里的默认文字 + TXT_IDLE（点开再收起要还原的那份）。
-          ⚠️ 注释里别抄整句 —— 抄了计数就成 3，这条会红（实测踩过）。 */
-    assert.strictEqual((WS_SRC.split(TXT).length - 1), 2,
-      '新文案不是恰好 2 次（按钮一份 + TXT_IDLE 一份）');
-    assert.ok(WS_SRC.indexOf('给网站支持点 Token费') < 0, '旧文案「AI算力紧张…Token费」还残留');
-    assert.ok(WS_SRC.indexOf("var TXT_IDLE='" + TXT + "'") > 0,
-      'TXT_IDLE 没跟着改：点开二维码再收起会跳回旧文案');
-    /* ② 右栏只有 320px（实测按钮可用宽 286px）→ 长句子必然折两行。
-          默认 line-height:1 是为单行胶囊设的，折行时两行会紧贴成一块，必须放宽。 */
-    assert.ok(/#btnDonate\{[^}]*max-width:100%/.test(WS_SRC), '按钮没限宽（折行时会撑破右栏）');
-    assert.ok(/#btnDonate\{[^}]*line-height:1\.4/.test(WS_SRC), '按钮行距还是 1，折行会贴成一块');
-    assert.ok(/#btnDonate #donateTxt\{[^}]*text-wrap:balance/.test(WS_SRC),
-      '两行长度没均分（会一行长、一行只剩俩字）');
   });
 
   t('v0.9.282：52 条 VTT 面板词条补齐到 27 语（高级面板一开就不能露中文）', () => {
@@ -16998,7 +16931,7 @@ t('v0.9.392：翻译设置 / 导出搬到主页卡片，抽屉里不再有这两
      ⚠️ 只在去掉注释的正文里数 —— expStyle 会在一段 JS 注释里以 <select id="expStyle"> 被写到，
         那是说明性引用，不是真的标签（v0.9.258 那条注释里重复了一次）。 */
   const plain = ML_SRC.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-  ['styleCustom', 'terms', 'marks', 'mode', 'batch', 'expStyle', 'maxW', 'biMaxW', 'apiBox', 'donateBox']
+  ['styleCustom', 'terms', 'marks', 'mode', 'batch', 'expStyle', 'maxW', 'biMaxW', 'apiBox']
     .forEach(id => {
       const n = (plain.match(new RegExp('id="' + id + '"', 'g')) || []).length;
       assert.strictEqual(n, 1, id + ' 出现 ' + n + ' 次（搬运丢件或搬重了）');

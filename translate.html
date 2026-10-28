@@ -651,36 +651,7 @@
     .main>aside.panel:last-child::-webkit-scrollbar{width:6px}
     .main>aside.panel:last-child::-webkit-scrollbar-thumb{background:#D9D8D4;border-radius:99px}
   }
-  /* v0.9.173：赞助入口（仅 zh-CN 界面显示，JS 按语言裁剪；非中文连 DOM 都不留）。
-     淡粉描边幽灵按钮，展开后显示支付宝收款码（图片懒加载：首次展开才赋 src，收起态零请求）。 */
-  /* v0.9.199：原来是带边框的小胶囊，和「下载/复制」挤在一起抢视觉重量。
-   改成最底部一行淡字链。颜色用 --sub 而不是更淡的 --mut：它是可点击元素，
-   对比度必须过 4.5:1（--mut 只有 2.5:1），不能为了「淡」牺牲可读性。 */
-  /* v0.9.204：从「灰色小字链」改成暖色胶囊。
-     灰色文字链太轻，几乎没人看见；但它也绝不能用主色（会比下载按钮还重）。
-     暖色自成一档：既不抢主 CTA，也不至于被忽略。底 #FAEEDA / 描边 #FAC775 / 字 #633806，
-     字与底对比度 6.9:1，过 AA。 */
-  #donateBox{text-align:center;margin-top:12px}
-  #btnDonate{display:inline-flex;align-items:center;gap:6px;background:#FAEEDA;border:1px solid #FAC775;
-    color:#633806;font-size:12.5px;line-height:1.4;padding:7px 12px;border-radius:999px;max-width:100%;
-    cursor:pointer;text-decoration:none;transition:all .12s}
-  /* v0.9.281：文案换成长句（详见按钮里那句）后，
-     右栏只有 320px，这句放不进一行 —— 允许折行并居中，行距靠上面的 line-height:1.4
-     （原来是 1，两行会紧贴在一起）。text-wrap:balance 让两行长度均分，不会第一行长第二行只剩几个字。
-     窄屏（≤1100px）右栏变全宽，这句自动回到单行，胶囊高度不变。 */
-  #btnDonate #donateTxt{text-align:center;text-wrap:balance}
-  #btnDonate:hover{background:#F7E2C0;border-color:#E9AE55;color:#633806}
-  #btnDonate svg{flex:none}
-  #btnDonate .d-heart{width:13px;height:13px}
-  #btnDonate .d-heart path{fill:#D4537E}
-  #btnDonate .d-token{width:16px;height:16px}
-  #btnDonate .d-token rect{fill:#FFF6EA;stroke:#BA7517;stroke-width:1.3}
-  #btnDonate .d-token rect:last-child{fill:#FAC775}
-  /* 展开的收款码用同一套暖色，整块才是一个东西。 */
-  #donateQr{margin-top:10px;background:#FFF9F0;border:1px solid #F1DDC0;border-radius:12px;padding:12px;text-align:center}
-  #donateQr img{width:150px;max-width:100%;border-radius:8px;display:block;margin:0 auto}
-  #donateQr .hint{color:#854F0B;font-size:12px;margin-top:8px;line-height:1.6}
-  #donateQr .hint{text-align:center;margin-top:6px}
+  /* 2026-10-28：右下角的支付宝赞助入口（#donateBox 按钮 + 收款码）整块下线，DOM/CSS/JS 一并删除。 */
   /* v0.9.106：模块标题升级为彩色图标徽章 + 渐隐分隔线 */
   /* v0.9.201：分节间距收进 4 档体系（0 / 4 / 8 / 20），22/10 → 20/8。 */
   .sec-title{font-size:11.5px;font-weight:800;color:var(--sub);letter-spacing:1.1px;margin:20px 0 8px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -788,8 +759,12 @@
   .center{display:flex;flex-direction:column;min-width:0}
   .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;flex:none}
   /* v0.9.262：为任务条下方广告位腾高度——统计卡内边距 8→6、数字 16→15（省约 6px） */
-  .metric{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:6px 10px;font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden}
-  .metric b{font-size:15px;color:var(--ink);font-weight:800;font-family:var(--mono);display:block;line-height:1.15}
+  /* 2026-10-28：指标卡压成一行——标签和数值同排，行高 19 + 上下无内边距，
+     整卡从 ~47px 砍到 ~22px（「能多矮改多矮」）。数字改 inline，靠 margin-left 与标签分开。 */
+  .metric{background:var(--card);border:1.5px solid var(--line);border-radius:9px;padding:0 8px;
+    font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden;line-height:19px}
+  .metric b{font-size:13px;color:var(--ink);font-weight:800;font-family:var(--mono);display:inline;
+    margin-left:4px;line-height:1}
   .metric.del b{color:var(--del)} .metric.warn b{color:var(--warn)} .metric.ok b{color:var(--ok)} .metric.hl b{color:var(--acc)}
 
   /* v0.9.262：任务条瘦身——内边距 10→7、百分比 21→19、条高 14→12、行距 6→4（省约 12px） */
@@ -837,11 +812,9 @@
   .pg-busy::before{content:'';position:absolute;left:9px;top:50%;width:6px;height:6px;margin-top:-3px;
     border-radius:50%;background:var(--tr);animation:pgblink 1.4s ease-in-out infinite}
 
-  /* v0.9.262：任务条下方的广告位（懒加载），初始 display:none，首次随任务条出现才显示，之后常驻。
-     2026-10-28：AdSense 换成 bauval 的 728x90 iframe 投放码。iframe 是固定 728 宽，
-     窄屏靠 max-width:100% 收进来、容器 overflow:hidden 兜底，绝不撑出横向滚动条。 */
-  .adbox{display:none;margin:0;overflow:hidden}
-  .adbox.show{display:block}
+  /* 2026-10-28：广告位由「随任务条出现」改为常驻，同时 AdSense 换成 bauval 的 728x90 iframe 投放码。
+     iframe 固定 728 宽，窄屏靠 max-width:100% 收进来、容器 overflow:hidden 兜底，绝不撑出横向滚动条。 */
+  .adbox{margin:0;overflow:hidden}
   .adbox iframe{display:block;border:0;margin:10px auto 0;max-width:100%}
 
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 8px}
@@ -1684,21 +1657,6 @@
         </span>
         <span class="fx-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg></span>
       </a>
-      <!-- v0.9.173：赞助入口。默认 hidden；JS 确认界面语言是 zh-CN、**且用户导出过至少一次**才露出
-           （其他语言整个从 DOM 移除）。v0.9.204：加「导出过」这个门槛 —— 还没拿到成果的人看到它
-           只会觉得在要钱，导出过的人正处在「东西到手」的情绪点上。
-           文案固定中文，不进 i18n 字典——只有简中用户看得见。 -->
-      <div id="donateBox" hidden>
-        <button id="btnDonate" type="button">
-          <svg class="d-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.2-4.7-9.6-8.6C.5 9.5 2.4 5.8 5.8 5.8c2 0 3.4 1.1 4.1 2.2.2.3.8.3 1 0 .7-1.1 2.1-2.2 4.1-2.2 3.4 0 5.3 3.7 3.4 6.6C19.2 16.3 12 21 12 21z"/></svg>
-          <span id="donateTxt">🌹工具不错，支持网站运营❤️</span>
-          <svg class="d-token" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.6" y="9" width="5.4" height="6" rx="1.6"/><rect x="9.3" y="9" width="5.4" height="6" rx="1.6"/><rect x="16" y="9" width="5.4" height="6" rx="1.6"/></svg>
-        </button>
-        <div id="donateQr" hidden>
-          <img id="donateImg" alt="支付宝收款码">
-          <div class="hint">图个快乐，多少随意</div>
-        </div>
-      </div>
     </aside>
   </div>
 </div>
@@ -2212,16 +2170,9 @@ function fmtDur(sec){
   const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), s=sec%60;
   return h>0 ? h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0') : m+':'+String(s).padStart(2,'0');
 }
-/* ---------------- v0.9.262 任务条下方广告位 ----------------
-   懒加载：容器初始 display:none，首次随任务条出现才显示，之后常驻。
-   2026-10-28：换成 bauval 的 iframe 投放码后，广告脚本随页面解析就执行（投放码用 document.write
-   写 iframe，load 之后动态插入会整页覆盖，所以不能改成懒 push），这里只负责开显示。 */
-function showAd(){
-  var box=document.getElementById('adBox');
-  if(!box || box.classList.contains('show')) return;
-  box.classList.add('show');
-  if(window.syncLstQueue) window.syncLstQueue();
-}
+/* ---------------- 任务条下方广告位 ----------------
+   2026-10-28：广告位已改为常驻（不再等任务条出现），容器常显，脚本随页面解析就写出 iframe，
+   所以这里不再需要 showAd()/懒 push。 */
 /* v0.9.297：任务条下方那句宽心话的开关。只有一个调用点原则会漂 ——
    所以集中到这里，三处（pgStart 开、pgFinish 关、setProg(…,false) 关）都走它。
    文案本身不在这里：走 data-i18n="pgBusyTip"，applyI18n 负责 27 语。 */
@@ -2233,8 +2184,6 @@ function setProg(p, show){
   const w=$('progWrap'); if(!w) return;
   if(!show){ w.classList.remove('show','done'); $('prog').classList.remove('run'); pgBusy(false); document.title=BASE_TITLE; return; }
   w.classList.add('show');
-  showAd();   /* v0.9.262：任务条出现即唤起广告位（内部幂等）
-                 v0.9.263：任务条本身提前到 pgStart（点翻译那一刻）出现，广告随之提前 */
   $('pgPct').textContent=p+'%';
   $('prog').firstChild.style.width=p+'%';
   document.title = (p>0 && p<100) ? (p+'% · '+BASE_TITLE) : BASE_TITLE;
@@ -7096,9 +7045,6 @@ $('btnDownload').addEventListener('click', ()=>{
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },200);
   /* v0.9.244：连导出格式一起上报（expFileFmt() 已把 ass-stack 归一为 ass，与服务端白名单一致） */
   reportEvent('download', '', expFileFmt());   // 下载成功上报（仅云端模式有效）
-  /* v0.9.204：导出成功 = 用户真的拿到了成果（也真的烧过 token）。到这一刻才解锁赞助入口。 */
-  try{ localStorage.setItem('srtDonateV1','1'); }catch(e){}
-  if(window.__donateReveal) window.__donateReveal();
   log(t('exported',name,buildExportItems().length),'okc');
 });
 $('btnCopy').addEventListener('click', async ()=>{
@@ -8819,30 +8765,6 @@ applyTipI18n();
    那里的依赖还没齐备；挪到所有初始化跑完之后才稳定生效。
    silent：语言对不上只写一行日志说明原因，绝不开屏弹窗。 */
 try{ const p=glossLibRestore({silent:true}); if(p && p.catch) p.catch(function(e){ console.error('[glossLibRestore]', e); }); }catch(e){ console.error('[glossLibRestore]', e); }
-/* v0.9.173：赞助入口 —— 仅简体中文界面显示（其他语言整个从 DOM 移除，连节点都不留）；
-   展开才给 img 赋 src，收起态对 donate-qr.jpg 零请求。此时 UI.lang 已在上文确定。 */
-(function(){
-  var box=document.getElementById('donateBox');
-  if(!box) return;
-  if(UI.lang!=='zh-CN'){ if(box.parentNode) box.parentNode.removeChild(box); return; }
-  var btn=document.getElementById('btnDonate'), qr=document.getElementById('donateQr'),
-      img=document.getElementById('donateImg'), txt=document.getElementById('donateTxt');
-  if(!btn||!qr||!img||!txt) return;
-  var TXT_IDLE='🌹工具不错，支持网站运营❤️';
-    /* v0.9.206：常驻显示（v0.9.204 曾改成「导出过至少一次才露出」，理由是「还没拿到成果的人
-     看到只会在要钱」；用户要求撤掉，恢复常驻）。
-     srtDonateV1 标记照写不误——它不再决定显不显示，但将来要做
-     「导出过的人换一句文案」这类差别时还能直接读。 */
-  window.__donateReveal=function(){ box.hidden=false; };
-  box.hidden=false;
-  var loaded=false;
-  btn.addEventListener('click', function(){
-    var opening=qr.hidden;
-    qr.hidden=!opening;
-    if(opening&&!loaded){ img.src='donate-qr-square.png?v=0.9.264'; loaded=true; }
-    txt.textContent=opening?'收起':TXT_IDLE;
-  });
-})();
 </script>
 <!-- v0.9.319：本页不再引 site-topnav.js —— 顶栏已撤掉 #topNav 占位（318 挂过一版太挤），
      引进来只会白渲染一段没人看的 DOM。其余 15 页照旧挂统一导航。 -->
