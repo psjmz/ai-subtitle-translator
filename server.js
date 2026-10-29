@@ -21,6 +21,13 @@ const crypto = require('crypto');
    页脚多语言互链要用它的 zh（语言自称）与 dir 字段 —— 别在 server.js 里另抄一份名册。 */
 const LANGS100 = require(path.join(__dirname, 'langs100.js'));
 
+/* v0.9.409：服务端按 URL 语言把首屏文案写进 HTML（i18n-ssr.js）。
+   以前 /ja/ 这类语言页只有 <title>/canonical 是日语，正文全是中文默认值 —— 那部分
+   靠客户端 applyI18n 换，爬虫和禁用 JS 的访客永远看不到译文。现在渲染时直接换掉。
+   100 种语言全覆盖：27 语用 i18n/dict.<lang>.js 全量分片，其余 73 语用英文打底 +
+   i18n/ui-<lang>.js 差异分片。加载失败一律返回原 HTML（页面照出，只是回到中文）。 */
+const I18N_SSR = require(path.join(__dirname, 'i18n-ssr.js'));
+
 const ROOT = __dirname;
 /* v0.9.348：允许用 DATA_DIR 指向独立目录 —— 只为端到端测试时能起一个不碰真实配置的实例。
    不设这个环境变量时行为与之前完全一致（生产环境不会设）。 */
@@ -31,7 +38,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.408';
+const ASSET_VER = '0.9.409';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -6395,6 +6402,19 @@ function serveIndexLang(req, res, lang, page){
   }
   fs.readFile(path.join(ROOT, P.file), 'utf8', (err, html) => {
     if (err) { res.writeHead(500, {'Content-Type':'text/plain; charset=utf-8'}); res.end(P.file + ' missing'); return; }
+    /* v0.9.409：按 URL 语言把可见文案（data-i18n / -ph / -aria）替换成译文。
+       ⚠️ 只对本页用「主站分片词典」的页面生效（首页 / 翻译工作台 / 多语台）。
+          其余工具页各有自己的 <page>-i18n.js，词条同名不同义 —— 例如 convert 页的
+          heroSub 是「转换…」，主站词典里是「翻译、清洗…」；硬套会把爬虫读到的正文写错，
+          比留着中文默认值更糟（客户端起来后会改对，爬虫看到的却是错的）。
+          判据直接看页面有没有引 /i18n/core.js：哪天那页迁到分片词典，这里自动跟上。
+       ⚠️ 必须在 SEO 注入与链接补前缀之前 —— 那些片段本来就是按语言现拼的，
+          再过一遍只是白跑两趟正则。
+       ⚠️ 整段 try：词典坏了也不许把页面打成 500，降级成原 HTML（中文默认值）即可。 */
+    if (html.indexOf('/i18n/core.js') >= 0) {
+      try { html = I18N_SSR.localizeHtml(html, lang); }
+      catch (e) { console.error('[i18n-ssr] 本地化失败，降级原页面', lang, P.file, e && e.message); }
+    }
     const base = publicBase(req) || '';
     const head = seoHead(lang, base, page);
     html = html.replace(/<!--SEO-HEAD-START-->[\s\S]*?<!--SEO-HEAD-END-->/,
