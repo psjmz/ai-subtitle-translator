@@ -38,7 +38,7 @@ const PORT = Number(process.env.PORT) || 3000;
 /* v0.9.368：服务端注入的静态资源版本号（目前只有 seo-alt.js）。
    以前这类注入要么不带 ?v=、要么在字符串里手写版号 —— 升号时必漏。统一走这个常量，
    单测会校验它与 index.html 里的 ?v= 一致。 */
-const ASSET_VER = '0.9.411';
+const ASSET_VER = '0.9.412';
 
 /* ---------------- 配置 ---------------- */
 const DEFAULTS = {
@@ -293,7 +293,16 @@ function bumpRetry(ev, rt){
 const FAIL_FIELD = { trunc: 'failTrunc', json: 'failJson', net: 'failNet', other: 'failOther',
   /* v0.9.380：上游 200 但正文为空，单列一类 —— 此前它落进 other/json，
      与「JSON 畸形」「其它」混在一起，排查时看不出「模型压根没回话」。 */
-  empty: 'failEmpty' };
+  empty: 'failEmpty',
+  /* v0.9.412：缺组单列一类。此前它与「JSON 畸形」一起归 json —— 但两者处置完全不同：
+     json 是模型吐的格式坏了（换批大小/重发有效），missgroup 是格式正常、只是少给了几个组
+     （补译通道该接手）。10-29 排查 Sanctuary S02E01 时正是卡在这里：28 次重试，
+     账本只记了一条 failOther，看不出「整批所有 cue 都没对齐」这个最关键的特征。 */
+  missgroup: 'failMissGroup',
+  /* v0.9.412：排队超时（服务端 wait 预算耗尽，主动放弃）与用户停止。
+     前者此前靠前端 _failWhy='pace_giveup' 上报，白名单里没这个键 → 落 other；
+     后者从来就没有分类。两者都不是「模型失败」，混在 other 里会污染失败率。 */
+  pace_giveup: 'failPace', pace: 'failPace', stop: 'failStop' };
 function bumpFail(ev, why){
   /* 必须用 hasOwnProperty 而非直接取键：FAIL_FIELD['__proto__'] / ['constructor'] 会命中原型链
      返回 Object.prototype / Object 构造函数（均为 truthy），于是把计数写进 '[object Object]'
@@ -686,7 +695,11 @@ const GAP_FIELDS = ['gapTryN','gapFixN','gapGiveUpN','shortDropKeepN','lyricShor
   /* v0.9.406：dropSdhN = 被删的 SDH 画面/声音标注条数（[speaking in French] 这类）。
      单列一项是为了让 subDrop 恢复本意：subDrop 只数「有实义的对白被删」，
      标注行既不该进救援，也不该把告警数字撑大。 */
-  'dropSdhN'];
+  'dropSdhN',
+  /* v0.9.412：整批失败后「拆组补救」通道的账。rescueTryN/rescueFixN 是这条通道的请求数与
+     救回组数 —— 判它值不值只看这个比值；rescueDegradeN = 3 组一包降为单组发的次数；
+     rescueAbort=1 表示修复率过低、本任务后续批已不再拆组补救。 */
+  'rescueTryN','rescueFixN','rescueDegradeN','rescueAbort'];
 function gapFields(meta){
   const o = {};
   for (const k of GAP_FIELDS) {

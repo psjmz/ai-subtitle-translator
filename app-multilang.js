@@ -1952,7 +1952,7 @@ function parseWithRepair(str){
   const m2=/position (\d+)/.exec(String(e.message||''));
   const p=m2?Math.min(+m2[1],str.length):0;
   const ctx=p>0?(' · 出错处: '+str.slice(Math.max(0,p-40),p+60).replace(/\s+/g,' ')):'';
-  throw new Error(String(e.message||e)+' · 响应开头: '+str.slice(0,100).replace(/\s+/g,' ')+ctx);
+  throw failErr('json', String(e.message||e)+' · 响应开头: '+str.slice(0,100).replace(/\s+/g,' ')+ctx);
 }
 
 function parseLlmJson(raw){
@@ -1972,7 +1972,7 @@ function parseLlmJson(raw){
      术语表等 {synopsis,terms} 形态匹配不到，仍回落首 {（与旧行为一致）。 */
   const ga=s.search(/\{\s*"(?:groups|cues|c|lyric)"\s*:/);
   const a=(ga>=0?ga:s.indexOf('{')), b=s.lastIndexOf('}');
-  if (a<0||b<=a) throw new Error(t('errNotJson'));
+  if (a<0||b<=a) throw failErr('json', t('errNotJson'));
   const slice=s.slice(a,b+1);
   return parseWithRepair(slice);
 }
@@ -2264,9 +2264,9 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
              而不是把一整段 JSON 塞进「✗ 失败：HTTP 502 {"error":…}」。 */
           if(relay){
             let em=''; try{ const ej=JSON.parse(tx); em=(ej&&ej.error&&ej.error.message)||''; }catch(e){}
-            if(em) throw new Error(em.slice(0,200));
+            if(em) throw failErr('net', em.slice(0,200));
           }
-          throw new Error('HTTP '+r.status+' '+tx.slice(0,200));
+          throw failErr('net', 'HTTP '+r.status+' '+tx.slice(0,200));
         }
         const j=await r.json();
         /* v0.9.183：服务端算出来「额度不够，等 N 秒再来」。只有内置通道会有（直连没有服务端）。 */
@@ -2281,13 +2281,13 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
             _failWhy='pace_giveup';      /* v0.9.146 起的一次性标记：让后台能分辨「排队超时」而不是「上游返空」 */
             /* v0.9.186：再带一个稳定的机器标识，供下游「不再重试」的判定用。
                不能靠文案匹配（会随界面语言变），也不能靠 _failWhy（全局且一次性）。 */
-            const e9=new Error(t('pgGiveUp')); e9.paceGiveUp=true; throw e9;
+            const e9=new Error(t('pgGiveUp')); e9.paceGiveUp=true; e9.code='pace'; throw e9;
           }
           paceBudget -= psec*1000;
           pacing=true; pauseTimer();     /* 排队不吃模型调用的超时预算 */
           let why='';
           try{ why=await pgPace(psec); } finally { pacing=false; resumeTimer(); }
-          if(why==='stop') throw new Error(t('userStop'));   /* 排队期间点停止要立刻响应 */
+          if(why==='stop') throw failErr('stop', t('userStop'));   /* 排队期间点停止要立刻响应 */
           continue;
         }
         /* v0.9.183：累加本次消耗，供完成态展示。缓存命中两种字段名都要读：
@@ -2308,7 +2308,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
            此前回退完全静默，加上后台记账又记着 A 的名字，用户只能判定「分流没生效」。 */
         try{ if(builtin && j && j._fb){ log(t('fbRoute', String(j._fb.from||''), String(j._fb.to||''), String(j._fb.msg||'').slice(0,80)), 'warn'); } }catch(e){}
         let out=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-        if(!out) throw new Error(t('errEmpty'));
+        if(!out) throw emptyErr();
         /* v0.9.120：思考型模型（如 SiliconFlow 上的 Qwen3/GLM 系）在非流式响应里会把 <think>…</think>
            推理文本混进 content，思考文本中的 { 会把下游「首 { 到尾 }」的 JSON 提取切进思考段
            （实测表象：批 1 三连败 Expected ',' or '}' after property value）。出口统一剥掉；
@@ -2350,7 +2350,7 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
        换算成「等了多少秒 + 下一步该干什么」。仅限我们自己 timer 触发的 abort；
        用户点停止时抛的也是同一类错误，届时 S.stop 为真，文案同样成立。 */
     if(e && (e.name==='AbortError' || /aborted|signal is abort/i.test(String(e.message||e)))){
-      throw new Error(t('errTimeout', Math.round(ms/1000)));
+      throw failErr('net', t('errTimeout', Math.round(ms/1000)));
     }
     throw e;
   } finally { clearTimeout(timer); clearTimeout(hbT); clearTimeout(hbZ); if(hbI) clearInterval(hbI); }
@@ -2419,8 +2419,34 @@ function describeCueErrs(errs, zh){
    _failWhy 为一次性标记（声明在 LAST_FINISH 旁）：随补救通道的第一个请求上报后立即清除，
    绝不残留到后续请求。
    判据：LAST_FINISH==='length' 是服务端回填的确切截断信号，优先于错误消息文本（后者随界面语言变化）。 */
+/* v0.9.412：给错误挂机器码。上报的分类只认 code，不再猜文案。 */
+function failErr(code, msg){
+  const e = new Error(msg);
+  e.code = code;
+  return e;
+}
+/* v0.9.412：空正文（上游 200 但 choices 里没内容）。主翻译页 v0.9.380 就单列了这一类，
+   这里一直只是普通 Error → 落进 other，多语页的「上游返空」在账本里长期看不见。一并补齐。 */
+function emptyErr(){ const e0=new Error(t('errEmpty')); e0._empty=1; e0.code='empty'; return e0; }
+/* v0.9.412：失败原因必须认机器码，不能认文案。
+   旧版 failWhyOf 拿**本地化后的界面文案**去匹配 /JSON|组/ —— 界面不是中文时（27 语任一种）
+   errMissGroup 全落进 other，后台只能看到「28 次重试、原因 unknown」。
+   10-29 排查 Sanctuary S02E01（935 条 / 28 次重试）时实证：账本里唯一那条 failOther
+   就是缺组，只因中文文案「缺少句组 N 的结果」里凑巧有个「组」字才没被彻底丢掉。
+   现在所有可预期的失败点都挂 code，分类只读 code；文案匹配降级为无 code 时的兜底。
+   顺带补上 v0.9.380 的 empty 分类 —— 那版只改了主翻译页，这里漏了（同一个「只改一半」毛病）。 */
+const FAIL_CODE = { trunc: 'trunc', nogroups: 'json', missgroup: 'missgroup',
+                    empty: 'empty', net: 'net', pace: 'pace', stop: 'stop' };
 function failWhyOf(msg){
-  const s = String(msg == null ? '' : msg);
+  const s = String(msg == null ? '' : String(msg && msg.message != null ? msg.message : msg));
+  const code = String((msg && (msg.code || msg.failCode)) || '');
+  if (code && Object.prototype.hasOwnProperty.call(FAIL_CODE, code)) {
+    /* 截断有独立判据：code 说 json 但输出真被截了，以截断为准（两者都要能区分） */
+    if (code !== 'trunc' && LAST_FINISH === 'length') return 'trunc';
+    return FAIL_CODE[code];
+  }
+  /* —— 以下为无 code 的老路径兜底（未改造的调用点、第三方错误）—— */
+  if ((msg && msg._empty) || /upstream_empty/.test(s)) return 'empty';
   if (LAST_FINISH === 'length') return 'trunc';
   if (/HTTP\s*(5\d\d|429)/.test(s) || /Failed to fetch|NetworkError|ETIMEDOUT|timeout/i.test(s)) return 'net';
   if (/JSON|Unexpected|errNoGroups|errNoGno|组/i.test(s)) return 'json';
@@ -2588,10 +2614,10 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     /* v0.9.125：输出被长度上限截断（finish_reason='length'）→ 内容必然不完整。
        此前这种情况会落到容错修复里「整形成功但丢句组」，表现为随机位置的 JSON 语法错 / 缺少句组 N，
        看起来像模型不行，实际是我们没发 max_tokens。这里直接报出确切原因。 */
-    if(LAST_FINISH==='length') throw new Error(t('errTruncOut'));
+    if(LAST_FINISH==='length') throw failErr('trunc', t('errTruncOut'));
     obj=parseLlmJson(raw);
   }
-  if(!obj) throw new Error(t('errNoGroups'));
+  if(!obj) throw failErr('nogroups', t('errNoGroups'));
   /* v0.9.127 的纯翻译模型通道（Hunyuan-MT 系列）返回的是组级 [{gno,text}]，与平铺协议无关：
      整组一个 text，由 backfillGroup 按时长切分回填。这里单独收下，其余一律走平铺重建。 */
   const pmMap = {};
@@ -2600,7 +2626,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
   });
   const cMap = flatCueMap(obj);
   const lyMap = flatLyricMap(obj);
-  if(!pureMT && send.length && !Object.keys(cMap).length && !Object.keys(lyMap).length) throw new Error(t('errNoGroups'));
+  if(!pureMT && send.length && !Object.keys(cMap).length && !Object.keys(lyMap).length) throw failErr('nogroups', t('errNoGroups'));
   /* fillers：模型判定整条纯水词的 cue 编号（过滤掉不存在的编号）。
      v0.9.379：从 4351 行提到这里——必须在 buildByGno / gapSet 之前算出来。
      「译文为空」在协议里有两种完全相反的合法含义：
@@ -2727,7 +2753,7 @@ async function translateBatch(base,key,model,groups,batchNo,totalBatch,sys,feedb
     }catch(e){ /* 补译失败：保持 missing 原样，走下面抛错 */ }
   }
   // 校验齐全：每个输入 cue 必须有结果（v0.9.45：只校验真正发给模型的 send 集）
-  if(missing.length){ S.gapGiveUpN=(S.gapGiveUpN||0)+1; throw new Error(t('errMissGroup',missing[0].gno)); }
+  if(missing.length){ S.gapGiveUpN=(S.gapGiveUpN||0)+1; throw failErr('missgroup', t('errMissGroup',missing[0].gno)); }
   // 语言锚定校验：收集文种不符的句组（防模型整批跑偏成中文/其他语言），由外层决定重试或接受
   const dstV = $('dstLang').value;
   /* v0.9.387：语言跑偏检测已移除，badAnchor 只剩「歌词缺词」这一类。
@@ -2966,7 +2992,7 @@ async function compressBatch(base,key,model,items,dstLang){
     {role:'user',content:userMsg}
   ],undefined,undefined,{json:1});
   const obj=parseLlmJson(raw);
-  if(!obj||!Array.isArray(obj.groups)) throw new Error(t('errNoGroups'));
+  if(!obj||!Array.isArray(obj.groups)) throw failErr('nogroups', t('errNoGroups'));
   const byGno={};
   obj.groups.forEach(x=>{ if(x&&x.gno!=null) byGno[x.gno]={ text:(x.text!=null?x.text:x.zh) }; });
   return byGno;
