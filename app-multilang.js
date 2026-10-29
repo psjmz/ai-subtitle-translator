@@ -400,6 +400,11 @@ const S = {
   dropRescueTryN: 0, dropRescueFixN: 0, dropSkipN: 0, dropRescueFail: 0, dropRescueOff: 0, dropSkipLogged: 0,
   dropSdhN: 0,
   dropTried: null,
+  /* v0.9.413：整批失败后「拆组补救」通道的账（与主翻译页 v0.9.412 同名同义）。
+     rescueTryN 是发出的补救请求数（失败也算，钱花了就要计），rescueFixN 是救回的组数，
+     两者相除就是这条通道的修复率；rescueDegradeN 记录「3 组一包 → 单组」降级几次，
+     rescueAbort=1 表示已按修复率止损。 */
+  rescueTryN: 0, rescueFixN: 0, rescueDegradeN: 0, rescueAbort: 0,
 };
 
 /* ---------------- 工具函数 ---------------- */
@@ -2135,6 +2140,11 @@ let LAST_FINISH='';   // v0.9.125：上一次 chatOnce 拿到 finish_reason（'l
 /* v0.9.146：整批失败原因的一次性上报标记。声明必须在 chatOnce（下方 6674 处读取它）之前，
    否则若将来有人在脚本求值阶段就触发请求，let 的暂时性死区会直接抛 ReferenceError。 */
 let _failWhy = null;
+/* v0.9.413：补救通道（rt=4）专属的失败原因（主翻译页 v0.9.380 就有的东西，多语页一直缺）。
+   全局那个 _failWhy 会被并发的 cue 重译请求先一步吃掉（mkBody 里谁先发谁消费），
+   10-25 实测主翻译页 367 次补救只记到 7 条原因。补救标记单独一份、只让 rt=4 的请求消费，
+   条数才对得上「失败了几批」。 */
+let _failWhy4 = null;
 /* v0.9.185：单个请求的排队总预算（毫秒）。此前是「最多排 8 轮」，而服务端每轮最多让等 60 秒
    → 一批最多干等 480 秒，等于原地打转；而且耗尽后会掉进 errEmpty，
    埋点把「排队超时」记成「上游返回空」，统计口径全错。改成按秒计的预算，耗尽抛独立错误。 */
@@ -2221,8 +2231,9 @@ async function chatOnce(base,key,model,msgs,timeoutMs,rt,opts){
         /* v0.9.183：pace=1 = 告诉服务端「我认得 {wait:N} 这种回执」。旧服务端不认识这个字段，
       直接忽略，行为不变；反过来，服务端也只对带这个标记的请求才可能返回 wait——
       否则旧版本的前端收到一个没有 choices 的响应，会当成「上游返回空」去走降级重试。 */
-      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
+      const meta=Object.assign({pace:1}, rt?{rt:rt}:{}, qTok?{q:qTok}:{}, S.trMeta||{}, _failWhy?{fwhy:_failWhy}:{}, (rt===4&&_failWhy4)?{fwhy:_failWhy4}:{}, (opts&&opts.json&&plan.rf)?{json:1}:{});
         _failWhy=null; /* v0.9.146：一次性标记，随本次请求上报后立即清除 */
+        if(rt===4) _failWhy4=null; /* v0.9.413：补救标记只让补救请求消费 */
         return {messages:msgs,temperature:0.2,stream:false,meta:Object.keys(meta).length?meta:undefined};
       }
       const rf=(plan.rf&&!userHasRf)?jsonFormatParam(base,model,opts):{};
@@ -2459,6 +2470,12 @@ function failWhyOf(msg){
    留足余量；15 次是让比值有统计意义的最小样本（低于它宁可不动手）。 */
 const GAP_TRY_MIN = 15;    /* 累计补译尝试达到这么多次才开始评估 */
 const GAP_EFF = 0.15;      /* 修复率低于此值 → 判定补译对本任务无效 */
+/* v0.9.413：整批失败后「拆组补救」通道的止损（与主翻译页 v0.9.412 同形同阈值）。
+   同样存在「每块都有点收获、整批永远不完整」的形态 —— 这正是指标全绿而任务空转的根源
+   （v0.9.383 的原话：每批都有部分组成功，正是这一点让熔断永远不触发）。
+   12 次是让比值有统计意义的下限：单块最多 2 轮，12 次大约覆盖 4~6 个块。 */
+const RESCUE_TRY_MIN = 12; /* 累计补救请求达到这么多次才开始评估 */
+const RESCUE_EFF = 0.15;   /* 修复率低于此值 → 判定补救对本任务无效，后续批不再拆组 */
 /* v0.9.406：SDH 画面/声音标注行（[speaking in French] / [door creaks open] / (laughs)）。
    它们不是对白，模型判「不用翻译」并删除属于正确判断——不该进救援（白付一次请求），
    也不该算进 subDrop 告警（那个数原意是「有实义的对白被删」，被这类标注撑大后就不准了）。
@@ -3318,7 +3335,7 @@ function reportEvent(ev, extra, fmt, meta, scope){
     /* v0.9.148：捎带丢行归因——dropLocal（本地：水词组+歌词删除）/ dropAiFiller（模型声明水词）/
        dropAiDrop（模型显式 drop）。与既有 dropN·subDrop 同为纯统计，服务端只在 finish 时读取。 */
     /* v0.9.151：再捎带 cue 结构错的类型分布（cueEmpty/cueMissing/…），与丢行归因同为 finish 时读取 */
-    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',scope:scope||'',taskId:m.taskId||'',src:m.src||'',pg:'multilang',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,dropRescueTryN:S.dropRescueTryN||0,dropRescueFixN:S.dropRescueFixN||0,dropSkipN:S.dropSkipN||0,dropRescueOff:S.dropRescueOff||0,dropSdhN:S.dropSdhN||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
+    const body=JSON.stringify({file:m.file,lang:m.lang,model:m.model,ev,msg:extra?String(extra).slice(0,200):'',fmt:fmt||'',scope:scope||'',taskId:m.taskId||'',src:m.src||'',pg:'multilang',dropN:S.dropN||0,subDrop:S.subDrop||0,dropLocal:S.dropLocal||0,dropAiFiller:S.dropAiFiller||0,dropAiDrop:S.dropAiDrop||0,cueEmpty:S.cueEmpty||0,cueMissing:S.cueMissing||0,cueDup:S.cueDup||0,cueUnknown:S.cueUnknown||0,cueBadEntry:S.cueBadEntry||0,cueNoArr:S.cueNoArr||0,cueOther:S.cueOther||0,cueRetryN:S.cueRetryN||0,cueRetryFix:S.cueRetryFix||0,gapTryN:S.gapTryN||0,gapFixN:S.gapFixN||0,gapGiveUpN:S.gapGiveUpN||0,gapAbortN:S.gapAbort||0,gapCoverN:S.gapCoverN||0,missN:(S.rows||[]).filter(function(r){return r&&r.flag==='missing';}).length,shortDropKeepN:S.shortDropKeepN||0,lyricShortN:S.lyricShortN||0,dropRescueTryN:S.dropRescueTryN||0,dropRescueFixN:S.dropRescueFixN||0,dropSkipN:S.dropSkipN||0,dropRescueOff:S.dropRescueOff||0,dropSdhN:S.dropSdhN||0,rescueTryN:S.rescueTryN||0,rescueFixN:S.rescueFixN||0,rescueDegradeN:S.rescueDegradeN||0,rescueAbort:S.rescueAbort||0,thinN:S.thinN||0,stopped:(ev==='finish'&&S.stop)?1:0,
       /* v0.9.375：编号级样本只在 finish 带一次 */
       cueSample:(ev==='finish'&&S.cueSamples&&S.cueSamples.length)?S.cueSamples:undefined});
     // v0.9.80：失败上报时页面可能正被关闭/刷新，优先 sendBeacon（卸载后仍可发出），不支持再回退 fetch
@@ -3521,7 +3538,7 @@ async function runTranslate(){
      实际这些值一个都不会被使用（切模式不清空输入框，值一直留着）。此前零提示。
      ⚠️ 必须在 clearLog 之后才写，否则会被同一轮的开场清屏擦掉。 */
   if(cfg.mode!=='api' && cfg.base && cfg.key && cfg.model) log(t('modeMismatch', cfg.base),'err');
-  S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0; S.locale=cfg.dst;
+  S.translating=true; S.stop=false; S.modelDead=false; S.paceOut=false; S.dropN=0; S.mergeN=0; S.mergedN=0; S.wrapN=0; S.dropLocal=0; S.dropAiFiller=0; S.dropAiDrop=0; S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0; S.rescueTryN=0; S.rescueFixN=0; S.rescueDegradeN=0; S.rescueAbort=0; S.locale=cfg.dst;   // v0.9.413：drop 救援账 + 拆组补救账随任务重置
   /* v0.9.151：cue 结构错类型计数随任务重置（与丢行归因同一口径，跨任务不累加） */
   S.cueEmpty=0; S.cueMissing=0; S.cueDup=0; S.cueUnknown=0; S.cueBadEntry=0; S.cueNoArr=0; S.cueOther=0;
   S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：编号样本与重试修复率随任务重置
@@ -3943,47 +3960,89 @@ async function runTranslate(){
           }
         }
       }
-      // v0.9.29：批次重试全败 → 拆单组逐个补救（Apple Fold 评测实证：fa 语言批 8 三连败导致 3 句组 missing，
-      // 同批其他句组本身无问题，隔离单组重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
-      if(!ok && !S.stop){
-        let saved=0, consecFail=0, drifted=[];
-        /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留） */
-        _failWhy = lastWhy || null;
-        for(const g1 of gBatch){
+      // v0.9.29：批次重试全败 → 拆成小组单独补救（Apple Fold 评测实证：fa 语言批 8 三连败导致 3 句组 missing，
+      // 同批其他句组本身无问题，隔离重发通常可救回；救不回的仍按 missing 标记，绝不当 drop）
+      if(!ok && !S.stop && !S.rescueAbort){
+        let consecFail=0, drifted=[];
+        /* v0.9.146：整批失败原因随本通道第一个请求一次性上报（每批重设，避免残留）
+           v0.9.380：改用补救专属标记 _failWhy4 —— 全局那个会被并发的 cue 重译请求先一步吃掉。 */
+        _failWhy4 = lastWhy || null;
+        /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
+           此前会连同这些组一起补救，白白多烧请求（语义与上方 v0.9.77「整批已有结果则跳过」一致）。 */
+        const pend = gBatch.filter(g=>!res.has(g.gno));
+        /* v0.9.380：一组一请求 → ≤3 组一请求。此前一批 9 组就是 9 次请求，上游返空时整片能刷出
+           74 次补救，全部打在同一条不出货的链路上；而请求越小越容易成功，3 组一批正好兼顾。
+           （v0.9.377 已给 cue 重译做过同样的切批，这条补救通道当时没跟上。） */
+        /* v0.9.412：块大小自适应。3 组一包的前提是「块里多数组都救得回」——
+           10-29 排查 Sanctuary S02E01（935 条 / 28 次重试 / 5 个批整批失败）看到反面：
+           只要块里有一组是模型吐不出来的，整块就得再发一轮，健康的另外两组纯陪绑。
+           故任何一个块**零收获**就立刻降到单组发：请求更小、命中率更高，也不再连累别的组。
+           只降不升 —— 块大小来回抖动会让请求数变得不可预测。 */
+        let RC = 3;
+        for(let ci=0; ci<pend.length; ){
           if(S.stop) break;
-          /* v0.9.146：已有结果的组不再重发——断点恢复时本批可能部分组已完成，
-             此前会连同这些组一起逐组补救，白白多烧请求。纯统计外的唯一行为改动，
-             语义与上方「整批已有结果则跳过」（v0.9.77）一致。 */
-          if(res.has(g1.gno)){ saved++; continue; }
+          const chunk = pend.slice(ci, ci+RC);
           let got1=false;
           // v0.9.58：补救通道同样过语言锚定——跑偏结果不再静默溜过；第 1 次跑偏 → 第 2 次带
           // 纠错反馈重译（与主通道 v0.9.57 同武器）；第 2 次仍跑偏 → 与主通道 anchorKeep 同策略带病接受
           let badTexts=[];
-          for(let a=0;a<2 && !got1;a++){
+          /* v0.9.381：RC=3（≤3 组一请求）是 380 改的，但退出条件仍是 `some` + `!got1`——
+             3 组里只要有 1 组成功就整块收工，另 2 组再也不重试，等于白送，且不报错、日志上看不出来。
+             改成与 5518 行分类重译同形的 todo 模式：每轮只重发本 chunk 里还没救回的组。
+             顺带接住「部分成功」：第 1 次跑偏的组单独留给第 2 次带反馈重译，已经成功的不再重发
+             （原来 `continue` 会把成功的一起丢掉，等于拿一遍重试换一遍重算）。 */
+          for(let a=0;a<2;a++){
+            const todo=chunk.filter(g=>!res.has(g.gno));
+            if(!todo.length) break;
             try{
+              S.rescueTryN=(S.rescueTryN||0)+1;   /* v0.9.412：补救请求数，供任务级止损算修复率。失败也算 —— 钱已经花了 */
               lastCall=Date.now();
-              const fbArr=(a>0&&badTexts.length)?badTexts.map(x=>({gno:g1.gno,text:x})):null;
+              const fbArr=(a>0&&badTexts.length)?badTexts:null;
               /* v0.9.146：rt 由 2 改 4——这是「整批请求失败后的逐组补救」，不是语言跑偏。
                  此前混用 rt=2，统计把网络/截断造成的补救全算进 retryAnchor，排查方向被带偏。 */
-              const o2=await translateBatch(effBase,effKey,effModel,[g1],bi+1,totalB,sysB,fbArr,ctx,4);
-              if((o2.badAnchor||[]).includes(g1.gno)){
-                const bt=String((o2.byGno[g1.gno]||{}).text||'').trim();
-                if(bt && !badTexts.includes(bt)) badTexts.push(bt);
-                if(a===0){ await new Promise(r=>setTimeout(r,1200)); continue; }
-                drifted.push(g1.gno);
+              const o2=await translateBatch(effBase,effKey,effModel,todo,bi+1,totalB,sysB,fbArr,ctx,4);
+              const bad=(o2.badAnchor||[]).filter(gno=>todo.some(g=>g.gno===gno));
+              if(bad.length){
+                bad.forEach(gno=>{
+                  const bt=String((o2.byGno[gno]||{}).text||'').trim();
+                  if(bt && !badTexts.some(x=>x.text===bt)) badTexts.push({gno:gno,text:bt});
+                });
+                if(a>0) drifted.push(...bad);   // 第 1 次跑偏不记账：留给下一轮带反馈重译
               }
-              Object.keys(o2.byGno).forEach(k=>res.set(Number(k), o2.byGno[k]));
+              Object.keys(o2.byGno).forEach(k=>{
+                const no=Number(k);
+                if(a===0 && bad.indexOf(no)>=0) return;  // 跑偏的不落地，下一轮重来
+                res.set(no, o2.byGno[k]);
+              });
               o2.fillers.forEach(no=>fillerSet.add(no));
-              saved++; got1=true;
-            }catch(e2){ await new Promise(r=>setTimeout(r,1200)); }
+              if(chunk.some(g=>res.has(g.gno))) got1=true;
+            }catch(e2){ /* 下一轮前统一退避 */ }
+            if(a===0 && chunk.some(g=>!res.has(g.gno))) await new Promise(r=>setTimeout(r,1200));
           }
-          // v0.9.56 熔断：连续 3 组补救全败 → 判定模型无响应，立即停止整片翻译
-          //（否则 24 组 × 2 次空转，最坏几十分钟才轮到下一批重复同样的失败）
-          if(!got1){ if(++consecFail>=3){ S.modelDead=true; S.stop=true; break; } }
+          // v0.9.56 熔断：连续 3 批补救全败 → 判定模型无响应，立即停止整片翻译
+          //（否则整片每批都空转一轮，最坏几十分钟才轮到下一批重复同样的失败）
+          /* v0.9.412：单组模式下阈值放宽到 6。3 组一包连败 3 次 = 9 个组都没救回来，
+             足以判定模型死了；而单组发本来就是「一组一命」，连败 3 次只说明这 3 组内容有毒，
+             同一批里后面的组未必不行 —— 拿 3 就停会误杀整片翻译。 */
+          if(!got1){ if(++consecFail>=(RC===1?6:3)){ S.modelDead=true; S.stop=true; break; } }
           else consecFail=0;
+          /* v0.9.412：本块救回几个组 —— 任务级止损的分母/分子（一个组可能占两轮请求） */
+          S.rescueFixN=(S.rescueFixN||0) + chunk.filter(g=>res.has(g.gno)).length;
+          ci += chunk.length;
+          if(!got1 && RC>1){ RC=1; S.rescueDegradeN=(S.rescueDegradeN||0)+1; }
         }
+        const saved = gBatch.filter(g=>res.has(g.gno)).length;
         if(drifted.length) log(t('anchorKeep', drifted.slice(0,5).join(',')+(drifted.length>5?'…':''), LBY(cfg.dst).zh),'err');
         log(t('batchRescue',bi+1,saved,gBatch.length), saved===gBatch.length?'okc':'err');
+        /* v0.9.412：补救通道的任务级止损。与 v0.9.383 的补译止损同形 ——
+           那一版治的是「补译 172 次只中 3 条」，这里是同一个病在补救通道上的表现：
+           每个块都有点收获，`saved>0` 恒成立，consecFail / deadStreak 两个熔断永远不触发。
+           到阈值就关掉后续批的拆组补救，剩余组按 missing 走正常兜底，不再白烧请求。
+           注意不停任务（不设 S.stop）：补救没了，主通道翻得动的部分照常翻完。 */
+        if(!S.rescueAbort && (S.rescueTryN||0) >= RESCUE_TRY_MIN
+           && (S.rescueFixN||0) < (S.rescueTryN||0)*RESCUE_EFF){
+          S.rescueAbort = 1;
+        }
         // v0.9.56：首批即全军覆没，或连续 2 批零成功 → 模型不工作，停止并弹窗（小批次凑不满 3 连败走此兜底）
         if(!S.stop && saved===0){
           deadStreak++;
@@ -6235,7 +6294,7 @@ function setSrc(text, fileName){
   S.dropN=S.mergeN=S.mergedN=S.wrapN=0; S.dropLocal=S.dropAiFiller=S.dropAiDrop=0;
   S.cueEmpty=S.cueMissing=S.cueDup=S.cueUnknown=S.cueBadEntry=S.cueNoArr=S.cueOther=0;
   S.cueSamples=[]; S.cueRetryN=0; S.cueRetryFix=0; S.gapTryN=0; S.gapFixN=0; S.gapGiveUpN=0; S.gapAbort=0; S.gapCoverN=0; S.shortDropKeepN=0; S.lyricShortN=0; S.thinN=0; S.thinSamples=[];   // v0.9.375：换片即清
-  S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0;   // v0.9.406：换片清掉落救援计数
+  S.dropRescueTryN=0; S.dropRescueFixN=0; S.dropSkipN=0; S.dropRescueFail=0; S.dropRescueOff=0; S.dropSkipLogged=0; S.dropTried=null; S.dropSdhN=0; S.rescueTryN=0; S.rescueFixN=0; S.rescueDegradeN=0; S.rescueAbort=0;   // v0.9.406：换片清掉落救援计数 / v0.9.413：连带补救通道计数
   if(fileName){
     S.fileBase=fileName.replace(/\.(srt|vtt|ass|ssa|txt)$/i,'');
   }
